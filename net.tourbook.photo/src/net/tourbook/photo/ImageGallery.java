@@ -894,7 +894,7 @@ public abstract class ImageGallery implements IItemListener, IGalleryContextMenu
 				if (width == Integer.MIN_VALUE || height == Integer.MIN_VALUE) {
 					cell.setText(UI.EMPTY_STRING);
 				} else {
-					cell.setText(Integer.toString(width) + " x " + Integer.toString(height));
+					cell.setText(Integer.toString(width) + UI.DIMENSION + Integer.toString(height));
 				}
 			}
 		});

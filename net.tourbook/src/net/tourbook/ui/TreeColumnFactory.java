@@ -558,7 +558,7 @@ public abstract class TreeColumnFactory {
 			
 			colDef.setColumnLabel(Messages.ColumnFactory_NumberOfPhotos_Label);
 			colDef.setColumnHeader(Messages.ColumnFactory_NumberOfPhotos_Header);
-			colDef.setColumnToolTipText(Messages.ColumnFactory_NumberOfPhotos2_Tooltip);
+			colDef.setColumnToolTipText(Messages.ColumnFactory_NumberOfPhotos_Tooltip);
 			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(8));
 			
 			return colDef;

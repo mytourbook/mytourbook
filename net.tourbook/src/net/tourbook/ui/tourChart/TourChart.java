@@ -2212,7 +2212,7 @@ public class TourChart extends Chart {
 
 		if (isShowPhotos && isShowTooltip) {
 
-			toolTip = Messages.Tour_Action_TourPhotosWithTooltip;
+			toolTip = Messages.Tour_Action_TourPhotosWithTooltip_Tooltip;
 			imageDescriptor = _imagePhotoTooltip;
 
 		} else if (!isShowPhotos && !isShowTooltip) {
@@ -2222,7 +2222,7 @@ public class TourChart extends Chart {
 
 		} else {
 
-			toolTip = Messages.Tour_Action_TourPhotosWithoutTooltip;
+			toolTip = Messages.Tour_Action_TourPhotosWithoutTooltip_Tooltip;
 			imageDescriptor = _imagePhoto;
 		}
 

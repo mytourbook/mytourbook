@@ -278,7 +278,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 	private ActionSaveDefaultPosition				_actionSaveDefaultPosition;
 	private ActionSelectMapProvider					_actionSelectMapProvider;
 	private ActionSetDefaultPosition				_actionSetDefaultPosition;
-	private ActionShowAllPhotos						_actionShowAllPhotos;
+	private ActionShowAllFilteredPhotos				_actionShowAllFilteredPhotos;
 	private ActionShowLegendInMap					_actionShowLegendInMap;
 	private ActionShowPhotos						_actionShowPhotos;
 	private ActionShowPOI							_actionShowPOI;
@@ -964,7 +964,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 
 		_actionPhotoFilter = new ActionPhotoProperties(this, parent, _state);
 		_actionShowPhotos = new ActionShowPhotos(this);
-		_actionShowAllPhotos = new ActionShowAllPhotos(this);
+		_actionShowAllFilteredPhotos = new ActionShowAllFilteredPhotos(this);
 		_actionShowSliderInMap = new ActionShowSliderInMap(this);
 		_actionShowSliderInLegend = new ActionShowSliderInLegend(this);
 		_actionShowLegendInMap = new ActionShowLegendInMap(this);
@@ -1550,7 +1550,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 		 * photo actions
 		 */
 		_actionPhotoFilter.setEnabled(isAllPhotoAvailable && _isShowPhoto);
-		_actionShowAllPhotos.setEnabled(canShowFilteredPhoto);
+		_actionShowAllFilteredPhotos.setEnabled(canShowFilteredPhoto);
 		_actionShowPhotos.setEnabled(isAllPhotoAvailable);
 		_actionSynchWithPhoto.setEnabled(canShowFilteredPhoto);
 
@@ -1634,7 +1634,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 
 		viewTbm.add(_actionPhotoFilter);
 		viewTbm.add(_actionShowPhotos);
-		viewTbm.add(_actionShowAllPhotos);
+		viewTbm.add(_actionShowAllFilteredPhotos);
 		viewTbm.add(_actionSynchWithPhoto);
 		viewTbm.add(new Separator());
 

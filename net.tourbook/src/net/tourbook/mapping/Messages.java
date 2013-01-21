@@ -27,21 +27,13 @@ public class Messages extends NLS {
 	public static String		graph_label_heartbeat_unit;
 
 	public static String		Image__PulseZones;
-
 	public static String		Image__PulseZones_Disabled;
 
-	public static String	Image_Action_Map_SyncPhotoWithMap;
-
-	public static String	Image_Action_Map_SyncPhotoWithMap_Disabled;
-
-	public static String	Image_Action_PhotoFilter;
-
-	public static String	Image_Action_PhotoFilter_Disabled;
-
+	public static String		Image_Action_Map_SyncPhotoWithMap;
+	public static String		Image_Action_Map_SyncPhotoWithMap_Disabled;
 	public static String		Image_Action_POI;
 	public static String		Image_Action_POI_Disabled;
-	public static String	Image_Action_ShowAllPhotosInMap;
-
+	public static String		Image_Action_ShowAllPhotosInMap;
 	public static String		Image_Action_ShowPhotosInMap;
 	public static String		Image_Action_ShowSliderInMap;
 	public static String		Image_Action_ShowStartEndInMap;
@@ -114,19 +106,15 @@ public class Messages extends NLS {
 	public static String		map_action_set_default_position;
 
 	public static String		Map_Action_ManageMapProviders;
-	public static String	Map_Action_PhotoFilter_Tooltip;
-
+	public static String		Map_Action_PhotoFilter_Tooltip;
 	public static String		Map_Action_POI;
 	public static String		Map_Action_POI_Tooltip;
 	public static String		Map_Action_SetDefaultMapProviders;
-	public static String	Map_Action_ShowAllPhotos_Tooltip;
-
-	public static String	Map_Action_ShowPhotos_Tooltip;
-
+	public static String		Map_Action_ShowAllFilteredPhotos_Tooltip;
+	public static String		Map_Action_ShowPhotos_Tooltip;
 	public static String		Map_Action_ShowTourInfoInMap;
 	public static String		Map_Action_ShowWayPoints;
-
-	public static String	Map_Action_SyncPhotoWithMap_Tooltip;
+	public static String		Map_Action_SyncPhotoWithMap_Tooltip;
 	public static String		Map_Action_ToggleMarker;
 
 	public static String		Map_Properties_ShowTileBorder;
@@ -176,9 +164,9 @@ public class Messages extends NLS {
 
 	public static String		Tour_Action_ShowHrZones_Tooltip;
 
-	public static String	Tour_Data_LoadTourData_Monitor;
+	public static String		Tour_Data_LoadTourData_Monitor;
 
-	public static String	Tour_Data_LoadTourData_Monitor_SubTask;
+	public static String		Tour_Data_LoadTourData_Monitor_SubTask;
 
 	static {
 		// initialize resource bundle

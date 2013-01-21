@@ -32,11 +32,11 @@ public class PhotoPropertiesEvent {
 
 	@Override
 	public String toString() {
-		return "PhotoPropertiesEvent [ratingStars="
+		return "PhotoPropertiesEvent [ratingStars=" //$NON-NLS-1$
 				+ filterRatingStars
-				+ "{)}, ratingStarOperator="
+				+ "{)}, ratingStarOperator=" //$NON-NLS-1$
 				+ fiterRatingStarOperator
-				+ "]";
+				+ "]"; //$NON-NLS-1$
 	}
 
 }

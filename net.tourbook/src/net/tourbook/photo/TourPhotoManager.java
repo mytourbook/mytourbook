@@ -140,6 +140,61 @@ public class TourPhotoManager implements IPhotoServiceProvider {
 		return _instance;
 	}
 
+	public static TourPhotoLinkView openLinkView() {
+
+		final IWorkbench wb = PlatformUI.getWorkbench();
+		final IWorkbenchWindow wbWindow = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+		TourPhotoLinkView linkView = null;
+
+		if (wbWindow != null) {
+			try {
+
+				final IWorkbenchPage activePage = wbWindow.getActivePage();
+
+				final IViewPart linkViewPart = activePage.findView(TourPhotoLinkView.ID);
+
+				if (linkViewPart instanceof TourPhotoLinkView) {
+
+					// link view is available in the current perspective
+
+					linkView = (TourPhotoLinkView) linkViewPart;
+
+				} else {
+
+					final String currentPerspectiveId = activePage.getPerspective().getId();
+
+					if (currentPerspectiveId.equals(TourPhotoLinkView.ID)) {
+
+						// open link view in current perspective
+
+					} else {
+
+						// open link perspective
+
+						wb.showPerspective(PerspectiveFactoryPhoto.PERSPECTIVE_ID, wbWindow);
+					}
+
+					linkView = (TourPhotoLinkView) Util.showView(TourPhotoLinkView.ID, false);
+				}
+
+				if (linkView != null) {
+
+					// show view but do not make it active
+					if (activePage.isPartVisible(linkViewPart) == false) {
+						activePage.showView(TourPhotoLinkView.ID, null, IWorkbenchPage.VIEW_VISIBLE);
+					}
+				}
+
+			} catch (final PartInitException e) {
+				StatusUtil.showStatus(e);
+			} catch (final WorkbenchException e) {
+				StatusUtil.showStatus(e);
+			}
+		}
+
+		return linkView;
+	}
+
 	public static void restoreState() {
 
 		// ensure photo service provider is set in the photo
@@ -644,57 +699,10 @@ public class TourPhotoManager implements IPhotoServiceProvider {
 
 	void linkPhotosWithTours(final PhotosWithExifSelection selectedPhotosWithExif) {
 
-		final IWorkbench wb = PlatformUI.getWorkbench();
-		final IWorkbenchWindow wbWindow = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+		final TourPhotoLinkView linkView = openLinkView();
 
-		if (wbWindow != null) {
-			try {
-
-				TourPhotoLinkView linkView = null;
-
-				final IWorkbenchPage activePage = wbWindow.getActivePage();
-
-				final IViewPart linkViewPart = activePage.findView(TourPhotoLinkView.ID);
-
-				if (linkViewPart instanceof TourPhotoLinkView) {
-
-					// link view is available in the current perspective
-
-					linkView = (TourPhotoLinkView) linkViewPart;
-
-				} else {
-
-					final String currentPerspectiveId = activePage.getPerspective().getId();
-
-					if (currentPerspectiveId.equals(TourPhotoLinkView.ID)) {
-
-						// open link view in current perspective
-
-					} else {
-
-						// open link perspective
-
-						wb.showPerspective(PerspectiveFactoryPhoto.PERSPECTIVE_ID, wbWindow);
-					}
-
-					linkView = (TourPhotoLinkView) Util.showView(TourPhotoLinkView.ID, false);
-				}
-
-				if (linkView != null) {
-
-					// show view but do not make it active
-					if (activePage.isPartVisible(linkViewPart) == false) {
-						activePage.showView(TourPhotoLinkView.ID, null, IWorkbenchPage.VIEW_VISIBLE);
-					}
-
-					linkView.showPhotosAndTours(selectedPhotosWithExif.photos);
-				}
-
-			} catch (final PartInitException e) {
-				StatusUtil.showStatus(e);
-			} catch (final WorkbenchException e) {
-				StatusUtil.showStatus(e);
-			}
+		if (linkView != null) {
+			linkView.showPhotosAndTours(selectedPhotosWithExif.photos);
 		}
 	}
 

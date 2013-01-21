@@ -1,6 +1,12 @@
 Version: 13.??.0                                           ?. ??? 2013 
 
 
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+I'm not sure if the photo workflow is too much complicated because there are so many features which can be set wrong and photos are not displayed, like a filter was activated and hides tour/photo but I tried to implement only helpful features to manage tours with photos.
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 Detected Problems:
 
 * photo gallery in the tour marker dialog box it not correctly initialized, state is not set
@@ -32,6 +38,8 @@ Tour Map view
 * filter photos by rating stars
 
 * set photo image size
+
+* Problem: photos are not displayed sometimes, because they are not yet loaded, selecting another tour and reselecting the previous tour will solve it. This problem will be fixed in the next major version.
 
 
 All photo galleries

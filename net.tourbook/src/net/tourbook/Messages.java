@@ -22,11 +22,9 @@ public class Messages extends NLS {
 	private static final String	BUNDLE_NAME	= "net.tourbook.messages";							//$NON-NLS-1$
 
 	public static String		Action_PhotosAndTours_FilterNoTours_Tooltip;
-
-	public static String	Action_PhotosAndTours_FilterNotSavedPhotos_Tooltip;
+	public static String		Action_PhotosAndTours_FilterNotSavedPhotos_Tooltip;
 	public static String		Action_PhotosAndTours_FilterPhotos_Tooltip;
-
-	public static String	Action_PhotosAndTours_SavePhotoInTour;
+	public static String		Action_PhotosAndTours_SavePhotoInTour;
 
 	public static String		Action_ToolTip_Hide;
 	public static String		Action_ToolTip_SetDefaults;
@@ -256,7 +254,6 @@ public class Messages extends NLS {
 
 	public static String		App_Action_About;
 	public static String		App_Action_Cancel;
-
 	public static String		App_Action_Close_ToolTip;
 	public static String		App_Action_edit_tour;
 	public static String		App_Action_ExtractTour;
@@ -534,7 +531,6 @@ public class Messages extends NLS {
 	public static String		Graph_Label_Gradient;
 	public static String		Graph_Label_Heartbeat;
 	public static String		Graph_Label_Heartbeat_unit;
-
 	public static String		Graph_Label_History;
 	public static String		Graph_Label_Pace;
 	public static String		Graph_Label_Power;
@@ -545,8 +541,7 @@ public class Messages extends NLS {
 	public static String		Graph_Label_Temperature;
 	public static String		Graph_Label_TimeDuration;
 	public static String		Graph_Label_TimeOfDay;
-	public static String	Graph_Label_Tour;
-
+	public static String		Graph_Label_Tour;
 	public static String		Graph_Label_Tour_Compare;
 	public static String		Graph_Label_Tour_Compare_unit;
 
@@ -640,22 +635,15 @@ public class Messages extends NLS {
 	public static String		Image__link;
 	public static String		Image__MyTourbook16;
 	public static String		Image__options;
-	public static String	Image__Photo_FilterNotSavedPhotos;
-
-	public static String	Image__Photo_FilterNotSavedPhotos_Disabled;
-
+	public static String		Image__Photo_FilterNotSavedPhotos;
+	public static String		Image__Photo_FilterNotSavedPhotos_Disabled;
 	public static String		Image__Photo_FilterOneHistoryTour;
 	public static String		Image__Photo_FilterOneHistoryTour_Disabled;
-	public static String		Image__Photo_FilterPhotos;
-	public static String		Image__Photo_FilterPhotos_Disabled;
-
-	public static String	Image__Photo_FilterTourWithPhotos;
-
-	public static String	Image__Photo_FilterTourWithPhotos_Disabled;
+	public static String		Image__Photo_FilterTourWithPhotos;
+	public static String		Image__Photo_FilterTourWithPhotos_Disabled;
 	public static String		Image__PhotoDirectoryView;
 	public static String		Image__PhotoGalleryHorizontal;
 	public static String		Image__PhotoGalleryVertical;
-
 	public static String		Image__PhotoImage;
 	public static String		Image__PhotoPhotos;
 	public static String		Image__Pin_Blue;
@@ -781,50 +769,35 @@ public class Messages extends NLS {
 
 	public static String		NT001_DialogExtractTour_InvalidTourData;
 
-	public static String	Photo_Filter_Label_NumberOfAllPhotos;
-
-	public static String	Photo_Filter_Label_NumberOfAllPhotos_Tooltip;
-
-	public static String	Photo_Filter_Label_NumberOfFilteredPhotos;
-
-	public static String	Photo_Filter_Label_NumberOfFilteredPhotos_Tooltip;
-
-	public static String	Photo_Filter_Label_RatingStars;
-
-	public static String	Photo_Filter_Label_RatingStars_Tooltip;
-
-	public static String	Photo_Filter_Operator_IsEqual;
-
-	public static String	Photo_Filter_Operator_IsLess;
-
-	public static String	Photo_Filter_Operator_IsMore;
+	public static String		Photo_Filter_Label_NumberOfAllPhotos_Tooltip;
+	public static String		Photo_Filter_Label_NumberOfFilteredPhotos_Tooltip;
+	public static String		Photo_Filter_Label_RatingStars;
+	public static String		Photo_Filter_Label_RatingStars_Tooltip;
+	public static String		Photo_Filter_Operator_IsEqual;
+	public static String		Photo_Filter_Operator_IsLess;
+	public static String		Photo_Filter_Operator_IsMore;
 
 	public static String		Photo_Gallery_Action_ToggleGalleryHorizontal_ToolTip;
 	public static String		Photo_Gallery_Action_ToggleGalleryVertical_ToolTip;
 	public static String		Photo_Gallery_Label_NoTourWithPhoto;
 
-	public static String	Photo_Properties_Label_Size;
-
-	public static String	Photo_Properties_Label_ThumbnailSize_Tooltip;
+	public static String		Photo_Properties_Label_Size;
+	public static String		Photo_Properties_Label_ThumbnailSize_Tooltip;
 
 	public static String		Photo_Tooltip_Action_MoveToolTip_ToolTip;
 	public static String		Photo_Tooltip_Action_PinToolTip_ToolTip;
 	public static String		Photo_Tooltip_Label_ShellNoResize;
 	public static String		Photo_Tooltip_Label_ShellWithResize;
 
-	public static String	Photo_TourPhotoMgr_Dialog_SaveStarRating_Message;
-
-	public static String	Photo_TourPhotoMgr_Dialog_SaveStarRating_Title;
+	public static String		Photo_TourPhotoMgr_Dialog_SaveStarRating_Message;
+	public static String		Photo_TourPhotoMgr_Dialog_SaveStarRating_Title;
 
 	public static String		Photos_AndTours_Combo_Camera_Tooltip;
-	public static String	Photos_AndTours_Dialog_CannotSaveHistoryTour_Message;
-
-	public static String	Photos_AndTours_Dialog_CannotSaveHistoryTour_Title;
-
+	public static String		Photos_AndTours_Dialog_CannotSaveHistoryTour_Message;
+	public static String		Photos_AndTours_Dialog_CannotSaveHistoryTour_Title;
 	public static String		Photos_AndTours_Label_AdjustTime;
 	public static String		Photos_AndTours_Label_AdjustTime_Tooltip;
 	public static String		Photos_AndTours_Label_DurationLess1Hour;
-
 	public static String		Photos_AndTours_Label_HistoryTour;
 	public static String		Photos_AndTours_Label_NoCamera;
 	public static String		Photos_AndTours_Label_NoSelectedPhoto;
@@ -1049,7 +1022,6 @@ public class Messages extends NLS {
 
 	public static String		Pref_TourDb_Dialog_TourDbSystemIsModified_Message;
 	public static String		Pref_TourDb_Dialog_TourDbSystemIsModified_Title;
-
 	public static String		Pref_TourDb_Group_TourDB;
 	public static String		Pref_TourDb_Radio_DbSystem_Embedded;
 	public static String		Pref_TourDb_Radio_DbSystem_Embedded_Tooltip;
@@ -1174,8 +1146,8 @@ public class Messages extends NLS {
 	public static String		Tour_Action_ShowHrZones_Tooltip;
 	public static String		Tour_Action_ShowTourMarker;
 	public static String		Tour_Action_TourPhotos;
-	public static String		Tour_Action_TourPhotosWithoutTooltip;
-	public static String		Tour_Action_TourPhotosWithTooltip;
+	public static String		Tour_Action_TourPhotosWithoutTooltip_Tooltip;
+	public static String		Tour_Action_TourPhotosWithTooltip_Tooltip;
 	public static String		Tour_Action_ValuePointToolTip_IsVisible;
 
 	public static String		Tour_Book_Action_delete_selected_tours;
@@ -1202,7 +1174,7 @@ public class Messages extends NLS {
 	public static String		Tour_Database_PostUpdate020_ConvertIntToFloat;
 	public static String		Tour_Database_PostUpdate021_SetTourStartEndTime;
 
-	public static String	Tour_Database_PostUpdate023_SetTimeSliceNumbers;
+	public static String		Tour_Database_PostUpdate023_SetTimeSliceNumbers;
 	public static String		Tour_Database_TourSaveError;
 	public static String		Tour_Database_update_tour;
 	public static String		Tour_Database_Update;
@@ -1235,7 +1207,7 @@ public class Messages extends NLS {
 	public static String		Tour_Marker_Column_IsVisible;
 	public static String		Tour_Marker_Column_IsVisible_Tooltip;
 
-	public static String	Tour_Marker_Column_IsVisibleNoEdit_Tooltip;
+	public static String		Tour_Marker_Column_IsVisibleNoEdit_Tooltip;
 	public static String		Tour_Marker_Column_km_tooltip;
 	public static String		Tour_Marker_Column_remark;
 	public static String		Tour_Marker_Column_time;

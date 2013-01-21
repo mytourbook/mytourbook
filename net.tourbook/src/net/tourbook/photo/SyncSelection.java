@@ -26,6 +26,9 @@ public class SyncSelection implements ISelection, ISelectionConverter {
 
 		originalSelection = selection;
 
+		// ensure link view is opened
+		TourPhotoManager.openLinkView();
+
 		return this;
 	}
 

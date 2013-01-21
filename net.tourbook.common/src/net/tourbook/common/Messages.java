@@ -33,13 +33,8 @@ public class Messages extends NLS {
 	public static String		Image__Weather_ScatteredShowers;
 	public static String		Image__Weather_Severe;
 
-	public static String	Image_Action_PhotoFilter;
-
-	public static String	Image_Action_PhotoFilter_Disabled;
-
-	public static String	Image_Action_PhotoProperties;
-
-	public static String	Image_Action_PhotoProperties_Disabled;
+	public static String		Image_Action_PhotoFilter;
+	public static String		Image_Action_PhotoFilter_Disabled;
 
 	public static String		Weather_Clounds_Clouds;
 	public static String		Weather_Clounds_Clouny;

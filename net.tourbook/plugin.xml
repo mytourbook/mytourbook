@@ -611,7 +611,7 @@
 			         commandId="command.net.tourbook.PhotoFilter"
 			         icon="icons/tour-filter-tour-with-photos.png" 
 			         style="toggle"
-			         tooltip="%Action_PhotoFilter_Tooltip"/>
+			         tooltip="%Action_TourPhotoFilter_Tooltip"/>
 		
 		   </toolbar>
 				
@@ -982,7 +982,7 @@
 		         
 		<command
 	        id="command.net.tourbook.PhotoFilter"
-	        name="%Action_PhotoFilter"
+	        name="%Action_TourPhotoFilter"
 	        defaultHandler="net.tourbook.photo.ActionHandlerPhotoFilter">
 
 			<state

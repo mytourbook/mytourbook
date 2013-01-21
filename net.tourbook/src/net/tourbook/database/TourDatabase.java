@@ -201,7 +201,7 @@ public class TourDatabase {
 
 	private static String							DERBY_DRIVER_CLASS;
 	private static String							DERBY_URL;
-	private static final String						DERBY_URL_CREATE_TRUE						= ";create=true";
+	private static final String						DERBY_URL_CREATE_TRUE						= ";create=true"; //$NON-NLS-1$
 
 	private boolean									_isDerbyEmbedded;
 

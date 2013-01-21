@@ -75,11 +75,11 @@ public class PhotoCache {
 
 	public static void dumpAllPhotos() {
 
-		System.out.println(UI.timeStampNano() + " PhotoCache\t");
+		System.out.println(UI.timeStampNano() + " PhotoCache\t"); //$NON-NLS-1$
 
 		for (final Photo photo : _cache.values()) {
 
-			System.out.println(UI.timeStampNano() + " \t" + photo.imageFilePathName + ("\t"));
+			System.out.println(UI.timeStampNano() + " \t" + photo.imageFilePathName + ("\t")); //$NON-NLS-1$ //$NON-NLS-2$
 
 			photo.dumpTourReferences();
 		}

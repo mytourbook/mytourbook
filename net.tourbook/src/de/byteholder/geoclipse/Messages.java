@@ -207,7 +207,6 @@ public class Messages extends NLS {
 	public static String		DBG054_Loading_Error_FromUrl;
 	public static String		DBG055_MapProfile_InvalidMapProvider;
 	public static String		DBG056_MapProfile_WrongClassForMapProvider;
-	public static String		DBG057_MapProfile_NoParentTile;
 
 	public static String		Offline_Area_Label_AreaMarker;
 

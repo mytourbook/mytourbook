@@ -38,29 +38,19 @@ public class Messages extends NLS {
 	public static String		Image__delete;
 	public static String		Image__Forward_Nav;
 	public static String		Image__Photo_Action_ShowAnnotation;
-
-	public static String	Image__Photo_Action_ShowAnnotation_Disabled;
-	public static String		Image__Photo_Action_ShowGPSAnnotation;
+	public static String		Image__Photo_Action_ShowAnnotation_Disabled;
 	public static String		Image__PhotoAnnotationExifGPS;
-
-	public static String	Image__PhotoAnnotationGPSHovered;
 	public static String		Image__PhotoAnnotationSavedInTour;
-
-	public static String	Image__PhotoAnnotationSavedInTourHovered;
+	public static String		Image__PhotoAnnotationSavedInTourHovered;
 	public static String		Image__PhotoAnnotationTourGPS;
-	public static String	Image__PhotoFilter_NoTour;
-
-	public static String	Image__PhotoFilter_NoTour_Disabled;
-
+	public static String		Image__PhotoFilter_NoTour;
+	public static String		Image__PhotoFilter_NoTour_Disabled;
 	public static String		Image__PhotoFilterGPS;
-
-	public static String	Image__PhotoFilterGPSDisabled;
+	public static String		Image__PhotoFilterGPSDisabled;
 	public static String		Image__PhotoFilterNoGPS;
-
-	public static String	Image__PhotoFilterNoGPSDisabled;
+	public static String		Image__PhotoFilterNoGPSDisabled;
 	public static String		Image__PhotoFilterTour;
-
-	public static String	Image__PhotoFilterTourDisabled;
+	public static String		Image__PhotoFilterTourDisabled;
 	public static String		Image__PhotoFolderGallery;
 	public static String		Image__PhotoFolderGallery_OnlyPhotos;
 	public static String		Image__PhotoFullsizeShellImage128;
@@ -73,13 +63,10 @@ public class Messages extends NLS {
 	public static String		Image__PhotoRatingStarHovered;
 	public static String		Image__PhotoRatingStarNotHovered;
 	public static String		Image__PhotoRatingStarNotHoveredButSet;
-	public static String		Image__PhotoRatingStars;
-	public static String		Image__PhotoRatingStarsHovered;
 	public static String		Image__PhotoSortByDate;
 	public static String		Image__PhotoSortByName;
 	public static String		Image__PhotoTooltip;
-
-	public static String	Image__PhotoTooltip_Disabled;
+	public static String		Image__PhotoTooltip_Disabled;
 	public static String		Image__PotoGalleryDetails;
 	public static String		Image__PotoGalleryThumbnail;
 	public static String		Image__refresh;
@@ -96,7 +83,6 @@ public class Messages extends NLS {
 	public static String		Photo_Gallery_Action_PhotoGalleryThumbnail_Tooltip;
 	public static String		Photo_Gallery_Action_ShowPhotoGalleryDetails;
 	public static String		Photo_Gallery_Action_ShowPhotoGalleryDetails_Tooltip;
-	public static String		Photo_Gallery_Action_ShowPhotoRatingStars;
 	public static String		Photo_Gallery_Action_ShowPhotoRatingStars_NoHoveredStars_Tooltip;
 	public static String		Photo_Gallery_Action_ShowPhotoRatingStars_NoStars_Tooltip;
 	public static String		Photo_Gallery_Action_ShowPhotoRatingStars_Tooltip;
@@ -119,8 +105,6 @@ public class Messages extends NLS {
 	public static String		Pic_Dir_Action_RunExternalAppTitle;
 	public static String		Pic_Dir_Action_ShowAnnotations;
 	public static String		Pic_Dir_Action_ShowAnnotations_Tooltip;
-	public static String		Pic_Dir_Action_ShowPhotoAnnotations;
-	public static String		Pic_Dir_Action_ShowPhotoAnnotations_Tooltip;
 	public static String		Pic_Dir_Action_ShowPhotoFileName;
 	public static String		Pic_Dir_Action_ShowPhotoFileName_Tooltip;
 	public static String		Pic_Dir_Action_ShowPhotoInfoFileDate;

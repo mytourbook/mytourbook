@@ -112,13 +112,13 @@ public class PhotoProperties extends AnimatedToolTipShell implements IPhotoEvent
 
 	private Spinner					_spinnerImageSize;
 
-	public static final int			OPERATOR_IS_EQUAL						= 0;
-	public static final int			OPERATOR_IS_MORE_OR_EQUAL				= 1;
+	public static final int			OPERATOR_IS_MORE_OR_EQUAL				= 0;
+	public static final int			OPERATOR_IS_EQUAL						= 1;
 	public static final int			OPERATOR_IS_LESS_OR_EQUAL				= 2;
 
 	private static final String[]	_ratingStarOperatorsText				= {
-			Messages.Photo_Filter_Operator_IsEqual,
 			Messages.Photo_Filter_Operator_IsMore,
+			Messages.Photo_Filter_Operator_IsEqual,
 			Messages.Photo_Filter_Operator_IsLess,
 																			//
 																			};
@@ -127,8 +127,8 @@ public class PhotoProperties extends AnimatedToolTipShell implements IPhotoEvent
 	 * <b>THEY MUST BE IN SYNC WITH </b> {@link #_filterRatingStarOperatorsText}
 	 */
 	private static final int[]		_ratingStarOperatorsValues				= {
-			OPERATOR_IS_EQUAL,
 			OPERATOR_IS_MORE_OR_EQUAL,
+			OPERATOR_IS_EQUAL,
 			OPERATOR_IS_LESS_OR_EQUAL,
 																			//
 																			};
@@ -523,7 +523,10 @@ public class PhotoProperties extends AnimatedToolTipShell implements IPhotoEvent
 	public void restoreState() {
 
 		_filterRatingStars = Util.getStateInt(_state, STATE_PHOTO_FILTER_RATING_STARS, RatingStars.MAX_RATING_STARS);
-		_filterRatingStarOperatorIndex = Util.getStateInt(_state, STATE_PHOTO_FILTER_RATING_STAR_OPERATOR, 0);
+		_filterRatingStarOperatorIndex = Util.getStateInt(
+				_state,
+				STATE_PHOTO_FILTER_RATING_STAR_OPERATOR,
+				OPERATOR_IS_EQUAL);
 
 		_imageSize = Util.getStateInt(_state, STATE_PHOTO_PROPERTIES_IMAGE_SIZE, Photo.MAP_IMAGE_DEFAULT_WIDTH_HEIGHT);
 

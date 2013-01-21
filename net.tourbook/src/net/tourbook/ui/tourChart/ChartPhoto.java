@@ -77,11 +77,11 @@ public class ChartPhoto {
 
 	@Override
 	public String toString() {
-		return "ChartPhoto ["
-				+ (" photo=" + photo + "{)},")
-				+ (" xValue=" + xValue + "{)},")
-				+ (" serieIndex=" + serieIndex)
-				+ "]"
+		return "ChartPhoto [" //$NON-NLS-1$
+				+ (" photo=" + photo + "{)},") //$NON-NLS-1$ //$NON-NLS-2$
+				+ (" xValue=" + xValue + "{)},") //$NON-NLS-1$ //$NON-NLS-2$
+				+ (" serieIndex=" + serieIndex) //$NON-NLS-1$
+				+ "]" //$NON-NLS-1$
 		//
 		;
 	}

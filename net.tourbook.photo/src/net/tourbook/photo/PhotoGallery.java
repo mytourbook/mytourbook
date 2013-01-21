@@ -523,14 +523,14 @@ public class PhotoGallery extends ImageGallery {
 		} else if (ratingStarBehaviour == RatingStarBehaviour.NO_HOVERED_STARS) {
 
 			toolTipText = Messages.Photo_Gallery_Action_ShowPhotoRatingStars_NoHoveredStars_Tooltip;
-			imageDescriptor = Activator.getImageDescriptor(Messages.Image__PhotoRatingStars);
+			imageDescriptor = Activator.getImageDescriptor(Messages.Image__PhotoRatingStar);
 
 		} else {
 
 			// set default: RatingStarBehaviour.HOVERED_STARS
 
 			toolTipText = Messages.Photo_Gallery_Action_ShowPhotoRatingStars_Tooltip;
-			imageDescriptor = Activator.getImageDescriptor(Messages.Image__PhotoRatingStarsHovered);
+			imageDescriptor = Activator.getImageDescriptor(Messages.Image__PhotoRatingStarHovered);
 		}
 
 		final boolean isShowRatingStars = ratingStarBehaviour != RatingStarBehaviour.NO_STARS;

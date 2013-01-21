@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2012  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -57,6 +57,7 @@ public class UI {
 	public static final String			SPACE4								= "    ";																	//$NON-NLS-1$
 	public static final String			STRING_0							= "0";																		//$NON-NLS-1$
 	public static final String			COMMA_SPACE							= ", ";																	//$NON-NLS-1$
+	public static final String			DIMENSION							= " x ";																	//$NON-NLS-1$
 
 	/**
 	 * contains a new line

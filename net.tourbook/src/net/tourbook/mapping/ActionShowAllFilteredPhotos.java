@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2012  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -19,17 +19,17 @@ import net.tourbook.application.TourbookPlugin;
 
 import org.eclipse.jface.action.Action;
 
-public class ActionShowAllPhotos extends Action {
+public class ActionShowAllFilteredPhotos extends Action {
 
 	private TourMapView	_mapView;
 
-	public ActionShowAllPhotos(final TourMapView mapView) {
+	public ActionShowAllFilteredPhotos(final TourMapView mapView) {
 
 		super(null, AS_PUSH_BUTTON);
 
 		_mapView = mapView;
 
-		setToolTipText(Messages.Map_Action_ShowAllPhotos_Tooltip);
+		setToolTipText(Messages.Map_Action_ShowAllFilteredPhotos_Tooltip);
 		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image_Action_ShowAllPhotosInMap));
 	}
 

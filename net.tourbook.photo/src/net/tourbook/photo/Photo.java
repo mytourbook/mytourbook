@@ -443,7 +443,7 @@ public class Photo {
 	public void dumpTourReferences() {
 
 		for (final TourPhotoReference ref : _tourPhotoRef.values()) {
-			System.out.println(UI.timeStampNano() + " \t\tphotoId=" + ref.photoId);
+			System.out.println(UI.timeStampNano() + " \t\tphotoId=" + ref.photoId); //$NON-NLS-1$
 			// TODO remove SYSTEM.OUT.PRINTLN
 		}
 	}
