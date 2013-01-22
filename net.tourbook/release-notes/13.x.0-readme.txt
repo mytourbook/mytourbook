@@ -1,4 +1,4 @@
-Version: 13.??.0                                           ?. ??? 2013 
+Version: 13.2.0                                           ?. ??? 2013 
 
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -13,12 +13,10 @@ Detected Problems:
 * tooltip flickering occures only with bad display drivers !!!
 
 
-Improvements
-
 
 Photos + Tours view
 
-* save photos in tour
+* save photos in tour, when a tour contains photos, they can be displayed in the tour chart, tour map and tour photo views
 
 * show number of saved photos including time adjustment
 
@@ -44,7 +42,7 @@ Tour Map view
 
 All photo galleries
 
-* star rating can be set for photos when they are saved in a tour. When a photo is set in multiple tours, star rating can currently not be set (I hope this happens not too often)
+* star rating can be set for photos when they are saved in a tour. When a photo is saved in multiple tours, star rating can currently not be set (I hope this happens not too often and should only occure when more than one person saves the same photo)
 
 
 Fixed bugs

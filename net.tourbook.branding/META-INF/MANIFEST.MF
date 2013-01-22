@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-SymbolicName: net.tourbook.branding
-Bundle-Version: 12.12.1.qualifier
+Bundle-Version: 13.2.0.qualifier
 Bundle-Vendor: MyTourbook
 Bundle-ActivationPolicy: lazy
 Bundle-Name: Branding plugin
