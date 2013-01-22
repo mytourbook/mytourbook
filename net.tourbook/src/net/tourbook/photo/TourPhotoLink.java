@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2012  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -173,7 +173,7 @@ public class TourPhotoLink {
 		final long[] historyTimeSerie = new long[timeSerieLength];
 
 		for (int photoIndex = 0; photoIndex < timeSerieLength; photoIndex++) {
-			historyTimeSerie[photoIndex] = linkPhotos.get(photoIndex).adjustedTime;
+			historyTimeSerie[photoIndex] = linkPhotos.get(photoIndex).adjustedTimeLink;
 		}
 
 		final long tourStart = historyTimeSerie[0];
@@ -275,7 +275,7 @@ public class TourPhotoLink {
 				tourEndTime = tourStartTime;
 			} else {
 				// get time from last photo
-				tourEndTime = linkPhotos.get(photosSize - 1).adjustedTime;
+				tourEndTime = linkPhotos.get(photosSize - 1).adjustedTimeLink;
 			}
 
 			finalizeHistoryTour();

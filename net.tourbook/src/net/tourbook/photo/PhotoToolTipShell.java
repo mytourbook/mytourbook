@@ -852,7 +852,6 @@ public abstract class PhotoToolTipShell {
 			return;
 		}
 
-
 		if (isToolTipDragged()) {
 			// is true when tooltip is dragged with the mouse
 			return;

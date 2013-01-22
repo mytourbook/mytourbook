@@ -33,7 +33,6 @@ import java.util.List;
 import java.util.Set;
 
 import net.tourbook.Messages;
-import net.tourbook.application.PerspectiveFactoryPhoto;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.PostSelectionProvider;
@@ -63,7 +62,6 @@ import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IViewPart;
-import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
@@ -71,7 +69,6 @@ import org.eclipse.ui.IWorkbenchPartSite;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.WorkbenchException;
 import org.joda.time.DateTime;
 
 public class TourPhotoManager implements IPhotoServiceProvider {
@@ -81,7 +78,7 @@ public class TourPhotoManager implements IPhotoServiceProvider {
 
 	private static final String						CAMERA_UNKNOWN_KEY				= "CAMERA_UNKNOWN_KEY";			//$NON-NLS-1$
 
-	private static final String						TEMP_FILE_PREFIX_ORIG			= "_orig_";						//$NON-NLS-1$
+//	private static final String						TEMP_FILE_PREFIX_ORIG			= "_orig_";						//$NON-NLS-1$
 
 	private final IPreferenceStore					_prefStore						= TourbookPlugin.getDefault() //
 																							.getPreferenceStore();
@@ -108,21 +105,32 @@ public class TourPhotoManager implements IPhotoServiceProvider {
 	/**
 	 * Compares 2 photos by the adjusted time.
 	 */
-	public static final Comparator<? super Photo>	AdjustTimeComparator;
+	public static final Comparator<? super Photo>	AdjustTimeComparatorLink;
+	public static final Comparator<? super Photo>	AdjustTimeComparatorTour;
 
 	static {
 
-		AdjustTimeComparator = new Comparator<Photo>() {
+		AdjustTimeComparatorLink = new Comparator<Photo>() {
 
 			@Override
 			public int compare(final Photo photo1, final Photo photo2) {
 
-				final long diff = photo1.adjustedTime - photo2.adjustedTime;
+				final long diff = photo1.adjustedTimeLink - photo2.adjustedTimeLink;
 
 				return diff < 0 ? -1 : diff > 0 ? 1 : 0;
 			}
 		};
 
+		AdjustTimeComparatorTour = new Comparator<Photo>() {
+
+			@Override
+			public int compare(final Photo photo1, final Photo photo2) {
+
+				final long diff = photo1.adjustedTimeTour - photo2.adjustedTimeTour;
+
+				return diff < 0 ? -1 : diff > 0 ? 1 : 0;
+			}
+		};
 	}
 
 	private TourPhotoManager() {
@@ -142,7 +150,7 @@ public class TourPhotoManager implements IPhotoServiceProvider {
 
 	public static TourPhotoLinkView openLinkView() {
 
-		final IWorkbench wb = PlatformUI.getWorkbench();
+//		final IWorkbench wb = PlatformUI.getWorkbench();
 		final IWorkbenchWindow wbWindow = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
 		TourPhotoLinkView linkView = null;
 
@@ -161,21 +169,23 @@ public class TourPhotoManager implements IPhotoServiceProvider {
 
 				} else {
 
-					final String currentPerspectiveId = activePage.getPerspective().getId();
-
-					if (currentPerspectiveId.equals(TourPhotoLinkView.ID)) {
-
-						// open link view in current perspective
-
-					} else {
-
-						// open link perspective
-
-						wb.showPerspective(PerspectiveFactoryPhoto.PERSPECTIVE_ID, wbWindow);
-					}
+//					final String currentPerspectiveId = activePage.getPerspective().getId();
+//
+//					if (currentPerspectiveId.equals(TourPhotoLinkView.ID)) {
+//
+//						// open link view in current perspective
+//
+//					} else {
+//
+//						// open link perspective
+//
+//						wb.showPerspective(PerspectiveFactoryPhoto.PERSPECTIVE_ID, wbWindow);
+//					}
 
 					linkView = (TourPhotoLinkView) Util.showView(TourPhotoLinkView.ID, false);
 				}
+
+				// ensure link view is visible
 
 				if (linkView != null) {
 
@@ -187,8 +197,8 @@ public class TourPhotoManager implements IPhotoServiceProvider {
 
 			} catch (final PartInitException e) {
 				StatusUtil.showStatus(e);
-			} catch (final WorkbenchException e) {
-				StatusUtil.showStatus(e);
+//			} catch (final WorkbenchException e) {
+//				StatusUtil.showStatus(e);
 			}
 		}
 
@@ -335,7 +345,7 @@ public class TourPhotoManager implements IPhotoServiceProvider {
 		// loop: all photos
 		for (final Photo photo : allPhotos) {
 
-			photoTime = photo.adjustedTime;
+			photoTime = photo.adjustedTimeLink;
 
 			// check if current photo can be put into current tour photo link
 			if (currentTourPhotoLink.isHistoryTour == false && photoTime <= currentTourPhotoLink.tourEndTime) {
@@ -475,7 +485,7 @@ public class TourPhotoManager implements IPhotoServiceProvider {
 
 		final HashMap<String, String> tourCameras = new HashMap<String, String>();
 
-		final TourPhotoLink historyTour = new TourPhotoLink(allPhotos.get(0).adjustedTime);
+		final TourPhotoLink historyTour = new TourPhotoLink(allPhotos.get(0).adjustedTimeLink);
 		historyTour.linkPhotos.addAll(allPhotos);
 
 		for (final Photo photo : allPhotos) {
@@ -518,7 +528,7 @@ public class TourPhotoManager implements IPhotoServiceProvider {
 			final TourPhotoLink firstTour = _dbTourPhotoLinks.get(0);
 			final Photo firstPhoto = allPhotos.get(0);
 
-			final DateTime firstPhotoTime = new DateTime(firstPhoto.adjustedTime);
+			final DateTime firstPhotoTime = new DateTime(firstPhoto.adjustedTimeLink);
 			if (firstPhotoTime.isBefore(firstTour.tourStartTime)) {
 
 				// first photo is before the first tour, create dummy tour
@@ -538,7 +548,7 @@ public class TourPhotoManager implements IPhotoServiceProvider {
 
 			// 1st tour is a history tour
 
-			final long tourStartUTC = allPhotos.get(0).adjustedTime;
+			final long tourStartUTC = allPhotos.get(0).adjustedTimeLink;
 //			final int tourStartUTCZoneOffset = DateTimeZone.getDefault().getOffset(tourStartUTC);
 
 			currentTourPhotoLink = new TourPhotoLink(tourStartUTC);
@@ -720,12 +730,12 @@ public class TourPhotoManager implements IPhotoServiceProvider {
 		/*
 		 * get date for 1st and last photo
 		 */
-		long firstPhotoTime = allPhotos.get(0).adjustedTime;
+		long firstPhotoTime = allPhotos.get(0).adjustedTimeLink;
 		long lastPhotoTime = firstPhotoTime;
 
 		for (final Photo photo : allPhotos) {
 
-			final long imageTime = photo.adjustedTime;
+			final long imageTime = photo.adjustedTimeLink;
 
 			if (imageTime < firstPhotoTime) {
 				firstPhotoTime = imageTime;
@@ -1410,7 +1420,7 @@ public class TourPhotoManager implements IPhotoServiceProvider {
 			// loop: photo serie, check if a photo is in the current time slice
 			while (true) {
 
-				final long imageAdjustedTime = photo.adjustedTime;
+				final long imageAdjustedTime = photo.adjustedTimeLink;
 				long imageTime = 0;
 
 				if (imageAdjustedTime != Long.MIN_VALUE) {
@@ -1579,7 +1589,7 @@ public class TourPhotoManager implements IPhotoServiceProvider {
 
 				photo.isSavedInTour = true;
 
-				photo.adjustedTime = dbAdjustedTime;
+				photo.adjustedTimeTour = dbAdjustedTime;
 				photo.imageExifTime = dbImageExifTime;
 
 				photo.isGeoFromExif = dbIsGeoFromExif == 1;

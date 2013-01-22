@@ -197,17 +197,17 @@ public class PhotoImageCache {
 			photo.getImageMetaData();
 
 			// check if height is set
-			if (photo.getImageWidth() == Integer.MIN_VALUE) {
-
-				// image dimension is not yet set
-
-				if (cacheWrapper.imageWidth != Integer.MIN_VALUE) {
-
-					// image dimension is available
-
-					photo.setDimension(cacheWrapper.imageWidth, cacheWrapper.imageHeight);
-				}
-			}
+//			if (photo.getImageWidth() == Integer.MIN_VALUE) {
+//
+//				// image dimension is not yet set
+//
+//				if (cacheWrapper.imageWidth != Integer.MIN_VALUE) {
+//
+//					// image dimension is available
+//
+//					photo.setDimension(cacheWrapper.imageWidth, cacheWrapper.imageHeight);
+//				}
+//			}
 		}
 		return photoImage;
 	}
@@ -281,6 +281,57 @@ public class PhotoImageCache {
 										final String originalImagePathName) {
 
 		putImageInCache(_imageCacheOriginal, imageKey, image, imageWidth, imageHeight, originalImagePathName);
+	}
+
+	/**
+	 * Set image size, when EXIF width/height is not available, the photo size is wrong and is
+	 * corrected here.
+	 * 
+	 * @param photo
+	 * @param imageWidth
+	 * @param imageHeight
+	 */
+	public static void setImageSize(final Photo photo, final int imageWidth, final int imageHeight) {
+
+		boolean isSet = false;
+
+		if (!isSet) {
+			isSet = setImageSize_IntoWrapperPhoto(photo, imageWidth, imageHeight, //
+					ImageQuality.THUMB,
+					_imageCache);
+		}
+
+		if (!isSet) {
+			isSet = setImageSize_IntoWrapperPhoto(photo, imageWidth, imageHeight, //
+					ImageQuality.HQ,
+					_imageCache);
+		}
+
+		if (!isSet) {
+			isSet = setImageSize_IntoWrapperPhoto(photo, imageWidth, imageHeight,//
+					ImageQuality.ORIGINAL,
+					_imageCacheOriginal);
+		}
+	}
+
+	private static boolean setImageSize_IntoWrapperPhoto(	final Photo photo,
+															final int imageWidth,
+															final int imageHeight,
+															final ImageQuality imageQuality,
+															final ConcurrentLinkedHashMap<String, ImageCacheWrapper> imageCache) {
+
+		final String imageKey = photo.getImageKey(imageQuality);
+
+		final ImageCacheWrapper cacheWrapper = imageCache.get(imageKey);
+
+		if (cacheWrapper != null) {
+
+			photo.setDimension(imageWidth, imageHeight);
+
+			return true;
+		}
+
+		return false;
 	}
 
 	public static void setOriginalImageCacheSize(final int newCacheSize) {

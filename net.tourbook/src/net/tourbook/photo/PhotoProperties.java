@@ -112,14 +112,14 @@ public class PhotoProperties extends AnimatedToolTipShell implements IPhotoEvent
 
 	private Spinner					_spinnerImageSize;
 
-	public static final int			OPERATOR_IS_MORE_OR_EQUAL				= 0;
+	public static final int			OPERATOR_IS_LESS_OR_EQUAL				= 0;
 	public static final int			OPERATOR_IS_EQUAL						= 1;
-	public static final int			OPERATOR_IS_LESS_OR_EQUAL				= 2;
+	public static final int			OPERATOR_IS_MORE_OR_EQUAL				= 2;
 
 	private static final String[]	_ratingStarOperatorsText				= {
-			Messages.Photo_Filter_Operator_IsMore,
-			Messages.Photo_Filter_Operator_IsEqual,
 			Messages.Photo_Filter_Operator_IsLess,
+			Messages.Photo_Filter_Operator_IsEqual,
+			Messages.Photo_Filter_Operator_IsMore,
 																			//
 																			};
 
@@ -127,9 +127,9 @@ public class PhotoProperties extends AnimatedToolTipShell implements IPhotoEvent
 	 * <b>THEY MUST BE IN SYNC WITH </b> {@link #_filterRatingStarOperatorsText}
 	 */
 	private static final int[]		_ratingStarOperatorsValues				= {
-			OPERATOR_IS_MORE_OR_EQUAL,
-			OPERATOR_IS_EQUAL,
 			OPERATOR_IS_LESS_OR_EQUAL,
+			OPERATOR_IS_EQUAL,
+			OPERATOR_IS_MORE_OR_EQUAL,
 																			//
 																			};
 
@@ -167,6 +167,7 @@ public class PhotoProperties extends AnimatedToolTipShell implements IPhotoEvent
 		setToolTipCreateStyle(AnimatedToolTipShell.TOOLTIP_STYLE_KEEP_CONTENT);
 		setBehaviourOnMouseOver(AnimatedToolTipShell.MOUSE_OVER_BEHAVIOUR_IGNORE_OWNER);
 		setIsKeepShellOpenWhenMoved(false);
+		setFadeIsSteps(1);
 	}
 
 	public void addPropertiesListener(final IPhotoPropertiesListener listener) {
@@ -219,8 +220,12 @@ public class PhotoProperties extends AnimatedToolTipShell implements IPhotoEvent
 				.applyTo(_shellContainer);
 		{
 			createUI_10_Filter(_shellContainer);
-			createUI_20_Operator(_shellContainer);
-			createUI_30_ImageSize(_shellContainer);
+
+			// spacer
+			final Label label = new Label(_shellContainer, SWT.NONE);
+			GridDataFactory.fillDefaults().hint(20, 0).applyTo(label);
+
+			createUI_20_ImageSize(_shellContainer);
 		}
 
 		return _shellContainer;
@@ -229,9 +234,8 @@ public class PhotoProperties extends AnimatedToolTipShell implements IPhotoEvent
 	private void createUI_10_Filter(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NO_FOCUS);
-//		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-		GridLayoutFactory.fillDefaults().applyTo(container);
-//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
+		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
 		{
 			/*
 			 * label: photo filter
@@ -241,6 +245,26 @@ public class PhotoProperties extends AnimatedToolTipShell implements IPhotoEvent
 
 			label.setText(Messages.Photo_Filter_Label_RatingStars);
 			label.setToolTipText(Messages.Photo_Filter_Label_RatingStars_Tooltip);
+
+			createUI_12_FilterHeader(container);
+
+			/*
+			 * combo: > = <
+			 */
+//			_comboRatingStarOperators = new Combo(container, SWT.READ_ONLY);
+			_comboRatingStarOperators = new Combo(container, SWT.READ_ONLY);
+			GridDataFactory.fillDefaults()//
+					.align(SWT.END, SWT.FILL)
+//					.hint(_pc.convertWidthInCharsToPixels(15), SWT.DEFAULT)
+					.applyTo(_comboRatingStarOperators);
+			_comboRatingStarOperators.setVisibleItemCount(10);
+//			_comboRatingStarOperators.setToolTipText(Messages.Photos_PhotoFilter_Combo_RatingStarOperands_Tooltip);
+			_comboRatingStarOperators.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(final SelectionEvent e) {
+					onSelectRatingStarOperands();
+				}
+			});
 
 			/*
 			 * rating stars
@@ -255,72 +279,50 @@ public class PhotoProperties extends AnimatedToolTipShell implements IPhotoEvent
 		}
 	}
 
-	private void createUI_20_Operator(final Composite parent) {
-
-		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-		GridLayoutFactory.fillDefaults().applyTo(container);
-		{
-			createUI_22_FilterHeader(container);
-
-			/*
-			 * combo: > = <
-			 */
-//			_comboRatingStarOperators = new Combo(container, SWT.READ_ONLY);
-			_comboRatingStarOperators = new Combo(container, SWT.READ_ONLY);
-			GridDataFactory.fillDefaults()//
-					.align(SWT.BEGINNING, SWT.FILL)
-//					.hint(_pc.convertWidthInCharsToPixels(15), SWT.DEFAULT)
-					.applyTo(_comboRatingStarOperators);
-			_comboRatingStarOperators.setVisibleItemCount(10);
-//			_comboRatingStarOperators.setToolTipText(Messages.Photos_PhotoFilter_Combo_RatingStarOperands_Tooltip);
-			_comboRatingStarOperators.addSelectionListener(new SelectionAdapter() {
-				@Override
-				public void widgetSelected(final SelectionEvent e) {
-					onSelectRatingStarOperands();
-				}
-			});
-		}
-	}
-
-	private void createUI_22_FilterHeader(final Composite parent) {
+	private void createUI_12_FilterHeader(final Composite parent) {
 
 		_containerFilterHeader = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults()//
-//				.grab(true, false)
-				.span(2, 1)
 				.applyTo(_containerFilterHeader);
-		GridLayoutFactory.fillDefaults().numColumns(4).applyTo(_containerFilterHeader);
+		GridLayoutFactory.fillDefaults()//
+				.applyTo(_containerFilterHeader);
+//		_containerFilterHeader.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
 		{
 			/*
-			 * value: number of all photos
+			 * inner container is used to center horizontally
 			 */
-			_lblAllPhotos = new Label(_containerFilterHeader, SWT.NO_FOCUS);
-			GridDataFactory.fillDefaults().applyTo(_lblAllPhotos);
+			final Composite innerContainer = new Composite(_containerFilterHeader, SWT.NONE);
+			GridDataFactory.fillDefaults().//
+					grab(true, false)
+					.align(SWT.CENTER, SWT.FILL)
+					.applyTo(innerContainer);
+			GridLayoutFactory.fillDefaults().numColumns(3).applyTo(innerContainer);
+//			innerContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_MAGENTA));
+			{
+				/*
+				 * value: number of all photos
+				 */
+				_lblAllPhotos = new Label(innerContainer, SWT.NO_FOCUS);
+				_lblAllPhotos.setText(UI.EMPTY_STRING);
+				_lblAllPhotos.setToolTipText(Messages.Photo_Filter_Label_NumberOfAllPhotos_Tooltip);
 
-			_lblAllPhotos.setText(UI.EMPTY_STRING);
-			_lblAllPhotos.setToolTipText(Messages.Photo_Filter_Label_NumberOfAllPhotos_Tooltip);
+				/*
+				 * label: number of filtered photos
+				 */
+				final Label label = new Label(innerContainer, SWT.NO_FOCUS);
+				label.setText(UI.DASH_WITH_SPACE);
 
-			/*
-			 * label: number of filtered photos
-			 */
-			final Label label = new Label(_containerFilterHeader, SWT.NO_FOCUS);
-			GridDataFactory.fillDefaults().applyTo(label);
-
-			label.setText(UI.DASH_WITH_SPACE);
-
-			/*
-			 * value: number of filtered photos
-			 */
-			_lblFilteredPhotos = new Label(_containerFilterHeader, SWT.NO_FOCUS);
-			GridDataFactory.fillDefaults().applyTo(_lblFilteredPhotos);
-
-			_lblFilteredPhotos.setText(UI.EMPTY_STRING);
-			_lblFilteredPhotos.setToolTipText(Messages.Photo_Filter_Label_NumberOfFilteredPhotos_Tooltip);
+				/*
+				 * value: number of filtered photos
+				 */
+				_lblFilteredPhotos = new Label(innerContainer, SWT.NO_FOCUS);
+				_lblFilteredPhotos.setText(UI.EMPTY_STRING);
+				_lblFilteredPhotos.setToolTipText(Messages.Photo_Filter_Label_NumberOfFilteredPhotos_Tooltip);
+			}
 		}
 	}
 
-	private void createUI_30_ImageSize(final Composite parent) {
+	private void createUI_20_ImageSize(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
 //		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
@@ -494,7 +496,7 @@ public class PhotoProperties extends AnimatedToolTipShell implements IPhotoEvent
 
 				_isWaitTimerStarted = true;
 
-				Display.getCurrent().timerExec(200, _waitTimer);
+				Display.getCurrent().timerExec(50, _waitTimer);
 			}
 		}
 	}
@@ -545,6 +547,15 @@ public class PhotoProperties extends AnimatedToolTipShell implements IPhotoEvent
 		_state.put(STATE_PHOTO_PROPERTIES_IMAGE_SIZE, _imageSize);
 	}
 
+	/**
+	 * This is called when the filter is run and filter statistics are available.
+	 * 
+	 * @param data
+	 */
+	protected void updateFilterActionUI(final MapFilterData data) {
+		// do nothing
+	}
+
 	private void updateFilterUI(final MapFilterData data) {
 
 		if (_lblAllPhotos == null || _lblAllPhotos.isDisposed()) {
@@ -560,6 +571,9 @@ public class PhotoProperties extends AnimatedToolTipShell implements IPhotoEvent
 		_lblFilteredPhotos.setText(Integer.toString(data.filteredPhotos));
 
 		_containerFilterHeader.layout();
+
+		// update action button
+		updateFilterActionUI(data);
 	}
 
 	private void updateUI() {

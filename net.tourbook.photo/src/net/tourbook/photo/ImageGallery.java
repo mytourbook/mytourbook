@@ -850,9 +850,9 @@ public abstract class ImageGallery implements IItemListener, IGalleryContextMenu
 			@Override
 			public void update(final ViewerCell cell) {
 
-				final Photo photo = (Photo) cell.getElement();
-
-				cell.setText(_dateFormatter.print(photo.adjustedTime));
+//				final Photo photo = (Photo) cell.getElement();
+//
+//				cell.setText(_dateFormatter.print(photo.adjustedTime));
 			}
 		});
 	}
@@ -869,9 +869,9 @@ public abstract class ImageGallery implements IItemListener, IGalleryContextMenu
 			@Override
 			public void update(final ViewerCell cell) {
 
-				final Photo photo = (Photo) cell.getElement();
-
-				cell.setText(_timeFormatter.print(photo.adjustedTime));
+//				final Photo photo = (Photo) cell.getElement();
+//
+//				cell.setText(_timeFormatter.print(photo.adjustedTime));
 			}
 		});
 	}
@@ -2079,7 +2079,7 @@ public abstract class ImageGallery implements IItemListener, IGalleryContextMenu
 		}
 
 		_hoveredItem.isHovered = false;
-		_hoveredItem.isNeedPostUIUpdate = false;
+		_hoveredItem.isNeedExitUIUpdate = false;
 		_hoveredItem.hoveredStars = 0;
 		_hoveredItem.isHoveredAnnotationTour = false;
 
@@ -2144,10 +2144,10 @@ public abstract class ImageGallery implements IItemListener, IGalleryContextMenu
 		 * reset hovering
 		 */
 
-		final boolean isUpdateUI = exitHoveredItem.isNeedPostUIUpdate;
+		final boolean isUpdateUI = exitHoveredItem.isNeedExitUIUpdate;
 
 		exitHoveredItem.isHovered = false;
-		exitHoveredItem.isNeedPostUIUpdate = false;
+		exitHoveredItem.isNeedExitUIUpdate = false;
 
 		exitHoveredItem.hoveredStars = 0;
 		exitHoveredItem.isHoveredAnnotationTour = false;
@@ -2199,7 +2199,7 @@ public abstract class ImageGallery implements IItemListener, IGalleryContextMenu
 			final boolean isModified = _photoRenderer.itemIsHovered(hoveredItem, itemMouseX, itemMouseY);
 
 			// don't reset here, this is done in the item exit event
-			hoveredItem.isNeedPostUIUpdate |= isModified;
+			hoveredItem.isNeedExitUIUpdate |= isModified;
 
 			if (isModified) {
 

@@ -6450,7 +6450,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 			// ensure this tour is set in the photo
 			galleryPhoto.addTour(tourPhoto.getTourId(), tourPhoto.getPhotoId());
 
-			galleryPhoto.adjustedTime = tourPhoto.getAdjustedTime();
+			galleryPhoto.adjustedTimeTour = tourPhoto.getAdjustedTime();
 			galleryPhoto.imageExifTime = tourPhoto.getImageExifTime();
 
 			final double tourLatitude = tourPhoto.getLatitude();
@@ -6470,7 +6470,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 			_galleryPhotos.add(galleryPhoto);
 		}
 
-		Collections.sort(_galleryPhotos, TourPhotoManager.AdjustTimeComparator);
+		Collections.sort(_galleryPhotos, TourPhotoManager.AdjustTimeComparatorTour);
 	}
 
 }

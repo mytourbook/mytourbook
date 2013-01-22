@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2012  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -21,13 +21,15 @@ import org.osgi.framework.Version;
 
 public class ApplicationVersion {
 
-	private static final String	DEVELOPMENT_VERSION_TEXT	= "DEVELOPMENT";									//$NON-NLS-1$
-	private static final String	DEV_WINDOW_TITLE			= UI.DASH_WITH_SPACE + DEVELOPMENT_VERSION_TEXT;
-//	private static final String	DEVELOPMENT_VERSION_TEXT	= UI.EMPTY_STRING;
-//	private static final String	DEV_WINDOW_TITLE			= UI.EMPTY_STRING;
+//	private static final String	DEVELOPMENT_VERSION_TEXT	= "DEVELOPMENT";									//$NON-NLS-1$
+//	private static final String	DEV_WINDOW_TITLE			= UI.DASH_WITH_SPACE + DEVELOPMENT_VERSION_TEXT;
+// V V V V V V V V V V V V V V V V V V V V V V V V V V V V V V V V V V V V V V V V V V V V V V V
+	private static final String	DEVELOPMENT_VERSION_TEXT	= UI.EMPTY_STRING;
+	private static final String	DEV_WINDOW_TITLE			= UI.EMPTY_STRING;
 
-//	private static String		_subVersion					= UI.EMPTY_STRING;
-	private static String		_subVersion					= " ireland";										//$NON-NLS-1$
+	private static String		_subVersion					= UI.EMPTY_STRING;
+// V V V V V V V V V V V V V V V V V V V V V V V V V V V V V V V V V V V V V V V V V V V V V V V
+//	private static String		_subVersion					= " ireland";										//$NON-NLS-1$
 //	private static String		_subVersion	= " BETA 1";	//$NON-NLS-1$
 
 // this is disabled because it contains redundant information and too much numbers which nobody needs

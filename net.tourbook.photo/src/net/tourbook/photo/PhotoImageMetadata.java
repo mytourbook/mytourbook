@@ -62,4 +62,42 @@ public class PhotoImageMetadata {
 	public String	model;
 
 	public PhotoImageMetadata() {}
+
+	@Override
+	public String toString() {
+		return "PhotoImageMetadata\n[\nfileDateTime="
+				+ fileDateTime
+				+ ", \n"
+				+ "exifDateTime="
+				+ exifDateTime
+				+ ", \n"
+				+ "imageWidth="
+				+ imageWidth
+				+ ", \n"
+				+ "imageHeight="
+				+ imageHeight
+				+ ", \n"
+				+ "orientation="
+				+ orientation
+				+ ", \n"
+				+ "imageDirection="
+				+ imageDirection
+				+ ", \n"
+				+ "altitude="
+				+ altitude
+				+ ", \n"
+				+ "latitude="
+				+ latitude
+				+ ", \nlongitude="
+				+ longitude
+				+ ", \ngpsAreaInfo="
+				+ gpsAreaInfo
+				+ ", \nobjectName="
+				+ objectName
+				+ ", \ncaptionAbstract="
+				+ captionAbstract
+				+ ", \nmodel="
+				+ model
+				+ "\n]";
+	}
 }

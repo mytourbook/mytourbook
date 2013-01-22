@@ -586,7 +586,7 @@ public class PhotoLoadManager {
 													final IPhotoServiceProvider photoServiceProvider,
 													final boolean isUpdateUI) {
 
-		// put image loading item into the waiting queue
+		// put loading item into the sql waiting queue
 		_waitingQueueSql.add(new PhotoSqlLoader(photo, loadCallbackImage, photoServiceProvider, isUpdateUI));
 
 		final Runnable executorTask = new Runnable() {

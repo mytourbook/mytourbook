@@ -1140,7 +1140,7 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 					} else {
 
 						if (starIndex < ratingStars) {
-							starImage = _imageRatingStar;
+							starImage = _imageRatingStarNotHoveredButSet;
 						} else {
 							starImage = _imageRatingStarNotHovered;
 						}
@@ -1419,7 +1419,26 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 		final boolean isStarsModified = itemIsHovered_Stars(hoveredItem, itemMouseX, itemMouseY);
 		final boolean isAnnotationModified = itemIsHovered_Annotation(hoveredItem, itemMouseX, itemMouseY);
 
-		return isStarsModified || isAnnotationModified;
+		boolean isModified = isStarsModified || isAnnotationModified;
+
+		if (hoveredItem.isNeedExitUIUpdate == false) {
+
+			// item is not yet entered
+
+			/*
+			 * with this mechanism the unhovered stars are displayed and the user has a better UI
+			 * response
+			 */
+
+			isModified = true;
+
+			hoveredItem.isNeedExitUIUpdate = true;
+		}
+
+//		System.out.println(UI.timeStampNano() + " itemIsHovered\tisModified=" + isModified);
+//		// TODO remove SYSTEM.OUT.PRINTLN
+
+		return isModified;
 	}
 
 	/**

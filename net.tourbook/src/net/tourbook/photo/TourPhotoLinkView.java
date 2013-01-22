@@ -1534,7 +1534,7 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 
 				// get tour for the first photo
 
-				final long tourPhotoTime = tourPhotos.get(0).adjustedTime;
+				final long tourPhotoTime = tourPhotos.get(0).adjustedTimeLink;
 
 				for (final TourPhotoLink link : _visibleTourPhotoLinks) {
 
@@ -1625,13 +1625,13 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 			final long exifTime = photo.imageExifTime;
 			final long cameraTimeAdjustment = photo.camera.timeAdjustment;
 
-			photo.adjustedTime = exifTime + cameraTimeAdjustment;
+			photo.adjustedTimeLink = exifTime + cameraTimeAdjustment;
 
 			// force that the position are updated
 			photo.resetWorldPosition();
 		}
 
-		Collections.sort(_allPhotos, TourPhotoManager.AdjustTimeComparator);
+		Collections.sort(_allPhotos, TourPhotoManager.AdjustTimeComparatorLink);
 	}
 
 	/**

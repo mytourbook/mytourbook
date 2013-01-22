@@ -99,6 +99,8 @@ public abstract class AnimatedToolTipShell {
 
 	private boolean						_isReceiveOnMouseMove;
 
+	private int							_fadeInSteps							= FADE_IN_STEPS;
+
 	/*
 	 * these settings are modifying the default behaviour which was implemented to show a photo
 	 * gallery tooltip
@@ -386,7 +388,7 @@ public abstract class AnimatedToolTipShell {
 					final boolean isInTarget = shellCurrentLocation.x == shellEndX
 							&& shellCurrentLocation.y == shellEndY;
 
-					final int diffAlpha = ALPHA_OPAQUE / FADE_IN_STEPS;
+					final int diffAlpha = ALPHA_OPAQUE / _fadeInSteps;
 
 					newAlpha = currentAlpha + diffAlpha;
 					if (newAlpha > ALPHA_OPAQUE) {
@@ -1047,6 +1049,10 @@ public abstract class AnimatedToolTipShell {
 
 	protected void setBehaviourOnMouseOver(final int mouseOverBehaviour) {
 		_mouseOverBehaviour = mouseOverBehaviour;
+	}
+
+	public void setFadeIsSteps(final int fadeInSteps) {
+		_fadeInSteps = fadeInSteps;
 	}
 
 	public void setIsKeepShellOpenWhenMoved(final boolean isKeepShellOpenWhenMoved) {

@@ -46,8 +46,8 @@ public class ActionPhotoProperties extends ContributionItem {
 	private PhotoProperties		_photoProperties;
 
 	private ToolBar				_toolBar;
-	private ToolItem			_actionToolItem;
 
+	private ToolItem			_actionToolItem;
 	private IDialogSettings		_state;
 
 	/*
@@ -56,7 +56,21 @@ public class ActionPhotoProperties extends ContributionItem {
 	private Control				_parent;
 
 	private Image				_imageEnabled;
+	private Image				_imageEnabledNoPhotos;
+	private Image				_imageEnabledWithPhotos;
 	private Image				_imageDisabled;
+
+	public class PhotoPropertiesUI extends PhotoProperties {
+
+		public PhotoPropertiesUI(final Control parent, final ToolBar toolBar, final IDialogSettings state) {
+			super(parent, toolBar, state);
+		}
+
+		@Override
+		protected void updateFilterActionUI(final MapFilterData data) {
+			onUpdateFilter(data);
+		}
+	}
 
 	public ActionPhotoProperties(final TourMapView mapView, final Control parent, final IDialogSettings state) {
 
@@ -66,9 +80,9 @@ public class ActionPhotoProperties extends ContributionItem {
 		_parent = parent;
 		_state = state;
 
-//		_imageEnabled = UI.IMAGE_REGISTRY.get(UI.IMAGE_ACTION_PHOTO_PROPERTIES);
-//		_imageDisabled = UI.IMAGE_REGISTRY.get(UI.IMAGE_ACTION_PHOTO_PROPERTIES_DISABLED);
 		_imageEnabled = UI.IMAGE_REGISTRY.get(UI.IMAGE_ACTION_PHOTO_FILTER);
+		_imageEnabledNoPhotos = UI.IMAGE_REGISTRY.get(UI.IMAGE_ACTION_PHOTO_FILTER_NO_PHOTOS);
+		_imageEnabledWithPhotos = UI.IMAGE_REGISTRY.get(UI.IMAGE_ACTION_PHOTO_FILTER_WITH_PHOTOS);
 		_imageDisabled = UI.IMAGE_REGISTRY.get(UI.IMAGE_ACTION_PHOTO_FILTER_DISABLED);
 	}
 
@@ -111,7 +125,7 @@ public class ActionPhotoProperties extends ContributionItem {
 				}
 			});
 
-			_photoProperties = new PhotoProperties(_parent, _toolBar, _state);
+			_photoProperties = new PhotoPropertiesUI(_parent, _toolBar, _state);
 
 			// send notifications to the map to update displayed photos
 			_photoProperties.addPropertiesListener(_mapView);
@@ -171,6 +185,15 @@ public class ActionPhotoProperties extends ContributionItem {
 		}
 
 		_photoProperties.open(itemBounds, true);
+	}
+
+	private void onUpdateFilter(final MapFilterData data) {
+
+		_actionToolItem.setImage(data.allPhotos == 0 ? //
+				_imageEnabled
+				: data.filteredPhotos == 0 ? //
+						_imageEnabledNoPhotos
+						: _imageEnabledWithPhotos);
 	}
 
 	void restoreState() {

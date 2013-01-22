@@ -89,7 +89,8 @@ public class Photo {
 	 * Time in ms (or {@link Long#MIN_VALUE} when not set) when photo was taken + time adjustments,
 	 * e.g. wrong time zone, wrong time is set in the camera.
 	 */
-	public long											adjustedTime					= Long.MIN_VALUE;
+	public long											adjustedTimeTour				= Long.MIN_VALUE;
+	public long											adjustedTimeLink				= Long.MIN_VALUE;
 
 	public long											imageFileSize;
 
@@ -325,9 +326,6 @@ public class Photo {
 	 */
 	private PhotoImageMetadata createPhotoMetadata(final IImageMetadata imageMetadata) {
 
-// this will log all available meta data
-//		System.out.println(imageMetadata.toString());
-
 		final PhotoImageMetadata photoMetadata = new PhotoImageMetadata();
 
 		/*
@@ -365,12 +363,14 @@ public class Photo {
 					jpegMetadata,
 					ExifTagConstants.EXIF_TAG_EXIF_IMAGE_WIDTH,
 					Integer.MIN_VALUE);
+
 			photoMetadata.imageHeight = getExifValueInt(
 					jpegMetadata,
 					ExifTagConstants.EXIF_TAG_EXIF_IMAGE_LENGTH,
 					Integer.MIN_VALUE);
 
 			photoMetadata.imageDirection = getExifValueDouble(jpegMetadata, GpsTagConstants.GPS_TAG_GPS_IMG_DIRECTION);
+
 			photoMetadata.altitude = getExifValueDouble(jpegMetadata, GpsTagConstants.GPS_TAG_GPS_ALTITUDE);
 
 			photoMetadata.model = getExifValueString(jpegMetadata, TiffTagConstants.TIFF_TAG_MODEL);
@@ -425,6 +425,16 @@ public class Photo {
 		// set file date time
 //		photoMetadata.fileDateTime = new DateTime(DateTimeZone.UTC).withMillis(imageFileLastModified);
 		photoMetadata.fileDateTime = new DateTime(imageFileLastModified);
+
+//// this will log all available meta data
+//		System.out.println(UI.timeStampNano());
+//		System.out.println(UI.timeStampNano() + " " + imageFileName);
+//		System.out.println(UI.timeStampNano());
+//		System.out.println(imageMetadata.toString());
+//		System.out.println(UI.timeStampNano());
+//		System.out.println(photoMetadata);
+//		System.out.println(UI.timeStampNano());
+//		// TODO remove SYSTEM.OUT.PRINTLN
 
 		return photoMetadata;
 	}

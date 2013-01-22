@@ -62,7 +62,7 @@ public class GalleryMT20Item {
 	/**
 	 * Is <code>true</code> when this gallery item is hovered and the UI needs to be updated.
 	 */
-	public boolean						isNeedPostUIUpdate;
+	public boolean						isNeedExitUIUpdate;
 
 	public boolean						isInHoveredGroup;
 

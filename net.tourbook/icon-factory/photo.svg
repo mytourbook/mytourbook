@@ -2985,17 +2985,6 @@
          offset="1"
          id="stop4420-0-0-4" />
     </linearGradient>
-    <clipPath
-       clipPathUnits="userSpaceOnUse"
-       id="clipPath4410">
-      <rect
-         y="124.62304"
-         x="204.54732"
-         height="3.8842766"
-         width="6.9053807"
-         id="rect4412"
-         style="opacity:0.52212387;color:#000000;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.40000001;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate" />
-    </clipPath>
     <radialGradient
        inkscape:collect="always"
        xlink:href="#linearGradient4416-8-7-7"
@@ -3586,6 +3575,190 @@
        id="radialGradient4554"
        xlink:href="#linearGradient3765-4-1-4-71"
        inkscape:collect="always" />
+    <radialGradient
+       r="3.0946617"
+       fy="128.62851"
+       fx="207.47215"
+       cy="128.62851"
+       cx="207.47215"
+       gradientTransform="matrix(1,0,0,0.95487583,0,5.7793099)"
+       gradientUnits="userSpaceOnUse"
+       id="radialGradient3775-1"
+       xlink:href="#linearGradient4416-1-7"
+       inkscape:collect="always" />
+    <linearGradient
+       id="linearGradient4416-1-7">
+      <stop
+         id="stop4418-1-4"
+         offset="0"
+         style="stop-color:#fa6f00;stop-opacity:1;" />
+      <stop
+         style="stop-color:#ff0501;stop-opacity:1;"
+         offset="1"
+         id="stop4420-5-0" />
+    </linearGradient>
+    <radialGradient
+       r="5"
+       fy="97.362183"
+       fx="183"
+       cy="97.362183"
+       cx="183"
+       gradientTransform="matrix(1,0,0,0.7999991,142.05,21.972689)"
+       gradientUnits="userSpaceOnUse"
+       id="radialGradient3695-1-9"
+       xlink:href="#linearGradient6549-4-2-2-8-74-4"
+       inkscape:collect="always" />
+    <linearGradient
+       id="linearGradient6549-4-2-2-8-74-4">
+      <stop
+         style="stop-color:#515151;stop-opacity:1;"
+         offset="0"
+         id="stop6551-2-8-8-8-0-8" />
+      <stop
+         id="stop6559-3-2-2-2-9-8"
+         offset="0.50693375"
+         style="stop-color:#404040;stop-opacity:1;" />
+      <stop
+         style="stop-color:#6c6c6c;stop-opacity:1;"
+         offset="1"
+         id="stop6553-2-8-9-4-4-2" />
+    </linearGradient>
+    <radialGradient
+       r="5"
+       fy="97.362183"
+       fx="183"
+       cy="97.362183"
+       cx="183"
+       gradientTransform="matrix(1,0,0,0.7999991,162.05,21.972689)"
+       gradientUnits="userSpaceOnUse"
+       id="radialGradient3762"
+       xlink:href="#linearGradient6549-4-2-2-8-74-4"
+       inkscape:collect="always" />
+    <radialGradient
+       r="3.0946617"
+       fy="128.62851"
+       fx="207.47215"
+       cy="128.62851"
+       cx="207.47215"
+       gradientTransform="matrix(1,0,0,0.95487583,0,5.7793099)"
+       gradientUnits="userSpaceOnUse"
+       id="radialGradient3775-17"
+       xlink:href="#linearGradient4416-1-1"
+       inkscape:collect="always" />
+    <linearGradient
+       id="linearGradient4416-1-1">
+      <stop
+         id="stop4418-1-1"
+         offset="0"
+         style="stop-color:#48ff2a;stop-opacity:1;" />
+      <stop
+         style="stop-color:#29db00;stop-opacity:1;"
+         offset="1"
+         id="stop4420-5-5" />
+    </linearGradient>
+    <radialGradient
+       r="5"
+       fy="97.362183"
+       fx="183"
+       cy="97.362183"
+       cx="183"
+       gradientTransform="matrix(1,0,0,0.7999991,142.05,21.972689)"
+       gradientUnits="userSpaceOnUse"
+       id="radialGradient3695-1-2"
+       xlink:href="#linearGradient6549-4-2-2-8-74-7"
+       inkscape:collect="always" />
+    <linearGradient
+       id="linearGradient6549-4-2-2-8-74-7">
+      <stop
+         style="stop-color:#515151;stop-opacity:1;"
+         offset="0"
+         id="stop6551-2-8-8-8-0-6" />
+      <stop
+         id="stop6559-3-2-2-2-9-1"
+         offset="0.50693375"
+         style="stop-color:#404040;stop-opacity:1;" />
+      <stop
+         style="stop-color:#6c6c6c;stop-opacity:1;"
+         offset="1"
+         id="stop6553-2-8-9-4-4-4" />
+    </linearGradient>
+    <radialGradient
+       r="5"
+       fy="97.362183"
+       fx="183"
+       cy="97.362183"
+       cx="183"
+       gradientTransform="matrix(1,0,0,0.7999991,182.05,21.972689)"
+       gradientUnits="userSpaceOnUse"
+       id="radialGradient3762-2"
+       xlink:href="#linearGradient6549-4-2-2-8-74-7"
+       inkscape:collect="always" />
+    <clipPath
+       clipPathUnits="userSpaceOnUse"
+       id="clipPath3767">
+      <rect
+         style="opacity:0.52212387;color:#000000;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.40000001;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+         id="rect3769"
+         width="6.9053807"
+         height="4.5327787"
+         x="204.54732"
+         y="124.62304" />
+    </clipPath>
+    <radialGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient4416-8-7-4"
+       id="radialGradient3645-1-17"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(1,0,0,0.95487583,0,5.7793099)"
+       cx="207.47215"
+       cy="128.62851"
+       fx="207.47215"
+       fy="128.62851"
+       r="3.0946617" />
+    <linearGradient
+       id="linearGradient4416-8-7-4">
+      <stop
+         id="stop4418-2-4-0"
+         offset="0"
+         style="stop-color:#fae000;stop-opacity:1;" />
+      <stop
+         style="stop-color:#ffb001;stop-opacity:1;"
+         offset="1"
+         id="stop4420-4-0-9" />
+    </linearGradient>
+    <clipPath
+       clipPathUnits="userSpaceOnUse"
+       id="clipPath3767-4">
+      <rect
+         style="opacity:0.52212387;color:#000000;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.40000001;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+         id="rect3769-8"
+         width="6.9053807"
+         height="4.5327787"
+         x="204.54732"
+         y="124.62304" />
+    </clipPath>
+    <radialGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient4416-7-7-8-4"
+       id="radialGradient4414-1-1-8-82"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(1,0,0,0.95487583,0,5.7793099)"
+       cx="207.47215"
+       cy="128.62851"
+       fx="207.47215"
+       fy="128.62851"
+       r="3.0946617" />
+    <linearGradient
+       id="linearGradient4416-7-7-8-4">
+      <stop
+         id="stop4418-4-4-2-5"
+         offset="0"
+         style="stop-color:#e1e1e1;stop-opacity:1;" />
+      <stop
+         style="stop-color:#e1e1e1;stop-opacity:1;"
+         offset="1"
+         id="stop4420-0-0-4-5" />
+    </linearGradient>
   </defs>
   <sodipodi:namedview
      id="base"
@@ -3594,14 +3767,14 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="22.627416"
-     inkscape:cx="224.59823"
-     inkscape:cy="891.30017"
+     inkscape:zoom="15.999999"
+     inkscape:cx="228.81292"
+     inkscape:cy="886.34176"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="true"
      inkscape:window-width="1514"
-     inkscape:window-height="1181"
+     inkscape:window-height="881"
      inkscape:window-x="78"
      inkscape:window-y="-8"
      inkscape:window-maximized="1"
@@ -4773,7 +4946,7 @@
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90"
        id="path4358-5-1"
-       clip-path="url(#clipPath4410)" />
+       clip-path="url(#clipPath3767)" />
     <rect
        style="opacity:0.98999999;fill:none;stroke:none"
        id="rect6561-8-1-9-9-5-5"
@@ -5156,13 +5329,13 @@
        sodipodi:rx="2.5"
        sodipodi:ry="2.5"
        d="m 95,39.862183 a 2.5,2.5 0 1 1 -5,0 2.5,2.5 0 1 1 5,0 z"
-       transform="matrix(1.6008873,0,0,1.6008873,74.917925,90.547321)"
+       transform="matrix(1.6008873,0,0,1.6008873,59.917929,70.547319)"
        inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook.common\icons\photo-properties.png"
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90" />
     <path
        style="color:#000000;fill:#ff0000;fill-opacity:1;stroke:none;stroke-width:1.52699995;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
-       d="m 219,162.36218 -2,-2 -2,-2 4,0 z"
+       d="m 204,142.36218 -2,-2 -2,-2 4,0 z"
        id="rect4573"
        inkscape:connector-curvature="0"
        sodipodi:nodetypes="ccccc"
@@ -5171,7 +5344,7 @@
        inkscape:export-ydpi="90" />
     <path
        style="color:#000000;fill:#ff0000;fill-opacity:1;stroke:none;stroke-width:1.52699995;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
-       d="m 229,160.36218 -2,2 0,-4 4,0 z"
+       d="m 214,140.36218 -2,2 0,-4 4,0 z"
        id="rect4573-7"
        inkscape:connector-curvature="0"
        sodipodi:nodetypes="ccccc"
@@ -5180,7 +5353,7 @@
        inkscape:export-ydpi="90" />
     <path
        style="color:#000000;fill:#ff0000;fill-opacity:1;stroke:none;stroke-width:1.52699995;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
-       d="m 219,150.36218 -4,0 2,-2 2,-2 z"
+       d="m 204,130.36218 -4,0 2,-2 2,-2 z"
        id="rect4573-3"
        inkscape:connector-curvature="0"
        sodipodi:nodetypes="ccccc"
@@ -5189,7 +5362,7 @@
        inkscape:export-ydpi="90" />
     <path
        style="color:#000000;fill:#ff0000;fill-opacity:1;stroke:none;stroke-width:1.52699995;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
-       d="m 231,150.36218 -4,0 0,-4 2,2 z"
+       d="m 216,130.36218 -4,0 0,-4 2,2 z"
        id="rect4573-35"
        inkscape:connector-curvature="0"
        sodipodi:nodetypes="ccccc"
@@ -5201,10 +5374,88 @@
        id="rect6561-8-1-9-9-5-5-9-1"
        width="16"
        height="16"
-       x="215"
-       y="146.36218"
+       x="200"
+       y="126.36218"
        inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook.common\icons\photo-properties.png"
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90" />
+    <path
+       style="fill:url(#radialGradient3762);fill-opacity:1;stroke:#444444;stroke-width:0.5;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       d="m 343.05,95.862353 4,4 10e-6,2.249827 2,0 -10e-6,-2.249827 4,-4 z"
+       id="path5771-6-9-5-5-5-4"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook.common\icons\photo-filter-rating-stars-no-photos.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"
+       sodipodi:nodetypes="ccccccc" />
+    <rect
+       style="opacity:0.98999999;fill:none;stroke:none"
+       id="rect6561-7-5-1-5"
+       width="16"
+       height="16"
+       x="340"
+       y="86.362183"
+       inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook.common\icons\photo-filter-rating-stars-no-photos.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <path
+       sodipodi:type="star"
+       style="color:#000000;fill:url(#radialGradient3775-1);fill-opacity:1;stroke:#a00000;stroke-width:0.21114060000000001;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+       sodipodi:sides="5"
+       sodipodi:cx="208"
+       sodipodi:cy="128.36218"
+       sodipodi:r1="3"
+       sodipodi:r2="1.5"
+       sodipodi:arg1="-1.5707963"
+       sodipodi:arg2="-0.9424778"
+       inkscape:flatsided="false"
+       inkscape:rounded="0"
+       inkscape:randomized="0"
+       d="m 208,125.36218 0.88168,1.78648 1.97149,0.28647 -1.42659,1.39058 0.33678,1.96352 -1.76336,-0.92705 -1.76336,0.92705 0.33678,-1.96352 -1.42659,-1.39058 1.97149,-0.28647 z"
+       inkscape:transform-center-y="-0.42172537"
+       transform="matrix(1.4720795,0,0,1.4720795,41.81976,-98.003237)"
+       inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook.common\icons\photo-filter-rating-stars-no-photos.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"
+       id="path4358-2-5" />
+    <path
+       style="fill:url(#radialGradient3762-2);fill-opacity:1;stroke:#444444;stroke-width:0.5;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       d="m 363.05,95.862353 4,3.999997 10e-6,2.24983 2,0 -10e-6,-2.24983 4,-3.999997 z"
+       id="path5771-6-9-5-5-5-3"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook.common\icons\photo-filter-rating-stars-with-photos.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"
+       sodipodi:nodetypes="ccccccc" />
+    <rect
+       style="opacity:0.98999999;fill:none;stroke:none"
+       id="rect6561-7-5-1-2"
+       width="16"
+       height="16"
+       x="360"
+       y="86.362183"
+       inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook.common\icons\photo-filter-rating-stars-with-photos.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <path
+       sodipodi:type="star"
+       style="color:#000000;fill:url(#radialGradient3775-17);fill-opacity:1;stroke:#007800;stroke-width:0.21114060000000001;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+       sodipodi:sides="5"
+       sodipodi:cx="208"
+       sodipodi:cy="128.36218"
+       sodipodi:r1="3"
+       sodipodi:r2="1.5"
+       sodipodi:arg1="-1.5707963"
+       sodipodi:arg2="-0.9424778"
+       inkscape:flatsided="false"
+       inkscape:rounded="0"
+       inkscape:randomized="0"
+       d="m 208,125.36218 0.88168,1.78648 1.97149,0.28647 -1.42659,1.39058 0.33678,1.96352 -1.76336,-0.92705 -1.76336,0.92705 0.33678,-1.96352 -1.42659,-1.39058 1.97149,-0.28647 z"
+       inkscape:transform-center-y="-0.42172537"
+       transform="matrix(1.4720795,0,0,1.4720795,61.81976,-98.003237)"
+       inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook.common\icons\photo-filter-rating-stars-with-photos.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"
+       id="path4358-2-2" />
   </g>
 </svg>

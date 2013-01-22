@@ -392,7 +392,7 @@ public class TourPhotosView extends ViewPart implements IPhotoEventListener {
 	}
 
 	/**
-	 * Get photos from tour photos.
+	 * Get photos from a tour.
 	 * 
 	 * @param allPhotos
 	 * @param tourData
@@ -416,8 +416,8 @@ public class TourPhotosView extends ViewPart implements IPhotoEventListener {
 		final int gallerySize = galleryPhotos.size();
 		if (gallerySize > 0) {
 
-			final long tourStartTime = galleryPhotos.get(0).adjustedTime;
-			final long tourEndTime = galleryPhotos.get(gallerySize - 1).adjustedTime;
+			final long tourStartTime = galleryPhotos.get(0).adjustedTimeTour;
+			final long tourEndTime = galleryPhotos.get(gallerySize - 1).adjustedTimeTour;
 
 			if (tourStartTime < _photoStartTime) {
 				_photoStartTime = tourStartTime;

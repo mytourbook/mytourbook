@@ -141,7 +141,7 @@ public class TourPhoto {
 		imageFileLastModified = imageFile.lastModified();
 		imageExifTime = photo.imageExifTime;
 
-		final long photoAdjustedTime = photo.adjustedTime;
+		final long photoAdjustedTime = photo.adjustedTimeLink;
 		adjustedTime = photoAdjustedTime == Long.MIN_VALUE ? imageExifTime : photoAdjustedTime;
 
 		if (photo.isGeoFromExif) {

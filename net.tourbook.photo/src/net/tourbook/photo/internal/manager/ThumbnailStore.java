@@ -17,7 +17,10 @@ package net.tourbook.photo.internal.manager;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Properties;
 import java.util.concurrent.locks.ReentrantLock;
 
 import javax.imageio.ImageIO;
@@ -52,6 +55,14 @@ public class ThumbnailStore {
 
 	static final String					THUMBNAIL_IMAGE_EXTENSION_JPG	= "jpg";						//$NON-NLS-1$
 	private static final String			THUMBNAIL_STORE_OS_PATH			= "thumbnail-store";			//$NON-NLS-1$
+
+	/*
+	 * photo image properties saved in a properties file
+	 */
+	private static final String			PROPERTIES_FILE_EXTENSION		= "properties";				//$NON-NLS-1$
+//	private static final String			PROPERTIES_FILE_HEADER			= "Image properties ";		//$NON-NLS-1$
+	public static final String			ORIGINAL_IMAGE_WIDTH			= "OriginalImageWidth";		//$NON-NLS-1$
+	public static final String			ORIGINAL_IMAGE_HEIGHT			= "OriginalImageHeight";		//$NON-NLS-1$
 
 	private static IPreferenceStore		_prefStore						= Activator.getDefault()//
 																				.getPreferenceStore();
@@ -180,23 +191,47 @@ public class ThumbnailStore {
 
 		for (final File imageFile : imageFiles) {
 
-			cleanupStoreFiles_10(imageFile, ImageQuality.THUMB, Photo.getImageKeyThumb(imageFile.getPath()));
-			cleanupStoreFiles_10(imageFile, ImageQuality.HQ, Photo.getImageKeyHQ(imageFile.getPath()));
+			final String imageFilePath = imageFile.getPath();
+
+			cleanupStoreFiles_10_QFile(imageFile, ImageQuality.THUMB, Photo.getImageKeyThumb(imageFilePath));
+			cleanupStoreFiles_10_QFile(imageFile, ImageQuality.HQ, Photo.getImageKeyHQ(imageFilePath));
 		}
 	}
 
-	private static void cleanupStoreFiles_10(	final File imageFile,
-												final ImageQuality imageQuality,
-												final String imageKey) {
+	private static void cleanupStoreFiles_10_QFile(	final File imageFile,
+													final ImageQuality imageQuality,
+													final String imageKey) {
 
 		final IPath storeImagePath = getStoreImagePath(imageFile.getName(), imageKey, imageQuality);
+		final IPath propImagePath = getPropertiesPathFromImagePath(storeImagePath);
+
+		cleanupStoreFiles_20_Delete(storeImagePath);
+		cleanupStoreFiles_20_Delete(propImagePath);
+	}
+
+	private static void cleanupStoreFiles_20_Delete(final IPath storeImagePath) {
 
 		final String storeFilePath = storeImagePath.toOSString();
 
 		final File storeFile = new File(storeFilePath);
 
 		if (storeFile.isFile()) {
+
+//			/*
+//			 * Java 7
+//			 */
+//			try {
+//
+//				final java.nio.file.Path path = FileSystems.getDefault().getPath(storeFilePath);
+//
+//				Files.delete(path);
+//
+//			} catch (final Exception e) {
+//				StatusUtil.log(NLS.bind("cannot delete file: {0}", storeFilePath)); //$NON-NLS-1$
+//			}
+
 			final boolean isDeleted = storeFile.delete();
+
 			if (isDeleted == false) {
 				StatusUtil.log(NLS.bind("cannot delete file: {0}", storeFilePath)); //$NON-NLS-1$
 			}
@@ -260,9 +295,7 @@ public class ThumbnailStore {
 		}
 
 		// update last cleanup time
-		_prefStore.setValue(
-IPhotoPreferences.PHOTO_THUMBNAIL_STORE_LAST_CLEANUP_DATE_TIME,
-				new DateTime().getMillis());
+		_prefStore.setValue(IPhotoPreferences.PHOTO_THUMBNAIL_STORE_LAST_CLEANUP_DATE_TIME, new DateTime().getMillis());
 	}
 
 	/**
@@ -397,6 +430,18 @@ IPhotoPreferences.PHOTO_THUMBNAIL_STORE_LAST_CLEANUP_DATE_TIME,
 		return isFileFolderDeleted ? 1 : 0;
 	}
 
+	static IPath getPropertiesPathFromImagePath(final IPath storeImageFilePath) {
+
+		final String rawFileName = storeImageFilePath.removeFileExtension().lastSegment();
+
+		final IPath propImageFilePath = storeImageFilePath
+				.removeLastSegments(1)
+				.append(rawFileName)
+				.addFileExtension(PROPERTIES_FILE_EXTENSION);
+
+		return propImageFilePath;
+	}
+
 	static synchronized IPath getStoreImagePath(final Photo photo, final ImageQuality imageQuality) {
 
 		if (photo.imageFilePathName.startsWith(_storePath.toOSString())) {
@@ -504,12 +549,47 @@ IPhotoPreferences.PHOTO_THUMBNAIL_STORE_LAST_CLEANUP_DATE_TIME,
 		return tnFolderPath.addTrailingSeparator();
 	}
 
+	private static void saveProperties(final IPath storeImageFilePath, final Properties originalImageProperties) {
+
+		IPath propImageFilePath = null;
+		FileOutputStream fileStream = null;
+
+		try {
+
+			propImageFilePath = getPropertiesPathFromImagePath(storeImageFilePath);
+
+			final File propFile = new File(propImageFilePath.toOSString());
+
+			fileStream = new FileOutputStream(propFile);
+
+			originalImageProperties.store(fileStream, null);
+
+		} catch (final Exception e) {
+
+			StatusUtil.log(NLS.bind(//
+					"Cannot save properties file: \"{0}\"", //$NON-NLS-1$
+					propImageFilePath.toOSString()), e);
+		} finally {
+
+			if (fileStream != null) {
+				try {
+					fileStream.close();
+				} catch (final IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+	}
+
 	/**
 	 * @param thumbImg
 	 * @param storeImageFilePath
+	 * @param originalImageProperties
 	 * @return Returns <code>true</code>when the image could be saved in the thumb store.
 	 */
-	static boolean saveThumbImageWithAWT(final BufferedImage thumbImg, final IPath storeImageFilePath) {
+	static boolean saveThumbImageWithAWT(	final BufferedImage thumbImg,
+											final IPath storeImageFilePath,
+											final Properties originalImageProperties) {
 
 		try {
 
@@ -519,6 +599,8 @@ IPhotoPreferences.PHOTO_THUMBNAIL_STORE_LAST_CLEANUP_DATE_TIME,
 			}
 
 			ImageIO.write(thumbImg, THUMBNAIL_IMAGE_EXTENSION_JPG, new File(storeImageFilePath.toOSString()));
+
+			saveProperties(storeImageFilePath, originalImageProperties);
 
 		} catch (final Exception e) {
 
@@ -532,7 +614,9 @@ IPhotoPreferences.PHOTO_THUMBNAIL_STORE_LAST_CLEANUP_DATE_TIME,
 		return true;
 	}
 
-	static void saveThumbImageWithSWT(final Image thumbnailImage, final IPath storeImageFilePath) {
+	static void saveThumbImageWithSWT(	final Image thumbnailImage,
+										final IPath storeImageFilePath,
+										final Properties originalImageProperties) {
 
 		try {
 
@@ -552,6 +636,8 @@ IPhotoPreferences.PHOTO_THUMBNAIL_STORE_LAST_CLEANUP_DATE_TIME,
 			 */
 			imageLoader.compression = 75;
 			imageLoader.save(fullImageFilePath.toOSString(), SWT.IMAGE_JPEG);
+
+			saveProperties(storeImageFilePath, originalImageProperties);
 
 		} catch (final Exception e) {
 

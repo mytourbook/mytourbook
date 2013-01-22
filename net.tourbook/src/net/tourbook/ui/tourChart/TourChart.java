@@ -810,8 +810,11 @@ public class TourChart extends Chart {
 	 * 
 	 * @param srcPhotos
 	 * @param chartPhotos
+	 * @param isPhotoSavedInTour
 	 */
-	private void createChartPhotos(final ArrayList<Photo> srcPhotos, final ArrayList<ChartPhoto> chartPhotos) {
+	private void createChartPhotos(	final ArrayList<Photo> srcPhotos,
+									final ArrayList<ChartPhoto> chartPhotos,
+									final boolean isPhotoSavedInTour) {
 
 		final int[] timeSerie = _tourData.timeSerie;
 		final long[] historySerie = _tourData.timeSerieHistory;
@@ -861,7 +864,12 @@ public class TourChart extends Chart {
 			// check if a photo is in the current time slice
 			while (true) {
 
-				final long imageAdjustedTime = photo.adjustedTime;
+//				boolean isSavedInTour = photo.isSavedInTour;
+
+				final long imageAdjustedTime = isPhotoSavedInTour //
+						? photo.adjustedTimeTour
+						: photo.adjustedTimeLink;
+
 				long imageTime = 0;
 
 				if (imageAdjustedTime != Long.MIN_VALUE) {
@@ -1035,7 +1043,7 @@ public class TourChart extends Chart {
 		if (srcTourPhotos != null && srcTourPhotos.size() > 0) {
 
 			final ArrayList<ChartPhoto> chartPhotos = new ArrayList<ChartPhoto>();
-			createChartPhotos(srcTourPhotos, chartPhotos);
+			createChartPhotos(srcTourPhotos, chartPhotos, true);
 
 			final PhotoCategory chartPhotoGroup = new PhotoCategory(chartPhotos, ChartPhotoType.TOUR);
 			chartPhotoGroups.add(chartPhotoGroup);
@@ -1052,7 +1060,7 @@ public class TourChart extends Chart {
 			if (srcLinkPhotos.size() > 0) {
 
 				final ArrayList<ChartPhoto> chartPhotos = new ArrayList<ChartPhoto>();
-				createChartPhotos(srcLinkPhotos, chartPhotos);
+				createChartPhotos(srcLinkPhotos, chartPhotos, false);
 
 				final PhotoCategory chartPhotoGroup = new PhotoCategory(chartPhotos, ChartPhotoType.LINK);
 				chartPhotoGroups.add(chartPhotoGroup);
