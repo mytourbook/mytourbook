@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -94,8 +94,8 @@ public class TourDatabase {
 	 */
 	private static final int						TOURBOOK_DB_VERSION							= 23;
 
-//	private static final int						TOURBOOK_DB_VERSION							= 23;	// 13.6.0   ???
-//	private static final int						TOURBOOK_DB_VERSION							= 22;	// 12.12.0   ???
+//	private static final int						TOURBOOK_DB_VERSION							= 23;	// 13.2.0
+//	private static final int						TOURBOOK_DB_VERSION							= 22;	// 12.12.0
 //	private static final int						TOURBOOK_DB_VERSION							= 21;	// 12.1.1
 //	private static final int						TOURBOOK_DB_VERSION							= 20;	// 12.1
 //	private static final int						TOURBOOK_DB_VERSION							= 19;	// 11.8
@@ -201,7 +201,7 @@ public class TourDatabase {
 
 	private static String							DERBY_DRIVER_CLASS;
 	private static String							DERBY_URL;
-	private static final String						DERBY_URL_CREATE_TRUE						= ";create=true"; //$NON-NLS-1$
+	private static final String						DERBY_URL_CREATE_TRUE						= ";create=true";							//$NON-NLS-1$
 
 	private boolean									_isDerbyEmbedded;
 
@@ -2297,7 +2297,7 @@ public class TourDatabase {
 				//
 				// version 22 end ---------
 
-				// version 23 start  -  13.?
+				// version 23 start  -  13.2.0
 				//
 				+ " numberOfTimeSlices			INTEGER DEFAULT 0,				\n" //$NON-NLS-1$
 				+ " numberOfPhotos				INTEGER DEFAULT 0,				\n" //$NON-NLS-1$
@@ -3118,6 +3118,54 @@ public class TourDatabase {
 		}
 	}
 
+	private boolean isColumnAvailable(final Connection conn, final String table, final String column) {
+
+		try {
+
+			System.out.println(net.tourbook.common.UI.timeStampNano() + " table: " + table + ("\tcolumn: " + column)); //$NON-NLS-1$ //$NON-NLS-2$
+
+			final DatabaseMetaData meta = conn.getMetaData();
+
+			final ResultSet result = meta.getColumns(null, TABLE_SCHEMA, table, column.toUpperCase());
+
+			while (result.next()) {
+
+				System.out.println(net.tourbook.common.UI.timeStampNano()
+						+ " \tcolumn name is available: " //$NON-NLS-1$
+						+ result.getString("COLUMN_NAME")); //$NON-NLS-1$
+				// TODO remove SYSTEM.OUT.PRINTLN
+
+				return true;
+			}
+
+			/*
+			 * dump all columns
+			 */
+//			final DatabaseMetaData meta = conn.getMetaData();
+//			final ResultSet result = meta.getColumns(null, TABLE_SCHEMA, table, NULL);
+//
+//			while (result.next()) {
+//				System.out.println("  "
+//						+ result.getString("TABLE_SCHEM")
+//						+ ", "
+//						+ result.getString("TABLE_NAME")
+//						+ ", "
+//						+ result.getString("COLUMN_NAME")
+//						+ ", "
+//						+ result.getString("TYPE_NAME")
+//						+ ", "
+//						+ result.getInt("COLUMN_SIZE")
+//						+ ", "
+//						+ result.getString("NULLABLE"));
+//			}
+
+		} catch (final SQLException e) {
+			UI.showSQLException(e);
+		}
+
+		return false;
+	}
+
 	private void logDbUpdateEnd(final int dbVersion) {
 		System.out.println(NLS.bind(Messages.Tour_Database_UpdateDone, dbVersion));
 		System.out.println();
@@ -3355,7 +3403,7 @@ public class TourDatabase {
 			 * connections and entitymanager which is checking the version number.
 			 * <p>
 			 * Also the data structure must be updated otherwise the entity manager fails because
-			 * the data structure in the programm code MUST be the same in the database.
+			 * the data structure in the programm code MUST be the same as in the database.
 			 */
 			if (isPostUpdate5) {
 				TourDatabase.computeComputedValuesForAllTours(monitor);
@@ -4398,8 +4446,13 @@ public class TourDatabase {
 
 		final Statement stmt = conn.createStatement();
 		{
+			String sql;
 
 			createTable_TourPhoto(stmt);
+
+			if (isColumnAvailable(conn, TABLE_TOUR_DATA, "TourStartTime") == false) {//$NON-NLS-1$
+
+				// table columns are not yet created
 
 //			TOURDATA	TOURDATA	TOURDATA	TOURDATA	TOURDATA	TOURDATA	TOURDATA	TOURDATA
 //			// version 22 start  -  12.12.0
@@ -4409,27 +4462,30 @@ public class TourDatabase {
 //
 //			+ "	TourRecordingTime 			BIGINT DEFAULT 0,				\n" //$NON-NLS-1$
 //			+ "	TourDrivingTime 			BIGINT DEFAULT 0,				\n" //$NON-NLS-1$
-			//
-			// version 22 end ---------
+				//
+				// version 22 end ---------
 
-			String sql;
+				sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN TourStartTime		BIGINT DEFAULT 0"; //$NON-NLS-1$ //$NON-NLS-2$
+				exec(stmt, sql);
 
-			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN TourStartTime		BIGINT DEFAULT 0"; //$NON-NLS-1$ //$NON-NLS-2$
-			exec(stmt, sql);
+				sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN TourEndTime		BIGINT DEFAULT 0"; //$NON-NLS-1$ //$NON-NLS-2$
+				exec(stmt, sql);
 
-			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN TourEndTime		BIGINT DEFAULT 0"; //$NON-NLS-1$ //$NON-NLS-2$
-			exec(stmt, sql);
+				/*
+				 * modify columns
+				 */
+				int no = 0;
+				final int max = 2;
 
-			/*
-			 * modify columns
-			 */
-			int no = 0;
-			final int max = 2;
+				modifyColumnType(TABLE_TOUR_DATA, "TourRecordingTime", "BIGINT DEFAULT 0", stmt, monitor, ++no, max); //			//$NON-NLS-1$ //$NON-NLS-2$
+				modifyColumnType(TABLE_TOUR_DATA, "TourDrivingTime", "BIGINT DEFAULT 0", stmt, monitor, ++no, max); //				//$NON-NLS-1$ //$NON-NLS-2$
 
-			modifyColumnType(TABLE_TOUR_DATA, "TourRecordingTime", "BIGINT DEFAULT 0", stmt, monitor, ++no, max); //			//$NON-NLS-1$ //$NON-NLS-2$
-			modifyColumnType(TABLE_TOUR_DATA, "TourDrivingTime", "BIGINT DEFAULT 0", stmt, monitor, ++no, max); //				//$NON-NLS-1$ //$NON-NLS-2$
+				createIndex_TourData_022(stmt);
+			}
 
-			createIndex_TourData_022(stmt);
+			if (isColumnAvailable(conn, TABLE_TOUR_MARKER, "IsMarkerVisible") == false) {//$NON-NLS-1$
+
+				// table columns are not yet created
 
 //			TOURMARKER	TOURMARKER	TOURMARKER	TOURMARKER	TOURMARKER	TOURMARKER	TOURMARKER	TOURMARKER
 //
@@ -4439,9 +4495,9 @@ public class TourDatabase {
 //			//
 //			// Version 22 - end
 
-			sql = "ALTER TABLE " + TABLE_TOUR_MARKER + " ADD COLUMN IsMarkerVisible		INTEGER DEFAULT 1"; //$NON-NLS-1$ //$NON-NLS-2$
-			exec(stmt, sql);
-
+				sql = "ALTER TABLE " + TABLE_TOUR_MARKER + " ADD COLUMN IsMarkerVisible		INTEGER DEFAULT 1"; //$NON-NLS-1$ //$NON-NLS-2$
+				exec(stmt, sql);
+			}
 		}
 		stmt.close();
 
@@ -4540,6 +4596,10 @@ public class TourDatabase {
 		final Statement stmt = conn.createStatement();
 		{
 
+			if (isColumnAvailable(conn, TABLE_TOUR_PHOTO, "imageFileName") == false) {//$NON-NLS-1$
+
+				// table columns are not yet created
+
 //
 //			TOUR_PHOTO	TOUR_PHOTO	TOUR_PHOTO	TOUR_PHOTO	TOUR_PHOTO	TOUR_PHOTO	TOUR_PHOTO	TOUR_PHOTO	TOUR_PHOTO
 //
@@ -4562,30 +4622,34 @@ public class TourDatabase {
 //			//
 //			// version 23 end
 
-			final String sqlTourPhoto[] = {
-					//
-					"ALTER TABLE " + TABLE_TOUR_PHOTO + " ADD COLUMN	imageFileName		" + varCharNoKomma(TourPhoto.DB_LENGTH_FILE_PATH), //$NON-NLS-1$ //$NON-NLS-2$
-					"ALTER TABLE " + TABLE_TOUR_PHOTO + " ADD COLUMN	imageFileExt		" + varCharNoKomma(TourPhoto.DB_LENGTH_FILE_PATH), //$NON-NLS-1$ //$NON-NLS-2$
-					"ALTER TABLE " + TABLE_TOUR_PHOTO + " ADD COLUMN	imageFilePath		" + varCharNoKomma(TourPhoto.DB_LENGTH_FILE_PATH), //$NON-NLS-1$ //$NON-NLS-2$
-					"ALTER TABLE " + TABLE_TOUR_PHOTO + " ADD COLUMN	imageFilePathName	" + varCharNoKomma(TourPhoto.DB_LENGTH_FILE_PATH), //$NON-NLS-1$ //$NON-NLS-2$
-					//
-					"ALTER TABLE " + TABLE_TOUR_PHOTO + " ADD COLUMN	imageExifTime			BIGINT DEFAULT 0", //$NON-NLS-1$ //$NON-NLS-2$
-					"ALTER TABLE " + TABLE_TOUR_PHOTO + " ADD COLUMN	imageFileLastModified	BIGINT DEFAULT 0", //$NON-NLS-1$ //$NON-NLS-2$
-					"ALTER TABLE " + TABLE_TOUR_PHOTO + " ADD COLUMN	adjustedTime			BIGINT DEFAULT 0", //$NON-NLS-1$ //$NON-NLS-2$
-					//
-					"ALTER TABLE " + TABLE_TOUR_PHOTO + " ADD COLUMN	ratingStars				INT DEFAULT 0", //$NON-NLS-1$ //$NON-NLS-2$
-					//
-					"ALTER TABLE " + TABLE_TOUR_PHOTO + " ADD COLUMN	isGeoFromPhoto			INT DEFAULT 0", //$NON-NLS-1$ //$NON-NLS-2$
-					"ALTER TABLE " + TABLE_TOUR_PHOTO + " ADD COLUMN	latitude 				DOUBLE DEFAULT 0", //$NON-NLS-1$ //$NON-NLS-2$
-					"ALTER TABLE " + TABLE_TOUR_PHOTO + " ADD COLUMN	longitude 				DOUBLE DEFAULT 0", //$NON-NLS-1$ //$NON-NLS-2$
-			};
+				final String sqlTourPhoto[] = {
+						//
+						"ALTER TABLE " + TABLE_TOUR_PHOTO + " ADD COLUMN	imageFileName		" + varCharNoKomma(TourPhoto.DB_LENGTH_FILE_PATH), //$NON-NLS-1$ //$NON-NLS-2$
+						"ALTER TABLE " + TABLE_TOUR_PHOTO + " ADD COLUMN	imageFileExt		" + varCharNoKomma(TourPhoto.DB_LENGTH_FILE_PATH), //$NON-NLS-1$ //$NON-NLS-2$
+						"ALTER TABLE " + TABLE_TOUR_PHOTO + " ADD COLUMN	imageFilePath		" + varCharNoKomma(TourPhoto.DB_LENGTH_FILE_PATH), //$NON-NLS-1$ //$NON-NLS-2$
+						"ALTER TABLE " + TABLE_TOUR_PHOTO + " ADD COLUMN	imageFilePathName	" + varCharNoKomma(TourPhoto.DB_LENGTH_FILE_PATH), //$NON-NLS-1$ //$NON-NLS-2$
+						//
+						"ALTER TABLE " + TABLE_TOUR_PHOTO + " ADD COLUMN	imageExifTime			BIGINT DEFAULT 0", //$NON-NLS-1$ //$NON-NLS-2$
+						"ALTER TABLE " + TABLE_TOUR_PHOTO + " ADD COLUMN	imageFileLastModified	BIGINT DEFAULT 0", //$NON-NLS-1$ //$NON-NLS-2$
+						"ALTER TABLE " + TABLE_TOUR_PHOTO + " ADD COLUMN	adjustedTime			BIGINT DEFAULT 0", //$NON-NLS-1$ //$NON-NLS-2$
+						//
+						"ALTER TABLE " + TABLE_TOUR_PHOTO + " ADD COLUMN	ratingStars				INT DEFAULT 0", //$NON-NLS-1$ //$NON-NLS-2$
+						//
+						"ALTER TABLE " + TABLE_TOUR_PHOTO + " ADD COLUMN	isGeoFromPhoto			INT DEFAULT 0", //$NON-NLS-1$ //$NON-NLS-2$
+						"ALTER TABLE " + TABLE_TOUR_PHOTO + " ADD COLUMN	latitude 				DOUBLE DEFAULT 0", //$NON-NLS-1$ //$NON-NLS-2$
+						"ALTER TABLE " + TABLE_TOUR_PHOTO + " ADD COLUMN	longitude 				DOUBLE DEFAULT 0", //$NON-NLS-1$ //$NON-NLS-2$
+				};
 
-			exec(stmt, sqlTourPhoto);
+				exec(stmt, sqlTourPhoto);
+			}
 
+			if (isColumnAvailable(conn, TABLE_TOUR_DATA, "numberOfTimeSlices") == false) {//$NON-NLS-1$
+
+				// table columns are not yet created
 //
 //			TOURDATA	TOURDATA	TOURDATA	TOURDATA	TOURDATA	TOURDATA	TOURDATA	TOURDATA	TOURDATA
 //
-//			// version 23 start  -  13.?
+//			// version 23 start
 //			//
 //			+ " numberOfTimeSlices			INTEGER DEFAULT 0,				\n" //$NON-NLS-1$
 //			+ " numberOfPhotos				INTEGER DEFAULT 0,				\n" //$NON-NLS-1$
@@ -4593,17 +4657,18 @@ public class TourDatabase {
 //			//
 //			// version 23 end ---------
 
-			final String sqlTourData[] = {
-					//
-					"ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN	numberOfTimeSlices		INTEGER DEFAULT 0", //$NON-NLS-1$ //$NON-NLS-2$
-					"ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN	numberOfPhotos			INTEGER DEFAULT 0", //$NON-NLS-1$ //$NON-NLS-2$
-					"ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN	photoTimeAdjustment		INTEGER DEFAULT 0", //$NON-NLS-1$ //$NON-NLS-2$
-			//
-			};
+				final String sqlTourData[] = {
+						//
+						"ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN	numberOfTimeSlices		INTEGER DEFAULT 0", //$NON-NLS-1$ //$NON-NLS-2$
+						"ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN	numberOfPhotos			INTEGER DEFAULT 0", //$NON-NLS-1$ //$NON-NLS-2$
+						"ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN	photoTimeAdjustment		INTEGER DEFAULT 0", //$NON-NLS-1$ //$NON-NLS-2$
+				//
+				};
 
-			exec(stmt, sqlTourData);
-
+				exec(stmt, sqlTourData);
+			}
 		}
+		
 		stmt.close();
 
 		logDbUpdateEnd(newDbVersion);

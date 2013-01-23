@@ -65,39 +65,39 @@ public class PhotoImageMetadata {
 
 	@Override
 	public String toString() {
-		return "PhotoImageMetadata\n[\nfileDateTime="
+		return "PhotoImageMetadata\n[\nfileDateTime=" //$NON-NLS-1$
 				+ fileDateTime
-				+ ", \n"
-				+ "exifDateTime="
+				+ ", \n" //$NON-NLS-1$
+				+ "exifDateTime=" //$NON-NLS-1$
 				+ exifDateTime
-				+ ", \n"
-				+ "imageWidth="
+				+ ", \n" //$NON-NLS-1$
+				+ "imageWidth=" //$NON-NLS-1$
 				+ imageWidth
-				+ ", \n"
-				+ "imageHeight="
+				+ ", \n" //$NON-NLS-1$
+				+ "imageHeight=" //$NON-NLS-1$
 				+ imageHeight
-				+ ", \n"
-				+ "orientation="
+				+ ", \n" //$NON-NLS-1$
+				+ "orientation=" //$NON-NLS-1$
 				+ orientation
-				+ ", \n"
-				+ "imageDirection="
+				+ ", \n" //$NON-NLS-1$
+				+ "imageDirection=" //$NON-NLS-1$
 				+ imageDirection
-				+ ", \n"
-				+ "altitude="
+				+ ", \n" //$NON-NLS-1$
+				+ "altitude=" //$NON-NLS-1$
 				+ altitude
-				+ ", \n"
-				+ "latitude="
+				+ ", \n" //$NON-NLS-1$
+				+ "latitude=" //$NON-NLS-1$
 				+ latitude
-				+ ", \nlongitude="
+				+ ", \nlongitude=" //$NON-NLS-1$
 				+ longitude
-				+ ", \ngpsAreaInfo="
+				+ ", \ngpsAreaInfo=" //$NON-NLS-1$
 				+ gpsAreaInfo
-				+ ", \nobjectName="
+				+ ", \nobjectName=" //$NON-NLS-1$
 				+ objectName
-				+ ", \ncaptionAbstract="
+				+ ", \ncaptionAbstract=" //$NON-NLS-1$
 				+ captionAbstract
-				+ ", \nmodel="
+				+ ", \nmodel=" //$NON-NLS-1$
 				+ model
-				+ "\n]";
+				+ "\n]"; //$NON-NLS-1$
 	}
 }

@@ -370,6 +370,9 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 									tourPhoto = new TourPhoto(tourData, galleryPhoto);
 								}
 
+								// set/update adjusted time
+								tourPhoto.setAdjustedTime(galleryPhoto.adjustedTimeLink);
+
 								tourPhotos.add(tourPhoto);
 
 								// add new/old photos
