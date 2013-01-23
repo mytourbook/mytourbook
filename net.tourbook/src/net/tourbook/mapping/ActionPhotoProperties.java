@@ -222,6 +222,12 @@ public class ActionPhotoProperties extends ContributionItem {
 	void setEnabled(final boolean isEnabled) {
 
 		_actionToolItem.setEnabled(isEnabled);
+
+		if (isEnabled && _actionToolItem.getSelection() == false) {
+
+			// show default icon
+			_actionToolItem.setImage(_imageEnabled);
+		}
 	}
 
 	private void updateUI() {
