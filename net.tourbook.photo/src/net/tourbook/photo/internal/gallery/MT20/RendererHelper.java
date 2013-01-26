@@ -54,8 +54,8 @@ public class RendererHelper {
 		 * thumb image is larger, this can happen when image is resized
 		 */
 
-		final int photoImageWidth = photo.getImageWidth();
-		final int photoImageHeight = photo.getImageHeight();
+		final int photoImageWidth = photo.getAvailableImageWidth();
+		final int photoImageHeight = photo.getAvailableImageHeight();
 
 		if (photoImageWidth != Integer.MIN_VALUE) {
 

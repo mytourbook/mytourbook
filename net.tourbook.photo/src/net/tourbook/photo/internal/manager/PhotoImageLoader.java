@@ -348,12 +348,7 @@ public class PhotoImageLoader {
 
 				final String originalImagePathName = _photo.imageFilePathName;
 
-				PhotoImageCache.putImage(
-						imageKey,
-						loadedExifImage,
-						_photo.getImageWidth(),
-						_photo.getImageHeight(),
-						originalImagePathName);
+				PhotoImageCache.putImage(imageKey, loadedExifImage, originalImagePathName);
 
 				// display image in the loading callback
 //				_loadCallBack.callBackImageIsLoaded(true);
@@ -793,12 +788,7 @@ public class PhotoImageLoader {
 			_photo.getImageMetaData();
 
 			// keep requested image in cache
-			PhotoImageCache.putImage(
-					_requestedImageKey,
-					requestedSWTImage,
-					_photo.getImageWidth(),
-					_photo.getImageHeight(),
-					originalImagePathName);
+			PhotoImageCache.putImage(_requestedImageKey, requestedSWTImage, originalImagePathName);
 		}
 
 		if (requestedSWTImage == null) {
@@ -1125,12 +1115,7 @@ public class PhotoImageLoader {
 				_photo.getImageMetaData();
 
 				// keep requested image in cache
-				PhotoImageCache.putImage(
-						_requestedImageKey,
-						requestedSWTImage,
-						_photo.getImageWidth(),
-						_photo.getImageHeight(),
-						originalImagePathName);
+				PhotoImageCache.putImage(_requestedImageKey, requestedSWTImage, originalImagePathName);
 			}
 
 			if (requestedSWTImage == null) {
@@ -1302,12 +1287,7 @@ public class PhotoImageLoader {
 				}
 
 				// keep requested image in cache
-				PhotoImageCache.putImageOriginal(
-						_requestedImageKey,
-						swtImage,
-						imageWidth,
-						imageHeight,
-						originalImagePathName);
+				PhotoImageCache.putImageOriginal(_requestedImageKey, swtImage, originalImagePathName);
 			}
 
 			if (isLoadingException) {
@@ -1387,7 +1367,7 @@ public class PhotoImageLoader {
 					final int width = Integer.parseInt(originalImageWidth);
 					final int height = Integer.parseInt(originalImageHeight);
 
-					_photo.setDimension(width, height);
+					_photo.setPhotoDimension(width, height);
 
 				} catch (final NumberFormatException e) {
 					StatusUtil.log(e);
@@ -1577,23 +1557,23 @@ public class PhotoImageLoader {
 				// ensure metadata are loaded
 				_photo.getImageMetaData();
 
-				final int imageWidth = _photo.getImageWidth();
-				final int imageHeight = _photo.getImageHeight();
+				int imageWidth = _photo.getPhotoImageWidth();
+				int imageHeight = _photo.getPhotoImageHeight();
 
 				// check if width is set
-//				if (imageWidth == Integer.MIN_VALUE) {
-//
-//					// image width is not set from metadata, set it from the image
-//
-//					final Rectangle imageBounds = loadedExifImage.getBounds();
-//					imageWidth = imageBounds.width;
-//					imageHeight = imageBounds.height;
-//
-//					// update dimension
-//					updateImageSize(imageWidth, imageHeight, false);
-//				}
+				if (imageWidth == Integer.MIN_VALUE) {
 
-				PhotoImageCache.putImage(imageKey, loadedExifImage, imageWidth, imageHeight, originalImagePathName);
+					// photo image width/height is not set from metadata, set it from the image
+
+					final Rectangle imageBounds = loadedExifImage.getBounds();
+					imageWidth = imageBounds.width;
+					imageHeight = imageBounds.height;
+
+					// update dimension
+					updateImageSize(imageWidth, imageHeight, false);
+				}
+
+				PhotoImageCache.putImage(imageKey, loadedExifImage, originalImagePathName);
 			}
 
 			/*
@@ -1658,8 +1638,8 @@ public class PhotoImageLoader {
 
 		final int thumbWidth = thumbImage.getWidth();
 		final int thumbHeight = thumbImage.getHeight();
-		final int photoImageWidth = _photo.getImageWidth();
-		final int photoImageHeight = _photo.getImageHeight();
+		final int photoImageWidth = _photo.getAvailableImageWidth();
+		final int photoImageHeight = _photo.getAvailableImageHeight();
 
 		final double thumbRatio = (double) thumbWidth / thumbHeight;
 		double photoRatio;
@@ -1780,19 +1760,17 @@ public class PhotoImageLoader {
 	 */
 	private void updateImageSize(final int imageWidth, final int imageHeight, final boolean isOriginalSize) {
 
-		// check if height is set
-		if (isOriginalSize || _photo.getImageWidth() == Integer.MIN_VALUE) {
-
-			// image dimension is not yet set
-
-			_photo.setDimension(imageWidth, imageHeight);
-		}
-
 		if (isOriginalSize) {
 
-			// update image cache wrapper size
+			_photo.setPhotoDimension(imageWidth, imageHeight);
+
+			// update cached image size
 
 			PhotoImageCache.setImageSize(_photo, imageWidth, imageHeight);
+
+		} else {
+
+			_photo.setThumbDimension(imageWidth, imageHeight);
 		}
 	}
 

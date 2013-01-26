@@ -232,26 +232,17 @@ public class PhotoImageCache {
 	 */
 	public static void putImage(final String imageKey,
 								final Image image,
-								final int imageWidth,
-								final int imageHeight,
 								final String originalImagePathName) {
 
-		putImageInCache(_imageCache, imageKey, image, imageWidth, imageHeight, originalImagePathName);
+		putImageInCache(_imageCache, imageKey, image, originalImagePathName);
 	}
 
 	private static void putImageInCache(final ConcurrentLinkedHashMap<String, ImageCacheWrapper> imageCache,
 										final String imageKey,
 										final Image image,
-										final int imageWidth,
-										final int imageHeight,
 										final String originalImagePathName) {
 
-		final ImageCacheWrapper imageCacheWrapper = new ImageCacheWrapper(
-				image,
-				imageWidth,
-				imageHeight,
-				originalImagePathName,
-				imageKey);
+		final ImageCacheWrapper imageCacheWrapper = new ImageCacheWrapper(image, originalImagePathName, imageKey);
 
 		final ImageCacheWrapper oldWrapper = imageCache.put(imageKey, imageCacheWrapper);
 
@@ -276,11 +267,9 @@ public class PhotoImageCache {
 	 */
 	public static void putImageOriginal(final String imageKey,
 										final Image image,
-										final int imageWidth,
-										final int imageHeight,
 										final String originalImagePathName) {
 
-		putImageInCache(_imageCacheOriginal, imageKey, image, imageWidth, imageHeight, originalImagePathName);
+		putImageInCache(_imageCacheOriginal, imageKey, image, originalImagePathName);
 	}
 
 	/**
@@ -296,25 +285,25 @@ public class PhotoImageCache {
 		boolean isSet = false;
 
 		if (!isSet) {
-			isSet = setImageSize_IntoWrapperPhoto(photo, imageWidth, imageHeight, //
+			isSet = setImageSize_IntoCacheWrapper(photo, imageWidth, imageHeight, //
 					ImageQuality.THUMB,
 					_imageCache);
 		}
 
 		if (!isSet) {
-			isSet = setImageSize_IntoWrapperPhoto(photo, imageWidth, imageHeight, //
+			isSet = setImageSize_IntoCacheWrapper(photo, imageWidth, imageHeight, //
 					ImageQuality.HQ,
 					_imageCache);
 		}
 
 		if (!isSet) {
-			isSet = setImageSize_IntoWrapperPhoto(photo, imageWidth, imageHeight,//
+			isSet = setImageSize_IntoCacheWrapper(photo, imageWidth, imageHeight,//
 					ImageQuality.ORIGINAL,
 					_imageCacheOriginal);
 		}
 	}
 
-	private static boolean setImageSize_IntoWrapperPhoto(	final Photo photo,
+	private static boolean setImageSize_IntoCacheWrapper(	final Photo photo,
 															final int imageWidth,
 															final int imageHeight,
 															final ImageQuality imageQuality,
@@ -326,7 +315,7 @@ public class PhotoImageCache {
 
 		if (cacheWrapper != null) {
 
-			photo.setDimension(imageWidth, imageHeight);
+			photo.setPhotoDimension(imageWidth, imageHeight);
 
 			return true;
 		}

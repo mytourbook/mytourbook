@@ -786,8 +786,8 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 				StatusUtil.log(e1);
 			}
 
-			final int photoImageWidth = photo.getImageWidth();
-			final int photoImageHeight = photo.getImageHeight();
+			final int photoImageWidth = photo.getPhotoImageWidth();
+			final int photoImageHeight = photo.getPhotoImageHeight();
 
 			if (photoImageWidth == Integer.MIN_VALUE) {
 
@@ -1249,17 +1249,6 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 
 				} else {
 
-					final int imageWidth = photo.getImageWidth();
-					final boolean isImageLoaded = imageWidth != Integer.MIN_VALUE;
-
-					/*
-					 * dimension
-					 */
-					String textDimension = UI.EMPTY_STRING;
-					if (isImageLoaded) {
-						textDimension = imageWidth + " x " + photo.getImageHeight(); //$NON-NLS-1$
-					}
-
 					/*
 					 * size
 					 */
@@ -1295,7 +1284,7 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 
 					statusText = NLS.bind(Messages.Pic_Dir_StatusLabel_LoadingFullsizeMeta, new Object[] {
 							photoImageFileName,
-							textDimension,
+							photo.getDimensionText(),
 							textSize,
 							textDateTime,
 							textOrientation });

@@ -889,13 +889,8 @@ public abstract class ImageGallery implements IItemListener, IGalleryContextMenu
 			public void update(final ViewerCell cell) {
 
 				final Photo photo = (Photo) cell.getElement();
-				final int width = photo.getImageWidth();
-				final int height = photo.getImageHeight();
-				if (width == Integer.MIN_VALUE || height == Integer.MIN_VALUE) {
-					cell.setText(UI.EMPTY_STRING);
-				} else {
-					cell.setText(Integer.toString(width) + UI.DIMENSION + Integer.toString(height));
-				}
+
+				cell.setText(photo.getDimensionText());
 			}
 		});
 	}

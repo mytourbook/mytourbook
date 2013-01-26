@@ -851,6 +851,17 @@ public class TourMapPainter extends MapPainter {
 			gcTile.setForeground(_bgColor);
 			gcTile.setLineWidth(1);
 			gcTile.drawRectangle(devX, devY, photoWidth, photoHeight);
+
+//			System.out.println(net.tourbook.common.UI.timeStampNano()
+//					+ " image: "
+//					+ imageSize.width
+//					+ "x"
+//					+ imageSize.height
+//					+ "\tphoto: "
+//					+ photoWidth
+//					+ " x "
+//					+ photoHeight);
+//			// TODO remove SYSTEM.OUT.PRINTLN
 		}
 
 		return isPhotoInTile;

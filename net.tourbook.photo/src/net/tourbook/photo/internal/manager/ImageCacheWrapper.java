@@ -26,20 +26,12 @@ public class ImageCacheWrapper {
 
 	public Image	image;
 
-//	public int		imageWidth;
-//	public int		imageHeight;
-
 	public String	originalImagePathName;
 
 	public ImageCacheWrapper(	final Image image,
-								final int imageWidth,
-								final int imageHeight,
 								final String originalImagePathName,
 								final String imageKey) {
 		this.image = image;
-
-//		this.imageWidth = imageWidth;
-//		this.imageHeight = imageHeight;
 
 		this.originalImagePathName = originalImagePathName;
 		this.imageKey = imageKey;

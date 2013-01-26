@@ -167,8 +167,11 @@ public class Photo {
 	 */
 	private int											_orientation					= 1;
 
-	private int											_imageWidth						= Integer.MIN_VALUE;
-	private int											_imageHeight					= Integer.MIN_VALUE;
+	private int											_photoImageWidth				= Integer.MIN_VALUE;
+	private int											_photoImageHeight				= Integer.MIN_VALUE;
+
+	private int											_thumbImageWidth				= Integer.MIN_VALUE;
+	private int											_thumbImageHeight				= Integer.MIN_VALUE;
 
 	/**
 	 * When <code>true</code>, EXIF geo is returned when available, otherwise tour geo is returned
@@ -484,6 +487,73 @@ public class Photo {
 		return _altitude;
 	}
 
+	/**
+	 * @return Returns photo image height which is available, in this sequence:
+	 *         <p>
+	 *         <li>Original image height<br>
+	 *         <li>Thumb image height<br>
+	 *         <li>{@link Integer#MIN_VALUE} when image height is not yet set
+	 */
+	public int getAvailableImageHeight() {
+
+		if (_photoImageHeight != Integer.MIN_VALUE) {
+			return _photoImageHeight;
+		}
+
+		if (_thumbImageHeight != Integer.MIN_VALUE) {
+			return _thumbImageHeight;
+		}
+
+		return Integer.MIN_VALUE;
+	}
+
+	/**
+	 * @return Returns photo image width which is available, in this sequence:
+	 *         <p>
+	 *         <li>Original image width<br>
+	 *         <li>Thumb image width<br>
+	 *         <li>{@link Integer#MIN_VALUE} when image width is not yet set
+	 */
+	public int getAvailableImageWidth() {
+
+		if (_photoImageWidth != Integer.MIN_VALUE) {
+			return _photoImageWidth;
+		}
+
+		if (_thumbImageWidth != Integer.MIN_VALUE) {
+			return _thumbImageWidth;
+		}
+
+		return Integer.MIN_VALUE;
+	}
+
+	/**
+	 * @return Returns image size as visible text which is displayed in the UI.
+	 */
+	public String getDimensionText() {
+
+		final StringBuilder sbDimenstion = new StringBuilder();
+
+		if (isImageSizeAvailable()) {
+
+			final boolean isThumbSize = isThumbImageSize();
+
+			if (isThumbSize) {
+				sbDimenstion.append(UI.SYMBOL_BRACKET_LEFT);
+			}
+
+			sbDimenstion.append(getAvailableImageWidth());
+			sbDimenstion.append(UI.DIMENSION);
+			sbDimenstion.append(getAvailableImageHeight());
+
+			if (isThumbSize) {
+				sbDimenstion.append(UI.SYMBOL_BRACKET_RIGHT);
+			}
+		}
+
+		return sbDimenstion.toString();
+	}
+
 	public DateTime getExifDateTime() {
 		return _exifDateTime;
 	}
@@ -676,10 +746,6 @@ public class Photo {
 		return _imageFileDateTime;
 	}
 
-	public int getImageHeight() {
-		return _imageHeight;
-	}
-
 	/**
 	 * @return Returns an image key which can be used to get images from an image cache. This key is
 	 *         a MD5 hash from the full image file path and the image quality.
@@ -783,13 +849,6 @@ public class Photo {
 	 */
 	public PhotoImageMetadata getImageMetaDataRaw() {
 		return _photoImageMetadata;
-	}
-
-	/**
-	 * @return Returns photo image width or {@link Integer#MIN_VALUE} when width is not set.
-	 */
-	public int getImageWidth() {
-		return _imageWidth;
 	}
 
 	/**
@@ -902,6 +961,17 @@ public class Photo {
 	 */
 	public DateTime getOriginalDateTime() {
 		return _exifDateTime != null ? _exifDateTime : _imageFileDateTime;
+	}
+
+	public int getPhotoImageHeight() {
+		return _photoImageHeight;
+	}
+
+	/**
+	 * @return Returns photo image width or {@link Integer#MIN_VALUE} when width is not set.
+	 */
+	public int getPhotoImageWidth() {
+		return _photoImageWidth;
 	}
 
 	public AtomicReference<PhotoSqlLoadingState> getSqlLoadingState() {
@@ -1020,8 +1090,33 @@ public class Photo {
 		return result;
 	}
 
+	/**
+	 * @return Return <code>true</code> when image size (thumb or original) is available.
+	 */
+	public boolean isImageSizeAvailable() {
+
+		if (_photoImageWidth != Integer.MIN_VALUE || _thumbImageWidth != Integer.MIN_VALUE) {
+			return true;
+		}
+
+		return false;
+	}
+
 	public boolean isLoadingError() {
 		return _isLoadingError;
+	}
+
+	/**
+	 * @return Returns <code>true</code> when the original image size is not available but the thumb
+	 *         image size.
+	 */
+	private boolean isThumbImageSize() {
+
+		if (_photoImageWidth != Integer.MIN_VALUE) {
+			return false;
+		}
+
+		return _thumbImageWidth != Integer.MIN_VALUE;
 	}
 
 	public void removeTour(final Long tourId) {
@@ -1042,14 +1137,6 @@ public class Photo {
 
 	public void setAltitude(final double altitude) {
 		_altitude = altitude;
-	}
-
-	public void setDimension(final int width, final int height) {
-
-		_imageWidth = width;
-		_imageHeight = height;
-
-		setMapImageSize();
 	}
 
 	public void setGpsAreaInfo(final String gpsAreaInfo) {
@@ -1080,15 +1167,34 @@ public class Photo {
 		final int imageCanvasWidth = PAINTED_MAP_IMAGE_WIDTH;
 		final int imageCanvasHeight = imageCanvasWidth;
 
+		final int imageWidth = _photoImageWidth != Integer.MIN_VALUE ? _photoImageWidth : _thumbImageWidth;
+		final int imageHeight = _photoImageHeight != Integer.MIN_VALUE ? _photoImageHeight : _thumbImageHeight;
+
 		_mapImageSize = RendererHelper.getBestSize(this, //
-				_imageWidth,
-				_imageHeight,
+				imageWidth,
+				imageHeight,
 				imageCanvasWidth,
 				imageCanvasHeight);
 	}
 
+	public void setPhotoDimension(final int width, final int height) {
+
+		_photoImageWidth = width;
+		_photoImageHeight = height;
+
+		setMapImageSize();
+	}
+
 	public void setStateExifThumb(final int exifThumbState) {
 		_exifThumbImageState = exifThumbState;
+	}
+
+	public void setThumbDimension(final int width, final int height) {
+		
+		_thumbImageWidth = width;
+		_thumbImageHeight = height;
+		
+		setMapImageSize();
 	}
 
 	public void setThumbSaveError() {
@@ -1149,8 +1255,8 @@ public class Photo {
 		_exifDateTime = photoImageMetadata.exifDateTime;
 		_imageFileDateTime = photoImageMetadata.fileDateTime;
 
-		_imageWidth = photoImageMetadata.imageWidth;
-		_imageHeight = photoImageMetadata.imageHeight;
+		_photoImageWidth = photoImageMetadata.imageWidth;
+		_photoImageHeight = photoImageMetadata.imageHeight;
 
 		_orientation = photoImageMetadata.orientation;
 
@@ -1163,7 +1269,7 @@ public class Photo {
 		_gpsAreaInfo = photoImageMetadata.gpsAreaInfo;
 
 		// rotate image, swap with and height
-		if (_imageWidth != Integer.MIN_VALUE && _imageHeight != Integer.MIN_VALUE) {
+		if (_photoImageWidth != Integer.MIN_VALUE && _photoImageHeight != Integer.MIN_VALUE) {
 
 			if (_orientation > 1) {
 
@@ -1173,10 +1279,10 @@ public class Photo {
 
 					// camera is rotated to the left or right by 90 degree
 
-					final int imageWidth = _imageWidth;
+					final int imageWidth = _photoImageWidth;
 
-					_imageWidth = _imageHeight;
-					_imageHeight = imageWidth;
+					_photoImageWidth = _photoImageHeight;
+					_photoImageHeight = imageWidth;
 				}
 			}
 		}

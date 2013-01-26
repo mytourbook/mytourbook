@@ -133,9 +133,6 @@ public class GalleryPhotoToolTip extends AnimatedToolTipShell {
 
 //		parent.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
 
-		final int imageWidth = _photo.getImageWidth();
-		final boolean isImageLoaded = imageWidth != Integer.MIN_VALUE;
-
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridLayoutFactory.fillDefaults()//
 				.extendedMargins(5, 5, 5, 5)
@@ -154,11 +151,12 @@ public class GalleryPhotoToolTip extends AnimatedToolTipShell {
 				GridDataFactory.fillDefaults().applyTo(label);
 				label.setText(_photo.imageFileName);
 
-				if (isImageLoaded) {
+				if (_photo.isImageSizeAvailable()) {
+
 					// dimension
 					label = new Label(containerHeader, SWT.NONE);
 					GridDataFactory.fillDefaults().grab(true, false).align(SWT.END, SWT.FILL).applyTo(label);
-					label.setText(imageWidth + " x " + _photo.getImageHeight()); //$NON-NLS-1$
+					label.setText(_photo.getDimensionText());
 				}
 			}
 
