@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2012  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -78,6 +78,8 @@ public class FullScreenPhotoGallery implements IPhotoGalleryProvider {
 
 	private int						_displayedPhotosHash;
 	private int						_displayedItemIndex;
+
+	private boolean					_isLinkPhotoDisplayed;
 
 	private ToolBarManager			_galleryToolbarManager;
 
@@ -604,6 +606,9 @@ public class FullScreenPhotoGallery implements IPhotoGalleryProvider {
 
 	@Override
 	public void setSelection(final PhotoSelection photoSelection) {
+
+		_isLinkPhotoDisplayed = photoSelection.isLinkPhotoDisplayed;
+
 		_fullScreenImageViewer.showImage(photoSelection);
 	}
 
@@ -675,7 +680,7 @@ public class FullScreenPhotoGallery implements IPhotoGalleryProvider {
 				_galleryShell.pack(true);
 			}
 
-			_photoGallery.showImages(photoWrapper, galleryPositionKey);
+			_photoGallery.showImages(photoWrapper, galleryPositionKey, _isLinkPhotoDisplayed);
 		}
 
 		// show photo in the gallery which is displayed in the full screen viewer

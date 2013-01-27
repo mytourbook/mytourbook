@@ -297,7 +297,9 @@ public abstract class ImageGallery implements IItemListener, IGalleryContextMenu
 
 	private int[]					_delayCounter					= { 0 };
 
-	private final DateTimeFormatter	_dateFormatter					= DateTimeFormat.mediumDate();
+	private Double					_contentGalleryPosition;
+	private boolean					_isLinkPhotoDisplayed;
+
 	private final DateTimeFormatter	_timeFormatter					= DateTimeFormat.mediumTime();
 	private final NumberFormat		_nf1							= NumberFormat.getNumberInstance();
 	{
@@ -329,7 +331,6 @@ public abstract class ImageGallery implements IItemListener, IGalleryContextMenu
 	private Label					_lblGalleryInfo;
 	private GalleryMT20Item[]		_sortedGalleryItems;
 
-	private Double					_contentGalleryPosition;
 	{
 		_galleryPositions = new LRUMap<String, Double>(MAX_GALLERY_POSITIONS);
 
@@ -615,7 +616,7 @@ public abstract class ImageGallery implements IItemListener, IGalleryContextMenu
 			}
 		}
 
-		return new PhotoSelection(photos, allItems, _galleryMT20.getSelectionIndex());
+		return new PhotoSelection(photos, allItems, _galleryMT20.getSelectionIndex(), _isLinkPhotoDisplayed);
 	}
 
 	/**
@@ -1486,6 +1487,10 @@ public abstract class ImageGallery implements IItemListener, IGalleryContextMenu
 		return isLoaded[0];
 	}
 
+	public boolean isLinkPhotoDisplayed() {
+		return _isLinkPhotoDisplayed;
+	}
+
 	private void jobFilter_10_Create() {
 
 		_jobFilter = new Job("PicDirImages: Filtering images") {//$NON-NLS-1$
@@ -1664,7 +1669,9 @@ public abstract class ImageGallery implements IItemListener, IGalleryContextMenu
 				// check again, the gps state could have been cached and set
 				if (photo.isExifLoaded) {
 
-					final boolean isPhotoWithGps = photo.isPhotoWithGps;
+					final boolean isPhotoWithGps = _isLinkPhotoDisplayed
+							? photo.isLinkPhotoWithGps
+							: photo.isTourPhotoWithGps;
 
 					if (isGPSFilter) {
 						if (isPhotoWithGps) {
@@ -1805,7 +1812,9 @@ public abstract class ImageGallery implements IItemListener, IGalleryContextMenu
 
 				if (photo.isExifLoaded) {
 
-					final boolean isPhotoWithGps = photo.isPhotoWithGps;
+					final boolean isPhotoWithGps = _isLinkPhotoDisplayed
+							? photo.isLinkPhotoWithGps
+							: photo.isTourPhotoWithGps;
 
 					if (isGPSFilter) {
 						if (isPhotoWithGps) {
@@ -2475,6 +2484,12 @@ public abstract class ImageGallery implements IItemListener, IGalleryContextMenu
 		_galleryMT20.setFullScreenImageViewer(fullScreenImageViewer);
 	}
 
+	private void setIsLinkPhotoDisplayed(final boolean isLinkPhotoDisplayed) {
+
+		_isLinkPhotoDisplayed = isLinkPhotoDisplayed;
+		_photoRenderer.setIsLinkPhotoDisplayed(isLinkPhotoDisplayed);
+	}
+
 	public void setPhotoInfo(	final boolean isShowPhotoName,
 								final PhotoDateInfo photoDateInfo,
 								final boolean isShowAnnotations,
@@ -2615,58 +2630,64 @@ public abstract class ImageGallery implements IItemListener, IGalleryContextMenu
 		_galleryMT20.setVertical(isVerticalGallery);
 	}
 
-	public void showImages(final ArrayList<Photo> allPhotos, final String galleryPositionKey) {
+	public void showImages(	final ArrayList<Photo> allPhotos,
+							final String galleryPositionKey,
+							final boolean isLinkPhotoDisplayed) {
 
 		final Photo[] photos = allPhotos.toArray(new Photo[allPhotos.size()]);
 
-		showImages(photos, galleryPositionKey);
+		showImages(photos, galleryPositionKey, isLinkPhotoDisplayed);
 	}
 
-	/**
-	 * Display images for a list of {@link Photo}.
-	 * 
-	 * @param allPhotos
-	 * @param galleryPositionKey
-	 *            Contains a unique key to keep gallery position for different contents
-	 */
-	public void showImages(	final ArrayList<Photo> allPhotos,
-							final String galleryPositionKey,
-							final boolean isShowDefaultMessage) {
-
-		jobFilter_12_Stop();
-		PhotoLoadManager.stopImageLoading(true);
-
-		//////////////////////////////////////////
-		//
-		// MUST BE REMOVED, IS ONLY FOR TESTING
-		//
-//		disposeAndDeleteAllImages();
-//		PhotoLoadManager.removeInvalidImageFiles();
-		//
-		// MUST BE REMOVED, IS ONLY FOR TESTING
-		//
-		//////////////////////////////////////////
-
-		if (isShowDefaultMessage) {
-			_lblDefaultPage.setText(_defaultStatusMessage);
-			showPageBookPage(_pageDefault, true);
-		}
-
-		// images are not loaded from a folder, photos are already available
-		_photoFolder = null;
-
-		_newGalleryPositionKey = galleryPositionKey;
-
-		workerExecute_DisplayImages(allPhotos.toArray(new Photo[allPhotos.size()]));
-	}
+//	/**
+//	 * Display images for a list of {@link Photo}.
+//	 *
+//	 * @param allPhotos
+//	 * @param galleryPositionKey
+//	 *            Contains a unique key to keep gallery position for different contents
+//	 */
+//	public void showImages(	final ArrayList<Photo> allPhotos,
+//							final String galleryPositionKey,
+//							final boolean isShowDefaultMessage,
+//							final boolean isLinkPhotoDisplayed) {
+//
+//		jobFilter_12_Stop();
+//		PhotoLoadManager.stopImageLoading(true);
+//
+//		//////////////////////////////////////////
+//		//
+//		// MUST BE REMOVED, IS ONLY FOR TESTING
+//		//
+////		disposeAndDeleteAllImages();
+////		PhotoLoadManager.removeInvalidImageFiles();
+//		//
+//		// MUST BE REMOVED, IS ONLY FOR TESTING
+//		//
+//		//////////////////////////////////////////
+//
+//		setIsLinkPhotoDisplayed(isLinkPhotoDisplayed);
+//
+//		if (isShowDefaultMessage) {
+//			_lblDefaultPage.setText(_defaultStatusMessage);
+//			showPageBookPage(_pageDefault, true);
+//		}
+//
+//		// images are not loaded from a folder, photos are already available
+//		_photoFolder = null;
+//
+//		_newGalleryPositionKey = galleryPositionKey;
+//
+//		workerExecute_DisplayImages(allPhotos.toArray(new Photo[allPhotos.size()]));
+//	}
 
 	/**
 	 * Display images for a selected folder.
 	 * 
 	 * @param imageFolder
 	 * @param isReloadFolder
+	 * @param isLinkPhotoDisplayed
 	 */
-	public void showImages(final File imageFolder, final boolean isReloadFolder) {
+	public void showImages(final File imageFolder, final boolean isReloadFolder, final boolean isLinkPhotoDisplayed) {
 
 		jobFilter_12_Stop();
 
@@ -2682,6 +2703,8 @@ public abstract class ImageGallery implements IItemListener, IGalleryContextMenu
 		// MUST BE REMOVED, IS ONLY FOR TESTING
 		//
 		//////////////////////////////////////////
+
+		setIsLinkPhotoDisplayed(isLinkPhotoDisplayed);
 
 		if (imageFolder == null) {
 			_lblDefaultPage.setText(Messages.Pic_Dir_Label_ReadingFolders);
@@ -2696,7 +2719,7 @@ public abstract class ImageGallery implements IItemListener, IGalleryContextMenu
 		workerUpdate(imageFolder, isReloadFolder);
 	}
 
-	public void showImages(final Photo[] allPhotos, final String galleryPositionKey) {
+	public void showImages(final Photo[] allPhotos, final String galleryPositionKey, final boolean isLinkPhotoDisplayed) {
 
 //		System.out.println(UI.timeStampNano() + " showImages() " + galleryPositionKey);
 //		// TODO remove SYSTEM.OUT.PRINTLN
@@ -2714,6 +2737,8 @@ public abstract class ImageGallery implements IItemListener, IGalleryContextMenu
 		// MUST BE REMOVED, IS ONLY FOR TESTING
 		//
 		//////////////////////////////////////////
+
+		setIsLinkPhotoDisplayed(isLinkPhotoDisplayed);
 
 		// images are not loaded from a folder, photos are already available
 		_photoFolder = null;
@@ -2929,36 +2954,6 @@ public abstract class ImageGallery implements IItemListener, IGalleryContextMenu
 		_pageGalleryInfo.setBackground(bgColor);
 		_lblGalleryInfo.setForeground(fgColor);
 		_lblGalleryInfo.setBackground(bgColor);
-	}
-
-	/**
-	 * Update geo position for all {@link Photo} contained in photo list.
-	 * 
-	 * @param updatedPhotoList
-	 */
-	public void updateGPSPosition(final ArrayList<?> updatedPhotoList) {
-
-		for (final Photo galleryPhoto : _allPhotos) {
-
-			final String galleryImageFilePathName = galleryPhoto.imageFilePathName;
-
-			for (final Object object : (ArrayList<?>) updatedPhotoList) {
-
-				if (object instanceof Photo) {
-
-					final Photo updatedPhoto = (Photo) object;
-
-					if (galleryImageFilePathName.equals(updatedPhoto.imageFilePathName)) {
-
-						galleryPhoto.setTourGeoPosition(updatedPhoto.getLatitude(), updatedPhoto.getLongitude());
-
-						break;
-					}
-				}
-			}
-		}
-
-		_galleryMT20.redraw();
 	}
 
 	/**

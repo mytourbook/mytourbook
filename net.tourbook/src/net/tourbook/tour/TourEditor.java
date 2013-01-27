@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -271,7 +271,7 @@ public class TourEditor extends EditorPart implements IPersistableEditor {
 		_editorInput = (TourEditorInput) input;
 
 		// set selection provider
-		getSite().setSelectionProvider(_postSelectionProvider = new PostSelectionProvider());
+		getSite().setSelectionProvider(_postSelectionProvider = new PostSelectionProvider(ID));
 
 		addSelectionListener();
 	}

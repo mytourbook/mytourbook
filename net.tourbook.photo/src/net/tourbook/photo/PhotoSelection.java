@@ -31,14 +31,17 @@ public class PhotoSelection implements ISelection {
 	public ArrayList<Photo>				galleryPhotos;
 	public Collection<GalleryMT20Item>	galleryItems;
 	public int[]						selectionIndices;
+	public boolean						isLinkPhotoDisplayed;
 
 	public PhotoSelection(	final ArrayList<Photo> allGalleryPhotos,
 							final Collection<GalleryMT20Item> allGalleryItems,
-							final int[] allSelectionIndices) {
+							final int[] allSelectionIndices,
+							final boolean allIsLinkPhotoDisplayed) {
 
 		galleryPhotos = allGalleryPhotos;
 		galleryItems = allGalleryItems;
 		selectionIndices = allSelectionIndices;
+		isLinkPhotoDisplayed = allIsLinkPhotoDisplayed;
 	}
 
 	@Override

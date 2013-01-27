@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -394,7 +394,7 @@ public class TourWaypointView extends ViewPart implements ITourProvider, ITourVi
 		addPartListener();
 
 		// this part is a selection provider
-		getSite().setSelectionProvider(_postSelectionProvider = new PostSelectionProvider());
+		getSite().setSelectionProvider(_postSelectionProvider = new PostSelectionProvider(ID));
 
 		// show default page
 		_pageBook.showPage(_pageNoChart);

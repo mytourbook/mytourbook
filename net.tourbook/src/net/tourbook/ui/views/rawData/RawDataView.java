@@ -615,7 +615,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		addTourEventListener();
 
 		// set this view part as selection provider
-		getSite().setSelectionProvider(_postSelectionProvider = new PostSelectionProvider());
+		getSite().setSelectionProvider(_postSelectionProvider = new PostSelectionProvider(ID));
 
 		_activePerson = TourbookPlugin.getActivePerson();
 

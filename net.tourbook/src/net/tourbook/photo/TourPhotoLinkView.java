@@ -366,12 +366,14 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 								TourPhoto tourPhoto = oldTourPhotos.get(galleryPhoto.imageFilePathName);
 
 								if (tourPhoto == null) {
-
 									tourPhoto = new TourPhoto(tourData, galleryPhoto);
 								}
 
-								// set/update adjusted time
+								// set adjusted time / geo location
 								tourPhoto.setAdjustedTime(galleryPhoto.adjustedTimeLink);
+								tourPhoto.setGeoLocation(
+										galleryPhoto.getLinkLatitude(),
+										galleryPhoto.getLinkLongitude());
 
 								tourPhotos.add(tourPhoto);
 
@@ -421,7 +423,7 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 		 * after saving tour + photos, update the photos and put them into the photo cache
 		 */
 		for (final TourData savedTourData : savedTours) {
-			savedTourData.updateGalleryPhotos();
+			savedTourData.createGalleryPhotos();
 		}
 
 		// update viewer data
@@ -1631,7 +1633,7 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 			photo.adjustedTimeLink = exifTime + cameraTimeAdjustment;
 
 			// force that the position are updated
-			photo.resetWorldPosition();
+			photo.resetLinkWorldPosition();
 		}
 
 		Collections.sort(_allPhotos, TourPhotoManager.AdjustTimeComparatorLink);

@@ -2995,6 +2995,62 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		return floatDataSerie;
 	}
 
+	/**
+	 * Create {@link Photo}'s from {@link TourPhoto}'s
+	 */
+	public void createGalleryPhotos() {
+
+		_galleryPhotos.clear();
+
+		// create gallery photos for all tour photos
+		for (final TourPhoto tourPhoto : tourPhotos) {
+
+			final String imageFilePathName = tourPhoto.getImageFilePathName();
+
+			Photo galleryPhoto = PhotoCache.getPhoto(imageFilePathName);
+			if (galleryPhoto == null) {
+
+				/*
+				 * photo is not found in the photo cache, create a new photo
+				 */
+
+				final File photoFile = new File(imageFilePathName);
+
+				galleryPhoto = new Photo(photoFile);
+			}
+
+			/*
+			 * when a photo is in the photo cache it is possible that the tour is from the file
+			 * system, update tour relevant fields
+			 */
+			galleryPhoto.isSavedInTour = true;
+
+			// ensure this tour is set in the photo
+			galleryPhoto.addTour(tourPhoto.getTourId(), tourPhoto.getPhotoId());
+
+			galleryPhoto.adjustedTimeTour = tourPhoto.getAdjustedTime();
+			galleryPhoto.imageExifTime = tourPhoto.getImageExifTime();
+
+			final double tourLatitude = tourPhoto.getLatitude();
+
+			if (tourLatitude != 0) {
+				galleryPhoto.setTourGeoPosition(tourLatitude, tourPhoto.getLongitude());
+			}
+
+			galleryPhoto.isTourPhotoWithGps = tourLatitude != 0;
+			galleryPhoto.isGeoFromExif = tourPhoto.isGeoFromExif();
+
+			galleryPhoto.ratingStars = tourPhoto.getRatingStars();
+
+			// add photo after it's initialized
+			PhotoCache.setPhoto(galleryPhoto);
+
+			_galleryPhotos.add(galleryPhoto);
+		}
+
+		Collections.sort(_galleryPhotos, TourPhotoManager.AdjustTimeComparatorTour);
+	}
+
 	public void createHistoryTimeSerie(final ArrayList<HistoryData> historySlices) {
 
 		final int serieSize = historySlices.size();
@@ -4351,7 +4407,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 		// photos are not yet set
 
-		updateGalleryPhotos();
+		createGalleryPhotos();
 
 		return _galleryPhotos;
 	}
@@ -4697,16 +4753,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		}
 	}
 
-	/**
-	 * @return returns the speed data in the metric measurement system
-	 */
-	public float[] getSpeedSerieMetric() {
-
-		computeSpeedSerie();
-
-		return speedSerie;
-	}
-
 //	public double[] getTimeSerieDouble() {
 //
 //		if (timeSerieHistory == null) {
@@ -4724,6 +4770,16 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 //
 //		return timeSerieHistoryDouble;
 //	}
+
+	/**
+	 * @return returns the speed data in the metric measurement system
+	 */
+	public float[] getSpeedSerieMetric() {
+
+		computeSpeedSerie();
+
+		return speedSerie;
+	}
 
 	/**
 	 * @return Returns SRTM metric or imperial data serie depending on the active measurement or
@@ -5863,7 +5919,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 						oldGalleryPhoto.isSavedInTour = false;
 						oldGalleryPhoto.ratingStars = 0;
 
-						oldGalleryPhoto.updateExifState();
+						oldGalleryPhoto.resetTourExifState();
 					}
 				}
 			}
@@ -6415,62 +6471,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		for (final TourMarker tourMarker : tourMarkers) {
 			tourMarker.updateDatabase_019_to_020();
 		}
-	}
-
-	public void updateGalleryPhotos() {
-
-		// remove photos from cache which are not saved any more
-//		PhotoCache.removePhotos(_galleryPhotos);
-
-		_galleryPhotos.clear();
-
-		// create gallery photos for all tour photos
-		for (final TourPhoto tourPhoto : tourPhotos) {
-
-			final String imageFilePathName = tourPhoto.getImageFilePathName();
-
-			Photo galleryPhoto = PhotoCache.getPhoto(imageFilePathName);
-			if (galleryPhoto == null) {
-
-				/*
-				 * photo is not found in the photo cache, create a new photo
-				 */
-
-				final File photoFile = new File(imageFilePathName);
-
-				galleryPhoto = new Photo(photoFile);
-			}
-
-			/*
-			 * when a photo is in the photo cache it is possible that the tour is from the file
-			 * system, update tour relevant fields
-			 */
-			galleryPhoto.isSavedInTour = true;
-
-			// ensure this tour is set in the photo
-			galleryPhoto.addTour(tourPhoto.getTourId(), tourPhoto.getPhotoId());
-
-			galleryPhoto.adjustedTimeTour = tourPhoto.getAdjustedTime();
-			galleryPhoto.imageExifTime = tourPhoto.getImageExifTime();
-
-			final double tourLatitude = tourPhoto.getLatitude();
-
-			if (tourLatitude != 0) {
-				galleryPhoto.setTourGeoPosition(tourLatitude, tourPhoto.getLongitude());
-			}
-
-			galleryPhoto.isPhotoWithGps = tourLatitude != 0;
-			galleryPhoto.isGeoFromExif = tourPhoto.isGeoFromExif();
-
-			galleryPhoto.ratingStars = tourPhoto.getRatingStars();
-
-			// add photo after it's initialized
-			PhotoCache.setPhoto(galleryPhoto);
-
-			_galleryPhotos.add(galleryPhoto);
-		}
-
-		Collections.sort(_galleryPhotos, TourPhotoManager.AdjustTimeComparatorTour);
 	}
 
 }

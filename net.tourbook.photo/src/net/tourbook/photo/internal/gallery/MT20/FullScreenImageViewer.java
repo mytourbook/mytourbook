@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2012  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -797,54 +797,5 @@ public class FullScreenImageViewer {
 
 		return true;
 	}
-
-//	private void zoomIn(final boolean isShift) {
-//
-//		if (_zoomFactor < MAX_ZOOM) {
-//
-//			final int accelerator = isShift ? 5 : 1;
-//
-//			_zoomState = ZoomState.ZOOMING;
-//
-//			_zoomFactor = _zoomFactor < 1//
-//					? _zoomFactor + (0.02 * accelerator)
-//					: _zoomFactor + (1 * accelerator);
-//
-//			// ensure max zoom
-//			_zoomFactor = Math.min(MAX_ZOOM, _zoomFactor);
-//
-//			updateUI();
-//		}
-//	}
-//
-//	private void zoomOut(final boolean isShift) {
-//
-//		if (_zoomFactor > MIN_ZOOM) {
-//
-//			final int accelerator = isShift ? 5 : 1;
-//
-//			_zoomState = ZoomState.ZOOMING;
-//
-//			if (_zoomFactor > 1) {
-//
-//				final double zoomFactor = _zoomFactor - (1 * accelerator);
-//
-//				// check if threshold 1 has changed
-//				if (zoomFactor > 1) {
-//					_zoomFactor = zoomFactor;
-//				} else {
-//					_zoomFactor = 1;
-//				}
-//
-//			} else {
-//				_zoomFactor = _zoomFactor - (0.02 * accelerator);
-//			}
-//
-//			// ensure min zoom
-//			_zoomFactor = Math.max(MIN_ZOOM, _zoomFactor);
-//
-//			updateUI();
-//		}
-//	}
 
 }

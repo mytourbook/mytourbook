@@ -107,7 +107,8 @@ public class Photo {
 	/**
 	 * Is <code>true</code> when this photo contains geo coordinates.
 	 */
-	public boolean										isPhotoWithGps;
+	public boolean										isLinkPhotoWithGps;
+	public boolean										isTourPhotoWithGps;
 
 	/**
 	 * Is <code>true</code> when geo coordinates origin is in the photo EXIF data.
@@ -177,7 +178,7 @@ public class Photo {
 	 * When <code>true</code>, EXIF geo is returned when available, otherwise tour geo is returned
 	 * when available. When requested geo is not available, the other is returned.
 	 */
-	private static boolean								_isGetExifGeo					= false;
+//	private static boolean								_isGetExifGeo					= false;
 
 	private static IPhotoServiceProvider				_photoServiceProvider;
 
@@ -189,6 +190,8 @@ public class Photo {
 	private double										_exifLongitude					= 0;
 	private double										_tourLatitude					= 0;
 	private double										_tourLongitude					= 0;
+	private double										_linkLatitude					= 0;
+	private double										_linkLongitude					= 0;
 
 	private String										_gpsAreaInfo;
 
@@ -206,7 +209,8 @@ public class Photo {
 	 * <p>
 	 * key: projection id + zoom level
 	 */
-	private final HashMap<Integer, Point>				_worldPosition					= new HashMap<Integer, Point>();
+	private final HashMap<Integer, Point>				_tourWorldPosition				= new HashMap<Integer, Point>();
+	private final HashMap<Integer, Point>				_linkWorldPosition				= new HashMap<Integer, Point>();
 
 	/**
 	 * Contains image keys for each image quality which can be used to get images from an image
@@ -851,29 +855,12 @@ public class Photo {
 		return _photoImageMetadata;
 	}
 
-	/**
-	 * @return Returns latitude.
-	 *         <p>
-	 *         <b> Double.MIN_VALUE cannot be used, it cannot be saved in the database. 0 is the
-	 *         value when the value is not set !!! </b>
-	 */
-	public double getLatitude() {
+	public double getLinkLatitude() {
+		return _linkLatitude;
+	}
 
-		double latitude;
-
-		if (_isGetExifGeo) {
-
-			latitude = _exifLatitude != 0 //
-					? _exifLatitude
-					: _tourLatitude;
-		} else {
-
-			latitude = _tourLatitude != 0 //
-					? _tourLatitude
-					: _exifLatitude;
-		}
-
-		return latitude;
+	public double getLinkLongitude() {
+		return _linkLongitude;
 	}
 
 	/**
@@ -888,31 +875,6 @@ public class Photo {
 		} else {
 			return _photoLoadingStateThumb;
 		}
-	}
-
-	/**
-	 * @return Returns longitude.
-	 *         <p>
-	 *         <b> Double.MIN_VALUE cannot be used, it cannot be saved in the database. 0 is the
-	 *         value when the value is not set !!! </b>
-	 */
-	public double getLongitude() {
-
-		double longitude;
-
-		if (_isGetExifGeo) {
-
-			longitude = _exifLongitude != 0 //
-					? _exifLongitude
-					: _tourLongitude;
-		} else {
-
-			longitude = _tourLongitude != 0 //
-					? _tourLongitude
-					: _exifLongitude;
-		}
-
-		return longitude;
 	}
 
 	/**
@@ -1030,6 +992,31 @@ public class Photo {
 		return null;
 	}
 
+//	/**
+//	 * @return Returns latitude.
+//	 *         <p>
+//	 *         <b> Double.MIN_VALUE cannot be used, it cannot be saved in the database. 0 is the
+//	 *         value when the value is not set !!! </b>
+//	 */
+//	public double getLatitude() {
+//
+//		double latitude;
+//
+////		if (_isGetExifGeo) {
+////
+////			latitude = _exifLatitude != 0 //
+////					? _exifLatitude
+////					: _tourLatitude;
+////		} else {
+////
+//		latitude = _tourLatitude != 0 //
+//				? _tourLatitude
+//				: _exifLatitude;
+////		}
+//
+//		return latitude;
+//	}
+
 	/**
 	 * @return Returns latitude.
 	 *         <p>
@@ -1038,7 +1025,15 @@ public class Photo {
 	 *         Returns 0 when the value is not set !!! </b>
 	 */
 	public double getTourLatitude() {
-		return _tourLatitude;
+		return _tourLatitude != 0 //
+				? _tourLatitude
+				: _exifLatitude;
+	}
+
+	public double getTourLongitude() {
+		return _tourLongitude != 0 //
+				? _tourLongitude
+				: _exifLongitude;
 	}
 
 	public HashMap<Long, TourPhotoReference> getTourPhotoReferences() {
@@ -1053,28 +1048,43 @@ public class Photo {
 	 * @param mapProvider
 	 * @param projectionId
 	 * @param zoomLevel
+	 * @param isLinkPhotoDisplayed
 	 * @return Returns the world position for this photo or <code>null</code> when geo position is
 	 *         not set.
 	 */
-	public Point getWorldPosition(final CommonMapProvider mapProvider, final String projectionId, final int zoomLevel) {
+	public Point getWorldPosition(	final CommonMapProvider mapProvider,
+									final String projectionId,
+									final int zoomLevel,
+									final boolean isLinkPhotoDisplayed) {
 
-		final double latitude = getLatitude();
+		final double latitude = isLinkPhotoDisplayed //
+				? _linkLatitude
+				: _tourLatitude;
+
 		if (latitude == 0) {
 			return null;
 		}
 
 		final Integer hashKey = projectionId.hashCode() + zoomLevel;
 
-		final Point worldPosition = _worldPosition.get(hashKey);
+		final Point worldPosition = isLinkPhotoDisplayed //
+				? _linkWorldPosition.get(hashKey)
+				: _tourWorldPosition.get(hashKey);
 
 		if (worldPosition == null) {
 			// convert lat/long into world pixels which depends on the map projection
 
-			final GeoPosition photoGeoPosition = new GeoPosition(latitude, getLongitude());
+			final GeoPosition photoGeoPosition = new GeoPosition(latitude, isLinkPhotoDisplayed
+					? _linkLongitude
+					: _tourLongitude);
 
 			final Point geoToPixel = mapProvider.geoToPixel(photoGeoPosition, zoomLevel);
 
-			_worldPosition.put(hashKey, geoToPixel);
+			if (isLinkPhotoDisplayed) {
+				_linkWorldPosition.put(hashKey, geoToPixel);
+			} else {
+				_tourWorldPosition.put(hashKey, geoToPixel);
+			}
 
 			return geoToPixel;
 		}
@@ -1123,16 +1133,26 @@ public class Photo {
 		_tourPhotoRef.remove(tourId);
 	}
 
-	public void resetTourGeoPosition() {
+	public void resetLinkGeoPositions() {
+
+		_linkLatitude = 0;
+		_linkLongitude = 0;
+
+		isLinkPhotoWithGps = isGeoFromExif;
+	}
+
+	public void resetLinkWorldPosition() {
+		_linkWorldPosition.clear();
+	}
+
+	public void resetTourExifState() {
+
+		// photo is not saved any more in a tour
 
 		_tourLatitude = 0;
 		_tourLongitude = 0;
 
-		isPhotoWithGps = isGeoFromExif;
-	}
-
-	public void resetWorldPosition() {
-		_worldPosition.clear();
+		isTourPhotoWithGps = isGeoFromExif;
 	}
 
 	public void setAltitude(final double altitude) {
@@ -1141,6 +1161,14 @@ public class Photo {
 
 	public void setGpsAreaInfo(final String gpsAreaInfo) {
 		_gpsAreaInfo = gpsAreaInfo;
+	}
+
+	public void setLinkGeoPosition(final double linkLatitude, final double linkLongitude) {
+
+		_linkLatitude = linkLatitude;
+		_linkLongitude = linkLongitude;
+
+		isLinkPhotoWithGps = true;
 	}
 
 	public void setLoadingState(final PhotoLoadingState photoLoadingState, final ImageQuality imageQuality) {
@@ -1190,10 +1218,10 @@ public class Photo {
 	}
 
 	public void setThumbDimension(final int width, final int height) {
-		
+
 		_thumbImageWidth = width;
 		_thumbImageHeight = height;
-		
+
 		setMapImageSize();
 	}
 
@@ -1206,7 +1234,7 @@ public class Photo {
 		_tourLatitude = latitude;
 		_tourLongitude = longitude;
 
-		isPhotoWithGps = true;
+		isTourPhotoWithGps = true;
 	}
 
 	@Override
@@ -1226,26 +1254,6 @@ public class Photo {
 //				+ (_latitude == 0 ? "\t-no GPS-" : "\t" + _latitude + " - " + _longitude)
 				//
 		;
-	}
-
-	public void updateExifState() {
-
-		if (isSavedInTour) {
-			// keep old exif state
-			return;
-		}
-
-		// photo is not saved any more in a tour
-
-		_tourLatitude = 0;
-		_tourLongitude = 0;
-
-		isPhotoWithGps = isGeoFromExif;
-
-		if (isGeoFromExif == false) {
-			_exifLatitude = 0;
-			_exifLongitude = 0;
-		}
 	}
 
 	public void updateImageMetadata(final PhotoImageMetadata photoImageMetadata) {
@@ -1299,7 +1307,7 @@ public class Photo {
 		final boolean isTourGPS = _tourLatitude != 0;
 
 		isGeoFromExif = isExifGPS;
-		isPhotoWithGps = isTourGPS || isExifGPS;
+		isTourPhotoWithGps = isTourGPS || isExifGPS;
 
 		// sort by exif date when available
 		if (_exifDateTime != null) {

@@ -517,7 +517,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 		createUI(parent);
 
 		// set selection provider
-		getSite().setSelectionProvider(_postSelectionProvider = new PostSelectionProvider());
+		getSite().setSelectionProvider(_postSelectionProvider = new PostSelectionProvider(ID));
 
 		addTourEventListener();
 		addPrefListener();

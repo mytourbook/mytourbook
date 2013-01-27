@@ -231,7 +231,7 @@ public class PicDirView extends ViewPart implements IPhotoEventListener {
 		PhotoManager.addPhotoEventListener(this);
 
 		// set selection provider
-		getSite().setSelectionProvider(_postSelectionProvider = new PostSelectionProvider());
+		getSite().setSelectionProvider(_postSelectionProvider = new PostSelectionProvider(ID));
 
 		/*
 		 * restore async because a previous folder can contain many files and it can take a long

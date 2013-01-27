@@ -128,11 +128,15 @@ public class ChartPhotoToolTip extends PhotoToolTipUI {
 		} else {
 
 			final PhotoPaintGroup photoGroup = photoLayer.getHoveredGroup();
+			final PhotoCategory hoveredCategory = photoLayer
+					.getHoveredCategory(eventTime, devXMouseMove, devYMouseMove);
 
 			// set tooltip position
 			_devXGridCenterX = photoGroup.hGridStart + (ChartLayerPhoto.GROUP_HORIZONTAL_WIDTH / 2);
 
-			showPhotoToolTip(hoveredPhotos);
+			final boolean isLinkPhotoDisplayed = hoveredCategory.photoType == ChartPhotoType.LINK;
+
+			showPhotoToolTip(hoveredPhotos, isLinkPhotoDisplayed);
 		}
 	}
 

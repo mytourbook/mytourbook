@@ -542,7 +542,7 @@ public class PicDirImages implements IPhotoGalleryProvider {
 
 	void showImages(final File imageFolder, final boolean isFromNavigationHistory, final boolean isReloadFolder) {
 
-		_photoGallery.showImages(imageFolder, isReloadFolder);
+		_photoGallery.showImages(imageFolder, isReloadFolder, false);
 
 		if (imageFolder != null && isFromNavigationHistory == false) {
 

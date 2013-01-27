@@ -776,7 +776,11 @@ public class TourMapPainter extends MapPainter {
 
 			for (final Photo photo : photoList) {
 
-				final Point photoWorldPixel = photo.getWorldPosition(mp, projectionId, mapZoomLevel);
+				final Point photoWorldPixel = photo.getWorldPosition(
+						mp,
+						projectionId,
+						mapZoomLevel,
+						_tourPaintConfig.isLinkPhotoDisplayed);
 				if (photoWorldPixel == null) {
 					continue;
 				}
@@ -1666,7 +1670,11 @@ public class TourMapPainter extends MapPainter {
 		 */
 		for (final Photo photo : photoList) {
 
-			final Point photoWorldPixel = photo.getWorldPosition(mp, projectionId, mapZoomLevel);
+			final Point photoWorldPixel = photo.getWorldPosition(
+					mp,
+					projectionId,
+					mapZoomLevel,
+					_tourPaintConfig.isLinkPhotoDisplayed);
 
 			if (photoWorldPixel == null) {
 				continue;

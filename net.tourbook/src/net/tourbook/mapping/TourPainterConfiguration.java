@@ -47,6 +47,12 @@ public class TourPainterConfiguration {
 	boolean									isPhotoVisible;
 	boolean									isTourVisible;
 
+	/**
+	 * Is <code>true</code> when a link photo is displayed, otherwise a tour photo (photo which is
+	 * save in a tour) is displayed.
+	 */
+	boolean									isLinkPhotoDisplayed;
+
 	private TourPainterConfiguration() {}
 
 	public static TourPainterConfiguration getInstance() {
@@ -106,7 +112,7 @@ public class TourPainterConfiguration {
 	 *            When <code>null</code>, photos are not displayed.
 	 * @param isShowPhoto
 	 */
-	public void setPhotos(final ArrayList<Photo> allPhotos, final boolean isShowPhoto) {
+	public void setPhotos(final ArrayList<Photo> allPhotos, final boolean isShowPhoto, final boolean isLinkPhoto) {
 
 		_photos.clear();
 
@@ -115,6 +121,8 @@ public class TourPainterConfiguration {
 		}
 
 		isPhotoVisible = isShowPhoto && _photos.size() > 0;
+
+		isLinkPhotoDisplayed = isLinkPhoto;
 	}
 
 	public void setSynchTourZoomLevel(final int zoomLevel) {

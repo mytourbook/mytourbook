@@ -259,6 +259,12 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 	private int										_tourDataHash;
 	private long									_tourHashOverlayKey;
 
+	/**
+	 * Is <code>true</code> when a link photo is displayed, otherwise a tour photo (photo which is
+	 * save in a tour) is displayed.
+	 */
+	private boolean									_isLinkPhotoDisplayed;
+
 	/*
 	 * UI controls
 	 */
@@ -896,7 +902,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 		_previousTourData = null;
 
 		_tourPainterConfig.resetTourData();
-		_tourPainterConfig.setPhotos(null, false);
+		_tourPainterConfig.setPhotos(null, false, false);
 
 		_tourInfoToolTipProvider.setTourData(null);
 
@@ -1724,10 +1730,21 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 		boolean isFirst = true;
 
 		for (final Photo photo : allPhotos) {
-			if (photo.isPhotoWithGps) {
 
-				final double latitude = photo.getLatitude();
-				final double longitude = photo.getLongitude();
+			final boolean isPhotoWithGps = _isLinkPhotoDisplayed ? photo.isLinkPhotoWithGps : photo.isTourPhotoWithGps;
+
+			if (isPhotoWithGps) {
+
+				double latitude;
+				double longitude;
+
+				if (_isLinkPhotoDisplayed) {
+					latitude = photo.getLinkLatitude();
+					longitude = photo.getLinkLongitude();
+				} else {
+					latitude = photo.getTourLatitude();
+					longitude = photo.getTourLongitude();
+				}
 
 				if (isFirst) {
 
@@ -1919,7 +1936,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 
 	private void onSelectionChanged(final ISelection selection) {
 
-//		System.out.println(net.tourbook.common.UI.timeStampNano() + " onSelectionChanged\t" + selection);
+//		System.out.println(net.tourbook.common.UI.timeStampNano() + " Map::onSelectionChanged\t" + selection);
 //		// TODO remove SYSTEM.OUT.PRINTLN
 
 		if (_isPartVisible == false) {
@@ -2166,7 +2183,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 		_previousTourData = null;
 
 		_tourPainterConfig.setTourData(_allTourData, _isShowTour);
-		_tourPainterConfig.setPhotos(_filteredPhotos, _isShowPhoto);
+		_tourPainterConfig.setPhotos(_filteredPhotos, _isShowPhoto, _isLinkPhotoDisplayed);
 
 		_tourInfoToolTipProvider.setTourDataList(_allTourData);
 
@@ -2243,9 +2260,13 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 	 */
 	private ArrayList<Photo> paintPhotoSelection(final ISelection selection) {
 
+		_isLinkPhotoDisplayed = false;
+
 		final ArrayList<Photo> allPhotos = new ArrayList<Photo>();
 
 		if (selection instanceof TourPhotoLinkSelection) {
+
+			_isLinkPhotoDisplayed = true;
 
 			final TourPhotoLinkSelection linkSelection = (TourPhotoLinkSelection) selection;
 
@@ -2254,13 +2275,6 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 			for (final TourPhotoLink tourPhotoLink : tourPhotoLinks) {
 				allPhotos.addAll(tourPhotoLink.linkPhotos);
 			}
-
-			/*
-			 * center photos and zoom in/out to see all photos but only when more than 1 tour is
-			 * selected
-			 */
-//			final boolean isForceZooming = tourPhotoLinks.size() > 1;
-//			final boolean isForceZooming = false;
 
 		} else {
 
@@ -2307,7 +2321,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 		}
 
 		_tourPainterConfig.setTourData(_allTourData, _isShowTour);
-		_tourPainterConfig.setPhotos(_filteredPhotos, _isShowPhoto);
+		_tourPainterConfig.setPhotos(_filteredPhotos, _isShowPhoto, _isLinkPhotoDisplayed);
 
 		_tourInfoToolTipProvider.setTourDataList(_allTourData);
 
@@ -2537,7 +2551,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 		_previousTourData = null;
 
 		_tourPainterConfig.setTourData(_allTourData, _isShowTour);
-		_tourPainterConfig.setPhotos(_filteredPhotos, _isShowPhoto);
+		_tourPainterConfig.setPhotos(_filteredPhotos, _isShowPhoto, _isLinkPhotoDisplayed);
 
 		_tourInfoToolTipProvider.setTourDataList(_allTourData);
 
@@ -2847,7 +2861,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 			_filteredPhotos.addAll(_allPhotos);
 		}
 
-		_tourPainterConfig.setPhotos(_filteredPhotos, _isShowPhoto);
+		_tourPainterConfig.setPhotos(_filteredPhotos, _isShowPhoto, _isLinkPhotoDisplayed);
 
 		enableActions();
 

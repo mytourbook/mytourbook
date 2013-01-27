@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -25,7 +25,17 @@ import org.eclipse.jface.viewers.SelectionChangedEvent;
 public class PostSelectionProvider implements IPostSelectionProvider {
 
 	private ListenerList	_postSelectionListeners	= new ListenerList();
+
 	private ISelection		_currentSelection;
+
+	private String			_name;
+
+	@SuppressWarnings("unused")
+	private PostSelectionProvider() {}
+
+	public PostSelectionProvider(final String name) {
+		_name = name;
+	}
 
 	public void addPostSelectionChangedListener(final ISelectionChangedListener listener) {
 		_postSelectionListeners.add(listener);
@@ -62,13 +72,27 @@ public class PostSelectionProvider implements IPostSelectionProvider {
 
 		final Object[] listeners = _postSelectionListeners.getListeners();
 
-		for (int i = 0; i < listeners.length; ++i) {
-			final ISelectionChangedListener l = (ISelectionChangedListener) listeners[i];
+		for (final Object listener : listeners) {
+			final ISelectionChangedListener l = (ISelectionChangedListener) listener;
 			SafeRunnable.run(new SafeRunnable() {
 				public void run() {
 					l.selectionChanged(event);
 				}
 			});
 		}
+	}
+
+	public void setSelectionNoFireEvent(final ISelection selection) {
+
+		if (selection == null) {
+			return;
+		}
+
+		_currentSelection = selection;
+	}
+
+	@Override
+	public String toString() {
+		return "PostSelectionProvider [_name=" + _name + "\t_currentSelection=" + _currentSelection + "]";
 	}
 }

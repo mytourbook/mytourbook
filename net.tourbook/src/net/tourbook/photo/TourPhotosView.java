@@ -98,6 +98,8 @@ public class TourPhotosView extends ViewPart implements IPhotoEventListener {
 	private long							_photoStartTime;
 	private long							_photoEndTime;
 
+	private boolean							_isLinkPhotoDisplayed;
+
 	/*
 	 * UI controls
 	 */
@@ -294,7 +296,7 @@ public class TourPhotosView extends ViewPart implements IPhotoEventListener {
 		restoreState();
 
 		// this part is a selection provider
-		getSite().setSelectionProvider(_postSelectionProvider = new PostSelectionProvider());
+		getSite().setSelectionProvider(_postSelectionProvider = new PostSelectionProvider(ID));
 
 		showTour();
 	}
@@ -435,8 +437,11 @@ public class TourPhotosView extends ViewPart implements IPhotoEventListener {
 		_galleryPositionKey = 0;
 		_photoStartTime = Long.MAX_VALUE;
 		_photoEndTime = Long.MIN_VALUE;
+		_isLinkPhotoDisplayed = false;
 
 		if (selection instanceof TourPhotoLinkSelection) {
+
+			_isLinkPhotoDisplayed = true;
 
 			final TourPhotoLinkSelection tourPhotoSelection = (TourPhotoLinkSelection) selection;
 
@@ -485,6 +490,12 @@ public class TourPhotosView extends ViewPart implements IPhotoEventListener {
 
 			updateUI(allPhotos);
 		}
+
+		/*
+		 * ensure the selection is set correctly and overwrite PhotogalleryProvider.setSelection()
+		 * which caused wrong behaviour
+		 */
+		_postSelectionProvider.setSelectionNoFireEvent(selection);
 	}
 
 	@Override
@@ -592,7 +603,9 @@ public class TourPhotosView extends ViewPart implements IPhotoEventListener {
 		 * update photo gallery
 		 */
 
-		_photoGallery.showImages(allPhotos, Long.toString(_galleryPositionKey) + "_TourPhotosView", true);//$NON-NLS-1$
+		_photoGallery.showImages(
+				allPhotos,
+				Long.toString(_galleryPositionKey) + "_TourPhotosView", _isLinkPhotoDisplayed);//$NON-NLS-1$
 
 		/*
 		 * set title

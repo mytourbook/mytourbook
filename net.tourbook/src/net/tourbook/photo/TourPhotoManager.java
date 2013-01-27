@@ -444,7 +444,7 @@ public class TourPhotoManager implements IPhotoServiceProvider {
 			tourCameras.put(camera.cameraName, camera.cameraName);
 
 			// set number of GPS/No GPS photos
-			final double latitude = photo.getLatitude();
+			final double latitude = photo.getLinkLatitude();
 			if (latitude == 0) {
 				currentTourPhotoLink.numberOfNoGPSPhotos++;
 			} else {
@@ -496,7 +496,7 @@ public class TourPhotoManager implements IPhotoServiceProvider {
 			tourCameras.put(camera.cameraName, camera.cameraName);
 
 			// set number of GPS/No GPS photos
-			final double latitude = photo.getLatitude();
+			final double latitude = photo.getLinkLatitude();
 			if (latitude == 0) {
 				historyTour.numberOfNoGPSPhotos++;
 			} else {
@@ -748,7 +748,7 @@ public class TourPhotoManager implements IPhotoServiceProvider {
 			 * by a tour anymore
 			 */
 			if (isResetGeoPosition) {
-				photo.resetTourGeoPosition();
+				photo.resetLinkGeoPositions();
 			}
 		}
 
@@ -1357,7 +1357,7 @@ public class TourPhotoManager implements IPhotoServiceProvider {
 			for (final Photo photo : tourPhotoLink.linkPhotos) {
 
 				// set number of GPS/No GPS photos
-				final double latitude = photo.getLatitude();
+				final double latitude = photo.getLinkLatitude();
 				if (latitude == 0) {
 					tourPhotoLink.numberOfNoGPSPhotos++;
 				} else {
@@ -1392,21 +1392,6 @@ public class TourPhotoManager implements IPhotoServiceProvider {
 
 		final long tourStart = tourData.getTourStartTime().getMillis() / 1000;
 		long timeSliceEnd = tourStart + (long) (timeSerie[1] / 2.0);
-
-//		/*
-//		 * get hashset for existing photos
-//		 */
-//		final Set<TourPhoto> tourPhotosSet = tourData.getTourPhotos();
-//		final HashMap<String, TourPhoto> tourPhotosMap = new HashMap<String, TourPhoto>();
-//		for (final TourPhoto tourPhoto : tourPhotosSet) {
-//			tourPhotosMap.put(tourPhoto.getImageFilePathName(), tourPhoto);
-//		}
-//
-////		if (_isAddPhotosToExistingTourPhotos == false) {
-////
-//		// previous photos will be replaced
-//		tourPhotosSet.clear();
-////		}
 
 		int timeIndex = 0;
 		int photoIndex = 0;
@@ -1480,11 +1465,7 @@ public class TourPhotoManager implements IPhotoServiceProvider {
 					final double tourLatitude = latitudeSerie[timeIndex];
 					final double tourLongitude = longitudeSerie[timeIndex];
 
-					setTourGPSIntoPhotos_20(tourData,
-//							tourPhotosSet,
-							photo,
-							tourLatitude,
-							tourLongitude);
+					setTourGPSIntoPhotos_20(tourData, photo, tourLatitude, tourLongitude);
 
 					photoIndex++;
 
@@ -1505,34 +1486,23 @@ public class TourPhotoManager implements IPhotoServiceProvider {
 		}
 	}
 
-	private void setTourGPSIntoPhotos_20(final TourData tourData,
-//											final Set<TourPhoto> tourPhotosSet,
+	private void setTourGPSIntoPhotos_20(	final TourData tourData,
 											final Photo photo,
 											final double tourLatitude,
 											final double tourLongitude) {
 
-//		final TourPhoto tourPhoto = new TourPhoto(tourData, photoWrapper.imageFile, photoWrapper.imageExifTime);
-
-		if (photo.isGeoFromExif /* && _isOverwritePhotoGPS == false */) {
+		if (photo.isGeoFromExif) {
 
 			// photo contains already EXIF GPS
 
 			// don't overwrite geo from EXIF, use GPS geo from photo wrapper
 
-//			tourPhoto.setGeoLocation(photo.getLatitude(), photo.getLongitude());
-
 		} else {
 
 			// set gps from tour into the photo
 
-//			tourPhoto.setGeoLocation(tourLatitude, tourLongitude);
-
-			// update photo+photowrapper
-//			photoWrapper.isGpsSetFromTour = true;
-			photo.setTourGeoPosition(tourLatitude, tourLongitude);
+			photo.setLinkGeoPosition(tourLatitude, tourLongitude);
 		}
-
-//		tourPhotosSet.add(tourPhoto);
 	}
 
 	@Override
@@ -1593,7 +1563,7 @@ public class TourPhotoManager implements IPhotoServiceProvider {
 				photo.imageExifTime = dbImageExifTime;
 
 				photo.isGeoFromExif = dbIsGeoFromExif == 1;
-				photo.isPhotoWithGps = dbLatitude != 0;
+				photo.isTourPhotoWithGps = dbLatitude != 0;
 
 				photo.ratingStars = dbRatingStars;
 

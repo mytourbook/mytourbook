@@ -567,7 +567,7 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 		_actionPinToolTip.setChecked(isToolTipPinned);
 	}
 
-	protected void showPhotoToolTip(final ArrayList<ChartPhoto> hoveredPhotos) {
+	protected void showPhotoToolTip(final ArrayList<ChartPhoto> hoveredPhotos, final boolean isLinkPhotoDisplayed) {
 
 		final boolean isPhotoHovered = hoveredPhotos != null && hoveredPhotos.size() > 0;
 
@@ -599,7 +599,7 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 
 		final String galleryPositionKey = hoveredPhotosHash + "_PhotoToolTipUI";//$NON-NLS-1$
 
-		_photoGallery.showImages(_allPhotos, galleryPositionKey);
+		_photoGallery.showImages(_allPhotos, galleryPositionKey, isLinkPhotoDisplayed);
 	}
 
 	private void updateUI_Colors(final Composite parent) {

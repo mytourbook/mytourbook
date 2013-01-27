@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2012  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -59,22 +59,4 @@ public class ExifCache {
 			}
 		}
 	}
-
-//	/**
-//	 * Update geo position in the cached exif data.
-//	 *
-//	 * @param updatedPhotos
-//	 */
-//	public static void updateGPSPosition(final ArrayList<PhotoWrapper> updatedPhotos) {
-//
-//		for (final PhotoWrapper photoWrapper : updatedPhotos) {
-//
-//			final PhotoImageMetadata imageMetadata = _exifCache.get(photoWrapper.imageFilePathName);
-//			if (imageMetadata != null) {
-//
-//				imageMetadata.latitude = photoWrapper.photo.getLatitude();
-//				imageMetadata.longitude = photoWrapper.photo.getLongitude();
-//			}
-//		}
-//	}
 }

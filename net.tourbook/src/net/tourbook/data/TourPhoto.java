@@ -141,17 +141,17 @@ public class TourPhoto {
 		imageFileLastModified = imageFile.lastModified();
 		imageExifTime = photo.imageExifTime;
 
-		final long photoAdjustedTimeLink = photo.adjustedTimeLink;
-		adjustedTime = photoAdjustedTimeLink == Long.MIN_VALUE ? imageExifTime : photoAdjustedTimeLink;
-
 		if (photo.isGeoFromExif) {
 			setIsGeoFromPhoto();
 		} else {
 			setIsGeoFromTour();
 		}
 
-		latitude = photo.getLatitude();
-		longitude = photo.getLongitude();
+//		final long photoAdjustedTimeLink = photo.adjustedTimeLink;
+//		adjustedTime = photoAdjustedTimeLink == Long.MIN_VALUE ? imageExifTime : photoAdjustedTimeLink;
+//
+//		latitude = photo.getLatitude();
+//		longitude = photo.getLongitude();
 	}
 
 	@Override

@@ -198,6 +198,8 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 	 */
 	private boolean						_isFocusActive;
 
+	private boolean						_isLinkPhotoDisplayed;
+
 	/*
 	 * UI resources
 	 */
@@ -585,7 +587,9 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 		int devXAnnotationOffset = 0;
 		Image annotationImage;
 
-		if (photo.isPhotoWithGps) {
+		final boolean isPhotoWithGps = _isLinkPhotoDisplayed ? photo.isLinkPhotoWithGps : photo.isTourPhotoWithGps;
+
+		if (isPhotoWithGps) {
 
 			devXAnnotationOffset = _annotationImageWidth;
 
@@ -1627,6 +1631,10 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 		_fontHeight = -1;
 
 		_galleryMT.setFont(font);
+	}
+
+	public void setIsLinkPhotoDisplayed(final boolean isLinkPhotoDisplayed) {
+		_isLinkPhotoDisplayed = isLinkPhotoDisplayed;
 	}
 
 	private void setPaintedZoomFactor(	final int imageWidth,

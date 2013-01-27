@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -185,7 +185,7 @@ public class TourStatisticsView extends ViewPart implements ITourProvider {
 	public void createPartControl(final Composite parent) {
 
 		// this view is a selection provider, set it before the statistics container is created
-		getSite().setSelectionProvider(_postSelectionProvider = new PostSelectionProvider());
+		getSite().setSelectionProvider(_postSelectionProvider = new PostSelectionProvider(ID));
 
 		_statContainer = new StatContainer(parent, getViewSite(), _postSelectionProvider, SWT.NONE);
 
