@@ -1746,6 +1746,15 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 					longitude = photo.getTourLongitude();
 				}
 
+				// exclude invalid positions
+				if (latitude == 0) {
+					continue;
+				}
+
+//				System.out.println(net.tourbook.common.UI.timeStampNano() + " " + photo);
+//				System.out.println(net.tourbook.common.UI.timeStampNano() + " \t" + latitude + "\t" + longitude);
+//				// TODO remove SYSTEM.OUT.PRINTLN
+
 				if (isFirst) {
 
 					isFirst = false;

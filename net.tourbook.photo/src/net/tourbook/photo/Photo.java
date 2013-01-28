@@ -856,11 +856,16 @@ public class Photo {
 	}
 
 	public double getLinkLatitude() {
-		return _linkLatitude;
+
+		return _linkLatitude != 0 //
+				? _linkLatitude
+				: _exifLatitude;
 	}
 
 	public double getLinkLongitude() {
-		return _linkLongitude;
+		return _linkLongitude != 0 //
+				? _linkLongitude
+				: _exifLongitude;
 	}
 
 	/**
@@ -1058,8 +1063,8 @@ public class Photo {
 									final boolean isLinkPhotoDisplayed) {
 
 		final double latitude = isLinkPhotoDisplayed //
-				? _linkLatitude
-				: _tourLatitude;
+				? getLinkLatitude()
+				: getTourLatitude();
 
 		if (latitude == 0) {
 			return null;
@@ -1075,8 +1080,8 @@ public class Photo {
 			// convert lat/long into world pixels which depends on the map projection
 
 			final GeoPosition photoGeoPosition = new GeoPosition(latitude, isLinkPhotoDisplayed
-					? _linkLongitude
-					: _tourLongitude);
+					? getLinkLongitude()
+					: getTourLongitude());
 
 			final Point geoToPixel = mapProvider.geoToPixel(photoGeoPosition, zoomLevel);
 
@@ -1251,8 +1256,10 @@ public class Photo {
 //				+ (_exifDateTime == null ? "-no date-" : "\t" + _exifDateTime)
 //				+ ("\trotate:" + rotateDegree)
 //				+ (_imageWidth == Integer.MIN_VALUE ? "-no size-" : "\t" + _imageWidth + "x" + _imageHeight)
-//				+ (_latitude == 0 ? "\t-no GPS-" : "\t" + _latitude + " - " + _longitude)
-				//
+				+ ("\tEXIF GPS: " + _exifLatitude + " - " + _exifLongitude)
+				+ ("\tLink GPS: " + _linkLatitude + " - " + _linkLongitude)
+				+ ("\tTour GPS: " + _tourLatitude + " - " + _tourLongitude)
+		//
 		;
 	}
 

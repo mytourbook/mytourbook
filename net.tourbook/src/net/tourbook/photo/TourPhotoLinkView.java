@@ -35,6 +35,7 @@ import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourPhoto;
 import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.tour.SelectionDeletedTours;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.TableColumnFactory;
@@ -547,6 +548,8 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 		_tourPhotoLinkSelection = null;
 
 		_tourViewer.setInput(new Object[0]);
+
+		enableControls();
 
 		_pageBook.showPage(_pageNoImage);
 	}
@@ -1344,6 +1347,12 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 			if (isSync) {
 				showPhotosAndTours(photoSelection.galleryPhotos);
 			}
+
+		} else if (selection instanceof SelectionDeletedTours) {
+
+			clearView();
+
+			_photoMgr.resetTourStartEnd();
 		}
 	}
 
@@ -1648,7 +1657,6 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 
 		if (numberOfPhotos == 0) {
 			clearView();
-			enableControls();
 			return;
 		}
 

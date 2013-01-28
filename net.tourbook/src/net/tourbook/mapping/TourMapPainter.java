@@ -774,7 +774,13 @@ public class TourMapPainter extends MapPainter {
 
 			int photoCounter = 0;
 
+//			System.out.println(net.tourbook.common.UI.timeStampNano() + " Photo\t");
+//			// TODO remove SYSTEM.OUT.PRINTLN
+
 			for (final Photo photo : photoList) {
+
+//				System.out.println(net.tourbook.common.UI.timeStampNano() + "\t" + photo);
+//				// TODO remove SYSTEM.OUT.PRINTLN
 
 				final Point photoWorldPixel = photo.getWorldPosition(
 						mp,
