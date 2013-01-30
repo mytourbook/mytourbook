@@ -90,6 +90,8 @@ public class Messages extends NLS {
 	public static String		Photo_ToolTip_Description;
 	public static String		Photo_ToolTip_ExifDate;
 	public static String		Photo_ToolTip_FileDate;
+
+	public static String	Photo_ToolTip_ImagePath;
 	public static String		Photo_ToolTip_Model;
 	public static String		Photo_ToolTip_Size;
 	public static String		Photo_ToolTip_Title;

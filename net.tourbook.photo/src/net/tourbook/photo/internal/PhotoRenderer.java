@@ -587,7 +587,7 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 		int devXAnnotationOffset = 0;
 		Image annotationImage;
 
-		final boolean isPhotoWithGps = _isLinkPhotoDisplayed ? photo.isLinkPhotoWithGps : photo.isTourPhotoWithGps;
+		final boolean isPhotoWithGps = photo.isLinkPhotoWithGps || photo.isTourPhotoWithGps;
 
 		if (isPhotoWithGps) {
 
