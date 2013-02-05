@@ -101,20 +101,20 @@ public class PhotoCache {
 //			_cache.remove(photo.imageFilePathName);
 //		}
 //	}
-//
-//	public static synchronized void removePhotosFromFolder(final String folderName) {
-//
-//		for (final Photo photo : _cache.values()) {
-//
-//			if (photo.imagePathName.equals(folderName)) {
-//
-//				_cache.remove(photo.imageFilePathName);
-//
-////				System.out.println(UI.timeStampNano() + " \tremoved:" + photo.imageFilePathName);
-////				// TODO remove SYSTEM.OUT.PRINTLN
-//			}
-//		}
-//	}
+
+	public static synchronized void removePhotosFromFolder(final String folderName) {
+
+		for (final Photo photo : _cache.values()) {
+
+			if (photo.imagePathName.equals(folderName)) {
+
+				_cache.remove(photo.imageFilePathName);
+
+//				System.out.println(UI.timeStampNano() + " \tremoved:" + photo.imageFilePathName);
+//				// TODO remove SYSTEM.OUT.PRINTLN
+			}
+		}
+	}
 
 	public static void setPhoto(final Photo photo) {
 		_cache.put(photo.imageFilePathName, photo);

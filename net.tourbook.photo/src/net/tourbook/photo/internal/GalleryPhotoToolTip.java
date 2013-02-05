@@ -133,6 +133,7 @@ public class GalleryPhotoToolTip extends AnimatedToolTipShell {
 
 //		parent.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
 
+		final boolean isLoadingError = _photo.isLoadingError();
 		final boolean isDrawImage = _galleryImageSize < 160;
 
 		final Composite container = new Composite(parent, SWT.NONE);
@@ -164,13 +165,13 @@ public class GalleryPhotoToolTip extends AnimatedToolTipShell {
 
 			final PhotoImageMetadata metaData = _photo.getImageMetaDataRaw();
 			if (metaData != null) {
-				createUI_Metadata(container, metaData, isDrawImage);
+				createUI_Metadata(container, metaData, isDrawImage, isLoadingError);
 			}
 
 			/*
 			 * label: loading error
 			 */
-			if (_photo.isLoadingError()) {
+			if (isLoadingError) {
 
 				_labelError = new Label(container, SWT.WRAP);
 				GridDataFactory.fillDefaults()//
@@ -189,7 +190,10 @@ public class GalleryPhotoToolTip extends AnimatedToolTipShell {
 		return container;
 	}
 
-	private void createUI_Metadata(final Composite parent, final PhotoImageMetadata metaData, final boolean isDrawImage) {
+	private void createUI_Metadata(	final Composite parent,
+									final PhotoImageMetadata metaData,
+									final boolean isDrawImage,
+									final boolean isError) {
 
 		final DateTime exifDateTime = _photo.getExifDateTime();
 		final DateTime imageFileDateTime = _photo.getImageFileDateTime();
@@ -206,7 +210,7 @@ public class GalleryPhotoToolTip extends AnimatedToolTipShell {
 		{
 			boolean isDrawFileDate = true;
 
-			if (isDrawImage == false) {
+			if (isError || isDrawImage == false) {
 				createUI_MetadataLine(container, Messages.Photo_ToolTip_ImagePath, _photo.imagePathName);
 			}
 

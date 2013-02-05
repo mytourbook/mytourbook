@@ -1,0 +1,6 @@
+
+Detected Problems in 13.2:
+
+* photo gallery in the tour marker dialog box it not correctly initialized, state is not set
+* tooltip flickering occures only with bad display drivers !!!
+

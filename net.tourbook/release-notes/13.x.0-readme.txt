@@ -1,51 +1,82 @@
-Version: 13.2.0                                           ?. ??? 2013 
+Version: 13.2.0                                        6. February 2013
 
 
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+New Features 	
 
-I'm not sure if the photo workflow is too much complicated because there are so many features which can be set wrong and photos are not displayed, like a filter was activated and hides tour/photo but I tried to implement only helpful features to manage tours with photos.
-
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-Detected Problems:
-
-* photo gallery in the tour marker dialog box it not correctly initialized, state is not set
-* tooltip flickering occures only with bad display drivers !!!
+* Photo workflow is now complete There are still features which can be 
+improved. 
 
 
 
-Photos + Tours view
+* Tour Photo Filter
 
-* save photos in tour, when a tour contains photos, they can be displayed in the tour chart, tour map and tour photo views
-
-* show number of saved photos including time adjustment
-
-* new filter to show only tours which contain photos but the photos are not yet saved in the tour
+- when this filter is activated, only tours with photos will be 
+displayed. This affects ALL views, special views are excluded, e.g. tour 
+import view. 
 
 
-Tour Chart view
+* Photos + Tours view 
 
-* show/hide photo markers with/without photo tooltip
+- save photos in a tour, when a tour contains photos, they can be 
+displayed in the tour chart, tour map and tour photo views 
 
-* show different photo markers for linked and saved photos 
-  !!! there is a different hovering algorithm for the mouse location and photo group background color !!!
+- displays number of saved photos and time adjustment 
 
-
-Tour Map view
-
-* filter photos by rating stars
-
-* set photo image size
-
-* Problem: photos are not displayed sometimes, because they are not yet loaded, selecting another tour and reselecting the previous tour will solve it. This problem will be fixed in the next major version.
+- new filter to show only tours which contain photos but the photos are 
+not yet saved in a tour 
 
 
-All photo galleries
+* Tour Chart view 
 
-* star rating can be set for photos when they are saved in a tour. When a photo is saved in multiple tours, star rating can currently not be set (I hope this happens not too often and should only occure when more than one person saves the same photo)
+- show/hide photo markers with/without photo tooltip 
+
+- show different photo markers for linked and saved photos 
 
 
-Fixed bugs
+* Tour Map view 
 
-* all average values in the tour book view are wrong, they included tours which values are not set -> average values are too small, http://sourceforge.net/tracker/?func=detail&atid=890604&aid=3599360&group_id=179799
+- filter photos by rating stars 
 
+- set photo image size 
+
+- Problem: sometimes photos are not displayed, because they are not yet 
+loaded, selecting another tour and reselecting the previous tour will 
+solve it. This problem will be fixed in the next major version. 
+
+
+* All photo galleries
+
+- star rating can be set for photos when they are saved in a tour. When 
+a photo is saved in multiple tours, star rating can currently not be set 
+(this situation can occure when more than one person is saving the same 
+photo) 
+
+ 
+
+Behaviour changed
+	
+* Tour Chart view
+
+- there is a different hovering algorithm for the mouse location and 
+photo marker background color 
+
+ 
+
+Fixed Bugs 	
+
+* Tour Book view
+ - all average values are wrong, they included tours which values are 
+not set -> average values are too small 3599360 
+
+
+-----------------------------------------------------------------------
+
+	
+NEW: MyTourbook Mailing List
+
+You can subscribe to this mailing list and you will receive a message 
+only when a new version is published. 
+
+When you have subscribed, you will receive an automated welcome mail 
+which says that you can send messages to this mailing list, this feature 
+is disabled. 

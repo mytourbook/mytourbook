@@ -28,7 +28,9 @@ import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.TreeViewerItem;
 import net.tourbook.common.util.Util;
 import net.tourbook.photo.IPhotoPreferences;
+import net.tourbook.photo.PhotoCache;
 import net.tourbook.photo.PhotoImageCache;
+import net.tourbook.photo.PhotoLoadManager;
 import net.tourbook.photo.PhotoUI;
 import net.tourbook.photo.PicDirView;
 import net.tourbook.photo.internal.manager.ExifCache;
@@ -314,6 +316,12 @@ public class PicDirFolder {
 
 					// remove cached images
 					PhotoImageCache.disposePath(folderPath);
+
+					// remove errors
+					PhotoLoadManager.removeInvalidImageFiles();
+
+					// remove photos
+					PhotoCache.removePhotosFromFolder(folderPath);
 
 					// delete store files
 					final File folder = new File(folderPath);
