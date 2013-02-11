@@ -3470,7 +3470,7 @@ public class Map extends Canvas {
 	 * 
 	 * @param tile
 	 */
-	private void queueOverlayPainting(final Tile tile) {
+	public void queueOverlayPainting(final Tile tile) {
 
 		tile.setOverlayTourStatus(OverlayTourState.IS_QUEUED);
 		tile.setOverlayImageState(OverlayImageState.NOT_SET);
