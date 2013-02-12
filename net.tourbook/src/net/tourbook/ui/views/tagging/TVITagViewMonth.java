@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -28,18 +28,18 @@ import net.tourbook.ui.UI;
 
 public class TVITagViewMonth extends TVITagViewItem {
 
-	private final TVITagViewYear	fYearItem;
+	private final TVITagViewYear	_yearItem;
 
-	private final int				fYear;
-	private final int				fMonth;
+	private final int				_year;
+	private final int				_month;
 
 	public TVITagViewMonth(final TVITagViewYear parentItem, final int dbYear, final int dbMonth) {
 
 		setParentItem(parentItem);
 
-		fYearItem = parentItem;
-		fYear = dbYear;
-		fMonth = dbMonth;
+		_yearItem = parentItem;
+		_year = dbYear;
+		_month = dbMonth;
 	}
 
 	/**
@@ -54,11 +54,11 @@ public class TVITagViewMonth extends TVITagViewItem {
 			return 0;
 		}
 
-		if (fYear < otherMonthItem.fYear) {
+		if (_year < otherMonthItem._year) {
 
 			return -1;
 
-		} else if (fYear > otherMonthItem.fYear) {
+		} else if (_year > otherMonthItem._year) {
 
 			return 1;
 
@@ -66,9 +66,9 @@ public class TVITagViewMonth extends TVITagViewItem {
 
 			// same year, check month
 
-			if (fMonth == otherMonthItem.fMonth) {
+			if (_month == otherMonthItem._month) {
 				return 0;
-			} else if (fMonth < otherMonthItem.fMonth) {
+			} else if (_month < otherMonthItem._month) {
 				return -1;
 			} else {
 				return 1;
@@ -88,17 +88,17 @@ public class TVITagViewMonth extends TVITagViewItem {
 			return false;
 		}
 		final TVITagViewMonth other = (TVITagViewMonth) obj;
-		if (fMonth != other.fMonth) {
+		if (_month != other._month) {
 			return false;
 		}
-		if (fYear != other.fYear) {
+		if (_year != other._year) {
 			return false;
 		}
-		if (fYearItem == null) {
-			if (other.fYearItem != null) {
+		if (_yearItem == null) {
+			if (other._yearItem != null) {
 				return false;
 			}
-		} else if (!fYearItem.equals(other.fYearItem)) {
+		} else if (!_yearItem.equals(other._yearItem)) {
 			return false;
 		}
 		return true;
@@ -148,9 +148,9 @@ public class TVITagViewMonth extends TVITagViewItem {
 			final Connection conn = TourDatabase.getInstance().getConnection();
 
 			final PreparedStatement statement = conn.prepareStatement(sb.toString());
-			statement.setLong(1, fYearItem.getTagId());
-			statement.setInt(2, fYear);
-			statement.setInt(3, fMonth);
+			statement.setLong(1, _yearItem.getTagId());
+			statement.setInt(2, _year);
+			statement.setInt(3, _month);
 			sqlFilter.setParameters(statement, 4);
 
 			long lastTourId = -1;
@@ -193,24 +193,20 @@ public class TVITagViewMonth extends TVITagViewItem {
 	}
 
 	public int getMonth() {
-		return fMonth;
+		return _month;
 	}
 
 	public TVITagViewYear getYearItem() {
-		return fYearItem;
+		return _yearItem;
 	}
 
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + fMonth;
-		result = prime * result + fYear;
-		result = prime * result + ((fYearItem == null) ? 0 : fYearItem.hashCode());
+		result = prime * result + _month;
+		result = prime * result + _year;
+		result = prime * result + ((_yearItem == null) ? 0 : _yearItem.hashCode());
 		return result;
 	}
-
-	@Override
-	protected void remove() {}
-
 }

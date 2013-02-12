@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -135,11 +135,8 @@ public class TVICompareResultComparedTour extends TVICompareResultItem {
 	/**
 	 * @return Returns <code>true</code> when the compare result is saved in the database
 	 */
-	public boolean isSaved() {
+	boolean isSaved() {
 		return compId != -1;
 	}
-
-	@Override
-	protected void remove() {}
 
 }

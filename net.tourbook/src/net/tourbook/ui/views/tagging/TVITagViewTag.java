@@ -1,17 +1,17 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
- *   
+ * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
+ * 
  * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software 
+ * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- *  
- * This program is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public License along with 
+ * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.ui.views.tagging;
 
@@ -37,13 +37,13 @@ import org.eclipse.jface.viewers.TreeViewer;
 
 public class TVITagViewTag extends TVITagViewItem {
 
-	private static final DateFormat	fDF		= DateFormat.getDateInstance(DateFormat.SHORT);
+	private static final DateFormat	_df		= DateFormat.getDateInstance(DateFormat.SHORT);
 
 	long							tagId;
 
 	String							name;
 
-	private int						fExpandType;
+	private int						_expandType;
 
 	public boolean					isRoot	= false;
 
@@ -72,7 +72,7 @@ public class TVITagViewTag extends TVITagViewItem {
 	@Override
 	protected void fetchChildren() {
 
-		switch (fExpandType) {
+		switch (_expandType) {
 		case TourTag.EXPAND_TYPE_FLAT:
 			setChildren(readTagChildrenTours(UI.EMPTY_STRING));
 			break;
@@ -92,7 +92,7 @@ public class TVITagViewTag extends TVITagViewItem {
 	}
 
 	public int getExpandType() {
-		return fExpandType;
+		return _expandType;
 	}
 
 	public String getName() {
@@ -166,7 +166,7 @@ public class TVITagViewTag extends TVITagViewItem {
 			sb.append(" LEFT OUTER JOIN " + TourDatabase.TABLE_TOUR_DATA + " TourData"); //$NON-NLS-1$ //$NON-NLS-2$
 			sb.append(" ON jTdataTtag.TourData_tourId = TourData.tourId "); //$NON-NLS-1$
 
-			// get all tag id's for one tour 
+			// get all tag id's for one tour
 			sb.append(" LEFT OUTER JOIN " + TourDatabase.JOINTABLE_TOURDATA__TOURTAG + " jTdataTtag2"); //$NON-NLS-1$ //$NON-NLS-2$
 			sb.append(" ON TourData.tourID = jTdataTtag2.TourData_tourId"); //$NON-NLS-1$
 
@@ -207,7 +207,7 @@ public class TVITagViewTag extends TVITagViewItem {
 					tourItem.tourId = tourId;
 					tourItem.getTourColumnData(result, resultTagId, 3);
 
-					tourItem.treeColumn = fDF.format(tourItem.tourDate.toDate());
+					tourItem.treeColumn = _df.format(tourItem.tourDate.toDate());
 				}
 
 				previousTourId = tourId;
@@ -291,7 +291,7 @@ public class TVITagViewTag extends TVITagViewItem {
 	 */
 	public void refresh(final TreeViewer tagViewer, final ArrayList<TourData> modifiedTours, final boolean isAddMode) {
 
-		switch (fExpandType) {
+		switch (_expandType) {
 		case TourTag.EXPAND_TYPE_FLAT:
 			refreshFlatTours(tagViewer, modifiedTours, isAddMode);
 			break;
@@ -388,11 +388,8 @@ public class TVITagViewTag extends TVITagViewItem {
 		tagViewer.update(allYearItems.toArray(), null);
 	}
 
-	@Override
-	protected void remove() {}
-
 	public void setExpandType(final int expandType) {
-		fExpandType = expandType;
+		_expandType = expandType;
 	}
 
 	public String setName(final String name) {
@@ -426,7 +423,7 @@ public class TVITagViewTag extends TVITagViewItem {
 
 			em.close();
 
-			fExpandType = expandType;
+			_expandType = expandType;
 		}
 
 	}

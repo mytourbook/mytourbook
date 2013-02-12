@@ -1,17 +1,17 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
- *   
+ * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
+ * 
  * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software 
+ * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- *  
- * This program is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public License along with 
+ * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.ui.views.tagging;
 
@@ -30,12 +30,12 @@ import net.tourbook.ui.UI;
  */
 public class TVITagViewRoot extends TVITagViewItem {
 
-	private TaggingView	fTagView;
-	private int		fTagViewStructure;
+//	private TaggingView	_tagView;
+	private int			_tagViewStructure;
 
 	public TVITagViewRoot(final TaggingView tagView, final int tagViewStructure) {
-		fTagView = tagView;
-		fTagViewStructure = tagViewStructure;
+//		_tagView = tagView;
+		_tagViewStructure = tagViewStructure;
 	}
 
 	@Override
@@ -55,7 +55,7 @@ public class TVITagViewRoot extends TVITagViewItem {
 			PreparedStatement statement;
 			ResultSet result;
 
-			if (fTagViewStructure == TaggingView.TAG_VIEW_LAYOUT_HIERARCHICAL) {
+			if (_tagViewStructure == TaggingView.TAG_VIEW_LAYOUT_HIERARCHICAL) {
 
 				/*
 				 * get tag categories
@@ -84,9 +84,9 @@ public class TVITagViewRoot extends TVITagViewItem {
 			/*
 			 * get tags
 			 */
-			final String whereClause = fTagViewStructure == TaggingView.TAG_VIEW_LAYOUT_FLAT
+			final String whereClause = _tagViewStructure == TaggingView.TAG_VIEW_LAYOUT_FLAT
 					? UI.EMPTY_STRING
-					: fTagViewStructure == TaggingView.TAG_VIEW_LAYOUT_HIERARCHICAL ? //
+					: _tagViewStructure == TaggingView.TAG_VIEW_LAYOUT_HIERARCHICAL ? //
 							" WHERE isRoot = 1" //$NON-NLS-1$
 							: UI.EMPTY_STRING;
 
@@ -125,12 +125,5 @@ public class TVITagViewRoot extends TVITagViewItem {
 			UI.showSQLException(e);
 		}
 	}
-
-	public TaggingView getTagView() {
-		return fTagView;
-	}
-
-	@Override
-	protected void remove() {}
 
 }

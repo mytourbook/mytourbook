@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2012  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -26,8 +26,6 @@ public abstract class TreeViewerItem {
 	private TreeViewerItem				_parentItem;
 	private ArrayList<TreeViewerItem>	_children;
 
-	private boolean						_isChildChildrenFetched;
-
 	/**
 	 * Adds a new child to this tree item
 	 * 
@@ -52,8 +50,8 @@ public abstract class TreeViewerItem {
 	}
 
 	/**
-	 * fetches the children for this tree item, childs can be added to this tree item with
-	 * {@link #addChild(TreeViewerItem)}
+	 * Fetches children for this tree item, childs can be added to this tree item with
+	 * {@link #addChild(TreeViewerItem)}.
 	 */
 	protected abstract void fetchChildren();
 
@@ -130,8 +128,6 @@ public abstract class TreeViewerItem {
 			return _children.size() > 0;
 		}
 	}
-
-	protected abstract void remove();
 
 	/**
 	 * Removes a child from this tree item

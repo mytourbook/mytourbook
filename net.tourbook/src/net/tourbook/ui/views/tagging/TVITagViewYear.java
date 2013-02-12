@@ -1,17 +1,17 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
- *   
+ * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
+ * 
  * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software 
+ * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- *  
- * This program is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public License along with 
+ * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.ui.views.tagging;
 
@@ -31,11 +31,11 @@ import net.tourbook.ui.UI;
 
 public class TVITagViewYear extends TVITagViewItem {
 
-	private final int				fYear;
-	private TVITagViewTag			fTagItem;
+	private final int				_year;
+	private TVITagViewTag			_tagItem;
 
-	private static Calendar			fCalendar		= GregorianCalendar.getInstance();
-	private static SimpleDateFormat	fMonthFormatter	= new SimpleDateFormat("MMM");		//$NON-NLS-1$
+	private static Calendar			_calendar		= GregorianCalendar.getInstance();
+	private static SimpleDateFormat	_monthFormatter	= new SimpleDateFormat("MMM");		//$NON-NLS-1$
 
 	/**
 	 * <code>true</code> when the children of this year item contains month items<br>
@@ -47,8 +47,8 @@ public class TVITagViewYear extends TVITagViewItem {
 		
 		setParentItem(parentItem);
 		
-		fTagItem = parentItem;
-		fYear = year;
+		_tagItem = parentItem;
+		_year = year;
 		fIsMonth = isMonth;
 	}
 
@@ -64,9 +64,9 @@ public class TVITagViewYear extends TVITagViewItem {
 			return 0;
 		}
 
-		if (fYear == otherYearItem.fYear) {
+		if (_year == otherYearItem._year) {
 			return 0;
-		} else if (fYear < otherYearItem.fYear) {
+		} else if (_year < otherYearItem._year) {
 			return -1;
 		} else {
 			return 1;
@@ -90,15 +90,15 @@ public class TVITagViewYear extends TVITagViewItem {
 		if (fIsMonth != other.fIsMonth) {
 			return false;
 		}
-		if (fYear != other.fYear) {
+		if (_year != other._year) {
 			return false;
 		}
 
-		if (fTagItem == null) {
-			if (other.fTagItem != null) {
+		if (_tagItem == null) {
+			if (other._tagItem != null) {
 				return false;
 			}
-		} else if (!fTagItem.equals(other.fTagItem)) {
+		} else if (!_tagItem.equals(other._tagItem)) {
 			return false;
 		}
 
@@ -116,15 +116,15 @@ public class TVITagViewYear extends TVITagViewItem {
 	}
 
 	public long getTagId() {
-		return fTagItem.tagId;
+		return _tagItem.tagId;
 	}
 
 	public TVITagViewTag getTagItem() {
-		return fTagItem;
+		return _tagItem;
 	}
 
 	public int getYear() {
-		return fYear;
+		return _year;
 	}
 
 	@Override
@@ -132,8 +132,8 @@ public class TVITagViewYear extends TVITagViewItem {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + (fIsMonth ? 1231 : 1237);
-		result = prime * result + ((fTagItem == null) ? 0 : fTagItem.hashCode());
-		result = prime * result + fYear;
+		result = prime * result + ((_tagItem == null) ? 0 : _tagItem.hashCode());
+		result = prime * result + _year;
 		return result;
 	}
 
@@ -172,8 +172,8 @@ public class TVITagViewYear extends TVITagViewItem {
 			final Connection conn = TourDatabase.getInstance().getConnection();
 
 			final PreparedStatement statement = conn.prepareStatement(sb.toString());
-			statement.setLong(1, fTagItem.getTagId());
-			statement.setInt(2, fYear);
+			statement.setLong(1, _tagItem.getTagId());
+			statement.setInt(2, _year);
 			sqlFilter.setParameters(statement, 3);
 
 			final ResultSet result = statement.executeQuery();
@@ -185,8 +185,8 @@ public class TVITagViewYear extends TVITagViewItem {
 				final TVITagViewMonth tourItem = new TVITagViewMonth(this, dbYear, dbMonth);
 				children.add(tourItem);
 
-				fCalendar.set(Calendar.MONTH, dbMonth - 1);
-				tourItem.treeColumn = fMonthFormatter.format(fCalendar.getTime());
+				_calendar.set(Calendar.MONTH, dbMonth - 1);
+				tourItem.treeColumn = _monthFormatter.format(_calendar.getTime());
 
 				tourItem.readSumColumnData(result, 3);
 			}
@@ -225,7 +225,7 @@ public class TVITagViewYear extends TVITagViewItem {
 			sb.append(" LEFT OUTER JOIN " + TourDatabase.TABLE_TOUR_DATA + " TourData"); //$NON-NLS-1$ //$NON-NLS-2$
 			sb.append(" ON jTdataTtag.TourData_tourId=TourData.tourId "); //$NON-NLS-1$
 
-			// get all tag id's for one tour 
+			// get all tag id's for one tour
 			sb.append(" LEFT OUTER JOIN " + TourDatabase.JOINTABLE_TOURDATA__TOURTAG + " jTdataTtag2"); //$NON-NLS-1$ //$NON-NLS-2$
 			sb.append(" ON TourData.tourID = jTdataTtag2.TourData_tourId"); //$NON-NLS-1$
 
@@ -238,8 +238,8 @@ public class TVITagViewYear extends TVITagViewItem {
 			final Connection conn = TourDatabase.getInstance().getConnection();
 
 			final PreparedStatement statement = conn.prepareStatement(sb.toString());
-			statement.setLong(1, fTagItem.getTagId());
-			statement.setInt(2, fYear);
+			statement.setLong(1, _tagItem.getTagId());
+			statement.setInt(2, _year);
 			sqlFilter.setParameters(statement, 3);
 
 			long lastTourId = -1;
@@ -283,8 +283,4 @@ public class TVITagViewYear extends TVITagViewItem {
 
 		return children;
 	}
-
-	@Override
-	protected void remove() {}
-
 }
