@@ -1,11 +1,26 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Map 3
-Bundle-SymbolicName: net.tourbook.map3
+Bundle-SymbolicName: net.tourbook.map3;singleton:=true
 Bundle-Version: 13.5.0.qualifier
 Bundle-Activator: net.tourbook.map3.Activator
+Bundle-Localization: plugin
 Bundle-Vendor: MyTourbook
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
+Import-Package: gov.nasa.worldwind,
+ gov.nasa.worldwind.avlist,
+ gov.nasa.worldwind.awt,
+ gov.nasa.worldwind.event,
+ gov.nasa.worldwind.geom,
+ gov.nasa.worldwind.globes,
+ gov.nasa.worldwind.layers,
+ gov.nasa.worldwind.pick,
+ gov.nasa.worldwind.render,
+ gov.nasa.worldwind.util,
+ gov.nasa.worldwind.view.firstperson,
+ gov.nasa.worldwind.view.orbit,
+ net.tourbook.common,
+ net.tourbook.common.util

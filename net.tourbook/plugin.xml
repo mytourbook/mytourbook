@@ -399,8 +399,7 @@
    </extension>
 
 
-   <extension
-         point="org.eclipse.ui.menus">
+   <extension point="org.eclipse.ui.menus">
 
 
       <menuContribution locationURI="menu:file?after=fileNew">
@@ -525,13 +524,6 @@
 	               tooltip="%command_view_tourEditor_tooltip"/>
 	               
 	         <command
-	               commandId="net.tourbook.mapping.command.tourMap"
-	               icon="icons/earth-globe-abstract.png"
-	               label="%command_tour_map_name"
-	               mnemonic="%command_tour_map_name_Mnemonic"
-	               tooltip="%command_tour_map_name_tooltip"/>
-	               
-	         <command
 		           commandId="command.net.tourbook.views.TourMarkerView"
 	               icon="icons/tour-marker.png"
 	               label="%view_name_Marker"
@@ -548,6 +540,17 @@
 	               icon="icons/tour-waypoint.png"
 	               label="%View_Name_Waypoint"
 	               mnemonic="%View_Name_Waypoint_Mnemonic"/>
+
+	         <command
+	               commandId="net.tourbook.mapping.command.tourMap"
+	               icon="icons/earth-globe-abstract.png"
+	               label="%command_tour_map_name"
+	               mnemonic="%command_tour_map_name_Mnemonic"
+	               tooltip="%command_tour_map_name_tooltip"/>
+	               
+         <separator
+               name="Map"
+               visible="false"/>
 
 
          <separator
@@ -641,12 +644,6 @@
 		            tooltip="%command_view_tourEditor_tooltip"/>
 		            
 		      <command
-		            commandId="net.tourbook.mapping.command.tourMap"
-		            icon="icons/earth-globe-abstract.png"
-		            label="%command_tour_map_name"
-		            tooltip="%command_tour_map_name_tooltip"/>
-		            
-		      <command
 		            commandId="command.net.tourbook.views.tagViewID"
 		            icon="icons/tour-tag.gif"
 		            label="%command_tagging_name"
@@ -659,6 +656,16 @@
 		            mnemonic="%command_tourChart_tool_graphAnalyzer_mnemonic"
 		            style="push"
 		            tooltip="%command_tourChart_tool_graphAnalyzer_tooltip"/>
+		            
+				<separator
+					name="Map"
+					visible="false"/>
+		            
+				<command
+					commandId="net.tourbook.mapping.command.tourMap"
+					icon="icons/earth-globe-abstract.png"
+					label="%command_tour_map_name"
+					tooltip="%command_tour_map_name_tooltip"/>
 		
 		   </toolbar>
 		</menuContribution>

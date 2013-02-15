@@ -13,7 +13,6 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-
 package net.tourbook.common.util;
 
 import java.util.ArrayList;
@@ -119,9 +118,9 @@ public abstract class TreeViewerItem {
 	public boolean hasChildren() {
 
 		if (_children == null) {
-			/*
-			 * if fChildren have not yet been retrieved we assume that fChildren can be available to
-			 * make the tree node expandable
+			/**
+			 * when _children have not yet been retrieved we assume that _children can be available
+			 * to make the tree node expandable
 			 */
 			return true;
 		} else {

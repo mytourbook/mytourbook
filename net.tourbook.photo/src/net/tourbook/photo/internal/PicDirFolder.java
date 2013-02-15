@@ -217,7 +217,7 @@ public class PicDirFolder {
 		}
 	}
 
-	private class FolderContentProvicer implements ITreeContentProvider {
+	private class FolderContentProvider implements ITreeContentProvider {
 
 		public void dispose() {}
 
@@ -505,7 +505,7 @@ public class PicDirFolder {
 
 		_folderViewer = new TreeViewer(tree);
 
-		_folderViewer.setContentProvider(new FolderContentProvicer());
+		_folderViewer.setContentProvider(new FolderContentProvider());
 		_folderViewer.setComparer(new FolderComparer());
 		_folderViewer.setUseHashlookup(true);
 

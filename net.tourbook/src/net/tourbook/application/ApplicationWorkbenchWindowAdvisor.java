@@ -484,6 +484,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 		TagMenuManager.saveTagState();
 		TourTypeMenuManager.saveState();
 		TourPhotoManager.saveState();
+		map3ma.saveState();
 
 		return super.preWindowShellClose();
 	}
