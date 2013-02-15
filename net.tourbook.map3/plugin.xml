@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+
+
+<!-- COMMANDS -->
+
+
+   <extension point="org.eclipse.ui.commands">
+
+      <command
+            id="net.tourbook.map3.command.TourMap3"
+            name="%View_Name_TourMap3"
+            defaultHandler="net.tourbook.map3.view.ActionHandlerOpenTourMap3View"
+            />
+            
+   </extension>
+
+
+<!-- MENUS -->
+
+
+   <extension point="org.eclipse.ui.menus">
+
+		<menuContribution locationURI="menu:views?after=Map" >
+		            
+			<command commandId="net.tourbook.map3.command.TourMap3"
+				icon="icons/map3-view.png"
+				label="%View_Name_TourMap3"
+				mnemonic="%View_Name_TourMap3_Mnemonic"/>
+		
+		</menuContribution>
+
+		<menuContribution locationURI="toolbar:org.eclipse.ui.main.toolbar?after=additions">
+		            
+			<toolbar id="net.tourbook.toolbars.tourViews">
+		            
+				<command
+					commandId="net.tourbook.map3.command.TourMap3"
+					icon="icons/map3-view.png"
+					label="%View_Name_TourMap3"
+					tooltip="%View_Name_TourMap3_Toolbar"/>
+
+			</toolbar>
+		
+		</menuContribution>
+
+   </extension>
+
+
+<!-- VIEWS -->
+
+
+   <extension point="org.eclipse.ui.views">
+   
+		<view
+			category="net.tourbook.category.tour"
+			class="net.tourbook.map3.view.Map3View"
+			icon="icons/map3-view.png"
+			id="net.tourbook.map3.Map3View"
+			name="%View_Name_TourMap3"
+		/>
+   
+		<view
+			category="net.tourbook.category.Tools"
+			class="net.tourbook.map3.view.Map3PropertiesView"
+			icon="icons/map3-properties.png"
+			id="net.tourbook.map3.Map3PropertiesView"
+			name="%View_Name_Map3Properties"
+		/>
+   
+   </extension>
+
+</plugin>

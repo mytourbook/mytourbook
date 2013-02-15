@@ -1,0 +1,83 @@
+Version: 13.2.0                                        6. February 2013
+
+
+New Features 	
+
+* Photo workflow is now complete.
+
+It took 12 months to implement this simple feature: "Show tour photos in 
+the map" and there are still some parts which can be improved. 
+
+
+* Tour Photo Filter
+
+- when this filter is activated, only tours with photos will be 
+displayed. This affects ALL views, special views are excluded, e.g. tour 
+import view. 
+
+
+* Photos + Tours view 
+
+- save photos in a tour, when a tour contains photos, they can be 
+displayed in the tour chart, tour map and tour photo views 
+
+- displays number of saved photos and time adjustment 
+
+- new filter to show only tours which contain photos but the photos are 
+not yet saved in a tour 
+
+
+* Tour Chart view 
+
+- show/hide photo markers with/without photo tooltip 
+
+- show different photo markers for linked and saved photos 
+
+
+* Tour Map view 
+
+- filter photos by rating stars 
+
+- set photo image size 
+
+- Problem: sometimes photos are not displayed, because they are not yet 
+loaded, selecting another tour and reselecting the previous tour will 
+solve it. This problem will be fixed in the next major version. 
+
+
+* All photo galleries
+
+- star rating can be set for photos when they are saved in a tour. When 
+a photo is saved in multiple tours, star rating can currently not be set 
+(this situation can occure when more than one person is saving the same 
+photo) 
+
+ 
+
+Behaviour changed
+	
+* Tour Chart view
+
+- there is a different hovering algorithm for the mouse location and 
+photo marker background color 
+
+ 
+
+Fixed Bugs 	
+
+* Tour Book view
+ - all average values are wrong, they included tours which values are 
+not set -> average values are too small 3599360 
+
+
+-----------------------------------------------------------------------
+
+	
+NEW: MyTourbook Mailing List
+
+You can subscribe to this mailing list and you will receive a message 
+only when a new version is published. 
+
+When you have subscribed, you will receive an automated welcome mail 
+which says that you can send messages to this mailing list, this feature 
+is disabled. 
