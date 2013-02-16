@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2011  Matthias Helmling and Contributors
+ * Copyright (C) 2013  Matthias Helmling and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -13,7 +13,6 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-
 package net.tourbook.ui.views.calendar;
 
 import java.util.ArrayList;
@@ -50,9 +49,11 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IPartListener2;
@@ -68,14 +69,14 @@ public class CalendarView extends ViewPart implements ITourProvider {
 	/**
 	 * The ID of the view as specified by the extension.
 	 */
-	public static final String					ID								= "net.tourbook.views.calendar.CalendarView"; //$NON-NLS-1$
+	public static final String					ID										= "net.tourbook.views.calendar.CalendarView";	//$NON-NLS-1$
 
-	private final IPreferenceStore				_prefStore						= TourbookPlugin.getDefault() //
-																						.getPreferenceStore();
+	private final IPreferenceStore				_prefStore								= TourbookPlugin.getDefault() //
+																								.getPreferenceStore();
 
-	private final IDialogSettings				_state							= TourbookPlugin.getDefault() //
-																						.getDialogSettingsSection(
-																								"TourCalendarView");			//$NON-NLS-1$
+	private final IDialogSettings				_state									= TourbookPlugin.getDefault() //
+																								.getDialogSettingsSection(
+																										"TourCalendarView");			//$NON-NLS-1$
 
 	private PageBook							_pageBook;
 
@@ -88,37 +89,38 @@ public class CalendarView extends ViewPart implements ITourProvider {
 	private IPropertyChangeListener				_propChangeListener;
 	private ITourEventListener					_tourPropertyListener;
 	private CalendarYearMonthContributionItem	_cymci;
-	
-	private String								STATE_SELECTED_TOURS			= "SelectedTours";								// $NON-NLS-1$ //$NON-NLS-1$
 
-	private String								STATE_FIRST_DAY					= "FirstDayDisplayed";							// $NON-NLS-1$ //$NON-NLS-1$
+	private Formatter							_formatter								= new Formatter();
+
+	private String								STATE_SELECTED_TOURS					= "SelectedTours";								// $NON-NLS-1$ //$NON-NLS-1$
+	private String								STATE_FIRST_DAY							= "FirstDayDisplayed";							// $NON-NLS-1$ //$NON-NLS-1$
 	private String								STATE_NUM_OF_WEEKS_NORMAL				= "NumberOfWeeksDisplayed";					// $NON-NLS-1$ //$NON-NLS-1$
 	private String								STATE_NUM_OF_WEEKS_TINY					= "NumberOfWeeksDisplayedTinyView";			// $NON-NLS-1$ //$NON-NLS-1$
-	private String								STATE_IS_LINKED					= "Linked";									// $NON-NLS-1$ //$NON-NLS-1$
-//	private String								STATE_TOUR_SIZE_DYNAMIC			= "TourSizeDynamic";							// $NON-NLS-1$ //$NON-NLS-1$
-	private String								STATE_NUMBER_OF_TOURS_PER_DAY	= "NumberOfToursPerDay";						// $NON-NLS-1$ //$NON-NLS-1$
+	private String								STATE_IS_LINKED							= "Linked";									// $NON-NLS-1$ //$NON-NLS-1$
+//	private String								STATE_TOUR_SIZE_DYNAMIC					= "TourSizeDynamic";							// $NON-NLS-1$ //$NON-NLS-1$
+	private String								STATE_NUMBER_OF_TOURS_PER_DAY			= "NumberOfToursPerDay";						// $NON-NLS-1$ //$NON-NLS-1$
 	private String								STATE_TOUR_INFO_FORMATTER_INDEX_		= "TourInfoFormatterIndex";					//$NON-NLS-1$
 	private String								STATE_WEEK_SUMMARY_FORMATTER_INDEX_		= "WeekSummaryFormatterIndex";					//$NON-NLS-1$
-	private String								STATE_TOUR_INFO_TEXT_COLOR			= "TourInfoUseTextColor";						//$NON-NLS-1$
+	private String								STATE_TOUR_INFO_TEXT_COLOR				= "TourInfoUseTextColor";						//$NON-NLS-1$
 	private String								STATE_TOUR_INFO_BLACK_TEXT_HIGHLIGHT	= "TourInfoUseBlackTextHightlight";			//$NON-NLS-1$
-	private String								STATE_SHOW_DAY_NUMBER_IN_TINY_LAYOUT	= "ShowDayNumberInTinyView"; //$NON-NLS-1$
-	private String								STATE_USE_LINE_COLOR_FOR_WEEK_SUMMARY	= "UseLineColorForWeekSummary"; //$NON-NLS-1$
+	private String								STATE_SHOW_DAY_NUMBER_IN_TINY_LAYOUT	= "ShowDayNumberInTinyView";					//$NON-NLS-1$
+	private String								STATE_USE_LINE_COLOR_FOR_WEEK_SUMMARY	= "UseLineColorForWeekSummary";				//$NON-NLS-1$
 
-	private Action								_forward, _back;
-	private Action								_zoomIn, _zoomOut;
-	private Action								_setLinked;
-	private Action								_gotoToday;
-	private Action[]							_setNumberOfToursPerDay;
-	// private Action								_setTourSizeDynamic;
-	private Action[]							_setTourInfoFormatLine;
-	private Action[]							_setSummaryFormatLine;
-	private Action[][]							_setTourInfoFormat;
-	private Action[][]							_setWeekSummaryFormat;
-	private Action								_setTourInfoTextColor;
-	private Action								_setTourInfoBlackTextHighlight;
-	private Action								_setShowDayNumberInTinyLayout;
+	private Action								_actionForward, _actionBack;
+	private Action								_actionZoomIn, _actionZoomOut;
+	private Action								_actionSetLinked;
+	private Action								_actionGotoToday;
+	private Action[]							_actionSetNumberOfToursPerDay;
+	// private Action							_setTourSizeDynamic;
+	private Action[]							_actionSetTourInfoFormatLine;
+	private Action[]							_actionSetSummaryFormatLine;
+	private Action[][]							_actionSetTourInfoFormat;
+	private Action[][]							_actionSetWeekSummaryFormat;
+	private Action								_actionSetTourInfoTextColor;
+	private Action								_actionSetTourInfoBlackTextHighlight;
+	private Action								_actionSetShowDayNumberInTinyLayout;
+	private Action								_actionSetUseLineColorForWeekSummary;
 
-	private Action								_setUseLineColorForWeekSummary;
 	private boolean								_useLineColorForWeekSummary				= false;
 
 	static final int							numberOfInfoLines						= 3;
@@ -128,7 +130,7 @@ public class CalendarView extends ViewPart implements ITourProvider {
 																								.getInstance()
 																								.getGraphColorDefinitions();
 
-	private WeekSummaryFormatter[]			_tourWeekSummaryFormatter				= {
+	private WeekSummaryFormatter[]				_tourWeekSummaryFormatter				= {
 																						// fool stupid auto formatter
 			// - Nothing -
 			new WeekSummaryFormatter(GraphColorProvider.PREF_GRAPH_TIME) {
@@ -143,13 +145,15 @@ public class CalendarView extends ViewPart implements ITourProvider {
 				}
 			},
 			// - Distance -
-			new WeekSummaryFormatter(GraphColorProvider.PREF_GRAPH_DISTANCE) {
+			new WeekSummaryFormatter(
+					GraphColorProvider.PREF_GRAPH_DISTANCE,
+					Messages.Calendar_View_Action_SummaryDistance) {
 
 				@Override
 				String format(final CalendarTourData data) {
 					if (data.distance > 0) {
 						final float distance = (float) (data.distance / 1000.0 / UI.UNIT_VALUE_DISTANCE);
-						return new Formatter().format(
+						return _formatter.format(
 								NLS.bind(Messages.Calendar_View_Format_Distance, UI.UNIT_LABEL_DISTANCE),
 								distance).toString();
 					} else {
@@ -158,12 +162,14 @@ public class CalendarView extends ViewPart implements ITourProvider {
 				}
 			},
 			// - Moving Time -
-			new WeekSummaryFormatter(GraphColorProvider.PREF_GRAPH_TIME, Messages.Calendar_View_Action_SummaryMovingTime) {
+			new WeekSummaryFormatter(
+					GraphColorProvider.PREF_GRAPH_TIME,
+					Messages.Calendar_View_Action_SummaryMovingTime) {
 
 				@Override
 				String format(final CalendarTourData data) {
 					if (data.recordingTime > 0) {
-						return new Formatter().format(
+						return _formatter.format(
 								Messages.Calendar_View_Format_Time,
 								data.drivingTime / 3600,
 								(data.drivingTime % 3600) / 60).toString();
@@ -173,7 +179,9 @@ public class CalendarView extends ViewPart implements ITourProvider {
 				}
 			},
 			// - Altitude -
-			new WeekSummaryFormatter(GraphColorProvider.PREF_GRAPH_ALTITUDE) {
+			new WeekSummaryFormatter(
+					GraphColorProvider.PREF_GRAPH_ALTITUDE,
+					Messages.Calendar_View_Action_SummaryAltitude) {
 
 				@Override
 				String format(final CalendarTourData data) {
@@ -186,12 +194,12 @@ public class CalendarView extends ViewPart implements ITourProvider {
 				}
 			},
 			// - Speed -
-			new WeekSummaryFormatter(GraphColorProvider.PREF_GRAPH_SPEED) {
+			new WeekSummaryFormatter(GraphColorProvider.PREF_GRAPH_SPEED, Messages.Calendar_View_Action_SummarySpeed) {
 
 				@Override
 				String format(final CalendarTourData data) {
 					if (data.distance > 0 && data.recordingTime > 0) {
-						return new Formatter().format(
+						return _formatter.format(
 								NLS.bind(Messages.Calendar_View_Format_Speed, UI.UNIT_LABEL_SPEED),
 								data.distance == 0 ? 0 : data.distance / (data.recordingTime / 3.6f)).toString();
 					} else {
@@ -200,7 +208,7 @@ public class CalendarView extends ViewPart implements ITourProvider {
 				}
 			},
 			// - Pace -
-			new WeekSummaryFormatter(GraphColorProvider.PREF_GRAPH_PACE) {
+			new WeekSummaryFormatter(GraphColorProvider.PREF_GRAPH_PACE, Messages.Calendar_View_Action_SummaryPace) {
 
 				@Override
 				String format(final CalendarTourData data) {
@@ -208,7 +216,7 @@ public class CalendarView extends ViewPart implements ITourProvider {
 						final int pace = (int) (data.distance == 0
 								? 0
 								: (1000 * data.recordingTime / data.distance * UI.UNIT_VALUE_DISTANCE));
-						return new Formatter().format(
+						return _formatter.format(
 								NLS.bind(Messages.Calendar_View_Format_Pace, UI.UNIT_LABEL_PACE),
 								pace / 60,
 								pace % 60).toString();
@@ -218,12 +226,14 @@ public class CalendarView extends ViewPart implements ITourProvider {
 				}
 			},
 			// - Recording Time -
-			new WeekSummaryFormatter(GraphColorProvider.PREF_GRAPH_TIME, Messages.Calendar_View_Action_SummaryRecordingTime) {
+			new WeekSummaryFormatter(
+					GraphColorProvider.PREF_GRAPH_TIME,
+					Messages.Calendar_View_Action_SummaryRecordingTime) {
 
 				@Override
 				String format(final CalendarTourData data) {
 					if (data.recordingTime > 0) {
-						return new Formatter().format(
+						return _formatter.format(
 								Messages.Calendar_View_Format_Time,
 								data.recordingTime / 3600,
 								(data.recordingTime % 3600) / 60).toString();
@@ -231,10 +241,9 @@ public class CalendarView extends ViewPart implements ITourProvider {
 						return UI.DASH;
 					}
 				}
-			},
-																						};
+			},																			};
 
-	private TourInfoFormatter[]					_tourInfoFormatter				= {
+	private TourInfoFormatter[]					_tourInfoFormatter						= {
 																						// fool stupid auto formatter
 			/*
 			 * nothing
@@ -303,7 +312,7 @@ public class CalendarView extends ViewPart implements ITourProvider {
 				public String format(final CalendarTourData data) {
 					final float distance = (float) (data.distance / 1000.0 / UI.UNIT_VALUE_DISTANCE);
 					final int time = data.recordingTime;
-					return new Formatter().format(
+					return _formatter.format(
 							NLS.bind(Messages.Calendar_View_Format_DistanceTime, UI.UNIT_LABEL_DISTANCE),
 							distance,
 							time / 3600,
@@ -324,7 +333,7 @@ public class CalendarView extends ViewPart implements ITourProvider {
 				public String format(final CalendarTourData data) {
 					final float distance = data.distance;
 					final int time = data.recordingTime;
-					return new Formatter().format(
+					return _formatter.format(
 							NLS.bind(
 									Messages.Calendar_View_Format_DistanceSpeed,
 									UI.UNIT_LABEL_DISTANCE,
@@ -349,7 +358,7 @@ public class CalendarView extends ViewPart implements ITourProvider {
 							? 0
 							: (1000 * data.recordingTime / data.distance * UI.UNIT_VALUE_DISTANCE));
 					final float distance = data.distance / 1000.0f / UI.UNIT_VALUE_DISTANCE;
-					return new Formatter().format(
+					return _formatter.format(
 							NLS.bind(
 									Messages.Calendar_View_Format_DistancePace,
 									UI.UNIT_LABEL_DISTANCE,
@@ -373,7 +382,7 @@ public class CalendarView extends ViewPart implements ITourProvider {
 				public String format(final CalendarTourData data) {
 					final int time = data.recordingTime;
 					final float distance = data.distance / 1000.0f / UI.UNIT_VALUE_DISTANCE;
-					return new Formatter().format(
+					return _formatter.format(
 							NLS.bind(Messages.Calendar_View_Format_TimeDistance, UI.UNIT_LABEL_DISTANCE),
 							time / 3600,
 							(time % 3600) / 60,
@@ -393,7 +402,7 @@ public class CalendarView extends ViewPart implements ITourProvider {
 				@Override
 				public String format(final CalendarTourData data) {
 					final int time = data.recordingTime;
-					return new Formatter().format(
+					return _formatter.format(
 							NLS.bind(Messages.Calendar_View_Format_TimeSpeed, UI.UNIT_LABEL_SPEED),
 							time / 3600,
 							(time % 3600) / 60,
@@ -412,10 +421,12 @@ public class CalendarView extends ViewPart implements ITourProvider {
 			new TourInfoFormatter() {
 				@Override
 				public String format(final CalendarTourData data) {
+
 					final int pace = (int) (data.distance == 0
 							? 0
 							: (1000 * data.recordingTime / data.distance * UI.UNIT_VALUE_DISTANCE));
-					return new Formatter().format(
+
+					return _formatter.format(
 							NLS.bind(Messages.Calendar_View_Format_TimePace, UI.UNIT_LABEL_PACE),
 							data.recordingTime / 3600,
 							(data.recordingTime % 3600) / 60,
@@ -429,17 +440,18 @@ public class CalendarView extends ViewPart implements ITourProvider {
 				}
 			}
 
-																				};
+																						};
 
 	class NumberOfToursPerDayAction extends Action {
 
-		private int	numberOfTours;
+		private int	_numberOfTours;
 
 		NumberOfToursPerDayAction(final int numberOfTours) {
 
 			super(null, AS_RADIO_BUTTON);
 
-			this.numberOfTours = numberOfTours;
+			_numberOfTours = numberOfTours;
+
 			if (0 == numberOfTours) {
 				setText(Messages.Calendar_View_Action_DisplayTours_All);
 			} else if (1 == numberOfTours) {
@@ -451,9 +463,9 @@ public class CalendarView extends ViewPart implements ITourProvider {
 
 		@Override
 		public void run() {
-			_calendarGraph.setNumberOfToursPerDay(numberOfTours);
+			_calendarGraph.setNumberOfToursPerDay(_numberOfTours);
 			for (int j = 0; j < 5; j++) {
-				_setNumberOfToursPerDay[j].setChecked((j == numberOfTours));
+				_actionSetNumberOfToursPerDay[j].setChecked((j == _numberOfTours));
 			}
 //			if (null != _setTourSizeDynamic) {
 //				_setTourSizeDynamic.setEnabled(numberOfTours != 0);
@@ -477,7 +489,7 @@ public class CalendarView extends ViewPart implements ITourProvider {
 		public void run() {
 			_calendarGraph.setTourInfoFormatter(forLine, formatter);
 			for (int i = 0; i < _tourInfoFormatter.length; i++) {
-				_setTourInfoFormat[forLine][i].setChecked(i == formatter.index);
+				_actionSetTourInfoFormat[forLine][i].setChecked(i == formatter.index);
 			}
 		}
 	}
@@ -513,7 +525,7 @@ public class CalendarView extends ViewPart implements ITourProvider {
 			formatMenu = new Menu(parent);
 
 			for (int i = 0; i < _tourInfoFormatter.length; i++) {
-				final ActionContributionItem item = new ActionContributionItem(_setTourInfoFormat[line][i]);
+				final ActionContributionItem item = new ActionContributionItem(_actionSetTourInfoFormat[line][i]);
 				item.fill(formatMenu, -1);
 			}
 
@@ -538,7 +550,7 @@ public class CalendarView extends ViewPart implements ITourProvider {
 	class WeekSummaryFormatAction extends Action {
 
 		WeekSummaryFormatter	formatter;
-		int					forLine;
+		int						forLine;
 
 		WeekSummaryFormatAction(final String text, final WeekSummaryFormatter formatter, final int forLine) {
 
@@ -551,7 +563,7 @@ public class CalendarView extends ViewPart implements ITourProvider {
 		public void run() {
 			_calendarGraph.setWeekSummaryFormatter(forLine, formatter);
 			for (int i = 0; i < _tourWeekSummaryFormatter.length; i++) {
-				_setWeekSummaryFormat[forLine][i].setChecked(i == formatter.index);
+				_actionSetWeekSummaryFormat[forLine][i].setChecked(i == formatter.index);
 			}
 		}
 	}
@@ -587,7 +599,7 @@ public class CalendarView extends ViewPart implements ITourProvider {
 			summaryMenu = new Menu(parent);
 
 			for (int i = 0; i < _tourWeekSummaryFormatter.length; i++) {
-				final ActionContributionItem item = new ActionContributionItem(_setWeekSummaryFormat[line][i]);
+				final ActionContributionItem item = new ActionContributionItem(_actionSetWeekSummaryFormat[line][i]);
 				item.fill(summaryMenu, -1);
 			}
 
@@ -603,9 +615,9 @@ public class CalendarView extends ViewPart implements ITourProvider {
 
 	abstract class WeekSummaryFormatter {
 
-		int	index;
+		int				index;
 		ColorDefinition	cd;
-		String name;
+		String			name;
 
 		WeekSummaryFormatter(final String colorName) {
 			cd = new GraphColorProvider().getGraphColorDefinition(colorName);
@@ -823,32 +835,32 @@ public class CalendarView extends ViewPart implements ITourProvider {
 
 	private void fillLocalPullDown(final IMenuManager manager) {
 
-		for (final Action element : _setSummaryFormatLine) {
+		for (final Action element : _actionSetSummaryFormatLine) {
 			manager.add(element);
 		}
 		manager.add(new Separator());
-		manager.add(_setUseLineColorForWeekSummary);
+		manager.add(_actionSetUseLineColorForWeekSummary);
 		manager.add(new Separator());
 
 		if (_calendarGraph.isTinyLayout()) {
 
-			manager.add(_setShowDayNumberInTinyLayout);
+			manager.add(_actionSetShowDayNumberInTinyLayout);
 
 		} else {
 
-			for (final Action element : _setTourInfoFormatLine) {
+			for (final Action element : _actionSetTourInfoFormatLine) {
 				manager.add(element);
 			}
 
 			manager.add(new Separator());
-			for (final Action element : _setNumberOfToursPerDay) {
+			for (final Action element : _actionSetNumberOfToursPerDay) {
 				manager.add(element);
 			}
 //			manager.add(new Separator());
 //			manager.add(_setTourSizeDynamic);
 //			manager.add(new Separator());
-			manager.add(_setTourInfoTextColor);
-			manager.add(_setTourInfoBlackTextHighlight);
+			manager.add(_actionSetTourInfoTextColor);
+			manager.add(_actionSetTourInfoBlackTextHighlight);
 
 		}
 
@@ -864,17 +876,17 @@ public class CalendarView extends ViewPart implements ITourProvider {
 		// manager.add(_forward);
 		// manager.add(_gotoToday);
 		// manager.add(new Separator());
-		manager.add(_zoomIn);
-		manager.add(_zoomOut);
+		manager.add(_actionZoomIn);
+		manager.add(_actionZoomOut);
 		manager.add(new Separator());
-		manager.add(_setLinked);
+		manager.add(_actionSetLinked);
 	}
 
 	private ArrayList<Action> getLocalActions() {
 		final ArrayList<Action> localActions = new ArrayList<Action>();
-		localActions.add(_back);
-		localActions.add(_gotoToday);
-		localActions.add(_forward);
+		localActions.add(_actionBack);
+		localActions.add(_actionGotoToday);
+		localActions.add(_actionForward);
 		return localActions;
 
 	}
@@ -895,69 +907,69 @@ public class CalendarView extends ViewPart implements ITourProvider {
 
 	private void makeActions() {
 
-		_back = new Action() {
+		_actionBack = new Action() {
 			@Override
 			public void run() {
 				_calendarGraph.gotoPrevScreen();
 			}
 		};
-		_back.setId("net.tourbook.calendar.back"); //$NON-NLS-1$
-		_back.setText(Messages.Calendar_View_Action_Back);
-		_back.setToolTipText(Messages.Calendar_View_Action_Back_Tooltip);
-		_back.setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__ArrowDown));
+		_actionBack.setId("net.tourbook.calendar.back"); //$NON-NLS-1$
+		_actionBack.setText(Messages.Calendar_View_Action_Back);
+		_actionBack.setToolTipText(Messages.Calendar_View_Action_Back_Tooltip);
+		_actionBack.setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__ArrowDown));
 
-		_forward = new Action() {
+		_actionForward = new Action() {
 			@Override
 			public void run() {
 				_calendarGraph.gotoNextScreen();
 			}
 		};
-		_forward.setText(Messages.Calendar_View_Action_Forward);
-		_forward.setToolTipText(Messages.Calendar_View_Action_Forward_Tooltip);
-		_forward.setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__ArrowUp));
+		_actionForward.setText(Messages.Calendar_View_Action_Forward);
+		_actionForward.setToolTipText(Messages.Calendar_View_Action_Forward_Tooltip);
+		_actionForward.setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__ArrowUp));
 
-		_zoomOut = new Action() {
+		_actionZoomOut = new Action() {
 			@Override
 			public void run() {
 				_calendarGraph.zoomOut();
 			}
 		};
-		_zoomOut.setText(Messages.Calendar_View_Action_ZoomOut);
-		_zoomOut.setToolTipText(Messages.Calendar_View_Action_ZoomOut_Tooltip);
-		_zoomOut.setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__ZoomOut));
+		_actionZoomOut.setText(Messages.Calendar_View_Action_ZoomOut);
+		_actionZoomOut.setToolTipText(Messages.Calendar_View_Action_ZoomOut_Tooltip);
+		_actionZoomOut.setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__ZoomOut));
 
-		_zoomIn = new Action() {
+		_actionZoomIn = new Action() {
 			@Override
 			public void run() {
 				_calendarGraph.zoomIn();
 			}
 		};
-		_zoomIn.setText(Messages.Calendar_View_Action_ZoomIn);
-		_zoomIn.setToolTipText(Messages.Calendar_View_Action_ZoomIn_Tooltip);
-		_zoomIn.setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__ZoomIn));
+		_actionZoomIn.setText(Messages.Calendar_View_Action_ZoomIn);
+		_actionZoomIn.setToolTipText(Messages.Calendar_View_Action_ZoomIn_Tooltip);
+		_actionZoomIn.setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__ZoomIn));
 
-		_setLinked = new Action(null, org.eclipse.jface.action.Action.AS_CHECK_BOX) {
+		_actionSetLinked = new Action(null, org.eclipse.jface.action.Action.AS_CHECK_BOX) {
 			@Override
 			public void run() {
-				_calendarGraph.setLinked(_setLinked.isChecked());
+				_calendarGraph.setLinked(_actionSetLinked.isChecked());
 			}
 		};
-		_setLinked.setText(Messages.Calendar_View_Action_LinkWithOtherViews);
-		_setLinked.setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__Synced));
-		_setLinked.setChecked(true);
+		_actionSetLinked.setText(Messages.Calendar_View_Action_LinkWithOtherViews);
+		_actionSetLinked.setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__Synced));
+		_actionSetLinked.setChecked(true);
 
-		_gotoToday = new Action() {
+		_actionGotoToday = new Action() {
 			@Override
 			public void run() {
 				_calendarGraph.gotoToday();
 			}
 		};
-		_gotoToday.setText(Messages.Calendar_View_Action_GotoToday);
-		_gotoToday.setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__ZoomCentered));
+		_actionGotoToday.setText(Messages.Calendar_View_Action_GotoToday);
+		_actionGotoToday.setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__ZoomCentered));
 
-		_setNumberOfToursPerDay = new Action[5];
+		_actionSetNumberOfToursPerDay = new Action[5];
 		for (int i = 0; i < 5; i++) {
-			_setNumberOfToursPerDay[i] = new NumberOfToursPerDayAction(i);
+			_actionSetNumberOfToursPerDay[i] = new NumberOfToursPerDayAction(i);
 		}
 
 //		_setTourSizeDynamic = new Action(null, org.eclipse.jface.action.Action.AS_CHECK_BOX) {
@@ -969,20 +981,20 @@ public class CalendarView extends ViewPart implements ITourProvider {
 //		_setTourSizeDynamic.setText(Messages.Calendar_View_Action_ResizeTours);
 
 		// the tour info line popup menu opener
-		_setTourInfoFormatLine = new Action[numberOfInfoLines];
+		_actionSetTourInfoFormatLine = new Action[numberOfInfoLines];
 		for (int i = 0; i < numberOfInfoLines; i++) {
-			_setTourInfoFormatLine[i] = new TourInfoFormatLineAction(NLS.bind(
+			_actionSetTourInfoFormatLine[i] = new TourInfoFormatLineAction(NLS.bind(
 					Messages.Calendar_View_Action_LineInfo,
 					i + 1), i);
 		}
-		
+
 		// the formatter actions used for all tour info lines
-		_setTourInfoFormat = new Action[numberOfInfoLines][_tourInfoFormatter.length];
+		_actionSetTourInfoFormat = new Action[numberOfInfoLines][_tourInfoFormatter.length];
 		for (int i = 0; i < numberOfInfoLines; i++) {
 			for (int j = 0; j < _tourInfoFormatter.length; j++) {
 				_tourInfoFormatter[j].index = j;
 				if (null != _tourInfoFormatter[j]) {
-					_setTourInfoFormat[i][j] = new TourInfoFormatAction(
+					_actionSetTourInfoFormat[i][j] = new TourInfoFormatAction(
 							_tourInfoFormatter[j].getText(),
 							_tourInfoFormatter[j],
 							i);
@@ -991,20 +1003,20 @@ public class CalendarView extends ViewPart implements ITourProvider {
 		}
 
 		// the week info line popup menu opener
-		_setSummaryFormatLine = new Action[numberOfSummaryLines];
+		_actionSetSummaryFormatLine = new Action[numberOfSummaryLines];
 		for (int i = 0; i < numberOfSummaryLines; i++) {
-			_setSummaryFormatLine[i] = new WeekSummaryFormatLineAction(NLS.bind(
+			_actionSetSummaryFormatLine[i] = new WeekSummaryFormatLineAction(NLS.bind(
 					Messages.Calendar_View_Action_SummaryInfo,
 					i + 1), i);
 		}
 
 		// the formatter actions used for the week summaries
-		_setWeekSummaryFormat = new Action[numberOfSummaryLines][_tourWeekSummaryFormatter.length];
+		_actionSetWeekSummaryFormat = new Action[numberOfSummaryLines][_tourWeekSummaryFormatter.length];
 		for (int i = 0; i < numberOfSummaryLines; i++) {
 			for (int j = 0; j < _tourWeekSummaryFormatter.length; j++) {
 				_tourWeekSummaryFormatter[j].index = j;
 				if (null != _tourWeekSummaryFormatter[j]) {
-					_setWeekSummaryFormat[i][j] = new WeekSummaryFormatAction(
+					_actionSetWeekSummaryFormat[i][j] = new WeekSummaryFormatAction(
 							_tourWeekSummaryFormatter[j].getText(),
 							_tourWeekSummaryFormatter[j],
 							i);
@@ -1012,38 +1024,38 @@ public class CalendarView extends ViewPart implements ITourProvider {
 			}
 		}
 
-		_setTourInfoTextColor = new Action(null, org.eclipse.jface.action.Action.AS_CHECK_BOX) {
+		_actionSetTourInfoTextColor = new Action(null, org.eclipse.jface.action.Action.AS_CHECK_BOX) {
 			@Override
 			public void run() {
 				_calendarGraph.setTourInfoUseLineColor(this.isChecked());
 			}
 		};
-		_setTourInfoTextColor.setText(Messages.Calendar_View_Action_TextColor);
+		_actionSetTourInfoTextColor.setText(Messages.Calendar_View_Action_TextColor);
 
-		_setTourInfoBlackTextHighlight = new Action(null, org.eclipse.jface.action.Action.AS_CHECK_BOX) {
+		_actionSetTourInfoBlackTextHighlight = new Action(null, org.eclipse.jface.action.Action.AS_CHECK_BOX) {
 			@Override
 			public void run() {
 				_calendarGraph.setTourInfoUseHighlightTextBlack(this.isChecked());
 			}
 		};
-		_setTourInfoBlackTextHighlight.setText(Messages.Calendar_View_Action_BlackHighlightText);
+		_actionSetTourInfoBlackTextHighlight.setText(Messages.Calendar_View_Action_BlackHighlightText);
 
-		_setShowDayNumberInTinyLayout = new Action(null, org.eclipse.jface.action.Action.AS_CHECK_BOX) {
+		_actionSetShowDayNumberInTinyLayout = new Action(null, org.eclipse.jface.action.Action.AS_CHECK_BOX) {
 			@Override
 			public void run() {
 				_calendarGraph.setShowDayNumberInTinyView(this.isChecked());
 			}
 		};
-		_setShowDayNumberInTinyLayout.setText(Messages.Calendar_View_Action_ShowDayNumberInTinyView);
+		_actionSetShowDayNumberInTinyLayout.setText(Messages.Calendar_View_Action_ShowDayNumberInTinyView);
 
-		_setUseLineColorForWeekSummary = new Action(null, org.eclipse.jface.action.Action.AS_CHECK_BOX) {
+		_actionSetUseLineColorForWeekSummary = new Action(null, org.eclipse.jface.action.Action.AS_CHECK_BOX) {
 			@Override
 			public void run() {
 				_useLineColorForWeekSummary = this.isChecked();
 				_calendarGraph.draw();
 			}
 		};
-		_setUseLineColorForWeekSummary.setText(Messages.Calendar_View_Action_UseLineColorForSummary);
+		_actionSetUseLineColorForWeekSummary.setText(Messages.Calendar_View_Action_UseLineColorForSummary);
 	}
 
 	private void onSelectionChanged(final ISelection selection) {
@@ -1053,7 +1065,7 @@ public class CalendarView extends ViewPart implements ITourProvider {
 			final Long newTourId = ((SelectionTourId) selection).getTourId();
 			final Long oldTourId = _calendarGraph.getSelectedTourId();
 			if (newTourId != oldTourId) {
-				if (_setLinked.isChecked()) {
+				if (_actionSetLinked.isChecked()) {
 					_calendarGraph.gotoTourId(newTourId);
 				} else {
 					_calendarGraph.removeSelection();
@@ -1065,8 +1077,14 @@ public class CalendarView extends ViewPart implements ITourProvider {
 	}
 
 	private void refreshCalendar() {
+
 		if (null != _calendarGraph) {
-			_calendarGraph.refreshCalendar();
+
+			BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
+				public void run() {
+					_calendarGraph.refreshCalendar();
+				}
+			});
 		}
 	}
 
@@ -1099,18 +1117,18 @@ public class CalendarView extends ViewPart implements ITourProvider {
 //			}
 //		}
 
-		_setLinked.setChecked(Util.getStateBoolean(_state, STATE_IS_LINKED, false));
+		_actionSetLinked.setChecked(Util.getStateBoolean(_state, STATE_IS_LINKED, false));
 
 		// _setTourSizeDynamic.setChecked(Util.getStateBoolean(_state, STATE_TOUR_SIZE_DYNAMIC, true));
 
 		final int numberOfTours = Util.getStateInt(_state, STATE_NUMBER_OF_TOURS_PER_DAY, 3);
-		if (numberOfTours < _setNumberOfToursPerDay.length) {
-			_setNumberOfToursPerDay[numberOfTours].run();
+		if (numberOfTours < _actionSetNumberOfToursPerDay.length) {
+			_actionSetNumberOfToursPerDay[numberOfTours].run();
 		}
 
 		for (int i = 0; i < numberOfInfoLines; i++) {
 			final int tourInfoFormatterIndex = Util.getStateInt(_state, STATE_TOUR_INFO_FORMATTER_INDEX_ + i, i + 1); // the 0. line has the 1. entry selected, the 1. line the 2. ...
-			_setTourInfoFormat[i][tourInfoFormatterIndex].run();
+			_actionSetTourInfoFormat[i][tourInfoFormatterIndex].run();
 		}
 
 		for (int i = 0; i < numberOfSummaryLines; i++) {
@@ -1118,29 +1136,29 @@ public class CalendarView extends ViewPart implements ITourProvider {
 					_state,
 					STATE_WEEK_SUMMARY_FORMATTER_INDEX_ + i,
 					i + 1);
-			_setWeekSummaryFormat[i][weekSummaryFormatterIndex].run();
+			_actionSetWeekSummaryFormat[i][weekSummaryFormatterIndex].run();
 		}
 
 		final boolean useTextColorForTourInfo = Util.getStateBoolean(_state, STATE_TOUR_INFO_TEXT_COLOR, false);
-		_setTourInfoTextColor.setChecked(useTextColorForTourInfo);
-		_setTourInfoTextColor.run();
+		_actionSetTourInfoTextColor.setChecked(useTextColorForTourInfo);
+		_actionSetTourInfoTextColor.run();
 
 		final boolean useBlackForTextHightlight = Util.getStateBoolean(
 				_state,
 				STATE_TOUR_INFO_BLACK_TEXT_HIGHLIGHT,
 				false);
-		_setTourInfoBlackTextHighlight.setChecked(useBlackForTextHightlight);
-		_setTourInfoBlackTextHighlight.run();
+		_actionSetTourInfoBlackTextHighlight.setChecked(useBlackForTextHightlight);
+		_actionSetTourInfoBlackTextHighlight.run();
 
 		final boolean showDayNumberInTinyView = Util.getStateBoolean(
 				_state,
 				STATE_SHOW_DAY_NUMBER_IN_TINY_LAYOUT,
 				false);
-		_setShowDayNumberInTinyLayout.setChecked(showDayNumberInTinyView);
-		_setShowDayNumberInTinyLayout.run();
+		_actionSetShowDayNumberInTinyLayout.setChecked(showDayNumberInTinyView);
+		_actionSetShowDayNumberInTinyLayout.run();
 
 		_useLineColorForWeekSummary = Util.getStateBoolean(_state, STATE_USE_LINE_COLOR_FOR_WEEK_SUMMARY, false);
-		_setUseLineColorForWeekSummary.setChecked(_useLineColorForWeekSummary);
+		_actionSetUseLineColorForWeekSummary.setChecked(_useLineColorForWeekSummary);
 
 	}
 
@@ -1161,7 +1179,7 @@ public class CalendarView extends ViewPart implements ITourProvider {
 		// until now we only implement single tour selection
 		_state.put(STATE_SELECTED_TOURS, _calendarGraph.getSelectedTourId());
 
-		_state.put(STATE_IS_LINKED, _setLinked.isChecked());
+		_state.put(STATE_IS_LINKED, _actionSetLinked.isChecked());
 		// _state.put(STATE_TOUR_SIZE_DYNAMIC, _setTourSizeDynamic.isChecked());
 
 		_state.put(STATE_NUMBER_OF_TOURS_PER_DAY, _calendarGraph.getNumberOfToursPerDay());
