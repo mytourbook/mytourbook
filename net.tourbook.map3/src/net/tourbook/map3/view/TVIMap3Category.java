@@ -18,31 +18,29 @@ package net.tourbook.map3.view;
 import gov.nasa.worldwind.layers.Layer;
 import gov.nasa.worldwind.layers.LayerList;
 
-public class TVICategory extends TVIMapItem {
+import java.util.ArrayList;
 
-	protected int	id;
+import org.eclipse.ui.dialogs.ContainerCheckedTreeViewer;
 
-	public TVICategory(final TVIRoot rootItem, final int id, final String name) {
+public class TVIMap3Category extends TVIMap3Item {
 
-		super(rootItem);
+	int								id;
+
+	private ArrayList<TVIMap3Layer>	_checkStateNotSet	= new ArrayList<TVIMap3Layer>();
+
+	public TVIMap3Category(final TVIMap3Root rootItem, final int id, final String name) {
+
+		super();
 
 		this.id = id;
 		this.name = name;
 	}
 
-	@Override
-	protected void fetchChildren() {
+	private void addWWDefaultLayer() {
 
 		final LayerList layers = Map3Manager.getWWCanvas().getModel().getLayers();
 
-//		// dump layer
-//		System.out.println(UI.timeStampNano() + " Layer");
-//		System.out.println(UI.timeStampNano() + " \t");
-//		// TODO remove SYSTEM.OUT.PRINTLN
-//		for (final Layer layer : layers) {
-//			System.out.println(layer.getName() + "\t" + layer.getClass().getCanonicalName() + "\t" + layer.isEnabled());
-//			// TODO remove SYSTEM.OUT.PRINTLN
-//		}
+//		Map3Manager.dumpLayer(layers);
 
 //		Stars							gov.nasa.worldwind.layers.StarsLayer					true
 //		Atmosphere						gov.nasa.worldwind.layers.SkyGradientLayer				true
@@ -64,14 +62,55 @@ public class TVICategory extends TVIMapItem {
 //		Scale bar						gov.nasa.worldwind.layers.ScalebarLayer					true
 //		Compass							gov.nasa.worldwind.layers.CompassLayer					true
 
-		if (id == Map3Manager.LAYER_ID) {
+		for (final Layer layer : layers) {
 
-			for (final Layer layer : layers) {
-				addChild(new TVILayer(rootItem, layer));
+			final Map3Layer map3Layer = Map3Manager.getMap3Layer(layer);
+
+			if (map3Layer == null) {
+				// this should not happen for the default layer
+				continue;
 			}
 
-		} else if (id == Map3Manager.CONTROLS_ID) {
+			// create tree item
+			final TVIMap3Layer map3Item = new TVIMap3Layer(layer);
 
+			map3Item.isEnabled = map3Layer.isEnabled;
+
+			addChild(map3Item);
+
+			// check state must be set later, it do not work when done now
+			_checkStateNotSet.add(map3Item);
+		}
+
+	}
+
+	@Override
+	protected void fetchChildren() {
+
+		addWWDefaultLayer();
+	}
+
+	void setCheckState() {
+
+		if (_checkStateNotSet.size() == 0) {
+			// nothing to do
+			return;
+		}
+
+		ContainerCheckedTreeViewer propViewer = null;
+
+		final Map3PropertiesView propView = Map3Manager.getMap3PropertiesView();
+		if (propView != null) {
+
+			propViewer = propView.getPropertiesViewer();
+
+			// set check state in the viewer
+			for (final TVIMap3Layer layerItem : _checkStateNotSet) {
+				propViewer.setChecked(layerItem, layerItem.isEnabled);
+			}
+
+			// reset
+			_checkStateNotSet.clear();
 		}
 	}
 

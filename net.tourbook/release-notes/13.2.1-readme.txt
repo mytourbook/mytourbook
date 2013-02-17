@@ -1,0 +1,18 @@
+Version: 13.2.1                                        ?. February 2013
+
+
+Minor Modifications
+
+* Calendar view
+ - changed wording in some actions
+
+
+
+Fixed Bugs 	
+
+* Tour Map view
+ - fixed partly the photo painting problem, photos are now painted when loaded but tracks can be painted above a photo, a manually refresh is necessary when this happened
+
+
+
+

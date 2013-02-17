@@ -15,22 +15,28 @@
  *******************************************************************************/
 package net.tourbook.map3.view;
 
-import java.util.ArrayList;
+/**
+ * Model for a map 3 layer.
+ * 
+ * @author Wolfgang Schramm
+ * @since 2013-02-17
+ */
+public class Map3Layer {
 
-public class TVIRoot extends TVIMapItem {
+	String	layerName;
 
-	public TVIRoot() {
-		super();
+	/**
+	 * Is <code>true</code> when layer is enabled (visible).
+	 */
+	boolean	isEnabled;
+
+	public Map3Layer(final String layerName) {
+		this.layerName=layerName;
 	}
 
 	@Override
-	protected void fetchChildren() {
-
-		final ArrayList<TVICategory> rootCategories = Map3Manager.getRootCategories(this);
-
-		for (final TVICategory rootCategory : rootCategories) {
-			addChild(rootCategory);
-		}
+	public String toString() {
+		return "Map3Layer [layerName=" + layerName + ", isEnabled=" + isEnabled + "]";
 	}
 
 }

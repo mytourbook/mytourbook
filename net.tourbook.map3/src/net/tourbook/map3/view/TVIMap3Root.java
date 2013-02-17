@@ -15,29 +15,22 @@
  *******************************************************************************/
 package net.tourbook.map3.view;
 
-import gov.nasa.worldwind.layers.Layer;
+import java.util.ArrayList;
 
-public class TVILayer extends TVIMapItem {
+public class TVIMap3Root extends TVIMap3Item {
 
-	Layer	layer;
-	boolean	isEnabled;
-
-	public TVILayer(final TVIRoot rootItem, final Layer layer) {
-
-		super(rootItem);
-
-		this.layer = layer;
-		this.name = layer.getName();
+	public TVIMap3Root() {
+		super();
 	}
 
 	@Override
 	protected void fetchChildren() {
-		// default layer has no children
-	}
 
-	@Override
-	public boolean hasChildren() {
-		return false;
+		final ArrayList<TVIMap3Category> rootCategories = Map3Manager.getRootCategories(this);
+
+		for (final TVIMap3Category rootCategory : rootCategories) {
+			addChild(rootCategory);
+		}
 	}
 
 }

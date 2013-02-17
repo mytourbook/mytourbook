@@ -18,17 +18,15 @@ package net.tourbook.map3.view;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.TreeViewerItem;
 
-public abstract class TVIMapItem extends TreeViewerItem {
-
-	TVIRoot	rootItem;
+public abstract class TVIMap3Item extends TreeViewerItem {
 
 	String	name	= UI.EMPTY_STRING;
 
-	protected TVIMapItem() {}
+	public TVIMap3Item() {}
 
-	public TVIMapItem(final TVIRoot rootItem) {
-		this.rootItem = rootItem;
+	@Override
+	public String toString() {
+		return "TVIMap3Item [name=" + name + "]";
 	}
-
 
 }

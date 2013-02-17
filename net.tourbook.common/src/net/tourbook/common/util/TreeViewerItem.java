@@ -115,6 +115,10 @@ public abstract class TreeViewerItem {
 		return _children;
 	}
 
+	/**
+	 * @return Returns <code>true</code> when this item has children or when children have not yet
+	 *         been retrieved.
+	 */
 	public boolean hasChildren() {
 
 		if (_children == null) {

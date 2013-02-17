@@ -81,6 +81,10 @@ public class UI {
 	public static final String			SYMBOL_INFINITY							= "\u221E";																//$NON-NLS-1$
 	public static final String			SYMBOL_SUM_WITH_SPACE					= "\u2211 ";																//$NON-NLS-1$
 	public static final String			SYMBOL_TAU								= "\u03c4";																//$NON-NLS-1$
+	private static final String			SYMBOL_MIN_INFINITY						= "-\u221E";																//$NON-NLS-1$
+	private static final String			SYMBOL_MAX_INFINITY						= "\u221E";																//$NON-NLS-1$
+//	private static final String			SYMBOL_CONSOLE_MIN_INFINITY				= "-oo";																	//$NON-NLS-1$
+//	private static final String			SYMBOL_CONSOLE_MAX_INFINITY				= "oo";																	//$NON-NLS-1$
 
 	public static final String			SYMBOL_BRACKET_LEFT						= "(";																		//$NON-NLS-1$
 	public static final String			SYMBOL_BRACKET_RIGHT					= ")";																		//$NON-NLS-1$
@@ -269,6 +273,17 @@ public class UI {
 			subclass = superclass;
 			superclass = subclass.getSuperclass();
 		}
+	}
+
+	public static String FormatDoubleMinMax(final double value) {
+
+		if (value == -Double.MAX_VALUE) {
+			return SYMBOL_MIN_INFINITY;
+		} else if (value == Double.MAX_VALUE) {
+			return SYMBOL_MAX_INFINITY;
+		}
+
+		return Double.toString(value);
 	}
 
 	/**
