@@ -85,7 +85,7 @@ public abstract class ColumnViewerTourInfoToolTip extends ToolTip implements ITo
 
 		Composite container;
 
-		if (_tourId != -1) {
+		if (_tourId != null && _tourId != -1) {
 			// first get data from the tour id when it is set
 			_tourData = TourManager.getInstance().getTourData(_tourId);
 		}

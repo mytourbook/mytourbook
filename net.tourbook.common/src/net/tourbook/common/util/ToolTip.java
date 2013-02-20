@@ -152,9 +152,19 @@ public abstract class ToolTip {
 			case SWT.MouseWheel:
 				toolTipHide(getShell(), event);
 				break;
+
+			/**
+			 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! <br>
+			 * <br>
+			 * The tooltip is delayed by DEFAULT with Display.getToolTipTime() <br>
+			 * <br>
+			 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+			 */
+//			case SWT.MouseMove:
 			case SWT.MouseHover:
 				toolTipCreate(event);
 				break;
+
 			case SWT.MouseExit:
 				/*
 				 * Check if the mouse exit happened because we move over the tooltip
@@ -703,6 +713,7 @@ public abstract class ToolTip {
 	}
 
 	private void toolTipShow(final Shell tip, final Event event) {
+
 		if (!tip.isDisposed()) {
 			currentArea = getToolTipArea(event);
 			final Composite contentArea = createToolTipContentArea(event, tip);

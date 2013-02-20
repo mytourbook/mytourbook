@@ -78,7 +78,7 @@ public class TVIMap3Category extends TVIMap3Item {
 
 			addChild(map3Item);
 
-			// check state must be set later, it do not work when done now
+			// check state must be set later, it do not work when it's done now
 			_checkStateNotSet.add(map3Item);
 		}
 
