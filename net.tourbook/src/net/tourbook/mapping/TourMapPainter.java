@@ -120,10 +120,12 @@ public class TourMapPainter extends MapPainter {
 
 	private class LoadCallbackImage implements ILoadCallBack {
 
-		private Map	__map;
+		private Map		__map;
+		private Tile	__tile;
 
-		public LoadCallbackImage(final Map map) {
+		public LoadCallbackImage(final Map map, final Tile tile) {
 			__map = map;
+			__tile = tile;
 		}
 
 		@Override
@@ -133,7 +135,8 @@ public class TourMapPainter extends MapPainter {
 				return;
 			}
 
-			__map.paint();
+			__map.queueOverlayPainting(__tile);
+//			__map.paint();
 		}
 	}
 
@@ -829,7 +832,7 @@ public class TourMapPainter extends MapPainter {
 //			final int zoomLevel = map.getZoom();
 			final int devPartOffset = ((parts - 1) / 2) * tileSize;
 
-			final Image image = getPhotoImage(photo, map);
+			final Image image = getPhotoImage(photo, map, tile);
 
 			if (image == null) {
 				return false;
@@ -1443,7 +1446,7 @@ public class TourMapPainter extends MapPainter {
 		return valuePosition;
 	}
 
-	private Image getPhotoImage(final Photo photo, final Map map) {
+	private Image getPhotoImage(final Photo photo, final Map map, final Tile tile) {
 
 		Image photoImage = null;
 
@@ -1464,7 +1467,7 @@ public class TourMapPainter extends MapPainter {
 
 				// the requested image is not available in the image cache -> image must be loaded
 
-				final ILoadCallBack imageLoadCallback = new LoadCallbackImage(map);
+				final ILoadCallBack imageLoadCallback = new LoadCallbackImage(map, tile);
 
 				PhotoLoadManager.putImageInLoadingQueueThumbMap(photo, requestedImageQuality, imageLoadCallback);
 			}
