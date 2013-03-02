@@ -19,15 +19,19 @@ import gov.nasa.worldwind.layers.Layer;
 
 public class TVIMap3Layer extends TVIMap3Item {
 
-	Layer	layer;
+	String	id;
+
+	Layer	wwLayer;
+
 	boolean	isEnabled;
+	boolean	isDefaultLayer;
 
-	public TVIMap3Layer(final Layer layer) {
+	int		defaultPosition;
 
-		super();
+	public TVIMap3Layer(final Layer wwLayer, final String uiLayerName) {
 
-		this.layer = layer;
-		this.name = layer.getName();
+		this.wwLayer = wwLayer;
+		this.name = uiLayerName;
 	}
 
 	@Override

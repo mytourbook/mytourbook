@@ -4,9 +4,39 @@ import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS {
 	private static final String	BUNDLE_NAME	= "net.tourbook.map3.view.messages";	//$NON-NLS-1$
+
+	public static String	Default_Category_Name_Controls;
+
+	public static String	Default_Category_Name_Features;
+
+	public static String	Default_Category_Name_Map;
+
+	public static String		Default_Layer_Atmosphere;
+	public static String		Default_Layer_Compass;
+	public static String		Default_Layer_MS_VirtualEarchAerial;
+	public static String		Default_Layer_NASABlueMarble;
+	public static String		Default_Layer_PlaceNames;
+	public static String		Default_Layer_PoliticalBoundaries;
+	public static String		Default_Layer_ScaleBar;
+	public static String		Default_Layer_USGS_UrbanArea;
+	public static String		Default_Layer_WMS_BingImagery;
+	public static String		Default_Layer_WMS_i_cubed_Landsat;
+	public static String		Default_Layer_WMS_NASABlueMarble2004;
+	public static String		Default_Layer_WMS_OpenStreetMap;
+	public static String		Default_Layer_WMS_USDA_NAIP;
+	public static String		Default_Layer_WMS_USDA_NAIP_USGS;
+	public static String		Default_Layer_WMS_USGS_Topo100;
+	public static String		Default_Layer_WMS_USGS_Topo24;
+	public static String		Default_Layer_WMS_USGS_Topo250;
+	public static String		Default_Layer_WorldMap;
+	public static String		Default_LayerName_Stars;
+
 	public static String		Image_Map3_Map3PropertiesView;
-	public static String	Image_Map3Property_Layer;
+	public static String		Image_Map3_PropertyLayer;
+
 	public static String		Map3_Action_OpenMap3PropertiesView;
+	public static String		Map3_Manager_Layer_Category_WorldWind;
+
 	static {
 		// initialize resource bundle
 		NLS.initializeMessages(BUNDLE_NAME, Messages.class);

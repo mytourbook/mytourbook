@@ -15,8 +15,6 @@
  *******************************************************************************/
 package net.tourbook.map3.view;
 
-import java.util.ArrayList;
-
 public class TVIMap3Root extends TVIMap3Item {
 
 	public TVIMap3Root() {
@@ -26,11 +24,7 @@ public class TVIMap3Root extends TVIMap3Item {
 	@Override
 	protected void fetchChildren() {
 
-		final ArrayList<TVIMap3Category> rootCategories = Map3Manager.getRootCategories(this);
-
-		for (final TVIMap3Category rootCategory : rootCategories) {
-			addChild(rootCategory);
-		}
+		// tree items are created from a xml file
 	}
 
 }

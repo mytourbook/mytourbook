@@ -39,6 +39,34 @@ public abstract class TreeViewerItem {
 	}
 
 	/**
+	 * Adds a new child before an existing child.
+	 * 
+	 * @param oldItem
+	 * @param newItem
+	 */
+	public synchronized void addChildBefore(final TreeViewerItem oldItem, final TreeViewerItem newItem) {
+
+		// set parent for the new child item
+		newItem.setParentItem(this);
+
+		// ensure children are created
+		getFetchedChildren();
+
+		int oldItemIndex = 0;
+		for (final TreeViewerItem childItem : _children) {
+
+			if (oldItem == childItem) {
+
+				_children.add(oldItemIndex, newItem);
+
+				return;
+			}
+
+			oldItemIndex++;
+		}
+	}
+
+	/**
 	 * clear children so they will be fetched again the next time when they are displayed
 	 */
 	public void clearChildren() {

@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Common2
-Bundle-SymbolicName: net.tourbook.common
+Bundle-Name: Common
+Bundle-SymbolicName: net.tourbook.common;singleton:=true
 Bundle-Version: 13.2.0.qualifier
 Bundle-Activator: net.tourbook.common.Activator
 Bundle-Vendor: MyTourbook
@@ -14,7 +14,7 @@ Export-Package: net.tourbook.common,
  net.tourbook.common.form,
  net.tourbook.common.map,
  net.tourbook.common.preferences,
- net.tourbook.common.tooltip,
+ net.tourbook.common.tooltip, 
  net.tourbook.common.util,
  net.tourbook.common.weather
 Import-Package: org.joda.time

@@ -52,6 +52,9 @@ import org.joda.time.DateTimeZone;
 public class UI {
 
 	public static final String			EMPTY_STRING							= "";																		//$NON-NLS-1$
+	public static final String			DASH									= "-";																		//$NON-NLS-1$
+	public static final String			DASH_WITH_SPACE							= " - ";																	//$NON-NLS-1$
+	public static final String			DASH_WITH_DOUBLE_SPACE					= "   -   ";																//$NON-NLS-1$
 	public static final String			SPACE									= " ";																		//$NON-NLS-1$
 	public static final String			SPACE2									= "  ";																	//$NON-NLS-1$
 	public static final String			SPACE4									= "    ";																	//$NON-NLS-1$
@@ -98,10 +101,12 @@ public class UI {
 	public static final String			SYMBOL_UNDERSCORE						= "_";																		//$NON-NLS-1$
 	public static final String			SYMBOL_WIND_WITH_SPACE					= "W ";																	//$NON-NLS-1$
 
+	public static final String			UNIT_MBYTES								= "MByte";																	//$NON-NLS-1$
+
 	/*
 	 * labels for the different measurement systems
 	 */
-	public static final String			UNIT_MBYTES								= "MByte";																	//$NON-NLS-1$
+	public static final String			UNIT_DISTANCE_KM						= "km";																	//$NON-NLS-1$
 
 	/**
 	 * The ellipsis is the string that is used to represent shortened text.
@@ -109,6 +114,7 @@ public class UI {
 	 * @since 3.0
 	 */
 	public static final String			ELLIPSIS								= "...";																	//$NON-NLS-1$
+	public static final String			ELLIPSIS_WITH_SPACE						= " ... ";																	//$NON-NLS-1$
 
 	private static final char[]			INVALID_FILENAME_CHARS					= new char[] {
 			'\\',
@@ -286,6 +292,17 @@ public class UI {
 		return Double.toString(value);
 	}
 
+	public static String FormatDoubleMinMaxElevationMeter(final double value) {
+
+		if (value == -Double.MAX_VALUE) {
+			return SYMBOL_MIN_INFINITY;
+		} else if (value == Double.MAX_VALUE) {
+			return SYMBOL_MAX_INFINITY;
+		}
+
+		return Long.toString((long) (value / 1000)) + UI.SPACE + UI.UNIT_DISTANCE_KM;
+	}
+
 	/**
 	 * @param degreeDirection
 	 * @return Returns cardinal direction
@@ -325,6 +342,24 @@ public class UI {
 		if (contextMenu != null && contextMenu.isDisposed() == false) {
 			contextMenu.setLocation(pt.x, pt.y);
 			contextMenu.setVisible(true);
+		}
+	}
+
+	public static void setColorForAllChildren(final Control child, final Color fgColor, final Color bgColor) {
+
+		child.setForeground(fgColor);
+		child.setBackground(bgColor);
+
+		if (child instanceof Composite) {
+
+			final Control[] children = ((Composite) child).getChildren();
+
+			for (final Control element : children) {
+
+				if (element != null && element.isDisposed() == false) {
+					setColorForAllChildren(element, fgColor, bgColor);
+				}
+			}
 		}
 	}
 

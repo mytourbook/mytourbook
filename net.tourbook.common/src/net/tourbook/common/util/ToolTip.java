@@ -154,11 +154,11 @@ public abstract class ToolTip {
 				break;
 
 			/**
-			 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! <br>
+			 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! <br>
 			 * <br>
-			 * The tooltip is delayed by DEFAULT with Display.getToolTipTime() <br>
+			 * The tooltip is delayed by DEFAULT with Display.getToolTipTime() on OSX <br>
 			 * <br>
-			 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+			 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 			 */
 //			case SWT.MouseMove:
 			case SWT.MouseHover:

@@ -13,30 +13,16 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.map3.view;
+package net.tourbook.map3.layer;
 
-/**
- * Model for a map 3 layer.
- * 
- * @author Wolfgang Schramm
- * @since 2013-02-17
- */
-public class Map3Layer {
+public class DefaultLayer {
 
-	String	layerName;
+	public String	layerId;
+	public String	layerName;
 
-	/**
-	 * Is <code>true</code> when layer is enabled (visible).
-	 */
-	boolean	isEnabled;
+	public DefaultLayer(final String layerId, final String layerName) {
 
-	public Map3Layer(final String layerName) {
-		this.layerName=layerName;
+		this.layerId = layerId;
+		this.layerName = layerName;
 	}
-
-	@Override
-	public String toString() {
-		return "Map3Layer [layerName=" + layerName + ", isEnabled=" + isEnabled + "]";
-	}
-
 }

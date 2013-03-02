@@ -29,6 +29,8 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.awt.SWT_AWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.ui.IPartListener2;
+import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.part.ViewPart;
 
 public class Map3View extends ViewPart {
@@ -38,6 +40,8 @@ public class Map3View extends ViewPart {
 	private static final WorldWindowGLCanvas	_wwCanvas	= Map3Manager.getWWCanvas();
 
 	private ActionOpenMap3Properties			_actionOpenMap3Properties;
+
+	private IPartListener2						_partListener;
 
 	private static int							_renderCounter;
 
@@ -64,6 +68,39 @@ public class Map3View extends ViewPart {
 			}
 		});
 	}
+	private void addPartListener() {
+
+		_partListener = new IPartListener2() {
+			@Override
+			public void partActivated(final IWorkbenchPartReference partRef) {}
+
+			@Override
+			public void partBroughtToTop(final IWorkbenchPartReference partRef) {}
+
+			@Override
+			public void partClosed(final IWorkbenchPartReference partRef) {
+				if (partRef.getPart(false) == Map3View.this) {
+					saveState();
+				}
+			}
+
+			@Override
+			public void partDeactivated(final IWorkbenchPartReference partRef) {}
+
+			@Override
+			public void partHidden(final IWorkbenchPartReference partRef) {}
+
+			@Override
+			public void partInputChanged(final IWorkbenchPartReference partRef) {}
+
+			@Override
+			public void partOpened(final IWorkbenchPartReference partRef) {}
+
+			@Override
+			public void partVisible(final IWorkbenchPartReference partRef) {}
+		};
+		getViewSite().getPage().addPartListener(_partListener);
+	}
 
 	private void createActions() {
 
@@ -82,9 +119,11 @@ public class Map3View extends ViewPart {
 
 		createUI(parent);
 
+		addPartListener();
 //		addMap3Listener();
 		createActions();
 
+		restoreState();
 		Map3Manager.setMap3View(this);
 	}
 
@@ -113,6 +152,16 @@ public class Map3View extends ViewPart {
 		Map3Manager.setMap3View(null);
 
 		super.dispose();
+	}
+
+	private void restoreState() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	private void saveState() {
+		// TODO Auto-generated method stub
+		
 	}
 
 	@Override

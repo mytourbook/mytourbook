@@ -19,13 +19,13 @@ import net.tourbook.common.UI;
 import net.tourbook.common.util.TreeViewerItem;
 import net.tourbook.map3.Activator;
 
+import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.layout.TreeColumnLayout;
 import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.CheckStateChangedEvent;
-import org.eclipse.jface.viewers.ColumnPixelData;
 import org.eclipse.jface.viewers.ColumnWeightData;
 import org.eclipse.jface.viewers.ICheckStateListener;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
@@ -47,6 +47,8 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
+import org.eclipse.ui.IPartListener2;
+import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.dialogs.ContainerCheckedTreeViewer;
 import org.eclipse.ui.part.ViewPart;
 
@@ -54,18 +56,20 @@ public class Map3PropertiesView extends ViewPart {
 
 	public static final String			ID				= "net.tourbook.map3.Map3PropertiesView";					//$NON-NLS-1$
 
+	private final IDialogSettings		_state			= Activator.getDefault().getDialogSettingsSection(ID);
+
 	private ContainerCheckedTreeViewer	_propViewer;
 
 	private Image						_imgLayerProp	= Activator.getImageDescriptor(
-																Messages.Image_Map3Property_Layer).createImage();
-
-	private TVIMap3Root					_rootItem		= new TVIMap3Root();
+																Messages.Image_Map3_PropertyLayer).createImage();
 
 	private boolean						_isTreeChecked;
 
 	private PixelConverter				_pc;
 
-	private PropertyViewerToolTip		_propViewerToolTip;
+	private IPartListener2				_partListener;
+
+//	private PropertyViewerToolTip		_propViewerToolTip;
 
 	private class PropertiesContentProvider implements ITreeContentProvider {
 
@@ -79,7 +83,7 @@ public class Map3PropertiesView extends ViewPart {
 
 		@Override
 		public Object[] getElements(final Object inputElement) {
-			return _rootItem.getFetchedChildrenAsArray();
+			return Map3Manager.getRootItem().getFetchedChildrenAsArray();
 		}
 
 		@Override
@@ -98,14 +102,52 @@ public class Map3PropertiesView extends ViewPart {
 
 	public Map3PropertiesView() {}
 
+	private void addPartListener() {
+
+		_partListener = new IPartListener2() {
+			@Override
+			public void partActivated(final IWorkbenchPartReference partRef) {}
+
+			@Override
+			public void partBroughtToTop(final IWorkbenchPartReference partRef) {}
+
+			@Override
+			public void partClosed(final IWorkbenchPartReference partRef) {
+				if (partRef.getPart(false) == Map3PropertiesView.this) {
+					saveState();
+				}
+			}
+
+			@Override
+			public void partDeactivated(final IWorkbenchPartReference partRef) {}
+
+			@Override
+			public void partHidden(final IWorkbenchPartReference partRef) {}
+
+			@Override
+			public void partInputChanged(final IWorkbenchPartReference partRef) {}
+
+			@Override
+			public void partOpened(final IWorkbenchPartReference partRef) {}
+
+			@Override
+			public void partVisible(final IWorkbenchPartReference partRef) {}
+		};
+		getViewSite().getPage().addPartListener(_partListener);
+	}
+
 	@Override
 	public void createPartControl(final Composite parent) {
 
 		createUI(parent);
 
+		addPartListener();
+
 		Map3Manager.setMap3PropertiesView(this);
 
 		_propViewer.setInput(new Object());
+
+		restoreState();
 	}
 
 	private void createUI(final Composite parent) {
@@ -145,13 +187,14 @@ public class Map3PropertiesView extends ViewPart {
 			 * that this listener is called before the viewer listeners.
 			 * <p>
 			 * When checking is not handled in this way, a user can check a tree item which is not
-			 * selected and the selected tree item visibility is toggled !!!
+			 * selected and the selected tree item layer visibility is toggled !!!
 			 */
 
 			tree.addSelectionListener(new SelectionAdapter() {
 
 				@Override
 				public void widgetSelected(final SelectionEvent e) {
+
 					_isTreeChecked = e.detail == SWT.CHECK;
 
 					if (_isTreeChecked) {
@@ -192,8 +235,8 @@ public class Map3PropertiesView extends ViewPart {
 
 						final TVIMap3Item item = (TVIMap3Item) firstItem;
 
-						System.out.println(UI.timeStampNano() + " selectionChanged\t" + item);
-						// TODO remove SYSTEM.OUT.PRINTLN
+//						System.out.println(UI.timeStampNano() + " selectionChanged\t" + item);
+//						// TODO remove SYSTEM.OUT.PRINTLN
 
 						if (item.hasChildren()) {
 
@@ -229,17 +272,10 @@ public class Map3PropertiesView extends ViewPart {
 			_propViewer.addTreeListener(new ITreeViewerListener() {
 
 				@Override
-				public void treeCollapsed(final TreeExpansionEvent event) {
-					// TODO Auto-generated method stub
-
-				}
+				public void treeCollapsed(final TreeExpansionEvent event) {}
 
 				@Override
 				public void treeExpanded(final TreeExpansionEvent event) {
-
-					System.out.println(UI.timeStampNano() + " treeExpanded\t");
-					// TODO remove SYSTEM.OUT.PRINTLN
-
 					onExpandTree((TVIMap3Item) event.getElement());
 				}
 			});
@@ -271,7 +307,8 @@ public class Map3PropertiesView extends ViewPart {
 
 		defineAllColumn(treeLayout);
 
-		_propViewerToolTip = new PropertyViewerToolTip(_propViewer);
+//		_propViewerToolTip = new PropertyViewerToolTip(_propViewer);
+		new PropertyViewerToolTip(_propViewer);
 
 		return layoutContainer;
 	}
@@ -279,7 +316,7 @@ public class Map3PropertiesView extends ViewPart {
 	private void defineAllColumn(final TreeColumnLayout treeLayout) {
 
 		defineColumn_CategoryLayer(treeLayout);
-		defineColumn_Info(treeLayout);
+//		defineColumn_Info(treeLayout);
 	}
 
 	/**
@@ -295,8 +332,6 @@ public class Map3PropertiesView extends ViewPart {
 		 */
 		tvc = new TreeViewerColumn(_propViewer, SWT.LEAD);
 		tc = tvc.getColumn();
-//		tc.setText("");
-//		tc.setToolTipText(Messages.Dialog_MapProfile_Column_MapProvider_Tooltip);
 		tvc.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -309,65 +344,9 @@ public class Map3PropertiesView extends ViewPart {
 
 					cell.setText(mapItem.name);
 				}
-
-				if (element instanceof TVIMap3Category) {
-
-					final TVIMap3Category propCategory = (TVIMap3Category) element;
-
-					if (propCategory.id == Map3Manager.WW_DEFAULT_LAYER_ID) {
-						cell.setImage(_imgLayerProp);
-					} else {
-						cell.setImage(null);
-					}
-				}
-
 			}
 		});
 		treeLayout.setColumnData(tc, new ColumnWeightData(100, true));
-	}
-
-	/**
-	 * Create columns for the tree viewer.
-	 */
-	private void defineColumn_Info(final TreeColumnLayout treeLayout) {
-
-		TreeViewerColumn tvc;
-		TreeColumn tc;
-
-		/*
-		 * column: tooltip
-		 */
-		tvc = new TreeViewerColumn(_propViewer, SWT.LEAD);
-		tc = tvc.getColumn();
-//		tc.setText("i");
-//		tc.setToolTipText(Messages.Dialog_MapProfile_Column_MapProvider_Tooltip);
-		tvc.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-
-				final Object element = cell.getElement();
-
-				if (element instanceof TVIMap3Item) {
-
-					final TVIMap3Item mapItem = (TVIMap3Item) element;
-
-					cell.setText(mapItem.name);
-				}
-
-				if (element instanceof TVIMap3Category) {
-
-					final TVIMap3Category propCategory = (TVIMap3Category) element;
-
-					if (propCategory.id == Map3Manager.WW_DEFAULT_LAYER_ID) {
-						cell.setImage(_imgLayerProp);
-					} else {
-						cell.setImage(null);
-					}
-				}
-
-			}
-		});
-		treeLayout.setColumnData(tc, new ColumnPixelData(_pc.convertWidthInCharsToPixels(11), false));
 	}
 
 	@Override
@@ -402,25 +381,47 @@ public class Map3PropertiesView extends ViewPart {
 		}
 	}
 
+	private void restoreState() {
+
+		// restore UI
+		final Object[] uiEnabledLayers = Map3Manager.getUIEnabledLayers();
+		final Object[] uiExpandedCategories = Map3Manager.getUIExpandedCategories();
+
+		_propViewer.setCheckedElements(uiEnabledLayers);
+		_propViewer.setExpandedElements(uiExpandedCategories);
+	}
+
+	private void saveState() {
+
+		// save/keep UI state
+		Map3Manager.saveUIState(_propViewer.getCheckedElements(), _propViewer.getExpandedElements());
+	}
+
 	@Override
 	public void setFocus() {
 		_propViewer.getTree().setFocus();
 	}
 
-	private boolean toggleLayerVisibility(final TVIMap3Layer layerItem) {
+	private boolean toggleLayerVisibility(final TVIMap3Layer tviLayer) {
 
 		// toggle state
-		final boolean isEnabled = !layerItem.layer.isEnabled();
+		final boolean isEnabled = !tviLayer.wwLayer.isEnabled();
 
 		// update model
-		layerItem.isEnabled = isEnabled;
+		tviLayer.isEnabled = isEnabled;
 
 		// update layer
-		layerItem.layer.setEnabled(isEnabled);
+		tviLayer.wwLayer.setEnabled(isEnabled);
 
 		// redraw map
 		Map3Manager.getWWCanvas().redraw();
 
 		return isEnabled;
+	}
+
+	void updateUINewLayer(final TVIMap3Layer newLayer) {
+
+		// update parent and all it's children
+		_propViewer.refresh(newLayer.getParentItem(), false);
 	}
 }
