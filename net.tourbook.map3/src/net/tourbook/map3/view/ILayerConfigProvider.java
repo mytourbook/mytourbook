@@ -15,48 +15,17 @@
  *******************************************************************************/
 package net.tourbook.map3.view;
 
-import gov.nasa.worldwind.layers.Layer;
+import net.tourbook.common.tooltip.ToolTip3;
 
-public class TVIMap3Layer extends TVIMap3Item {
+import org.eclipse.swt.widgets.Composite;
 
-	String						id;
+public interface ILayerConfigProvider {
 
-	Layer						wwLayer;
+	void createConfigUI(ToolTip3 toolTip, final Composite parent);
 
-	boolean						isLayerVisible;
-	boolean						isDefaultLayer;
-
-	int							defaultPosition;
-
-	private ICheckStateListener	_checkStateListener;
-
-	ILayerConfigProvider		layerConfigProvider;
-
-	public TVIMap3Layer(final Layer wwLayer, final String uiLayerName) {
-
-		this.wwLayer = wwLayer;
-		this.name = uiLayerName;
-	}
-
-	void addCheckStateListener(final ICheckStateListener checkStateListener) {
-		_checkStateListener = checkStateListener;
-	}
-
-	@Override
-	protected void fetchChildren() {
-		// default layer has no children
-	}
-
-	@Override
-	public boolean hasChildren() {
-		return false;
-	}
-
-	void onSetCheckState() {
-
-		if (_checkStateListener != null) {
-			_checkStateListener.onSetCheckState(this);
-		}
-	}
+	/**
+	 * @return Returns a title which is displayed as tooltip when tooltip header is hovered.
+	 */
+	String getTitle();
 
 }

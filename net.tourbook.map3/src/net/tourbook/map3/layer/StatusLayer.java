@@ -516,7 +516,13 @@ public class StatusLayer extends AbstractLayer implements PositionListener, Rend
 		if (UNIT_IMPERIAL.equals(elevationUnit)) {
 			return String.format("%s %,d mi", altitude, (int) Math.round(WWMath.convertMetersToMiles(metersAltitude)));
 		} else {
-			return String.format("%s %,d km", altitude, (int) Math.round(metersAltitude / 1e3));
+
+			if (metersAltitude >= 10000) {
+				return String.format("%s %,d km", altitude, (int) Math.round(metersAltitude / 1e3));
+			} else {
+				return String.format("%s %,.1f km", altitude, metersAltitude / 1000);
+			}
+
 		}
 	}
 

@@ -15,48 +15,8 @@
  *******************************************************************************/
 package net.tourbook.map3.view;
 
-import gov.nasa.worldwind.layers.Layer;
+public interface ICheckStateListener {
 
-public class TVIMap3Layer extends TVIMap3Item {
-
-	String						id;
-
-	Layer						wwLayer;
-
-	boolean						isLayerVisible;
-	boolean						isDefaultLayer;
-
-	int							defaultPosition;
-
-	private ICheckStateListener	_checkStateListener;
-
-	ILayerConfigProvider		layerConfigProvider;
-
-	public TVIMap3Layer(final Layer wwLayer, final String uiLayerName) {
-
-		this.wwLayer = wwLayer;
-		this.name = uiLayerName;
-	}
-
-	void addCheckStateListener(final ICheckStateListener checkStateListener) {
-		_checkStateListener = checkStateListener;
-	}
-
-	@Override
-	protected void fetchChildren() {
-		// default layer has no children
-	}
-
-	@Override
-	public boolean hasChildren() {
-		return false;
-	}
-
-	void onSetCheckState() {
-
-		if (_checkStateListener != null) {
-			_checkStateListener.onSetCheckState(this);
-		}
-	}
+	void onSetCheckState(TVIMap3Layer tviMap3Layer);
 
 }

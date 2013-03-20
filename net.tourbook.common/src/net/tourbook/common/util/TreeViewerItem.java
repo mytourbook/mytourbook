@@ -18,11 +18,12 @@ package net.tourbook.common.util;
 import java.util.ArrayList;
 
 /**
- * Abstract class which contains an item for a tree viewer
+ * Abstract class which contains an item for a tree viewer.
  */
 public abstract class TreeViewerItem {
 
 	private TreeViewerItem				_parentItem;
+
 	private ArrayList<TreeViewerItem>	_children;
 
 	/**
@@ -42,9 +43,10 @@ public abstract class TreeViewerItem {
 	 * Adds a new child before an existing child.
 	 * 
 	 * @param oldItem
+	 *            Item before the new item is inserted.
 	 * @param newItem
 	 */
-	public synchronized void addChildBefore(final TreeViewerItem oldItem, final TreeViewerItem newItem) {
+	public void addChildBefore(final TreeViewerItem oldItem, final TreeViewerItem newItem) {
 
 		// set parent for the new child item
 		newItem.setParentItem(this);

@@ -40,6 +40,16 @@ public class Messages extends NLS {
 
 	public static String	Image_Action_PhotoFilterWithPhotos;
 
+	public static String	Image_App_CloseSmall;
+
+	public static String	Image_App_CloseSmall_Hovered;
+
+	public static String	Image_App_PinedSmall;
+
+	public static String	Image_App_PinnedSmall_Disabled;
+
+	public static String	Image_App_PinnedSmall_Hovered;
+
 	public static String		Weather_Clounds_Clouds;
 	public static String		Weather_Clounds_Clouny;
 	public static String		Weather_Clounds_IsNotDefined;

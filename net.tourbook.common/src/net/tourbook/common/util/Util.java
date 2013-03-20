@@ -389,6 +389,17 @@ public class Util {
 		return urlString.replaceAll(URL_SPACE, URL_SPACE_REPLACEMENT);
 	}
 
+	public static boolean getBoolean(final Object data) {
+
+		boolean is = false;
+
+		if (data instanceof Boolean) {
+			is = (Boolean) data;
+		}
+
+		return is;
+	}
+
 	private static int getKeyAccelerator(final MouseEvent event) {
 
 		boolean isCtrlKey;
@@ -461,6 +472,39 @@ public class Util {
 	 */
 	public static boolean getStateBoolean(final IDialogSettings state, final String key, final boolean defaultValue) {
 		return state.get(key) == null ? defaultValue : state.getBoolean(key);
+	}
+
+	/**
+	 * @param state
+	 * @param stateKey
+	 * @param defaultValue
+	 * @param combo
+	 * @param defaultComboIndex
+	 *            Combo default index when retrieved state index is too large.
+	 * @return
+	 */
+	public static int getStateCombo(final IDialogSettings state,
+									final String stateKey,
+									final int defaultValue,
+									final Combo combo,
+									final int defaultComboIndex) {
+
+		int comboIndex = getStateInt(state, stateKey, defaultValue);
+
+		final int maxItems = combo.getItemCount();
+
+		if (comboIndex >= maxItems) {
+
+			// combo index is too large
+
+			if (defaultComboIndex >= maxItems) {
+				comboIndex = 0;
+			} else {
+				comboIndex = defaultComboIndex;
+			}
+		}
+
+		return comboIndex;
 	}
 
 	/**

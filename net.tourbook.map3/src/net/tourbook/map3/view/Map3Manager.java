@@ -20,9 +20,13 @@ import gov.nasa.worldwind.WorldWind;
 import gov.nasa.worldwind.WorldWindow;
 import gov.nasa.worldwind.avlist.AVKey;
 import gov.nasa.worldwind.awt.WorldWindowGLCanvas;
+import gov.nasa.worldwind.geom.LatLon;
 import gov.nasa.worldwind.layers.CompassLayer;
 import gov.nasa.worldwind.layers.Layer;
 import gov.nasa.worldwind.layers.LayerList;
+import gov.nasa.worldwind.layers.TerrainProfileLayer;
+import gov.nasa.worldwind.layers.ViewControlsLayer;
+import gov.nasa.worldwind.layers.ViewControlsSelectListener;
 import gov.nasa.worldwind.layers.placename.PlaceNameLayer;
 
 import java.io.File;
@@ -57,30 +61,30 @@ public class Map3Manager {
 
 	static final int								WW_DEFAULT_LAYER_ID				= 1;
 
-	private static final String						MAP3_LAYER_STRUCTURE_FILE_NAME	= "map3-layer.xml";					//$NON-NLS-1$
+	private static final String						MAP3_LAYER_STRUCTURE_FILE_NAME	= "map3-layers.xml";					//$NON-NLS-1$
 
 	private static final String						TAG_ROOT						= "Map3LayerStructure";				//$NON-NLS-1$
+
 	private static final String						TAG_CATEGORY					= "category";							//$NON-NLS-1$
 	private static final String						TAG_LAYER						= "layer";								//$NON-NLS-1$
-
 	private static final String						ATTR_NAME						= "name";								//$NON-NLS-1$
+
 	private static final String						ATTR_ID							= "id";								//$NON-NLS-1$
 	private static final String						ATTR_IS_DEFAULT_LAYER			= "isDefaultLayer";					//$NON-NLS-1$
 	private static final String						ATTR_IS_ENABLED					= "isEnabled";							//$NON-NLS-1$
 	private static final String						ATTR_IS_EXPANDED				= "isExpanded";						//$NON-NLS-1$
-
 	/**
 	 * _bundle must be set here otherwise an exception occures in saveState()
 	 */
 	private static final Bundle						_bundle							= Activator
 																							.getDefault()
 																							.getBundle();
+
 	private static final IPath						_stateLocation					= Platform
 																							.getStateLocation(_bundle);
 	private static final IDialogSettings			_state							= Activator.getDefault()//
 																							.getDialogSettingsSection(
 																									"Map3Manager");		//$NON-NLS-1$
-
 	/**
 	 * Root item for the layer tree viewer. This contains the UI model.
 	 */
@@ -94,18 +98,24 @@ public class Map3Manager {
 	private static Map3View							_map3View;
 
 	/**
-	 * Instance of {@link Map3PropertiesView} or <code>null</code> when view is not created.
+	 * Instance of {@link Map3PropertiesView} or <code>null</code> when view is not created or
+	 * disposed.
 	 */
 	private static Map3PropertiesView				_map3PropertiesView;
 
 	private static LayerList						_wwDefaultLayers;
+
+	/**
+	 * Contains custom (none default) layers, key is layerId.
+	 */
 	private static HashMap<String, TVIMap3Layer>	_customLayers					= new HashMap<String, TVIMap3Layer>();
 
 	private static Object[]							_uiEnabledLayers;
+
 	private static Object[]							_uiExpandedCategories;
 	private static ArrayList<TVIMap3Layer>			_uiEnabledLayersFromXml			= new ArrayList<TVIMap3Layer>();
 	private static ArrayList<TVIMap3Category>		_uiExpandedCategoriesFromXml	= new ArrayList<TVIMap3Category>();
-
+	private static ArrayList<Layer>					_xmlLayers						= new ArrayList<Layer>();
 	private static final DateTimeFormatter			_dtFormatter					= ISODateTimeFormat
 																							.basicDateTimeNoMillis();
 
@@ -114,6 +124,41 @@ public class Map3Manager {
 	static {
 
 		_initWorldWindLayerModel();
+	}
+
+	private static final class CheckStateListener implements ICheckStateListener {
+
+		ViewControlsSelectListener	_viewControlListener;
+
+		/**
+		 * This flag keeps track of adding/removing the listener that it is not done more than once.
+		 */
+		int							__lastAddRemoveAction	= -1;
+
+		private CheckStateListener(final ViewControlsLayer viewControlsLayer) {
+
+			_viewControlListener = new ViewControlsSelectListener(_wwCanvas, viewControlsLayer);
+		}
+
+		@Override
+		public void onSetCheckState(final TVIMap3Layer tviMap3Layer) {
+
+			if (tviMap3Layer.isLayerVisible) {
+
+				if (__lastAddRemoveAction != 1) {
+					__lastAddRemoveAction = 1;
+					_wwCanvas.addSelectListener(_viewControlListener);
+				}
+
+			} else {
+
+				if (__lastAddRemoveAction != 0) {
+					__lastAddRemoveAction = 0;
+					_wwCanvas.removeSelectListener(_viewControlListener);
+				}
+			}
+
+		}
 	}
 
 	/**
@@ -131,16 +176,117 @@ public class Map3Manager {
 		// get default layer
 		_wwDefaultLayers = model.getLayers();
 
-		// create custom layer
-		createMapStatusLayer();
+		// create custom layer BEFORE state is applied
+		createCustomLayer_MapStatus();
+		createCustomLayer_ViewerController();
+		createCustomLayer_TerrainProfile();
 
 		// restore layer from xml file
 		_uiRootItem = readLayerXml_10();
 
-		// 3.
-		updateCustomLayer();
+		final Layer[] layerObject = _xmlLayers.toArray(new Layer[_xmlLayers.size()]);
+		final LayerList layers = new LayerList(layerObject);
+		model.setLayers(layers);
 
+		// model must be set BEFORE model is updated
 		_wwCanvas.setModel(model);
+
+		/*
+		 * ensure All custom layers are in the model because it can happen, that a layer is created
+		 * after the initial load of the layer list and new layers are not contained in the xml
+		 * layer file.
+		 */
+		updateWWModel(model.getLayers());
+	}
+
+	private static void createCustomLayer_MapStatus() {
+
+		/*
+		 * create WW layer
+		 */
+		final StatusLayer statusLayer = new StatusLayer();
+		//this.layer = new StatusMGRSLayer();
+		//this.layer = new StatusUTMLayer();
+
+		statusLayer.setEventSource(_wwCanvas);
+		statusLayer.setCoordDecimalPlaces(2); // default is 4
+		//layer.setElevationUnits(StatusLayer.UNIT_IMPERIAL);
+
+		/*
+		 * create UI model layer
+		 */
+		final String layerId = StatusLayer.class.getCanonicalName();
+
+		final TVIMap3Layer tviLayer = new TVIMap3Layer(statusLayer, statusLayer.getName());
+
+		tviLayer.id = layerId;
+
+		// default is enabled
+		tviLayer.isLayerVisible = true;
+		tviLayer.defaultPosition = INSERT_BEFORE_COMPASS;
+
+		_customLayers.put(layerId, tviLayer);
+	}
+
+	private static void createCustomLayer_TerrainProfile() {
+
+		/*
+		 * create WW layer
+		 */
+		// Add terrain profile layer
+//		final TerrainProfileLayer profileLayer = new TerrainProfileLayer();
+//		profileLayer.setEventSource(_wwCanvas);
+//		profileLayer.setFollow(TerrainProfileLayer.FOLLOW_PATH);
+//		profileLayer.setShowProfileLine(false);
+
+		// Add TerrainProfileLayer
+		final TerrainProfileLayer profileLayer = new TerrainProfileLayer();
+		profileLayer.setEventSource(_wwCanvas);
+		profileLayer.setStartLatLon(LatLon.fromDegrees(0, -10));
+		profileLayer.setEndLatLon(LatLon.fromDegrees(0, 65));
+
+		/*
+		 * create UI model layer
+		 */
+		final String layerId = TerrainProfileLayer.class.getCanonicalName();
+
+		final TVIMap3Layer tviLayer = new TVIMap3Layer(profileLayer, profileLayer.getName());
+
+		tviLayer.id = layerId;
+
+		// default is enabled
+		tviLayer.isLayerVisible = true;
+		tviLayer.defaultPosition = INSERT_BEFORE_COMPASS;
+
+		tviLayer.layerConfigProvider = new TerrainProfileConfig(_wwCanvas, profileLayer, _state);
+
+		_customLayers.put(layerId, tviLayer);
+	}
+
+	private static void createCustomLayer_ViewerController() {
+
+		/*
+		 * create WW layer
+		 */
+		// Create and install the view controls layer and register a controller for it with the World Window.
+		final ViewControlsLayer viewControlsLayer = new ViewControlsLayer();
+
+		/*
+		 * create UI model layer
+		 */
+		final String layerId = ViewControlsLayer.class.getCanonicalName();
+
+		final TVIMap3Layer tviLayer = new TVIMap3Layer(viewControlsLayer, viewControlsLayer.getName());
+
+		tviLayer.id = layerId;
+
+		// default is enabled
+		tviLayer.isLayerVisible = true;
+		tviLayer.defaultPosition = INSERT_BEFORE_COMPASS;
+
+		tviLayer.addCheckStateListener(new CheckStateListener(viewControlsLayer));
+
+		_customLayers.put(layerId, tviLayer);
 	}
 
 	/**
@@ -318,37 +464,10 @@ public class Map3Manager {
 
 				xmlLayer.putString(ATTR_ID, tviLayer.id);
 				xmlLayer.putString(ATTR_NAME, tviLayer.name);
-				xmlLayer.putBoolean(ATTR_IS_ENABLED, tviLayer.isEnabled);
+				xmlLayer.putBoolean(ATTR_IS_ENABLED, tviLayer.isLayerVisible);
 				xmlLayer.putBoolean(ATTR_IS_DEFAULT_LAYER, tviLayer.isDefaultLayer);
 			}
 		}
-	}
-
-	private static void createMapStatusLayer() {
-
-		/*
-		 * create WW layer
-		 */
-		final StatusLayer statusLayer = new StatusLayer();
-		//this.layer = new StatusMGRSLayer();
-		//this.layer = new StatusUTMLayer();
-
-		statusLayer.setEventSource(_wwCanvas);
-		statusLayer.setCoordDecimalPlaces(2); // default is 4
-		//layer.setElevationUnits(StatusLayer.UNIT_IMPERIAL);
-
-		/*
-		 * create UI model layer
-		 */
-		final String layerId = StatusLayer.class.getCanonicalName();
-
-		final TVIMap3Layer tviLayer = new TVIMap3Layer(statusLayer, statusLayer.getName());
-
-		tviLayer.id = layerId;
-		tviLayer.isEnabled = true;
-		tviLayer.defaultPosition = INSERT_BEFORE_COMPASS;
-
-		_customLayers.put(layerId, tviLayer);
 	}
 
 	static void dumpLayer(final LayerList layers) {
@@ -481,7 +600,7 @@ public class Map3Manager {
 		/*
 		 * update UI model
 		 */
-		final TVIMap3Layer insertedUILayer = insertBeforeCompassInUIModel(_uiRootItem, newWWLayer);
+		final TVIMap3Layer insertedUILayer = insertBeforeCompassInUIModel(_uiRootItem, newWWLayer, newUILayer);
 
 		return insertedUILayer;
 	}
@@ -495,32 +614,40 @@ public class Map3Manager {
 	 * 
 	 * @param tviParent
 	 * @param newWWLayer
+	 * @param newUILayer
 	 * @return
 	 */
-	private static TVIMap3Layer insertBeforeCompassInUIModel(final TVIMap3Item tviParent, final Layer newWWLayer) {
+	private static TVIMap3Layer insertBeforeCompassInUIModel(	final TVIMap3Item tviParent,
+																final Layer newWWLayer,
+																final TVIMap3Layer newUILayer) {
 
-//		for (final TreeViewerItem tviItem : tviParent.getFetchedChildren()) {
-//			if (tviItem instanceof TVIMap3Layer) {
-//				final TVIMap3Layer tviLayer = (TVIMap3Layer) tviItem;
-//				if (tviLayer.wwLayer instanceof CompassLayer) {
-//
-//					// compass layer found in ui model
-//
-//					tviParent.addChildBefore(tviLayer, newTVILayer);
-//
-//					return newTVILayer;
-//				}
-//
-//			} else if (tviItem instanceof TVIMap3Category) {
-//
-//				final TVIMap3Layer insertedLayer = insertBeforeCompassInUIModel((TVIMap3Category) tviItem, newWWLayer);
-//
-//				if (insertedLayer != null) {
-//					// new layer is inserted
-//					return insertedLayer;
-//				}
-//			}
-//		}
+		for (final TreeViewerItem tviChild : tviParent.getFetchedChildren()) {
+
+			if (tviChild instanceof TVIMap3Layer) {
+
+				final TVIMap3Layer tviLayer = (TVIMap3Layer) tviChild;
+				if (tviLayer.wwLayer instanceof CompassLayer) {
+
+					// compass layer found in ui model
+
+					tviParent.addChildBefore(tviLayer, newUILayer);
+
+					return newUILayer;
+				}
+
+			} else if (tviChild instanceof TVIMap3Category) {
+
+				final TVIMap3Layer insertedLayer = insertBeforeCompassInUIModel(
+						(TVIMap3Category) tviChild,
+						newWWLayer,
+						newUILayer);
+
+				if (insertedLayer != null) {
+					// new layer is inserted
+					return insertedLayer;
+				}
+			}
+		}
 
 		return null;
 	}
@@ -662,34 +789,32 @@ public class Map3Manager {
 
 					if (xmlType.equals(TAG_LAYER)) {
 
-						final boolean isDefaultLayer = xmlChild.getBoolean(ATTR_IS_DEFAULT_LAYER) == null
-								? false
-								: true;
-
 						final String xmlLayerId = xmlChild.getString(ATTR_ID);
-						final boolean isEnabled = xmlChild.getBoolean(ATTR_IS_ENABLED);
+						final boolean isEnabled = Boolean.TRUE.equals(xmlChild.getBoolean(ATTR_IS_ENABLED));
+						final boolean isDefaultLayer = Boolean.TRUE.equals(xmlChild.getBoolean(ATTR_IS_DEFAULT_LAYER));
 
 						TVIMap3Layer tviLayer;
 
 						if (isDefaultLayer) {
 
-							// default layer
+							// layer is a default layer
 
 							final Layer wwLayer = _wwDefaultLayers.getLayerByName(xmlLayerId);
 
 							// check if xml layer is a default ww layer
 							if (wwLayer == null) {
-								StatusUtil.log(NLS.bind("NTMVMM001 layer \"{0}\" is not a ww default layer.", xmlName));//$NON-NLS-1$
+								StatusUtil.log(NLS.bind(
+										"NTMVMM001 layer \"{0}\" is not a ww default layer.", xmlLayerId));//$NON-NLS-1$
 								continue;
 							}
 
-							final DefaultLayer mapDefaultLayer = MapDefaultLayer.getLayer(xmlLayerId);
 							String layerName;
+							final DefaultLayer mapDefaultLayer = MapDefaultLayer.getLayer(xmlLayerId);
 
 							// use untranslated name, this should not occure
 							if (mapDefaultLayer == null) {
 								StatusUtil.log(NLS.bind(
-										"NTMVMM002 layer \"{0}\" is not defined as map default layer.", xmlName));//$NON-NLS-1$
+										"NTMVMM002 layer \"{0}\" is not defined as map default layer.", xmlLayerId));//$NON-NLS-1$
 								layerName = xmlName;
 							} else {
 								layerName = mapDefaultLayer.layerName;
@@ -700,7 +825,7 @@ public class Map3Manager {
 							tviLayer.id = xmlLayerId;
 							tviLayer.isDefaultLayer = true;
 
-							tviParent.addChild(tviLayer);
+							_xmlLayers.add(wwLayer);
 
 						} else {
 
@@ -709,21 +834,23 @@ public class Map3Manager {
 							tviLayer = _customLayers.get(xmlLayerId);
 
 							if (tviLayer == null) {
-								StatusUtil.log(NLS.bind("NTMVMM003 layer \"{0}\" is not available.", xmlName));//$NON-NLS-1$
+								StatusUtil.log(NLS.bind("NTMVMM003 xml layer \"{0}\" is not available.", xmlLayerId));//$NON-NLS-1$
 								continue;
 							}
 
-							_uiEnabledLayersFromXml.add(tviLayer);
+							_xmlLayers.add(tviLayer.wwLayer);
 						}
 
 						/*
 						 * set layer/UI enable state
 						 */
-						tviLayer.isEnabled = isEnabled;
+						tviLayer.isLayerVisible = isEnabled;
 						tviLayer.wwLayer.setEnabled(isEnabled);
 						if (isEnabled) {
 							_uiEnabledLayersFromXml.add(tviLayer);
 						}
+
+						tviParent.addChild(tviLayer);
 
 					} else if (xmlType.equals(TAG_CATEGORY)) {
 
@@ -732,7 +859,7 @@ public class Map3Manager {
 						tviParent.addChild(tviCategory);
 
 						// set expanded state
-						final Boolean isExpanded = xmlChild.getBoolean(ATTR_IS_EXPANDED);
+						final Boolean isExpanded = Boolean.TRUE.equals(xmlChild.getBoolean(ATTR_IS_EXPANDED));
 						if (isExpanded != null && isExpanded) {
 							_uiExpandedCategoriesFromXml.add(tviCategory);
 						}
@@ -815,16 +942,40 @@ public class Map3Manager {
 		_map3View = map3View;
 	}
 
-	private static void updateCustomLayer() {
+	/**
+	 * Ensure All custom layers are set in the ww model.
+	 * 
+	 * @param modelLayers
+	 */
+	private static void updateWWModel(final LayerList modelLayers) {
+
+		final ArrayList<TVIMap3Layer> insertedLayers = new ArrayList<TVIMap3Layer>();
 
 		for (final TVIMap3Layer tviLayer : _customLayers.values()) {
 
-			// update ui/ww model
-			final TVIMap3Layer insertedUILayer = insertBeforeCompass(_wwCanvas, tviLayer);
+			final Layer customWWLayer = tviLayer.wwLayer;
 
-			if (_map3PropertiesView != null) {
-				_map3PropertiesView.updateUINewLayer(insertedUILayer);
+			if (modelLayers.contains(customWWLayer)) {
+				continue;
 			}
+
+			TVIMap3Layer insertedUILayer = null;
+			// update ui/ww model
+			if (tviLayer.defaultPosition == INSERT_BEFORE_COMPASS) {
+
+				insertedUILayer = insertBeforeCompass(_wwCanvas, tviLayer);
+
+			} else {
+
+				// insert in default position
+				insertedUILayer = insertBeforeCompass(_wwCanvas, tviLayer);
+			}
+
+			insertedLayers.add(insertedUILayer);
+		}
+
+		if (_map3PropertiesView != null && insertedLayers.size() > 0) {
+			_map3PropertiesView.updateUINewLayer(insertedLayers);
 		}
 	}
 

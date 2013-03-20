@@ -103,7 +103,7 @@ public class TVIMap3Category extends TVIMap3Item {
 
 			// set check state in the viewer
 			for (final TVIMap3Layer layerItem : _checkStateNotSet) {
-				propViewer.setChecked(layerItem, layerItem.isEnabled);
+				propViewer.setChecked(layerItem, layerItem.isLayerVisible);
 			}
 
 			// reset
