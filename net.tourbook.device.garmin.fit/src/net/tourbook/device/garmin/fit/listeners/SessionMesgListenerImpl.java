@@ -18,71 +18,77 @@ public class SessionMesgListenerImpl extends AbstractMesgListener implements Ses
 
 	@Override
 	public void onMesg(final SessionMesg mesg) {
+
 		context.beforeSession();
 
 		final Integer messageIndex = mesg.getMessageIndex();
 		if (messageIndex == null) {
-			throw new FitActivityReaderException("Missing session message index"); //$NON-NLS-1$
-		}
-		context.setSessionIndex(messageIndex.toString());
 
-		final DateTime startTime = mesg.getStartTime();
-		if (startTime == null) {
-			throw new FitActivityReaderException("Missing session start date"); //$NON-NLS-1$
-		}
+			// ignore
 
-		final TourData tourData = getTourData();
+//			throw new FitActivityReaderException("Missing session message index"); //$NON-NLS-1$
+		} else {
 
-		tourData.setTourStartTime(new org.joda.time.DateTime(startTime.getDate()));
+			context.setSessionIndex(messageIndex.toString());
 
-		final Sport sport = mesg.getSport();
-		if (sport != null) {
-			tourData.setDeviceModeName(sport.name());
-		}
+			final DateTime startTime = mesg.getStartTime();
+			if (startTime == null) {
+				throw new FitActivityReaderException("Missing session start date"); //$NON-NLS-1$
+			}
 
-		final Short avgHeartRate = mesg.getAvgHeartRate();
-		if (avgHeartRate != null) {
-			tourData.setAvgPulse(avgHeartRate);
-		}
+			final TourData tourData = getTourData();
 
-		final Short avgCadence = mesg.getAvgCadence();
-		if (avgCadence != null) {
-			tourData.setAvgCadence(avgCadence);
-		}
+			tourData.setTourStartTime(new org.joda.time.DateTime(startTime.getDate()));
 
-		final Float avgSpeed = mesg.getAvgSpeed();
-		if (avgSpeed != null) {
-			tourData.setDeviceAvgSpeed(DataConverters.convertSpeed(avgSpeed));
-		}
+			final Sport sport = mesg.getSport();
+			if (sport != null) {
+				tourData.setDeviceModeName(sport.name());
+			}
 
-		final Integer totalCalories = mesg.getTotalCalories();
-		if (totalCalories != null) {
-			tourData.setCalories(totalCalories);
-		}
+			final Short avgHeartRate = mesg.getAvgHeartRate();
+			if (avgHeartRate != null) {
+				tourData.setAvgPulse(avgHeartRate);
+			}
 
-		final Float totalDistance = mesg.getTotalDistance();
-		if (totalDistance != null) {
-			tourData.setTourDistance(Math.round(totalDistance));
-		}
+			final Short avgCadence = mesg.getAvgCadence();
+			if (avgCadence != null) {
+				tourData.setAvgCadence(avgCadence);
+			}
 
-		final Integer totalAscent = mesg.getTotalAscent();
-		if (totalAscent != null) {
-			tourData.setTourAltUp(totalAscent);
-		}
+			final Float avgSpeed = mesg.getAvgSpeed();
+			if (avgSpeed != null) {
+				tourData.setDeviceAvgSpeed(DataConverters.convertSpeed(avgSpeed));
+			}
 
-		final Integer totalDescent = mesg.getTotalDescent();
-		if (totalDescent != null) {
-			tourData.setTourAltDown(totalDescent);
-		}
+			final Integer totalCalories = mesg.getTotalCalories();
+			if (totalCalories != null) {
+				tourData.setCalories(totalCalories);
+			}
 
-		final Float totalElapsedTime = mesg.getTotalElapsedTime();
-		if (totalElapsedTime != null) {
-			tourData.setTourRecordingTime(Math.round(totalElapsedTime));
-		}
+			final Float totalDistance = mesg.getTotalDistance();
+			if (totalDistance != null) {
+				tourData.setTourDistance(Math.round(totalDistance));
+			}
 
-		final Float totalTimerTime = mesg.getTotalTimerTime();
-		if (totalTimerTime != null) {
-			tourData.setTourDrivingTime(Math.round(totalTimerTime));
+			final Integer totalAscent = mesg.getTotalAscent();
+			if (totalAscent != null) {
+				tourData.setTourAltUp(totalAscent);
+			}
+
+			final Integer totalDescent = mesg.getTotalDescent();
+			if (totalDescent != null) {
+				tourData.setTourAltDown(totalDescent);
+			}
+
+			final Float totalElapsedTime = mesg.getTotalElapsedTime();
+			if (totalElapsedTime != null) {
+				tourData.setTourRecordingTime(Math.round(totalElapsedTime));
+			}
+
+			final Float totalTimerTime = mesg.getTotalTimerTime();
+			if (totalTimerTime != null) {
+				tourData.setTourDrivingTime(Math.round(totalTimerTime));
+			}
 		}
 
 		context.afterSession();
