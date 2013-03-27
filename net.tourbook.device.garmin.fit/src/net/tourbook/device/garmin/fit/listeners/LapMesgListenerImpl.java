@@ -16,35 +16,27 @@ public class LapMesgListenerImpl extends AbstractMesgListener implements LapMesg
 	public void onMesg(final LapMesg mesg) {
 		context.beforeLap();
 
-		final Integer messageIndex = mesg.getMessageIndex();
-		if (messageIndex == null) {
+		final Integer messageIndex = getMessageIndex(mesg);
+		
+		getTourMarker().setLabel(messageIndex.toString());
+		getTourMarker().setVisualPosition(ChartLabel.VISUAL_HORIZONTAL_ABOVE_GRAPH_CENTERED);
 
-			// ignore
+		getTourMarker().setSerieIndex(context.getSerieIndex() - 1);
 
-//			throw new FitActivityReaderException("Lap message index is missing"); //$NON-NLS-1$
+		final Float totalDistance = mesg.getTotalDistance();
+		if (totalDistance != null) {
+			float lapDistance = context.getLapDistance();
+			lapDistance += totalDistance;
+			context.setLapDistance(lapDistance);
+			getTourMarker().setDistance(lapDistance);
+		}
 
-		} else {
-
-			getTourMarker().setLabel(messageIndex.toString());
-			getTourMarker().setVisualPosition(ChartLabel.VISUAL_HORIZONTAL_ABOVE_GRAPH_CENTERED);
-
-			getTourMarker().setSerieIndex(context.getSerieIndex() - 1);
-
-			final Float totalDistance = mesg.getTotalDistance();
-			if (totalDistance != null) {
-				float lapDistance = context.getLapDistance();
-				lapDistance += totalDistance;
-				context.setLapDistance(lapDistance);
-				getTourMarker().setDistance(lapDistance);
-			}
-
-			final Float totalElapsedTime = mesg.getTotalElapsedTime();
-			if (totalElapsedTime != null) {
-				int lapTime = context.getLapTime();
-				lapTime += Math.round(totalElapsedTime);
-				context.setLapTime(lapTime);
-				getTourMarker().setTime(lapTime);
-			}
+		final Float totalElapsedTime = mesg.getTotalElapsedTime();
+		if (totalElapsedTime != null) {
+			int lapTime = context.getLapTime();
+			lapTime += Math.round(totalElapsedTime);
+			context.setLapTime(lapTime);
+			getTourMarker().setTime(lapTime);
 		}
 
 		context.afterLap();
