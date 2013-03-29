@@ -8,6 +8,8 @@ import com.garmin.fit.LapMesgListener;
 
 public class LapMesgListenerImpl extends AbstractMesgListener implements LapMesgListener {
 
+	private int	_lapCounter;
+
 	public LapMesgListenerImpl(final FitActivityContext context) {
 		super(context);
 	}
@@ -16,9 +18,9 @@ public class LapMesgListenerImpl extends AbstractMesgListener implements LapMesg
 	public void onMesg(final LapMesg mesg) {
 		context.beforeLap();
 
-		final Integer messageIndex = getMessageIndex(mesg);
-		
-		getTourMarker().setLabel(messageIndex.toString());
+		final Integer messageIndex = getLapMessageIndex(mesg);
+
+		getTourMarker().setLabel(messageIndex == null ? Integer.toString(++_lapCounter) : messageIndex.toString());
 		getTourMarker().setVisualPosition(ChartLabel.VISUAL_HORIZONTAL_ABOVE_GRAPH_CENTERED);
 
 		getTourMarker().setSerieIndex(context.getSerieIndex() - 1);
