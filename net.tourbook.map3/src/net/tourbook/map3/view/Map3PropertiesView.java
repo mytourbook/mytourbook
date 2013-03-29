@@ -312,6 +312,10 @@ public class Map3PropertiesView extends ViewPart {
 
 	private void onSelectTreeItem() {
 
+		/*
+		 * the following actions will only be done, when the sensitive area of the row is hovered
+		 * with the mouse
+		 */
 		final ViewerRow hoveredRow = _propToolTip.getHoveredRow();
 
 		if (hoveredRow == null) {
@@ -341,6 +345,8 @@ public class Map3PropertiesView extends ViewPart {
 				}
 
 			} else if (mapItem instanceof TVIMap3Layer) {
+
+				// toggle layer visibility
 
 				toggleLayerVisibility((TVIMap3Layer) mapItem, true);
 			}

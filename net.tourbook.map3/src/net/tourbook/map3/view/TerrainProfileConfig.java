@@ -21,6 +21,7 @@ import gov.nasa.worldwind.layers.TerrainProfileLayer;
 import java.awt.Dimension;
 
 import net.tourbook.common.UI;
+import net.tourbook.common.tooltip.IToolProvider;
 import net.tourbook.common.tooltip.ToolTip3;
 import net.tourbook.common.util.Util;
 
@@ -43,7 +44,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.ui.IViewPart;
 
-public class TerrainProfileConfig implements ILayerConfigProvider {
+public class TerrainProfileConfig implements IToolProvider {
 
 	private static final String			STATE_PREFIX							= "STATE_TERRAIN_PROFILE_";				//$NON-NLS-1$
 	private static final String			STATE_TERRAIN_PROFILE_FOLLOW			= "STATE_TERRAIN_PROFILE_FOLLOW";			//$NON-NLS-1$
@@ -56,7 +57,6 @@ public class TerrainProfileConfig implements ILayerConfigProvider {
 
 	private IDialogSettings				_state;
 
-	private ToolTip3					_toolTip;
 
 	private WorldWindowGLCanvas			_wwcanvas;
 	private TerrainProfileLayer			_profileLayer;
@@ -112,9 +112,8 @@ public class TerrainProfileConfig implements ILayerConfigProvider {
 	}
 
 	@Override
-	public void createConfigUI(final ToolTip3 toolTip, final Composite parent) {
+	public void createUI(final Composite parent) {
 
-		_toolTip = toolTip;
 
 		parent.addDisposeListener(new DisposeListener() {
 			@Override
@@ -123,13 +122,13 @@ public class TerrainProfileConfig implements ILayerConfigProvider {
 			}
 		});
 
-		createUI(parent);
+		createUI_10(parent);
 		updateUI();
 
 		restoreState();
 	}
 
-	private void createUI(final Composite parent) {
+	private void createUI_10(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);

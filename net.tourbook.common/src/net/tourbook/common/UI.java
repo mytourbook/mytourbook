@@ -19,9 +19,7 @@ import java.nio.charset.Charset;
 
 import net.tourbook.common.weather.IWeather;
 
-import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.resource.ImageRegistry;
-import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.custom.ScrolledComposite;
@@ -33,24 +31,19 @@ import org.eclipse.swt.events.VerifyEvent;
 import org.eclipse.swt.events.VerifyListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Cursor;
-import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.GC;
-import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.PaletteData;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.graphics.TextLayout;
-import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Sash;
-import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.Spinner;
 import org.epics.css.dal.Timestamp;
 import org.epics.css.dal.Timestamp.Format;
 import org.joda.time.DateTime;
@@ -59,9 +52,6 @@ import org.joda.time.DateTimeZone;
 public class UI {
 
 	public static final String			EMPTY_STRING							= "";																		//$NON-NLS-1$
-	public static final String			DASH									= "-";																		//$NON-NLS-1$
-	public static final String			DASH_WITH_SPACE							= " - ";																	//$NON-NLS-1$
-	public static final String			DASH_WITH_DOUBLE_SPACE					= "   -   ";																//$NON-NLS-1$
 	public static final String			SPACE									= " ";																		//$NON-NLS-1$
 	public static final String			SPACE2									= "  ";																	//$NON-NLS-1$
 	public static final String			SPACE4									= "    ";																	//$NON-NLS-1$
@@ -91,10 +81,6 @@ public class UI {
 	public static final String			SYMBOL_INFINITY							= "\u221E";																//$NON-NLS-1$
 	public static final String			SYMBOL_SUM_WITH_SPACE					= "\u2211 ";																//$NON-NLS-1$
 	public static final String			SYMBOL_TAU								= "\u03c4";																//$NON-NLS-1$
-	private static final String			SYMBOL_MIN_INFINITY						= "-\u221E";																//$NON-NLS-1$
-	private static final String			SYMBOL_MAX_INFINITY						= "\u221E";																//$NON-NLS-1$
-//	private static final String			SYMBOL_CONSOLE_MIN_INFINITY				= "-oo";																	//$NON-NLS-1$
-//	private static final String			SYMBOL_CONSOLE_MAX_INFINITY				= "oo";																	//$NON-NLS-1$
 
 	public static final String			SYMBOL_BRACKET_LEFT						= "(";																		//$NON-NLS-1$
 	public static final String			SYMBOL_BRACKET_RIGHT					= ")";																		//$NON-NLS-1$
@@ -108,12 +94,10 @@ public class UI {
 	public static final String			SYMBOL_UNDERSCORE						= "_";																		//$NON-NLS-1$
 	public static final String			SYMBOL_WIND_WITH_SPACE					= "W ";																	//$NON-NLS-1$
 
-	public static final String			UNIT_MBYTES								= "MByte";																	//$NON-NLS-1$
-
 	/*
 	 * labels for the different measurement systems
 	 */
-	public static final String			UNIT_DISTANCE_KM						= "km";																	//$NON-NLS-1$
+	public static final String			UNIT_MBYTES								= "MByte";																	//$NON-NLS-1$
 
 	/**
 	 * The ellipsis is the string that is used to represent shortened text.
@@ -121,7 +105,6 @@ public class UI {
 	 * @since 3.0
 	 */
 	public static final String			ELLIPSIS								= "...";																	//$NON-NLS-1$
-	public static final String			ELLIPSIS_WITH_SPACE						= " ... ";																	//$NON-NLS-1$
 
 	private static final char[]			INVALID_FILENAME_CHARS					= new char[] {
 			'\\',
@@ -171,13 +154,13 @@ public class UI {
 	public static final String			IMAGE_ACTION_PHOTO_FILTER_NO_PHOTOS		= "IMAGE_ACTION_PHOTO_FILTER_NO_PHOTOS";									//$NON-NLS-1$
 	public static final String			IMAGE_ACTION_PHOTO_FILTER_WITH_PHOTOS	= "IMAGE_ACTION_PHOTO_FILTER_WITH_PHOTOS";									//$NON-NLS-1$
 	public static final String			IMAGE_ACTION_PHOTO_FILTER_DISABLED		= "IMAGE_ACTION_PHOTO_FILTER_DISABLED";									//$NON-NLS-1$
-	public static final String			IMAGE_APP_CLOSE_SMALL					= "IMAGE_APP_CLOSE_SMALL";													//$NON-NLS-1$
-	public static final String			IMAGE_APP_CLOSE_SMALL_HOVERED			= "IMAGE_APP_CLOSE_SMALL_HOVERED";											//$NON-NLS-1$
+<<<<<<< master
+//	public static final String			IMAGE_ACTION_PHOTO_PROPERTIES			= "IMAGE_ACTION_PHOTO_PROPERTIES";											//$NON-NLS-1$
+//	public static final String			IMAGE_ACTION_PHOTO_PROPERTIES_DISABLED	= "IMAGE_ACTION_PHOTO_PROPERTIES_DISABLED";								//$NON-NLS-1$
+=======
+>>>>>>> local
 	public static final String			IMAGE_CONFIGURE_COLUMNS					= "IMAGE_CONFIGURE_COLUMNS";												//$NON-NLS-1$
 	public static final String			IMAGE_EMPTY_16							= "_empty16";																//$NON-NLS-1$
-	public static final String			IMAGE_APP_PINNED_SMALL					= "IMAGE_APP_PINNED_SMALL";												//$NON-NLS-1$
-	public static final String			IMAGE_APP_PINNED_SMALL_DISABLED			= "IMAGE_APP_PINNED_SMALL_DISABLED";										//$NON-NLS-1$
-	public static final String			IMAGE_APP_PINNED_SMALL_HOVERED			= "IMAGE_APP_PINNED_SMALL_HOVERED";										//$NON-NLS-1$
 
 	public final static ImageRegistry	IMAGE_REGISTRY;
 
@@ -193,19 +176,14 @@ public class UI {
 				Activator.getImageDescriptor(Messages.Image_Action_PhotoFilterWithPhotos));
 		IMAGE_REGISTRY.put(IMAGE_ACTION_PHOTO_FILTER_DISABLED,//
 				Activator.getImageDescriptor(Messages.Image_Action_PhotoFilter_Disabled));
+<<<<<<< master
+//		IMAGE_REGISTRY.put(IMAGE_ACTION_PHOTO_PROPERTIES, //
+//				Activator.getImageDescriptor(Messages.Image_Action_PhotoProperties));
+//		IMAGE_REGISTRY.put(IMAGE_ACTION_PHOTO_PROPERTIES_DISABLED,//
+//				Activator.getImageDescriptor(Messages.Image_Action_PhotoProperties_Disabled));
+=======
 
-		IMAGE_REGISTRY.put(IMAGE_APP_CLOSE_SMALL, //
-				Activator.getImageDescriptor(Messages.Image_App_CloseSmall));
-		IMAGE_REGISTRY.put(IMAGE_APP_CLOSE_SMALL_HOVERED, //
-				Activator.getImageDescriptor(Messages.Image_App_CloseSmall_Hovered));
-
-		IMAGE_REGISTRY.put(IMAGE_APP_PINNED_SMALL, //
-				Activator.getImageDescriptor(Messages.Image_App_PinedSmall));
-		IMAGE_REGISTRY.put(IMAGE_APP_PINNED_SMALL_DISABLED, //
-				Activator.getImageDescriptor(Messages.Image_App_PinnedSmall_Disabled));
-		IMAGE_REGISTRY.put(IMAGE_APP_PINNED_SMALL_HOVERED, //
-				Activator.getImageDescriptor(Messages.Image_App_PinnedSmall_Hovered));
-
+>>>>>>> local
 		IMAGE_REGISTRY.put(IMAGE_CONFIGURE_COLUMNS, //
 				Activator.getImageDescriptor(Messages.Image__ConfigureColumns));
 		IMAGE_REGISTRY.put(IMAGE_EMPTY_16, //
@@ -230,41 +208,6 @@ public class UI {
 				Activator.getImageDescriptor(Messages.Image__Weather_Severe));
 
 	}
-
-	/**
-	 * The dialog settings key name for stored dialog x location.
-	 * 
-	 * @since 3.2
-	 */
-	private static final String			DIALOG_ORIGIN_X							= "DIALOG_X_ORIGIN";														//$NON-NLS-1$
-
-	/**
-	 * The dialog settings key name for stored dialog y location.
-	 * 
-	 * @since 3.2
-	 */
-	private static final String			DIALOG_ORIGIN_Y							= "DIALOG_Y_ORIGIN";														//$NON-NLS-1$
-
-	/**
-	 * The dialog settings key name for stored dialog width.
-	 * 
-	 * @since 3.2
-	 */
-	private static final String			DIALOG_WIDTH							= "DIALOG_WIDTH";															//$NON-NLS-1$
-
-	/**
-	 * The dialog settings key name for stored dialog height.
-	 * 
-	 * @since 3.2
-	 */
-	private static final String			DIALOG_HEIGHT							= "DIALOG_HEIGHT";															//$NON-NLS-1$
-
-	/**
-	 * The dialog settings key name for the font used when the dialog height and width was stored.
-	 * 
-	 * @since 3.2
-	 */
-	private static final String			DIALOG_FONT_DATA						= "DIALOG_FONT_NAME";														//$NON-NLS-1$
 
 	public static void addSashColorHandler(final Sash sash) {
 
@@ -319,33 +262,6 @@ public class UI {
 		return new Cursor(display, sourceData, 0, 0);
 	}
 
-	public static Color disposeResource(final Color resource) {
-		if ((resource != null) && !resource.isDisposed()) {
-			resource.dispose();
-		}
-		return null;
-	}
-
-	public static Cursor disposeResource(final Cursor resource) {
-		if ((resource != null) && !resource.isDisposed()) {
-			resource.dispose();
-		}
-		return null;
-	}
-
-	/**
-	 * disposes a resource
-	 * 
-	 * @param image
-	 * @return
-	 */
-	public static Image disposeResource(final Image resource) {
-		if ((resource != null) && !resource.isDisposed()) {
-			resource.dispose();
-		}
-		return null;
-	}
-
 	public static void dumpSuperClasses(final Object o) {
 
 		Class<?> subclass = o.getClass();
@@ -360,28 +276,6 @@ public class UI {
 			subclass = superclass;
 			superclass = subclass.getSuperclass();
 		}
-	}
-
-	public static String FormatDoubleMinMax(final double value) {
-
-		if (value == -Double.MAX_VALUE) {
-			return SYMBOL_MIN_INFINITY;
-		} else if (value == Double.MAX_VALUE) {
-			return SYMBOL_MAX_INFINITY;
-		}
-
-		return Double.toString(value);
-	}
-
-	public static String FormatDoubleMinMaxElevationMeter(final double value) {
-
-		if (value == -Double.MAX_VALUE) {
-			return SYMBOL_MIN_INFINITY;
-		} else if (value == Double.MAX_VALUE) {
-			return SYMBOL_MAX_INFINITY;
-		}
-
-		return Long.toString((long) (value / 1000)) + UI.SPACE + UI.UNIT_DISTANCE_KM;
 	}
 
 	/**
@@ -407,37 +301,6 @@ public class UI {
 	}
 
 	/**
-	 * This is a copy with modifications from {@link org.eclipse.jface.dialogs.Dialog}
-	 * 
-	 * @param statePrefix
-	 */
-	public static Point getInitialLocation(	final IDialogSettings state,
-											final String statePrefix,
-											final Shell shell,
-											final Shell parentShell) {
-
-		Point result = shell.getLocation();
-
-		try {
-			final int x = state.getInt(statePrefix + DIALOG_ORIGIN_X);
-			final int y = state.getInt(statePrefix + DIALOG_ORIGIN_Y);
-			result = new Point(x, y);
-
-			// The coordinates were stored relative to the parent shell.
-			// Convert to display coordinates.
-			if (parentShell != null) {
-				final Point parentLocation = parentShell.getLocation();
-				result.x += parentLocation.x;
-				result.y += parentLocation.y;
-			}
-		} catch (final NumberFormatException e) {}
-
-		// No attempt is made to constrain the bounds. The default
-		// constraining behavior in Window will be used.
-		return result;
-	}
-
-	/**
 	 * Opens the control context menu, the menue is aligned below the control to the right side
 	 * 
 	 * @param control
@@ -454,65 +317,6 @@ public class UI {
 		if (contextMenu != null && contextMenu.isDisposed() == false) {
 			contextMenu.setLocation(pt.x, pt.y);
 			contextMenu.setVisible(true);
-		}
-	}
-
-	/**
-	 * This is a copy with modifications from {@link org.eclipse.jface.dialogs.Dialog}
-	 * 
-	 * @param statePrefix
-	 */
-	public static void saveDialogBounds(final IDialogSettings state,
-										final String statePrefix,
-										final Shell shell,
-										final Shell parentShell) {
-
-		if (state != null) {
-
-			final Point shellLocation = shell.getLocation();
-			final Point shellSize = shell.getSize();
-
-			if (parentShell != null) {
-				final Point parentLocation = parentShell.getLocation();
-				shellLocation.x -= parentLocation.x;
-				shellLocation.y -= parentLocation.y;
-			}
-
-			state.put(statePrefix + DIALOG_ORIGIN_X, shellLocation.x);
-			state.put(statePrefix + DIALOG_ORIGIN_Y, shellLocation.y);
-
-			state.put(statePrefix + DIALOG_WIDTH, shellSize.x);
-			state.put(statePrefix + DIALOG_HEIGHT, shellSize.y);
-
-			final FontData[] fontDatas = JFaceResources.getDialogFont().getFontData();
-			if (fontDatas.length > 0) {
-				state.put(statePrefix + DIALOG_FONT_DATA, fontDatas[0].toString());
-			}
-		}
-	}
-
-	public static void setColorForAllChildren(final Control child, final Color fgColor, final Color bgColor) {
-
-		child.setForeground(fgColor);
-		child.setBackground(bgColor);
-
-		if (child instanceof Composite) {
-
-			final Control[] children = ((Composite) child).getChildren();
-
-			for (final Control control : children) {
-
-				if (control != null && control.isDisposed() == false //
-
-						// exclude controls
-						&& !control.getClass().equals(Combo.class)
-						&& !control.getClass().equals(Spinner.class)
-				//
-				) {
-
-					setColorForAllChildren(control, fgColor, bgColor);
-				}
-			}
 		}
 	}
 

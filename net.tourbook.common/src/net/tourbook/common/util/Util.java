@@ -16,13 +16,10 @@
 package net.tourbook.common.util;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.MessageDigest;
@@ -50,7 +47,6 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.XMLMemento;
 import org.eclipse.ui.browser.IWebBrowser;
 import org.eclipse.ui.browser.IWorkbenchBrowserSupport;
 import org.joda.time.DateTime;
@@ -58,26 +54,17 @@ import org.xml.sax.Attributes;
 
 public class Util {
 
-	private static final String	URL_SPACE								= " ";					//$NON-NLS-1$
-	private static final String	URL_SPACE_REPLACEMENT					= "%20";				//$NON-NLS-1$
+	private static final String	URL_SPACE								= " ";		//$NON-NLS-1$
+	private static final String	URL_SPACE_REPLACEMENT					= "%20";	//$NON-NLS-1$
 
-	public static final String	UNIQUE_ID_SUFFIX_GARMIN_FIT				= "12653";				//$NON-NLS-1$
-	public static final String	UNIQUE_ID_SUFFIX_GARMIN_TCX				= "42984";				//$NON-NLS-1$
-	public static final String	UNIQUE_ID_SUFFIX_GPX					= "31683";				//$NON-NLS-1$
-	public static final String	UNIQUE_ID_SUFFIX_NMEA					= "32481";				//$NON-NLS-1$
-	public static final String	UNIQUE_ID_SUFFIX_POLAR_HRM				= "63193";				//$NON-NLS-1$
-	public static final String	UNIQUE_ID_SUFFIX_POLAR_PDD				= "76913";				//$NON-NLS-1$
-	public static final String	UNIQUE_ID_SUFFIX_POLAR_TRAINER			= "13457";				//$NON-NLS-1$
-	public static final String	UNIQUE_ID_SUFFIX_SPORT_TRACKS_FITLOG	= "24168";				//$NON-NLS-1$
-
-	/*
-	 * default xml attributes
-	 */
-	public static final String	ATTR_ROOT_DATETIME						= "Created";			//$NON-NLS-1$
-	public static final String	ATTR_ROOT_VERSION_MAJOR					= "VersionMajor";		//$NON-NLS-1$
-	public static final String	ATTR_ROOT_VERSION_MINOR					= "VersionMinor";		//$NON-NLS-1$
-	public static final String	ATTR_ROOT_VERSION_MICRO					= "VersionMicro";		//$NON-NLS-1$
-	public static final String	ATTR_ROOT_VERSION_QUALIFIER				= "VersionQualifier";	//$NON-NLS-1$
+	public static final String	UNIQUE_ID_SUFFIX_GARMIN_FIT				= "12653";	//$NON-NLS-1$
+	public static final String	UNIQUE_ID_SUFFIX_GARMIN_TCX				= "42984";	//$NON-NLS-1$
+	public static final String	UNIQUE_ID_SUFFIX_GPX					= "31683";	//$NON-NLS-1$
+	public static final String	UNIQUE_ID_SUFFIX_NMEA					= "32481";	//$NON-NLS-1$
+	public static final String	UNIQUE_ID_SUFFIX_POLAR_HRM				= "63193";	//$NON-NLS-1$
+	public static final String	UNIQUE_ID_SUFFIX_POLAR_PDD				= "76913";	//$NON-NLS-1$
+	public static final String	UNIQUE_ID_SUFFIX_POLAR_TRAINER			= "13457";	//$NON-NLS-1$
+	public static final String	UNIQUE_ID_SUFFIX_SPORT_TRACKS_FITLOG	= "24168";	//$NON-NLS-1$
 
 	public static int adjustScaleValueOnMouseScroll(final MouseEvent event) {
 
@@ -372,32 +359,8 @@ public class Util {
 		return null;
 	}
 
-	public static String dumpMemento(final XMLMemento xmlMemento) {
-
-		final StringBuilder sb = new StringBuilder();
-		for (final String attr : xmlMemento.getAttributeKeys()) {
-			sb.append(attr);
-			sb.append(UI.SYMBOL_EQUAL);
-			sb.append(xmlMemento.getString(attr));
-			sb.append(UI.COMMA_SPACE);
-		}
-
-		return sb.toString();
-	}
-
 	public static String encodeSpace(final String urlString) {
 		return urlString.replaceAll(URL_SPACE, URL_SPACE_REPLACEMENT);
-	}
-
-	public static boolean getBoolean(final Object data) {
-
-		boolean is = false;
-
-		if (data instanceof Boolean) {
-			is = (Boolean) data;
-		}
-
-		return is;
 	}
 
 	private static int getKeyAccelerator(final MouseEvent event) {
@@ -472,39 +435,6 @@ public class Util {
 	 */
 	public static boolean getStateBoolean(final IDialogSettings state, final String key, final boolean defaultValue) {
 		return state.get(key) == null ? defaultValue : state.getBoolean(key);
-	}
-
-	/**
-	 * @param state
-	 * @param stateKey
-	 * @param defaultValue
-	 * @param combo
-	 * @param defaultComboIndex
-	 *            Combo default index when retrieved state index is too large.
-	 * @return
-	 */
-	public static int getStateCombo(final IDialogSettings state,
-									final String stateKey,
-									final int defaultValue,
-									final Combo combo,
-									final int defaultComboIndex) {
-
-		int comboIndex = getStateInt(state, stateKey, defaultValue);
-
-		final int maxItems = combo.getItemCount();
-
-		if (comboIndex >= maxItems) {
-
-			// combo index is too large
-
-			if (defaultComboIndex >= maxItems) {
-				comboIndex = 0;
-			} else {
-				comboIndex = defaultComboIndex;
-			}
-		}
-
-		return comboIndex;
 	}
 
 	/**
@@ -1035,34 +965,5 @@ public class Util {
 			}
 		}
 		return retu.toString();
-	}
-
-	/**
-	 * Writes a XML memento into a XML file.
-	 * 
-	 * @param xmlMemento
-	 * @param xmlFile
-	 */
-	public static void writeXml(final XMLMemento xmlMemento, final File xmlFile) {
-
-		BufferedWriter writer = null;
-
-		try {
-
-			writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(xmlFile), UI.UTF_8));
-
-			xmlMemento.save(writer);
-
-		} catch (final Exception e) {
-			StatusUtil.log(e);
-		} finally {
-			if (writer != null) {
-				try {
-					writer.close();
-				} catch (final IOException e) {
-					StatusUtil.log(e);
-				}
-			}
-		}
 	}
 }

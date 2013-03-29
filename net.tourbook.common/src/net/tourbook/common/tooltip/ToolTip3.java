@@ -23,6 +23,7 @@ import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.graphics.Cursor;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FillLayout;
@@ -39,6 +40,8 @@ import org.eclipse.swt.widgets.Shell;
  * Part of this tooltip is copied from org.eclipse.jface.window.ToolTip
  */
 public abstract class ToolTip3 {
+
+	public static final int				SHELL_MARGIN							= 5;
 
 	public static final String			SHELL_STATE_IS_CUSTOM_UI				= "SHELL_STATE_IS_CUSTOM_UI";		//$NON-NLS-1$
 	public static final String			SHELL_STATE_IS_MOVED					= "SHELL_STATE_IS_MOVED";			//$NON-NLS-1$
@@ -74,7 +77,7 @@ public abstract class ToolTip3 {
 
 	private static final int			ALPHA_OPAQUE							= 0xff;
 
-	private static final int			MOUSE_HOVER_DELAY						= 1;
+	private static final int			MOUSE_HOVER_DELAY						= 10;
 	private static final int			AUTO_CLOSE_INTERVAL						= 700;
 
 	private OwnerControlListener		_ownerControlListener;
@@ -118,16 +121,14 @@ public abstract class ToolTip3 {
 	 */
 	private Display						_display;
 
-	/**
-	 * Tooltip shell which is currently be visible
-	 */
-//	private Shell						_shell;
-
 	private Control						_ownerControl;
 
 	private OwnerHoverTimer				_ownerHoverTimer;
 	private Point						_ownerHoverPosition;
 	private ToolTipAutoCloseTimer		_ttAutoCloseTimer;
+
+	private Cursor						_cursorDragged;
+	private Cursor						_cursorHand;
 
 	/**
 	 * Contains all shells which are not moved. Key is the tooltip area for which the tooltip is
@@ -141,11 +142,6 @@ public abstract class ToolTip3 {
 	 */
 	private HashMap<Object, Shell>		_allMovedShells							= new HashMap<Object, Shell>();
 
-	/**
-	 * Tooltip area for the {@link #_activeTTShell}, is be <code>null</code> when a tooltip is not
-	 * visible.
-	 */
-//	private Object						_activeToolTipArea;
 	private Shell						_activeTTShell;
 
 	private final class AnimationTimer implements Runnable {
@@ -243,6 +239,9 @@ public abstract class ToolTip3 {
 
 		addOwnerControlListener();
 		addOwnerShellListener();
+
+		_cursorDragged = new Cursor(_display, SWT.CURSOR_SIZEALL);
+		_cursorHand = new Cursor(_display, SWT.CURSOR_HAND);
 	}
 
 	private void addDisplayFilterListener() {
@@ -633,11 +632,20 @@ public abstract class ToolTip3 {
 
 		ttShell.setLayout(new FillLayout());
 
-		// create content
-		createToolTipContentArea(ttShell);
+		Composite ttUIContainer;
+		final IToolProvider toolProvider = isToolShell();
+
+		if (toolProvider == null) {
+			// this is not a custom tool provider
+			ttUIContainer = ttShell;
+		} else {
+			ttUIContainer = new ToolShell(this, toolProvider).createUI(ttShell);
+		}
+
+		// create tooltip content
+		createToolTipContentArea(ttUIContainer);
 
 		ttShell.pack(true);
-
 		ttShell.setRedraw(true);
 
 		addTTShellListener(ttShell);
@@ -680,6 +688,14 @@ public abstract class ToolTip3 {
 		}
 
 		return location;
+	}
+
+	protected Cursor getCursorDragged() {
+		return _cursorDragged;
+	}
+
+	protected Cursor getCursorHand() {
+		return _cursorHand;
 	}
 
 	private Rectangle getDisplayBounds(final Point location) {
@@ -743,19 +759,6 @@ public abstract class ToolTip3 {
 		ttHide();
 	}
 
-	private void moveShellWhenVisible() {
-
-		if (_isKeepToolTipOpenWhenResizedOrMoved == false) {
-			return;
-		}
-
-		if (_activeTTShell == null || _activeTTShell.isDisposed() || _activeTTShell.isVisible() == false) {
-			return;
-		}
-
-		ttShow();
-	}
-
 //	protected boolean isToolTipVisible() {
 //
 //		if (shell == null || shell.isDisposed()) {
@@ -769,6 +772,25 @@ public abstract class ToolTip3 {
 //
 //		return isShellVisible;
 //	}
+
+	/**
+	 * @return Returns <code>true</code> when the shell tooltip can be moved with the mouse, a
+	 *         tooltip header will be displayed.
+	 */
+	protected abstract IToolProvider isToolShell();
+
+	private void moveShellWhenVisible() {
+
+		if (_isKeepToolTipOpenWhenResizedOrMoved == false) {
+			return;
+		}
+
+		if (_activeTTShell == null || _activeTTShell.isDisposed() || _activeTTShell.isVisible() == false) {
+			return;
+		}
+
+		ttShow();
+	}
 
 	/**
 	 * @return When the returned rectangle (which has display locations) is hit by the mouse, the
@@ -922,6 +944,21 @@ public abstract class ToolTip3 {
 		return isKeepOpened;
 	}
 
+	private void onDispose(final Event event) {
+
+		// hide all tooltips
+
+		removeOwnerShellListener();
+		removeDisplayFilterListener();
+
+		_cursorDragged = UI.disposeResource(_cursorDragged);
+		_cursorHand = UI.disposeResource(_cursorHand);
+
+//		passOnEvent(shell, event);
+
+		close(true);
+	}
+
 	protected void onMouseMoveInToolTip(final MouseEvent mouseEvent) {}
 
 	private void onOwnerControlEvent(final Event event) {
@@ -933,7 +970,7 @@ public abstract class ToolTip3 {
 		switch (event.type) {
 		case SWT.Dispose:
 
-			onOwnerDispose(event);
+			onDispose(event);
 
 			removeOwnerControlsListener();
 
@@ -962,18 +999,6 @@ public abstract class ToolTip3 {
 
 			break;
 		}
-	}
-
-	private void onOwnerDispose(final Event event) {
-
-		// hide tooltip definitively
-
-		removeOwnerShellListener();
-		removeDisplayFilterListener();
-
-//		passOnEvent(shell, event);
-
-		close(true);
 	}
 
 	private void onOwnerHovered() {
@@ -1241,30 +1266,7 @@ public abstract class ToolTip3 {
 		_mouseOverBehaviour = mouseOverBehaviour;
 	}
 
-	/**
-	 * Set tooltip location when it was dragged with the mouse.
-	 * 
-	 * @param shell
-	 * @param xDiff
-	 *            Relative x location when dragging started
-	 * @param yDiff
-	 *            Relative y location when dragging started
-	 */
-	protected void setDraggedLocation(final Shell shell, final int xDiff, final int yDiff) {
 
-		if (shell == null || shell.isDisposed()) {
-			return;
-		}
-
-		final Point movedLocation = shell.getLocation();
-		movedLocation.x += xDiff;
-		movedLocation.y += yDiff;
-
-		final Point size = shell.getSize();
-		final Point shellLocation = fixupDisplayBounds(size, movedLocation);
-
-		shell.setLocation(shellLocation.x, shellLocation.y);
-	}
 
 	public void setFadeIsSteps(final int fadeInSteps) {
 		_fadeInSteps = fadeInSteps;

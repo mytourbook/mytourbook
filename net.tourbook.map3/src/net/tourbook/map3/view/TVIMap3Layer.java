@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.map3.view;
 
+import net.tourbook.common.tooltip.IToolProvider;
 import gov.nasa.worldwind.layers.Layer;
 
 public class TVIMap3Layer extends TVIMap3Item {
@@ -30,7 +31,7 @@ public class TVIMap3Layer extends TVIMap3Item {
 
 	private ICheckStateListener	_checkStateListener;
 
-	ILayerConfigProvider		layerConfigProvider;
+	IToolProvider		layerConfigProvider;
 
 	public TVIMap3Layer(final Layer wwLayer, final String uiLayerName) {
 

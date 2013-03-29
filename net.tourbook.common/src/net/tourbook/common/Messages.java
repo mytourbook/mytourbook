@@ -40,6 +40,8 @@ public class Messages extends NLS {
 
 	public static String	Image_Action_PhotoFilterWithPhotos;
 
+<<<<<<< master
+=======
 	public static String	Image_App_CloseSmall;
 
 	public static String	Image_App_CloseSmall_Hovered;
@@ -50,6 +52,11 @@ public class Messages extends NLS {
 
 	public static String	Image_App_PinnedSmall_Hovered;
 
+	public static String	Map3_PropertyTooltip_Action_Close_Tooltip;
+
+	public static String	Map3_PropertyTooltip_Action_MoveToDefaultLocation_Tooltip;
+
+>>>>>>> local
 	public static String		Weather_Clounds_Clouds;
 	public static String		Weather_Clounds_Clouny;
 	public static String		Weather_Clounds_IsNotDefined;
