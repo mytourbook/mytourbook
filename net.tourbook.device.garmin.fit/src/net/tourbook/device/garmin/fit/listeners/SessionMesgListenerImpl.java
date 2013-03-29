@@ -11,19 +11,17 @@ import com.garmin.fit.SessionMesgListener;
 import com.garmin.fit.Sport;
 
 public class SessionMesgListenerImpl extends AbstractMesgListener implements SessionMesgListener {
-
+	
 	public SessionMesgListenerImpl(final FitActivityContext context) {
 		super(context);
 	}
 
 	@Override
 	public void onMesg(final SessionMesg mesg) {
+
 		context.beforeSession();
 
-		final Integer messageIndex = mesg.getMessageIndex();
-		if (messageIndex == null) {
-			throw new FitActivityReaderException("Missing session message index"); //$NON-NLS-1$
-		}
+		final Integer messageIndex = getMessageIndex(mesg);
 		context.setSessionIndex(messageIndex.toString());
 
 		final DateTime startTime = mesg.getStartTime();
