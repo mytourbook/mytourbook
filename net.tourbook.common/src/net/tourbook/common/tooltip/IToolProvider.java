@@ -17,18 +17,27 @@ package net.tourbook.common.tooltip;
 
 import org.eclipse.swt.widgets.Composite;
 
+/**
+ * Provides the UI for a {@link MovableTool}.
+ */
 public interface IToolProvider {
 
 	/**
-	 * Create UI for the custom tool.
+	 * Creates the UI for this tool.
 	 * 
 	 * @param parent
 	 */
-	void createUI(final Composite parent);
+	void createToolUI(final Composite parent);
 
 	/**
-	 * @return Returns a title which is displayed as tooltip when tooltip header is hovered.
+	 * @return Returns a title which is displayed as tooltip when the tooltip header in a movable
+	 *         tooltip is hovered.
 	 */
-	String getTitle();
+	String getToolTitle();
+
+	/**
+	 * @return Returns <code>true</code> when the tooltip can be moved.
+	 */
+	boolean isToolMovable();
 
 }

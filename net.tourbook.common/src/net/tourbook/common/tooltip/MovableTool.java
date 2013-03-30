@@ -32,7 +32,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 
-class ToolShell {
+class MovableTool {
 
 	private static final int	WINDOW_TITLE_HEIGHT	= 12;
 
@@ -43,15 +43,17 @@ class ToolShell {
 	private ToolTip3			_toolTip3;
 	private IToolProvider		_toolProvider;
 
+	private boolean				_isMoved;
+
 	/*
 	 * UI controls
 	 */
-	private Button				_btnPin;
-	private Button				_btnClose;
-
 	private Shell				_shell;
 
-	ToolShell(final ToolTip3 toolTip3, final IToolProvider toolProvider) {
+	private Button				_btnDefaultLocation;
+	private Button				_btnClose;
+
+	MovableTool(final ToolTip3 toolTip3, final IToolProvider toolProvider) {
 
 		_toolTip3 = toolTip3;
 		_toolProvider = toolProvider;
@@ -118,9 +120,9 @@ class ToolShell {
 
 					_isTTDragged = false;
 
-//					_buttonPin.setEnabled(true);
+					_btnDefaultLocation.setEnabled(true);
 
-					_toolTip3.toolTipIsMoved(_shell);
+					_isMoved = true;
 				}
 
 				header.setCursor(_toolTip3.getCursorHand());
@@ -128,7 +130,7 @@ class ToolShell {
 		});
 	}
 
-	Composite createUI(final Shell shell) {
+	void createUI(final Shell shell) {
 
 		_shell = shell;
 
@@ -142,8 +144,6 @@ class ToolShell {
 		{
 			createUI_10_Custom(toolContainer);
 		}
-
-		return toolContainer;
 	}
 
 	private void createUI_10_Custom(final Composite parent) {
@@ -156,7 +156,7 @@ class ToolShell {
 				.applyTo(container);
 //			container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
 		{
-			_toolProvider.createUI(container);
+			_toolProvider.createToolUI(container);
 		}
 	}
 
@@ -169,7 +169,7 @@ class ToolShell {
 //		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
 
 		// show layer title in the hovered tooltip header
-		container.setToolTipText(_toolProvider.getTitle());
+		container.setToolTipText(_toolProvider.getToolTitle());
 
 		addHeaderListener(container);
 
@@ -177,25 +177,25 @@ class ToolShell {
 			/*
 			 * button: pin
 			 */
-			_btnPin = new Button(container, SWT.NONE);
+			_btnDefaultLocation = new Button(container, SWT.NONE);
 
 			GridDataFactory.fillDefaults()//
 					.align(SWT.BEGINNING, SWT.CENTER)
 					.grab(false, true)
 					.hint(WINDOW_TITLE_HEIGHT, SWT.DEFAULT)
-					.applyTo(_btnPin);
+					.applyTo(_btnDefaultLocation);
 
-			_btnPin.setToolTipText(Messages.Map3_PropertyTooltip_Action_MoveToDefaultLocation_Tooltip);
-			_btnPin.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WIDGET_NORMAL_SHADOW));
+			_btnDefaultLocation.setToolTipText(Messages.Map3_PropertyTooltip_Action_MoveToDefaultLocation_Tooltip);
+			_btnDefaultLocation.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WIDGET_NORMAL_SHADOW));
 
-			_btnPin.addSelectionListener(new SelectionAdapter() {
+			_btnDefaultLocation.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(final SelectionEvent e) {
-					onSelectPin();
+					onSelectDefaultLocation();
 				}
 			});
 
-			_btnPin.setEnabled(false);
+			_btnDefaultLocation.setEnabled(false);
 
 			/*
 			 * button: close
@@ -221,7 +221,11 @@ class ToolShell {
 		}
 	}
 
-	private void onSelectPin() {
+	boolean isMoved() {
+		return _isMoved;
+	}
+
+	private void onSelectDefaultLocation() {
 		// TODO Auto-generated method stub
 
 	}

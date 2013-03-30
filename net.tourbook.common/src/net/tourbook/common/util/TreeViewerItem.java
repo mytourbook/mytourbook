@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2012  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -13,20 +13,18 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-
 package net.tourbook.common.util;
 
 import java.util.ArrayList;
 
 /**
- * Abstract class which contains an item for a tree viewer
+ * Abstract class which contains an item for a tree viewer.
  */
 public abstract class TreeViewerItem {
 
 	private TreeViewerItem				_parentItem;
+	
 	private ArrayList<TreeViewerItem>	_children;
-
-	private boolean						_isChildChildrenFetched;
 
 	/**
 	 * Adds a new child to this tree item
@@ -42,6 +40,35 @@ public abstract class TreeViewerItem {
 	}
 
 	/**
+	 * Adds a new child before an existing child.
+	 * 
+	 * @param oldItem
+	 *            Item before the new item is inserted.
+	 * @param newItem
+	 */
+	public void addChildBefore(final TreeViewerItem oldItem, final TreeViewerItem newItem) {
+
+		// set parent for the new child item
+		newItem.setParentItem(this);
+
+		// ensure children are created
+		getFetchedChildren();
+
+		int oldItemIndex = 0;
+		for (final TreeViewerItem childItem : _children) {
+
+			if (oldItem == childItem) {
+
+				_children.add(oldItemIndex, newItem);
+
+				return;
+			}
+
+			oldItemIndex++;
+		}
+	}
+
+	/**
 	 * clear children so they will be fetched again the next time when they are displayed
 	 */
 	public void clearChildren() {
@@ -52,8 +79,8 @@ public abstract class TreeViewerItem {
 	}
 
 	/**
-	 * fetches the children for this tree item, childs can be added to this tree item with
-	 * {@link #addChild(TreeViewerItem)}
+	 * Fetches children for this tree item, childs can be added to this tree item with
+	 * {@link #addChild(TreeViewerItem)}.
 	 */
 	protected abstract void fetchChildren();
 
@@ -118,20 +145,22 @@ public abstract class TreeViewerItem {
 		return _children;
 	}
 
+	/**
+	 * @return Returns <code>true</code> when this item has children or when children have not yet
+	 *         been retrieved.
+	 */
 	public boolean hasChildren() {
 
 		if (_children == null) {
-			/*
-			 * if fChildren have not yet been retrieved we assume that fChildren can be available to
-			 * make the tree node expandable
+			/**
+			 * when _children have not yet been retrieved we assume that _children can be available
+			 * to make the tree node expandable
 			 */
 			return true;
 		} else {
 			return _children.size() > 0;
 		}
 	}
-
-	protected abstract void remove();
 
 	/**
 	 * Removes a child from this tree item

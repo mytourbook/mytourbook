@@ -23,6 +23,7 @@ import java.awt.Dimension;
 import net.tourbook.common.UI;
 import net.tourbook.common.tooltip.IToolProvider;
 import net.tourbook.common.tooltip.ToolTip3;
+import net.tourbook.common.tooltip.ToolTip3Tool;
 import net.tourbook.common.util.Util;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -44,7 +45,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.ui.IViewPart;
 
-public class TerrainProfileConfig implements IToolProvider {
+public class TerrainProfileConfiguration implements IToolProvider {
 
 	private static final String			STATE_PREFIX							= "STATE_TERRAIN_PROFILE_";				//$NON-NLS-1$
 	private static final String			STATE_TERRAIN_PROFILE_FOLLOW			= "STATE_TERRAIN_PROFILE_FOLLOW";			//$NON-NLS-1$
@@ -56,7 +57,6 @@ public class TerrainProfileConfig implements IToolProvider {
 	private static final String			STATE_TERRAIN_PROFILE_IS_TOOLTIP_MOVED	= "STATE_TERRAIN_PROFILE_IS_TOOLTIP_MOVED"; //$NON-NLS-1$
 
 	private IDialogSettings				_state;
-
 
 	private WorldWindowGLCanvas			_wwcanvas;
 	private TerrainProfileLayer			_profileLayer;
@@ -92,9 +92,9 @@ public class TerrainProfileConfig implements IToolProvider {
 	private Label						_lblProfileLength;
 	private Spinner						_spinnerProfileLength;
 
-	TerrainProfileConfig(	final WorldWindowGLCanvas wwcanvas,
-							final TerrainProfileLayer profileLayer,
-							final IDialogSettings state) {
+	TerrainProfileConfiguration(final WorldWindowGLCanvas wwcanvas,
+								final TerrainProfileLayer profileLayer,
+								final IDialogSettings state) {
 
 		_wwcanvas = wwcanvas;
 		_profileLayer = profileLayer;
@@ -112,8 +112,7 @@ public class TerrainProfileConfig implements IToolProvider {
 	}
 
 	@Override
-	public void createUI(final Composite parent) {
-
+	public void createToolUI(final Composite parent) {
 
 		parent.addDisposeListener(new DisposeListener() {
 			@Override
@@ -264,8 +263,13 @@ public class TerrainProfileConfig implements IToolProvider {
 	}
 
 	@Override
-	public String getTitle() {
+	public String getToolTitle() {
 		return _profileLayer.getName();
+	}
+
+	@Override
+	public boolean isToolMovable() {
+		return true;
 	}
 
 	private void onModify() {
@@ -366,18 +370,27 @@ public class TerrainProfileConfig implements IToolProvider {
 		/*
 		 * tooltip location
 		 */
-		final boolean isTTMoved = Util.getBoolean(ttShell.getData(ToolTip3.SHELL_STATE_IS_MOVED));
-		_state.put(STATE_TERRAIN_PROFILE_IS_TOOLTIP_MOVED, isTTMoved);
+		final Object shellData = ttShell.getData(ToolTip3.SHELL_DATA_TOOL);
+		if (shellData instanceof ToolTip3Tool) {
 
-		if (isTTMoved) {
+			final ToolTip3Tool ttTool = (ToolTip3Tool) shellData;
 
-			final IViewPart ttParentView = Map3Manager.getMap3PropertiesView();
-			if (ttParentView != null) {
+			// save move state
+			final boolean isMoved = ttTool.isMoved();
+			_state.put(STATE_TERRAIN_PROFILE_IS_TOOLTIP_MOVED, isMoved);
 
-				final Shell wbShell = ttParentView.getViewSite().getWorkbenchWindow().getShell();
+			if (isMoved) {
 
-				if (wbShell != null) {
-					UI.saveDialogBounds(_state, STATE_PREFIX, ttShell, wbShell);
+				// save dialog position
+
+				final IViewPart ttParentView = Map3Manager.getMap3PropertiesView();
+				if (ttParentView != null) {
+
+					final Shell wbShell = ttParentView.getViewSite().getWorkbenchWindow().getShell();
+
+					if (wbShell != null) {
+						UI.saveDialogBounds(_state, STATE_PREFIX, ttShell, wbShell);
+					}
 				}
 			}
 		}

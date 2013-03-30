@@ -37,10 +37,10 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.ui.dialogs.ContainerCheckedTreeViewer;
 
-public class PropertyViewerToolTip extends ToolTip3 {
+public class PropertyViewerToolTip extends ToolTip3 implements IToolProvider {
 
 	/**
-	 * Relative start of the sensitive area in a hovered row.
+	 * Relative horizontal start of the sensitive area in a hovered row.
 	 */
 	private static final double			HOVERED_SENSITIVE_AREA	= 0.66;
 
@@ -87,13 +87,10 @@ public class PropertyViewerToolTip extends ToolTip3 {
 		_boldFont = JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT);
 	}
 
+
+
 	@Override
-	protected void createToolTipContentArea(final Composite parent) {
-
-		createUI(parent);
-	}
-
-	private Composite createUI(final Composite parent) {
+	public void createToolUI(final Composite parent) {
 
 		/*
 		 * shell container is necessary because the margins of the inner container will hide the
@@ -111,8 +108,6 @@ public class PropertyViewerToolTip extends ToolTip3 {
 				UI.setColorForAllChildren(container, _fgColor, _bgColor);
 			}
 		}
-
-		return shellContainer;
 	}
 
 	private void createUI_20_Info(final Composite parent) {
@@ -153,6 +148,18 @@ public class PropertyViewerToolTip extends ToolTip3 {
 	ViewerRow getHoveredRow() {
 
 		return _sensitiveRowArea;
+	}
+
+	@Override
+	protected IToolProvider getToolProvider() {
+
+		if (_mapLayer == null) {
+			return this;
+		}
+
+		final boolean isLayerVisible = _mapLayer.toolProvider != null && _mapLayer.isLayerVisible;
+
+		return isLayerVisible ? _mapLayer.toolProvider : this;
 	}
 
 	@Override
@@ -243,28 +250,20 @@ public class PropertyViewerToolTip extends ToolTip3 {
 			ttDisplayLocation.y = ttDisplayLocation.y - tipSizeHeight - rowHeight;
 		}
 
-		resetUI();
-
 		return ttDisplayLocation;
 	}
 
 	@Override
-	protected IToolProvider isToolShell() {
+	public String getToolTitle() {
+		return UI.EMPTY_STRING;
+	}
 
-		if (_mapLayer == null) {
-			return null;
-		}
-
-		final boolean isLayerVisible = _mapLayer.layerConfigProvider != null && _mapLayer.isLayerVisible;
-
-		return isLayerVisible ? _mapLayer.layerConfigProvider : null;
+	@Override
+	public boolean isToolMovable() {
+		return false;
 	}
 
 	private void onDispose() {
-
-	}
-
-	private void resetUI() {
 
 	}
 
@@ -274,9 +273,9 @@ public class PropertyViewerToolTip extends ToolTip3 {
 
 			// tooltip is displayed
 
-			if (_mapLayer.layerConfigProvider != null) {
+			if (_mapLayer.toolProvider != null) {
 
-				// update UI when a custom config provider is set
+				// update UI when a tool provider is set in the layer
 
 				update();
 			}

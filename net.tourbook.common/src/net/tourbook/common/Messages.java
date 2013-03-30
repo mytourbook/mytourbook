@@ -19,7 +19,7 @@ import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS {
 
-	private static final String	BUNDLE_NAME	= "net.tourbook.common.messages";	//$NON-NLS-1$
+	private static final String	BUNDLE_NAME	= "net.tourbook.common.messages";				//$NON-NLS-1$
 
 	public static String		Image___Empty16;
 	public static String		Image__ConfigureColumns;
@@ -35,28 +35,12 @@ public class Messages extends NLS {
 
 	public static String		Image_Action_PhotoFilter;
 	public static String		Image_Action_PhotoFilter_Disabled;
+	public static String		Image_Action_PhotoFilterNoPhotos;
+	public static String		Image_Action_PhotoFilterWithPhotos;
 
-	public static String	Image_Action_PhotoFilterNoPhotos;
+	public static String		Map3_PropertyTooltip_Action_Close_Tooltip;
+	public static String		Map3_PropertyTooltip_Action_MoveToDefaultLocation_Tooltip;
 
-	public static String	Image_Action_PhotoFilterWithPhotos;
-
-<<<<<<< master
-=======
-	public static String	Image_App_CloseSmall;
-
-	public static String	Image_App_CloseSmall_Hovered;
-
-	public static String	Image_App_PinedSmall;
-
-	public static String	Image_App_PinnedSmall_Disabled;
-
-	public static String	Image_App_PinnedSmall_Hovered;
-
-	public static String	Map3_PropertyTooltip_Action_Close_Tooltip;
-
-	public static String	Map3_PropertyTooltip_Action_MoveToDefaultLocation_Tooltip;
-
->>>>>>> local
 	public static String		Weather_Clounds_Clouds;
 	public static String		Weather_Clounds_Clouny;
 	public static String		Weather_Clounds_IsNotDefined;

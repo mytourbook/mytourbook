@@ -30,14 +30,10 @@ public class Messages extends NLS {
 	public static String		Default_Layer_WorldMap;
 	public static String		Default_LayerName_Stars;
 
-	public static String		Image_App_CloseSmall;
-	public static String		Image_App_CloseSmall_Hovered;
-
 	public static String		Image_Map3_Map3PropertiesView;
 	public static String		Image_Map3_PropertyLayer;
 
 	public static String		Map3_Action_OpenMap3PropertiesView;
-	public static String		Map3_Manager_Layer_Category_WorldWind;
 
 	public static String		Terrain_Follow_Cursor;
 	public static String		Terrain_Follow_Eye;

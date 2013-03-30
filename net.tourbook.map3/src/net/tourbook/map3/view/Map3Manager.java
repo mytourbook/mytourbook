@@ -258,7 +258,7 @@ public class Map3Manager {
 		tviLayer.isLayerVisible = true;
 		tviLayer.defaultPosition = INSERT_BEFORE_COMPASS;
 
-		tviLayer.layerConfigProvider = new TerrainProfileConfig(_wwCanvas, profileLayer, _state);
+		tviLayer.toolProvider = new TerrainProfileConfiguration(_wwCanvas, profileLayer, _state);
 
 		_customLayers.put(layerId, tviLayer);
 	}
