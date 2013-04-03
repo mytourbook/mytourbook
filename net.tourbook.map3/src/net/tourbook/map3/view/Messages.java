@@ -6,9 +6,11 @@ public class Messages extends NLS {
 
 	private static final String	BUNDLE_NAME	= "net.tourbook.map3.view.messages";	//$NON-NLS-1$
 
-	public static String		Default_Category_Name_Controls;
-	public static String		Default_Category_Name_Features;
+	public static String	Default_Category_Name_Info;
+
 	public static String		Default_Category_Name_Map;
+
+	public static String	Default_Category_Name_Tools;
 
 	public static String		Default_Layer_Atmosphere;
 	public static String		Default_Layer_Compass;

@@ -15,18 +15,37 @@
  *******************************************************************************/
 package net.tourbook.common.tooltip;
 
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Shell;
 
 public class ToolTip3Tool {
 
-	private Shell		_ttShell;
+	private Shell			_ttShell;
 
 	/**
-	 * When not <code>null</code> the tooltip is movable.
+	 * When <code>null</code> this is a default tool otherwise it is a flexible tool.
 	 */
-	private MovableTool	_movableTools;
+	private FlexTool		_flexTool;
 
-	private Object		_toolTipArea;
+	private Object			_toolTipArea;
+
+	/**
+	 * State if a tool is visible or not. When a tool is hidden, the default tooltip is displayed
+	 * and not the tool specific tooltip.
+	 */
+	private boolean			_isVisible;
+
+	private IToolProvider	_toolProvider;
+
+	/**
+	 * Default location when tooltip area is hovered.
+	 */
+	private Point			_defaultLocation;
+
+	/**
+	 * Initial location where the tooltip should be displayed.
+	 */
+	private Point			_initialLocation;
 
 	/**
 	 * @param toolTipArea
@@ -51,8 +70,41 @@ public class ToolTip3Tool {
 		}
 	}
 
+	Point getDefaultLocation() {
+		return _defaultLocation;
+	}
+
+	Point getInitialLocation() {
+
+		// get location
+		final Point location = _initialLocation;
+
+		// reset location that location is returned only once
+		_initialLocation = null;
+
+		_toolProvider.resetInitialLocation();
+
+		if (location != null) {
+
+			if (_flexTool != null) {
+
+				/*
+				 * set moved because the _initialLocation is used to display the tooltip which is
+				 * only available when the tooltip was moved previously
+				 */
+				_flexTool.setMoved();
+			}
+		}
+
+		return location;
+	}
+
 	Shell getShell() {
 		return _ttShell;
+	}
+
+	IToolProvider getToolProvider() {
+		return _toolProvider;
 	}
 
 	Object getToolTipArea() {
@@ -60,10 +112,10 @@ public class ToolTip3Tool {
 	}
 
 	/**
-	 * @return Returns <code>true</code> when this is a movable tool.
+	 * @return Returns <code>true</code> when this is a flexible (movable) tool.
 	 */
-	boolean isMovable() {
-		return _movableTools != null;
+	boolean isFlexTool() {
+		return _flexTool != null;
 	}
 
 	/**
@@ -71,15 +123,65 @@ public class ToolTip3Tool {
 	 */
 	public boolean isMoved() {
 
-		if (_movableTools == null) {
+		if (_flexTool == null) {
 			return false;
 		}
 
-		return _movableTools.isMoved();
+		return _flexTool.isMoved();
 	}
 
-	void setMovable(final MovableTool movableTool) {
-		_movableTools = movableTool;
+	boolean isVisible() {
+		return _isVisible;
+	}
+
+	void setDefaultLocation(final Point defaultLocation) {
+		_defaultLocation = defaultLocation;
+	}
+
+	void setFlexable(final FlexTool flexTool) {
+
+		_flexTool = flexTool;
+
+		// flex tools are displayed when created
+		_isVisible = true;
+	}
+
+	void setInitialLocation(final Point initialLocation) {
+		_initialLocation = initialLocation;
+	}
+
+	void setToolProvider(final IToolProvider toolProvider) {
+		_toolProvider = toolProvider;
+	}
+
+	/**
+	 * Set state if this tool is visible or not.
+	 * 
+	 * @param isVisible
+	 */
+	void setToolVisibility(final boolean isVisible) {
+
+//		System.out.println(UI.timeStampNano() + " _isVisible=" + _isVisible + "\t" + isVisible);
+//		// TODO remove SYSTEM.OUT.PRINTLN
+//
+//		if (isVisible == false) {
+//			int a = 0;
+//			a++;
+//		}
+
+		_isVisible = isVisible;
+	}
+
+	@Override
+	public String toString() {
+		return String
+				.format(
+						"\nToolTip3Tool\n   _toolTipArea=%s, \n   _toolProvider=%s, \n   isFlexTool()=%s, \n   isMoved()=%s, \n   isVisible()=%s\n",
+						_toolTipArea,
+						_toolProvider,
+						isFlexTool(),
+						isMoved(),
+						isVisible());
 	}
 
 }

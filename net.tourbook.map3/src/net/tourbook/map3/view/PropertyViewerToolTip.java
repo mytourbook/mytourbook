@@ -18,6 +18,7 @@ package net.tourbook.map3.view;
 import gov.nasa.worldwind.layers.Layer;
 import net.tourbook.common.UI;
 import net.tourbook.common.tooltip.IToolProvider;
+import net.tourbook.common.tooltip.ToolProviderAdapter;
 import net.tourbook.common.tooltip.ToolTip3;
 
 import org.eclipse.jface.layout.GridLayoutFactory;
@@ -37,26 +38,24 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.ui.dialogs.ContainerCheckedTreeViewer;
 
-public class PropertyViewerToolTip extends ToolTip3 implements IToolProvider {
+public class PropertyViewerToolTip extends ToolTip3 {
 
 	/**
 	 * Relative horizontal start of the sensitive area in a hovered row.
 	 */
 	private static final double			HOVERED_SENSITIVE_AREA	= 0.66;
 
-	/**
-	 * Column index for the info/tooltip column
-	 */
-
 	private ContainerCheckedTreeViewer	_propViewer;
-	private Tree						_tree;
 
+	private Tree						_tree;
 	private ViewerRow					_viewerRow;
+
 	private ViewerRow					_sensitiveRowArea;
+	private IToolProvider				_defaultToolProvider	= new ToolProvider();
 
 	private TVIMap3Layer				_mapLayer;
-
 	private int							_hoverLeftBorder;
+
 	private int							_columnWidth;
 
 	/*
@@ -65,6 +64,13 @@ public class PropertyViewerToolTip extends ToolTip3 implements IToolProvider {
 	private Color						_bgColor;
 	private Color						_fgColor;
 	private Font						_boldFont;
+
+	private final class ToolProvider extends ToolProviderAdapter {
+		@Override
+		public void createToolUI(final Composite parent) {
+			createToolTipUI(parent);
+		}
+	}
 
 	public PropertyViewerToolTip(final ContainerCheckedTreeViewer propViewer) {
 
@@ -87,10 +93,7 @@ public class PropertyViewerToolTip extends ToolTip3 implements IToolProvider {
 		_boldFont = JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT);
 	}
 
-
-
-	@Override
-	public void createToolUI(final Composite parent) {
+	private void createToolTipUI(final Composite parent) {
 
 		/*
 		 * shell container is necessary because the margins of the inner container will hide the
@@ -139,7 +142,7 @@ public class PropertyViewerToolTip extends ToolTip3 implements IToolProvider {
 	}
 
 	/**
-	 * @return Returns row which is hovered with the mouse or <code>null</code> when no row is
+	 * @return Returns a row which is hovered with the mouse or <code>null</code> when no row is
 	 *         hovered or when mouse is not hoverering the sensitive area.
 	 *         <p>
 	 *         Sensitive area is 1/3 of the right side of the row which is set in
@@ -151,15 +154,29 @@ public class PropertyViewerToolTip extends ToolTip3 implements IToolProvider {
 	}
 
 	@Override
-	protected IToolProvider getToolProvider() {
+	protected IToolProvider getToolProvider(final Object toolTipArea) {
 
 		if (_mapLayer == null) {
-			return this;
+			return _defaultToolProvider;
 		}
 
-		final boolean isLayerVisible = _mapLayer.toolProvider != null && _mapLayer.isLayerVisible;
+		final boolean isToolProvider = _mapLayer.toolProvider != null;
 
-		return isLayerVisible ? _mapLayer.toolProvider : this;
+		if (isToolProvider) {
+
+			/**
+			 * !!! HACK !!!
+			 * <p>
+			 * Ensure the toolprovider contains the tooltip area. When a layer is hovered the first
+			 * time and the tool is set to be visible, then the flex tool should be displayed and
+			 * NOT the default tooltip.
+			 */
+			_mapLayer.toolProvider.setToolTipArea(toolTipArea);
+		}
+
+		final boolean isLayerVisible = isToolProvider && _mapLayer.isLayerVisible;
+
+		return isLayerVisible ? _mapLayer.toolProvider : _defaultToolProvider;
 	}
 
 	@Override
@@ -170,7 +187,7 @@ public class PropertyViewerToolTip extends ToolTip3 implements IToolProvider {
 		_viewerRow = null;
 		_sensitiveRowArea = null;
 
-		ViewerRow ttArea = null;
+		Object ttArea = null;
 
 		final ViewerCell viewerCell = _propViewer.getCell(ownerHoverPosition);
 
@@ -253,32 +270,23 @@ public class PropertyViewerToolTip extends ToolTip3 implements IToolProvider {
 		return ttDisplayLocation;
 	}
 
-	@Override
-	public String getToolTitle() {
-		return UI.EMPTY_STRING;
-	}
-
-	@Override
-	public boolean isToolMovable() {
-		return false;
-	}
-
 	private void onDispose() {
 
 	}
 
-	void setLayerVisibility(final TVIMap3Layer mapLayer) {
+	void setLayerVisibility(final TVIMap3Layer mapLayer, final boolean isUpdateUI) {
 
-		if (_mapLayer != null) {
+		if (mapLayer == null) {
+			return;
+		}
 
-			// tooltip is displayed
+		final IToolProvider toolProvider = mapLayer.toolProvider;
 
-			if (_mapLayer.toolProvider != null) {
+		if (toolProvider != null) {
 
-				// update UI when a tool provider is set in the layer
+			// update UI when a tool provider is set in the layer
 
-				update();
-			}
+			toggleToolVisibility(toolProvider, mapLayer.isLayerVisible, isUpdateUI);
 		}
 	}
 

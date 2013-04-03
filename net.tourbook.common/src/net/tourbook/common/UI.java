@@ -440,6 +440,12 @@ public class UI {
 		}
 	}
 
+	public static void resetInitialLocation(final IDialogSettings _state, final String statePrefix) {
+
+		_state.put(statePrefix + DIALOG_ORIGIN_X, (String) null);
+		_state.put(statePrefix + DIALOG_ORIGIN_Y, (String) null);
+	}
+
 	/**
 	 * This is a copy with modifications from {@link org.eclipse.jface.dialogs.Dialog}
 	 * 

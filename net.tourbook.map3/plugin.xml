@@ -63,7 +63,7 @@
    
 		<view
 			category="net.tourbook.category.Tools"
-			class="net.tourbook.map3.view.Map3PropertiesView"
+			class="net.tourbook.map3.view.Map3LayerView"
 			icon="icons/map3-properties.png"
 			id="net.tourbook.map3.Map3PropertiesView"
 			name="%View_Name_Map3Properties"

@@ -26,13 +26,17 @@ import org.eclipse.swt.events.MouseMoveListener;
 import org.eclipse.swt.events.MouseTrackListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 
-class MovableTool {
+/**
+ * A flexiable tool can be moved with the mouse.
+ */
+class FlexTool {
 
 	private static final int	WINDOW_TITLE_HEIGHT	= 12;
 
@@ -41,22 +45,22 @@ class MovableTool {
 	private int					_devYTTMouseDown;
 
 	private ToolTip3			_toolTip3;
-	private IToolProvider		_toolProvider;
+	private ToolTip3Tool		_tooltipTool;
 
-	private boolean				_isMoved;
+	private boolean				_isToolMoved;
 
 	/*
 	 * UI controls
 	 */
-	private Shell				_shell;
-
+//	private Shell				_shell;
+	private Composite			_headerContainer;
 	private Button				_btnDefaultLocation;
 	private Button				_btnClose;
 
-	MovableTool(final ToolTip3 toolTip3, final IToolProvider toolProvider) {
+	FlexTool(final ToolTip3 toolTip3, final ToolTip3Tool tooltipTool) {
 
 		_toolTip3 = toolTip3;
-		_toolProvider = toolProvider;
+		_tooltipTool = tooltipTool;
 	}
 
 	private void addHeaderListener(final Composite header) {
@@ -65,16 +69,12 @@ class MovableTool {
 
 			@Override
 			public void mouseEnter(final MouseEvent e) {
-
-				header.setCursor(_toolTip3.getCursorHand());
+				onMouseEnter(header);
 			}
 
 			@Override
 			public void mouseExit(final MouseEvent e) {
-
-				_isTTDragged = false;
-
-				header.setCursor(null);
+				onMouseExit(header);
 			}
 
 			@Override
@@ -84,55 +84,26 @@ class MovableTool {
 		header.addMouseMoveListener(new MouseMoveListener() {
 			@Override
 			public void mouseMove(final MouseEvent event) {
-
-//				System.out.println(UI.timeStampNano() + " mouseMove\t");
-//				// TODO remove SYSTEM.OUT.PRINTLN
-
-				if (_isTTDragged) {
-
-					final int xDiff = event.x - _devXTTMouseDown;
-					final int yDiff = event.y - _devYTTMouseDown;
-
-					setDraggedLocation(header.getShell(), xDiff, yDiff);
-				}
+				onMouseMove(header, event);
 			}
 		});
 
 		header.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseDown(final MouseEvent event) {
-
-//				System.out.println(UI.timeStampNano() + " mouseDown\t" + _cursorDragged); //$NON-NLS-1$
-//				// TODO remove SYSTEM.OUT.PRINTLN
-
-				_isTTDragged = true;
-
-				_devXTTMouseDown = event.x;
-				_devYTTMouseDown = event.y;
-
-				header.setCursor(_toolTip3.getCursorDragged());
+				onMouseDown(header, event);
 			}
 
 			@Override
 			public void mouseUp(final MouseEvent e) {
-
-				if (_isTTDragged) {
-
-					_isTTDragged = false;
-
-					_btnDefaultLocation.setEnabled(true);
-
-					_isMoved = true;
-				}
-
-				header.setCursor(_toolTip3.getCursorHand());
+				onMouseUp(header);
 			}
 		});
 	}
 
 	void createUI(final Shell shell) {
 
-		_shell = shell;
+//		_shell = shell;
 
 		/*
 		 * shell container is necessary because the margins of the inner container will hide the
@@ -144,6 +115,8 @@ class MovableTool {
 		{
 			createUI_10_Custom(toolContainer);
 		}
+
+		setHeaderColor();
 	}
 
 	private void createUI_10_Custom(final Composite parent) {
@@ -156,28 +129,31 @@ class MovableTool {
 				.applyTo(container);
 //			container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
 		{
-			_toolProvider.createToolUI(container);
+			_tooltipTool.getToolProvider().createToolUI(container);
 		}
 	}
 
 	private void createUI_20_ToolTipHeader(final Composite parent) {
 
-		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, false).hint(SWT.DEFAULT, WINDOW_TITLE_HEIGHT).applyTo(container);
-		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
-		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WIDGET_NORMAL_SHADOW));
+		_headerContainer = new Composite(parent, SWT.NONE);
+		GridDataFactory
+				.fillDefaults()
+				.grab(true, false)
+				.hint(SWT.DEFAULT, WINDOW_TITLE_HEIGHT)
+				.applyTo(_headerContainer);
+		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(_headerContainer);
 //		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
 
 		// show layer title in the hovered tooltip header
-		container.setToolTipText(_toolProvider.getToolTitle());
+		_headerContainer.setToolTipText(_tooltipTool.getToolProvider().getToolTitle());
 
-		addHeaderListener(container);
+		addHeaderListener(_headerContainer);
 
 		{
 			/*
 			 * button: pin
 			 */
-			_btnDefaultLocation = new Button(container, SWT.NONE);
+			_btnDefaultLocation = new Button(_headerContainer, SWT.NONE);
 
 			GridDataFactory.fillDefaults()//
 					.align(SWT.BEGINNING, SWT.CENTER)
@@ -186,7 +162,6 @@ class MovableTool {
 					.applyTo(_btnDefaultLocation);
 
 			_btnDefaultLocation.setToolTipText(Messages.Map3_PropertyTooltip_Action_MoveToDefaultLocation_Tooltip);
-			_btnDefaultLocation.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WIDGET_NORMAL_SHADOW));
 
 			_btnDefaultLocation.addSelectionListener(new SelectionAdapter() {
 				@Override
@@ -200,7 +175,7 @@ class MovableTool {
 			/*
 			 * button: close
 			 */
-			_btnClose = new Button(container, SWT.NONE);
+			_btnClose = new Button(_headerContainer, SWT.NONE);
 
 			GridDataFactory.fillDefaults()//
 					.align(SWT.END, SWT.CENTER)
@@ -209,7 +184,6 @@ class MovableTool {
 					.applyTo(_btnClose);
 
 			_btnClose.setToolTipText(Messages.Map3_PropertyTooltip_Action_Close_Tooltip);
-			_btnClose.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WIDGET_NORMAL_SHADOW));
 
 			_btnClose.addSelectionListener(new SelectionAdapter() {
 				@Override
@@ -222,12 +196,61 @@ class MovableTool {
 	}
 
 	boolean isMoved() {
-		return _isMoved;
+		return _isToolMoved;
+	}
+
+	private void onMouseDown(final Composite header, final MouseEvent event) {
+
+		_isTTDragged = true;
+
+		_devXTTMouseDown = event.x;
+		_devYTTMouseDown = event.y;
+
+		header.setCursor(_toolTip3.getCursorDragged());
+	}
+
+	private void onMouseEnter(final Composite header) {
+
+		header.setCursor(_toolTip3.getCursorHand());
+	}
+
+	private void onMouseExit(final Composite header) {
+
+		_isTTDragged = false;
+
+		header.setCursor(null);
+	}
+
+	private void onMouseMove(final Composite header, final MouseEvent event) {
+
+		if (_isTTDragged) {
+
+			final int xDiff = event.x - _devXTTMouseDown;
+			final int yDiff = event.y - _devYTTMouseDown;
+
+			setDraggedLocation(header.getShell(), xDiff, yDiff);
+		}
+	}
+
+	private void onMouseUp(final Composite header) {
+
+		if (_isTTDragged) {
+
+			_isTTDragged = false;
+
+			updateUI_MoveLocation(true);
+
+			_toolTip3.disableDisplayListener();
+		}
+
+		header.setCursor(_toolTip3.getCursorHand());
 	}
 
 	private void onSelectDefaultLocation() {
-		// TODO Auto-generated method stub
 
+		updateUI_MoveLocation(false);
+
+		_toolTip3.moveToDefaultLocation(_tooltipTool);
 	}
 
 	/**
@@ -253,6 +276,32 @@ class MovableTool {
 		final Point shellLocation = _toolTip3.fixupDisplayBounds(size, movedLocation);
 
 		shell.setLocation(shellLocation.x, shellLocation.y);
+	}
+
+	private void setHeaderColor() {
+
+		final Color headerBg = _isToolMoved //
+				? Display.getCurrent().getSystemColor(SWT.COLOR_WIDGET_LIGHT_SHADOW)
+				: Display.getCurrent().getSystemColor(SWT.COLOR_WIDGET_NORMAL_SHADOW);
+
+		_headerContainer.setBackground(headerBg);
+		_btnDefaultLocation.setBackground(headerBg);
+		_btnClose.setBackground(headerBg);
+	}
+
+	void setMoved() {
+		updateUI_MoveLocation(true);
+	}
+
+	private void updateUI_MoveLocation(final boolean isMoved) {
+
+		// set move state
+		_isToolMoved = isMoved;
+
+		// update UI
+		_btnDefaultLocation.setEnabled(isMoved);
+
+		setHeaderColor();
 	}
 
 }

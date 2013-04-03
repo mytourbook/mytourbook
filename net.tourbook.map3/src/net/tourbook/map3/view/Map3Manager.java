@@ -27,7 +27,6 @@ import gov.nasa.worldwind.layers.LayerList;
 import gov.nasa.worldwind.layers.TerrainProfileLayer;
 import gov.nasa.worldwind.layers.ViewControlsLayer;
 import gov.nasa.worldwind.layers.ViewControlsSelectListener;
-import gov.nasa.worldwind.layers.placename.PlaceNameLayer;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -98,10 +97,9 @@ public class Map3Manager {
 	private static Map3View							_map3View;
 
 	/**
-	 * Instance of {@link Map3PropertiesView} or <code>null</code> when view is not created or
-	 * disposed.
+	 * Instance of {@link Map3LayerView} or <code>null</code> when view is not created or disposed.
 	 */
-	private static Map3PropertiesView				_map3PropertiesView;
+	private static Map3LayerView					_map3PropertiesView;
 
 	private static LayerList						_wwDefaultLayers;
 
@@ -225,6 +223,8 @@ public class Map3Manager {
 		tviLayer.isLayerVisible = true;
 		tviLayer.defaultPosition = INSERT_BEFORE_COMPASS;
 
+		_uiEnabledLayersFromXml.add(tviLayer);
+
 		_customLayers.put(layerId, tviLayer);
 	}
 
@@ -238,6 +238,8 @@ public class Map3Manager {
 //		profileLayer.setEventSource(_wwCanvas);
 //		profileLayer.setFollow(TerrainProfileLayer.FOLLOW_PATH);
 //		profileLayer.setShowProfileLine(false);
+
+		final boolean isVisible = false;
 
 		// Add TerrainProfileLayer
 		final TerrainProfileLayer profileLayer = new TerrainProfileLayer();
@@ -255,10 +257,18 @@ public class Map3Manager {
 		tviLayer.id = layerId;
 
 		// default is enabled
-		tviLayer.isLayerVisible = true;
+		tviLayer.isLayerVisible = isVisible;
 		tviLayer.defaultPosition = INSERT_BEFORE_COMPASS;
 
-		tviLayer.toolProvider = new TerrainProfileConfiguration(_wwCanvas, profileLayer, _state);
+		final TerrainProfileConfiguration terrainProfileConfig = new TerrainProfileConfiguration(
+				_wwCanvas,
+				profileLayer,
+				_state);
+		tviLayer.toolProvider = terrainProfileConfig.getToolProvider();
+
+		if (isVisible) {
+			_uiEnabledLayersFromXml.add(tviLayer);
+		}
 
 		_customLayers.put(layerId, tviLayer);
 	}
@@ -285,6 +295,8 @@ public class Map3Manager {
 		tviLayer.defaultPosition = INSERT_BEFORE_COMPASS;
 
 		tviLayer.addCheckStateListener(new CheckStateListener(viewControlsLayer));
+
+		_uiEnabledLayersFromXml.add(tviLayer);
 
 		_customLayers.put(layerId, tviLayer);
 	}
@@ -321,47 +333,47 @@ public class Map3Manager {
 	private static XMLMemento createLayerXml_0_DefaultTreeItems() {
 
 		XMLMemento xmlRoot;
-
+		IMemento xmlWWCategory;
 		try {
 
 			xmlRoot = createLayerXml_10_WriteRoot();
 
-			IMemento xmlWWCategory = xmlRoot.createChild(TAG_CATEGORY);
+			xmlWWCategory = xmlRoot.createChild(TAG_CATEGORY);
 			xmlWWCategory.putString(ATTR_NAME, Messages.Default_Category_Name_Map);
 			xmlWWCategory.putBoolean(ATTR_IS_EXPANDED, true);
 
 			{
-				createLayerXml_20_DefaultLayer(xmlWWCategory, MapDefaultLayer.ID_STARS, true);
-				createLayerXml_20_DefaultLayer(xmlWWCategory, MapDefaultLayer.ID_ATMOSPHERE, true);
-				createLayerXml_20_DefaultLayer(xmlWWCategory, MapDefaultLayer.ID_NASA_BLUE_MARBLE_IMAGE, true);
-				createLayerXml_20_DefaultLayer(xmlWWCategory, MapDefaultLayer.ID_BLUE_MARBLE_WMS_2004, true);
-				createLayerXml_20_DefaultLayer(xmlWWCategory, MapDefaultLayer.ID_I_CUBED_LANDSAT, true);
-				createLayerXml_20_DefaultLayer(xmlWWCategory, MapDefaultLayer.ID_USDA_NAIP, false);
-				createLayerXml_20_DefaultLayer(xmlWWCategory, MapDefaultLayer.ID_USDA_NAIP_USGS, false);
-				createLayerXml_20_DefaultLayer(xmlWWCategory, MapDefaultLayer.ID_MS_VIRTUAL_EARTH_AERIAL, false);
-				createLayerXml_20_DefaultLayer(xmlWWCategory, MapDefaultLayer.ID_BING_IMAGERY, false);
-				createLayerXml_20_DefaultLayer(xmlWWCategory, MapDefaultLayer.ID_USGS_TOPOGRAPHIC_MAPS_1_250K, false);
-				createLayerXml_20_DefaultLayer(xmlWWCategory, MapDefaultLayer.ID_USGS_TOPOGRAPHIC_MAPS_1_100K, false);
-				createLayerXml_20_DefaultLayer(xmlWWCategory, MapDefaultLayer.ID_USGS_TOPOGRAPHIC_MAPS_1_24K, false);
-				createLayerXml_20_DefaultLayer(xmlWWCategory, MapDefaultLayer.ID_USGS_URBAN_AREA_ORTHO, false);
-				createLayerXml_20_DefaultLayer(xmlWWCategory, MapDefaultLayer.ID_POLITICAL_BOUNDARIES, false);
-				createLayerXml_20_DefaultLayer(xmlWWCategory, MapDefaultLayer.ID_OPEN_STREET_MAP, false);
+				createLayerXml_20_DefaultLayer(xmlWWCategory, true, MapDefaultLayer.ID_STARS);
+				createLayerXml_20_DefaultLayer(xmlWWCategory, true, MapDefaultLayer.ID_ATMOSPHERE);
+				createLayerXml_20_DefaultLayer(xmlWWCategory, true, MapDefaultLayer.ID_NASA_BLUE_MARBLE_IMAGE);
+				createLayerXml_20_DefaultLayer(xmlWWCategory, true, MapDefaultLayer.ID_BLUE_MARBLE_WMS_2004);
+				createLayerXml_20_DefaultLayer(xmlWWCategory, true, MapDefaultLayer.ID_I_CUBED_LANDSAT);
+				createLayerXml_20_DefaultLayer(xmlWWCategory, false, MapDefaultLayer.ID_USDA_NAIP);
+				createLayerXml_20_DefaultLayer(xmlWWCategory, false, MapDefaultLayer.ID_USDA_NAIP_USGS);
+				createLayerXml_20_DefaultLayer(xmlWWCategory, false, MapDefaultLayer.ID_MS_VIRTUAL_EARTH_AERIAL);
+				createLayerXml_20_DefaultLayer(xmlWWCategory, false, MapDefaultLayer.ID_BING_IMAGERY);
+				createLayerXml_20_DefaultLayer(xmlWWCategory, false, MapDefaultLayer.ID_USGS_TOPOGRAPHIC_MAPS_1_250K);
+				createLayerXml_20_DefaultLayer(xmlWWCategory, false, MapDefaultLayer.ID_USGS_TOPOGRAPHIC_MAPS_1_100K);
+				createLayerXml_20_DefaultLayer(xmlWWCategory, false, MapDefaultLayer.ID_USGS_TOPOGRAPHIC_MAPS_1_24K);
+				createLayerXml_20_DefaultLayer(xmlWWCategory, false, MapDefaultLayer.ID_USGS_URBAN_AREA_ORTHO);
+				createLayerXml_20_DefaultLayer(xmlWWCategory, false, MapDefaultLayer.ID_POLITICAL_BOUNDARIES);
+				createLayerXml_20_DefaultLayer(xmlWWCategory, false, MapDefaultLayer.ID_OPEN_STREET_MAP);
 			}
 
 			xmlWWCategory = xmlRoot.createChild(TAG_CATEGORY);
-			xmlWWCategory.putString(ATTR_NAME, Messages.Default_Category_Name_Features);
+			xmlWWCategory.putString(ATTR_NAME, Messages.Default_Category_Name_Info);
 			xmlWWCategory.putBoolean(ATTR_IS_EXPANDED, true);
 			{
-				createLayerXml_20_DefaultLayer(xmlWWCategory, MapDefaultLayer.ID_PLACE_NAMES, true);
+				createLayerXml_20_DefaultLayer(xmlWWCategory, true, MapDefaultLayer.ID_PLACE_NAMES);
+				createLayerXml_20_DefaultLayer(xmlWWCategory, true, MapDefaultLayer.ID_WORLD_MAP);
+				createLayerXml_20_DefaultLayer(xmlWWCategory, true, MapDefaultLayer.ID_SCALE_BAR);
 			}
 
 			xmlWWCategory = xmlRoot.createChild(TAG_CATEGORY);
-			xmlWWCategory.putString(ATTR_NAME, Messages.Default_Category_Name_Controls);
+			xmlWWCategory.putString(ATTR_NAME, Messages.Default_Category_Name_Tools);
 			xmlWWCategory.putBoolean(ATTR_IS_EXPANDED, true);
 			{
-				createLayerXml_20_DefaultLayer(xmlWWCategory, MapDefaultLayer.ID_WORLD_MAP, true);
-				createLayerXml_20_DefaultLayer(xmlWWCategory, MapDefaultLayer.ID_SCALE_BAR, true);
-				createLayerXml_20_DefaultLayer(xmlWWCategory, MapDefaultLayer.ID_COMPASS, true);
+				createLayerXml_20_DefaultLayer(xmlWWCategory, true, MapDefaultLayer.ID_COMPASS);
 			}
 
 		} catch (final Exception e) {
@@ -389,8 +401,8 @@ public class Map3Manager {
 	}
 
 	private static void createLayerXml_20_DefaultLayer(	final IMemento xmlCategory,
-														final String defaultLayerId,
-														final boolean isEnabled) {
+														final boolean isEnabled,
+														final String defaultLayerId) {
 
 		final DefaultLayer mapDefaultLayer = MapDefaultLayer.getLayer(defaultLayerId);
 
@@ -526,9 +538,9 @@ public class Map3Manager {
 	}
 
 	/**
-	 * @return Returns instance of {@link Map3PropertiesView} or null when view is not created.
+	 * @return Returns instance of {@link Map3LayerView} or null when view is not created.
 	 */
-	static Map3PropertiesView getMap3PropertiesView() {
+	static Map3LayerView getMap3PropertiesView() {
 		return _map3PropertiesView;
 	}
 
@@ -563,14 +575,14 @@ public class Map3Manager {
 	 */
 	public static void insertAfterPlacenames(final WorldWindow wwd, final Layer layer) {
 
-		int compassPosition = 0;
-		final LayerList layers = wwd.getModel().getLayers();
-		for (final Layer l : layers) {
-			if (l instanceof PlaceNameLayer) {
-				compassPosition = layers.indexOf(l);
-			}
-		}
-		layers.add(compassPosition + 1, layer);
+//		int compassPosition = 0;
+//		final LayerList layers = wwd.getModel().getLayers();
+//		for (final Layer l : layers) {
+//			if (l instanceof PlaceNameLayer) {
+//				compassPosition = layers.indexOf(l);
+//			}
+//		}
+//		layers.add(compassPosition + 1, layer);
 	}
 
 	/**
@@ -586,21 +598,24 @@ public class Map3Manager {
 		 * update WW model
 		 */
 		int compassPosition = 0;
-		final LayerList layers = wwd.getModel().getLayers();
-		for (final Layer l : layers) {
-			if (l instanceof CompassLayer) {
-				compassPosition = layers.indexOf(l);
+		final LayerList wwLayers = wwd.getModel().getLayers();
+		for (final Layer wwLayer : wwLayers) {
+			if (wwLayer instanceof CompassLayer) {
+				compassPosition = wwLayers.indexOf(wwLayer);
 			}
 		}
 
 		final Layer newWWLayer = newUILayer.wwLayer;
 
-		layers.add(compassPosition, newWWLayer);
+		wwLayers.add(compassPosition, newWWLayer);
+
+		// update ww layer visibility
+		newWWLayer.setEnabled(newUILayer.isLayerVisible);
 
 		/*
 		 * update UI model
 		 */
-		final TVIMap3Layer insertedUILayer = insertBeforeCompassInUIModel(_uiRootItem, newWWLayer, newUILayer);
+		final TVIMap3Layer insertedUILayer = insertBeforeCompass_10(_uiRootItem, newWWLayer, newUILayer);
 
 		return insertedUILayer;
 	}
@@ -617,9 +632,9 @@ public class Map3Manager {
 	 * @param newUILayer
 	 * @return
 	 */
-	private static TVIMap3Layer insertBeforeCompassInUIModel(	final TVIMap3Item tviParent,
-																final Layer newWWLayer,
-																final TVIMap3Layer newUILayer) {
+	private static TVIMap3Layer insertBeforeCompass_10(	final TVIMap3Item tviParent,
+														final Layer newWWLayer,
+														final TVIMap3Layer newUILayer) {
 
 		for (final TreeViewerItem tviChild : tviParent.getFetchedChildren()) {
 
@@ -637,7 +652,7 @@ public class Map3Manager {
 
 			} else if (tviChild instanceof TVIMap3Category) {
 
-				final TVIMap3Layer insertedLayer = insertBeforeCompassInUIModel(
+				final TVIMap3Layer insertedLayer = insertBeforeCompass_10(
 						(TVIMap3Category) tviChild,
 						newWWLayer,
 						newUILayer);
@@ -661,15 +676,15 @@ public class Map3Manager {
 	 */
 	public static void insertBeforeLayerName(final WorldWindow wwd, final Layer layer, final String targetName) {
 
-		int targetPosition = 0;
-		final LayerList layers = wwd.getModel().getLayers();
-		for (final Layer l : layers) {
-			if (l.getName().indexOf(targetName) != -1) {
-				targetPosition = layers.indexOf(l);
-				break;
-			}
-		}
-		layers.add(targetPosition, layer);
+//		int targetPosition = 0;
+//		final LayerList layers = wwd.getModel().getLayers();
+//		for (final Layer l : layers) {
+//			if (l.getName().indexOf(targetName) != -1) {
+//				targetPosition = layers.indexOf(l);
+//				break;
+//			}
+//		}
+//		layers.add(targetPosition, layer);
 	}
 
 	/**
@@ -680,14 +695,14 @@ public class Map3Manager {
 	 */
 	public static void insertBeforePlacenames(final WorldWindow wwd, final Layer layer) {
 
-		int compassPosition = 0;
-		final LayerList layers = wwd.getModel().getLayers();
-		for (final Layer l : layers) {
-			if (l instanceof PlaceNameLayer) {
-				compassPosition = layers.indexOf(l);
-			}
-		}
-		layers.add(compassPosition, layer);
+//		int compassPosition = 0;
+//		final LayerList layers = wwd.getModel().getLayers();
+//		for (final Layer l : layers) {
+//			if (l instanceof PlaceNameLayer) {
+//				compassPosition = layers.indexOf(l);
+//			}
+//		}
+//		layers.add(compassPosition, layer);
 	}
 
 	private static boolean isCategoryExpanded(final TVIMap3Category tviCategory) {
@@ -904,7 +919,7 @@ public class Map3Manager {
 	/**
 	 * @param map3PropertiesView
 	 */
-	static void setMap3PropertiesView(final Map3PropertiesView map3PropertiesView) {
+	static void setMap3PropertiesView(final Map3LayerView map3PropertiesView) {
 		_map3PropertiesView = map3PropertiesView;
 	}
 
@@ -946,6 +961,7 @@ public class Map3Manager {
 	 * Ensure All custom layers are set in the ww model.
 	 * 
 	 * @param modelLayers
+	 *            Layers which are already added to the model.
 	 */
 	private static void updateWWModel(final LayerList modelLayers) {
 
@@ -956,6 +972,8 @@ public class Map3Manager {
 			final Layer customWWLayer = tviLayer.wwLayer;
 
 			if (modelLayers.contains(customWWLayer)) {
+
+				// layer is already contained in the model
 				continue;
 			}
 
@@ -975,7 +993,7 @@ public class Map3Manager {
 		}
 
 		if (_map3PropertiesView != null && insertedLayers.size() > 0) {
-			_map3PropertiesView.updateUINewLayer(insertedLayers);
+			_map3PropertiesView.updateUI_NewLayer(insertedLayers);
 		}
 	}
 

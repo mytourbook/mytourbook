@@ -30,7 +30,7 @@ public class ActionOpenMap3Properties extends Action {
 
 	@Override
 	public void run() {
-		Util.showView(Map3PropertiesView.ID, true);
+		Util.showView(Map3LayerView.ID, true);
 	}
 
 }

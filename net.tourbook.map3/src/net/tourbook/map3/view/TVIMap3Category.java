@@ -96,7 +96,7 @@ public class TVIMap3Category extends TVIMap3Item {
 
 		ContainerCheckedTreeViewer propViewer = null;
 
-		final Map3PropertiesView propView = Map3Manager.getMap3PropertiesView();
+		final Map3LayerView propView = Map3Manager.getMap3PropertiesView();
 		if (propView != null) {
 
 			propViewer = propView.getPropertiesViewer();

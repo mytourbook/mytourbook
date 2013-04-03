@@ -45,7 +45,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.ui.IViewPart;
 
-public class TerrainProfileConfiguration implements IToolProvider {
+public class TerrainProfileConfiguration {
 
 	private static final String			STATE_PREFIX							= "STATE_TERRAIN_PROFILE_";				//$NON-NLS-1$
 	private static final String			STATE_TERRAIN_PROFILE_FOLLOW			= "STATE_TERRAIN_PROFILE_FOLLOW";			//$NON-NLS-1$
@@ -81,16 +81,59 @@ public class TerrainProfileConfiguration implements IToolProvider {
 			Messages.Terrain_Follow_Object										};
 
 	private SelectionAdapter			_selectionListener;
+
 	private Point						_initialTTLocation;
+	private Object						_toolTipArea;
+
+	private IToolProvider				_toolProvider;
 
 	// UI controls
 	private Combo						_comboDimension;
+
 	private Combo						_comboFollow;
 	private Button						_chkShowEye;
 	private Button						_chkKeepProportions;
 	private Button						_chkZeroBased;
 	private Label						_lblProfileLength;
 	private Spinner						_spinnerProfileLength;
+
+	private class TerrainToolProvider implements IToolProvider {
+
+		@Override
+		public void createToolUI(final Composite parent) {
+			createUI(parent);
+		}
+
+		@Override
+		public Point getInitialLocation() {
+			return _initialTTLocation;
+		}
+
+		@Override
+		public Object getToolTipArea() {
+			return _toolTipArea;
+		}
+
+		@Override
+		public String getToolTitle() {
+			return _profileLayer.getName();
+		}
+
+		@Override
+		public boolean isFlexTool() {
+			return true;
+		}
+
+		@Override
+		public void resetInitialLocation() {
+			resetInitialLocation2();
+		}
+
+		@Override
+		public void setToolTipArea(final Object toolTipArea) {
+			_toolTipArea = toolTipArea;
+		}
+	};
 
 	TerrainProfileConfiguration(final WorldWindowGLCanvas wwcanvas,
 								final TerrainProfileLayer profileLayer,
@@ -99,6 +142,8 @@ public class TerrainProfileConfiguration implements IToolProvider {
 		_wwcanvas = wwcanvas;
 		_profileLayer = profileLayer;
 		_state = state;
+
+		_toolProvider = new TerrainToolProvider();
 
 		_selectionListener = new SelectionAdapter() {
 			@Override
@@ -111,8 +156,7 @@ public class TerrainProfileConfiguration implements IToolProvider {
 		};
 	}
 
-	@Override
-	public void createToolUI(final Composite parent) {
+	private void createUI(final Composite parent) {
 
 		parent.addDisposeListener(new DisposeListener() {
 			@Override
@@ -262,14 +306,8 @@ public class TerrainProfileConfiguration implements IToolProvider {
 		}
 	}
 
-	@Override
-	public String getToolTitle() {
-		return _profileLayer.getName();
-	}
-
-	@Override
-	public boolean isToolMovable() {
-		return true;
+	IToolProvider getToolProvider() {
+		return _toolProvider;
 	}
 
 	private void onModify() {
@@ -317,6 +355,13 @@ public class TerrainProfileConfiguration implements IToolProvider {
 		enableControls();
 
 		_wwcanvas.redraw();
+	}
+
+	private void resetInitialLocation2() {
+
+		_state.put(STATE_TERRAIN_PROFILE_IS_TOOLTIP_MOVED, false);
+
+		UI.resetInitialLocation(_state, STATE_PREFIX);
 	}
 
 	private void restoreState() {
@@ -368,7 +413,7 @@ public class TerrainProfileConfiguration implements IToolProvider {
 		_state.put(STATE_TERRAIN_PROFILE_PROFILE_LENGTH, _spinnerProfileLength.getSelection());
 
 		/*
-		 * tooltip location
+		 * save tooltip location
 		 */
 		final Object shellData = ttShell.getData(ToolTip3.SHELL_DATA_TOOL);
 		if (shellData instanceof ToolTip3Tool) {
@@ -381,7 +426,7 @@ public class TerrainProfileConfiguration implements IToolProvider {
 
 			if (isMoved) {
 
-				// save dialog position
+				// save dialog position ONLY when moved, when not moved the tooltip is displayed at the default location
 
 				final IViewPart ttParentView = Map3Manager.getMap3PropertiesView();
 				if (ttParentView != null) {
@@ -394,6 +439,20 @@ public class TerrainProfileConfiguration implements IToolProvider {
 				}
 			}
 		}
+	}
+
+	@Override
+	public String toString() {
+		final StringBuilder builder = new StringBuilder();
+		builder
+				.append("\nTerrainProfileConfiguration\n   getToolTipArea()=")
+				.append(_toolProvider.getToolTipArea())
+				.append(", \n   getToolTitle()=")
+				.append(_toolProvider.getToolTitle())
+				.append(", \n   isToolMovable()=")
+				.append(_toolProvider.isFlexTool())
+				.append("\n");
+		return builder.toString();
 	}
 
 	private void updateUI() {

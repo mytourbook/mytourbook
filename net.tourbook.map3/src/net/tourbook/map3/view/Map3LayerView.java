@@ -22,10 +22,8 @@ import net.tourbook.common.UI;
 import net.tourbook.common.util.TreeViewerItem;
 import net.tourbook.map3.Activator;
 
-import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
-import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.layout.TreeColumnLayout;
 import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.CheckStateChangedEvent;
@@ -54,18 +52,18 @@ import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.dialogs.ContainerCheckedTreeViewer;
 import org.eclipse.ui.part.ViewPart;
 
-public class Map3PropertiesView extends ViewPart {
+public class Map3LayerView extends ViewPart {
 
 	public static final String			ID				= "net.tourbook.map3.Map3PropertiesView";					//$NON-NLS-1$
 
-	private final IDialogSettings		_state			= Activator.getDefault().getDialogSettingsSection(ID);
+//	private final IDialogSettings		_state			= Activator.getDefault().getDialogSettingsSection(ID);
 
-	private ContainerCheckedTreeViewer	_propViewer;
+	private ContainerCheckedTreeViewer	_layerViewer;
 
 	private Image						_imgLayerProp	= Activator.getImageDescriptor(
 																Messages.Image_Map3_PropertyLayer).createImage();
 
-	private PixelConverter				_pc;
+//	private PixelConverter				_pc;
 
 	private IPartListener2				_partListener;
 
@@ -100,7 +98,7 @@ public class Map3PropertiesView extends ViewPart {
 		public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
 	}
 
-	public Map3PropertiesView() {}
+	public Map3LayerView() {}
 
 	private void addPartListener() {
 
@@ -113,7 +111,7 @@ public class Map3PropertiesView extends ViewPart {
 
 			@Override
 			public void partClosed(final IWorkbenchPartReference partRef) {
-				if (partRef.getPart(false) == Map3PropertiesView.this) {
+				if (partRef.getPart(false) == Map3LayerView.this) {
 					saveState();
 				}
 			}
@@ -146,24 +144,24 @@ public class Map3PropertiesView extends ViewPart {
 		Map3Manager.setMap3PropertiesView(this);
 
 		// restore layers
-		_propViewer.setInput(new Object());
+		_layerViewer.setInput(new Object());
 
 		restoreState();
 	}
 
 	private void createUI(final Composite parent) {
 
-		_pc = new PixelConverter(parent);
+//		_pc = new PixelConverter(parent);
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
 		GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
 		{
-			createUI_10_PropViewer(container);
+			createUI_10_LayerViewer(container);
 		}
 	}
 
-	private Control createUI_10_PropViewer(final Composite parent) {
+	private Control createUI_10_LayerViewer(final Composite parent) {
 
 		final TreeColumnLayout treeLayout = new TreeColumnLayout();
 
@@ -199,26 +197,26 @@ public class Map3PropertiesView extends ViewPart {
 			/*
 			 * tree viewer
 			 */
-			_propViewer = new ContainerCheckedTreeViewer(tree);
+			_layerViewer = new ContainerCheckedTreeViewer(tree);
 
-			_propViewer.setContentProvider(new PropertiesContentProvider());
-			_propViewer.setUseHashlookup(true);
+			_layerViewer.setContentProvider(new PropertiesContentProvider());
+			_layerViewer.setUseHashlookup(true);
 
-			_propViewer.addDoubleClickListener(new IDoubleClickListener() {
+			_layerViewer.addDoubleClickListener(new IDoubleClickListener() {
 				@Override
 				public void doubleClick(final DoubleClickEvent event) {
 
-					final IStructuredSelection selection = (IStructuredSelection) _propViewer.getSelection();
+					final IStructuredSelection selection = (IStructuredSelection) _layerViewer.getSelection();
 
 					final Object firstItem = selection.getFirstElement();
 					if (firstItem instanceof TVIMap3Layer) {
 
-						toggleLayerVisibility((TVIMap3Layer) firstItem, true);
+						toggleLayerVisibility((TVIMap3Layer) firstItem, true, false);
 					}
 				}
 			});
 
-			_propViewer.addTreeListener(new ITreeViewerListener() {
+			_layerViewer.addTreeListener(new ITreeViewerListener() {
 
 				@Override
 				public void treeCollapsed(final TreeExpansionEvent event) {}
@@ -229,15 +227,10 @@ public class Map3PropertiesView extends ViewPart {
 				}
 			});
 
-			_propViewer.addCheckStateListener(new ICheckStateListener() {
-
+			_layerViewer.addCheckStateListener(new ICheckStateListener() {
 				@Override
 				public void checkStateChanged(final CheckStateChangedEvent event) {
-
-					final Object itemData = event.getElement();
-					if (itemData instanceof TVIMap3Layer) {
-						toggleLayerVisibility((TVIMap3Layer) itemData, false);
-					}
+					onChangeCheckState(event);
 				}
 			});
 		}
@@ -247,7 +240,7 @@ public class Map3PropertiesView extends ViewPart {
 		// hide default tooltip and display the custom tooltip
 		tree.setToolTipText(UI.EMPTY_STRING);
 
-		_propToolTip = new PropertyViewerToolTip(_propViewer);
+		_propToolTip = new PropertyViewerToolTip(_layerViewer);
 
 		return layoutContainer;
 	}
@@ -269,7 +262,7 @@ public class Map3PropertiesView extends ViewPart {
 		/*
 		 * column: category/layer
 		 */
-		tvc = new TreeViewerColumn(_propViewer, SWT.LEAD);
+		tvc = new TreeViewerColumn(_layerViewer, SWT.LEAD);
 		tc = tvc.getColumn();
 		tvc.setLabelProvider(new CellLabelProvider() {
 			@Override
@@ -299,7 +292,67 @@ public class Map3PropertiesView extends ViewPart {
 	}
 
 	ContainerCheckedTreeViewer getPropertiesViewer() {
-		return _propViewer;
+		return _layerViewer;
+	}
+
+	private void onChangeCheckState(final CheckStateChangedEvent event) {
+
+		final Object viewerItem = event.getElement();
+
+		if (viewerItem instanceof TVIMap3Layer) {
+
+			toggleLayerVisibility((TVIMap3Layer) viewerItem, false, false);
+
+		} else if (viewerItem instanceof TVIMap3Category) {
+
+			final TVIMap3Category tviCategory = (TVIMap3Category) viewerItem;
+
+			final ArrayList<TreeViewerItem> children = tviCategory.getUnfetchedChildren();
+			if (children == null) {
+				return;
+			}
+
+			final boolean isCategoryVisible = event.getChecked();
+
+			boolean isMapModified = false;
+
+			for (final TreeViewerItem childItem : children) {
+
+				if (childItem instanceof TVIMap3Layer) {
+
+					final TVIMap3Layer tviLayer = (TVIMap3Layer) childItem;
+
+					final boolean isLayerVisible = tviLayer.wwLayer.isEnabled();
+
+					if (isCategoryVisible == isLayerVisible) {
+
+						// layer has the correct visibility
+						continue;
+					}
+
+					// force map redraw
+					isMapModified = true;
+
+					// update model
+					tviLayer.isLayerVisible = isCategoryVisible;
+
+					// update ww layer
+					tviLayer.wwLayer.setEnabled(isCategoryVisible);
+
+					// add/remove layer listener
+					tviLayer.onSetCheckState();
+
+					// update tooltip
+					_propToolTip.setLayerVisibility(tviLayer, false);
+				}
+			}
+
+			// redraw map
+			if (isMapModified) {
+				Map3Manager.getWWCanvas().redraw();
+			}
+
+		}
 	}
 
 	private void onExpandTree(final TVIMap3Item element) {
@@ -332,13 +385,13 @@ public class Map3PropertiesView extends ViewPart {
 
 				// expand collapse item
 
-				if (_propViewer.getExpandedState(hoveredItem)) {
+				if (_layerViewer.getExpandedState(hoveredItem)) {
 
-					_propViewer.collapseToLevel(hoveredItem, 1);
+					_layerViewer.collapseToLevel(hoveredItem, 1);
 
 				} else {
 
-					_propViewer.expandToLevel(hoveredItem, 1);
+					_layerViewer.expandToLevel(hoveredItem, 1);
 
 					// expand event is not fired, set state manually
 					onExpandTree(mapItem);
@@ -348,7 +401,7 @@ public class Map3PropertiesView extends ViewPart {
 
 				// toggle layer visibility
 
-				toggleLayerVisibility((TVIMap3Layer) mapItem, true);
+				toggleLayerVisibility((TVIMap3Layer) mapItem, true, true);
 			}
 		}
 
@@ -360,8 +413,8 @@ public class Map3PropertiesView extends ViewPart {
 		final Object[] uiEnabledLayers = Map3Manager.getUIEnabledLayers();
 		final Object[] uiExpandedCategories = Map3Manager.getUIExpandedCategories();
 
-		_propViewer.setCheckedElements(uiEnabledLayers);
-		_propViewer.setExpandedElements(uiExpandedCategories);
+		_layerViewer.setCheckedElements(uiEnabledLayers);
+		_layerViewer.setExpandedElements(uiExpandedCategories);
 
 		// inform layer about check state modification
 		for (final Object object : uiEnabledLayers) {
@@ -375,15 +428,17 @@ public class Map3PropertiesView extends ViewPart {
 	private void saveState() {
 
 		// save/keep UI state
-		Map3Manager.saveUIState(_propViewer.getCheckedElements(), _propViewer.getExpandedElements());
+		Map3Manager.saveUIState(_layerViewer.getCheckedElements(), _layerViewer.getExpandedElements());
 	}
 
 	@Override
 	public void setFocus() {
-		_propViewer.getTree().setFocus();
+		_layerViewer.getTree().setFocus();
 	}
 
-	private void toggleLayerVisibility(final TVIMap3Layer tviLayer, final boolean isUpdateViewer) {
+	private void toggleLayerVisibility(	final TVIMap3Layer tviLayer,
+										final boolean isUpdateViewer,
+										final boolean isUpdateTooltip) {
 
 		// toggle state
 		final boolean isLayerVisible = !tviLayer.wwLayer.isEnabled();
@@ -391,7 +446,7 @@ public class Map3PropertiesView extends ViewPart {
 		// update model
 		tviLayer.isLayerVisible = isLayerVisible;
 
-		// update layer
+		// update ww layer
 		tviLayer.wwLayer.setEnabled(isLayerVisible);
 
 		// add/remove layer listener
@@ -401,16 +456,16 @@ public class Map3PropertiesView extends ViewPart {
 		Map3Manager.getWWCanvas().redraw();
 
 		// update tooltip
-		_propToolTip.setLayerVisibility(tviLayer);
+		_propToolTip.setLayerVisibility(tviLayer, isUpdateTooltip);
 
 		if (isUpdateViewer) {
 
 			// update viewer
-			_propViewer.setChecked(tviLayer, isLayerVisible);
+			_layerViewer.setChecked(tviLayer, isLayerVisible);
 		}
 	}
 
-	void updateUINewLayer(final ArrayList<TVIMap3Layer> insertedLayers) {
+	void updateUI_NewLayer(final ArrayList<TVIMap3Layer> insertedLayers) {
 
 		// get a set of unique parents
 		final HashSet<TreeViewerItem> parentItems = new HashSet<TreeViewerItem>();
@@ -423,7 +478,7 @@ public class Map3PropertiesView extends ViewPart {
 
 		// update parent and all it's children
 		for (final TreeViewerItem parentItem : parentItems) {
-			_propViewer.refresh(parentItem, false);
+			_layerViewer.refresh(parentItem, false);
 		}
 	}
 }
