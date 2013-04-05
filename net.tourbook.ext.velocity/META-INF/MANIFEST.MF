@@ -8,7 +8,7 @@ Bundle-Vendor: MyTourbook
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  net.tourbook.common,
- net.tourbook.rxtx_2.2
+ net.tourbook.ext.rxtx_2.2
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Eclipse-BuddyPolicy: registered
 Bundle-ActivationPolicy: lazy
