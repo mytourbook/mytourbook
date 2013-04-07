@@ -138,6 +138,7 @@ public class PropertyViewerToolTip extends ToolTip3 {
 			label.setText(UI.FormatDoubleMinMaxElevationMeter(minActiveAltitude)
 					+ UI.ELLIPSIS_WITH_SPACE
 					+ UI.FormatDoubleMinMaxElevationMeter(maxActiveAltitude));
+			label.setToolTipText(Messages.Prop_Viewer_Label_AltitudeRange_Tooltip);
 		}
 	}
 

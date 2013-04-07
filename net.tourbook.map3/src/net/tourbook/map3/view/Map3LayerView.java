@@ -20,7 +20,6 @@ import java.util.HashSet;
 
 import net.tourbook.common.UI;
 import net.tourbook.common.util.TreeViewerItem;
-import net.tourbook.map3.Activator;
 
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
@@ -42,7 +41,6 @@ import org.eclipse.jface.viewers.ViewerRow;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
-import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Tree;
@@ -54,16 +52,11 @@ import org.eclipse.ui.part.ViewPart;
 
 public class Map3LayerView extends ViewPart {
 
-	public static final String			ID				= "net.tourbook.map3.Map3PropertiesView";					//$NON-NLS-1$
+	public static final String			ID	= "net.tourbook.map3.Map3PropertiesView";	//$NON-NLS-1$
 
 //	private final IDialogSettings		_state			= Activator.getDefault().getDialogSettingsSection(ID);
 
 	private ContainerCheckedTreeViewer	_layerViewer;
-
-	private Image						_imgLayerProp	= Activator.getImageDescriptor(
-																Messages.Image_Map3_PropertyLayer).createImage();
-
-//	private PixelConverter				_pc;
 
 	private IPartListener2				_partListener;
 
@@ -283,8 +276,6 @@ public class Map3LayerView extends ViewPart {
 
 	@Override
 	public void dispose() {
-
-		_imgLayerProp.dispose();
 
 		Map3Manager.setMap3PropertiesView(null);
 

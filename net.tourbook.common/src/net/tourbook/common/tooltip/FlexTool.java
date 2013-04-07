@@ -280,9 +280,11 @@ class FlexTool {
 
 	private void setHeaderColor() {
 
-		final Color headerBg = _isToolMoved //
-				? Display.getCurrent().getSystemColor(SWT.COLOR_WIDGET_LIGHT_SHADOW)
-				: Display.getCurrent().getSystemColor(SWT.COLOR_WIDGET_NORMAL_SHADOW);
+//		final Color headerBg = _isToolMoved //
+//				? Display.getCurrent().getSystemColor(SWT.COLOR_WIDGET_LIGHT_SHADOW)
+//				: Display.getCurrent().getSystemColor(SWT.COLOR_WIDGET_NORMAL_SHADOW);
+
+		final Color headerBg = Display.getCurrent().getSystemColor(SWT.COLOR_WIDGET_NORMAL_SHADOW);
 
 		_headerContainer.setBackground(headerBg);
 		_btnDefaultLocation.setBackground(headerBg);

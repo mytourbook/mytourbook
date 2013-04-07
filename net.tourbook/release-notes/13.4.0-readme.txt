@@ -1,0 +1,39 @@
+Version: 13.4                                        ?. April 2013
+
+TODO's TODO's TODO's TODO's TODO's TODO's TODO's TODO's 
+
+
+* improve text and value formatting in the tour print feature 
+
+* http://mytourbook.sourceforge.net/mytourbook/index.php/map-provider -> 2d-map-provider
+
+TODO's TODO's TODO's TODO's TODO's TODO's TODO's TODO's 
+
+
+
+
+Minor Modifications
+
+* 
+
+3D map and Linux
+
+- Ubuntu 12.04 can crash in VMWare when "Accelerate 3D graphics" is checked in VM settings
+
+- Ubuntu 12.04 is crashing when showing "Open Street Map" layer
+
+- causes lot of exception's when showing most of the layers, e.g.
+
+gov.nasa.worldwind.layers.TextureTile initializeTexture
+SEVERE: Exception attempting to read texture file 
+javax.media.opengl.GLException: DXTn compressed textures not supported by this graphics card
+	at com.sun.opengl.util.texture.Texture.checkCompressedTextureExtensions(Texture.java:987)
+	at com.sun.opengl.util.texture.Texture.updateImage(Texture.java:530)
+	at com.sun.opengl.util.texture.Texture.updateImage(Texture.java:381)
+
+Fixed Bugs 	
+
+* 
+
+
+
