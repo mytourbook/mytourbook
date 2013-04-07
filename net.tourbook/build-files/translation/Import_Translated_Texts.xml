@@ -80,6 +80,9 @@
 			
 			C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook\build-files\create-translation-archive.xml
 		-->
+		<echo message="----------------------------" />
+		<echo message="RECREATE TRANSLATION ARCHIVE" />
+		<echo message="----------------------------" />
 		<ant antfile="Create_Translation_Archive.xml" />
 
 	</target>

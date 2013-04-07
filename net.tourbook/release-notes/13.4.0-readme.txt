@@ -10,6 +10,9 @@ TODO's TODO's TODO's TODO's TODO's TODO's TODO's TODO's
 TODO's TODO's TODO's TODO's TODO's TODO's TODO's TODO's 
 
 
+Updates
+
+* improved Italian translation, by Doriano Cometto
 
 
 Minor Modifications
