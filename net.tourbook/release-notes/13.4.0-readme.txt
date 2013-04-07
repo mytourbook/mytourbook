@@ -2,26 +2,24 @@ Version: 13.4                                        ?. April 2013
 
 TODO's TODO's TODO's TODO's TODO's TODO's TODO's TODO's 
 
-
-* improve text and value formatting in the tour print feature 
-
-* http://mytourbook.sourceforge.net/mytourbook/index.php/map-provider -> 2d-map-provider
-
-* French translation is from Vincent Di Sanzo
+* requested French translation 
 
 TODO's TODO's TODO's TODO's TODO's TODO's TODO's TODO's 
 
 
 Updates
 
-* improved Italian translation, by Doriano Cometto
+* improved Italian translation, provided by Doriano Cometto
+
+* improved French translation, provided by Vincent Di Sanzo
+
 
 
 Minor Modifications
 
 * 
 
-3D map and Linux
+3D map and Linux, can cause troubles
 
 - Ubuntu 12.04 can crash in VMWare when "Accelerate 3D graphics" is checked in VM settings
 
