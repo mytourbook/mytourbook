@@ -58,7 +58,7 @@ public abstract class ToolProviderAdapter implements IToolProvider {
 	@Override
 	public String toString() {
 		return String.format(
-				"\nToolProviderAdapter\n   isFlexTool()=%s\n   getToolTitle()=%s\n   getToolTipArea()=%s\n",
+				"\nToolProviderAdapter\n   isFlexTool()=%s\n   getToolTitle()=%s\n   getToolTipArea()=%s\n", //$NON-NLS-1$
 				isFlexTool(),
 				getToolTitle(),
 				getToolTipArea());

@@ -7,6 +7,8 @@ TODO's TODO's TODO's TODO's TODO's TODO's TODO's TODO's
 
 * http://mytourbook.sourceforge.net/mytourbook/index.php/map-provider -> 2d-map-provider
 
+* French translation is from Vincent Di Sanzo
+
 TODO's TODO's TODO's TODO's TODO's TODO's TODO's TODO's 
 
 

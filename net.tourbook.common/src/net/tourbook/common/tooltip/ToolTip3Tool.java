@@ -176,7 +176,7 @@ public class ToolTip3Tool {
 	public String toString() {
 		return String
 				.format(
-						"\nToolTip3Tool\n   _toolTipArea=%s, \n   _toolProvider=%s, \n   isFlexTool()=%s, \n   isMoved()=%s, \n   isVisible()=%s\n",
+						"\nToolTip3Tool\n   _toolTipArea=%s, \n   _toolProvider=%s, \n   isFlexTool()=%s, \n   isMoved()=%s, \n   isVisible()=%s\n", //$NON-NLS-1$
 						_toolTipArea,
 						_toolProvider,
 						isFlexTool(),
