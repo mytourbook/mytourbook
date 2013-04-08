@@ -217,6 +217,12 @@ public class PhotoImageCache {
 		final String imageKey = photo.getImageKey(ImageQuality.ORIGINAL);
 
 		return getImageFromCache(_imageCacheOriginal, photo, imageKey);
+
+//		if (_imageCacheOriginal.size() > 1) {
+//
+//		}
+//
+//		return null;
 	}
 
 	/**
@@ -230,9 +236,7 @@ public class PhotoImageCache {
 	 * @param imageWidth
 	 * @param originalImagePathName
 	 */
-	public static void putImage(final String imageKey,
-								final Image image,
-								final String originalImagePathName) {
+	public static void putImage(final String imageKey, final Image image, final String originalImagePathName) {
 
 		putImageInCache(_imageCache, imageKey, image, originalImagePathName);
 	}
@@ -265,10 +269,9 @@ public class PhotoImageCache {
 	 * @param imageWidth
 	 * @param originalImagePathName
 	 */
-	public static void putImageOriginal(final String imageKey,
-										final Image image,
-										final String originalImagePathName) {
+	public static void putImageOriginal(final String imageKey, final Image image, final String originalImagePathName) {
 
+		if (_imageCacheOriginal.size() > 1) {}
 		putImageInCache(_imageCacheOriginal, imageKey, image, originalImagePathName);
 	}
 
