@@ -33,14 +33,13 @@ import org.joda.time.DateTime;
 
 public class CalendarTourDataProvider {
 
-	private static CalendarTourDataProvider	_instance;
+	private static CalendarTourDataProvider				_instance;
 
 //	private ArrayList<Long>					_tourIds;
 
 	private HashMap<Integer, CalendarTourData[][][]>	_dayCache;
 	private HashMap<Integer, CalendarTourData[]>		_weekCache;
 	private DateTime									_firstDateTime;
-
 
 	private CalendarTourDataProvider() {
 		invalidate();
@@ -54,8 +53,8 @@ public class CalendarTourDataProvider {
 	}
 
 	CalendarTourData[] getCalendarDayData(final int year, final int month, final int day) {
-		
-		CalendarTourData[]				data;
+
+		CalendarTourData[] data;
 
 //		if (!_dayCache.containsKey(year)) {
 //			_dayCache.put(year, new CalendarTourData[12][31][]);
@@ -84,7 +83,7 @@ public class CalendarTourDataProvider {
 		return data;
 
 	}
-	
+
 	/**
 	 * Retrieve data from the database
 	 * 
@@ -96,7 +95,7 @@ public class CalendarTourDataProvider {
 	CalendarTourData[] getCalendarDayDataFromDb(final int year, final int month, final int day) {
 
 		final int colorOffset = 1;
-		
+
 		CalendarTourData[] calendarTourData = null;
 
 		final ArrayList<TourType> tourTypeList = TourDatabase.getAllTourTypes();
@@ -158,7 +157,7 @@ public class CalendarTourDataProvider {
 			final ArrayList<Long> dbTypeIds = new ArrayList<Long>();
 			final ArrayList<Integer> dbTypeColorIndex = new ArrayList<Integer>();
 
-			final ArrayList<Long>tourIds = new ArrayList<Long>();
+			final ArrayList<Long> tourIds = new ArrayList<Long>();
 
 			final HashMap<Long, ArrayList<Long>> dbTagIds = new HashMap<Long, ArrayList<Long>>();
 
@@ -259,13 +258,13 @@ public class CalendarTourDataProvider {
 			 * create data
 			 */
 			final int size = tourIds.size();
-			
+
 			calendarTourData = new CalendarTourData[size];
-			
+
 			final int dayOfWeek = (new DateTime(year, month, day, 12, 0, 0, 0)).getDayOfWeek();
 
 			for (int i = 0; i < size; i++) {
-				
+
 				final CalendarTourData data = new CalendarTourData();
 
 				final long tourId = tourIds.get(i);
@@ -306,6 +305,7 @@ public class CalendarTourDataProvider {
 
 		return calendarTourData;
 	}
+
 	/**
 	 * Retrieve data from the database
 	 * 
@@ -318,7 +318,7 @@ public class CalendarTourDataProvider {
 	CalendarTourData[][] getCalendarMonthDataFromDb(final int year, final int month) {
 
 		final int colorOffset = 1;
-		
+
 		CalendarTourData[][] calendarTourData = null;
 		CalendarTourData[] calendarTourDayData = null;
 
@@ -395,17 +395,17 @@ public class CalendarTourDataProvider {
 			statement.setInt(1, year);
 			statement.setInt(2, month);
 			filter.setParameters(statement, 4);
-			
+
 			calendarTourData = new CalendarTourData[31][];
-			
+
 			long tourId = -1;
 
 			for (int day = 0; day < 31; day++) {
-			
+
 				statement.setInt(3, day + 1);
 
 				final ResultSet result = statement.executeQuery();
-				
+
 				boolean firstTourOfDay = true;
 				tourIds = new ArrayList<Long>();
 
@@ -488,8 +488,8 @@ public class CalendarTourDataProvider {
 						}
 
 						/*
-						 * convert type id to the type index in the tour type array, this is also the
-						 * color index for the tour type
+						 * convert type id to the type index in the tour type array, this is also
+						 * the color index for the tour type
 						 */
 						int tourTypeColorIndex = 0;
 						final Long dbTypeIdObject = (Long) result.getObject(12);
@@ -508,7 +508,7 @@ public class CalendarTourDataProvider {
 					}
 
 					lastTourId = tourId;
-					
+
 				} // while result.next() == all tours of this day
 
 				/*
@@ -552,13 +552,13 @@ public class CalendarTourDataProvider {
 					calendarTourDayData[i] = data;
 
 				} // create data for this day
-					
+
 				calendarTourData[day] = calendarTourDayData;
 
 			} // for days 0 .. 30
 
 			conn.close();
-			
+
 		} catch (final SQLException e) {
 			UI.showSQLException(e);
 		}
@@ -567,9 +567,9 @@ public class CalendarTourDataProvider {
 	}
 
 	public DateTime getCalendarTourDateTime(final Long tourId) {
-		
+
 		DateTime dt = new DateTime();
-		
+
 		final String select = "SELECT " //$NON-NLS-1$
 				+ "StartYear," //				2 //$NON-NLS-1$
 				+ "StartMonth," //				3 //$NON-NLS-1$
@@ -579,9 +579,9 @@ public class CalendarTourDataProvider {
 				+ (" FROM " + TourDatabase.TABLE_TOUR_DATA + UI.NEW_LINE) //$NON-NLS-1$
 
 				+ (" WHERE TourId=?" + UI.NEW_LINE); //$NON-NLS-1$
-		
+
 		try {
-			
+
 			final Connection conn = TourDatabase.getInstance().getConnection();
 			final PreparedStatement statement = conn.prepareStatement(select);
 
@@ -596,38 +596,38 @@ public class CalendarTourDataProvider {
 				dt = new DateTime(year, month, day, hour, minute, 0, 0);
 			}
 			conn.close();
-			
+
 		} catch (final SQLException e) {
 			UI.showSQLException(e);
 		}
 
 		return dt;
 	}
-	
+
 	CalendarTourData getCalendarWeekSummaryData(final int year, final int week) {
-		
-		CalendarTourData				data;
+
+		CalendarTourData data;
 
 		if (!_weekCache.containsKey(year)) {
 			_weekCache.put(year, new CalendarTourData[54]); // weeks are from 1..53; we simply leave array index 0 unused (yes, a year can have more than 52 weeks)
 		}
-		
+
 		if (_weekCache.get(year)[week] != null) {
 			data = _weekCache.get(year)[week];
 		} else {
 			data = getCalendarWeekSummaryDataFromDb(year, week);
 			_weekCache.get(year)[week] = data;
 		}
-		
+
 		return data;
-			
+
 	}
 
 	CalendarTourData getCalendarWeekSummaryDataFromDb(final int year, final int week) {
-		
+
 		final CalendarTourData data = new CalendarTourData();
 		final SQLFilter filter = new SQLFilter();
-		
+
 		final String select = "SELECT " //$NON-NLS-1$
 				+ "SUM(TourDistance)," //			1 //$NON-NLS-1$
 				+ "SUM(TourAltUp)," //				2 //$NON-NLS-1$
@@ -647,7 +647,7 @@ public class CalendarTourDataProvider {
 
 			final Connection conn = TourDatabase.getInstance().getConnection();
 			final PreparedStatement statement = conn.prepareStatement(select);
-			
+
 			statement.setInt(1, year);
 			statement.setInt(2, week);
 			filter.setParameters(statement, 3);
@@ -696,24 +696,31 @@ public class CalendarTourDataProvider {
 			final PreparedStatement statement = conn.prepareStatement(select);
 
 			final ResultSet result = statement.executeQuery();
-			if (result.next()) {
+			while (result.next()) {
 
 				final int year = result.getShort(1);
 				final int month = result.getShort(2);
 				final int day = result.getShort(3);
 
-				_firstDateTime = new DateTime(year, month, day, 12, 0, 0, 0);
+//				System.out.println(net.tourbook.common.UI.timeStampNano() + " " + year + "-" + month + " " + day);
+//				// TODO remove SYSTEM.OUT.PRINTLN
 
-			} else {
+				if (year != 0 && month != 0 && day != 0) {
 
-				_firstDateTime = new DateTime();
+					// this case happened that year/month/day is 0
+
+					_firstDateTime = new DateTime(year, month, day, 12, 0, 0, 0);
+
+					break;
+				}
 			}
+
 			conn.close();
 		} catch (final SQLException e) {
 			UI.showSQLException(e);
 		}
 
-		if (null == _firstDateTime) {
+		if (_firstDateTime == null) {
 			_firstDateTime = (new DateTime()).minusYears(1);
 		}
 

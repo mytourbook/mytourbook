@@ -16,7 +16,6 @@
 package net.tourbook.ui.views.calendar;
 
 import java.util.ArrayList;
-import java.util.Formatter;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
@@ -90,8 +89,6 @@ public class CalendarView extends ViewPart implements ITourProvider {
 	private ITourEventListener					_tourPropertyListener;
 	private CalendarYearMonthContributionItem	_cymci;
 
-	private Formatter							_formatter								= new Formatter();
-
 	private String								STATE_SELECTED_TOURS					= "SelectedTours";								// $NON-NLS-1$ //$NON-NLS-1$
 	private String								STATE_FIRST_DAY							= "FirstDayDisplayed";							// $NON-NLS-1$ //$NON-NLS-1$
 	private String								STATE_NUM_OF_WEEKS_NORMAL				= "NumberOfWeeksDisplayed";					// $NON-NLS-1$ //$NON-NLS-1$
@@ -152,10 +149,12 @@ public class CalendarView extends ViewPart implements ITourProvider {
 				@Override
 				String format(final CalendarTourData data) {
 					if (data.distance > 0) {
+
 						final float distance = (float) (data.distance / 1000.0 / UI.UNIT_VALUE_DISTANCE);
-						return _formatter.format(
+
+						return String.format(
 								NLS.bind(Messages.Calendar_View_Format_Distance, UI.UNIT_LABEL_DISTANCE),
-								distance).toString();
+								distance);
 					} else {
 						return UI.DASH;
 					}
@@ -169,7 +168,7 @@ public class CalendarView extends ViewPart implements ITourProvider {
 				@Override
 				String format(final CalendarTourData data) {
 					if (data.recordingTime > 0) {
-						return _formatter.format(
+						return String.format(
 								Messages.Calendar_View_Format_Time,
 								data.drivingTime / 3600,
 								(data.drivingTime % 3600) / 60).toString();
@@ -199,7 +198,7 @@ public class CalendarView extends ViewPart implements ITourProvider {
 				@Override
 				String format(final CalendarTourData data) {
 					if (data.distance > 0 && data.recordingTime > 0) {
-						return _formatter.format(
+						return String.format(
 								NLS.bind(Messages.Calendar_View_Format_Speed, UI.UNIT_LABEL_SPEED),
 								data.distance == 0 ? 0 : data.distance / (data.recordingTime / 3.6f)).toString();
 					} else {
@@ -216,7 +215,7 @@ public class CalendarView extends ViewPart implements ITourProvider {
 						final int pace = (int) (data.distance == 0
 								? 0
 								: (1000 * data.recordingTime / data.distance * UI.UNIT_VALUE_DISTANCE));
-						return _formatter.format(
+						return String.format(
 								NLS.bind(Messages.Calendar_View_Format_Pace, UI.UNIT_LABEL_PACE),
 								pace / 60,
 								pace % 60).toString();
@@ -233,7 +232,7 @@ public class CalendarView extends ViewPart implements ITourProvider {
 				@Override
 				String format(final CalendarTourData data) {
 					if (data.recordingTime > 0) {
-						return _formatter.format(
+						return String.format(
 								Messages.Calendar_View_Format_Time,
 								data.recordingTime / 3600,
 								(data.recordingTime % 3600) / 60).toString();
@@ -312,7 +311,7 @@ public class CalendarView extends ViewPart implements ITourProvider {
 				public String format(final CalendarTourData data) {
 					final float distance = (float) (data.distance / 1000.0 / UI.UNIT_VALUE_DISTANCE);
 					final int time = data.recordingTime;
-					return _formatter.format(
+					return String.format(
 							NLS.bind(Messages.Calendar_View_Format_DistanceTime, UI.UNIT_LABEL_DISTANCE),
 							distance,
 							time / 3600,
@@ -333,7 +332,7 @@ public class CalendarView extends ViewPart implements ITourProvider {
 				public String format(final CalendarTourData data) {
 					final float distance = data.distance;
 					final int time = data.recordingTime;
-					return _formatter.format(
+					return String.format(
 							NLS.bind(
 									Messages.Calendar_View_Format_DistanceSpeed,
 									UI.UNIT_LABEL_DISTANCE,
@@ -358,7 +357,7 @@ public class CalendarView extends ViewPart implements ITourProvider {
 							? 0
 							: (1000 * data.recordingTime / data.distance * UI.UNIT_VALUE_DISTANCE));
 					final float distance = data.distance / 1000.0f / UI.UNIT_VALUE_DISTANCE;
-					return _formatter.format(
+					return String.format(
 							NLS.bind(
 									Messages.Calendar_View_Format_DistancePace,
 									UI.UNIT_LABEL_DISTANCE,
@@ -382,7 +381,7 @@ public class CalendarView extends ViewPart implements ITourProvider {
 				public String format(final CalendarTourData data) {
 					final int time = data.recordingTime;
 					final float distance = data.distance / 1000.0f / UI.UNIT_VALUE_DISTANCE;
-					return _formatter.format(
+					return String.format(
 							NLS.bind(Messages.Calendar_View_Format_TimeDistance, UI.UNIT_LABEL_DISTANCE),
 							time / 3600,
 							(time % 3600) / 60,
@@ -402,7 +401,7 @@ public class CalendarView extends ViewPart implements ITourProvider {
 				@Override
 				public String format(final CalendarTourData data) {
 					final int time = data.recordingTime;
-					return _formatter.format(
+					return String.format(
 							NLS.bind(Messages.Calendar_View_Format_TimeSpeed, UI.UNIT_LABEL_SPEED),
 							time / 3600,
 							(time % 3600) / 60,
@@ -426,7 +425,7 @@ public class CalendarView extends ViewPart implements ITourProvider {
 							? 0
 							: (1000 * data.recordingTime / data.distance * UI.UNIT_VALUE_DISTANCE));
 
-					return _formatter.format(
+					return String.format(
 							NLS.bind(Messages.Calendar_View_Format_TimePace, UI.UNIT_LABEL_PACE),
 							data.recordingTime / 3600,
 							(data.recordingTime % 3600) / 60,
