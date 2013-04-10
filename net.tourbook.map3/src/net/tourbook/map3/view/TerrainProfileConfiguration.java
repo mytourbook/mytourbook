@@ -378,6 +378,10 @@ public class TerrainProfileConfiguration {
 		/*
 		 * tooltip location
 		 */
+
+		// reset location
+		_initialTTLocation = null;
+
 		final boolean isTTMoved = Util.getStateBoolean(_state, STATE_TERRAIN_PROFILE_IS_TOOLTIP_MOVED, false);
 		if (isTTMoved) {
 

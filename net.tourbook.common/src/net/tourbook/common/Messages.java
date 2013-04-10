@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2012  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -38,7 +38,9 @@ public class Messages extends NLS {
 	public static String		Image_Action_PhotoFilterNoPhotos;
 	public static String		Image_Action_PhotoFilterWithPhotos;
 
+	public static String		Map3_PropertyTooltip_Action_Close;
 	public static String		Map3_PropertyTooltip_Action_Close_Tooltip;
+	public static String		Map3_PropertyTooltip_Action_MoveToDefaultLocation;
 	public static String		Map3_PropertyTooltip_Action_MoveToDefaultLocation_Tooltip;
 
 	public static String		Weather_Clounds_Clouds;

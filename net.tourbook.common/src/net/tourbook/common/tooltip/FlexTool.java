@@ -39,24 +39,24 @@ import org.eclipse.swt.widgets.Shell;
  */
 class FlexTool {
 
-	private static final int	WINDOW_TITLE_HEIGHT	= UI.IS_OSX ? 14 : 12;
+//	private static final int	WINDOW_TITLE_HEIGHT	= UI.IS_OSX ? SWT.DEFAULT : 16;
 
-	private boolean				_isTTDragged;
-	private int					_devXTTMouseDown;
-	private int					_devYTTMouseDown;
+	private boolean			_isTTDragged;
+	private int				_devXTTMouseDown;
+	private int				_devYTTMouseDown;
 
-	private ToolTip3			_toolTip3;
-	private ToolTip3Tool		_tooltipTool;
+	private ToolTip3		_toolTip3;
+	private ToolTip3Tool	_tooltipTool;
 
-	private boolean				_isToolMoved;
+	private boolean			_isToolMoved;
 
 	/*
 	 * UI controls
 	 */
 //	private Shell				_shell;
-	private Composite			_headerContainer;
-	private Button				_btnDefaultLocation;
-	private Button				_btnClose;
+	private Composite		_headerContainer;
+	private Button			_btnDefaultLocation;
+	private Button			_btnClose;
 
 	FlexTool(final ToolTip3 toolTip3, final ToolTip3Tool tooltipTool) {
 
@@ -136,11 +136,15 @@ class FlexTool {
 
 	private void createUI_20_ToolTipHeader(final Composite parent) {
 
+		final int WINDOW_TITLE_HEIGHT = UI.IS_OSX ? SWT.DEFAULT : 16;
+		final String btnCloseText = UI.IS_OSX ? "x" : UI.SPACE;
+		final String btnDefaultText = UI.IS_OSX ? "M" : UI.SPACE;
+
 		_headerContainer = new Composite(parent, SWT.NONE);
 		GridDataFactory
 				.fillDefaults()
 				.grab(true, false)
-//				.hint(SWT.DEFAULT, WINDOW_TITLE_HEIGHT)
+				.hint(SWT.DEFAULT, WINDOW_TITLE_HEIGHT)
 				.applyTo(_headerContainer);
 		GridLayoutFactory.fillDefaults()//
 				.numColumns(2)
@@ -166,7 +170,8 @@ class FlexTool {
 //					.hint(WINDOW_TITLE_HEIGHT, SWT.DEFAULT)
 					.applyTo(_btnClose);
 
-			_btnClose.setText("X");
+//			_btnClose.setText(Messages.Map3_PropertyTooltip_Action_Close);
+			_btnClose.setText(btnCloseText);
 			_btnClose.setToolTipText(Messages.Map3_PropertyTooltip_Action_Close_Tooltip);
 
 			_btnClose.addSelectionListener(new SelectionAdapter() {
@@ -185,12 +190,14 @@ class FlexTool {
 			GridDataFactory.fillDefaults()//
 					.align(SWT.END, SWT.CENTER)
 					.grab(false, true)
-//					.indent(0, 4)
+//					.indent(0, 2)
 //					.hint(WINDOW_TITLE_HEIGHT, SWT.DEFAULT)
 					.applyTo(_btnDefaultLocation);
 
-			_btnDefaultLocation.setText("Default");
-
+			_btnDefaultLocation.setText(btnDefaultText);
+//			_btnDefaultLocation.setText("«");
+//			_btnDefaultLocation.setText("•");
+//			_btnDefaultLocation.setText(Messages.Map3_PropertyTooltip_Action_MoveToDefaultLocation);
 			_btnDefaultLocation.setToolTipText(Messages.Map3_PropertyTooltip_Action_MoveToDefaultLocation_Tooltip);
 
 			_btnDefaultLocation.addSelectionListener(new SelectionAdapter() {
@@ -264,7 +271,7 @@ class FlexTool {
 
 	/**
 	 * Set tooltip location when it was dragged with the mouse.
-	 *
+	 * 
 	 * @param shell
 	 * @param xDiff
 	 *            Relative x location when dragging started
