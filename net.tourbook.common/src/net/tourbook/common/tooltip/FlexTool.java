@@ -1,14 +1,14 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
- * 
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
@@ -16,6 +16,7 @@
 package net.tourbook.common.tooltip;
 
 import net.tourbook.common.Messages;
+import net.tourbook.common.UI;
 
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
@@ -38,7 +39,7 @@ import org.eclipse.swt.widgets.Shell;
  */
 class FlexTool {
 
-	private static final int	WINDOW_TITLE_HEIGHT	= 12;
+	private static final int	WINDOW_TITLE_HEIGHT	= UI.IS_OSX ? 14 : 12;
 
 	private boolean				_isTTDragged;
 	private int					_devXTTMouseDown;
@@ -139,9 +140,12 @@ class FlexTool {
 		GridDataFactory
 				.fillDefaults()
 				.grab(true, false)
-				.hint(SWT.DEFAULT, WINDOW_TITLE_HEIGHT)
+//				.hint(SWT.DEFAULT, WINDOW_TITLE_HEIGHT)
 				.applyTo(_headerContainer);
-		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(_headerContainer);
+		GridLayoutFactory.fillDefaults()//
+				.numColumns(2)
+				.spacing(0, 0)
+				.applyTo(_headerContainer);
 //		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
 
 		// show layer title in the hovered tooltip header
@@ -151,15 +155,41 @@ class FlexTool {
 
 		{
 			/*
-			 * button: pin
+			 * button: close
+			 */
+			_btnClose = new Button(_headerContainer, SWT.NONE);
+
+			GridDataFactory.fillDefaults()//
+					.align(SWT.BEGINNING, SWT.CENTER)
+					.grab(true, true)
+//					.indent(0, 4)
+//					.hint(WINDOW_TITLE_HEIGHT, SWT.DEFAULT)
+					.applyTo(_btnClose);
+
+			_btnClose.setText("X");
+			_btnClose.setToolTipText(Messages.Map3_PropertyTooltip_Action_Close_Tooltip);
+
+			_btnClose.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(final SelectionEvent e) {
+					// hide tooltip
+					_btnClose.getShell().close();
+				}
+			});
+
+			/*
+			 * button: default location
 			 */
 			_btnDefaultLocation = new Button(_headerContainer, SWT.NONE);
 
 			GridDataFactory.fillDefaults()//
-					.align(SWT.BEGINNING, SWT.CENTER)
+					.align(SWT.END, SWT.CENTER)
 					.grab(false, true)
-					.hint(WINDOW_TITLE_HEIGHT, SWT.DEFAULT)
+//					.indent(0, 4)
+//					.hint(WINDOW_TITLE_HEIGHT, SWT.DEFAULT)
 					.applyTo(_btnDefaultLocation);
+
+			_btnDefaultLocation.setText("Default");
 
 			_btnDefaultLocation.setToolTipText(Messages.Map3_PropertyTooltip_Action_MoveToDefaultLocation_Tooltip);
 
@@ -171,27 +201,6 @@ class FlexTool {
 			});
 
 			_btnDefaultLocation.setEnabled(false);
-
-			/*
-			 * button: close
-			 */
-			_btnClose = new Button(_headerContainer, SWT.NONE);
-
-			GridDataFactory.fillDefaults()//
-					.align(SWT.END, SWT.CENTER)
-					.grab(true, true)
-					.hint(WINDOW_TITLE_HEIGHT, SWT.DEFAULT)
-					.applyTo(_btnClose);
-
-			_btnClose.setToolTipText(Messages.Map3_PropertyTooltip_Action_Close_Tooltip);
-
-			_btnClose.addSelectionListener(new SelectionAdapter() {
-				@Override
-				public void widgetSelected(final SelectionEvent e) {
-					// hide tooltip
-					_btnClose.getShell().close();
-				}
-			});
 		}
 	}
 
@@ -255,7 +264,7 @@ class FlexTool {
 
 	/**
 	 * Set tooltip location when it was dragged with the mouse.
-	 * 
+	 *
 	 * @param shell
 	 * @param xDiff
 	 *            Relative x location when dragging started
