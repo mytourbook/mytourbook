@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feature
+      id="feature.net.tourbook.ext.worldwind"
+      label="World Wind Java SDK"
+      version="1.5.0"
+      plugin="net.tourbook.branding">
+
+   <description url="http://worldwind.arc.nasa.gov/java/">
+      see http://worldwind.arc.nasa.gov/java/
+   </description>
+
+   <copyright url="http://worldwind.arc.nasa.gov/worldwind-nosa-1.3.html">
+      see http://worldwind.arc.nasa.gov/worldwind-nosa-1.3.html
+   </copyright>
+
+   <license url="http://worldwind.arc.nasa.gov/worldwind-nosa-1.3.html">
+      see http://worldwind.arc.nasa.gov/worldwind-nosa-1.3.html
+   </license>
+
+   <url>
+      <update label="MyTourbook Update Site" url="http://mytourbook.sourceforge.net/updates/"/>
+   </url>
+
+   <plugin
+         id="net.tourbook.ext.worldwind_1.5"
+         download-size="0"
+         install-size="0"
+         version="1.5.0"
+         unpack="false"/>
+
+   <plugin
+         id="net.tourbook.ext.worldwind.linux32_1.5"
+         os="linux"
+         arch="x86"
+         download-size="0"
+         install-size="0"
+         version="1.5.0"
+         fragment="true"
+         unpack="false"/>
+
+   <plugin
+         id="net.tourbook.ext.worldwind.linux64_1.5"
+         os="linux"
+         arch="x86_64"
+         download-size="0"
+         install-size="0"
+         version="1.5.0"
+         fragment="true"
+         unpack="false"/>
+
+   <plugin
+         id="net.tourbook.ext.worldwind.macosx_1.5"
+         os="macosx"
+         download-size="0"
+         install-size="0"
+         version="1.5.0"
+         fragment="true"
+         unpack="false"/>
+
+   <plugin
+         id="net.tourbook.ext.worldwind.win32_1.5"
+         os="win32"
+         arch="x86"
+         download-size="0"
+         install-size="0"
+         version="1.5.0"
+         fragment="true"
+         unpack="false"/>
+
+   <plugin
+         id="net.tourbook.ext.worldwind.win64_1.5"
+         os="win32"
+         arch="x86_64"
+         download-size="0"
+         install-size="0"
+         version="1.5.0"
+         fragment="true"
+         unpack="false"/>
+
+</feature>

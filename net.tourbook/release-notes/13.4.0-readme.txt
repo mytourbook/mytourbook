@@ -1,11 +1,5 @@
 Version: 13.4                                        ?. April 2013
 
-TODO's TODO's TODO's TODO's TODO's TODO's TODO's TODO's 
-
-* requested French translation 
-
-TODO's TODO's TODO's TODO's TODO's TODO's TODO's TODO's 
-
 
 Updates
 
@@ -17,9 +11,14 @@ Updates
 
 Minor Modifications
 
-* 
+* Changed wording for actions in the calendar view
 
-3D map and Linux, can cause troubles
+
+New experimental Feature
+
+* 3D map
+
+* 3D map and Linux, can cause troubles
 
 - Ubuntu 12.04 can crash in VMWare when "Accelerate 3D graphics" is checked in VM settings
 
@@ -34,9 +33,14 @@ javax.media.opengl.GLException: DXTn compressed textures not supported by this g
 	at com.sun.opengl.util.texture.Texture.updateImage(Texture.java:530)
 	at com.sun.opengl.util.texture.Texture.updateImage(Texture.java:381)
 
+	
 Fixed Bugs 	
 
-* 
+* PDF printing issues caused by int -> long resturucturing (1 year ago):
+
+- marker are not sorted
+
+- marker distance is not displayed 
 
 
 

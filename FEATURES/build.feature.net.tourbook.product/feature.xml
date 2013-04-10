@@ -2,7 +2,7 @@
 <feature
       id="net.tourbook.product.feature"
       label="MyTourbook Product Features"
-      version="13.2.0.qualifier"
+      version="13.4.0.qualifier"
       provider-name="MyTourbook">
 
    <description>
@@ -55,6 +55,10 @@
 
    <includes
          id="feature.net.tourbook.app.nl"
+         version="0.0.0"/>
+
+   <includes
+         id="feature.net.tourbook.ext.worldwind"
          version="0.0.0"/>
 
 </feature>

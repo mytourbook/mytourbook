@@ -22,28 +22,15 @@
       <update label="%updateSiteName" url="http://mytourbook.sourceforge.net/updates/"/>
    </url>
 
-   <requires>
-      <import plugin="net.tourbook.rxtx_2.2" version="2.2.2" match="greaterOrEqual"/>
-   </requires>
-
    <plugin
-         id="net.tourbook.rxtx_2.2"
+         id="net.tourbook.ext.rxtx_2.2"
          download-size="0"
          install-size="0"
          version="2.2.2.pre2"
          unpack="false"/>
 
    <plugin
-         id="net.tourbook.rxtx.macosx_2.2"
-         os="macosx"
-         download-size="0"
-         install-size="0"
-         version="2.2.2.pre2"
-         fragment="true"
-         unpack="false"/>
-
-   <plugin
-         id="net.tourbook.rxtx.linux32_2.2"
+         id="net.tourbook.ext.rxtx.linux32_2.2"
          os="linux"
          arch="x86"
          download-size="0"
@@ -53,7 +40,7 @@
          unpack="false"/>
 
    <plugin
-         id="net.tourbook.rxtx.linux64_2.2"
+         id="net.tourbook.ext.rxtx.linux64_2.2"
          os="linux"
          arch="x86_64"
          download-size="0"
@@ -63,7 +50,16 @@
          unpack="false"/>
 
    <plugin
-         id="net.tourbook.rxtx.win32_2.2"
+         id="net.tourbook.ext.rxtx.macosx_2.2"
+         os="macosx"
+         download-size="0"
+         install-size="0"
+         version="2.2.2.pre2"
+         fragment="true"
+         unpack="false"/>
+
+   <plugin
+         id="net.tourbook.ext.rxtx.win32_2.2"
          os="win32"
          arch="x86"
          download-size="0"
@@ -73,7 +69,7 @@
          unpack="false"/>
 
    <plugin
-         id="net.tourbook.rxtx.win64_2.2"
+         id="net.tourbook.ext.rxtx.win64_2.2"
          os="win32"
          arch="x86_64"
          download-size="0"
