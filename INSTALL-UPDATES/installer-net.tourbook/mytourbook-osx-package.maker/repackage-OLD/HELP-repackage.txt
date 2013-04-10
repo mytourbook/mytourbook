@@ -1,0 +1,97 @@
+Last login: Wed Aug  3 16:20:48 on console
+noname:~ wschramm$ sudo cd /Users/wschramm/ws_mt-with-GIT/mytourbook-GIT/INSTALL-UPDATES/installer-net.tourbook
+Password:
+noname:~ wschramm$ ls -l
+total 8
+drwxrwxrwx   5 wschramm  staff   170  7 Okt  2010 Apple Developer Tools
+drwx------+ 16 wschramm  staff   544 27 Jul 09:12 Desktop
+drwx------+ 18 wschramm  staff   612 27 Jan  2011 Documents
+drwxr-xr-x@  5 wschramm  staff   170 26 Aug  2010 DownloadDirector
+drwx------+ 29 wschramm  staff   986 24 Jul 14:43 Downloads
+drwxr-xr-x@  5 wschramm  staff   170 13 Okt  2010 GPS-Tracks
+drwxr-xr-x   4 wschramm  staff   136 26 Aug  2010 INSTALL
+drwx------+ 37 wschramm  staff  1258 14 Mär 11:31 Library
+drwxr-xr-x   9 wschramm  staff   306 14 Jan  2011 Lightroom
+drwx------+  3 wschramm  staff   102 23 Aug  2010 Movies
+drwx------+  4 wschramm  staff   136 23 Aug  2010 Music
+drwx------+  9 wschramm  staff   306 26 Jan  2011 Pictures
+drwxr-xr-x+  6 wschramm  staff   204 17 Dez  2010 Public
+drwxr-xr-x   2 wschramm  staff    68  7 Okt  2010 SametimeTranscripts
+drwxr-xr-x   3 wschramm  staff   102 23 Sep  2010 Screenshots
+drwxr-xr-x+  5 wschramm  staff   170 23 Aug  2010 Sites
+drwxr-xr-x   4 wschramm  staff   136 12 Mai 07:15 dat
+-rw-r--r--@  1 wschramm  staff    43 24 Aug  2010 dlmgr_.pro
+drwxr-xr-x@  5 wschramm  staff   170 23 Aug  2010 e-3.6-DISABLED
+drwxr-xr-x@  5 wschramm  staff   170 24 Sep  2010 e-3.6.1
+drwxr-xr-x@  7 wschramm  staff   238 16 Mai 08:18 e-3.6.2
+drwxr-xr-x   5 wschramm  staff   170 24 Jul 14:44 e-3.7.0-64
+drwxr-xr-x@  5 wschramm  staff   170 20 Mär 15:40 e-3.7M6
+drwxr-xr-x   4 wschramm  staff   136 16 Sep  2010 git
+drwxr-xr-x   3 wschramm  staff   102  6 Sep  2010 hac4
+drwxrwxrwx   9 wschramm  staff   306 24 Jul 14:55 mytourbook
+drwxr-xr-x  14 wschramm  staff   476  6 Sep  2010 mytourbook-10.9
+drwxrwxrwx  25 wschramm  staff   850 17 Nov  2010 mytourbook-DEVICE-DATA
+drwxr-xr-x   7 wschramm  staff   238  3 Aug 15:39 mytourbook-PRODUCT
+drwxr-xr-x  42 wschramm  staff  1428  7 Okt  2010 mytourbook-TRUNK
+drwxr-xr-x  12 wschramm  staff   408  7 Okt  2010 mytourbook-before-10.10
+drwxr-xr-x@  9 wschramm  staff   306 27 Nov  2010 mytourbook-bugs
+drwxr-xr-x   9 wschramm  staff   306 14 Mär 17:14 mytourbook-osx-package.maker
+drwxr-xr-x   5 wschramm  staff   170 15 Okt  2010 offline-map
+drwxr-xr-x   4 wschramm  staff   136 24 Jul 14:59 offline-srtm3
+drwxr-xr-x   5 wschramm  staff   170 20 Mär 16:09 runtime-mt
+drwxr-xr-x  18 wschramm  staff   612 24 Jul 14:49 ws
+drwxr-xr-x   7 wschramm  staff   238  3 Aug 16:17 ws_mt-with-GIT
+drwxr-xr-x   3 wschramm  staff   102 16 Mai 08:15 ws_notes_852
+noname:~ wschramm$ cd /Users/wschramm/ws_mt-with-GIT/mytourbook-GIT/INSTALL-UPDATES/installer-net.tourbook
+noname:installer-net.tourbook wschramm$ ls -l
+total 0
+drwxr-xr-x   7 wschramm  staff  238  3 Aug 16:02 osx-package.maker
+drwxr-xr-x  26 wschramm  staff  884 24 Jul 14:54 win-Inno.Setup
+noname:installer-net.tourbook wschramm$ cd osx-package.maker
+noname:osx-package.maker wschramm$ ls -l
+total 40
+-rw-r--r--   1 wschramm  staff  7516  7 Mär 08:35 EclipseOSXRepackager
+-rw-r--r--   1 wschramm  staff  2975  7 Mär 08:35 EclipseOSXRepackagerUI
+drwxr-xr-x  42 wschramm  staff  1428  3 Aug 16:02 mytourbook OSX Installer
+-rw-r--r--   1 wschramm  staff   259  7 Mär 08:35 repackage-mt-10.10.sh
+-rw-r--r--@  1 wschramm  staff   255  3 Aug 16:02 repackage-mt-11.8.0.sh
+noname:osx-package.maker wschramm$ chmod 755 repackage-mt-11.8.0.sh
+noname:osx-package.maker wschramm$ ls -l
+total 40
+-rw-r--r--   1 wschramm  staff  7516  7 Mär 08:35 EclipseOSXRepackager
+-rw-r--r--   1 wschramm  staff  2975  7 Mär 08:35 EclipseOSXRepackagerUI
+drwxr-xr-x  42 wschramm  staff  1428  3 Aug 16:02 mytourbook OSX Installer
+-rw-r--r--   1 wschramm  staff   259  7 Mär 08:35 repackage-mt-10.10.sh
+-rwxr-xr-x@  1 wschramm  staff   255  3 Aug 16:02 repackage-mt-11.8.0.sh
+noname:osx-package.maker wschramm$ sudo ./repackage-mt-11.8.0.sh
+./repackage-mt-11.8.0.sh: line 5: ./EclipseOSXRepackager: Permission denied
+noname:osx-package.maker wschramm$ sudo ./repackage-mt-11.8.0.sh
+./repackage-mt-11.8.0.sh: line 5: ./EclipseOSXRepackager: Permission denied
+noname:osx-package.maker wschramm$ sudo -s
+bash-3.2# ls -l
+total 40
+-rw-r--r--   1 wschramm  staff  7516  7 Mär 08:35 EclipseOSXRepackager
+-rw-r--r--   1 wschramm  staff  2975  7 Mär 08:35 EclipseOSXRepackagerUI
+drwxr-xr-x  42 wschramm  staff  1428  3 Aug 16:02 mytourbook OSX Installer
+-rw-r--r--   1 wschramm  staff   259  7 Mär 08:35 repackage-mt-10.10.sh
+-rwxr-xr-x@  1 wschramm  staff   255  3 Aug 16:02 repackage-mt-11.8.0.sh
+bash-3.2# ./repackage-mt-11.8.0.sh
+./repackage-mt-11.8.0.sh: line 5: ./EclipseOSXRepackager: Permission denied
+bash-3.2# ls -l
+total 40
+-rw-r--r--   1 wschramm  staff  7516  7 Mär 08:35 EclipseOSXRepackager
+-rw-r--r--   1 wschramm  staff  2975  7 Mär 08:35 EclipseOSXRepackagerUI
+drwxr-xr-x  42 wschramm  staff  1428  3 Aug 16:02 mytourbook OSX Installer
+-rw-r--r--   1 wschramm  staff   259  7 Mär 08:35 repackage-mt-10.10.sh
+-rwxr-xr-x@  1 wschramm  staff   255  3 Aug 16:02 repackage-mt-11.8.0.sh
+bash-3.2# chmod 755 EclipseOSXRepackager
+bash-3.2# chmod 755 EclipseOSXRepackagerUI
+bash-3.2# ./repackage-mt-11.8.0.sh
+Source Eclipse installation:  /Users/wschramm/mytourbook-PRODUCT/11.8.0/mytourbook_11.8.0.macosx.cocoa.x86_64/mytourbook
+Destination Mac OS X bundle:  /Users/wschramm/mytourbook-PRODUCT/11.8.0/mytourbook_11.8.0.macosx.cocoa.x86_64/MyTourbook.app
+Copying launcher...
+Copying configuration area...
+Copying features...
+Copying plugins...
+Done.
+bash-3.2# 
