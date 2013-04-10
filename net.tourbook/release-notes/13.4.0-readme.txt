@@ -34,16 +34,18 @@ New experimental Feature
 
 * 3D map
 
+- loading map images from the internet is not very fast but when retrieved from the internal cash it is OK
+
+- navigating with the mouse is different than Google Earth
+
+
 * Crash out of the box
 
-  When running 3D map with Ubuntu 12.04 in VMWare 8.0.5 it can cause a lot of problems, native Linux is not yet tested.
+  When running 3D map in my Linux environment it causes a lot of problems, native Linux is not yet tested.
 
   Win 7 and OSX 10.6 are running smoothly (when you have a good graphic card :-)
 
-  
-- Ubuntu 12.04 can crash in VMWare 8.0.5 when "Accelerate 3D graphics" is checked in VM settings
-
-- Ubuntu 12.04 is crashing when showing "Open Street Map" layer
+- MyTourbook can crash when showing "Open Street Map" layer
 
 - causes lot of exception's when showing layers which are drawing map tiles
 
@@ -54,5 +56,32 @@ javax.media.opengl.GLException: DXTn compressed textures not supported by this g
 	at com.sun.opengl.util.texture.Texture.updateImage(Texture.java:530)
 	at com.sun.opengl.util.texture.Texture.updateImage(Texture.java:381)
 
-	
+
+
+My Linux environment:
+
+- VMWare 8.0.5
+
+- Ubuntu 12.04
+
+- JRE version: 7.0_13-b20
+
+- Java VM: Java HotSpot(TM) Client VM (23.7-b01 mixed mode linux-x86 )
+
+
+These layers can be displayed without problems:
+
+- Stars
+
+- Atmosphere
+
+- Place Names
+
+- Scale bar
+
+- Terrain profile graph
+
+- View Controls
+
+- Status Layer
 	
