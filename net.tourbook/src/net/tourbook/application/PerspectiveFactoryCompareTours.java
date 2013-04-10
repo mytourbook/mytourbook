@@ -1,17 +1,17 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
- *   
+ * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
+ * 
  * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software 
+ * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- *  
- * This program is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public License along with 
+ * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.application;
 
@@ -32,12 +32,12 @@ public class PerspectiveFactoryCompareTours implements IPerspectiveFactory {
 	private static final String	FOLDER_ID_REF		= "ref";									//$NON-NLS-1$
 
 	public void createInitialLayout(final IPageLayout layout) {
-		
+
 		layout.setEditorAreaVisible(false);
 
 		//--------------------------------------------------------------------------------
 
-		final IFolderLayout listFolder = layout.createFolder(FOLDER_ID_LIST,
+		final IFolderLayout listFolder = layout.createFolder(FOLDER_ID_LIST,//
 				IPageLayout.LEFT,
 				0.4f,
 				IPageLayout.ID_EDITOR_AREA);
@@ -46,7 +46,7 @@ public class PerspectiveFactoryCompareTours implements IPerspectiveFactory {
 
 		//--------------------------------------------------------------------------------
 
-		final IFolderLayout refFolder = layout.createFolder(FOLDER_ID_REF,
+		final IFolderLayout refFolder = layout.createFolder(FOLDER_ID_REF,//
 				IPageLayout.TOP,
 				0.7f,
 				IPageLayout.ID_EDITOR_AREA);
@@ -55,7 +55,10 @@ public class PerspectiveFactoryCompareTours implements IPerspectiveFactory {
 
 		//--------------------------------------------------------------------------------
 
-		final IFolderLayout compFolder = layout.createFolder(FOLDER_ID_COMPARE, IPageLayout.BOTTOM, 0.5f, FOLDER_ID_REF);
+		final IFolderLayout compFolder = layout.createFolder(FOLDER_ID_COMPARE, //
+				IPageLayout.BOTTOM,
+				0.5f,
+				FOLDER_ID_REF);
 
 		compFolder.addView(TourCatalogViewComparedTour.ID);
 	}

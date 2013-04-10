@@ -2,7 +2,7 @@
 <feature
       id="feature.net.tourbook.app.nl"
       label="MyTourbook Language Support"
-      version="13.2.0.qualifier"
+      version="13.4.0.qualifier"
       provider-name="MyTourbook"
       plugin="net.tourbook.branding">
 
@@ -24,17 +24,26 @@
 
    <requires>
       <import plugin="net.tourbook.chart"/>
+      <import plugin="net.tourbook.common"/>
       <import plugin="net.tourbook.device"/>
       <import plugin="net.tourbook.device.garmin"/>
       <import plugin="net.tourbook.device.nmea"/>
       <import plugin="net.tourbook"/>
-      <import plugin="net.tourbook.statistics"/>
       <import plugin="net.tourbook.printing"/>
-      <import plugin="net.tourbook.common"/>
+      <import plugin="net.tourbook.statistics"/>
+      <import plugin="net.tourbook.photo"/>
    </requires>
 
    <plugin
          id="net.tourbook.chart.nl"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         fragment="true"
+         unpack="false"/>
+
+   <plugin
+         id="net.tourbook.common.nl"
          download-size="0"
          install-size="0"
          version="0.0.0"
@@ -66,7 +75,23 @@
          unpack="false"/>
 
    <plugin
+         id="net.tourbook.map3.nl"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         fragment="true"
+         unpack="false"/>
+
+   <plugin
          id="net.tourbook.nl"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         fragment="true"
+         unpack="false"/>
+
+   <plugin
+         id="net.tourbook.photo.nl"
          download-size="0"
          install-size="0"
          version="0.0.0"
@@ -83,22 +108,6 @@
 
    <plugin
          id="net.tourbook.statistics.nl"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         fragment="true"
-         unpack="false"/>
-
-   <plugin
-         id="net.tourbook.common.nl"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         fragment="true"
-         unpack="false"/>
-
-   <plugin
-         id="net.tourbook.photo.nl"
          download-size="0"
          install-size="0"
          version="0.0.0"

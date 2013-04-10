@@ -52,7 +52,7 @@ import org.eclipse.ui.part.ViewPart;
 
 public class Map3LayerView extends ViewPart {
 
-	public static final String			ID	= "net.tourbook.map3.Map3PropertiesView";	//$NON-NLS-1$
+	public static final String			ID	= "net.tourbook.map3.Map3LayerView";	//$NON-NLS-1$
 
 //	private final IDialogSettings		_state			= Activator.getDefault().getDialogSettingsSection(ID);
 

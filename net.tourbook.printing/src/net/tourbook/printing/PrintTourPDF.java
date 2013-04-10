@@ -20,7 +20,6 @@ import javax.xml.transform.stream.StreamSource;
 import net.tourbook.data.IXmlSerializable;
 import net.tourbook.data.TourData;
 import net.tourbook.ui.FileCollisionBehavior;
-import net.tourbook.ui.Messages;
 import net.tourbook.ui.UI;
 
 import org.apache.fop.apps.FOPException;
@@ -67,7 +66,7 @@ public class PrintTourPDF extends PrintTourExtension {
 		final DateTime dtTourEnd = dtTourStart.plusSeconds((int) _tourData.getTourRecordingTime());
 
 		return String.format(
-				Messages.Tour_Tooltip_Format_DateWeekTime,
+				net.tourbook.ui.Messages.Tour_Tooltip_Format_DateWeekTime,
 				_dateFormatter.print(dtTourStart.getMillis()),
 				_timeFormatter.print(dtTourStart.getMillis()),
 				_timeFormatter.print(dtTourEnd.getMillis()),
@@ -221,99 +220,35 @@ public class PrintTourPDF extends PrintTourExtension {
 		_transformer.setParameter("unitLabelSpeed", UI.UNIT_LABEL_SPEED); //$NON-NLS-1$
 		_transformer.setParameter("unitLabelAltitude", UI.UNIT_LABEL_ALTITUDE); //$NON-NLS-1$
 		_transformer.setParameter("unitLabelTemperature", UI.UNIT_LABEL_TEMPERATURE); //$NON-NLS-1$
-		_transformer.setParameter("unitLabelHeartBeat", Messages.Value_Unit_Pulse); //$NON-NLS-1$
-		_transformer.setParameter("unitLabelCadence", Messages.Value_Unit_Cadence); //$NON-NLS-1$
-		_transformer.setParameter("unitLabelCalories", Messages.Value_Unit_Calories); //$NON-NLS-1$
+		_transformer.setParameter("unitLabelHeartBeat", net.tourbook.ui.Messages.Value_Unit_Pulse); //$NON-NLS-1$
+		_transformer.setParameter("unitLabelCadence", net.tourbook.ui.Messages.Value_Unit_Cadence); //$NON-NLS-1$
+		_transformer.setParameter("unitLabelCalories", net.tourbook.ui.Messages.Value_Unit_Calories); //$NON-NLS-1$
 	}
 
 	private void setTranslationParameters(final Transformer _transformer) {
 
-		_transformer.setParameter(//
-				"lang.Tour_Print_Tour",//$NON-NLS-1$
-				net.tourbook.printing.Messages.Tour_Print_Tour);
-
-		_transformer.setParameter(//
-				"lang.Tour_Print_Start",//$NON-NLS-1$
-				net.tourbook.printing.Messages.Tour_Print_Start);
-
-		_transformer.setParameter(//
-				"lang.Tour_Print_Start_Location",//$NON-NLS-1$
-				net.tourbook.printing.Messages.Tour_Print_Start_Location);
-
-		_transformer.setParameter(//
-				"lang.Tour_Print_End_Location",//$NON-NLS-1$
-				net.tourbook.printing.Messages.Tour_Print_End_Location);
-
-		_transformer.setParameter(//
-				"lang.Tour_Print_Time_Distance_Speed",//$NON-NLS-1$
-				net.tourbook.printing.Messages.Tour_Print_Time_Distance_Speed);
-
-		_transformer.setParameter(//
-				"lang.Tour_Print_Tour_Time",//$NON-NLS-1$
-				net.tourbook.printing.Messages.Tour_Print_Tour_Time);
-
-		_transformer.setParameter(//
-				"lang.Tour_Print_Tour_Pausing_Time",//$NON-NLS-1$
-				net.tourbook.printing.Messages.Tour_Print_Tour_Pausing_Time);
-
-		_transformer.setParameter(//
-				"lang.Tour_Print_Tour_Moving_Time",//$NON-NLS-1$
-				net.tourbook.printing.Messages.Tour_Print_Tour_Moving_Time);
-
-		_transformer.setParameter(//
-				"lang.Tour_Print_Distance",//$NON-NLS-1$
-				net.tourbook.printing.Messages.Tour_Print_Distance);
-
-		_transformer.setParameter(//
-				"lang.Tour_Print_Maximum_Speed",//$NON-NLS-1$
-				net.tourbook.printing.Messages.Tour_Print_Maximum_Speed);
-
-		_transformer.setParameter(//
-				"lang.Tour_Print_Personal",//$NON-NLS-1$
-				net.tourbook.printing.Messages.Tour_Print_Personal);
-
-		_transformer.setParameter(//
-				"lang.Tour_Print_Rest_Pulse",//$NON-NLS-1$
-				net.tourbook.printing.Messages.Tour_Print_Rest_Pulse);
-
-		_transformer.setParameter(//
-				"lang.Tour_Print_Maximum_Pulse",//$NON-NLS-1$
-				net.tourbook.printing.Messages.Tour_Print_Maximum_Pulse);
-
-		_transformer.setParameter(//
-				"lang.Tour_Print_Average_Pulse",//$NON-NLS-1$
-				net.tourbook.printing.Messages.Tour_Print_Average_Pulse);
-
-		_transformer.setParameter(//
-				"lang.Tour_Print_Calories",//$NON-NLS-1$
-				net.tourbook.printing.Messages.Tour_Print_Calories);
-
-		_transformer.setParameter(//
-				"lang.Tour_Print_Average_Cadence",//$NON-NLS-1$
-				net.tourbook.printing.Messages.Tour_Print_Average_Cadence);
-
-		_transformer.setParameter(//
-				"lang.Tour_Print_Altitude",//$NON-NLS-1$
-				net.tourbook.printing.Messages.Tour_Print_Altitude);
-
-		_transformer.setParameter(//
-				"lang.Tour_Print_Highest_Altitude",//$NON-NLS-1$
-				net.tourbook.printing.Messages.Tour_Print_Highest_Altitude);
-
-		_transformer.setParameter(//
-				"lang.Tour_Print_Meters_Up",//$NON-NLS-1$
-				net.tourbook.printing.Messages.Tour_Print_Meters_Up);
-
-		_transformer.setParameter(//
-				"lang.Tour_Print_Meters_Down",//$NON-NLS-1$
-				net.tourbook.printing.Messages.Tour_Print_Meters_Down);
-
-		_transformer.setParameter(//
-				"lang.Tour_Print_Tour_Markers",//$NON-NLS-1$
-				net.tourbook.printing.Messages.Tour_Print_Tour_Markers);
-
-		_transformer.setParameter(//
-				"lang.Tour_Print_No_Markers_Found",//$NON-NLS-1$
-				net.tourbook.printing.Messages.Tour_Print_No_Markers_Found);
+		_transformer.setParameter("lang.Tour_Print_PageTitle", Messages.Tour_Print_PageTitle);
+		_transformer.setParameter("lang.Tour_Print_Tour", Messages.Tour_Print_Tour); //$NON-NLS-1$
+		_transformer.setParameter("lang.Tour_Print_Start", Messages.Tour_Print_Start); //$NON-NLS-1$
+		_transformer.setParameter("lang.Tour_Print_Start_Location", Messages.Tour_Print_Start_Location); //$NON-NLS-1$
+		_transformer.setParameter("lang.Tour_Print_End_Location", Messages.Tour_Print_End_Location); //$NON-NLS-1$
+		_transformer.setParameter("lang.Tour_Print_Time_Distance_Speed", Messages.Tour_Print_Time_Distance_Speed); //$NON-NLS-1$
+		_transformer.setParameter("lang.Tour_Print_Tour_Time", Messages.Tour_Print_Tour_Time); //$NON-NLS-1$
+		_transformer.setParameter("lang.Tour_Print_Tour_Pausing_Time", Messages.Tour_Print_Tour_Pausing_Time); //$NON-NLS-1$
+		_transformer.setParameter("lang.Tour_Print_Tour_Moving_Time", Messages.Tour_Print_Tour_Moving_Time); //$NON-NLS-1$
+		_transformer.setParameter("lang.Tour_Print_Distance", Messages.Tour_Print_Distance); //$NON-NLS-1$
+		_transformer.setParameter("lang.Tour_Print_Maximum_Speed", Messages.Tour_Print_Maximum_Speed); //$NON-NLS-1$
+		_transformer.setParameter("lang.Tour_Print_Personal", Messages.Tour_Print_Personal); //$NON-NLS-1$
+		_transformer.setParameter("lang.Tour_Print_Rest_Pulse", Messages.Tour_Print_Rest_Pulse); //$NON-NLS-1$
+		_transformer.setParameter("lang.Tour_Print_Maximum_Pulse", Messages.Tour_Print_Maximum_Pulse); //$NON-NLS-1$
+		_transformer.setParameter("lang.Tour_Print_Average_Pulse", Messages.Tour_Print_Average_Pulse); //$NON-NLS-1$
+		_transformer.setParameter("lang.Tour_Print_Calories", Messages.Tour_Print_Calories); //$NON-NLS-1$
+		_transformer.setParameter("lang.Tour_Print_Average_Cadence", Messages.Tour_Print_Average_Cadence); //$NON-NLS-1$
+		_transformer.setParameter("lang.Tour_Print_Altitude", Messages.Tour_Print_Altitude); //$NON-NLS-1$
+		_transformer.setParameter("lang.Tour_Print_Highest_Altitude", Messages.Tour_Print_Highest_Altitude); //$NON-NLS-1$
+		_transformer.setParameter("lang.Tour_Print_Meters_Up", Messages.Tour_Print_Meters_Up); //$NON-NLS-1$
+		_transformer.setParameter("lang.Tour_Print_Meters_Down", Messages.Tour_Print_Meters_Down); //$NON-NLS-1$
+		_transformer.setParameter("lang.Tour_Print_Tour_Markers", Messages.Tour_Print_Tour_Markers); //$NON-NLS-1$
+		_transformer.setParameter("lang.Tour_Print_No_Markers_Found", Messages.Tour_Print_No_Markers_Found); //$NON-NLS-1$
 	}
 }

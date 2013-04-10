@@ -39,7 +39,7 @@ public class Messages extends NLS {
 	public static String		Dialog_Print_Error_Title;
 	public static String		Dialog_Print_Error_Message;
 
-
+	public static String		Tour_Print_PageTitle;
 	public static String		Tour_Print_Tour;
 	public static String		Tour_Print_Start;
 	public static String		Tour_Print_Start_Location;
@@ -62,7 +62,7 @@ public class Messages extends NLS {
 	public static String		Tour_Print_Meters_Down;
 	public static String		Tour_Print_Tour_Markers;
 	public static String		Tour_Print_No_Markers_Found;
-	
+
 	public static String		app_btn_browse;
 
 	static {

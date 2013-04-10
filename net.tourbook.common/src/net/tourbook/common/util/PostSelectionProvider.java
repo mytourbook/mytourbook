@@ -93,6 +93,6 @@ public class PostSelectionProvider implements IPostSelectionProvider {
 
 	@Override
 	public String toString() {
-		return "PostSelectionProvider [_name=" + _name + "\t_currentSelection=" + _currentSelection + "]";
+		return "PostSelectionProvider [_name=" + _name + "\t_currentSelection=" + _currentSelection + "]"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 }

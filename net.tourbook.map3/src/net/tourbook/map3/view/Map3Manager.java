@@ -120,8 +120,7 @@ public class Map3Manager {
 	private static final int						INSERT_BEFORE_COMPASS			= 1;
 
 	static {
-
-		_initWorldWindLayerModel();
+		create_WorldWindLayerModel();
 	}
 
 	private static final class CheckStateListener implements ICheckStateListener {
@@ -162,7 +161,7 @@ public class Map3Manager {
 	/**
 	 * Initialize WW model with default layers.
 	 */
-	private static void _initWorldWindLayerModel() {
+	private static void create_WorldWindLayerModel() {
 
 		// create default model
 		final Model model = (Model) WorldWind.createConfigurationComponent(AVKey.MODEL_CLASS_NAME);
@@ -174,7 +173,7 @@ public class Map3Manager {
 		// get default layer
 		_wwDefaultLayers = model.getLayers();
 
-		// create custom layer BEFORE state is applied
+		// create custom layer BEFORE state is applied and xml file is read which references these layers
 		createCustomLayer_MapStatus();
 		createCustomLayer_ViewerController();
 		createCustomLayer_TerrainProfile();
@@ -185,6 +184,8 @@ public class Map3Manager {
 		final Layer[] layerObject = _xmlLayers.toArray(new Layer[_xmlLayers.size()]);
 		final LayerList layers = new LayerList(layerObject);
 		model.setLayers(layers);
+
+//		LatLon.fromDegrees(0, -10)
 
 		// model must be set BEFORE model is updated
 		_wwCanvas.setModel(model);
@@ -219,11 +220,15 @@ public class Map3Manager {
 
 		tviLayer.id = layerId;
 
+		final boolean isVisible = true;
+
 		// default is enabled
-		tviLayer.isLayerVisible = true;
+		tviLayer.isLayerVisible = isVisible;
 		tviLayer.defaultPosition = INSERT_BEFORE_COMPASS;
 
-		_uiEnabledLayersFromXml.add(tviLayer);
+		if (isVisible) {
+			_uiEnabledLayersFromXml.add(tviLayer);
+		}
 
 		_customLayers.put(layerId, tviLayer);
 	}
@@ -239,7 +244,7 @@ public class Map3Manager {
 //		profileLayer.setFollow(TerrainProfileLayer.FOLLOW_PATH);
 //		profileLayer.setShowProfileLine(false);
 
-		final boolean isVisible = false;
+//		final boolean isVisible = false;
 
 		// Add TerrainProfileLayer
 		final TerrainProfileLayer profileLayer = new TerrainProfileLayer();
@@ -257,7 +262,7 @@ public class Map3Manager {
 		tviLayer.id = layerId;
 
 		// default is enabled
-		tviLayer.isLayerVisible = isVisible;
+//		tviLayer.isLayerVisible = isVisible;
 		tviLayer.defaultPosition = INSERT_BEFORE_COMPASS;
 
 		final TerrainProfileConfiguration terrainProfileConfig = new TerrainProfileConfiguration(
@@ -266,9 +271,9 @@ public class Map3Manager {
 				_state);
 		tviLayer.toolProvider = terrainProfileConfig.getToolProvider();
 
-		if (isVisible) {
-			_uiEnabledLayersFromXml.add(tviLayer);
-		}
+//		if (isVisible) {
+//			_uiEnabledLayersFromXml.add(tviLayer);
+//		}
 
 		_customLayers.put(layerId, tviLayer);
 	}
@@ -291,12 +296,12 @@ public class Map3Manager {
 		tviLayer.id = layerId;
 
 		// default is enabled
-		tviLayer.isLayerVisible = true;
+//		tviLayer.isLayerVisible = true;
 		tviLayer.defaultPosition = INSERT_BEFORE_COMPASS;
 
 		tviLayer.addCheckStateListener(new CheckStateListener(viewControlsLayer));
 
-		_uiEnabledLayersFromXml.add(tviLayer);
+//		_uiEnabledLayersFromXml.add(tviLayer);
 
 		_customLayers.put(layerId, tviLayer);
 	}
@@ -350,13 +355,13 @@ public class Map3Manager {
 				createLayerXml_20_DefaultLayer(xmlWWCategory, true, MapDefaultLayer.ID_I_CUBED_LANDSAT);
 				createLayerXml_20_DefaultLayer(xmlWWCategory, false, MapDefaultLayer.ID_USDA_NAIP);
 				createLayerXml_20_DefaultLayer(xmlWWCategory, false, MapDefaultLayer.ID_USDA_NAIP_USGS);
-				createLayerXml_20_DefaultLayer(xmlWWCategory, false, MapDefaultLayer.ID_MS_VIRTUAL_EARTH_AERIAL);
-				createLayerXml_20_DefaultLayer(xmlWWCategory, false, MapDefaultLayer.ID_BING_IMAGERY);
+				createLayerXml_20_DefaultLayer(xmlWWCategory, true, MapDefaultLayer.ID_MS_VIRTUAL_EARTH_AERIAL);
+				createLayerXml_20_DefaultLayer(xmlWWCategory, true, MapDefaultLayer.ID_BING_IMAGERY);
 				createLayerXml_20_DefaultLayer(xmlWWCategory, false, MapDefaultLayer.ID_USGS_TOPOGRAPHIC_MAPS_1_250K);
 				createLayerXml_20_DefaultLayer(xmlWWCategory, false, MapDefaultLayer.ID_USGS_TOPOGRAPHIC_MAPS_1_100K);
 				createLayerXml_20_DefaultLayer(xmlWWCategory, false, MapDefaultLayer.ID_USGS_TOPOGRAPHIC_MAPS_1_24K);
 				createLayerXml_20_DefaultLayer(xmlWWCategory, false, MapDefaultLayer.ID_USGS_URBAN_AREA_ORTHO);
-				createLayerXml_20_DefaultLayer(xmlWWCategory, false, MapDefaultLayer.ID_POLITICAL_BOUNDARIES);
+				createLayerXml_20_DefaultLayer(xmlWWCategory, true, MapDefaultLayer.ID_POLITICAL_BOUNDARIES);
 				createLayerXml_20_DefaultLayer(xmlWWCategory, false, MapDefaultLayer.ID_OPEN_STREET_MAP);
 			}
 
@@ -863,6 +868,9 @@ public class Map3Manager {
 						tviLayer.wwLayer.setEnabled(isEnabled);
 						if (isEnabled) {
 							_uiEnabledLayersFromXml.add(tviLayer);
+						} else {
+							// ensure that default enabled layer are hidden (which are created BEFORE xml file is read) !!!
+							_uiEnabledLayersFromXml.remove(tviLayer);
 						}
 
 						tviParent.addChild(tviLayer);
