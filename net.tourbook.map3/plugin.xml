@@ -65,7 +65,7 @@
 			category="net.tourbook.category.Tools"
 			class="net.tourbook.map3.view.Map3LayerView"
 			icon="icons/map3-properties.png"
-			id="net.tourbook.map3.Map3PropertiesView"
+			id="net.tourbook.map3.Map3LayerView"
 			name="%View_Name_Map3Properties"
 		/>
    

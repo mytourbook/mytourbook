@@ -179,54 +179,35 @@
             name="%Perspective_Name_ToursAndPhotos"/>
    </extension>
    
-   <extension
-         point="org.eclipse.ui.perspectiveExtensions">
+   <extension point="org.eclipse.ui.perspectiveExtensions">
 
-      <perspectiveExtension
-            targetID="*">
+      <perspectiveExtension targetID="*">
 
-         <perspectiveShortcut
-               id="net.tourbook.perspective.TourBook"/>
-         <perspectiveShortcut
-               id="net.tourbook.perspective.TourCatalog"/>
-         <perspectiveShortcut
-               id="net.tourbook.perspective.Statistic"/>
-         <perspectiveShortcut
-               id="net.tourbook.perspective.RawData"/>
-         <perspectiveShortcut
-               id="net.tourbook.perspective.CompareTours"/>
-         <perspectiveShortcut
-               id="net.tourbook.perspective.TourPhotoLinks"/>
+         <perspectiveShortcut id="net.tourbook.perspective.TourBook"/>
+         <perspectiveShortcut id="net.tourbook.perspective.TourCatalog"/>
+         <perspectiveShortcut id="net.tourbook.perspective.Statistic"/>
+         <perspectiveShortcut id="net.tourbook.perspective.RawData"/>
+         <perspectiveShortcut id="net.tourbook.perspective.CompareTours"/>
+         <perspectiveShortcut id="net.tourbook.perspective.TourPhotoLinks"/>
+               
       </perspectiveExtension>
 
-   <!--
-   -->
+      <perspectiveExtension targetID="net.tourbook.perspective.TourCatalog">
 
-
-      <perspectiveExtension
-            targetID="net.tourbook.perspective.TourCatalog">
-
-         <viewShortcut
-               id="net.tourbook.views.tourCatalog.comparedTourView"/>
-         <viewShortcut
-               id="net.tourbook.views.tourCatalog.referenceTourView"/>
-         <viewShortcut
-               id="net.tourbook.views.tourCatalog.yearStatisticView"/>
+         <viewShortcut id="net.tourbook.views.tourCatalog.comparedTourView"/>
+         <viewShortcut id="net.tourbook.views.tourCatalog.referenceTourView"/>
+         <viewShortcut id="net.tourbook.views.tourCatalog.yearStatisticView"/>
+      
       </perspectiveExtension>
 
 
-      <perspectiveExtension
-            targetID="net.tourbook.perspective.CompareTours">
+      <perspectiveExtension targetID="net.tourbook.perspective.CompareTours">
 
-         <viewShortcut
-               id="net.tourbook.views.tourCatalog.CompareResultView"/>
-         <viewShortcut
-               id="net.tourbook.views.tourCatalog.referenceTourView"/>
-         <viewShortcut
-               id="net.tourbook.views.tourCatalog.comparedTourView"/>
+         <viewShortcut id="net.tourbook.views.tourCatalog.CompareResultView"/>
+         <viewShortcut id="net.tourbook.views.tourCatalog.referenceTourView"/>
+         <viewShortcut id="net.tourbook.views.tourCatalog.comparedTourView"/>
+      
       </perspectiveExtension>
-
-
 
    </extension>
 

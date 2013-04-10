@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -49,19 +49,18 @@ public class PerspectiveFactoryTourBook implements IPerspectiveFactory {
 
 		//--------------------------------------------------------------------------------
 
-		final IFolderLayout mapFolder = layout.createFolder(//
-				FOLDER_ID_MAP,
+		final IFolderLayout mapFolder = layout.createFolder(FOLDER_ID_MAP,//
 				IPageLayout.RIGHT,
-				0.5f,
+				0.4f,
 				IPageLayout.ID_EDITOR_AREA);
 
 		mapFolder.addView(TourMapView.ID);
+		mapFolder.addPlaceholder(IExternalIds.VIEW_ID_NET_TOURBOOK_MAP3_MAP3_VIEW);
 		mapFolder.addView(TourDataEditorView.ID);
 
 		//--------------------------------------------------------------------------------
 
-		final IFolderLayout chartFolder = layout.createFolder(//
-				FOLDER_ID_CHART,
+		final IFolderLayout chartFolder = layout.createFolder(FOLDER_ID_CHART,//
 				IPageLayout.BOTTOM,
 				0.5f,
 				FOLDER_ID_MAP);
@@ -70,8 +69,7 @@ public class PerspectiveFactoryTourBook implements IPerspectiveFactory {
 
 		//--------------------------------------------------------------------------------
 
-		final IFolderLayout listFolder = layout.createFolder(
-				FOLDER_ID_LIST,
+		final IFolderLayout listFolder = layout.createFolder(FOLDER_ID_LIST,//
 				IPageLayout.TOP,
 				0.6f,
 				IPageLayout.ID_EDITOR_AREA);
@@ -81,11 +79,11 @@ public class PerspectiveFactoryTourBook implements IPerspectiveFactory {
 		listFolder.addView(CalendarView.ID);
 		listFolder.addView(TourStatisticsView.ID);
 		listFolder.addPlaceholder(PicDirView.ID);
+		listFolder.addPlaceholder(IExternalIds.VIEW_ID_NET_TOURBOOK_MAP3_MAP3_LAYER_VIEW);
 
 		//--------------------------------------------------------------------------------
 
-		final IFolderLayout markerFolder = layout.createFolder(
-				FOLDER_ID_MARKER,
+		final IFolderLayout markerFolder = layout.createFolder(FOLDER_ID_MARKER,//
 				IPageLayout.BOTTOM,
 				0.6f,
 				FOLDER_ID_LIST);

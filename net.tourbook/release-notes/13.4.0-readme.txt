@@ -1,6 +1,7 @@
 Version: 13.4                                        ?. April 2013
 
 
+
 Updates
 
 * improved Italian translation, provided by Doriano Cometto
@@ -14,17 +15,37 @@ Minor Modifications
 * Changed wording for actions in the calendar view
 
 
+
+Fixed Bugs 	
+
+* PDF printing issues caused by int -> long resturucturing (1 year ago):
+
+- markers are not sorted
+
+- marker distance is not displayed 
+
+
+* Fixed problem when importing FIT files from o-synce Navi2Coach, provided by Marcin Kuthan
+
+
+
+
 New experimental Feature
 
 * 3D map
 
-* 3D map and Linux, can cause troubles
+* Crash out of the box
 
-- Ubuntu 12.04 can crash in VMWare when "Accelerate 3D graphics" is checked in VM settings
+  When running 3D map with Ubuntu 12.04 in VMWare 8.0.5 it can cause a lot of problems, native Linux is not yet tested.
+
+  Win 7 and OSX 10.6 are running smoothly (when you have a good graphic card :-)
+
+  
+- Ubuntu 12.04 can crash in VMWare 8.0.5 when "Accelerate 3D graphics" is checked in VM settings
 
 - Ubuntu 12.04 is crashing when showing "Open Street Map" layer
 
-- causes lot of exception's when showing most of the layers, e.g.
+- causes lot of exception's when showing layers which are drawing map tiles
 
 gov.nasa.worldwind.layers.TextureTile initializeTexture
 SEVERE: Exception attempting to read texture file 
@@ -34,13 +55,4 @@ javax.media.opengl.GLException: DXTn compressed textures not supported by this g
 	at com.sun.opengl.util.texture.Texture.updateImage(Texture.java:381)
 
 	
-Fixed Bugs 	
-
-* PDF printing issues caused by int -> long resturucturing (1 year ago):
-
-- marker are not sorted
-
-- marker distance is not displayed 
-
-
-
+	
