@@ -28,7 +28,6 @@ import org.eclipse.swt.events.MouseTrackListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
@@ -41,14 +40,14 @@ class FlexTool {
 
 //	private static final int	WINDOW_TITLE_HEIGHT	= UI.IS_OSX ? SWT.DEFAULT : 16;
 
-	private boolean			_isTTDragged;
-	private int				_devXTTMouseDown;
-	private int				_devYTTMouseDown;
+//	private boolean			_isTTDragged;
+//	private int				_devXTTMouseDown;
+//	private int				_devYTTMouseDown;
 
 	private ToolTip3		_toolTip3;
 	private ToolTip3Tool	_tooltipTool;
 
-	private boolean			_isToolMoved;
+//	private boolean			_isToolMoved;
 
 	/*
 	 * UI controls
@@ -212,54 +211,55 @@ class FlexTool {
 	}
 
 	boolean isMoved() {
-		return _isToolMoved;
+		return false;
+//		return _isToolMoved;
 	}
 
 	private void onMouseDown(final Composite header, final MouseEvent event) {
 
-		_isTTDragged = true;
-
-		_devXTTMouseDown = event.x;
-		_devYTTMouseDown = event.y;
-
-		header.setCursor(_toolTip3.getCursorDragged());
+//		_isTTDragged = true;
+//
+//		_devXTTMouseDown = event.x;
+//		_devYTTMouseDown = event.y;
+//
+//		header.setCursor(_toolTip3.getCursorDragged());
 	}
 
 	private void onMouseEnter(final Composite header) {
 
-		header.setCursor(_toolTip3.getCursorHand());
+//		header.setCursor(_toolTip3.getCursorHand());
 	}
 
 	private void onMouseExit(final Composite header) {
 
-		_isTTDragged = false;
-
-		header.setCursor(null);
+//		_isTTDragged = false;
+//
+//		header.setCursor(null);
 	}
 
 	private void onMouseMove(final Composite header, final MouseEvent event) {
 
-		if (_isTTDragged) {
-
-			final int xDiff = event.x - _devXTTMouseDown;
-			final int yDiff = event.y - _devYTTMouseDown;
-
-			setDraggedLocation(header.getShell(), xDiff, yDiff);
-		}
+//		if (_isTTDragged) {
+//
+//			final int xDiff = event.x - _devXTTMouseDown;
+//			final int yDiff = event.y - _devYTTMouseDown;
+//
+//			setDraggedLocation(header.getShell(), xDiff, yDiff);
+//		}
 	}
 
 	private void onMouseUp(final Composite header) {
 
-		if (_isTTDragged) {
-
-			_isTTDragged = false;
-
-			updateUI_MoveLocation(true);
-
-			_toolTip3.disableDisplayListener();
-		}
-
-		header.setCursor(_toolTip3.getCursorHand());
+//		if (_isTTDragged) {
+//
+//			_isTTDragged = false;
+//
+//			updateUI_MoveLocation(true);
+//
+//			_toolTip3.disableDisplayListener();
+//		}
+//
+//		header.setCursor(_toolTip3.getCursorHand());
 	}
 
 	private void onSelectDefaultLocation() {
@@ -269,30 +269,30 @@ class FlexTool {
 		_toolTip3.moveToDefaultLocation(_tooltipTool);
 	}
 
-	/**
-	 * Set tooltip location when it was dragged with the mouse.
-	 * 
-	 * @param shell
-	 * @param xDiff
-	 *            Relative x location when dragging started
-	 * @param yDiff
-	 *            Relative y location when dragging started
-	 */
-	private void setDraggedLocation(final Shell shell, final int xDiff, final int yDiff) {
-
-		if (shell == null || shell.isDisposed()) {
-			return;
-		}
-
-		final Point movedLocation = shell.getLocation();
-		movedLocation.x += xDiff;
-		movedLocation.y += yDiff;
-
-		final Point size = shell.getSize();
-		final Point shellLocation = _toolTip3.fixupDisplayBounds(size, movedLocation);
-
-		shell.setLocation(shellLocation.x, shellLocation.y);
-	}
+//	/**
+//	 * Set tooltip location when it was dragged with the mouse.
+//	 *
+//	 * @param shell
+//	 * @param xDiff
+//	 *            Relative x location when dragging started
+//	 * @param yDiff
+//	 *            Relative y location when dragging started
+//	 */
+//	private void setDraggedLocation(final Shell shell, final int xDiff, final int yDiff) {
+//
+//		if (shell == null || shell.isDisposed()) {
+//			return;
+//		}
+//
+//		final Point movedLocation = shell.getLocation();
+//		movedLocation.x += xDiff;
+//		movedLocation.y += yDiff;
+//
+//		final Point size = shell.getSize();
+//		final Point shellLocation = _toolTip3.fixupDisplayBounds(size, movedLocation);
+//
+//		shell.setLocation(shellLocation.x, shellLocation.y);
+//	}
 
 	private void setHeaderColor() {
 
@@ -313,8 +313,8 @@ class FlexTool {
 
 	private void updateUI_MoveLocation(final boolean isMoved) {
 
-		// set move state
-		_isToolMoved = isMoved;
+//		// set move state
+//		_isToolMoved = isMoved;
 
 		// update UI
 		_btnDefaultLocation.setEnabled(isMoved);
