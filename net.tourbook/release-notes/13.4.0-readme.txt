@@ -1,87 +1,119 @@
-Version: 13.4                                        ?. April 2013
+Version: 13.4                                           13. April 2013
+
+Minor Modifications 
+
+* Changed wording for actions in the calendar view. 
+
+
+Updates 
+
+* Improved Italian translation, provided by Doriano Cometto. 
+* Improved French translation, provided by Vincent Di Sanzo. 
+
+
+Fixed Bugs 
+
+* PDF printing issues caused by int -> long restructuring (1 year ago) 
+- Markers are not sorted. 
+- Marker distance is not displayed. 
+
+* Fixed problem when importing FIT files from o-synce Navi2Coach, 
+provided by Marcin Kuthan. 
 
 
 
-Updates
+Experimental Feature: 3D Map 
 
-* improved Italian translation, provided by Doriano Cometto
+This map is currently just a "simple" map with a few features: 
+* Show/hide map layer 
+* Terrain profile graph tool 
 
-* improved French translation, provided by Vincent Di Sanzo
+It is planned that tours and photos are also displayed. 
 
-
-
-Minor Modifications
-
-* Changed wording for actions in the calendar view
-
+This map is displayed with the NASA World Wind SDK (why the application 
+is now 10 MByte larger than before). 
 
 
-Fixed Bugs 	
+3D Map Demos 
 
-* PDF printing issues caused by int -> long resturucturing (1 year ago):
-
-- markers are not sorted
-
-- marker distance is not displayed 
+There are many demos which shows features which can be implemented in 
+this map. 
 
 
-* Fixed problem when importing FIT files from o-synce Navi2Coach, provided by Marcin Kuthan
+Why is World Wind used instead of Google maps ? 
+
+* Pro Google 
+- There are many areas where Google map is better than 
+World Wind. 
+
+* Pro World Wind 
+- No Ads. 
+- No Google dependency. 
+- No Google internet connection. 
+- No over-engineered map navigation. 
+- Anything can be customized. 
+
+
+Map navigation 
+
+Map navigation can be done with the buttons in the View Controls layer 
+or with the Default Controls (mouse + keyboard) which are described here 
+(in the lower part of the page). 
+
+
+One Click Area 
+
+The 3D Properties view contains an area where layers can be 
+activated/deactivated very easily with the mouse. 
+
+This area is on the right site of the view and it's width is one third 
+of the whole view width. The mouse cursor will change when this area is 
+hovered. 
+
+Clicking inside this area is doing these actions: 
+* Show/hide map layer. 
+* Collapse/expand layer category. 
+
+
+Terrain profile graph 
+
+The Terrain profile graph tool can not be dragged to another location 
+(like in the screenshot) because it's not working correctly with Linux. 
 
 
 
+Linux: Crash out of the box :-( 
 
-New experimental Feature
+When running this 3D map in a Linux environment within VMWare it caused 
+a lot of problems, native Linux is not yet tested. 
 
-* 3D map
-
-- loading map images from the internet is not very fast but when retrieved from the internal cash it is OK
-
-- navigating with the mouse is different than Google Earth
-
-
-* Crash out of the box
-
-  When running 3D map in my Linux environment it causes a lot of problems, native Linux is not yet tested.
-
-  Win 7 and OSX 10.6 are running smoothly (when you have a good graphic card :-)
-
-- MyTourbook can crash when showing "Open Street Map" layer
-
-- causes lot of exception's when showing layers which are drawing map tiles
-
-gov.nasa.worldwind.layers.TextureTile initializeTexture
-SEVERE: Exception attempting to read texture file 
-javax.media.opengl.GLException: DXTn compressed textures not supported by this graphics card
-	at com.sun.opengl.util.texture.Texture.checkCompressedTextureExtensions(Texture.java:987)
-	at com.sun.opengl.util.texture.Texture.updateImage(Texture.java:530)
-	at com.sun.opengl.util.texture.Texture.updateImage(Texture.java:381)
+This map is running smoothly with Win 7 and OSX 10.6 (when you have a 
+good graphic card :-) 
 
 
+Linux problems 
 
-My Linux environment:
-
-- VMWare 8.0.5
-
-- Ubuntu 12.04
-
-- JRE version: 7.0_13-b20
-
-- Java VM: Java HotSpot(TM) Client VM (23.7-b01 mixed mode linux-x86 )
+* MyTourbook can crash when showing "Open Street Map" layer. It can 
+display a few tiles but then it crashes.
+* A lot of exception's can occure (see console) when showing layers 
+which draw map tiles. 
 
 
-These layers can be displayed without problems:
+Used Linux test environment 
 
-- Stars
+* VMWare 8.0.5 
+* Ubuntu 12.04 
+* JRE version: 7.0_13-b20 
+* Java VM: Java HotSpot(TM) Client VM (23.7-b01 mixed mode linux-x86 ) 
 
-- Atmosphere
 
-- Place Names
+These layers can be displayed in Linux without problems 
 
-- Scale bar
+* Stars 
+* Atmosphere 
+* Place Names 
+* Scale bar 
+* Terrain profile graph 
+* View Controls 
+* Status Layer 
 
-- Terrain profile graph
-
-- View Controls
-
-- Status Layer
-	

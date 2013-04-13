@@ -227,7 +227,7 @@ public class PrintTourPDF extends PrintTourExtension {
 
 	private void setTranslationParameters(final Transformer _transformer) {
 
-		_transformer.setParameter("lang.Tour_Print_PageTitle", Messages.Tour_Print_PageTitle);
+		_transformer.setParameter("lang.Tour_Print_PageTitle", Messages.Tour_Print_PageTitle); //$NON-NLS-1$
 		_transformer.setParameter("lang.Tour_Print_Tour", Messages.Tour_Print_Tour); //$NON-NLS-1$
 		_transformer.setParameter("lang.Tour_Print_Start", Messages.Tour_Print_Start); //$NON-NLS-1$
 		_transformer.setParameter("lang.Tour_Print_Start_Location", Messages.Tour_Print_Start_Location); //$NON-NLS-1$

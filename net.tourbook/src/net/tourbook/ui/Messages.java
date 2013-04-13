@@ -185,8 +185,7 @@ public class Messages extends NLS {
 	public static String		ColumnFactory_NumberOfNoGPSPhotos_Tooltip;
 	public static String		ColumnFactory_NumberOfPhotos_Header;
 	public static String		ColumnFactory_NumberOfPhotos_Label;
-
-	public static String	ColumnFactory_NumberOfPhotos_Tooltip;
+	public static String		ColumnFactory_NumberOfPhotos_Tooltip;
 	public static String		ColumnFactory_NumberOfTimeSlices_Header;
 	public static String		ColumnFactory_NumberOfTimeSlices_Label;
 	public static String		ColumnFactory_NumberOfTimeSlices_Tooltip;
