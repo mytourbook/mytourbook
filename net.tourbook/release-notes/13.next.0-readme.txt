@@ -1,0 +1,21 @@
+Version: 13.next                                           ?. April 2013
+
+Minor Modifications 
+
+
+Updates 
+
+
+
+Fixed Bugs 
+
+* When a tour is split, these error occured:
+
+- A tour marker can be out of array bounds.
+
+- NPE occured when last time slice is split
+
+-
+
+
+
