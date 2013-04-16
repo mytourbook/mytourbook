@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2012  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -724,13 +724,16 @@ public class RawDataManager {
 
 		for (final TourData reimportedTourData : _newlyImportedTours.values()) {
 
-			/*
-			 * data series must have the same number of time slices, otherwise the markers can be
-			 * off the array bounds, this problem could be solved but takes time to do it.
-			 */
-			if (oldTourData.timeSerie.length != reimportedTourData.timeSerie.length) {
-				isWrongLength = true;
-				continue;
+			if (oldTourData.timeSerie != null && reimportedTourData.timeSerie != null) {
+
+				/*
+				 * data series must have the same number of time slices, otherwise the markers can
+				 * be off the array bounds, this problem could be solved but takes time to do it.
+				 */
+				if (oldTourData.timeSerie.length != reimportedTourData.timeSerie.length) {
+					isWrongLength = true;
+					continue;
+				}
 			}
 
 			/*
