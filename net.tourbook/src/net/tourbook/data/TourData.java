@@ -2411,7 +2411,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		}
 
 		// check if required data for speed, gradient... are available
-		if (size < 2 || distanceSerie == null && (latitudeSerie == null || longitudeSerie == null)) {
+		if (distanceSerie == null && (latitudeSerie == null || longitudeSerie == null)) {
 			return;
 		}
 
@@ -2427,6 +2427,11 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 		altimeterSerie = new float[size];
 		altimeterSerieImperial = new float[size];
+
+		// ensure data series are created to prevent exceptions
+		if (size < 2) {
+			return;
+		}
 
 		final double[] distance = new double[size];
 		final double[] distance_sc = new double[size];

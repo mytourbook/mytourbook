@@ -705,6 +705,14 @@ public class TourMapPainter extends MapPainter {
 
 							final int serieIndex = tourMarker.getSerieIndex();
 
+							/*
+							 * check bounds because when a tour is split, it can happen that the
+							 * marker serie index is out of scope
+							 */
+							if (serieIndex >= latitudeSerie.length) {
+								continue;
+							}
+
 							// draw tour marker
 							if (drawTourMarker(
 									gcTile,

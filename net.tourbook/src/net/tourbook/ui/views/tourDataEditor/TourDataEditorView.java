@@ -4701,8 +4701,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		final StructuredSelection sliceSelection = (StructuredSelection) _sliceViewer.getSelection();
 
-		final boolean isOneSliceSelected = sliceSelection.size() == 1;
-		final boolean isSliceSelected = sliceSelection.size() > 0;
+		final int numberOfSelectedSlices = sliceSelection.size();
+
+		final boolean isSliceSelected = numberOfSelectedSlices > 0;
+		final boolean isOneSliceSelected = numberOfSelectedSlices == 1;
 		final boolean isTourInDb = isTourInDb();
 
 		// check if a marker can be created
@@ -4734,19 +4736,33 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		_actionCsvTimeSliceExport.setEnabled(isSliceSelected);
 
 		_actionSplitTour.setEnabled(isOneSliceSelected);
-		_actionExtractTour.setEnabled(sliceSelection.size() >= 2);
+		_actionExtractTour.setEnabled(numberOfSelectedSlices >= 2);
 
 		// set start/end position into the actions
 		if (isSliceSelected) {
 
-			final Object[] sliceArray = sliceSelection.toArray();
-			final TimeSlice firstTimeSlice = (TimeSlice) sliceArray[0];
-			final TimeSlice lastTimeSlice = (TimeSlice) sliceArray[sliceArray.length - 1];
+			final Object[] selectedSliceArray = sliceSelection.toArray();
+			final int lastSliceIndex = selectedSliceArray.length - 1;
 
-			_actionExportTour.setTourRange(firstTimeSlice.serieIndex, lastTimeSlice.serieIndex);
+			final TimeSlice firstSelectedTimeSlice = (TimeSlice) selectedSliceArray[0];
+			final TimeSlice lastSelectedTimeSlice = (TimeSlice) selectedSliceArray[lastSliceIndex];
 
-			_actionSplitTour.setTourRange(firstTimeSlice.serieIndex);
-			_actionExtractTour.setTourRange(firstTimeSlice.serieIndex, lastTimeSlice.serieIndex);
+			final int firstSelectedSerieIndex = firstSelectedTimeSlice.serieIndex;
+			final int lastSelectedSerieIndex = lastSelectedTimeSlice.serieIndex;
+
+			_actionExportTour.setTourRange(firstSelectedSerieIndex, lastSelectedSerieIndex);
+
+			_actionSplitTour.setTourRange(firstSelectedSerieIndex);
+			_actionExtractTour.setTourRange(firstSelectedSerieIndex, lastSelectedSerieIndex);
+
+			/*
+			 * prevent that the first and last slice is selected for the split which causes errors
+			 */
+			final int numberOfAllSlices = _sliceViewerItems.length;
+
+			final boolean isSplitValid = firstSelectedSerieIndex > 0 && firstSelectedSerieIndex < numberOfAllSlices - 1;
+
+			_actionSplitTour.setEnabled(isOneSliceSelected && isSplitValid);
 		}
 	}
 
@@ -5162,9 +5178,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			viewerItems[serieIndex] = new TimeSlice(serieIndex);
 		}
 
-		if (viewerItems.length == 0) {
-			return viewerItems;
-		}
 		return viewerItems;
 	}
 
