@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -242,7 +242,11 @@ public class CSVTourDataReader extends TourbookDevice {
 			// save new entity
 			newSavedTourType = TourDatabase.saveEntity(newTourType, newTourType.getTypeId(), TourType.class);
 			if (newSavedTourType != null) {
+
 				tourType = newSavedTourType;
+
+				TourDatabase.clearTourTypes();
+				TourManager.getInstance().clearTourDataCache();
 			}
 		}
 
@@ -357,6 +361,9 @@ public class CSVTourDataReader extends TourbookDevice {
 				final Display display = Display.getDefault();
 
 				if (isNewTag) {
+
+					// fire modify event
+
 					display.syncExec(new Runnable() {
 						public void run() {
 							TourManager.fireEvent(TourEventId.TAG_STRUCTURE_CHANGED);
@@ -366,20 +373,18 @@ public class CSVTourDataReader extends TourbookDevice {
 
 				if (isNewTourType) {
 
-					TourDatabase.clearTourTypes();
-					TourManager.getInstance().clearTourDataCache();
+					// fire modify event
 
 					display.syncExec(new Runnable() {
 						public void run() {
-							// fire modify event
 							TourbookPlugin
 									.getDefault()
 									.getPreferenceStore()
 									.setValue(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED, Math.random());
 						}
 					});
-
 				}
+
 			} catch (final IOException e) {
 				e.printStackTrace();
 			}
