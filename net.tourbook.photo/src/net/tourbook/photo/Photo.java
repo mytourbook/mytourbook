@@ -1186,6 +1186,7 @@ public class Photo {
 			_photoLoadingStateThumb = photoLoadingState;
 		}
 
+		// set overall loading error
 		if (photoLoadingState == PhotoLoadingState.IMAGE_IS_INVALID) {
 			_isLoadingError = true;
 		}

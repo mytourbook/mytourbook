@@ -2085,7 +2085,8 @@ public abstract class ImageGallery implements IItemListener, IGalleryContextMenu
 		_hoveredItem.isHovered = false;
 		_hoveredItem.isNeedExitUIUpdate = false;
 		_hoveredItem.hoveredStars = 0;
-		_hoveredItem.isHoveredAnnotationTour = false;
+		_hoveredItem.isHovered_AnnotationTour = false;
+		_hoveredItem.isHovered_InvalidImage = false;
 
 		if (_hoveredItem.allSelectedGalleryItems != null) {
 
@@ -2124,7 +2125,11 @@ public abstract class ImageGallery implements IItemListener, IGalleryContextMenu
 	@Override
 	public boolean onItemMouseDown(final GalleryMT20Item mouseDownItem, final int itemMouseX, final int itemMouseY) {
 
-		if (mouseDownItem != null && (_isHandleRatingStars || _isShowAnnotations)) {
+		if (mouseDownItem == null) {
+			return false;
+		}
+
+		if (_isHandleRatingStars || _isShowAnnotations || mouseDownItem.photo.isLoadingError()) {
 
 			if (_photoRenderer.isMouseDownHandled(mouseDownItem, itemMouseX, itemMouseY)) {
 
@@ -2140,7 +2145,9 @@ public abstract class ImageGallery implements IItemListener, IGalleryContextMenu
 	@Override
 	public void onItemMouseExit(final GalleryMT20Item exitHoveredItem, final int itemMouseX, final int itemMouseY) {
 
-		if (_isHandleRatingStars == false && _isShowAnnotations == false) {
+		if (_isHandleRatingStars == false
+				&& _isShowAnnotations == false
+				&& exitHoveredItem.photo.isLoadingError() == false) {
 			return;
 		}
 
@@ -2154,7 +2161,8 @@ public abstract class ImageGallery implements IItemListener, IGalleryContextMenu
 		exitHoveredItem.isNeedExitUIUpdate = false;
 
 		exitHoveredItem.hoveredStars = 0;
-		exitHoveredItem.isHoveredAnnotationTour = false;
+		exitHoveredItem.isHovered_AnnotationTour = false;
+		exitHoveredItem.isHovered_InvalidImage = false;
 
 		if (exitHoveredItem.allSelectedGalleryItems != null) {
 
@@ -2191,16 +2199,20 @@ public abstract class ImageGallery implements IItemListener, IGalleryContextMenu
 			_photoGalleryTooltip.show(hoveredItem);
 		}
 
+		if (hoveredItem == null) {
+			return;
+		}
+
 		final boolean isRatingStarsHandledAndPainted = _isHandleRatingStars && _isAttributesPainted;
 
-		if (hoveredItem != null && (isRatingStarsHandledAndPainted || _isShowAnnotations)) {
+		if (isRatingStarsHandledAndPainted || _isShowAnnotations || hoveredItem.photo.isLoadingError()) {
 
 			_hoveredItem = hoveredItem;
 
 			hoveredItem.isHovered = true;
 
 			// this will set allSelectedGalleryItems in the hovered item
-			final boolean isModified = _photoRenderer.itemIsHovered(hoveredItem, itemMouseX, itemMouseY);
+			final boolean isModified = _photoRenderer.isItemHovered(hoveredItem, itemMouseX, itemMouseY);
 
 			// don't reset here, this is done in the item exit event
 			hoveredItem.isNeedExitUIUpdate |= isModified;

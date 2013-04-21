@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.photo;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -35,6 +36,15 @@ public interface IPhotoServiceProvider {
 	void openTour(HashMap<Long, TourPhotoReference> tourPhotoReferences);
 
 	/**
+	 * Replace file image path in this and other photos which are in the same path.
+	 * 
+	 * @param sourcePhoto
+	 *            Photo from which the image should be replaced
+	 * @return Returns a list of all images which file image path has been modified.
+	 */
+	ArrayList<File> replaceImageFilePath(Photo sourcePhoto);
+
+	/**
 	 * A mouse down event occured at a hovered gallery item within the star rating area.
 	 * 
 	 * @param photos
@@ -49,6 +59,5 @@ public interface IPhotoServiceProvider {
 	 * @param photo
 	 */
 	void setTourReference(Photo photo);
-
 
 }

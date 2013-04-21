@@ -15,7 +15,8 @@ Fixed Bugs
 
 - NPE occured when last time slice is split
 
--
+
+* Show photo annotations at the correct position when image cannot be loaded
 
 
 

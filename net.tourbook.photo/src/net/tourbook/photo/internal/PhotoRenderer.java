@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.photo.internal;
 
+import java.io.File;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -162,8 +163,14 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 	private int							_paintedImageWidth;
 	private int							_paintedImageHeight;
 
+	private int							_paintedStatusTextX;
+	private int							_paintedStatusTextY;
+	private int							_paintedStatusTextWidth;
+
 	private static int					_annotationImageWidth;
 	private static int					_annotationImageHeight;
+	private static int					_invalidPhotoImageWidth;
+	private static int					_invalidPhotoImageHeight;
 	private static int					_ratingStarImageWidth;
 	private static int					_ratingStarImageHeight;
 
@@ -217,6 +224,9 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 	private static Image				_imageAnnotationSavedInTour;
 	private static Image				_imageAnnotationSavedInTour_Hovered;
 
+	private static Image				_imageInvalidPhotoImage;
+	private static Image				_imageInvalidPhotoImage_Hovered;
+
 	private static Image				_imageRatingStar;
 	private static Image				_imageRatingStarAndHovered;
 	private static Image				_imageRatingStarDisabled;
@@ -234,6 +244,9 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 		_imageAnnotationSavedInTour = imageRegistry.get(PhotoUI.PHOTO_ANNOTATION_SAVED_IN_TOUR);
 		_imageAnnotationSavedInTour_Hovered = imageRegistry.get(PhotoUI.PHOTO_ANNOTATION_SAVED_IN_TOUR_HOVERED);
 
+		_imageInvalidPhotoImage = imageRegistry.get(PhotoUI.INVALID_PHOTO_IMAGE);
+		_imageInvalidPhotoImage_Hovered = imageRegistry.get(PhotoUI.INVALID_PHOTO_IMAGE_HOVERED);
+
 		_imageRatingStar = imageRegistry.get(PhotoUI.PHOTO_RATING_STAR);
 		_imageRatingStarAndHovered = imageRegistry.get(PhotoUI.PHOTO_RATING_STAR_AND_HOVERED);
 		_imageRatingStarDelete = imageRegistry.get(PhotoUI.PHOTO_RATING_STAR_DELETE);
@@ -242,13 +255,17 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 		_imageRatingStarNotHovered = imageRegistry.get(PhotoUI.PHOTO_RATING_STAR_NOT_HOVERED);
 		_imageRatingStarNotHoveredButSet = imageRegistry.get(PhotoUI.PHOTO_RATING_STAR_NOT_HOVERED_BUT_SET);
 
-		final Rectangle bounds = _imageAnnotationGpsExif.getBounds();
-		_annotationImageWidth = bounds.width;
-		_annotationImageHeight = bounds.height;
+		Rectangle imageBounds = _imageAnnotationGpsExif.getBounds();
+		_annotationImageWidth = imageBounds.width;
+		_annotationImageHeight = imageBounds.height;
 
-		final Rectangle ratingStarBounds = _imageRatingStar.getBounds();
-		_ratingStarImageWidth = ratingStarBounds.width;
-		_ratingStarImageHeight = ratingStarBounds.height;
+		imageBounds = _imageRatingStar.getBounds();
+		_ratingStarImageWidth = imageBounds.width;
+		_ratingStarImageHeight = imageBounds.height;
+
+		imageBounds = _imageInvalidPhotoImage.getBounds();
+		_invalidPhotoImageWidth = imageBounds.width;
+		_invalidPhotoImageHeight = imageBounds.height;
 
 		MAX_RATING_STARS_WIDTH = _ratingStarImageWidth * RatingStars.MAX_RATING_STARS;
 	}
@@ -296,8 +313,8 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 			_fontHeight = gc.getFontMetrics().getHeight();
 		}
 
-		galleryItem.photoPaintedX = galleryItemViewPortX + _gridBorderSize;
-		galleryItem.photoPaintedY = galleryItemViewPortY + _gridBorderSize;
+		galleryItem.paintedX_Photo = galleryItemViewPortX + _gridBorderSize;
+		galleryItem.paintedY_Photo = galleryItemViewPortY + _gridBorderSize;
 		_photoWidth = galleryItemWidth - _gridBorderSize;
 		_photoHeight = galleryItemHeight - _gridBorderSize;
 
@@ -318,8 +335,8 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 		_paintedDest_Width = itemImageWidth;
 		_paintedDest_Height = itemImageHeight;
 
-		final int imageX = galleryItem.photoPaintedX + (isBorder ? border2 : 0);
-		final int imageY = galleryItem.photoPaintedY + (isBorder ? border2 : 0);
+		final int itemImageX = galleryItem.paintedX_Photo + (isBorder ? border2 : 0);
+		final int itemImageY = galleryItem.paintedY_Photo + (isBorder ? border2 : 0);
 
 		final ImageQuality requestedImageQuality = itemImageWidth <= PhotoLoadManager.IMAGE_SIZE_THUMBNAIL
 				? ImageQuality.THUMB
@@ -392,8 +409,8 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 			}
 
 			final boolean isPainted = draw_Image(gc, photo, paintedImage, galleryItem,//
-					imageX,
-					imageY,
+					itemImageX,
+					itemImageY,
 					itemImageWidth,
 					itemImageHeight,
 					isRequestedQuality,
@@ -411,9 +428,13 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 
 			// image is not available
 
-			drawStatusText(gc, photo, //
-					imageX,
-					imageY,
+			// set image positions that annotations are painted correctly
+			_paintedDest_DevX = itemImageX;
+			_paintedDest_DevY = itemImageY;
+
+			draw_StatusText(gc, galleryItem, //
+					itemImageX,
+					itemImageY,
 					itemImageWidth,
 					itemImageHeight,
 					requestedImageQuality,
@@ -427,21 +448,21 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 
 		// draw name & date & annotations
 		if (_isAttributesPainted && isDrawPhotoDateName) {
-			drawAttributes(gc, photo, //
-					imageX,
-					imageY,
+			draw_Attributes(gc, photo, //
+					itemImageX,
+					itemImageY,
 					itemImageWidth,
 					itemImageHeight);
 		}
 
 		// annotations are drawn in the bottom right corner of the image
 		if (_isShowAnnotations) {
-			drawAnnotations(gc, galleryItem, photo);
+			draw_Annotations(gc, galleryItem, photo);
 		}
 
 		if (_isAttributesPainted && _isShowPhotoRatingStars) {
 
-			drawRatingStars(gc, galleryItem, photo.ratingStars);
+			draw_RatingStars(gc, galleryItem, photo.ratingStars);
 
 			_isRatingStarsPainted = true;
 
@@ -450,9 +471,182 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 			_isRatingStarsPainted = false;
 		}
 
+		if (photo.isLoadingError()) {
+
+			draw_InvalidImage(gc, galleryItem, photo, //
+					itemImageX,
+					itemImageY,
+					itemImageWidth,
+					itemImageHeight);
+		}
+
 //		// debug box for the whole gallery item area
 //		gc.setForeground(gc.getDevice().getSystemColor(SWT.COLOR_GREEN));
 //		gc.drawRectangle(galleryItemViewPortX - 1, galleryItemViewPortY, galleryItemWidth - 1, galleryItemHeight - 1);
+	}
+
+	private void draw_Annotations(final GC gc, final GalleryMT20Item galleryItem, final Photo photo) {
+
+		final boolean isItemHovered = galleryItem.isHovered;
+
+		final int devXAnnotation = _paintedDest_DevX + _paintedDest_Width;
+		final int devYAnnotation = _paintedDest_DevY + _paintedDest_Height - _annotationImageHeight;
+
+		int devXAnnotationOffset = 0;
+		Image annotationImage;
+
+		final boolean isPhotoWithGps = photo.isLinkPhotoWithGps || photo.isTourPhotoWithGps;
+
+		if (isPhotoWithGps) {
+
+			devXAnnotationOffset = _annotationImageWidth;
+
+			annotationImage = photo.isGeoFromExif ? _imageAnnotationGpsExif : _imageAnnotationGpsTour;
+
+			gc.drawImage(//
+					annotationImage,
+					devXAnnotation - devXAnnotationOffset,
+					devYAnnotation);
+
+			galleryItem.paintedX_Annotation_Gps = devXAnnotation - _paintedDest_DevX;
+
+		} else {
+
+			galleryItem.paintedX_Annotation_Gps = Integer.MIN_VALUE;
+		}
+
+		if (photo.isSavedInTour) {
+
+			devXAnnotationOffset += _annotationImageWidth;
+
+			if (isItemHovered && galleryItem.isHovered_AnnotationTour) {
+				annotationImage = _imageAnnotationSavedInTour_Hovered;
+			} else {
+				annotationImage = _imageAnnotationSavedInTour;
+			}
+
+			gc.drawImage(//
+					annotationImage,
+					devXAnnotation - devXAnnotationOffset,
+					devYAnnotation);
+
+			galleryItem.paintedX_Annotation_Tour = devXAnnotation - galleryItem.paintedX_Photo - devXAnnotationOffset;
+
+		} else {
+
+			galleryItem.paintedX_Annotation_Tour = Integer.MIN_VALUE;
+		}
+
+		galleryItem.paintedY_Annotation = devYAnnotation - galleryItem.paintedY_Photo;
+	}
+
+	private void draw_Attributes(	final GC gc,
+									final Photo photo,
+									final int photoPosX,
+									final int photoPosY,
+									final int photoWidth,
+									final int photoHeight) {
+
+		/*
+		 * get text for date/filename
+		 */
+		int textFileNameWidth = -1;
+		int textDateTimeWidth = -1;
+		String textFileName = null;
+		String textDateTime = null;
+
+		int textFileNamePosCenterX = 0;
+		int textDateTimePosCenterX = 0;
+
+		if (_isShowPhotoName) {
+			textFileName = photo.imageFileName;
+			textFileNameWidth = gc.textExtent(textFileName).x;
+
+			textFileNamePosCenterX = (photoWidth - (textFileNameWidth > photoWidth ? photoWidth : textFileNameWidth)) / 2;
+		}
+
+		if (_isShowDateInfo) {
+			final DateTime dateTime = photo.getOriginalDateTime();
+			if (dateTime != null) {
+
+				if (_photoDateInfo == PhotoDateInfo.Date) {
+
+					textDateTime = _dtFormatterDate.print(dateTime);
+
+				} else if (_photoDateInfo == PhotoDateInfo.Time) {
+
+					textDateTime = _dtFormatterTime.print(dateTime);
+
+				} else {
+					textDateTime = _dtFormatterDateTime.print(dateTime);
+				}
+
+				textDateTimeWidth = gc.textExtent(textDateTime).x;
+
+				textDateTimePosCenterX = (photoWidth - (textDateTimeWidth > photoWidth ? photoWidth : textDateTimeWidth)) / 2;
+			}
+		}
+
+		/*
+		 * get text position
+		 */
+		final int defaultTextPosY = photoPosY + photoHeight - _fontHeight;
+
+		int posXFilename = photoPosX;
+		int posYFilename = defaultTextPosY;
+		int posXDate = photoPosX;
+		final int posYDate = defaultTextPosY;
+
+		if (textFileNameWidth != -1 && textDateTimeWidth != -1) {
+
+			// paint filename & date
+
+			final int textSpacing = 10;
+			final int textWidth = textFileNameWidth + textSpacing + textDateTimeWidth;
+
+			if (textWidth > photoWidth) {
+
+				// paint on top of each other, filename first
+
+				posXFilename += textFileNamePosCenterX;
+				posXDate += textDateTimePosCenterX;
+				posYFilename -= _fontHeight;
+
+			} else {
+
+				// center text
+
+				final int textX = (photoWidth - textWidth) / 2;
+				posXFilename += textX;
+				posXDate += textX + textFileNameWidth + textSpacing;
+			}
+
+		} else if (textFileNameWidth != -1) {
+
+			// paint only filename
+			posXFilename += textFileNamePosCenterX;
+
+		} else if (textDateTimeWidth != -1) {
+
+			// paint only date
+			posXDate += textDateTimePosCenterX;
+		}
+
+		/*
+		 * draw text
+		 */
+		gc.setForeground(_fgColor);
+		gc.setBackground(_bgColor);
+
+		// draw filename
+		if (textFileNameWidth != -1) {
+			gc.drawString(textFileName, posXFilename, posYFilename, false);
+		}
+
+		// draw date time
+		if (textDateTimeWidth != -1) {
+			gc.drawString(textDateTime, posXDate, posYDate, false);
+		}
 	}
 
 	/**
@@ -577,169 +771,300 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 		return true;
 	}
 
-	private void drawAnnotations(final GC gc, final GalleryMT20Item galleryItem, final Photo photo) {
+	private void draw_InvalidImage(	final GC gc,
+									final GalleryMT20Item galleryItem,
+									final Photo photo,
+									final int itemImageX,
+									final int itemImageY,
+									final int itemImageWidth,
+									final int itemImageHeight) {
 
-		final boolean isItemHovered = galleryItem.isHovered;
+		final int actionMargin = 3;
 
-		final int devXAnnotation = _paintedDest_DevX + _paintedDest_Width;
-		final int devYAnnotation = _paintedDest_DevY + _paintedDest_Height - _annotationImageHeight;
-
-		int devXAnnotationOffset = 0;
-		Image annotationImage;
-
-		final boolean isPhotoWithGps = photo.isLinkPhotoWithGps || photo.isTourPhotoWithGps;
-
-		if (isPhotoWithGps) {
-
-			devXAnnotationOffset = _annotationImageWidth;
-
-			annotationImage = photo.isGeoFromExif ? _imageAnnotationGpsExif : _imageAnnotationGpsTour;
-
-			gc.drawImage(//
-					annotationImage,
-					devXAnnotation - devXAnnotationOffset,
-					devYAnnotation);
-
-			galleryItem.itemX_AnnotationPainted_Gps = devXAnnotation - _paintedDest_DevX;
-
-		} else {
-
-			galleryItem.itemX_AnnotationPainted_Gps = Integer.MIN_VALUE;
+		// ensure action icon is within gallery item
+		int paintedInvalidImageX = _paintedStatusTextX + _paintedStatusTextWidth + actionMargin;
+		if (paintedInvalidImageX + _invalidPhotoImageWidth > itemImageX + itemImageWidth) {
+			paintedInvalidImageX = itemImageX + itemImageWidth - 0 * actionMargin - _invalidPhotoImageWidth;
 		}
 
-		if (photo.isSavedInTour) {
+		gc.setBackground(_bgColor);
+		gc.fillRectangle(//
+				paintedInvalidImageX - actionMargin,
+				_paintedStatusTextY - actionMargin,
+				_invalidPhotoImageWidth + 2 * actionMargin,
+				_invalidPhotoImageHeight + 2 * actionMargin);
 
-			devXAnnotationOffset += _annotationImageWidth;
+		final Image image = galleryItem.isHovered_InvalidImage
+				? _imageInvalidPhotoImage_Hovered
+				: _imageInvalidPhotoImage;
 
-			if (isItemHovered && galleryItem.isHoveredAnnotationTour) {
-				annotationImage = _imageAnnotationSavedInTour_Hovered;
-			} else {
-				annotationImage = _imageAnnotationSavedInTour;
-			}
+		gc.drawImage(image, paintedInvalidImageX, _paintedStatusTextY);
 
-			gc.drawImage(//
-					annotationImage,
-					devXAnnotation - devXAnnotationOffset,
-					devYAnnotation);
-
-			galleryItem.itemXAnnotationPaintedTour = devXAnnotation - galleryItem.photoPaintedX - devXAnnotationOffset;
-
-//			galleryItem.photoPaintedX
-
-		} else {
-
-			galleryItem.itemXAnnotationPaintedTour = Integer.MIN_VALUE;
-		}
-
-		galleryItem.itemYAnnotationPainted = devYAnnotation - galleryItem.photoPaintedY;
+		// remember RELATIVE position
+		galleryItem.paintedY_InvalidImageArea = _paintedStatusTextY - galleryItem.paintedY_Photo;
+		galleryItem.paintedHeight_InvalidImageArea = _invalidPhotoImageHeight + 2 * actionMargin;
 	}
 
-	private void drawAttributes(final GC gc,
-								final Photo photo,
-								final int photoPosX,
-								final int photoPosY,
-								final int photoWidth,
-								final int photoHeight) {
+	private void draw_RatingStars(final GC gc, final GalleryMT20Item galleryItem, final int ratingStars) {
 
-		/*
-		 * get text for date/filename
-		 */
-		int textFileNameWidth = -1;
-		int textDateTimeWidth = -1;
-		String textFileName = null;
-		String textDateTime = null;
+		final boolean isItemHovered = (galleryItem.isHovered || galleryItem.isInHoveredGroup)
+				&& _isHandleHoveredRatingStars;
 
-		int textFileNamePosCenterX = 0;
-		int textDateTimePosCenterX = 0;
+		final int hoveredStars = galleryItem.hoveredStars;
+		final boolean isStarHovered = hoveredStars > 0;
+		boolean canSetRating = false;
 
-		if (_isShowPhotoName) {
-			textFileName = photo.imageFileName;
-			textFileNameWidth = gc.textExtent(textFileName).x;
-
-			textFileNamePosCenterX = (photoWidth - (textFileNameWidth > photoWidth ? photoWidth : textFileNameWidth)) / 2;
+		final Photo photo = galleryItem.photo;
+		if (photo != null) {
+			canSetRating = photo.isSavedInTour;
 		}
 
-		if (_isShowDateInfo) {
-			final DateTime dateTime = photo.getOriginalDateTime();
-			if (dateTime != null) {
+		// center ratings stars in the middle of the image
+		final int ratingStarsLeftBorder = galleryItem.paintedX_Photo + _photoWidth / 2 - MAX_RATING_STARS_WIDTH / 2;
 
-				if (_photoDateInfo == PhotoDateInfo.Date) {
+		for (int starIndex = 0; starIndex < RatingStars.MAX_RATING_STARS; starIndex++) {
 
-					textDateTime = _dtFormatterDate.print(dateTime);
+			Image starImage;
 
-				} else if (_photoDateInfo == PhotoDateInfo.Time) {
+			if (canSetRating) {
 
-					textDateTime = _dtFormatterTime.print(dateTime);
+				if (isItemHovered) {
+
+					if (isStarHovered) {
+
+						if (starIndex < hoveredStars) {
+
+							if (starIndex < ratingStars) {
+
+								if (starIndex == ratingStars - 1) {
+									starImage = _imageRatingStarDelete;
+								} else {
+									starImage = _imageRatingStarAndHovered;
+								}
+							} else {
+								starImage = _imageRatingStarHovered;
+							}
+
+						} else {
+							if (starIndex < ratingStars) {
+								starImage = _imageRatingStarNotHoveredButSet;
+							} else {
+								starImage = _imageRatingStarNotHovered;
+							}
+						}
+
+					} else {
+
+						if (starIndex < ratingStars) {
+							starImage = _imageRatingStarNotHoveredButSet;
+						} else {
+							starImage = _imageRatingStarNotHovered;
+						}
+					}
 
 				} else {
-					textDateTime = _dtFormatterDateTime.print(dateTime);
+
+					// item is not hovered
+
+					if (starIndex < ratingStars) {
+						starImage = _imageRatingStar;
+					} else {
+						return;
+					}
+				}
+			} else {
+
+				// rating stars cannot be set
+
+				if (isItemHovered) {
+
+					if (isStarHovered == false) {
+
+						if (starIndex > 0) {
+
+							// draw only one disabled star, thats enough
+
+							return;
+						}
+					}
+				} else {
+
+					if (starIndex > 0) {
+
+						// draw only one disabled star, thats enough
+
+						return;
+					}
 				}
 
-				textDateTimeWidth = gc.textExtent(textDateTime).x;
-
-				textDateTimePosCenterX = (photoWidth - (textDateTimeWidth > photoWidth ? photoWidth : textDateTimeWidth)) / 2;
+				starImage = _imageRatingStarDisabled;
 			}
+
+			// draw stars at the top
+
+			gc.drawImage(starImage, //
+					ratingStarsLeftBorder + (_ratingStarImageWidth * (starIndex)),
+					galleryItem.paintedY_Photo);
+		}
+	}
+
+	/**
+	 * @param gc
+	 * @param photo
+	 * @param photoPosX
+	 * @param photoPosY
+	 * @param imageCanvasWidth
+	 * @param imageCanvasHeight
+	 * @param requestedImageQuality
+	 * @param isImageNameDisplayed
+	 * @param isSelected
+	 * @param isFullsizeImage
+	 * @param bgColor
+	 */
+	private void draw_StatusText(	final GC gc,
+									final GalleryMT20Item galleryItem,
+									final int photoPosX,
+									final int photoPosY,
+									final int imageCanvasWidth,
+									final int imageCanvasHeight,
+									final ImageQuality requestedImageQuality,
+									final boolean isImageNameDisplayed,
+									final boolean isSelected,
+									final boolean isFullsizeImage,
+									final Color bgColor) {
+
+		final Photo photo = galleryItem.photo;
+
+		final boolean isLoadingError = photo.getLoadingState(requestedImageQuality) == PhotoLoadingState.IMAGE_IS_INVALID;
+
+		if (isFullsizeImage && isLoadingError == false && _isShowFullsizeLoadingMessage == false) {
+			return;
 		}
 
-		/*
-		 * get text position
-		 */
-		final int defaultTextPosY = photoPosY + photoHeight - _fontHeight;
+		final String photoImageFileName = isImageNameDisplayed ? //
+				// don't show file name a 2nd time
+				UI.EMPTY_STRING
+				: photo.imageFileName;
 
-		int posXFilename = photoPosX;
-		int posYFilename = defaultTextPosY;
-		int posXDate = photoPosX;
-		final int posYDate = defaultTextPosY;
+		String statusText;
+		PhotoImageMetadata metaData = null;
 
-		if (textFileNameWidth != -1 && textDateTimeWidth != -1) {
+		if (isLoadingError) {
 
-			// paint filename & date
+			// {0} loading failed
+			statusText = NLS.bind(Messages.Pic_Dir_StatusLabel_LoadingFailed, photoImageFileName);
 
-			final int textSpacing = 10;
-			final int textWidth = textFileNameWidth + textSpacing + textDateTimeWidth;
+		} else {
 
-			if (textWidth > photoWidth) {
+			final int exifThumbImageState = photo.getExifThumbImageState();
+			metaData = photo.getImageMetaDataRaw();
 
-				// paint on top of each other, filename first
+			if (isFullsizeImage) {
 
-				posXFilename += textFileNamePosCenterX;
-				posXDate += textDateTimePosCenterX;
-				posYFilename -= _fontHeight;
+				if (metaData == null) {
+
+					statusText = NLS.bind(Messages.Pic_Dir_StatusLabel_LoadingFullsizeNoMeta, photoImageFileName);
+
+				} else {
+
+					/*
+					 * size
+					 */
+					final String textSize = _nfMByte.format(photo.imageFileSize / 1024.0 / 1024.0)
+							+ UI.SPACE
+							+ UI.UNIT_MBYTES;
+
+					/*
+					 * date/time
+					 */
+					final DateTime dateTime = photo.getOriginalDateTime();
+					String textDateTime = UI.EMPTY_STRING;
+					if (dateTime != null) {
+						textDateTime = _dtWeekday.print(dateTime) + UI.SPACE2 + _dtFormatter.print(dateTime);
+					}
+
+					/*
+					 * orientation
+					 */
+					String textOrientation = UI.EMPTY_STRING;
+					final int orientation = photo.getOrientation();
+					if (orientation > 1) {
+						// see here http://www.impulseadventure.com/photo/exif-orientation.html
+
+						if (orientation == 8) {
+							textOrientation = Rotation.CW_270.toString();
+						} else if (orientation == 3) {
+							textOrientation = Rotation.CW_180.toString();
+						} else if (orientation == 6) {
+							textOrientation = Rotation.CW_90.toString();
+						}
+					}
+
+					statusText = NLS.bind(Messages.Pic_Dir_StatusLabel_LoadingFullsizeMeta, new Object[] {
+							photoImageFileName,
+							photo.getDimensionText(),
+							textSize,
+							textDateTime,
+							textOrientation });
+				}
 
 			} else {
 
-				// center text
+				if (metaData == null || exifThumbImageState == -1) {
 
-				final int textX = (photoWidth - textWidth) / 2;
-				posXFilename += textX;
-				posXDate += textX + textFileNameWidth + textSpacing;
+					// {0} loading thumb and exif...
+
+					statusText = NLS.bind(Messages.Pic_Dir_StatusLabel_LoadingThumbExif, photoImageFileName);
+
+				} else {
+
+					// {0} loading fullsize...
+					statusText = NLS.bind(Messages.Pic_Dir_StatusLabel_LoadingFullsize, photoImageFileName);
+				}
 			}
-
-		} else if (textFileNameWidth != -1) {
-
-			// paint only filename
-			posXFilename += textFileNamePosCenterX;
-
-		} else if (textDateTimeWidth != -1) {
-
-			// paint only date
-			posXDate += textDateTimePosCenterX;
 		}
 
 		/*
-		 * draw text
+		 * center text
 		 */
-		gc.setForeground(_fgColor);
-		gc.setBackground(_bgColor);
+		_paintedStatusTextWidth = gc.textExtent(statusText).x;
+		final int textOffsetX = (imageCanvasWidth - (_paintedStatusTextWidth > imageCanvasWidth
+				? imageCanvasWidth
+				: _paintedStatusTextWidth)) / 2;
+		final int textOffsetY = (imageCanvasHeight - (_fontHeight > imageCanvasHeight ? imageCanvasHeight : _fontHeight)) / 2;
 
-		// draw filename
-		if (textFileNameWidth != -1) {
-			gc.drawString(textFileName, posXFilename, posYFilename, false);
+		_paintedStatusTextX = photoPosX + textOffsetX;
+		_paintedStatusTextY = photoPosY + textOffsetY;
+
+		/*
+		 * set color
+		 */
+		final Device device = gc.getDevice();
+		if (isLoadingError) {
+
+			if (galleryItem.isHovered_InvalidImage) {
+				gc.setForeground(_fgColor);
+			} else {
+				gc.setForeground(device.getSystemColor(SWT.COLOR_RED));
+			}
+
+		} else {
+			if (metaData != null) {
+				gc.setForeground(_fgColor);
+			} else {
+				// show different color when metadata are not yet loaded
+				gc.setForeground(device.getSystemColor(SWT.COLOR_YELLOW));
+			}
 		}
+		gc.setBackground(bgColor);
 
-		// draw date time
-		if (textDateTimeWidth != -1) {
-			gc.drawString(textDateTime, posXDate, posYDate, false);
+		gc.drawString(statusText, _paintedStatusTextX, _paintedStatusTextY, false);
+
+		if (isSelected) {
+
+			// draw marker line on the left side
+			gc.setBackground(_selectionFgColor);
+			gc.fillRectangle(photoPosX, photoPosY, 2, imageCanvasHeight);
 		}
 	}
 
@@ -832,7 +1157,7 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 		 */
 		if (_isShowFullsizeLoadingMessage && _isFullsizeImageAvailable == false || _isFullsizeLoadingError) {
 
-			drawStatusText(gc, photo, //
+			draw_StatusText(gc, galleryItem, //
 					0, // 								x
 					canvasHeight - _fontHeight - 1, //	y
 					canvasWidth, // 					width
@@ -1093,252 +1418,6 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 
 	}
 
-	private void drawRatingStars(final GC gc, final GalleryMT20Item galleryItem, final int ratingStars) {
-
-		final boolean isItemHovered = (galleryItem.isHovered || galleryItem.isInHoveredGroup)
-				&& _isHandleHoveredRatingStars;
-
-		final int hoveredStars = galleryItem.hoveredStars;
-		final boolean isStarHovered = hoveredStars > 0;
-		boolean canSetRating = false;
-
-		final Photo photo = galleryItem.photo;
-		if (photo != null) {
-			canSetRating = photo.isSavedInTour;
-		}
-
-		// center ratings stars in the middle of the image
-		final int ratingStarsLeftBorder = galleryItem.photoPaintedX + _photoWidth / 2 - MAX_RATING_STARS_WIDTH / 2;
-
-		for (int starIndex = 0; starIndex < RatingStars.MAX_RATING_STARS; starIndex++) {
-
-			Image starImage;
-
-			if (canSetRating) {
-
-				if (isItemHovered) {
-
-					if (isStarHovered) {
-
-						if (starIndex < hoveredStars) {
-
-							if (starIndex < ratingStars) {
-
-								if (starIndex == ratingStars - 1) {
-									starImage = _imageRatingStarDelete;
-								} else {
-									starImage = _imageRatingStarAndHovered;
-								}
-							} else {
-								starImage = _imageRatingStarHovered;
-							}
-
-						} else {
-							if (starIndex < ratingStars) {
-								starImage = _imageRatingStarNotHoveredButSet;
-							} else {
-								starImage = _imageRatingStarNotHovered;
-							}
-						}
-
-					} else {
-
-						if (starIndex < ratingStars) {
-							starImage = _imageRatingStarNotHoveredButSet;
-						} else {
-							starImage = _imageRatingStarNotHovered;
-						}
-					}
-
-				} else {
-
-					// item is not hovered
-
-					if (starIndex < ratingStars) {
-						starImage = _imageRatingStar;
-					} else {
-						return;
-					}
-				}
-			} else {
-
-				// rating stars cannot be set
-
-				if (isItemHovered) {
-
-					if (isStarHovered == false) {
-
-						if (starIndex > 0) {
-
-							// draw only one disabled star, thats enough
-
-							return;
-						}
-					}
-				} else {
-
-					if (starIndex > 0) {
-
-						// draw only one disabled star, thats enough
-
-						return;
-					}
-				}
-
-				starImage = _imageRatingStarDisabled;
-			}
-
-			// draw stars at the top
-
-			gc.drawImage(starImage, //
-					ratingStarsLeftBorder + (_ratingStarImageWidth * (starIndex)),
-					galleryItem.photoPaintedY);
-		}
-	}
-
-	/**
-	 * @param gc
-	 * @param photo
-	 * @param photoPosX
-	 * @param photoPosY
-	 * @param imageCanvasWidth
-	 * @param imageCanvasHeight
-	 * @param requestedImageQuality
-	 * @param isImageNameDisplayed
-	 * @param isSelected
-	 * @param isFullsizeImage
-	 * @param bgColor
-	 */
-	private void drawStatusText(final GC gc,
-								final Photo photo,
-								final int photoPosX,
-								final int photoPosY,
-								final int imageCanvasWidth,
-								final int imageCanvasHeight,
-								final ImageQuality requestedImageQuality,
-								final boolean isImageNameDisplayed,
-								final boolean isSelected,
-								final boolean isFullsizeImage,
-								final Color bgColor) {
-
-		final boolean isLoadingError = photo.getLoadingState(requestedImageQuality) == PhotoLoadingState.IMAGE_IS_INVALID;
-
-		if (isFullsizeImage && isLoadingError == false && _isShowFullsizeLoadingMessage == false) {
-			return;
-		}
-
-		final String photoImageFileName = isImageNameDisplayed ? //
-				// don't show file name a 2nd time
-				UI.EMPTY_STRING
-				: photo.imageFileName;
-
-		String statusText;
-		PhotoImageMetadata metaData = null;
-
-		if (isLoadingError) {
-
-			// {0} loading failed
-			statusText = NLS.bind(Messages.Pic_Dir_StatusLabel_LoadingFailed, photoImageFileName);
-
-		} else {
-
-			final int exifThumbImageState = photo.getExifThumbImageState();
-			metaData = photo.getImageMetaDataRaw();
-
-			if (isFullsizeImage) {
-
-				if (metaData == null) {
-
-					statusText = NLS.bind(Messages.Pic_Dir_StatusLabel_LoadingFullsizeNoMeta, photoImageFileName);
-
-				} else {
-
-					/*
-					 * size
-					 */
-					final String textSize = _nfMByte.format(photo.imageFileSize / 1024.0 / 1024.0)
-							+ UI.SPACE
-							+ UI.UNIT_MBYTES;
-
-					/*
-					 * date/time
-					 */
-					final DateTime dateTime = photo.getOriginalDateTime();
-					String textDateTime = UI.EMPTY_STRING;
-					if (dateTime != null) {
-						textDateTime = _dtWeekday.print(dateTime) + UI.SPACE2 + _dtFormatter.print(dateTime);
-					}
-
-					/*
-					 * orientation
-					 */
-					String textOrientation = UI.EMPTY_STRING;
-					final int orientation = photo.getOrientation();
-					if (orientation > 1) {
-						// see here http://www.impulseadventure.com/photo/exif-orientation.html
-
-						if (orientation == 8) {
-							textOrientation = Rotation.CW_270.toString();
-						} else if (orientation == 3) {
-							textOrientation = Rotation.CW_180.toString();
-						} else if (orientation == 6) {
-							textOrientation = Rotation.CW_90.toString();
-						}
-					}
-
-					statusText = NLS.bind(Messages.Pic_Dir_StatusLabel_LoadingFullsizeMeta, new Object[] {
-							photoImageFileName,
-							photo.getDimensionText(),
-							textSize,
-							textDateTime,
-							textOrientation });
-				}
-
-			} else {
-
-				if (metaData == null || exifThumbImageState == -1) {
-
-					// {0} loading thumb and exif...
-
-					statusText = NLS.bind(Messages.Pic_Dir_StatusLabel_LoadingThumbExif, photoImageFileName);
-
-				} else {
-
-					// {0} loading fullsize...
-					statusText = NLS.bind(Messages.Pic_Dir_StatusLabel_LoadingFullsize, photoImageFileName);
-				}
-			}
-		}
-
-		final int textWidth = gc.textExtent(statusText).x;
-
-		// Center text
-		final int textOffsetX = (imageCanvasWidth - (textWidth > imageCanvasWidth ? imageCanvasWidth : textWidth)) / 2;
-		final int textOffsetY = (imageCanvasHeight - (_fontHeight > imageCanvasHeight ? imageCanvasHeight : _fontHeight)) / 2;
-
-		final Device device = gc.getDevice();
-		if (isLoadingError) {
-			gc.setForeground(device.getSystemColor(SWT.COLOR_RED));
-		} else {
-			if (metaData != null) {
-				gc.setForeground(_fgColor);
-			} else {
-				gc.setForeground(device.getSystemColor(SWT.COLOR_YELLOW));
-			}
-		}
-
-		gc.setBackground(bgColor);
-
-		gc.drawString(statusText, photoPosX + textOffsetX, photoPosY + textOffsetY, false);
-
-		if (isSelected) {
-
-			// draw marker line on the left side
-			gc.setBackground(_selectionFgColor);
-			gc.fillRectangle(photoPosX, photoPosY, 2, imageCanvasHeight);
-		}
-	}
-
 	@Override
 	public int getBorderSize() {
 		return _gridBorderSize + _imageBorderSize;
@@ -1366,53 +1445,21 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 	}
 
 	/**
-	 * @param galleryItem
-	 * @param itemMouseX
-	 * @param itemMouseY
-	 * @return Returns <code>true</code> when the mouse down event is handled and no further actions
-	 *         should be done in the gallery (e.g. no select item).
-	 */
-	public boolean isMouseDownHandled(final GalleryMT20Item galleryItem, final int itemMouseX, final int itemMouseY) {
-
-		if (_isRatingStarsPainted && _isHandleHoveredRatingStars && isRatingStarsHovered(itemMouseX, itemMouseY)) {
-			return saveRatingStars(galleryItem);
-		}
-
-		if (_isShowAnnotations && galleryItem.isHoveredAnnotationTour) {
-
-			Photo.getPhotoServiceProvider().openTour(galleryItem.photo.getTourPhotoReferences());
-
-			return true;
-		}
-
-		return false;
-	}
-
-	/**
-	 * @param itemMouseX
-	 * @param itemMouseY
-	 * @return Returns <code>true</code> when the rating star area in a gallery item is hovered.
-	 */
-	private boolean isRatingStarsHovered(final int itemMouseX, final int itemMouseY) {
-
-		return itemMouseX >= _ratingStarsLeftBorder//
-				//
-				&& itemMouseX <= _ratingStarsLeftBorder + MAX_RATING_STARS_WIDTH
-				&& itemMouseY <= _ratingStarImageHeight;
-	}
-
-	/**
 	 * @param hoveredItem
 	 * @param itemMouseX
 	 * @param itemMouseY
 	 * @return
 	 */
-	public boolean itemIsHovered(final GalleryMT20Item hoveredItem, final int itemMouseX, final int itemMouseY) {
+	public boolean isItemHovered(final GalleryMT20Item hoveredItem, final int itemMouseX, final int itemMouseY) {
 
-		final boolean isStarsModified = itemIsHovered_Stars(hoveredItem, itemMouseX, itemMouseY);
-		final boolean isAnnotationModified = itemIsHovered_Annotation(hoveredItem, itemMouseX, itemMouseY);
+		boolean isModified = isItemHovered_InvalidImage(hoveredItem, itemMouseX, itemMouseY);
 
-		boolean isModified = isStarsModified || isAnnotationModified;
+		if (isModified == false) {
+			isModified = isItemHovered_Stars(hoveredItem, itemMouseX, itemMouseY);
+		}
+		if (isModified == false) {
+			isModified = isItemHovered_Annotation(hoveredItem, itemMouseX, itemMouseY);
+		}
 
 		if (hoveredItem.isNeedExitUIUpdate == false) {
 
@@ -1440,25 +1487,66 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 	 * @param itemMouseY
 	 * @return Returns <code>true</code> when the hovered state has changed.
 	 */
-	private boolean itemIsHovered_Annotation(	final GalleryMT20Item hoveredItem,
+	private boolean isItemHovered_Annotation(	final GalleryMT20Item hoveredItem,
 												final int itemMouseX,
 												final int itemMouseY) {
 
-		final boolean isHoveredBackup = hoveredItem.isHoveredAnnotationTour;
+		final boolean isHoveredBackup = hoveredItem.isHovered_AnnotationTour;
 
-		hoveredItem.isHoveredAnnotationTour = false;
+		hoveredItem.isHovered_AnnotationTour = false;
 
-		if (itemMouseY < hoveredItem.itemYAnnotationPainted) {
+		if (itemMouseY < hoveredItem.paintedY_Annotation) {
 			return isHoveredBackup == true;
 		}
 
-		final int paintedX = hoveredItem.itemXAnnotationPaintedTour;
+		final int paintedX = hoveredItem.paintedX_Annotation_Tour;
 
 		if (paintedX != Integer.MIN_VALUE && itemMouseX >= paintedX && itemMouseX <= paintedX + _annotationImageWidth) {
-			hoveredItem.isHoveredAnnotationTour = true;
+			hoveredItem.isHovered_AnnotationTour = true;
 		}
 
-		return isHoveredBackup != hoveredItem.isHoveredAnnotationTour;
+		return isHoveredBackup != hoveredItem.isHovered_AnnotationTour;
+	}
+
+	/**
+	 * @param hoveredItem
+	 * @param itemMouseX
+	 * @param itemMouseY
+	 * @return Returns <code>true</code> when the hovered state has changed.
+	 */
+	private boolean isItemHovered_InvalidImage(	final GalleryMT20Item hoveredItem,
+												final int itemMouseX,
+												final int itemMouseY) {
+
+		final boolean isHoveredPreviously = hoveredItem.isHovered_InvalidImage;
+		boolean hasChangedHoveredState = isHoveredPreviously == true;
+
+		hoveredItem.isHovered_InvalidImage = false;
+
+		if (hoveredItem.photo.isLoadingError()) {
+
+			// invalid image is only displayed when a loading error occured
+
+			// check if invalid image is hovered with mouse
+
+			final int topBorder = hoveredItem.paintedY_InvalidImageArea;
+			final int bottomBorder = topBorder + hoveredItem.paintedHeight_InvalidImageArea;
+
+			if (itemMouseY >= topBorder && itemMouseY <= bottomBorder) {
+
+				hoveredItem.isHovered_InvalidImage = true;
+
+				hasChangedHoveredState = isHoveredPreviously != hoveredItem.isHovered_InvalidImage;
+			}
+
+//			System.out.println(UI.timeStampNano() //
+//					+ ("\tY:" + itemMouseY)
+//					+ ("\t" + topBorder)
+//					+ ("\t" + bottomBorder));
+//			// TODO remove SYSTEM.OUT.PRINTLN
+		}
+
+		return hasChangedHoveredState;
 	}
 
 	/**
@@ -1467,7 +1555,7 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 	 * @param itemMouseY
 	 * @return Returns <code>true</code> when the hovered state or the selection has changed.
 	 */
-	private boolean itemIsHovered_Stars(final GalleryMT20Item hoveredItem, final int itemMouseX, final int itemMouseY) {
+	private boolean isItemHovered_Stars(final GalleryMT20Item hoveredItem, final int itemMouseX, final int itemMouseY) {
 
 		if (_isHandleHoveredRatingStars == false || _isAttributesPainted == false) {
 			return false;
@@ -1523,6 +1611,57 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 		final boolean isHoveredStarsModified = backupHoveredStars != hoveredItem.hoveredStars;
 
 		return isHoveredStarsModified || isSelectionModified;
+	}
+
+	/**
+	 * @param galleryItem
+	 * @param itemMouseX
+	 * @param itemMouseY
+	 * @return Returns <code>true</code> when the mouse down event is handled and no further actions
+	 *         should be done in the gallery (e.g. no select item).
+	 */
+	public boolean isMouseDownHandled(final GalleryMT20Item galleryItem, final int itemMouseX, final int itemMouseY) {
+
+		if (galleryItem.photo.isLoadingError() && galleryItem.isHovered_InvalidImage) {
+
+			final ArrayList<File> replacedImages = Photo.getPhotoServiceProvider().replaceImageFilePath(
+					galleryItem.photo);
+
+			if (replacedImages != null && replacedImages.size() > 0) {
+
+				// update gallery
+
+//				galleryItem.gallery.updateReplacedImageFilePath(replacedImages);
+			}
+
+			return true;
+		}
+
+		if (_isRatingStarsPainted && _isHandleHoveredRatingStars && isRatingStarsHovered(itemMouseX, itemMouseY)) {
+			return saveRatingStars(galleryItem);
+		}
+
+		if (_isShowAnnotations && galleryItem.isHovered_AnnotationTour) {
+
+			Photo.getPhotoServiceProvider().openTour(galleryItem.photo.getTourPhotoReferences());
+
+			return true;
+		}
+
+		return false;
+	}
+
+	/**
+	 * @param itemMouseX
+	 * @param itemMouseY
+	 * @return Returns <code>true</code> when the rating star area in a gallery item is hovered.
+	 */
+	private boolean isRatingStarsHovered(final int itemMouseX, final int itemMouseY) {
+
+		return itemMouseX >= _ratingStarsLeftBorder//
+				//
+				&& itemMouseX <= _ratingStarsLeftBorder + MAX_RATING_STARS_WIDTH
+				&& itemMouseY <= _ratingStarImageHeight;
 	}
 
 	@Override

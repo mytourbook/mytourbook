@@ -178,7 +178,7 @@ public class GalleryPhotoToolTip extends AnimatedToolTipShell {
 						.indent(0, 5)
 //						.hint(DEFAULT_TEXT_WIDTH, SWT.DEFAULT)
 						.applyTo(_labelError);
-				_labelError.setText(Messages.Pic_Dir_Label_ImageLoadingFailed);
+				_labelError.setText(Messages.Pic_Dir_Label_ImageLoadingFailedOrInvalidFolder);
 			}
 
 			// display thumb image only when the gallery image is smaller than the default thumb size
@@ -211,6 +211,7 @@ public class GalleryPhotoToolTip extends AnimatedToolTipShell {
 			boolean isDrawFileDate = true;
 
 			if (isError || isDrawImage == false) {
+				// draw image folder
 				createUI_MetadataLine(container, Messages.Photo_ToolTip_ImagePath, _photo.imagePathName);
 			}
 

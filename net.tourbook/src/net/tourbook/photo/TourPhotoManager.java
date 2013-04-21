@@ -54,6 +54,7 @@ import org.apache.commons.imaging.formats.jpeg.JpegImageMetadata;
 import org.apache.commons.imaging.formats.tiff.TiffImageMetadata;
 import org.apache.commons.imaging.formats.tiff.write.TiffOutputSet;
 import org.eclipse.jface.dialogs.IDialogSettings;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.MessageDialogWithToggle;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.viewers.ISelectionProvider;
@@ -61,6 +62,7 @@ import org.eclipse.jface.window.Window;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
@@ -707,6 +709,105 @@ public class TourPhotoManager implements IPhotoServiceProvider {
 		allTourPhotoLinks.addAll(mergedLinks);
 	}
 
+	/**
+	 * @param imageFolder
+	 * @return Returns number of photos which set in {@link TourPhoto}s for a given folder.
+	 */
+	private int getTourPhotos(final String imageFolder) {
+
+		int numberOfTourPhotos = 0;
+
+		Connection conn = null;
+
+		try {
+
+			conn = TourDatabase.getInstance().getConnection();
+
+			final String sql = "SELECT COUNT(*)" // 						//$NON-NLS-1$
+					+ " FROM " + TourDatabase.TABLE_TOUR_PHOTO //			//$NON-NLS-1$
+					+ " WHERE imageFilePath=?"; //							//$NON-NLS-1$
+
+			final PreparedStatement stmt = conn.prepareStatement(sql);
+
+			stmt.setString(1, imageFolder);
+
+			final ResultSet result = stmt.executeQuery();
+
+			// get first result
+			result.next();
+
+			// get first value
+			numberOfTourPhotos = result.getInt(1);
+
+		} catch (final SQLException e) {
+			net.tourbook.ui.UI.showSQLException(e);
+		} finally {
+
+			if (conn != null) {
+				try {
+					conn.close();
+				} catch (final SQLException e) {
+					net.tourbook.ui.UI.showSQLException(e);
+				}
+			}
+		}
+
+		return numberOfTourPhotos;
+	}
+
+	private int getTourPhotoTours(final String imagePath) {
+
+		int numberOfTours = 0;
+
+		Connection conn = null;
+
+		try {
+
+			conn = TourDatabase.getInstance().getConnection();
+
+			final String sql = "" //													//$NON-NLS-1$
+
+					// get number of tours
+					+ " SELECT COUNT(*)" // 											//$NON-NLS-1$
+					+ " FROM" //														//$NON-NLS-1$
+
+					// get all tours which contain the image folder
+					+ " (" //															//$NON-NLS-1$
+					//
+					+ (" SELECT DISTINCT " + TourDatabase.TABLE_TOUR_DATA + "_tourId") //$NON-NLS-1$ //$NON-NLS-2$
+					+ (" FROM " + TourDatabase.TABLE_TOUR_PHOTO) //						//$NON-NLS-1$
+					+ " WHERE imageFilePath=?" //										//$NON-NLS-1$
+					//
+					+ " ) TourId"; //													//$NON-NLS-1$
+
+			final PreparedStatement stmt = conn.prepareStatement(sql);
+
+			stmt.setString(1, imagePath);
+
+			final ResultSet result = stmt.executeQuery();
+
+			// get first result
+			result.next();
+
+			// get first value
+			numberOfTours = result.getInt(1);
+
+		} catch (final SQLException e) {
+			net.tourbook.ui.UI.showSQLException(e);
+		} finally {
+
+			if (conn != null) {
+				try {
+					conn.close();
+				} catch (final SQLException e) {
+					net.tourbook.ui.UI.showSQLException(e);
+				}
+			}
+		}
+
+		return numberOfTours;
+	}
+
 	void linkPhotosWithTours(final PhotosWithExifSelection selectedPhotosWithExif) {
 
 		final TourPhotoLinkView linkView = openLinkView();
@@ -950,6 +1051,46 @@ public class TourPhotoManager implements IPhotoServiceProvider {
 
 			break;
 		}
+	}
+
+	@Override
+	public ArrayList<File> replaceImageFilePath(final Photo sourcePhoto) {
+
+		final Shell shell = Display.getDefault().getActiveShell();
+		final String imagePath = sourcePhoto.imagePathName;
+
+		final int numberOfTourPhotos = getTourPhotos(imagePath);
+
+		/*
+		 * show info when no images are found, this case should not happen because this method is
+		 * called with a tour photo and only when the photo image is not found
+		 */
+		if (numberOfTourPhotos == 0) {
+
+			MessageDialog.openInformation(shell, //
+					Messages.Photo_TourPhotoMgr_Dialog_ReplacePhotoImage_Title,
+					NLS.bind(//
+							Messages.Photo_TourPhotoMgr_Dialog_ReplacePhotoImage_NoImage_Message,
+							imagePath));
+
+			return null;
+		}
+
+		ArrayList<File> modifiedImageFilePath = null;
+		final int numberOfTourPhotoTours = getTourPhotoTours(imagePath);
+
+		if (MessageDialog.openQuestion(shell, //
+				Messages.Photo_TourPhotoMgr_Dialog_ReplacePhotoImage_Title,
+				NLS.bind(//
+						Messages.Photo_TourPhotoMgr_Dialog_ReplacePhotoImage_Message,
+						new Object[] { numberOfTourPhotoTours, //
+								numberOfTourPhotos,
+								imagePath }))) {
+
+			modifiedImageFilePath = null;
+		}
+
+		return modifiedImageFilePath;
 	}
 
 	void resetTourStartEnd() {

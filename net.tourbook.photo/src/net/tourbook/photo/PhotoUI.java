@@ -32,6 +32,9 @@ public class PhotoUI {
 	public static Styler		PHOTO_FOLDER_STYLER;
 	public static Styler		PHOTO_FILE_STYLER;
 
+	public static final String	INVALID_PHOTO_IMAGE						= "INVALID_PHOTO_IMAGE";					//$NON-NLS-1$
+	public static final String	INVALID_PHOTO_IMAGE_HOVERED				= "INVALID_PHOTO_IMAGE_HOVERED";			//$NON-NLS-1$
+
 	public static final String	PHOTO_ANNOTATION_GPS_EXIF				= "PHOTO_ANNOTATION_GPS_EXIF";				//$NON-NLS-1$
 	public static final String	PHOTO_ANNOTATION_GPS_TOUR				= "PHOTO_ANNOTATION_GPS_TOUR";				//$NON-NLS-1$
 	public static final String	PHOTO_ANNOTATION_SAVED_IN_TOUR			= "PHOTO_ANNOTATION_SAVED_IN_TOUR";		//$NON-NLS-1$
@@ -56,6 +59,11 @@ public class PhotoUI {
 		PHOTO_FILE_STYLER = StyledString.createColorRegistryStyler(IPhotoPreferences.PHOTO_VIEWER_COLOR_FILE, null);
 
 		final ImageRegistry imageRegistry = UI.IMAGE_REGISTRY;
+
+		imageRegistry.put(INVALID_PHOTO_IMAGE, //
+				Activator.getImageDescriptor(Messages.Image__PhotoInvalidPhotoImage));
+		imageRegistry.put(INVALID_PHOTO_IMAGE_HOVERED,//
+				Activator.getImageDescriptor(Messages.Image__PhotoInvalidPhotoImageHovered));
 
 		imageRegistry.put(PHOTO_ANNOTATION_GPS_EXIF, //
 				Activator.getImageDescriptor(Messages.Image__PhotoAnnotationExifGPS));

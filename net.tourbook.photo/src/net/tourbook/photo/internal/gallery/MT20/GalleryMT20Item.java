@@ -80,19 +80,30 @@ public class GalleryMT20Item {
 	/**
 	 * X position where this gallery item is painted on the canvas.
 	 */
-	public int							photoPaintedX;
+	public int							paintedX_Photo;
 
 	/**
 	 * Y position where this gallery item is painted on the canvas.
 	 */
-	public int							photoPaintedY;
+	public int							paintedY_Photo;
 
-	public int							itemX_AnnotationPainted_Gps;
+	/*
+	 * annotaions
+	 */
+	public boolean						isHovered_AnnotationTour;
+	public int							paintedX_Annotation_Gps;
+	public int							paintedX_Annotation_Tour;
+	public int							paintedY_Annotation;
 
-	public int							itemXAnnotationPaintedTour;
-
-	public int							itemYAnnotationPainted;
-	public boolean						isHoveredAnnotationTour;
+	/*
+	 * invalid image
+	 */
+	/**
+	 * Is <code>true</code> when the photo image cannot be loaded and the warning image is hovered.
+	 */
+	public boolean						isHovered_InvalidImage;
+	public int							paintedY_InvalidImageArea;
+	public int							paintedHeight_InvalidImageArea;
 
 	public GalleryMT20Item(final GalleryMT20 galleryMT20) {
 		this.gallery = galleryMT20;
