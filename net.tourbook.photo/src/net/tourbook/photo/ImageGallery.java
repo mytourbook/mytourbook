@@ -2651,47 +2651,6 @@ public abstract class ImageGallery implements IItemListener, IGalleryContextMenu
 		showImages(photos, galleryPositionKey, isLinkPhotoDisplayed);
 	}
 
-//	/**
-//	 * Display images for a list of {@link Photo}.
-//	 *
-//	 * @param allPhotos
-//	 * @param galleryPositionKey
-//	 *            Contains a unique key to keep gallery position for different contents
-//	 */
-//	public void showImages(	final ArrayList<Photo> allPhotos,
-//							final String galleryPositionKey,
-//							final boolean isShowDefaultMessage,
-//							final boolean isLinkPhotoDisplayed) {
-//
-//		jobFilter_12_Stop();
-//		PhotoLoadManager.stopImageLoading(true);
-//
-//		//////////////////////////////////////////
-//		//
-//		// MUST BE REMOVED, IS ONLY FOR TESTING
-//		//
-////		disposeAndDeleteAllImages();
-////		PhotoLoadManager.removeInvalidImageFiles();
-//		//
-//		// MUST BE REMOVED, IS ONLY FOR TESTING
-//		//
-//		//////////////////////////////////////////
-//
-//		setIsLinkPhotoDisplayed(isLinkPhotoDisplayed);
-//
-//		if (isShowDefaultMessage) {
-//			_lblDefaultPage.setText(_defaultStatusMessage);
-//			showPageBookPage(_pageDefault, true);
-//		}
-//
-//		// images are not loaded from a folder, photos are already available
-//		_photoFolder = null;
-//
-//		_newGalleryPositionKey = galleryPositionKey;
-//
-//		workerExecute_DisplayImages(allPhotos.toArray(new Photo[allPhotos.size()]));
-//	}
-
 	/**
 	 * Display images for a selected folder.
 	 * 

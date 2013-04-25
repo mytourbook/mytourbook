@@ -53,6 +53,8 @@ import org.apache.commons.imaging.common.IImageMetadata;
 import org.apache.commons.imaging.formats.jpeg.JpegImageMetadata;
 import org.apache.commons.imaging.formats.tiff.TiffImageMetadata;
 import org.apache.commons.imaging.formats.tiff.write.TiffOutputSet;
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.MessageDialogWithToggle;
@@ -60,7 +62,9 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.window.Window;
 import org.eclipse.osgi.util.NLS;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
+import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IViewPart;
@@ -77,10 +81,9 @@ public class TourPhotoManager implements IPhotoServiceProvider {
 
 	private static final String						STATE_CAMERA_ADJUSTMENT_NAME	= "STATE_CAMERA_ADJUSTMENT_NAME";	//$NON-NLS-1$
 	private static final String						STATE_CAMERA_ADJUSTMENT_TIME	= "STATE_CAMERA_ADJUSTMENT_TIME";	//$NON-NLS-1$
+	private static final String						STATE_REPLACE_IMAGE_FOLDER		= "STATE_REPLACE_IMAGE_FOLDER";	//$NON-NLS-1$
 
 	private static final String						CAMERA_UNKNOWN_KEY				= "CAMERA_UNKNOWN_KEY";			//$NON-NLS-1$
-
-//	private static final String						TEMP_FILE_PREFIX_ORIG			= "_orig_";						//$NON-NLS-1$
 
 	private final IPreferenceStore					_prefStore						= TourbookPlugin.getDefault() //
 																							.getPreferenceStore();
@@ -103,6 +106,8 @@ public class TourPhotoManager implements IPhotoServiceProvider {
 	private ArrayList<TourPhotoLink>				_allDbTourPhotoLinks			= new ArrayList<TourPhotoLink>();
 
 	private ArrayList<TourPhotoLink>				_dbTourPhotoLinks				= new ArrayList<TourPhotoLink>();
+
+	private static String							_replaceImageFolder;
 
 	/**
 	 * Compares 2 photos by the adjusted time.
@@ -232,6 +237,11 @@ public class TourPhotoManager implements IPhotoServiceProvider {
 				_allAvailableCameras.put(cameraName, camera);
 			}
 		}
+
+		/*
+		 * replace image folder
+		 */
+		_replaceImageFolder = _state.get(STATE_REPLACE_IMAGE_FOLDER);
 	}
 
 	public static void saveState() {
@@ -252,6 +262,13 @@ public class TourPhotoManager implements IPhotoServiceProvider {
 		}
 		_state.put(STATE_CAMERA_ADJUSTMENT_NAME, cameras);
 		Util.setState(_state, STATE_CAMERA_ADJUSTMENT_TIME, adjustment);
+
+		/*
+		 * replace image folder
+		 */
+		if (_replaceImageFolder != null) {
+			_state.put(STATE_REPLACE_IMAGE_FOLDER, _replaceImageFolder);
+		}
 	}
 
 	private static void setTourCameras(final HashMap<String, String> cameras, final TourPhotoLink historyTour) {
@@ -713,9 +730,9 @@ public class TourPhotoManager implements IPhotoServiceProvider {
 	 * @param imageFolder
 	 * @return Returns number of photos which set in {@link TourPhoto}s for a given folder.
 	 */
-	private int getTourPhotos(final String imageFolder) {
+	private ArrayList<String> getTourPhotos(final String imageFolder) {
 
-		int numberOfTourPhotos = 0;
+		final ArrayList<String> tourPhotoImages = new ArrayList<String>();
 
 		Connection conn = null;
 
@@ -723,7 +740,7 @@ public class TourPhotoManager implements IPhotoServiceProvider {
 
 			conn = TourDatabase.getInstance().getConnection();
 
-			final String sql = "SELECT COUNT(*)" // 						//$NON-NLS-1$
+			final String sql = "SELECT imageFileName" // 						//$NON-NLS-1$
 					+ " FROM " + TourDatabase.TABLE_TOUR_PHOTO //			//$NON-NLS-1$
 					+ " WHERE imageFilePath=?"; //							//$NON-NLS-1$
 
@@ -733,11 +750,9 @@ public class TourPhotoManager implements IPhotoServiceProvider {
 
 			final ResultSet result = stmt.executeQuery();
 
-			// get first result
-			result.next();
-
-			// get first value
-			numberOfTourPhotos = result.getInt(1);
+			while (result.next()) {
+				tourPhotoImages.add(result.getString(1));
+			}
 
 		} catch (final SQLException e) {
 			net.tourbook.ui.UI.showSQLException(e);
@@ -752,7 +767,7 @@ public class TourPhotoManager implements IPhotoServiceProvider {
 			}
 		}
 
-		return numberOfTourPhotos;
+		return tourPhotoImages;
 	}
 
 	private int getTourPhotoTours(final String imagePath) {
@@ -1054,43 +1069,243 @@ public class TourPhotoManager implements IPhotoServiceProvider {
 	}
 
 	@Override
-	public ArrayList<File> replaceImageFilePath(final Photo sourcePhoto) {
+	public ArrayList<ImagePathReplacement> replaceImageFilePath(final Photo sourcePhoto) {
 
-		final Shell shell = Display.getDefault().getActiveShell();
-		final String imagePath = sourcePhoto.imagePathName;
+		final Display display = Display.getDefault();
+		final Shell shell = display.getActiveShell();
 
-		final int numberOfTourPhotos = getTourPhotos(imagePath);
+		final String newImageFolder[] = new String[1];
+		final String oldImageFolder = sourcePhoto.imagePathName;
+
+		final ArrayList<String> tourPhotoImageNames = getTourPhotos(oldImageFolder);
 
 		/*
 		 * show info when no images are found, this case should not happen because this method is
 		 * called with a tour photo and only when the photo image is not found
 		 */
-		if (numberOfTourPhotos == 0) {
+		if (tourPhotoImageNames.size() == 0) {
 
 			MessageDialog.openInformation(shell, //
 					Messages.Photo_TourPhotoMgr_Dialog_ReplacePhotoImage_Title,
 					NLS.bind(//
 							Messages.Photo_TourPhotoMgr_Dialog_ReplacePhotoImage_NoImage_Message,
-							imagePath));
+							oldImageFolder));
 
 			return null;
 		}
 
-		ArrayList<File> modifiedImageFilePath = null;
-		final int numberOfTourPhotoTours = getTourPhotoTours(imagePath);
+		final ArrayList<IPath> validImages = new ArrayList<IPath>();
+		final ArrayList<String> inValidImageNames = new ArrayList<String>();
+		final int numberOfTourPhotoTours = getTourPhotoTours(oldImageFolder);
+		final ArrayList<IPath> modifiedImages = new ArrayList<IPath>();
 
 		if (MessageDialog.openQuestion(shell, //
 				Messages.Photo_TourPhotoMgr_Dialog_ReplacePhotoImage_Title,
 				NLS.bind(//
 						Messages.Photo_TourPhotoMgr_Dialog_ReplacePhotoImage_Message,
 						new Object[] { numberOfTourPhotoTours, //
-								numberOfTourPhotos,
-								imagePath }))) {
+								tourPhotoImageNames.size(),
+								oldImageFolder }))) {
 
-			modifiedImageFilePath = null;
+			final DirectoryDialog dialog = new DirectoryDialog(shell, SWT.SAVE);
+
+			dialog.setText(Messages.Photo_TourPhotoMgr_Dialog_ReplacePhotoImage_Title);
+			dialog.setMessage(NLS.bind(
+					Messages.Photo_TourPhotoMgr_Dialog_ReplacePhotoImage_SelectFolder_Message,
+					sourcePhoto.imageFileName,
+					oldImageFolder));
+
+			if (_replaceImageFolder != null) {
+				dialog.setFilterPath(_replaceImageFolder);
+			}
+
+			newImageFolder[0] = dialog.open();
+
+			if (newImageFolder[0] != null) {
+
+				// a folder is selected
+
+				_replaceImageFolder = newImageFolder[0];
+
+				// check which images are available at the new location
+				BusyIndicator.showWhile(display, new Runnable() {
+					public void run() {
+
+						final IPath folderPath = new Path(newImageFolder[0]).addTrailingSeparator();
+
+						for (final String imageName : tourPhotoImageNames) {
+
+							final IPath imagePathName = folderPath.append(imageName);
+
+							if (imagePathName.toFile().exists()) {
+								validImages.add(imagePathName);
+							} else {
+								inValidImageNames.add(imageName);
+							}
+						}
+					}
+				});
+
+				if (validImages.size() == 0) {
+
+					// there are no images in the new selected folder
+
+					MessageDialog.openInformation(shell, //
+							Messages.Photo_TourPhotoMgr_Dialog_ReplacePhotoImage_Title,
+							NLS.bind(//
+									Messages.Photo_TourPhotoMgr_Dialog_ReplacePhotoImage_NoValidImages_Message,
+									newImageFolder[0],
+									oldImageFolder));
+
+				} else {
+
+					// there are images in the new selected folder
+
+					if (inValidImageNames.size() == 0) {
+
+						// all images can be replaced
+
+						if (MessageDialog.openQuestion(shell, //
+								Messages.Photo_TourPhotoMgr_Dialog_ReplacePhotoImage_Title,
+								NLS.bind(//
+										Messages.Photo_TourPhotoMgr_Dialog_ReplacePhotoImage_ReplaceAll_Message,
+										new Object[] { validImages.size(), //
+												oldImageFolder,
+												newImageFolder[0] }))) {
+
+							modifiedImages.addAll(validImages);
+						}
+
+					} else {
+
+						// some images are not available
+
+						if (MessageDialog.openQuestion(shell, //
+								Messages.Photo_TourPhotoMgr_Dialog_ReplacePhotoImage_Title,
+								NLS.bind(//
+										Messages.Photo_TourPhotoMgr_Dialog_ReplacePhotoImage_ReplacePartly_Message,
+										new Object[] {
+												validImages.size(),
+												inValidImageNames.size(),
+												oldImageFolder,
+												newImageFolder[0],
+												tourPhotoImageNames.size() }))) {
+
+							modifiedImages.addAll(validImages);
+						}
+					}
+				}
+			}
 		}
 
-		return modifiedImageFilePath;
+		final ArrayList<ImagePathReplacement> replacedImages = new ArrayList<ImagePathReplacement>();
+
+		if (modifiedImages.size() > 0) {
+
+			BusyIndicator.showWhile(display, new Runnable() {
+				public void run() {
+
+					final ArrayList<ImagePathReplacement> replacedImagesInDb = replaceImageFilePath_InSQLDb(
+							oldImageFolder,
+							modifiedImages);
+
+					replacedImages.addAll(replacedImagesInDb);
+				}
+			});
+		}
+
+		/*
+		 * show error message with all invalid image names
+		 */
+		if (validImages.size() > 0 && inValidImageNames.size() > 0) {
+
+			// sort names
+			Collections.sort(inValidImageNames);
+
+			final StringBuilder sb = new StringBuilder();
+
+			sb.append(NLS.bind(
+					Messages.TourPhotoManager_Photo_TourPhotoMgr_Dialog_ReplacePhotoImage_NoValidImageNames,
+					newImageFolder[0]));
+
+			for (final String invalidName : inValidImageNames) {
+				sb.append(UI.NEW_LINE + invalidName);
+			}
+
+			StatusUtil.showStatus(sb.toString());
+		}
+
+		return replacedImages;
+	}
+
+	/**
+	 * Replace image file path in the tour photo table.
+	 * 
+	 * @param oldImageFolder
+	 * @param modifiedImages
+	 * @return
+	 */
+	private ArrayList<ImagePathReplacement> replaceImageFilePath_InSQLDb(	final String oldImageFolder,
+																			final ArrayList<IPath> modifiedImages) {
+
+		final ArrayList<ImagePathReplacement> replacedImages = new ArrayList<ImagePathReplacement>();
+
+		Connection conn = null;
+
+		try {
+
+			conn = TourDatabase.getInstance().getConnection();
+
+			final String sql = "UPDATE " + TourDatabase.TABLE_TOUR_PHOTO //	//$NON-NLS-1$
+
+					+ " SET" //									//$NON-NLS-1$
+
+					+ " imageFilePath=?, " //				1	//$NON-NLS-1$
+					+ " imageFilePathName=? " //			2	//$NON-NLS-1$
+
+					+ " WHERE imageFilePathName=?"; //			3	//$NON-NLS-1$
+
+			final PreparedStatement sqlUpdate = conn.prepareStatement(sql);
+
+			final IPath oldImagePath = new Path(oldImageFolder);
+
+			for (final IPath imagePath : modifiedImages) {
+
+				final String imageFilePath = imagePath.removeLastSegments(1).toOSString();
+				final String imageFilePathName = imagePath.toOSString();
+
+				final String imageFileName = imagePath.lastSegment();
+				final String oldImageFilePathName = oldImagePath.append(imageFileName).toOSString();
+
+//				if (imageFileName.equals("P1000699.JPG")) {
+//					int a = 0;
+//					a++;
+//				}
+
+				// update photo in db
+				sqlUpdate.setString(1, imageFilePath);
+				sqlUpdate.setString(2, imageFilePathName);
+				sqlUpdate.setString(3, oldImageFilePathName);
+
+				sqlUpdate.executeUpdate();
+
+				replacedImages.add(new ImagePathReplacement(oldImageFilePathName, imagePath));
+			}
+
+		} catch (final SQLException e) {
+			net.tourbook.ui.UI.showSQLException(e);
+		} finally {
+
+			if (conn != null) {
+				try {
+					conn.close();
+				} catch (final SQLException e) {
+					net.tourbook.ui.UI.showSQLException(e);
+				}
+			}
+		}
+
+		return replacedImages;
 	}
 
 	void resetTourStartEnd() {

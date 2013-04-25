@@ -281,7 +281,7 @@ public abstract class GalleryMT20 extends Canvas {
 	private IExternalGalleryListener			_externalGalleryListener;
 
 	/**
-	 * When <code>true</code> other shell actions are displayed.
+	 * When <code>true</code> other shell actions can be displayed.
 	 */
 	private boolean								_isShowOtherShellActions	= true;
 
@@ -567,6 +567,10 @@ public abstract class GalleryMT20 extends Canvas {
 				}
 			}
 		});
+	}
+
+	public boolean canShowOtherShellActions() {
+		return _isShowOtherShellActions;
 	}
 
 	/**
@@ -2279,7 +2283,6 @@ public abstract class GalleryMT20 extends Canvas {
 	}
 
 	private void redrawGallery() {
-
 		redraw();
 	}
 
@@ -2728,12 +2731,6 @@ public abstract class GalleryMT20 extends Canvas {
 	public void setIsShowOtherShellActions(final boolean isShowOtherShellActions) {
 		_isShowOtherShellActions = isShowOtherShellActions;
 	}
-
-//	public void setSelection(final Collection<GalleryMT20Item> selection) {
-//
-//		// IS NOT YET IMPLEMENTED
-//
-//	}
 
 	public void setItemMinMaxSize(final int minItemSize, final int maxItemSize) {
 		_minItemWidth = minItemSize;

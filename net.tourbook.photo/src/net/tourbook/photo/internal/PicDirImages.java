@@ -420,6 +420,10 @@ public class PicDirImages implements IPhotoGalleryProvider {
 
 				_photoGallery.updatePhotos(arrayList);
 			}
+
+		} else if (photoEventId == PhotoEventId.PHOTO_IMAGE_PATH_IS_MODIFIED) {
+
+			_photoGallery.refreshUI();
 		}
 	}
 

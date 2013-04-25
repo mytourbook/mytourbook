@@ -1,5 +1,14 @@
 Version: 13.next                                           ?. April 2013
 
+
+New Feature
+
+
+* Change image folder
+
+!!! this feature is not available when an image is displayed in an image gallery tooltip !!!
+
+
 Minor Modifications 
 
 

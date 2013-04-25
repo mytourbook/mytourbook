@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2012  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -49,7 +49,9 @@ public class PhotoExifLoader {
 		// load metadata
 		_photo.getImageMetaData();
 
-		_loadCallBack.callBackImageIsLoaded(false);
+		if (_loadCallBack != null) {
+			_loadCallBack.callBackImageIsLoaded(false);
+		}
 	}
 
 }

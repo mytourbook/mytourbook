@@ -57,9 +57,9 @@ public class Messages extends NLS {
 	public static String		Image__PhotoInfoDate;
 	public static String		Image__PhotoInfoName;
 
-	public static String	Image__PhotoInvalidPhotoImage;
+	public static String		Image__PhotoInvalidPhotoImage;
 
-	public static String	Image__PhotoInvalidPhotoImageHovered;
+	public static String		Image__PhotoInvalidPhotoImageHovered;
 	public static String		Image__PhotoRatingStar;
 	public static String		Image__PhotoRatingStarAndHovered;
 	public static String		Image__PhotoRatingStarDelete;
@@ -95,7 +95,7 @@ public class Messages extends NLS {
 	public static String		Photo_ToolTip_ExifDate;
 	public static String		Photo_ToolTip_FileDate;
 
-	public static String	Photo_ToolTip_ImagePath;
+	public static String		Photo_ToolTip_ImagePath;
 	public static String		Photo_ToolTip_Model;
 	public static String		Photo_ToolTip_Size;
 	public static String		Photo_ToolTip_Title;
@@ -141,8 +141,7 @@ public class Messages extends NLS {
 	public static String		Pic_Dir_ImageSizeIndicator_Tooltip;
 	public static String		Pic_Dir_Label_ExternalApp;
 	public static String		Pic_Dir_Label_ImageLoadingFailed;
-
-	public static String	Pic_Dir_Label_ImageLoadingFailedOrInvalidFolder;
+	public static String		Pic_Dir_Label_ImageLoadingFailed_FileNotAvailable;
 	public static String		Pic_Dir_Label_Loading;
 	public static String		Pic_Dir_Label_ReadingFolders;
 	public static String		Pic_Dir_Spinner_ThumbnailSize_Tooltip;

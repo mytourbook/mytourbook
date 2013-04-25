@@ -2648,6 +2648,11 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 
 				updateFilteredPhotos();
 			}
+
+		} else if (photoEventId == PhotoEventId.PHOTO_IMAGE_PATH_IS_MODIFIED) {
+
+			// this is not working, manual refresh is necessary
+//			_map.redraw();
 		}
 	}
 

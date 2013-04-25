@@ -15,28 +15,24 @@
  *******************************************************************************/
 package net.tourbook.photo;
 
-import java.util.ArrayList;
+import org.eclipse.core.runtime.IPath;
 
-public enum PhotoEventId {
+public class ImagePathReplacement {
 
-	/**
-	 * Photo attributes, e.g star rating has been modified. Event data contain an {@link ArrayList}
-	 * with the modified {@link Photo}'s.
-	 */
-	PHOTO_ATTRIBUTES_ARE_MODIFIED,
+	public String	oldImageFilePathName;
+	public IPath	newImageFilePathName;
 
-	/**
-	 * Photo filter is run, event data contains MapFilterData.
-	 */
-	PHOTO_FILTER,
+	public ImagePathReplacement(final String oldImageFilePathName, final IPath newImageFilePathName) {
 
-	/**
-	 * File image path has been modified.
-	 */
-	PHOTO_IMAGE_PATH_IS_MODIFIED,
+		this.oldImageFilePathName = oldImageFilePathName;
+		this.newImageFilePathName = newImageFilePathName;
+	}
 
-	/**
-	 * Event data contains a selection with photos.
-	 */
-	PHOTO_SELECTION,
+	@Override
+	public String toString() {
+		return String.format(
+				"\nImagePathReplacement\n   oldImageFilePathName=%s\n   newImageFilePathName=%s\n",
+				oldImageFilePathName,
+				newImageFilePathName.toOSString());
+	}
 }

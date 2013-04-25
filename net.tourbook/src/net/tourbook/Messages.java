@@ -19,7 +19,7 @@ import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS {
 
-	private static final String	BUNDLE_NAME	= "net.tourbook.messages";							//$NON-NLS-1$
+	private static final String	BUNDLE_NAME	= "net.tourbook.messages";								//$NON-NLS-1$
 
 	public static String		Action_PhotosAndTours_FilterNoTours_Tooltip;
 	public static String		Action_PhotosAndTours_FilterNotSavedPhotos_Tooltip;
@@ -793,12 +793,13 @@ public class Messages extends NLS {
 	public static String		Photo_Tooltip_Label_ShellNoResize;
 	public static String		Photo_Tooltip_Label_ShellWithResize;
 
-	public static String	Photo_TourPhotoMgr_Dialog_ReplacePhotoImage_Message;
-
-	public static String	Photo_TourPhotoMgr_Dialog_ReplacePhotoImage_NoImage_Message;
-
-	public static String	Photo_TourPhotoMgr_Dialog_ReplacePhotoImage_Title;
-
+	public static String		Photo_TourPhotoMgr_Dialog_ReplacePhotoImage_Message;
+	public static String		Photo_TourPhotoMgr_Dialog_ReplacePhotoImage_NoImage_Message;
+	public static String		Photo_TourPhotoMgr_Dialog_ReplacePhotoImage_NoValidImages_Message;
+	public static String		Photo_TourPhotoMgr_Dialog_ReplacePhotoImage_ReplaceAll_Message;
+	public static String		Photo_TourPhotoMgr_Dialog_ReplacePhotoImage_ReplacePartly_Message;
+	public static String		Photo_TourPhotoMgr_Dialog_ReplacePhotoImage_SelectFolder_Message;
+	public static String		Photo_TourPhotoMgr_Dialog_ReplacePhotoImage_Title;
 	public static String		Photo_TourPhotoMgr_Dialog_SaveStarRating_Message;
 	public static String		Photo_TourPhotoMgr_Dialog_SaveStarRating_Title;
 
@@ -1488,6 +1489,8 @@ public class Messages extends NLS {
 	public static String		TourEditor_Dialog_DeleteDistanceValues_Title;
 	public static String		TourEditor_Dialog_SetAltitudeFromSRTM_Message;
 	public static String		TourEditor_Dialog_SetAltitudeFromSRTM_Title;
+
+	public static String	TourPhotoManager_Photo_TourPhotoMgr_Dialog_ReplacePhotoImage_NoValidImageNames;
 
 	public static String		Training_Action_EditHrZones;
 

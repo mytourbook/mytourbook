@@ -27,11 +27,14 @@ public class ExifCache {
 	/**
 	 * Cache for exif meta data, key is file path
 	 */
-	private static final ConcurrentLinkedHashMap<String, PhotoImageMetadata>	_exifCache	= new ConcurrentLinkedHashMap//
-																							.Builder<String, PhotoImageMetadata>()
-																									.maximumWeightedCapacity(
-																											20000)
-																									.build();
+	private static final ConcurrentLinkedHashMap<String, PhotoImageMetadata>	_exifCache;
+
+	static {
+
+		_exifCache = new ConcurrentLinkedHashMap.Builder<String, PhotoImageMetadata>()
+				.maximumWeightedCapacity(20000)
+				.build();
+	}
 
 	public static void clear() {
 		_exifCache.clear();

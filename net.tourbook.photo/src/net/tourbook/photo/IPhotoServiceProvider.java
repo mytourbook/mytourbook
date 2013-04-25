@@ -15,7 +15,6 @@
  *******************************************************************************/
 package net.tourbook.photo;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -42,7 +41,7 @@ public interface IPhotoServiceProvider {
 	 *            Photo from which the image should be replaced
 	 * @return Returns a list of all images which file image path has been modified.
 	 */
-	ArrayList<File> replaceImageFilePath(Photo sourcePhoto);
+	ArrayList<ImagePathReplacement> replaceImageFilePath(Photo sourcePhoto);
 
 	/**
 	 * A mouse down event occured at a hovered gallery item within the star rating area.

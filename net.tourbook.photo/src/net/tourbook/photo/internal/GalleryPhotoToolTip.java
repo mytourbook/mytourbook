@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2012  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -133,7 +133,8 @@ public class GalleryPhotoToolTip extends AnimatedToolTipShell {
 
 //		parent.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
 
-		final boolean isLoadingError = _photo.isLoadingError();
+		final boolean isImageNotAvailable = _photo.isImageFileAvailable() == false;
+		final boolean isLoadingError = _photo.isLoadingError() || isImageNotAvailable;
 		final boolean isDrawImage = _galleryImageSize < 160;
 
 		final Composite container = new Composite(parent, SWT.NONE);
@@ -163,9 +164,19 @@ public class GalleryPhotoToolTip extends AnimatedToolTipShell {
 				}
 			}
 
-			final PhotoImageMetadata metaData = _photo.getImageMetaDataRaw();
-			if (metaData != null) {
-				createUI_Metadata(container, metaData, isDrawImage, isLoadingError);
+			if (isLoadingError) {
+
+				// draw image folder
+				final Label label = new Label(containerHeader, SWT.NONE);
+				GridDataFactory.fillDefaults().span(2, 1).applyTo(label);
+				label.setText(_photo.imagePathName);
+
+			} else {
+
+				final PhotoImageMetadata metaData = _photo.getImageMetaDataRaw();
+				if (metaData != null) {
+					createUI_Metadata(container, metaData, isDrawImage);
+				}
 			}
 
 			/*
@@ -178,7 +189,10 @@ public class GalleryPhotoToolTip extends AnimatedToolTipShell {
 						.indent(0, 5)
 //						.hint(DEFAULT_TEXT_WIDTH, SWT.DEFAULT)
 						.applyTo(_labelError);
-				_labelError.setText(Messages.Pic_Dir_Label_ImageLoadingFailedOrInvalidFolder);
+
+				_labelError.setText(isImageNotAvailable
+						? Messages.Pic_Dir_Label_ImageLoadingFailed_FileNotAvailable
+						: Messages.Pic_Dir_Label_ImageLoadingFailed);
 			}
 
 			// display thumb image only when the gallery image is smaller than the default thumb size
@@ -190,10 +204,7 @@ public class GalleryPhotoToolTip extends AnimatedToolTipShell {
 		return container;
 	}
 
-	private void createUI_Metadata(	final Composite parent,
-									final PhotoImageMetadata metaData,
-									final boolean isDrawImage,
-									final boolean isError) {
+	private void createUI_Metadata(final Composite parent, final PhotoImageMetadata metaData, final boolean isDrawImage) {
 
 		final DateTime exifDateTime = _photo.getExifDateTime();
 		final DateTime imageFileDateTime = _photo.getImageFileDateTime();
@@ -210,7 +221,7 @@ public class GalleryPhotoToolTip extends AnimatedToolTipShell {
 		{
 			boolean isDrawFileDate = true;
 
-			if (isError || isDrawImage == false) {
+			if (isDrawImage == false) {
 				// draw image folder
 				createUI_MetadataLine(container, Messages.Photo_ToolTip_ImagePath, _photo.imagePathName);
 			}
@@ -613,7 +624,8 @@ public class GalleryPhotoToolTip extends AnimatedToolTipShell {
 		}
 
 		if (_labelError != null && _labelError.isDisposed() == false) {
-			_labelError.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
+//			_labelError.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
+			_labelError.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
 		}
 
 // set image preview background

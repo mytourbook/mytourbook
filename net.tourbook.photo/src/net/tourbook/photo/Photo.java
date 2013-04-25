@@ -70,7 +70,7 @@ public class Photo {
 	public String										imageFileExt;
 
 	/**
-	 * File path name is the unique key for a photowrapper.
+	 * File path name is the unique key for a photo.
 	 */
 	public String										imageFilePathName;
 
@@ -180,6 +180,9 @@ public class Photo {
 	 */
 //	private static boolean								_isGetExifGeo					= false;
 
+	/**
+	 * 
+	 */
 	private static IPhotoServiceProvider				_photoServiceProvider;
 
 	/**
@@ -233,6 +236,11 @@ public class Photo {
 	private boolean										_isLoadingError;
 
 	/**
+	 * Is <code>true</code> when the image file is available in the file system.
+	 */
+	private boolean										_isImageFileAvailable;
+
+	/**
 	 * Exif thumb state
 	 * <p>
 	 * 
@@ -265,14 +273,14 @@ public class Photo {
 
 		imageFileName = imageFile.getName();
 		imageFilePathName = imageFile.getPath();
-		imageFileLastModified = imageFile.lastModified();
 
-		imagePathName = new Path(imageFilePathName).removeLastSegments(1).toOSString();
+		final Path imagePath = new Path(imageFilePathName);
+
+		imagePathName = imagePath.removeLastSegments(1).toOSString();
+		imageFileExt = imagePath.getFileExtension();
 
 		imageFileSize = imageFile.length();
-
-		final int dotPos = imageFileName.lastIndexOf(UI.SYMBOL_DOT);
-		imageFileExt = dotPos > 0 ? imageFileName.substring(dotPos + 1).toLowerCase() : UI.EMPTY_STRING;
+		imageFileLastModified = imageFile.lastModified();
 
 		// initially sort by file date until exif data are loaded
 		imageExifTime = imageFileLastModified;
@@ -286,11 +294,9 @@ public class Photo {
 		_imageKeyHQ = getImageKeyHQ(imageFilePathName);
 		_imageKeyOriginal = Util.computeMD5(imageFilePathName + "_Original");//$NON-NLS-1$
 
-		_photoLoadingStateThumb = PhotoLoadingState.UNDEFINED;
-		_photoLoadingStateHQ = PhotoLoadingState.UNDEFINED;
-		_photoLoadingStateOriginal = PhotoLoadingState.UNDEFINED;
+		_isImageFileAvailable = file.exists();
 
-		_isLoadingError = false;
+		setDefaultLoadingState();
 	}
 
 	public static String getImageKeyHQ(final String imageFilePathName) {
@@ -1105,6 +1111,10 @@ public class Photo {
 		return result;
 	}
 
+	public boolean isImageFileAvailable() {
+		return _isImageFileAvailable;
+	}
+
 	/**
 	 * @return Return <code>true</code> when image size (thumb or original) is available.
 	 */
@@ -1150,6 +1160,19 @@ public class Photo {
 		_linkWorldPosition.clear();
 	}
 
+	public void resetLoadingState() {
+
+		// force loading of metadata
+		_photoImageMetadata = null;
+
+		// the image file should now be available, but check again
+		_isImageFileAvailable = new File(imageFilePathName).exists();
+
+		setDefaultLoadingState();
+
+//		PhotoLoadManager.putPhotoInLoadingErrorMap(imageFilePathName);
+	}
+
 	public void resetTourExifState() {
 
 		// photo is not saved any more in a tour
@@ -1162,6 +1185,26 @@ public class Photo {
 
 	public void setAltitude(final double altitude) {
 		_altitude = altitude;
+	}
+
+	private void setDefaultLoadingState() {
+
+		if (_isImageFileAvailable) {
+
+			_photoLoadingStateThumb = PhotoLoadingState.UNDEFINED;
+			_photoLoadingStateHQ = PhotoLoadingState.UNDEFINED;
+			_photoLoadingStateOriginal = PhotoLoadingState.UNDEFINED;
+
+			_isLoadingError = false;
+
+		} else {
+
+			_photoLoadingStateThumb = PhotoLoadingState.IMAGE_IS_INVALID;
+			_photoLoadingStateHQ = PhotoLoadingState.IMAGE_IS_INVALID;
+			_photoLoadingStateOriginal = PhotoLoadingState.IMAGE_IS_INVALID;
+
+			_isLoadingError = true;
+		}
 	}
 
 	public void setGpsAreaInfo(final String gpsAreaInfo) {

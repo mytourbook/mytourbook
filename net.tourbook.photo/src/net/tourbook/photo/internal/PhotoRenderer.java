@@ -15,22 +15,28 @@
  *******************************************************************************/
 package net.tourbook.photo.internal;
 
-import java.io.File;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.concurrent.atomic.AtomicReference;
 
 import net.tourbook.common.UI;
 import net.tourbook.common.util.StatusUtil;
+import net.tourbook.photo.ILoadCallBack;
 import net.tourbook.photo.IPhotoServiceProvider;
 import net.tourbook.photo.ImageGallery;
+import net.tourbook.photo.ImagePathReplacement;
 import net.tourbook.photo.ImageQuality;
 import net.tourbook.photo.Photo;
+import net.tourbook.photo.PhotoCache;
+import net.tourbook.photo.PhotoEventId;
 import net.tourbook.photo.PhotoImageCache;
 import net.tourbook.photo.PhotoImageMetadata;
 import net.tourbook.photo.PhotoLoadManager;
 import net.tourbook.photo.PhotoLoadingState;
+import net.tourbook.photo.PhotoManager;
+import net.tourbook.photo.PhotoSqlLoadingState;
 import net.tourbook.photo.PhotoUI;
 import net.tourbook.photo.RatingStars;
 import net.tourbook.photo.internal.gallery.MT20.AbstractGalleryMT20ItemRenderer;
@@ -40,6 +46,7 @@ import net.tourbook.photo.internal.gallery.MT20.GalleryMT20Item;
 import net.tourbook.photo.internal.gallery.MT20.PaintingResult;
 import net.tourbook.photo.internal.gallery.MT20.RendererHelper;
 import net.tourbook.photo.internal.gallery.MT20.ZoomState;
+import net.tourbook.photo.internal.manager.ExifCache;
 
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.osgi.util.NLS;
@@ -270,6 +277,75 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 		MAX_RATING_STARS_WIDTH = _ratingStarImageWidth * RatingStars.MAX_RATING_STARS;
 	}
 
+	private class LoadCallbackExif implements ILoadCallBack {
+
+		private Photo	__photo;
+
+		public LoadCallbackExif(final Photo photo) {
+			__photo = photo;
+		}
+
+		@Override
+		public void callBackImageIsLoaded(final boolean isUpdateUI) {
+
+			// keep exif metadata
+			final PhotoImageMetadata metadata = __photo.getImageMetaDataRaw();
+
+			if (metadata != null) {
+				ExifCache.put(__photo.imageFilePathName, metadata);
+			}
+
+			updateSqlState();
+
+			// mark image area as needed to be redrawn
+			Display.getDefault().syncExec(new Runnable() {
+
+				public void run() {
+
+					if (_imageGallery.isDisposed()) {
+						return;
+					}
+
+					_imageGallery.refreshUI();
+
+//					/*
+//					 * Visibility check must be done in the UI thread because scrolling the gallery can
+//					 * reposition the gallery item. This can be a BIG problem because the redraw()
+//					 * method is painting the background color at the specified rectangle, it cost me a
+//					 * lot of time to figure this out.
+//					 */
+//					final boolean isItemVisible = _galleryItem.gallery.isItemVisible(_galleryItem);
+//
+//					if (isItemVisible) {
+//
+//						// redraw gallery item WITH background
+//						_imageGallery.redrawItem(_galleryItem);
+//					}
+				}
+			});
+//
+//			_imageGallery.jobUILoading_20_Schedule();
+		}
+
+		private void updateSqlState() {
+
+			final AtomicReference<PhotoSqlLoadingState> sqlLoadingState = __photo.getSqlLoadingState();
+
+			final boolean isInLoadingQueue = sqlLoadingState.get() == PhotoSqlLoadingState.IS_IN_LOADING_QUEUE;
+
+			final boolean isSqlLoaded = sqlLoadingState.compareAndSet(
+					PhotoSqlLoadingState.IS_LOADED,
+					PhotoSqlLoadingState.IS_IN_LOADING_QUEUE);
+
+			if (isInLoadingQueue == false && isSqlLoaded == false) {
+
+				final IPhotoServiceProvider photoServiceProvider = Photo.getPhotoServiceProvider();
+
+				PhotoLoadManager.putPhotoInLoadingQueueSql(__photo, this, photoServiceProvider, false);
+			}
+		}
+	}
+
 	public PhotoRenderer(final GalleryMT20 galleryMT20, final ImageGallery imageGallery) {
 		_galleryMT = galleryMT20;
 		_imageGallery = imageGallery;
@@ -345,44 +421,48 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 		// painted image can have different sizes for 1 photo: original, HQ and thumb
 		Image paintedImage = null;
 		boolean isRequestedQuality = false;
+		final boolean isImageFileAvailable = photo.isImageFileAvailable();
 
-		// check if image has an loading error
-		final PhotoLoadingState photoLoadingState = photo.getLoadingState(requestedImageQuality);
+		if (isImageFileAvailable) {
 
-		if (photoLoadingState != PhotoLoadingState.IMAGE_IS_INVALID) {
+			// check if image has an loading error
+			final PhotoLoadingState photoLoadingState = photo.getLoadingState(requestedImageQuality);
 
-			// image is not yet loaded
+			if (photoLoadingState != PhotoLoadingState.IMAGE_IS_INVALID) {
 
-			// check if image is in the cache
-			paintedImage = PhotoImageCache.getImage(photo, requestedImageQuality);
+				// image is not yet loaded
 
-			if ((paintedImage == null || paintedImage.isDisposed())
-					&& photoLoadingState == PhotoLoadingState.IMAGE_IS_IN_LOADING_QUEUE == false) {
+				// check if image is in the cache
+				paintedImage = PhotoImageCache.getImage(photo, requestedImageQuality);
 
-				// the requested image is not available in the image cache -> image must be loaded
+				if ((paintedImage == null || paintedImage.isDisposed())
+						&& photoLoadingState == PhotoLoadingState.IMAGE_IS_IN_LOADING_QUEUE == false) {
 
-				final LoadCallbackImage imageLoadCallback = new LoadCallbackImage(_imageGallery, galleryItem);
+					// requested image is not available in the image cache -> image must be loaded
 
-				PhotoLoadManager.putImageInLoadingQueueThumbGallery(
-						galleryItem,
-						photo,
-						requestedImageQuality,
-						imageLoadCallback);
-			}
+					final LoadCallbackImage imageLoadCallback = new LoadCallbackImage(_imageGallery, galleryItem);
 
-			isRequestedQuality = true;
+					PhotoLoadManager.putImageInLoadingQueueThumbGallery(
+							galleryItem,
+							photo,
+							requestedImageQuality,
+							imageLoadCallback);
+				}
 
-			if (paintedImage == null || paintedImage.isDisposed()) {
+				isRequestedQuality = true;
 
-				// requested size is not available, try to get image with lower quality
+				if (paintedImage == null || paintedImage.isDisposed()) {
 
-				isRequestedQuality = false;
+					// requested size is not available, try to get image with lower quality
 
-				final ImageQuality lowerImageQuality = galleryItemWidth > PhotoLoadManager.IMAGE_SIZE_THUMBNAIL
-						? ImageQuality.THUMB
-						: ImageQuality.HQ;
+					isRequestedQuality = false;
 
-				paintedImage = PhotoImageCache.getImage(photo, lowerImageQuality);
+					final ImageQuality lowerImageQuality = galleryItemWidth > PhotoLoadManager.IMAGE_SIZE_THUMBNAIL
+							? ImageQuality.THUMB
+							: ImageQuality.HQ;
+
+					paintedImage = PhotoImageCache.getImage(photo, lowerImageQuality);
+				}
 			}
 		}
 
@@ -422,7 +502,7 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 
 //			// debug box for the image area
 //			gc.setForeground(gc.getDevice().getSystemColor(SWT.COLOR_RED));
-//			gc.drawRectangle(imageX, imageY, imageWidth - 2, imageHeight - 1);
+//			gc.drawRectangle(itemImageX, itemImageY, itemImageWidth - 2, itemImageHeight - 1);
 
 		} else {
 
@@ -471,7 +551,7 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 			_isRatingStarsPainted = false;
 		}
 
-		if (photo.isLoadingError()) {
+		if (isImageFileAvailable == false || photo.isLoadingError()) {
 
 			draw_InvalidImage(gc, galleryItem, photo, //
 					itemImageX,
@@ -590,7 +670,7 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 		/*
 		 * get text position
 		 */
-		final int defaultTextPosY = photoPosY + photoHeight - _fontHeight;
+		final int defaultTextPosY = photoPosY + photoHeight - _fontHeight + 1;
 
 		int posXFilename = photoPosX;
 		int posYFilename = defaultTextPosY;
@@ -1043,9 +1123,12 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 		if (isLoadingError) {
 
 			if (galleryItem.isHovered_InvalidImage) {
-				gc.setForeground(_fgColor);
-			} else {
+//				gc.setForeground(_fgColor);
 				gc.setForeground(device.getSystemColor(SWT.COLOR_RED));
+			} else {
+//				gc.setForeground(device.getSystemColor(SWT.COLOR_RED));
+//				gc.setForeground(device.getSystemColor(SWT.COLOR_GRAY));
+				gc.setForeground(_fgColor);
 			}
 
 		} else {
@@ -1058,11 +1141,11 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 		}
 		gc.setBackground(bgColor);
 
+		// draw text
 		gc.drawString(statusText, _paintedStatusTextX, _paintedStatusTextY, false);
 
+		// draw selection marker line on the left side
 		if (isSelected) {
-
-			// draw marker line on the left side
 			gc.setBackground(_selectionFgColor);
 			gc.fillRectangle(photoPosX, photoPosY, 2, imageCanvasHeight);
 		}
@@ -1518,14 +1601,16 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 												final int itemMouseX,
 												final int itemMouseY) {
 
+		if (hoveredItem.gallery.canShowOtherShellActions() == false) {
+			return false;
+		}
+
 		final boolean isHoveredPreviously = hoveredItem.isHovered_InvalidImage;
 		boolean hasChangedHoveredState = isHoveredPreviously == true;
 
 		hoveredItem.isHovered_InvalidImage = false;
 
-		if (hoveredItem.photo.isLoadingError()) {
-
-			// invalid image is only displayed when a loading error occured
+		if (hoveredItem.photo.isImageFileAvailable() == false) {
 
 			// check if invalid image is hovered with mouse
 
@@ -1622,17 +1707,16 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 	 */
 	public boolean isMouseDownHandled(final GalleryMT20Item galleryItem, final int itemMouseX, final int itemMouseY) {
 
-		if (galleryItem.photo.isLoadingError() && galleryItem.isHovered_InvalidImage) {
+		if (//
 
-			final ArrayList<File> replacedImages = Photo.getPhotoServiceProvider().replaceImageFilePath(
-					galleryItem.photo);
+		// this check is IMPORTANT, otherwise the app can freeze !!!
+		galleryItem.gallery.canShowOtherShellActions()
 
-			if (replacedImages != null && replacedImages.size() > 0) {
+		//
+				&& galleryItem.photo.isLoadingError()
+				&& galleryItem.isHovered_InvalidImage) {
 
-				// update gallery
-
-//				galleryItem.gallery.updateReplacedImageFilePath(replacedImages);
-			}
+			replaceImageFolder(galleryItem);
 
 			return true;
 		}
@@ -1662,6 +1746,33 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 				//
 				&& itemMouseX <= _ratingStarsLeftBorder + MAX_RATING_STARS_WIDTH
 				&& itemMouseY <= _ratingStarImageHeight;
+	}
+
+	private void replaceImageFolder(final GalleryMT20Item galleryItem) {
+
+		final ArrayList<ImagePathReplacement> replacedImages = Photo.getPhotoServiceProvider().replaceImageFilePath(
+				galleryItem.photo);
+
+		if (replacedImages != null && replacedImages.size() > 0) {
+
+			// image path names are updated (in photo and SQL db), update caches and galleries
+
+			PhotoCache.replaceImageFilePath(replacedImages);
+
+			ExifCache.remove(galleryItem.photo.imagePathName);
+
+			for (final ImagePathReplacement replacedImage : replacedImages) {
+
+				final Photo cachedPhoto = PhotoCache.getPhoto(replacedImage.newImageFilePathName.toOSString());
+
+				if (cachedPhoto != null) {
+					PhotoLoadManager.putImageInLoadingQueueExif(cachedPhoto, new LoadCallbackExif(cachedPhoto));
+				}
+			}
+
+			// update all galleries
+			PhotoManager.firePhotoEvent(null, PhotoEventId.PHOTO_IMAGE_PATH_IS_MODIFIED, replacedImages);
+		}
 	}
 
 	@Override

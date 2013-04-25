@@ -16,19 +16,21 @@
 package net.tourbook.photo;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import net.tourbook.common.UI;
 
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.ListenerList;
 
 import com.googlecode.concurrentlinkedhashmap.ConcurrentLinkedHashMap;
 import com.googlecode.concurrentlinkedhashmap.EvictionListener;
 
 /**
- * This cache is photos.
+ * This cache is caching ALL photos.
  */
 public class PhotoCache {
 
@@ -116,6 +118,36 @@ public class PhotoCache {
 		}
 	}
 
+	public static synchronized void replaceImageFilePath(final ArrayList<ImagePathReplacement> replacedImages) {
+
+		for (final ImagePathReplacement replacedImage : replacedImages) {
+
+			final Photo cachedPhoto = _cache.remove(replacedImage.oldImageFilePathName);
+
+			if (cachedPhoto != null) {
+
+				// update image file path
+
+				final IPath newImageFilePathName = replacedImage.newImageFilePathName;
+
+				cachedPhoto.imageFile = newImageFilePathName.toFile();
+				cachedPhoto.imagePathName = newImageFilePathName.removeLastSegments(1).toOSString();
+				cachedPhoto.imageFilePathName = newImageFilePathName.toOSString();
+
+				// reset loading state to force a reload of the image in the gallery
+				cachedPhoto.resetLoadingState();
+
+				// set photo with new file path name
+				setPhoto(cachedPhoto);
+			}
+		}
+	}
+
+	/**
+	 * Keep photo in the photo cache.
+	 * 
+	 * @param photo
+	 */
 	public static void setPhoto(final Photo photo) {
 		_cache.put(photo.imageFilePathName, photo);
 	}
