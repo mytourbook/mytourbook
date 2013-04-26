@@ -1092,14 +1092,14 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 
 				if (metaData == null || exifThumbImageState == -1) {
 
-					// {0} loading thumb and exif...
+					// {0} loading thumb and exif ...
 
 					statusText = NLS.bind(Messages.Pic_Dir_StatusLabel_LoadingThumbExif, photoImageFileName);
 
 				} else {
 
-					// {0} loading fullsize...
-					statusText = NLS.bind(Messages.Pic_Dir_StatusLabel_LoadingFullsize, photoImageFileName);
+					// {0} loading thumb ...
+					statusText = NLS.bind(Messages.Pic_Dir_StatusLabel_LoadingThumb, photoImageFileName);
 				}
 			}
 		}

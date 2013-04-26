@@ -690,6 +690,10 @@ public abstract class GalleryMT20 extends Canvas {
 			_customContextMenuProvider.fillContextMenu(menuMgr);
 		}
 
+		/**
+		 * When this gallery is displayed in a tooltip and the tooltip is getting hidden when a
+		 * context menu action is executed. the app is FREEZING !!!.
+		 */
 		if (_isShowOtherShellActions) {
 
 			menuMgr.add(new Separator());

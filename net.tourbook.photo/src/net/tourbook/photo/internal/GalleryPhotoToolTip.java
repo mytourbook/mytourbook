@@ -31,6 +31,7 @@ import net.tourbook.photo.internal.gallery.MT20.RendererHelper;
 
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.PaintEvent;
@@ -145,37 +146,40 @@ public class GalleryPhotoToolTip extends AnimatedToolTipShell {
 				.applyTo(container);
 //		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
 		{
-			final Composite containerHeader = new Composite(container, SWT.NONE);
-			GridDataFactory.fillDefaults().grab(true, false).applyTo(containerHeader);
-			GridLayoutFactory.fillDefaults().numColumns(2).spacing(10, 0).applyTo(containerHeader);
+			if (isImageNotAvailable == false) {
+
+				final Composite containerHeader = new Composite(container, SWT.NONE);
+				GridDataFactory.fillDefaults().grab(true, false).applyTo(containerHeader);
+				GridLayoutFactory.fillDefaults().numColumns(2).spacing(10, 0).applyTo(containerHeader);
 //			containerHeader.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_MAGENTA));
-			{
-				// image filename
-				Label label = new Label(containerHeader, SWT.NONE);
-				GridDataFactory.fillDefaults().applyTo(label);
-				label.setText(_photo.imageFileName);
+				{
+					// image filename
+					Label label = new Label(containerHeader, SWT.NONE);
+					GridDataFactory.fillDefaults().applyTo(label);
+					label.setText(_photo.imageFileName);
 
-				if (_photo.isImageSizeAvailable()) {
+					if (_photo.isImageSizeAvailable()) {
 
-					// dimension
-					label = new Label(containerHeader, SWT.NONE);
-					GridDataFactory.fillDefaults().grab(true, false).align(SWT.END, SWT.FILL).applyTo(label);
-					label.setText(_photo.getDimensionText());
+						// dimension
+						label = new Label(containerHeader, SWT.NONE);
+						GridDataFactory.fillDefaults().grab(true, false).align(SWT.END, SWT.FILL).applyTo(label);
+						label.setText(_photo.getDimensionText());
+					}
 				}
-			}
 
-			if (isLoadingError) {
+				if (isLoadingError) {
 
-				// draw image folder
-				final Label label = new Label(containerHeader, SWT.NONE);
-				GridDataFactory.fillDefaults().span(2, 1).applyTo(label);
-				label.setText(_photo.imagePathName);
+					// draw image folder
+					final Label label = new Label(containerHeader, SWT.NONE);
+					GridDataFactory.fillDefaults().span(2, 1).applyTo(label);
+					label.setText(_photo.imagePathName);
 
-			} else {
+				} else {
 
-				final PhotoImageMetadata metaData = _photo.getImageMetaDataRaw();
-				if (metaData != null) {
-					createUI_Metadata(container, metaData, isDrawImage);
+					final PhotoImageMetadata metaData = _photo.getImageMetaDataRaw();
+					if (metaData != null) {
+						createUI_Metadata(container, metaData, isDrawImage);
+					}
 				}
 			}
 
@@ -190,9 +194,9 @@ public class GalleryPhotoToolTip extends AnimatedToolTipShell {
 //						.hint(DEFAULT_TEXT_WIDTH, SWT.DEFAULT)
 						.applyTo(_labelError);
 
-				_labelError.setText(isImageNotAvailable
-						? Messages.Pic_Dir_Label_ImageLoadingFailed_FileNotAvailable
-						: Messages.Pic_Dir_Label_ImageLoadingFailed);
+				_labelError.setText(isImageNotAvailable ? NLS.bind(
+						Messages.Pic_Dir_Label_ImageLoadingFailed_FileNotAvailable,
+						_photo.imageFilePathName) : Messages.Pic_Dir_Label_ImageLoadingFailed);
 			}
 
 			// display thumb image only when the gallery image is smaller than the default thumb size

@@ -150,11 +150,11 @@ public class Messages extends NLS {
 	public static String		Pic_Dir_StatusLabel_1ImageIsHiddenByFilter;
 	public static String		Pic_Dir_StatusLabel_FilteringImages;
 	public static String		Pic_Dir_StatusLabel_LoadingFailed;
-	public static String		Pic_Dir_StatusLabel_LoadingFullsize;
 	public static String		Pic_Dir_StatusLabel_LoadingFullsizeMeta;
 	public static String		Pic_Dir_StatusLabel_LoadingFullsizeNoMeta;
 	public static String		Pic_Dir_StatusLabel_LoadingImages;
 	public static String		Pic_Dir_StatusLabel_LoadingImagesFilter;
+	public static String		Pic_Dir_StatusLabel_LoadingThumb;
 	public static String		Pic_Dir_StatusLabel_LoadingThumbExif;
 	public static String		Pic_Dir_StatusLabel_nImagesAreHiddenByFilter;
 	public static String		Pic_Dir_StatusLabel_NoFolder;
