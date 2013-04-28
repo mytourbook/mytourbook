@@ -13,7 +13,13 @@
             name="%View_Name_TourMap3"
             defaultHandler="net.tourbook.map3.view.ActionHandlerOpenTourMap3View"
             />
-            
+
+      <command
+            id="net.tourbook.command.WorldWind.Diagnostics"
+            name="%Command_WorldWind_Diagnostics"
+            defaultHandler="net.tourbook.map3.ActionHandlerWorldWindDiagnostics"
+            />
+	            
    </extension>
 
 
@@ -44,6 +50,20 @@
 			</toolbar>
 		
 		</menuContribution>
+
+<!-- this is not yet working correctly
+
+		<menuContribution locationURI="menu:file?after=databaseTools">
+
+			<command
+				commandId="net.tourbook.command.WorldWind.Diagnostics"
+				label="%Command_WorldWind_Diagnostics"
+				mnemonic="%Command_WorldWind_Diagnostics_Mnemonic"
+				style="push"/>
+
+		</menuContribution>
+-->
+
 
    </extension>
 

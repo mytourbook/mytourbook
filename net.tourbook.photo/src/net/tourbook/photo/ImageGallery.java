@@ -39,7 +39,7 @@ import net.tourbook.common.util.Util;
 import net.tourbook.common.weather.IWeather;
 import net.tourbook.photo.internal.Activator;
 import net.tourbook.photo.internal.GalleryActionBar;
-import net.tourbook.photo.internal.GalleryPhotoToolTip;
+import net.tourbook.photo.internal.PhotoGalleryToolTip;
 import net.tourbook.photo.internal.GalleryType;
 import net.tourbook.photo.internal.Messages;
 import net.tourbook.photo.internal.PhotoDateInfo;
@@ -230,7 +230,7 @@ public abstract class ImageGallery implements IItemListener, IGalleryContextMenu
 	private PhotoRenderer			_photoRenderer;
 	private FullScreenImageViewer	_fullScreenImageViewer;
 
-	private GalleryPhotoToolTip		_photoGalleryTooltip;
+	private PhotoGalleryToolTip		_photoGalleryTooltip;
 
 	/**
 	 * Folder which images are currently be displayed
@@ -695,7 +695,7 @@ public abstract class ImageGallery implements IItemListener, IGalleryContextMenu
 			}
 		}
 
-		_photoGalleryTooltip = new GalleryPhotoToolTip(_galleryMT20);
+		_photoGalleryTooltip = new PhotoGalleryToolTip(_galleryMT20);
 		_photoGalleryTooltip.setReceiveMouseMoveEvent(true);
 
 		_galleryMT20.addItemListener(this);

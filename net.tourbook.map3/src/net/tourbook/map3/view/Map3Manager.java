@@ -568,7 +568,7 @@ public class Map3Manager {
 		return _uiExpandedCategories;
 	}
 
-	static WorldWindowGLCanvas getWWCanvas() {
+	public static WorldWindowGLCanvas getWWCanvas() {
 		return _wwCanvas;
 	}
 

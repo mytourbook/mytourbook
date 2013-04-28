@@ -1,5 +1,9 @@
 
+##########################
+
 Create Translation Archive
+
+##########################
 
 - switch to workspace "C:\DAT\ws_mt-with-GIT" 
 
@@ -23,8 +27,11 @@ Create Translation Archive
 	- run script "CreateTranslationArchive"
 
 
+############
 
 Create Build
+
+############
 
 requirements:
 - buckminster is installed to see better error messages
@@ -51,7 +58,11 @@ requirements:
 	- run product export wizard in the product file
 
 
+##################
+
 Create Update Site
 
+##################
+
 - run script "clear-update-site.xml" in the project "update-site.mytourbook"
-- build the update site in site.xml
+- build the update site within site.xml

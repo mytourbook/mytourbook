@@ -44,6 +44,7 @@ import org.apache.commons.imaging.formats.tiff.constants.GpsTagConstants;
 import org.apache.commons.imaging.formats.tiff.constants.TiffTagConstants;
 import org.apache.commons.imaging.formats.tiff.taginfos.TagInfo;
 import org.apache.commons.imaging.formats.tiff.taginfos.TagInfoShortOrLong;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.osgi.util.NLS;
 import org.joda.time.DateTime;
@@ -267,36 +268,9 @@ public class Photo {
 	/**
 	 * @param galleryItemIndex
 	 */
-	public Photo(final File file) {
+	public Photo(final File photoImageFile) {
 
-		imageFile = file;
-
-		imageFileName = imageFile.getName();
-		imageFilePathName = imageFile.getPath();
-
-		final Path imagePath = new Path(imageFilePathName);
-
-		imagePathName = imagePath.removeLastSegments(1).toOSString();
-		imageFileExt = imagePath.getFileExtension();
-
-		imageFileSize = imageFile.length();
-		imageFileLastModified = imageFile.lastModified();
-
-		// initially sort by file date until exif data are loaded
-		imageExifTime = imageFileLastModified;
-
-		_uniqueId = imageFilePathName;
-
-		/*
-		 * initialize image keys and loading states
-		 */
-		_imageKeyThumb = getImageKeyThumb(imageFilePathName);
-		_imageKeyHQ = getImageKeyHQ(imageFilePathName);
-		_imageKeyOriginal = Util.computeMD5(imageFilePathName + "_Original");//$NON-NLS-1$
-
-		_isImageFileAvailable = file.exists();
-
-		setDefaultLoadingState();
+		setupPhoto(photoImageFile, new Path(photoImageFile.getPath()));
 	}
 
 	public static String getImageKeyHQ(final String imageFilePathName) {
@@ -1003,31 +977,6 @@ public class Photo {
 		return null;
 	}
 
-//	/**
-//	 * @return Returns latitude.
-//	 *         <p>
-//	 *         <b> Double.MIN_VALUE cannot be used, it cannot be saved in the database. 0 is the
-//	 *         value when the value is not set !!! </b>
-//	 */
-//	public double getLatitude() {
-//
-//		double latitude;
-//
-////		if (_isGetExifGeo) {
-////
-////			latitude = _exifLatitude != 0 //
-////					? _exifLatitude
-////					: _tourLatitude;
-////		} else {
-////
-//		latitude = _tourLatitude != 0 //
-//				? _tourLatitude
-//				: _exifLatitude;
-////		}
-//
-//		return latitude;
-//	}
-
 	/**
 	 * @return Returns latitude.
 	 *         <p>
@@ -1148,6 +1097,16 @@ public class Photo {
 		_tourPhotoRef.remove(tourId);
 	}
 
+	public void replaceImageFile(final IPath newImageFilePathName) {
+
+		// force loading of metadata
+		_photoImageMetadata = null;
+
+		setupPhoto(newImageFilePathName.toFile(), newImageFilePathName);
+
+//		PhotoLoadManager.putPhotoInLoadingErrorMap(imageFilePathName);
+	}
+
 	public void resetLinkGeoPositions() {
 
 		_linkLatitude = 0;
@@ -1158,19 +1117,6 @@ public class Photo {
 
 	public void resetLinkWorldPosition() {
 		_linkWorldPosition.clear();
-	}
-
-	public void resetLoadingState() {
-
-		// force loading of metadata
-		_photoImageMetadata = null;
-
-		// the image file should now be available, but check again
-		_isImageFileAvailable = new File(imageFilePathName).exists();
-
-		setDefaultLoadingState();
-
-//		PhotoLoadManager.putPhotoInLoadingErrorMap(imageFilePathName);
 	}
 
 	public void resetTourExifState() {
@@ -1185,26 +1131,6 @@ public class Photo {
 
 	public void setAltitude(final double altitude) {
 		_altitude = altitude;
-	}
-
-	private void setDefaultLoadingState() {
-
-		if (_isImageFileAvailable) {
-
-			_photoLoadingStateThumb = PhotoLoadingState.UNDEFINED;
-			_photoLoadingStateHQ = PhotoLoadingState.UNDEFINED;
-			_photoLoadingStateOriginal = PhotoLoadingState.UNDEFINED;
-
-			_isLoadingError = false;
-
-		} else {
-
-			_photoLoadingStateThumb = PhotoLoadingState.IMAGE_IS_INVALID;
-			_photoLoadingStateHQ = PhotoLoadingState.IMAGE_IS_INVALID;
-			_photoLoadingStateOriginal = PhotoLoadingState.IMAGE_IS_INVALID;
-
-			_isLoadingError = true;
-		}
 	}
 
 	public void setGpsAreaInfo(final String gpsAreaInfo) {
@@ -1284,6 +1210,54 @@ public class Photo {
 		_tourLongitude = longitude;
 
 		isTourPhotoWithGps = true;
+	}
+
+	private void setupPhoto(final File photoImageFile, final IPath photoImagePath) {
+
+		final String photoImageFilePathName = photoImageFile.getAbsolutePath();
+		final long lastModified = photoImageFile.lastModified();
+
+		imageFile = photoImageFile;
+
+		imageFileName = photoImageFile.getName();
+		imageFilePathName = photoImageFilePathName;
+
+		imagePathName = photoImagePath.removeLastSegments(1).toOSString();
+		imageFileExt = photoImagePath.getFileExtension();
+
+		imageFileSize = photoImageFile.length();
+		imageFileLastModified = lastModified;
+
+		// initially sort by file date until exif data are loaded
+		imageExifTime = lastModified;
+
+		_uniqueId = photoImageFilePathName;
+
+		/*
+		 * initialize image keys and loading states
+		 */
+		_imageKeyThumb = getImageKeyThumb(photoImageFilePathName);
+		_imageKeyHQ = getImageKeyHQ(photoImageFilePathName);
+		_imageKeyOriginal = Util.computeMD5(photoImageFilePathName + "_Original");//$NON-NLS-1$
+
+		_isImageFileAvailable = photoImageFile.exists();
+
+		if (_isImageFileAvailable) {
+
+			_photoLoadingStateThumb = PhotoLoadingState.UNDEFINED;
+			_photoLoadingStateHQ = PhotoLoadingState.UNDEFINED;
+			_photoLoadingStateOriginal = PhotoLoadingState.UNDEFINED;
+
+			_isLoadingError = false;
+
+		} else {
+
+			_photoLoadingStateThumb = PhotoLoadingState.IMAGE_IS_INVALID;
+			_photoLoadingStateHQ = PhotoLoadingState.IMAGE_IS_INVALID;
+			_photoLoadingStateOriginal = PhotoLoadingState.IMAGE_IS_INVALID;
+
+			_isLoadingError = true;
+		}
 	}
 
 	@Override

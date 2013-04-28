@@ -1,19 +1,16 @@
-Version: 13.next                                           ?. April 2013
+Version: 13.4.1                                           ?. April 2013
 
 
-New Feature
+New
 
 
-* Change image folder
+* Change image folder for a tour photo, with this limits:
 
-!!! this feature is not available when an image is displayed in an image gallery tooltip !!!
+- !!! This feature is not available when an image is displayed in an image gallery tooltip !!!
 
+- The image location is saved in the tour with the platform specific structure, therefore the tour images are not displayed, when the tour database is moved to another platform, c:\ != /home/user
 
-Minor Modifications 
-
-
-Updates 
-
+- Folder replacement can be done only for images in ONE foler and not for a selected image, subfolders are also ignored.
 
 
 Fixed Bugs 

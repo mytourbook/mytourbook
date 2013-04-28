@@ -485,6 +485,8 @@ public class Messages extends NLS {
 	public static String		Dialog_SplitTour_Label_TourTitle;
 	public static String		Dialog_SplitTour_Label_TourTitle_Tooltip;
 
+	public static String		Dialog_WorldWind_Diagnostics;
+
 	public static String		Dlg_AdjustAltitude_Group_options;
 	public static String		Dlg_AdjustAltitude_Label_end_altitude;
 	public static String		Dlg_AdjustAltitude_Label_end_altitude_tooltip;
@@ -795,6 +797,7 @@ public class Messages extends NLS {
 
 	public static String		Photo_TourPhotoMgr_Dialog_ReplacePhotoImage_Message;
 	public static String		Photo_TourPhotoMgr_Dialog_ReplacePhotoImage_NoImage_Message;
+	public static String		Photo_TourPhotoMgr_Dialog_ReplacePhotoImage_NoValidImageNames;
 	public static String		Photo_TourPhotoMgr_Dialog_ReplacePhotoImage_NoValidImages_Message;
 	public static String		Photo_TourPhotoMgr_Dialog_ReplacePhotoImage_ReplaceAll_Message;
 	public static String		Photo_TourPhotoMgr_Dialog_ReplacePhotoImage_ReplacePartly_Message;
@@ -1489,8 +1492,6 @@ public class Messages extends NLS {
 	public static String		TourEditor_Dialog_DeleteDistanceValues_Title;
 	public static String		TourEditor_Dialog_SetAltitudeFromSRTM_Message;
 	public static String		TourEditor_Dialog_SetAltitudeFromSRTM_Title;
-
-	public static String	TourPhotoManager_Photo_TourPhotoMgr_Dialog_ReplacePhotoImage_NoValidImageNames;
 
 	public static String		Training_Action_EditHrZones;
 

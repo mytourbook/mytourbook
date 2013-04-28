@@ -23,7 +23,6 @@ import java.util.concurrent.Executors;
 
 import net.tourbook.common.UI;
 
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.ListenerList;
 
 import com.googlecode.concurrentlinkedhashmap.ConcurrentLinkedHashMap;
@@ -97,28 +96,17 @@ public class PhotoCache {
 		}
 	}
 
-//	public static synchronized void removePhotos(final Collection<Photo> photos) {
-//
-//		for (final Photo photo : photos) {
-//			_cache.remove(photo.imageFilePathName);
-//		}
-//	}
-
 	public static synchronized void removePhotosFromFolder(final String folderName) {
 
 		for (final Photo photo : _cache.values()) {
 
 			if (photo.imagePathName.equals(folderName)) {
-
 				_cache.remove(photo.imageFilePathName);
-
-//				System.out.println(UI.timeStampNano() + " \tremoved:" + photo.imageFilePathName);
-//				// TODO remove SYSTEM.OUT.PRINTLN
 			}
 		}
 	}
 
-	public static synchronized void replaceImageFilePath(final ArrayList<ImagePathReplacement> replacedImages) {
+	public static synchronized void replaceImageFile(final ArrayList<ImagePathReplacement> replacedImages) {
 
 		for (final ImagePathReplacement replacedImage : replacedImages) {
 
@@ -128,14 +116,8 @@ public class PhotoCache {
 
 				// update image file path
 
-				final IPath newImageFilePathName = replacedImage.newImageFilePathName;
-
-				cachedPhoto.imageFile = newImageFilePathName.toFile();
-				cachedPhoto.imagePathName = newImageFilePathName.removeLastSegments(1).toOSString();
-				cachedPhoto.imageFilePathName = newImageFilePathName.toOSString();
-
 				// reset loading state to force a reload of the image in the gallery
-				cachedPhoto.resetLoadingState();
+				cachedPhoto.replaceImageFile(replacedImage.newImageFilePathName);
 
 				// set photo with new file path name
 				setPhoto(cachedPhoto);

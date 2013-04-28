@@ -31,7 +31,7 @@ public class ImagePathReplacement {
 	@Override
 	public String toString() {
 		return String.format(
-				"\nImagePathReplacement\n   oldImageFilePathName=%s\n   newImageFilePathName=%s\n",
+				"\nImagePathReplacement\n   oldImageFilePathName=%s\n   newImageFilePathName=%s\n", //$NON-NLS-1$
 				oldImageFilePathName,
 				newImageFilePathName.toOSString());
 	}

@@ -1757,7 +1757,7 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 
 			// image path names are updated (in photo and SQL db), update caches and galleries
 
-			PhotoCache.replaceImageFilePath(replacedImages);
+			PhotoCache.replaceImageFile(replacedImages);
 
 			ExifCache.remove(galleryItem.photo.imagePathName);
 

@@ -4,19 +4,19 @@
 
 	<target name="clear-update-site">
 
-		<delete>
+		<delete failonerror="false">
 			<fileset dir="plugins" includes="**/*" />
 		</delete>
 
-		<delete>
+		<delete failonerror="false">
 			<fileset dir="features" includes="**/*" />
 		</delete>
 
-		<delete dir="logs" />
+		<delete dir="logs" failonerror="false" />
 
-		<delete file="content.jar" />
-		<delete file="artifacts.jar" />
-		<delete file="logs.zip" />
+		<delete file="content.jar" failonerror="false" />
+		<delete file="artifacts.jar" failonerror="false" />
+		<delete file="logs.zip" failonerror="false" />
 
 	</target>
 

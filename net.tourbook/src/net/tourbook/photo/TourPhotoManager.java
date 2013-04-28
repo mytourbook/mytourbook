@@ -1225,7 +1225,7 @@ public class TourPhotoManager implements IPhotoServiceProvider {
 			final StringBuilder sb = new StringBuilder();
 
 			sb.append(NLS.bind(
-					Messages.TourPhotoManager_Photo_TourPhotoMgr_Dialog_ReplacePhotoImage_NoValidImageNames,
+					Messages.Photo_TourPhotoMgr_Dialog_ReplacePhotoImage_NoValidImageNames,
 					newImageFolder[0]));
 
 			for (final String invalidName : inValidImageNames) {

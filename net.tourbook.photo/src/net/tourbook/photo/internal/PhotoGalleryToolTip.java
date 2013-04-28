@@ -54,7 +54,7 @@ import org.joda.time.format.DateTimeFormatter;
 /**
  * created: 4.10.2012
  */
-public class GalleryPhotoToolTip extends AnimatedToolTipShell {
+public class PhotoGalleryToolTip extends AnimatedToolTipShell {
 
 	private static final int		DEFAULT_TEXT_WIDTH	= 50;
 
@@ -98,7 +98,7 @@ public class GalleryPhotoToolTip extends AnimatedToolTipShell {
 
 	private Label					_labelError;
 
-	public GalleryPhotoToolTip(final GalleryMT20 gallery) {
+	public PhotoGalleryToolTip(final GalleryMT20 gallery) {
 
 		super(gallery);
 
@@ -134,8 +134,8 @@ public class GalleryPhotoToolTip extends AnimatedToolTipShell {
 
 //		parent.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
 
-		final boolean isImageNotAvailable = _photo.isImageFileAvailable() == false;
-		final boolean isLoadingError = _photo.isLoadingError() || isImageNotAvailable;
+		final boolean isImageFileNotAvailable = _photo.isImageFileAvailable() == false;
+		final boolean isLoadingError = _photo.isLoadingError() || isImageFileNotAvailable;
 		final boolean isDrawImage = _galleryImageSize < 160;
 
 		final Composite container = new Composite(parent, SWT.NONE);
@@ -146,12 +146,14 @@ public class GalleryPhotoToolTip extends AnimatedToolTipShell {
 				.applyTo(container);
 //		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
 		{
-			if (isImageNotAvailable == false) {
+			if (isImageFileNotAvailable == false) {
+
+				// image file is available
 
 				final Composite containerHeader = new Composite(container, SWT.NONE);
 				GridDataFactory.fillDefaults().grab(true, false).applyTo(containerHeader);
 				GridLayoutFactory.fillDefaults().numColumns(2).spacing(10, 0).applyTo(containerHeader);
-//			containerHeader.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_MAGENTA));
+//				containerHeader.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_MAGENTA));
 				{
 					// image filename
 					Label label = new Label(containerHeader, SWT.NONE);
@@ -194,7 +196,7 @@ public class GalleryPhotoToolTip extends AnimatedToolTipShell {
 //						.hint(DEFAULT_TEXT_WIDTH, SWT.DEFAULT)
 						.applyTo(_labelError);
 
-				_labelError.setText(isImageNotAvailable ? NLS.bind(
+				_labelError.setText(isImageFileNotAvailable ? NLS.bind(
 						Messages.Pic_Dir_Label_ImageLoadingFailed_FileNotAvailable,
 						_photo.imageFilePathName) : Messages.Pic_Dir_Label_ImageLoadingFailed);
 			}
