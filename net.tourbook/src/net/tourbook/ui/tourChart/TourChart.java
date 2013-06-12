@@ -513,7 +513,7 @@ public class TourChart extends Chart {
 
 	public void actionShowStartTime(final Boolean isItemChecked) {
 
-		_tourChartConfig.isShowStartTime = isItemChecked;
+		_tourChartConfig.xAxisTime = isItemChecked ? X_AXIS_START_TIME.TOUR_START_TIME : X_AXIS_START_TIME.START_WITH_0;
 		updateTourChart(true);
 
 		setActionChecked(ACTION_ID_IS_SHOW_START_TIME, isItemChecked);
@@ -613,9 +613,32 @@ public class TourChart extends Chart {
 
 			// x-axis already shows time, toggle between tour start time and tour time
 
-			final boolean isShowStartTime = !_tourChartConfig.isShowStartTime;
+			final X_AXIS_START_TIME configXAxisTime = _tourChartConfig.xAxisTime;
 
-			_tourChartConfig.isShowStartTime = isShowStartTime;
+			if (_tourData.getPhotoTimeAdjustment() > 0) {
+
+				if (configXAxisTime == X_AXIS_START_TIME.START_WITH_0) {
+
+					_tourChartConfig.xAxisTime = X_AXIS_START_TIME.TOUR_START_TIME;
+
+				} else if (configXAxisTime == X_AXIS_START_TIME.TOUR_START_TIME) {
+
+					_tourChartConfig.xAxisTime = X_AXIS_START_TIME.PHOTO_TIME;
+
+				} else {
+					_tourChartConfig.xAxisTime = X_AXIS_START_TIME.START_WITH_0;
+				}
+
+			} else {
+
+				/*
+				 * there is no photo time adjustment, toggle between relative and absolute time
+				 */
+
+				_tourChartConfig.xAxisTime = configXAxisTime == X_AXIS_START_TIME.START_WITH_0
+						? X_AXIS_START_TIME.TOUR_START_TIME
+						: X_AXIS_START_TIME.START_WITH_0;
+			}
 
 			/**
 			 * keepMinMaxValues must be set to false, that a deeply zoomed in chart can display
@@ -623,7 +646,7 @@ public class TourChart extends Chart {
 			 */
 			updateTourChart(false);
 
-			setActionChecked(ACTION_ID_IS_SHOW_START_TIME, isShowStartTime);
+			setActionChecked(ACTION_ID_IS_SHOW_START_TIME, _tourChartConfig.xAxisTime != X_AXIS_START_TIME.START_WITH_0);
 
 			return;
 		}
@@ -1454,16 +1477,18 @@ public class TourChart extends Chart {
 		/*
 		 * x-axis time/distance
 		 */
+		final boolean isShowTimeOnXAxis = _tourChartConfig.isShowTimeOnXAxis;
+
 		tourAction = _allTourChartActions.get(ACTION_ID_IS_SHOW_START_TIME);
-		tourAction.setEnabled(_tourChartConfig.isShowTimeOnXAxis);
-		tourAction.setChecked(_tourChartConfig.isShowStartTime);
+		tourAction.setEnabled(isShowTimeOnXAxis);
+		tourAction.setChecked(_tourChartConfig.xAxisTime != X_AXIS_START_TIME.START_WITH_0);
 
 		tourAction = _allTourChartActions.get(ACTION_ID_X_AXIS_TIME);
 		tourAction.setEnabled(true); // time data are always available
-		tourAction.setChecked(_tourChartConfig.isShowTimeOnXAxis);
+		tourAction.setChecked(isShowTimeOnXAxis);
 
 		tourAction = _allTourChartActions.get(ACTION_ID_X_AXIS_DISTANCE);
-		tourAction.setChecked(!_tourChartConfig.isShowTimeOnXAxis);
+		tourAction.setChecked(!isShowTimeOnXAxis);
 		tourAction.setEnabled(!_tourChartConfig.isForceTimeOnXAxis);
 
 		// get options check status from the configuration

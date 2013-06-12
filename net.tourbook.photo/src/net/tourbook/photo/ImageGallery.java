@@ -39,12 +39,12 @@ import net.tourbook.common.util.Util;
 import net.tourbook.common.weather.IWeather;
 import net.tourbook.photo.internal.Activator;
 import net.tourbook.photo.internal.GalleryActionBar;
-import net.tourbook.photo.internal.PhotoGalleryToolTip;
 import net.tourbook.photo.internal.GalleryType;
 import net.tourbook.photo.internal.Messages;
 import net.tourbook.photo.internal.PhotoDateInfo;
 import net.tourbook.photo.internal.PhotoFilterGPS;
 import net.tourbook.photo.internal.PhotoFilterTour;
+import net.tourbook.photo.internal.PhotoGalleryToolTip;
 import net.tourbook.photo.internal.PhotoRenderer;
 import net.tourbook.photo.internal.RatingStarBehaviour;
 import net.tourbook.photo.internal.TableColumnFactory;
@@ -2644,9 +2644,16 @@ public abstract class ImageGallery implements IItemListener, IGalleryContextMenu
 
 	public void showImages(	final ArrayList<Photo> allPhotos,
 							final String galleryPositionKey,
-							final boolean isLinkPhotoDisplayed) {
+							final boolean isLinkPhotoDisplayed,
+							final boolean isFilteredAndSorted) {
 
 		final Photo[] photos = allPhotos.toArray(new Photo[allPhotos.size()]);
+
+		if (isFilteredAndSorted == false) {
+
+			// sort photos with current sorting algorithm
+			Arrays.sort(photos, getCurrentComparator());
+		}
 
 		showImages(photos, galleryPositionKey, isLinkPhotoDisplayed);
 	}
@@ -2690,7 +2697,9 @@ public abstract class ImageGallery implements IItemListener, IGalleryContextMenu
 		workerUpdate(imageFolder, isReloadFolder);
 	}
 
-	public void showImages(final Photo[] allPhotos, final String galleryPositionKey, final boolean isLinkPhotoDisplayed) {
+	public void showImages(	final Photo[] allFilteredAnsSortedPhotos,
+							final String galleryPositionKey,
+							final boolean isLinkPhotoDisplayed) {
 
 //		System.out.println(UI.timeStampNano() + " showImages() " + galleryPositionKey);
 //		// TODO remove SYSTEM.OUT.PRINTLN
@@ -2721,7 +2730,7 @@ public abstract class ImageGallery implements IItemListener, IGalleryContextMenu
 
 		_galleryMT20.deselectAll();
 
-		_allPhotos = allPhotos;
+		_allPhotos = allFilteredAnsSortedPhotos;
 
 		final double galleryPosition = getCachedGalleryPosition();
 

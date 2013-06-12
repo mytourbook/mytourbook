@@ -49,7 +49,7 @@ public class TourChartConfiguration {
 	 * <p>
 	 * false: show the tour time which starts at 0
 	 */
-	public boolean					isShowStartTime			= false;
+	public X_AXIS_START_TIME				xAxisTime				= X_AXIS_START_TIME.START_WITH_0;
 
 	/**
 	 * contains a list for all graphs which are displayed, the sequence of the list is the sequence

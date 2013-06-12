@@ -432,6 +432,9 @@ public class TourPhotosView extends ViewPart implements IPhotoEventListener {
 
 	private void onSelectionChanged(final ISelection selection) {
 
+//		System.out.println(net.tourbook.common.UI.timeStampNano() + " TourPhotosView\t" + selection);
+//		// TODO remove SYSTEM.OUT.PRINTLN
+
 		final ArrayList<Photo> allPhotos = new ArrayList<Photo>();
 
 		_galleryPositionKey = 0;
@@ -607,9 +610,11 @@ public class TourPhotosView extends ViewPart implements IPhotoEventListener {
 		 * update photo gallery
 		 */
 
-		_photoGallery.showImages(
+		_photoGallery.showImages(//
 				allPhotos,
-				Long.toString(_galleryPositionKey) + "_TourPhotosView", _isLinkPhotoDisplayed);//$NON-NLS-1$
+				Long.toString(_galleryPositionKey) + "_TourPhotosView", //$NON-NLS-1$
+				_isLinkPhotoDisplayed,
+				false);
 
 		/*
 		 * set title

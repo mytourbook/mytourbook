@@ -48,6 +48,7 @@ import net.tourbook.ui.action.ActionEditQuick;
 import net.tourbook.ui.action.ActionEditTour;
 import net.tourbook.ui.tourChart.TourChart;
 import net.tourbook.ui.tourChart.TourChartConfiguration;
+import net.tourbook.ui.tourChart.X_AXIS_START_TIME;
 import net.tourbook.ui.views.TourChartAnalyzerInfo;
 import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
 
@@ -370,7 +371,10 @@ public class TourManager {
 		tourChartConfig.isShowTimeOnXAxis = isShowTime;
 		tourChartConfig.isShowTimeOnXAxisBackup = isShowTime;
 
-		tourChartConfig.isShowStartTime = _prefStore.getBoolean(ITourbookPreferences.GRAPH_X_AXIS_STARTTIME);
+		final boolean isTourStartTime = _prefStore.getBoolean(ITourbookPreferences.GRAPH_X_AXIS_STARTTIME);
+		tourChartConfig.xAxisTime = isTourStartTime
+				? X_AXIS_START_TIME.TOUR_START_TIME
+				: X_AXIS_START_TIME.START_WITH_0;
 		tourChartConfig.isSRTMDataVisible = _prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_SRTM_VISIBLE);
 
 		tourChartConfig.isShowTourMarker = _prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_MARKER_VISIBLE);
@@ -1733,7 +1737,15 @@ public class TourManager {
 					+ (tourStartTime.getMinuteOfHour() * 60)
 					+ tourStartTime.getSecondOfMinute();
 
-			xDataTime.setStartValue(tourChartConfig.isShowStartTime ? tourTimeOfDay : 0);
+			final int photoTimeOfDay = tourTimeOfDay - tourData.getPhotoTimeAdjustment();
+
+			final X_AXIS_START_TIME configXAxisTime = tourChartConfig.xAxisTime;
+			
+			final double xAxisStartValue = configXAxisTime == X_AXIS_START_TIME.START_WITH_0
+					? 0
+					: configXAxisTime == X_AXIS_START_TIME.TOUR_START_TIME ? tourTimeOfDay : photoTimeOfDay;
+
+			xDataTime.setStartValue(xAxisStartValue);
 
 			xDataTime.setIsTimeSerieWithTimeZoneAdjustment(tourData.isTimeSerieWithTimeZoneAdjustment());
 

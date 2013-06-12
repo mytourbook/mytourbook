@@ -1,0 +1,27 @@
+Version: 13.4.2                                           ?. June 2013
+
+
+New
+
+
+* 
+
+
+Improvement
+
+* Tour Chart
+
+- Toggle x-axis time between 
+  
+  - Recording time (relative time)
+  
+  - Day time (absolute time)
+  
+  - Day time with photo time adjustment (this is new)
+
+
+Fixed Bugs 
+
+* Sort photos correctly in the Tour Photos view when multiple tours are selected.
+
+

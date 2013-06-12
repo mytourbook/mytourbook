@@ -599,7 +599,7 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 
 		final String galleryPositionKey = hoveredPhotosHash + "_PhotoToolTipUI";//$NON-NLS-1$
 
-		_photoGallery.showImages(_allPhotos, galleryPositionKey, isLinkPhotoDisplayed);
+		_photoGallery.showImages(_allPhotos, galleryPositionKey, isLinkPhotoDisplayed, true);
 	}
 
 	private void updateUI_Colors(final Composite parent) {

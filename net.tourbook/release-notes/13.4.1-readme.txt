@@ -1,0 +1,33 @@
+Version: 13.4.1                                           29. April 2013 
+
+ 
+New 
+
+* Change tour photo image location. 
+
+
+Fixed Bugs 
+
+* A splitted tour can cause these errors: 
+
+- A tour marker can be out of array bounds. 
+
+- NPE occured when last time slice is split. 
+
+
+* Show photo annotations at the correct position when images cannot be 
+loaded. 
+
+
+* Experience with 3D Map & Linux 
+
+In the release notes of version 13.4 it was written that Linux can crash 
+using the new 3D map. This is still true but it also depends on the used 
+graphic card. 
+
+When having a computer (notebook) with an onboard and a 2nd graphic 
+card, it can work successfully with the onboard graphic card but it can 
+crash with the 2nd graphic card. 
+
+Doriano Cometto sent this screenshot. 
+
