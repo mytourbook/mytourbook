@@ -16,6 +16,7 @@
 package net.tourbook.extension.export;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
@@ -78,6 +79,9 @@ public class ActionExport extends Action implements IMenuCreator {
 			if (selectedTours == null || selectedTours.size() == 0) {
 				return;
 			}
+
+			// sort by date/time
+			Collections.sort(selectedTours);
 
 			_exportTourExtension.exportTours(selectedTours, _tourStartIndex, _tourEndIndex);
 		}

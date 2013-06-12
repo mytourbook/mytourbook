@@ -24,4 +24,5 @@ Fixed Bugs
 
 * Sort photos correctly in the Tour Photos view when multiple tours are selected.
 
+* Sort tours by date/time when exporting tours.
 

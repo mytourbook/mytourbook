@@ -3075,7 +3075,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 		long tourStartTime = 0;
 
-		// convert data from the tour format into interger[] arrays
+		// convert data from the tour format into long[] array
 		for (int serieIndex = 0; serieIndex < serieSize; serieIndex++) {
 
 			final HistoryData timeData = timeDataSerie[serieIndex];
