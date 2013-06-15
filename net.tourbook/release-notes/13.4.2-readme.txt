@@ -1,11 +1,6 @@
 Version: 13.4.2                                           ?. June 2013
 
 
-New
-
-
-* 
-
 
 Improvement
 
@@ -20,9 +15,11 @@ Improvement
   - Day time with photo time adjustment (this is new)
 
 
-Fixed Bugs 
+Fixed Problems 
 
 * Sort photos correctly in the Tour Photos view when multiple tours are selected.
 
-* Sort tours by date/time when exporting tours.
+* Sort tours by date/time when exporting multiple tours.
+
+* Show photos in the tour map when photos are not yet loaded in other views. This implementation is not yet perfect but better than before.
 
