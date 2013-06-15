@@ -66,7 +66,11 @@ public class RendererHelper {
 				imagePaintedWidth = photoImageWidth;
 				imagePaintedHeight = photoImageHeight;
 			}
-		} else if (imagePaintedWidth > imageWidth || imagePaintedHeight > imageHeight) {
+		} else
+
+		// photo is NOT loaded
+
+		if (imageWidth != Integer.MIN_VALUE && (imagePaintedWidth > imageWidth || imagePaintedHeight > imageHeight)) {
 
 			imagePaintedWidth = imageWidth;
 			imagePaintedHeight = imageHeight;
