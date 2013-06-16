@@ -1,25 +1,20 @@
-Version: 13.4.2                                           ?. June 2013
+Version: 13.4.2                                            16. June 2013
 
 
+Improvement 
 
-Improvement
+* Tour Chart 
 
-* Tour Chart
-
-- Toggle x-axis time between 
-  
-  - Recording time (relative time)
-  
-  - Day time (absolute time)
-  
-  - Day time with photo time adjustment (this is new)
+- Toggle x-axis time between - Recording time (relative time) - Day time 
+(absolute time) - Day time with photo time adjustment (this is new) 
 
 
 Fixed Problems 
 
-* Sort photos correctly in the Tour Photos view when multiple tours are selected.
+* Sort photos correctly in the Tour Photos view when multiple tours are 
+selected. 
 
-* Sort tours by date/time when exporting multiple tours.
+* Sort tours by date/time when exporting multiple tours. 
 
-* Show photos in the tour map when photos are not yet loaded in other views. This implementation is not yet perfect but better than before.
-
+* Show photos in the tour map when photos are not yet loaded in other 
+views. This implementation is not yet perfect but better than before. 
