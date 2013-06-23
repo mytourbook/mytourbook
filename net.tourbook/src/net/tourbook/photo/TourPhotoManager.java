@@ -1847,18 +1847,25 @@ public class TourPhotoManager implements IPhotoServiceProvider {
 											final double tourLatitude,
 											final double tourLongitude) {
 
-		if (photo.isGeoFromExif) {
+//		if (photo.isGeoFromExif) {
+//
+//			// photo contains already EXIF GPS
+//
+//			// don't overwrite geo from EXIF, use GPS geo from photo
+//
+//		} else {
+//
+//			// set gps from tour into the photo
+//
+//			photo.setLinkGeoPosition(tourLatitude, tourLongitude);
+//		}
 
-			// photo contains already EXIF GPS
-
-			// don't overwrite geo from EXIF, use GPS geo from photo wrapper
-
-		} else {
-
-			// set gps from tour into the photo
-
-			photo.setLinkGeoPosition(tourLatitude, tourLongitude);
-		}
+		/*
+		 * Tour GPS is more accurate than EXIF GPS, the best way to handle this problem is by
+		 * specifiying an preference but because my camera has written the wrong GPS into the
+		 * photos, this is now (13.4.3) the new behaviour.
+		 */
+		photo.setLinkGeoPosition(tourLatitude, tourLongitude);
 	}
 
 	@Override

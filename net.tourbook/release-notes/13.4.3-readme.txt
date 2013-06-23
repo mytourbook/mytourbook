@@ -1,0 +1,18 @@
+Version: 13.4.3                                            ?. June 2013
+
+
+Changed Behaviour
+
+* Use tour GPS instead of photo GPS to display a photo in a map
+When a photo contains GPS data, then either this data or the data from the tour can be used to display a photo in the map. Because the photo GPS has mostly not the same precise location than the tour GPS or when the photo GPS is wrong (because the photo software writes the wrong position into the EXIF, which happened with my camera), the tour GPS is save and used to display a photo in the map.
+
+
+
+Improvement 
+
+* 
+
+
+Fixed Problems 
+
+* 
