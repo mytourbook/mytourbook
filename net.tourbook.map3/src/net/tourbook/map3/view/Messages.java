@@ -6,6 +6,8 @@ public class Messages extends NLS {
 
 	private static final String	BUNDLE_NAME	= "net.tourbook.map3.view.messages";	//$NON-NLS-1$
 
+	public static String	Custom_Category_Name_Tour;
+
 	public static String		Default_Category_Name_Info;
 	public static String		Default_Category_Name_Map;
 	public static String		Default_Category_Name_Tools;
@@ -51,6 +53,8 @@ public class Messages extends NLS {
 	public static String		Terrain_Profile_Label_Dimension;
 	public static String		Terrain_Profile_Label_Follow;
 	public static String		Terrain_Profile_Label_ProfileLength;
+
+	public static String	TourTrack_Layer_Name;
 
 	static {
 		// initialize resource bundle

@@ -27,6 +27,7 @@ import gov.nasa.worldwind.layers.LayerList;
 import gov.nasa.worldwind.layers.TerrainProfileLayer;
 import gov.nasa.worldwind.layers.ViewControlsLayer;
 import gov.nasa.worldwind.layers.ViewControlsSelectListener;
+import gov.nasa.worldwind.layers.placename.PlaceNameLayer;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -43,6 +44,7 @@ import net.tourbook.map3.Activator;
 import net.tourbook.map3.layer.DefaultLayer;
 import net.tourbook.map3.layer.MapDefaultLayer;
 import net.tourbook.map3.layer.StatusLayer;
+import net.tourbook.map3.layer.TourTrackLayer;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Platform;
@@ -62,16 +64,28 @@ public class Map3Manager {
 
 	private static final String						MAP3_LAYER_STRUCTURE_FILE_NAME	= "map3-layers.xml";					//$NON-NLS-1$
 
-	private static final String						TAG_ROOT						= "Map3LayerStructure";				//$NON-NLS-1$
+	/**
+	 * This version number is incremented, when structural changes (e.g. new category) are done.
+	 * When this happens, the <b>default</b> structure is created.
+	 */
+	private static final int						MAP3_LAYER_STRUCTURE_VERSION	= 3;
 
+	private static final String						ATTR_MAP3_LAYER_VERSION			= "map3LayerVersion";					//$NON-NLS-1$
+
+	private static final String						TAG_ROOT						= "Map3LayerStructure";				//$NON-NLS-1$
 	private static final String						TAG_CATEGORY					= "category";							//$NON-NLS-1$
 	private static final String						TAG_LAYER						= "layer";								//$NON-NLS-1$
+
 	private static final String						ATTR_NAME						= "name";								//$NON-NLS-1$
 
 	private static final String						ATTR_ID							= "id";								//$NON-NLS-1$
 	private static final String						ATTR_IS_DEFAULT_LAYER			= "isDefaultLayer";					//$NON-NLS-1$
 	private static final String						ATTR_IS_ENABLED					= "isEnabled";							//$NON-NLS-1$
 	private static final String						ATTR_IS_EXPANDED				= "isExpanded";						//$NON-NLS-1$
+
+	private static final int						INSERT_BEFORE_COMPASS			= 1;
+	private static final int						INSERT_BEFORE_PLACE_NAMES		= 2;
+
 	/**
 	 * _bundle must be set here otherwise an exception occures in saveState()
 	 */
@@ -116,8 +130,6 @@ public class Map3Manager {
 	private static ArrayList<Layer>					_xmlLayers						= new ArrayList<Layer>();
 	private static final DateTimeFormatter			_dtFormatter					= ISODateTimeFormat
 																							.basicDateTimeNoMillis();
-
-	private static final int						INSERT_BEFORE_COMPASS			= 1;
 
 	static {
 		create_WorldWindLayerModel();
@@ -164,38 +176,38 @@ public class Map3Manager {
 	private static void create_WorldWindLayerModel() {
 
 		// create default model
-		final Model model = (Model) WorldWind.createConfigurationComponent(AVKey.MODEL_CLASS_NAME);
+		final Model wwModel = (Model) WorldWind.createConfigurationComponent(AVKey.MODEL_CLASS_NAME);
 
-		model.setShowWireframeExterior(false);
-		model.setShowWireframeInterior(false);
-		model.setShowTessellationBoundingVolumes(false);
+		wwModel.setShowWireframeExterior(false);
+		wwModel.setShowWireframeInterior(false);
+		wwModel.setShowTessellationBoundingVolumes(false);
 
 		// get default layer
-		_wwDefaultLayers = model.getLayers();
+		_wwDefaultLayers = wwModel.getLayers();
 
 		// create custom layer BEFORE state is applied and xml file is read which references these layers
+		createCustomLayer_TourTracks();
 		createCustomLayer_MapStatus();
 		createCustomLayer_ViewerController();
 		createCustomLayer_TerrainProfile();
 
 		// restore layer from xml file
-		_uiRootItem = readLayerXml_10();
+		_uiRootItem = parseLayerXml();
 
+		// set ww layers from xml layers
 		final Layer[] layerObject = _xmlLayers.toArray(new Layer[_xmlLayers.size()]);
 		final LayerList layers = new LayerList(layerObject);
-		model.setLayers(layers);
-
-//		LatLon.fromDegrees(0, -10)
+		wwModel.setLayers(layers);
 
 		// model must be set BEFORE model is updated
-		_wwCanvas.setModel(model);
+		_wwCanvas.setModel(wwModel);
 
 		/*
 		 * ensure All custom layers are in the model because it can happen, that a layer is created
 		 * after the initial load of the layer list and new layers are not contained in the xml
 		 * layer file.
 		 */
-		updateWWModel(model.getLayers());
+		setCustomLayerInWWModel(wwModel.getLayers());
 	}
 
 	private static void createCustomLayer_MapStatus() {
@@ -278,6 +290,37 @@ public class Map3Manager {
 		_customLayers.put(layerId, tviLayer);
 	}
 
+	private static void createCustomLayer_TourTracks() {
+
+		/*
+		 * create WW layer
+		 */
+		final TourTrackLayer tourTrackLayer = new TourTrackLayer();
+
+//		statusLayer.setEventSource(_wwCanvas);
+
+		/*
+		 * create UI model layer
+		 */
+
+		final TVIMap3Layer tviLayer = new TVIMap3Layer(tourTrackLayer.getLayer(), tourTrackLayer.getName());
+
+		final String layerId = TourTrackLayer.MAP3_LAYER_ID;
+		tviLayer.id = layerId;
+
+		final boolean isVisible = true;
+
+		// default is enabled
+		tviLayer.isLayerVisible = isVisible;
+		tviLayer.defaultPosition = INSERT_BEFORE_PLACE_NAMES;
+
+		if (isVisible) {
+			_uiEnabledLayersFromXml.add(tviLayer);
+		}
+
+		_customLayers.put(layerId, tviLayer);
+	}
+
 	private static void createCustomLayer_ViewerController() {
 
 		/*
@@ -311,74 +354,91 @@ public class Map3Manager {
 	 * 
 	 * <pre>
 	 * 
-	 * 		Stars							gov.nasa.worldwind.layers.StarsLayer					true
-	 * 		Atmosphere						gov.nasa.worldwind.layers.SkyGradientLayer				true
-	 * 		NASA Blue Marble Image			gov.nasa.worldwind.layers.Earth.BMNGOneImage			true
-	 * 		Blue Marble (WMS) 2004			gov.nasa.worldwind.wms.WMSTiledImageLayer				true
-	 * 		i-cubed Landsat					gov.nasa.worldwind.wms.WMSTiledImageLayer				true
-	 * 		USDA NAIP						gov.nasa.worldwind.wms.WMSTiledImageLayer				false
-	 * 		USDA NAIP USGS					gov.nasa.worldwind.wms.WMSTiledImageLayer				false
-	 * 		MS Virtual Earth Aerial			gov.nasa.worldwind.layers.BasicTiledImageLayer			false
-	 * 		Bing Imagery					gov.nasa.worldwind.wms.WMSTiledImageLayer				false
-	 * 		USGS Topographic Maps 1:250K	gov.nasa.worldwind.wms.WMSTiledImageLayer				false
-	 * 		USGS Topographic Maps 1:100K	gov.nasa.worldwind.wms.WMSTiledImageLayer				false
-	 * 		USGS Topographic Maps 1:24K		gov.nasa.worldwind.wms.WMSTiledImageLayer				false
-	 * 		USGS Urban Area Ortho			gov.nasa.worldwind.layers.BasicTiledImageLayer			false
-	 * 		Political Boundaries			gov.nasa.worldwind.layers.Earth.CountryBoundariesLayer	false
-	 * 		Open Street 					Map	gov.nasa.worldwind.wms.WMSTiledImageLayer			false
-	 * 		Place Names						gov.nasa.worldwind.layers.Earth.NASAWFSPlaceNameLayer	true
-	 * 		World Map						gov.nasa.worldwind.layers.WorldMapLayer					true
-	 * 		Scale bar						gov.nasa.worldwind.layers.ScalebarLayer					true
-	 * 		Compass							gov.nasa.worldwind.layers.CompassLayer					true
+	 * 		Stars							true		gov.nasa.worldwind.layers.StarsLayer
+	 * 		Atmosphere						true        gov.nasa.worldwind.layers.SkyGradientLayer
+	 * 		NASA Blue Marble Image			true        gov.nasa.worldwind.layers.Earth.BMNGOneImage
+	 * 		Blue Marble (WMS) 2004			true        gov.nasa.worldwind.wms.WMSTiledImageLayer
+	 * 		i-cubed Landsat					true        gov.nasa.worldwind.wms.WMSTiledImageLayer
+	 * 		USDA NAIP						false       gov.nasa.worldwind.wms.WMSTiledImageLayer
+	 * 		USDA NAIP USGS					false       gov.nasa.worldwind.wms.WMSTiledImageLayer
+	 * 		MS Virtual Earth Aerial			false       gov.nasa.worldwind.layers.BasicTiledImageLayer
+	 * 		Bing Imagery					false       gov.nasa.worldwind.wms.WMSTiledImageLayer
+	 * 		USGS Topographic Maps 1:250K	false       gov.nasa.worldwind.wms.WMSTiledImageLayer
+	 * 		USGS Topographic Maps 1:100K	false       gov.nasa.worldwind.wms.WMSTiledImageLayer
+	 * 		USGS Topographic Maps 1:24K		false       gov.nasa.worldwind.wms.WMSTiledImageLayer
+	 * 		USGS Urban Area Ortho			false       gov.nasa.worldwind.layers.BasicTiledImageLayer
+	 * 		Political Boundaries			false       gov.nasa.worldwind.layers.Earth.CountryBoundariesLayer
+	 * 		Open Street Map					false       gov.nasa.worldwind.wms.WMSTiledImageLayer
+	 * 		Place Names						true        gov.nasa.worldwind.layers.Earth.NASAWFSPlaceNameLayer
+	 * 		World Map						true        gov.nasa.worldwind.layers.WorldMapLayer
+	 * 		Scale bar						true        gov.nasa.worldwind.layers.ScalebarLayer
+	 * 		Compass							true        gov.nasa.worldwind.layers.CompassLayer
 	 * 
 	 * </pre>
 	 * 
 	 * @return
 	 */
-	private static XMLMemento createLayerXml_0_DefaultTreeItems() {
+	private static XMLMemento createLayerXml_0__DefaultLayer() {
 
 		XMLMemento xmlRoot;
-		IMemento xmlWWCategory;
+
 		try {
 
 			xmlRoot = createLayerXml_10_WriteRoot();
 
-			xmlWWCategory = xmlRoot.createChild(TAG_CATEGORY);
-			xmlWWCategory.putString(ATTR_NAME, Messages.Default_Category_Name_Map);
-			xmlWWCategory.putBoolean(ATTR_IS_EXPANDED, true);
-
+			/*
+			 * Category: Map
+			 */
+			final IMemento xmlWWCategoryMap = xmlRoot.createChild(TAG_CATEGORY);
+			xmlWWCategoryMap.putString(ATTR_NAME, Messages.Default_Category_Name_Map);
+			xmlWWCategoryMap.putBoolean(ATTR_IS_EXPANDED, true);
 			{
-				createLayerXml_20_DefaultLayer(xmlWWCategory, true, MapDefaultLayer.ID_STARS);
-				createLayerXml_20_DefaultLayer(xmlWWCategory, true, MapDefaultLayer.ID_ATMOSPHERE);
-				createLayerXml_20_DefaultLayer(xmlWWCategory, true, MapDefaultLayer.ID_NASA_BLUE_MARBLE_IMAGE);
-				createLayerXml_20_DefaultLayer(xmlWWCategory, true, MapDefaultLayer.ID_BLUE_MARBLE_WMS_2004);
-				createLayerXml_20_DefaultLayer(xmlWWCategory, true, MapDefaultLayer.ID_I_CUBED_LANDSAT);
-				createLayerXml_20_DefaultLayer(xmlWWCategory, false, MapDefaultLayer.ID_USDA_NAIP);
-				createLayerXml_20_DefaultLayer(xmlWWCategory, false, MapDefaultLayer.ID_USDA_NAIP_USGS);
-				createLayerXml_20_DefaultLayer(xmlWWCategory, true, MapDefaultLayer.ID_MS_VIRTUAL_EARTH_AERIAL);
-				createLayerXml_20_DefaultLayer(xmlWWCategory, true, MapDefaultLayer.ID_BING_IMAGERY);
-				createLayerXml_20_DefaultLayer(xmlWWCategory, false, MapDefaultLayer.ID_USGS_TOPOGRAPHIC_MAPS_1_250K);
-				createLayerXml_20_DefaultLayer(xmlWWCategory, false, MapDefaultLayer.ID_USGS_TOPOGRAPHIC_MAPS_1_100K);
-				createLayerXml_20_DefaultLayer(xmlWWCategory, false, MapDefaultLayer.ID_USGS_TOPOGRAPHIC_MAPS_1_24K);
-				createLayerXml_20_DefaultLayer(xmlWWCategory, false, MapDefaultLayer.ID_USGS_URBAN_AREA_ORTHO);
-				createLayerXml_20_DefaultLayer(xmlWWCategory, true, MapDefaultLayer.ID_POLITICAL_BOUNDARIES);
-				createLayerXml_20_DefaultLayer(xmlWWCategory, false, MapDefaultLayer.ID_OPEN_STREET_MAP);
+				createLayerXml_20_DefaultLayer(xmlWWCategoryMap, true, MapDefaultLayer.ID_STARS);
+				createLayerXml_20_DefaultLayer(xmlWWCategoryMap, true, MapDefaultLayer.ID_ATMOSPHERE);
+				createLayerXml_20_DefaultLayer(xmlWWCategoryMap, true, MapDefaultLayer.ID_NASA_BLUE_MARBLE_IMAGE);
+				createLayerXml_20_DefaultLayer(xmlWWCategoryMap, true, MapDefaultLayer.ID_BLUE_MARBLE_WMS_2004);
+				createLayerXml_20_DefaultLayer(xmlWWCategoryMap, true, MapDefaultLayer.ID_I_CUBED_LANDSAT);
+				createLayerXml_20_DefaultLayer(xmlWWCategoryMap, false, MapDefaultLayer.ID_USDA_NAIP);
+				createLayerXml_20_DefaultLayer(xmlWWCategoryMap, false, MapDefaultLayer.ID_USDA_NAIP_USGS);
+				createLayerXml_20_DefaultLayer(xmlWWCategoryMap, true, MapDefaultLayer.ID_MS_VIRTUAL_EARTH_AERIAL);
+				createLayerXml_20_DefaultLayer(xmlWWCategoryMap, true, MapDefaultLayer.ID_BING_IMAGERY);
+				createLayerXml_20_DefaultLayer(xmlWWCategoryMap, false, MapDefaultLayer.ID_USGS_TOPOGRAPHIC_MAPS_1_250K);
+				createLayerXml_20_DefaultLayer(xmlWWCategoryMap, false, MapDefaultLayer.ID_USGS_TOPOGRAPHIC_MAPS_1_100K);
+				createLayerXml_20_DefaultLayer(xmlWWCategoryMap, false, MapDefaultLayer.ID_USGS_TOPOGRAPHIC_MAPS_1_24K);
+				createLayerXml_20_DefaultLayer(xmlWWCategoryMap, false, MapDefaultLayer.ID_USGS_URBAN_AREA_ORTHO);
+				createLayerXml_20_DefaultLayer(xmlWWCategoryMap, true, MapDefaultLayer.ID_POLITICAL_BOUNDARIES);
+				createLayerXml_20_DefaultLayer(xmlWWCategoryMap, false, MapDefaultLayer.ID_OPEN_STREET_MAP);
 			}
 
-			xmlWWCategory = xmlRoot.createChild(TAG_CATEGORY);
-			xmlWWCategory.putString(ATTR_NAME, Messages.Default_Category_Name_Info);
-			xmlWWCategory.putBoolean(ATTR_IS_EXPANDED, true);
+			/*
+			 * Category: Tour
+			 */
+			final IMemento xmlWWCategoryTour = xmlRoot.createChild(TAG_CATEGORY);
+			xmlWWCategoryTour.putString(ATTR_NAME, Messages.Custom_Category_Name_Tour);
+			xmlWWCategoryTour.putBoolean(ATTR_IS_EXPANDED, true);
 			{
-				createLayerXml_20_DefaultLayer(xmlWWCategory, true, MapDefaultLayer.ID_PLACE_NAMES);
-				createLayerXml_20_DefaultLayer(xmlWWCategory, true, MapDefaultLayer.ID_WORLD_MAP);
-				createLayerXml_20_DefaultLayer(xmlWWCategory, true, MapDefaultLayer.ID_SCALE_BAR);
+				createLayerXml_20_DefaultLayer(xmlWWCategoryTour, true, MapDefaultLayer.ID_PLACE_NAMES);
 			}
 
-			xmlWWCategory = xmlRoot.createChild(TAG_CATEGORY);
-			xmlWWCategory.putString(ATTR_NAME, Messages.Default_Category_Name_Tools);
-			xmlWWCategory.putBoolean(ATTR_IS_EXPANDED, true);
+			/*
+			 * Category: Info
+			 */
+			final IMemento xmlWWCategoryInfo = xmlRoot.createChild(TAG_CATEGORY);
+			xmlWWCategoryInfo.putString(ATTR_NAME, Messages.Default_Category_Name_Info);
+			xmlWWCategoryInfo.putBoolean(ATTR_IS_EXPANDED, true);
 			{
-				createLayerXml_20_DefaultLayer(xmlWWCategory, true, MapDefaultLayer.ID_COMPASS);
+				createLayerXml_20_DefaultLayer(xmlWWCategoryInfo, true, MapDefaultLayer.ID_WORLD_MAP);
+				createLayerXml_20_DefaultLayer(xmlWWCategoryInfo, true, MapDefaultLayer.ID_SCALE_BAR);
+			}
+
+			/*
+			 * Category: Tools
+			 */
+			final IMemento xmlWWCategoryTools = xmlRoot.createChild(TAG_CATEGORY);
+			xmlWWCategoryTools.putString(ATTR_NAME, Messages.Default_Category_Name_Tools);
+			xmlWWCategoryTools.putBoolean(ATTR_IS_EXPANDED, true);
+			{
+				createLayerXml_20_DefaultLayer(xmlWWCategoryTools, true, MapDefaultLayer.ID_COMPASS);
 			}
 
 		} catch (final Exception e) {
@@ -401,6 +461,9 @@ public class Map3Manager {
 		xmlRoot.putInteger(Util.ATTR_ROOT_VERSION_MINOR, version.getMinor());
 		xmlRoot.putInteger(Util.ATTR_ROOT_VERSION_MICRO, version.getMicro());
 		xmlRoot.putString(Util.ATTR_ROOT_VERSION_QUALIFIER, version.getQualifier());
+
+		// layer structure version
+		xmlRoot.putInteger(ATTR_MAP3_LAYER_VERSION, MAP3_LAYER_STRUCTURE_VERSION);
 
 		return xmlRoot;
 	}
@@ -620,7 +683,7 @@ public class Map3Manager {
 		/*
 		 * update UI model
 		 */
-		final TVIMap3Layer insertedUILayer = insertBeforeCompass_10(_uiRootItem, newWWLayer, newUILayer);
+		final TVIMap3Layer insertedUILayer = insertBeforeCompass_10(_uiRootItem, newUILayer);
 
 		return insertedUILayer;
 	}
@@ -637,9 +700,7 @@ public class Map3Manager {
 	 * @param newUILayer
 	 * @return
 	 */
-	private static TVIMap3Layer insertBeforeCompass_10(	final TVIMap3Item tviParent,
-														final Layer newWWLayer,
-														final TVIMap3Layer newUILayer) {
+	private static TVIMap3Layer insertBeforeCompass_10(final TVIMap3Item tviParent, final TVIMap3Layer newUILayer) {
 
 		for (final TreeViewerItem tviChild : tviParent.getFetchedChildren()) {
 
@@ -657,10 +718,7 @@ public class Map3Manager {
 
 			} else if (tviChild instanceof TVIMap3Category) {
 
-				final TVIMap3Layer insertedLayer = insertBeforeCompass_10(
-						(TVIMap3Category) tviChild,
-						newWWLayer,
-						newUILayer);
+				final TVIMap3Layer insertedLayer = insertBeforeCompass_10((TVIMap3Category) tviChild, newUILayer);
 
 				if (insertedLayer != null) {
 					// new layer is inserted
@@ -696,18 +754,77 @@ public class Map3Manager {
 	 * Insert the layer into the layer list just before the placenames.
 	 * 
 	 * @param wwd
-	 * @param layer
+	 * @param newWWLayer
+	 * @return
 	 */
-	public static void insertBeforePlacenames(final WorldWindow wwd, final Layer layer) {
+	private static TVIMap3Layer insertBeforePlaceNames(final WorldWindow wwd, final TVIMap3Layer newUILayer) {
 
-//		int compassPosition = 0;
-//		final LayerList layers = wwd.getModel().getLayers();
-//		for (final Layer l : layers) {
-//			if (l instanceof PlaceNameLayer) {
-//				compassPosition = layers.indexOf(l);
-//			}
-//		}
-//		layers.add(compassPosition, layer);
+		/*
+		 * update WW model
+		 */
+		int compassPosition = 0;
+		final LayerList wwLayers = wwd.getModel().getLayers();
+		for (final Layer wwLayer : wwLayers) {
+			if (wwLayer instanceof PlaceNameLayer) {
+				compassPosition = wwLayers.indexOf(wwLayer);
+			}
+		}
+
+		final Layer newWWLayer = newUILayer.wwLayer;
+
+		wwLayers.add(compassPosition, newWWLayer);
+
+		// update ww layer visibility
+		newWWLayer.setEnabled(newUILayer.isLayerVisible);
+
+		/*
+		 * update UI model
+		 */
+		final TVIMap3Layer insertedUILayer = insertBeforePlaceNames_10(_uiRootItem, newUILayer);
+
+		return insertedUILayer;
+	}
+
+	/**
+	 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	 * <p>
+	 * RECURSIVE RECURSIVE RECURSIVE RECURSIVE RECURSIVE RECURSIVE RECURSIVE RECURSIVE
+	 * <p>
+	 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	 * 
+	 * @param tviParent
+	 * @param newWWLayer
+	 * @param newUILayer
+	 * @return
+	 */
+	private static TVIMap3Layer insertBeforePlaceNames_10(final TVIMap3Item tviParent, final TVIMap3Layer newUILayer) {
+
+		for (final TreeViewerItem tviChild : tviParent.getFetchedChildren()) {
+
+			if (tviChild instanceof TVIMap3Layer) {
+
+				final TVIMap3Layer tviLayer = (TVIMap3Layer) tviChild;
+				if (tviLayer.wwLayer instanceof PlaceNameLayer) {
+
+					// compass layer found in ui model
+
+					tviParent.addChildBefore(tviLayer, newUILayer);
+
+					return newUILayer;
+				}
+
+			} else if (tviChild instanceof TVIMap3Category) {
+
+				final TVIMap3Layer insertedLayer = insertBeforePlaceNames_10((TVIMap3Category) tviChild, newUILayer);
+
+				if (insertedLayer != null) {
+					// new layer is inserted
+					return insertedLayer;
+				}
+			}
+		}
+
+		return null;
 	}
 
 	private static boolean isCategoryExpanded(final TVIMap3Category tviCategory) {
@@ -726,12 +843,11 @@ public class Map3Manager {
 	}
 
 	/**
-	 * Read map provider list from a xml file
+	 * Read/Create map layers with it's state from a xml file
 	 * 
-	 * @return Returns a list with all map providers from a xml file including wrapped plugin map
-	 *         provider
+	 * @return
 	 */
-	private static TVIMap3Root readLayerXml_10() {
+	private static TVIMap3Root parseLayerXml() {
 
 		final TVIMap3Root tviRoot = new TVIMap3Root();
 
@@ -758,12 +874,14 @@ public class Map3Manager {
 				}
 			}
 
-			if (xmlRoot == null) {
+			final Integer layerVersion = xmlRoot.getInteger(ATTR_MAP3_LAYER_VERSION);
+
+			if (xmlRoot == null || layerVersion == null || layerVersion < MAP3_LAYER_STRUCTURE_VERSION) {
 				// get default layer tree
-				xmlRoot = createLayerXml_0_DefaultTreeItems();
+				xmlRoot = createLayerXml_0__DefaultLayer();
 			}
 
-			readLayerXml_20_Children(xmlRoot, tviRoot);
+			parseLayerXml_10_Children(xmlRoot, tviRoot);
 
 			_uiEnabledLayers = _uiEnabledLayersFromXml.toArray();
 			_uiExpandedCategories = _uiExpandedCategoriesFromXml.toArray();
@@ -794,7 +912,7 @@ public class Map3Manager {
 	 * @param xmlParent
 	 * @param tviParent
 	 */
-	private static void readLayerXml_20_Children(final XMLMemento xmlParent, final TVIMap3Item tviParent) {
+	private static void parseLayerXml_10_Children(final XMLMemento xmlParent, final TVIMap3Item tviParent) {
 
 		for (final IMemento mementoChild : xmlParent.getChildren()) {
 
@@ -887,7 +1005,7 @@ public class Map3Manager {
 							_uiExpandedCategoriesFromXml.add(tviCategory);
 						}
 
-						readLayerXml_20_Children(xmlChild, tviCategory);
+						parseLayerXml_10_Children(xmlChild, tviCategory);
 					}
 				} catch (final Exception e) {
 					StatusUtil.log(Util.dumpMemento(xmlChild), e);
@@ -922,6 +1040,51 @@ public class Map3Manager {
 
 		_uiEnabledLayers = enabledLayers.toArray();
 		_uiExpandedCategories = expandedElements;
+	}
+
+	/**
+	 * Ensure All custom layers are set in the ww model.
+	 * 
+	 * @param wwLayers
+	 *            Layers which are already added to the model.
+	 */
+	private static void setCustomLayerInWWModel(final LayerList wwLayers) {
+
+		final ArrayList<TVIMap3Layer> insertedLayers = new ArrayList<TVIMap3Layer>();
+
+		for (final TVIMap3Layer tviLayer : _customLayers.values()) {
+
+			final Layer customWWLayer = tviLayer.wwLayer;
+
+			if (wwLayers.contains(customWWLayer)) {
+
+				// layer is already contained in the model
+				continue;
+			}
+
+			TVIMap3Layer insertedUILayer = null;
+
+			// update ui/ww model
+			if (tviLayer.defaultPosition == INSERT_BEFORE_COMPASS) {
+
+				insertedUILayer = insertBeforeCompass(_wwCanvas, tviLayer);
+
+			} else if (tviLayer.defaultPosition == INSERT_BEFORE_PLACE_NAMES) {
+
+				insertedUILayer = insertBeforePlaceNames(_wwCanvas, tviLayer);
+
+			} else {
+
+				// insert in default position
+				insertedUILayer = insertBeforeCompass(_wwCanvas, tviLayer);
+			}
+
+			insertedLayers.add(insertedUILayer);
+		}
+
+		if (_map3PropertiesView != null && insertedLayers.size() > 0) {
+			_map3PropertiesView.updateUI_NewLayer(insertedLayers);
+		}
 	}
 
 	/**
@@ -963,46 +1126,6 @@ public class Map3Manager {
 
 	static void setMap3View(final Map3View map3View) {
 		_map3View = map3View;
-	}
-
-	/**
-	 * Ensure All custom layers are set in the ww model.
-	 * 
-	 * @param modelLayers
-	 *            Layers which are already added to the model.
-	 */
-	private static void updateWWModel(final LayerList modelLayers) {
-
-		final ArrayList<TVIMap3Layer> insertedLayers = new ArrayList<TVIMap3Layer>();
-
-		for (final TVIMap3Layer tviLayer : _customLayers.values()) {
-
-			final Layer customWWLayer = tviLayer.wwLayer;
-
-			if (modelLayers.contains(customWWLayer)) {
-
-				// layer is already contained in the model
-				continue;
-			}
-
-			TVIMap3Layer insertedUILayer = null;
-			// update ui/ww model
-			if (tviLayer.defaultPosition == INSERT_BEFORE_COMPASS) {
-
-				insertedUILayer = insertBeforeCompass(_wwCanvas, tviLayer);
-
-			} else {
-
-				// insert in default position
-				insertedUILayer = insertBeforeCompass(_wwCanvas, tviLayer);
-			}
-
-			insertedLayers.add(insertedUILayer);
-		}
-
-		if (_map3PropertiesView != null && insertedLayers.size() > 0) {
-			_map3PropertiesView.updateUI_NewLayer(insertedLayers);
-		}
 	}
 
 }
