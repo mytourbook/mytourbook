@@ -26,7 +26,7 @@ import net.tourbook.chart.ChartSegments;
 import net.tourbook.chart.ChartToolTipInfo;
 import net.tourbook.chart.ChartType;
 import net.tourbook.chart.IChartInfoProvider;
-import net.tourbook.colors.GraphColorProvider;
+import net.tourbook.common.color.GraphColorProvider;
 import net.tourbook.data.TourPerson;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.statistic.StatisticContext;

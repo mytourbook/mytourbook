@@ -30,7 +30,7 @@ import net.tourbook.chart.ChartToolTipInfo;
 import net.tourbook.chart.ChartType;
 import net.tourbook.chart.IBarSelectionListener;
 import net.tourbook.chart.IChartInfoProvider;
-import net.tourbook.colors.GraphColorProvider;
+import net.tourbook.common.color.GraphColorProvider;
 import net.tourbook.common.util.ArrayListToArray;
 import net.tourbook.common.util.IToolTipHideListener;
 import net.tourbook.common.util.PostSelectionProvider;
@@ -828,7 +828,7 @@ public class YearStatisticView extends ViewPart {
 		// set the bar low/high data
 		final ChartDataYSerie yData = new ChartDataYSerie(ChartType.BAR, ArrayListToArray.toFloat(_tourSpeed));
 
-		TourManager.setGraphColor(_prefStore, yData, GraphColorProvider.PREF_GRAPH_SPEED);
+		TourManager.setGraphColor(yData, GraphColorProvider.PREF_GRAPH_SPEED);
 
 		/*
 		 * set/restore min/max values

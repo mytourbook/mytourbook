@@ -33,7 +33,7 @@ import net.tourbook.chart.ChartType;
 import net.tourbook.chart.IBarSelectionListener;
 import net.tourbook.chart.IChartInfoProvider;
 import net.tourbook.chart.SelectionBarChart;
-import net.tourbook.colors.GraphColorProvider;
+import net.tourbook.common.color.GraphColorProvider;
 import net.tourbook.common.util.IToolTipHideListener;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourPerson;

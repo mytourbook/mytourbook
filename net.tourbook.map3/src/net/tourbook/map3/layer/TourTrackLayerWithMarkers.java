@@ -17,7 +17,6 @@ package net.tourbook.map3.layer;
 
 import gov.nasa.worldwind.geom.LatLon;
 import gov.nasa.worldwind.geom.Position;
-import gov.nasa.worldwind.layers.Layer;
 import gov.nasa.worldwind.layers.MarkerLayer;
 import gov.nasa.worldwind.render.Material;
 import gov.nasa.worldwind.render.markers.BasicMarker;
@@ -25,30 +24,51 @@ import gov.nasa.worldwind.render.markers.BasicMarkerAttributes;
 import gov.nasa.worldwind.render.markers.BasicMarkerShape;
 import gov.nasa.worldwind.render.markers.Marker;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 
+import net.tourbook.common.UI;
+import net.tourbook.data.TourData;
 import net.tourbook.map3.view.Messages;
 
 /**
  */
-public class TourTrackLayer {
+public class TourTrackLayerWithMarkers extends MarkerLayer implements PropertyChangeListener {
 
 	public static final String			MAP3_LAYER_ID	= "TourTrackLayer";			//$NON-NLS-1$
 
 	private static ArrayList<Position>	_positions		= new ArrayList<Position>();
 
-	private MarkerLayer					_trackLayer;
-	{
+	static {
 		_positions.add(new Position(LatLon.fromDegrees(47.3658, 8.5428), 500));
 		_positions.add(new Position(LatLon.fromDegrees(47.3430, 8.6907), 500));
 	}
 
-	private MarkerLayer createTracksLayer() {
+	public TourTrackLayerWithMarkers() {
 
-//		try {
-//			final GpxReader reader = new GpxReader();
-//			reader.readStream(WWIO.openFileOrResourceStream(TRACK_PATH, this.getClass()));
-//			final Iterator<Position> positions = reader.getTrackPositionIterator();
+		setOverrideMarkerElevation(true);
+		setElevation(0);
+		setEnablePickSizeReturn(true);
+
+//		setKeepSeparated(false); ????????????
+
+		addPropertyChangeListener(this);
+	}
+
+	@Override
+	public String getName() {
+		return Messages.TourTrack_Layer_Name;
+	}
+
+	@Override
+	public void propertyChange(final PropertyChangeEvent evt) {
+
+		System.out.println(UI.timeStampNano() + " \t" + evt);
+		// TODO remove SYSTEM.OUT
+	}
+
+	public void setDefaultPositons() {
 
 		final BasicMarkerAttributes attrs = new BasicMarkerAttributes(Material.WHITE, BasicMarkerShape.SPHERE, 1d);
 
@@ -57,34 +77,42 @@ public class TourTrackLayer {
 			markers.add(new BasicMarker(position, attrs));
 		}
 
-		final MarkerLayer layer = new MarkerLayer(markers);
-		layer.setOverrideMarkerElevation(true);
-		layer.setElevation(0);
-		layer.setEnablePickSizeReturn(true);
-
-		return layer;
-
-//		} catch (final ParserConfigurationException e) {
-//			e.printStackTrace();
-//		} catch (final SAXException e) {
-//			e.printStackTrace();
-//		} catch (final IOException e) {
-//			e.printStackTrace();
-//		}
-//
-//		return null;
+		setMarkers(markers);
 	}
 
-	public Layer getLayer() {
+	public void showTour(final TourData tourData) {
 
-		if (_trackLayer == null) {
-			_trackLayer = createTracksLayer();
+//		final long start = System.currentTimeMillis();
+
+		final double[] allLat = tourData.latitudeSerie;
+		final double[] allLon = tourData.longitudeSerie;
+		final float[] allAlti = tourData.altitudeSerie;
+
+		if (allLat == null) {
+			return;
 		}
 
-		return _trackLayer;
-	}
+		final ArrayList<Marker> markers = new ArrayList<Marker>();
 
-	public String getName() {
-		return Messages.TourTrack_Layer_Name;
+		final BasicMarkerAttributes attrs = new BasicMarkerAttributes(Material.YELLOW, BasicMarkerShape.SPHERE, 1d);
+
+		for (int serieIndex = 0; serieIndex < allLat.length; serieIndex++) {
+
+			final double lat = allLat[serieIndex];
+			final double lon = allLon[serieIndex];
+
+			float alti = 0;
+
+			if (allAlti != null) {
+				alti = allAlti[serieIndex];
+			}
+
+			markers.add(new BasicMarker(new Position(LatLon.fromDegrees(lat, lon), alti), attrs));
+		}
+
+		setMarkers(markers);
+
+//		System.out.println(UI.timeStampNano() + " showTour\t" + (System.currentTimeMillis() - start) + " ms");
+//		// TODO remove SYSTEM.OUT.PRINTLN
 	}
 }

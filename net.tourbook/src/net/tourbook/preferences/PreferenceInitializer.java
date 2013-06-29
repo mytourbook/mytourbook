@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -19,8 +19,6 @@ import java.util.Calendar;
 
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.Chart;
-import net.tourbook.colors.ColorDefinition;
-import net.tourbook.colors.GraphColorProvider;
 import net.tourbook.common.util.StringToArrayConverter;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.tour.BreakTimeTool;
@@ -94,30 +92,6 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 		store.setDefault(ITourbookPreferences.STAT_DURATION_LOW_VALUE, 0);
 		store.setDefault(ITourbookPreferences.STAT_DURATION_INTERVAL, 60);
 		store.setDefault(ITourbookPreferences.STAT_DURATION_NUMBERS, 10);
-
-		/*
-		 * graph color preferences
-		 */
-		for (final ColorDefinition graphDefinition : GraphColorProvider.getInstance().getGraphColorDefinitions()) {
-
-			final String graphPrefName = graphDefinition.getGraphPrefName();
-
-			PreferenceConverter.setDefault(
-					store,
-					graphPrefName + GraphColorProvider.PREF_COLOR_BRIGHT,
-					graphDefinition.getDefaultGradientBright());
-
-			PreferenceConverter.setDefault(
-					store,
-					graphPrefName + GraphColorProvider.PREF_COLOR_DARK,
-					graphDefinition.getDefaultGradientDark());
-
-			PreferenceConverter.setDefault(
-					store,
-					graphPrefName + GraphColorProvider.PREF_COLOR_LINE,
-					graphDefinition.getDefaultLineColor());
-
-		}
 
 		/*
 		 * graph preferences

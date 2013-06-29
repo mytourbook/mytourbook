@@ -16,7 +16,9 @@
 package net.tourbook.mapping;
 
 import net.tourbook.application.TourbookPlugin;
-import net.tourbook.colors.ColorDefinition;
+import net.tourbook.common.color.ColorDefinition;
+import net.tourbook.common.color.LegendColor;
+import net.tourbook.common.color.ValueColor;
 import net.tourbook.preferences.PrefPageAppearanceColors;
 import net.tourbook.ui.UI;
 

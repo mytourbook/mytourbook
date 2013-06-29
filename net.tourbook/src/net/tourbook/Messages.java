@@ -528,36 +528,7 @@ public class Messages extends NLS {
 	public static String		Format_rawdata_file_yyyy_mm_dd;
 	public static String		Format_yyyymmdd_hhmmss;
 
-	public static String		Graph_Label_Altimeter;
-	public static String		Graph_Label_Altitude;
-	public static String		Graph_Label_Cadence;
-	public static String		Graph_Label_Cadence_unit;
-	public static String		Graph_Label_Distance;
-	public static String		Graph_Label_Gradiend_unit;
-	public static String		Graph_Label_Gradient;
-	public static String		Graph_Label_Heartbeat;
-	public static String		Graph_Label_Heartbeat_unit;
-	public static String		Graph_Label_History;
-	public static String		Graph_Label_Pace;
-	public static String		Graph_Label_Power;
-	public static String		Graph_Label_Power_unit;
-	public static String		Graph_Label_ShowHrZoneBackground;
-	public static String		Graph_Label_ShowHrZoneBackground_Tooltip;
-	public static String		Graph_Label_Speed;
-	public static String		Graph_Label_Temperature;
-	public static String		Graph_Label_TimeDuration;
-	public static String		Graph_Label_TimeOfDay;
-	public static String		Graph_Label_Tour;
-	public static String		Graph_Label_Tour_Compare;
-	public static String		Graph_Label_Tour_Compare_unit;
 
-	public static String		Graph_Pref_color_gradient_bright;
-	public static String		Graph_Pref_color_gradient_dark;
-	public static String		Graph_Pref_color_line;
-	public static String		Graph_Pref_color_mapping;
-	public static String		Graph_Pref_color_statistic_distance;
-	public static String		Graph_Pref_color_statistic_time;
-	public static String		Graph_Pref_ColorText;
 
 	public static String		HR_Zone_01_060_Moderate;
 	public static String		HR_Zone_01_060_Moderate_Shortcut;

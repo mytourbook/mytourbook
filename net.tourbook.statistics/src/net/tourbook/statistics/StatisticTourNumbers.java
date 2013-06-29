@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -28,7 +28,8 @@ import net.tourbook.chart.ChartToolTipInfo;
 import net.tourbook.chart.ChartType;
 import net.tourbook.chart.IChartInfoProvider;
 import net.tourbook.chart.Util;
-import net.tourbook.colors.GraphColorProvider;
+import net.tourbook.common.color.GraphColorProvider;
+import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.data.TourPerson;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
@@ -126,7 +127,7 @@ public class StatisticTourNumbers extends YearStatistic {
 				final String property = event.getProperty();
 
 				// test if the color or statistic data have changed
-				if (property.equals(ITourbookPreferences.GRAPH_COLORS_HAS_CHANGED)
+				if (property.equals(ICommonPreferences.GRAPH_COLORS_HAS_CHANGED)
 						|| property.equals(ITourbookPreferences.STAT_DISTANCE_NUMBERS)
 						|| property.equals(ITourbookPreferences.STAT_DISTANCE_LOW_VALUE)
 						|| property.equals(ITourbookPreferences.STAT_DISTANCE_INTERVAL)

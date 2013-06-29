@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2012  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -27,9 +27,13 @@ import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.SelectionChartInfo;
 import net.tourbook.chart.SelectionChartXSliderPosition;
-import net.tourbook.colors.ColorDefinition;
-import net.tourbook.colors.GraphColorProvider;
+import net.tourbook.common.color.ColorDefinition;
+import net.tourbook.common.color.GraphColorProvider;
+import net.tourbook.common.color.ILegendProvider;
+import net.tourbook.common.color.LegendConfig;
+import net.tourbook.common.color.LegendUnitFormat;
 import net.tourbook.common.map.GeoPosition;
+import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.common.util.ITourToolTipProvider;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.TourToolTip;
@@ -121,191 +125,181 @@ import de.byteholder.gpx.PointOfInterest;
  */
 public class TourMapView extends ViewPart implements IMapContextProvider, IPhotoEventListener, IPhotoPropertiesListener {
 
-	public static final String						ID									= "net.tourbook.mapping.mappingViewID";	//$NON-NLS-1$
+	public static final String				ID									= "net.tourbook.mapping.mappingViewID"; //$NON-NLS-1$
 
-	private static final int						DEFAULT_LEGEND_WIDTH				= 150;
-	private static final int						DEFAULT_LEGEND_HEIGHT				= 300;
-	private static final int						LEGEND_TOP_MARGIN					= 20;
+	private static final int				DEFAULT_LEGEND_WIDTH				= 150;
+	private static final int				DEFAULT_LEGEND_HEIGHT				= 300;
+	private static final int				LEGEND_TOP_MARGIN					= 20;
 
-	public static final int							LEGEND_MARGIN_TOP_BOTTOM			= 10;
-	public static final int							LEGEND_UNIT_DISTANCE				= 60;
+	public static final int					LEGEND_MARGIN_TOP_BOTTOM			= 10;
+	public static final int					LEGEND_UNIT_DISTANCE				= 60;
 
-	public static final int							TOUR_COLOR_DEFAULT					= 0;
-	public static final int							TOUR_COLOR_ALTITUDE					= 10;
-	public static final int							TOUR_COLOR_GRADIENT					= 20;
-	public static final int							TOUR_COLOR_PULSE					= 30;
-	public static final int							TOUR_COLOR_SPEED					= 40;
-	public static final int							TOUR_COLOR_PACE						= 50;
-	public static final int							TOUR_COLOR_HR_ZONE					= 60;
+	private static final String				STATE_IS_SHOW_TOUR_IN_MAP			= "STATE_IS_SHOW_TOUR_IN_MAP";			//$NON-NLS-1$
+	private static final String				STATE_IS_SHOW_PHOTO_IN_MAP			= "STATE_IS_SHOW_PHOTO_IN_MAP";		//$NON-NLS-1$
+	private static final String				STATE_IS_SHOW_LEGEND_IN_MAP			= "STATE_IS_SHOW_LEGEND_IN_MAP";		//$NON-NLS-1$
+	private static final String				STATE_SYNC_WITH_PHOTO				= "STATE_SYNC_WITH_PHOTO";				//$NON-NLS-1$
+	private static final String				MEMENTO_SHOW_START_END_IN_MAP		= "action.show-start-end-in-map";		//$NON-NLS-1$
+	private static final String				MEMENTO_SHOW_TOUR_MARKER			= "action.show-tour-marker";			//$NON-NLS-1$
+	private static final String				MEMENTO_SHOW_SLIDER_IN_MAP			= "action.show-slider-in-map";			//$NON-NLS-1$
+	private static final String				MEMENTO_SHOW_SLIDER_IN_LEGEND		= "action.show-slider-in-legend";		//$NON-NLS-1$
+	private static final String				MEMENTO_SHOW_SCALE_IN_MAP			= "action.show-scale-in-map";			//$NON-NLS-1$
+	private static final String				MEMENTO_SHOW_TOUR_INFO_IN_MAP		= "action.show-tour-info-in-map";		//$NON-NLS-1$
+	private static final String				MEMENTO_SHOW_WAY_POINTS				= "action.show-way-points-in-map";		//$NON-NLS-1$
+	private static final String				MEMENTO_SYNCH_WITH_SELECTED_TOUR	= "action.synch-with-selected-tour";	//$NON-NLS-1$
+	private static final String				MEMENTO_SYNCH_WITH_TOURCHART_SLIDER	= "action.synch-with-tourchart-slider"; //$NON-NLS-1$
+	private static final String				MEMENTO_ZOOM_CENTERED				= "action.zoom-centered";				//$NON-NLS-1$
+	private static final String				MEMENTO_MAP_DIM_LEVEL				= "action.map-dim-level";				//$NON-NLS-1$
 
-	private static final String						STATE_IS_SHOW_TOUR_IN_MAP			= "STATE_IS_SHOW_TOUR_IN_MAP";				//$NON-NLS-1$
-	private static final String						STATE_IS_SHOW_PHOTO_IN_MAP			= "STATE_IS_SHOW_PHOTO_IN_MAP";			//$NON-NLS-1$
-	private static final String						STATE_IS_SHOW_LEGEND_IN_MAP			= "STATE_IS_SHOW_LEGEND_IN_MAP";			//$NON-NLS-1$
-	private static final String						STATE_SYNC_WITH_PHOTO				= "STATE_SYNC_WITH_PHOTO";					//$NON-NLS-1$
-	private static final String						MEMENTO_SHOW_START_END_IN_MAP		= "action.show-start-end-in-map";			//$NON-NLS-1$
-	private static final String						MEMENTO_SHOW_TOUR_MARKER			= "action.show-tour-marker";				//$NON-NLS-1$
-	private static final String						MEMENTO_SHOW_SLIDER_IN_MAP			= "action.show-slider-in-map";				//$NON-NLS-1$
-	private static final String						MEMENTO_SHOW_SLIDER_IN_LEGEND		= "action.show-slider-in-legend";			//$NON-NLS-1$
-	private static final String						MEMENTO_SHOW_SCALE_IN_MAP			= "action.show-scale-in-map";				//$NON-NLS-1$
-	private static final String						MEMENTO_SHOW_TOUR_INFO_IN_MAP		= "action.show-tour-info-in-map";			//$NON-NLS-1$
-	private static final String						MEMENTO_SHOW_WAY_POINTS				= "action.show-way-points-in-map";			//$NON-NLS-1$
-	private static final String						MEMENTO_SYNCH_WITH_SELECTED_TOUR	= "action.synch-with-selected-tour";		//$NON-NLS-1$
-	private static final String						MEMENTO_SYNCH_WITH_TOURCHART_SLIDER	= "action.synch-with-tourchart-slider";	//$NON-NLS-1$
-	private static final String						MEMENTO_ZOOM_CENTERED				= "action.zoom-centered";					//$NON-NLS-1$
-	private static final String						MEMENTO_MAP_DIM_LEVEL				= "action.map-dim-level";					//$NON-NLS-1$
+	private static final String				MEMENTO_SYNCH_TOUR_ZOOM_LEVEL		= "synch-tour-zoom-level";				//$NON-NLS-1$
+	private static final String				MEMENTO_SELECTED_MAP_PROVIDER_ID	= "selected.map-provider-id";			//$NON-NLS-1$
 
-	private static final String						MEMENTO_SYNCH_TOUR_ZOOM_LEVEL		= "synch-tour-zoom-level";					//$NON-NLS-1$
-	private static final String						MEMENTO_SELECTED_MAP_PROVIDER_ID	= "selected.map-provider-id";				//$NON-NLS-1$
+	private static final String				MEMENTO_DEFAULT_POSITION_ZOOM		= "default.position.zoom-level";		//$NON-NLS-1$
+	private static final String				MEMENTO_DEFAULT_POSITION_LATITUDE	= "default.position.latitude";			//$NON-NLS-1$
+	private static final String				MEMENTO_DEFAULT_POSITION_LONGITUDE	= "default.position.longitude";		//$NON-NLS-1$
 
-	private static final String						MEMENTO_DEFAULT_POSITION_ZOOM		= "default.position.zoom-level";			//$NON-NLS-1$
-	private static final String						MEMENTO_DEFAULT_POSITION_LATITUDE	= "default.position.latitude";				//$NON-NLS-1$
-	private static final String						MEMENTO_DEFAULT_POSITION_LONGITUDE	= "default.position.longitude";			//$NON-NLS-1$
+	private static final String				MEMENTO_TOUR_COLOR_ID				= "tour-color-id";						//$NON-NLS-1$
 
-	private static final String						MEMENTO_TOUR_COLOR_ID				= "tour-color-id";							//$NON-NLS-1$
+	static final String						PREF_SHOW_TILE_INFO					= "MapDebug.ShowTileInfo";				//$NON-NLS-1$
+	static final String						PREF_SHOW_TILE_BORDER				= "MapDebug.ShowTileBorder";			//$NON-NLS-1$
+	static final String						PREF_DEBUG_MAP_DIM_LEVEL			= "MapDebug.MapDimLevel";				//$NON-NLS-1$
 
-	static final String								PREF_SHOW_TILE_INFO					= "MapDebug.ShowTileInfo";					//$NON-NLS-1$
-	static final String								PREF_SHOW_TILE_BORDER				= "MapDebug.ShowTileBorder";				//$NON-NLS-1$
-	static final String								PREF_DEBUG_MAP_DIM_LEVEL			= "MapDebug.MapDimLevel";					//$NON-NLS-1$
+	private final IPreferenceStore			_prefStore							= TourbookPlugin
+																						.getDefault()
+																						.getPreferenceStore();
+	private final IDialogSettings			_state								= TourbookPlugin
+																						.getDefault()
+																						.getDialogSettingsSection(ID);
 
-	private final IPreferenceStore					_prefStore							= TourbookPlugin
-																								.getDefault()
-																								.getPreferenceStore();
-	private final IDialogSettings					_state								= TourbookPlugin
-																								.getDefault()
-																								.getDialogSettingsSection(
-																										ID);
-
-	private boolean									_isPartVisible;
+	private boolean							_isPartVisible;
 
 	/**
 	 * contains selection which was set when the part is hidden
 	 */
-	private ISelection								_selectionWhenHidden;
+	private ISelection						_selectionWhenHidden;
 
-	private IPartListener2							_partListener;
-	private ISelectionListener						_postSelectionListener;
-	private IPropertyChangeListener					_prefChangeListener;
-	private ITourEventListener						_tourEventListener;
+	private IPartListener2					_partListener;
+	private ISelectionListener				_postSelectionListener;
+	private IPropertyChangeListener			_prefChangeListener;
+	private ITourEventListener				_tourEventListener;
 
 	/**
 	 * Contains all tours which are displayed in the map.
 	 */
-	private final ArrayList<TourData>				_allTourData						= new ArrayList<TourData>();
-	private TourData								_previousTourData;
+	private final ArrayList<TourData>		_allTourData						= new ArrayList<TourData>();
+	private TourData						_previousTourData;
 
 	/**
 	 * contains photos which are displayed in the map
 	 */
-	private final ArrayList<Photo>					_allPhotos							= new ArrayList<Photo>();
-	private final ArrayList<Photo>					_filteredPhotos						= new ArrayList<Photo>();
+	private final ArrayList<Photo>			_allPhotos							= new ArrayList<Photo>();
+	private final ArrayList<Photo>			_filteredPhotos						= new ArrayList<Photo>();
 
-	private boolean									_isPhotoFilterActive;
+	private boolean							_isPhotoFilterActive;
 
-	private int										_photoFilterRatingStars;
-	private int										_photoFilterRatingStarOperator;
+	private int								_photoFilterRatingStars;
+	private int								_photoFilterRatingStarOperator;
 
-	private boolean									_isShowTour;
-	private boolean									_isShowPhoto;
-	private boolean									_isShowLegend;
+	private boolean							_isShowTour;
+	private boolean							_isShowPhoto;
+	private boolean							_isShowLegend;
 
-	private boolean									_isMapSynchedWithPhoto;
-	private boolean									_isMapSynchedWithTour;
-	private boolean									_isMapSynchedWithSlider;
-	private boolean									_isPositionCentered;
+	private boolean							_isMapSynchedWithPhoto;
+	private boolean							_isMapSynchedWithTour;
+	private boolean							_isMapSynchedWithSlider;
+	private boolean							_isPositionCentered;
 
-	private int										_defaultZoom;
-	private GeoPosition								_defaultPosition					= null;
+	private int								_defaultZoom;
+	private GeoPosition						_defaultPosition					= null;
 
 	/**
 	 * when <code>true</code> a tour is painted, <code>false</code> a point of interrest is painted
 	 */
-	private boolean									_isTourOrWayPoint;
+	private boolean							_isTourOrWayPoint;
 
 	/*
 	 * tool tips
 	 */
-	private TourToolTip								_tourToolTip;
+	private TourToolTip						_tourToolTip;
 
-	private TourInfoToolTipProvider					_tourInfoToolTipProvider			= new TourInfoToolTipProvider();
-	private ITourToolTipProvider					_wayPointToolTipProvider			= new WayPointToolTipProvider();
+	private TourInfoToolTipProvider			_tourInfoToolTipProvider			= new TourInfoToolTipProvider();
+	private ITourToolTipProvider			_wayPointToolTipProvider			= new WayPointToolTipProvider();
 
-	private String									_poiName;
-	private GeoPosition								_poiPosition;
-	private int										_poiZoomLevel;
+	private String							_poiName;
+	private GeoPosition						_poiPosition;
+	private int								_poiZoomLevel;
 
-	private final DirectMappingPainter				_directMappingPainter				= new DirectMappingPainter();
+	private final DirectMappingPainter		_directMappingPainter				= new DirectMappingPainter();
 
 	/*
 	 * current position for the x-sliders
 	 */
-	private int										_currentLeftSliderValueIndex;
-	private int										_currentRightSliderValueIndex;
-	private int										_currentSelectedSliderValueIndex;
+	private int								_currentLeftSliderValueIndex;
+	private int								_currentRightSliderValueIndex;
+	private int								_currentSelectedSliderValueIndex;
 
-	private MapLegend								_mapLegend;
-	private final HashMap<Integer, ILegendProvider>	_legendProviders					= new HashMap<Integer, ILegendProvider>();
+	private MapLegend						_mapLegend;
 
-	private long									_previousOverlayKey;
+	private long							_previousOverlayKey;
 
-	private int										_mapDimLevel						= -1;
-	private RGB										_mapDimColor;
+	private int								_mapDimLevel						= -1;
+	private RGB								_mapDimColor;
 
-	private int										_selectedProfileKey					= 0;
+	private int								_selectedProfileKey					= 0;
 
-	private final MapInfoManager					_mapInfoManager						= MapInfoManager.getInstance();
-	private final TourPainterConfiguration			_tourPainterConfig					= TourPainterConfiguration
-																								.getInstance();
-	private int										_tourIdHash;
-	private int										_tourDataHash;
-	private long									_tourHashOverlayKey;
+	private final MapInfoManager			_mapInfoManager						= MapInfoManager.getInstance();
+	private final TourPainterConfiguration	_tourPainterConfig					= TourPainterConfiguration
+																						.getInstance();
+	private int								_tourIdHash;
+	private int								_tourDataHash;
+	private long							_tourHashOverlayKey;
 
 	/**
 	 * Is <code>true</code> when a link photo is displayed, otherwise a tour photo (photo which is
 	 * save in a tour) is displayed.
 	 */
-	private boolean									_isLinkPhotoDisplayed;
+	private boolean							_isLinkPhotoDisplayed;
 
 	/*
 	 * UI controls
 	 */
-	private Map										_map;
+	private Map								_map;
 
-	private ActionTourColor							_actionTourColorAltitude;
-	private ActionTourColor							_actionTourColorGradient;
-	private ActionTourColor							_actionTourColorPulse;
-	private ActionTourColor							_actionTourColorSpeed;
-	private ActionTourColor							_actionTourColorPace;
-	private ActionTourColor							_actionTourColorHrZone;
+	private ActionTourColor					_actionTourColorAltitude;
+	private ActionTourColor					_actionTourColorGradient;
+	private ActionTourColor					_actionTourColorPulse;
+	private ActionTourColor					_actionTourColorSpeed;
+	private ActionTourColor					_actionTourColorPace;
+	private ActionTourColor					_actionTourColorHrZone;
 
-	private ActionDimMap							_actionDimMap;
-	private ActionManageMapProviders				_actionManageProvider;
-	private ActionPhotoProperties					_actionPhotoFilter;
-	private ActionReloadFailedMapImages				_actionReloadFailedMapImages;
-	private ActionSaveDefaultPosition				_actionSaveDefaultPosition;
-	private ActionSelectMapProvider					_actionSelectMapProvider;
-	private ActionSetDefaultPosition				_actionSetDefaultPosition;
-	private ActionShowAllFilteredPhotos				_actionShowAllFilteredPhotos;
-	private ActionShowLegendInMap					_actionShowLegendInMap;
-	private ActionShowPhotos						_actionShowPhotos;
-	private ActionShowPOI							_actionShowPOI;
-	private ActionShowScaleInMap					_actionShowScaleInMap;
-	private ActionShowSliderInMap					_actionShowSliderInMap;
-	private ActionShowSliderInLegend				_actionShowSliderInLegend;
-	private ActionShowStartEndInMap					_actionShowStartEndInMap;
-	private ActionShowTourInMap						_actionShowTourInMap;
-	private ActionShowTourInfoInMap					_actionShowTourInfoInMap;
-	private ActionShowTourMarker					_actionShowTourMarker;
-	private ActionShowWayPoints						_actionShowWayPoints;
-	private ActionSynchWithPhoto					_actionSynchWithPhoto;
-	private ActionSynchWithSlider					_actionSynchWithSlider;
-	private ActionSynchWithTour						_actionSynchWithTour;
-	private ActionSynchTourZoomLevel				_actionSynchTourZoomLevel;
+	private ActionDimMap					_actionDimMap;
+	private ActionManageMapProviders		_actionManageProvider;
+	private ActionPhotoProperties			_actionPhotoFilter;
+	private ActionReloadFailedMapImages		_actionReloadFailedMapImages;
+	private ActionSaveDefaultPosition		_actionSaveDefaultPosition;
+	private ActionSelectMapProvider			_actionSelectMapProvider;
+	private ActionSetDefaultPosition		_actionSetDefaultPosition;
+	private ActionShowAllFilteredPhotos		_actionShowAllFilteredPhotos;
+	private ActionShowLegendInMap			_actionShowLegendInMap;
+	private ActionShowPhotos				_actionShowPhotos;
+	private ActionShowPOI					_actionShowPOI;
+	private ActionShowScaleInMap			_actionShowScaleInMap;
+	private ActionShowSliderInMap			_actionShowSliderInMap;
+	private ActionShowSliderInLegend		_actionShowSliderInLegend;
+	private ActionShowStartEndInMap			_actionShowStartEndInMap;
+	private ActionShowTourInMap				_actionShowTourInMap;
+	private ActionShowTourInfoInMap			_actionShowTourInfoInMap;
+	private ActionShowTourMarker			_actionShowTourMarker;
+	private ActionShowWayPoints				_actionShowWayPoints;
+	private ActionSynchWithPhoto			_actionSynchWithPhoto;
+	private ActionSynchWithSlider			_actionSynchWithSlider;
+	private ActionSynchWithTour				_actionSynchWithTour;
+	private ActionSynchTourZoomLevel		_actionSynchTourZoomLevel;
 
-	private ActionZoomIn							_actionZoomIn;
-	private ActionZoomOut							_actionZoomOut;
-	private ActionZoomCentered						_actionZoomCentered;
-	private ActionZoomShowEntireEarth				_actionZoomShowAll;
-	private ActionZoomShowEntireTour				_actionShowEntireTour;
+	private ActionZoomIn					_actionZoomIn;
+	private ActionZoomOut					_actionZoomOut;
+	private ActionZoomCentered				_actionZoomCentered;
+	private ActionZoomShowEntireEarth		_actionZoomShowAll;
+	private ActionZoomShowEntireTour		_actionShowEntireTour;
 
 	public TourMapView() {}
 
@@ -747,7 +741,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 					_map.setTourPaintMethodEnhanced(//
 							event.getNewValue().equals(PrefPageAppearanceMap.TOUR_PAINT_METHOD_COMPLEX));
 
-				} else if (property.equals(ITourbookPreferences.GRAPH_COLORS_HAS_CHANGED)) {
+				} else if (property.equals(ICommonPreferences.GRAPH_COLORS_HAS_CHANGED)) {
 
 					// update tour and legend
 
@@ -913,42 +907,42 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 
 		_actionTourColorAltitude = new ActionTourColor(
 				this,
-				TOUR_COLOR_ALTITUDE,
+				TourMapColors.TOUR_COLOR_ALTITUDE,
 				Messages.map_action_tour_color_altitude_tooltip,
 				Messages.image_action_tour_color_altitude,
 				Messages.image_action_tour_color_altitude_disabled);
 
 		_actionTourColorGradient = new ActionTourColor(
 				this,
-				TOUR_COLOR_GRADIENT,
+				TourMapColors.TOUR_COLOR_GRADIENT,
 				Messages.map_action_tour_color_gradient_tooltip,
 				Messages.image_action_tour_color_gradient,
 				Messages.image_action_tour_color_gradient_disabled);
 
 		_actionTourColorPulse = new ActionTourColor(
 				this,
-				TOUR_COLOR_PULSE,
+				TourMapColors.TOUR_COLOR_PULSE,
 				Messages.map_action_tour_color_pulse_tooltip,
 				Messages.image_action_tour_color_pulse,
 				Messages.image_action_tour_color_pulse_disabled);
 
 		_actionTourColorSpeed = new ActionTourColor(
 				this,
-				TOUR_COLOR_SPEED,
+				TourMapColors.TOUR_COLOR_SPEED,
 				Messages.map_action_tour_color_speed_tooltip,
 				Messages.image_action_tour_color_speed,
 				Messages.image_action_tour_color_speed_disabled);
 
 		_actionTourColorPace = new ActionTourColor(
 				this,
-				TOUR_COLOR_PACE,
+				TourMapColors.TOUR_COLOR_PACE,
 				Messages.map_action_tour_color_pase_tooltip,
 				Messages.image_action_tour_color_pace,
 				Messages.image_action_tour_color_pace_disabled);
 
 		_actionTourColorHrZone = new ActionTourColor(
 				this,
-				TOUR_COLOR_HR_ZONE,
+				TourMapColors.TOUR_COLOR_HR_ZONE,
 				Messages.Tour_Action_ShowHrZones_Tooltip,
 				Messages.Image__PulseZones,
 				Messages.Image__PulseZones_Disabled);
@@ -1081,7 +1075,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 		// tell the legend provider how to draw the legend
 		switch (legendProvider.getTourColorId()) {
 
-		case TOUR_COLOR_ALTITUDE:
+		case TourMapColors.TOUR_COLOR_ALTITUDE:
 
 			float minValue = Float.MIN_VALUE;
 			float maxValue = Float.MAX_VALUE;
@@ -1131,7 +1125,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 
 			break;
 
-		case TOUR_COLOR_PULSE:
+		case TourMapColors.TOUR_COLOR_PULSE:
 
 			minValue = Float.MIN_VALUE;
 			maxValue = Float.MAX_VALUE;
@@ -1180,7 +1174,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 
 			break;
 
-		case TOUR_COLOR_SPEED:
+		case TourMapColors.TOUR_COLOR_SPEED:
 
 			minValue = Float.MIN_VALUE;
 			maxValue = Float.MAX_VALUE;
@@ -1230,7 +1224,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 
 			break;
 
-		case TOUR_COLOR_PACE:
+		case TourMapColors.TOUR_COLOR_PACE:
 
 			minValue = Float.MIN_VALUE;
 			maxValue = Float.MAX_VALUE;
@@ -1280,7 +1274,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 
 			break;
 
-		case TOUR_COLOR_GRADIENT:
+		case TourMapColors.TOUR_COLOR_GRADIENT:
 
 			minValue = Float.MIN_VALUE;
 			maxValue = Float.MAX_VALUE;
@@ -1347,7 +1341,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 		// tell the legend provider how to draw the legend
 		switch (legendProvider.getTourColorId()) {
 
-		case TOUR_COLOR_HR_ZONE:
+		case TourMapColors.TOUR_COLOR_HR_ZONE:
 
 			boolean isValidData = false;
 
@@ -1367,36 +1361,6 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 		}
 
 		return false;
-	}
-
-	/**
-	 * Create legend provider for all graphs which can be displayed.
-	 */
-	private void createLegendProviders() {
-
-		_legendProviders.put(//
-				TOUR_COLOR_PULSE, //
-				new LegendProviderGradientColors(new LegendConfig(), new LegendColor(), TOUR_COLOR_PULSE));
-
-		_legendProviders.put(//
-				TOUR_COLOR_ALTITUDE, //
-				new LegendProviderGradientColors(new LegendConfig(), new LegendColor(), TOUR_COLOR_ALTITUDE));
-
-		_legendProviders.put(//
-				TOUR_COLOR_SPEED, //
-				new LegendProviderGradientColors(new LegendConfig(), new LegendColor(), TOUR_COLOR_SPEED));
-
-		_legendProviders.put(//
-				TOUR_COLOR_PACE, //
-				new LegendProviderGradientColors(new LegendConfig(), new LegendColor(), TOUR_COLOR_PACE));
-
-		_legendProviders.put(//
-				TOUR_COLOR_GRADIENT, //
-				new LegendProviderGradientColors(new LegendConfig(), new LegendColor(), TOUR_COLOR_GRADIENT));
-
-		_legendProviders.put(//
-				TOUR_COLOR_HR_ZONE, //
-				new LegendProviderHrZones(TOUR_COLOR_HR_ZONE));
 	}
 
 	@Override
@@ -1454,7 +1418,6 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 		});
 
 		createActions(parent);
-		createLegendProviders();
 
 		fillActionBars();
 
@@ -1700,7 +1663,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 	}
 
 	private ILegendProvider getLegendProvider(final int colorId) {
-		return _legendProviders.get(colorId);
+		return TourMapColors.getColorProvider(colorId);
 	}
 
 	public Map getMap() {
@@ -2765,27 +2728,27 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 			final Integer colorId = _state.getInt(MEMENTO_TOUR_COLOR_ID);
 
 			switch (colorId) {
-			case TOUR_COLOR_ALTITUDE:
+			case TourMapColors.TOUR_COLOR_ALTITUDE:
 				_actionTourColorAltitude.setChecked(true);
 				break;
 
-			case TOUR_COLOR_GRADIENT:
+			case TourMapColors.TOUR_COLOR_GRADIENT:
 				_actionTourColorGradient.setChecked(true);
 				break;
 
-			case TOUR_COLOR_PULSE:
+			case TourMapColors.TOUR_COLOR_PULSE:
 				_actionTourColorPulse.setChecked(true);
 				break;
 
-			case TOUR_COLOR_SPEED:
+			case TourMapColors.TOUR_COLOR_SPEED:
 				_actionTourColorSpeed.setChecked(true);
 				break;
 
-			case TOUR_COLOR_PACE:
+			case TourMapColors.TOUR_COLOR_PACE:
 				_actionTourColorPace.setChecked(true);
 				break;
 
-			case TOUR_COLOR_HR_ZONE:
+			case TourMapColors.TOUR_COLOR_HR_ZONE:
 				_actionTourColorHrZone.setChecked(true);
 				break;
 
@@ -2809,7 +2772,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 		if (_tourPainterConfig.getLegendProvider() == null) {
 
 			// set default legend provider
-			_tourPainterConfig.setLegendProvider(getLegendProvider(TOUR_COLOR_ALTITUDE));
+			_tourPainterConfig.setLegendProvider(getLegendProvider(TourMapColors.TOUR_COLOR_ALTITUDE));
 
 			// hide legend
 			_map.setShowLegend(false);
@@ -2936,21 +2899,21 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 		int colorId;
 
 		if (_actionTourColorGradient.isChecked()) {
-			colorId = TOUR_COLOR_GRADIENT;
+			colorId = TourMapColors.TOUR_COLOR_GRADIENT;
 
 		} else if (_actionTourColorPulse.isChecked()) {
-			colorId = TOUR_COLOR_PULSE;
+			colorId = TourMapColors.TOUR_COLOR_PULSE;
 
 		} else if (_actionTourColorSpeed.isChecked()) {
-			colorId = TOUR_COLOR_SPEED;
+			colorId = TourMapColors.TOUR_COLOR_SPEED;
 
 		} else if (_actionTourColorPace.isChecked()) {
-			colorId = TOUR_COLOR_PACE;
+			colorId = TourMapColors.TOUR_COLOR_PACE;
 
 		} else if (_actionTourColorHrZone.isChecked()) {
-			colorId = TOUR_COLOR_HR_ZONE;
+			colorId = TourMapColors.TOUR_COLOR_HR_ZONE;
 		} else {
-			colorId = TOUR_COLOR_ALTITUDE;
+			colorId = TourMapColors.TOUR_COLOR_ALTITUDE;
 		}
 		_state.put(MEMENTO_TOUR_COLOR_ID, colorId);
 

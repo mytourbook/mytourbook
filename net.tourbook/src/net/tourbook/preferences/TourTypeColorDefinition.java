@@ -15,7 +15,7 @@
  *******************************************************************************/
 package net.tourbook.preferences;
 
-import net.tourbook.colors.ColorDefinition;
+import net.tourbook.common.color.ColorDefinition;
 import net.tourbook.data.TourType;
 
 import org.eclipse.swt.graphics.RGB;

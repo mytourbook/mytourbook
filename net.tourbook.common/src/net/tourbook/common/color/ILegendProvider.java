@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2012  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -13,10 +13,14 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.mapping;
 
-public enum LegendUnitFormat {
+package net.tourbook.common.color;
 
-	Number, //
-	Pace
+public interface ILegendProvider {
+
+	/**
+	 * @return Returns an id to identify the {@link ILegendProvider}
+	 */
+	public abstract int getTourColorId();
+
 }

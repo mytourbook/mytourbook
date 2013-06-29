@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2012  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -60,12 +60,6 @@ public interface ITourbookPreferences {
 	public static final String	STAT_DURATION_NUMBERS						= "statistic.duration.numbers";							//$NON-NLS-1$
 	public static final String	STAT_DURATION_LOW_VALUE						= "statistic.duration.lowvalue";							//$NON-NLS-1$
 	public static final String	STAT_DURATION_INTERVAL						= "statistic.duration.interval";							//$NON-NLS-1$
-
-	/*
-	 * colors
-	 */
-	public static final String	GRAPH_COLORS								= "graph.colors.";											//$NON-NLS-1$
-	public static final String	GRAPH_COLORS_HAS_CHANGED					= "graph.colors.has-changed";								//$NON-NLS-1$
 
 	/*
 	 * Graphs

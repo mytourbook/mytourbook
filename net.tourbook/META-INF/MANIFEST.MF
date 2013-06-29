@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %Application_Name
 Bundle-SymbolicName: net.tourbook;singleton:=true
-Bundle-Version: 13.4.2.qualifier
+Bundle-Version: 13.10.0.qualifier
 Bundle-Activator: net.tourbook.application.TourbookPlugin
 Bundle-Vendor: %Bundle-Vendor
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
@@ -30,7 +30,6 @@ Export-Package: de.byteholder.geoclipse.map,
  de.byteholder.geoclipse.tileinfo,
  net.tourbook,
  net.tourbook.application,
- net.tourbook.colors,
  net.tourbook.data,
  net.tourbook.database,
  net.tourbook.extension.export,

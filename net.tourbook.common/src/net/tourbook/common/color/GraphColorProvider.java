@@ -13,7 +13,7 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.colors;
+package net.tourbook.common.color;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -25,16 +25,13 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import net.tourbook.Messages;
-import net.tourbook.application.TourbookPlugin;
-import net.tourbook.mapping.LegendColor;
-import net.tourbook.mapping.ValueColor;
+import net.tourbook.common.Activator;
+import net.tourbook.common.Messages;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Platform;
@@ -47,244 +44,242 @@ import org.w3c.dom.Element;
 
 public class GraphColorProvider {
 
-	public static final String				PREF_GRAPH_ALTIMETER		= "altimeter";			//$NON-NLS-1$
-	public static final String				PREF_GRAPH_ALTITUDE			= "altitude";			//$NON-NLS-1$
-	public static final String				PREF_GRAPH_CADENCE			= "cadence";			//$NON-NLS-1$
-	public static final String				PREF_GRAPH_DISTANCE			= "distance";			//$NON-NLS-1$
-	public static final String				PREF_GRAPH_HEARTBEAT		= "heartbeat";			//$NON-NLS-1$
-	public static final String				PREF_GRAPH_HISTORY			= "History";			//$NON-NLS-1$
-	public static final String				PREF_GRAPH_GRADIENT			= "gradient";			//$NON-NLS-1$
-	public static final String				PREF_GRAPH_PACE				= "pace";				//$NON-NLS-1$
-	public static final String				PREF_GRAPH_POWER			= "power";				//$NON-NLS-1$
-	public static final String				PREF_GRAPH_SPEED			= "speed";				//$NON-NLS-1$
-	public static final String				PREF_GRAPH_TEMPTERATURE		= "tempterature";		//$NON-NLS-1$
-	public static final String				PREF_GRAPH_TIME				= "duration";			//$NON-NLS-1$
-	public static final String				PREF_GRAPH_TOUR				= "tour";				//$NON-NLS-1$
-	public static final String				PREF_GRAPH_TOUR_COMPARE		= "tourCompare";		//$NON-NLS-1$
+	public static final String			PREF_GRAPH_ALTIMETER		= "altimeter";			//$NON-NLS-1$
+	public static final String			PREF_GRAPH_ALTITUDE			= "altitude";			//$NON-NLS-1$
+	public static final String			PREF_GRAPH_CADENCE			= "cadence";			//$NON-NLS-1$
+	public static final String			PREF_GRAPH_DISTANCE			= "distance";			//$NON-NLS-1$
+	public static final String			PREF_GRAPH_HEARTBEAT		= "heartbeat";			//$NON-NLS-1$
+	public static final String			PREF_GRAPH_HISTORY			= "History";			//$NON-NLS-1$
+	public static final String			PREF_GRAPH_GRADIENT			= "gradient";			//$NON-NLS-1$
+	public static final String			PREF_GRAPH_PACE				= "pace";				//$NON-NLS-1$
+	public static final String			PREF_GRAPH_POWER			= "power";				//$NON-NLS-1$
+	public static final String			PREF_GRAPH_SPEED			= "speed";				//$NON-NLS-1$
+	public static final String			PREF_GRAPH_TEMPTERATURE		= "tempterature";		//$NON-NLS-1$
+	public static final String			PREF_GRAPH_TIME				= "duration";			//$NON-NLS-1$
+	public static final String			PREF_GRAPH_TOUR				= "tour";				//$NON-NLS-1$
+	public static final String			PREF_GRAPH_TOUR_COMPARE		= "tourCompare";		//$NON-NLS-1$
 
-	public static final String				PREF_COLOR_BRIGHT			= "bright";			//$NON-NLS-1$
-	public static final String				PREF_COLOR_DARK				= "dark";				//$NON-NLS-1$
-	public static final String				PREF_COLOR_LINE				= "line";				//$NON-NLS-1$
-	public static final String				PREF_COLOR_TEXT				= "text";				//$NON-NLS-1$
-	public static final String				PREF_COLOR_MAPPING			= "mapping";			//$NON-NLS-1$
+	public static final String			PREF_COLOR_BRIGHT			= "bright";			//$NON-NLS-1$
+	public static final String			PREF_COLOR_DARK				= "dark";				//$NON-NLS-1$
+	public static final String			PREF_COLOR_LINE				= "line";				//$NON-NLS-1$
+	public static final String			PREF_COLOR_TEXT				= "text";				//$NON-NLS-1$
+	public static final String			PREF_COLOR_MAPPING			= "mapping";			//$NON-NLS-1$
 
-	private static final String				MEMENTO_LEGEND_COLOR_FILE	= "legendcolor.xml";	//$NON-NLS-1$
-	private static final String				MEMENTO_ROOT				= "legendcolorlist";	//$NON-NLS-1$
+	private static final String			MEMENTO_LEGEND_COLOR_FILE	= "legendcolor.xml";	//$NON-NLS-1$
+	private static final String			MEMENTO_ROOT				= "legendcolorlist";	//$NON-NLS-1$
 
-	private static final String				MEMENTO_CHILD_LEGEND_COLOR	= "legendcolor";		//$NON-NLS-1$
-	private static final String				TAG_LEGEND_COLOR_PREF_NAME	= "prefname";			//$NON-NLS-1$
+	private static final String			MEMENTO_CHILD_LEGEND_COLOR	= "legendcolor";		//$NON-NLS-1$
+	private static final String			TAG_LEGEND_COLOR_PREF_NAME	= "prefname";			//$NON-NLS-1$
 
-	private static final String				MEMENTO_CHILD_VALUE_COLOR	= "valuecolor";		//$NON-NLS-1$
-	private static final String				TAG_VALUE_COLOR_VALUE		= "value";				//$NON-NLS-1$
-	private static final String				TAG_VALUE_COLOR_RED			= "red";				//$NON-NLS-1$
-	private static final String				TAG_VALUE_COLOR_GREEN		= "green";				//$NON-NLS-1$
-	private static final String				TAG_VALUE_COLOR_BLUE		= "blue";				//$NON-NLS-1$
+	private static final String			MEMENTO_CHILD_VALUE_COLOR	= "valuecolor";		//$NON-NLS-1$
+	private static final String			TAG_VALUE_COLOR_VALUE		= "value";				//$NON-NLS-1$
+	private static final String			TAG_VALUE_COLOR_RED			= "red";				//$NON-NLS-1$
+	private static final String			TAG_VALUE_COLOR_GREEN		= "green";				//$NON-NLS-1$
+	private static final String			TAG_VALUE_COLOR_BLUE		= "blue";				//$NON-NLS-1$
 
-	private static final String				MEMENTO_CHILD_BRIGHTNESS	= "brightness";		//$NON-NLS-1$
-	private static final String				TAG_BRIGHTNESS_MIN			= "min";				//$NON-NLS-1$
-	private static final String				TAG_BRIGHTNESS_MIN_FACTOR	= "minFactor";			//$NON-NLS-1$
-	private static final String				TAG_BRIGHTNESS_MAX			= "max";				//$NON-NLS-1$
-	private static final String				TAG_BRIGHTNESS_MAX_FACTOR	= "maxFactor";			//$NON-NLS-1$
+	private static final String			MEMENTO_CHILD_BRIGHTNESS	= "brightness";		//$NON-NLS-1$
+	private static final String			TAG_BRIGHTNESS_MIN			= "min";				//$NON-NLS-1$
+	private static final String			TAG_BRIGHTNESS_MIN_FACTOR	= "minFactor";			//$NON-NLS-1$
+	private static final String			TAG_BRIGHTNESS_MAX			= "max";				//$NON-NLS-1$
+	private static final String			TAG_BRIGHTNESS_MAX_FACTOR	= "maxFactor";			//$NON-NLS-1$
 
-	private static final String				MEMENTO_CHILD_MIN_MAX_VALUE	= "minmaxValue";		//$NON-NLS-1$
-	private static final String				TAG_IS_MIN_VALUE_OVERWRITE	= "isMinOverwrite";	//$NON-NLS-1$
-	private static final String				TAG_MIN_VALUE_OVERWRITE		= "minValueOverwrite";	//$NON-NLS-1$
-	private static final String				TAG_IS_MAX_VALUE_OVERWRITE	= "isMaxOverwrite";	//$NON-NLS-1$
-	private static final String				TAG_MAX_VALUE_OVERWRITE		= "maxValueOverwrite";	//$NON-NLS-1$
+	private static final String			MEMENTO_CHILD_MIN_MAX_VALUE	= "minmaxValue";		//$NON-NLS-1$
+	private static final String			TAG_IS_MIN_VALUE_OVERWRITE	= "isMinOverwrite";	//$NON-NLS-1$
+	private static final String			TAG_MIN_VALUE_OVERWRITE		= "minValueOverwrite";	//$NON-NLS-1$
+	private static final String			TAG_IS_MAX_VALUE_OVERWRITE	= "isMaxOverwrite";	//$NON-NLS-1$
+	private static final String			TAG_MAX_VALUE_OVERWRITE		= "maxValueOverwrite";	//$NON-NLS-1$
 
-	public static String[][]				colorNames					= new String[][] {
+	public static String[][]			colorNames					= new String[][] {
 			{ PREF_COLOR_BRIGHT, Messages.Graph_Pref_color_gradient_bright },
 			{ PREF_COLOR_DARK, Messages.Graph_Pref_color_gradient_dark },
 			{ PREF_COLOR_LINE, Messages.Graph_Pref_color_line },
 			{ PREF_COLOR_TEXT, Messages.Graph_Pref_ColorText },
-			{ PREF_COLOR_MAPPING, Messages.Graph_Pref_color_mapping }	};
+			{ PREF_COLOR_MAPPING, Messages.Graph_Pref_color_mapping } };
 
-	private static final LegendColor		LEGEND_COLOR_ALTITUDE		= new LegendColor(
-																				new ValueColor[] {
+	private static final LegendColor	LEGEND_COLOR_ALTITUDE		= new LegendColor(
+																			new ValueColor[] {
 			new ValueColor(10, 130, 0, 157),
 			new ValueColor(50, 255, 85, 13),
 			new ValueColor(100, 255, 255, 0),
 			new ValueColor(150, 0, 170, 9),
-			new ValueColor(190, 23, 163, 255)									},
-																				LegendColor.BRIGHTNESS_DIMMING,
-																				15,
-																				LegendColor.BRIGHTNESS_LIGHTNING,
-																				39);
+			new ValueColor(190, 23, 163, 255)								},
+																			LegendColor.BRIGHTNESS_DIMMING,
+																			15,
+																			LegendColor.BRIGHTNESS_LIGHTNING,
+																			39);
 
-	private static final LegendColor		LEGEND_COLOR_PULSE			= new LegendColor(
-																				new ValueColor[] {
+	private static final LegendColor	LEGEND_COLOR_PULSE			= new LegendColor(
+																			new ValueColor[] {
 			new ValueColor(10, 0, 203, 0),
 			new ValueColor(50, 57, 255, 0),
 			new ValueColor(100, 255, 255, 0),
 			new ValueColor(150, 255, 0, 0),
-			new ValueColor(190, 255, 0, 247)									},
-																				LegendColor.BRIGHTNESS_DIMMING,
-																				11,
-																				LegendColor.BRIGHTNESS_DIMMING,
-																				10);
+			new ValueColor(190, 255, 0, 247)								},
+																			LegendColor.BRIGHTNESS_DIMMING,
+																			11,
+																			LegendColor.BRIGHTNESS_DIMMING,
+																			10);
 
-	private static final LegendColor		LEGEND_COLOR_GRADIENT		= new LegendColor(
-																				new ValueColor[] {
+	private static final LegendColor	LEGEND_COLOR_GRADIENT		= new LegendColor(
+																			new ValueColor[] {
 			new ValueColor(10, 0, 0, 255),
 			new ValueColor(50, 0, 255, 255),
 			new ValueColor(100, 0, 237, 0),
 			new ValueColor(150, 255, 255, 0),
-			new ValueColor(190, 255, 0, 0)										},
-																				LegendColor.BRIGHTNESS_DIMMING,
-																				23,
-																				LegendColor.BRIGHTNESS_DIMMING,
-																				10,
-																				true,
-																				-20,
-																				true,
-																				20);
+			new ValueColor(190, 255, 0, 0)									},
+																			LegendColor.BRIGHTNESS_DIMMING,
+																			23,
+																			LegendColor.BRIGHTNESS_DIMMING,
+																			10,
+																			true,
+																			-20,
+																			true,
+																			20);
 
-	private static final LegendColor		LEGEND_COLOR_PACE			= new LegendColor(
-																				new ValueColor[] {
+	private static final LegendColor	LEGEND_COLOR_PACE			= new LegendColor(
+																			new ValueColor[] {
 			new ValueColor(10, 255, 0, 0),
 			new ValueColor(50, 255, 255, 0),
 			new ValueColor(100, 0, 169, 0),
 			new ValueColor(150, 0, 255, 255),
-			new ValueColor(190, 0, 0, 255)										},
-																				LegendColor.BRIGHTNESS_DIMMING,
-																				17,
-																				LegendColor.BRIGHTNESS_DIMMING,
-																				8)
+			new ValueColor(190, 0, 0, 255)									},
+																			LegendColor.BRIGHTNESS_DIMMING,
+																			17,
+																			LegendColor.BRIGHTNESS_DIMMING,
+																			8);
 
-																		;
-
-	private static final LegendColor		LEGEND_COLOR_SPEED			= new LegendColor(
-																				new ValueColor[] {
+	private static final LegendColor	LEGEND_COLOR_SPEED			= new LegendColor(
+																			new ValueColor[] {
 			new ValueColor(10, 0, 0, 255),
 			new ValueColor(50, 0, 255, 255),
 			new ValueColor(100, 0, 169, 0),
 			new ValueColor(150, 255, 255, 0),
-			new ValueColor(190, 255, 0, 0)										},
-																				LegendColor.BRIGHTNESS_DIMMING,
-																				17,
-																				LegendColor.BRIGHTNESS_DIMMING,
-																				8);
+			new ValueColor(190, 255, 0, 0)									},
+																			LegendColor.BRIGHTNESS_DIMMING,
+																			17,
+																			LegendColor.BRIGHTNESS_DIMMING,
+																			8);
 
 	/**
 	 * 
 	 */
-	private static final ColorDefinition[]	GRAPH_COLOR_DEFAULTS		= new ColorDefinition[] {
+//	private static final ColorDefinition[]	GRAPH_COLOR_DEFAULTS		= new ColorDefinition[] {
+//
+//			new ColorDefinition(PREF_GRAPH_ALTITUDE,//
+//					Messages.Graph_Label_Altitude,
+//					new RGB(255, 255, 255),
+//					new RGB(0, 255, 0),
+//					new RGB(45, 188, 45),
+//					new RGB(44, 134, 33),
+//					LEGEND_COLOR_ALTITUDE),
+//
+//			new ColorDefinition(PREF_GRAPH_HEARTBEAT, //
+//					Messages.Graph_Label_Heartbeat,
+//					new RGB(255, 255, 255),
+//					new RGB(253, 0, 0),
+//					new RGB(253, 0, 0),
+//					new RGB(183, 0, 0),
+//					LEGEND_COLOR_PULSE),
+//
+//			new ColorDefinition(PREF_GRAPH_SPEED,//
+//					Messages.Graph_Label_Speed,
+//					new RGB(255, 255, 255),
+//					new RGB(0, 135, 211),
+//					new RGB(0, 132, 210),
+//					new RGB(0, 106, 167),
+//					LEGEND_COLOR_SPEED),
+//
+//			new ColorDefinition(PREF_GRAPH_PACE,//
+//					Messages.Graph_Label_Pace,
+//					new RGB(255, 255, 255),
+//					new RGB(0x9C, 0x2F, 0xFF),
+//					new RGB(0x9C, 0x2F, 0xFF),
+//					new RGB(88, 26, 142),
+//					LEGEND_COLOR_PACE),
+//
+//			new ColorDefinition(PREF_GRAPH_POWER,//
+//					Messages.Graph_Label_Power,
+//					new RGB(255, 255, 255),
+//					new RGB(240, 0, 150),
+//					new RGB(240, 0, 150),
+//					new RGB(106, 0, 67),
+//					null),
+//
+//			new ColorDefinition(PREF_GRAPH_TEMPTERATURE, //
+//					Messages.Graph_Label_Temperature,
+//					new RGB(255, 255, 255),
+//					new RGB(0, 217, 240),
+//					new RGB(0, 216, 240),
+//					new RGB(0, 134, 147),
+//					null),
+//
+//			new ColorDefinition(PREF_GRAPH_GRADIENT, //
+//					Messages.Graph_Label_Gradient,
+//					new RGB(255, 255, 255),
+//					new RGB(249, 231, 0),
+//					new RGB(236, 206, 0),
+//					new RGB(111, 98, 0),
+//					LEGEND_COLOR_GRADIENT),
+//
+//			new ColorDefinition(PREF_GRAPH_ALTIMETER, //
+//					Messages.Graph_Label_Altimeter,
+//					new RGB(255, 255, 255),
+//					new RGB(255, 180, 0),
+//					new RGB(249, 174, 0),
+//					new RGB(144, 103, 0),
+//					null),
+//
+//			new ColorDefinition(PREF_GRAPH_CADENCE,//
+//					Messages.Graph_Label_Cadence,
+//					new RGB(255, 255, 255),
+//					new RGB(228, 106, 16),
+//					new RGB(228, 106, 16),
+//					new RGB(139, 64, 10),
+//					null),
+//
+//			new ColorDefinition(PREF_GRAPH_TOUR_COMPARE, //
+//					Messages.Graph_Label_Tour_Compare,
+//					new RGB(255, 255, 255),
+//					new RGB(255, 140, 26),
+//					new RGB(242, 135, 22),
+//					new RGB(139, 77, 15),
+//					null),
+//
+//			new ColorDefinition(PREF_GRAPH_HISTORY,//
+//					Messages.Graph_Label_History,
+//					new RGB(255, 255, 255),
+//					new RGB(0xFF, 0x80, 0x33),
+//					new RGB(0xFF, 0x80, 0x33),
+//					new RGB(0xFF, 0x80, 0x33),
+//					null),
+//
+//			new ColorDefinition(PREF_GRAPH_TOUR,//
+//					Messages.Graph_Label_Tour,
+//					new RGB(255, 255, 255),
+//					new RGB(0x0d, 0xaa, 0xff),
+//					new RGB(0x0d, 0xaa, 0xff),
+//					new RGB(0x0d, 0xaa, 0xff),
+//					null),
+//
+//			new ColorDefinition(PREF_GRAPH_DISTANCE,//
+//					Messages.Graph_Pref_color_statistic_distance,
+//					new RGB(255, 255, 255),
+//					new RGB(239, 167, 16),
+//					new RGB(203, 141, 14),
+//					new RGB(139, 98, 10),
+//					null),
+//
+//			new ColorDefinition(PREF_GRAPH_TIME,//
+//					Messages.Graph_Pref_color_statistic_time,
+//					new RGB(255, 255, 255),
+//					new RGB(187, 187, 140),
+//					new RGB(170, 170, 127),
+//					new RGB(88, 88, 67),
+//					null)												};
 
-			new ColorDefinition(PREF_GRAPH_ALTITUDE,//
-					Messages.Graph_Label_Altitude,
-					new RGB(255, 255, 255),
-					new RGB(0, 255, 0),
-					new RGB(45, 188, 45),
-					new RGB(44, 134, 33),
-					LEGEND_COLOR_ALTITUDE),
+	private static GraphColorProvider	_instance;
 
-			new ColorDefinition(PREF_GRAPH_HEARTBEAT, //
-					Messages.Graph_Label_Heartbeat,
-					new RGB(255, 255, 255),
-					new RGB(253, 0, 0),
-					new RGB(253, 0, 0),
-					new RGB(183, 0, 0),
-					LEGEND_COLOR_PULSE),
-
-			new ColorDefinition(PREF_GRAPH_SPEED,//
-					Messages.Graph_Label_Speed,
-					new RGB(255, 255, 255),
-					new RGB(0, 135, 211),
-					new RGB(0, 132, 210),
-					new RGB(0, 106, 167),
-					LEGEND_COLOR_SPEED),
-
-			new ColorDefinition(PREF_GRAPH_PACE,//
-					Messages.Graph_Label_Pace,
-					new RGB(255, 255, 255),
-					new RGB(0x9C, 0x2F, 0xFF),
-					new RGB(0x9C, 0x2F, 0xFF),
-					new RGB(88, 26, 142),
-					LEGEND_COLOR_PACE),
-
-			new ColorDefinition(PREF_GRAPH_POWER,//
-					Messages.Graph_Label_Power,
-					new RGB(255, 255, 255),
-					new RGB(240, 0, 150),
-					new RGB(240, 0, 150),
-					new RGB(106, 0, 67),
-					null),
-
-			new ColorDefinition(PREF_GRAPH_TEMPTERATURE, //
-					Messages.Graph_Label_Temperature,
-					new RGB(255, 255, 255),
-					new RGB(0, 217, 240),
-					new RGB(0, 216, 240),
-					new RGB(0, 134, 147),
-					null),
-
-			new ColorDefinition(PREF_GRAPH_GRADIENT, //
-					Messages.Graph_Label_Gradient,
-					new RGB(255, 255, 255),
-					new RGB(249, 231, 0),
-					new RGB(236, 206, 0),
-					new RGB(111, 98, 0),
-					LEGEND_COLOR_GRADIENT),
-
-			new ColorDefinition(PREF_GRAPH_ALTIMETER, //
-					Messages.Graph_Label_Altimeter,
-					new RGB(255, 255, 255),
-					new RGB(255, 180, 0),
-					new RGB(249, 174, 0),
-					new RGB(144, 103, 0),
-					null),
-
-			new ColorDefinition(PREF_GRAPH_CADENCE,//
-					Messages.Graph_Label_Cadence,
-					new RGB(255, 255, 255),
-					new RGB(228, 106, 16),
-					new RGB(228, 106, 16),
-					new RGB(139, 64, 10),
-					null),
-
-			new ColorDefinition(PREF_GRAPH_TOUR_COMPARE, //
-					Messages.Graph_Label_Tour_Compare,
-					new RGB(255, 255, 255),
-					new RGB(255, 140, 26),
-					new RGB(242, 135, 22),
-					new RGB(139, 77, 15),
-					null),
-
-			new ColorDefinition(PREF_GRAPH_HISTORY,//
-					Messages.Graph_Label_History,
-					new RGB(255, 255, 255),
-					new RGB(0xFF, 0x80, 0x33),
-					new RGB(0xFF, 0x80, 0x33),
-					new RGB(0xFF, 0x80, 0x33),
-					null),
-
-			new ColorDefinition(PREF_GRAPH_TOUR,//
-					Messages.Graph_Label_Tour,
-					new RGB(255, 255, 255),
-					new RGB(0x0d, 0xaa, 0xff),
-					new RGB(0x0d, 0xaa, 0xff),
-					new RGB(0x0d, 0xaa, 0xff),
-					null),
-
-			new ColorDefinition(PREF_GRAPH_DISTANCE,//
-					Messages.Graph_Pref_color_statistic_distance,
-					new RGB(255, 255, 255),
-					new RGB(239, 167, 16),
-					new RGB(203, 141, 14),
-					new RGB(139, 98, 10),
-					null),
-
-			new ColorDefinition(PREF_GRAPH_TIME,//
-					Messages.Graph_Pref_color_statistic_time,
-					new RGB(255, 255, 255),
-					new RGB(187, 187, 140),
-					new RGB(170, 170, 127),
-					new RGB(88, 88, 67),
-					null)												};
-
-	private static GraphColorProvider		_instance;
-
-	private ColorDefinition[]				_graphColorDefinitions;
+	private ColorDefinition[]			_graphColorDefinitions;
 
 	public GraphColorProvider() {}
 
@@ -319,7 +314,7 @@ public class GraphColorProvider {
 
 		try {
 
-			final IPath stateLocation = Platform.getStateLocation(TourbookPlugin.getDefault().getBundle());
+			final IPath stateLocation = Platform.getStateLocation(Activator.getDefault().getBundle());
 			final File file = stateLocation.append(MEMENTO_LEGEND_COLOR_FILE).toFile();
 
 			writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "UTF-8")); //$NON-NLS-1$
@@ -399,9 +394,119 @@ public class GraphColorProvider {
 			return _graphColorDefinitions;
 		}
 
-		final List<ColorDefinition> list = new ArrayList<ColorDefinition>();
+		final List<ColorDefinition> allColorDef = new ArrayList<ColorDefinition>();
 
-		Collections.addAll(list, GRAPH_COLOR_DEFAULTS);
+		allColorDef.add(new ColorDefinition(PREF_GRAPH_ALTITUDE,//
+				Messages.Graph_Label_Altitude,
+				new RGB(255, 255, 255),
+				new RGB(0, 255, 0),
+				new RGB(45, 188, 45),
+				new RGB(44, 134, 33),
+				LEGEND_COLOR_ALTITUDE));
+
+		allColorDef.add(new ColorDefinition(PREF_GRAPH_HEARTBEAT, //
+				Messages.Graph_Label_Heartbeat,
+				new RGB(255, 255, 255),
+				new RGB(253, 0, 0),
+				new RGB(253, 0, 0),
+				new RGB(183, 0, 0),
+				LEGEND_COLOR_PULSE));
+
+		allColorDef.add(new ColorDefinition(PREF_GRAPH_SPEED,//
+				Messages.Graph_Label_Speed,
+				new RGB(255, 255, 255),
+				new RGB(0, 135, 211),
+				new RGB(0, 132, 210),
+				new RGB(0, 106, 167),
+				LEGEND_COLOR_SPEED));
+
+		allColorDef.add(new ColorDefinition(PREF_GRAPH_PACE,//
+				Messages.Graph_Label_Pace,
+				new RGB(255, 255, 255),
+				new RGB(0x9C, 0x2F, 0xFF),
+				new RGB(0x9C, 0x2F, 0xFF),
+				new RGB(88, 26, 142),
+				LEGEND_COLOR_PACE));
+
+		allColorDef.add(new ColorDefinition(PREF_GRAPH_POWER,//
+				Messages.Graph_Label_Power,
+				new RGB(255, 255, 255),
+				new RGB(240, 0, 150),
+				new RGB(240, 0, 150),
+				new RGB(106, 0, 67),
+				null));
+
+		allColorDef.add(new ColorDefinition(PREF_GRAPH_TEMPTERATURE, //
+				Messages.Graph_Label_Temperature,
+				new RGB(255, 255, 255),
+				new RGB(0, 217, 240),
+				new RGB(0, 216, 240),
+				new RGB(0, 134, 147),
+				null));
+
+		allColorDef.add(new ColorDefinition(PREF_GRAPH_GRADIENT, //
+				Messages.Graph_Label_Gradient,
+				new RGB(255, 255, 255),
+				new RGB(249, 231, 0),
+				new RGB(236, 206, 0),
+				new RGB(111, 98, 0),
+				LEGEND_COLOR_GRADIENT));
+
+		allColorDef.add(new ColorDefinition(PREF_GRAPH_ALTIMETER, //
+				Messages.Graph_Label_Altimeter,
+				new RGB(255, 255, 255),
+				new RGB(255, 180, 0),
+				new RGB(249, 174, 0),
+				new RGB(144, 103, 0),
+				null));
+
+		allColorDef.add(new ColorDefinition(PREF_GRAPH_CADENCE,//
+				Messages.Graph_Label_Cadence,
+				new RGB(255, 255, 255),
+				new RGB(228, 106, 16),
+				new RGB(228, 106, 16),
+				new RGB(139, 64, 10),
+				null));
+
+		allColorDef.add(new ColorDefinition(PREF_GRAPH_TOUR_COMPARE, //
+				Messages.Graph_Label_Tour_Compare,
+				new RGB(255, 255, 255),
+				new RGB(255, 140, 26),
+				new RGB(242, 135, 22),
+				new RGB(139, 77, 15),
+				null));
+
+		allColorDef.add(new ColorDefinition(PREF_GRAPH_HISTORY,//
+				Messages.Graph_Label_History,
+				new RGB(255, 255, 255),
+				new RGB(0xFF, 0x80, 0x33),
+				new RGB(0xFF, 0x80, 0x33),
+				new RGB(0xFF, 0x80, 0x33),
+				null));
+
+		allColorDef.add(new ColorDefinition(PREF_GRAPH_TOUR,//
+				Messages.Graph_Label_Tour,
+				new RGB(255, 255, 255),
+				new RGB(0x0d, 0xaa, 0xff),
+				new RGB(0x0d, 0xaa, 0xff),
+				new RGB(0x0d, 0xaa, 0xff),
+				null));
+
+		allColorDef.add(new ColorDefinition(PREF_GRAPH_DISTANCE,//
+				Messages.Graph_Pref_color_statistic_distance,
+				new RGB(255, 255, 255),
+				new RGB(239, 167, 16),
+				new RGB(203, 141, 14),
+				new RGB(139, 98, 10),
+				null));
+
+		allColorDef.add(new ColorDefinition(PREF_GRAPH_TIME,//
+				Messages.Graph_Pref_color_statistic_time,
+				new RGB(255, 255, 255),
+				new RGB(187, 187, 140),
+				new RGB(170, 170, 127),
+				new RGB(88, 88, 67),
+				null));
 
 		// sort list by name
 //		Collections.sort(list, new Comparator<ColorDefinition>() {
@@ -410,7 +515,7 @@ public class GraphColorProvider {
 //			}
 //		});
 
-		_graphColorDefinitions = list.toArray(new ColorDefinition[list.size()]);
+		_graphColorDefinitions = allColorDef.toArray(new ColorDefinition[allColorDef.size()]);
 
 		readLegendColors();
 		setLegendColors();
@@ -423,7 +528,7 @@ public class GraphColorProvider {
 	 */
 	private void readLegendColors() {
 
-		final IPath stateLocation = Platform.getStateLocation(TourbookPlugin.getDefault().getBundle());
+		final IPath stateLocation = Platform.getStateLocation(Activator.getDefault().getBundle());
 		final File file = stateLocation.append(MEMENTO_LEGEND_COLOR_FILE).toFile();
 
 		// check if file is available

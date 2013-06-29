@@ -74,10 +74,6 @@ public class Messages extends NLS {
 	public static String		image_action_zoom_show_all_disabled;
 	public static String		image_action_zoom_show_entire_tour;
 
-	public static String		legend_color_dim_color;
-	public static String		legend_color_keep_color;
-	public static String		legend_color_lighten_color;
-
 	public static String		LegendColor_Dialog_Check_LiveUpdate;
 	public static String		LegendColor_Dialog_Check_LiveUpdate_Tooltip;
 

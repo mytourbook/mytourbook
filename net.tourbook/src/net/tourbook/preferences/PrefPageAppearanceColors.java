@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -20,16 +20,17 @@ import java.util.Arrays;
 import java.util.List;
 
 import net.tourbook.Messages;
-import net.tourbook.application.TourbookPlugin;
-import net.tourbook.colors.ColorDefinition;
-import net.tourbook.colors.GraphColorItem;
-import net.tourbook.colors.GraphColorProvider;
+import net.tourbook.common.Activator;
+import net.tourbook.common.color.ColorDefinition;
+import net.tourbook.common.color.GraphColorItem;
+import net.tourbook.common.color.GraphColorProvider;
+import net.tourbook.common.color.LegendColor;
+import net.tourbook.common.color.LegendConfig;
+import net.tourbook.common.color.ValueColor;
+import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.mapping.DialogMappingColor;
 import net.tourbook.mapping.ILegendProviderGradientColors;
-import net.tourbook.mapping.LegendColor;
-import net.tourbook.mapping.LegendConfig;
 import net.tourbook.mapping.LegendProviderGradientColors;
-import net.tourbook.mapping.ValueColor;
 import net.tourbook.ui.UI;
 
 import org.eclipse.jface.layout.GridDataFactory;
@@ -429,7 +430,7 @@ public class PrefPageAppearanceColors extends PreferencePage implements IWorkben
 	}
 
 	public void init(final IWorkbench workbench) {
-		setPreferenceStore(TourbookPlugin.getDefault().getPreferenceStore());
+		setPreferenceStore(Activator.getDefault().getPreferenceStore());
 	}
 
 	/**
@@ -623,7 +624,7 @@ public class PrefPageAppearanceColors extends PreferencePage implements IWorkben
 
 		for (final ColorDefinition graphDefinition : GraphColorProvider.getInstance().getGraphColorDefinitions()) {
 
-			final String prefGraphName = ITourbookPreferences.GRAPH_COLORS + graphDefinition.getPrefName() + "."; //$NON-NLS-1$
+			final String prefGraphName = ICommonPreferences.GRAPH_COLORS + graphDefinition.getPrefName() + "."; //$NON-NLS-1$
 
 			PreferenceConverter.setValue(
 					prefStore,
@@ -665,7 +666,7 @@ public class PrefPageAppearanceColors extends PreferencePage implements IWorkben
 		}
 
 		// force to change the status
-		getPreferenceStore().setValue(ITourbookPreferences.GRAPH_COLORS_HAS_CHANGED, Math.random());
+		getPreferenceStore().setValue(ICommonPreferences.GRAPH_COLORS_HAS_CHANGED, Math.random());
 	}
 
 	private void updateColorsFromDialog(final ColorDefinition selectedColorDefinition) {

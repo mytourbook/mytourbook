@@ -15,6 +15,11 @@
  *******************************************************************************/
 package net.tourbook.mapping;
 
+import net.tourbook.common.color.ILegendProvider;
+import net.tourbook.common.color.LegendColor;
+import net.tourbook.common.color.LegendConfig;
+import net.tourbook.common.color.LegendUnitFormat;
+
 import org.eclipse.swt.graphics.Rectangle;
 
 public interface ILegendProviderGradientColors extends ILegendProvider {

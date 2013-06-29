@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -19,10 +19,10 @@ import java.util.ArrayList;
 
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.ChartDataYSerie;
-import net.tourbook.colors.GraphColorProvider;
+import net.tourbook.common.color.GraphColorProvider;
+import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
-import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.ui.TourTypeFilter;
 
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -46,7 +46,7 @@ public class StatisticServices {
 	public static void setDefaultColors(final ChartDataYSerie yData, final String graphName) {
 
 		final IPreferenceStore prefStore = TourbookPlugin.getDefault().getPreferenceStore();
-		final String defaultColorName = ITourbookPreferences.GRAPH_COLORS + graphName + "."; //$NON-NLS-1$
+		final String defaultColorName = ICommonPreferences.GRAPH_COLORS + graphName + "."; //$NON-NLS-1$
 
 		// put the color into the chart data
 		yData.setDefaultRGB(PreferenceConverter.getColor(prefStore, //
@@ -118,7 +118,7 @@ public class StatisticServices {
 			 * color index 0: default color
 			 */
 			final IPreferenceStore prefStore = TourbookPlugin.getDefault().getPreferenceStore();
-			final String defaultColorName = ITourbookPreferences.GRAPH_COLORS + graphName + "."; //$NON-NLS-1$
+			final String defaultColorName = ICommonPreferences.GRAPH_COLORS + graphName + "."; //$NON-NLS-1$
 
 			rgbBright.add(PreferenceConverter.getColor(prefStore, defaultColorName
 					+ GraphColorProvider.PREF_COLOR_BRIGHT));

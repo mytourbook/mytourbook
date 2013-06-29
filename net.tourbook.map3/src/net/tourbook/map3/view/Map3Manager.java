@@ -44,7 +44,8 @@ import net.tourbook.map3.Activator;
 import net.tourbook.map3.layer.DefaultLayer;
 import net.tourbook.map3.layer.MapDefaultLayer;
 import net.tourbook.map3.layer.StatusLayer;
-import net.tourbook.map3.layer.TourTrackLayer;
+import net.tourbook.map3.layer.TourTrackLayerWithMarkers;
+import net.tourbook.map3.layer.TourTrackLayerWithPaths;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Platform;
@@ -122,12 +123,15 @@ public class Map3Manager {
 	 */
 	private static HashMap<String, TVIMap3Layer>	_customLayers					= new HashMap<String, TVIMap3Layer>();
 
+	private static TourTrackLayerWithPaths			_tourTrackLayer;
+
 	private static Object[]							_uiEnabledLayers;
 
 	private static Object[]							_uiExpandedCategories;
 	private static ArrayList<TVIMap3Layer>			_uiEnabledLayersFromXml			= new ArrayList<TVIMap3Layer>();
 	private static ArrayList<TVIMap3Category>		_uiExpandedCategoriesFromXml	= new ArrayList<TVIMap3Category>();
 	private static ArrayList<Layer>					_xmlLayers						= new ArrayList<Layer>();
+
 	private static final DateTimeFormatter			_dtFormatter					= ISODateTimeFormat
 																							.basicDateTimeNoMillis();
 
@@ -295,17 +299,16 @@ public class Map3Manager {
 		/*
 		 * create WW layer
 		 */
-		final TourTrackLayer tourTrackLayer = new TourTrackLayer();
-
-//		statusLayer.setEventSource(_wwCanvas);
+//		_tourTrackLayer = new TourTrackLayerWithMarkers();
+//		_tourTrackLayer.setDefaultPositons();
+		_tourTrackLayer = new TourTrackLayerWithPaths();
 
 		/*
 		 * create UI model layer
 		 */
+		final TVIMap3Layer tviLayer = new TVIMap3Layer(_tourTrackLayer, _tourTrackLayer.getName());
 
-		final TVIMap3Layer tviLayer = new TVIMap3Layer(tourTrackLayer.getLayer(), tourTrackLayer.getName());
-
-		final String layerId = TourTrackLayer.MAP3_LAYER_ID;
+		final String layerId = TourTrackLayerWithMarkers.MAP3_LAYER_ID;
 		tviLayer.id = layerId;
 
 		final boolean isVisible = true;
@@ -621,6 +624,10 @@ public class Map3Manager {
 
 	static TVIMap3Root getRootItem() {
 		return _uiRootItem;
+	}
+
+	static TourTrackLayerWithPaths getTourLayer() {
+		return _tourTrackLayer;
 	}
 
 	static Object[] getUIEnabledLayers() {

@@ -28,10 +28,10 @@ import net.tourbook.chart.ChartDataXSerie;
 import net.tourbook.chart.ChartDataYSerie;
 import net.tourbook.chart.ChartType;
 import net.tourbook.chart.IChartLayer;
-import net.tourbook.colors.GraphColorProvider;
+import net.tourbook.common.color.GraphColorProvider;
+import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
-import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.ITourEventListener;
 import net.tourbook.tour.SelectionDeletedTours;
 import net.tourbook.tour.SelectionTourData;
@@ -246,7 +246,7 @@ public class ConconiChartView extends ViewPart {
 
 		_selectedTour = markedTour;
 
-		final String prefGraphName = ITourbookPreferences.GRAPH_COLORS + GraphColorProvider.PREF_GRAPH_HEARTBEAT + "."; //$NON-NLS-1$
+		final String prefGraphName = ICommonPreferences.GRAPH_COLORS + GraphColorProvider.PREF_GRAPH_HEARTBEAT + "."; //$NON-NLS-1$
 
 		final RGB rgbPrefLine = PreferenceConverter.getColor(//
 				_prefStore,
@@ -383,8 +383,8 @@ public class ConconiChartView extends ViewPart {
 		 * power
 		 */
 		final ChartDataXSerie xDataPower = new ChartDataXSerie(powerSerie);
-		xDataPower.setLabel(Messages.Graph_Label_Power);
-		xDataPower.setUnitLabel(Messages.Graph_Label_Power_unit);
+		xDataPower.setLabel(net.tourbook.common.Messages.Graph_Label_Power);
+		xDataPower.setUnitLabel(net.tourbook.common.Messages.Graph_Label_Power_unit);
 
 		/*
 		 * double is not yet supported for the y-axis
@@ -395,8 +395,8 @@ public class ConconiChartView extends ViewPart {
 		 * pulse
 		 */
 		_yDataPulse = new ChartDataYSerie(ChartType.XY_SCATTER, pulseSerieFloat);
-		_yDataPulse.setYTitle(Messages.Graph_Label_Heartbeat);
-		_yDataPulse.setUnitLabel(Messages.Graph_Label_Heartbeat_unit);
+		_yDataPulse.setYTitle(net.tourbook.common.Messages.Graph_Label_Heartbeat);
+		_yDataPulse.setUnitLabel(net.tourbook.common.Messages.Graph_Label_Heartbeat_unit);
 		_yDataPulse.setDefaultRGB(rgbPrefLine);
 		_yDataPulse.setRgbLine(rgbLine);
 		_yDataPulse.setRgbDark(rgbDark);
@@ -614,7 +614,7 @@ public class ConconiChartView extends ViewPart {
 					// label: heartbeat unit
 					label = new Label(containerValues, SWT.NONE);
 					GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(label);
-					label.setText(Messages.Graph_Label_Heartbeat_unit);
+					label.setText(net.tourbook.common.Messages.Graph_Label_Heartbeat_unit);
 
 					// label: power value
 					_lblDeflactionPower = new Label(containerValues, SWT.TRAIL);

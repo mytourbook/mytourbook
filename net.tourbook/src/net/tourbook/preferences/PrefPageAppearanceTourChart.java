@@ -370,8 +370,9 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 			 */
 			_chkShowHrZoneBackground = new Button(container, SWT.CHECK);
 			GridDataFactory.fillDefaults().span(2, 1).applyTo(_chkShowHrZoneBackground);
-			_chkShowHrZoneBackground.setText(Messages.Graph_Label_ShowHrZoneBackground);
-			_chkShowHrZoneBackground.setToolTipText(Messages.Graph_Label_ShowHrZoneBackground_Tooltip);
+			_chkShowHrZoneBackground.setText(net.tourbook.common.Messages.Graph_Label_ShowHrZoneBackground);
+			_chkShowHrZoneBackground
+					.setToolTipText(net.tourbook.common.Messages.Graph_Label_ShowHrZoneBackground_Tooltip);
 		}
 	}
 
@@ -792,15 +793,21 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 
 		// create a map and list with all available graphs
 
-		final Graph graphAltitude = new Graph(TourManager.GRAPH_ALTITUDE, Messages.Graph_Label_Altitude);
-		final Graph graphSpeed = new Graph(TourManager.GRAPH_SPEED, Messages.Graph_Label_Speed);
-		final Graph graphPace = new Graph(TourManager.GRAPH_PACE, Messages.Graph_Label_Pace);
-		final Graph graphPower = new Graph(TourManager.GRAPH_POWER, Messages.Graph_Label_Power);
-		final Graph graphPulse = new Graph(TourManager.GRAPH_PULSE, Messages.Graph_Label_Heartbeat);
-		final Graph graphTemperature = new Graph(TourManager.GRAPH_TEMPERATURE, Messages.Graph_Label_Temperature);
-		final Graph graphCadence = new Graph(TourManager.GRAPH_CADENCE, Messages.Graph_Label_Cadence);
-		final Graph graphAltimeter = new Graph(TourManager.GRAPH_ALTIMETER, Messages.Graph_Label_Altimeter);
-		final Graph graphGradient = new Graph(TourManager.GRAPH_GRADIENT, Messages.Graph_Label_Gradient);
+		final Graph graphAltitude = new Graph(
+				TourManager.GRAPH_ALTITUDE,
+				net.tourbook.common.Messages.Graph_Label_Altitude);
+		final Graph graphSpeed = new Graph(TourManager.GRAPH_SPEED, net.tourbook.common.Messages.Graph_Label_Speed);
+		final Graph graphPace = new Graph(TourManager.GRAPH_PACE, net.tourbook.common.Messages.Graph_Label_Pace);
+		final Graph graphPower = new Graph(TourManager.GRAPH_POWER, net.tourbook.common.Messages.Graph_Label_Power);
+		final Graph graphPulse = new Graph(TourManager.GRAPH_PULSE, net.tourbook.common.Messages.Graph_Label_Heartbeat);
+		final Graph graphTemperature = new Graph(TourManager.GRAPH_TEMPERATURE,//
+				net.tourbook.common.Messages.Graph_Label_Temperature);
+		final Graph graphCadence = new Graph(TourManager.GRAPH_CADENCE,//
+				net.tourbook.common.Messages.Graph_Label_Cadence);
+		final Graph graphAltimeter = new Graph(TourManager.GRAPH_ALTIMETER,//
+				net.tourbook.common.Messages.Graph_Label_Altimeter);
+		final Graph graphGradient = new Graph(TourManager.GRAPH_GRADIENT,//
+				net.tourbook.common.Messages.Graph_Label_Gradient);
 
 		_graphMap = new HashMap<Integer, Graph>();
 		_graphMap.put(TourManager.GRAPH_ALTITUDE, graphAltitude);

@@ -17,8 +17,8 @@ package net.tourbook.preferences;
 
 import java.util.HashMap;
 
-import net.tourbook.colors.ColorDefinition;
-import net.tourbook.colors.GraphColorItem;
+import net.tourbook.common.color.ColorDefinition;
+import net.tourbook.common.color.GraphColorItem;
 import net.tourbook.mapping.ILegendProviderGradientColors;
 import net.tourbook.mapping.TourMapPainter;
 

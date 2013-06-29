@@ -19,8 +19,8 @@ import java.util.ArrayList;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
-import net.tourbook.colors.ColorDefinition;
-import net.tourbook.colors.GraphColorProvider;
+import net.tourbook.common.color.ColorDefinition;
+import net.tourbook.common.color.GraphColorProvider;
 import net.tourbook.common.util.SelectionProvider;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;

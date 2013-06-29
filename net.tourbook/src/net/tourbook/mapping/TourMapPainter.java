@@ -25,7 +25,13 @@ import java.util.Set;
 
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.Util;
+import net.tourbook.common.color.ILegendProvider;
+import net.tourbook.common.color.LegendColor;
+import net.tourbook.common.color.LegendConfig;
+import net.tourbook.common.color.LegendUnitFormat;
+import net.tourbook.common.color.ValueColor;
 import net.tourbook.common.map.GeoPosition;
+import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.data.TourWayPoint;
@@ -526,7 +532,7 @@ public class TourMapPainter extends MapPainter {
 				final String property = event.getProperty();
 
 				// test if the color or statistic data have changed
-				if (property.equals(ITourbookPreferences.GRAPH_COLORS_HAS_CHANGED)) {
+				if (property.equals(ICommonPreferences.GRAPH_COLORS_HAS_CHANGED)) {
 					getTourPainterSettings();
 				}
 			}
@@ -1867,27 +1873,27 @@ public class TourMapPainter extends MapPainter {
 		_legendProvider = legendProvider;
 
 		switch (_legendProvider.getTourColorId()) {
-		case TourMapView.TOUR_COLOR_ALTITUDE:
+		case TourMapColors.TOUR_COLOR_ALTITUDE:
 			_dataSerie = tourData.getAltitudeSerie();
 			break;
 
-		case TourMapView.TOUR_COLOR_GRADIENT:
+		case TourMapColors.TOUR_COLOR_GRADIENT:
 			_dataSerie = tourData.getGradientSerie();
 			break;
 
-		case TourMapView.TOUR_COLOR_PULSE:
+		case TourMapColors.TOUR_COLOR_PULSE:
 			_dataSerie = tourData.pulseSerie;
 			break;
 
-		case TourMapView.TOUR_COLOR_SPEED:
+		case TourMapColors.TOUR_COLOR_SPEED:
 			_dataSerie = tourData.getSpeedSerie();
 			break;
 
-		case TourMapView.TOUR_COLOR_PACE:
+		case TourMapColors.TOUR_COLOR_PACE:
 			_dataSerie = tourData.getPaceSerieSeconds();
 			break;
 
-		case TourMapView.TOUR_COLOR_HR_ZONE:
+		case TourMapColors.TOUR_COLOR_HR_ZONE:
 			_dataSerie = tourData.pulseSerie;
 			break;
 

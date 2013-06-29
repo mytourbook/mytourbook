@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -13,11 +13,10 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.colors;
+package net.tourbook.common.color;
 
-import net.tourbook.application.TourbookPlugin;
-import net.tourbook.mapping.LegendColor;
-import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.common.Activator;
+import net.tourbook.common.preferences.ICommonPreferences;
 
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferenceConverter;
@@ -86,7 +85,7 @@ public class ColorDefinition {
 
 		_defaultLegendColor = defaultLegendColor;
 
-		final IPreferenceStore prefStore = TourbookPlugin.getDefault().getPreferenceStore();
+		final IPreferenceStore prefStore = Activator.getDefault().getPreferenceStore();
 		final String graphPrefName = getGraphPrefName();
 
 		/*
@@ -189,7 +188,7 @@ public class ColorDefinition {
 	}
 
 	public String getGraphPrefName() {
-		return ITourbookPreferences.GRAPH_COLORS + _prefName + "."; //$NON-NLS-1$
+		return ICommonPreferences.GRAPH_COLORS + _prefName + "."; //$NON-NLS-1$
 	}
 
 	public String getImageId() {
@@ -218,6 +217,10 @@ public class ColorDefinition {
 
 	public RGB getNewLineColor() {
 		return _lineColorNew;
+	}
+
+	public RGB getNewTextColor() {
+		return _textColorNew;
 	}
 
 	public String getPrefName() {
@@ -281,6 +284,10 @@ public class ColorDefinition {
 		_lineColorNew = newLineColor;
 	}
 
+	public void setNewTextColor(final RGB _textColorNew) {
+		this._textColorNew = _textColorNew;
+	}
+
 	public void setPrefName(final String prefName) {
 		_prefName = prefName;
 	}
@@ -291,14 +298,6 @@ public class ColorDefinition {
 
 	public void setVisibleName(final String visibleName) {
 		_visibleName = visibleName;
-	}
-
-	public RGB getNewTextColor() {
-		return _textColorNew;
-	}
-
-	public void setNewTextColor(RGB _textColorNew) {
-		this._textColorNew = _textColorNew;
 	}
 
 }

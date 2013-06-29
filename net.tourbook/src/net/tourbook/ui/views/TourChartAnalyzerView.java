@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -31,7 +31,7 @@ import net.tourbook.chart.GraphDrawingData;
 import net.tourbook.chart.SelectionChartInfo;
 import net.tourbook.chart.SelectionChartXSliderPosition;
 import net.tourbook.chart.Util;
-import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.tour.SelectionTourChart;
 import net.tourbook.tour.SelectionTourData;
 import net.tourbook.tour.TourManager;
@@ -172,7 +172,7 @@ public class TourChartAnalyzerView extends ViewPart {
 
 				final String property = event.getProperty();
 
-				if (property.equals(ITourbookPreferences.GRAPH_COLORS_HAS_CHANGED)) {
+				if (property.equals(ICommonPreferences.GRAPH_COLORS_HAS_CHANGED)) {
 
 					// dispose old colors
 					_colorCache.dispose();

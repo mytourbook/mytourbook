@@ -934,7 +934,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 
 			// label: unit
 			label = new Label(container, SWT.NONE);
-			label.setText(Messages.Graph_Label_Heartbeat_unit);
+			label.setText(net.tourbook.common.Messages.Graph_Label_Heartbeat_unit);
 		}
 
 		final Composite containerAge = new Composite(parent, SWT.NONE);
@@ -1009,7 +1009,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 			 * label: unit
 			 */
 			label = new Label(container, SWT.NONE);
-			label.setText(Messages.Graph_Label_Heartbeat_unit);
+			label.setText(net.tourbook.common.Messages.Graph_Label_Heartbeat_unit);
 
 			/*
 			 * combo: formula to compute hr max
@@ -1375,7 +1375,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 			 */
 			label = new Label(parent, SWT.NONE);
 			GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(label);
-			label.setText(Messages.Graph_Label_Heartbeat_unit);
+			label.setText(net.tourbook.common.Messages.Graph_Label_Heartbeat_unit);
 			label.addMouseListener(_hrZoneMouseListener);
 		}
 	}

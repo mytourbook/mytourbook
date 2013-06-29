@@ -21,6 +21,37 @@ public class Messages extends NLS {
 
 	private static final String	BUNDLE_NAME	= "net.tourbook.common.messages";				//$NON-NLS-1$
 
+	public static String		Graph_Label_Altimeter;
+	public static String		Graph_Label_Altitude;
+	public static String		Graph_Label_Cadence;
+	public static String		Graph_Label_Cadence_unit;
+	public static String		Graph_Label_Distance;
+	public static String		Graph_Label_Gradiend_unit;
+	public static String		Graph_Label_Gradient;
+	public static String		Graph_Label_Heartbeat;
+	public static String		Graph_Label_Heartbeat_unit;
+	public static String		Graph_Label_History;
+	public static String		Graph_Label_Pace;
+	public static String		Graph_Label_Power;
+	public static String		Graph_Label_Power_unit;
+	public static String		Graph_Label_ShowHrZoneBackground;
+	public static String		Graph_Label_ShowHrZoneBackground_Tooltip;
+	public static String		Graph_Label_Speed;
+	public static String		Graph_Label_Temperature;
+	public static String		Graph_Label_TimeDuration;
+	public static String		Graph_Label_TimeOfDay;
+	public static String		Graph_Label_Tour;
+	public static String		Graph_Label_Tour_Compare;
+	public static String		Graph_Label_Tour_Compare_unit;
+
+	public static String		Graph_Pref_color_gradient_bright;
+	public static String		Graph_Pref_color_gradient_dark;
+	public static String		Graph_Pref_color_line;
+	public static String		Graph_Pref_color_mapping;
+	public static String		Graph_Pref_color_statistic_distance;
+	public static String		Graph_Pref_color_statistic_time;
+	public static String		Graph_Pref_ColorText;
+
 	public static String		Image___Empty16;
 	public static String		Image__ConfigureColumns;
 	public static String		Image__options;
@@ -88,6 +119,10 @@ public class Messages extends NLS {
 	public static String		Weather_WindSpeed_Bft11_Short;
 	public static String		Weather_WindSpeed_Bft12;
 	public static String		Weather_WindSpeed_Bft12_Short;
+
+	public static String		legend_color_dim_color;
+	public static String		legend_color_keep_color;
+	public static String		legend_color_lighten_color;
 
 	static {
 		// initialize resource bundle

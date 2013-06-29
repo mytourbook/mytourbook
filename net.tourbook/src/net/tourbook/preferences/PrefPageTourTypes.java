@@ -25,9 +25,9 @@ import javax.persistence.Query;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
-import net.tourbook.colors.ColorDefinition;
-import net.tourbook.colors.GraphColorItem;
-import net.tourbook.colors.GraphColorProvider;
+import net.tourbook.common.color.ColorDefinition;
+import net.tourbook.common.color.GraphColorItem;
+import net.tourbook.common.color.GraphColorProvider;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;

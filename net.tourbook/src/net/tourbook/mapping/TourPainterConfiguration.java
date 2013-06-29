@@ -18,6 +18,7 @@ package net.tourbook.mapping;
 import java.util.ArrayList;
 import java.util.Set;
 
+import net.tourbook.common.color.ILegendProvider;
 import net.tourbook.common.map.GeoPosition;
 import net.tourbook.data.TourData;
 import net.tourbook.photo.Photo;

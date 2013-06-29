@@ -13,3 +13,5 @@ Require-Bundle: org.eclipse.ui,
  net.tourbook.ext.jars
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
+Import-Package: net.tourbook.data,
+ net.tourbook.tour

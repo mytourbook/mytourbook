@@ -384,7 +384,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
 			_spinRestPuls.addMouseWheelListener(_mouseWheelListener);
 
 			// label: bpm
-			_tk.createLabel(container, Messages.Graph_Label_Heartbeat_unit);
+			_tk.createLabel(container, net.tourbook.common.Messages.Graph_Label_Heartbeat_unit);
 		}
 	}
 

@@ -690,7 +690,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	private double[]											distanceSerieDoubleImperial;
 
 	/**
-	 * contains the absolute altitude in m (metric system)
+	 * Contains the absolute altitude in meter (metric system) or <code>null</code> when not
+	 * available.
 	 */
 	@Transient
 	public float[]												altitudeSerie;

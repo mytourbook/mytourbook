@@ -19,6 +19,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.tourbook.chart.Util;
+import net.tourbook.common.color.LegendColor;
+import net.tourbook.common.color.LegendConfig;
+import net.tourbook.common.color.LegendUnitFormat;
+import net.tourbook.common.color.ValueColor;
 
 import org.eclipse.swt.graphics.Rectangle;
 

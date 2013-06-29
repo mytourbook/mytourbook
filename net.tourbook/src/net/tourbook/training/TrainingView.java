@@ -656,7 +656,7 @@ public class TrainingView extends ViewPart {
 		/*
 		 * label: bpm
 		 */
-		label = _tk.createLabel(parent, Messages.Graph_Label_Heartbeat_unit);
+		label = _tk.createLabel(parent, net.tourbook.common.Messages.Graph_Label_Heartbeat_unit);
 		GridDataFactory.fillDefaults()//
 				.align(SWT.END, SWT.FILL)
 //				.align(SWT.CENTER, SWT.FILL)
@@ -1331,7 +1331,7 @@ public class TrainingView extends ViewPart {
 		 */
 		final ChartDataXSerie xData = new ChartDataXSerie(_xSeriePulse);
 		xData.setAxisUnit(ChartDataXSerie.X_AXIS_UNIT_NUMBER_CENTER);
-		xData.setUnitLabel(Messages.Graph_Label_Heartbeat_unit);
+		xData.setUnitLabel(net.tourbook.common.Messages.Graph_Label_Heartbeat_unit);
 		xData.setStartValue(_pulseStart);
 
 		chartDataModel.setXData(xData);
@@ -1444,7 +1444,7 @@ public class TrainingView extends ViewPart {
 					+ UI.DASH
 					+ zoneMaxBpmText
 					+ UI.SPACE
-					+ Messages.Graph_Label_Heartbeat_unit
+					+ net.tourbook.common.Messages.Graph_Label_Heartbeat_unit
 					//
 					+ UI.NEW_LINE
 					+ UI.NEW_LINE
@@ -1457,7 +1457,7 @@ public class TrainingView extends ViewPart {
 					+ Messages.HRMax_Label
 					+ UI.SPACE
 					+ zoneContext.hrMax
-					+ Messages.Graph_Label_Heartbeat_unit
+					+ net.tourbook.common.Messages.Graph_Label_Heartbeat_unit
 			//
 			;
 

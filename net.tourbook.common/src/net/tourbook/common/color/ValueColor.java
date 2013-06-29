@@ -13,24 +13,42 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
+package net.tourbook.common.color;
 
-package net.tourbook.mapping;
+public class ValueColor {
 
-import net.tourbook.common.color.ILegendProvider;
-import net.tourbook.data.TourData;
+	public float	value;
 
-public interface ILegendProviderDiscreteColors extends ILegendProvider {
+	public int		red;
+	public int		green;
+	public int		blue;
+
+	public ValueColor(final float value, final int red, final int green, final int blue) {
+
+		this.value = value;
+
+		this.red = red;
+		this.green = green;
+		this.blue = blue;
+	}
 
 	/**
-	 * @param tourData
-	 *            Tour which is currently painted, can be <code>null</code>.
-	 * @param valueIndex
-	 *            in the data serie
-	 * @param isDrawLine
-	 *            Is <code>true</code> when a line is painted. This requires that the painted color
-	 *            is adjusted.
-	 * @return Returns the RGB value for a graph value.
+	 * Create a copy
+	 * 
+	 * @param valueColor
 	 */
-	abstract int getColorValue(TourData tourData, int valueIndex, boolean isDrawLine);
+	public ValueColor(final ValueColor valueColor) {
+
+		value = valueColor.value;
+
+		red = valueColor.red;
+		green = valueColor.green;
+		blue = valueColor.blue;
+	}
+
+	@Override
+	public String toString() {
+		return "new ValueColor(" + value + ", " + red + ", " + green + ", " + blue + ")"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+	}
 
 }
