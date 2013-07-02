@@ -17,7 +17,7 @@ package net.tourbook.common.util;
 
 import java.util.ArrayList;
 
-import net.tourbook.common.Activator;
+import net.tourbook.common.CommonActivator;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.TrayDialog;
@@ -597,7 +597,7 @@ public class DialogModifyColumns extends TrayDialog {
 
 	@Override
 	protected IDialogSettings getDialogBoundsSettings() {
-		return Activator.getDefault().getDialogSettingsSection(getClass().getName() + "_DialogBounds"); //$NON-NLS-1$
+		return CommonActivator.getState(getClass().getName() + "_DialogBounds"); //$NON-NLS-1$
 	}
 
 	/**

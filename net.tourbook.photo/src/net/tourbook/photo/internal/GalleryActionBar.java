@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2012  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,7 +15,6 @@
  *******************************************************************************/
 package net.tourbook.photo.internal;
 
-import net.tourbook.common.Activator;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.Util;
 import net.tourbook.photo.IPhotoPreferences;

@@ -21,6 +21,6 @@ public interface ICommonPreferences {
 	 * colors
 	 */
 	public static final String	GRAPH_COLORS				= "graph.colors.";				//$NON-NLS-1$
-	public static final String	GRAPH_COLORS_HAS_CHANGED	= "graph.colors.has-changed";	//$NON-NLS-1$
+
 
 }

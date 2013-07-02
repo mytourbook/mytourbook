@@ -25,7 +25,6 @@ import net.tourbook.chart.ITooltipOwner;
 import net.tourbook.chart.IValuePointToolTip;
 import net.tourbook.common.PointLong;
 import net.tourbook.common.color.GraphColorProvider;
-import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.preferences.ITourbookPreferences;
@@ -279,7 +278,7 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 						hide();
 					}
 
-				} else if (property.equals(ICommonPreferences.GRAPH_COLORS_HAS_CHANGED)) {
+				} else if (property.equals(ITourbookPreferences.GRAPH_COLORS_HAS_CHANGED)) {
 
 					// dispose old colors
 					_colorCache.dispose();

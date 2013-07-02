@@ -30,7 +30,7 @@ import java.util.List;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import net.tourbook.common.Activator;
+import net.tourbook.common.CommonActivator;
 import net.tourbook.common.Messages;
 
 import org.eclipse.core.runtime.IPath;
@@ -314,7 +314,7 @@ public class GraphColorProvider {
 
 		try {
 
-			final IPath stateLocation = Platform.getStateLocation(Activator.getDefault().getBundle());
+			final IPath stateLocation = Platform.getStateLocation(CommonActivator.getDefault().getBundle());
 			final File file = stateLocation.append(MEMENTO_LEGEND_COLOR_FILE).toFile();
 
 			writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "UTF-8")); //$NON-NLS-1$
@@ -528,7 +528,7 @@ public class GraphColorProvider {
 	 */
 	private void readLegendColors() {
 
-		final IPath stateLocation = Platform.getStateLocation(Activator.getDefault().getBundle());
+		final IPath stateLocation = Platform.getStateLocation(CommonActivator.getDefault().getBundle());
 		final File file = stateLocation.append(MEMENTO_LEGEND_COLOR_FILE).toFile();
 
 		// check if file is available

@@ -15,7 +15,7 @@
  *******************************************************************************/
 package net.tourbook.common.color;
 
-import net.tourbook.common.Activator;
+import net.tourbook.common.CommonActivator;
 import net.tourbook.common.preferences.ICommonPreferences;
 
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -24,30 +24,32 @@ import org.eclipse.swt.graphics.RGB;
 
 public class ColorDefinition {
 
-	private String				_prefName;
-	private String				_visibleName;
+	private final IPreferenceStore	_commonPrefStore	= CommonActivator.getPrefStore();
 
-	private GraphColorItem[]	_colorParts;
+	private String					_prefName;
+	private String					_visibleName;
 
-	private RGB					_lineColor;
-	private RGB					_lineColorDefault;
-	private RGB					_lineColorNew;
+	private GraphColorItem[]		_colorParts;
 
-	private RGB					_gradientBright;
-	private RGB					_gradientBrightDefault;
-	private RGB					_gradientBrightNew;
+	private RGB						_lineColor;
+	private RGB						_lineColorDefault;
+	private RGB						_lineColorNew;
 
-	private RGB					_gradientDark;
-	private RGB					_gradientDarkDefault;
-	private RGB					_gradientDarkNew;
+	private RGB						_gradientBright;
+	private RGB						_gradientBrightDefault;
+	private RGB						_gradientBrightNew;
 
-	private RGB					_textColor;
-	private RGB					_textColorDefault;
-	private RGB					_textColorNew;
+	private RGB						_gradientDark;
+	private RGB						_gradientDarkDefault;
+	private RGB						_gradientDarkNew;
 
-	private LegendColor			_legendColor;
-	private LegendColor			_defaultLegendColor;
-	private LegendColor			_newLegendColor;
+	private RGB						_textColor;
+	private RGB						_textColorDefault;
+	private RGB						_textColorNew;
+
+	private LegendColor				_legendColor;
+	private LegendColor				_defaultLegendColor;
+	private LegendColor				_newLegendColor;
 
 	/**
 	 * Sets the color for the default, current and changes
@@ -85,15 +87,14 @@ public class ColorDefinition {
 
 		_defaultLegendColor = defaultLegendColor;
 
-		final IPreferenceStore prefStore = Activator.getDefault().getPreferenceStore();
 		final String graphPrefName = getGraphPrefName();
 
 		/*
 		 * set gradient bright from pref store or default
 		 */
 		final String prefColorGradientBright = graphPrefName + GraphColorProvider.PREF_COLOR_BRIGHT;
-		if (prefStore.contains(prefColorGradientBright)) {
-			_gradientBright = PreferenceConverter.getColor(prefStore, prefColorGradientBright);
+		if (_commonPrefStore.contains(prefColorGradientBright)) {
+			_gradientBright = PreferenceConverter.getColor(_commonPrefStore, prefColorGradientBright);
 		} else {
 			_gradientBright = _gradientBrightDefault;
 		}
@@ -103,8 +104,8 @@ public class ColorDefinition {
 		 * gradient dark
 		 */
 		final String prefColorGradientDark = graphPrefName + GraphColorProvider.PREF_COLOR_DARK;
-		if (prefStore.contains(prefColorGradientDark)) {
-			_gradientDark = PreferenceConverter.getColor(prefStore, prefColorGradientDark);
+		if (_commonPrefStore.contains(prefColorGradientDark)) {
+			_gradientDark = PreferenceConverter.getColor(_commonPrefStore, prefColorGradientDark);
 		} else {
 			_gradientDark = _gradientDarkDefault;
 		}
@@ -114,8 +115,8 @@ public class ColorDefinition {
 		 * line color
 		 */
 		final String prefColorLine = graphPrefName + GraphColorProvider.PREF_COLOR_LINE;
-		if (prefStore.contains(prefColorLine)) {
-			_lineColor = PreferenceConverter.getColor(prefStore, prefColorLine);
+		if (_commonPrefStore.contains(prefColorLine)) {
+			_lineColor = PreferenceConverter.getColor(_commonPrefStore, prefColorLine);
 		} else {
 			_lineColor = _lineColorDefault;
 		}
@@ -125,8 +126,8 @@ public class ColorDefinition {
 		 * text color
 		 */
 		final String prefColorText = graphPrefName + GraphColorProvider.PREF_COLOR_TEXT;
-		if (prefStore.contains(prefColorText)) {
-			_textColor = PreferenceConverter.getColor(prefStore, prefColorText);
+		if (_commonPrefStore.contains(prefColorText)) {
+			_textColor = PreferenceConverter.getColor(_commonPrefStore, prefColorText);
 		} else {
 			_textColor = _textColorDefault;
 		}

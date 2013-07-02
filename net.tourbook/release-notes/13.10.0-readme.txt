@@ -1,20 +1,35 @@
 Version: 13.10.0                                            ?. ? 2013
 
 
-* Chart + map colors have been reset (because of internal structure changes)
-When you have not customized the colors, you don't have to care about the following description.
-When you have customized colors, follow these steps to get your old colors back, when you don't do this, you will see the default colors but you can do these steps later because the old color values will not be replaced.
-1. move file ...mytourbook\.metadata\.plugins\net.tourbook\legendcolor.xml
-  to        ...mytourbook\.metadata\.plugins\net.tourbook.common\legendcolor.xml
+* Chart + map colors have been reset to the default colors (because of internal structure changes)
+
+When you have not customized the colors, you are set, you don't have to migrateit.
+
+When you have customized colors, follow these steps to get your old colors back. When you don't do this now, you will see the default colors but you can do these steps later because the old color values will not be deleted or modified.
+
+1. Move file "legendcolor.xml"
+ from ...mytourbook\.metadata\.plugins\net.tourbook\
+ to   ...mytourbook\.metadata\.plugins\net.tourbook.common\
 		
-2. start application
-3. make any color change in the preference dialog and press OK (this will force that a new pref file is created)
-4. close application
-5. copy any lines which are starting with "graph.colors." from the file ...mytourbook\.metadata\.plugins\org.eclipse.core.runtime\.settings\net.tourbook.prefs into the new file (which was created with step 3) ...mytourbook\.metadata\.plugins\org.eclipse.core.runtime\.settings\net.tourbook.common.prefs and replace existing lines which start with "graph.colors."
-6. start application
+2. Start application
+
+3. Change any color (but not the mapping color) in Appearance/Colors in the preference dialog and press OK, this will force that a new pref file is created
+
+4. Close application
+
+5. From the file "net.tourbook.prefs" in "...mytourbook\.metadata\.plugins\org.eclipse.core.runtime\.settings\"
+
+ move any lines which are starting with "graph.colors."
+ 
+ into the new file "net.tourbook.common.prefs" (which was created in step 3 and is is in the same folder)
+ 
+ and replace existing lines which start with "graph.colors."
+
+6. Start application
 
 Why is it so complicated?
-The colors will also be used in the new 3D map and therefore a restructuring is necessary.
+The colors will now also be used in the new 3D map and therefore a restructuring was necessary.
+
 
 Changed Behaviour
 

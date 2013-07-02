@@ -28,10 +28,9 @@ import net.tourbook.chart.ChartDataXSerie;
 import net.tourbook.chart.ChartDataYSerie;
 import net.tourbook.chart.ChartType;
 import net.tourbook.chart.ComputeChartValue;
-import net.tourbook.common.Activator;
+import net.tourbook.common.CommonActivator;
 import net.tourbook.common.color.GraphColorProvider;
 import net.tourbook.common.preferences.ICommonPreferences;
-import net.tourbook.common.util.IExternalTourEvents;
 import net.tourbook.common.util.MtMath;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.StringToArrayConverter;
@@ -126,7 +125,8 @@ public class TourManager {
 
 	private static TourManager				_instance;
 
-	private final static IPreferenceStore	_prefStore								= TourbookPlugin.getDefault() //
+	private final static IPreferenceStore	_prefStore								= TourbookPlugin
+																							.getDefault()
 																							.getPreferenceStore();
 
 	/**
@@ -164,13 +164,11 @@ public class TourManager {
 
 		createAvgCallbacks();
 
-		final IPreferenceStore commonPrefStore = Activator.getDefault().getPreferenceStore();
-
-		commonPrefStore.addPropertyChangeListener(new IPropertyChangeListener() {
+		_prefStore.addPropertyChangeListener(new IPropertyChangeListener() {
 			@Override
 			public void propertyChange(final PropertyChangeEvent event) {
 
-				if (event.getProperty().equals(IExternalTourEvents.CLEAR_TOURDATA_CACHE)) {
+				if (event.getProperty().equals(ITourbookPreferences.CLEAR_TOURDATA_CACHE)) {
 
 					clearTourDataCache();
 
@@ -1207,22 +1205,22 @@ public class TourManager {
 		final String prefGraphName = ICommonPreferences.GRAPH_COLORS + graphName + "."; //$NON-NLS-1$
 
 		// get COLOR from common pref store
-		final IPreferenceStore prefStore = Activator.getDefault().getPreferenceStore();
+		final IPreferenceStore _commonPrefStore = CommonActivator.getPrefStore();
 
 		final RGB prefLineColor = PreferenceConverter.getColor(//
-				prefStore,
+				_commonPrefStore,
 				prefGraphName + GraphColorProvider.PREF_COLOR_LINE);
 
 		final RGB prefTextColor = PreferenceConverter.getColor(//
-				prefStore,
+				_commonPrefStore,
 				prefGraphName + GraphColorProvider.PREF_COLOR_TEXT);
 
 		final RGB prefDarkColor = PreferenceConverter.getColor(//
-				prefStore,
+				_commonPrefStore,
 				prefGraphName + GraphColorProvider.PREF_COLOR_DARK);
 
 		final RGB prefBrightColor = PreferenceConverter.getColor(//
-				prefStore,
+				_commonPrefStore,
 				prefGraphName + GraphColorProvider.PREF_COLOR_BRIGHT);
 
 		/*

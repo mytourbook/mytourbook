@@ -15,7 +15,7 @@
  *******************************************************************************/
 package net.tourbook.common.preferences;
 
-import net.tourbook.common.Activator;
+import net.tourbook.common.CommonActivator;
 import net.tourbook.common.color.ColorDefinition;
 import net.tourbook.common.color.GraphColorProvider;
 
@@ -31,7 +31,7 @@ public class CommonPreferenceInitializer extends AbstractPreferenceInitializer {
 	@Override
 	public void initializeDefaultPreferences() {
 
-		final IPreferenceStore store = Activator.getDefault().getPreferenceStore();
+		final IPreferenceStore commonPrefStore = CommonActivator.getPrefStore();
 
 		/*
 		 * graph color preferences
@@ -41,17 +41,17 @@ public class CommonPreferenceInitializer extends AbstractPreferenceInitializer {
 			final String graphPrefName = graphDefinition.getGraphPrefName();
 
 			PreferenceConverter.setDefault(
-					store,
+					commonPrefStore,
 					graphPrefName + GraphColorProvider.PREF_COLOR_BRIGHT,
 					graphDefinition.getDefaultGradientBright());
 
 			PreferenceConverter.setDefault(
-					store,
+					commonPrefStore,
 					graphPrefName + GraphColorProvider.PREF_COLOR_DARK,
 					graphDefinition.getDefaultGradientDark());
 
 			PreferenceConverter.setDefault(
-					store,
+					commonPrefStore,
 					graphPrefName + GraphColorProvider.PREF_COLOR_LINE,
 					graphDefinition.getDefaultLineColor());
 

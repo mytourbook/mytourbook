@@ -19,7 +19,6 @@ import java.util.ArrayList;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
-import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.ITourbookPreferences;
@@ -56,7 +55,7 @@ public abstract class YearStatistic extends TourbookStatistic implements IYearSt
 				final String property = event.getProperty();
 
 				// test if the color or statistic data have changed
-				if (property.equals(ICommonPreferences.GRAPH_COLORS_HAS_CHANGED)
+				if (property.equals(ITourbookPreferences.GRAPH_COLORS_HAS_CHANGED)
 				//
 						|| property.equals(ITourbookPreferences.GRAPH_GRID_HORIZONTAL_DISTANCE)
 						|| property.equals(ITourbookPreferences.GRAPH_GRID_VERTICAL_DISTANCE)

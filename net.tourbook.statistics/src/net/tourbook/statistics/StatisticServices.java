@@ -17,8 +17,8 @@ package net.tourbook.statistics;
 
 import java.util.ArrayList;
 
-import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.ChartDataYSerie;
+import net.tourbook.common.CommonActivator;
 import net.tourbook.common.color.GraphColorProvider;
 import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.data.TourType;
@@ -45,11 +45,13 @@ public class StatisticServices {
 	 */
 	public static void setDefaultColors(final ChartDataYSerie yData, final String graphName) {
 
-		final IPreferenceStore prefStore = TourbookPlugin.getDefault().getPreferenceStore();
+		final IPreferenceStore commonPrefStore = CommonActivator.getPrefStore();
+
 		final String defaultColorName = ICommonPreferences.GRAPH_COLORS + graphName + "."; //$NON-NLS-1$
 
 		// put the color into the chart data
-		yData.setDefaultRGB(PreferenceConverter.getColor(prefStore, //
+		yData.setDefaultRGB(PreferenceConverter.getColor(//
+				commonPrefStore,
 				defaultColorName + GraphColorProvider.PREF_COLOR_LINE));
 	}
 
@@ -117,14 +119,24 @@ public class StatisticServices {
 			/*
 			 * color index 0: default color
 			 */
-			final IPreferenceStore prefStore = TourbookPlugin.getDefault().getPreferenceStore();
+			final IPreferenceStore commonPrefStore = CommonActivator.getPrefStore();
 			final String defaultColorName = ICommonPreferences.GRAPH_COLORS + graphName + "."; //$NON-NLS-1$
 
-			rgbBright.add(PreferenceConverter.getColor(prefStore, defaultColorName
-					+ GraphColorProvider.PREF_COLOR_BRIGHT));
-			rgbDark.add(PreferenceConverter.getColor(prefStore, defaultColorName + GraphColorProvider.PREF_COLOR_DARK));
-			rgbLine.add(PreferenceConverter.getColor(prefStore, defaultColorName + GraphColorProvider.PREF_COLOR_LINE));
-			rgbText.add(PreferenceConverter.getColor(prefStore, defaultColorName + GraphColorProvider.PREF_COLOR_TEXT));
+			rgbBright.add(PreferenceConverter.getColor(//
+					commonPrefStore,
+					defaultColorName + GraphColorProvider.PREF_COLOR_BRIGHT));
+
+			rgbDark.add(PreferenceConverter.getColor(//
+					commonPrefStore,
+					defaultColorName + GraphColorProvider.PREF_COLOR_DARK));
+
+			rgbLine.add(PreferenceConverter.getColor(//
+					commonPrefStore,
+					defaultColorName + GraphColorProvider.PREF_COLOR_LINE));
+
+			rgbText.add(PreferenceConverter.getColor(//
+					commonPrefStore,
+					defaultColorName + GraphColorProvider.PREF_COLOR_TEXT));
 		}
 
 		/*

@@ -41,7 +41,6 @@ import net.tourbook.common.PointLong;
 import net.tourbook.common.UI;
 import net.tourbook.common.action.ActionOpenPrefDialog;
 import net.tourbook.common.color.GraphColorProvider;
-import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.common.util.IToolTipHideListener;
 import net.tourbook.common.util.TourToolTip;
 import net.tourbook.data.TourData;
@@ -723,7 +722,7 @@ public class TourChart extends Chart {
 
 					isChartModified = true;
 
-				} else if (property.equals(ICommonPreferences.GRAPH_COLORS_HAS_CHANGED)) {
+				} else if (property.equals(ITourbookPreferences.GRAPH_COLORS_HAS_CHANGED)) {
 
 					/*
 					 * when the chart is computed, the modified colors are read from the preferences

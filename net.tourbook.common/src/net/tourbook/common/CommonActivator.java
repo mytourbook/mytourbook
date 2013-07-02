@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2012  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -16,6 +16,7 @@
 package net.tourbook.common;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
@@ -23,25 +24,25 @@ import org.osgi.framework.BundleContext;
 /**
  * The activator class controls the plug-in life cycle
  */
-public class Activator extends AbstractUIPlugin {
+public class CommonActivator extends AbstractUIPlugin {
 
 	// The plug-in ID
-	public static final String	PLUGIN_ID	= "net.tourbook.common";	//$NON-NLS-1$
+	public static final String		PLUGIN_ID	= "net.tourbook.common";	//$NON-NLS-1$
 
 	// The shared instance
-	private static Activator	plugin;
+	private static CommonActivator	plugin;
 
 	/**
 	 * The constructor
 	 */
-	public Activator() {}
+	public CommonActivator() {}
 
 	/**
 	 * Returns the shared instance
 	 * 
 	 * @return the shared instance
 	 */
-	public static Activator getDefault() {
+	public static CommonActivator getDefault() {
 		return plugin;
 	}
 
@@ -56,14 +57,19 @@ public class Activator extends AbstractUIPlugin {
 		return imageDescriptorFromPlugin(PLUGIN_ID, "icons/" + path); //$NON-NLS-1$
 	}
 
+	public static IPreferenceStore getPrefStore() {
+		return getDefault().getPreferenceStore();
+	}
+
 	/**
 	 * @param sectionName
 	 * @return Returns the dialog setting section for the sectionName, a section is always returned
 	 *         even when it's empty
 	 */
-	public IDialogSettings getDialogSettingsSection(final String sectionName) {
+	public static IDialogSettings getState(final String sectionName) {
 
-		final IDialogSettings dialogSettings = getDialogSettings();
+		final IDialogSettings dialogSettings = getDefault().getDialogSettings();
+
 		IDialogSettings section = dialogSettings.getSection(sectionName);
 
 		if (section == null) {

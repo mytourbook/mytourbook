@@ -20,8 +20,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 import net.tourbook.application.TourbookPlugin;
-import net.tourbook.common.Activator;
-import net.tourbook.common.util.IExternalTourEvents;
+import net.tourbook.preferences.ITourbookPreferences;
 
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -63,7 +62,7 @@ public class PrefPageSRTM extends PreferencePage implements IWorkbenchPreference
 
 //	http://dds.cr.usgs.gov/srtm/version2_1/SRTM3/Eurasia/N47E008.hgt.zip
 
-	private IPreferenceStore		_prefStore;
+	private IPreferenceStore		_prefStore				= TourbookPlugin.getDefault().getPreferenceStore();
 
 	private final String			_defaultSRTMFilePath	= Platform.getInstanceLocation().getURL().getPath();
 
@@ -85,8 +84,6 @@ public class PrefPageSRTM extends PreferencePage implements IWorkbenchPreference
 
 	@Override
 	protected Control createContents(final Composite parent) {
-
-		_prefStore = TourbookPlugin.getDefault().getPreferenceStore();
 
 		createUI(parent);
 
@@ -373,11 +370,8 @@ public class PrefPageSRTM extends PreferencePage implements IWorkbenchPreference
 
 			ElevationSRTM3.clearElevationFileCache();
 
-			// fire event to clear the tour data cache which remove existing srtm data
-			Activator
-					.getDefault()
-					.getPreferenceStore()
-					.setValue(IExternalTourEvents.CLEAR_TOURDATA_CACHE, Math.random());
+			// fire event to clear the tour data cache which removes existing srtm data
+			_prefStore.setValue(ITourbookPreferences.CLEAR_TOURDATA_CACHE, Math.random());
 		}
 
 		return super.performOk();

@@ -31,7 +31,6 @@ import net.tourbook.common.color.LegendConfig;
 import net.tourbook.common.color.LegendUnitFormat;
 import net.tourbook.common.color.ValueColor;
 import net.tourbook.common.map.GeoPosition;
-import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.data.TourWayPoint;
@@ -76,8 +75,6 @@ public class TourMapPainter extends MapPainter {
 
 	private static final int				MARKER_MARGIN		= 2;
 	private static final int				MARKER_POLE			= 16;
-
-	private final static IPreferenceStore	_prefStore			= TourbookPlugin.getDefault().getPreferenceStore();
 
 	private static IPropertyChangeListener	_prefChangeListener;
 
@@ -532,14 +529,15 @@ public class TourMapPainter extends MapPainter {
 				final String property = event.getProperty();
 
 				// test if the color or statistic data have changed
-				if (property.equals(ICommonPreferences.GRAPH_COLORS_HAS_CHANGED)) {
+				if (property.equals(ITourbookPreferences.GRAPH_COLORS_HAS_CHANGED)) {
 					getTourPainterSettings();
 				}
 			}
 		};
 
-		// add pref listener
-		_prefStore.addPropertyChangeListener(_prefChangeListener);
+		// add pref listener, dispose is not removing it because it is static !!!
+		TourbookPlugin.getDefault().getPreferenceStore()//
+				.addPropertyChangeListener(_prefChangeListener);
 	}
 
 	private void createImages() {

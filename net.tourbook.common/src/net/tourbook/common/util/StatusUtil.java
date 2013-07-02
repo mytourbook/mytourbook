@@ -13,7 +13,7 @@ package net.tourbook.common.util;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-import net.tourbook.common.Activator;
+import net.tourbook.common.CommonActivator;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
@@ -88,7 +88,7 @@ public class StatusUtil {
 	 */
 	public static void handleStatus(final String message, final Throwable e, final int style, final int severity) {
 		StatusManager.getManager().handle(
-				newStatus(Activator.PLUGIN_ID, message, e, severity),
+				newStatus(CommonActivator.PLUGIN_ID, message, e, severity),
 				style | StatusManager.LOG);
 	}
 
@@ -159,7 +159,7 @@ public class StatusUtil {
 			}
 		}
 
-		return new Status(severity, Activator.PLUGIN_ID, severity, statusMessage, getCause(exception));
+		return new Status(severity, CommonActivator.PLUGIN_ID, severity, statusMessage, getCause(exception));
 	}
 
 	private static IStatus newStatus(	final String pluginId,

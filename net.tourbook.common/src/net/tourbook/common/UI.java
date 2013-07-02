@@ -213,39 +213,39 @@ public class UI {
 
 	static {
 
-		IMAGE_REGISTRY = Activator.getDefault().getImageRegistry();
+		IMAGE_REGISTRY = CommonActivator.getDefault().getImageRegistry();
 
 		IMAGE_REGISTRY.put(IMAGE_ACTION_PHOTO_FILTER, //
-				Activator.getImageDescriptor(Messages.Image_Action_PhotoFilter));
+				CommonActivator.getImageDescriptor(Messages.Image_Action_PhotoFilter));
 		IMAGE_REGISTRY.put(IMAGE_ACTION_PHOTO_FILTER_NO_PHOTOS, //
-				Activator.getImageDescriptor(Messages.Image_Action_PhotoFilterNoPhotos));
+				CommonActivator.getImageDescriptor(Messages.Image_Action_PhotoFilterNoPhotos));
 		IMAGE_REGISTRY.put(IMAGE_ACTION_PHOTO_FILTER_WITH_PHOTOS, //
-				Activator.getImageDescriptor(Messages.Image_Action_PhotoFilterWithPhotos));
+				CommonActivator.getImageDescriptor(Messages.Image_Action_PhotoFilterWithPhotos));
 		IMAGE_REGISTRY.put(IMAGE_ACTION_PHOTO_FILTER_DISABLED,//
-				Activator.getImageDescriptor(Messages.Image_Action_PhotoFilter_Disabled));
+				CommonActivator.getImageDescriptor(Messages.Image_Action_PhotoFilter_Disabled));
 
 		IMAGE_REGISTRY.put(IMAGE_CONFIGURE_COLUMNS, //
-				Activator.getImageDescriptor(Messages.Image__ConfigureColumns));
+				CommonActivator.getImageDescriptor(Messages.Image__ConfigureColumns));
 		IMAGE_REGISTRY.put(IMAGE_EMPTY_16, //
-				Activator.getImageDescriptor(Messages.Image___Empty16));
+				CommonActivator.getImageDescriptor(Messages.Image___Empty16));
 
 		// weather images
 		IMAGE_REGISTRY.put(IWeather.WEATHER_ID_CLEAR, //
-				Activator.getImageDescriptor(Messages.Image__weather_sunny));
+				CommonActivator.getImageDescriptor(Messages.Image__weather_sunny));
 		IMAGE_REGISTRY.put(IWeather.WEATHER_ID_PART_CLOUDS, //
-				Activator.getImageDescriptor(Messages.Image__weather_cloudy));
+				CommonActivator.getImageDescriptor(Messages.Image__weather_cloudy));
 		IMAGE_REGISTRY.put(IWeather.WEATHER_ID_OVERCAST, //
-				Activator.getImageDescriptor(Messages.Image__weather_clouds));
+				CommonActivator.getImageDescriptor(Messages.Image__weather_clouds));
 		IMAGE_REGISTRY.put(IWeather.WEATHER_ID_LIGHTNING,//
-				Activator.getImageDescriptor(Messages.Image__weather_lightning));
+				CommonActivator.getImageDescriptor(Messages.Image__weather_lightning));
 		IMAGE_REGISTRY.put(IWeather.WEATHER_ID_RAIN,//
-				Activator.getImageDescriptor(Messages.Image__weather_rain));
+				CommonActivator.getImageDescriptor(Messages.Image__weather_rain));
 		IMAGE_REGISTRY.put(IWeather.WEATHER_ID_SNOW,//
-				Activator.getImageDescriptor(Messages.Image__weather_snow));
+				CommonActivator.getImageDescriptor(Messages.Image__weather_snow));
 		IMAGE_REGISTRY.put(IWeather.WEATHER_ID_SCATTERED_SHOWERS,//
-				Activator.getImageDescriptor(Messages.Image__Weather_ScatteredShowers));
+				CommonActivator.getImageDescriptor(Messages.Image__Weather_ScatteredShowers));
 		IMAGE_REGISTRY.put(IWeather.WEATHER_ID_SEVERE_WEATHER_ALERT,//
-				Activator.getImageDescriptor(Messages.Image__Weather_Severe));
+				CommonActivator.getImageDescriptor(Messages.Image__Weather_Severe));
 
 	}
 

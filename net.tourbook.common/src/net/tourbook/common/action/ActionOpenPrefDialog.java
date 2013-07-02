@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2012  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,7 +15,7 @@
  *******************************************************************************/
 package net.tourbook.common.action;
 
-import net.tourbook.common.Activator;
+import net.tourbook.common.CommonActivator;
 import net.tourbook.common.Messages;
 
 import org.eclipse.jface.action.Action;
@@ -29,13 +29,14 @@ public final class ActionOpenPrefDialog extends Action {
 	public ActionOpenPrefDialog(final String text, final String prefPageId) {
 
 		setText(text);
-		setImageDescriptor(Activator.getImageDescriptor(Messages.Image__options));
+		setImageDescriptor(CommonActivator.getImageDescriptor(Messages.Image__options));
 
 		_prefPageId = prefPageId;
 	}
 
 	@Override
 	public void run() {
+
 		PreferencesUtil.createPreferenceDialogOn(//
 		Display.getCurrent().getActiveShell(),
 				_prefPageId,

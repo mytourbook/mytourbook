@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -28,6 +28,7 @@ import net.tourbook.chart.ChartDataXSerie;
 import net.tourbook.chart.ChartDataYSerie;
 import net.tourbook.chart.ChartType;
 import net.tourbook.chart.IChartLayer;
+import net.tourbook.common.CommonActivator;
 import net.tourbook.common.color.GraphColorProvider;
 import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.common.util.Util;
@@ -87,8 +88,7 @@ public class ConconiChartView extends ViewPart {
 	private final boolean			_isOSX							= net.tourbook.common.UI.IS_OSX;
 	private final boolean			_isLinux						= net.tourbook.common.UI.IS_LINUX;
 
-	private final IPreferenceStore	_prefStore						= TourbookPlugin.getDefault() //
-																			.getPreferenceStore();
+	private final IPreferenceStore	_commonPrefStore				= CommonActivator.getPrefStore();
 
 	private final IDialogSettings	_state							= TourbookPlugin.getDefault().//
 																			getDialogSettingsSection(ID);
@@ -249,15 +249,15 @@ public class ConconiChartView extends ViewPart {
 		final String prefGraphName = ICommonPreferences.GRAPH_COLORS + GraphColorProvider.PREF_GRAPH_HEARTBEAT + "."; //$NON-NLS-1$
 
 		final RGB rgbPrefLine = PreferenceConverter.getColor(//
-				_prefStore,
+				_commonPrefStore,
 				prefGraphName + GraphColorProvider.PREF_COLOR_LINE);
 
 		final RGB rgbPrefDark = PreferenceConverter.getColor(//
-				_prefStore,
+				_commonPrefStore,
 				prefGraphName + GraphColorProvider.PREF_COLOR_DARK);
 
 		final RGB rgbPrefBright = PreferenceConverter.getColor(//
-				_prefStore,
+				_commonPrefStore,
 				prefGraphName + GraphColorProvider.PREF_COLOR_BRIGHT);
 
 		final double[][] powerSerie = new double[validDataLength][];

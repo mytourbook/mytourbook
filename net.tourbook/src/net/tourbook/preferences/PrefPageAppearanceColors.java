@@ -20,7 +20,8 @@ import java.util.Arrays;
 import java.util.List;
 
 import net.tourbook.Messages;
-import net.tourbook.common.Activator;
+import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.CommonActivator;
 import net.tourbook.common.color.ColorDefinition;
 import net.tourbook.common.color.GraphColorItem;
 import net.tourbook.common.color.GraphColorProvider;
@@ -74,20 +75,23 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 
 public class PrefPageAppearanceColors extends PreferencePage implements IWorkbenchPreferencePage, IColorTreeViewer {
 
-	private static final List<Float>		_unitValues		= Arrays.asList(10f, 50f, 100f, 150f, 190f);
-	private static final List<String>		_unitLabels		= Arrays.asList(
-																	Messages.Pref_ChartColors_unit_min,
-																	Messages.Pref_ChartColors_unit_low,
-																	Messages.Pref_ChartColors_unit_mid,
-																	Messages.Pref_ChartColors_unit_high,
-																	Messages.Pref_ChartColors_unit_max);
+	private static final List<Float>		_unitValues			= Arrays.asList(10f, 50f, 100f, 150f, 190f);
+	private static final List<String>		_unitLabels			= Arrays.asList(
+																		Messages.Pref_ChartColors_unit_min,
+																		Messages.Pref_ChartColors_unit_low,
+																		Messages.Pref_ChartColors_unit_mid,
+																		Messages.Pref_ChartColors_unit_high,
+																		Messages.Pref_ChartColors_unit_max);
 
-	private ValueColor[]					_valueColors	= new ValueColor[] {
+	private final IPreferenceStore			_prefStore			= TourbookPlugin.getDefault().getPreferenceStore();
+	private final IPreferenceStore			_commonPrefStore	= CommonActivator.getPrefStore();
+
+	private ValueColor[]					_valueColors		= new ValueColor[] {
 			new ValueColor(10, 255, 0, 0),
 			new ValueColor(50, 100, 100, 0),
 			new ValueColor(100, 0, 255, 0),
 			new ValueColor(150, 0, 100, 100),
-			new ValueColor(190, 0, 0, 255)					};
+			new ValueColor(190, 0, 0, 255)						};
 
 	TreeViewer								_colorViewer;
 
@@ -243,7 +247,7 @@ public class PrefPageAppearanceColors extends PreferencePage implements IWorkben
 				| SWT.FULL_SELECTION);
 
 		tree.setHeaderVisible(false);
-		tree.setLinesVisible(getPreferenceStore().getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
+		tree.setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
 
 		_colorViewer = new TreeViewer(tree);
 		defineAllColumns(treeLayout, tree);
@@ -430,7 +434,7 @@ public class PrefPageAppearanceColors extends PreferencePage implements IWorkben
 	}
 
 	public void init(final IWorkbench workbench) {
-		setPreferenceStore(Activator.getDefault().getPreferenceStore());
+		setPreferenceStore(_commonPrefStore);
 	}
 
 	/**
@@ -620,29 +624,27 @@ public class PrefPageAppearanceColors extends PreferencePage implements IWorkben
 	 */
 	private void saveGraphColors() {
 
-		final IPreferenceStore prefStore = getPreferenceStore();
-
 		for (final ColorDefinition graphDefinition : GraphColorProvider.getInstance().getGraphColorDefinitions()) {
 
 			final String prefGraphName = ICommonPreferences.GRAPH_COLORS + graphDefinition.getPrefName() + "."; //$NON-NLS-1$
 
 			PreferenceConverter.setValue(
-					prefStore,
+					_commonPrefStore,
 					prefGraphName + GraphColorProvider.PREF_COLOR_BRIGHT,
 					graphDefinition.getNewGradientBright());
 
 			PreferenceConverter.setValue(
-					prefStore,
+					_commonPrefStore,
 					prefGraphName + GraphColorProvider.PREF_COLOR_DARK,
 					graphDefinition.getNewGradientDark());
 
 			PreferenceConverter.setValue(
-					prefStore,
+					_commonPrefStore,
 					prefGraphName + GraphColorProvider.PREF_COLOR_LINE,
 					graphDefinition.getNewLineColor());
 
 			PreferenceConverter.setValue(
-					prefStore,
+					_commonPrefStore,
 					prefGraphName + GraphColorProvider.PREF_COLOR_TEXT,
 					graphDefinition.getNewTextColor());
 		}
@@ -666,7 +668,8 @@ public class PrefPageAppearanceColors extends PreferencePage implements IWorkben
 		}
 
 		// force to change the status
-		getPreferenceStore().setValue(ICommonPreferences.GRAPH_COLORS_HAS_CHANGED, Math.random());
+		TourbookPlugin.getDefault().getPreferenceStore()//
+				.setValue(ITourbookPreferences.GRAPH_COLORS_HAS_CHANGED, Math.random());
 	}
 
 	private void updateColorsFromDialog(final ColorDefinition selectedColorDefinition) {

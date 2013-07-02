@@ -17,7 +17,6 @@ package net.tourbook.preferences;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
-import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.common.util.Util;
 import net.tourbook.ui.UI;
 
@@ -287,7 +286,7 @@ public class PrefPageAppearanceMap extends FieldEditorPreferencePage implements 
 	 * fire one event for all modifications
 	 */
 	private void fireModificationEvent() {
-		_prefStore.setValue(ICommonPreferences.GRAPH_COLORS_HAS_CHANGED, Math.random());
+		_prefStore.setValue(ITourbookPreferences.GRAPH_COLORS_HAS_CHANGED, Math.random());
 	}
 
 	@Override

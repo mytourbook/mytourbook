@@ -33,7 +33,6 @@ import net.tourbook.common.color.ILegendProvider;
 import net.tourbook.common.color.LegendConfig;
 import net.tourbook.common.color.LegendUnitFormat;
 import net.tourbook.common.map.GeoPosition;
-import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.common.util.ITourToolTipProvider;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.TourToolTip;
@@ -741,7 +740,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 					_map.setTourPaintMethodEnhanced(//
 							event.getNewValue().equals(PrefPageAppearanceMap.TOUR_PAINT_METHOD_COMPLEX));
 
-				} else if (property.equals(ICommonPreferences.GRAPH_COLORS_HAS_CHANGED)) {
+				} else if (property.equals(ITourbookPreferences.GRAPH_COLORS_HAS_CHANGED)) {
 
 					// update tour and legend
 

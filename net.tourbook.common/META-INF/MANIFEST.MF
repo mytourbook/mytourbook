@@ -3,7 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: MyTourbook Commons
 Bundle-SymbolicName: net.tourbook.common;singleton:=true
 Bundle-Version: 13.4.2.qualifier
-Bundle-Activator: net.tourbook.common.Activator
+Bundle-Activator: net.tourbook.common.CommonActivator
 Bundle-Vendor: MyTourbook
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime

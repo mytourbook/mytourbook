@@ -15,6 +15,8 @@
  *******************************************************************************/
 package net.tourbook.preferences;
 
+import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.CommonActivator;
 import net.tourbook.ui.UI;
 
 public interface ITourbookPreferences {
@@ -30,6 +32,7 @@ public interface ITourbookPreferences {
 	 * system
 	 */
 	public static final String	TOUR_CACHE_SIZE								= "TourCacheSize";											//$NON-NLS-1$
+	public static final String	CLEAR_TOURDATA_CACHE						= "CLEAR_TOURDATA_CACHE";									//$NON-NLS-1$
 
 	/*
 	 * tour database
@@ -106,6 +109,14 @@ public interface ITourbookPreferences {
 	public static final String	GRAPH_JAMET_SMOOTHING_SPEED_TAU				= "GraphJametSmoothing_SpeedSmoothingTau";					//$NON-NLS-1$
 	public static final String	GRAPH_JAMET_SMOOTHING_REPEATED_SMOOTHING	= "GraphJametSmoothing_RepeatedSmoothing";					//$NON-NLS-1$
 	public static final String	GRAPH_JAMET_SMOOTHING_REPEATED_TAU			= "GraphJametSmoothing_RepeatedTau";						//$NON-NLS-1$
+
+	/**
+	 * Graph color change flag.
+	 * <p>
+	 * Graph colors are set in the {@link CommonActivator} pref store, but the change flag is hosted
+	 * in the {@link TourbookPlugin} pref store.
+	 */
+	public static final String	GRAPH_COLORS_HAS_CHANGED					= "graph.colors.has-changed";								//$NON-NLS-1$
 
 	/*
 	 * 
