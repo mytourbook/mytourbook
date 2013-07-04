@@ -28,10 +28,10 @@ import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.color.ColorDefinition;
 import net.tourbook.common.color.GraphColorItem;
 import net.tourbook.common.color.GraphColorProvider;
+import net.tourbook.common.color.ILegendProviderGradientColors;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
-import net.tourbook.mapping.ILegendProviderGradientColors;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.UI;
 

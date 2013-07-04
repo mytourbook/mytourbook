@@ -42,6 +42,7 @@ import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.ChartLabel;
 import net.tourbook.chart.SelectionChartInfo;
 import net.tourbook.chart.SelectionChartXSliderPosition;
+import net.tourbook.common.UI;
 import net.tourbook.common.action.ActionOpenPrefDialog;
 import net.tourbook.common.util.ColumnDefinition;
 import net.tourbook.common.util.ColumnManager;
@@ -78,7 +79,6 @@ import net.tourbook.ui.ITourProvider2;
 import net.tourbook.ui.ImageComboLabel;
 import net.tourbook.ui.MessageManager;
 import net.tourbook.ui.TableColumnFactory;
-import net.tourbook.ui.UI;
 import net.tourbook.ui.action.ActionExtractTour;
 import net.tourbook.ui.action.ActionModifyColumns;
 import net.tourbook.ui.action.ActionSetTourTypeMenu;
@@ -807,7 +807,9 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 					// none metric measurement systemm
 
-					displayedValue = metricValue * UI.UNIT_FAHRENHEIT_MULTI + UI.UNIT_FAHRENHEIT_ADD;
+					displayedValue = metricValue
+							* net.tourbook.ui.UI.UNIT_FAHRENHEIT_MULTI
+							+ net.tourbook.ui.UI.UNIT_FAHRENHEIT_ADD;
 				}
 			}
 
@@ -850,7 +852,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 							// none metric measurement systemm, convert entered value into metric value
 
-							metricValue = ((enteredValue - UI.UNIT_FAHRENHEIT_ADD)) / UI.UNIT_FAHRENHEIT_MULTI;
+							metricValue = ((enteredValue - net.tourbook.ui.UI.UNIT_FAHRENHEIT_ADD))
+									/ net.tourbook.ui.UI.UNIT_FAHRENHEIT_MULTI;
 						}
 					}
 
@@ -1279,7 +1282,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		dialog.setFilterPath(_viewState.get(STATE_CSV_EXPORT_PATH));
 		dialog.setFilterExtensions(new String[] { CSV_FILE_EXTENSION });
-		dialog.setFileName(UI.format_yyyymmdd_hhmmss(_tourData) + UI.SYMBOL_DOT + CSV_FILE_EXTENSION);
+		dialog.setFileName(net.tourbook.ui.UI.format_yyyymmdd_hhmmss(_tourData) + UI.SYMBOL_DOT + CSV_FILE_EXTENSION);
 
 		final String selectedFilePath = dialog.open();
 		if (selectedFilePath == null) {
@@ -1292,7 +1295,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		_viewState.put(STATE_CSV_EXPORT_PATH, exportFilePath.getPath());
 
 		if (exportFilePath.exists()) {
-			if (UI.confirmOverwrite(exportFilePath) == false) {
+			if (net.tourbook.ui.UI.confirmOverwrite(exportFilePath) == false) {
 				// don't overwrite file, nothing more to do
 				return;
 			}
@@ -1322,7 +1325,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 				// time hh:mm:ss
 				if (_serieTime != null) {
-					sb.append(UI.format_hh_mm_ss(_serieTime[serieIndex]));
+					sb.append(net.tourbook.ui.UI.format_hh_mm_ss(_serieTime[serieIndex]));
 				}
 				sb.append(UI.TAB);
 
@@ -1371,8 +1374,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 					if (_unitValueTemperature != 1) {
 						// use imperial system
 						final float imperialTemp = metricTemperature
-								* UI.UNIT_FAHRENHEIT_MULTI
-								+ UI.UNIT_FAHRENHEIT_ADD;
+								* net.tourbook.ui.UI.UNIT_FAHRENHEIT_MULTI
+								+ net.tourbook.ui.UI.UNIT_FAHRENHEIT_ADD;
 						sb.append(_nf3.format(imperialTemp));
 					} else {
 						// use metric system
@@ -1395,7 +1398,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 				// pace
 				if (_seriePace != null) {
-					sb.append(UI.format_hhh_mm_ss((long) _seriePace[serieIndex]));
+					sb.append(net.tourbook.ui.UI.format_hhh_mm_ss((long) _seriePace[serieIndex]));
 				}
 				sb.append(UI.TAB);
 
@@ -1424,7 +1427,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 				sb.append(UI.TAB);
 
 				// end of line
-				sb.append(UI.SYSTEM_NEW_LINE);
+				sb.append(net.tourbook.ui.UI.SYSTEM_NEW_LINE);
 				exportWriter.write(sb.toString());
 			}
 
@@ -1786,7 +1789,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 						// measurement system has changed
 
-						UI.updateUnits();
+						net.tourbook.ui.UI.updateUnits();
 
 						/*
 						 * It is possible that the unit values in the UI class have been updated
@@ -1912,7 +1915,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 					// check if this tour data editor contains a tour which must be updated
 
 					// update editor
-					if (UI.containsTourId(eventData, tourDataEditorTourId) != null) {
+					if (net.tourbook.ui.UI.containsTourId(eventData, tourDataEditorTourId) != null) {
 
 						// reload tour data
 						_tourData = TourManager.getInstance().getTourData(_tourData.getTourId());
@@ -3849,7 +3852,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
-				cell.setText(UI.format_hh_mm_ss(((TourMarker) cell.getElement()).getTime()));
+				cell.setText(net.tourbook.ui.UI.format_hh_mm_ss(((TourMarker) cell.getElement()).getTime()));
 			}
 		});
 	}
@@ -3934,7 +3937,9 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			public void update(final ViewerCell cell) {
 				if (_serieBreakTime != null) {
 					final TimeSlice timeSlice = (TimeSlice) cell.getElement();
-					cell.setText(_serieBreakTime[timeSlice.serieIndex] ? UI.BREAK_TIME_MARKER : UI.EMPTY_STRING);
+					cell.setText(_serieBreakTime[timeSlice.serieIndex]
+							? net.tourbook.ui.UI.BREAK_TIME_MARKER
+							: UI.EMPTY_STRING);
 				} else {
 					cell.setText(UI.EMPTY_STRING);
 				}
@@ -4138,7 +4143,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 					final TimeSlice timeSlice = (TimeSlice) cell.getElement();
 					final long pace = (long) _seriePace[timeSlice.serieIndex];
 
-					cell.setText(UI.format_mm_ss(pace));
+					cell.setText(net.tourbook.ui.UI.format_mm_ss(pace));
 				}
 			}
 		});
@@ -4309,8 +4314,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 						// use imperial system
 
 						final double imperialTemp = metricTemperature
-								* UI.UNIT_FAHRENHEIT_MULTI
-								+ UI.UNIT_FAHRENHEIT_ADD;
+								* net.tourbook.ui.UI.UNIT_FAHRENHEIT_MULTI
+								+ net.tourbook.ui.UI.UNIT_FAHRENHEIT_ADD;
 
 						cell.setText(_nf1.format(imperialTemp));
 
@@ -4366,7 +4371,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			public void update(final ViewerCell cell) {
 				final int serieIndex = ((TimeSlice) cell.getElement()).serieIndex;
 				if (_serieTime != null) {
-					cell.setText(UI.format_hh_mm_ss(_serieTime[serieIndex]));
+					cell.setText(net.tourbook.ui.UI.format_hh_mm_ss(_serieTime[serieIndex]));
 				} else {
 					cell.setText(UI.EMPTY_STRING);
 				}
@@ -4415,7 +4420,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 					final int serieIndex = ((TimeSlice) cell.getElement()).serieIndex;
 
-					cell.setText(UI.format_hh_mm_ss(_tourStartDayTime + _serieTime[serieIndex]));
+					cell.setText(net.tourbook.ui.UI.format_hh_mm_ss(_tourStartDayTime + _serieTime[serieIndex]));
 				}
 			}
 		});
@@ -4448,7 +4453,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		final int selectionIndex = _comboClouds.getSelectionIndex();
 
 		final String cloudKey = IWeather.cloudIcon[selectionIndex];
-		final Image cloundIcon = net.tourbook.common.UI.IMAGE_REGISTRY.get(cloudKey);
+		final Image cloundIcon = UI.IMAGE_REGISTRY.get(cloudKey);
 
 		_lblCloudIcon.setImage(cloundIcon);
 	}
@@ -6473,11 +6478,13 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 	private void updateInternalUnitValues() {
 
-		_unitValueDistance = UI.UNIT_VALUE_DISTANCE;
-		_unitValueAltitude = UI.UNIT_VALUE_ALTITUDE;
-		_unitValueTemperature = UI.UNIT_VALUE_TEMPERATURE;
+		_unitValueDistance = net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
+		_unitValueAltitude = net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE;
+		_unitValueTemperature = net.tourbook.ui.UI.UNIT_VALUE_TEMPERATURE;
 
-		_unitValueWindSpeed = UI.UNIT_VALUE_DISTANCE == 1 ? IWeather.windSpeedKmh : IWeather.windSpeedMph;
+		_unitValueWindSpeed = net.tourbook.ui.UI.UNIT_VALUE_DISTANCE == 1
+				? IWeather.windSpeedKmh
+				: IWeather.windSpeedMph;
 	}
 
 	/**
@@ -6523,7 +6530,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 			final int cloudIndex = _comboClouds.getSelectionIndex();
 			String cloudValue = IWeather.cloudIcon[cloudIndex];
-			if (cloudValue.equals(net.tourbook.common.UI.IMAGE_EMPTY_16)) {
+			if (cloudValue.equals(UI.IMAGE_EMPTY_16)) {
 				// replace invalid cloud key
 				cloudValue = UI.EMPTY_STRING;
 			}
@@ -6532,7 +6539,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			if (_isTemperatureManuallyModified) {
 				float temperature = (float) _spinTemperature.getSelection() / 10;
 				if (_unitValueTemperature != 1) {
-					temperature = (temperature - UI.UNIT_FAHRENHEIT_ADD) / UI.UNIT_FAHRENHEIT_MULTI;
+					temperature = (temperature - net.tourbook.ui.UI.UNIT_FAHRENHEIT_ADD)
+							/ net.tourbook.ui.UI.UNIT_FAHRENHEIT_MULTI;
 				}
 				_tourData.setAvgTemperature(temperature);
 			}
@@ -6817,7 +6825,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		if (tourType == null) {
 			_pageEditorForm.setImage(null);
 		} else {
-			_pageEditorForm.setImage(UI.getInstance().getTourTypeImage(tourType.getTypeId()));
+			_pageEditorForm.setImage(net.tourbook.ui.UI.getInstance().getTourTypeImage(tourType.getTypeId()));
 		}
 
 		updateUITitleAsynch(getTourTitle());
@@ -6889,7 +6897,9 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		if (_unitValueTemperature != 1) {
 			final float imperialTemperature = avgTemperature;
-			avgTemperature = imperialTemperature * UI.UNIT_FAHRENHEIT_MULTI + UI.UNIT_FAHRENHEIT_ADD;
+			avgTemperature = imperialTemperature
+					* net.tourbook.ui.UI.UNIT_FAHRENHEIT_MULTI
+					+ net.tourbook.ui.UI.UNIT_FAHRENHEIT_ADD;
 		}
 
 		/*
@@ -6931,8 +6941,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		_timePaused.setTime(pausedTime);
 
 		// tour type/tags
-		UI.updateUITourType(_tourData, _lblTourType, true);
-		UI.updateUITags(_tourData, _lblTourTags);
+		net.tourbook.ui.UI.updateUITourType(_tourData, _lblTourType, true);
+		net.tourbook.ui.UI.updateUITags(_tourData, _lblTourTags);
 
 		// measurement system
 		_lblTourDistanceUnit.setText(UI.UNIT_LABEL_DISTANCE);
@@ -7215,8 +7225,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	private void updateUITourTypeTags() {
 
 		// tour type/tags
-		UI.updateUITourType(_tourData, _lblTourType, true);
-		UI.updateUITags(_tourData, _lblTourTags);
+		net.tourbook.ui.UI.updateUITourType(_tourData, _lblTourType, true);
+		net.tourbook.ui.UI.updateUITags(_tourData, _lblTourTags);
 
 		// reflow layout that the tags are aligned correctly
 		_tourContainer.layout(true);
@@ -7289,7 +7299,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		sb.append(UI.TAB);
 
 		// end of line
-		sb.append(UI.SYSTEM_NEW_LINE);
+		sb.append(net.tourbook.ui.UI.SYSTEM_NEW_LINE);
 		exportWriter.write(sb.toString());
 	}
 }

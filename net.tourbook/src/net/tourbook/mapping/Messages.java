@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -159,10 +159,6 @@ public class Messages extends NLS {
 	public static String		statusLine_mapInfo_tooltip;
 
 	public static String		Tour_Action_ShowHrZones_Tooltip;
-
-	public static String		Tour_Data_LoadTourData_Monitor;
-
-	public static String		Tour_Data_LoadTourData_Monitor_SubTask;
 
 	static {
 		// initialize resource bundle

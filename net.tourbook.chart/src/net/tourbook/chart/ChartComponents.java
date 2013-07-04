@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -21,6 +21,7 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 
 import net.tourbook.common.UI;
+import net.tourbook.common.util.Util;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlAdapter;
@@ -475,7 +476,11 @@ public class ChartComponents extends Composite {
 					unitLabelValue = unitLabelValue % DAY_IN_SECONDS;
 				}
 
-				final String unitLabel = Util.formatValue((float) unitLabelValue, unitType, valueDivisor, true);
+				final String unitLabel = net.tourbook.chart.Util.formatValue(
+						(float) unitLabelValue,
+						unitType,
+						valueDivisor,
+						true);
 
 				final boolean isMajorValue = unitLabelValue % majorValue == 0;
 
@@ -1032,7 +1037,7 @@ public class ChartComponents extends Composite {
 
 				final long unitValue = unitValueStart % DAY_IN_SECONDS;
 
-				final String unitLabel = Util.format_hh_mm_ss_Optional(unitValue);
+				final String unitLabel = net.tourbook.chart.Util.format_hh_mm_ss_Optional(unitValue);
 
 				final boolean isMajorValue = unitValue % majorUnit == 0;
 
@@ -1055,7 +1060,7 @@ public class ChartComponents extends Composite {
 				final long unitValue = (unitValueAdjusted + startSeconds) % DAY_IN_SECONDS;
 				final boolean isMajorValue = unitValue % majorUnit == 0;
 
-				final String unitLabel = Util.format_hh_mm_ss_Optional(unitValue);
+				final String unitLabel = net.tourbook.chart.Util.format_hh_mm_ss_Optional(unitValue);
 
 				xUnitTitles.add(new ChartUnit(unitValueAdjusted, unitLabel, isMajorValue));
 			}
@@ -1071,7 +1076,7 @@ public class ChartComponents extends Composite {
 				final long unitValue = (unitValueAdjusted + startSeconds) % DAY_IN_SECONDS;
 				final boolean isMajorValue = unitValue % majorUnit == 0;
 
-				final String unitLabel = Util.format_hh_mm_ss_Optional(unitValue);
+				final String unitLabel = net.tourbook.chart.Util.format_hh_mm_ss_Optional(unitValue);
 
 				xUnitTitles.add(new ChartUnit(unitValueAdjusted, unitLabel, isMajorValue));
 			}
@@ -1514,7 +1519,11 @@ public class ChartComponents extends Composite {
 
 			final double descaledValue = (double) scaledValue / valueScaling;
 
-			final String unitLabel = Util.formatValue((float) descaledValue, unitType, valueDivisor, false);
+			final String unitLabel = net.tourbook.chart.Util.formatValue(
+					(float) descaledValue,
+					unitType,
+					valueDivisor,
+					false);
 			final boolean isMajorValue = descaledValue % majorValue == 0;
 
 			unitList.add(new ChartUnit((float) descaledValue, unitLabel, isMajorValue));
@@ -1528,7 +1537,7 @@ public class ChartComponents extends Composite {
 		}
 
 		if (unitType == ChartDataSerie.AXIS_UNIT_HOUR_MINUTE_24H && scaledValue > scaledMaxValue) {
-			unitList.add(new ChartUnit(scaledMaxValue / valueScaling, Util.EMPTY_STRING));
+			unitList.add(new ChartUnit(scaledMaxValue / valueScaling, UI.EMPTY_STRING));
 		}
 	}
 
@@ -1684,7 +1693,7 @@ public class ChartComponents extends Composite {
 		// loop: create unit label for all units
 		while (graphValue <= graphMaxValue) {
 
-			final String unitLabel = Util.formatValue(graphValue, unitType, valueDivisor, false);
+			final String unitLabel = net.tourbook.chart.Util.formatValue(graphValue, unitType, valueDivisor, false);
 			final boolean isMajorValue = graphValue % majorValue == 0;
 
 			unitList.add(new ChartUnit(graphValue, unitLabel, isMajorValue));
@@ -1698,7 +1707,7 @@ public class ChartComponents extends Composite {
 		}
 
 		if (unitType == ChartDataSerie.AXIS_UNIT_HOUR_MINUTE_24H && graphValue > graphMaxValue) {
-			unitList.add(new ChartUnit(graphMaxValue, Util.EMPTY_STRING));
+			unitList.add(new ChartUnit(graphMaxValue, UI.EMPTY_STRING));
 		}
 
 	}

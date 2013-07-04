@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -320,7 +320,7 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 
 			// label: unit
 			label = new Label(container, SWT.NONE);
-			label.setText(UI.UNIT_LABEL_ALTITUDE);
+			label.setText(net.tourbook.common.UI.UNIT_LABEL_ALTITUDE);
 
 			// label: description
 			label = new Label(container, SWT.WRAP);
@@ -463,7 +463,7 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 		_pagebookBreakTime.showPage(_pageBreakBySliceSpeed);
 
 		container.layout(true, true);
-		UI.setEqualizeColumWidths(_firstColBreakTime);
+		net.tourbook.common.UI.setEqualizeColumWidths(_firstColBreakTime);
 
 		return container;
 	}
@@ -496,7 +496,7 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 
 				// label: km/h
 				label = new Label(container, SWT.NONE);
-				label.setText(UI.UNIT_LABEL_SPEED);
+				label.setText(net.tourbook.common.UI.UNIT_LABEL_SPEED);
 			}
 
 			/*
@@ -520,7 +520,7 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 
 				// label: km/h
 				label = new Label(container, SWT.NONE);
-				label.setText(UI.UNIT_LABEL_SPEED);
+				label.setText(net.tourbook.common.UI.UNIT_LABEL_SPEED);
 			}
 
 			/*
@@ -590,7 +590,7 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 
 			// label: km/h
 			label = new Label(container, SWT.NONE);
-			label.setText(UI.UNIT_LABEL_SPEED);
+			label.setText(net.tourbook.common.UI.UNIT_LABEL_SPEED);
 
 			/*
 			 * label: description
@@ -636,7 +636,7 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 
 			// label: km/h
 			label = new Label(container, SWT.NONE);
-			label.setText(UI.UNIT_LABEL_SPEED);
+			label.setText(net.tourbook.common.UI.UNIT_LABEL_SPEED);
 
 			/*
 			 * label: description
@@ -703,7 +703,7 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 
 				// label: unit
 				_lblBreakDistanceUnit = new Label(container, SWT.NONE);
-				_lblBreakDistanceUnit.setText(UI.UNIT_LABEL_DISTANCE_SMALL);
+				_lblBreakDistanceUnit.setText(net.tourbook.common.UI.UNIT_LABEL_DISTANCE_SMALL);
 				GridDataFactory.fillDefaults()//
 //						.span(2, 1)
 						.align(SWT.FILL, SWT.CENTER)
@@ -906,7 +906,7 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 				NLS.bind(
 						Messages.compute_tourValueElevation_dlg_computeValues_message,
 						Integer.toString((int) (altiMin / UI.UNIT_VALUE_ALTITUDE)),
-						UI.UNIT_LABEL_ALTITUDE)) == false) {
+						net.tourbook.common.UI.UNIT_LABEL_ALTITUDE)) == false) {
 			return;
 		}
 
@@ -933,9 +933,9 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 				return NLS.bind(Messages.compute_tourValueElevation_resultText, //
 						new Object[] {
 								prefMinAltitude,
-								UI.UNIT_LABEL_ALTITUDE,
+								net.tourbook.common.UI.UNIT_LABEL_ALTITUDE,
 								_nf0.format((elevation[1] - elevation[0]) / UI.UNIT_VALUE_ALTITUDE),
-								UI.UNIT_LABEL_ALTITUDE //
+								net.tourbook.common.UI.UNIT_LABEL_ALTITUDE //
 						});
 			}
 
@@ -951,7 +951,7 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 					subTaskText = NLS.bind(Messages.compute_tourValueElevation_subTaskText,//
 							new Object[] {
 									_nf0.format((elevation[1] - elevation[0]) / UI.UNIT_VALUE_ALTITUDE),
-									UI.UNIT_LABEL_ALTITUDE //
+									net.tourbook.common.UI.UNIT_LABEL_ALTITUDE //
 							});
 				}
 

@@ -1147,6 +1147,8 @@ public class Messages extends NLS {
 	public static String		Tour_Book_Combo_year_tooltip;
 	public static String		Tour_Book_Label_chart_title;
 
+	public static String		Tour_Data_LoadTourData_Monitor;
+	public static String		Tour_Data_LoadTourData_Monitor_SubTask;
 	public static String		Tour_Data_SaveTour_Monitor;
 	public static String		Tour_Data_SaveTour_MonitorSubtask;
 

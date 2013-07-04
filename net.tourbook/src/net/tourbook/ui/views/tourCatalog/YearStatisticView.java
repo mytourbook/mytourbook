@@ -30,6 +30,7 @@ import net.tourbook.chart.ChartToolTipInfo;
 import net.tourbook.chart.ChartType;
 import net.tourbook.chart.IBarSelectionListener;
 import net.tourbook.chart.IChartInfoProvider;
+import net.tourbook.common.UI;
 import net.tourbook.common.color.GraphColorProvider;
 import net.tourbook.common.util.ArrayListToArray;
 import net.tourbook.common.util.IToolTipHideListener;
@@ -40,7 +41,6 @@ import net.tourbook.tour.ITourEventListener;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourInfoToolTipProvider;
 import net.tourbook.tour.TourManager;
-import net.tourbook.ui.UI;
 
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IToolBarManager;
@@ -237,7 +237,7 @@ public class YearStatisticView extends ViewPart {
 
 					// measurement system has changed
 
-					UI.updateUnits();
+					net.tourbook.ui.UI.updateUnits();
 
 					// recreate the chart
 					_yearChart.dispose();
@@ -810,7 +810,7 @@ public class YearStatisticView extends ViewPart {
 							final DateTime dt = new DateTime(tourItem.getTourDate());
 
 							_DOYValues.add(getYearDOYs(dt.getYear()) + dt.getDayOfYear() - 1);
-							_tourSpeed.add(tourItem.getTourSpeed() / UI.UNIT_VALUE_DISTANCE);
+							_tourSpeed.add(tourItem.getTourSpeed() / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE);
 							_allTours.add(tourItem);
 						}
 					}

@@ -23,15 +23,15 @@ import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.color.ColorDefinition;
+import net.tourbook.common.color.GradientColorProvider;
 import net.tourbook.common.color.GraphColorItem;
 import net.tourbook.common.color.GraphColorProvider;
+import net.tourbook.common.color.ILegendProviderGradientColors;
 import net.tourbook.common.color.LegendColor;
 import net.tourbook.common.color.LegendConfig;
 import net.tourbook.common.color.ValueColor;
 import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.mapping.DialogMappingColor;
-import net.tourbook.mapping.ILegendProviderGradientColors;
-import net.tourbook.mapping.LegendProviderGradientColors;
 import net.tourbook.ui.UI;
 
 import org.eclipse.jface.layout.GridDataFactory;
@@ -103,7 +103,7 @@ public class PrefPageAppearanceColors extends PreferencePage implements IWorkben
 
 	private ColorDefinition					_expandedItem;
 
-	private LegendProviderGradientColors	_legendProvider;
+	private GradientColorProvider	_legendProvider;
 	private DialogMappingColor				_dialogMappingColor;
 	private GraphColorPainter				_graphColorPainter;
 
@@ -452,7 +452,7 @@ public class PrefPageAppearanceColors extends PreferencePage implements IWorkben
 		final LegendColor legendColor = new LegendColor();
 		legendColor.valueColors = _valueColors;
 
-		_legendProvider = new LegendProviderGradientColors(legendConfig, legendColor, 0);
+		_legendProvider = new GradientColorProvider(legendConfig, legendColor, 0);
 		_dialogMappingColor = new DialogMappingColor(Display.getCurrent().getActiveShell(), _legendProvider, this);
 	}
 

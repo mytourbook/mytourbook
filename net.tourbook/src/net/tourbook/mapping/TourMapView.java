@@ -16,7 +16,6 @@
 package net.tourbook.mapping;
 
 import java.awt.Point;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -27,14 +26,15 @@ import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.SelectionChartInfo;
 import net.tourbook.chart.SelectionChartXSliderPosition;
+import net.tourbook.common.UI;
 import net.tourbook.common.color.ColorDefinition;
 import net.tourbook.common.color.GraphColorProvider;
 import net.tourbook.common.color.ILegendProvider;
+import net.tourbook.common.color.ILegendProviderGradientColors;
 import net.tourbook.common.color.LegendConfig;
 import net.tourbook.common.color.LegendUnitFormat;
 import net.tourbook.common.map.GeoPosition;
 import net.tourbook.common.util.ITourToolTipProvider;
-import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.TourToolTip;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
@@ -63,20 +63,16 @@ import net.tourbook.tour.TourInfoToolTipProvider;
 import net.tourbook.tour.TourManager;
 import net.tourbook.training.TrainingManager;
 import net.tourbook.ui.MTRectangle;
-import net.tourbook.ui.UI;
 import net.tourbook.ui.views.tourCatalog.SelectionTourCatalogView;
 import net.tourbook.ui.views.tourCatalog.TVICatalogComparedTour;
 import net.tourbook.ui.views.tourCatalog.TVICatalogRefTourItem;
 import net.tourbook.ui.views.tourCatalog.TVICompareResultComparedTour;
 
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.MessageDialogWithToggle;
-import org.eclipse.jface.dialogs.ProgressMonitorDialog;
-import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferenceConverter;
 import org.eclipse.jface.util.IPropertyChangeListener;
@@ -84,7 +80,6 @@ import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.window.Window;
-import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
@@ -125,13 +120,6 @@ import de.byteholder.gpx.PointOfInterest;
 public class TourMapView extends ViewPart implements IMapContextProvider, IPhotoEventListener, IPhotoPropertiesListener {
 
 	public static final String				ID									= "net.tourbook.mapping.mappingViewID"; //$NON-NLS-1$
-
-	private static final int				DEFAULT_LEGEND_WIDTH				= 150;
-	private static final int				DEFAULT_LEGEND_HEIGHT				= 300;
-	private static final int				LEGEND_TOP_MARGIN					= 20;
-
-	public static final int					LEGEND_MARGIN_TOP_BOTTOM			= 10;
-	public static final int					LEGEND_UNIT_DISTANCE				= 60;
 
 	private static final String				STATE_IS_SHOW_TOUR_IN_MAP			= "STATE_IS_SHOW_TOUR_IN_MAP";			//$NON-NLS-1$
 	private static final String				STATE_IS_SHOW_PHOTO_IN_MAP			= "STATE_IS_SHOW_PHOTO_IN_MAP";		//$NON-NLS-1$
@@ -728,8 +716,8 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 
 					// measurement system has changed
 
-					UI.updateUnits();
-					_map.setMeasurementSystem(UI.UNIT_VALUE_DISTANCE, UI.UNIT_LABEL_DISTANCE);
+					net.tourbook.ui.UI.updateUnits();
+					_map.setMeasurementSystem(net.tourbook.ui.UI.UNIT_VALUE_DISTANCE, UI.UNIT_LABEL_DISTANCE);
 
 					createLegendImage(_tourPainterConfig.getLegendProvider());
 
@@ -906,42 +894,42 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 
 		_actionTourColorAltitude = new ActionTourColor(
 				this,
-				TourMapColors.TOUR_COLOR_ALTITUDE,
+				ILegendProvider.TOUR_COLOR_ALTITUDE,
 				Messages.map_action_tour_color_altitude_tooltip,
 				Messages.image_action_tour_color_altitude,
 				Messages.image_action_tour_color_altitude_disabled);
 
 		_actionTourColorGradient = new ActionTourColor(
 				this,
-				TourMapColors.TOUR_COLOR_GRADIENT,
+				ILegendProvider.TOUR_COLOR_GRADIENT,
 				Messages.map_action_tour_color_gradient_tooltip,
 				Messages.image_action_tour_color_gradient,
 				Messages.image_action_tour_color_gradient_disabled);
 
 		_actionTourColorPulse = new ActionTourColor(
 				this,
-				TourMapColors.TOUR_COLOR_PULSE,
+				ILegendProvider.TOUR_COLOR_PULSE,
 				Messages.map_action_tour_color_pulse_tooltip,
 				Messages.image_action_tour_color_pulse,
 				Messages.image_action_tour_color_pulse_disabled);
 
 		_actionTourColorSpeed = new ActionTourColor(
 				this,
-				TourMapColors.TOUR_COLOR_SPEED,
+				ILegendProvider.TOUR_COLOR_SPEED,
 				Messages.map_action_tour_color_speed_tooltip,
 				Messages.image_action_tour_color_speed,
 				Messages.image_action_tour_color_speed_disabled);
 
 		_actionTourColorPace = new ActionTourColor(
 				this,
-				TourMapColors.TOUR_COLOR_PACE,
+				ILegendProvider.TOUR_COLOR_PACE,
 				Messages.map_action_tour_color_pase_tooltip,
 				Messages.image_action_tour_color_pace,
 				Messages.image_action_tour_color_pace_disabled);
 
 		_actionTourColorHrZone = new ActionTourColor(
 				this,
-				TourMapColors.TOUR_COLOR_HR_ZONE,
+				ILegendProvider.TOUR_COLOR_HR_ZONE,
 				Messages.Tour_Action_ShowHrZones_Tooltip,
 				Messages.Image__PulseZones,
 				Messages.Image__PulseZones_Disabled);
@@ -1000,11 +988,11 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 		if ((legendImage != null) && !legendImage.isDisposed()) {
 			legendImage.dispose();
 		}
-		final int legendWidth = DEFAULT_LEGEND_WIDTH;
-		int legendHeight = DEFAULT_LEGEND_HEIGHT;
+		final int legendWidth = ILegendProvider.DEFAULT_LEGEND_WIDTH;
+		int legendHeight = ILegendProvider.DEFAULT_LEGEND_HEIGHT;
 
 		final Rectangle mapBounds = _map.getBounds();
-		legendHeight = Math.max(1, Math.min(legendHeight, mapBounds.height - LEGEND_TOP_MARGIN));
+		legendHeight = Math.max(1, Math.min(legendHeight, mapBounds.height - ILegendProvider.LEGEND_TOP_MARGIN));
 
 		final RGB rgbTransparent = new RGB(0xfe, 0xfe, 0xfe);
 
@@ -1019,19 +1007,20 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 		final Display display = Display.getCurrent();
 		legendImage = new Image(display, overlayImageData);
 		final Rectangle legendImageBounds = legendImage.getBounds();
+		final int legendHeightNoMargin = legendImageBounds.height - 2 * ILegendProvider.LEGEND_MARGIN_TOP_BOTTOM;
 
 		boolean isDataAvailable = false;
 		if (legendProvider instanceof ILegendProviderGradientColors) {
 
 			isDataAvailable = createLegendImage10SetProviderValues(//
 					(ILegendProviderGradientColors) legendProvider,
-					legendImageBounds);
+					legendHeightNoMargin);
 
 		} else if (legendProvider instanceof ILegendProviderDiscreteColors) {
 
 			isDataAvailable = createLegendImage20SetProviderValues(
 					(ILegendProviderDiscreteColors) legendProvider,
-					legendImageBounds);
+					legendHeightNoMargin);
 		}
 
 		final Color transparentColor = new Color(display, rgbTransparent);
@@ -1055,12 +1044,12 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 	 * displayed legend
 	 * 
 	 * @param legendProvider
-	 * @param legendBounds
+	 * @param legendHeight
 	 * @return Return <code>true</code> when the legend value could be updated, <code>false</code>
 	 *         when data are not available
 	 */
 	private boolean createLegendImage10SetProviderValues(	final ILegendProviderGradientColors legendProvider,
-															final Rectangle legendBounds) {
+															final int legendHeight) {
 
 		if (_allTourData.size() == 0) {
 			return false;
@@ -1074,7 +1063,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 		// tell the legend provider how to draw the legend
 		switch (legendProvider.getTourColorId()) {
 
-		case TourMapColors.TOUR_COLOR_ALTITUDE:
+		case ILegendProvider.TOUR_COLOR_ALTITUDE:
 
 			float minValue = Float.MIN_VALUE;
 			float maxValue = Float.MAX_VALUE;
@@ -1116,7 +1105,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 
 			legendProvider.setLegendColorColors(colorDefinition.getNewLegendColor());
 			legendProvider.setLegendColorValues(
-					legendBounds,
+					legendHeight,
 					minValue,
 					maxValue,
 					UI.UNIT_LABEL_ALTITUDE,
@@ -1124,7 +1113,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 
 			break;
 
-		case TourMapColors.TOUR_COLOR_PULSE:
+		case ILegendProvider.TOUR_COLOR_PULSE:
 
 			minValue = Float.MIN_VALUE;
 			maxValue = Float.MAX_VALUE;
@@ -1165,7 +1154,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 
 			legendProvider.setLegendColorColors(colorDefinition.getNewLegendColor());
 			legendProvider.setLegendColorValues(
-					legendBounds,
+					legendHeight,
 					minValue,
 					maxValue,
 					Messages.graph_label_heartbeat_unit,
@@ -1173,7 +1162,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 
 			break;
 
-		case TourMapColors.TOUR_COLOR_SPEED:
+		case ILegendProvider.TOUR_COLOR_SPEED:
 
 			minValue = Float.MIN_VALUE;
 			maxValue = Float.MAX_VALUE;
@@ -1215,7 +1204,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 
 			legendProvider.setLegendColorColors(colorDefinition.getNewLegendColor());
 			legendProvider.setLegendColorValues(
-					legendBounds,
+					legendHeight,
 					minValue,
 					maxValue,
 					UI.UNIT_LABEL_SPEED,
@@ -1223,7 +1212,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 
 			break;
 
-		case TourMapColors.TOUR_COLOR_PACE:
+		case ILegendProvider.TOUR_COLOR_PACE:
 
 			minValue = Float.MIN_VALUE;
 			maxValue = Float.MAX_VALUE;
@@ -1265,7 +1254,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 
 			legendProvider.setLegendColorColors(colorDefinition.getNewLegendColor());
 			legendProvider.setLegendColorValues(
-					legendBounds,
+					legendHeight,
 					minValue,
 					maxValue,
 					UI.UNIT_LABEL_PACE,
@@ -1273,7 +1262,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 
 			break;
 
-		case TourMapColors.TOUR_COLOR_GRADIENT:
+		case ILegendProvider.TOUR_COLOR_GRADIENT:
 
 			minValue = Float.MIN_VALUE;
 			maxValue = Float.MAX_VALUE;
@@ -1315,7 +1304,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 
 			legendProvider.setLegendColorColors(colorDefinition.getNewLegendColor());
 			legendProvider.setLegendColorValues(
-					legendBounds,
+					legendHeight,
 					minValue,
 					maxValue,
 					Messages.graph_label_gradient_unit,
@@ -1331,7 +1320,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 	}
 
 	private boolean createLegendImage20SetProviderValues(	final ILegendProviderDiscreteColors legendProvider,
-															final Rectangle legendImageBounds) {
+															final int legendHeight) {
 
 		if (_allTourData.size() == 0) {
 			return false;
@@ -1340,7 +1329,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 		// tell the legend provider how to draw the legend
 		switch (legendProvider.getTourColorId()) {
 
-		case TourMapColors.TOUR_COLOR_HR_ZONE:
+		case ILegendProvider.TOUR_COLOR_HR_ZONE:
 
 			boolean isValidData = false;
 
@@ -1375,7 +1364,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 
 		_map.setLegend(_mapLegend);
 		_map.setShowLegend(true);
-		_map.setMeasurementSystem(UI.UNIT_VALUE_DISTANCE, UI.UNIT_LABEL_DISTANCE);
+		_map.setMeasurementSystem(net.tourbook.ui.UI.UNIT_VALUE_DISTANCE, UI.UNIT_LABEL_DISTANCE);
 
 		final String tourPaintMethod = _prefStore.getString(ITourbookPreferences.MAP_LAYOUT_TOUR_PAINT_METHOD);
 		_map.setTourPaintMethodEnhanced(tourPaintMethod.equals(PrefPageAppearanceMap.TOUR_PAINT_METHOD_COMPLEX));
@@ -1406,9 +1395,10 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 				final Rectangle mapBounds = _map.getBounds();
 				final Rectangle legendBounds = legendImage.getBounds();
 
-				if ((mapBounds.height < DEFAULT_LEGEND_HEIGHT + LEGEND_TOP_MARGIN)
-						|| ((mapBounds.height > DEFAULT_LEGEND_HEIGHT + LEGEND_TOP_MARGIN) //
-						&& (legendBounds.height < DEFAULT_LEGEND_HEIGHT)) //
+				if ((mapBounds.height < ILegendProvider.DEFAULT_LEGEND_HEIGHT + ILegendProvider.LEGEND_TOP_MARGIN)
+						|| ((mapBounds.height > ILegendProvider.DEFAULT_LEGEND_HEIGHT
+								+ ILegendProvider.LEGEND_TOP_MARGIN) //
+						&& (legendBounds.height < ILegendProvider.DEFAULT_LEGEND_HEIGHT)) //
 				) {
 
 					createLegendImage(_tourPainterConfig.getLegendProvider());
@@ -1877,34 +1867,6 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 		return mapPositions;
 	}
 
-	/**
-	 * Checks if {@link TourData} can be painted
-	 * 
-	 * @param tourData
-	 * @return <code>true</code> when {@link TourData} contains a tour which can be painted in the
-	 *         map
-	 */
-	private boolean isPaintDataValid(final TourData tourData) {
-
-		if (tourData == null) {
-			return false;
-		}
-
-		// check if coordinates are available
-
-		final double[] longitudeSerie = tourData.longitudeSerie;
-		final double[] latitudeSerie = tourData.latitudeSerie;
-
-		if ((longitudeSerie == null)
-				|| (longitudeSerie.length == 0)
-				|| (latitudeSerie == null)
-				|| (latitudeSerie.length == 0)) {
-			return false;
-		}
-
-		return true;
-	}
-
 	private void onSelectionChanged(final ISelection selection) {
 
 //		System.out.println(net.tourbook.common.UI.timeStampNano() + " Map::onSelectionChanged\t" + selection);
@@ -2139,7 +2101,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 		long newOverlayKey = -1;
 		for (final TourData tourData : _allTourData) {
 
-			if (isPaintDataValid(tourData)) {
+			if (TourManager.isPaintDataValid(tourData)) {
 				newOverlayKey += tourData.getTourId();
 			}
 		}
@@ -2282,9 +2244,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 
 			// tour data needs to be loaded
 
-			_allTourData.clear();
-
-			newOverlayKey = paintTours_05_GetTourData(tourIdList);
+			newOverlayKey = TourManager.loadTourData(tourIdList, _allTourData);
 
 			_tourIdHash = tourIdList.hashCode();
 			_tourDataHash = _allTourData.hashCode();
@@ -2309,73 +2269,6 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 		_map.paint();
 	}
 
-	private long paintTours_05_GetTourData(final ArrayList<Long> tourIdList) {
-
-		// create a unique overlay key for the selected tours
-		final long newOverlayKey[] = { 0 };
-
-		if (tourIdList.size() > 200) {
-
-			try {
-
-				final IRunnableWithProgress saveRunnable = new IRunnableWithProgress() {
-					@Override
-					public void run(final IProgressMonitor monitor) throws InvocationTargetException,
-							InterruptedException {
-
-						int loadCounter = 0;
-						final int idSize = tourIdList.size();
-
-						monitor.beginTask(Messages.Tour_Data_LoadTourData_Monitor, idSize);
-
-						for (final Long tourId : tourIdList) {
-
-							monitor.subTask(NLS.bind(
-									Messages.Tour_Data_LoadTourData_Monitor_SubTask,
-									++loadCounter,
-									idSize));
-
-							if (monitor.isCanceled()) {
-								break;
-							}
-
-							final TourData tourData = TourManager.getInstance().getTourData(tourId);
-							if (isPaintDataValid(tourData)) {
-
-								// keep tour data for each tour id
-								_allTourData.add(tourData);
-								newOverlayKey[0] += tourData.getTourId();
-							}
-
-							monitor.worked(1);
-						}
-					}
-				};
-
-				new ProgressMonitorDialog(Display.getCurrent().getActiveShell()).run(true, true, saveRunnable);
-
-			} catch (final InvocationTargetException e) {
-				StatusUtil.showStatus(e);
-			} catch (final InterruptedException e) {
-				StatusUtil.showStatus(e);
-			}
-
-		} else {
-
-			for (final Long tourId : tourIdList) {
-
-				final TourData tourData = TourManager.getInstance().getTourData(tourId);
-				if (isPaintDataValid(tourData)) {
-
-					// keep tour data for each tour id
-					_allTourData.add(tourData);
-					newOverlayKey[0] += tourData.getTourId();
-				}
-			}
-		}
-
-		return newOverlayKey[0];
-	}
 
 	private void paintTours_10_All() {
 
@@ -2412,7 +2305,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 
 		_isTourOrWayPoint = true;
 
-		if (isPaintDataValid(tourData) == false) {
+		if (TourManager.isPaintDataValid(tourData) == false) {
 			showDefaultMap(_isShowPhoto);
 			return;
 		}
@@ -2535,7 +2428,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 		long newOverlayKey = -1;
 		for (final TourData tourData : _allTourData) {
 
-			if (isPaintDataValid(tourData)) {
+			if (TourManager.isPaintDataValid(tourData)) {
 				newOverlayKey += tourData.getTourId();
 			}
 		}
@@ -2560,7 +2453,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 
 		_isTourOrWayPoint = true;
 
-		if (isPaintDataValid(tourData) == false) {
+		if (TourManager.isPaintDataValid(tourData) == false) {
 			showDefaultMap(_isShowPhoto);
 			return;
 		}
@@ -2727,27 +2620,27 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 			final Integer colorId = _state.getInt(MEMENTO_TOUR_COLOR_ID);
 
 			switch (colorId) {
-			case TourMapColors.TOUR_COLOR_ALTITUDE:
+			case ILegendProvider.TOUR_COLOR_ALTITUDE:
 				_actionTourColorAltitude.setChecked(true);
 				break;
 
-			case TourMapColors.TOUR_COLOR_GRADIENT:
+			case ILegendProvider.TOUR_COLOR_GRADIENT:
 				_actionTourColorGradient.setChecked(true);
 				break;
 
-			case TourMapColors.TOUR_COLOR_PULSE:
+			case ILegendProvider.TOUR_COLOR_PULSE:
 				_actionTourColorPulse.setChecked(true);
 				break;
 
-			case TourMapColors.TOUR_COLOR_SPEED:
+			case ILegendProvider.TOUR_COLOR_SPEED:
 				_actionTourColorSpeed.setChecked(true);
 				break;
 
-			case TourMapColors.TOUR_COLOR_PACE:
+			case ILegendProvider.TOUR_COLOR_PACE:
 				_actionTourColorPace.setChecked(true);
 				break;
 
-			case TourMapColors.TOUR_COLOR_HR_ZONE:
+			case ILegendProvider.TOUR_COLOR_HR_ZONE:
 				_actionTourColorHrZone.setChecked(true);
 				break;
 
@@ -2771,7 +2664,7 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 		if (_tourPainterConfig.getLegendProvider() == null) {
 
 			// set default legend provider
-			_tourPainterConfig.setLegendProvider(getLegendProvider(TourMapColors.TOUR_COLOR_ALTITUDE));
+			_tourPainterConfig.setLegendProvider(getLegendProvider(ILegendProvider.TOUR_COLOR_ALTITUDE));
 
 			// hide legend
 			_map.setShowLegend(false);
@@ -2898,21 +2791,21 @@ public class TourMapView extends ViewPart implements IMapContextProvider, IPhoto
 		int colorId;
 
 		if (_actionTourColorGradient.isChecked()) {
-			colorId = TourMapColors.TOUR_COLOR_GRADIENT;
+			colorId = ILegendProvider.TOUR_COLOR_GRADIENT;
 
 		} else if (_actionTourColorPulse.isChecked()) {
-			colorId = TourMapColors.TOUR_COLOR_PULSE;
+			colorId = ILegendProvider.TOUR_COLOR_PULSE;
 
 		} else if (_actionTourColorSpeed.isChecked()) {
-			colorId = TourMapColors.TOUR_COLOR_SPEED;
+			colorId = ILegendProvider.TOUR_COLOR_SPEED;
 
 		} else if (_actionTourColorPace.isChecked()) {
-			colorId = TourMapColors.TOUR_COLOR_PACE;
+			colorId = ILegendProvider.TOUR_COLOR_PACE;
 
 		} else if (_actionTourColorHrZone.isChecked()) {
-			colorId = TourMapColors.TOUR_COLOR_HR_ZONE;
+			colorId = ILegendProvider.TOUR_COLOR_HR_ZONE;
 		} else {
-			colorId = TourMapColors.TOUR_COLOR_ALTITUDE;
+			colorId = ILegendProvider.TOUR_COLOR_ALTITUDE;
 		}
 		_state.put(MEMENTO_TOUR_COLOR_ID, colorId);
 

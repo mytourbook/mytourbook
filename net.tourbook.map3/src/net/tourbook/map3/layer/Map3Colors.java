@@ -13,7 +13,7 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.mapping;
+package net.tourbook.map3.layer;
 
 import java.util.HashMap;
 
@@ -22,7 +22,8 @@ import net.tourbook.common.color.ILegendProvider;
 import net.tourbook.common.color.LegendColor;
 import net.tourbook.common.color.LegendConfig;
 
-public class TourMapColors {
+public class Map3Colors {
+
 
 	/**
 	 * Key is the color id.
@@ -54,9 +55,9 @@ public class TourMapColors {
 				ILegendProvider.TOUR_COLOR_GRADIENT,
 				new GradientColorProvider(new LegendConfig(), new LegendColor(), ILegendProvider.TOUR_COLOR_GRADIENT));
 
-		_legendProviders.put(//
-				ILegendProvider.TOUR_COLOR_HR_ZONE,
-				new HrZonesColorProvider(ILegendProvider.TOUR_COLOR_HR_ZONE));
+//		_legendProviders.put(//
+//				ILegendProvider.TOUR_COLOR_HR_ZONE,
+//				new HrZonesColorProvider(ILegendProvider.TOUR_COLOR_HR_ZONE));
 	}
 
 	public static ILegendProvider getColorProvider(final int colorId) {

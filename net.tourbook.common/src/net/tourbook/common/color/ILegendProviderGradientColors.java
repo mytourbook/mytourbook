@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2012  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -13,14 +13,8 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.mapping;
+package net.tourbook.common.color;
 
-import net.tourbook.common.color.ILegendProvider;
-import net.tourbook.common.color.LegendColor;
-import net.tourbook.common.color.LegendConfig;
-import net.tourbook.common.color.LegendUnitFormat;
-
-import org.eclipse.swt.graphics.Rectangle;
 
 public interface ILegendProviderGradientColors extends ILegendProvider {
 
@@ -41,14 +35,9 @@ public interface ILegendProviderGradientColors extends ILegendProvider {
 	 */
 	abstract void setLegendColorColors(LegendColor newLegendColor);
 
-	abstract void setLegendColorValues(	Rectangle legendBounds,
+	abstract void setLegendColorValues(	int legendHeight,
 										float minValue,
 										float maxValue,
 										String unitText,
 										LegendUnitFormat unitFormat);
-
-//	abstract void setLegendColorValues(	Rectangle legendBounds,
-//										float[] dataSerie,
-//										String unitText,
-//										LegendUnitFormat unitFormat);
 }

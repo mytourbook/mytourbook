@@ -19,7 +19,7 @@ import java.util.HashMap;
 
 import net.tourbook.common.color.ColorDefinition;
 import net.tourbook.common.color.GraphColorItem;
-import net.tourbook.mapping.ILegendProviderGradientColors;
+import net.tourbook.common.color.ILegendProviderGradientColors;
 import net.tourbook.mapping.TourMapPainter;
 
 import org.eclipse.swt.SWT;

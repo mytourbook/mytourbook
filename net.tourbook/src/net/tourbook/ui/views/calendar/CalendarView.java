@@ -19,6 +19,7 @@ import java.util.ArrayList;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.UI;
 import net.tourbook.common.color.ColorDefinition;
 import net.tourbook.common.color.GraphColorProvider;
 import net.tourbook.common.util.SelectionProvider;
@@ -31,7 +32,6 @@ import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.ITourProvider;
-import net.tourbook.ui.UI;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ActionContributionItem;
@@ -62,6 +62,7 @@ import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.part.ViewPart;
 import org.joda.time.DateTime;
+//import net.tourbook.ui.UI;
 
 public class CalendarView extends ViewPart implements ITourProvider {
 
@@ -150,7 +151,7 @@ public class CalendarView extends ViewPart implements ITourProvider {
 				String format(final CalendarTourData data) {
 					if (data.distance > 0) {
 
-						final float distance = (float) (data.distance / 1000.0 / UI.UNIT_VALUE_DISTANCE);
+						final float distance = (float) (data.distance / 1000.0 / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE);
 
 						return String.format(
 								NLS.bind(Messages.Calendar_View_Format_Distance, UI.UNIT_LABEL_DISTANCE),
@@ -185,7 +186,7 @@ public class CalendarView extends ViewPart implements ITourProvider {
 				@Override
 				String format(final CalendarTourData data) {
 					if (data.altitude > 0) {
-						final long alt = (long) (data.altitude / UI.UNIT_VALUE_ALTITUDE);
+						final long alt = (long) (data.altitude / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE);
 						return alt + UI.SPACE + UI.UNIT_LABEL_ALTITUDE;
 					} else {
 						return UI.DASH;
@@ -214,7 +215,7 @@ public class CalendarView extends ViewPart implements ITourProvider {
 					if (data.recordingTime > 0 && data.distance > 0) {
 						final int pace = (int) (data.distance == 0
 								? 0
-								: (1000 * data.recordingTime / data.distance * UI.UNIT_VALUE_DISTANCE));
+								: (1000 * data.recordingTime / data.distance * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE));
 						return String.format(
 								NLS.bind(Messages.Calendar_View_Format_Pace, UI.UNIT_LABEL_PACE),
 								pace / 60,
@@ -309,7 +310,7 @@ public class CalendarView extends ViewPart implements ITourProvider {
 			new TourInfoFormatter() {
 				@Override
 				public String format(final CalendarTourData data) {
-					final float distance = (float) (data.distance / 1000.0 / UI.UNIT_VALUE_DISTANCE);
+					final float distance = (float) (data.distance / 1000.0 / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE);
 					final int time = data.recordingTime;
 					return String.format(
 							NLS.bind(Messages.Calendar_View_Format_DistanceTime, UI.UNIT_LABEL_DISTANCE),
@@ -337,7 +338,7 @@ public class CalendarView extends ViewPart implements ITourProvider {
 									Messages.Calendar_View_Format_DistanceSpeed,
 									UI.UNIT_LABEL_DISTANCE,
 									UI.UNIT_LABEL_SPEED),
-							distance / 1000.0f / UI.UNIT_VALUE_DISTANCE,
+							distance / 1000.0f / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE,
 							distance == 0 ? 0 : distance / (time / 3.6f)).toString();
 				}
 
@@ -355,8 +356,8 @@ public class CalendarView extends ViewPart implements ITourProvider {
 				public String format(final CalendarTourData data) {
 					final int pace = (int) (data.distance == 0
 							? 0
-							: (1000 * data.recordingTime / data.distance * UI.UNIT_VALUE_DISTANCE));
-					final float distance = data.distance / 1000.0f / UI.UNIT_VALUE_DISTANCE;
+							: (1000 * data.recordingTime / data.distance * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE));
+					final float distance = data.distance / 1000.0f / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
 					return String.format(
 							NLS.bind(
 									Messages.Calendar_View_Format_DistancePace,
@@ -380,7 +381,7 @@ public class CalendarView extends ViewPart implements ITourProvider {
 				@Override
 				public String format(final CalendarTourData data) {
 					final int time = data.recordingTime;
-					final float distance = data.distance / 1000.0f / UI.UNIT_VALUE_DISTANCE;
+					final float distance = data.distance / 1000.0f / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
 					return String.format(
 							NLS.bind(Messages.Calendar_View_Format_TimeDistance, UI.UNIT_LABEL_DISTANCE),
 							time / 3600,
@@ -405,7 +406,10 @@ public class CalendarView extends ViewPart implements ITourProvider {
 							NLS.bind(Messages.Calendar_View_Format_TimeSpeed, UI.UNIT_LABEL_SPEED),
 							time / 3600,
 							(time % 3600) / 60,
-							data.distance == 0 ? 0 : data.distance / time * 3.6f / UI.UNIT_VALUE_DISTANCE).toString();
+							data.distance == 0 ? 0 : data.distance
+									/ time
+									* 3.6f
+									/ net.tourbook.ui.UI.UNIT_VALUE_DISTANCE).toString();
 				}
 
 				@Override
@@ -423,7 +427,7 @@ public class CalendarView extends ViewPart implements ITourProvider {
 
 					final int pace = (int) (data.distance == 0
 							? 0
-							: (1000 * data.recordingTime / data.distance * UI.UNIT_VALUE_DISTANCE));
+							: (1000 * data.recordingTime / data.distance * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE));
 
 					return String.format(
 							NLS.bind(Messages.Calendar_View_Format_TimePace, UI.UNIT_LABEL_PACE),

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -31,13 +31,13 @@ import net.tourbook.chart.ChartSegments;
 import net.tourbook.chart.ChartToolTipInfo;
 import net.tourbook.chart.ChartType;
 import net.tourbook.chart.IChartInfoProvider;
+import net.tourbook.common.UI;
 import net.tourbook.common.color.GraphColorProvider;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourPerson;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.statistic.StatisticContext;
 import net.tourbook.ui.TourTypeFilter;
-import net.tourbook.ui.UI;
 
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.viewers.IPostSelectionProvider;

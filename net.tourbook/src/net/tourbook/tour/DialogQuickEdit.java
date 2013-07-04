@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -24,12 +24,12 @@ import java.util.TreeSet;
 import net.sf.swtaddons.autocomplete.combo.AutocompleteComboInput;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.UI;
 import net.tourbook.common.util.Util;
 import net.tourbook.common.weather.IWeather;
 import net.tourbook.data.TourData;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.ui.UI;
 import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
 
 import org.eclipse.jface.dialogs.IDialogConstants;
@@ -243,9 +243,11 @@ public class DialogQuickEdit extends TitleAreaDialog {
 		_pc = new PixelConverter(parent);
 		_hintDefaultSpinnerWidth = _isLinux ? SWT.DEFAULT : _pc.convertWidthInCharsToPixels(_isOSX ? 14 : 7);
 
-		_unitValueDistance = UI.UNIT_VALUE_DISTANCE;
-		_unitValueTemperature = UI.UNIT_VALUE_TEMPERATURE;
-		_unitValueWindSpeed = UI.UNIT_VALUE_DISTANCE == 1 ? IWeather.windSpeedKmh : IWeather.windSpeedMph;
+		_unitValueDistance = net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
+		_unitValueTemperature = net.tourbook.ui.UI.UNIT_VALUE_TEMPERATURE;
+		_unitValueWindSpeed = net.tourbook.ui.UI.UNIT_VALUE_DISTANCE == 1
+				? IWeather.windSpeedKmh
+				: IWeather.windSpeedMph;
 
 		_tk = new FormToolkit(parent.getDisplay());
 
@@ -901,7 +903,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
 		if (_isTemperatureManuallyModified) {
 			float temperature = (float) _spinTemperature.getSelection() / 10;
 			if (_unitValueTemperature != 1) {
-				temperature = ((temperature - UI.UNIT_FAHRENHEIT_ADD) / UI.UNIT_FAHRENHEIT_MULTI);
+				temperature = ((temperature - net.tourbook.ui.UI.UNIT_FAHRENHEIT_ADD) / net.tourbook.ui.UI.UNIT_FAHRENHEIT_MULTI);
 			}
 			_tourData.setAvgTemperature(temperature);
 		}
@@ -954,7 +956,9 @@ public class DialogQuickEdit extends TitleAreaDialog {
 
 			if (_unitValueTemperature != 1) {
 				final float metricTemperature = avgTemperature;
-				avgTemperature = metricTemperature * UI.UNIT_FAHRENHEIT_MULTI + UI.UNIT_FAHRENHEIT_ADD;
+				avgTemperature = metricTemperature
+						* net.tourbook.ui.UI.UNIT_FAHRENHEIT_MULTI
+						+ net.tourbook.ui.UI.UNIT_FAHRENHEIT_ADD;
 			}
 
 			_spinTemperature.setDigits(1);

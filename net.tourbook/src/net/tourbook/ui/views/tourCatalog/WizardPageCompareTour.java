@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -25,12 +25,12 @@ import java.util.ArrayList;
 import net.tourbook.Messages;
 import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartDataModel;
+import net.tourbook.common.UI;
 import net.tourbook.common.form.ViewerDetailForm;
 import net.tourbook.common.util.TreeViewerItem;
 import net.tourbook.data.TourData;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.tour.TourManager;
-import net.tourbook.ui.UI;
 import net.tourbook.ui.tourChart.TourChartConfiguration;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -141,7 +141,7 @@ public class WizardPageCompareTour extends WizardPage {
 				case COLUMN_DISTANCE:
 					fNf.setMinimumFractionDigits(1);
 					fNf.setMaximumFractionDigits(1);
-					return fNf.format((tourItem.colDistance) / (1000 * UI.UNIT_VALUE_DISTANCE));
+					return fNf.format((tourItem.colDistance) / (1000 * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE));
 
 				case COLUMN_RECORDING:
 					final long recordingTime = tourItem.colRecordingTime;
@@ -151,7 +151,7 @@ public class WizardPageCompareTour extends WizardPage {
 							((recordingTime % 3600) / 60));
 
 				case COLUMN_UP:
-					return Long.toString((long) (tourItem.colAltitudeUp / UI.UNIT_VALUE_ALTITUDE));
+					return Long.toString((long) (tourItem.colAltitudeUp / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE));
 
 				default:
 				}
@@ -367,7 +367,7 @@ public class WizardPageCompareTour extends WizardPage {
 			conn.close();
 
 		} catch (final SQLException e) {
-			UI.showSQLException(e);
+			net.tourbook.ui.UI.showSQLException(e);
 		}
 
 		return allTourIds.toArray(new Long[allTourIds.size()]);

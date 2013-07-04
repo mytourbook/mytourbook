@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.ui;
 
+import net.tourbook.common.UI;
 import net.tourbook.common.util.ColumnManager;
 import net.tourbook.common.util.TreeColumnDefinition;
 

@@ -17,6 +17,8 @@ package net.tourbook.chart;
 
 import java.util.HashMap;
 
+import net.tourbook.common.UI;
+
 import org.eclipse.swt.graphics.RGB;
 
 public abstract class ChartDataSerie {
@@ -235,7 +237,7 @@ public abstract class ChartDataSerie {
 	 *            The measurement to set.
 	 */
 	public void setUnitLabel(final String unit) {
-		_unitLabel = unit == null ? Util.EMPTY_STRING : unit;
+		_unitLabel = unit == null ? UI.EMPTY_STRING : unit;
 	}
 
 	public void setValueDivisor(final int valueDivisor) {

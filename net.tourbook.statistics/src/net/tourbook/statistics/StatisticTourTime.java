@@ -32,6 +32,7 @@ import net.tourbook.chart.ChartType;
 import net.tourbook.chart.IBarSelectionListener;
 import net.tourbook.chart.IChartInfoProvider;
 import net.tourbook.chart.SelectionBarChart;
+import net.tourbook.common.UI;
 import net.tourbook.common.color.GraphColorProvider;
 import net.tourbook.common.util.IToolTipHideListener;
 import net.tourbook.common.util.Util;
@@ -45,7 +46,6 @@ import net.tourbook.tour.TourInfoToolTipProvider;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.TourTypeFilter;
-import net.tourbook.ui.UI;
 import net.tourbook.ui.action.ActionEditQuick;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -246,7 +246,7 @@ public class StatisticTourTime extends YearStatistic implements IBarSelectionPro
 		final String tourTypeName = TourDatabase.getTourTypeName(_tourTimeData.typeIds[valueIndex]);
 		final String tourTags = TourDatabase.getTagNames(_tourTimeData.tagIds.get(tooltipTourId));
 		final String tourDescription = _tourTimeData.tourDescription.get(valueIndex).replace(
-				UI.SYSTEM_NEW_LINE,
+				net.tourbook.ui.UI.SYSTEM_NEW_LINE,
 				UI.NEW_LINE);
 
 		final int[] startValue = _tourTimeData.tourTimeStartValues;

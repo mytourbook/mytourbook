@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -13,10 +13,27 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-
 package net.tourbook.common.color;
 
 public interface ILegendProvider {
+
+	/*
+	 * Tour color ids
+	 */
+	public static final int	TOUR_COLOR_ALTITUDE			= 10;
+	public static final int	TOUR_COLOR_GRADIENT			= 20;
+	public static final int	TOUR_COLOR_PULSE			= 30;
+	public static final int	TOUR_COLOR_SPEED			= 40;
+	public static final int	TOUR_COLOR_PACE				= 50;
+	public static final int	TOUR_COLOR_HR_ZONE			= 60;
+
+	public static final int	DEFAULT_LEGEND_WIDTH		= 150;
+	public static final int	DEFAULT_LEGEND_HEIGHT		= 300;
+
+	public static final int	LEGEND_TOP_MARGIN			= 20;
+	public static final int	LEGEND_MARGIN_TOP_BOTTOM	= 10;
+
+	public static final int	LEGEND_UNIT_DISTANCE		= 60;
 
 	/**
 	 * @return Returns an id to identify the {@link ILegendProvider}

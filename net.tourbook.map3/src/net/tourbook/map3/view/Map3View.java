@@ -20,6 +20,7 @@ import gov.nasa.worldwind.event.RenderingEvent;
 import gov.nasa.worldwind.event.RenderingListener;
 
 import java.awt.BorderLayout;
+import java.util.ArrayList;
 
 import net.tourbook.common.UI;
 import net.tourbook.data.TourData;
@@ -284,15 +285,15 @@ public class Map3View extends ViewPart {
 
 			enableActions();
 
-//		} else if (selection instanceof SelectionTourIds) {
-//
-//			// paint all selected tours
-//
-//			final ArrayList<Long> tourIds = ((SelectionTourIds) selection).getTourIds();
-//			if (tourIds.size() == 0) {
-//
-//				// history tour (without tours) is displayed
-//
+		} else if (selection instanceof SelectionTourIds) {
+
+			// paint all selected tours
+
+			final ArrayList<Long> tourIds = ((SelectionTourIds) selection).getTourIds();
+			if (tourIds.size() == 0) {
+
+				// history tour (without tours) is displayed
+
 //				final ArrayList<Photo> allPhotos = paintPhotoSelection(selection);
 //
 //				if (allPhotos.size() > 0) {
@@ -302,28 +303,29 @@ public class Map3View extends ViewPart {
 //
 //					enableActions();
 //				}
-//
-//			} else if (tourIds.size() == 1) {
-//
-//				// only 1 tour is displayed, synch with this tour !!!
-//
-//				final TourData tourData = TourManager.getInstance().getTourData(tourIds.get(0));
-//
+
+			} else if (tourIds.size() == 1) {
+
+				// only 1 tour is displayed, synch with this tour !!!
+
+				final TourData tourData = TourManager.getInstance().getTourData(tourIds.get(0));
+
+				showTour(tourData);
 //				paintTours_20_One(tourData, false, true);
 //				paintPhotoSelection(selection);
-//
-//				enableActions();
-//
-//			} else {
-//
-//				// paint multiple tours
-//
-//				paintTours(tourIds);
+
+				enableActions();
+
+			} else {
+
+				// paint multiple tours
+
+				showTours(tourIds);
 //				paintPhotoSelection(selection);
-//
+
 //				enableActions(true);
-//			}
-//
+			}
+
 //		} else if (selection instanceof SelectionChartInfo) {
 //
 //			final ChartDataModel chartDataModel = ((SelectionChartInfo) selection).chartDataModel;
@@ -490,12 +492,28 @@ public class Map3View extends ViewPart {
 
 	}
 
-	private void showTour(final TourData tourData) {
+	private void showAllTours(final ArrayList<TourData> allTours) {
 
-		Map3Manager.getTourLayer().showTour(tourData);
+		Map3Manager.getTourLayer().showTours(allTours);
 
 		_wwCanvas.redraw();
+	}
 
+	private void showTour(final TourData tourData) {
+
+		final ArrayList<TourData> allTours = new ArrayList<TourData>();
+		allTours.add(tourData);
+
+		showAllTours(allTours);
+	}
+
+	private void showTours(final ArrayList<Long> allTourIds) {
+
+		final ArrayList<TourData> allTourData = new ArrayList<TourData>();
+
+		final long newOverlayKey = TourManager.loadTourData(allTourIds, allTourData);
+
+		showAllTours(allTourData);
 	}
 
 }

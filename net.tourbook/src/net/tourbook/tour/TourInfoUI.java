@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -19,6 +19,7 @@ import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Set;
 
+import net.tourbook.common.UI;
 import net.tourbook.common.util.ITourToolTipProvider;
 import net.tourbook.common.util.Util;
 import net.tourbook.common.weather.IWeather;
@@ -28,7 +29,6 @@ import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.Messages;
-import net.tourbook.ui.UI;
 import net.tourbook.ui.action.ActionTourToolTipEditQuick;
 import net.tourbook.ui.action.ActionTourToolTipEditTour;
 
@@ -817,7 +817,9 @@ public class TourInfoUI {
 
 	private int getWindSpeedTextIndex(final int speed) {
 
-		final int[] unitValueWindSpeed = UI.UNIT_VALUE_DISTANCE == 1 ? IWeather.windSpeedKmh : IWeather.windSpeedMph;
+		final int[] unitValueWindSpeed = net.tourbook.ui.UI.UNIT_VALUE_DISTANCE == 1
+				? IWeather.windSpeedKmh
+				: IWeather.windSpeedMph;
 
 		// set speed to max index value
 		int speedValueIndex = unitValueWindSpeed.length - 1;
@@ -851,7 +853,7 @@ public class TourInfoUI {
 		 */
 		if (_lblTourType != null && _lblTourType.isDisposed() == false) {
 			_lblTourType.setToolTipText(_uiTourTypeName);
-			UI.updateUITourType(_tourData, _lblTourType, false);
+			net.tourbook.ui.UI.updateUITourType(_tourData, _lblTourType, false);
 		}
 
 		String tourTitle = _tourData.getTourTitle();
@@ -867,7 +869,7 @@ public class TourInfoUI {
 			_lblTourTypeText.setText(_tourData.getTourType().getName());
 		}
 		if (_hasTags) {
-			UI.updateUITags(_tourData, _lblTourTags);
+			net.tourbook.ui.UI.updateUITags(_tourData, _lblTourTags);
 		}
 		if (_hasDescription) {
 			_txtDescription.setText(_tourData.getTourDescription());
@@ -944,7 +946,7 @@ public class TourInfoUI {
 		}
 
 		int windSpeed = _tourData.getWeatherWindSpeed();
-		windSpeed = (int) (windSpeed / UI.UNIT_VALUE_DISTANCE);
+		windSpeed = (int) (windSpeed / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE);
 
 		_lblWindSpeed.setText(Integer.toString(windSpeed));
 		_lblWindSpeedUnit.setText(String.format(
@@ -961,8 +963,10 @@ public class TourInfoUI {
 
 		// temperature
 		float temperature = _tourData.getAvgTemperature();
-		if (UI.UNIT_VALUE_TEMPERATURE != 1) {
-			temperature = temperature * UI.UNIT_FAHRENHEIT_MULTI + UI.UNIT_FAHRENHEIT_ADD;
+		if (net.tourbook.ui.UI.UNIT_VALUE_TEMPERATURE != 1) {
+			temperature = temperature
+					* net.tourbook.ui.UI.UNIT_FAHRENHEIT_MULTI
+					+ net.tourbook.ui.UI.UNIT_FAHRENHEIT_ADD;
 		}
 		_lblTemperature.setText(_nf1.format(temperature));
 
@@ -977,15 +981,17 @@ public class TourInfoUI {
 		/*
 		 * column: right
 		 */
-		final float distance = _tourData.getTourDistance() / UI.UNIT_VALUE_DISTANCE;
+		final float distance = _tourData.getTourDistance() / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
 
 		_lblDistance.setText(_nf3.format(distance / 1000));
 		_lblDistanceUnit.setText(UI.UNIT_LABEL_DISTANCE);
 
-		_lblAltitudeUp.setText(Integer.toString((int) (_tourData.getTourAltUp() / UI.UNIT_VALUE_ALTITUDE)));
+		_lblAltitudeUp
+				.setText(Integer.toString((int) (_tourData.getTourAltUp() / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE)));
 		_lblAltitudeUpUnit.setText(UI.UNIT_LABEL_ALTITUDE);
 
-		_lblAltitudeDown.setText(Integer.toString((int) (_tourData.getTourAltDown() / UI.UNIT_VALUE_ALTITUDE)));
+		_lblAltitudeDown
+				.setText(Integer.toString((int) (_tourData.getTourAltDown() / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE)));
 		_lblAltitudeDownUnit.setText(UI.UNIT_LABEL_ALTITUDE);
 
 		_lblAvgSpeed.setText(_nf1.format(movingTime == 0 ? 0 : distance / (movingTime / 3.6f)));

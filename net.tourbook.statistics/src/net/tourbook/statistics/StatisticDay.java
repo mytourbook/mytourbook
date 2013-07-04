@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -33,6 +33,7 @@ import net.tourbook.chart.ChartType;
 import net.tourbook.chart.IBarSelectionListener;
 import net.tourbook.chart.IChartInfoProvider;
 import net.tourbook.chart.SelectionBarChart;
+import net.tourbook.common.UI;
 import net.tourbook.common.color.GraphColorProvider;
 import net.tourbook.common.util.IToolTipHideListener;
 import net.tourbook.data.TourData;
@@ -48,7 +49,6 @@ import net.tourbook.tour.TourInfoToolTipProvider;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.TourTypeFilter;
-import net.tourbook.ui.UI;
 import net.tourbook.ui.action.ActionEditQuick;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -284,7 +284,7 @@ public abstract class StatisticDay extends YearStatistic implements IBarSelectio
 		final String tourTypeName = TourDatabase.getTourTypeName(_tourDayData.typeIds[valueIndex]);
 		final String tourTags = TourDatabase.getTagNames(_tourDayData.tagIds.get(tooltipTourId));
 		final String tourDescription = _tourDayData.tourDescription.get(valueIndex).replace(
-				UI.SYSTEM_NEW_LINE,
+				net.tourbook.ui.UI.SYSTEM_NEW_LINE,
 				UI.NEW_LINE);
 
 		final int[] startValue = _tourDayData.tourStartValues;

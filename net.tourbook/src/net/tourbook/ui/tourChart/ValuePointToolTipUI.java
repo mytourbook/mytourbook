@@ -24,11 +24,11 @@ import net.tourbook.chart.ColorCache;
 import net.tourbook.chart.ITooltipOwner;
 import net.tourbook.chart.IValuePointToolTip;
 import net.tourbook.common.PointLong;
+import net.tourbook.common.UI;
 import net.tourbook.common.color.GraphColorProvider;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.ui.UI;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ToolBarManager;
@@ -1267,7 +1267,7 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 
 		if (_isVisibleAndAvailableDistance) {
 
-			final float distance = _tourData.distanceSerie[valueIndex] / 1000 / UI.UNIT_VALUE_DISTANCE;
+			final float distance = _tourData.distanceSerie[valueIndex] / 1000 / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
 
 			_lblDistance.setText(_nf3NoGroup.format(distance));
 		}
@@ -1303,20 +1303,25 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 
 			float temperature = _tourData.temperatureSerie[valueIndex];
 
-			if (UI.UNIT_VALUE_TEMPERATURE != 1) {
+			if (net.tourbook.ui.UI.UNIT_VALUE_TEMPERATURE != 1) {
+
 				// get imperial temperature
-				temperature = temperature * UI.UNIT_FAHRENHEIT_MULTI + UI.UNIT_FAHRENHEIT_ADD;
+
+				temperature = temperature
+						* net.tourbook.ui.UI.UNIT_FAHRENHEIT_MULTI
+						+ net.tourbook.ui.UI.UNIT_FAHRENHEIT_ADD;
 			}
 
 			_lblTemperature.setText(_nf1.format(temperature));
 		}
 
 		if (_isVisibleAndAvailableTimeDuration) {
-			_lblTimeDuration.setText(UI.format_hhh_mm_ss(timeSerie[valueIndex]));
+			_lblTimeDuration.setText(net.tourbook.ui.UI.format_hhh_mm_ss(timeSerie[valueIndex]));
 		}
 
 		if (_isVisibleAndAvailableTimeOfDay) {
-			_lblTimeOfDay.setText(UI.format_hhh_mm_ss(_tourData.getStartTimeOfDay() + timeSerie[valueIndex]));
+			_lblTimeOfDay.setText(net.tourbook.ui.UI.format_hhh_mm_ss(_tourData.getStartTimeOfDay()
+					+ timeSerie[valueIndex]));
 		}
 
 		if (_isVisibleAndAvailableTimeSlice) {

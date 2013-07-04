@@ -28,6 +28,7 @@ import net.tourbook.chart.ChartToolTipInfo;
 import net.tourbook.chart.ChartType;
 import net.tourbook.chart.IChartInfoProvider;
 import net.tourbook.chart.Util;
+import net.tourbook.common.UI;
 import net.tourbook.common.color.GraphColorProvider;
 import net.tourbook.data.TourPerson;
 import net.tourbook.data.TourType;
@@ -35,7 +36,6 @@ import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.statistic.StatisticContext;
 import net.tourbook.ui.TourTypeFilter;
-import net.tourbook.ui.UI;
 
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.preference.IPreferenceStore;

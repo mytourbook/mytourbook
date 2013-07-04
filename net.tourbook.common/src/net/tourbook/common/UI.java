@@ -16,10 +16,12 @@
 package net.tourbook.common;
 
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 
 import net.tourbook.common.weather.IWeather;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
+import org.eclipse.jface.preference.StringFieldEditor;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
@@ -42,6 +44,7 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.graphics.TextLayout;
+import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -49,6 +52,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Sash;
+import org.eclipse.swt.widgets.Scale;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Spinner;
 import org.epics.css.dal.Timestamp;
@@ -108,13 +112,6 @@ public class UI {
 	public static final String			SYMBOL_UNDERSCORE						= "_";																		//$NON-NLS-1$
 	public static final String			SYMBOL_WIND_WITH_SPACE					= "W ";																	//$NON-NLS-1$
 
-	public static final String			UNIT_MBYTES								= "MByte";																	//$NON-NLS-1$
-
-	/*
-	 * labels for the different measurement systems
-	 */
-	public static final String			UNIT_DISTANCE_KM						= "km";																	//$NON-NLS-1$
-
 	/**
 	 * The ellipsis is the string that is used to represent shortened text.
 	 * 
@@ -147,9 +144,48 @@ public class UI {
 	public static final String			MENU_SEPARATOR_ADDITIONS				= "additions";																//$NON-NLS-1$
 
 	/**
-	 * layout hint for a description field
+	 * Layout hint for a description field
 	 */
 	public static final int				DEFAULT_DESCRIPTION_WIDTH				= 350;
+	public static final int				DEFAULT_FIELD_WIDTH						= 40;
+
+	/*
+	 * Contains the unit label in the currenty measurement system for the distance values
+	 */
+	public static String				UNIT_LABEL_DISTANCE;
+	public static String				UNIT_LABEL_DISTANCE_SMALL;
+	public static String				UNIT_LABEL_ALTITUDE;
+	public static String				UNIT_LABEL_ALTIMETER;
+	public static String				UNIT_LABEL_TEMPERATURE;
+	public static String				UNIT_LABEL_SPEED;
+	public static String				UNIT_LABEL_PACE;
+
+	public static final String			UNIT_LABEL_TIME							= "h";																		//$NON-NLS-1$
+	public static final String			UNIT_LABEL_DIRECTION					= "\u00B0";																//$NON-NLS-1$
+
+	/*
+	 * Labels for the different measurement systems
+	 */
+	public static final String			UNIT_METER								= "m";																		//$NON-NLS-1$
+	public static final String			UNIT_ALTITUDE_M							= "m";																		//$NON-NLS-1$
+	public static final String			UNIT_DISTANCE_KM						= "km";																	//$NON-NLS-1$
+	public static final String			UNIT_SPEED_KM_H							= "km/h";																	//$NON-NLS-1$
+	public static final String			UNIT_TEMPERATURE_C						= "\u00B0C";																//$NON-NLS-1$
+	public static final String			UNIT_ALTIMETER_M_H						= "m/h";																	//$NON-NLS-1$
+	public static final String			UNIT_PACE_MIN_P_KM						= "min/km";																//$NON-NLS-1$
+	public static final String			UNIT_WEIGHT_KG							= "kg";																	//$NON-NLS-1$
+	public static final String			UNIT_MBYTES								= "MByte";																	//$NON-NLS-1$
+
+	public static final String			UNIT_DISTANCE_YARD						= "yd";																	//$NON-NLS-1$
+	public static final String			UNIT_ALTITUDE_FT						= "ft";																	//$NON-NLS-1$
+	public static final String			UNIT_DISTANCE_MI						= "mi";																	//$NON-NLS-1$
+	public static final String			UNIT_SPEED_MPH							= "mph";																	//$NON-NLS-1$
+	public static final String			UNIT_TEMPERATURE_F						= "\u00B0F";																//$NON-NLS-1$
+	public static final String			UNIT_ALTIMETER_FT_H						= "ft/h";																	//$NON-NLS-1$
+	public static final String			UNIT_PACE_MIN_P_MILE					= "min/mi";																//$NON-NLS-1$
+
+	public static final String			UNIT_LABEL_POWER						= "Watt";																	//$NON-NLS-1$
+	public static final String			UNIT_LABEL_MS							= "ms";																	//$NON-NLS-1$
 
 	/*
 	 * SET_FORMATTING_OFF
@@ -210,6 +246,8 @@ public class UI {
 	public static final String			IMAGE_EMPTY_16							= "_empty16";																//$NON-NLS-1$
 
 	public final static ImageRegistry	IMAGE_REGISTRY;
+	public static final int				FORM_FIRST_COLUMN_INDENT				= 16;
+	public static final char								TAB								= '\t';
 
 	static {
 
@@ -280,6 +318,58 @@ public class UI {
 				}
 			}
 		});
+	}
+
+	public static void adjustScaleValueOnMouseScroll(final MouseEvent event) {
+
+		boolean isCtrlKey;
+		boolean isShiftKey;
+
+		if (UI.IS_OSX) {
+			isCtrlKey = (event.stateMask & SWT.MOD1) > 0;
+			isShiftKey = (event.stateMask & SWT.MOD3) > 0;
+			//			isAltKey = (event.stateMask & SWT.MOD3) > 0;
+		} else {
+			isCtrlKey = (event.stateMask & SWT.MOD1) > 0;
+			isShiftKey = (event.stateMask & SWT.MOD2) > 0;
+			//			isAltKey = (event.stateMask & SWT.MOD3) > 0;
+		}
+
+		// accelerate with Ctrl + Shift key
+		int accelerator = isCtrlKey ? 10 : 1;
+		accelerator *= isShiftKey ? 5 : 1;
+
+		final Scale scale = (Scale) event.widget;
+		final int increment = scale.getIncrement();
+		final int oldValue = scale.getSelection();
+		final int valueDiff = ((event.count > 0 ? increment : -increment) * accelerator);
+
+		scale.setSelection(oldValue + valueDiff);
+	}
+
+	public static void adjustSpinnerValueOnMouseScroll(final MouseEvent event) {
+
+		boolean isCtrlKey;
+		boolean isShiftKey;
+
+		if (UI.IS_OSX) {
+			isCtrlKey = (event.stateMask & SWT.MOD1) > 0;
+			isShiftKey = (event.stateMask & SWT.MOD3) > 0;
+			//			isAltKey = (event.stateMask & SWT.MOD3) > 0;
+		} else {
+			isCtrlKey = (event.stateMask & SWT.MOD1) > 0;
+			isShiftKey = (event.stateMask & SWT.MOD2) > 0;
+			//			isAltKey = (event.stateMask & SWT.MOD3) > 0;
+		}
+
+		// accelerate with Ctrl + Shift key
+		int accelerator = isCtrlKey ? 10 : 1;
+		accelerator *= isShiftKey ? 5 : 1;
+
+		final Spinner spinner = (Spinner) event.widget;
+		final int newValue = ((event.count > 0 ? 1 : -1) * accelerator);
+
+		spinner.setSelection(spinner.getSelection() + newValue);
 	}
 
 	/**
@@ -503,6 +593,13 @@ public class UI {
 				}
 			}
 		}
+	}
+
+	public static GridData setFieldWidth(final Composite parent, final StringFieldEditor field, final int width) {
+		final GridData gd = new GridData();
+		gd.widthHint = width;
+		field.getTextControl(parent).setLayoutData(gd);
+		return gd;
 	}
 
 	/**
@@ -731,6 +828,36 @@ public class UI {
 				}
 			}
 		};
+	}
+
+	/**
+	 * set width for all controls in one column to the max width value
+	 */
+	public static void setEqualizeColumWidths(final ArrayList<Control> columnControls) {
+		UI.setEqualizeColumWidths(columnControls, 0);
+	}
+
+	public static void setEqualizeColumWidths(final ArrayList<Control> columnControls, final int additionalSpace) {
+	
+		int maxWidth = 0;
+	
+		// get max width from all first columns controls
+		for (final Control control : columnControls) {
+	
+			if (control.isDisposed()) {
+				// this should not happen, but it did during testing
+				return;
+			}
+	
+			final int width = control.getSize().x + additionalSpace;
+	
+			maxWidth = width > maxWidth ? width : maxWidth;
+		}
+	
+		// set width for all first column controls
+		for (final Control control : columnControls) {
+			((GridData) control.getLayoutData()).widthHint = maxWidth;
+		}
 	}
 
 // this conversion is not working for all png images, found SWT2Dutil.java

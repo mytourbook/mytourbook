@@ -788,7 +788,7 @@ public class DialogMarker extends TitleAreaDialog {
 		final TableViewerColumn tvc = new TableViewerColumn(_markerViewer, SWT.TRAIL);
 		final TableColumn tc = tvc.getColumn();
 
-		tc.setText(net.tourbook.ui.UI.UNIT_LABEL_DISTANCE);
+		tc.setText(UI.UNIT_LABEL_DISTANCE);
 		tc.setToolTipText(Messages.Tour_Marker_Column_km_tooltip);
 		tvc.setLabelProvider(new CellLabelProvider() {
 

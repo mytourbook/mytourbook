@@ -662,7 +662,7 @@ public class DialogSelectSRTMColors extends TitleAreaDialog {
 			spinnerElevation.addSelectionListener(eleSelectionListener);
 			spinnerElevation.addMouseWheelListener(new MouseWheelListener() {
 				public void mouseScrolled(final MouseEvent event) {
-					net.tourbook.ui.UI.adjustSpinnerValueOnMouseScroll(event);
+					UI.adjustSpinnerValueOnMouseScroll(event);
 					onSelectElevation(event.widget);
 				}
 			});

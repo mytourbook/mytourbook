@@ -29,6 +29,7 @@ import net.tourbook.chart.ChartDataYSerie;
 import net.tourbook.chart.ChartType;
 import net.tourbook.chart.IChartLayer;
 import net.tourbook.common.CommonActivator;
+import net.tourbook.common.UI;
 import net.tourbook.common.color.GraphColorProvider;
 import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.common.util.Util;
@@ -39,7 +40,6 @@ import net.tourbook.tour.SelectionTourData;
 import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.SelectionTourIds;
 import net.tourbook.tour.TourManager;
-import net.tourbook.ui.UI;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;

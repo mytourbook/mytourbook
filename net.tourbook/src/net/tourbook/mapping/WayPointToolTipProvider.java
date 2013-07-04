@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2012  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -18,13 +18,13 @@ package net.tourbook.mapping;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 
+import net.tourbook.common.UI;
 import net.tourbook.common.util.HoveredAreaContext;
 import net.tourbook.common.util.ITourToolTipProvider;
 import net.tourbook.common.util.TourToolTip;
 import net.tourbook.data.TourWayPoint;
 import net.tourbook.ui.IMapToolTipProvider;
 import net.tourbook.ui.Messages;
-import net.tourbook.ui.UI;
 
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
@@ -146,7 +146,7 @@ public class WayPointToolTipProvider implements ITourToolTipProvider, IMapToolTi
 				final float wpAltitude = _hoveredWayPoint.getAltitude();
 				if (wpAltitude != Float.MIN_VALUE) {
 
-					final float altitude = wpAltitude / UI.UNIT_VALUE_ALTITUDE;
+					final float altitude = wpAltitude / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE;
 
 					createUIItem(container, Messages.Tooltip_WayPoint_Label_Altitude, //
 							_nf_1_1.format(altitude) + UI.SPACE + UI.UNIT_LABEL_ALTITUDE);

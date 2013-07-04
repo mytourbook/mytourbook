@@ -27,7 +27,7 @@ import org.eclipse.swt.graphics.RGB;
 /**
  * Contains all data to draw the legend image for discrete colors.
  */
-public class LegendProviderHrZones implements ILegendProviderDiscreteColors {
+public class HrZonesColorProvider implements ILegendProviderDiscreteColors {
 
 	private int							_colorId;
 
@@ -43,7 +43,7 @@ public class LegendProviderHrZones implements ILegendProviderDiscreteColors {
 	private HrZoneContext				_hrZoneContext;
 	private float[]						_pulseData;
 
-	public LegendProviderHrZones(final int colorId) {
+	public HrZonesColorProvider(final int colorId) {
 		_colorId = colorId;
 	}
 
@@ -69,11 +69,11 @@ public class LegendProviderHrZones implements ILegendProviderDiscreteColors {
 		}
 
 		/**
+		 * Superhack :-) <br>
 		 * Adjust the value index to use the previous data because when a tour is painted as a line
 		 * is will be painted "to" the value and not "from" the value.<br>
 		 * This is not the best solution but adjusting the tour paint algorithm is much much more
-		 * complex, really !!! <br>
-		 * superhack :-)
+		 * complex, really !!!
 		 */
 		final int adjustedValueIndex = valueIndex > 0 && isDrawLine ? //
 				valueIndex - 1

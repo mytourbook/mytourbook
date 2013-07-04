@@ -520,7 +520,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider {
 		final TableViewerColumn tvc = new TableViewerColumn(_markerViewer, SWT.TRAIL);
 		final TableColumn tvcColumn = tvc.getColumn();
 
-		tvcColumn.setText(UI.SYMBOL_DIFFERENCE + UI.UNIT_LABEL_DISTANCE);
+		tvcColumn.setText(UI.SYMBOL_DIFFERENCE + net.tourbook.common.UI.UNIT_LABEL_DISTANCE);
 		tvc.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -590,7 +590,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider {
 
 		final TableViewerColumn tvc = new TableViewerColumn(_markerViewer, SWT.TRAIL);
 		final TableColumn tvcColumn = tvc.getColumn();
-		tvcColumn.setText(UI.UNIT_LABEL_DISTANCE);
+		tvcColumn.setText(net.tourbook.common.UI.UNIT_LABEL_DISTANCE);
 		tvcColumn.setToolTipText(Messages.Tour_Marker_Column_km_tooltip);
 		tvc.setLabelProvider(new CellLabelProvider() {
 			@Override

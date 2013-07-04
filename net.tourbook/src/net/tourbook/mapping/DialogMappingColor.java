@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -16,11 +16,13 @@
 package net.tourbook.mapping;
 
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.UI;
 import net.tourbook.common.color.ColorDefinition;
+import net.tourbook.common.color.GradientColorProvider;
+import net.tourbook.common.color.ILegendProviderGradientColors;
 import net.tourbook.common.color.LegendColor;
 import net.tourbook.common.color.ValueColor;
 import net.tourbook.preferences.PrefPageAppearanceColors;
-import net.tourbook.ui.UI;
 
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -131,7 +133,7 @@ public class DialogMappingColor extends TitleAreaDialog {
 	}
 
 	public DialogMappingColor(	final Shell parentShell,
-								final LegendProviderGradientColors legendProvider,
+								final GradientColorProvider legendProvider,
 								final PrefPageAppearanceColors prefPageAppearanceColors) {
 
 		super(parentShell);

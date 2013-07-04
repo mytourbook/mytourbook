@@ -26,10 +26,9 @@ import java.util.Set;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.Util;
 import net.tourbook.common.color.ILegendProvider;
-import net.tourbook.common.color.LegendColor;
+import net.tourbook.common.color.ILegendProviderGradientColors;
 import net.tourbook.common.color.LegendConfig;
 import net.tourbook.common.color.LegendUnitFormat;
-import net.tourbook.common.color.ValueColor;
 import net.tourbook.common.map.GeoPosition;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
@@ -213,9 +212,9 @@ public class TourMapPainter extends MapPainter {
 			// vertical legend
 
 			legendPositionX = legendBounds.x + 1;
-			legendPositionY = legendBounds.y + TourMapView.LEGEND_MARGIN_TOP_BOTTOM;
+			legendPositionY = legendBounds.y + ILegendProvider.LEGEND_MARGIN_TOP_BOTTOM;
 			legendWidth = 20;
-			legendHeight = legendBounds.height - 2 * TourMapView.LEGEND_MARGIN_TOP_BOTTOM;
+			legendHeight = legendBounds.height - 2 * ILegendProvider.LEGEND_MARGIN_TOP_BOTTOM;
 
 			availableLegendPixels = legendHeight - 1;
 
@@ -359,135 +358,7 @@ public class TourMapPainter extends MapPainter {
 
 	}
 
-	/**
-	 * @param legendConfig
-	 * @param legendColor
-	 * @param legendValue
-	 * @param device
-	 * @return Returns a {@link Color} which corresponst to the legend value
-	 */
-	static int getLegendColor(final LegendConfig legendConfig, final LegendColor legendColor, final float legendValue) {
 
-		int red = 0;
-		int green = 0;
-		int blue = 0;
-
-		final ValueColor[] valueColors = legendColor.valueColors;
-		final float minBrightnessFactor = legendColor.minBrightnessFactor / 100.0f;
-		final float maxBrightnessFactor = legendColor.maxBrightnessFactor / 100.0f;
-
-		/*
-		 * find the valueColor for the current value
-		 */
-		ValueColor valueColor;
-		ValueColor minValueColor = null;
-		ValueColor maxValueColor = null;
-
-		for (final ValueColor valueColor2 : valueColors) {
-
-			valueColor = valueColor2;
-			if (legendValue > valueColor.value) {
-				minValueColor = valueColor;
-			}
-			if (legendValue <= valueColor.value) {
-				maxValueColor = valueColor;
-			}
-
-			if (minValueColor != null && maxValueColor != null) {
-				break;
-			}
-		}
-
-		if (minValueColor == null) {
-
-			// legend value is smaller than minimum value
-
-			valueColor = valueColors[0];
-			red = valueColor.red;
-			green = valueColor.green;
-			blue = valueColor.blue;
-
-			final float minValue = valueColor.value;
-			final float minDiff = legendConfig.legendMinValue - minValue;
-
-			final float ratio = minDiff == 0 ? 1 : (legendValue - minValue) / minDiff;
-			final float dimmRatio = minBrightnessFactor * ratio;
-
-			if (legendColor.minBrightness == LegendColor.BRIGHTNESS_DIMMING) {
-
-				red = red - (int) (dimmRatio * red);
-				green = green - (int) (dimmRatio * green);
-				blue = blue - (int) (dimmRatio * blue);
-
-			} else if (legendColor.minBrightness == LegendColor.BRIGHTNESS_LIGHTNING) {
-
-				red = red + (int) (dimmRatio * (255 - red));
-				green = green + (int) (dimmRatio * (255 - green));
-				blue = blue + (int) (dimmRatio * (255 - blue));
-			}
-
-		} else if (maxValueColor == null) {
-
-			// legend value is larger than maximum value
-
-			valueColor = valueColors[valueColors.length - 1];
-			red = valueColor.red;
-			green = valueColor.green;
-			blue = valueColor.blue;
-
-			final float maxValue = valueColor.value;
-			final float maxDiff = legendConfig.legendMaxValue - maxValue;
-
-			final float ratio = maxDiff == 0 ? 1 : (legendValue - maxValue) / maxDiff;
-			final float dimmRatio = maxBrightnessFactor * ratio;
-
-			if (legendColor.maxBrightness == LegendColor.BRIGHTNESS_DIMMING) {
-
-				red = red - (int) (dimmRatio * red);
-				green = green - (int) (dimmRatio * green);
-				blue = blue - (int) (dimmRatio * blue);
-
-			} else if (legendColor.maxBrightness == LegendColor.BRIGHTNESS_LIGHTNING) {
-
-				red = red + (int) (dimmRatio * (255 - red));
-				green = green + (int) (dimmRatio * (255 - green));
-				blue = blue + (int) (dimmRatio * (255 - blue));
-			}
-
-		} else {
-
-			// legend value is in the min/max range
-
-			final float maxValue = maxValueColor.value;
-			final float minValue = minValueColor.value;
-			final int minRed = minValueColor.red;
-			final int minGreen = minValueColor.green;
-			final int minBlue = minValueColor.blue;
-
-			final int redDiff = maxValueColor.red - minRed;
-			final int greenDiff = maxValueColor.green - minGreen;
-			final int blueDiff = maxValueColor.blue - minBlue;
-
-			final float ratioDiff = maxValue - minValue;
-			final float ratio = ratioDiff == 0 ? 1 : (legendValue - minValue) / (ratioDiff);
-
-			red = (int) (minRed + redDiff * ratio);
-			green = (int) (minGreen + greenDiff * ratio);
-			blue = (int) (minBlue + blueDiff * ratio);
-		}
-
-		// adjust color values to 0...255, this is optimized
-		final int maxRed = (0 >= red) ? 0 : red;
-		final int maxGreen = (0 >= green) ? 0 : green;
-		final int maxBlue = (0 >= blue) ? 0 : blue;
-		red = (255 <= maxRed) ? 255 : maxRed;
-		green = (255 <= maxGreen) ? 255 : maxGreen;
-		blue = (255 <= maxBlue) ? 255 : maxBlue;
-
-		final int colorValue = ((red & 0xFF) << 0) | ((green & 0xFF) << 8) | ((blue & 0xFF) << 16);
-
-		return colorValue;
-	}
 
 	private static void getTourPainterSettings() {
 
@@ -1444,8 +1315,8 @@ public class TourMapPainter extends MapPainter {
 
 			// min < value < max
 
-			final int legendPositionY = legendBounds.y + TourMapView.LEGEND_MARGIN_TOP_BOTTOM;
-			final int legendHeight = legendBounds.height - 2 * TourMapView.LEGEND_MARGIN_TOP_BOTTOM;
+			final int legendPositionY = legendBounds.y + ILegendProvider.LEGEND_MARGIN_TOP_BOTTOM;
+			final int legendHeight = legendBounds.height - 2 * ILegendProvider.LEGEND_MARGIN_TOP_BOTTOM;
 
 			final int pixelDiff = legendHeight - 1;
 
@@ -1499,8 +1370,11 @@ public class TourMapPainter extends MapPainter {
 
 		int colorValue = 0;
 		if (_legendProvider instanceof ILegendProviderGradientColors) {
+
 			colorValue = ((ILegendProviderGradientColors) _legendProvider).getColorValue(_dataSerie[serieIndex]);
+
 		} else if (_legendProvider instanceof ILegendProviderDiscreteColors) {
+
 			colorValue = ((ILegendProviderDiscreteColors) _legendProvider).getColorValue(
 					tourData,
 					serieIndex,
@@ -1871,27 +1745,27 @@ public class TourMapPainter extends MapPainter {
 		_legendProvider = legendProvider;
 
 		switch (_legendProvider.getTourColorId()) {
-		case TourMapColors.TOUR_COLOR_ALTITUDE:
+		case ILegendProvider.TOUR_COLOR_ALTITUDE:
 			_dataSerie = tourData.getAltitudeSerie();
 			break;
 
-		case TourMapColors.TOUR_COLOR_GRADIENT:
+		case ILegendProvider.TOUR_COLOR_GRADIENT:
 			_dataSerie = tourData.getGradientSerie();
 			break;
 
-		case TourMapColors.TOUR_COLOR_PULSE:
+		case ILegendProvider.TOUR_COLOR_PULSE:
 			_dataSerie = tourData.pulseSerie;
 			break;
 
-		case TourMapColors.TOUR_COLOR_SPEED:
+		case ILegendProvider.TOUR_COLOR_SPEED:
 			_dataSerie = tourData.getSpeedSerie();
 			break;
 
-		case TourMapColors.TOUR_COLOR_PACE:
+		case ILegendProvider.TOUR_COLOR_PACE:
 			_dataSerie = tourData.getPaceSerieSeconds();
 			break;
 
-		case TourMapColors.TOUR_COLOR_HR_ZONE:
+		case ILegendProvider.TOUR_COLOR_HR_ZONE:
 			_dataSerie = tourData.pulseSerie;
 			break;
 

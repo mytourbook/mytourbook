@@ -29,6 +29,7 @@ import net.tourbook.chart.ChartDataYSerie;
 import net.tourbook.chart.ChartType;
 import net.tourbook.chart.ComputeChartValue;
 import net.tourbook.common.CommonActivator;
+import net.tourbook.common.UI;
 import net.tourbook.common.color.GraphColorProvider;
 import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.common.util.MtMath;
@@ -43,7 +44,6 @@ import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.PrefPageViews;
 import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.ITourProviderAll;
-import net.tourbook.ui.UI;
 import net.tourbook.ui.action.ActionEditQuick;
 import net.tourbook.ui.action.ActionEditTour;
 import net.tourbook.ui.tourChart.TourChart;
@@ -488,11 +488,11 @@ public class TourManager {
 	}
 
 	public static String getTourDateFull(final TourData tourData) {
-		return UI.DateFormatterFull.format(tourData.getTourStartTimeMS());
+		return net.tourbook.ui.UI.DateFormatterFull.format(tourData.getTourStartTimeMS());
 	}
 
 	private static String getTourDateLong(final Date date) {
-		return UI.DateFormatterLong.format(date.getTime());
+		return net.tourbook.ui.UI.DateFormatterLong.format(date.getTime());
 	}
 
 	/**
@@ -504,7 +504,7 @@ public class TourManager {
 			return UI.EMPTY_STRING;
 		}
 
-		return UI.DateFormatterShort.format(tourData.getTourStartTimeMS());
+		return net.tourbook.ui.UI.DateFormatterShort.format(tourData.getTourStartTimeMS());
 	}
 
 	/**
@@ -535,18 +535,18 @@ public class TourManager {
 	}
 
 	public static String getTourDateTimeShort(final TourData tourData) {
-		return UI.DTFormatterShort.print(tourData.getTourStartTime());
+		return net.tourbook.ui.UI.DTFormatterShort.print(tourData.getTourStartTime());
 	}
 
 	private static String getTourTimeShort(final Date date) {
-		return UI.TimeFormatterShort.format(date.getTime());
+		return net.tourbook.ui.UI.TimeFormatterShort.format(date.getTime());
 	}
 
 	/**
 	 * @return returns the date of this tour
 	 */
 	public static String getTourTimeShort(final TourData tourData) {
-		return UI.TimeFormatterShort.format(tourData.getTourStartTimeMS());
+		return net.tourbook.ui.UI.TimeFormatterShort.format(tourData.getTourStartTimeMS());
 	}
 
 	public static String getTourTitle(final Date date) {
@@ -579,6 +579,34 @@ public class TourManager {
 	}
 
 	/**
+	 * Checks if {@link TourData} can be painted
+	 * 
+	 * @param tourData
+	 * @return <code>true</code> when {@link TourData} contains a tour which can be painted in the
+	 *         map
+	 */
+	public static boolean isPaintDataValid(final TourData tourData) {
+
+		if (tourData == null) {
+			return false;
+		}
+
+		// check if coordinates are available
+
+		final double[] longitudeSerie = tourData.longitudeSerie;
+		final double[] latitudeSerie = tourData.latitudeSerie;
+
+		if ((longitudeSerie == null)
+				|| (longitudeSerie.length == 0)
+				|| (latitudeSerie == null)
+				|| (latitudeSerie.length == 0)) {
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
 	 * Checks if a tour in the {@link TourDataEditorView} is modified and shows the editor when it's
 	 * modified. A message dialog informs the user about the modified tour and that the requested
 	 * actions cannot be done.
@@ -607,6 +635,82 @@ public class TourManager {
 		}
 
 		return false;
+	}
+
+	/**
+	 * @param allTourIds
+	 * @param allTourData
+	 *            Contains {@link TourData} for all tour ids.
+	 * @return Returns a unique key for all {@link TourData}.
+	 */
+	public static long loadTourData(final ArrayList<Long> allTourIds, final ArrayList<TourData> allTourData) {
+
+		allTourData.clear();
+
+		// create a unique key for all tours
+		final long newOverlayKey[] = { 0 };
+
+		if (allTourIds.size() > 200) {
+
+			try {
+
+				final IRunnableWithProgress saveRunnable = new IRunnableWithProgress() {
+					@Override
+					public void run(final IProgressMonitor monitor) throws InvocationTargetException,
+							InterruptedException {
+
+						int loadCounter = 0;
+						final int idSize = allTourIds.size();
+
+						monitor.beginTask(Messages.Tour_Data_LoadTourData_Monitor, idSize);
+
+						for (final Long tourId : allTourIds) {
+
+							monitor.subTask(NLS.bind(
+									Messages.Tour_Data_LoadTourData_Monitor_SubTask,
+									++loadCounter,
+									idSize));
+
+							if (monitor.isCanceled()) {
+								break;
+							}
+
+							final TourData tourData = TourManager.getInstance().getTourData(tourId);
+							if (isPaintDataValid(tourData)) {
+
+								// keep tour data for each tour id
+								allTourData.add(tourData);
+								newOverlayKey[0] += tourData.getTourId();
+							}
+
+							monitor.worked(1);
+						}
+					}
+				};
+
+				new ProgressMonitorDialog(Display.getCurrent().getActiveShell()).run(true, true, saveRunnable);
+
+			} catch (final InvocationTargetException e) {
+				StatusUtil.showStatus(e);
+			} catch (final InterruptedException e) {
+				StatusUtil.showStatus(e);
+			}
+
+		} else {
+
+			for (final Long tourId : allTourIds) {
+
+				final TourData tourData = TourManager.getInstance().getTourData(tourId);
+				if (isPaintDataValid(tourData)) {
+
+					// keep tour data for each tour id
+					allTourData.add(tourData);
+					newOverlayKey[0] += tourData.getTourId();
+				}
+			}
+		}
+
+		return newOverlayKey[0];
 	}
 
 	public static TourDataEditorView openTourEditor(final boolean isActive) {

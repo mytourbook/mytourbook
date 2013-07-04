@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -24,6 +24,7 @@ import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.ISliderMoveListener;
 import net.tourbook.chart.SelectionChartInfo;
+import net.tourbook.common.UI;
 import net.tourbook.common.action.ActionOpenPrefDialog;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
@@ -35,7 +36,6 @@ import net.tourbook.tour.TourEvent;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.ITourProvider2;
-import net.tourbook.ui.UI;
 import net.tourbook.ui.action.ActionSetTourTypeMenu;
 import net.tourbook.ui.tourChart.ChartLayer2ndAltiSerie;
 import net.tourbook.ui.tourChart.I2ndAltiLayer;
@@ -76,6 +76,7 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Scale;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Widget;
+//import net.tourbook.ui.UI;
 
 public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2, I2ndAltiLayer {
 
@@ -529,7 +530,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
 
 				_sourceTour.dataSerieAdjustedAlti = adjustedTargetAltitudeSerie;
 
-				startAltiDiff /= UI.UNIT_VALUE_ALTITUDE;
+				startAltiDiff /= net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE;
 
 				final int targetEndTime = targetTimeSerie[endIndex];
 				final float targetEndDistance = targetDistanceSerie[endIndex];
@@ -542,7 +543,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
 				// meter/meter
 				altiDiffDist = targetEndDistance == 0 ? //
 						0f
-						: ((startAltiDiff * 1000) / targetEndDistance) / UI.UNIT_VALUE_DISTANCE;
+						: ((startAltiDiff * 1000) / targetEndDistance) / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
 
 			} else if (_chkAdjustAltiFromSource.getSelection()) {
 
@@ -1486,8 +1487,8 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
 		final int altiDiff1 = _scaleAltitude1.getSelection() - MAX_ADJUST_ALTITUDE_1;
 		final int altiDiff10 = (_scaleAltitude10.getSelection() - MAX_ADJUST_ALTITUDE_10) * 10;
 
-		final float localAltiDiff1 = altiDiff1 / UI.UNIT_VALUE_ALTITUDE;
-		final float localAltiDiff10 = altiDiff10 / UI.UNIT_VALUE_ALTITUDE;
+		final float localAltiDiff1 = altiDiff1 / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE;
+		final float localAltiDiff10 = altiDiff10 / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE;
 
 		_lblAltitudeDiff1.setText(Integer.toString((int) localAltiDiff1) + UI.SPACE + UI.UNIT_LABEL_ALTITUDE);
 		_lblAltitudeDiff10.setText(Integer.toString((int) localAltiDiff10) + UI.SPACE + UI.UNIT_LABEL_ALTITUDE);
@@ -1887,7 +1888,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
 		_scaleAltitude1.setSelection(altitudeOffset1 + MAX_ADJUST_ALTITUDE_1);
 		_scaleAltitude10.setSelection(altitudeOffset10 + MAX_ADJUST_ALTITUDE_10);
 
-		UI.updateUITourType(_sourceTour, _lblTourType, true);
+		net.tourbook.ui.UI.updateUITourType(_sourceTour, _lblTourType, true);
 
 		onModifyProperties();
 	}

@@ -38,6 +38,7 @@ import java.util.TimeZone;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.UI;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
@@ -48,7 +49,6 @@ import net.tourbook.extension.export.ExportTourExtension;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.FileCollisionBehavior;
 import net.tourbook.ui.ImageComboLabel;
-import net.tourbook.ui.UI;
 
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
@@ -846,9 +846,13 @@ public class DialogExportTour extends TitleAreaDialog {
 							uiStartTime,
 							uiEndTime,
 
-							_numberFormatter.format(distanceSerie[_tourStartIndex] / 1000 / UI.UNIT_VALUE_DISTANCE),
+									_numberFormatter.format(distanceSerie[_tourStartIndex]
+											/ 1000
+											/ net.tourbook.ui.UI.UNIT_VALUE_DISTANCE),
 
-							_numberFormatter.format(distanceSerie[_tourEndIndex] / 1000 / UI.UNIT_VALUE_DISTANCE),
+									_numberFormatter.format(distanceSerie[_tourEndIndex]
+											/ 1000
+											/ net.tourbook.ui.UI.UNIT_VALUE_DISTANCE),
 
 							UI.UNIT_LABEL_DISTANCE,
 
@@ -1044,7 +1048,7 @@ public class DialogExportTour extends TitleAreaDialog {
 		} catch (final NumberFormatException e) {
 			camouflageSpeed[0] = 0.1F;
 		}
-		camouflageSpeed[0] *= UI.UNIT_VALUE_DISTANCE / 3.6f;
+		camouflageSpeed[0] *= net.tourbook.ui.UI.UNIT_VALUE_DISTANCE / 3.6f;
 
 		final ArrayList<GarminTrack> trackList = new ArrayList<GarminTrack>();
 		final ArrayList<GarminWaypoint> wayPointList = new ArrayList<GarminWaypoint>();
@@ -1143,7 +1147,8 @@ public class DialogExportTour extends TitleAreaDialog {
 
 							// get filepath
 							final IPath filePath = exportFilePath
-									.append(UI.format_yyyymmdd_hhmmss(tourData))
+.append(
+									net.tourbook.ui.UI.format_yyyymmdd_hhmmss(tourData))
 									.addFileExtension(_exportExtensionPoint.getFileExtension());
 
 							final GarminLap tourLap = createExportLap(tourData, addNotes);
@@ -1223,7 +1228,7 @@ public class DialogExportTour extends TitleAreaDialog {
 			if (isOverwriteFiles) {
 				// overwrite is enabled in the UI
 			} else {
-				isOverwrite = UI.confirmOverwrite(fileCollisionBehaviour, exportFile);
+				isOverwrite = net.tourbook.ui.UI.confirmOverwrite(fileCollisionBehaviour, exportFile);
 			}
 		}
 
@@ -1585,7 +1590,7 @@ public class DialogExportTour extends TitleAreaDialog {
 	@Override
 	protected void okPressed() {
 
-		UI.disableAllControls(_inputContainer);
+		net.tourbook.ui.UI.disableAllControls(_inputContainer);
 
 		BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
 			public void run() {
@@ -1648,7 +1653,7 @@ public class DialogExportTour extends TitleAreaDialog {
 			_rdoTcxNameFromTour.setSelection(isFromTour);
 			_rdoTcxNameFromField.setSelection(!isFromTour);
 
-			UI.restoreCombo(_comboTcxCourseName, _state.getArray(STATE_TCX_COURSE_NAME));
+			net.tourbook.ui.UI.restoreCombo(_comboTcxCourseName, _state.getArray(STATE_TCX_COURSE_NAME));
 
 			updateUICourseName();
 		}
@@ -1665,8 +1670,8 @@ public class DialogExportTour extends TitleAreaDialog {
 		_txtCamouflageSpeed.selectAll();
 
 		// export file/path
-		UI.restoreCombo(_comboFile, _state.getArray(STATE_EXPORT_FILE_NAME));
-		UI.restoreCombo(_comboPath, _state.getArray(STATE_EXPORT_PATH_NAME));
+		net.tourbook.ui.UI.restoreCombo(_comboFile, _state.getArray(STATE_EXPORT_FILE_NAME));
+		net.tourbook.ui.UI.restoreCombo(_comboPath, _state.getArray(STATE_EXPORT_PATH_NAME));
 		_chkOverwriteFiles.setSelection(_state.getBoolean(STATE_IS_OVERWRITE_FILES));
 	}
 
@@ -1749,7 +1754,7 @@ public class DialogExportTour extends TitleAreaDialog {
 			final int startTime = minTourData.timeSerie[_tourStartIndex];
 			final DateTime tourTime = dtTour.plusSeconds(startTime);
 
-			_comboFile.setText(UI.format_yyyymmdd_hhmmss(
+			_comboFile.setText(net.tourbook.ui.UI.format_yyyymmdd_hhmmss(
 					tourTime.getYear(),
 					tourTime.getMonthOfYear(),
 					tourTime.getDayOfMonth(),
@@ -1760,7 +1765,7 @@ public class DialogExportTour extends TitleAreaDialog {
 
 			// display the tour date/time
 
-			_comboFile.setText(UI.format_yyyymmdd_hhmmss(minTourData));
+			_comboFile.setText(net.tourbook.ui.UI.format_yyyymmdd_hhmmss(minTourData));
 		}
 	}
 

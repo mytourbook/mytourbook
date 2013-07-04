@@ -25,6 +25,7 @@ import javax.persistence.EntityTransaction;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.UI;
 import net.tourbook.common.util.ColumnManager;
 import net.tourbook.common.util.ITourViewer;
 import net.tourbook.common.util.PostSelectionProvider;
@@ -43,7 +44,6 @@ import net.tourbook.tour.TourManager;
 import net.tourbook.tour.TourTypeMenuManager;
 import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.TreeColumnFactory;
-import net.tourbook.ui.UI;
 import net.tourbook.ui.action.ActionCollapseAll;
 import net.tourbook.ui.action.ActionEditQuick;
 import net.tourbook.ui.action.ActionEditTour;
@@ -326,7 +326,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 
 					// measurement system has changed
 
-					UI.updateUnits();
+					net.tourbook.ui.UI.updateUnits();
 
 					_columnManager.saveState(_state);
 					_columnManager.clearColumns();
@@ -722,7 +722,8 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 
 					final TVICompareResultComparedTour compareItem = (TVICompareResultComparedTour) element;
 
-					cell.setText(_nf2.format(compareItem.compareDistance / (1000 * UI.UNIT_VALUE_DISTANCE)));
+					cell.setText(_nf2.format(compareItem.compareDistance
+							/ (1000 * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE)));
 					setCellColor(cell, element);
 				}
 			}
@@ -750,7 +751,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 
 					final TVICompareResultComparedTour compareItem = (TVICompareResultComparedTour) element;
 
-					cell.setText(_nf1.format(compareItem.compareSpeed / UI.UNIT_VALUE_DISTANCE));
+					cell.setText(_nf1.format(compareItem.compareSpeed / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE));
 					setCellColor(cell, element);
 				}
 			}
@@ -777,7 +778,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 
 					final TVICompareResultComparedTour compareItem = (TVICompareResultComparedTour) element;
 
-					cell.setText(_nf1.format(compareItem.movedSpeed / UI.UNIT_VALUE_DISTANCE));
+					cell.setText(_nf1.format(compareItem.movedSpeed / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE));
 					setCellColor(cell, element);
 				}
 			}
@@ -804,7 +805,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 
 					final TVICompareResultComparedTour compareItem = (TVICompareResultComparedTour) element;
 
-					cell.setText(_nf1.format(compareItem.dbSpeed / UI.UNIT_VALUE_DISTANCE));
+					cell.setText(_nf1.format(compareItem.dbSpeed / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE));
 					setCellColor(cell, element);
 				}
 			}
@@ -897,7 +898,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 					final TourData comparedTourData = ((TVICompareResultComparedTour) element).comparedTourData;
 					final TourType tourType = comparedTourData.getTourType();
 					if (tourType != null) {
-						cell.setImage(UI.getInstance().getTourTypeImage(tourType.getTypeId()));
+						cell.setImage(net.tourbook.ui.UI.getInstance().getTourTypeImage(tourType.getTypeId()));
 					}
 				}
 			}
@@ -1368,7 +1369,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 
 		if (element instanceof TVICompareResultReferenceTour) {
 
-			cell.setForeground(JFaceResources.getColorRegistry().get(UI.VIEW_COLOR_TITLE));
+			cell.setForeground(JFaceResources.getColorRegistry().get(net.tourbook.ui.UI.VIEW_COLOR_TITLE));
 
 		} else if (element instanceof TVICompareResultComparedTour) {
 
@@ -1378,7 +1379,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 				cell.setForeground(Display.getDefault().getSystemColor(SWT.COLOR_GRAY));
 			} else {
 				// show the text with tour color
-				cell.setForeground(JFaceResources.getColorRegistry().get(UI.VIEW_COLOR_TOUR));
+				cell.setForeground(JFaceResources.getColorRegistry().get(net.tourbook.ui.UI.VIEW_COLOR_TOUR));
 //				cell.setForeground(Display.getDefault().getSystemColor(SWT.COLOR_WIDGET_FOREGROUND));
 			}
 		}

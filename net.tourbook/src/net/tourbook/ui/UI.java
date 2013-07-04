@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2012  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -46,7 +46,6 @@ import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferenceConverter;
-import org.eclipse.jface.preference.StringFieldEditor;
 import org.eclipse.jface.resource.ColorRegistry;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
@@ -58,7 +57,6 @@ import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.custom.SashForm;
-import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
@@ -70,9 +68,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Scale;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.IWorkbenchWindow;
@@ -110,8 +106,6 @@ public class UI {
 	public static final String								MNEMONIC						= "&";											//$NON-NLS-1$
 	public static final String								BREAK_TIME_MARKER				= "x";											//$NON-NLS-1$
 
-	public static final char								TAB								= '\t';
-
 	/**
 	 * contains a new line
 	 */
@@ -136,34 +130,7 @@ public class UI {
 	public static final String								VIEW_COLOR_BG_SEGMENTER_DOWN	= "view.colorBG.segmenterDown";				//$NON-NLS-1$
 	public static final String								VIEW_COLOR_BG_HISTORY_TOUR		= "VIEW_COLOR_BG_HISTORY_TOUR";				//$NON-NLS-1$
 
-	public static final int									DEFAULT_FIELD_WIDTH				= 40;
-	public static final int									FORM_FIRST_COLUMN_INDENT		= 16;
-
 	public static final String								UTF_8							= "UTF-8";										//$NON-NLS-1$
-
-	/*
-	 * labels for the different measurement systems
-	 */
-	public static final String								UNIT_METER						= "m";											//$NON-NLS-1$
-	private static final String								UNIT_ALTITUDE_M					= "m";											//$NON-NLS-1$
-	public static final String								UNIT_DISTANCE_KM				= "km";										//$NON-NLS-1$
-	private static final String								UNIT_SPEED_KM_H					= "km/h";										//$NON-NLS-1$
-	private static final String								UNIT_TEMPERATURE_C				= "\u00B0C";									//$NON-NLS-1$
-	private static final String								UNIT_ALTIMETER_M_H				= "m/h";										//$NON-NLS-1$
-	private static final String								UNIT_PACE_MIN_P_KM				= "min/km";									//$NON-NLS-1$
-	public static final String								UNIT_WEIGHT_KG					= "kg";										//$NON-NLS-1$
-	public static final String								UNIT_MBYTES						= "MByte";										//$NON-NLS-1$
-
-	private static final String								UNIT_DISTANCE_YARD				= "yd";										//$NON-NLS-1$
-	private static final String								UNIT_ALTITUDE_FT				= "ft";										//$NON-NLS-1$
-	public static final String								UNIT_DISTANCE_MI				= "mi";										//$NON-NLS-1$
-	private static final String								UNIT_SPEED_MPH					= "mph";										//$NON-NLS-1$
-	private static final String								UNIT_TEMPERATURE_F				= "\u00B0F";									//$NON-NLS-1$
-	private static final String								UNIT_ALTIMETER_FT_H				= "ft/h";										//$NON-NLS-1$
-	private static final String								UNIT_PACE_MIN_P_MILE			= "min/mi";									//$NON-NLS-1$
-
-	public static final String								UNIT_LABEL_POWER				= "Watt";										//$NON-NLS-1$
-	public static final String								UNIT_LABEL_MS					= "ms";										//$NON-NLS-1$
 
 	public static final String								SYMBOL_AVERAGE					= "\u00f8";									//$NON-NLS-1$
 	public static final String								SYMBOL_AVERAGE_WITH_SPACE		= "\u00f8 ";									//$NON-NLS-1$
@@ -230,20 +197,6 @@ public class UI {
 	// (Celcius * 9/5) + 32 = Fahrenheit
 	public static final float								UNIT_FAHRENHEIT_MULTI			= 1.8f;
 	public static final float								UNIT_FAHRENHEIT_ADD				= 32;
-
-	public static final String								UNIT_LABEL_TIME					= "h";											//$NON-NLS-1$
-
-	/**
-	 * contains the unit label in the currenty measurement system for the distance values
-	 */
-	public static String									UNIT_LABEL_DISTANCE;
-	public static String									UNIT_LABEL_DISTANCE_SMALL;
-	public static String									UNIT_LABEL_ALTITUDE;
-	public static String									UNIT_LABEL_ALTIMETER;
-	public static String									UNIT_LABEL_TEMPERATURE;
-	public static String									UNIT_LABEL_SPEED;
-	public static String									UNIT_LABEL_PACE;
-	public static String									UNIT_LABEL_DIRECTION			= "\u00B0";									//$NON-NLS-1$
 
 	private static final String								TOUR_TYPE_PREFIX				= "tourType";									//$NON-NLS-1$
 
@@ -327,58 +280,6 @@ public class UI {
 	}
 
 	private UI() {}
-
-	public static void adjustScaleValueOnMouseScroll(final MouseEvent event) {
-
-		boolean isCtrlKey;
-		boolean isShiftKey;
-
-		if (UI.IS_OSX) {
-			isCtrlKey = (event.stateMask & SWT.MOD1) > 0;
-			isShiftKey = (event.stateMask & SWT.MOD3) > 0;
-//			isAltKey = (event.stateMask & SWT.MOD3) > 0;
-		} else {
-			isCtrlKey = (event.stateMask & SWT.MOD1) > 0;
-			isShiftKey = (event.stateMask & SWT.MOD2) > 0;
-//			isAltKey = (event.stateMask & SWT.MOD3) > 0;
-		}
-
-		// accelerate with Ctrl + Shift key
-		int accelerator = isCtrlKey ? 10 : 1;
-		accelerator *= isShiftKey ? 5 : 1;
-
-		final Scale scale = (Scale) event.widget;
-		final int increment = scale.getIncrement();
-		final int oldValue = scale.getSelection();
-		final int valueDiff = ((event.count > 0 ? increment : -increment) * accelerator);
-
-		scale.setSelection(oldValue + valueDiff);
-	}
-
-	public static void adjustSpinnerValueOnMouseScroll(final MouseEvent event) {
-
-		boolean isCtrlKey;
-		boolean isShiftKey;
-
-		if (UI.IS_OSX) {
-			isCtrlKey = (event.stateMask & SWT.MOD1) > 0;
-			isShiftKey = (event.stateMask & SWT.MOD3) > 0;
-//			isAltKey = (event.stateMask & SWT.MOD3) > 0;
-		} else {
-			isCtrlKey = (event.stateMask & SWT.MOD1) > 0;
-			isShiftKey = (event.stateMask & SWT.MOD2) > 0;
-//			isAltKey = (event.stateMask & SWT.MOD3) > 0;
-		}
-
-		// accelerate with Ctrl + Shift key
-		int accelerator = isCtrlKey ? 10 : 1;
-		accelerator *= isShiftKey ? 5 : 1;
-
-		final Spinner spinner = (Spinner) event.widget;
-		final int newValue = ((event.count > 0 ? 1 : -1) * accelerator);
-
-		spinner.setSelection(spinner.getSelection() + newValue);
-	}
 
 	/**
 	 * Change the title for the application
@@ -1059,46 +960,9 @@ public class UI {
 		control.setBackground(null);
 	}
 
-	/**
-	 * set width for all controls in one column to the max width value
-	 */
-	public static void setEqualizeColumWidths(final ArrayList<Control> columnControls) {
-		setEqualizeColumWidths(columnControls, 0);
-	}
-
-	public static void setEqualizeColumWidths(final ArrayList<Control> columnControls, final int additionalSpace) {
-
-		int maxWidth = 0;
-
-		// get max width from all first columns controls
-		for (final Control control : columnControls) {
-
-			if (control.isDisposed()) {
-				// this should not happen, but it did during testing
-				return;
-			}
-
-			final int width = control.getSize().x + additionalSpace;
-
-			maxWidth = width > maxWidth ? width : maxWidth;
-		}
-
-		// set width for all first column controls
-		for (final Control control : columnControls) {
-			((GridData) control.getLayoutData()).widthHint = maxWidth;
-		}
-	}
-
 	public static void setErrorColor(final Text control) {
 		control.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
 		control.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_WHITE));
-	}
-
-	public static GridData setFieldWidth(final Composite parent, final StringFieldEditor field, final int width) {
-		final GridData gd = new GridData();
-		gd.widthHint = width;
-		field.getTextControl(parent).setLayoutData(gd);
-		return gd;
 	}
 
 	public static void setHorizontalSpacer(final Composite parent, final int columns) {
@@ -1248,11 +1112,11 @@ public class UI {
 			UNIT_VALUE_DISTANCE = UNIT_MILE;
 			UNIT_VALUE_DISTANCE_SMALL = UNIT_YARD;
 
-			UNIT_LABEL_DISTANCE = UNIT_DISTANCE_MI;
-			UNIT_LABEL_DISTANCE_SMALL = UNIT_DISTANCE_YARD;
+			net.tourbook.common.UI.UNIT_LABEL_DISTANCE = net.tourbook.common.UI.UNIT_DISTANCE_MI;
+			net.tourbook.common.UI.UNIT_LABEL_DISTANCE_SMALL = net.tourbook.common.UI.UNIT_DISTANCE_YARD;
 
-			UNIT_LABEL_SPEED = UNIT_SPEED_MPH;
-			UNIT_LABEL_PACE = UNIT_PACE_MIN_P_MILE;
+			net.tourbook.common.UI.UNIT_LABEL_SPEED = net.tourbook.common.UI.UNIT_SPEED_MPH;
+			net.tourbook.common.UI.UNIT_LABEL_PACE = net.tourbook.common.UI.UNIT_PACE_MIN_P_MILE;
 
 		} else {
 
@@ -1261,11 +1125,11 @@ public class UI {
 			UNIT_VALUE_DISTANCE = 1;
 			UNIT_VALUE_DISTANCE_SMALL = 1;
 
-			UNIT_LABEL_DISTANCE = UNIT_DISTANCE_KM;
-			UNIT_LABEL_DISTANCE_SMALL = UNIT_METER;
+			net.tourbook.common.UI.UNIT_LABEL_DISTANCE = net.tourbook.common.UI.UNIT_DISTANCE_KM;
+			net.tourbook.common.UI.UNIT_LABEL_DISTANCE_SMALL = net.tourbook.common.UI.UNIT_METER;
 
-			UNIT_LABEL_SPEED = UNIT_SPEED_KM_H;
-			UNIT_LABEL_PACE = UNIT_PACE_MIN_P_KM;
+			net.tourbook.common.UI.UNIT_LABEL_SPEED = net.tourbook.common.UI.UNIT_SPEED_KM_H;
+			net.tourbook.common.UI.UNIT_LABEL_PACE = net.tourbook.common.UI.UNIT_PACE_MIN_P_KM;
 		}
 
 		/*
@@ -1278,8 +1142,8 @@ public class UI {
 
 			UNIT_VALUE_ALTITUDE = UNIT_FOOT;
 
-			UNIT_LABEL_ALTITUDE = UNIT_ALTITUDE_FT;
-			UNIT_LABEL_ALTIMETER = UNIT_ALTIMETER_FT_H;
+			net.tourbook.common.UI.UNIT_LABEL_ALTITUDE = net.tourbook.common.UI.UNIT_ALTITUDE_FT;
+			net.tourbook.common.UI.UNIT_LABEL_ALTIMETER = net.tourbook.common.UI.UNIT_ALTIMETER_FT_H;
 
 		} else {
 
@@ -1287,8 +1151,8 @@ public class UI {
 
 			UNIT_VALUE_ALTITUDE = 1;
 
-			UNIT_LABEL_ALTITUDE = UNIT_ALTITUDE_M;
-			UNIT_LABEL_ALTIMETER = UNIT_ALTIMETER_M_H;
+			net.tourbook.common.UI.UNIT_LABEL_ALTITUDE = net.tourbook.common.UI.UNIT_ALTITUDE_M;
+			net.tourbook.common.UI.UNIT_LABEL_ALTIMETER = net.tourbook.common.UI.UNIT_ALTIMETER_M_H;
 		}
 
 		/*
@@ -1300,14 +1164,14 @@ public class UI {
 			// set imperial measure system
 
 			UNIT_VALUE_TEMPERATURE = UNIT_FAHRENHEIT_ADD;
-			UNIT_LABEL_TEMPERATURE = UNIT_TEMPERATURE_F;
+			net.tourbook.common.UI.UNIT_LABEL_TEMPERATURE = net.tourbook.common.UI.UNIT_TEMPERATURE_F;
 
 		} else {
 
 			// default is the metric measure system
 
 			UNIT_VALUE_TEMPERATURE = 1;
-			UNIT_LABEL_TEMPERATURE = UNIT_TEMPERATURE_C;
+			net.tourbook.common.UI.UNIT_LABEL_TEMPERATURE = net.tourbook.common.UI.UNIT_TEMPERATURE_C;
 		}
 	}
 
