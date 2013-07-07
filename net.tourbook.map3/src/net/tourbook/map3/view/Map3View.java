@@ -22,8 +22,10 @@ import gov.nasa.worldwind.event.RenderingListener;
 import java.awt.BorderLayout;
 import java.util.ArrayList;
 
+import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.data.TourData;
+import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.ITourEventListener;
 import net.tourbook.tour.SelectionTourData;
 import net.tourbook.tour.SelectionTourId;
@@ -33,6 +35,9 @@ import net.tourbook.tour.TourManager;
 
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.layout.GridDataFactory;
+import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.awt.SWT_AWT;
@@ -46,7 +51,9 @@ import org.eclipse.ui.part.ViewPart;
 
 public class Map3View extends ViewPart {
 
-	public static final String					ID			= "net.tourbook.map3.Map3View"; //$NON-NLS-1$
+	public static final String					ID			= "net.tourbook.map3.Map3View";					//$NON-NLS-1$
+
+	private final IPreferenceStore				_prefStore	= TourbookPlugin.getDefault().getPreferenceStore();
 
 	private static final WorldWindowGLCanvas	_wwCanvas	= Map3Manager.getWWCanvas();
 
@@ -54,6 +61,7 @@ public class Map3View extends ViewPart {
 
 	private IPartListener2						_partListener;
 	private ISelectionListener					_postSelectionListener;
+	private IPropertyChangeListener				_prefChangeListener;
 	private ITourEventListener					_tourEventListener;
 
 	private boolean								_isPartVisible;
@@ -133,6 +141,28 @@ public class Map3View extends ViewPart {
 		getViewSite().getPage().addPartListener(_partListener);
 	}
 
+	private void addPrefListener() {
+
+		_prefChangeListener = new IPropertyChangeListener() {
+			@Override
+			public void propertyChange(final PropertyChangeEvent event) {
+
+				final String property = event.getProperty();
+
+				if (property.equals(ITourbookPreferences.GRAPH_COLORS_HAS_CHANGED)) {
+
+					// update map colors
+
+					Map3Manager.getTourLayer().updateColors();
+
+					_wwCanvas.redraw();
+				}
+			}
+		};
+
+		_prefStore.addPropertyChangeListener(_prefChangeListener);
+	}
+
 	/**
 	 * listen for events when a tour is selected
 	 */
@@ -207,6 +237,7 @@ public class Map3View extends ViewPart {
 		createUI(parent);
 
 		addPartListener();
+		addPrefListener();
 		addSelectionListener();
 		addTourEventListener();
 //		addMap3Listener();
@@ -239,6 +270,14 @@ public class Map3View extends ViewPart {
 	public void dispose() {
 
 		Map3Manager.setMap3View(null);
+
+		_prefStore.removePropertyChangeListener(_prefChangeListener);
+		getViewSite().getPage().removePostSelectionListener(_postSelectionListener);
+		getViewSite().getPage().removePartListener(_partListener);
+
+		TourManager.getInstance().removeTourEventListener(_tourEventListener);
+
+		_prefStore.removePropertyChangeListener(_prefChangeListener);
 
 		super.dispose();
 	}

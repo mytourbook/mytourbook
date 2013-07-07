@@ -44,8 +44,8 @@ import net.tourbook.map3.Activator;
 import net.tourbook.map3.layer.DefaultLayer;
 import net.tourbook.map3.layer.MapDefaultLayer;
 import net.tourbook.map3.layer.StatusLayer;
+import net.tourbook.map3.layer.TourTrackLayerWithFastShape;
 import net.tourbook.map3.layer.TourTrackLayerWithMarkers;
-import net.tourbook.map3.layer.TourTrackLayerWithPaths;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Platform;
@@ -123,7 +123,7 @@ public class Map3Manager {
 	 */
 	private static HashMap<String, TVIMap3Layer>	_customLayers					= new HashMap<String, TVIMap3Layer>();
 
-	private static TourTrackLayerWithPaths			_tourTrackLayer;
+	private static TourTrackLayerWithFastShape		_tourTrackLayer;
 
 	private static Object[]							_uiEnabledLayers;
 
@@ -301,7 +301,8 @@ public class Map3Manager {
 		 */
 //		_tourTrackLayer = new TourTrackLayerWithMarkers();
 //		_tourTrackLayer.setDefaultPositons();
-		_tourTrackLayer = new TourTrackLayerWithPaths();
+//		_tourTrackLayer = new TourTrackLayerWithPaths();
+		_tourTrackLayer = new TourTrackLayerWithFastShape();
 
 		/*
 		 * create UI model layer
@@ -626,7 +627,7 @@ public class Map3Manager {
 		return _uiRootItem;
 	}
 
-	static TourTrackLayerWithPaths getTourLayer() {
+	static TourTrackLayerWithFastShape getTourLayer() {
 		return _tourTrackLayer;
 	}
 

@@ -36,11 +36,9 @@ class TourPositionColors implements Path.PositionColors {
 
 	private ILegendProvider		_colorProvider	= Map3Colors.getColorProvider(ILegendProvider.TOUR_COLOR_ALTITUDE);
 
-	public Color getColor(final Position position, final int ordinal) {
+	public Color getColor(final float altitude) {
 
 		// Color the positions based on their altitude.
-
-		final double altitude = position.getAltitude();
 
 		int colorValue = -1;
 
@@ -48,7 +46,7 @@ class TourPositionColors implements Path.PositionColors {
 
 			final ILegendProviderGradientColors gradientColorProvider = (ILegendProviderGradientColors) _colorProvider;
 
-			colorValue = gradientColorProvider.getColorValue((float) altitude);
+			colorValue = gradientColorProvider.getColorValue(altitude);
 		}
 
 		if (colorValue == -1) {
@@ -57,8 +55,13 @@ class TourPositionColors implements Path.PositionColors {
 		}
 
 		return _colorCache.get(colorValue);
+	}
 
-//		return altitude < 800 ? Color.GREEN : altitude < 1000 ? Color.BLUE : Color.RED;
+	public Color getColor(final Position position, final int ordinal) {
+
+		final double altitude = position.getAltitude();
+
+		return getColor((float) altitude);
 	}
 
 	public void updateColors(final ArrayList<TourData> allTours) {
