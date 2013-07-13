@@ -63,9 +63,10 @@ public class Activator extends AbstractUIPlugin {
 	 * @return Returns the dialog setting section for the sectionName, a section is always returned
 	 *         even when it's empty
 	 */
-	public IDialogSettings getDialogSettingsSection(final String sectionName) {
+	public static IDialogSettings getStateArea(final String sectionName) {
 
-		final IDialogSettings dialogSettings = getDialogSettings();
+		final IDialogSettings dialogSettings = getDefault().getDialogSettings();
+
 		IDialogSettings section = dialogSettings.getSection(sectionName);
 
 		if (section == null) {

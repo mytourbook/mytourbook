@@ -166,6 +166,7 @@ public class TerrainProfileConfiguration {
 		});
 
 		createUI_10(parent);
+
 		updateUI();
 
 		restoreState();

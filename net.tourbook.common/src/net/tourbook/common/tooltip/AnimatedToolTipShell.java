@@ -1051,7 +1051,7 @@ public abstract class AnimatedToolTipShell {
 		_mouseOverBehaviour = mouseOverBehaviour;
 	}
 
-	public void setFadeIsSteps(final int fadeInSteps) {
+	public void setFadeInSteps(final int fadeInSteps) {
 		_fadeInSteps = fadeInSteps;
 	}
 

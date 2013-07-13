@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.data.TourData;
+import net.tourbook.map3.Activator;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.ITourEventListener;
 import net.tourbook.tour.SelectionTourData;
@@ -34,6 +35,7 @@ import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
 
 import org.eclipse.jface.action.IToolBarManager;
+import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
@@ -51,13 +53,16 @@ import org.eclipse.ui.part.ViewPart;
 
 public class Map3View extends ViewPart {
 
-	public static final String					ID			= "net.tourbook.map3.Map3View";					//$NON-NLS-1$
+	public static final String					ID				= "net.tourbook.map3.Map3View";					//$NON-NLS-1$
 
-	private final IPreferenceStore				_prefStore	= TourbookPlugin.getDefault().getPreferenceStore();
+	private final IPreferenceStore				_mtPrefStore	= TourbookPlugin.getDefault().getPreferenceStore();
 
-	private static final WorldWindowGLCanvas	_wwCanvas	= Map3Manager.getWWCanvas();
+	private final IDialogSettings				_state			= Activator.getStateArea(getClass().getName());
+
+	private static final WorldWindowGLCanvas	_wwCanvas		= Map3Manager.getWWCanvas();
 
 	private ActionOpenMap3Properties			_actionOpenMap3Properties;
+	private ActionTourTrackProperties			_actionTrackLayerProperties;
 
 	private IPartListener2						_partListener;
 	private ISelectionListener					_postSelectionListener;
@@ -153,14 +158,14 @@ public class Map3View extends ViewPart {
 
 					// update map colors
 
-					Map3Manager.getTourLayer().updateColors();
+//					Map3Manager.getTourLayer().updateColors();
 
 					_wwCanvas.redraw();
 				}
 			}
 		};
 
-		_prefStore.addPropertyChangeListener(_prefChangeListener);
+		_mtPrefStore.addPropertyChangeListener(_prefChangeListener);
 	}
 
 	/**
@@ -219,9 +224,10 @@ public class Map3View extends ViewPart {
 		TourManager.getInstance().addTourEventListener(_tourEventListener);
 	}
 
-	private void createActions() {
+	private void createActions(final Composite parent) {
 
 		_actionOpenMap3Properties = new ActionOpenMap3Properties();
+		_actionTrackLayerProperties = new ActionTourTrackProperties(this, parent, _state);
 
 		/*
 		 * fill view toolbar
@@ -229,6 +235,7 @@ public class Map3View extends ViewPart {
 		final IToolBarManager tbm = getViewSite().getActionBars().getToolBarManager();
 
 		tbm.add(_actionOpenMap3Properties);
+		tbm.add(_actionTrackLayerProperties);
 	}
 
 	@Override
@@ -241,7 +248,8 @@ public class Map3View extends ViewPart {
 		addSelectionListener();
 		addTourEventListener();
 //		addMap3Listener();
-		createActions();
+
+		createActions(parent);
 
 		restoreState();
 		Map3Manager.setMap3View(this);
@@ -271,13 +279,11 @@ public class Map3View extends ViewPart {
 
 		Map3Manager.setMap3View(null);
 
-		_prefStore.removePropertyChangeListener(_prefChangeListener);
+		_mtPrefStore.removePropertyChangeListener(_prefChangeListener);
 		getViewSite().getPage().removePostSelectionListener(_postSelectionListener);
 		getViewSite().getPage().removePartListener(_partListener);
 
 		TourManager.getInstance().removeTourEventListener(_tourEventListener);
-
-		_prefStore.removePropertyChangeListener(_prefChangeListener);
 
 		super.dispose();
 	}
@@ -304,6 +310,8 @@ public class Map3View extends ViewPart {
 			return;
 		}
 
+		final boolean isTourTrackVisible = Map3Manager.getTourTrackLayer().isEnabled();
+
 		if (selection instanceof SelectionTourData) {
 
 //			final SelectionTourData selectionTourData = (SelectionTourData) selection;
@@ -316,6 +324,10 @@ public class Map3View extends ViewPart {
 
 		} else if (selection instanceof SelectionTourId) {
 
+			if (isTourTrackVisible == false) {
+				return;
+			}
+
 			final Long tourId = ((SelectionTourId) selection).getTourId();
 			final TourData tourData = TourManager.getInstance().getTourData(tourId);
 
@@ -327,6 +339,10 @@ public class Map3View extends ViewPart {
 		} else if (selection instanceof SelectionTourIds) {
 
 			// paint all selected tours
+
+			if (isTourTrackVisible == false) {
+				return;
+			}
 
 			final ArrayList<Long> tourIds = ((SelectionTourIds) selection).getTourIds();
 			if (tourIds.size() == 0) {
@@ -533,7 +549,7 @@ public class Map3View extends ViewPart {
 
 	private void showAllTours(final ArrayList<TourData> allTours) {
 
-		Map3Manager.getTourLayer().showTours(allTours);
+		Map3Manager.getTourTrackLayer().showTours(allTours);
 
 		_wwCanvas.redraw();
 	}

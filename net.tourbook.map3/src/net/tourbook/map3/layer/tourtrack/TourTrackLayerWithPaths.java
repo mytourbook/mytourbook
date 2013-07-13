@@ -13,17 +13,16 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.map3.layer;
+package net.tourbook.map3.layer.tourtrack;
 
-import gov.nasa.worldwind.WorldWind;
 import gov.nasa.worldwind.avlist.AVKey;
 import gov.nasa.worldwind.geom.LatLon;
 import gov.nasa.worldwind.geom.Position;
 import gov.nasa.worldwind.layers.RenderableLayer;
 import gov.nasa.worldwind.render.BasicShapeAttributes;
-import gov.nasa.worldwind.render.DrawContext;
 import gov.nasa.worldwind.render.Material;
-import gov.nasa.worldwind.render.MultiResolutionPath;
+import gov.nasa.worldwind.render.Path;
+import gov.nasa.worldwind.render.Renderable;
 import gov.nasa.worldwind.render.ShapeAttributes;
 
 import java.beans.PropertyChangeEvent;
@@ -31,7 +30,10 @@ import java.util.ArrayList;
 
 import net.tourbook.common.UI;
 import net.tourbook.data.TourData;
+import net.tourbook.map3.view.Map3Manager;
 import net.tourbook.map3.view.Messages;
+
+import org.eclipse.jface.dialogs.IDialogSettings;
 
 /**
  */
@@ -39,43 +41,25 @@ public class TourTrackLayerWithPaths extends RenderableLayer {
 
 	public static final String			MAP3_LAYER_ID	= "TourTrackLayer"; //$NON-NLS-1$
 
+	private IDialogSettings				_state;
+
 	private final TourPositionColors	_positionColors;
 
-	private class MTMultiResPath extends MultiResolutionPath {
+	private final TourTrackConfig		_tourTrackConfig;
 
-		private SkipCountComputer	_skipCounter;
+	public TourTrackLayerWithPaths(final IDialogSettings state) {
 
-		public MTMultiResPath(final ArrayList<Position> positions) {
+		_state = state;
 
-			super(positions);
-
-			_skipCounter = new SkipCountComputer() {
-
-				@Override
-				public int computeSkipCount(final DrawContext dc, final PathData pathData) {
-
-					final double d = getDistanceMetric(dc, pathData);
-
-//					System.out.println(UI.timeStampNano() + " distance:" + d);
-//					// TODO remove SYSTEM.OUT.PRINTLN
-
-					return d > 10000 ? 4 : d > 1000 ? 2 : 1;
-				}
-			};
-		}
-
-		@Override
-		public SkipCountComputer getSkipCountComputer() {
-			return _skipCounter;
-		}
-
-	}
-
-	public TourTrackLayerWithPaths() {
+		_tourTrackConfig = new TourTrackConfig(state);
 
 		_positionColors = new TourPositionColors();
 
 		addPropertyChangeListener(this);
+	}
+
+	public TourTrackConfig getConfig() {
+		return _tourTrackConfig;
 	}
 
 	@Override
@@ -83,11 +67,33 @@ public class TourTrackLayerWithPaths extends RenderableLayer {
 		return Messages.TourTrack_Layer_Name;
 	}
 
+	public void onModifyConfig() {
+
+		for (final Renderable renderable : getRenderables()) {
+
+			if (renderable instanceof Path) {
+
+				final Path path = (Path) renderable;
+
+				path.setAltitudeMode(_tourTrackConfig.altitudeMode);
+				path.setFollowTerrain(_tourTrackConfig.isFollowTerrain);
+			}
+		}
+
+		Map3Manager.getWWCanvas().redraw();
+	}
+
 	@Override
 	public void propertyChange(final PropertyChangeEvent evt) {
 
-		System.out.println(UI.timeStampNano() + " \t" + evt);
+		System.out.println(UI.timeStampNano() + " \t" + evt.getPropertyName() + " \t" + evt);
 		// TODO remove SYSTEM.OUT
+	}
+
+	public void saveState() {
+
+		_tourTrackConfig.saveState(_state);
+
 	}
 
 	public void showTours(final ArrayList<TourData> allTours) {
@@ -128,30 +134,31 @@ public class TourTrackLayerWithPaths extends RenderableLayer {
 			/*
 			 * create one path for each tour
 			 */
-			final MultiResolutionPath tourPath = new MTMultiResPath(positions);
-//			final Path tourPath = new Path(positions);
+//			final MultiResolutionPath tourPath = new MTMultiResPath(positions);
+			final Path tourPath = new Path(positions);
 
 			tourPath.setPathType(AVKey.LINEAR);
-			tourPath.setValue(AVKey.DISPLAY_NAME, MAP3_LAYER_ID);
+//			tourPath.setValue(AVKey.DISPLAY_NAME, MAP3_LAYER_ID);
 
 			// Show how to make the colors vary along the paths.
 			tourPath.setPositionColors(_positionColors);
 
 			// Indicate that dots are to be drawn at each specified path position.
-			tourPath.setShowPositions(true);
-			tourPath.setShowPositionsScale(2);
+//			tourPath.setShowPositions(true);
+//			tourPath.setShowPositionsScale(2);
 
-			tourPath.setSkipCountComputer(tourPath.getSkipCountComputer());
+//			tourPath.setSkipCountComputer(tourPath.getSkipCountComputer());
 
 			// Indicate that the dots be drawn only when the path is less than 5 KM from the eye point.
 //			tourPath.setShowPositionsThreshold(5e3);
 
 			// Override generic view-distance geometry regeneration because multi-res Paths handle that themselves.
-			tourPath.setViewDistanceExpiration(false);
+//			tourPath.setViewDistanceExpiration(false);
 
 //			tourPath.setAltitudeMode(WorldWind.RELATIVE_TO_GROUND);
-			tourPath.setAltitudeMode(WorldWind.CLAMP_TO_GROUND);
 //			tourPath.setAltitudeMode(WorldWind.ABSOLUTE);
+			tourPath.setAltitudeMode(_tourTrackConfig.altitudeMode);
+			tourPath.setFollowTerrain(_tourTrackConfig.isFollowTerrain);
 
 			// Create attributes for the Path.
 			final ShapeAttributes attrs = new BasicShapeAttributes();

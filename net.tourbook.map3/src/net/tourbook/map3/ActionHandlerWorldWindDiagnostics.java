@@ -42,8 +42,7 @@ import org.eclipse.swt.widgets.Text;
 
 public class ActionHandlerWorldWindDiagnostics extends AbstractHandler {
 
-	private final IDialogSettings				_state		= Activator.getDefault() //
-																	.getDialogSettingsSection(getClass().getName());
+	private final IDialogSettings				_state		= Activator.getStateArea(getClass().getName());
 
 	private static final WorldWindowGLCanvas	_wwCanvas	= Map3Manager.getWWCanvas();
 

@@ -167,7 +167,7 @@ public class PhotoProperties extends AnimatedToolTipShell implements IPhotoEvent
 		setToolTipCreateStyle(AnimatedToolTipShell.TOOLTIP_STYLE_KEEP_CONTENT);
 		setBehaviourOnMouseOver(AnimatedToolTipShell.MOUSE_OVER_BEHAVIOUR_IGNORE_OWNER);
 		setIsKeepShellOpenWhenMoved(false);
-		setFadeIsSteps(1);
+		setFadeInSteps(1);
 	}
 
 	public void addPropertiesListener(final IPhotoPropertiesListener listener) {

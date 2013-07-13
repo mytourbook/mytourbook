@@ -10,7 +10,7 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  net.tourbook.common,
  net.tourbook.ext.jars,
- net.tourbook.ext.au.gov.ga.worldwind;bundle-version="13.10.0"
+ net.tourbook.ext.worldwind_1.5
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Import-Package: net.tourbook.application,

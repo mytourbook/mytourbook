@@ -13,7 +13,7 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.map3.layer;
+package net.tourbook.map3.layer.tourtrack;
 
 import gov.nasa.worldwind.geom.LatLon;
 import gov.nasa.worldwind.geom.Position;
@@ -39,6 +39,8 @@ public class TourTrackLayerWithMarkers extends MarkerLayer implements PropertyCh
 	public static final String			MAP3_LAYER_ID	= "TourTrackLayer";			//$NON-NLS-1$
 
 	private static ArrayList<Position>	_positions		= new ArrayList<Position>();
+
+	private ArrayList<TourData>			_allTours;
 
 	static {
 		_positions.add(new Position(LatLon.fromDegrees(47.3658, 8.5428), 500));
@@ -80,39 +82,50 @@ public class TourTrackLayerWithMarkers extends MarkerLayer implements PropertyCh
 		setMarkers(markers);
 	}
 
-	public void showTour(final TourData tourData) {
+	private void showTours() {
 
-//		final long start = System.currentTimeMillis();
-
-		final double[] allLat = tourData.latitudeSerie;
-		final double[] allLon = tourData.longitudeSerie;
-		final float[] allAlti = tourData.altitudeSerie;
-
-		if (allLat == null) {
-			return;
-		}
+		//		final long start = System.currentTimeMillis();
 
 		final ArrayList<Marker> markers = new ArrayList<Marker>();
-
 		final BasicMarkerAttributes attrs = new BasicMarkerAttributes(Material.YELLOW, BasicMarkerShape.SPHERE, 1d);
 
-		for (int serieIndex = 0; serieIndex < allLat.length; serieIndex++) {
+		for (final TourData oneTour : _allTours) {
 
-			final double lat = allLat[serieIndex];
-			final double lon = allLon[serieIndex];
+			final double[] allLat = oneTour.latitudeSerie;
+			final double[] allLon = oneTour.longitudeSerie;
+			final float[] allAlti = oneTour.altitudeSerie;
 
-			float alti = 0;
-
-			if (allAlti != null) {
-				alti = allAlti[serieIndex];
+			if (allLat == null) {
+				continue;
 			}
 
-			markers.add(new BasicMarker(new Position(LatLon.fromDegrees(lat, lon), alti), attrs));
+
+			for (int serieIndex = 0; serieIndex < allLat.length; serieIndex++) {
+
+				final double lat = allLat[serieIndex];
+				final double lon = allLon[serieIndex];
+
+				float alti = 0;
+
+				if (allAlti != null) {
+					alti = allAlti[serieIndex];
+				}
+
+				markers.add(new BasicMarker(new Position(LatLon.fromDegrees(lat, lon), alti), attrs));
+			}
 		}
 
 		setMarkers(markers);
 
-//		System.out.println(UI.timeStampNano() + " showTour\t" + (System.currentTimeMillis() - start) + " ms");
-//		// TODO remove SYSTEM.OUT.PRINTLN
+		//		System.out.println(UI.timeStampNano() + " showTour\t" + (System.currentTimeMillis() - start) + " ms");
+		//		// TODO remove SYSTEM.OUT.PRINTLN
 	}
+
+	public void showTours(final ArrayList<TourData> allTours) {
+
+		_allTours = allTours;
+
+		showTours();
+	}
+
 }

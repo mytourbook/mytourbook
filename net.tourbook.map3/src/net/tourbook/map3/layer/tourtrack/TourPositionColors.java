@@ -13,7 +13,7 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.map3.layer;
+package net.tourbook.map3.layer.tourtrack;
 
 import gov.nasa.worldwind.geom.Position;
 import gov.nasa.worldwind.render.Path;
@@ -29,6 +29,8 @@ import net.tourbook.common.color.ILegendProviderGradientColors;
 import net.tourbook.common.color.LegendConfig;
 import net.tourbook.common.color.LegendUnitFormat;
 import net.tourbook.data.TourData;
+import net.tourbook.map3.layer.ColorCacheAWT;
+import net.tourbook.map3.layer.Map3Colors;
 
 class TourPositionColors implements Path.PositionColors {
 

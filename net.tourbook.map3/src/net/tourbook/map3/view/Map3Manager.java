@@ -44,8 +44,7 @@ import net.tourbook.map3.Activator;
 import net.tourbook.map3.layer.DefaultLayer;
 import net.tourbook.map3.layer.MapDefaultLayer;
 import net.tourbook.map3.layer.StatusLayer;
-import net.tourbook.map3.layer.TourTrackLayerWithFastShape;
-import net.tourbook.map3.layer.TourTrackLayerWithMarkers;
+import net.tourbook.map3.layer.tourtrack.TourTrackLayerWithPaths;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Platform;
@@ -90,15 +89,13 @@ public class Map3Manager {
 	/**
 	 * _bundle must be set here otherwise an exception occures in saveState()
 	 */
-	private static final Bundle						_bundle							= Activator
-																							.getDefault()
+	private static final Bundle						_bundle							= Activator.getDefault()//
 																							.getBundle();
+	private static final IDialogSettings			_state							= Activator.getStateArea(//
+																							Map3Manager.class.getName());
 
 	private static final IPath						_stateLocation					= Platform
 																							.getStateLocation(_bundle);
-	private static final IDialogSettings			_state							= Activator.getDefault()//
-																							.getDialogSettingsSection(
-																									"Map3Manager");		//$NON-NLS-1$
 	/**
 	 * Root item for the layer tree viewer. This contains the UI model.
 	 */
@@ -123,7 +120,7 @@ public class Map3Manager {
 	 */
 	private static HashMap<String, TVIMap3Layer>	_customLayers					= new HashMap<String, TVIMap3Layer>();
 
-	private static TourTrackLayerWithFastShape		_tourTrackLayer;
+	private static TourTrackLayerWithPaths			_tourTrackLayer;
 
 	private static Object[]							_uiEnabledLayers;
 
@@ -300,16 +297,15 @@ public class Map3Manager {
 		 * create WW layer
 		 */
 //		_tourTrackLayer = new TourTrackLayerWithMarkers();
-//		_tourTrackLayer.setDefaultPositons();
-//		_tourTrackLayer = new TourTrackLayerWithPaths();
-		_tourTrackLayer = new TourTrackLayerWithFastShape();
+		_tourTrackLayer = new TourTrackLayerWithPaths(_state);
+//		_tourTrackLayer = new TourTrackLayerWithFastShape();
 
 		/*
 		 * create UI model layer
 		 */
 		final TVIMap3Layer tviLayer = new TVIMap3Layer(_tourTrackLayer, _tourTrackLayer.getName());
 
-		final String layerId = TourTrackLayerWithMarkers.MAP3_LAYER_ID;
+		final String layerId = TourTrackLayerWithPaths.MAP3_LAYER_ID;
 		tviLayer.id = layerId;
 
 		final boolean isVisible = true;
@@ -627,7 +623,7 @@ public class Map3Manager {
 		return _uiRootItem;
 	}
 
-	static TourTrackLayerWithFastShape getTourLayer() {
+	static TourTrackLayerWithPaths getTourTrackLayer() {
 		return _tourTrackLayer;
 	}
 
@@ -1023,6 +1019,8 @@ public class Map3Manager {
 	}
 
 	public static void saveState() {
+
+		_tourTrackLayer.saveState();
 
 		/*
 		 * save layer structure in xml file

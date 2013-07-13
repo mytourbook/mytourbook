@@ -6,7 +6,13 @@ public class Messages extends NLS {
 
 	private static final String	BUNDLE_NAME	= "net.tourbook.map3.view.messages";	//$NON-NLS-1$
 
-	public static String	Custom_Category_Name_Tour;
+	public static String	Altitude_Mode_Absolute;
+
+	public static String	Altitude_Mode_ClampToGround;
+
+	public static String	Altitude_Mode_RelativeToGround;
+
+	public static String		Custom_Category_Name_Tour;
 
 	public static String		Default_Category_Name_Info;
 	public static String		Default_Category_Name_Map;
@@ -33,8 +39,11 @@ public class Messages extends NLS {
 	public static String		Default_LayerName_Stars;
 
 	public static String		Image_Map3_Map3PropertiesView;
+	public static String		Image_Map3_TourTracks;
+	public static String		Image_Map3_TourTracks_Disabled;
 
 	public static String		Map3_Action_OpenMap3PropertiesView;
+	public static String		Map3_Action_OpenTrackLayerProperties_Tooltip;
 
 	public static String		Prop_Viewer_Label_AltitudeRange_Tooltip;
 
@@ -54,7 +63,9 @@ public class Messages extends NLS {
 	public static String		Terrain_Profile_Label_Follow;
 	public static String		Terrain_Profile_Label_ProfileLength;
 
-	public static String	TourTrack_Layer_Name;
+	public static String	TourTrac_Properties_Label_Altitude;
+
+	public static String		TourTrack_Layer_Name;
 
 	static {
 		// initialize resource bundle
