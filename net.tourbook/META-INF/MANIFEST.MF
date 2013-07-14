@@ -23,7 +23,8 @@ Require-Bundle: org.eclipse.ui,
  net.tourbook.ext.rxtx_2.2,
  net.tourbook.common,
  net.tourbook.chart,
- net.tourbook.photo
+ net.tourbook.photo,
+ net.tourbook.ext.worldwind_1.5
 Export-Package: de.byteholder.geoclipse.map,
  de.byteholder.geoclipse.map.event,
  de.byteholder.geoclipse.mapprovider,

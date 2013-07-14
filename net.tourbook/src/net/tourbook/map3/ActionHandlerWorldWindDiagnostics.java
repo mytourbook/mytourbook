@@ -21,6 +21,7 @@ import java.util.Map;
 
 import javax.media.opengl.GL;
 
+import net.tourbook.application.TourbookPlugin;
 import net.tourbook.map3.view.Map3Manager;
 
 import org.eclipse.core.commands.AbstractHandler;
@@ -42,7 +43,8 @@ import org.eclipse.swt.widgets.Text;
 
 public class ActionHandlerWorldWindDiagnostics extends AbstractHandler {
 
-	private final IDialogSettings				_state		= Activator.getStateArea(getClass().getName());
+	private final IDialogSettings				_state		= TourbookPlugin.getStateSection(//
+																	getClass().getCanonicalName());
 
 	private static final WorldWindowGLCanvas	_wwCanvas	= Map3Manager.getWWCanvas();
 

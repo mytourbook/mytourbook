@@ -17,6 +17,7 @@ package net.tourbook.map3.view;
 
 import gov.nasa.worldwind.WorldWind;
 import net.tourbook.common.tooltip.AnimatedToolTipShell;
+import net.tourbook.map3.Messages;
 import net.tourbook.map3.layer.tourtrack.TourTrackConfig;
 
 import org.eclipse.jface.dialogs.IDialogSettings;

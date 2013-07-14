@@ -15,8 +15,9 @@
  *******************************************************************************/
 package net.tourbook.map3.view;
 
+import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
-import net.tourbook.map3.Activator;
+import net.tourbook.mapping.Messages;
 
 import org.eclipse.jface.action.ContributionItem;
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -34,30 +35,34 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 
-public class ActionTourTrackProperties extends ContributionItem {
+public class ActionShowTourInMap3 extends ContributionItem {
 
-	private static final String		ID	= "ACTION_TRACK_LAYER_PROPERTIES_ID";	//$NON-NLS-1$
+	private static final String			ID	= "ACTION_TRACK_LAYER_PROPERTIES_ID";	//$NON-NLS-1$
 
 //	private static final String		STATE_IS_TRACK_LAYER_VISIBLE	= "STATE_IS_TRACK_LAYER_VISIBLE";		//$NON-NLS-1$
 
-	private Map3View				_map3View;
+	private Map3View					_map3View;
 
 	private DialogTourTrackProperties	_trackLayerProperties;
 
-	private ToolBar					_toolBar;
+	private ToolBar						_toolBar;
 
-	private ToolItem				_actionTrackLayer;
-	private IDialogSettings			_state;
+	private ToolItem					_actionTrackLayer;
+	private IDialogSettings				_state;
+
+	private boolean						_isActionEnabled;
+	private boolean						_isActionSelected;
 
 	/*
 	 * UI controls
 	 */
-	private Control					_parent;
+	private Control						_parent;
 
-	private Image					_actionImage;
-	private Image					_actionImageDisabled;
+	private Image						_actionImage;
 
-	public ActionTourTrackProperties(final Map3View map3View, final Control parent, final IDialogSettings state) {
+//	private Image						_actionImageDisabled;
+
+	public ActionShowTourInMap3(final Map3View map3View, final Control parent, final IDialogSettings state) {
 
 		super(ID);
 
@@ -66,8 +71,11 @@ public class ActionTourTrackProperties extends ContributionItem {
 		_parent = parent;
 		_state = state;
 
-		_actionImage = Activator.getImageDescriptor(Messages.Image_Map3_TourTracks).createImage();
-		_actionImageDisabled = Activator.getImageDescriptor(Messages.Image_Map3_TourTracks_Disabled).createImage();
+		_actionImage = TourbookPlugin.getImageDescriptor(Messages.image_action_show_tour_in_map).createImage();
+//		_actionImageDisabled = TourbookPlugin.getImageDescriptor(Messages.image_action_show_tour_in_map_disabled)//
+//				.createImage();
+//		_actionImageDisabled = TourbookPlugin.getImageDescriptor("refresh-all.png")//
+//				.createImage();
 	}
 
 	@Override
@@ -78,17 +86,6 @@ public class ActionTourTrackProperties extends ContributionItem {
 			// action is not yet created
 
 			_toolBar = toolbar;
-
-			_actionTrackLayer = new ToolItem(toolbar, SWT.CHECK);
-
-			_actionTrackLayer.setImage(_actionImage);
-
-			_actionTrackLayer.addSelectionListener(new SelectionAdapter() {
-				@Override
-				public void widgetSelected(final SelectionEvent e) {
-					onAction();
-				}
-			});
 
 			toolbar.addDisposeListener(new DisposeListener() {
 				public void widgetDisposed(final DisposeEvent e) {
@@ -106,6 +103,23 @@ public class ActionTourTrackProperties extends ContributionItem {
 				}
 			});
 
+			_actionTrackLayer = new ToolItem(toolbar, SWT.CHECK);
+
+			_actionTrackLayer.setSelection(_isActionSelected);
+			_actionTrackLayer.setEnabled(_isActionEnabled);
+
+//			_actionTrackLayer.setImage(_isActionEnabled ? _actionImage : _actionImageDisabled);
+			_actionTrackLayer.setImage(_actionImage);
+
+			_actionTrackLayer.setToolTipText(Messages.map_action_show_tour_in_map);
+
+			_actionTrackLayer.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(final SelectionEvent e) {
+					onSelect();
+				}
+			});
+
 			_trackLayerProperties = new DialogTourTrackProperties(_parent, _toolBar, _state);
 
 			// send notifications to the map to update displayed photos
@@ -113,35 +127,10 @@ public class ActionTourTrackProperties extends ContributionItem {
 		}
 	}
 
-	private void onAction() {
-
-		updateUI();
-
-		final boolean isTrackVisible = _actionTrackLayer.getSelection();
-
-		if (isTrackVisible) {
-
-			final Rectangle itemBounds = _actionTrackLayer.getBounds();
-
-			final Point itemDisplayPosition = _toolBar.toDisplay(itemBounds.x, itemBounds.y);
-
-			itemBounds.x = itemDisplayPosition.x;
-			itemBounds.y = itemDisplayPosition.y;
-
-			_trackLayerProperties.open(itemBounds, false);
-
-		} else {
-
-			_trackLayerProperties.close();
-		}
-
-//		_map3View.actionPhotoProperties(isTrackVisible);
-	}
-
 	private void onDispose() {
 
 		_actionImage.dispose();
-		_actionImageDisabled.dispose();
+//		_actionImageDisabled.dispose();
 
 		_actionTrackLayer.dispose();
 		_actionTrackLayer = null;
@@ -173,6 +162,31 @@ public class ActionTourTrackProperties extends ContributionItem {
 		_trackLayerProperties.open(itemBounds, true);
 	}
 
+	private void onSelect() {
+
+		updateUI();
+
+		final boolean isTrackVisible = _actionTrackLayer.getSelection();
+
+		if (isTrackVisible) {
+
+			final Rectangle itemBounds = _actionTrackLayer.getBounds();
+
+			final Point itemDisplayPosition = _toolBar.toDisplay(itemBounds.x, itemBounds.y);
+
+			itemBounds.x = itemDisplayPosition.x;
+			itemBounds.y = itemDisplayPosition.y;
+
+			_trackLayerProperties.open(itemBounds, false);
+
+		} else {
+
+			_trackLayerProperties.close();
+		}
+
+		Map3Manager.setTourTrackVisible(isTrackVisible);
+	}
+
 	void restoreState() {
 
 		_actionTrackLayer.setSelection(Map3Manager.getTourTrackLayer().isEnabled());
@@ -185,23 +199,39 @@ public class ActionTourTrackProperties extends ContributionItem {
 //		updateUI_FotoFilterStats();
 	}
 
-	void setEnabled(final boolean isEnabled) {
+	/**
+	 * Set enable/disable and selection for this action.
+	 * 
+	 * @param isSelected
+	 * @param isEnabled
+	 */
+	void setState(final boolean isSelected, final boolean isEnabled) {
 
-		_actionTrackLayer.setEnabled(isEnabled);
-		_actionTrackLayer.setImage(isEnabled ? _actionImage : _actionImageDisabled);
+		if (_actionTrackLayer == null) {
+
+			_isActionEnabled = isEnabled;
+			_isActionSelected = isSelected;
+
+		} else {
+
+			_actionTrackLayer.setSelection(isSelected);
+
+			_actionTrackLayer.setEnabled(isEnabled);
+//			_actionTrackLayer.setImage(isEnabled ? _actionImage : _actionImageDisabled);
+		}
 	}
 
 	private void updateUI() {
 
 		if (_actionTrackLayer.getSelection()) {
 
-			// hide tooltip because the photo filter is displayed
+			// hide tooltip because the track properties dialog is displayed
 
 			_actionTrackLayer.setToolTipText(UI.EMPTY_STRING);
 
 		} else {
 
-			_actionTrackLayer.setToolTipText(Messages.Map3_Action_OpenTrackLayerProperties_Tooltip);
+			_actionTrackLayer.setToolTipText(Messages.map_action_show_tour_in_map);
 		}
 	}
 

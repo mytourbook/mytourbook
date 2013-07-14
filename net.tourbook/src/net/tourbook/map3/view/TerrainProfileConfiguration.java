@@ -25,6 +25,7 @@ import net.tourbook.common.tooltip.IToolProvider;
 import net.tourbook.common.tooltip.ToolTip3;
 import net.tourbook.common.tooltip.ToolTip3Tool;
 import net.tourbook.common.util.Util;
+import net.tourbook.map3.Messages;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;

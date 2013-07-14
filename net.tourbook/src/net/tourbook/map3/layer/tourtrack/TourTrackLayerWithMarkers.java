@@ -30,7 +30,7 @@ import java.util.ArrayList;
 
 import net.tourbook.common.UI;
 import net.tourbook.data.TourData;
-import net.tourbook.map3.view.Messages;
+import net.tourbook.map3.Messages;
 
 /**
  */

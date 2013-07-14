@@ -17,7 +17,7 @@ package net.tourbook.map3.layer;
 
 import java.util.HashMap;
 
-import net.tourbook.map3.view.Messages;
+import net.tourbook.map3.Messages;
 
 /**
  * Contains WorldWind default layers.

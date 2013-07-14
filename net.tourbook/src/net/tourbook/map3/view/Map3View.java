@@ -25,7 +25,6 @@ import java.util.ArrayList;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.data.TourData;
-import net.tourbook.map3.Activator;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.ITourEventListener;
 import net.tourbook.tour.SelectionTourData;
@@ -35,6 +34,7 @@ import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
 
 import org.eclipse.jface.action.IToolBarManager;
+import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -51,18 +51,22 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.part.ViewPart;
 
+/**
+ * Display 3-D Map
+ */
 public class Map3View extends ViewPart {
 
 	public static final String					ID				= "net.tourbook.map3.Map3View";					//$NON-NLS-1$
 
 	private final IPreferenceStore				_mtPrefStore	= TourbookPlugin.getDefault().getPreferenceStore();
 
-	private final IDialogSettings				_state			= Activator.getStateArea(getClass().getName());
+	private final IDialogSettings				_state			= TourbookPlugin.getStateSection(//
+																		getClass().getCanonicalName());
 
 	private static final WorldWindowGLCanvas	_wwCanvas		= Map3Manager.getWWCanvas();
 
 	private ActionOpenMap3Properties			_actionOpenMap3Properties;
-	private ActionTourTrackProperties			_actionTrackLayerProperties;
+	private ActionShowTourInMap3				_actionShowTourInMap3;
 
 	private IPartListener2						_partListener;
 	private ISelectionListener					_postSelectionListener;
@@ -71,6 +75,8 @@ public class Map3View extends ViewPart {
 
 	private boolean								_isPartVisible;
 	private ISelection							_selectionWhenHidden;
+
+	private ArrayList<TourData>					_allTours		= new ArrayList<TourData>();
 
 	private static int							_renderCounter;
 
@@ -227,15 +233,8 @@ public class Map3View extends ViewPart {
 	private void createActions(final Composite parent) {
 
 		_actionOpenMap3Properties = new ActionOpenMap3Properties();
-		_actionTrackLayerProperties = new ActionTourTrackProperties(this, parent, _state);
+		_actionShowTourInMap3 = new ActionShowTourInMap3(this, parent, _state);
 
-		/*
-		 * fill view toolbar
-		 */
-		final IToolBarManager tbm = getViewSite().getActionBars().getToolBarManager();
-
-		tbm.add(_actionOpenMap3Properties);
-		tbm.add(_actionTrackLayerProperties);
 	}
 
 	@Override
@@ -250,8 +249,11 @@ public class Map3View extends ViewPart {
 //		addMap3Listener();
 
 		createActions(parent);
+		fillActionBars();
 
 		restoreState();
+		enableActions();
+
 		Map3Manager.setMap3View(this);
 	}
 
@@ -288,9 +290,25 @@ public class Map3View extends ViewPart {
 		super.dispose();
 	}
 
-	private void enableActions() {
-		// TODO Auto-generated method stub
+	void enableActions() {
 
+		final boolean isTourTrackVisible = Map3Manager.getTourTrackLayer().isEnabled();
+		final boolean isTourAvailable = _allTours.size() > 0;
+
+		_actionShowTourInMap3.setState(isTourTrackVisible, isTourAvailable);
+	}
+
+	private void fillActionBars() {
+
+		/*
+		 * fill view toolbar
+		 */
+		final IToolBarManager tbm = getViewSite().getActionBars().getToolBarManager();
+
+		tbm.add(_actionShowTourInMap3);
+		tbm.add(new Separator());
+
+		tbm.add(_actionOpenMap3Properties);
 	}
 
 	private void onSelectionChanged(final ISelection selection) {
@@ -533,7 +551,6 @@ public class Map3View extends ViewPart {
 	}
 
 	private void restoreState() {
-		// TODO Auto-generated method stub
 
 	}
 
@@ -548,6 +565,9 @@ public class Map3View extends ViewPart {
 	}
 
 	private void showAllTours(final ArrayList<TourData> allTours) {
+
+		_allTours.clear();
+		_allTours.addAll(allTours);
 
 		Map3Manager.getTourTrackLayer().showTours(allTours);
 

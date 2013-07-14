@@ -30,8 +30,8 @@ import java.util.ArrayList;
 
 import net.tourbook.common.UI;
 import net.tourbook.data.TourData;
+import net.tourbook.map3.Messages;
 import net.tourbook.map3.view.Map3Manager;
-import net.tourbook.map3.view.Messages;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
 
@@ -86,7 +86,7 @@ public class TourTrackLayerWithPaths extends RenderableLayer {
 	@Override
 	public void propertyChange(final PropertyChangeEvent evt) {
 
-		System.out.println(UI.timeStampNano() + " \t" + evt.getPropertyName() + " \t" + evt);
+		System.out.println(UI.timeStampNano() + " " + getClass() + " \t" + evt.getPropertyName() + " \t" + evt);
 		// TODO remove SYSTEM.OUT
 	}
 

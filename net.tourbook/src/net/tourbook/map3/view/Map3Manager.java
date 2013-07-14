@@ -36,11 +36,12 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.TreeViewerItem;
 import net.tourbook.common.util.Util;
-import net.tourbook.map3.Activator;
+import net.tourbook.map3.Messages;
 import net.tourbook.map3.layer.DefaultLayer;
 import net.tourbook.map3.layer.MapDefaultLayer;
 import net.tourbook.map3.layer.StatusLayer;
@@ -89,10 +90,11 @@ public class Map3Manager {
 	/**
 	 * _bundle must be set here otherwise an exception occures in saveState()
 	 */
-	private static final Bundle						_bundle							= Activator.getDefault()//
+	private static final Bundle						_bundle							= TourbookPlugin.getDefault()//
 																							.getBundle();
-	private static final IDialogSettings			_state							= Activator.getStateArea(//
-																							Map3Manager.class.getName());
+	private static final IDialogSettings			_state							= TourbookPlugin
+																							.getStateSection(Map3Manager.class
+																									.getCanonicalName());
 
 	private static final IPath						_stateLocation					= Platform
 																							.getStateLocation(_bundle);
@@ -111,7 +113,7 @@ public class Map3Manager {
 	/**
 	 * Instance of {@link Map3LayerView} or <code>null</code> when view is not created or disposed.
 	 */
-	private static Map3LayerView					_map3PropertiesView;
+	private static Map3LayerView					_map3LayerView;
 
 	private static LayerList						_wwDefaultLayers;
 
@@ -598,6 +600,19 @@ public class Map3Manager {
 		}
 	}
 
+	/**
+	 * @param isTrackVisible
+	 */
+	static void enableMap3Actions() {
+
+		if (_map3View == null) {
+			// ignore when view is not created
+			return;
+		}
+
+		_map3View.enableActions();
+	}
+
 	private static File getLayerXmlFile() {
 
 		final File layerFile = _stateLocation.append(MAP3_LAYER_STRUCTURE_FILE_NAME).toFile();
@@ -609,7 +624,7 @@ public class Map3Manager {
 	 * @return Returns instance of {@link Map3LayerView} or null when view is not created.
 	 */
 	static Map3LayerView getMap3PropertiesView() {
-		return _map3PropertiesView;
+		return _map3LayerView;
 	}
 
 	/**
@@ -878,7 +893,12 @@ public class Map3Manager {
 				}
 			}
 
-			final Integer layerVersion = xmlRoot.getInteger(ATTR_MAP3_LAYER_VERSION);
+			Integer layerVersion = null;
+
+			// get current layer version, when available
+			if (xmlRoot != null) {
+				layerVersion = xmlRoot.getInteger(ATTR_MAP3_LAYER_VERSION);
+			}
 
 			if (xmlRoot == null || layerVersion == null || layerVersion < MAP3_LAYER_STRUCTURE_VERSION) {
 				// get default layer tree
@@ -1088,16 +1108,10 @@ public class Map3Manager {
 			insertedLayers.add(insertedUILayer);
 		}
 
-		if (_map3PropertiesView != null && insertedLayers.size() > 0) {
-			_map3PropertiesView.updateUI_NewLayer(insertedLayers);
+		// update UI
+		if (_map3LayerView != null && insertedLayers.size() > 0) {
+			_map3LayerView.updateUI_NewLayer(insertedLayers);
 		}
-	}
-
-	/**
-	 * @param map3PropertiesView
-	 */
-	static void setMap3PropertiesView(final Map3LayerView map3PropertiesView) {
-		_map3PropertiesView = map3PropertiesView;
 	}
 
 	/**
@@ -1130,8 +1144,38 @@ public class Map3Manager {
 	 * </pre>
 	 */
 
+	/**
+	 * @param map3PropertiesView
+	 */
+	static void setMap3PropertiesView(final Map3LayerView map3PropertiesView) {
+		_map3LayerView = map3PropertiesView;
+	}
+
+	/**
+	 * Keep track if {@link Map3View} is visible.
+	 * 
+	 * @param map3View
+	 */
 	static void setMap3View(final Map3View map3View) {
 		_map3View = map3View;
+	}
+
+	static void setTourTrackVisible(final boolean isTrackVisible) {
+
+		if (_map3LayerView == null) {
+
+			// layer viewer is not displayed, update model
+
+			getTourTrackLayer().setEnabled(isTrackVisible);
+
+		} else {
+
+			// update model and UI
+
+			_map3LayerView.setTourTrackLayerVisibility(
+					_customLayers.get(TourTrackLayerWithPaths.MAP3_LAYER_ID),
+					isTrackVisible);
+		}
 	}
 
 }

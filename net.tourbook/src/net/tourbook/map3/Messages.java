@@ -1,16 +1,29 @@
-package net.tourbook.map3.view;
+/*******************************************************************************
+ * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
+ * 
+ * This program is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation version 2 of the License.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License along with
+ * this program; if not, write to the Free Software Foundation,
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
+ *******************************************************************************/
+package net.tourbook.map3;
 
 import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS {
 
-	private static final String	BUNDLE_NAME	= "net.tourbook.map3.view.messages";	//$NON-NLS-1$
+	private static final String	BUNDLE_NAME	= "net.tourbook.map3.messages";	//$NON-NLS-1$
 
-	public static String	Altitude_Mode_Absolute;
-
-	public static String	Altitude_Mode_ClampToGround;
-
-	public static String	Altitude_Mode_RelativeToGround;
+	public static String		Altitude_Mode_Absolute;
+	public static String		Altitude_Mode_ClampToGround;
+	public static String		Altitude_Mode_RelativeToGround;
 
 	public static String		Custom_Category_Name_Tour;
 
@@ -39,8 +52,6 @@ public class Messages extends NLS {
 	public static String		Default_LayerName_Stars;
 
 	public static String		Image_Map3_Map3PropertiesView;
-	public static String		Image_Map3_TourTracks;
-	public static String		Image_Map3_TourTracks_Disabled;
 
 	public static String		Map3_Action_OpenMap3PropertiesView;
 	public static String		Map3_Action_OpenTrackLayerProperties_Tooltip;
@@ -63,7 +74,7 @@ public class Messages extends NLS {
 	public static String		Terrain_Profile_Label_Follow;
 	public static String		Terrain_Profile_Label_ProfileLength;
 
-	public static String	TourTrac_Properties_Label_Altitude;
+	public static String		TourTrac_Properties_Label_Altitude;
 
 	public static String		TourTrack_Layer_Name;
 

@@ -15,8 +15,9 @@
  *******************************************************************************/
 package net.tourbook.map3.view;
 
+import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.util.Util;
-import net.tourbook.map3.Activator;
+import net.tourbook.map3.Messages;
 
 import org.eclipse.jface.action.Action;
 
@@ -25,7 +26,7 @@ public class ActionOpenMap3Properties extends Action {
 	public ActionOpenMap3Properties() {
 
 		setText(Messages.Map3_Action_OpenMap3PropertiesView);
-		setImageDescriptor(Activator.getImageDescriptor(Messages.Image_Map3_Map3PropertiesView));
+		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image_Map3_Map3PropertiesView));
 	}
 
 	@Override

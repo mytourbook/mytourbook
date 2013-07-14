@@ -427,13 +427,20 @@ public class Map3LayerView extends ViewPart {
 		_layerViewer.getTree().setFocus();
 	}
 
-	private void toggleLayerVisibility(	final TVIMap3Layer tviLayer,
+	void setTourTrackLayerVisibility(final TVIMap3Layer tviLayer, final boolean isTrackVisible) {
+		setTourTrackLayerVisibility(tviLayer, isTrackVisible, true, false);
+	}
+
+	/**
+	 * @param tviLayer
+	 * @param isLayerVisible
+	 * @param isUpdateViewer
+	 * @param isUpdateTooltip
+	 */
+	void setTourTrackLayerVisibility(	final TVIMap3Layer tviLayer,
+										final boolean isLayerVisible,
 										final boolean isUpdateViewer,
 										final boolean isUpdateTooltip) {
-
-		// toggle state
-		final boolean isLayerVisible = !tviLayer.wwLayer.isEnabled();
-
 		// update model
 		tviLayer.isLayerVisible = isLayerVisible;
 
@@ -454,6 +461,26 @@ public class Map3LayerView extends ViewPart {
 			// update viewer
 			_layerViewer.setChecked(tviLayer, isLayerVisible);
 		}
+
+		// update actions in the map view
+		if (tviLayer.wwLayer.equals(Map3Manager.getTourTrackLayer())) {
+			Map3Manager.enableMap3Actions();
+		}
+	}
+
+	/**
+	 * @param tviLayer
+	 * @param isUpdateViewer
+	 * @param isUpdateTooltip
+	 */
+	private void toggleLayerVisibility(	final TVIMap3Layer tviLayer,
+										final boolean isUpdateViewer,
+										final boolean isUpdateTooltip) {
+
+		// toggle state
+		final boolean isLayerVisible = !tviLayer.wwLayer.isEnabled();
+
+		setTourTrackLayerVisibility(tviLayer, isLayerVisible, isUpdateViewer, isUpdateTooltip);
 	}
 
 	void updateUI_NewLayer(final ArrayList<TVIMap3Layer> insertedLayers) {

@@ -20,6 +20,7 @@ import net.tourbook.common.UI;
 import net.tourbook.common.tooltip.IToolProvider;
 import net.tourbook.common.tooltip.ToolProviderAdapter;
 import net.tourbook.common.tooltip.ToolTip3;
+import net.tourbook.map3.Messages;
 
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.resource.JFaceResources;
