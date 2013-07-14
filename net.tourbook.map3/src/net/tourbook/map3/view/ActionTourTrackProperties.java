@@ -42,7 +42,7 @@ public class ActionTourTrackProperties extends ContributionItem {
 
 	private Map3View				_map3View;
 
-	private TourTrackPropertiesUI	_trackLayerProperties;
+	private DialogTourTrackProperties	_trackLayerProperties;
 
 	private ToolBar					_toolBar;
 
@@ -106,7 +106,7 @@ public class ActionTourTrackProperties extends ContributionItem {
 				}
 			});
 
-			_trackLayerProperties = new TourTrackPropertiesUI(_parent, _toolBar, _state);
+			_trackLayerProperties = new DialogTourTrackProperties(_parent, _toolBar, _state);
 
 			// send notifications to the map to update displayed photos
 //			_trackLayerProperties.addPropertiesListener(_map3View);

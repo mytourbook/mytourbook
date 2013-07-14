@@ -42,7 +42,7 @@ import org.eclipse.swt.widgets.ToolBar;
 /**
  * Map3 tour track layer properties dialog.
  */
-public class TourTrackPropertiesUI extends AnimatedToolTipShell {
+public class DialogTourTrackProperties extends AnimatedToolTipShell {
 
 	private static final int		SHELL_MARGIN		= 5;
 
@@ -98,7 +98,7 @@ public class TourTrackPropertiesUI extends AnimatedToolTipShell {
 		}
 	}
 
-	public TourTrackPropertiesUI(final Control ownerControl, final ToolBar toolBar, final IDialogSettings state) {
+	public DialogTourTrackProperties(final Control ownerControl, final ToolBar toolBar, final IDialogSettings state) {
 
 		super(ownerControl);
 
