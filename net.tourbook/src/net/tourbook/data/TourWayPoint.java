@@ -27,7 +27,7 @@ import net.tourbook.common.map.GeoPosition;
 import net.tourbook.common.util.IHoveredArea;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.database.TourDatabase;
-import net.tourbook.mapping.Messages;
+import net.tourbook.map2.Messages;
 
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.swt.graphics.Image;

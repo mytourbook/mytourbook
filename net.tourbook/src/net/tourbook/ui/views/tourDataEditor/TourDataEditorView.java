@@ -61,7 +61,7 @@ import net.tourbook.database.MyTourbookException;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.extension.export.ActionExport;
 import net.tourbook.importdata.RawDataManager;
-import net.tourbook.mapping.SelectionMapPosition;
+import net.tourbook.map2.view.SelectionMapPosition;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tag.TagMenuManager;
 import net.tourbook.tour.ActionOpenAdjustAltitudeDialog;

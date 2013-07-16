@@ -30,6 +30,7 @@ import net.tourbook.tour.ITourEventListener;
 import net.tourbook.tour.SelectionTourData;
 import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.SelectionTourIds;
+import net.tourbook.tour.TourEvent;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
 
@@ -76,7 +77,12 @@ public class Map3View extends ViewPart {
 	private boolean								_isPartVisible;
 	private ISelection							_selectionWhenHidden;
 
+	/**
+	 * Contains all tours which are displayed in the map.
+	 */
 	private ArrayList<TourData>					_allTours		= new ArrayList<TourData>();
+
+	private Composite							_mapContainer;
 
 	private static int							_renderCounter;
 
@@ -202,32 +208,39 @@ public class Map3View extends ViewPart {
 					return;
 				}
 
-//				if (eventId == TourEventId.TOUR_CHART_PROPERTY_IS_MODIFIED) {
-//
-//					resetMap();
-//
-//				} else if ((eventId == TourEventId.TOUR_CHANGED) && (eventData instanceof TourEvent)) {
-//
-//					final ArrayList<TourData> modifiedTours = ((TourEvent) eventData).getModifiedTours();
-//					if ((modifiedTours != null) && (modifiedTours.size() > 0)) {
-//
-//						_allTourData.clear();
-//						_allTourData.addAll(modifiedTours);
-//
-//						resetMap();
-//					}
-//
-//				} else if (eventId == TourEventId.UPDATE_UI || eventId == TourEventId.CLEAR_DISPLAYED_TOUR) {
-//
-//					clearView();
-//
-//				} else if (eventId == TourEventId.SLIDER_POSITION_CHANGED) {
-//					onSelectionChanged((ISelection) eventData);
-//				}
+				if (eventId == TourEventId.TOUR_CHART_PROPERTY_IS_MODIFIED) {
+
+					updateUI();
+
+				} else if ((eventId == TourEventId.TOUR_CHANGED) && (eventData instanceof TourEvent)) {
+
+					final ArrayList<TourData> modifiedTours = ((TourEvent) eventData).getModifiedTours();
+					if ((modifiedTours != null) && (modifiedTours.size() > 0)) {
+
+						_allTours.clear();
+						_allTours.addAll(modifiedTours);
+
+						updateUI();
+					}
+
+				} else if (eventId == TourEventId.UPDATE_UI || eventId == TourEventId.CLEAR_DISPLAYED_TOUR) {
+
+					clearView();
+
+				} else if (eventId == TourEventId.SLIDER_POSITION_CHANGED) {
+					onSelectionChanged((ISelection) eventData);
+				}
 			}
 		};
 
 		TourManager.getInstance().addTourEventListener(_tourEventListener);
+	}
+
+	private void clearView() {
+
+		_allTours.clear();
+
+		updateUI();
 	}
 
 	private void createActions(final Composite parent) {
@@ -252,9 +265,30 @@ public class Map3View extends ViewPart {
 		fillActionBars();
 
 		restoreState();
-		enableActions();
 
 		Map3Manager.setMap3View(this);
+
+		Display.getCurrent().asyncExec(new Runnable() {
+			@Override
+			public void run() {
+
+				// validate widget
+				if (_mapContainer.isDisposed()) {
+					return;
+				}
+
+				// check if tour is set from a selection provider
+				if (_allTours.size() > 0) {
+					return;
+				}
+
+				final ArrayList<TourData> allTours = TourManager.getSelectedTours();
+				if (allTours != null) {
+
+					showAllTours(allTours);
+				}
+			}
+		});
 	}
 
 	private void createUI(final Composite parent) {
@@ -263,10 +297,10 @@ public class Map3View extends ViewPart {
 		GridDataFactory.fillDefaults().grab(true, true).applyTo(parent);
 
 		// build GUI: container(SWT) -> Frame(AWT) -> Panel(AWT) -> WorldWindowGLCanvas(AWT)
-		final Composite container = new Composite(parent, SWT.EMBEDDED);
-		GridDataFactory.fillDefaults().applyTo(container);
+		_mapContainer = new Composite(parent, SWT.EMBEDDED);
+		GridDataFactory.fillDefaults().applyTo(_mapContainer);
 		{
-			final java.awt.Frame awtFrame = SWT_AWT.new_Frame(container);
+			final java.awt.Frame awtFrame = SWT_AWT.new_Frame(_mapContainer);
 			final java.awt.Panel awtPanel = new java.awt.Panel(new java.awt.BorderLayout());
 
 			awtFrame.add(awtPanel);
@@ -290,6 +324,9 @@ public class Map3View extends ViewPart {
 		super.dispose();
 	}
 
+	/**
+	 * Enable actions according to the available tours in {@link #_allTours}.
+	 */
 	void enableActions() {
 
 		final boolean isTourTrackVisible = Map3Manager.getTourTrackLayer().isEnabled();
@@ -313,7 +350,7 @@ public class Map3View extends ViewPart {
 
 	private void onSelectionChanged(final ISelection selection) {
 
-//		System.out.println(net.tourbook.common.UI.timeStampNano() + " Map::onSelectionChanged\t" + selection);
+//		System.out.println(UI.timeStampNano() + " Map::onSelectionChanged\t" + selection);
 //		// TODO remove SYSTEM.OUT.PRINTLN
 
 		if (_isPartVisible == false) {
@@ -352,8 +389,6 @@ public class Map3View extends ViewPart {
 			showTour(tourData);
 //			paintPhotoSelection(selection);
 
-			enableActions();
-
 		} else if (selection instanceof SelectionTourIds) {
 
 			// paint all selected tours
@@ -364,6 +399,8 @@ public class Map3View extends ViewPart {
 
 			final ArrayList<Long> tourIds = ((SelectionTourIds) selection).getTourIds();
 			if (tourIds.size() == 0) {
+
+				clearView();
 
 				// history tour (without tours) is displayed
 
@@ -386,8 +423,6 @@ public class Map3View extends ViewPart {
 				showTour(tourData);
 //				paintTours_20_One(tourData, false, true);
 //				paintPhotoSelection(selection);
-
-				enableActions();
 
 			} else {
 
@@ -569,9 +604,7 @@ public class Map3View extends ViewPart {
 		_allTours.clear();
 		_allTours.addAll(allTours);
 
-		Map3Manager.getTourTrackLayer().showTours(allTours);
-
-		_wwCanvas.redraw();
+		updateUI();
 	}
 
 	private void showTour(final TourData tourData) {
@@ -586,9 +619,22 @@ public class Map3View extends ViewPart {
 
 		final ArrayList<TourData> allTourData = new ArrayList<TourData>();
 
+		// load all tours
 		final long newOverlayKey = TourManager.loadTourData(allTourIds, allTourData);
 
 		showAllTours(allTourData);
+	}
+
+	/**
+	 * Shows all tours in the map which are set in {@link #_allTours}.
+	 */
+	private void updateUI() {
+
+		enableActions();
+
+		Map3Manager.getTourTrackLayer().showTours(_allTours);
+
+		_wwCanvas.redraw();
 	}
 
 }

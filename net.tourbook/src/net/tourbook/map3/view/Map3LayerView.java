@@ -60,7 +60,7 @@ public class Map3LayerView extends ViewPart {
 
 	private IPartListener2				_partListener;
 
-	private PropertyViewerToolTip		_propToolTip;
+	private DialogPropertyViewerToolTip		_propToolTip;
 
 	private class PropertiesContentProvider implements ITreeContentProvider {
 
@@ -233,7 +233,7 @@ public class Map3LayerView extends ViewPart {
 		// hide default tooltip and display the custom tooltip
 		tree.setToolTipText(UI.EMPTY_STRING);
 
-		_propToolTip = new PropertyViewerToolTip(_layerViewer);
+		_propToolTip = new DialogPropertyViewerToolTip(_layerViewer);
 
 		return layoutContainer;
 	}

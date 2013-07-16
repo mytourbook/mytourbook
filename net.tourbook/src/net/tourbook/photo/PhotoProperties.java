@@ -18,7 +18,7 @@ package net.tourbook.photo;
 import net.tourbook.Messages;
 import net.tourbook.common.tooltip.AnimatedToolTipShell;
 import net.tourbook.common.util.Util;
-import net.tourbook.mapping.MapFilterData;
+import net.tourbook.map2.view.MapFilterData;
 
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.jface.dialogs.IDialogSettings;

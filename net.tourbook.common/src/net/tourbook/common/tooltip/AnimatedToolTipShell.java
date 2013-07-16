@@ -66,6 +66,8 @@ public abstract class AnimatedToolTipShell {
 
 	private static final int			MOVE_STEPS								= 20;
 
+	private static final int			AUTO_CLOSE_INTERVAL						= 700;
+
 	private static final int			ALPHA_OPAQUE							= 0xff;
 
 	private OwnerControlListener		_ownerControlListener;
@@ -97,9 +99,12 @@ public abstract class AnimatedToolTipShell {
 	private final AnimationTimer		_animationTimer;
 	private int							_animationMoveCounter;
 
+	private ToolTipAutoCloseTimer		_ttAutoCloseTimer;
+
 	private boolean						_isReceiveOnMouseMove;
 
 	private int							_fadeInSteps							= FADE_IN_STEPS;
+	private int							_fadeOutSteps							= FADE_OUT_STEPS;
 
 	/*
 	 * these settings are modifying the default behaviour which was implemented to show a photo
@@ -150,12 +155,24 @@ public abstract class AnimatedToolTipShell {
 
 	}
 
+	/**
+	 * This checks if a mouse is above a tooltip. When mouse is above the 3D map or outside of this
+	 * application, mouse events are not captured and a tooltip keeps opened until other actions are
+	 * done.
+	 */
+	private final class ToolTipAutoCloseTimer implements Runnable {
+		@Override
+		public void run() {
+			onTTAutoCloseTimer();
+		}
+	}
+
 	private class ToolTipDisplayListener implements Listener {
 		public void handleEvent(final Event event) {
 
 			switch (event.type) {
 			case SWT.MouseMove:
-				onTTDisplayMouseMove(event);
+				onDisplayMouseMove();
 				break;
 			}
 		}
@@ -187,9 +204,21 @@ public abstract class AnimatedToolTipShell {
 		_ownerShellListener = new OwnerShellListener();
 
 		_animationTimer = new AnimationTimer();
+		_ttAutoCloseTimer = new ToolTipAutoCloseTimer();
 
 		addOwnerControlListener();
 		addOwnerShellListener();
+	}
+
+	private void addDisplayFilterListener() {
+
+		if (_isDisplayListenerSet) {
+			return;
+		}
+
+		_display.addFilter(SWT.MouseMove, _ttDisplayListener);
+
+		_isDisplayListenerSet = true;
 	}
 
 	/**
@@ -236,17 +265,6 @@ public abstract class AnimatedToolTipShell {
 				addTTAllControlsListener(child);
 			}
 		}
-	}
-
-	private void addTTDisplayListener() {
-
-		if (_isDisplayListenerSet) {
-			return;
-		}
-
-		_display.addFilter(SWT.MouseMove, _ttDisplayListener);
-
-		_isDisplayListenerSet = true;
 	}
 
 	private void addTTShellListener(final Shell shell) {
@@ -434,7 +452,7 @@ public abstract class AnimatedToolTipShell {
 						return;
 					}
 
-					final int alphaDiff = ALPHA_OPAQUE / FADE_OUT_STEPS;
+					final int alphaDiff = ALPHA_OPAQUE / _fadeOutSteps;
 
 					newAlpha = currentAlpha - alphaDiff;
 					finalFadeAlpha = 0;
@@ -663,7 +681,7 @@ public abstract class AnimatedToolTipShell {
 	 * Hide the currently active tool tip
 	 */
 	public void hide() {
-		ttHide(null);
+		ttHide();
 	}
 
 	protected boolean isToolTipVisible() {
@@ -688,156 +706,12 @@ public abstract class AnimatedToolTipShell {
 		return null;
 	}
 
-	private void onDispose(final Event event) {
-
-		if (_shell == null || _shell.isDisposed()) {
-			return;
-		}
-
-		// hide tooltip definitively
-
-		removeOwnerShellListener();
-		removeTTDisplayListener();
-
-		passOnEvent(_shell, event);
-		_shell.dispose();
-	}
-
-	protected abstract void onMouseMoveInToolTip(MouseEvent mouseEvent);
-
-	private void onOwnerControlEvent(final Event event) {
-
-		if (_ownerControl == null || _ownerControl.isDisposed()) {
-			return;
-		}
-
-		switch (event.type) {
-		case SWT.Dispose:
-
-			onDispose(event);
-
-			removeOwnerControlsListener();
-
-			break;
-
-		case SWT.Resize:
-
-			showShellWhenVisible();
-
-			break;
-		}
-	}
-
-	private void onOwnerShellEvent(final Event event) {
-
-		if (_shell == null || _shell.isDisposed()) {
-			return;
-		}
-
-		switch (event.type) {
-		case SWT.Deactivate:
-
-			_display.asyncExec(new Runnable() {
-
-				public void run() {
-
-					// hide tooltip when another shell is activated
-
-					if (_display.getActiveShell() != _shell) {
-						ttHide(event);
-					}
-				}
-			});
-			break;
-
-		case SWT.Move:
-
-			showShellWhenVisible();
-
-			break;
-		}
-	}
-
-	public void onReparentShell(final Shell reparentedShell) {
-
-		/*
-		 * reparenting a shells parent which is a shell do NOT work
-		 */
-
-		if (_shell != null && _shell.isDisposed() == false && _shell.isVisible()) {
-			_shell.setVisible(false);
-		}
-
-		// stop animation
-		_isShellFadingIn = _isShellFadingOut = false;
-	}
-
-	private void onTTAllControlsEvent(final Event event) {
-
-		if (_shell == null || _shell.isDisposed()) {
-			return;
-		}
-
-		switch (event.type) {
-		case SWT.KeyDown:
-
-			if (event.keyCode == SWT.ESC) {
-				hide();
-			}
-
-			break;
-
-		case SWT.MouseEnter:
-
-			if (_isShellFadingIn || _isShellFadingOut) {
-
-				// stop animation
-//				_isShellFadingIn = _isShellFadingOut = false;
-			}
-
-			break;
-
-		case SWT.MouseExit:
-
-			break;
-
-		case SWT.MouseMove:
-
-			if (_isReceiveOnMouseMove //
-//					&& _isShellFadingIn == false
-//					&& _isShellFadingOut == false//
-			) {
-
-				final Widget widget = event.widget;
-
-				if (widget instanceof Control) {
-
-					final Point ttDisplayLocation = ((Control) widget).toDisplay(event.x, event.y);
-					final Point ownerLocation = _ownerControl.toControl(ttDisplayLocation);
-
-					_display.asyncExec(new Runnable() {
-						public void run() {
-
-							final MouseEvent mouseEvent = new MouseEvent(event);
-							mouseEvent.x = ownerLocation.x;
-							mouseEvent.y = ownerLocation.y;
-
-							onMouseMoveInToolTip(mouseEvent);
-						}
-					});
-				}
-			}
-
-			break;
-		}
-	}
-
-	private void onTTDisplayMouseMove(final Event event) {
+	private boolean onDisplayMouseMove() {
 
 //		final long start = System.nanoTime();
 
 		if (_shell == null || _shell.isDisposed() || _shell.isVisible() == false) {
-			return;
+			return false;
 		}
 
 		boolean isHide = false;
@@ -953,15 +827,200 @@ public abstract class AnimatedToolTipShell {
 
 				// hide definitively
 
-				ttHide(event);
+				ttHide();
+			}
+		}
+
+		boolean isKeepOpened = true;
+
+		if (isInTooltip && _isShellFadingOut) {
+
+			// don't hide when mouse is hovering hiding tooltip
+
+			ttShow();
+
+		} else if (isHide) {
+
+			final Rectangle noHideArea = noHideOnMouseMove();
+
+			if (noHideArea == null || noHideArea.contains(displayCursorLocation) == false) {
+
+				// hide definitively
+
+				ttHide();
+
+				isKeepOpened = false;
 			}
 		}
 
 //		System.out.println(UI.timeStampNano()
-//				+ " onTTDisplayMouseMove"
+//				+ " onDisplayMouseMove\t"
 //				+ ((float) (System.nanoTime() - start) / 1000000)
 //				+ " ms");
 //		// TODO remove SYSTEM.OUT.PRINTLN
+
+		return isKeepOpened;
+
+	}
+
+	private void onDispose(final Event event) {
+
+		if (_shell == null || _shell.isDisposed()) {
+			return;
+		}
+
+		// hide tooltip definitively
+
+		removeOwnerShellListener();
+		removeDisplayFilterListener();
+
+		// deactivate auto close timer
+		_display.timerExec(-1, _ttAutoCloseTimer);
+
+		_shell.dispose();
+	}
+
+	protected abstract void onMouseMoveInToolTip(MouseEvent mouseEvent);
+
+	private void onOwnerControlEvent(final Event event) {
+
+		if (_ownerControl == null || _ownerControl.isDisposed()) {
+			return;
+		}
+
+		switch (event.type) {
+		case SWT.Dispose:
+
+			onDispose(event);
+
+			removeOwnerControlsListener();
+
+			break;
+
+		case SWT.Resize:
+
+			showShellWhenVisible();
+
+			break;
+		}
+	}
+
+	private void onOwnerShellEvent(final Event event) {
+
+		if (_shell == null || _shell.isDisposed()) {
+			return;
+		}
+
+		switch (event.type) {
+		case SWT.Deactivate:
+
+			_display.asyncExec(new Runnable() {
+
+				public void run() {
+
+					// hide tooltip when another shell is activated
+
+					if (_display.getActiveShell() != _shell) {
+						ttHide();
+					}
+				}
+			});
+			break;
+
+		case SWT.Move:
+
+			showShellWhenVisible();
+
+			break;
+		}
+	}
+
+	public void onReparentShell(final Shell reparentedShell) {
+
+		/*
+		 * reparenting a shells parent which is a shell do NOT work
+		 */
+
+		if (_shell != null && _shell.isDisposed() == false && _shell.isVisible()) {
+			_shell.setVisible(false);
+		}
+
+		// stop animation
+		_isShellFadingIn = _isShellFadingOut = false;
+	}
+
+	private void onTTAllControlsEvent(final Event event) {
+
+		if (_shell == null || _shell.isDisposed()) {
+			return;
+		}
+
+		switch (event.type) {
+		case SWT.KeyDown:
+
+			if (event.keyCode == SWT.ESC) {
+				hide();
+			}
+
+			break;
+
+		case SWT.MouseEnter:
+
+			if (_isShellFadingIn || _isShellFadingOut) {
+
+				// stop animation
+//				_isShellFadingIn = _isShellFadingOut = false;
+			}
+
+			break;
+
+		case SWT.MouseExit:
+
+			break;
+
+		case SWT.MouseMove:
+
+			if (_isReceiveOnMouseMove //
+//					&& _isShellFadingIn == false
+//					&& _isShellFadingOut == false//
+			) {
+
+				final Widget widget = event.widget;
+
+				if (widget instanceof Control) {
+
+					final Point ttDisplayLocation = ((Control) widget).toDisplay(event.x, event.y);
+					final Point ownerLocation = _ownerControl.toControl(ttDisplayLocation);
+
+					_display.asyncExec(new Runnable() {
+						public void run() {
+
+							final MouseEvent mouseEvent = new MouseEvent(event);
+							mouseEvent.x = ownerLocation.x;
+							mouseEvent.y = ownerLocation.y;
+
+							onMouseMoveInToolTip(mouseEvent);
+						}
+					});
+				}
+			}
+
+			break;
+		}
+	}
+
+	private void onTTAutoCloseTimer() {
+
+//		System.out.println(UI.timeStampNano() + " onTTAutoCloseTimer\t");
+//		// TODO remove SYSTEM.OUT.PRINTLN
+
+		final boolean isKeepOpened = onDisplayMouseMove();
+
+		if (isKeepOpened) {
+
+			// start again to check again
+			_display.timerExec(AUTO_CLOSE_INTERVAL, _ttAutoCloseTimer);
+		}
 	}
 
 	private void onTTShellEvent(final Event event) {
@@ -991,7 +1050,7 @@ public abstract class AnimatedToolTipShell {
 							return;
 						}
 
-						ttHide(event);
+						ttHide();
 					}
 				});
 			}
@@ -1006,17 +1065,15 @@ public abstract class AnimatedToolTipShell {
 
 	}
 
-	private void passOnEvent(final Shell shell, final Event event) {
+	private void removeDisplayFilterListener() {
 
-		if (_ownerControl != null
-				&& !_ownerControl.isDisposed()
-				&& event != null
-				&& event.widget != _ownerControl
-				&& event.type == SWT.MouseDown) {
-
-			// the following was left in order to fix bug 298770 with minimal change. In 3.7, the complete method should be removed.
-			shell.close();
+		if (_isDisplayListenerSet == false) {
+			return;
 		}
+
+		_display.removeFilter(SWT.MouseMove, _ttDisplayListener);
+
+		_isDisplayListenerSet = false;
 	}
 
 	/**
@@ -1036,23 +1093,16 @@ public abstract class AnimatedToolTipShell {
 		ownerShell.removeListener(SWT.Move, _ownerShellListener);
 	}
 
-	private void removeTTDisplayListener() {
-
-		if (_isDisplayListenerSet == false) {
-			return;
-		}
-
-		_display.removeFilter(SWT.MouseMove, _ttDisplayListener);
-
-		_isDisplayListenerSet = false;
-	}
-
 	protected void setBehaviourOnMouseOver(final int mouseOverBehaviour) {
 		_mouseOverBehaviour = mouseOverBehaviour;
 	}
 
 	public void setFadeInSteps(final int fadeInSteps) {
 		_fadeInSteps = fadeInSteps;
+	}
+
+	public void setFadeOutSteps(final int fadeOutSteps) {
+		_fadeOutSteps = fadeOutSteps;
 	}
 
 	public void setIsKeepShellOpenWhenMoved(final boolean isKeepShellOpenWhenMoved) {
@@ -1071,7 +1121,7 @@ public abstract class AnimatedToolTipShell {
 
 			_shell.setVisible(true);
 
-			addTTDisplayListener();
+			addDisplayFilterListener();
 
 		} else {
 
@@ -1081,7 +1131,7 @@ public abstract class AnimatedToolTipShell {
 
 			_shell.setVisible(false);
 
-			removeTTDisplayListener();
+			removeDisplayFilterListener();
 		}
 	}
 
@@ -1129,7 +1179,7 @@ public abstract class AnimatedToolTipShell {
 		ttShow();
 	}
 
-	private void ttHide(final Event event) {
+	private void ttHide() {
 
 		if (_shell == null || _shell.isDisposed() || _shell.isVisible() == false) {
 			return;
@@ -1156,6 +1206,9 @@ public abstract class AnimatedToolTipShell {
 		if (canShowToolTip() == false) {
 			return;
 		}
+
+		// ensure tooltip is closed when mouse is not hovering the tooltip or application
+		_display.timerExec(AUTO_CLOSE_INTERVAL, _ttAutoCloseTimer);
 
 		_isShellFadingIn = true;
 		_isShellFadingOut = false;

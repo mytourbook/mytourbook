@@ -47,7 +47,7 @@ import net.tourbook.common.util.ITourToolTipProvider;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.TourToolTip;
 import net.tourbook.data.TourWayPoint;
-import net.tourbook.mapping.WayPointToolTipProvider;
+import net.tourbook.map2.view.WayPointToolTipProvider;
 import net.tourbook.ui.IInfoToolTipProvider;
 import net.tourbook.ui.IMapToolTipProvider;
 

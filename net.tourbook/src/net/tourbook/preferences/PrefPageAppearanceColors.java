@@ -31,7 +31,7 @@ import net.tourbook.common.color.LegendColor;
 import net.tourbook.common.color.LegendConfig;
 import net.tourbook.common.color.ValueColor;
 import net.tourbook.common.preferences.ICommonPreferences;
-import net.tourbook.mapping.DialogMappingColor;
+import net.tourbook.map2.view.DialogMappingColor;
 import net.tourbook.ui.UI;
 
 import org.eclipse.jface.layout.GridDataFactory;

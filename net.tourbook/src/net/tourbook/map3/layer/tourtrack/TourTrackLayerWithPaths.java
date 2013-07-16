@@ -77,6 +77,7 @@ public class TourTrackLayerWithPaths extends RenderableLayer {
 
 				path.setAltitudeMode(_tourTrackConfig.altitudeMode);
 				path.setFollowTerrain(_tourTrackConfig.isFollowTerrain);
+				path.setPathType(_tourTrackConfig.pathType);
 			}
 		}
 

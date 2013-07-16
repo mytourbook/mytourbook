@@ -280,7 +280,7 @@ public class Map3Manager {
 //		tviLayer.isLayerVisible = isVisible;
 		tviLayer.defaultPosition = INSERT_BEFORE_COMPASS;
 
-		final TerrainProfileConfiguration terrainProfileConfig = new TerrainProfileConfiguration(
+		final DialogTerrainProfileConfig terrainProfileConfig = new DialogTerrainProfileConfig(
 				_wwCanvas,
 				profileLayer,
 				_state);

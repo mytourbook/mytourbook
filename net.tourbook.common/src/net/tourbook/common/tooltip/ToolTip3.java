@@ -194,7 +194,7 @@ public abstract class ToolTip3 {
 
 	/**
 	 * This checks if a mouse is above a tooltip. When mouse is above the 3D map or outside of this
-	 * applicate, mouse events are not captured and a tooltip keeps opend until other actions are
+	 * application, mouse events are not captured and a tooltip keeps opened until other actions are
 	 * done.
 	 */
 	private final class ToolTipAutoCloseTimer implements Runnable {
@@ -763,14 +763,6 @@ public abstract class ToolTip3 {
 		return ttTool;
 	}
 
-	void disableDisplayListener() {
-
-		removeDisplayFilterListener();
-
-		// deactivate auto close timer
-		_display.timerExec(-1, _ttAutoCloseTimer);
-	}
-
 	/**
 	 * Ensure that the tooltip is not displayed outside of the display.
 	 * 
@@ -1134,8 +1126,6 @@ public abstract class ToolTip3 {
 		_cursorDragged = UI.disposeResource(_cursorDragged);
 		_cursorHand = UI.disposeResource(_cursorHand);
 
-//		passOnEvent(shell, event);
-
 		closeAll();
 	}
 
@@ -1442,19 +1432,6 @@ public abstract class ToolTip3 {
 
 		}
 
-	}
-
-	private void passOnEvent(final Shell shell, final Event event) {
-
-		if (_ownerControl != null
-				&& !_ownerControl.isDisposed()
-				&& event != null
-				&& event.widget != _ownerControl
-				&& event.type == SWT.MouseDown) {
-
-			// the following was left in order to fix bug 298770 with minimal change. In 3.7, the complete method should be removed.
-			shell.close();
-		}
 	}
 
 	private void removeDisplayFilterListener() {

@@ -17,7 +17,7 @@ package net.tourbook.map3.view;
 
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
-import net.tourbook.mapping.Messages;
+import net.tourbook.map2.Messages;
 
 import org.eclipse.jface.action.ContributionItem;
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -43,7 +43,7 @@ public class ActionShowTourInMap3 extends ContributionItem {
 
 	private Map3View					_map3View;
 
-	private DialogTourTrackProperties	_trackLayerProperties;
+	private DialogTourTrackConfig	_trackLayerProperties;
 
 	private ToolBar						_toolBar;
 
@@ -120,7 +120,7 @@ public class ActionShowTourInMap3 extends ContributionItem {
 				}
 			});
 
-			_trackLayerProperties = new DialogTourTrackProperties(_parent, _toolBar, _state);
+			_trackLayerProperties = new DialogTourTrackConfig(_parent, _toolBar, _state);
 
 			// send notifications to the map to update displayed photos
 //			_trackLayerProperties.addPropertiesListener(_map3View);

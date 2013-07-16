@@ -15,7 +15,7 @@
  *******************************************************************************/
 package net.tourbook.application;
 
-import net.tourbook.mapping.TourMapView;
+import net.tourbook.map2.view.Map2View;
 import net.tourbook.photo.PicDirView;
 import net.tourbook.statistic.TourStatisticsView;
 import net.tourbook.ui.tourChart.TourChartView;
@@ -54,7 +54,7 @@ public class PerspectiveFactoryTourBook implements IPerspectiveFactory {
 				0.4f,
 				IPageLayout.ID_EDITOR_AREA);
 
-		mapFolder.addView(TourMapView.ID);
+		mapFolder.addView(Map2View.ID);
 		mapFolder.addPlaceholder(IExternalIds.VIEW_ID_NET_TOURBOOK_MAP3_MAP3_VIEW);
 		mapFolder.addView(TourDataEditorView.ID);
 

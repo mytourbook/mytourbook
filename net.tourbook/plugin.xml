@@ -722,7 +722,7 @@
 		   <toolbar id="net.tourbook.mapping.statusline.mapinfo">
 
 		      <control
-		            class="net.tourbook.mapping.MapInfoContribution"
+		            class="net.tourbook.map2.view.MapInfoContribution"
 		            id="net.tourbook.mapping.mapinfo">
 		      </control>
 		   </toolbar>
@@ -940,7 +940,7 @@
       <command
             id="net.tourbook.mapping.command.tourMap"
             name="%command_tour_map_name"
-            defaultHandler="net.tourbook.mapping.ActionHandlerOpenTourMapView"
+            defaultHandler="net.tourbook.map2.action.ActionHandlerOpenTourMapView"
             />
 
       <command
@@ -1061,7 +1061,7 @@
 
    <extension
          point="net.tourbook.mapOverlay">
-      <painter class="net.tourbook.mapping.TourMapPainter"/>
+      <painter class="net.tourbook.map2.view.TourMapPainter"/>
    </extension>
 
 
@@ -1163,7 +1163,7 @@
 	      </view>
 	      <view
 	            category="net.tourbook.category.tour"
-	            class="net.tourbook.mapping.TourMapView"
+	            class="net.tourbook.map2.view.Map2View"
 	            icon="icons/earth-globe-abstract.png"
 	            id="net.tourbook.mapping.mappingViewID"
 	            name="%view_name_tour_map">
@@ -1301,7 +1301,7 @@
 	      </view>
 	      <view
 	            category="net.tourbook.category.system"
-	            class="net.tourbook.mapping.TourMapPropertyView"
+	            class="net.tourbook.map2.view.TourMapPropertyView"
 	            icon="icons/tour-map-properties.png"
 	            id="net.tourbook.mapping.TourMapPropertyView"
 	            name="%view_name_map_properties">
