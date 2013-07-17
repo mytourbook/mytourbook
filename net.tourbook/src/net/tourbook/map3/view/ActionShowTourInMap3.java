@@ -37,30 +37,29 @@ import org.eclipse.swt.widgets.ToolItem;
 
 public class ActionShowTourInMap3 extends ContributionItem {
 
-	private static final String			ID	= "ACTION_TRACK_LAYER_PROPERTIES_ID";	//$NON-NLS-1$
+	private static final String		ID	= "ACTION_TRACK_LAYER_PROPERTIES_ID";	//$NON-NLS-1$
 
 //	private static final String		STATE_IS_TRACK_LAYER_VISIBLE	= "STATE_IS_TRACK_LAYER_VISIBLE";		//$NON-NLS-1$
 
-	private Map3View					_map3View;
+	private Map3View				_map3View;
 
 	private DialogTourTrackConfig	_trackLayerProperties;
 
-	private ToolBar						_toolBar;
+	private ToolBar					_toolBar;
 
-	private ToolItem					_actionTrackLayer;
-	private IDialogSettings				_state;
+	private ToolItem				_actionTrackLayer;
+	private IDialogSettings			_state;
 
-	private boolean						_isActionEnabled;
-	private boolean						_isActionSelected;
+	private boolean					_isActionEnabled;
+	private boolean					_isActionSelected;
 
 	/*
 	 * UI controls
 	 */
-	private Control						_parent;
+	private Control					_parent;
 
-	private Image						_actionImage;
-
-//	private Image						_actionImageDisabled;
+	private Image					_actionImage;
+	private Image					_actionImageDisabled;
 
 	public ActionShowTourInMap3(final Map3View map3View, final Control parent, final IDialogSettings state) {
 
@@ -72,8 +71,8 @@ public class ActionShowTourInMap3 extends ContributionItem {
 		_state = state;
 
 		_actionImage = TourbookPlugin.getImageDescriptor(Messages.image_action_show_tour_in_map).createImage();
-//		_actionImageDisabled = TourbookPlugin.getImageDescriptor(Messages.image_action_show_tour_in_map_disabled)//
-//				.createImage();
+		_actionImageDisabled = TourbookPlugin.getImageDescriptor(Messages.image_action_show_tour_in_map_disabled)//
+				.createImage();
 //		_actionImageDisabled = TourbookPlugin.getImageDescriptor("refresh-all.png")//
 //				.createImage();
 	}
@@ -105,6 +104,10 @@ public class ActionShowTourInMap3 extends ContributionItem {
 
 			_actionTrackLayer = new ToolItem(toolbar, SWT.CHECK);
 
+			// !!! image must be set before enable state is set
+			_actionTrackLayer.setImage(_actionImage);
+			_actionTrackLayer.setDisabledImage(_actionImageDisabled);
+
 			_actionTrackLayer.setSelection(_isActionSelected);
 			_actionTrackLayer.setEnabled(_isActionEnabled);
 
@@ -130,7 +133,7 @@ public class ActionShowTourInMap3 extends ContributionItem {
 	private void onDispose() {
 
 		_actionImage.dispose();
-//		_actionImageDisabled.dispose();
+		_actionImageDisabled.dispose();
 
 		_actionTrackLayer.dispose();
 		_actionTrackLayer = null;
@@ -168,6 +171,9 @@ public class ActionShowTourInMap3 extends ContributionItem {
 
 		final boolean isTrackVisible = _actionTrackLayer.getSelection();
 
+		/*
+		 * show/hide tour track properties
+		 */
 		if (isTrackVisible) {
 
 			final Rectangle itemBounds = _actionTrackLayer.getBounds();
@@ -184,7 +190,7 @@ public class ActionShowTourInMap3 extends ContributionItem {
 			_trackLayerProperties.close();
 		}
 
-		Map3Manager.setTourTrackVisible(isTrackVisible);
+		_map3View.actionShowTour(isTrackVisible);
 	}
 
 	void restoreState() {
@@ -217,7 +223,6 @@ public class ActionShowTourInMap3 extends ContributionItem {
 			_actionTrackLayer.setSelection(isSelected);
 
 			_actionTrackLayer.setEnabled(isEnabled);
-//			_actionTrackLayer.setImage(isEnabled ? _actionImage : _actionImageDisabled);
 		}
 	}
 

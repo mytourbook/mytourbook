@@ -55,7 +55,7 @@ public class PerspectiveFactoryTourBook implements IPerspectiveFactory {
 				IPageLayout.ID_EDITOR_AREA);
 
 		mapFolder.addView(Map2View.ID);
-		mapFolder.addPlaceholder(IExternalIds.VIEW_ID_NET_TOURBOOK_MAP3_MAP3_VIEW);
+		mapFolder.addPlaceholder(IExternalIds.VIEW_ID_NET_TOURBOOK_MAP3_MAP3_VIEW_ID);
 		mapFolder.addView(TourDataEditorView.ID);
 
 		//--------------------------------------------------------------------------------

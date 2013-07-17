@@ -149,7 +149,7 @@ import de.byteholder.gpx.PointOfInterest;
  */
 public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEventListener, IPhotoPropertiesListener {
 
-	public static final String				ID									= "net.tourbook.mapping.mappingViewID"; //$NON-NLS-1$
+	public static final String				ID									= "net.tourbook.map2.view.Map2ViewId";	//$NON-NLS-1$
 
 	private static final String				STATE_IS_SHOW_TOUR_IN_MAP			= "STATE_IS_SHOW_TOUR_IN_MAP";			//$NON-NLS-1$
 	private static final String				STATE_IS_SHOW_PHOTO_IN_MAP			= "STATE_IS_SHOW_PHOTO_IN_MAP";		//$NON-NLS-1$
@@ -2298,7 +2298,6 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 
 		_map.paint();
 	}
-
 
 	private void paintTours_10_All() {
 

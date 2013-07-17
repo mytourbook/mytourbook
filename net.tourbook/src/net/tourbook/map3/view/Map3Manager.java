@@ -1160,6 +1160,11 @@ public class Map3Manager {
 		_map3View = map3View;
 	}
 
+	/**
+	 * Show/hide tour track layer.
+	 * 
+	 * @param isTrackVisible
+	 */
 	static void setTourTrackVisible(final boolean isTrackVisible) {
 
 		if (_map3LayerView == null) {

@@ -12,7 +12,7 @@ https://sourceforge.net/p/mytourbook/code/ci/master/tree/net.tourbook/translatio
 
 * Chart + map colors have been reset to the default colors (because of internal structure changes)
 
-When you have not customized the colors, you are set, you don't have to migrateit.
+When you have not customized the colors, you are set, you don't have to migrate it.
 
 When you have customized colors, follow these steps to get your old colors back. When you don't do this now, you will see the default colors but you can do these steps later because the old color values will not be deleted or modified.
 

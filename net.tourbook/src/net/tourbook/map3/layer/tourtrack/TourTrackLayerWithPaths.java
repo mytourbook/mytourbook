@@ -87,7 +87,10 @@ public class TourTrackLayerWithPaths extends RenderableLayer {
 	@Override
 	public void propertyChange(final PropertyChangeEvent evt) {
 
-		System.out.println(UI.timeStampNano() + " " + getClass() + " \t" + evt.getPropertyName() + " \t" + evt);
+		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] \t")
+				+ evt.getPropertyName()
+				+ " \t"
+				+ evt);
 		// TODO remove SYSTEM.OUT
 	}
 

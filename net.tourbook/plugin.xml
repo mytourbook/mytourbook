@@ -1165,7 +1165,7 @@
 	            category="net.tourbook.category.tour"
 	            class="net.tourbook.map2.view.Map2View"
 	            icon="icons/earth-globe-abstract.png"
-	            id="net.tourbook.mapping.mappingViewID"
+	            id="net.tourbook.map2.view.Map2ViewId"
 	            name="%view_name_tour_map">
 	      </view>
 	      <view
@@ -1455,7 +1455,7 @@
 			category="net.tourbook.category.tour"
 			class="net.tourbook.map3.view.Map3View"
 			icon="icons/map3-view.png"
-			id="net.tourbook.map3.Map3View"
+			id="net.tourbook.map3.Map3ViewId"
 			name="%View_Name_TourMap3"
 		/>
    

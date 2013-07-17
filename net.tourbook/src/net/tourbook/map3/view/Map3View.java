@@ -24,6 +24,7 @@ import java.util.ArrayList;
 
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
+import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.ITourEventListener;
@@ -57,14 +58,17 @@ import org.eclipse.ui.part.ViewPart;
  */
 public class Map3View extends ViewPart {
 
-	public static final String					ID				= "net.tourbook.map3.Map3View";					//$NON-NLS-1$
+	public static final String					ID							= "net.tourbook.map3.Map3ViewId";		//$NON-NLS-1$
 
-	private final IPreferenceStore				_mtPrefStore	= TourbookPlugin.getDefault().getPreferenceStore();
+	private static final String					STATE_IS_SHOW_TOUR_IN_MAP	= "STATE_IS_SHOW_TOUR_IN_MAP";			//$NON-NLS-1$
 
-	private final IDialogSettings				_state			= TourbookPlugin.getStateSection(//
-																		getClass().getCanonicalName());
+	private final IPreferenceStore				_prefStore					= TourbookPlugin.getDefault()//
+																					.getPreferenceStore();
 
-	private static final WorldWindowGLCanvas	_wwCanvas		= Map3Manager.getWWCanvas();
+	private final IDialogSettings				_state						= TourbookPlugin.getStateSection(//
+																					getClass().getCanonicalName());
+
+	private static final WorldWindowGLCanvas	_wwCanvas					= Map3Manager.getWWCanvas();
 
 	private ActionOpenMap3Properties			_actionOpenMap3Properties;
 	private ActionShowTourInMap3				_actionShowTourInMap3;
@@ -77,16 +81,27 @@ public class Map3View extends ViewPart {
 	private boolean								_isPartVisible;
 	private ISelection							_selectionWhenHidden;
 
+	private boolean								_isShowTour;
+
 	/**
 	 * Contains all tours which are displayed in the map.
 	 */
-	private ArrayList<TourData>					_allTours		= new ArrayList<TourData>();
+	private ArrayList<TourData>					_allTours					= new ArrayList<TourData>();
 
 	private Composite							_mapContainer;
 
 	private static int							_renderCounter;
 
 	public Map3View() {}
+
+	public void actionShowTour(final boolean isTrackVisible) {
+
+		_isShowTour = isTrackVisible;
+
+		Map3Manager.setTourTrackVisible(isTrackVisible);
+
+		updateUI();
+	}
 
 	private void addMap3Listener() {
 
@@ -177,7 +192,7 @@ public class Map3View extends ViewPart {
 			}
 		};
 
-		_mtPrefStore.addPropertyChangeListener(_prefChangeListener);
+		_prefStore.addPropertyChangeListener(_prefChangeListener);
 	}
 
 	/**
@@ -264,31 +279,27 @@ public class Map3View extends ViewPart {
 		createActions(parent);
 		fillActionBars();
 
-		restoreState();
-
 		Map3Manager.setMap3View(this);
 
+		/*
+		 * !!! It requires 2x asyncExec that the a tour provider is providing tours !!!
+		 */
 		Display.getCurrent().asyncExec(new Runnable() {
 			@Override
 			public void run() {
 
-				// validate widget
-				if (_mapContainer.isDisposed()) {
-					return;
-				}
+				restoreState();
+				enableActions();
 
-				// check if tour is set from a selection provider
-				if (_allTours.size() > 0) {
-					return;
-				}
-
-				final ArrayList<TourData> allTours = TourManager.getSelectedTours();
-				if (allTours != null) {
-
-					showAllTours(allTours);
+				if (_allTours.size() == 0) {
+					// a tour is not displayed, find a tour provider which provides a tour
+					showToursFromTourProvider();
+				} else {
+					updateUI();
 				}
 			}
 		});
+
 	}
 
 	private void createUI(final Composite parent) {
@@ -315,7 +326,7 @@ public class Map3View extends ViewPart {
 
 		Map3Manager.setMap3View(null);
 
-		_mtPrefStore.removePropertyChangeListener(_prefChangeListener);
+		_prefStore.removePropertyChangeListener(_prefChangeListener);
 		getViewSite().getPage().removePostSelectionListener(_postSelectionListener);
 		getViewSite().getPage().removePartListener(_partListener);
 
@@ -587,6 +598,12 @@ public class Map3View extends ViewPart {
 
 	private void restoreState() {
 
+		final boolean isTourAvailable = _allTours.size() > 0;
+
+		// is show tour
+		_isShowTour = Util.getStateBoolean(_state, STATE_IS_SHOW_TOUR_IN_MAP, true);
+		_actionShowTourInMap3.setState(_isShowTour, isTourAvailable);
+
 	}
 
 	private void saveState() {
@@ -623,6 +640,30 @@ public class Map3View extends ViewPart {
 		final long newOverlayKey = TourManager.loadTourData(allTourIds, allTourData);
 
 		showAllTours(allTourData);
+	}
+
+	private void showToursFromTourProvider() {
+
+		Display.getCurrent().asyncExec(new Runnable() {
+			@Override
+			public void run() {
+
+				// validate widget
+				if (_mapContainer.isDisposed()) {
+					return;
+				}
+
+				// check if tour is set from a selection provider
+				if (_allTours.size() > 0) {
+					return;
+				}
+
+				final ArrayList<TourData> allTours = TourManager.getSelectedTours();
+				if (allTours != null) {
+					showAllTours(allTours);
+				}
+			}
+		});
 	}
 
 	/**
