@@ -13,11 +13,14 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.map3.view;
+package net.tourbook.map3.action;
 
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.map2.Messages;
+import net.tourbook.map3.view.DialogTourTrackConfig;
+import net.tourbook.map3.view.Map3Manager;
+import net.tourbook.map3.view.Map3View;
 
 import org.eclipse.jface.action.ContributionItem;
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -211,7 +214,7 @@ public class ActionShowTourInMap3 extends ContributionItem {
 	 * @param isSelected
 	 * @param isEnabled
 	 */
-	void setState(final boolean isSelected, final boolean isEnabled) {
+	public void setState(final boolean isSelected, final boolean isEnabled) {
 
 		if (_actionTrackLayer == null) {
 

@@ -103,7 +103,7 @@ public class Map3Manager {
 	 */
 	private static TVIMap3Root						_uiRootItem;
 
-	private static final WorldWindowGLCanvas		_wwCanvas						= new WorldWindowGLCanvas();
+	private static final WorldWindowGLCanvas		_ww;
 
 	/**
 	 * Instance of {@link Map3View} or <code>null</code> when view is not created.
@@ -135,7 +135,10 @@ public class Map3Manager {
 																							.basicDateTimeNoMillis();
 
 	static {
-		create_WorldWindLayerModel();
+
+		_ww = new WorldWindowGLCanvas();
+
+		initializeMap3();
 	}
 
 	private static final class CheckStateListener implements ICheckStateListener {
@@ -149,7 +152,7 @@ public class Map3Manager {
 
 		private CheckStateListener(final ViewControlsLayer viewControlsLayer) {
 
-			_viewControlListener = new ViewControlsSelectListener(_wwCanvas, viewControlsLayer);
+			_viewControlListener = new ViewControlsSelectListener(_ww, viewControlsLayer);
 		}
 
 		@Override
@@ -159,58 +162,18 @@ public class Map3Manager {
 
 				if (__lastAddRemoveAction != 1) {
 					__lastAddRemoveAction = 1;
-					_wwCanvas.addSelectListener(_viewControlListener);
+					_ww.addSelectListener(_viewControlListener);
 				}
 
 			} else {
 
 				if (__lastAddRemoveAction != 0) {
 					__lastAddRemoveAction = 0;
-					_wwCanvas.removeSelectListener(_viewControlListener);
+					_ww.removeSelectListener(_viewControlListener);
 				}
 			}
 
 		}
-	}
-
-	/**
-	 * Initialize WW model with default layers.
-	 */
-	private static void create_WorldWindLayerModel() {
-
-		// create default model
-		final Model wwModel = (Model) WorldWind.createConfigurationComponent(AVKey.MODEL_CLASS_NAME);
-
-		wwModel.setShowWireframeExterior(false);
-		wwModel.setShowWireframeInterior(false);
-		wwModel.setShowTessellationBoundingVolumes(false);
-
-		// get default layer
-		_wwDefaultLayers = wwModel.getLayers();
-
-		// create custom layer BEFORE state is applied and xml file is read which references these layers
-		createCustomLayer_TourTracks();
-		createCustomLayer_MapStatus();
-		createCustomLayer_ViewerController();
-		createCustomLayer_TerrainProfile();
-
-		// restore layer from xml file
-		_uiRootItem = parseLayerXml();
-
-		// set ww layers from xml layers
-		final Layer[] layerObject = _xmlLayers.toArray(new Layer[_xmlLayers.size()]);
-		final LayerList layers = new LayerList(layerObject);
-		wwModel.setLayers(layers);
-
-		// model must be set BEFORE model is updated
-		_wwCanvas.setModel(wwModel);
-
-		/*
-		 * ensure All custom layers are in the model because it can happen, that a layer is created
-		 * after the initial load of the layer list and new layers are not contained in the xml
-		 * layer file.
-		 */
-		setCustomLayerInWWModel(wwModel.getLayers());
 	}
 
 	private static void createCustomLayer_MapStatus() {
@@ -222,7 +185,7 @@ public class Map3Manager {
 		//this.layer = new StatusMGRSLayer();
 		//this.layer = new StatusUTMLayer();
 
-		statusLayer.setEventSource(_wwCanvas);
+		statusLayer.setEventSource(_ww);
 		statusLayer.setCoordDecimalPlaces(2); // default is 4
 		//layer.setElevationUnits(StatusLayer.UNIT_IMPERIAL);
 
@@ -263,7 +226,7 @@ public class Map3Manager {
 
 		// Add TerrainProfileLayer
 		final TerrainProfileLayer profileLayer = new TerrainProfileLayer();
-		profileLayer.setEventSource(_wwCanvas);
+		profileLayer.setEventSource(_ww);
 		profileLayer.setStartLatLon(LatLon.fromDegrees(0, -10));
 		profileLayer.setEndLatLon(LatLon.fromDegrees(0, 65));
 
@@ -281,7 +244,7 @@ public class Map3Manager {
 		tviLayer.defaultPosition = INSERT_BEFORE_COMPASS;
 
 		final DialogTerrainProfileConfig terrainProfileConfig = new DialogTerrainProfileConfig(
-				_wwCanvas,
+				_ww,
 				profileLayer,
 				_state);
 		tviLayer.toolProvider = terrainProfileConfig.getToolProvider();
@@ -638,7 +601,7 @@ public class Map3Manager {
 		return _uiRootItem;
 	}
 
-	static TourTrackLayerWithPaths getTourTrackLayer() {
+	public static TourTrackLayerWithPaths getTourTrackLayer() {
 		return _tourTrackLayer;
 	}
 
@@ -651,7 +614,53 @@ public class Map3Manager {
 	}
 
 	public static WorldWindowGLCanvas getWWCanvas() {
-		return _wwCanvas;
+		return _ww;
+	}
+
+	/**
+	 * Initialize WW model with default layers.
+	 */
+	private static void initializeMap3() {
+
+		// create default model
+		final Model wwModel = (Model) WorldWind.createConfigurationComponent(AVKey.MODEL_CLASS_NAME);
+
+		wwModel.setShowWireframeExterior(false);
+		wwModel.setShowWireframeInterior(false);
+		wwModel.setShowTessellationBoundingVolumes(false);
+
+		// get default layer
+		_wwDefaultLayers = wwModel.getLayers();
+
+		// create custom layer BEFORE state is applied and xml file is read which references these layers
+		createCustomLayer_TourTracks();
+		createCustomLayer_MapStatus();
+		createCustomLayer_ViewerController();
+		createCustomLayer_TerrainProfile();
+
+		// restore layer from xml file
+		_uiRootItem = parseLayerXml();
+
+		// set ww layers from xml layers
+		final Layer[] layerObject = _xmlLayers.toArray(new Layer[_xmlLayers.size()]);
+		final LayerList layers = new LayerList(layerObject);
+		wwModel.setLayers(layers);
+
+		// model must be set BEFORE model is updated
+		_ww.setModel(wwModel);
+
+		/*
+		 * ensure All custom layers are in the model because it can happen, that a layer is created
+		 * after the initial load of the layer list and new layers are not contained in the xml
+		 * layer file.
+		 */
+		setCustomLayerInWWModel(wwModel.getLayers());
+
+//		gov.nasa.worldwindx.examples.kml.KMLViewController
+
+//		this.viewController = new ViewController(this.getWwd());
+//		this.viewController.setObjectsToTrack(this.objectsToTrack);
+
 	}
 
 	/**
@@ -1093,16 +1102,16 @@ public class Map3Manager {
 			// update ui/ww model
 			if (tviLayer.defaultPosition == INSERT_BEFORE_COMPASS) {
 
-				insertedUILayer = insertBeforeCompass(_wwCanvas, tviLayer);
+				insertedUILayer = insertBeforeCompass(_ww, tviLayer);
 
 			} else if (tviLayer.defaultPosition == INSERT_BEFORE_PLACE_NAMES) {
 
-				insertedUILayer = insertBeforePlaceNames(_wwCanvas, tviLayer);
+				insertedUILayer = insertBeforePlaceNames(_ww, tviLayer);
 
 			} else {
 
 				// insert in default position
-				insertedUILayer = insertBeforeCompass(_wwCanvas, tviLayer);
+				insertedUILayer = insertBeforeCompass(_ww, tviLayer);
 			}
 
 			insertedLayers.add(insertedUILayer);

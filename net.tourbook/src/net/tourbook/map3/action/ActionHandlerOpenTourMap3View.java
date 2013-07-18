@@ -13,9 +13,10 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.map3.view;
+package net.tourbook.map3.action;
 
 import net.tourbook.common.util.Util;
+import net.tourbook.map3.view.Map3View;
 
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;

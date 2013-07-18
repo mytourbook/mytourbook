@@ -1389,7 +1389,7 @@
       <command
             id="net.tourbook.map3.command.TourMap3"
             name="%View_Name_TourMap3"
-            defaultHandler="net.tourbook.map3.view.ActionHandlerOpenTourMap3View"
+            defaultHandler="net.tourbook.map3.action.ActionHandlerOpenTourMap3View"
             />
 
       <command

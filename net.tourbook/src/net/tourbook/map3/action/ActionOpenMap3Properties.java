@@ -13,11 +13,12 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.map3.view;
+package net.tourbook.map3.action;
 
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.util.Util;
 import net.tourbook.map3.Messages;
+import net.tourbook.map3.view.Map3LayerView;
 
 import org.eclipse.jface.action.Action;
 

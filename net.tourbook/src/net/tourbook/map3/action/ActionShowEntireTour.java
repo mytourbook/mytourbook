@@ -13,24 +13,23 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-
-package net.tourbook.map2.action;
+package net.tourbook.map3.action;
 
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.map2.Messages;
-import net.tourbook.map2.view.Map2View;
+import net.tourbook.map3.view.Map3View;
 
 import org.eclipse.jface.action.Action;
 
-public class ActionZoomShowEntireTour extends Action {
+public class ActionShowEntireTour extends Action {
 
-	private Map2View	_map2View;
+	private Map3View	_map3View;
 
-	public ActionZoomShowEntireTour(final Map2View map2View) {
+	public ActionShowEntireTour(final Map3View map3View) {
 
 		super(null, AS_PUSH_BUTTON);
 
-		_map2View = map2View;
+		_map3View = map3View;
 
 		setToolTipText(Messages.map_action_zoom_show_entire_tour);
 		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.image_action_zoom_show_entire_tour));
@@ -38,7 +37,7 @@ public class ActionZoomShowEntireTour extends Action {
 
 	@Override
 	public void run() {
-		_map2View.actionZoomShowEntireTour();
+		_map3View.actionZoomShowEntireTour();
 	}
 
 }

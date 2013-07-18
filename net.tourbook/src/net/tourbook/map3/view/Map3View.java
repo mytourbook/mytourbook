@@ -26,6 +26,9 @@ import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
+import net.tourbook.map3.action.ActionOpenMap3Properties;
+import net.tourbook.map3.action.ActionShowEntireTour;
+import net.tourbook.map3.action.ActionShowTourInMap3;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.ITourEventListener;
 import net.tourbook.tour.SelectionTourData;
@@ -71,6 +74,8 @@ public class Map3View extends ViewPart {
 	private static final WorldWindowGLCanvas	_wwCanvas					= Map3Manager.getWWCanvas();
 
 	private ActionOpenMap3Properties			_actionOpenMap3Properties;
+
+	private ActionShowEntireTour				_actionShowEntireTour;
 	private ActionShowTourInMap3				_actionShowTourInMap3;
 
 	private IPartListener2						_partListener;
@@ -101,6 +106,11 @@ public class Map3View extends ViewPart {
 		Map3Manager.setTourTrackVisible(isTrackVisible);
 
 		updateUI();
+	}
+
+	public void actionZoomShowEntireTour() {
+		// TODO Auto-generated method stub
+
 	}
 
 	private void addMap3Listener() {
@@ -261,8 +271,9 @@ public class Map3View extends ViewPart {
 	private void createActions(final Composite parent) {
 
 		_actionOpenMap3Properties = new ActionOpenMap3Properties();
-		_actionShowTourInMap3 = new ActionShowTourInMap3(this, parent, _state);
 
+		_actionShowEntireTour = new ActionShowEntireTour(this);
+		_actionShowTourInMap3 = new ActionShowTourInMap3(this, parent, _state);
 	}
 
 	@Override
@@ -354,6 +365,7 @@ public class Map3View extends ViewPart {
 		final IToolBarManager tbm = getViewSite().getActionBars().getToolBarManager();
 
 		tbm.add(_actionShowTourInMap3);
+		tbm.add(_actionShowEntireTour);
 		tbm.add(new Separator());
 
 		tbm.add(_actionOpenMap3Properties);
