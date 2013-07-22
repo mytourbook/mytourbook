@@ -138,7 +138,7 @@ public class Map3Manager {
 
 		_ww = new WorldWindowGLCanvas();
 
-		initializeMap3();
+		_initializeMap3();
 	}
 
 	private static final class CheckStateListener implements ICheckStateListener {
@@ -174,6 +174,52 @@ public class Map3Manager {
 			}
 
 		}
+	}
+
+	/**
+	 * Initialize WW model with default layers.
+	 */
+	private static void _initializeMap3() {
+
+		// create default model
+		final Model wwModel = (Model) WorldWind.createConfigurationComponent(AVKey.MODEL_CLASS_NAME);
+
+		wwModel.setShowWireframeExterior(false);
+		wwModel.setShowWireframeInterior(false);
+		wwModel.setShowTessellationBoundingVolumes(false);
+
+		// get default layer
+		_wwDefaultLayers = wwModel.getLayers();
+
+		// create custom layer BEFORE state is applied and xml file is read which references these layers
+		createCustomLayer_TourTracks();
+		createCustomLayer_MapStatus();
+		createCustomLayer_ViewerController();
+		createCustomLayer_TerrainProfile();
+
+		// restore layer from xml file
+		_uiRootItem = parseLayerXml();
+
+		// set ww layers from xml layers
+		final Layer[] layerObject = _xmlLayers.toArray(new Layer[_xmlLayers.size()]);
+		final LayerList layers = new LayerList(layerObject);
+		wwModel.setLayers(layers);
+
+		// model must be set BEFORE model is updated
+		_ww.setModel(wwModel);
+
+		/*
+		 * ensure All custom layers are in the model because it can happen, that a layer is created
+		 * after the initial load of the layer list and new layers are not contained in the xml
+		 * layer file.
+		 */
+		setCustomLayerInWWModel(wwModel.getLayers());
+
+//		gov.nasa.worldwindx.examples.kml.KMLViewController
+
+//		this.viewController = new ViewController(this.getWwd());
+//		this.viewController.setObjectsToTrack(this.objectsToTrack);
+
 	}
 
 	private static void createCustomLayer_MapStatus() {
@@ -615,52 +661,6 @@ public class Map3Manager {
 
 	public static WorldWindowGLCanvas getWWCanvas() {
 		return _ww;
-	}
-
-	/**
-	 * Initialize WW model with default layers.
-	 */
-	private static void initializeMap3() {
-
-		// create default model
-		final Model wwModel = (Model) WorldWind.createConfigurationComponent(AVKey.MODEL_CLASS_NAME);
-
-		wwModel.setShowWireframeExterior(false);
-		wwModel.setShowWireframeInterior(false);
-		wwModel.setShowTessellationBoundingVolumes(false);
-
-		// get default layer
-		_wwDefaultLayers = wwModel.getLayers();
-
-		// create custom layer BEFORE state is applied and xml file is read which references these layers
-		createCustomLayer_TourTracks();
-		createCustomLayer_MapStatus();
-		createCustomLayer_ViewerController();
-		createCustomLayer_TerrainProfile();
-
-		// restore layer from xml file
-		_uiRootItem = parseLayerXml();
-
-		// set ww layers from xml layers
-		final Layer[] layerObject = _xmlLayers.toArray(new Layer[_xmlLayers.size()]);
-		final LayerList layers = new LayerList(layerObject);
-		wwModel.setLayers(layers);
-
-		// model must be set BEFORE model is updated
-		_ww.setModel(wwModel);
-
-		/*
-		 * ensure All custom layers are in the model because it can happen, that a layer is created
-		 * after the initial load of the layer list and new layers are not contained in the xml
-		 * layer file.
-		 */
-		setCustomLayerInWWModel(wwModel.getLayers());
-
-//		gov.nasa.worldwindx.examples.kml.KMLViewController
-
-//		this.viewController = new ViewController(this.getWwd());
-//		this.viewController.setObjectsToTrack(this.objectsToTrack);
-
 	}
 
 	/**

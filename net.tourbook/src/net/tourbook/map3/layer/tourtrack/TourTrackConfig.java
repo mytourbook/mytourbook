@@ -32,13 +32,13 @@ public class TourTrackConfig {
 	 * Altitude mode
 	 */
 	public static final String[]	ALTITUDE_MODE_LABEL		= {
-			Messages.Track_Config_Altitude_Mode_ClampToGround,
 			Messages.Track_Config_Altitude_Mode_Absolute,
+			Messages.Track_Config_Altitude_Mode_ClampToGround,
 			Messages.Track_Config_Altitude_Mode_RelativeToGround, };
 
 	public static final int[]		ALTITUDE_MODE_VALUE		= {
-			WorldWind.CLAMP_TO_GROUND,
 			WorldWind.ABSOLUTE,
+			WorldWind.CLAMP_TO_GROUND,
 			WorldWind.RELATIVE_TO_GROUND,					};
 
 	/*

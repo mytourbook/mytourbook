@@ -100,11 +100,13 @@ public class TourTrackLayerWithPaths extends RenderableLayer {
 
 	}
 
-	public void showTours(final ArrayList<TourData> allTours) {
+	public ArrayList<Position> showTours(final ArrayList<TourData> allTours) {
 
 //		final long start = System.currentTimeMillis();
 
 		removeAllRenderables();
+
+		final ArrayList<Position> allPositions = new ArrayList<Position>();
 
 		for (final TourData oneTour : allTours) {
 
@@ -119,7 +121,7 @@ public class TourTrackLayerWithPaths extends RenderableLayer {
 			/*
 			 * create positions for all slices
 			 */
-			final ArrayList<Position> positions = new ArrayList<Position>();
+			final ArrayList<Position> trackPositions = new ArrayList<Position>();
 
 			for (int serieIndex = 0; serieIndex < latSerie.length; serieIndex++) {
 
@@ -132,14 +134,14 @@ public class TourTrackLayerWithPaths extends RenderableLayer {
 					alti = allAlti[serieIndex] + 1;
 				}
 
-				positions.add(new Position(LatLon.fromDegrees(lat, lon), alti));
+				trackPositions.add(new Position(LatLon.fromDegrees(lat, lon), alti));
 			}
 
 			/*
 			 * create one path for each tour
 			 */
 //			final MultiResolutionPath tourPath = new MTMultiResPath(positions);
-			final Path tourPath = new Path(positions);
+			final Path tourPath = new Path(trackPositions);
 
 			tourPath.setPathType(AVKey.LINEAR);
 //			tourPath.setValue(AVKey.DISPLAY_NAME, MAP3_LAYER_ID);
@@ -173,6 +175,8 @@ public class TourTrackLayerWithPaths extends RenderableLayer {
 
 			tourPath.setAttributes(attrs);
 
+			allPositions.addAll(trackPositions);
+
 			addRenderable(tourPath);
 		}
 
@@ -180,5 +184,7 @@ public class TourTrackLayerWithPaths extends RenderableLayer {
 
 //		System.out.println(UI.timeStampNano() + " showTour\t" + (System.currentTimeMillis() - start) + " ms");
 //		// TODO remove SYSTEM.OUT.PRINTLN
+
+		return allPositions;
 	}
 }
