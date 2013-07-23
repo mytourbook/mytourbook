@@ -15,7 +15,6 @@
  *******************************************************************************/
 package net.tourbook.map3.layer.tourtrack;
 
-import gov.nasa.worldwind.avlist.AVKey;
 import gov.nasa.worldwind.geom.LatLon;
 import gov.nasa.worldwind.geom.Position;
 import gov.nasa.worldwind.layers.RenderableLayer;
@@ -45,13 +44,13 @@ public class TourTrackLayerWithPaths extends RenderableLayer {
 
 	private final TourPositionColors	_positionColors;
 
-	private final TourTrackConfig		_tourTrackConfig;
+	private final TourTrackConfig		_trackConfig;
 
 	public TourTrackLayerWithPaths(final IDialogSettings state) {
 
 		_state = state;
 
-		_tourTrackConfig = new TourTrackConfig(state);
+		_trackConfig = new TourTrackConfig(state);
 
 		_positionColors = new TourPositionColors();
 
@@ -59,7 +58,7 @@ public class TourTrackLayerWithPaths extends RenderableLayer {
 	}
 
 	public TourTrackConfig getConfig() {
-		return _tourTrackConfig;
+		return _trackConfig;
 	}
 
 	@Override
@@ -72,12 +71,7 @@ public class TourTrackLayerWithPaths extends RenderableLayer {
 		for (final Renderable renderable : getRenderables()) {
 
 			if (renderable instanceof Path) {
-
-				final Path path = (Path) renderable;
-
-				path.setAltitudeMode(_tourTrackConfig.altitudeMode);
-				path.setFollowTerrain(_tourTrackConfig.isFollowTerrain);
-				path.setPathType(_tourTrackConfig.pathType);
+				setPathAttributes((Path) renderable);
 			}
 		}
 
@@ -96,8 +90,51 @@ public class TourTrackLayerWithPaths extends RenderableLayer {
 
 	public void saveState() {
 
-		_tourTrackConfig.saveState(_state);
+		_trackConfig.saveState(_state);
+	}
 
+	private void setPathAttributes(final Path path) {
+
+//		tourPath.setValue(AVKey.DISPLAY_NAME, MAP3_LAYER_ID);
+
+		// Indicate that dots are to be drawn at each specified path position.
+		path.setShowPositions(_trackConfig.isShowTrackPosition);
+		path.setShowPositionsScale(_trackConfig.trackPositionSize);
+
+//		tourPath.setSkipCountComputer(tourPath.getSkipCountComputer());
+
+		// Indicate that the dots be drawn only when the path is less than 5 KM from the eye point.
+//		tourPath.setShowPositionsThreshold(5e3);
+
+		// Override generic view-distance geometry regeneration because multi-res Paths handle that themselves.
+//		tourPath.setViewDistanceExpiration(false);
+
+		path.setAltitudeMode(_trackConfig.altitudeMode);
+		path.setFollowTerrain(_trackConfig.isFollowTerrain);
+		path.setPathType(_trackConfig.pathType);
+
+		path.setExtrude(_trackConfig.isExtrudePath);
+		path.setDrawVerticals(_trackConfig.isDrawVerticals);
+
+		/*
+		 * Create attributes for the Path.
+		 */
+
+		final ShapeAttributes shapeAttrs = new BasicShapeAttributes();
+
+		shapeAttrs.setDrawOutline(true);
+		shapeAttrs.setOutlineWidth(_trackConfig.outlineWidth);
+		shapeAttrs.setOutlineMaterial(Material.GRAY);
+		shapeAttrs.setOutlineOpacity(0.5);
+
+		shapeAttrs.setDrawInterior(true);
+		shapeAttrs.setInteriorMaterial(Material.YELLOW);
+		shapeAttrs.setInteriorOpacity(0.5);
+
+		path.setAttributes(shapeAttrs);
+
+		// Show how to make the colors vary along the paths.
+		path.setPositionColors(_positionColors);
 	}
 
 	public ArrayList<Position> showTours(final ArrayList<TourData> allTours) {
@@ -143,41 +180,12 @@ public class TourTrackLayerWithPaths extends RenderableLayer {
 //			final MultiResolutionPath tourPath = new MTMultiResPath(positions);
 			final Path tourPath = new Path(trackPositions);
 
-			tourPath.setPathType(AVKey.LINEAR);
-//			tourPath.setValue(AVKey.DISPLAY_NAME, MAP3_LAYER_ID);
-
-			// Show how to make the colors vary along the paths.
-			tourPath.setPositionColors(_positionColors);
-
-			// Indicate that dots are to be drawn at each specified path position.
-//			tourPath.setShowPositions(true);
-//			tourPath.setShowPositionsScale(2);
-
-//			tourPath.setSkipCountComputer(tourPath.getSkipCountComputer());
-
-			// Indicate that the dots be drawn only when the path is less than 5 KM from the eye point.
-//			tourPath.setShowPositionsThreshold(5e3);
-
-			// Override generic view-distance geometry regeneration because multi-res Paths handle that themselves.
-//			tourPath.setViewDistanceExpiration(false);
-
-//			tourPath.setAltitudeMode(WorldWind.RELATIVE_TO_GROUND);
-//			tourPath.setAltitudeMode(WorldWind.ABSOLUTE);
-			tourPath.setAltitudeMode(_tourTrackConfig.altitudeMode);
-			tourPath.setFollowTerrain(_tourTrackConfig.isFollowTerrain);
-
-			// Create attributes for the Path.
-			final ShapeAttributes attrs = new BasicShapeAttributes();
-			attrs.setOutlineWidth(6);
-
-			attrs.setDrawInterior(false);
-			attrs.setOutlineMaterial(Material.RED);
-
-			tourPath.setAttributes(attrs);
-
-			allPositions.addAll(trackPositions);
+			setPathAttributes(tourPath);
 
 			addRenderable(tourPath);
+
+			// keep all positions which is used to find the outline for ALL selected tours
+			allPositions.addAll(trackPositions);
 		}
 
 		_positionColors.updateColors(allTours);

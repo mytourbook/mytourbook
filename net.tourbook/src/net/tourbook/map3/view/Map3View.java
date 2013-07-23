@@ -128,11 +128,15 @@ public class Map3View extends ViewPart {
 	public void actionSynchMapViewWithTour() {
 
 		_isSyncMapViewWithTour = _actionSynMapViewWithTour.isChecked();
+
+		if (_isSyncMapViewWithTour) {
+			showAllTours();
+		}
 	}
 
 	public void actionZoomShowEntireTour() {
-		// TODO Auto-generated method stub
 
+		showAllTours(true);
 	}
 
 	private void addMap3Listener() {
@@ -667,23 +671,9 @@ public class Map3View extends ViewPart {
 
 	}
 
-	/**
-	 * Shows all tours in the map which are set in {@link #_allTours}.
-	 */
 	private void showAllTours() {
 
-		enableActions();
-
-		final TourTrackLayerWithPaths tourTrackLayer = Map3Manager.getTourTrackLayer();
-
-		final ArrayList<Position> allPositions = tourTrackLayer.showTours(_allTours);
-
-		if (_isSyncMapViewWithTour) {
-			final Map3ViewController viewController = Map3ViewController.create(Map3Manager.getWWCanvas());
-			viewController.goToDefaultView(allPositions);
-		}
-
-		_wwCanvas.redraw();
+		showAllTours(_isSyncMapViewWithTour);
 	}
 
 	private void showAllTours(final ArrayList<TourData> allTours) {
@@ -692,6 +682,27 @@ public class Map3View extends ViewPart {
 		_allTours.addAll(allTours);
 
 		showAllTours();
+	}
+
+	/**
+	 * Shows all tours in the map which are set in {@link #_allTours}.
+	 * 
+	 * @param isSyncMapViewWithTour
+	 */
+	private void showAllTours(final boolean isSyncMapViewWithTour) {
+
+		enableActions();
+
+		final TourTrackLayerWithPaths tourTrackLayer = Map3Manager.getTourTrackLayer();
+
+		final ArrayList<Position> allPositions = tourTrackLayer.showTours(_allTours);
+
+		if (isSyncMapViewWithTour) {
+			final Map3ViewController viewController = Map3ViewController.create(Map3Manager.getWWCanvas());
+			viewController.goToDefaultView(allPositions);
+		}
+
+		_wwCanvas.redraw();
 	}
 
 	private void showTour(final TourData tourData) {

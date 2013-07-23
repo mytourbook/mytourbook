@@ -62,16 +62,18 @@ import org.joda.time.DateTimeZone;
 
 public class UI {
 
-	public static final String			EMPTY_STRING							= "";																		//$NON-NLS-1$
 	public static final String			DASH									= "-";																		//$NON-NLS-1$
 	public static final String			DASH_WITH_SPACE							= " - ";																	//$NON-NLS-1$
 	public static final String			DASH_WITH_DOUBLE_SPACE					= "   -   ";																//$NON-NLS-1$
+	public static final String			DIMENSION								= " x ";																	//$NON-NLS-1$
+	public static final String			EMPTY_STRING							= "";																		//$NON-NLS-1$
 	public static final String			SPACE									= " ";																		//$NON-NLS-1$
 	public static final String			SPACE2									= "  ";																	//$NON-NLS-1$
 	public static final String			SPACE4									= "    ";																	//$NON-NLS-1$
 	public static final String			STRING_0								= "0";																		//$NON-NLS-1$
-	public static final String			COMMA_SPACE								= ", ";																	//$NON-NLS-1$
-	public static final String			DIMENSION								= " x ";																	//$NON-NLS-1$
+	public static final String			COMMA_SPACE								= ", ";
+	//$NON-NLS-1$
+	public static final char			TAB										= '\t';
 
 	/**
 	 * contains a new line
@@ -111,6 +113,8 @@ public class UI {
 	public static final String			SYMBOL_PERCENTAGE						= "%";																		//$NON-NLS-1$
 	public static final String			SYMBOL_UNDERSCORE						= "_";																		//$NON-NLS-1$
 	public static final String			SYMBOL_WIND_WITH_SPACE					= "W ";																	//$NON-NLS-1$
+
+	public static final int				FORM_FIRST_COLUMN_INDENT				= 16;
 
 	/**
 	 * The ellipsis is the string that is used to represent shortened text.
@@ -246,8 +250,6 @@ public class UI {
 	public static final String			IMAGE_EMPTY_16							= "_empty16";																//$NON-NLS-1$
 
 	public final static ImageRegistry	IMAGE_REGISTRY;
-	public static final int				FORM_FIRST_COLUMN_INDENT				= 16;
-	public static final char								TAB								= '\t';
 
 	static {
 
@@ -595,6 +597,36 @@ public class UI {
 		}
 	}
 
+	/**
+	 * set width for all controls in one column to the max width value
+	 */
+	public static void setEqualizeColumWidths(final ArrayList<Control> columnControls) {
+		UI.setEqualizeColumWidths(columnControls, 0);
+	}
+
+	public static void setEqualizeColumWidths(final ArrayList<Control> columnControls, final int additionalSpace) {
+
+		int maxWidth = 0;
+
+		// get max width from all first columns controls
+		for (final Control control : columnControls) {
+
+			if (control.isDisposed()) {
+				// this should not happen, but it did during testing
+				return;
+			}
+
+			final int width = control.getSize().x + additionalSpace;
+
+			maxWidth = width > maxWidth ? width : maxWidth;
+		}
+
+		// set width for all first column controls
+		for (final Control control : columnControls) {
+			((GridData) control.getLayoutData()).widthHint = maxWidth;
+		}
+	}
+
 	public static GridData setFieldWidth(final Composite parent, final StringFieldEditor field, final int width) {
 		final GridData gd = new GridData();
 		gd.widthHint = width;
@@ -828,36 +860,6 @@ public class UI {
 				}
 			}
 		};
-	}
-
-	/**
-	 * set width for all controls in one column to the max width value
-	 */
-	public static void setEqualizeColumWidths(final ArrayList<Control> columnControls) {
-		UI.setEqualizeColumWidths(columnControls, 0);
-	}
-
-	public static void setEqualizeColumWidths(final ArrayList<Control> columnControls, final int additionalSpace) {
-	
-		int maxWidth = 0;
-	
-		// get max width from all first columns controls
-		for (final Control control : columnControls) {
-	
-			if (control.isDisposed()) {
-				// this should not happen, but it did during testing
-				return;
-			}
-	
-			final int width = control.getSize().x + additionalSpace;
-	
-			maxWidth = width > maxWidth ? width : maxWidth;
-		}
-	
-		// set width for all first column controls
-		for (final Control control : columnControls) {
-			((GridData) control.getLayoutData()).widthHint = maxWidth;
-		}
 	}
 
 // this conversion is not working for all png images, found SWT2Dutil.java

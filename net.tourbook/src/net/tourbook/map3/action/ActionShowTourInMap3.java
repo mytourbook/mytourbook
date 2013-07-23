@@ -126,7 +126,7 @@ public class ActionShowTourInMap3 extends ContributionItem {
 				}
 			});
 
-			_trackLayerProperties = new DialogTourTrackConfig(_parent, _toolBar, _state);
+			_trackLayerProperties = new DialogTourTrackConfig(_parent, _toolBar);
 
 			// send notifications to the map to update displayed photos
 //			_trackLayerProperties.addPropertiesListener(_map3View);
