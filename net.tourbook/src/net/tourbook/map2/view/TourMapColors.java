@@ -35,24 +35,26 @@ public class TourMapColors {
 	private static void createLegendProviders() {
 
 		_legendProviders.put(//
-				ILegendProvider.TOUR_COLOR_PULSE,
-				new GradientColorProvider(new LegendConfig(), new LegendColor(), ILegendProvider.TOUR_COLOR_PULSE));
-
-		_legendProviders.put(//
 				ILegendProvider.TOUR_COLOR_ALTITUDE,
 				new GradientColorProvider(new LegendConfig(), new LegendColor(), ILegendProvider.TOUR_COLOR_ALTITUDE));
 
 		_legendProviders.put(//
-				ILegendProvider.TOUR_COLOR_SPEED,
-				new GradientColorProvider(new LegendConfig(), new LegendColor(), ILegendProvider.TOUR_COLOR_SPEED));
+				ILegendProvider.TOUR_COLOR_GRADIENT,
+				new GradientColorProvider(new LegendConfig(), new LegendColor(), ILegendProvider.TOUR_COLOR_GRADIENT));
 
 		_legendProviders.put(//
 				ILegendProvider.TOUR_COLOR_PACE,
 				new GradientColorProvider(new LegendConfig(), new LegendColor(), ILegendProvider.TOUR_COLOR_PACE));
 
 		_legendProviders.put(//
-				ILegendProvider.TOUR_COLOR_GRADIENT,
-				new GradientColorProvider(new LegendConfig(), new LegendColor(), ILegendProvider.TOUR_COLOR_GRADIENT));
+				ILegendProvider.TOUR_COLOR_PULSE,
+				new GradientColorProvider(new LegendConfig(), new LegendColor(), ILegendProvider.TOUR_COLOR_PULSE));
+
+		_legendProviders.put(//
+				ILegendProvider.TOUR_COLOR_SPEED,
+				new GradientColorProvider(new LegendConfig(), new LegendColor(), ILegendProvider.TOUR_COLOR_SPEED));
+
+		//
 
 		_legendProviders.put(//
 				ILegendProvider.TOUR_COLOR_HR_ZONE,
@@ -68,6 +70,13 @@ public class TourMapColors {
 			createLegendProviders();
 		}
 
-		return _legendProviders.get(colorId);
+		ILegendProvider legendProvider = _legendProviders.get(colorId);
+
+		// use default when not available
+		if (legendProvider == null) {
+			legendProvider = _legendProviders.get(ILegendProvider.TOUR_COLOR_ALTITUDE);
+		}
+
+		return legendProvider;
 	}
 }

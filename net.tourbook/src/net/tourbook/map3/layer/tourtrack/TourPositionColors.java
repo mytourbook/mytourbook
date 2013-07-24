@@ -29,16 +29,17 @@ import net.tourbook.common.color.ILegendProviderGradientColors;
 import net.tourbook.common.color.LegendConfig;
 import net.tourbook.common.color.LegendUnitFormat;
 import net.tourbook.data.TourData;
+import net.tourbook.map2.Messages;
 import net.tourbook.map3.layer.ColorCacheAWT;
 import net.tourbook.map3.layer.Map3Colors;
 
 class TourPositionColors implements Path.PositionColors {
 
-	private final ColorCacheAWT	_colorCache		= new ColorCacheAWT();
+	private final ColorCacheAWT	_awtColorCache	= new ColorCacheAWT();
 
 	private ILegendProvider		_colorProvider	= Map3Colors.getColorProvider(ILegendProvider.TOUR_COLOR_ALTITUDE);
 
-	public Color getColor(final float altitude) {
+	public Color getColor(final float graphValue) {
 
 		// Color the positions based on their altitude.
 
@@ -48,7 +49,7 @@ class TourPositionColors implements Path.PositionColors {
 
 			final ILegendProviderGradientColors gradientColorProvider = (ILegendProviderGradientColors) _colorProvider;
 
-			colorValue = gradientColorProvider.getColorValue(altitude);
+			colorValue = gradientColorProvider.getColorValue(graphValue);
 		}
 
 		if (colorValue == -1) {
@@ -56,7 +57,7 @@ class TourPositionColors implements Path.PositionColors {
 			return Color.MAGENTA;
 		}
 
-		return _colorCache.get(colorValue);
+		return _awtColorCache.get(colorValue);
 	}
 
 	public Color getColor(final Position position, final int ordinal) {
@@ -66,13 +67,18 @@ class TourPositionColors implements Path.PositionColors {
 		return getColor((float) altitude);
 	}
 
-	public void updateColors(final ArrayList<TourData> allTours) {
+	void setColorProvider(final ILegendProvider legendProvider) {
+
+		_colorProvider = legendProvider;
+	}
+
+	void updateColors(final ArrayList<TourData> allTours) {
 
 		if (_colorProvider instanceof ILegendProviderGradientColors) {
 
 			final ILegendProviderGradientColors colorProvider = (ILegendProviderGradientColors) _colorProvider;
 
-			updateColors_10(allTours, colorProvider, 300);
+			updateColors_10_SetMinMaxValues(allTours, colorProvider, 300);
 		}
 	}
 
@@ -86,9 +92,9 @@ class TourPositionColors implements Path.PositionColors {
 	 * @return Return <code>true</code> when the legend value could be updated, <code>false</code>
 	 *         when data are not available
 	 */
-	private boolean updateColors_10(final ArrayList<TourData> allTourData,
-									final ILegendProviderGradientColors legendProvider,
-									final int legendHeight) {
+	private boolean updateColors_10_SetMinMaxValues(final ArrayList<TourData> allTourData,
+													final ILegendProviderGradientColors legendProvider,
+													final int legendHeight) {
 
 		if (allTourData.size() == 0) {
 			return false;
@@ -106,6 +112,7 @@ class TourPositionColors implements Path.PositionColors {
 
 			float minValue = Float.MIN_VALUE;
 			float maxValue = Float.MAX_VALUE;
+
 			boolean setInitialValue = true;
 
 			for (final TourData tourData : allTourData) {
@@ -152,204 +159,205 @@ class TourPositionColors implements Path.PositionColors {
 
 			break;
 
-//		case TourMapColors.TOUR_COLOR_PULSE:
-//
-//			minValue = Float.MIN_VALUE;
-//			maxValue = Float.MAX_VALUE;
-//			setInitialValue = true;
-//
-//			for (final TourData tourData : _allTourData) {
-//
-//				final float[] dataSerie = tourData.pulseSerie;
-//				if ((dataSerie == null) || (dataSerie.length == 0)) {
-//					continue;
-//				}
-//
-//				/*
-//				 * get min/max values
-//				 */
-//				for (final float dataValue : dataSerie) {
-//
-//					// patch from Kenny Moens / 2011-08-04
-//					if (dataValue == 0) {
-//						continue;
-//					}
-//
-//					if (setInitialValue) {
-//						setInitialValue = false;
-//						minValue = maxValue = dataValue;
-//					}
-//
-//					minValue = (minValue <= dataValue) ? minValue : dataValue;
-//					maxValue = (maxValue >= dataValue) ? maxValue : dataValue;
-//				}
-//			}
-//
-//			if ((minValue == Float.MIN_VALUE) || (maxValue == Float.MAX_VALUE)) {
-//				return false;
-//			}
-//
-//			colorDefinition = colorProvider.getGraphColorDefinition(GraphColorProvider.PREF_GRAPH_HEARTBEAT);
-//
-//			legendProvider.setLegendColorColors(colorDefinition.getNewLegendColor());
-//			legendProvider.setLegendColorValues(
-//					legendBounds,
-//					minValue,
-//					maxValue,
-//					Messages.graph_label_heartbeat_unit,
-//					LegendUnitFormat.Number);
-//
-//			break;
-//
-//		case TourMapColors.TOUR_COLOR_SPEED:
-//
-//			minValue = Float.MIN_VALUE;
-//			maxValue = Float.MAX_VALUE;
-//			setInitialValue = true;
-//
-//			for (final TourData tourData : _allTourData) {
-//
-//				final float[] dataSerie = tourData.getSpeedSerie();
-//				if ((dataSerie == null) || (dataSerie.length == 0)) {
-//					continue;
-//				}
-//
-//				/*
-//				 * get min/max values
-//				 */
-//				for (final float dataValue : dataSerie) {
-//
-//					if (dataValue == Float.MIN_VALUE) {
-//						// skip invalid values
-//						continue;
-//					}
-//
-//					if (setInitialValue) {
-//						setInitialValue = false;
-//						minValue = maxValue = dataValue;
-//					}
-//
-//					minValue = (minValue <= dataValue) ? minValue : dataValue;
-//					maxValue = (maxValue >= dataValue) ? maxValue : dataValue;
-//				}
-//			}
-//
-//			if ((minValue == Float.MIN_VALUE) || (maxValue == Float.MAX_VALUE)) {
-//				return false;
-//			}
-//
-//			legendConfig.numberFormatDigits = 1;
-//			colorDefinition = colorProvider.getGraphColorDefinition(GraphColorProvider.PREF_GRAPH_SPEED);
-//
-//			legendProvider.setLegendColorColors(colorDefinition.getNewLegendColor());
-//			legendProvider.setLegendColorValues(
-//					legendBounds,
-//					minValue,
-//					maxValue,
-//					UI.UNIT_LABEL_SPEED,
-//					LegendUnitFormat.Number);
-//
-//			break;
-//
-//		case TourMapColors.TOUR_COLOR_PACE:
-//
-//			minValue = Float.MIN_VALUE;
-//			maxValue = Float.MAX_VALUE;
-//			setInitialValue = true;
-//
-//			for (final TourData tourData : _allTourData) {
-//
-//				final float[] dataSerie = tourData.getPaceSerieSeconds();
-//				if ((dataSerie == null) || (dataSerie.length == 0)) {
-//					continue;
-//				}
-//
-//				/*
-//				 * get min/max values
-//				 */
-//				for (final float dataValue : dataSerie) {
-//
-//					if (dataValue == Float.MIN_VALUE) {
-//						// skip invalid values
-//						continue;
-//					}
-//
-//					if (setInitialValue) {
-//						setInitialValue = false;
-//						minValue = maxValue = dataValue;
-//					}
-//
-//					minValue = (minValue <= dataValue) ? minValue : dataValue;
-//					maxValue = (maxValue >= dataValue) ? maxValue : dataValue;
-//				}
-//			}
-//
-//			if ((minValue == Float.MIN_VALUE) || (maxValue == Float.MAX_VALUE)) {
-//				return false;
-//			}
-//
-//			legendConfig.unitFormat = LegendUnitFormat.Pace;
-//			colorDefinition = colorProvider.getGraphColorDefinition(GraphColorProvider.PREF_GRAPH_PACE);
-//
-//			legendProvider.setLegendColorColors(colorDefinition.getNewLegendColor());
-//			legendProvider.setLegendColorValues(
-//					legendBounds,
-//					minValue,
-//					maxValue,
-//					UI.UNIT_LABEL_PACE,
-//					LegendUnitFormat.Pace);
-//
-//			break;
-//
-//		case TourMapColors.TOUR_COLOR_GRADIENT:
-//
-//			minValue = Float.MIN_VALUE;
-//			maxValue = Float.MAX_VALUE;
-//			setInitialValue = true;
-//
-//			for (final TourData tourData : _allTourData) {
-//
-//				final float[] dataSerie = tourData.getGradientSerie();
-//				if ((dataSerie == null) || (dataSerie.length == 0)) {
-//					continue;
-//				}
-//
-//				/*
-//				 * get min/max values
-//				 */
-//				for (final float dataValue : dataSerie) {
-//
-//					if (dataValue == Float.MIN_VALUE) {
-//						// skip invalid values
-//						continue;
-//					}
-//
-//					if (setInitialValue) {
-//						setInitialValue = false;
-//						minValue = maxValue = dataValue;
-//					}
-//
-//					minValue = (minValue <= dataValue) ? minValue : dataValue;
-//					maxValue = (maxValue >= dataValue) ? maxValue : dataValue;
-//				}
-//			}
-//
-//			if ((minValue == Float.MIN_VALUE) || (maxValue == Float.MAX_VALUE)) {
-//				return false;
-//			}
-//
-//			legendConfig.numberFormatDigits = 1;
-//			colorDefinition = colorProvider.getGraphColorDefinition(GraphColorProvider.PREF_GRAPH_GRADIENT);
-//
-//			legendProvider.setLegendColorColors(colorDefinition.getNewLegendColor());
-//			legendProvider.setLegendColorValues(
-//					legendBounds,
-//					minValue,
-//					maxValue,
-//					Messages.graph_label_gradient_unit,
-//					LegendUnitFormat.Number);
-//
-//			break;
+		case ILegendProvider.TOUR_COLOR_PULSE:
+
+			minValue = Float.MIN_VALUE;
+			maxValue = Float.MAX_VALUE;
+
+			setInitialValue = true;
+
+			for (final TourData tourData : allTourData) {
+
+				final float[] dataSerie = tourData.pulseSerie;
+				if ((dataSerie == null) || (dataSerie.length == 0)) {
+					continue;
+				}
+
+				/*
+				 * get min/max values
+				 */
+				for (final float dataValue : dataSerie) {
+
+					// patch from Kenny Moens / 2011-08-04
+					if (dataValue == 0) {
+						continue;
+					}
+
+					if (setInitialValue) {
+						setInitialValue = false;
+						minValue = maxValue = dataValue;
+					}
+
+					minValue = (minValue <= dataValue) ? minValue : dataValue;
+					maxValue = (maxValue >= dataValue) ? maxValue : dataValue;
+				}
+			}
+
+			if ((minValue == Float.MIN_VALUE) || (maxValue == Float.MAX_VALUE)) {
+				return false;
+			}
+
+			colorDefinition = colorProvider.getGraphColorDefinition(GraphColorProvider.PREF_GRAPH_HEARTBEAT);
+
+			legendProvider.setLegendColorColors(colorDefinition.getNewLegendColor());
+			legendProvider.setLegendColorValues(
+					legendHeight,
+					minValue,
+					maxValue,
+					Messages.graph_label_heartbeat_unit,
+					LegendUnitFormat.Number);
+
+			break;
+
+		case ILegendProvider.TOUR_COLOR_SPEED:
+
+			minValue = Float.MIN_VALUE;
+			maxValue = Float.MAX_VALUE;
+			setInitialValue = true;
+
+			for (final TourData tourData : allTourData) {
+
+				final float[] dataSerie = tourData.getSpeedSerie();
+				if ((dataSerie == null) || (dataSerie.length == 0)) {
+					continue;
+				}
+
+				/*
+				 * get min/max values
+				 */
+				for (final float dataValue : dataSerie) {
+
+					if (dataValue == Float.MIN_VALUE) {
+						// skip invalid values
+						continue;
+					}
+
+					if (setInitialValue) {
+						setInitialValue = false;
+						minValue = maxValue = dataValue;
+					}
+
+					minValue = (minValue <= dataValue) ? minValue : dataValue;
+					maxValue = (maxValue >= dataValue) ? maxValue : dataValue;
+				}
+			}
+
+			if ((minValue == Float.MIN_VALUE) || (maxValue == Float.MAX_VALUE)) {
+				return false;
+			}
+
+			legendConfig.numberFormatDigits = 1;
+			colorDefinition = colorProvider.getGraphColorDefinition(GraphColorProvider.PREF_GRAPH_SPEED);
+
+			legendProvider.setLegendColorColors(colorDefinition.getNewLegendColor());
+			legendProvider.setLegendColorValues(
+					legendHeight,
+					minValue,
+					maxValue,
+					UI.UNIT_LABEL_SPEED,
+					LegendUnitFormat.Number);
+
+			break;
+
+		case ILegendProvider.TOUR_COLOR_PACE:
+
+			minValue = Float.MIN_VALUE;
+			maxValue = Float.MAX_VALUE;
+			setInitialValue = true;
+
+			for (final TourData tourData : allTourData) {
+
+				final float[] dataSerie = tourData.getPaceSerieSeconds();
+				if ((dataSerie == null) || (dataSerie.length == 0)) {
+					continue;
+				}
+
+				/*
+				 * get min/max values
+				 */
+				for (final float dataValue : dataSerie) {
+
+					if (dataValue == Float.MIN_VALUE) {
+						// skip invalid values
+						continue;
+					}
+
+					if (setInitialValue) {
+						setInitialValue = false;
+						minValue = maxValue = dataValue;
+					}
+
+					minValue = (minValue <= dataValue) ? minValue : dataValue;
+					maxValue = (maxValue >= dataValue) ? maxValue : dataValue;
+				}
+			}
+
+			if ((minValue == Float.MIN_VALUE) || (maxValue == Float.MAX_VALUE)) {
+				return false;
+			}
+
+			legendConfig.unitFormat = LegendUnitFormat.Pace;
+			colorDefinition = colorProvider.getGraphColorDefinition(GraphColorProvider.PREF_GRAPH_PACE);
+
+			legendProvider.setLegendColorColors(colorDefinition.getNewLegendColor());
+			legendProvider.setLegendColorValues(
+					legendHeight,
+					minValue,
+					maxValue,
+					UI.UNIT_LABEL_PACE,
+					LegendUnitFormat.Pace);
+
+			break;
+
+		case ILegendProvider.TOUR_COLOR_GRADIENT:
+
+			minValue = Float.MIN_VALUE;
+			maxValue = Float.MAX_VALUE;
+			setInitialValue = true;
+
+			for (final TourData tourData : allTourData) {
+
+				final float[] dataSerie = tourData.getGradientSerie();
+				if ((dataSerie == null) || (dataSerie.length == 0)) {
+					continue;
+				}
+
+				/*
+				 * get min/max values
+				 */
+				for (final float dataValue : dataSerie) {
+
+					if (dataValue == Float.MIN_VALUE) {
+						// skip invalid values
+						continue;
+					}
+
+					if (setInitialValue) {
+						setInitialValue = false;
+						minValue = maxValue = dataValue;
+					}
+
+					minValue = (minValue <= dataValue) ? minValue : dataValue;
+					maxValue = (maxValue >= dataValue) ? maxValue : dataValue;
+				}
+			}
+
+			if ((minValue == Float.MIN_VALUE) || (maxValue == Float.MAX_VALUE)) {
+				return false;
+			}
+
+			legendConfig.numberFormatDigits = 1;
+			colorDefinition = colorProvider.getGraphColorDefinition(GraphColorProvider.PREF_GRAPH_GRADIENT);
+
+			legendProvider.setLegendColorColors(colorDefinition.getNewLegendColor());
+			legendProvider.setLegendColorValues(
+					legendHeight,
+					minValue,
+					maxValue,
+					Messages.graph_label_gradient_unit,
+					LegendUnitFormat.Number);
+
+			break;
 
 		default:
 			break;

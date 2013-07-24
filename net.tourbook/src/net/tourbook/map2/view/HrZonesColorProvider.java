@@ -70,8 +70,8 @@ public class HrZonesColorProvider implements ILegendProviderDiscreteColors {
 
 		/**
 		 * Superhack :-) <br>
-		 * Adjust the value index to use the previous data because when a tour is painted as a line
-		 * is will be painted "to" the value and not "from" the value.<br>
+		 * Adjust the value index to use the previous data because when a tour is painted as a line,
+		 * it will be painted "to" the value and not "from" the value.<br>
 		 * This is not the best solution but adjusting the tour paint algorithm is much much more
 		 * complex, really !!!
 		 */

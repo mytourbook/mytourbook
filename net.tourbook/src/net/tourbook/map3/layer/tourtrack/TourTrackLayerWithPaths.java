@@ -16,7 +16,6 @@
 package net.tourbook.map3.layer.tourtrack;
 
 import gov.nasa.worldwind.geom.LatLon;
-import gov.nasa.worldwind.geom.Position;
 import gov.nasa.worldwind.layers.RenderableLayer;
 import gov.nasa.worldwind.render.BasicShapeAttributes;
 import gov.nasa.worldwind.render.Material;
@@ -28,6 +27,7 @@ import java.beans.PropertyChangeEvent;
 import java.util.ArrayList;
 
 import net.tourbook.common.UI;
+import net.tourbook.common.color.ILegendProvider;
 import net.tourbook.data.TourData;
 import net.tourbook.map3.Messages;
 import net.tourbook.map3.view.Map3Manager;
@@ -42,7 +42,7 @@ public class TourTrackLayerWithPaths extends RenderableLayer {
 
 	private IDialogSettings				_state;
 
-	private final TourPositionColors	_positionColors;
+	private final TourPositionColors	_tourPositionColors;
 
 	private final TourTrackConfig		_trackConfig;
 
@@ -52,14 +52,126 @@ public class TourTrackLayerWithPaths extends RenderableLayer {
 
 		_trackConfig = new TourTrackConfig(state);
 
-		_positionColors = new TourPositionColors();
+		_tourPositionColors = new TourPositionColors();
 
 		addPropertyChangeListener(this);
+	}
+
+	/**
+	 * Create a path for each tour.
+	 * 
+	 * @param allTours
+	 * @return
+	 */
+	public ArrayList<PositionWithTour> createTrackPaths(final ArrayList<TourData> allTours) {
+
+//		final long start = System.currentTimeMillis();
+
+		removeAllRenderables();
+
+		final ArrayList<PositionWithTour> allPositions = new ArrayList<PositionWithTour>();
+
+		for (final TourData tourData : allTours) {
+
+			final double[] latSerie = tourData.latitudeSerie;
+			final double[] lonSerie = tourData.longitudeSerie;
+			final float[] altiSerie = tourData.altitudeSerie;
+
+			if (latSerie == null) {
+				continue;
+			}
+
+			/*
+			 * create positions for all slices
+			 */
+			final ArrayList<PositionWithTour> trackPositions = new ArrayList<PositionWithTour>();
+
+			for (int serieIndex = 0; serieIndex < latSerie.length; serieIndex++) {
+
+				final double lat = latSerie[serieIndex];
+				final double lon = lonSerie[serieIndex];
+
+				float alti = 0;
+
+				if (altiSerie != null) {
+					alti = altiSerie[serieIndex] + 1;
+				}
+
+				final float dataSerieValue;
+
+				trackPositions.add(new PositionWithTour(LatLon.fromDegrees(lat, lon), alti, dataSerieValue));
+			}
+
+			/*
+			 * create one path for each tour
+			 */
+//			final MultiResolutionPath tourPath = new MTMultiResPath(positions);
+			final PathWithTour tourPath = new PathWithTour(trackPositions);
+
+			setPathAttributes(tourPath);
+
+			addRenderable(tourPath);
+
+			// keep all positions which is used to find the outline for ALL selected tours
+			allPositions.addAll(trackPositions);
+		}
+
+		_tourPositionColors.updateColors(allTours);
+
+//		System.out.println(UI.timeStampNano() + " showTour\t" + (System.currentTimeMillis() - start) + " ms");
+//		// TODO remove SYSTEM.OUT.PRINTLN
+
+		return allPositions;
 	}
 
 	public TourTrackConfig getConfig() {
 		return _trackConfig;
 	}
+
+	/**
+	 * Set the data serie which is painted
+	 * 
+	 * @param tourData
+	 */
+	private float[] getDataSerie(final TourData tourData) {
+
+//		final ILegendProvider legendProvider = _tourPaintConfig.getLegendProvider();
+//		if (legendProvider == null) {
+//			_dataSerie = null;
+//			return;
+//		}
+
+
+		switch (_legendProvider.getTourColorId()) {
+		case ILegendProvider.TOUR_COLOR_ALTITUDE:
+			_dataSerie = tourData.getAltitudeSerie();
+			break;
+
+		case ILegendProvider.TOUR_COLOR_GRADIENT:
+			_dataSerie = tourData.getGradientSerie();
+			break;
+
+		case ILegendProvider.TOUR_COLOR_PULSE:
+			_dataSerie = tourData.pulseSerie;
+			break;
+
+		case ILegendProvider.TOUR_COLOR_SPEED:
+			_dataSerie = tourData.getSpeedSerie();
+			break;
+
+		case ILegendProvider.TOUR_COLOR_PACE:
+			_dataSerie = tourData.getPaceSerieSeconds();
+			break;
+
+		case ILegendProvider.TOUR_COLOR_HR_ZONE:
+			_dataSerie = tourData.pulseSerie;
+			break;
+
+		default:
+			break;
+		}
+	}
+
 
 	@Override
 	public String getName() {
@@ -134,65 +246,16 @@ public class TourTrackLayerWithPaths extends RenderableLayer {
 		path.setAttributes(shapeAttrs);
 
 		// Show how to make the colors vary along the paths.
-		path.setPositionColors(_positionColors);
+		path.setPositionColors(_tourPositionColors);
 	}
 
-	public ArrayList<Position> showTours(final ArrayList<TourData> allTours) {
+	public void updateColors(final ArrayList<TourData> allTours) {
 
-//		final long start = System.currentTimeMillis();
+		_tourPositionColors.updateColors(allTours);
+	}
 
-		removeAllRenderables();
+	public void updateColors(final ArrayList<TourData> _allTours, final ILegendProvider legendProvider) {
 
-		final ArrayList<Position> allPositions = new ArrayList<Position>();
-
-		for (final TourData oneTour : allTours) {
-
-			final double[] latSerie = oneTour.latitudeSerie;
-			final double[] allLon = oneTour.longitudeSerie;
-			final float[] allAlti = oneTour.altitudeSerie;
-
-			if (latSerie == null) {
-				continue;
-			}
-
-			/*
-			 * create positions for all slices
-			 */
-			final ArrayList<Position> trackPositions = new ArrayList<Position>();
-
-			for (int serieIndex = 0; serieIndex < latSerie.length; serieIndex++) {
-
-				final double lat = latSerie[serieIndex];
-				final double lon = allLon[serieIndex];
-
-				float alti = 0;
-
-				if (allAlti != null) {
-					alti = allAlti[serieIndex] + 1;
-				}
-
-				trackPositions.add(new Position(LatLon.fromDegrees(lat, lon), alti));
-			}
-
-			/*
-			 * create one path for each tour
-			 */
-//			final MultiResolutionPath tourPath = new MTMultiResPath(positions);
-			final Path tourPath = new Path(trackPositions);
-
-			setPathAttributes(tourPath);
-
-			addRenderable(tourPath);
-
-			// keep all positions which is used to find the outline for ALL selected tours
-			allPositions.addAll(trackPositions);
-		}
-
-		_positionColors.updateColors(allTours);
-
-//		System.out.println(UI.timeStampNano() + " showTour\t" + (System.currentTimeMillis() - start) + " ms");
-//		// TODO remove SYSTEM.OUT.PRINTLN
-
-		return allPositions;
+		_tourPositionColors.setColorProvider(legendProvider);
 	}
 }

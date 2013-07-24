@@ -18,20 +18,23 @@ package net.tourbook.map3.view;
 import gov.nasa.worldwind.awt.WorldWindowGLCanvas;
 import gov.nasa.worldwind.event.RenderingEvent;
 import gov.nasa.worldwind.event.RenderingListener;
-import gov.nasa.worldwind.geom.Position;
 
 import java.awt.BorderLayout;
 import java.util.ArrayList;
 
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
+import net.tourbook.common.color.ILegendProvider;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
+import net.tourbook.map2.view.TourMapColors;
 import net.tourbook.map3.action.ActionOpenMap3Properties;
 import net.tourbook.map3.action.ActionShowEntireTour;
 import net.tourbook.map3.action.ActionShowTourInMap3;
 import net.tourbook.map3.action.ActionSyncMapPositionWithSlider;
 import net.tourbook.map3.action.ActionSyncMapViewWithTour;
+import net.tourbook.map3.action.ActionTourColor;
+import net.tourbook.map3.layer.tourtrack.PositionWithTour;
 import net.tourbook.map3.layer.tourtrack.TourTrackLayerWithPaths;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.ITourEventListener;
@@ -70,6 +73,7 @@ public class Map3View extends ViewPart {
 	private static final String					STATE_IS_SYNC_MAP_VIEW_WITH_TOUR		= "STATE_IS_SYNC_MAP_VIEW_WITH_TOUR";		//$NON-NLS-1$
 	private static final String					STATE_IS_SYNC_MAP_POSITION_WITH_SLIDER	= "STATE_IS_SYNC_MAP_POSITION_WITH_SLIDER"; //$NON-NLS-1$
 	private static final String					STATE_IS_TOUR_VISIBLE					= "STATE_IS_TOUR_VISIBLE";					//$NON-NLS-1$
+	private static final String					STATE_TOUR_COLOR_ID						= "STATE_TOUR_COLOR_ID";					//$NON-NLS-1$
 
 	private final IPreferenceStore				_prefStore								= TourbookPlugin.getDefault()//
 																								.getPreferenceStore();
@@ -87,6 +91,12 @@ public class Map3View extends ViewPart {
 	private ActionShowTourInMap3				_actionShowTourInMap3;
 	private ActionSyncMapPositionWithSlider		_actionSynMapPositionWithSlider;
 	private ActionSyncMapViewWithTour			_actionSynMapViewWithTour;
+	private ActionTourColor						_actionTourColorAltitude;
+	private ActionTourColor						_actionTourColorGradient;
+	private ActionTourColor						_actionTourColorPulse;
+	private ActionTourColor						_actionTourColorSpeed;
+	private ActionTourColor						_actionTourColorPace;
+	private ActionTourColor						_actionTourColorHrZone;
 
 	private IPartListener2						_partListener;
 	private ISelectionListener					_postSelectionListener;
@@ -107,9 +117,16 @@ public class Map3View extends ViewPart {
 
 	private Composite							_mapContainer;
 
+	private int									_tourColorId;
+
 	private static int							_renderCounter;
 
 	public Map3View() {}
+
+	public void actionSetTourColor(final int colorId) {
+
+		updateMapColors(colorId);
+	}
 
 	public void actionShowTour(final boolean isTrackVisible) {
 
@@ -221,9 +238,7 @@ public class Map3View extends ViewPart {
 
 					// update map colors
 
-//					Map3Manager.getTourLayer().updateColors();
-
-					_wwCanvas.redraw();
+					updateMapColors();
 				}
 			}
 		};
@@ -302,6 +317,13 @@ public class Map3View extends ViewPart {
 		_actionShowTourInMap3 = new ActionShowTourInMap3(this, parent, _state);
 		_actionSynMapPositionWithSlider = new ActionSyncMapPositionWithSlider(this);
 		_actionSynMapViewWithTour = new ActionSyncMapViewWithTour(this);
+
+		_actionTourColorAltitude = ActionTourColor.createAction(this, ILegendProvider.TOUR_COLOR_ALTITUDE);
+		_actionTourColorGradient = ActionTourColor.createAction(this, ILegendProvider.TOUR_COLOR_GRADIENT);
+		_actionTourColorPulse = ActionTourColor.createAction(this, ILegendProvider.TOUR_COLOR_PULSE);
+		_actionTourColorSpeed = ActionTourColor.createAction(this, ILegendProvider.TOUR_COLOR_SPEED);
+		_actionTourColorPace = ActionTourColor.createAction(this, ILegendProvider.TOUR_COLOR_PACE);
+		_actionTourColorHrZone = ActionTourColor.createAction(this, ILegendProvider.TOUR_COLOR_HR_ZONE);
 	}
 
 	@Override
@@ -393,6 +415,14 @@ public class Map3View extends ViewPart {
 		 */
 		final IToolBarManager tbm = getViewSite().getActionBars().getToolBarManager();
 
+		tbm.add(_actionTourColorAltitude);
+		tbm.add(_actionTourColorPulse);
+		tbm.add(_actionTourColorSpeed);
+		tbm.add(_actionTourColorPace);
+		tbm.add(_actionTourColorGradient);
+		tbm.add(_actionTourColorHrZone);
+		tbm.add(new Separator());
+
 		tbm.add(_actionShowTourInMap3);
 		tbm.add(_actionShowEntireTour);
 		tbm.add(_actionSynMapViewWithTour);
@@ -402,6 +432,10 @@ public class Map3View extends ViewPart {
 		tbm.add(new Separator());
 
 		tbm.add(_actionOpenMap3Properties);
+	}
+
+	private ILegendProvider getLegendProvider(final int colorId) {
+		return TourMapColors.getColorProvider(colorId);
 	}
 
 	private void onSelectionChanged(final ISelection selection) {
@@ -657,6 +691,39 @@ public class Map3View extends ViewPart {
 		_isTourVisible = Util.getStateBoolean(_state, STATE_IS_TOUR_VISIBLE, true);
 		_actionShowTourInMap3.setState(_isTourVisible, isTourAvailable);
 
+		// tour color
+		_tourColorId = Util.getStateInt(_state, STATE_TOUR_COLOR_ID, ILegendProvider.TOUR_COLOR_ALTITUDE);
+
+		switch (_tourColorId) {
+		case ILegendProvider.TOUR_COLOR_ALTITUDE:
+			_actionTourColorAltitude.setChecked(true);
+			break;
+
+		case ILegendProvider.TOUR_COLOR_GRADIENT:
+			_actionTourColorGradient.setChecked(true);
+			break;
+
+		case ILegendProvider.TOUR_COLOR_PULSE:
+			_actionTourColorPulse.setChecked(true);
+			break;
+
+		case ILegendProvider.TOUR_COLOR_SPEED:
+			_actionTourColorSpeed.setChecked(true);
+			break;
+
+		case ILegendProvider.TOUR_COLOR_PACE:
+			_actionTourColorPace.setChecked(true);
+			break;
+
+		case ILegendProvider.TOUR_COLOR_HR_ZONE:
+			_actionTourColorHrZone.setChecked(true);
+			break;
+
+		default:
+			_actionTourColorAltitude.setChecked(true);
+			break;
+		}
+
 	}
 
 	private void saveState() {
@@ -664,6 +731,8 @@ public class Map3View extends ViewPart {
 		_state.put(STATE_IS_SYNC_MAP_POSITION_WITH_SLIDER, _isSyncMapPositionWithSlider);
 		_state.put(STATE_IS_SYNC_MAP_VIEW_WITH_TOUR, _isSyncMapViewWithTour);
 		_state.put(STATE_IS_TOUR_VISIBLE, _isTourVisible);
+
+		_state.put(STATE_TOUR_COLOR_ID, _tourColorId);
 	}
 
 	@Override
@@ -695,9 +764,10 @@ public class Map3View extends ViewPart {
 
 		final TourTrackLayerWithPaths tourTrackLayer = Map3Manager.getTourTrackLayer();
 
-		final ArrayList<Position> allPositions = tourTrackLayer.showTours(_allTours);
+		final ArrayList<PositionWithTour> allPositions = tourTrackLayer.createTrackPaths(_allTours);
 
 		if (isSyncMapViewWithTour) {
+
 			final Map3ViewController viewController = Map3ViewController.create(Map3Manager.getWWCanvas());
 			viewController.goToDefaultView(allPositions);
 		}
@@ -745,6 +815,22 @@ public class Map3View extends ViewPart {
 				}
 			}
 		});
+	}
+
+	private void updateMapColors() {
+
+		Map3Manager.getTourTrackLayer().updateColors(_allTours);
+
+		_wwCanvas.redraw();
+	}
+
+	private void updateMapColors(final int colorId) {
+
+		final ILegendProvider legendProvider = getLegendProvider(colorId);
+
+		Map3Manager.getTourTrackLayer().updateColors(_allTours, legendProvider);
+
+		_wwCanvas.redraw();
 	}
 
 }

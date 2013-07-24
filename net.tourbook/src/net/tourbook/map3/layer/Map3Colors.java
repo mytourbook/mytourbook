@@ -21,6 +21,7 @@ import net.tourbook.common.color.GradientColorProvider;
 import net.tourbook.common.color.ILegendProvider;
 import net.tourbook.common.color.LegendColor;
 import net.tourbook.common.color.LegendConfig;
+import net.tourbook.map2.view.HrZonesColorProvider;
 
 public class Map3Colors {
 
@@ -55,9 +56,9 @@ public class Map3Colors {
 				ILegendProvider.TOUR_COLOR_GRADIENT,
 				new GradientColorProvider(new LegendConfig(), new LegendColor(), ILegendProvider.TOUR_COLOR_GRADIENT));
 
-//		_legendProviders.put(//
-//				ILegendProvider.TOUR_COLOR_HR_ZONE,
-//				new HrZonesColorProvider(ILegendProvider.TOUR_COLOR_HR_ZONE));
+		_legendProviders.put(//
+				ILegendProvider.TOUR_COLOR_HR_ZONE,
+				new HrZonesColorProvider(ILegendProvider.TOUR_COLOR_HR_ZONE));
 	}
 
 	public static ILegendProvider getColorProvider(final int colorId) {
