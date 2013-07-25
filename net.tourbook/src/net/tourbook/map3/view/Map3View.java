@@ -34,7 +34,7 @@ import net.tourbook.map3.action.ActionShowTourInMap3;
 import net.tourbook.map3.action.ActionSyncMapPositionWithSlider;
 import net.tourbook.map3.action.ActionSyncMapViewWithTour;
 import net.tourbook.map3.action.ActionTourColor;
-import net.tourbook.map3.layer.tourtrack.PositionWithTour;
+import net.tourbook.map3.layer.tourtrack.TourMap3Position;
 import net.tourbook.map3.layer.tourtrack.TourTrackLayerWithPaths;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.ITourEventListener;
@@ -125,7 +125,9 @@ public class Map3View extends ViewPart {
 
 	public void actionSetTourColor(final int colorId) {
 
-		updateMapColors(colorId);
+		setColorProvider(colorId);
+
+		updateMapColors();
 	}
 
 	public void actionShowTour(final boolean isTrackVisible) {
@@ -406,6 +408,10 @@ public class Map3View extends ViewPart {
 		_actionShowTourInMap3.setState(isTrackLayerVisible, isTourAvailable);
 		_actionSynMapPositionWithSlider.setEnabled(isTourAvailable);
 		_actionSynMapViewWithTour.setEnabled(isTourAvailable);
+
+		/*
+		 * tour color actions
+		 */
 	}
 
 	private void fillActionBars() {
@@ -432,10 +438,6 @@ public class Map3View extends ViewPart {
 		tbm.add(new Separator());
 
 		tbm.add(_actionOpenMap3Properties);
-	}
-
-	private ILegendProvider getLegendProvider(final int colorId) {
-		return TourMapColors.getColorProvider(colorId);
 	}
 
 	private void onSelectionChanged(final ISelection selection) {
@@ -724,6 +726,8 @@ public class Map3View extends ViewPart {
 			break;
 		}
 
+		setColorProvider(_tourColorId);
+
 	}
 
 	private void saveState() {
@@ -733,6 +737,13 @@ public class Map3View extends ViewPart {
 		_state.put(STATE_IS_TOUR_VISIBLE, _isTourVisible);
 
 		_state.put(STATE_TOUR_COLOR_ID, _tourColorId);
+	}
+
+	private void setColorProvider(final int colorId) {
+
+		final ILegendProvider legendProvider = TourMapColors.getColorProvider(colorId);
+
+		Map3Manager.getTourTrackLayer().setColorProvider(legendProvider);
 	}
 
 	@Override
@@ -758,13 +769,13 @@ public class Map3View extends ViewPart {
 	 * 
 	 * @param isSyncMapViewWithTour
 	 */
-	private void showAllTours(final boolean isSyncMapViewWithTour) {
+	public void showAllTours(final boolean isSyncMapViewWithTour) {
 
 		enableActions();
 
 		final TourTrackLayerWithPaths tourTrackLayer = Map3Manager.getTourTrackLayer();
 
-		final ArrayList<PositionWithTour> allPositions = tourTrackLayer.createTrackPaths(_allTours);
+		final ArrayList<TourMap3Position> allPositions = tourTrackLayer.createTrackPaths(_allTours);
 
 		if (isSyncMapViewWithTour) {
 
@@ -821,14 +832,7 @@ public class Map3View extends ViewPart {
 
 		Map3Manager.getTourTrackLayer().updateColors(_allTours);
 
-		_wwCanvas.redraw();
-	}
-
-	private void updateMapColors(final int colorId) {
-
-		final ILegendProvider legendProvider = getLegendProvider(colorId);
-
-		Map3Manager.getTourTrackLayer().updateColors(_allTours, legendProvider);
+		showAllTours(false);
 
 		_wwCanvas.redraw();
 	}

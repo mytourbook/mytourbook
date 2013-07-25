@@ -23,13 +23,13 @@ import java.util.ArrayList;
 
 public class PathWithTour extends Path {
 
-	private PositionWithTour[]	_trackPositions;
+	private TourMap3Position[]	_trackPositions;
 
-	public PathWithTour(final ArrayList<PositionWithTour> trackPositions) {
+	public PathWithTour(final ArrayList<TourMap3Position> trackPositions) {
 
 		super(trackPositions);
 
-		_trackPositions = trackPositions.toArray(new PositionWithTour[trackPositions.size()]);
+		_trackPositions = trackPositions.toArray(new TourMap3Position[trackPositions.size()]);
 	}
 
 	@Override
@@ -40,10 +40,10 @@ public class PathWithTour extends Path {
 			final TourPositionColors tourPosColors = (TourPositionColors) positionColors;
 			final float dataSerieValue = _trackPositions[ordinal].dataSerieValue;
 
-			tourPosColors.getColor(dataSerieValue);
+			return tourPosColors.getColor(dataSerieValue);
 		}
 
-		return super.getColor(pos, ordinal);
+		return Color.CYAN;
 	}
 
 }

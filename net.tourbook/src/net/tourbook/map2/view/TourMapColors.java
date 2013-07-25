@@ -27,54 +27,54 @@ public class TourMapColors {
 	/**
 	 * Key is the color id.
 	 */
-	private static HashMap<Integer, ILegendProvider>	_legendProviders;
+	private static HashMap<Integer, ILegendProvider>	_colorProviders;
 
 	/**
 	 * Create legend provider for all graphs which can be displayed.
 	 */
-	private static void createLegendProviders() {
+	private static void createColorProviders() {
 
-		_legendProviders.put(//
+		_colorProviders.put(//
 				ILegendProvider.TOUR_COLOR_ALTITUDE,
-				new GradientColorProvider(new LegendConfig(), new LegendColor(), ILegendProvider.TOUR_COLOR_ALTITUDE));
+				new GradientColorProvider(ILegendProvider.TOUR_COLOR_ALTITUDE, new LegendConfig(), new LegendColor()));
 
-		_legendProviders.put(//
+		_colorProviders.put(//
 				ILegendProvider.TOUR_COLOR_GRADIENT,
-				new GradientColorProvider(new LegendConfig(), new LegendColor(), ILegendProvider.TOUR_COLOR_GRADIENT));
+				new GradientColorProvider(ILegendProvider.TOUR_COLOR_GRADIENT, new LegendConfig(), new LegendColor()));
 
-		_legendProviders.put(//
+		_colorProviders.put(//
 				ILegendProvider.TOUR_COLOR_PACE,
-				new GradientColorProvider(new LegendConfig(), new LegendColor(), ILegendProvider.TOUR_COLOR_PACE));
+				new GradientColorProvider(ILegendProvider.TOUR_COLOR_PACE, new LegendConfig(), new LegendColor()));
 
-		_legendProviders.put(//
+		_colorProviders.put(//
 				ILegendProvider.TOUR_COLOR_PULSE,
-				new GradientColorProvider(new LegendConfig(), new LegendColor(), ILegendProvider.TOUR_COLOR_PULSE));
+				new GradientColorProvider(ILegendProvider.TOUR_COLOR_PULSE, new LegendConfig(), new LegendColor()));
 
-		_legendProviders.put(//
+		_colorProviders.put(//
 				ILegendProvider.TOUR_COLOR_SPEED,
-				new GradientColorProvider(new LegendConfig(), new LegendColor(), ILegendProvider.TOUR_COLOR_SPEED));
+				new GradientColorProvider(ILegendProvider.TOUR_COLOR_SPEED, new LegendConfig(), new LegendColor()));
 
 		//
 
-		_legendProviders.put(//
+		_colorProviders.put(//
 				ILegendProvider.TOUR_COLOR_HR_ZONE,
 				new HrZonesColorProvider(ILegendProvider.TOUR_COLOR_HR_ZONE));
 	}
 
 	public static ILegendProvider getColorProvider(final int colorId) {
 
-		if (_legendProviders == null) {
+		if (_colorProviders == null) {
 
-			_legendProviders = new HashMap<Integer, ILegendProvider>();
+			_colorProviders = new HashMap<Integer, ILegendProvider>();
 
-			createLegendProviders();
+			createColorProviders();
 		}
 
-		ILegendProvider legendProvider = _legendProviders.get(colorId);
+		ILegendProvider legendProvider = _colorProviders.get(colorId);
 
 		// use default when not available
 		if (legendProvider == null) {
-			legendProvider = _legendProviders.get(ILegendProvider.TOUR_COLOR_ALTITUDE);
+			legendProvider = _colorProviders.get(ILegendProvider.TOUR_COLOR_ALTITUDE);
 		}
 
 		return legendProvider;

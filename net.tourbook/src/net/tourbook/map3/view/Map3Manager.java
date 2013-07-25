@@ -639,7 +639,7 @@ public class Map3Manager {
 	/**
 	 * @return Returns instance of {@link Map3View} or null when view is not created.
 	 */
-	static Map3View getMap3View() {
+	public static Map3View getMap3View() {
 		return _map3View;
 	}
 

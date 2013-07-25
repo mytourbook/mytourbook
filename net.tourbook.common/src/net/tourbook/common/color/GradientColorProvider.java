@@ -31,15 +31,17 @@ public class GradientColorProvider implements ILegendProviderGradientColors {
 	private int				_colorId;
 
 	/**
-	 * @param legendConfig
-	 * @param legendColor
 	 * @param colorId
 	 *            Unique id for this color, it can be e.g. altitude, speed, ...
+	 * @param legendConfig
+	 * @param legendColor
 	 */
-	public GradientColorProvider(final LegendConfig legendConfig, final LegendColor legendColor, final int colorId) {
+	public GradientColorProvider(final int colorId, final LegendConfig legendConfig, final LegendColor legendColor) {
+
+		_colorId = colorId;
+
 		_legendConfig = legendConfig;
 		_legendColor = legendColor;
-		_colorId = colorId;
 	}
 
 	private static List<Float> getLegendUnits(	final int legendHeight,

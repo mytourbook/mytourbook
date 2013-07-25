@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.map3.layer.tourtrack;
 
+import gov.nasa.worldwind.WorldWind;
 import gov.nasa.worldwind.geom.LatLon;
 import gov.nasa.worldwind.layers.RenderableLayer;
 import gov.nasa.worldwind.render.BasicShapeAttributes;
@@ -63,43 +64,50 @@ public class TourTrackLayerWithPaths extends RenderableLayer {
 	 * @param allTours
 	 * @return
 	 */
-	public ArrayList<PositionWithTour> createTrackPaths(final ArrayList<TourData> allTours) {
+	public ArrayList<TourMap3Position> createTrackPaths(final ArrayList<TourData> allTours) {
 
 //		final long start = System.currentTimeMillis();
 
 		removeAllRenderables();
 
-		final ArrayList<PositionWithTour> allPositions = new ArrayList<PositionWithTour>();
+		final boolean isAbsoluteAltitude = _trackConfig.altitudeMode == WorldWind.ABSOLUTE;
+		final int altitudeOffset = isAbsoluteAltitude ? _trackConfig.altitudeOffset : 0;
+
+		final ArrayList<TourMap3Position> allPositions = new ArrayList<TourMap3Position>();
 
 		for (final TourData tourData : allTours) {
 
 			final double[] latSerie = tourData.latitudeSerie;
 			final double[] lonSerie = tourData.longitudeSerie;
-			final float[] altiSerie = tourData.altitudeSerie;
 
 			if (latSerie == null) {
 				continue;
 			}
 
+			final float[] altiSerie = tourData.altitudeSerie;
+			final float[] dataSerie = getDataSerie(tourData);
+
 			/*
 			 * create positions for all slices
 			 */
-			final ArrayList<PositionWithTour> trackPositions = new ArrayList<PositionWithTour>();
+			final ArrayList<TourMap3Position> trackPositions = new ArrayList<TourMap3Position>();
 
 			for (int serieIndex = 0; serieIndex < latSerie.length; serieIndex++) {
 
 				final double lat = latSerie[serieIndex];
 				final double lon = lonSerie[serieIndex];
 
-				float alti = 0;
-
+				float altitude = 0;
 				if (altiSerie != null) {
-					alti = altiSerie[serieIndex] + 1;
+					altitude = altiSerie[serieIndex] + altitudeOffset;
 				}
 
-				final float dataSerieValue;
+				float dataSerieValue = 0;
+				if (dataSerie != null) {
+					dataSerieValue = dataSerie[serieIndex];
+				}
 
-				trackPositions.add(new PositionWithTour(LatLon.fromDegrees(lat, lon), alti, dataSerieValue));
+				trackPositions.add(new TourMap3Position(LatLon.fromDegrees(lat, lon), altitude, dataSerieValue));
 			}
 
 			/*
@@ -141,37 +149,31 @@ public class TourTrackLayerWithPaths extends RenderableLayer {
 //			return;
 //		}
 
+		final ILegendProvider colorProvider = _tourPositionColors.getColorProvider();
 
-		switch (_legendProvider.getTourColorId()) {
+		switch (colorProvider.getTourColorId()) {
 		case ILegendProvider.TOUR_COLOR_ALTITUDE:
-			_dataSerie = tourData.getAltitudeSerie();
-			break;
+			return tourData.getAltitudeSerie();
 
 		case ILegendProvider.TOUR_COLOR_GRADIENT:
-			_dataSerie = tourData.getGradientSerie();
-			break;
+			return tourData.getGradientSerie();
 
 		case ILegendProvider.TOUR_COLOR_PULSE:
-			_dataSerie = tourData.pulseSerie;
-			break;
+			return tourData.pulseSerie;
 
 		case ILegendProvider.TOUR_COLOR_SPEED:
-			_dataSerie = tourData.getSpeedSerie();
-			break;
+			return tourData.getSpeedSerie();
 
 		case ILegendProvider.TOUR_COLOR_PACE:
-			_dataSerie = tourData.getPaceSerieSeconds();
-			break;
+			return tourData.getPaceSerieSeconds();
 
 		case ILegendProvider.TOUR_COLOR_HR_ZONE:
-			_dataSerie = tourData.pulseSerie;
-			break;
+			return tourData.pulseSerie;
 
 		default:
-			break;
+			return tourData.getAltitudeSerie();
 		}
 	}
-
 
 	@Override
 	public String getName() {
@@ -180,14 +182,23 @@ public class TourTrackLayerWithPaths extends RenderableLayer {
 
 	public void onModifyConfig() {
 
-		for (final Renderable renderable : getRenderables()) {
+		if (_trackConfig.isRecreateTracks) {
 
-			if (renderable instanceof Path) {
-				setPathAttributes((Path) renderable);
+			// track data has changed
+
+			Map3Manager.getMap3View().showAllTours(false);
+
+		} else {
+
+			for (final Renderable renderable : getRenderables()) {
+
+				if (renderable instanceof Path) {
+					setPathAttributes((Path) renderable);
+				}
 			}
-		}
 
-		Map3Manager.getWWCanvas().redraw();
+			Map3Manager.getWWCanvas().redraw();
+		}
 	}
 
 	@Override
@@ -203,6 +214,11 @@ public class TourTrackLayerWithPaths extends RenderableLayer {
 	public void saveState() {
 
 		_trackConfig.saveState(_state);
+	}
+
+	public void setColorProvider(final ILegendProvider legendProvider) {
+
+		_tourPositionColors.setColorProvider(legendProvider);
 	}
 
 	private void setPathAttributes(final Path path) {
@@ -237,11 +253,12 @@ public class TourTrackLayerWithPaths extends RenderableLayer {
 		shapeAttrs.setDrawOutline(true);
 		shapeAttrs.setOutlineWidth(_trackConfig.outlineWidth);
 		shapeAttrs.setOutlineMaterial(Material.GRAY);
+//		shapeAttrs.setOutlineOpacity(_trackConfig.outlineOpacity);
 		shapeAttrs.setOutlineOpacity(0.5);
 
 		shapeAttrs.setDrawInterior(true);
 		shapeAttrs.setInteriorMaterial(Material.YELLOW);
-		shapeAttrs.setInteriorOpacity(0.5);
+		shapeAttrs.setInteriorOpacity(_trackConfig.interiorOpacity);
 
 		path.setAttributes(shapeAttrs);
 
@@ -252,10 +269,5 @@ public class TourTrackLayerWithPaths extends RenderableLayer {
 	public void updateColors(final ArrayList<TourData> allTours) {
 
 		_tourPositionColors.updateColors(allTours);
-	}
-
-	public void updateColors(final ArrayList<TourData> _allTours, final ILegendProvider legendProvider) {
-
-		_tourPositionColors.setColorProvider(legendProvider);
 	}
 }

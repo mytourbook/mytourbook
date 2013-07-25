@@ -25,10 +25,13 @@ import org.eclipse.jface.dialogs.IDialogSettings;
 public class TourTrackConfig {
 
 	private static final String		STATE_ALTITUDE_MODE				= "STATE_ALTITUDE_MODE";			//$NON-NLS-1$
+	private static final String		STATE_ALTITUDE_OFFSET			= "STATE_ALTITUDE_OFFSET";			//$NON-NLS-1$
 	private static final String		STATE_IS_DRAW_VERTICALS			= "STATE_IS_DRAW_VERTICALS";		//$NON-NLS-1$
 	private static final String		STATE_IS_EXTRUDE_PATH			= "STATE_IS_EXTRUDE_PATH";			//$NON-NLS-1$
 	private static final String		STATE_IS_FOLLOW_TERRAIN			= "STATE_IS_FOLLOW_TERRAIN";		//$NON-NLS-1$
 	private static final String		STATE_IS_SHOW_TRACK_POSITION	= "STATE_IS_SHOW_TRACK_POSITION";	//$NON-NLS-1$
+	private static final String		STATE_INTERIOR_OPACITY			= "STATE_INTERIOR_OPACITY";		//$NON-NLS-1$
+	private static final String		STATE_OUTLINE_OPACITY			= "STATE_OUTLINE_OPACITY";			//$NON-NLS-1$
 	private static final String		STATE_OUTLINE_WIDTH				= "STATE_OUTLINE_WIDTH";			//$NON-NLS-1$
 	private static final String		STATE_PATH_TYPE					= "STATE_PATH_TYPE";				//$NON-NLS-1$
 	private static final String		STATE_TRACK_POSITION_SIZE		= "STATE_TRACK_POSITION_SIZE";		//$NON-NLS-1$
@@ -59,21 +62,24 @@ public class TourTrackConfig {
 			AVKey.GREAT_CIRCLE,
 			AVKey.RHUMB_LINE,										};
 
-//    * Specifies this path's path type. Recognized values are {@link AVKey#GREAT_CIRCLE}, {@link AVKey#RHUMB_LINE} and
-//    * {@link AVKey#LINEAR}.
-//    *
-//    * @param pathType the current path type. The default value is {@link AVKey#LINEAR}.
+	public boolean					isRecreateTracks;
 
+	/*
+	 * Configurations which are saved in the state.
+	 */
 	public int						altitudeMode;
-	public boolean					isFollowTerrain;
-	public String					pathType;
-
-	public double					outlineWidth;
-	public boolean					isShowTrackPosition;
-	public double					trackPositionSize;
+	public int						altitudeOffset;
 
 	public boolean					isExtrudePath;
 	public boolean					isDrawVerticals;
+	public boolean					isFollowTerrain;
+	public boolean					isShowTrackPosition;
+
+	public String					pathType;
+	public double					interiorOpacity;
+//	public double					outlineOpacity;
+	public double					outlineWidth;
+	public double					trackPositionSize;
 
 	TourTrackConfig(final IDialogSettings state) {
 
@@ -139,29 +145,36 @@ public class TourTrackConfig {
 	private void restoreState(final IDialogSettings state) {
 
 		altitudeMode = getAltitudeModeValue(Util.getStateInt(state, STATE_ALTITUDE_MODE, WorldWind.CLAMP_TO_GROUND));
-		isFollowTerrain = Util.getStateBoolean(state, STATE_IS_FOLLOW_TERRAIN, true);
-		pathType = getPathTypeValue(Util.getStateString(state, STATE_PATH_TYPE, AVKey.LINEAR));
+		altitudeOffset = Util.getStateInt(state, STATE_ALTITUDE_OFFSET, 0);
 
-		outlineWidth = Util.getStateDouble(state, STATE_OUTLINE_WIDTH, 5.0);
-		isShowTrackPosition = Util.getStateBoolean(state, STATE_IS_SHOW_TRACK_POSITION, false);
-		trackPositionSize = Util.getStateDouble(state, STATE_TRACK_POSITION_SIZE, 5.0);
-
-		isExtrudePath = Util.getStateBoolean(state, STATE_IS_EXTRUDE_PATH, false);
 		isDrawVerticals = Util.getStateBoolean(state, STATE_IS_DRAW_VERTICALS, false);
+		isExtrudePath = Util.getStateBoolean(state, STATE_IS_EXTRUDE_PATH, false);
+		isFollowTerrain = Util.getStateBoolean(state, STATE_IS_FOLLOW_TERRAIN, true);
+		isShowTrackPosition = Util.getStateBoolean(state, STATE_IS_SHOW_TRACK_POSITION, false);
+
+		interiorOpacity = Util.getStateDouble(state, STATE_INTERIOR_OPACITY, 0.5);
+//		outlineOpacity = Util.getStateDouble(state, STATE_OUTLINE_OPACITY, 0.5);
+		outlineWidth = Util.getStateDouble(state, STATE_OUTLINE_WIDTH, 5.0);
+		pathType = getPathTypeValue(Util.getStateString(state, STATE_PATH_TYPE, AVKey.LINEAR));
+		trackPositionSize = Util.getStateDouble(state, STATE_TRACK_POSITION_SIZE, 5.0);
 	}
 
 	void saveState(final IDialogSettings state) {
 
 		state.put(STATE_ALTITUDE_MODE, altitudeMode);
-		state.put(STATE_IS_FOLLOW_TERRAIN, isFollowTerrain);
-		state.put(STATE_PATH_TYPE, pathType);
+		state.put(STATE_ALTITUDE_OFFSET, altitudeOffset);
 
-		state.put(STATE_OUTLINE_WIDTH, outlineWidth);
+		state.put(STATE_IS_DRAW_VERTICALS, isDrawVerticals);
+		state.put(STATE_IS_EXTRUDE_PATH, isExtrudePath);
+		state.put(STATE_IS_FOLLOW_TERRAIN, isFollowTerrain);
 		state.put(STATE_IS_SHOW_TRACK_POSITION, isShowTrackPosition);
+
+		state.put(STATE_INTERIOR_OPACITY, interiorOpacity);
+//		state.put(STATE_OUTLINE_OPACITY, outlineOpacity);
+		state.put(STATE_OUTLINE_WIDTH, outlineWidth);
+		state.put(STATE_PATH_TYPE, pathType);
 		state.put(STATE_TRACK_POSITION_SIZE, trackPositionSize);
 
-		state.put(STATE_IS_EXTRUDE_PATH, isExtrudePath);
-		state.put(STATE_IS_DRAW_VERTICALS, isDrawVerticals);
 	}
 
 }

@@ -448,7 +448,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 
 	public void actionSetTourColor(final int colorId) {
 
-		final ILegendProvider legendProvider = getLegendProvider(colorId);
+		final ILegendProvider legendProvider = getColorProvider(colorId);
 
 		_tourPainterConfig.setLegendProvider(legendProvider);
 
@@ -1681,7 +1681,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 		menuMgr.add(_actionReloadFailedMapImages);
 	}
 
-	private ILegendProvider getLegendProvider(final int colorId) {
+	private ILegendProvider getColorProvider(final int colorId) {
 		return TourMapColors.getColorProvider(colorId);
 	}
 
@@ -2678,7 +2678,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 				break;
 			}
 
-			_tourPainterConfig.setLegendProvider(getLegendProvider(colorId));
+			_tourPainterConfig.setLegendProvider(getColorProvider(colorId));
 
 		} catch (final NumberFormatException e) {
 			_actionTourColorAltitude.setChecked(true);
@@ -2693,7 +2693,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 		if (_tourPainterConfig.getLegendProvider() == null) {
 
 			// set default legend provider
-			_tourPainterConfig.setLegendProvider(getLegendProvider(ILegendProvider.TOUR_COLOR_ALTITUDE));
+			_tourPainterConfig.setLegendProvider(getColorProvider(ILegendProvider.TOUR_COLOR_ALTITUDE));
 
 			// hide legend
 			_map.setShowLegend(false);

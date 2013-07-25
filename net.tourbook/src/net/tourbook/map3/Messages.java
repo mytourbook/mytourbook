@@ -77,6 +77,10 @@ public class Messages extends NLS {
 	public static String		TourTrack_Properties_Checkbox_IsFollowTerrain;
 	public static String		TourTrack_Properties_Checkbox_ShowTrackPositions;
 	public static String		TourTrack_Properties_Label_Altitude;
+
+	public static String	TourTrack_Properties_Label_AltitudeOffset;
+
+	public static String	TourTrack_Properties_Label_CurtainOpacity;
 	public static String		TourTrack_Properties_Label_OutlineWidth;
 	public static String		TourTrack_Properties_Label_PathType;
 	public static String		TourTrack_Properties_Label_TrackPositionSize;

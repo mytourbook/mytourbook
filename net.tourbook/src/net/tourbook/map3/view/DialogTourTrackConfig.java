@@ -51,15 +51,6 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell {
 
 	private static final int	SHELL_MARGIN		= 5;
 
-	private static final int	MIN_IMAGE_WIDTH		= 10;
-
-	/**
-	 * This value is small because a map do not yet load large images !!!
-	 */
-	private static final int	MAX_IMAGE_WIDTH		= 200;
-
-//	private static final int	TRACK_POSITION_SIZE_DIGITS	= 0;
-
 	// initialize with default values which are (should) never be used
 	private Rectangle			_toolTipItemBounds	= new Rectangle(0, 0, 50, 50);
 
@@ -84,18 +75,22 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell {
 	 */
 	private Composite			_shellContainer;
 
+	private Button				_chkDrawVerticals;
+	private Button				_chkExtrudePath;
 	private Button				_chkFollowTerrain;
+	private Button				_chkTrackPositions;
+
 	private Combo				_comboAltitude;
 	private Combo				_comboPathType;
 
-	private Button				_chkTrackPositions;
+	private Label				_lblAbsoluteOffset;
+	private Label				_lblCurtainOpacity;
 	private Label				_lblTrackPositionSize;
-	private Spinner				_spinnerTrackPositionSize;
 
+	private Spinner				_spinnerAltitudeOffset;
+	private Spinner				_spinnerInteriorOpacity;
 	private Spinner				_spinnerOutlineWidth;
-
-	private Button				_chkExtrudePath;
-	private Button				_chkDrawVerticals;
+	private Spinner				_spinnerTrackPositionSize;
 
 	private final class WaitTimer implements Runnable {
 		@Override
@@ -175,7 +170,7 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell {
 				.numColumns(3)
 				.applyTo(_shellContainer);
 		{
-			createUI_10(_shellContainer);
+			createUI_010_UI(_shellContainer);
 
 			// spacer
 			final Label label = new Label(_shellContainer, SWT.NONE);
@@ -185,39 +180,13 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell {
 		return _shellContainer;
 	}
 
-	private void createUI_10(final Composite parent) {
+	private void createUI_010_UI(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NO_FOCUS);
 		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
 //		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
 		{
-			{
-				/*
-				 * label: Altitude
-				 */
-				final Label label = new Label(container, SWT.NONE);
-				GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(label);
-
-				label.setText(Messages.TourTrack_Properties_Label_Altitude);
-
-				/*
-				 * combo: Altitude
-				 */
-				_comboAltitude = new Combo(container, SWT.READ_ONLY | SWT.BORDER);
-				GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.FILL).applyTo(_comboAltitude);
-				_comboAltitude.setVisibleItemCount(10);
-				_comboAltitude.addSelectionListener(_defaultSelectionListener);
-			}
-
-			{
-				/*
-				 * checkbox: Follow terrain
-				 */
-				_chkFollowTerrain = new Button(container, SWT.CHECK);
-				GridDataFactory.fillDefaults().span(2, 1).applyTo(_chkFollowTerrain);
-				_chkFollowTerrain.setText(Messages.TourTrack_Properties_Checkbox_IsFollowTerrain);
-				_chkFollowTerrain.addSelectionListener(_defaultSelectionListener);
-			}
+			createUI_100_Altitude(container);
 
 			{
 				/*
@@ -237,7 +206,6 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell {
 						.applyTo(_spinnerOutlineWidth);
 				_spinnerOutlineWidth.setMinimum(0);
 				_spinnerOutlineWidth.setMaximum(10);
-//				_spinnerOutlineWidth.setDigits(TRACK_POSITION_SIZE_DIGITS);
 				_spinnerOutlineWidth.setIncrement(1);
 				_spinnerOutlineWidth.setPageIncrement(10);
 				_spinnerOutlineWidth.addSelectionListener(_defaultSelectionListener);
@@ -280,7 +248,6 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell {
 						.applyTo(_spinnerTrackPositionSize);
 				_spinnerTrackPositionSize.setMinimum(0);
 				_spinnerTrackPositionSize.setMaximum(60);
-//				_spinnerTrackPositionSize.setDigits(TRACK_POSITION_SIZE_DIGITS);
 				_spinnerTrackPositionSize.setIncrement(1);
 				_spinnerTrackPositionSize.setPageIncrement(10);
 				_spinnerTrackPositionSize.addSelectionListener(_defaultSelectionListener);
@@ -290,7 +257,6 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell {
 						onSelection();
 					}
 				});
-
 			}
 
 			{
@@ -301,6 +267,37 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell {
 				GridDataFactory.fillDefaults().span(2, 1).applyTo(_chkExtrudePath);
 				_chkExtrudePath.setText(Messages.TourTrack_Properties_Checkbox_ExtrudePath);
 				_chkExtrudePath.addSelectionListener(_defaultSelectionListener);
+
+				/*
+				 * Label: Curtain opacity
+				 */
+				_lblCurtainOpacity = new Label(container, SWT.NONE);
+				GridDataFactory.fillDefaults()//
+						.align(SWT.FILL, SWT.CENTER)
+						.indent(UI.FORM_FIRST_COLUMN_INDENT, 0)
+						.applyTo(_lblCurtainOpacity);
+
+				_lblCurtainOpacity.setText(Messages.TourTrack_Properties_Label_CurtainOpacity);
+
+				/*
+				 * Spinner: Track position size
+				 */
+				_spinnerInteriorOpacity = new Spinner(container, SWT.BORDER);
+				GridDataFactory.fillDefaults() //
+						.align(SWT.BEGINNING, SWT.FILL)
+						.applyTo(_spinnerInteriorOpacity);
+				_spinnerInteriorOpacity.setMinimum(0);
+				_spinnerInteriorOpacity.setMaximum(100);
+				_spinnerInteriorOpacity.setDigits(2);
+				_spinnerInteriorOpacity.setIncrement(1);
+				_spinnerInteriorOpacity.setPageIncrement(10);
+				_spinnerInteriorOpacity.addSelectionListener(_defaultSelectionListener);
+				_spinnerInteriorOpacity.addMouseWheelListener(new MouseWheelListener() {
+					public void mouseScrolled(final MouseEvent event) {
+						Util.adjustSpinnerValueOnMouseScroll(event);
+						onSelection();
+					}
+				});
 
 				/*
 				 * Checkbox: Draw verticals for the extruded path
@@ -334,17 +331,88 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell {
 		}
 	}
 
+	private void createUI_100_Altitude(final Composite container) {
+
+		{
+			/*
+			 * label: Altitude
+			 */
+			final Label label = new Label(container, SWT.NONE);
+			GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(label);
+
+			label.setText(Messages.TourTrack_Properties_Label_Altitude);
+
+			/*
+			 * combo: Altitude
+			 */
+			_comboAltitude = new Combo(container, SWT.READ_ONLY | SWT.BORDER);
+			GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.FILL).applyTo(_comboAltitude);
+			_comboAltitude.setVisibleItemCount(10);
+			_comboAltitude.addSelectionListener(_defaultSelectionListener);
+		}
+
+		{
+			/*
+			 * label: Absolute offset
+			 */
+			_lblAbsoluteOffset = new Label(container, SWT.NONE);
+			GridDataFactory.fillDefaults()//
+					.indent(UI.FORM_FIRST_COLUMN_INDENT, 0)
+					.align(SWT.FILL, SWT.CENTER)
+					.applyTo(_lblAbsoluteOffset);
+
+			_lblAbsoluteOffset.setText(Messages.TourTrack_Properties_Label_AltitudeOffset);
+
+			/*
+			 * Spinner: Altitude offset
+			 */
+			_spinnerAltitudeOffset = new Spinner(container, SWT.BORDER);
+			GridDataFactory.fillDefaults() //
+					.align(SWT.BEGINNING, SWT.FILL)
+					.applyTo(_spinnerAltitudeOffset);
+			_spinnerAltitudeOffset.setMinimum(-10000);
+			_spinnerAltitudeOffset.setMaximum(100000);
+			_spinnerAltitudeOffset.setIncrement(1);
+			_spinnerAltitudeOffset.setPageIncrement(10);
+			_spinnerAltitudeOffset.addSelectionListener(_defaultSelectionListener);
+			_spinnerAltitudeOffset.addMouseWheelListener(new MouseWheelListener() {
+				public void mouseScrolled(final MouseEvent event) {
+					Util.adjustSpinnerValueOnMouseScroll(event);
+					onSelection();
+				}
+			});
+		}
+
+		{
+			/*
+			 * checkbox: Follow terrain
+			 */
+			_chkFollowTerrain = new Button(container, SWT.CHECK);
+			GridDataFactory.fillDefaults()//
+					.span(2, 1)
+					.indent(UI.FORM_FIRST_COLUMN_INDENT, 0)
+					.applyTo(_chkFollowTerrain);
+			_chkFollowTerrain.setText(Messages.TourTrack_Properties_Checkbox_IsFollowTerrain);
+			_chkFollowTerrain.addSelectionListener(_defaultSelectionListener);
+		}
+	}
+
 	private void enableControls() {
 
 		final boolean isAbsoluteAltitude = _trackConfig.altitudeMode == WorldWind.ABSOLUTE;
+		final boolean isShowCurtain = _trackConfig.isExtrudePath;
 		final boolean isShowTrackPosition = _trackConfig.isShowTrackPosition;
 
+		_lblAbsoluteOffset.setEnabled(isAbsoluteAltitude);
+		_spinnerAltitudeOffset.setEnabled(isAbsoluteAltitude);
 		_chkFollowTerrain.setEnabled(isAbsoluteAltitude == false);
 
 		_lblTrackPositionSize.setEnabled(isShowTrackPosition);
 		_spinnerTrackPositionSize.setEnabled(isShowTrackPosition);
 
-		_chkDrawVerticals.setEnabled(_trackConfig.isExtrudePath);
+		_lblCurtainOpacity.setEnabled(isShowCurtain);
+		_spinnerInteriorOpacity.setEnabled(isShowCurtain);
+		_chkDrawVerticals.setEnabled(isShowCurtain);
 	}
 
 	@Override
@@ -453,19 +521,25 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell {
 
 		_trackConfig = Map3Manager.getTourTrackLayer().getConfig();
 
+		_chkDrawVerticals.setSelection(_trackConfig.isDrawVerticals);
+		_chkExtrudePath.setSelection(_trackConfig.isExtrudePath);
+		_chkFollowTerrain.setSelection(_trackConfig.isFollowTerrain);
+		_chkTrackPositions.setSelection(_trackConfig.isShowTrackPosition);
+
 		_comboAltitude.select(_trackConfig.getAltitudeModeIndex());
 		_comboPathType.select(_trackConfig.getPathTypeIndex());
-		_chkFollowTerrain.setSelection(_trackConfig.isFollowTerrain);
 
+		_spinnerAltitudeOffset.setSelection(_trackConfig.altitudeOffset);
 		_spinnerOutlineWidth.setSelection((int) (_trackConfig.outlineWidth));
-		_chkTrackPositions.setSelection(_trackConfig.isShowTrackPosition);
+		_spinnerInteriorOpacity.setSelection((int) (_trackConfig.interiorOpacity * 100));
 		_spinnerTrackPositionSize.setSelection((int) (_trackConfig.trackPositionSize));
 
-		_chkExtrudePath.setSelection(_trackConfig.isExtrudePath);
-		_chkDrawVerticals.setSelection(_trackConfig.isDrawVerticals);
 	}
 
 	private void saveState() {
+
+		final int backupAltitudeOffset = _trackConfig.altitudeOffset;
+		final boolean backupIsAbsoluteAltitude = _trackConfig.altitudeMode == WorldWind.ABSOLUTE;
 
 		int altitudeModeIndex = _comboAltitude.getSelectionIndex();
 		if (altitudeModeIndex == -1) {
@@ -479,15 +553,30 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell {
 		// update config
 
 		_trackConfig.altitudeMode = TourTrackConfig.ALTITUDE_MODE_VALUE[altitudeModeIndex];
-		_trackConfig.isFollowTerrain = _chkFollowTerrain.getSelection();
-		_trackConfig.pathType = TourTrackConfig.PATH_TYPE_VALUE[pathTypeIndex];
+		_trackConfig.altitudeOffset = _spinnerAltitudeOffset.getSelection();
 
-		_trackConfig.outlineWidth = _spinnerOutlineWidth.getSelection();
+		_trackConfig.isDrawVerticals = _chkDrawVerticals.getSelection();
+		_trackConfig.isExtrudePath = _chkExtrudePath.getSelection();
+		_trackConfig.isFollowTerrain = _chkFollowTerrain.getSelection();
 		_trackConfig.isShowTrackPosition = _chkTrackPositions.getSelection();
+
+		_trackConfig.interiorOpacity = _spinnerInteriorOpacity.getSelection() / 100.0;
+		_trackConfig.outlineWidth = _spinnerOutlineWidth.getSelection();
+		_trackConfig.pathType = TourTrackConfig.PATH_TYPE_VALUE[pathTypeIndex];
 		_trackConfig.trackPositionSize = _spinnerTrackPositionSize.getSelection();
 
-		_trackConfig.isExtrudePath = _chkExtrudePath.getSelection();
-		_trackConfig.isDrawVerticals = _chkDrawVerticals.getSelection();
+		final boolean isAbsoluteAltitude = _trackConfig.altitudeMode == WorldWind.ABSOLUTE;
+
+		if (backupAltitudeOffset == _trackConfig.altitudeOffset && backupIsAbsoluteAltitude == isAbsoluteAltitude) {
+
+			_trackConfig.isRecreateTracks = false;
+
+		} else {
+
+			// altitude offset or altitude mode has changed
+
+			_trackConfig.isRecreateTracks = true;
+		}
 	}
 
 	private void updateUI() {

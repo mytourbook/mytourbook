@@ -18,7 +18,7 @@ package net.tourbook.map3.layer.tourtrack;
 import gov.nasa.worldwind.geom.LatLon;
 import gov.nasa.worldwind.geom.Position;
 
-public class PositionWithTour extends Position {
+public class TourMap3Position extends Position {
 
 	/**
 	 * Contains the value from the data serie which is painted in the map, this can be altitude,
@@ -26,7 +26,7 @@ public class PositionWithTour extends Position {
 	 */
 	float	dataSerieValue;
 
-	public PositionWithTour(final LatLon fromDegrees, final float alti, final float dataSerieValue) {
+	public TourMap3Position(final LatLon fromDegrees, final float alti, final float dataSerieValue) {
 
 		super(fromDegrees, alti);
 

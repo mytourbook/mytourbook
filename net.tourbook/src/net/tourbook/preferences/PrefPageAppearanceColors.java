@@ -452,7 +452,7 @@ public class PrefPageAppearanceColors extends PreferencePage implements IWorkben
 		final LegendColor legendColor = new LegendColor();
 		legendColor.valueColors = _valueColors;
 
-		_legendProvider = new GradientColorProvider(legendConfig, legendColor, 0);
+		_legendProvider = new GradientColorProvider(0, legendConfig, legendColor);
 		_dialogMappingColor = new DialogMappingColor(Display.getCurrent().getActiveShell(), _legendProvider, this);
 	}
 

@@ -67,6 +67,10 @@ class TourPositionColors implements Path.PositionColors {
 		return getColor((float) altitude);
 	}
 
+	ILegendProvider getColorProvider() {
+		return _colorProvider;
+	}
+
 	void setColorProvider(final ILegendProvider legendProvider) {
 
 		_colorProvider = legendProvider;
