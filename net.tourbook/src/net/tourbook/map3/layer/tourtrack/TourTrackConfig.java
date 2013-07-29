@@ -21,65 +21,65 @@ import net.tourbook.common.util.Util;
 import net.tourbook.map3.Messages;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
+import org.eclipse.swt.graphics.RGB;
 
 public class TourTrackConfig {
 
-	private static final String		STATE_ALTITUDE_MODE				= "STATE_ALTITUDE_MODE";			//$NON-NLS-1$
-	private static final String		STATE_ALTITUDE_OFFSET			= "STATE_ALTITUDE_OFFSET";			//$NON-NLS-1$
-	private static final String		STATE_IS_DRAW_VERTICALS			= "STATE_IS_DRAW_VERTICALS";		//$NON-NLS-1$
-	private static final String		STATE_IS_EXTRUDE_PATH			= "STATE_IS_EXTRUDE_PATH";			//$NON-NLS-1$
-	private static final String		STATE_IS_FOLLOW_TERRAIN			= "STATE_IS_FOLLOW_TERRAIN";		//$NON-NLS-1$
-	private static final String		STATE_IS_SHOW_TRACK_POSITION	= "STATE_IS_SHOW_TRACK_POSITION";	//$NON-NLS-1$
-	private static final String		STATE_INTERIOR_OPACITY			= "STATE_INTERIOR_OPACITY";		//$NON-NLS-1$
-	private static final String		STATE_OUTLINE_OPACITY			= "STATE_OUTLINE_OPACITY";			//$NON-NLS-1$
-	private static final String		STATE_OUTLINE_WIDTH				= "STATE_OUTLINE_WIDTH";			//$NON-NLS-1$
-	private static final String		STATE_PATH_TYPE					= "STATE_PATH_TYPE";				//$NON-NLS-1$
-	private static final String		STATE_TRACK_POSITION_SIZE		= "STATE_TRACK_POSITION_SIZE";		//$NON-NLS-1$
+	private static final String			STATE_ALTITUDE_MODE				= "STATE_ALTITUDE_MODE";			//$NON-NLS-1$
+	private static final String			STATE_ALTITUDE_OFFSET			= "STATE_ALTITUDE_OFFSET";			//$NON-NLS-1$
+	private static final String			STATE_IS_ABSOLUTE_OFFSET		= "STATE_IS_ABSOLUTE_OFFSET";		//$NON-NLS-1$
+	private static final String			STATE_IS_DRAW_VERTICALS			= "STATE_IS_DRAW_VERTICALS";		//$NON-NLS-1$
+	private static final String			STATE_IS_EXTRUDE_PATH			= "STATE_IS_EXTRUDE_PATH";			//$NON-NLS-1$
+	private static final String			STATE_IS_FOLLOW_TERRAIN			= "STATE_IS_FOLLOW_TERRAIN";		//$NON-NLS-1$
+	private static final String			STATE_IS_SHOW_TRACK_POSITION	= "STATE_IS_SHOW_TRACK_POSITION";	//$NON-NLS-1$
+	private static final String			STATE_INTERIOR_COLOR			= "STATE_INTERIOR_COLOR";			//$NON-NLS-1$
+	private static final String			STATE_INTERIOR_OPACITY			= "STATE_INTERIOR_OPACITY";		//$NON-NLS-1$
+	private static final String			STATE_NUMBER_OF_SUB_SEGMENTS	= "STATE_NUMBER_OF_SUB_SEGMENTS";	//$NON-NLS-1$
+	private static final String			STATE_OUTLINE_COLOR				= "STATE_OUTLINE_COLOR";			//$NON-NLS-1$
+	private static final String			STATE_OUTLINE_OPACITY			= "STATE_OUTLINE_OPACITY";			//$NON-NLS-1$
+	private static final String			STATE_OUTLINE_WIDTH				= "STATE_OUTLINE_WIDTH";			//$NON-NLS-1$
+	private static final String			STATE_PATH_TYPE					= "STATE_PATH_TYPE";				//$NON-NLS-1$
+	private static final String			STATE_TRACK_POSITION_SIZE		= "STATE_TRACK_POSITION_SIZE";		//$NON-NLS-1$
 
-	/*
-	 * Altitude mode
-	 */
-	public static final String[]	ALTITUDE_MODE_LABEL				= {
-			Messages.Track_Config_Altitude_Mode_Absolute,
-			Messages.Track_Config_Altitude_Mode_ClampToGround,
-			Messages.Track_Config_Altitude_Mode_RelativeToGround,	};
+	public static final AltitudeMode[]	ALTITUDE_MODE					= {
+			new AltitudeMode(Messages.Track_Config_Altitude_Mode_ClampToGround, WorldWind.CLAMP_TO_GROUND),
+			new AltitudeMode(Messages.Track_Config_Altitude_Mode_Absolute, WorldWind.ABSOLUTE),
+			new AltitudeMode(Messages.Track_Config_Altitude_Mode_RelativeToGround, WorldWind.RELATIVE_TO_GROUND) //
+																		};
 
-	public static final int[]		ALTITUDE_MODE_VALUE				= {
-			WorldWind.ABSOLUTE,
-			WorldWind.CLAMP_TO_GROUND,
-			WorldWind.RELATIVE_TO_GROUND,							};
+	public static final PathType[]		PATH_TYPE						= {
+			new PathType(Messages.Track_Config_Path_Type_Linear, AVKey.LINEAR),
+			new PathType(Messages.Track_Config_Path_Type_GreatCircle, AVKey.GREAT_CIRCLE),
+			new PathType(Messages.Track_Config_Path_Type_RHumbLine, AVKey.RHUMB_LINE), //
+																		};
 
-	/*
-	 * Path type
-	 */
-	public static final String[]	PATH_TYPE_LABEL					= {
-			Messages.Track_Config_Path_Type_Linear,
-			Messages.Track_Config_Path_Type_GreatCircle,
-			Messages.Track_Config_Path_Type_RHumbLine,				};
-
-	public static final String[]	PATH_TYPE_VALUE					= { //
-																	AVKey.LINEAR, //
-			AVKey.GREAT_CIRCLE,
-			AVKey.RHUMB_LINE,										};
-
-	public boolean					isRecreateTracks;
+	public boolean						isRecreateTracks;
 
 	/*
 	 * Configurations which are saved in the state.
 	 */
-	public int						altitudeMode;
-	public int						altitudeOffset;
+	public int							altitudeMode;
+	public int							altitudeOffsetDistance;
 
-	public boolean					isExtrudePath;
-	public boolean					isDrawVerticals;
-	public boolean					isFollowTerrain;
-	public boolean					isShowTrackPosition;
+	/**
+	 * Is <code>true</code> when altitude offset is enabled.
+	 */
+	public boolean						isAbsoluteOffset;
+	public boolean						isExtrudePath;
+	public boolean						isDrawVerticals;
+	public boolean						isFollowTerrain;
+	public boolean						isShowTrackPosition;
 
-	public String					pathType;
-	public double					interiorOpacity;
-//	public double					outlineOpacity;
-	public double					outlineWidth;
-	public double					trackPositionSize;
+	public RGB							interiorColor;
+	public double						interiorOpacity;
+
+	public RGB							outlineColor;
+	public double						outlineOpacity;
+	public double						outlineWidth;
+
+	public String						pathType;
+	public double						trackPositionSize;
+	public int							numSubsegments;
 
 	TourTrackConfig(final IDialogSettings state) {
 
@@ -91,8 +91,8 @@ public class TourTrackConfig {
 	 */
 	public int getAltitudeModeIndex() {
 
-		for (int valueIndex = 0; valueIndex < ALTITUDE_MODE_VALUE.length; valueIndex++) {
-			if (ALTITUDE_MODE_VALUE[valueIndex] == altitudeMode) {
+		for (int valueIndex = 0; valueIndex < ALTITUDE_MODE.length; valueIndex++) {
+			if (ALTITUDE_MODE[valueIndex].value == altitudeMode) {
 				return valueIndex;
 			}
 		}
@@ -103,9 +103,9 @@ public class TourTrackConfig {
 
 	private int getAltitudeModeValue(final int stateAltitudeMode) {
 
-		for (final int altiModeValue : ALTITUDE_MODE_VALUE) {
-			if (altiModeValue == stateAltitudeMode) {
-				return altiModeValue;
+		for (final AltitudeMode altiMode : ALTITUDE_MODE) {
+			if (altiMode.value == stateAltitudeMode) {
+				return altiMode.value;
 			}
 		}
 
@@ -115,8 +115,8 @@ public class TourTrackConfig {
 
 	public int getPathTypeIndex() {
 
-		for (int valueIndex = 0; valueIndex < PATH_TYPE_VALUE.length; valueIndex++) {
-			if (PATH_TYPE_VALUE[valueIndex].equals(pathType)) {
+		for (int valueIndex = 0; valueIndex < PATH_TYPE.length; valueIndex++) {
+			if (PATH_TYPE[valueIndex].value.equals(pathType)) {
 				return valueIndex;
 			}
 		}
@@ -127,9 +127,9 @@ public class TourTrackConfig {
 
 	private String getPathTypeValue(final String statePathType) {
 
-		for (final String pathTypeValue : PATH_TYPE_VALUE) {
-			if (pathTypeValue.equals(statePathType)) {
-				return pathTypeValue;
+		for (final PathType pathType : PATH_TYPE) {
+			if (pathType.value.equals(statePathType)) {
+				return pathType.value;
 			}
 		}
 
@@ -145,36 +145,53 @@ public class TourTrackConfig {
 	private void restoreState(final IDialogSettings state) {
 
 		altitudeMode = getAltitudeModeValue(Util.getStateInt(state, STATE_ALTITUDE_MODE, WorldWind.CLAMP_TO_GROUND));
-		altitudeOffset = Util.getStateInt(state, STATE_ALTITUDE_OFFSET, 0);
+		altitudeOffsetDistance = Util.getStateInt(state, STATE_ALTITUDE_OFFSET, 0);
 
+		isAbsoluteOffset = Util.getStateBoolean(state, STATE_IS_ABSOLUTE_OFFSET, false);
 		isDrawVerticals = Util.getStateBoolean(state, STATE_IS_DRAW_VERTICALS, false);
 		isExtrudePath = Util.getStateBoolean(state, STATE_IS_EXTRUDE_PATH, false);
 		isFollowTerrain = Util.getStateBoolean(state, STATE_IS_FOLLOW_TERRAIN, true);
-		isShowTrackPosition = Util.getStateBoolean(state, STATE_IS_SHOW_TRACK_POSITION, false);
 
+		// curtain
+		interiorColor = Util.getStateColor(state, STATE_INTERIOR_COLOR, new RGB(0xFF, 0xE3, 0x5D));
 		interiorOpacity = Util.getStateDouble(state, STATE_INTERIOR_OPACITY, 0.5);
-//		outlineOpacity = Util.getStateDouble(state, STATE_OUTLINE_OPACITY, 0.5);
+
+		// verticals
+		outlineColor = Util.getStateColor(state, STATE_OUTLINE_COLOR, new RGB(0xFA, 0xEA, 0x9B));
+		outlineOpacity = Util.getStateDouble(state, STATE_OUTLINE_OPACITY, 0.5);
 		outlineWidth = Util.getStateDouble(state, STATE_OUTLINE_WIDTH, 5.0);
+
+		// track position
+		isShowTrackPosition = Util.getStateBoolean(state, STATE_IS_SHOW_TRACK_POSITION, false);
+		trackPositionSize = Util.getStateDouble(state, STATE_TRACK_POSITION_SIZE, 2.0);
+
+		// path + segments
 		pathType = getPathTypeValue(Util.getStateString(state, STATE_PATH_TYPE, AVKey.LINEAR));
-		trackPositionSize = Util.getStateDouble(state, STATE_TRACK_POSITION_SIZE, 5.0);
+		numSubsegments = Util.getStateInt(state, STATE_NUMBER_OF_SUB_SEGMENTS, 0);
 	}
 
 	void saveState(final IDialogSettings state) {
 
 		state.put(STATE_ALTITUDE_MODE, altitudeMode);
-		state.put(STATE_ALTITUDE_OFFSET, altitudeOffset);
+		state.put(STATE_ALTITUDE_OFFSET, altitudeOffsetDistance);
 
+		state.put(STATE_IS_ABSOLUTE_OFFSET, isAbsoluteOffset);
 		state.put(STATE_IS_DRAW_VERTICALS, isDrawVerticals);
 		state.put(STATE_IS_EXTRUDE_PATH, isExtrudePath);
 		state.put(STATE_IS_FOLLOW_TERRAIN, isFollowTerrain);
-		state.put(STATE_IS_SHOW_TRACK_POSITION, isShowTrackPosition);
 
 		state.put(STATE_INTERIOR_OPACITY, interiorOpacity);
-//		state.put(STATE_OUTLINE_OPACITY, outlineOpacity);
+		Util.setState(state, STATE_INTERIOR_COLOR, interiorColor);
+
+		state.put(STATE_OUTLINE_OPACITY, outlineOpacity);
 		state.put(STATE_OUTLINE_WIDTH, outlineWidth);
-		state.put(STATE_PATH_TYPE, pathType);
+		Util.setState(state, STATE_OUTLINE_COLOR, outlineColor);
+
+		state.put(STATE_IS_SHOW_TRACK_POSITION, isShowTrackPosition);
 		state.put(STATE_TRACK_POSITION_SIZE, trackPositionSize);
 
+		state.put(STATE_PATH_TYPE, pathType);
+		state.put(STATE_NUMBER_OF_SUB_SEGMENTS, numSubsegments);
 	}
 
 }

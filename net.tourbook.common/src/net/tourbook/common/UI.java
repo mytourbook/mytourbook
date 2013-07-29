@@ -84,6 +84,7 @@ public class UI {
 	 * contains 2 new lines
 	 */
 	public static final String			NEW_LINE2								= "\n\n";																	//$NON-NLS-1$
+	public static final String			NEW_LINE3								= "\n\n\n";																//$NON-NLS-1$
 
 	public static final String			SYMBOL_AVERAGE							= "\u00f8";																//$NON-NLS-1$
 	public static final String			SYMBOL_AVERAGE_WITH_SPACE				= "\u00f8 ";																//$NON-NLS-1$

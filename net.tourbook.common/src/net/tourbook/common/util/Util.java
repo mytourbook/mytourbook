@@ -38,6 +38,7 @@ import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Resource;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Display;
@@ -656,6 +657,15 @@ public class Util {
 	 */
 	public static boolean getStateBoolean(final IDialogSettings state, final String key, final boolean defaultValue) {
 		return state.get(key) == null ? defaultValue : state.getBoolean(key);
+	}
+
+	public static RGB getStateColor(final IDialogSettings state, final String key, final RGB defaultRGB) {
+
+		final int[] defaultValue = { defaultRGB.red, defaultRGB.green, defaultRGB.blue };
+
+		final int[] colorValues = getStateIntArray(state, key, defaultValue);
+
+		return new RGB(colorValues[0], colorValues[1], colorValues[2]);
 	}
 
 	/**
@@ -1511,6 +1521,17 @@ public class Util {
 		}
 
 		state.put(stateKey, stateIndices);
+	}
+
+	public static void setState(final IDialogSettings state, final String stateKey, final RGB rgb) {
+
+		final String[] stateValues = new String[3];
+
+		stateValues[0] = Integer.toString(rgb.red);
+		stateValues[1] = Integer.toString(rgb.green);
+		stateValues[2] = Integer.toString(rgb.blue);
+
+		state.put(stateKey, stateValues);
 	}
 
 	public static void showSQLException(SQLException e) {

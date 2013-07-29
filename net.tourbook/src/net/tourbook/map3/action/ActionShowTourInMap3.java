@@ -23,7 +23,6 @@ import net.tourbook.map3.view.Map3Manager;
 import net.tourbook.map3.view.Map3View;
 
 import org.eclipse.jface.action.ContributionItem;
-import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
@@ -42,16 +41,12 @@ public class ActionShowTourInMap3 extends ContributionItem {
 
 	private static final String		ID	= "ACTION_TRACK_LAYER_PROPERTIES_ID";	//$NON-NLS-1$
 
-//	private static final String		STATE_IS_TRACK_LAYER_VISIBLE	= "STATE_IS_TRACK_LAYER_VISIBLE";		//$NON-NLS-1$
-
 	private Map3View				_map3View;
 
 	private DialogTourTrackConfig	_trackLayerProperties;
 
 	private ToolBar					_toolBar;
-
 	private ToolItem				_actionTrackLayer;
-	private IDialogSettings			_state;
 
 	private boolean					_isActionEnabled;
 	private boolean					_isActionSelected;
@@ -61,23 +56,26 @@ public class ActionShowTourInMap3 extends ContributionItem {
 	 */
 	private Control					_parent;
 
+	/*
+	 * UI resources
+	 */
 	private Image					_actionImage;
 	private Image					_actionImageDisabled;
 
-	public ActionShowTourInMap3(final Map3View map3View, final Control parent, final IDialogSettings state) {
+	public ActionShowTourInMap3(final Map3View map3View, final Control parent) {
 
 		super(ID);
 
 		_map3View = map3View;
 
 		_parent = parent;
-		_state = state;
 
-		_actionImage = TourbookPlugin.getImageDescriptor(Messages.image_action_show_tour_in_map).createImage();
-		_actionImageDisabled = TourbookPlugin.getImageDescriptor(Messages.image_action_show_tour_in_map_disabled)//
+		_actionImage = TourbookPlugin//
+				.getImageDescriptor(Messages.image_action_show_tour_in_map)
 				.createImage();
-//		_actionImageDisabled = TourbookPlugin.getImageDescriptor("refresh-all.png")//
-//				.createImage();
+		_actionImageDisabled = TourbookPlugin//
+				.getImageDescriptor(Messages.image_action_show_tour_in_map_disabled)
+				.createImage();
 	}
 
 	@Override
@@ -114,7 +112,6 @@ public class ActionShowTourInMap3 extends ContributionItem {
 			_actionTrackLayer.setSelection(_isActionSelected);
 			_actionTrackLayer.setEnabled(_isActionEnabled);
 
-//			_actionTrackLayer.setImage(_isActionEnabled ? _actionImage : _actionImageDisabled);
 			_actionTrackLayer.setImage(_actionImage);
 
 			_actionTrackLayer.setToolTipText(Messages.map_action_show_tour_in_map);
@@ -127,9 +124,6 @@ public class ActionShowTourInMap3 extends ContributionItem {
 			});
 
 			_trackLayerProperties = new DialogTourTrackConfig(_parent, _toolBar);
-
-			// send notifications to the map to update displayed photos
-//			_trackLayerProperties.addPropertiesListener(_map3View);
 		}
 	}
 
@@ -201,11 +195,6 @@ public class ActionShowTourInMap3 extends ContributionItem {
 		_actionTrackLayer.setSelection(Map3Manager.getTourTrackLayer().isEnabled());
 
 		updateUI();
-
-//		_map3View.actionPhotoProperties(isFilterActive);
-
-		// update AFTER photo filter is activated
-//		updateUI_FotoFilterStats();
 	}
 
 	/**

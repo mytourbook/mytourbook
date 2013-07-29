@@ -15,6 +15,8 @@
  *******************************************************************************/
 package net.tourbook.map3.view;
 
+import gov.nasa.worldwind.View;
+import gov.nasa.worldwind.avlist.AVKey;
 import gov.nasa.worldwind.awt.WorldWindowGLCanvas;
 import gov.nasa.worldwind.event.RenderingEvent;
 import gov.nasa.worldwind.event.RenderingListener;
@@ -73,6 +75,7 @@ public class Map3View extends ViewPart {
 	private static final String					STATE_IS_SYNC_MAP_VIEW_WITH_TOUR		= "STATE_IS_SYNC_MAP_VIEW_WITH_TOUR";		//$NON-NLS-1$
 	private static final String					STATE_IS_SYNC_MAP_POSITION_WITH_SLIDER	= "STATE_IS_SYNC_MAP_POSITION_WITH_SLIDER"; //$NON-NLS-1$
 	private static final String					STATE_IS_TOUR_VISIBLE					= "STATE_IS_TOUR_VISIBLE";					//$NON-NLS-1$
+	private static final String					STATE_MAP3_VIEW							= "STATE_MAP3_VIEW";						//$NON-NLS-1$
 	private static final String					STATE_TOUR_COLOR_ID						= "STATE_TOUR_COLOR_ID";					//$NON-NLS-1$
 
 	private final IPreferenceStore				_prefStore								= TourbookPlugin.getDefault()//
@@ -124,6 +127,8 @@ public class Map3View extends ViewPart {
 	public Map3View() {}
 
 	public void actionSetTourColor(final int colorId) {
+
+		_tourColorId = colorId;
 
 		setColorProvider(colorId);
 
@@ -316,7 +321,7 @@ public class Map3View extends ViewPart {
 		_actionOpenMap3Properties = new ActionOpenMap3Properties();
 
 		_actionShowEntireTour = new ActionShowEntireTour(this);
-		_actionShowTourInMap3 = new ActionShowTourInMap3(this, parent, _state);
+		_actionShowTourInMap3 = new ActionShowTourInMap3(this, parent);
 		_actionSynMapPositionWithSlider = new ActionSyncMapPositionWithSlider(this);
 		_actionSynMapViewWithTour = new ActionSyncMapViewWithTour(this);
 
@@ -722,11 +727,20 @@ public class Map3View extends ViewPart {
 			break;
 
 		default:
+			_tourColorId = ILegendProvider.TOUR_COLOR_ALTITUDE;
 			_actionTourColorAltitude.setChecked(true);
 			break;
 		}
 
 		setColorProvider(_tourColorId);
+
+		final String stateMap3View = Util.getStateString(_state, STATE_MAP3_VIEW, null);
+		if (stateMap3View != null) {
+
+			final View view = _wwCanvas.getView();
+			view.restoreState(stateMap3View);
+			view.firePropertyChange(AVKey.VIEW, null, view);
+		}
 
 	}
 
@@ -737,6 +751,10 @@ public class Map3View extends ViewPart {
 		_state.put(STATE_IS_TOUR_VISIBLE, _isTourVisible);
 
 		_state.put(STATE_TOUR_COLOR_ID, _tourColorId);
+
+		final View view = _wwCanvas.getView();
+
+		_state.put(STATE_MAP3_VIEW, view.getRestorableState());
 	}
 
 	private void setColorProvider(final int colorId) {

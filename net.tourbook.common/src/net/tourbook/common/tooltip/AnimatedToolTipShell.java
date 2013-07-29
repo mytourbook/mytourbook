@@ -522,6 +522,14 @@ public abstract class AnimatedToolTipShell {
 	 */
 	protected abstract void beforeHideToolTip();
 
+	/**
+	 * @return When <code>false</code> is returned, the tooltip will <b>not</b> be closed. This can
+	 *         be used when the tooltip opens another dialog which prevents to close this tooltip.
+	 */
+	protected boolean canCloseToolTip() {
+		return true;
+	}
+
 	protected abstract boolean canShowToolTip();
 
 	/**
@@ -706,12 +714,26 @@ public abstract class AnimatedToolTipShell {
 		return null;
 	}
 
+	/**
+	 * @return Returns <code>true</code> when the tooltip should be kept opened.
+	 */
 	private boolean onDisplayMouseMove() {
 
 //		final long start = System.nanoTime();
 
 		if (_shell == null || _shell.isDisposed() || _shell.isVisible() == false) {
 			return false;
+		}
+
+		if (canCloseToolTip() == false) {
+
+//			System.out.println(UI.timeStampNano()
+//					+ " ["
+//					+ getClass().getSimpleName()
+//					+ "] onDisplayMouseMove::canCloseToolTip\t");
+//			// TODO remove SYSTEM.OUT.PRINTLN
+
+			return true;
 		}
 
 		boolean isHide = false;
@@ -1044,9 +1066,14 @@ public abstract class AnimatedToolTipShell {
 							return;
 						}
 
-						if (_ownerControl.getShell() == _shell.getDisplay().getActiveShell()) {
+						if (// don't hide when ...
 
-							// don't hide when main window is active
+						// ... main window is active
+						_ownerControl.getShell() == _shell.getDisplay().getActiveShell()
+
+						// ... a sub shell is opened
+								|| canCloseToolTip() == false) {
+
 							return;
 						}
 

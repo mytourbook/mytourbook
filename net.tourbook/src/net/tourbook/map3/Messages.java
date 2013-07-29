@@ -72,19 +72,24 @@ public class Messages extends NLS {
 
 	public static String		TourTrack_Layer_Name;
 
+	public static String		TourTrack_Properties_Checkbox_AltitudeOffset;
 	public static String		TourTrack_Properties_Checkbox_DrawVerticals;
 	public static String		TourTrack_Properties_Checkbox_ExtrudePath;
 	public static String		TourTrack_Properties_Checkbox_IsFollowTerrain;
 	public static String		TourTrack_Properties_Checkbox_ShowTrackPositions;
 	public static String		TourTrack_Properties_Label_Altitude;
-
-	public static String	TourTrack_Properties_Label_AltitudeOffset;
-
-	public static String	TourTrack_Properties_Label_CurtainOpacity;
+	public static String		TourTrack_Properties_Label_AltitudeOffsetDistance;
+	public static String		TourTrack_Properties_Label_CurtainColor;
+	public static String		TourTrack_Properties_Label_CurtainOpacity;
+	public static String		TourTrack_Properties_Label_NumberOfSubSegments;
+	public static String		TourTrack_Properties_Label_NumberOfSubSegments_Tooltip;
 	public static String		TourTrack_Properties_Label_OutlineWidth;
+	public static String		TourTrack_Properties_Label_OutlineWidth_Tooltip;
 	public static String		TourTrack_Properties_Label_PathType;
 	public static String		TourTrack_Properties_Label_TrackPositionSize;
 	public static String		TourTrack_Properties_Label_TrackPositionSize_Tooltip;
+	public static String		TourTrack_Properties_Label_VerticalColor;
+	public static String		TourTrack_Properties_Label_VerticalOpacity;
 
 	public static String		Track_Config_Altitude_Mode_Absolute;
 	public static String		Track_Config_Altitude_Mode_ClampToGround;

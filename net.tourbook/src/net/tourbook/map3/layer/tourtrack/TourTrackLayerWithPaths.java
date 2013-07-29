@@ -24,6 +24,7 @@ import gov.nasa.worldwind.render.Path;
 import gov.nasa.worldwind.render.Renderable;
 import gov.nasa.worldwind.render.ShapeAttributes;
 
+import java.awt.Color;
 import java.beans.PropertyChangeEvent;
 import java.util.ArrayList;
 
@@ -34,6 +35,7 @@ import net.tourbook.map3.Messages;
 import net.tourbook.map3.view.Map3Manager;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
+import org.eclipse.swt.graphics.RGB;
 
 /**
  */
@@ -70,8 +72,11 @@ public class TourTrackLayerWithPaths extends RenderableLayer {
 
 		removeAllRenderables();
 
-		final boolean isAbsoluteAltitude = _trackConfig.altitudeMode == WorldWind.ABSOLUTE;
-		final int altitudeOffset = isAbsoluteAltitude ? _trackConfig.altitudeOffset : 0;
+		final boolean isAbsoluteAltitudeMode = _trackConfig.altitudeMode == WorldWind.ABSOLUTE;
+
+		final int altitudeOffset = isAbsoluteAltitudeMode && _trackConfig.isAbsoluteOffset
+				? _trackConfig.altitudeOffsetDistance
+				: 0;
 
 		final ArrayList<TourMap3Position> allPositions = new ArrayList<TourMap3Position>();
 
@@ -221,13 +226,14 @@ public class TourTrackLayerWithPaths extends RenderableLayer {
 		_tourPositionColors.setColorProvider(legendProvider);
 	}
 
+	/**
+	 * Set attributes from the configuration into the path.
+	 * 
+	 * @param path
+	 */
 	private void setPathAttributes(final Path path) {
 
 //		tourPath.setValue(AVKey.DISPLAY_NAME, MAP3_LAYER_ID);
-
-		// Indicate that dots are to be drawn at each specified path position.
-		path.setShowPositions(_trackConfig.isShowTrackPosition);
-		path.setShowPositionsScale(_trackConfig.trackPositionSize);
 
 //		tourPath.setSkipCountComputer(tourPath.getSkipCountComputer());
 
@@ -237,6 +243,10 @@ public class TourTrackLayerWithPaths extends RenderableLayer {
 		// Override generic view-distance geometry regeneration because multi-res Paths handle that themselves.
 //		tourPath.setViewDistanceExpiration(false);
 
+		// Indicate that dots are to be drawn at each specified path position.
+		path.setShowPositions(_trackConfig.isShowTrackPosition);
+		path.setShowPositionsScale(_trackConfig.trackPositionSize);
+
 		path.setAltitudeMode(_trackConfig.altitudeMode);
 		path.setFollowTerrain(_trackConfig.isFollowTerrain);
 		path.setPathType(_trackConfig.pathType);
@@ -244,26 +254,31 @@ public class TourTrackLayerWithPaths extends RenderableLayer {
 		path.setExtrude(_trackConfig.isExtrudePath);
 		path.setDrawVerticals(_trackConfig.isDrawVerticals);
 
+		path.setNumSubsegments(_trackConfig.numSubsegments);
+
+		// Show how to make the colors vary along the paths.
+		path.setPositionColors(_tourPositionColors);
+
 		/*
 		 * Create attributes for the Path.
 		 */
+		final RGB interiorColor = _trackConfig.interiorColor;
+		final RGB outlineColor = _trackConfig.outlineColor;
+		final Color colorInterior = new Color(interiorColor.red, interiorColor.green, interiorColor.blue);
+		final Color colorOutline = new Color(outlineColor.red, outlineColor.green, outlineColor.blue);
 
 		final ShapeAttributes shapeAttrs = new BasicShapeAttributes();
 
 		shapeAttrs.setDrawOutline(true);
 		shapeAttrs.setOutlineWidth(_trackConfig.outlineWidth);
-		shapeAttrs.setOutlineMaterial(Material.GRAY);
-//		shapeAttrs.setOutlineOpacity(_trackConfig.outlineOpacity);
-		shapeAttrs.setOutlineOpacity(0.5);
+		shapeAttrs.setOutlineOpacity(_trackConfig.outlineOpacity);
+		shapeAttrs.setOutlineMaterial(new Material(colorOutline));
 
 		shapeAttrs.setDrawInterior(true);
-		shapeAttrs.setInteriorMaterial(Material.YELLOW);
 		shapeAttrs.setInteriorOpacity(_trackConfig.interiorOpacity);
+		shapeAttrs.setInteriorMaterial(new Material(colorInterior));
 
 		path.setAttributes(shapeAttrs);
-
-		// Show how to make the colors vary along the paths.
-		path.setPositionColors(_tourPositionColors);
 	}
 
 	public void updateColors(final ArrayList<TourData> allTours) {

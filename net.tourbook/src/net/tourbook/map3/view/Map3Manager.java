@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.map3.view;
 
+import gov.nasa.worldwind.Configuration;
 import gov.nasa.worldwind.Model;
 import gov.nasa.worldwind.WorldWind;
 import gov.nasa.worldwind.WorldWindow;
@@ -135,6 +136,17 @@ public class Map3Manager {
 																							.basicDateTimeNoMillis();
 
 	static {
+
+		// copied from gov.nasa.worldwindx.examples.ApplicationTemplate - 28.7.2013
+//        System.setProperty("java.net.useSystemProxies", "true");
+		if (Configuration.isMacOS()) {
+//            System.setProperty("apple.laf.useScreenMenuBar", "true");
+//            System.setProperty("com.apple.mrj.application.apple.menu.about.name", "World Wind Application");
+//            System.setProperty("com.apple.mrj.application.growbox.intrudes", "false");
+//            System.setProperty("apple.awt.brushMetalLook", "true");
+		} else if (Configuration.isWindowsOS()) {
+			System.setProperty("sun.awt.noerasebackground", "true"); // prevents flashing during window resizing
+		}
 
 		_ww = new WorldWindowGLCanvas();
 

@@ -22,6 +22,7 @@ import java.util.Map;
 import javax.media.opengl.GL;
 
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.UI;
 import net.tourbook.map3.view.Map3Manager;
 
 import org.eclipse.core.commands.AbstractHandler;
@@ -49,15 +50,15 @@ public class ActionHandlerWorldWindDiagnostics extends AbstractHandler {
 	private static final WorldWindowGLCanvas	_wwCanvas	= Map3Manager.getWWCanvas();
 
 	private static Attr[]						attrs		= new Attr[] {
-			new Attr(GL.GL_STENCIL_BITS, "stencil bits"),
-			new Attr(GL.GL_DEPTH_BITS, "depth bits"),
-			new Attr(GL.GL_MAX_TEXTURE_UNITS, "max texture units"),
-			new Attr(GL.GL_MAX_TEXTURE_IMAGE_UNITS_ARB, "max texture image units"),
-			new Attr(GL.GL_MAX_TEXTURE_COORDS_ARB, "max texture coords"),
-			new Attr(GL.GL_MAX_TEXTURE_SIZE, "max texture size"),
-			new Attr(GL.GL_MAX_ELEMENTS_INDICES, "max elements indices"),
-			new Attr(GL.GL_MAX_ELEMENTS_VERTICES, "max elements vertices"),
-			new Attr(GL.GL_MAX_LIGHTS, "max lights")		};
+			new Attr(GL.GL_STENCIL_BITS, "stencil bits"), //$NON-NLS-1$
+			new Attr(GL.GL_DEPTH_BITS, "depth bits"), //$NON-NLS-1$
+			new Attr(GL.GL_MAX_TEXTURE_UNITS, "max texture units"), //$NON-NLS-1$
+			new Attr(GL.GL_MAX_TEXTURE_IMAGE_UNITS_ARB, "max texture image units"), //$NON-NLS-1$
+			new Attr(GL.GL_MAX_TEXTURE_COORDS_ARB, "max texture coords"), //$NON-NLS-1$
+			new Attr(GL.GL_MAX_TEXTURE_SIZE, "max texture size"), //$NON-NLS-1$
+			new Attr(GL.GL_MAX_ELEMENTS_INDICES, "max elements indices"), //$NON-NLS-1$
+			new Attr(GL.GL_MAX_ELEMENTS_VERTICES, "max elements vertices"), //$NON-NLS-1$
+			new Attr(GL.GL_MAX_LIGHTS, "max lights")		};										//$NON-NLS-1$
 
 	private static class Attr {
 
@@ -90,7 +91,7 @@ public class ActionHandlerWorldWindDiagnostics extends AbstractHandler {
 
 //			Dialog_WorldWind_Diagnostics=World Wind Diagnostics
 
-			shell.setText("World Wind Diagnostics");
+			shell.setText("World Wind Diagnostics"); //$NON-NLS-1$
 		}
 
 		@Override
@@ -130,27 +131,29 @@ public class ActionHandlerWorldWindDiagnostics extends AbstractHandler {
 
 			final StringBuilder sb = new StringBuilder();
 
-			sb.append(gov.nasa.worldwind.Version.getVersion() + "\n");
+			sb.append(gov.nasa.worldwind.Version.getVersion() + UI.NEW_LINE);
 
-			sb.append("\nSystem Properties\n");
-			sb.append("Processors: " + Runtime.getRuntime().availableProcessors() + "\n");
-			sb.append("Free memory: " + Runtime.getRuntime().freeMemory() + " bytes\n");
-			sb.append("Max memory: " + Runtime.getRuntime().maxMemory() + " bytes\n");
-			sb.append("Total memory: " + Runtime.getRuntime().totalMemory() + " bytes\n");
+			getDiagText_GL(sb);
+			getDiagText_JOGL(sb);
+			getDiagText_System(sb);
 
-			for (final Map.Entry<?, ?> prop : System.getProperties().entrySet()) {
-				sb.append(prop.getKey() + " = " + prop.getValue() + "\n");
-			}
+			_txtInfo.setText(sb.toString());
+		}
 
-//			final javax.media.opengl.GL gl = GLContext.getCurrent().getGL();
+		private void getDiagText_GL(final StringBuilder sb) {
+			
+			//			final javax.media.opengl.GL gl = GLContext.getCurrent().getGL();
 
 			final GL gl = _wwCanvas.getGL();
 
-			sb.append("\nOpenGL Values\n");
-			final String oglVersion = gl.glGetString(GL.GL_VERSION);
-			sb.append("OpenGL version: " + oglVersion + "\n");
+			sb.append(UI.NEW_LINE3);
+			sb.append("OpenGL Values"); //$NON-NLS-1$
+			sb.append(UI.NEW_LINE2);
 
-			String value = "";
+			final String oglVersion = gl.glGetString(GL.GL_VERSION);
+			sb.append("OpenGL version: " + oglVersion + UI.NEW_LINE); //$NON-NLS-1$
+
+			String value = UI.EMPTY_STRING;
 			final int[] intVals = new int[1];
 			for (final Attr attr : attrs) {
 				if (attr.attr instanceof Integer) {
@@ -158,40 +161,61 @@ public class ActionHandlerWorldWindDiagnostics extends AbstractHandler {
 					value = Integer.toString(intVals[0]);
 				}
 
-				sb.append(attr.name + ": " + value + "\n");
+				sb.append(attr.name + ": " + value + UI.NEW_LINE); //$NON-NLS-1$
 			}
 
 			final String extensionString = gl.glGetString(GL.GL_EXTENSIONS);
 			if (extensionString != null) {
 
-				final String[] extensions = extensionString.split(" ");
-				sb.append("Extensions\n");
+				final String[] extensions = extensionString.split(UI.SPACE);
+				sb.append("Extensions\n"); //$NON-NLS-1$
 				for (final String ext : extensions) {
-					sb.append("    " + ext + "\n");
+					sb.append(UI.SPACE4 + ext + UI.NEW_LINE);
 				}
 			}
+		}
 
-			sb.append("\nJOGL Values\n");
-			final String pkgName = "javax.media.opengl";
+		private void getDiagText_JOGL(final StringBuilder sb) {
+			
+			sb.append(UI.NEW_LINE3);
+			sb.append("JOGL Values"); //$NON-NLS-1$
+			sb.append(UI.NEW_LINE2);
+
+			final String pkgName = "javax.media.opengl"; //$NON-NLS-1$
 			try {
-				getClass().getClassLoader().loadClass(pkgName + ".GL");
+
+				final Class<?> glClass = getClass().getClassLoader().loadClass(pkgName + ".GL"); //$NON-NLS-1$
 
 				final Package p = Package.getPackage(pkgName);
 				if (p == null) {
-					sb.append("WARNING: Package.getPackage(" + pkgName + ") is null\n");
+					sb.append("WARNING: Package.getPackage(" + pkgName + ") is null\n"); //$NON-NLS-1$ //$NON-NLS-2$
 				} else {
-					sb.append(p + "\n");
-					sb.append("Specification Title = " + p.getSpecificationTitle() + "\n");
-					sb.append("Specification Vendor = " + p.getSpecificationVendor() + "\n");
-					sb.append("Specification Version = " + p.getSpecificationVersion() + "\n");
-					sb.append("Implementation Vendor = " + p.getImplementationVendor() + "\n");
-					sb.append("Implementation Version = " + p.getImplementationVersion() + "\n");
+					sb.append(p + UI.NEW_LINE);
+					sb.append("Specification Title = " + p.getSpecificationTitle() + UI.NEW_LINE); //$NON-NLS-1$
+					sb.append("Specification Vendor = " + p.getSpecificationVendor() + UI.NEW_LINE); //$NON-NLS-1$
+					sb.append("Specification Version = " + p.getSpecificationVersion() + UI.NEW_LINE); //$NON-NLS-1$
+					sb.append("Implementation Vendor = " + p.getImplementationVendor() + UI.NEW_LINE); //$NON-NLS-1$
+					sb.append("Implementation Version = " + p.getImplementationVersion() + UI.NEW_LINE); //$NON-NLS-1$
 				}
 			} catch (final ClassNotFoundException e) {
-				sb.append("Unable to load " + pkgName + "\n");
+				sb.append("Unable to load " + pkgName + UI.NEW_LINE); //$NON-NLS-1$
 			}
+		}
 
-			_txtInfo.setText(sb.toString());
+		private void getDiagText_System(final StringBuilder sb) {
+			
+			sb.append(UI.NEW_LINE3);
+			sb.append("System Properties"); //$NON-NLS-1$
+			sb.append(UI.NEW_LINE2);
+
+			sb.append("Processors: " + Runtime.getRuntime().availableProcessors() + UI.NEW_LINE); //$NON-NLS-1$
+			sb.append("Free memory: " + Runtime.getRuntime().freeMemory() + " bytes\n"); //$NON-NLS-1$ //$NON-NLS-2$
+			sb.append("Max memory: " + Runtime.getRuntime().maxMemory() + " bytes\n"); //$NON-NLS-1$ //$NON-NLS-2$
+			sb.append("Total memory: " + Runtime.getRuntime().totalMemory() + " bytes\n"); //$NON-NLS-1$ //$NON-NLS-2$
+
+			for (final Map.Entry<?, ?> prop : System.getProperties().entrySet()) {
+				sb.append(prop.getKey() + " = " + prop.getValue() + UI.NEW_LINE);//$NON-NLS-1$
+			}
 		}
 
 		@Override

@@ -1395,7 +1395,7 @@
       <command
             id="net.tourbook.command.WorldWind.Diagnostics"
             name="%Command_WorldWind_Diagnostics"
-            defaultHandler="net.tourbook.map3.ActionHandlerWorldWindDiagnostics"
+            defaultHandler="net.tourbook.map3.action.ActionHandlerWorldWindDiagnostics"
             />
 	            
    </extension>
