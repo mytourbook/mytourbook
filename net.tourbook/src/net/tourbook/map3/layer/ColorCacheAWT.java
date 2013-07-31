@@ -24,6 +24,13 @@ public class ColorCacheAWT {
 	private TIntObjectHashMap<Color>	_colors	= new TIntObjectHashMap<Color>();
 
 	/**
+	 * Removes existing color values from the cache.
+	 */
+	public void clear() {
+		_colors.clear();
+	}
+
+	/**
 	 * @param colorValue
 	 * @return Returns the color for the <code>colorValue</code> from the color cache, color is
 	 *         created when it is not available

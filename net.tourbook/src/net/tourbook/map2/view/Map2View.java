@@ -779,9 +779,6 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 						_map.disposeTiles();
 						_map.paint();
 					}
-
-				} else if (property.equals(ITourbookPreferences.MEASUREMENT_SYSTEM)) {
-
 				}
 			}
 		};

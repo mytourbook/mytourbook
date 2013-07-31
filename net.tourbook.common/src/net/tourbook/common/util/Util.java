@@ -643,6 +643,10 @@ public class Util {
 	 */
 	public static String[] getStateArray(final IDialogSettings state, final String key, final String[] defaultValue) {
 
+		if (state == null) {
+			return defaultValue;
+		}
+
 		final String[] stateValue = state.getArray(key);
 
 		return stateValue == null ? defaultValue : stateValue;
@@ -656,10 +660,19 @@ public class Util {
 	 *         default value is returned.
 	 */
 	public static boolean getStateBoolean(final IDialogSettings state, final String key, final boolean defaultValue) {
+
+		if (state == null) {
+			return defaultValue;
+		}
+
 		return state.get(key) == null ? defaultValue : state.getBoolean(key);
 	}
 
 	public static RGB getStateColor(final IDialogSettings state, final String key, final RGB defaultRGB) {
+
+		if (state == null) {
+			return defaultRGB;
+		}
 
 		final int[] defaultValue = { defaultRGB.red, defaultRGB.green, defaultRGB.blue };
 
@@ -709,6 +722,11 @@ public class Util {
 	 *         default value is returned.
 	 */
 	public static double getStateDouble(final IDialogSettings state, final String key, final double defaultValue) {
+
+		if (state == null) {
+			return defaultValue;
+		}
+
 		try {
 			return state.get(key) == null ? defaultValue : state.getDouble(key);
 		} catch (final NumberFormatException e) {
@@ -724,6 +742,11 @@ public class Util {
 	 *         default value is returned.
 	 */
 	public static float getStateFloat(final IDialogSettings state, final String key, final float defaultValue) {
+
+		if (state == null) {
+			return defaultValue;
+		}
+
 		try {
 			return state.get(key) == null ? defaultValue : state.getFloat(key);
 		} catch (final NumberFormatException e) {
@@ -764,6 +787,11 @@ public class Util {
 	 *         default value is returned.
 	 */
 	public static int getStateInt(final IDialogSettings state, final String key, final int defaultValue) {
+
+		if (state == null) {
+			return defaultValue;
+		}
+
 		try {
 			return state.get(key) == null ? defaultValue : state.getInt(key);
 		} catch (final NumberFormatException e) {
@@ -772,6 +800,10 @@ public class Util {
 	}
 
 	public static int[] getStateIntArray(final IDialogSettings state, final String key, final int[] defaultValue) {
+
+		if (state == null) {
+			return defaultValue;
+		}
 
 		final String[] stringValues = state.getArray(key);
 
@@ -811,6 +843,11 @@ public class Util {
 	 *         default value is returned.
 	 */
 	public static long getStateLong(final IDialogSettings state, final String key, final long defaultValue) {
+
+		if (state == null) {
+			return defaultValue;
+		}
+
 		try {
 			return state.get(key) == null ? defaultValue : state.getLong(key);
 		} catch (final NumberFormatException e) {
@@ -819,6 +856,10 @@ public class Util {
 	}
 
 	public static long[] getStateLongArray(final IDialogSettings state, final String key, final long[] defaultValue) {
+
+		if (state == null) {
+			return defaultValue;
+		}
 
 		final String[] stringValues = state.getArray(key);
 
@@ -858,6 +899,10 @@ public class Util {
 	 *         default value is returned.
 	 */
 	public static String getStateString(final IDialogSettings state, final String key, final String defaultValue) {
+
+		if (state == null) {
+			return defaultValue;
+		}
 
 		final String stateValue = state.get(key);
 

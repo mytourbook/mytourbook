@@ -64,6 +64,8 @@ public class Map3Manager {
 
 	static final int								WW_DEFAULT_LAYER_ID				= 1;
 
+	public static final String						PROPERTY_NAME_ENABLED			= "Enabled";							//$NON-NLS-1$
+
 	private static final String						MAP3_LAYER_STRUCTURE_FILE_NAME	= "map3-layers.xml";					//$NON-NLS-1$
 
 	/**
@@ -153,7 +155,7 @@ public class Map3Manager {
 		_initializeMap3();
 	}
 
-	private static final class CheckStateListener implements ICheckStateListener {
+	private static final class ViewerControllerCheckStateListener implements ICheckStateListener {
 
 		ViewControlsSelectListener	_viewControlListener;
 
@@ -162,7 +164,7 @@ public class Map3Manager {
 		 */
 		int							__lastAddRemoveAction	= -1;
 
-		private CheckStateListener(final ViewControlsLayer viewControlsLayer) {
+		private ViewerControllerCheckStateListener(final ViewControlsLayer viewControlsLayer) {
 
 			_viewControlListener = new ViewControlsSelectListener(_ww, viewControlsLayer);
 		}
@@ -341,6 +343,8 @@ public class Map3Manager {
 			_uiEnabledLayersFromXml.add(tviLayer);
 		}
 
+		tviLayer.addCheckStateListener(_tourTrackLayer);
+
 		_customLayers.put(layerId, tviLayer);
 	}
 
@@ -365,7 +369,7 @@ public class Map3Manager {
 //		tviLayer.isLayerVisible = true;
 		tviLayer.defaultPosition = INSERT_BEFORE_COMPASS;
 
-		tviLayer.addCheckStateListener(new CheckStateListener(viewControlsLayer));
+		tviLayer.addCheckStateListener(new ViewerControllerCheckStateListener(viewControlsLayer));
 
 //		_uiEnabledLayersFromXml.add(tviLayer);
 
@@ -1059,6 +1063,11 @@ public class Map3Manager {
 		}
 	}
 
+	public static void redraw() {
+
+		_ww.redraw();
+	}
+
 	public static void saveState() {
 
 		_tourTrackLayer.saveState();
@@ -1088,6 +1097,36 @@ public class Map3Manager {
 		_uiEnabledLayers = enabledLayers.toArray();
 		_uiExpandedCategories = expandedElements;
 	}
+
+	/**
+	 * <pre>
+	 * //		view.set
+	 * //
+	 * //
+	 * //        BasicFlyView view = (BasicFlyView) this.wwd.getView();
+	 * //
+	 * //        // Stop iterators first
+	 * //        view.stopAnimations();
+	 * //
+	 * //        // Save current eye position
+	 * //        final Position pos = view.getEyePosition();
+	 * //
+	 * //        // Set view heading, pitch and fov
+	 * //        view.setHeading(Angle.fromDegrees(this.headingSlider.getValue()));
+	 * //        view.setPitch(Angle.fromDegrees(this.pitchSlider.getValue()));
+	 * //        view.setFieldOfView(Angle.fromDegrees(this.fovSlider.getValue()));
+	 * //        view.setRoll(Angle.fromDegrees(this.rollSlider.getValue()));
+	 * //        //view.setZoom(0);
+	 * //
+	 * //        // Restore eye position
+	 * //        view.setEyePosition(pos);
+	 * ////        System.out.println(&quot;Eye Position: &quot; + pos.latitude.toString() + &quot; , &quot; + pos.longitude.toString() + &quot;, &quot; + pos.getElevation());
+	 * ////        System.out.println(&quot;Orient: &quot; + view.getHeading() + &quot;, &quot; + view.getPitch() + &quot;, &quot; + view.getRoll() );
+	 * //
+	 * //        // Redraw
+	 * //        this.wwd.redraw();
+	 * </pre>
+	 */
 
 	/**
 	 * Ensure All custom layers are set in the ww model.
@@ -1136,36 +1175,6 @@ public class Map3Manager {
 	}
 
 	/**
-	 * <pre>
-	 * //		view.set
-	 * //
-	 * //
-	 * //        BasicFlyView view = (BasicFlyView) this.wwd.getView();
-	 * //
-	 * //        // Stop iterators first
-	 * //        view.stopAnimations();
-	 * //
-	 * //        // Save current eye position
-	 * //        final Position pos = view.getEyePosition();
-	 * //
-	 * //        // Set view heading, pitch and fov
-	 * //        view.setHeading(Angle.fromDegrees(this.headingSlider.getValue()));
-	 * //        view.setPitch(Angle.fromDegrees(this.pitchSlider.getValue()));
-	 * //        view.setFieldOfView(Angle.fromDegrees(this.fovSlider.getValue()));
-	 * //        view.setRoll(Angle.fromDegrees(this.rollSlider.getValue()));
-	 * //        //view.setZoom(0);
-	 * //
-	 * //        // Restore eye position
-	 * //        view.setEyePosition(pos);
-	 * ////        System.out.println(&quot;Eye Position: &quot; + pos.latitude.toString() + &quot; , &quot; + pos.longitude.toString() + &quot;, &quot; + pos.getElevation());
-	 * ////        System.out.println(&quot;Orient: &quot; + view.getHeading() + &quot;, &quot; + view.getPitch() + &quot;, &quot; + view.getRoll() );
-	 * //
-	 * //        // Redraw
-	 * //        this.wwd.redraw();
-	 * </pre>
-	 */
-
-	/**
 	 * @param map3PropertiesView
 	 */
 	static void setMap3PropertiesView(final Map3LayerView map3PropertiesView) {
@@ -1192,7 +1201,7 @@ public class Map3Manager {
 
 			// layer viewer is not displayed, update model
 
-			getTourTrackLayer().setEnabled(isTrackVisible);
+			_tourTrackLayer.setEnabled(isTrackVisible);
 
 		} else {
 

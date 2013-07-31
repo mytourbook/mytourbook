@@ -53,12 +53,19 @@ public class TourTrackConfig {
 			new PathType(Messages.Track_Config_Path_Type_RHumbLine, AVKey.RHUMB_LINE), //
 																		};
 
+	/**
+	 * Recreate tracks when <code>true</code>.
+	 */
 	public boolean						isRecreateTracks;
 
 	/*
 	 * Configurations which are saved in the state.
 	 */
 	public int							altitudeMode;
+
+	/**
+	 * Vertical distance in m (meter).
+	 */
 	public int							altitudeOffsetDistance;
 
 	/**
@@ -138,32 +145,69 @@ public class TourTrackConfig {
 	}
 
 	/**
-	 * Set track configuration from state, when not available set defaults
+	 * Set track configuration with default values.
+	 */
+	public void reset() {
+
+		restoreState(null);
+
+		isRecreateTracks = true;
+	}
+
+	/**
+	 * Set track configuration from state, when not available set defaults.
 	 * 
 	 * @param state
 	 */
 	private void restoreState(final IDialogSettings state) {
+//
+//		outlineWidth = Util.getStateDouble(state, STATE_OUTLINE_WIDTH, 5.0);
+//
+//		// altitude
+//		altitudeMode = getAltitudeModeValue(Util.getStateInt(state, STATE_ALTITUDE_MODE, WorldWind.CLAMP_TO_GROUND));
+//		isAbsoluteOffset = Util.getStateBoolean(state, STATE_IS_ABSOLUTE_OFFSET, false);
+//		altitudeOffsetDistance = Util.getStateInt(state, STATE_ALTITUDE_OFFSET, 0);
+//		isFollowTerrain = Util.getStateBoolean(state, STATE_IS_FOLLOW_TERRAIN, true);
+//
+//		// track position
+//		isShowTrackPosition = Util.getStateBoolean(state, STATE_IS_SHOW_TRACK_POSITION, false);
+//		trackPositionSize = Util.getStateDouble(state, STATE_TRACK_POSITION_SIZE, 2.0);
+//
+//		// curtain
+//		isExtrudePath = Util.getStateBoolean(state, STATE_IS_EXTRUDE_PATH, false);
+//		interiorColor = Util.getStateColor(state, STATE_INTERIOR_COLOR, new RGB(0xFF, 0xE3, 0x5D));
+//		interiorOpacity = Util.getStateDouble(state, STATE_INTERIOR_OPACITY, 0.5);
+//
+//		// verticals
+//		isDrawVerticals = Util.getStateBoolean(state, STATE_IS_DRAW_VERTICALS, false);
+//		outlineColor = Util.getStateColor(state, STATE_OUTLINE_COLOR, new RGB(0xFA, 0xEA, 0x9B));
+//		outlineOpacity = Util.getStateDouble(state, STATE_OUTLINE_OPACITY, 0.5);
+//
+//		// path + segments
+//		pathType = getPathTypeValue(Util.getStateString(state, STATE_PATH_TYPE, AVKey.LINEAR));
+//		numSubsegments = Util.getStateInt(state, STATE_NUMBER_OF_SUB_SEGMENTS, 0);
 
-		altitudeMode = getAltitudeModeValue(Util.getStateInt(state, STATE_ALTITUDE_MODE, WorldWind.CLAMP_TO_GROUND));
-		altitudeOffsetDistance = Util.getStateInt(state, STATE_ALTITUDE_OFFSET, 0);
+		outlineWidth = Util.getStateDouble(state, STATE_OUTLINE_WIDTH, 1.0);
 
-		isAbsoluteOffset = Util.getStateBoolean(state, STATE_IS_ABSOLUTE_OFFSET, false);
-		isDrawVerticals = Util.getStateBoolean(state, STATE_IS_DRAW_VERTICALS, false);
-		isExtrudePath = Util.getStateBoolean(state, STATE_IS_EXTRUDE_PATH, false);
+		// altitude
+		altitudeMode = getAltitudeModeValue(Util.getStateInt(state, STATE_ALTITUDE_MODE, WorldWind.ABSOLUTE));
+		isAbsoluteOffset = Util.getStateBoolean(state, STATE_IS_ABSOLUTE_OFFSET, true);
+		altitudeOffsetDistance = Util.getStateInt(state, STATE_ALTITUDE_OFFSET, 50);
 		isFollowTerrain = Util.getStateBoolean(state, STATE_IS_FOLLOW_TERRAIN, true);
 
+		// track position
+		isShowTrackPosition = Util.getStateBoolean(state, STATE_IS_SHOW_TRACK_POSITION, true);
+		trackPositionSize = Util.getStateDouble(state, STATE_TRACK_POSITION_SIZE, 5.0);
+
 		// curtain
+		isExtrudePath = Util.getStateBoolean(state, STATE_IS_EXTRUDE_PATH, true);
 		interiorColor = Util.getStateColor(state, STATE_INTERIOR_COLOR, new RGB(0xFF, 0xE3, 0x5D));
-		interiorOpacity = Util.getStateDouble(state, STATE_INTERIOR_OPACITY, 0.5);
+		interiorOpacity = Util.getStateDouble(state, STATE_INTERIOR_OPACITY, 0.0);
 
 		// verticals
-		outlineColor = Util.getStateColor(state, STATE_OUTLINE_COLOR, new RGB(0xFA, 0xEA, 0x9B));
-		outlineOpacity = Util.getStateDouble(state, STATE_OUTLINE_OPACITY, 0.5);
-		outlineWidth = Util.getStateDouble(state, STATE_OUTLINE_WIDTH, 5.0);
-
-		// track position
-		isShowTrackPosition = Util.getStateBoolean(state, STATE_IS_SHOW_TRACK_POSITION, false);
-		trackPositionSize = Util.getStateDouble(state, STATE_TRACK_POSITION_SIZE, 2.0);
+		isDrawVerticals = Util.getStateBoolean(state, STATE_IS_DRAW_VERTICALS, true);
+		outlineColor = Util.getStateColor(state, STATE_OUTLINE_COLOR, new RGB(0xFF, 0xFF, 0xFF));
+		outlineOpacity = Util.getStateDouble(state, STATE_OUTLINE_OPACITY, 0.1);
 
 		// path + segments
 		pathType = getPathTypeValue(Util.getStateString(state, STATE_PATH_TYPE, AVKey.LINEAR));

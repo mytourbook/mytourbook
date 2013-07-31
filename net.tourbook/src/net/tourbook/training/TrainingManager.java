@@ -192,7 +192,8 @@ public class TrainingManager {
 	 * 
 	 * @param tourData
 	 * @param currentPerson
-	 * @return Returns <code>true</code> when HR zones are available for the
+	 * @return Returns <code>true</code> when HR zones are available for the data (person is set in
+	 *         the data).
 	 */
 	public static boolean isRequiredHrZoneDataAvailable(final TourData tourData) {
 

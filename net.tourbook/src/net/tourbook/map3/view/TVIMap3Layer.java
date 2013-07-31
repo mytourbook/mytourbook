@@ -24,7 +24,7 @@ public class TVIMap3Layer extends TVIMap3Item {
 
 	Layer						wwLayer;
 
-	boolean						isLayerVisible;
+	public boolean				isLayerVisible;
 	boolean						isDefaultLayer;
 
 	int							defaultPosition;

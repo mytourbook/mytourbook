@@ -30,7 +30,7 @@ import net.tourbook.common.color.ILegendProvider;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.map2.view.TourMapColors;
-import net.tourbook.map3.action.ActionOpenMap3Properties;
+import net.tourbook.map3.action.ActionOpenMap3LayerView;
 import net.tourbook.map3.action.ActionShowEntireTour;
 import net.tourbook.map3.action.ActionShowTourInMap3;
 import net.tourbook.map3.action.ActionSyncMapPositionWithSlider;
@@ -70,7 +70,7 @@ import org.eclipse.ui.part.ViewPart;
  */
 public class Map3View extends ViewPart {
 
-	public static final String					ID										= "net.tourbook.map3.Map3ViewId";			//$NON-NLS-1$
+	public static final String					ID										= "net.tourbook.map3.view.Map3ViewId";		//$NON-NLS-1$
 
 	private static final String					STATE_IS_SYNC_MAP_VIEW_WITH_TOUR		= "STATE_IS_SYNC_MAP_VIEW_WITH_TOUR";		//$NON-NLS-1$
 	private static final String					STATE_IS_SYNC_MAP_POSITION_WITH_SLIDER	= "STATE_IS_SYNC_MAP_POSITION_WITH_SLIDER"; //$NON-NLS-1$
@@ -88,7 +88,7 @@ public class Map3View extends ViewPart {
 
 	private static final WorldWindowGLCanvas	_wwCanvas								= Map3Manager.getWWCanvas();
 
-	private ActionOpenMap3Properties			_actionOpenMap3Properties;
+	private ActionOpenMap3LayerView				_actionOpenMap3LayerView;
 
 	private ActionShowEntireTour				_actionShowEntireTour;
 	private ActionShowTourInMap3				_actionShowTourInMap3;
@@ -246,6 +246,10 @@ public class Map3View extends ViewPart {
 					// update map colors
 
 					updateMapColors();
+
+				} else if (property.equals(ITourbookPreferences.MEASUREMENT_SYSTEM)) {
+
+					_actionShowTourInMap3.updateMeasurementSystem();
 				}
 			}
 		};
@@ -318,7 +322,7 @@ public class Map3View extends ViewPart {
 
 	private void createActions(final Composite parent) {
 
-		_actionOpenMap3Properties = new ActionOpenMap3Properties();
+		_actionOpenMap3LayerView = new ActionOpenMap3LayerView();
 
 		_actionShowEntireTour = new ActionShowEntireTour(this);
 		_actionShowTourInMap3 = new ActionShowTourInMap3(this, parent);
@@ -442,7 +446,7 @@ public class Map3View extends ViewPart {
 
 		tbm.add(new Separator());
 
-		tbm.add(_actionOpenMap3Properties);
+		tbm.add(_actionOpenMap3LayerView);
 	}
 
 	private void onSelectionChanged(final ISelection selection) {

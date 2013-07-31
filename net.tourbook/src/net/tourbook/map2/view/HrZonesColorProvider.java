@@ -47,8 +47,7 @@ public class HrZonesColorProvider implements ILegendProviderDiscreteColors {
 		_colorId = colorId;
 	}
 
-	@Override
-	public int getColorValue(final TourData tourData, final int valueIndex, final boolean isDrawLine) {
+	private void checkHrData(final TourData tourData) {
 
 		if (tourData != _checkedTourData) {
 
@@ -63,6 +62,24 @@ public class HrZonesColorProvider implements ILegendProviderDiscreteColors {
 				_pulseData = tourData.pulseSerie;
 			}
 		}
+	}
+
+	@Override
+	public int getColorValue(final TourData tourData, final int serieIndex) {
+
+		checkHrData(tourData);
+
+		if (_isValidHrZoneData == false) {
+			return 0xFF0AE3;
+		}
+ 
+		return getHrColor(serieIndex);
+	}
+
+	@Override
+	public int getColorValue(final TourData tourData, final int valueIndex, final boolean isDrawLine) {
+
+		checkHrData(tourData);
 
 		if (_isValidHrZoneData == false) {
 			return 0xFF0AE3;
@@ -79,8 +96,12 @@ public class HrZonesColorProvider implements ILegendProviderDiscreteColors {
 				valueIndex - 1
 				: valueIndex;
 
-		final float pulse = _pulseData[adjustedValueIndex];
+		return getHrColor(adjustedValueIndex);
+	}
 
+	private int getHrColor(final int serieIndex) {
+
+		final float pulse = _pulseData[serieIndex];
 		final int zoneIndex = TrainingManager.getZoneIndex(_hrZoneContext, pulse);
 
 		final TourPersonHRZone hrZone = _personHrZones.get(zoneIndex);

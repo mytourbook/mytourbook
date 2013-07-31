@@ -1455,7 +1455,7 @@
 			category="net.tourbook.category.tour"
 			class="net.tourbook.map3.view.Map3View"
 			icon="icons/map3-view.png"
-			id="net.tourbook.map3.Map3ViewId"
+			id="net.tourbook.map3.view.Map3ViewId"
 			name="%View_Name_TourMap3"
 		/>
    

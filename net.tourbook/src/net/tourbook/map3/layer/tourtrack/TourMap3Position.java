@@ -24,7 +24,9 @@ public class TourMap3Position extends Position {
 	 * Contains the value from the data serie which is painted in the map, this can be altitude,
 	 * pulse, ...
 	 */
-	float	dataSerieValue;
+	float		dataSerieValue;
+
+	public int	colorValue;
 
 	public TourMap3Position(final LatLon fromDegrees, final float alti, final float dataSerieValue) {
 

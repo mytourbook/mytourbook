@@ -16,6 +16,9 @@
 package net.tourbook.map3.layer.tourtrack;
 
 import gov.nasa.worldwind.WorldWind;
+import gov.nasa.worldwind.awt.WorldWindowGLCanvas;
+import gov.nasa.worldwind.event.SelectEvent;
+import gov.nasa.worldwind.event.SelectListener;
 import gov.nasa.worldwind.geom.LatLon;
 import gov.nasa.worldwind.layers.RenderableLayer;
 import gov.nasa.worldwind.render.BasicShapeAttributes;
@@ -31,30 +34,38 @@ import java.util.ArrayList;
 import net.tourbook.common.UI;
 import net.tourbook.common.color.ILegendProvider;
 import net.tourbook.data.TourData;
+import net.tourbook.map2.view.ILegendProviderDiscreteColors;
 import net.tourbook.map3.Messages;
+import net.tourbook.map3.view.ICheckStateListener;
 import net.tourbook.map3.view.Map3Manager;
+import net.tourbook.map3.view.TVIMap3Layer;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.swt.graphics.RGB;
 
 /**
  */
-public class TourTrackLayerWithPaths extends RenderableLayer {
+public class TourTrackLayerWithPaths extends RenderableLayer implements SelectListener, ICheckStateListener {
 
-	public static final String			MAP3_LAYER_ID	= "TourTrackLayer"; //$NON-NLS-1$
+	public static final String			MAP3_LAYER_ID			= "TourTrackLayer"; //$NON-NLS-1$
 
 	private IDialogSettings				_state;
 
 	private final TourPositionColors	_tourPositionColors;
+	private ILegendProvider				_colorProvider;
 
 	private final TourTrackConfig		_trackConfig;
+
+	/**
+	 * This flag keeps track of adding/removing the listener that it is not done more than once.
+	 */
+	private int							_lastAddRemoveAction	= -1;
 
 	public TourTrackLayerWithPaths(final IDialogSettings state) {
 
 		_state = state;
 
 		_trackConfig = new TourTrackConfig(state);
-
 		_tourPositionColors = new TourPositionColors();
 
 		addPropertyChangeListener(this);
@@ -112,14 +123,26 @@ public class TourTrackLayerWithPaths extends RenderableLayer {
 					dataSerieValue = dataSerie[serieIndex];
 				}
 
-				trackPositions.add(new TourMap3Position(LatLon.fromDegrees(lat, lon), altitude, dataSerieValue));
+				final TourMap3Position trackPosition = new TourMap3Position(
+						LatLon.fromDegrees(lat, lon),
+						altitude,
+						dataSerieValue);
+
+				if (_colorProvider instanceof ILegendProviderDiscreteColors) {
+
+					final ILegendProviderDiscreteColors discreteColorProvider = (ILegendProviderDiscreteColors) _colorProvider;
+
+					trackPosition.colorValue = discreteColorProvider.getColorValue(tourData, serieIndex);
+				}
+
+				trackPositions.add(trackPosition);
 			}
 
 			/*
 			 * create one path for each tour
 			 */
 //			final MultiResolutionPath tourPath = new MTMultiResPath(positions);
-			final PathWithTour tourPath = new PathWithTour(trackPositions);
+			final PathWithTour tourPath = new PathWithTour(trackPositions, _colorProvider);
 
 			setPathAttributes(tourPath);
 
@@ -158,7 +181,7 @@ public class TourTrackLayerWithPaths extends RenderableLayer {
 
 		switch (colorProvider.getTourColorId()) {
 		case ILegendProvider.TOUR_COLOR_ALTITUDE:
-			return tourData.getAltitudeSerie();
+			return tourData.altitudeSerie;
 
 		case ILegendProvider.TOUR_COLOR_GRADIENT:
 			return tourData.getGradientSerie();
@@ -176,7 +199,7 @@ public class TourTrackLayerWithPaths extends RenderableLayer {
 			return tourData.pulseSerie;
 
 		default:
-			return tourData.getAltitudeSerie();
+			return tourData.altitudeSerie;
 		}
 	}
 
@@ -207,13 +230,28 @@ public class TourTrackLayerWithPaths extends RenderableLayer {
 	}
 
 	@Override
-	public void propertyChange(final PropertyChangeEvent evt) {
+	public void onSetCheckState(final TVIMap3Layer tviMap3Layer) {
+
+		setupWWSelectionListener(tviMap3Layer.isLayerVisible);
+	}
+
+	@Override
+	public void propertyChange(final PropertyChangeEvent propEvent) {
 
 		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] \t")
-				+ evt.getPropertyName()
+				+ propEvent.getPropertyName()
 				+ " \t"
-				+ evt);
+				+ propEvent);
 		// TODO remove SYSTEM.OUT
+
+		if (propEvent.getPropertyName().equals(Map3Manager.PROPERTY_NAME_ENABLED)) {
+
+			// layer is set to visible/hidden
+
+			final boolean isLayerVisible = propEvent.getNewValue().equals(UI.BOOLEAN_TRUE);
+
+			setupWWSelectionListener(isLayerVisible);
+		}
 	}
 
 	public void saveState() {
@@ -221,9 +259,19 @@ public class TourTrackLayerWithPaths extends RenderableLayer {
 		_trackConfig.saveState(_state);
 	}
 
-	public void setColorProvider(final ILegendProvider legendProvider) {
+	@Override
+	public void selected(final SelectEvent event) {
 
-		_tourPositionColors.setColorProvider(legendProvider);
+		System.out.println(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] \t" + event);
+		// TODO remove SYSTEM.OUT.PRINTLN
+
+	}
+
+	public void setColorProvider(final ILegendProvider colorProvider) {
+
+		_colorProvider = colorProvider;
+
+		_tourPositionColors.setColorProvider(colorProvider);
 	}
 
 	/**
@@ -281,8 +329,31 @@ public class TourTrackLayerWithPaths extends RenderableLayer {
 		path.setAttributes(shapeAttrs);
 	}
 
+	private void setupWWSelectionListener(final boolean isLayerVisible) {
+
+		final WorldWindowGLCanvas ww = Map3Manager.getWWCanvas();
+
+		if (isLayerVisible) {
+
+			if (_lastAddRemoveAction != 1) {
+
+				_lastAddRemoveAction = 1;
+				ww.addSelectListener(this);
+			}
+
+		} else {
+
+			if (_lastAddRemoveAction != 0) {
+
+				_lastAddRemoveAction = 0;
+				ww.removeSelectListener(this);
+			}
+		}
+	}
+
 	public void updateColors(final ArrayList<TourData> allTours) {
 
 		_tourPositionColors.updateColors(allTours);
 	}
+
 }

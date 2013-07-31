@@ -21,13 +21,20 @@ import gov.nasa.worldwind.render.Path;
 import java.awt.Color;
 import java.util.ArrayList;
 
+import net.tourbook.common.color.ILegendProvider;
+import net.tourbook.common.color.ILegendProviderGradientColors;
+import net.tourbook.map2.view.ILegendProviderDiscreteColors;
+
 public class PathWithTour extends Path {
 
 	private TourMap3Position[]	_trackPositions;
+	private ILegendProvider		_colorProvider;
 
-	public PathWithTour(final ArrayList<TourMap3Position> trackPositions) {
+	public PathWithTour(final ArrayList<TourMap3Position> trackPositions, final ILegendProvider colorProvider) {
 
 		super(trackPositions);
+
+		_colorProvider = colorProvider;
 
 		_trackPositions = trackPositions.toArray(new TourMap3Position[trackPositions.size()]);
 	}
@@ -38,9 +45,18 @@ public class PathWithTour extends Path {
 		if (positionColors instanceof TourPositionColors) {
 
 			final TourPositionColors tourPosColors = (TourPositionColors) positionColors;
-			final float dataSerieValue = _trackPositions[ordinal].dataSerieValue;
 
-			return tourPosColors.getColor(dataSerieValue);
+			final TourMap3Position trackPosition = _trackPositions[ordinal];
+
+			if (_colorProvider instanceof ILegendProviderGradientColors) {
+
+				return tourPosColors.getColor(trackPosition.dataSerieValue);
+
+			} else if (_colorProvider instanceof ILegendProviderDiscreteColors) {
+
+				return tourPosColors.getColorFromColorValue(trackPosition.colorValue);
+			}
+
 		}
 
 		return Color.CYAN;

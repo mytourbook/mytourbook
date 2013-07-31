@@ -62,9 +62,15 @@ class TourPositionColors implements Path.PositionColors {
 
 	public Color getColor(final Position position, final int ordinal) {
 
-		final double altitude = position.getAltitude();
+//		final double altitude = position.getAltitude();
+//
+//		return getColor((float) altitude);
 
-		return getColor((float) altitude);
+		return Color.RED;
+	}
+
+	public Color getColorFromColorValue(final int colorValue) {
+		return _awtColorCache.get(colorValue);
 	}
 
 	ILegendProvider getColorProvider() {
@@ -74,6 +80,8 @@ class TourPositionColors implements Path.PositionColors {
 	void setColorProvider(final ILegendProvider legendProvider) {
 
 		_colorProvider = legendProvider;
+
+		_awtColorCache.clear();
 	}
 
 	void updateColors(final ArrayList<TourData> allTours) {

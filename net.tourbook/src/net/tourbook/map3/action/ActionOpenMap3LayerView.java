@@ -22,9 +22,9 @@ import net.tourbook.map3.view.Map3LayerView;
 
 import org.eclipse.jface.action.Action;
 
-public class ActionOpenMap3Properties extends Action {
+public class ActionOpenMap3LayerView extends Action {
 
-	public ActionOpenMap3Properties() {
+	public ActionOpenMap3LayerView() {
 
 		setText(Messages.Map3_Action_OpenMap3PropertiesView);
 		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image_Map3_Map3PropertiesView));

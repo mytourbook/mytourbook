@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -13,13 +13,14 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-
 package net.tourbook.map2.view;
 
 import net.tourbook.common.color.ILegendProvider;
 import net.tourbook.data.TourData;
 
 public interface ILegendProviderDiscreteColors extends ILegendProvider {
+
+	abstract int getColorValue(TourData tourData, int serieIndex);
 
 	/**
 	 * @param tourData

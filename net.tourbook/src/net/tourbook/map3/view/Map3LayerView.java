@@ -60,7 +60,7 @@ public class Map3LayerView extends ViewPart {
 
 	private IPartListener2				_partListener;
 
-	private DialogPropertyViewerToolTip		_propToolTip;
+	private DialogPropertyViewerToolTip	_propToolTip;
 
 	private class PropertiesContentProvider implements ITreeContentProvider {
 
@@ -340,7 +340,7 @@ public class Map3LayerView extends ViewPart {
 
 			// redraw map
 			if (isMapModified) {
-				Map3Manager.getWWCanvas().redraw();
+				Map3Manager.redraw();
 			}
 
 		}
@@ -451,7 +451,7 @@ public class Map3LayerView extends ViewPart {
 		tviLayer.onSetCheckState();
 
 		// redraw map
-		Map3Manager.getWWCanvas().redraw();
+		Map3Manager.redraw();
 
 		// update tooltip
 		_propToolTip.setLayerVisibility(tviLayer, isUpdateTooltip);

@@ -20,7 +20,7 @@ package net.tourbook.application;
  */
 public interface IExternalIds {
 
-	public static final String	VIEW_ID_NET_TOURBOOK_MAP3_MAP3_VIEW_ID		= "net.tourbook.map3.Map3ViewId";		//$NON-NLS-1$
+	public static final String	VIEW_ID_NET_TOURBOOK_MAP3_MAP3_VIEW_ID		= "net.tourbook.map3.view.Map3ViewId";	//$NON-NLS-1$
 	public static final String	VIEW_ID_NET_TOURBOOK_MAP3_MAP3_LAYER_VIEW	= "net.tourbook.map3.Map3LayerView";	//$NON-NLS-1$
 
 }

@@ -43,7 +43,7 @@ public class ActionShowTourInMap3 extends ContributionItem {
 
 	private Map3View				_map3View;
 
-	private DialogTourTrackConfig	_trackLayerProperties;
+	private DialogTourTrackConfig	_trackLayerPropertiesDialog;
 
 	private ToolBar					_toolBar;
 	private ToolItem				_actionTrackLayer;
@@ -123,7 +123,7 @@ public class ActionShowTourInMap3 extends ContributionItem {
 				}
 			});
 
-			_trackLayerProperties = new DialogTourTrackConfig(_parent, _toolBar);
+			_trackLayerPropertiesDialog = new DialogTourTrackConfig(_parent, _toolBar);
 		}
 	}
 
@@ -159,7 +159,7 @@ public class ActionShowTourInMap3 extends ContributionItem {
 			itemBounds.y = itemDisplayPosition.y;
 		}
 
-		_trackLayerProperties.open(itemBounds, true);
+		_trackLayerPropertiesDialog.open(itemBounds, true);
 	}
 
 	private void onSelect() {
@@ -180,11 +180,11 @@ public class ActionShowTourInMap3 extends ContributionItem {
 			itemBounds.x = itemDisplayPosition.x;
 			itemBounds.y = itemDisplayPosition.y;
 
-			_trackLayerProperties.open(itemBounds, false);
+			_trackLayerPropertiesDialog.open(itemBounds, false);
 
 		} else {
 
-			_trackLayerProperties.close();
+			_trackLayerPropertiesDialog.close();
 		}
 
 		_map3View.actionShowTour(isTrackVisible);
@@ -216,6 +216,15 @@ public class ActionShowTourInMap3 extends ContributionItem {
 
 			_actionTrackLayer.setEnabled(isEnabled);
 		}
+	}
+
+	public void updateMeasurementSystem() {
+
+		if (_trackLayerPropertiesDialog == null) {
+			return;
+		}
+		
+		_trackLayerPropertiesDialog.updateMeasurementSystem();
 	}
 
 	private void updateUI() {

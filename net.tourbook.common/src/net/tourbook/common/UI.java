@@ -146,6 +146,8 @@ public class UI {
 
 	public static final Charset			UTF8_CHARSET							= Charset.forName("UTF-8");												//$NON-NLS-1$
 
+	public static final String			BOOLEAN_TRUE							= Boolean.toString(Boolean.TRUE);
+
 	public static final String			MENU_SEPARATOR_ADDITIONS				= "additions";																//$NON-NLS-1$
 
 	/**

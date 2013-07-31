@@ -30,6 +30,10 @@ import gov.nasa.worldwind.view.orbit.OrbitViewInputHandler;
 
 import java.util.List;
 
+import net.tourbook.common.util.StatusUtil;
+
+import org.eclipse.swt.widgets.Display;
+
 /*
  * Original implementation (18.7.2013) gov.nasa.worldwindx.examples.KeepingObjectsInView.ViewController
  * Original implementation (21.7.2013) gov.nasa.worldwindx.examples.kml.KMLViewController
@@ -56,7 +60,6 @@ public abstract class Map3ViewController {
 
 	/** WorldWindow that holds the view to animate. */
 	protected WorldWindow		wwd;
-
 
 	/**
 	 * Create the view controller.
@@ -134,6 +137,37 @@ public abstract class Map3ViewController {
 	public void goToDefaultView(final List<? extends Position> positions) {
 
 		final View view = this.wwd.getView();
+		final Globe globe = view.getGlobe();
+
+		if (globe == null) {
+
+			/*
+			 * this happenes when a tour is selected and the 3d map is not yet opened but is being
+			 * opened with an action button
+			 */
+			StatusUtil.logInfo("globe == null");
+
+			// try again
+			Display.getCurrent().timerExec(200, new Runnable() {
+				public void run() {
+					gotoView(positions);
+				}
+			});
+
+			return;
+		}
+
+		gotoView(positions);
+	}
+
+	private void gotoView(final List<? extends Position> positions) {
+
+		final View view = this.wwd.getView();
+		final Globe globe = view.getGlobe();
+
+		if (globe == null) {
+			return;
+		}
 
 		final BasicOrbitView orbitView = (BasicOrbitView) view;
 
@@ -148,7 +182,7 @@ public abstract class Map3ViewController {
 			// Compute the sector that bounds all of the points in the list. Move the view so that this entire
 			// sector is visible.
 			final Sector sector = Sector.boundingSector(positions);
-			final Globe globe = view.getGlobe();
+
 			final double ve = this.wwd.getSceneController().getVerticalExaggeration();
 
 			// Find the highest point in the geometry. Make sure that our bounding cylinder encloses this point.
