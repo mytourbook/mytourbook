@@ -18,14 +18,11 @@ package net.tourbook.map3.view;
 import gov.nasa.worldwind.View;
 import gov.nasa.worldwind.avlist.AVKey;
 import gov.nasa.worldwind.awt.WorldWindowGLCanvas;
-import gov.nasa.worldwind.event.RenderingEvent;
-import gov.nasa.worldwind.event.RenderingListener;
 
 import java.awt.BorderLayout;
 import java.util.ArrayList;
 
 import net.tourbook.application.TourbookPlugin;
-import net.tourbook.common.UI;
 import net.tourbook.common.color.ILegendProvider;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
@@ -166,21 +163,21 @@ public class Map3View extends ViewPart {
 	private void addMap3Listener() {
 
 		// Register a rendering listener that's notified when exceptions occur during rendering.
-		_wwCanvas.addRenderingListener(new RenderingListener() {
-
-			@Override
-			public void stageChanged(final RenderingEvent event) {
-
-				Display.getDefault().asyncExec(new Runnable() {
-					public void run() {
-
-						System.out.println(UI.timeStampNano() + " is rendered: " + _renderCounter++);
-						// TODO remove SYSTEM.OUT.PRINTLN
-
-					}
-				});
-			}
-		});
+//		_wwCanvas.addRenderingListener(new RenderingListener() {
+//
+//			@Override
+//			public void stageChanged(final RenderingEvent event) {
+//
+//				Display.getDefault().asyncExec(new Runnable() {
+//					public void run() {
+//
+//						System.out.println(UI.timeStampNano() + " is rendered: " + _renderCounter++);
+//						// TODO remove SYSTEM.OUT.PRINTLN
+//
+//					}
+//				});
+//			}
+//		});
 	}
 
 	private void addPartListener() {
@@ -387,6 +384,8 @@ public class Map3View extends ViewPart {
 
 			awtFrame.add(awtPanel);
 			awtPanel.add(_wwCanvas, BorderLayout.CENTER);
+
+			// set context menu with net.tourbook.common.util.SWTPopupOverAWT
 		}
 
 		parent.layout();

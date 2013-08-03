@@ -19,7 +19,6 @@ import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.map2.Messages;
 import net.tourbook.map3.view.DialogTourTrackConfig;
-import net.tourbook.map3.view.Map3Manager;
 import net.tourbook.map3.view.Map3View;
 
 import org.eclipse.jface.action.ContributionItem;
@@ -124,6 +123,8 @@ public class ActionShowTourInMap3 extends ContributionItem {
 			});
 
 			_trackLayerPropertiesDialog = new DialogTourTrackConfig(_parent, _toolBar);
+
+			updateUI_Tooltip();
 		}
 	}
 
@@ -164,7 +165,7 @@ public class ActionShowTourInMap3 extends ContributionItem {
 
 	private void onSelect() {
 
-		updateUI();
+		updateUI_Tooltip();
 
 		final boolean isTrackVisible = _actionTrackLayer.getSelection();
 
@@ -190,13 +191,6 @@ public class ActionShowTourInMap3 extends ContributionItem {
 		_map3View.actionShowTour(isTrackVisible);
 	}
 
-	void restoreState() {
-
-		_actionTrackLayer.setSelection(Map3Manager.getTourTrackLayer().isEnabled());
-
-		updateUI();
-	}
-
 	/**
 	 * Set enable/disable and selection for this action.
 	 * 
@@ -213,9 +207,10 @@ public class ActionShowTourInMap3 extends ContributionItem {
 		} else {
 
 			_actionTrackLayer.setSelection(isSelected);
-
 			_actionTrackLayer.setEnabled(isEnabled);
 		}
+
+		updateUI_Tooltip();
 	}
 
 	public void updateMeasurementSystem() {
@@ -223,11 +218,11 @@ public class ActionShowTourInMap3 extends ContributionItem {
 		if (_trackLayerPropertiesDialog == null) {
 			return;
 		}
-		
+
 		_trackLayerPropertiesDialog.updateMeasurementSystem();
 	}
 
-	private void updateUI() {
+	private void updateUI_Tooltip() {
 
 		if (_actionTrackLayer.getSelection()) {
 

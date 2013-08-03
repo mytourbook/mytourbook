@@ -15,9 +15,6 @@
  *******************************************************************************/
 package net.tourbook.map3.layer.tourtrack;
 
-import gov.nasa.worldwind.geom.Position;
-import gov.nasa.worldwind.render.Path;
-
 import java.awt.Color;
 import java.util.ArrayList;
 
@@ -33,15 +30,13 @@ import net.tourbook.map2.Messages;
 import net.tourbook.map3.layer.ColorCacheAWT;
 import net.tourbook.map3.layer.Map3Colors;
 
-class TourPositionColors implements Path.PositionColors {
+class TourColors {
 
 	private final ColorCacheAWT	_awtColorCache	= new ColorCacheAWT();
 
 	private ILegendProvider		_colorProvider	= Map3Colors.getColorProvider(ILegendProvider.TOUR_COLOR_ALTITUDE);
 
-	public Color getColor(final float graphValue) {
-
-		// Color the positions based on their altitude.
+	public Color getColor(final float graphValue, final Integer positionIndex) {
 
 		int colorValue = -1;
 
@@ -53,20 +48,17 @@ class TourPositionColors implements Path.PositionColors {
 		}
 
 		if (colorValue == -1) {
-			// set ugly default value
+			// set ugly default value, this case should not happen
 			return Color.MAGENTA;
 		}
 
-		return _awtColorCache.get(colorValue);
-	}
-
-	public Color getColor(final Position position, final int ordinal) {
-
-//		final double altitude = position.getAltitude();
+//		if (isHighlight) {
 //
-//		return getColor((float) altitude);
+//			// create invers color
+//			colorValue = 0xffffff - colorValue;
+//		}
 
-		return Color.RED;
+		return _awtColorCache.get(colorValue);
 	}
 
 	public Color getColorFromColorValue(final int colorValue) {

@@ -51,7 +51,7 @@ public class TourTrackLayerWithPaths extends RenderableLayer implements SelectLi
 
 	private IDialogSettings				_state;
 
-	private final TourPositionColors	_tourPositionColors;
+	private final TourColors	_tourPositionColors;
 	private ILegendProvider				_colorProvider;
 
 	private final TourTrackConfig		_trackConfig;
@@ -66,7 +66,7 @@ public class TourTrackLayerWithPaths extends RenderableLayer implements SelectLi
 		_state = state;
 
 		_trackConfig = new TourTrackConfig(state);
-		_tourPositionColors = new TourPositionColors();
+		_tourPositionColors = new TourColors();
 
 		addPropertyChangeListener(this);
 	}
@@ -142,7 +142,7 @@ public class TourTrackLayerWithPaths extends RenderableLayer implements SelectLi
 			 * create one path for each tour
 			 */
 //			final MultiResolutionPath tourPath = new MTMultiResPath(positions);
-			final PathWithTour tourPath = new PathWithTour(trackPositions, _colorProvider);
+			final TourTrackPath tourPath = new TourTrackPath(tourData, trackPositions, _colorProvider);
 
 			setPathAttributes(tourPath);
 
@@ -208,6 +208,7 @@ public class TourTrackLayerWithPaths extends RenderableLayer implements SelectLi
 		return Messages.TourTrack_Layer_Name;
 	}
 
+
 	public void onModifyConfig() {
 
 		if (_trackConfig.isRecreateTracks) {
@@ -248,7 +249,7 @@ public class TourTrackLayerWithPaths extends RenderableLayer implements SelectLi
 
 			// layer is set to visible/hidden
 
-			final boolean isLayerVisible = propEvent.getNewValue().equals(UI.BOOLEAN_TRUE);
+			final boolean isLayerVisible = propEvent.getNewValue().equals(Boolean.TRUE);
 
 			setupWWSelectionListener(isLayerVisible);
 		}
@@ -259,12 +260,48 @@ public class TourTrackLayerWithPaths extends RenderableLayer implements SelectLi
 		_trackConfig.saveState(_state);
 	}
 
+	/**
+	 * This listener is set in
+	 * net.tourbook.map3.layer.tourtrack.TourTrackLayerWithPaths.setupWWSelectionListener(boolean)
+	 * <p>
+	 * (non-Javadoc)
+	 * 
+	 * @see gov.nasa.worldwind.event.SelectListener#selected(gov.nasa.worldwind.event.SelectEvent)
+	 */
 	@Override
 	public void selected(final SelectEvent event) {
-
-		System.out.println(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] \t" + event);
-		// TODO remove SYSTEM.OUT.PRINTLN
-
+//
+//		if (event.getMouseEvent() != null && event.getMouseEvent().isConsumed()) {
+//			return;
+//		}
+//
+//		final PickedObject topPickedObject = event.getTopPickedObject();
+//
+//		final String topObjectText = topPickedObject == null ? "null" : topPickedObject.getClass().getSimpleName();
+//
+//		final StringBuilder sb = new StringBuilder();
+//		sb.append(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] \t");
+//		sb.append("topObject: " + topObjectText);
+//
+//		if (topPickedObject != null && topPickedObject.getObject() instanceof TourTrackPath) {
+//
+//			final TourTrackPath tourPath = (TourTrackPath) topPickedObject.getObject();
+//
+//			final Object pickOrdinal = topPickedObject.getValue(AVKey.ORDINAL);
+//			final Integer pickIndex = (Integer) pickOrdinal;
+//
+//			sb.append("\tpickIndex: " + pickIndex);
+//			sb.append("\t" + tourPath);
+//
+////			_tourPositionColors.highlight();
+//
+//		} else {
+//
+//			// dehighlight
+//		}
+//
+//		System.out.println(sb.toString());
+//		// TODO remove SYSTEM.OUT.PRINTLN
 	}
 
 	public void setColorProvider(final ILegendProvider colorProvider) {
@@ -305,7 +342,7 @@ public class TourTrackLayerWithPaths extends RenderableLayer implements SelectLi
 		path.setNumSubsegments(_trackConfig.numSubsegments);
 
 		// Show how to make the colors vary along the paths.
-		path.setPositionColors(_tourPositionColors);
+//		path.setPositionColors(_tourPositionColors);
 
 		/*
 		 * Create attributes for the Path.
@@ -339,6 +376,13 @@ public class TourTrackLayerWithPaths extends RenderableLayer implements SelectLi
 
 				_lastAddRemoveAction = 1;
 				ww.addSelectListener(this);
+
+				System.out.println(UI.timeStampNano()
+						+ " ["
+						+ getClass().getSimpleName()
+						+ "] \tsetupWWSelectionListener\tadd");
+				// TODO remove SYSTEM.OUT.PRINTLN
+
 			}
 
 		} else {
@@ -347,6 +391,12 @@ public class TourTrackLayerWithPaths extends RenderableLayer implements SelectLi
 
 				_lastAddRemoveAction = 0;
 				ww.removeSelectListener(this);
+
+				System.out.println(UI.timeStampNano()
+						+ " ["
+						+ getClass().getSimpleName()
+						+ "] \tsetupWWSelectionListener\tremove");
+				// TODO remove SYSTEM.OUT.PRINTLN
 			}
 		}
 	}

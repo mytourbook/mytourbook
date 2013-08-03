@@ -40,7 +40,6 @@ import org.eclipse.swt.events.MouseTrackAdapter;
 import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Button;
@@ -75,7 +74,6 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 	/*
 	 * UI resources
 	 */
-	private Font					_boldFont;
 
 	/*
 	 * UI controls
@@ -123,8 +121,6 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 	public DialogTourTrackConfig(final Control ownerControl, final ToolBar toolBar) {
 
 		super(ownerControl);
-
-		_boldFont = JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT);
 
 		addListener(ownerControl, toolBar);
 
@@ -217,7 +213,7 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 //			container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
 			{
 				createUI_000_Title(container);
-				createUI_100_Outline(container);
+				createUI_100_LineWidth(container);
 				createUI_200_Altitude(container);
 				createUI_300_TrackPosition(container);
 				createUI_400_ExtrudePath(container);
@@ -234,15 +230,13 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 		GridDataFactory.fillDefaults()//
 				.grab(true, false)
 				.span(2, 1)
-//						.align(SWT.FILL, SWT.CENTER)
 				.applyTo(title);
-//		title.setFont(_boldFont);
 		title.setFont(JFaceResources.getBannerFont());
 
 		title.setText(Messages.TourTrack_Properties_Label_DialogTitle);
 	}
 
-	private void createUI_100_Outline(final Composite parent) {
+	private void createUI_100_LineWidth(final Composite parent) {
 		{
 			/*
 			 * label: Outline width

@@ -205,18 +205,7 @@ public class GradientColorProvider implements ILegendProviderGradientColors {
 	}
 
 	@Override
-	public int getColorValue(final float legendValue) {
-//		return getLegendColor(_legendConfig, _legendColor, legendValue);
-//	}
-//
-//	/**
-//	 * @param legendConfig
-//	 * @param legendColor
-//	 * @param legendValue
-//	 * @param device
-//	 * @return Returns a {@link Color} which corresponst to the legend value
-//	 */
-//	private int getLegendColor(final LegendConfig legendConfig, final LegendColor legendColor, final float legendValue) {
+	public int getColorValue(final float graphValue) {
 
 		int red = 0;
 		int green = 0;
@@ -236,10 +225,10 @@ public class GradientColorProvider implements ILegendProviderGradientColors {
 		for (final ValueColor valueColor2 : valueColors) {
 
 			valueColor = valueColor2;
-			if (legendValue > valueColor.value) {
+			if (graphValue > valueColor.value) {
 				minValueColor = valueColor;
 			}
-			if (legendValue <= valueColor.value) {
+			if (graphValue <= valueColor.value) {
 				maxValueColor = valueColor;
 			}
 
@@ -260,7 +249,7 @@ public class GradientColorProvider implements ILegendProviderGradientColors {
 			final float minValue = valueColor.value;
 			final float minDiff = _legendConfig.legendMinValue - minValue;
 
-			final float ratio = minDiff == 0 ? 1 : (legendValue - minValue) / minDiff;
+			final float ratio = minDiff == 0 ? 1 : (graphValue - minValue) / minDiff;
 			final float dimmRatio = minBrightnessFactor * ratio;
 
 			if (_legendColor.minBrightness == LegendColor.BRIGHTNESS_DIMMING) {
@@ -288,7 +277,7 @@ public class GradientColorProvider implements ILegendProviderGradientColors {
 			final float maxValue = valueColor.value;
 			final float maxDiff = _legendConfig.legendMaxValue - maxValue;
 
-			final float ratio = maxDiff == 0 ? 1 : (legendValue - maxValue) / maxDiff;
+			final float ratio = maxDiff == 0 ? 1 : (graphValue - maxValue) / maxDiff;
 			final float dimmRatio = maxBrightnessFactor * ratio;
 
 			if (_legendColor.maxBrightness == LegendColor.BRIGHTNESS_DIMMING) {
@@ -319,7 +308,7 @@ public class GradientColorProvider implements ILegendProviderGradientColors {
 			final int blueDiff = maxValueColor.blue - minBlue;
 
 			final float ratioDiff = maxValue - minValue;
-			final float ratio = ratioDiff == 0 ? 1 : (legendValue - minValue) / (ratioDiff);
+			final float ratio = ratioDiff == 0 ? 1 : (graphValue - minValue) / (ratioDiff);
 
 			red = (int) (minRed + redDiff * ratio);
 			green = (int) (minGreen + greenDiff * ratio);

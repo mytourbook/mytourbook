@@ -23,34 +23,41 @@ import java.util.ArrayList;
 
 import net.tourbook.common.color.ILegendProvider;
 import net.tourbook.common.color.ILegendProviderGradientColors;
+import net.tourbook.data.TourData;
 import net.tourbook.map2.view.ILegendProviderDiscreteColors;
 
-public class PathWithTour extends Path {
+public class TourTrackPath extends Path {
 
+	private TourData			_tourData;
 	private TourMap3Position[]	_trackPositions;
 	private ILegendProvider		_colorProvider;
 
-	public PathWithTour(final ArrayList<TourMap3Position> trackPositions, final ILegendProvider colorProvider) {
+	private boolean				_isHighlight;
+	private int					_highlightPickIndex;
+
+	public TourTrackPath(final TourData tourData,
+						final ArrayList<TourMap3Position> trackPositions,
+						final ILegendProvider colorProvider) {
 
 		super(trackPositions);
 
-		_colorProvider = colorProvider;
-
+		_tourData = tourData;
 		_trackPositions = trackPositions.toArray(new TourMap3Position[trackPositions.size()]);
+		_colorProvider = colorProvider;
 	}
 
 	@Override
 	protected Color getColor(final Position pos, final Integer ordinal) {
 
-		if (positionColors instanceof TourPositionColors) {
+		if (positionColors instanceof TourColors) {
 
-			final TourPositionColors tourPosColors = (TourPositionColors) positionColors;
+			final TourColors tourPosColors = (TourColors) positionColors;
 
 			final TourMap3Position trackPosition = _trackPositions[ordinal];
 
 			if (_colorProvider instanceof ILegendProviderGradientColors) {
 
-				return tourPosColors.getColor(trackPosition.dataSerieValue);
+				return tourPosColors.getColor(trackPosition.dataSerieValue, ordinal);
 
 			} else if (_colorProvider instanceof ILegendProviderDiscreteColors) {
 
@@ -60,6 +67,16 @@ public class PathWithTour extends Path {
 		}
 
 		return Color.CYAN;
+	}
+
+	TourMap3Position[] getTrackPositions() {
+		return _trackPositions;
+	}
+
+	@Override
+	public String toString() {
+
+		return this.getClass().getSimpleName() + ("\t" + _tourData) + ("\tTrack positions: " + _trackPositions.length);
 	}
 
 }
