@@ -16,12 +16,15 @@
 package net.tourbook.map3.layer.tourtrack;
 
 import gov.nasa.worldwind.WorldWind;
+import gov.nasa.worldwind.avlist.AVKey;
 import gov.nasa.worldwind.awt.WorldWindowGLCanvas;
 import gov.nasa.worldwind.event.SelectEvent;
 import gov.nasa.worldwind.event.SelectListener;
 import gov.nasa.worldwind.geom.LatLon;
 import gov.nasa.worldwind.layers.RenderableLayer;
+import gov.nasa.worldwind.pick.PickedObject;
 import gov.nasa.worldwind.render.BasicShapeAttributes;
+import gov.nasa.worldwind.render.Highlightable;
 import gov.nasa.worldwind.render.Material;
 import gov.nasa.worldwind.render.Path;
 import gov.nasa.worldwind.render.Renderable;
@@ -51,10 +54,13 @@ public class TourTrackLayerWithPaths extends RenderableLayer implements SelectLi
 
 	private IDialogSettings				_state;
 
-	private final TourColors	_tourPositionColors;
+	private final TourPositionColors	_tourPositionColors;
 	private ILegendProvider				_colorProvider;
 
 	private final TourTrackConfig		_trackConfig;
+
+	private TourTrackPath				_lastPickedTourTrack;
+	private Integer						_lastPickPositionIndex;
 
 	/**
 	 * This flag keeps track of adding/removing the listener that it is not done more than once.
@@ -66,7 +72,7 @@ public class TourTrackLayerWithPaths extends RenderableLayer implements SelectLi
 		_state = state;
 
 		_trackConfig = new TourTrackConfig(state);
-		_tourPositionColors = new TourColors();
+		_tourPositionColors = new TourPositionColors();
 
 		addPropertyChangeListener(this);
 	}
@@ -177,9 +183,9 @@ public class TourTrackLayerWithPaths extends RenderableLayer implements SelectLi
 //			return;
 //		}
 
-		final ILegendProvider colorProvider = _tourPositionColors.getColorProvider();
+//		final ILegendProvider colorProvider = _tourPositionColors.getColorProvider();
 
-		switch (colorProvider.getTourColorId()) {
+		switch (_colorProvider.getTourColorId()) {
 		case ILegendProvider.TOUR_COLOR_ALTITUDE:
 			return tourData.altitudeSerie;
 
@@ -207,7 +213,6 @@ public class TourTrackLayerWithPaths extends RenderableLayer implements SelectLi
 	public String getName() {
 		return Messages.TourTrack_Layer_Name;
 	}
-
 
 	public void onModifyConfig() {
 
@@ -270,38 +275,159 @@ public class TourTrackLayerWithPaths extends RenderableLayer implements SelectLi
 	 */
 	@Override
 	public void selected(final SelectEvent event) {
-//
-//		if (event.getMouseEvent() != null && event.getMouseEvent().isConsumed()) {
-//			return;
-//		}
-//
-//		final PickedObject topPickedObject = event.getTopPickedObject();
-//
-//		final String topObjectText = topPickedObject == null ? "null" : topPickedObject.getClass().getSimpleName();
-//
-//		final StringBuilder sb = new StringBuilder();
-//		sb.append(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] \t");
-//		sb.append("topObject: " + topObjectText);
-//
-//		if (topPickedObject != null && topPickedObject.getObject() instanceof TourTrackPath) {
-//
-//			final TourTrackPath tourPath = (TourTrackPath) topPickedObject.getObject();
-//
-//			final Object pickOrdinal = topPickedObject.getValue(AVKey.ORDINAL);
-//			final Integer pickIndex = (Integer) pickOrdinal;
-//
-//			sb.append("\tpickIndex: " + pickIndex);
-//			sb.append("\t" + tourPath);
-//
-////			_tourPositionColors.highlight();
-//
-//		} else {
-//
-//			// dehighlight
-//		}
-//
-//		System.out.println(sb.toString());
-//		// TODO remove SYSTEM.OUT.PRINTLN
+
+		if (event.getMouseEvent() != null && event.getMouseEvent().isConsumed()) {
+			return;
+		}
+
+		final PickedObject topPickedObject = event.getTopPickedObject();
+
+		final String topObjectText = topPickedObject == null ? //
+				"null"
+				: topPickedObject.getClass().getSimpleName()
+						+ "\t"
+						+ topPickedObject.getObject().getClass().getSimpleName();
+
+		final StringBuilder sb = new StringBuilder();
+		sb.append(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] \t");
+		sb.append("topObject: " + topObjectText);
+
+		TourTrackPath pickedTourTrack = null;
+		Integer pickPositionIndex = null;
+
+		if (topPickedObject != null && topPickedObject.getObject() instanceof TourTrackPath) {
+
+			pickedTourTrack = (TourTrackPath) topPickedObject.getObject();
+
+			final Object pickOrdinal = topPickedObject.getValue(AVKey.ORDINAL);
+			pickPositionIndex = (Integer) pickOrdinal;
+
+			sb.append("\t" + pickedTourTrack);
+			sb.append("\tpickIndex: " + pickPositionIndex);
+		}
+
+		// Ignore hover and rollover events. We're only interested in mouse pressed and mouse clicked events.
+//        String eventAction = event.getEventAction();
+//		if (eventAction == SelectEvent.HOVER || eventAction == SelectEvent.ROLLOVER)
+//            return;
+
+		selected_WithAttributeColor(pickedTourTrack);
+		selected_WithPositionColor(pickedTourTrack, pickPositionIndex);
+
+		_lastPickedTourTrack = pickedTourTrack;
+		_lastPickPositionIndex = pickPositionIndex;
+
+		System.out.println(sb.toString());
+		// TODO remove SYSTEM.OUT.PRINTLN
+	}
+
+	private void selected_WithAttributeColor(final TourTrackPath pickedTourTrack) {
+
+		if (_lastPickedTourTrack == pickedTourTrack) {
+			return; // same thing selected
+		}
+
+		// Turn off highlight if on.
+		if (_lastPickedTourTrack != null) {
+			_lastPickedTourTrack.setHighlighted(false);
+		}
+
+		// Turn on highlight if object selected.
+		if (pickedTourTrack instanceof Highlightable) {
+			pickedTourTrack.setHighlighted(true);
+		}
+	}
+
+	private void selected_WithPositionColor(final TourTrackPath pickedTourTrack, final Integer pickPositionIndex) {
+
+		boolean isRedraw = false;
+		if (pickedTourTrack == null) {
+
+			// a new tour track is not picked
+
+			if (_lastPickedTourTrack == null) {
+
+				// nothing is picked, nothing must be reseted
+
+			} else {
+
+				// reset last picked tour
+
+				_lastPickedTourTrack.setPicked(false, null);
+				isRedraw = true;
+			}
+
+		} else {
+
+			// a tour track is picked
+
+			if (_lastPickedTourTrack == null) {
+
+				// a new track is picked
+
+				pickedTourTrack.setPicked(true, pickPositionIndex);
+				isRedraw = true;
+
+			} else {
+
+				// an old track is picked, check if a new track is picked
+
+				if (_lastPickedTourTrack == pickedTourTrack) {
+
+					// the same track is picked, check if another position is picked
+
+					if (_lastPickPositionIndex == null) {
+
+						// a new position is picked
+
+						pickedTourTrack.setPicked(true, pickPositionIndex);
+						isRedraw = true;
+
+					} else {
+
+						// an old position is picked
+
+						if (pickPositionIndex == null) {
+
+							// a new position is not picked, reset pick position but keep the track picked
+
+							pickedTourTrack.setPicked(true, null);
+							isRedraw = true;
+
+						} else {
+
+							if (pickPositionIndex.equals(_lastPickPositionIndex)) {
+
+								// the same position and the same track is picked, do nothing
+
+							} else {
+
+								// another position is picked
+
+								pickedTourTrack.setPicked(true, pickPositionIndex);
+								isRedraw = true;
+							}
+						}
+					}
+
+				} else {
+
+					// another track is picked
+
+					// first reset last track
+					_lastPickedTourTrack.setPicked(false, null);
+
+					// pick new track
+					pickedTourTrack.setPicked(true, pickPositionIndex);
+
+					isRedraw = true;
+				}
+			}
+		}
+
+		if (isRedraw) {
+			Map3Manager.redraw();
+		}
 	}
 
 	public void setColorProvider(final ILegendProvider colorProvider) {
@@ -312,18 +438,14 @@ public class TourTrackLayerWithPaths extends RenderableLayer implements SelectLi
 	}
 
 	/**
-	 * Set attributes from the configuration into the path.
+	 * Set attributes from the configuration into the path but <b>only</b> when they have changed
+	 * because setting some properties will reset the path and it will be recreated.
 	 * 
 	 * @param path
 	 */
 	private void setPathAttributes(final Path path) {
 
-//		tourPath.setValue(AVKey.DISPLAY_NAME, MAP3_LAYER_ID);
-
 //		tourPath.setSkipCountComputer(tourPath.getSkipCountComputer());
-
-		// Indicate that the dots be drawn only when the path is less than 5 KM from the eye point.
-//		tourPath.setShowPositionsThreshold(5e3);
 
 		// Override generic view-distance geometry regeneration because multi-res Paths handle that themselves.
 //		tourPath.setViewDistanceExpiration(false);
@@ -331,39 +453,99 @@ public class TourTrackLayerWithPaths extends RenderableLayer implements SelectLi
 		// Indicate that dots are to be drawn at each specified path position.
 		path.setShowPositions(_trackConfig.isShowTrackPosition);
 		path.setShowPositionsScale(_trackConfig.trackPositionSize);
+		path.setShowPositionsThreshold(Math.pow(10, _trackConfig.trackPositionThreshold));
 
-		path.setAltitudeMode(_trackConfig.altitudeMode);
-		path.setFollowTerrain(_trackConfig.isFollowTerrain);
-		path.setPathType(_trackConfig.pathType);
+		final int altitudeMode = _trackConfig.altitudeMode;
+		if (altitudeMode != path.getAltitudeMode()) {
+			path.setAltitudeMode(altitudeMode);
+		}
 
-		path.setExtrude(_trackConfig.isExtrudePath);
-		path.setDrawVerticals(_trackConfig.isDrawVerticals);
+		final boolean isFollowTerrain = _trackConfig.isFollowTerrain;
+		if (isFollowTerrain != path.isFollowTerrain()) {
+			path.setFollowTerrain(isFollowTerrain);
+		}
 
-		path.setNumSubsegments(_trackConfig.numSubsegments);
+		final String pathType = _trackConfig.pathType;
+		if (pathType.equals(path.getPathType()) == false) {
+			path.setPathType(pathType);
+		}
 
-		// Show how to make the colors vary along the paths.
-//		path.setPositionColors(_tourPositionColors);
+		final boolean isExtrudePath = _trackConfig.isExtrudePath;
+		if (isExtrudePath != path.isExtrude()) {
+			path.setExtrude(isExtrudePath);
+		}
+
+		final boolean isDrawVerticals = _trackConfig.isDrawVerticals;
+		if (isDrawVerticals != path.isDrawVerticals()) {
+			path.setDrawVerticals(isDrawVerticals);
+		}
+
+		final int numSubsegments = _trackConfig.numSubsegments;
+		if (numSubsegments != path.getNumSubsegments()) {
+			path.setNumSubsegments(numSubsegments);
+		}
 
 		/*
-		 * Create attributes for the Path.
+		 * Shape attributes for the path
+		 */
+		ShapeAttributes normalAttributes = path.getAttributes();
+		ShapeAttributes highAttributes = path.getHighlightAttributes();
+
+		if (normalAttributes == null) {
+
+			// initialize colors
+
+			normalAttributes = new BasicShapeAttributes();
+			highAttributes = new BasicShapeAttributes();
+
+			// Show how to make the colors vary along the paths.
+			path.setPositionColors(_tourPositionColors);
+		}
+
+		/*
+		 * Normal attributes
 		 */
 		final RGB interiorColor = _trackConfig.interiorColor;
 		final RGB outlineColor = _trackConfig.outlineColor;
-		final Color colorInterior = new Color(interiorColor.red, interiorColor.green, interiorColor.blue);
-		final Color colorOutline = new Color(outlineColor.red, outlineColor.green, outlineColor.blue);
+		normalAttributes.setDrawOutline(true);
+		normalAttributes.setOutlineWidth(_trackConfig.outlineWidth);
+		normalAttributes.setOutlineOpacity(_trackConfig.outlineOpacity);
+		normalAttributes.setOutlineMaterial(new Material(new Color(
+				outlineColor.red,
+				outlineColor.green,
+				outlineColor.blue)));
 
-		final ShapeAttributes shapeAttrs = new BasicShapeAttributes();
+		normalAttributes.setDrawInterior(true);
+		normalAttributes.setInteriorOpacity(_trackConfig.interiorOpacity);
+		normalAttributes.setInteriorMaterial(new Material(new Color(
+				interiorColor.red,
+				interiorColor.green,
+				interiorColor.blue)));
 
-		shapeAttrs.setDrawOutline(true);
-		shapeAttrs.setOutlineWidth(_trackConfig.outlineWidth);
-		shapeAttrs.setOutlineOpacity(_trackConfig.outlineOpacity);
-		shapeAttrs.setOutlineMaterial(new Material(colorOutline));
+		path.setAttributes(normalAttributes);
 
-		shapeAttrs.setDrawInterior(true);
-		shapeAttrs.setInteriorOpacity(_trackConfig.interiorOpacity);
-		shapeAttrs.setInteriorMaterial(new Material(colorInterior));
+		/*
+		 * Highlight attributes
+		 */
+		final RGB interiorColorHigh = _trackConfig.interiorColorHigh;
+		final RGB outlineColorHigh = _trackConfig.outlineColorHigh;
 
-		path.setAttributes(shapeAttrs);
+		highAttributes.setDrawInterior(true);
+		highAttributes.setInteriorOpacity(_trackConfig.interiorOpacityHigh);
+		highAttributes.setInteriorMaterial(new Material(new Color(
+				interiorColorHigh.red,
+				interiorColorHigh.green,
+				interiorColorHigh.blue)));
+
+		highAttributes.setDrawOutline(true);
+		highAttributes.setOutlineWidth(_trackConfig.outlineWidth);
+		highAttributes.setOutlineOpacity(_trackConfig.outlineOpacityHigh);
+		highAttributes.setOutlineMaterial(new Material(new Color(
+				outlineColorHigh.red,
+				outlineColorHigh.green,
+				outlineColorHigh.blue)));
+
+		path.setHighlightAttributes(highAttributes);
 	}
 
 	private void setupWWSelectionListener(final boolean isLayerVisible) {

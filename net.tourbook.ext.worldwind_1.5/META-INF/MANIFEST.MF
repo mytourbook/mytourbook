@@ -8,7 +8,6 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ClassPath: gdal.jar,
  gluegen-rt.jar,
  jogl.jar,
- worldwind.jar,
  worldwindx.jar
 Export-Package: com.sun.gluegen.runtime,
  com.sun.opengl.cg,

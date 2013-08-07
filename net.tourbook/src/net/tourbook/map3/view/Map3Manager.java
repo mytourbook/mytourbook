@@ -1065,7 +1065,13 @@ public class Map3Manager {
 
 	public static void redraw() {
 
-		_ww.redraw();
+		_ww.getView().firePropertyChange(AVKey.VIEW, null, _ww.getView());
+//		_ww.redraw();
+
+//		if (_map3View != null) {
+//
+//			_map3View.redraw();
+//		}
 	}
 
 	public static void saveState() {

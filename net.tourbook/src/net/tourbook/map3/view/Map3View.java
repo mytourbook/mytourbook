@@ -20,6 +20,8 @@ import gov.nasa.worldwind.avlist.AVKey;
 import gov.nasa.worldwind.awt.WorldWindowGLCanvas;
 
 import java.awt.BorderLayout;
+import java.awt.EventQueue;
+import java.awt.Frame;
 import java.util.ArrayList;
 
 import net.tourbook.application.TourbookPlugin;
@@ -104,7 +106,8 @@ public class Map3View extends ViewPart {
 	private ITourEventListener					_tourEventListener;
 
 	private boolean								_isPartVisible;
-	private ISelection							_selectionWhenHidden;
+	private boolean								_isRestored;
+	private ISelection							_lastHiddenSelection;
 
 	private boolean								_isSyncMapPositionWithSlider;
 	private boolean								_isSyncMapViewWithTour;
@@ -118,6 +121,8 @@ public class Map3View extends ViewPart {
 	private Composite							_mapContainer;
 
 	private int									_tourColorId;
+
+	private Frame								_awtFrame;
 
 	private static int							_renderCounter;
 
@@ -218,11 +223,11 @@ public class Map3View extends ViewPart {
 
 					_isPartVisible = true;
 
-					if (_selectionWhenHidden != null) {
+					if (_lastHiddenSelection != null) {
 
-						onSelectionChanged(_selectionWhenHidden);
+						onSelectionChanged(_lastHiddenSelection);
 
-						_selectionWhenHidden = null;
+						_lastHiddenSelection = null;
 					}
 				}
 			}
@@ -360,10 +365,21 @@ public class Map3View extends ViewPart {
 				restoreState();
 				enableActions();
 
-				if (_allTours.size() == 0) {
+				_isRestored = true;
+
+				if (_lastHiddenSelection != null) {
+
+					onSelectionChanged(_lastHiddenSelection);
+
+					_lastHiddenSelection = null;
+
+				} else if (_allTours.size() == 0) {
+
 					// a tour is not displayed, find a tour provider which provides a tour
 					showToursFromTourProvider();
+
 				} else {
+
 					showAllTours();
 				}
 			}
@@ -379,10 +395,10 @@ public class Map3View extends ViewPart {
 		_mapContainer = new Composite(parent, SWT.EMBEDDED);
 		GridDataFactory.fillDefaults().applyTo(_mapContainer);
 		{
-			final java.awt.Frame awtFrame = SWT_AWT.new_Frame(_mapContainer);
+			_awtFrame = SWT_AWT.new_Frame(_mapContainer);
 			final java.awt.Panel awtPanel = new java.awt.Panel(new java.awt.BorderLayout());
 
-			awtFrame.add(awtPanel);
+			_awtFrame.add(awtPanel);
 			awtPanel.add(_wwCanvas, BorderLayout.CENTER);
 
 			// set context menu with net.tourbook.common.util.SWTPopupOverAWT
@@ -453,15 +469,16 @@ public class Map3View extends ViewPart {
 //		System.out.println(UI.timeStampNano() + " Map::onSelectionChanged\t" + selection);
 //		// TODO remove SYSTEM.OUT.PRINTLN
 
-		if (_isPartVisible == false) {
+		if (_isPartVisible == false || _isRestored == false) {
 
 			if (selection instanceof SelectionTourData
 					|| selection instanceof SelectionTourId
 					|| selection instanceof SelectionTourIds) {
 
 				// keep only selected tours
-				_selectionWhenHidden = selection;
+				_lastHiddenSelection = selection;
 			}
+
 			return;
 		}
 
@@ -685,6 +702,23 @@ public class Map3View extends ViewPart {
 		}
 	}
 
+	void redraw() {
+
+//		_mapContainer.getDisplay().asyncExec(new Runnable() {
+//			public void run() {
+//				_mapContainer.redraw();
+//
+//			}
+//		});
+
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				_awtFrame.validate();
+				_awtFrame.repaint();
+			}
+		});
+	}
+
 	private void restoreState() {
 
 		final boolean isTourAvailable = _allTours.size() > 0;
@@ -737,11 +771,13 @@ public class Map3View extends ViewPart {
 
 		setColorProvider(_tourColorId);
 
+		// restore 3D view
 		final String stateMap3View = Util.getStateString(_state, STATE_MAP3_VIEW, null);
 		if (stateMap3View != null) {
 
 			final View view = _wwCanvas.getView();
 			view.restoreState(stateMap3View);
+
 			view.firePropertyChange(AVKey.VIEW, null, view);
 		}
 
@@ -762,9 +798,9 @@ public class Map3View extends ViewPart {
 
 	private void setColorProvider(final int colorId) {
 
-		final ILegendProvider legendProvider = TourMapColors.getColorProvider(colorId);
+		final ILegendProvider colorProvider = TourMapColors.getColorProvider(colorId);
 
-		Map3Manager.getTourTrackLayer().setColorProvider(legendProvider);
+		Map3Manager.getTourTrackLayer().setColorProvider(colorProvider);
 	}
 
 	@Override

@@ -15,6 +15,9 @@
  *******************************************************************************/
 package net.tourbook.map3.layer.tourtrack;
 
+import gov.nasa.worldwind.geom.Position;
+import gov.nasa.worldwind.render.Path;
+
 import java.awt.Color;
 import java.util.ArrayList;
 
@@ -30,53 +33,78 @@ import net.tourbook.map2.Messages;
 import net.tourbook.map3.layer.ColorCacheAWT;
 import net.tourbook.map3.layer.Map3Colors;
 
-class TourColors {
+class TourPositionColors implements Path.PositionColors {
 
 	private final ColorCacheAWT	_awtColorCache	= new ColorCacheAWT();
 
 	private ILegendProvider		_colorProvider	= Map3Colors.getColorProvider(ILegendProvider.TOUR_COLOR_ALTITUDE);
 
-	public Color getColor(final float graphValue, final Integer positionIndex) {
+	public Color getColor(final Position position, final int ordinal) {
 
-		int colorValue = -1;
+		/**
+		 * This returns a dummy color, it is just a placeholder because a Path.PositionColors must
+		 * be set in the Path THAT a position color is used :-(
+		 */
 
-		if (_colorProvider instanceof ILegendProviderGradientColors) {
+		return Color.CYAN;
+	}
 
-			final ILegendProviderGradientColors gradientColorProvider = (ILegendProviderGradientColors) _colorProvider;
-
-			colorValue = gradientColorProvider.getColorValue(graphValue);
-		}
-
-		if (colorValue == -1) {
-			// set ugly default value, this case should not happen
-			return Color.MAGENTA;
-		}
-
-//		if (isHighlight) {
-//
-//			// create invers color
-//			colorValue = 0xffffff - colorValue;
-//		}
-
+	public Color getDiscreteColor(final int colorValue) {
 		return _awtColorCache.get(colorValue);
 	}
 
-	public Color getColorFromColorValue(final int colorValue) {
-		return _awtColorCache.get(colorValue);
+	public Color getGradientColor(	final float graphValue,
+									final Integer positionIndex,
+									final boolean isTourTrackedPicked,
+									final int tourTrackPickIndex) {
+
+		Color positionColor;
+
+		if (isTourTrackedPicked) {
+
+			// tour track is picked
+
+			if (tourTrackPickIndex != -1 && tourTrackPickIndex == positionIndex) {
+
+				// track position is picked, display with inverse color
+
+				positionColor = Color.GREEN;
+
+			} else {
+
+				positionColor = Color.RED;
+			}
+
+		} else {
+
+			int colorValue = -1;
+
+			if (_colorProvider instanceof ILegendProviderGradientColors) {
+
+				final ILegendProviderGradientColors gradientColorProvider = (ILegendProviderGradientColors) _colorProvider;
+
+				colorValue = gradientColorProvider.getColorValue(graphValue);
+			}
+
+			if (colorValue == -1) {
+				// set ugly default value, this case should not happen
+				return Color.MAGENTA;
+			}
+
+			positionColor = _awtColorCache.get(colorValue);
+		}
+
+		return positionColor;
 	}
 
-	ILegendProvider getColorProvider() {
-		return _colorProvider;
-	}
-
-	void setColorProvider(final ILegendProvider legendProvider) {
+	public void setColorProvider(final ILegendProvider legendProvider) {
 
 		_colorProvider = legendProvider;
 
 		_awtColorCache.clear();
 	}
 
-	void updateColors(final ArrayList<TourData> allTours) {
+	public void updateColors(final ArrayList<TourData> allTours) {
 
 		if (_colorProvider instanceof ILegendProviderGradientColors) {
 
