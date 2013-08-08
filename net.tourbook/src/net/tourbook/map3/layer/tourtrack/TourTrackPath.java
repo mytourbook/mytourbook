@@ -32,7 +32,7 @@ public class TourTrackPath extends MultiResolutionPath {
 	private TourMap3Position[]	_trackPositions;
 	private ILegendProvider		_colorProvider;
 
-	private boolean				_isTourTrackedPicked;
+	private boolean				_isTourTrackPicked;
 	private int					_tourTrackPickIndex;
 
 	private PositionColors		_notPickedPositionColors;
@@ -52,7 +52,7 @@ public class TourTrackPath extends MultiResolutionPath {
 	@Override
 	protected Color getColor(final Position pos, final Integer ordinal) {
 
-		if (_isTourTrackedPicked) {
+		if (_isTourTrackPicked) {
 			// prevent setting position colors
 			return null;
 //			return Color.pink;
@@ -68,7 +68,7 @@ public class TourTrackPath extends MultiResolutionPath {
 				return tourPosColors.getGradientColor(
 						trackPosition.dataSerieValue,
 						ordinal,
-						_isTourTrackedPicked,
+						_isTourTrackPicked,
 						_tourTrackPickIndex);
 
 			} else if (_colorProvider instanceof ILegendProviderDiscreteColors) {
@@ -91,7 +91,7 @@ public class TourTrackPath extends MultiResolutionPath {
 
 	void setPicked(final boolean isTourTrackedPicked, final Integer pickIndex) {
 
-		_isTourTrackedPicked = isTourTrackedPicked;
+		_isTourTrackPicked = isTourTrackedPicked;
 
 		if (pickIndex == null) {
 			_tourTrackPickIndex = -1;

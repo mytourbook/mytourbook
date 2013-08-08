@@ -62,6 +62,8 @@ public class TourTrackLayerWithPaths extends RenderableLayer implements SelectLi
 	private TourTrackPath				_lastPickedTourTrack;
 	private Integer						_lastPickPositionIndex;
 
+	private boolean						_isSelected;
+
 	/**
 	 * This flag keeps track of adding/removing the listener that it is not done more than once.
 	 */
@@ -502,50 +504,66 @@ public class TourTrackLayerWithPaths extends RenderableLayer implements SelectLi
 			path.setPositionColors(_tourPositionColors);
 		}
 
-		/*
-		 * Normal attributes
-		 */
+		setPathAttributes_Default(path, normalAttributes);
+		setPathAttributes_Hovered(path, highAttributes);
+
+	}
+
+	/**
+	 * Set default shape attributes
+	 * 
+	 * @param path
+	 * @param shapeAttributes
+	 */
+	private void setPathAttributes_Default(final Path path, final ShapeAttributes shapeAttributes) {
+
 		final RGB interiorColor = _trackConfig.interiorColor;
 		final RGB outlineColor = _trackConfig.outlineColor;
-		normalAttributes.setDrawOutline(true);
-		normalAttributes.setOutlineWidth(_trackConfig.outlineWidth);
-		normalAttributes.setOutlineOpacity(_trackConfig.outlineOpacity);
-		normalAttributes.setOutlineMaterial(new Material(new Color(
+		shapeAttributes.setDrawOutline(true);
+		shapeAttributes.setOutlineWidth(_trackConfig.outlineWidth);
+		shapeAttributes.setOutlineOpacity(_trackConfig.outlineOpacity);
+		shapeAttributes.setOutlineMaterial(new Material(new Color(
 				outlineColor.red,
 				outlineColor.green,
 				outlineColor.blue)));
 
-		normalAttributes.setDrawInterior(true);
-		normalAttributes.setInteriorOpacity(_trackConfig.interiorOpacity);
-		normalAttributes.setInteriorMaterial(new Material(new Color(
+		shapeAttributes.setDrawInterior(true);
+		shapeAttributes.setInteriorOpacity(_trackConfig.interiorOpacity);
+		shapeAttributes.setInteriorMaterial(new Material(new Color(
 				interiorColor.red,
 				interiorColor.green,
 				interiorColor.blue)));
 
-		path.setAttributes(normalAttributes);
+		path.setAttributes(shapeAttributes);
+	}
 
-		/*
-		 * Highlight attributes
-		 */
-		final RGB interiorColorHigh = _trackConfig.interiorColorHigh;
-		final RGB outlineColorHigh = _trackConfig.outlineColorHigh;
+	/**
+	 * Set hovered shape attributes
+	 * 
+	 * @param path
+	 * @param shapeAttributes
+	 */
+	private void setPathAttributes_Hovered(final Path path, final ShapeAttributes shapeAttributes) {
 
-		highAttributes.setDrawInterior(true);
-		highAttributes.setInteriorOpacity(_trackConfig.interiorOpacityHigh);
-		highAttributes.setInteriorMaterial(new Material(new Color(
-				interiorColorHigh.red,
-				interiorColorHigh.green,
-				interiorColorHigh.blue)));
+		final RGB interiorColor = _trackConfig.interiorColorHovered;
+		final RGB outlineColor = _trackConfig.outlineColorHovered;
 
-		highAttributes.setDrawOutline(true);
-		highAttributes.setOutlineWidth(_trackConfig.outlineWidth);
-		highAttributes.setOutlineOpacity(_trackConfig.outlineOpacityHigh);
-		highAttributes.setOutlineMaterial(new Material(new Color(
-				outlineColorHigh.red,
-				outlineColorHigh.green,
-				outlineColorHigh.blue)));
+		shapeAttributes.setDrawInterior(true);
+		shapeAttributes.setInteriorOpacity(_trackConfig.interiorOpacityHovered);
+		shapeAttributes.setInteriorMaterial(new Material(new Color(
+				interiorColor.red,
+				interiorColor.green,
+				interiorColor.blue)));
 
-		path.setHighlightAttributes(highAttributes);
+		shapeAttributes.setDrawOutline(true);
+		shapeAttributes.setOutlineWidth(_trackConfig.outlineWidth);
+		shapeAttributes.setOutlineOpacity(_trackConfig.outlineOpacityHovered);
+		shapeAttributes.setOutlineMaterial(new Material(new Color(
+				outlineColor.red,
+				outlineColor.green,
+				outlineColor.blue)));
+
+		path.setHighlightAttributes(shapeAttributes);
 	}
 
 	private void setupWWSelectionListener(final boolean isLayerVisible) {

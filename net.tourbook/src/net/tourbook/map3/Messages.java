@@ -74,14 +74,10 @@ public class Messages extends NLS {
 
 	public static String		TourTrack_Properties_Button_Default;
 	public static String		TourTrack_Properties_Button_Default_Tooltip;
-
-	public static String	TourTrack_Properties_Button_Performance;
-
-	public static String	TourTrack_Properties_Button_Performance_Tooltip;
-
-	public static String	TourTrack_Properties_Button_Quality;
-
-	public static String	TourTrack_Properties_Button_Quality_Tooltip;
+	public static String		TourTrack_Properties_Button_Performance;
+	public static String		TourTrack_Properties_Button_Performance_Tooltip;
+	public static String		TourTrack_Properties_Button_Quality;
+	public static String		TourTrack_Properties_Button_Quality_Tooltip;
 	public static String		TourTrack_Properties_Checkbox_AltitudeOffset;
 	public static String		TourTrack_Properties_Checkbox_DrawVerticals;
 	public static String		TourTrack_Properties_Checkbox_ExtrudePath;
@@ -92,6 +88,8 @@ public class Messages extends NLS {
 	public static String		TourTrack_Properties_Label_Altitude_Tooltip;
 	public static String		TourTrack_Properties_Label_AltitudeOffsetDistance;
 	public static String		TourTrack_Properties_Label_CurtainColor;
+
+	public static String	TourTrack_Properties_Label_CurtainColorHovered;
 	public static String		TourTrack_Properties_Label_CurtainColorSelected;
 	public static String		TourTrack_Properties_Label_CurtainOpacity;
 	public static String		TourTrack_Properties_Label_DialogTitle;
@@ -101,6 +99,8 @@ public class Messages extends NLS {
 	public static String		TourTrack_Properties_Label_NumberOfSubSegments_Tooltip;
 	public static String		TourTrack_Properties_Label_OutlineColorDefault;
 	public static String		TourTrack_Properties_Label_OutlineColorDefault_Tooltip;
+	public static String		TourTrack_Properties_Label_OutlineColorHovered;
+	public static String		TourTrack_Properties_Label_OutlineColorHovered_Tooltip;
 	public static String		TourTrack_Properties_Label_OutlineColorSelected;
 	public static String		TourTrack_Properties_Label_OutlineColorSelected_Tooltip;
 	public static String		TourTrack_Properties_Label_OutlineWidth;

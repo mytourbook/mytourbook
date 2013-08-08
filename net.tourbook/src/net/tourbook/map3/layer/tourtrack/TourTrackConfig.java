@@ -25,26 +25,30 @@ import org.eclipse.swt.graphics.RGB;
 
 public class TourTrackConfig {
 
-	private static final String			STATE_ALTITUDE_MODE				= "STATE_ALTITUDE_MODE";			//$NON-NLS-1$
-	private static final String			STATE_ALTITUDE_OFFSET			= "STATE_ALTITUDE_OFFSET";			//$NON-NLS-1$
-	private static final String			STATE_IS_ABSOLUTE_OFFSET		= "STATE_IS_ABSOLUTE_OFFSET";		//$NON-NLS-1$
-	private static final String			STATE_IS_DRAW_VERTICALS			= "STATE_IS_DRAW_VERTICALS";		//$NON-NLS-1$
-	private static final String			STATE_IS_EXTRUDE_PATH			= "STATE_IS_EXTRUDE_PATH";			//$NON-NLS-1$
-	private static final String			STATE_IS_FOLLOW_TERRAIN			= "STATE_IS_FOLLOW_TERRAIN";		//$NON-NLS-1$
-	private static final String			STATE_IS_SHOW_TRACK_POSITION	= "STATE_IS_SHOW_TRACK_POSITION";	//$NON-NLS-1$
-	private static final String			STATE_INTERIOR_COLOR			= "STATE_INTERIOR_COLOR";			//$NON-NLS-1$
-	private static final String			STATE_INTERIOR_COLOR_HIGH		= "STATE_INTERIOR_COLOR_HIGH";		//$NON-NLS-1$
-	private static final String			STATE_INTERIOR_OPACITY			= "STATE_INTERIOR_OPACITY";		//$NON-NLS-1$
-	private static final String			STATE_INTERIOR_OPACITY_HIGH		= "STATE_INTERIOR_OPACITY_HIGH";	//$NON-NLS-1$
-	private static final String			STATE_NUMBER_OF_SUB_SEGMENTS	= "STATE_NUMBER_OF_SUB_SEGMENTS";	//$NON-NLS-1$
-	private static final String			STATE_OUTLINE_COLOR				= "STATE_OUTLINE_COLOR";			//$NON-NLS-1$
-	private static final String			STATE_OUTLINE_COLOR_HIGH		= "STATE_OUTLINE_COLOR_HIGH";		//$NON-NLS-1$
-	private static final String			STATE_OUTLINE_OPACITY			= "STATE_OUTLINE_OPACITY";			//$NON-NLS-1$
-	private static final String			STATE_OUTLINE_OPACITY_HIGH		= "STATE_OUTLINE_OPACITY_HIGH";	//$NON-NLS-1$
-	private static final String			STATE_OUTLINE_WIDTH				= "STATE_OUTLINE_WIDTH";			//$NON-NLS-1$
-	private static final String			STATE_PATH_TYPE					= "STATE_PATH_TYPE";				//$NON-NLS-1$
-	private static final String			STATE_TRACK_POSITION_SIZE		= "STATE_TRACK_POSITION_SIZE";		//$NON-NLS-1$
-	private static final String			STATE_TRACK_POSITION_THRESHOLD	= "STATE_TRACK_POSITION_THRESHOLD"; //$NON-NLS-1$
+	private static final String			STATE_ALTITUDE_MODE				= "STATE_ALTITUDE_MODE";				//$NON-NLS-1$
+	private static final String			STATE_ALTITUDE_OFFSET			= "STATE_ALTITUDE_OFFSET";				//$NON-NLS-1$
+	private static final String			STATE_IS_ABSOLUTE_OFFSET		= "STATE_IS_ABSOLUTE_OFFSET";			//$NON-NLS-1$
+	private static final String			STATE_IS_DRAW_VERTICALS			= "STATE_IS_DRAW_VERTICALS";			//$NON-NLS-1$
+	private static final String			STATE_IS_EXTRUDE_PATH			= "STATE_IS_EXTRUDE_PATH";				//$NON-NLS-1$
+	private static final String			STATE_IS_FOLLOW_TERRAIN			= "STATE_IS_FOLLOW_TERRAIN";			//$NON-NLS-1$
+	private static final String			STATE_IS_SHOW_TRACK_POSITION	= "STATE_IS_SHOW_TRACK_POSITION";		//$NON-NLS-1$
+	private static final String			STATE_INTERIOR_COLOR			= "STATE_INTERIOR_COLOR";				//$NON-NLS-1$
+	private static final String			STATE_INTERIOR_COLOR_HOVERED	= "STATE_INTERIOR_COLOR_HOVERED";		//$NON-NLS-1$
+	private static final String			STATE_INTERIOR_COLOR_SELECTED	= "STATE_INTERIOR_COLOR_SELECTED";		//$NON-NLS-1$
+	private static final String			STATE_INTERIOR_OPACITY			= "STATE_INTERIOR_OPACITY";			//$NON-NLS-1$
+	private static final String			STATE_INTERIOR_OPACITY_HOVERED	= "STATE_INTERIOR_OPACITY_HOVERED";	//$NON-NLS-1$
+	private static final String			STATE_INTERIOR_OPACITY_SELECTED	= "STATE_INTERIOR_OPACITY_SELECTED";	//$NON-NLS-1$
+	private static final String			STATE_NUMBER_OF_SUB_SEGMENTS	= "STATE_NUMBER_OF_SUB_SEGMENTS";		//$NON-NLS-1$
+	private static final String			STATE_OUTLINE_COLOR				= "STATE_OUTLINE_COLOR";				//$NON-NLS-1$
+	private static final String			STATE_OUTLINE_COLOR_HOVERED		= "STATE_OUTLINE_COLOR_HOVERED";		//$NON-NLS-1$
+	private static final String			STATE_OUTLINE_COLOR_SELECTED	= "STATE_OUTLINE_COLOR_SELECTED";		//$NON-NLS-1$
+	private static final String			STATE_OUTLINE_OPACITY			= "STATE_OUTLINE_OPACITY";				//$NON-NLS-1$
+	private static final String			STATE_OUTLINE_OPACITY_HOVERED	= "STATE_OUTLINE_OPACITY_HOVERED";		//$NON-NLS-1$
+	private static final String			STATE_OUTLINE_OPACITY_SELECTED	= "STATE_OUTLINE_OPACITY_SELECTED";	//$NON-NLS-1$
+	private static final String			STATE_OUTLINE_WIDTH				= "STATE_OUTLINE_WIDTH";				//$NON-NLS-1$
+	private static final String			STATE_PATH_TYPE					= "STATE_PATH_TYPE";					//$NON-NLS-1$
+	private static final String			STATE_TRACK_POSITION_SIZE		= "STATE_TRACK_POSITION_SIZE";			//$NON-NLS-1$
+	private static final String			STATE_TRACK_POSITION_THRESHOLD	= "STATE_TRACK_POSITION_THRESHOLD";	//$NON-NLS-1$
 
 	public static final AltitudeMode[]	ALTITUDE_MODE					= {
 			new AltitudeMode(Messages.Track_Config_Altitude_Mode_ClampToGround, WorldWind.CLAMP_TO_GROUND),
@@ -84,14 +88,18 @@ public class TourTrackConfig {
 	public boolean						isShowTrackPosition;
 
 	public RGB							interiorColor;
-	public RGB							interiorColorHigh;
+	public RGB							interiorColorHovered;
+	public RGB							interiorColorSelected;
 	public double						interiorOpacity;
-	public double						interiorOpacityHigh;
+	public double						interiorOpacityHovered;
+	public double						interiorOpacitySelected;
 
 	public RGB							outlineColor;
-	public RGB							outlineColorHigh;
+	public RGB							outlineColorSelected;
+	public RGB							outlineColorHovered;
 	public double						outlineOpacity;
-	public double						outlineOpacityHigh;
+	public double						outlineOpacitySelected;
+	public double						outlineOpacityHovered;
 
 	public double						outlineWidth;
 
@@ -162,6 +170,7 @@ public class TourTrackConfig {
 	 */
 	public void reset() {
 
+		// restore from default values
 		restoreState(null);
 
 		isRecreateTracks = true;
@@ -174,7 +183,19 @@ public class TourTrackConfig {
 	 */
 	private void restoreState(final IDialogSettings state) {
 
+		final RGB defaultRGB = new RGB(0xFF, 0xFF, 0x0);
+		final RGB hoveredRGB = new RGB(0x0, 0xFF, 0xff);
+		final RGB selectedRGB = new RGB(0xFF, 0x0, 0xff);
+
+//		final RGB interiorRGB = new RGB(0xff, 0xff, 0xff);
+
 		outlineWidth = Util.getStateDouble(state, STATE_OUTLINE_WIDTH, 1.0);
+		outlineColor = Util.getStateColor(state, STATE_OUTLINE_COLOR, defaultRGB);
+		outlineColorHovered = Util.getStateColor(state, STATE_OUTLINE_COLOR_HOVERED, hoveredRGB);
+		outlineColorSelected = Util.getStateColor(state, STATE_OUTLINE_COLOR_SELECTED, selectedRGB);
+		outlineOpacity = Util.getStateDouble(state, STATE_OUTLINE_OPACITY, 0.5);
+		outlineOpacityHovered = Util.getStateDouble(state, STATE_OUTLINE_OPACITY_HOVERED, 0.5);
+		outlineOpacitySelected = Util.getStateDouble(state, STATE_OUTLINE_OPACITY_SELECTED, 0.5);
 
 		// altitude
 		altitudeMode = getAltitudeModeValue(Util.getStateInt(state, STATE_ALTITUDE_MODE, WorldWind.ABSOLUTE));
@@ -184,22 +205,20 @@ public class TourTrackConfig {
 
 		// track position
 		isShowTrackPosition = Util.getStateBoolean(state, STATE_IS_SHOW_TRACK_POSITION, true);
-		trackPositionSize = Util.getStateDouble(state, STATE_TRACK_POSITION_SIZE, 5.0);
+		trackPositionSize = Util.getStateDouble(state, STATE_TRACK_POSITION_SIZE, 10.0);
 		trackPositionThreshold = Util.getStateDouble(state, STATE_TRACK_POSITION_SIZE, 6);
 
 		// curtain
 		isExtrudePath = Util.getStateBoolean(state, STATE_IS_EXTRUDE_PATH, true);
-		interiorColor = Util.getStateColor(state, STATE_INTERIOR_COLOR, new RGB(0xFF, 0xE3, 0x5D));
-		interiorColorHigh = Util.getStateColor(state, STATE_INTERIOR_COLOR_HIGH, new RGB(0xFF, 0xE3, 0x0));
+		interiorColor = Util.getStateColor(state, STATE_INTERIOR_COLOR, defaultRGB);
+		interiorColorHovered = Util.getStateColor(state, STATE_INTERIOR_COLOR_HOVERED, hoveredRGB);
+		interiorColorSelected = Util.getStateColor(state, STATE_INTERIOR_COLOR_SELECTED, selectedRGB);
 		interiorOpacity = Util.getStateDouble(state, STATE_INTERIOR_OPACITY, 0.0);
-		interiorOpacityHigh = Util.getStateDouble(state, STATE_INTERIOR_OPACITY_HIGH, 0.0);
+		interiorOpacityHovered = Util.getStateDouble(state, STATE_INTERIOR_OPACITY_HOVERED, 0.2);
+		interiorOpacitySelected = Util.getStateDouble(state, STATE_INTERIOR_OPACITY_SELECTED, 0.2);
 
 		// verticals
-		isDrawVerticals = Util.getStateBoolean(state, STATE_IS_DRAW_VERTICALS, true);
-		outlineColor = Util.getStateColor(state, STATE_OUTLINE_COLOR, new RGB(0xFF, 0xFF, 0xFF));
-		outlineColorHigh = Util.getStateColor(state, STATE_OUTLINE_COLOR_HIGH, new RGB(0xFF, 0xFF, 0x0));
-		outlineOpacity = Util.getStateDouble(state, STATE_OUTLINE_OPACITY, 0.1);
-		outlineOpacityHigh = Util.getStateDouble(state, STATE_OUTLINE_OPACITY_HIGH, 0.1);
+		isDrawVerticals = Util.getStateBoolean(state, STATE_IS_DRAW_VERTICALS, false);
 
 		// path + segments
 		pathType = getPathTypeValue(Util.getStateString(state, STATE_PATH_TYPE, AVKey.LINEAR));
@@ -207,6 +226,14 @@ public class TourTrackConfig {
 	}
 
 	void saveState(final IDialogSettings state) {
+
+		state.put(STATE_OUTLINE_WIDTH, outlineWidth);
+		state.put(STATE_OUTLINE_OPACITY, outlineOpacity);
+		state.put(STATE_OUTLINE_OPACITY_HOVERED, outlineOpacityHovered);
+		state.put(STATE_OUTLINE_OPACITY_SELECTED, outlineOpacitySelected);
+		Util.setState(state, STATE_OUTLINE_COLOR, outlineColor);
+		Util.setState(state, STATE_OUTLINE_COLOR_HOVERED, outlineColorHovered);
+		Util.setState(state, STATE_OUTLINE_COLOR_SELECTED, outlineColorSelected);
 
 		state.put(STATE_ALTITUDE_MODE, altitudeMode);
 		state.put(STATE_ALTITUDE_OFFSET, altitudeOffsetDistance);
@@ -217,16 +244,11 @@ public class TourTrackConfig {
 		state.put(STATE_IS_FOLLOW_TERRAIN, isFollowTerrain);
 
 		state.put(STATE_INTERIOR_OPACITY, interiorOpacity);
-		state.put(STATE_INTERIOR_OPACITY_HIGH, interiorOpacityHigh);
+		state.put(STATE_INTERIOR_OPACITY_HOVERED, interiorOpacityHovered);
+		state.put(STATE_INTERIOR_OPACITY_SELECTED, interiorOpacitySelected);
 		Util.setState(state, STATE_INTERIOR_COLOR, interiorColor);
-		Util.setState(state, STATE_INTERIOR_COLOR_HIGH, interiorColorHigh);
-
-		state.put(STATE_OUTLINE_OPACITY, outlineOpacity);
-		state.put(STATE_OUTLINE_OPACITY_HIGH, outlineOpacityHigh);
-		Util.setState(state, STATE_OUTLINE_COLOR, outlineColor);
-		Util.setState(state, STATE_OUTLINE_COLOR_HIGH, outlineColorHigh);
-
-		state.put(STATE_OUTLINE_WIDTH, outlineWidth);
+		Util.setState(state, STATE_INTERIOR_COLOR_HOVERED, interiorColorHovered);
+		Util.setState(state, STATE_INTERIOR_COLOR_SELECTED, interiorColorSelected);
 
 		state.put(STATE_IS_SHOW_TRACK_POSITION, isShowTrackPosition);
 		state.put(STATE_TRACK_POSITION_SIZE, trackPositionSize);
