@@ -16,7 +16,7 @@
 package net.tourbook.map3.layer.tourtrack;
 
 import gov.nasa.worldwind.geom.Position;
-import gov.nasa.worldwind.render.MultiResolutionPath;
+import gov.nasa.worldwind.render.Path;
 
 import java.awt.Color;
 import java.util.ArrayList;
@@ -26,7 +26,7 @@ import net.tourbook.common.color.ILegendProviderGradientColors;
 import net.tourbook.data.TourData;
 import net.tourbook.map2.view.ILegendProviderDiscreteColors;
 
-public class TourTrackPath extends MultiResolutionPath {
+public class TrackPath extends Path implements ITourTrack {
 
 	private TourData			_tourData;
 	private TourMap3Position[]	_trackPositions;
@@ -38,7 +38,7 @@ public class TourTrackPath extends MultiResolutionPath {
 	private PositionColors		_notPickedPositionColors;
 	private ArrayList<Color>	_notPickedTessColors;
 
-	public TourTrackPath(	final TourData tourData,
+	public TrackPath(	final TourData tourData,
 							final ArrayList<TourMap3Position> trackPositions,
 							final ILegendProvider colorProvider) {
 
@@ -75,7 +75,6 @@ public class TourTrackPath extends MultiResolutionPath {
 
 				return tourPosColors.getDiscreteColor(trackPosition.colorValue);
 			}
-
 		}
 
 		/**
@@ -89,7 +88,7 @@ public class TourTrackPath extends MultiResolutionPath {
 		return _trackPositions;
 	}
 
-	void setPicked(final boolean isTourTrackedPicked, final Integer pickIndex) {
+	public void setPicked(final boolean isTourTrackedPicked, final Integer pickIndex) {
 
 		_isTourTrackPicked = isTourTrackedPicked;
 

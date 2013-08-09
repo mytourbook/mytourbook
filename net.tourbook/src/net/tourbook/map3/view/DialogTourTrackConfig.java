@@ -16,7 +16,6 @@
 package net.tourbook.map3.view;
 
 import gov.nasa.worldwind.WorldWind;
-import gov.nasa.worldwind.avlist.AVKey;
 import net.tourbook.common.UI;
 import net.tourbook.common.color.ColorSelectorExtended;
 import net.tourbook.common.color.IColorSelectorListener;
@@ -24,7 +23,7 @@ import net.tourbook.common.tooltip.AnimatedToolTipShell;
 import net.tourbook.common.util.Util;
 import net.tourbook.map3.Messages;
 import net.tourbook.map3.layer.tourtrack.AltitudeMode;
-import net.tourbook.map3.layer.tourtrack.PathType;
+import net.tourbook.map3.layer.tourtrack.PathResolution;
 import net.tourbook.map3.layer.tourtrack.TourTrackConfig;
 
 import org.eclipse.jface.layout.GridDataFactory;
@@ -102,13 +101,14 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 	private ColorSelectorExtended	_colorOutlineColorSelected;
 
 	private Combo					_comboAltitude;
-	private Combo					_comboPathType;
+	private Combo					_comboPathResolution;
+//	private Combo					_comboPathType;
 
 	private Label					_lblAltitudeOffsetDistanceUnit;
 	private Label					_lblCurtainColor;
 	private Label					_lblCurtainColorHovered;
 	private Label					_lblCurtainColorSelected;
-	private Label					_lblNumOfSubSegments;
+//	private Label					_lblNumOfSubSegments;
 	private Label					_lblOutlineColor;
 	private Label					_lblOutlineColorHovered;
 	private Label					_lblOutlineColorSelected;
@@ -121,7 +121,7 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 	private Spinner					_spinnerInteriorOpacity;
 	private Spinner					_spinnerInteriorOpacityHovered;
 	private Spinner					_spinnerInteriorOpacitySelected;
-	private Spinner					_spinnerNumOfSubSegments;
+//	private Spinner					_spinnerNumOfSubSegments;
 	private Spinner					_spinnerOutlineOpacity;
 	private Spinner					_spinnerOutlineOpacityHovered;
 	private Spinner					_spinnerOutlineOpacitySelected;
@@ -237,10 +237,11 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 			{
 				createUI_000_Title(container);
 				createUI_100_Line(container);
+				createUI_150_PathResolution(container);
 				createUI_200_Altitude(container);
 				createUI_300_TrackPosition(container);
 				createUI_400_ExtrudePath(container);
-				createUI_800_TrackType(container);
+//				createUI_800_TrackType(container);
 				createUI_900_Actions(container);
 			}
 		}
@@ -450,6 +451,26 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 				});
 			}
 		}
+	}
+
+	private void createUI_150_PathResolution(final Composite parent) {
+
+		/*
+		 * label: Path resolution
+		 */
+		final Label label = new Label(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(label);
+
+		label.setText(Messages.TourTrack_Properties_Label_PathResolution);
+		label.setToolTipText(Messages.TourTrack_Properties_Label_PathResolution_Tooltip);
+
+		/*
+		 * combo: Path resolution
+		 */
+		_comboPathResolution = new Combo(parent, SWT.READ_ONLY | SWT.BORDER);
+		GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.FILL).applyTo(_comboPathResolution);
+		_comboPathResolution.setVisibleItemCount(10);
+		_comboPathResolution.addSelectionListener(_defaultSelectionListener);
 	}
 
 	private void createUI_200_Altitude(final Composite parent) {
@@ -823,57 +844,57 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 		_chkDrawVerticals.addSelectionListener(_defaultSelectionListener);
 	}
 
-	private void createUI_800_TrackType(final Composite parent) {
-
-		/*
-		 * label: Path type
-		 */
-		final Label label = new Label(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(label);
-
-		label.setText(Messages.TourTrack_Properties_Label_PathType);
-		label.setToolTipText(Messages.TourTrack_Properties_Label_PathType_Tooltip);
-
-		/*
-		 * combo: Path type
-		 */
-		_comboPathType = new Combo(parent, SWT.READ_ONLY | SWT.BORDER);
-		GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.FILL).applyTo(_comboPathType);
-		_comboPathType.setVisibleItemCount(10);
-		_comboPathType.addSelectionListener(_defaultSelectionListener);
-
-		/*
-		 * label: Number of subsegments
-		 */
-		_lblNumOfSubSegments = new Label(parent, SWT.NONE);
-		GridDataFactory.fillDefaults()//
-				.indent(UI.FORM_FIRST_COLUMN_INDENT, 0)
-				.align(SWT.FILL, SWT.CENTER)
-				.applyTo(_lblNumOfSubSegments);
-
-		_lblNumOfSubSegments.setText(Messages.TourTrack_Properties_Label_NumberOfSubSegments);
-		_lblNumOfSubSegments.setToolTipText(Messages.TourTrack_Properties_Label_NumberOfSubSegments_Tooltip);
-
-		/*
-		 * Spinner: Number of subsegments
-		 */
-		_spinnerNumOfSubSegments = new Spinner(parent, SWT.BORDER);
-		GridDataFactory.fillDefaults() //
-				.align(SWT.BEGINNING, SWT.FILL)
-				.applyTo(_spinnerNumOfSubSegments);
-		_spinnerNumOfSubSegments.setMinimum(0);
-		_spinnerNumOfSubSegments.setMaximum(10);
-		_spinnerNumOfSubSegments.setIncrement(1);
-		_spinnerNumOfSubSegments.setPageIncrement(10);
-		_spinnerNumOfSubSegments.addSelectionListener(_defaultSelectionListener);
-		_spinnerNumOfSubSegments.addMouseWheelListener(new MouseWheelListener() {
-			public void mouseScrolled(final MouseEvent event) {
-				Util.adjustSpinnerValueOnMouseScroll(event);
-				onSelection();
-			}
-		});
-
-	}
+//	private void createUI_800_TrackType(final Composite parent) {
+//
+//		/*
+//		 * label: Path type
+//		 */
+//		final Label label = new Label(parent, SWT.NONE);
+//		GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(label);
+//
+//		label.setText(Messages.TourTrack_Properties_Label_PathType);
+//		label.setToolTipText(Messages.TourTrack_Properties_Label_PathType_Tooltip);
+//
+//		/*
+//		 * combo: Path type
+//		 */
+//		_comboPathType = new Combo(parent, SWT.READ_ONLY | SWT.BORDER);
+//		GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.FILL).applyTo(_comboPathType);
+//		_comboPathType.setVisibleItemCount(10);
+//		_comboPathType.addSelectionListener(_defaultSelectionListener);
+//
+//		/*
+//		 * label: Number of subsegments
+//		 */
+//		_lblNumOfSubSegments = new Label(parent, SWT.NONE);
+//		GridDataFactory.fillDefaults()//
+//				.indent(UI.FORM_FIRST_COLUMN_INDENT, 0)
+//				.align(SWT.FILL, SWT.CENTER)
+//				.applyTo(_lblNumOfSubSegments);
+//
+//		_lblNumOfSubSegments.setText(Messages.TourTrack_Properties_Label_NumberOfSubSegments);
+//		_lblNumOfSubSegments.setToolTipText(Messages.TourTrack_Properties_Label_NumberOfSubSegments_Tooltip);
+//
+//		/*
+//		 * Spinner: Number of subsegments
+//		 */
+//		_spinnerNumOfSubSegments = new Spinner(parent, SWT.BORDER);
+//		GridDataFactory.fillDefaults() //
+//				.align(SWT.BEGINNING, SWT.FILL)
+//				.applyTo(_spinnerNumOfSubSegments);
+//		_spinnerNumOfSubSegments.setMinimum(0);
+//		_spinnerNumOfSubSegments.setMaximum(10);
+//		_spinnerNumOfSubSegments.setIncrement(1);
+//		_spinnerNumOfSubSegments.setPageIncrement(10);
+//		_spinnerNumOfSubSegments.addSelectionListener(_defaultSelectionListener);
+//		_spinnerNumOfSubSegments.addMouseWheelListener(new MouseWheelListener() {
+//			public void mouseScrolled(final MouseEvent event) {
+//				Util.adjustSpinnerValueOnMouseScroll(event);
+//				onSelection();
+//			}
+//		});
+//
+//	}
 
 	private void createUI_900_Actions(final Composite parent) {
 
@@ -960,8 +981,8 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 		 * Note: The sub-segments number is ignored when the path follows terrain or when the path
 		 * type is AVKey.LINEAR.
 		 */
-		final boolean isSubSegmentIgnored = isFollowTerrain || _trackConfig.pathType.equals(AVKey.LINEAR);
-		final boolean isSubSegmentAvailable = !isSubSegmentIgnored;
+//		final boolean isSubSegmentIgnored = isFollowTerrain || _trackConfig.pathType.equals(AVKey.LINEAR);
+//		final boolean isSubSegmentAvailable = !isSubSegmentIgnored;
 
 		// altitude
 		_chkAltitudeOffset.setEnabled(isAbsoluteAltitude);
@@ -988,8 +1009,8 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 		_chkDrawVerticals.setEnabled(isShowCurtain);
 
 		// path
-		_lblNumOfSubSegments.setEnabled(isSubSegmentAvailable);
-		_spinnerNumOfSubSegments.setEnabled(isSubSegmentAvailable);
+//		_lblNumOfSubSegments.setEnabled(isSubSegmentAvailable);
+//		_spinnerNumOfSubSegments.setEnabled(isSubSegmentAvailable);
 	}
 
 	@Override
@@ -1161,8 +1182,9 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 		_spinnerTrackPositionThreshold.setSelection((int) _trackConfig.trackPositionThreshold);
 
 		// path
-		_comboPathType.select(_trackConfig.getPathTypeIndex());
-		_spinnerNumOfSubSegments.setSelection(_trackConfig.numSubsegments);
+		_comboPathResolution.select(_trackConfig.getPathResolutionIndex());
+//		_comboPathType.select(_trackConfig.getPathTypeIndex());
+//		_spinnerNumOfSubSegments.setSelection(_trackConfig.numSubsegments);
 
 		updateUI();
 	}
@@ -1175,15 +1197,22 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 		final boolean backupIsAltitudeOffset = _trackConfig.isAbsoluteOffset;
 		final int backupAltitudeOffsetDistance = _trackConfig.altitudeOffsetDistance;
 		final boolean backupIsAbsoluteAltitudeMode = _trackConfig.altitudeMode == WorldWind.ABSOLUTE;
+		final int backupPathResolution = _trackConfig.pathResolution;
 
 		int altitudeModeIndex = _comboAltitude.getSelectionIndex();
 		if (altitudeModeIndex == -1) {
 			altitudeModeIndex = 0;
 		}
-		int pathTypeIndex = _comboPathType.getSelectionIndex();
-		if (pathTypeIndex == -1) {
-			pathTypeIndex = 0;
+
+		int pathResolutionIndex = _comboPathResolution.getSelectionIndex();
+		if (pathResolutionIndex == -1) {
+			pathResolutionIndex = 0;
 		}
+
+//		int pathTypeIndex = _comboPathType.getSelectionIndex();
+//		if (pathTypeIndex == -1) {
+//			pathTypeIndex = 0;
+//		}
 
 		final int altitudeOffsetMetric = (int) (_spinnerAltitudeOffsetDistance.getSelection() * net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE);
 
@@ -1222,15 +1251,28 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 		_trackConfig.trackPositionThreshold = _spinnerTrackPositionThreshold.getSelection();
 
 		// path
-		_trackConfig.pathType = TourTrackConfig.PATH_TYPE[pathTypeIndex].value;
-		_trackConfig.numSubsegments = _spinnerNumOfSubSegments.getSelection();
+		_trackConfig.pathResolution = TourTrackConfig.PATH_RESOLUTION[pathResolutionIndex].value;
+//		_trackConfig.pathType = TourTrackConfig.PATH_TYPE[pathTypeIndex].value;
+//		_trackConfig.numSubsegments = _spinnerNumOfSubSegments.getSelection();
 
 		final boolean isAbsoluteAltitudeMode = _trackConfig.altitudeMode == WorldWind.ABSOLUTE;
 		final boolean isAbsoluteAltitudeNotModified = //
 		backupIsAltitudeOffset == _trackConfig.isAbsoluteOffset
 				&& backupIsAbsoluteAltitudeMode == isAbsoluteAltitudeMode;
 
-		if (backupAltitudeOffsetDistance == _trackConfig.altitudeOffsetDistance && isAbsoluteAltitudeNotModified) {
+		/*
+		 * check if tracks must be recreated
+		 */
+		if (//
+			// altitude offset (vertical distance) is not modified
+		backupAltitudeOffsetDistance == _trackConfig.altitudeOffsetDistance //
+
+				// path resolution is not modified
+				&& backupPathResolution == _trackConfig.pathResolution //
+
+				&& isAbsoluteAltitudeNotModified
+		//
+		) {
 
 			_trackConfig.isRecreateTracks = false;
 
@@ -1276,9 +1318,14 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 			_comboAltitude.add(altiMode.label);
 		}
 
-		// fill path type combo
-		for (final PathType pathType : TourTrackConfig.PATH_TYPE) {
-			_comboPathType.add(pathType.label);
+//		// fill path type combo
+//		for (final PathType pathType : TourTrackConfig.PATH_TYPE) {
+//			_comboPathType.add(pathType.label);
+//		}
+
+		// fill path resolution combo
+		for (final PathResolution pathResolution : TourTrackConfig.PATH_RESOLUTION) {
+			_comboPathResolution.add(pathResolution.label);
 		}
 	}
 

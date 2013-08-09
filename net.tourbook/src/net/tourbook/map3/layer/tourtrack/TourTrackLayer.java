@@ -48,7 +48,7 @@ import org.eclipse.swt.graphics.RGB;
 
 /**
  */
-public class TourTrackLayerWithPaths extends RenderableLayer implements SelectListener, ICheckStateListener {
+public class TourTrackLayer extends RenderableLayer implements SelectListener, ICheckStateListener {
 
 	public static final String			MAP3_LAYER_ID			= "TourTrackLayer"; //$NON-NLS-1$
 
@@ -59,7 +59,7 @@ public class TourTrackLayerWithPaths extends RenderableLayer implements SelectLi
 
 	private final TourTrackConfig		_trackConfig;
 
-	private TourTrackPath				_lastPickedTourTrack;
+	private ITourTrack					_lastPickedTourTrack;
 	private Integer						_lastPickPositionIndex;
 
 	private boolean						_isSelected;
@@ -69,7 +69,7 @@ public class TourTrackLayerWithPaths extends RenderableLayer implements SelectLi
 	 */
 	private int							_lastAddRemoveAction	= -1;
 
-	public TourTrackLayerWithPaths(final IDialogSettings state) {
+	public TourTrackLayer(final IDialogSettings state) {
 
 		_state = state;
 
@@ -149,12 +149,17 @@ public class TourTrackLayerWithPaths extends RenderableLayer implements SelectLi
 			/*
 			 * create one path for each tour
 			 */
-//			final MultiResolutionPath tourPath = new MTMultiResPath(positions);
-			final TourTrackPath tourPath = new TourTrackPath(tourData, trackPositions, _colorProvider);
+			Path trackPath;
+			if (_trackConfig.pathResolution == TourTrackConfig.PATH_RESOLUTION_MULTI) {
+				trackPath = new TrackPathMultiResolution(tourData, trackPositions, _colorProvider);
+			} else {
+				// default == all track positions
+				trackPath = new TrackPath(tourData, trackPositions, _colorProvider);
+			}
 
-			setPathAttributes(tourPath);
+			setPathAttributes(trackPath);
 
-			addRenderable(tourPath);
+			addRenderable(trackPath);
 
 			// keep all positions which is used to find the outline for ALL selected tours
 			allPositions.addAll(trackPositions);
@@ -294,12 +299,12 @@ public class TourTrackLayerWithPaths extends RenderableLayer implements SelectLi
 		sb.append(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] \t");
 		sb.append("topObject: " + topObjectText);
 
-		TourTrackPath pickedTourTrack = null;
+		ITourTrack pickedTourTrack = null;
 		Integer pickPositionIndex = null;
 
-		if (topPickedObject != null && topPickedObject.getObject() instanceof TourTrackPath) {
+		if (topPickedObject != null && topPickedObject.getObject() instanceof ITourTrack) {
 
-			pickedTourTrack = (TourTrackPath) topPickedObject.getObject();
+			pickedTourTrack = (ITourTrack) topPickedObject.getObject();
 
 			final Object pickOrdinal = topPickedObject.getValue(AVKey.ORDINAL);
 			pickPositionIndex = (Integer) pickOrdinal;
@@ -323,7 +328,7 @@ public class TourTrackLayerWithPaths extends RenderableLayer implements SelectLi
 		// TODO remove SYSTEM.OUT.PRINTLN
 	}
 
-	private void selected_WithAttributeColor(final TourTrackPath pickedTourTrack) {
+	private void selected_WithAttributeColor(final ITourTrack pickedTourTrack) {
 
 		if (_lastPickedTourTrack == pickedTourTrack) {
 			return; // same thing selected
@@ -340,7 +345,7 @@ public class TourTrackLayerWithPaths extends RenderableLayer implements SelectLi
 		}
 	}
 
-	private void selected_WithPositionColor(final TourTrackPath pickedTourTrack, final Integer pickPositionIndex) {
+	private void selected_WithPositionColor(final ITourTrack pickedTourTrack, final Integer pickPositionIndex) {
 
 		boolean isRedraw = false;
 		if (pickedTourTrack == null) {
@@ -467,10 +472,10 @@ public class TourTrackLayerWithPaths extends RenderableLayer implements SelectLi
 			path.setFollowTerrain(isFollowTerrain);
 		}
 
-		final String pathType = _trackConfig.pathType;
-		if (pathType.equals(path.getPathType()) == false) {
-			path.setPathType(pathType);
-		}
+//		final String pathType = _trackConfig.pathType;
+//		if (pathType.equals(path.getPathType()) == false) {
+//			path.setPathType(pathType);
+//		}
 
 		final boolean isExtrudePath = _trackConfig.isExtrudePath;
 		if (isExtrudePath != path.isExtrude()) {
@@ -482,10 +487,11 @@ public class TourTrackLayerWithPaths extends RenderableLayer implements SelectLi
 			path.setDrawVerticals(isDrawVerticals);
 		}
 
-		final int numSubsegments = _trackConfig.numSubsegments;
-		if (numSubsegments != path.getNumSubsegments()) {
-			path.setNumSubsegments(numSubsegments);
-		}
+//		final int numSubsegments = _trackConfig.numSubsegments;
+//		if (numSubsegments != path.getNumSubsegments()) {
+//			path.setNumSubsegments(numSubsegments);
+//		}
+		path.setNumSubsegments(0);
 
 		/*
 		 * Shape attributes for the path

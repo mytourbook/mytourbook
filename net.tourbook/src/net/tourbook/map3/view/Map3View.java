@@ -36,7 +36,7 @@ import net.tourbook.map3.action.ActionSyncMapPositionWithSlider;
 import net.tourbook.map3.action.ActionSyncMapViewWithTour;
 import net.tourbook.map3.action.ActionTourColor;
 import net.tourbook.map3.layer.tourtrack.TourMap3Position;
-import net.tourbook.map3.layer.tourtrack.TourTrackLayerWithPaths;
+import net.tourbook.map3.layer.tourtrack.TourTrackLayer;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.ITourEventListener;
 import net.tourbook.tour.SelectionTourData;
@@ -830,7 +830,7 @@ public class Map3View extends ViewPart {
 
 		enableActions();
 
-		final TourTrackLayerWithPaths tourTrackLayer = Map3Manager.getTourTrackLayer();
+		final TourTrackLayer tourTrackLayer = Map3Manager.getTourTrackLayer();
 
 		final ArrayList<TourMap3Position> allPositions = tourTrackLayer.createTrackPaths(_allTours);
 

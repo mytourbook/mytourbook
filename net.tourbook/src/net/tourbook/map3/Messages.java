@@ -105,6 +105,10 @@ public class Messages extends NLS {
 	public static String		TourTrack_Properties_Label_OutlineColorSelected_Tooltip;
 	public static String		TourTrack_Properties_Label_OutlineWidth;
 	public static String		TourTrack_Properties_Label_OutlineWidth_Tooltip;
+	public static String	TourTrack_Properties_Label_PathResolution;
+
+	public static String	TourTrack_Properties_Label_PathResolution_Tooltip;
+
 	public static String		TourTrack_Properties_Label_PathType;
 	public static String		TourTrack_Properties_Label_PathType_Tooltip;
 	public static String		TourTrack_Properties_Label_TrackPositionSize;
@@ -115,6 +119,10 @@ public class Messages extends NLS {
 	public static String		Track_Config_Altitude_Mode_Absolute;
 	public static String		Track_Config_Altitude_Mode_ClampToGround;
 	public static String		Track_Config_Altitude_Mode_RelativeToGround;
+	public static String	Track_Config_Path_Resolution_All;
+
+	public static String	Track_Config_Path_Resolution_Multi;
+
 	public static String		Track_Config_Path_Type_GreatCircle;
 	public static String		Track_Config_Path_Type_Linear;
 	public static String		Track_Config_Path_Type_RHumbLine;

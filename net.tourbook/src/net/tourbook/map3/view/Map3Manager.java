@@ -46,7 +46,7 @@ import net.tourbook.map3.Messages;
 import net.tourbook.map3.layer.DefaultLayer;
 import net.tourbook.map3.layer.MapDefaultLayer;
 import net.tourbook.map3.layer.StatusLayer;
-import net.tourbook.map3.layer.tourtrack.TourTrackLayerWithPaths;
+import net.tourbook.map3.layer.tourtrack.TourTrackLayer;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Platform;
@@ -125,7 +125,7 @@ public class Map3Manager {
 	 */
 	private static HashMap<String, TVIMap3Layer>	_customLayers					= new HashMap<String, TVIMap3Layer>();
 
-	private static TourTrackLayerWithPaths			_tourTrackLayer;
+	private static TourTrackLayer			_tourTrackLayer;
 
 	private static Object[]							_uiEnabledLayers;
 
@@ -322,7 +322,7 @@ public class Map3Manager {
 		 * create WW layer
 		 */
 //		_tourTrackLayer = new TourTrackLayerWithMarkers();
-		_tourTrackLayer = new TourTrackLayerWithPaths(_state);
+		_tourTrackLayer = new TourTrackLayer(_state);
 //		_tourTrackLayer = new TourTrackLayerWithFastShape();
 
 		/*
@@ -330,7 +330,7 @@ public class Map3Manager {
 		 */
 		final TVIMap3Layer tviLayer = new TVIMap3Layer(_tourTrackLayer, _tourTrackLayer.getName());
 
-		final String layerId = TourTrackLayerWithPaths.MAP3_LAYER_ID;
+		final String layerId = TourTrackLayer.MAP3_LAYER_ID;
 		tviLayer.id = layerId;
 
 		final boolean isVisible = true;
@@ -663,7 +663,7 @@ public class Map3Manager {
 		return _uiRootItem;
 	}
 
-	public static TourTrackLayerWithPaths getTourTrackLayer() {
+	public static TourTrackLayer getTourTrackLayer() {
 		return _tourTrackLayer;
 	}
 
@@ -1214,7 +1214,7 @@ public class Map3Manager {
 			// update model and UI
 
 			_map3LayerView.setTourTrackLayerVisibility(
-					_customLayers.get(TourTrackLayerWithPaths.MAP3_LAYER_ID),
+					_customLayers.get(TourTrackLayer.MAP3_LAYER_ID),
 					isTrackVisible);
 		}
 	}
