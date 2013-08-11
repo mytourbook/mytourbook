@@ -15,13 +15,24 @@
  *******************************************************************************/
 package net.tourbook.map3.layer.tourtrack;
 
-import net.tourbook.data.TourData;
+import gov.nasa.worldwind.render.Path;
 
-public interface ITourTrack {
+import java.awt.Color;
+import java.util.ArrayList;
+import java.util.List;
 
-	TourData getTourData();
+/**
+ * This interface is a wrapper for a tour which is rendered with a {@link Path}.
+ */
+public interface ITrackPath {
+
+	List<Color> getTessellatedColors();
 
 	void setHighlighted(boolean isHighlighted);
 
 	void setPicked(boolean isPicked, Integer pickPositionIndex);
+
+	void setTessellatedColors(ArrayList<Color> tessellatedColors);
+
+	void setTourTrack(TourTrack tourTrack);
 }

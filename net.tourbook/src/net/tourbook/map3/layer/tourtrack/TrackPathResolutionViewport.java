@@ -20,119 +20,45 @@ import gov.nasa.worldwind.render.MultiResolutionPath;
 
 import java.awt.Color;
 import java.util.ArrayList;
+import java.util.List;
 
-import net.tourbook.common.color.ILegendProvider;
-import net.tourbook.common.color.ILegendProviderGradientColors;
-import net.tourbook.data.TourData;
-import net.tourbook.map2.view.ILegendProviderDiscreteColors;
+public class TrackPathResolutionViewport extends MultiResolutionPath implements ITrackPath {
 
-public class TrackPathResolutionViewport extends MultiResolutionPath implements ITourTrack {
+	private TourTrack	_tourTrack;
 
-	private TourData			_tourData;
-	private TourMap3Position[]	_trackPositions;
-	private ILegendProvider		_colorProvider;
-
-	private boolean				_isTourTrackPicked;
-	private int					_tourTrackPickIndex;
-
-	private PositionColors		_notPickedPositionColors;
-	private ArrayList<Color>	_notPickedTessColors;
-
-	public TrackPathResolutionViewport(	final TourData tourData,
-										final ArrayList<TourMap3Position> trackPositions,
-										final ILegendProvider colorProvider) {
+	public TrackPathResolutionViewport(final ArrayList<TourMap3Position> trackPositions) {
 
 		super(trackPositions);
-
-		_tourData = tourData;
-		_trackPositions = trackPositions.toArray(new TourMap3Position[trackPositions.size()]);
-		_colorProvider = colorProvider;
 	}
 
 	@Override
 	protected Color getColor(final Position pos, final Integer ordinal) {
 
-		if (_isTourTrackPicked) {
-			// prevent setting position colors
-			return null;
-//			return Color.pink;
-		}
-
-		if (positionColors instanceof TourPositionColors) {
-
-			final TourPositionColors tourPosColors = (TourPositionColors) positionColors;
-			final TourMap3Position trackPosition = _trackPositions[ordinal];
-
-			if (_colorProvider instanceof ILegendProviderGradientColors) {
-
-				return tourPosColors.getGradientColor(
-						trackPosition.dataSerieValue,
-						ordinal,
-						_isTourTrackPicked,
-						_tourTrackPickIndex);
-
-			} else if (_colorProvider instanceof ILegendProviderDiscreteColors) {
-
-				return tourPosColors.getDiscreteColor(trackPosition.colorValue);
-			}
-		}
-
-		/**
-		 * <code>null</code> is very important when <b>NO</b> position colors are set.
-		 */
-
-		return null;
+		return _tourTrack.getColor(positionColors, pos, ordinal);
 	}
 
 	@Override
-	public TourData getTourData() {
-		return _tourData;
-	}
+	public List<Color> getTessellatedColors() {
 
-	TourMap3Position[] getTrackPositions() {
-		return _trackPositions;
-	}
-
-	public void setPicked(final boolean isTourTrackedPicked, final Integer pickIndex) {
-
-		_isTourTrackPicked = isTourTrackedPicked;
-
-		if (pickIndex == null) {
-			_tourTrackPickIndex = -1;
-		} else {
-			_tourTrackPickIndex = pickIndex;
-		}
-
-		final PathData pathData = getCurrentPathData();
-
-		if (isTourTrackedPicked) {
-
-			_notPickedTessColors = (ArrayList<Color>) pathData.getTessellatedColors();
-			pathData.setTessellatedColors(null);
-
-			if (positionColors != null) {
-
-				_notPickedPositionColors = positionColors;
-				positionColors = null;
-			}
-
-		} else {
-
-			pathData.setTessellatedColors(_notPickedTessColors);
-
-			if (_notPickedPositionColors != null) {
-				positionColors = _notPickedPositionColors;
-			}
-		}
+		return getCurrentPathData().getTessellatedColors();
 	}
 
 	@Override
-	public String toString() {
+	public void setPicked(final boolean isPicked, final Integer pickPositionIndex) {
 
-		return this.getClass().getSimpleName() + ("\t" + _tourData) //
-//				+ ("\tTrack positions: " + _trackPositions.length)
-				//
-		;
+		_tourTrack.setPicked(positionColors, isPicked, pickPositionIndex);
+	}
+
+	@Override
+	public void setTessellatedColors(final ArrayList<Color> tessellatedColors) {
+
+		getCurrentPathData().setTessellatedColors(tessellatedColors);
+	}
+
+	@Override
+	public void setTourTrack(final TourTrack tourTrack) {
+
+		_tourTrack = tourTrack;
 	}
 
 }

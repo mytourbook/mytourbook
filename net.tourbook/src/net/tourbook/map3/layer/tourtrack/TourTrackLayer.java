@@ -59,7 +59,7 @@ public class TourTrackLayer extends RenderableLayer implements SelectListener, I
 
 	private final TourTrackConfig		_trackConfig;
 
-	private ITourTrack					_lastPickedTourTrack;
+	private ITrackPath					_lastPickedTourTrack;
 	private Integer						_lastPickPositionIndex;
 
 	private boolean						_selectedTrack;
@@ -149,27 +149,37 @@ public class TourTrackLayer extends RenderableLayer implements SelectListener, I
 			/*
 			 * create one path for each tour
 			 */
-			Path trackPath;
+			TourTrack tourTrack;
+			ITrackPath trackPath;
+
 			if (_trackConfig.pathResolution == TourTrackConfig.PATH_RESOLUTION_MULTI_VIEWPORT) {
 
-				trackPath = new TrackPathResolutionViewport(tourData, trackPositions, _colorProvider);
+				trackPath = new TrackPathResolutionViewport(trackPositions);
 
 			} else if (_trackConfig.pathResolution == TourTrackConfig.PATH_RESOLUTION_MULTI_ALL) {
 
-				trackPath = new TrackPathResolutionFewer(tourData, trackPositions, _colorProvider);
+				trackPath = new TrackPathResolutionFewer(trackPositions);
 
 			} else {
 
 				// default == all track positions
-				trackPath = new TrackPathResolutionAll(tourData, trackPositions, _colorProvider);
+				trackPath = new TrackPathResolutionAll(trackPositions);
 			}
 
-			setPathAttributes(trackPath);
+			tourTrack = new TourTrack(trackPath, tourData, trackPositions, _colorProvider);
 
-			addRenderable(trackPath);
+			trackPath.setTourTrack(tourTrack);
 
-			// keep all positions which is used to find the outline for ALL selected tours
-			allPositions.addAll(trackPositions);
+			if (trackPath instanceof Path) {
+
+				final Path path = (Path) trackPath;
+
+				setPathAttributes(path);
+				addRenderable(path);
+
+				// keep all positions which is used to find the outline for ALL selected tours
+				allPositions.addAll(trackPositions);
+			}
 		}
 
 		_tourPositionColors.updateColors(allTours);
@@ -306,12 +316,12 @@ public class TourTrackLayer extends RenderableLayer implements SelectListener, I
 		sb.append(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] \t");
 		sb.append("topObject: " + topObjectText);
 
-		ITourTrack pickedTourTrack = null;
+		ITrackPath pickedTourTrack = null;
 		Integer pickPositionIndex = null;
 
-		if (topPickedObject != null && topPickedObject.getObject() instanceof ITourTrack) {
+		if (topPickedObject != null && topPickedObject.getObject() instanceof ITrackPath) {
 
-			pickedTourTrack = (ITourTrack) topPickedObject.getObject();
+			pickedTourTrack = (ITrackPath) topPickedObject.getObject();
 
 			final Object pickOrdinal = topPickedObject.getValue(AVKey.ORDINAL);
 			pickPositionIndex = (Integer) pickOrdinal;
@@ -326,7 +336,7 @@ public class TourTrackLayer extends RenderableLayer implements SelectListener, I
 //            return;
 
 
-		selected_WithAttributeColor(pickedTourTrack);
+//		selected_WithAttributeColor(pickedTourTrack);
 		selected_WithPositionColor(pickedTourTrack, pickPositionIndex);
 
 		_lastPickedTourTrack = pickedTourTrack;
@@ -336,10 +346,11 @@ public class TourTrackLayer extends RenderableLayer implements SelectListener, I
 		// TODO remove SYSTEM.OUT.PRINTLN
 	}
 
-	private void selected_WithAttributeColor(final ITourTrack pickedTourTrack) {
+	private void selected_WithAttributeColor(final ITrackPath pickedTourTrack) {
 
 		if (_lastPickedTourTrack == pickedTourTrack) {
-			return; // same thing selected
+			// same tour as before
+			return;
 		}
 
 		// Turn off highlight if on.
@@ -353,7 +364,7 @@ public class TourTrackLayer extends RenderableLayer implements SelectListener, I
 		}
 	}
 
-	private void selected_WithPositionColor(final ITourTrack pickedTourTrack, final Integer pickPositionIndex) {
+	private void selected_WithPositionColor(final ITrackPath pickedTourTrack, final Integer pickPositionIndex) {
 
 		boolean isRedraw = false;
 		if (pickedTourTrack == null) {
@@ -460,11 +471,6 @@ public class TourTrackLayer extends RenderableLayer implements SelectListener, I
 	 */
 	private void setPathAttributes(final Path path) {
 
-//		tourPath.setSkipCountComputer(tourPath.getSkipCountComputer());
-
-		// Override generic view-distance geometry regeneration because multi-res Paths handle that themselves.
-//		tourPath.setViewDistanceExpiration(false);
-
 		// Indicate that dots are to be drawn at each specified path position.
 		path.setShowPositions(_trackConfig.isShowTrackPosition);
 		path.setShowPositionsScale(_trackConfig.trackPositionSize);
@@ -480,11 +486,6 @@ public class TourTrackLayer extends RenderableLayer implements SelectListener, I
 			path.setFollowTerrain(isFollowTerrain);
 		}
 
-//		final String pathType = _trackConfig.pathType;
-//		if (pathType.equals(path.getPathType()) == false) {
-//			path.setPathType(pathType);
-//		}
-
 		final boolean isExtrudePath = _trackConfig.isExtrudePath;
 		if (isExtrudePath != path.isExtrude()) {
 			path.setExtrude(isExtrudePath);
@@ -494,6 +495,11 @@ public class TourTrackLayer extends RenderableLayer implements SelectListener, I
 		if (isDrawVerticals != path.isDrawVerticals()) {
 			path.setDrawVerticals(isDrawVerticals);
 		}
+
+//		final String pathType = _trackConfig.pathType;
+//		if (pathType.equals(path.getPathType()) == false) {
+//			path.setPathType(pathType);
+//		}
 
 //		final int numSubsegments = _trackConfig.numSubsegments;
 //		if (numSubsegments != path.getNumSubsegments()) {
