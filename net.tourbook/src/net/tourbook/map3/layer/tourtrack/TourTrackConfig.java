@@ -37,7 +37,7 @@ public class TourTrackConfig {
 	private static final String				STATE_INTERIOR_OPACITY			= "STATE_INTERIOR_OPACITY";			//$NON-NLS-1$
 	private static final String				STATE_INTERIOR_OPACITY_HOVERED	= "STATE_INTERIOR_OPACITY_HOVERED";	//$NON-NLS-1$
 	private static final String				STATE_INTERIOR_OPACITY_SELECTED	= "STATE_INTERIOR_OPACITY_SELECTED";	//$NON-NLS-1$
-	private static final String				STATE_NUMBER_OF_SUB_SEGMENTS	= "STATE_NUMBER_OF_SUB_SEGMENTS";		//$NON-NLS-1$
+//	private static final String				STATE_NUMBER_OF_SUB_SEGMENTS	= "STATE_NUMBER_OF_SUB_SEGMENTS";		//$NON-NLS-1$
 	private static final String				STATE_OUTLINE_COLOR				= "STATE_OUTLINE_COLOR";				//$NON-NLS-1$
 	private static final String				STATE_OUTLINE_COLOR_HOVERED		= "STATE_OUTLINE_COLOR_HOVERED";		//$NON-NLS-1$
 	private static final String				STATE_OUTLINE_COLOR_SELECTED	= "STATE_OUTLINE_COLOR_SELECTED";		//$NON-NLS-1$
@@ -46,7 +46,7 @@ public class TourTrackConfig {
 	private static final String				STATE_OUTLINE_OPACITY_SELECTED	= "STATE_OUTLINE_OPACITY_SELECTED";	//$NON-NLS-1$
 	private static final String				STATE_OUTLINE_WIDTH				= "STATE_OUTLINE_WIDTH";				//$NON-NLS-1$
 	private static final String				STATE_PATH_RESOLUTION			= "STATE_PATH_RESOLUTION";				//$NON-NLS-1$
-	private static final String				STATE_PATH_TYPE					= "STATE_PATH_TYPE";					//$NON-NLS-1$
+//	private static final String				STATE_PATH_TYPE					= "STATE_PATH_TYPE";					//$NON-NLS-1$
 	private static final String				STATE_TRACK_POSITION_SIZE		= "STATE_TRACK_POSITION_SIZE";			//$NON-NLS-1$
 	private static final String				STATE_TRACK_POSITION_THRESHOLD	= "STATE_TRACK_POSITION_THRESHOLD";	//$NON-NLS-1$
 
@@ -63,11 +63,13 @@ public class TourTrackConfig {
 //																			};
 
 	public static final int					PATH_RESOLUTION_ALL_POSITIONS	= 0;
-	public static final int					PATH_RESOLUTION_MULTI			= 1;
+	public static final int					PATH_RESOLUTION_MULTI_ALL		= 1;
+	public static final int					PATH_RESOLUTION_MULTI_VIEWPORT	= 2;
 
 	public static final PathResolution[]	PATH_RESOLUTION					= {
 			new PathResolution(Messages.Track_Config_Path_Resolution_All, PATH_RESOLUTION_ALL_POSITIONS),
-			new PathResolution(Messages.Track_Config_Path_Resolution_Multi, PATH_RESOLUTION_MULTI),//
+			new PathResolution(Messages.Track_Config_Path_Resolution_Fewer, PATH_RESOLUTION_MULTI_ALL),//
+			new PathResolution(Messages.Track_Config_Path_Resolution_Viewport, PATH_RESOLUTION_MULTI_VIEWPORT),//
 																			//
 																			};
 

@@ -15,10 +15,13 @@
  *******************************************************************************/
 package net.tourbook.map3.layer.tourtrack;
 
+import net.tourbook.data.TourData;
+
 public interface ITourTrack {
+
+	TourData getTourData();
 
 	void setHighlighted(boolean isHighlighted);
 
 	void setPicked(boolean isPicked, Integer pickPositionIndex);
-
 }

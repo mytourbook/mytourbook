@@ -121,7 +121,9 @@ public class Messages extends NLS {
 	public static String		Track_Config_Altitude_Mode_RelativeToGround;
 	public static String	Track_Config_Path_Resolution_All;
 
-	public static String	Track_Config_Path_Resolution_Multi;
+	public static String	Track_Config_Path_Resolution_Fewer;
+
+	public static String	Track_Config_Path_Resolution_Viewport;
 
 	public static String		Track_Config_Path_Type_GreatCircle;
 	public static String		Track_Config_Path_Type_Linear;

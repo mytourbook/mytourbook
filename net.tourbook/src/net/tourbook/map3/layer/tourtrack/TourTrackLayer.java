@@ -62,7 +62,7 @@ public class TourTrackLayer extends RenderableLayer implements SelectListener, I
 	private ITourTrack					_lastPickedTourTrack;
 	private Integer						_lastPickPositionIndex;
 
-	private boolean						_isSelected;
+	private boolean						_selectedTrack;
 
 	/**
 	 * This flag keeps track of adding/removing the listener that it is not done more than once.
@@ -150,11 +150,18 @@ public class TourTrackLayer extends RenderableLayer implements SelectListener, I
 			 * create one path for each tour
 			 */
 			Path trackPath;
-			if (_trackConfig.pathResolution == TourTrackConfig.PATH_RESOLUTION_MULTI) {
-				trackPath = new TrackPathMultiResolution(tourData, trackPositions, _colorProvider);
+			if (_trackConfig.pathResolution == TourTrackConfig.PATH_RESOLUTION_MULTI_VIEWPORT) {
+
+				trackPath = new TrackPathResolutionViewport(tourData, trackPositions, _colorProvider);
+
+			} else if (_trackConfig.pathResolution == TourTrackConfig.PATH_RESOLUTION_MULTI_ALL) {
+
+				trackPath = new TrackPathResolutionFewer(tourData, trackPositions, _colorProvider);
+
 			} else {
+
 				// default == all track positions
-				trackPath = new TrackPath(tourData, trackPositions, _colorProvider);
+				trackPath = new TrackPathResolutionAll(tourData, trackPositions, _colorProvider);
 			}
 
 			setPathAttributes(trackPath);
@@ -317,6 +324,7 @@ public class TourTrackLayer extends RenderableLayer implements SelectListener, I
 //        String eventAction = event.getEventAction();
 //		if (eventAction == SelectEvent.HOVER || eventAction == SelectEvent.ROLLOVER)
 //            return;
+
 
 		selected_WithAttributeColor(pickedTourTrack);
 		selected_WithPositionColor(pickedTourTrack, pickPositionIndex);
