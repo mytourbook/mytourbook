@@ -36,9 +36,45 @@ public class TrackPathResolutionAll extends Path implements ITrackPath {
 	}
 
 	public TrackPathResolutionAll(final ArrayList<TourMap3Position> trackPositions) {
-
 		super(trackPositions);
 	}
+
+//	/**
+//	 * This is overwritten to check if tessellatedColors are available.
+//	 * <p/>
+//	 * {@inheritDoc}
+//	 */
+//	@Override
+//	protected void addTessellatedPosition(	final Position pos,
+//											final Color color,
+//											final Integer ordinal,
+//											final PathData pathData) {
+//
+//		final TourPathData tourPathData = (TourPathData) pathData;
+//
+//		if (ordinal != null) {
+//			// NOTE: Assign these indices before adding the new position to the tessellatedPositions list.
+//			final int index = tourPathData.getTessellatedPositions().size() * 2;
+//			tourPathData.getPolePositions().put(index).put(index + 1);
+//
+//			if (tourPathData.isHasExtrusionPoints()) {
+//				tourPathData.getPositionPoints().put(index);
+//			} else {
+//				tourPathData.getPositionPoints().put(tourPathData.getTessellatedPositions().size());
+//			}
+//		}
+//
+//		tourPathData.getTessellatedPositions().add(pos); // be sure to do the add after the pole position is set
+//
+//		if (color != null) {
+//
+//			final List<Color> tessellatedColors = tourPathData.getTessellatedColors();
+//
+//			if (tessellatedColors != null) {
+//				tessellatedColors.add(color);
+//			}
+//		}
+//	}
 
 	/**
 	 * {@inheritDoc}
@@ -52,37 +88,58 @@ public class TrackPathResolutionAll extends Path implements ITrackPath {
 
 	@Override
 	protected Color getColor(final Position pos, final Integer ordinal) {
-
-		return _tourTrack.getColor(positionColors, pos, ordinal);
+		return _tourTrack.getColor(pos, ordinal);
 	}
 
 	@Override
-	public List<Color> getTessellatedColors() {
+	public PositionColors getPathPositionColors() {
+		return positionColors;
+	}
 
+	@Override
+	public List<Color> getPathTessellatedColors() {
 		return getCurrentPathData().getTessellatedColors();
+	}
+
+	@Override
+	public void render(final DrawContext dc) {
+
+		super.render(dc);
+
+//		System.out.println(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] \trender: " + dc);
+//		// TODO remove SYSTEM.OUT.PRINTLN
+	}
+
+	@Override
+	public void resetPathTessellatedColors() {
+		getCurrentPathData().setTessellatedColors(null);
+	}
+
+	@Override
+	public void setPathHighlighted(final boolean isHighlighted) {
+		setHighlighted(isHighlighted);
+	}
+
+	@Override
+	public void setPathPositionColors(final PositionColors positionColors) {
+		this.positionColors = positionColors;
 	}
 
 	@Override
 	public void setPicked(final boolean isPicked, final Integer pickPositionIndex) {
 
-		_tourTrack.setPicked(positionColors, isPicked, pickPositionIndex);
-	}
+		_tourTrack.setPicked(isPicked, pickPositionIndex);
 
-	@Override
-	public void setTessellatedColors(final ArrayList<Color> tessellatedColors) {
+		if (isPicked == false) {
 
-		final PathData currentPathData = getCurrentPathData();
+			// after picking, ensure that the positions colors are set again
 
-		currentPathData.setTessellatedColors(tessellatedColors);
-
-//		if (tessellatedColors == null) {
-//			currentPathData.setTessellatedPositions(null);
-//		}
+			getCurrentPathData().setExpired(true);
+		}
 	}
 
 	@Override
 	public void setTourTrack(final TourTrack tourTrack) {
-
 		_tourTrack = tourTrack;
 	}
 }

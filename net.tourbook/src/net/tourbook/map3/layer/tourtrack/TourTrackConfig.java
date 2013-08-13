@@ -37,7 +37,7 @@ public class TourTrackConfig {
 	private static final String				STATE_INTERIOR_OPACITY			= "STATE_INTERIOR_OPACITY";			//$NON-NLS-1$
 	private static final String				STATE_INTERIOR_OPACITY_HOVERED	= "STATE_INTERIOR_OPACITY_HOVERED";	//$NON-NLS-1$
 	private static final String				STATE_INTERIOR_OPACITY_SELECTED	= "STATE_INTERIOR_OPACITY_SELECTED";	//$NON-NLS-1$
-//	private static final String				STATE_NUMBER_OF_SUB_SEGMENTS	= "STATE_NUMBER_OF_SUB_SEGMENTS";		//$NON-NLS-1$
+	private static final String				STATE_NUMBER_OF_SUB_SEGMENTS	= "STATE_NUMBER_OF_SUB_SEGMENTS";		//$NON-NLS-1$
 	private static final String				STATE_OUTLINE_COLOR				= "STATE_OUTLINE_COLOR";				//$NON-NLS-1$
 	private static final String				STATE_OUTLINE_COLOR_HOVERED		= "STATE_OUTLINE_COLOR_HOVERED";		//$NON-NLS-1$
 	private static final String				STATE_OUTLINE_COLOR_SELECTED	= "STATE_OUTLINE_COLOR_SELECTED";		//$NON-NLS-1$
@@ -116,7 +116,8 @@ public class TourTrackConfig {
 
 	public double							outlineWidth;
 
-//	public int								numSubsegments;
+	// UI is currently disabled, subsegments == 0
+	public int								numSubsegments;
 //	public String							pathType;
 
 	public double							trackPositionSize;
@@ -249,7 +250,7 @@ public class TourTrackConfig {
 
 		// path + segments
 //		pathType = getPathTypeValue(Util.getStateString(state, STATE_PATH_TYPE, AVKey.LINEAR));
-//		numSubsegments = Util.getStateInt(state, STATE_NUMBER_OF_SUB_SEGMENTS, 0);
+		numSubsegments = Util.getStateInt(state, STATE_NUMBER_OF_SUB_SEGMENTS, 0);
 	}
 
 	void saveState(final IDialogSettings state) {
@@ -284,7 +285,7 @@ public class TourTrackConfig {
 		state.put(STATE_TRACK_POSITION_THRESHOLD, trackPositionThreshold);
 
 //		state.put(STATE_PATH_TYPE, pathType);
-//		state.put(STATE_NUMBER_OF_SUB_SEGMENTS, numSubsegments);
+		state.put(STATE_NUMBER_OF_SUB_SEGMENTS, numSubsegments);
 	}
 
 }

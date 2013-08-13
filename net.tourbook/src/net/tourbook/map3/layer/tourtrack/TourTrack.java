@@ -21,7 +21,6 @@ import gov.nasa.worldwind.render.Path.PositionColors;
 import java.awt.Color;
 import java.util.ArrayList;
 
-import net.tourbook.common.UI;
 import net.tourbook.common.color.ILegendProvider;
 import net.tourbook.common.color.ILegendProviderGradientColors;
 import net.tourbook.data.TourData;
@@ -39,7 +38,8 @@ public class TourTrack {
 	private int					_tourTrackPickIndex;
 
 	private PositionColors		_notPickedPositionColors;
-	private ArrayList<Color>	_notPickedTessColors;
+
+//	private ArrayList<Color>	_notPickedTessColors;
 
 	public TourTrack(	final ITrackPath trackPath,
 						final TourData tourData,
@@ -53,7 +53,7 @@ public class TourTrack {
 		_colorProvider = colorProvider;
 	}
 
-	Color getColor(final PositionColors positionColors, final Position pos, final Integer ordinal) {
+	Color getColor(final Position pos, final Integer ordinal) {
 
 		if (_isTourTrackPicked) {
 			// prevent setting position colors
@@ -61,6 +61,7 @@ public class TourTrack {
 //			return Color.pink;
 		}
 
+		final PositionColors positionColors = _trackPath.getPathPositionColors();
 		if (positionColors instanceof TourPositionColors) {
 
 			final TourPositionColors tourPosColors = (TourPositionColors) positionColors;
@@ -87,12 +88,22 @@ public class TourTrack {
 		return null;
 	}
 
-	public void setPicked(	final PositionColors positionColors,
-							final boolean isTourTrackedPicked,
-							final Integer pickIndex) {
+	public void setPicked(final boolean isTourTrackedPicked, final Integer pickIndex) {
 
-		final next strategy: final set tessellated color final NOT to null final but to one final color and the final highlighted position to final another color
-		
+//		System.out.println(UI.timeStampNano()
+//				+ " ["
+//				+ getClass().getSimpleName()
+//				+ "] \t\tisTourTrackedPicked="
+//				+ isTourTrackedPicked
+//				+ "\t_notPickedPositionColors="
+//				+ _notPickedPositionColors);
+//		// TODO remove SYSTEM.OUT.PRINTLN
+
+		/*
+		 * next strategy: set tessellated color final NOT to null final but to one final color and
+		 * the final highlighted position to final another color
+		 */
+
 		_isTourTrackPicked = isTourTrackedPicked;
 
 		if (pickIndex == null) {
@@ -103,29 +114,26 @@ public class TourTrack {
 
 		if (isTourTrackedPicked) {
 
-			_notPickedTessColors = (ArrayList<Color>) _trackPath.getTessellatedColors();
+			// tour IS picked
 
-			String size;
-			if (_notPickedTessColors == null) {
-				size = "null";
-			} else {
-				size = Integer.toString(_notPickedTessColors.size());
-			}
+			_trackPath.resetPathTessellatedColors();
 
-			_trackPath.setTessellatedColors(null);
+			final PositionColors positionColors = _trackPath.getPathPositionColors();
 
 			if (positionColors != null) {
 
 				_notPickedPositionColors = positionColors;
-//				positionColors = null;
+
+				_trackPath.setPathPositionColors(null);
 			}
 
 		} else {
 
-			_trackPath.setTessellatedColors(_notPickedTessColors);
+			// tour is NOT picked
 
 			if (_notPickedPositionColors != null) {
-//				positionColors = _notPickedPositionColors;
+
+				_trackPath.setPathPositionColors(_notPickedPositionColors);
 			}
 		}
 	}

@@ -16,9 +16,9 @@
 package net.tourbook.map3.layer.tourtrack;
 
 import gov.nasa.worldwind.render.Path;
+import gov.nasa.worldwind.render.Path.PositionColors;
 
 import java.awt.Color;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -26,13 +26,17 @@ import java.util.List;
  */
 public interface ITrackPath {
 
-	List<Color> getTessellatedColors();
+	PositionColors getPathPositionColors();
 
-	void setHighlighted(boolean isHighlighted);
+	List<Color> getPathTessellatedColors();
+
+	void resetPathTessellatedColors();
+
+	void setPathHighlighted(boolean isHighlighted);
+
+	void setPathPositionColors(PositionColors positionColors);
 
 	void setPicked(boolean isPicked, Integer pickPositionIndex);
-
-	void setTessellatedColors(ArrayList<Color> tessellatedColors);
 
 	void setTourTrack(TourTrack tourTrack);
 }

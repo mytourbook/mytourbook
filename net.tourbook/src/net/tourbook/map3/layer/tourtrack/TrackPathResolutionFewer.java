@@ -35,25 +35,43 @@ public class TrackPathResolutionFewer extends MTMultiResolutionPath implements I
 	@Override
 	protected Color getColor(final Position pos, final Integer ordinal) {
 
-		return _tourTrack.getColor(positionColors, pos, ordinal);
+		return _tourTrack.getColor(pos, ordinal);
 	}
 
 	@Override
-	public List<Color> getTessellatedColors() {
+	public PositionColors getPathPositionColors() {
+
+		return positionColors;
+	}
+
+	@Override
+	public List<Color> getPathTessellatedColors() {
 
 		return getCurrentPathData().getTessellatedColors();
 	}
 
 	@Override
-	public void setPicked(final boolean isPicked, final Integer pickPositionIndex) {
+	public void setPathHighlighted(final boolean isHighlighted) {
 
-		_tourTrack.setPicked(positionColors, isPicked, pickPositionIndex);
+		setHighlighted(isHighlighted);
 	}
 
 	@Override
-	public void setTessellatedColors(final ArrayList<Color> tessellatedColors) {
+	public void setPathPositionColors(final PositionColors positionColors) {
+
+		this.positionColors = positionColors;
+	}
+
+	@Override
+	public void resetPathTessellatedColors(final ArrayList<Color> tessellatedColors) {
 
 		getCurrentPathData().setTessellatedColors(tessellatedColors);
+	}
+
+	@Override
+	public void setPicked(final boolean isPicked, final Integer pickPositionIndex) {
+
+		_tourTrack.setPicked(isPicked, pickPositionIndex);
 	}
 
 	@Override

@@ -255,6 +255,7 @@ public class TourTrackLayer extends RenderableLayer implements SelectListener, I
 				}
 			}
 
+			// ensure path modifications are redrawn
 			Map3Manager.getWWCanvas().redraw();
 		}
 	}
@@ -335,8 +336,7 @@ public class TourTrackLayer extends RenderableLayer implements SelectListener, I
 //		if (eventAction == SelectEvent.HOVER || eventAction == SelectEvent.ROLLOVER)
 //            return;
 
-
-//		selected_WithAttributeColor(pickedTourTrack);
+		selected_WithAttributeColor(pickedTourTrack);
 		selected_WithPositionColor(pickedTourTrack, pickPositionIndex);
 
 		_lastPickedTourTrack = pickedTourTrack;
@@ -355,12 +355,12 @@ public class TourTrackLayer extends RenderableLayer implements SelectListener, I
 
 		// Turn off highlight if on.
 		if (_lastPickedTourTrack != null) {
-			_lastPickedTourTrack.setHighlighted(false);
+			_lastPickedTourTrack.setPathHighlighted(false);
 		}
 
 		// Turn on highlight if object selected.
 		if (pickedTourTrack instanceof Highlightable) {
-			pickedTourTrack.setHighlighted(true);
+			pickedTourTrack.setPathHighlighted(true);
 		}
 	}
 
@@ -496,16 +496,24 @@ public class TourTrackLayer extends RenderableLayer implements SelectListener, I
 			path.setDrawVerticals(isDrawVerticals);
 		}
 
+// UI is disabled
 //		final String pathType = _trackConfig.pathType;
 //		if (pathType.equals(path.getPathType()) == false) {
 //			path.setPathType(pathType);
 //		}
 
+// UI is disabled
 //		final int numSubsegments = _trackConfig.numSubsegments;
 //		if (numSubsegments != path.getNumSubsegments()) {
 //			path.setNumSubsegments(numSubsegments);
 //		}
-		path.setNumSubsegments(0);
+		/*
+		 * numSubsegments do not have a UI (it's disabled) but ensure that 0 subsegments are set
+		 */
+		if (path.getNumSubsegments() != 0) {
+			path.setNumSubsegments(0);
+			_trackConfig.numSubsegments = 0;
+		}
 
 		/*
 		 * Shape attributes for the path
