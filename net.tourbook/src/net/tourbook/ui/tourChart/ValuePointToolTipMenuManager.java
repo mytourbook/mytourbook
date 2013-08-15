@@ -608,13 +608,12 @@ public class ValuePointToolTipMenuManager {
 		_menuParentItem = toolItem;
 
 		final ToolBar menuParentControl = _menuParentItem.getParent();
-
-		final Menu menu = getMenu(menuParentControl);
-
 		final Rectangle toolItemBounds = _menuParentItem.getBounds();
+
 		Point topLeft = new Point(toolItemBounds.x, toolItemBounds.y + toolItemBounds.height);
 		topLeft = menuParentControl.toDisplay(topLeft);
 
+		final Menu menu = getMenu(menuParentControl);
 		menu.setLocation(topLeft.x, topLeft.y);
 		menu.setVisible(true);
 	}

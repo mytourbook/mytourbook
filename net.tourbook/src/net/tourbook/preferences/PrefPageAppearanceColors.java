@@ -75,37 +75,37 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 
 public class PrefPageAppearanceColors extends PreferencePage implements IWorkbenchPreferencePage, IColorTreeViewer {
 
-	private static final List<Float>		_unitValues			= Arrays.asList(10f, 50f, 100f, 150f, 190f);
-	private static final List<String>		_unitLabels			= Arrays.asList(
-																		Messages.Pref_ChartColors_unit_min,
-																		Messages.Pref_ChartColors_unit_low,
-																		Messages.Pref_ChartColors_unit_mid,
-																		Messages.Pref_ChartColors_unit_high,
-																		Messages.Pref_ChartColors_unit_max);
+	private static final List<Float>	_unitValues			= Arrays.asList(10f, 50f, 100f, 150f, 190f);
+	private static final List<String>	_unitLabels			= Arrays.asList(
+																	Messages.Pref_ChartColors_unit_min,
+																	Messages.Pref_ChartColors_unit_low,
+																	Messages.Pref_ChartColors_unit_mid,
+																	Messages.Pref_ChartColors_unit_high,
+																	Messages.Pref_ChartColors_unit_max);
 
-	private final IPreferenceStore			_prefStore			= TourbookPlugin.getDefault().getPreferenceStore();
-	private final IPreferenceStore			_commonPrefStore	= CommonActivator.getPrefStore();
+	private final IPreferenceStore		_prefStore			= TourbookPlugin.getDefault().getPreferenceStore();
+	private final IPreferenceStore		_commonPrefStore	= CommonActivator.getPrefStore();
 
-	private ValueColor[]					_valueColors		= new ValueColor[] {
+	private ValueColor[]				_valueColors		= new ValueColor[] {
 			new ValueColor(10, 255, 0, 0),
 			new ValueColor(50, 100, 100, 0),
 			new ValueColor(100, 0, 255, 0),
 			new ValueColor(150, 0, 100, 100),
-			new ValueColor(190, 0, 0, 255)						};
+			new ValueColor(190, 0, 0, 255)					};
 
-	TreeViewer								_colorViewer;
+	TreeViewer							_colorViewer;
 
-	private ColorSelector					_colorSelector;
-	private Button							_btnLegend;
+	private ColorSelector				_colorSelector;
+	private Button						_btnLegend;
 
-	private GraphColorItem					_selectedColor;
-	private boolean							_isColorChanged;
+	private GraphColorItem				_selectedColor;
+	private boolean						_isColorChanged;
 
-	private ColorDefinition					_expandedItem;
+	private ColorDefinition				_expandedItem;
 
-	private GradientColorProvider	_legendProvider;
-	private DialogMappingColor				_dialogMappingColor;
-	private GraphColorPainter				_graphColorPainter;
+	private GradientColorProvider		_legendProvider;
+	private DialogMappingColor			_dialogMappingColor;
+	private GraphColorPainter			_graphColorPainter;
 
 	/**
 	 * the color content provider has the following structure<br>

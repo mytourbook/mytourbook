@@ -37,9 +37,7 @@ public class TourTrack {
 
 	private int					_tourTrackPickIndex;
 
-	private PositionColors		_notPickedPositionColors;
-
-//	private ArrayList<Color>	_notPickedTessColors;
+	private PositionColors		_originalPositionColors;
 
 	public TourTrack(	final ITrackPath trackPath,
 						final TourData tourData,
@@ -56,6 +54,7 @@ public class TourTrack {
 	Color getColor(final Position pos, final Integer ordinal) {
 
 		if (_isTourTrackPicked) {
+
 			// prevent setting position colors
 			return null;
 //			return Color.pink;
@@ -90,20 +89,6 @@ public class TourTrack {
 
 	public void setPicked(final boolean isTourTrackedPicked, final Integer pickIndex) {
 
-//		System.out.println(UI.timeStampNano()
-//				+ " ["
-//				+ getClass().getSimpleName()
-//				+ "] \t\tisTourTrackedPicked="
-//				+ isTourTrackedPicked
-//				+ "\t_notPickedPositionColors="
-//				+ _notPickedPositionColors);
-//		// TODO remove SYSTEM.OUT.PRINTLN
-
-		/*
-		 * next strategy: set tessellated color final NOT to null final but to one final color and
-		 * the final highlighted position to final another color
-		 */
-
 		_isTourTrackPicked = isTourTrackedPicked;
 
 		if (pickIndex == null) {
@@ -122,7 +107,7 @@ public class TourTrack {
 
 			if (positionColors != null) {
 
-				_notPickedPositionColors = positionColors;
+				_originalPositionColors = positionColors;
 
 				_trackPath.setPathPositionColors(null);
 			}
@@ -131,9 +116,9 @@ public class TourTrack {
 
 			// tour is NOT picked
 
-			if (_notPickedPositionColors != null) {
+			if (_originalPositionColors != null) {
 
-				_trackPath.setPathPositionColors(_notPickedPositionColors);
+				_trackPath.setPathPositionColors(_originalPositionColors);
 			}
 		}
 	}

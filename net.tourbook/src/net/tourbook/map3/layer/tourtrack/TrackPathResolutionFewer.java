@@ -16,6 +16,7 @@
 package net.tourbook.map3.layer.tourtrack;
 
 import gov.nasa.worldwind.geom.Position;
+import gov.nasa.worldwind.render.DrawContext;
 
 import java.awt.Color;
 import java.util.ArrayList;
@@ -34,50 +35,67 @@ public class TrackPathResolutionFewer extends MTMultiResolutionPath implements I
 
 	@Override
 	protected Color getColor(final Position pos, final Integer ordinal) {
-
 		return _tourTrack.getColor(pos, ordinal);
 	}
 
 	@Override
 	public PositionColors getPathPositionColors() {
-
 		return positionColors;
 	}
 
 	@Override
 	public List<Color> getPathTessellatedColors() {
-
 		return getCurrentPathData().getTessellatedColors();
 	}
 
 	@Override
-	public void setPathHighlighted(final boolean isHighlighted) {
+	public void resetPathTessellatedColors() {
+		getCurrentPathData().setTessellatedColors(null);
+	}
 
+	@Override
+	public void setPathHighlighted(final boolean isHighlighted) {
 		setHighlighted(isHighlighted);
 	}
 
 	@Override
 	public void setPathPositionColors(final PositionColors positionColors) {
-
 		this.positionColors = positionColors;
-	}
-
-	@Override
-	public void resetPathTessellatedColors(final ArrayList<Color> tessellatedColors) {
-
-		getCurrentPathData().setTessellatedColors(tessellatedColors);
 	}
 
 	@Override
 	public void setPicked(final boolean isPicked, final Integer pickPositionIndex) {
 
 		_tourTrack.setPicked(isPicked, pickPositionIndex);
+
+		if (isPicked == false) {
+
+			/*
+			 * This hack prevents an tess color NPE, it took me many days to understand 3D drawing
+			 * and find this "solution".
+			 */
+			getCurrentPathData().setTessellatedPositions(null);
+		}
+
+		// after picking, ensure that the positions colors are set again
+		getCurrentPathData().setExpired(true);
 	}
 
 	@Override
 	public void setTourTrack(final TourTrack tourTrack) {
-
 		_tourTrack = tourTrack;
 	}
 
+	@Override
+	protected boolean shouldUseVBOs(final DrawContext dc) {
+
+		final List<Position> tessellatedPositions = this.getCurrentPathData().getTessellatedPositions();
+
+		// NPE can occure
+		if (tessellatedPositions == null) {
+			return true;
+		}
+
+		return tessellatedPositions.size() > VBO_THRESHOLD && super.shouldUseVBOs(dc);
+	}
 }

@@ -1,6 +1,3 @@
-/*
- * This source code was found (1.8.2013) here http://www.eclipse.org/forums/index.php/t/208284/
- */
 package net.tourbook.common.util;
 
 import java.awt.BorderLayout;
@@ -25,6 +22,10 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
+
+/*
+ * This source code was found (1.8.2013) here http://www.eclipse.org/forums/index.php/t/208284/
+ */
 
 /**
  * Demonstrates the workaround for displaying a SWT popup menu over swing components under GTK (menu
@@ -102,6 +103,7 @@ public class SWTPopupOverAWT {
 
 		final JPanel jPanel = new JPanel(new BorderLayout());
 		awtPanel.add(jPanel);
+
 		jPanel.addMouseListener(new MouseAdapter() { // maps AWT mouse events to the display of the popup menu
 
 					@Override

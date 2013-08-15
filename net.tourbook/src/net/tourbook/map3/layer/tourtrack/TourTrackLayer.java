@@ -317,17 +317,17 @@ public class TourTrackLayer extends RenderableLayer implements SelectListener, I
 		sb.append(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] \t");
 		sb.append("topObject: " + topObjectText);
 
-		ITrackPath pickedTourTrack = null;
+		ITrackPath pickedTrackPath = null;
 		Integer pickPositionIndex = null;
 
 		if (topPickedObject != null && topPickedObject.getObject() instanceof ITrackPath) {
 
-			pickedTourTrack = (ITrackPath) topPickedObject.getObject();
+			pickedTrackPath = (ITrackPath) topPickedObject.getObject();
 
 			final Object pickOrdinal = topPickedObject.getValue(AVKey.ORDINAL);
 			pickPositionIndex = (Integer) pickOrdinal;
 
-			sb.append("\t" + pickedTourTrack);
+			sb.append("\t" + pickedTrackPath);
 			sb.append("\tpickIndex: " + pickPositionIndex);
 		}
 
@@ -336,14 +336,14 @@ public class TourTrackLayer extends RenderableLayer implements SelectListener, I
 //		if (eventAction == SelectEvent.HOVER || eventAction == SelectEvent.ROLLOVER)
 //            return;
 
-		selected_WithAttributeColor(pickedTourTrack);
-		selected_WithPositionColor(pickedTourTrack, pickPositionIndex);
+		selected_WithAttributeColor(pickedTrackPath);
+		selected_WithPositionColor(pickedTrackPath, pickPositionIndex);
 
-		_lastPickedTourTrack = pickedTourTrack;
+		_lastPickedTourTrack = pickedTrackPath;
 		_lastPickPositionIndex = pickPositionIndex;
 
-		System.out.println(sb.toString());
-		// TODO remove SYSTEM.OUT.PRINTLN
+//		System.out.println(sb.toString());
+//		// TODO remove SYSTEM.OUT.PRINTLN
 	}
 
 	private void selected_WithAttributeColor(final ITrackPath pickedTourTrack) {
@@ -364,16 +364,16 @@ public class TourTrackLayer extends RenderableLayer implements SelectListener, I
 		}
 	}
 
-	private void selected_WithPositionColor(final ITrackPath pickedTourTrack, final Integer pickPositionIndex) {
+	private void selected_WithPositionColor(final ITrackPath pickedTrackPath, final Integer pickPositionIndex) {
 
 		boolean isRedraw = false;
-		if (pickedTourTrack == null) {
+		if (pickedTrackPath == null) {
 
 			// a new tour track is not picked
 
 			if (_lastPickedTourTrack == null) {
 
-				// nothing is picked, nothing must be reseted
+				// nothing is picked, nothing must be reset
 
 			} else {
 
@@ -391,14 +391,14 @@ public class TourTrackLayer extends RenderableLayer implements SelectListener, I
 
 				// a new track is picked
 
-				pickedTourTrack.setPicked(true, pickPositionIndex);
+				pickedTrackPath.setPicked(true, pickPositionIndex);
 				isRedraw = true;
 
 			} else {
 
 				// an old track is picked, check if a new track is picked
 
-				if (_lastPickedTourTrack == pickedTourTrack) {
+				if (_lastPickedTourTrack == pickedTrackPath) {
 
 					// the same track is picked, check if another position is picked
 
@@ -406,7 +406,7 @@ public class TourTrackLayer extends RenderableLayer implements SelectListener, I
 
 						// a new position is picked
 
-						pickedTourTrack.setPicked(true, pickPositionIndex);
+						pickedTrackPath.setPicked(true, pickPositionIndex);
 						isRedraw = true;
 
 					} else {
@@ -417,7 +417,7 @@ public class TourTrackLayer extends RenderableLayer implements SelectListener, I
 
 							// a new position is not picked, reset pick position but keep the track picked
 
-							pickedTourTrack.setPicked(true, null);
+							pickedTrackPath.setPicked(true, null);
 							isRedraw = true;
 
 						} else {
@@ -430,7 +430,7 @@ public class TourTrackLayer extends RenderableLayer implements SelectListener, I
 
 								// another position is picked
 
-								pickedTourTrack.setPicked(true, pickPositionIndex);
+								pickedTrackPath.setPicked(true, pickPositionIndex);
 								isRedraw = true;
 							}
 						}
@@ -444,7 +444,7 @@ public class TourTrackLayer extends RenderableLayer implements SelectListener, I
 					_lastPickedTourTrack.setPicked(false, null);
 
 					// pick new track
-					pickedTourTrack.setPicked(true, pickPositionIndex);
+					pickedTrackPath.setPicked(true, pickPositionIndex);
 
 					isRedraw = true;
 				}

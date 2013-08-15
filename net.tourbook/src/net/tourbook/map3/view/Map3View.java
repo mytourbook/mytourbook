@@ -22,13 +22,19 @@ import gov.nasa.worldwind.awt.WorldWindowGLCanvas;
 import java.awt.BorderLayout;
 import java.awt.EventQueue;
 import java.awt.Frame;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 
+import javax.swing.SwingUtilities;
+
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.UI;
 import net.tourbook.common.color.ILegendProvider;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.map2.view.TourMapColors;
+import net.tourbook.map3.action.ActionMapColor;
 import net.tourbook.map3.action.ActionOpenMap3LayerView;
 import net.tourbook.map3.action.ActionShowEntireTour;
 import net.tourbook.map3.action.ActionShowTourInMap3;
@@ -46,6 +52,8 @@ import net.tourbook.tour.TourEvent;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
 
+import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.ActionContributionItem;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -56,8 +64,11 @@ import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.awt.SWT_AWT;
+import org.eclipse.swt.events.MenuAdapter;
+import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Menu;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchPart;
@@ -81,14 +92,14 @@ public class Map3View extends ViewPart {
 																								.getPreferenceStore();
 
 	private final IDialogSettings				_state									= TourbookPlugin
-																								.getStateSection(//
-																								getClass()
+																								.getStateSection(getClass()
 																										.getCanonicalName());
 
 	private static final WorldWindowGLCanvas	_wwCanvas								= Map3Manager.getWWCanvas();
 
 	private ActionOpenMap3LayerView				_actionOpenMap3LayerView;
 
+	private ActionMapColor						_actionMapColor;
 	private ActionShowEntireTour				_actionShowEntireTour;
 	private ActionShowTourInMap3				_actionShowTourInMap3;
 	private ActionSyncMapPositionWithSlider		_actionSynMapPositionWithSlider;
@@ -104,6 +115,7 @@ public class Map3View extends ViewPart {
 	private ISelectionListener					_postSelectionListener;
 	private IPropertyChangeListener				_prefChangeListener;
 	private ITourEventListener					_tourEventListener;
+	private MouseAdapter						_map3MouseListener;
 
 	private boolean								_isPartVisible;
 	private boolean								_isRestored;
@@ -124,6 +136,8 @@ public class Map3View extends ViewPart {
 
 	private Frame								_awtFrame;
 
+	private Menu								_contextMenu;
+
 	private static int							_renderCounter;
 
 	public Map3View() {}
@@ -131,6 +145,8 @@ public class Map3View extends ViewPart {
 	public void actionSetTourColor(final int colorId) {
 
 		_tourColorId = colorId;
+
+		_actionMapColor.setColorId(colorId);
 
 		setColorProvider(colorId);
 
@@ -167,22 +183,15 @@ public class Map3View extends ViewPart {
 
 	private void addMap3Listener() {
 
-		// Register a rendering listener that's notified when exceptions occur during rendering.
-//		_wwCanvas.addRenderingListener(new RenderingListener() {
-//
-//			@Override
-//			public void stageChanged(final RenderingEvent event) {
-//
-//				Display.getDefault().asyncExec(new Runnable() {
-//					public void run() {
-//
-//						System.out.println(UI.timeStampNano() + " is rendered: " + _renderCounter++);
-//						// TODO remove SYSTEM.OUT.PRINTLN
-//
-//					}
-//				});
-//			}
-//		});
+		_map3MouseListener = new MouseAdapter() {
+
+			@Override
+			public void mouseClicked(final MouseEvent e) {
+				onMouseClick(e);
+			}
+		};
+
+		_wwCanvas.getInputHandler().addMouseListener(_map3MouseListener);
 	}
 
 	private void addPartListener() {
@@ -326,6 +335,8 @@ public class Map3View extends ViewPart {
 
 		_actionOpenMap3LayerView = new ActionOpenMap3LayerView();
 
+		_actionMapColor = new ActionMapColor(this, _state);
+
 		_actionShowEntireTour = new ActionShowEntireTour(this);
 		_actionShowTourInMap3 = new ActionShowTourInMap3(this, parent);
 		_actionSynMapPositionWithSlider = new ActionSyncMapPositionWithSlider(this);
@@ -339,6 +350,30 @@ public class Map3View extends ViewPart {
 		_actionTourColorHrZone = ActionTourColor.createAction(this, ILegendProvider.TOUR_COLOR_HR_ZONE);
 	}
 
+	/**
+	 * Context menu with net.tourbook.common.util.SWTPopupOverAWT
+	 * 
+	 * @param yPosScreen
+	 * @param xPosScreen
+	 */
+	private void createContextMenu(final int xPosScreen, final int yPosScreen) {
+
+		disposeContextMenu();
+
+		_contextMenu = new Menu(_mapContainer);
+
+		// Add listener to repopulate the menu each time
+		_contextMenu.addMenuListener(new MenuAdapter() {
+			@Override
+			public void menuShown(final MenuEvent e) {
+				fillContextMenu((Menu) e.widget);
+			}
+		});
+
+		_contextMenu.setLocation(xPosScreen, yPosScreen);
+		_contextMenu.setVisible(true);
+	}
+
 	@Override
 	public void createPartControl(final Composite parent) {
 
@@ -348,7 +383,7 @@ public class Map3View extends ViewPart {
 		addPrefListener();
 		addSelectionListener();
 		addTourEventListener();
-//		addMap3Listener();
+		addMap3Listener();
 
 		createActions(parent);
 		fillActionBars();
@@ -400,8 +435,6 @@ public class Map3View extends ViewPart {
 
 			_awtFrame.add(awtPanel);
 			awtPanel.add(_wwCanvas, BorderLayout.CENTER);
-
-			// set context menu with net.tourbook.common.util.SWTPopupOverAWT
 		}
 
 		parent.layout();
@@ -418,7 +451,17 @@ public class Map3View extends ViewPart {
 
 		TourManager.getInstance().removeTourEventListener(_tourEventListener);
 
+		_wwCanvas.getInputHandler().removeMouseListener(_map3MouseListener);
+
+		disposeContextMenu();
+
 		super.dispose();
+	}
+
+	private void disposeContextMenu() {
+		if (_contextMenu != null) {
+			_contextMenu.dispose();
+		}
 	}
 
 	/**
@@ -462,6 +505,62 @@ public class Map3View extends ViewPart {
 		tbm.add(new Separator());
 
 		tbm.add(_actionOpenMap3LayerView);
+	}
+
+	private void fillContextMenu(final Menu menu) {
+
+		fillMenuItem(menu, _actionMapColor);
+
+//		final MenuItem item1 = new MenuItem(_contextMenu, SWT.PUSH);
+//		item1.setText("useless item for test");
+//		item1.addSelectionListener(new SelectionListener() {
+//			@Override
+//			public void widgetDefaultSelected(final SelectionEvent arg0) {}
+//
+//			@Override
+//			public void widgetSelected(final SelectionEvent arg0) {
+//				System.out.println("The useless popup menu was clicked !");
+//			}
+//		});
+	}
+
+	private void fillMenuItem(final Menu menu, final Action action) {
+
+		final ActionContributionItem item = new ActionContributionItem(action);
+		item.fill(menu, -1);
+	}
+
+	private void onMouseClick(final MouseEvent mouseEvent) {
+
+		if (mouseEvent == null || mouseEvent.isConsumed()) {
+			return;
+		}
+
+		final boolean isRightClick = SwingUtilities.isRightMouseButton(mouseEvent);
+		if (isRightClick) {
+
+			// open context menu
+
+			System.out.println(UI.timeStampNano()
+					+ " ["
+					+ getClass().getSimpleName()
+					+ "] \tRight_Click\t"
+					+ mouseEvent.getXOnScreen()
+					+ " : "
+					+ mouseEvent.getYOnScreen());
+			// TODO remove SYSTEM.OUT.PRINTLN
+
+			_mapContainer.getDisplay().asyncExec(new Runnable() {
+
+				public void run() {
+
+					System.out.println("SWT calling menu");
+
+					createContextMenu(mouseEvent.getXOnScreen(), mouseEvent.getYOnScreen());
+				}
+			});
+			mouseEvent.consume();
+		}
 	}
 
 	private void onSelectionChanged(final ISelection selection) {
@@ -768,6 +867,8 @@ public class Map3View extends ViewPart {
 			_actionTourColorAltitude.setChecked(true);
 			break;
 		}
+
+		_actionMapColor.setColorId(_tourColorId);
 
 		setColorProvider(_tourColorId);
 

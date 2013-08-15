@@ -102,15 +102,6 @@ public class TrackPathResolutionAll extends Path implements ITrackPath {
 	}
 
 	@Override
-	public void render(final DrawContext dc) {
-
-		super.render(dc);
-
-//		System.out.println(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] \trender: " + dc);
-//		// TODO remove SYSTEM.OUT.PRINTLN
-	}
-
-	@Override
 	public void resetPathTessellatedColors() {
 		getCurrentPathData().setTessellatedColors(null);
 	}
@@ -132,14 +123,32 @@ public class TrackPathResolutionAll extends Path implements ITrackPath {
 
 		if (isPicked == false) {
 
-			// after picking, ensure that the positions colors are set again
-
-			getCurrentPathData().setExpired(true);
+			/*
+			 * This hack prevents an tess color NPE, it took me many days to understand 3D drawing
+			 * and find this "solution".
+			 */
+			getCurrentPathData().setTessellatedPositions(null);
 		}
+
+		// after picking, ensure that the positions colors are set again
+		getCurrentPathData().setExpired(true);
 	}
 
 	@Override
 	public void setTourTrack(final TourTrack tourTrack) {
 		_tourTrack = tourTrack;
+	}
+
+	@Override
+	protected boolean shouldUseVBOs(final DrawContext dc) {
+
+		final List<Position> tessellatedPositions = this.getCurrentPathData().getTessellatedPositions();
+
+		// NPE can occure
+		if (tessellatedPositions == null) {
+			return true;
+		}
+
+		return tessellatedPositions.size() > VBO_THRESHOLD && super.shouldUseVBOs(dc);
 	}
 }
