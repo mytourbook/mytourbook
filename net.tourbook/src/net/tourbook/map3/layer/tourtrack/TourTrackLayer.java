@@ -35,9 +35,9 @@ import java.beans.PropertyChangeEvent;
 import java.util.ArrayList;
 
 import net.tourbook.common.UI;
-import net.tourbook.common.color.ILegendProvider;
+import net.tourbook.common.color.IMapColorProvider;
 import net.tourbook.data.TourData;
-import net.tourbook.map2.view.ILegendProviderDiscreteColors;
+import net.tourbook.map2.view.IDiscreteColors;
 import net.tourbook.map3.Messages;
 import net.tourbook.map3.view.ICheckStateListener;
 import net.tourbook.map3.view.Map3Manager;
@@ -55,7 +55,7 @@ public class TourTrackLayer extends RenderableLayer implements SelectListener, I
 	private IDialogSettings				_state;
 
 	private final TourPositionColors	_tourPositionColors;
-	private ILegendProvider				_colorProvider;
+	private IMapColorProvider				_colorProvider;
 
 	private final TourTrackConfig		_trackConfig;
 
@@ -136,9 +136,9 @@ public class TourTrackLayer extends RenderableLayer implements SelectListener, I
 						altitude,
 						dataSerieValue);
 
-				if (_colorProvider instanceof ILegendProviderDiscreteColors) {
+				if (_colorProvider instanceof IDiscreteColors) {
 
-					final ILegendProviderDiscreteColors discreteColorProvider = (ILegendProviderDiscreteColors) _colorProvider;
+					final IDiscreteColors discreteColorProvider = (IDiscreteColors) _colorProvider;
 
 					trackPosition.colorValue = discreteColorProvider.getColorValue(tourData, serieIndex);
 				}
@@ -209,23 +209,23 @@ public class TourTrackLayer extends RenderableLayer implements SelectListener, I
 
 //		final ILegendProvider colorProvider = _tourPositionColors.getColorProvider();
 
-		switch (_colorProvider.getTourColorId()) {
-		case ILegendProvider.TOUR_COLOR_ALTITUDE:
+		switch (_colorProvider.getMapColorId()) {
+		case Altitude:
 			return tourData.altitudeSerie;
 
-		case ILegendProvider.TOUR_COLOR_GRADIENT:
+		case Gradient:
 			return tourData.getGradientSerie();
 
-		case ILegendProvider.TOUR_COLOR_PULSE:
-			return tourData.pulseSerie;
-
-		case ILegendProvider.TOUR_COLOR_SPEED:
-			return tourData.getSpeedSerie();
-
-		case ILegendProvider.TOUR_COLOR_PACE:
+		case Pace:
 			return tourData.getPaceSerieSeconds();
 
-		case ILegendProvider.TOUR_COLOR_HR_ZONE:
+		case Pulse:
+			return tourData.pulseSerie;
+
+		case Speed:
+			return tourData.getSpeedSerie();
+
+		case HrZone:
 			return tourData.pulseSerie;
 
 		default:
@@ -456,7 +456,7 @@ public class TourTrackLayer extends RenderableLayer implements SelectListener, I
 		}
 	}
 
-	public void setColorProvider(final ILegendProvider colorProvider) {
+	public void setColorProvider(final IMapColorProvider colorProvider) {
 
 		_colorProvider = colorProvider;
 

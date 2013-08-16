@@ -18,12 +18,10 @@ package net.tourbook.map2.view;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.color.ColorDefinition;
-import net.tourbook.common.color.GradientColorProvider;
-import net.tourbook.common.color.ILegendProviderGradientColors;
-import net.tourbook.common.color.LegendColor;
+import net.tourbook.common.color.IGradientColors;
+import net.tourbook.common.color.MapColor;
 import net.tourbook.common.color.ValueColor;
 import net.tourbook.map2.Messages;
-import net.tourbook.preferences.PrefPageAppearanceColors;
 
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -67,59 +65,59 @@ import org.eclipse.swt.widgets.Spinner;
 
 public class DialogMappingColor extends TitleAreaDialog {
 
-	private static final String			VALUE_SPACER		= "999";			//$NON-NLS-1$
+	private static final String					VALUE_SPACER		= "999";			//$NON-NLS-1$
 
-	private static final int			SPINNER_MIN_VALUE	= -200;
-	private static final int			SPINNER_MAX_VALUE	= 10000;
+	private static final int					SPINNER_MIN_VALUE	= -200;
+	private static final int					SPINNER_MAX_VALUE	= 10000;
 
-	private static final String			STATE_LIVE_UPDATE	= "IsLiveUpdate";	//$NON-NLS-1$
+	private static final String					STATE_LIVE_UPDATE	= "IsLiveUpdate";	//$NON-NLS-1$
 
 	// ---------- UI controls----------
 
-	private Canvas						_canvasMappingColor;
-	private Image						_imageMappingColor;
+	private Canvas								_canvasMappingColor;
+	private Image								_imageMappingColor;
 
-	private Combo						_cboMaxBrightness;
-	private Combo						_cboMinBrightness;
+	private Combo								_cboMaxBrightness;
+	private Combo								_cboMinBrightness;
 
-	private Scale						_scaleMinBrightness;
-	private Label						_lblMinBrightnessValue;
-	private Scale						_scaleMaxBrightness;
-	private Label						_lblMaxBrightnessValue;
+	private Scale								_scaleMinBrightness;
+	private Label								_lblMinBrightnessValue;
+	private Scale								_scaleMaxBrightness;
+	private Label								_lblMaxBrightnessValue;
 
-	private Button						_chkForceMinValue;
-	private Label						_lblMinValue;
-	private Spinner						_spinMinValue;
+	private Button								_chkForceMinValue;
+	private Label								_lblMinValue;
+	private Spinner								_spinMinValue;
 
-	private Button						_chkForceMaxValue;
-	private Label						_lblMaxValue;
-	private Spinner						_spinMaxValue;
+	private Button								_chkForceMaxValue;
+	private Label								_lblMaxValue;
+	private Spinner								_spinMaxValue;
 
-	private ColorSelector				_colorSelectorMax;
-	private ColorSelector				_colorSelectorHigh;
-	private ColorSelector				_colorSelectorMid;
-	private ColorSelector				_colorSelectorLow;
-	private ColorSelector				_colorSelectorMin;
+	private ColorSelector						_colorSelectorMax;
+	private ColorSelector						_colorSelectorHigh;
+	private ColorSelector						_colorSelectorMid;
+	private ColorSelector						_colorSelectorLow;
+	private ColorSelector						_colorSelectorMin;
 
 	// ---------- fields ----------
 
-	private PrefPageAppearanceColors	_prefPage;
+	private IMapColorUpdater					_mapColorUpdater;
 
-	private final ILegendProviderGradientColors		_legendProvider;
-	private ValueColor[]				_colorValueModel;
+	private final IGradientColors	_colorProvider;
+	private ValueColor[]						_colorValueModel;
 
-	private LegendColor					_legendColorWorkingCopy;
+	private MapColor							_legendColorWorkingCopy;
 
-	private final SelectionAdapter		_defaultSelectionAdapter;
-	private final IDialogSettings		_state;
+	private final SelectionAdapter				_defaultSelectionAdapter;
+	private final IDialogSettings				_state;
 
-	private ColorDefinition				_colorDefinition;
+	private ColorDefinition						_colorDefinition;
 
-	private boolean						_isInitializeControls;
+	private boolean								_isInitializeControls;
 
-	private Button						_btnApply;
+	private Button								_btnApply;
 
-	private Button						_chkLiveUpdate;
+	private Button								_chkLiveUpdate;
 
 	{
 		_defaultSelectionAdapter = new SelectionAdapter() {
@@ -134,16 +132,16 @@ public class DialogMappingColor extends TitleAreaDialog {
 	}
 
 	public DialogMappingColor(	final Shell parentShell,
-								final GradientColorProvider legendProvider,
-								final PrefPageAppearanceColors prefPageAppearanceColors) {
+								final IGradientColors colorProvider,
+								final IMapColorUpdater mapColorUpdater) {
 
 		super(parentShell);
 
 		// make dialog resizable
 		setShellStyle(getShellStyle() | SWT.RESIZE);
 
-		_legendProvider = legendProvider;
-		_prefPage = prefPageAppearanceColors;
+		_colorProvider = colorProvider;
+		_mapColorUpdater = mapColorUpdater;
 	}
 
 	@Override
@@ -236,7 +234,7 @@ public class DialogMappingColor extends TitleAreaDialog {
 			gc.setBackground(transparentColor);
 			gc.fillRectangle(imageBounds);
 
-			TourMapPainter.drawLegend(gc, imageBounds, _legendProvider, true);
+			TourMapPainter.drawLegend(gc, imageBounds, _colorProvider, true);
 		}
 		gc.dispose();
 		transparentColor.dispose();
@@ -422,7 +420,7 @@ public class DialogMappingColor extends TitleAreaDialog {
 
 			_cboMaxBrightness = new Combo(group, SWT.DROP_DOWN | SWT.READ_ONLY);
 			_cboMaxBrightness.addSelectionListener(_defaultSelectionAdapter);
-			for (final String comboLabel : LegendColor.BRIGHTNESS_LABELS) {
+			for (final String comboLabel : MapColor.BRIGHTNESS_LABELS) {
 				_cboMaxBrightness.add(comboLabel);
 			}
 
@@ -450,7 +448,7 @@ public class DialogMappingColor extends TitleAreaDialog {
 
 			_cboMinBrightness = new Combo(group, SWT.DROP_DOWN | SWT.READ_ONLY);
 			_cboMinBrightness.addSelectionListener(_defaultSelectionAdapter);
-			for (final String comboLabel : LegendColor.BRIGHTNESS_LABELS) {
+			for (final String comboLabel : MapColor.BRIGHTNESS_LABELS) {
 				_cboMinBrightness.add(comboLabel);
 			}
 
@@ -584,7 +582,7 @@ public class DialogMappingColor extends TitleAreaDialog {
 			_btnApply.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(final SelectionEvent e) {
-					_prefPage.actionApplyColors();
+					_mapColorUpdater.applyMapColors();
 				}
 			});
 			setButtonLayoutData(_btnApply);
@@ -594,7 +592,7 @@ public class DialogMappingColor extends TitleAreaDialog {
 	private void doLiveUpdate() {
 
 		if (_chkLiveUpdate.getSelection() == true) {
-			_prefPage.actionApplyColors();
+			_mapColorUpdater.applyMapColors();
 		}
 	}
 
@@ -639,7 +637,7 @@ public class DialogMappingColor extends TitleAreaDialog {
 		return _state;
 	}
 
-	public LegendColor getLegendColor() {
+	public MapColor getLegendColor() {
 		return _legendColorWorkingCopy;
 	}
 
@@ -669,8 +667,8 @@ public class DialogMappingColor extends TitleAreaDialog {
 	}
 
 	/**
-	 * Initialized the dialog by setting the {@link LegendColor} which will be displayed in this
-	 * dialog, it will use a copy of the supplied {@link LegendColor}
+	 * Initialized the dialog by setting the {@link MapColor} which will be displayed in this
+	 * dialog, it will use a copy of the supplied {@link MapColor}
 	 * 
 	 * @param colorDefinition
 	 */
@@ -756,7 +754,8 @@ public class DialogMappingColor extends TitleAreaDialog {
 
 	private void updateUILegendImage() {
 
-		final LegendColor legendColor = _legendProvider.getLegendColor();
+		final MapColor legendColor = _colorProvider.getLegendColor();
+
 		legendColor.valueColors = _colorValueModel;
 		legendColor.minBrightnessFactor = _legendColorWorkingCopy.minBrightnessFactor;
 		legendColor.maxBrightnessFactor = _legendColorWorkingCopy.maxBrightnessFactor;

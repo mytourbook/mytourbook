@@ -26,6 +26,7 @@ import java.util.Set;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.color.MapColorId;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
@@ -791,6 +792,32 @@ public class UI {
 		}
 
 		return _timeFormatterShort;
+	}
+
+	public static ImageDescriptor getGraphImageDescriptor(final MapColorId mapColorId) {
+
+		switch (mapColorId) {
+		case Altitude:
+			return TourbookPlugin.getImageDescriptor(Messages.Image__graph_altitude);
+
+		case Gradient:
+			return TourbookPlugin.getImageDescriptor(Messages.Image__graph_gradient);
+
+		case Pace:
+			return TourbookPlugin.getImageDescriptor(Messages.Image__graph_pace);
+
+		case Pulse:
+			return TourbookPlugin.getImageDescriptor(Messages.Image__graph_heartbeat);
+
+		case Speed:
+			return TourbookPlugin.getImageDescriptor(Messages.Image__graph_speed);
+
+		case HrZone:
+			return TourbookPlugin.getImageDescriptor(Messages.Image__PulseZones);
+
+		default:
+			return TourbookPlugin.getImageDescriptor(Messages.Image__graph_altitude);
+		}
 	}
 
 	public static UI getInstance() {

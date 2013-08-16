@@ -15,29 +15,19 @@
  *******************************************************************************/
 package net.tourbook.common.color;
 
+public interface IMapColorProvider {
 
-public interface ILegendProviderGradientColors extends ILegendProvider {
+	public static final int	DEFAULT_LEGEND_WIDTH		= 150;
+	public static final int	DEFAULT_LEGEND_HEIGHT		= 300;
 
-	/**
-	 * @param graphValue
-	 * @return Returns the RGB value for a graph value.
-	 */
-	abstract int getColorValue(float graphValue);
+	public static final int	LEGEND_TOP_MARGIN			= 20;
+	public static final int	LEGEND_MARGIN_TOP_BOTTOM	= 10;
 
-	abstract LegendColor getLegendColor();
-
-	abstract LegendConfig getLegendConfig();
+	public static final int	LEGEND_UNIT_DISTANCE		= 60;
 
 	/**
-	 * Set the colors for the legend, the values will not be changed
-	 * 
-	 * @param newLegendColor
+	 * @return Returns an id to identify the {@link IMapColorProvider}
 	 */
-	abstract void setLegendColorColors(LegendColor newLegendColor);
+	public abstract MapColorId getMapColorId();
 
-	abstract void setLegendColorValues(	int legendHeight,
-										float minValue,
-										float maxValue,
-										String unitText,
-										LegendUnitFormat unitFormat);
 }

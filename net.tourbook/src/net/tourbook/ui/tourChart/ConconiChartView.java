@@ -30,7 +30,7 @@ import net.tourbook.chart.ChartType;
 import net.tourbook.chart.IChartLayer;
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.UI;
-import net.tourbook.common.color.GraphColorProvider;
+import net.tourbook.common.color.GraphColorManager;
 import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
@@ -246,19 +246,19 @@ public class ConconiChartView extends ViewPart {
 
 		_selectedTour = markedTour;
 
-		final String prefGraphName = ICommonPreferences.GRAPH_COLORS + GraphColorProvider.PREF_GRAPH_HEARTBEAT + "."; //$NON-NLS-1$
+		final String prefGraphName = ICommonPreferences.GRAPH_COLORS + GraphColorManager.PREF_GRAPH_HEARTBEAT + "."; //$NON-NLS-1$
 
 		final RGB rgbPrefLine = PreferenceConverter.getColor(//
 				_commonPrefStore,
-				prefGraphName + GraphColorProvider.PREF_COLOR_LINE);
+				prefGraphName + GraphColorManager.PREF_COLOR_LINE);
 
 		final RGB rgbPrefDark = PreferenceConverter.getColor(//
 				_commonPrefStore,
-				prefGraphName + GraphColorProvider.PREF_COLOR_DARK);
+				prefGraphName + GraphColorManager.PREF_COLOR_DARK);
 
 		final RGB rgbPrefBright = PreferenceConverter.getColor(//
 				_commonPrefStore,
-				prefGraphName + GraphColorProvider.PREF_COLOR_BRIGHT);
+				prefGraphName + GraphColorManager.PREF_COLOR_BRIGHT);
 
 		final double[][] powerSerie = new double[validDataLength][];
 		final double[][] pulseSerie = new double[validDataLength][];

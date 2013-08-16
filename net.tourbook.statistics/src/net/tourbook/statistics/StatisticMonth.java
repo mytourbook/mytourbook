@@ -34,7 +34,7 @@ import net.tourbook.chart.ChartToolTipInfo;
 import net.tourbook.chart.ChartType;
 import net.tourbook.chart.IChartInfoProvider;
 import net.tourbook.common.UI;
-import net.tourbook.common.color.GraphColorProvider;
+import net.tourbook.common.color.GraphColorManager;
 import net.tourbook.data.TourPerson;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.statistic.StatisticContext;
@@ -241,8 +241,8 @@ public abstract class StatisticMonth extends YearStatistic {
 		yData.setYTitle(Messages.LABEL_GRAPH_ALTITUDE);
 		yData.setUnitLabel(UI.UNIT_LABEL_ALTITUDE);
 		yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_NUMBER);
-		StatisticServices.setDefaultColors(yData, GraphColorProvider.PREF_GRAPH_ALTITUDE);
-		StatisticServices.setTourTypeColors(yData, GraphColorProvider.PREF_GRAPH_ALTITUDE, _activeTourTypeFilter);
+		StatisticServices.setDefaultColors(yData, GraphColorManager.PREF_GRAPH_ALTITUDE);
+		StatisticServices.setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_ALTITUDE, _activeTourTypeFilter);
 		StatisticServices.setTourTypeColorIndex(yData, _tourMonthData.typeIds, _activeTourTypeFilter);
 
 		chartDataModel.addYData(yData);
@@ -259,8 +259,8 @@ public abstract class StatisticMonth extends YearStatistic {
 		yData.setUnitLabel(UI.UNIT_LABEL_DISTANCE);
 		yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_NUMBER);
 		yData.setValueDivisor(1000);
-		StatisticServices.setDefaultColors(yData, GraphColorProvider.PREF_GRAPH_DISTANCE);
-		StatisticServices.setTourTypeColors(yData, GraphColorProvider.PREF_GRAPH_DISTANCE, _activeTourTypeFilter);
+		StatisticServices.setDefaultColors(yData, GraphColorManager.PREF_GRAPH_DISTANCE);
+		StatisticServices.setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_DISTANCE, _activeTourTypeFilter);
 		StatisticServices.setTourTypeColorIndex(yData, _tourMonthData.typeIds, _activeTourTypeFilter);
 
 		chartDataModel.addYData(yData);
@@ -276,8 +276,8 @@ public abstract class StatisticMonth extends YearStatistic {
 		yData.setYTitle(Messages.LABEL_GRAPH_TIME);
 		yData.setUnitLabel(Messages.LABEL_GRAPH_TIME_UNIT);
 		yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_HOUR_MINUTE);
-		StatisticServices.setDefaultColors(yData, GraphColorProvider.PREF_GRAPH_TIME);
-		StatisticServices.setTourTypeColors(yData, GraphColorProvider.PREF_GRAPH_TIME, _activeTourTypeFilter);
+		StatisticServices.setDefaultColors(yData, GraphColorManager.PREF_GRAPH_TIME);
+		StatisticServices.setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_TIME, _activeTourTypeFilter);
 		StatisticServices.setTourTypeColorIndex(yData, _tourMonthData.typeIds, _activeTourTypeFilter);
 
 		chartDataModel.addYData(yData);

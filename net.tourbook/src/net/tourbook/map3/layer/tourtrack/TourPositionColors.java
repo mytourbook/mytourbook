@@ -23,11 +23,12 @@ import java.util.ArrayList;
 
 import net.tourbook.common.UI;
 import net.tourbook.common.color.ColorDefinition;
-import net.tourbook.common.color.GraphColorProvider;
-import net.tourbook.common.color.ILegendProvider;
-import net.tourbook.common.color.ILegendProviderGradientColors;
-import net.tourbook.common.color.LegendConfig;
+import net.tourbook.common.color.GraphColorManager;
+import net.tourbook.common.color.IMapColorProvider;
+import net.tourbook.common.color.IGradientColors;
 import net.tourbook.common.color.LegendUnitFormat;
+import net.tourbook.common.color.MapColorConfig;
+import net.tourbook.common.color.MapColorId;
 import net.tourbook.data.TourData;
 import net.tourbook.map2.Messages;
 import net.tourbook.map3.layer.ColorCacheAWT;
@@ -37,7 +38,7 @@ class TourPositionColors implements Path.PositionColors {
 
 	private final ColorCacheAWT	_awtColorCache	= new ColorCacheAWT();
 
-	private ILegendProvider		_colorProvider	= Map3Colors.getColorProvider(ILegendProvider.TOUR_COLOR_ALTITUDE);
+	private IMapColorProvider		_colorProvider	= Map3Colors.getColorProvider(MapColorId.Altitude);
 
 	public Color getColor(final Position position, final int ordinal) {
 
@@ -79,9 +80,9 @@ class TourPositionColors implements Path.PositionColors {
 
 			int colorValue = -1;
 
-			if (_colorProvider instanceof ILegendProviderGradientColors) {
+			if (_colorProvider instanceof IGradientColors) {
 
-				final ILegendProviderGradientColors gradientColorProvider = (ILegendProviderGradientColors) _colorProvider;
+				final IGradientColors gradientColorProvider = (IGradientColors) _colorProvider;
 
 				colorValue = gradientColorProvider.getColorValue(graphValue);
 			}
@@ -97,7 +98,7 @@ class TourPositionColors implements Path.PositionColors {
 		return positionColor;
 	}
 
-	public void setColorProvider(final ILegendProvider legendProvider) {
+	public void setColorProvider(final IMapColorProvider legendProvider) {
 
 		_colorProvider = legendProvider;
 
@@ -106,41 +107,41 @@ class TourPositionColors implements Path.PositionColors {
 
 	public void updateColors(final ArrayList<TourData> allTours) {
 
-		if (_colorProvider instanceof ILegendProviderGradientColors) {
+		if (_colorProvider instanceof IGradientColors) {
 
-			final ILegendProviderGradientColors colorProvider = (ILegendProviderGradientColors) _colorProvider;
+			final IGradientColors colorProvider = (IGradientColors) _colorProvider;
 
 			updateColors_10_SetMinMaxValues(allTours, colorProvider, 300);
 		}
 	}
 
 	/**
-	 * Update the min/max values in the {@link ILegendProviderGradientColors} for the currently
+	 * Update the min/max values in the {@link IGradientColors} for the currently
 	 * displayed legend
 	 * 
 	 * @param allTourData
-	 * @param legendProvider
+	 * @param colorProvider
 	 * @param legendBounds
 	 * @return Return <code>true</code> when the legend value could be updated, <code>false</code>
 	 *         when data are not available
 	 */
 	private boolean updateColors_10_SetMinMaxValues(final ArrayList<TourData> allTourData,
-													final ILegendProviderGradientColors legendProvider,
+													final IGradientColors colorProvider,
 													final int legendHeight) {
 
 		if (allTourData.size() == 0) {
 			return false;
 		}
 
-		final GraphColorProvider colorProvider = GraphColorProvider.getInstance();
+		final GraphColorManager graphColorProvider = GraphColorManager.getInstance();
 
 		ColorDefinition colorDefinition = null;
-		final LegendConfig legendConfig = legendProvider.getLegendConfig();
+		final MapColorConfig legendConfig = colorProvider.getLegendConfig();
 
 		// tell the legend provider how to draw the legend
-		switch (legendProvider.getTourColorId()) {
+		switch (colorProvider.getMapColorId()) {
 
-		case ILegendProvider.TOUR_COLOR_ALTITUDE:
+		case Altitude:
 
 			float minValue = Float.MIN_VALUE;
 			float maxValue = Float.MAX_VALUE;
@@ -179,10 +180,11 @@ class TourPositionColors implements Path.PositionColors {
 				return false;
 			}
 
-			colorDefinition = colorProvider.getGraphColorDefinition(GraphColorProvider.PREF_GRAPH_ALTITUDE);
+			colorDefinition = graphColorProvider.getGraphColorDefinition(GraphColorManager.PREF_GRAPH_ALTITUDE);
 
-			legendProvider.setLegendColorColors(colorDefinition.getNewLegendColor());
-			legendProvider.setLegendColorValues(
+			colorProvider.setLegendColorColors(colorDefinition.getNewLegendColor());
+
+			colorProvider.setLegendColorValues(
 					legendHeight,
 					minValue,
 					maxValue,
@@ -191,7 +193,7 @@ class TourPositionColors implements Path.PositionColors {
 
 			break;
 
-		case ILegendProvider.TOUR_COLOR_PULSE:
+		case Pulse:
 
 			minValue = Float.MIN_VALUE;
 			maxValue = Float.MAX_VALUE;
@@ -229,10 +231,10 @@ class TourPositionColors implements Path.PositionColors {
 				return false;
 			}
 
-			colorDefinition = colorProvider.getGraphColorDefinition(GraphColorProvider.PREF_GRAPH_HEARTBEAT);
+			colorDefinition = graphColorProvider.getGraphColorDefinition(GraphColorManager.PREF_GRAPH_HEARTBEAT);
 
-			legendProvider.setLegendColorColors(colorDefinition.getNewLegendColor());
-			legendProvider.setLegendColorValues(
+			colorProvider.setLegendColorColors(colorDefinition.getNewLegendColor());
+			colorProvider.setLegendColorValues(
 					legendHeight,
 					minValue,
 					maxValue,
@@ -241,7 +243,7 @@ class TourPositionColors implements Path.PositionColors {
 
 			break;
 
-		case ILegendProvider.TOUR_COLOR_SPEED:
+		case Speed:
 
 			minValue = Float.MIN_VALUE;
 			maxValue = Float.MAX_VALUE;
@@ -279,10 +281,10 @@ class TourPositionColors implements Path.PositionColors {
 			}
 
 			legendConfig.numberFormatDigits = 1;
-			colorDefinition = colorProvider.getGraphColorDefinition(GraphColorProvider.PREF_GRAPH_SPEED);
+			colorDefinition = graphColorProvider.getGraphColorDefinition(GraphColorManager.PREF_GRAPH_SPEED);
 
-			legendProvider.setLegendColorColors(colorDefinition.getNewLegendColor());
-			legendProvider.setLegendColorValues(
+			colorProvider.setLegendColorColors(colorDefinition.getNewLegendColor());
+			colorProvider.setLegendColorValues(
 					legendHeight,
 					minValue,
 					maxValue,
@@ -291,7 +293,7 @@ class TourPositionColors implements Path.PositionColors {
 
 			break;
 
-		case ILegendProvider.TOUR_COLOR_PACE:
+		case Pace:
 
 			minValue = Float.MIN_VALUE;
 			maxValue = Float.MAX_VALUE;
@@ -329,10 +331,10 @@ class TourPositionColors implements Path.PositionColors {
 			}
 
 			legendConfig.unitFormat = LegendUnitFormat.Pace;
-			colorDefinition = colorProvider.getGraphColorDefinition(GraphColorProvider.PREF_GRAPH_PACE);
+			colorDefinition = graphColorProvider.getGraphColorDefinition(GraphColorManager.PREF_GRAPH_PACE);
 
-			legendProvider.setLegendColorColors(colorDefinition.getNewLegendColor());
-			legendProvider.setLegendColorValues(
+			colorProvider.setLegendColorColors(colorDefinition.getNewLegendColor());
+			colorProvider.setLegendColorValues(
 					legendHeight,
 					minValue,
 					maxValue,
@@ -341,7 +343,7 @@ class TourPositionColors implements Path.PositionColors {
 
 			break;
 
-		case ILegendProvider.TOUR_COLOR_GRADIENT:
+		case Gradient:
 
 			minValue = Float.MIN_VALUE;
 			maxValue = Float.MAX_VALUE;
@@ -379,10 +381,10 @@ class TourPositionColors implements Path.PositionColors {
 			}
 
 			legendConfig.numberFormatDigits = 1;
-			colorDefinition = colorProvider.getGraphColorDefinition(GraphColorProvider.PREF_GRAPH_GRADIENT);
+			colorDefinition = graphColorProvider.getGraphColorDefinition(GraphColorManager.PREF_GRAPH_GRADIENT);
 
-			legendProvider.setLegendColorColors(colorDefinition.getNewLegendColor());
-			legendProvider.setLegendColorValues(
+			colorProvider.setLegendColorColors(colorDefinition.getNewLegendColor());
+			colorProvider.setLegendColorValues(
 					legendHeight,
 					minValue,
 					maxValue,

@@ -27,8 +27,8 @@ import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.color.ColorDefinition;
 import net.tourbook.common.color.GraphColorItem;
-import net.tourbook.common.color.GraphColorProvider;
-import net.tourbook.common.color.ILegendProviderGradientColors;
+import net.tourbook.common.color.GraphColorManager;
+import net.tourbook.common.color.IGradientColors;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
@@ -170,15 +170,15 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 	private void createColorNames(final ColorDefinition colorDefinition) {
 
 		// use the first 4 color, the mapping color is not used in tour types
-		final int graphNamesLength = GraphColorProvider.colorNames.length - 1;
+		final int graphNamesLength = GraphColorManager.colorNames.length - 1;
 
 		final GraphColorItem[] graphColors = new GraphColorItem[graphNamesLength];
 
 		for (int nameIndex = 0; nameIndex < graphNamesLength; nameIndex++) {
 			graphColors[nameIndex] = new GraphColorItem(
 					colorDefinition,
-					GraphColorProvider.colorNames[nameIndex][0],
-					GraphColorProvider.colorNames[nameIndex][1],
+					GraphColorManager.colorNames[nameIndex][0],
+					GraphColorManager.colorNames[nameIndex][1],
 					false);
 		}
 
@@ -594,7 +594,7 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 		}
 	}
 
-	public ILegendProviderGradientColors getLegendProvider() {
+	public IGradientColors getLegendProvider() {
 		return null;
 	}
 

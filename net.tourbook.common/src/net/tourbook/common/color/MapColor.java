@@ -17,7 +17,7 @@ package net.tourbook.common.color;
 
 import net.tourbook.common.Messages;
 
-public class LegendColor {
+public class MapColor {
 
 	public static final String[]	BRIGHTNESS_LABELS		= new String[] //
 															{
@@ -52,7 +52,7 @@ public class LegendColor {
 	public boolean					isMinValueOverwrite		= false;
 	public int						overwriteMinValue;
 
-	public LegendColor() {}
+	public MapColor() {}
 
 	/**
 	 * @param valueColors
@@ -61,13 +61,14 @@ public class LegendColor {
 	 * @param maxBrightness
 	 * @param maxBrightnessFactor
 	 */
-	public LegendColor(	final ValueColor[] valueColors,
+	public MapColor(	final ValueColor[] valueColors,
 						final int minBrightness,
 						final int minBrightnessFactor,
 						final int maxBrightness,
 						final int maxBrightnessFactor) {
 
 		this.valueColors = valueColors;
+
 		this.minBrightness = minBrightness;
 		this.minBrightnessFactor = minBrightnessFactor;
 		this.maxBrightness = maxBrightness;
@@ -85,7 +86,7 @@ public class LegendColor {
 	 * @param isMaxOverwrite
 	 * @param maxOverwrite
 	 */
-	public LegendColor(	final ValueColor[] valueColors,
+	public MapColor(	final ValueColor[] valueColors,
 						final int minBrightness,
 						final int minBrightnessFactor,
 						final int maxBrightness,
@@ -96,6 +97,7 @@ public class LegendColor {
 						final int maxOverwrite) {
 
 		this.valueColors = valueColors;
+
 		this.minBrightness = minBrightness;
 		this.minBrightnessFactor = minBrightnessFactor;
 		this.maxBrightness = maxBrightness;
@@ -108,13 +110,13 @@ public class LegendColor {
 	}
  
 	/**
-	 * Creates a copy for this {@link LegendColor}
+	 * Creates a copy for this {@link MapColor}
 	 * 
 	 * @return
 	 */
-	public LegendColor getCopy() {
+	public MapColor getCopy() {
 
-		final LegendColor copy = new LegendColor();
+		final MapColor copy = new MapColor();
 
 		copy.valueColors = new ValueColor[valueColors.length];
 		for (int colorIndex = 0; colorIndex < valueColors.length; colorIndex++) {

@@ -15,8 +15,12 @@
  *******************************************************************************/
 package net.tourbook.map3.action;
 
+import net.tourbook.common.color.IMapColorProvider;
+import net.tourbook.common.color.MapColorId;
+import net.tourbook.map2.view.TourMapColors;
 import net.tourbook.map3.Messages;
 import net.tourbook.map3.view.Map3View;
+import net.tourbook.ui.UI;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -26,7 +30,7 @@ public class ActionMapColor extends Action {
 	private Map3View		_mapView;
 	private IDialogSettings	_state;
 
-	private int				_colorId;
+	private MapColorId		_mapColorId;
 
 	public ActionMapColor(final Map3View mapView, final IDialogSettings state) {
 
@@ -35,7 +39,7 @@ public class ActionMapColor extends Action {
 		_mapView = mapView;
 		_state = state;
 
-		setText(Messages.Map3_Action_MappingColor);
+		setText(Messages.Map3_Action_TrackColor);
 //		setToolTipText(toolTipText);
 //
 //		setImageDescriptor(TourbookPlugin.getImageDescriptor(imageEnabled));
@@ -91,10 +95,20 @@ public class ActionMapColor extends Action {
 //			break;
 //		}
 
+		final IMapColorProvider colorProvider = TourMapColors.getColorProvider(_mapColorId);
+
+//		final DialogMappingColor dialogMappingColor = new DialogMappingColor(
+//				Display.getCurrent().getActiveShell(),
+//				colorProvider,
+//				_mapView);
+
 	}
 
-	public void setColorId(final int colorId) {
-		_colorId = colorId;
+	public void setColorId(final MapColorId mapColorId) {
+
+		_mapColorId = mapColorId;
+
+		setImageDescriptor(UI.getGraphImageDescriptor(mapColorId));
 	}
 
 }

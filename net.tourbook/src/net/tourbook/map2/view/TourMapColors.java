@@ -18,16 +18,17 @@ package net.tourbook.map2.view;
 import java.util.HashMap;
 
 import net.tourbook.common.color.GradientColorProvider;
-import net.tourbook.common.color.ILegendProvider;
-import net.tourbook.common.color.LegendColor;
-import net.tourbook.common.color.LegendConfig;
+import net.tourbook.common.color.IMapColorProvider;
+import net.tourbook.common.color.MapColor;
+import net.tourbook.common.color.MapColorConfig;
+import net.tourbook.common.color.MapColorId;
 
 public class TourMapColors {
 
 	/**
 	 * Key is the color id.
 	 */
-	private static HashMap<Integer, ILegendProvider>	_colorProviders;
+	private static HashMap<MapColorId, IMapColorProvider>	_colorProviders;
 
 	/**
 	 * Create legend provider for all graphs which can be displayed.
@@ -35,46 +36,46 @@ public class TourMapColors {
 	private static void createColorProviders() {
 
 		_colorProviders.put(//
-				ILegendProvider.TOUR_COLOR_ALTITUDE,
-				new GradientColorProvider(ILegendProvider.TOUR_COLOR_ALTITUDE, new LegendConfig(), new LegendColor()));
+				MapColorId.Altitude,
+				new GradientColorProvider(MapColorId.Altitude, new MapColorConfig(), new MapColor()));
 
 		_colorProviders.put(//
-				ILegendProvider.TOUR_COLOR_GRADIENT,
-				new GradientColorProvider(ILegendProvider.TOUR_COLOR_GRADIENT, new LegendConfig(), new LegendColor()));
+				MapColorId.Gradient,
+				new GradientColorProvider(MapColorId.Gradient, new MapColorConfig(), new MapColor()));
 
 		_colorProviders.put(//
-				ILegendProvider.TOUR_COLOR_PACE,
-				new GradientColorProvider(ILegendProvider.TOUR_COLOR_PACE, new LegendConfig(), new LegendColor()));
+				MapColorId.Pace,
+				new GradientColorProvider(MapColorId.Pace, new MapColorConfig(), new MapColor()));
 
 		_colorProviders.put(//
-				ILegendProvider.TOUR_COLOR_PULSE,
-				new GradientColorProvider(ILegendProvider.TOUR_COLOR_PULSE, new LegendConfig(), new LegendColor()));
+				MapColorId.Pulse,
+				new GradientColorProvider(MapColorId.Pulse, new MapColorConfig(), new MapColor()));
 
 		_colorProviders.put(//
-				ILegendProvider.TOUR_COLOR_SPEED,
-				new GradientColorProvider(ILegendProvider.TOUR_COLOR_SPEED, new LegendConfig(), new LegendColor()));
+				MapColorId.Speed,
+				new GradientColorProvider(MapColorId.Speed, new MapColorConfig(), new MapColor()));
 
 		//
 
 		_colorProviders.put(//
-				ILegendProvider.TOUR_COLOR_HR_ZONE,
-				new HrZonesColorProvider(ILegendProvider.TOUR_COLOR_HR_ZONE));
+				MapColorId.HrZone,
+				new HrZonesColorProvider(MapColorId.HrZone));
 	}
 
-	public static ILegendProvider getColorProvider(final int colorId) {
+	public static IMapColorProvider getColorProvider(final MapColorId colorId) {
 
 		if (_colorProviders == null) {
 
-			_colorProviders = new HashMap<Integer, ILegendProvider>();
+			_colorProviders = new HashMap<MapColorId, IMapColorProvider>();
 
 			createColorProviders();
 		}
 
-		ILegendProvider legendProvider = _colorProviders.get(colorId);
+		IMapColorProvider legendProvider = _colorProviders.get(colorId);
 
 		// use default when not available
 		if (legendProvider == null) {
-			legendProvider = _colorProviders.get(ILegendProvider.TOUR_COLOR_ALTITUDE);
+			legendProvider = _colorProviders.get(MapColorId.Altitude);
 		}
 
 		return legendProvider;

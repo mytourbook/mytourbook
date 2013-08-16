@@ -19,7 +19,7 @@ import java.util.ArrayList;
 
 import net.tourbook.chart.ChartDataYSerie;
 import net.tourbook.common.CommonActivator;
-import net.tourbook.common.color.GraphColorProvider;
+import net.tourbook.common.color.GraphColorManager;
 import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
@@ -38,7 +38,7 @@ public class StatisticServices {
 
 	/**
 	 * Set default colors for the y-axis, the color is defined in
-	 * {@link GraphColorProvider#PREF_COLOR_LINE}
+	 * {@link GraphColorManager#PREF_COLOR_LINE}
 	 * 
 	 * @param yData
 	 * @param graphName
@@ -52,7 +52,7 @@ public class StatisticServices {
 		// put the color into the chart data
 		yData.setDefaultRGB(PreferenceConverter.getColor(//
 				commonPrefStore,
-				defaultColorName + GraphColorProvider.PREF_COLOR_LINE));
+				defaultColorName + GraphColorManager.PREF_COLOR_LINE));
 	}
 
 	/**
@@ -124,19 +124,19 @@ public class StatisticServices {
 
 			rgbBright.add(PreferenceConverter.getColor(//
 					commonPrefStore,
-					defaultColorName + GraphColorProvider.PREF_COLOR_BRIGHT));
+					defaultColorName + GraphColorManager.PREF_COLOR_BRIGHT));
 
 			rgbDark.add(PreferenceConverter.getColor(//
 					commonPrefStore,
-					defaultColorName + GraphColorProvider.PREF_COLOR_DARK));
+					defaultColorName + GraphColorManager.PREF_COLOR_DARK));
 
 			rgbLine.add(PreferenceConverter.getColor(//
 					commonPrefStore,
-					defaultColorName + GraphColorProvider.PREF_COLOR_LINE));
+					defaultColorName + GraphColorManager.PREF_COLOR_LINE));
 
 			rgbText.add(PreferenceConverter.getColor(//
 					commonPrefStore,
-					defaultColorName + GraphColorProvider.PREF_COLOR_TEXT));
+					defaultColorName + GraphColorManager.PREF_COLOR_TEXT));
 		}
 
 		/*

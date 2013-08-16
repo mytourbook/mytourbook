@@ -33,7 +33,7 @@ import net.tourbook.chart.IBarSelectionListener;
 import net.tourbook.chart.IChartInfoProvider;
 import net.tourbook.chart.SelectionBarChart;
 import net.tourbook.common.UI;
-import net.tourbook.common.color.GraphColorProvider;
+import net.tourbook.common.color.GraphColorManager;
 import net.tourbook.common.util.IToolTipHideListener;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
@@ -536,8 +536,8 @@ public class StatisticTourTime extends YearStatistic implements IBarSelectionPro
 		yData.setYAxisDirection(false);
 
 		yData.setColorIndex(new int[][] { _tourTimeData.typeColorIndex });
-		StatisticServices.setTourTypeColors(yData, GraphColorProvider.PREF_GRAPH_TIME, _activeTourTypeFiler);
-		StatisticServices.setDefaultColors(yData, GraphColorProvider.PREF_GRAPH_TIME);
+		StatisticServices.setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_TIME, _activeTourTypeFiler);
+		StatisticServices.setDefaultColors(yData, GraphColorManager.PREF_GRAPH_TIME);
 
 		chartModel.addYData(yData);
 

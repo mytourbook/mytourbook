@@ -19,7 +19,7 @@ import java.util.HashMap;
 
 import net.tourbook.common.color.ColorDefinition;
 import net.tourbook.common.color.GraphColorItem;
-import net.tourbook.common.color.ILegendProviderGradientColors;
+import net.tourbook.common.color.IGradientColors;
 import net.tourbook.map2.view.TourMapPainter;
 
 import org.eclipse.swt.SWT;
@@ -106,7 +106,7 @@ public class GraphColorPainter {
 					/*
 					 * tell the legend provider with which color the legend should be painted
 					 */
-					final ILegendProviderGradientColors legendProvider = _colorTreeViewer.getLegendProvider();
+					final IGradientColors legendProvider = _colorTreeViewer.getLegendProvider();
 					legendProvider.setLegendColorColors(graphColor.getColorDefinition().getNewLegendColor());
 
 					TourMapPainter.drawLegend(gc, borderRect, legendProvider, false);
@@ -167,7 +167,7 @@ public class GraphColorPainter {
 					if (graphColorItem.isLegend()) {
 
 						// tell the legend provider how to draw the legend
-						final ILegendProviderGradientColors legendProvider = _colorTreeViewer.getLegendProvider();
+						final IGradientColors legendProvider = _colorTreeViewer.getLegendProvider();
 						legendProvider.setLegendColorColors(graphColorItem.getColorDefinition().getNewLegendColor());
 
 						TourMapPainter.drawLegend(gc, borderRect, legendProvider, false);

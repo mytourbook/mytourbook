@@ -25,7 +25,7 @@ import net.tourbook.chart.ITooltipOwner;
 import net.tourbook.chart.IValuePointToolTip;
 import net.tourbook.common.PointLong;
 import net.tourbook.common.UI;
-import net.tourbook.common.color.GraphColorProvider;
+import net.tourbook.common.color.GraphColorManager;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.preferences.ITourbookPreferences;
@@ -135,7 +135,7 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 	private Color							_fgBorder;
 	private Color							_bgColor;
 	private final ColorCache				_colorCache						= new ColorCache();
-	private final GraphColorProvider		_colorProvider					= GraphColorProvider.getInstance();
+	private final GraphColorManager		_colorProvider					= GraphColorManager.getInstance();
 
 	private final ArrayList<Control>		_firstColumnControls			= new ArrayList<Control>();
 	private final ArrayList<Control>		_firstColumnContainerControls	= new ArrayList<Control>();
@@ -451,13 +451,13 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 						SWT.TRAIL,
 						6,
 						net.tourbook.common.Messages.Graph_Label_Altimeter,
-						GraphColorProvider.PREF_GRAPH_ALTIMETER);
+						GraphColorManager.PREF_GRAPH_ALTIMETER);
 
 				_lblAltimeterUnit = createUILabelValue(
 						container,
 						SWT.LEAD,
 						net.tourbook.common.Messages.Graph_Label_Altimeter,
-						GraphColorProvider.PREF_GRAPH_ALTIMETER);
+						GraphColorManager.PREF_GRAPH_ALTIMETER);
 
 				_lblAltimeterUnit.setText(UI.UNIT_LABEL_ALTIMETER);
 			}
@@ -477,13 +477,13 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 						SWT.TRAIL,
 						6,
 						net.tourbook.common.Messages.Graph_Label_Altitude,
-						GraphColorProvider.PREF_GRAPH_ALTITUDE);
+						GraphColorManager.PREF_GRAPH_ALTITUDE);
 
 				_lblAltitudeUnit = createUILabelValue(
 						container,
 						SWT.LEAD,
 						net.tourbook.common.Messages.Graph_Label_Altitude,
-						GraphColorProvider.PREF_GRAPH_ALTITUDE);
+						GraphColorManager.PREF_GRAPH_ALTITUDE);
 
 				_lblAltitudeUnit.setText(UI.UNIT_LABEL_ALTITUDE);
 			}
@@ -503,13 +503,13 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 						SWT.TRAIL,
 						3,
 						net.tourbook.common.Messages.Graph_Label_Cadence,
-						GraphColorProvider.PREF_GRAPH_CADENCE);
+						GraphColorManager.PREF_GRAPH_CADENCE);
 
 				createUILabel(
 						container,
 						net.tourbook.common.Messages.Graph_Label_Cadence_unit,
 						net.tourbook.common.Messages.Graph_Label_Cadence,
-						GraphColorProvider.PREF_GRAPH_CADENCE);
+						GraphColorManager.PREF_GRAPH_CADENCE);
 			}
 			_firstColumnControls.add(_lblCadence);
 			_firstColumnContainerControls.add(container);
@@ -549,13 +549,13 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 						SWT.TRAIL,
 						9,
 						net.tourbook.common.Messages.Graph_Label_Distance,
-						GraphColorProvider.PREF_GRAPH_DISTANCE);
+						GraphColorManager.PREF_GRAPH_DISTANCE);
 
 				_lblDistanceUnit = createUILabelValue(
 						container,
 						SWT.LEAD,
 						net.tourbook.common.Messages.Graph_Label_Distance,
-						GraphColorProvider.PREF_GRAPH_DISTANCE);
+						GraphColorManager.PREF_GRAPH_DISTANCE);
 
 				_lblDistanceUnit.setText(UI.UNIT_LABEL_DISTANCE);
 			}
@@ -575,13 +575,13 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 						SWT.TRAIL,
 						4,
 						net.tourbook.common.Messages.Graph_Label_Gradient,
-						GraphColorProvider.PREF_GRAPH_GRADIENT);
+						GraphColorManager.PREF_GRAPH_GRADIENT);
 
 				createUILabel(
 						container,
 						net.tourbook.common.Messages.Graph_Label_Gradiend_unit,
 						net.tourbook.common.Messages.Graph_Label_Gradient,
-						GraphColorProvider.PREF_GRAPH_GRADIENT);
+						GraphColorManager.PREF_GRAPH_GRADIENT);
 			}
 			_firstColumnControls.add(_lblGradient);
 			_firstColumnContainerControls.add(container);
@@ -599,13 +599,13 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 						SWT.TRAIL,
 						5,
 						net.tourbook.common.Messages.Graph_Label_Pace,
-						GraphColorProvider.PREF_GRAPH_PACE);
+						GraphColorManager.PREF_GRAPH_PACE);
 
 				_lblPaceUnit = createUILabelValue(
 						container,
 						SWT.LEAD,
 						net.tourbook.common.Messages.Graph_Label_Pace,
-						GraphColorProvider.PREF_GRAPH_PACE);
+						GraphColorManager.PREF_GRAPH_PACE);
 
 				_lblPaceUnit.setText(UI.UNIT_LABEL_PACE);
 			}
@@ -625,13 +625,13 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 						SWT.TRAIL,
 						4,
 						net.tourbook.common.Messages.Graph_Label_Power,
-						GraphColorProvider.PREF_GRAPH_POWER);
+						GraphColorManager.PREF_GRAPH_POWER);
 
 				createUILabel(
 						container,
 						net.tourbook.common.Messages.Graph_Label_Power_unit,
 						net.tourbook.common.Messages.Graph_Label_Power,
-						GraphColorProvider.PREF_GRAPH_POWER);
+						GraphColorManager.PREF_GRAPH_POWER);
 			}
 			_firstColumnControls.add(_lblPower);
 			_firstColumnContainerControls.add(container);
@@ -649,13 +649,13 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 						SWT.TRAIL,
 						3,
 						net.tourbook.common.Messages.Graph_Label_Heartbeat,
-						GraphColorProvider.PREF_GRAPH_HEARTBEAT);
+						GraphColorManager.PREF_GRAPH_HEARTBEAT);
 
 				createUILabel(
 						container,
 						net.tourbook.common.Messages.Graph_Label_Heartbeat_unit,
 						net.tourbook.common.Messages.Graph_Label_Heartbeat,
-						GraphColorProvider.PREF_GRAPH_HEARTBEAT);
+						GraphColorManager.PREF_GRAPH_HEARTBEAT);
 			}
 			_firstColumnControls.add(_lblPulse);
 			_firstColumnContainerControls.add(container);
@@ -673,13 +673,13 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 						SWT.TRAIL,
 						4,
 						net.tourbook.common.Messages.Graph_Label_Speed,
-						GraphColorProvider.PREF_GRAPH_SPEED);
+						GraphColorManager.PREF_GRAPH_SPEED);
 
 				_lblSpeedUnit = createUILabelValue(
 						container,
 						SWT.LEAD,
 						net.tourbook.common.Messages.Graph_Label_Speed,
-						GraphColorProvider.PREF_GRAPH_SPEED);
+						GraphColorManager.PREF_GRAPH_SPEED);
 
 				_lblSpeedUnit.setText(UI.UNIT_LABEL_SPEED);
 			}
@@ -699,13 +699,13 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 						SWT.TRAIL,
 						4,
 						net.tourbook.common.Messages.Graph_Label_Temperature,
-						GraphColorProvider.PREF_GRAPH_TEMPTERATURE);
+						GraphColorManager.PREF_GRAPH_TEMPTERATURE);
 
 				_lblTemperatureUnit = createUILabelValue(
 						container,
 						SWT.LEAD,
 						net.tourbook.common.Messages.Graph_Label_Temperature,
-						GraphColorProvider.PREF_GRAPH_TEMPTERATURE);
+						GraphColorManager.PREF_GRAPH_TEMPTERATURE);
 
 				_lblTemperatureUnit.setText(UI.UNIT_LABEL_TEMPERATURE);
 			}
@@ -725,13 +725,13 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 						SWT.TRAIL,
 						8,
 						net.tourbook.common.Messages.Graph_Label_TimeDuration,
-						GraphColorProvider.PREF_GRAPH_TIME);
+						GraphColorManager.PREF_GRAPH_TIME);
 
 				createUILabel(
 						container,
 						UI.UNIT_LABEL_TIME,
 						net.tourbook.common.Messages.Graph_Label_TimeDuration,
-						GraphColorProvider.PREF_GRAPH_TIME);
+						GraphColorManager.PREF_GRAPH_TIME);
 			}
 
 			_firstColumnControls.add(_lblTimeDuration);
@@ -750,13 +750,13 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 						SWT.TRAIL,
 						8,
 						net.tourbook.common.Messages.Graph_Label_TimeOfDay,
-						GraphColorProvider.PREF_GRAPH_TIME);
+						GraphColorManager.PREF_GRAPH_TIME);
 
 				createUILabel(
 						container,
 						UI.UNIT_LABEL_TIME,
 						net.tourbook.common.Messages.Graph_Label_TimeOfDay,
-						GraphColorProvider.PREF_GRAPH_TIME);
+						GraphColorManager.PREF_GRAPH_TIME);
 			}
 
 			_firstColumnControls.add(_lblTimeOfDay);

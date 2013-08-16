@@ -21,7 +21,7 @@ import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.color.ColorDefinition;
-import net.tourbook.common.color.GraphColorProvider;
+import net.tourbook.common.color.GraphColorManager;
 import net.tourbook.common.util.SelectionProvider;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
@@ -124,14 +124,14 @@ public class CalendarView extends ViewPart implements ITourProvider {
 	static final int							numberOfInfoLines						= 3;
 	static final int							numberOfSummaryLines					= 5;
 
-	ColorDefinition[]							_colorDefinitiosn						= GraphColorProvider
+	ColorDefinition[]							_colorDefinitiosn						= GraphColorManager
 																								.getInstance()
 																								.getGraphColorDefinitions();
 
 	private WeekSummaryFormatter[]				_tourWeekSummaryFormatter				= {
 																						// fool stupid auto formatter
 			// - Nothing -
-			new WeekSummaryFormatter(GraphColorProvider.PREF_GRAPH_TIME) {
+			new WeekSummaryFormatter(GraphColorManager.PREF_GRAPH_TIME) {
 				@Override
 				public String format(final CalendarTourData data) {
 					return UI.EMPTY_STRING;
@@ -144,7 +144,7 @@ public class CalendarView extends ViewPart implements ITourProvider {
 			},
 			// - Distance -
 			new WeekSummaryFormatter(
-					GraphColorProvider.PREF_GRAPH_DISTANCE,
+					GraphColorManager.PREF_GRAPH_DISTANCE,
 					Messages.Calendar_View_Action_SummaryDistance) {
 
 				@Override
@@ -163,7 +163,7 @@ public class CalendarView extends ViewPart implements ITourProvider {
 			},
 			// - Moving Time -
 			new WeekSummaryFormatter(
-					GraphColorProvider.PREF_GRAPH_TIME,
+					GraphColorManager.PREF_GRAPH_TIME,
 					Messages.Calendar_View_Action_SummaryMovingTime) {
 
 				@Override
@@ -180,7 +180,7 @@ public class CalendarView extends ViewPart implements ITourProvider {
 			},
 			// - Altitude -
 			new WeekSummaryFormatter(
-					GraphColorProvider.PREF_GRAPH_ALTITUDE,
+					GraphColorManager.PREF_GRAPH_ALTITUDE,
 					Messages.Calendar_View_Action_SummaryAltitude) {
 
 				@Override
@@ -194,7 +194,7 @@ public class CalendarView extends ViewPart implements ITourProvider {
 				}
 			},
 			// - Speed -
-			new WeekSummaryFormatter(GraphColorProvider.PREF_GRAPH_SPEED, Messages.Calendar_View_Action_SummarySpeed) {
+			new WeekSummaryFormatter(GraphColorManager.PREF_GRAPH_SPEED, Messages.Calendar_View_Action_SummarySpeed) {
 
 				@Override
 				String format(final CalendarTourData data) {
@@ -208,7 +208,7 @@ public class CalendarView extends ViewPart implements ITourProvider {
 				}
 			},
 			// - Pace -
-			new WeekSummaryFormatter(GraphColorProvider.PREF_GRAPH_PACE, Messages.Calendar_View_Action_SummaryPace) {
+			new WeekSummaryFormatter(GraphColorManager.PREF_GRAPH_PACE, Messages.Calendar_View_Action_SummaryPace) {
 
 				@Override
 				String format(final CalendarTourData data) {
@@ -227,7 +227,7 @@ public class CalendarView extends ViewPart implements ITourProvider {
 			},
 			// - Recording Time -
 			new WeekSummaryFormatter(
-					GraphColorProvider.PREF_GRAPH_TIME,
+					GraphColorManager.PREF_GRAPH_TIME,
 					Messages.Calendar_View_Action_SummaryRecordingTime) {
 
 				@Override
@@ -623,7 +623,7 @@ public class CalendarView extends ViewPart implements ITourProvider {
 		String			name;
 
 		WeekSummaryFormatter(final String colorName) {
-			cd = new GraphColorProvider().getGraphColorDefinition(colorName);
+			cd = new GraphColorManager().getGraphColorDefinition(colorName);
 		}
 
 		WeekSummaryFormatter(final String colorName, final String name) {

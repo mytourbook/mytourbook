@@ -21,10 +21,10 @@ import gov.nasa.worldwind.render.Path.PositionColors;
 import java.awt.Color;
 import java.util.ArrayList;
 
-import net.tourbook.common.color.ILegendProvider;
-import net.tourbook.common.color.ILegendProviderGradientColors;
+import net.tourbook.common.color.IMapColorProvider;
+import net.tourbook.common.color.IGradientColors;
 import net.tourbook.data.TourData;
-import net.tourbook.map2.view.ILegendProviderDiscreteColors;
+import net.tourbook.map2.view.IDiscreteColors;
 
 public class TourTrack {
 
@@ -32,7 +32,7 @@ public class TourTrack {
 
 	private TourData			_tourData;
 	private TourMap3Position[]	_trackPositions;
-	private ILegendProvider		_colorProvider;
+	private IMapColorProvider		_colorProvider;
 	private boolean				_isTourTrackPicked;
 
 	private int					_tourTrackPickIndex;
@@ -42,7 +42,7 @@ public class TourTrack {
 	public TourTrack(	final ITrackPath trackPath,
 						final TourData tourData,
 						final ArrayList<TourMap3Position> trackPositions,
-						final ILegendProvider colorProvider) {
+						final IMapColorProvider colorProvider) {
 
 		_trackPath = trackPath;
 
@@ -66,7 +66,7 @@ public class TourTrack {
 			final TourPositionColors tourPosColors = (TourPositionColors) positionColors;
 			final TourMap3Position trackPosition = _trackPositions[ordinal];
 
-			if (_colorProvider instanceof ILegendProviderGradientColors) {
+			if (_colorProvider instanceof IGradientColors) {
 
 				return tourPosColors.getGradientColor(
 						trackPosition.dataSerieValue,
@@ -74,7 +74,7 @@ public class TourTrack {
 						_isTourTrackPicked,
 						_tourTrackPickIndex);
 
-			} else if (_colorProvider instanceof ILegendProviderDiscreteColors) {
+			} else if (_colorProvider instanceof IDiscreteColors) {
 
 				return tourPosColors.getDiscreteColor(trackPosition.colorValue);
 			}

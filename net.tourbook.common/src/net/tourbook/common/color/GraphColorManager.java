@@ -42,7 +42,7 @@ import org.eclipse.ui.XMLMemento;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-public class GraphColorProvider {
+public class GraphColorManager {
 
 	public static final String			PREF_GRAPH_ALTIMETER		= "altimeter";			//$NON-NLS-1$
 	public static final String			PREF_GRAPH_ALTITUDE			= "altitude";			//$NON-NLS-1$
@@ -96,19 +96,19 @@ public class GraphColorProvider {
 			{ PREF_COLOR_TEXT, Messages.Graph_Pref_ColorText },
 			{ PREF_COLOR_MAPPING, Messages.Graph_Pref_color_mapping } };
 
-	private static final LegendColor	LEGEND_COLOR_ALTITUDE;
-	private static final LegendColor	LEGEND_COLOR_GRADIENT;
-	private static final LegendColor	LEGEND_COLOR_PACE;
-	private static final LegendColor	LEGEND_COLOR_PULSE;
-	private static final LegendColor	LEGEND_COLOR_SPEED;
+	private static final MapColor		MAP_COLOR_ALTITUDE;
+	private static final MapColor		MAP_COLOR_GRADIENT;
+	private static final MapColor		MAP_COLOR_PACE;
+	private static final MapColor		MAP_COLOR_PULSE;
+	private static final MapColor		MAP_COLOR_SPEED;
 
+	/*
+	 * Set map default colors.
+	 */
 	static {
 
-		/*
-		 * set default colors
-		 */
-
-		LEGEND_COLOR_ALTITUDE = new LegendColor(//
+		MAP_COLOR_ALTITUDE = new MapColor(//
+				//
 				new ValueColor[] {
 			new ValueColor(10, 204, 145, 64),
 			new ValueColor(50, 255, 85, 13),
@@ -116,12 +116,13 @@ public class GraphColorProvider {
 			new ValueColor(150, 0, 170, 9),
 			new ValueColor(190, 23, 163, 255) },
 				//
-				LegendColor.BRIGHTNESS_DIMMING,
+				MapColor.BRIGHTNESS_DIMMING,
 				38,
-				LegendColor.BRIGHTNESS_LIGHTNING,
+				MapColor.BRIGHTNESS_LIGHTNING,
 				39);
 
-		LEGEND_COLOR_GRADIENT = new LegendColor(//
+		MAP_COLOR_GRADIENT = new MapColor(//
+				//
 				new ValueColor[] {
 			new ValueColor(10, 0, 0, 255),
 			new ValueColor(50, 0, 255, 255),
@@ -129,16 +130,19 @@ public class GraphColorProvider {
 			new ValueColor(150, 255, 255, 0),
 			new ValueColor(190, 255, 0, 0) },
 				//
-				LegendColor.BRIGHTNESS_DIMMING,
+				MapColor.BRIGHTNESS_DIMMING,
 				23,
-				LegendColor.BRIGHTNESS_DIMMING,
+				MapColor.BRIGHTNESS_DIMMING,
 				10,
+				//
+				// overwrite min/max values
 				true,
 				-10,
 				true,
 				10);
 
-		LEGEND_COLOR_PACE = new LegendColor(//
+		MAP_COLOR_PACE = new MapColor(//
+				//
 				new ValueColor[] {
 			new ValueColor(10, 255, 0, 0),
 			new ValueColor(50, 255, 255, 0),
@@ -146,12 +150,13 @@ public class GraphColorProvider {
 			new ValueColor(150, 0, 255, 255),
 			new ValueColor(190, 0, 0, 255) },
 				//
-				LegendColor.BRIGHTNESS_DIMMING,
+				MapColor.BRIGHTNESS_DIMMING,
 				17,
-				LegendColor.BRIGHTNESS_DIMMING,
+				MapColor.BRIGHTNESS_DIMMING,
 				8);
 
-		LEGEND_COLOR_PULSE = new LegendColor(//
+		MAP_COLOR_PULSE = new MapColor(//
+				//
 				new ValueColor[] {
 			new ValueColor(10, 0, 203, 0),
 			new ValueColor(50, 57, 255, 0),
@@ -159,12 +164,13 @@ public class GraphColorProvider {
 			new ValueColor(150, 255, 0, 0),
 			new ValueColor(190, 255, 0, 247) },
 				//
-				LegendColor.BRIGHTNESS_DIMMING,
+				MapColor.BRIGHTNESS_DIMMING,
 				11,
-				LegendColor.BRIGHTNESS_DIMMING,
+				MapColor.BRIGHTNESS_DIMMING,
 				10);
 
-		LEGEND_COLOR_SPEED = new LegendColor(//
+		MAP_COLOR_SPEED = new MapColor(//
+				//
 				new ValueColor[] {
 			new ValueColor(10, 0, 0, 255),
 			new ValueColor(50, 0, 255, 255),
@@ -172,26 +178,29 @@ public class GraphColorProvider {
 			new ValueColor(150, 255, 255, 0),
 			new ValueColor(190, 255, 0, 0) },
 				//
-				LegendColor.BRIGHTNESS_DIMMING,
+				MapColor.BRIGHTNESS_DIMMING,
 				17,
-				LegendColor.BRIGHTNESS_DIMMING,
+				MapColor.BRIGHTNESS_DIMMING,
 				8);
 	}
 
-	private static GraphColorProvider	_instance;
+	private static GraphColorManager	_instance;
 
 	private ColorDefinition[]			_graphColorDefinitions;
 
-	public GraphColorProvider() {}
+	public GraphColorManager() {}
 
-	public static GraphColorProvider getInstance() {
+	public static GraphColorManager getInstance() {
+
 		if (_instance == null) {
-			_instance = new GraphColorProvider();
+			_instance = new GraphColorManager();
 		}
+
 		return _instance;
 	}
 
 	private static XMLMemento getXMLMementoRoot() {
+
 		Document document;
 		try {
 			document = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
@@ -222,9 +231,9 @@ public class GraphColorProvider {
 
 			final XMLMemento xmlMemento = getXMLMementoRoot();
 
-			for (final ColorDefinition graphDefinition : GraphColorProvider.getInstance().getGraphColorDefinitions()) {
+			for (final ColorDefinition graphDefinition : GraphColorManager.getInstance().getGraphColorDefinitions()) {
 
-				final LegendColor legendColor = graphDefinition.getNewLegendColor();
+				final MapColor legendColor = graphDefinition.getNewLegendColor();
 
 				// legendColor can be null when a legend color is not defined
 				if (legendColor == null) {
@@ -303,7 +312,7 @@ public class GraphColorProvider {
 				new RGB(0, 255, 0),
 				new RGB(45, 188, 45),
 				new RGB(44, 134, 33),
-				LEGEND_COLOR_ALTITUDE));
+				MAP_COLOR_ALTITUDE));
 
 		allColorDef.add(new ColorDefinition(PREF_GRAPH_HEARTBEAT, //
 				Messages.Graph_Label_Heartbeat,
@@ -311,7 +320,7 @@ public class GraphColorProvider {
 				new RGB(253, 0, 0),
 				new RGB(253, 0, 0),
 				new RGB(183, 0, 0),
-				LEGEND_COLOR_PULSE));
+				MAP_COLOR_PULSE));
 
 		allColorDef.add(new ColorDefinition(PREF_GRAPH_SPEED,//
 				Messages.Graph_Label_Speed,
@@ -319,7 +328,7 @@ public class GraphColorProvider {
 				new RGB(0, 135, 211),
 				new RGB(0, 132, 210),
 				new RGB(0, 106, 167),
-				LEGEND_COLOR_SPEED));
+				MAP_COLOR_SPEED));
 
 		allColorDef.add(new ColorDefinition(PREF_GRAPH_PACE,//
 				Messages.Graph_Label_Pace,
@@ -327,7 +336,7 @@ public class GraphColorProvider {
 				new RGB(0x9C, 0x2F, 0xFF),
 				new RGB(0x9C, 0x2F, 0xFF),
 				new RGB(88, 26, 142),
-				LEGEND_COLOR_PACE));
+				MAP_COLOR_PACE));
 
 		allColorDef.add(new ColorDefinition(PREF_GRAPH_POWER,//
 				Messages.Graph_Label_Power,
@@ -351,7 +360,7 @@ public class GraphColorProvider {
 				new RGB(249, 231, 0),
 				new RGB(236, 206, 0),
 				new RGB(111, 98, 0),
-				LEGEND_COLOR_GRADIENT));
+				MAP_COLOR_GRADIENT));
 
 		allColorDef.add(new ColorDefinition(PREF_GRAPH_ALTIMETER, //
 				Messages.Graph_Label_Altimeter,
@@ -460,7 +469,7 @@ public class GraphColorProvider {
 					continue;
 				}
 
-				final LegendColor legendColor = new LegendColor();
+				final MapColor legendColor = new MapColor();
 
 				/*
 				 * value colors
@@ -580,14 +589,14 @@ public class GraphColorProvider {
 
 				// legend color is not set, try to get default when available
 
-				final LegendColor defaultLegendColor = colorDefinition.getDefaultLegendColor();
+				final MapColor defaultLegendColor = colorDefinition.getDefaultLegendColor();
 				if (defaultLegendColor != null) {
 					colorDefinition.setLegendColor(defaultLegendColor.getCopy());
 				}
 			}
 
 			// set new legend color
-			final LegendColor legendColor = colorDefinition.getLegendColor();
+			final MapColor legendColor = colorDefinition.getLegendColor();
 			colorDefinition.setNewLegendColor(legendColor);
 		}
 	}

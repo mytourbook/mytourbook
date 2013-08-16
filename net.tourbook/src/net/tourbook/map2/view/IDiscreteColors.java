@@ -15,10 +15,10 @@
  *******************************************************************************/
 package net.tourbook.map2.view;
 
-import net.tourbook.common.color.ILegendProvider;
+import net.tourbook.common.color.IMapColorProvider;
 import net.tourbook.data.TourData;
 
-public interface ILegendProviderDiscreteColors extends ILegendProvider {
+public interface IDiscreteColors extends IMapColorProvider {
 
 	abstract int getColorValue(TourData tourData, int serieIndex);
 

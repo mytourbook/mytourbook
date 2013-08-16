@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -17,6 +17,7 @@ package net.tourbook.map2.view;
 
 import java.util.ArrayList;
 
+import net.tourbook.common.color.MapColorId;
 import net.tourbook.data.HrZoneContext;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourPersonHRZone;
@@ -27,9 +28,9 @@ import org.eclipse.swt.graphics.RGB;
 /**
  * Contains all data to draw the legend image for discrete colors.
  */
-public class HrZonesColorProvider implements ILegendProviderDiscreteColors {
+public class HrZonesColorProvider implements IDiscreteColors {
 
-	private int							_colorId;
+	private MapColorId					_mapColorId;
 
 	/**
 	 * {@link TourData} which are checked if they contain valid HR zone data
@@ -43,8 +44,8 @@ public class HrZonesColorProvider implements ILegendProviderDiscreteColors {
 	private HrZoneContext				_hrZoneContext;
 	private float[]						_pulseData;
 
-	public HrZonesColorProvider(final int colorId) {
-		_colorId = colorId;
+	public HrZonesColorProvider(final MapColorId mapColorId) {
+		_mapColorId = mapColorId;
 	}
 
 	private void checkHrData(final TourData tourData) {
@@ -72,7 +73,7 @@ public class HrZonesColorProvider implements ILegendProviderDiscreteColors {
 		if (_isValidHrZoneData == false) {
 			return 0xFF0AE3;
 		}
- 
+
 		return getHrColor(serieIndex);
 	}
 
@@ -114,8 +115,9 @@ public class HrZonesColorProvider implements ILegendProviderDiscreteColors {
 		return rgbValue;
 	}
 
-	public int getTourColorId() {
-		return _colorId;
+	@Override
+	public MapColorId getMapColorId() {
+		return _mapColorId;
 	}
 
 }

@@ -13,29 +13,10 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.common.color;
+package net.tourbook.map2.view;
 
-import java.util.List;
+public interface IMapColorUpdater {
 
-import net.tourbook.common.UI;
+	void applyMapColors();
 
-/**
- * Configuration for the map legend to visualize one unit in a tour
- */
-public class LegendConfig {
-
-	public float			legendMinValue;
-	public float			legendMaxValue;
-
-	public List<Float>		units;
-	public List<String>		unitLabels;
-
-	public LegendUnitFormat	unitFormat	= LegendUnitFormat.Number;
-
-	public String			unitText	= UI.EMPTY_STRING;
-
-	/**
-	 * Number of digits when label is formatted, default is 0.
-	 */
-	public int				numberFormatDigits;
 }

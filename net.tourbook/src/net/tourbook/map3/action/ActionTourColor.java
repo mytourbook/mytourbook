@@ -16,7 +16,7 @@
 package net.tourbook.map3.action;
 
 import net.tourbook.application.TourbookPlugin;
-import net.tourbook.common.color.ILegendProvider;
+import net.tourbook.common.color.MapColorId;
 import net.tourbook.map2.Messages;
 import net.tourbook.map3.view.Map3View;
 
@@ -25,10 +25,10 @@ import org.eclipse.jface.action.Action;
 public class ActionTourColor extends Action {
 
 	private Map3View	_mapView;
-	private int			_colorId;
+	private MapColorId	_colorId;
 
 	public ActionTourColor(	final Map3View mapView,
-							final int colorId,
+							final MapColorId colorId,
 							final String toolTipText,
 							final String imageEnabled,
 							final String imageDisabled) {
@@ -51,59 +51,59 @@ public class ActionTourColor extends Action {
 	 * @param colorId
 	 * @return
 	 */
-	public static ActionTourColor createAction(final Map3View map3View, final int colorId) {
+	public static ActionTourColor createAction(final Map3View map3View, final MapColorId colorId) {
 
 		switch (colorId) {
-		case ILegendProvider.TOUR_COLOR_ALTITUDE:
+		case Altitude:
 
 			return new ActionTourColor(
 					map3View,
-					ILegendProvider.TOUR_COLOR_ALTITUDE,
+					MapColorId.Altitude,
 					Messages.map_action_tour_color_altitude_tooltip,
 					Messages.image_action_tour_color_altitude,
 					Messages.image_action_tour_color_altitude_disabled);
 
-		case ILegendProvider.TOUR_COLOR_GRADIENT:
+		case Gradient:
 
 			return new ActionTourColor(
 					map3View,
-					ILegendProvider.TOUR_COLOR_GRADIENT,
+					MapColorId.Gradient,
 					Messages.map_action_tour_color_gradient_tooltip,
 					Messages.image_action_tour_color_gradient,
 					Messages.image_action_tour_color_gradient_disabled);
 
-		case ILegendProvider.TOUR_COLOR_PULSE:
+		case Pace:
 
 			return new ActionTourColor(
 					map3View,
-					ILegendProvider.TOUR_COLOR_PULSE,
-					Messages.map_action_tour_color_pulse_tooltip,
-					Messages.image_action_tour_color_pulse,
-					Messages.image_action_tour_color_pulse_disabled);
-
-		case ILegendProvider.TOUR_COLOR_SPEED:
-
-			return new ActionTourColor(
-					map3View,
-					ILegendProvider.TOUR_COLOR_SPEED,
-					Messages.map_action_tour_color_speed_tooltip,
-					Messages.image_action_tour_color_speed,
-					Messages.image_action_tour_color_speed_disabled);
-
-		case ILegendProvider.TOUR_COLOR_PACE:
-
-			return new ActionTourColor(
-					map3View,
-					ILegendProvider.TOUR_COLOR_PACE,
+					MapColorId.Pace,
 					Messages.map_action_tour_color_pase_tooltip,
 					Messages.image_action_tour_color_pace,
 					Messages.image_action_tour_color_pace_disabled);
 
-		case ILegendProvider.TOUR_COLOR_HR_ZONE:
+		case Pulse:
 
 			return new ActionTourColor(
 					map3View,
-					ILegendProvider.TOUR_COLOR_HR_ZONE,
+					MapColorId.Pulse,
+					Messages.map_action_tour_color_pulse_tooltip,
+					Messages.image_action_tour_color_pulse,
+					Messages.image_action_tour_color_pulse_disabled);
+
+		case Speed:
+
+			return new ActionTourColor(
+					map3View,
+					MapColorId.Speed,
+					Messages.map_action_tour_color_speed_tooltip,
+					Messages.image_action_tour_color_speed,
+					Messages.image_action_tour_color_speed_disabled);
+
+		case HrZone:
+
+			return new ActionTourColor(
+					map3View,
+					MapColorId.HrZone,
 					Messages.Tour_Action_ShowHrZones_Tooltip,
 					Messages.Image__PulseZones,
 					Messages.Image__PulseZones_Disabled);

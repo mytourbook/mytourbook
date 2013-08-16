@@ -18,7 +18,7 @@ package net.tourbook.map2.view;
 import java.util.ArrayList;
 import java.util.Set;
 
-import net.tourbook.common.color.ILegendProvider;
+import net.tourbook.common.color.IMapColorProvider;
 import net.tourbook.common.map.GeoPosition;
 import net.tourbook.data.TourData;
 import net.tourbook.photo.Photo;
@@ -40,7 +40,7 @@ public class TourPainterConfiguration {
 
 	private int								_synchTourZoomLevel;
 
-	private ILegendProvider					_legendProvider;
+	private IMapColorProvider					_legendProvider;
 
 	boolean									isShowStartEndInMap;
 	boolean									isShowTourMarker;
@@ -65,7 +65,7 @@ public class TourPainterConfiguration {
 		return _instance;
 	}
 
-	public ILegendProvider getLegendProvider() {
+	public IMapColorProvider getLegendProvider() {
 		return _legendProvider;
 	}
 
@@ -102,7 +102,7 @@ public class TourPainterConfiguration {
 		_tourDataList.add(null);
 	}
 
-	public void setLegendProvider(final ILegendProvider iLegendProvider) {
+	public void setLegendProvider(final IMapColorProvider iLegendProvider) {
 		if (iLegendProvider != null) {
 			_legendProvider = iLegendProvider;
 		}

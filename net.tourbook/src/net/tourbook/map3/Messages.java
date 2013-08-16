@@ -49,10 +49,10 @@ public class Messages extends NLS {
 
 	public static String		Image_Map3_Map3PropertiesView;
 
-	public static String	Map3_Action_MappingColor;
-
 	public static String		Map3_Action_OpenMap3PropertiesView;
 	public static String		Map3_Action_OpenTrackLayerProperties_Tooltip;
+
+	public static String	Map3_Action_TrackColor;
 
 	public static String		Prop_Viewer_Label_AltitudeRange_Tooltip;
 

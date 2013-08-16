@@ -40,7 +40,7 @@ import net.tourbook.chart.ITooltipOwner;
 import net.tourbook.common.PointLong;
 import net.tourbook.common.UI;
 import net.tourbook.common.action.ActionOpenPrefDialog;
-import net.tourbook.common.color.GraphColorProvider;
+import net.tourbook.common.color.GraphColorManager;
 import net.tourbook.common.util.IToolTipHideListener;
 import net.tourbook.common.util.TourToolTip;
 import net.tourbook.data.TourData;
@@ -343,12 +343,12 @@ public class TourChart extends Chart {
 
 		addPrefListeners();
 
-		final GraphColorProvider colorProvider = GraphColorProvider.getInstance();
+		final GraphColorManager colorProvider = GraphColorManager.getInstance();
 
 		_photoOverlayBGColorLink = new Color(getDisplay(), //
-				colorProvider.getGraphColorDefinition(GraphColorProvider.PREF_GRAPH_HISTORY).getLineColor());
+				colorProvider.getGraphColorDefinition(GraphColorManager.PREF_GRAPH_HISTORY).getLineColor());
 		_photoOverlayBGColorTour = new Color(getDisplay(), //
-				colorProvider.getGraphColorDefinition(GraphColorProvider.PREF_GRAPH_TOUR).getLineColor());
+				colorProvider.getGraphColorDefinition(GraphColorManager.PREF_GRAPH_TOUR).getLineColor());
 
 		/*
 		 * set values from pref store

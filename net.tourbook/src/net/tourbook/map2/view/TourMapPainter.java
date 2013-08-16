@@ -25,10 +25,10 @@ import java.util.Set;
 
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.Util;
-import net.tourbook.common.color.ILegendProvider;
-import net.tourbook.common.color.ILegendProviderGradientColors;
-import net.tourbook.common.color.LegendConfig;
+import net.tourbook.common.color.IMapColorProvider;
+import net.tourbook.common.color.IGradientColors;
 import net.tourbook.common.color.LegendUnitFormat;
+import net.tourbook.common.color.MapColorConfig;
 import net.tourbook.common.map.GeoPosition;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
@@ -80,7 +80,7 @@ public class TourMapPainter extends MapPainter {
 
 	private float[]							_dataSerie;
 
-	private ILegendProvider					_legendProvider;
+	private IMapColorProvider					_legendProvider;
 	// painting parameter
 	private int								_lineWidth;
 
@@ -169,21 +169,21 @@ public class TourMapPainter extends MapPainter {
 	 */
 	public static void drawLegend(	final GC gc,
 									final Rectangle legendBounds,
-									final ILegendProvider legendProvider,
+									final IMapColorProvider legendProvider,
 									final boolean isDrawVertical) {
 
-		if (legendProvider instanceof ILegendProviderGradientColors) {
-			drawLegendGradientColors(gc, legendBounds, (ILegendProviderGradientColors) legendProvider, isDrawVertical);
+		if (legendProvider instanceof IGradientColors) {
+			drawLegendGradientColors(gc, legendBounds, (IGradientColors) legendProvider, isDrawVertical);
 		}
 	}
 
 	private static void drawLegendGradientColors(	final GC gc,
 													final Rectangle legendBounds,
-													final ILegendProviderGradientColors legendProvider,
+													final IGradientColors legendProvider,
 													final boolean isDrawVertical) {
 
 		final Device display = gc.getDevice();
-		final LegendConfig legendConfig = legendProvider.getLegendConfig();
+		final MapColorConfig legendConfig = legendProvider.getLegendConfig();
 
 		// ensure units are available
 		if (legendConfig.units == null /* || config.unitLabels == null */) {
@@ -213,9 +213,9 @@ public class TourMapPainter extends MapPainter {
 			// vertical legend
 
 			legendPositionX = legendBounds.x + 1;
-			legendPositionY = legendBounds.y + ILegendProvider.LEGEND_MARGIN_TOP_BOTTOM;
+			legendPositionY = legendBounds.y + IMapColorProvider.LEGEND_MARGIN_TOP_BOTTOM;
 			legendWidth = 20;
-			legendHeight = legendBounds.height - 2 * ILegendProvider.LEGEND_MARGIN_TOP_BOTTOM;
+			legendHeight = legendBounds.height - 2 * IMapColorProvider.LEGEND_MARGIN_TOP_BOTTOM;
 
 			availableLegendPixels = legendHeight - 1;
 
@@ -358,8 +358,6 @@ public class TourMapPainter extends MapPainter {
 		textBorderColor.dispose();
 
 	}
-
-
 
 	private static void getTourPainterSettings() {
 
@@ -1282,7 +1280,7 @@ public class TourMapPainter extends MapPainter {
 
 		if (_dataSerie == null || valueIndex >= _dataSerie.length || //
 				// check legend provider type
-				_legendProvider instanceof ILegendProviderGradientColors == false//
+				_legendProvider instanceof IGradientColors == false//
 		) {
 			return Integer.MIN_VALUE;
 		}
@@ -1295,7 +1293,7 @@ public class TourMapPainter extends MapPainter {
 
 		int valuePosition = 0;
 
-		final LegendConfig config = ((ILegendProviderGradientColors) _legendProvider).getLegendConfig();
+		final MapColorConfig config = ((IGradientColors) _legendProvider).getLegendConfig();
 
 //		final Integer unitFactor = config.unitFactor;
 //		dataValue /= unitFactor;
@@ -1316,8 +1314,8 @@ public class TourMapPainter extends MapPainter {
 
 			// min < value < max
 
-			final int legendPositionY = legendBounds.y + ILegendProvider.LEGEND_MARGIN_TOP_BOTTOM;
-			final int legendHeight = legendBounds.height - 2 * ILegendProvider.LEGEND_MARGIN_TOP_BOTTOM;
+			final int legendPositionY = legendBounds.y + IMapColorProvider.LEGEND_MARGIN_TOP_BOTTOM;
+			final int legendHeight = legendBounds.height - 2 * IMapColorProvider.LEGEND_MARGIN_TOP_BOTTOM;
 
 			final int pixelDiff = legendHeight - 1;
 
@@ -1370,13 +1368,13 @@ public class TourMapPainter extends MapPainter {
 		}
 
 		int colorValue = 0;
-		if (_legendProvider instanceof ILegendProviderGradientColors) {
+		if (_legendProvider instanceof IGradientColors) {
 
-			colorValue = ((ILegendProviderGradientColors) _legendProvider).getColorValue(_dataSerie[serieIndex]);
+			colorValue = ((IGradientColors) _legendProvider).getColorValue(_dataSerie[serieIndex]);
 
-		} else if (_legendProvider instanceof ILegendProviderDiscreteColors) {
+		} else if (_legendProvider instanceof IDiscreteColors) {
 
-			colorValue = ((ILegendProviderDiscreteColors) _legendProvider).getColorValue(
+			colorValue = ((IDiscreteColors) _legendProvider).getColorValue(
 					tourData,
 					serieIndex,
 					isDrawLine);
@@ -1737,7 +1735,8 @@ public class TourMapPainter extends MapPainter {
 	 */
 	private void setDataSerie(final TourData tourData) {
 
-		final ILegendProvider legendProvider = _tourPaintConfig.getLegendProvider();
+		final IMapColorProvider legendProvider = _tourPaintConfig.getLegendProvider();
+
 		if (legendProvider == null) {
 			_dataSerie = null;
 			return;
@@ -1745,28 +1744,28 @@ public class TourMapPainter extends MapPainter {
 
 		_legendProvider = legendProvider;
 
-		switch (_legendProvider.getTourColorId()) {
-		case ILegendProvider.TOUR_COLOR_ALTITUDE:
+		switch (_legendProvider.getMapColorId()) {
+		case Altitude:
 			_dataSerie = tourData.getAltitudeSerie();
 			break;
 
-		case ILegendProvider.TOUR_COLOR_GRADIENT:
+		case Gradient:
 			_dataSerie = tourData.getGradientSerie();
 			break;
 
-		case ILegendProvider.TOUR_COLOR_PULSE:
+		case Pulse:
 			_dataSerie = tourData.pulseSerie;
 			break;
 
-		case ILegendProvider.TOUR_COLOR_SPEED:
+		case Speed:
 			_dataSerie = tourData.getSpeedSerie();
 			break;
 
-		case ILegendProvider.TOUR_COLOR_PACE:
+		case Pace:
 			_dataSerie = tourData.getPaceSerieSeconds();
 			break;
 
-		case ILegendProvider.TOUR_COLOR_HR_ZONE:
+		case HrZone:
 			_dataSerie = tourData.pulseSerie;
 			break;
 

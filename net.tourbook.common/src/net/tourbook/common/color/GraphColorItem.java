@@ -56,13 +56,13 @@ public class GraphColorItem {
 
 	public RGB getNewRGB() {
 
-		if (_colorPrefName.compareTo(GraphColorProvider.PREF_COLOR_LINE) == 0) {
+		if (_colorPrefName.compareTo(GraphColorManager.PREF_COLOR_LINE) == 0) {
 			return _colorDefinition.getNewLineColor();
 
-		} else if (_colorPrefName.compareTo(GraphColorProvider.PREF_COLOR_TEXT) == 0) {
+		} else if (_colorPrefName.compareTo(GraphColorManager.PREF_COLOR_TEXT) == 0) {
 			return _colorDefinition.getNewTextColor();
 
-		} else if (_colorPrefName.compareTo(GraphColorProvider.PREF_COLOR_BRIGHT) == 0) {
+		} else if (_colorPrefName.compareTo(GraphColorManager.PREF_COLOR_BRIGHT) == 0) {
 			return _colorDefinition.getNewGradientBright();
 
 		} else {
@@ -76,7 +76,7 @@ public class GraphColorItem {
 
 	/**
 	 * @return Returns <code>true</code> when this {@link GraphColorItem} represents a
-	 *         {@link LegendColor}
+	 *         {@link MapColor}
 	 */
 	public boolean isLegend() {
 		return _isLegend;
@@ -88,13 +88,13 @@ public class GraphColorItem {
 
 	public void setNewRGB(final RGB rgb) {
 
-		if (_colorPrefName.compareTo(GraphColorProvider.PREF_COLOR_LINE) == 0) {
+		if (_colorPrefName.compareTo(GraphColorManager.PREF_COLOR_LINE) == 0) {
 			_colorDefinition.setNewLineColor(rgb);
 
-		} else if (_colorPrefName.compareTo(GraphColorProvider.PREF_COLOR_TEXT) == 0) {
+		} else if (_colorPrefName.compareTo(GraphColorManager.PREF_COLOR_TEXT) == 0) {
 			_colorDefinition.setNewTextColor(rgb);
 
-		} else if (_colorPrefName.compareTo(GraphColorProvider.PREF_COLOR_BRIGHT) == 0) {
+		} else if (_colorPrefName.compareTo(GraphColorManager.PREF_COLOR_BRIGHT) == 0) {
 			_colorDefinition.setNewGradientBright(rgb);
 
 		} else {

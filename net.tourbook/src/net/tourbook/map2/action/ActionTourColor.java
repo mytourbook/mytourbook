@@ -16,6 +16,7 @@
 package net.tourbook.map2.action;
 
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.color.MapColorId;
 import net.tourbook.map2.view.Map2View;
 
 import org.eclipse.jface.action.Action;
@@ -23,10 +24,10 @@ import org.eclipse.jface.action.Action;
 public class ActionTourColor extends Action {
 
 	private Map2View	_mapView;
-	private int			_colorId;
+	private MapColorId	_colorId;
 
 	public ActionTourColor(	final Map2View mapView,
-							final int colorId,
+							final MapColorId colorId,
 							final String toolTipText,
 							final String imageEnabled,
 							final String imageDisabled) {

@@ -17,7 +17,7 @@ package net.tourbook.common.preferences;
 
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.color.ColorDefinition;
-import net.tourbook.common.color.GraphColorProvider;
+import net.tourbook.common.color.GraphColorManager;
 
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -36,23 +36,23 @@ public class CommonPreferenceInitializer extends AbstractPreferenceInitializer {
 		/*
 		 * graph color preferences
 		 */
-		for (final ColorDefinition graphDefinition : GraphColorProvider.getInstance().getGraphColorDefinitions()) {
+		for (final ColorDefinition graphDefinition : GraphColorManager.getInstance().getGraphColorDefinitions()) {
 
 			final String graphPrefName = graphDefinition.getGraphPrefName();
 
 			PreferenceConverter.setDefault(
 					commonPrefStore,
-					graphPrefName + GraphColorProvider.PREF_COLOR_BRIGHT,
+					graphPrefName + GraphColorManager.PREF_COLOR_BRIGHT,
 					graphDefinition.getDefaultGradientBright());
 
 			PreferenceConverter.setDefault(
 					commonPrefStore,
-					graphPrefName + GraphColorProvider.PREF_COLOR_DARK,
+					graphPrefName + GraphColorManager.PREF_COLOR_DARK,
 					graphDefinition.getDefaultGradientDark());
 
 			PreferenceConverter.setDefault(
 					commonPrefStore,
-					graphPrefName + GraphColorProvider.PREF_COLOR_LINE,
+					graphPrefName + GraphColorManager.PREF_COLOR_LINE,
 					graphDefinition.getDefaultLineColor());
 
 		}

@@ -47,9 +47,9 @@ public class ColorDefinition {
 	private RGB						_textColorDefault;
 	private RGB						_textColorNew;
 
-	private LegendColor				_legendColor;
-	private LegendColor				_defaultLegendColor;
-	private LegendColor				_newLegendColor;
+	private MapColor				_legendColor;
+	private MapColor				_defaultLegendColor;
+	private MapColor				_newLegendColor;
 
 	/**
 	 * Sets the color for the default, current and changes
@@ -75,7 +75,7 @@ public class ColorDefinition {
 								final RGB defaultGradientDark,
 								final RGB defaultLineColor,
 								final RGB defaultTextColor,
-								final LegendColor defaultLegendColor) {
+								final MapColor defaultLegendColor) {
 
 		_prefName = prefName;
 		_visibleName = visibleName;
@@ -92,7 +92,7 @@ public class ColorDefinition {
 		/*
 		 * set gradient bright from pref store or default
 		 */
-		final String prefColorGradientBright = graphPrefName + GraphColorProvider.PREF_COLOR_BRIGHT;
+		final String prefColorGradientBright = graphPrefName + GraphColorManager.PREF_COLOR_BRIGHT;
 		if (_commonPrefStore.contains(prefColorGradientBright)) {
 			_gradientBright = PreferenceConverter.getColor(_commonPrefStore, prefColorGradientBright);
 		} else {
@@ -103,7 +103,7 @@ public class ColorDefinition {
 		/*
 		 * gradient dark
 		 */
-		final String prefColorGradientDark = graphPrefName + GraphColorProvider.PREF_COLOR_DARK;
+		final String prefColorGradientDark = graphPrefName + GraphColorManager.PREF_COLOR_DARK;
 		if (_commonPrefStore.contains(prefColorGradientDark)) {
 			_gradientDark = PreferenceConverter.getColor(_commonPrefStore, prefColorGradientDark);
 		} else {
@@ -114,7 +114,7 @@ public class ColorDefinition {
 		/*
 		 * line color
 		 */
-		final String prefColorLine = graphPrefName + GraphColorProvider.PREF_COLOR_LINE;
+		final String prefColorLine = graphPrefName + GraphColorManager.PREF_COLOR_LINE;
 		if (_commonPrefStore.contains(prefColorLine)) {
 			_lineColor = PreferenceConverter.getColor(_commonPrefStore, prefColorLine);
 		} else {
@@ -125,7 +125,7 @@ public class ColorDefinition {
 		/*
 		 * text color
 		 */
-		final String prefColorText = graphPrefName + GraphColorProvider.PREF_COLOR_TEXT;
+		final String prefColorText = graphPrefName + GraphColorManager.PREF_COLOR_TEXT;
 		if (_commonPrefStore.contains(prefColorText)) {
 			_textColor = PreferenceConverter.getColor(_commonPrefStore, prefColorText);
 		} else {
@@ -164,7 +164,7 @@ public class ColorDefinition {
 		return _gradientDarkDefault;
 	}
 
-	public LegendColor getDefaultLegendColor() {
+	public MapColor getDefaultLegendColor() {
 		return _defaultLegendColor;
 	}
 
@@ -196,7 +196,7 @@ public class ColorDefinition {
 		return _prefName;
 	}
 
-	public LegendColor getLegendColor() {
+	public MapColor getLegendColor() {
 		return _legendColor;
 	}
 
@@ -212,7 +212,7 @@ public class ColorDefinition {
 		return _gradientDarkNew;
 	}
 
-	public LegendColor getNewLegendColor() {
+	public MapColor getNewLegendColor() {
 		return _newLegendColor;
 	}
 
@@ -261,7 +261,7 @@ public class ColorDefinition {
 		_gradientDark = gradientDark;
 	}
 
-	public void setLegendColor(final LegendColor legendColor) {
+	public void setLegendColor(final MapColor legendColor) {
 		_legendColor = legendColor;
 	}
 
@@ -277,7 +277,7 @@ public class ColorDefinition {
 		_gradientDarkNew = newGradientDark;
 	}
 
-	public void setNewLegendColor(final LegendColor newLegendColor) {
+	public void setNewLegendColor(final MapColor newLegendColor) {
 		_newLegendColor = newLegendColor;
 	}
 

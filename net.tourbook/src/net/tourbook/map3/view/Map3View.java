@@ -30,9 +30,11 @@ import javax.swing.SwingUtilities;
 
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
-import net.tourbook.common.color.ILegendProvider;
+import net.tourbook.common.color.IMapColorProvider;
+import net.tourbook.common.color.MapColorId;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
+import net.tourbook.map2.view.IMapColorUpdater;
 import net.tourbook.map2.view.TourMapColors;
 import net.tourbook.map3.action.ActionMapColor;
 import net.tourbook.map3.action.ActionOpenMap3LayerView;
@@ -78,7 +80,7 @@ import org.eclipse.ui.part.ViewPart;
 /**
  * Display 3-D Map
  */
-public class Map3View extends ViewPart {
+public class Map3View extends ViewPart implements IMapColorUpdater {
 
 	public static final String					ID										= "net.tourbook.map3.view.Map3ViewId";		//$NON-NLS-1$
 
@@ -132,7 +134,7 @@ public class Map3View extends ViewPart {
 
 	private Composite							_mapContainer;
 
-	private int									_tourColorId;
+	private MapColorId							_tourColorId;
 
 	private Frame								_awtFrame;
 
@@ -142,11 +144,9 @@ public class Map3View extends ViewPart {
 
 	public Map3View() {}
 
-	public void actionSetTourColor(final int colorId) {
+	public void actionSetTourColor(final MapColorId colorId) {
 
 		_tourColorId = colorId;
-
-		_actionMapColor.setColorId(colorId);
 
 		setColorProvider(colorId);
 
@@ -324,6 +324,11 @@ public class Map3View extends ViewPart {
 		TourManager.getInstance().addTourEventListener(_tourEventListener);
 	}
 
+	@Override
+	public void applyMapColors() {
+
+	}
+
 	private void clearView() {
 
 		_allTours.clear();
@@ -342,19 +347,19 @@ public class Map3View extends ViewPart {
 		_actionSynMapPositionWithSlider = new ActionSyncMapPositionWithSlider(this);
 		_actionSynMapViewWithTour = new ActionSyncMapViewWithTour(this);
 
-		_actionTourColorAltitude = ActionTourColor.createAction(this, ILegendProvider.TOUR_COLOR_ALTITUDE);
-		_actionTourColorGradient = ActionTourColor.createAction(this, ILegendProvider.TOUR_COLOR_GRADIENT);
-		_actionTourColorPulse = ActionTourColor.createAction(this, ILegendProvider.TOUR_COLOR_PULSE);
-		_actionTourColorSpeed = ActionTourColor.createAction(this, ILegendProvider.TOUR_COLOR_SPEED);
-		_actionTourColorPace = ActionTourColor.createAction(this, ILegendProvider.TOUR_COLOR_PACE);
-		_actionTourColorHrZone = ActionTourColor.createAction(this, ILegendProvider.TOUR_COLOR_HR_ZONE);
+		_actionTourColorAltitude = ActionTourColor.createAction(this, MapColorId.Altitude);
+		_actionTourColorGradient = ActionTourColor.createAction(this, MapColorId.Gradient);
+		_actionTourColorPace = ActionTourColor.createAction(this, MapColorId.Pace);
+		_actionTourColorPulse = ActionTourColor.createAction(this, MapColorId.Pulse);
+		_actionTourColorSpeed = ActionTourColor.createAction(this, MapColorId.Speed);
+		_actionTourColorHrZone = ActionTourColor.createAction(this, MapColorId.HrZone);
 	}
 
 	/**
 	 * Context menu with net.tourbook.common.util.SWTPopupOverAWT
 	 * 
-	 * @param yPosScreen
 	 * @param xPosScreen
+	 * @param yPosScreen
 	 */
 	private void createContextMenu(final int xPosScreen, final int yPosScreen) {
 
@@ -387,6 +392,8 @@ public class Map3View extends ViewPart {
 
 		createActions(parent);
 		fillActionBars();
+
+//		getViewSite().registerContextMenu(menuManager, selectionProvider)
 
 		Map3Manager.setMap3View(this);
 
@@ -509,6 +516,12 @@ public class Map3View extends ViewPart {
 
 	private void fillContextMenu(final Menu menu) {
 
+		// set color before menu is filled
+		_actionMapColor.setColorId(_tourColorId);
+
+//		if (_tourColorId) {
+//
+//		}
 		fillMenuItem(menu, _actionMapColor);
 
 //		final MenuItem item1 = new MenuItem(_contextMenu, SWT.PUSH);
@@ -835,40 +848,45 @@ public class Map3View extends ViewPart {
 		_actionShowTourInMap3.setState(_isTourVisible, isTourAvailable);
 
 		// tour color
-		_tourColorId = Util.getStateInt(_state, STATE_TOUR_COLOR_ID, ILegendProvider.TOUR_COLOR_ALTITUDE);
+		final String stateColorId = Util.getStateString(_state, STATE_TOUR_COLOR_ID, MapColorId.Altitude.name());
+
+		try {
+			_tourColorId = MapColorId.valueOf(stateColorId);
+		} catch (final Exception e) {
+			// set default
+			_tourColorId = MapColorId.Altitude;
+		}
 
 		switch (_tourColorId) {
-		case ILegendProvider.TOUR_COLOR_ALTITUDE:
+		case Altitude:
 			_actionTourColorAltitude.setChecked(true);
 			break;
 
-		case ILegendProvider.TOUR_COLOR_GRADIENT:
+		case Gradient:
 			_actionTourColorGradient.setChecked(true);
 			break;
 
-		case ILegendProvider.TOUR_COLOR_PULSE:
-			_actionTourColorPulse.setChecked(true);
-			break;
-
-		case ILegendProvider.TOUR_COLOR_SPEED:
-			_actionTourColorSpeed.setChecked(true);
-			break;
-
-		case ILegendProvider.TOUR_COLOR_PACE:
+		case Pace:
 			_actionTourColorPace.setChecked(true);
 			break;
 
-		case ILegendProvider.TOUR_COLOR_HR_ZONE:
+		case Pulse:
+			_actionTourColorPulse.setChecked(true);
+			break;
+
+		case Speed:
+			_actionTourColorSpeed.setChecked(true);
+			break;
+
+		case HrZone:
 			_actionTourColorHrZone.setChecked(true);
 			break;
 
 		default:
-			_tourColorId = ILegendProvider.TOUR_COLOR_ALTITUDE;
+			_tourColorId = MapColorId.Altitude;
 			_actionTourColorAltitude.setChecked(true);
 			break;
 		}
-
-		_actionMapColor.setColorId(_tourColorId);
 
 		setColorProvider(_tourColorId);
 
@@ -890,16 +908,16 @@ public class Map3View extends ViewPart {
 		_state.put(STATE_IS_SYNC_MAP_VIEW_WITH_TOUR, _isSyncMapViewWithTour);
 		_state.put(STATE_IS_TOUR_VISIBLE, _isTourVisible);
 
-		_state.put(STATE_TOUR_COLOR_ID, _tourColorId);
+		_state.put(STATE_TOUR_COLOR_ID, _tourColorId.name());
 
 		final View view = _wwCanvas.getView();
 
 		_state.put(STATE_MAP3_VIEW, view.getRestorableState());
 	}
 
-	private void setColorProvider(final int colorId) {
+	private void setColorProvider(final MapColorId colorId) {
 
-		final ILegendProvider colorProvider = TourMapColors.getColorProvider(colorId);
+		final IMapColorProvider colorProvider = TourMapColors.getColorProvider(colorId);
 
 		Map3Manager.getTourTrackLayer().setColorProvider(colorProvider);
 	}

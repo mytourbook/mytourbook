@@ -23,25 +23,27 @@ import net.tourbook.common.util.Util;
 /**
  * Contains all data to draw the legend image.
  */
-public class GradientColorProvider implements ILegendProviderGradientColors {
+public class GradientColorProvider implements IGradientColors {
 
-	protected LegendConfig	_legendConfig;
-	protected LegendColor	_legendColor;
+	private MapColorId		_mapColorId;
 
-	private int				_colorId;
+	private MapColor		_mapColor;
+	private MapColorConfig	_mapColorConfig;
 
 	/**
-	 * @param colorId
+	 * @param mapColorId
 	 *            Unique id for this color, it can be e.g. altitude, speed, ...
-	 * @param legendConfig
-	 * @param legendColor
+	 * @param mapColorConfig
+	 * @param mapColor
 	 */
-	public GradientColorProvider(final int colorId, final LegendConfig legendConfig, final LegendColor legendColor) {
+	public GradientColorProvider(	final MapColorId mapColorId,
+									final MapColorConfig mapColorConfig,
+									final MapColor mapColor) {
 
-		_colorId = colorId;
+		_mapColorId = mapColorId;
 
-		_legendConfig = legendConfig;
-		_legendColor = legendColor;
+		_mapColorConfig = mapColorConfig;
+		_mapColor = mapColor;
 	}
 
 	private static List<Float> getLegendUnits(	final int legendHeight,
@@ -66,7 +68,7 @@ public class GradientColorProvider implements ILegendProviderGradientColors {
 		 */
 		final float graphRange = graphMaxValue - graphMinValue;
 
-		final int defaultUnitCount = legendHeight / ILegendProvider.LEGEND_UNIT_DISTANCE;
+		final int defaultUnitCount = legendHeight / IMapColorProvider.LEGEND_UNIT_DISTANCE;
 
 		// get range for one unit
 		final float graphUnitValue = graphRange / Math.max(1, defaultUnitCount);
@@ -152,7 +154,7 @@ public class GradientColorProvider implements ILegendProviderGradientColors {
 		 * calculate the number of units which will be visible by dividing the available height by
 		 * the minimum size which one unit should have in pixels
 		 */
-		final float defaultUnitCount = legendHeight / ILegendProvider.LEGEND_UNIT_DISTANCE;
+		final float defaultUnitCount = legendHeight / IMapColorProvider.LEGEND_UNIT_DISTANCE;
 
 		// unitValue is the number in data values for one unit
 		final float defaultUnitValue = graphValueRange / Math.max(1, defaultUnitCount);
@@ -211,9 +213,9 @@ public class GradientColorProvider implements ILegendProviderGradientColors {
 		int green = 0;
 		int blue = 0;
 
-		final ValueColor[] valueColors = _legendColor.valueColors;
-		final float minBrightnessFactor = _legendColor.minBrightnessFactor / 100.0f;
-		final float maxBrightnessFactor = _legendColor.maxBrightnessFactor / 100.0f;
+		final ValueColor[] valueColors = _mapColor.valueColors;
+		final float minBrightnessFactor = _mapColor.minBrightnessFactor / 100.0f;
+		final float maxBrightnessFactor = _mapColor.maxBrightnessFactor / 100.0f;
 
 		/*
 		 * find the valueColor for the current value
@@ -247,18 +249,18 @@ public class GradientColorProvider implements ILegendProviderGradientColors {
 			blue = valueColor.blue;
 
 			final float minValue = valueColor.value;
-			final float minDiff = _legendConfig.legendMinValue - minValue;
+			final float minDiff = _mapColorConfig.legendMinValue - minValue;
 
 			final float ratio = minDiff == 0 ? 1 : (graphValue - minValue) / minDiff;
 			final float dimmRatio = minBrightnessFactor * ratio;
 
-			if (_legendColor.minBrightness == LegendColor.BRIGHTNESS_DIMMING) {
+			if (_mapColor.minBrightness == MapColor.BRIGHTNESS_DIMMING) {
 
 				red = red - (int) (dimmRatio * red);
 				green = green - (int) (dimmRatio * green);
 				blue = blue - (int) (dimmRatio * blue);
 
-			} else if (_legendColor.minBrightness == LegendColor.BRIGHTNESS_LIGHTNING) {
+			} else if (_mapColor.minBrightness == MapColor.BRIGHTNESS_LIGHTNING) {
 
 				red = red + (int) (dimmRatio * (255 - red));
 				green = green + (int) (dimmRatio * (255 - green));
@@ -275,18 +277,18 @@ public class GradientColorProvider implements ILegendProviderGradientColors {
 			blue = valueColor.blue;
 
 			final float maxValue = valueColor.value;
-			final float maxDiff = _legendConfig.legendMaxValue - maxValue;
+			final float maxDiff = _mapColorConfig.legendMaxValue - maxValue;
 
 			final float ratio = maxDiff == 0 ? 1 : (graphValue - maxValue) / maxDiff;
 			final float dimmRatio = maxBrightnessFactor * ratio;
 
-			if (_legendColor.maxBrightness == LegendColor.BRIGHTNESS_DIMMING) {
+			if (_mapColor.maxBrightness == MapColor.BRIGHTNESS_DIMMING) {
 
 				red = red - (int) (dimmRatio * red);
 				green = green - (int) (dimmRatio * green);
 				blue = blue - (int) (dimmRatio * blue);
 
-			} else if (_legendColor.maxBrightness == LegendColor.BRIGHTNESS_LIGHTNING) {
+			} else if (_mapColor.maxBrightness == MapColor.BRIGHTNESS_LIGHTNING) {
 
 				red = red + (int) (dimmRatio * (255 - red));
 				green = green + (int) (dimmRatio * (255 - green));
@@ -328,21 +330,21 @@ public class GradientColorProvider implements ILegendProviderGradientColors {
 		return colorValue;
 	}
 
-	public LegendColor getLegendColor() {
-		return _legendColor;
+	public MapColor getLegendColor() {
+		return _mapColor;
 	}
 
-	public LegendConfig getLegendConfig() {
-		return _legendConfig;
+	public MapColorConfig getLegendConfig() {
+		return _mapColorConfig;
 	}
 
-	public int getTourColorId() {
-		return _colorId;
+	public MapColorId getMapColorId() {
+		return _mapColorId;
 	}
 
-	public void setLegendColorColors(final LegendColor legendColor) {
+	public void setLegendColorColors(final MapColor legendColor) {
 
-		final ValueColor[] valueColors = _legendColor.valueColors;
+		final ValueColor[] valueColors = _mapColor.valueColors;
 		final ValueColor[] newValueColors = legendColor.valueColors;
 
 		// copy new colors into current legend colors
@@ -356,15 +358,15 @@ public class GradientColorProvider implements ILegendProviderGradientColors {
 			valueColor.blue = newValueColor.blue;
 		}
 
-		_legendColor.minBrightness = legendColor.minBrightness;
-		_legendColor.minBrightnessFactor = legendColor.minBrightnessFactor;
-		_legendColor.maxBrightness = legendColor.maxBrightness;
-		_legendColor.maxBrightnessFactor = legendColor.maxBrightnessFactor;
+		_mapColor.minBrightness = legendColor.minBrightness;
+		_mapColor.minBrightnessFactor = legendColor.minBrightnessFactor;
+		_mapColor.maxBrightness = legendColor.maxBrightness;
+		_mapColor.maxBrightnessFactor = legendColor.maxBrightnessFactor;
 
-		_legendColor.isMinValueOverwrite = legendColor.isMinValueOverwrite;
-		_legendColor.overwriteMinValue = legendColor.overwriteMinValue;
-		_legendColor.isMaxValueOverwrite = legendColor.isMaxValueOverwrite;
-		_legendColor.overwriteMaxValue = legendColor.overwriteMaxValue;
+		_mapColor.isMinValueOverwrite = legendColor.isMinValueOverwrite;
+		_mapColor.overwriteMinValue = legendColor.overwriteMinValue;
+		_mapColor.isMaxValueOverwrite = legendColor.isMaxValueOverwrite;
+		_mapColor.overwriteMaxValue = legendColor.overwriteMaxValue;
 	}
 
 	/**
@@ -386,22 +388,20 @@ public class GradientColorProvider implements ILegendProviderGradientColors {
 		 * enforce min/max values, another option is necessary in the pref dialog to not enforce
 		 * min/max values
 		 */
-		if (_legendColor.isMinValueOverwrite /*
-											 * && minValue < _legendColor.overwriteMinValue *
-											 * unitFactor
-											 */) {
-			minValue = _legendColor.overwriteMinValue;
+		if (_mapColor.isMinValueOverwrite /*
+										 * && minValue < _legendColor.overwriteMinValue * unitFactor
+										 */) {
+			minValue = _mapColor.overwriteMinValue;
 
 			if (unitFormat == LegendUnitFormat.Pace) {
 				// adjust value from minutes->seconds
 				minValue *= 60;
 			}
 		}
-		if (_legendColor.isMaxValueOverwrite /*
-											 * && maxValue > _legendColor.overwriteMaxValue *
-											 * unitFactor
-											 */) {
-			maxValue = _legendColor.overwriteMaxValue;
+		if (_mapColor.isMaxValueOverwrite /*
+										 * && maxValue > _legendColor.overwriteMaxValue * unitFactor
+										 */) {
+			maxValue = _mapColor.overwriteMaxValue;
 
 			if (unitFormat == LegendUnitFormat.Pace) {
 				// adjust value from minutes->seconds
@@ -420,10 +420,10 @@ public class GradientColorProvider implements ILegendProviderGradientColors {
 			final Float legendMinValue = legendUnits.get(0);
 			final Float legendMaxValue = legendUnits.get(legendUnits.size() - 1);
 
-			_legendConfig.units = legendUnits;
-			_legendConfig.unitText = unitText;
-			_legendConfig.legendMinValue = legendMinValue;
-			_legendConfig.legendMaxValue = legendMaxValue;
+			_mapColorConfig.units = legendUnits;
+			_mapColorConfig.unitText = unitText;
+			_mapColorConfig.legendMinValue = legendMinValue;
+			_mapColorConfig.legendMaxValue = legendMaxValue;
 
 			/*
 			 * set color configuration, each tour has a different altitude config
@@ -434,7 +434,7 @@ public class GradientColorProvider implements ILegendProviderGradientColors {
 			final float diffMinMax10 = diffMinMax / 10;
 			final float midValueAbsolute = legendMinValue + diffMinMax2;
 
-			final ValueColor[] valueColors = _legendColor.valueColors;
+			final ValueColor[] valueColors = _mapColor.valueColors;
 
 			valueColors[0].value = legendMinValue + diffMinMax10;
 			valueColors[1].value = legendMinValue + diffMinMax2 / 2;

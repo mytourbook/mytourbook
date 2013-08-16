@@ -29,7 +29,7 @@ import net.tourbook.chart.ChartType;
 import net.tourbook.chart.IChartInfoProvider;
 import net.tourbook.chart.Util;
 import net.tourbook.common.UI;
-import net.tourbook.common.color.GraphColorProvider;
+import net.tourbook.common.color.GraphColorManager;
 import net.tourbook.data.TourPerson;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
@@ -648,8 +648,8 @@ public class StatisticTourNumbers extends YearStatistic {
 		yData.setVisibleMinValue(0);
 		chartDataModel.addYData(yData);
 
-		StatisticServices.setDefaultColors(yData, GraphColorProvider.PREF_GRAPH_ALTITUDE);
-		StatisticServices.setTourTypeColors(yData, GraphColorProvider.PREF_GRAPH_ALTITUDE, _activeTourTypeFilter);
+		StatisticServices.setDefaultColors(yData, GraphColorManager.PREF_GRAPH_ALTITUDE);
+		StatisticServices.setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_ALTITUDE, _activeTourTypeFilter);
 		yData.setColorIndex(colorIndex);
 
 		createToolTipProviderAltitude(chartDataModel);
@@ -711,8 +711,8 @@ public class StatisticTourNumbers extends YearStatistic {
 		yData.setVisibleMinValue(0);
 		yData.setValueDivisor(valueDivisor);
 		chartDataModel.addYData(yData);
-		StatisticServices.setDefaultColors(yData, GraphColorProvider.PREF_GRAPH_DISTANCE);
-		StatisticServices.setTourTypeColors(yData, GraphColorProvider.PREF_GRAPH_DISTANCE, _activeTourTypeFilter);
+		StatisticServices.setDefaultColors(yData, GraphColorManager.PREF_GRAPH_DISTANCE);
+		StatisticServices.setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_DISTANCE, _activeTourTypeFilter);
 		yData.setColorIndex(colorIndex);
 
 		createToolTipProviderDistance(chartDataModel);
@@ -825,8 +825,8 @@ public class StatisticTourNumbers extends YearStatistic {
 		yData.setVisibleMinValue(0);
 		chartDataModel.addYData(yData);
 
-		StatisticServices.setDefaultColors(yData, GraphColorProvider.PREF_GRAPH_TIME);
-		StatisticServices.setTourTypeColors(yData, GraphColorProvider.PREF_GRAPH_TIME, _activeTourTypeFilter);
+		StatisticServices.setDefaultColors(yData, GraphColorManager.PREF_GRAPH_TIME);
+		StatisticServices.setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_TIME, _activeTourTypeFilter);
 		yData.setColorIndex(colorIndex);
 
 		createToolTipProviderDuration(chartDataModel);

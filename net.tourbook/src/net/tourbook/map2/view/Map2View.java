@@ -28,11 +28,12 @@ import net.tourbook.chart.SelectionChartInfo;
 import net.tourbook.chart.SelectionChartXSliderPosition;
 import net.tourbook.common.UI;
 import net.tourbook.common.color.ColorDefinition;
-import net.tourbook.common.color.GraphColorProvider;
-import net.tourbook.common.color.ILegendProvider;
-import net.tourbook.common.color.ILegendProviderGradientColors;
-import net.tourbook.common.color.LegendConfig;
+import net.tourbook.common.color.GraphColorManager;
+import net.tourbook.common.color.IMapColorProvider;
+import net.tourbook.common.color.IGradientColors;
 import net.tourbook.common.color.LegendUnitFormat;
+import net.tourbook.common.color.MapColorConfig;
+import net.tourbook.common.color.MapColorId;
 import net.tourbook.common.map.GeoPosition;
 import net.tourbook.common.util.ITourToolTipProvider;
 import net.tourbook.common.util.TourToolTip;
@@ -446,9 +447,9 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 		_map.paint();
 	}
 
-	public void actionSetTourColor(final int colorId) {
+	public void actionSetTourColor(final MapColorId colorId) {
 
-		final ILegendProvider legendProvider = getColorProvider(colorId);
+		final IMapColorProvider legendProvider = getColorProvider(colorId);
 
 		_tourPainterConfig.setLegendProvider(legendProvider);
 
@@ -921,42 +922,42 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 
 		_actionTourColorAltitude = new ActionTourColor(
 				this,
-				ILegendProvider.TOUR_COLOR_ALTITUDE,
+				MapColorId.Altitude,
 				Messages.map_action_tour_color_altitude_tooltip,
 				Messages.image_action_tour_color_altitude,
 				Messages.image_action_tour_color_altitude_disabled);
 
 		_actionTourColorGradient = new ActionTourColor(
 				this,
-				ILegendProvider.TOUR_COLOR_GRADIENT,
+				MapColorId.Gradient,
 				Messages.map_action_tour_color_gradient_tooltip,
 				Messages.image_action_tour_color_gradient,
 				Messages.image_action_tour_color_gradient_disabled);
 
 		_actionTourColorPulse = new ActionTourColor(
 				this,
-				ILegendProvider.TOUR_COLOR_PULSE,
+				MapColorId.Pulse,
 				Messages.map_action_tour_color_pulse_tooltip,
 				Messages.image_action_tour_color_pulse,
 				Messages.image_action_tour_color_pulse_disabled);
 
 		_actionTourColorSpeed = new ActionTourColor(
 				this,
-				ILegendProvider.TOUR_COLOR_SPEED,
+				MapColorId.Speed,
 				Messages.map_action_tour_color_speed_tooltip,
 				Messages.image_action_tour_color_speed,
 				Messages.image_action_tour_color_speed_disabled);
 
 		_actionTourColorPace = new ActionTourColor(
 				this,
-				ILegendProvider.TOUR_COLOR_PACE,
+				MapColorId.Pace,
 				Messages.map_action_tour_color_pase_tooltip,
 				Messages.image_action_tour_color_pace,
 				Messages.image_action_tour_color_pace_disabled);
 
 		_actionTourColorHrZone = new ActionTourColor(
 				this,
-				ILegendProvider.TOUR_COLOR_HR_ZONE,
+				MapColorId.HrZone,
 				Messages.Tour_Action_ShowHrZones_Tooltip,
 				Messages.Image__PulseZones,
 				Messages.Image__PulseZones_Disabled);
@@ -1001,7 +1002,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 	 * 
 	 * @param legendProvider
 	 */
-	private void createLegendImage(final ILegendProvider legendProvider) {
+	private void createLegendImage(final IMapColorProvider legendProvider) {
 
 		Image legendImage = _mapLegend.getImage();
 
@@ -1015,11 +1016,11 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 		if ((legendImage != null) && !legendImage.isDisposed()) {
 			legendImage.dispose();
 		}
-		final int legendWidth = ILegendProvider.DEFAULT_LEGEND_WIDTH;
-		int legendHeight = ILegendProvider.DEFAULT_LEGEND_HEIGHT;
+		final int legendWidth = IMapColorProvider.DEFAULT_LEGEND_WIDTH;
+		int legendHeight = IMapColorProvider.DEFAULT_LEGEND_HEIGHT;
 
 		final Rectangle mapBounds = _map.getBounds();
-		legendHeight = Math.max(1, Math.min(legendHeight, mapBounds.height - ILegendProvider.LEGEND_TOP_MARGIN));
+		legendHeight = Math.max(1, Math.min(legendHeight, mapBounds.height - IMapColorProvider.LEGEND_TOP_MARGIN));
 
 		final RGB rgbTransparent = new RGB(0xfe, 0xfe, 0xfe);
 
@@ -1034,19 +1035,19 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 		final Display display = Display.getCurrent();
 		legendImage = new Image(display, overlayImageData);
 		final Rectangle legendImageBounds = legendImage.getBounds();
-		final int legendHeightNoMargin = legendImageBounds.height - 2 * ILegendProvider.LEGEND_MARGIN_TOP_BOTTOM;
+		final int legendHeightNoMargin = legendImageBounds.height - 2 * IMapColorProvider.LEGEND_MARGIN_TOP_BOTTOM;
 
 		boolean isDataAvailable = false;
-		if (legendProvider instanceof ILegendProviderGradientColors) {
+		if (legendProvider instanceof IGradientColors) {
 
 			isDataAvailable = createLegendImage10SetProviderValues(//
-					(ILegendProviderGradientColors) legendProvider,
+					(IGradientColors) legendProvider,
 					legendHeightNoMargin);
 
-		} else if (legendProvider instanceof ILegendProviderDiscreteColors) {
+		} else if (legendProvider instanceof IDiscreteColors) {
 
 			isDataAvailable = createLegendImage20SetProviderValues(
-					(ILegendProviderDiscreteColors) legendProvider,
+					(IDiscreteColors) legendProvider,
 					legendHeightNoMargin);
 		}
 
@@ -1067,7 +1068,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 	}
 
 	/**
-	 * Update the min/max values in the {@link ILegendProviderGradientColors} for the currently
+	 * Update the min/max values in the {@link IGradientColors} for the currently
 	 * displayed legend
 	 * 
 	 * @param legendProvider
@@ -1075,22 +1076,22 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 	 * @return Return <code>true</code> when the legend value could be updated, <code>false</code>
 	 *         when data are not available
 	 */
-	private boolean createLegendImage10SetProviderValues(	final ILegendProviderGradientColors legendProvider,
+	private boolean createLegendImage10SetProviderValues(	final IGradientColors legendProvider,
 															final int legendHeight) {
 
 		if (_allTourData.size() == 0) {
 			return false;
 		}
 
-		final GraphColorProvider colorProvider = GraphColorProvider.getInstance();
+		final GraphColorManager colorProvider = GraphColorManager.getInstance();
 
 		ColorDefinition colorDefinition = null;
-		final LegendConfig legendConfig = legendProvider.getLegendConfig();
+		final MapColorConfig legendConfig = legendProvider.getLegendConfig();
 
 		// tell the legend provider how to draw the legend
-		switch (legendProvider.getTourColorId()) {
+		switch (legendProvider.getMapColorId()) {
 
-		case ILegendProvider.TOUR_COLOR_ALTITUDE:
+		case Altitude:
 
 			float minValue = Float.MIN_VALUE;
 			float maxValue = Float.MAX_VALUE;
@@ -1128,7 +1129,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 				return false;
 			}
 
-			colorDefinition = colorProvider.getGraphColorDefinition(GraphColorProvider.PREF_GRAPH_ALTITUDE);
+			colorDefinition = colorProvider.getGraphColorDefinition(GraphColorManager.PREF_GRAPH_ALTITUDE);
 
 			legendProvider.setLegendColorColors(colorDefinition.getNewLegendColor());
 			legendProvider.setLegendColorValues(
@@ -1140,7 +1141,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 
 			break;
 
-		case ILegendProvider.TOUR_COLOR_PULSE:
+		case Pulse:
 
 			minValue = Float.MIN_VALUE;
 			maxValue = Float.MAX_VALUE;
@@ -1177,7 +1178,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 				return false;
 			}
 
-			colorDefinition = colorProvider.getGraphColorDefinition(GraphColorProvider.PREF_GRAPH_HEARTBEAT);
+			colorDefinition = colorProvider.getGraphColorDefinition(GraphColorManager.PREF_GRAPH_HEARTBEAT);
 
 			legendProvider.setLegendColorColors(colorDefinition.getNewLegendColor());
 			legendProvider.setLegendColorValues(
@@ -1189,7 +1190,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 
 			break;
 
-		case ILegendProvider.TOUR_COLOR_SPEED:
+		case Speed:
 
 			minValue = Float.MIN_VALUE;
 			maxValue = Float.MAX_VALUE;
@@ -1227,7 +1228,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 			}
 
 			legendConfig.numberFormatDigits = 1;
-			colorDefinition = colorProvider.getGraphColorDefinition(GraphColorProvider.PREF_GRAPH_SPEED);
+			colorDefinition = colorProvider.getGraphColorDefinition(GraphColorManager.PREF_GRAPH_SPEED);
 
 			legendProvider.setLegendColorColors(colorDefinition.getNewLegendColor());
 			legendProvider.setLegendColorValues(
@@ -1239,7 +1240,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 
 			break;
 
-		case ILegendProvider.TOUR_COLOR_PACE:
+		case Pace:
 
 			minValue = Float.MIN_VALUE;
 			maxValue = Float.MAX_VALUE;
@@ -1277,7 +1278,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 			}
 
 			legendConfig.unitFormat = LegendUnitFormat.Pace;
-			colorDefinition = colorProvider.getGraphColorDefinition(GraphColorProvider.PREF_GRAPH_PACE);
+			colorDefinition = colorProvider.getGraphColorDefinition(GraphColorManager.PREF_GRAPH_PACE);
 
 			legendProvider.setLegendColorColors(colorDefinition.getNewLegendColor());
 			legendProvider.setLegendColorValues(
@@ -1289,7 +1290,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 
 			break;
 
-		case ILegendProvider.TOUR_COLOR_GRADIENT:
+		case Gradient:
 
 			minValue = Float.MIN_VALUE;
 			maxValue = Float.MAX_VALUE;
@@ -1327,7 +1328,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 			}
 
 			legendConfig.numberFormatDigits = 1;
-			colorDefinition = colorProvider.getGraphColorDefinition(GraphColorProvider.PREF_GRAPH_GRADIENT);
+			colorDefinition = colorProvider.getGraphColorDefinition(GraphColorManager.PREF_GRAPH_GRADIENT);
 
 			legendProvider.setLegendColorColors(colorDefinition.getNewLegendColor());
 			legendProvider.setLegendColorValues(
@@ -1346,7 +1347,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 		return true;
 	}
 
-	private boolean createLegendImage20SetProviderValues(	final ILegendProviderDiscreteColors legendProvider,
+	private boolean createLegendImage20SetProviderValues(	final IDiscreteColors legendProvider,
 															final int legendHeight) {
 
 		if (_allTourData.size() == 0) {
@@ -1354,9 +1355,9 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 		}
 
 		// tell the legend provider how to draw the legend
-		switch (legendProvider.getTourColorId()) {
+		switch (legendProvider.getMapColorId()) {
 
-		case ILegendProvider.TOUR_COLOR_HR_ZONE:
+		case HrZone:
 
 			boolean isValidData = false;
 
@@ -1422,10 +1423,9 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 				final Rectangle mapBounds = _map.getBounds();
 				final Rectangle legendBounds = legendImage.getBounds();
 
-				if ((mapBounds.height < ILegendProvider.DEFAULT_LEGEND_HEIGHT + ILegendProvider.LEGEND_TOP_MARGIN)
-						|| ((mapBounds.height > ILegendProvider.DEFAULT_LEGEND_HEIGHT
-								+ ILegendProvider.LEGEND_TOP_MARGIN) //
-						&& (legendBounds.height < ILegendProvider.DEFAULT_LEGEND_HEIGHT)) //
+				if ((mapBounds.height < IMapColorProvider.DEFAULT_LEGEND_HEIGHT + IMapColorProvider.LEGEND_TOP_MARGIN)
+						|| ((mapBounds.height > IMapColorProvider.DEFAULT_LEGEND_HEIGHT + IMapColorProvider.LEGEND_TOP_MARGIN) //
+						&& (legendBounds.height < IMapColorProvider.DEFAULT_LEGEND_HEIGHT)) //
 				) {
 
 					createLegendImage(_tourPainterConfig.getLegendProvider());
@@ -1678,7 +1678,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 		menuMgr.add(_actionReloadFailedMapImages);
 	}
 
-	private ILegendProvider getColorProvider(final int colorId) {
+	private IMapColorProvider getColorProvider(final MapColorId colorId) {
 		return TourMapColors.getColorProvider(colorId);
 	}
 
@@ -2643,30 +2643,39 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 
 		// tour color
 		try {
-			final Integer colorId = _state.getInt(MEMENTO_TOUR_COLOR_ID);
+
+			final String stateColorId = Util.getStateString(_state, MEMENTO_TOUR_COLOR_ID, MapColorId.Altitude.name());
+
+			MapColorId colorId;
+			try {
+				colorId = MapColorId.valueOf(stateColorId);
+			} catch (final Exception e) {
+				// set default
+				colorId = MapColorId.Altitude;
+			}
 
 			switch (colorId) {
-			case ILegendProvider.TOUR_COLOR_ALTITUDE:
+			case Altitude:
 				_actionTourColorAltitude.setChecked(true);
 				break;
 
-			case ILegendProvider.TOUR_COLOR_GRADIENT:
+			case Gradient:
 				_actionTourColorGradient.setChecked(true);
 				break;
 
-			case ILegendProvider.TOUR_COLOR_PULSE:
-				_actionTourColorPulse.setChecked(true);
-				break;
-
-			case ILegendProvider.TOUR_COLOR_SPEED:
-				_actionTourColorSpeed.setChecked(true);
-				break;
-
-			case ILegendProvider.TOUR_COLOR_PACE:
+			case Pace:
 				_actionTourColorPace.setChecked(true);
 				break;
 
-			case ILegendProvider.TOUR_COLOR_HR_ZONE:
+			case Pulse:
+				_actionTourColorPulse.setChecked(true);
+				break;
+
+			case Speed:
+				_actionTourColorSpeed.setChecked(true);
+				break;
+
+			case HrZone:
 				_actionTourColorHrZone.setChecked(true);
 				break;
 
@@ -2690,7 +2699,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 		if (_tourPainterConfig.getLegendProvider() == null) {
 
 			// set default legend provider
-			_tourPainterConfig.setLegendProvider(getColorProvider(ILegendProvider.TOUR_COLOR_ALTITUDE));
+			_tourPainterConfig.setLegendProvider(getColorProvider(MapColorId.Altitude));
 
 			// hide legend
 			_map.setShowLegend(false);
@@ -2814,26 +2823,27 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 		}
 
 		// tour color
-		int colorId;
+		MapColorId colorId;
 
 		if (_actionTourColorGradient.isChecked()) {
-			colorId = ILegendProvider.TOUR_COLOR_GRADIENT;
+			colorId = MapColorId.Gradient;
 
 		} else if (_actionTourColorPulse.isChecked()) {
-			colorId = ILegendProvider.TOUR_COLOR_PULSE;
+			colorId = MapColorId.Pulse;
 
 		} else if (_actionTourColorSpeed.isChecked()) {
-			colorId = ILegendProvider.TOUR_COLOR_SPEED;
+			colorId = MapColorId.Speed;
 
 		} else if (_actionTourColorPace.isChecked()) {
-			colorId = ILegendProvider.TOUR_COLOR_PACE;
+			colorId = MapColorId.Pace;
 
 		} else if (_actionTourColorHrZone.isChecked()) {
-			colorId = ILegendProvider.TOUR_COLOR_HR_ZONE;
+			colorId = MapColorId.HrZone;
 		} else {
-			colorId = ILegendProvider.TOUR_COLOR_ALTITUDE;
+			// use altitude as default
+			colorId = MapColorId.Altitude;
 		}
-		_state.put(MEMENTO_TOUR_COLOR_ID, colorId);
+		_state.put(MEMENTO_TOUR_COLOR_ID, colorId.name());
 
 		_actionPhotoFilter.saveState();
 	}

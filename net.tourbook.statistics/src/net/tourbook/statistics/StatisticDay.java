@@ -34,7 +34,7 @@ import net.tourbook.chart.IBarSelectionListener;
 import net.tourbook.chart.IChartInfoProvider;
 import net.tourbook.chart.SelectionBarChart;
 import net.tourbook.common.UI;
-import net.tourbook.common.color.GraphColorProvider;
+import net.tourbook.common.color.GraphColorManager;
 import net.tourbook.common.util.IToolTipHideListener;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourPerson;
@@ -427,8 +427,8 @@ public abstract class StatisticDay extends YearStatistic implements IBarSelectio
 		yData.setCustomData(ALTITUDE_DATA, 1);
 		yData.setColorIndex(new int[][] { _tourDayData.typeColorIndex });
 
-		StatisticServices.setDefaultColors(yData, GraphColorProvider.PREF_GRAPH_ALTITUDE);
-		StatisticServices.setTourTypeColors(yData, GraphColorProvider.PREF_GRAPH_ALTITUDE, _activeTourTypeFilter);
+		StatisticServices.setDefaultColors(yData, GraphColorManager.PREF_GRAPH_ALTITUDE);
+		StatisticServices.setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_ALTITUDE, _activeTourTypeFilter);
 
 		chartModel.addYData(yData);
 	}
@@ -451,8 +451,8 @@ public abstract class StatisticDay extends YearStatistic implements IBarSelectio
 		yData.setCustomData(DISTANCE_DATA, 1);
 		yData.setColorIndex(new int[][] { _tourDayData.typeColorIndex });
 
-		StatisticServices.setDefaultColors(yData, GraphColorProvider.PREF_GRAPH_DISTANCE);
-		StatisticServices.setTourTypeColors(yData, GraphColorProvider.PREF_GRAPH_DISTANCE, _activeTourTypeFilter);
+		StatisticServices.setDefaultColors(yData, GraphColorManager.PREF_GRAPH_DISTANCE);
+		StatisticServices.setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_DISTANCE, _activeTourTypeFilter);
 
 		chartModel.addYData(yData);
 	}
@@ -473,8 +473,8 @@ public abstract class StatisticDay extends YearStatistic implements IBarSelectio
 		yData.setCustomData(DURATION_DATA, 1);
 		yData.setColorIndex(new int[][] { _tourDayData.typeColorIndex });
 
-		StatisticServices.setDefaultColors(yData, GraphColorProvider.PREF_GRAPH_TIME);
-		StatisticServices.setTourTypeColors(yData, GraphColorProvider.PREF_GRAPH_TIME, _activeTourTypeFilter);
+		StatisticServices.setDefaultColors(yData, GraphColorManager.PREF_GRAPH_TIME);
+		StatisticServices.setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_TIME, _activeTourTypeFilter);
 
 		chartModel.addYData(yData);
 	}

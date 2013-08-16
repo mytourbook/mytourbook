@@ -15,29 +15,27 @@
  *******************************************************************************/
 package net.tourbook.common.color;
 
-public interface ILegendProvider {
+import java.util.List;
 
-	/*
-	 * Tour color ids
-	 */
-	public static final int	TOUR_COLOR_ALTITUDE			= 10;
-	public static final int	TOUR_COLOR_GRADIENT			= 20;
-	public static final int	TOUR_COLOR_PULSE			= 30;
-	public static final int	TOUR_COLOR_SPEED			= 40;
-	public static final int	TOUR_COLOR_PACE				= 50;
-	public static final int	TOUR_COLOR_HR_ZONE			= 60;
+import net.tourbook.common.UI;
 
-	public static final int	DEFAULT_LEGEND_WIDTH		= 150;
-	public static final int	DEFAULT_LEGEND_HEIGHT		= 300;
+/**
+ * Configuration for the map legend to visualize one unit in a tour
+ */
+public class MapColorConfig {
 
-	public static final int	LEGEND_TOP_MARGIN			= 20;
-	public static final int	LEGEND_MARGIN_TOP_BOTTOM	= 10;
+	public float			legendMinValue;
+	public float			legendMaxValue;
 
-	public static final int	LEGEND_UNIT_DISTANCE		= 60;
+	public List<Float>		units;
+	public List<String>		unitLabels;
+
+	public LegendUnitFormat	unitFormat	= LegendUnitFormat.Number;
+
+	public String			unitText	= UI.EMPTY_STRING;
 
 	/**
-	 * @return Returns an id to identify the {@link ILegendProvider}
+	 * Number of digits when label is formatted, default is 0.
 	 */
-	public abstract int getTourColorId();
-
+	public int				numberFormatDigits;
 }
