@@ -25,21 +25,21 @@ public class GraphColorItem {
 	private String			_visibleName;
 
 	/**
-	 * <code>true</code> when this {@link GraphColorItem} is used as for a legend
+	 * Is <code>true</code> when this {@link GraphColorItem} is used as for a map color.
 	 */
-	private boolean			_isLegend;
+	private boolean			_isMapColor;
 
-	public GraphColorItem(	final ColorDefinition parent,
+	public GraphColorItem(	final ColorDefinition colorDefinition,
 							final String colorPrefName,
 							final String visibleName,
-							final boolean isLegend) {
+							final boolean isMapColor) {
 
-		_colorDefinition = parent;
+		_colorDefinition = colorDefinition;
 
 		_colorPrefName = colorPrefName;
 		_visibleName = visibleName;
 
-		_isLegend = isLegend;
+		_isMapColor = isMapColor;
 	}
 
 	public ColorDefinition getColorDefinition() {
@@ -78,8 +78,8 @@ public class GraphColorItem {
 	 * @return Returns <code>true</code> when this {@link GraphColorItem} represents a
 	 *         {@link MapColor}
 	 */
-	public boolean isLegend() {
-		return _isLegend;
+	public boolean isMapColor() {
+		return _isMapColor;
 	}
 
 	public void setName(final String fName) {
@@ -89,12 +89,15 @@ public class GraphColorItem {
 	public void setNewRGB(final RGB rgb) {
 
 		if (_colorPrefName.compareTo(GraphColorManager.PREF_COLOR_LINE) == 0) {
+
 			_colorDefinition.setNewLineColor(rgb);
 
 		} else if (_colorPrefName.compareTo(GraphColorManager.PREF_COLOR_TEXT) == 0) {
+
 			_colorDefinition.setNewTextColor(rgb);
 
 		} else if (_colorPrefName.compareTo(GraphColorManager.PREF_COLOR_BRIGHT) == 0) {
+
 			_colorDefinition.setNewGradientBright(rgb);
 
 		} else {

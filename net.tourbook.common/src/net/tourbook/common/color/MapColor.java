@@ -15,8 +15,13 @@
  *******************************************************************************/
 package net.tourbook.common.color;
 
+import java.util.Arrays;
+
 import net.tourbook.common.Messages;
 
+/**
+ * Contains all colors to paint a tour in a map.
+ */
 public class MapColor {
 
 	public static final String[]	BRIGHTNESS_LABELS		= new String[] //
@@ -29,12 +34,12 @@ public class MapColor {
 	public static final int			BRIGHTNESS_DIMMING		= 1;
 	public static final int			BRIGHTNESS_LIGHTNING	= 2;
 
-	public ValueColor[]				valueColors				= new ValueColor[] {
-			new ValueColor(10, 255, 0, 0),
-			new ValueColor(50, 100, 100, 0),
-			new ValueColor(100, 0, 255, 0),
-			new ValueColor(150, 0, 100, 100),
-			new ValueColor(190, 0, 0, 255)					};
+	public ColorValue[]				colorValues				= new ColorValue[] {
+			new ColorValue(10, 255, 0, 0),
+			new ColorValue(50, 100, 100, 0),
+			new ColorValue(100, 0, 255, 0),
+			new ColorValue(150, 0, 100, 100),
+			new ColorValue(190, 0, 0, 255)					};
 
 	/**
 	 * min and max value is painted black when {@link #minBrightnessFactor}==100, a value below 100
@@ -61,13 +66,13 @@ public class MapColor {
 	 * @param maxBrightness
 	 * @param maxBrightnessFactor
 	 */
-	public MapColor(	final ValueColor[] valueColors,
-						final int minBrightness,
-						final int minBrightnessFactor,
-						final int maxBrightness,
-						final int maxBrightnessFactor) {
+	public MapColor(final ColorValue[] valueColors,
+					final int minBrightness,
+					final int minBrightnessFactor,
+					final int maxBrightness,
+					final int maxBrightnessFactor) {
 
-		this.valueColors = valueColors;
+		this.colorValues = valueColors;
 
 		this.minBrightness = minBrightness;
 		this.minBrightnessFactor = minBrightnessFactor;
@@ -86,17 +91,17 @@ public class MapColor {
 	 * @param isMaxOverwrite
 	 * @param maxOverwrite
 	 */
-	public MapColor(	final ValueColor[] valueColors,
-						final int minBrightness,
-						final int minBrightnessFactor,
-						final int maxBrightness,
-						final int maxBrightnessFactor,
-						final boolean isMinOverwrite,
-						final int minOverwrite,
-						final boolean isMaxOverwrite,
-						final int maxOverwrite) {
+	public MapColor(final ColorValue[] valueColors,
+					final int minBrightness,
+					final int minBrightnessFactor,
+					final int maxBrightness,
+					final int maxBrightnessFactor,
+					final boolean isMinOverwrite,
+					final int minOverwrite,
+					final boolean isMaxOverwrite,
+					final int maxOverwrite) {
 
-		this.valueColors = valueColors;
+		this.colorValues = valueColors;
 
 		this.minBrightness = minBrightness;
 		this.minBrightnessFactor = minBrightnessFactor;
@@ -108,7 +113,7 @@ public class MapColor {
 		this.isMaxValueOverwrite = isMaxOverwrite;
 		this.overwriteMaxValue = maxOverwrite;
 	}
- 
+
 	/**
 	 * Creates a copy for this {@link MapColor}
 	 * 
@@ -118,9 +123,10 @@ public class MapColor {
 
 		final MapColor copy = new MapColor();
 
-		copy.valueColors = new ValueColor[valueColors.length];
-		for (int colorIndex = 0; colorIndex < valueColors.length; colorIndex++) {
-			copy.valueColors[colorIndex] = new ValueColor(valueColors[colorIndex]);
+		copy.colorValues = new ColorValue[colorValues.length];
+
+		for (int colorIndex = 0; colorIndex < colorValues.length; colorIndex++) {
+			copy.colorValues[colorIndex] = new ColorValue(colorValues[colorIndex]);
 		}
 
 		copy.minBrightness = minBrightness;
@@ -136,6 +142,36 @@ public class MapColor {
 		copy.overwriteMaxValue = overwriteMaxValue;
 
 		return copy;
+	}
+
+	@Override
+	public String toString() {
+
+		final int maxLen = 10;
+
+		return String.format(
+				"\n"
+						+ "MapColor\n"
+						+ "   colorValues=%s\n"
+						+ "   minBrightness=%s\n"
+						+ "   minBrightnessFactor=%s\n"
+						+ "   maxBrightness=%s\n"
+						+ "   maxBrightnessFactor=%s\n"
+						+ "   isMaxValueOverwrite=%s\n"
+						+ "   overwriteMaxValue=%s\n"
+						+ "   isMinValueOverwrite=%s\n"
+						+ "   overwriteMinValue=%s\n",
+				colorValues != null
+						? Arrays.asList(colorValues).subList(0, Math.min(colorValues.length, maxLen))
+						: null,
+				minBrightness,
+				minBrightnessFactor,
+				maxBrightness,
+				maxBrightnessFactor,
+				isMaxValueOverwrite,
+				overwriteMaxValue,
+				isMinValueOverwrite,
+				overwriteMinValue);
 	}
 
 }

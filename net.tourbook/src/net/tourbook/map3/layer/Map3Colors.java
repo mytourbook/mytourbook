@@ -20,7 +20,7 @@ import java.util.HashMap;
 import net.tourbook.common.color.GradientColorProvider;
 import net.tourbook.common.color.IMapColorProvider;
 import net.tourbook.common.color.MapColor;
-import net.tourbook.common.color.MapColorConfig;
+import net.tourbook.common.color.MapLegendImageConfig;
 import net.tourbook.common.color.MapColorId;
 import net.tourbook.map2.view.HrZonesColorProvider;
 
@@ -38,23 +38,23 @@ public class Map3Colors {
 
 		_colorProviders.put(//
 				MapColorId.Altitude,
-				new GradientColorProvider(MapColorId.Altitude, new MapColorConfig(), new MapColor()));
+				new GradientColorProvider(MapColorId.Altitude, new MapLegendImageConfig(), new MapColor()));
 
 		_colorProviders.put(//
 				MapColorId.Gradient,
-				new GradientColorProvider(MapColorId.Gradient, new MapColorConfig(), new MapColor()));
+				new GradientColorProvider(MapColorId.Gradient, new MapLegendImageConfig(), new MapColor()));
 
 		_colorProviders.put(//
 				MapColorId.Pace,
-				new GradientColorProvider(MapColorId.Pace, new MapColorConfig(), new MapColor()));
+				new GradientColorProvider(MapColorId.Pace, new MapLegendImageConfig(), new MapColor()));
 
 		_colorProviders.put(//
 				MapColorId.Pulse,
-				new GradientColorProvider(MapColorId.Pulse, new MapColorConfig(), new MapColor()));
+				new GradientColorProvider(MapColorId.Pulse, new MapLegendImageConfig(), new MapColor()));
 
 		_colorProviders.put(//
 				MapColorId.Speed,
-				new GradientColorProvider(MapColorId.Speed, new MapColorConfig(), new MapColor()));
+				new GradientColorProvider(MapColorId.Speed, new MapLegendImageConfig(), new MapColor()));
 
 		_colorProviders.put(//
 				MapColorId.HrZone,

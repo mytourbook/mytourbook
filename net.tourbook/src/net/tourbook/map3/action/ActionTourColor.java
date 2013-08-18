@@ -120,7 +120,7 @@ public class ActionTourColor extends Action {
 
 		// !!! this method is also called when the button is unchecked !!!
 		if (isChecked()) {
-			_mapView.actionSetTourColor(_colorId);
+			_mapView.actionSetMapColor(_colorId);
 		}
 	}
 

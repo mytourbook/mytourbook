@@ -15,8 +15,10 @@
  *******************************************************************************/
 package net.tourbook.map2.view;
 
+import net.tourbook.common.color.MapColor;
+
 public interface IMapColorUpdater {
 
-	void applyMapColors();
+	void applyMapColors(MapColor newMapColor);
 
 }

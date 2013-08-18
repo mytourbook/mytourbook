@@ -32,9 +32,12 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.Messages;
+import net.tourbook.common.preferences.ICommonPreferences;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.preference.PreferenceConverter;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.WorkbenchException;
@@ -42,6 +45,9 @@ import org.eclipse.ui.XMLMemento;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+/**
+ * Manage colors which are displayed in a chart, map or other locations.
+ */
 public class GraphColorManager {
 
 	public static final String			PREF_GRAPH_ALTIMETER		= "altimeter";			//$NON-NLS-1$
@@ -102,19 +108,19 @@ public class GraphColorManager {
 	private static final MapColor		MAP_COLOR_PULSE;
 	private static final MapColor		MAP_COLOR_SPEED;
 
-	/*
+	/**
 	 * Set map default colors.
 	 */
 	static {
 
 		MAP_COLOR_ALTITUDE = new MapColor(//
 				//
-				new ValueColor[] {
-			new ValueColor(10, 204, 145, 64),
-			new ValueColor(50, 255, 85, 13),
-			new ValueColor(100, 255, 255, 0),
-			new ValueColor(150, 0, 170, 9),
-			new ValueColor(190, 23, 163, 255) },
+				new ColorValue[] {
+			new ColorValue(10, 204, 145, 64),
+			new ColorValue(50, 255, 85, 13),
+			new ColorValue(100, 255, 255, 0),
+			new ColorValue(150, 0, 170, 9),
+			new ColorValue(190, 23, 163, 255) },
 				//
 				MapColor.BRIGHTNESS_DIMMING,
 				38,
@@ -123,12 +129,12 @@ public class GraphColorManager {
 
 		MAP_COLOR_GRADIENT = new MapColor(//
 				//
-				new ValueColor[] {
-			new ValueColor(10, 0, 0, 255),
-			new ValueColor(50, 0, 255, 255),
-			new ValueColor(100, 0, 237, 0),
-			new ValueColor(150, 255, 255, 0),
-			new ValueColor(190, 255, 0, 0) },
+				new ColorValue[] {
+			new ColorValue(10, 0, 0, 255),
+			new ColorValue(50, 0, 255, 255),
+			new ColorValue(100, 0, 237, 0),
+			new ColorValue(150, 255, 255, 0),
+			new ColorValue(190, 255, 0, 0) },
 				//
 				MapColor.BRIGHTNESS_DIMMING,
 				23,
@@ -143,12 +149,12 @@ public class GraphColorManager {
 
 		MAP_COLOR_PACE = new MapColor(//
 				//
-				new ValueColor[] {
-			new ValueColor(10, 255, 0, 0),
-			new ValueColor(50, 255, 255, 0),
-			new ValueColor(100, 0, 169, 0),
-			new ValueColor(150, 0, 255, 255),
-			new ValueColor(190, 0, 0, 255) },
+				new ColorValue[] {
+			new ColorValue(10, 255, 0, 0),
+			new ColorValue(50, 255, 255, 0),
+			new ColorValue(100, 0, 169, 0),
+			new ColorValue(150, 0, 255, 255),
+			new ColorValue(190, 0, 0, 255) },
 				//
 				MapColor.BRIGHTNESS_DIMMING,
 				17,
@@ -157,12 +163,12 @@ public class GraphColorManager {
 
 		MAP_COLOR_PULSE = new MapColor(//
 				//
-				new ValueColor[] {
-			new ValueColor(10, 0, 203, 0),
-			new ValueColor(50, 57, 255, 0),
-			new ValueColor(100, 255, 255, 0),
-			new ValueColor(150, 255, 0, 0),
-			new ValueColor(190, 255, 0, 247) },
+				new ColorValue[] {
+			new ColorValue(10, 0, 203, 0),
+			new ColorValue(50, 57, 255, 0),
+			new ColorValue(100, 255, 255, 0),
+			new ColorValue(150, 255, 0, 0),
+			new ColorValue(190, 255, 0, 247) },
 				//
 				MapColor.BRIGHTNESS_DIMMING,
 				11,
@@ -171,12 +177,12 @@ public class GraphColorManager {
 
 		MAP_COLOR_SPEED = new MapColor(//
 				//
-				new ValueColor[] {
-			new ValueColor(10, 0, 0, 255),
-			new ValueColor(50, 0, 255, 255),
-			new ValueColor(100, 0, 169, 0),
-			new ValueColor(150, 255, 255, 0),
-			new ValueColor(190, 255, 0, 0) },
+				new ColorValue[] {
+			new ColorValue(10, 0, 0, 255),
+			new ColorValue(50, 0, 255, 255),
+			new ColorValue(100, 0, 169, 0),
+			new ColorValue(150, 255, 255, 0),
+			new ColorValue(190, 255, 0, 0) },
 				//
 				MapColor.BRIGHTNESS_DIMMING,
 				17,
@@ -215,10 +221,40 @@ public class GraphColorManager {
 		}
 	}
 
+	private static void saveGraphColors_InPrefStore() {
+
+		final IPreferenceStore commonPrefStore = CommonActivator.getPrefStore();
+
+		for (final ColorDefinition graphDefinition : getInstance().getGraphColorDefinitions()) {
+
+			final String prefGraphName = ICommonPreferences.GRAPH_COLORS + graphDefinition.getPrefName() + "."; //$NON-NLS-1$
+
+			PreferenceConverter.setValue(
+					commonPrefStore,
+					prefGraphName + PREF_COLOR_BRIGHT,
+					graphDefinition.getNewGradientBright());
+
+			PreferenceConverter.setValue(
+					commonPrefStore,
+					prefGraphName + PREF_COLOR_DARK,
+					graphDefinition.getNewGradientDark());
+
+			PreferenceConverter.setValue(
+					commonPrefStore,
+					prefGraphName + PREF_COLOR_LINE,
+					graphDefinition.getNewLineColor());
+
+			PreferenceConverter.setValue(
+					commonPrefStore,
+					prefGraphName + PREF_COLOR_TEXT,
+					graphDefinition.getNewTextColor());
+		}
+	}
+
 	/**
-	 * write the legend color data into a xml file
+	 * Write the map color data into a xml file.
 	 */
-	public static void saveLegendData() {
+	private static void saveGraphColors_InXml_MapColors() {
 
 		BufferedWriter writer = null;
 
@@ -231,19 +267,19 @@ public class GraphColorManager {
 
 			final XMLMemento xmlMemento = getXMLMementoRoot();
 
-			for (final ColorDefinition graphDefinition : GraphColorManager.getInstance().getGraphColorDefinitions()) {
+			for (final ColorDefinition graphDefinition : getInstance().getGraphColorDefinitions()) {
 
-				final MapColor legendColor = graphDefinition.getNewLegendColor();
+				final MapColor mapColor = graphDefinition.getNewMapColor();
 
-				// legendColor can be null when a legend color is not defined
-				if (legendColor == null) {
+				// map color can be null when it's not defined
+				if (mapColor == null) {
 					continue;
 				}
 
 				final IMemento mementoLegendColor = xmlMemento.createChild(MEMENTO_CHILD_LEGEND_COLOR);
 				mementoLegendColor.putString(TAG_LEGEND_COLOR_PREF_NAME, graphDefinition.getPrefName());
 
-				for (final ValueColor valueColor : legendColor.valueColors) {
+				for (final ColorValue valueColor : mapColor.colorValues) {
 
 					final IMemento mementoValueColor = mementoLegendColor.createChild(MEMENTO_CHILD_VALUE_COLOR);
 
@@ -254,16 +290,16 @@ public class GraphColorManager {
 				}
 
 				final IMemento mementoBrightness = mementoLegendColor.createChild(MEMENTO_CHILD_BRIGHTNESS);
-				mementoBrightness.putInteger(TAG_BRIGHTNESS_MIN, legendColor.minBrightness);
-				mementoBrightness.putInteger(TAG_BRIGHTNESS_MIN_FACTOR, legendColor.minBrightnessFactor);
-				mementoBrightness.putInteger(TAG_BRIGHTNESS_MAX, legendColor.maxBrightness);
-				mementoBrightness.putInteger(TAG_BRIGHTNESS_MAX_FACTOR, legendColor.maxBrightnessFactor);
+				mementoBrightness.putInteger(TAG_BRIGHTNESS_MIN, mapColor.minBrightness);
+				mementoBrightness.putInteger(TAG_BRIGHTNESS_MIN_FACTOR, mapColor.minBrightnessFactor);
+				mementoBrightness.putInteger(TAG_BRIGHTNESS_MAX, mapColor.maxBrightness);
+				mementoBrightness.putInteger(TAG_BRIGHTNESS_MAX_FACTOR, mapColor.maxBrightnessFactor);
 
 				final IMemento mementoMinMaxValue = mementoLegendColor.createChild(MEMENTO_CHILD_MIN_MAX_VALUE);
-				mementoMinMaxValue.putInteger(TAG_IS_MIN_VALUE_OVERWRITE, legendColor.isMinValueOverwrite ? 1 : 0);
-				mementoMinMaxValue.putInteger(TAG_MIN_VALUE_OVERWRITE, legendColor.overwriteMinValue);
-				mementoMinMaxValue.putInteger(TAG_IS_MAX_VALUE_OVERWRITE, legendColor.isMaxValueOverwrite ? 1 : 0);
-				mementoMinMaxValue.putInteger(TAG_MAX_VALUE_OVERWRITE, legendColor.overwriteMaxValue);
+				mementoMinMaxValue.putInteger(TAG_IS_MIN_VALUE_OVERWRITE, mapColor.isMinValueOverwrite ? 1 : 0);
+				mementoMinMaxValue.putInteger(TAG_MIN_VALUE_OVERWRITE, mapColor.overwriteMinValue);
+				mementoMinMaxValue.putInteger(TAG_IS_MAX_VALUE_OVERWRITE, mapColor.isMaxValueOverwrite ? 1 : 0);
+				mementoMinMaxValue.putInteger(TAG_MAX_VALUE_OVERWRITE, mapColor.overwriteMaxValue);
 			}
 
 			xmlMemento.save(writer);
@@ -281,28 +317,25 @@ public class GraphColorManager {
 		}
 	}
 
-	/**
-	 * @param preferenceName
-	 *            preference name PREF_GRAPH_...
-	 * @return Returns the {@link ColorDefinition} for the preference name
-	 */
-	public ColorDefinition getGraphColorDefinition(final String preferenceName) {
+	public static void saveNewColors() {
 
-		final ColorDefinition[] colorDefinitions = getGraphColorDefinitions();
-		for (final ColorDefinition colorDefinition : colorDefinitions) {
-			if (colorDefinition.getPrefName().equals(preferenceName)) {
-				return colorDefinition;
-			}
+		// save all graph colors, in the pref store and the map color in a xml file.
+		saveGraphColors_InPrefStore();
+		saveGraphColors_InXml_MapColors();
+
+		// update current colors
+		for (final ColorDefinition graphDefinition : getInstance().getGraphColorDefinitions()) {
+
+			graphDefinition.setGradientBright(graphDefinition.getNewGradientBright());
+			graphDefinition.setGradientDark(graphDefinition.getNewGradientDark());
+			graphDefinition.setLineColor(graphDefinition.getNewLineColor());
+			graphDefinition.setTextColor(graphDefinition.getNewTextColor());
+
+			graphDefinition.setMapColor(graphDefinition.getNewMapColor());
 		}
-
-		return null;
 	}
 
-	public ColorDefinition[] getGraphColorDefinitions() {
-
-		if (_graphColorDefinitions != null) {
-			return _graphColorDefinitions;
-		}
+	private List<ColorDefinition> createDefaultColors() {
 
 		final List<ColorDefinition> allColorDef = new ArrayList<ColorDefinition>();
 
@@ -417,6 +450,34 @@ public class GraphColorManager {
 				new RGB(170, 170, 127),
 				new RGB(88, 88, 67),
 				null));
+		return allColorDef;
+	}
+
+	/**
+	 * @param preferenceName
+	 *            preference name PREF_GRAPH_...
+	 * @return Returns the {@link ColorDefinition} for the preference name
+	 */
+	public ColorDefinition getGraphColorDefinition(final String preferenceName) {
+
+		final ColorDefinition[] colorDefinitions = getGraphColorDefinitions();
+
+		for (final ColorDefinition colorDefinition : colorDefinitions) {
+			if (colorDefinition.getPrefName().equals(preferenceName)) {
+				return colorDefinition;
+			}
+		}
+
+		return null;
+	}
+
+	public ColorDefinition[] getGraphColorDefinitions() {
+
+		if (_graphColorDefinitions != null) {
+			return _graphColorDefinitions;
+		}
+
+		final List<ColorDefinition> allColorDef = createDefaultColors();
 
 		// sort list by name
 //		Collections.sort(list, new Comparator<ColorDefinition>() {
@@ -427,8 +488,8 @@ public class GraphColorManager {
 
 		_graphColorDefinitions = allColorDef.toArray(new ColorDefinition[allColorDef.size()]);
 
-		readLegendColors();
-		setLegendColors();
+		readXmlMapColors();
+		setMapColors();
 
 		return _graphColorDefinitions;
 	}
@@ -436,7 +497,7 @@ public class GraphColorManager {
 	/**
 	 * Read legend data from a xml file
 	 */
-	private void readLegendColors() {
+	private void readXmlMapColors() {
 
 		final IPath stateLocation = Platform.getStateLocation(CommonActivator.getDefault().getBundle());
 		final File file = stateLocation.append(MEMENTO_LEGEND_COLOR_FILE).toFile();
@@ -474,7 +535,7 @@ public class GraphColorManager {
 				/*
 				 * value colors
 				 */
-				final ArrayList<ValueColor> valueColors = new ArrayList<ValueColor>();
+				final ArrayList<ColorValue> valueColors = new ArrayList<ColorValue>();
 
 				// loop: all value colors
 				for (final IMemento mementoValueColor : mementoValueColors) {
@@ -485,10 +546,10 @@ public class GraphColorManager {
 					final Integer blue = mementoValueColor.getInteger(TAG_VALUE_COLOR_BLUE);
 
 					if (value != null && red != null && green != null && blue != null) {
-						valueColors.add(new ValueColor(value, red, green, blue));
+						valueColors.add(new ColorValue(value, red, green, blue));
 					}
 				}
-				legendColor.valueColors = valueColors.toArray(new ValueColor[valueColors.size()]);
+				legendColor.colorValues = valueColors.toArray(new ColorValue[valueColors.size()]);
 
 				/*
 				 * min/max brightness
@@ -552,7 +613,7 @@ public class GraphColorManager {
 
 						// color definition found
 
-						colorDefinition.setLegendColor(legendColor);
+						colorDefinition.setMapColor(legendColor);
 						break;
 					}
 				}
@@ -580,24 +641,25 @@ public class GraphColorManager {
 	/**
 	 * set legend colors when available
 	 */
-	private void setLegendColors() {
+	private void setMapColors() {
 
 		for (final ColorDefinition colorDefinition : _graphColorDefinitions) {
 
 			// set legend color
-			if (colorDefinition.getLegendColor() == null) {
+			if (colorDefinition.getMapColor() == null) {
 
 				// legend color is not set, try to get default when available
 
-				final MapColor defaultLegendColor = colorDefinition.getDefaultLegendColor();
-				if (defaultLegendColor != null) {
-					colorDefinition.setLegendColor(defaultLegendColor.getCopy());
+				final MapColor defaultMapColor = colorDefinition.getDefaultMapColor();
+
+				if (defaultMapColor != null) {
+					colorDefinition.setMapColor(defaultMapColor.getCopy());
 				}
 			}
 
-			// set new legend color
-			final MapColor legendColor = colorDefinition.getLegendColor();
-			colorDefinition.setNewLegendColor(legendColor);
+			// set new map color
+			final MapColor mapColor = colorDefinition.getMapColor();
+			colorDefinition.setNewMapColor(mapColor);
 		}
 	}
 }

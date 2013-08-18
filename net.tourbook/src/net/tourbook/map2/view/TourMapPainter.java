@@ -25,10 +25,10 @@ import java.util.Set;
 
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.Util;
-import net.tourbook.common.color.IMapColorProvider;
 import net.tourbook.common.color.IGradientColors;
+import net.tourbook.common.color.IMapColorProvider;
 import net.tourbook.common.color.LegendUnitFormat;
-import net.tourbook.common.color.MapColorConfig;
+import net.tourbook.common.color.MapLegendImageConfig;
 import net.tourbook.common.map.GeoPosition;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
@@ -69,7 +69,7 @@ import de.byteholder.geoclipse.map.Tile;
 import de.byteholder.geoclipse.mapprovider.MP;
 
 /**
- * Paints a tour into the map
+ * Paints a tour into the 2D map.
  */
 public class TourMapPainter extends MapPainter {
 
@@ -80,7 +80,7 @@ public class TourMapPainter extends MapPainter {
 
 	private float[]							_dataSerie;
 
-	private IMapColorProvider					_legendProvider;
+	private IMapColorProvider				_legendProvider;
 	// painting parameter
 	private int								_lineWidth;
 
@@ -156,49 +156,28 @@ public class TourMapPainter extends MapPainter {
 		init();
 	}
 
-	/**
-	 * Draw legend colors into the legend bounds
-	 * 
-	 * @param gc
-	 * @param legendBounds
-	 * @param isDrawVertical
-	 *            when <code>true</code> the legend is drawn vertical, when false the legend is
-	 *            drawn horizontal
-	 * @param colorId
-	 * @return
-	 */
-	public static void drawLegend(	final GC gc,
-									final Rectangle legendBounds,
-									final IMapColorProvider legendProvider,
-									final boolean isDrawVertical) {
-
-		if (legendProvider instanceof IGradientColors) {
-			drawLegendGradientColors(gc, legendBounds, (IGradientColors) legendProvider, isDrawVertical);
-		}
-	}
-
 	private static void drawLegendGradientColors(	final GC gc,
 													final Rectangle legendBounds,
-													final IGradientColors legendProvider,
+													final IGradientColors colorProvider,
 													final boolean isDrawVertical) {
 
 		final Device display = gc.getDevice();
-		final MapColorConfig legendConfig = legendProvider.getLegendConfig();
+		final MapLegendImageConfig legendImageConfig = colorProvider.getMapLegendImageConfig();
 
 		// ensure units are available
-		if (legendConfig.units == null /* || config.unitLabels == null */) {
+		if (legendImageConfig.units == null /* || config.unitLabels == null */) {
 			return;
 		}
 
 		// get configuration for the legend
-		final ArrayList<Float> legendUnits = new ArrayList<Float>(legendConfig.units);
-		final float legendMaxValue = legendConfig.legendMaxValue;
-		final float legendMinValue = legendConfig.legendMinValue;
+		final ArrayList<Float> legendUnits = new ArrayList<Float>(legendImageConfig.units);
+		final float legendMaxValue = legendImageConfig.legendMaxValue;
+		final float legendMinValue = legendImageConfig.legendMinValue;
 		final float legendDiffValue = legendMaxValue - legendMinValue;
-		final String unitText = legendConfig.unitText;
-		final List<String> unitLabels = legendConfig.unitLabels;
-		final int legendFormatDigits = legendConfig.numberFormatDigits;
-		final LegendUnitFormat unitFormat = legendConfig.unitFormat;
+		final String unitText = legendImageConfig.unitText;
+		final List<String> unitLabels = legendImageConfig.unitLabels;
+		final int legendFormatDigits = legendImageConfig.numberFormatDigits;
+		final LegendUnitFormat unitFormat = legendImageConfig.unitFormat;
 
 		Rectangle legendBorder;
 
@@ -334,7 +313,7 @@ public class TourMapPainter extends MapPainter {
 			 * draw legend color line
 			 */
 
-			final int lineColorValue = legendProvider.getColorValue(legendValue);
+			final int lineColorValue = colorProvider.getColorValue(legendValue);
 			final Color lineColor = _colorCache.get(lineColorValue);
 
 			gc.setForeground(lineColor);
@@ -359,11 +338,32 @@ public class TourMapPainter extends MapPainter {
 
 	}
 
+	/**
+	 * Draws map legend colors into the legend bounds.
+	 * 
+	 * @param gc
+	 * @param legendBounds
+	 * @param colorProvider
+	 * @param isDrawVertical
+	 *            When <code>true</code> the legend is drawn vertically otherwise it's drawn
+	 *            horizontally.
+	 */
+	public static void drawMapLegend(	final GC gc,
+										final Rectangle legendBounds,
+										final IMapColorProvider colorProvider,
+										final boolean isDrawVertical) {
+
+		if (colorProvider instanceof IGradientColors) {
+			drawLegendGradientColors(gc, legendBounds, (IGradientColors) colorProvider, isDrawVertical);
+		}
+	}
+
 	private static void getTourPainterSettings() {
 
 		final IPreferenceStore prefStore = TourbookPlugin.getDefault().getPreferenceStore();
 
 		final String drawSymbol = prefStore.getString(ITourbookPreferences.MAP_LAYOUT_SYMBOL);
+
 		_prefIsDrawLine = drawSymbol.equals(PrefPageAppearanceMap.MAP_TOUR_SYMBOL_LINE);
 		_prefIsDrawSquare = drawSymbol.equals(PrefPageAppearanceMap.MAP_TOUR_SYMBOL_SQUARE);
 
@@ -1293,7 +1293,7 @@ public class TourMapPainter extends MapPainter {
 
 		int valuePosition = 0;
 
-		final MapColorConfig config = ((IGradientColors) _legendProvider).getLegendConfig();
+		final MapLegendImageConfig config = ((IGradientColors) _legendProvider).getMapLegendImageConfig();
 
 //		final Integer unitFactor = config.unitFactor;
 //		dataValue /= unitFactor;
@@ -1374,10 +1374,7 @@ public class TourMapPainter extends MapPainter {
 
 		} else if (_legendProvider instanceof IDiscreteColors) {
 
-			colorValue = ((IDiscreteColors) _legendProvider).getColorValue(
-					tourData,
-					serieIndex,
-					isDrawLine);
+			colorValue = ((IDiscreteColors) _legendProvider).getColorValue(tourData, serieIndex, isDrawLine);
 		}
 
 		if (isBorder) {

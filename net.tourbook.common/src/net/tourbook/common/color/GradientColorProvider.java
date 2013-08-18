@@ -25,24 +25,24 @@ import net.tourbook.common.util.Util;
  */
 public class GradientColorProvider implements IGradientColors {
 
-	private MapColorId		_mapColorId;
+	private MapColorId				_mapColorId;
 
-	private MapColor		_mapColor;
-	private MapColorConfig	_mapColorConfig;
+	private MapColor				_mapColor;
+	private MapLegendImageConfig	_mapLegendImageConfig;
 
 	/**
 	 * @param mapColorId
 	 *            Unique id for this color, it can be e.g. altitude, speed, ...
-	 * @param mapColorConfig
+	 * @param mapLegendImageConfig
 	 * @param mapColor
 	 */
 	public GradientColorProvider(	final MapColorId mapColorId,
-									final MapColorConfig mapColorConfig,
+									final MapLegendImageConfig mapLegendImageConfig,
 									final MapColor mapColor) {
 
 		_mapColorId = mapColorId;
 
-		_mapColorConfig = mapColorConfig;
+		_mapLegendImageConfig = mapLegendImageConfig;
 		_mapColor = mapColor;
 	}
 
@@ -213,18 +213,18 @@ public class GradientColorProvider implements IGradientColors {
 		int green = 0;
 		int blue = 0;
 
-		final ValueColor[] valueColors = _mapColor.valueColors;
+		final ColorValue[] valueColors = _mapColor.colorValues;
 		final float minBrightnessFactor = _mapColor.minBrightnessFactor / 100.0f;
 		final float maxBrightnessFactor = _mapColor.maxBrightnessFactor / 100.0f;
 
 		/*
 		 * find the valueColor for the current value
 		 */
-		ValueColor valueColor;
-		ValueColor minValueColor = null;
-		ValueColor maxValueColor = null;
+		ColorValue valueColor;
+		ColorValue minValueColor = null;
+		ColorValue maxValueColor = null;
 
-		for (final ValueColor valueColor2 : valueColors) {
+		for (final ColorValue valueColor2 : valueColors) {
 
 			valueColor = valueColor2;
 			if (graphValue > valueColor.value) {
@@ -249,7 +249,7 @@ public class GradientColorProvider implements IGradientColors {
 			blue = valueColor.blue;
 
 			final float minValue = valueColor.value;
-			final float minDiff = _mapColorConfig.legendMinValue - minValue;
+			final float minDiff = _mapLegendImageConfig.legendMinValue - minValue;
 
 			final float ratio = minDiff == 0 ? 1 : (graphValue - minValue) / minDiff;
 			final float dimmRatio = minBrightnessFactor * ratio;
@@ -277,7 +277,7 @@ public class GradientColorProvider implements IGradientColors {
 			blue = valueColor.blue;
 
 			final float maxValue = valueColor.value;
-			final float maxDiff = _mapColorConfig.legendMaxValue - maxValue;
+			final float maxDiff = _mapLegendImageConfig.legendMaxValue - maxValue;
 
 			final float ratio = maxDiff == 0 ? 1 : (graphValue - maxValue) / maxDiff;
 			final float dimmRatio = maxBrightnessFactor * ratio;
@@ -301,13 +301,13 @@ public class GradientColorProvider implements IGradientColors {
 
 			final float maxValue = maxValueColor.value;
 			final float minValue = minValueColor.value;
-			final int minRed = minValueColor.red;
-			final int minGreen = minValueColor.green;
-			final int minBlue = minValueColor.blue;
+			final float minRed = minValueColor.red;
+			final float minGreen = minValueColor.green;
+			final float minBlue = minValueColor.blue;
 
-			final int redDiff = maxValueColor.red - minRed;
-			final int greenDiff = maxValueColor.green - minGreen;
-			final int blueDiff = maxValueColor.blue - minBlue;
+			final float redDiff = maxValueColor.red - minRed;
+			final float greenDiff = maxValueColor.green - minGreen;
+			final float blueDiff = maxValueColor.blue - minBlue;
 
 			final float ratioDiff = maxValue - minValue;
 			final float ratio = ratioDiff == 0 ? 1 : (graphValue - minValue) / (ratioDiff);
@@ -325,48 +325,48 @@ public class GradientColorProvider implements IGradientColors {
 		green = (255 <= maxGreen) ? 255 : maxGreen;
 		blue = (255 <= maxBlue) ? 255 : maxBlue;
 
-		final int colorValue = ((red & 0xFF) << 0) | ((green & 0xFF) << 8) | ((blue & 0xFF) << 16);
+		final int graphColor = ((red & 0xFF) << 0) | ((green & 0xFF) << 8) | ((blue & 0xFF) << 16);
 
-		return colorValue;
+		return graphColor;
 	}
 
-	public MapColor getLegendColor() {
+	public MapColor getMapColor() {
 		return _mapColor;
-	}
-
-	public MapColorConfig getLegendConfig() {
-		return _mapColorConfig;
 	}
 
 	public MapColorId getMapColorId() {
 		return _mapColorId;
 	}
 
-	public void setLegendColorColors(final MapColor legendColor) {
+	public MapLegendImageConfig getMapLegendImageConfig() {
+		return _mapLegendImageConfig;
+	}
 
-		final ValueColor[] valueColors = _mapColor.valueColors;
-		final ValueColor[] newValueColors = legendColor.valueColors;
+	public void setMapColorColors(final MapColor mapColor) {
+
+		final ColorValue[] valueColors = _mapColor.colorValues;
+		final ColorValue[] newValueColors = mapColor.colorValues;
 
 		// copy new colors into current legend colors
 		for (int valueIndex = 0; valueIndex < valueColors.length; valueIndex++) {
 
-			final ValueColor valueColor = valueColors[valueIndex];
-			final ValueColor newValueColor = newValueColors[valueIndex];
+			final ColorValue valueColor = valueColors[valueIndex];
+			final ColorValue newValueColor = newValueColors[valueIndex];
 
 			valueColor.red = newValueColor.red;
 			valueColor.green = newValueColor.green;
 			valueColor.blue = newValueColor.blue;
 		}
 
-		_mapColor.minBrightness = legendColor.minBrightness;
-		_mapColor.minBrightnessFactor = legendColor.minBrightnessFactor;
-		_mapColor.maxBrightness = legendColor.maxBrightness;
-		_mapColor.maxBrightnessFactor = legendColor.maxBrightnessFactor;
+		_mapColor.minBrightness = mapColor.minBrightness;
+		_mapColor.minBrightnessFactor = mapColor.minBrightnessFactor;
+		_mapColor.maxBrightness = mapColor.maxBrightness;
+		_mapColor.maxBrightnessFactor = mapColor.maxBrightnessFactor;
 
-		_mapColor.isMinValueOverwrite = legendColor.isMinValueOverwrite;
-		_mapColor.overwriteMinValue = legendColor.overwriteMinValue;
-		_mapColor.isMaxValueOverwrite = legendColor.isMaxValueOverwrite;
-		_mapColor.overwriteMaxValue = legendColor.overwriteMaxValue;
+		_mapColor.isMinValueOverwrite = mapColor.isMinValueOverwrite;
+		_mapColor.overwriteMinValue = mapColor.overwriteMinValue;
+		_mapColor.isMaxValueOverwrite = mapColor.isMaxValueOverwrite;
+		_mapColor.overwriteMaxValue = mapColor.overwriteMaxValue;
 	}
 
 	/**
@@ -378,11 +378,11 @@ public class GradientColorProvider implements IGradientColors {
 	 * @param unitText
 	 */
 	@Override
-	public void setLegendColorValues(	final int legendHeight,
-										float minValue,
-										float maxValue,
-										final String unitText,
-										final LegendUnitFormat unitFormat) {
+	public void setMapConfigValues(	final int legendHeight,
+									float minValue,
+									float maxValue,
+									final String unitText,
+									final LegendUnitFormat unitFormat) {
 
 		/*
 		 * enforce min/max values, another option is necessary in the pref dialog to not enforce
@@ -420,10 +420,10 @@ public class GradientColorProvider implements IGradientColors {
 			final Float legendMinValue = legendUnits.get(0);
 			final Float legendMaxValue = legendUnits.get(legendUnits.size() - 1);
 
-			_mapColorConfig.units = legendUnits;
-			_mapColorConfig.unitText = unitText;
-			_mapColorConfig.legendMinValue = legendMinValue;
-			_mapColorConfig.legendMaxValue = legendMaxValue;
+			_mapLegendImageConfig.units = legendUnits;
+			_mapLegendImageConfig.unitText = unitText;
+			_mapLegendImageConfig.legendMinValue = legendMinValue;
+			_mapLegendImageConfig.legendMaxValue = legendMaxValue;
 
 			/*
 			 * set color configuration, each tour has a different altitude config
@@ -434,7 +434,7 @@ public class GradientColorProvider implements IGradientColors {
 			final float diffMinMax10 = diffMinMax / 10;
 			final float midValueAbsolute = legendMinValue + diffMinMax2;
 
-			final ValueColor[] valueColors = _mapColor.valueColors;
+			final ColorValue[] valueColors = _mapColor.colorValues;
 
 			valueColors[0].value = legendMinValue + diffMinMax10;
 			valueColors[1].value = legendMinValue + diffMinMax2 / 2;

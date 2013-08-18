@@ -47,9 +47,9 @@ public class ColorDefinition {
 	private RGB						_textColorDefault;
 	private RGB						_textColorNew;
 
-	private MapColor				_legendColor;
-	private MapColor				_defaultLegendColor;
-	private MapColor				_newLegendColor;
+	private MapColor				_mapColor;
+	private MapColor				_defaultMapColor;
+	private MapColor				_newMapColor;
 
 	/**
 	 * Sets the color for the default, current and changes
@@ -66,8 +66,8 @@ public class ColorDefinition {
 	 *            default line color
 	 * @param defaultTextColor
 	 *            default text color
-	 * @param defaultLegendColor
-	 *            legend color configuration or <code>null</code> when legend is not available
+	 * @param defaultMapColor
+	 *            Map color configuration or <code>null</code> when not available.
 	 */
 	protected ColorDefinition(	final String prefName,
 								final String visibleName,
@@ -75,7 +75,7 @@ public class ColorDefinition {
 								final RGB defaultGradientDark,
 								final RGB defaultLineColor,
 								final RGB defaultTextColor,
-								final MapColor defaultLegendColor) {
+								final MapColor defaultMapColor) {
 
 		_prefName = prefName;
 		_visibleName = visibleName;
@@ -85,7 +85,7 @@ public class ColorDefinition {
 		_lineColorDefault = defaultLineColor;
 		_textColorDefault = defaultTextColor;
 
-		_defaultLegendColor = defaultLegendColor;
+		_defaultMapColor = defaultMapColor;
 
 		final String graphPrefName = getGraphPrefName();
 
@@ -136,6 +136,7 @@ public class ColorDefinition {
 
 	@Override
 	public boolean equals(final Object obj) {
+
 		if (this == obj) {
 			return true;
 		}
@@ -145,6 +146,7 @@ public class ColorDefinition {
 		if (getClass() != obj.getClass()) {
 			return false;
 		}
+
 		final ColorDefinition other = (ColorDefinition) obj;
 		if (_prefName == null) {
 			if (other._prefName != null) {
@@ -153,6 +155,7 @@ public class ColorDefinition {
 		} else if (!_prefName.equals(other._prefName)) {
 			return false;
 		}
+
 		return true;
 	}
 
@@ -164,8 +167,8 @@ public class ColorDefinition {
 		return _gradientDarkDefault;
 	}
 
-	public MapColor getDefaultLegendColor() {
-		return _defaultLegendColor;
+	public MapColor getDefaultMapColor() {
+		return _defaultMapColor;
 	}
 
 	public RGB getDefaultLineColor() {
@@ -196,12 +199,12 @@ public class ColorDefinition {
 		return _prefName;
 	}
 
-	public MapColor getLegendColor() {
-		return _legendColor;
-	}
-
 	public RGB getLineColor() {
 		return _lineColor;
+	}
+
+	public MapColor getMapColor() {
+		return _mapColor;
 	}
 
 	public RGB getNewGradientBright() {
@@ -212,12 +215,12 @@ public class ColorDefinition {
 		return _gradientDarkNew;
 	}
 
-	public MapColor getNewLegendColor() {
-		return _newLegendColor;
-	}
-
 	public RGB getNewLineColor() {
 		return _lineColorNew;
+	}
+
+	public MapColor getNewMapColor() {
+		return _newMapColor;
 	}
 
 	public RGB getNewTextColor() {
@@ -261,12 +264,12 @@ public class ColorDefinition {
 		_gradientDark = gradientDark;
 	}
 
-	public void setLegendColor(final MapColor legendColor) {
-		_legendColor = legendColor;
-	}
-
 	public void setLineColor(final RGB lineColor) {
 		_lineColor = lineColor;
+	}
+
+	public void setMapColor(final MapColor mapColor) {
+		_mapColor = mapColor;
 	}
 
 	public void setNewGradientBright(final RGB newGradientBright) {
@@ -277,12 +280,12 @@ public class ColorDefinition {
 		_gradientDarkNew = newGradientDark;
 	}
 
-	public void setNewLegendColor(final MapColor newLegendColor) {
-		_newLegendColor = newLegendColor;
-	}
-
 	public void setNewLineColor(final RGB newLineColor) {
 		_lineColorNew = newLineColor;
+	}
+
+	public void setNewMapColor(final MapColor newMapColor) {
+		_newMapColor = newMapColor;
 	}
 
 	public void setNewTextColor(final RGB _textColorNew) {

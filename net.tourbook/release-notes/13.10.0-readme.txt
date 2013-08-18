@@ -40,6 +40,11 @@ Why is it so complicated?
 The colors will now also be used in the new 3D map and therefore a restructuring was necessary.
 
 
+New
+
+* Modify track color directly in the map context menu instead of the pref dialog with multiple clicks (which I hate since a very long time)
+
+
 Changed Behaviour
 
 * 

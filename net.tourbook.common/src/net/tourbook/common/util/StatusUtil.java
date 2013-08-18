@@ -129,6 +129,10 @@ public class StatusUtil {
 		handleStatus(exception.getMessage(), exception, StatusManager.LOG, IStatus.ERROR);
 	}
 
+	public static void logError(final String message) {
+		handleStatus(message, null, StatusManager.LOG, IStatus.ERROR);
+	}
+
 	public static void logInfo(final String message) {
 		handleStatus(message, null, StatusManager.LOG, IStatus.INFO);
 	}

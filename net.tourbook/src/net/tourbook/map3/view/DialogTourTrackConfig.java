@@ -84,8 +84,8 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 	private Composite				_shellContainer;
 
 	private Button					_btnDefault;
-	private Button					_btnPerformance;
-	private Button					_btnQuality;
+//	private Button					_btnPerformance;
+//	private Button					_btnQuality;
 
 	private Button					_chkAltitudeOffset;
 	private Button					_chkDrawVerticals;
@@ -904,50 +904,52 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 				.span(2, 1)
 				.indent(0, 20)
 				.applyTo(container);
-		GridLayoutFactory.fillDefaults().numColumns(3).equalWidth(true).applyTo(container);
+		GridLayoutFactory.fillDefaults()//
+				.numColumns(1)
+//				.equalWidth(true)
+				.applyTo(container);
 //		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
 		{
-
-			/*
-			 * Button: High performance
-			 */
-			_btnPerformance = new Button(container, SWT.PUSH);
-			GridDataFactory.fillDefaults()//
-					.align(SWT.FILL, SWT.FILL)
-					.grab(true, false)
-					.applyTo(_btnPerformance);
-			_btnPerformance.setText(Messages.TourTrack_Properties_Button_Performance);
-			_btnPerformance.setToolTipText(Messages.TourTrack_Properties_Button_Performance_Tooltip);
-			_btnPerformance.addSelectionListener(new SelectionAdapter() {
-				@Override
-				public void widgetSelected(final SelectionEvent e) {
-					onActionPerformance();
-				}
-			});
-
-			/*
-			 * Button: High quality
-			 */
-			_btnQuality = new Button(container, SWT.PUSH);
-			GridDataFactory.fillDefaults()//
-					.align(SWT.FILL, SWT.FILL)
-					.grab(true, false)
-					.applyTo(_btnQuality);
-			_btnQuality.setText(Messages.TourTrack_Properties_Button_Quality);
-			_btnQuality.setToolTipText(Messages.TourTrack_Properties_Button_Quality_Tooltip);
-			_btnQuality.addSelectionListener(new SelectionAdapter() {
-				@Override
-				public void widgetSelected(final SelectionEvent e) {
-					onActionQuality();
-				}
-			});
+//			/*
+//			 * Button: High performance
+//			 */
+//			_btnPerformance = new Button(container, SWT.PUSH);
+//			GridDataFactory.fillDefaults()//
+//					.align(SWT.FILL, SWT.FILL)
+//					.grab(true, false)
+//					.applyTo(_btnPerformance);
+//			_btnPerformance.setText(Messages.TourTrack_Properties_Button_Performance);
+//			_btnPerformance.setToolTipText(Messages.TourTrack_Properties_Button_Performance_Tooltip);
+//			_btnPerformance.addSelectionListener(new SelectionAdapter() {
+//				@Override
+//				public void widgetSelected(final SelectionEvent e) {
+//					onActionPerformance();
+//				}
+//			});
+//
+//			/*
+//			 * Button: High quality
+//			 */
+//			_btnQuality = new Button(container, SWT.PUSH);
+//			GridDataFactory.fillDefaults()//
+//					.align(SWT.FILL, SWT.FILL)
+//					.grab(true, false)
+//					.applyTo(_btnQuality);
+//			_btnQuality.setText(Messages.TourTrack_Properties_Button_Quality);
+//			_btnQuality.setToolTipText(Messages.TourTrack_Properties_Button_Quality_Tooltip);
+//			_btnQuality.addSelectionListener(new SelectionAdapter() {
+//				@Override
+//				public void widgetSelected(final SelectionEvent e) {
+//					onActionQuality();
+//				}
+//			});
 
 			/*
 			 * Button: Default
 			 */
 			_btnDefault = new Button(container, SWT.PUSH);
 			GridDataFactory.fillDefaults()//
-					.align(SWT.FILL, SWT.FILL)
+					.align(SWT.TRAIL, SWT.FILL)
 					.grab(true, false)
 					.applyTo(_btnDefault);
 			_btnDefault.setText(Messages.TourTrack_Properties_Button_Default);

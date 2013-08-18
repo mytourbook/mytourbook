@@ -34,7 +34,6 @@ import net.tourbook.common.color.IMapColorProvider;
 import net.tourbook.common.color.MapColorId;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
-import net.tourbook.map2.view.IMapColorUpdater;
 import net.tourbook.map2.view.TourMapColors;
 import net.tourbook.map3.action.ActionMapColor;
 import net.tourbook.map3.action.ActionOpenMap3LayerView;
@@ -80,7 +79,7 @@ import org.eclipse.ui.part.ViewPart;
 /**
  * Display 3-D Map
  */
-public class Map3View extends ViewPart implements IMapColorUpdater {
+public class Map3View extends ViewPart {
 
 	public static final String					ID										= "net.tourbook.map3.view.Map3ViewId";		//$NON-NLS-1$
 
@@ -144,7 +143,7 @@ public class Map3View extends ViewPart implements IMapColorUpdater {
 
 	public Map3View() {}
 
-	public void actionSetTourColor(final MapColorId colorId) {
+	public void actionSetMapColor(final MapColorId colorId) {
 
 		_tourColorId = colorId;
 
@@ -324,10 +323,6 @@ public class Map3View extends ViewPart implements IMapColorUpdater {
 		TourManager.getInstance().addTourEventListener(_tourEventListener);
 	}
 
-	@Override
-	public void applyMapColors() {
-
-	}
 
 	private void clearView() {
 
@@ -516,25 +511,15 @@ public class Map3View extends ViewPart implements IMapColorUpdater {
 
 	private void fillContextMenu(final Menu menu) {
 
-		// set color before menu is filled
+		// set color before menu is filled, this sets the action image
 		_actionMapColor.setColorId(_tourColorId);
 
-//		if (_tourColorId) {
-//
-//		}
-		fillMenuItem(menu, _actionMapColor);
+		if (_tourColorId != MapColorId.HrZone) {
 
-//		final MenuItem item1 = new MenuItem(_contextMenu, SWT.PUSH);
-//		item1.setText("useless item for test");
-//		item1.addSelectionListener(new SelectionListener() {
-//			@Override
-//			public void widgetDefaultSelected(final SelectionEvent arg0) {}
-//
-//			@Override
-//			public void widgetSelected(final SelectionEvent arg0) {
-//				System.out.println("The useless popup menu was clicked !");
-//			}
-//		});
+			// hr zone has a different color provider and is not yet supported
+
+			fillMenuItem(menu, _actionMapColor);
+		}
 	}
 
 	private void fillMenuItem(final Menu menu, final Action action) {
@@ -1010,7 +995,10 @@ public class Map3View extends ViewPart implements IMapColorUpdater {
 
 		showAllTours(false);
 
-		_wwCanvas.redraw();
+//		_wwCanvas.redraw();
+
+		Map3Manager.redraw();
+
 	}
 
 }

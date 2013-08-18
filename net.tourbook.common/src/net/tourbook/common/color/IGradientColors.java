@@ -23,18 +23,21 @@ public interface IGradientColors extends IMapColorProvider {
 	 */
 	abstract int getColorValue(float graphValue);
 
-	abstract MapColor getLegendColor();
-
-	abstract MapColorConfig getLegendConfig();
+	abstract MapColor getMapColor();
 
 	/**
-	 * Set the colors for the legend, the values will not be changed
-	 * 
-	 * @param newLegendColor
+	 * @return Returns configuration how a map legend image is painted.
 	 */
-	abstract void setLegendColorColors(MapColor newLegendColor);
+	abstract MapLegendImageConfig getMapLegendImageConfig();
 
-	abstract void setLegendColorValues(	int legendHeight,
+	/**
+	 * Set the colors for the map legend, the values will not be changed.
+	 * 
+	 * @param newMapColor
+	 */
+	abstract void setMapColorColors(MapColor newMapColor);
+
+	abstract void setMapConfigValues(	int legendHeight,
 										float minValue,
 										float maxValue,
 										String unitText,

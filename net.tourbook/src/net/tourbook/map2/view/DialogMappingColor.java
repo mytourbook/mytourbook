@@ -18,9 +18,9 @@ package net.tourbook.map2.view;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.color.ColorDefinition;
+import net.tourbook.common.color.ColorValue;
 import net.tourbook.common.color.IGradientColors;
 import net.tourbook.common.color.MapColor;
-import net.tourbook.common.color.ValueColor;
 import net.tourbook.map2.Messages;
 
 import org.eclipse.jface.dialogs.IDialogConstants;
@@ -28,6 +28,7 @@ import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.preference.ColorSelector;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
@@ -65,59 +66,58 @@ import org.eclipse.swt.widgets.Spinner;
 
 public class DialogMappingColor extends TitleAreaDialog {
 
-	private static final String					VALUE_SPACER		= "999";			//$NON-NLS-1$
+	private static final String		VALUE_SPACER		= "999";												//$NON-NLS-1$
 
-	private static final int					SPINNER_MIN_VALUE	= -200;
-	private static final int					SPINNER_MAX_VALUE	= 10000;
+	private static final int		SPINNER_MIN_VALUE	= -200;
+	private static final int		SPINNER_MAX_VALUE	= 10000;
 
-	private static final String					STATE_LIVE_UPDATE	= "IsLiveUpdate";	//$NON-NLS-1$
+	private static final String		STATE_LIVE_UPDATE	= "IsLiveUpdate";										//$NON-NLS-1$
 
-	// ---------- UI controls----------
+	private final IDialogSettings	_state				= TourbookPlugin.getStateSection("DialogMappingColor"); //$NON-NLS-1$
 
-	private Canvas								_canvasMappingColor;
-	private Image								_imageMappingColor;
-
-	private Combo								_cboMaxBrightness;
-	private Combo								_cboMinBrightness;
-
-	private Scale								_scaleMinBrightness;
-	private Label								_lblMinBrightnessValue;
-	private Scale								_scaleMaxBrightness;
-	private Label								_lblMaxBrightnessValue;
-
-	private Button								_chkForceMinValue;
-	private Label								_lblMinValue;
-	private Spinner								_spinMinValue;
-
-	private Button								_chkForceMaxValue;
-	private Label								_lblMaxValue;
-	private Spinner								_spinMaxValue;
-
-	private ColorSelector						_colorSelectorMax;
-	private ColorSelector						_colorSelectorHigh;
-	private ColorSelector						_colorSelectorMid;
-	private ColorSelector						_colorSelectorLow;
-	private ColorSelector						_colorSelectorMin;
-
-	// ---------- fields ----------
-
-	private IMapColorUpdater					_mapColorUpdater;
+	private IMapColorUpdater		_mapColorUpdater;
 
 	private final IGradientColors	_colorProvider;
-	private ValueColor[]						_colorValueModel;
+	private MapColor				_mapColorWorkingCopy;
 
-	private MapColor							_legendColorWorkingCopy;
+	private final SelectionAdapter	_defaultSelectionAdapter;
 
-	private final SelectionAdapter				_defaultSelectionAdapter;
-	private final IDialogSettings				_state;
+	private ColorDefinition			_colorDefinition;
 
-	private ColorDefinition						_colorDefinition;
+	private boolean					_isInitializeControls;
 
-	private boolean								_isInitializeControls;
+	private PixelConverter			_pc;
 
-	private Button								_btnApply;
+	/*
+	 * UI controls
+	 */
+	private Canvas					_canvasMappingColor;
+	private Image					_imageMappingColor;
 
-	private Button								_chkLiveUpdate;
+	private Button					_btnApply;
+	private Button					_chkForceMinValue;
+	private Button					_chkForceMaxValue;
+	private Button					_chkLiveUpdate;
+
+	private Combo					_cboMaxBrightness;
+	private Combo					_cboMinBrightness;
+
+	private Label					_lblMinBrightnessValue;
+	private Label					_lblMaxBrightnessValue;
+	private Label					_lblMinValue;
+	private Label					_lblMaxValue;
+
+	private Scale					_scaleMinBrightness;
+	private Scale					_scaleMaxBrightness;
+
+	private Spinner					_spinMinValue;
+	private Spinner					_spinMaxValue;
+
+	private ColorSelector			_colorSelectorMax;
+	private ColorSelector			_colorSelectorHigh;
+	private ColorSelector			_colorSelectorMid;
+	private ColorSelector			_colorSelectorLow;
+	private ColorSelector			_colorSelectorMin;
 
 	{
 		_defaultSelectionAdapter = new SelectionAdapter() {
@@ -128,7 +128,6 @@ public class DialogMappingColor extends TitleAreaDialog {
 			}
 		};
 
-		_state = TourbookPlugin.getDefault().getDialogSettingsSection("DialogMappingColor"); //$NON-NLS-1$
 	}
 
 	public DialogMappingColor(	final Shell parentShell,
@@ -172,17 +171,23 @@ public class DialogMappingColor extends TitleAreaDialog {
 		/*
 		 * update color selectors
 		 */
-		ValueColor valueColor;
-		valueColor = _colorValueModel[4];
-		_colorSelectorMax.setColorValue(new RGB(valueColor.red, valueColor.green, valueColor.blue));
-		valueColor = _colorValueModel[3];
-		_colorSelectorHigh.setColorValue(new RGB(valueColor.red, valueColor.green, valueColor.blue));
-		valueColor = _colorValueModel[2];
-		_colorSelectorMid.setColorValue(new RGB(valueColor.red, valueColor.green, valueColor.blue));
-		valueColor = _colorValueModel[1];
-		_colorSelectorLow.setColorValue(new RGB(valueColor.red, valueColor.green, valueColor.blue));
-		valueColor = _colorValueModel[0];
-		_colorSelectorMin.setColorValue(new RGB(valueColor.red, valueColor.green, valueColor.blue));
+		final ColorValue[] colorValues = _mapColorWorkingCopy.colorValues;
+		ColorValue colorValue;
+
+		colorValue = colorValues[4];
+		_colorSelectorMax.setColorValue(new RGB(colorValue.red, colorValue.green, colorValue.blue));
+
+		colorValue = colorValues[3];
+		_colorSelectorHigh.setColorValue(new RGB(colorValue.red, colorValue.green, colorValue.blue));
+
+		colorValue = colorValues[2];
+		_colorSelectorMid.setColorValue(new RGB(colorValue.red, colorValue.green, colorValue.blue));
+
+		colorValue = colorValues[1];
+		_colorSelectorLow.setColorValue(new RGB(colorValue.red, colorValue.green, colorValue.blue));
+
+		colorValue = colorValues[0];
+		_colorSelectorMin.setColorValue(new RGB(colorValue.red, colorValue.green, colorValue.blue));
 
 		setTitle(Messages.legendcolor_dialog_title);
 		setMessage(NLS.bind(Messages.legendcolor_dialog_title_message, _colorDefinition.getVisibleName()));
@@ -213,7 +218,7 @@ public class DialogMappingColor extends TitleAreaDialog {
 		}
 
 		final Point legendSize = _canvasMappingColor.getSize();
-		final int legendWidth = Math.max(30, legendSize.x);
+		final int legendWidth = Math.max(140, legendSize.x);
 		final int legendHeight = Math.max(100, legendSize.y);
 		final RGB rgbTransparent = new RGB(0xfe, 0xfe, 0xfe);
 
@@ -234,7 +239,7 @@ public class DialogMappingColor extends TitleAreaDialog {
 			gc.setBackground(transparentColor);
 			gc.fillRectangle(imageBounds);
 
-			TourMapPainter.drawLegend(gc, imageBounds, _colorProvider, true);
+			TourMapPainter.drawMapLegend(gc, imageBounds, _colorProvider, true);
 		}
 		gc.dispose();
 		transparentColor.dispose();
@@ -242,12 +247,15 @@ public class DialogMappingColor extends TitleAreaDialog {
 
 	private void createUI(final Composite parent) {
 
+		_pc = new PixelConverter(parent);
+
 		/*
 		 * dialog container
 		 */
 		final Composite dlgContainer = new Composite(parent, SWT.NONE);
 		GridLayoutFactory.swtDefaults().extendedMargins(10, 10, 5, 5).numColumns(3).applyTo(dlgContainer);
 		GridDataFactory.fillDefaults().grab(true, true).applyTo(dlgContainer);
+//		dlgContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
 		{
 			createUI10Legend(dlgContainer);
 			createUI20LegendColorSelector(dlgContainer);
@@ -271,7 +279,10 @@ public class DialogMappingColor extends TitleAreaDialog {
 		 * legend
 		 */
 		_canvasMappingColor = new Canvas(parent, SWT.DOUBLE_BUFFERED);
-		GridDataFactory.fillDefaults().grab(false, true).applyTo(_canvasMappingColor);
+		GridDataFactory.fillDefaults()//
+				.grab(false, true)
+				.hint(_pc.convertWidthInCharsToPixels(18), SWT.DEFAULT)
+				.applyTo(_canvasMappingColor);
 		_canvasMappingColor.addPaintListener(new PaintListener() {
 			public void paintControl(final PaintEvent e) {
 				if (_imageMappingColor == null || _imageMappingColor.isDisposed()) {
@@ -582,7 +593,7 @@ public class DialogMappingColor extends TitleAreaDialog {
 			_btnApply.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(final SelectionEvent e) {
-					_mapColorUpdater.applyMapColors();
+					_mapColorUpdater.applyMapColors(_mapColorWorkingCopy);
 				}
 			});
 			setButtonLayoutData(_btnApply);
@@ -592,7 +603,7 @@ public class DialogMappingColor extends TitleAreaDialog {
 	private void doLiveUpdate() {
 
 		if (_chkLiveUpdate.getSelection() == true) {
-			_mapColorUpdater.applyMapColors();
+			_mapColorUpdater.applyMapColors(_mapColorWorkingCopy);
 		}
 	}
 
@@ -637,15 +648,16 @@ public class DialogMappingColor extends TitleAreaDialog {
 		return _state;
 	}
 
-	public MapColor getLegendColor() {
-		return _legendColorWorkingCopy;
-	}
+//	public MapColor getMapColor() {
+//		return _mapColorWorkingCopy;
+//	}
 
 	private void onSelectColor(final ColorSelector colorSelector, final int valueColorIndex) {
 
 		// update model
+
+		final ColorValue colorValue = _mapColorWorkingCopy.colorValues[4 - valueColorIndex];
 		final RGB selectedRGB = colorSelector.getColorValue();
-		final ValueColor colorValue = _colorValueModel[4 - valueColorIndex];
 
 		colorValue.red = selectedRGB.red;
 		colorValue.green = selectedRGB.green;
@@ -677,8 +689,15 @@ public class DialogMappingColor extends TitleAreaDialog {
 		_colorDefinition = colorDefinition;
 
 		// use a copy of the legendColor to support the cancel feature
-		_legendColorWorkingCopy = colorDefinition.getNewLegendColor().getCopy();
-		_colorValueModel = _legendColorWorkingCopy.valueColors;
+		_mapColorWorkingCopy = colorDefinition.getNewMapColor().getCopy();
+
+//		System.out.println(UI.timeStampNano()
+//				+ " ["
+//				+ getClass().getSimpleName()
+//				+ "] \t"
+//				+ Arrays.toString(colorValues));
+//		// TODO remove SYSTEM.OUT.PRINTLN
+
 	}
 
 	/**
@@ -687,31 +706,34 @@ public class DialogMappingColor extends TitleAreaDialog {
 	private void updateModelFromUI() {
 
 		// update color selector
-		ValueColor colorValue = _colorValueModel[4];
+
+		final ColorValue[] colorValues = _mapColorWorkingCopy.colorValues;
+
+		ColorValue colorValue = colorValues[4];
 		_colorSelectorMax.setColorValue(new RGB(colorValue.red, colorValue.green, colorValue.blue));
 
-		colorValue = _colorValueModel[3];
+		colorValue = colorValues[3];
 		_colorSelectorHigh.setColorValue(new RGB(colorValue.red, colorValue.green, colorValue.blue));
 
-		colorValue = _colorValueModel[2];
+		colorValue = colorValues[2];
 		_colorSelectorMid.setColorValue(new RGB(colorValue.red, colorValue.green, colorValue.blue));
 
-		colorValue = _colorValueModel[1];
+		colorValue = colorValues[1];
 		_colorSelectorLow.setColorValue(new RGB(colorValue.red, colorValue.green, colorValue.blue));
 
-		colorValue = _colorValueModel[0];
+		colorValue = colorValues[0];
 		_colorSelectorMin.setColorValue(new RGB(colorValue.red, colorValue.green, colorValue.blue));
 
-		_legendColorWorkingCopy.minBrightness = _cboMinBrightness.getSelectionIndex();
-		_legendColorWorkingCopy.minBrightnessFactor = _scaleMinBrightness.getSelection();
-		_legendColorWorkingCopy.maxBrightness = _cboMaxBrightness.getSelectionIndex();
-		_legendColorWorkingCopy.maxBrightnessFactor = _scaleMaxBrightness.getSelection();
+		_mapColorWorkingCopy.minBrightness = _cboMinBrightness.getSelectionIndex();
+		_mapColorWorkingCopy.minBrightnessFactor = _scaleMinBrightness.getSelection();
+		_mapColorWorkingCopy.maxBrightness = _cboMaxBrightness.getSelectionIndex();
+		_mapColorWorkingCopy.maxBrightnessFactor = _scaleMaxBrightness.getSelection();
 
-		_legendColorWorkingCopy.isMinValueOverwrite = _chkForceMinValue.getSelection();
-		_legendColorWorkingCopy.overwriteMinValue = _spinMinValue.getSelection();
+		_mapColorWorkingCopy.isMinValueOverwrite = _chkForceMinValue.getSelection();
+		_mapColorWorkingCopy.overwriteMinValue = _spinMinValue.getSelection();
 
-		_legendColorWorkingCopy.isMaxValueOverwrite = _chkForceMaxValue.getSelection();
-		_legendColorWorkingCopy.overwriteMaxValue = _spinMaxValue.getSelection();
+		_mapColorWorkingCopy.isMaxValueOverwrite = _chkForceMaxValue.getSelection();
+		_mapColorWorkingCopy.overwriteMaxValue = _spinMaxValue.getSelection();
 
 		enableControls();
 
@@ -725,16 +747,16 @@ public class DialogMappingColor extends TitleAreaDialog {
 	private void updateUI() {
 
 		// update min/max brightness
-		_cboMinBrightness.select(_legendColorWorkingCopy.minBrightness);
-		_scaleMinBrightness.setSelection(_legendColorWorkingCopy.minBrightnessFactor);
-		_cboMaxBrightness.select(_legendColorWorkingCopy.maxBrightness);
-		_scaleMaxBrightness.setSelection(_legendColorWorkingCopy.maxBrightnessFactor);
+		_cboMinBrightness.select(_mapColorWorkingCopy.minBrightness);
+		_scaleMinBrightness.setSelection(_mapColorWorkingCopy.minBrightnessFactor);
+		_cboMaxBrightness.select(_mapColorWorkingCopy.maxBrightness);
+		_scaleMaxBrightness.setSelection(_mapColorWorkingCopy.maxBrightnessFactor);
 
 		// update min/max value
-		_chkForceMinValue.setSelection(_legendColorWorkingCopy.isMinValueOverwrite);
-		_spinMinValue.setSelection(_legendColorWorkingCopy.overwriteMinValue);
-		_chkForceMaxValue.setSelection(_legendColorWorkingCopy.isMaxValueOverwrite);
-		_spinMaxValue.setSelection(_legendColorWorkingCopy.overwriteMaxValue);
+		_chkForceMinValue.setSelection(_mapColorWorkingCopy.isMinValueOverwrite);
+		_spinMinValue.setSelection(_mapColorWorkingCopy.overwriteMinValue);
+		_chkForceMaxValue.setSelection(_mapColorWorkingCopy.isMaxValueOverwrite);
+		_spinMaxValue.setSelection(_mapColorWorkingCopy.overwriteMaxValue);
 
 		updateUILabels();
 		enableControls();
@@ -754,20 +776,22 @@ public class DialogMappingColor extends TitleAreaDialog {
 
 	private void updateUILegendImage() {
 
-		final MapColor legendColor = _colorProvider.getLegendColor();
+		final MapColor mapColor = _colorProvider.getMapColor();
 
-		legendColor.valueColors = _colorValueModel;
-		legendColor.minBrightnessFactor = _legendColorWorkingCopy.minBrightnessFactor;
-		legendColor.maxBrightnessFactor = _legendColorWorkingCopy.maxBrightnessFactor;
-		legendColor.minBrightness = _legendColorWorkingCopy.minBrightness;
-		legendColor.maxBrightness = _legendColorWorkingCopy.maxBrightness;
+		mapColor.colorValues = _mapColorWorkingCopy.colorValues;
 
-		legendColor.isMinValueOverwrite = _legendColorWorkingCopy.isMinValueOverwrite;
-		legendColor.overwriteMinValue = _legendColorWorkingCopy.overwriteMinValue;
-		legendColor.isMaxValueOverwrite = _legendColorWorkingCopy.isMaxValueOverwrite;
-		legendColor.overwriteMaxValue = _legendColorWorkingCopy.overwriteMaxValue;
+		mapColor.minBrightnessFactor = _mapColorWorkingCopy.minBrightnessFactor;
+		mapColor.maxBrightnessFactor = _mapColorWorkingCopy.maxBrightnessFactor;
+		mapColor.minBrightness = _mapColorWorkingCopy.minBrightness;
+		mapColor.maxBrightness = _mapColorWorkingCopy.maxBrightness;
+
+		mapColor.isMinValueOverwrite = _mapColorWorkingCopy.isMinValueOverwrite;
+		mapColor.overwriteMinValue = _mapColorWorkingCopy.overwriteMinValue;
+		mapColor.isMaxValueOverwrite = _mapColorWorkingCopy.isMaxValueOverwrite;
+		mapColor.overwriteMaxValue = _mapColorWorkingCopy.overwriteMaxValue;
 
 		createLegendImage();
+
 		_canvasMappingColor.redraw();
 	}
 

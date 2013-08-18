@@ -99,17 +99,17 @@ public class GraphColorPainter {
 
 			final GC gc = new GC(image);
 			{
-				if (graphColor.isLegend()) {
+				if (graphColor.isMapColor()) {
 
 					// draw legend image
 
 					/*
 					 * tell the legend provider with which color the legend should be painted
 					 */
-					final IGradientColors legendProvider = _colorTreeViewer.getLegendProvider();
-					legendProvider.setLegendColorColors(graphColor.getColorDefinition().getNewLegendColor());
+					final IGradientColors legendProvider = _colorTreeViewer.getMapLegendColorProvider();
+					legendProvider.setMapColorColors(graphColor.getColorDefinition().getNewMapColor());
 
-					TourMapPainter.drawLegend(gc, borderRect, legendProvider, false);
+					TourMapPainter.drawMapLegend(gc, borderRect, legendProvider, false);
 
 				} else {
 
@@ -164,13 +164,13 @@ public class GraphColorPainter {
 							colorHeight,
 							colorWidth);
 
-					if (graphColorItem.isLegend()) {
+					if (graphColorItem.isMapColor()) {
 
 						// tell the legend provider how to draw the legend
-						final IGradientColors legendProvider = _colorTreeViewer.getLegendProvider();
-						legendProvider.setLegendColorColors(graphColorItem.getColorDefinition().getNewLegendColor());
+						final IGradientColors legendProvider = _colorTreeViewer.getMapLegendColorProvider();
+						legendProvider.setMapColorColors(graphColorItem.getColorDefinition().getNewMapColor());
 
-						TourMapPainter.drawLegend(gc, borderRect, legendProvider, false);
+						TourMapPainter.drawMapLegend(gc, borderRect, legendProvider, false);
 
 					} else {
 

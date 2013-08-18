@@ -20,7 +20,7 @@ import java.util.HashMap;
 import net.tourbook.common.color.GradientColorProvider;
 import net.tourbook.common.color.IMapColorProvider;
 import net.tourbook.common.color.MapColor;
-import net.tourbook.common.color.MapColorConfig;
+import net.tourbook.common.color.MapLegendImageConfig;
 import net.tourbook.common.color.MapColorId;
 
 public class TourMapColors {
@@ -28,56 +28,56 @@ public class TourMapColors {
 	/**
 	 * Key is the color id.
 	 */
-	private static HashMap<MapColorId, IMapColorProvider>	_colorProviders;
+	private static HashMap<MapColorId, IMapColorProvider>	_mapColorProviders;
 
 	/**
 	 * Create legend provider for all graphs which can be displayed.
 	 */
 	private static void createColorProviders() {
 
-		_colorProviders.put(//
+		_mapColorProviders.put(//
 				MapColorId.Altitude,
-				new GradientColorProvider(MapColorId.Altitude, new MapColorConfig(), new MapColor()));
+				new GradientColorProvider(MapColorId.Altitude, new MapLegendImageConfig(), new MapColor()));
 
-		_colorProviders.put(//
+		_mapColorProviders.put(//
 				MapColorId.Gradient,
-				new GradientColorProvider(MapColorId.Gradient, new MapColorConfig(), new MapColor()));
+				new GradientColorProvider(MapColorId.Gradient, new MapLegendImageConfig(), new MapColor()));
 
-		_colorProviders.put(//
+		_mapColorProviders.put(//
 				MapColorId.Pace,
-				new GradientColorProvider(MapColorId.Pace, new MapColorConfig(), new MapColor()));
+				new GradientColorProvider(MapColorId.Pace, new MapLegendImageConfig(), new MapColor()));
 
-		_colorProviders.put(//
+		_mapColorProviders.put(//
 				MapColorId.Pulse,
-				new GradientColorProvider(MapColorId.Pulse, new MapColorConfig(), new MapColor()));
+				new GradientColorProvider(MapColorId.Pulse, new MapLegendImageConfig(), new MapColor()));
 
-		_colorProviders.put(//
+		_mapColorProviders.put(//
 				MapColorId.Speed,
-				new GradientColorProvider(MapColorId.Speed, new MapColorConfig(), new MapColor()));
+				new GradientColorProvider(MapColorId.Speed, new MapLegendImageConfig(), new MapColor()));
 
 		//
 
-		_colorProviders.put(//
+		_mapColorProviders.put(//
 				MapColorId.HrZone,
 				new HrZonesColorProvider(MapColorId.HrZone));
 	}
 
 	public static IMapColorProvider getColorProvider(final MapColorId colorId) {
 
-		if (_colorProviders == null) {
+		if (_mapColorProviders == null) {
 
-			_colorProviders = new HashMap<MapColorId, IMapColorProvider>();
+			_mapColorProviders = new HashMap<MapColorId, IMapColorProvider>();
 
 			createColorProviders();
 		}
 
-		IMapColorProvider legendProvider = _colorProviders.get(colorId);
+		IMapColorProvider mapColorProvider = _mapColorProviders.get(colorId);
 
 		// use default when not available
-		if (legendProvider == null) {
-			legendProvider = _colorProviders.get(MapColorId.Altitude);
+		if (mapColorProvider == null) {
+			mapColorProvider = _mapColorProviders.get(MapColorId.Altitude);
 		}
 
-		return legendProvider;
+		return mapColorProvider;
 	}
 }

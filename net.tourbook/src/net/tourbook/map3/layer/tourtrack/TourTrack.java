@@ -21,8 +21,8 @@ import gov.nasa.worldwind.render.Path.PositionColors;
 import java.awt.Color;
 import java.util.ArrayList;
 
-import net.tourbook.common.color.IMapColorProvider;
 import net.tourbook.common.color.IGradientColors;
+import net.tourbook.common.color.IMapColorProvider;
 import net.tourbook.data.TourData;
 import net.tourbook.map2.view.IDiscreteColors;
 
@@ -57,7 +57,6 @@ public class TourTrack {
 
 			// prevent setting position colors
 			return null;
-//			return Color.pink;
 		}
 
 		final PositionColors positionColors = _trackPath.getPathPositionColors();

@@ -594,7 +594,7 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 		}
 	}
 
-	public IGradientColors getLegendProvider() {
+	public IGradientColors getMapLegendColorProvider() {
 		return null;
 	}
 

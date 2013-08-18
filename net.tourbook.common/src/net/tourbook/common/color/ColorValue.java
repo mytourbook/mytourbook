@@ -15,27 +15,40 @@
  *******************************************************************************/
 package net.tourbook.common.color;
 
-import java.util.List;
+public class ColorValue {
 
-import net.tourbook.common.UI;
+	public float	value;
 
-/**
- * Configuration for the map legend to visualize one unit in a tour
- */
-public class MapColorConfig {
-
-	public float			legendMinValue;
-	public float			legendMaxValue;
-
-	public List<Float>		units;
-	public List<String>		unitLabels;
-
-	public LegendUnitFormat	unitFormat	= LegendUnitFormat.Number;
-
-	public String			unitText	= UI.EMPTY_STRING;
+	public int		red;
+	public int		green;
+	public int		blue;
 
 	/**
-	 * Number of digits when label is formatted, default is 0.
+	 * Create a copy
+	 * 
+	 * @param colorValue
 	 */
-	public int				numberFormatDigits;
+	public ColorValue(final ColorValue colorValue) {
+
+		value = colorValue.value;
+
+		red = colorValue.red;
+		green = colorValue.green;
+		blue = colorValue.blue;
+	}
+
+	public ColorValue(final float value, final int red, final int green, final int blue) {
+
+		this.value = value;
+
+		this.red = red;
+		this.green = green;
+		this.blue = blue;
+	}
+
+	@Override
+	public String toString() {
+		return "new ColorValue(" + value + ", " + red + ", " + green + ", " + blue + ")"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+	}
+
 }

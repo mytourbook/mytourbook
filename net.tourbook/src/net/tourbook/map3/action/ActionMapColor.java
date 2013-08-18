@@ -15,35 +15,59 @@
  *******************************************************************************/
 package net.tourbook.map3.action;
 
+import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.color.ColorDefinition;
+import net.tourbook.common.color.GradientColorProvider;
+import net.tourbook.common.color.GraphColorManager;
+import net.tourbook.common.color.IGradientColors;
 import net.tourbook.common.color.IMapColorProvider;
+import net.tourbook.common.color.MapColor;
 import net.tourbook.common.color.MapColorId;
+import net.tourbook.common.util.StatusUtil;
+import net.tourbook.map2.view.DialogMappingColor;
+import net.tourbook.map2.view.IMapColorUpdater;
 import net.tourbook.map2.view.TourMapColors;
 import net.tourbook.map3.Messages;
 import net.tourbook.map3.view.Map3View;
+import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.preferences.PrefPageAppearanceColors;
 import net.tourbook.ui.UI;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.IDialogSettings;
+import org.eclipse.swt.widgets.Display;
 
-public class ActionMapColor extends Action {
+public class ActionMapColor extends Action implements IMapColorUpdater {
 
-	private Map3View		_mapView;
-	private IDialogSettings	_state;
+//	private Map3View			_mapView;
+//	private IDialogSettings	_state;
 
-	private MapColorId		_mapColorId;
+	private MapColorId			_mapColorId;
+	private DialogMappingColor	_dialogMappingColor;
+	private ColorDefinition		_colorDefinition;
 
 	public ActionMapColor(final Map3View mapView, final IDialogSettings state) {
 
 		super(null, AS_PUSH_BUTTON);
 
-		_mapView = mapView;
-		_state = state;
+//		_mapView = mapView;
+//		_state = state;
 
 		setText(Messages.Map3_Action_TrackColor);
 //		setToolTipText(toolTipText);
-//
-//		setImageDescriptor(TourbookPlugin.getImageDescriptor(imageEnabled));
-//		setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(imageDisabled));
+	}
+
+	@Override
+	public void applyMapColors(final MapColor newMapColor) {
+
+		// update color definition with new color from the color dialog
+		_colorDefinition.setNewMapColor(newMapColor);
+
+		GraphColorManager.saveNewColors();
+
+		// force to change the status
+		TourbookPlugin.getDefault().getPreferenceStore()//
+				.setValue(ITourbookPreferences.GRAPH_COLORS_HAS_CHANGED, Math.random());
 	}
 
 	/**
@@ -57,50 +81,54 @@ public class ActionMapColor extends Action {
 	@Override
 	public void run() {
 
-//		final GraphColorProvider colorProvider = GraphColorProvider.getInstance();
-//
-//		final ColorDefinition colorDefinition = colorProvider
-//				.getGraphColorDefinition(GraphColorProvider.PREF_GRAPH_ALTITUDE);
-//
-//		_tourColorId = Util.getStateInt(_state, STATE_TOUR_COLOR_ID, ILegendProvider.TOUR_COLOR_ALTITUDE);
-//
-//		switch (_tourColorId) {
-//		case ILegendProvider.TOUR_COLOR_ALTITUDE:
-//			_actionTourColorAltitude.setChecked(true);
-//			break;
-//
-//		case ILegendProvider.TOUR_COLOR_GRADIENT:
-//			_actionTourColorGradient.setChecked(true);
-//			break;
-//
-//		case ILegendProvider.TOUR_COLOR_PULSE:
-//			_actionTourColorPulse.setChecked(true);
-//			break;
-//
-//		case ILegendProvider.TOUR_COLOR_SPEED:
-//			_actionTourColorSpeed.setChecked(true);
-//			break;
-//
-//		case ILegendProvider.TOUR_COLOR_PACE:
-//			_actionTourColorPace.setChecked(true);
-//			break;
-//
-//		case ILegendProvider.TOUR_COLOR_HR_ZONE:
-//			_actionTourColorHrZone.setChecked(true);
-//			break;
-//
-//		default:
-//			_tourColorId = ILegendProvider.TOUR_COLOR_ALTITUDE;
-//			_actionTourColorAltitude.setChecked(true);
-//			break;
-//		}
+		final IMapColorProvider mapColorProvider = TourMapColors.getColorProvider(_mapColorId);
 
-		final IMapColorProvider colorProvider = TourMapColors.getColorProvider(_mapColorId);
+		if (mapColorProvider instanceof IGradientColors) {
 
-//		final DialogMappingColor dialogMappingColor = new DialogMappingColor(
-//				Display.getCurrent().getActiveShell(),
-//				colorProvider,
-//				_mapView);
+			final GradientColorProvider mapLegendColorProvider = PrefPageAppearanceColors
+					.createLegendImageColorProvider();
+
+			_dialogMappingColor = new DialogMappingColor(
+					Display.getCurrent().getActiveShell(),
+					mapLegendColorProvider,
+					this);
+
+			_colorDefinition = null;
+
+			final GraphColorManager colorManager = GraphColorManager.getInstance();
+
+			switch (_mapColorId) {
+			case Altitude:
+				_colorDefinition = colorManager.getGraphColorDefinition(GraphColorManager.PREF_GRAPH_ALTITUDE);
+				break;
+			case Gradient:
+				_colorDefinition = colorManager.getGraphColorDefinition(GraphColorManager.PREF_GRAPH_GRADIENT);
+				break;
+			case Pace:
+				_colorDefinition = colorManager.getGraphColorDefinition(GraphColorManager.PREF_GRAPH_PACE);
+				break;
+			case Pulse:
+				_colorDefinition = colorManager.getGraphColorDefinition(GraphColorManager.PREF_GRAPH_HEARTBEAT);
+				break;
+			case Speed:
+				_colorDefinition = colorManager.getGraphColorDefinition(GraphColorManager.PREF_GRAPH_SPEED);
+				break;
+
+			default:
+				break;
+			}
+
+			if (_colorDefinition == null) {
+				StatusUtil.logError("Colordefinition is null");
+				return;
+			}
+
+			// set the color which should be modified in the dialog
+			_dialogMappingColor.setLegendColor(_colorDefinition);
+
+			// new colors will be set with applyMapColors
+			_dialogMappingColor.open();
+		}
 
 	}
 

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2012  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -40,7 +40,7 @@ public class TourPainterConfiguration {
 
 	private int								_synchTourZoomLevel;
 
-	private IMapColorProvider					_legendProvider;
+	private IMapColorProvider				_mapColorProvider;
 
 	boolean									isShowStartEndInMap;
 	boolean									isShowTourMarker;
@@ -66,7 +66,7 @@ public class TourPainterConfiguration {
 	}
 
 	public IMapColorProvider getLegendProvider() {
-		return _legendProvider;
+		return _mapColorProvider;
 	}
 
 	public ArrayList<Photo> getPhotos() {
@@ -102,9 +102,9 @@ public class TourPainterConfiguration {
 		_tourDataList.add(null);
 	}
 
-	public void setLegendProvider(final IMapColorProvider iLegendProvider) {
-		if (iLegendProvider != null) {
-			_legendProvider = iLegendProvider;
+	public void setMapColorProvider(final IMapColorProvider mapColorProvider) {
+		if (mapColorProvider != null) {
+			_mapColorProvider = mapColorProvider;
 		}
 	}
 

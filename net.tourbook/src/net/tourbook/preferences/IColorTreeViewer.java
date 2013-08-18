@@ -23,6 +23,6 @@ public interface IColorTreeViewer {
 
 	TreeViewer getTreeViewer();
 
-	IGradientColors getLegendProvider();
+	IGradientColors getMapLegendColorProvider();
 
 }
