@@ -33,15 +33,17 @@ public class TourTrackConfig {
 	private static final String				STATE_IS_SHOW_TRACK_POSITION	= "STATE_IS_SHOW_TRACK_POSITION";		//$NON-NLS-1$
 	private static final String				STATE_INTERIOR_COLOR			= "STATE_INTERIOR_COLOR";				//$NON-NLS-1$
 	private static final String				STATE_INTERIOR_COLOR_HOVERED	= "STATE_INTERIOR_COLOR_HOVERED";		//$NON-NLS-1$
+	private static final String				STATE_INTERIOR_COLOR_HOV_SEL	= "STATE_INTERIOR_COLOR_HOV_SEL";		//$NON-NLS-1$
 	private static final String				STATE_INTERIOR_COLOR_SELECTED	= "STATE_INTERIOR_COLOR_SELECTED";		//$NON-NLS-1$
 	private static final String				STATE_INTERIOR_OPACITY			= "STATE_INTERIOR_OPACITY";			//$NON-NLS-1$
 	private static final String				STATE_INTERIOR_OPACITY_HOVERED	= "STATE_INTERIOR_OPACITY_HOVERED";	//$NON-NLS-1$
+	private static final String				STATE_INTERIOR_OPACITY_HOV_SEL	= "STATE_INTERIOR_OPACITY_HOV_SEL";	//$NON-NLS-1$
 	private static final String				STATE_INTERIOR_OPACITY_SELECTED	= "STATE_INTERIOR_OPACITY_SELECTED";	//$NON-NLS-1$
 	private static final String				STATE_NUMBER_OF_SUB_SEGMENTS	= "STATE_NUMBER_OF_SUB_SEGMENTS";		//$NON-NLS-1$
-	private static final String				STATE_OUTLINE_COLOR				= "STATE_OUTLINE_COLOR";				//$NON-NLS-1$
+	private static final String				STATE_OUTLINE_COLOR_HOV_SEL		= "STATE_OUTLINE_COLOR_HOV_SEL";		//$NON-NLS-1$
 	private static final String				STATE_OUTLINE_COLOR_HOVERED		= "STATE_OUTLINE_COLOR_HOVERED";		//$NON-NLS-1$
 	private static final String				STATE_OUTLINE_COLOR_SELECTED	= "STATE_OUTLINE_COLOR_SELECTED";		//$NON-NLS-1$
-	private static final String				STATE_OUTLINE_OPACITY			= "STATE_OUTLINE_OPACITY";				//$NON-NLS-1$
+	private static final String				STATE_OUTLINE_OPACITY_HOV_SEL	= "STATE_OUTLINE_OPACITY_HOV_SEL";		//$NON-NLS-1$
 	private static final String				STATE_OUTLINE_OPACITY_HOVERED	= "STATE_OUTLINE_OPACITY_HOVERED";		//$NON-NLS-1$
 	private static final String				STATE_OUTLINE_OPACITY_SELECTED	= "STATE_OUTLINE_OPACITY_SELECTED";	//$NON-NLS-1$
 	private static final String				STATE_OUTLINE_WIDTH				= "STATE_OUTLINE_WIDTH";				//$NON-NLS-1$
@@ -63,13 +65,13 @@ public class TourTrackConfig {
 //																			};
 
 	public static final int					PATH_RESOLUTION_ALL_POSITIONS	= 0;
-	public static final int					PATH_RESOLUTION_MULTI_ALL		= 1;
-	public static final int					PATH_RESOLUTION_MULTI_VIEWPORT	= 2;
+	public static final int					PATH_RESOLUTION_OPTIMIZED		= 1;
+	public static final int					PATH_RESOLUTION_VIEWPORT	= 2;
 
 	public static final PathResolution[]	PATH_RESOLUTION					= {
-			new PathResolution(Messages.Track_Config_Path_Resolution_All, PATH_RESOLUTION_ALL_POSITIONS),
-			new PathResolution(Messages.Track_Config_Path_Resolution_Fewer, PATH_RESOLUTION_MULTI_ALL),//
-			new PathResolution(Messages.Track_Config_Path_Resolution_Viewport, PATH_RESOLUTION_MULTI_VIEWPORT),//
+			new PathResolution(Messages.Track_Config_Path_Resolution_High, PATH_RESOLUTION_ALL_POSITIONS),
+			new PathResolution(Messages.Track_Config_Path_Resolution_Optimized, PATH_RESOLUTION_OPTIMIZED),//
+			new PathResolution(Messages.Track_Config_Path_Resolution_Viewport, PATH_RESOLUTION_VIEWPORT),//
 																			//
 																			};
 
@@ -102,17 +104,19 @@ public class TourTrackConfig {
 
 	public RGB								interiorColor;
 	public RGB								interiorColorHovered;
+	public RGB								interiorColorHovSel;
 	public RGB								interiorColorSelected;
 	public double							interiorOpacity;
 	public double							interiorOpacityHovered;
+	public double							interiorOpacityHovSel;
 	public double							interiorOpacitySelected;
 
-	public RGB								outlineColor;
-	public RGB								outlineColorSelected;
 	public RGB								outlineColorHovered;
-	public double							outlineOpacity;
-	public double							outlineOpacitySelected;
+	public RGB								outlineColorHovSel;
+	public RGB								outlineColorSelected;
 	public double							outlineOpacityHovered;
+	public double							outlineOpacityHovSel;
+	public double							outlineOpacitySelected;
 
 	public double							outlineWidth;
 
@@ -211,17 +215,18 @@ public class TourTrackConfig {
 
 		final RGB defaultRGB = new RGB(0xFF, 0xFF, 0x0);
 		final RGB hoveredRGB = new RGB(0x0, 0xFF, 0xff);
+		final RGB hovSelRGB = new RGB(0x0, 0x80, 0x80);
 		final RGB selectedRGB = new RGB(0xFF, 0x0, 0xff);
 
 //		final RGB interiorRGB = new RGB(0xff, 0xff, 0xff);
 
-		pathResolution = Util.getStateInt(state, STATE_PATH_RESOLUTION, PATH_RESOLUTION_ALL_POSITIONS);
+		pathResolution = Util.getStateInt(state, STATE_PATH_RESOLUTION, PATH_RESOLUTION_OPTIMIZED);
 
 		outlineWidth = Util.getStateDouble(state, STATE_OUTLINE_WIDTH, 1.0);
-		outlineColor = Util.getStateColor(state, STATE_OUTLINE_COLOR, defaultRGB);
+		outlineColorHovSel = Util.getStateColor(state, STATE_OUTLINE_COLOR_HOV_SEL, defaultRGB);
 		outlineColorHovered = Util.getStateColor(state, STATE_OUTLINE_COLOR_HOVERED, hoveredRGB);
 		outlineColorSelected = Util.getStateColor(state, STATE_OUTLINE_COLOR_SELECTED, selectedRGB);
-		outlineOpacity = Util.getStateDouble(state, STATE_OUTLINE_OPACITY, 0.5);
+		outlineOpacityHovSel = Util.getStateDouble(state, STATE_OUTLINE_OPACITY_HOV_SEL, 0.5);
 		outlineOpacityHovered = Util.getStateDouble(state, STATE_OUTLINE_OPACITY_HOVERED, 0.5);
 		outlineOpacitySelected = Util.getStateDouble(state, STATE_OUTLINE_OPACITY_SELECTED, 0.5);
 
@@ -240,9 +245,11 @@ public class TourTrackConfig {
 		isExtrudePath = Util.getStateBoolean(state, STATE_IS_EXTRUDE_PATH, true);
 		interiorColor = Util.getStateColor(state, STATE_INTERIOR_COLOR, defaultRGB);
 		interiorColorHovered = Util.getStateColor(state, STATE_INTERIOR_COLOR_HOVERED, hoveredRGB);
+		interiorColorHovSel = Util.getStateColor(state, STATE_INTERIOR_COLOR_HOV_SEL, hovSelRGB);
 		interiorColorSelected = Util.getStateColor(state, STATE_INTERIOR_COLOR_SELECTED, selectedRGB);
 		interiorOpacity = Util.getStateDouble(state, STATE_INTERIOR_OPACITY, 0.0);
 		interiorOpacityHovered = Util.getStateDouble(state, STATE_INTERIOR_OPACITY_HOVERED, 0.2);
+		interiorOpacityHovSel = Util.getStateDouble(state, STATE_INTERIOR_OPACITY_HOV_SEL, 0.2);
 		interiorOpacitySelected = Util.getStateDouble(state, STATE_INTERIOR_OPACITY_SELECTED, 0.2);
 
 		// verticals
@@ -258,10 +265,10 @@ public class TourTrackConfig {
 		state.put(STATE_PATH_RESOLUTION, pathResolution);
 
 		state.put(STATE_OUTLINE_WIDTH, outlineWidth);
-		state.put(STATE_OUTLINE_OPACITY, outlineOpacity);
+		state.put(STATE_OUTLINE_OPACITY_HOV_SEL, outlineOpacityHovSel);
 		state.put(STATE_OUTLINE_OPACITY_HOVERED, outlineOpacityHovered);
 		state.put(STATE_OUTLINE_OPACITY_SELECTED, outlineOpacitySelected);
-		Util.setState(state, STATE_OUTLINE_COLOR, outlineColor);
+		Util.setState(state, STATE_OUTLINE_COLOR_HOV_SEL, outlineColorHovSel);
 		Util.setState(state, STATE_OUTLINE_COLOR_HOVERED, outlineColorHovered);
 		Util.setState(state, STATE_OUTLINE_COLOR_SELECTED, outlineColorSelected);
 
@@ -275,9 +282,11 @@ public class TourTrackConfig {
 
 		state.put(STATE_INTERIOR_OPACITY, interiorOpacity);
 		state.put(STATE_INTERIOR_OPACITY_HOVERED, interiorOpacityHovered);
+		state.put(STATE_INTERIOR_OPACITY_HOV_SEL, interiorOpacityHovSel);
 		state.put(STATE_INTERIOR_OPACITY_SELECTED, interiorOpacitySelected);
 		Util.setState(state, STATE_INTERIOR_COLOR, interiorColor);
 		Util.setState(state, STATE_INTERIOR_COLOR_HOVERED, interiorColorHovered);
+		Util.setState(state, STATE_INTERIOR_COLOR_HOV_SEL, interiorColorHovSel);
 		Util.setState(state, STATE_INTERIOR_COLOR_SELECTED, interiorColorSelected);
 
 		state.put(STATE_IS_SHOW_TRACK_POSITION, isShowTrackPosition);

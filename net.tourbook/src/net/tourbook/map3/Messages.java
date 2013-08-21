@@ -92,6 +92,8 @@ public class Messages extends NLS {
 	public static String		TourTrack_Properties_Label_CurtainColor;
 
 	public static String	TourTrack_Properties_Label_CurtainColorHovered;
+
+	public static String	TourTrack_Properties_Label_CurtainColorHovSel;
 	public static String		TourTrack_Properties_Label_CurtainColorSelected;
 	public static String		TourTrack_Properties_Label_CurtainOpacity;
 	public static String		TourTrack_Properties_Label_DialogTitle;
@@ -99,10 +101,12 @@ public class Messages extends NLS {
 	public static String		TourTrack_Properties_Label_LineOpacitySelected;
 	public static String		TourTrack_Properties_Label_NumberOfSubSegments;
 	public static String		TourTrack_Properties_Label_NumberOfSubSegments_Tooltip;
-	public static String		TourTrack_Properties_Label_OutlineColorDefault;
-	public static String		TourTrack_Properties_Label_OutlineColorDefault_Tooltip;
 	public static String		TourTrack_Properties_Label_OutlineColorHovered;
 	public static String		TourTrack_Properties_Label_OutlineColorHovered_Tooltip;
+
+	public static String	TourTrack_Properties_Label_OutlineColorHovSel;
+
+	public static String	TourTrack_Properties_Label_OutlineColorHovSel_Tooltip;
 	public static String		TourTrack_Properties_Label_OutlineColorSelected;
 	public static String		TourTrack_Properties_Label_OutlineColorSelected_Tooltip;
 	public static String		TourTrack_Properties_Label_OutlineWidth;
@@ -113,6 +117,10 @@ public class Messages extends NLS {
 
 	public static String		TourTrack_Properties_Label_PathType;
 	public static String		TourTrack_Properties_Label_PathType_Tooltip;
+	public static String	TourTrack_Properties_Label_TrackColor;
+
+	public static String	TourTrack_Properties_Label_TrackColor_Tooltip;
+
 	public static String		TourTrack_Properties_Label_TrackPositionSize;
 	public static String		TourTrack_Properties_Label_TrackPositionSize_Tooltip;
 	public static String		TourTrack_Properties_Label_TrackPositionThreshold;
@@ -121,9 +129,9 @@ public class Messages extends NLS {
 	public static String		Track_Config_Altitude_Mode_Absolute;
 	public static String		Track_Config_Altitude_Mode_ClampToGround;
 	public static String		Track_Config_Altitude_Mode_RelativeToGround;
-	public static String	Track_Config_Path_Resolution_All;
+	public static String	Track_Config_Path_Resolution_High;
 
-	public static String	Track_Config_Path_Resolution_Fewer;
+	public static String	Track_Config_Path_Resolution_Optimized;
 
 	public static String	Track_Config_Path_Resolution_Viewport;
 

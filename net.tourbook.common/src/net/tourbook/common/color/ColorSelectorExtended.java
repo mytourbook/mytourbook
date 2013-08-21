@@ -21,7 +21,10 @@ import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.swt.widgets.Composite;
 
 /**
- * Extends the {@link ColorSelector}
+ * Extends the {@link ColorSelector} with an open & close listener, which is fired when the dialog
+ * is opened or closes.
+ * <p>
+ * This can be used to keep parent dialog opened when the color selector dialog is opened.
  */
 public class ColorSelectorExtended extends ColorSelector {
 
@@ -36,15 +39,19 @@ public class ColorSelectorExtended extends ColorSelector {
 	}
 
 	/**
-	 * fire a selection event for this tour chart
+	 * Fire an open event that the dialog is opened or closes.
 	 */
 	private void fireOpenEvent(final boolean isOpened) {
+
 		final Object[] listeners = _openListeners.getListeners();
-		for (final Object listener2 : listeners) {
-			final IColorSelectorListener listener = (IColorSelectorListener) listener2;
+
+		for (final Object listener : listeners) {
+
+			final IColorSelectorListener colorSelectorListener = (IColorSelectorListener) listener;
+
 			SafeRunnable.run(new SafeRunnable() {
 				public void run() {
-					listener.colorDialogOpened(isOpened);
+					colorSelectorListener.colorDialogOpened(isOpened);
 				}
 			});
 		}

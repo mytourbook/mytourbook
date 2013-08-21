@@ -17,25 +17,29 @@ package net.tourbook.map3.layer.tourtrack;
 
 import gov.nasa.worldwind.geom.Position;
 import gov.nasa.worldwind.render.DrawContext;
+import gov.nasa.worldwind.render.MultiResolutionPath;
+import gov.nasa.worldwind.render.Path;
 
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.tourbook.map3.shape.MTMultiResolutionPath;
-
-public class TrackPathResolutionFewer extends MTMultiResolutionPath implements ITrackPath {
+public class TrackPathViewport extends MultiResolutionPath implements ITrackPath {
 
 	private TourTrack	_tourTrack;
 
-	public TrackPathResolutionFewer(final ArrayList<TourMap3Position> trackPositions) {
-
+	public TrackPathViewport(final ArrayList<TourMap3Position> trackPositions) {
 		super(trackPositions);
 	}
 
 	@Override
 	protected Color getColor(final Position pos, final Integer ordinal) {
 		return _tourTrack.getColor(pos, ordinal);
+	}
+
+	@Override
+	public Path getPath() {
+		return this;
 	}
 
 	@Override
@@ -46,6 +50,11 @@ public class TrackPathResolutionFewer extends MTMultiResolutionPath implements I
 	@Override
 	public List<Color> getPathTessellatedColors() {
 		return getCurrentPathData().getTessellatedColors();
+	}
+
+	@Override
+	public TourTrack getTourTrack() {
+		return _tourTrack;
 	}
 
 	@Override
@@ -66,7 +75,7 @@ public class TrackPathResolutionFewer extends MTMultiResolutionPath implements I
 	@Override
 	public void setPicked(final boolean isPicked, final Integer pickPositionIndex) {
 
-		_tourTrack.setPicked(isPicked, pickPositionIndex);
+		_tourTrack.setHovered(isPicked, pickPositionIndex);
 
 		if (isPicked == false) {
 

@@ -32,10 +32,12 @@ public class TourTrack {
 
 	private TourData			_tourData;
 	private TourMap3Position[]	_trackPositions;
-	private IMapColorProvider		_colorProvider;
-	private boolean				_isTourTrackPicked;
+	private IMapColorProvider	_colorProvider;
 
-	private int					_tourTrackPickIndex;
+	private boolean				_isHovered;
+	private boolean				_isSelected;
+
+	private int					_tourTrackHoverIndex;
 
 	private PositionColors		_originalPositionColors;
 
@@ -53,7 +55,7 @@ public class TourTrack {
 
 	Color getColor(final Position pos, final Integer ordinal) {
 
-		if (_isTourTrackPicked) {
+		if (_isHovered) {
 
 			// prevent setting position colors
 			return null;
@@ -70,8 +72,8 @@ public class TourTrack {
 				return tourPosColors.getGradientColor(
 						trackPosition.dataSerieValue,
 						ordinal,
-						_isTourTrackPicked,
-						_tourTrackPickIndex);
+						_isHovered,
+						_tourTrackHoverIndex);
 
 			} else if (_colorProvider instanceof IDiscreteColors) {
 
@@ -86,19 +88,31 @@ public class TourTrack {
 		return null;
 	}
 
-	public void setPicked(final boolean isTourTrackedPicked, final Integer pickIndex) {
+	public TourData getTourData() {
+		return _tourData;
+	}
 
-		_isTourTrackPicked = isTourTrackedPicked;
+	boolean isHovered() {
+		return _isHovered;
+	}
 
-		if (pickIndex == null) {
-			_tourTrackPickIndex = -1;
+	boolean isSelected() {
+		return _isSelected;
+	}
+
+	void setHovered(final boolean isHovered, final Integer hoveredTrackIndex) {
+
+		_isHovered = isHovered;
+
+		if (hoveredTrackIndex == null) {
+			_tourTrackHoverIndex = -1;
 		} else {
-			_tourTrackPickIndex = pickIndex;
+			_tourTrackHoverIndex = hoveredTrackIndex;
 		}
 
-		if (isTourTrackedPicked) {
+		if (isHovered || _isSelected) {
 
-			// tour IS picked
+			// tour IS hovered or selected
 
 			_trackPath.resetPathTessellatedColors();
 
@@ -113,13 +127,17 @@ public class TourTrack {
 
 		} else {
 
-			// tour is NOT picked
+			// tour is NOT hovered or selected
 
 			if (_originalPositionColors != null) {
 
 				_trackPath.setPathPositionColors(_originalPositionColors);
 			}
 		}
+	}
+
+	void setSelected(final boolean isSelected) {
+		_isSelected = isSelected;
 	}
 
 	@Override
@@ -130,4 +148,5 @@ public class TourTrack {
 				//
 		;
 	}
+
 }

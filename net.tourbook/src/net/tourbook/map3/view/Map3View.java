@@ -32,8 +32,10 @@ import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.color.IMapColorProvider;
 import net.tourbook.common.color.MapColorId;
+import net.tourbook.common.util.PostSelectionProvider;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
+import net.tourbook.extension.export.ActionExport;
 import net.tourbook.map2.view.TourMapColors;
 import net.tourbook.map3.action.ActionMapColor;
 import net.tourbook.map3.action.ActionOpenMap3LayerView;
@@ -42,9 +44,13 @@ import net.tourbook.map3.action.ActionShowTourInMap3;
 import net.tourbook.map3.action.ActionSyncMapPositionWithSlider;
 import net.tourbook.map3.action.ActionSyncMapViewWithTour;
 import net.tourbook.map3.action.ActionTourColor;
+import net.tourbook.map3.layer.tourtrack.ITrackPath;
 import net.tourbook.map3.layer.tourtrack.TourMap3Position;
 import net.tourbook.map3.layer.tourtrack.TourTrackLayer;
 import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.printing.ActionPrint;
+import net.tourbook.tour.ActionOpenAdjustAltitudeDialog;
+import net.tourbook.tour.ActionOpenMarkerDialog;
 import net.tourbook.tour.ITourEventListener;
 import net.tourbook.tour.SelectionTourData;
 import net.tourbook.tour.SelectionTourId;
@@ -52,6 +58,10 @@ import net.tourbook.tour.SelectionTourIds;
 import net.tourbook.tour.TourEvent;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
+import net.tourbook.ui.ITourProvider;
+import net.tourbook.ui.action.ActionEditQuick;
+import net.tourbook.ui.action.ActionEditTour;
+import net.tourbook.ui.action.ActionOpenTour;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ActionContributionItem;
@@ -77,9 +87,9 @@ import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.part.ViewPart;
 
 /**
- * Display 3-D Map
+ * Display 3-D map with tour tracks.
  */
-public class Map3View extends ViewPart {
+public class Map3View extends ViewPart implements ITourProvider {
 
 	public static final String					ID										= "net.tourbook.map3.view.Map3ViewId";		//$NON-NLS-1$
 
@@ -112,12 +122,24 @@ public class Map3View extends ViewPart {
 	private ActionTourColor						_actionTourColorPace;
 	private ActionTourColor						_actionTourColorHrZone;
 
+	// context menu actions
+	private ActionEditQuick						_actionEditQuick;
+	private ActionEditTour						_actionEditTour;
+	private ActionExport						_actionExportTour;
+	private ActionOpenAdjustAltitudeDialog		_actionOpenAdjustAltitudeDialog;
+	private ActionOpenMarkerDialog				_actionOpenMarkerDialog;
+	private ActionOpenTour						_actionOpenTour;
+	private ActionPrint							_actionPrintTour;
+
+	private PostSelectionProvider				_postSelectionProvider;
+
 	private IPartListener2						_partListener;
 	private ISelectionListener					_postSelectionListener;
 	private IPropertyChangeListener				_prefChangeListener;
 	private ITourEventListener					_tourEventListener;
 	private MouseAdapter						_map3MouseListener;
 
+	private boolean								_isPartActive;
 	private boolean								_isPartVisible;
 	private boolean								_isRestored;
 	private ISelection							_lastHiddenSelection;
@@ -126,22 +148,35 @@ public class Map3View extends ViewPart {
 	private boolean								_isSyncMapViewWithTour;
 	private boolean								_isTourVisible;
 
+	private static int							_renderCounter;
+
 	/**
 	 * Contains all tours which are displayed in the map.
 	 */
 	private ArrayList<TourData>					_allTours								= new ArrayList<TourData>();
 
-	private Composite							_mapContainer;
-
+	/**
+	 * Color id for the currently displayed tour tracks.
+	 */
 	private MapColorId							_tourColorId;
 
+	/*
+	 * UI controls
+	 */
+	private Composite							_mapContainer;
 	private Frame								_awtFrame;
 
 	private Menu								_contextMenu;
 
-	private static int							_renderCounter;
-
 	public Map3View() {}
+
+	void actionOpenTrackColorDialog() {
+
+		// set color before menu is filled, this sets the action image and color provider
+		_actionMapColor.setColorId(_tourColorId);
+
+		_actionMapColor.run();
+	}
 
 	public void actionSetMapColor(final MapColorId colorId) {
 
@@ -197,7 +232,11 @@ public class Map3View extends ViewPart {
 
 		_partListener = new IPartListener2() {
 			@Override
-			public void partActivated(final IWorkbenchPartReference partRef) {}
+			public void partActivated(final IWorkbenchPartReference partRef) {
+				if (partRef.getPart(false) == Map3View.this) {
+					_isPartActive = true;
+				}
+			}
 
 			@Override
 			public void partBroughtToTop(final IWorkbenchPartReference partRef) {}
@@ -210,7 +249,11 @@ public class Map3View extends ViewPart {
 			}
 
 			@Override
-			public void partDeactivated(final IWorkbenchPartReference partRef) {}
+			public void partDeactivated(final IWorkbenchPartReference partRef) {
+				if (partRef.getPart(false) == Map3View.this) {
+					_isPartActive = false;
+				}
+			}
 
 			@Override
 			public void partHidden(final IWorkbenchPartReference partRef) {
@@ -276,6 +319,7 @@ public class Map3View extends ViewPart {
 			public void selectionChanged(final IWorkbenchPart part, final ISelection selection) {
 
 				if (part == Map3View.this) {
+					// ignore own selections
 					return;
 				}
 
@@ -323,7 +367,6 @@ public class Map3View extends ViewPart {
 		TourManager.getInstance().addTourEventListener(_tourEventListener);
 	}
 
-
 	private void clearView() {
 
 		_allTours.clear();
@@ -348,6 +391,16 @@ public class Map3View extends ViewPart {
 		_actionTourColorPulse = ActionTourColor.createAction(this, MapColorId.Pulse);
 		_actionTourColorSpeed = ActionTourColor.createAction(this, MapColorId.Speed);
 		_actionTourColorHrZone = ActionTourColor.createAction(this, MapColorId.HrZone);
+
+		// context menu actions
+		_actionEditQuick = new ActionEditQuick(this);
+		_actionEditTour = new ActionEditTour(this);
+		_actionExportTour = new ActionExport(this);
+		_actionOpenAdjustAltitudeDialog = new ActionOpenAdjustAltitudeDialog(this);
+		_actionOpenMarkerDialog = new ActionOpenMarkerDialog(this, true);
+		_actionOpenTour = new ActionOpenTour(this);
+		_actionPrintTour = new ActionPrint(this);
+
 	}
 
 	/**
@@ -387,6 +440,9 @@ public class Map3View extends ViewPart {
 
 		createActions(parent);
 		fillActionBars();
+
+		// set selection provider
+		getSite().setSelectionProvider(_postSelectionProvider = new PostSelectionProvider(ID));
 
 //		getViewSite().registerContextMenu(menuManager, selectionProvider)
 
@@ -448,6 +504,7 @@ public class Map3View extends ViewPart {
 		Map3Manager.setMap3View(null);
 
 		_prefStore.removePropertyChangeListener(_prefChangeListener);
+
 		getViewSite().getPage().removePostSelectionListener(_postSelectionListener);
 		getViewSite().getPage().removePartListener(_partListener);
 
@@ -483,6 +540,21 @@ public class Map3View extends ViewPart {
 		 */
 	}
 
+	private void enableContextMenuActions() {
+
+		final ITrackPath selectedTrack = Map3Manager.getTourTrackLayer().getSelectedTrack();
+		final boolean isTourSelected = selectedTrack != null;
+
+		_actionEditQuick.setEnabled(isTourSelected);
+		_actionEditTour.setEnabled(isTourSelected);
+		_actionOpenMarkerDialog.setEnabled(isTourSelected);
+		_actionOpenAdjustAltitudeDialog.setEnabled(isTourSelected);
+		_actionOpenTour.setEnabled(isTourSelected);
+		_actionExportTour.setEnabled(isTourSelected);
+		_actionPrintTour.setEnabled(isTourSelected);
+
+	}
+
 	private void fillActionBars() {
 
 		/*
@@ -511,21 +583,62 @@ public class Map3View extends ViewPart {
 
 	private void fillContextMenu(final Menu menu) {
 
-		// set color before menu is filled, this sets the action image
+		fillMenuItem(menu, _actionEditQuick);
+		fillMenuItem(menu, _actionEditTour);
+		fillMenuItem(menu, _actionOpenMarkerDialog);
+		fillMenuItem(menu, _actionOpenAdjustAltitudeDialog);
+		fillMenuItem(menu, _actionOpenTour);
+
+//		_tagMenuMgr.fillTagMenu(menuMgr);
+//
+//		// tour type actions
+//		fillMenuItem(menu, new Separator());
+//		fillMenuItem(menu, _actionSetTourType);
+//		TourTypeMenuManager.fillMenuWithRecentTourTypes(menuMgr, this, true);
+
+		(new Separator()).fill(menu, -1);
+		fillMenuItem(menu, _actionExportTour);
+		fillMenuItem(menu, _actionPrintTour);
+
+		// set color before menu is filled, this sets the action image and color id
 		_actionMapColor.setColorId(_tourColorId);
 
 		if (_tourColorId != MapColorId.HrZone) {
 
 			// hr zone has a different color provider and is not yet supported
 
+			(new Separator()).fill(menu, -1);
 			fillMenuItem(menu, _actionMapColor);
 		}
+
+		enableContextMenuActions();
 	}
 
 	private void fillMenuItem(final Menu menu, final Action action) {
 
 		final ActionContributionItem item = new ActionContributionItem(action);
 		item.fill(menu, -1);
+	}
+
+	@Override
+	public ArrayList<TourData> getSelectedTours() {
+
+		final ITrackPath selectedTrack = Map3Manager.getTourTrackLayer().getSelectedTrack();
+
+		if (selectedTrack != null) {
+
+			final ArrayList<TourData> selectedTours = new ArrayList<TourData>();
+
+			selectedTours.add(selectedTrack.getTourTrack().getTourData());
+
+			return selectedTours;
+		}
+
+		return null;
+	}
+
+	MapColorId getTrackColorId() {
+		return _tourColorId;
 	}
 
 	private void onMouseClick(final MouseEvent mouseEvent) {
@@ -909,6 +1022,25 @@ public class Map3View extends ViewPart {
 
 	@Override
 	public void setFocus() {
+
+	}
+
+	public void setSelection(final ISelection selection) {
+
+		// run in SWT thread
+		_mapContainer.getDisplay().asyncExec(new Runnable() {
+			public void run() {
+
+				if (_isPartActive == false) {
+
+					// activate this view, otherwise the selection provider is not working
+
+					Util.showView(ID, true);
+				}
+
+				_postSelectionProvider.setSelection(selection);
+			}
+		});
 
 	}
 

@@ -17,24 +17,30 @@ package net.tourbook.map3.layer.tourtrack;
 
 import gov.nasa.worldwind.geom.Position;
 import gov.nasa.worldwind.render.DrawContext;
-import gov.nasa.worldwind.render.MultiResolutionPath;
+import gov.nasa.worldwind.render.Path;
 
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TrackPathResolutionViewport extends MultiResolutionPath implements ITrackPath {
+import net.tourbook.map3.shape.MTMultiResolutionPath;
+
+public class TrackPathOptimized extends MTMultiResolutionPath implements ITrackPath {
 
 	private TourTrack	_tourTrack;
 
-	public TrackPathResolutionViewport(final ArrayList<TourMap3Position> trackPositions) {
-
+	public TrackPathOptimized(final ArrayList<TourMap3Position> trackPositions) {
 		super(trackPositions);
 	}
 
 	@Override
 	protected Color getColor(final Position pos, final Integer ordinal) {
 		return _tourTrack.getColor(pos, ordinal);
+	}
+
+	@Override
+	public Path getPath() {
+		return this;
 	}
 
 	@Override
@@ -48,6 +54,11 @@ public class TrackPathResolutionViewport extends MultiResolutionPath implements 
 	}
 
 	@Override
+	public TourTrack getTourTrack() {
+		return _tourTrack;
+	}
+
+	@Override
 	public void resetPathTessellatedColors() {
 		getCurrentPathData().setTessellatedColors(null);
 	}
@@ -58,22 +69,41 @@ public class TrackPathResolutionViewport extends MultiResolutionPath implements 
 	}
 
 	@Override
-	public void setPathPositionColors(final PositionColors positionColors) {
-		this.positionColors = positionColors;
+	public void setPathPositionColors(final PositionColors newPositionColors) {
+		positionColors = newPositionColors;
 	}
 
 	@Override
-	public void setPicked(final boolean isPicked, final Integer pickPositionIndex) {
+	public void setPicked(final boolean isHovered, final Integer pickPositionIndex) {
 
-		_tourTrack.setPicked(isPicked, pickPositionIndex);
+		_tourTrack.setHovered(isHovered, pickPositionIndex);
 
-		if (isPicked == false) {
+//		System.out.println(UI.timeStampNano()
+//				+ " ["
+//				+ getClass().getSimpleName()
+//				+ "]  "
+//				+ _tourTrack
+//				+ "\tisHovered="
+//				+ isHovered
+//				+ "\tisSelected="
+//				+ _tourTrack.isSelected());
+//		// TODO remove SYSTEM.OUT.PRINTLN
+
+		if (isHovered == false && _tourTrack.isSelected() == false) {
 
 			/*
-			 * This hack prevents an tess color NPE, it took me many days to understand 3D drawing
+			 * This hack prevents a tess color NPE, it took me many days to understand 3D drawing
 			 * and find this "solution".
 			 */
 			getCurrentPathData().setTessellatedPositions(null);
+
+//			System.out.println(UI.timeStampNano()
+//					+ " ["
+//					+ getClass().getSimpleName()
+//					+ "] "
+//					+ _tourTrack
+//					+ "\tset tess pos = null");
+//			// TODO remove SYSTEM.OUT.PRINTLN
 		}
 
 		// after picking, ensure that the positions colors are set again

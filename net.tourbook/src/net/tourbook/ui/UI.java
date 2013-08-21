@@ -122,6 +122,16 @@ public class UI {
 
 	public static final String								IS_NOT_INITIALIZED				= "IS NOT INITIALIZED";						//$NON-NLS-1$
 
+	public static final String								GRAPH_ALTIMETER					= "GRAPH_ALTIMETER";							//$NON-NLS-1$
+	public static final String								GRAPH_ALTITUDE					= "GRAPH_ALTITUDE";							//$NON-NLS-1$
+	public static final String								GRAPH_CADENCE					= "GRAPH_CADENCE";								//$NON-NLS-1$
+	public static final String								GRAPH_GRADIENT					= "GRAPH_GRADIENT";							//$NON-NLS-1$
+	public static final String								GRAPH_PACE						= "GRAPH_PACE";								//$NON-NLS-1$
+	public static final String								GRAPH_POWER						= "GRAPH_POWER";								//$NON-NLS-1$
+	public static final String								GRAPH_PULSE						= "GRAPH_PULSE";								//$NON-NLS-1$
+	public static final String								GRAPH_SPEED						= "GRAPH_SPEED";								//$NON-NLS-1$
+	public static final String								GRAPH_TEMPERATURE				= "GRAPH_TEMPERATURE";							//$NON-NLS-1$
+
 	public static final String								VIEW_COLOR_CATEGORY				= "view.color.category";						//$NON-NLS-1$
 	public static final String								VIEW_COLOR_TITLE				= "view.color.title";							//$NON-NLS-1$
 	public static final String								VIEW_COLOR_SUB					= "view.color.sub";							//$NON-NLS-1$
@@ -248,9 +258,22 @@ public class UI {
 		setViewColorsFromPrefStore();
 
 		/*
-		 * load images into the image registry
+		 * load often used images into the image registry
 		 */
 		IMAGE_REGISTRY = TourbookPlugin.getDefault().getImageRegistry();
+
+		/*
+		 * Chart and map graphs.
+		 */
+		IMAGE_REGISTRY.put(GRAPH_ALTIMETER, TourbookPlugin.getImageDescriptor(Messages.Image__graph_altimeter));
+		IMAGE_REGISTRY.put(GRAPH_ALTITUDE, TourbookPlugin.getImageDescriptor(Messages.Image__graph_altitude));
+		IMAGE_REGISTRY.put(GRAPH_CADENCE, TourbookPlugin.getImageDescriptor(Messages.Image__graph_cadence));
+		IMAGE_REGISTRY.put(GRAPH_GRADIENT, TourbookPlugin.getImageDescriptor(Messages.Image__graph_gradient));
+		IMAGE_REGISTRY.put(GRAPH_PACE, TourbookPlugin.getImageDescriptor(Messages.Image__graph_pace));
+		IMAGE_REGISTRY.put(GRAPH_POWER, TourbookPlugin.getImageDescriptor(Messages.Image__graph_power));
+		IMAGE_REGISTRY.put(GRAPH_PULSE, TourbookPlugin.getImageDescriptor(Messages.Image__graph_heartbeat));
+		IMAGE_REGISTRY.put(GRAPH_SPEED, TourbookPlugin.getImageDescriptor(Messages.Image__graph_speed));
+		IMAGE_REGISTRY.put(GRAPH_TEMPERATURE, TourbookPlugin.getImageDescriptor(Messages.Image__graph_temperature));
 
 		// tour type images
 		IMAGE_REGISTRY.put(IMAGE_TOUR_TYPE_FILTER, //
@@ -792,6 +815,32 @@ public class UI {
 		}
 
 		return _timeFormatterShort;
+	}
+
+	public static Image getGraphImage(final MapColorId mapColorId) {
+
+		switch (mapColorId) {
+		case Altitude:
+			return IMAGE_REGISTRY.get(GRAPH_ALTITUDE);
+
+		case Gradient:
+			return IMAGE_REGISTRY.get(GRAPH_GRADIENT);
+
+		case Pace:
+			return IMAGE_REGISTRY.get(GRAPH_PACE);
+
+		case Pulse:
+			return IMAGE_REGISTRY.get(GRAPH_PULSE);
+
+		case Speed:
+			return IMAGE_REGISTRY.get(GRAPH_SPEED);
+
+		case HrZone:
+			// this is not yet supported
+
+		default:
+			return IMAGE_REGISTRY.get(GRAPH_ALTITUDE);
+		}
 	}
 
 	public static ImageDescriptor getGraphImageDescriptor(final MapColorId mapColorId) {

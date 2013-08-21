@@ -37,15 +37,12 @@ import net.tourbook.proxy.IPreferences;
 import net.tourbook.tag.TagMenuManager;
 import net.tourbook.tour.TourTypeMenuManager;
 import net.tourbook.ui.UI;
-import net.tourbook.ui.tourChart.TourChart;
 import net.tourbook.ui.views.rawData.RawDataView;
 
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.jface.resource.ImageRegistry;
-import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.graphics.Point;
@@ -416,8 +413,6 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 		final IWorkbenchWindowConfigurer configurer = getWindowConfigurer();
 
 		configurer.setTitle(_appTitle);
-
-		setupImages();
 	}
 
 	@Override
@@ -515,39 +510,6 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 				onPostSelectionChanged(part, selection);
 			}
 		});
-	}
-
-	private void setupImages() {
-
-		final ImageRegistry imageRegistry = JFaceResources.getImageRegistry();
-
-		imageRegistry.put(TourChart.ACTION_ID_GRAPH_ALTIMETER, //
-				TourbookPlugin.getImageDescriptor(Messages.Image__graph_altimeter));
-
-		imageRegistry.put(TourChart.ACTION_ID_GRAPH_ALTITUDE, //
-				TourbookPlugin.getImageDescriptor(Messages.Image__graph_altitude));
-
-		imageRegistry.put(TourChart.ACTION_ID_GRAPH_CADENCE, //
-				TourbookPlugin.getImageDescriptor(Messages.Image__graph_cadence));
-
-		imageRegistry.put(TourChart.ACTION_ID_GRAPH_GRADIENT, //
-				TourbookPlugin.getImageDescriptor(Messages.Image__graph_gradient));
-
-		imageRegistry.put(TourChart.ACTION_ID_GRAPH_PACE, //
-				TourbookPlugin.getImageDescriptor(Messages.Image__graph_pace));
-
-		imageRegistry.put(TourChart.ACTION_ID_GRAPH_POWER, //
-				TourbookPlugin.getImageDescriptor(Messages.Image__graph_power));
-
-		imageRegistry.put(TourChart.ACTION_ID_GRAPH_PULSE, //
-				TourbookPlugin.getImageDescriptor(Messages.Image__graph_heartbeat));
-
-		imageRegistry.put(TourChart.ACTION_ID_GRAPH_SPEED, //
-				TourbookPlugin.getImageDescriptor(Messages.Image__graph_speed));
-
-		imageRegistry.put(TourChart.ACTION_ID_GRAPH_TEMPERATURE, //
-				TourbookPlugin.getImageDescriptor(Messages.Image__graph_temperature));
-
 	}
 
 	/**

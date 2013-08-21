@@ -110,17 +110,6 @@ public class TourChart extends Chart {
 	public static final String		ACTION_ID_X_AXIS_DISTANCE				= "ACTION_ID_X_AXIS_DISTANCE";								//$NON-NLS-1$
 	public static final String		ACTION_ID_X_AXIS_TIME					= "ACTION_ID_X_AXIS_TIME";									//$NON-NLS-1$
 
-	public static final String		ACTION_ID_GRAPH_ALTIMETER				= "ACTION_ID_GRAPH_ALTIMETER";								//$NON-NLS-1$
-	public static final String		ACTION_ID_GRAPH_ALTITUDE				= "ACTION_ID_GRAPH_ALTITUDE";								//$NON-NLS-1$
-	public static final String		ACTION_ID_GRAPH_CADENCE					= "ACTION_ID_GRAPH_CADENCE";								//$NON-NLS-1$
-	public static final String		ACTION_ID_GRAPH_GRADIENT				= "ACTION_ID_GRAPH_GRADIENT";								//$NON-NLS-1$
-	public static final String		ACTION_ID_GRAPH_PACE					= "ACTION_ID_GRAPH_PACE";									//$NON-NLS-1$
-	public static final String		ACTION_ID_GRAPH_POWER					= "ACTION_ID_GRAPH_POWER";									//$NON-NLS-1$
-	public static final String		ACTION_ID_GRAPH_PULSE					= "ACTION_ID_GRAPH_PULSE";									//$NON-NLS-1$
-	public static final String		ACTION_ID_GRAPH_SPEED					= "ACTION_ID_GRAPH_SPEED";									//$NON-NLS-1$
-	public static final String		ACTION_ID_GRAPH_TEMPERATURE				= "ACTION_ID_GRAPH_TEMPERATURE";							//$NON-NLS-1$
-	public static final String		ACTION_ID_GRAPH_TOUR_COMPARE			= "ACTION_ID_GRAPH_TOUR_COMPARE";							//$NON-NLS-1$
-
 	public static final String		ACTION_ID_HR_ZONE_DROPDOWN_MENU			= "ACTION_ID_HR_ZONE_DROPDOWN_MENU";						//$NON-NLS-1$
 	public static final String		ACTION_ID_HR_ZONE_STYLE_GRAPH_TOP		= "ACTION_ID_HR_ZONE_STYLE_GRAPH_TOP";						//$NON-NLS-1$
 	public static final String		ACTION_ID_HR_ZONE_STYLE_NO_GRADIENT		= "ACTION_ID_HR_ZONE_STYLE_NO_GRADIENT";					//$NON-NLS-1$
@@ -1252,7 +1241,6 @@ public class TourChart extends Chart {
 
 		createTourChartActions_12_GraphAction(
 				TourManager.GRAPH_ALTITUDE,
-				ACTION_ID_GRAPH_ALTITUDE,
 				net.tourbook.common.Messages.Graph_Label_Altitude,
 				Messages.Tour_Action_graph_altitude_tooltip,
 				Messages.Image__graph_altitude,
@@ -1260,7 +1248,6 @@ public class TourChart extends Chart {
 
 		createTourChartActions_12_GraphAction(
 				TourManager.GRAPH_SPEED,
-				ACTION_ID_GRAPH_SPEED,
 				net.tourbook.common.Messages.Graph_Label_Speed,
 				Messages.Tour_Action_graph_speed_tooltip,
 				Messages.Image__graph_speed,
@@ -1268,7 +1255,6 @@ public class TourChart extends Chart {
 
 		createTourChartActions_12_GraphAction(
 				TourManager.GRAPH_PACE,
-				ACTION_ID_GRAPH_PACE,
 				net.tourbook.common.Messages.Graph_Label_Pace,
 				Messages.Tour_Action_graph_pace_tooltip,
 				Messages.Image__graph_pace,
@@ -1276,7 +1262,6 @@ public class TourChart extends Chart {
 
 		createTourChartActions_12_GraphAction(
 				TourManager.GRAPH_POWER,
-				ACTION_ID_GRAPH_POWER,
 				net.tourbook.common.Messages.Graph_Label_Power,
 				Messages.Tour_Action_graph_power_tooltip,
 				Messages.Image__graph_power,
@@ -1284,7 +1269,6 @@ public class TourChart extends Chart {
 
 		createTourChartActions_12_GraphAction(
 				TourManager.GRAPH_ALTIMETER,
-				ACTION_ID_GRAPH_ALTIMETER,
 				net.tourbook.common.Messages.Graph_Label_Altimeter,
 				Messages.Tour_Action_graph_altimeter_tooltip,
 				Messages.Image__graph_altimeter,
@@ -1292,7 +1276,6 @@ public class TourChart extends Chart {
 
 		createTourChartActions_12_GraphAction(
 				TourManager.GRAPH_PULSE,
-				ACTION_ID_GRAPH_PULSE,
 				net.tourbook.common.Messages.Graph_Label_Heartbeat,
 				Messages.Tour_Action_graph_heartbeat_tooltip,
 				Messages.Image__graph_heartbeat,
@@ -1300,7 +1283,6 @@ public class TourChart extends Chart {
 
 		createTourChartActions_12_GraphAction(
 				TourManager.GRAPH_TEMPERATURE,
-				ACTION_ID_GRAPH_TEMPERATURE,
 				net.tourbook.common.Messages.Graph_Label_Temperature,
 				Messages.Tour_Action_graph_temperature_tooltip,
 				Messages.Image__graph_temperature,
@@ -1308,7 +1290,6 @@ public class TourChart extends Chart {
 
 		createTourChartActions_12_GraphAction(
 				TourManager.GRAPH_CADENCE,
-				ACTION_ID_GRAPH_CADENCE,
 				net.tourbook.common.Messages.Graph_Label_Cadence,
 				Messages.Tour_Action_graph_cadence_tooltip,
 				Messages.Image__graph_cadence,
@@ -1316,7 +1297,6 @@ public class TourChart extends Chart {
 
 		createTourChartActions_12_GraphAction(
 				TourManager.GRAPH_GRADIENT,
-				ACTION_ID_GRAPH_GRADIENT,
 				net.tourbook.common.Messages.Graph_Label_Gradient,
 				Messages.Tour_Action_graph_gradient_tooltip,
 				Messages.Image__graph_gradient,
@@ -1324,7 +1304,6 @@ public class TourChart extends Chart {
 
 		createTourChartActions_12_GraphAction(
 				TourManager.GRAPH_TOUR_COMPARE,
-				ACTION_ID_GRAPH_TOUR_COMPARE,
 				net.tourbook.common.Messages.Graph_Label_Tour_Compare,
 				Messages.Tour_Action_graph_tour_compare_tooltip,
 				Messages.Image__graph_tour_compare,
@@ -1335,14 +1314,12 @@ public class TourChart extends Chart {
 	 * Create a graph action
 	 * 
 	 * @param graphId
-	 * @param commandId
 	 * @param label
 	 * @param toolTip
 	 * @param imageEnabled
 	 * @param imageDisabled
 	 */
 	private void createTourChartActions_12_GraphAction(	final int graphId,
-														final String commandId,
 														final String label,
 														final String toolTip,
 														final String imageEnabled,

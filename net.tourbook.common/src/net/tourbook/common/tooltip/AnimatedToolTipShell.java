@@ -530,6 +530,12 @@ public abstract class AnimatedToolTipShell {
 		return true;
 	}
 
+	/**
+	 * Is called before the tooltip is displayed.
+	 * 
+	 * @return Returns <code>true</code> when the tooltip should be opened, otherwise
+	 *         <code>false</code>.
+	 */
 	protected abstract boolean canShowToolTip();
 
 	/**

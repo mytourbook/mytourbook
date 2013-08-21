@@ -26,9 +26,13 @@ import java.util.List;
  */
 public interface ITrackPath {
 
+	Path getPath();
+
 	PositionColors getPathPositionColors();
 
 	List<Color> getPathTessellatedColors();
+
+	TourTrack getTourTrack();
 
 	void resetPathTessellatedColors();
 

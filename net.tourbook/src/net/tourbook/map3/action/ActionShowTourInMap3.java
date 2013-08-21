@@ -122,7 +122,7 @@ public class ActionShowTourInMap3 extends ContributionItem {
 				}
 			});
 
-			_trackLayerPropertiesDialog = new DialogTourTrackConfig(_parent, _toolBar);
+			_trackLayerPropertiesDialog = new DialogTourTrackConfig(_parent, _toolBar, _map3View);
 
 			updateUI_Tooltip();
 		}
