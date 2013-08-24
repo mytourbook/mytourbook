@@ -122,6 +122,14 @@ public class Messages extends NLS {
 	public static String	TourTrack_Properties_Label_TrackColor_Tooltip;
 
 	public static String		TourTrack_Properties_Label_TrackPositionSize;
+
+	public static String	TourTrack_Properties_Label_TrackPositionSize_Hovered;
+
+	public static String	TourTrack_Properties_Label_TrackPositionSize_Hovered_Tooltip;
+
+	public static String	TourTrack_Properties_Label_TrackPositionSize_Selected;
+
+	public static String	TourTrack_Properties_Label_TrackPositionSize_Selected_Tooltip;
 	public static String		TourTrack_Properties_Label_TrackPositionSize_Tooltip;
 	public static String		TourTrack_Properties_Label_TrackPositionThreshold;
 	public static String		TourTrack_Properties_Label_TrackPositionThreshold_Tooltip;

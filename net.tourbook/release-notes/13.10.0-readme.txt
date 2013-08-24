@@ -7,6 +7,11 @@ update git url in messages edit docu
 https://sourceforge.net/p/mytourbook/code/ci/master/tree/net.tourbook/translations/mt-translations.zip
 
 
+
+https://prism-break.org/
+
+
+
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 
@@ -58,3 +63,17 @@ Improvement
 Fixed Problems 
 
 * 
+
+
+* Advantages:
+
+- find easily which tours have a wrong altitude
+
+
+3D Problems
+
+- ensure the 3D Tour Map view is selected before a tour is selected, this case is covered in the app but sometime it only works when the view is aktivated, mostly this happens after the app start
+
+- selecting multiple tours is currently not supported
+
+- there are many features which are not yet implemented

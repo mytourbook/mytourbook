@@ -60,7 +60,16 @@ public class TrackPathOptimized extends MTMultiResolutionPath implements ITrackP
 
 	@Override
 	public void resetPathTessellatedColors() {
-		getCurrentPathData().setTessellatedColors(null);
+
+		final PathData currentPathData = getCurrentPathData();
+
+		/*
+		 * can be null when not initialized, this happened when a tour is reselected but not yet
+		 * displayed
+		 */
+		if (currentPathData != null) {
+			currentPathData.setTessellatedColors(null);
+		}
 	}
 
 	@Override

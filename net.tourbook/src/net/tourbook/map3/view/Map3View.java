@@ -347,11 +347,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 
 					final ArrayList<TourData> modifiedTours = ((TourEvent) eventData).getModifiedTours();
 					if ((modifiedTours != null) && (modifiedTours.size() > 0)) {
-
-						_allTours.clear();
-						_allTours.addAll(modifiedTours);
-
-						showAllTours();
+						updateModifiedTours(modifiedTours);
 					}
 
 				} else if (eventId == TourEventId.UPDATE_UI || eventId == TourEventId.CLEAR_DISPLAYED_TOUR) {
@@ -573,7 +569,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 		tbm.add(_actionShowTourInMap3);
 		tbm.add(_actionShowEntireTour);
 		tbm.add(_actionSynMapViewWithTour);
-		tbm.add(_actionSynMapPositionWithSlider);
+//		tbm.add(_actionSynMapPositionWithSlider);
 		tbm.add(new Separator());
 
 		tbm.add(new Separator());
@@ -1131,6 +1127,14 @@ public class Map3View extends ViewPart implements ITourProvider {
 
 		Map3Manager.redraw();
 
+	}
+
+	private void updateModifiedTours(final ArrayList<TourData> modifiedTours) {
+
+		_allTours.removeAll(modifiedTours);
+		_allTours.addAll(modifiedTours);
+
+		showAllTours();
 	}
 
 }

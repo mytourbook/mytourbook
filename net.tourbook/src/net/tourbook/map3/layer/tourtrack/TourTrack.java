@@ -92,6 +92,20 @@ public class TourTrack {
 		return _tourData;
 	}
 
+	void hackResetPositionColors() {
+
+		_trackPath.resetPathTessellatedColors();
+
+		final PositionColors positionColors = _trackPath.getPathPositionColors();
+
+		if (positionColors != null) {
+
+			_originalPositionColors = positionColors;
+
+			_trackPath.setPathPositionColors(null);
+		}
+	}
+
 	boolean isHovered() {
 		return _isHovered;
 	}
@@ -114,16 +128,7 @@ public class TourTrack {
 
 			// tour IS hovered or selected
 
-			_trackPath.resetPathTessellatedColors();
-
-			final PositionColors positionColors = _trackPath.getPathPositionColors();
-
-			if (positionColors != null) {
-
-				_originalPositionColors = positionColors;
-
-				_trackPath.setPathPositionColors(null);
-			}
+			hackResetPositionColors();
 
 		} else {
 
