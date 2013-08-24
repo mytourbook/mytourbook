@@ -26,7 +26,7 @@ public abstract class TVIMap3Item extends TreeViewerItem {
 
 	@Override
 	public String toString() {
-		return "TVIMap3Item [name=" + name + "]";
+		return "TVIMap3Item [name=" + name + "]"; //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 

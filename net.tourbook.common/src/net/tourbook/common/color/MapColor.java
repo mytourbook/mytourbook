@@ -150,17 +150,17 @@ public class MapColor {
 		final int maxLen = 10;
 
 		return String.format(
-				"\n"
-						+ "MapColor\n"
-						+ "   colorValues=%s\n"
-						+ "   minBrightness=%s\n"
-						+ "   minBrightnessFactor=%s\n"
-						+ "   maxBrightness=%s\n"
-						+ "   maxBrightnessFactor=%s\n"
-						+ "   isMaxValueOverwrite=%s\n"
-						+ "   overwriteMaxValue=%s\n"
-						+ "   isMinValueOverwrite=%s\n"
-						+ "   overwriteMinValue=%s\n",
+				"\n" //$NON-NLS-1$
+						+ "MapColor\n" //$NON-NLS-1$
+						+ "   colorValues=%s\n" //$NON-NLS-1$
+						+ "   minBrightness=%s\n" //$NON-NLS-1$
+						+ "   minBrightnessFactor=%s\n" //$NON-NLS-1$
+						+ "   maxBrightness=%s\n" //$NON-NLS-1$
+						+ "   maxBrightnessFactor=%s\n" //$NON-NLS-1$
+						+ "   isMaxValueOverwrite=%s\n" //$NON-NLS-1$
+						+ "   overwriteMaxValue=%s\n" //$NON-NLS-1$
+						+ "   isMinValueOverwrite=%s\n" //$NON-NLS-1$
+						+ "   overwriteMinValue=%s\n", //$NON-NLS-1$
 				colorValues != null
 						? Arrays.asList(colorValues).subList(0, Math.min(colorValues.length, maxLen))
 						: null,

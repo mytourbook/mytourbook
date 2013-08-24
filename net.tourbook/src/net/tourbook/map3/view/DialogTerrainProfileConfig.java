@@ -451,13 +451,13 @@ public class DialogTerrainProfileConfig {
 	public String toString() {
 		final StringBuilder builder = new StringBuilder();
 		builder
-				.append("\nTerrainProfileConfiguration\n   getToolTipArea()=")
+				.append("\nTerrainProfileConfiguration\n   getToolTipArea()=") //$NON-NLS-1$
 				.append(_toolProvider.getToolTipArea())
-				.append(", \n   getToolTitle()=")
+				.append(", \n   getToolTitle()=") //$NON-NLS-1$
 				.append(_toolProvider.getToolTitle())
-				.append(", \n   isToolMovable()=")
+				.append(", \n   isToolMovable()=") //$NON-NLS-1$
 				.append(_toolProvider.isFlexTool())
-				.append("\n");
+				.append("\n"); //$NON-NLS-1$
 		return builder.toString();
 	}
 

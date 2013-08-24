@@ -485,8 +485,6 @@ public class Messages extends NLS {
 	public static String		Dialog_SplitTour_Label_TourTitle;
 	public static String		Dialog_SplitTour_Label_TourTitle_Tooltip;
 
-	public static String		Dialog_WorldWind_Diagnostics;
-
 	public static String		Dlg_AdjustAltitude_Group_options;
 	public static String		Dlg_AdjustAltitude_Label_end_altitude;
 	public static String		Dlg_AdjustAltitude_Label_end_altitude_tooltip;
@@ -527,8 +525,6 @@ public class Messages extends NLS {
 	public static String		Format_hhmmss;
 	public static String		Format_rawdata_file_yyyy_mm_dd;
 	public static String		Format_yyyymmdd_hhmmss;
-
-
 
 	public static String		HR_Zone_01_060_Moderate;
 	public static String		HR_Zone_01_060_Moderate_Shortcut;

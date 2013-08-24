@@ -43,15 +43,15 @@ public class MapLegendImageConfig {
 	public String toString() {
 		final int maxLen = 10;
 		return String.format(
-				"\n"
-						+ "MapLegendImageConfig\n"
-						+ "   legendMinValue=%s\n"
-						+ "   legendMaxValue=%s\n"
-						+ "   units=%s\n"
-						+ "   unitLabels=%s\n"
-						+ "   unitFormat=%s\n"
-						+ "   unitText=%s\n"
-						+ "   numberFormatDigits=%s\n",
+				"\n" //$NON-NLS-1$
+						+ "MapLegendImageConfig\n" //$NON-NLS-1$
+						+ "   legendMinValue=%s\n" //$NON-NLS-1$
+						+ "   legendMaxValue=%s\n" //$NON-NLS-1$
+						+ "   units=%s\n" //$NON-NLS-1$
+						+ "   unitLabels=%s\n" //$NON-NLS-1$
+						+ "   unitFormat=%s\n" //$NON-NLS-1$
+						+ "   unitText=%s\n" //$NON-NLS-1$
+						+ "   numberFormatDigits=%s\n", //$NON-NLS-1$
 				legendMinValue,
 				legendMaxValue,
 				units != null ? units.subList(0, Math.min(units.size(), maxLen)) : null,

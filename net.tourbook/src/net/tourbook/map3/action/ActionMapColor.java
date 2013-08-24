@@ -119,7 +119,7 @@ public class ActionMapColor extends Action implements IMapColorUpdater {
 			}
 
 			if (_colorDefinition == null) {
-				StatusUtil.logError("Colordefinition is null");
+				StatusUtil.logError("Colordefinition is null"); //$NON-NLS-1$
 				return;
 			}
 

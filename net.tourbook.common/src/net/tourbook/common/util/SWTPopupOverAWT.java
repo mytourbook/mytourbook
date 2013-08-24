@@ -59,7 +59,7 @@ public class SWTPopupOverAWT {
 		// creates a SWT Shell
 		swtDisplay = new Display();
 		swtShell = new Shell(swtDisplay);
-		swtShell.setText("click somewhere !");
+		swtShell.setText("click somewhere !"); //$NON-NLS-1$
 
 		final Composite swtComposite = new Composite(swtShell, SWT.BORDER | SWT.EMBEDDED);
 
@@ -74,14 +74,14 @@ public class SWTPopupOverAWT {
 		swtPopupMenu = new Menu(swtComposite);
 
 		final MenuItem item1 = new MenuItem(swtPopupMenu, SWT.PUSH);
-		item1.setText("useless item for test");
+		item1.setText("useless item for test"); //$NON-NLS-1$
 		item1.addSelectionListener(new SelectionListener() {
 			@Override
 			public void widgetDefaultSelected(final SelectionEvent arg0) {}
 
 			@Override
 			public void widgetSelected(final SelectionEvent arg0) {
-				System.out.println("The useless popup menu was clicked !");
+				System.out.println("The useless popup menu was clicked !"); //$NON-NLS-1$
 			}
 		});
 
@@ -90,7 +90,7 @@ public class SWTPopupOverAWT {
 			@Override
 			public void menuHidden(final MenuEvent arg0) {
 
-				System.out.println("the SWT menu was hidden (by itself)");
+				System.out.println("the SWT menu was hidden (by itself)"); //$NON-NLS-1$
 			}
 
 			@Override
@@ -112,11 +112,11 @@ public class SWTPopupOverAWT {
 						final boolean isLeft = SwingUtilities.isLeftMouseButton(e);
 						final boolean isRight = SwingUtilities.isRightMouseButton(e);
 
-						System.out.println("AWT click detected\tisLeft=" + isLeft + "\tisRight=" + isRight);
+						System.out.println("AWT click detected\tisLeft=" + isLeft + "\tisRight=" + isRight); //$NON-NLS-1$ //$NON-NLS-2$
 
 						swtDisplay.asyncExec(new Runnable() {
 							public void run() {
-								System.out.println("SWT calling menu");
+								System.out.println("SWT calling menu"); //$NON-NLS-1$
 								swtIndirectShowMenu(e.getXOnScreen(), e.getYOnScreen());
 							}
 						});
@@ -153,11 +153,11 @@ public class SWTPopupOverAWT {
 			public void run() {
 
 				if (swtPopupMenu.isVisible()) {
-					System.out.println("made visible after " + (MAX_RETRIES - retriesRemaining) + " attempts");
+					System.out.println("made visible after " + (MAX_RETRIES - retriesRemaining) + " attempts"); //$NON-NLS-1$ //$NON-NLS-2$
 
 				} else if (retriesRemaining > 0) {
 
-					System.out.println("retrying (remains " + (retriesRemaining - 1) + ")");
+					System.out.println("retrying (remains " + (retriesRemaining - 1) + ")"); //$NON-NLS-1$ //$NON-NLS-2$
 
 					//swtHost.getShell().forceFocus();
 					//swtHost.getShell().forceActive();
@@ -170,7 +170,7 @@ public class SWTPopupOverAWT {
 						);
 						shell.setSize(10, 10); // big enough to avoid errors from the gtk layer
 						shell.setBackground(swtDisplay.getSystemColor(SWT.COLOR_RED));
-						shell.setText("Not visible");
+						shell.setText("Not visible"); //$NON-NLS-1$
 						shell.setVisible(false);
 						shell.open();
 						shell.dispose();
@@ -184,7 +184,7 @@ public class SWTPopupOverAWT {
 					retryVisible(retriesRemaining - 1);
 
 				} else {
-					System.err.println("unable to display the menu, sorry :-(");
+					System.err.println("unable to display the menu, sorry :-("); //$NON-NLS-1$
 				}
 			}
 		});
@@ -198,7 +198,7 @@ public class SWTPopupOverAWT {
 
 		swtPopupMenu.setLocation(new Point(x, y));
 
-		System.out.println("Displaying the menu at coordinates " + x + "," + y);
+		System.out.println("Displaying the menu at coordinates " + x + "," + y); //$NON-NLS-1$ //$NON-NLS-2$
 		swtPopupMenu.setVisible(true);
 
 		// if GUI not based on GTK, the menu should already be displayed.

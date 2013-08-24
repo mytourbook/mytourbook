@@ -71,7 +71,7 @@ public class UI {
 	public static final String			SPACE2									= "  ";																	//$NON-NLS-1$
 	public static final String			SPACE4									= "    ";																	//$NON-NLS-1$
 	public static final String			STRING_0								= "0";																		//$NON-NLS-1$
-	public static final String			COMMA_SPACE								= ", ";
+	public static final String			COMMA_SPACE								= ", "; //$NON-NLS-1$
 	//$NON-NLS-1$
 	public static final char			TAB										= '\t';
 

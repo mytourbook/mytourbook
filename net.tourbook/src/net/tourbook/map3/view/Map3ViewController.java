@@ -89,7 +89,7 @@ public abstract class Map3ViewController {
 	public static Map3ViewController create(final WorldWindow wwd) {
 
 		if (wwd == null) {
-			final String message = Logging.getMessage("nullValue.WorldWindow");
+			final String message = Logging.getMessage("nullValue.WorldWindow"); //$NON-NLS-1$
 			Logging.logger().severe(message);
 			throw new IllegalStateException(message);
 		}
@@ -145,7 +145,7 @@ public abstract class Map3ViewController {
 			 * this happenes when a tour is selected and the 3d map is not yet opened but is being
 			 * opened with an action button
 			 */
-			StatusUtil.logInfo("globe == null");
+			StatusUtil.logInfo("globe == null"); //$NON-NLS-1$
 
 			// try again
 			Display.getCurrent().timerExec(200, new Runnable() {
@@ -194,7 +194,7 @@ public abstract class Map3ViewController {
 
 			final Extent extent = Sector.computeBoundingCylinder(globe, ve, sector, minElevation, maxElevation);
 			if (extent == null) {
-				final String message = Logging.getMessage("nullValue.SectorIsNull");
+				final String message = Logging.getMessage("nullValue.SectorIsNull"); //$NON-NLS-1$
 				Logging.logger().warning(message);
 				return;
 			}

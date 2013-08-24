@@ -66,7 +66,7 @@ public class TourTrackLayerWithMarkers extends MarkerLayer implements PropertyCh
 	@Override
 	public void propertyChange(final PropertyChangeEvent evt) {
 
-		System.out.println(UI.timeStampNano() + " \t" + evt);
+		System.out.println(UI.timeStampNano() + " \t" + evt); //$NON-NLS-1$
 		// TODO remove SYSTEM.OUT
 	}
 

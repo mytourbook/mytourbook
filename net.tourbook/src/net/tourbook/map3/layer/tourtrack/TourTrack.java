@@ -148,7 +148,7 @@ public class TourTrack {
 	@Override
 	public String toString() {
 
-		return this.getClass().getSimpleName() + ("\t" + _tourData) //
+		return this.getClass().getSimpleName() + ("\t" + _tourData) // //$NON-NLS-1$
 //				+ ("\tTrack positions: " + _trackPositions.length)
 				//
 		;

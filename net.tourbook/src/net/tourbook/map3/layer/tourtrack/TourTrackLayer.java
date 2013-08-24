@@ -295,11 +295,11 @@ public class TourTrackLayer extends RenderableLayer implements SelectListener, I
 	@Override
 	public void propertyChange(final PropertyChangeEvent propEvent) {
 
-		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] \t")
-				+ propEvent.getPropertyName()
-				+ " \t"
-				+ propEvent);
-		// TODO remove SYSTEM.OUT
+//		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] \t") //$NON-NLS-1$ //$NON-NLS-2$
+//				+ propEvent.getPropertyName()
+//				+ " \t" //$NON-NLS-1$
+//				+ propEvent);
+//		// TODO remove SYSTEM.OUT
 
 		if (propEvent.getPropertyName().equals(Map3Manager.PROPERTY_NAME_ENABLED)) {
 
@@ -332,8 +332,8 @@ public class TourTrackLayer extends RenderableLayer implements SelectListener, I
 		}
 
 		final StringBuilder sb = new StringBuilder();
-		sb.append(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] \t");
-		sb.append("\t" + event.getEventAction());
+		sb.append(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] \t"); //$NON-NLS-1$ //$NON-NLS-2$
+		sb.append("\t" + event.getEventAction()); //$NON-NLS-1$
 
 		final PickedObject pickedObject = event.getTopPickedObject();
 
@@ -355,7 +355,7 @@ public class TourTrackLayer extends RenderableLayer implements SelectListener, I
 			hoveredPositionIndex = (Integer) pickOrdinal;
 
 //			sb.append("\t" + hoveredTrackPath);
-			sb.append("\tpickIndex: " + hoveredPositionIndex);
+			sb.append("\tpickIndex: " + hoveredPositionIndex); //$NON-NLS-1$
 		}
 
 		final String eventAction = event.getEventAction();
@@ -781,11 +781,11 @@ public class TourTrackLayer extends RenderableLayer implements SelectListener, I
 				_lastAddRemoveAction = 1;
 				ww.addSelectListener(this);
 
-				System.out.println(UI.timeStampNano()
-						+ " ["
-						+ getClass().getSimpleName()
-						+ "] \tsetupWWSelectionListener\tadd");
-				// TODO remove SYSTEM.OUT.PRINTLN
+//				System.out.println(UI.timeStampNano()
+//						+ " [" //$NON-NLS-1$
+//						+ getClass().getSimpleName()
+//						+ "] \tsetupWWSelectionListener\tadd"); //$NON-NLS-1$
+//				// TODO remove SYSTEM.OUT.PRINTLN
 
 			}
 
@@ -796,11 +796,11 @@ public class TourTrackLayer extends RenderableLayer implements SelectListener, I
 				_lastAddRemoveAction = 0;
 				ww.removeSelectListener(this);
 
-				System.out.println(UI.timeStampNano()
-						+ " ["
-						+ getClass().getSimpleName()
-						+ "] \tsetupWWSelectionListener\tremove");
-				// TODO remove SYSTEM.OUT.PRINTLN
+//				System.out.println(UI.timeStampNano()
+//						+ " [" //$NON-NLS-1$
+//						+ getClass().getSimpleName()
+//						+ "] \tsetupWWSelectionListener\tremove"); //$NON-NLS-1$
+//				// TODO remove SYSTEM.OUT.PRINTLN
 			}
 		}
 	}

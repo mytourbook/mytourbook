@@ -42,10 +42,10 @@ import net.tourbook.application.TourbookPlugin;
 
 public class DefaultProxySelector extends ProxySelector {
 	public enum ProxyPolicy {
-        NO_PROXY("no-proxy"),
-        USE_SYSTEM_SETTINGS("use-system-settings"),
-        USE_HTTP_PROXY("use-http-proxy"),
-        USE_SOCKS_PROXY("use-socks-proxy");
+        NO_PROXY("no-proxy"), //$NON-NLS-1$
+        USE_SYSTEM_SETTINGS("use-system-settings"), //$NON-NLS-1$
+        USE_HTTP_PROXY("use-http-proxy"), //$NON-NLS-1$
+        USE_SOCKS_PROXY("use-socks-proxy"); //$NON-NLS-1$
 
         private String policyName;
         ProxyPolicy(String policyName) {
@@ -77,7 +77,7 @@ public class DefaultProxySelector extends ProxySelector {
   */
  private static boolean JVM_WILL_USE_SYSTEM_PROXIES = false;
  {
-     String v = System.getProperty("java.net.useSystemProxies");
+     String v = System.getProperty("java.net.useSystemProxies"); //$NON-NLS-1$
      if (v != null && v.equals(Boolean.TRUE.toString())) {
          JVM_WILL_USE_SYSTEM_PROXIES = true;
      }
@@ -125,26 +125,26 @@ public class DefaultProxySelector extends ProxySelector {
 	 
 	 int port = parseProxyPortValue(prefStore.getString(IPreferences.PROXY_SERVER_PORT));
 	 String host = prefStore.getString(IPreferences.PROXY_SERVER_ADDRESS);
-	 if (host != null && ! host.trim().equals("") && port > 0) {
+	 if (host != null && ! host.trim().equals("") && port > 0) { //$NON-NLS-1$
          httpProxySocketAddress = new InetSocketAddress(host,port);
      } else {
          httpProxySocketAddress = null;
          if (proxyPolicy.equals(ProxyPolicy.USE_HTTP_PROXY)) {
-             System.err.println("Warning: Unexpected parameters for HTTP proxy. Got host "+host+" and port "+port+".");
-             System.err.println("The proxy will not be used.");
+             System.err.println("Warning: Unexpected parameters for HTTP proxy. Got host "+host+" and port "+port+"."); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+             System.err.println("The proxy will not be used."); //$NON-NLS-1$
          }
      }
 	 
      port = parseProxyPortValue(prefStore.getString(IPreferences.SOCKS_PROXY_SERVER_PORT));
      host = prefStore.getString(IPreferences.SOCKS_PROXY_SERVER_ADDRESS);
 	
-     if (host != null && ! host.trim().equals("") && port > 0) {
+     if (host != null && ! host.trim().equals("") && port > 0) { //$NON-NLS-1$
          socksProxySocketAddress = new InetSocketAddress(host,port);
      } else {
          socksProxySocketAddress = null;
          if (proxyPolicy.equals(ProxyPolicy.USE_SOCKS_PROXY)) {
-             System.err.println("Warning: Unexpected parameters for SOCKS proxy. Got host "+host+" and port "+port+".");
-             System.err.println("The proxy will not be used.");
+             System.err.println("Warning: Unexpected parameters for SOCKS proxy. Got host "+host+" and port "+port+"."); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+             System.err.println("The proxy will not be used."); //$NON-NLS-1$
          }
      }
 }
@@ -155,13 +155,13 @@ protected static int parseProxyPortValue(String value) {
      try {
          port = Integer.parseInt(value);
      } catch (NumberFormatException e) {
-         System.err.println("Unexpected format for port number in in preference. Got "+value+".");
-         System.err.println("The proxy will not be used.");
+         System.err.println("Unexpected format for port number in in preference. Got "+value+"."); //$NON-NLS-1$ //$NON-NLS-2$
+         System.err.println("The proxy will not be used."); //$NON-NLS-1$
          return 0;
      }
      if (port <= 0 || port >  65535) {
-         System.err.println("Illegal port number in preference. Got "+value+".");
-         System.err.println("The proxy will not be used.");
+         System.err.println("Illegal port number in preference. Got "+value+"."); //$NON-NLS-1$ //$NON-NLS-2$
+         System.err.println("The proxy will not be used."); //$NON-NLS-1$
          return 0;
      }
      return port;
@@ -173,7 +173,7 @@ protected static int parseProxyPortValue(String value) {
      // Just log something. The network stack will also throw an exception which will be caught
      // somewhere else
      //
-     System.out.println("Error: Connection to proxy "+sa.toString()+" for URI "+uri.toString()+" failed. Exception was: "+ ioe.toString());
+     System.out.println("Error: Connection to proxy "+sa.toString()+" for URI "+uri.toString()+" failed. Exception was: "+ ioe.toString()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
  }
 
  @Override
@@ -182,7 +182,7 @@ protected static int parseProxyPortValue(String value) {
      switch(proxyPolicy) {
      case USE_SYSTEM_SETTINGS:
          if (!JVM_WILL_USE_SYSTEM_PROXIES) {
-             System.err.println("Warning: the JVM is not configured to lookup proxies from the system settings. The property ''java.net.useSystemProxies'' was missing at startup time.  Will not use a proxy.");
+             System.err.println("Warning: the JVM is not configured to lookup proxies from the system settings. The property ''java.net.useSystemProxies'' was missing at startup time.  Will not use a proxy."); //$NON-NLS-1$
              return Collections.singletonList(Proxy.NO_PROXY);
          }
          // delegate to the former proxy selector
