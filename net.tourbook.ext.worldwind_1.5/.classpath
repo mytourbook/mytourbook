@@ -1,8 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry kind="src" path="src/org/codehaus/jackson"/>
-	<classpathentry kind="src" path="src/gov/nasa/worldwind"/>
-	<classpathentry kind="src" path="src/com/zebraimaging"/>
 	<classpathentry exported="true" kind="lib" path="jogl.jar" sourcepath="C:/E/java-resources/gov.nasa.worldwind/jogl-git/jogl-1.1.1a-javadoc.jar">
 		<attributes>
 			<attribute name="javadoc_location" value="jar:file:/C:/E/java-resources/gov.nasa.worldwind/jogl-git/jogl-1.1.1a-javadoc.jar!/"/>
@@ -10,6 +7,7 @@
 	</classpathentry>
 	<classpathentry exported="true" kind="lib" path="gdal.jar"/>
 	<classpathentry exported="true" kind="lib" path="gluegen-rt.jar"/>
+	<classpathentry exported="true" kind="lib" path="worldwind.jar" sourcepath="C:/E/java-resources/gov.nasa.worldwind/worldwind-1.5.0.zip"/>
 	<classpathentry exported="true" kind="lib" path="worldwindx.jar" sourcepath="C:/E/java-resources/gov.nasa.worldwind/worldwind-1.5.0.zip"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>

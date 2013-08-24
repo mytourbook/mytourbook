@@ -116,7 +116,7 @@ public class GraphColorManager {
 		MAP_COLOR_ALTITUDE = new MapColor(//
 				//
 				new ColorValue[] {
-			new ColorValue(10, 204, 145, 64),
+			new ColorValue(10, 0xEC, 0x20, 0x20),
 			new ColorValue(50, 255, 85, 13),
 			new ColorValue(100, 255, 255, 0),
 			new ColorValue(150, 0, 170, 9),

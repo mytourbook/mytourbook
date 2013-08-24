@@ -46,8 +46,6 @@ import net.tourbook.tour.SelectionTourData;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.swt.graphics.RGB;
 
-/**
- */
 public class TourTrackLayer extends RenderableLayer implements SelectListener, ICheckStateListener {
 
 	public static final String			MAP3_LAYER_ID			= "TourTrackLayer";			//$NON-NLS-1$
@@ -230,14 +228,6 @@ public class TourTrackLayer extends RenderableLayer implements SelectListener, I
 	 */
 	private float[] getDataSerie(final TourData tourData) {
 
-//		final ILegendProvider legendProvider = _tourPaintConfig.getLegendProvider();
-//		if (legendProvider == null) {
-//			_dataSerie = null;
-//			return;
-//		}
-
-//		final ILegendProvider colorProvider = _tourPositionColors.getColorProvider();
-
 		switch (_colorProvider.getMapColorId()) {
 		case Altitude:
 			return tourData.altitudeSerie;
@@ -368,10 +358,7 @@ public class TourTrackLayer extends RenderableLayer implements SelectListener, I
 			sb.append("\tpickIndex: " + hoveredPositionIndex);
 		}
 
-		// Ignore hover and rollover events. We're only interested in mouse pressed and mouse clicked events.
 		final String eventAction = event.getEventAction();
-//		if (eventAction == SelectEvent.HOVER || eventAction == SelectEvent.ROLLOVER)
-//            return;
 
 		final ITrackPath backupSelectedTrackPath = _selectedTrackPath;
 
@@ -587,10 +574,6 @@ public class TourTrackLayer extends RenderableLayer implements SelectListener, I
 
 		final Path path = trackPath.getPath();
 
-		// Indicate that dots are to be drawn at each specified path position.
-//		path.setShowPositions(_trackConfig.isShowTrackPosition);
-//		path.setShowPositionsScale(_trackConfig.trackPositionSize / _trackConfig.outlineWidth);
-
 		path.setShowPositionsThreshold(Math.pow(10, _trackConfig.trackPositionThreshold));
 
 		final int altitudeMode = _trackConfig.altitudeMode;
@@ -613,17 +596,6 @@ public class TourTrackLayer extends RenderableLayer implements SelectListener, I
 			path.setDrawVerticals(isDrawVerticals);
 		}
 
-// UI is disabled
-//		final String pathType = _trackConfig.pathType;
-//		if (pathType.equals(path.getPathType()) == false) {
-//			path.setPathType(pathType);
-//		}
-
-// UI is disabled
-//		final int numSubsegments = _trackConfig.numSubsegments;
-//		if (numSubsegments != path.getNumSubsegments()) {
-//			path.setNumSubsegments(numSubsegments);
-//		}
 		/*
 		 * numSubsegments do not have a UI (it's disabled) but ensure that 0 subsegments are set
 		 */

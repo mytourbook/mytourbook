@@ -48,7 +48,6 @@ public class TourTrackConfig {
 	private static final String				STATE_OUTLINE_OPACITY_SELECTED		= "STATE_OUTLINE_OPACITY_SELECTED";	//$NON-NLS-1$
 	private static final String				STATE_OUTLINE_WIDTH					= "STATE_OUTLINE_WIDTH";				//$NON-NLS-1$
 	private static final String				STATE_PATH_RESOLUTION				= "STATE_PATH_RESOLUTION";				//$NON-NLS-1$
-//	private static final String				STATE_PATH_TYPE					= "STATE_PATH_TYPE";					//$NON-NLS-1$
 	private static final String				STATE_TRACK_POSITION_SIZE			= "STATE_TRACK_POSITION_SIZE";			//$NON-NLS-1$
 	private static final String				STATE_TRACK_POSITION_SIZE_HOVERED	= "STATE_TRACK_POSITION_SIZE_HOVERED";	//$NON-NLS-1$
 	private static final String				STATE_TRACK_POSITION_SIZE_SELECTED	= "STATE_TRACK_POSITION_SIZE_SELECTED"; //$NON-NLS-1$
@@ -59,12 +58,6 @@ public class TourTrackConfig {
 			new AltitudeMode(Messages.Track_Config_Altitude_Mode_Absolute, WorldWind.ABSOLUTE),
 			new AltitudeMode(Messages.Track_Config_Altitude_Mode_RelativeToGround, WorldWind.RELATIVE_TO_GROUND) //
 																				};
-
-//	public static final PathType[]			PATH_TYPE						= {
-//			new PathType(Messages.Track_Config_Path_Type_Linear, AVKey.LINEAR),
-//			new PathType(Messages.Track_Config_Path_Type_GreatCircle, AVKey.GREAT_CIRCLE),
-//			new PathType(Messages.Track_Config_Path_Type_RHumbLine, AVKey.RHUMB_LINE), //
-//																			};
 
 	public static final int					PATH_RESOLUTION_ALL_POSITIONS		= 0;
 	public static final int					PATH_RESOLUTION_OPTIMIZED			= 1;
@@ -124,7 +117,6 @@ public class TourTrackConfig {
 
 	// UI is currently disabled, subsegments == 0
 	public int								numSubsegments;
-//	public String							pathType;
 
 	public double							trackPositionSize;
 	public double							trackPositionSizeHovered;
@@ -175,30 +167,6 @@ public class TourTrackConfig {
 		return 0;
 	}
 
-//	public int getPathTypeIndex() {
-//
-//		for (int valueIndex = 0; valueIndex < PATH_TYPE.length; valueIndex++) {
-//			if (PATH_TYPE[valueIndex].value.equals(pathType)) {
-//				return valueIndex;
-//			}
-//		}
-//
-//		// return default value
-//		return 0;
-//	}
-
-//	private String getPathTypeValue(final String statePathType) {
-//
-//		for (final PathType pathType : PATH_TYPE) {
-//			if (pathType.value.equals(statePathType)) {
-//				return pathType.value;
-//			}
-//		}
-//
-//		// return default value
-//		return AVKey.LINEAR;
-//	}
-
 	/**
 	 * Set track configuration with default values.
 	 */
@@ -222,8 +190,6 @@ public class TourTrackConfig {
 		final RGB hovSelRGB = new RGB(0xff, 0x0, 0xff);
 		final RGB selectedRGB = new RGB(0xFF, 0xff, 0xff);
 
-//		final RGB interiorRGB = new RGB(0xff, 0xff, 0xff);
-
 		pathResolution = Util.getStateInt(state, STATE_PATH_RESOLUTION, PATH_RESOLUTION_OPTIMIZED);
 
 		outlineWidth = Util.getStateDouble(state, STATE_OUTLINE_WIDTH, 1.0);
@@ -245,7 +211,7 @@ public class TourTrackConfig {
 		trackPositionSize = Util.getStateDouble(state, STATE_TRACK_POSITION_SIZE, 8.0);
 		trackPositionSizeHovered = Util.getStateDouble(state, STATE_TRACK_POSITION_SIZE_HOVERED, 12.0);
 		trackPositionSizeSelected = Util.getStateDouble(state, STATE_TRACK_POSITION_SIZE_SELECTED, 10.0);
-		trackPositionThreshold = Util.getStateDouble(state, STATE_TRACK_POSITION_SIZE, 10);
+		trackPositionThreshold = Util.getStateDouble(state, STATE_TRACK_POSITION_THRESHOLD, 10);
 
 		// curtain
 		isExtrudePath = Util.getStateBoolean(state, STATE_IS_EXTRUDE_PATH, true);
@@ -262,7 +228,6 @@ public class TourTrackConfig {
 		isDrawVerticals = Util.getStateBoolean(state, STATE_IS_DRAW_VERTICALS, false);
 
 		// path + segments
-//		pathType = getPathTypeValue(Util.getStateString(state, STATE_PATH_TYPE, AVKey.LINEAR));
 		numSubsegments = Util.getStateInt(state, STATE_NUMBER_OF_SUB_SEGMENTS, 0);
 	}
 
@@ -301,7 +266,6 @@ public class TourTrackConfig {
 		state.put(STATE_TRACK_POSITION_SIZE_SELECTED, trackPositionSizeSelected);
 		state.put(STATE_TRACK_POSITION_THRESHOLD, trackPositionThreshold);
 
-//		state.put(STATE_PATH_TYPE, pathType);
 		state.put(STATE_NUMBER_OF_SUB_SEGMENTS, numSubsegments);
 	}
 

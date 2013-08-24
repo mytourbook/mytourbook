@@ -34,6 +34,26 @@ public class TrackPathOptimized extends MTMultiResolutionPath implements ITrackP
 	}
 
 	@Override
+	protected void addTessellatedPosition(final Position pos, final Color color, final Integer ordinal, final PathData pathData) {
+
+		try {
+			super.addTessellatedPosition(pos, color, ordinal, pathData);
+		} catch (final Exception e) {
+			// ignore, it can happen
+		}
+	}
+
+	@Override
+	protected void drawPointsVBO(final DrawContext dc, final int[] vboIds, final PathData pathData) {
+
+		try {
+			super.drawPointsVBO(dc, vboIds, pathData);
+		} catch (final Exception e) {
+			// ignore, it can happen
+		}
+	}
+
+	@Override
 	protected Color getColor(final Position pos, final Integer ordinal) {
 		return _tourTrack.getColor(pos, ordinal);
 	}

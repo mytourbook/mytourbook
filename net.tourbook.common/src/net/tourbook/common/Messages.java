@@ -69,9 +69,7 @@ public class Messages extends NLS {
 	public static String		Image_Action_PhotoFilterNoPhotos;
 	public static String		Image_Action_PhotoFilterWithPhotos;
 
-	public static String		Map3_PropertyTooltip_Action_Close;
 	public static String		Map3_PropertyTooltip_Action_Close_Tooltip;
-	public static String		Map3_PropertyTooltip_Action_MoveToDefaultLocation;
 	public static String		Map3_PropertyTooltip_Action_MoveToDefaultLocation_Tooltip;
 
 	public static String		Weather_Clounds_Clouds;

@@ -19,7 +19,7 @@ import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS {
 
-	private static final String	BUNDLE_NAME	= "net.tourbook.map3.messages";				//$NON-NLS-1$
+	private static final String	BUNDLE_NAME	= "net.tourbook.map3.messages";					//$NON-NLS-1$
 
 	public static String		Custom_Category_Name_Tour;
 
@@ -52,7 +52,7 @@ public class Messages extends NLS {
 	public static String		Map3_Action_OpenMap3PropertiesView;
 	public static String		Map3_Action_OpenTrackLayerProperties_Tooltip;
 
-	public static String	Map3_Action_TrackColor;
+	public static String		Map3_Action_TrackColor;
 
 	public static String		Prop_Viewer_Label_AltitudeRange_Tooltip;
 
@@ -82,19 +82,28 @@ public class Messages extends NLS {
 	public static String		TourTrack_Properties_Button_Quality_Tooltip;
 	public static String		TourTrack_Properties_Checkbox_AltitudeOffset;
 	public static String		TourTrack_Properties_Checkbox_DrawVerticals;
+
+	public static String	TourTrack_Properties_Checkbox_DrawVerticals_Tooltip;
 	public static String		TourTrack_Properties_Checkbox_ExtrudePath;
 	public static String		TourTrack_Properties_Checkbox_ExtrudePath_Tooltip;
 	public static String		TourTrack_Properties_Checkbox_IsFollowTerrain;
 	public static String		TourTrack_Properties_Checkbox_ShowTrackPositions;
+	public static String		TourTrack_Properties_Checkbox_ShowTrackPositions_Tooltip;
 	public static String		TourTrack_Properties_Label_Altitude;
 	public static String		TourTrack_Properties_Label_Altitude_Tooltip;
 	public static String		TourTrack_Properties_Label_AltitudeOffsetDistance;
 	public static String		TourTrack_Properties_Label_CurtainColor;
 
-	public static String	TourTrack_Properties_Label_CurtainColorHovered;
+	public static String	TourTrack_Properties_Label_CurtainColor_Tooltip;
+	public static String		TourTrack_Properties_Label_CurtainColorHovered;
 
-	public static String	TourTrack_Properties_Label_CurtainColorHovSel;
+	public static String	TourTrack_Properties_Label_CurtainColorHovered_Tooltip;
+	public static String		TourTrack_Properties_Label_CurtainColorHovSel;
+
+	public static String	TourTrack_Properties_Label_CurtainColorHovSel_Tooltip;
 	public static String		TourTrack_Properties_Label_CurtainColorSelected;
+
+	public static String	TourTrack_Properties_Label_CurtainColorSelected_Tooltip;
 	public static String		TourTrack_Properties_Label_CurtainOpacity;
 	public static String		TourTrack_Properties_Label_DialogTitle;
 	public static String		TourTrack_Properties_Label_LineOpacityDefault;
@@ -103,33 +112,23 @@ public class Messages extends NLS {
 	public static String		TourTrack_Properties_Label_NumberOfSubSegments_Tooltip;
 	public static String		TourTrack_Properties_Label_OutlineColorHovered;
 	public static String		TourTrack_Properties_Label_OutlineColorHovered_Tooltip;
-
-	public static String	TourTrack_Properties_Label_OutlineColorHovSel;
-
-	public static String	TourTrack_Properties_Label_OutlineColorHovSel_Tooltip;
+	public static String		TourTrack_Properties_Label_OutlineColorHovSel;
+	public static String		TourTrack_Properties_Label_OutlineColorHovSel_Tooltip;
 	public static String		TourTrack_Properties_Label_OutlineColorSelected;
 	public static String		TourTrack_Properties_Label_OutlineColorSelected_Tooltip;
 	public static String		TourTrack_Properties_Label_OutlineWidth;
 	public static String		TourTrack_Properties_Label_OutlineWidth_Tooltip;
-	public static String	TourTrack_Properties_Label_PathResolution;
-
-	public static String	TourTrack_Properties_Label_PathResolution_Tooltip;
-
+	public static String		TourTrack_Properties_Label_PathResolution;
+	public static String		TourTrack_Properties_Label_PathResolution_Tooltip;
 	public static String		TourTrack_Properties_Label_PathType;
 	public static String		TourTrack_Properties_Label_PathType_Tooltip;
-	public static String	TourTrack_Properties_Label_TrackColor;
-
-	public static String	TourTrack_Properties_Label_TrackColor_Tooltip;
-
+	public static String		TourTrack_Properties_Label_TrackColor;
+	public static String		TourTrack_Properties_Label_TrackColor_Tooltip;
 	public static String		TourTrack_Properties_Label_TrackPositionSize;
-
-	public static String	TourTrack_Properties_Label_TrackPositionSize_Hovered;
-
-	public static String	TourTrack_Properties_Label_TrackPositionSize_Hovered_Tooltip;
-
-	public static String	TourTrack_Properties_Label_TrackPositionSize_Selected;
-
-	public static String	TourTrack_Properties_Label_TrackPositionSize_Selected_Tooltip;
+	public static String		TourTrack_Properties_Label_TrackPositionSize_Hovered;
+	public static String		TourTrack_Properties_Label_TrackPositionSize_Hovered_Tooltip;
+	public static String		TourTrack_Properties_Label_TrackPositionSize_Selected;
+	public static String		TourTrack_Properties_Label_TrackPositionSize_Selected_Tooltip;
 	public static String		TourTrack_Properties_Label_TrackPositionSize_Tooltip;
 	public static String		TourTrack_Properties_Label_TrackPositionThreshold;
 	public static String		TourTrack_Properties_Label_TrackPositionThreshold_Tooltip;
@@ -137,11 +136,10 @@ public class Messages extends NLS {
 	public static String		Track_Config_Altitude_Mode_Absolute;
 	public static String		Track_Config_Altitude_Mode_ClampToGround;
 	public static String		Track_Config_Altitude_Mode_RelativeToGround;
-	public static String	Track_Config_Path_Resolution_High;
+	public static String		Track_Config_Path_Resolution_High;
 
-	public static String	Track_Config_Path_Resolution_Optimized;
-
-	public static String	Track_Config_Path_Resolution_Viewport;
+	public static String		Track_Config_Path_Resolution_Optimized;
+	public static String		Track_Config_Path_Resolution_Viewport;
 
 	public static String		Track_Config_Path_Type_GreatCircle;
 	public static String		Track_Config_Path_Type_Linear;

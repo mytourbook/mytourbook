@@ -29,7 +29,6 @@ import java.util.ArrayList;
 import javax.swing.SwingUtilities;
 
 import net.tourbook.application.TourbookPlugin;
-import net.tourbook.common.UI;
 import net.tourbook.common.color.IMapColorProvider;
 import net.tourbook.common.color.MapColorId;
 import net.tourbook.common.util.PostSelectionProvider;
@@ -648,20 +647,20 @@ public class Map3View extends ViewPart implements ITourProvider {
 
 			// open context menu
 
-			System.out.println(UI.timeStampNano()
-					+ " ["
-					+ getClass().getSimpleName()
-					+ "] \tRight_Click\t"
-					+ mouseEvent.getXOnScreen()
-					+ " : "
-					+ mouseEvent.getYOnScreen());
-			// TODO remove SYSTEM.OUT.PRINTLN
+//			System.out.println(UI.timeStampNano()
+//					+ " ["
+//					+ getClass().getSimpleName()
+//					+ "] \tRight_Click\t"
+//					+ mouseEvent.getXOnScreen()
+//					+ " : "
+//					+ mouseEvent.getYOnScreen());
+//			// TODO remove SYSTEM.OUT.PRINTLN
 
 			_mapContainer.getDisplay().asyncExec(new Runnable() {
 
 				public void run() {
 
-					System.out.println("SWT calling menu");
+//					System.out.println("SWT calling menu");
 
 					createContextMenu(mouseEvent.getXOnScreen(), mouseEvent.getYOnScreen());
 				}
