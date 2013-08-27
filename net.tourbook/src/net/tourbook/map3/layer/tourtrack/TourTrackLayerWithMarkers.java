@@ -30,7 +30,6 @@ import java.util.ArrayList;
 
 import net.tourbook.common.UI;
 import net.tourbook.data.TourData;
-import net.tourbook.map3.Messages;
 
 /**
  */
@@ -56,11 +55,6 @@ public class TourTrackLayerWithMarkers extends MarkerLayer implements PropertyCh
 //		setKeepSeparated(false); ????????????
 
 		addPropertyChangeListener(this);
-	}
-
-	@Override
-	public String getName() {
-		return Messages.TourTrack_Layer_Name;
 	}
 
 	@Override
@@ -98,7 +92,6 @@ public class TourTrackLayerWithMarkers extends MarkerLayer implements PropertyCh
 			if (allLat == null) {
 				continue;
 			}
-
 
 			for (int serieIndex = 0; serieIndex < allLat.length; serieIndex++) {
 

@@ -2,7 +2,7 @@
 <feature
       id="feature.net.tourbook.app"
       label="MyTourbook Application"
-      version="13.4.2.qualifier"
+      version="13.9.0.qualifier"
       provider-name="MyTourbook"
       plugin="net.tourbook.branding">
 
@@ -42,98 +42,90 @@
       <import plugin="net.tourbook.photo"/>
       <import plugin="net.tourbook.ext.rxtx_2.2"/>
       <import plugin="net.tourbook.ext.worldwind_1.5"/>
-      <import plugin="net.tourbook.map3"/>
    </requires>
 
    <plugin
          id="net.tourbook.branding"
          download-size="0"
          install-size="0"
-         version="13.4.2.qualifier"
+         version="13.9.0.qualifier"
          unpack="false"/>
 
    <plugin
          id="net.tourbook.chart"
          download-size="0"
          install-size="0"
-         version="13.4.2.qualifier"
+         version="13.9.0.qualifier"
          unpack="false"/>
 
    <plugin
          id="net.tourbook.export"
          download-size="0"
          install-size="0"
-         version="13.4.2.qualifier"
+         version="13.9.0.qualifier"
          unpack="false"/>
 
    <plugin
          id="net.tourbook.printing"
          download-size="0"
          install-size="0"
-         version="13.4.2.qualifier"
+         version="13.9.0.qualifier"
          unpack="false"/>
 
    <plugin
          id="net.tourbook.device"
          download-size="0"
          install-size="0"
-         version="13.4.2.qualifier"
+         version="13.9.0.qualifier"
          unpack="false"/>
 
    <plugin
          id="net.tourbook.device.garmin"
          download-size="0"
          install-size="0"
-         version="13.4.2.qualifier"
+         version="13.9.0.qualifier"
          unpack="false"/>
 
    <plugin
          id="net.tourbook.device.garmin.fit"
          download-size="0"
          install-size="0"
-         version="13.4.2.qualifier"
+         version="13.9.0.qualifier"
          unpack="false"/>
 
    <plugin
          id="net.tourbook.device.nmea"
          download-size="0"
          install-size="0"
-         version="13.4.2.qualifier"
+         version="13.9.0.qualifier"
          unpack="false"/>
 
    <plugin
          id="net.tourbook.statistics"
          download-size="0"
          install-size="0"
-         version="13.4.2.qualifier"
+         version="13.9.0.qualifier"
          unpack="false"/>
 
    <plugin
          id="net.tourbook.common"
          download-size="0"
          install-size="0"
-         version="13.4.2.qualifier"
-         unpack="false"/>
-
-   <plugin
-         id="net.tourbook"
-         download-size="0"
-         install-size="0"
-         version="13.4.2.qualifier"
+         version="13.9.0.qualifier"
          unpack="false"/>
 
    <plugin
          id="net.tourbook.photo"
          download-size="0"
          install-size="0"
-         version="13.4.2.qualifier"
+         version="13.9.0.qualifier"
          unpack="false"/>
 
    <plugin
-         id="net.tourbook.map3"
+         id="net.tourbook"
          download-size="0"
          install-size="0"
-         version="13.4.2.qualifier"
+         version="13.9.0.qualifier"
          unpack="false"/>
 
 </feature>

@@ -37,7 +37,6 @@ import net.tourbook.common.UI;
 import net.tourbook.common.color.IMapColorProvider;
 import net.tourbook.data.TourData;
 import net.tourbook.map2.view.IDiscreteColors;
-import net.tourbook.map3.Messages;
 import net.tourbook.map3.view.ICheckStateListener;
 import net.tourbook.map3.view.Map3Manager;
 import net.tourbook.map3.view.TVIMap3Layer;
@@ -250,11 +249,6 @@ public class TourTrackLayer extends RenderableLayer implements SelectListener, I
 		default:
 			return tourData.altitudeSerie;
 		}
-	}
-
-	@Override
-	public String getName() {
-		return Messages.TourTrack_Layer_Name;
 	}
 
 	/**

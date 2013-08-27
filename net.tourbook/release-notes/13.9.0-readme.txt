@@ -11,6 +11,7 @@ https://sourceforge.net/p/mytourbook/code/ci/master/tree/net.tourbook/translatio
 https://prism-break.org/
 
 
+IT'S NOT RECOMMEND TO USE THE ENCRYPTED VERSION BECAUSE DATA CAN GET CORRUPTED,  just a warning.
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 

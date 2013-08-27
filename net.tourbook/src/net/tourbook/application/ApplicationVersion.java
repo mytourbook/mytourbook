@@ -21,15 +21,15 @@ import org.osgi.framework.Version;
 
 public class ApplicationVersion {
 
-//	private static final String	DEVELOPMENT_VERSION_TEXT	= UI.EMPTY_STRING;
-//	private static final String	DEV_WINDOW_TITLE			= UI.EMPTY_STRING;
+	private static final String	DEVELOPMENT_VERSION_TEXT	= UI.EMPTY_STRING;
+	private static final String	DEV_WINDOW_TITLE			= UI.EMPTY_STRING;
 // X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X
-	private static final String	DEVELOPMENT_VERSION_TEXT	= "DEVELOPMENT";									//$NON-NLS-1$
-	private static final String	DEV_WINDOW_TITLE			= UI.DASH_WITH_SPACE + DEVELOPMENT_VERSION_TEXT;
+//	private static final String	DEVELOPMENT_VERSION_TEXT	= "DEVELOPMENT";									//$NON-NLS-1$
+//	private static final String	DEV_WINDOW_TITLE			= UI.DASH_WITH_SPACE + DEVELOPMENT_VERSION_TEXT;
 
-//	private static String		_subVersion					= UI.EMPTY_STRING;
+	private static String		_subVersion					= UI.EMPTY_STRING;
 // X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X
-	private static String		_subVersion					= " map3";											//$NON-NLS-1$
+//	private static String		_subVersion					= " map3";											//$NON-NLS-1$
 
 // this is disabled because it contains redundant information and too much numbers which nobody needs
 // the version number is now used from the plugin version, see below

@@ -635,6 +635,7 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 					.indent(UI.FORM_FIRST_COLUMN_INDENT, 0)
 					.applyTo(_chkAltitudeOffset);
 			_chkAltitudeOffset.setText(Messages.TourTrack_Properties_Checkbox_AltitudeOffset);
+			_chkAltitudeOffset.setToolTipText(Messages.TourTrack_Properties_Checkbox_AltitudeOffset_Tooltip);
 			_chkAltitudeOffset.addSelectionListener(_defaultSelectionListener);
 
 			final Composite containerAltitude = new Composite(parent, SWT.NONE);
@@ -678,6 +679,7 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 					.indent(UI.FORM_FIRST_COLUMN_INDENT, 0)
 					.applyTo(_chkFollowTerrain);
 			_chkFollowTerrain.setText(Messages.TourTrack_Properties_Checkbox_IsFollowTerrain);
+			_chkFollowTerrain.setToolTipText(Messages.TourTrack_Properties_Checkbox_IsFollowTerrain_Tooltip);
 			_chkFollowTerrain.addSelectionListener(_defaultSelectionListener);
 		}
 	}

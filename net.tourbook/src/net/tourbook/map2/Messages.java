@@ -23,8 +23,6 @@ public class Messages extends NLS {
 
 	public static String		App_Action_Apply;
 
-	public static String	App_Action_RestoreDefaults;
-
 	public static String		graph_label_gradient_unit;
 	public static String		graph_label_heartbeat_unit;
 

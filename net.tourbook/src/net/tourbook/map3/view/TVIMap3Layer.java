@@ -20,7 +20,7 @@ import net.tourbook.common.tooltip.IToolProvider;
 
 public class TVIMap3Layer extends TVIMap3Item {
 
-	String						id;
+	private String				id;
 
 	Layer						wwLayer;
 
@@ -33,8 +33,9 @@ public class TVIMap3Layer extends TVIMap3Item {
 
 	IToolProvider				toolProvider;
 
-	public TVIMap3Layer(final Layer wwLayer, final String uiLayerName) {
+	public TVIMap3Layer(final String id, final Layer wwLayer, final String uiLayerName) {
 
+		this.id = id;
 		this.wwLayer = wwLayer;
 		this.name = uiLayerName;
 	}
@@ -46,6 +47,10 @@ public class TVIMap3Layer extends TVIMap3Item {
 	@Override
 	protected void fetchChildren() {
 		// default layer has no children
+	}
+
+	public String getId() {
+		return id;
 	}
 
 	@Override

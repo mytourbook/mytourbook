@@ -43,7 +43,9 @@ import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.TreeViewerItem;
 import net.tourbook.common.util.Util;
 import net.tourbook.map3.Messages;
+import net.tourbook.map3.layer.DefaultCategory;
 import net.tourbook.map3.layer.DefaultLayer;
+import net.tourbook.map3.layer.MapDefaultCategory;
 import net.tourbook.map3.layer.MapDefaultLayer;
 import net.tourbook.map3.layer.StatusLayer;
 import net.tourbook.map3.layer.tourtrack.TourTrackLayer;
@@ -64,31 +66,34 @@ public class Map3Manager {
 
 	static final int								WW_DEFAULT_LAYER_ID				= 1;
 
-	public static final String						PROPERTY_NAME_ENABLED			= "Enabled";							//$NON-NLS-1$
+	public static final String						PROPERTY_NAME_ENABLED			= "Enabled";														//$NON-NLS-1$
 
-	private static final String						MAP3_LAYER_STRUCTURE_FILE_NAME	= "map3-layers.xml";					//$NON-NLS-1$
+	private static final String						MAP3_LAYER_STRUCTURE_FILE_NAME	= "map3-layers.xml";												//$NON-NLS-1$
 
 	/**
 	 * This version number is incremented, when structural changes (e.g. new category) are done.
 	 * When this happens, the <b>default</b> structure is created.
 	 */
-	private static final int						MAP3_LAYER_STRUCTURE_VERSION	= 3;
+	private static final int						MAP3_LAYER_STRUCTURE_VERSION	= 6;
 
-	private static final String						ATTR_MAP3_LAYER_VERSION			= "map3LayerVersion";					//$NON-NLS-1$
+	private static final String						ATTR_MAP3_LAYER_VERSION			= "map3LayerVersion";												//$NON-NLS-1$
 
-	private static final String						TAG_ROOT						= "Map3LayerStructure";				//$NON-NLS-1$
-	private static final String						TAG_CATEGORY					= "category";							//$NON-NLS-1$
-	private static final String						TAG_LAYER						= "layer";								//$NON-NLS-1$
+	private static final String						TAG_ROOT						= "Map3LayerStructure";											//$NON-NLS-1$
+	private static final String						TAG_CATEGORY					= "category";														//$NON-NLS-1$
+	private static final String						TAG_LAYER						= "layer";															//$NON-NLS-1$
 
-	private static final String						ATTR_NAME						= "name";								//$NON-NLS-1$
-
-	private static final String						ATTR_ID							= "id";								//$NON-NLS-1$
-	private static final String						ATTR_IS_DEFAULT_LAYER			= "isDefaultLayer";					//$NON-NLS-1$
-	private static final String						ATTR_IS_ENABLED					= "isEnabled";							//$NON-NLS-1$
-	private static final String						ATTR_IS_EXPANDED				= "isExpanded";						//$NON-NLS-1$
+	private static final String						ATTR_ID							= "id";															//$NON-NLS-1$
+	private static final String						ATTR_IS_DEFAULT_LAYER			= "isDefaultLayer";												//$NON-NLS-1$
+	private static final String						ATTR_IS_ENABLED					= "isEnabled";														//$NON-NLS-1$
+	private static final String						ATTR_IS_EXPANDED				= "isExpanded";													//$NON-NLS-1$
 
 	private static final int						INSERT_BEFORE_COMPASS			= 1;
 	private static final int						INSERT_BEFORE_PLACE_NAMES		= 2;
+
+	private static final String						ERROR_01						= "NTMV_MM001 Layer \"{0}\" is not a ww default layer.";			//$NON-NLS-1$
+	private static final String						ERROR_02						= "NTMV_MM002 Layer \"{0}\" is not defined as map default layer.";	//$NON-NLS-1$
+	private static final String						ERROR_03						= "NTMV_MM003 XML layer \"{0}\" is not available.";				//$NON-NLS-1$
+	private static final String						ERROR_04						= "NTMV_MM004 Category \"{0}\" is not a default category.";		//$NON-NLS-1$
 
 	/**
 	 * _bundle must be set here otherwise an exception occures in saveState()
@@ -125,7 +130,7 @@ public class Map3Manager {
 	 */
 	private static HashMap<String, TVIMap3Layer>	_customLayers					= new HashMap<String, TVIMap3Layer>();
 
-	private static TourTrackLayer			_tourTrackLayer;
+	private static TourTrackLayer					_tourTrackLayer;
 
 	private static Object[]							_uiEnabledLayers;
 
@@ -254,9 +259,7 @@ public class Map3Manager {
 		 */
 		final String layerId = StatusLayer.class.getCanonicalName();
 
-		final TVIMap3Layer tviLayer = new TVIMap3Layer(statusLayer, statusLayer.getName());
-
-		tviLayer.id = layerId;
+		final TVIMap3Layer tviLayer = new TVIMap3Layer(layerId, statusLayer, Messages.Custom_Layer_Status);
 
 		final boolean isVisible = true;
 
@@ -276,14 +279,6 @@ public class Map3Manager {
 		/*
 		 * create WW layer
 		 */
-		// Add terrain profile layer
-//		final TerrainProfileLayer profileLayer = new TerrainProfileLayer();
-//		profileLayer.setEventSource(_wwCanvas);
-//		profileLayer.setFollow(TerrainProfileLayer.FOLLOW_PATH);
-//		profileLayer.setShowProfileLine(false);
-
-//		final boolean isVisible = false;
-
 		// Add TerrainProfileLayer
 		final TerrainProfileLayer profileLayer = new TerrainProfileLayer();
 		profileLayer.setEventSource(_ww);
@@ -295,23 +290,16 @@ public class Map3Manager {
 		 */
 		final String layerId = TerrainProfileLayer.class.getCanonicalName();
 
-		final TVIMap3Layer tviLayer = new TVIMap3Layer(profileLayer, profileLayer.getName());
+		final TVIMap3Layer tviLayer = new TVIMap3Layer(layerId, profileLayer, Messages.Custom_Layer_TerrainProfile);
 
-		tviLayer.id = layerId;
-
-		// default is enabled
-//		tviLayer.isLayerVisible = isVisible;
 		tviLayer.defaultPosition = INSERT_BEFORE_COMPASS;
 
 		final DialogTerrainProfileConfig terrainProfileConfig = new DialogTerrainProfileConfig(
 				_ww,
 				profileLayer,
 				_state);
-		tviLayer.toolProvider = terrainProfileConfig.getToolProvider();
 
-//		if (isVisible) {
-//			_uiEnabledLayersFromXml.add(tviLayer);
-//		}
+		tviLayer.toolProvider = terrainProfileConfig.getToolProvider();
 
 		_customLayers.put(layerId, tviLayer);
 	}
@@ -328,10 +316,8 @@ public class Map3Manager {
 		/*
 		 * create UI model layer
 		 */
-		final TVIMap3Layer tviLayer = new TVIMap3Layer(_tourTrackLayer, _tourTrackLayer.getName());
-
 		final String layerId = TourTrackLayer.MAP3_LAYER_ID;
-		tviLayer.id = layerId;
+		final TVIMap3Layer tviLayer = new TVIMap3Layer(layerId, _tourTrackLayer, Messages.Custom_Layer_TourTrack);
 
 		final boolean isVisible = true;
 
@@ -361,17 +347,13 @@ public class Map3Manager {
 		 */
 		final String layerId = ViewControlsLayer.class.getCanonicalName();
 
-		final TVIMap3Layer tviLayer = new TVIMap3Layer(viewControlsLayer, viewControlsLayer.getName());
+		final TVIMap3Layer tviLayer = new TVIMap3Layer(
+				layerId,
+				viewControlsLayer,
+				Messages.Custom_Layer_ViewerController);
 
-		tviLayer.id = layerId;
-
-		// default is enabled
-//		tviLayer.isLayerVisible = true;
 		tviLayer.defaultPosition = INSERT_BEFORE_COMPASS;
-
 		tviLayer.addCheckStateListener(new ViewerControllerCheckStateListener(viewControlsLayer));
-
-//		_uiEnabledLayersFromXml.add(tviLayer);
 
 		_customLayers.put(layerId, tviLayer);
 	}
@@ -405,7 +387,7 @@ public class Map3Manager {
 	 * 
 	 * @return
 	 */
-	private static XMLMemento createLayerXml_0__DefaultLayer() {
+	private static XMLMemento createLayerXml_0_DefaultLayer() {
 
 		XMLMemento xmlRoot;
 
@@ -416,56 +398,48 @@ public class Map3Manager {
 			/*
 			 * Category: Map
 			 */
-			final IMemento xmlWWCategoryMap = xmlRoot.createChild(TAG_CATEGORY);
-			xmlWWCategoryMap.putString(ATTR_NAME, Messages.Default_Category_Name_Map);
-			xmlWWCategoryMap.putBoolean(ATTR_IS_EXPANDED, true);
+			final IMemento xmlCategoryMap = createLayerXml_20_DefaultCategory(xmlRoot, MapDefaultCategory.ID_MAP);
 			{
-				createLayerXml_20_DefaultLayer(xmlWWCategoryMap, true, MapDefaultLayer.ID_STARS);
-				createLayerXml_20_DefaultLayer(xmlWWCategoryMap, true, MapDefaultLayer.ID_ATMOSPHERE);
-				createLayerXml_20_DefaultLayer(xmlWWCategoryMap, true, MapDefaultLayer.ID_NASA_BLUE_MARBLE_IMAGE);
-				createLayerXml_20_DefaultLayer(xmlWWCategoryMap, true, MapDefaultLayer.ID_BLUE_MARBLE_WMS_2004);
-				createLayerXml_20_DefaultLayer(xmlWWCategoryMap, true, MapDefaultLayer.ID_I_CUBED_LANDSAT);
-				createLayerXml_20_DefaultLayer(xmlWWCategoryMap, false, MapDefaultLayer.ID_USDA_NAIP);
-				createLayerXml_20_DefaultLayer(xmlWWCategoryMap, false, MapDefaultLayer.ID_USDA_NAIP_USGS);
-				createLayerXml_20_DefaultLayer(xmlWWCategoryMap, true, MapDefaultLayer.ID_MS_VIRTUAL_EARTH_AERIAL);
-				createLayerXml_20_DefaultLayer(xmlWWCategoryMap, true, MapDefaultLayer.ID_BING_IMAGERY);
-				createLayerXml_20_DefaultLayer(xmlWWCategoryMap, false, MapDefaultLayer.ID_USGS_TOPOGRAPHIC_MAPS_1_250K);
-				createLayerXml_20_DefaultLayer(xmlWWCategoryMap, false, MapDefaultLayer.ID_USGS_TOPOGRAPHIC_MAPS_1_100K);
-				createLayerXml_20_DefaultLayer(xmlWWCategoryMap, false, MapDefaultLayer.ID_USGS_TOPOGRAPHIC_MAPS_1_24K);
-				createLayerXml_20_DefaultLayer(xmlWWCategoryMap, false, MapDefaultLayer.ID_USGS_URBAN_AREA_ORTHO);
-				createLayerXml_20_DefaultLayer(xmlWWCategoryMap, true, MapDefaultLayer.ID_POLITICAL_BOUNDARIES);
-				createLayerXml_20_DefaultLayer(xmlWWCategoryMap, false, MapDefaultLayer.ID_OPEN_STREET_MAP);
+				createLayerXml_30_DefaultLayer(xmlCategoryMap, true, MapDefaultLayer.ID_STARS);
+				createLayerXml_30_DefaultLayer(xmlCategoryMap, true, MapDefaultLayer.ID_ATMOSPHERE);
+				createLayerXml_30_DefaultLayer(xmlCategoryMap, true, MapDefaultLayer.ID_NASA_BLUE_MARBLE_IMAGE);
+				createLayerXml_30_DefaultLayer(xmlCategoryMap, true, MapDefaultLayer.ID_BLUE_MARBLE_WMS_2004);
+				createLayerXml_30_DefaultLayer(xmlCategoryMap, true, MapDefaultLayer.ID_I_CUBED_LANDSAT);
+				createLayerXml_30_DefaultLayer(xmlCategoryMap, false, MapDefaultLayer.ID_USDA_NAIP);
+				createLayerXml_30_DefaultLayer(xmlCategoryMap, false, MapDefaultLayer.ID_USDA_NAIP_USGS);
+				createLayerXml_30_DefaultLayer(xmlCategoryMap, true, MapDefaultLayer.ID_MS_VIRTUAL_EARTH_AERIAL);
+				createLayerXml_30_DefaultLayer(xmlCategoryMap, true, MapDefaultLayer.ID_BING_IMAGERY);
+				createLayerXml_30_DefaultLayer(xmlCategoryMap, false, MapDefaultLayer.ID_USGS_TOPOGRAPHIC_MAPS_1_250K);
+				createLayerXml_30_DefaultLayer(xmlCategoryMap, false, MapDefaultLayer.ID_USGS_TOPOGRAPHIC_MAPS_1_100K);
+				createLayerXml_30_DefaultLayer(xmlCategoryMap, false, MapDefaultLayer.ID_USGS_TOPOGRAPHIC_MAPS_1_24K);
+				createLayerXml_30_DefaultLayer(xmlCategoryMap, false, MapDefaultLayer.ID_USGS_URBAN_AREA_ORTHO);
+				createLayerXml_30_DefaultLayer(xmlCategoryMap, true, MapDefaultLayer.ID_POLITICAL_BOUNDARIES);
+				createLayerXml_30_DefaultLayer(xmlCategoryMap, false, MapDefaultLayer.ID_OPEN_STREET_MAP);
 			}
 
 			/*
 			 * Category: Tour
 			 */
-			final IMemento xmlWWCategoryTour = xmlRoot.createChild(TAG_CATEGORY);
-			xmlWWCategoryTour.putString(ATTR_NAME, Messages.Custom_Category_Name_Tour);
-			xmlWWCategoryTour.putBoolean(ATTR_IS_EXPANDED, true);
+			final IMemento xmlCategoryTour = createLayerXml_20_DefaultCategory(xmlRoot, MapDefaultCategory.ID_TOUR);
 			{
-				createLayerXml_20_DefaultLayer(xmlWWCategoryTour, true, MapDefaultLayer.ID_PLACE_NAMES);
+				createLayerXml_30_DefaultLayer(xmlCategoryTour, true, MapDefaultLayer.ID_PLACE_NAMES);
 			}
 
 			/*
 			 * Category: Info
 			 */
-			final IMemento xmlWWCategoryInfo = xmlRoot.createChild(TAG_CATEGORY);
-			xmlWWCategoryInfo.putString(ATTR_NAME, Messages.Default_Category_Name_Info);
-			xmlWWCategoryInfo.putBoolean(ATTR_IS_EXPANDED, true);
+			final IMemento xmlCategoryInfo = createLayerXml_20_DefaultCategory(xmlRoot, MapDefaultCategory.ID_INFO);
 			{
-				createLayerXml_20_DefaultLayer(xmlWWCategoryInfo, true, MapDefaultLayer.ID_WORLD_MAP);
-				createLayerXml_20_DefaultLayer(xmlWWCategoryInfo, true, MapDefaultLayer.ID_SCALE_BAR);
+				createLayerXml_30_DefaultLayer(xmlCategoryInfo, true, MapDefaultLayer.ID_WORLD_MAP);
+				createLayerXml_30_DefaultLayer(xmlCategoryInfo, true, MapDefaultLayer.ID_SCALE_BAR);
 			}
 
 			/*
 			 * Category: Tools
 			 */
-			final IMemento xmlWWCategoryTools = xmlRoot.createChild(TAG_CATEGORY);
-			xmlWWCategoryTools.putString(ATTR_NAME, Messages.Default_Category_Name_Tools);
-			xmlWWCategoryTools.putBoolean(ATTR_IS_EXPANDED, true);
+			final IMemento xmlCategoryTools = createLayerXml_20_DefaultCategory(xmlRoot, MapDefaultCategory.ID_TOOL);
 			{
-				createLayerXml_20_DefaultLayer(xmlWWCategoryTools, true, MapDefaultLayer.ID_COMPASS);
+				createLayerXml_30_DefaultLayer(xmlCategoryTools, true, MapDefaultLayer.ID_COMPASS);
 			}
 
 		} catch (final Exception e) {
@@ -495,7 +469,17 @@ public class Map3Manager {
 		return xmlRoot;
 	}
 
-	private static void createLayerXml_20_DefaultLayer(	final IMemento xmlCategory,
+	private static IMemento createLayerXml_20_DefaultCategory(final IMemento xmlRoot, final String categoryId) {
+
+		final IMemento xmlCategory = xmlRoot.createChild(TAG_CATEGORY);
+
+		xmlCategory.putString(ATTR_ID, categoryId);
+		xmlCategory.putBoolean(ATTR_IS_EXPANDED, true);
+
+		return xmlCategory;
+	}
+
+	private static void createLayerXml_30_DefaultLayer(	final IMemento xmlCategory,
 														final boolean isEnabled,
 														final String defaultLayerId) {
 
@@ -508,7 +492,6 @@ public class Map3Manager {
 		final IMemento xmlLayer = xmlCategory.createChild(TAG_LAYER);
 
 		xmlLayer.putString(ATTR_ID, defaultLayerId);
-		xmlLayer.putString(ATTR_NAME, mapDefaultLayer.layerName);
 		xmlLayer.putBoolean(ATTR_IS_ENABLED, isEnabled);
 		xmlLayer.putBoolean(ATTR_IS_DEFAULT_LAYER, true);
 	}
@@ -558,7 +541,7 @@ public class Map3Manager {
 
 				final XMLMemento xmlCategory = (XMLMemento) xmlParent.createChild(TAG_CATEGORY);
 
-				xmlCategory.putString(ATTR_NAME, tviCategory.name);
+				xmlCategory.putString(ATTR_ID, tviCategory.getId());
 				xmlCategory.putBoolean(ATTR_IS_EXPANDED, isCategoryExpanded(tviCategory));
 
 				createLayerXml_60_FromTreeChildren(tviItem, xmlCategory);
@@ -569,8 +552,7 @@ public class Map3Manager {
 
 				final IMemento xmlLayer = xmlParent.createChild(TAG_LAYER);
 
-				xmlLayer.putString(ATTR_ID, tviLayer.id);
-				xmlLayer.putString(ATTR_NAME, tviLayer.name);
+				xmlLayer.putString(ATTR_ID, tviLayer.getId());
 				xmlLayer.putBoolean(ATTR_IS_ENABLED, tviLayer.isLayerVisible);
 				xmlLayer.putBoolean(ATTR_IS_DEFAULT_LAYER, tviLayer.isDefaultLayer);
 			}
@@ -926,8 +908,9 @@ public class Map3Manager {
 			}
 
 			if (xmlRoot == null || layerVersion == null || layerVersion < MAP3_LAYER_STRUCTURE_VERSION) {
-				// get default layer tree
-				xmlRoot = createLayerXml_0__DefaultLayer();
+
+				// create default layer tree
+				xmlRoot = createLayerXml_0_DefaultLayer();
 			}
 
 			parseLayerXml_10_Children(xmlRoot, tviRoot);
@@ -971,12 +954,11 @@ public class Map3Manager {
 
 				try {
 
-					final String xmlName = xmlChild.getString(ATTR_NAME);
 					final String xmlType = xmlChild.getType();
+					final String xmlChildId = xmlChild.getString(ATTR_ID);
 
 					if (xmlType.equals(TAG_LAYER)) {
 
-						final String xmlLayerId = xmlChild.getString(ATTR_ID);
 						final boolean isEnabled = Boolean.TRUE.equals(xmlChild.getBoolean(ATTR_IS_ENABLED));
 						final boolean isDefaultLayer = Boolean.TRUE.equals(xmlChild.getBoolean(ATTR_IS_DEFAULT_LAYER));
 
@@ -986,30 +968,25 @@ public class Map3Manager {
 
 							// layer is a default layer
 
-							final Layer wwLayer = _wwDefaultLayers.getLayerByName(xmlLayerId);
+							final Layer wwLayer = _wwDefaultLayers.getLayerByName(xmlChildId);
 
 							// check if xml layer is a default ww layer
 							if (wwLayer == null) {
-								StatusUtil.log(NLS.bind(
-										"NTMVMM001 layer \"{0}\" is not a ww default layer.", xmlLayerId));//$NON-NLS-1$
+								StatusUtil.log(NLS.bind(ERROR_01, xmlChildId));
 								continue;
 							}
 
-							String layerName;
-							final DefaultLayer mapDefaultLayer = MapDefaultLayer.getLayer(xmlLayerId);
-
+							final DefaultLayer mapDefaultLayer = MapDefaultLayer.getLayer(xmlChildId);
 							// use untranslated name, this should not occure
 							if (mapDefaultLayer == null) {
-								StatusUtil.log(NLS.bind(
-										"NTMVMM002 layer \"{0}\" is not defined as map default layer.", xmlLayerId));//$NON-NLS-1$
-								layerName = xmlName;
-							} else {
-								layerName = mapDefaultLayer.layerName;
+								StatusUtil.log(NLS.bind(ERROR_02, xmlChildId));
+								continue;
 							}
 
-							tviLayer = new TVIMap3Layer(wwLayer, layerName);
+							final String layerName = mapDefaultLayer.layerName;
 
-							tviLayer.id = xmlLayerId;
+							tviLayer = new TVIMap3Layer(xmlChildId, wwLayer, layerName);
+
 							tviLayer.isDefaultLayer = true;
 
 							_xmlLayers.add(wwLayer);
@@ -1018,10 +995,10 @@ public class Map3Manager {
 
 							// NO default layer
 
-							tviLayer = _customLayers.get(xmlLayerId);
+							tviLayer = _customLayers.get(xmlChildId);
 
 							if (tviLayer == null) {
-								StatusUtil.log(NLS.bind("NTMVMM003 xml layer \"{0}\" is not available.", xmlLayerId));//$NON-NLS-1$
+								StatusUtil.log(NLS.bind(ERROR_03, xmlChildId));
 								continue;
 							}
 
@@ -1044,7 +1021,15 @@ public class Map3Manager {
 
 					} else if (xmlType.equals(TAG_CATEGORY)) {
 
-						final TVIMap3Category tviCategory = new TVIMap3Category(xmlName);
+						final DefaultCategory defaultCategory = MapDefaultCategory.getLayer(xmlChildId);
+						if (defaultCategory == null) {
+							StatusUtil.log(NLS.bind(ERROR_04, xmlChildId));
+							continue;
+						}
+
+						final String categoryName = defaultCategory.categoryName;
+
+						final TVIMap3Category tviCategory = new TVIMap3Category(xmlChildId, categoryName);
 
 						tviParent.addChild(tviCategory);
 
@@ -1214,9 +1199,7 @@ public class Map3Manager {
 
 			// update model and UI
 
-			_map3LayerView.setTourTrackLayerVisibility(
-					_customLayers.get(TourTrackLayer.MAP3_LAYER_ID),
-					isTrackVisible);
+			_map3LayerView.setTourTrackLayerVisibility(_customLayers.get(TourTrackLayer.MAP3_LAYER_ID), isTrackVisible);
 		}
 	}
 

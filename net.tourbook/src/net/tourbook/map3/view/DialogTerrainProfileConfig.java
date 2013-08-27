@@ -117,7 +117,7 @@ public class DialogTerrainProfileConfig {
 
 		@Override
 		public String getToolTitle() {
-			return _profileLayer.getName();
+			return Messages.Custom_Layer_TerrainProfile;
 		}
 
 		@Override

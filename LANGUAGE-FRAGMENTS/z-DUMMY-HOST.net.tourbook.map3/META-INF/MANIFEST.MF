@@ -1,7 +1,0 @@
-Manifest-Version: 1.0
-Bundle-ManifestVersion: 2
-Bundle-Name: Language support
-Bundle-SymbolicName: net.tourbook.map3;singleton:=true
-Bundle-Version: 13.4.0.qualifier
-Bundle-Vendor: MyTourbook
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6

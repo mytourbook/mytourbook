@@ -19,6 +19,7 @@ import net.tourbook.Messages;
 
 import org.eclipse.core.runtime.IProduct;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.GC;
@@ -28,6 +29,7 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.branding.IProductConstants;
 import org.eclipse.ui.splash.BasicSplashHandler;
+import org.joda.time.DateTime;
 
 /**
  * This was a copy of EclipseSplashHandler Parses the well known product constants and constructs a
@@ -104,7 +106,7 @@ public class MyTourbookSplashHandler extends BasicSplashHandler {
 		final int borderRight = 385;
 		final int borderBottom = 101;
 
-		final String copyRight = Messages.App_Splash_Copyright;
+		final String copyRight = NLS.bind(Messages.App_Splash_Copyright, new DateTime().getYear());
 		final int textHeight = gc.textExtent(copyRight).y;
 
 		final String version = "Version " + ApplicationVersion.getVersionSimple(); //$NON-NLS-1$

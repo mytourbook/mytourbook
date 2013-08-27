@@ -15,18 +15,18 @@
  *******************************************************************************/
 package net.tourbook.map3.layer;
 
-public class DefaultLayer {
+public class DefaultCategory {
 
-	public String	layerId;
+	public String	categoryId;
 
 	/**
-	 * Layer name which is translated.
+	 * Category name which is translated.
 	 */
-	public String	layerName;
+	public String	categoryName;
 
-	public DefaultLayer(final String layerId, final String layerName) {
+	public DefaultCategory(final String categoryId, final String categoryName) {
 
-		this.layerId = layerId;
-		this.layerName = layerName;
+		this.categoryId = categoryId;
+		this.categoryName = categoryName;
 	}
 }

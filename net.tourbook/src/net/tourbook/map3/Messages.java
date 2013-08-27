@@ -21,11 +21,10 @@ public class Messages extends NLS {
 
 	private static final String	BUNDLE_NAME	= "net.tourbook.map3.messages";				//$NON-NLS-1$
 
-	public static String		Custom_Category_Name_Tour;
-
-	public static String		Default_Category_Name_Info;
-	public static String		Default_Category_Name_Map;
-	public static String		Default_Category_Name_Tools;
+	public static String		Custom_Layer_Status;
+	public static String		Custom_Layer_TerrainProfile;
+	public static String		Custom_Layer_TourTrack;
+	public static String		Custom_Layer_ViewerController;
 
 	public static String		Default_Layer_Atmosphere;
 	public static String		Default_Layer_Compass;
@@ -34,6 +33,7 @@ public class Messages extends NLS {
 	public static String		Default_Layer_PlaceNames;
 	public static String		Default_Layer_PoliticalBoundaries;
 	public static String		Default_Layer_ScaleBar;
+	public static String		Default_Layer_Stars;
 	public static String		Default_Layer_USGS_UrbanArea;
 	public static String		Default_Layer_WMS_BingImagery;
 	public static String		Default_Layer_WMS_i_cubed_Landsat;
@@ -45,12 +45,18 @@ public class Messages extends NLS {
 	public static String		Default_Layer_WMS_USGS_Topo24;
 	public static String		Default_Layer_WMS_USGS_Topo250;
 	public static String		Default_Layer_WorldMap;
-	public static String		Default_LayerName_Stars;
 
 	public static String		Image_Map3_Map3PropertiesView;
 
-	public static String		Map3_Action_OpenMap3PropertiesView;
+	public static String	Layer_Category_Info;
 
+	public static String	Layer_Category_Map;
+
+	public static String	Layer_Category_Tools;
+
+	public static String	Layer_Category_Tour;
+
+	public static String		Map3_Action_OpenMap3PropertiesView;
 	public static String		Map3_Action_TrackColor;
 
 	public static String		Prop_Viewer_Label_AltitudeRange_Tooltip;
@@ -71,16 +77,16 @@ public class Messages extends NLS {
 	public static String		Terrain_Profile_Label_Follow;
 	public static String		Terrain_Profile_Label_ProfileLength;
 
-	public static String		TourTrack_Layer_Name;
-
 	public static String		TourTrack_Properties_Button_Default;
 	public static String		TourTrack_Properties_Button_Default_Tooltip;
 	public static String		TourTrack_Properties_Checkbox_AltitudeOffset;
+	public static String		TourTrack_Properties_Checkbox_AltitudeOffset_Tooltip;
 	public static String		TourTrack_Properties_Checkbox_DrawVerticals;
 	public static String		TourTrack_Properties_Checkbox_DrawVerticals_Tooltip;
 	public static String		TourTrack_Properties_Checkbox_ExtrudePath;
 	public static String		TourTrack_Properties_Checkbox_ExtrudePath_Tooltip;
 	public static String		TourTrack_Properties_Checkbox_IsFollowTerrain;
+	public static String		TourTrack_Properties_Checkbox_IsFollowTerrain_Tooltip;
 	public static String		TourTrack_Properties_Checkbox_ShowTrackPositions;
 	public static String		TourTrack_Properties_Checkbox_ShowTrackPositions_Tooltip;
 	public static String		TourTrack_Properties_Label_Altitude;
@@ -115,7 +121,6 @@ public class Messages extends NLS {
 	public static String		Track_Config_Altitude_Mode_ClampToGround;
 	public static String		Track_Config_Altitude_Mode_RelativeToGround;
 	public static String		Track_Config_Path_Resolution_High;
-
 	public static String		Track_Config_Path_Resolution_Optimized;
 	public static String		Track_Config_Path_Resolution_Viewport;
 

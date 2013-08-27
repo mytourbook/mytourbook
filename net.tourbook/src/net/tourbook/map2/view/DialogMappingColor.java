@@ -95,7 +95,6 @@ public class DialogMappingColor extends TitleAreaDialog {
 	private Image					_imageMappingColor;
 
 	private Button					_btnApply;
-	private Button					_btnDefaults;
 
 	private Button					_chkForceMinValue;
 	private Button					_chkForceMaxValue;
@@ -463,36 +462,6 @@ public class DialogMappingColor extends TitleAreaDialog {
 				}
 			});
 			setButtonLayoutData(_btnApply);
-		}
-	}
-
-	private void createUI_60_RestoreDefaults(final Composite parent) {
-
-		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults()//
-				.grab(true, false)
-				.applyTo(container);
-		GridLayoutFactory.fillDefaults()//
-				.numColumns(1)
-				.margins(0, 20)
-				.applyTo(container);
-//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
-		{
-			/*
-			 * Button: Restore defaults
-			 */
-			_btnDefaults = new Button(container, SWT.NONE);
-			GridDataFactory.fillDefaults()//
-					.align(SWT.TRAIL, SWT.CENTER)
-					.applyTo(container);
-			_btnDefaults.setText(Messages.App_Action_RestoreDefaults);
-			_btnDefaults.addSelectionListener(new SelectionAdapter() {
-				@Override
-				public void widgetSelected(final SelectionEvent e) {
-					onSelectDefaults();
-				}
-			});
-			setButtonLayoutData(_btnDefaults);
 		}
 	}
 
