@@ -421,9 +421,20 @@ public class Map3View extends ViewPart implements ITourProvider {
 
 		// Add listener to repopulate the menu each time
 		_swtContextMenu.addMenuListener(new MenuAdapter() {
+
+			boolean	_isFilled;
+
 			@Override
 			public void menuShown(final MenuEvent e) {
-				fillContextMenu((Menu) e.widget);
+
+				if (_isFilled == false) {
+
+					// Ubuntu filled it twice
+					
+					_isFilled = true;
+
+					fillContextMenu((Menu) e.widget);
+				}
 			}
 		});
 
