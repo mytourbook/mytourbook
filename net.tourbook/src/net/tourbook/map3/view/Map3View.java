@@ -32,6 +32,7 @@ import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.color.IMapColorProvider;
 import net.tourbook.common.color.MapColorId;
 import net.tourbook.common.util.PostSelectionProvider;
+import net.tourbook.common.util.SWTPopupOverAWT;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.extension.export.ActionExport;
@@ -93,11 +94,11 @@ public class Map3View extends ViewPart implements ITourProvider {
 	public static final String					ID										= "net.tourbook.map3.view.Map3ViewId";		//$NON-NLS-1$
 
 	private static final String					STATE_IS_SYNC_MAP_VIEW_WITH_TOUR		= "STATE_IS_SYNC_MAP_VIEW_WITH_TOUR";		//$NON-NLS-1$
+
 	private static final String					STATE_IS_SYNC_MAP_POSITION_WITH_SLIDER	= "STATE_IS_SYNC_MAP_POSITION_WITH_SLIDER"; //$NON-NLS-1$
 	private static final String					STATE_IS_TOUR_VISIBLE					= "STATE_IS_TOUR_VISIBLE";					//$NON-NLS-1$
 	private static final String					STATE_MAP3_VIEW							= "STATE_MAP3_VIEW";						//$NON-NLS-1$
 	private static final String					STATE_TOUR_COLOR_ID						= "STATE_TOUR_COLOR_ID";					//$NON-NLS-1$
-
 	private final IPreferenceStore				_prefStore								= TourbookPlugin.getDefault()//
 																								.getPreferenceStore();
 
@@ -110,6 +111,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 	private ActionOpenMap3LayerView				_actionOpenMap3LayerView;
 
 	private ActionMapColor						_actionMapColor;
+
 	private ActionShowEntireTour				_actionShowEntireTour;
 	private ActionShowTourInMap3				_actionShowTourInMap3;
 	private ActionSyncMapPositionWithSlider		_actionSynMapPositionWithSlider;
@@ -120,33 +122,32 @@ public class Map3View extends ViewPart implements ITourProvider {
 	private ActionTourColor						_actionTourColorSpeed;
 	private ActionTourColor						_actionTourColorPace;
 	private ActionTourColor						_actionTourColorHrZone;
-
 	// context menu actions
 	private ActionEditQuick						_actionEditQuick;
+
 	private ActionEditTour						_actionEditTour;
 	private ActionExport						_actionExportTour;
 	private ActionOpenAdjustAltitudeDialog		_actionOpenAdjustAltitudeDialog;
 	private ActionOpenMarkerDialog				_actionOpenMarkerDialog;
 	private ActionOpenTour						_actionOpenTour;
 	private ActionPrint							_actionPrintTour;
-
 	private PostSelectionProvider				_postSelectionProvider;
 
 	private IPartListener2						_partListener;
+
 	private ISelectionListener					_postSelectionListener;
 	private IPropertyChangeListener				_prefChangeListener;
 	private ITourEventListener					_tourEventListener;
-	private MouseAdapter						_map3MouseListener;
-
+	private MouseAdapter						_awtMouseListener;
 	private boolean								_isPartActive;
+
 	private boolean								_isPartVisible;
 	private boolean								_isRestored;
 	private ISelection							_lastHiddenSelection;
-
 	private boolean								_isSyncMapPositionWithSlider;
+
 	private boolean								_isSyncMapViewWithTour;
 	private boolean								_isTourVisible;
-
 	private static int							_renderCounter;
 
 	/**
@@ -163,9 +164,17 @@ public class Map3View extends ViewPart implements ITourProvider {
 	 * UI controls
 	 */
 	private Composite							_mapContainer;
-	private Frame								_awtFrame;
 
-	private Menu								_contextMenu;
+	private Frame								_awtFrame;
+	private Menu								_swtContextMenu;
+
+	private class Map3ContextMenu extends SWTPopupOverAWT {
+
+		public Map3ContextMenu(final Display display, final Menu swtContextMenu) {
+			super(display, swtContextMenu);
+		}
+
+	}
 
 	public Map3View() {}
 
@@ -216,15 +225,15 @@ public class Map3View extends ViewPart implements ITourProvider {
 
 	private void addMap3Listener() {
 
-		_map3MouseListener = new MouseAdapter() {
+		_awtMouseListener = new MouseAdapter() {
 
 			@Override
 			public void mouseClicked(final MouseEvent e) {
-				onMouseClick(e);
+				onAWTMouseClick(e);
 			}
 		};
 
-		_wwCanvas.getInputHandler().addMouseListener(_map3MouseListener);
+		_wwCanvas.getInputHandler().addMouseListener(_awtMouseListener);
 	}
 
 	private void addPartListener() {
@@ -408,18 +417,30 @@ public class Map3View extends ViewPart implements ITourProvider {
 
 		disposeContextMenu();
 
-		_contextMenu = new Menu(_mapContainer);
+		_swtContextMenu = new Menu(_mapContainer);
 
 		// Add listener to repopulate the menu each time
-		_contextMenu.addMenuListener(new MenuAdapter() {
+		_swtContextMenu.addMenuListener(new MenuAdapter() {
 			@Override
 			public void menuShown(final MenuEvent e) {
 				fillContextMenu((Menu) e.widget);
 			}
 		});
 
-		_contextMenu.setLocation(xPosScreen, yPosScreen);
-		_contextMenu.setVisible(true);
+		final Display display = _mapContainer.getDisplay();
+
+		final Map3ContextMenu swt_awt_ContextMenu = new Map3ContextMenu(display, _swtContextMenu);
+
+		display.asyncExec(new Runnable() {
+			public void run() {
+				System.out.println("SWT calling menu"); //$NON-NLS-1$
+				swt_awt_ContextMenu.swtIndirectShowMenu(xPosScreen, yPosScreen);
+			}
+		});
+
+//		_swtContextMenu.setLocation(xPosScreen, yPosScreen);
+//		_swtContextMenu.setVisible(true);
+
 	}
 
 	@Override
@@ -505,7 +526,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 
 		TourManager.getInstance().removeTourEventListener(_tourEventListener);
 
-		_wwCanvas.getInputHandler().removeMouseListener(_map3MouseListener);
+		_wwCanvas.getInputHandler().removeMouseListener(_awtMouseListener);
 
 		disposeContextMenu();
 
@@ -513,8 +534,9 @@ public class Map3View extends ViewPart implements ITourProvider {
 	}
 
 	private void disposeContextMenu() {
-		if (_contextMenu != null) {
-			_contextMenu.dispose();
+
+		if (_swtContextMenu != null) {
+			_swtContextMenu.dispose();
 		}
 	}
 
@@ -636,7 +658,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 		return _tourColorId;
 	}
 
-	private void onMouseClick(final MouseEvent mouseEvent) {
+	private void onAWTMouseClick(final MouseEvent mouseEvent) {
 
 		if (mouseEvent == null || mouseEvent.isConsumed()) {
 			return;
