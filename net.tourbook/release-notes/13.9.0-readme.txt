@@ -2,16 +2,17 @@ Version: 13.10.0                                            ?. ? 2013
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-update git url in messages edit docu
+-update git url in messages edit docu
 
-https://sourceforge.net/p/mytourbook/code/ci/master/tree/net.tourbook/translations/mt-translations.zip
+-https://sourceforge.net/p/mytourbook/code/ci/master/tree/net.tourbook/translations/mt-translations.zip
 
+-memory size
 
+-https://prism-break.org/
 
-https://prism-break.org/
+-select/deselect tour
 
-
-IT'S NOT RECOMMEND TO USE THE ENCRYPTED VERSION BECAUSE DATA CAN GET CORRUPTED,  just a warning.
+-IT'S NOT RECOMMEND TO USE THE ENCRYPTED VERSION BECAUSE DATA CAN GET CORRUPTED,  just a warning.
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 

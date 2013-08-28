@@ -138,11 +138,11 @@ public class SWTPopupOverAWT {
 			public void run() {
 
 				if (swtPopupMenu.isVisible()) {
-					System.out.println("made visible after " + (MAX_RETRIES - retriesRemaining) + " attempts"); //$NON-NLS-1$ //$NON-NLS-2$
+//					System.out.println("made visible after " + (MAX_RETRIES - retriesRemaining) + " attempts"); //$NON-NLS-1$ //$NON-NLS-2$
 
 				} else if (retriesRemaining > 0) {
 
-					System.out.println("retrying (remains " + (retriesRemaining - 1) + ")"); //$NON-NLS-1$ //$NON-NLS-2$
+//					System.out.println("retrying (remains " + (retriesRemaining - 1) + ")"); //$NON-NLS-1$ //$NON-NLS-2$
 
 					//swtHost.getShell().forceFocus();
 					//swtHost.getShell().forceActive();
@@ -183,7 +183,7 @@ public class SWTPopupOverAWT {
 
 		swtPopupMenu.setLocation(new Point(x, y));
 
-		System.out.println("Displaying the menu at coordinates " + x + "," + y); //$NON-NLS-1$ //$NON-NLS-2$
+//		System.out.println("Displaying the menu at coordinates " + x + "," + y); //$NON-NLS-1$ //$NON-NLS-2$
 		swtPopupMenu.setVisible(true);
 
 		// if GUI not based on GTK, the menu should already be displayed.

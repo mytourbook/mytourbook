@@ -430,7 +430,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 				if (_isFilled == false) {
 
 					// Ubuntu filled it twice
-					
+
 					_isFilled = true;
 
 					fillContextMenu((Menu) e.widget);
@@ -444,14 +444,10 @@ public class Map3View extends ViewPart implements ITourProvider {
 
 		display.asyncExec(new Runnable() {
 			public void run() {
-				System.out.println("SWT calling menu"); //$NON-NLS-1$
+//				System.out.println("SWT calling menu"); //$NON-NLS-1$
 				swt_awt_ContextMenu.swtIndirectShowMenu(xPosScreen, yPosScreen);
 			}
 		});
-
-//		_swtContextMenu.setLocation(xPosScreen, yPosScreen);
-//		_swtContextMenu.setVisible(true);
-
 	}
 
 	@Override
