@@ -6426,6 +6426,9 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		}
 
 		_tourChart = null;
+
+		_postSelectionProvider.clearSelection();
+
 		updateUIFromModel(tourDataForEditor, false, true);
 	}
 

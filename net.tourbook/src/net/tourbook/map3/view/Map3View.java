@@ -1130,6 +1130,8 @@ public class Map3View extends ViewPart implements ITourProvider {
 
 	private void updateModifiedTours(final ArrayList<TourData> modifiedTours) {
 
+		_postSelectionProvider.clearSelection();
+
 		_allTours.removeAll(modifiedTours);
 		_allTours.addAll(modifiedTours);
 

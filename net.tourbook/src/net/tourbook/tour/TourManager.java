@@ -200,7 +200,10 @@ public class TourManager {
 			return true;
 		}
 
-		if (tourData1.getTourId().longValue() == tourData2.getTourId().longValue() && tourData1 != tourData2) {
+		final long tourId1 = tourData1.getTourId().longValue();
+		final long tourId2 = tourData2.getTourId().longValue();
+
+		if (tourId1 == tourId2 && tourData1 != tourData2) {
 
 			final StringBuilder sb = new StringBuilder()//
 					.append("ERROR: ") //$NON-NLS-1$
@@ -1264,6 +1267,10 @@ public class TourManager {
 		if (savedTour != null) {
 			savedTours.add(savedTour);
 		}
+
+//		System.out.println(UI.timeStampNano() + " [saveModifiedToursOneTour] Old Tour\t" + tourData);
+//		System.out.println(UI.timeStampNano() + " [saveModifiedToursOneTour] Saved Tour\t" + savedTour);
+//		// TODO remove SYSTEM.OUT.PRINTLN
 	}
 
 	public static boolean setAltitudeValuesFromSRTM(final ArrayList<TourData> tourDataList) {

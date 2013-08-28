@@ -54,8 +54,8 @@ public class TourTrackConfig {
 	private static final String				STATE_TRACK_POSITION_THRESHOLD		= "STATE_TRACK_POSITION_THRESHOLD";	//$NON-NLS-1$
 
 	public static final AltitudeMode[]		ALTITUDE_MODE						= {
-			new AltitudeMode(Messages.Track_Config_Altitude_Mode_ClampToGround, WorldWind.CLAMP_TO_GROUND),
 			new AltitudeMode(Messages.Track_Config_Altitude_Mode_Absolute, WorldWind.ABSOLUTE),
+			new AltitudeMode(Messages.Track_Config_Altitude_Mode_ClampToGround, WorldWind.CLAMP_TO_GROUND),
 			new AltitudeMode(Messages.Track_Config_Altitude_Mode_RelativeToGround, WorldWind.RELATIVE_TO_GROUND) //
 																				};
 
