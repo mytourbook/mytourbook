@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -22,31 +22,16 @@ import net.tourbook.ui.tourChart.TourChart;
 import org.eclipse.jface.viewers.ISelection;
 
 /**
- * selection is fired when a tour was selected
+ * Selection is fired when a tour was selected.
  */
 public class SelectionTourData implements ISelection {
 
 	private TourChart	_tourChart;
 	private TourData	_tourData;
 
-	private boolean		_isForceRedraw	= false;
-
 	public SelectionTourData(final TourChart tourChart, final TourData tourData) {
 		_tourChart = tourChart;
 		_tourData = tourData;
-	}
-
-	/**
-	 * @param tourChart
-	 * @param tourData
-	 * @param forceRedraw
-	 *            when <code>true</code> the displayed tour should be redrawn because the
-	 *            {@link TourData} has been changed
-	 */
-	public SelectionTourData(final TourChart tourChart, final TourData tourData, final boolean forceRedraw) {
-		_tourChart = tourChart;
-		_tourData = tourData;
-		_isForceRedraw = forceRedraw;
 	}
 
 	public SelectionTourData(final TourData tourData) {
@@ -67,14 +52,6 @@ public class SelectionTourData implements ISelection {
 
 	public boolean isEmpty() {
 		return false;
-	}
-
-	public boolean isForceRedraw() {
-		return _isForceRedraw;
-	}
-
-	public void setForceRedraw(final boolean fForceRedraw) {
-		this._isForceRedraw = fForceRedraw;
 	}
 
 	@Override

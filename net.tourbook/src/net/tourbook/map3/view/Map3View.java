@@ -201,7 +201,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 
 		Map3Manager.setTourTrackVisible(isTrackVisible);
 
-		showAllTours();
+		showAllTours_InternalTours();
 	}
 
 	public void actionSynchMapPositionWithSlider() {
@@ -214,7 +214,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 		_isSyncMapViewWithTour = _actionSynMapViewWithTour.isChecked();
 
 		if (_isSyncMapViewWithTour) {
-			showAllTours();
+			showAllTours_InternalTours();
 		}
 	}
 
@@ -349,7 +349,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 
 				if (eventId == TourEventId.TOUR_CHART_PROPERTY_IS_MODIFIED) {
 
-					showAllTours();
+					showAllTours_InternalTours();
 
 				} else if ((eventId == TourEventId.TOUR_CHANGED) && (eventData instanceof TourEvent)) {
 
@@ -375,7 +375,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 
 		_allTours.clear();
 
-		showAllTours();
+		showAllTours_InternalTours();
 	}
 
 	private void createActions(final Composite parent) {
@@ -496,7 +496,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 
 				} else {
 
-					showAllTours();
+					showAllTours_InternalTours();
 				}
 			}
 		});
@@ -720,13 +720,12 @@ public class Map3View extends ViewPart implements ITourProvider {
 
 		if (selection instanceof SelectionTourData) {
 
-//			final SelectionTourData selectionTourData = (SelectionTourData) selection;
-//			final TourData tourData = selectionTourData.getTourData();
-//
-//			paintTours_20_One(tourData, selectionTourData.isForceRedraw(), true);
+			final SelectionTourData selectionTourData = (SelectionTourData) selection;
+			final TourData tourData = selectionTourData.getTourData();
+
+			showTour(tourData);
+
 //			paintPhotoSelection(selection);
-//
-//			enableActions();
 
 		} else if (selection instanceof SelectionTourId) {
 
@@ -738,6 +737,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 			final TourData tourData = TourManager.getInstance().getTourData(tourId);
 
 			showTour(tourData);
+
 //			paintPhotoSelection(selection);
 
 		} else if (selection instanceof SelectionTourIds) {
@@ -1068,23 +1068,11 @@ public class Map3View extends ViewPart implements ITourProvider {
 
 	}
 
-	private void showAllTours() {
-
-		showAllTours(_isSyncMapViewWithTour);
-	}
-
-	private void showAllTours(final ArrayList<TourData> allTours) {
-
-		_allTours.clear();
-		_allTours.addAll(allTours);
-
-		showAllTours();
-	}
-
 	/**
 	 * Shows all tours in the map which are set in {@link #_allTours}.
 	 * 
 	 * @param isSyncMapViewWithTour
+	 *            When <code>true</code> the map will zoomed and positioned to show all tours.
 	 */
 	public void showAllTours(final boolean isSyncMapViewWithTour) {
 
@@ -1103,12 +1091,30 @@ public class Map3View extends ViewPart implements ITourProvider {
 		_wwCanvas.redraw();
 	}
 
+	private void showAllTours_InternalTours() {
+
+		showAllTours(_isSyncMapViewWithTour);
+	}
+
+	private void showAllTours_NewTours(final ArrayList<TourData> allTours) {
+
+		// check if new tours are already displayed
+		if (allTours.hashCode() == _allTours.hashCode()) {
+			return;
+		}
+
+		_allTours.clear();
+		_allTours.addAll(allTours);
+
+		showAllTours_InternalTours();
+	}
+
 	private void showTour(final TourData tourData) {
 
 		final ArrayList<TourData> allTours = new ArrayList<TourData>();
 		allTours.add(tourData);
 
-		showAllTours(allTours);
+		showAllTours_NewTours(allTours);
 	}
 
 	private void showTours(final ArrayList<Long> allTourIds) {
@@ -1118,7 +1124,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 		// load all tours
 		final long newOverlayKey = TourManager.loadTourData(allTourIds, allTourData);
 
-		showAllTours(allTourData);
+		showAllTours_NewTours(allTourData);
 	}
 
 	private void showToursFromTourProvider() {
@@ -1139,7 +1145,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 
 				final ArrayList<TourData> allTours = TourManager.getSelectedTours();
 				if (allTours != null) {
-					showAllTours(allTours);
+					showAllTours_NewTours(allTours);
 				}
 			}
 		});
@@ -1164,7 +1170,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 		_allTours.removeAll(modifiedTours);
 		_allTours.addAll(modifiedTours);
 
-		showAllTours();
+		showAllTours_InternalTours();
 	}
 
 }

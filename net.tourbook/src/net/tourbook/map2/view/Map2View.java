@@ -1916,7 +1916,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 			final SelectionTourData selectionTourData = (SelectionTourData) selection;
 			final TourData tourData = selectionTourData.getTourData();
 
-			paintTours_20_One(tourData, selectionTourData.isForceRedraw(), true);
+			paintTours_20_One(tourData, false, true);
 			paintPhotoSelection(selection);
 
 			enableActions();
