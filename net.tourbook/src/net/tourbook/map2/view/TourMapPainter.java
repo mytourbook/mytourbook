@@ -748,14 +748,8 @@ public class TourMapPainter extends MapPainter {
 			gcTile.drawRectangle(devX, devY, photoWidth, photoHeight);
 
 //			System.out.println(net.tourbook.common.UI.timeStampNano()
-//					+ " image: "
-//					+ imageSize.width
-//					+ "x"
-//					+ imageSize.height
-//					+ "\tphoto: "
-//					+ photoWidth
-//					+ " x "
-//					+ photoHeight);
+//					+ (" image: " + imageSize.width + "x" + imageSize.height)
+//					+ ("\tphoto: " + photoWidth + " x " + photoHeight));
 //			// TODO remove SYSTEM.OUT.PRINTLN
 		}
 

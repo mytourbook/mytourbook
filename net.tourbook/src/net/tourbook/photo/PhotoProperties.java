@@ -532,6 +532,11 @@ public class PhotoProperties extends AnimatedToolTipShell implements IPhotoEvent
 
 		_imageSize = Util.getStateInt(_state, STATE_PHOTO_PROPERTIES_IMAGE_SIZE, Photo.MAP_IMAGE_DEFAULT_WIDTH_HEIGHT);
 
+		// ensure that an image is displayed, it happend that image size was 0
+		if (_imageSize < 10) {
+			_imageSize = Photo.MAP_IMAGE_DEFAULT_WIDTH_HEIGHT;
+		}
+
 		// set image size for the map photos
 		Photo.setPaintedMapImageWidth(_imageSize);
 
