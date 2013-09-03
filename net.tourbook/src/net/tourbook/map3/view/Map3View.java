@@ -1082,11 +1082,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 
 		final ArrayList<TourMap3Position> allPositions = tourTrackLayer.createTrackPaths(_allTours);
 
-		if (isSyncMapViewWithTour) {
-
-			final Map3ViewController viewController = Map3ViewController.create(Map3Manager.getWWCanvas());
-			viewController.goToDefaultView(allPositions);
-		}
+		syncMapWithTour(isSyncMapViewWithTour, allPositions);
 
 		_wwCanvas.redraw();
 	}
@@ -1109,10 +1105,39 @@ public class Map3View extends ViewPart implements ITourProvider {
 		showAllTours_InternalTours();
 	}
 
-	private void showTour(final TourData tourData) {
+	private void showTour(final TourData newTourData) {
+
+		// check if this tour is already displayed
+		for (final TourData existingTour : _allTours) {
+			if (newTourData.equals(existingTour)) {
+
+				/*
+				 * the new tour is already displayed in the map, just select it but only when
+				 * multiple tours are displayed, otherwise one tour gets selected which is a very
+				 * annoying
+				 */
+
+				if (_allTours.size() > 1) {
+
+					final TourTrackLayer tourTrackLayer = Map3Manager.getTourTrackLayer();
+					final ArrayList<TourMap3Position> trackPositions = tourTrackLayer.selectTrackPath(newTourData);
+
+					if (trackPositions == null) {
+						// track is already selected
+						return;
+					}
+
+					syncMapWithTour(_isSyncMapViewWithTour, trackPositions);
+
+					_wwCanvas.redraw();
+				}
+
+				return;
+			}
+		}
 
 		final ArrayList<TourData> allTours = new ArrayList<TourData>();
-		allTours.add(tourData);
+		allTours.add(newTourData);
 
 		showAllTours_NewTours(allTours);
 	}
@@ -1149,6 +1174,14 @@ public class Map3View extends ViewPart implements ITourProvider {
 				}
 			}
 		});
+	}
+
+	public void syncMapWithTour(final boolean isSyncMapViewWithTour, final ArrayList<TourMap3Position> allPositions) {
+		if (isSyncMapViewWithTour) {
+
+			final Map3ViewController viewController = Map3ViewController.create(Map3Manager.getWWCanvas());
+			viewController.goToDefaultView(allPositions);
+		}
 	}
 
 	private void updateMapColors() {

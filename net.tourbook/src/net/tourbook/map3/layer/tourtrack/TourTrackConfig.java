@@ -59,13 +59,13 @@ public class TourTrackConfig {
 			new AltitudeMode(Messages.Track_Config_Altitude_Mode_RelativeToGround, WorldWind.RELATIVE_TO_GROUND) //
 																				};
 
-	public static final int					PATH_RESOLUTION_ALL_POSITIONS		= 0;
-	public static final int					PATH_RESOLUTION_OPTIMIZED			= 1;
+	public static final int					PATH_RESOLUTION_OPTIMIZED			= 0;
+	public static final int					PATH_RESOLUTION_ALL_POSITIONS		= 1;
 	public static final int					PATH_RESOLUTION_VIEWPORT			= 2;
 
 	public static final PathResolution[]	PATH_RESOLUTION						= {
-			new PathResolution(Messages.Track_Config_Path_Resolution_High, PATH_RESOLUTION_ALL_POSITIONS),
 			new PathResolution(Messages.Track_Config_Path_Resolution_Optimized, PATH_RESOLUTION_OPTIMIZED),//
+			new PathResolution(Messages.Track_Config_Path_Resolution_High, PATH_RESOLUTION_ALL_POSITIONS),
 			new PathResolution(Messages.Track_Config_Path_Resolution_Viewport, PATH_RESOLUTION_VIEWPORT),//
 																				//
 																				};

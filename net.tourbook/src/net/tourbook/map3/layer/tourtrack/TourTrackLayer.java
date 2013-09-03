@@ -59,6 +59,9 @@ public class TourTrackLayer extends RenderableLayer implements SelectListener, I
 	private ITrackPath					_lastHoveredTourTrack;
 	private Integer						_lastHoveredPositionIndex;
 
+	/**
+	 * Contains the track which is currently selected, otherwise <code>null</code>.
+	 */
 	private ITrackPath					_selectedTrackPath;
 
 	private ShapeAttributes				_normalAttributes		= new BasicShapeAttributes();
@@ -352,7 +355,24 @@ public class TourTrackLayer extends RenderableLayer implements SelectListener, I
 			sb.append("\tpickIndex: " + hoveredPositionIndex); //$NON-NLS-1$
 		}
 
-		final String eventAction = event.getEventAction();
+		selectTrackPath(hoveredTrackPath, hoveredPositionIndex, event.getEventAction(), true);
+
+//		System.out.println(sb.toString());
+//		// TODO remove SYSTEM.OUT.PRINTLN
+	}
+
+	/**
+	 * @param hoveredTrackPath
+	 * @param hoveredPositionIndex
+	 *            Can be <code>null</code> when a position is not hovered.
+	 * @param eventAction
+	 *            To select a track path set this parameter to {@link SelectEvent#LEFT_CLICK}.
+	 * @param isFireSelection
+	 */
+	private void selectTrackPath(	final ITrackPath hoveredTrackPath,
+									final Integer hoveredPositionIndex,
+									final String eventAction,
+									final boolean isFireSelection) {
 
 		final ITrackPath backupSelectedTrackPath = _selectedTrackPath;
 
@@ -361,7 +381,7 @@ public class TourTrackLayer extends RenderableLayer implements SelectListener, I
 			if (_lastHoveredTourTrack != null) {
 
 				// update select state
-				selected_Clicked_TourTrack(_lastHoveredTourTrack);
+				selectTrackPath_Clicked_TourTrack(_lastHoveredTourTrack);
 			}
 		}
 
@@ -369,15 +389,16 @@ public class TourTrackLayer extends RenderableLayer implements SelectListener, I
 
 			// updated colors
 
-			selected_Hovered_WithAttributeColor(hoveredTrackPath);
-			selected_Hovered_WithPositionColor(hoveredTrackPath, hoveredPositionIndex);
+			selectTrackPath_Hovered_WithAttributeColor(hoveredTrackPath);
+			selectTrackPath_Hovered_WithPositionColor(hoveredTrackPath, hoveredPositionIndex);
 
 			_lastHoveredTourTrack = hoveredTrackPath;
 			_lastHoveredPositionIndex = hoveredPositionIndex;
 		}
 
 		// fire selection
-		if (_selectedTrackPath != null
+		if (isFireSelection
+				&& _selectedTrackPath != null
 				&& (backupSelectedTrackPath == null || _selectedTrackPath != backupSelectedTrackPath)) {
 
 			// a new track is selected, fire selection
@@ -385,16 +406,57 @@ public class TourTrackLayer extends RenderableLayer implements SelectListener, I
 			Map3Manager.getMap3View().setSelection(
 					new SelectionTourData(_selectedTrackPath.getTourTrack().getTourData()));
 		}
+	}
 
-//		System.out.println(sb.toString());
-//		// TODO remove SYSTEM.OUT.PRINTLN
+	/**
+	 * @param tourData
+	 * @return Returns track positions or <code>null</code> when track is already selected.
+	 */
+	public ArrayList<TourMap3Position> selectTrackPath(final TourData tourData) {
+
+		if (_selectedTrackPath != null && _selectedTrackPath.getTourTrack().getTourData().equals(tourData)) {
+
+			// track is already selected -> nothing to do
+
+			return null;
+		}
+
+		for (final Renderable renderable : getRenderables()) {
+
+			if (renderable instanceof ITrackPath) {
+
+				final ITrackPath trackPath = (ITrackPath) renderable;
+
+				if (trackPath.getTourTrack().getTourData().equals(tourData)) {
+
+					// found track for the selectable tour
+
+					// prevent to fire a selection again because we are currently within a fired selection
+
+					// 1. hover track which should be selected, this will set the last hovered tour track
+					selectTrackPath(trackPath, null, SelectEvent.ROLLOVER, false);
+
+					// 2. select tour track
+					selectTrackPath(trackPath, null, SelectEvent.LEFT_CLICK, false);
+
+					// 3. simulate hover out of the track that the tour is displayed with the selected color
+					//    and not with the hovered color
+					selectTrackPath(null, null, SelectEvent.ROLLOVER, false);
+
+					return trackPath.getTourTrack().getTrackPositions();
+				}
+			}
+		}
+
+		// this case should not happen
+		return null;
 	}
 
 	/**
 	 * @param clickedTrack
 	 *            Contains the {@link ITrackPath} which is clicked with the mouse.
 	 */
-	private void selected_Clicked_TourTrack(final ITrackPath clickedTrack) {
+	private void selectTrackPath_Clicked_TourTrack(final ITrackPath clickedTrack) {
 
 		if (clickedTrack == _selectedTrackPath) {
 
@@ -431,7 +493,7 @@ public class TourTrackLayer extends RenderableLayer implements SelectListener, I
 		}
 	}
 
-	private void selected_Hovered_WithAttributeColor(final ITrackPath hoveredTrack) {
+	private void selectTrackPath_Hovered_WithAttributeColor(final ITrackPath hoveredTrack) {
 
 		if (_lastHoveredTourTrack == hoveredTrack) {
 			// same tour as before
@@ -451,7 +513,8 @@ public class TourTrackLayer extends RenderableLayer implements SelectListener, I
 		}
 	}
 
-	private void selected_Hovered_WithPositionColor(final ITrackPath hoveredTrack, final Integer hoveredPositionIndex) {
+	private void selectTrackPath_Hovered_WithPositionColor(	final ITrackPath hoveredTrack,
+															final Integer hoveredPositionIndex) {
 
 		boolean isRedraw = false;
 

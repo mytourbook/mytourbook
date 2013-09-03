@@ -581,9 +581,16 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 		/*
 		 * fire tour selection
 		 */
-		_postSelectionProvider.setSelection(new SelectionTourData(_tourChart, _tourData));
+		if (_tourData == null) {
 
-		fireSliderPosition();
+			_postSelectionProvider.clearSelection();
+
+		} else {
+
+			_postSelectionProvider.setSelection(new SelectionTourData(_tourChart, _tourData));
+
+			fireSliderPosition();
+		}
 	}
 
 	private void showTour() {

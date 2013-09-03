@@ -28,18 +28,21 @@ import net.tourbook.map2.view.IDiscreteColors;
 
 public class TourTrack {
 
-	private ITrackPath			_trackPath;
+	private ITrackPath					_trackPath;
 
-	private TourData			_tourData;
-	private TourMap3Position[]	_trackPositions;
-	private IMapColorProvider	_colorProvider;
+	private TourData					_tourData;
 
-	private boolean				_isHovered;
-	private boolean				_isSelected;
+	private TourMap3Position[]			_trackPositions;
+	private ArrayList<TourMap3Position>	_trackPositionsList;
 
-	private int					_tourTrackHoverIndex;
+	private IMapColorProvider			_colorProvider;
 
-	private PositionColors		_originalPositionColors;
+	private boolean						_isHovered;
+	private boolean						_isSelected;
+
+	private int							_tourTrackHoverIndex;
+
+	private PositionColors				_originalPositionColors;
 
 	public TourTrack(	final ITrackPath trackPath,
 						final TourData tourData,
@@ -49,7 +52,10 @@ public class TourTrack {
 		_trackPath = trackPath;
 
 		_tourData = tourData;
+
 		_trackPositions = trackPositions.toArray(new TourMap3Position[trackPositions.size()]);
+		_trackPositionsList = trackPositions;
+
 		_colorProvider = colorProvider;
 	}
 
@@ -90,6 +96,10 @@ public class TourTrack {
 
 	public TourData getTourData() {
 		return _tourData;
+	}
+
+	public ArrayList<TourMap3Position> getTrackPositions() {
+		return _trackPositionsList;
 	}
 
 	void hackResetPositionColors() {
