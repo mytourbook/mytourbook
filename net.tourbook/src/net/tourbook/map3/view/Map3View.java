@@ -1026,6 +1026,14 @@ public class Map3View extends ViewPart implements ITourProvider {
 
 	private void saveState() {
 
+		/*
+		 * It can happen that this view is not yet restored with restoreState() but the saveState()
+		 * method is called which causes a NPE
+		 */
+		if (_tourColorId == null) {
+			return;
+		}
+
 		_state.put(STATE_IS_SYNC_MAP_POSITION_WITH_SLIDER, _isSyncMapPositionWithSlider);
 		_state.put(STATE_IS_SYNC_MAP_VIEW_WITH_TOUR, _isSyncMapViewWithTour);
 		_state.put(STATE_IS_TOUR_VISIBLE, _isTourVisible);
@@ -1106,6 +1114,10 @@ public class Map3View extends ViewPart implements ITourProvider {
 	}
 
 	private void showTour(final TourData newTourData) {
+
+		if (newTourData == null) {
+			return;
+		}
 
 		// check if this tour is already displayed
 		for (final TourData existingTour : _allTours) {

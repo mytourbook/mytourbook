@@ -758,7 +758,10 @@ public class TourMarkerView extends ViewPart implements ITourProvider {
 	public ArrayList<TourData> getSelectedTours() {
 
 		final ArrayList<TourData> selectedTours = new ArrayList<TourData>();
-		selectedTours.add(_tourData);
+
+		if (_tourData != null) {
+			selectedTours.add(_tourData);
+		}
 
 		return selectedTours;
 	}
