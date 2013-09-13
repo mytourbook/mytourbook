@@ -124,7 +124,7 @@ public class Map3Manager {
 	 */
 	private static Map3LayerView						_map3LayerView;
 
-	private static LayerList							_wwDefaultLayers;
+	private static LayerList						_wwDefaultLocaleLayers;
 
 	/**
 	 * Contains custom (none default) layers, key is layerId and sorted by insertion.
@@ -209,7 +209,13 @@ public class Map3Manager {
 		wwModel.setShowTessellationBoundingVolumes(false);
 
 		// get default layer
-		_wwDefaultLayers = wwModel.getLayers();
+		_wwDefaultLocaleLayers = wwModel.getLayers();
+
+//		System.out.println(UI.timeStampNano() + " Map3 layer");
+//		for (final Layer layer : _wwDefaultLocaleLayers) {
+//			System.out.println(UI.timeStampNano() + "\t" + layer);
+//		}
+//		// TODO remove SYSTEM.OUT.PRINTLN
 
 		// create custom layer BEFORE state is applied and xml file is read which references these layers
 		createCustomLayer_TourTracks();
@@ -996,9 +1002,11 @@ public class Map3Manager {
 
 						if (isDefaultLayer) {
 
-							// layer is a default layer
+							// this is a default layer
 
-							final Layer wwLayer = _wwDefaultLayers.getLayerByName(xmlChildId);
+							final String localeLayerId = MapDefaultLayer.getLocaleLayerId(xmlChildId);
+
+							final Layer wwLayer = _wwDefaultLocaleLayers.getLayerByName(localeLayerId);
 
 							// check if xml layer is a default ww layer
 							if (wwLayer == null) {
@@ -1023,7 +1031,7 @@ public class Map3Manager {
 
 						} else {
 
-							// NO default layer
+							// this is NO default layer
 
 							tviLayer = _customLayers.get(xmlChildId);
 

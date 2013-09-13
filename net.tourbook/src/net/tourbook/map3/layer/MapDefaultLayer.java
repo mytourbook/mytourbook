@@ -16,6 +16,7 @@
 package net.tourbook.map3.layer;
 
 import java.util.HashMap;
+import java.util.Locale;
 
 import net.tourbook.map3.Messages;
 
@@ -46,36 +47,168 @@ public class MapDefaultLayer {
 //	Scale bar						gov.nasa.worldwind.layers.ScalebarLayer					true
 //	Compass							gov.nasa.worldwind.layers.CompassLayer					true
 
+	/**
+	 * <code>
+	 * 
+	 * 
+	 *  These names are translated and needs to be used as a layer id.
+	 * 
+	 * 	fr
+	 * 
+	 * 		Étoiles
+	 * 		Atmosphère
+	 * 		NASA Blue Marble Image
+	 * 		Blue Marble (WMS) 2004
+	 * 		i-cubed Landsat
+	 * 		USDA NAIP
+	 * 		USDA NAIP USGS
+	 * 		MS Virtual Earth Aerial
+	 * 		Bing Imagery
+	 * 		USGS Topographic Maps 1:250K
+	 * 		USGS Topographic Maps 1:100K
+	 * 		USGS Topographic Maps 1:24K
+	 * 		USGS Urban Area Ortho
+	 * 		Political Boundaries
+	 * 		Open Street Map
+	 * 
+	 * 		Toponymes
+	 * 		Carte du monde
+	 * 		Échelle
+	 * 		Boussole
+	 * 
+	 * 
+	 *  de
+	 * 	en
+	 *  es
+	 *  it
+	 *  nl
+	 * 
+	 * 		Stars
+	 * 		Atmosphere
+	 * 		NASA Blue Marble Image
+	 * 		Blue Marble (WMS) 2004
+	 * 		i-cubed Landsat
+	 * 		USDA NAIP
+	 * 		USDA NAIP USGS
+	 * 		MS Virtual Earth Aerial
+	 * 		Bing Imagery
+	 * 		USGS Topographic Maps 1:250K
+	 * 		USGS Topographic Maps 1:100K
+	 * 		USGS Topographic Maps 1:24K
+	 * 		USGS Urban Area Ortho
+	 * 		Political Boundaries
+	 * 		Open Street Map
+	 * 
+	 * 		Place Names
+	 * 		World Map
+	 * 		Scale bar
+	 * 		Compass
+	 * 
+	 * </code>
+	 */
 	/*
 	 * default layer id's
 	 */
-	public static final String						ID_STARS						= getNormalizedLayerKey("Stars");							//$NON-NLS-1$
-	public static final String						ID_ATMOSPHERE					= getNormalizedLayerKey("Atmosphere");						//$NON-NLS-1$
+	public static final String							ID_STARS						= getNormalizedLayerKey("Stars");							//$NON-NLS-1$
+	public static final String							ID_ATMOSPHERE					= getNormalizedLayerKey("Atmosphere");						//$NON-NLS-1$
 
-	public static final String						ID_NASA_BLUE_MARBLE_IMAGE		= getNormalizedLayerKey("NASA Blue Marble Image");			//$NON-NLS-1$
-	public static final String						ID_BLUE_MARBLE_WMS_2004			= getNormalizedLayerKey("Blue Marble (WMS) 2004");			//$NON-NLS-1$
-	public static final String						ID_I_CUBED_LANDSAT				= getNormalizedLayerKey("i-cubed Landsat");				//$NON-NLS-1$
-	public static final String						ID_USDA_NAIP					= getNormalizedLayerKey("USDA NAIP");						//$NON-NLS-1$
-	public static final String						ID_USDA_NAIP_USGS				= getNormalizedLayerKey("USDA NAIP USGS");					//$NON-NLS-1$
+	public static final String							ID_NASA_BLUE_MARBLE_IMAGE		= getNormalizedLayerKey("NASA Blue Marble Image");			//$NON-NLS-1$
+	public static final String							ID_BLUE_MARBLE_WMS_2004			= getNormalizedLayerKey("Blue Marble (WMS) 2004");			//$NON-NLS-1$
+	public static final String							ID_I_CUBED_LANDSAT				= getNormalizedLayerKey("i-cubed Landsat");				//$NON-NLS-1$
+	public static final String							ID_USDA_NAIP					= getNormalizedLayerKey("USDA NAIP");						//$NON-NLS-1$
+	public static final String							ID_USDA_NAIP_USGS				= getNormalizedLayerKey("USDA NAIP USGS");					//$NON-NLS-1$
 
-	public static final String						ID_MS_VIRTUAL_EARTH_AERIAL		= getNormalizedLayerKey("MS Virtual Earth Aerial");		//$NON-NLS-1$
-	public static final String						ID_BING_IMAGERY					= getNormalizedLayerKey("Bing Imagery");					//$NON-NLS-1$
-	public static final String						ID_USGS_TOPOGRAPHIC_MAPS_1_100K	= getNormalizedLayerKey("USGS Topographic Maps 1:100K");	//$NON-NLS-1$
-	public static final String						ID_USGS_TOPOGRAPHIC_MAPS_1_24K	= getNormalizedLayerKey("USGS Topographic Maps 1:24K");	//$NON-NLS-1$
-	public static final String						ID_USGS_TOPOGRAPHIC_MAPS_1_250K	= getNormalizedLayerKey("USGS Topographic Maps 1:250K");	//$NON-NLS-1$
-	public static final String						ID_USGS_URBAN_AREA_ORTHO		= getNormalizedLayerKey("USGS Urban Area Ortho");			//$NON-NLS-1$
+	public static final String							ID_MS_VIRTUAL_EARTH_AERIAL		= getNormalizedLayerKey("MS Virtual Earth Aerial");		//$NON-NLS-1$
+	public static final String							ID_BING_IMAGERY					= getNormalizedLayerKey("Bing Imagery");					//$NON-NLS-1$
+	public static final String							ID_USGS_TOPOGRAPHIC_MAPS_1_100K	= getNormalizedLayerKey("USGS Topographic Maps 1:100K");	//$NON-NLS-1$
+	public static final String							ID_USGS_TOPOGRAPHIC_MAPS_1_24K	= getNormalizedLayerKey("USGS Topographic Maps 1:24K");	//$NON-NLS-1$
+	public static final String							ID_USGS_TOPOGRAPHIC_MAPS_1_250K	= getNormalizedLayerKey("USGS Topographic Maps 1:250K");	//$NON-NLS-1$
+	public static final String							ID_USGS_URBAN_AREA_ORTHO		= getNormalizedLayerKey("USGS Urban Area Ortho");			//$NON-NLS-1$
 
-	public static final String						ID_OPEN_STREET_MAP				= getNormalizedLayerKey("Open Street Map");				//$NON-NLS-1$
+	public static final String							ID_OPEN_STREET_MAP				= getNormalizedLayerKey("Open Street Map");				//$NON-NLS-1$
 
-	public static final String						ID_POLITICAL_BOUNDARIES			= getNormalizedLayerKey("Political Boundaries");			//$NON-NLS-1$
-	public static final String						ID_PLACE_NAMES					= getNormalizedLayerKey("Place Names");					//$NON-NLS-1$
-	public static final String						ID_WORLD_MAP					= getNormalizedLayerKey("World Map");						//$NON-NLS-1$
-	public static final String						ID_SCALE_BAR					= getNormalizedLayerKey("Scale bar");						//$NON-NLS-1$
-	public static final String						ID_COMPASS						= getNormalizedLayerKey("Compass");						//$NON-NLS-1$
+	public static final String							ID_POLITICAL_BOUNDARIES			= getNormalizedLayerKey("Political Boundaries");			//$NON-NLS-1$
+	public static final String							ID_PLACE_NAMES					= getNormalizedLayerKey("Place Names");					//$NON-NLS-1$
+	public static final String							ID_WORLD_MAP					= getNormalizedLayerKey("World Map");						//$NON-NLS-1$
+	public static final String							ID_SCALE_BAR					= getNormalizedLayerKey("Scale bar");						//$NON-NLS-1$
+	public static final String							ID_COMPASS						= getNormalizedLayerKey("Compass");						//$NON-NLS-1$
 
-	private static HashMap<String, DefaultLayer>	_wwDefaultLayer					= new HashMap<String, DefaultLayer>();
+	private static final HashMap<String, DefaultLayer>	_wwDefaultLayer					= new HashMap<String, DefaultLayer>();
+
+	/**
+	 * Key is the global (english) layer id, value is the locale layer id.
+	 */
+	private static final HashMap<String, String>		_wwLocaleLayerNames				= new HashMap<String, String>();
 
 	static {
+
+		/*
+		 * Overwrite layer id's when they are translated. :-(((
+		 */
+
+		if (Locale.getDefault().getLanguage().equals(new Locale("fr").getLanguage())) { //				//$NON-NLS-1$
+
+			/**
+			 * French layers
+			 */
+
+			/**
+			 * Very strange, stars are not using the display name.
+			 */
+//			_wwLocaleLayerNames.put(ID_STARS, "Étoiles"); //$NON-NLS-1$
+			_wwLocaleLayerNames.put(ID_STARS, ID_STARS);
+
+			_wwLocaleLayerNames.put(ID_ATMOSPHERE, "Atmosphère"); //$NON-NLS-1$
+
+			_wwLocaleLayerNames.put(ID_NASA_BLUE_MARBLE_IMAGE, "NASA Blue Marble Image"); //$NON-NLS-1$
+			_wwLocaleLayerNames.put(ID_BLUE_MARBLE_WMS_2004, "Blue Marble (WMS) 2004"); //$NON-NLS-1$
+			_wwLocaleLayerNames.put(ID_I_CUBED_LANDSAT, "i-cubed Landsat"); //$NON-NLS-1$
+			_wwLocaleLayerNames.put(ID_USDA_NAIP, "USDA NAIP"); //$NON-NLS-1$
+			_wwLocaleLayerNames.put(ID_USDA_NAIP_USGS, "USDA NAIP USGS"); //$NON-NLS-1$
+
+			_wwLocaleLayerNames.put(ID_MS_VIRTUAL_EARTH_AERIAL, "MS Virtual Earth Aerial"); //$NON-NLS-1$
+			_wwLocaleLayerNames.put(ID_BING_IMAGERY, "Bing Imagery"); //$NON-NLS-1$
+			_wwLocaleLayerNames.put(ID_USGS_TOPOGRAPHIC_MAPS_1_100K, "USGS Topographic Maps 1:100K"); //$NON-NLS-1$
+			_wwLocaleLayerNames.put(ID_USGS_TOPOGRAPHIC_MAPS_1_24K, "USGS Topographic Maps 1:24K"); //$NON-NLS-1$
+			_wwLocaleLayerNames.put(ID_USGS_TOPOGRAPHIC_MAPS_1_250K, "USGS Topographic Maps 1:250K"); //$NON-NLS-1$
+			_wwLocaleLayerNames.put(ID_USGS_URBAN_AREA_ORTHO, "USGS Urban Area Ortho"); //$NON-NLS-1$
+
+			_wwLocaleLayerNames.put(ID_OPEN_STREET_MAP, "Open Street Map"); //$NON-NLS-1$
+
+			_wwLocaleLayerNames.put(ID_POLITICAL_BOUNDARIES, "Political Boundaries"); //$NON-NLS-1$
+			_wwLocaleLayerNames.put(ID_PLACE_NAMES, "Toponymes"); //$NON-NLS-1$
+			_wwLocaleLayerNames.put(ID_WORLD_MAP, "Carte du monde"); //$NON-NLS-1$
+			_wwLocaleLayerNames.put(ID_SCALE_BAR, "Échelle"); //$NON-NLS-1$
+			_wwLocaleLayerNames.put(ID_COMPASS, "Boussole"); //$NON-NLS-1$
+
+		} else {
+
+			// all other languages do not contain translated layer id's
+
+			_wwLocaleLayerNames.put(ID_STARS, ID_STARS);
+			_wwLocaleLayerNames.put(ID_ATMOSPHERE, ID_ATMOSPHERE);
+
+			_wwLocaleLayerNames.put(ID_NASA_BLUE_MARBLE_IMAGE, ID_NASA_BLUE_MARBLE_IMAGE);
+			_wwLocaleLayerNames.put(ID_BLUE_MARBLE_WMS_2004, ID_BLUE_MARBLE_WMS_2004);
+			_wwLocaleLayerNames.put(ID_I_CUBED_LANDSAT, ID_I_CUBED_LANDSAT);
+			_wwLocaleLayerNames.put(ID_USDA_NAIP, ID_USDA_NAIP);
+			_wwLocaleLayerNames.put(ID_USDA_NAIP_USGS, ID_USDA_NAIP_USGS);
+
+			_wwLocaleLayerNames.put(ID_MS_VIRTUAL_EARTH_AERIAL, ID_MS_VIRTUAL_EARTH_AERIAL);
+			_wwLocaleLayerNames.put(ID_BING_IMAGERY, ID_BING_IMAGERY);
+			_wwLocaleLayerNames.put(ID_USGS_TOPOGRAPHIC_MAPS_1_100K, ID_USGS_TOPOGRAPHIC_MAPS_1_100K);
+			_wwLocaleLayerNames.put(ID_USGS_TOPOGRAPHIC_MAPS_1_24K, ID_USGS_TOPOGRAPHIC_MAPS_1_24K);
+			_wwLocaleLayerNames.put(ID_USGS_TOPOGRAPHIC_MAPS_1_250K, ID_USGS_TOPOGRAPHIC_MAPS_1_250K);
+			_wwLocaleLayerNames.put(ID_USGS_URBAN_AREA_ORTHO, ID_USGS_URBAN_AREA_ORTHO);
+
+			_wwLocaleLayerNames.put(ID_OPEN_STREET_MAP, ID_OPEN_STREET_MAP);
+
+			_wwLocaleLayerNames.put(ID_POLITICAL_BOUNDARIES, ID_POLITICAL_BOUNDARIES);
+			_wwLocaleLayerNames.put(ID_PLACE_NAMES, ID_PLACE_NAMES);
+			_wwLocaleLayerNames.put(ID_WORLD_MAP, ID_WORLD_MAP);
+			_wwLocaleLayerNames.put(ID_SCALE_BAR, ID_SCALE_BAR);
+			_wwLocaleLayerNames.put(ID_COMPASS, ID_COMPASS);
+		}
 
 		_wwDefaultLayer.put(ID_STARS, //
 				new DefaultLayer(ID_STARS, Messages.Default_Layer_Stars));
@@ -134,6 +267,10 @@ public class MapDefaultLayer {
 	 */
 	public static DefaultLayer getLayer(final String defaultLayerId) {
 		return _wwDefaultLayer.get(defaultLayerId);
+	}
+
+	public static String getLocaleLayerId(final String globalLayerId) {
+		return _wwLocaleLayerNames.get(globalLayerId);
 	}
 
 	/**
