@@ -75,6 +75,8 @@ import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.awt.SWT_AWT;
+import org.eclipse.swt.events.ControlAdapter;
+import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.MenuAdapter;
 import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.widgets.Composite;
@@ -518,6 +520,13 @@ public class Map3View extends ViewPart implements ITourProvider {
 			awtPanel.add(_wwCanvas, BorderLayout.CENTER);
 		}
 
+		_mapContainer.addControlListener(new ControlAdapter() {
+			@Override
+			public void controlResized(final ControlEvent e) {
+				Map3Manager.getTourInfoLayer().resizeLegendImage();
+			}
+		});
+
 		parent.layout();
 	}
 
@@ -642,6 +651,10 @@ public class Map3View extends ViewPart implements ITourProvider {
 
 		final ActionContributionItem item = new ActionContributionItem(action);
 		item.fill(menu, -1);
+	}
+
+	public java.awt.Rectangle getMapSize() {
+		return _wwCanvas.getBounds();
 	}
 
 	@Override
@@ -1050,6 +1063,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 		final IMapColorProvider colorProvider = TourMapColors.getColorProvider(colorId);
 
 		Map3Manager.getTourTrackLayer().setColorProvider(colorProvider);
+		Map3Manager.getTourInfoLayer().setColorProvider(colorProvider);
 	}
 
 	@Override
@@ -1090,9 +1104,18 @@ public class Map3View extends ViewPart implements ITourProvider {
 
 		final ArrayList<TourMap3Position> allPositions = tourTrackLayer.createTrackPaths(_allTours);
 
+		Map3Manager.getTourInfoLayer().updateLegendImage();
+
+		showAllTours_Final(isSyncMapViewWithTour, allPositions);
+	}
+
+	public void showAllTours_Final(final boolean isSyncMapViewWithTour, final ArrayList<TourMap3Position> allPositions) {
+
 		syncMapWithTour(isSyncMapViewWithTour, allPositions);
 
-		_wwCanvas.redraw();
+//		_wwCanvas.redraw();
+
+		Map3Manager.redrawMap();
 	}
 
 	private void showAllTours_InternalTours() {
@@ -1139,9 +1162,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 						return;
 					}
 
-					syncMapWithTour(_isSyncMapViewWithTour, trackPositions);
-
-					_wwCanvas.redraw();
+					showAllTours_Final(_isSyncMapViewWithTour, trackPositions);
 				}
 
 				return;
@@ -1189,6 +1210,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 	}
 
 	public void syncMapWithTour(final boolean isSyncMapViewWithTour, final ArrayList<TourMap3Position> allPositions) {
+
 		if (isSyncMapViewWithTour) {
 
 			final Map3ViewController viewController = Map3ViewController.create(Map3Manager.getWWCanvas());
@@ -1200,12 +1222,9 @@ public class Map3View extends ViewPart implements ITourProvider {
 
 		Map3Manager.getTourTrackLayer().updateColors(_allTours);
 
+		Map3Manager.getTourInfoLayer().updateLegendImage();
+
 		showAllTours(false);
-
-//		_wwCanvas.redraw();
-
-		Map3Manager.redraw();
-
 	}
 
 	private void updateModifiedTours(final ArrayList<TourData> modifiedTours) {
@@ -1216,6 +1235,10 @@ public class Map3View extends ViewPart implements ITourProvider {
 		_allTours.addAll(modifiedTours);
 
 		showAllTours_InternalTours();
+	}
+
+	public ArrayList<TourData> getAllTours() {
+		return _allTours;
 	}
 
 }

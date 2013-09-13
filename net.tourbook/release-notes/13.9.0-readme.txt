@@ -2,17 +2,8 @@ Version: 13.10.0                                            ?. ? 2013
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
--update git url in messages edit docu
-
--https://sourceforge.net/p/mytourbook/code/ci/master/tree/net.tourbook/translations/mt-translations.zip
-
 -memory size
 
--https://prism-break.org/
-
--select/deselect tour
-
--IT'S NOT RECOMMEND TO USE THE ENCRYPTED VERSION BECAUSE DATA CAN GET CORRUPTED,  just a warning.
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -76,6 +67,3 @@ Fixed Problems
 
 - ensure the 3D Tour Map view is selected before a tour is selected, this case is covered in the app but sometime it only works when the view is aktivated, mostly this happens after the app start
 
-- selecting multiple tours is currently not supported
-
-- there are many features which are not yet implemented

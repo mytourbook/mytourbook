@@ -48,6 +48,15 @@ public abstract class TreeViewerItem {
 	 */
 	public void addChildBefore(final TreeViewerItem oldItem, final TreeViewerItem newItem) {
 
+//		System.out.println(UI.timeStampNano()
+//				+ " ["
+//				+ getClass().getSimpleName()
+//				+ "] \told: "
+//				+ oldItem
+//				+ "\tnew: "
+//				+ newItem);
+//		// TODO remove SYSTEM.OUT.PRINTLN
+
 		// set parent for the new child item
 		newItem.setParentItem(this);
 

@@ -165,7 +165,7 @@ public class TourMapPainter extends MapPainter {
 		final MapLegendImageConfig legendImageConfig = colorProvider.getMapLegendImageConfig();
 
 		// ensure units are available
-		if (legendImageConfig.units == null /* || config.unitLabels == null */) {
+		if (legendImageConfig.units == null) {
 			return;
 		}
 

@@ -62,4 +62,9 @@ public class TVIMap3Category extends TVIMap3Item {
 		}
 	}
 
+	@Override
+	public String toString() {
+		return String.format("\nTVIMap3Category\n   id=%s\n", id);
+	}
+
 }

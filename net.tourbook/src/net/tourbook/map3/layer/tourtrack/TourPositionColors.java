@@ -100,7 +100,12 @@ class TourPositionColors implements Path.PositionColors {
 		_awtColorCache.clear();
 	}
 
-	public void updateColors(final ArrayList<TourData> allTours) {
+	/**
+	 * Update colors in the color provider.
+	 * 
+	 * @param allTours
+	 */
+	public void updateColorProvider(final ArrayList<TourData> allTours) {
 
 		if (_colorProvider instanceof IGradientColors) {
 

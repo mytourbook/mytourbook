@@ -855,7 +855,7 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 		Map3Manager.getTourTrackLayer().onModifyConfig();
 
 		// update map
-		Map3Manager.redraw();
+		Map3Manager.redrawMap();
 	}
 
 	private void onDispose() {

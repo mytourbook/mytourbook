@@ -65,4 +65,16 @@ public class TVIMap3Layer extends TVIMap3Item {
 		}
 	}
 
+	@Override
+	public String toString() {
+		return String
+				.format(
+						"\nTVIMap3Layer\n   id=%s\n   wwLayer=%s\n   isLayerVisible=%s\n   isDefaultLayer=%s\n   defaultPosition=%s\n",
+						id,
+						wwLayer,
+						isLayerVisible,
+						isDefaultLayer,
+						defaultPosition);
+	}
+
 }

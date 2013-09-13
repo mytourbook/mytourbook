@@ -340,7 +340,7 @@ public class Map3LayerView extends ViewPart {
 
 			// redraw map
 			if (isMapModified) {
-				Map3Manager.redraw();
+				Map3Manager.redrawMap();
 			}
 
 		}
@@ -401,14 +401,14 @@ public class Map3LayerView extends ViewPart {
 	private void restoreState() {
 
 		// restore UI
-		final Object[] uiEnabledLayers = Map3Manager.getUIEnabledLayers();
+		final Object[] uiVisibleLayers = Map3Manager.getUIVisibleLayers();
 		final Object[] uiExpandedCategories = Map3Manager.getUIExpandedCategories();
 
-		_layerViewer.setCheckedElements(uiEnabledLayers);
+		_layerViewer.setCheckedElements(uiVisibleLayers);
 		_layerViewer.setExpandedElements(uiExpandedCategories);
 
 		// inform layer about check state modification
-		for (final Object object : uiEnabledLayers) {
+		for (final Object object : uiVisibleLayers) {
 			if (object instanceof TVIMap3Layer) {
 				final TVIMap3Layer tviLayer = (TVIMap3Layer) object;
 				tviLayer.onSetCheckState();
@@ -451,7 +451,7 @@ public class Map3LayerView extends ViewPart {
 		tviLayer.onSetCheckState();
 
 		// redraw map
-		Map3Manager.redraw();
+		Map3Manager.redrawMap();
 
 		// update tooltip
 		_propToolTip.setLayerVisibility(tviLayer, isUpdateTooltip);

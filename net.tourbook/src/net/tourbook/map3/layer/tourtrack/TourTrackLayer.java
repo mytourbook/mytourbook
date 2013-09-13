@@ -199,7 +199,7 @@ public class TourTrackLayer extends RenderableLayer implements SelectListener, I
 			allPositions.addAll(trackPositions);
 		}
 
-		_tourPositionColors.updateColors(allTours);
+		_tourPositionColors.updateColorProvider(allTours);
 
 		// initialize previously selected track
 		if (_selectedTrackPath != null) {
@@ -610,7 +610,7 @@ public class TourTrackLayer extends RenderableLayer implements SelectListener, I
 		}
 
 		if (isRedraw) {
-			Map3Manager.redraw();
+			Map3Manager.redrawMap();
 		}
 	}
 
@@ -864,7 +864,7 @@ public class TourTrackLayer extends RenderableLayer implements SelectListener, I
 
 	public void updateColors(final ArrayList<TourData> allTours) {
 
-		_tourPositionColors.updateColors(allTours);
+		_tourPositionColors.updateColorProvider(allTours);
 	}
 
 }
