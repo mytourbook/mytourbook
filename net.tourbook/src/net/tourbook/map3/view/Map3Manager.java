@@ -48,7 +48,7 @@ import net.tourbook.map3.layer.DefaultLayer;
 import net.tourbook.map3.layer.MapDefaultCategory;
 import net.tourbook.map3.layer.MapDefaultLayer;
 import net.tourbook.map3.layer.StatusLayer;
-import net.tourbook.map3.layer.TourInfoLayer;
+import net.tourbook.map3.layer.TourLegendLayer;
 import net.tourbook.map3.layer.tourtrack.TourTrackLayer;
 
 import org.eclipse.core.runtime.IPath;
@@ -91,10 +91,10 @@ public class Map3Manager {
 	private static final int							INSERT_BEFORE_COMPASS			= 1;
 	private static final int							INSERT_BEFORE_PLACE_NAMES		= 2;
 
-	private static final String							ERROR_01						= "NTMV_MM001 Layer \"{0}\" is not a ww default layer.";			//$NON-NLS-1$
-	private static final String							ERROR_02						= "NTMV_MM002 Layer \"{0}\" is not defined as map default layer.";	//$NON-NLS-1$
-	private static final String							ERROR_03						= "NTMV_MM003 XML layer \"{0}\" is not available.";				//$NON-NLS-1$
-	private static final String							ERROR_04						= "NTMV_MM004 Category \"{0}\" is not a default category.";		//$NON-NLS-1$
+	private static final String							ERROR_01						= "NTMV_MM_001 Layer \"{0}\" is not a ww default layer.";			//$NON-NLS-1$
+	private static final String							ERROR_02						= "NTMV_MM_002 Layer \"{0}\" is not defined as map default layer."; //$NON-NLS-1$
+	private static final String							ERROR_03						= "NTMV_MM_003 XML layer \"{0}\" is not available.";				//$NON-NLS-1$
+	private static final String							ERROR_04						= "NTMV_MM_004 Category \"{0}\" is not a default category.";		//$NON-NLS-1$
 
 	/**
 	 * _bundle must be set here otherwise an exception occures in saveState()
@@ -124,15 +124,18 @@ public class Map3Manager {
 	 */
 	private static Map3LayerView						_map3LayerView;
 
-	private static LayerList						_wwDefaultLocaleLayers;
+	/**
+	 * Contains default layers with locale layer names which are used as a layer id.
+	 */
+	private static LayerList							_wwDefaultLocaleLayers;
 
 	/**
 	 * Contains custom (none default) layers, key is layerId and sorted by insertion.
 	 */
-	private static LinkedHashMap<String, TVIMap3Layer>	_customLayers					= new LinkedHashMap<String, TVIMap3Layer>();
+	private static LinkedHashMap<String, TVIMap3Layer>	_uiCustomLayers					= new LinkedHashMap<String, TVIMap3Layer>();
 
 	private static TourTrackLayer						_tourTrackLayer;
-	private static TourInfoLayer						_tourInfoLayer;
+	private static TourLegendLayer						_tourLegendLayer;
 
 	private static Object[]								_uiVisibleLayers;
 	private static Object[]								_uiExpandedCategories;
@@ -219,7 +222,7 @@ public class Map3Manager {
 
 		// create custom layer BEFORE state is applied and xml file is read which references these layers
 		createCustomLayer_TourTracks();
-		createCustomLayer_TourInfo();
+		createCustomLayer_TourLegend();
 		createCustomLayer_MapStatus();
 		createCustomLayer_ViewerController();
 		createCustomLayer_TerrainProfile();
@@ -279,7 +282,7 @@ public class Map3Manager {
 			_uiVisibleLayersFromXml.add(tviLayer);
 		}
 
-		_customLayers.put(layerId, tviLayer);
+		_uiCustomLayers.put(layerId, tviLayer);
 	}
 
 	private static void createCustomLayer_TerrainProfile() {
@@ -309,21 +312,19 @@ public class Map3Manager {
 
 		tviLayer.toolProvider = terrainProfileConfig.getToolProvider();
 
-		_customLayers.put(layerId, tviLayer);
+		_uiCustomLayers.put(layerId, tviLayer);
 	}
 
-	private static void createCustomLayer_TourInfo() {
+	private static void createCustomLayer_TourLegend() {
 
-		/*
-		 * create WW layer
-		 */
-		_tourInfoLayer = new TourInfoLayer(_state);
+		// create WW layer
+		_tourLegendLayer = new TourLegendLayer(_state);
 
 		/*
 		 * create UI model layer
 		 */
-		final String layerId = TourInfoLayer.MAP3_LAYER_ID;
-		final TVIMap3Layer tviLayer = new TVIMap3Layer(layerId, _tourInfoLayer, Messages.Custom_Layer_TourInfo);
+		final String layerId = TourLegendLayer.MAP3_LAYER_ID;
+		final TVIMap3Layer tviLayer = new TVIMap3Layer(layerId, _tourLegendLayer, Messages.Custom_Layer_TourLegend);
 
 		final boolean isVisible = true;
 
@@ -335,7 +336,7 @@ public class Map3Manager {
 			_uiVisibleLayersFromXml.add(tviLayer);
 		}
 
-		_customLayers.put(layerId, tviLayer);
+		_uiCustomLayers.put(layerId, tviLayer);
 	}
 
 	private static void createCustomLayer_TourTracks() {
@@ -363,7 +364,7 @@ public class Map3Manager {
 
 		tviLayer.addCheckStateListener(_tourTrackLayer);
 
-		_customLayers.put(layerId, tviLayer);
+		_uiCustomLayers.put(layerId, tviLayer);
 	}
 
 	private static void createCustomLayer_ViewerController() {
@@ -387,7 +388,7 @@ public class Map3Manager {
 		tviLayer.defaultPosition = INSERT_BEFORE_COMPASS;
 		tviLayer.addCheckStateListener(new ViewerControllerCheckStateListener(viewControlsLayer));
 
-		_customLayers.put(layerId, tviLayer);
+		_uiCustomLayers.put(layerId, tviLayer);
 	}
 
 	/**
@@ -662,7 +663,7 @@ public class Map3Manager {
 	/**
 	 * @return Returns instance of {@link Map3LayerView} or null when view is not created.
 	 */
-	static Map3LayerView getMap3PropertiesView() {
+	static Map3LayerView getMap3LayerView() {
 		return _map3LayerView;
 	}
 
@@ -677,8 +678,8 @@ public class Map3Manager {
 		return _uiRootItem;
 	}
 
-	public static TourInfoLayer getTourInfoLayer() {
-		return _tourInfoLayer;
+	public static TourLegendLayer getTourLegendLayer() {
+		return _tourLegendLayer;
 	}
 
 	public static TourTrackLayer getTourTrackLayer() {
@@ -695,24 +696,6 @@ public class Map3Manager {
 
 	public static WorldWindowGLCanvas getWWCanvas() {
 		return _ww;
-	}
-
-	/**
-	 * Insert the layer into the layer list just after the placenames.
-	 * 
-	 * @param wwd
-	 * @param layer
-	 */
-	public static void insertAfterPlacenames(final WorldWindow wwd, final Layer layer) {
-
-//		int compassPosition = 0;
-//		final LayerList layers = wwd.getModel().getLayers();
-//		for (final Layer l : layers) {
-//			if (l instanceof PlaceNameLayer) {
-//				compassPosition = layers.indexOf(l);
-//			}
-//		}
-//		layers.add(compassPosition + 1, layer);
 	}
 
 	/**
@@ -790,26 +773,6 @@ public class Map3Manager {
 		}
 
 		return null;
-	}
-
-	/**
-	 * Insert the layer into the layer list just before the target layer.
-	 * 
-	 * @param wwd
-	 * @param layer
-	 * @param targetName
-	 */
-	public static void insertBeforeLayerName(final WorldWindow wwd, final Layer layer, final String targetName) {
-
-//		int targetPosition = 0;
-//		final LayerList layers = wwd.getModel().getLayers();
-//		for (final Layer l : layers) {
-//			if (l.getName().indexOf(targetName) != -1) {
-//				targetPosition = layers.indexOf(l);
-//				break;
-//			}
-//		}
-//		layers.add(targetPosition, layer);
 	}
 
 	/**
@@ -1033,7 +996,7 @@ public class Map3Manager {
 
 							// this is NO default layer
 
-							tviLayer = _customLayers.get(xmlChildId);
+							tviLayer = _uiCustomLayers.get(xmlChildId);
 
 							if (tviLayer == null) {
 								StatusUtil.log(NLS.bind(ERROR_03, xmlChildId));
@@ -1100,8 +1063,8 @@ public class Map3Manager {
 
 	public static void saveState() {
 
-		_tourTrackLayer.saveState();
-		_tourInfoLayer.saveState();
+		_tourTrackLayer.saveState(_state);
+		_tourLegendLayer.saveState(_state);
 
 		/*
 		 * save layer structure in xml file
@@ -1169,7 +1132,7 @@ public class Map3Manager {
 
 		final ArrayList<TVIMap3Layer> insertedLayers = new ArrayList<TVIMap3Layer>();
 
-		for (final TVIMap3Layer tviLayer : _customLayers.values()) {
+		for (final TVIMap3Layer tviLayer : _uiCustomLayers.values()) {
 
 			final Layer customWWLayer = tviLayer.wwLayer;
 
@@ -1202,6 +1165,20 @@ public class Map3Manager {
 		// update UI
 		if (_map3LayerView != null && insertedLayers.size() > 0) {
 			_map3LayerView.updateUI_NewLayer(insertedLayers);
+		}
+	}
+
+	static void setLegendVisible(final boolean isLegendVisible) {
+
+		// update model
+		_tourLegendLayer.setEnabled(isLegendVisible);
+
+		// update UI
+		if (_map3LayerView != null) {
+
+			_map3LayerView.setTourLegendLayerVisibility(
+					_uiCustomLayers.get(TourLegendLayer.MAP3_LAYER_ID),
+					isLegendVisible);
 		}
 	}
 
@@ -1238,7 +1215,9 @@ public class Map3Manager {
 
 			// update model and UI
 
-			_map3LayerView.setTourTrackLayerVisibility(_customLayers.get(TourTrackLayer.MAP3_LAYER_ID), isTrackVisible);
+			_map3LayerView.setTourTrackLayerVisibility(//
+					_uiCustomLayers.get(TourTrackLayer.MAP3_LAYER_ID),
+					isTrackVisible);
 		}
 	}
 

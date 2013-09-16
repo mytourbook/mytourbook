@@ -40,6 +40,7 @@ import net.tourbook.map2.view.TourMapColors;
 import net.tourbook.map3.action.ActionMapColor;
 import net.tourbook.map3.action.ActionOpenMap3LayerView;
 import net.tourbook.map3.action.ActionShowEntireTour;
+import net.tourbook.map3.action.ActionShowLegendInMap3;
 import net.tourbook.map3.action.ActionShowTourInMap3;
 import net.tourbook.map3.action.ActionSyncMapPositionWithSlider;
 import net.tourbook.map3.action.ActionSyncMapViewWithTour;
@@ -95,12 +96,13 @@ public class Map3View extends ViewPart implements ITourProvider {
 
 	public static final String					ID										= "net.tourbook.map3.view.Map3ViewId";		//$NON-NLS-1$
 
+	private static final String					STATE_IS_LEGEND_VISIBLE					= "STATE_IS_LEGEND_VISIBLE";				//$NON-NLS-1$
 	private static final String					STATE_IS_SYNC_MAP_VIEW_WITH_TOUR		= "STATE_IS_SYNC_MAP_VIEW_WITH_TOUR";		//$NON-NLS-1$
-
 	private static final String					STATE_IS_SYNC_MAP_POSITION_WITH_SLIDER	= "STATE_IS_SYNC_MAP_POSITION_WITH_SLIDER"; //$NON-NLS-1$
 	private static final String					STATE_IS_TOUR_VISIBLE					= "STATE_IS_TOUR_VISIBLE";					//$NON-NLS-1$
 	private static final String					STATE_MAP3_VIEW							= "STATE_MAP3_VIEW";						//$NON-NLS-1$
 	private static final String					STATE_TOUR_COLOR_ID						= "STATE_TOUR_COLOR_ID";					//$NON-NLS-1$
+
 	private final IPreferenceStore				_prefStore								= TourbookPlugin.getDefault()//
 																								.getPreferenceStore();
 
@@ -115,6 +117,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 	private ActionMapColor						_actionMapColor;
 
 	private ActionShowEntireTour				_actionShowEntireTour;
+	private ActionShowLegendInMap3				_actionShowLegendInMap;
 	private ActionShowTourInMap3				_actionShowTourInMap3;
 	private ActionSyncMapPositionWithSlider		_actionSynMapPositionWithSlider;
 	private ActionSyncMapViewWithTour			_actionSynMapViewWithTour;
@@ -124,9 +127,9 @@ public class Map3View extends ViewPart implements ITourProvider {
 	private ActionTourColor						_actionTourColorSpeed;
 	private ActionTourColor						_actionTourColorPace;
 	private ActionTourColor						_actionTourColorHrZone;
+
 	// context menu actions
 	private ActionEditQuick						_actionEditQuick;
-
 	private ActionEditTour						_actionEditTour;
 	private ActionExport						_actionExportTour;
 	private ActionOpenAdjustAltitudeDialog		_actionOpenAdjustAltitudeDialog;
@@ -150,6 +153,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 
 	private boolean								_isSyncMapViewWithTour;
 	private boolean								_isTourVisible;
+	private boolean								_isLegendVisible;
 	private static int							_renderCounter;
 
 	/**
@@ -195,6 +199,13 @@ public class Map3View extends ViewPart implements ITourProvider {
 		setColorProvider(colorId);
 
 		updateMapColors();
+	}
+
+	public void actionShowLegendInMap(final boolean isLegendVisible) {
+
+		_isLegendVisible = isLegendVisible;
+
+		Map3Manager.setLegendVisible(isLegendVisible);
 	}
 
 	public void actionShowTour(final boolean isTrackVisible) {
@@ -387,6 +398,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 		_actionMapColor = new ActionMapColor(this, _state);
 
 		_actionShowEntireTour = new ActionShowEntireTour(this);
+		_actionShowLegendInMap = new ActionShowLegendInMap3(this);
 		_actionShowTourInMap3 = new ActionShowTourInMap3(this, parent);
 		_actionSynMapPositionWithSlider = new ActionSyncMapPositionWithSlider(this);
 		_actionSynMapViewWithTour = new ActionSyncMapViewWithTour(this);
@@ -521,10 +533,12 @@ public class Map3View extends ViewPart implements ITourProvider {
 		}
 
 		_mapContainer.addControlListener(new ControlAdapter() {
+
 			@Override
 			public void controlResized(final ControlEvent e) {
-				Map3Manager.getTourInfoLayer().resizeLegendImage();
+				Map3Manager.getTourLegendLayer().resizeLegendImage();
 			}
+
 		});
 
 		parent.layout();
@@ -562,15 +576,14 @@ public class Map3View extends ViewPart implements ITourProvider {
 	void enableActions() {
 
 		final boolean isTrackLayerVisible = Map3Manager.getTourTrackLayer().isEnabled();
+		final boolean isLegendLayerVisible = Map3Manager.getTourLegendLayer().isEnabled();
 		final boolean isTourAvailable = _allTours.size() > 0;
 
 		_actionShowTourInMap3.setState(isTrackLayerVisible, isTourAvailable);
 		_actionSynMapPositionWithSlider.setEnabled(isTourAvailable);
 		_actionSynMapViewWithTour.setEnabled(isTourAvailable);
 
-		/*
-		 * tour color actions
-		 */
+		_actionShowLegendInMap.setChecked(isLegendLayerVisible);
 	}
 
 	private void enableContextMenuActions() {
@@ -616,6 +629,20 @@ public class Map3View extends ViewPart implements ITourProvider {
 
 	private void fillContextMenu(final Menu menu) {
 
+		fillMenuItem(menu, _actionShowLegendInMap);
+
+		// set color before menu is filled, this sets the action image and color id
+		_actionMapColor.setColorId(_tourColorId);
+
+		if (_tourColorId != MapColorId.HrZone) {
+
+			// hr zone has a different color provider and is not yet supported
+
+			(new Separator()).fill(menu, -1);
+			fillMenuItem(menu, _actionMapColor);
+		}
+
+		(new Separator()).fill(menu, -1);
 		fillMenuItem(menu, _actionEditQuick);
 		fillMenuItem(menu, _actionEditTour);
 		fillMenuItem(menu, _actionOpenMarkerDialog);
@@ -633,17 +660,6 @@ public class Map3View extends ViewPart implements ITourProvider {
 		fillMenuItem(menu, _actionExportTour);
 		fillMenuItem(menu, _actionPrintTour);
 
-		// set color before menu is filled, this sets the action image and color id
-		_actionMapColor.setColorId(_tourColorId);
-
-		if (_tourColorId != MapColorId.HrZone) {
-
-			// hr zone has a different color provider and is not yet supported
-
-			(new Separator()).fill(menu, -1);
-			fillMenuItem(menu, _actionMapColor);
-		}
-
 		enableContextMenuActions();
 	}
 
@@ -651,6 +667,10 @@ public class Map3View extends ViewPart implements ITourProvider {
 
 		final ActionContributionItem item = new ActionContributionItem(action);
 		item.fill(menu, -1);
+	}
+
+	public ArrayList<TourData> getAllTours() {
+		return _allTours;
 	}
 
 	public java.awt.Rectangle getMapSize() {
@@ -982,6 +1002,11 @@ public class Map3View extends ViewPart implements ITourProvider {
 		_isTourVisible = Util.getStateBoolean(_state, STATE_IS_TOUR_VISIBLE, true);
 		_actionShowTourInMap3.setState(_isTourVisible, isTourAvailable);
 
+		// is legend visible
+		_isLegendVisible = Util.getStateBoolean(_state, STATE_IS_LEGEND_VISIBLE, true);
+		_actionShowLegendInMap.setChecked(_isLegendVisible);
+		Map3Manager.setLegendVisible(_isLegendVisible);
+
 		// tour color
 		final String stateColorId = Util.getStateString(_state, STATE_TOUR_COLOR_ID, MapColorId.Altitude.name());
 
@@ -1049,6 +1074,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 
 		_state.put(STATE_IS_SYNC_MAP_POSITION_WITH_SLIDER, _isSyncMapPositionWithSlider);
 		_state.put(STATE_IS_SYNC_MAP_VIEW_WITH_TOUR, _isSyncMapViewWithTour);
+		_state.put(STATE_IS_LEGEND_VISIBLE, _isLegendVisible);
 		_state.put(STATE_IS_TOUR_VISIBLE, _isTourVisible);
 
 		_state.put(STATE_TOUR_COLOR_ID, _tourColorId.name());
@@ -1063,7 +1089,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 		final IMapColorProvider colorProvider = TourMapColors.getColorProvider(colorId);
 
 		Map3Manager.getTourTrackLayer().setColorProvider(colorProvider);
-		Map3Manager.getTourInfoLayer().setColorProvider(colorProvider);
+		Map3Manager.getTourLegendLayer().setColorProvider(colorProvider);
 	}
 
 	@Override
@@ -1104,7 +1130,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 
 		final ArrayList<TourMap3Position> allPositions = tourTrackLayer.createTrackPaths(_allTours);
 
-		Map3Manager.getTourInfoLayer().updateLegendImage();
+		Map3Manager.getTourLegendLayer().updateLegendImage();
 
 		showAllTours_Final(isSyncMapViewWithTour, allPositions);
 	}
@@ -1222,7 +1248,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 
 		Map3Manager.getTourTrackLayer().updateColors(_allTours);
 
-		Map3Manager.getTourInfoLayer().updateLegendImage();
+		Map3Manager.getTourLegendLayer().updateLegendImage();
 
 		showAllTours(false);
 	}
@@ -1235,10 +1261,6 @@ public class Map3View extends ViewPart implements ITourProvider {
 		_allTours.addAll(modifiedTours);
 
 		showAllTours_InternalTours();
-	}
-
-	public ArrayList<TourData> getAllTours() {
-		return _allTours;
 	}
 
 }

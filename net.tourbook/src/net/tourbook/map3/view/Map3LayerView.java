@@ -15,6 +15,8 @@
  *******************************************************************************/
 package net.tourbook.map3.view;
 
+import gov.nasa.worldwind.layers.Layer;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 
@@ -330,8 +332,8 @@ public class Map3LayerView extends ViewPart {
 					// update ww layer
 					tviLayer.wwLayer.setEnabled(isCategoryVisible);
 
-					// add/remove layer listener
-					tviLayer.onSetCheckState();
+					// fire check state listener
+					tviLayer.fireCheckStateListener();
 
 					// update tooltip
 					_propToolTip.setLayerVisibility(tviLayer, false);
@@ -411,7 +413,7 @@ public class Map3LayerView extends ViewPart {
 		for (final Object object : uiVisibleLayers) {
 			if (object instanceof TVIMap3Layer) {
 				final TVIMap3Layer tviLayer = (TVIMap3Layer) object;
-				tviLayer.onSetCheckState();
+				tviLayer.fireCheckStateListener();
 			}
 		}
 	}
@@ -427,6 +429,15 @@ public class Map3LayerView extends ViewPart {
 		_layerViewer.getTree().setFocus();
 	}
 
+	void setTourLegendLayerVisibility(final TVIMap3Layer tviLayer, final boolean isLegendVisible) {
+
+		// update model
+		tviLayer.isLayerVisible = isLegendVisible;
+
+		// update viewer
+		_layerViewer.setChecked(tviLayer, isLegendVisible);
+	}
+
 	void setTourTrackLayerVisibility(final TVIMap3Layer tviLayer, final boolean isTrackVisible) {
 		setTourTrackLayerVisibility(tviLayer, isTrackVisible, true, false);
 	}
@@ -437,18 +448,20 @@ public class Map3LayerView extends ViewPart {
 	 * @param isUpdateViewer
 	 * @param isUpdateTooltip
 	 */
-	void setTourTrackLayerVisibility(	final TVIMap3Layer tviLayer,
-										final boolean isLayerVisible,
-										final boolean isUpdateViewer,
-										final boolean isUpdateTooltip) {
+	private void setTourTrackLayerVisibility(	final TVIMap3Layer tviLayer,
+												final boolean isLayerVisible,
+												final boolean isUpdateViewer,
+												final boolean isUpdateTooltip) {
 		// update model
 		tviLayer.isLayerVisible = isLayerVisible;
 
+		final Layer wwLayer = tviLayer.wwLayer;
+
 		// update ww layer
-		tviLayer.wwLayer.setEnabled(isLayerVisible);
+		wwLayer.setEnabled(isLayerVisible);
 
 		// add/remove layer listener
-		tviLayer.onSetCheckState();
+		tviLayer.fireCheckStateListener();
 
 		// redraw map
 		Map3Manager.redrawMap();
@@ -463,7 +476,7 @@ public class Map3LayerView extends ViewPart {
 		}
 
 		// update actions in the map view
-		if (tviLayer.wwLayer.equals(Map3Manager.getTourTrackLayer())) {
+		if (wwLayer.equals(Map3Manager.getTourTrackLayer()) || wwLayer.equals(Map3Manager.getTourLegendLayer())) {
 			Map3Manager.enableMap3Actions();
 		}
 	}

@@ -49,6 +49,13 @@ public class TVIMap3Layer extends TVIMap3Item {
 		// default layer has no children
 	}
 
+	void fireCheckStateListener() {
+
+		if (_checkStateListener != null) {
+			_checkStateListener.onSetCheckState(this);
+		}
+	}
+
 	public String getId() {
 		return id;
 	}
@@ -56,13 +63,6 @@ public class TVIMap3Layer extends TVIMap3Item {
 	@Override
 	public boolean hasChildren() {
 		return false;
-	}
-
-	void onSetCheckState() {
-
-		if (_checkStateListener != null) {
-			_checkStateListener.onSetCheckState(this);
-		}
 	}
 
 	@Override

@@ -23,7 +23,7 @@ public class Messages extends NLS {
 
 	public static String		Custom_Layer_Status;
 	public static String		Custom_Layer_TerrainProfile;
-	public static String	Custom_Layer_TourInfo;
+	public static String	Custom_Layer_TourLegend;
 
 	public static String		Custom_Layer_TourTrack;
 	public static String		Custom_Layer_ViewerController;

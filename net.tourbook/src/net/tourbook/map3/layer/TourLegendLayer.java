@@ -18,6 +18,7 @@ package net.tourbook.map3.layer;
 import gov.nasa.worldwind.layers.RenderableLayer;
 import gov.nasa.worldwind.render.ScreenImage;
 
+import java.awt.Point;
 import java.awt.image.BufferedImage;
 
 import net.tourbook.common.color.IGradientColors;
@@ -38,25 +39,29 @@ import org.eclipse.swt.widgets.Display;
 
 import de.byteholder.geoclipse.map.SWT_AWT_Images;
 
-public class TourInfoLayer extends RenderableLayer {
+public class TourLegendLayer extends RenderableLayer {
 
-	public static final String	MAP3_LAYER_ID	= "TourInfoLayer";	//$NON-NLS-1$
-
-	private IDialogSettings		_state;
-
-	private ScreenImage			_legendImage;
+	public static final String	MAP3_LAYER_ID	= "TourLegendLayer";	//$NON-NLS-1$
 
 	private IMapColorProvider	_colorProvider;
 
+	private ScreenImage			_legendImage;
+
 	private int					_legendImageHeight;
+	private Point				_legendImageLocation;
 
-	public TourInfoLayer(final IDialogSettings state) {
+	private BufferedImage		_awtLegendImage;
 
-		_state = state;
+	public TourLegendLayer(final IDialogSettings state) {
+
+		restoreState(state);
 
 		_legendImage = new ScreenImage();
+		_legendImage.setOpacity(0.8);
 
 		addRenderable(_legendImage);
+
+		setPickEnabled(false);
 	}
 
 	public void resizeLegendImage() {
@@ -84,35 +89,27 @@ public class TourInfoLayer extends RenderableLayer {
 //			return;
 //		}
 
-		/*
-		 * check height
-		 */
 
-		final int mapHeight = Map3Manager.getMap3View().getMapSize().height;
-
-		if ((mapHeight < IMapColorProvider.DEFAULT_LEGEND_HEIGHT + IMapColorProvider.LEGEND_TOP_MARGIN)
-				|| ((mapHeight > IMapColorProvider.DEFAULT_LEGEND_HEIGHT + IMapColorProvider.LEGEND_TOP_MARGIN) //
-				&& (_legendImageHeight < IMapColorProvider.DEFAULT_LEGEND_HEIGHT)) //
-		) {
-
-			final int legendHeightNoMargin = _legendImageHeight - 2 * IMapColorProvider.LEGEND_MARGIN_TOP_BOTTOM;
-
-			MapUtils.updateMinMaxValues(//
-					Map3Manager.getMap3View().getAllTours(),
-					colorProvider,
-					legendHeightNoMargin);
-
-			updateLegendImage();
-		}
+		updateLegendImage();
 
 	}
 
-	public void saveState() {
+	private void restoreState(final IDialogSettings state) {
+
+	}
+
+	public void saveState(final IDialogSettings state) {
 
 	}
 
 	public void setColorProvider(final IMapColorProvider colorProvider) {
 		_colorProvider = colorProvider;
+	}
+
+	public void setLegendVisible(final boolean isLegendVisible) {
+
+		// show/hide image
+		_legendImage.setScreenLocation(isLegendVisible ? _legendImageLocation : null);
 	}
 
 	/**
@@ -127,9 +124,19 @@ public class TourInfoLayer extends RenderableLayer {
 
 		final int mapHeight = Map3Manager.getMap3View().getMapSize().height;
 
+//		System.out.println(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] \tmapHeight=" + mapHeight);
+//		// TODO remove SYSTEM.OUT.PRINTLN
+
 		_legendImageHeight = Math.max(1, Math.min(//
 				IMapColorProvider.DEFAULT_LEGEND_HEIGHT,
 				mapHeight - IMapColorProvider.LEGEND_TOP_MARGIN));
+
+		final int legendHeightNoMargin = _legendImageHeight - 2 * IMapColorProvider.LEGEND_MARGIN_TOP_BOTTOM;
+
+		MapUtils.updateMinMaxValues(//
+				Map3Manager.getMap3View().getAllTours(),
+				(IGradientColors) _colorProvider,
+				legendHeightNoMargin);
 
 		final RGB rgbTransparent = new RGB(0xfe, 0xfe, 0xfe);
 
@@ -158,13 +165,22 @@ public class TourInfoLayer extends RenderableLayer {
 
 			SWT_AWT_Images.convertTransparentPixelToTransparentData(imageData, rgbTransparent);
 
-			final BufferedImage awtImage = SWT_AWT_Images.convertToAWT(imageData);
+			_awtLegendImage = SWT_AWT_Images.convertToAWT(imageData);
 
-			_legendImage.setImageSource(awtImage);
+			_legendImage.setImageSource(_awtLegendImage);
 
 		}
 		gc.dispose();
 		transparentColor.dispose();
 		legendImage.dispose();
+
+		/*
+		 * set legend positon at left/bottom
+		 */
+		final int devXCenter = (int) (5 + IMapColorProvider.DEFAULT_LEGEND_WIDTH / 2.0);
+		final int devYCenter = (int) (mapHeight - 20 - _legendImageHeight / 2.0);
+
+		_legendImageLocation = new Point(devXCenter, devYCenter);
+		_legendImage.setScreenLocation(_legendImageLocation);
 	}
 }

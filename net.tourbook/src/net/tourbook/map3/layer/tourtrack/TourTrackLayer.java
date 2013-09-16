@@ -49,8 +49,6 @@ public class TourTrackLayer extends RenderableLayer implements SelectListener, I
 
 	public static final String			MAP3_LAYER_ID			= "TourTrackLayer";			//$NON-NLS-1$
 
-	private IDialogSettings				_state;
-
 	private final TourPositionColors	_tourPositionColors;
 	private IMapColorProvider			_colorProvider;
 
@@ -75,8 +73,6 @@ public class TourTrackLayer extends RenderableLayer implements SelectListener, I
 	private int							_lastAddRemoveAction	= -1;
 
 	public TourTrackLayer(final IDialogSettings state) {
-
-		_state = state;
 
 		_trackConfig = new TourTrackConfig(state);
 		_tourPositionColors = new TourPositionColors();
@@ -308,9 +304,9 @@ public class TourTrackLayer extends RenderableLayer implements SelectListener, I
 		}
 	}
 
-	public void saveState() {
+	public void saveState(final IDialogSettings state) {
 
-		_trackConfig.saveState(_state);
+		_trackConfig.saveState(state);
 	}
 
 	/**

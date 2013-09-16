@@ -387,7 +387,7 @@ public class DialogTerrainProfileConfig {
 		final boolean isTTMoved = Util.getStateBoolean(_state, STATE_TERRAIN_PROFILE_IS_TOOLTIP_MOVED, false);
 		if (isTTMoved) {
 
-			final IViewPart ttParentView = Map3Manager.getMap3PropertiesView();
+			final IViewPart ttParentView = Map3Manager.getMap3LayerView();
 			if (ttParentView != null) {
 
 				final Shell wbShell = ttParentView.getViewSite().getWorkbenchWindow().getShell();
@@ -434,7 +434,7 @@ public class DialogTerrainProfileConfig {
 
 				// save dialog position ONLY when moved, when not moved the tooltip is displayed at the default location
 
-				final IViewPart ttParentView = Map3Manager.getMap3PropertiesView();
+				final IViewPart ttParentView = Map3Manager.getMap3LayerView();
 				if (ttParentView != null) {
 
 					final Shell wbShell = ttParentView.getViewSite().getWorkbenchWindow().getShell();
