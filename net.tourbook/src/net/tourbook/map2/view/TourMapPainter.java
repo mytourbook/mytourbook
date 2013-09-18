@@ -17,6 +17,7 @@ package net.tourbook.map2.view;
 
 import gnu.trove.map.hash.TIntObjectHashMap;
 
+import java.awt.Graphics2D;
 import java.awt.Point;
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -34,6 +35,7 @@ import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.data.TourWayPoint;
 import net.tourbook.map2.Messages;
+import net.tourbook.map3.layer.legend.MapLegendLabel;
 import net.tourbook.photo.ILoadCallBack;
 import net.tourbook.photo.IPhotoPreferences;
 import net.tourbook.photo.ImageQuality;
@@ -156,18 +158,65 @@ public class TourMapPainter extends MapPainter {
 		init();
 	}
 
-	private static void drawLegendGradientColors(	final GC gc,
-													final Rectangle legendBounds,
-													final IGradientColors colorProvider,
-													final boolean isDrawVertical) {
+	private static void drawLegendGradientColors_AWT(	final Graphics2D g2d,
+														final int legendWidth,
+														final int legendHeight,
+														final IGradientColors colorProvider) {
 
-		final Device display = gc.getDevice();
 		final MapLegendImageConfig legendImageConfig = colorProvider.getMapLegendImageConfig();
 
 		// ensure units are available
 		if (legendImageConfig.units == null) {
 			return;
 		}
+
+		// get configuration for the legend
+		final float legendMaxValue = legendImageConfig.legendMaxValue;
+		final float legendMinValue = legendImageConfig.legendMinValue;
+		final float legendDiffValue = legendMaxValue - legendMinValue;
+
+		final int legendPositionX = 1;
+		final int legendPositionY = 1;
+
+		final int availableLegendPixels = legendHeight - 3;
+
+		// pixelValue contains the value for ONE pixel
+		final float pixelValue = legendDiffValue / availableLegendPixels;
+
+		for (int pixelIndex = 0; pixelIndex <= availableLegendPixels; pixelIndex++) {
+
+			final float legendValue = legendMinValue + pixelValue * pixelIndex;
+
+			final int valuePositionY = legendPositionY + availableLegendPixels - pixelIndex;
+
+			final int lineColorValue = colorProvider.getColorValue(legendValue);
+			final int red = (lineColorValue & 0xFF) >>> 0;
+			final int green = (lineColorValue & 0xFF00) >>> 8;
+			final int blue = (lineColorValue & 0xFF0000) >>> 16;
+
+			// draw legend color line
+			g2d.setColor(new java.awt.Color(red, green, blue));
+			g2d.drawLine(legendPositionX, valuePositionY, legendWidth, valuePositionY);
+		}
+
+		// draw border
+		g2d.setColor(java.awt.Color.WHITE);
+		g2d.drawRect(0, 0, legendWidth - 1, legendHeight - 1);
+	}
+
+	private static void drawLegendGradientColors_SWT(	final GC gc,
+														final Rectangle legendBounds,
+														final IGradientColors colorProvider,
+														final boolean isDrawVertical) {
+
+		final MapLegendImageConfig legendImageConfig = colorProvider.getMapLegendImageConfig();
+
+		// ensure units are available
+		if (legendImageConfig.units == null) {
+			return;
+		}
+
+		final Device display = gc.getDevice();
 
 		// get configuration for the legend
 		final ArrayList<Float> legendUnits = new ArrayList<Float>(legendImageConfig.units);
@@ -193,7 +242,7 @@ public class TourMapPainter extends MapPainter {
 
 			legendPositionX = legendBounds.x + 1;
 			legendPositionY = legendBounds.y + IMapColorProvider.LEGEND_MARGIN_TOP_BOTTOM;
-			legendWidth = 20;
+			legendWidth = IMapColorProvider.DEFAULT_LEGEND_GRAPHIC_WIDTH;
 			legendHeight = legendBounds.height - 2 * IMapColorProvider.LEGEND_MARGIN_TOP_BOTTOM;
 
 			availableLegendPixels = legendHeight - 1;
@@ -354,8 +403,105 @@ public class TourMapPainter extends MapPainter {
 										final boolean isDrawVertical) {
 
 		if (colorProvider instanceof IGradientColors) {
-			drawLegendGradientColors(gc, legendBounds, (IGradientColors) colorProvider, isDrawVertical);
+			drawLegendGradientColors_SWT(gc, legendBounds, (IGradientColors) colorProvider, isDrawVertical);
 		}
+	}
+
+	public static void drawMapLegend(	final Graphics2D g2d,
+										final int legendWidth,
+										final int legendHeight,
+										final IMapColorProvider colorProvider) {
+
+		if (colorProvider instanceof IGradientColors) {
+			drawLegendGradientColors_AWT(g2d, legendWidth, legendHeight, (IGradientColors) colorProvider);
+		}
+	}
+
+	public static ArrayList<MapLegendLabel> getMapLegendLabels(	final int legendWidth,
+																final int legendHeight,
+																final IGradientColors colorProvider) {
+
+		final ArrayList<MapLegendLabel> legendLabels = new ArrayList<MapLegendLabel>();
+
+		final MapLegendImageConfig legendImageConfig = colorProvider.getMapLegendImageConfig();
+
+		// ensure units are available
+		if (legendImageConfig.units == null) {
+			return legendLabels;
+		}
+
+		// get configuration for the legend
+		final ArrayList<Float> allLegendUnits = new ArrayList<Float>(legendImageConfig.units);
+
+		final String unitText = legendImageConfig.unitText;
+		final List<String> unitLabels = legendImageConfig.unitLabels;
+		final int legendFormatDigits = legendImageConfig.numberFormatDigits;
+		final LegendUnitFormat unitFormat = legendImageConfig.unitFormat;
+
+		// get configuration for the legend
+		final float legendMaxValue = legendImageConfig.legendMaxValue;
+		final float legendMinValue = legendImageConfig.legendMinValue;
+		final float legendDiffValue = legendMaxValue - legendMinValue;
+
+		final int legendPositionY = 1;
+
+		final int availableLegendPixels = legendHeight - 3;
+
+		// pixelValue contains the value for ONE pixel
+		final float pixelValue = legendDiffValue / availableLegendPixels;
+
+		float legendValue = 0;
+		int unitLabelIndex = 0;
+
+		for (int pixelIndex = 0; pixelIndex <= availableLegendPixels; pixelIndex++) {
+
+			legendValue = legendMinValue + pixelValue * pixelIndex;
+
+			final int valuePositionY = legendPositionY + availableLegendPixels - pixelIndex;
+
+			// find a unit which corresponds to the current legend value
+			for (final Float unitValue : allLegendUnits) {
+
+				if (legendValue >= unitValue) {
+
+					/*
+					 * get unit label
+					 */
+					String valueText;
+					if (unitLabels == null) {
+
+						// set default unit label
+
+						if (unitFormat == LegendUnitFormat.Pace) {
+
+							valueText = Util.format_mm_ss(unitValue.longValue()) + UI.SPACE + unitText;
+
+						} else {
+
+							if (legendFormatDigits == 0) {
+								valueText = Integer.toString(unitValue.intValue()) + UI.SPACE + unitText;
+							} else {
+								// currently only 1 digit is supported
+								valueText = _nf1.format(unitValue) + UI.SPACE + unitText;
+							}
+						}
+
+					} else {
+						// when unitLabels are available, they will overwrite the default labeling
+						valueText = unitLabels.get(unitLabelIndex++);
+					}
+
+					legendLabels.add(new MapLegendLabel(unitValue, valueText, valuePositionY));
+
+					// prevent to draw this unit again
+					allLegendUnits.remove(unitValue);
+
+					break;
+				}
+			}
+		}
+
+		return legendLabels;
 	}
 
 	private static void getTourPainterSettings() {

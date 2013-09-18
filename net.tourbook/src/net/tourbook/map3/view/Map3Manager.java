@@ -48,7 +48,7 @@ import net.tourbook.map3.layer.DefaultLayer;
 import net.tourbook.map3.layer.MapDefaultCategory;
 import net.tourbook.map3.layer.MapDefaultLayer;
 import net.tourbook.map3.layer.StatusLayer;
-import net.tourbook.map3.layer.TourLegendLayer;
+import net.tourbook.map3.layer.legend.TourLegendLayer;
 import net.tourbook.map3.layer.tourtrack.TourTrackLayer;
 
 import org.eclipse.core.runtime.IPath;
@@ -1064,7 +1064,6 @@ public class Map3Manager {
 	public static void saveState() {
 
 		_tourTrackLayer.saveState(_state);
-		_tourLegendLayer.saveState(_state);
 
 		/*
 		 * save layer structure in xml file

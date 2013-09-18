@@ -22,6 +22,8 @@ import gov.nasa.worldwind.awt.WorldWindowGLCanvas;
 import java.awt.BorderLayout;
 import java.awt.EventQueue;
 import java.awt.Frame;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
@@ -76,8 +78,6 @@ import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.awt.SWT_AWT;
-import org.eclipse.swt.events.ControlAdapter;
-import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.MenuAdapter;
 import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.widgets.Composite;
@@ -530,16 +530,25 @@ public class Map3View extends ViewPart implements ITourProvider {
 
 			_awtFrame.add(awtPanel);
 			awtPanel.add(_wwCanvas, BorderLayout.CENTER);
+
 		}
 
-		_mapContainer.addControlListener(new ControlAdapter() {
+		_awtFrame.addComponentListener(new ComponentAdapter() {
 
 			@Override
-			public void controlResized(final ControlEvent e) {
+			public void componentResized(final ComponentEvent e) {
 				Map3Manager.getTourLegendLayer().resizeLegendImage();
 			}
-
 		});
+
+//		_mapContainer.addControlListener(new ControlAdapter() {
+//
+//			@Override
+//			public void controlResized(final ControlEvent e) {
+//				Map3Manager.getTourLegendLayer().resizeLegendImage();
+//			}
+//
+//		});
 
 		parent.layout();
 	}

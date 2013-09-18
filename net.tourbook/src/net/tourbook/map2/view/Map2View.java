@@ -1319,7 +1319,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 		boolean isDataAvailable = false;
 		if (mapColorProvider instanceof IGradientColors) {
 
-			isDataAvailable = MapUtils.updateMinMaxValues(
+			isDataAvailable = MapUtils.updateLegendMinMaxValues(
 					_allTourData,
 					(IGradientColors) mapColorProvider,
 					legendHeightNoMargin);

@@ -111,7 +111,7 @@ class TourPositionColors implements Path.PositionColors {
 
 			final IGradientColors colorProvider = (IGradientColors) _colorProvider;
 
-			MapUtils.updateMinMaxValues(allTours, colorProvider, 300);
+			MapUtils.updateLegendMinMaxValues(allTours, colorProvider, 300);
 		}
 	}
 

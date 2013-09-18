@@ -29,7 +29,7 @@ import net.tourbook.map2.Messages;
 public class MapUtils {
 
 	/**
-	 * Update the min/max values in the {@link IGradientColors} for the currently displayed legend
+	 * Update the min/max values in the {@link IGradientColors} for the currently displayed legend.
 	 * 
 	 * @param allTourData
 	 * @param mapColorProvider
@@ -37,7 +37,7 @@ public class MapUtils {
 	 * @return Return <code>true</code> when the legend value could be updated, <code>false</code>
 	 *         when data are not available
 	 */
-	public static boolean updateMinMaxValues(	final ArrayList<TourData> allTourData,
+	public static boolean updateLegendMinMaxValues(	final ArrayList<TourData> allTourData,
 												final IGradientColors mapColorProvider,
 												final int legendHeight) {
 
