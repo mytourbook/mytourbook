@@ -1092,6 +1092,13 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 
 	public void updateMeasurementSystem() {
 
+		if (_lblAltitudeOffsetDistanceUnit == null) {
+
+			// dialog is not yet created
+
+			return;
+		}
+
 		_lblAltitudeOffsetDistanceUnit.setText(UI.UNIT_LABEL_ALTITUDE);
 		_lblAltitudeOffsetDistanceUnit.getParent().layout();
 
