@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -18,9 +18,6 @@ package net.tourbook.ui.views;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.ScrolledComposite;
-import org.eclipse.swt.events.ControlAdapter;
-import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.part.ViewPart;
@@ -33,8 +30,8 @@ public class TourChartSmoothingView extends ViewPart {
 
 	private FormToolkit			_tk;
 
-	private ScrolledComposite	_scrolledContainer;
-	private Composite			_scrolledContent;
+//	private ScrolledComposite	_scrolledContainer;
+//	private Composite			_scrolledContent;
 
 	public TourChartSmoothingView() {}
 
@@ -50,27 +47,39 @@ public class TourChartSmoothingView extends ViewPart {
 
 		_tk = new FormToolkit(parent.getDisplay());
 
-		_scrolledContainer = new ScrolledComposite(parent, SWT.V_SCROLL);
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+		GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
 		{
-			_scrolledContent = _tk.createComposite(_scrolledContainer);
-			GridDataFactory.fillDefaults().applyTo(_scrolledContent);
-			GridLayoutFactory.swtDefaults().numColumns(1).applyTo(_scrolledContent);
-			{
-				_smoothingUI.createUI(_scrolledContent, false);
-			}
-
-			// setup scrolled container
-			_scrolledContainer.setExpandVertical(true);
-			_scrolledContainer.setExpandHorizontal(true);
-			_scrolledContainer.addControlListener(new ControlAdapter() {
-				@Override
-				public void controlResized(final ControlEvent e) {
-					onResizeScrolledContainer(_scrolledContent);
-				}
-			});
-
-			_scrolledContainer.setContent(_scrolledContent);
+			_smoothingUI.createUI(container, false);
 		}
+
+		/*
+		 * Disabled scrolled container, that the spinner controls can be modified with the mouse
+		 * wheel, otherwise the container is scrolled.
+		 */
+
+//		_scrolledContainer = new ScrolledComposite(parent, SWT.V_SCROLL);
+//		{
+//			_scrolledContent = _tk.createComposite(_scrolledContainer);
+//			GridDataFactory.fillDefaults().applyTo(_scrolledContent);
+//			GridLayoutFactory.swtDefaults().numColumns(1).applyTo(_scrolledContent);
+//			{
+//				_smoothingUI.createUI(_scrolledContent, false);
+//			}
+//
+//			// setup scrolled container
+//			_scrolledContainer.setExpandVertical(true);
+//			_scrolledContainer.setExpandHorizontal(true);
+//			_scrolledContainer.addControlListener(new ControlAdapter() {
+//				@Override
+//				public void controlResized(final ControlEvent e) {
+//					onResizeScrolledContainer(_scrolledContent);
+//				}
+//			});
+//
+//			_scrolledContainer.setContent(_scrolledContent);
+//		}
 	}
 
 	@Override
@@ -82,9 +91,9 @@ public class TourChartSmoothingView extends ViewPart {
 		super.dispose();
 	}
 
-	private void onResizeScrolledContainer(final Composite container) {
-		_scrolledContainer.setMinSize(container.computeSize(SWT.DEFAULT, SWT.DEFAULT));
-	}
+//	private void onResizeScrolledContainer(final Composite container) {
+//		_scrolledContainer.setMinSize(container.computeSize(SWT.DEFAULT, SWT.DEFAULT));
+//	}
 
 	@Override
 	public void setFocus() {}
