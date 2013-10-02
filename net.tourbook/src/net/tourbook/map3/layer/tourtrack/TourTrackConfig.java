@@ -86,7 +86,7 @@ public class TourTrackConfig {
 	/**
 	 * Vertical distance in m (meter).
 	 */
-	public int								altitudeOffsetDistance;
+	public int								altitudeVerticalOffset;
 
 	/**
 	 * Is <code>true</code> when altitude offset is enabled.
@@ -203,7 +203,7 @@ public class TourTrackConfig {
 		// altitude
 		altitudeMode = getAltitudeModeValue(Util.getStateInt(state, STATE_ALTITUDE_MODE, WorldWind.ABSOLUTE));
 		isAbsoluteOffset = Util.getStateBoolean(state, STATE_IS_ABSOLUTE_OFFSET, true);
-		altitudeOffsetDistance = Util.getStateInt(state, STATE_ALTITUDE_OFFSET, 50);
+		altitudeVerticalOffset = Util.getStateInt(state, STATE_ALTITUDE_OFFSET, 50);
 		isFollowTerrain = Util.getStateBoolean(state, STATE_IS_FOLLOW_TERRAIN, true);
 
 		// track position
@@ -244,7 +244,7 @@ public class TourTrackConfig {
 		Util.setState(state, STATE_OUTLINE_COLOR_SELECTED, outlineColorSelected);
 
 		state.put(STATE_ALTITUDE_MODE, altitudeMode);
-		state.put(STATE_ALTITUDE_OFFSET, altitudeOffsetDistance);
+		state.put(STATE_ALTITUDE_OFFSET, altitudeVerticalOffset);
 
 		state.put(STATE_IS_ABSOLUTE_OFFSET, isAbsoluteOffset);
 		state.put(STATE_IS_DRAW_VERTICALS, isDrawVerticals);

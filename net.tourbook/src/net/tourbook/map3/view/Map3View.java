@@ -16,39 +16,64 @@
 package net.tourbook.map3.view;
 
 import gov.nasa.worldwind.View;
+import gov.nasa.worldwind.WorldWind;
 import gov.nasa.worldwind.avlist.AVKey;
 import gov.nasa.worldwind.awt.WorldWindowGLCanvas;
+import gov.nasa.worldwind.geom.Angle;
+import gov.nasa.worldwind.geom.LatLon;
+import gov.nasa.worldwind.geom.Line;
+import gov.nasa.worldwind.geom.Position;
+import gov.nasa.worldwind.geom.Vec4;
+import gov.nasa.worldwind.globes.Globe;
+import gov.nasa.worldwind.render.AnnotationAttributes;
+import gov.nasa.worldwind.render.GlobeAnnotation;
+import gov.nasa.worldwind.view.orbit.BasicOrbitView;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.EventQueue;
 import java.awt.Frame;
+import java.awt.Insets;
+import java.awt.Point;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import javax.swing.SwingUtilities;
 
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.chart.ChartDataModel;
+import net.tourbook.chart.SelectionChartInfo;
+import net.tourbook.common.UI;
+import net.tourbook.common.color.ColorUtil;
+import net.tourbook.common.color.IGradientColors;
 import net.tourbook.common.color.IMapColorProvider;
 import net.tourbook.common.color.MapColorId;
+import net.tourbook.common.color.MapLegendImageConfig;
 import net.tourbook.common.util.PostSelectionProvider;
 import net.tourbook.common.util.SWTPopupOverAWT;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.extension.export.ActionExport;
+import net.tourbook.importdata.RawDataManager;
 import net.tourbook.map2.view.TourMapColors;
 import net.tourbook.map3.action.ActionMapColor;
 import net.tourbook.map3.action.ActionOpenMap3LayerView;
+import net.tourbook.map3.action.ActionShowChartSliderInMap;
 import net.tourbook.map3.action.ActionShowEntireTour;
 import net.tourbook.map3.action.ActionShowLegendInMap3;
 import net.tourbook.map3.action.ActionShowTourInMap3;
-import net.tourbook.map3.action.ActionSyncMapPositionWithSlider;
-import net.tourbook.map3.action.ActionSyncMapViewWithTour;
+import net.tourbook.map3.action.ActionSyncMapWithChartSlider;
+import net.tourbook.map3.action.ActionSyncMapWithTour;
 import net.tourbook.map3.action.ActionTourColor;
+import net.tourbook.map3.layer.ChartSliderLayer;
+import net.tourbook.map3.layer.TourInfoLayer;
 import net.tourbook.map3.layer.tourtrack.ITrackPath;
 import net.tourbook.map3.layer.tourtrack.TourMap3Position;
+import net.tourbook.map3.layer.tourtrack.TourTrackConfig;
 import net.tourbook.map3.layer.tourtrack.TourTrackLayer;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.printing.ActionPrint;
@@ -96,6 +121,8 @@ public class Map3View extends ViewPart implements ITourProvider {
 
 	public static final String					ID										= "net.tourbook.map3.view.Map3ViewId";		//$NON-NLS-1$
 
+	private static final String					STATE_IS_CHART_SLIDERVISIBLE			= "STATE_IS_CHART_SLIDERVISIBLE";			//$NON-NLS-1$
+
 	private static final String					STATE_IS_LEGEND_VISIBLE					= "STATE_IS_LEGEND_VISIBLE";				//$NON-NLS-1$
 	private static final String					STATE_IS_SYNC_MAP_VIEW_WITH_TOUR		= "STATE_IS_SYNC_MAP_VIEW_WITH_TOUR";		//$NON-NLS-1$
 	private static final String					STATE_IS_SYNC_MAP_POSITION_WITH_SLIDER	= "STATE_IS_SYNC_MAP_POSITION_WITH_SLIDER"; //$NON-NLS-1$
@@ -113,14 +140,13 @@ public class Map3View extends ViewPart implements ITourProvider {
 	private static final WorldWindowGLCanvas	_wwCanvas								= Map3Manager.getWWCanvas();
 
 	private ActionOpenMap3LayerView				_actionOpenMap3LayerView;
-
 	private ActionMapColor						_actionMapColor;
-
+	private ActionShowChartSliderInMap			_actionShowChartSliderInMap;
 	private ActionShowEntireTour				_actionShowEntireTour;
 	private ActionShowLegendInMap3				_actionShowLegendInMap;
 	private ActionShowTourInMap3				_actionShowTourInMap3;
-	private ActionSyncMapPositionWithSlider		_actionSynMapPositionWithSlider;
-	private ActionSyncMapViewWithTour			_actionSynMapViewWithTour;
+	private ActionSyncMapWithChartSlider		_actionSynMapWithChartSlider;
+	private ActionSyncMapWithTour				_actionSynMapWithTour;
 	private ActionTourColor						_actionTourColorAltitude;
 	private ActionTourColor						_actionTourColorGradient;
 	private ActionTourColor						_actionTourColorPulse;
@@ -136,26 +162,26 @@ public class Map3View extends ViewPart implements ITourProvider {
 	private ActionOpenMarkerDialog				_actionOpenMarkerDialog;
 	private ActionOpenTour						_actionOpenTour;
 	private ActionPrint							_actionPrintTour;
+
 	private PostSelectionProvider				_postSelectionProvider;
-
 	private IPartListener2						_partListener;
-
 	private ISelectionListener					_postSelectionListener;
 	private IPropertyChangeListener				_prefChangeListener;
 	private ITourEventListener					_tourEventListener;
-	private MouseAdapter						_awtMouseListener;
-	private boolean								_isPartActive;
 
+	private MouseAdapter						_awtMouseListener;
+
+	private boolean								_isPartActive;
 	private boolean								_isPartVisible;
 	private boolean								_isRestored;
-	private ISelection							_lastHiddenSelection;
-	private boolean								_isSyncMapPositionWithSlider;
 
+	private ISelection							_lastHiddenSelection;
+
+	private boolean								_isSyncMapWithChartSlider;
 	private boolean								_isSyncMapViewWithTour;
 	private boolean								_isTourVisible;
 	private boolean								_isLegendVisible;
-	private static int							_renderCounter;
-
+	private boolean								_isChartSliderVisible;
 	/**
 	 * Contains all tours which are displayed in the map.
 	 */
@@ -167,12 +193,24 @@ public class Map3View extends ViewPart implements ITourProvider {
 	private MapColorId							_tourColorId;
 
 	/*
+	 * current position for the x-sliders
+	 */
+	private int									_currentLeftSliderValueIndex;
+	private int									_currentRightSliderValueIndex;
+	private int									_currentSelectedSliderValueIndex;
+	//
+	/*
 	 * UI controls
 	 */
 	private Composite							_mapContainer;
 
 	private Frame								_awtFrame;
+
 	private Menu								_swtContextMenu;
+
+	private ITrackPath							_previousHoveredTrack;
+	private Integer								_previousHoveredTrackPosition;
+	private Position							_previousMapSliderPosition;
 
 	private class Map3ContextMenu extends SWTPopupOverAWT {
 
@@ -201,30 +239,37 @@ public class Map3View extends ViewPart implements ITourProvider {
 		updateMapColors();
 	}
 
+	public void actionShowChartSlider(final boolean isVisible) {
+
+		_isChartSliderVisible = isVisible;
+
+		Map3Manager.setLayerVisible_ChartSlider(isVisible);
+	}
+
 	public void actionShowLegendInMap(final boolean isLegendVisible) {
 
 		_isLegendVisible = isLegendVisible;
 
-		Map3Manager.setLegendVisible(isLegendVisible);
+		Map3Manager.setLayerVisible_Legend(isLegendVisible);
 	}
 
 	public void actionShowTour(final boolean isTrackVisible) {
 
 		_isTourVisible = isTrackVisible;
 
-		Map3Manager.setTourTrackVisible(isTrackVisible);
+		Map3Manager.setLayerVisible_TourTrack(isTrackVisible);
 
 		showAllTours_InternalTours();
 	}
 
 	public void actionSynchMapPositionWithSlider() {
 
-		_isSyncMapPositionWithSlider = _actionSynMapPositionWithSlider.isChecked();
+		_isSyncMapWithChartSlider = _actionSynMapWithChartSlider.isChecked();
 	}
 
 	public void actionSynchMapViewWithTour() {
 
-		_isSyncMapViewWithTour = _actionSynMapViewWithTour.isChecked();
+		_isSyncMapViewWithTour = _actionSynMapWithTour.isChecked();
 
 		if (_isSyncMapViewWithTour) {
 			showAllTours_InternalTours();
@@ -297,7 +342,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 
 					if (_lastHiddenSelection != null) {
 
-						onSelectionChanged(_lastHiddenSelection);
+						onSelection(_lastHiddenSelection);
 
 						_lastHiddenSelection = null;
 					}
@@ -344,7 +389,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 					return;
 				}
 
-				onSelectionChanged(selection);
+				onSelection(selection);
 			}
 		};
 		getSite().getPage().addPostSelectionListener(_postSelectionListener);
@@ -376,7 +421,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 					clearView();
 
 				} else if (eventId == TourEventId.SLIDER_POSITION_CHANGED) {
-					onSelectionChanged((ISelection) eventData);
+					onSelection((ISelection) eventData);
 				}
 			}
 		};
@@ -384,11 +429,72 @@ public class Map3View extends ViewPart implements ITourProvider {
 		TourManager.getInstance().addTourEventListener(_tourEventListener);
 	}
 
-	private void clearView() {
+	private void cleanupOldTours() {
+
+		_previousMapSliderPosition = null;
+		_previousHoveredTrack = null;
+		_previousHoveredTrackPosition = null;
+
+		_postSelectionProvider.clearSelection();
 
 		_allTours.clear();
+	}
+
+	private void clearView() {
+
+		cleanupOldTours();
 
 		showAllTours_InternalTours();
+	}
+
+	/**
+	 * Compute a center position from an eye position and an orientation. If the view is looking at
+	 * the earth, the center position is the intersection point of the globe and a ray beginning at
+	 * the eye point, in the direction of the forward vector. If the view is looking at the horizon,
+	 * the center position is the eye position. Otherwise, the center position is null.
+	 * 
+	 * @param eyePosition
+	 *            The eye position.
+	 * @param forward
+	 *            The forward vector.
+	 * @param pitch
+	 *            View pitch.
+	 * @param altitudeMode
+	 *            Altitude mode of {@code eyePosition}.
+	 * @return The center position of the view.
+	 */
+	protected Position computeCenterPosition(	final Position eyePosition,
+												final Vec4 forward,
+												final Angle pitch,
+												final int altitudeMode) {
+		double height;
+
+		final Angle latitude = eyePosition.getLatitude();
+		final Angle longitude = eyePosition.getLongitude();
+
+		final Globe globe = Map3Manager.getWWCanvas().getModel().getGlobe();
+
+		if (altitudeMode == WorldWind.CLAMP_TO_GROUND) {
+			height = globe.getElevation(latitude, longitude);
+		} else if (altitudeMode == WorldWind.RELATIVE_TO_GROUND) {
+			height = globe.getElevation(latitude, longitude) + eyePosition.getAltitude();
+		} else {
+			height = eyePosition.getAltitude();
+		}
+
+		final Vec4 eyePoint = globe.computePointFromPosition(new Position(latitude, longitude, height));
+
+		// Find the intersection of the globe and the camera's forward vector. Looking at the horizon (tilt == 90)
+		// is a special case because it is a valid view, but the view vector does not intersect the globe.
+		Position lookAtPosition;
+		final double tolerance = 0.001;
+		if (Math.abs(pitch.degrees - 90.0) > tolerance) {
+			lookAtPosition = globe.getIntersectionPosition(new Line(eyePoint, forward));
+		} else {
+			lookAtPosition = globe.computePositionFromPoint(eyePoint);
+		}
+
+		return lookAtPosition;
 	}
 
 	private void createActions(final Composite parent) {
@@ -397,11 +503,12 @@ public class Map3View extends ViewPart implements ITourProvider {
 
 		_actionMapColor = new ActionMapColor(this, _state);
 
+		_actionShowChartSliderInMap = new ActionShowChartSliderInMap(this);
 		_actionShowEntireTour = new ActionShowEntireTour(this);
 		_actionShowLegendInMap = new ActionShowLegendInMap3(this);
 		_actionShowTourInMap3 = new ActionShowTourInMap3(this, parent);
-		_actionSynMapPositionWithSlider = new ActionSyncMapPositionWithSlider(this);
-		_actionSynMapViewWithTour = new ActionSyncMapViewWithTour(this);
+		_actionSynMapWithChartSlider = new ActionSyncMapWithChartSlider(this);
+		_actionSynMapWithTour = new ActionSyncMapWithTour(this);
 
 		_actionTourColorAltitude = ActionTourColor.createAction(this, MapColorId.Altitude);
 		_actionTourColorGradient = ActionTourColor.createAction(this, MapColorId.Gradient);
@@ -499,7 +606,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 
 				if (_lastHiddenSelection != null) {
 
-					onSelectionChanged(_lastHiddenSelection);
+					onSelection(_lastHiddenSelection);
 
 					_lastHiddenSelection = null;
 
@@ -514,6 +621,72 @@ public class Map3View extends ViewPart implements ITourProvider {
 				}
 			}
 		});
+	}
+
+	private String createSliderText(final int positionIndex, final TourData tourData) {
+
+		String graphValueText = null;
+
+		switch (_tourColorId) {
+
+		case Altitude:
+
+			final float[] altitudeSerie = tourData.altitudeSerie;
+			if (altitudeSerie != null) {
+
+				final float altitudeMetric = altitudeSerie[positionIndex];
+				final float altitude = altitudeMetric / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE;
+
+				graphValueText = String.format("%.1f %s", altitude, UI.UNIT_LABEL_ALTITUDE);
+			}
+			break;
+
+		case Gradient:
+
+			final float[] gradientSerie = tourData.gradientSerie;
+			if (gradientSerie != null) {
+				graphValueText = String.format("%.1f %%", gradientSerie[positionIndex]);
+			}
+			break;
+
+		case Pace:
+
+			final float[] paceSerie = tourData.getPaceSerie();
+			if (paceSerie != null) {
+				final float pace = paceSerie[positionIndex];
+				graphValueText = String.format(
+						"%s %s",
+						net.tourbook.ui.UI.format_mm_ss((long) pace),
+						UI.UNIT_LABEL_PACE);
+			}
+			break;
+
+		case Pulse:
+
+			final float[] pulseSerie = tourData.pulseSerie;
+			if (pulseSerie != null) {
+				graphValueText = String.format("%.0f bpm", pulseSerie[positionIndex]);
+			}
+
+			break;
+
+		case Speed:
+
+			final float[] speedSerie = tourData.getSpeedSerie();
+			if (speedSerie != null) {
+				graphValueText = String.format("%.1f %s", speedSerie[positionIndex], UI.UNIT_LABEL_SPEED);
+			}
+			break;
+
+		default:
+			break;
+		}
+
+		if (graphValueText != null) {
+			return graphValueText;
+		} else {
+			return UI.EMPTY_STRING;
+		}
 	}
 
 	private void createUI(final Composite parent) {
@@ -537,7 +710,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 
 			@Override
 			public void componentResized(final ComponentEvent e) {
-				Map3Manager.getTourLegendLayer().resizeLegendImage();
+				Map3Manager.getLayer_TourLegend().resizeLegendImage();
 			}
 		});
 
@@ -584,21 +757,30 @@ public class Map3View extends ViewPart implements ITourProvider {
 	 */
 	void enableActions() {
 
-		final boolean isTrackLayerVisible = Map3Manager.getTourTrackLayer().isEnabled();
-		final boolean isLegendLayerVisible = Map3Manager.getTourLegendLayer().isEnabled();
+		final boolean isChartSliderVisible = Map3Manager.getLayer_ChartSlider().isEnabled();
+		final boolean isLegendVisible = Map3Manager.getLayer_TourLegend().isEnabled();
+		final boolean isTrackVisible = Map3Manager.getLayer_TourTrack().isEnabled();
+
 		final boolean isTourAvailable = _allTours.size() > 0;
 
-		_actionShowTourInMap3.setState(isTrackLayerVisible, isTourAvailable);
-		_actionSynMapPositionWithSlider.setEnabled(isTourAvailable);
-		_actionSynMapViewWithTour.setEnabled(isTourAvailable);
+		_actionShowTourInMap3.setState(isTrackVisible, isTourAvailable);
+		_actionSynMapWithChartSlider.setEnabled(isTourAvailable);
+		_actionSynMapWithTour.setEnabled(isTourAvailable);
 
-		_actionShowLegendInMap.setChecked(isLegendLayerVisible);
+		_actionShowLegendInMap.setChecked(isLegendVisible);
+		_actionShowChartSliderInMap.setChecked(isChartSliderVisible);
 	}
 
 	private void enableContextMenuActions() {
 
-		final ITrackPath selectedTrack = Map3Manager.getTourTrackLayer().getSelectedTrack();
+		final ITrackPath selectedTrack = Map3Manager.getLayer_TourTrack().getSelectedTrack();
 		final boolean isTourSelected = selectedTrack != null;
+		final boolean isTourAvailable = _allTours.size() > 0;
+
+		_actionShowChartSliderInMap.setEnabled(isTourAvailable);
+		_actionShowLegendInMap.setEnabled(isTourAvailable);
+
+		_actionMapColor.setEnabled(isTourAvailable);
 
 		_actionEditQuick.setEnabled(isTourSelected);
 		_actionEditTour.setEnabled(isTourSelected);
@@ -607,7 +789,6 @@ public class Map3View extends ViewPart implements ITourProvider {
 		_actionOpenTour.setEnabled(isTourSelected);
 		_actionExportTour.setEnabled(isTourSelected);
 		_actionPrintTour.setEnabled(isTourSelected);
-
 	}
 
 	private void fillActionBars() {
@@ -627,8 +808,8 @@ public class Map3View extends ViewPart implements ITourProvider {
 
 		tbm.add(_actionShowTourInMap3);
 		tbm.add(_actionShowEntireTour);
-		tbm.add(_actionSynMapViewWithTour);
-//		tbm.add(_actionSynMapPositionWithSlider);
+		tbm.add(_actionSynMapWithTour);
+		tbm.add(_actionSynMapWithChartSlider);
 		tbm.add(new Separator());
 
 		tbm.add(new Separator());
@@ -639,6 +820,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 	private void fillContextMenu(final Menu menu) {
 
 		fillMenuItem(menu, _actionShowLegendInMap);
+		fillMenuItem(menu, _actionShowChartSliderInMap);
 
 		// set color before menu is filled, this sets the action image and color id
 		_actionMapColor.setColorId(_tourColorId);
@@ -682,14 +864,90 @@ public class Map3View extends ViewPart implements ITourProvider {
 		return _allTours;
 	}
 
+	/**
+	 * @return Returns {@link ChartSliderLayer} or null when layer is not displayed.
+	 */
+	private ChartSliderLayer getChartSliderLayer() {
+
+		final ChartSliderLayer chartSliderLayer = Map3Manager.getLayer_ChartSlider();
+
+		if (chartSliderLayer.isEnabled() == false) {
+			// layer is not displayed
+			return null;
+		}
+
+		return chartSliderLayer;
+	}
+
+	private float getDataSerieValue(final float[] dataSerie, final int positionIndex, final float legendMinValue) {
+
+		final float legendValue = dataSerie == null ? legendMinValue : dataSerie[positionIndex];
+
+		return legendValue;
+	}
+
 	public java.awt.Rectangle getMapSize() {
 		return _wwCanvas.getBounds();
+	}
+
+	/**
+	 * @param allTours
+	 * @return Returns only tours which can be displayed in the map (which contains geo
+	 *         coordinates).
+	 */
+	private ArrayList<TourData> getMapTours(final ArrayList<TourData> allTours) {
+
+		final ArrayList<TourData> mapTours = new ArrayList<TourData>(allTours.size());
+
+		for (final TourData tourData : allTours) {
+
+			final double[] latitudeSerie = tourData.latitudeSerie;
+
+			if (latitudeSerie != null && latitudeSerie.length > 0) {
+				mapTours.add(tourData);
+			}
+		}
+
+		return mapTours;
+	}
+
+	/**
+	 * @param chartSliderLayer
+	 * @return Returns {@link TourData} of the selected tour track or <code>null</code> when a tour
+	 *         is not selected.
+	 */
+	private TourData getSelectedTour(final ChartSliderLayer chartSliderLayer) {
+
+		TourData tourData;
+		final ITrackPath selectedTrack = Map3Manager.getLayer_TourTrack().getSelectedTrack();
+
+		if (selectedTrack == null) {
+
+			if (_allTours.size() == 0) {
+
+				return null;
+
+			} else {
+
+				// a track is not selected, get first tour
+
+				tourData = _allTours.get(0);
+			}
+
+		} else {
+
+			// get selected tour
+
+			tourData = selectedTrack.getTourTrack().getTourData();
+		}
+
+		return tourData;
 	}
 
 	@Override
 	public ArrayList<TourData> getSelectedTours() {
 
-		final ITrackPath selectedTrack = Map3Manager.getTourTrackLayer().getSelectedTrack();
+		final ITrackPath selectedTrack = Map3Manager.getLayer_TourTrack().getSelectedTrack();
 
 		if (selectedTrack != null) {
 
@@ -701,6 +959,36 @@ public class Map3View extends ViewPart implements ITourProvider {
 		}
 
 		return null;
+	}
+
+	private double getSliderYPosition(final float trackAltitude) {
+
+		final TourTrackConfig trackConfig = Map3Manager.getLayer_TourTrack().getConfig();
+
+		final int altitudeMode = trackConfig.altitudeMode;
+		final boolean isAbsoluteAltitudeMode = altitudeMode == WorldWind.ABSOLUTE;
+
+		final int altitudeVerticalOffset = isAbsoluteAltitudeMode && trackConfig.isAbsoluteOffset
+				? trackConfig.altitudeVerticalOffset
+				: 0;
+
+		double sliderYPosition;
+		switch (altitudeMode) {
+		case WorldWind.ABSOLUTE:
+			sliderYPosition = trackAltitude + altitudeVerticalOffset;
+			break;
+
+		case WorldWind.RELATIVE_TO_GROUND:
+			sliderYPosition = trackAltitude;
+			break;
+
+		default:
+			// case: WorldWind.CLAMP_TO_GROUND
+			sliderYPosition = 0;
+			break;
+		}
+
+		return sliderYPosition;
 	}
 
 	MapColorId getTrackColorId() {
@@ -740,7 +1028,13 @@ public class Map3View extends ViewPart implements ITourProvider {
 		}
 	}
 
-	private void onSelectionChanged(final ISelection selection) {
+	void onModifyConfig() {
+
+		// altitude mode can have been changed, do a slider repositioning
+		updateChartSlider();
+	}
+
+	private void onSelection(final ISelection selection) {
 
 //		System.out.println(UI.timeStampNano() + " Map::onSelectionChanged\t" + selection);
 //		// TODO remove SYSTEM.OUT.PRINTLN
@@ -758,7 +1052,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 			return;
 		}
 
-		final boolean isTourTrackVisible = Map3Manager.getTourTrackLayer().isEnabled();
+		final boolean isTourTrackVisible = Map3Manager.getLayer_TourTrack().isEnabled();
 
 		if (selection instanceof SelectionTourData) {
 
@@ -827,38 +1121,24 @@ public class Map3View extends ViewPart implements ITourProvider {
 //				enableActions(true);
 			}
 
-//		} else if (selection instanceof SelectionChartInfo) {
-//
-//			final ChartDataModel chartDataModel = ((SelectionChartInfo) selection).chartDataModel;
-//			if (chartDataModel != null) {
-//
-//				final Object tourId = chartDataModel.getCustomData(TourManager.CUSTOM_DATA_TOUR_ID);
-//				if (tourId instanceof Long) {
-//
-//					TourData tourData = TourManager.getInstance().getTourData((Long) tourId);
-//					if (tourData == null) {
-//
-//						// tour is not in the database, try to get it from the raw data manager
-//
-//						final HashMap<Long, TourData> rawData = RawDataManager.getInstance().getImportedTours();
-//						tourData = rawData.get(tourId);
-//					}
-//
-//					if (tourData != null) {
-//
-//						final SelectionChartInfo chartInfo = (SelectionChartInfo) selection;
-//
-//						paintTourSliders(
-//								tourData,
-//								chartInfo.leftSliderValuesIndex,
-//								chartInfo.rightSliderValuesIndex,
-//								chartInfo.selectedSliderValuesIndex);
-//
-//						enableActions();
-//					}
-//				}
-//			}
-//
+		} else if (selection instanceof SelectionChartInfo) {
+
+			if (_isChartSliderVisible == false) {
+				return;
+			}
+
+			final SelectionChartInfo chartInfo = (SelectionChartInfo) selection;
+
+			final ChartDataModel chartDataModel = chartInfo.chartDataModel;
+			if (chartDataModel != null) {
+
+				final Object tourId = chartDataModel.getCustomData(TourManager.CUSTOM_DATA_TOUR_ID);
+				if (tourId instanceof Long) {
+
+					syncMapWith_ChartSlider(chartInfo, (Long) tourId);
+				}
+			}
+
 //		} else if (selection instanceof SelectionChartXSliderPosition) {
 //
 //			final SelectionChartXSliderPosition xSliderPos = (SelectionChartXSliderPosition) selection;
@@ -1001,11 +1281,11 @@ public class Map3View extends ViewPart implements ITourProvider {
 
 		// sync map with tour
 		_isSyncMapViewWithTour = Util.getStateBoolean(_state, STATE_IS_SYNC_MAP_VIEW_WITH_TOUR, true);
-		_actionSynMapViewWithTour.setChecked(_isSyncMapViewWithTour);
+		_actionSynMapWithTour.setChecked(_isSyncMapViewWithTour);
 
 		// sync map position with slider
-		_isSyncMapPositionWithSlider = Util.getStateBoolean(_state, STATE_IS_SYNC_MAP_POSITION_WITH_SLIDER, false);
-		_actionSynMapPositionWithSlider.setChecked(_isSyncMapPositionWithSlider);
+		_isSyncMapWithChartSlider = Util.getStateBoolean(_state, STATE_IS_SYNC_MAP_POSITION_WITH_SLIDER, false);
+		_actionSynMapWithChartSlider.setChecked(_isSyncMapWithChartSlider);
 
 		// is tour visible / available
 		_isTourVisible = Util.getStateBoolean(_state, STATE_IS_TOUR_VISIBLE, true);
@@ -1014,7 +1294,12 @@ public class Map3View extends ViewPart implements ITourProvider {
 		// is legend visible
 		_isLegendVisible = Util.getStateBoolean(_state, STATE_IS_LEGEND_VISIBLE, true);
 		_actionShowLegendInMap.setChecked(_isLegendVisible);
-		Map3Manager.setLegendVisible(_isLegendVisible);
+		Map3Manager.setLayerVisible_Legend(_isLegendVisible);
+
+		// is chart slider visible
+		_isChartSliderVisible = Util.getStateBoolean(_state, STATE_IS_CHART_SLIDERVISIBLE, true);
+		_actionShowChartSliderInMap.setChecked(_isChartSliderVisible);
+		Map3Manager.setLayerVisible_ChartSlider(_isChartSliderVisible);
 
 		// tour color
 		final String stateColorId = Util.getStateString(_state, STATE_TOUR_COLOR_ID, MapColorId.Altitude.name());
@@ -1081,7 +1366,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 			return;
 		}
 
-		_state.put(STATE_IS_SYNC_MAP_POSITION_WITH_SLIDER, _isSyncMapPositionWithSlider);
+		_state.put(STATE_IS_SYNC_MAP_POSITION_WITH_SLIDER, _isSyncMapWithChartSlider);
 		_state.put(STATE_IS_SYNC_MAP_VIEW_WITH_TOUR, _isSyncMapViewWithTour);
 		_state.put(STATE_IS_LEGEND_VISIBLE, _isLegendVisible);
 		_state.put(STATE_IS_TOUR_VISIBLE, _isTourVisible);
@@ -1093,12 +1378,106 @@ public class Map3View extends ViewPart implements ITourProvider {
 		_state.put(STATE_MAP3_VIEW, view.getRestorableState());
 	}
 
+	private void setAnnotationColors(	final TourData tourData,
+										final int positionIndex,
+										final AnnotationAttributes attributes) {
+		final Color bgColor;
+		final Color fgColor;
+
+		final IMapColorProvider colorProvider = TourMapColors.getColorProvider(_tourColorId);
+
+		if (colorProvider instanceof IGradientColors) {
+
+			final IGradientColors gradientColorProvider = (IGradientColors) colorProvider;
+
+			final MapLegendImageConfig legendImageConfig = gradientColorProvider.getMapLegendImageConfig();
+			final float legendMinValue = legendImageConfig.legendMinValue;
+
+			float graphValue = legendMinValue;
+
+			switch (_tourColorId) {
+
+			case Altitude:
+
+				graphValue = getDataSerieValue(tourData.altitudeSerie, positionIndex, legendMinValue);
+				break;
+
+			case Gradient:
+
+				graphValue = getDataSerieValue(tourData.gradientSerie, positionIndex, legendMinValue);
+				break;
+
+			case Pace:
+
+				graphValue = getDataSerieValue(tourData.getPaceSerie(), positionIndex, legendMinValue);
+				break;
+
+			case Pulse:
+
+				graphValue = getDataSerieValue(tourData.pulseSerie, positionIndex, legendMinValue);
+				break;
+
+			case Speed:
+
+				graphValue = getDataSerieValue(tourData.getSpeedSerie(), positionIndex, legendMinValue);
+				break;
+
+			default:
+				break;
+			}
+
+			// get color according to the value
+			final int colorValue = gradientColorProvider.getColorValue(graphValue);
+
+			final int red = (colorValue & 0xFF) >>> 0;
+			final int green = (colorValue & 0xFF00) >>> 8;
+			final int blue = (colorValue & 0xFF0000) >>> 16;
+
+			bgColor = new Color(red, green, blue);
+			fgColor = ColorUtil.getContrastColor(red, green, blue);
+
+		} else {
+
+			// set default color
+
+			bgColor = null;
+			fgColor = null;
+		}
+
+		attributes.setBackgroundColor(bgColor);
+		attributes.setTextColor(fgColor);
+	}
+
+	private void setAnnotationPosition(	final GlobeAnnotation annotation,
+										final TourData tourData,
+										final int positionIndex) {
+
+		final double[] latitudeSerie = tourData.latitudeSerie;
+		final double[] longitudeSerie = tourData.longitudeSerie;
+
+		final double latitude = latitudeSerie[positionIndex];
+		final double longitude = longitudeSerie[positionIndex];
+
+		final float[] altitudeSerie = tourData.altitudeSerie;
+		final float trackAltitude = altitudeSerie == null ? 0 : altitudeSerie[positionIndex];
+
+		final double sliderYPosition = getSliderYPosition(trackAltitude);
+
+		final TourTrackConfig trackConfig = Map3Manager.getLayer_TourTrack().getConfig();
+
+		annotation.setAltitudeMode(trackConfig.altitudeMode);
+		annotation.setPosition(new Position(new LatLon(//
+				Angle.fromDegrees(latitude),
+				Angle.fromDegrees(longitude)), //
+				sliderYPosition));
+	}
+
 	private void setColorProvider(final MapColorId colorId) {
 
 		final IMapColorProvider colorProvider = TourMapColors.getColorProvider(colorId);
 
-		Map3Manager.getTourTrackLayer().setColorProvider(colorProvider);
-		Map3Manager.getTourLegendLayer().setColorProvider(colorProvider);
+		Map3Manager.getLayer_TourTrack().setColorProvider(colorProvider);
+		Map3Manager.getLayer_TourLegend().setColorProvider(colorProvider);
 	}
 
 	@Override
@@ -1125,6 +1504,86 @@ public class Map3View extends ViewPart implements ITourProvider {
 
 	}
 
+	public void setTourInfo(final ITrackPath hoveredTrackPath, final Integer hoveredPositionIndex) {
+
+		final TourInfoLayer tourInfoLayer = Map3Manager.getLayer_TourInfo();
+
+		if (hoveredTrackPath == null) {
+
+			// hide tour info
+
+			_previousHoveredTrack = null;
+			_previousHoveredTrackPosition = null;
+
+			tourInfoLayer.setTrackPointVisible(false);
+
+		} else {
+
+			// a tour is hovered
+
+			if (hoveredPositionIndex == null) {
+
+				// a position is not hovered, keep tour info opened
+
+			} else {
+
+				// ckeck if a new position is hovered
+				if (_previousHoveredTrack != null
+						&& _previousHoveredTrack == hoveredTrackPath
+						&& _previousHoveredTrackPosition != null
+						&& _previousHoveredTrackPosition.intValue() == hoveredPositionIndex.intValue()) {
+
+					return;
+				}
+
+//				System.out.println(UI.timeStampNano()
+//						+ " ["
+//						+ getClass().getSimpleName()
+//						+ "] \thoveredTrackPath: "
+//						+ hoveredTrackPath
+//						+ "\thoveredPositionIndex: "
+//						+ hoveredPositionIndex);
+//				// TODO remove SYSTEM.OUT.PRINTLN
+
+				// keep hovered position
+				_previousHoveredTrack = hoveredTrackPath;
+				_previousHoveredTrackPosition = hoveredPositionIndex;
+
+				final TourData tourData = hoveredTrackPath.getTourTrack().getTourData();
+
+				final GlobeAnnotation trackPoint = tourInfoLayer.getTrackPoint();
+				trackPoint.setText(createSliderText(hoveredPositionIndex, tourData));
+
+				final AnnotationAttributes attributes = trackPoint.getAttributes();
+				final int defaultMargin = 3;
+				final int left = defaultMargin + 2;
+				final int right = defaultMargin + 2;
+				final int top = defaultMargin;
+				final int bottom = defaultMargin;
+				final Insets insets = new Insets(top, left, bottom, right);
+
+				final int leaderGapWidth = 4;
+				final int drawOffsetX = 0;
+				final int drawOffsetY = 40;
+				final Point drawOffset = new Point(drawOffsetX, drawOffsetY);
+
+				final int cornerRadius = 7;
+
+				attributes.setDrawOffset(drawOffset);
+				attributes.setLeaderGapWidth(leaderGapWidth);
+
+				attributes.setCornerRadius(cornerRadius);
+				attributes.setInsets(insets);
+
+				setAnnotationPosition(trackPoint, tourData, hoveredPositionIndex);
+
+				setAnnotationColors(tourData, hoveredPositionIndex, attributes);
+
+				tourInfoLayer.setTrackPointVisible(true);
+			}
+		}
+	}
+
 	/**
 	 * Shows all tours in the map which are set in {@link #_allTours}.
 	 * 
@@ -1135,20 +1594,20 @@ public class Map3View extends ViewPart implements ITourProvider {
 
 		enableActions();
 
-		final TourTrackLayer tourTrackLayer = Map3Manager.getTourTrackLayer();
+		final TourTrackLayer tourTrackLayer = Map3Manager.getLayer_TourTrack();
 
 		final ArrayList<TourMap3Position> allPositions = tourTrackLayer.createTrackPaths(_allTours);
 
-		Map3Manager.getTourLegendLayer().updateLegendImage();
+		Map3Manager.getLayer_TourLegend().updateLegendImage();
 
 		showAllTours_Final(isSyncMapViewWithTour, allPositions);
 	}
 
-	public void showAllTours_Final(final boolean isSyncMapViewWithTour, final ArrayList<TourMap3Position> allPositions) {
+	private void showAllTours_Final(final boolean isSyncMapViewWithTour, final ArrayList<TourMap3Position> allPositions) {
 
-		syncMapWithTour(isSyncMapViewWithTour, allPositions);
+		syncMapWith_Tour(isSyncMapViewWithTour, allPositions);
 
-//		_wwCanvas.redraw();
+		updateChartSlider();
 
 		Map3Manager.redrawMap();
 	}
@@ -1165,8 +1624,9 @@ public class Map3View extends ViewPart implements ITourProvider {
 			return;
 		}
 
-		_allTours.clear();
-		_allTours.addAll(allTours);
+		cleanupOldTours();
+
+		_allTours.addAll(getMapTours(allTours));
 
 		showAllTours_InternalTours();
 	}
@@ -1189,7 +1649,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 
 				if (_allTours.size() > 1) {
 
-					final TourTrackLayer tourTrackLayer = Map3Manager.getTourTrackLayer();
+					final TourTrackLayer tourTrackLayer = Map3Manager.getLayer_TourTrack();
 					final ArrayList<TourMap3Position> trackPositions = tourTrackLayer.selectTrackPath(newTourData);
 
 					if (trackPositions == null) {
@@ -1244,30 +1704,227 @@ public class Map3View extends ViewPart implements ITourProvider {
 		});
 	}
 
-	public void syncMapWithTour(final boolean isSyncMapViewWithTour, final ArrayList<TourMap3Position> allPositions) {
+	private void syncMapWith_ChartSlider(final SelectionChartInfo chartInfo, final Long tourId) {
+
+		TourData tourData = TourManager.getInstance().getTourData(tourId);
+		if (tourData == null) {
+
+			// tour is not in the database, try to get it from the raw data manager
+
+			final HashMap<Long, TourData> rawData = RawDataManager.getInstance().getImportedTours();
+			tourData = rawData.get(tourId);
+		}
+
+		final ChartSliderLayer chartSliderLayer = getChartSliderLayer();
+
+		if (tourData == null) {
+
+			chartSliderLayer.setSliderVisible(false);
+
+		} else {
+
+			if (_isSyncMapWithChartSlider) {
+
+				// sync map with chart slider
+
+				final int valuesIndex = chartInfo.selectedSliderValuesIndex;
+
+				final double latitude = tourData.latitudeSerie[valuesIndex];
+				final double longitude = tourData.longitudeSerie[valuesIndex];
+
+				final float[] altitudeSerie = tourData.altitudeSerie;
+				final float trackAltitude = altitudeSerie == null ? 0 : altitudeSerie[valuesIndex];
+
+				final double elevation = getSliderYPosition(trackAltitude);
+
+				final LatLon sliderDegrees = LatLon.fromDegrees(latitude, longitude);
+
+				/*
+				 * Prevent setting the same location because this will jitter the map slider and is
+				 * unnecessary.
+				 */
+				if (_previousMapSliderPosition != null) {
+
+					if (_previousMapSliderPosition.getLatitude().equals(sliderDegrees.latitude)
+							&& _previousMapSliderPosition.getLongitude().equals(sliderDegrees.longitude)
+							&& _previousMapSliderPosition.elevation == elevation) {
+
+						return;
+					}
+				}
+
+				chartSliderLayer.setSliderVisible(false);
+
+				final View view = Map3Manager.getWWCanvas().getView();
+				if (view instanceof BasicOrbitView) {
+
+					final BasicOrbitView orbitView = (BasicOrbitView) view;
+
+					final Position mapSliderPosition = new Position(sliderDegrees, elevation);
+
+					/*
+					 * This fragment is copied from
+					 * gov.nasa.worldwindx.applications.sar.AnalysisPanel.updateView(boolean)
+					 */
+
+					// Send a message to stop all changes to the view's center position.
+//					orbitView.stopMovementOnCenter();
+
+					// Set the view to center on the track position,
+					// while keeping the eye altitude constant.
+					try {
+
+						final Position eyePos = orbitView.getCurrentEyePosition();
+
+						// New eye lat/lon will follow the ground position.
+						final LatLon newEyeLatLon = eyePos
+								.add(mapSliderPosition.subtract(orbitView.getCenterPosition()));
+
+						// Eye elevation will not change unless it is below the ground position elevation.
+						final double newEyeElev = eyePos.getElevation() < mapSliderPosition.getElevation() //
+								? mapSliderPosition.getElevation()
+								: eyePos.getElevation();
+
+						final Position newEyePos = new Position(newEyeLatLon, newEyeElev);
+
+						orbitView.setOrientation(newEyePos, mapSliderPosition);
+
+						// keep current position
+						_previousMapSliderPosition = mapSliderPosition;
+					}
+
+					// Fallback to setting center position.
+					catch (final Exception e) {
+
+						orbitView.setCenterPosition(mapSliderPosition);
+						// View/OrbitView will have logged the exception, no need to log it here.
+					}
+				}
+
+				// update slider UI
+				updateChartSlider_10_Position(
+						chartSliderLayer,
+						tourData,
+						chartInfo.leftSliderValuesIndex,
+						chartInfo.rightSliderValuesIndex,
+						valuesIndex);
+
+				chartSliderLayer.setSliderVisible(true);
+
+				enableActions();
+			}
+		}
+	}
+
+	private void syncMapWith_Tour(final boolean isSyncMapViewWithTour, final ArrayList<TourMap3Position> allPositions) {
 
 		if (isSyncMapViewWithTour) {
 
 			final Map3ViewController viewController = Map3ViewController.create(Map3Manager.getWWCanvas());
+
 			viewController.goToDefaultView(allPositions);
 		}
 	}
 
+	private void updateChartSlider() {
+
+		final ChartSliderLayer chartSliderLayer = getChartSliderLayer();
+		if (chartSliderLayer == null) {
+			return;
+		}
+
+		final TourData tourData = getSelectedTour(chartSliderLayer);
+		if (tourData == null) {
+			chartSliderLayer.setSliderVisible(false);
+			return;
+		}
+
+		chartSliderLayer.setSliderVisible(true);
+
+		updateChartSlider_10_Position(
+				chartSliderLayer,
+				tourData,
+				_currentLeftSliderValueIndex,
+				_currentRightSliderValueIndex,
+				_currentSelectedSliderValueIndex);
+	}
+
+	private void updateChartSlider_10_Position(	final ChartSliderLayer chartSliderLayer,
+												final TourData tourData,
+												int leftPosIndex,
+												int rightPosIndex,
+												int selectedPosIndex) {
+
+		final double[] latitudeSerie = tourData.latitudeSerie;
+
+		final int lastIndex = latitudeSerie.length - 1;
+
+		// check array bounds
+		if (leftPosIndex < 0 || leftPosIndex > lastIndex) {
+			leftPosIndex = 0;
+		}
+		if (rightPosIndex < 0 || rightPosIndex > lastIndex) {
+			rightPosIndex = lastIndex;
+		}
+		if (selectedPosIndex < 0 || selectedPosIndex > lastIndex) {
+			selectedPosIndex = lastIndex;
+		}
+
+		_currentLeftSliderValueIndex = leftPosIndex;
+		_currentRightSliderValueIndex = rightPosIndex;
+		_currentSelectedSliderValueIndex = selectedPosIndex;
+
+		updateChartSlider_20_Data(//
+				chartSliderLayer.getLeftSlider(),
+				_currentLeftSliderValueIndex,
+				tourData,
+				true);
+
+		updateChartSlider_20_Data(//
+				chartSliderLayer.getRightSlider(),
+				_currentRightSliderValueIndex,
+				tourData,
+				false);
+
+		Map3Manager.redrawMap();
+	}
+
+	private void updateChartSlider_20_Data(	final GlobeAnnotation slider,
+											final int positionIndex,
+											final TourData tourData,
+											final boolean isLeftSlider) {
+
+		/*
+		 * set position and text
+		 */
+		setAnnotationPosition(slider, tourData, positionIndex);
+
+		slider.setText(createSliderText(positionIndex, tourData));
+
+		/*
+		 * set color
+		 */
+		final AnnotationAttributes attributes = slider.getAttributes();
+
+		setAnnotationColors(tourData, positionIndex, attributes);
+	}
+
 	private void updateMapColors() {
 
-		Map3Manager.getTourTrackLayer().updateColors(_allTours);
-
-		Map3Manager.getTourLegendLayer().updateLegendImage();
+		Map3Manager.getLayer_TourTrack().updateColors(_allTours);
+//		Map3Manager.getLayer_TourLegend().updateLegendImage();
 
 		showAllTours(false);
 	}
 
 	private void updateModifiedTours(final ArrayList<TourData> modifiedTours) {
 
+		// cleanup old tours, this method cannot be used: cleanupOldTours();
 		_postSelectionProvider.clearSelection();
+		_previousMapSliderPosition = null;
 
 		_allTours.removeAll(modifiedTours);
-		_allTours.addAll(modifiedTours);
+		_allTours.addAll(getMapTours(modifiedTours));
 
 		showAllTours_InternalTours();
 	}

@@ -35,7 +35,7 @@ import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.data.TourWayPoint;
 import net.tourbook.map2.Messages;
-import net.tourbook.map3.layer.legend.MapLegendLabel;
+import net.tourbook.map3.layer.TourLegendLabel;
 import net.tourbook.photo.ILoadCallBack;
 import net.tourbook.photo.IPhotoPreferences;
 import net.tourbook.photo.ImageQuality;
@@ -189,10 +189,10 @@ public class TourMapPainter extends MapPainter {
 
 			final int valuePositionY = legendPositionY + availableLegendPixels - pixelIndex;
 
-			final int lineColorValue = colorProvider.getColorValue(legendValue);
-			final int red = (lineColorValue & 0xFF) >>> 0;
-			final int green = (lineColorValue & 0xFF00) >>> 8;
-			final int blue = (lineColorValue & 0xFF0000) >>> 16;
+			final int colorValue = colorProvider.getColorValue(legendValue);
+			final int red = (colorValue & 0xFF) >>> 0;
+			final int green = (colorValue & 0xFF00) >>> 8;
+			final int blue = (colorValue & 0xFF0000) >>> 16;
 
 			// draw legend color line
 			g2d.setColor(new java.awt.Color(red, green, blue));
@@ -417,11 +417,11 @@ public class TourMapPainter extends MapPainter {
 		}
 	}
 
-	public static ArrayList<MapLegendLabel> getMapLegendLabels(	final int legendWidth,
+	public static ArrayList<TourLegendLabel> getMapLegendLabels(	final int legendWidth,
 																final int legendHeight,
 																final IGradientColors colorProvider) {
 
-		final ArrayList<MapLegendLabel> legendLabels = new ArrayList<MapLegendLabel>();
+		final ArrayList<TourLegendLabel> legendLabels = new ArrayList<TourLegendLabel>();
 
 		final MapLegendImageConfig legendImageConfig = colorProvider.getMapLegendImageConfig();
 
@@ -491,7 +491,7 @@ public class TourMapPainter extends MapPainter {
 						valueText = unitLabels.get(unitLabelIndex++);
 					}
 
-					legendLabels.add(new MapLegendLabel(unitValue, valueText, valuePositionY));
+					legendLabels.add(new TourLegendLabel(unitValue, valueText, valuePositionY));
 
 					// prevent to draw this unit again
 					allLegendUnits.remove(unitValue);

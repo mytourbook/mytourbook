@@ -429,7 +429,7 @@ public class Map3LayerView extends ViewPart {
 		_layerViewer.getTree().setFocus();
 	}
 
-	void setTourLegendLayerVisibility(final TVIMap3Layer tviLayer, final boolean isLegendVisible) {
+	void setLayerVisible(final TVIMap3Layer tviLayer, final boolean isLegendVisible) {
 
 		// update model
 		tviLayer.isLayerVisible = isLegendVisible;
@@ -438,8 +438,9 @@ public class Map3LayerView extends ViewPart {
 		_layerViewer.setChecked(tviLayer, isLegendVisible);
 	}
 
-	void setTourTrackLayerVisibility(final TVIMap3Layer tviLayer, final boolean isTrackVisible) {
-		setTourTrackLayerVisibility(tviLayer, isTrackVisible, true, false);
+	void setLayerVisible_TourTrack(final TVIMap3Layer tviLayer, final boolean isTrackVisible) {
+
+		setLayerVisible_TourTrack(tviLayer, isTrackVisible, true, false);
 	}
 
 	/**
@@ -448,10 +449,10 @@ public class Map3LayerView extends ViewPart {
 	 * @param isUpdateViewer
 	 * @param isUpdateTooltip
 	 */
-	private void setTourTrackLayerVisibility(	final TVIMap3Layer tviLayer,
-												final boolean isLayerVisible,
-												final boolean isUpdateViewer,
-												final boolean isUpdateTooltip) {
+	private void setLayerVisible_TourTrack(	final TVIMap3Layer tviLayer,
+											final boolean isLayerVisible,
+											final boolean isUpdateViewer,
+											final boolean isUpdateTooltip) {
 		// update model
 		tviLayer.isLayerVisible = isLayerVisible;
 
@@ -475,10 +476,8 @@ public class Map3LayerView extends ViewPart {
 			_layerViewer.setChecked(tviLayer, isLayerVisible);
 		}
 
-		// update actions in the map view
-		if (wwLayer.equals(Map3Manager.getTourTrackLayer()) || wwLayer.equals(Map3Manager.getTourLegendLayer())) {
-			Map3Manager.enableMap3Actions();
-		}
+		// check/uncheck actions in the map view
+		Map3Manager.enableMap3Actions();
 	}
 
 	/**
@@ -493,7 +492,7 @@ public class Map3LayerView extends ViewPart {
 		// toggle state
 		final boolean isLayerVisible = !tviLayer.wwLayer.isEnabled();
 
-		setTourTrackLayerVisibility(tviLayer, isLayerVisible, isUpdateViewer, isUpdateTooltip);
+		setLayerVisible_TourTrack(tviLayer, isLayerVisible, isUpdateViewer, isUpdateTooltip);
 	}
 
 	void updateUI_NewLayer(final ArrayList<TVIMap3Layer> insertedLayers) {

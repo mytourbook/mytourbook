@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.common;
 
+import java.awt.Font;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 
@@ -71,7 +72,7 @@ public class UI {
 	public static final String			SPACE2									= "  ";																	//$NON-NLS-1$
 	public static final String			SPACE4									= "    ";																	//$NON-NLS-1$
 	public static final String			STRING_0								= "0";																		//$NON-NLS-1$
-	public static final String			COMMA_SPACE								= ", "; //$NON-NLS-1$
+	public static final String			COMMA_SPACE								= ", ";																	//$NON-NLS-1$
 	//$NON-NLS-1$
 	public static final char			TAB										= '\t';
 
@@ -239,6 +240,8 @@ public class UI {
 	 * @since 3.2
 	 */
 	private static final String			DIALOG_FONT_DATA						= "DIALOG_FONT_NAME";														//$NON-NLS-1$
+
+	public static final Font			AWT_FONT_ARIAL_BOLD_12					= Font.decode("Arial-bold-12");
 
 	/*
 	 * image keys for images which are stored in the image registry

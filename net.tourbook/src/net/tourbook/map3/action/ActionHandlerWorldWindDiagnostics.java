@@ -20,6 +20,7 @@ import gov.nasa.worldwind.awt.WorldWindowGLCanvas;
 import java.util.Map;
 
 import javax.media.opengl.GL;
+import javax.media.opengl.GLCapabilities;
 
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
@@ -146,6 +147,8 @@ public class ActionHandlerWorldWindDiagnostics extends AbstractHandler {
 
 			final GL gl = _wwCanvas.getGL();
 
+			final GLCapabilities caps = _wwCanvas.getChosenGLCapabilities();
+
 			sb.append(UI.NEW_LINE3);
 			sb.append("OpenGL Values"); //$NON-NLS-1$
 			sb.append(UI.NEW_LINE2);
@@ -226,13 +229,16 @@ public class ActionHandlerWorldWindDiagnostics extends AbstractHandler {
 
 		@Override
 		protected Point getInitialSize() {
+
 			final Point calculatedSize = super.getInitialSize();
+
 			if (calculatedSize.x < 600) {
 				calculatedSize.x = 600;
 			}
 			if (calculatedSize.y < 600) {
 				calculatedSize.y = 600;
 			}
+
 			return calculatedSize;
 		}
 

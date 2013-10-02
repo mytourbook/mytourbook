@@ -22,11 +22,11 @@ import net.tourbook.map3.view.Map3View;
 
 import org.eclipse.jface.action.Action;
 
-public class ActionSyncMapViewWithTour extends Action {
+public class ActionSyncMapWithTour extends Action {
 
 	private Map3View	_map3View;
 
-	public ActionSyncMapViewWithTour(final Map3View mapView) {
+	public ActionSyncMapWithTour(final Map3View mapView) {
 
 		super(null, AS_CHECK_BOX);
 

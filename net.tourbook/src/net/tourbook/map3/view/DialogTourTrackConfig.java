@@ -69,7 +69,6 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 
 	private boolean					_canOpenToolTip;
 	private boolean					_isWaitTimerStarted;
-	private boolean					_isUpdateUI;
 
 	private SelectionAdapter		_defaultSelectionListener;
 
@@ -151,7 +150,7 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 		_defaultSelectionListener = new SelectionAdapter() {
 			@Override
 			public void widgetSelected(final SelectionEvent e) {
-				onSelection();
+				onModifyConfig();
 			}
 		};
 
@@ -307,7 +306,7 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 			_spinnerOutlineWidth.addMouseWheelListener(new MouseWheelListener() {
 				public void mouseScrolled(final MouseEvent event) {
 					Util.adjustSpinnerValueOnMouseScroll(event);
-					onSelection();
+					onModifyConfig();
 				}
 			});
 		}
@@ -376,7 +375,7 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 				_spinnerTrackPositionThreshold.addMouseWheelListener(new MouseWheelListener() {
 					public void mouseScrolled(final MouseEvent event) {
 						Util.adjustSpinnerValueOnMouseScroll(event);
-						onSelection();
+						onModifyConfig();
 					}
 				});
 
@@ -657,7 +656,7 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 				_spinnerAltitudeOffsetDistance.addMouseWheelListener(new MouseWheelListener() {
 					public void mouseScrolled(final MouseEvent event) {
 						Util.adjustSpinnerValueOnMouseScroll(event);
-						onSelection();
+						onModifyConfig();
 					}
 				});
 
@@ -721,7 +720,7 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 		spinnerOutlineOpacity.addMouseWheelListener(new MouseWheelListener() {
 			public void mouseScrolled(final MouseEvent event) {
 				Util.adjustSpinnerValueOnMouseScroll(event);
-				onSelection();
+				onModifyConfig();
 			}
 		});
 
@@ -738,7 +737,7 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 
 		colorSelector.addListener(new IPropertyChangeListener() {
 			public void propertyChange(final PropertyChangeEvent event) {
-				onSelection();
+				onModifyConfig();
 			}
 		});
 		colorSelector.addOpenListener(this);
@@ -761,7 +760,7 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 		spinnerTrackPositionSize.addMouseWheelListener(new MouseWheelListener() {
 			public void mouseScrolled(final MouseEvent event) {
 				Util.adjustSpinnerValueOnMouseScroll(event);
-				onSelection();
+				onModifyConfig();
 			}
 		});
 		return spinnerTrackPositionSize;
@@ -852,7 +851,7 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 		enableControls();
 
 		// update track layer
-		Map3Manager.getTourTrackLayer().onModifyConfig();
+		Map3Manager.getLayer_TourTrack().onModifyConfig();
 
 		// update map
 		Map3Manager.redrawMap();
@@ -862,28 +861,25 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 
 	}
 
-	private void onModify() {
+	private void onModifyConfig() {
 
 		saveState();
 
 		enableControls();
 
-		// update track layer
-		Map3Manager.getTourTrackLayer().onModifyConfig();
+		// update layer
+		Map3Manager.getLayer_TourTrack().onModifyConfig();
+
+		// update sliders
+		final Map3View map3View = Map3Manager.getMap3View();
+		if (map3View != null) {
+			map3View.onModifyConfig();
+		}
 	}
 
 	@Override
 	protected void onMouseMoveInToolTip(final MouseEvent mouseEvent) {
 
-	}
-
-	private void onSelection() {
-
-		if (_isUpdateUI) {
-			return;
-		}
-
-		onModify();
 	}
 
 	private void onSelectTrackColor() {
@@ -951,7 +947,7 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 	 */
 	public void restoreState() {
 
-		_trackConfig = Map3Manager.getTourTrackLayer().getConfig();
+		_trackConfig = Map3Manager.getLayer_TourTrack().getConfig();
 
 		// line color
 		_spinnerOutlineWidth.setSelection((int) (_trackConfig.outlineWidth));
@@ -966,7 +962,7 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 		_comboAltitude.select(_trackConfig.getAltitudeModeIndex());
 		_chkAltitudeOffset.setSelection(_trackConfig.isAbsoluteOffset);
 		_spinnerAltitudeOffsetDistance.setSelection(//
-				(int) (_trackConfig.altitudeOffsetDistance / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE));
+				(int) (_trackConfig.altitudeVerticalOffset / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE));
 		_chkFollowTerrain.setSelection(_trackConfig.isFollowTerrain);
 
 		// curtain color
@@ -1002,7 +998,7 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 	private void saveState() {
 
 		final boolean backupIsAltitudeOffset = _trackConfig.isAbsoluteOffset;
-		final int backupAltitudeOffsetDistance = _trackConfig.altitudeOffsetDistance;
+		final int backupAltitudeOffsetDistance = _trackConfig.altitudeVerticalOffset;
 		final boolean backupIsAbsoluteAltitudeMode = _trackConfig.altitudeMode == WorldWind.ABSOLUTE;
 		final int backupPathResolution = _trackConfig.pathResolution;
 
@@ -1032,7 +1028,7 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 		// altitude
 		_trackConfig.isAbsoluteOffset = _chkAltitudeOffset.getSelection();
 		_trackConfig.altitudeMode = TourTrackConfig.ALTITUDE_MODE[altitudeModeIndex].value;
-		_trackConfig.altitudeOffsetDistance = altitudeOffsetMetric;
+		_trackConfig.altitudeVerticalOffset = altitudeOffsetMetric;
 		_trackConfig.isFollowTerrain = _chkFollowTerrain.getSelection();
 
 		// curtain
@@ -1069,7 +1065,7 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 		 */
 		if (//
 			// altitude offset (vertical distance) is not modified
-		backupAltitudeOffsetDistance == _trackConfig.altitudeOffsetDistance //
+		backupAltitudeOffsetDistance == _trackConfig.altitudeVerticalOffset //
 
 				// path resolution is not modified
 				&& backupPathResolution == _trackConfig.pathResolution //

@@ -21,6 +21,8 @@ public class Messages extends NLS {
 
 	private static final String	BUNDLE_NAME	= "net.tourbook.map3.messages";				//$NON-NLS-1$
 
+	public static String	Custom_Layer_ChartSlider;
+
 	public static String		Custom_Layer_Status;
 	public static String		Custom_Layer_TerrainProfile;
 	public static String	Custom_Layer_TourLegend;

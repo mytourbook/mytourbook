@@ -13,7 +13,7 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.map3.layer.legend;
+package net.tourbook.map3.layer;
 
 import gov.nasa.worldwind.avlist.AVKey;
 import gov.nasa.worldwind.layers.RenderableLayer;
@@ -54,8 +54,8 @@ public class TourLegendLayer extends RenderableLayer {
 
 	public static final String				MAP3_LAYER_ID	= "TourLegendLayer";				//$NON-NLS-1$
 
-	protected static final Font				DEFAULT_FONT	= Font.decode("Arial-PLAIN-12");
-	protected static final Color			DEFAULT_COLOR	= Color.WHITE;
+	private static final Font				DEFAULT_FONT	= Font.decode("Arial-PLAIN-12");
+	private static final Color				DEFAULT_COLOR	= Color.WHITE;
 
 	private IMapColorProvider				_colorProvider;
 
@@ -428,7 +428,7 @@ public class TourLegendLayer extends RenderableLayer {
 		_legendImageLocation = new Point(devXCenter, devYCenter);
 		_legendImage.setScreenLocation(_legendImageLocation);
 
-		final ArrayList<MapLegendLabel> legendLabels = TourMapPainter.getMapLegendLabels(
+		final ArrayList<TourLegendLabel> legendLabels = TourMapPainter.getMapLegendLabels(
 				legendWidth,
 				legendHeight,
 				gradientColorProvider);
@@ -438,7 +438,7 @@ public class TourLegendLayer extends RenderableLayer {
 //		final Font font = Font.decode("Arial-BOLD-12");
 		final Font font = Font.decode("Arial-12");
 
-		for (final MapLegendLabel mapLegendLabel : legendLabels) {
+		for (final TourLegendLabel mapLegendLabel : legendLabels) {
 
 			labels.add(createLegendLabelAttributes(
 					mapLegendLabel.legendValue,

@@ -17,6 +17,7 @@ package net.tourbook.map3.view;
 
 import gov.nasa.worldwind.Configuration;
 import gov.nasa.worldwind.Model;
+import gov.nasa.worldwind.View;
 import gov.nasa.worldwind.WorldWind;
 import gov.nasa.worldwind.WorldWindow;
 import gov.nasa.worldwind.avlist.AVKey;
@@ -29,6 +30,7 @@ import gov.nasa.worldwind.layers.TerrainProfileLayer;
 import gov.nasa.worldwind.layers.ViewControlsLayer;
 import gov.nasa.worldwind.layers.ViewControlsSelectListener;
 import gov.nasa.worldwind.layers.placename.PlaceNameLayer;
+import gov.nasa.worldwindx.examples.ApplicationTemplate;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -43,12 +45,15 @@ import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.TreeViewerItem;
 import net.tourbook.common.util.Util;
 import net.tourbook.map3.Messages;
+import net.tourbook.map3.layer.ChartSliderLayer;
 import net.tourbook.map3.layer.DefaultCategory;
 import net.tourbook.map3.layer.DefaultLayer;
+import net.tourbook.map3.layer.IToolLayer;
 import net.tourbook.map3.layer.MapDefaultCategory;
 import net.tourbook.map3.layer.MapDefaultLayer;
 import net.tourbook.map3.layer.StatusLayer;
-import net.tourbook.map3.layer.legend.TourLegendLayer;
+import net.tourbook.map3.layer.TourInfoLayer;
+import net.tourbook.map3.layer.TourLegendLayer;
 import net.tourbook.map3.layer.tourtrack.TourTrackLayer;
 
 import org.eclipse.core.runtime.IPath;
@@ -82,36 +87,35 @@ public class Map3Manager {
 	private static final String							TAG_ROOT						= "Map3LayerStructure";											//$NON-NLS-1$
 	private static final String							TAG_CATEGORY					= "category";														//$NON-NLS-1$
 	private static final String							TAG_LAYER						= "layer";															//$NON-NLS-1$
-
+	//
 	private static final String							ATTR_ID							= "id";															//$NON-NLS-1$
 	private static final String							ATTR_IS_DEFAULT_LAYER			= "isDefaultLayer";												//$NON-NLS-1$
 	private static final String							ATTR_IS_ENABLED					= "isEnabled";														//$NON-NLS-1$
 	private static final String							ATTR_IS_EXPANDED				= "isExpanded";													//$NON-NLS-1$
-
+	//
 	private static final int							INSERT_BEFORE_COMPASS			= 1;
-	private static final int							INSERT_BEFORE_PLACE_NAMES		= 2;
-
+	public static final int								INSERT_BEFORE_PLACE_NAMES		= 2;
+	//
 	private static final String							ERROR_01						= "NTMV_MM_001 Layer \"{0}\" is not a ww default layer.";			//$NON-NLS-1$
 	private static final String							ERROR_02						= "NTMV_MM_002 Layer \"{0}\" is not defined as map default layer."; //$NON-NLS-1$
 	private static final String							ERROR_03						= "NTMV_MM_003 XML layer \"{0}\" is not available.";				//$NON-NLS-1$
 	private static final String							ERROR_04						= "NTMV_MM_004 Category \"{0}\" is not a default category.";		//$NON-NLS-1$
-
 	/**
 	 * _bundle must be set here otherwise an exception occures in saveState()
 	 */
 	private static final Bundle							_bundle							= TourbookPlugin.getDefault()//
 																								.getBundle();
+
 	private static final IDialogSettings				_state							= TourbookPlugin
 																								.getStateSection(Map3Manager.class
 																										.getCanonicalName());
-
 	private static final IPath							_stateLocation					= Platform
 																								.getStateLocation(_bundle);
+
 	/**
 	 * Root item for the layer tree viewer. This contains the UI model.
 	 */
 	private static TVIMap3Root							_uiRootItem;
-
 	private static final WorldWindowGLCanvas			_ww;
 
 	/**
@@ -134,15 +138,21 @@ public class Map3Manager {
 	 */
 	private static LinkedHashMap<String, TVIMap3Layer>	_uiCustomLayers					= new LinkedHashMap<String, TVIMap3Layer>();
 
-	private static TourTrackLayer						_tourTrackLayer;
-	private static TourLegendLayer						_tourLegendLayer;
-
+	/**
+	 * Contains layers which can not be set visible in the UI but are visible on demand.
+	 */
+	private static LinkedHashMap<String, IToolLayer>	_toolLayers						= new LinkedHashMap<String, IToolLayer>();
+	//
+	private static ChartSliderLayer						_wwLayer_ChartSlider;
+	private static TourInfoLayer						_wwLayer_TourInfo;
+	private static TourLegendLayer						_wwLayer_TourLegend;
+	private static TourTrackLayer						_wwLayer_TourTrack;
+	//
 	private static Object[]								_uiVisibleLayers;
 	private static Object[]								_uiExpandedCategories;
 	private static ArrayList<TVIMap3Layer>				_uiVisibleLayersFromXml			= new ArrayList<TVIMap3Layer>();
 	private static ArrayList<TVIMap3Category>			_uiExpandedCategoriesFromXml	= new ArrayList<TVIMap3Category>();
 	private static ArrayList<Layer>						_xmlLayers						= new ArrayList<Layer>();
-
 	private static final DateTimeFormatter				_dtFormatter					= ISODateTimeFormat
 																								.basicDateTimeNoMillis();
 
@@ -221,11 +231,13 @@ public class Map3Manager {
 //		// TODO remove SYSTEM.OUT.PRINTLN
 
 		// create custom layer BEFORE state is applied and xml file is read which references these layers
-		createCustomLayer_TourTracks();
-		createCustomLayer_TourLegend();
-		createCustomLayer_MapStatus();
-		createCustomLayer_ViewerController();
-		createCustomLayer_TerrainProfile();
+		createLayer_MT_TourTracks();
+		createLayer_MT_TourLegend();
+		createLayer_MT_ChartSlider();
+		createLayer_MT_TourInfo();
+		createLayer_WW_MapStatus();
+		createLayer_WW_ViewerController();
+		createLayer_WW_TerrainProfile();
 
 		// restore layer from xml file
 		_uiRootItem = parseLayerXml();
@@ -245,14 +257,96 @@ public class Map3Manager {
 		 */
 		setCustomLayerInWWModel(wwModel.getLayers());
 
-//		gov.nasa.worldwindx.examples.kml.KMLViewController
-
-//		this.viewController = new ViewController(this.getWwd());
-//		this.viewController.setObjectsToTrack(this.objectsToTrack);
-
+		setToolLayerInWWModel();
 	}
 
-	private static void createCustomLayer_MapStatus() {
+	private static void createLayer_MT_ChartSlider() {
+
+		// create WW layer
+		_wwLayer_ChartSlider = new ChartSliderLayer(_state);
+
+		/*
+		 * create UI model layer
+		 */
+		final String layerId = ChartSliderLayer.MAP3_LAYER_ID;
+		final TVIMap3Layer tviLayer = new TVIMap3Layer(layerId, _wwLayer_ChartSlider, Messages.Custom_Layer_ChartSlider);
+
+		final boolean isVisible = true;
+
+		// default is enabled
+		tviLayer.isLayerVisible = isVisible;
+		tviLayer.defaultPosition = INSERT_BEFORE_PLACE_NAMES;
+
+		if (isVisible) {
+			_uiVisibleLayersFromXml.add(tviLayer);
+		}
+
+		_uiCustomLayers.put(layerId, tviLayer);
+	}
+
+	private static void createLayer_MT_TourInfo() {
+
+		// create WW layer
+		_wwLayer_TourInfo = new TourInfoLayer(_state);
+
+		final String layerId = TourInfoLayer.MAP3_LAYER_ID;
+
+		_toolLayers.put(layerId, _wwLayer_TourInfo);
+	}
+
+	private static void createLayer_MT_TourLegend() {
+
+		// create WW layer
+		_wwLayer_TourLegend = new TourLegendLayer(_state);
+
+		/*
+		 * create UI model layer
+		 */
+		final String layerId = TourLegendLayer.MAP3_LAYER_ID;
+		final TVIMap3Layer tviLayer = new TVIMap3Layer(layerId, _wwLayer_TourLegend, Messages.Custom_Layer_TourLegend);
+
+		final boolean isVisible = true;
+
+		// default is enabled
+		tviLayer.isLayerVisible = isVisible;
+		tviLayer.defaultPosition = INSERT_BEFORE_PLACE_NAMES;
+
+		if (isVisible) {
+			_uiVisibleLayersFromXml.add(tviLayer);
+		}
+
+		_uiCustomLayers.put(layerId, tviLayer);
+	}
+
+	private static void createLayer_MT_TourTracks() {
+
+		/*
+		 * create WW layer
+		 */
+		_wwLayer_TourTrack = new TourTrackLayer(_state);
+
+		/*
+		 * create UI model layer
+		 */
+		final String layerId = TourTrackLayer.MAP3_LAYER_ID;
+		final TVIMap3Layer tviLayer = new TVIMap3Layer(layerId, _wwLayer_TourTrack, Messages.Custom_Layer_TourTrack);
+
+		final boolean isVisible = true;
+
+		// default is enabled
+		tviLayer.isLayerVisible = isVisible;
+		tviLayer.defaultPosition = INSERT_BEFORE_PLACE_NAMES;
+
+		if (isVisible) {
+			_uiVisibleLayersFromXml.add(tviLayer);
+		}
+
+		tviLayer.addCheckStateListener(_wwLayer_TourTrack);
+
+		_uiCustomLayers.put(layerId, tviLayer);
+	}
+
+	private static void createLayer_WW_MapStatus() {
 
 		/*
 		 * create WW layer
@@ -262,7 +356,7 @@ public class Map3Manager {
 		//this.layer = new StatusUTMLayer();
 
 		statusLayer.setEventSource(_ww);
-		statusLayer.setCoordDecimalPlaces(2); // default is 4
+		statusLayer.setCoordDecimalPlaces(4); // default is 4
 		//layer.setElevationUnits(StatusLayer.UNIT_IMPERIAL);
 
 		/*
@@ -285,7 +379,7 @@ public class Map3Manager {
 		_uiCustomLayers.put(layerId, tviLayer);
 	}
 
-	private static void createCustomLayer_TerrainProfile() {
+	private static void createLayer_WW_TerrainProfile() {
 
 		/*
 		 * create WW layer
@@ -315,59 +409,7 @@ public class Map3Manager {
 		_uiCustomLayers.put(layerId, tviLayer);
 	}
 
-	private static void createCustomLayer_TourLegend() {
-
-		// create WW layer
-		_tourLegendLayer = new TourLegendLayer(_state);
-
-		/*
-		 * create UI model layer
-		 */
-		final String layerId = TourLegendLayer.MAP3_LAYER_ID;
-		final TVIMap3Layer tviLayer = new TVIMap3Layer(layerId, _tourLegendLayer, Messages.Custom_Layer_TourLegend);
-
-		final boolean isVisible = true;
-
-		// default is enabled
-		tviLayer.isLayerVisible = isVisible;
-		tviLayer.defaultPosition = INSERT_BEFORE_PLACE_NAMES;
-
-		if (isVisible) {
-			_uiVisibleLayersFromXml.add(tviLayer);
-		}
-
-		_uiCustomLayers.put(layerId, tviLayer);
-	}
-
-	private static void createCustomLayer_TourTracks() {
-
-		/*
-		 * create WW layer
-		 */
-		_tourTrackLayer = new TourTrackLayer(_state);
-
-		/*
-		 * create UI model layer
-		 */
-		final String layerId = TourTrackLayer.MAP3_LAYER_ID;
-		final TVIMap3Layer tviLayer = new TVIMap3Layer(layerId, _tourTrackLayer, Messages.Custom_Layer_TourTrack);
-
-		final boolean isVisible = true;
-
-		// default is enabled
-		tviLayer.isLayerVisible = isVisible;
-		tviLayer.defaultPosition = INSERT_BEFORE_PLACE_NAMES;
-
-		if (isVisible) {
-			_uiVisibleLayersFromXml.add(tviLayer);
-		}
-
-		tviLayer.addCheckStateListener(_tourTrackLayer);
-
-		_uiCustomLayers.put(layerId, tviLayer);
-	}
-
-	private static void createCustomLayer_ViewerController() {
+	private static void createLayer_WW_ViewerController() {
 
 		/*
 		 * create WW layer
@@ -653,6 +695,22 @@ public class Map3Manager {
 		_map3View.enableActions();
 	}
 
+	public static ChartSliderLayer getLayer_ChartSlider() {
+		return _wwLayer_ChartSlider;
+	}
+
+	public static TourInfoLayer getLayer_TourInfo() {
+		return _wwLayer_TourInfo;
+	}
+
+	public static TourLegendLayer getLayer_TourLegend() {
+		return _wwLayer_TourLegend;
+	}
+
+	public static TourTrackLayer getLayer_TourTrack() {
+		return _wwLayer_TourTrack;
+	}
+
 	private static File getLayerXmlFile() {
 
 		final File layerFile = _stateLocation.append(MAP3_LAYER_STRUCTURE_FILE_NAME).toFile();
@@ -676,14 +734,6 @@ public class Map3Manager {
 
 	static TVIMap3Root getRootItem() {
 		return _uiRootItem;
-	}
-
-	public static TourLegendLayer getTourLegendLayer() {
-		return _tourLegendLayer;
-	}
-
-	public static TourTrackLayer getTourTrackLayer() {
-		return _tourTrackLayer;
 	}
 
 	static Object[] getUIExpandedCategories() {
@@ -1051,7 +1101,9 @@ public class Map3Manager {
 
 	public static void redrawMap() {
 
-		_ww.getView().firePropertyChange(AVKey.VIEW, null, _ww.getView());
+		final View view = _ww.getView();
+
+		view.firePropertyChange(AVKey.VIEW, null, view);
 
 //		_ww.redraw();
 
@@ -1063,7 +1115,7 @@ public class Map3Manager {
 
 	public static void saveState() {
 
-		_tourTrackLayer.saveState(_state);
+		_wwLayer_TourTrack.saveState(_state);
 
 		/*
 		 * save layer structure in xml file
@@ -1165,19 +1217,57 @@ public class Map3Manager {
 		if (_map3LayerView != null && insertedLayers.size() > 0) {
 			_map3LayerView.updateUI_NewLayer(insertedLayers);
 		}
+
 	}
 
-	static void setLegendVisible(final boolean isLegendVisible) {
+	static void setLayerVisible_ChartSlider(final boolean isChartSliderVisible) {
 
 		// update model
-		_tourLegendLayer.setEnabled(isLegendVisible);
+		_wwLayer_ChartSlider.setEnabled(isChartSliderVisible);
 
 		// update UI
 		if (_map3LayerView != null) {
 
-			_map3LayerView.setTourLegendLayerVisibility(
+			_map3LayerView.setLayerVisible(//
+					_uiCustomLayers.get(ChartSliderLayer.MAP3_LAYER_ID),
+					isChartSliderVisible);
+		}
+	}
+
+	static void setLayerVisible_Legend(final boolean isLegendVisible) {
+
+		// update model
+		_wwLayer_TourLegend.setEnabled(isLegendVisible);
+
+		// update UI
+		if (_map3LayerView != null) {
+
+			_map3LayerView.setLayerVisible(//
 					_uiCustomLayers.get(TourLegendLayer.MAP3_LAYER_ID),
 					isLegendVisible);
+		}
+	}
+
+	/**
+	 * Show/hide tour track layer.
+	 * 
+	 * @param isTrackVisible
+	 */
+	static void setLayerVisible_TourTrack(final boolean isTrackVisible) {
+
+		if (_map3LayerView == null) {
+
+			// layer viewer is not displayed, update model
+
+			_wwLayer_TourTrack.setEnabled(isTrackVisible);
+
+		} else {
+
+			// update model and UI
+
+			_map3LayerView.setLayerVisible_TourTrack(//
+					_uiCustomLayers.get(TourTrackLayer.MAP3_LAYER_ID),
+					isTrackVisible);
 		}
 	}
 
@@ -1197,26 +1287,26 @@ public class Map3Manager {
 		_map3View = map3View;
 	}
 
-	/**
-	 * Show/hide tour track layer.
-	 * 
-	 * @param isTrackVisible
-	 */
-	static void setTourTrackVisible(final boolean isTrackVisible) {
+	private static void setToolLayerInWWModel() {
 
-		if (_map3LayerView == null) {
+		for (final IToolLayer toolLayer : _toolLayers.values()) {
 
-			// layer viewer is not displayed, update model
+			final int defaultPosition = toolLayer.getDefaultPosition();
 
-			_tourTrackLayer.setEnabled(isTrackVisible);
+			if (defaultPosition == INSERT_BEFORE_COMPASS) {
 
-		} else {
+				ApplicationTemplate.insertBeforeCompass(_ww, toolLayer);
 
-			// update model and UI
+			} else if (defaultPosition == INSERT_BEFORE_PLACE_NAMES) {
 
-			_map3LayerView.setTourTrackLayerVisibility(//
-					_uiCustomLayers.get(TourTrackLayer.MAP3_LAYER_ID),
-					isTrackVisible);
+				ApplicationTemplate.insertBeforePlacenames(_ww, toolLayer);
+
+			} else {
+
+				// ensure it's displayed
+
+				ApplicationTemplate.insertBeforeCompass(_ww, toolLayer);
+			}
 		}
 	}
 

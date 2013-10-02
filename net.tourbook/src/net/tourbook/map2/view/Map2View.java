@@ -2026,7 +2026,11 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 							? leftSliderValueIndex
 							: rightSliderValueIndex;
 
-					paintTourSliders(tourData, leftSliderValueIndex, rightSliderValueIndex, leftSliderValueIndex);
+					paintTourSliders(//
+							tourData,
+							leftSliderValueIndex,
+							rightSliderValueIndex,
+							leftSliderValueIndex);
 
 					enableActions();
 				}
@@ -2043,7 +2047,11 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 					? valueIndex1
 					: valueIndex2;
 
-			paintTourSliders(mapPositionSelection.getTourData(), valueIndex1, valueIndex2, valueIndex1);
+			paintTourSliders(//
+					mapPositionSelection.getTourData(),
+					valueIndex1,
+					valueIndex2,
+					valueIndex1);
 
 			enableActions();
 

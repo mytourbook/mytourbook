@@ -33,7 +33,6 @@ import java.awt.Color;
 import java.beans.PropertyChangeEvent;
 import java.util.ArrayList;
 
-import net.tourbook.common.UI;
 import net.tourbook.common.color.IMapColorProvider;
 import net.tourbook.data.TourData;
 import net.tourbook.map2.view.IDiscreteColors;
@@ -103,7 +102,7 @@ public class TourTrackLayer extends RenderableLayer implements SelectListener, I
 		final boolean isAbsoluteAltitudeMode = _trackConfig.altitudeMode == WorldWind.ABSOLUTE;
 
 		final int altitudeOffset = isAbsoluteAltitudeMode && _trackConfig.isAbsoluteOffset
-				? _trackConfig.altitudeOffsetDistance
+				? _trackConfig.altitudeVerticalOffset
 				: 0;
 
 		final ArrayList<TourMap3Position> allPositions = new ArrayList<TourMap3Position>();
@@ -296,7 +295,7 @@ public class TourTrackLayer extends RenderableLayer implements SelectListener, I
 
 		if (propEvent.getPropertyName().equals(Map3Manager.PROPERTY_NAME_ENABLED)) {
 
-			// layer is set to visible/hidden
+			// layer is set to be visible/hidden
 
 			final boolean isLayerVisible = propEvent.getNewValue().equals(Boolean.TRUE);
 
@@ -310,8 +309,7 @@ public class TourTrackLayer extends RenderableLayer implements SelectListener, I
 	}
 
 	/**
-	 * This listener is set in
-	 * net.tourbook.map3.layer.tourtrack.TourTrackLayerWithPaths.setupWWSelectionListener(boolean)
+	 * This listener is set in set {@link #setupWWSelectionListener(boolean)}
 	 * <p>
 	 * {@inheritDoc}
 	 * 
@@ -324,9 +322,9 @@ public class TourTrackLayer extends RenderableLayer implements SelectListener, I
 			return;
 		}
 
-		final StringBuilder sb = new StringBuilder();
-		sb.append(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] \t"); //$NON-NLS-1$ //$NON-NLS-2$
-		sb.append("\t" + event.getEventAction()); //$NON-NLS-1$
+//		final StringBuilder sb = new StringBuilder();
+//		sb.append(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] \t"); //$NON-NLS-1$ //$NON-NLS-2$
+//		sb.append("\t" + event.getEventAction()); //$NON-NLS-1$
 
 		final PickedObject pickedObject = event.getTopPickedObject();
 
@@ -348,7 +346,7 @@ public class TourTrackLayer extends RenderableLayer implements SelectListener, I
 			hoveredPositionIndex = (Integer) pickOrdinal;
 
 //			sb.append("\t" + hoveredTrackPath);
-			sb.append("\tpickIndex: " + hoveredPositionIndex); //$NON-NLS-1$
+//			sb.append("\tpickIndex: " + hoveredPositionIndex); //$NON-NLS-1$
 		}
 
 		selectTrackPath(hoveredTrackPath, hoveredPositionIndex, event.getEventAction(), true);
@@ -393,14 +391,20 @@ public class TourTrackLayer extends RenderableLayer implements SelectListener, I
 		}
 
 		// fire selection
-		if (isFireSelection
-				&& _selectedTrackPath != null
-				&& (backupSelectedTrackPath == null || _selectedTrackPath != backupSelectedTrackPath)) {
+		if (isFireSelection) {
 
-			// a new track is selected, fire selection
+			if (_selectedTrackPath != null
+					&& (backupSelectedTrackPath == null || _selectedTrackPath != backupSelectedTrackPath)) {
 
-			Map3Manager.getMap3View().setSelection(
-					new SelectionTourData(_selectedTrackPath.getTourTrack().getTourData()));
+				// a new track is selected, fire selection
+
+				Map3Manager.getMap3View().setSelection(
+						new SelectionTourData(_selectedTrackPath.getTourTrack().getTourData()));
+
+			} else {
+
+				Map3Manager.getMap3View().setTourInfo(hoveredTrackPath, hoveredPositionIndex);
+			}
 		}
 	}
 

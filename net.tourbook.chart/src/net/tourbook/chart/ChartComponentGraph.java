@@ -4594,6 +4594,7 @@ public class ChartComponentGraph extends Canvas {
 			// get the chart data
 			final ChartDataYSerie yData = drawingData.getYData();
 			final int[][] colorsIndex = yData.getColorsIndex();
+			final int[] lineColorIndex = colorsIndex[0];
 
 			/*
 			 * get hovered rectangle
@@ -4606,6 +4607,11 @@ public class ChartComponentGraph extends Canvas {
 			// check bounds
 			final PointLong[] lineDevPositions = _lineDevPositions.get(graphIndex);
 			if (lineDevPositions.length - 1 < graphIndex) {
+				return;
+			}
+
+			// check color index
+			if (_hoveredLineValueIndex > lineColorIndex.length - 1) {
 				return;
 			}
 
@@ -4642,7 +4648,7 @@ public class ChartComponentGraph extends Canvas {
 
 				// get the colors
 				final RGB[] rgbLine = yData.getRgbLine();
-				final int colorIndex = colorsIndex[0][_hoveredLineValueIndex];
+				final int colorIndex = lineColorIndex[_hoveredLineValueIndex];
 
 				final RGB rgbLineDef = rgbLine[colorIndex];
 				colorLine = getColor(rgbLineDef);
