@@ -142,7 +142,7 @@ public class ActionHandlerWorldWindDiagnostics extends AbstractHandler {
 		}
 
 		private void getDiagText_GL(final StringBuilder sb) {
-			
+
 			//			final javax.media.opengl.GL gl = GLContext.getCurrent().getGL();
 
 			final GL gl = _wwCanvas.getGL();
@@ -179,7 +179,7 @@ public class ActionHandlerWorldWindDiagnostics extends AbstractHandler {
 		}
 
 		private void getDiagText_JOGL(final StringBuilder sb) {
-			
+
 			sb.append(UI.NEW_LINE3);
 			sb.append("JOGL Values"); //$NON-NLS-1$
 			sb.append(UI.NEW_LINE2);
@@ -206,7 +206,7 @@ public class ActionHandlerWorldWindDiagnostics extends AbstractHandler {
 		}
 
 		private void getDiagText_System(final StringBuilder sb) {
-			
+
 			sb.append(UI.NEW_LINE3);
 			sb.append("System Properties"); //$NON-NLS-1$
 			sb.append(UI.NEW_LINE2);
@@ -240,6 +240,91 @@ public class ActionHandlerWorldWindDiagnostics extends AbstractHandler {
 			}
 
 			return calculatedSize;
+		}
+
+		/**
+		 * This code is found in jogl.jar: jogamp.opengl.awt.VersionApplet <code>
+		 * 
+		 * 
+			<object classid="clsid:8AD9C840-044E-11D1-B3E9-00805F499D93"
+			      width="800" height="600">
+			   <param name="code" value="org.jdesktop.applet.util.JNLPAppletLauncher">
+			   <param name="archive" value="jar/applet-launcher.jar,
+			                                jar/gluegen-rt.jar,
+			                                jar/jogl-all.jar">
+			   <param name="codebase_lookup" value="false">
+			   <param name="subapplet.classname" value="jogamp.opengl.awt.VersionApplet">
+			   <param name="subapplet.displayname" value="JOGL Applet Version">
+			   <param name="noddraw.check" value="true">
+			   <param name="progressbar" value="true">
+			   <param name="jnlpNumExtensions" value="1">
+			   <param name="jnlpExtension1" value="jogl-all-awt.jnlp">
+			   <param name="java_arguments" value="-Dsun.java2d.noddraw=true">
+			   <param name="jnlp_href" value="jogl-applet-version.jnlp">
+			   <comment>
+			     <embed code="org.jdesktop.applet.util.JNLPAppletLauncher"
+			          width="800" height="600"
+			          type="application/x-java-applet;version=1.6"
+			          pluginspage="http://java.sun.com/javase/downloads/ea.jsp"
+			          archive="jar/applet-launcher.jar,
+			                   jar/gluegen-rt.jar,
+			                   jar/jogl-all.jar"
+			          codebase_lookup" value="false"
+			          subapplet.classname="jogamp.opengl.awt.VersionApplet"
+			          subapplet.displayname="JOGL Applet Version"
+			          noddraw.check="true"
+			          progressbar="true"
+			          jnlpNumExtensions="1"
+			          jnlpExtension1="jogl-all-awt.jnlp"
+			          java_arguments="-Dsun.java2d.noddraw=true"
+			          jnlp_href="jogl-applet-version.jnlp">
+			        <noembed>Sorry, no Java support detected.</noembed>
+			     </embed>
+			   </comment>
+			</object>
+		 * </code>
+		 */
+		private void GL2_Info() {
+
+//		    final GLProfile glp = GLProfile.getDefault();
+//		    final GLCapabilities glcaps = new GLCapabilities(glp);
+//
+//		    s = VersionUtil.getPlatformInfo().toString();
+//		    System.err.println(s);
+//
+//		    s = GlueGenVersion.getInstance().toString();
+//		    System.err.println(s);
+//
+//		    /*
+//		    s = NativeWindowVersion.getInstance().toString();
+//		    System.err.println(s);
+//		    tareaVersion.append(NativeWindowVersion.getInstance().toString());
+//		    */
+//
+//		    s = JoglVersion.getInstance().toString();
+//		    System.err.println(s);
+//
+//		    final GLDrawableFactory factory = GLDrawableFactory.getFactory(glp);
+//		    final List<GLCapabilitiesImmutable> availCaps = factory.getAvailableCapabilities(null);
+//		    for(int i=0; i<availCaps.size(); i++) {
+//		        s = ((GLCapabilitiesImmutable) availCaps.get(i)).toString();
+//		        System.err.println(s);
+//		        tareaCaps.append(s);
+//		        tareaCaps.append(Platform.getNewline());
+//		    }
+//
+//		    final Container grid = new Container();
+//		    grid.setLayout(new GridLayout(2, 1));
+//		    grid.add(tareaVersion);
+//		    grid.add(tareaCaps);
+//		    add(grid, BorderLayout.CENTER);
+//
+//		    canvas = new GLCanvas(glcaps);
+//		    canvas.addGLEventListener(new GLInfo());
+//		    canvas.setSize(10, 10);
+//		    add(canvas, BorderLayout.SOUTH);
+//		    validate();
+
 		}
 
 	}

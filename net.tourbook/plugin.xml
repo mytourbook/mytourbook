@@ -1429,8 +1429,7 @@
 		
 		</menuContribution>
 
-<!-- this is not yet working correctly
--->
+<!-- this is not working correctly with Jogl 1.1.1.a, it should work with 2.x but is not yet tested
 
 		<menuContribution locationURI="menu:file?after=databaseTools">
 
@@ -1441,6 +1440,7 @@
 				style="push"/>
 
 		</menuContribution>
+-->
 
 
    </extension>

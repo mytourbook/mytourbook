@@ -37,7 +37,6 @@ public class ColorCacheAWT {
 	 */
 	public Color get(final int colorValue) {
 
-//		Color color = _colors.get(new Integer(colorValue));
 		Color color = _colors.get(colorValue);
 		if (color != null) {
 			return color;
@@ -47,7 +46,9 @@ public class ColorCacheAWT {
 		final int green = (colorValue & 0xFF00) >>> 8;
 		final int blue = (colorValue & 0xFF0000) >>> 16;
 
-		color = new Color(red, green, blue);
+		final int opacity = 0xa0;
+		color = new Color(red, green, blue, opacity);
+//		color = new Color(red, green, blue);
 
 		_colors.put(colorValue, color);
 
