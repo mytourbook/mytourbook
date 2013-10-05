@@ -1723,96 +1723,97 @@ public class Map3View extends ViewPart implements ITourProvider {
 
 		} else {
 
-			if (_isSyncMapWithChartSlider) {
+			// sync map with chart slider
 
-				// sync map with chart slider
+			final int valuesIndex = chartInfo.selectedSliderValuesIndex;
 
-				final int valuesIndex = chartInfo.selectedSliderValuesIndex;
+			final double latitude = tourData.latitudeSerie[valuesIndex];
+			final double longitude = tourData.longitudeSerie[valuesIndex];
 
-				final double latitude = tourData.latitudeSerie[valuesIndex];
-				final double longitude = tourData.longitudeSerie[valuesIndex];
+			final float[] altitudeSerie = tourData.altitudeSerie;
+			final float trackAltitude = altitudeSerie == null ? 0 : altitudeSerie[valuesIndex];
 
-				final float[] altitudeSerie = tourData.altitudeSerie;
-				final float trackAltitude = altitudeSerie == null ? 0 : altitudeSerie[valuesIndex];
+			final double elevation = getSliderYPosition(trackAltitude);
 
-				final double elevation = getSliderYPosition(trackAltitude);
+			final LatLon sliderDegrees = LatLon.fromDegrees(latitude, longitude);
 
-				final LatLon sliderDegrees = LatLon.fromDegrees(latitude, longitude);
+			/*
+			 * Prevent setting the same location because this will jitter the map slider and is
+			 * unnecessary.
+			 */
+			if (_previousMapSliderPosition != null) {
+
+				if (_previousMapSliderPosition.getLatitude().equals(sliderDegrees.latitude)
+						&& _previousMapSliderPosition.getLongitude().equals(sliderDegrees.longitude)
+						&& _previousMapSliderPosition.elevation == elevation) {
+
+					return;
+				}
+			}
+
+			chartSliderLayer.setSliderVisible(false);
+
+			final View view = Map3Manager.getWWCanvas().getView();
+			if (view instanceof BasicOrbitView) {
+
+				final BasicOrbitView orbitView = (BasicOrbitView) view;
+
+				final Position mapSliderPosition = new Position(sliderDegrees, elevation);
 
 				/*
-				 * Prevent setting the same location because this will jitter the map slider and is
-				 * unnecessary.
+				 * This fragment is copied from
+				 * gov.nasa.worldwindx.applications.sar.AnalysisPanel.updateView(boolean)
 				 */
-				if (_previousMapSliderPosition != null) {
 
-					if (_previousMapSliderPosition.getLatitude().equals(sliderDegrees.latitude)
-							&& _previousMapSliderPosition.getLongitude().equals(sliderDegrees.longitude)
-							&& _previousMapSliderPosition.elevation == elevation) {
-
-						return;
-					}
-				}
-
-				chartSliderLayer.setSliderVisible(false);
-
-				final View view = Map3Manager.getWWCanvas().getView();
-				if (view instanceof BasicOrbitView) {
-
-					final BasicOrbitView orbitView = (BasicOrbitView) view;
-
-					final Position mapSliderPosition = new Position(sliderDegrees, elevation);
-
-					/*
-					 * This fragment is copied from
-					 * gov.nasa.worldwindx.applications.sar.AnalysisPanel.updateView(boolean)
-					 */
-
-					// Send a message to stop all changes to the view's center position.
+				// Send a message to stop all changes to the view's center position.
 //					orbitView.stopMovementOnCenter();
 
-					// Set the view to center on the track position,
-					// while keeping the eye altitude constant.
-					try {
+				// Set the view to center on the track position,
+				// while keeping the eye altitude constant.
+				try {
 
-						final Position eyePos = orbitView.getCurrentEyePosition();
+					final Position eyePos = orbitView.getCurrentEyePosition();
 
-						// New eye lat/lon will follow the ground position.
-						final LatLon newEyeLatLon = eyePos
-								.add(mapSliderPosition.subtract(orbitView.getCenterPosition()));
+					// New eye lat/lon will follow the ground position.
+					final LatLon newEyeLatLon = eyePos.add(mapSliderPosition.subtract(orbitView.getCenterPosition()));
 
-						// Eye elevation will not change unless it is below the ground position elevation.
-						final double newEyeElev = eyePos.getElevation() < mapSliderPosition.getElevation() //
-								? mapSliderPosition.getElevation()
-								: eyePos.getElevation();
+					// Eye elevation will not change unless it is below the ground position elevation.
+					final double newEyeElev = eyePos.getElevation() < mapSliderPosition.getElevation() //
+							? mapSliderPosition.getElevation()
+							: eyePos.getElevation();
 
-						final Position newEyePos = new Position(newEyeLatLon, newEyeElev);
+					final Position newEyePos = new Position(newEyeLatLon, newEyeElev);
 
+					if (_isSyncMapWithChartSlider) {
 						orbitView.setOrientation(newEyePos, mapSliderPosition);
-
-						// keep current position
-						_previousMapSliderPosition = mapSliderPosition;
 					}
 
-					// Fallback to setting center position.
-					catch (final Exception e) {
+					// keep current position
+					_previousMapSliderPosition = mapSliderPosition;
+				}
+
+				// Fallback to setting center position.
+				catch (final Exception e) {
+
+					if (_isSyncMapWithChartSlider) {
 
 						orbitView.setCenterPosition(mapSliderPosition);
 						// View/OrbitView will have logged the exception, no need to log it here.
 					}
 				}
-
-				// update slider UI
-				updateChartSlider_10_Position(
-						chartSliderLayer,
-						tourData,
-						chartInfo.leftSliderValuesIndex,
-						chartInfo.rightSliderValuesIndex,
-						valuesIndex);
-
-				chartSliderLayer.setSliderVisible(true);
-
-				enableActions();
 			}
+
+			// update slider UI
+			updateChartSlider_10_Position(
+					chartSliderLayer,
+					tourData,
+					chartInfo.leftSliderValuesIndex,
+					chartInfo.rightSliderValuesIndex,
+					valuesIndex);
+
+			chartSliderLayer.setSliderVisible(true);
+
+			enableActions();
 		}
 	}
 
