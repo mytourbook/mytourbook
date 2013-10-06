@@ -271,13 +271,11 @@ public final class Timestamp implements Comparable<Timestamp> {
 		return milliseconds * 1000000 + nanoseconds;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see java.lang.Object#toString()
-	 */
 	@Override
 	public String toString() {
+
 		final StringBuffer sb = new StringBuffer(32);
+
 		formatFull.format(new Date(milliseconds), sb, new FieldPosition(DateFormat.FULL));
 
 //		if (nanoseconds < 100000) {
@@ -300,7 +298,7 @@ public final class Timestamp implements Comparable<Timestamp> {
 //			}
 //		}
 
-		sb.append("'" + nanoseconds / 100000); //$NON-NLS-1$
+		sb.append(String.format("'%,03d", nanoseconds / 1000)); //$NON-NLS-1$
 
 		return sb.toString();
 	}

@@ -19,6 +19,10 @@ import gov.nasa.worldwind.geom.Position;
 import gov.nasa.worldwind.layers.AnnotationLayer;
 import gov.nasa.worldwind.render.AnnotationAttributes;
 import gov.nasa.worldwind.render.GlobeAnnotation;
+
+import java.awt.Insets;
+import java.awt.Point;
+
 import net.tourbook.common.UI;
 import net.tourbook.map3.view.Map3Manager;
 
@@ -55,6 +59,18 @@ public class TourInfoLayer extends AnnotationLayer implements IToolLayer {
 
 		final AnnotationAttributes attributes = trackPoint.getAttributes();
 
+		attributes.setCornerRadius(ChartSliderLayer.CHART_SLIDER_CORNER_RADIUS);
+		attributes.setInsets(new Insets(
+				ChartSliderLayer.CHART_SLIDER_MARGIN,
+				ChartSliderLayer.CHART_SLIDER_MARGIN + 3,
+				ChartSliderLayer.CHART_SLIDER_MARGIN,
+				ChartSliderLayer.CHART_SLIDER_MARGIN));
+
+		attributes.setDrawOffset(new Point(0, ChartSliderLayer.CHART_SLIDER_DRAW_OFFSET_Y));
+		attributes.setLeaderGapWidth(ChartSliderLayer.CHART_SLIDER_LEADER_GAP);
+		attributes.setFont(UI.AWT_FONT_ARIAL_BOLD_12);
+
+		// initially hide the annotation
 		attributes.setVisible(false);
 
 		return trackPoint;

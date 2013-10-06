@@ -17,8 +17,11 @@ package net.tourbook.map3.view;
 
 import gov.nasa.worldwind.View;
 import gov.nasa.worldwind.WorldWind;
+import gov.nasa.worldwind.WorldWindow;
 import gov.nasa.worldwind.avlist.AVKey;
 import gov.nasa.worldwind.awt.WorldWindowGLCanvas;
+import gov.nasa.worldwind.event.RenderingEvent;
+import gov.nasa.worldwind.event.RenderingListener;
 import gov.nasa.worldwind.geom.Angle;
 import gov.nasa.worldwind.geom.LatLon;
 import gov.nasa.worldwind.geom.Line;
@@ -27,19 +30,21 @@ import gov.nasa.worldwind.geom.Vec4;
 import gov.nasa.worldwind.globes.Globe;
 import gov.nasa.worldwind.render.AnnotationAttributes;
 import gov.nasa.worldwind.render.GlobeAnnotation;
+import gov.nasa.worldwind.util.PerformanceStatistic;
 import gov.nasa.worldwind.view.orbit.BasicOrbitView;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.EventQueue;
 import java.awt.Frame;
-import java.awt.Insets;
-import java.awt.Point;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashMap;
 
 import javax.swing.SwingUtilities;
@@ -169,7 +174,8 @@ public class Map3View extends ViewPart implements ITourProvider {
 	private IPropertyChangeListener				_prefChangeListener;
 	private ITourEventListener					_tourEventListener;
 
-	private MouseAdapter						_awtMouseListener;
+	private MouseAdapter						_wwMouseListener;
+	private RenderingListener					_wwStatisticListener;
 
 	private boolean								_isPartActive;
 	private boolean								_isPartVisible;
@@ -182,6 +188,10 @@ public class Map3View extends ViewPart implements ITourProvider {
 	private boolean								_isTourVisible;
 	private boolean								_isLegendVisible;
 	private boolean								_isChartSliderVisible;
+
+	private int									_statisticUpdateInterval				= 500;
+	private long								_statisticLastUpdate;
+
 	/**
 	 * Contains all tours which are displayed in the map.
 	 */
@@ -211,6 +221,11 @@ public class Map3View extends ViewPart implements ITourProvider {
 	private ITrackPath							_previousHoveredTrack;
 	private Integer								_previousHoveredTrackPosition;
 	private Position							_previousMapSliderPosition;
+
+	/**
+	 * <code>true</code> will log frame/cache... statistics.
+	 */
+	private boolean								_isLogStatistics						= false;
 
 	private class Map3ContextMenu extends SWTPopupOverAWT {
 
@@ -283,7 +298,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 
 	private void addMap3Listener() {
 
-		_awtMouseListener = new MouseAdapter() {
+		_wwMouseListener = new MouseAdapter() {
 
 			@Override
 			public void mouseClicked(final MouseEvent e) {
@@ -291,7 +306,40 @@ public class Map3View extends ViewPart implements ITourProvider {
 			}
 		};
 
-		_wwCanvas.getInputHandler().addMouseListener(_awtMouseListener);
+		_wwCanvas.getInputHandler().addMouseListener(_wwMouseListener);
+
+		/*
+		 * Statistics
+		 */
+		if (_isLogStatistics) {
+
+			_wwCanvas.setPerFrameStatisticsKeys(PerformanceStatistic.ALL_STATISTICS_SET);
+			_wwStatisticListener = new RenderingListener() {
+
+				@Override
+				public void stageChanged(final RenderingEvent event) {
+
+					final long now = System.currentTimeMillis();
+
+					final String stage = event.getStage();
+
+					if (stage.equals(RenderingEvent.AFTER_BUFFER_SWAP)
+							&& event.getSource() instanceof WorldWindow
+							&& now - _statisticLastUpdate > _statisticUpdateInterval) {
+
+						EventQueue.invokeLater(new Runnable() {
+							public void run() {
+								updateStatistics();
+							}
+						});
+
+						_statisticLastUpdate = now;
+					}
+				}
+			};
+
+			_wwCanvas.addRenderingListener(_wwStatisticListener);
+		}
 	}
 
 	private void addPartListener() {
@@ -472,7 +520,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 		final Angle latitude = eyePosition.getLatitude();
 		final Angle longitude = eyePosition.getLongitude();
 
-		final Globe globe = Map3Manager.getWWCanvas().getModel().getGlobe();
+		final Globe globe = _wwCanvas.getModel().getGlobe();
 
 		if (altitudeMode == WorldWind.CLAMP_TO_GROUND) {
 			height = globe.getElevation(latitude, longitude);
@@ -738,7 +786,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 
 		TourManager.getInstance().removeTourEventListener(_tourEventListener);
 
-		_wwCanvas.getInputHandler().removeMouseListener(_awtMouseListener);
+		_wwCanvas.getInputHandler().removeMouseListener(_wwMouseListener);
 
 		disposeContextMenu();
 
@@ -1378,9 +1426,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 		_state.put(STATE_MAP3_VIEW, view.getRestorableState());
 	}
 
-	private void setAnnotationColors(	final TourData tourData,
-										final int positionIndex,
-										final AnnotationAttributes attributes) {
+	private void setAnnotationColors(final TourData tourData, final int positionIndex, final GlobeAnnotation trackPoint) {
 		final Color bgColor;
 		final Color fgColor;
 
@@ -1443,6 +1489,8 @@ public class Map3View extends ViewPart implements ITourProvider {
 			bgColor = null;
 			fgColor = null;
 		}
+
+		final AnnotationAttributes attributes = trackPoint.getAttributes();
 
 		attributes.setBackgroundColor(bgColor);
 		attributes.setTextColor(fgColor);
@@ -1554,30 +1602,8 @@ public class Map3View extends ViewPart implements ITourProvider {
 				final GlobeAnnotation trackPoint = tourInfoLayer.getTrackPoint();
 				trackPoint.setText(createSliderText(hoveredPositionIndex, tourData));
 
-				final AnnotationAttributes attributes = trackPoint.getAttributes();
-				final int defaultMargin = 3;
-				final int left = defaultMargin + 2;
-				final int right = defaultMargin + 2;
-				final int top = defaultMargin;
-				final int bottom = defaultMargin;
-				final Insets insets = new Insets(top, left, bottom, right);
-
-				final int leaderGapWidth = 4;
-				final int drawOffsetX = 0;
-				final int drawOffsetY = 40;
-				final Point drawOffset = new Point(drawOffsetX, drawOffsetY);
-
-				final int cornerRadius = 7;
-
-				attributes.setDrawOffset(drawOffset);
-				attributes.setLeaderGapWidth(leaderGapWidth);
-
-				attributes.setCornerRadius(cornerRadius);
-				attributes.setInsets(insets);
-
 				setAnnotationPosition(trackPoint, tourData, hoveredPositionIndex);
-
-				setAnnotationColors(tourData, hoveredPositionIndex, attributes);
+				setAnnotationColors(tourData, hoveredPositionIndex, trackPoint);
 
 				tourInfoLayer.setTrackPointVisible(true);
 			}
@@ -1753,7 +1779,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 
 			chartSliderLayer.setSliderVisible(false);
 
-			final View view = Map3Manager.getWWCanvas().getView();
+			final View view = _wwCanvas.getView();
 			if (view instanceof BasicOrbitView) {
 
 				final BasicOrbitView orbitView = (BasicOrbitView) view;
@@ -1821,7 +1847,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 
 		if (isSyncMapViewWithTour) {
 
-			final Map3ViewController viewController = Map3ViewController.create(Map3Manager.getWWCanvas());
+			final Map3ViewController viewController = Map3ViewController.create(_wwCanvas);
 
 			viewController.goToDefaultView(allPositions);
 		}
@@ -1899,15 +1925,9 @@ public class Map3View extends ViewPart implements ITourProvider {
 		 * set position and text
 		 */
 		setAnnotationPosition(slider, tourData, positionIndex);
+		setAnnotationColors(tourData, positionIndex, slider);
 
 		slider.setText(createSliderText(positionIndex, tourData));
-
-		/*
-		 * set color
-		 */
-		final AnnotationAttributes attributes = slider.getAttributes();
-
-		setAnnotationColors(tourData, positionIndex, attributes);
 	}
 
 	private void updateMapColors() {
@@ -1928,6 +1948,76 @@ public class Map3View extends ViewPart implements ITourProvider {
 		_allTours.addAll(getMapTours(modifiedTours));
 
 		showAllTours_InternalTours();
+	}
+
+//	public static final String	ALL						= "gov.nasa.worldwind.perfstat.All";
+//
+//	public static final String	FRAME_RATE				= "gov.nasa.worldwind.perfstat.FrameRate";
+//	public static final String	FRAME_TIME				= "gov.nasa.worldwind.perfstat.FrameTime";
+//	public static final String	PICK_TIME				= "gov.nasa.worldwind.perfstat.PickTime";
+//
+//	public static final String	TERRAIN_TILE_COUNT		= "gov.nasa.worldwind.perfstat.TerrainTileCount";
+//	public static final String	IMAGE_TILE_COUNT		= "gov.nasa.worldwind.perfstat.ImageTileCount";
+//
+//	public static final String	AIRSPACE_GEOMETRY_COUNT	= "gov.nasa.worldwind.perfstat.AirspaceGeometryCount";
+//	public static final String	AIRSPACE_VERTEX_COUNT	= "gov.nasa.worldwind.perfstat.AirspaceVertexCount";
+//
+//	public static final String	JVM_HEAP				= "gov.nasa.worldwind.perfstat.JvmHeap";
+//	public static final String	JVM_HEAP_USED			= "gov.nasa.worldwind.perfstat.JvmHeapUsed";
+//
+//	public static final String	MEMORY_CACHE			= "gov.nasa.worldwind.perfstat.MemoryCache";
+//	public static final String	TEXTURE_CACHE			= "gov.nasa.worldwind.perfstat.TextureCache";
+
+//2013-10-06 10:12:12.317'955 [Map3View] 	         0  Frame Rate (fps)
+//2013-10-06 10:12:12.317'982 [Map3View] 	       152  Frame Time (ms)
+//2013-10-06 10:12:12.318'366 [Map3View] 	         8  Pick Time (ms)
+
+//2013-10-06 10:12:12.318'392 [Map3View] 	        91  Terrain Tiles
+
+//2013-10-06 10:12:12.318'169 [Map3View] 	      6252  Cache Size (Kb): Terrain
+//2013-10-06 10:12:12.318'191 [Map3View] 	         0  Cache Size (Kb): Placename Tiles
+//2013-10-06 10:12:12.318'214 [Map3View] 	      1860  Cache Size (Kb): Texture Tiles
+//2013-10-06 10:12:12.318'289 [Map3View] 	      3870  Cache Size (Kb): Elevation Tiles
+//2013-10-06 10:12:12.318'414 [Map3View] 	    422617  Texture Cache size (Kb)
+
+//2013-10-06 10:12:12.318'007 [Map3View] 	         2  Blue Marble (WMS) 2004 Tiles
+//2013-10-06 10:12:12.318'044 [Map3View] 	        35  i-cubed Landsat Tiles
+//2013-10-06 10:12:12.318'069 [Map3View] 	        84  MS Virtual Earth Aerial Tiles
+//2013-10-06 10:12:12.318'093 [Map3View] 	        84  Bing Imagery Tiles
+
+//2013-10-06 10:12:12.318'118 [Map3View] 	    463659  JVM total memory (Kb)
+//2013-10-06 10:12:12.318'141 [Map3View] 	    431273  JVM used memory (Kb)
+
+	private void updateStatistics() {
+
+		final Collection<PerformanceStatistic> stats = _wwCanvas.getSceneController().getPerFrameStatistics();
+
+		if (stats.size() < 1) {
+			return;
+		}
+
+		final PerformanceStatistic[] pfs = stats.toArray(new PerformanceStatistic[stats.size()]);
+		Arrays.sort(pfs, new Comparator<PerformanceStatistic>() {
+
+			@Override
+			public int compare(final PerformanceStatistic o1, final PerformanceStatistic o2) {
+
+				// sort stats by key to group them by the same type
+				return o1.getKey().compareTo(o2.getKey());
+			}
+		});
+
+		System.out.println(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] \t");
+		System.out.println(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] \t");
+
+		for (final PerformanceStatistic stat : pfs) {
+			System.out.println(UI.timeStampNano()
+					+ " ["
+					+ getClass().getSimpleName()
+					+ "] \t"
+					+ String.format("%10s  %s", stat.getValue(), stat.getDisplayString()));
+//					+ String.format("%-40s%10s", stat.getDisplayString(), stat.getValue()));
+		}
 	}
 
 }

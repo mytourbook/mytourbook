@@ -32,7 +32,12 @@ import org.eclipse.jface.dialogs.IDialogSettings;
  */
 public class ChartSliderLayer extends AnnotationLayer {
 
-	public static final String	MAP3_LAYER_ID	= "ChartSliderLayer";	//$NON-NLS-1$
+	static final int			CHART_SLIDER_DRAW_OFFSET_Y	= 40;
+	static final int			CHART_SLIDER_CORNER_RADIUS	= 7;
+	static final int			CHART_SLIDER_LEADER_GAP		= 7;
+	static final int			CHART_SLIDER_MARGIN			= 5;
+
+	public static final String	MAP3_LAYER_ID				= "ChartSliderLayer";	//$NON-NLS-1$
 
 	private GlobeAnnotation		_leftSlider;
 	private GlobeAnnotation		_rightSlider;
@@ -62,26 +67,18 @@ public class ChartSliderLayer extends AnnotationLayer {
 		 * set attributes
 		 */
 		final AnnotationAttributes attributes = slider.getAttributes();
-		final int defaultMargin = 5;
-		final int top = defaultMargin;
-		final int left = defaultMargin + 3;
-		final int bottom = defaultMargin;
-		final int right = defaultMargin;
-		final Insets insets = new Insets(top, left, bottom, right);
 
-		final int leaderGapWidth = 7;
 		final int drawOffsetX = 10;
-		final int drawOffsetY = 40;
-		final Point drawOffset = new Point(isLeftSlider ? -drawOffsetX : drawOffsetX, drawOffsetY);
 
-		final int cornerRadius = 7;
+		attributes.setCornerRadius(CHART_SLIDER_CORNER_RADIUS);
+		attributes.setInsets(new Insets(
+				CHART_SLIDER_MARGIN,
+				CHART_SLIDER_MARGIN + 3,
+				CHART_SLIDER_MARGIN,
+				CHART_SLIDER_MARGIN));
 
-		attributes.setDrawOffset(drawOffset);
-		attributes.setLeaderGapWidth(leaderGapWidth);
-
-		attributes.setCornerRadius(cornerRadius);
-		attributes.setInsets(insets);
-
+		attributes.setDrawOffset(new Point(isLeftSlider ? -drawOffsetX : drawOffsetX, CHART_SLIDER_DRAW_OFFSET_Y));
+		attributes.setLeaderGapWidth(CHART_SLIDER_LEADER_GAP);
 		attributes.setFont(UI.AWT_FONT_ARIAL_BOLD_12);
 
 		// initially hide the slider
