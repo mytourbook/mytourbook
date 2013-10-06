@@ -223,7 +223,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 	private Position							_previousMapSliderPosition;
 
 	/**
-	 * <code>true</code> will log frame/cache... statistics.
+	 * <code>true</code> will log frame/cache... statistics like in {@link PerformanceStatistic}
 	 */
 	private boolean								_isLogStatistics						= false;
 
