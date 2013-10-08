@@ -657,8 +657,11 @@ public class TourTrackLayer extends RenderableLayer implements SelectListener, I
 		 * numSubsegments do not have a UI (it's disabled) but ensure that 0 subsegments are set
 		 */
 		if (path.getNumSubsegments() != 0) {
-			path.setNumSubsegments(0);
-			_trackConfig.numSubsegments = 0;
+
+			final int subSegments = 0;
+
+			path.setNumSubsegments(subSegments);
+			_trackConfig.numSubsegments = subSegments;
 		}
 
 		/*
