@@ -408,16 +408,47 @@ public class Smooth {
 		//------------------
 		field_sf[0] = field[0];
 		for (i = 1; i < size; i++) {
-			dt = (time[i] - time[i - 1]) / tau;
-			field_sf[i] = (field_sf[i - 1] + dt * field[i]) / (1. + dt);
+
+			final int currentTime = time[i];
+			final int prevTime = time[i - 1];
+
+			// prevent div by zero
+			if (currentTime == prevTime) {
+				field_sf[i] = field[i];
+			} else {
+
+				dt = (currentTime - prevTime) / tau;
+
+				// prevent div by zero
+				if (dt == -1.) {
+					field_sf[i] = field[i];
+				} else {
+					field_sf[i] = (field_sf[i - 1] + dt * field[i]) / (1. + dt);
+				}
+			}
 		}
 
 		// Backward smoothing
 		//-------------------
 		field_sb[size - 1] = field[size - 1];
 		for (i = 2; i < size + 1; i++) {
-			dt = (time[size - i + 1] - time[size - i]) / tau;
-			field_sb[size - i] = (field_sb[size - i + 1] + dt * field[size - i]) / (1. + dt);
+
+			final int currentTime = time[size - i + 1];
+			final int prevTime = time[size - i];
+
+			// prevent div by zero
+			if (currentTime == prevTime) {
+				field_sb[size - i] = field[size - i];
+			} else {
+				dt = (currentTime - prevTime) / tau;
+
+				// prevent div by zero
+				if (dt == -1.0) {
+					field_sb[size - i] = field[size - i];
+				} else {
+					field_sb[size - i] = (field_sb[size - i + 1] + dt * field[size - i]) / (1. + dt);
+				}
+			}
 		}
 
 		// Centered smoothing

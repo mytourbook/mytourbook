@@ -17,7 +17,6 @@ package net.tourbook.ui.views;
 
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
-import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.part.ViewPart;
@@ -47,9 +46,10 @@ public class TourChartSmoothingView extends ViewPart {
 
 		_tk = new FormToolkit(parent.getDisplay());
 
-		final Composite container = new Composite(parent, SWT.NONE);
+		final Composite container = _tk.createComposite(parent);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-		GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
+		GridLayoutFactory.swtDefaults().numColumns(1).applyTo(container);
+//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
 		{
 			_smoothingUI.createUI(container, false);
 		}
