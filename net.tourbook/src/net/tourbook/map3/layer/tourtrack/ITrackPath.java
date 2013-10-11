@@ -18,9 +18,6 @@ package net.tourbook.map3.layer.tourtrack;
 import gov.nasa.worldwind.render.Path;
 import gov.nasa.worldwind.render.Path.PositionColors;
 
-import java.awt.Color;
-import java.util.List;
-
 /**
  * This interface is a wrapper for a tour which is rendered with a {@link Path}.
  */
@@ -30,15 +27,15 @@ public interface ITrackPath {
 
 	PositionColors getPathPositionColors();
 
-	List<Color> getPathTessellatedColors();
+//	List<Color> getPathTessellatedColors();
 
 	TourTrack getTourTrack();
 
-	void resetPathTessellatedColors();
+//	void resetPathTessellatedColors();
 
-	void setPathHighlighted(boolean isHighlighted);
+//	void setPathHighlighted(boolean isHighlighted);
 
-	void setPathPositionColors(PositionColors positionColors);
+//	void setPathPositionColors(PositionColors positionColors);
 
 	void setPicked(boolean isPicked, Integer pickPositionIndex);
 

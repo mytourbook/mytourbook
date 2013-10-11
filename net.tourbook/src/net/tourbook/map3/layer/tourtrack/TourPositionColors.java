@@ -49,48 +49,23 @@ class TourPositionColors implements Path.PositionColors {
 		return _awtColorCache.get(colorValue);
 	}
 
-	public Color getGradientColor(	final float graphValue,
-									final Integer positionIndex,
-									final boolean isTourTrackedPicked,
-									final int tourTrackPickIndex) {
+	public Color getGradientColor(final float graphValue, final Integer positionIndex, final int tourTrackPickIndex) {
 
-		Color positionColor;
+		int colorValue = -1;
 
-		if (isTourTrackedPicked) {
+		if (_colorProvider instanceof IGradientColors) {
 
-			// tour track is picked
+			final IGradientColors gradientColorProvider = (IGradientColors) _colorProvider;
 
-			if (tourTrackPickIndex != -1 && tourTrackPickIndex == positionIndex) {
-
-				// track position is picked, display with inverse color
-
-				positionColor = Color.GREEN;
-
-			} else {
-
-				positionColor = Color.RED;
-			}
-
-		} else {
-
-			int colorValue = -1;
-
-			if (_colorProvider instanceof IGradientColors) {
-
-				final IGradientColors gradientColorProvider = (IGradientColors) _colorProvider;
-
-				colorValue = gradientColorProvider.getColorValue(graphValue);
-			}
-
-			if (colorValue == -1) {
-				// set ugly default value, this case should not happen
-				return Color.MAGENTA;
-			}
-
-			positionColor = _awtColorCache.get(colorValue);
+			colorValue = gradientColorProvider.getColorValue(graphValue);
 		}
 
-		return positionColor;
+		if (colorValue == -1) {
+			// set ugly default value, this case should not happen
+			return Color.MAGENTA;
+		}
+
+		return _awtColorCache.get(colorValue);
 	}
 
 	public void setColorProvider(final IMapColorProvider legendProvider) {

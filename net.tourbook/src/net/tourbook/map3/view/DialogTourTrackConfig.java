@@ -675,7 +675,6 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 			_chkFollowTerrain = new Button(parent, SWT.CHECK);
 			GridDataFactory.fillDefaults()//
 					.span(2, 1)
-					.indent(UI.FORM_FIRST_COLUMN_INDENT, 0)
 					.applyTo(_chkFollowTerrain);
 			_chkFollowTerrain.setText(Messages.TourTrack_Properties_Checkbox_IsFollowTerrain);
 			_chkFollowTerrain.setToolTipText(Messages.TourTrack_Properties_Checkbox_IsFollowTerrain_Tooltip);
@@ -685,22 +684,24 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 
 	private void createUI_600_PathResolution(final Composite parent) {
 
-		/*
-		 * label: Path resolution
-		 */
-		final Label label = new Label(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(label);
+		{
+			/*
+			 * label: Path resolution
+			 */
+			final Label label = new Label(parent, SWT.NONE);
+			GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(label);
 
-		label.setText(Messages.TourTrack_Properties_Label_PathResolution);
-		label.setToolTipText(Messages.TourTrack_Properties_Label_PathResolution_Tooltip);
+			label.setText(Messages.TourTrack_Properties_Label_PathResolution);
+			label.setToolTipText(Messages.TourTrack_Properties_Label_PathResolution_Tooltip);
 
-		/*
-		 * combo: Path resolution
-		 */
-		_comboPathResolution = new Combo(parent, SWT.READ_ONLY | SWT.BORDER);
-		GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.FILL).applyTo(_comboPathResolution);
-		_comboPathResolution.setVisibleItemCount(10);
-		_comboPathResolution.addSelectionListener(_defaultSelectionListener);
+			/*
+			 * combo: Path resolution
+			 */
+			_comboPathResolution = new Combo(parent, SWT.READ_ONLY | SWT.BORDER);
+			GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.FILL).applyTo(_comboPathResolution);
+			_comboPathResolution.setVisibleItemCount(10);
+			_comboPathResolution.addSelectionListener(_defaultSelectionListener);
+		}
 	}
 
 	private Spinner createUI_ColorOpacity(final Composite parent) {
@@ -778,12 +779,9 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 		// Hr zones are not yet supported
 		final boolean isGradientColor = _trackColorId != MapColorId.HrZone;
 
-		final boolean canFollowTerrain = isAbsoluteAltitude == false;
-
 		// altitude
 		_chkAltitudeOffset.setEnabled(isAbsoluteAltitude);
 		_spinnerAltitudeOffsetDistance.setEnabled(isAbsoluteAltitudeEnabled);
-		_chkFollowTerrain.setEnabled(canFollowTerrain);
 
 		// track position
 		_chkTrackPositions.setEnabled(isTrackPositionVisible);
@@ -798,6 +796,7 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 
 		// extrude track
 		_chkExtrudePath.setEnabled(isClampToGround == false);
+
 		_lblCurtainColor.setEnabled(isShowCurtain);
 		_lblCurtainColorHovered.setEnabled(isShowCurtain);
 		_lblCurtainColorHovSel.setEnabled(isShowCurtain);
@@ -810,6 +809,7 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 		_spinnerInteriorOpacityHovered.setEnabled(isShowCurtain);
 		_spinnerInteriorOpacityHovSel.setEnabled(isShowCurtain);
 		_spinnerInteriorOpacitySelected.setEnabled(isShowCurtain);
+
 		_chkDrawVerticals.setEnabled(isShowCurtain);
 
 		// track color
@@ -998,8 +998,9 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 	private void saveState() {
 
 		final boolean backupIsAltitudeOffset = _trackConfig.isAbsoluteOffset;
-		final int backupAltitudeOffsetDistance = _trackConfig.altitudeVerticalOffset;
 		final boolean backupIsAbsoluteAltitudeMode = _trackConfig.altitudeMode == WorldWind.ABSOLUTE;
+		final boolean backupIsFollowTerrain = _trackConfig.isFollowTerrain;
+		final int backupAltitudeOffsetDistance = _trackConfig.altitudeVerticalOffset;
 		final int backupPathResolution = _trackConfig.pathResolution;
 
 		int altitudeModeIndex = _comboAltitude.getSelectionIndex();
@@ -1064,11 +1065,14 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 		 * check if tracks must be recreated
 		 */
 		if (//
-			// altitude offset (vertical distance) is not modified
+			// altitude offset (vertical distance) is NOT modified
 		backupAltitudeOffsetDistance == _trackConfig.altitudeVerticalOffset //
 
-				// path resolution is not modified
+				// path resolution is NOT modified
 				&& backupPathResolution == _trackConfig.pathResolution //
+
+				// follow terrain is NOT modified
+				&& backupIsFollowTerrain == _trackConfig.isFollowTerrain //
 
 				&& isAbsoluteAltitudeNotModified
 		//

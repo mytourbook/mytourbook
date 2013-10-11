@@ -16,13 +16,11 @@
 package net.tourbook.map3.layer.tourtrack;
 
 import gov.nasa.worldwind.geom.Position;
-import gov.nasa.worldwind.render.DrawContext;
 import gov.nasa.worldwind.render.MultiResolutionPath;
 import gov.nasa.worldwind.render.Path;
 
 import java.awt.Color;
 import java.util.ArrayList;
-import java.util.List;
 
 public class TrackPathViewport extends MultiResolutionPath implements ITrackPath {
 
@@ -33,25 +31,6 @@ public class TrackPathViewport extends MultiResolutionPath implements ITrackPath
 	}
 
 	@Override
-	protected void addTessellatedPosition(final Position pos, final Color color, final Integer ordinal, final PathData pathData) {
-
-		try {
-			super.addTessellatedPosition(pos, color, ordinal, pathData);
-		} catch (final Exception e) {
-			// ignore, it can happen
-		}
-	}
-
-	@Override
-	protected void drawPointsVBO(final DrawContext dc, final int[] vboIds, final PathData pathData) {
-
-		try {
-			super.drawPointsVBO(dc, vboIds, pathData);
-		} catch (final Exception e) {
-			// ignore, it can happen
-		}
-	}
-	@Override
 	protected Color getColor(final Position pos, final Integer ordinal) {
 		return _tourTrack.getColor(pos, ordinal);
 	}
@@ -60,14 +39,10 @@ public class TrackPathViewport extends MultiResolutionPath implements ITrackPath
 	public Path getPath() {
 		return this;
 	}
+
 	@Override
 	public PositionColors getPathPositionColors() {
 		return positionColors;
-	}
-
-	@Override
-	public List<Color> getPathTessellatedColors() {
-		return getCurrentPathData().getTessellatedColors();
 	}
 
 	@Override
@@ -76,45 +51,9 @@ public class TrackPathViewport extends MultiResolutionPath implements ITrackPath
 	}
 
 	@Override
-	public void resetPathTessellatedColors() {
-
-		final PathData currentPathData = getCurrentPathData();
-
-		/*
-		 * can be null when not initialized, this happened when a tour is reselected but not yet
-		 * displayed
-		 */
-		if (currentPathData != null) {
-			currentPathData.setTessellatedColors(null);
-		}
-	}
-
-	@Override
-	public void setPathHighlighted(final boolean isHighlighted) {
-		setHighlighted(isHighlighted);
-	}
-
-	@Override
-	public void setPathPositionColors(final PositionColors positionColors) {
-		this.positionColors = positionColors;
-	}
-
-	@Override
 	public void setPicked(final boolean isPicked, final Integer pickPositionIndex) {
 
 		_tourTrack.setHovered(isPicked, pickPositionIndex);
-
-		if (isPicked == false) {
-
-			/*
-			 * This hack prevents an tess color NPE, it took me many days to understand 3D drawing
-			 * and find this "solution".
-			 */
-			getCurrentPathData().setTessellatedPositions(null);
-		}
-
-		// after picking, ensure that the positions colors are set again
-		getCurrentPathData().setExpired(true);
 	}
 
 	@Override
@@ -122,16 +61,4 @@ public class TrackPathViewport extends MultiResolutionPath implements ITrackPath
 		_tourTrack = tourTrack;
 	}
 
-	@Override
-	protected boolean shouldUseVBOs(final DrawContext dc) {
-
-		final List<Position> tessellatedPositions = this.getCurrentPathData().getTessellatedPositions();
-
-		// NPE can occure
-		if (tessellatedPositions == null) {
-			return true;
-		}
-
-		return tessellatedPositions.size() > VBO_THRESHOLD && super.shouldUseVBOs(dc);
-	}
 }

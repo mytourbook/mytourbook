@@ -46,7 +46,7 @@ public class ColorCacheAWT {
 		final int green = (colorValue & 0xFF00) >>> 8;
 		final int blue = (colorValue & 0xFF0000) >>> 16;
 
-		final int opacity = 0xf0;
+		final int opacity = 0x80;
 		color = new Color(red, green, blue, opacity);
 //		color = new Color(red, green, blue);
 

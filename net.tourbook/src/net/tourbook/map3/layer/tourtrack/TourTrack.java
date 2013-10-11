@@ -42,8 +42,6 @@ public class TourTrack {
 
 	private int							_tourTrackHoverIndex;
 
-	private PositionColors				_originalPositionColors;
-
 	public TourTrack(	final ITrackPath trackPath,
 						final TourData tourData,
 						final ArrayList<TourMap3Position> trackPositions,
@@ -64,7 +62,7 @@ public class TourTrack {
 		if (_isHovered) {
 
 			// prevent setting position colors
-			return null;
+//			return null;
 		}
 
 		final PositionColors positionColors = _trackPath.getPathPositionColors();
@@ -75,11 +73,7 @@ public class TourTrack {
 
 			if (_colorProvider instanceof IGradientColors) {
 
-				return tourPosColors.getGradientColor(
-						trackPosition.dataSerieValue,
-						ordinal,
-						_isHovered,
-						_tourTrackHoverIndex);
+				return tourPosColors.getGradientColor(trackPosition.dataSerieValue, ordinal, _tourTrackHoverIndex);
 
 			} else if (_colorProvider instanceof IDiscreteColors) {
 
@@ -102,20 +96,6 @@ public class TourTrack {
 		return _trackPositionsList;
 	}
 
-	void hackResetPositionColors() {
-
-		_trackPath.resetPathTessellatedColors();
-
-		final PositionColors positionColors = _trackPath.getPathPositionColors();
-
-		if (positionColors != null) {
-
-			_originalPositionColors = positionColors;
-
-			_trackPath.setPathPositionColors(null);
-		}
-	}
-
 	boolean isHovered() {
 		return _isHovered;
 	}
@@ -132,22 +112,6 @@ public class TourTrack {
 			_tourTrackHoverIndex = -1;
 		} else {
 			_tourTrackHoverIndex = hoveredTrackIndex;
-		}
-
-		if (isHovered || _isSelected) {
-
-			// tour IS hovered or selected
-
-			hackResetPositionColors();
-
-		} else {
-
-			// tour is NOT hovered or selected
-
-			if (_originalPositionColors != null) {
-
-				_trackPath.setPathPositionColors(_originalPositionColors);
-			}
 		}
 	}
 

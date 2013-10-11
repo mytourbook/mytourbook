@@ -202,10 +202,10 @@ public class TourTrackLayer extends RenderableLayer implements SelectListener, I
 			_selectedTrackPath.getTourTrack().setSelected(true);
 
 			// hide position color that highlighted colors are displayed, this is a hack
-			_selectedTrackPath.getTourTrack().hackResetPositionColors();
+//			_selectedTrackPath.getTourTrack().hackResetPositionColors();
 
 			setPathHighlighAttributes(_selectedTrackPath);
-			_selectedTrackPath.setPathHighlighted(true);
+//			_selectedTrackPath.setPathHighlighted(true);
 		}
 
 //		System.out.println(UI.timeStampNano() + " showTour\t" + (System.currentTimeMillis() - start) + " ms");
@@ -368,6 +368,19 @@ public class TourTrackLayer extends RenderableLayer implements SelectListener, I
 									final String eventAction,
 									final boolean isFireSelection) {
 
+//		System.out.println(UI.timeStampNano()
+//				+ " ["
+//				+ getClass().getSimpleName()
+//				+ "] \t"
+//				+ hoveredTrackPath
+//				+ "\t"
+//				+ hoveredPositionIndex
+//				+ "\t"
+//				+ eventAction
+//				+ "\t"
+//				+ isFireSelection);
+//// TODO remove SYSTEM.OUT.PRINTLN
+
 		final ITrackPath backupSelectedTrackPath = _selectedTrackPath;
 
 		if (eventAction == SelectEvent.LEFT_CLICK) {
@@ -383,7 +396,7 @@ public class TourTrackLayer extends RenderableLayer implements SelectListener, I
 
 			// updated colors
 
-			selectTrackPath_Hovered_WithAttributeColor(hoveredTrackPath);
+//			selectTrackPath_Hovered_WithAttributeColor(hoveredTrackPath);
 			selectTrackPath_Hovered_WithPositionColor(hoveredTrackPath, hoveredPositionIndex);
 
 			_lastHoveredTourTrack = hoveredTrackPath;
@@ -504,19 +517,17 @@ public class TourTrackLayer extends RenderableLayer implements SelectListener, I
 
 		// Turn off highlight if on.
 		if (_lastHoveredTourTrack != null && _lastHoveredTourTrack.getTourTrack().isSelected() == false) {
-			_lastHoveredTourTrack.setPathHighlighted(false);
+//			_lastHoveredTourTrack.setPathHighlighted(false);
 		}
 
-		// Turn on highlight if object selected.
+		// Turn on highlight if object is selected.
 		if (hoveredTrack != null) {
-			hoveredTrack.setPathHighlighted(true);
+//			hoveredTrack.setPathHighlighted(true);
 		}
 	}
 
 	private void selectTrackPath_Hovered_WithPositionColor(	final ITrackPath hoveredTrack,
 															final Integer hoveredPositionIndex) {
-
-		boolean isRedraw = false;
 
 		if (hoveredTrack == null) {
 
@@ -532,7 +543,6 @@ public class TourTrackLayer extends RenderableLayer implements SelectListener, I
 
 				_lastHoveredTourTrack.setPicked(false, null);
 				setPathHighlighAttributes(_lastHoveredTourTrack);
-				isRedraw = true;
 			}
 
 		} else {
@@ -545,7 +555,6 @@ public class TourTrackLayer extends RenderableLayer implements SelectListener, I
 
 				hoveredTrack.setPicked(true, hoveredPositionIndex);
 				setPathHighlighAttributes(hoveredTrack);
-				isRedraw = true;
 
 			} else {
 
@@ -561,7 +570,6 @@ public class TourTrackLayer extends RenderableLayer implements SelectListener, I
 
 						hoveredTrack.setPicked(true, hoveredPositionIndex);
 						setPathHighlighAttributes(hoveredTrack);
-						isRedraw = true;
 
 					} else {
 
@@ -573,7 +581,6 @@ public class TourTrackLayer extends RenderableLayer implements SelectListener, I
 
 							hoveredTrack.setPicked(true, null);
 							setPathHighlighAttributes(hoveredTrack);
-							isRedraw = true;
 
 						} else {
 
@@ -587,7 +594,6 @@ public class TourTrackLayer extends RenderableLayer implements SelectListener, I
 
 								hoveredTrack.setPicked(true, hoveredPositionIndex);
 								setPathHighlighAttributes(hoveredTrack);
-								isRedraw = true;
 							}
 						}
 					}
@@ -604,13 +610,8 @@ public class TourTrackLayer extends RenderableLayer implements SelectListener, I
 					hoveredTrack.setPicked(true, hoveredPositionIndex);
 					setPathHighlighAttributes(hoveredTrack);
 
-					isRedraw = true;
 				}
 			}
-		}
-
-		if (isRedraw) {
-			Map3Manager.redrawMap();
 		}
 	}
 
@@ -676,6 +677,8 @@ public class TourTrackLayer extends RenderableLayer implements SelectListener, I
 		path.setAttributes(_normalAttributes);
 
 		setPathHighlighAttributes(trackPath);
+
+		path.setEnableDepthOffset(true);
 	}
 
 	/**
@@ -779,12 +782,11 @@ public class TourTrackLayer extends RenderableLayer implements SelectListener, I
 	private void setPathHighlighAttributes(final ITrackPath trackPath) {
 
 		final TourTrack tourTrack = trackPath.getTourTrack();
-		final Path path = trackPath.getPath();
 
 		final boolean isHovered = tourTrack.isHovered();
 		final boolean isSelected = tourTrack.isSelected();
 
-		final ShapeAttributes highlightAttrs;
+		final ShapeAttributes shapeAttrs;
 
 		// defaults are for selected/hovered
 		boolean isShowPositions;
@@ -792,7 +794,7 @@ public class TourTrackLayer extends RenderableLayer implements SelectListener, I
 
 		if (isHovered && isSelected) {
 
-			highlightAttrs = _hovselAttributes;
+			shapeAttrs = _hovselAttributes;
 
 			positionsScale = _trackConfig.trackPositionSizeHovered;
 			isShowPositions = positionsScale == 0.0 ? false : true;
@@ -801,14 +803,14 @@ public class TourTrackLayer extends RenderableLayer implements SelectListener, I
 
 			if (isHovered) {
 
-				highlightAttrs = _hoveredAttributes;
+				shapeAttrs = _hoveredAttributes;
 
 				positionsScale = _trackConfig.trackPositionSizeHovered;
 				isShowPositions = positionsScale == 0.0 ? false : true;
 
 			} else if (isSelected) {
 
-				highlightAttrs = _selecedAttributes;
+				shapeAttrs = _selecedAttributes;
 
 				positionsScale = _trackConfig.trackPositionSizeSelected;
 				isShowPositions = positionsScale == 0.0 ? false : true;
@@ -817,17 +819,20 @@ public class TourTrackLayer extends RenderableLayer implements SelectListener, I
 
 				// not hovered and not selected => normal
 
-				highlightAttrs = _normalAttributes;
+				shapeAttrs = _normalAttributes;
 
 				isShowPositions = _trackConfig.isShowTrackPosition;
 				positionsScale = _trackConfig.trackPositionSize;
 			}
 		}
 
+		final Path path = trackPath.getPath();
+
 		path.setShowPositions(isShowPositions);
 		path.setShowPositionsScale(positionsScale / _trackConfig.outlineWidth);
 
-		path.setHighlightAttributes(highlightAttrs);
+//		path.setHighlightAttributes(shapeAttrs);
+//		path.setAttributes(shapeAttrs);
 	}
 
 	private void setupWWSelectionListener(final boolean isLayerVisible) {
