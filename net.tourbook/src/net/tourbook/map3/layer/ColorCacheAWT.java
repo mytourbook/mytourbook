@@ -22,6 +22,7 @@ import java.awt.Color;
 public class ColorCacheAWT {
 
 	private TIntObjectHashMap<Color>	_colors	= new TIntObjectHashMap<Color>();
+	private int							_opacity;
 
 	/**
 	 * Removes existing color values from the cache.
@@ -46,13 +47,18 @@ public class ColorCacheAWT {
 		final int green = (colorValue & 0xFF00) >>> 8;
 		final int blue = (colorValue & 0xFF0000) >>> 16;
 
-		final int opacity = 0x80;
-		color = new Color(red, green, blue, opacity);
-//		color = new Color(red, green, blue);
+		color = new Color(red, green, blue, _opacity);
 
 		_colors.put(colorValue, color);
 
 		return color;
+	}
+
+	public void setOpacity(final double opacity) {
+
+		_opacity = (int) (opacity * 255);
+
+		_colors.clear();
 	}
 
 }

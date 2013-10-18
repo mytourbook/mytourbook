@@ -27,17 +27,9 @@ public interface ITrackPath {
 
 	PositionColors getPathPositionColors();
 
-//	List<Color> getPathTessellatedColors();
-
 	TourTrack getTourTrack();
-
-//	void resetPathTessellatedColors();
-
-//	void setPathHighlighted(boolean isHighlighted);
-
-//	void setPathPositionColors(PositionColors positionColors);
 
 	void setPicked(boolean isPicked, Integer pickPositionIndex);
 
-	void setTourTrack(TourTrack tourTrack);
+	void setTourTrack(TourTrack tourTrack, TourTrackConfig tourTrackConfig);
 }

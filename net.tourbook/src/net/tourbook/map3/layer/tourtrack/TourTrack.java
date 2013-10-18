@@ -128,4 +128,14 @@ public class TourTrack {
 		;
 	}
 
+	void updateColors(final double trackOpacity) {
+
+		final PositionColors positionColors = _trackPath.getPathPositionColors();
+		if (positionColors instanceof TourPositionColors) {
+
+			final TourPositionColors tourPosColors = (TourPositionColors) positionColors;
+			tourPosColors.updateColors(trackOpacity);
+		}
+	}
+
 }

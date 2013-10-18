@@ -23,7 +23,8 @@ import java.util.ArrayList;
 
 public class TrackPathHighResolution extends Path implements ITrackPath {
 
-	private TourTrack	_tourTrack;
+	private TourTrack		_tourTrack;
+	private TourTrackConfig	_tourTrackConfig;
 
 	public TrackPathHighResolution(final ArrayList<TourMap3Position> trackPositions) {
 		super(trackPositions);
@@ -56,8 +57,10 @@ public class TrackPathHighResolution extends Path implements ITrackPath {
 	}
 
 	@Override
-	public void setTourTrack(final TourTrack tourTrack) {
+	public void setTourTrack(final TourTrack tourTrack, final TourTrackConfig tourTrackConfig) {
+
 		_tourTrack = tourTrack;
+		_tourTrackConfig = tourTrackConfig;
 	}
 
 }

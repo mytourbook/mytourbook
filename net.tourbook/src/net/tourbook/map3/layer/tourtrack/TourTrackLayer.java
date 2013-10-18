@@ -175,7 +175,7 @@ public class TourTrackLayer extends RenderableLayer implements SelectListener, I
 
 			final TourTrack tourTrack = new TourTrack(trackPath, tourData, trackPositions, _colorProvider);
 
-			trackPath.setTourTrack(tourTrack);
+			trackPath.setTourTrack(tourTrack, _trackConfig);
 
 			// Show how to make the colors vary along the paths.
 			trackPath.getPath().setPositionColors(_tourPositionColors);
@@ -629,6 +629,9 @@ public class TourTrackLayer extends RenderableLayer implements SelectListener, I
 	 * @param path
 	 */
 	private void setPathAttributes(final ITrackPath trackPath) {
+
+		// force the track colors to be recreated, opacity can habe been changed
+		trackPath.getTourTrack().updateColors(_trackConfig.trackOpacity);
 
 		final Path path = trackPath.getPath();
 

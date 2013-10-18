@@ -126,7 +126,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 
 	public static final String					ID										= "net.tourbook.map3.view.Map3ViewId";		//$NON-NLS-1$
 
-	private static final String					STATE_IS_CHART_SLIDERVISIBLE			= "STATE_IS_CHART_SLIDERVISIBLE";			//$NON-NLS-1$
+	private static final String					STATE_IS_CHART_SLIDER_VISIBLE			= "STATE_IS_CHART_SLIDERVISIBLE";			//$NON-NLS-1$
 
 	private static final String					STATE_IS_LEGEND_VISIBLE					= "STATE_IS_LEGEND_VISIBLE";				//$NON-NLS-1$
 	private static final String					STATE_IS_SYNC_MAP_VIEW_WITH_TOUR		= "STATE_IS_SYNC_MAP_VIEW_WITH_TOUR";		//$NON-NLS-1$
@@ -1345,7 +1345,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 		Map3Manager.setLayerVisible_Legend(_isLegendVisible);
 
 		// is chart slider visible
-		_isChartSliderVisible = Util.getStateBoolean(_state, STATE_IS_CHART_SLIDERVISIBLE, true);
+		_isChartSliderVisible = Util.getStateBoolean(_state, STATE_IS_CHART_SLIDER_VISIBLE, true);
 		_actionShowChartSliderInMap.setChecked(_isChartSliderVisible);
 		Map3Manager.setLayerVisible_ChartSlider(_isChartSliderVisible);
 
@@ -1414,9 +1414,10 @@ public class Map3View extends ViewPart implements ITourProvider {
 			return;
 		}
 
+		_state.put(STATE_IS_CHART_SLIDER_VISIBLE, _isChartSliderVisible);
+		_state.put(STATE_IS_LEGEND_VISIBLE, _isLegendVisible);
 		_state.put(STATE_IS_SYNC_MAP_POSITION_WITH_SLIDER, _isSyncMapWithChartSlider);
 		_state.put(STATE_IS_SYNC_MAP_VIEW_WITH_TOUR, _isSyncMapViewWithTour);
-		_state.put(STATE_IS_LEGEND_VISIBLE, _isLegendVisible);
 		_state.put(STATE_IS_TOUR_VISIBLE, _isTourVisible);
 
 		_state.put(STATE_TOUR_COLOR_ID, _tourColorId.name());
@@ -1427,6 +1428,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 	}
 
 	private void setAnnotationColors(final TourData tourData, final int positionIndex, final GlobeAnnotation trackPoint) {
+
 		final Color bgColor;
 		final Color fgColor;
 

@@ -53,20 +53,20 @@ public class MTMultiResolutionPath extends MultiResolutionPath {
 	@Override
 	protected void makePositions(final DrawContext dc, final PathData pathData) {
 
-		final Iterator<? extends Position> iter = this.positions.iterator();
+		final Iterator<? extends Position> iter = positions.iterator();
 		Position posA = iter.next();
 		int ordinalA = 0;
-		Color colorA = this.getColor(posA, ordinalA);
+		Color colorA = getColor(posA, ordinalA);
 
-		this.addTessellatedPosition(posA, colorA, ordinalA, pathData); // add the first position of the path
+		addTessellatedPosition(posA, colorA, ordinalA, pathData); // add the first position of the path
 
-		final int skipCount = this.skipCountComputer.computeSkipCount(dc, pathData);
+		final int skipCount = skipCountComputer.computeSkipCount(dc, pathData);
 
 //		System.out.println(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] \tskipCount: " + skipCount);
 //		// TODO remove SYSTEM.OUT.PRINTLN
 
 		// Tessellate each segment of the path.
-		Vec4 ptA = this.computePoint(dc.getTerrain(), posA);
+		Vec4 ptA = computePoint(dc.getTerrain(), posA);
 
 		for (int i = 1; iter.hasNext(); i++) {
 
@@ -78,21 +78,21 @@ public class MTMultiResolutionPath extends MultiResolutionPath {
 
 //			final int ordinalB = ordinalA + 1;
 			final int ordinalB = i;
-			final Color colorB = this.getColor(posB, ordinalB);
-			final Vec4 ptB = this.computePoint(dc.getTerrain(), posB);
+			final Color colorB = getColor(posB, ordinalB);
+			final Vec4 ptB = computePoint(dc.getTerrain(), posB);
 
 			// If the segment is very small or not visible, don't tessellate, just add the segment's end position.
-			if (this.isSmall(dc, ptA, ptB, 8)) {
+			if (isSmall(dc, ptA, ptB, 8)) {
 
 				continue;
 
-			} else if (!this.isSegmentVisible(dc, posA, posB, ptA, ptB)) {
+			} else if (!isSegmentVisible(dc, posA, posB, ptA, ptB)) {
 
-				this.addTessellatedPosition(posB, colorB, ordinalB, pathData);
+				addTessellatedPosition(posB, colorB, ordinalB, pathData);
 
 			} else {
 
-				this.makeSegment(dc, posA, posB, ptA, ptB, colorA, colorB, ordinalA, ordinalB, pathData);
+				makeSegment(dc, posA, posB, ptA, ptB, colorA, colorB, ordinalA, ordinalB, pathData);
 			}
 
 			posA = posB;

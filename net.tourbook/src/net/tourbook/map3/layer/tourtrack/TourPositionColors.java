@@ -90,4 +90,9 @@ class TourPositionColors implements Path.PositionColors {
 		}
 	}
 
+	void updateColors(final double trackOpacity) {
+
+		_awtColorCache.setOpacity(trackOpacity);
+	}
+
 }

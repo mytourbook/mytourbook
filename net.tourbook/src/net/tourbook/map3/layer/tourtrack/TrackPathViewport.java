@@ -24,7 +24,8 @@ import java.util.ArrayList;
 
 public class TrackPathViewport extends MultiResolutionPath implements ITrackPath {
 
-	private TourTrack	_tourTrack;
+	private TourTrack		_tourTrack;
+	private TourTrackConfig	_tourTrackConfig;
 
 	public TrackPathViewport(final ArrayList<TourMap3Position> trackPositions) {
 		super(trackPositions);
@@ -57,8 +58,10 @@ public class TrackPathViewport extends MultiResolutionPath implements ITrackPath
 	}
 
 	@Override
-	public void setTourTrack(final TourTrack tourTrack) {
+	public void setTourTrack(final TourTrack tourTrack, final TourTrackConfig tourTrackConfig) {
+
 		_tourTrack = tourTrack;
+		_tourTrackConfig = tourTrackConfig;
 	}
 
 }

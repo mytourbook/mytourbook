@@ -127,6 +127,7 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 	private Spinner					_spinnerOutlineOpacityHovSel;
 	private Spinner					_spinnerOutlineOpacitySelected;
 	private Spinner					_spinnerOutlineWidth;
+	private Spinner					_spinnerTrackOpacity;
 	private Spinner					_spinnerTrackPositionSize;
 	private Spinner					_spinnerTrackPositionSizeHovered;
 	private Spinner					_spinnerTrackPositionSizeSelected;
@@ -405,17 +406,24 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 			_lblTrackColor.setText(Messages.TourTrack_Properties_Label_TrackColor);
 			_lblTrackColor.setToolTipText(Messages.TourTrack_Properties_Label_TrackColor_Tooltip);
 
-			/*
-			 * Button: Track color
-			 */
-			_btnTrackColor = new Button(parent, SWT.PUSH);
-			_btnTrackColor.setImage(net.tourbook.ui.UI.IMAGE_REGISTRY.get(net.tourbook.ui.UI.GRAPH_ALTITUDE));
-			_btnTrackColor.addSelectionListener(new SelectionAdapter() {
-				@Override
-				public void widgetSelected(final SelectionEvent e) {
-					onSelectTrackColor();
-				}
-			});
+			final Composite container = new Composite(parent, SWT.NONE);
+			GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+			GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+			{
+				/*
+				 * Button: Track color
+				 */
+				_btnTrackColor = new Button(container, SWT.PUSH);
+				_btnTrackColor.setImage(net.tourbook.ui.UI.IMAGE_REGISTRY.get(net.tourbook.ui.UI.GRAPH_ALTITUDE));
+				_btnTrackColor.addSelectionListener(new SelectionAdapter() {
+					@Override
+					public void widgetSelected(final SelectionEvent e) {
+						onSelectTrackColor();
+					}
+				});
+
+				_spinnerTrackOpacity = createUI_ColorOpacity(container);
+			}
 		}
 
 		/*
@@ -949,6 +957,9 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 
 		_trackConfig = Map3Manager.getLayer_TourTrack().getConfig();
 
+		// track
+		_spinnerTrackOpacity.setSelection((int) (_trackConfig.trackOpacity * 100));
+
 		// line color
 		_spinnerOutlineWidth.setSelection((int) (_trackConfig.outlineWidth));
 		_colorOutlineColorHovSel.setColorValue(_trackConfig.outlineColorHovSel);
@@ -1016,6 +1027,9 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 		final int altitudeOffsetMetric = (int) (_spinnerAltitudeOffsetDistance.getSelection() * net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE);
 
 		// update config
+
+		// track
+		_trackConfig.trackOpacity = _spinnerTrackOpacity.getSelection() / 100.0;
 
 		// line
 		_trackConfig.outlineWidth = _spinnerOutlineWidth.getSelection();

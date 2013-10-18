@@ -48,6 +48,7 @@ public class TourTrackConfig {
 	private static final String				STATE_OUTLINE_OPACITY_SELECTED		= "STATE_OUTLINE_OPACITY_SELECTED";	//$NON-NLS-1$
 	private static final String				STATE_OUTLINE_WIDTH					= "STATE_OUTLINE_WIDTH";				//$NON-NLS-1$
 	private static final String				STATE_PATH_RESOLUTION				= "STATE_PATH_RESOLUTION";				//$NON-NLS-1$
+	private static final String				STATE_TRACK_OPACITY					= "STATE_TRACK_OPACITY";				//$NON-NLS-1$
 	private static final String				STATE_TRACK_POSITION_SIZE			= "STATE_TRACK_POSITION_SIZE";			//$NON-NLS-1$
 	private static final String				STATE_TRACK_POSITION_SIZE_HOVERED	= "STATE_TRACK_POSITION_SIZE_HOVERED";	//$NON-NLS-1$
 	private static final String				STATE_TRACK_POSITION_SIZE_SELECTED	= "STATE_TRACK_POSITION_SIZE_SELECTED"; //$NON-NLS-1$
@@ -118,6 +119,7 @@ public class TourTrackConfig {
 	// UI is currently disabled, subsegments == 0
 	public int								numSubsegments;
 
+	public double							trackOpacity;
 	public double							trackPositionSize;
 	public double							trackPositionSizeHovered;
 	public double							trackPositionSizeSelected;
@@ -190,6 +192,8 @@ public class TourTrackConfig {
 		final RGB hovSelRGB = new RGB(0xff, 0x0, 0xff);
 		final RGB selectedRGB = new RGB(0xFF, 0xff, 0xff);
 
+		trackOpacity = Util.getStateDouble(state, STATE_TRACK_OPACITY, 0.5);
+
 		pathResolution = Util.getStateInt(state, STATE_PATH_RESOLUTION, PATH_RESOLUTION_OPTIMIZED);
 
 		outlineWidth = Util.getStateDouble(state, STATE_OUTLINE_WIDTH, 1.0);
@@ -232,6 +236,8 @@ public class TourTrackConfig {
 	}
 
 	void saveState(final IDialogSettings state) {
+
+		state.put(STATE_TRACK_OPACITY, trackOpacity);
 
 		state.put(STATE_PATH_RESOLUTION, pathResolution);
 
