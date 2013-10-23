@@ -15,12 +15,12 @@
  *******************************************************************************/
 package net.tourbook.map3.layer.tourtrack;
 
-public class AltitudeMode {
+public class ComboEntry {
 
 	public String	label;
 	public int		value;
 
-	public AltitudeMode(final String label, final int value) {
+	public ComboEntry(final String label, final int value) {
 
 		this.label = label;
 		this.value = value;

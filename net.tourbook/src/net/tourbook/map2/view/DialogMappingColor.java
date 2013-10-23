@@ -265,9 +265,10 @@ public class DialogMappingColor extends TitleAreaDialog {
 			final Composite valueContainer = new Composite(dlgContainer, SWT.NONE);
 			GridLayoutFactory.fillDefaults().numColumns(1).applyTo(valueContainer);
 			GridDataFactory.fillDefaults().grab(true, false).applyTo(valueContainer);
+//			valueContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_MAGENTA));
 			{
-				createUI_30_Brightness(valueContainer);
-				createUI_40_MinMaxValue(valueContainer);
+				createUI_30_MinMaxValue(valueContainer);
+				createUI_40_Brightness(valueContainer);
 
 				createUI_50_Apply(valueContainer);
 
@@ -277,74 +278,7 @@ public class DialogMappingColor extends TitleAreaDialog {
 		}
 	}
 
-	private void createUI_30_Brightness(final Composite parent) {
-
-		Label label;
-
-		final Group group = new Group(parent, SWT.NONE);
-		group.setText(Messages.legendcolor_dialog_group_minmax_brightness);
-		GridLayoutFactory.swtDefaults().numColumns(4).applyTo(group);
-		GridDataFactory.fillDefaults().grab(true, false).indent(0, 0).applyTo(group);
-		{
-			/*
-			 * combobox: max brightness
-			 */
-
-			label = new Label(group, SWT.NONE);
-			label.setText(Messages.legendcolor_dialog_max_brightness_label);
-			label.setToolTipText(Messages.legendcolor_dialog_max_brightness_tooltip);
-
-			_cboMaxBrightness = new Combo(group, SWT.DROP_DOWN | SWT.READ_ONLY);
-			_cboMaxBrightness.addSelectionListener(_defaultSelectionAdapter);
-			for (final String comboLabel : MapColor.BRIGHTNESS_LABELS) {
-				_cboMaxBrightness.add(comboLabel);
-			}
-
-			/*
-			 * scale: max brightness factor
-			 */
-			_scaleMaxBrightness = new Scale(group, SWT.NONE);
-			GridDataFactory.fillDefaults().grab(true, false).applyTo(_scaleMaxBrightness);
-			_scaleMaxBrightness.setMinimum(0);
-			_scaleMaxBrightness.setMaximum(100);
-			_scaleMaxBrightness.setPageIncrement(10);
-			_scaleMaxBrightness.addSelectionListener(_defaultSelectionAdapter);
-
-			_lblMaxBrightnessValue = new Label(group, SWT.NONE);
-			_lblMaxBrightnessValue.setText(VALUE_SPACER);
-			_lblMaxBrightnessValue.pack(true);
-
-			/*
-			 * combobox: min brightness
-			 */
-
-			label = new Label(group, SWT.NONE);
-			label.setText(Messages.legendcolor_dialog_min_brightness_label);
-			label.setToolTipText(Messages.legendcolor_dialog_min_brightness_tooltip);
-
-			_cboMinBrightness = new Combo(group, SWT.DROP_DOWN | SWT.READ_ONLY);
-			_cboMinBrightness.addSelectionListener(_defaultSelectionAdapter);
-			for (final String comboLabel : MapColor.BRIGHTNESS_LABELS) {
-				_cboMinBrightness.add(comboLabel);
-			}
-
-			/*
-			 * scale: min brightness factor
-			 */
-			_scaleMinBrightness = new Scale(group, SWT.NONE);
-			GridDataFactory.fillDefaults().grab(true, false).applyTo(_scaleMinBrightness);
-			_scaleMinBrightness.setMinimum(0);
-			_scaleMinBrightness.setMaximum(100);
-			_scaleMinBrightness.setPageIncrement(10);
-			_scaleMinBrightness.addSelectionListener(_defaultSelectionAdapter);
-
-			_lblMinBrightnessValue = new Label(group, SWT.NONE);
-			_lblMinBrightnessValue.setText(VALUE_SPACER);
-			_lblMinBrightnessValue.pack(true);
-		}
-	}
-
-	private void createUI_40_MinMaxValue(final Composite parent) {
+	private void createUI_30_MinMaxValue(final Composite parent) {
 
 		final Group group = new Group(parent, SWT.NONE);
 		group.setText(Messages.legendcolor_dialog_group_minmax_value);
@@ -430,11 +364,88 @@ public class DialogMappingColor extends TitleAreaDialog {
 		}
 	}
 
+	private void createUI_40_Brightness(final Composite parent) {
+
+		Label label;
+
+		final Group group = new Group(parent, SWT.NONE);
+		group.setText(Messages.legendcolor_dialog_group_minmax_brightness);
+		GridLayoutFactory.swtDefaults().numColumns(4).applyTo(group);
+		GridDataFactory.fillDefaults().grab(true, false).indent(0, 0).applyTo(group);
+		{
+			{
+				/*
+				 * combobox: min brightness
+				 */
+
+				label = new Label(group, SWT.NONE);
+				label.setText(Messages.legendcolor_dialog_min_brightness_label);
+				label.setToolTipText(Messages.legendcolor_dialog_min_brightness_tooltip);
+
+				_cboMinBrightness = new Combo(group, SWT.DROP_DOWN | SWT.READ_ONLY);
+				_cboMinBrightness.addSelectionListener(_defaultSelectionAdapter);
+				for (final String comboLabel : MapColor.BRIGHTNESS_LABELS) {
+					_cboMinBrightness.add(comboLabel);
+				}
+
+				/*
+				 * scale: min brightness factor
+				 */
+				_scaleMinBrightness = new Scale(group, SWT.NONE);
+				GridDataFactory.fillDefaults().grab(true, false).applyTo(_scaleMinBrightness);
+				_scaleMinBrightness.setMinimum(0);
+				_scaleMinBrightness.setMaximum(100);
+				_scaleMinBrightness.setPageIncrement(10);
+				_scaleMinBrightness.addSelectionListener(_defaultSelectionAdapter);
+
+				_lblMinBrightnessValue = new Label(group, SWT.NONE);
+				_lblMinBrightnessValue.setText(VALUE_SPACER);
+				_lblMinBrightnessValue.pack(true);
+			}
+
+			{
+				/*
+				 * combobox: max brightness
+				 */
+
+				label = new Label(group, SWT.NONE);
+				label.setText(Messages.legendcolor_dialog_max_brightness_label);
+				label.setToolTipText(Messages.legendcolor_dialog_max_brightness_tooltip);
+
+				_cboMaxBrightness = new Combo(group, SWT.DROP_DOWN | SWT.READ_ONLY);
+				_cboMaxBrightness.addSelectionListener(_defaultSelectionAdapter);
+				for (final String comboLabel : MapColor.BRIGHTNESS_LABELS) {
+					_cboMaxBrightness.add(comboLabel);
+				}
+
+				/*
+				 * scale: max brightness factor
+				 */
+				_scaleMaxBrightness = new Scale(group, SWT.NONE);
+				GridDataFactory.fillDefaults().grab(true, false).applyTo(_scaleMaxBrightness);
+				_scaleMaxBrightness.setMinimum(0);
+				_scaleMaxBrightness.setMaximum(100);
+				_scaleMaxBrightness.setPageIncrement(10);
+				_scaleMaxBrightness.addSelectionListener(_defaultSelectionAdapter);
+
+				_lblMaxBrightnessValue = new Label(group, SWT.NONE);
+				_lblMaxBrightnessValue.setText(VALUE_SPACER);
+				_lblMaxBrightnessValue.pack(true);
+			}
+
+		}
+	}
+
 	private void createUI_50_Apply(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+		GridDataFactory.fillDefaults()//
+				.grab(true, true)
+				.indent(0, 20)
+				.align(SWT.FILL, SWT.END)
+				.applyTo(container);
 		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
 		{
 			/*
 			 * button: live update

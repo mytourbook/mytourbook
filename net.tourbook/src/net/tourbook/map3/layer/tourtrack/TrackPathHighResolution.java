@@ -24,6 +24,8 @@ import java.util.ArrayList;
 public class TrackPathHighResolution extends Path implements ITrackPath {
 
 	private TourTrack		_tourTrack;
+
+	@SuppressWarnings("unused")
 	private TourTrackConfig	_tourTrackConfig;
 
 	public TrackPathHighResolution(final ArrayList<TourMap3Position> trackPositions) {
@@ -48,6 +50,17 @@ public class TrackPathHighResolution extends Path implements ITrackPath {
 	@Override
 	public TourTrack getTourTrack() {
 		return _tourTrack;
+	}
+
+	@Override
+	public void setExpired() {
+
+		final AbstractShapeData pathData = getCurrentData();
+
+		// it was null when implementing and testing
+		if (pathData != null) {
+			pathData.setExpired(true);
+		}
 	}
 
 	@Override

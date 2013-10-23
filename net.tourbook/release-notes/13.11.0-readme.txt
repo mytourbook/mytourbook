@@ -1,0 +1,13 @@
+Version: 13.11.0                                       16. September 2013
+
+
+!!! enforce default values in tour track config !!!
+
+ * translation: check ALL these texts net.tourbook.map3.Messages.TourTrack_Properties_* because many are modified, some are new
+ I'm not planning to do this every release but I'm still learning OpenGL and it's possibilities.
+
+
+New 	
+ 
+
+* 

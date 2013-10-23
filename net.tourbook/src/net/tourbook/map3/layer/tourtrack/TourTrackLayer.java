@@ -631,7 +631,7 @@ public class TourTrackLayer extends RenderableLayer implements SelectListener, I
 	private void setPathAttributes(final ITrackPath trackPath) {
 
 		// force the track colors to be recreated, opacity can habe been changed
-		trackPath.getTourTrack().updateColors(_trackConfig.trackOpacity);
+		trackPath.getTourTrack().updateColors(_trackConfig.outlineOpacity);
 
 		final Path path = trackPath.getPath();
 
@@ -678,10 +678,14 @@ public class TourTrackLayer extends RenderableLayer implements SelectListener, I
 		setPathAttributes_Selected();
 
 		path.setAttributes(_normalAttributes);
-
 		setPathHighlighAttributes(trackPath);
 
 		path.setEnableDepthOffset(true);
+
+		/*
+		 * ensure that cached data are recreated, e.g. direction arrow size
+		 */
+		trackPath.setExpired();
 	}
 
 	/**
@@ -691,19 +695,19 @@ public class TourTrackLayer extends RenderableLayer implements SelectListener, I
 	 */
 	private void setPathAttributes_Hovered() {
 
-		final RGB interiorRGB = _trackConfig.interiorColorHovered;
-		final RGB outlineRGB = _trackConfig.outlineColorHovered;
+		final RGB interiorRGB = _trackConfig.interiorColor_Hovered;
+		final RGB outlineRGB = _trackConfig.outlineColor_Hovered;
 
 		final Color interiorColor = new Color(interiorRGB.red, interiorRGB.green, interiorRGB.blue);
 		final Color outlineColor = new Color(outlineRGB.red, outlineRGB.green, outlineRGB.blue);
 
 		_hoveredAttributes.setDrawOutline(true);
 		_hoveredAttributes.setOutlineWidth(_trackConfig.outlineWidth);
-		_hoveredAttributes.setOutlineOpacity(_trackConfig.outlineOpacityHovered);
+		_hoveredAttributes.setOutlineOpacity(_trackConfig.outlineOpacity_Hovered);
 		_hoveredAttributes.setOutlineMaterial(new Material(outlineColor));
 
 		_hoveredAttributes.setDrawInterior(true);
-		_hoveredAttributes.setInteriorOpacity(_trackConfig.interiorOpacityHovered);
+		_hoveredAttributes.setInteriorOpacity(_trackConfig.interiorOpacity_Hovered);
 		_hoveredAttributes.setInteriorMaterial(new Material(interiorColor));
 	}
 
@@ -714,19 +718,19 @@ public class TourTrackLayer extends RenderableLayer implements SelectListener, I
 	 */
 	private void setPathAttributes_HovSel() {
 
-		final RGB interiorRGB = _trackConfig.interiorColorHovSel;
-		final RGB outlineRGB = _trackConfig.outlineColorHovSel;
+		final RGB interiorRGB = _trackConfig.interiorColor_HovSel;
+		final RGB outlineRGB = _trackConfig.outlineColor_HovSel;
 
 		final Color interiorColor = new Color(interiorRGB.red, interiorRGB.green, interiorRGB.blue);
 		final Color outlineColor = new Color(outlineRGB.red, outlineRGB.green, outlineRGB.blue);
 
 		_hovselAttributes.setDrawOutline(true);
 		_hovselAttributes.setOutlineWidth(_trackConfig.outlineWidth);
-		_hovselAttributes.setOutlineOpacity(_trackConfig.outlineOpacityHovSel);
+		_hovselAttributes.setOutlineOpacity(_trackConfig.outlineOpacity_HovSel);
 		_hovselAttributes.setOutlineMaterial(new Material(outlineColor));
 
 		_hovselAttributes.setDrawInterior(true);
-		_hovselAttributes.setInteriorOpacity(_trackConfig.interiorOpacityHovSel);
+		_hovselAttributes.setInteriorOpacity(_trackConfig.interiorOpacity_HovSel);
 		_hovselAttributes.setInteriorMaterial(new Material(interiorColor));
 	}
 
@@ -737,17 +741,16 @@ public class TourTrackLayer extends RenderableLayer implements SelectListener, I
 	 */
 	private void setPathAttributes_Normal() {
 
-		/*
-		 * There is no outline color because tour track is painted with position colors, therefor
-		 * the interior color is set (but never displayed).
-		 */
 		final RGB interiorRGB = _trackConfig.interiorColor;
+		final RGB outlineRGB = _trackConfig.outlineColor;
+
 		final Color interiorColor = new Color(interiorRGB.red, interiorRGB.green, interiorRGB.blue);
+		final Color outlineColor = new Color(outlineRGB.red, outlineRGB.green, outlineRGB.blue);
 
 		_normalAttributes.setDrawOutline(true);
 		_normalAttributes.setOutlineWidth(_trackConfig.outlineWidth);
-		_normalAttributes.setOutlineOpacity(_trackConfig.interiorOpacity);
-		_normalAttributes.setOutlineMaterial(new Material(interiorColor));
+		_normalAttributes.setOutlineOpacity(_trackConfig.outlineOpacity);
+		_normalAttributes.setOutlineMaterial(new Material(outlineColor));
 
 		_normalAttributes.setDrawInterior(true);
 		_normalAttributes.setInteriorOpacity(_trackConfig.interiorOpacity);
@@ -761,19 +764,19 @@ public class TourTrackLayer extends RenderableLayer implements SelectListener, I
 	 */
 	private void setPathAttributes_Selected() {
 
-		final RGB interiorRGB = _trackConfig.interiorColorSelected;
-		final RGB outlineRGB = _trackConfig.outlineColorSelected;
+		final RGB interiorRGB = _trackConfig.interiorColor_Selected;
+		final RGB outlineRGB = _trackConfig.outlineColor_Selected;
 
 		final Color interiorColor = new Color(interiorRGB.red, interiorRGB.green, interiorRGB.blue);
 		final Color outlineColor = new Color(outlineRGB.red, outlineRGB.green, outlineRGB.blue);
 
 		_selecedAttributes.setDrawOutline(true);
 		_selecedAttributes.setOutlineWidth(_trackConfig.outlineWidth);
-		_selecedAttributes.setOutlineOpacity(_trackConfig.outlineOpacitySelected);
+		_selecedAttributes.setOutlineOpacity(_trackConfig.outlineOpacity_Selected);
 		_selecedAttributes.setOutlineMaterial(new Material(outlineColor));
 
 		_selecedAttributes.setDrawInterior(true);
-		_selecedAttributes.setInteriorOpacity(_trackConfig.interiorOpacitySelected);
+		_selecedAttributes.setInteriorOpacity(_trackConfig.interiorOpacity_Selected);
 		_selecedAttributes.setInteriorMaterial(new Material(interiorColor));
 	}
 
@@ -799,34 +802,31 @@ public class TourTrackLayer extends RenderableLayer implements SelectListener, I
 
 			shapeAttrs = _hovselAttributes;
 
-			positionsScale = _trackConfig.trackPositionSizeHovered;
+			positionsScale = _trackConfig.trackPositionSize_Hovered;
+			isShowPositions = positionsScale == 0.0 ? false : true;
+
+		} else if (isHovered) {
+
+			shapeAttrs = _hoveredAttributes;
+
+			positionsScale = _trackConfig.trackPositionSize_Hovered;
+			isShowPositions = positionsScale == 0.0 ? false : true;
+
+		} else if (isSelected) {
+
+			shapeAttrs = _selecedAttributes;
+
+			positionsScale = _trackConfig.trackPositionSize_Selected;
 			isShowPositions = positionsScale == 0.0 ? false : true;
 
 		} else {
 
-			if (isHovered) {
+			// not hovered and not selected => normal
 
-				shapeAttrs = _hoveredAttributes;
+			shapeAttrs = _normalAttributes;
 
-				positionsScale = _trackConfig.trackPositionSizeHovered;
-				isShowPositions = positionsScale == 0.0 ? false : true;
-
-			} else if (isSelected) {
-
-				shapeAttrs = _selecedAttributes;
-
-				positionsScale = _trackConfig.trackPositionSizeSelected;
-				isShowPositions = positionsScale == 0.0 ? false : true;
-
-			} else {
-
-				// not hovered and not selected => normal
-
-				shapeAttrs = _normalAttributes;
-
-				isShowPositions = _trackConfig.isShowTrackPosition;
-				positionsScale = _trackConfig.trackPositionSize;
-			}
+			isShowPositions = _trackConfig.isShowTrackPosition;
+			positionsScale = _trackConfig.trackPositionSize;
 		}
 
 		final Path path = trackPath.getPath();
@@ -834,8 +834,7 @@ public class TourTrackLayer extends RenderableLayer implements SelectListener, I
 		path.setShowPositions(isShowPositions);
 		path.setShowPositionsScale(positionsScale / _trackConfig.outlineWidth);
 
-//		path.setHighlightAttributes(shapeAttrs);
-//		path.setAttributes(shapeAttrs);
+		path.setHighlightAttributes(shapeAttrs);
 	}
 
 	private void setupWWSelectionListener(final boolean isLayerVisible) {

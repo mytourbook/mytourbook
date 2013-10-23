@@ -279,7 +279,18 @@ public class Map3View extends ViewPart implements ITourProvider {
 
 	public void actionSynchMapPositionWithSlider() {
 
-		_isSyncMapWithChartSlider = _actionSynMapWithChartSlider.isChecked();
+		final boolean isSync = _actionSynMapWithChartSlider.isChecked();
+
+		_isSyncMapWithChartSlider = isSync;
+
+		if (isSync) {
+
+			// ensure that the chart sliders are displayed
+
+			_actionShowChartSliderInMap.setChecked(true);
+
+//			actionShowChartSlider(true);
+		}
 	}
 
 	public void actionSynchMapViewWithTour() {

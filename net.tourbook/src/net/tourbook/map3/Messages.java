@@ -104,8 +104,16 @@ public class Messages extends NLS {
 	public static String		TourTrack_Properties_Label_CurtainColorSelected;
 	public static String		TourTrack_Properties_Label_CurtainColorSelected_Tooltip;
 	public static String		TourTrack_Properties_Label_DialogTitle;
+
+	public static String	TourTrack_Properties_Label_DirectionArrowSize;
+
+	public static String	TourTrack_Properties_Label_DirectionArrowSize_Tooltip;
 	public static String		TourTrack_Properties_Label_OutlineColorHovered;
 	public static String		TourTrack_Properties_Label_OutlineColorHovered_Tooltip;
+	public static String	TourTrack_Properties_Label_OutlineColor;
+
+	public static String	TourTrack_Properties_Label_OutlineColor_Tooltip;
+
 	public static String		TourTrack_Properties_Label_OutlineColorHovSel;
 	public static String		TourTrack_Properties_Label_OutlineColorHovSel_Tooltip;
 	public static String		TourTrack_Properties_Label_OutlineColorSelected;
@@ -127,6 +135,10 @@ public class Messages extends NLS {
 	public static String		Track_Config_Path_Resolution_High;
 	public static String		Track_Config_Path_Resolution_Optimized;
 	public static String		Track_Config_Path_Resolution_Viewport;
+
+	public static String	Track_Config_TrackColorMode_Solid;
+
+	public static String	Track_Config_TrackColorMode_Value;
 
 	static {
 		// initialize resource bundle

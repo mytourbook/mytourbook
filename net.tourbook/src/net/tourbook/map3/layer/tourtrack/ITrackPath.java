@@ -29,6 +29,11 @@ public interface ITrackPath {
 
 	TourTrack getTourTrack();
 
+	/**
+	 * Sets the path data expired.
+	 */
+	void setExpired();
+
 	void setPicked(boolean isPicked, Integer pickPositionIndex);
 
 	void setTourTrack(TourTrack tourTrack, TourTrackConfig tourTrackConfig);

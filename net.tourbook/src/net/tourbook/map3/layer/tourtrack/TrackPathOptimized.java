@@ -34,6 +34,7 @@ import java.util.List;
 
 import javax.media.opengl.GL;
 
+import net.tourbook.common.color.ColorUtil;
 import net.tourbook.map3.shape.MTMultiResolutionPath;
 
 import org.eclipse.swt.graphics.RGB;
@@ -42,44 +43,29 @@ import com.sun.opengl.util.BufferUtil;
 
 public class TrackPathOptimized extends MTMultiResolutionPath implements ITrackPath {
 
-	private static final int	SKIP_COUNTER			= 30;
+	private static final int	SKIP_COUNTER		= 30;
 
 	private TourTrack			_tourTrack;
 	private TourTrackConfig		_tourTrackConfig;
 
-	private static final String	ARROWS_KEY				= TrackPathOptimized.class.getName() + ".DirectionArrows";
-
-	/** Default arrow length, in meters. */
-	public static final double	DEFAULT_ARROW_LENGTH	= 300;
-
-	/** Default arrow angle. */
-	public static final Angle	DEFAULT_ARROW_ANGLE		= Angle.fromDegrees(45.0);
-
-	/** Default maximum screen size of the arrowheads, in pixels. */
-	public static final double	DEFAULT_MAX_SCREEN_SIZE	= 30.0;
+	private static final String	ARROW_BORDER_KEY	= TrackPathOptimized.class.getName() + ".ArrowBorder";
+	private static final String	ARROW_POSITION_KEY	= TrackPathOptimized.class.getName() + ".ArrowPosition";
+	private static final String	ARROW_SURFACE_KEY	= TrackPathOptimized.class.getName() + ".ArrowSurface";
 
 	/** The length, in meters, of the arrowhead, from tip to base. */
-	protected double			arrowLength				= DEFAULT_ARROW_LENGTH;
+	protected double			_arrowLength		= 30.0;
 
 	/** The angle of the arrowhead tip. */
-	protected Angle				arrowAngle				= DEFAULT_ARROW_ANGLE;
+	protected Angle				_arrowAngle			= Angle.fromDegrees(30.0);
 
-	/** The maximum screen size, in pixels, of the direction arrowheads. */
-	protected double			maxScreenSize			= DEFAULT_MAX_SCREEN_SIZE;
-	private TIntArrayList		_polePositionsIndizes;
+	private TIntArrayList		_arrowPositionIndizes;
 
-	protected static class MTPathData extends MultiResolutionPathData {
+	private int					_arrowPositionVboId;
+	private int					_arrowSurfaceVboId;
+	private int					_arrowBorderVboId;
 
-		protected FloatBuffer	renderedPath_Selected;
-
-		protected int			vertexStride_Selected;
-		protected int			vertexCount_Selected;
-
-		public MTPathData(final DrawContext dc, final Path shape) {
-			super(dc, shape);
-		}
-
-	}
+	private boolean				_isShowArrows		= true;
+	private int					_numberOfDirectionArrows;
 
 	public TrackPathOptimized(final ArrayList<TourMap3Position> trackPositions) {
 		super(trackPositions);
@@ -91,34 +77,37 @@ public class TrackPathOptimized extends MTMultiResolutionPath implements ITrackP
 												final FloatBuffer path,
 												final PathData pathData) {
 
-		computeAbsolutePoints_Selected(dc, positions, (MTPathData) pathData);
+		if (_isShowArrows) {
+
+			computeArrowPositions(dc, positions, pathData);
+			computeDirectionArrows(dc, pathData);
+		}
 
 		return super.computeAbsolutePoints(dc, positions, path, pathData);
 	}
 
-	private void computeAbsolutePoints_Selected(final DrawContext dc,
-												final List<Position> positions,
-												final MTPathData pathData) {
+	private void computeArrowPositions(final DrawContext dc, final List<Position> positions, final PathData pathData) {
 
-		final double poleEyeHeight = pathData.getEyeDistance() / 10.0;
+		final double poleEyeHeight = pathData.getEyeDistance() / 50.0;
 
 		final int elemsPerPoint = 3;
 		final int positionSize = positions.size();
 		final int polePositionSize = (positionSize / SKIP_COUNTER) + 3;
-		final int numPoints = polePositionSize * 2;
+		final int numPoints = polePositionSize * 1;
 
 		final int bufferSize = elemsPerPoint * numPoints;
-		FloatBuffer renderedPath = pathData.renderedPath_Selected;
+		FloatBuffer arrowPositions = (FloatBuffer) pathData.getValue(ARROW_POSITION_KEY);
 
-		if (renderedPath == null || renderedPath.capacity() < bufferSize) {
-			renderedPath = BufferUtil.newFloatBuffer(bufferSize);
+		if (arrowPositions == null || arrowPositions.capacity() < bufferSize) {
+			arrowPositions = BufferUtil.newFloatBuffer(bufferSize);
 		}
-		renderedPath.clear();
+		pathData.setValue(ARROW_POSITION_KEY, arrowPositions);
+		arrowPositions.clear();
 
-		if (_polePositionsIndizes == null || _polePositionsIndizes.size() < polePositionSize) {
-			_polePositionsIndizes = new TIntArrayList(polePositionSize);
+		if (_arrowPositionIndizes == null || _arrowPositionIndizes.size() < polePositionSize) {
+			_arrowPositionIndizes = new TIntArrayList(polePositionSize);
 		}
-		_polePositionsIndizes.clear();
+		_arrowPositionIndizes.clear();
 
 		final Globe globe = dc.getGlobe();
 		final Vec4 referencePoint = pathData.getReferencePoint();
@@ -128,112 +117,95 @@ public class TrackPathOptimized extends MTMultiResolutionPath implements ITrackP
 		if (isVerticalExaggeration) {
 			verticalExaggeration = dc.getVerticalExaggeration();
 		}
-		final double poleHeight = poleEyeHeight;// * verticalExaggeration;
+		final double poleHeight = poleEyeHeight;
 
 		for (int posIndex = 0; posIndex < positionSize; posIndex++) {
 
 			if (posIndex % SKIP_COUNTER == 0 || posIndex == 0 || posIndex == positionSize - 1) {
 
-				_polePositionsIndizes.add(posIndex);
+				_arrowPositionIndizes.add(posIndex);
 
 				final Position geoPosition = positions.get(posIndex);
-				final double altitude = verticalExaggeration * geoPosition.getAltitude();
+				final double altitude = geoPosition.getAltitude() * verticalExaggeration;
 
-				// create bottom vertex
-				Vec4 pt = globe.computePointFromPosition(//
-						geoPosition.getLatitude(),
-						geoPosition.getLongitude(),
-						altitude);
-
-//				Vec4 pt = dc.computeTerrainPoint(//
-//						geoPosition.getLatitude(),
-//						geoPosition.getLongitude(),
-//						0);
-
-				renderedPath.put((float) (pt.x - referencePoint.x));
-				renderedPath.put((float) (pt.y - referencePoint.y));
-				renderedPath.put((float) (pt.z - referencePoint.z));
-
-				// create top vertex
-				pt = globe.computePointFromPosition(//
+				// create arrow position vertex
+				final Vec4 pt = globe.computePointFromPosition(//
 						geoPosition.getLatitude(),
 						geoPosition.getLongitude(),
 						altitude + poleHeight);
 
-				renderedPath.put((float) (pt.x - referencePoint.x));
-				renderedPath.put((float) (pt.y - referencePoint.y));
-				renderedPath.put((float) (pt.z - referencePoint.z));
+				putVertexIntoBuffer(arrowPositions, pt, referencePoint);
 			}
 		}
 
-		renderedPath.flip(); // since the path is reused the limit might not be the same as the previous usage
-
-		pathData.renderedPath_Selected = renderedPath;
-		pathData.vertexStride_Selected = elemsPerPoint;
-		pathData.vertexCount_Selected = renderedPath.limit() / (elemsPerPoint);
+		// since the buffer is reused the limit might not be the same as the previous usage
+		arrowPositions.flip();
 	}
 
-	private void computeDirectionArrows(final DrawContext dc, final MTPathData pathData) {
+	private void computeDirectionArrows(final DrawContext dc, final PathData pathData) {
 
-		final int numPositions = _polePositionsIndizes.size();
+		final int numPositions = _arrowPositionIndizes.size();
 		if (numPositions < 2) {
 			return;
 		}
 
-		final int FLOATS_PER_ARROWHEAD = 9; // 3 points * 3 coordinates per point
-		FloatBuffer arrowBuffer = (FloatBuffer) pathData.getValue(ARROWS_KEY);
-		if (arrowBuffer == null || arrowBuffer.capacity() < numPositions * FLOATS_PER_ARROWHEAD) {
-			arrowBuffer = BufferUtil.newFloatBuffer(FLOATS_PER_ARROWHEAD * numPositions);
+		/*
+		 * Arrow surface
+		 */
+		final int FLOATS_PER_ARROW_SURFACE = 9; // 3 points * 3 coordinates per point
+		FloatBuffer arrowSurfaceBuffer = (FloatBuffer) pathData.getValue(ARROW_SURFACE_KEY);
+		if (arrowSurfaceBuffer == null || arrowSurfaceBuffer.capacity() < numPositions * FLOATS_PER_ARROW_SURFACE) {
+			arrowSurfaceBuffer = BufferUtil.newFloatBuffer(FLOATS_PER_ARROW_SURFACE * numPositions);
 		}
+		pathData.setValue(ARROW_SURFACE_KEY, arrowSurfaceBuffer);
+		arrowSurfaceBuffer.clear();
 
-		pathData.setValue(ARROWS_KEY, arrowBuffer);
-		arrowBuffer.clear();
+		/*
+		 * Arrow border
+		 */
+		final int FLOATS_PER_ARROW_BORDER = 18; // 6 points * 3 coordinates per point
+		FloatBuffer arrowBorderBuffer = (FloatBuffer) pathData.getValue(ARROW_BORDER_KEY);
+		if (arrowBorderBuffer == null || arrowBorderBuffer.capacity() < numPositions * FLOATS_PER_ARROW_BORDER) {
+			arrowBorderBuffer = BufferUtil.newFloatBuffer(FLOATS_PER_ARROW_BORDER * numPositions);
+		}
+		pathData.setValue(ARROW_BORDER_KEY, arrowBorderBuffer);
+		arrowBorderBuffer.clear();
 
 		final Terrain terrain = dc.getTerrain();
 
-		final double arrowBase = arrowLength * arrowAngle.tanHalfAngle();
-
-		final FloatBuffer renderedPath = pathData.renderedPath_Selected;
-		renderedPath.rewind();
+		final FloatBuffer arrowPositions = (FloatBuffer) pathData.getValue(ARROW_POSITION_KEY);
+		arrowPositions.rewind();
 
 		final List<Position> tessellatedPositions = pathData.getTessellatedPositions();
 
-		int currentPositionIndex = _polePositionsIndizes.get(0);
+		int currentPositionIndex = _arrowPositionIndizes.get(0);
 		final Position poleA = tessellatedPositions.get(currentPositionIndex);
 		Vec4 polePtA = computePoint(terrain, poleA);
 
 		final Vec4 referencePoint = pathData.getReferencePoint();
 
-		for (int poleIndex = 1; poleIndex < _polePositionsIndizes.size(); poleIndex++) {
+		for (int poleIndex = 1; poleIndex < _arrowPositionIndizes.size(); poleIndex++) {
 
-			final int positionIndex = _polePositionsIndizes.get(poleIndex);
-
-			/*
-			 * Find the position of this pole and the next pole. Divide by 2 to convert an index in
-			 * the renderedPath buffer to a index in the tessellatedPositions list.
-			 */
-			final int nextPositionIndex = positionIndex;
+			final int nextPositionIndex = _arrowPositionIndizes.get(poleIndex);
 
 			final Position poleB = tessellatedPositions.get(nextPositionIndex);
 
 			final Vec4 polePtB = computePoint(terrain, poleB);
 
-			final int poleIndexOffset = poleIndex * 6;
+			final int poleIndexOffset = (poleIndex - 1) * 3;
 
 			final Vec4 arrowPole = new Vec4(
-					renderedPath.get(poleIndexOffset + 3) + referencePoint.x,
-					renderedPath.get(poleIndexOffset + 4) + referencePoint.y,
-					renderedPath.get(poleIndexOffset + 5) + referencePoint.z);
+					arrowPositions.get(poleIndexOffset + 0) + referencePoint.x,
+					arrowPositions.get(poleIndexOffset + 1) + referencePoint.y,
+					arrowPositions.get(poleIndexOffset + 2) + referencePoint.z);
 
 			computeDirectionArrows_ArrowheadGeometry(
 					dc,
 					polePtA,
 					polePtB,
 					arrowPole,
-					polePtB,
-					arrowLength,
-					arrowBase,
-					arrowBuffer,
+					arrowSurfaceBuffer,
+					arrowBorderBuffer,
 					pathData);
 
 			currentPositionIndex = nextPositionIndex;
@@ -241,7 +213,10 @@ public class TrackPathOptimized extends MTMultiResolutionPath implements ITrackP
 		}
 
 		// hide unused arrows
-		arrowBuffer.flip();
+		arrowSurfaceBuffer.flip();
+		arrowBorderBuffer.flip();
+
+		_numberOfDirectionArrows = arrowSurfaceBuffer.limit() / 3;
 	}
 
 	/**
@@ -257,13 +232,9 @@ public class TrackPathOptimized extends MTMultiResolutionPath implements ITrackP
 	 *            first position of the tessellated path midway between the poles
 	 * @param ptB
 	 *            second position of the tessellated path midway between the poles
-	 * @param arrowLength
-	 *            length of the arrowhead, in meters. The arrow head may not be rendered at full
-	 *            size, because is it may not exceed {@link #maxScreenSize} pixels in length.
-	 * @param arrowBase
-	 *            length of the arrowhead base
-	 * @param buffer
+	 * @param arrowSurfaceBuffer
 	 *            buffer in which to place computed points
+	 * @param arrowBorderBuffer
 	 * @param pathData
 	 *            the current globe-specific path data.
 	 */
@@ -271,10 +242,8 @@ public class TrackPathOptimized extends MTMultiResolutionPath implements ITrackP
 															final Vec4 polePtA,
 															final Vec4 polePtB,
 															final Vec4 arrowPole,
-															final Vec4 ptB,
-															double arrowLength,
-															double arrowBase,
-															final FloatBuffer buffer,
+															final FloatBuffer arrowSurfaceBuffer,
+															final FloatBuffer arrowBorderBuffer,
 															final PathData pathData) {
 		/*
 		 * Build a triangle to represent the arrowhead. The triangle is built from two vectors, one
@@ -302,14 +271,16 @@ public class TrackPathOptimized extends MTMultiResolutionPath implements ITrackP
 		final View view = dc.getView();
 		final double midpointDistance = view.getEyePoint().distanceTo3(midPoint);
 		final double pixelSize = view.computePixelSizeAtDistance(midpointDistance);
-		if (arrowLength / pixelSize > this.maxScreenSize) {
-			arrowLength = this.maxScreenSize * pixelSize;
-			arrowBase = arrowLength * arrowAngle.tanHalfAngle();
-		}
+
+		double arrowLength = _arrowLength;
+		double arrowBase = arrowLength * _arrowAngle.tanHalfAngle();
+
+		arrowLength = _tourTrackConfig.directionArrowSize * pixelSize;
+		arrowBase = arrowLength * _arrowAngle.tanHalfAngle();
 
 		// Don't draw an arrowhead if the path segment is smaller than the arrow
 		if (poleDistance <= arrowLength) {
-//			return;
+			return;
 		}
 
 		perpendicular = perpendicular.normalize3().multiply3(arrowBase);
@@ -329,58 +300,31 @@ public class TrackPathOptimized extends MTMultiResolutionPath implements ITrackP
 		final Vec4 vertex1 = midPoint.add3(parallel).add3(perpendicular);
 		final Vec4 vertex2 = midPoint.add3(parallel).add3(perpendicular.multiply3(-1.0));
 
-		// Add geometry to the buffer
 		final Vec4 referencePoint = pathData.getReferencePoint();
-		buffer.put((float) (vertex1.x - referencePoint.x));
-		buffer.put((float) (vertex1.y - referencePoint.y));
-		buffer.put((float) (vertex1.z - referencePoint.z));
 
-		buffer.put((float) (vertex2.x - referencePoint.x));
-		buffer.put((float) (vertex2.y - referencePoint.y));
-		buffer.put((float) (vertex2.z - referencePoint.z));
+		// Add geometry to the buffer
+		putVertexIntoBuffer(arrowSurfaceBuffer, vertex1, referencePoint);
+		putVertexIntoBuffer(arrowSurfaceBuffer, vertex2, referencePoint);
+		putVertexIntoBuffer(arrowSurfaceBuffer, midPoint, referencePoint);
 
-		buffer.put((float) (midPoint.x - referencePoint.x));
-		buffer.put((float) (midPoint.y - referencePoint.y));
-		buffer.put((float) (midPoint.z - referencePoint.z));
-	}
+		// add border to the buffer
+		putVertexIntoBuffer(arrowBorderBuffer, vertex1, referencePoint);
+		putVertexIntoBuffer(arrowBorderBuffer, vertex2, referencePoint);
 
-	/**
-	 * {@inheritDoc}
-	 * <p/>
-	 * Overridden to return a new instance of MultiResolutionPathData.
-	 */
-	@Override
-	protected AbstractShapeData createCacheEntry(final DrawContext dc) {
-		return new MTPathData(dc, this);
-	}
+		putVertexIntoBuffer(arrowBorderBuffer, vertex2, referencePoint);
+		putVertexIntoBuffer(arrowBorderBuffer, midPoint, referencePoint);
 
-	/**
-	 * {@inheritDoc}
-	 * <p/>
-	 * Overridden to also draw direction arrows.
-	 * 
-	 * @param dc
-	 *            Current draw context.
-	 */
-	@Override
-	protected void doDrawOutline(final DrawContext dc) {
-
-		super.doDrawOutline(dc);
-
-		// this must be drawn AFTER the super.doDrawOutline() because it is using the pole positions !!!
-		if (dc.isPickingMode() == false) {
-
-			final PathData pathData = getCurrentPathData();
-
-			computeDirectionArrows(dc, (MTPathData) pathData);
-			drawDirectionArrows(dc, pathData);
-		}
+		putVertexIntoBuffer(arrowBorderBuffer, midPoint, referencePoint);
+		putVertexIntoBuffer(arrowBorderBuffer, vertex1, referencePoint);
 	}
 
 	@Override
 	protected void doDrawOutlineVBO(final DrawContext dc, final int[] vboIds, final PathData pathData) {
 
 		final boolean isPickingMode = dc.isPickingMode();
+
+		final boolean isTourSelected = _tourTrack.isSelected();
+		final boolean isTourHovered = _tourTrack.isHovered();
 
 		final GL gl = dc.getGL();
 
@@ -393,7 +337,28 @@ public class TrackPathOptimized extends MTMultiResolutionPath implements ITrackP
 			final int stride = hasExtrusionPoints ? 2 * vertexStride : vertexStride;
 			final int count = hasExtrusionPoints ? vertexCount / 2 : vertexCount;
 
-			final boolean useVertexColors = !isPickingMode && pathData.getTessellatedColors() != null;
+			final boolean isShowTrackValueColor = isShowTrackValueColor_Outline();
+
+			final boolean useVertexColors = !isPickingMode
+					&& pathData.getTessellatedColors() != null
+					&& isShowTrackValueColor;
+
+			if (!isPickingMode && !isShowTrackValueColor) {
+
+				RGB rgb;
+
+				if (isTourHovered && isTourSelected) {
+					rgb = _tourTrackConfig.outlineColor_HovSel;
+				} else if (isTourHovered) {
+					rgb = _tourTrackConfig.outlineColor_Hovered;
+				} else if (isTourSelected) {
+					rgb = _tourTrackConfig.outlineColor_Selected;
+				} else {
+					rgb = _tourTrackConfig.outlineColor;
+				}
+
+				gl.glColor4ub((byte) rgb.red, (byte) rgb.green, (byte) rgb.blue, (byte) 0xbf);
+			}
 
 			// Convert stride from number of elements to number of bytes.
 			gl.glBindBuffer(GL.GL_ARRAY_BUFFER, vboIds[0]);
@@ -414,7 +379,7 @@ public class TrackPathOptimized extends MTMultiResolutionPath implements ITrackP
 				gl.glDisableClientState(GL.GL_COLOR_ARRAY);
 			}
 
-			if (hasExtrusionPoints && this.isDrawVerticals()) {
+			if (hasExtrusionPoints && isDrawVerticals()) {
 				drawVerticalOutlineVBO(dc, vboIds, pathData);
 			}
 
@@ -422,30 +387,12 @@ public class TrackPathOptimized extends MTMultiResolutionPath implements ITrackP
 				drawPointsVBO(dc, vboIds, pathData);
 			}
 
-			final boolean isTourSelected = _tourTrack.isSelected();
-			final boolean isTourHovered = _tourTrack.isHovered();
-
-			if (isPickingMode == false && isTourSelected) {
-				drawColoredWallVBO(dc, vboIds, pathData);
+			if (!isPickingMode) {
+//				drawColoredWallVBO(dc, vboIds, pathData);
 			}
 
-			if (isPickingMode == false && (isTourSelected || isTourHovered)) {
-
-				RGB rgb = null;
-
-				if (isTourHovered && isTourSelected) {
-					rgb = _tourTrackConfig.outlineColorHovSel;
-				} else if (isTourHovered) {
-					rgb = _tourTrackConfig.outlineColorHovered;
-				} else {
-					rgb = _tourTrackConfig.outlineColorSelected;
-				}
-
-				gl.glColor4ub((byte) rgb.red, (byte) rgb.green, (byte) rgb.blue, (byte) 0xbf);
-
-				gl.glLineWidth(2);
-
-				drawSelectedPositionsVBO(dc, vboIds, (MTPathData) pathData);
+			if (!isPickingMode && _isShowArrows) {
+				drawDirectionArrows(dc, vboIds, pathData);
 			}
 
 		} finally {
@@ -461,7 +408,9 @@ public class TrackPathOptimized extends MTMultiResolutionPath implements ITrackP
 		final int vertexStride = pathData.getVertexStride();
 
 		final int stride = vertexStride;
-		final boolean useVertexColors = !dc.isPickingMode() && pathData.getTessellatedColors() != null;
+		final boolean useVertexColors = !dc.isPickingMode()
+				&& pathData.getTessellatedColors() != null
+				&& isShowTrackValueColor_Interior();
 
 		// Convert stride from number of elements to number of bytes.
 		gl.glBindBuffer(GL.GL_ARRAY_BUFFER, vboIds[0]);
@@ -499,21 +448,26 @@ public class TrackPathOptimized extends MTMultiResolutionPath implements ITrackP
 	 * 
 	 * @param dc
 	 *            Current draw context.
+	 * @param vboIds
 	 * @param pathData
 	 *            the current globe-specific path data.
 	 */
-	private void drawDirectionArrows(final DrawContext dc, final PathData pathData) {
+	private void drawDirectionArrows(final DrawContext dc, final int[] vboIds, final PathData pathData) {
+
+		if (_numberOfDirectionArrows < 1) {
+			return;
+		}
 
 		RGB rgb = null;
 		final boolean isTourSelected = _tourTrack.isSelected();
 		final boolean isTourHovered = _tourTrack.isHovered();
 
 		if (isTourHovered && isTourSelected) {
-			rgb = _tourTrackConfig.outlineColorHovSel;
+			rgb = _tourTrackConfig.outlineColor_HovSel;
 		} else if (isTourHovered) {
-			rgb = _tourTrackConfig.outlineColorHovered;
+			rgb = _tourTrackConfig.outlineColor_Hovered;
 		} else if (isTourSelected) {
-			rgb = _tourTrackConfig.outlineColorSelected;
+			rgb = _tourTrackConfig.outlineColor_Selected;
 		}
 
 		if (rgb == null) {
@@ -521,82 +475,142 @@ public class TrackPathOptimized extends MTMultiResolutionPath implements ITrackP
 		}
 
 		final GL gl = dc.getGL();
-		boolean projectionOffsetPushed = false; // keep track for error recovery
+		boolean isProjectionOffsetPushed = false; // keep track for error recovery
 
 		try {
 
-			if (this.isSurfacePath()) {
+			if (isSurfacePath()) {
 
 				// Pull the arrow triangles forward just a bit to ensure they show over the terrain.
 				dc.pushProjectionOffest(SURFACE_PATH_DEPTH_OFFSET);
 				gl.glDepthMask(false);
-				projectionOffsetPushed = true;
+				isProjectionOffsetPushed = true;
 			}
 
-			gl.glColor4ub((byte) rgb.red, (byte) rgb.green, (byte) rgb.blue, (byte) 0xbf);
+			final int opacity = 0xff;
 
-			gl.glLineWidth(2);
+			// draw triangle
+			gl.glColor4ub((byte) rgb.red, (byte) rgb.green, (byte) rgb.blue, (byte) opacity);
 
-			final FloatBuffer directionArrows = (FloatBuffer) pathData.getValue(ARROWS_KEY);
-			gl.glVertexPointer(3, GL.GL_FLOAT, 0, directionArrows.rewind());
-			gl.glDrawArrays(GL.GL_TRIANGLES, 0, directionArrows.limit() / 3);
+			gl.glBindBuffer(GL.GL_ARRAY_BUFFER, vboIds[_arrowSurfaceVboId]);
+
+			// Convert stride from number of elements to number of bytes.
+			gl.glVertexPointer(3, GL.GL_FLOAT, 4 * 3, 0);
+			gl.glDrawArrays(GL.GL_TRIANGLES, 0, _numberOfDirectionArrows);
+
+			// draw border
+			final Color borderColor = ColorUtil.getContrastColor(rgb.red, rgb.green, rgb.blue);
+			gl.glLineWidth(2.0f);
+			gl.glColor4ub(
+					(byte) borderColor.getRed(),
+					(byte) borderColor.getGreen(),
+					(byte) borderColor.getBlue(),
+					(byte) opacity);
+
+			gl.glBindBuffer(GL.GL_ARRAY_BUFFER, vboIds[_arrowBorderVboId]);
+
+			// Convert stride from number of elements to number of bytes.
+			gl.glVertexPointer(3, GL.GL_FLOAT, 4 * 3, 0);
+			gl.glDrawArrays(GL.GL_LINES, 0, _numberOfDirectionArrows * 2);
 
 		} finally {
 
-			if (projectionOffsetPushed) {
+			if (isProjectionOffsetPushed) {
 				dc.popProjectionOffest();
 				gl.glDepthMask(true);
 			}
 		}
 	}
 
-	private void drawSelectedPositionsVBO(final DrawContext dc, final int[] vboIds, final MTPathData pathData) {
+	/**
+	 * Draws points at this path's specified positions.
+	 * <p/>
+	 * Note: when the draw context is in picking mode, this binds the current GL_ARRAY_BUFFER to 0
+	 * after using the currently bound GL_ARRAY_BUFFER to specify the vertex pointer. This does not
+	 * restore GL_ARRAY_BUFFER to the its previous state. If the caller intends to use that buffer
+	 * after this method returns, the caller must bind the buffer again.
+	 * 
+	 * @param dc
+	 *            the current draw context.
+	 * @param vboIds
+	 *            the ids of this shapes buffers.
+	 * @param pathData
+	 *            the current globe-specific path data.
+	 */
+	@Override
+	protected void drawPointsVBO(final DrawContext dc, final int[] vboIds, final PathData pathData) {
 
-		final FloatBuffer selectedPositions = pathData.renderedPath_Selected;
-		if (selectedPositions == null || selectedPositions.limit() < 1) {
+		final double d = getDistanceMetric(dc, pathData);
+		if (d > getShowPositionsThreshold()) {
 			return;
 		}
 
-		final int vboId = vboIds[vboIds.length - 1];
+		final IntBuffer posPoints = pathData.getPositionPoints();
+		if (posPoints == null || posPoints.limit() < 1) {
+			return;
+		}
 
-//		System.out.println(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] \tdraw vboId:" + vboId);
-//		// TODO remove SYSTEM.OUT.PRINTLN
+		final boolean useVertexColors = pathData.getTessellatedColors() != null && isShowTrackValueColor_Outline();
 
 		final GL gl = dc.getGL();
 
 		// Convert stride from number of elements to number of bytes.
-		gl.glBindBuffer(GL.GL_ARRAY_BUFFER, vboId);
-		gl.glVertexPointer(3, GL.GL_FLOAT, 4 * pathData.vertexStride_Selected, 0);
-//		gl.glDrawArrays(GL.GL_LINES, 0, Math.min(2, pathData.vertexCount_Selected));
-		gl.glDrawArrays(GL.GL_LINES, 0, pathData.vertexCount_Selected);
+		gl.glVertexPointer(3, GL.GL_FLOAT, 4 * pathData.getVertexStride(), 0);
 
-//		gl.glBindBuffer(GL.GL_ARRAY_BUFFER, 0);
-//		gl.glLineWidth(1);
+		if (dc.isPickingMode()) {
+
+			gl.glEnableClientState(GL.GL_COLOR_ARRAY);
+			gl.glBindBuffer(GL.GL_ARRAY_BUFFER, 0);
+			gl.glColorPointer(3, GL.GL_UNSIGNED_BYTE, 0, pickPositionColors);
+
+		} else if (useVertexColors) {
+			// Apply this path's per-position colors if we're in normal rendering mode (not picking) and this path's
+			// positionColors is non-null. Convert the stride and offset from number of elements to number of bytes.
+			gl.glEnableClientState(GL.GL_COLOR_ARRAY);
+			gl.glColorPointer(4, GL.GL_FLOAT, 4 * pathData.getVertexStride(), 4 * pathData.getColorOffset());
+		}
+
+		prepareToDrawPoints(dc);
+
+		gl.glBindBuffer(GL.GL_ELEMENT_ARRAY_BUFFER, vboIds[2]);
+		gl.glDrawElements(GL.GL_POINTS, posPoints.limit(), GL.GL_UNSIGNED_INT, 0);
+
+		// Restore the previous GL point state.
+		gl.glPointSize(1f);
+		gl.glDisable(GL.GL_POINT_SMOOTH);
+
+		// Restore the previous GL color array state.
+		if (dc.isPickingMode() || useVertexColors) {
+			gl.glDisableClientState(GL.GL_COLOR_ARRAY);
+		}
 	}
 
 	@Override
 	protected void fillVBO(final DrawContext dc) {
 
-		final MTPathData pathData = (MTPathData) getCurrentPathData();
+		final PathData pathData = getCurrentPathData();
 
-		int numIds = isShowPositions() ? //
+		int numberOfIds = isShowPositions() ? //
 				3
 				: pathData.isHasExtrusionPoints() && isDrawVerticals() ? //
 						2
 						: 1;
 
-		// show selected path positions
-		numIds++;
+		// show arrow keys
+		if (_isShowArrows) {
+			numberOfIds += 3;
+		}
 
 		int[] vboIds = (int[]) dc.getGpuResourceCache().get(pathData.getVboCacheKey());
-		if (vboIds != null && vboIds.length != numIds) {
-			this.clearCachedVbos(dc);
+		if (vboIds != null && vboIds.length != numberOfIds) {
+			clearCachedVbos(dc);
 			vboIds = null;
 		}
 
 		final GL gl = dc.getGL();
 
 		final int vSize = pathData.getRenderedPath().limit() * 4;
+
 		int iSize = pathData.isHasExtrusionPoints() && isDrawVerticals() ? //
 				pathData.getTessellatedPositions().size() * 2 * 4
 				: 0;
@@ -605,12 +619,15 @@ public class TrackPathOptimized extends MTMultiResolutionPath implements ITrackP
 			iSize += pathData.getTessellatedPositions().size();
 		}
 
-		// show selected path positions
-		iSize += pathData.renderedPath_Selected.limit() * 4;
+		if (_isShowArrows) {
+			iSize += ((FloatBuffer) pathData.getValue(ARROW_POSITION_KEY)).limit() * 4;
+			iSize += ((FloatBuffer) pathData.getValue(ARROW_SURFACE_KEY)).limit() * 4;
+			iSize += ((FloatBuffer) pathData.getValue(ARROW_BORDER_KEY)).limit() * 4;
+		}
 
 		if (vboIds == null) {
 
-			vboIds = new int[numIds];
+			vboIds = new int[numberOfIds];
 
 			gl.glGenBuffers(vboIds.length, vboIds, 0);
 
@@ -639,22 +656,26 @@ public class TrackPathOptimized extends MTMultiResolutionPath implements ITrackP
 				gl.glBufferData(GL.GL_ELEMENT_ARRAY_BUFFER, ib.limit() * 4, ib.rewind(), GL.GL_STATIC_DRAW);
 			}
 
-			// create selected path position vbo
-			final FloatBuffer fb = pathData.renderedPath_Selected;
-			gl.glBindBuffer(GL.GL_ARRAY_BUFFER, vboIds[numIds - 1]);
-			gl.glBufferData(GL.GL_ARRAY_BUFFER, fb.limit() * 4, fb.rewind(), GL.GL_STATIC_DRAW);
+			if (_isShowArrows) {
 
-//			System.out.println(UI.timeStampNano()
-//					+ " ["
-//					+ getClass().getSimpleName()
-//					+ "] fillVBO()"
-//					+ (" \tvboId: " + vboIds[numIds - 1])
-//					+ ("\tsize: " + fb.limit() * 4)
-//					+ ("\tfb.limit(): " + fb.limit())
-//					+ "\n"
-//			//
-//					);
-//			// TODO remove SYSTEM.OUT.PRINTLN
+				int vboIndex = numberOfIds - 3;
+
+				// create vbo for direction arrows
+				_arrowPositionVboId = vboIndex++;
+				FloatBuffer fb = (FloatBuffer) pathData.getValue(ARROW_POSITION_KEY);
+				gl.glBindBuffer(GL.GL_ARRAY_BUFFER, vboIds[_arrowPositionVboId]);
+				gl.glBufferData(GL.GL_ARRAY_BUFFER, fb.limit() * 4, fb.rewind(), GL.GL_STATIC_DRAW);
+
+				_arrowSurfaceVboId = vboIndex++;
+				fb = (FloatBuffer) pathData.getValue(ARROW_SURFACE_KEY);
+				gl.glBindBuffer(GL.GL_ARRAY_BUFFER, vboIds[_arrowSurfaceVboId]);
+				gl.glBufferData(GL.GL_ARRAY_BUFFER, fb.limit() * 4, fb.rewind(), GL.GL_STATIC_DRAW);
+
+				_arrowBorderVboId = vboIndex++;
+				fb = (FloatBuffer) pathData.getValue(ARROW_BORDER_KEY);
+				gl.glBindBuffer(GL.GL_ARRAY_BUFFER, vboIds[_arrowBorderVboId]);
+				gl.glBufferData(GL.GL_ARRAY_BUFFER, fb.limit() * 4, fb.rewind(), GL.GL_STATIC_DRAW);
+			}
 
 		} finally {
 
@@ -683,164 +704,87 @@ public class TrackPathOptimized extends MTMultiResolutionPath implements ITrackP
 		return _tourTrack;
 	}
 
+	private boolean isShowTrackValueColor_Interior() {
+
+		boolean isShowTrackValue;
+
+		final boolean isTourSelected = _tourTrack.isSelected();
+		final boolean isTourHovered = _tourTrack.isHovered();
+
+		if (isTourHovered && isTourSelected) {
+
+			isShowTrackValue = _tourTrackConfig.interiorColorMode_HovSel == TourTrackConfig.COLOR_MODE_TRACK_VALUE;
+
+		} else if (isTourHovered) {
+
+			isShowTrackValue = _tourTrackConfig.interiorColorMode_Hovered == TourTrackConfig.COLOR_MODE_TRACK_VALUE;
+
+		} else if (isTourSelected) {
+
+			isShowTrackValue = _tourTrackConfig.interiorColorMode_Selected == TourTrackConfig.COLOR_MODE_TRACK_VALUE;
+
+		} else {
+
+			isShowTrackValue = _tourTrackConfig.interiorColorMode == TourTrackConfig.COLOR_MODE_TRACK_VALUE;
+		}
+
+		return isShowTrackValue;
+	}
+
+	/**
+	 * @return Returns <code>true</code> when the track value color should be used to paint a track
+	 *         or curtain.
+	 */
+	private boolean isShowTrackValueColor_Outline() {
+
+		boolean isShowTrackValue;
+
+		final boolean isTourSelected = _tourTrack.isSelected();
+		final boolean isTourHovered = _tourTrack.isHovered();
+
+		if (isTourHovered && isTourSelected) {
+
+			isShowTrackValue = _tourTrackConfig.outlineColorMode_HovSel == TourTrackConfig.COLOR_MODE_TRACK_VALUE;
+
+		} else if (isTourHovered) {
+
+			isShowTrackValue = _tourTrackConfig.outlineColorMode_Hovered == TourTrackConfig.COLOR_MODE_TRACK_VALUE;
+
+		} else if (isTourSelected) {
+
+			isShowTrackValue = _tourTrackConfig.outlineColorMode_Selected == TourTrackConfig.COLOR_MODE_TRACK_VALUE;
+
+		} else {
+
+			isShowTrackValue = _tourTrackConfig.outlineColorMode == TourTrackConfig.COLOR_MODE_TRACK_VALUE;
+		}
+
+		return isShowTrackValue;
+	}
+
+	private void putVertexIntoBuffer(final FloatBuffer buffer, final Vec4 vertex, final Vec4 referencePoint) {
+
+		buffer.put((float) (vertex.x - referencePoint.x));
+		buffer.put((float) (vertex.y - referencePoint.y));
+		buffer.put((float) (vertex.z - referencePoint.z));
+	}
+
+	@Override
+	public void setExpired() {
+
+		final AbstractShapeData pathData = getCurrentData();
+
+		// it was null when implementing and testing
+		if (pathData != null) {
+			pathData.setExpired(true);
+		}
+	}
+
 	@Override
 	public void setPicked(final boolean isHovered, final Integer pickPositionIndex) {
 
 		_tourTrack.setHovered(isHovered, pickPositionIndex);
-
-//		System.out.println(UI.timeStampNano()
-//				+ " ["
-//				+ getClass().getSimpleName()
-//				+ "]  "
-//				+ _tourTrack
-//				+ "\tisHovered="
-//				+ isHovered
-//				+ "\tisSelected="
-//				+ _tourTrack.isSelected());
-//		// TODO remove SYSTEM.OUT.PRINTLN
-
-//		if (isHovered == false && _tourTrack.isSelected() == false) {
-//
-//			/*
-//			 * This hack prevents a tess color NPE, it took me many days to understand 3D drawing
-//			 * and find this "solution".
-//			 */
-//			getCurrentPathData().setTessellatedPositions(null);
-//
-////			System.out.println(UI.timeStampNano()
-////					+ " ["
-////					+ getClass().getSimpleName()
-////					+ "] "
-////					+ _tourTrack
-////					+ "\tset tess pos = null");
-////			// TODO remove SYSTEM.OUT.PRINTLN
-//		}
-//
-//		// after picking, ensure that the positions colors are set again
-//		getCurrentPathData().setExpired(true);
 	}
-
-//	/**
-//	 * Computes a model-coordinate path from a list of positions, using the altitudes in the
-//	 * specified positions. Adds extrusion points -- those on the ground -- when the path is
-//	 * extruded and the specified single altitude is not 0.
-//	 *
-//	 * @param dc
-//	 *            the current draw context.
-//	 * @param positions
-//	 *            the positions to create a path for.
-//	 * @param path
-//	 *            a buffer in which to store the computed points. May be null. The buffer is not
-//	 *            used if it is null or tool small for the required number of points. A new buffer
-//	 *            is created in that case and returned by this method. This method modifies the
-//	 *            buffer,s position and limit fields.
-//	 * @param pathData
-//	 *            the current globe-specific path data.
-//	 * @return the buffer in which to place the computed points.
-//	 */
-//	@Override
-//	protected FloatBuffer computeAbsolutePoints(final DrawContext dc,
-//												final List<Position> positions,
-//												FloatBuffer path,
-//												final PathData pathData) {
-//
-//		final double eyeDistance = pathData.getEyeDistance();
-//		final double highlightPole = eyeDistance / 30.0;
-//		final int skipCounter = 15;
-//
-////		System.out.println(UI.timeStampNano()
-////				+ " ["
-////				+ getClass().getSimpleName()
-////				+ "] \tpositions.size() "
-////				+ positions.size()
-////				+ "\teye: "
-////				+ eyeDistance);
-////		// TODO remove SYSTEM.OUT.PRINTLN
-//
-//		final List<Color> tessellatedColors = pathData.getTessellatedColors();
-//
-//		final int numPoints = this.isExtrude() ? 2 * positions.size() : positions.size();
-//		final int elemsPerPoint = (tessellatedColors != null ? 7 : 3);
-//
-//		final Iterator<Color> colorIter = (tessellatedColors != null //
-//				? tessellatedColors.iterator()
-//				: null);
-//
-//		final float[] color = (tessellatedColors != null ? new float[4] : null);
-//
-//		if (path == null || path.capacity() < elemsPerPoint * numPoints) {
-//			path = BufferUtil.newFloatBuffer(elemsPerPoint * numPoints);
-//		}
-//
-//		path.clear();
-//
-//
-//		final Globe globe = dc.getGlobe();
-//		final Vec4 referencePoint = pathData.getReferencePoint();
-//
-//		if (dc.getVerticalExaggeration() != 1) {
-//
-//			final double ve = dc.getVerticalExaggeration();
-//
-//			for (final Position pos : positions) {
-//
-//				final Vec4 pt = globe.computePointFromPosition(
-//						pos.getLatitude(),
-//						pos.getLongitude(),
-//						ve * (pos.getAltitude()));
-//
-//				path.put((float) (pt.x - referencePoint.x));
-//				path.put((float) (pt.y - referencePoint.y));
-//				path.put((float) (pt.z - referencePoint.z));
-//
-//				if (colorIter != null && colorIter.hasNext()) {
-//					colorIter.next().getRGBComponents(color);
-//					path.put(color);
-//				}
-//
-//				if (this.isExtrude()) {
-//					this.appendTerrainPoint(dc, pos, color, path, pathData);
-//				}
-//			}
-//		} else {
-//
-//			for (int posIndex = 0; posIndex < positions.size(); posIndex++) {
-//
-//				final Position pos = positions.get(posIndex);
-//
-//				Vec4 pt;
-//
-//				if (posIndex % skipCounter == 0) {
-//
-//					pt = globe.computePointFromPosition(//
-//							pos.getLatitude(),
-//							pos.getLongitude(),
-//							pos.getAltitude() + highlightPole);
-//				} else {
-//
-//					pt = globe.computePointFromPosition(pos);
-//				}
-//
-//				path.put((float) (pt.x - referencePoint.x));
-//				path.put((float) (pt.y - referencePoint.y));
-//				path.put((float) (pt.z - referencePoint.z));
-//
-//				if (colorIter != null && colorIter.hasNext()) {
-//					colorIter.next().getRGBComponents(color);
-//					path.put(color);
-//				}
-//
-//				if (this.isExtrude()) {
-//					this.appendTerrainPoint(dc, pos, color, path, pathData);
-//				}
-//			}
-//		}
-//
-//		pathData.setColorOffset((tessellatedColors != null ? 3 : 0));
-//		pathData.setVertexStride(elemsPerPoint);
-//
-//		return path;
-//	}
 
 	@Override
 	public void setTourTrack(final TourTrack tourTrack, final TourTrackConfig tourTrackConfig) {
