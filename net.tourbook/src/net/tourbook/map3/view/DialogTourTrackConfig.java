@@ -127,6 +127,7 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 	private Label					_lblTrackPositionThresholdAbsolute;
 
 	private Spinner					_spinnerAltitudeOffsetDistance;
+	private Spinner					_spinnerDirectionArrowDistance;
 	private Spinner					_spinnerDirectionArrowSize;
 	private Spinner					_spinnerInteriorOpacity;
 	private Spinner					_spinnerInteriorOpacity_Hovered;
@@ -325,9 +326,12 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 
 	private void createUI_110_DirectionArrow(final Composite parent) {
 
+		/*
+		 * Direction Arrow
+		 */
 		{
 			/*
-			 * label: Direction arrow
+			 * Label
 			 */
 			final Label label = new Label(parent, SWT.NONE);
 			GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(label);
@@ -335,24 +339,48 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 			label.setText(Messages.TourTrack_Properties_Label_DirectionArrowSize);
 			label.setToolTipText(Messages.TourTrack_Properties_Label_DirectionArrowSize_Tooltip);
 
-			/*
-			 * Spinner: Direction Arrow
-			 */
-			_spinnerDirectionArrowSize = new Spinner(parent, SWT.BORDER);
-			GridDataFactory.fillDefaults() //
-					.align(SWT.BEGINNING, SWT.FILL)
-					.applyTo(_spinnerDirectionArrowSize);
-			_spinnerDirectionArrowSize.setMinimum(10);
-			_spinnerDirectionArrowSize.setMaximum(100);
-			_spinnerDirectionArrowSize.setIncrement(10);
-			_spinnerDirectionArrowSize.setPageIncrement(50);
-			_spinnerDirectionArrowSize.addSelectionListener(_defaultSelectionListener);
-			_spinnerDirectionArrowSize.addMouseWheelListener(new MouseWheelListener() {
-				public void mouseScrolled(final MouseEvent event) {
-					Util.adjustSpinnerValueOnMouseScroll(event);
-					onModifyConfig();
-				}
-			});
+			final Composite container = new Composite(parent, SWT.NONE);
+			GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+			GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+			{
+				/*
+				 * Size
+				 */
+				_spinnerDirectionArrowSize = new Spinner(container, SWT.BORDER);
+				GridDataFactory.fillDefaults() //
+						.align(SWT.BEGINNING, SWT.FILL)
+						.applyTo(_spinnerDirectionArrowSize);
+				_spinnerDirectionArrowSize.setMinimum(10);
+				_spinnerDirectionArrowSize.setMaximum(100);
+				_spinnerDirectionArrowSize.setIncrement(10);
+				_spinnerDirectionArrowSize.setPageIncrement(50);
+				_spinnerDirectionArrowSize.addSelectionListener(_defaultSelectionListener);
+				_spinnerDirectionArrowSize.addMouseWheelListener(new MouseWheelListener() {
+					public void mouseScrolled(final MouseEvent event) {
+						Util.adjustSpinnerValueOnMouseScroll(event);
+						onModifyConfig();
+					}
+				});
+
+				/*
+				 * Vertical distance
+				 */
+				_spinnerDirectionArrowDistance = new Spinner(container, SWT.BORDER);
+				GridDataFactory.fillDefaults() //
+						.align(SWT.BEGINNING, SWT.FILL)
+						.applyTo(_spinnerDirectionArrowDistance);
+				_spinnerDirectionArrowDistance.setMinimum(1);
+				_spinnerDirectionArrowDistance.setMaximum(20);
+				_spinnerDirectionArrowDistance.setIncrement(1);
+				_spinnerDirectionArrowDistance.setPageIncrement(5);
+				_spinnerDirectionArrowDistance.addSelectionListener(_defaultSelectionListener);
+				_spinnerDirectionArrowDistance.addMouseWheelListener(new MouseWheelListener() {
+					public void mouseScrolled(final MouseEvent event) {
+						Util.adjustSpinnerValueOnMouseScroll(event);
+						onModifyConfig();
+					}
+				});
+			}
 		}
 	}
 
@@ -866,6 +894,9 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 		final boolean isOutlineSolidColor_HovSel = _trackConfig.outlineColorMode_HovSel == TourTrackConfig.COLOR_MODE_SOLID_COLOR;
 		final boolean isOutlineSolidColor_Selected = _trackConfig.outlineColorMode_Selected == TourTrackConfig.COLOR_MODE_SOLID_COLOR;
 
+		// vertical lines are painted with the outline color
+		final boolean isOutLineColor = isOutlineSolidColor || _trackConfig.isDrawVerticals;
+
 		final boolean isInteriorSolidColor = isShowCurtain
 				&& _trackConfig.interiorColorMode == TourTrackConfig.COLOR_MODE_SOLID_COLOR;
 		final boolean isInteriorSolidColor_Hovered = isShowCurtain
@@ -897,25 +928,31 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 		_lblCurtainColor_HovSel.setEnabled(isShowCurtain);
 		_lblCurtainColor_Selected.setEnabled(isShowCurtain);
 
-		// vertical lines are painted with the outline color
-		_colorOutlineColor.setEnabled(isOutlineSolidColor || _trackConfig.isDrawVerticals);
+		_colorOutlineColor.setEnabled(isOutLineColor);
 		_colorOutlineColor_Hovered.setEnabled(isOutlineSolidColor_Hovered);
 		_colorOutlineColor_HovSel.setEnabled(isOutlineSolidColor_HovSel);
 		_colorOutlineColor_Selected.setEnabled(isOutlineSolidColor_Selected);
+
+		_spinnerOutlineOpacity.setEnabled(isOutLineColor);
+		_spinnerOutlineOpacity_Hovered.setEnabled(isOutlineSolidColor_Hovered);
+		_spinnerOutlineOpacity_HovSel.setEnabled(isOutlineSolidColor_HovSel);
+		_spinnerOutlineOpacity_Selected.setEnabled(isOutlineSolidColor_Selected);
 
 		// interior
 		_comboInteriorColorMode.setEnabled(isShowCurtain);
 		_comboInteriorColorMode_Hovered.setEnabled(isShowCurtain);
 		_comboInteriorColorMode_HovSel.setEnabled(isShowCurtain);
 		_comboInteriorColorMode_Selected.setEnabled(isShowCurtain);
+
 		_colorInteriorColor.setEnabled(isInteriorSolidColor);
 		_colorInteriorColor_Hovered.setEnabled(isInteriorSolidColor_Hovered);
 		_colorInteriorColor_HovSel.setEnabled(isInteriorSolidColor_HovSel);
 		_colorInteriorColor_Selected.setEnabled(isInteriorSolidColor_Selected);
-		_spinnerInteriorOpacity.setEnabled(isShowCurtain);
-		_spinnerInteriorOpacity_Hovered.setEnabled(isShowCurtain);
-		_spinnerInteriorOpacity_HovSel.setEnabled(isShowCurtain);
-		_spinnerInteriorOpacity_Selected.setEnabled(isShowCurtain);
+
+		_spinnerInteriorOpacity.setEnabled(isInteriorSolidColor);
+		_spinnerInteriorOpacity_Hovered.setEnabled(isInteriorSolidColor_Hovered);
+		_spinnerInteriorOpacity_HovSel.setEnabled(isInteriorSolidColor_HovSel);
+		_spinnerInteriorOpacity_Selected.setEnabled(isInteriorSolidColor_Selected);
 
 		_chkDrawVerticals.setEnabled(isShowCurtain);
 
@@ -1072,6 +1109,7 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 		_trackConfig = Map3Manager.getLayer_TourTrack().getConfig();
 
 		// track
+		_spinnerDirectionArrowDistance.setSelection((int) (_trackConfig.directionArrowDistance));
 		_spinnerDirectionArrowSize.setSelection((int) (_trackConfig.directionArrowSize));
 
 		// line color
@@ -1138,6 +1176,7 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 		final boolean backupIsFollowTerrain = _trackConfig.isFollowTerrain;
 		final int backupAltitudeOffsetDistance = _trackConfig.altitudeVerticalOffset;
 		final int backupPathResolution = _trackConfig.pathResolution;
+		final double backupDirectionArrowDistance = _trackConfig.directionArrowDistance;
 
 		int altitudeModeIndex = _comboAltitude.getSelectionIndex();
 		if (altitudeModeIndex == -1) {
@@ -1150,6 +1189,7 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 
 		// track
 		_trackConfig.directionArrowSize = _spinnerDirectionArrowSize.getSelection();
+		_trackConfig.directionArrowDistance = _spinnerDirectionArrowDistance.getSelection();
 
 		// line
 		_trackConfig.outlineWidth = _spinnerOutlineWidth.getSelection();
@@ -1217,6 +1257,9 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 
 				// follow terrain is NOT modified
 				&& backupIsFollowTerrain == _trackConfig.isFollowTerrain //
+
+				// direction arrow distance is NOT modified
+				&& backupDirectionArrowDistance == _trackConfig.directionArrowDistance//
 
 				&& isAbsoluteAltitudeNotModified
 		//

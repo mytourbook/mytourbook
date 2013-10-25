@@ -88,8 +88,6 @@ public class TrackPathOptimized extends MTMultiResolutionPath implements ITrackP
 
 	private void computeArrowPositions(final DrawContext dc, final List<Position> positions, final PathData pathData) {
 
-		final double poleEyeHeight = pathData.getEyeDistance() / 50.0;
-
 		final int elemsPerPoint = 3;
 		final int positionSize = positions.size();
 		final int polePositionSize = (positionSize / SKIP_COUNTER) + 3;
@@ -117,7 +115,8 @@ public class TrackPathOptimized extends MTMultiResolutionPath implements ITrackP
 		if (isVerticalExaggeration) {
 			verticalExaggeration = dc.getVerticalExaggeration();
 		}
-		final double poleHeight = poleEyeHeight;
+
+		final double poleHeight = pathData.getEyeDistance() / (100.0 / _tourTrackConfig.directionArrowDistance * 1.5);
 
 		for (int posIndex = 0; posIndex < positionSize; posIndex++) {
 
@@ -319,6 +318,46 @@ public class TrackPathOptimized extends MTMultiResolutionPath implements ITrackP
 	}
 
 	@Override
+	protected void doDrawInteriorVBO(final DrawContext dc, final int[] vboIds, final PathData pathData) {
+
+		final GL gl = dc.getGL();
+
+		final int vertexStride = pathData.getVertexStride();
+
+		final boolean useVertexColors = !dc.isPickingMode()
+				&& pathData.getTessellatedColors() != null
+				&& isShowTrackValueColor_Interior();
+
+		// Convert stride from number of elements to number of bytes.
+		gl.glBindBuffer(GL.GL_ARRAY_BUFFER, vboIds[0]);
+		gl.glVertexPointer(3, GL.GL_FLOAT, 4 * vertexStride, 0);
+
+		// Apply this path's per-position colors if we're in normal rendering mode (not picking) and this path's
+		// positionColors is non-null.
+		if (useVertexColors) {
+
+			// Convert stride and offset from number of elements to number of bytes.
+			gl.glEnableClientState(GL.GL_COLOR_ARRAY);
+			gl.glColorPointer(4, GL.GL_FLOAT, 4 * vertexStride, 4 * pathData.getColorOffset());
+		}
+
+		gl.glDrawArrays(GL.GL_TRIANGLE_STRIP, 0, pathData.getVertexCount());
+
+		if (useVertexColors) {
+			gl.glDisableClientState(GL.GL_COLOR_ARRAY);
+		}
+
+//		final GL gl = dc.getGL();
+//
+//		// Convert stride from number of elements to number of bytes.
+//		gl.glBindBuffer(GL.GL_ARRAY_BUFFER, vboIds[0]);
+//		gl.glVertexPointer(3, GL.GL_FLOAT, 4 * pathData.getVertexStride(), 0);
+//		gl.glDrawArrays(GL.GL_TRIANGLE_STRIP, 0, pathData.getVertexCount());
+
+		gl.glBindBuffer(GL.GL_ARRAY_BUFFER, 0);
+	}
+
+	@Override
 	protected void doDrawOutlineVBO(final DrawContext dc, final int[] vboIds, final PathData pathData) {
 
 		final boolean isPickingMode = dc.isPickingMode();
@@ -387,10 +426,6 @@ public class TrackPathOptimized extends MTMultiResolutionPath implements ITrackP
 				drawPointsVBO(dc, vboIds, pathData);
 			}
 
-			if (!isPickingMode) {
-//				drawColoredWallVBO(dc, vboIds, pathData);
-			}
-
 			if (!isPickingMode && _isShowArrows) {
 				drawDirectionArrows(dc, vboIds, pathData);
 			}
@@ -398,37 +433,6 @@ public class TrackPathOptimized extends MTMultiResolutionPath implements ITrackP
 		} finally {
 			gl.glBindBuffer(GL.GL_ARRAY_BUFFER, 0);
 			gl.glBindBuffer(GL.GL_ELEMENT_ARRAY_BUFFER, 0);
-		}
-	}
-
-	private void drawColoredWallVBO(final DrawContext dc, final int[] vboIds, final PathData pathData) {
-
-		final GL gl = dc.getGL();
-
-		final int vertexStride = pathData.getVertexStride();
-
-		final int stride = vertexStride;
-		final boolean useVertexColors = !dc.isPickingMode()
-				&& pathData.getTessellatedColors() != null
-				&& isShowTrackValueColor_Interior();
-
-		// Convert stride from number of elements to number of bytes.
-		gl.glBindBuffer(GL.GL_ARRAY_BUFFER, vboIds[0]);
-		gl.glVertexPointer(3, GL.GL_FLOAT, 4 * stride, 0);
-
-		// Apply this path's per-position colors if we're in normal rendering mode (not picking) and this path's
-		// positionColors is non-null.
-		if (useVertexColors) {
-
-			// Convert stride and offset from number of elements to number of bytes.
-			gl.glEnableClientState(GL.GL_COLOR_ARRAY);
-			gl.glColorPointer(4, GL.GL_FLOAT, 4 * stride, 4 * pathData.getColorOffset());
-		}
-
-		gl.glDrawArrays(GL.GL_TRIANGLE_STRIP, 0, pathData.getVertexCount());
-
-		if (useVertexColors) {
-			gl.glDisableClientState(GL.GL_COLOR_ARRAY);
 		}
 	}
 
@@ -539,6 +543,10 @@ public class TrackPathOptimized extends MTMultiResolutionPath implements ITrackP
 	 */
 	@Override
 	protected void drawPointsVBO(final DrawContext dc, final int[] vboIds, final PathData pathData) {
+
+		if (_tourTrackConfig.isShowTrackPosition == false) {
+			return;
+		}
 
 		final double d = getDistanceMetric(dc, pathData);
 		if (d > getShowPositionsThreshold()) {
