@@ -64,7 +64,6 @@ public class TrackPathOptimized extends MTMultiResolutionPath implements ITrackP
 	private int					_arrowSurfaceVboId;
 	private int					_arrowBorderVboId;
 
-	private boolean				_isShowArrows		= true;
 	private int					_numberOfDirectionArrows;
 
 	public TrackPathOptimized(final ArrayList<TourMap3Position> trackPositions) {
@@ -77,7 +76,7 @@ public class TrackPathOptimized extends MTMultiResolutionPath implements ITrackP
 												final FloatBuffer path,
 												final PathData pathData) {
 
-		if (_isShowArrows) {
+		if (_tourTrackConfig.isShowDirectionArrows) {
 
 			computeArrowPositions(dc, positions, pathData);
 			computeDirectionArrows(dc, pathData);
@@ -320,41 +319,30 @@ public class TrackPathOptimized extends MTMultiResolutionPath implements ITrackP
 	@Override
 	protected void doDrawInteriorVBO(final DrawContext dc, final int[] vboIds, final PathData pathData) {
 
-		final GL gl = dc.getGL();
+		/*
+		 * Interior vertex color is painted in drawInteriorVertexColorVBO(...) to solve z fighting
+		 * problems.
+		 */
+		if (isShowInteriorVertexColor(dc, pathData) == false) {
 
-		final int vertexStride = pathData.getVertexStride();
+			// draw with solid color
 
-		final boolean useVertexColors = !dc.isPickingMode()
-				&& pathData.getTessellatedColors() != null
-				&& isShowTrackValueColor_Interior();
+			final Color solidColor = getSolidColor_Interior();
 
-		// Convert stride from number of elements to number of bytes.
-		gl.glBindBuffer(GL.GL_ARRAY_BUFFER, vboIds[0]);
-		gl.glVertexPointer(3, GL.GL_FLOAT, 4 * vertexStride, 0);
+			if (!dc.isPickingMode() && solidColor != null) {
 
-		// Apply this path's per-position colors if we're in normal rendering mode (not picking) and this path's
-		// positionColors is non-null.
-		if (useVertexColors) {
+				// set solid color
 
-			// Convert stride and offset from number of elements to number of bytes.
-			gl.glEnableClientState(GL.GL_COLOR_ARRAY);
-			gl.glColorPointer(4, GL.GL_FLOAT, 4 * vertexStride, 4 * pathData.getColorOffset());
+				dc.getGL().glColor4ub(
+						(byte) solidColor.getRed(),
+						(byte) solidColor.getGreen(),
+						(byte) solidColor.getBlue(),
+						(byte) solidColor.getAlpha());
+			}
+
+			super.doDrawInteriorVBO(dc, vboIds, pathData);
 		}
 
-		gl.glDrawArrays(GL.GL_TRIANGLE_STRIP, 0, pathData.getVertexCount());
-
-		if (useVertexColors) {
-			gl.glDisableClientState(GL.GL_COLOR_ARRAY);
-		}
-
-//		final GL gl = dc.getGL();
-//
-//		// Convert stride from number of elements to number of bytes.
-//		gl.glBindBuffer(GL.GL_ARRAY_BUFFER, vboIds[0]);
-//		gl.glVertexPointer(3, GL.GL_FLOAT, 4 * pathData.getVertexStride(), 0);
-//		gl.glDrawArrays(GL.GL_TRIANGLE_STRIP, 0, pathData.getVertexCount());
-
-		gl.glBindBuffer(GL.GL_ARRAY_BUFFER, 0);
 	}
 
 	@Override
@@ -426,7 +414,12 @@ public class TrackPathOptimized extends MTMultiResolutionPath implements ITrackP
 				drawPointsVBO(dc, vboIds, pathData);
 			}
 
-			if (!isPickingMode && _isShowArrows) {
+			if (isShowInteriorVertexColor(dc, pathData)) {
+				// Interior with vertex color must be painted here otherwise there is a z depth problem !!!
+				drawInteriorVertexColorVBO(dc, vboIds, pathData);
+			}
+
+			if (!isPickingMode && _tourTrackConfig.isShowDirectionArrows) {
 				drawDirectionArrows(dc, vboIds, pathData);
 			}
 
@@ -526,6 +519,27 @@ public class TrackPathOptimized extends MTMultiResolutionPath implements ITrackP
 		}
 	}
 
+	private void drawInteriorVertexColorVBO(final DrawContext dc, final int[] vboIds, final PathData pathData) {
+
+		final GL gl = dc.getGL();
+
+		final int vertexStride = pathData.getVertexStride();
+
+		// Convert stride from number of elements to number of bytes.
+		gl.glBindBuffer(GL.GL_ARRAY_BUFFER, vboIds[0]);
+		{
+			gl.glEnableClientState(GL.GL_COLOR_ARRAY);
+			{
+				gl.glVertexPointer(3, GL.GL_FLOAT, 4 * vertexStride, 0);
+				gl.glColorPointer(4, GL.GL_FLOAT, 4 * vertexStride, 4 * pathData.getColorOffset());
+
+				gl.glDrawArrays(GL.GL_TRIANGLE_STRIP, 0, pathData.getVertexCount());
+			}
+			gl.glDisableClientState(GL.GL_COLOR_ARRAY);
+		}
+		gl.glBindBuffer(GL.GL_ARRAY_BUFFER, 0);
+	}
+
 	/**
 	 * Draws points at this path's specified positions.
 	 * <p/>
@@ -605,7 +619,7 @@ public class TrackPathOptimized extends MTMultiResolutionPath implements ITrackP
 						: 1;
 
 		// show arrow keys
-		if (_isShowArrows) {
+		if (_tourTrackConfig.isShowDirectionArrows) {
 			numberOfIds += 3;
 		}
 
@@ -627,7 +641,7 @@ public class TrackPathOptimized extends MTMultiResolutionPath implements ITrackP
 			iSize += pathData.getTessellatedPositions().size();
 		}
 
-		if (_isShowArrows) {
+		if (_tourTrackConfig.isShowDirectionArrows) {
 			iSize += ((FloatBuffer) pathData.getValue(ARROW_POSITION_KEY)).limit() * 4;
 			iSize += ((FloatBuffer) pathData.getValue(ARROW_SURFACE_KEY)).limit() * 4;
 			iSize += ((FloatBuffer) pathData.getValue(ARROW_BORDER_KEY)).limit() * 4;
@@ -664,7 +678,7 @@ public class TrackPathOptimized extends MTMultiResolutionPath implements ITrackP
 				gl.glBufferData(GL.GL_ELEMENT_ARRAY_BUFFER, ib.limit() * 4, ib.rewind(), GL.GL_STATIC_DRAW);
 			}
 
-			if (_isShowArrows) {
+			if (_tourTrackConfig.isShowDirectionArrows) {
 
 				int vboIndex = numberOfIds - 3;
 
@@ -707,36 +721,72 @@ public class TrackPathOptimized extends MTMultiResolutionPath implements ITrackP
 		return positionColors;
 	}
 
+	/**
+	 * @return Returns <code>null</code> when vertex color should be use for painting otherwise it
+	 *         returns the solid color.
+	 */
+	private Color getSolidColor_Interior() {
+
+		final boolean isTourSelected = _tourTrack.isSelected();
+		final boolean isTourHovered = _tourTrack.isHovered();
+
+		RGB solidColor = null;
+		float interiorOpacity = 0;
+
+		if (isTourHovered && isTourSelected) {
+
+			if (_tourTrackConfig.interiorColorMode_HovSel == TourTrackConfig.COLOR_MODE_SOLID_COLOR) {
+
+				solidColor = _tourTrackConfig.interiorColor_HovSel;
+				interiorOpacity = (float) (_tourTrackConfig.interiorOpacity_HovSel);
+			}
+
+		} else if (isTourHovered) {
+
+			if (_tourTrackConfig.interiorColorMode_Hovered == TourTrackConfig.COLOR_MODE_SOLID_COLOR) {
+
+				solidColor = _tourTrackConfig.interiorColor_Hovered;
+				interiorOpacity = (float) (_tourTrackConfig.interiorOpacity_Hovered);
+			}
+
+		} else if (isTourSelected) {
+
+			if (_tourTrackConfig.interiorColorMode_Selected == TourTrackConfig.COLOR_MODE_SOLID_COLOR) {
+				solidColor = _tourTrackConfig.interiorColor_Selected;
+				interiorOpacity = (float) (_tourTrackConfig.interiorOpacity_Selected);
+			}
+
+		} else {
+
+			if (_tourTrackConfig.interiorColorMode == TourTrackConfig.COLOR_MODE_SOLID_COLOR) {
+				solidColor = _tourTrackConfig.interiorColor;
+				interiorOpacity = (float) (_tourTrackConfig.interiorOpacity);
+			}
+		}
+
+		if (solidColor == null) {
+			return null;
+		}
+
+		return new Color(//
+				solidColor.red / 255.0f,
+				solidColor.green / 255.0f,
+				solidColor.blue / 255.0f,
+				interiorOpacity);
+	}
+
 	@Override
 	public TourTrack getTourTrack() {
 		return _tourTrack;
 	}
 
-	private boolean isShowTrackValueColor_Interior() {
+	private boolean isShowInteriorVertexColor(final DrawContext dc, final PathData pathData) {
 
-		boolean isShowTrackValue;
+		final boolean useVertexColors = !dc.isPickingMode()
+				&& pathData.getTessellatedColors() != null
+				&& getSolidColor_Interior() == null;
 
-		final boolean isTourSelected = _tourTrack.isSelected();
-		final boolean isTourHovered = _tourTrack.isHovered();
-
-		if (isTourHovered && isTourSelected) {
-
-			isShowTrackValue = _tourTrackConfig.interiorColorMode_HovSel == TourTrackConfig.COLOR_MODE_TRACK_VALUE;
-
-		} else if (isTourHovered) {
-
-			isShowTrackValue = _tourTrackConfig.interiorColorMode_Hovered == TourTrackConfig.COLOR_MODE_TRACK_VALUE;
-
-		} else if (isTourSelected) {
-
-			isShowTrackValue = _tourTrackConfig.interiorColorMode_Selected == TourTrackConfig.COLOR_MODE_TRACK_VALUE;
-
-		} else {
-
-			isShowTrackValue = _tourTrackConfig.interiorColorMode == TourTrackConfig.COLOR_MODE_TRACK_VALUE;
-		}
-
-		return isShowTrackValue;
+		return useVertexColors;
 	}
 
 	/**

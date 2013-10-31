@@ -100,6 +100,7 @@ public class Map3Manager {
 	private static final String							ERROR_02						= "NTMV_MM_002 Layer \"{0}\" is not defined as map default layer."; //$NON-NLS-1$
 	private static final String							ERROR_03						= "NTMV_MM_003 XML layer \"{0}\" is not available.";				//$NON-NLS-1$
 	private static final String							ERROR_04						= "NTMV_MM_004 Category \"{0}\" is not a default category.";		//$NON-NLS-1$
+
 	/**
 	 * _bundle must be set here otherwise an exception occures in saveState()
 	 */

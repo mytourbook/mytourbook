@@ -622,6 +622,20 @@ public class TourTrackLayer extends RenderableLayer implements SelectListener, I
 		_tourPositionColors.setColorProvider(colorProvider);
 	}
 
+	public void setExpired() {
+
+		for (final Renderable renderable : getRenderables()) {
+
+			if (renderable instanceof ITrackPath) {
+				final ITrackPath trackPath = (ITrackPath) renderable;
+
+				trackPath.setExpired();
+			}
+		}
+		
+		Map3Manager.getWWCanvas().redraw();
+	}
+
 	/**
 	 * Set attributes from the configuration into the path but <b>only</b> when they have changed
 	 * because setting some properties will reset the path and it will be recreated.

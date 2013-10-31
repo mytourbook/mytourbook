@@ -68,6 +68,7 @@ import net.tourbook.map2.view.TourMapColors;
 import net.tourbook.map3.action.ActionMapColor;
 import net.tourbook.map3.action.ActionOpenMap3LayerView;
 import net.tourbook.map3.action.ActionShowChartSliderInMap;
+import net.tourbook.map3.action.ActionShowDirectionArrows;
 import net.tourbook.map3.action.ActionShowEntireTour;
 import net.tourbook.map3.action.ActionShowLegendInMap3;
 import net.tourbook.map3.action.ActionShowTourInMap3;
@@ -147,6 +148,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 	private ActionOpenMap3LayerView				_actionOpenMap3LayerView;
 	private ActionMapColor						_actionMapColor;
 	private ActionShowChartSliderInMap			_actionShowChartSliderInMap;
+	private ActionShowDirectionArrows			_actionShowDirectionArrows;
 	private ActionShowEntireTour				_actionShowEntireTour;
 	private ActionShowLegendInMap3				_actionShowLegendInMap;
 	private ActionShowTourInMap3				_actionShowTourInMap3;
@@ -258,7 +260,20 @@ public class Map3View extends ViewPart implements ITourProvider {
 
 		_isChartSliderVisible = isVisible;
 
+		enableActions();
+
 		Map3Manager.setLayerVisible_ChartSlider(isVisible);
+	}
+
+	public void actionShowDirectionArrows(final boolean isVisible) {
+
+		final TourTrackLayer tourTrackLayer = Map3Manager.getLayer_TourTrack();
+		final TourTrackConfig trackConfig = tourTrackLayer.getConfig();
+
+		trackConfig.isShowDirectionArrows = isVisible;
+
+		// invalidate cached data and force a redraw
+		tourTrackLayer.setExpired();
 	}
 
 	public void actionShowLegendInMap(final boolean isLegendVisible) {
@@ -563,6 +578,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 		_actionMapColor = new ActionMapColor(this, _state);
 
 		_actionShowChartSliderInMap = new ActionShowChartSliderInMap(this);
+		_actionShowDirectionArrows = new ActionShowDirectionArrows(this);
 		_actionShowEntireTour = new ActionShowEntireTour(this);
 		_actionShowLegendInMap = new ActionShowLegendInMap3(this);
 		_actionShowTourInMap3 = new ActionShowTourInMap3(this, parent);
@@ -584,7 +600,6 @@ public class Map3View extends ViewPart implements ITourProvider {
 		_actionOpenMarkerDialog = new ActionOpenMarkerDialog(this, true);
 		_actionOpenTour = new ActionOpenTour(this);
 		_actionPrintTour = new ActionPrint(this);
-
 	}
 
 	/**
@@ -823,7 +838,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 		final boolean isTourAvailable = _allTours.size() > 0;
 
 		_actionShowTourInMap3.setState(isTrackVisible, isTourAvailable);
-		_actionSynMapWithChartSlider.setEnabled(isTourAvailable);
+		_actionSynMapWithChartSlider.setEnabled(isTourAvailable && _isChartSliderVisible);
 		_actionSynMapWithTour.setEnabled(isTourAvailable);
 
 		_actionShowLegendInMap.setChecked(isLegendVisible);
@@ -878,8 +893,9 @@ public class Map3View extends ViewPart implements ITourProvider {
 
 	private void fillContextMenu(final Menu menu) {
 
-		fillMenuItem(menu, _actionShowLegendInMap);
+		fillMenuItem(menu, _actionShowDirectionArrows);
 		fillMenuItem(menu, _actionShowChartSliderInMap);
+		fillMenuItem(menu, _actionShowLegendInMap);
 
 		// set color before menu is filled, this sets the action image and color id
 		_actionMapColor.setColorId(_tourColorId);
@@ -924,7 +940,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 	}
 
 	/**
-	 * @return Returns {@link ChartSliderLayer} or null when layer is not displayed.
+	 * @return Returns {@link ChartSliderLayer} or <code>null</code> when layer is not displayed.
 	 */
 	private ChartSliderLayer getChartSliderLayer() {
 
@@ -1317,23 +1333,6 @@ public class Map3View extends ViewPart implements ITourProvider {
 		}
 	}
 
-	void redraw() {
-
-//		_mapContainer.getDisplay().asyncExec(new Runnable() {
-//			public void run() {
-//				_mapContainer.redraw();
-//
-//			}
-//		});
-
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				_awtFrame.validate();
-				_awtFrame.repaint();
-			}
-		});
-	}
-
 	private void restoreState() {
 
 		final boolean isTourAvailable = _allTours.size() > 0;
@@ -1402,6 +1401,8 @@ public class Map3View extends ViewPart implements ITourProvider {
 		}
 
 		setColorProvider(_tourColorId);
+
+		_actionShowDirectionArrows.setChecked(Map3Manager.getLayer_TourTrack().getConfig().isShowDirectionArrows);
 
 		// restore 3D view
 		final String stateMap3View = Util.getStateString(_state, STATE_MAP3_VIEW, null);
@@ -1951,18 +1952,6 @@ public class Map3View extends ViewPart implements ITourProvider {
 		showAllTours(false);
 	}
 
-	private void updateModifiedTours(final ArrayList<TourData> modifiedTours) {
-
-		// cleanup old tours, this method cannot be used: cleanupOldTours();
-		_postSelectionProvider.clearSelection();
-		_previousMapSliderPosition = null;
-
-		_allTours.removeAll(modifiedTours);
-		_allTours.addAll(getMapTours(modifiedTours));
-
-		showAllTours_InternalTours();
-	}
-
 //	public static final String	ALL						= "gov.nasa.worldwind.perfstat.All";
 //
 //	public static final String	FRAME_RATE				= "gov.nasa.worldwind.perfstat.FrameRate";
@@ -2000,6 +1989,18 @@ public class Map3View extends ViewPart implements ITourProvider {
 
 //2013-10-06 10:12:12.318'118 [Map3View] 	    463659  JVM total memory (Kb)
 //2013-10-06 10:12:12.318'141 [Map3View] 	    431273  JVM used memory (Kb)
+
+	private void updateModifiedTours(final ArrayList<TourData> modifiedTours) {
+
+		// cleanup old tours, this method cannot be used: cleanupOldTours();
+		_postSelectionProvider.clearSelection();
+		_previousMapSliderPosition = null;
+
+		_allTours.removeAll(modifiedTours);
+		_allTours.addAll(getMapTours(modifiedTours));
+
+		showAllTours_InternalTours();
+	}
 
 	private void updateStatistics() {
 

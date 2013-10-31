@@ -59,12 +59,6 @@ public class TourTrack {
 
 	Color getColor(final Position pos, final Integer ordinal) {
 
-		if (_isHovered) {
-
-			// prevent setting position colors
-//			return null;
-		}
-
 		final PositionColors positionColors = _trackPath.getPathPositionColors();
 		if (positionColors instanceof TourPositionColors) {
 

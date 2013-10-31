@@ -108,6 +108,10 @@ public class Messages extends NLS {
 	public static String	TourTrack_Properties_Label_DirectionArrowSize;
 
 	public static String	TourTrack_Properties_Label_DirectionArrowSize_Tooltip;
+
+	public static String	TourTrack_Properties_Label_Name;
+
+	public static String	TourTrack_Properties_Label_Name_Tooltip;
 	public static String		TourTrack_Properties_Label_OutlineColorHovered;
 	public static String		TourTrack_Properties_Label_OutlineColorHovered_Tooltip;
 	public static String	TourTrack_Properties_Label_OutlineColor;
