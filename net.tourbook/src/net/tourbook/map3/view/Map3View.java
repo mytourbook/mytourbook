@@ -80,6 +80,7 @@ import net.tourbook.map3.layer.TourInfoLayer;
 import net.tourbook.map3.layer.tourtrack.ITrackPath;
 import net.tourbook.map3.layer.tourtrack.TourMap3Position;
 import net.tourbook.map3.layer.tourtrack.TourTrackConfig;
+import net.tourbook.map3.layer.tourtrack.TourTrackConfigManager;
 import net.tourbook.map3.layer.tourtrack.TourTrackLayer;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.printing.ActionPrint;
@@ -268,7 +269,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 	public void actionShowDirectionArrows(final boolean isVisible) {
 
 		final TourTrackLayer tourTrackLayer = Map3Manager.getLayer_TourTrack();
-		final TourTrackConfig trackConfig = tourTrackLayer.getConfig();
+		final TourTrackConfig trackConfig = TourTrackConfigManager.getActiveConfig();
 
 		trackConfig.isShowDirectionArrows = isVisible;
 
@@ -1038,7 +1039,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 
 	private double getSliderYPosition(final float trackAltitude) {
 
-		final TourTrackConfig trackConfig = Map3Manager.getLayer_TourTrack().getConfig();
+		final TourTrackConfig trackConfig = TourTrackConfigManager.getActiveConfig();
 
 		final int altitudeMode = trackConfig.altitudeMode;
 		final boolean isAbsoluteAltitudeMode = altitudeMode == WorldWind.ABSOLUTE;
@@ -1402,7 +1403,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 
 		setColorProvider(_tourColorId);
 
-		_actionShowDirectionArrows.setChecked(Map3Manager.getLayer_TourTrack().getConfig().isShowDirectionArrows);
+		_actionShowDirectionArrows.setChecked(TourTrackConfigManager.getActiveConfig().isShowDirectionArrows);
 
 		// restore 3D view
 		final String stateMap3View = Util.getStateString(_state, STATE_MAP3_VIEW, null);
@@ -1525,7 +1526,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 
 		final double sliderYPosition = getSliderYPosition(trackAltitude);
 
-		final TourTrackConfig trackConfig = Map3Manager.getLayer_TourTrack().getConfig();
+		final TourTrackConfig trackConfig = TourTrackConfigManager.getActiveConfig();
 
 		annotation.setAltitudeMode(trackConfig.altitudeMode);
 		annotation.setPosition(new Position(new LatLon(//

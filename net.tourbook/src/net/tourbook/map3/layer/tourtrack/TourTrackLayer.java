@@ -51,8 +51,6 @@ public class TourTrackLayer extends RenderableLayer implements SelectListener, I
 	private final TourPositionColors	_tourPositionColors;
 	private IMapColorProvider			_colorProvider;
 
-	private final TourTrackConfig		_trackConfig;
-
 	private ITrackPath					_lastHoveredTourTrack;
 	private Integer						_lastHoveredPositionIndex;
 
@@ -73,7 +71,6 @@ public class TourTrackLayer extends RenderableLayer implements SelectListener, I
 
 	public TourTrackLayer(final IDialogSettings state) {
 
-		_trackConfig = new TourTrackConfig(state);
 		_tourPositionColors = new TourPositionColors();
 
 		addPropertyChangeListener(this);
@@ -99,10 +96,12 @@ public class TourTrackLayer extends RenderableLayer implements SelectListener, I
 		// remove all tracks from layer
 		removeAllRenderables();
 
-		final boolean isAbsoluteAltitudeMode = _trackConfig.altitudeMode == WorldWind.ABSOLUTE;
+		final TourTrackConfig trackConfig = TourTrackConfigManager.getActiveConfig();
 
-		final int altitudeOffset = isAbsoluteAltitudeMode && _trackConfig.isAbsoluteOffset
-				? _trackConfig.altitudeVerticalOffset
+		final boolean isAbsoluteAltitudeMode = trackConfig.altitudeMode == WorldWind.ABSOLUTE;
+
+		final int altitudeOffset = isAbsoluteAltitudeMode && trackConfig.isAbsoluteOffset
+				? trackConfig.altitudeVerticalOffset
 				: 0;
 
 		final ArrayList<TourMap3Position> allPositions = new ArrayList<TourMap3Position>();
@@ -159,11 +158,11 @@ public class TourTrackLayer extends RenderableLayer implements SelectListener, I
 			 */
 			ITrackPath trackPath;
 
-			if (_trackConfig.pathResolution == TourTrackConfig.PATH_RESOLUTION_VIEWPORT) {
+			if (trackConfig.pathResolution == TourTrackConfig.PATH_RESOLUTION_VIEWPORT) {
 
 				trackPath = new TrackPathViewport(trackPositions);
 
-			} else if (_trackConfig.pathResolution == TourTrackConfig.PATH_RESOLUTION_ALL_POSITIONS) {
+			} else if (trackConfig.pathResolution == TourTrackConfig.PATH_RESOLUTION_ALL_POSITIONS) {
 
 				trackPath = new TrackPathHighResolution(trackPositions);
 
@@ -175,7 +174,7 @@ public class TourTrackLayer extends RenderableLayer implements SelectListener, I
 
 			final TourTrack tourTrack = new TourTrack(trackPath, tourData, trackPositions, _colorProvider);
 
-			trackPath.setTourTrack(tourTrack, _trackConfig);
+			trackPath.setTourTrack(tourTrack, trackConfig);
 
 			// Show how to make the colors vary along the paths.
 			trackPath.getPath().setPositionColors(_tourPositionColors);
@@ -212,10 +211,6 @@ public class TourTrackLayer extends RenderableLayer implements SelectListener, I
 //		// TODO remove SYSTEM.OUT.PRINTLN
 
 		return allPositions;
-	}
-
-	public TourTrackConfig getConfig() {
-		return _trackConfig;
 	}
 
 	/**
@@ -258,7 +253,9 @@ public class TourTrackLayer extends RenderableLayer implements SelectListener, I
 
 	public void onModifyConfig() {
 
-		if (_trackConfig.isRecreateTracks) {
+		final TourTrackConfig trackConfig = TourTrackConfigManager.getActiveConfig();
+
+		if (trackConfig.isRecreateTracks) {
 
 			// track data has changed
 
@@ -305,7 +302,7 @@ public class TourTrackLayer extends RenderableLayer implements SelectListener, I
 
 	public void saveState(final IDialogSettings state) {
 
-		_trackConfig.saveState(state);
+		TourTrackConfigManager.saveState();
 	}
 
 	/**
@@ -632,7 +629,7 @@ public class TourTrackLayer extends RenderableLayer implements SelectListener, I
 				trackPath.setExpired();
 			}
 		}
-		
+
 		Map3Manager.getWWCanvas().redraw();
 	}
 
@@ -644,29 +641,31 @@ public class TourTrackLayer extends RenderableLayer implements SelectListener, I
 	 */
 	private void setPathAttributes(final ITrackPath trackPath) {
 
+		final TourTrackConfig trackConfig = TourTrackConfigManager.getActiveConfig();
+
 		// force the track colors to be recreated, opacity can habe been changed
-		trackPath.getTourTrack().updateColors(_trackConfig.outlineOpacity);
+		trackPath.getTourTrack().updateColors(trackConfig.outlineOpacity);
 
 		final Path path = trackPath.getPath();
 
-		path.setShowPositionsThreshold(Math.pow(10, _trackConfig.trackPositionThreshold));
+		path.setShowPositionsThreshold(Math.pow(10, trackConfig.trackPositionThreshold));
 
-		final int altitudeMode = _trackConfig.altitudeMode;
+		final int altitudeMode = trackConfig.altitudeMode;
 		if (altitudeMode != path.getAltitudeMode()) {
 			path.setAltitudeMode(altitudeMode);
 		}
 
-		final boolean isFollowTerrain = _trackConfig.isFollowTerrain;
+		final boolean isFollowTerrain = trackConfig.isFollowTerrain;
 		if (isFollowTerrain != path.isFollowTerrain()) {
 			path.setFollowTerrain(isFollowTerrain);
 		}
 
-		final boolean isExtrudePath = _trackConfig.isExtrudePath;
+		final boolean isExtrudePath = trackConfig.isShowInterior;
 		if (isExtrudePath != path.isExtrude()) {
 			path.setExtrude(isExtrudePath);
 		}
 
-		final boolean isDrawVerticals = _trackConfig.isDrawVerticals;
+		final boolean isDrawVerticals = trackConfig.isDrawVerticals;
 		if (isDrawVerticals != path.isDrawVerticals()) {
 			path.setDrawVerticals(isDrawVerticals);
 		}
@@ -675,11 +674,7 @@ public class TourTrackLayer extends RenderableLayer implements SelectListener, I
 		 * numSubsegments do not have a UI (it's disabled) but ensure that 0 subsegments are set
 		 */
 		if (path.getNumSubsegments() != 0) {
-
-			final int subSegments = 0;
-
-			path.setNumSubsegments(subSegments);
-			_trackConfig.numSubsegments = subSegments;
+			path.setNumSubsegments(0);
 		}
 
 		/*
@@ -709,19 +704,21 @@ public class TourTrackLayer extends RenderableLayer implements SelectListener, I
 	 */
 	private void setPathAttributes_Hovered() {
 
-		final RGB interiorRGB = _trackConfig.interiorColor_Hovered;
-		final RGB outlineRGB = _trackConfig.outlineColor_Hovered;
+		final TourTrackConfig trackConfig = TourTrackConfigManager.getActiveConfig();
+
+		final RGB interiorRGB = trackConfig.interiorColor_Hovered;
+		final RGB outlineRGB = trackConfig.outlineColor_Hovered;
 
 		final Color interiorColor = new Color(interiorRGB.red, interiorRGB.green, interiorRGB.blue);
 		final Color outlineColor = new Color(outlineRGB.red, outlineRGB.green, outlineRGB.blue);
 
 		_hoveredAttributes.setDrawOutline(true);
-		_hoveredAttributes.setOutlineWidth(_trackConfig.outlineWidth);
-		_hoveredAttributes.setOutlineOpacity(_trackConfig.outlineOpacity_Hovered);
+		_hoveredAttributes.setOutlineWidth(trackConfig.outlineWidth);
+		_hoveredAttributes.setOutlineOpacity(trackConfig.outlineOpacity_Hovered);
 		_hoveredAttributes.setOutlineMaterial(new Material(outlineColor));
 
 		_hoveredAttributes.setDrawInterior(true);
-		_hoveredAttributes.setInteriorOpacity(_trackConfig.interiorOpacity_Hovered);
+		_hoveredAttributes.setInteriorOpacity(trackConfig.interiorOpacity_Hovered);
 		_hoveredAttributes.setInteriorMaterial(new Material(interiorColor));
 	}
 
@@ -732,19 +729,21 @@ public class TourTrackLayer extends RenderableLayer implements SelectListener, I
 	 */
 	private void setPathAttributes_HovSel() {
 
-		final RGB interiorRGB = _trackConfig.interiorColor_HovSel;
-		final RGB outlineRGB = _trackConfig.outlineColor_HovSel;
+		final TourTrackConfig trackConfig = TourTrackConfigManager.getActiveConfig();
+
+		final RGB interiorRGB = trackConfig.interiorColor_HovSel;
+		final RGB outlineRGB = trackConfig.outlineColor_HovSel;
 
 		final Color interiorColor = new Color(interiorRGB.red, interiorRGB.green, interiorRGB.blue);
 		final Color outlineColor = new Color(outlineRGB.red, outlineRGB.green, outlineRGB.blue);
 
 		_hovselAttributes.setDrawOutline(true);
-		_hovselAttributes.setOutlineWidth(_trackConfig.outlineWidth);
-		_hovselAttributes.setOutlineOpacity(_trackConfig.outlineOpacity_HovSel);
+		_hovselAttributes.setOutlineWidth(trackConfig.outlineWidth);
+		_hovselAttributes.setOutlineOpacity(trackConfig.outlineOpacity_HovSel);
 		_hovselAttributes.setOutlineMaterial(new Material(outlineColor));
 
 		_hovselAttributes.setDrawInterior(true);
-		_hovselAttributes.setInteriorOpacity(_trackConfig.interiorOpacity_HovSel);
+		_hovselAttributes.setInteriorOpacity(trackConfig.interiorOpacity_HovSel);
 		_hovselAttributes.setInteriorMaterial(new Material(interiorColor));
 	}
 
@@ -755,19 +754,21 @@ public class TourTrackLayer extends RenderableLayer implements SelectListener, I
 	 */
 	private void setPathAttributes_Normal() {
 
-		final RGB interiorRGB = _trackConfig.interiorColor;
-		final RGB outlineRGB = _trackConfig.outlineColor;
+		final TourTrackConfig trackConfig = TourTrackConfigManager.getActiveConfig();
+
+		final RGB interiorRGB = trackConfig.interiorColor;
+		final RGB outlineRGB = trackConfig.outlineColor;
 
 		final Color interiorColor = new Color(interiorRGB.red, interiorRGB.green, interiorRGB.blue);
 		final Color outlineColor = new Color(outlineRGB.red, outlineRGB.green, outlineRGB.blue);
 
 		_normalAttributes.setDrawOutline(true);
-		_normalAttributes.setOutlineWidth(_trackConfig.outlineWidth);
-		_normalAttributes.setOutlineOpacity(_trackConfig.outlineOpacity);
+		_normalAttributes.setOutlineWidth(trackConfig.outlineWidth);
+		_normalAttributes.setOutlineOpacity(trackConfig.outlineOpacity);
 		_normalAttributes.setOutlineMaterial(new Material(outlineColor));
 
 		_normalAttributes.setDrawInterior(true);
-		_normalAttributes.setInteriorOpacity(_trackConfig.interiorOpacity);
+		_normalAttributes.setInteriorOpacity(trackConfig.interiorOpacity);
 		_normalAttributes.setInteriorMaterial(new Material(interiorColor));
 	}
 
@@ -778,19 +779,21 @@ public class TourTrackLayer extends RenderableLayer implements SelectListener, I
 	 */
 	private void setPathAttributes_Selected() {
 
-		final RGB interiorRGB = _trackConfig.interiorColor_Selected;
-		final RGB outlineRGB = _trackConfig.outlineColor_Selected;
+		final TourTrackConfig trackConfig = TourTrackConfigManager.getActiveConfig();
+
+		final RGB interiorRGB = trackConfig.interiorColor_Selected;
+		final RGB outlineRGB = trackConfig.outlineColor_Selected;
 
 		final Color interiorColor = new Color(interiorRGB.red, interiorRGB.green, interiorRGB.blue);
 		final Color outlineColor = new Color(outlineRGB.red, outlineRGB.green, outlineRGB.blue);
 
 		_selecedAttributes.setDrawOutline(true);
-		_selecedAttributes.setOutlineWidth(_trackConfig.outlineWidth);
-		_selecedAttributes.setOutlineOpacity(_trackConfig.outlineOpacity_Selected);
+		_selecedAttributes.setOutlineWidth(trackConfig.outlineWidth);
+		_selecedAttributes.setOutlineOpacity(trackConfig.outlineOpacity_Selected);
 		_selecedAttributes.setOutlineMaterial(new Material(outlineColor));
 
 		_selecedAttributes.setDrawInterior(true);
-		_selecedAttributes.setInteriorOpacity(_trackConfig.interiorOpacity_Selected);
+		_selecedAttributes.setInteriorOpacity(trackConfig.interiorOpacity_Selected);
 		_selecedAttributes.setInteriorMaterial(new Material(interiorColor));
 	}
 
@@ -806,6 +809,7 @@ public class TourTrackLayer extends RenderableLayer implements SelectListener, I
 		final boolean isHovered = tourTrack.isHovered();
 		final boolean isSelected = tourTrack.isSelected();
 
+		final TourTrackConfig trackConfig = TourTrackConfigManager.getActiveConfig();
 		final ShapeAttributes shapeAttrs;
 
 		// defaults are for selected/hovered
@@ -816,21 +820,21 @@ public class TourTrackLayer extends RenderableLayer implements SelectListener, I
 
 			shapeAttrs = _hovselAttributes;
 
-			positionsScale = _trackConfig.trackPositionSize_Hovered;
+			positionsScale = trackConfig.trackPositionSize_Hovered;
 			isShowPositions = positionsScale == 0.0 ? false : true;
 
 		} else if (isHovered) {
 
 			shapeAttrs = _hoveredAttributes;
 
-			positionsScale = _trackConfig.trackPositionSize_Hovered;
+			positionsScale = trackConfig.trackPositionSize_Hovered;
 			isShowPositions = positionsScale == 0.0 ? false : true;
 
 		} else if (isSelected) {
 
 			shapeAttrs = _selecedAttributes;
 
-			positionsScale = _trackConfig.trackPositionSize_Selected;
+			positionsScale = trackConfig.trackPositionSize_Selected;
 			isShowPositions = positionsScale == 0.0 ? false : true;
 
 		} else {
@@ -839,14 +843,14 @@ public class TourTrackLayer extends RenderableLayer implements SelectListener, I
 
 			shapeAttrs = _normalAttributes;
 
-			isShowPositions = _trackConfig.isShowTrackPosition;
-			positionsScale = _trackConfig.trackPositionSize;
+			isShowPositions = trackConfig.isShowTrackPosition;
+			positionsScale = trackConfig.trackPositionSize;
 		}
 
 		final Path path = trackPath.getPath();
 
 		path.setShowPositions(isShowPositions);
-		path.setShowPositionsScale(positionsScale / _trackConfig.outlineWidth);
+		path.setShowPositionsScale(positionsScale / trackConfig.outlineWidth);
 
 		path.setHighlightAttributes(shapeAttrs);
 	}

@@ -469,53 +469,53 @@ public class Map3Manager {
 
 		try {
 
-			xmlRoot = createLayerXml_10_WriteRoot();
+			xmlRoot = createLayerXml_100_WriteRoot();
 
 			/*
 			 * Category: Map
 			 */
-			final IMemento xmlCategoryMap = createLayerXml_20_DefaultCategory(xmlRoot, MapDefaultCategory.ID_MAP);
+			final IMemento xmlCategoryMap = createLayerXml_110_DefaultCategory(xmlRoot, MapDefaultCategory.ID_MAP);
 			{
-				createLayerXml_30_DefaultLayer(xmlCategoryMap, true, MapDefaultLayer.ID_STARS);
-				createLayerXml_30_DefaultLayer(xmlCategoryMap, true, MapDefaultLayer.ID_ATMOSPHERE);
-				createLayerXml_30_DefaultLayer(xmlCategoryMap, true, MapDefaultLayer.ID_NASA_BLUE_MARBLE_IMAGE);
-				createLayerXml_30_DefaultLayer(xmlCategoryMap, true, MapDefaultLayer.ID_BLUE_MARBLE_WMS_2004);
-				createLayerXml_30_DefaultLayer(xmlCategoryMap, true, MapDefaultLayer.ID_I_CUBED_LANDSAT);
-				createLayerXml_30_DefaultLayer(xmlCategoryMap, false, MapDefaultLayer.ID_USDA_NAIP);
-				createLayerXml_30_DefaultLayer(xmlCategoryMap, false, MapDefaultLayer.ID_USDA_NAIP_USGS);
-				createLayerXml_30_DefaultLayer(xmlCategoryMap, true, MapDefaultLayer.ID_MS_VIRTUAL_EARTH_AERIAL);
-				createLayerXml_30_DefaultLayer(xmlCategoryMap, true, MapDefaultLayer.ID_BING_IMAGERY);
-				createLayerXml_30_DefaultLayer(xmlCategoryMap, false, MapDefaultLayer.ID_USGS_TOPOGRAPHIC_MAPS_1_250K);
-				createLayerXml_30_DefaultLayer(xmlCategoryMap, false, MapDefaultLayer.ID_USGS_TOPOGRAPHIC_MAPS_1_100K);
-				createLayerXml_30_DefaultLayer(xmlCategoryMap, false, MapDefaultLayer.ID_USGS_TOPOGRAPHIC_MAPS_1_24K);
-				createLayerXml_30_DefaultLayer(xmlCategoryMap, false, MapDefaultLayer.ID_USGS_URBAN_AREA_ORTHO);
-				createLayerXml_30_DefaultLayer(xmlCategoryMap, true, MapDefaultLayer.ID_POLITICAL_BOUNDARIES);
-				createLayerXml_30_DefaultLayer(xmlCategoryMap, false, MapDefaultLayer.ID_OPEN_STREET_MAP);
+				createLayerXml_120_DefaultLayer(xmlCategoryMap, true, MapDefaultLayer.ID_STARS);
+				createLayerXml_120_DefaultLayer(xmlCategoryMap, true, MapDefaultLayer.ID_ATMOSPHERE);
+				createLayerXml_120_DefaultLayer(xmlCategoryMap, true, MapDefaultLayer.ID_NASA_BLUE_MARBLE_IMAGE);
+				createLayerXml_120_DefaultLayer(xmlCategoryMap, true, MapDefaultLayer.ID_BLUE_MARBLE_WMS_2004);
+				createLayerXml_120_DefaultLayer(xmlCategoryMap, true, MapDefaultLayer.ID_I_CUBED_LANDSAT);
+				createLayerXml_120_DefaultLayer(xmlCategoryMap, false, MapDefaultLayer.ID_USDA_NAIP);
+				createLayerXml_120_DefaultLayer(xmlCategoryMap, false, MapDefaultLayer.ID_USDA_NAIP_USGS);
+				createLayerXml_120_DefaultLayer(xmlCategoryMap, true, MapDefaultLayer.ID_MS_VIRTUAL_EARTH_AERIAL);
+				createLayerXml_120_DefaultLayer(xmlCategoryMap, true, MapDefaultLayer.ID_BING_IMAGERY);
+				createLayerXml_120_DefaultLayer(xmlCategoryMap, false, MapDefaultLayer.ID_USGS_TOPOGRAPHIC_MAPS_1_250K);
+				createLayerXml_120_DefaultLayer(xmlCategoryMap, false, MapDefaultLayer.ID_USGS_TOPOGRAPHIC_MAPS_1_100K);
+				createLayerXml_120_DefaultLayer(xmlCategoryMap, false, MapDefaultLayer.ID_USGS_TOPOGRAPHIC_MAPS_1_24K);
+				createLayerXml_120_DefaultLayer(xmlCategoryMap, false, MapDefaultLayer.ID_USGS_URBAN_AREA_ORTHO);
+				createLayerXml_120_DefaultLayer(xmlCategoryMap, true, MapDefaultLayer.ID_POLITICAL_BOUNDARIES);
+				createLayerXml_120_DefaultLayer(xmlCategoryMap, false, MapDefaultLayer.ID_OPEN_STREET_MAP);
 			}
 
 			/*
 			 * Category: Tour
 			 */
-			final IMemento xmlCategoryTour = createLayerXml_20_DefaultCategory(xmlRoot, MapDefaultCategory.ID_TOUR);
+			final IMemento xmlCategoryTour = createLayerXml_110_DefaultCategory(xmlRoot, MapDefaultCategory.ID_TOUR);
 			{
-				createLayerXml_30_DefaultLayer(xmlCategoryTour, true, MapDefaultLayer.ID_PLACE_NAMES);
+				createLayerXml_120_DefaultLayer(xmlCategoryTour, true, MapDefaultLayer.ID_PLACE_NAMES);
 			}
 
 			/*
 			 * Category: Info
 			 */
-			final IMemento xmlCategoryInfo = createLayerXml_20_DefaultCategory(xmlRoot, MapDefaultCategory.ID_INFO);
+			final IMemento xmlCategoryInfo = createLayerXml_110_DefaultCategory(xmlRoot, MapDefaultCategory.ID_INFO);
 			{
-				createLayerXml_30_DefaultLayer(xmlCategoryInfo, true, MapDefaultLayer.ID_WORLD_MAP);
-				createLayerXml_30_DefaultLayer(xmlCategoryInfo, true, MapDefaultLayer.ID_SCALE_BAR);
+				createLayerXml_120_DefaultLayer(xmlCategoryInfo, true, MapDefaultLayer.ID_WORLD_MAP);
+				createLayerXml_120_DefaultLayer(xmlCategoryInfo, true, MapDefaultLayer.ID_SCALE_BAR);
 			}
 
 			/*
 			 * Category: Tools
 			 */
-			final IMemento xmlCategoryTools = createLayerXml_20_DefaultCategory(xmlRoot, MapDefaultCategory.ID_TOOL);
+			final IMemento xmlCategoryTools = createLayerXml_110_DefaultCategory(xmlRoot, MapDefaultCategory.ID_TOOL);
 			{
-				createLayerXml_30_DefaultLayer(xmlCategoryTools, true, MapDefaultLayer.ID_COMPASS);
+				createLayerXml_120_DefaultLayer(xmlCategoryTools, true, MapDefaultLayer.ID_COMPASS);
 			}
 
 		} catch (final Exception e) {
@@ -525,7 +525,7 @@ public class Map3Manager {
 		return xmlRoot;
 	}
 
-	private static XMLMemento createLayerXml_10_WriteRoot() {
+	private static XMLMemento createLayerXml_100_WriteRoot() {
 
 		final XMLMemento xmlRoot = XMLMemento.createWriteRoot(TAG_ROOT);
 
@@ -545,7 +545,7 @@ public class Map3Manager {
 		return xmlRoot;
 	}
 
-	private static IMemento createLayerXml_20_DefaultCategory(final IMemento xmlRoot, final String categoryId) {
+	private static IMemento createLayerXml_110_DefaultCategory(final IMemento xmlRoot, final String categoryId) {
 
 		final IMemento xmlCategory = xmlRoot.createChild(TAG_CATEGORY);
 
@@ -555,7 +555,7 @@ public class Map3Manager {
 		return xmlCategory;
 	}
 
-	private static void createLayerXml_30_DefaultLayer(	final IMemento xmlCategory,
+	private static void createLayerXml_120_DefaultLayer(	final IMemento xmlCategory,
 														final boolean isEnabled,
 														final String defaultLayerId) {
 
@@ -575,15 +575,15 @@ public class Map3Manager {
 	/**
 	 * @return
 	 */
-	private static XMLMemento createLayerXml_50_FromTreeItems() {
+	private static XMLMemento createLayerXml_200_FromTreeItems() {
 
 		XMLMemento xmlRoot = null;
 
 		try {
 
-			xmlRoot = createLayerXml_10_WriteRoot();
+			xmlRoot = createLayerXml_100_WriteRoot();
 
-			createLayerXml_60_FromTreeChildren(_uiRootItem, xmlRoot);
+			createLayerXml_210_FromTreeChildren(_uiRootItem, xmlRoot);
 
 		} catch (final Exception e) {
 			StatusUtil.log(e);
@@ -602,7 +602,7 @@ public class Map3Manager {
 	 * @param parentItem
 	 * @param xmlParent
 	 */
-	private static void createLayerXml_60_FromTreeChildren(final TreeViewerItem parentItem, final XMLMemento xmlParent) {
+	private static void createLayerXml_210_FromTreeChildren(final TreeViewerItem parentItem, final XMLMemento xmlParent) {
 
 		final ArrayList<TreeViewerItem> tviChildren = parentItem.getUnfetchedChildren();
 		if (tviChildren == null) {
@@ -620,7 +620,7 @@ public class Map3Manager {
 				xmlCategory.putString(ATTR_ID, tviCategory.getId());
 				xmlCategory.putBoolean(ATTR_IS_EXPANDED, isCategoryExpanded(tviCategory));
 
-				createLayerXml_60_FromTreeChildren(tviItem, xmlCategory);
+				createLayerXml_210_FromTreeChildren(tviItem, xmlCategory);
 
 			} else if (tviItem instanceof TVIMap3Layer) {
 
@@ -1121,7 +1121,7 @@ public class Map3Manager {
 		/*
 		 * save layer structure in xml file
 		 */
-		final XMLMemento xmlRoot = createLayerXml_50_FromTreeItems();
+		final XMLMemento xmlRoot = createLayerXml_200_FromTreeItems();
 		final File xmlFile = getLayerXmlFile();
 
 		Util.writeXml(xmlRoot, xmlFile);

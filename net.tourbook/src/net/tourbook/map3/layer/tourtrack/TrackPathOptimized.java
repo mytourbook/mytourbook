@@ -850,4 +850,13 @@ public class TrackPathOptimized extends MTMultiResolutionPath implements ITrackP
 		_tourTrack = tourTrack;
 		_tourTrackConfig = tourTrackConfig;
 	}
+
+	@Override
+	protected boolean shouldUseVBOs(final DrawContext dc) {
+
+//		draw with VA is not yet implemented !!!
+//		return this.getCurrentPathData().getTessellatedPositions().size() > VBO_THRESHOLD && super.shouldUseVBOs(dc);
+
+		return true;
+	}
 }

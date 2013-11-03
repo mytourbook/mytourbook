@@ -45,6 +45,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Scale;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Spinner;
+import org.eclipse.ui.IMemento;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
@@ -79,6 +80,10 @@ public class Util {
 	public static final String	ATTR_ROOT_VERSION_MINOR					= "VersionMinor";		//$NON-NLS-1$
 	public static final String	ATTR_ROOT_VERSION_MICRO					= "VersionMicro";		//$NON-NLS-1$
 	public static final String	ATTR_ROOT_VERSION_QUALIFIER				= "VersionQualifier";	//$NON-NLS-1$
+
+	public static final String	ATTR_COLOR_RED							= "red";				//$NON-NLS-1$
+	public static final String	ATTR_COLOR_GREEN						= "green";				//$NON-NLS-1$
+	public static final String	ATTR_COLOR_BLUE							= "blue";				//$NON-NLS-1$
 
 	public static int adjustScaleValueOnMouseScroll(final MouseEvent event) {
 
@@ -971,6 +976,97 @@ public class Util {
 		}
 	}
 
+	public static boolean getXmlBoolean(final XMLMemento xmlMemento, final String key, final Boolean defaultValue) {
+
+		Boolean value = xmlMemento.getBoolean(key);
+
+		if (value == null) {
+			value = defaultValue;
+		}
+
+		return value;
+	}
+
+	public static float getXmlFloat(final XMLMemento xmlMemento,
+									final String key,
+									final float defaultValue,
+									final int minValue,
+									final int maxValue) {
+
+		final Float value = getXmlFloat(xmlMemento, key, defaultValue);
+
+		if (value < minValue) {
+			return minValue;
+		}
+
+		if (value > maxValue) {
+			return maxValue;
+		}
+
+		return value;
+	}
+
+	public static Float getXmlFloat(final XMLMemento xmlMemento, final String key, final Float defaultValue) {
+
+		Float value = xmlMemento.getFloat(key);
+
+		if (value == null) {
+			value = defaultValue;
+		}
+
+		return value;
+	}
+
+	public static int getXmlInteger(final XMLMemento xmlMemento,
+									final String key,
+									final int defaultValue,
+									final int minValue,
+									final int maxValue) {
+
+		final int value = getXmlInteger(xmlMemento, key, defaultValue);
+
+		if (value < minValue) {
+			return minValue;
+		}
+
+		if (value > maxValue) {
+			return maxValue;
+		}
+
+		return value;
+	}
+
+	public static int getXmlInteger(final XMLMemento xmlMemento, final String key, final Integer defaultValue) {
+
+		Integer value = xmlMemento.getInteger(key);
+
+		if (value == null) {
+			value = defaultValue;
+		}
+
+		return value;
+	}
+
+	public static RGB getXmlRgb(final XMLMemento xmlMemento, final String key, final RGB defaultValue) {
+
+		final int red = getXmlInteger(xmlMemento, ATTR_COLOR_RED, defaultValue.red);
+		final int green = getXmlInteger(xmlMemento, ATTR_COLOR_GREEN, defaultValue.green);
+		final int blue = getXmlInteger(xmlMemento, ATTR_COLOR_BLUE, defaultValue.blue);
+
+		return new RGB(red, green, blue);
+	}
+
+	public static String getXmlString(final XMLMemento xmlConfig, final String key, final String defaultValue) {
+
+		String value = xmlConfig.getString(key);
+
+		if (value == null) {
+			value = defaultValue;
+		}
+
+		return value;
+	}
+
 	/**
 	 * found here: http://www.odi.ch/prog/design/datetime.php
 	 * 
@@ -1577,6 +1673,21 @@ public class Util {
 		stateValues[2] = Integer.toString(rgb.blue);
 
 		state.put(stateKey, stateValues);
+	}
+
+	/**
+	 * @param xmlColor
+	 * @param tagName
+	 * @param rgb
+	 */
+	public static void setXmlRgb(final IMemento xmlColor, final String tagName, final RGB rgb) {
+
+		final IMemento colorValue = xmlColor.createChild(tagName);
+		{
+			colorValue.putInteger(ATTR_COLOR_RED, rgb.red);
+			colorValue.putInteger(ATTR_COLOR_GREEN, rgb.green);
+			colorValue.putInteger(ATTR_COLOR_BLUE, rgb.blue);
+		}
 	}
 
 	public static void showSQLException(SQLException e) {
