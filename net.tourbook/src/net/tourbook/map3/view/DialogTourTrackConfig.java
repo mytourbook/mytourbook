@@ -296,13 +296,6 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 		GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
 //		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
 		{
-			/*
-			 * Label: Title
-			 */
-			final Label title = new Label(container, SWT.LEAD);
-			GridDataFactory.fillDefaults().grab(true, false).applyTo(title);
-			title.setFont(JFaceResources.getBannerFont());
-			title.setText(Messages.TourTrack_Properties_Label_DialogTitle);
 
 			/*
 			 * Combo: Configutation
@@ -336,6 +329,17 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 					onSelectDefault();
 				}
 			});
+
+			/*
+			 * Label: Title
+			 */
+			final Label title = new Label(container, SWT.LEAD);
+			GridDataFactory.fillDefaults()//
+					.grab(true, false)
+					.align(SWT.END, SWT.FILL)
+					.applyTo(title);
+			title.setFont(JFaceResources.getBannerFont());
+			title.setText(Messages.TourTrack_Properties_Label_DialogTitle);
 		}
 	}
 
@@ -946,11 +950,12 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 		// altitude
 		_chkAltitudeOffset.setEnabled(isAbsoluteAltitude);
 		_spinnerAltitudeOffsetDistance.setEnabled(isAbsoluteAltitudeEnabled);
+		_lblAltitudeOffsetDistanceUnit.setEnabled(isAbsoluteAltitudeEnabled);
 
 		// track position
 		_chkTrackPositions.setEnabled(isTrackPositionVisible);
-
 		_lblTrackPositionThreshold.setEnabled(isShowTrackPosition);
+		_lblTrackPositionThresholdAbsolute.setEnabled(isShowTrackPosition);
 
 		_spinnerTrackPositionSize.setEnabled(isShowTrackPosition);
 		_spinnerTrackPositionSize_Hovered.setEnabled(isShowTrackPosition);

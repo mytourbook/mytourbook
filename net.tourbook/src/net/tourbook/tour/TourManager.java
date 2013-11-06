@@ -653,7 +653,7 @@ public class TourManager {
 		// create a unique key for all tours
 		final long newOverlayKey[] = { 0 };
 
-		if (allTourIds.size() > 200) {
+		if (allTourIds.size() > 50) {
 
 			try {
 

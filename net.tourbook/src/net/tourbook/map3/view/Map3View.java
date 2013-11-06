@@ -64,6 +64,7 @@ import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.extension.export.ActionExport;
 import net.tourbook.importdata.RawDataManager;
+import net.tourbook.map2.view.IDiscreteColors;
 import net.tourbook.map2.view.TourMapColors;
 import net.tourbook.map3.action.ActionMapColor;
 import net.tourbook.map3.action.ActionOpenMap3LayerView;
@@ -229,6 +230,10 @@ public class Map3View extends ViewPart implements ITourProvider {
 	 * <code>true</code> will log frame/cache... statistics like in {@link PerformanceStatistic}
 	 */
 	private boolean								_isLogStatistics						= false;
+
+	private int									_allTourIdHash;
+
+	private int									_allTourDataHash;
 
 	private class Map3ContextMenu extends SWTPopupOverAWT {
 
@@ -736,6 +741,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 			}
 			break;
 
+		case HrZone:
 		case Pulse:
 
 			final float[] pulseSerie = tourData.pulseSerie;
@@ -1447,6 +1453,8 @@ public class Map3View extends ViewPart implements ITourProvider {
 
 		final IMapColorProvider colorProvider = TourMapColors.getColorProvider(_tourColorId);
 
+		Integer colorValue = null;
+
 		if (colorProvider instanceof IGradientColors) {
 
 			final IGradientColors gradientColorProvider = (IGradientColors) colorProvider;
@@ -1488,7 +1496,23 @@ public class Map3View extends ViewPart implements ITourProvider {
 			}
 
 			// get color according to the value
-			final int colorValue = gradientColorProvider.getColorValue(graphValue);
+			colorValue = gradientColorProvider.getColorValue(graphValue);
+
+		} else if (colorProvider instanceof IDiscreteColors) {
+
+			final IDiscreteColors discreteColorProvider = (IDiscreteColors) colorProvider;
+
+			colorValue = discreteColorProvider.getColorValue(tourData, positionIndex);
+		}
+
+		if (colorValue == null) {
+
+			// set default color
+
+			bgColor = null;
+			fgColor = null;
+
+		} else {
 
 			final int red = (colorValue & 0xFF) >>> 0;
 			final int green = (colorValue & 0xFF00) >>> 8;
@@ -1496,13 +1520,6 @@ public class Map3View extends ViewPart implements ITourProvider {
 
 			bgColor = new Color(red, green, blue);
 			fgColor = ColorUtil.getContrastColor(red, green, blue);
-
-		} else {
-
-			// set default color
-
-			bgColor = null;
-			fgColor = null;
 		}
 
 		final AnnotationAttributes attributes = trackPoint.getAttributes();
@@ -1713,12 +1730,23 @@ public class Map3View extends ViewPart implements ITourProvider {
 
 	private void showTours(final ArrayList<Long> allTourIds) {
 
-		final ArrayList<TourData> allTourData = new ArrayList<TourData>();
+		if (allTourIds.hashCode() != _allTourIdHash || _allTours.hashCode() != _allTourDataHash) {
 
-		// load all tours
-		final long newOverlayKey = TourManager.loadTourData(allTourIds, allTourData);
+			// tour data needs to be loaded
 
-		showAllTours_NewTours(allTourData);
+			final ArrayList<TourData> allTourData = new ArrayList<TourData>();
+
+			TourManager.loadTourData(allTourIds, allTourData);
+
+			_allTourIdHash = allTourIds.hashCode();
+			_allTourDataHash = allTourData.hashCode();
+
+			showAllTours_NewTours(allTourData);
+
+		} else {
+
+			showAllTours_NewTours(_allTours);
+		}
 	}
 
 	private void showToursFromTourProvider() {

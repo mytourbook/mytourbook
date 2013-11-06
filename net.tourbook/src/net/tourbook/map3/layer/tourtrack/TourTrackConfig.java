@@ -69,68 +69,81 @@ public class TourTrackConfig {
 	 */
 	public boolean						isRecreateTracks;
 
-	public String						id;
-	public String						defaultId;
-	public String						name;
+	/*
+	 * Set default values also here to ensure that a valid value is set. A default value would not
+	 * be set when an xml tag is not available.
+	 */
 
-	public double						outlineWidth;
-	public int							outlineColorMode;
-	public int							outlineColorMode_Hovered;
-	public int							outlineColorMode_Selected;
-	public int							outlineColorMode_HovSel;
-	public RGB							outlineColor;
-	public RGB							outlineColor_Hovered;
-	public RGB							outlineColor_Selected;
-	public RGB							outlineColor_HovSel;
-	public double						outlineOpacity;
-	public double						outlineOpacity_Hovered;
-	public double						outlineOpacity_Selected;
-	public double						outlineOpacity_HovSel;
+	public String						id								= Long.toString(System.nanoTime());
+	public String						defaultId						= TourTrackConfigManager.DEFAULT_ID_DEFAULT;
+	public String						name							= TourTrackConfigManager.CONFIG_NAME_UNKNOWN;
+
+	// outline
+	public double						outlineWidth					= TourTrackConfigManager.OUTLINE_WIDTH_DEFAULT;
+	public int							outlineColorMode				= TourTrackConfigManager.OUTLINE_COLOR_MODE_NORMAL_DEFAULT;
+	public int							outlineColorMode_Hovered		= TourTrackConfigManager.OUTLINE_COLOR_MODE_HOVERED_DEFAULT;
+	public int							outlineColorMode_Selected		= TourTrackConfigManager.OUTLINE_COLOR_MODE_SELECTED_DEFAULT;
+	public int							outlineColorMode_HovSel			= TourTrackConfigManager.OUTLINE_COLOR_MODE_HOV_SEL_DEFAULT;
+
+	public RGB							outlineColor					= TourTrackConfigManager.RGB_NORMAL_DEFAULT;
+	public RGB							outlineColor_Hovered			= TourTrackConfigManager.RGB_HOVERED_DEFAULT;
+	public RGB							outlineColor_Selected			= TourTrackConfigManager.RGB_SELECTED_DEFAULT;
+	public RGB							outlineColor_HovSel				= TourTrackConfigManager.RGB_HOV_SEL_DEFAULT;
+
+	public double						outlineOpacity					= TourTrackConfigManager.OUTLINE_OPACITY_NORMAL_DEFAULT;
+	public double						outlineOpacity_Hovered			= TourTrackConfigManager.OUTLINE_OPACITY_HOVERED_DEFAULT;
+	public double						outlineOpacity_Selected			= TourTrackConfigManager.OUTLINE_OPACITY_SELECTED_DEFAULT;
+	public double						outlineOpacity_HovSel			= TourTrackConfigManager.OUTLINE_OPACITY_HOV_SEL_DEFAULT;
 
 	// interior
-	public boolean						isShowInterior;
-	public boolean						isDrawVerticals;
-	public int							interiorColorMode;
-	public int							interiorColorMode_Hovered;
-	public int							interiorColorMode_Selected;
-	public int							interiorColorMode_HovSel;
-	public RGB							interiorColor;
-	public RGB							interiorColor_Hovered;
-	public RGB							interiorColor_Selected;
-	public RGB							interiorColor_HovSel;
-	public double						interiorOpacity;
-	public double						interiorOpacity_Hovered;
-	public double						interiorOpacity_Selected;
-	public double						interiorOpacity_HovSel;
+	public boolean						isShowInterior					= TourTrackConfigManager.IS_INTERIOR_VISIBLE_DEFAULT;
+	public boolean						isDrawVerticals					= TourTrackConfigManager.IS_DRAW_VERTICALS_DEFAULT;
+
+	public int							interiorColorMode				= TourTrackConfigManager.INTERIOR_COLOR_MODE_NORMAL_DEFAULT;
+	public int							interiorColorMode_Hovered		= TourTrackConfigManager.INTERIOR_COLOR_MODE_HOVERED_DEFAULT;
+	public int							interiorColorMode_Selected		= TourTrackConfigManager.INTERIOR_COLOR_MODE_SELECTED_DEFAULT;
+	public int							interiorColorMode_HovSel		= TourTrackConfigManager.INTERIOR_COLOR_MODE_HOV_SEL_DEFAULT;
+
+	public RGB							interiorColor					= TourTrackConfigManager.RGB_NORMAL_DEFAULT;
+	public RGB							interiorColor_Hovered			= TourTrackConfigManager.RGB_HOVERED_DEFAULT;
+	public RGB							interiorColor_Selected			= TourTrackConfigManager.RGB_SELECTED_DEFAULT;
+	public RGB							interiorColor_HovSel			= TourTrackConfigManager.RGB_HOV_SEL_DEFAULT;
+
+	public double						interiorOpacity					= TourTrackConfigManager.INTERIOR_OPACITY_NORMAL_DEFAULT;
+	public double						interiorOpacity_Hovered			= TourTrackConfigManager.INTERIOR_OPACITY_HOVERED_DEFAULT;
+	public double						interiorOpacity_Selected		= TourTrackConfigManager.INTERIOR_OPACITY_SELECTED_DEFAULT;
+	public double						interiorOpacity_HovSel			= TourTrackConfigManager.INTERIOR_OPACITY_HOV_SEL_DEFAULT;
 
 	// direction arrows
-	public boolean						isShowDirectionArrows;
-	public double						directionArrowDistance;
-	public double						directionArrowSize;
+	public boolean						isShowDirectionArrows			= TourTrackConfigManager.IS_DIRECTION_ARROWS_VISIBLE_DEFAULT;
+	public double						directionArrowDistance			= TourTrackConfigManager.DIRECTION_ARROW_VERTICAL_DISTANCE_DEFAULT;
+	public double						directionArrowSize				= TourTrackConfigManager.DIRECTION_ARROW_SIZE_DEFAULT;
 
 	// track positions
-	public boolean						isShowTrackPosition;
-	public double						trackPositionSize;
-	public double						trackPositionSize_Hovered;
-	public double						trackPositionSize_Selected;
-	public double						trackPositionSize_HovSel;
-	public int							trackPositionThreshold;
+	public boolean						isShowTrackPosition				= TourTrackConfigManager.IS_SHOW_TRACK_POSITION_DEFAULT;
+	public int							trackPositionThreshold			= TourTrackConfigManager.TRACK_POSITION_THRESHOLD_DEFAULT;
+	public double						trackPositionSize				= TourTrackConfigManager.TRACK_POSITION_SIZE_NORMAL_DEFAULT;
+	public double						trackPositionSize_Hovered		= TourTrackConfigManager.TRACK_POSITION_SIZE_HOVERED_DEFAULT;
+	public double						trackPositionSize_Selected		= TourTrackConfigManager.TRACK_POSITION_SIZE_SELECTED_DEFAULT;
+	public double						trackPositionSize_HovSel		= TourTrackConfigManager.TRACK_POSITION_SIZE_HOV_SEL_DEFAULT;
 
-	// other properties
-	public int							altitudeMode;
+	/*
+	 * Other properties
+	 */
+	public int							altitudeMode					= TourTrackConfigManager.ALTITUDE_MODE_DEFAULT;
 
 	/**
 	 * Vertical distance in m (meter).
 	 */
-	public int							altitudeVerticalOffset;
+	public int							altitudeVerticalOffset			= TourTrackConfigManager.ALTITUDE_OFFSET_DEFAULT;
 
 	/**
 	 * Is <code>true</code> when altitude offset is enabled.
 	 */
-	public boolean						isAbsoluteOffset;
+	public boolean						isAbsoluteOffset				= TourTrackConfigManager.IS_ABSOLUTE_OFFSET_DEFAULT;
 
-	public boolean						isFollowTerrain;
-	public int							pathResolution;
+	public boolean						isFollowTerrain					= TourTrackConfigManager.CONFIG_IS_FOLLOW_TERRAIN_DEFAULT;
+	public int							pathResolution					= TourTrackConfigManager.CONFIG_PATH_RESOLUTION_DEFAULT;
 
 	TourTrackConfig() {}
 

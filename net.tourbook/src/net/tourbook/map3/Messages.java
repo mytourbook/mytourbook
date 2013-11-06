@@ -126,13 +126,18 @@ public class Messages extends NLS {
 	public static String		Track_Config_Altitude_Mode_ClampToGround;
 	public static String		Track_Config_Altitude_Mode_RelativeToGround;
 
-	public static String		Track_Config_ConfigName_Close;
+	public static String	Track_Config_ConfigName_CloseBright;
+
+	public static String	Track_Config_ConfigName_CloseDark;
 
 	public static String	Track_Config_ConfigName_Custom;
 	public static String		Track_Config_ConfigName_Default;
 
 	public static String	Track_Config_ConfigName_Extrem;
-	public static String		Track_Config_ConfigName_Far;
+
+	public static String	Track_Config_ConfigName_FarBright;
+
+	public static String	Track_Config_ConfigName_FarDark;
 	public static String		Track_Config_ConfigName_Unknown;
 
 	public static String		Track_Config_Path_Resolution_High;
