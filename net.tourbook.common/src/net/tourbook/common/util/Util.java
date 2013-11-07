@@ -38,6 +38,7 @@ import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Resource;
 import org.eclipse.swt.widgets.Combo;
@@ -1088,6 +1089,23 @@ public class Util {
 		}
 
 		return year;
+	}
+
+	/**
+	 * @param event
+	 * @return Returns <code>true</code> when the <Ctrl> or <Command> key is pressed.
+	 */
+	public static boolean isCtrlKeyPressed(final SelectionEvent event) {
+
+		boolean isCtrl;
+
+		if (UI.IS_OSX) {
+			isCtrl = (event.stateMask & SWT.COMMAND) != 0;
+		} else {
+			isCtrl = (event.stateMask & SWT.MOD1) != 0;
+		}
+
+		return isCtrl;
 	}
 
 	/**

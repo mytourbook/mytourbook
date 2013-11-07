@@ -1064,8 +1064,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 			sliderYPosition = trackAltitude;
 			break;
 
-		default:
-			// case: WorldWind.CLAMP_TO_GROUND
+		default: // WorldWind.CLAMP_TO_GROUND
 			sliderYPosition = 0;
 			break;
 		}

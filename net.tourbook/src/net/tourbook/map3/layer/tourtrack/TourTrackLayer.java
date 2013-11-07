@@ -156,25 +156,11 @@ public class TourTrackLayer extends RenderableLayer implements SelectListener, I
 			/*
 			 * create one path for each tour
 			 */
-			ITrackPath trackPath;
-
-			if (trackConfig.pathResolution == TourTrackConfig.PATH_RESOLUTION_VIEWPORT) {
-
-				trackPath = new TrackPathViewport(trackPositions);
-
-			} else if (trackConfig.pathResolution == TourTrackConfig.PATH_RESOLUTION_ALL_POSITIONS) {
-
-				trackPath = new TrackPathHighResolution(trackPositions);
-
-			} else {
-
-				// default == optimized track positions
-				trackPath = new TrackPathOptimized(trackPositions);
-			}
+			final ITrackPath trackPath = new TrackPathOptimized(trackPositions);
 
 			final TourTrack tourTrack = new TourTrack(trackPath, tourData, trackPositions, _colorProvider);
 
-			trackPath.setTourTrack(tourTrack, trackConfig);
+			trackPath.setTourTrack(tourTrack);
 
 			// Show how to make the colors vary along the paths.
 			trackPath.getPath().setPositionColors(_tourPositionColors);
@@ -200,11 +186,7 @@ public class TourTrackLayer extends RenderableLayer implements SelectListener, I
 
 			_selectedTrackPath.getTourTrack().setSelected(true);
 
-			// hide position color that highlighted colors are displayed, this is a hack
-//			_selectedTrackPath.getTourTrack().hackResetPositionColors();
-
 			setPathHighlighAttributes(_selectedTrackPath);
-//			_selectedTrackPath.setPathHighlighted(true);
 		}
 
 //		System.out.println(UI.timeStampNano() + " showTour\t" + (System.currentTimeMillis() - start) + " ms");
@@ -255,7 +237,7 @@ public class TourTrackLayer extends RenderableLayer implements SelectListener, I
 
 		final TourTrackConfig trackConfig = TourTrackConfigManager.getActiveConfig();
 
-		if (trackConfig.isRecreateTracks) {
+		if (trackConfig.isRecreateTracks()) {
 
 			// track data has changed
 
@@ -641,9 +623,12 @@ public class TourTrackLayer extends RenderableLayer implements SelectListener, I
 	 */
 	private void setPathAttributes(final ITrackPath trackPath) {
 
+//		System.out.println(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] \tsetPathAttributes()");
+//		// TODO remove SYSTEM.OUT.PRINTLN
+
 		final TourTrackConfig trackConfig = TourTrackConfigManager.getActiveConfig();
 
-		// force the track colors to be recreated, opacity can habe been changed
+		// force the track colors to be recreated, opacity can have been changed
 		trackPath.getTourTrack().updateColors(trackConfig.outlineOpacity);
 
 		final Path path = trackPath.getPath();
@@ -683,8 +668,15 @@ public class TourTrackLayer extends RenderableLayer implements SelectListener, I
 
 		setPathAttributes_Normal();
 		setPathAttributes_Hovered();
-		setPathAttributes_HovSel();
 		setPathAttributes_Selected();
+		setPathAttributes_HovSel();
+
+//		System.out.println(UI.timeStampNano()
+//				+ " ["
+//				+ getClass().getSimpleName()
+//				+ "] \t\trgb: "
+//				+ _normalAttributes.getOutlineMaterial().getDiffuse());
+//		// TODO remove SYSTEM.OUT.PRINTLN
 
 		path.setAttributes(_normalAttributes);
 		setPathHighlighAttributes(trackPath);
@@ -820,7 +812,7 @@ public class TourTrackLayer extends RenderableLayer implements SelectListener, I
 
 			shapeAttrs = _hovselAttributes;
 
-			positionsScale = trackConfig.trackPositionSize_Hovered;
+			positionsScale = trackConfig.trackPositionSize_HovSel;
 			isShowPositions = positionsScale == 0.0 ? false : true;
 
 		} else if (isHovered) {

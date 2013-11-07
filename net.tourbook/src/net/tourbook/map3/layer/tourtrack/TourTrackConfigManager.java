@@ -64,8 +64,7 @@ public class TourTrackConfigManager {
 	private static final String						CONFIG_NAME_CUSTOM							= Messages.Track_Config_ConfigName_Custom;
 	static final String								CONFIG_NAME_UNKNOWN							= Messages.Track_Config_ConfigName_Unknown;
 
-	public static final Boolean						CONFIG_IS_FOLLOW_TERRAIN_DEFAULT			= Boolean.TRUE;
-	public static final int							CONFIG_PATH_RESOLUTION_DEFAULT				= TourTrackConfig.PATH_RESOLUTION_OPTIMIZED;
+	public static final Boolean						CONFIG_IS_FOLLOW_TERRAIN_DEFAULT			= Boolean.FALSE;
 
 	// direction arrows
 	public static final Boolean						IS_DIRECTION_ARROWS_VISIBLE_DEFAULT			= Boolean.TRUE;
@@ -121,10 +120,10 @@ public class TourTrackConfigManager {
 	public static final int							TRACK_POSITION_SIZE_MIN						= 1;
 	public static final int							TRACK_POSITION_SIZE_MAX						= 60;
 
-	public static final float						TRACK_POSITION_SIZE_NORMAL_DEFAULT			= 8;
+	public static final float						TRACK_POSITION_SIZE_NORMAL_DEFAULT			= 10;
 	public static final float						TRACK_POSITION_SIZE_HOVERED_DEFAULT			= 12;
 	public static final float						TRACK_POSITION_SIZE_SELECTED_DEFAULT		= 10;
-	public static final float						TRACK_POSITION_SIZE_HOV_SEL_DEFAULT			= 12;
+	public static final float						TRACK_POSITION_SIZE_HOV_SEL_DEFAULT			= 14;
 
 	public static final int							TRACK_POSITION_THRESHOLD_DEFAULT			= 10;											// this is an exponent
 
@@ -179,7 +178,6 @@ public class TourTrackConfigManager {
 	private static final String						ATTR_ID										= "id";										//$NON-NLS-1$
 	private static final String						ATTR_DEFAULT_ID								= "defaultId";									//$NON-NLS-1$
 	private static final String						ATTR_CONFIG_NAME							= "name";										//$NON-NLS-1$
-	private static final String						ATTR_PATH_RESOLUTION						= "pathResolution";							//$NON-NLS-1$
 	private static final String						ATTR_IS_FOLLOW_TERRAIN						= "isFollowTerrain";							//$NON-NLS-1$
 
 	// direction arrows
@@ -230,6 +228,9 @@ public class TourTrackConfigManager {
 	private static final DateTimeFormatter			_dtFormatter								= ISODateTimeFormat
 																										.basicDateTimeNoMillis();
 
+	/**
+	 * Contains all configurations which are loaded from a xml file.
+	 */
 	private static final ArrayList<TourTrackConfig>	_allConfigs									= new ArrayList<TourTrackConfig>();
 
 	private static TourTrackConfig					_activeConfig;
@@ -306,7 +307,6 @@ public class TourTrackConfigManager {
 			xmlConfig.putString(ATTR_DEFAULT_ID, defaultId);
 			xmlConfig.putString(ATTR_CONFIG_NAME, configName);
 
-			xmlConfig.putInteger(ATTR_PATH_RESOLUTION, CONFIG_PATH_RESOLUTION_DEFAULT);
 			xmlConfig.putBoolean(ATTR_IS_FOLLOW_TERRAIN, CONFIG_IS_FOLLOW_TERRAIN_DEFAULT);
 
 			// <directionArrows>
@@ -419,7 +419,6 @@ public class TourTrackConfigManager {
 			xmlConfig.putString(ATTR_DEFAULT_ID, config.defaultId);
 			xmlConfig.putString(ATTR_CONFIG_NAME, config.name);
 
-			xmlConfig.putInteger(ATTR_PATH_RESOLUTION, config.pathResolution);
 			xmlConfig.putBoolean(ATTR_IS_FOLLOW_TERRAIN, config.isFollowTerrain);
 
 			// <directionArrows>
@@ -597,6 +596,68 @@ public class TourTrackConfigManager {
 	}
 
 	/**
+	 * Overwrite default values according to the default id {@link TourTrackConfig#defaultId}.
+	 * 
+	 * @param config
+	 */
+	private static void overwriteConfigDefaultValues(final TourTrackConfig config) {
+
+		if (config.defaultId.equals(DEFAULT_ID_CLOSE_BRIGHT)) {
+
+			config.outlineColorMode = TourTrackConfig.COLOR_MODE_SOLID_COLOR;
+			config.outlineColor = RGB_BLACK;
+			config.trackPositionSize = 1;
+
+			config.interiorColorMode = TourTrackConfig.COLOR_MODE_TRACK_VALUE;
+
+		} else if (config.defaultId.equals(DEFAULT_ID_CLOSE_DARK)) {
+
+			config.outlineColorMode = TourTrackConfig.COLOR_MODE_SOLID_COLOR;
+			config.outlineColor = RGB_WHITE;
+			config.trackPositionSize = 1;
+
+			config.interiorColorMode = TourTrackConfig.COLOR_MODE_TRACK_VALUE;
+
+		} else if (config.defaultId.equals(DEFAULT_ID_FAR_BRIGHT)) {
+
+			config.outlineColorMode = TourTrackConfig.COLOR_MODE_SOLID_COLOR;
+			config.outlineColor = RGB_BLACK;
+			config.trackPositionSize = 1;
+
+			config.interiorColorMode = TourTrackConfig.COLOR_MODE_TRACK_VALUE;
+
+			config.altitudeVerticalOffset = 500;
+
+		} else if (config.defaultId.equals(DEFAULT_ID_FAR_DARK)) {
+
+			config.outlineColorMode = TourTrackConfig.COLOR_MODE_SOLID_COLOR;
+			config.outlineColor = RGB_WHITE;
+			config.trackPositionSize = 1;
+
+			config.interiorColorMode = TourTrackConfig.COLOR_MODE_TRACK_VALUE;
+
+			config.altitudeVerticalOffset = 500;
+
+		} else if (config.defaultId.equals(DEFAULT_ID_EXTREM)) {
+
+			config.outlineColorMode = TourTrackConfig.COLOR_MODE_SOLID_COLOR;
+			config.outlineColor = RGB_BLACK;
+			config.trackPositionSize = 1;
+
+			config.interiorColorMode = TourTrackConfig.COLOR_MODE_TRACK_VALUE;
+
+			config.altitudeVerticalOffset = 500000;
+		}
+	}
+
+	private static void overwriteConfigDefaultValues_ForAll() {
+
+		for (final TourTrackConfig config : _allConfigs) {
+			overwriteConfigDefaultValues(config);
+		}
+	}
+
+	/**
 	 * Parse configuration xml.
 	 * 
 	 * @param allConfigurations
@@ -690,16 +751,10 @@ public class TourTrackConfigManager {
 				ATTR_CONFIG_NAME,
 				CONFIG_NAME_UNKNOWN);
 
-		trackConfig.pathResolution = Util.getXmlInteger(//
-				xmlConfig,
-				ATTR_PATH_RESOLUTION,
-				CONFIG_PATH_RESOLUTION_DEFAULT);
-
 		trackConfig.isFollowTerrain = Util.getXmlBoolean(
 				xmlConfig,
 				ATTR_IS_FOLLOW_TERRAIN,
 				CONFIG_IS_FOLLOW_TERRAIN_DEFAULT);
-
 	}
 
 	private static void parse_200_DirectionArrows(final XMLMemento xmlDirectionArrow, final TourTrackConfig trackConfig) {
@@ -1099,9 +1154,7 @@ public class TourTrackConfigManager {
 
 				// overwrite config default values
 
-				for (final TourTrackConfig config : _allConfigs) {
-					setConfigDefaultValues(config);
-				}
+				overwriteConfigDefaultValues_ForAll();
 			}
 
 			_activeConfig = readConfigFromXml_GetActive();
@@ -1151,6 +1204,7 @@ public class TourTrackConfigManager {
 			StatusUtil.log("Created default config for tour track properties.");//$NON-NLS-1$
 
 			createAllDefaults();
+			overwriteConfigDefaultValues_ForAll();
 
 			activeConfig = getFirstDefaultConfig();
 		}
@@ -1165,16 +1219,41 @@ public class TourTrackConfigManager {
 
 		final String backupConfigName = _activeConfig.name;
 
-		/*
-		 * Create xml with default values for the active config
-		 */
+		// create xml with default values for the active config
+		final XMLMemento xmlRoot = resetConfig(_activeConfig.defaultId);
+
+		// parse xml
+		final ArrayList<TourTrackConfig> newConfigs = new ArrayList<TourTrackConfig>();
+		parse_000_All(newConfigs, xmlRoot, false);
+
+		final TourTrackConfig newConfig = newConfigs.get(0);
+
+		overwriteConfigDefaultValues(newConfig);
+
+		newConfig.name = backupConfigName;
+		newConfig.checkTrackRecreation(_activeConfig);
+
+		// replace config
+		_allConfigs.set(getActiveConfigIndexFromId(), newConfig);
+
+		_activeConfig = newConfig;
+	}
+
+	public static void resetAllConfigurations() {
+
+		createAllDefaults();
+		overwriteConfigDefaultValues_ForAll();
+
+		_activeConfig = _allConfigs.get(0);
+	}
+
+	private static XMLMemento resetConfig(final String defaultId) throws Error {
+
 		XMLMemento xmlRoot;
 
 		try {
 
 			xmlRoot = create_Root();
-
-			final String defaultId = _activeConfig.defaultId;
 
 			if (defaultId.equals(DEFAULT_ID_CLOSE_BRIGHT)) {
 
@@ -1206,22 +1285,7 @@ public class TourTrackConfigManager {
 		} catch (final Exception e) {
 			throw new Error(e.getMessage());
 		}
-
-		// parse xml
-		final ArrayList<TourTrackConfig> newConfigs = new ArrayList<TourTrackConfig>();
-		parse_000_All(newConfigs, xmlRoot, false);
-
-		final TourTrackConfig newConfig = newConfigs.get(0);
-
-		setConfigDefaultValues(newConfig);
-
-		newConfig.isRecreateTracks = true;
-		newConfig.name = backupConfigName;
-
-		// replace config
-		_allConfigs.set(getActiveConfigIndexFromId(), newConfig);
-
-		_activeConfig = newConfig;
+		return xmlRoot;
 	}
 
 	public static void saveState() {
@@ -1239,62 +1303,5 @@ public class TourTrackConfigManager {
 
 	public static void setActiveConfig(final TourTrackConfig newConfig) {
 		_activeConfig = newConfig;
-	}
-
-	/**
-	 * Overwrite default values according to the default id {@link TourTrackConfig#defaultId}.
-	 * 
-	 * @param config
-	 */
-	private static void setConfigDefaultValues(final TourTrackConfig config) {
-
-		if (config.defaultId.equals(DEFAULT_ID_CLOSE_BRIGHT)) {
-
-			config.outlineColorMode = TourTrackConfig.COLOR_MODE_SOLID_COLOR;
-			config.outlineColor = RGB_BLACK;
-			config.trackPositionSize = 1;
-
-			config.interiorColorMode = TourTrackConfig.COLOR_MODE_TRACK_VALUE;
-
-
-		} else if (config.defaultId.equals(DEFAULT_ID_CLOSE_DARK)) {
-
-			config.outlineColorMode = TourTrackConfig.COLOR_MODE_SOLID_COLOR;
-			config.outlineColor = RGB_WHITE;
-			config.trackPositionSize = 1;
-
-			config.interiorColorMode = TourTrackConfig.COLOR_MODE_TRACK_VALUE;
-
-
-		} else if (config.defaultId.equals(DEFAULT_ID_FAR_BRIGHT)) {
-
-			config.outlineColorMode = TourTrackConfig.COLOR_MODE_SOLID_COLOR;
-			config.outlineColor = RGB_BLACK;
-			config.trackPositionSize = 1;
-
-			config.interiorColorMode = TourTrackConfig.COLOR_MODE_TRACK_VALUE;
-
-			config.altitudeVerticalOffset = 500;
-
-		} else if (config.defaultId.equals(DEFAULT_ID_FAR_DARK)) {
-
-			config.outlineColorMode = TourTrackConfig.COLOR_MODE_SOLID_COLOR;
-			config.outlineColor = RGB_WHITE;
-			config.trackPositionSize = 1;
-
-			config.interiorColorMode = TourTrackConfig.COLOR_MODE_TRACK_VALUE;
-
-			config.altitudeVerticalOffset = 500;
-
-		} else if (config.defaultId.equals(DEFAULT_ID_EXTREM)) {
-
-			config.outlineColorMode = TourTrackConfig.COLOR_MODE_SOLID_COLOR;
-			config.outlineColor = RGB_BLACK;
-			config.trackPositionSize = 1;
-
-			config.interiorColorMode = TourTrackConfig.COLOR_MODE_TRACK_VALUE;
-
-			config.altitudeVerticalOffset = 500000;
-		}
 	}
 }

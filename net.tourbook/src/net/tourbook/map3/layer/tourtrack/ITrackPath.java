@@ -36,5 +36,5 @@ public interface ITrackPath {
 
 	void setPicked(boolean isPicked, Integer pickPositionIndex);
 
-	void setTourTrack(TourTrack tourTrack, TourTrackConfig tourTrackConfig);
+	void setTourTrack(TourTrack tourTrack);
 }

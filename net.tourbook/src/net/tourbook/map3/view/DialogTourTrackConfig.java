@@ -22,7 +22,6 @@ import java.util.ArrayList;
 import net.tourbook.common.UI;
 import net.tourbook.common.color.ColorSelectorExtended;
 import net.tourbook.common.color.IColorSelectorListener;
-import net.tourbook.common.color.MapColorId;
 import net.tourbook.common.tooltip.AnimatedToolTipShell;
 import net.tourbook.common.util.Util;
 import net.tourbook.map3.Messages;
@@ -82,7 +81,6 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 
 	private boolean					_isAnotherDialogOpened;
 
-	private MapColorId				_trackColorId;
 	private boolean					_isUpdateUI;
 
 	private PixelConverter			_pc;
@@ -96,8 +94,7 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 	 */
 	private Composite				_shellContainer;
 
-	private Button					_btnDefault;
-	private Button					_btnTrackColor;
+	private Button					_btnReset;
 
 	private Button					_chkAltitudeOffset;
 	private Button					_chkDrawVerticals;
@@ -115,7 +112,6 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 	private ColorSelectorExtended	_colorOutlineColor_Selected;
 
 	private Combo					_comboAltitude;
-	private Combo					_comboPathResolution;
 	private Combo					_comboInteriorColorMode;
 	private Combo					_comboInteriorColorMode_Selected;
 	private Combo					_comboInteriorColorMode_Hovered;
@@ -134,7 +130,6 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 	private Label					_lblOutlineColor;
 	private Label					_lblOutlineColor_HovSel;
 	private Label					_lblOutlineColor_Selected;
-	private Label					_lblTrackColor;
 	private Label					_lblTrackPositionThreshold;
 	private Label					_lblTrackPositionThresholdAbsolute;
 
@@ -145,17 +140,19 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 	private Spinner					_spinnerInteriorOpacity_Hovered;
 	private Spinner					_spinnerInteriorOpacity_HovSel;
 	private Spinner					_spinnerInteriorOpacity_Selected;
+	private Spinner					_spinnerOutlineOpacity;
 	private Spinner					_spinnerOutlineOpacity_Hovered;
 	private Spinner					_spinnerOutlineOpacity_HovSel;
 	private Spinner					_spinnerOutlineOpacity_Selected;
 	private Spinner					_spinnerOutlineWidth;
-	private Spinner					_spinnerOutlineOpacity;
 	private Spinner					_spinnerTrackPositionSize;
 	private Spinner					_spinnerTrackPositionSize_Hovered;
 	private Spinner					_spinnerTrackPositionSize_Selected;
+	private Spinner					_spinnerTrackPositionSize_HovSel;
 	private Spinner					_spinnerTrackPositionThreshold;
 
 	private Text					_textName;
+
 
 	private final class WaitTimer implements Runnable {
 		@Override
@@ -274,15 +271,13 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 					.applyTo(container);
 //			container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
 			{
-				createUI_050_Name(container);
 				createUI_100_Line(container);
 				createUI_110_DirectionArrow(container);
 				createUI_200_TrackPosition(container);
-				createUI_300_TrackColor(container);
-				createUI_350_Outline(container);
-				createUI_400_ExtrudePath(container);
+				createUI_300_Outline(container);
+				createUI_400_Interior(container);
 				createUI_500_Altitude(container);
-				createUI_600_PathResolution(container);
+				createUI_999_Name(container);
 			}
 		}
 
@@ -296,6 +291,16 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 		GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
 //		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
 		{
+			/*
+			 * Label: Title
+			 */
+			final Label title = new Label(container, SWT.LEAD);
+			GridDataFactory.fillDefaults()//
+					.grab(true, false)
+					.align(SWT.BEGINNING, SWT.CENTER)
+					.applyTo(title);
+			title.setFont(JFaceResources.getBannerFont());
+			title.setText(Messages.TourTrack_Properties_Label_DialogTitle);
 
 			/*
 			 * Combo: Configutation
@@ -314,59 +319,18 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 			});
 
 			/*
-			 * Button: Default
+			 * Button: Reset
 			 */
-			_btnDefault = new Button(container, SWT.PUSH);
+			_btnReset = new Button(container, SWT.PUSH);
 			GridDataFactory.fillDefaults()//
-					.align(SWT.TRAIL, SWT.FILL)
-					.grab(false, false)
-					.applyTo(_btnDefault);
-			_btnDefault.setText(Messages.TourTrack_Properties_Button_Default);
-			_btnDefault.setToolTipText(Messages.TourTrack_Properties_Button_Default_Tooltip);
-			_btnDefault.addSelectionListener(new SelectionAdapter() {
+//					.align(SWT.TRAIL, SWT.FILL)
+					.applyTo(_btnReset);
+			_btnReset.setText(Messages.TourTrack_Properties_Button_Default);
+			_btnReset.setToolTipText(Messages.TourTrack_Properties_Button_Default_Tooltip);
+			_btnReset.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(final SelectionEvent e) {
-					onSelectDefault();
-				}
-			});
-
-			/*
-			 * Label: Title
-			 */
-			final Label title = new Label(container, SWT.LEAD);
-			GridDataFactory.fillDefaults()//
-					.grab(true, false)
-					.align(SWT.END, SWT.FILL)
-					.applyTo(title);
-			title.setFont(JFaceResources.getBannerFont());
-			title.setText(Messages.TourTrack_Properties_Label_DialogTitle);
-		}
-	}
-
-	private void createUI_050_Name(final Composite parent) {
-
-		/*
-		 * Name
-		 */
-		{
-			/*
-			 * Label
-			 */
-			final Label label = new Label(parent, SWT.NONE);
-			GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(label);
-
-			label.setText(Messages.TourTrack_Properties_Label_Name);
-			label.setToolTipText(Messages.TourTrack_Properties_Label_Name_Tooltip);
-
-			/*
-			 * Text
-			 */
-			_textName = new Text(parent, SWT.BORDER);
-			GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(_textName);
-			_textName.addModifyListener(new ModifyListener() {
-				@Override
-				public void modifyText(final ModifyEvent e) {
-					onModifyName();
+					onSelectDefaultConfig(e);
 				}
 			});
 		}
@@ -503,44 +467,7 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 		}
 	}
 
-	private void createUI_300_TrackColor(final Composite parent) {
-
-		/*
-		 * Track color
-		 */
-		{
-			/*
-			 * Label: Track color
-			 */
-			_lblTrackColor = new Label(parent, SWT.NONE);
-			GridDataFactory.fillDefaults()//
-					.align(SWT.FILL, SWT.CENTER)
-					.applyTo(_lblTrackColor);
-
-			_lblTrackColor.setText(Messages.TourTrack_Properties_Label_TrackColor);
-			_lblTrackColor.setToolTipText(Messages.TourTrack_Properties_Label_TrackColor_Tooltip);
-
-			final Composite container = new Composite(parent, SWT.NONE);
-			GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-			GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
-			{
-				/*
-				 * Button: Track color
-				 */
-				_btnTrackColor = new Button(container, SWT.PUSH);
-				_btnTrackColor.setImage(net.tourbook.ui.UI.IMAGE_REGISTRY.get(net.tourbook.ui.UI.GRAPH_ALTITUDE));
-				_btnTrackColor.addSelectionListener(new SelectionAdapter() {
-					@Override
-					public void widgetSelected(final SelectionEvent e) {
-						onSelectTrackColor();
-					}
-				});
-			}
-		}
-
-	}
-
-	private void createUI_350_Outline(final Composite parent) {
+	private void createUI_300_Outline(final Composite parent) {
 		/*
 		 * Normal color
 		 */
@@ -622,16 +549,17 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 
 			final Composite container = new Composite(parent, SWT.NONE);
 			GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-			GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
+			GridLayoutFactory.fillDefaults().numColumns(4).applyTo(container);
 			{
 				_comboOutlineColorMode_HovSel = createUI_Combo_ColorMode(container);
 				_colorOutlineColor_HovSel = createUI_ColorSelector(container);
 				_spinnerOutlineOpacity_HovSel = createUI_Spinner_ColorOpacity(container);
+				_spinnerTrackPositionSize_HovSel = createUI_Spinner_PositionSize(container);
 			}
 		}
 	}
 
-	private void createUI_400_ExtrudePath(final Composite container) {
+	private void createUI_400_Interior(final Composite container) {
 
 		/*
 		 * Extrude path
@@ -643,12 +571,12 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 			_chkShowInterior.setToolTipText(Messages.TourTrack_Properties_Checkbox_ExtrudePath_Tooltip);
 			_chkShowInterior.addSelectionListener(_defaultSelectionListener);
 
-			createUI_410_Interior(container);
-			createUI_420_Verticals(container);
+			createUI_410__Interior(container);
+			createUI_420__Verticals(container);
 		}
 	}
 
-	private void createUI_410_Interior(final Composite parent) {
+	private void createUI_410__Interior(final Composite parent) {
 
 		/*
 		 * Curtain/Interior color
@@ -743,7 +671,7 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 		}
 	}
 
-	private void createUI_420_Verticals(final Composite parent) {
+	private void createUI_420__Verticals(final Composite parent) {
 
 		/*
 		 * Checkbox: Draw verticals for the extruded path
@@ -831,25 +759,32 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 		}
 	}
 
-	private void createUI_600_PathResolution(final Composite parent) {
+	private void createUI_999_Name(final Composite parent) {
 
+		/*
+		 * Name
+		 */
 		{
 			/*
-			 * label: Path resolution
+			 * Label
 			 */
 			final Label label = new Label(parent, SWT.NONE);
 			GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(label);
 
-			label.setText(Messages.TourTrack_Properties_Label_PathResolution);
-			label.setToolTipText(Messages.TourTrack_Properties_Label_PathResolution_Tooltip);
+			label.setText(Messages.TourTrack_Properties_Label_Name);
+			label.setToolTipText(Messages.TourTrack_Properties_Label_Name_Tooltip);
 
 			/*
-			 * combo: Path resolution
+			 * Text
 			 */
-			_comboPathResolution = new Combo(parent, SWT.READ_ONLY | SWT.BORDER);
-			GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.FILL).applyTo(_comboPathResolution);
-			_comboPathResolution.setVisibleItemCount(10);
-			_comboPathResolution.addSelectionListener(_defaultSelectionListener);
+			_textName = new Text(parent, SWT.BORDER);
+			GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(_textName);
+			_textName.addModifyListener(new ModifyListener() {
+				@Override
+				public void modifyText(final ModifyEvent e) {
+					onModifyName();
+				}
+			});
 		}
 	}
 
@@ -927,9 +862,6 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 		final boolean isTrackPositionVisible = trackConfig.outlineWidth > 0.0;
 		final boolean isShowTrackPosition = trackConfig.isShowTrackPosition & isTrackPositionVisible;
 
-		// Hr zones are not yet supported
-		final boolean isGradientColor = _trackColorId != MapColorId.HrZone;
-
 		final boolean isOutlineSolidColor = trackConfig.outlineColorMode == TourTrackConfig.COLOR_MODE_SOLID_COLOR;
 		final boolean isOutlineSolidColor_Hovered = trackConfig.outlineColorMode_Hovered == TourTrackConfig.COLOR_MODE_SOLID_COLOR;
 		final boolean isOutlineSolidColor_HovSel = trackConfig.outlineColorMode_HovSel == TourTrackConfig.COLOR_MODE_SOLID_COLOR;
@@ -960,6 +892,7 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 		_spinnerTrackPositionSize.setEnabled(isShowTrackPosition);
 		_spinnerTrackPositionSize_Hovered.setEnabled(isShowTrackPosition);
 		_spinnerTrackPositionSize_Selected.setEnabled(isShowTrackPosition);
+		_spinnerTrackPositionSize_HovSel.setEnabled(isShowTrackPosition);
 		_spinnerTrackPositionThreshold.setEnabled(isShowTrackPosition);
 
 		// extrude track
@@ -998,9 +931,6 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 		_spinnerInteriorOpacity_Selected.setEnabled(isInteriorSolidColor_Selected);
 
 		_chkDrawVerticals.setEnabled(isShowCurtain);
-
-		// track color
-		_btnTrackColor.setEnabled(isGradientColor);
 	}
 
 	/**
@@ -1030,10 +960,6 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 	}
 
 	private void initBeforeOpened() {
-
-		_trackColorId = _map3View.getTrackColorId();
-
-		_btnTrackColor.setImage(net.tourbook.ui.UI.getGraphImage(_trackColorId));
 
 		enableControls();
 	}
@@ -1102,25 +1028,35 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 		// keep data from previous config
 		saveState();
 
+		final TourTrackConfig previousConfig = (TourTrackConfig) TourTrackConfigManager.getActiveConfig().clone();
+
 		TourTrackConfigManager.setActiveConfig(selectedConfig);
 
-		updateUI_SetActiveConfig();
+		updateUI_SetActiveConfig(previousConfig);
 	}
 
-	private void onSelectDefault() {
+	private void onSelectDefaultConfig(final SelectionEvent selectionEvent) {
 
-		TourTrackConfigManager.resetActiveConfig();
+		TourTrackConfig previousConfig = null;
 
-		updateUI_SetActiveConfig();
-	}
+		if (Util.isCtrlKeyPressed(selectionEvent)) {
 
-	private void onSelectTrackColor() {
+			// reset All configurations
 
-		_isAnotherDialogOpened = true;
+			TourTrackConfigManager.resetAllConfigurations();
 
-		_map3View.actionOpenTrackColorDialog();
+			updateUI_ComboConfigName(true);
 
-		_isAnotherDialogOpened = false;
+		} else {
+
+			// reset active config
+
+			previousConfig = (TourTrackConfig) TourTrackConfigManager.getActiveConfig().clone();
+
+			TourTrackConfigManager.resetActiveConfig();
+		}
+
+		updateUI_SetActiveConfig(previousConfig);
 	}
 
 	/**
@@ -1245,6 +1181,7 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 		_spinnerTrackPositionSize.setSelection((int) (trackConfig.trackPositionSize));
 		_spinnerTrackPositionSize_Hovered.setSelection((int) (trackConfig.trackPositionSize_Hovered));
 		_spinnerTrackPositionSize_Selected.setSelection((int) (trackConfig.trackPositionSize_Selected));
+		_spinnerTrackPositionSize_HovSel.setSelection((int) (trackConfig.trackPositionSize_HovSel));
 		_spinnerTrackPositionThreshold.setSelection(trackConfig.trackPositionThreshold);
 
 		// altitude
@@ -1253,9 +1190,6 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 		_spinnerAltitudeOffsetDistance.setSelection(//
 				(int) (trackConfig.altitudeVerticalOffset / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE));
 		_chkFollowTerrain.setSelection(trackConfig.isFollowTerrain);
-
-		// path
-		_comboPathResolution.select(trackConfig.getPathResolutionIndex());
 
 		updateUI();
 
@@ -1324,6 +1258,7 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 		trackConfig.trackPositionSize = _spinnerTrackPositionSize.getSelection();
 		trackConfig.trackPositionSize_Hovered = _spinnerTrackPositionSize_Hovered.getSelection();
 		trackConfig.trackPositionSize_Selected = _spinnerTrackPositionSize_Selected.getSelection();
+		trackConfig.trackPositionSize_HovSel = _spinnerTrackPositionSize_HovSel.getSelection();
 		trackConfig.trackPositionThreshold = _spinnerTrackPositionThreshold.getSelection();
 
 		// altitude
@@ -1331,9 +1266,6 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 		trackConfig.altitudeMode = TourTrackConfig.ALTITUDE_MODE[getComboIndex(_comboAltitude)].value;
 		trackConfig.altitudeVerticalOffset = altitudeOffsetMetric;
 		trackConfig.isFollowTerrain = _chkFollowTerrain.getSelection();
-
-		// path
-		trackConfig.pathResolution = TourTrackConfig.PATH_RESOLUTION[getComboIndex(_comboPathResolution)].value;
 	}
 
 	/**
@@ -1341,49 +1273,13 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 	 */
 	private void saveStateWithRecreateCheck() {
 
-		final TourTrackConfig trackConfig = TourTrackConfigManager.getActiveConfig();
+		final TourTrackConfig activeConfig = TourTrackConfigManager.getActiveConfig();
 
-		final boolean backupIsAltitudeOffset = trackConfig.isAbsoluteOffset;
-		final boolean backupIsAbsoluteAltitudeMode = trackConfig.altitudeMode == WorldWind.ABSOLUTE;
-		final boolean backupIsFollowTerrain = trackConfig.isFollowTerrain;
-		final int backupAltitudeOffsetDistance = trackConfig.altitudeVerticalOffset;
-		final int backupPathResolution = trackConfig.pathResolution;
+		final TourTrackConfig clonedTrackConfig = (TourTrackConfig) activeConfig.clone();
 
 		saveState();
 
-		final boolean isAbsoluteAltitudeMode = trackConfig.altitudeMode == WorldWind.ABSOLUTE;
-		final boolean isAbsoluteAltitudeNotModified = backupIsAltitudeOffset == trackConfig.isAbsoluteOffset
-				&& backupIsAbsoluteAltitudeMode == isAbsoluteAltitudeMode;
-
-		/*
-		 * check if tracks must be recreated
-		 */
-		if (//
-		true
-		// altitude offset (vertical distance) is NOT modified
-				&& backupAltitudeOffsetDistance == trackConfig.altitudeVerticalOffset //
-
-				// path resolution is NOT modified
-				&& backupPathResolution == trackConfig.pathResolution //
-
-				// follow terrain is NOT modified
-				&& backupIsFollowTerrain == trackConfig.isFollowTerrain //
-
-				// direction arrow distance is NOT modified
-//				&& backupDirectionArrowDistance == _trackConfig.directionArrowDistance//
-
-				&& isAbsoluteAltitudeNotModified
-		//
-		) {
-
-			trackConfig.isRecreateTracks = false;
-
-		} else {
-
-			// altitude offset or altitude mode has changed
-
-			trackConfig.isRecreateTracks = true;
-		}
+		activeConfig.checkTrackRecreation(clonedTrackConfig);
 	}
 
 	public void updateMeasurementSystem() {
@@ -1416,6 +1312,33 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 		_lblTrackPositionThresholdAbsolute.getParent().layout();
 	}
 
+	private void updateUI_ComboConfigName(final boolean isReplaceItems) {
+
+		final boolean backupIsUpdateUI = _isUpdateUI;
+		_isUpdateUI = true;
+		{
+			int backupNameIndex = 0;
+
+			if (isReplaceItems) {
+				backupNameIndex = _comboName.getSelectionIndex();
+				_comboName.removeAll();
+			}
+
+			for (final TourTrackConfig config : TourTrackConfigManager.getAllConfigurations()) {
+				_comboName.add(config.name);
+			}
+
+			if (isReplaceItems) {
+
+				if (backupNameIndex < 0) {
+					backupNameIndex = 0;
+				}
+				_comboName.select(backupNameIndex);
+			}
+		}
+		_isUpdateUI = backupIsUpdateUI;
+	}
+
 	private void updateUI_FillCombo(final Combo combo) {
 
 		// fill track color combo
@@ -1426,18 +1349,11 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 
 	private void updateUI_initial() {
 
-		for (final TourTrackConfig config : TourTrackConfigManager.getAllConfigurations()) {
-			_comboName.add(config.name);
-		}
+		updateUI_ComboConfigName(false);
 
 		// fill altitude mode combo
 		for (final ComboEntry altiMode : TourTrackConfig.ALTITUDE_MODE) {
 			_comboAltitude.add(altiMode.label);
-		}
-
-		// fill path resolution combo
-		for (final ComboEntry pathResolution : TourTrackConfig.PATH_RESOLUTION) {
-			_comboPathResolution.add(pathResolution.label);
 		}
 
 		updateUI_FillCombo(_comboOutlineColorMode);
@@ -1451,7 +1367,7 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 		updateUI_FillCombo(_comboInteriorColorMode_Selected);
 	}
 
-	private void updateUI_SetActiveConfig() {
+	private void updateUI_SetActiveConfig(final TourTrackConfig previousConfig) {
 
 		restoreState();
 
@@ -1459,7 +1375,7 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 
 		final TourTrackConfig trackConfig = TourTrackConfigManager.getActiveConfig();
 
-		trackConfig.isRecreateTracks = true;
+		trackConfig.checkTrackRecreation(previousConfig);
 
 		// update track layer
 		Map3Manager.getLayer_TourTrack().onModifyConfig();

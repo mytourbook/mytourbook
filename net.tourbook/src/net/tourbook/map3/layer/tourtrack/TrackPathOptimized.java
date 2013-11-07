@@ -17,6 +17,7 @@ package net.tourbook.map3.layer.tourtrack;
 
 import gnu.trove.list.array.TIntArrayList;
 import gov.nasa.worldwind.View;
+import gov.nasa.worldwind.WorldWind;
 import gov.nasa.worldwind.cache.GpuResourceCache;
 import gov.nasa.worldwind.geom.Angle;
 import gov.nasa.worldwind.geom.Position;
@@ -46,11 +47,10 @@ public class TrackPathOptimized extends MTMultiResolutionPath implements ITrackP
 	private static final int	SKIP_COUNTER		= 30;
 
 	private TourTrack			_tourTrack;
-	private TourTrackConfig		_tourTrackConfig;
 
-	private static final String	ARROW_BORDER_KEY	= TrackPathOptimized.class.getName() + ".ArrowBorder";
-	private static final String	ARROW_POSITION_KEY	= TrackPathOptimized.class.getName() + ".ArrowPosition";
-	private static final String	ARROW_SURFACE_KEY	= TrackPathOptimized.class.getName() + ".ArrowSurface";
+	private static final String	ARROW_BORDER_KEY	= TrackPathOptimized.class.getName() + ".ArrowBorder";		//$NON-NLS-1$
+	private static final String	ARROW_POSITION_KEY	= TrackPathOptimized.class.getName() + ".ArrowPosition";	//$NON-NLS-1$
+	private static final String	ARROW_SURFACE_KEY	= TrackPathOptimized.class.getName() + ".ArrowSurface";	//$NON-NLS-1$
 
 	/** The length, in meters, of the arrowhead, from tip to base. */
 	protected double			_arrowLength		= 30.0;
@@ -76,7 +76,9 @@ public class TrackPathOptimized extends MTMultiResolutionPath implements ITrackP
 												final FloatBuffer path,
 												final PathData pathData) {
 
-		if (_tourTrackConfig.isShowDirectionArrows) {
+		final TourTrackConfig config = TourTrackConfigManager.getActiveConfig();
+
+		if (config.isShowDirectionArrows) {
 
 			computeArrowPositions(dc, positions, pathData);
 			computeDirectionArrows(dc, pathData);
@@ -86,6 +88,9 @@ public class TrackPathOptimized extends MTMultiResolutionPath implements ITrackP
 	}
 
 	private void computeArrowPositions(final DrawContext dc, final List<Position> positions, final PathData pathData) {
+
+//		System.out.println(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] \tcomputeArrowPositions()");
+//		// TODO remove SYSTEM.OUT.PRINTLN
 
 		final int elemsPerPoint = 3;
 		final int positionSize = positions.size();
@@ -109,13 +114,25 @@ public class TrackPathOptimized extends MTMultiResolutionPath implements ITrackP
 		final Globe globe = dc.getGlobe();
 		final Vec4 referencePoint = pathData.getReferencePoint();
 
+		// vertical exaggeration
 		double verticalExaggeration = 1;
 		final boolean isVerticalExaggeration = dc.getVerticalExaggeration() != 1;
 		if (isVerticalExaggeration) {
 			verticalExaggeration = dc.getVerticalExaggeration();
 		}
 
-		final double poleHeight = pathData.getEyeDistance() / (100.0 / _tourTrackConfig.directionArrowDistance * 1.5);
+		final TourTrackConfig trackConfig = TourTrackConfigManager.getActiveConfig();
+
+		// altitude offset
+		final int altitudeMode = trackConfig.altitudeMode;
+//		final boolean isAbsoluteAltitudeMode = altitudeMode == WorldWind.ABSOLUTE;
+//		final int altitudeVerticalOffset = isAbsoluteAltitudeMode && trackConfig.isAbsoluteOffset
+//				? trackConfig.altitudeVerticalOffset
+//				: 0;
+
+		final TourTrackConfig config = TourTrackConfigManager.getActiveConfig();
+
+		final double poleHeight = pathData.getEyeDistance() / (100.0 / config.directionArrowDistance * 1.5);
 
 		for (int posIndex = 0; posIndex < positionSize; posIndex++) {
 
@@ -124,13 +141,29 @@ public class TrackPathOptimized extends MTMultiResolutionPath implements ITrackP
 				_arrowPositionIndizes.add(posIndex);
 
 				final Position geoPosition = positions.get(posIndex);
-				final double altitude = geoPosition.getAltitude() * verticalExaggeration;
+				final double trackAltitude = geoPosition.getAltitude() * verticalExaggeration;
 
 				// create arrow position vertex
-				final Vec4 pt = globe.computePointFromPosition(//
-						geoPosition.getLatitude(),
-						geoPosition.getLongitude(),
-						altitude + poleHeight);
+				Vec4 pt;
+				if (altitudeMode == WorldWind.CLAMP_TO_GROUND) {
+
+					pt = dc.computeTerrainPoint(geoPosition.getLatitude(), geoPosition.getLongitude(), 0 + poleHeight);
+
+				} else if (altitudeMode == WorldWind.RELATIVE_TO_GROUND) {
+
+					pt = dc.computeTerrainPoint(//
+							geoPosition.getLatitude(),
+							geoPosition.getLongitude(),
+							trackAltitude + poleHeight);
+
+				} else { // WorldWind.ABSOLUTE
+
+					pt = globe.computePointFromPosition(//
+							geoPosition.getLatitude(),
+							geoPosition.getLongitude(),
+							trackAltitude + poleHeight);
+
+				}
 
 				putVertexIntoBuffer(arrowPositions, pt, referencePoint);
 			}
@@ -197,7 +230,7 @@ public class TrackPathOptimized extends MTMultiResolutionPath implements ITrackP
 					arrowPositions.get(poleIndexOffset + 1) + referencePoint.y,
 					arrowPositions.get(poleIndexOffset + 2) + referencePoint.z);
 
-			computeDirectionArrows_ArrowheadGeometry(
+			computeDirectionArrows_ArrowHeadGeometry(
 					dc,
 					polePtA,
 					polePtB,
@@ -236,7 +269,7 @@ public class TrackPathOptimized extends MTMultiResolutionPath implements ITrackP
 	 * @param pathData
 	 *            the current globe-specific path data.
 	 */
-	private void computeDirectionArrows_ArrowheadGeometry(	final DrawContext dc,
+	private void computeDirectionArrows_ArrowHeadGeometry(	final DrawContext dc,
 															final Vec4 polePtA,
 															final Vec4 polePtB,
 															final Vec4 arrowPole,
@@ -270,10 +303,12 @@ public class TrackPathOptimized extends MTMultiResolutionPath implements ITrackP
 		final double midpointDistance = view.getEyePoint().distanceTo3(midPoint);
 		final double pixelSize = view.computePixelSizeAtDistance(midpointDistance);
 
+		final TourTrackConfig config = TourTrackConfigManager.getActiveConfig();
+
 		double arrowLength = _arrowLength;
 		double arrowBase = arrowLength * _arrowAngle.tanHalfAngle();
 
-		arrowLength = _tourTrackConfig.directionArrowSize * pixelSize;
+		arrowLength = config.directionArrowSize * pixelSize;
 		arrowBase = arrowLength * _arrowAngle.tanHalfAngle();
 
 		// Don't draw an arrowhead if the path segment is smaller than the arrow
@@ -317,6 +352,24 @@ public class TrackPathOptimized extends MTMultiResolutionPath implements ITrackP
 	}
 
 	@Override
+	protected FloatBuffer computePointsRelativeToTerrain(	final DrawContext dc,
+															final List<Position> positions,
+															final Double altitude,
+															final FloatBuffer path,
+															final PathData pathData) {
+
+		final TourTrackConfig config = TourTrackConfigManager.getActiveConfig();
+
+		if (config.isShowDirectionArrows) {
+
+			computeArrowPositions(dc, positions, pathData);
+			computeDirectionArrows(dc, pathData);
+		}
+
+		return super.computePointsRelativeToTerrain(dc, positions, altitude, path, pathData);
+	}
+
+	@Override
 	protected void doDrawInteriorVBO(final DrawContext dc, final int[] vboIds, final PathData pathData) {
 
 		/*
@@ -348,6 +401,8 @@ public class TrackPathOptimized extends MTMultiResolutionPath implements ITrackP
 	@Override
 	protected void doDrawOutlineVBO(final DrawContext dc, final int[] vboIds, final PathData pathData) {
 
+		final TourTrackConfig config = TourTrackConfigManager.getActiveConfig();
+
 		final boolean isPickingMode = dc.isPickingMode();
 
 		final boolean isTourSelected = _tourTrack.isSelected();
@@ -375,13 +430,13 @@ public class TrackPathOptimized extends MTMultiResolutionPath implements ITrackP
 				RGB rgb;
 
 				if (isTourHovered && isTourSelected) {
-					rgb = _tourTrackConfig.outlineColor_HovSel;
+					rgb = config.outlineColor_HovSel;
 				} else if (isTourHovered) {
-					rgb = _tourTrackConfig.outlineColor_Hovered;
+					rgb = config.outlineColor_Hovered;
 				} else if (isTourSelected) {
-					rgb = _tourTrackConfig.outlineColor_Selected;
+					rgb = config.outlineColor_Selected;
 				} else {
-					rgb = _tourTrackConfig.outlineColor;
+					rgb = config.outlineColor;
 				}
 
 				gl.glColor4ub((byte) rgb.red, (byte) rgb.green, (byte) rgb.blue, (byte) 0xbf);
@@ -419,7 +474,7 @@ public class TrackPathOptimized extends MTMultiResolutionPath implements ITrackP
 				drawInteriorVertexColorVBO(dc, vboIds, pathData);
 			}
 
-			if (!isPickingMode && _tourTrackConfig.isShowDirectionArrows) {
+			if (!isPickingMode && config.isShowDirectionArrows) {
 				drawDirectionArrows(dc, vboIds, pathData);
 			}
 
@@ -455,16 +510,17 @@ public class TrackPathOptimized extends MTMultiResolutionPath implements ITrackP
 			return;
 		}
 
+		final TourTrackConfig config = TourTrackConfigManager.getActiveConfig();
 		RGB rgb = null;
 		final boolean isTourSelected = _tourTrack.isSelected();
 		final boolean isTourHovered = _tourTrack.isHovered();
 
 		if (isTourHovered && isTourSelected) {
-			rgb = _tourTrackConfig.outlineColor_HovSel;
+			rgb = config.outlineColor_HovSel;
 		} else if (isTourHovered) {
-			rgb = _tourTrackConfig.outlineColor_Hovered;
+			rgb = config.outlineColor_Hovered;
 		} else if (isTourSelected) {
-			rgb = _tourTrackConfig.outlineColor_Selected;
+			rgb = config.outlineColor_Selected;
 		}
 
 		if (rgb == null) {
@@ -558,7 +614,9 @@ public class TrackPathOptimized extends MTMultiResolutionPath implements ITrackP
 	@Override
 	protected void drawPointsVBO(final DrawContext dc, final int[] vboIds, final PathData pathData) {
 
-		if (_tourTrackConfig.isShowTrackPosition == false) {
+		final TourTrackConfig config = TourTrackConfigManager.getActiveConfig();
+
+		if (config.isShowTrackPosition == false) {
 			return;
 		}
 
@@ -610,6 +668,7 @@ public class TrackPathOptimized extends MTMultiResolutionPath implements ITrackP
 	@Override
 	protected void fillVBO(final DrawContext dc) {
 
+		final TourTrackConfig config = TourTrackConfigManager.getActiveConfig();
 		final PathData pathData = getCurrentPathData();
 
 		int numberOfIds = isShowPositions() ? //
@@ -619,7 +678,7 @@ public class TrackPathOptimized extends MTMultiResolutionPath implements ITrackP
 						: 1;
 
 		// show arrow keys
-		if (_tourTrackConfig.isShowDirectionArrows) {
+		if (config.isShowDirectionArrows) {
 			numberOfIds += 3;
 		}
 
@@ -641,7 +700,7 @@ public class TrackPathOptimized extends MTMultiResolutionPath implements ITrackP
 			iSize += pathData.getTessellatedPositions().size();
 		}
 
-		if (_tourTrackConfig.isShowDirectionArrows) {
+		if (config.isShowDirectionArrows) {
 			iSize += ((FloatBuffer) pathData.getValue(ARROW_POSITION_KEY)).limit() * 4;
 			iSize += ((FloatBuffer) pathData.getValue(ARROW_SURFACE_KEY)).limit() * 4;
 			iSize += ((FloatBuffer) pathData.getValue(ARROW_BORDER_KEY)).limit() * 4;
@@ -678,7 +737,7 @@ public class TrackPathOptimized extends MTMultiResolutionPath implements ITrackP
 				gl.glBufferData(GL.GL_ELEMENT_ARRAY_BUFFER, ib.limit() * 4, ib.rewind(), GL.GL_STATIC_DRAW);
 			}
 
-			if (_tourTrackConfig.isShowDirectionArrows) {
+			if (config.isShowDirectionArrows) {
 
 				int vboIndex = numberOfIds - 3;
 
@@ -727,6 +786,8 @@ public class TrackPathOptimized extends MTMultiResolutionPath implements ITrackP
 	 */
 	private Color getSolidColor_Interior() {
 
+		final TourTrackConfig config = TourTrackConfigManager.getActiveConfig();
+
 		final boolean isTourSelected = _tourTrack.isSelected();
 		final boolean isTourHovered = _tourTrack.isHovered();
 
@@ -735,32 +796,32 @@ public class TrackPathOptimized extends MTMultiResolutionPath implements ITrackP
 
 		if (isTourHovered && isTourSelected) {
 
-			if (_tourTrackConfig.interiorColorMode_HovSel == TourTrackConfig.COLOR_MODE_SOLID_COLOR) {
+			if (config.interiorColorMode_HovSel == TourTrackConfig.COLOR_MODE_SOLID_COLOR) {
 
-				solidColor = _tourTrackConfig.interiorColor_HovSel;
-				interiorOpacity = (float) (_tourTrackConfig.interiorOpacity_HovSel);
+				solidColor = config.interiorColor_HovSel;
+				interiorOpacity = (float) (config.interiorOpacity_HovSel);
 			}
 
 		} else if (isTourHovered) {
 
-			if (_tourTrackConfig.interiorColorMode_Hovered == TourTrackConfig.COLOR_MODE_SOLID_COLOR) {
+			if (config.interiorColorMode_Hovered == TourTrackConfig.COLOR_MODE_SOLID_COLOR) {
 
-				solidColor = _tourTrackConfig.interiorColor_Hovered;
-				interiorOpacity = (float) (_tourTrackConfig.interiorOpacity_Hovered);
+				solidColor = config.interiorColor_Hovered;
+				interiorOpacity = (float) (config.interiorOpacity_Hovered);
 			}
 
 		} else if (isTourSelected) {
 
-			if (_tourTrackConfig.interiorColorMode_Selected == TourTrackConfig.COLOR_MODE_SOLID_COLOR) {
-				solidColor = _tourTrackConfig.interiorColor_Selected;
-				interiorOpacity = (float) (_tourTrackConfig.interiorOpacity_Selected);
+			if (config.interiorColorMode_Selected == TourTrackConfig.COLOR_MODE_SOLID_COLOR) {
+				solidColor = config.interiorColor_Selected;
+				interiorOpacity = (float) (config.interiorOpacity_Selected);
 			}
 
 		} else {
 
-			if (_tourTrackConfig.interiorColorMode == TourTrackConfig.COLOR_MODE_SOLID_COLOR) {
-				solidColor = _tourTrackConfig.interiorColor;
-				interiorOpacity = (float) (_tourTrackConfig.interiorOpacity);
+			if (config.interiorColorMode == TourTrackConfig.COLOR_MODE_SOLID_COLOR) {
+				solidColor = config.interiorColor;
+				interiorOpacity = (float) (config.interiorOpacity);
 			}
 		}
 
@@ -795,6 +856,8 @@ public class TrackPathOptimized extends MTMultiResolutionPath implements ITrackP
 	 */
 	private boolean isShowTrackValueColor_Outline() {
 
+		final TourTrackConfig config = TourTrackConfigManager.getActiveConfig();
+
 		boolean isShowTrackValue;
 
 		final boolean isTourSelected = _tourTrack.isSelected();
@@ -802,19 +865,19 @@ public class TrackPathOptimized extends MTMultiResolutionPath implements ITrackP
 
 		if (isTourHovered && isTourSelected) {
 
-			isShowTrackValue = _tourTrackConfig.outlineColorMode_HovSel == TourTrackConfig.COLOR_MODE_TRACK_VALUE;
+			isShowTrackValue = config.outlineColorMode_HovSel == TourTrackConfig.COLOR_MODE_TRACK_VALUE;
 
 		} else if (isTourHovered) {
 
-			isShowTrackValue = _tourTrackConfig.outlineColorMode_Hovered == TourTrackConfig.COLOR_MODE_TRACK_VALUE;
+			isShowTrackValue = config.outlineColorMode_Hovered == TourTrackConfig.COLOR_MODE_TRACK_VALUE;
 
 		} else if (isTourSelected) {
 
-			isShowTrackValue = _tourTrackConfig.outlineColorMode_Selected == TourTrackConfig.COLOR_MODE_TRACK_VALUE;
+			isShowTrackValue = config.outlineColorMode_Selected == TourTrackConfig.COLOR_MODE_TRACK_VALUE;
 
 		} else {
 
-			isShowTrackValue = _tourTrackConfig.outlineColorMode == TourTrackConfig.COLOR_MODE_TRACK_VALUE;
+			isShowTrackValue = config.outlineColorMode == TourTrackConfig.COLOR_MODE_TRACK_VALUE;
 		}
 
 		return isShowTrackValue;
@@ -845,10 +908,8 @@ public class TrackPathOptimized extends MTMultiResolutionPath implements ITrackP
 	}
 
 	@Override
-	public void setTourTrack(final TourTrack tourTrack, final TourTrackConfig tourTrackConfig) {
-
+	public void setTourTrack(final TourTrack tourTrack) {
 		_tourTrack = tourTrack;
-		_tourTrackConfig = tourTrackConfig;
 	}
 
 	@Override
