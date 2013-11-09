@@ -18,7 +18,7 @@ package net.tourbook.map3.layer;
 import gov.nasa.worldwind.geom.Position;
 import gov.nasa.worldwind.layers.AnnotationLayer;
 import gov.nasa.worldwind.render.AnnotationAttributes;
-import gov.nasa.worldwind.render.GlobeAnnotation;
+import gov.nasa.worldwind.render.DrawContext;
 
 import java.awt.Insets;
 import java.awt.Point;
@@ -33,9 +33,9 @@ import org.eclipse.jface.dialogs.IDialogSettings;
  */
 public class TourInfoLayer extends AnnotationLayer implements IToolLayer {
 
-	public static final String	MAP3_LAYER_ID	= "TourInfoLayer";	//$NON-NLS-1$
+	public static final String		MAP3_LAYER_ID	= "TourInfoLayer";	//$NON-NLS-1$
 
-	private GlobeAnnotation		_hoveredTrackPoint;
+	private TrackPointAnnotation	_hoveredTrackPoint;
 
 	public TourInfoLayer(final IDialogSettings state) {
 
@@ -51,9 +51,9 @@ public class TourInfoLayer extends AnnotationLayer implements IToolLayer {
 		addAnnotation(_hoveredTrackPoint);
 	}
 
-	private GlobeAnnotation createHoveredTrackPoint() {
+	private TrackPointAnnotation createHoveredTrackPoint() {
 
-		final GlobeAnnotation trackPoint = new GlobeAnnotation(UI.EMPTY_STRING, Position.ZERO);
+		final TrackPointAnnotation trackPoint = new TrackPointAnnotation(UI.EMPTY_STRING, Position.ZERO);
 
 		trackPoint.setAlwaysOnTop(true);
 
@@ -77,12 +77,19 @@ public class TourInfoLayer extends AnnotationLayer implements IToolLayer {
 	}
 
 	@Override
-	public int getDefaultPosition() {
+	protected void doRender(final DrawContext dc) {
 
+		_hoveredTrackPoint.setSliderPosition(dc);
+
+		super.doRender(dc);
+	}
+
+	@Override
+	public int getDefaultPosition() {
 		return Map3Manager.INSERT_BEFORE_PLACE_NAMES;
 	}
 
-	public GlobeAnnotation getTrackPoint() {
+	public TrackPointAnnotation getTrackPoint() {
 		return _hoveredTrackPoint;
 	}
 

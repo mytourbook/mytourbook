@@ -122,6 +122,14 @@ public class Messages extends NLS {
 	public static String		TourTrack_Properties_Label_TrackPositionThreshold;
 	public static String		TourTrack_Properties_Label_TrackPositionThreshold_Tooltip;
 
+	public static String	TourTrack_Properties_Radio_AltitudeOffsetAbsolute;
+
+	public static String	TourTrack_Properties_Radio_AltitudeOffsetAbsolute_Tooltip;
+
+	public static String	TourTrack_Properties_Radio_AltitudeOffsetRelative;
+
+	public static String	TourTrack_Properties_Radio_AltitudeOffsetRelative_Tooltip;
+
 	public static String		Track_Config_Altitude_Mode_Absolute;
 	public static String		Track_Config_Altitude_Mode_ClampToGround;
 	public static String		Track_Config_Altitude_Mode_RelativeToGround;
@@ -138,6 +146,14 @@ public class Messages extends NLS {
 	public static String	Track_Config_ConfigName_FarBright;
 
 	public static String	Track_Config_ConfigName_FarDark;
+
+	public static String	Track_Config_ConfigName_MiddleBright;
+
+	public static String	Track_Config_ConfigName_MiddleDark;
+
+	public static String	Track_Config_ConfigName_RelativeBright;
+
+	public static String	Track_Config_ConfigName_RelativeDark;
 	public static String		Track_Config_ConfigName_Unknown;
 
 	public static String		Track_Config_Path_Resolution_High;

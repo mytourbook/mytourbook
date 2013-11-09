@@ -31,12 +31,14 @@ import java.awt.Color;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.media.opengl.GL;
 
 import net.tourbook.common.color.ColorUtil;
 import net.tourbook.map3.shape.MTMultiResolutionPath;
+import net.tourbook.map3.view.Map3View;
 
 import org.eclipse.swt.graphics.RGB;
 
@@ -84,7 +86,92 @@ public class TrackPathOptimized extends MTMultiResolutionPath implements ITrackP
 			computeDirectionArrows(dc, pathData);
 		}
 
-		return super.computeAbsolutePoints(dc, positions, path, pathData);
+		return computeAbsolutePoints_WithOffset(dc, positions, path, pathData);
+	}
+
+	/**
+	 * This is a copy from {@link Path#computeAbsolutePoints} with altitude adjustment.
+	 * 
+	 * @param dc
+	 * @param positions
+	 * @param path
+	 * @param pathData
+	 * @return
+	 */
+	private FloatBuffer computeAbsolutePoints_WithOffset(	final DrawContext dc,
+															final List<Position> positions,
+															FloatBuffer path,
+															final PathData pathData) {
+
+		final double eyeElevation = dc.getView().getEyePosition().getElevation();
+
+		final TourTrackConfig config = TourTrackConfigManager.getActiveConfig();
+
+		final boolean isAbsoluteAltitudeMode = config.altitudeMode == WorldWind.ABSOLUTE;
+		final boolean isAltitudeOffset = config.isAltitudeOffset;
+		final boolean isOffsetModeAbsolute = config.altitudeOffsetMode == TourTrackConfigManager.ALTITUDE_OFFSET_MODE_ABSOLUTE;
+		final boolean isOffsetModeRelative = config.altitudeOffsetMode == TourTrackConfigManager.ALTITUDE_OFFSET_MODE_RELATIVE;
+
+		final int relativeOffset = config.altitudeOffsetDistanceRelative;
+
+		double altitudeOffset = 0;
+
+		if (isAbsoluteAltitudeMode && isAltitudeOffset) {
+
+			if (isOffsetModeAbsolute) {
+
+				altitudeOffset = config.altitudeOffsetDistanceAbsolute;
+
+			} else if (isOffsetModeRelative && relativeOffset > 0) {
+
+				altitudeOffset = eyeElevation / 100.0 * relativeOffset;
+			}
+		}
+
+		final List<Color> tessellatedColors = pathData.getTessellatedColors();
+
+		final int numPoints = this.isExtrude() ? 2 * positions.size() : positions.size();
+		final int elemsPerPoint = (tessellatedColors != null ? 7 : 3);
+		final Iterator<Color> colorIter = (tessellatedColors != null ? tessellatedColors.iterator() : null);
+		final float[] color = (tessellatedColors != null ? new float[4] : null);
+
+		if (path == null || path.capacity() < elemsPerPoint * numPoints) {
+			path = BufferUtil.newFloatBuffer(elemsPerPoint * numPoints);
+		}
+
+		path.clear();
+
+		final Globe globe = dc.getGlobe();
+		final Vec4 referencePoint = pathData.getReferencePoint();
+		final double ve = dc.getVerticalExaggeration();
+
+		for (final Position pos : positions) {
+
+			final double altitude = pos.getAltitude();
+
+			final Vec4 pt = globe.computePointFromPosition(//
+					pos.getLatitude(),
+					pos.getLongitude(),
+					ve * altitude + altitudeOffset);
+
+			path.put((float) (pt.x - referencePoint.x));
+			path.put((float) (pt.y - referencePoint.y));
+			path.put((float) (pt.z - referencePoint.z));
+
+			if (colorIter != null && colorIter.hasNext()) {
+				colorIter.next().getRGBComponents(color);
+				path.put(color);
+			}
+
+			if (this.isExtrude()) {
+				this.appendTerrainPoint(dc, pos, color, path, pathData);
+			}
+		}
+
+		pathData.setColorOffset(tessellatedColors != null ? 3 : 0);
+		pathData.setVertexStride(elemsPerPoint);
+
+		return path;
 	}
 
 	private void computeArrowPositions(final DrawContext dc, final List<Position> positions, final PathData pathData) {
@@ -121,16 +208,10 @@ public class TrackPathOptimized extends MTMultiResolutionPath implements ITrackP
 			verticalExaggeration = dc.getVerticalExaggeration();
 		}
 
-		final TourTrackConfig trackConfig = TourTrackConfigManager.getActiveConfig();
-
-		// altitude offset
-		final int altitudeMode = trackConfig.altitudeMode;
-//		final boolean isAbsoluteAltitudeMode = altitudeMode == WorldWind.ABSOLUTE;
-//		final int altitudeVerticalOffset = isAbsoluteAltitudeMode && trackConfig.isAbsoluteOffset
-//				? trackConfig.altitudeVerticalOffset
-//				: 0;
-
 		final TourTrackConfig config = TourTrackConfigManager.getActiveConfig();
+
+		final int altitudeMode = config.altitudeMode;
+		final double altitudeOffset = Map3View.getAltitudeOffset(dc.getView().getEyePosition());
 
 		final double poleHeight = pathData.getEyeDistance() / (100.0 / config.directionArrowDistance * 1.5);
 
@@ -141,7 +222,7 @@ public class TrackPathOptimized extends MTMultiResolutionPath implements ITrackP
 				_arrowPositionIndizes.add(posIndex);
 
 				final Position geoPosition = positions.get(posIndex);
-				final double trackAltitude = geoPosition.getAltitude() * verticalExaggeration;
+				final double trackAltitude = (geoPosition.getAltitude() * verticalExaggeration) + altitudeOffset;
 
 				// create arrow position vertex
 				Vec4 pt;

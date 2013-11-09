@@ -78,6 +78,7 @@ import net.tourbook.map3.action.ActionSyncMapWithTour;
 import net.tourbook.map3.action.ActionTourColor;
 import net.tourbook.map3.layer.ChartSliderLayer;
 import net.tourbook.map3.layer.TourInfoLayer;
+import net.tourbook.map3.layer.TrackPointAnnotation;
 import net.tourbook.map3.layer.tourtrack.ITrackPath;
 import net.tourbook.map3.layer.tourtrack.TourMap3Position;
 import net.tourbook.map3.layer.tourtrack.TourTrackConfig;
@@ -244,6 +245,44 @@ public class Map3View extends ViewPart implements ITourProvider {
 	}
 
 	public Map3View() {}
+
+	/**
+	 * @param eyePosition
+	 * @return Returns altitude offset depending on the configuration settings.
+	 */
+	public static double getAltitudeOffset(final Position eyePosition) {
+
+		if (eyePosition == null) {
+			return 0;
+		}
+
+		final TourTrackConfig config = TourTrackConfigManager.getActiveConfig();
+
+		final boolean isAbsoluteAltitudeMode = config.altitudeMode == WorldWind.ABSOLUTE;
+		final boolean isAltitudeOffset = config.isAltitudeOffset;
+		final boolean isOffsetModeAbsolute = config.altitudeOffsetMode == TourTrackConfigManager.ALTITUDE_OFFSET_MODE_ABSOLUTE;
+		final boolean isOffsetModeRelative = config.altitudeOffsetMode == TourTrackConfigManager.ALTITUDE_OFFSET_MODE_RELATIVE;
+
+		final int relativeOffset = config.altitudeOffsetDistanceRelative;
+
+		double altitudeOffset = 0;
+
+		if (isAbsoluteAltitudeMode && isAltitudeOffset) {
+
+			if (isOffsetModeAbsolute) {
+
+				altitudeOffset = config.altitudeOffsetDistanceAbsolute;
+
+			} else if (isOffsetModeRelative && relativeOffset > 0) {
+
+				final double eyeElevation = eyePosition.getElevation();
+
+				altitudeOffset = eyeElevation / 100.0 * relativeOffset;
+			}
+		}
+
+		return altitudeOffset;
+	}
 
 	void actionOpenTrackColorDialog() {
 
@@ -1043,29 +1082,27 @@ public class Map3View extends ViewPart implements ITourProvider {
 		return null;
 	}
 
-	private double getSliderYPosition(final float trackAltitude) {
+	private double getSliderYPosition(final float trackAltitude, final Position eyePosition) {
 
-		final TourTrackConfig trackConfig = TourTrackConfigManager.getActiveConfig();
+		final TourTrackConfig config = TourTrackConfigManager.getActiveConfig();
 
-		final int altitudeMode = trackConfig.altitudeMode;
-		final boolean isAbsoluteAltitudeMode = altitudeMode == WorldWind.ABSOLUTE;
+		double sliderYPosition = 0;
 
-		final int altitudeVerticalOffset = isAbsoluteAltitudeMode && trackConfig.isAbsoluteOffset
-				? trackConfig.altitudeVerticalOffset
-				: 0;
-
-		double sliderYPosition;
-		switch (altitudeMode) {
+		switch (config.altitudeMode) {
 		case WorldWind.ABSOLUTE:
-			sliderYPosition = trackAltitude + altitudeVerticalOffset;
+
+			sliderYPosition = trackAltitude + getAltitudeOffset(eyePosition);
 			break;
 
 		case WorldWind.RELATIVE_TO_GROUND:
+
 			sliderYPosition = trackAltitude;
 			break;
 
-		default: // WorldWind.CLAMP_TO_GROUND
-			sliderYPosition = 0;
+		default:
+
+			// WorldWind.CLAMP_TO_GROUND -> y position = 0
+
 			break;
 		}
 
@@ -1527,7 +1564,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 		attributes.setTextColor(fgColor);
 	}
 
-	private void setAnnotationPosition(	final GlobeAnnotation annotation,
+	private void setAnnotationPosition(	final TrackPointAnnotation sliderAnnotation,
 										final TourData tourData,
 										final int positionIndex) {
 
@@ -1540,15 +1577,16 @@ public class Map3View extends ViewPart implements ITourProvider {
 		final float[] altitudeSerie = tourData.altitudeSerie;
 		final float trackAltitude = altitudeSerie == null ? 0 : altitudeSerie[positionIndex];
 
-		final double sliderYPosition = getSliderYPosition(trackAltitude);
+		final TourTrackConfig config = TourTrackConfigManager.getActiveConfig();
 
-		final TourTrackConfig trackConfig = TourTrackConfigManager.getActiveConfig();
-
-		annotation.setAltitudeMode(trackConfig.altitudeMode);
-		annotation.setPosition(new Position(new LatLon(//
+		final LatLon latLon = new LatLon(//
 				Angle.fromDegrees(latitude),
-				Angle.fromDegrees(longitude)), //
-				sliderYPosition));
+				Angle.fromDegrees(longitude));
+
+		sliderAnnotation.latLon = latLon;
+		sliderAnnotation.trackAltitude = trackAltitude;
+
+		sliderAnnotation.setAltitudeMode(config.altitudeMode);
 	}
 
 	private void setColorProvider(final MapColorId colorId) {
@@ -1630,7 +1668,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 
 				final TourData tourData = hoveredTrackPath.getTourTrack().getTourData();
 
-				final GlobeAnnotation trackPoint = tourInfoLayer.getTrackPoint();
+				final TrackPointAnnotation trackPoint = tourInfoLayer.getTrackPoint();
 				trackPoint.setText(createSliderText(hoveredPositionIndex, tourData));
 
 				setAnnotationPosition(trackPoint, tourData, hoveredPositionIndex);
@@ -1799,32 +1837,32 @@ public class Map3View extends ViewPart implements ITourProvider {
 			final double longitude = tourData.longitudeSerie[valuesIndex];
 
 			final float[] altitudeSerie = tourData.altitudeSerie;
-			final float trackAltitude = altitudeSerie == null ? 0 : altitudeSerie[valuesIndex];
-
-			final double elevation = getSliderYPosition(trackAltitude);
-
-			final LatLon sliderDegrees = LatLon.fromDegrees(latitude, longitude);
-
-			/*
-			 * Prevent setting the same location because this will jitter the map slider and is
-			 * unnecessary.
-			 */
-			if (_previousMapSliderPosition != null) {
-
-				if (_previousMapSliderPosition.getLatitude().equals(sliderDegrees.latitude)
-						&& _previousMapSliderPosition.getLongitude().equals(sliderDegrees.longitude)
-						&& _previousMapSliderPosition.elevation == elevation) {
-
-					return;
-				}
-			}
-
-			chartSliderLayer.setSliderVisible(false);
 
 			final View view = _wwCanvas.getView();
 			if (view instanceof BasicOrbitView) {
 
 				final BasicOrbitView orbitView = (BasicOrbitView) view;
+				final Position eyePos = orbitView.getCurrentEyePosition();
+
+				final float trackAltitude = altitudeSerie == null ? 0 : altitudeSerie[valuesIndex];
+				final double elevation = getSliderYPosition(trackAltitude, eyePos);
+				final LatLon sliderDegrees = LatLon.fromDegrees(latitude, longitude);
+
+				/*
+				 * Prevent setting the same location because this will jitter the map slider and is
+				 * unnecessary.
+				 */
+				if (_previousMapSliderPosition != null) {
+
+					if (_previousMapSliderPosition.getLatitude().equals(sliderDegrees.latitude)
+							&& _previousMapSliderPosition.getLongitude().equals(sliderDegrees.longitude)
+							&& _previousMapSliderPosition.elevation == elevation) {
+
+						return;
+					}
+				}
+
+				chartSliderLayer.setSliderVisible(false);
 
 				final Position mapSliderPosition = new Position(sliderDegrees, elevation);
 
@@ -1839,8 +1877,6 @@ public class Map3View extends ViewPart implements ITourProvider {
 				// Set the view to center on the track position,
 				// while keeping the eye altitude constant.
 				try {
-
-					final Position eyePos = orbitView.getCurrentEyePosition();
 
 					// New eye lat/lon will follow the ground position.
 					final LatLon newEyeLatLon = eyePos.add(mapSliderPosition.subtract(orbitView.getCenterPosition()));
@@ -1958,7 +1994,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 		Map3Manager.redrawMap();
 	}
 
-	private void updateChartSlider_20_Data(	final GlobeAnnotation slider,
+	private void updateChartSlider_20_Data(	final TrackPointAnnotation slider,
 											final int positionIndex,
 											final TourData tourData,
 											final boolean isLeftSlider) {

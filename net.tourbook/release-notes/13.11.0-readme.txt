@@ -11,3 +11,9 @@ New
  
 
 * 
+
+
+
+Stability of this version
+
+Not bad, it has less crashes than the previous version but it still can happen. It can mostly occur when many tours are displayed.

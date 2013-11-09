@@ -48,16 +48,24 @@ public class TourTrackConfigManager {
 	/*
 	 * Default id is used to reset a configuration to default values.
 	 */
-	static final String								DEFAULT_ID_DEFAULT							= "#default";									//$NON-NLS-1$
-	private static final String						DEFAULT_ID_CLOSE_BRIGHT						= "#closeBright";								//$NON-NLS-1$
-	private static final String						DEFAULT_ID_CLOSE_DARK						= "#closeDark";								//$NON-NLS-1$
-	private static final String						DEFAULT_ID_FAR_BRIGHT						= "#farBright";								//$NON-NLS-1$
-	private static final String						DEFAULT_ID_FAR_DARK							= "#farDark";									//$NON-NLS-1$
-	private static final String						DEFAULT_ID_EXTREM							= "#extrem";									//$NON-NLS-1$
+	static final String								DEFAULT_ID_DEFAULT							= "#default";										//$NON-NLS-1$
+	private static final String						DEFAULT_ID_RELATIVE_BRIGHT					= "#relativeBright";								//$NON-NLS-1$
+	private static final String						DEFAULT_ID_RELATIVE_DARK					= "#relativeDark";									//$NON-NLS-1$
+	private static final String						DEFAULT_ID_CLOSE_BRIGHT						= "#closeBright";									//$NON-NLS-1$
+	private static final String						DEFAULT_ID_CLOSE_DARK						= "#closeDark";									//$NON-NLS-1$
+	private static final String						DEFAULT_ID_MIDDLE_BRIGHT					= "#middleBright";									//$NON-NLS-1$
+	private static final String						DEFAULT_ID_MIDDLE_DARK						= "#middleDark";									//$NON-NLS-1$
+	private static final String						DEFAULT_ID_FAR_BRIGHT						= "#farBright";									//$NON-NLS-1$
+	private static final String						DEFAULT_ID_FAR_DARK							= "#farDark";										//$NON-NLS-1$
+	private static final String						DEFAULT_ID_EXTREM							= "#extrem";										//$NON-NLS-1$
 
 	private static final String						CONFIG_NAME_DEFAULT							= Messages.Track_Config_ConfigName_Default;
+	private static final String						CONFIG_NAME_RELATIVE_BRIGHT					= Messages.Track_Config_ConfigName_RelativeBright;
+	private static final String						CONFIG_NAME_RELATIVE_DARK					= Messages.Track_Config_ConfigName_RelativeDark;
 	private static final String						CONFIG_NAME_CLOSE_BRIGHT					= Messages.Track_Config_ConfigName_CloseBright;
 	private static final String						CONFIG_NAME_CLOSE_DARK						= Messages.Track_Config_ConfigName_CloseDark;
+	private static final String						CONFIG_NAME_MIDDLE_BRIGHT					= Messages.Track_Config_ConfigName_MiddleBright;
+	private static final String						CONFIG_NAME_MIDDLE_DARK						= Messages.Track_Config_ConfigName_MiddleDark;
 	private static final String						CONFIG_NAME_FAR_BRIGHT						= Messages.Track_Config_ConfigName_FarBright;
 	private static final String						CONFIG_NAME_FAR_DARK						= Messages.Track_Config_ConfigName_FarDark;
 	private static final String						CONFIG_NAME_EXTREM							= Messages.Track_Config_ConfigName_Extrem;
@@ -125,15 +133,22 @@ public class TourTrackConfigManager {
 	public static final float						TRACK_POSITION_SIZE_SELECTED_DEFAULT		= 10;
 	public static final float						TRACK_POSITION_SIZE_HOV_SEL_DEFAULT			= 14;
 
-	public static final int							TRACK_POSITION_THRESHOLD_DEFAULT			= 10;											// this is an exponent
+	// this is an exponent
+	public static final int							TRACK_POSITION_THRESHOLD_DEFAULT			= 10;
 
 	// altitude
 	public static final int							ALTITUDE_MODE_DEFAULT						= WorldWind.ABSOLUTE;
-	public static final boolean						IS_ABSOLUTE_OFFSET_DEFAULT					= true;
+	public static final boolean						IS_ALTITUDE_OFFSET_DEFAULT					= true;
+	public static final int							ALTITUDE_OFFSET_MODE_ABSOLUTE				= 0;
+	public static final int							ALTITUDE_OFFSET_MODE_RELATIVE				= 1;
+	public static final int							ALTITUDE_OFFSET_MODE_DEFAULT				= ALTITUDE_OFFSET_MODE_ABSOLUTE;
 
-	public static final int							ALTITUDE_OFFSET_MIN							= -1000000;
-	public static final int							ALTITUDE_OFFSET_MAX							= 1000000;
-	public static final int							ALTITUDE_OFFSET_DEFAULT						= 50;
+	public static final int							ALTITUDE_OFFSET_ABSOLUTE_MIN				= -1000000;
+	public static final int							ALTITUDE_OFFSET_ABSOLUTE_MAX				= 1000000;
+	public static final int							ALTITUDE_OFFSET_ABSOLUTE_DEFAULT			= 50;
+	public static final int							ALTITUDE_OFFSET_RELATIVE_MIN				= 0;
+	public static final int							ALTITUDE_OFFSET_RELATIVE_MAX				= 50;
+	public static final int							ALTITUDE_OFFSET_RELATIVE_DEFAULT			= 3;
 
 	// opacity
 	public static final int							OPACITY_MIN									= 0;
@@ -160,7 +175,7 @@ public class TourTrackConfigManager {
 		RGB_SELECTED_DEFAULT = new RGB(0xFF, 0xff, 0xff);
 	}
 
-	private static final String						TOUR_TRACK_CONFIG_FILE_NAME					= "tour-track-config.xml";						//$NON-NLS-1$
+	private static final String						TOUR_TRACK_CONFIG_FILE_NAME					= "tour-track-config.xml";							//$NON-NLS-1$
 
 	/**
 	 * This version number is incremented, when structural changes (e.g. new category) are done.
@@ -169,50 +184,52 @@ public class TourTrackConfigManager {
 	private static final int						TOUR_TRACK_CONFIG_VERSION					= 1;
 
 	// root
-	private static final String						TAG_ROOT									= "TourTrackConfigurationRoot";				//$NON-NLS-1$
-	private static final String						ATTR_ACTIVE_CONFIG_ID						= "activeConfigId";							//$NON-NLS-1$
-	private static final String						ATTR_CONFIG_VERSION							= "configVersion";								//$NON-NLS-1$
+	private static final String						TAG_ROOT									= "TourTrackConfigurationRoot";					//$NON-NLS-1$
+	private static final String						ATTR_ACTIVE_CONFIG_ID						= "activeConfigId";								//$NON-NLS-1$
+	private static final String						ATTR_CONFIG_VERSION							= "configVersion";									//$NON-NLS-1$
 
 	// config
-	private static final String						TAG_TRACK_CONFIG							= "trackConfig";								//$NON-NLS-1$
-	private static final String						ATTR_ID										= "id";										//$NON-NLS-1$
-	private static final String						ATTR_DEFAULT_ID								= "defaultId";									//$NON-NLS-1$
-	private static final String						ATTR_CONFIG_NAME							= "name";										//$NON-NLS-1$
-	private static final String						ATTR_IS_FOLLOW_TERRAIN						= "isFollowTerrain";							//$NON-NLS-1$
+	private static final String						TAG_TRACK_CONFIG							= "trackConfig";									//$NON-NLS-1$
+	private static final String						ATTR_ID										= "id";											//$NON-NLS-1$
+	private static final String						ATTR_DEFAULT_ID								= "defaultId";										//$NON-NLS-1$
+	private static final String						ATTR_CONFIG_NAME							= "name";											//$NON-NLS-1$
+	private static final String						ATTR_IS_FOLLOW_TERRAIN						= "isFollowTerrain";								//$NON-NLS-1$
 
 	// direction arrows
-	private static final String						TAG_DIRECTION_ARROWS						= "directionArrows";							//$NON-NLS-1$
-	private static final String						ATTR_VERTICAL_DISTANCE						= "verticalDistance";							//$NON-NLS-1$
-	private static final String						ATTR_DIRECTION_ARROW_SIZE					= "arrowSize";									//$NON-NLS-1$
+	private static final String						TAG_DIRECTION_ARROWS						= "directionArrows";								//$NON-NLS-1$
+	private static final String						ATTR_VERTICAL_DISTANCE						= "verticalDistance";								//$NON-NLS-1$
+	private static final String						ATTR_DIRECTION_ARROW_SIZE					= "arrowSize";										//$NON-NLS-1$
 
 	// outline
-	private static final String						TAG_OUTLINE									= "outline";									//$NON-NLS-1$
-	private static final String						ATTR_OUTLINE_WIDTH							= "width";										//$NON-NLS-1$
+	private static final String						TAG_OUTLINE									= "outline";										//$NON-NLS-1$
+	private static final String						ATTR_OUTLINE_WIDTH							= "width";											//$NON-NLS-1$
 
 	// track position
-	private static final String						TAG_TRACK_POSITION							= "trackPosition";								//$NON-NLS-1$
-	private static final String						TAG_TRACK_POSITION_SIZE						= "size";										//$NON-NLS-1$
-	private static final String						ATTR_TRACK_POSITION_THRESHOLD				= "threshold";									//$NON-NLS-1$
+	private static final String						TAG_TRACK_POSITION							= "trackPosition";									//$NON-NLS-1$
+	private static final String						TAG_TRACK_POSITION_SIZE						= "size";											//$NON-NLS-1$
+	private static final String						ATTR_TRACK_POSITION_THRESHOLD				= "threshold";										//$NON-NLS-1$
 
 	// interior
-	private static final String						TAG_INTERIOR								= "interior";									//$NON-NLS-1$
-	private static final String						ATTR_IS_DRAW_VERTICALS						= "isDrawVerticals";							//$NON-NLS-1$
+	private static final String						TAG_INTERIOR								= "interior";										//$NON-NLS-1$
+	private static final String						ATTR_IS_DRAW_VERTICALS						= "isDrawVerticals";								//$NON-NLS-1$
 
 	// altitude
-	private static final String						TAG_ALTITUDE								= "altitude";									//$NON-NLS-1$
-	private static final String						ATTR_IS_ABSOLUTE_OFFSET						= "isAbsoluteOffset";							//$NON-NLS-1$
-	private static final String						ATTR_ALTITUDE_OFFSET						= "absoluteOffset";							//$NON-NLS-1$
-	private static final String						ATTR_ALTITUDE_MODE							= "mode";										//$NON-NLS-1$
+	private static final String						TAG_ALTITUDE								= "altitude";										//$NON-NLS-1$
+	private static final String						ATTR_ALTITUDE_MODE							= "altitudeMode";									//$NON-NLS-1$
+	private static final String						ATTR_IS_ABSOLUTE_OFFSET						= "isAbsoluteOffset";								//$NON-NLS-1$
+	private static final String						ATTR_OFFSET_MODE							= "offsetMode";									//$NON-NLS-1$
+	private static final String						ATTR_ALTITUDE_OFFSET_ABSOLUTE				= "absoluteOffset";								//$NON-NLS-1$
+	private static final String						ATTR_ALTITUDE_OFFSET_RELATIVE				= "relativeOffset";								//$NON-NLS-1$
 
 	// common attributes
-	private static final String						TAG_COLOR_MODE								= "colorMode";									//$NON-NLS-1$
-	private static final String						TAG_COLOR									= "color";										//$NON-NLS-1$
-	private static final String						TAG_OPACITY									= "opacity";									//$NON-NLS-1$
-	private static final String						ATTR_IS_VISIBLE								= "isVisible";									//$NON-NLS-1$
-	private static final String						TAG_COLOR_NORMAL							= "normal";									//$NON-NLS-1$
-	private static final String						TAG_COLOR_HOVERED							= "hovered";									//$NON-NLS-1$
-	private static final String						TAG_COLOR_SELECTED							= "selected";									//$NON-NLS-1$
-	private static final String						TAG_COLOR_HOV_AND_SEL						= "hovsel";									//$NON-NLS-1$
+	private static final String						TAG_COLOR_MODE								= "colorMode";										//$NON-NLS-1$
+	private static final String						TAG_COLOR									= "color";											//$NON-NLS-1$
+	private static final String						TAG_OPACITY									= "opacity";										//$NON-NLS-1$
+	private static final String						ATTR_IS_VISIBLE								= "isVisible";										//$NON-NLS-1$
+	private static final String						TAG_COLOR_NORMAL							= "normal";										//$NON-NLS-1$
+	private static final String						TAG_COLOR_HOVERED							= "hovered";										//$NON-NLS-1$
+	private static final String						TAG_COLOR_SELECTED							= "selected";										//$NON-NLS-1$
+	private static final String						TAG_COLOR_HOV_AND_SEL						= "hovsel";										//$NON-NLS-1$
 	private static final String						ATTR_NORMAL									= TAG_COLOR_NORMAL;
 	private static final String						ATTR_HOVERED								= TAG_COLOR_HOVERED;
 	private static final String						ATTR_SELECTED								= TAG_COLOR_SELECTED;
@@ -276,10 +293,19 @@ public class TourTrackConfigManager {
 			xmlRoot = create_Root();
 
 			createDefaultXml_10(xmlRoot, CONFIG_NAME_DEFAULT, DEFAULT_ID_DEFAULT);
+
+			createDefaultXml_10(xmlRoot, CONFIG_NAME_RELATIVE_BRIGHT, DEFAULT_ID_RELATIVE_BRIGHT);
+			createDefaultXml_10(xmlRoot, CONFIG_NAME_RELATIVE_DARK, DEFAULT_ID_RELATIVE_DARK);
+
 			createDefaultXml_10(xmlRoot, CONFIG_NAME_CLOSE_BRIGHT, DEFAULT_ID_CLOSE_BRIGHT);
 			createDefaultXml_10(xmlRoot, CONFIG_NAME_CLOSE_DARK, DEFAULT_ID_CLOSE_DARK);
+
+			createDefaultXml_10(xmlRoot, CONFIG_NAME_MIDDLE_BRIGHT, DEFAULT_ID_MIDDLE_BRIGHT);
+			createDefaultXml_10(xmlRoot, CONFIG_NAME_MIDDLE_DARK, DEFAULT_ID_MIDDLE_DARK);
+
 			createDefaultXml_10(xmlRoot, CONFIG_NAME_FAR_BRIGHT, DEFAULT_ID_FAR_BRIGHT);
 			createDefaultXml_10(xmlRoot, CONFIG_NAME_FAR_DARK, DEFAULT_ID_FAR_DARK);
+
 			createDefaultXml_10(xmlRoot, CONFIG_NAME_EXTREM, DEFAULT_ID_EXTREM);
 
 			// append custom configurations
@@ -404,8 +430,10 @@ public class TourTrackConfigManager {
 			final IMemento xmlAltitude = xmlConfig.createChild(TAG_ALTITUDE);
 			{
 				xmlAltitude.putInteger(ATTR_ALTITUDE_MODE, ALTITUDE_MODE_DEFAULT);
-				xmlAltitude.putBoolean(ATTR_IS_ABSOLUTE_OFFSET, IS_ABSOLUTE_OFFSET_DEFAULT);
-				xmlAltitude.putInteger(ATTR_ALTITUDE_OFFSET, ALTITUDE_OFFSET_DEFAULT);
+				xmlAltitude.putBoolean(ATTR_IS_ABSOLUTE_OFFSET, IS_ALTITUDE_OFFSET_DEFAULT);
+				xmlAltitude.putInteger(ATTR_OFFSET_MODE, ALTITUDE_OFFSET_MODE_DEFAULT);
+				xmlAltitude.putInteger(ATTR_ALTITUDE_OFFSET_ABSOLUTE, ALTITUDE_OFFSET_ABSOLUTE_DEFAULT);
+				xmlAltitude.putInteger(ATTR_ALTITUDE_OFFSET_RELATIVE, ALTITUDE_OFFSET_RELATIVE_DEFAULT);
 			}
 		}
 	}
@@ -516,8 +544,8 @@ public class TourTrackConfigManager {
 			final IMemento xmlAltitude = xmlConfig.createChild(TAG_ALTITUDE);
 			{
 				xmlAltitude.putInteger(ATTR_ALTITUDE_MODE, config.altitudeMode);
-				xmlAltitude.putBoolean(ATTR_IS_ABSOLUTE_OFFSET, config.isAbsoluteOffset);
-				xmlAltitude.putInteger(ATTR_ALTITUDE_OFFSET, config.altitudeVerticalOffset);
+				xmlAltitude.putBoolean(ATTR_IS_ABSOLUTE_OFFSET, config.isAltitudeOffset);
+				xmlAltitude.putInteger(ATTR_ALTITUDE_OFFSET_ABSOLUTE, config.altitudeOffsetDistanceAbsolute);
 			}
 		}
 	}
@@ -602,51 +630,59 @@ public class TourTrackConfigManager {
 	 */
 	private static void overwriteConfigDefaultValues(final TourTrackConfig config) {
 
-		if (config.defaultId.equals(DEFAULT_ID_CLOSE_BRIGHT)) {
+		if (config.defaultId.equals(DEFAULT_ID_DEFAULT)) {
 
-			config.outlineColorMode = TourTrackConfig.COLOR_MODE_SOLID_COLOR;
-			config.outlineColor = RGB_BLACK;
-			config.trackPositionSize = 1;
+			// default id contains only default values -> nothing to do
 
-			config.interiorColorMode = TourTrackConfig.COLOR_MODE_TRACK_VALUE;
+		} else if (config.defaultId.equals(DEFAULT_ID_RELATIVE_BRIGHT)) {
+
+			overwriteConfigValues_Bright(config);
+
+			config.altitudeOffsetMode = TourTrackConfigManager.ALTITUDE_OFFSET_MODE_RELATIVE;
+
+		} else if (config.defaultId.equals(DEFAULT_ID_RELATIVE_DARK)) {
+
+			overwriteConfigValues_Dark(config);
+
+			config.altitudeOffsetMode = TourTrackConfigManager.ALTITUDE_OFFSET_MODE_RELATIVE;
+
+		} else if (config.defaultId.equals(DEFAULT_ID_CLOSE_BRIGHT)) {
+
+			overwriteConfigValues_Bright(config);
 
 		} else if (config.defaultId.equals(DEFAULT_ID_CLOSE_DARK)) {
 
-			config.outlineColorMode = TourTrackConfig.COLOR_MODE_SOLID_COLOR;
-			config.outlineColor = RGB_WHITE;
-			config.trackPositionSize = 1;
+			overwriteConfigValues_Dark(config);
 
-			config.interiorColorMode = TourTrackConfig.COLOR_MODE_TRACK_VALUE;
+		} else if (config.defaultId.equals(DEFAULT_ID_MIDDLE_BRIGHT)) {
+
+			overwriteConfigValues_Bright(config);
+
+			config.altitudeOffsetDistanceAbsolute = 500;
+
+		} else if (config.defaultId.equals(DEFAULT_ID_MIDDLE_DARK)) {
+
+			overwriteConfigValues_Dark(config);
+
+			config.altitudeOffsetDistanceAbsolute = 500;
 
 		} else if (config.defaultId.equals(DEFAULT_ID_FAR_BRIGHT)) {
 
-			config.outlineColorMode = TourTrackConfig.COLOR_MODE_SOLID_COLOR;
-			config.outlineColor = RGB_BLACK;
-			config.trackPositionSize = 1;
+			overwriteConfigValues_Bright(config);
 
-			config.interiorColorMode = TourTrackConfig.COLOR_MODE_TRACK_VALUE;
-
-			config.altitudeVerticalOffset = 500;
+			config.altitudeOffsetDistanceAbsolute = 5000;
 
 		} else if (config.defaultId.equals(DEFAULT_ID_FAR_DARK)) {
 
-			config.outlineColorMode = TourTrackConfig.COLOR_MODE_SOLID_COLOR;
-			config.outlineColor = RGB_WHITE;
-			config.trackPositionSize = 1;
+			overwriteConfigValues_Dark(config);
 
-			config.interiorColorMode = TourTrackConfig.COLOR_MODE_TRACK_VALUE;
-
-			config.altitudeVerticalOffset = 500;
+			config.altitudeOffsetDistanceAbsolute = 5000;
 
 		} else if (config.defaultId.equals(DEFAULT_ID_EXTREM)) {
 
-			config.outlineColorMode = TourTrackConfig.COLOR_MODE_SOLID_COLOR;
-			config.outlineColor = RGB_BLACK;
-			config.trackPositionSize = 1;
+			overwriteConfigValues_Dark(config);
 
-			config.interiorColorMode = TourTrackConfig.COLOR_MODE_TRACK_VALUE;
-
-			config.altitudeVerticalOffset = 500000;
+			config.altitudeOffsetDistanceAbsolute = 500000;
 		}
 	}
 
@@ -655,6 +691,24 @@ public class TourTrackConfigManager {
 		for (final TourTrackConfig config : _allConfigs) {
 			overwriteConfigDefaultValues(config);
 		}
+	}
+
+	private static void overwriteConfigValues_Bright(final TourTrackConfig config) {
+
+		config.outlineColorMode = TourTrackConfig.COLOR_MODE_SOLID_COLOR;
+		config.outlineColor = RGB_BLACK;
+		config.trackPositionSize = 1;
+
+		config.interiorColorMode = TourTrackConfig.COLOR_MODE_TRACK_VALUE;
+	}
+
+	private static void overwriteConfigValues_Dark(final TourTrackConfig config) {
+
+		config.outlineColorMode = TourTrackConfig.COLOR_MODE_SOLID_COLOR;
+		config.outlineColor = RGB_WHITE;
+		config.trackPositionSize = 1;
+
+		config.interiorColorMode = TourTrackConfig.COLOR_MODE_TRACK_VALUE;
 	}
 
 	/**
@@ -934,23 +988,19 @@ public class TourTrackConfigManager {
 
 	private static void parse_410__ColorMode(final XMLMemento xmlColorMode, final TourTrackConfig trackConfig) {
 
-		trackConfig.interiorColorMode = Util.getXmlInteger(
-				xmlColorMode,
+		trackConfig.interiorColorMode = Util.getXmlInteger(xmlColorMode,//
 				ATTR_NORMAL,
 				INTERIOR_COLOR_MODE_NORMAL_DEFAULT);
 
-		trackConfig.interiorColorMode_Hovered = Util.getXmlInteger(
-				xmlColorMode,
+		trackConfig.interiorColorMode_Hovered = Util.getXmlInteger(xmlColorMode,//
 				ATTR_HOVERED,
 				INTERIOR_COLOR_MODE_HOVERED_DEFAULT);
 
-		trackConfig.interiorColorMode_Selected = Util.getXmlInteger(
-				xmlColorMode,
+		trackConfig.interiorColorMode_Selected = Util.getXmlInteger(xmlColorMode,//
 				ATTR_SELECTED,
 				INTERIOR_COLOR_MODE_SELECTED_DEFAULT);
 
-		trackConfig.interiorColorMode_HovSel = Util.getXmlInteger(
-				xmlColorMode,
+		trackConfig.interiorColorMode_HovSel = Util.getXmlInteger(xmlColorMode,//
 				ATTR_HOV_AND_SEL,
 				INTERIOR_COLOR_MODE_HOV_SEL_DEFAULT);
 	}
@@ -964,29 +1014,25 @@ public class TourTrackConfigManager {
 
 			if (colorChildTag.equals(TAG_COLOR_NORMAL)) {
 
-				trackConfig.interiorColor = Util.getXmlRgb(//
-						xmlColorChild,
+				trackConfig.interiorColor = Util.getXmlRgb(xmlColorChild,//
 						ATTR_NORMAL,
 						RGB_NORMAL_DEFAULT);
 
 			} else if (colorChildTag.equals(TAG_COLOR_HOVERED)) {
 
-				trackConfig.interiorColor_Hovered = Util.getXmlRgb(//
-						xmlColorChild,
+				trackConfig.interiorColor_Hovered = Util.getXmlRgb(xmlColorChild,//
 						ATTR_HOVERED,
 						RGB_HOVERED_DEFAULT);
 
 			} else if (colorChildTag.equals(TAG_COLOR_SELECTED)) {
 
-				trackConfig.interiorColor_Selected = Util.getXmlRgb(//
-						xmlColorChild,
+				trackConfig.interiorColor_Selected = Util.getXmlRgb(xmlColorChild,//
 						ATTR_SELECTED,
 						RGB_SELECTED_DEFAULT);
 
 			} else if (colorChildTag.equals(TAG_COLOR_HOV_AND_SEL)) {
 
-				trackConfig.interiorColor_HovSel = Util.getXmlRgb(//
-						xmlColorChild,
+				trackConfig.interiorColor_HovSel = Util.getXmlRgb(xmlColorChild,//
 						ATTR_HOV_AND_SEL,
 						RGB_HOV_SEL_DEFAULT);
 			}
@@ -995,29 +1041,25 @@ public class TourTrackConfigManager {
 
 	private static void parse_430__Opacity(final XMLMemento xmlOpacity, final TourTrackConfig trackConfig) {
 
-		trackConfig.interiorOpacity = Util.getXmlFloat(
-				xmlOpacity,
+		trackConfig.interiorOpacity = Util.getXmlFloat(xmlOpacity,//
 				ATTR_NORMAL,
 				INTERIOR_OPACITY_NORMAL_DEFAULT,
 				OPACITY_MIN,
 				OPACITY_MAX);
 
-		trackConfig.interiorOpacity_Hovered = Util.getXmlFloat(
-				xmlOpacity,
+		trackConfig.interiorOpacity_Hovered = Util.getXmlFloat(xmlOpacity,//
 				ATTR_HOVERED,
 				INTERIOR_OPACITY_HOVERED_DEFAULT,
 				OPACITY_MIN,
 				OPACITY_MAX);
 
-		trackConfig.interiorOpacity_Selected = Util.getXmlFloat(
-				xmlOpacity,
+		trackConfig.interiorOpacity_Selected = Util.getXmlFloat(xmlOpacity,//
 				ATTR_SELECTED,
 				INTERIOR_OPACITY_SELECTED_DEFAULT,
 				OPACITY_MIN,
 				OPACITY_MAX);
 
-		trackConfig.interiorOpacity_HovSel = Util.getXmlFloat(
-				xmlOpacity,
+		trackConfig.interiorOpacity_HovSel = Util.getXmlFloat(xmlOpacity,//
 				ATTR_HOV_AND_SEL,
 				INTERIOR_OPACITY_HOV_SEL_DEFAULT,
 				OPACITY_MIN,
@@ -1042,29 +1084,25 @@ public class TourTrackConfigManager {
 
 			final XMLMemento xmlTrackSize = (XMLMemento) mementoTrackSize;
 
-			trackConfig.trackPositionSize = Util.getXmlFloat(
-					xmlTrackSize,
+			trackConfig.trackPositionSize = Util.getXmlFloat(xmlTrackSize,//
 					ATTR_NORMAL,
 					TRACK_POSITION_SIZE_NORMAL_DEFAULT,
 					TRACK_POSITION_SIZE_MIN,
 					TRACK_POSITION_SIZE_MAX);
 
-			trackConfig.trackPositionSize_Hovered = Util.getXmlFloat(
-					xmlTrackSize,
+			trackConfig.trackPositionSize_Hovered = Util.getXmlFloat(xmlTrackSize,//
 					ATTR_HOVERED,
 					TRACK_POSITION_SIZE_HOVERED_DEFAULT,
 					TRACK_POSITION_SIZE_MIN,
 					TRACK_POSITION_SIZE_MAX);
 
-			trackConfig.trackPositionSize_Selected = Util.getXmlFloat(
-					xmlTrackSize,
+			trackConfig.trackPositionSize_Selected = Util.getXmlFloat(xmlTrackSize,//
 					ATTR_SELECTED,
 					TRACK_POSITION_SIZE_SELECTED_DEFAULT,
 					TRACK_POSITION_SIZE_MIN,
 					TRACK_POSITION_SIZE_MAX);
 
-			trackConfig.trackPositionSize_HovSel = Util.getXmlFloat(
-					xmlTrackSize,
+			trackConfig.trackPositionSize_HovSel = Util.getXmlFloat(xmlTrackSize,//
 					ATTR_HOV_AND_SEL,
 					TRACK_POSITION_SIZE_HOV_SEL_DEFAULT,
 					TRACK_POSITION_SIZE_MIN,
@@ -1075,24 +1113,31 @@ public class TourTrackConfigManager {
 
 	private static void parse_600_Altitude(final XMLMemento xmlAltitude, final TourTrackConfig trackConfig) {
 
-		final int xmlAltitudeMode = Util.getXmlInteger(//
-				xmlAltitude,
+		final int xmlAltitudeMode = Util.getXmlInteger(xmlAltitude,//
 				ATTR_ALTITUDE_MODE,
 				ALTITUDE_MODE_DEFAULT);
 
 		trackConfig.altitudeMode = TourTrackConfig.getValidAltitudeModeValue(xmlAltitudeMode);
 
-		trackConfig.isAbsoluteOffset = Util.getXmlBoolean(//
-				xmlAltitude,
+		trackConfig.isAltitudeOffset = Util.getXmlBoolean(xmlAltitude,//
 				ATTR_IS_ABSOLUTE_OFFSET,
-				IS_ABSOLUTE_OFFSET_DEFAULT);
+				IS_ALTITUDE_OFFSET_DEFAULT);
 
-		trackConfig.altitudeVerticalOffset = Util.getXmlInteger(//
-				xmlAltitude,
-				ATTR_ALTITUDE_OFFSET,
-				ALTITUDE_OFFSET_DEFAULT,
-				ALTITUDE_OFFSET_MIN,
-				ALTITUDE_OFFSET_MAX);
+		trackConfig.altitudeOffsetMode = Util.getXmlInteger(xmlAltitude, //
+				ATTR_OFFSET_MODE,
+				ALTITUDE_OFFSET_MODE_DEFAULT);
+
+		trackConfig.altitudeOffsetDistanceAbsolute = Util.getXmlInteger(xmlAltitude,//
+				ATTR_ALTITUDE_OFFSET_ABSOLUTE,
+				ALTITUDE_OFFSET_ABSOLUTE_DEFAULT,
+				ALTITUDE_OFFSET_ABSOLUTE_MIN,
+				ALTITUDE_OFFSET_ABSOLUTE_MAX);
+
+		trackConfig.altitudeOffsetDistanceRelative = Util.getXmlInteger(xmlAltitude,//
+				ATTR_ALTITUDE_OFFSET_RELATIVE,
+				ALTITUDE_OFFSET_RELATIVE_DEFAULT,
+				ALTITUDE_OFFSET_RELATIVE_MIN,
+				ALTITUDE_OFFSET_RELATIVE_MAX);
 	}
 
 	/**
@@ -1256,23 +1301,36 @@ public class TourTrackConfigManager {
 			xmlRoot = create_Root();
 
 			if (defaultId.equals(DEFAULT_ID_CLOSE_BRIGHT)) {
-
 				createDefaultXml_10(xmlRoot, CONFIG_NAME_CLOSE_BRIGHT, DEFAULT_ID_CLOSE_BRIGHT);
-
 			} else if (defaultId.equals(DEFAULT_ID_CLOSE_DARK)) {
-
 				createDefaultXml_10(xmlRoot, CONFIG_NAME_CLOSE_DARK, DEFAULT_ID_CLOSE_DARK);
 
-			} else if (defaultId.equals(DEFAULT_ID_FAR_BRIGHT)) {
+			} else
 
+			// between
+
+			if (defaultId.equals(DEFAULT_ID_MIDDLE_BRIGHT)) {
+				createDefaultXml_10(xmlRoot, CONFIG_NAME_MIDDLE_BRIGHT, DEFAULT_ID_MIDDLE_BRIGHT);
+			} else if (defaultId.equals(DEFAULT_ID_MIDDLE_DARK)) {
+				createDefaultXml_10(xmlRoot, CONFIG_NAME_MIDDLE_DARK, DEFAULT_ID_MIDDLE_DARK);
+			} else
+
+			// far
+
+			if (defaultId.equals(DEFAULT_ID_FAR_BRIGHT)) {
 				createDefaultXml_10(xmlRoot, CONFIG_NAME_FAR_BRIGHT, DEFAULT_ID_FAR_BRIGHT);
-
 			} else if (defaultId.equals(DEFAULT_ID_FAR_DARK)) {
-
 				createDefaultXml_10(xmlRoot, CONFIG_NAME_FAR_DARK, DEFAULT_ID_FAR_DARK);
+			} else
+
+			// relative
+
+			if (defaultId.equals(DEFAULT_ID_RELATIVE_BRIGHT)) {
+				createDefaultXml_10(xmlRoot, CONFIG_NAME_RELATIVE_BRIGHT, DEFAULT_ID_RELATIVE_BRIGHT);
+			} else if (defaultId.equals(DEFAULT_ID_RELATIVE_DARK)) {
+				createDefaultXml_10(xmlRoot, CONFIG_NAME_RELATIVE_DARK, DEFAULT_ID_RELATIVE_DARK);
 
 			} else if (defaultId.equals(DEFAULT_ID_EXTREM)) {
-
 				createDefaultXml_10(xmlRoot, CONFIG_NAME_EXTREM, DEFAULT_ID_EXTREM);
 
 			} else {

@@ -122,7 +122,8 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 	private Combo					_comboOutlineColorMode_HovSel;
 	private Combo					_comboOutlineColorMode_Selected;
 
-	private Label					_lblAltitudeOffsetDistanceUnit;
+	private Label					_lblAltitudeOffsetAbsoluteUnit;
+	private Label					_lblAltitudeOffsetRelativeUnit;
 	private Label					_lblInteriorColor;
 	private Label					_lblInteriorColor_Hovered;
 	private Label					_lblInteriorColor_HovSel;
@@ -133,7 +134,11 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 	private Label					_lblTrackPositionThreshold;
 	private Label					_lblTrackPositionThresholdAbsolute;
 
-	private Spinner					_spinnerAltitudeOffsetDistance;
+	private Button					_rdoOffsetAbsolute;
+	private Button					_rdoOffsetRelative;
+
+	private Spinner					_spinnerAltitudeOffsetAbsolute;
+	private Spinner					_spinnerAltitudeOffsetRelative;
 	private Spinner					_spinnerDirectionArrowDistance;
 	private Spinner					_spinnerDirectionArrowSize;
 	private Spinner					_spinnerInteriorOpacity;
@@ -152,7 +157,6 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 	private Spinner					_spinnerTrackPositionThreshold;
 
 	private Text					_textName;
-
 
 	private final class WaitTimer implements Runnable {
 		@Override
@@ -714,34 +718,87 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 			_chkAltitudeOffset = new Button(parent, SWT.CHECK);
 			GridDataFactory.fillDefaults()//
 					.indent(UI.FORM_FIRST_COLUMN_INDENT, 0)
+					.span(2, 1)
 					.applyTo(_chkAltitudeOffset);
 			_chkAltitudeOffset.setText(Messages.TourTrack_Properties_Checkbox_AltitudeOffset);
 			_chkAltitudeOffset.setToolTipText(Messages.TourTrack_Properties_Checkbox_AltitudeOffset_Tooltip);
 			_chkAltitudeOffset.addSelectionListener(_defaultSelectionListener);
 
-			final Composite containerAltitude = new Composite(parent, SWT.NONE);
-			GridDataFactory.fillDefaults().grab(true, false).applyTo(containerAltitude);
-			GridLayoutFactory.fillDefaults().numColumns(2).applyTo(containerAltitude);
+		}
+
+		{
+			/*
+			 * Radio: Absolute
+			 */
+			_rdoOffsetAbsolute = new Button(parent, SWT.RADIO);
+			GridDataFactory.fillDefaults()//
+					.indent(2 * UI.FORM_FIRST_COLUMN_INDENT, 0)
+					.applyTo(_rdoOffsetAbsolute);
+			_rdoOffsetAbsolute.setText(Messages.TourTrack_Properties_Radio_AltitudeOffsetAbsolute);
+			_rdoOffsetAbsolute.setToolTipText(Messages.TourTrack_Properties_Radio_AltitudeOffsetAbsolute_Tooltip);
+			_rdoOffsetAbsolute.addSelectionListener(_defaultSelectionListener);
+
+			final Composite containerOffsetAbsolute = new Composite(parent, SWT.NONE);
+			GridDataFactory.fillDefaults().grab(true, false).applyTo(containerOffsetAbsolute);
+			GridLayoutFactory.fillDefaults().numColumns(2).applyTo(containerOffsetAbsolute);
 			{
 				/*
 				 * Spinner: Altitude offset
 				 */
-				_spinnerAltitudeOffsetDistance = new Spinner(containerAltitude, SWT.BORDER);
+				_spinnerAltitudeOffsetAbsolute = new Spinner(containerOffsetAbsolute, SWT.BORDER);
 				GridDataFactory.fillDefaults() //
 						.align(SWT.BEGINNING, SWT.FILL)
-						.applyTo(_spinnerAltitudeOffsetDistance);
-				_spinnerAltitudeOffsetDistance.setMinimum(TourTrackConfigManager.ALTITUDE_OFFSET_MIN);
-				_spinnerAltitudeOffsetDistance.setMaximum(TourTrackConfigManager.ALTITUDE_OFFSET_MAX);
-				_spinnerAltitudeOffsetDistance.setIncrement(1);
-				_spinnerAltitudeOffsetDistance.setPageIncrement(10);
-				_spinnerAltitudeOffsetDistance.addSelectionListener(_defaultSelectionListener);
-				_spinnerAltitudeOffsetDistance.addMouseWheelListener(_defaultMouseWheelListener);
+						.applyTo(_spinnerAltitudeOffsetAbsolute);
+				_spinnerAltitudeOffsetAbsolute.setMinimum(TourTrackConfigManager.ALTITUDE_OFFSET_ABSOLUTE_MIN);
+				_spinnerAltitudeOffsetAbsolute.setMaximum(TourTrackConfigManager.ALTITUDE_OFFSET_ABSOLUTE_MAX);
+				_spinnerAltitudeOffsetAbsolute.setIncrement(1);
+				_spinnerAltitudeOffsetAbsolute.setPageIncrement(10);
+				_spinnerAltitudeOffsetAbsolute.addSelectionListener(_defaultSelectionListener);
+				_spinnerAltitudeOffsetAbsolute.addMouseWheelListener(_defaultMouseWheelListener);
 
 				/*
 				 * Label: m (meter/feet)
 				 */
-				_lblAltitudeOffsetDistanceUnit = new Label(containerAltitude, SWT.NONE);
-				_lblAltitudeOffsetDistanceUnit.setText(UI.UNIT_LABEL_ALTITUDE);
+				_lblAltitudeOffsetAbsoluteUnit = new Label(containerOffsetAbsolute, SWT.NONE);
+				_lblAltitudeOffsetAbsoluteUnit.setText(UI.UNIT_LABEL_ALTITUDE);
+			}
+		}
+
+		{
+			/*
+			 * Radio: Relative
+			 */
+			_rdoOffsetRelative = new Button(parent, SWT.RADIO);
+			GridDataFactory.fillDefaults()//
+					.indent(2 * UI.FORM_FIRST_COLUMN_INDENT, 0)
+					.applyTo(_rdoOffsetRelative);
+			_rdoOffsetRelative.setText(Messages.TourTrack_Properties_Radio_AltitudeOffsetRelative);
+			_rdoOffsetRelative.setToolTipText(Messages.TourTrack_Properties_Radio_AltitudeOffsetRelative_Tooltip);
+			_rdoOffsetRelative.addSelectionListener(_defaultSelectionListener);
+
+			final Composite containerOffsetRelative = new Composite(parent, SWT.NONE);
+			GridDataFactory.fillDefaults().grab(true, false).applyTo(containerOffsetRelative);
+			GridLayoutFactory.fillDefaults().numColumns(2).applyTo(containerOffsetRelative);
+			{
+				/*
+				 * Spinner: Altitude offset relative
+				 */
+				_spinnerAltitudeOffsetRelative = new Spinner(containerOffsetRelative, SWT.BORDER);
+				GridDataFactory.fillDefaults() //
+						.align(SWT.BEGINNING, SWT.FILL)
+						.applyTo(_spinnerAltitudeOffsetRelative);
+				_spinnerAltitudeOffsetRelative.setMinimum(TourTrackConfigManager.ALTITUDE_OFFSET_RELATIVE_MIN);
+				_spinnerAltitudeOffsetRelative.setMaximum(TourTrackConfigManager.ALTITUDE_OFFSET_RELATIVE_MAX);
+				_spinnerAltitudeOffsetRelative.setIncrement(1);
+				_spinnerAltitudeOffsetRelative.setPageIncrement(10);
+				_spinnerAltitudeOffsetRelative.addSelectionListener(_defaultSelectionListener);
+				_spinnerAltitudeOffsetRelative.addMouseWheelListener(_defaultMouseWheelListener);
+
+				/*
+				 * Label: %
+				 */
+				_lblAltitudeOffsetRelativeUnit = new Label(containerOffsetRelative, SWT.NONE);
+				_lblAltitudeOffsetRelativeUnit.setText(UI.SYMBOL_PERCENTAGE);
 			}
 		}
 
@@ -853,36 +910,42 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 
 	private void enableControls() {
 
-		final TourTrackConfig trackConfig = TourTrackConfigManager.getActiveConfig();
+		final TourTrackConfig config = TourTrackConfigManager.getActiveConfig();
 
-		final boolean isAbsoluteAltitude = trackConfig.altitudeMode == WorldWind.ABSOLUTE;
-		final boolean isClampToGround = trackConfig.altitudeMode == WorldWind.CLAMP_TO_GROUND;
+		final boolean isAbsoluteAltitude = config.altitudeMode == WorldWind.ABSOLUTE;
+		final boolean isClampToGround = config.altitudeMode == WorldWind.CLAMP_TO_GROUND;
 		final boolean isAbsoluteAltitudeEnabled = _chkAltitudeOffset.getSelection() && isAbsoluteAltitude;
-		final boolean isShowCurtain = isClampToGround == false && trackConfig.isShowInterior;
-		final boolean isTrackPositionVisible = trackConfig.outlineWidth > 0.0;
-		final boolean isShowTrackPosition = trackConfig.isShowTrackPosition & isTrackPositionVisible;
+		final boolean isShowCurtain = isClampToGround == false && config.isShowInterior;
+		final boolean isTrackPositionVisible = config.outlineWidth > 0.0;
+		final boolean isShowTrackPosition = config.isShowTrackPosition & isTrackPositionVisible;
+		final boolean isOffsetModeAbsolute = config.altitudeOffsetMode == TourTrackConfigManager.ALTITUDE_OFFSET_MODE_ABSOLUTE;
+		final boolean isOffsetModeRelative = config.altitudeOffsetMode == TourTrackConfigManager.ALTITUDE_OFFSET_MODE_RELATIVE;
 
-		final boolean isOutlineSolidColor = trackConfig.outlineColorMode == TourTrackConfig.COLOR_MODE_SOLID_COLOR;
-		final boolean isOutlineSolidColor_Hovered = trackConfig.outlineColorMode_Hovered == TourTrackConfig.COLOR_MODE_SOLID_COLOR;
-		final boolean isOutlineSolidColor_HovSel = trackConfig.outlineColorMode_HovSel == TourTrackConfig.COLOR_MODE_SOLID_COLOR;
-		final boolean isOutlineSolidColor_Selected = trackConfig.outlineColorMode_Selected == TourTrackConfig.COLOR_MODE_SOLID_COLOR;
+		final boolean isOutlineSolidColor = config.outlineColorMode == TourTrackConfig.COLOR_MODE_SOLID_COLOR;
+		final boolean isOutlineSolidColor_Hovered = config.outlineColorMode_Hovered == TourTrackConfig.COLOR_MODE_SOLID_COLOR;
+		final boolean isOutlineSolidColor_HovSel = config.outlineColorMode_HovSel == TourTrackConfig.COLOR_MODE_SOLID_COLOR;
+		final boolean isOutlineSolidColor_Selected = config.outlineColorMode_Selected == TourTrackConfig.COLOR_MODE_SOLID_COLOR;
 
 		// vertical lines are painted with the outline color
-		final boolean isOutLineColor = isOutlineSolidColor || trackConfig.isDrawVerticals;
+		final boolean isOutLineColor = isOutlineSolidColor || config.isDrawVerticals;
 
 		final boolean isInteriorSolidColor = isShowCurtain
-				&& trackConfig.interiorColorMode == TourTrackConfig.COLOR_MODE_SOLID_COLOR;
+				&& config.interiorColorMode == TourTrackConfig.COLOR_MODE_SOLID_COLOR;
 		final boolean isInteriorSolidColor_Hovered = isShowCurtain
-				&& trackConfig.interiorColorMode_Hovered == TourTrackConfig.COLOR_MODE_SOLID_COLOR;
+				&& config.interiorColorMode_Hovered == TourTrackConfig.COLOR_MODE_SOLID_COLOR;
 		final boolean isInteriorSolidColor_HovSel = isShowCurtain
-				&& trackConfig.interiorColorMode_HovSel == TourTrackConfig.COLOR_MODE_SOLID_COLOR;
+				&& config.interiorColorMode_HovSel == TourTrackConfig.COLOR_MODE_SOLID_COLOR;
 		final boolean isInteriorSolidColor_Selected = isShowCurtain
-				&& trackConfig.interiorColorMode_Selected == TourTrackConfig.COLOR_MODE_SOLID_COLOR;
+				&& config.interiorColorMode_Selected == TourTrackConfig.COLOR_MODE_SOLID_COLOR;
 
 		// altitude
 		_chkAltitudeOffset.setEnabled(isAbsoluteAltitude);
-		_spinnerAltitudeOffsetDistance.setEnabled(isAbsoluteAltitudeEnabled);
-		_lblAltitudeOffsetDistanceUnit.setEnabled(isAbsoluteAltitudeEnabled);
+		_rdoOffsetAbsolute.setEnabled(isAbsoluteAltitudeEnabled);
+		_rdoOffsetRelative.setEnabled(isAbsoluteAltitudeEnabled);
+		_spinnerAltitudeOffsetAbsolute.setEnabled(isAbsoluteAltitudeEnabled && isOffsetModeAbsolute);
+		_spinnerAltitudeOffsetRelative.setEnabled(isAbsoluteAltitudeEnabled && isOffsetModeRelative);
+		_lblAltitudeOffsetAbsoluteUnit.setEnabled(isAbsoluteAltitudeEnabled && isOffsetModeAbsolute);
+		_lblAltitudeOffsetRelativeUnit.setEnabled(isAbsoluteAltitudeEnabled && isOffsetModeRelative);
 
 		// track position
 		_chkTrackPositions.setEnabled(isTrackPositionVisible);
@@ -1117,79 +1180,84 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 
 		_isUpdateUI = true;
 
-		final TourTrackConfig trackConfig = TourTrackConfigManager.getActiveConfig();
+		final TourTrackConfig config = TourTrackConfigManager.getActiveConfig();
 
 		// get active config AFTER getting the index because this could change the active config
 		final int activeConfigIndex = TourTrackConfigManager.getActiveConfigIndex();
 
+		final boolean isOffsetAbsolute = config.altitudeOffsetMode == TourTrackConfigManager.ALTITUDE_OFFSET_MODE_ABSOLUTE;
+
 		_comboName.select(activeConfigIndex);
-		_textName.setText(trackConfig.name);
+		_textName.setText(config.name);
 
 		// track
-		_spinnerDirectionArrowDistance.setSelection((int) (trackConfig.directionArrowDistance));
-		_spinnerDirectionArrowSize.setSelection((int) (trackConfig.directionArrowSize));
+		_spinnerDirectionArrowDistance.setSelection((int) (config.directionArrowDistance));
+		_spinnerDirectionArrowSize.setSelection((int) (config.directionArrowSize));
 
 		// line color
-		_spinnerOutlineWidth.setSelection((int) (trackConfig.outlineWidth));
+		_spinnerOutlineWidth.setSelection((int) (config.outlineWidth));
 
-		_comboOutlineColorMode.select(trackConfig.getColorModeIndex(trackConfig.outlineColorMode));
-		_comboOutlineColorMode_Hovered.select(trackConfig.getColorModeIndex(trackConfig.outlineColorMode_Hovered));
-		_comboOutlineColorMode_HovSel.select(trackConfig.getColorModeIndex(trackConfig.outlineColorMode_HovSel));
-		_comboOutlineColorMode_Selected.select(trackConfig.getColorModeIndex(trackConfig.outlineColorMode_Selected));
+		_comboOutlineColorMode.select(config.getColorModeIndex(config.outlineColorMode));
+		_comboOutlineColorMode_Hovered.select(config.getColorModeIndex(config.outlineColorMode_Hovered));
+		_comboOutlineColorMode_HovSel.select(config.getColorModeIndex(config.outlineColorMode_HovSel));
+		_comboOutlineColorMode_Selected.select(config.getColorModeIndex(config.outlineColorMode_Selected));
 
-		_colorOutlineColor.setColorValue(trackConfig.outlineColor);
-		_colorOutlineColor_Hovered.setColorValue(trackConfig.outlineColor_Hovered);
-		_colorOutlineColor_HovSel.setColorValue(trackConfig.outlineColor_HovSel);
-		_colorOutlineColor_Selected.setColorValue(trackConfig.outlineColor_Selected);
+		_colorOutlineColor.setColorValue(config.outlineColor);
+		_colorOutlineColor_Hovered.setColorValue(config.outlineColor_Hovered);
+		_colorOutlineColor_HovSel.setColorValue(config.outlineColor_HovSel);
+		_colorOutlineColor_Selected.setColorValue(config.outlineColor_Selected);
 
 		_spinnerOutlineOpacity.setSelection((//
-				int) (trackConfig.outlineOpacity * TourTrackConfigManager.OPACITY_DIGITS_FACTOR));
+				int) (config.outlineOpacity * TourTrackConfigManager.OPACITY_DIGITS_FACTOR));
 		_spinnerOutlineOpacity_Hovered.setSelection(//
-				(int) (trackConfig.outlineOpacity_Hovered * TourTrackConfigManager.OPACITY_DIGITS_FACTOR));
+				(int) (config.outlineOpacity_Hovered * TourTrackConfigManager.OPACITY_DIGITS_FACTOR));
 		_spinnerOutlineOpacity_HovSel.setSelection(//
-				(int) (trackConfig.outlineOpacity_HovSel * TourTrackConfigManager.OPACITY_DIGITS_FACTOR));
+				(int) (config.outlineOpacity_HovSel * TourTrackConfigManager.OPACITY_DIGITS_FACTOR));
 		_spinnerOutlineOpacity_Selected.setSelection(//
-				(int) (trackConfig.outlineOpacity_Selected * TourTrackConfigManager.OPACITY_DIGITS_FACTOR));
+				(int) (config.outlineOpacity_Selected * TourTrackConfigManager.OPACITY_DIGITS_FACTOR));
 
 		// curtain color
-		_chkShowInterior.setSelection(trackConfig.isShowInterior);
+		_chkShowInterior.setSelection(config.isShowInterior);
 
-		_comboInteriorColorMode.select(trackConfig.getColorModeIndex(trackConfig.interiorColorMode));
-		_comboInteriorColorMode_Hovered.select(trackConfig.getColorModeIndex(trackConfig.interiorColorMode_Hovered));
-		_comboInteriorColorMode_HovSel.select(trackConfig.getColorModeIndex(trackConfig.interiorColorMode_HovSel));
-		_comboInteriorColorMode_Selected.select(trackConfig.getColorModeIndex(trackConfig.interiorColorMode_Selected));
+		_comboInteriorColorMode.select(config.getColorModeIndex(config.interiorColorMode));
+		_comboInteriorColorMode_Hovered.select(config.getColorModeIndex(config.interiorColorMode_Hovered));
+		_comboInteriorColorMode_HovSel.select(config.getColorModeIndex(config.interiorColorMode_HovSel));
+		_comboInteriorColorMode_Selected.select(config.getColorModeIndex(config.interiorColorMode_Selected));
 
-		_colorInteriorColor.setColorValue(trackConfig.interiorColor);
-		_colorInteriorColor_Hovered.setColorValue(trackConfig.interiorColor_Hovered);
-		_colorInteriorColor_HovSel.setColorValue(trackConfig.interiorColor_HovSel);
-		_colorInteriorColor_Selected.setColorValue(trackConfig.interiorColor_Selected);
+		_colorInteriorColor.setColorValue(config.interiorColor);
+		_colorInteriorColor_Hovered.setColorValue(config.interiorColor_Hovered);
+		_colorInteriorColor_HovSel.setColorValue(config.interiorColor_HovSel);
+		_colorInteriorColor_Selected.setColorValue(config.interiorColor_Selected);
 
 		_spinnerInteriorOpacity.setSelection(//
-				(int) (trackConfig.interiorOpacity * TourTrackConfigManager.OPACITY_DIGITS_FACTOR));
+				(int) (config.interiorOpacity * TourTrackConfigManager.OPACITY_DIGITS_FACTOR));
 		_spinnerInteriorOpacity_Hovered.setSelection(//
-				(int) (trackConfig.interiorOpacity_Hovered * TourTrackConfigManager.OPACITY_DIGITS_FACTOR));
+				(int) (config.interiorOpacity_Hovered * TourTrackConfigManager.OPACITY_DIGITS_FACTOR));
 		_spinnerInteriorOpacity_HovSel.setSelection(//
-				(int) (trackConfig.interiorOpacity_HovSel * TourTrackConfigManager.OPACITY_DIGITS_FACTOR));
+				(int) (config.interiorOpacity_HovSel * TourTrackConfigManager.OPACITY_DIGITS_FACTOR));
 		_spinnerInteriorOpacity_Selected.setSelection(//
-				(int) (trackConfig.interiorOpacity_Selected * TourTrackConfigManager.OPACITY_DIGITS_FACTOR));
+				(int) (config.interiorOpacity_Selected * TourTrackConfigManager.OPACITY_DIGITS_FACTOR));
 
 		// verticals
-		_chkDrawVerticals.setSelection(trackConfig.isDrawVerticals);
+		_chkDrawVerticals.setSelection(config.isDrawVerticals);
 
 		// track position
-		_chkTrackPositions.setSelection(trackConfig.isShowTrackPosition);
-		_spinnerTrackPositionSize.setSelection((int) (trackConfig.trackPositionSize));
-		_spinnerTrackPositionSize_Hovered.setSelection((int) (trackConfig.trackPositionSize_Hovered));
-		_spinnerTrackPositionSize_Selected.setSelection((int) (trackConfig.trackPositionSize_Selected));
-		_spinnerTrackPositionSize_HovSel.setSelection((int) (trackConfig.trackPositionSize_HovSel));
-		_spinnerTrackPositionThreshold.setSelection(trackConfig.trackPositionThreshold);
+		_chkTrackPositions.setSelection(config.isShowTrackPosition);
+		_spinnerTrackPositionSize.setSelection((int) (config.trackPositionSize));
+		_spinnerTrackPositionSize_Hovered.setSelection((int) (config.trackPositionSize_Hovered));
+		_spinnerTrackPositionSize_Selected.setSelection((int) (config.trackPositionSize_Selected));
+		_spinnerTrackPositionSize_HovSel.setSelection((int) (config.trackPositionSize_HovSel));
+		_spinnerTrackPositionThreshold.setSelection(config.trackPositionThreshold);
 
 		// altitude
-		_comboAltitude.select(trackConfig.getAltitudeModeIndex());
-		_chkAltitudeOffset.setSelection(trackConfig.isAbsoluteOffset);
-		_spinnerAltitudeOffsetDistance.setSelection(//
-				(int) (trackConfig.altitudeVerticalOffset / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE));
-		_chkFollowTerrain.setSelection(trackConfig.isFollowTerrain);
+		_comboAltitude.select(config.getAltitudeModeIndex());
+		_chkAltitudeOffset.setSelection(config.isAltitudeOffset);
+		_rdoOffsetAbsolute.setSelection(isOffsetAbsolute);
+		_rdoOffsetRelative.setSelection(!isOffsetAbsolute);
+		_spinnerAltitudeOffsetAbsolute.setSelection(//
+				(int) (config.altitudeOffsetDistanceAbsolute / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE));
+		_spinnerAltitudeOffsetRelative.setSelection(config.altitudeOffsetDistanceRelative);
+		_chkFollowTerrain.setSelection(config.isFollowTerrain);
 
 		updateUI();
 
@@ -1198,74 +1266,76 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 
 	private void saveState() {
 
-		final int altitudeOffsetMetric = (int) (_spinnerAltitudeOffsetDistance.getSelection() * net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE);
+		final int altitudeOffsetMetric = (int) (_spinnerAltitudeOffsetAbsolute.getSelection() * net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE);
 
 		// update config
 
-		final TourTrackConfig trackConfig = TourTrackConfigManager.getActiveConfig();
+		final TourTrackConfig config = TourTrackConfigManager.getActiveConfig();
 
-		trackConfig.name = _textName.getText();
+		config.name = _textName.getText();
 
 		// track
-		trackConfig.directionArrowSize = _spinnerDirectionArrowSize.getSelection();
-		trackConfig.directionArrowDistance = _spinnerDirectionArrowDistance.getSelection();
+		config.directionArrowSize = _spinnerDirectionArrowSize.getSelection();
+		config.directionArrowDistance = _spinnerDirectionArrowDistance.getSelection();
 
 		// line
-		trackConfig.outlineWidth = _spinnerOutlineWidth.getSelection();
-		trackConfig.outlineColorMode = TourTrackConfig.TRACK_COLOR_MODE[getComboIndex(_comboOutlineColorMode)].value;
-		trackConfig.outlineColorMode_Hovered = TourTrackConfig.TRACK_COLOR_MODE[getComboIndex(_comboOutlineColorMode_Hovered)].value;
-		trackConfig.outlineColorMode_HovSel = TourTrackConfig.TRACK_COLOR_MODE[getComboIndex(_comboOutlineColorMode_HovSel)].value;
-		trackConfig.outlineColorMode_Selected = TourTrackConfig.TRACK_COLOR_MODE[getComboIndex(_comboOutlineColorMode_Selected)].value;
-		trackConfig.outlineColor = _colorOutlineColor.getColorValue();
-		trackConfig.outlineColor_Hovered = _colorOutlineColor_Hovered.getColorValue();
-		trackConfig.outlineColor_HovSel = _colorOutlineColor_HovSel.getColorValue();
-		trackConfig.outlineColor_Selected = _colorOutlineColor_Selected.getColorValue();
+		config.outlineWidth = _spinnerOutlineWidth.getSelection();
+		config.outlineColorMode = TourTrackConfig.TRACK_COLOR_MODE[getComboIndex(_comboOutlineColorMode)].value;
+		config.outlineColorMode_Hovered = TourTrackConfig.TRACK_COLOR_MODE[getComboIndex(_comboOutlineColorMode_Hovered)].value;
+		config.outlineColorMode_HovSel = TourTrackConfig.TRACK_COLOR_MODE[getComboIndex(_comboOutlineColorMode_HovSel)].value;
+		config.outlineColorMode_Selected = TourTrackConfig.TRACK_COLOR_MODE[getComboIndex(_comboOutlineColorMode_Selected)].value;
+		config.outlineColor = _colorOutlineColor.getColorValue();
+		config.outlineColor_Hovered = _colorOutlineColor_Hovered.getColorValue();
+		config.outlineColor_HovSel = _colorOutlineColor_HovSel.getColorValue();
+		config.outlineColor_Selected = _colorOutlineColor_Selected.getColorValue();
 
-		trackConfig.outlineOpacity = _spinnerOutlineOpacity.getSelection()
+		config.outlineOpacity = _spinnerOutlineOpacity.getSelection() / TourTrackConfigManager.OPACITY_DIGITS_FACTOR;
+		config.outlineOpacity_Hovered = _spinnerOutlineOpacity_Hovered.getSelection()
 				/ TourTrackConfigManager.OPACITY_DIGITS_FACTOR;
-		trackConfig.outlineOpacity_Hovered = _spinnerOutlineOpacity_Hovered.getSelection()
+		config.outlineOpacity_HovSel = _spinnerOutlineOpacity_HovSel.getSelection()
 				/ TourTrackConfigManager.OPACITY_DIGITS_FACTOR;
-		trackConfig.outlineOpacity_HovSel = _spinnerOutlineOpacity_HovSel.getSelection()
-				/ TourTrackConfigManager.OPACITY_DIGITS_FACTOR;
-		trackConfig.outlineOpacity_Selected = _spinnerOutlineOpacity_Selected.getSelection()
+		config.outlineOpacity_Selected = _spinnerOutlineOpacity_Selected.getSelection()
 				/ TourTrackConfigManager.OPACITY_DIGITS_FACTOR;
 
 		// interior
-		trackConfig.isShowInterior = _chkShowInterior.getSelection();
-		trackConfig.interiorColorMode = TourTrackConfig.TRACK_COLOR_MODE[getComboIndex(_comboInteriorColorMode)].value;
-		trackConfig.interiorColorMode_Hovered = TourTrackConfig.TRACK_COLOR_MODE[getComboIndex(_comboInteriorColorMode_Hovered)].value;
-		trackConfig.interiorColorMode_HovSel = TourTrackConfig.TRACK_COLOR_MODE[getComboIndex(_comboInteriorColorMode_HovSel)].value;
-		trackConfig.interiorColorMode_Selected = TourTrackConfig.TRACK_COLOR_MODE[getComboIndex(_comboInteriorColorMode_Selected)].value;
-		trackConfig.interiorColor = _colorInteriorColor.getColorValue();
-		trackConfig.interiorColor_Hovered = _colorInteriorColor_Hovered.getColorValue();
-		trackConfig.interiorColor_HovSel = _colorInteriorColor_HovSel.getColorValue();
-		trackConfig.interiorColor_Selected = _colorInteriorColor_Selected.getColorValue();
+		config.isShowInterior = _chkShowInterior.getSelection();
+		config.interiorColorMode = TourTrackConfig.TRACK_COLOR_MODE[getComboIndex(_comboInteriorColorMode)].value;
+		config.interiorColorMode_Hovered = TourTrackConfig.TRACK_COLOR_MODE[getComboIndex(_comboInteriorColorMode_Hovered)].value;
+		config.interiorColorMode_HovSel = TourTrackConfig.TRACK_COLOR_MODE[getComboIndex(_comboInteriorColorMode_HovSel)].value;
+		config.interiorColorMode_Selected = TourTrackConfig.TRACK_COLOR_MODE[getComboIndex(_comboInteriorColorMode_Selected)].value;
+		config.interiorColor = _colorInteriorColor.getColorValue();
+		config.interiorColor_Hovered = _colorInteriorColor_Hovered.getColorValue();
+		config.interiorColor_HovSel = _colorInteriorColor_HovSel.getColorValue();
+		config.interiorColor_Selected = _colorInteriorColor_Selected.getColorValue();
 
-		trackConfig.interiorOpacity = _spinnerInteriorOpacity.getSelection()
+		config.interiorOpacity = _spinnerInteriorOpacity.getSelection() / TourTrackConfigManager.OPACITY_DIGITS_FACTOR;
+		config.interiorOpacity_Hovered = _spinnerInteriorOpacity_Hovered.getSelection()
 				/ TourTrackConfigManager.OPACITY_DIGITS_FACTOR;
-		trackConfig.interiorOpacity_Hovered = _spinnerInteriorOpacity_Hovered.getSelection()
+		config.interiorOpacity_HovSel = _spinnerInteriorOpacity_HovSel.getSelection()
 				/ TourTrackConfigManager.OPACITY_DIGITS_FACTOR;
-		trackConfig.interiorOpacity_HovSel = _spinnerInteriorOpacity_HovSel.getSelection()
-				/ TourTrackConfigManager.OPACITY_DIGITS_FACTOR;
-		trackConfig.interiorOpacity_Selected = _spinnerInteriorOpacity_Selected.getSelection()
+		config.interiorOpacity_Selected = _spinnerInteriorOpacity_Selected.getSelection()
 				/ TourTrackConfigManager.OPACITY_DIGITS_FACTOR;
 
 		// verticals
-		trackConfig.isDrawVerticals = _chkDrawVerticals.getSelection();
+		config.isDrawVerticals = _chkDrawVerticals.getSelection();
 
 		// track position
-		trackConfig.isShowTrackPosition = _chkTrackPositions.getSelection();
-		trackConfig.trackPositionSize = _spinnerTrackPositionSize.getSelection();
-		trackConfig.trackPositionSize_Hovered = _spinnerTrackPositionSize_Hovered.getSelection();
-		trackConfig.trackPositionSize_Selected = _spinnerTrackPositionSize_Selected.getSelection();
-		trackConfig.trackPositionSize_HovSel = _spinnerTrackPositionSize_HovSel.getSelection();
-		trackConfig.trackPositionThreshold = _spinnerTrackPositionThreshold.getSelection();
+		config.isShowTrackPosition = _chkTrackPositions.getSelection();
+		config.trackPositionSize = _spinnerTrackPositionSize.getSelection();
+		config.trackPositionSize_Hovered = _spinnerTrackPositionSize_Hovered.getSelection();
+		config.trackPositionSize_Selected = _spinnerTrackPositionSize_Selected.getSelection();
+		config.trackPositionSize_HovSel = _spinnerTrackPositionSize_HovSel.getSelection();
+		config.trackPositionThreshold = _spinnerTrackPositionThreshold.getSelection();
 
 		// altitude
-		trackConfig.isAbsoluteOffset = _chkAltitudeOffset.getSelection();
-		trackConfig.altitudeMode = TourTrackConfig.ALTITUDE_MODE[getComboIndex(_comboAltitude)].value;
-		trackConfig.altitudeVerticalOffset = altitudeOffsetMetric;
-		trackConfig.isFollowTerrain = _chkFollowTerrain.getSelection();
+		config.isAltitudeOffset = _chkAltitudeOffset.getSelection();
+		config.altitudeMode = TourTrackConfig.ALTITUDE_MODE[getComboIndex(_comboAltitude)].value;
+		config.altitudeOffsetMode = _rdoOffsetRelative.getSelection()
+				? TourTrackConfigManager.ALTITUDE_OFFSET_MODE_RELATIVE
+				: TourTrackConfigManager.ALTITUDE_OFFSET_MODE_ABSOLUTE;
+		config.altitudeOffsetDistanceAbsolute = altitudeOffsetMetric;
+		config.altitudeOffsetDistanceRelative = _spinnerAltitudeOffsetRelative.getSelection();
+		config.isFollowTerrain = _chkFollowTerrain.getSelection();
 	}
 
 	/**
@@ -1284,15 +1354,15 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 
 	public void updateMeasurementSystem() {
 
-		if (_lblAltitudeOffsetDistanceUnit == null) {
+		if (_lblAltitudeOffsetAbsoluteUnit == null) {
 
 			// dialog is not yet created
 
 			return;
 		}
 
-		_lblAltitudeOffsetDistanceUnit.setText(UI.UNIT_LABEL_ALTITUDE);
-		_lblAltitudeOffsetDistanceUnit.getParent().layout();
+		_lblAltitudeOffsetAbsoluteUnit.setText(UI.UNIT_LABEL_ALTITUDE);
+		_lblAltitudeOffsetAbsoluteUnit.getParent().layout();
 
 		restoreState();
 	}

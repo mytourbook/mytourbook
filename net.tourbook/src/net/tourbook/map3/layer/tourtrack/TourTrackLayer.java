@@ -15,7 +15,6 @@
  *******************************************************************************/
 package net.tourbook.map3.layer.tourtrack;
 
-import gov.nasa.worldwind.WorldWind;
 import gov.nasa.worldwind.avlist.AVKey;
 import gov.nasa.worldwind.awt.WorldWindowGLCanvas;
 import gov.nasa.worldwind.event.SelectEvent;
@@ -96,14 +95,6 @@ public class TourTrackLayer extends RenderableLayer implements SelectListener, I
 		// remove all tracks from layer
 		removeAllRenderables();
 
-		final TourTrackConfig trackConfig = TourTrackConfigManager.getActiveConfig();
-
-		final boolean isAbsoluteAltitudeMode = trackConfig.altitudeMode == WorldWind.ABSOLUTE;
-
-		final int altitudeOffset = isAbsoluteAltitudeMode && trackConfig.isAbsoluteOffset
-				? trackConfig.altitudeVerticalOffset
-				: 0;
-
 		final ArrayList<TourMap3Position> allPositions = new ArrayList<TourMap3Position>();
 
 		for (final TourData tourData : allTours) {
@@ -130,7 +121,7 @@ public class TourTrackLayer extends RenderableLayer implements SelectListener, I
 
 				float altitude = 0;
 				if (altiSerie != null) {
-					altitude = altiSerie[serieIndex] + altitudeOffset;
+					altitude = altiSerie[serieIndex];
 				}
 
 				float dataSerieValue = 0;

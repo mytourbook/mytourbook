@@ -18,7 +18,7 @@ package net.tourbook.map3.layer;
 import gov.nasa.worldwind.geom.Position;
 import gov.nasa.worldwind.layers.AnnotationLayer;
 import gov.nasa.worldwind.render.AnnotationAttributes;
-import gov.nasa.worldwind.render.GlobeAnnotation;
+import gov.nasa.worldwind.render.DrawContext;
 
 import java.awt.Insets;
 import java.awt.Point;
@@ -32,15 +32,15 @@ import org.eclipse.jface.dialogs.IDialogSettings;
  */
 public class ChartSliderLayer extends AnnotationLayer {
 
-	static final int			CHART_SLIDER_DRAW_OFFSET_Y	= 40;
-	static final int			CHART_SLIDER_CORNER_RADIUS	= 7;
-	static final int			CHART_SLIDER_LEADER_GAP		= 7;
-	static final int			CHART_SLIDER_MARGIN			= 5;
+	static final int				CHART_SLIDER_DRAW_OFFSET_Y	= 40;
+	static final int				CHART_SLIDER_CORNER_RADIUS	= 7;
+	static final int				CHART_SLIDER_LEADER_GAP		= 7;
+	static final int				CHART_SLIDER_MARGIN			= 5;
 
-	public static final String	MAP3_LAYER_ID				= "ChartSliderLayer";	//$NON-NLS-1$
+	public static final String		MAP3_LAYER_ID				= "ChartSliderLayer";	//$NON-NLS-1$
 
-	private GlobeAnnotation		_leftSlider;
-	private GlobeAnnotation		_rightSlider;
+	private TrackPointAnnotation	_leftSlider;
+	private TrackPointAnnotation	_rightSlider;
 
 	public ChartSliderLayer(final IDialogSettings state) {
 
@@ -58,9 +58,9 @@ public class ChartSliderLayer extends AnnotationLayer {
 		addAnnotation(_rightSlider);
 	}
 
-	private GlobeAnnotation createSlider(final boolean isLeftSlider) {
+	private TrackPointAnnotation createSlider(final boolean isLeftSlider) {
 
-		final GlobeAnnotation slider = new GlobeAnnotation(UI.EMPTY_STRING, Position.ZERO);
+		final TrackPointAnnotation slider = new TrackPointAnnotation(UI.EMPTY_STRING, Position.ZERO);
 		slider.setAlwaysOnTop(true);
 
 		/*
@@ -87,11 +87,20 @@ public class ChartSliderLayer extends AnnotationLayer {
 		return slider;
 	}
 
-	public GlobeAnnotation getLeftSlider() {
+	@Override
+	protected void doRender(final DrawContext dc) {
+
+		_leftSlider.setSliderPosition(dc);
+		_rightSlider.setSliderPosition(dc);
+
+		super.doRender(dc);
+	}
+
+	public TrackPointAnnotation getLeftSlider() {
 		return _leftSlider;
 	}
 
-	public GlobeAnnotation getRightSlider() {
+	public TrackPointAnnotation getRightSlider() {
 		return _rightSlider;
 	}
 
