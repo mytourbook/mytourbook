@@ -36,6 +36,7 @@ import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
+import net.tourbook.common.UI;
 import net.tourbook.common.color.IGradientColors;
 import net.tourbook.common.color.IMapColorProvider;
 import net.tourbook.common.color.MapLegendImageConfig;
@@ -54,8 +55,12 @@ public class TourLegendLayer extends RenderableLayer {
 
 	public static final String				MAP3_LAYER_ID	= "TourLegendLayer";				//$NON-NLS-1$
 
-	private static final Font				DEFAULT_FONT	= Font.decode("Arial-PLAIN-12");
+	private static final Font				DEFAULT_FONT	= UI.AWT_FONT_ARIAL_12;
+//	private static final Font				DEFAULT_FONT	= Font.decode("Arial-PLAIN-12"); //$NON-NLS-1$
+//	private final Font						DEFAULT_FONT	= Font.decode("Arial-BOLD-12");
+//	private final Font						DEFAULT_FONT	= Font.decode("Arial-12");
 	private static final Color				DEFAULT_COLOR	= Color.WHITE;
+
 
 	private IMapColorProvider				_colorProvider;
 
@@ -307,7 +312,7 @@ public class TourLegendLayer extends RenderableLayer {
 	public void render(final DrawContext dc) {
 
 		if (dc == null) {
-			final String message = Logging.getMessage("nullValue.DrawContextIsNull");
+			final String message = Logging.getMessage("nullValue.DrawContextIsNull"); //$NON-NLS-1$
 			Logging.logger().severe(message);
 			throw new IllegalArgumentException(message);
 		}
@@ -435,15 +440,12 @@ public class TourLegendLayer extends RenderableLayer {
 
 		final ArrayList<LabelAttributes> labels = new ArrayList<TourLegendLayer.LabelAttributes>();
 
-//		final Font font = Font.decode("Arial-BOLD-12");
-		final Font font = Font.decode("Arial-12");
-
 		for (final TourLegendLabel mapLegendLabel : legendLabels) {
 
 			labels.add(createLegendLabelAttributes(
 					mapLegendLabel.legendValue,
 					mapLegendLabel.legendText,
-					font,
+					DEFAULT_FONT,
 					Color.WHITE,
 					5d,
 					0d));

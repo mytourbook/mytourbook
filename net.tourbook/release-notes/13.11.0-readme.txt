@@ -3,17 +3,32 @@ Version: 13.11.0                                       16. September 2013
 
 !!! enforce default values in tour track config !!!
 
- * translation: check ALL these texts net.tourbook.map3.Messages.TourTrack_Properties_* because many are modified, some are new
+ * translation: THIS IS VERY IMPORTANT: check ALL these texts net.tourbook.map3.Messages.TourTrack_Properties_* because many are modified, some are new
  I'm not planning to do this every release but I'm still learning OpenGL and it's possibilities.
 
-
-New 	
+ 
+ 
+Tip: activate view when moving slider with a synched map !!! 
+ 
  
 
-* 
+New in 3D Map
+
+* Improved tour track properties.
+
+* Show hovered position value.
+
+* Show tour direction (with arrows).
+
+* Show tour chart slider.
+
+* Sync tour chart slider with map.
+
+* Tour legend is displayed correctly on all platforms.
+
 
 
 
 Stability of this version
 
-Not bad, it has less crashes than the previous version but it still can happen. It can mostly occur when many tours are displayed.
+Stability in this version is very good but not yet perfect, crashes still can happen but not very often, mostly when many tours (hundreds) are displayed. In this version, the tour rendering was rewritten which helped to reduce crashes.

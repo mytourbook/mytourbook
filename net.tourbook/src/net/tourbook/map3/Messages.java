@@ -55,6 +55,7 @@ public class Messages extends NLS {
 	public static String		Layer_Category_Tools;
 	public static String		Layer_Category_Tour;
 
+	public static String		Map3_Action_DirectionArrows;
 	public static String		Map3_Action_OpenMap3PropertiesView;
 	public static String		Map3_Action_TrackColor;
 
@@ -90,6 +91,8 @@ public class Messages extends NLS {
 	public static String		TourTrack_Properties_Checkbox_ShowTrackPositions_Tooltip;
 	public static String		TourTrack_Properties_Label_Altitude;
 	public static String		TourTrack_Properties_Label_Altitude_Tooltip;
+	public static String		TourTrack_Properties_Label_ConfigName;
+	public static String		TourTrack_Properties_Label_ConfigName_Tooltip;
 	public static String		TourTrack_Properties_Label_CurtainColor;
 	public static String		TourTrack_Properties_Label_CurtainColor_Tooltip;
 	public static String		TourTrack_Properties_Label_CurtainColorHovered;
@@ -98,9 +101,8 @@ public class Messages extends NLS {
 	public static String		TourTrack_Properties_Label_CurtainColorHovSel_Tooltip;
 	public static String		TourTrack_Properties_Label_CurtainColorSelected;
 	public static String		TourTrack_Properties_Label_CurtainColorSelected_Tooltip;
-	public static String		TourTrack_Properties_Label_DialogTitle;
-	public static String		TourTrack_Properties_Label_DirectionArrowSize;
-	public static String		TourTrack_Properties_Label_DirectionArrowSize_Tooltip;
+	public static String		TourTrack_Properties_Label_DirectionArrow;
+	public static String		TourTrack_Properties_Label_DirectionArrow_Tooltip;
 	public static String		TourTrack_Properties_Label_Name;
 	public static String		TourTrack_Properties_Label_Name_Tooltip;
 	public static String		TourTrack_Properties_Label_OutlineColorHovered;
@@ -121,39 +123,25 @@ public class Messages extends NLS {
 	public static String		TourTrack_Properties_Label_TrackPositionSize_Tooltip;
 	public static String		TourTrack_Properties_Label_TrackPositionThreshold;
 	public static String		TourTrack_Properties_Label_TrackPositionThreshold_Tooltip;
-
-	public static String	TourTrack_Properties_Radio_AltitudeOffsetAbsolute;
-
-	public static String	TourTrack_Properties_Radio_AltitudeOffsetAbsolute_Tooltip;
-
-	public static String	TourTrack_Properties_Radio_AltitudeOffsetRelative;
-
-	public static String	TourTrack_Properties_Radio_AltitudeOffsetRelative_Tooltip;
+	public static String		TourTrack_Properties_Radio_AltitudeOffsetAbsolute;
+	public static String		TourTrack_Properties_Radio_AltitudeOffsetAbsolute_Tooltip;
+	public static String		TourTrack_Properties_Radio_AltitudeOffsetRelative;
+	public static String		TourTrack_Properties_Radio_AltitudeOffsetRelative_Tooltip;
 
 	public static String		Track_Config_Altitude_Mode_Absolute;
 	public static String		Track_Config_Altitude_Mode_ClampToGround;
 	public static String		Track_Config_Altitude_Mode_RelativeToGround;
 
-	public static String	Track_Config_ConfigName_CloseBright;
-
-	public static String	Track_Config_ConfigName_CloseDark;
-
-	public static String	Track_Config_ConfigName_Custom;
+	public static String		Track_Config_ConfigName_CloseBright;
+	public static String		Track_Config_ConfigName_CloseDark;
 	public static String		Track_Config_ConfigName_Default;
-
-	public static String	Track_Config_ConfigName_Extrem;
-
-	public static String	Track_Config_ConfigName_FarBright;
-
-	public static String	Track_Config_ConfigName_FarDark;
-
-	public static String	Track_Config_ConfigName_MiddleBright;
-
-	public static String	Track_Config_ConfigName_MiddleDark;
-
-	public static String	Track_Config_ConfigName_RelativeBright;
-
-	public static String	Track_Config_ConfigName_RelativeDark;
+	public static String		Track_Config_ConfigName_Extrem;
+	public static String		Track_Config_ConfigName_FarBright;
+	public static String		Track_Config_ConfigName_FarDark;
+	public static String		Track_Config_ConfigName_MiddleBright;
+	public static String		Track_Config_ConfigName_MiddleDark;
+	public static String		Track_Config_ConfigName_RelativeBright;
+	public static String		Track_Config_ConfigName_RelativeDark;
 	public static String		Track_Config_ConfigName_Unknown;
 
 	public static String		Track_Config_Path_Resolution_High;

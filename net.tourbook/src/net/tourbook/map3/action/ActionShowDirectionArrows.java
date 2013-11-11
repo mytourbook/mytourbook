@@ -15,7 +15,7 @@
  *******************************************************************************/
 package net.tourbook.map3.action;
 
-import net.tourbook.map2.Messages;
+import net.tourbook.map3.Messages;
 import net.tourbook.map3.view.Map3View;
 
 import org.eclipse.jface.action.Action;
@@ -26,7 +26,7 @@ public class ActionShowDirectionArrows extends Action {
 
 	public ActionShowDirectionArrows(final Map3View mapView) {
 
-		super(Messages.Map_Action_DirectionArrows, AS_CHECK_BOX);
+		super(Messages.Map3_Action_DirectionArrows, AS_CHECK_BOX);
 
 		_mapView = mapView;
 	}

@@ -31,6 +31,20 @@ public class TourTrackConfig implements Cloneable {
 			new ComboEntry(Messages.Track_Config_Altitude_Mode_RelativeToGround, WorldWind.RELATIVE_TO_GROUND) //
 																		};
 
+	/*
+	 * These texts are translated but currently not used, but to keep the translations, the text is
+	 * assigned to a public field. Later this may be removed, 11.11.2013.
+	 */
+	public static String				oldTranslatedText_1				= Messages.TourTrack_Properties_Label_PathResolution;
+	public static String				oldTranslatedText_2				= Messages.TourTrack_Properties_Label_PathResolution_Tooltip;
+	public static String				oldTranslatedText_3				= Messages.TourTrack_Properties_Label_TrackColor;
+	public static String				oldTranslatedText_4				= Messages.TourTrack_Properties_Label_TrackColor_Tooltip;
+	public static String				oldTranslatedText_5				= Messages.TourTrack_Properties_Label_TrackPositionSize;
+	public static String				oldTranslatedText_6				= Messages.TourTrack_Properties_Label_TrackPositionSize_Tooltip;
+	public static String				oldTranslatedText_7				= Messages.Track_Config_Path_Resolution_High;
+	public static String				oldTranslatedText_8				= Messages.Track_Config_Path_Resolution_Optimized;
+	public static String				oldTranslatedText_9				= Messages.Track_Config_Path_Resolution_Viewport;
+
 //	/*
 //	 * Path resolution
 //	 */
@@ -176,22 +190,24 @@ public class TourTrackConfig implements Cloneable {
 
 		} else {
 
-			final boolean backupIsFollowTerrain = previousConfig.isFollowTerrain;
+//			final boolean backupIsFollowTerrain = previousConfig.isFollowTerrain;
+//
+//			/*
+//			 * check if tracks must be recreated
+//			 */
+//			if (//
+//			// follow terrain is  modified
+//			backupIsFollowTerrain != isFollowTerrain //
+//			) {
+//
+//				_isRecreateTracks = true;
+//
+//			} else {
+//
+//				_isRecreateTracks = false;
+//			}
 
-			/*
-			 * check if tracks must be recreated
-			 */
-			if (//
-			// follow terrain is  modified
-			backupIsFollowTerrain != isFollowTerrain //
-			) {
-
-				_isRecreateTracks = true;
-
-			} else {
-
-				_isRecreateTracks = false;
-			}
+			_isRecreateTracks = false;
 		}
 
 //		System.out.println(UI.timeStampNano()

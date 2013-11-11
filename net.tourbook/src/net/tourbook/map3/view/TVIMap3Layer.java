@@ -69,7 +69,7 @@ public class TVIMap3Layer extends TVIMap3Item {
 	public String toString() {
 		return String
 				.format(
-						"\nTVIMap3Layer\n   id=%s\n   wwLayer=%s\n   isLayerVisible=%s\n   isDefaultLayer=%s\n   defaultPosition=%s\n",
+						"\nTVIMap3Layer\n   id=%s\n   wwLayer=%s\n   isLayerVisible=%s\n   isDefaultLayer=%s\n   defaultPosition=%s\n", //$NON-NLS-1$
 						id,
 						wwLayer,
 						isLayerVisible,

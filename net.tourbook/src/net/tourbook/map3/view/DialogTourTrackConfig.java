@@ -66,8 +66,6 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 
 	private static final int		SHELL_MARGIN				= 5;
 
-	private Map3View				_map3View;
-
 	// initialize with default values which are (should) never be used
 	private Rectangle				_toolTipItemBounds			= new Rectangle(0, 0, 50, 50);
 
@@ -84,10 +82,6 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 	private boolean					_isUpdateUI;
 
 	private PixelConverter			_pc;
-
-	/*
-	 * UI resources
-	 */
 
 	/*
 	 * UI controls
@@ -165,11 +159,9 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 		}
 	}
 
-	public DialogTourTrackConfig(final Control ownerControl, final ToolBar toolBar, final Map3View map3View) {
+	public DialogTourTrackConfig(final Control ownerControl, final ToolBar toolBar) {
 
 		super(ownerControl);
-
-		_map3View = map3View;
 
 		addListener(ownerControl, toolBar);
 
@@ -267,14 +259,13 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 		GridLayoutFactory.fillDefaults().margins(SHELL_MARGIN, SHELL_MARGIN).applyTo(_shellContainer);
 //		_shellContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
 		{
-			createUI_000_DialogTitle(_shellContainer);
-
 			final Composite container = new Composite(_shellContainer, SWT.NO_FOCUS);
 			GridLayoutFactory.fillDefaults()//
 					.numColumns(2)
 					.applyTo(container);
 //			container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
 			{
+				createUI_000_ConfigurationName(container);
 				createUI_100_Line(container);
 				createUI_110_DirectionArrow(container);
 				createUI_200_TrackPosition(container);
@@ -288,23 +279,24 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 		return _shellContainer;
 	}
 
-	private void createUI_000_DialogTitle(final Composite parent) {
+	private void createUI_000_ConfigurationName(final Composite parent) {
+
+		/*
+		 * Label: Title
+		 */
+		final Label title = new Label(parent, SWT.LEAD);
+		GridDataFactory.fillDefaults()//
+				.grab(true, false)
+				.align(SWT.BEGINNING, SWT.CENTER)
+				.applyTo(title);
+		title.setFont(JFaceResources.getBannerFont());
+		title.setText(Messages.TourTrack_Properties_Label_ConfigName);
+		title.setToolTipText(Messages.TourTrack_Properties_Label_ConfigName_Tooltip);
 
 		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(false, false).applyTo(container);
-		GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
-//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
 		{
-			/*
-			 * Label: Title
-			 */
-			final Label title = new Label(container, SWT.LEAD);
-			GridDataFactory.fillDefaults()//
-					.grab(true, false)
-					.align(SWT.BEGINNING, SWT.CENTER)
-					.applyTo(title);
-			title.setFont(JFaceResources.getBannerFont());
-			title.setText(Messages.TourTrack_Properties_Label_DialogTitle);
 
 			/*
 			 * Combo: Configutation
@@ -327,7 +319,8 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 			 */
 			_btnReset = new Button(container, SWT.PUSH);
 			GridDataFactory.fillDefaults()//
-//					.align(SWT.TRAIL, SWT.FILL)
+					.grab(true, false)
+					.align(SWT.END, SWT.FILL)
 					.applyTo(_btnReset);
 			_btnReset.setText(Messages.TourTrack_Properties_Button_Default);
 			_btnReset.setToolTipText(Messages.TourTrack_Properties_Button_Default_Tooltip);
@@ -380,8 +373,8 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 			final Label label = new Label(parent, SWT.NONE);
 			GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(label);
 
-			label.setText(Messages.TourTrack_Properties_Label_DirectionArrowSize);
-			label.setToolTipText(Messages.TourTrack_Properties_Label_DirectionArrowSize_Tooltip);
+			label.setText(Messages.TourTrack_Properties_Label_DirectionArrow);
+			label.setToolTipText(Messages.TourTrack_Properties_Label_DirectionArrow_Tooltip);
 
 			final Composite container = new Composite(parent, SWT.NONE);
 			GridDataFactory.fillDefaults().grab(true, false).applyTo(container);

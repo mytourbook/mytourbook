@@ -52,6 +52,7 @@ import javax.swing.SwingUtilities;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.SelectionChartInfo;
+import net.tourbook.common.Messages;
 import net.tourbook.common.UI;
 import net.tourbook.common.color.ColorUtil;
 import net.tourbook.common.color.IGradientColors;
@@ -127,6 +128,12 @@ import org.eclipse.ui.part.ViewPart;
  * Display 3-D map with tour tracks.
  */
 public class Map3View extends ViewPart implements ITourProvider {
+
+	private static final String					SLIDER_TEXT_ALTITUDE					= "%.1f %s";								//$NON-NLS-1$
+	private static final String					SLIDER_TEXT_GRADIENT					= "%.1f %%";								//$NON-NLS-1$
+	private static final String					SLIDER_TEXT_PACE						= "%s %s";									//$NON-NLS-1$
+	private static final String					SLIDER_TEXT_PULSE						= "%.0f %s";								//$NON-NLS-1$
+	private static final String					SLIDER_TEXT_SPEED						= "%.1f %s";								//$NON-NLS-1$
 
 	public static final String					ID										= "net.tourbook.map3.view.Map3ViewId";		//$NON-NLS-1$
 
@@ -756,7 +763,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 				final float altitudeMetric = altitudeSerie[positionIndex];
 				final float altitude = altitudeMetric / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE;
 
-				graphValueText = String.format("%.1f %s", altitude, UI.UNIT_LABEL_ALTITUDE);
+				graphValueText = String.format(SLIDER_TEXT_ALTITUDE, altitude, UI.UNIT_LABEL_ALTITUDE);
 			}
 			break;
 
@@ -764,7 +771,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 
 			final float[] gradientSerie = tourData.gradientSerie;
 			if (gradientSerie != null) {
-				graphValueText = String.format("%.1f %%", gradientSerie[positionIndex]);
+				graphValueText = String.format(SLIDER_TEXT_GRADIENT, gradientSerie[positionIndex]);
 			}
 			break;
 
@@ -774,7 +781,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 			if (paceSerie != null) {
 				final float pace = paceSerie[positionIndex];
 				graphValueText = String.format(
-						"%s %s",
+						SLIDER_TEXT_PACE,
 						net.tourbook.ui.UI.format_mm_ss((long) pace),
 						UI.UNIT_LABEL_PACE);
 			}
@@ -785,7 +792,10 @@ public class Map3View extends ViewPart implements ITourProvider {
 
 			final float[] pulseSerie = tourData.pulseSerie;
 			if (pulseSerie != null) {
-				graphValueText = String.format("%.0f bpm", pulseSerie[positionIndex]);
+				graphValueText = String.format(
+						SLIDER_TEXT_PULSE,
+						pulseSerie[positionIndex],
+						Messages.Graph_Label_Heartbeat_unit);
 			}
 
 			break;
@@ -794,7 +804,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 
 			final float[] speedSerie = tourData.getSpeedSerie();
 			if (speedSerie != null) {
-				graphValueText = String.format("%.1f %s", speedSerie[positionIndex], UI.UNIT_LABEL_SPEED);
+				graphValueText = String.format(SLIDER_TEXT_SPEED, speedSerie[positionIndex], UI.UNIT_LABEL_SPEED);
 			}
 			break;
 
@@ -2085,15 +2095,15 @@ public class Map3View extends ViewPart implements ITourProvider {
 			}
 		});
 
-		System.out.println(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] \t");
-		System.out.println(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] \t");
+		System.out.println(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] \t"); //$NON-NLS-1$ //$NON-NLS-2$
+		System.out.println(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] \t"); //$NON-NLS-1$ //$NON-NLS-2$
 
 		for (final PerformanceStatistic stat : pfs) {
 			System.out.println(UI.timeStampNano()
-					+ " ["
+					+ " [" //$NON-NLS-1$
 					+ getClass().getSimpleName()
-					+ "] \t"
-					+ String.format("%10s  %s", stat.getValue(), stat.getDisplayString()));
+					+ "] \t" //$NON-NLS-1$
+					+ String.format("%10s  %s", stat.getValue(), stat.getDisplayString())); //$NON-NLS-1$
 //					+ String.format("%-40s%10s", stat.getDisplayString(), stat.getValue()));
 		}
 	}

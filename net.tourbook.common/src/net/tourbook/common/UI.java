@@ -241,7 +241,8 @@ public class UI {
 	 */
 	private static final String			DIALOG_FONT_DATA						= "DIALOG_FONT_NAME";														//$NON-NLS-1$
 
-	public static final Font			AWT_FONT_ARIAL_BOLD_12					= Font.decode("Arial-bold-12");
+	public static final Font			AWT_FONT_ARIAL_12						= Font.decode("Arial-plain-12");											//$NON-NLS-1$
+	public static final Font			AWT_FONT_ARIAL_BOLD_12					= Font.decode("Arial-bold-12");											//$NON-NLS-1$
 
 	/*
 	 * image keys for images which are stored in the image registry
