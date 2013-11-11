@@ -1329,6 +1329,13 @@ public class TourTrackConfigManager {
 
 	public static void saveState() {
 
+		if (_activeConfig == null) {
+
+			// this can happen when not yet used
+
+			return;
+		}
+
 		final XMLMemento xmlRoot = create_Root();
 
 		xmlRoot.putString(ATTR_ACTIVE_CONFIG_ID, _activeConfig.id);
