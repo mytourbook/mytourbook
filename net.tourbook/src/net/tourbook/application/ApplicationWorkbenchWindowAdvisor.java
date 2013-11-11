@@ -29,6 +29,7 @@ import net.tourbook.common.util.StatusUtil;
 import net.tourbook.data.TourPerson;
 import net.tourbook.database.PersonManager;
 import net.tourbook.database.TourDatabase;
+import net.tourbook.map3.view.Map3Manager;
 import net.tourbook.photo.TourPhotoManager;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.PrefPagePeople;
@@ -479,6 +480,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 		TagMenuManager.saveTagState();
 		TourTypeMenuManager.saveState();
 		TourPhotoManager.saveState();
+		Map3Manager.saveState();
 
 		return super.preWindowShellClose();
 	}

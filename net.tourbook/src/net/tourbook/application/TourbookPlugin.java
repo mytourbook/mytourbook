@@ -20,7 +20,6 @@ import java.util.ResourceBundle;
 
 import net.tourbook.data.TourPerson;
 import net.tourbook.database.TourDatabase;
-import net.tourbook.map3.view.Map3Manager;
 import net.tourbook.ui.TourTypeFilter;
 
 import org.eclipse.core.runtime.IStatus;
@@ -198,14 +197,6 @@ public class TourbookPlugin extends AbstractUIPlugin {
 
 	public void log(final String message, final Throwable exception) {
 		getLog().log(new Status(IStatus.ERROR, PLUGIN_ID, 0, message, exception));
-	}
-
-	@Override
-	protected void saveDialogSettings() {
-
-		Map3Manager.saveState();
-
-		super.saveDialogSettings();
 	}
 
 	@Override
