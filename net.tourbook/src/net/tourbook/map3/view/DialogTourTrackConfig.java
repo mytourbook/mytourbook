@@ -303,8 +303,10 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 			 */
 			_comboName = new Combo(container, SWT.READ_ONLY | SWT.BORDER);
 			GridDataFactory.fillDefaults()//
+					.grab(true, false)
 					.align(SWT.BEGINNING, SWT.CENTER)
-					.hint(_pc.convertHorizontalDLUsToPixels(15 * 4), SWT.DEFAULT)
+// this is too small in linux					
+//					.hint(_pc.convertHorizontalDLUsToPixels(15 * 4), SWT.DEFAULT)
 					.applyTo(_comboName);
 			_comboName.setVisibleItemCount(20);
 			_comboName.addSelectionListener(new SelectionAdapter() {
@@ -319,8 +321,7 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 			 */
 			_btnReset = new Button(container, SWT.PUSH);
 			GridDataFactory.fillDefaults()//
-					.grab(true, false)
-					.align(SWT.END, SWT.FILL)
+					.align(SWT.END, SWT.CENTER)
 					.applyTo(_btnReset);
 			_btnReset.setText(Messages.TourTrack_Properties_Button_Default);
 			_btnReset.setToolTipText(Messages.TourTrack_Properties_Button_Default_Tooltip);
