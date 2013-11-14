@@ -1,14 +1,14 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
- * 
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
@@ -60,6 +60,7 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.osgi.util.NLS;
+import org.eclipse.swt.awt.SWT_AWT;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.XMLMemento;
 import org.joda.time.DateTime;
@@ -162,10 +163,43 @@ public class Map3Manager {
 		// copied from gov.nasa.worldwindx.examples.ApplicationTemplate - 28.7.2013
 //        System.setProperty("java.net.useSystemProxies", "true");
 		if (Configuration.isMacOS()) {
+
 //            System.setProperty("apple.laf.useScreenMenuBar", "true");
 //            System.setProperty("com.apple.mrj.application.apple.menu.about.name", "World Wind Application");
 //            System.setProperty("com.apple.mrj.application.growbox.intrudes", "false");
 //            System.setProperty("apple.awt.brushMetalLook", "true");
+
+//			org.eclipse.swt.SWTError: Not implemented (java.lang.ClassNotFoundException: apple.awt.CEmbeddedFrame)
+//			at org.eclipse.swt.SWT.error(SWT.java:4387)
+//			at org.eclipse.swt.SWT.error(SWT.java:4276)
+//			at org.eclipse.swt.awt.SWT_AWT.new_Frame(SWT_AWT.java:145)
+//			at net.tourbook.map3.view.Map3View.createUI(Map3View.java:836)
+//			at net.tourbook.map3.view.Map3View.createPartControl(Map3View.java:708)
+
+//			when this is fixed with...
+
+			SWT_AWT.embeddedFrameClass = "sun.lwawt.macosx.CViewEmbeddedFrame";
+
+//			...this error occures
+
+//Exception in thread "AWT-EventQueue-0" javax.media.opengl.GLException: java.lang.NoClassDefFoundError: apple/awt/ComponentModel
+//	at com.sun.opengl.impl.Java2D.invokeWithOGLContextCurrent(Java2D.java:296)
+//	at javax.media.opengl.Threading.invokeOnOpenGLThread(Threading.java:266)
+//	at javax.media.opengl.GLCanvas.maybeDoSingleThreadedWorkaround(GLCanvas.java:410)
+//	at javax.media.opengl.GLCanvas.display(GLCanvas.java:244)
+//	at javax.media.opengl.GLCanvas.paint(GLCanvas.java:277)
+//	at sun.awt.RepaintArea.paintComponent(RepaintArea.java:264)
+//	at sun.lwawt.LWRepaintArea.paintComponent(LWRepaintArea.java:54)
+//	at sun.awt.RepaintArea.paint(RepaintArea.java:240)
+//	at sun.lwawt.LWComponentPeer.handleJavaPaintEvent(LWComponentPeer.java:1267)
+//	at sun.lwawt.LWComponentPeer.handleEvent(LWComponentPeer.java:1150)
+//	at java.awt.Component.dispatchEventImpl(Component.java:4937)
+//	at java.awt.Component.dispatchEvent(Component.java:4687)
+//	at java.awt.EventQueue.dispatchEventImpl(EventQueue.java:735)
+//	at java.awt.EventQueue.access$200(EventQueue.java:103)
+//	at java.awt.EventQueue$3.run(EventQueue.java:694)
+//	at java.awt.EventQueue$3.run(EventQueue.java:692)
+
 		} else if (Configuration.isWindowsOS()) {
 			System.setProperty("sun.awt.noerasebackground", "true"); // prevents flashing during window resizing //$NON-NLS-1$ //$NON-NLS-2$
 		}
@@ -436,9 +470,9 @@ public class Map3Manager {
 
 	/**
 	 * These layers are defined as default in WorldWind 1.5
-	 * 
+	 *
 	 * <pre>
-	 * 
+	 *
 	 * 		Stars							true		gov.nasa.worldwind.layers.StarsLayer
 	 * 		Atmosphere						true        gov.nasa.worldwind.layers.SkyGradientLayer
 	 * 		NASA Blue Marble Image			true        gov.nasa.worldwind.layers.Earth.BMNGOneImage
@@ -458,9 +492,9 @@ public class Map3Manager {
 	 * 		World Map						true        gov.nasa.worldwind.layers.WorldMapLayer
 	 * 		Scale bar						true        gov.nasa.worldwind.layers.ScalebarLayer
 	 * 		Compass							true        gov.nasa.worldwind.layers.CompassLayer
-	 * 
+	 *
 	 * </pre>
-	 * 
+	 *
 	 * @return
 	 */
 	private static XMLMemento createLayerXml_0_DefaultLayer() {
@@ -555,7 +589,7 @@ public class Map3Manager {
 		return xmlCategory;
 	}
 
-	private static void createLayerXml_120_DefaultLayer(	final IMemento xmlCategory,
+	private static void createLayerXml_120_DefaultLayer(final IMemento xmlCategory,
 														final boolean isEnabled,
 														final String defaultLayerId) {
 
@@ -598,7 +632,7 @@ public class Map3Manager {
 	 * RECURSIVE RECURSIVE RECURSIVE RECURSIVE RECURSIVE RECURSIVE RECURSIVE RECURSIVE
 	 * <p>
 	 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-	 * 
+	 *
 	 * @param parentItem
 	 * @param xmlParent
 	 */
@@ -751,7 +785,7 @@ public class Map3Manager {
 
 	/**
 	 * Insert the layer into the layer list just before the compass.
-	 * 
+	 *
 	 * @param wwd
 	 * @param newWWLayer
 	 * @return
@@ -790,7 +824,7 @@ public class Map3Manager {
 	 * RECURSIVE RECURSIVE RECURSIVE RECURSIVE RECURSIVE RECURSIVE RECURSIVE RECURSIVE
 	 * <p>
 	 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-	 * 
+	 *
 	 * @param tviParent
 	 * @param newWWLayer
 	 * @param newUILayer
@@ -828,7 +862,7 @@ public class Map3Manager {
 
 	/**
 	 * Insert the layer into the layer list just before the placenames.
-	 * 
+	 *
 	 * @param wwd
 	 * @param newWWLayer
 	 * @return
@@ -867,7 +901,7 @@ public class Map3Manager {
 	 * RECURSIVE RECURSIVE RECURSIVE RECURSIVE RECURSIVE RECURSIVE RECURSIVE RECURSIVE
 	 * <p>
 	 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-	 * 
+	 *
 	 * @param tviParent
 	 * @param newWWLayer
 	 * @param newUILayer
@@ -920,7 +954,7 @@ public class Map3Manager {
 
 	/**
 	 * Read/Create map layers with it's state from a xml file
-	 * 
+	 *
 	 * @return
 	 */
 	private static TVIMap3Root parseLayerXml() {
@@ -990,7 +1024,7 @@ public class Map3Manager {
 	 * RECURSIVE RECURSIVE RECURSIVE RECURSIVE RECURSIVE RECURSIVE RECURSIVE RECURSIVE
 	 * <p>
 	 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-	 * 
+	 *
 	 * @param xmlParent
 	 * @param tviParent
 	 */
@@ -1176,7 +1210,7 @@ public class Map3Manager {
 
 	/**
 	 * Ensure All custom layers are set in the ww model.
-	 * 
+	 *
 	 * @param wwLayers
 	 *            Layers which are already added to the model.
 	 */
@@ -1251,7 +1285,7 @@ public class Map3Manager {
 
 	/**
 	 * Show/hide tour track layer.
-	 * 
+	 *
 	 * @param isTrackVisible
 	 */
 	static void setLayerVisible_TourTrack(final boolean isTrackVisible) {
@@ -1281,7 +1315,7 @@ public class Map3Manager {
 
 	/**
 	 * Keep track if {@link Map3View} is visible.
-	 * 
+	 *
 	 * @param map3View
 	 */
 	static void setMap3View(final Map3View map3View) {
