@@ -73,6 +73,7 @@ public class TourTrackConfigManager {
 	static final String								CONFIG_NAME_UNKNOWN							= Messages.Track_Config_ConfigName_Unknown;
 
 	public static final Boolean						CONFIG_IS_FOLLOW_TERRAIN_DEFAULT			= Boolean.FALSE;
+	public static final float						CONFIG_TRACK_COLOR_OPACITY_DEFAULT			= 1.0f;
 
 	// direction arrows
 	public static final Boolean						IS_DIRECTION_ARROWS_VISIBLE_DEFAULT			= Boolean.TRUE;
@@ -82,8 +83,8 @@ public class TourTrackConfigManager {
 	public static final float						DIRECTION_ARROW_SIZE_DEFAULT				= 40.0f;
 
 	public static final int							DIRECTION_ARROW_VERTICAL_DISTANCE_MIN		= 1;
-	public static final int							DIRECTION_ARROW_VERTICAL_DISTANCE_MAX		= 20;
-	public static final float						DIRECTION_ARROW_VERTICAL_DISTANCE_DEFAULT	= 1.0f;
+	public static final int							DIRECTION_ARROW_VERTICAL_DISTANCE_MAX		= 100;
+	public static final float						DIRECTION_ARROW_VERTICAL_DISTANCE_DEFAULT	= 2.0f;
 
 	// outline
 	public static final int							OUTLINE_WIDTH_MIN							= 0;
@@ -95,7 +96,7 @@ public class TourTrackConfigManager {
 	public static final int							OUTLINE_COLOR_MODE_SELECTED_DEFAULT			= TourTrackConfig.COLOR_MODE_SOLID_COLOR;
 	public static final int							OUTLINE_COLOR_MODE_HOV_SEL_DEFAULT			= TourTrackConfig.COLOR_MODE_TRACK_VALUE;
 
-	public static final float						OUTLINE_OPACITY_NORMAL_DEFAULT				= 0.5f;
+	public static final float						OUTLINE_OPACITY_NORMAL_DEFAULT				= 1.0f;
 	public static final float						OUTLINE_OPACITY_HOVERED_DEFAULT				= 1.0f;
 	public static final float						OUTLINE_OPACITY_SELECTED_DEFAULT			= 1.0f;
 	public static final float						OUTLINE_OPACITY_HOV_SEL_DEFAULT				= 1.0f;
@@ -139,6 +140,7 @@ public class TourTrackConfigManager {
 	// altitude
 	public static final int							ALTITUDE_MODE_DEFAULT						= WorldWind.ABSOLUTE;
 	public static final boolean						IS_ALTITUDE_OFFSET_DEFAULT					= true;
+	public static final boolean						IS_ALTITUDE_OFFSET_RANDOM_DEFAULT			= false;
 	public static final int							ALTITUDE_OFFSET_MODE_ABSOLUTE				= 0;
 	public static final int							ALTITUDE_OFFSET_MODE_RELATIVE				= 1;
 	public static final int							ALTITUDE_OFFSET_MODE_DEFAULT				= ALTITUDE_OFFSET_MODE_ABSOLUTE;
@@ -194,6 +196,7 @@ public class TourTrackConfigManager {
 	private static final String						ATTR_DEFAULT_ID								= "defaultId";										//$NON-NLS-1$
 	private static final String						ATTR_CONFIG_NAME							= "name";											//$NON-NLS-1$
 	private static final String						ATTR_IS_FOLLOW_TERRAIN						= "isFollowTerrain";								//$NON-NLS-1$
+	private static final String						ATTR_TRACK_COLOR_OPACITY_DEFAULT			= "trackColorOpacity";								//$NON-NLS-1$
 
 	// direction arrows
 	private static final String						TAG_DIRECTION_ARROWS						= "directionArrows";								//$NON-NLS-1$
@@ -217,6 +220,7 @@ public class TourTrackConfigManager {
 	private static final String						TAG_ALTITUDE								= "altitude";										//$NON-NLS-1$
 	private static final String						ATTR_ALTITUDE_MODE							= "altitudeMode";									//$NON-NLS-1$
 	private static final String						ATTR_IS_ABSOLUTE_OFFSET						= "isAbsoluteOffset";								//$NON-NLS-1$
+	private static final String						ATTR_IS_ABSOLUTE_OFFSET_RANDOM				= "isAbsoluteOffsetRandom";
 	private static final String						ATTR_ALTITUDE_OFFSET_MODE					= "offsetMode";									//$NON-NLS-1$
 	private static final String						ATTR_ALTITUDE_OFFSET_ABSOLUTE				= "absoluteOffset";								//$NON-NLS-1$
 	private static final String						ATTR_ALTITUDE_OFFSET_RELATIVE				= "relativeOffset";								//$NON-NLS-1$
@@ -334,6 +338,7 @@ public class TourTrackConfigManager {
 			xmlConfig.putString(ATTR_CONFIG_NAME, configName);
 
 			xmlConfig.putBoolean(ATTR_IS_FOLLOW_TERRAIN, CONFIG_IS_FOLLOW_TERRAIN_DEFAULT);
+			xmlConfig.putFloat(ATTR_TRACK_COLOR_OPACITY_DEFAULT, CONFIG_TRACK_COLOR_OPACITY_DEFAULT);
 
 			// <directionArrows>
 			final IMemento xmlDirectionArrows = xmlConfig.createChild(TAG_DIRECTION_ARROWS);
@@ -431,6 +436,7 @@ public class TourTrackConfigManager {
 			{
 				xmlAltitude.putInteger(ATTR_ALTITUDE_MODE, ALTITUDE_MODE_DEFAULT);
 				xmlAltitude.putBoolean(ATTR_IS_ABSOLUTE_OFFSET, IS_ALTITUDE_OFFSET_DEFAULT);
+				xmlAltitude.putBoolean(ATTR_IS_ABSOLUTE_OFFSET_RANDOM, IS_ALTITUDE_OFFSET_RANDOM_DEFAULT);
 				xmlAltitude.putInteger(ATTR_ALTITUDE_OFFSET_MODE, ALTITUDE_OFFSET_MODE_DEFAULT);
 				xmlAltitude.putInteger(ATTR_ALTITUDE_OFFSET_ABSOLUTE, ALTITUDE_OFFSET_ABSOLUTE_DEFAULT);
 				xmlAltitude.putInteger(ATTR_ALTITUDE_OFFSET_RELATIVE, ALTITUDE_OFFSET_RELATIVE_DEFAULT);
@@ -448,6 +454,7 @@ public class TourTrackConfigManager {
 			xmlConfig.putString(ATTR_CONFIG_NAME, config.name);
 
 			xmlConfig.putBoolean(ATTR_IS_FOLLOW_TERRAIN, config.isFollowTerrain);
+			xmlConfig.putFloat(ATTR_TRACK_COLOR_OPACITY_DEFAULT, (float) config.trackColorOpacity);
 
 			// <directionArrows>
 			final IMemento xmlDirectionArrows = xmlConfig.createChild(TAG_DIRECTION_ARROWS);
@@ -545,6 +552,7 @@ public class TourTrackConfigManager {
 			{
 				xmlAltitude.putInteger(ATTR_ALTITUDE_MODE, config.altitudeMode);
 				xmlAltitude.putBoolean(ATTR_IS_ABSOLUTE_OFFSET, config.isAltitudeOffset);
+				xmlAltitude.putBoolean(ATTR_IS_ABSOLUTE_OFFSET_RANDOM, config.isAltitudeOffsetRandom);
 				xmlAltitude.putInteger(ATTR_ALTITUDE_OFFSET_MODE, config.altitudeOffsetMode);
 				xmlAltitude.putInteger(ATTR_ALTITUDE_OFFSET_ABSOLUTE, config.altitudeOffsetDistanceAbsolute);
 				xmlAltitude.putInteger(ATTR_ALTITUDE_OFFSET_RELATIVE, config.altitudeOffsetDistanceRelative);
@@ -697,6 +705,8 @@ public class TourTrackConfigManager {
 
 	private static void overwriteConfigValues_Bright(final TourTrackConfig config) {
 
+		config.trackColorOpacity = 0.5f;
+
 		config.outlineColorMode = TourTrackConfig.COLOR_MODE_SOLID_COLOR;
 		config.outlineColor = RGB_BLACK;
 		config.trackPositionSize = 1;
@@ -705,6 +715,8 @@ public class TourTrackConfigManager {
 	}
 
 	private static void overwriteConfigValues_Dark(final TourTrackConfig config) {
+
+		config.trackColorOpacity = 0.5f;
 
 		config.outlineColorMode = TourTrackConfig.COLOR_MODE_SOLID_COLOR;
 		config.outlineColor = RGB_WHITE;
@@ -807,6 +819,13 @@ public class TourTrackConfigManager {
 		config.isFollowTerrain = Util.getXmlBoolean(xmlConfig, //
 				ATTR_IS_FOLLOW_TERRAIN,
 				CONFIG_IS_FOLLOW_TERRAIN_DEFAULT);
+
+		config.trackColorOpacity = Util.getXmlFloat(
+				xmlConfig,
+				ATTR_TRACK_COLOR_OPACITY_DEFAULT,
+				CONFIG_TRACK_COLOR_OPACITY_DEFAULT,
+				OPACITY_MIN,
+				OPACITY_MAX);
 	}
 
 	private static void parse_200_DirectionArrows(final XMLMemento xmlDirectionArrow, final TourTrackConfig config) {
@@ -1103,6 +1122,10 @@ public class TourTrackConfigManager {
 		config.isAltitudeOffset = Util.getXmlBoolean(xmlAltitude,//
 				ATTR_IS_ABSOLUTE_OFFSET,
 				IS_ALTITUDE_OFFSET_DEFAULT);
+
+		config.isAltitudeOffsetRandom = Util.getXmlBoolean(xmlAltitude,//
+				ATTR_IS_ABSOLUTE_OFFSET_RANDOM,
+				IS_ALTITUDE_OFFSET_RANDOM_DEFAULT);
 
 		config.altitudeOffsetMode = Util.getXmlInteger(xmlAltitude, //
 				ATTR_ALTITUDE_OFFSET_MODE,

@@ -126,6 +126,15 @@ public class TrackPathOptimized extends MTMultiResolutionPath implements ITrackP
 
 				altitudeOffset = eyeElevation / 100.0 * relativeOffset;
 			}
+
+			if (config.isAltitudeOffsetRandom) {
+
+				/*
+				 * The random value should be kept that other objects, e.g. map chart slider is
+				 * correctly positioned.
+				 */
+				altitudeOffset *= Math.random() + 0.1;
+			}
 		}
 
 		final List<Color> tessellatedColors = pathData.getTessellatedColors();
@@ -509,18 +518,26 @@ public class TrackPathOptimized extends MTMultiResolutionPath implements ITrackP
 			if (!isPickingMode && !isShowTrackValueColor) {
 
 				RGB rgb;
+				double alpha;
 
 				if (isTourHovered && isTourSelected) {
 					rgb = config.outlineColor_HovSel;
+					alpha = config.outlineOpacity_HovSel;
 				} else if (isTourHovered) {
 					rgb = config.outlineColor_Hovered;
+					alpha = config.outlineOpacity_Hovered;
 				} else if (isTourSelected) {
 					rgb = config.outlineColor_Selected;
+					alpha = config.outlineOpacity_Selected;
 				} else {
 					rgb = config.outlineColor;
+					alpha = config.outlineOpacity;
+
+					// enforce better visibility
+//					alpha = 1;
 				}
 
-				gl.glColor4ub((byte) rgb.red, (byte) rgb.green, (byte) rgb.blue, (byte) 0xbf);
+				gl.glColor4ub((byte) rgb.red, (byte) rgb.green, (byte) rgb.blue, (byte) (alpha * 0xff));
 			}
 
 			// Convert stride from number of elements to number of bytes.

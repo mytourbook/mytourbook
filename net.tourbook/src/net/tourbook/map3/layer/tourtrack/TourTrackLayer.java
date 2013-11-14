@@ -620,7 +620,7 @@ public class TourTrackLayer extends RenderableLayer implements SelectListener, I
 		final TourTrackConfig trackConfig = TourTrackConfigManager.getActiveConfig();
 
 		// force the track colors to be recreated, opacity can have been changed
-		trackPath.getTourTrack().updateColors(trackConfig.outlineOpacity);
+		trackPath.getTourTrack().updateColors(trackConfig.trackColorOpacity);
 
 		final Path path = trackPath.getPath();
 

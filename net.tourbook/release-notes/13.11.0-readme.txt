@@ -1,12 +1,6 @@
-Version: 13.11.0                                       16. September 2013
+Version: 13.11.0                                       25. November 2013
 
 
-!!! enforce default values in tour track config !!!
-
- * translation: THIS IS VERY IMPORTANT: check ALL these texts net.tourbook.map3.Messages.TourTrack_Properties_* because many are modified, some are new
- I'm not planning to do this every release but I'm still learning OpenGL and it's possibilities.
-
- 
  
 Tip: activate view when moving slider with a synched map !!! 
  
@@ -31,4 +25,4 @@ New in 3D Map
 
 Stability of this version
 
-Stability in this version is very good but not yet perfect, crashes still can happen but not very often, mostly when many tours (hundreds) are displayed. In this version, the tour rendering was rewritten which helped to reduce crashes.
+Stability in this version is much better than the previous version but it is not yet perfect, crashes still can happen but not very often, mostly when many tours (hundreds) are displayed. In this version, the tour rendering was rewritten which helped to reduce crashing.

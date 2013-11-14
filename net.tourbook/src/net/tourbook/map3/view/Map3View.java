@@ -286,6 +286,11 @@ public class Map3View extends ViewPart implements ITourProvider {
 
 				altitudeOffset = eyeElevation / 100.0 * relativeOffset;
 			}
+
+			if (config.isAltitudeOffsetRandom) {
+
+				// this needs to be implemented, is not yet done
+			}
 		}
 
 		return altitudeOffset;

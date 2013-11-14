@@ -81,6 +81,10 @@ public class Messages extends NLS {
 	public static String		TourTrack_Properties_Button_Default_Tooltip;
 	public static String		TourTrack_Properties_Checkbox_AltitudeOffset;
 	public static String		TourTrack_Properties_Checkbox_AltitudeOffset_Tooltip;
+
+	public static String	TourTrack_Properties_Checkbox_AltitudeOffsetRandom;
+
+	public static String	TourTrack_Properties_Checkbox_AltitudeOffsetRandom_Tooltip;
 	public static String		TourTrack_Properties_Checkbox_DrawVerticals;
 	public static String		TourTrack_Properties_Checkbox_DrawVerticals_Tooltip;
 	public static String		TourTrack_Properties_Checkbox_ExtrudePath;

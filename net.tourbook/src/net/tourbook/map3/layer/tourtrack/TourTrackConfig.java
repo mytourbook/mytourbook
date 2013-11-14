@@ -37,8 +37,8 @@ public class TourTrackConfig implements Cloneable {
 	 */
 	public static String				oldTranslatedText_1				= Messages.TourTrack_Properties_Label_PathResolution;
 	public static String				oldTranslatedText_2				= Messages.TourTrack_Properties_Label_PathResolution_Tooltip;
-	public static String				oldTranslatedText_3				= Messages.TourTrack_Properties_Label_TrackColor;
-	public static String				oldTranslatedText_4				= Messages.TourTrack_Properties_Label_TrackColor_Tooltip;
+//	public static String				oldTranslatedText_3				= Messages.TourTrack_Properties_Label_TrackColor;
+//	public static String				oldTranslatedText_4				= Messages.TourTrack_Properties_Label_TrackColor_Tooltip;
 	public static String				oldTranslatedText_5				= Messages.TourTrack_Properties_Label_TrackPositionSize;
 	public static String				oldTranslatedText_6				= Messages.TourTrack_Properties_Label_TrackPositionSize_Tooltip;
 	public static String				oldTranslatedText_7				= Messages.Track_Config_Path_Resolution_High;
@@ -151,6 +151,12 @@ public class TourTrackConfig implements Cloneable {
 	 */
 	public boolean						isAltitudeOffset				= TourTrackConfigManager.IS_ALTITUDE_OFFSET_DEFAULT;
 
+	/**
+	 * When <code>true</code> the altitude offset value will be multiplied with the random number
+	 * 0.1...1.0
+	 */
+	public boolean						isAltitudeOffsetRandom			= TourTrackConfigManager.IS_ALTITUDE_OFFSET_RANDOM_DEFAULT;
+
 	public int							altitudeOffsetMode				= TourTrackConfigManager.ALTITUDE_OFFSET_MODE_DEFAULT;
 
 	/**
@@ -160,6 +166,12 @@ public class TourTrackConfig implements Cloneable {
 	public int							altitudeOffsetDistanceRelative	= TourTrackConfigManager.ALTITUDE_OFFSET_RELATIVE_DEFAULT;
 
 	public boolean						isFollowTerrain					= TourTrackConfigManager.CONFIG_IS_FOLLOW_TERRAIN_DEFAULT;
+
+	/**
+	 * Opacity of the track color: outline/interior, separate colors are not yet supported, it not a
+	 * simple task.
+	 */
+	public double						trackColorOpacity				= TourTrackConfigManager.CONFIG_TRACK_COLOR_OPACITY_DEFAULT;
 
 	TourTrackConfig() {}
 
