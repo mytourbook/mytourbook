@@ -204,6 +204,30 @@ public class Map3Manager {
 			System.setProperty("sun.awt.noerasebackground", "true"); // prevents flashing during window resizing //$NON-NLS-1$ //$NON-NLS-2$
 		}
 
+		/*
+		 * This needs to be set, because the jogl selfexpanded native libraries are not found, so
+		 * they are packacked into platform specific plugins.
+		 */
+		System.setProperty("jogamp.gluegen.UseTempJarCache", Boolean.FALSE.toString());
+//java.lang.UnsatisfiedLinkError: Can't load library: C:\E\e-3.8.2-32\eclipse\gluegen-rt.dll
+//	at java.lang.ClassLoader.loadLibrary(ClassLoader.java:1854)
+//	at java.lang.Runtime.load0(Runtime.java:795)
+//	at java.lang.System.load(System.java:1062)
+//	at com.jogamp.common.jvm.JNILibLoaderBase.loadLibraryInternal(JNILibLoaderBase.java:548)
+//	at com.jogamp.common.jvm.JNILibLoaderBase.access$000(JNILibLoaderBase.java:64)
+//	at com.jogamp.common.jvm.JNILibLoaderBase$DefaultAction.loadLibrary(JNILibLoaderBase.java:95)
+//	at com.jogamp.common.jvm.JNILibLoaderBase.loadLibrary(JNILibLoaderBase.java:412)
+//	at com.jogamp.common.os.DynamicLibraryBundle$GlueJNILibLoader.loadLibrary(DynamicLibraryBundle.java:387)
+//	at com.jogamp.common.os.Platform$1.run(Platform.java:202)
+//	at java.security.AccessController.doPrivileged(Native Method)
+//	at com.jogamp.common.os.Platform.<clinit>(Platform.java:173)
+//	at javax.media.opengl.GLProfile.<clinit>(GLProfile.java:82)
+//	at gov.nasa.worldwind.Configuration.getMaxCompatibleGLProfile(Unknown Source)
+//	at gov.nasa.worldwind.awt.WorldWindowGLCanvas.getCaps(Unknown Source)
+//	at gov.nasa.worldwind.awt.WorldWindowGLCanvas.<init>(Unknown Source)
+//	at net.tourbook.map3.view.Map3Manager.<clinit>(Map3Manager.java:213)
+//	at net.tourbook.map3.view.Map3View.<clinit>(Map3View.java:156)
+
 		_ww = new WorldWindowGLCanvas();
 
 		_initializeMap3();
@@ -470,9 +494,9 @@ public class Map3Manager {
 
 	/**
 	 * These layers are defined as default in WorldWind 1.5
-	 *
+	 * 
 	 * <pre>
-	 *
+	 * 
 	 * 		Stars							true		gov.nasa.worldwind.layers.StarsLayer
 	 * 		Atmosphere						true        gov.nasa.worldwind.layers.SkyGradientLayer
 	 * 		NASA Blue Marble Image			true        gov.nasa.worldwind.layers.Earth.BMNGOneImage
@@ -492,9 +516,9 @@ public class Map3Manager {
 	 * 		World Map						true        gov.nasa.worldwind.layers.WorldMapLayer
 	 * 		Scale bar						true        gov.nasa.worldwind.layers.ScalebarLayer
 	 * 		Compass							true        gov.nasa.worldwind.layers.CompassLayer
-	 *
+	 * 
 	 * </pre>
-	 *
+	 * 
 	 * @return
 	 */
 	private static XMLMemento createLayerXml_0_DefaultLayer() {
@@ -632,7 +656,7 @@ public class Map3Manager {
 	 * RECURSIVE RECURSIVE RECURSIVE RECURSIVE RECURSIVE RECURSIVE RECURSIVE RECURSIVE
 	 * <p>
 	 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-	 *
+	 * 
 	 * @param parentItem
 	 * @param xmlParent
 	 */
@@ -785,7 +809,7 @@ public class Map3Manager {
 
 	/**
 	 * Insert the layer into the layer list just before the compass.
-	 *
+	 * 
 	 * @param wwd
 	 * @param newWWLayer
 	 * @return
@@ -824,7 +848,7 @@ public class Map3Manager {
 	 * RECURSIVE RECURSIVE RECURSIVE RECURSIVE RECURSIVE RECURSIVE RECURSIVE RECURSIVE
 	 * <p>
 	 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-	 *
+	 * 
 	 * @param tviParent
 	 * @param newWWLayer
 	 * @param newUILayer
@@ -862,7 +886,7 @@ public class Map3Manager {
 
 	/**
 	 * Insert the layer into the layer list just before the placenames.
-	 *
+	 * 
 	 * @param wwd
 	 * @param newWWLayer
 	 * @return
@@ -901,7 +925,7 @@ public class Map3Manager {
 	 * RECURSIVE RECURSIVE RECURSIVE RECURSIVE RECURSIVE RECURSIVE RECURSIVE RECURSIVE
 	 * <p>
 	 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-	 *
+	 * 
 	 * @param tviParent
 	 * @param newWWLayer
 	 * @param newUILayer
@@ -954,7 +978,7 @@ public class Map3Manager {
 
 	/**
 	 * Read/Create map layers with it's state from a xml file
-	 *
+	 * 
 	 * @return
 	 */
 	private static TVIMap3Root parseLayerXml() {
@@ -1024,7 +1048,7 @@ public class Map3Manager {
 	 * RECURSIVE RECURSIVE RECURSIVE RECURSIVE RECURSIVE RECURSIVE RECURSIVE RECURSIVE
 	 * <p>
 	 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-	 *
+	 * 
 	 * @param xmlParent
 	 * @param tviParent
 	 */
@@ -1210,7 +1234,7 @@ public class Map3Manager {
 
 	/**
 	 * Ensure All custom layers are set in the ww model.
-	 *
+	 * 
 	 * @param wwLayers
 	 *            Layers which are already added to the model.
 	 */
@@ -1285,7 +1309,7 @@ public class Map3Manager {
 
 	/**
 	 * Show/hide tour track layer.
-	 *
+	 * 
 	 * @param isTrackVisible
 	 */
 	static void setLayerVisible_TourTrack(final boolean isTrackVisible) {
@@ -1315,7 +1339,7 @@ public class Map3Manager {
 
 	/**
 	 * Keep track if {@link Map3View} is visible.
-	 *
+	 * 
 	 * @param map3View
 	 */
 	static void setMap3View(final Map3View map3View) {

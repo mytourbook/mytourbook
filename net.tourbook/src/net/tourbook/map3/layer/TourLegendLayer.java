@@ -46,7 +46,7 @@ import net.tourbook.map3.view.Map3Manager;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
 
-import com.sun.opengl.util.j2d.TextRenderer;
+import com.jogamp.opengl.util.awt.TextRenderer;
 
 /**
  * Part of this code is copied from: gov.nasa.worldwindx.examples.analytics.AnalyticSurfaceLegend

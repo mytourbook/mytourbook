@@ -1,8 +1,7 @@
 /*
-Copyright (C) 2001, 2008 United States Government
-as represented by the Administrator of the
-National Aeronautics and Space Administration.
-All Rights Reserved.
+ * Copyright (C) 2012 United States Government as represented by the Administrator of the
+ * National Aeronautics and Space Administration.
+ * All Rights Reserved.
  */
 package net.tourbook.map3.layer;
 
@@ -23,6 +22,7 @@ import gov.nasa.worldwind.render.DrawContext;
 import gov.nasa.worldwind.render.OrderedRenderable;
 import gov.nasa.worldwind.util.Logging;
 import gov.nasa.worldwind.util.OGLTextRenderer;
+import gov.nasa.worldwind.util.OGLUtil;
 import gov.nasa.worldwind.util.WWMath;
 
 import java.awt.Color;
@@ -39,19 +39,21 @@ import java.io.InputStream;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
 import javax.swing.Timer;
 
-import com.sun.opengl.util.j2d.TextRenderer;
-import com.sun.opengl.util.texture.Texture;
-import com.sun.opengl.util.texture.TextureCoords;
-import com.sun.opengl.util.texture.TextureIO;
+import com.jogamp.opengl.util.awt.TextRenderer;
+import com.jogamp.opengl.util.texture.Texture;
+import com.jogamp.opengl.util.texture.TextureCoords;
+import com.jogamp.opengl.util.texture.TextureData;
+import com.jogamp.opengl.util.texture.TextureIO;
 
 /**
  * @author jparsons
- * @version $Id: StatusLayer.java 665 2012-06-26 20:43:22Z tgaskins $
+ * @version $Id: StatusLayer.java 1171 2013-02-11 21:45:02Z dcollins $
  */
 /*
- * this is a copy from /gov/nasa/worldwindx/examples/util/StatusLayer.java - 2013-02-24
+ * this is a copy from /gov/nasa/worldwindx/examples/util/StatusLayer.java - 2013-11-14
  */
 /**
  * Renders statusbar information as a layer. Used ScalebarLayer and StatusBar as template
@@ -275,17 +277,17 @@ public class StatusLayer extends AbstractLayer implements PositionListener, Rend
 
 //		final long start = System.nanoTime();
 
-		final GL gl = dc.getGL();
+		final GL2 gl = dc.getGL().getGL2(); // GL initialization checks for GL2 compatibility.
 		boolean attribsPushed = false;
 		boolean modelviewPushed = false;
 		boolean projectionPushed = false;
 		try {
-			gl.glPushAttrib(GL.GL_DEPTH_BUFFER_BIT
-					| GL.GL_COLOR_BUFFER_BIT
-					| GL.GL_ENABLE_BIT
-					| GL.GL_TRANSFORM_BIT
-					| GL.GL_VIEWPORT_BIT
-					| GL.GL_CURRENT_BIT);
+			gl.glPushAttrib(GL2.GL_DEPTH_BUFFER_BIT
+					| GL2.GL_COLOR_BUFFER_BIT
+					| GL2.GL_ENABLE_BIT
+					| GL2.GL_TRANSFORM_BIT
+					| GL2.GL_VIEWPORT_BIT
+					| GL2.GL_CURRENT_BIT);
 			attribsPushed = true;
 
 			gl.glEnable(GL.GL_BLEND);
@@ -295,7 +297,7 @@ public class StatusLayer extends AbstractLayer implements PositionListener, Rend
 			// Load a parallel projection with xy dimensions (viewportWidth, viewportHeight)
 			// into the GL projection matrix.
 			final java.awt.Rectangle viewport = dc.getView().getViewport();
-			gl.glMatrixMode(javax.media.opengl.GL.GL_PROJECTION);
+			gl.glMatrixMode(GL2.GL_PROJECTION);
 			gl.glPushMatrix();
 			projectionPushed = true;
 			gl.glLoadIdentity();
@@ -307,7 +309,7 @@ public class StatusLayer extends AbstractLayer implements PositionListener, Rend
 				final double maxwh = size.width > size.height ? size.width : size.height;
 				gl.glOrtho(0d, viewport.width, 0d, viewport.height, -0.6 * maxwh, 0.6 * maxwh);
 
-				gl.glMatrixMode(GL.GL_MODELVIEW);
+				gl.glMatrixMode(GL2.GL_MODELVIEW);
 				gl.glPushMatrix();
 				modelviewPushed = true;
 				gl.glLoadIdentity();
@@ -332,7 +334,7 @@ public class StatusLayer extends AbstractLayer implements PositionListener, Rend
 
 					//draw background image
 					if (iconTexture == null) {
-						initBGTexture();
+						initBGTexture(dc);
 					}
 
 					final double width = this.getScaledBGWidth();
@@ -346,7 +348,7 @@ public class StatusLayer extends AbstractLayer implements PositionListener, Rend
 
 						if (iconTexture != null) {
 							gl.glEnable(GL.GL_TEXTURE_2D);
-							iconTexture.bind();
+							iconTexture.bind(gl);
 							gl.glColor4d(1d, 1d, 1d, this.getOpacity());
 							gl.glEnable(GL.GL_BLEND);
 							gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
@@ -361,11 +363,11 @@ public class StatusLayer extends AbstractLayer implements PositionListener, Rend
 			}
 		} finally {
 			if (projectionPushed) {
-				gl.glMatrixMode(GL.GL_PROJECTION);
+				gl.glMatrixMode(GL2.GL_PROJECTION);
 				gl.glPopMatrix();
 			}
 			if (modelviewPushed) {
-				gl.glMatrixMode(GL.GL_MODELVIEW);
+				gl.glMatrixMode(GL2.GL_MODELVIEW);
 				gl.glPopMatrix();
 			}
 			if (attribsPushed) {
@@ -382,9 +384,9 @@ public class StatusLayer extends AbstractLayer implements PositionListener, Rend
 										final Vec4 origin,
 										final Dimension dimension,
 										final Color color) {
-		final GL gl = dc.getGL();
+		final GL2 gl = dc.getGL().getGL2(); // GL initialization checks for GL2 compatibility.
 		gl.glColor4ub((byte) color.getRed(), (byte) color.getGreen(), (byte) color.getBlue(), (byte) color.getAlpha());
-		gl.glBegin(GL.GL_POLYGON);
+		gl.glBegin(GL2.GL_POLYGON);
 		gl.glVertex3d(origin.x, origin.y, 0);
 		gl.glVertex3d(origin.x + dimension.getWidth(), origin.y, 0);
 		gl.glVertex3d(origin.x + dimension.getWidth(), origin.y + dimension.getHeight(), 0);
@@ -477,7 +479,7 @@ public class StatusLayer extends AbstractLayer implements PositionListener, Rend
 		previousPos = newPos;
 	}
 
-	private void initBGTexture() {
+	private void initBGTexture(final DrawContext dc) {
 		try {
 			InputStream iconStream = this.getClass().getResourceAsStream("/" + iconFilePath_bg);
 			if (iconStream == null) {
@@ -487,8 +489,9 @@ public class StatusLayer extends AbstractLayer implements PositionListener, Rend
 				}
 			}
 
-			iconTexture = TextureIO.newTexture(iconStream, false, null);
-			iconTexture.bind();
+			final TextureData textureData = OGLUtil.newTextureData(dc.getGL().getGLProfile(), iconStream, false);
+			iconTexture = TextureIO.newTexture(textureData);
+			iconTexture.bind(dc.getGL());
 			this.bgWidth = iconTexture.getWidth();
 			this.bgHeight = iconTexture.getHeight();
 		} catch (final IOException e) {
@@ -507,6 +510,7 @@ public class StatusLayer extends AbstractLayer implements PositionListener, Rend
 		if (UNIT_IMPERIAL.equals(elevationUnit)) {
 			return String.format("%s %,d feet", elev, (int) Math.round(WWMath.convertMetersToFeet(metersElevation)));
 		} else {
+			// Default to metric units.
 			return String.format("%s %,d meters", elev, (int) Math.round(metersElevation));
 		}
 	}
@@ -516,6 +520,7 @@ public class StatusLayer extends AbstractLayer implements PositionListener, Rend
 		if (UNIT_IMPERIAL.equals(elevationUnit)) {
 			return String.format("%s %,d mi", altitude, (int) Math.round(WWMath.convertMetersToMiles(metersAltitude)));
 		} else {
+			// Default to metric units.
 
 			if (metersAltitude >= 10000) {
 				return String.format("%s %,d km", altitude, (int) Math.round(metersAltitude / 1e3));

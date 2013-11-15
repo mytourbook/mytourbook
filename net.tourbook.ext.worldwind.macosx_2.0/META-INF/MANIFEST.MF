@@ -1,0 +1,8 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: World Wind Resources
+Bundle-SymbolicName: net.tourbook.ext.worldwind.macosx_2.0;singleton:=true
+Bundle-Version: 2.0.0.rev1721
+Bundle-Vendor: NASA World Wind
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Fragment-Host: net.tourbook.ext.worldwind_2.0;bundle-version="2.0.0"
