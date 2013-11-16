@@ -38,6 +38,8 @@ public class Messages extends NLS {
 	public static String		Default_Layer_Stars;
 	public static String		Default_Layer_USGS_UrbanArea;
 	public static String		Default_Layer_WMS_BingImagery;
+
+	public static String	Default_Layer_WMS_EarthAtNight;
 	public static String		Default_Layer_WMS_i_cubed_Landsat;
 	public static String		Default_Layer_WMS_NASABlueMarble2004;
 	public static String		Default_Layer_WMS_OpenStreetMap;

@@ -71,17 +71,15 @@ import org.osgi.framework.Version;
 
 public class Map3Manager {
 
-	static final int									WW_DEFAULT_LAYER_ID				= 1;
-
-	public static final String							PROPERTY_NAME_ENABLED			= "Enabled";														//$NON-NLS-1$
-
-	private static final String							MAP3_LAYER_STRUCTURE_FILE_NAME	= "map3-layers.xml";												//$NON-NLS-1$
-
 	/**
 	 * This version number is incremented, when structural changes (e.g. new category) are done.
 	 * When this happens, the <b>default</b> structure is created.
 	 */
-	private static final int							MAP3_LAYER_STRUCTURE_VERSION	= 9;
+	private static final int							MAP3_LAYER_STRUCTURE_VERSION	= 12;
+
+	public static final String							PROPERTY_NAME_ENABLED			= "Enabled";														//$NON-NLS-1$
+
+	private static final String							MAP3_LAYER_STRUCTURE_FILE_NAME	= "map3-layers.xml";												//$NON-NLS-1$
 
 	private static final String							ATTR_MAP3_LAYER_VERSION			= "map3LayerVersion";												//$NON-NLS-1$
 
@@ -178,7 +176,7 @@ public class Map3Manager {
 
 //			when this is fixed with...
 
-			SWT_AWT.embeddedFrameClass = "sun.lwawt.macosx.CViewEmbeddedFrame";
+			SWT_AWT.embeddedFrameClass = "sun.lwawt.macosx.CViewEmbeddedFrame"; //$NON-NLS-1$
 
 //			...this error occures
 
@@ -208,7 +206,7 @@ public class Map3Manager {
 		 * This needs to be set, because the jogl selfexpanded native libraries are not found, so
 		 * they are packacked into platform specific plugins.
 		 */
-		System.setProperty("jogamp.gluegen.UseTempJarCache", Boolean.FALSE.toString());
+		System.setProperty("jogamp.gluegen.UseTempJarCache", Boolean.FALSE.toString()); //$NON-NLS-1$
 //java.lang.UnsatisfiedLinkError: Can't load library: C:\E\e-3.8.2-32\eclipse\gluegen-rt.dll
 //	at java.lang.ClassLoader.loadLibrary(ClassLoader.java:1854)
 //	at java.lang.Runtime.load0(Runtime.java:795)
@@ -283,11 +281,7 @@ public class Map3Manager {
 		// get default layer
 		_wwDefaultLocaleLayers = wwModel.getLayers();
 
-//		System.out.println(UI.timeStampNano() + " Map3 layer");
-//		for (final Layer layer : _wwDefaultLocaleLayers) {
-//			System.out.println(UI.timeStampNano() + "\t" + layer);
-//		}
-//		// TODO remove SYSTEM.OUT.PRINTLN
+//		dumpLayer(_wwDefaultLocaleLayers);
 
 		// create custom layer BEFORE state is applied and xml file is read which references these layers
 		createLayer_MT_TourTracks();
@@ -549,6 +543,7 @@ public class Map3Manager {
 				createLayerXml_120_DefaultLayer(xmlCategoryMap, false, MapDefaultLayer.ID_USGS_URBAN_AREA_ORTHO);
 				createLayerXml_120_DefaultLayer(xmlCategoryMap, true, MapDefaultLayer.ID_POLITICAL_BOUNDARIES);
 				createLayerXml_120_DefaultLayer(xmlCategoryMap, false, MapDefaultLayer.ID_OPEN_STREET_MAP);
+				createLayerXml_120_DefaultLayer(xmlCategoryMap, false, MapDefaultLayer.ID_EARTH_AT_NIGHT);
 			}
 
 			/*
@@ -695,19 +690,22 @@ public class Map3Manager {
 
 	static void dumpLayer(final LayerList layers) {
 
+		System.out.println(UI.timeStampNano() + " [" + Map3Manager.class.getSimpleName() + "] WW Layers"); //$NON-NLS-1$ //$NON-NLS-2$
+		// TODO remove SYSTEM.OUT.PRINTLN
+
 		for (final Layer layer : layers) {
 
 			final String name = layer.getName();
 
-			final double minActiveAltitude = layer.getMinActiveAltitude();
-			final double maxActiveAltitude = layer.getMaxActiveAltitude();
+//			final double minActiveAltitude = layer.getMinActiveAltitude();
+//			final double maxActiveAltitude = layer.getMaxActiveAltitude();
 
-			System.out.println();
-			System.out.println(" layer: " + layer.getClass().getName() + "\t" + name); //$NON-NLS-1$ //$NON-NLS-2$
-			System.out.println(" \tMinMax altitude:\t" //$NON-NLS-1$
-					+ UI.FormatDoubleMinMax(minActiveAltitude)
-					+ ("\t" + UI.FormatDoubleMinMax(maxActiveAltitude))); //$NON-NLS-1$
-			// TODO remove SYSTEM.OUT.PRINTLN
+//			System.out.println();
+			System.out.println(String.format("\t%-60s %s", layer.getClass().getName(), name)); //$NON-NLS-1$
+//			System.out.println(" \tMinMax altitude:\t" //$NON-NLS-1$
+//					+ UI.FormatDoubleMinMax(minActiveAltitude)
+//					+ ("\t" + UI.FormatDoubleMinMax(maxActiveAltitude))); //$NON-NLS-1$
+//			// TODO remove SYSTEM.OUT.PRINTLN
 
 //			if (layer instanceof WMSTiledImageLayer) {
 //
@@ -717,27 +715,6 @@ public class Map3Manager {
 //				System.out.println(" \tScale\t\t\t" + wmsLayer.getScale());
 //			}
 
-//			for (final Entry<String, Object> layerEntry : layer.getEntries()) {
-//
-//				final Object layerEntryValue = layerEntry.getValue();
-//
-//				System.out.println(" \t" + layerEntry.getKey() + "\t" + layerEntryValue);
-//				// TODO remove SYSTEM.OUT.PRINTLN
-//
-//				if (layerEntryValue instanceof AVList) {
-//
-//					final AVList avList = (AVList) layerEntryValue;
-//
-//					for (final Entry<String, Object> avListEntry : avList.getEntries()) {
-//
-//						System.out.println(" \t\t"
-//								+ String.format("%-60s", avListEntry.getKey())
-//								+ "\t"
-//								+ avListEntry.getValue());
-//						// TODO remove SYSTEM.OUT.PRINTLN
-//					}
-//				}
-//			}
 		}
 	}
 

@@ -220,7 +220,7 @@ public class TourTrackConfigManager {
 	private static final String						TAG_ALTITUDE								= "altitude";										//$NON-NLS-1$
 	private static final String						ATTR_ALTITUDE_MODE							= "altitudeMode";									//$NON-NLS-1$
 	private static final String						ATTR_IS_ABSOLUTE_OFFSET						= "isAbsoluteOffset";								//$NON-NLS-1$
-	private static final String						ATTR_IS_ABSOLUTE_OFFSET_RANDOM				= "isAbsoluteOffsetRandom";
+	private static final String						ATTR_IS_ABSOLUTE_OFFSET_RANDOM				= "isAbsoluteOffsetRandom"; //$NON-NLS-1$
 	private static final String						ATTR_ALTITUDE_OFFSET_MODE					= "offsetMode";									//$NON-NLS-1$
 	private static final String						ATTR_ALTITUDE_OFFSET_ABSOLUTE				= "absoluteOffset";								//$NON-NLS-1$
 	private static final String						ATTR_ALTITUDE_OFFSET_RELATIVE				= "relativeOffset";								//$NON-NLS-1$

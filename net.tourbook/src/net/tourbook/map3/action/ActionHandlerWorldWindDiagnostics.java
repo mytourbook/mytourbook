@@ -20,7 +20,8 @@ import gov.nasa.worldwind.awt.WorldWindowGLCanvas;
 import java.util.Map;
 
 import javax.media.opengl.GL;
-import javax.media.opengl.GLCapabilities;
+import javax.media.opengl.GL2;
+import javax.media.opengl.GLCapabilitiesImmutable;
 
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
@@ -51,15 +52,15 @@ public class ActionHandlerWorldWindDiagnostics extends AbstractHandler {
 	private static final WorldWindowGLCanvas	_wwCanvas	= Map3Manager.getWWCanvas();
 
 	private static Attr[]						attrs		= new Attr[] {
-			new Attr(GL.GL_STENCIL_BITS, "stencil bits"), //$NON-NLS-1$
-			new Attr(GL.GL_DEPTH_BITS, "depth bits"), //$NON-NLS-1$
-			new Attr(GL.GL_MAX_TEXTURE_UNITS, "max texture units"), //$NON-NLS-1$
-			new Attr(GL.GL_MAX_TEXTURE_IMAGE_UNITS_ARB, "max texture image units"), //$NON-NLS-1$
-			new Attr(GL.GL_MAX_TEXTURE_COORDS_ARB, "max texture coords"), //$NON-NLS-1$
-			new Attr(GL.GL_MAX_TEXTURE_SIZE, "max texture size"), //$NON-NLS-1$
-			new Attr(GL.GL_MAX_ELEMENTS_INDICES, "max elements indices"), //$NON-NLS-1$
-			new Attr(GL.GL_MAX_ELEMENTS_VERTICES, "max elements vertices"), //$NON-NLS-1$
-			new Attr(GL.GL_MAX_LIGHTS, "max lights")		};										//$NON-NLS-1$
+			new Attr(GL2.GL_STENCIL_BITS, "stencil bits"), //$NON-NLS-1$
+			new Attr(GL2.GL_DEPTH_BITS, "depth bits"), //$NON-NLS-1$
+			new Attr(GL2.GL_MAX_TEXTURE_UNITS, "max texture units"), //$NON-NLS-1$
+			new Attr(GL2.GL_MAX_TEXTURE_IMAGE_UNITS_ARB, "max texture image units"), //$NON-NLS-1$
+			new Attr(GL2.GL_MAX_TEXTURE_COORDS_ARB, "max texture coords"), //$NON-NLS-1$
+			new Attr(GL2.GL_MAX_TEXTURE_SIZE, "max texture size"), //$NON-NLS-1$
+			new Attr(GL2.GL_MAX_ELEMENTS_INDICES, "max elements indices"), //$NON-NLS-1$
+			new Attr(GL2.GL_MAX_ELEMENTS_VERTICES, "max elements vertices"), //$NON-NLS-1$
+			new Attr(GL2.GL_MAX_LIGHTS, "max lights")		};										//$NON-NLS-1$
 
 	private static class Attr {
 
@@ -147,7 +148,7 @@ public class ActionHandlerWorldWindDiagnostics extends AbstractHandler {
 
 			final GL gl = _wwCanvas.getGL();
 
-			final GLCapabilities caps = _wwCanvas.getChosenGLCapabilities();
+			final GLCapabilitiesImmutable caps = _wwCanvas.getChosenGLCapabilities();
 
 			sb.append(UI.NEW_LINE3);
 			sb.append("OpenGL Values"); //$NON-NLS-1$

@@ -41,7 +41,7 @@
       <import plugin="net.tourbook.device"/>
       <import plugin="net.tourbook.photo"/>
       <import plugin="net.tourbook.ext.rxtx_2.2"/>
-      <import plugin="net.tourbook.ext.worldwind_1.5"/>
+      <import plugin="net.tourbook.ext.worldwind_2.0"/>
    </requires>
 
    <plugin

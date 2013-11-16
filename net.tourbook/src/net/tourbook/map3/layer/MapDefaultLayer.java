@@ -47,6 +47,34 @@ public class MapDefaultLayer {
 //	Scale bar						gov.nasa.worldwind.layers.ScalebarLayer					true
 //	Compass							gov.nasa.worldwind.layers.CompassLayer					true
 
+//	 *     <Layer className="gov.nasa.worldwind.layers.StarsLayer">
+//	 *         <!--Individual properties can be specified within Layer entries, like this:-->
+//	 *         <Property name="Name" value="Stars"/>
+//	 *     </Layer>
+//	 *     <Layer className="gov.nasa.worldwind.layers.SkyGradientLayer"/>
+//	 *     <Layer className="gov.nasa.worldwind.layers.Earth.BMNGOneImage">
+//	 *         <Property name="MinActiveAltitude" value="3e6"/>
+//	 *     </Layer>
+//	 *     <Layer href="config/Earth/BMNGWMSLayer2.xml" actuate="onLoad"/>
+//	 *     <Layer href="config/Earth/LandsatI3WMSLayer2.xml" actuate="onLoad"/>
+//	 *     <Layer href="config/Earth/USDANAIPWMSImageLayer.xml" actuate="onRequest"/>
+//	 *     <Layer href="config/Earth/USDANAIPUSGSWMSImageLayer.xml" actuate="onRequest"/>
+//	 *     <Layer href="config/Earth/MSVirtualEarthAerialLayer.xml" actuate="onRequest"/>
+//	 *     <Layer href="config/Earth/BingImagery.xml" actuate="onRequest"/>
+//	 *     <Layer href="config/Earth/USGSTopoLowResLayer.xml" actuate="onRequest"/>
+//	 *     <Layer href="config/Earth/USGSTopoMedResLayer.xml" actuate="onRequest"/>
+//	 *     <Layer href="config/Earth/USGSTopoHighResLayer.xml" actuate="onRequest"/>
+//	 *     <Layer href="config/Earth/USGSUrbanAreaOrthoLayer.xml" actuate="onRequest"/>
+//	 *     <!--<Layer className="gov.nasa.worldwind.layers.Earth.OSMMapnikLayer" actuate="onRequest"/>-->
+//	 *     <!--<Layer className="gov.nasa.worldwind.layers.Earth.OSMCycleMapLayer" actuate="onRequest"/>-->
+//	 *     <Layer className="gov.nasa.worldwind.layers.Earth.CountryBoundariesLayer" actuate="onRequest"/>
+//	 *     <Layer href="config/Earth/OpenStreetMap.xml" actuate="onRequest"/>
+//	 *     <Layer href="config/Earth/EarthAtNightLayer.xml" actuate="onRequest"/>
+//	 *     <Layer className="gov.nasa.worldwind.layers.Earth.NASAWFSPlaceNameLayer"/>
+//	 *     <Layer className="gov.nasa.worldwind.layers.WorldMapLayer"/>
+//	 *     <Layer className="gov.nasa.worldwind.layers.ScalebarLayer"/>
+//	 *     <Layer className="gov.nasa.worldwind.layers.CompassLayer"/>
+
 	/**
 	 * <code>
 	 * 
@@ -58,7 +86,7 @@ public class MapDefaultLayer {
 	 * 		Étoiles
 	 * 		Atmosphère
 	 * 		NASA Blue Marble Image
-	 * 		Blue Marble (WMS) 2004
+	 * 		Blue Marble May 2004
 	 * 		i-cubed Landsat
 	 * 		USDA NAIP
 	 * 		USDA NAIP USGS
@@ -70,6 +98,7 @@ public class MapDefaultLayer {
 	 * 		USGS Urban Area Ortho
 	 * 		Political Boundaries
 	 * 		Open Street Map
+	 * 		Earth at Night
 	 * 
 	 * 		Toponymes
 	 * 		Carte du monde
@@ -86,7 +115,7 @@ public class MapDefaultLayer {
 	 * 		Stars
 	 * 		Atmosphere
 	 * 		NASA Blue Marble Image
-	 * 		Blue Marble (WMS) 2004
+	 * 		Blue Marble May 2004
 	 * 		i-cubed Landsat
 	 * 		USDA NAIP
 	 * 		USDA NAIP USGS
@@ -98,6 +127,7 @@ public class MapDefaultLayer {
 	 * 		USGS Urban Area Ortho
 	 * 		Political Boundaries
 	 * 		Open Street Map
+	 * 		Earth at Night
 	 * 
 	 * 		Place Names
 	 * 		World Map
@@ -106,6 +136,7 @@ public class MapDefaultLayer {
 	 * 
 	 * </code>
 	 */
+
 	/*
 	 * default layer id's
 	 */
@@ -113,7 +144,7 @@ public class MapDefaultLayer {
 	public static final String							ID_ATMOSPHERE					= getNormalizedLayerKey("Atmosphere");						//$NON-NLS-1$
 
 	public static final String							ID_NASA_BLUE_MARBLE_IMAGE		= getNormalizedLayerKey("NASA Blue Marble Image");			//$NON-NLS-1$
-	public static final String							ID_BLUE_MARBLE_WMS_2004			= getNormalizedLayerKey("Blue Marble (WMS) 2004");			//$NON-NLS-1$
+	public static final String							ID_BLUE_MARBLE_WMS_2004			= getNormalizedLayerKey("Blue Marble May 2004");			//$NON-NLS-1$
 	public static final String							ID_I_CUBED_LANDSAT				= getNormalizedLayerKey("i-cubed Landsat");				//$NON-NLS-1$
 	public static final String							ID_USDA_NAIP					= getNormalizedLayerKey("USDA NAIP");						//$NON-NLS-1$
 	public static final String							ID_USDA_NAIP_USGS				= getNormalizedLayerKey("USDA NAIP USGS");					//$NON-NLS-1$
@@ -126,6 +157,7 @@ public class MapDefaultLayer {
 	public static final String							ID_USGS_URBAN_AREA_ORTHO		= getNormalizedLayerKey("USGS Urban Area Ortho");			//$NON-NLS-1$
 
 	public static final String							ID_OPEN_STREET_MAP				= getNormalizedLayerKey("Open Street Map");				//$NON-NLS-1$
+	public static final String							ID_EARTH_AT_NIGHT				= getNormalizedLayerKey("Earth at Night");					//$NON-NLS-1$
 
 	public static final String							ID_POLITICAL_BOUNDARIES			= getNormalizedLayerKey("Political Boundaries");			//$NON-NLS-1$
 	public static final String							ID_PLACE_NAMES					= getNormalizedLayerKey("Place Names");					//$NON-NLS-1$
@@ -161,7 +193,7 @@ public class MapDefaultLayer {
 			_wwLocaleLayerNames.put(ID_ATMOSPHERE, "Atmosphère"); //$NON-NLS-1$
 
 			_wwLocaleLayerNames.put(ID_NASA_BLUE_MARBLE_IMAGE, "NASA Blue Marble Image"); //$NON-NLS-1$
-			_wwLocaleLayerNames.put(ID_BLUE_MARBLE_WMS_2004, "Blue Marble (WMS) 2004"); //$NON-NLS-1$
+			_wwLocaleLayerNames.put(ID_BLUE_MARBLE_WMS_2004, "Blue Marble May 2004"); //$NON-NLS-1$
 			_wwLocaleLayerNames.put(ID_I_CUBED_LANDSAT, "i-cubed Landsat"); //$NON-NLS-1$
 			_wwLocaleLayerNames.put(ID_USDA_NAIP, "USDA NAIP"); //$NON-NLS-1$
 			_wwLocaleLayerNames.put(ID_USDA_NAIP_USGS, "USDA NAIP USGS"); //$NON-NLS-1$
@@ -174,6 +206,7 @@ public class MapDefaultLayer {
 			_wwLocaleLayerNames.put(ID_USGS_URBAN_AREA_ORTHO, "USGS Urban Area Ortho"); //$NON-NLS-1$
 
 			_wwLocaleLayerNames.put(ID_OPEN_STREET_MAP, "Open Street Map"); //$NON-NLS-1$
+			_wwLocaleLayerNames.put(ID_EARTH_AT_NIGHT, "Earth at Night"); //$NON-NLS-1$
 
 			_wwLocaleLayerNames.put(ID_POLITICAL_BOUNDARIES, "Political Boundaries"); //$NON-NLS-1$
 			_wwLocaleLayerNames.put(ID_PLACE_NAMES, "Toponymes"); //$NON-NLS-1$
@@ -202,6 +235,7 @@ public class MapDefaultLayer {
 			_wwLocaleLayerNames.put(ID_USGS_URBAN_AREA_ORTHO, ID_USGS_URBAN_AREA_ORTHO);
 
 			_wwLocaleLayerNames.put(ID_OPEN_STREET_MAP, ID_OPEN_STREET_MAP);
+			_wwLocaleLayerNames.put(ID_EARTH_AT_NIGHT, ID_EARTH_AT_NIGHT);
 
 			_wwLocaleLayerNames.put(ID_POLITICAL_BOUNDARIES, ID_POLITICAL_BOUNDARIES);
 			_wwLocaleLayerNames.put(ID_PLACE_NAMES, ID_PLACE_NAMES);
@@ -254,6 +288,9 @@ public class MapDefaultLayer {
 
 		_wwDefaultLayer.put(ID_OPEN_STREET_MAP, //
 				new DefaultLayer(ID_OPEN_STREET_MAP, Messages.Default_Layer_WMS_OpenStreetMap));
+
+		_wwDefaultLayer.put(ID_EARTH_AT_NIGHT, //
+				new DefaultLayer(ID_EARTH_AT_NIGHT, Messages.Default_Layer_WMS_EarthAtNight));
 
 		_wwDefaultLayer.put(ID_PLACE_NAMES, new DefaultLayer(ID_PLACE_NAMES, Messages.Default_Layer_PlaceNames));
 		_wwDefaultLayer.put(ID_WORLD_MAP, new DefaultLayer(ID_WORLD_MAP, Messages.Default_Layer_WorldMap));
