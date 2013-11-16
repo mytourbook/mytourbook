@@ -137,6 +137,8 @@ public class TrackPathOptimized extends MTMultiResolutionPath implements ITrackP
 			}
 		}
 
+		altitudeOffset *= dc.getVerticalExaggeration();
+
 		final List<Color> tessellatedColors = pathData.getTessellatedColors();
 
 		final int numPoints = this.isExtrude() ? 2 * positions.size() : positions.size();
@@ -210,11 +212,7 @@ public class TrackPathOptimized extends MTMultiResolutionPath implements ITrackP
 		final Vec4 referencePoint = pathData.getReferencePoint();
 
 		// vertical exaggeration
-		double verticalExaggeration = 1;
-		final boolean isVerticalExaggeration = dc.getVerticalExaggeration() != 1;
-		if (isVerticalExaggeration) {
-			verticalExaggeration = dc.getVerticalExaggeration();
-		}
+		final double verticalExaggeration = dc.getVerticalExaggeration();
 
 		final TourTrackConfig config = TourTrackConfigManager.getActiveConfig();
 
@@ -222,6 +220,7 @@ public class TrackPathOptimized extends MTMultiResolutionPath implements ITrackP
 		final double altitudeOffset = Map3View.getAltitudeOffset(dc.getView().getEyePosition());
 
 		final double poleHeight = pathData.getEyeDistance() / (100.0 / config.directionArrowDistance * 1.5);
+//		poleHeight *= verticalExaggeration;
 
 		for (int posIndex = 0; posIndex < positionSize; posIndex++) {
 
@@ -230,7 +229,7 @@ public class TrackPathOptimized extends MTMultiResolutionPath implements ITrackP
 				_arrowPositionIndizes.add(posIndex);
 
 				final Position geoPosition = positions.get(posIndex);
-				final double trackAltitude = (geoPosition.getAltitude() * verticalExaggeration) + altitudeOffset;
+				final double trackAltitude = (geoPosition.getAltitude() + altitudeOffset) * verticalExaggeration;
 
 				// create arrow position vertex
 				Vec4 pt;
@@ -479,10 +478,10 @@ public class TrackPathOptimized extends MTMultiResolutionPath implements ITrackP
 						.getGL()
 						.getGL2()
 						.glColor4ub(
-						(byte) solidColor.getRed(),
-						(byte) solidColor.getGreen(),
-						(byte) solidColor.getBlue(),
-						(byte) solidColor.getAlpha());
+								(byte) solidColor.getRed(),
+								(byte) solidColor.getGreen(),
+								(byte) solidColor.getBlue(),
+								(byte) solidColor.getAlpha());
 			}
 
 			super.doDrawInteriorVBO(dc, vboIds, pathData);

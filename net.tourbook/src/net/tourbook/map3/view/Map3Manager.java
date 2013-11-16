@@ -198,6 +198,8 @@ public class Map3Manager {
 //	at java.awt.EventQueue$3.run(EventQueue.java:694)
 //	at java.awt.EventQueue$3.run(EventQueue.java:692)
 
+// 			This error has been fixed by moving from WWJ 1.5 to 2.0
+
 		} else if (Configuration.isWindowsOS()) {
 			System.setProperty("sun.awt.noerasebackground", "true"); // prevents flashing during window resizing //$NON-NLS-1$ //$NON-NLS-2$
 		}
