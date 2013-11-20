@@ -1838,7 +1838,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 
 		final ChartSliderLayer chartSliderLayer = getChartSliderLayer();
 
-		if (tourData == null) {
+		if (tourData == null || tourData.latitudeSerie == null) {
 
 			chartSliderLayer.setSliderVisible(false);
 
@@ -2104,8 +2104,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 		System.out.println(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] \t"); //$NON-NLS-1$ //$NON-NLS-2$
 
 		for (final PerformanceStatistic stat : pfs) {
-			System.out.println(UI.timeStampNano()
-					+ " [" //$NON-NLS-1$
+			System.out.println(UI.timeStampNano() + " [" //$NON-NLS-1$
 					+ getClass().getSimpleName()
 					+ "] \t" //$NON-NLS-1$
 					+ String.format("%10s  %s", stat.getValue(), stat.getDisplayString())); //$NON-NLS-1$

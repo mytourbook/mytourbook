@@ -513,6 +513,13 @@ public class ChartComponentAxis extends Canvas {
 
 		draw_00_AxisImage();
 
+		if (_axisImage == null) {
+
+			// this case happened
+
+			return;
+		}
+
 		gc.drawImage(_axisImage, 0, 0);
 	}
 
