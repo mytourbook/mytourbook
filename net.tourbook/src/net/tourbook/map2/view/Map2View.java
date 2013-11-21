@@ -90,7 +90,6 @@ import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourInfoToolTipProvider;
 import net.tourbook.tour.TourManager;
 import net.tourbook.training.TrainingManager;
-import net.tourbook.ui.MTRectangle;
 import net.tourbook.ui.views.tourCatalog.SelectionTourCatalogView;
 import net.tourbook.ui.views.tourCatalog.TVICatalogComparedTour;
 import net.tourbook.ui.views.tourCatalog.TVICatalogRefTourItem;
@@ -1133,7 +1132,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 
 		final int zoom = _map.getZoom();
 
-		final Rectangle positionRect = getPositionRect(positionBounds, zoom);
+		final Rectangle positionRect = _map.getPositionRect(positionBounds, zoom);
 
 		final Point center = new Point(//
 				positionRect.x + positionRect.width / 2,
@@ -1171,7 +1170,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 				positionBounds.add(_poiPosition);
 			}
 
-			final Rectangle positionRect = getPositionRect(positionBounds, zoom);
+			final Rectangle positionRect = _map.getPositionRect(positionBounds, zoom);
 
 			final Point center = new Point(//
 					positionRect.x + positionRect.width / 2,
@@ -1766,20 +1765,6 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 		mapPositions.add(new GeoPosition(maxLatitude, maxLongitude));
 
 		return mapPositions;
-	}
-
-	private Rectangle getPositionRect(final Set<GeoPosition> positions, final int zoom) {
-
-		final MP mp = _map.getMapProvider();
-		final Point point1 = mp.geoToPixel(positions.iterator().next(), zoom);
-		final MTRectangle mtRect = new MTRectangle(point1.x, point1.y, 0, 0);
-
-		for (final GeoPosition pos : positions) {
-			final Point point = mp.geoToPixel(pos, zoom);
-			mtRect.add(point.x, point.y);
-		}
-
-		return new Rectangle(mtRect.x, mtRect.y, mtRect.width, mtRect.height);
 	}
 
 	private Set<GeoPosition> getTourBounds(final ArrayList<TourData> tourDataList) {
@@ -2873,7 +2858,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 	 *            when <code>true</code> the zoom level will be adjusted to user settings
 	 */
 	private void setBoundsZoomLevel(final Set<GeoPosition> positions, final boolean isAdjustZoomLevel) {
-		a = 0;
+
 		if ((positions == null) || (positions.size() < 2)) {
 			return;
 		}
@@ -2883,7 +2868,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 		final int maximumZoomLevel = mp.getMaximumZoomLevel();
 		int zoom = mp.getMinimumZoomLevel();
 
-		Rectangle positionRect = getPositionRect(positions, zoom);
+		Rectangle positionRect = _map.getPositionRect(positions, zoom);
 		Rectangle viewport = _map.getWorldPixelViewport();
 
 		// zoom in until the tour is larger than the viewport
@@ -2904,7 +2889,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 			}
 			_map.setZoom(zoom);
 
-			positionRect = getPositionRect(positions, zoom);
+			positionRect = _map.getPositionRect(positions, zoom);
 			viewport = _map.getWorldPixelViewport();
 		}
 

@@ -29,6 +29,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
@@ -50,6 +51,7 @@ import net.tourbook.data.TourWayPoint;
 import net.tourbook.map2.view.WayPointToolTipProvider;
 import net.tourbook.ui.IInfoToolTipProvider;
 import net.tourbook.ui.IMapToolTipProvider;
+import net.tourbook.ui.MTRectangle;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -1044,6 +1046,43 @@ public class Map extends Canvas {
 		return _addressLocation;
 	}
 
+	/**
+	 * Parse bounding box string.
+	 * 
+	 * @param boundingBox
+	 * @return Returns a set with bounding box positions or <code>null</code> when boundingBox
+	 *         cannot be parsed.
+	 */
+	private Set<GeoPosition> getBoundingBoxPositions(final String boundingBox) {
+
+// example
+//		"48.4838981628418,48.5500030517578,9.02030849456787,9.09173774719238"
+
+		final String[] boundingBoxValues = boundingBox.split(",");
+
+		if (boundingBoxValues.length != 4) {
+			return null;
+		}
+
+		try {
+
+			final Set<GeoPosition> positions = new HashSet<GeoPosition>();
+
+			positions.add(new GeoPosition(//
+					Double.parseDouble(boundingBoxValues[0]),
+					Double.parseDouble(boundingBoxValues[2])));
+
+			positions.add(new GeoPosition(//
+					Double.parseDouble(boundingBoxValues[1]),
+					Double.parseDouble(boundingBoxValues[3])));
+
+			return positions;
+
+		} catch (final Exception e) {
+			return null;
+		}
+	}
+
 	public Rectangle getBoundingRect(final Set<GeoPosition> positions, final int zoom) {
 
 		final java.awt.Point geoPixel = _mp.geoToPixel(positions.iterator().next(), zoom);
@@ -1152,6 +1191,21 @@ public class Map extends Canvas {
 		return _poiTT;
 	}
 
+	public Rectangle getPositionRect(final Set<GeoPosition> positions, final int zoom) {
+
+		// set first point
+		final java.awt.Point point1 = _mp.geoToPixel(positions.iterator().next(), zoom);
+		final MTRectangle mtRect = new MTRectangle(point1.x, point1.y, 0, 0);
+
+		// set 2..n points
+		for (final GeoPosition pos : positions) {
+			final java.awt.Point point = _mp.geoToPixel(pos, zoom);
+			mtRect.add(point.x, point.y);
+		}
+
+		return new Rectangle(mtRect.x, mtRect.y, mtRect.width, mtRect.height);
+	}
+
 	/**
 	 * Returns the bounds of the viewport in pixels. This can be used to transform points into the
 	 * world bitmap coordinate space. The viewport is the part of the map, that you can currently
@@ -1199,12 +1253,54 @@ public class Map extends Canvas {
 	 * @return Returns zoom level or -1 when bounding box is <code>null</code>.
 	 */
 	public int getZoom(final String boundingBox) {
-		
+
+		// original: setBoundsZoomLevel
+
 		if (boundingBox == null) {
 			return -1;
 		}
-		
-		return _mp.;
+
+		final Set<GeoPosition> positions = getBoundingBoxPositions(boundingBox);
+		if (positions == null) {
+			return -1;
+		}
+
+		final MP mp = getMapProvider();
+
+		final int maximumZoomLevel = mp.getMaximumZoomLevel();
+		int zoom = mp.getMinimumZoomLevel();
+
+		Rectangle positionRect = getPositionRect(positions, zoom);
+		Rectangle viewport = getWorldPixelViewport();
+
+		// zoom in until bounding box is larger than the viewport
+		while ((positionRect.width < viewport.width) && (positionRect.height < viewport.height)) {
+
+			// center position in the map
+			final java.awt.Point center = new java.awt.Point(//
+					positionRect.x + positionRect.width / 2,
+					positionRect.y + positionRect.height / 2);
+
+			setMapCenter(mp.pixelToGeo(center, zoom));
+
+			zoom++;
+
+			// check zoom level
+			if (zoom >= maximumZoomLevel) {
+				break;
+			}
+			setZoom(zoom);
+
+			positionRect = getPositionRect(positions, zoom);
+			viewport = getWorldPixelViewport();
+		}
+
+		// the algorithm generated a larger zoom level as necessary
+		zoom--;
+
+		setZoom(zoom);
+
+		return zoom;
 	}
 
 	private void hideHoveredArea() {
@@ -3827,15 +3923,18 @@ public class Map extends Canvas {
 
 		_isPoiVisible = true;
 
-		final PoiToolTip poi = getPoi();
-		poi.geoPosition = poiGeoPosition;
-		poi.setText(poiText);
+		final PoiToolTip poiToolTip = getPoi();
+		poiToolTip.geoPosition = poiGeoPosition;
+		poiToolTip.setText(poiText);
 
 		setZoom(zoomLevel);
 
 		_isPoiPositionInViewport = updatePoiImageDevPosition();
 
 		if (_isPoiPositionInViewport == false) {
+
+			// recenter map only when poi is not visible
+
 			setMapCenter(poiGeoPosition);
 		}
 
