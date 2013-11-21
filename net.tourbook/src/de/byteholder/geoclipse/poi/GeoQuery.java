@@ -18,7 +18,7 @@ public class GeoQuery extends Observable implements Runnable {
 
 //	private final static String			URL	= 			"http://www.frankieandshadow.com/osm/search.xml?find="; //$NON-NLS-1$
 //	private final static String			SEARCH_URL		= "http://gazetteer.openstreetmap.org/namefinder/search.xml?find="; //$NON-NLS-1$
-	private final static String			SEARCH_URL		= "http://nominatim.openstreetmap.org/search?format=xml&addressdetails=1&q=";	//$NON-NLS-1$
+	private final static String			SEARCH_URL		= "http://nominatim.openstreetmap.org/search?format=xml&addressdetails=0&q=";	//$NON-NLS-1$
 
 	private ArrayList<PointOfInterest>	_searchResult	= new ArrayList<PointOfInterest>();
 

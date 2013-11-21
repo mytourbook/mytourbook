@@ -33,11 +33,13 @@ public class GeoQuerySAXHandler extends DefaultHandler {
 
 	private static final String			ATTR_LAT			= "lat";			//$NON-NLS-1$
 	private static final String			ATTR_LON			= "lon";			//$NON-NLS-1$
-	private static final String			ATTR_NAME			= "name";			//$NON-NLS-1$
-	private static final String			ATTR_CATEGORY		= "category";		//$NON-NLS-1$
+//	private static final String			ATTR_NAME			= "name";			//$NON-NLS-1$
+	private static final String			ATTR_NAME			= "display_name";	//$NON-NLS-1$
+	private static final String			ATTR_CATEGORY		= "class";			//$NON-NLS-1$
 	private static final String			ATTR_INFO			= "info";			//$NON-NLS-1$
 	private static final String			ATTR_TYPE			= "type";			//$NON-NLS-1$
-	private static final String			ATTR_ZOOM			= "zoom";			//$NON-NLS-1$
+//	private static final String			ATTR_ZOOM			= "zoom";			//$NON-NLS-1$
+	private static final String			ATTR_BOUNDINGBOX	= "boundingbox";	//$NON-NLS-1$
 
 	private ArrayList<PointOfInterest>	_searchResult;
 
@@ -66,18 +68,18 @@ public class GeoQuerySAXHandler extends DefaultHandler {
 		}
 	}
 
-	private static int parseInt(final String textValue, final int defaultValue) {
-		try {
-			if (textValue != null) {
-				return Integer.parseInt(textValue);
-			} else {
-				return defaultValue;
-			}
-
-		} catch (final NumberFormatException e) {
-			return defaultValue;
-		}
-	}
+//	private static int parseInt(final String textValue, final int defaultValue) {
+//		try {
+//			if (textValue != null) {
+//				return Integer.parseInt(textValue);
+//			} else {
+//				return defaultValue;
+//			}
+//
+//		} catch (final NumberFormatException e) {
+//			return defaultValue;
+//		}
+//	}
 
 	private PointOfInterest createPOI(final Attributes attributes) {
 
@@ -89,10 +91,12 @@ public class GeoQuerySAXHandler extends DefaultHandler {
 		final String attrCategory = attributes.getValue(ATTR_CATEGORY);
 		final String attrInfo = attributes.getValue(ATTR_INFO);
 		final String attrType = attributes.getValue(ATTR_TYPE);
-		final String attrZoom = attributes.getValue(ATTR_ZOOM);
+//		final String attrZoom = attributes.getValue(ATTR_ZOOM);
+		final String attrBoundingBox = attributes.getValue(ATTR_BOUNDINGBOX);
 
 		poi.setPosition(new GeoPosition(parseDouble(attrLatitude, 0), parseDouble(attrLongitude, 0)));
-		poi.setRecommendedZoom(parseInt(attrZoom, 8));
+//		poi.setRecommendedZoom(parseInt(attrZoom, 8));
+		poi.setBoundingBox(attrBoundingBox);
 
 		poi.setName(attrName == null ? UI.EMPTY_STRING : attrName);
 		poi.setCategory(attrCategory == null ? UI.EMPTY_STRING : attrCategory);

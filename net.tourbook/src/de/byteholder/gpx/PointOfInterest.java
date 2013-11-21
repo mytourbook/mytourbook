@@ -21,9 +21,21 @@ public class PointOfInterest extends Waypoint implements ISelection {
 
 	private String						info;
 
-	private int							recommendedZoom	= -1;
+//	private int							recommendedZoom	= -1;
 
 	private List<? extends Waypoint>	nearestPlaces;
+
+	private String						_boundingBox;
+
+	/**
+	 * @return Returns bounding box of this POI or <code>null</code>, when not available.
+	 *         <p>
+	 *         e.g.
+	 *         boundingbox="48.4838981628418,48.5500030517578,9.02030849456787,9.09173774719238"
+	 */
+	public String getBoundingBox() {
+		return _boundingBox;
+	}
 
 	public String getCategory() {
 		return category;
@@ -33,23 +45,19 @@ public class PointOfInterest extends Waypoint implements ISelection {
 		return info;
 	}
 
+//	/**
+//	 * @return Return the recommended zoom level or -1 when the zoom level should not be changed
+//	 */
+//	public int getRecommendedZoom() {
+//		return recommendedZoom;
+//	}
+
 	public List<? extends Waypoint> getNearestPlaces() {
 		return nearestPlaces;
 	}
 
-	/**
-	 * @return Return the recommended zoom level or -1 when the zoom level should not be changed
-	 */
-	public int getRecommendedZoom() {
-		return recommendedZoom;
-	}
-
 	public boolean isEmpty() {
 		return false;
-	}
-
-	public void setCategory(final String category) {
-		this.category = category;
 	}
 
 //	public void setType(Type type) {
@@ -69,16 +77,24 @@ public class PointOfInterest extends Waypoint implements ISelection {
 //		}
 //	}
 
+	public void setBoundingBox(final String boundingBox) {
+		_boundingBox = boundingBox;
+	}
+
+	public void setCategory(final String category) {
+		this.category = category;
+	}
+
 	public void setInfo(final String info) {
 		this.info = info;
 	}
 
+//	public void setRecommendedZoom(final int recommendedZoom) {
+//		this.recommendedZoom = recommendedZoom;
+//	}
+
 	public void setNearestPlaces(final List<? extends Waypoint> nearestPlaces) {
 		this.nearestPlaces = nearestPlaces;
-	}
-
-	public void setRecommendedZoom(final int recommendedZoom) {
-		this.recommendedZoom = recommendedZoom;
 	}
 
 	@Override

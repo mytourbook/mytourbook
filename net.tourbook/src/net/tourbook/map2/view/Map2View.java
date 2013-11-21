@@ -2066,7 +2066,13 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 			_poiPosition = poi.getPosition();
 			_poiName = poi.getName();
 
-			_poiZoomLevel = poi.getRecommendedZoom();
+			final String boundingBox = poi.getBoundingBox();
+			if (boundingBox == null) {
+				_poiZoomLevel = _map.getZoom();
+			} else {
+				_poiZoomLevel = _map.getZoom(boundingBox);
+			}
+
 			if (_poiZoomLevel == -1) {
 				_poiZoomLevel = _map.getZoom();
 			}
@@ -2867,7 +2873,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 	 *            when <code>true</code> the zoom level will be adjusted to user settings
 	 */
 	private void setBoundsZoomLevel(final Set<GeoPosition> positions, final boolean isAdjustZoomLevel) {
-
+		a = 0;
 		if ((positions == null) || (positions.size() < 2)) {
 			return;
 		}

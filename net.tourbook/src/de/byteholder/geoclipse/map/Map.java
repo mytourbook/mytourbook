@@ -1045,8 +1045,9 @@ public class Map extends Canvas {
 	}
 
 	public Rectangle getBoundingRect(final Set<GeoPosition> positions, final int zoom) {
-		final java.awt.Point point1 = _mp.geoToPixel(positions.iterator().next(), zoom);
-		final Rectangle rect = new Rectangle(point1.x, point1.y, 0, 0);
+
+		final java.awt.Point geoPixel = _mp.geoToPixel(positions.iterator().next(), zoom);
+		final Rectangle rect = new Rectangle(geoPixel.x, geoPixel.y, 0, 0);
 
 		for (final GeoPosition pos : positions) {
 			final java.awt.Point point = _mp.geoToPixel(pos, zoom);
@@ -1191,6 +1192,19 @@ public class Map extends Canvas {
 	 */
 	public int getZoom() {
 		return _mapZoomLevel;
+	}
+
+	/**
+	 * @param boundingBox
+	 * @return Returns zoom level or -1 when bounding box is <code>null</code>.
+	 */
+	public int getZoom(final String boundingBox) {
+		
+		if (boundingBox == null) {
+			return -1;
+		}
+		
+		return _mp.;
 	}
 
 	private void hideHoveredArea() {
@@ -3582,40 +3596,6 @@ public class Map extends Canvas {
 		_isLiveView = isLiveView;
 	}
 
-	/**
-	 * Set the center of the map to a geo position (with lat/long) and redraw the map.
-	 * 
-	 * @param geoPosition
-	 *            Center position in lat/lon
-	 */
-	public void setMapCenter(final GeoPosition geoPosition) {
-
-		final java.awt.Point newMapCenter = _mp.geoToPixel(geoPosition, _mapZoomLevel);
-
-		if (Thread.currentThread() == _displayThread) {
-
-			setMapCenterInWorldPixel(newMapCenter);
-
-		} else {
-
-			// current thread is not the display thread
-
-			_display.syncExec(new Runnable() {
-				@Override
-				public void run() {
-					if (!isDisposed()) {
-						setMapCenterInWorldPixel(newMapCenter);
-					}
-				}
-			});
-		}
-
-		updateViewPortData();
-		updateTourToolTip();
-
-		paint();
-	}
-
 	/*
 	 * keep old method because it is not easy to understand
 	 */
@@ -3665,6 +3645,40 @@ public class Map extends Canvas {
 //		 */
 ////		_currentOfflineArea = null;
 //	}
+
+	/**
+	 * Set the center of the map to a geo position (with lat/long) and redraw the map.
+	 * 
+	 * @param geoPosition
+	 *            Center position in lat/lon
+	 */
+	public void setMapCenter(final GeoPosition geoPosition) {
+
+		final java.awt.Point newMapCenter = _mp.geoToPixel(geoPosition, _mapZoomLevel);
+
+		if (Thread.currentThread() == _displayThread) {
+
+			setMapCenterInWorldPixel(newMapCenter);
+
+		} else {
+
+			// current thread is not the display thread
+
+			_display.syncExec(new Runnable() {
+				@Override
+				public void run() {
+					if (!isDisposed()) {
+						setMapCenterInWorldPixel(newMapCenter);
+					}
+				}
+			});
+		}
+
+		updateViewPortData();
+		updateTourToolTip();
+
+		paint();
+	}
 
 	/**
 	 * Sets the center of the map {@link #_worldPixelMapCenter} in world pixel coordinates. The
@@ -3782,6 +3796,16 @@ public class Map extends Canvas {
 		_overlayKey = key;
 	}
 
+//	public void setPhoto(final Photo photo) {
+//
+//		final GeoPosition geoPosition = photo.getGeoPosition();
+//		if (geoPosition == null) {
+//			return;
+//		}
+//
+//		setMapCenter(geoPosition);
+//	}
+
 	/**
 	 * @param isRedrawEnabled
 	 *            Set <code>true</code> to enable map drawing (which is the default). When
@@ -3798,16 +3822,6 @@ public class Map extends Canvas {
 			paint();
 		}
 	}
-
-//	public void setPhoto(final Photo photo) {
-//
-//		final GeoPosition geoPosition = photo.getGeoPosition();
-//		if (geoPosition == null) {
-//			return;
-//		}
-//
-//		setMapCenter(geoPosition);
-//	}
 
 	public void setPoi(final GeoPosition poiGeoPosition, final int zoomLevel, final String poiText) {
 
@@ -3980,6 +3994,13 @@ public class Map extends Canvas {
 		});
 	}
 
+//	/** Determine the space between the first two fingers */
+//	private float touchDistance(final Touch touch1, final Touch touch2) {
+//		final float x = touch1.positionX - touch2.positionX;
+//		final float y = touch1.positionY - touch2.positionY;
+//		return (float) Math.sqrt(x * x + y * y);
+//	}
+
 	/**
 	 * Set the zoom level for the map and centers the map to the previous center. The zoom level is
 	 * checked if the map provider supports the requested zoom level.
@@ -4050,13 +4071,6 @@ public class Map extends Canvas {
 
 		fireZoomEvent(adjustedZoomLevel);
 	}
-
-//	/** Determine the space between the first two fingers */
-//	private float touchDistance(final Touch touch1, final Touch touch2) {
-//		final float x = touch1.positionX - touch2.positionX;
-//		final float y = touch1.positionY - touch2.positionY;
-//		return (float) Math.sqrt(x * x + y * y);
-//	}
 
 	private void showPoi() {
 
