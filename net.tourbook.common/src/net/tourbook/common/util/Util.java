@@ -1732,7 +1732,7 @@ public class Util {
 	 * @param viewId
 	 * @param isActivateView
 	 *            View is activated when <code>true</code>, otherwise it is only visible.
-	 * @return
+	 * @return Returns the opened/activated view.
 	 */
 	public static IViewPart showView(final String viewId, final boolean isActivateView) {
 

@@ -1869,9 +1869,22 @@ public class Map3View extends ViewPart implements ITourProvider {
 				 */
 				if (_previousMapSliderPosition != null) {
 
+//					final Angle latDiff = _previousMapSliderPosition.getLatitude().subtract(sliderDegrees.latitude);
+//					final Angle lonDiff = _previousMapSliderPosition.getLongitude().subtract(sliderDegrees.longitude);
+					final double eleDiff = _previousMapSliderPosition.elevation - elevation;
+
+//					System.out.println(UI.timeStampNano()
+//							+ " ["
+//							+ getClass().getSimpleName()
+//							+ "] \t"
+//							+ ("\tlatDiff=" + latDiff.toString())
+//							+ ("\tlonDiff=" + lonDiff)
+//							+ ("\teleDiff=" + eleDiff));
+//					// TODO remove SYSTEM.OUT.PRINTLN
+
 					if (_previousMapSliderPosition.getLatitude().equals(sliderDegrees.latitude)
 							&& _previousMapSliderPosition.getLongitude().equals(sliderDegrees.longitude)
-							&& _previousMapSliderPosition.elevation == elevation) {
+							&& eleDiff < 0.001) {
 
 						return;
 					}

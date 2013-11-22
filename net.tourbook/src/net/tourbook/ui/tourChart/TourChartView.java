@@ -25,6 +25,7 @@ import net.tourbook.chart.ISliderMoveListener;
 import net.tourbook.chart.SelectionChartInfo;
 import net.tourbook.chart.SelectionChartXSliderPosition;
 import net.tourbook.common.util.PostSelectionProvider;
+import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.photo.IPhotoEventListener;
 import net.tourbook.photo.PhotoEventId;
@@ -67,6 +68,7 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.part.ViewPart;
+//import net.tourbook.ui.UI;
 
 // author: Wolfgang Schramm
 // create: 09.07.2007
@@ -91,6 +93,9 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 	 */
 	private boolean					_isForceUpdate;
 
+	private boolean					_isPartActive;
+	private boolean					_isInSelectionChanged;
+
 	private PostSelectionProvider	_postSelectionProvider;
 	private ISelectionListener		_postSelectionListener;
 	private IPropertyChangeListener	_prefChangeListener;
@@ -108,7 +113,12 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 	private void addPartListener() {
 		_partListener = new IPartListener2() {
 
-			public void partActivated(final IWorkbenchPartReference partRef) {}
+			public void partActivated(final IWorkbenchPartReference partRef) {
+
+				if (partRef.getPart(false) == TourChartView.this) {
+					_isPartActive = true;
+				}
+			}
 
 			public void partBroughtToTop(final IWorkbenchPartReference partRef) {}
 
@@ -116,7 +126,11 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 
 			public void partDeactivated(final IWorkbenchPartReference partRef) {
 
-				// ensure that at each part deactivation the photo tooltip gets hidden
+				if (partRef.getPart(false) == TourChartView.this) {
+					_isPartActive = false;
+				}
+
+				// ensure that at EACH part deactivation the photo tooltip gets hidden
 				_tourChart.partIsDeactivated();
 			}
 
@@ -193,7 +207,11 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 					return;
 				}
 
+				_isInSelectionChanged = true;
+
 				onSelectionChanged(selection);
+
+				_isInSelectionChanged = false;
 			}
 		};
 		getSite().getPage().addPostSelectionListener(_postSelectionListener);
@@ -347,6 +365,23 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 		// fire a slider move selection when a slider was moved in the tour chart
 		_tourChart.addSliderMoveListener(new ISliderMoveListener() {
 			public void sliderMoved(final SelectionChartInfo chartInfoSelection) {
+
+				/*
+				 * Activate view only when NOT in a selection change event, otherwise it get
+				 * activated at all time.
+				 */
+				final boolean canActivateView = _isInSelectionChanged == false;
+
+				if (canActivateView && _isPartActive == false) {
+
+					/*
+					 * Ensure that this part is active when an event is fired, otherwise it will not
+					 * be fired in the selection provider !!!
+					 */
+
+					Util.showView(ID, true);
+				}
+
 				_postSelectionProvider.setSelection(chartInfoSelection);
 			}
 		});
@@ -369,10 +404,11 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 	}
 
 	/**
-	 * fire slider move event when the chart is drawn the first time or when the focus gets the
-	 * chart, this will move the sliders in the map to the correct position
+	 * Fire slider move event when the chart is drawn the first time or when the focus gets the
+	 * chart, this will move the sliders in the map to the correct position.
 	 */
 	private void fireSliderPosition() {
+
 		Display.getCurrent().asyncExec(new Runnable() {
 			public void run() {
 
