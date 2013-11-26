@@ -1,14 +1,16 @@
 Version: 13.11.0                                       25. November 2013
 
 
- 
-Tip: activate view when moving slider with a synched map !!! 
- 
- 
+Platform Mac OS X is discontinued.
 
-New in 3D Map
 
-* Improved tour track properties.
+New 3D Map Features 	
+
+* Improved tour track configuration with:
+  + Multiple configurations.
+  + Draw curtain with Track color.
+  + Relative altitude offset.
+  + Randomize altitude offset.
 
 * Show hovered position value.
 
@@ -21,8 +23,21 @@ New in 3D Map
 * Tour legend is displayed correctly on all platforms.
 
 
+Fixed Bugs 
+
+* POI search is fixed partly, this quick fix do not yet have any 
+features as it was before. POI search is not yet supported for 3D map. 
 
 
-Stability of this version
+Crash Stability 
 
-Stability in this version is much better than the previous version but it is not yet perfect, crashes still can happen but not very often, mostly when many tours (hundreds) are displayed. In this version, the tour rendering was rewritten which helped to reduce crashing.
+* Crash stability in this version is much better than the previous 
+version but it is not yet perfect, crashes still can happen but not very
+often, mostly when many tours (hundreds) are displayed. In this version,
+the tour rendering was rewritten which helped to reduce crashing. 
+
+
+World Wind SDK 
+
+* Update from 1.5 to 2.0 revision 1721, this increased the application
+size from 60 to 65 MByte. 
