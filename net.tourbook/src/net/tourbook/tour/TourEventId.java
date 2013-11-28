@@ -29,6 +29,11 @@ public enum TourEventId {
 	TOUR_CHANGED,
 
 	/**
+	 * Event data contain the selected tours.
+	 */
+	TOUR_SELECTION,
+
+	/**
 	 * {@link TourData} has been modified, the UI must be updated by reloading {@link TourData}
 	 * <p>
 	 * When this event is fired, {@link TourDataEditorView} must <b>NOT</b> be dirty, this can be
@@ -92,10 +97,5 @@ public enum TourEventId {
 	 * view is closed which provided the tour
 	 */
 	CLEAR_DISPLAYED_TOUR,
-
-//	/**
-//	 * time offset for the merged tour is modified
-//	 */
-//	TOUR_MERGE_CHANGED,
 
 }

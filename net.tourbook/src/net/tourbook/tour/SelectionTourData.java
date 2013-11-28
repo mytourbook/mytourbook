@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.tour;
 
+import net.tourbook.chart.SelectionChartXSliderPosition;
 import net.tourbook.data.TourData;
 import net.tourbook.ui.UI;
 import net.tourbook.ui.tourChart.TourChart;
@@ -29,6 +30,9 @@ public class SelectionTourData implements ISelection {
 	private TourChart	_tourChart;
 	private TourData	_tourData;
 
+	private int			_leftSliderValueIndex	= SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION;
+	private int			_rightSliderValueIndex	= SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION;
+
 	public SelectionTourData(final TourChart tourChart, final TourData tourData) {
 		_tourChart = tourChart;
 		_tourData = tourData;
@@ -36,6 +40,14 @@ public class SelectionTourData implements ISelection {
 
 	public SelectionTourData(final TourData tourData) {
 		_tourData = tourData;
+	}
+
+	public int getLeftSliderValueIndex() {
+		return _leftSliderValueIndex;
+	}
+
+	public int getRightSliderValueIndex() {
+		return _rightSliderValueIndex;
 	}
 
 	/**
@@ -54,6 +66,21 @@ public class SelectionTourData implements ISelection {
 		return false;
 	}
 
+	/**
+	 * @return Returns <code>true</code> when left or right slider value is set in this selection.
+	 */
+	public boolean isSliderValueIndexAvailable() {
+
+		return _leftSliderValueIndex != SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION
+				|| _rightSliderValueIndex != SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION;
+	}
+
+	public void setSliderValueIndex(final int leftSliderValueIndex, final int rightSliderValueIndex) {
+
+		_leftSliderValueIndex = leftSliderValueIndex;
+		_rightSliderValueIndex = rightSliderValueIndex;
+	}
+
 	@Override
 	public String toString() {
 
@@ -61,7 +88,7 @@ public class SelectionTourData implements ISelection {
 
 		sb.append("[SelectionTourData]\n");//$NON-NLS-1$
 
-		sb.append("\tfTourData:");//$NON-NLS-1$
+		sb.append("\t_tourData:");//$NON-NLS-1$
 		if (_tourData == null) {
 			sb.append(_tourData);
 		} else {
@@ -70,7 +97,7 @@ public class SelectionTourData implements ISelection {
 
 		sb.append(UI.NEW_LINE);
 
-		sb.append("\tfTourChart:");//$NON-NLS-1$
+		sb.append("\t_tourChart:");//$NON-NLS-1$
 		if (_tourChart == null) {
 			sb.append(_tourChart);
 		} else {

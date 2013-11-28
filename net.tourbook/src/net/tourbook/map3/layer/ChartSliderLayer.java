@@ -15,8 +15,11 @@
  *******************************************************************************/
 package net.tourbook.map3.layer;
 
+import gov.nasa.worldwind.event.SelectEvent;
+import gov.nasa.worldwind.event.SelectListener;
 import gov.nasa.worldwind.geom.Position;
 import gov.nasa.worldwind.layers.AnnotationLayer;
+import gov.nasa.worldwind.pick.PickedObject;
 import gov.nasa.worldwind.render.AnnotationAttributes;
 import gov.nasa.worldwind.render.DrawContext;
 
@@ -30,7 +33,7 @@ import org.eclipse.jface.dialogs.IDialogSettings;
 /**
  * Part of this code is copied from: gov.nasa.worldwindx.examples.analytics.AnalyticSurfaceLegend
  */
-public class ChartSliderLayer extends AnnotationLayer {
+public class ChartSliderLayer extends AnnotationLayer implements SelectListener {
 
 	static final int				CHART_SLIDER_DRAW_OFFSET_Y	= 40;
 	static final int				CHART_SLIDER_CORNER_RADIUS	= 7;
@@ -81,6 +84,10 @@ public class ChartSliderLayer extends AnnotationLayer {
 		attributes.setLeaderGapWidth(CHART_SLIDER_LEADER_GAP);
 		attributes.setFont(UI.AWT_FONT_ARIAL_BOLD_12);
 
+//		slider.setPickEnabled(true);
+
+		setPickEnabled(true);
+
 		// initially hide the slider
 		attributes.setVisible(false);
 
@@ -102,6 +109,40 @@ public class ChartSliderLayer extends AnnotationLayer {
 
 	public TrackPointAnnotation getRightSlider() {
 		return _rightSlider;
+	}
+
+	/**
+	 * This listener is set in set {@link #setupWWSelectionListener(boolean)}
+	 * <p>
+	 * {@inheritDoc}
+	 * 
+	 * @see gov.nasa.worldwind.event.SelectListener#selected(gov.nasa.worldwind.event.SelectEvent)
+	 */
+	@Override
+	public void selected(final SelectEvent event) {
+
+//		if (event.getMouseEvent() != null && event.getMouseEvent().isConsumed()) {
+//			return;
+//		}
+//
+//		if (Map3Manager.getMap3View().isContextMenuVisible()) {
+//
+//			// prevent actions when context menu is visible
+//
+//			return;
+//		}
+
+		final String eventAction = event.getEventAction();
+
+		// get hovered object
+		final PickedObject pickedObject = event.getTopPickedObject();
+
+		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
+				+ ("\teventAction: " + eventAction)
+				+ ("\tpickedObject: " + pickedObject)
+		//
+				);
+		// TODO remove SYSTEM.OUT.PRINTLN
 	}
 
 	public void setSliderVisible(final boolean isVisible) {

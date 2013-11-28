@@ -94,7 +94,7 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 	private boolean					_isForceUpdate;
 
 	private boolean					_isPartActive;
-	private boolean					_isInSelectionChanged;
+	private boolean					_isInSelectionListener;
 
 	private PostSelectionProvider	_postSelectionProvider;
 	private ISelectionListener		_postSelectionListener;
@@ -207,11 +207,11 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 					return;
 				}
 
-				_isInSelectionChanged = true;
+				_isInSelectionListener = true;
 
 				onSelectionChanged(selection);
 
-				_isInSelectionChanged = false;
+				_isInSelectionListener = false;
 			}
 		};
 		getSite().getPage().addPostSelectionListener(_postSelectionListener);
@@ -226,6 +226,8 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 				if (part == TourChartView.this) {
 					return;
 				}
+
+				_isInSelectionListener = true;
 
 				if (eventId == TourEventId.SEGMENT_LAYER_CHANGED) {
 
@@ -274,6 +276,13 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 						}
 					}
 
+				} else if ((eventId == TourEventId.TOUR_SELECTION //
+						|| eventId == TourEventId.SLIDER_POSITION_CHANGED)
+
+						&& eventData instanceof ISelection) {
+
+					onSelectionChanged((ISelection) eventData);
+
 				} else if (eventId == TourEventId.CLEAR_DISPLAYED_TOUR) {
 
 					clearView();
@@ -295,6 +304,8 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 						updateChart(TourManager.getInstance().getTourData(tourId));
 					}
 				}
+
+				_isInSelectionListener = false;
 			}
 		};
 
@@ -367,12 +378,12 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 			public void sliderMoved(final SelectionChartInfo chartInfoSelection) {
 
 				/*
-				 * Activate view only when NOT in a selection change event, otherwise it get
-				 * activated at all time.
+				 * Activate view only when NOT in a selection listener event, otherwise it get
+				 * activated all time.
 				 */
-				final boolean canActivateView = _isInSelectionChanged == false;
+				final boolean canActivateView = _isInSelectionListener == false;
 
-				if (canActivateView && _isPartActive == false) {
+				if (_isPartActive == false && canActivateView) {
 
 					/*
 					 * Ensure that this part is active when an event is fired, otherwise it will not
@@ -449,7 +460,9 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 
 		if (selection instanceof SelectionTourData) {
 
-			final TourData selectionTourData = ((SelectionTourData) selection).getTourData();
+			final SelectionTourData tourDataSelection = (SelectionTourData) selection;
+
+			final TourData selectionTourData = tourDataSelection.getTourData();
 			if (selectionTourData != null) {
 
 				// prevent loading the same tour
@@ -458,6 +471,16 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 				}
 
 				updateChart(selectionTourData);
+
+				if (tourDataSelection.isSliderValueIndexAvailable()) {
+
+					// set slider positions
+
+					_tourChart.setXSliderPosition(new SelectionChartXSliderPosition(//
+							_tourChart,
+							tourDataSelection.getLeftSliderValueIndex(),
+							tourDataSelection.getRightSliderValueIndex()));
+				}
 			}
 
 		} else if (selection instanceof SelectionTourId) {

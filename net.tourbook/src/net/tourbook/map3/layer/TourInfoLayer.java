@@ -35,6 +35,9 @@ public class TourInfoLayer extends AnnotationLayer implements IToolLayer {
 
 	public static final String		MAP3_LAYER_ID	= "TourInfoLayer";	//$NON-NLS-1$
 
+	/**
+	 * Track point annotation when a tour track is hovered.
+	 */
 	private TrackPointAnnotation	_hoveredTrackPoint;
 
 	public TourInfoLayer(final IDialogSettings state) {
@@ -89,7 +92,7 @@ public class TourInfoLayer extends AnnotationLayer implements IToolLayer {
 		return Map3Manager.INSERT_BEFORE_PLACE_NAMES;
 	}
 
-	public TrackPointAnnotation getTrackPoint() {
+	public TrackPointAnnotation getHoveredTrackPoint() {
 		return _hoveredTrackPoint;
 	}
 

@@ -52,6 +52,7 @@ import javax.swing.SwingUtilities;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.SelectionChartInfo;
+import net.tourbook.chart.SelectionChartXSliderPosition;
 import net.tourbook.common.Messages;
 import net.tourbook.common.UI;
 import net.tourbook.common.color.ColorUtil;
@@ -59,16 +60,18 @@ import net.tourbook.common.color.IGradientColors;
 import net.tourbook.common.color.IMapColorProvider;
 import net.tourbook.common.color.MapColorId;
 import net.tourbook.common.color.MapLegendImageConfig;
-import net.tourbook.common.util.PostSelectionProvider;
 import net.tourbook.common.util.SWTPopupOverAWT;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.extension.export.ActionExport;
 import net.tourbook.importdata.RawDataManager;
 import net.tourbook.map2.view.IDiscreteColors;
+import net.tourbook.map2.view.SelectionMapPosition;
 import net.tourbook.map2.view.TourMapColors;
 import net.tourbook.map3.action.ActionMapColor;
 import net.tourbook.map3.action.ActionOpenMap3LayerView;
+import net.tourbook.map3.action.ActionSetChartSliderLeft;
+import net.tourbook.map3.action.ActionSetChartSliderRight;
 import net.tourbook.map3.action.ActionShowChartSliderInMap;
 import net.tourbook.map3.action.ActionShowDirectionArrows;
 import net.tourbook.map3.action.ActionShowEntireTour;
@@ -100,6 +103,7 @@ import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.action.ActionEditQuick;
 import net.tourbook.ui.action.ActionEditTour;
 import net.tourbook.ui.action.ActionOpenTour;
+import net.tourbook.ui.tourChart.TourChart;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ActionContributionItem;
@@ -157,6 +161,8 @@ public class Map3View extends ViewPart implements ITourProvider {
 
 	private ActionOpenMap3LayerView				_actionOpenMap3LayerView;
 	private ActionMapColor						_actionMapColor;
+	private ActionSetChartSliderLeft			_actionSetChartSliderLeft;
+	private ActionSetChartSliderRight			_actionSetChartSliderRight;
 	private ActionShowChartSliderInMap			_actionShowChartSliderInMap;
 	private ActionShowDirectionArrows			_actionShowDirectionArrows;
 	private ActionShowEntireTour				_actionShowEntireTour;
@@ -180,7 +186,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 	private ActionOpenTour						_actionOpenTour;
 	private ActionPrint							_actionPrintTour;
 
-	private PostSelectionProvider				_postSelectionProvider;
+//	private PostSelectionProvider				_postSelectionProvider;
 	private IPartListener2						_partListener;
 	private ISelectionListener					_postSelectionListener;
 	private IPropertyChangeListener				_prefChangeListener;
@@ -189,9 +195,10 @@ public class Map3View extends ViewPart implements ITourProvider {
 	private MouseAdapter						_wwMouseListener;
 	private RenderingListener					_wwStatisticListener;
 
-	private boolean								_isPartActive;
+//	private boolean								_isPartActive;
 	private boolean								_isPartVisible;
 	private boolean								_isRestored;
+	private boolean								_isContextMenuVisible;
 
 	private ISelection							_lastHiddenSelection;
 
@@ -209,39 +216,35 @@ public class Map3View extends ViewPart implements ITourProvider {
 	 */
 	private ArrayList<TourData>					_allTours								= new ArrayList<TourData>();
 
+	private int									_allTourIdHash;
+	private int									_allTourDataHash;
+
 	/**
 	 * Color id for the currently displayed tour tracks.
 	 */
 	private MapColorId							_tourColorId;
-
-	/*
-	 * current position for the x-sliders
-	 */
-	private int									_currentLeftSliderValueIndex;
-	private int									_currentRightSliderValueIndex;
-	private int									_currentSelectedSliderValueIndex;
-	//
-	/*
-	 * UI controls
-	 */
-	private Composite							_mapContainer;
-
-	private Frame								_awtFrame;
-
-	private Menu								_swtContextMenu;
-
-	private ITrackPath							_previousHoveredTrack;
-	private Integer								_previousHoveredTrackPosition;
-	private Position							_previousMapSliderPosition;
 
 	/**
 	 * <code>true</code> will log frame/cache... statistics like in {@link PerformanceStatistic}
 	 */
 	private boolean								_isLogStatistics						= false;
 
-	private int									_allTourIdHash;
+	/*
+	 * current position for the x-sliders (vertical slider)
+	 */
+	private int									_currentLeftSliderValueIndex;
+	private int									_currentRightSliderValueIndex;
+	private Position							_currentChartSliderPosition;
 
-	private int									_allTourDataHash;
+	private ITrackPath							_currentHoveredTrack;
+	private Integer								_currentHoveredTrackPosition;
+
+	/*
+	 * UI controls
+	 */
+	private Composite							_mapContainer;
+	private Frame								_awtFrame;
+	private Menu								_swtContextMenu;
 
 	private class Map3ContextMenu extends SWTPopupOverAWT {
 
@@ -313,13 +316,88 @@ public class Map3View extends ViewPart implements ITourProvider {
 		updateMapColors();
 	}
 
+	public void actionSetTrackSlider(final boolean isLeftSlider) {
+
+		if (_currentHoveredTrack == null || _currentHoveredTrackPosition == null) {
+			return;
+		}
+
+//		final ChartSliderLayer chartSliderLayer = getChartSliderLayer();
+//		if (chartSliderLayer == null) {
+//			Map3Manager.setLayerVisible_ChartSlider(true);
+//		}
+
+		final TourData tourData = _currentHoveredTrack.getTourTrack().getTourData();
+
+		TourChart tourChart = null;
+		final TourChart activeTourChart = TourManager.getInstance().getActiveTourChart();
+
+		if ((activeTourChart != null)
+				&& (activeTourChart.isDisposed() == false)
+				&& (activeTourChart.getTourData() == tourData)) {
+
+			tourChart = activeTourChart;
+		}
+
+		final int serieIndex0 = SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION;
+		int serieIndexLeft = SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION;
+		int serieIndexRight = SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION;
+
+		if (isLeftSlider) {
+
+			serieIndexLeft = _currentHoveredTrackPosition;
+			_currentLeftSliderValueIndex = _currentHoveredTrackPosition;
+
+		} else {
+
+			serieIndexRight = _currentHoveredTrackPosition;
+			_currentRightSliderValueIndex = _currentHoveredTrackPosition;
+		}
+
+		ISelection sliderSelection = null;
+
+		if (tourChart == null) {
+
+			// chart is not available, fire a map position
+
+			final double[] serieLatitude = tourData.latitudeSerie;
+
+			if ((serieLatitude != null) && (serieLatitude.length > 0)) {
+
+				// map position is available
+
+				sliderSelection = new SelectionMapPosition(tourData, serieIndexLeft, serieIndexRight, true);
+			}
+
+		} else {
+
+			sliderSelection = new SelectionChartXSliderPosition(
+					tourChart,
+					serieIndex0,
+					serieIndexLeft,
+					serieIndexRight,
+					true);
+		}
+
+		if (sliderSelection != null) {
+
+			updateChartSlider_10_Position(//
+					tourData,
+					_currentLeftSliderValueIndex,
+					_currentRightSliderValueIndex);
+
+			TourManager.fireEventWithCustomData(//
+					TourEventId.SLIDER_POSITION_CHANGED,
+					sliderSelection,
+					Map3View.this);
+
+			setChartSliderVisible(true);
+		}
+	}
+
 	public void actionShowChartSlider(final boolean isVisible) {
 
-		_isChartSliderVisible = isVisible;
-
-		enableActions();
-
-		Map3Manager.setLayerVisible_ChartSlider(isVisible);
+		setChartSliderVisible(isVisible);
 	}
 
 	public void actionShowDirectionArrows(final boolean isVisible) {
@@ -431,7 +509,9 @@ public class Map3View extends ViewPart implements ITourProvider {
 			@Override
 			public void partActivated(final IWorkbenchPartReference partRef) {
 				if (partRef.getPart(false) == Map3View.this) {
-					_isPartActive = true;
+//					_isPartActive = true;
+//					System.out.println(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] \tpartActivated");
+//					// TODO remove SYSTEM.OUT.PRINTLN
 				}
 			}
 
@@ -448,7 +528,9 @@ public class Map3View extends ViewPart implements ITourProvider {
 			@Override
 			public void partDeactivated(final IWorkbenchPartReference partRef) {
 				if (partRef.getPart(false) == Map3View.this) {
-					_isPartActive = false;
+//					_isPartActive = false;
+//					System.out.println(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] \tpartDeactivated");
+//// TODO remove SYSTEM.OUT.PRINTLN
 				}
 			}
 
@@ -552,6 +634,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 					clearView();
 
 				} else if (eventId == TourEventId.SLIDER_POSITION_CHANGED) {
+
 					onSelection((ISelection) eventData);
 				}
 			}
@@ -562,11 +645,11 @@ public class Map3View extends ViewPart implements ITourProvider {
 
 	private void cleanupOldTours() {
 
-		_previousMapSliderPosition = null;
-		_previousHoveredTrack = null;
-		_previousHoveredTrackPosition = null;
+		_currentChartSliderPosition = null;
+		_currentHoveredTrack = null;
+		_currentHoveredTrackPosition = null;
 
-		_postSelectionProvider.clearSelection();
+//		_postSelectionProvider.clearSelection();
 
 		_allTours.clear();
 	}
@@ -634,6 +717,8 @@ public class Map3View extends ViewPart implements ITourProvider {
 
 		_actionMapColor = new ActionMapColor(this, _state);
 
+		_actionSetChartSliderLeft = new ActionSetChartSliderLeft(this);
+		_actionSetChartSliderRight = new ActionSetChartSliderRight(this);
 		_actionShowChartSliderInMap = new ActionShowChartSliderInMap(this);
 		_actionShowDirectionArrows = new ActionShowDirectionArrows(this);
 		_actionShowEntireTour = new ActionShowEntireTour(this);
@@ -677,6 +762,23 @@ public class Map3View extends ViewPart implements ITourProvider {
 			boolean	_isFilled;
 
 			@Override
+			public void menuHidden(final MenuEvent e) {
+
+				_isContextMenuVisible = false;
+
+				/*
+				 * run async that the context state and tour info reset is done after the context
+				 * menu actions has done they tasks
+				 */
+				Display.getCurrent().asyncExec(new Runnable() {
+					public void run() {
+
+						hideTourInfo();
+					}
+				});
+			}
+
+			@Override
 			public void menuShown(final MenuEvent e) {
 
 				if (_isFilled == false) {
@@ -687,6 +789,8 @@ public class Map3View extends ViewPart implements ITourProvider {
 
 					fillContextMenu((Menu) e.widget);
 				}
+
+				_isContextMenuVisible = true;
 			}
 		});
 
@@ -717,7 +821,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 		fillActionBars();
 
 		// set selection provider
-		getSite().setSelectionProvider(_postSelectionProvider = new PostSelectionProvider(ID));
+//		getSite().setSelectionProvider(_postSelectionProvider = new PostSelectionProvider(ID));
 
 //		getViewSite().registerContextMenu(menuManager, selectionProvider)
 
@@ -909,9 +1013,13 @@ public class Map3View extends ViewPart implements ITourProvider {
 	private void enableContextMenuActions() {
 
 		final ITrackPath selectedTrack = Map3Manager.getLayer_TourTrack().getSelectedTrack();
+
 		final boolean isTourSelected = selectedTrack != null;
 		final boolean isTourAvailable = _allTours.size() > 0;
+		final boolean isTrackPositionHovered = _currentHoveredTrack != null && _currentHoveredTrackPosition != null;
 
+		_actionSetChartSliderLeft.setEnabled(isTrackPositionHovered);
+		_actionSetChartSliderRight.setEnabled(isTrackPositionHovered);
 		_actionShowChartSliderInMap.setEnabled(isTourAvailable);
 		_actionShowLegendInMap.setEnabled(isTourAvailable);
 
@@ -954,6 +1062,10 @@ public class Map3View extends ViewPart implements ITourProvider {
 
 	private void fillContextMenu(final Menu menu) {
 
+		fillMenuItem(menu, _actionSetChartSliderLeft);
+		fillMenuItem(menu, _actionSetChartSliderRight);
+
+		(new Separator()).fill(menu, -1);
 		fillMenuItem(menu, _actionShowDirectionArrows);
 		fillMenuItem(menu, _actionShowChartSliderInMap);
 		fillMenuItem(menu, _actionShowLegendInMap);
@@ -994,6 +1106,27 @@ public class Map3View extends ViewPart implements ITourProvider {
 
 		final ActionContributionItem item = new ActionContributionItem(action);
 		item.fill(menu, -1);
+	}
+
+	public void fireTourSelection(final ISelection selection) {
+
+		// add slider position to the selection
+		if (selection instanceof SelectionTourData) {
+
+			final SelectionTourData tourDataSelection = (SelectionTourData) selection;
+
+			tourDataSelection.setSliderValueIndex(_currentLeftSliderValueIndex, _currentRightSliderValueIndex);
+		}
+
+		// run in SWT thread
+		_mapContainer.getDisplay().asyncExec(new Runnable() {
+			public void run() {
+
+				// activate this view
+
+				TourManager.fireEventWithCustomData(TourEventId.TOUR_SELECTION, selection, Map3View.this);
+			}
+		});
 	}
 
 	public ArrayList<TourData> getAllTours() {
@@ -1128,31 +1261,38 @@ public class Map3View extends ViewPart implements ITourProvider {
 		return _tourColorId;
 	}
 
+	private void hideTourInfo() {
+
+		_currentHoveredTrack = null;
+		_currentHoveredTrackPosition = null;
+
+		Map3Manager.getLayer_TourInfo().setTrackPointVisible(false);
+	}
+
+	public boolean isContextMenuVisible() {
+		return _isContextMenuVisible;
+	}
+
 	private void onAWTMouseClick(final MouseEvent mouseEvent) {
 
 		if (mouseEvent == null || mouseEvent.isConsumed()) {
 			return;
 		}
 
+//		System.out.println(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] \tonAWTMouseClick");
+//		// TODO remove SYSTEM.OUT.PRINTLN
+
 		final boolean isRightClick = SwingUtilities.isRightMouseButton(mouseEvent);
 		if (isRightClick) {
 
 			// open context menu
 
-//			System.out.println(UI.timeStampNano()
-//					+ " ["
-//					+ getClass().getSimpleName()
-//					+ "] \tRight_Click\t"
-//					+ mouseEvent.getXOnScreen()
-//					+ " : "
-//					+ mouseEvent.getYOnScreen());
-//			// TODO remove SYSTEM.OUT.PRINTLN
+			// set state here because opening the context menu is async
+			_isContextMenuVisible = true;
 
 			_mapContainer.getDisplay().asyncExec(new Runnable() {
 
 				public void run() {
-
-//					System.out.println("SWT calling menu");
 
 					createContextMenu(mouseEvent.getXOnScreen(), mouseEvent.getYOnScreen());
 				}
@@ -1604,6 +1744,16 @@ public class Map3View extends ViewPart implements ITourProvider {
 		sliderAnnotation.setAltitudeMode(config.altitudeMode);
 	}
 
+	private void setChartSliderVisible(final boolean isVisible) {
+
+		_isChartSliderVisible = isVisible;
+
+		// !!! set state in model before enable actions !!!
+		Map3Manager.setLayerVisible_ChartSlider(isVisible);
+
+		enableActions();
+	}
+
 	private void setColorProvider(final MapColorId colorId) {
 
 		final IMapColorProvider colorProvider = TourMapColors.getColorProvider(colorId);
@@ -1612,42 +1762,37 @@ public class Map3View extends ViewPart implements ITourProvider {
 		Map3Manager.getLayer_TourLegend().setColorProvider(colorProvider);
 	}
 
+	public void setContextMenuVisible(final boolean isVisible) {
+		_isContextMenuVisible = isVisible;
+	}
+
 	@Override
 	public void setFocus() {
 
 	}
 
-	public void setSelection(final ISelection selection) {
-
-		// run in SWT thread
-		_mapContainer.getDisplay().asyncExec(new Runnable() {
-			public void run() {
-
-				if (_isPartActive == false) {
-
-					// activate this view, otherwise the selection provider is not working
-
-					Util.showView(ID, true);
-				}
-
-				_postSelectionProvider.setSelection(selection);
-			}
-		});
-
-	}
-
 	public void setTourInfo(final ITrackPath hoveredTrackPath, final Integer hoveredPositionIndex) {
 
-		final TourInfoLayer tourInfoLayer = Map3Manager.getLayer_TourInfo();
+//		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "]")
+//				+ ("\thoveredPositionIndex: " + hoveredPositionIndex)
+//				+ ("\t_currentHoveredTrackPosition: " + _currentHoveredTrackPosition)
+//				+ ("\thoveredTrackPath: " + hoveredTrackPath)
+//		//
+//				);
+//		// TODO remove SYSTEM.OUT.PRINTLN
 
 		if (hoveredTrackPath == null) {
 
 			// hide tour info
 
-			_previousHoveredTrack = null;
-			_previousHoveredTrackPosition = null;
+			if (_isContextMenuVisible) {
 
-			tourInfoLayer.setTrackPointVisible(false);
+				// keep tour info visible when context menu is displayed
+
+				return;
+			}
+
+			hideTourInfo();
 
 		} else {
 
@@ -1655,35 +1800,28 @@ public class Map3View extends ViewPart implements ITourProvider {
 
 			if (hoveredPositionIndex == null) {
 
-				// a position is not hovered, keep tour info opened
+				// a new position is not hovered, keep tour info opened
 
 			} else {
 
 				// ckeck if a new position is hovered
-				if (_previousHoveredTrack != null
-						&& _previousHoveredTrack == hoveredTrackPath
-						&& _previousHoveredTrackPosition != null
-						&& _previousHoveredTrackPosition.intValue() == hoveredPositionIndex.intValue()) {
+				if (_currentHoveredTrack != null
+						&& _currentHoveredTrack == hoveredTrackPath
+						&& _currentHoveredTrackPosition != null
+						&& _currentHoveredTrackPosition.intValue() == hoveredPositionIndex.intValue()) {
 
 					return;
 				}
 
-//				System.out.println(UI.timeStampNano()
-//						+ " ["
-//						+ getClass().getSimpleName()
-//						+ "] \thoveredTrackPath: "
-//						+ hoveredTrackPath
-//						+ "\thoveredPositionIndex: "
-//						+ hoveredPositionIndex);
-//				// TODO remove SYSTEM.OUT.PRINTLN
-
 				// keep hovered position
-				_previousHoveredTrack = hoveredTrackPath;
-				_previousHoveredTrackPosition = hoveredPositionIndex;
+				_currentHoveredTrack = hoveredTrackPath;
+				_currentHoveredTrackPosition = hoveredPositionIndex;
 
 				final TourData tourData = hoveredTrackPath.getTourTrack().getTourData();
 
-				final TrackPointAnnotation trackPoint = tourInfoLayer.getTrackPoint();
+				final TourInfoLayer tourInfoLayer = Map3Manager.getLayer_TourInfo();
+				final TrackPointAnnotation trackPoint = tourInfoLayer.getHoveredTrackPoint();
+
 				trackPoint.setText(createSliderText(hoveredPositionIndex, tourData));
 
 				setAnnotationPosition(trackPoint, tourData, hoveredPositionIndex);
@@ -1867,23 +2005,17 @@ public class Map3View extends ViewPart implements ITourProvider {
 				 * Prevent setting the same location because this will jitter the map slider and is
 				 * unnecessary.
 				 */
-				if (_previousMapSliderPosition != null) {
+				if (_currentChartSliderPosition != null) {
 
-//					final Angle latDiff = _previousMapSliderPosition.getLatitude().subtract(sliderDegrees.latitude);
-//					final Angle lonDiff = _previousMapSliderPosition.getLongitude().subtract(sliderDegrees.longitude);
-					final double eleDiff = _previousMapSliderPosition.elevation - elevation;
+					/*
+					 * Set a new position and sync map only, when lat/lon are different and
+					 * elevation is larger than 1mm.
+					 */
 
-//					System.out.println(UI.timeStampNano()
-//							+ " ["
-//							+ getClass().getSimpleName()
-//							+ "] \t"
-//							+ ("\tlatDiff=" + latDiff.toString())
-//							+ ("\tlonDiff=" + lonDiff)
-//							+ ("\teleDiff=" + eleDiff));
-//					// TODO remove SYSTEM.OUT.PRINTLN
+					final double eleDiff = _currentChartSliderPosition.elevation - elevation;
 
-					if (_previousMapSliderPosition.getLatitude().equals(sliderDegrees.latitude)
-							&& _previousMapSliderPosition.getLongitude().equals(sliderDegrees.longitude)
+					if (_currentChartSliderPosition.getLatitude().equals(sliderDegrees.latitude)
+							&& _currentChartSliderPosition.getLongitude().equals(sliderDegrees.longitude)
 							&& eleDiff < 0.001) {
 
 						return;
@@ -1900,10 +2032,9 @@ public class Map3View extends ViewPart implements ITourProvider {
 				 */
 
 				// Send a message to stop all changes to the view's center position.
-//					orbitView.stopMovementOnCenter();
+//				orbitView.stopMovementOnCenter();
 
-				// Set the view to center on the track position,
-				// while keeping the eye altitude constant.
+				// Set the view to center on the track position, while keeping the eye altitude constant.
 				try {
 
 					// New eye lat/lon will follow the ground position.
@@ -1921,7 +2052,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 					}
 
 					// keep current position
-					_previousMapSliderPosition = mapSliderPosition;
+					_currentChartSliderPosition = mapSliderPosition;
 				}
 
 				// Fallback to setting center position.
@@ -1936,14 +2067,10 @@ public class Map3View extends ViewPart implements ITourProvider {
 			}
 
 			// update slider UI
-			updateChartSlider_10_Position(
-					chartSliderLayer,
+			updateChartSlider_10_Position(//
 					tourData,
 					chartInfo.leftSliderValuesIndex,
-					chartInfo.rightSliderValuesIndex,
-					valuesIndex);
-
-			chartSliderLayer.setSliderVisible(true);
+					chartInfo.rightSliderValuesIndex);
 
 			enableActions();
 		}
@@ -1957,91 +2084,6 @@ public class Map3View extends ViewPart implements ITourProvider {
 
 			viewController.goToDefaultView(allPositions);
 		}
-	}
-
-	private void updateChartSlider() {
-
-		final ChartSliderLayer chartSliderLayer = getChartSliderLayer();
-		if (chartSliderLayer == null) {
-			return;
-		}
-
-		final TourData tourData = getSelectedTour(chartSliderLayer);
-		if (tourData == null) {
-			chartSliderLayer.setSliderVisible(false);
-			return;
-		}
-
-		chartSliderLayer.setSliderVisible(true);
-
-		updateChartSlider_10_Position(
-				chartSliderLayer,
-				tourData,
-				_currentLeftSliderValueIndex,
-				_currentRightSliderValueIndex,
-				_currentSelectedSliderValueIndex);
-	}
-
-	private void updateChartSlider_10_Position(	final ChartSliderLayer chartSliderLayer,
-												final TourData tourData,
-												int leftPosIndex,
-												int rightPosIndex,
-												int selectedPosIndex) {
-
-		final double[] latitudeSerie = tourData.latitudeSerie;
-
-		final int lastIndex = latitudeSerie.length - 1;
-
-		// check array bounds
-		if (leftPosIndex < 0 || leftPosIndex > lastIndex) {
-			leftPosIndex = 0;
-		}
-		if (rightPosIndex < 0 || rightPosIndex > lastIndex) {
-			rightPosIndex = lastIndex;
-		}
-		if (selectedPosIndex < 0 || selectedPosIndex > lastIndex) {
-			selectedPosIndex = lastIndex;
-		}
-
-		_currentLeftSliderValueIndex = leftPosIndex;
-		_currentRightSliderValueIndex = rightPosIndex;
-		_currentSelectedSliderValueIndex = selectedPosIndex;
-
-		updateChartSlider_20_Data(//
-				chartSliderLayer.getLeftSlider(),
-				_currentLeftSliderValueIndex,
-				tourData,
-				true);
-
-		updateChartSlider_20_Data(//
-				chartSliderLayer.getRightSlider(),
-				_currentRightSliderValueIndex,
-				tourData,
-				false);
-
-		Map3Manager.redrawMap();
-	}
-
-	private void updateChartSlider_20_Data(	final TrackPointAnnotation slider,
-											final int positionIndex,
-											final TourData tourData,
-											final boolean isLeftSlider) {
-
-		/*
-		 * set position and text
-		 */
-		setAnnotationPosition(slider, tourData, positionIndex);
-		setAnnotationColors(tourData, positionIndex, slider);
-
-		slider.setText(createSliderText(positionIndex, tourData));
-	}
-
-	private void updateMapColors() {
-
-		Map3Manager.getLayer_TourTrack().updateColors(_allTours);
-//		Map3Manager.getLayer_TourLegend().updateLegendImage();
-
-		showAllTours(false);
 	}
 
 //	public static final String	ALL						= "gov.nasa.worldwind.perfstat.All";
@@ -2082,11 +2124,84 @@ public class Map3View extends ViewPart implements ITourProvider {
 //2013-10-06 10:12:12.318'118 [Map3View] 	    463659  JVM total memory (Kb)
 //2013-10-06 10:12:12.318'141 [Map3View] 	    431273  JVM used memory (Kb)
 
+	private void updateChartSlider() {
+
+		final ChartSliderLayer chartSliderLayer = getChartSliderLayer();
+		if (chartSliderLayer == null) {
+			return;
+		}
+
+		final TourData tourData = getSelectedTour(chartSliderLayer);
+		if (tourData == null) {
+			chartSliderLayer.setSliderVisible(false);
+			return;
+		}
+
+		updateChartSlider_10_Position(tourData, _currentLeftSliderValueIndex, _currentRightSliderValueIndex);
+	}
+
+	private void updateChartSlider_10_Position(final TourData tourData, int leftPosIndex, int rightPosIndex) {
+
+		final ChartSliderLayer chartSliderLayer = getChartSliderLayer();
+		if (chartSliderLayer == null) {
+			return;
+		}
+
+		final double[] latitudeSerie = tourData.latitudeSerie;
+		final int lastIndex = latitudeSerie.length - 1;
+
+		// check array bounds
+		if (leftPosIndex < 0 || leftPosIndex > lastIndex) {
+			leftPosIndex = 0;
+		}
+		if (rightPosIndex < 0 || rightPosIndex > lastIndex) {
+			rightPosIndex = lastIndex;
+		}
+
+		_currentLeftSliderValueIndex = leftPosIndex;
+		_currentRightSliderValueIndex = rightPosIndex;
+
+		updateChartSlider_20_Data(//
+				chartSliderLayer.getLeftSlider(),
+				_currentLeftSliderValueIndex,
+				tourData);
+
+		updateChartSlider_20_Data(//
+				chartSliderLayer.getRightSlider(),
+				_currentRightSliderValueIndex,
+				tourData);
+
+		chartSliderLayer.setSliderVisible(true);
+
+		Map3Manager.redrawMap();
+	}
+
+	private void updateChartSlider_20_Data(	final TrackPointAnnotation slider,
+											final int positionIndex,
+											final TourData tourData) {
+
+		/*
+		 * set position and text
+		 */
+		setAnnotationPosition(slider, tourData, positionIndex);
+		setAnnotationColors(tourData, positionIndex, slider);
+
+		slider.setText(createSliderText(positionIndex, tourData));
+	}
+
+	private void updateMapColors() {
+
+		Map3Manager.getLayer_TourTrack().updateColors(_allTours);
+//		Map3Manager.getLayer_TourLegend().updateLegendImage();
+
+		showAllTours(false);
+	}
+
 	private void updateModifiedTours(final ArrayList<TourData> modifiedTours) {
 
 		// cleanup old tours, this method cannot be used: cleanupOldTours();
-		_postSelectionProvider.clearSelection();
-		_previousMapSliderPosition = null;
+//		_postSelectionProvider.clearSelection();
+		_currentChartSliderPosition = null;
 
 		_allTours.removeAll(modifiedTours);
 		_allTours.addAll(getMapTours(modifiedTours));

@@ -36,6 +36,7 @@ public class Messages extends NLS {
 	public static String		Image_Action_ShowAllPhotosInMap;
 	public static String		Image_Action_ShowPhotosInMap;
 	public static String		Image_Action_ShowSliderInMap;
+	public static String		Image_Action_ShowSliderInMap_Left;
 	public static String		Image_Action_ShowStartEndInMap;
 	public static String		Image_Action_TourWayPoint;
 	public static String		Image_Action_TourWayPoint_Disabled;

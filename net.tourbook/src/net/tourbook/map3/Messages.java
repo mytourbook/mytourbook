@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -38,8 +38,7 @@ public class Messages extends NLS {
 	public static String		Default_Layer_Stars;
 	public static String		Default_Layer_USGS_UrbanArea;
 	public static String		Default_Layer_WMS_BingImagery;
-
-	public static String	Default_Layer_WMS_EarthAtNight;
+	public static String		Default_Layer_WMS_EarthAtNight;
 	public static String		Default_Layer_WMS_i_cubed_Landsat;
 	public static String		Default_Layer_WMS_NASABlueMarble2004;
 	public static String		Default_Layer_WMS_OpenStreetMap;
@@ -59,6 +58,8 @@ public class Messages extends NLS {
 
 	public static String		Map3_Action_DirectionArrows;
 	public static String		Map3_Action_OpenMap3PropertiesView;
+	public static String		Map3_Action_SetChartSliderLeft;
+	public static String		Map3_Action_SetChartSliderRight;
 	public static String		Map3_Action_TrackColor;
 
 	public static String		Prop_Viewer_Label_AltitudeRange_Tooltip;
@@ -83,10 +84,8 @@ public class Messages extends NLS {
 	public static String		TourTrack_Properties_Button_Default_Tooltip;
 	public static String		TourTrack_Properties_Checkbox_AltitudeOffset;
 	public static String		TourTrack_Properties_Checkbox_AltitudeOffset_Tooltip;
-
-	public static String	TourTrack_Properties_Checkbox_AltitudeOffsetRandom;
-
-	public static String	TourTrack_Properties_Checkbox_AltitudeOffsetRandom_Tooltip;
+	public static String		TourTrack_Properties_Checkbox_AltitudeOffsetRandom;
+	public static String		TourTrack_Properties_Checkbox_AltitudeOffsetRandom_Tooltip;
 	public static String		TourTrack_Properties_Checkbox_DrawVerticals;
 	public static String		TourTrack_Properties_Checkbox_DrawVerticals_Tooltip;
 	public static String		TourTrack_Properties_Checkbox_ExtrudePath;

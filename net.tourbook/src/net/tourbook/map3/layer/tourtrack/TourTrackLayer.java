@@ -37,6 +37,7 @@ import net.tourbook.data.TourData;
 import net.tourbook.map2.view.IDiscreteColors;
 import net.tourbook.map3.view.ICheckStateListener;
 import net.tourbook.map3.view.Map3Manager;
+import net.tourbook.map3.view.Map3View;
 import net.tourbook.map3.view.TVIMap3Layer;
 import net.tourbook.tour.SelectionTourData;
 
@@ -292,37 +293,52 @@ public class TourTrackLayer extends RenderableLayer implements SelectListener, I
 			return;
 		}
 
-//		final StringBuilder sb = new StringBuilder();
-//		sb.append(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] \t"); //$NON-NLS-1$ //$NON-NLS-2$
-//		sb.append("\t" + event.getEventAction()); //$NON-NLS-1$
+		final String eventAction = event.getEventAction();
 
-		final PickedObject pickedObject = event.getTopPickedObject();
+//		System.out.println(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] \teventAction: " + eventAction);
+//		// TODO remove SYSTEM.OUT.PRINTLN
 
-//		final String topObjectText = topPickedObject == null ? //
-//				"null"
-//				: topPickedObject.getClass().getSimpleName()
-//				+ "\t"
-//				+ topPickedObject.getObject().getClass().getSimpleName();
-//		sb.append("topObject: " + topObjectText);
+		if (Map3Manager.getMap3View().isContextMenuVisible()) {
 
-		ITrackPath hoveredTrackPath = null;
-		Integer hoveredPositionIndex = null;
+			// prevent actions when context menu is visible
 
-		if (pickedObject != null && pickedObject.getObject() instanceof ITrackPath) {
-
-			hoveredTrackPath = (ITrackPath) pickedObject.getObject();
-
-			final Object pickOrdinal = pickedObject.getValue(AVKey.ORDINAL);
-			hoveredPositionIndex = (Integer) pickOrdinal;
-
-//			sb.append("\t" + hoveredTrackPath);
-//			sb.append("\tpickIndex: " + hoveredPositionIndex); //$NON-NLS-1$
+			return;
 		}
 
-		selectTrackPath(hoveredTrackPath, hoveredPositionIndex, event.getEventAction(), true);
+		if (eventAction == SelectEvent.HOVER) {
 
-//		System.out.println(sb.toString());
-//		// TODO remove SYSTEM.OUT.PRINTLN
+			// not yet used
+
+		} else if (eventAction == SelectEvent.RIGHT_PRESS) {
+
+			/**
+			 * When the context menu should be displayed and the right mouse button is pressed,
+			 * first a SelectEvent.HOVER is fired before SelectEvent.RIGHT_PRESS is fired. Therefor
+			 * the context state must be set here.
+			 * <p>
+			 * The context menu is opened with a ww mouse listener in Map3View.
+			 */
+
+//			map3View.setContextMenuVisible(true);
+
+		} else {
+
+			// get hovered object
+			final PickedObject pickedObject = event.getTopPickedObject();
+
+			ITrackPath hoveredTrackPath = null;
+			Integer hoveredPositionIndex = null;
+
+			if (pickedObject != null && pickedObject.getObject() instanceof ITrackPath) {
+
+				hoveredTrackPath = (ITrackPath) pickedObject.getObject();
+
+				final Object pickOrdinal = pickedObject.getValue(AVKey.ORDINAL);
+				hoveredPositionIndex = (Integer) pickOrdinal;
+			}
+
+			selectTrackPath(hoveredTrackPath, hoveredPositionIndex, eventAction, true);
+		}
 	}
 
 	/**
@@ -337,19 +353,6 @@ public class TourTrackLayer extends RenderableLayer implements SelectListener, I
 									final Integer hoveredPositionIndex,
 									final String eventAction,
 									final boolean isFireSelection) {
-
-//		System.out.println(UI.timeStampNano()
-//				+ " ["
-//				+ getClass().getSimpleName()
-//				+ "] \t"
-//				+ hoveredTrackPath
-//				+ "\t"
-//				+ hoveredPositionIndex
-//				+ "\t"
-//				+ eventAction
-//				+ "\t"
-//				+ isFireSelection);
-//// TODO remove SYSTEM.OUT.PRINTLN
 
 		final ITrackPath backupSelectedTrackPath = _selectedTrackPath;
 
@@ -366,7 +369,6 @@ public class TourTrackLayer extends RenderableLayer implements SelectListener, I
 
 			// updated colors
 
-//			selectTrackPath_Hovered_WithAttributeColor(hoveredTrackPath);
 			selectTrackPath_Hovered_WithPositionColor(hoveredTrackPath, hoveredPositionIndex);
 
 			_lastHoveredTourTrack = hoveredTrackPath;
@@ -376,17 +378,18 @@ public class TourTrackLayer extends RenderableLayer implements SelectListener, I
 		// fire selection
 		if (isFireSelection) {
 
+			final Map3View map3View = Map3Manager.getMap3View();
+
 			if (_selectedTrackPath != null
 					&& (backupSelectedTrackPath == null || _selectedTrackPath != backupSelectedTrackPath)) {
 
 				// a new track is selected, fire selection
 
-				Map3Manager.getMap3View().setSelection(
-						new SelectionTourData(_selectedTrackPath.getTourTrack().getTourData()));
+				map3View.fireTourSelection(new SelectionTourData(_selectedTrackPath.getTourTrack().getTourData()));
 
 			} else {
 
-				Map3Manager.getMap3View().setTourInfo(hoveredTrackPath, hoveredPositionIndex);
+				map3View.setTourInfo(hoveredTrackPath, hoveredPositionIndex);
 			}
 		}
 	}
