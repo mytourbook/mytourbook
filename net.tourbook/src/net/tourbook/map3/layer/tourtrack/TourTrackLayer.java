@@ -851,13 +851,6 @@ public class TourTrackLayer extends RenderableLayer implements SelectListener, I
 
 				_lastAddRemoveAction = 1;
 				ww.addSelectListener(this);
-
-//				System.out.println(UI.timeStampNano()
-//						+ " [" //$NON-NLS-1$
-//						+ getClass().getSimpleName()
-//						+ "] \tsetupWWSelectionListener\tadd"); //$NON-NLS-1$
-//				// TODO remove SYSTEM.OUT.PRINTLN
-
 			}
 
 		} else {
@@ -866,12 +859,6 @@ public class TourTrackLayer extends RenderableLayer implements SelectListener, I
 
 				_lastAddRemoveAction = 0;
 				ww.removeSelectListener(this);
-
-//				System.out.println(UI.timeStampNano()
-//						+ " [" //$NON-NLS-1$
-//						+ getClass().getSimpleName()
-//						+ "] \tsetupWWSelectionListener\tremove"); //$NON-NLS-1$
-//				// TODO remove SYSTEM.OUT.PRINTLN
 			}
 		}
 	}
