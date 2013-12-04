@@ -51,6 +51,7 @@ import net.tourbook.map3.layer.DefaultLayer;
 import net.tourbook.map3.layer.IToolLayer;
 import net.tourbook.map3.layer.MapDefaultCategory;
 import net.tourbook.map3.layer.MapDefaultLayer;
+import net.tourbook.map3.layer.MarkerLayer;
 import net.tourbook.map3.layer.StatusLayer;
 import net.tourbook.map3.layer.TourInfoLayer;
 import net.tourbook.map3.layer.TourLegendLayer;
@@ -75,7 +76,7 @@ public class Map3Manager {
 	 * This version number is incremented, when structural changes (e.g. new category) are done.
 	 * When this happens, the <b>default</b> structure is created.
 	 */
-	private static final int							MAP3_LAYER_STRUCTURE_VERSION	= 12;
+	private static final int							MAP3_LAYER_STRUCTURE_VERSION	= 13;
 
 	public static final String							PROPERTY_NAME_ENABLED			= "Enabled";														//$NON-NLS-1$
 
@@ -144,15 +145,18 @@ public class Map3Manager {
 	private static LinkedHashMap<String, IToolLayer>	_toolLayers						= new LinkedHashMap<String, IToolLayer>();
 	//
 	private static ChartSliderLayer						_wwLayer_ChartSlider;
+	private static MarkerLayer							_wwLayer_Marker;
 	private static TourInfoLayer						_wwLayer_TourInfo;
 	private static TourLegendLayer						_wwLayer_TourLegend;
 	private static TourTrackLayer						_wwLayer_TourTrack;
+
 	//
 	private static Object[]								_uiVisibleLayers;
 	private static Object[]								_uiExpandedCategories;
 	private static ArrayList<TVIMap3Layer>				_uiVisibleLayersFromXml			= new ArrayList<TVIMap3Layer>();
 	private static ArrayList<TVIMap3Category>			_uiExpandedCategoriesFromXml	= new ArrayList<TVIMap3Category>();
 	private static ArrayList<Layer>						_xmlLayers						= new ArrayList<Layer>();
+
 	private static final DateTimeFormatter				_dtFormatter					= ISODateTimeFormat
 																								.basicDateTimeNoMillis();
 
@@ -287,6 +291,7 @@ public class Map3Manager {
 
 		// create custom layer BEFORE state is applied and xml file is read which references these layers
 		createLayer_MT_TourTracks();
+		createLayer_MT_Marker();
 		createLayer_MT_TourLegend();
 		createLayer_MT_ChartSlider();
 		createLayer_MT_TourInfo();
@@ -335,6 +340,34 @@ public class Map3Manager {
 		if (isVisible) {
 			_uiVisibleLayersFromXml.add(tviLayer);
 		}
+
+		_uiCustomLayers.put(layerId, tviLayer);
+	}
+
+	private static void createLayer_MT_Marker() {
+
+		/*
+		 * create WW layer
+		 */
+		_wwLayer_Marker = new MarkerLayer(_state);
+
+		/*
+		 * create UI model layer
+		 */
+		final String layerId = MarkerLayer.MAP3_LAYER_ID;
+		final TVIMap3Layer tviLayer = new TVIMap3Layer(layerId, _wwLayer_Marker, Messages.Custom_Layer_POI);
+
+		final boolean isVisible = true;
+
+		// default is enabled
+		tviLayer.isLayerVisible = isVisible;
+		tviLayer.defaultPosition = INSERT_BEFORE_PLACE_NAMES;
+
+		if (isVisible) {
+			_uiVisibleLayersFromXml.add(tviLayer);
+		}
+
+		tviLayer.addCheckStateListener(_wwLayer_Marker);
 
 		_uiCustomLayers.put(layerId, tviLayer);
 	}
@@ -730,11 +763,15 @@ public class Map3Manager {
 			return;
 		}
 
-		_map3View.enableActions();
+		_map3View.updateActionsState();
 	}
 
 	public static ChartSliderLayer getLayer_ChartSlider() {
 		return _wwLayer_ChartSlider;
+	}
+
+	public static MarkerLayer getLayer_Marker() {
+		return _wwLayer_Marker;
 	}
 
 	public static TourInfoLayer getLayer_TourInfo() {
@@ -1258,18 +1295,20 @@ public class Map3Manager {
 
 	}
 
+	private static void setCustomLayerVisibleInLayerView(final boolean isVisible, final String customLayerId) {
+
+		if (_map3LayerView != null) {
+			_map3LayerView.setLayerVisible(_uiCustomLayers.get(customLayerId), isVisible);
+		}
+	}
+
 	static void setLayerVisible_ChartSlider(final boolean isChartSliderVisible) {
 
 		// update model
 		_wwLayer_ChartSlider.setEnabled(isChartSliderVisible);
 
 		// update UI
-		if (_map3LayerView != null) {
-
-			_map3LayerView.setLayerVisible(//
-					_uiCustomLayers.get(ChartSliderLayer.MAP3_LAYER_ID),
-					isChartSliderVisible);
-		}
+		setCustomLayerVisibleInLayerView(isChartSliderVisible, ChartSliderLayer.MAP3_LAYER_ID);
 	}
 
 	static void setLayerVisible_Legend(final boolean isLegendVisible) {
@@ -1278,12 +1317,16 @@ public class Map3Manager {
 		_wwLayer_TourLegend.setEnabled(isLegendVisible);
 
 		// update UI
-		if (_map3LayerView != null) {
+		setCustomLayerVisibleInLayerView(isLegendVisible, TourLegendLayer.MAP3_LAYER_ID);
+	}
 
-			_map3LayerView.setLayerVisible(//
-					_uiCustomLayers.get(TourLegendLayer.MAP3_LAYER_ID),
-					isLegendVisible);
-		}
+	static void setLayerVisible_Marker(final boolean isVisible) {
+
+		// update model
+		_wwLayer_Marker.setEnabled(isVisible);
+
+		// update UI
+		setCustomLayerVisibleInLayerView(isVisible, MarkerLayer.MAP3_LAYER_ID);
 	}
 
 	/**

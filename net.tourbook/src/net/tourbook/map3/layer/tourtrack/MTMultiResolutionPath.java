@@ -4,7 +4,7 @@
  * All Rights Reserved.
  */
 
-package net.tourbook.map3.shape;
+package net.tourbook.map3.layer.tourtrack;
 
 import gov.nasa.worldwind.geom.Position;
 import gov.nasa.worldwind.geom.Vec4;

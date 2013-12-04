@@ -37,7 +37,6 @@ import java.util.List;
 import javax.media.opengl.GL2;
 
 import net.tourbook.common.color.ColorUtil;
-import net.tourbook.map3.shape.MTMultiResolutionPath;
 import net.tourbook.map3.view.Map3View;
 
 import org.eclipse.swt.graphics.RGB;

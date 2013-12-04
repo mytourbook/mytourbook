@@ -18,8 +18,18 @@ package net.tourbook.map3.layer;
 import gov.nasa.worldwind.awt.WorldWindowGLCanvas;
 import gov.nasa.worldwind.event.SelectEvent;
 import gov.nasa.worldwind.event.SelectListener;
+import gov.nasa.worldwind.geom.Position;
 import gov.nasa.worldwind.layers.RenderableLayer;
 import gov.nasa.worldwind.pick.PickedObject;
+import gov.nasa.worldwind.render.PointPlacemarkAttributes;
+
+import java.util.ArrayList;
+import java.util.Set;
+
+import net.tourbook.common.UI;
+import net.tourbook.data.TourData;
+import net.tourbook.data.TourMarker;
+import net.tourbook.map3.layer.tourtrack.TourTrackConfig;
 import net.tourbook.map3.layer.tourtrack.TourTrackConfigManager;
 import net.tourbook.map3.view.ICheckStateListener;
 import net.tourbook.map3.view.Map3Manager;
@@ -27,7 +37,7 @@ import net.tourbook.map3.view.TVIMap3Layer;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
 
-public class POILayer extends RenderableLayer implements SelectListener, ICheckStateListener {
+public class MarkerLayer extends RenderableLayer implements SelectListener, ICheckStateListener {
 
 	public static final String	MAP3_LAYER_ID			= "POILayer";	//$NON-NLS-1$
 
@@ -36,9 +46,95 @@ public class POILayer extends RenderableLayer implements SelectListener, ICheckS
 	 */
 	private int					_lastAddRemoveAction	= -1;
 
-	public POILayer(final IDialogSettings state) {
+	private MTClutterFilter		_clutterFilter;
+
+	public MarkerLayer(final IDialogSettings state) {
+
+		_clutterFilter = new MTClutterFilter();
 
 //		addPropertyChangeListener(this);
+	}
+
+	public void createMarker(final ArrayList<TourData> _allTours) {
+
+		removeAllRenderables();
+
+		final PointPlacemarkAttributes ppAttributes = new PointPlacemarkAttributes();
+		ppAttributes.setScale(3.0);
+		ppAttributes.setLabelScale(1.0);
+		ppAttributes.setLabelFont(UI.AWT_FONT_ARIAL_48);
+
+		final TourTrackConfig config = TourTrackConfigManager.getActiveConfig();
+
+		for (final TourData tourData : _allTours) {
+
+			final Set<TourMarker> tourMarkerList = tourData.getTourMarkers();
+			if (tourMarkerList.size() == 0) {
+				continue;
+			}
+
+			// check if geo position is available
+			final double[] latitudeSerie = tourData.latitudeSerie;
+			final double[] longitudeSerie = tourData.longitudeSerie;
+			if (latitudeSerie == null || longitudeSerie == null) {
+				continue;
+			}
+
+			for (final TourMarker tourMarker : tourMarkerList) {
+
+				// skip marker when hidden or not set
+				if (tourMarker.isMarkerVisible() == false || tourMarker.getLabel().length() == 0) {
+					continue;
+				}
+
+				final int serieIndex = tourMarker.getSerieIndex();
+
+				/*
+				 * check bounds because when a tour is split, it can happen that the marker serie
+				 * index is out of scope
+				 */
+				if (serieIndex >= latitudeSerie.length) {
+					continue;
+				}
+
+				/*
+				 * draw tour marker
+				 */
+
+				int altitudeMode;
+				double altitude = 0;
+				final float[] altitudeSerie = tourData.altitudeSerie;
+
+//				if (altitudeSerie == null) {
+//
+//					altitudeMode = WorldWind.CLAMP_TO_GROUND;
+//
+//				} else {
+//
+				altitude = altitudeSerie[serieIndex] + 000;
+				altitudeMode = config.altitudeMode;
+//				}
+
+				final MTPointPlacemark pp = new MTPointPlacemark(Position.fromDegrees(
+						latitudeSerie[serieIndex],
+						longitudeSerie[serieIndex],
+						altitude));
+
+				pp.setAltitudeMode(altitudeMode);
+//				pp.setEnableDecluttering(true);
+
+				pp.setLabelText(tourMarker.getLabel());
+
+				// set tooltip
+//				pp.setValue(AVKey.DISPLAY_NAME, "Clamp to ground, Label, Semi-transparent, Audio icon");
+
+				pp.setLineEnabled(true);
+
+				pp.setAttributes(ppAttributes);
+
+				addRenderable(pp);
+			}
+		}
 	}
 
 	@Override
@@ -98,6 +194,9 @@ public class POILayer extends RenderableLayer implements SelectListener, ICheckS
 
 				_lastAddRemoveAction = 1;
 				ww.addSelectListener(this);
+
+//				ww.getSceneController().setClutterFilter(_clutterFilter);
+
 			}
 
 		} else {
@@ -106,6 +205,8 @@ public class POILayer extends RenderableLayer implements SelectListener, ICheckS
 
 				_lastAddRemoveAction = 0;
 				ww.removeSelectListener(this);
+
+//				ww.getSceneController().setClutterFilter(null);
 			}
 		}
 	}

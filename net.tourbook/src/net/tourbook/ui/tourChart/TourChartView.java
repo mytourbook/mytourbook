@@ -25,7 +25,6 @@ import net.tourbook.chart.ISliderMoveListener;
 import net.tourbook.chart.SelectionChartInfo;
 import net.tourbook.chart.SelectionChartXSliderPosition;
 import net.tourbook.common.util.PostSelectionProvider;
-import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.photo.IPhotoEventListener;
 import net.tourbook.photo.PhotoEventId;
@@ -390,7 +389,25 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 					 * be fired in the selection provider !!!
 					 */
 
-					Util.showView(ID, true);
+//					Util.showView(ID, true);
+
+// this cause this problem
+//					org.eclipse.ui.PartInitException: Warning: Detected recursive attempt by part net.tourbook.views.TourChartView to create itself (this is probably, but not necessarily, a bug)
+//					at org.eclipse.ui.internal.WorkbenchPartReference.getPart(WorkbenchPartReference.java:586)
+//					at org.eclipse.ui.internal.Perspective.showView(Perspective.java:2245)
+//					at org.eclipse.ui.internal.WorkbenchPage.busyShowView(WorkbenchPage.java:1154)
+//					at org.eclipse.ui.internal.WorkbenchPage$20.run(WorkbenchPage.java:3934)
+//					at org.eclipse.swt.custom.BusyIndicator.showWhile(BusyIndicator.java:70)
+//					at org.eclipse.ui.internal.WorkbenchPage.showView(WorkbenchPage.java:3931)
+//					at net.tourbook.common.util.Util.showView(Util.java:1758)
+//					at net.tourbook.ui.tourChart.TourChartView$7.sliderMoved(TourChartView.java:393)
+//					at net.tourbook.chart.Chart$5.run(Chart.java:545)
+//					at org.eclipse.core.runtime.SafeRunner.run(SafeRunner.java:42)
+//					at org.eclipse.ui.internal.JFaceUtil$1.run(JFaceUtil.java:49)
+//					at org.eclipse.jface.util.SafeRunnable.run(SafeRunnable.java:175)
+//					at net.tourbook.chart.Chart.fireSliderMoveEvent(Chart.java:543)
+//					at net.tourbook.chart.Chart.updateChart(Chart.java:1220)
+//					at net.tourbook.chart.Chart.updateChart(Chart.java:1155)
 				}
 
 				_postSelectionProvider.setSelection(chartInfoSelection);

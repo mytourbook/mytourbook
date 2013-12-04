@@ -76,11 +76,13 @@ import net.tourbook.map3.action.ActionShowChartSliderInMap;
 import net.tourbook.map3.action.ActionShowDirectionArrows;
 import net.tourbook.map3.action.ActionShowEntireTour;
 import net.tourbook.map3.action.ActionShowLegendInMap3;
+import net.tourbook.map3.action.ActionShowMarker;
 import net.tourbook.map3.action.ActionShowTourInMap3;
 import net.tourbook.map3.action.ActionSyncMapWithChartSlider;
 import net.tourbook.map3.action.ActionSyncMapWithTour;
 import net.tourbook.map3.action.ActionTourColor;
 import net.tourbook.map3.layer.ChartSliderLayer;
+import net.tourbook.map3.layer.MarkerLayer;
 import net.tourbook.map3.layer.TourInfoLayer;
 import net.tourbook.map3.layer.TrackPointAnnotation;
 import net.tourbook.map3.layer.tourtrack.ITrackPath;
@@ -167,6 +169,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 	private ActionShowDirectionArrows			_actionShowDirectionArrows;
 	private ActionShowEntireTour				_actionShowEntireTour;
 	private ActionShowLegendInMap3				_actionShowLegendInMap;
+	private ActionShowMarker					_actionShowMarker;
 	private ActionShowTourInMap3				_actionShowTourInMap3;
 	private ActionSyncMapWithChartSlider		_actionSynMapWithChartSlider;
 	private ActionSyncMapWithTour				_actionSynMapWithTour;
@@ -204,9 +207,6 @@ public class Map3View extends ViewPart implements ITourProvider {
 
 	private boolean								_isSyncMapWithChartSlider;
 	private boolean								_isSyncMapViewWithTour;
-	private boolean								_isTourVisible;
-	private boolean								_isLegendVisible;
-	private boolean								_isChartSliderVisible;
 
 	private int									_statisticUpdateInterval				= 500;
 	private long								_statisticLastUpdate;
@@ -402,25 +402,24 @@ public class Map3View extends ViewPart implements ITourProvider {
 
 	public void actionShowDirectionArrows(final boolean isVisible) {
 
-		final TourTrackLayer tourTrackLayer = Map3Manager.getLayer_TourTrack();
-		final TourTrackConfig trackConfig = TourTrackConfigManager.getActiveConfig();
+		// update model
+		TourTrackConfigManager.getActiveConfig().isShowDirectionArrows = isVisible;
 
-		trackConfig.isShowDirectionArrows = isVisible;
-
-		// invalidate cached data and force a redraw
-		tourTrackLayer.setExpired();
+		// update UI, invalidate cached data and force a redraw
+		Map3Manager.getLayer_TourTrack().setExpired();
 	}
 
 	public void actionShowLegendInMap(final boolean isLegendVisible) {
 
-		_isLegendVisible = isLegendVisible;
-
 		Map3Manager.setLayerVisible_Legend(isLegendVisible);
 	}
 
-	public void actionShowTour(final boolean isTrackVisible) {
+	public void actionShowMarker(final boolean isVisible) {
 
-		_isTourVisible = isTrackVisible;
+		Map3Manager.setLayerVisible_Marker(isVisible);
+	}
+
+	public void actionShowTour(final boolean isTrackVisible) {
 
 		Map3Manager.setLayerVisible_TourTrack(isTrackVisible);
 
@@ -723,6 +722,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 		_actionShowDirectionArrows = new ActionShowDirectionArrows(this);
 		_actionShowEntireTour = new ActionShowEntireTour(this);
 		_actionShowLegendInMap = new ActionShowLegendInMap3(this);
+		_actionShowMarker = new ActionShowMarker(this);
 		_actionShowTourInMap3 = new ActionShowTourInMap3(this, parent);
 		_actionSynMapWithChartSlider = new ActionSyncMapWithChartSlider(this);
 		_actionSynMapWithTour = new ActionSyncMapWithTour(this);
@@ -835,7 +835,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 			public void run() {
 
 				restoreState();
-				enableActions();
+				updateActionsState();
 
 				_isRestored = true;
 
@@ -991,25 +991,6 @@ public class Map3View extends ViewPart implements ITourProvider {
 		}
 	}
 
-	/**
-	 * Enable actions according to the available tours in {@link #_allTours}.
-	 */
-	void enableActions() {
-
-		final boolean isChartSliderVisible = Map3Manager.getLayer_ChartSlider().isEnabled();
-		final boolean isLegendVisible = Map3Manager.getLayer_TourLegend().isEnabled();
-		final boolean isTrackVisible = Map3Manager.getLayer_TourTrack().isEnabled();
-
-		final boolean isTourAvailable = _allTours.size() > 0;
-
-		_actionShowTourInMap3.setState(isTrackVisible, isTourAvailable);
-		_actionSynMapWithChartSlider.setEnabled(isTourAvailable && _isChartSliderVisible);
-		_actionSynMapWithTour.setEnabled(isTourAvailable);
-
-		_actionShowLegendInMap.setChecked(isLegendVisible);
-		_actionShowChartSliderInMap.setChecked(isChartSliderVisible);
-	}
-
 	private void enableContextMenuActions() {
 
 		final ITrackPath selectedTrack = Map3Manager.getLayer_TourTrack().getSelectedTrack();
@@ -1067,6 +1048,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 
 		(new Separator()).fill(menu, -1);
 		fillMenuItem(menu, _actionShowDirectionArrows);
+		fillMenuItem(menu, _actionShowMarker);
 		fillMenuItem(menu, _actionShowChartSliderInMap);
 		fillMenuItem(menu, _actionShowLegendInMap);
 
@@ -1309,9 +1291,6 @@ public class Map3View extends ViewPart implements ITourProvider {
 
 	private void onSelection(final ISelection selection) {
 
-//		System.out.println(UI.timeStampNano() + " Map::onSelectionChanged\t" + selection);
-//		// TODO remove SYSTEM.OUT.PRINTLN
-
 		if (_isPartVisible == false || _isRestored == false) {
 
 			if (selection instanceof SelectionTourData
@@ -1326,6 +1305,13 @@ public class Map3View extends ViewPart implements ITourProvider {
 		}
 
 		final boolean isTourTrackVisible = Map3Manager.getLayer_TourTrack().isEnabled();
+		final boolean isPOIVisible = Map3Manager.getLayer_Marker().isEnabled();
+		final boolean isChartSliderVisible = Map3Manager.getLayer_ChartSlider().isEnabled();
+
+		// check if a tour or poi can be displayed
+		if (isTourTrackVisible == false && isPOIVisible == false) {
+			return;
+		}
 
 		if (selection instanceof SelectionTourData) {
 
@@ -1334,45 +1320,21 @@ public class Map3View extends ViewPart implements ITourProvider {
 
 			showTour(tourData);
 
-//			paintPhotoSelection(selection);
-
 		} else if (selection instanceof SelectionTourId) {
-
-			if (isTourTrackVisible == false) {
-				return;
-			}
 
 			final Long tourId = ((SelectionTourId) selection).getTourId();
 			final TourData tourData = TourManager.getInstance().getTourData(tourId);
 
 			showTour(tourData);
 
-//			paintPhotoSelection(selection);
-
 		} else if (selection instanceof SelectionTourIds) {
 
 			// paint all selected tours
-
-			if (isTourTrackVisible == false) {
-				return;
-			}
 
 			final ArrayList<Long> tourIds = ((SelectionTourIds) selection).getTourIds();
 			if (tourIds.size() == 0) {
 
 				clearView();
-
-				// history tour (without tours) is displayed
-
-//				final ArrayList<Photo> allPhotos = paintPhotoSelection(selection);
-//
-//				if (allPhotos.size() > 0) {
-//
-////					centerPhotos(allPhotos, false);
-//					showDefaultMap(true);
-//
-//					enableActions();
-//				}
 
 			} else if (tourIds.size() == 1) {
 
@@ -1381,22 +1343,17 @@ public class Map3View extends ViewPart implements ITourProvider {
 				final TourData tourData = TourManager.getInstance().getTourData(tourIds.get(0));
 
 				showTour(tourData);
-//				paintTours_20_One(tourData, false, true);
-//				paintPhotoSelection(selection);
 
 			} else {
 
 				// paint multiple tours
 
 				showTours(tourIds);
-//				paintPhotoSelection(selection);
-
-//				enableActions(true);
 			}
 
 		} else if (selection instanceof SelectionChartInfo) {
 
-			if (_isChartSliderVisible == false) {
+			if (isChartSliderVisible == false) {
 				return;
 			}
 
@@ -1412,122 +1369,6 @@ public class Map3View extends ViewPart implements ITourProvider {
 				}
 			}
 
-//		} else if (selection instanceof SelectionChartXSliderPosition) {
-//
-//			final SelectionChartXSliderPosition xSliderPos = (SelectionChartXSliderPosition) selection;
-//			final Chart chart = xSliderPos.getChart();
-//			if (chart == null) {
-//				return;
-//			}
-//
-//			final ChartDataModel chartDataModel = chart.getChartDataModel();
-//
-//			final Object tourId = chartDataModel.getCustomData(TourManager.CUSTOM_DATA_TOUR_ID);
-//			if (tourId instanceof Long) {
-//
-//				final TourData tourData = TourManager.getInstance().getTourData((Long) tourId);
-//				if (tourData != null) {
-//
-//					final int leftSliderValueIndex = xSliderPos.getLeftSliderValueIndex();
-//					int rightSliderValueIndex = xSliderPos.getRightSliderValueIndex();
-//
-//					rightSliderValueIndex = rightSliderValueIndex == SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION
-//							? leftSliderValueIndex
-//							: rightSliderValueIndex;
-//
-//					paintTourSliders(tourData, leftSliderValueIndex, rightSliderValueIndex, leftSliderValueIndex);
-//
-//					enableActions();
-//				}
-//			}
-//
-//		} else if (selection instanceof SelectionMapPosition) {
-//
-//			final SelectionMapPosition mapPositionSelection = (SelectionMapPosition) selection;
-//
-//			final int valueIndex1 = mapPositionSelection.getSlider1ValueIndex();
-//			int valueIndex2 = mapPositionSelection.getSlider2ValueIndex();
-//
-//			valueIndex2 = valueIndex2 == SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION
-//					? valueIndex1
-//					: valueIndex2;
-//
-//			paintTourSliders(mapPositionSelection.getTourData(), valueIndex1, valueIndex2, valueIndex1);
-//
-//			enableActions();
-//
-//		} else if (selection instanceof PointOfInterest) {
-//
-//			_isTourOrWayPoint = false;
-//
-//			clearView();
-//
-//			final PointOfInterest poi = (PointOfInterest) selection;
-//
-//			_poiPosition = poi.getPosition();
-//			_poiName = poi.getName();
-//
-//			_poiZoomLevel = poi.getRecommendedZoom();
-//			if (_poiZoomLevel == -1) {
-//				_poiZoomLevel = _map.getZoom();
-//			}
-//
-//			_map.setPoi(_poiPosition, _poiZoomLevel, _poiName);
-//
-//			_actionShowPOI.setChecked(true);
-//
-//			enableActions();
-//
-//		} else if (selection instanceof StructuredSelection) {
-//
-//			final StructuredSelection structuredSelection = (StructuredSelection) selection;
-//			final Object firstElement = structuredSelection.getFirstElement();
-//
-//			if (firstElement instanceof TVICatalogComparedTour) {
-//
-//				final TVICatalogComparedTour comparedTour = (TVICatalogComparedTour) firstElement;
-//				final long tourId = comparedTour.getTourId();
-//
-//				final TourData tourData = TourManager.getInstance().getTourData(tourId);
-//				paintTours_20_One(tourData, false, true);
-//
-//			} else if (firstElement instanceof TVICompareResultComparedTour) {
-//
-//				final TVICompareResultComparedTour compareResultItem = (TVICompareResultComparedTour) firstElement;
-//				final TourData tourData = TourManager.getInstance().getTourData(
-//						compareResultItem.getComparedTourData().getTourId());
-//				paintTours_20_One(tourData, false, true);
-//
-//			} else if (firstElement instanceof TourWayPoint) {
-//
-//				final TourWayPoint wp = (TourWayPoint) firstElement;
-//
-//				_map.setPOI(_wayPointToolTipProvider, wp);
-//			}
-//
-//			enableActions();
-//
-//		} else if (selection instanceof PhotoSelection) {
-//
-//			paintPhotos(((PhotoSelection) selection).galleryPhotos);
-//
-//			enableActions();
-//
-//		} else if (selection instanceof SelectionTourCatalogView) {
-//
-//			// show reference tour
-//
-//			final SelectionTourCatalogView tourCatalogSelection = (SelectionTourCatalogView) selection;
-//
-//			final TVICatalogRefTourItem refItem = tourCatalogSelection.getRefItem();
-//			if (refItem != null) {
-//
-//				final TourData tourData = TourManager.getInstance().getTourData(refItem.getTourId());
-//
-//				paintTours_20_One(tourData, false, true);
-//
-//				enableActions();
-//			}
 		}
 	}
 
@@ -1544,18 +1385,18 @@ public class Map3View extends ViewPart implements ITourProvider {
 		_actionSynMapWithChartSlider.setChecked(_isSyncMapWithChartSlider);
 
 		// is tour visible / available
-		_isTourVisible = Util.getStateBoolean(_state, STATE_IS_TOUR_VISIBLE, true);
-		_actionShowTourInMap3.setState(_isTourVisible, isTourAvailable);
+		final boolean isTourVisible = Util.getStateBoolean(_state, STATE_IS_TOUR_VISIBLE, true);
+		_actionShowTourInMap3.setState(isTourVisible, isTourAvailable);
 
 		// is legend visible
-		_isLegendVisible = Util.getStateBoolean(_state, STATE_IS_LEGEND_VISIBLE, true);
-		_actionShowLegendInMap.setChecked(_isLegendVisible);
-		Map3Manager.setLayerVisible_Legend(_isLegendVisible);
+		final boolean isLegendVisible = Util.getStateBoolean(_state, STATE_IS_LEGEND_VISIBLE, true);
+		_actionShowLegendInMap.setChecked(isLegendVisible);
+		Map3Manager.setLayerVisible_Legend(isLegendVisible);
 
 		// is chart slider visible
-		_isChartSliderVisible = Util.getStateBoolean(_state, STATE_IS_CHART_SLIDER_VISIBLE, true);
-		_actionShowChartSliderInMap.setChecked(_isChartSliderVisible);
-		Map3Manager.setLayerVisible_ChartSlider(_isChartSliderVisible);
+		final boolean isChartSliderVisible = Util.getStateBoolean(_state, STATE_IS_CHART_SLIDER_VISIBLE, true);
+		_actionShowChartSliderInMap.setChecked(isChartSliderVisible);
+		Map3Manager.setLayerVisible_ChartSlider(isChartSliderVisible);
 
 		// tour color
 		final String stateColorId = Util.getStateString(_state, STATE_TOUR_COLOR_ID, MapColorId.Altitude.name());
@@ -1624,11 +1465,15 @@ public class Map3View extends ViewPart implements ITourProvider {
 			return;
 		}
 
-		_state.put(STATE_IS_CHART_SLIDER_VISIBLE, _isChartSliderVisible);
-		_state.put(STATE_IS_LEGEND_VISIBLE, _isLegendVisible);
+		final boolean isChartSliderVisible = Map3Manager.getLayer_ChartSlider().isEnabled();
+		final boolean isLegendVisible = Map3Manager.getLayer_TourLegend().isEnabled();
+		final boolean isTrackVisible = Map3Manager.getLayer_TourTrack().isEnabled();
+
+		_state.put(STATE_IS_CHART_SLIDER_VISIBLE, isChartSliderVisible);
+		_state.put(STATE_IS_LEGEND_VISIBLE, isLegendVisible);
 		_state.put(STATE_IS_SYNC_MAP_POSITION_WITH_SLIDER, _isSyncMapWithChartSlider);
 		_state.put(STATE_IS_SYNC_MAP_VIEW_WITH_TOUR, _isSyncMapViewWithTour);
-		_state.put(STATE_IS_TOUR_VISIBLE, _isTourVisible);
+		_state.put(STATE_IS_TOUR_VISIBLE, isTrackVisible);
 
 		_state.put(STATE_TOUR_COLOR_ID, _tourColorId.name());
 
@@ -1746,12 +1591,10 @@ public class Map3View extends ViewPart implements ITourProvider {
 
 	private void setChartSliderVisible(final boolean isVisible) {
 
-		_isChartSliderVisible = isVisible;
-
 		// !!! set state in model before enable actions !!!
 		Map3Manager.setLayerVisible_ChartSlider(isVisible);
 
-		enableActions();
+		updateActionsState();
 	}
 
 	private void setColorProvider(final MapColorId colorId) {
@@ -1840,20 +1683,39 @@ public class Map3View extends ViewPart implements ITourProvider {
 	 */
 	public void showAllTours(final boolean isSyncMapViewWithTour) {
 
-		enableActions();
+		updateActionsState();
 
 		final TourTrackLayer tourTrackLayer = Map3Manager.getLayer_TourTrack();
 
-		final ArrayList<TourMap3Position> allPositions = tourTrackLayer.createTrackPaths(_allTours);
+		if (tourTrackLayer.isEnabled()) {
 
-		Map3Manager.getLayer_TourLegend().updateLegendImage();
+			// track layer is displayed
 
-		showAllTours_Final(isSyncMapViewWithTour, allPositions);
+			final ArrayList<TourMap3Position> allPositions = tourTrackLayer.createTrackPaths(_allTours);
+			Map3Manager.getLayer_TourLegend().updateLegendImage();
+
+			showAllTours_Final(isSyncMapViewWithTour, allPositions);
+		}
+
+		final MarkerLayer markerLayer = Map3Manager.getLayer_Marker();
+		if (markerLayer.isEnabled()) {
+
+			// poi layer is displayed
+
+			markerLayer.createMarker(_allTours);
+
+			Map3Manager.redrawMap();
+		}
 	}
 
 	private void showAllTours_Final(final boolean isSyncMapViewWithTour, final ArrayList<TourMap3Position> allPositions) {
 
-		syncMapWith_Tour(isSyncMapViewWithTour, allPositions);
+		if (isSyncMapViewWithTour) {
+
+			final Map3ViewController viewController = Map3ViewController.create(_wwCanvas);
+
+			viewController.goToDefaultView(allPositions);
+		}
 
 		updateChartSlider();
 
@@ -1887,6 +1749,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 
 		// check if this tour is already displayed
 		for (final TourData existingTour : _allTours) {
+
 			if (newTourData.equals(existingTour)) {
 
 				/*
@@ -2072,21 +1935,11 @@ public class Map3View extends ViewPart implements ITourProvider {
 					chartInfo.leftSliderValuesIndex,
 					chartInfo.rightSliderValuesIndex);
 
-			enableActions();
+			updateActionsState();
 		}
 	}
 
-	private void syncMapWith_Tour(final boolean isSyncMapViewWithTour, final ArrayList<TourMap3Position> allPositions) {
-
-		if (isSyncMapViewWithTour) {
-
-			final Map3ViewController viewController = Map3ViewController.create(_wwCanvas);
-
-			viewController.goToDefaultView(allPositions);
-		}
-	}
-
-//	public static final String	ALL						= "gov.nasa.worldwind.perfstat.All";
+	//	public static final String	ALL						= "gov.nasa.worldwind.perfstat.All";
 //
 //	public static final String	FRAME_RATE				= "gov.nasa.worldwind.perfstat.FrameRate";
 //	public static final String	FRAME_TIME				= "gov.nasa.worldwind.perfstat.FrameTime";
@@ -2123,6 +1976,27 @@ public class Map3View extends ViewPart implements ITourProvider {
 
 //2013-10-06 10:12:12.318'118 [Map3View] 	    463659  JVM total memory (Kb)
 //2013-10-06 10:12:12.318'141 [Map3View] 	    431273  JVM used memory (Kb)
+
+	/**
+	 * Enable actions according to the available tours in {@link #_allTours}.
+	 */
+	void updateActionsState() {
+
+		final boolean isChartSliderVisible = Map3Manager.getLayer_ChartSlider().isEnabled();
+		final boolean isLegendVisible = Map3Manager.getLayer_TourLegend().isEnabled();
+		final boolean isTrackVisible = Map3Manager.getLayer_TourTrack().isEnabled();
+		final boolean isMarkerVisible = Map3Manager.getLayer_Marker().isEnabled();
+
+		final boolean isTourAvailable = _allTours.size() > 0;
+
+		_actionShowTourInMap3.setState(isTrackVisible, isTourAvailable);
+		_actionSynMapWithChartSlider.setEnabled(isTourAvailable && isChartSliderVisible);
+		_actionSynMapWithTour.setEnabled(isTourAvailable);
+
+		_actionShowLegendInMap.setChecked(isLegendVisible);
+		_actionShowChartSliderInMap.setChecked(isChartSliderVisible);
+		_actionShowMarker.setChecked(isMarkerVisible);
+	}
 
 	private void updateChartSlider() {
 
