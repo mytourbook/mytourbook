@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %Application_Name
 Bundle-SymbolicName: net.tourbook;singleton:=true
-Bundle-Version: 13.11.1.qualifier
+Bundle-Version: 14.2.0.qualifier
 Bundle-Activator: net.tourbook.application.TourbookPlugin
 Bundle-Vendor: %Bundle-Vendor
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
@@ -21,7 +21,7 @@ Require-Bundle: org.eclipse.ui,
  net.tourbook.ext.jars,
  net.tourbook.ext.ejb3,
  net.tourbook.ext.rxtx_2.2,
- net.tourbook.ext.worldwind_2.0,
+ net.tourbook.ext.worldwind_2.0_src,
  net.tourbook.common,
  net.tourbook.chart,
  net.tourbook.photo
