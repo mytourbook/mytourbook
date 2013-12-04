@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -70,21 +70,21 @@ import net.tourbook.map2.view.SelectionMapPosition;
 import net.tourbook.map2.view.TourMapColors;
 import net.tourbook.map3.action.ActionMapColor;
 import net.tourbook.map3.action.ActionOpenMap3LayerView;
-import net.tourbook.map3.action.ActionSetChartSliderLeft;
-import net.tourbook.map3.action.ActionSetChartSliderRight;
-import net.tourbook.map3.action.ActionShowChartSliderInMap;
+import net.tourbook.map3.action.ActionSetTrackSliderPositionLeft;
+import net.tourbook.map3.action.ActionSetTrackSliderPositionRight;
 import net.tourbook.map3.action.ActionShowDirectionArrows;
 import net.tourbook.map3.action.ActionShowEntireTour;
-import net.tourbook.map3.action.ActionShowLegendInMap3;
+import net.tourbook.map3.action.ActionShowLegend;
 import net.tourbook.map3.action.ActionShowMarker;
 import net.tourbook.map3.action.ActionShowTourInMap3;
+import net.tourbook.map3.action.ActionShowTrackSlider;
 import net.tourbook.map3.action.ActionSyncMapWithChartSlider;
 import net.tourbook.map3.action.ActionSyncMapWithTour;
 import net.tourbook.map3.action.ActionTourColor;
-import net.tourbook.map3.layer.ChartSliderLayer;
 import net.tourbook.map3.layer.MarkerLayer;
 import net.tourbook.map3.layer.TourInfoLayer;
 import net.tourbook.map3.layer.TrackPointAnnotation;
+import net.tourbook.map3.layer.TrackSliderLayer;
 import net.tourbook.map3.layer.tourtrack.ITrackPath;
 import net.tourbook.map3.layer.tourtrack.TourMap3Position;
 import net.tourbook.map3.layer.tourtrack.TourTrackConfig;
@@ -143,12 +143,11 @@ public class Map3View extends ViewPart implements ITourProvider {
 
 	public static final String					ID										= "net.tourbook.map3.view.Map3ViewId";		//$NON-NLS-1$
 
-	private static final String					STATE_IS_CHART_SLIDER_VISIBLE			= "STATE_IS_CHART_SLIDERVISIBLE";			//$NON-NLS-1$
-
 	private static final String					STATE_IS_LEGEND_VISIBLE					= "STATE_IS_LEGEND_VISIBLE";				//$NON-NLS-1$
 	private static final String					STATE_IS_SYNC_MAP_VIEW_WITH_TOUR		= "STATE_IS_SYNC_MAP_VIEW_WITH_TOUR";		//$NON-NLS-1$
 	private static final String					STATE_IS_SYNC_MAP_POSITION_WITH_SLIDER	= "STATE_IS_SYNC_MAP_POSITION_WITH_SLIDER"; //$NON-NLS-1$
 	private static final String					STATE_IS_TOUR_VISIBLE					= "STATE_IS_TOUR_VISIBLE";					//$NON-NLS-1$
+	private static final String					STATE_IS_TRACK_SLIDER_VISIBLE			= "STATE_IS_TRACK_SLIDERVISIBLE";			//$NON-NLS-1$
 	private static final String					STATE_MAP3_VIEW							= "STATE_MAP3_VIEW";						//$NON-NLS-1$
 	private static final String					STATE_TOUR_COLOR_ID						= "STATE_TOUR_COLOR_ID";					//$NON-NLS-1$
 
@@ -163,12 +162,12 @@ public class Map3View extends ViewPart implements ITourProvider {
 
 	private ActionOpenMap3LayerView				_actionOpenMap3LayerView;
 	private ActionMapColor						_actionMapColor;
-	private ActionSetChartSliderLeft			_actionSetChartSliderLeft;
-	private ActionSetChartSliderRight			_actionSetChartSliderRight;
-	private ActionShowChartSliderInMap			_actionShowChartSliderInMap;
+	private ActionSetTrackSliderPositionLeft	_actionSetTrackSliderLeft;
+	private ActionSetTrackSliderPositionRight	_actionSetTrackSliderRight;
+	private ActionShowTrackSlider				_actionShowTrackSlider;
 	private ActionShowDirectionArrows			_actionShowDirectionArrows;
 	private ActionShowEntireTour				_actionShowEntireTour;
-	private ActionShowLegendInMap3				_actionShowLegendInMap;
+	private ActionShowLegend				_actionShowLegendInMap;
 	private ActionShowMarker					_actionShowMarker;
 	private ActionShowTourInMap3				_actionShowTourInMap3;
 	private ActionSyncMapWithChartSlider		_actionSynMapWithChartSlider;
@@ -234,7 +233,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 	 */
 	private int									_currentLeftSliderValueIndex;
 	private int									_currentRightSliderValueIndex;
-	private Position							_currentChartSliderPosition;
+	private Position							_currentTrackInfoSliderPosition;
 
 	private ITrackPath							_currentHoveredTrack;
 	private Integer								_currentHoveredTrackPosition;
@@ -322,11 +321,6 @@ public class Map3View extends ViewPart implements ITourProvider {
 			return;
 		}
 
-//		final ChartSliderLayer chartSliderLayer = getChartSliderLayer();
-//		if (chartSliderLayer == null) {
-//			Map3Manager.setLayerVisible_ChartSlider(true);
-//		}
-
 		final TourData tourData = _currentHoveredTrack.getTourTrack().getTourData();
 
 		TourChart tourChart = null;
@@ -381,7 +375,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 
 		if (sliderSelection != null) {
 
-			updateChartSlider_10_Position(//
+			updateTrackSlider_10_Position(//
 					tourData,
 					_currentLeftSliderValueIndex,
 					_currentRightSliderValueIndex);
@@ -391,13 +385,8 @@ public class Map3View extends ViewPart implements ITourProvider {
 					sliderSelection,
 					Map3View.this);
 
-			setChartSliderVisible(true);
+			setTrackSliderVisible(true);
 		}
-	}
-
-	public void actionShowChartSlider(final boolean isVisible) {
-
-		setChartSliderVisible(isVisible);
 	}
 
 	public void actionShowDirectionArrows(final boolean isVisible) {
@@ -409,7 +398,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 		Map3Manager.getLayer_TourTrack().setExpired();
 	}
 
-	public void actionShowLegendInMap(final boolean isLegendVisible) {
+	public void actionShowLegend(final boolean isLegendVisible) {
 
 		Map3Manager.setLayerVisible_Legend(isLegendVisible);
 	}
@@ -426,6 +415,11 @@ public class Map3View extends ViewPart implements ITourProvider {
 		showAllTours_InternalTours();
 	}
 
+	public void actionShowTrackSlider(final boolean isVisible) {
+
+		setTrackSliderVisible(isVisible);
+	}
+
 	public void actionSynchMapPositionWithSlider() {
 
 		final boolean isSync = _actionSynMapWithChartSlider.isChecked();
@@ -434,11 +428,9 @@ public class Map3View extends ViewPart implements ITourProvider {
 
 		if (isSync) {
 
-			// ensure that the chart sliders are displayed
+			// ensure that the track sliders are displayed
 
-			_actionShowChartSliderInMap.setChecked(true);
-
-//			actionShowChartSlider(true);
+			_actionShowTrackSlider.setChecked(true);
 		}
 	}
 
@@ -644,7 +636,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 
 	private void cleanupOldTours() {
 
-		_currentChartSliderPosition = null;
+		_currentTrackInfoSliderPosition = null;
 		_currentHoveredTrack = null;
 		_currentHoveredTrackPosition = null;
 
@@ -716,12 +708,12 @@ public class Map3View extends ViewPart implements ITourProvider {
 
 		_actionMapColor = new ActionMapColor(this, _state);
 
-		_actionSetChartSliderLeft = new ActionSetChartSliderLeft(this);
-		_actionSetChartSliderRight = new ActionSetChartSliderRight(this);
-		_actionShowChartSliderInMap = new ActionShowChartSliderInMap(this);
+		_actionSetTrackSliderLeft = new ActionSetTrackSliderPositionLeft(this);
+		_actionSetTrackSliderRight = new ActionSetTrackSliderPositionRight(this);
+		_actionShowTrackSlider = new ActionShowTrackSlider(this);
 		_actionShowDirectionArrows = new ActionShowDirectionArrows(this);
 		_actionShowEntireTour = new ActionShowEntireTour(this);
-		_actionShowLegendInMap = new ActionShowLegendInMap3(this);
+		_actionShowLegendInMap = new ActionShowLegend(this);
 		_actionShowMarker = new ActionShowMarker(this);
 		_actionShowTourInMap3 = new ActionShowTourInMap3(this, parent);
 		_actionSynMapWithChartSlider = new ActionSyncMapWithChartSlider(this);
@@ -999,9 +991,9 @@ public class Map3View extends ViewPart implements ITourProvider {
 		final boolean isTourAvailable = _allTours.size() > 0;
 		final boolean isTrackPositionHovered = _currentHoveredTrack != null && _currentHoveredTrackPosition != null;
 
-		_actionSetChartSliderLeft.setEnabled(isTrackPositionHovered);
-		_actionSetChartSliderRight.setEnabled(isTrackPositionHovered);
-		_actionShowChartSliderInMap.setEnabled(isTourAvailable);
+		_actionSetTrackSliderLeft.setEnabled(isTrackPositionHovered);
+		_actionSetTrackSliderRight.setEnabled(isTrackPositionHovered);
+		_actionShowTrackSlider.setEnabled(isTourAvailable);
 		_actionShowLegendInMap.setEnabled(isTourAvailable);
 
 		_actionMapColor.setEnabled(isTourAvailable);
@@ -1043,13 +1035,13 @@ public class Map3View extends ViewPart implements ITourProvider {
 
 	private void fillContextMenu(final Menu menu) {
 
-		fillMenuItem(menu, _actionSetChartSliderLeft);
-		fillMenuItem(menu, _actionSetChartSliderRight);
+		fillMenuItem(menu, _actionSetTrackSliderLeft);
+		fillMenuItem(menu, _actionSetTrackSliderRight);
 
 		(new Separator()).fill(menu, -1);
 		fillMenuItem(menu, _actionShowDirectionArrows);
 		fillMenuItem(menu, _actionShowMarker);
-		fillMenuItem(menu, _actionShowChartSliderInMap);
+		fillMenuItem(menu, _actionShowTrackSlider);
 		fillMenuItem(menu, _actionShowLegendInMap);
 
 		// set color before menu is filled, this sets the action image and color id
@@ -1115,21 +1107,6 @@ public class Map3View extends ViewPart implements ITourProvider {
 		return _allTours;
 	}
 
-	/**
-	 * @return Returns {@link ChartSliderLayer} or <code>null</code> when layer is not displayed.
-	 */
-	private ChartSliderLayer getChartSliderLayer() {
-
-		final ChartSliderLayer chartSliderLayer = Map3Manager.getLayer_ChartSlider();
-
-		if (chartSliderLayer.isEnabled() == false) {
-			// layer is not displayed
-			return null;
-		}
-
-		return chartSliderLayer;
-	}
-
 	private float getDataSerieValue(final float[] dataSerie, final int positionIndex, final float legendMinValue) {
 
 		final float legendValue = dataSerie == null ? legendMinValue : dataSerie[positionIndex];
@@ -1163,11 +1140,11 @@ public class Map3View extends ViewPart implements ITourProvider {
 	}
 
 	/**
-	 * @param chartSliderLayer
+	 * @param trackSliderLayer
 	 * @return Returns {@link TourData} of the selected tour track or <code>null</code> when a tour
 	 *         is not selected.
 	 */
-	private TourData getSelectedTour(final ChartSliderLayer chartSliderLayer) {
+	private TourData getSelectedTour(final TrackSliderLayer trackSliderLayer) {
 
 		TourData tourData;
 		final ITrackPath selectedTrack = Map3Manager.getLayer_TourTrack().getSelectedTrack();
@@ -1243,6 +1220,21 @@ public class Map3View extends ViewPart implements ITourProvider {
 		return _tourColorId;
 	}
 
+	/**
+	 * @return Returns {@link TrackSliderLayer} or <code>null</code> when layer is not displayed.
+	 */
+	private TrackSliderLayer getTrackSliderLayer() {
+
+		final TrackSliderLayer chartTrackLayer = Map3Manager.getLayer_TrackSlider();
+
+		if (chartTrackLayer.isEnabled() == false) {
+			// layer is not displayed
+			return null;
+		}
+
+		return chartTrackLayer;
+	}
+
 	private void hideTourInfo() {
 
 		_currentHoveredTrack = null;
@@ -1286,7 +1278,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 	void onModifyConfig() {
 
 		// altitude mode can have been changed, do a slider repositioning
-		updateChartSlider();
+		updateTrackSlider();
 	}
 
 	private void onSelection(final ISelection selection) {
@@ -1306,7 +1298,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 
 		final boolean isTourTrackVisible = Map3Manager.getLayer_TourTrack().isEnabled();
 		final boolean isPOIVisible = Map3Manager.getLayer_Marker().isEnabled();
-		final boolean isChartSliderVisible = Map3Manager.getLayer_ChartSlider().isEnabled();
+		final boolean isTrackSliderVisible = Map3Manager.getLayer_TrackSlider().isEnabled();
 
 		// check if a tour or poi can be displayed
 		if (isTourTrackVisible == false && isPOIVisible == false) {
@@ -1353,7 +1345,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 
 		} else if (selection instanceof SelectionChartInfo) {
 
-			if (isChartSliderVisible == false) {
+			if (isTrackSliderVisible == false) {
 				return;
 			}
 
@@ -1387,6 +1379,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 		// is tour visible / available
 		final boolean isTourVisible = Util.getStateBoolean(_state, STATE_IS_TOUR_VISIBLE, true);
 		_actionShowTourInMap3.setState(isTourVisible, isTourAvailable);
+		Map3Manager.setLayerVisible_TourTrack(isTourVisible);
 
 		// is legend visible
 		final boolean isLegendVisible = Util.getStateBoolean(_state, STATE_IS_LEGEND_VISIBLE, true);
@@ -1394,9 +1387,9 @@ public class Map3View extends ViewPart implements ITourProvider {
 		Map3Manager.setLayerVisible_Legend(isLegendVisible);
 
 		// is chart slider visible
-		final boolean isChartSliderVisible = Util.getStateBoolean(_state, STATE_IS_CHART_SLIDER_VISIBLE, true);
-		_actionShowChartSliderInMap.setChecked(isChartSliderVisible);
-		Map3Manager.setLayerVisible_ChartSlider(isChartSliderVisible);
+		final boolean isTrackSliderVisible = Util.getStateBoolean(_state, STATE_IS_TRACK_SLIDER_VISIBLE, true);
+		_actionShowTrackSlider.setChecked(isTrackSliderVisible);
+		Map3Manager.setLayerVisible_TrackSlider(isTrackSliderVisible);
 
 		// tour color
 		final String stateColorId = Util.getStateString(_state, STATE_TOUR_COLOR_ID, MapColorId.Altitude.name());
@@ -1465,11 +1458,11 @@ public class Map3View extends ViewPart implements ITourProvider {
 			return;
 		}
 
-		final boolean isChartSliderVisible = Map3Manager.getLayer_ChartSlider().isEnabled();
+		final boolean isTrackSliderVisible = Map3Manager.getLayer_TrackSlider().isEnabled();
 		final boolean isLegendVisible = Map3Manager.getLayer_TourLegend().isEnabled();
 		final boolean isTrackVisible = Map3Manager.getLayer_TourTrack().isEnabled();
 
-		_state.put(STATE_IS_CHART_SLIDER_VISIBLE, isChartSliderVisible);
+		_state.put(STATE_IS_TRACK_SLIDER_VISIBLE, isTrackSliderVisible);
 		_state.put(STATE_IS_LEGEND_VISIBLE, isLegendVisible);
 		_state.put(STATE_IS_SYNC_MAP_POSITION_WITH_SLIDER, _isSyncMapWithChartSlider);
 		_state.put(STATE_IS_SYNC_MAP_VIEW_WITH_TOUR, _isSyncMapViewWithTour);
@@ -1589,14 +1582,6 @@ public class Map3View extends ViewPart implements ITourProvider {
 		sliderAnnotation.setAltitudeMode(config.altitudeMode);
 	}
 
-	private void setChartSliderVisible(final boolean isVisible) {
-
-		// !!! set state in model before enable actions !!!
-		Map3Manager.setLayerVisible_ChartSlider(isVisible);
-
-		updateActionsState();
-	}
-
 	private void setColorProvider(final MapColorId colorId) {
 
 		final IMapColorProvider colorProvider = TourMapColors.getColorProvider(colorId);
@@ -1675,6 +1660,14 @@ public class Map3View extends ViewPart implements ITourProvider {
 		}
 	}
 
+	private void setTrackSliderVisible(final boolean isVisible) {
+
+		// !!! set state in model before enable actions !!!
+		Map3Manager.setLayerVisible_TrackSlider(isVisible);
+
+		updateActionsState();
+	}
+
 	/**
 	 * Shows all tours in the map which are set in {@link #_allTours}.
 	 * 
@@ -1717,7 +1710,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 			viewController.goToDefaultView(allPositions);
 		}
 
-		updateChartSlider();
+		updateTrackSlider();
 
 		Map3Manager.redrawMap();
 	}
@@ -1837,7 +1830,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 			tourData = rawData.get(tourId);
 		}
 
-		final ChartSliderLayer chartSliderLayer = getChartSliderLayer();
+		final TrackSliderLayer chartSliderLayer = getTrackSliderLayer();
 
 		if (tourData == null || tourData.latitudeSerie == null) {
 
@@ -1868,17 +1861,17 @@ public class Map3View extends ViewPart implements ITourProvider {
 				 * Prevent setting the same location because this will jitter the map slider and is
 				 * unnecessary.
 				 */
-				if (_currentChartSliderPosition != null) {
+				if (_currentTrackInfoSliderPosition != null) {
 
 					/*
 					 * Set a new position and sync map only, when lat/lon are different and
 					 * elevation is larger than 1mm.
 					 */
 
-					final double eleDiff = _currentChartSliderPosition.elevation - elevation;
+					final double eleDiff = _currentTrackInfoSliderPosition.elevation - elevation;
 
-					if (_currentChartSliderPosition.getLatitude().equals(sliderDegrees.latitude)
-							&& _currentChartSliderPosition.getLongitude().equals(sliderDegrees.longitude)
+					if (_currentTrackInfoSliderPosition.getLatitude().equals(sliderDegrees.latitude)
+							&& _currentTrackInfoSliderPosition.getLongitude().equals(sliderDegrees.longitude)
 							&& eleDiff < 0.001) {
 
 						return;
@@ -1915,7 +1908,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 					}
 
 					// keep current position
-					_currentChartSliderPosition = mapSliderPosition;
+					_currentTrackInfoSliderPosition = mapSliderPosition;
 				}
 
 				// Fallback to setting center position.
@@ -1930,7 +1923,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 			}
 
 			// update slider UI
-			updateChartSlider_10_Position(//
+			updateTrackSlider_10_Position(//
 					tourData,
 					chartInfo.leftSliderValuesIndex,
 					chartInfo.rightSliderValuesIndex);
@@ -1982,7 +1975,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 	 */
 	void updateActionsState() {
 
-		final boolean isChartSliderVisible = Map3Manager.getLayer_ChartSlider().isEnabled();
+		final boolean isTrackSliderVisible = Map3Manager.getLayer_TrackSlider().isEnabled();
 		final boolean isLegendVisible = Map3Manager.getLayer_TourLegend().isEnabled();
 		final boolean isTrackVisible = Map3Manager.getLayer_TourTrack().isEnabled();
 		final boolean isMarkerVisible = Map3Manager.getLayer_Marker().isEnabled();
@@ -1990,77 +1983,12 @@ public class Map3View extends ViewPart implements ITourProvider {
 		final boolean isTourAvailable = _allTours.size() > 0;
 
 		_actionShowTourInMap3.setState(isTrackVisible, isTourAvailable);
-		_actionSynMapWithChartSlider.setEnabled(isTourAvailable && isChartSliderVisible);
+		_actionSynMapWithChartSlider.setEnabled(isTourAvailable && isTrackSliderVisible);
 		_actionSynMapWithTour.setEnabled(isTourAvailable);
 
 		_actionShowLegendInMap.setChecked(isLegendVisible);
-		_actionShowChartSliderInMap.setChecked(isChartSliderVisible);
+		_actionShowTrackSlider.setChecked(isTrackSliderVisible);
 		_actionShowMarker.setChecked(isMarkerVisible);
-	}
-
-	private void updateChartSlider() {
-
-		final ChartSliderLayer chartSliderLayer = getChartSliderLayer();
-		if (chartSliderLayer == null) {
-			return;
-		}
-
-		final TourData tourData = getSelectedTour(chartSliderLayer);
-		if (tourData == null) {
-			chartSliderLayer.setSliderVisible(false);
-			return;
-		}
-
-		updateChartSlider_10_Position(tourData, _currentLeftSliderValueIndex, _currentRightSliderValueIndex);
-	}
-
-	private void updateChartSlider_10_Position(final TourData tourData, int leftPosIndex, int rightPosIndex) {
-
-		final ChartSliderLayer chartSliderLayer = getChartSliderLayer();
-		if (chartSliderLayer == null) {
-			return;
-		}
-
-		final double[] latitudeSerie = tourData.latitudeSerie;
-		final int lastIndex = latitudeSerie.length - 1;
-
-		// check array bounds
-		if (leftPosIndex < 0 || leftPosIndex > lastIndex) {
-			leftPosIndex = 0;
-		}
-		if (rightPosIndex < 0 || rightPosIndex > lastIndex) {
-			rightPosIndex = lastIndex;
-		}
-
-		_currentLeftSliderValueIndex = leftPosIndex;
-		_currentRightSliderValueIndex = rightPosIndex;
-
-		updateChartSlider_20_Data(//
-				chartSliderLayer.getLeftSlider(),
-				_currentLeftSliderValueIndex,
-				tourData);
-
-		updateChartSlider_20_Data(//
-				chartSliderLayer.getRightSlider(),
-				_currentRightSliderValueIndex,
-				tourData);
-
-		chartSliderLayer.setSliderVisible(true);
-
-		Map3Manager.redrawMap();
-	}
-
-	private void updateChartSlider_20_Data(	final TrackPointAnnotation slider,
-											final int positionIndex,
-											final TourData tourData) {
-
-		/*
-		 * set position and text
-		 */
-		setAnnotationPosition(slider, tourData, positionIndex);
-		setAnnotationColors(tourData, positionIndex, slider);
-
-		slider.setText(createSliderText(positionIndex, tourData));
 	}
 
 	private void updateMapColors() {
@@ -2075,7 +2003,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 
 		// cleanup old tours, this method cannot be used: cleanupOldTours();
 //		_postSelectionProvider.clearSelection();
-		_currentChartSliderPosition = null;
+		_currentTrackInfoSliderPosition = null;
 
 		_allTours.removeAll(modifiedTours);
 		_allTours.addAll(getMapTours(modifiedTours));
@@ -2112,6 +2040,71 @@ public class Map3View extends ViewPart implements ITourProvider {
 					+ String.format("%10s  %s", stat.getValue(), stat.getDisplayString())); //$NON-NLS-1$
 //					+ String.format("%-40s%10s", stat.getDisplayString(), stat.getValue()));
 		}
+	}
+
+	private void updateTrackSlider() {
+
+		final TrackSliderLayer trackSliderLayer = getTrackSliderLayer();
+		if (trackSliderLayer == null) {
+			return;
+		}
+
+		final TourData tourData = getSelectedTour(trackSliderLayer);
+		if (tourData == null) {
+			trackSliderLayer.setSliderVisible(false);
+			return;
+		}
+
+		updateTrackSlider_10_Position(tourData, _currentLeftSliderValueIndex, _currentRightSliderValueIndex);
+	}
+
+	private void updateTrackSlider_10_Position(final TourData tourData, int leftPosIndex, int rightPosIndex) {
+
+		final TrackSliderLayer trackSliderLayer = getTrackSliderLayer();
+		if (trackSliderLayer == null) {
+			return;
+		}
+
+		final double[] latitudeSerie = tourData.latitudeSerie;
+		final int lastIndex = latitudeSerie.length - 1;
+
+		// check array bounds
+		if (leftPosIndex < 0 || leftPosIndex > lastIndex) {
+			leftPosIndex = 0;
+		}
+		if (rightPosIndex < 0 || rightPosIndex > lastIndex) {
+			rightPosIndex = lastIndex;
+		}
+
+		_currentLeftSliderValueIndex = leftPosIndex;
+		_currentRightSliderValueIndex = rightPosIndex;
+
+		updateTrackSlider_20_Data(//
+				trackSliderLayer.getLeftSlider(),
+				_currentLeftSliderValueIndex,
+				tourData);
+
+		updateTrackSlider_20_Data(//
+				trackSliderLayer.getRightSlider(),
+				_currentRightSliderValueIndex,
+				tourData);
+
+		trackSliderLayer.setSliderVisible(true);
+
+		Map3Manager.redrawMap();
+	}
+
+	private void updateTrackSlider_20_Data(	final TrackPointAnnotation slider,
+											final int positionIndex,
+											final TourData tourData) {
+
+		/*
+		 * set position and text
+		 */
+		setAnnotationPosition(slider, tourData, positionIndex);
+		setAnnotationColors(tourData, positionIndex, slider);
+
+		slider.setText(createSliderText(positionIndex, tourData));
 	}
 
 }

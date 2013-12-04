@@ -93,7 +93,6 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 	private boolean					_isForceUpdate;
 
 	private boolean					_isPartActive;
-	private boolean					_isInSelectionListener;
 
 	private PostSelectionProvider	_postSelectionProvider;
 	private ISelectionListener		_postSelectionListener;
@@ -206,11 +205,7 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 					return;
 				}
 
-				_isInSelectionListener = true;
-
 				onSelectionChanged(selection);
-
-				_isInSelectionListener = false;
 			}
 		};
 		getSite().getPage().addPostSelectionListener(_postSelectionListener);
@@ -226,7 +221,6 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 					return;
 				}
 
-				_isInSelectionListener = true;
 
 				if (eventId == TourEventId.SEGMENT_LAYER_CHANGED) {
 
@@ -303,8 +297,6 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 						updateChart(TourManager.getInstance().getTourData(tourId));
 					}
 				}
-
-				_isInSelectionListener = false;
 			}
 		};
 
@@ -380,35 +372,35 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 				 * Activate view only when NOT in a selection listener event, otherwise it get
 				 * activated all time.
 				 */
-				final boolean canActivateView = _isInSelectionListener == false;
+//				final boolean canActivateView = _isInSelectionListener == false;
 
-				if (_isPartActive == false && canActivateView) {
-
-					/*
-					 * Ensure that this part is active when an event is fired, otherwise it will not
-					 * be fired in the selection provider !!!
-					 */
-
-//					Util.showView(ID, true);
-
-// this cause this problem
-//					org.eclipse.ui.PartInitException: Warning: Detected recursive attempt by part net.tourbook.views.TourChartView to create itself (this is probably, but not necessarily, a bug)
-//					at org.eclipse.ui.internal.WorkbenchPartReference.getPart(WorkbenchPartReference.java:586)
-//					at org.eclipse.ui.internal.Perspective.showView(Perspective.java:2245)
-//					at org.eclipse.ui.internal.WorkbenchPage.busyShowView(WorkbenchPage.java:1154)
-//					at org.eclipse.ui.internal.WorkbenchPage$20.run(WorkbenchPage.java:3934)
-//					at org.eclipse.swt.custom.BusyIndicator.showWhile(BusyIndicator.java:70)
-//					at org.eclipse.ui.internal.WorkbenchPage.showView(WorkbenchPage.java:3931)
-//					at net.tourbook.common.util.Util.showView(Util.java:1758)
-//					at net.tourbook.ui.tourChart.TourChartView$7.sliderMoved(TourChartView.java:393)
-//					at net.tourbook.chart.Chart$5.run(Chart.java:545)
-//					at org.eclipse.core.runtime.SafeRunner.run(SafeRunner.java:42)
-//					at org.eclipse.ui.internal.JFaceUtil$1.run(JFaceUtil.java:49)
-//					at org.eclipse.jface.util.SafeRunnable.run(SafeRunnable.java:175)
-//					at net.tourbook.chart.Chart.fireSliderMoveEvent(Chart.java:543)
-//					at net.tourbook.chart.Chart.updateChart(Chart.java:1220)
-//					at net.tourbook.chart.Chart.updateChart(Chart.java:1155)
-				}
+//				if (_isPartActive == false && canActivateView) {
+//
+//					/*
+//					 * Ensure that this part is active when an event is fired, otherwise it will not
+//					 * be fired in the selection provider !!!
+//					 */
+//
+////					Util.showView(ID, true);
+//
+//// this cause this problem
+////					org.eclipse.ui.PartInitException: Warning: Detected recursive attempt by part net.tourbook.views.TourChartView to create itself (this is probably, but not necessarily, a bug)
+////					at org.eclipse.ui.internal.WorkbenchPartReference.getPart(WorkbenchPartReference.java:586)
+////					at org.eclipse.ui.internal.Perspective.showView(Perspective.java:2245)
+////					at org.eclipse.ui.internal.WorkbenchPage.busyShowView(WorkbenchPage.java:1154)
+////					at org.eclipse.ui.internal.WorkbenchPage$20.run(WorkbenchPage.java:3934)
+////					at org.eclipse.swt.custom.BusyIndicator.showWhile(BusyIndicator.java:70)
+////					at org.eclipse.ui.internal.WorkbenchPage.showView(WorkbenchPage.java:3931)
+////					at net.tourbook.common.util.Util.showView(Util.java:1758)
+////					at net.tourbook.ui.tourChart.TourChartView$7.sliderMoved(TourChartView.java:393)
+////					at net.tourbook.chart.Chart$5.run(Chart.java:545)
+////					at org.eclipse.core.runtime.SafeRunner.run(SafeRunner.java:42)
+////					at org.eclipse.ui.internal.JFaceUtil$1.run(JFaceUtil.java:49)
+////					at org.eclipse.jface.util.SafeRunnable.run(SafeRunnable.java:175)
+////					at net.tourbook.chart.Chart.fireSliderMoveEvent(Chart.java:543)
+////					at net.tourbook.chart.Chart.updateChart(Chart.java:1220)
+////					at net.tourbook.chart.Chart.updateChart(Chart.java:1155)
+//				}
 
 				_postSelectionProvider.setSelection(chartInfoSelection);
 			}

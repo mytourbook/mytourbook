@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,27 +15,29 @@
  *******************************************************************************/
 package net.tourbook.map3.action;
 
-import net.tourbook.map2.Messages;
+import net.tourbook.application.TourbookPlugin;
+import net.tourbook.map3.Messages;
 import net.tourbook.map3.view.Map3View;
 
 import org.eclipse.jface.action.Action;
 
-public class ActionShowLegendInMap3 extends Action {
+public class ActionSetTrackSliderPositionLeft extends Action {
 
-	private Map3View	_map3View;
+	private Map3View	_mapView;
 
-	public ActionShowLegendInMap3(final Map3View map3View) {
+	public ActionSetTrackSliderPositionLeft(final Map3View mapView) {
 
-		super(null, AS_CHECK_BOX);
+		super(Messages.Map3_Action_SetTrackSliderPositionLeft, AS_PUSH_BUTTON);
 
-		_map3View = map3View;
+		_mapView = mapView;
 
-		setText(Messages.map_action_show_legend_in_map);
+		setImageDescriptor(TourbookPlugin.getImageDescriptor(//
+				net.tourbook.map2.Messages.Image_Action_ShowSliderInMap_Left));
 	}
 
 	@Override
 	public void run() {
-		_map3View.actionShowLegendInMap(isChecked());
+		_mapView.actionSetTrackSlider(true);
 	}
 
 }

@@ -15,28 +15,25 @@
  *******************************************************************************/
 package net.tourbook.map3.action;
 
-import net.tourbook.application.TourbookPlugin;
-import net.tourbook.map2.Messages;
+import net.tourbook.map3.Messages;
 import net.tourbook.map3.view.Map3View;
 
 import org.eclipse.jface.action.Action;
 
-public class ActionShowChartSliderInMap extends Action {
+public class ActionShowLegend extends Action {
 
-	private Map3View	_mapView;
+	private Map3View	_map3View;
 
-	public ActionShowChartSliderInMap(final Map3View mapView) {
+	public ActionShowLegend(final Map3View map3View) {
 
-		super(Messages.map_action_show_slider_in_map, AS_CHECK_BOX);
+		super(Messages.Map3_Action_ShowLegend, AS_CHECK_BOX);
 
-		_mapView = mapView;
-
-		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image_Action_ShowSliderInMap));
+		_map3View = map3View;
 	}
 
 	@Override
 	public void run() {
-		_mapView.actionShowChartSlider(isChecked());
+		_map3View.actionShowLegend(isChecked());
 	}
 
 }

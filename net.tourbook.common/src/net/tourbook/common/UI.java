@@ -241,7 +241,13 @@ public class UI {
 	 */
 	private static final String			DIALOG_FONT_DATA						= "DIALOG_FONT_NAME";														//$NON-NLS-1$
 
+	public static final Font			AWT_FONT_ARIAL_8						= Font.decode("Arial-plain-8");											//$NON-NLS-1$
+	public static final Font			AWT_FONT_ARIAL_10						= Font.decode("Arial-plain-10");											//$NON-NLS-1$
 	public static final Font			AWT_FONT_ARIAL_12						= Font.decode("Arial-plain-12");											//$NON-NLS-1$
+	public static final Font			AWT_FONT_ARIAL_14						= Font.decode("Arial-plain-14");											//$NON-NLS-1$
+	public static final Font			AWT_FONT_ARIAL_16						= Font.decode("Arial-plain-16");											//$NON-NLS-1$
+	public static final Font			AWT_FONT_ARIAL_18						= Font.decode("Arial-plain-18");											//$NON-NLS-1$
+	public static final Font			AWT_FONT_ARIAL_20						= Font.decode("Arial-plain-20");											//$NON-NLS-1$
 	public static final Font			AWT_FONT_ARIAL_24						= Font.decode("Arial-plain-24");											//$NON-NLS-1$
 	public static final Font			AWT_FONT_ARIAL_48						= Font.decode("Arial-plain-48");											//$NON-NLS-1$
 	public static final Font			AWT_FONT_ARIAL_BOLD_12					= Font.decode("Arial-bold-12");											//$NON-NLS-1$

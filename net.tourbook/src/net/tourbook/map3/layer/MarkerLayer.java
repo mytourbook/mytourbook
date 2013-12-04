@@ -39,7 +39,7 @@ import org.eclipse.jface.dialogs.IDialogSettings;
 
 public class MarkerLayer extends RenderableLayer implements SelectListener, ICheckStateListener {
 
-	public static final String	MAP3_LAYER_ID			= "POILayer";	//$NON-NLS-1$
+	public static final String	MAP3_LAYER_ID			= "MarkerLayer";	//$NON-NLS-1$
 
 	/**
 	 * This flag keeps track of adding/removing the listener that it is not done more than once.
@@ -60,9 +60,9 @@ public class MarkerLayer extends RenderableLayer implements SelectListener, IChe
 		removeAllRenderables();
 
 		final PointPlacemarkAttributes ppAttributes = new PointPlacemarkAttributes();
-		ppAttributes.setScale(3.0);
+		ppAttributes.setScale(1.5);
 		ppAttributes.setLabelScale(1.0);
-		ppAttributes.setLabelFont(UI.AWT_FONT_ARIAL_48);
+		ppAttributes.setLabelFont(UI.AWT_FONT_ARIAL_16);
 
 		final TourTrackConfig config = TourTrackConfigManager.getActiveConfig();
 

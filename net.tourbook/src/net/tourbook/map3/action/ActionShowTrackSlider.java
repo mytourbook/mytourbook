@@ -21,23 +21,22 @@ import net.tourbook.map3.view.Map3View;
 
 import org.eclipse.jface.action.Action;
 
-public class ActionSetChartSliderRight extends Action {
+public class ActionShowTrackSlider extends Action {
 
 	private Map3View	_mapView;
 
-	public ActionSetChartSliderRight(final Map3View mapView) {
+	public ActionShowTrackSlider(final Map3View mapView) {
 
-		super(Messages.Map3_Action_SetChartSliderRight, AS_PUSH_BUTTON);
+		super(Messages.Map3_Action_ShowTrackSlider, AS_CHECK_BOX);
 
 		_mapView = mapView;
 
-		setImageDescriptor(TourbookPlugin.getImageDescriptor(//
-				net.tourbook.map2.Messages.Image_Action_ShowSliderInMap));
+		setImageDescriptor(TourbookPlugin.getImageDescriptor(net.tourbook.map2.Messages.Image_Action_ShowSliderInMap));
 	}
 
 	@Override
 	public void run() {
-		_mapView.actionSetTrackSlider(false);
+		_mapView.actionShowTrackSlider(isChecked());
 	}
 
 }

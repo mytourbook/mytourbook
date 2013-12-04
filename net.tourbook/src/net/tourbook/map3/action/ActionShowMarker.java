@@ -16,7 +16,7 @@
 package net.tourbook.map3.action;
 
 import net.tourbook.application.TourbookPlugin;
-import net.tourbook.map2.Messages;
+import net.tourbook.map3.Messages;
 import net.tourbook.map3.view.Map3View;
 
 import org.eclipse.jface.action.Action;
@@ -27,11 +27,13 @@ public class ActionShowMarker extends Action {
 
 	public ActionShowMarker(final Map3View mapView) {
 
-		super(Messages.map_action_show_tour_marker, AS_CHECK_BOX);
+		super(Messages.Map3_Action_ShowMarker, AS_CHECK_BOX);
 
-		setImageDescriptor(TourbookPlugin.getImageDescriptor(net.tourbook.Messages.Image__edit_tour_marker));
-		setDisabledImageDescriptor(TourbookPlugin
-				.getImageDescriptor(net.tourbook.Messages.Image__edit_tour_marker_disabled));
+		setImageDescriptor(TourbookPlugin.getImageDescriptor(//
+				net.tourbook.Messages.Image__edit_tour_marker));
+
+		setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(//
+				net.tourbook.Messages.Image__edit_tour_marker_disabled));
 
 		_mapView = mapView;
 	}

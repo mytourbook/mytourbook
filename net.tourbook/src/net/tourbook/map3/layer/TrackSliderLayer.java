@@ -33,19 +33,19 @@ import org.eclipse.jface.dialogs.IDialogSettings;
 /**
  * Part of this code is copied from: gov.nasa.worldwindx.examples.analytics.AnalyticSurfaceLegend
  */
-public class ChartSliderLayer extends AnnotationLayer implements SelectListener {
+public class TrackSliderLayer extends AnnotationLayer implements SelectListener {
 
 	static final int				CHART_SLIDER_DRAW_OFFSET_Y	= 40;
 	static final int				CHART_SLIDER_CORNER_RADIUS	= 7;
 	static final int				CHART_SLIDER_LEADER_GAP		= 7;
 	static final int				CHART_SLIDER_MARGIN			= 5;
 
-	public static final String		MAP3_LAYER_ID				= "ChartSliderLayer";	//$NON-NLS-1$
+	public static final String		MAP3_LAYER_ID				= "TrackSliderLayer";	//$NON-NLS-1$
 
 	private TrackPointAnnotation	_leftSlider;
 	private TrackPointAnnotation	_rightSlider;
 
-	public ChartSliderLayer(final IDialogSettings state) {
+	public TrackSliderLayer(final IDialogSettings state) {
 
 		setPickEnabled(false);
 
@@ -137,9 +137,9 @@ public class ChartSliderLayer extends AnnotationLayer implements SelectListener 
 		// get hovered object
 		final PickedObject pickedObject = event.getTopPickedObject();
 
-		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
-				+ ("\teventAction: " + eventAction)
-				+ ("\tpickedObject: " + pickedObject)
+		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") //$NON-NLS-1$ //$NON-NLS-2$
+				+ ("\teventAction: " + eventAction) //$NON-NLS-1$
+				+ ("\tpickedObject: " + pickedObject) //$NON-NLS-1$
 		//
 				);
 		// TODO remove SYSTEM.OUT.PRINTLN

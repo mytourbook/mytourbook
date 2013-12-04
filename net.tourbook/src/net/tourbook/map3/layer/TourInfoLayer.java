@@ -62,15 +62,15 @@ public class TourInfoLayer extends AnnotationLayer implements IToolLayer {
 
 		final AnnotationAttributes attributes = trackPoint.getAttributes();
 
-		attributes.setCornerRadius(ChartSliderLayer.CHART_SLIDER_CORNER_RADIUS);
+		attributes.setCornerRadius(TrackSliderLayer.CHART_SLIDER_CORNER_RADIUS);
 		attributes.setInsets(new Insets(
-				ChartSliderLayer.CHART_SLIDER_MARGIN,
-				ChartSliderLayer.CHART_SLIDER_MARGIN + 3,
-				ChartSliderLayer.CHART_SLIDER_MARGIN,
-				ChartSliderLayer.CHART_SLIDER_MARGIN));
+				TrackSliderLayer.CHART_SLIDER_MARGIN,
+				TrackSliderLayer.CHART_SLIDER_MARGIN + 3,
+				TrackSliderLayer.CHART_SLIDER_MARGIN,
+				TrackSliderLayer.CHART_SLIDER_MARGIN));
 
-		attributes.setDrawOffset(new Point(0, ChartSliderLayer.CHART_SLIDER_DRAW_OFFSET_Y));
-		attributes.setLeaderGapWidth(ChartSliderLayer.CHART_SLIDER_LEADER_GAP);
+		attributes.setDrawOffset(new Point(0, TrackSliderLayer.CHART_SLIDER_DRAW_OFFSET_Y));
+		attributes.setLeaderGapWidth(TrackSliderLayer.CHART_SLIDER_LEADER_GAP);
 		attributes.setFont(UI.AWT_FONT_ARIAL_BOLD_12);
 
 		// initially hide the annotation

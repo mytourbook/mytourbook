@@ -21,13 +21,12 @@ public class Messages extends NLS {
 
 	private static final String	BUNDLE_NAME	= "net.tourbook.map3.messages";				//$NON-NLS-1$
 
-	public static String		Custom_Layer_ChartSlider;
-
-	public static String	Custom_Layer_POI;
 	public static String		Custom_Layer_Status;
 	public static String		Custom_Layer_TerrainProfile;
 	public static String		Custom_Layer_TourLegend;
+	public static String		Custom_Layer_TourMarker;
 	public static String		Custom_Layer_TourTrack;
+	public static String		Custom_Layer_TrackSlider;
 	public static String		Custom_Layer_ViewerController;
 
 	public static String		Default_Layer_Atmosphere;
@@ -60,8 +59,14 @@ public class Messages extends NLS {
 
 	public static String		Map3_Action_DirectionArrows;
 	public static String		Map3_Action_OpenMap3PropertiesView;
-	public static String		Map3_Action_SetChartSliderLeft;
-	public static String		Map3_Action_SetChartSliderRight;
+	public static String	Map3_Action_SetTrackSliderPositionLeft;
+
+	public static String	Map3_Action_SetTrackSliderPositionRight;
+	public static String	Map3_Action_ShowLegend;
+
+	public static String	Map3_Action_ShowMarker;
+
+	public static String	Map3_Action_ShowTrackSlider;
 	public static String		Map3_Action_TrackColor;
 
 	public static String		Prop_Viewer_Label_AltitudeRange_Tooltip;

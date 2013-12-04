@@ -1058,7 +1058,7 @@ public class Map extends Canvas {
 // example
 //		"48.4838981628418,48.5500030517578,9.02030849456787,9.09173774719238"
 
-		final String[] boundingBoxValues = boundingBox.split(",");
+		final String[] boundingBoxValues = boundingBox.split(","); //$NON-NLS-1$
 
 		if (boundingBoxValues.length != 4) {
 			return null;

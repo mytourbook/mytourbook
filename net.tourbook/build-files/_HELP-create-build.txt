@@ -24,7 +24,8 @@ Create Translation Archive
 	
 - switch to workspace "C:\DAT\ws_mt-with-GIT"
 
-	- run script "CreateTranslationArchive"
+	- run script "Create_Translation_Archive"
+
 
 - test translations
 
@@ -46,9 +47,10 @@ requirements:
 	- about.mappings
 	- net.tourbook.application.ApplicationVersion
 
+
 - switch to workspace "C:\DAT\ws_mt-with-GIT"
 	
-	- run script "CreateMyTourbookBuildFiles" in plugin net.tourbook/build-files
+	- run script "Create_MyTourbook_BuildFiles" in plugin net.tourbook/build-files
 
 	
 - switch to workspace "C:\DAT\mytourbook-BUILD-ws"
@@ -69,6 +71,18 @@ requirements:
 Create Update Site
 
 ##################
+
+- create translation archive when necessary, see above instructions
+
+- switch to workspace "C:\DAT\ws_mt-with-GIT"
+
+	- run script "Create_MyTourbook_BuildFiles"
+
+
+- switch to workspace "C:\DAT\mytourbook-BUILD-ws"
+	
+	- refresh all projects with F5
+	- run Project/clean... for all projects
 
 - run script "clear-update-site.xml" in the project "update-site.mytourbook"
 - build the update site within site.xml
