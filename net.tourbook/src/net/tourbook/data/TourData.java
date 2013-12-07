@@ -1406,7 +1406,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 			dataSerieAltimeter[serieIndex] = 3600 * altitudeDiff / timeDiff / UI.UNIT_VALUE_ALTITUDE;
 
 			// keep gradient data
-			dataSerieGradient[serieIndex] = distanceDiff == 0 ? 0 : altitudeDiff * 1000 / distanceDiff;
+			dataSerieGradient[serieIndex] = distanceDiff == 0 ? 0 : altitudeDiff * 100 / distanceDiff;
 		}
 
 		if (UI.UNIT_VALUE_ALTITUDE != 1) {
@@ -1571,7 +1571,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 				// compute gradient
 				if (distanceDiff > 0) {
-					final float gradient = altitudeDiff * 1000 / distanceDiff;
+					final float gradient = altitudeDiff * 100 / distanceDiff;
 					dataSerieGradient[serieIndex] = gradient;
 				} else {
 //					dataSerieAltimeter[serieIndex] = -200;
