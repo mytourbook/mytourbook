@@ -272,13 +272,15 @@ public class SmoothingUI {
 
 		updateUI();
 
-		final SmoothingAlgorithm selectedSmoothingAlgo = getSelectedAlgorithm();
+		final SmoothingAlgorithm selectedAlgorithm = getSelectedAlgorithm();
 
-		_smoothingInitial.performDefaults(//
-				selectedSmoothingAlgo.algorithmId.equals(ISmoothingAlgorithm.SMOOTHING_ALGORITHM_INITIAL));
+		final boolean isInitialSelected = selectedAlgorithm.algorithmId.equals(//
+				ISmoothingAlgorithm.SMOOTHING_ALGORITHM_INITIAL);
+		_smoothingInitial.performDefaults(isInitialSelected);
 
-		_smoothingJamet.performDefaults(//
-				selectedSmoothingAlgo.algorithmId.equals(ISmoothingAlgorithm.SMOOTHING_ALGORITHM_JAMET));
+		final boolean isJametSelected = selectedAlgorithm.algorithmId.equals(//
+				ISmoothingAlgorithm.SMOOTHING_ALGORITHM_JAMET);
+		_smoothingJamet.performDefaults(isJametSelected);
 	}
 
 	private void restoreState() {

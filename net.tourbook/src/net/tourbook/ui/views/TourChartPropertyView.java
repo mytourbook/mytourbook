@@ -18,26 +18,21 @@ package net.tourbook.ui.views;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.ChartType;
-import net.tourbook.common.UI;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
 
-import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
-import org.eclipse.swt.events.MouseEvent;
-import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.ui.part.ViewPart;
 
 public class TourChartPropertyView extends ViewPart {
@@ -50,14 +45,7 @@ public class TourChartPropertyView extends ViewPart {
 	private Button					_rdoLineChartType;
 	private Button					_rdoBarChartType;
 
-	private Button					_chkIsCustomClipSettings;
-	private Spinner					_spinnerClipValues;
-
-	private Button					_chkIsCustomPaceClipping;
-	private Spinner					_spinnerPaceClipping;
-
 	private SelectionAdapter		_defaultSelectionListener;
-	private MouseWheelListener		_defaultMouseWheelListener;
 
 	@Override
 	public void createPartControl(final Composite parent) {
@@ -80,7 +68,6 @@ public class TourChartPropertyView extends ViewPart {
 //		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
 		{
 			createUI10ChartType(container);
-			createUI30Clipping(container);
 		}
 
 		/*
@@ -123,64 +110,8 @@ public class TourChartPropertyView extends ViewPart {
 		}
 	}
 
-	private void createUI30Clipping(final Composite parent) {
-
-		final Composite container = new Composite(parent, SWT.NONE);
-		GridLayoutFactory.fillDefaults().numColumns(2).margins(5, 0).spacing(5, 0).applyTo(container);
-		{
-			/*
-			 * is value clipping
-			 */
-			_chkIsCustomClipSettings = new Button(container, SWT.CHECK);
-			GridDataFactory.fillDefaults()//
-					.span(2, 1)
-					.applyTo(_chkIsCustomClipSettings);
-			_chkIsCustomClipSettings.setText(Messages.TourChart_Property_check_customize_value_clipping);
-			_chkIsCustomClipSettings.addSelectionListener(_defaultSelectionListener);
-
-			/*
-			 * time slice to clip values
-			 */
-			Label label = new Label(container, SWT.NONE);
-			GridDataFactory.fillDefaults().indent(16, 0).align(SWT.FILL, SWT.CENTER).applyTo(label);
-			label.setText(Messages.TourChart_Property_label_time_slices);
-
-			_spinnerClipValues = new Spinner(container, SWT.HORIZONTAL | SWT.BORDER);
-			_spinnerClipValues.setMaximum(1000);
-			_spinnerClipValues.addSelectionListener(_defaultSelectionListener);
-			_spinnerClipValues.addMouseWheelListener(_defaultMouseWheelListener);
-
-			/*
-			 * is pace clipping
-			 */
-			_chkIsCustomPaceClipping = new Button(container, SWT.CHECK);
-			GridDataFactory.fillDefaults()//
-					.span(2, 1)
-					.applyTo(_chkIsCustomPaceClipping);
-			_chkIsCustomPaceClipping.setText(Messages.TourChart_Property_check_customize_pace_clipping);
-			_chkIsCustomPaceClipping.addSelectionListener(_defaultSelectionListener);
-
-			/*
-			 * time slice to clip pace
-			 */
-			label = new Label(container, SWT.NONE);
-			GridDataFactory.fillDefaults()//
-					.indent(16, 0)
-					.align(SWT.FILL, SWT.CENTER)
-					.applyTo(label);
-			label.setText(Messages.TourChart_Property_label_pace_speed);
-
-			_spinnerPaceClipping = new Spinner(container, SWT.HORIZONTAL | SWT.BORDER);
-			_spinnerPaceClipping.setMaximum(1000);
-			_spinnerPaceClipping.addSelectionListener(_defaultSelectionListener);
-			_spinnerPaceClipping.addMouseWheelListener(_defaultMouseWheelListener);
-		}
-	}
-
 	private void enableControls() {
 
-		_spinnerClipValues.setEnabled(_chkIsCustomClipSettings.getSelection());
-		_spinnerPaceClipping.setEnabled(_chkIsCustomPaceClipping.getSelection());
 	}
 
 	private void initUI() {
@@ -188,13 +119,6 @@ public class TourChartPropertyView extends ViewPart {
 		_defaultSelectionListener = new SelectionAdapter() {
 			@Override
 			public void widgetSelected(final SelectionEvent event) {
-				onChangeProperty();
-			}
-		};
-
-		_defaultMouseWheelListener = new MouseWheelListener() {
-			public void mouseScrolled(final MouseEvent event) {
-				UI.adjustSpinnerValueOnMouseScroll(event);
 				onChangeProperty();
 			}
 		};
@@ -228,19 +152,6 @@ public class TourChartPropertyView extends ViewPart {
 			_rdoBarChartType.setSelection(true);
 		}
 
-		/*
-		 * clipping
-		 */
-		_chkIsCustomClipSettings.setSelection(_prefStore.getBoolean(//
-				ITourbookPreferences.GRAPH_PROPERTY_IS_VALUE_CLIPPING));
-		_spinnerClipValues.setSelection(//
-				_prefStore.getInt(ITourbookPreferences.GRAPH_PROPERTY_VALUE_CLIPPING_TIMESLICE));
-
-		_chkIsCustomPaceClipping.setSelection(//
-				_prefStore.getBoolean(ITourbookPreferences.GRAPH_PROPERTY_IS_PACE_CLIPPING));
-		_spinnerPaceClipping.setSelection(//
-				_prefStore.getInt(ITourbookPreferences.GRAPH_PROPERTY_PACE_CLIPPING_VALUE));
-
 		enableControls();
 	}
 
@@ -257,27 +168,6 @@ public class TourChartPropertyView extends ViewPart {
 				: ChartType.BAR;
 
 		_prefStore.setValue(ITourbookPreferences.GRAPH_PROPERTY_CHARTTYPE, chartType.name());
-
-		/*
-		 * clip time slices
-		 */
-		_prefStore.setValue(
-				ITourbookPreferences.GRAPH_PROPERTY_IS_VALUE_CLIPPING,
-				_chkIsCustomClipSettings.getSelection());
-		_prefStore.setValue(
-				ITourbookPreferences.GRAPH_PROPERTY_VALUE_CLIPPING_TIMESLICE,
-				_spinnerClipValues.getSelection());
-
-		/*
-		 * pace clipping value in 0.1 km/h-mph
-		 */
-		_prefStore.setValue(
-				ITourbookPreferences.GRAPH_PROPERTY_IS_PACE_CLIPPING,
-				_chkIsCustomPaceClipping.getSelection());
-
-		_prefStore.setValue(
-				ITourbookPreferences.GRAPH_PROPERTY_PACE_CLIPPING_VALUE,
-				_spinnerPaceClipping.getSelection());
 	}
 
 	@Override
