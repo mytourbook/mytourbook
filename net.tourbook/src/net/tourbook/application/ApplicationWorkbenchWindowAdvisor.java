@@ -30,6 +30,7 @@ import net.tourbook.data.TourPerson;
 import net.tourbook.database.PersonManager;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.map3.view.Map3Manager;
+import net.tourbook.map3.view.Map3State;
 import net.tourbook.photo.TourPhotoManager;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.PrefPagePeople;
@@ -480,7 +481,15 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 		TagMenuManager.saveTagState();
 		TourTypeMenuManager.saveState();
 		TourPhotoManager.saveState();
-		Map3Manager.saveState();
+
+		/**
+		 * Save map3 state only when map is initialized (displayed). When this state is not checked
+		 * and map is not yet initialized, the map will be initialized which produces an annoying
+		 * delay when the application is being closing.
+		 */
+		if (Map3State.isMapInitialized) {
+			Map3Manager.saveState();
+		}
 
 		return super.preWindowShellClose();
 	}

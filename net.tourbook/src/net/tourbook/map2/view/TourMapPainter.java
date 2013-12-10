@@ -1872,7 +1872,7 @@ public class TourMapPainter extends MapPainter {
 	 */
 	private void setDataSerie(final TourData tourData) {
 
-		final IMapColorProvider legendProvider = _tourPaintConfig.getLegendProvider();
+		final IMapColorProvider legendProvider = _tourPaintConfig.getMapColorProvider();
 
 		if (legendProvider == null) {
 			_dataSerie = null;

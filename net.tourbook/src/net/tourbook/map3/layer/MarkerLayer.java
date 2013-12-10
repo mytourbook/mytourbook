@@ -15,12 +15,14 @@
  *******************************************************************************/
 package net.tourbook.map3.layer;
 
+import gov.nasa.worldwind.avlist.AVKey;
 import gov.nasa.worldwind.awt.WorldWindowGLCanvas;
 import gov.nasa.worldwind.event.SelectEvent;
 import gov.nasa.worldwind.event.SelectListener;
 import gov.nasa.worldwind.geom.Position;
 import gov.nasa.worldwind.layers.RenderableLayer;
 import gov.nasa.worldwind.pick.PickedObject;
+import gov.nasa.worldwind.render.PointPlacemark;
 import gov.nasa.worldwind.render.PointPlacemarkAttributes;
 
 import java.util.ArrayList;
@@ -60,9 +62,9 @@ public class MarkerLayer extends RenderableLayer implements SelectListener, IChe
 		removeAllRenderables();
 
 		final PointPlacemarkAttributes ppAttributes = new PointPlacemarkAttributes();
-		ppAttributes.setScale(1.5);
+		ppAttributes.setScale(3.0);
 		ppAttributes.setLabelScale(1.0);
-		ppAttributes.setLabelFont(UI.AWT_FONT_ARIAL_16);
+		ppAttributes.setLabelFont(UI.AWT_FONT_ARIAL_BOLD_24);
 
 		final TourTrackConfig config = TourTrackConfigManager.getActiveConfig();
 
@@ -115,7 +117,7 @@ public class MarkerLayer extends RenderableLayer implements SelectListener, IChe
 				altitudeMode = config.altitudeMode;
 //				}
 
-				final MTPointPlacemark pp = new MTPointPlacemark(Position.fromDegrees(
+				final PointPlacemark pp = new PointPlacemark(Position.fromDegrees(
 						latitudeSerie[serieIndex],
 						longitudeSerie[serieIndex],
 						altitude));
@@ -126,7 +128,7 @@ public class MarkerLayer extends RenderableLayer implements SelectListener, IChe
 				pp.setLabelText(tourMarker.getLabel());
 
 				// set tooltip
-//				pp.setValue(AVKey.DISPLAY_NAME, "Clamp to ground, Label, Semi-transparent, Audio icon");
+				pp.setValue(AVKey.DISPLAY_NAME, "Tooltip: " + tourMarker.getLabel());
 
 				pp.setLineEnabled(true);
 

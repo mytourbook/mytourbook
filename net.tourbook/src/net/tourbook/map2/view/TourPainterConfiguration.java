@@ -65,7 +65,7 @@ public class TourPainterConfiguration {
 		return _instance;
 	}
 
-	public IMapColorProvider getLegendProvider() {
+	public IMapColorProvider getMapColorProvider() {
 		return _mapColorProvider;
 	}
 

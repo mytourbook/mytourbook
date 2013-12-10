@@ -235,6 +235,8 @@ public class Map3Manager {
 		_ww = new WorldWindowGLCanvas();
 
 		_initializeMap3();
+
+		Map3State.isMapInitialized = true;
 	}
 
 	private static final class ViewerControllerCheckStateListener implements ICheckStateListener {

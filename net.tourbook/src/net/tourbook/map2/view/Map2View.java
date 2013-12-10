@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -68,6 +68,7 @@ import net.tourbook.map2.action.ActionZoomIn;
 import net.tourbook.map2.action.ActionZoomOut;
 import net.tourbook.map2.action.ActionZoomShowEntireEarth;
 import net.tourbook.map2.action.ActionZoomShowEntireTour;
+import net.tourbook.map3.action.ActionMapColor;
 import net.tourbook.photo.IPhotoEventListener;
 import net.tourbook.photo.IPhotoPropertiesListener;
 import net.tourbook.photo.Photo;
@@ -263,6 +264,8 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 	private final MapInfoManager			_mapInfoManager						= MapInfoManager.getInstance();
 	private final TourPainterConfiguration	_tourPainterConfig					= TourPainterConfiguration
 																						.getInstance();
+	private MapColorId						_tourColorId;
+
 	private int								_tourIdHash;
 	private int								_tourDataHash;
 	private long							_tourHashOverlayKey;
@@ -273,11 +276,6 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 	 */
 	private boolean							_isLinkPhotoDisplayed;
 
-	/*
-	 * UI controls
-	 */
-	private Map								_map;
-
 	private ActionTourColor					_actionTourColorAltitude;
 	private ActionTourColor					_actionTourColorGradient;
 	private ActionTourColor					_actionTourColorPulse;
@@ -286,6 +284,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 	private ActionTourColor					_actionTourColorHrZone;
 
 	private ActionDimMap					_actionDimMap;
+	private ActionMapColor					_actionMapColor;
 	private ActionManageMapProviders		_actionManageProvider;
 	private ActionPhotoProperties			_actionPhotoFilter;
 	private ActionReloadFailedMapImages		_actionReloadFailedMapImages;
@@ -314,6 +313,11 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 	private ActionZoomCentered				_actionZoomCentered;
 	private ActionZoomShowEntireEarth		_actionZoomShowAll;
 	private ActionZoomShowEntireTour		_actionShowEntireTour;
+
+	/*
+	 * UI controls
+	 */
+	private Map								_map;
 
 	public Map2View() {}
 
@@ -727,14 +731,12 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 
 	public void actionSetTourColor(final MapColorId colorId) {
 
-		final IMapColorProvider mapColorProvider = getColorProvider(colorId);
-
-		_tourPainterConfig.setMapColorProvider(mapColorProvider);
+		setTourPainterColorProvider(colorId);
 
 		_map.disposeOverlayImageCache();
 		_map.paint();
 
-		createLegendImage(mapColorProvider);
+		createLegendImage(getColorProvider(colorId));
 	}
 
 	public void actionSetZoomCentered() {
@@ -1028,7 +1030,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 					net.tourbook.ui.UI.updateUnits();
 					_map.setMeasurementSystem(net.tourbook.ui.UI.UNIT_VALUE_DISTANCE, UI.UNIT_LABEL_DISTANCE);
 
-					createLegendImage(_tourPainterConfig.getLegendProvider());
+					createLegendImage(_tourPainterConfig.getMapColorProvider());
 
 					_map.paint();
 
@@ -1041,7 +1043,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 
 					// update tour and legend
 
-					createLegendImage(_tourPainterConfig.getLegendProvider());
+					createLegendImage(_tourPainterConfig.getMapColorProvider());
 
 					_map.disposeOverlayImageCache();
 					_map.paint();
@@ -1251,6 +1253,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 		_actionSynchWithSlider = new ActionSynchWithSlider(this);
 		_actionSynchTourZoomLevel = new ActionSynchTourZoomLevel(this);
 
+		_actionMapColor = new ActionMapColor();
 		_actionSelectMapProvider = new ActionSelectMapProvider(this);
 		_actionSetDefaultPosition = new ActionSetDefaultPosition(this);
 		_actionSaveDefaultPosition = new ActionSaveDefaultPosition(this);
@@ -1427,7 +1430,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 						&& (legendBounds.height < IMapColorProvider.DEFAULT_LEGEND_HEIGHT)) //
 				) {
 
-					createLegendImage(_tourPainterConfig.getLegendProvider());
+					createLegendImage(_tourPainterConfig.getMapColorProvider());
 				}
 			}
 		});
@@ -1542,10 +1545,12 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 		 * tour actions
 		 */
 		final int numberOfTours = _allTourData.size();
+		final boolean isTourAvailable = numberOfTours > 0;
 		final boolean isMultipleTours = numberOfTours > 1 && _isShowTour;
 		final boolean isOneTour = _isTourOrWayPoint && (isMultipleTours == false) && _isShowTour;
 
-		_actionShowEntireTour.setEnabled(_isTourOrWayPoint && _isShowTour && numberOfTours > 0);
+		_actionMapColor.setEnabled(isTourAvailable);
+		_actionShowEntireTour.setEnabled(_isTourOrWayPoint && _isShowTour && isTourAvailable);
 		_actionShowLegendInMap.setEnabled(_isTourOrWayPoint);
 		_actionShowSliderInLegend.setEnabled(_isTourOrWayPoint && _isShowLegend);
 		_actionShowSliderInMap.setEnabled(_isTourOrWayPoint);
@@ -1656,23 +1661,38 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 		menuMgr.add(_actionShowScaleInMap);
 		menuMgr.add(_actionShowSliderInMap);
 		menuMgr.add(_actionShowSliderInLegend);
-		menuMgr.add(new Separator());
 
+		menuMgr.add(new Separator());
 		menuMgr.add(_actionShowTourMarker);
 		menuMgr.add(_actionShowWayPoints);
 		menuMgr.add(_actionShowPOI);
 		menuMgr.add(_actionShowStartEndInMap);
 		menuMgr.add(_actionShowTourInfoInMap);
-		menuMgr.add(new Separator());
 
+		menuMgr.add(new Separator());
 		menuMgr.add(_actionSetDefaultPosition);
 		menuMgr.add(_actionSaveDefaultPosition);
+
 		menuMgr.add(new Separator());
+
+		// it can happen that color id is not yet set
+		if (_tourColorId != null) {
+
+			// set color before menu is filled, this sets the action image and color id
+			_actionMapColor.setColorId(_tourColorId);
+
+			if (_tourColorId != MapColorId.HrZone) {
+
+				// hr zone has a different color provider and is not yet supported
+
+				menuMgr.add(_actionMapColor);
+			}
+		}
 
 		menuMgr.add(_actionDimMap);
 		menuMgr.add(_actionSynchTourZoomLevel);
-		menuMgr.add(new Separator());
 
+		menuMgr.add(new Separator());
 		menuMgr.add(_actionManageProvider);
 		menuMgr.add(_actionReloadFailedMapImages);
 	}
@@ -2177,7 +2197,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 
 		setBoundsZoomLevel(tourBounds, false);
 
-		createLegendImage(_tourPainterConfig.getLegendProvider());
+		createLegendImage(_tourPainterConfig.getMapColorProvider());
 
 		_map.paint();
 	}
@@ -2290,7 +2310,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 			_map.disposeOverlayImageCache();
 		}
 
-		createLegendImage(_tourPainterConfig.getLegendProvider());
+		createLegendImage(_tourPainterConfig.getMapColorProvider());
 
 		_map.paint();
 	}
@@ -2419,7 +2439,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 		if (isNewTour || forceRedraw) {
 
 			// adjust legend values for the new or changed tour
-			createLegendImage(_tourPainterConfig.getLegendProvider());
+			createLegendImage(_tourPainterConfig.getMapColorProvider());
 
 			_map.setOverlayKey(tourData.getTourId().toString());
 			_map.disposeOverlayImageCache();
@@ -2466,7 +2486,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 			_map.disposeOverlayImageCache();
 		}
 
-		createLegendImage(_tourPainterConfig.getLegendProvider());
+		createLegendImage(_tourPainterConfig.getMapColorProvider());
 
 		_map.paint();
 	}
@@ -2683,7 +2703,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 				break;
 			}
 
-			_tourPainterConfig.setMapColorProvider(getColorProvider(colorId));
+			setTourPainterColorProvider(colorId);
 
 		} catch (final NumberFormatException e) {
 			_actionTourColorAltitude.setChecked(true);
@@ -2695,10 +2715,10 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 		_map.setShowLegend(_isShowTour);
 
 		// check legend provider
-		if (_tourPainterConfig.getLegendProvider() == null) {
+		if (_tourPainterConfig.getMapColorProvider() == null) {
 
 			// set default legend provider
-			_tourPainterConfig.setMapColorProvider(getColorProvider(MapColorId.Altitude));
+			setTourPainterColorProvider(MapColorId.Altitude);
 
 			// hide legend
 			_map.setShowLegend(false);
@@ -2950,6 +2970,15 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 
 		_map.setMapCenter(new GeoPosition(latitudeSerie[sliderIndex], longitudeSerie[sliderIndex]));
 
+	}
+
+	private void setTourPainterColorProvider(final MapColorId colorId) {
+
+		_tourColorId = colorId;
+
+		final IMapColorProvider mapColorProvider = getColorProvider(colorId);
+
+		_tourPainterConfig.setMapColorProvider(mapColorProvider);
 	}
 
 	private void showDefaultMap(final boolean isShowOverlays) {

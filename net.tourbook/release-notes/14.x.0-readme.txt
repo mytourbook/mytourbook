@@ -4,7 +4,7 @@ Version: 14.?.0                                       ?. ? 2014
 
 New 3D Map Features 	
 
-* set left/right track slider
+* 
 
 * 
 

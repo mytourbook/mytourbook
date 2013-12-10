@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -28,33 +28,24 @@ import net.tourbook.map2.view.DialogMappingColor;
 import net.tourbook.map2.view.IMapColorUpdater;
 import net.tourbook.map2.view.TourMapColors;
 import net.tourbook.map3.Messages;
-import net.tourbook.map3.view.Map3View;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.PrefPageAppearanceColors;
 import net.tourbook.ui.UI;
 
 import org.eclipse.jface.action.Action;
-import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.swt.widgets.Display;
 
 public class ActionMapColor extends Action implements IMapColorUpdater {
-
-//	private Map3View			_mapView;
-//	private IDialogSettings	_state;
 
 	private MapColorId			_mapColorId;
 	private DialogMappingColor	_dialogMappingColor;
 	private ColorDefinition		_colorDefinition;
 
-	public ActionMapColor(final Map3View mapView, final IDialogSettings state) {
+	public ActionMapColor() {
 
 		super(null, AS_PUSH_BUTTON);
 
-//		_mapView = mapView;
-//		_state = state;
-
 		setText(Messages.Map3_Action_TrackColor);
-//		setToolTipText(toolTipText);
 	}
 
 	@Override

@@ -167,7 +167,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 	private ActionShowTrackSlider				_actionShowTrackSlider;
 	private ActionShowDirectionArrows			_actionShowDirectionArrows;
 	private ActionShowEntireTour				_actionShowEntireTour;
-	private ActionShowLegend				_actionShowLegendInMap;
+	private ActionShowLegend					_actionShowLegendInMap;
 	private ActionShowMarker					_actionShowMarker;
 	private ActionShowTourInMap3				_actionShowTourInMap3;
 	private ActionSyncMapWithChartSlider		_actionSynMapWithChartSlider;
@@ -706,7 +706,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 
 		_actionOpenMap3LayerView = new ActionOpenMap3LayerView();
 
-		_actionMapColor = new ActionMapColor(this, _state);
+		_actionMapColor = new ActionMapColor();
 
 		_actionSetTrackSliderLeft = new ActionSetTrackSliderPositionLeft(this);
 		_actionSetTrackSliderRight = new ActionSetTrackSliderPositionRight(this);
