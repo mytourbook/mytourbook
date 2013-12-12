@@ -17,11 +17,8 @@ package net.tourbook.map3.view;
 
 import gov.nasa.worldwind.View;
 import gov.nasa.worldwind.WorldWind;
-import gov.nasa.worldwind.WorldWindow;
 import gov.nasa.worldwind.avlist.AVKey;
 import gov.nasa.worldwind.awt.WorldWindowGLCanvas;
-import gov.nasa.worldwind.event.RenderingEvent;
-import gov.nasa.worldwind.event.RenderingListener;
 import gov.nasa.worldwind.geom.Angle;
 import gov.nasa.worldwind.geom.LatLon;
 import gov.nasa.worldwind.geom.Line;
@@ -30,21 +27,16 @@ import gov.nasa.worldwind.geom.Vec4;
 import gov.nasa.worldwind.globes.Globe;
 import gov.nasa.worldwind.render.AnnotationAttributes;
 import gov.nasa.worldwind.render.GlobeAnnotation;
-import gov.nasa.worldwind.util.PerformanceStatistic;
 import gov.nasa.worldwind.view.orbit.BasicOrbitView;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.EventQueue;
 import java.awt.Frame;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Comparator;
 import java.util.HashMap;
 
 import javax.swing.SwingUtilities;
@@ -69,7 +61,9 @@ import net.tourbook.map2.view.IDiscreteColors;
 import net.tourbook.map2.view.SelectionMapPosition;
 import net.tourbook.map2.view.TourMapColors;
 import net.tourbook.map3.action.ActionMapColor;
+import net.tourbook.map3.action.ActionOpenGLVersions;
 import net.tourbook.map3.action.ActionOpenMap3LayerView;
+import net.tourbook.map3.action.ActionOpenMap3StatisticsView;
 import net.tourbook.map3.action.ActionSetTrackSliderPositionLeft;
 import net.tourbook.map3.action.ActionSetTrackSliderPositionRight;
 import net.tourbook.map3.action.ActionShowDirectionArrows;
@@ -109,6 +103,7 @@ import net.tourbook.ui.tourChart.TourChart;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ActionContributionItem;
+import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -124,6 +119,7 @@ import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
+import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchPart;
@@ -160,7 +156,9 @@ public class Map3View extends ViewPart implements ITourProvider {
 
 	private static final WorldWindowGLCanvas	_wwCanvas								= Map3Manager.getWWCanvas();
 
+	private ActionOpenGLVersions				_actionOpenGLVersions;
 	private ActionOpenMap3LayerView				_actionOpenMap3LayerView;
+	private ActionOpenMap3StatisticsView		_actionOpenMap3StatisticsView;
 	private ActionMapColor						_actionMapColor;
 	private ActionSetTrackSliderPositionLeft	_actionSetTrackSliderLeft;
 	private ActionSetTrackSliderPositionRight	_actionSetTrackSliderRight;
@@ -188,14 +186,12 @@ public class Map3View extends ViewPart implements ITourProvider {
 	private ActionOpenTour						_actionOpenTour;
 	private ActionPrint							_actionPrintTour;
 
-//	private PostSelectionProvider				_postSelectionProvider;
 	private IPartListener2						_partListener;
 	private ISelectionListener					_postSelectionListener;
 	private IPropertyChangeListener				_prefChangeListener;
 	private ITourEventListener					_tourEventListener;
 
 	private MouseAdapter						_wwMouseListener;
-	private RenderingListener					_wwStatisticListener;
 
 //	private boolean								_isPartActive;
 	private boolean								_isPartVisible;
@@ -206,9 +202,6 @@ public class Map3View extends ViewPart implements ITourProvider {
 
 	private boolean								_isSyncMapWithChartSlider;
 	private boolean								_isSyncMapViewWithTour;
-
-	private int									_statisticUpdateInterval				= 500;
-	private long								_statisticLastUpdate;
 
 	/**
 	 * Contains all tours which are displayed in the map.
@@ -222,11 +215,6 @@ public class Map3View extends ViewPart implements ITourProvider {
 	 * Color id for the currently displayed tour tracks.
 	 */
 	private MapColorId							_tourColorId;
-
-	/**
-	 * <code>true</code> will log frame/cache... statistics like in {@link PerformanceStatistic}
-	 */
-	private boolean								_isLogStatistics						= false;
 
 	/*
 	 * current position for the x-sliders (vertical slider)
@@ -463,35 +451,35 @@ public class Map3View extends ViewPart implements ITourProvider {
 		/*
 		 * Statistics
 		 */
-		if (_isLogStatistics) {
-
-			_wwCanvas.setPerFrameStatisticsKeys(PerformanceStatistic.ALL_STATISTICS_SET);
-			_wwStatisticListener = new RenderingListener() {
-
-				@Override
-				public void stageChanged(final RenderingEvent event) {
-
-					final long now = System.currentTimeMillis();
-
-					final String stage = event.getStage();
-
-					if (stage.equals(RenderingEvent.AFTER_BUFFER_SWAP)
-							&& event.getSource() instanceof WorldWindow
-							&& now - _statisticLastUpdate > _statisticUpdateInterval) {
-
-						EventQueue.invokeLater(new Runnable() {
-							public void run() {
-								updateStatistics();
-							}
-						});
-
-						_statisticLastUpdate = now;
-					}
-				}
-			};
-
-			_wwCanvas.addRenderingListener(_wwStatisticListener);
-		}
+//		if (_isLogStatistics) {
+//
+//			_wwCanvas.setPerFrameStatisticsKeys(PerformanceStatistic.ALL_STATISTICS_SET);
+//			_wwStatisticListener = new RenderingListener() {
+//
+//				@Override
+//				public void stageChanged(final RenderingEvent event) {
+//
+//					final long now = System.currentTimeMillis();
+//
+//					final String stage = event.getStage();
+//
+//					if (stage.equals(RenderingEvent.AFTER_BUFFER_SWAP)
+//							&& event.getSource() instanceof WorldWindow
+//							&& now - _statisticLastUpdate > _statisticUpdateInterval) {
+//
+//						EventQueue.invokeLater(new Runnable() {
+//							public void run() {
+//								updateStatistics();
+//							}
+//						});
+//
+//						_statisticLastUpdate = now;
+//					}
+//				}
+//			};
+//
+//			_wwCanvas.addRenderingListener(_wwStatisticListener);
+//		}
 	}
 
 	private void addPartListener() {
@@ -704,7 +692,9 @@ public class Map3View extends ViewPart implements ITourProvider {
 
 	private void createActions(final Composite parent) {
 
+		_actionOpenGLVersions = new ActionOpenGLVersions();
 		_actionOpenMap3LayerView = new ActionOpenMap3LayerView();
+		_actionOpenMap3StatisticsView = new ActionOpenMap3StatisticsView();
 
 		_actionMapColor = new ActionMapColor();
 
@@ -971,6 +961,11 @@ public class Map3View extends ViewPart implements ITourProvider {
 
 		_wwCanvas.getInputHandler().removeMouseListener(_wwMouseListener);
 
+		/*
+		 * !!! THIS WILL BLOCK THE UI !!!
+		 */
+//		_awtFrame.dispose();
+
 		disposeContextMenu();
 
 		super.dispose();
@@ -1009,10 +1004,12 @@ public class Map3View extends ViewPart implements ITourProvider {
 
 	private void fillActionBars() {
 
+		final IActionBars actionBars = getViewSite().getActionBars();
+
 		/*
 		 * fill view toolbar
 		 */
-		final IToolBarManager tbm = getViewSite().getActionBars().getToolBarManager();
+		final IToolBarManager tbm = actionBars.getToolBarManager();
 
 		tbm.add(_actionTourColorAltitude);
 		tbm.add(_actionTourColorPulse);
@@ -1031,6 +1028,14 @@ public class Map3View extends ViewPart implements ITourProvider {
 		tbm.add(new Separator());
 
 		tbm.add(_actionOpenMap3LayerView);
+
+		/*
+		 * fill view menu
+		 */
+		final IMenuManager menuMgr = actionBars.getMenuManager();
+
+		menuMgr.add(_actionOpenMap3StatisticsView);
+		menuMgr.add(_actionOpenGLVersions);
 	}
 
 	private void fillContextMenu(final Menu menu) {
@@ -2009,37 +2014,6 @@ public class Map3View extends ViewPart implements ITourProvider {
 		_allTours.addAll(getMapTours(modifiedTours));
 
 		showAllTours_InternalTours();
-	}
-
-	private void updateStatistics() {
-
-		final Collection<PerformanceStatistic> stats = _wwCanvas.getSceneController().getPerFrameStatistics();
-
-		if (stats.size() < 1) {
-			return;
-		}
-
-		final PerformanceStatistic[] pfs = stats.toArray(new PerformanceStatistic[stats.size()]);
-		Arrays.sort(pfs, new Comparator<PerformanceStatistic>() {
-
-			@Override
-			public int compare(final PerformanceStatistic o1, final PerformanceStatistic o2) {
-
-				// sort stats by key to group them by the same type
-				return o1.getKey().compareTo(o2.getKey());
-			}
-		});
-
-		System.out.println(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] \t"); //$NON-NLS-1$ //$NON-NLS-2$
-		System.out.println(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] \t"); //$NON-NLS-1$ //$NON-NLS-2$
-
-		for (final PerformanceStatistic stat : pfs) {
-			System.out.println(UI.timeStampNano() + " [" //$NON-NLS-1$
-					+ getClass().getSimpleName()
-					+ "] \t" //$NON-NLS-1$
-					+ String.format("%10s  %s", stat.getValue(), stat.getDisplayString())); //$NON-NLS-1$
-//					+ String.format("%-40s%10s", stat.getDisplayString(), stat.getValue()));
-		}
 	}
 
 	private void updateTrackSlider() {

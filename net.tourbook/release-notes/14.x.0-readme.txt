@@ -10,6 +10,19 @@ New 3D Map Features
 
 
 
+Other New Features
+
+* Set track color in 2D map context menu.
+
+* Moved time slice clipping from tour chart properties view into the initial smoothing algorithm UI.
+
+
+
 Fixed Bugs 
 
-* 
+* Power and gradient was 10 times higher when using initial smoothing algorithm.
+
+* Removed delay when app is closing and map3 is not displayed
+
+
+

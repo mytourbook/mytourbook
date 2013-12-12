@@ -53,6 +53,7 @@ public class MTPointPlacemark extends PointPlacemark {
 		}
 
 		Color color = this.getActiveAttributes().getLabelColor();
+
 		// Use the default color if the active attributes do not specify one.
 		if (color == null) {
 //			color = PointPlacemarkAttributes.DEFAULT_LABEL_COLOR;
@@ -101,13 +102,8 @@ public class MTPointPlacemark extends PointPlacemark {
 		}
 
 		// Do not depth buffer the label. (Placemarks beyond the horizon are culled above.)
-//		gl.glDisable(GL.GL_DEPTH_TEST);
-//		gl.glDepthMask(false);
-		if ((!dc.isDeepPickingEnabled())) {
-			gl.glEnable(GL.GL_DEPTH_TEST);
-		}
-		gl.glDepthFunc(GL.GL_LEQUAL);
-		gl.glDepthMask(true);
+		gl.glDisable(GL.GL_DEPTH_TEST);
+		gl.glDepthMask(false);
 
 		final TextRenderer textRenderer = OGLTextRenderer.getOrCreateTextRenderer(dc.getTextRendererCache(), font);
 		try {

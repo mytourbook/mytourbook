@@ -3760,6 +3760,17 @@
          offset="1"
          id="stop9514-0" />
     </linearGradient>
+    <linearGradient
+       id="linearGradient9510-4">
+      <stop
+         style="stop-color:#e3f0ff;stop-opacity:1;"
+         offset="0"
+         id="stop9512-0" />
+      <stop
+         style="stop-color:#0981ff;stop-opacity:1;"
+         offset="1"
+         id="stop9514-9" />
+    </linearGradient>
   </defs>
   <sodipodi:namedview
      id="base"
@@ -3768,16 +3779,16 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="16"
-     inkscape:cx="36.314433"
-     inkscape:cy="994.27954"
+     inkscape:zoom="29.695154"
+     inkscape:cx="71.70424"
+     inkscape:cy="993.78632"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="true"
-     inkscape:window-width="1750"
-     inkscape:window-height="1401"
-     inkscape:window-x="431"
-     inkscape:window-y="0"
+     inkscape:window-width="1484"
+     inkscape:window-height="1165"
+     inkscape:window-x="567"
+     inkscape:window-y="120"
      inkscape:window-maximized="0"
      inkscape:snap-grids="true"
      inkscape:snap-page="false"
@@ -4307,5 +4318,62 @@
        inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook.map3\icons\map3-tour-tracks.png"
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90" />
+    <rect
+       style="opacity:0.98999999;fill:none;stroke:none"
+       id="rect6561-8-1-9-9-5-5-9-9-1-4"
+       width="16"
+       height="16"
+       x="50"
+       y="51.362183"
+       inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook\icons\map3-statistics.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <text
+       xml:space="preserve"
+       style="font-size:10px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:Segoe UI;-inkscape-font-specification:Segoe UI Bold"
+       x="49.269531"
+       y="61.771851"
+       id="text3778"
+       sodipodi:linespacing="125%"
+       inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook\icons\map3-statistics.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"><tspan
+         sodipodi:role="line"
+         id="tspan3784"
+         x="49.269531"
+         y="61.771851">FpS</tspan></text>
+    <rect
+       style="opacity:0.98999999;fill:none;stroke:none"
+       id="rect6561-8-1-9-9-5-5-9-9-1-4-1"
+       width="16"
+       height="16"
+       x="70"
+       y="51.362183"
+       inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook\icons\map3-opengl-version.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <text
+       xml:space="preserve"
+       style="font-size:10px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:Segoe UI;-inkscape-font-specification:Segoe UI Bold"
+       x="70.65625"
+       y="62.860718"
+       id="text3778-7"
+       sodipodi:linespacing="125%"
+       inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook\icons\map3-opengl-version.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"><tspan
+         sodipodi:role="line"
+         id="tspan3784-4"
+         x="70.65625"
+         y="62.860718">4.x</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:9px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+       x="76.342422"
+       y="57.890156"
+       id="text3759"
+       sodipodi:linespacing="125%"><tspan
+         sodipodi:role="line"
+         id="tspan3761"></tspan></text>
   </g>
 </svg>

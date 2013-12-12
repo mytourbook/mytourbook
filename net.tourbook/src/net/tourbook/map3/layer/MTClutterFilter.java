@@ -205,18 +205,23 @@ public class MTClutterFilter implements ClutterFilter {
 	public void apply(final DrawContext dc, final List<Declutterable> shapes) {
 
 		for (final Declutterable shape : shapes) {
-			final Rectangle2D bounds = shape.getBounds(dc);
 
+			final Rectangle2D bounds = shape.getBounds(dc);
 			final Rectangle2D intersectingRegion = this.intersects(bounds);
+
 			if (intersectingRegion != null) {
+
 				this.addShape(intersectingRegion, shape);
+
 			} else if (bounds != null) {
+
 				// Double the size of the capturing rectangle in order to grab more than it otherwise would. This
 				// reduces the clutter caused by the decluttered representations themselves.
 				final double w = 2 * bounds.getWidth();
 				final double h = 2 * bounds.getHeight();
 				final double x = bounds.getX() - 0.5 * bounds.getWidth();
 				final double y = bounds.getY() - 0.5 * bounds.getHeight();
+
 				this.addShape(new Rectangle.Double(x, y, w, h), shape);
 			}
 		}
@@ -227,6 +232,7 @@ public class MTClutterFilter implements ClutterFilter {
 
 	/** Release all the resources used in the most recent filter application. */
 	protected void clear() {
+
 		this.rectList.clear();
 		this.shapeMap.clear();
 	}
@@ -240,6 +246,7 @@ public class MTClutterFilter implements ClutterFilter {
 	 *         the filter, otherwise false.
 	 */
 	protected Rectangle2D intersects(final Rectangle2D rectangle) {
+
 		if (rectangle == null) {
 			return null;
 		}
@@ -265,6 +272,7 @@ public class MTClutterFilter implements ClutterFilter {
 	protected void render(final DrawContext dc) {
 
 		for (final Map.Entry<Rectangle2D, List<Declutterable>> entry : this.shapeMap.entrySet()) {
+
 			List<PointPlacemark> placemarks = null;
 			Declutterable firstShape = null;
 

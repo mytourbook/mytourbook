@@ -1086,8 +1086,7 @@
 	</extension>
 	
 	
-   <extension
-         point="org.eclipse.ui.views">
+   <extension	point="org.eclipse.ui.views">
 
       <category
             id="net.tourbook.category.tourList"
@@ -1136,10 +1135,12 @@
 	            name="%view_name_Statistics">
 	      </view>
 
+
       <category
             id="net.tourbook.category.tour"
-            name="%view_category_tour">
-      </category>
+            name="%view_category_tour"
+      />
+
 	      <view
 	            category="net.tourbook.category.tour"
 	            class="net.tourbook.ui.tourChart.TourChartView"
@@ -1163,13 +1164,6 @@
 	      </view>
 	      <view
 	            category="net.tourbook.category.tour"
-	            class="net.tourbook.map2.view.Map2View"
-	            icon="icons/earth-globe-abstract.png"
-	            id="net.tourbook.map2.view.Map2ViewId"
-	            name="%view_name_tour_map">
-	      </view>
-	      <view
-	            category="net.tourbook.category.tour"
 	            class="net.tourbook.ui.views.TourWaypointView"
 	            icon="icons/tour-waypoint.png"
 	            id="net.tourbook.views.TourWaypointView"
@@ -1177,10 +1171,11 @@
 	      </view>
 
 
-      <category
-            id="net.tourbook.category.Tools"
-            name="%View_Category_Tools">
-      </category>
+		<category
+			id="net.tourbook.category.Tools"
+			name="%View_Category_Tools"
+		/>
+		
 	      <view
 	            category="net.tourbook.category.Tools"
 	            class="net.tourbook.ui.tourChart.ConconiChartView"
@@ -1225,10 +1220,12 @@
 	            name="Places">
 	      </view>
 
+
       <category
             id="net.tourbook.category.compareTours"
-            name="%view_category_compare_tours">
-      </category>
+            name="%view_category_compare_tours"
+      />
+      
 	      <view
 	            category="net.tourbook.category.compareTours"
 	            class="net.tourbook.ui.views.tourCatalog.TourCompareResultView"
@@ -1259,9 +1256,9 @@
 	      </view>
 
 	      
-	<!--
-		Photo   Photo   Photo   Photo   Photo   Photo   Photo   Photo   Photo   Photo   
-	-->            
+		<!--
+			5. Photo   
+		-->    
 
 		<category
 			id="net.tourbook.category.photo"
@@ -1280,10 +1277,31 @@
 				id="net.tourbook.photo.TourPhotosView.ID"
 				name="%View_Name_PhotoTourPhotos"/>
 
-      <category
-            id="net.tourbook.category.system"
-            name="%view_category_system">
-      </category>
+
+		<!--
+			6. Map   
+		-->            
+	
+		<category
+			id="net.tourbook.category.map"
+			name="%View_Category_Map"/>
+	   
+			<view
+				category="net.tourbook.category.map"
+				class="net.tourbook.map2.view.Map2View"
+				icon="icons/earth-globe-abstract.png"
+				id="net.tourbook.map2.view.Map2ViewId"
+				name="%view_name_tour_map"
+			/>
+	
+	
+		<!--
+			99. System
+		-->    
+
+		<category
+			id="net.tourbook.category.system"
+			name="%view_category_system"/>
 
 	      <view
 	            category="net.tourbook.category.system"
@@ -1374,15 +1392,15 @@
       </key>
    </extension>
 
-<!-- 
 
- MAP 3   MAP 3   MAP 3   MAP 3   MAP 3   MAP 3   MAP 3   MAP 3   MAP 3   MAP 3   MAP 3   MAP 3   
-
--->
-
-
-<!-- COMMANDS -->
-
+	<!-- 
+	
+	 MAP 3   MAP 3   MAP 3   MAP 3   MAP 3   MAP 3   MAP 3   MAP 3   MAP 3   MAP 3   MAP 3   MAP 3   
+	
+	-->
+	
+	
+	<!-- COMMANDS -->
 
    <extension point="org.eclipse.ui.commands">
 
@@ -1391,20 +1409,12 @@
             name="%View_Name_TourMap3"
             defaultHandler="net.tourbook.map3.action.ActionHandlerOpenTourMap3View"
             />
-
-<!-- this is not working correctly with Jogl 1.1.1.a, it should work with 2.x but is not yet tested
-      <command
-            id="net.tourbook.command.WorldWind.Diagnostics"
-            name="%Command_WorldWind_Diagnostics"
-            defaultHandler="net.tourbook.map3.action.ActionHandlerWorldWindDiagnostics"
-            />
--->
 	            
    </extension>
 
 
-<!-- MENUS -->
 
+	<!-- MENUS -->
 
    <extension point="org.eclipse.ui.menus">
 
@@ -1431,30 +1441,17 @@
 		
 		</menuContribution>
 
-<!-- this is not working correctly with Jogl 1.1.1.a, it should work with 2.x but is not yet tested
-
-		<menuContribution locationURI="menu:file?after=databaseTools">
-
-			<command
-				commandId="net.tourbook.command.WorldWind.Diagnostics"
-				label="%Command_WorldWind_Diagnostics"
-				mnemonic="%Command_WorldWind_Diagnostics_Mnemonic"
-				style="push"/>
-
-		</menuContribution>
--->
-
 
    </extension>
 
 
-<!-- VIEWS -->
 
+	<!-- VIEWS -->
 
    <extension point="org.eclipse.ui.views">
-   
+
 		<view
-			category="net.tourbook.category.tour"
+			category="net.tourbook.category.map"
 			class="net.tourbook.map3.view.Map3View"
 			icon="icons/map3-view.png"
 			id="net.tourbook.map3.view.Map3ViewId"
@@ -1462,11 +1459,19 @@
 		/>
    
 		<view
-			category="net.tourbook.category.Tools"
+			category="net.tourbook.category.map"
 			class="net.tourbook.map3.view.Map3LayerView"
 			icon="icons/map3-properties.png"
 			id="net.tourbook.map3.Map3LayerView"
 			name="%View_Name_Map3Properties"
+		/>
+
+		<view
+			category="net.tourbook.category.map"
+			class="net.tourbook.map3.view.Map3StatisticsView"
+			icon="icons/map3-statistics.png"
+			id="net.tourbook.map3.Map3StatisticsView"
+			name="%View_Name_Map3Statistics"
 		/>
    
    </extension>
