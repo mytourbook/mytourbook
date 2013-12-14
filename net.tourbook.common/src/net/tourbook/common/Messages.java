@@ -21,6 +21,17 @@ public class Messages extends NLS {
 
 	private static final String	BUNDLE_NAME	= "net.tourbook.common.messages";				//$NON-NLS-1$
 
+	public static String		color_chooser_choosed_color;
+	public static String		color_chooser_hexagon;
+	public static String		color_chooser_hexagon_move;
+	public static String		color_chooser_rgb;
+	public static String		color_chooser_red;
+	public static String		color_chooser_green;
+	public static String		color_chooser_blue;
+	public static String		color_chooser_hue;
+	public static String		color_chooser_saturation;
+	public static String		color_chooser_brightness;
+
 	public static String		Graph_Label_Altimeter;
 	public static String		Graph_Label_Altitude;
 	public static String		Graph_Label_Cadence;

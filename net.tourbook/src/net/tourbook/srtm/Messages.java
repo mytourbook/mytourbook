@@ -108,17 +108,6 @@ public class Messages extends NLS {
 	public static String		dialog_multipleVertexes_label_startElevation;
 	public static String		dialog_multipleVertexes_title;
 
-	public static String		color_chooser_choosed_color;
-	public static String		color_chooser_hexagon;
-	public static String		color_chooser_hexagon_move;
-	public static String		color_chooser_rgb;
-	public static String		color_chooser_red;
-	public static String		color_chooser_green;
-	public static String		color_chooser_blue;
-	public static String		color_chooser_hue;
-	public static String		color_chooser_saturation;
-	public static String		color_chooser_brightness;
-
 	public static String		error_message_cannotConnectToServer;
 	public static String		error_message_timeoutWhenConnectingToServer;
 

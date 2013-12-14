@@ -24,7 +24,8 @@ import java.util.Collections;
 
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
-import net.tourbook.ui.ImageCanvas;
+import net.tourbook.common.widgets.ColorChooser;
+import net.tourbook.common.widgets.ImageCanvas;
 
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
