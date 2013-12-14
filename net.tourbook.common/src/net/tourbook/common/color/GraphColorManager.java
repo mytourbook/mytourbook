@@ -530,7 +530,7 @@ public class GraphColorManager {
 					continue;
 				}
 
-				final MapColor legendColor = new MapColor();
+				final MapColor loadedMapColor = new MapColor();
 
 				/*
 				 * value colors
@@ -549,7 +549,7 @@ public class GraphColorManager {
 						valueColors.add(new ColorValue(value, red, green, blue));
 					}
 				}
-				legendColor.colorValues = valueColors.toArray(new ColorValue[valueColors.size()]);
+				loadedMapColor.colorValues = valueColors.toArray(new ColorValue[valueColors.size()]);
 
 				/*
 				 * min/max brightness
@@ -561,19 +561,19 @@ public class GraphColorManager {
 
 					final Integer minBrightness = mementoBrightness0.getInteger(TAG_BRIGHTNESS_MIN);
 					if (minBrightness != null) {
-						legendColor.minBrightness = minBrightness;
+						loadedMapColor.minBrightness = minBrightness;
 					}
 					final Integer minBrightnessFactor = mementoBrightness0.getInteger(TAG_BRIGHTNESS_MIN_FACTOR);
 					if (minBrightness != null) {
-						legendColor.minBrightnessFactor = minBrightnessFactor;
+						loadedMapColor.minBrightnessFactor = minBrightnessFactor;
 					}
 					final Integer maxBrightness = mementoBrightness0.getInteger(TAG_BRIGHTNESS_MAX);
 					if (maxBrightness != null) {
-						legendColor.maxBrightness = maxBrightness;
+						loadedMapColor.maxBrightness = maxBrightness;
 					}
 					final Integer maxBrightnessFactor = mementoBrightness0.getInteger(TAG_BRIGHTNESS_MAX_FACTOR);
 					if (minBrightness != null) {
-						legendColor.maxBrightnessFactor = maxBrightnessFactor;
+						loadedMapColor.maxBrightnessFactor = maxBrightnessFactor;
 					}
 				}
 
@@ -587,20 +587,20 @@ public class GraphColorManager {
 
 					final Integer isMinOverwrite = mementoMinMaxValue0.getInteger(TAG_IS_MIN_VALUE_OVERWRITE);
 					if (isMinOverwrite != null) {
-						legendColor.isMinValueOverwrite = isMinOverwrite == 1;
+						loadedMapColor.isMinValueOverwrite = isMinOverwrite == 1;
 					}
 					final Integer minValue = mementoMinMaxValue0.getInteger(TAG_MIN_VALUE_OVERWRITE);
 					if (minValue != null) {
-						legendColor.overwriteMinValue = minValue;
+						loadedMapColor.overwriteMinValue = minValue;
 					}
 
 					final Integer isMaxOverwrite = mementoMinMaxValue0.getInteger(TAG_IS_MAX_VALUE_OVERWRITE);
 					if (isMaxOverwrite != null) {
-						legendColor.isMaxValueOverwrite = isMaxOverwrite == 1;
+						loadedMapColor.isMaxValueOverwrite = isMaxOverwrite == 1;
 					}
 					final Integer maxValue = mementoMinMaxValue0.getInteger(TAG_MAX_VALUE_OVERWRITE);
 					if (maxValue != null) {
-						legendColor.overwriteMaxValue = maxValue;
+						loadedMapColor.overwriteMaxValue = maxValue;
 					}
 				}
 
@@ -613,7 +613,7 @@ public class GraphColorManager {
 
 						// color definition found
 
-						colorDefinition.setMapColor(legendColor);
+						colorDefinition.setMapColor(loadedMapColor);
 						break;
 					}
 				}

@@ -8,6 +8,10 @@ New 3D Map Features
 
 * 
 
+* Display runtime statistics, e.g. frames per second.
+    
+* Show OpenGL version.
+
 
 
 Other New Features
@@ -15,6 +19,7 @@ Other New Features
 * Set track color in 2D map context menu.
 
 * Moved time slice clipping from tour chart properties view into the initial smoothing algorithm UI.
+
 
 
 

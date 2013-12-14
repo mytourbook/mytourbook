@@ -238,6 +238,53 @@
 			</page>
 
 
+	<!--
+		2D Map
+	-->
+	
+      <page
+            class="de.byteholder.geoclipse.preferences.PrefPageMap"
+            id="de.byteholder.geoclipse.preferences.map"
+            name="%pref_page_map">
+      </page>
+	      <page
+	            category="de.byteholder.geoclipse.preferences.map"
+	            class="de.byteholder.geoclipse.preferences.PrefPageMapProviders"
+	            id="de.byteholder.geoclipse.preferences.PrefPageMapProvider"
+	            name="%pref_page_provider">
+	      </page>
+	      <page
+	            category="de.byteholder.geoclipse.preferences.map"
+	            class="de.byteholder.geoclipse.preferences.PrefPageCache"
+	            id="de.byteholder.geoclipse.preferences.PrefPageCache"
+	            name="%pref_page_cache">
+	      </page>
+
+
+	<!--
+		3D Map
+	-->
+	
+		<page
+			name="%Pref_Page_3DMap"
+			id="net.tourbook.preferences.PrefPage3DMap"
+			class="net.tourbook.preferences.PrefPage3DMap"
+		/>
+			<page
+				name="%Pref_Page_3DMap_Color"
+				id="net.tourbook.preferences.PrefPage3DMapColor"
+				class="net.tourbook.preferences.PrefPage3DMapColor"
+			/>
+			
+	<!--
+				category="net.tourbook.preferences.PrefPage3DMap"
+	-->
+
+
+	<!--
+		Appearance
+	-->
+
       <page
             class="net.tourbook.preferences.PrefPageAppearance"
             id="net.tourbook.preferences.PrefPageAppearance"
@@ -317,27 +364,8 @@
       </page>
 
 	<!--
-		Map
+		Tour Type
 	-->
-      <page
-            class="de.byteholder.geoclipse.preferences.PrefPageMap"
-            id="de.byteholder.geoclipse.preferences.map"
-            name="%pref_page_map">
-      </page>
-	      <page
-	            category="de.byteholder.geoclipse.preferences.map"
-	            class="de.byteholder.geoclipse.preferences.PrefPageMapProviders"
-	            id="de.byteholder.geoclipse.preferences.PrefPageMapProvider"
-	            name="%pref_page_provider">
-	      </page>
-	      <page
-	            category="de.byteholder.geoclipse.preferences.map"
-	            class="de.byteholder.geoclipse.preferences.PrefPageCache"
-	            id="de.byteholder.geoclipse.preferences.PrefPageCache"
-	            name="%pref_page_cache">
-	      </page>
-
-
       <page
             class="net.tourbook.preferences.PrefPageTourTypeFilterList"
             id="net.tourbook.preferences.PrefPageTourTypeFilter"

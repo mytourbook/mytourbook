@@ -13,22 +13,34 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.common.color;
+package net.tourbook.preferences;
 
-/**
- * Color id's for tour tracks which are displayed in a 2D/3D map.
- */
-public enum MapColorId {
+import org.eclipse.jface.layout.GridDataFactory;
+import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.jface.preference.PreferencePage;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
+import org.eclipse.ui.IWorkbench;
+import org.eclipse.ui.IWorkbenchPreferencePage;
 
-	Altitude,
-	//
-	Gradient,
-	//
-	Pulse,
-	//
-	Speed,
-	//
-	Pace,
-	//
-	HrZone,
+public class PrefPage3DMap extends PreferencePage implements IWorkbenchPreferencePage {
+
+	@Override
+	protected Control createContents(final Composite parent) {
+
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+		GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
+		{
+
+		}
+
+		return container;
+	}
+
+	public void init(final IWorkbench workbench) {
+		noDefaultAndApplyButton();
+	}
+
 }
