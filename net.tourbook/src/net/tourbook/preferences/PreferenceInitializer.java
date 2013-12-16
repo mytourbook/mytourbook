@@ -218,10 +218,10 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 		 */
 		store.setDefault(
 				ITourbookPreferences.VIEW_LAYOUT_RECORDING_TIME_FORMAT,
-				PrefPageAppearanceView.VIEW_TIME_LAYOUT_HH_MM);
+				PrefPageViewColors.VIEW_TIME_LAYOUT_HH_MM);
 		store.setDefault(
 				ITourbookPreferences.VIEW_LAYOUT_DRIVING_TIME_FORMAT,
-				PrefPageAppearanceView.VIEW_TIME_LAYOUT_HH_MM);
+				PrefPageViewColors.VIEW_TIME_LAYOUT_HH_MM);
 
 		store.setDefault(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES, false);
 
@@ -229,13 +229,13 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 		 * map
 		 */
 		// appearance of the painted tour in map
-		store.setDefault(ITourbookPreferences.MAP_LAYOUT_SYMBOL, PrefPageAppearanceMap.MAP_TOUR_SYMBOL_LINE);
+		store.setDefault(ITourbookPreferences.MAP_LAYOUT_SYMBOL, PrefPageMap2Appearance.MAP_TOUR_SYMBOL_LINE);
 		store.setDefault(ITourbookPreferences.MAP_LAYOUT_SYMBOL_WIDTH, 6);
 		store.setDefault(ITourbookPreferences.MAP_LAYOUT_PAINT_WITH_BORDER, true);
 		store.setDefault(ITourbookPreferences.MAP_LAYOUT_BORDER_WIDTH, 1);
 		store.setDefault(
 				ITourbookPreferences.MAP_LAYOUT_TOUR_PAINT_METHOD,
-				PrefPageAppearanceMap.TOUR_PAINT_METHOD_SIMPLE);
+				PrefPageMap2Appearance.TOUR_PAINT_METHOD_SIMPLE);
 
 		PreferenceConverter.setDefault(store, ITourbookPreferences.MAP_LAYOUT_DIM_COLOR, new RGB(0x00, 0x00, 0x00));
 

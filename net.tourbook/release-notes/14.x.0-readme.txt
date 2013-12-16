@@ -20,7 +20,7 @@ Other New Features
 
 * Moved time slice clipping from tour chart properties view into the initial smoothing algorithm UI.
 
-
+* Reorganizes structure in preference dialog, moved some appearance pages to their correct parent.
 
 
 Fixed Bugs 

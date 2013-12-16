@@ -168,7 +168,7 @@ public class ActionOpenGLVersions extends Action {
 
 		super(Messages.Map3_Action_ShowOpenGLVersion_Tooltip, AS_PUSH_BUTTON);
 
-		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__Map3_OpenGL_Version));
+		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image_Map3_OpenGL_Version));
 	}
 
 	private Control createUI(final Composite parent) {
@@ -258,7 +258,7 @@ public class ActionOpenGLVersions extends Action {
 		// WW version
 		sb.append(VersionUtil.SEPERATOR);
 		sb.append(UI.NEW_LINE);
-		sb.append(Version.getVersionName() + " - " + Version.getVersionNumber());
+		sb.append(Version.getVersionName() + UI.DASH_WITH_SPACE + Version.getVersionNumber());
 		sb.append(UI.NEW_LINE);
 		sb.append(VersionUtil.SEPERATOR);
 		sb.append(UI.NEW_LINE3);

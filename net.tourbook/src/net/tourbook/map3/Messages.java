@@ -50,11 +50,9 @@ public class Messages extends NLS {
 	public static String		Default_Layer_WMS_USGS_Topo250;
 	public static String		Default_Layer_WorldMap;
 
-	public static String	Image__Map3_OpenGL_Version;
-
 	public static String		Image_Map3_Map3PropertiesView;
-
-	public static String	Image_Map3_StatisticsView;
+	public static String		Image_Map3_OpenGL_Version;
+	public static String		Image_Map3_StatisticsView;
 
 	public static String		Layer_Category_Info;
 	public static String		Layer_Category_Map;
@@ -63,21 +61,16 @@ public class Messages extends NLS {
 
 	public static String		Map3_Action_DirectionArrows;
 	public static String		Map3_Action_OpenMap3PropertiesView;
-
-	public static String	Map3_Action_OpenMap3StatisticsView;
-	public static String	Map3_Action_SetTrackSliderPositionLeft;
-
-	public static String	Map3_Action_SetTrackSliderPositionRight;
-	public static String	Map3_Action_ShowLegend;
-
-	public static String	Map3_Action_ShowMarker;
-
-	public static String	Map3_Action_ShowOpenGLVersion_Tooltip;
-
-	public static String	Map3_Action_ShowTrackSlider;
+	public static String		Map3_Action_OpenMap3StatisticsView;
+	public static String		Map3_Action_SetTrackSliderPositionLeft;
+	public static String		Map3_Action_SetTrackSliderPositionRight;
+	public static String		Map3_Action_ShowLegend;
+	public static String		Map3_Action_ShowMarker;
+	public static String		Map3_Action_ShowOpenGLVersion_Tooltip;
+	public static String		Map3_Action_ShowTrackSlider;
 	public static String		Map3_Action_TrackColor;
 
-	public static String	Map3_Dialog_OpenGLVersion_Title;
+	public static String		Map3_Dialog_OpenGLVersion_Title;
 
 	public static String		Prop_Viewer_Label_AltitudeRange_Tooltip;
 

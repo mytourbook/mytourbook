@@ -46,7 +46,7 @@ import net.tourbook.photo.PhotoLoadManager;
 import net.tourbook.photo.PhotoLoadingState;
 import net.tourbook.photo.PhotoUI;
 import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.preferences.PrefPageAppearanceMap;
+import net.tourbook.preferences.PrefPageMap2Appearance;
 import net.tourbook.ui.UI;
 
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -510,8 +510,8 @@ public class TourMapPainter extends MapPainter {
 
 		final String drawSymbol = prefStore.getString(ITourbookPreferences.MAP_LAYOUT_SYMBOL);
 
-		_prefIsDrawLine = drawSymbol.equals(PrefPageAppearanceMap.MAP_TOUR_SYMBOL_LINE);
-		_prefIsDrawSquare = drawSymbol.equals(PrefPageAppearanceMap.MAP_TOUR_SYMBOL_SQUARE);
+		_prefIsDrawLine = drawSymbol.equals(PrefPageMap2Appearance.MAP_TOUR_SYMBOL_LINE);
+		_prefIsDrawSquare = drawSymbol.equals(PrefPageMap2Appearance.MAP_TOUR_SYMBOL_SQUARE);
 
 		_prefLineWidth = prefStore.getInt(ITourbookPreferences.MAP_LAYOUT_SYMBOL_WIDTH);
 		_prefWithBorder = prefStore.getBoolean(ITourbookPreferences.MAP_LAYOUT_PAINT_WITH_BORDER);

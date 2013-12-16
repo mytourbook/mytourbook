@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -66,7 +66,6 @@ public class Messages extends NLS {
 	public static String		prefPage_srtm_editor_data_filepath;
 	public static String		prefPage_srtm_group_label_data_location;
 	public static String		prefPage_srtm_group_label_srtm3;
-	public static String		prefPage_srtm_link_srtmProfiles;
 	public static String		prefPage_srtm_msg_invalid_data_path;
 	public static String		prefPage_srtm_msg_invalidSrtm3FtpUrl;
 	public static String		prefPage_srtm_msg_invalidSrtm3HttpUrl;

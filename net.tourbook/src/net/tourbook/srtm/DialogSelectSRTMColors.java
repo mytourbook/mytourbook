@@ -74,12 +74,12 @@ public class DialogSelectSRTMColors extends TitleAreaDialog implements IProfileC
 	private final IDialogSettings	_state;
 
 	private ColorChooser			_colorChooser;
-	private SRTMProfile				_dialogSRTMProfile;
+	private SRTMProfile				_dialogProfile;
 
 	private ArrayList<SRTMProfile>	_srtmProfiles;
 
 	private PrefPageSRTMColors		_prefPageSRTMColors;
-	private SRTMProfile				_selectedProfile;
+	private SRTMProfile				_originalProfile;
 	private boolean					_isNewProfile;
 
 	private boolean					_isUIUpdated;
@@ -127,14 +127,14 @@ public class DialogSelectSRTMColors extends TitleAreaDialog implements IProfileC
 
 	/**
 	 * @param parentShell
-	 * @param originalSRTMProfile
+	 * @param originalProfile
 	 * @param dialogProfile
 	 * @param srtmProfiles
 	 * @param prefPageSRTMColors
 	 * @param isNewProfile
 	 */
 	public DialogSelectSRTMColors(	final Shell parentShell,
-									final SRTMProfile originalSRTMProfile,
+									final SRTMProfile originalProfile,
 									final SRTMProfile dialogProfile,
 									final ArrayList<SRTMProfile> srtmProfiles,
 									final PrefPageSRTMColors prefPageSRTMColors,
@@ -143,8 +143,9 @@ public class DialogSelectSRTMColors extends TitleAreaDialog implements IProfileC
 		super(parentShell);
 
 		_srtmProfiles = srtmProfiles;
-		_dialogSRTMProfile = dialogProfile;
-		_selectedProfile = originalSRTMProfile;
+
+		_originalProfile = originalProfile;
+		_dialogProfile = dialogProfile;
 
 		_prefPageSRTMColors = prefPageSRTMColors;
 		_isNewProfile = isNewProfile;
@@ -735,7 +736,7 @@ public class DialogSelectSRTMColors extends TitleAreaDialog implements IProfileC
 	}
 
 	private RGBVertexImage getVertexImage() {
-		return _dialogSRTMProfile.getRgbVertexImage();
+		return _dialogProfile.getRgbVertexImage();
 	}
 
 	@Override
@@ -748,7 +749,7 @@ public class DialogSelectSRTMColors extends TitleAreaDialog implements IProfileC
 
 	private void onApply() {
 		updateProfileFromUI();
-		_prefPageSRTMColors.saveProfile(_selectedProfile, _dialogSRTMProfile, _isNewProfile);
+		_prefPageSRTMColors.saveProfile(_originalProfile, _dialogProfile, _isNewProfile);
 	}
 
 	private void onDispose() {
@@ -919,7 +920,7 @@ public class DialogSelectSRTMColors extends TitleAreaDialog implements IProfileC
 		disposeProfileImage();
 
 		final Rectangle imageBounds = _canvasProfileImage.getBounds();
-		_profileImage = _dialogSRTMProfile.createImage(imageBounds.width, imageBounds.height, false);
+		_profileImage = _dialogProfile.createImage(imageBounds.width, imageBounds.height, false);
 		_canvasProfileImage.setImage(_profileImage);
 	}
 
@@ -992,20 +993,20 @@ public class DialogSelectSRTMColors extends TitleAreaDialog implements IProfileC
 
 		sortVertexsAndUpdateProfile();
 
-		_dialogSRTMProfile.setProfileName(_txtProfileName.getText());
-		_dialogSRTMProfile.setTilePath(_txtTilePath.getText());
-		_dialogSRTMProfile.setShadowState(_chkShadow.getSelection());
-		_dialogSRTMProfile.setResolution(getResolutionFromUI());
-		_dialogSRTMProfile.setShadowValue(Float.parseFloat(_txtShadowValue.getText()));
+		_dialogProfile.setProfileName(_txtProfileName.getText());
+		_dialogProfile.setTilePath(_txtTilePath.getText());
+		_dialogProfile.setShadowState(_chkShadow.getSelection());
+		_dialogProfile.setResolution(getResolutionFromUI());
+		_dialogProfile.setShadowValue(Float.parseFloat(_txtShadowValue.getText()));
 	}
 
 	private void updateUI() {
 
-		_txtProfileName.setText(_dialogSRTMProfile.getProfileName());
-		_txtTilePath.setText(_dialogSRTMProfile.getTilePath());
-		_chkShadow.setSelection(_dialogSRTMProfile.isShadowState());
-		setResolutionIntoUI(_dialogSRTMProfile.getResolution());
-		_txtShadowValue.setText(Float.toString(_dialogSRTMProfile.getShadowValue()));
+		_txtProfileName.setText(_dialogProfile.getProfileName());
+		_txtTilePath.setText(_dialogProfile.getTilePath());
+		_chkShadow.setSelection(_dialogProfile.isShadowState());
+		setResolutionIntoUI(_dialogProfile.getResolution());
+		_txtShadowValue.setText(Float.toString(_dialogProfile.getShadowValue()));
 	}
 
 	private boolean validateFields() {
@@ -1015,7 +1016,7 @@ public class DialogSelectSRTMColors extends TitleAreaDialog implements IProfileC
 		/*
 		 * check if the tile path is already used
 		 */
-		final int dialogProfileId = _dialogSRTMProfile.getProfileId();
+		final int dialogProfileId = _dialogProfile.getProfileId();
 		final String dialogTilePath = _txtTilePath.getText().trim();
 
 		for (final SRTMProfile profile : _srtmProfiles) {

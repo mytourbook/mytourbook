@@ -25,7 +25,7 @@ import net.tourbook.application.TourbookPlugin;
 import net.tourbook.srtm.GeoLat;
 import net.tourbook.srtm.GeoLon;
 import net.tourbook.srtm.IPreferences;
-import net.tourbook.srtm.PrefPageSRTM;
+import net.tourbook.srtm.PrefPageSRTMData;
 
 import org.eclipse.jface.preference.IPreferenceStore;
 
@@ -72,7 +72,7 @@ public class DownloadSRTM3 {
 
 			// set ftp host from url which contains the protocol ftp://
 			String ftpUrl = prefStore.getString(IPreferences.STATE_SRTM3_FTP_URL);
-			ftpUrl = ftpUrl.substring(PrefPageSRTM.PROTOCOL_FTP.length());
+			ftpUrl = ftpUrl.substring(PrefPageSRTMData.PROTOCOL_FTP.length());
 			_ftpDownloader.setHost(ftpUrl);
 
 			_ftpDownloader.get(remoteFilePath, remoteFileName, localZipName);

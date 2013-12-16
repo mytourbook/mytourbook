@@ -80,7 +80,7 @@ import net.tourbook.photo.PhotoSelection;
 import net.tourbook.photo.TourPhotoLink;
 import net.tourbook.photo.TourPhotoLinkSelection;
 import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.preferences.PrefPageAppearanceMap;
+import net.tourbook.preferences.PrefPageMap2Appearance;
 import net.tourbook.srtm.IPreferences;
 import net.tourbook.tour.ITourEventListener;
 import net.tourbook.tour.SelectionTourData;
@@ -1037,7 +1037,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 				} else if (property.equals(ITourbookPreferences.MAP_LAYOUT_TOUR_PAINT_METHOD)) {
 
 					_map.setTourPaintMethodEnhanced(//
-							event.getNewValue().equals(PrefPageAppearanceMap.TOUR_PAINT_METHOD_COMPLEX));
+							event.getNewValue().equals(PrefPageMap2Appearance.TOUR_PAINT_METHOD_COMPLEX));
 
 				} else if (property.equals(ITourbookPreferences.GRAPH_COLORS_HAS_CHANGED)) {
 
@@ -1396,7 +1396,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 		_map.setMeasurementSystem(net.tourbook.ui.UI.UNIT_VALUE_DISTANCE, UI.UNIT_LABEL_DISTANCE);
 
 		final String tourPaintMethod = _prefStore.getString(ITourbookPreferences.MAP_LAYOUT_TOUR_PAINT_METHOD);
-		_map.setTourPaintMethodEnhanced(tourPaintMethod.equals(PrefPageAppearanceMap.TOUR_PAINT_METHOD_COMPLEX));
+		_map.setTourPaintMethodEnhanced(tourPaintMethod.equals(PrefPageMap2Appearance.TOUR_PAINT_METHOD_COMPLEX));
 
 		// setup tool tip's
 		_map.setTourToolTip(_tourToolTip = new TourToolTip(_map));

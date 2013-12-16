@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -45,20 +45,16 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
-import org.eclipse.ui.dialogs.PreferencesUtil;
 
 import de.byteholder.geoclipse.map.UI;
 
-public class PrefPageSRTM extends PreferencePage implements IWorkbenchPreferencePage {
+public class PrefPageSRTMData extends PreferencePage implements IWorkbenchPreferencePage {
 
 	public static final String		PROTOCOL_HTTP			= "http://";											//$NON-NLS-1$
 	public static final String		PROTOCOL_FTP			= "ftp://";											//$NON-NLS-1$
-
-	private static final String		PREF_PAGE_SRTM_COLORS	= "net.tourbook.ext.srtm.PrefPageSRTMColors";			//$NON-NLS-1$
 
 //	http://dds.cr.usgs.gov/srtm/version2_1/SRTM3/Eurasia/N47E008.hgt.zip
 
@@ -107,13 +103,12 @@ public class PrefPageSRTM extends PreferencePage implements IWorkbenchPreference
 		GridLayoutFactory.fillDefaults().applyTo(_prefContainer);
 		GridDataFactory.swtDefaults().applyTo(_prefContainer);
 		{
-			createUI10CacheSettings(_prefContainer);
-			createUI20Srtm3Url(_prefContainer);
-			createUI30SrtmPageLink(_prefContainer);
+			createUI_10_CacheSettings(_prefContainer);
+			createUI_20_Srtm3Url(_prefContainer);
 		}
 	}
 
-	private void createUI10CacheSettings(final Composite parent) {
+	private void createUI_10_CacheSettings(final Composite parent) {
 
 		final Group group = new Group(parent, SWT.NONE);
 		group.setText(Messages.prefPage_srtm_group_label_data_location);
@@ -156,7 +151,7 @@ public class PrefPageSRTM extends PreferencePage implements IWorkbenchPreference
 		GridLayoutFactory.swtDefaults().numColumns(3).applyTo(group);
 	}
 
-	private void createUI20Srtm3Url(final Composite parent) {
+	private void createUI_20_Srtm3Url(final Composite parent) {
 
 		final SelectionAdapter selectListener = new SelectionAdapter() {
 			@Override
@@ -211,25 +206,6 @@ public class PrefPageSRTM extends PreferencePage implements IWorkbenchPreference
 				@Override
 				public void widgetSelected(final SelectionEvent e) {
 					onCheckConnection();
-				}
-			});
-		}
-	}
-
-	private void createUI30SrtmPageLink(final Composite parent) {
-
-		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().indent(0, 20).applyTo(container);
-		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
-		{
-
-			final Link link = new Link(container, SWT.NONE);
-			link.setText(Messages.prefPage_srtm_link_srtmProfiles);
-			link.setEnabled(true);
-			link.addSelectionListener(new SelectionAdapter() {
-				@Override
-				public void widgetSelected(final SelectionEvent e) {
-					PreferencesUtil.createPreferenceDialogOn(getShell(), PREF_PAGE_SRTM_COLORS, null, null);
 				}
 			});
 		}

@@ -33,7 +33,7 @@ import net.tourbook.data.TourTag;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.preferences.PrefPageAppearanceView;
+import net.tourbook.preferences.PrefPageViewColors;
 import net.tourbook.tag.ActionMenuSetAllTagStructures;
 import net.tourbook.tag.ActionMenuSetTagStructure;
 import net.tourbook.tag.ActionRenameTag;
@@ -1440,10 +1440,10 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 	private void readDisplayFormats() {
 
 		_isRecTimeFormat_hhmmss = _prefStore.getString(ITourbookPreferences.VIEW_LAYOUT_RECORDING_TIME_FORMAT).equals(
-				PrefPageAppearanceView.VIEW_TIME_LAYOUT_HH_MM_SS);
+				PrefPageViewColors.VIEW_TIME_LAYOUT_HH_MM_SS);
 
 		_isDriveTimeFormat_hhmmss = _prefStore.getString(ITourbookPreferences.VIEW_LAYOUT_DRIVING_TIME_FORMAT).equals(
-				PrefPageAppearanceView.VIEW_TIME_LAYOUT_HH_MM_SS);
+				PrefPageViewColors.VIEW_TIME_LAYOUT_HH_MM_SS);
 	}
 
 	@Override

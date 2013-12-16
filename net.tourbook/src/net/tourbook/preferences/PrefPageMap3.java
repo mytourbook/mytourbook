@@ -24,7 +24,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
-public class PrefPage3DMap extends PreferencePage implements IWorkbenchPreferencePage {
+public class PrefPageMap3 extends PreferencePage implements IWorkbenchPreferencePage {
 
 	@Override
 	protected Control createContents(final Composite parent) {

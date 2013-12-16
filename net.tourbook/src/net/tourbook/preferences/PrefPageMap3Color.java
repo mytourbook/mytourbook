@@ -60,7 +60,7 @@ import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
-public class PrefPage3DMapColor extends PreferencePage implements IWorkbenchPreferencePage {
+public class PrefPageMap3Color extends PreferencePage implements IWorkbenchPreferencePage {
 
 	private final IPreferenceStore	_prefStore	= TourbookPlugin.getDefault().getPreferenceStore();
 
@@ -68,6 +68,8 @@ public class PrefPage3DMapColor extends PreferencePage implements IWorkbenchPref
 
 	private TreeViewer				_colorProfileViewer;
 	private Map3ColorDefinition		_expandedItem;
+
+	private boolean					_isTreeExpading;
 
 	/*
 	 * UI controls
@@ -118,7 +120,7 @@ public class PrefPage3DMapColor extends PreferencePage implements IWorkbenchPref
 		}
 
 		public Object[] getElements(final Object inputElement) {
-			if (inputElement instanceof PrefPage3DMapColor) {
+			if (inputElement instanceof PrefPageMap3Color) {
 
 				final ArrayList<Map3ColorDefinition> colorDefinitions = Map3ColorManager.getMapColorDefinitions();
 
@@ -143,6 +145,12 @@ public class PrefPage3DMapColor extends PreferencePage implements IWorkbenchPref
 	}
 
 	private void autoExpandCollapse(final Map3ColorDefinition treeItem) {
+
+		if (_isTreeExpading) {
+
+			// prevent runtime exception: Ignored reentrant call while viewer is busy.
+			return;
+		}
 
 		if (_colorProfileViewer.getExpandedState(treeItem)) {
 
@@ -251,7 +259,12 @@ public class PrefPage3DMapColor extends PreferencePage implements IWorkbenchPref
 				if (element instanceof Map3ColorDefinition) {
 
 					if (_expandedItem != null) {
-						_colorProfileViewer.collapseToLevel(_expandedItem, 1);
+
+						_isTreeExpading = true;
+						{
+							_colorProfileViewer.collapseToLevel(_expandedItem, 1);
+						}
+						_isTreeExpading = false;
 					}
 
 					Display.getCurrent().asyncExec(new Runnable() {
@@ -504,7 +517,8 @@ public class PrefPage3DMapColor extends PreferencePage implements IWorkbenchPref
 
 			// color definition is selected
 
-			autoExpandCollapse((Map3ColorDefinition) firstSelectedItem);
+// this feature is annoying when using keyboard -> disabled
+//			autoExpandCollapse((Map3ColorDefinition) firstSelectedItem);
 		}
 	}
 

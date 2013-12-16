@@ -132,7 +132,7 @@ public class ThumbnailStore {
 
 		// check if cleanup is enabled
 		final boolean isCleanup = _prefStore.getBoolean(IPhotoPreferences.PHOTO_THUMBNAIL_STORE_IS_CLEANUP);
-		if (isCleanup == false) {
+		if (isIgnoreCleanupPeriod == false && isCleanup == false) {
 			return;
 		}
 
