@@ -17,7 +17,28 @@ package net.tourbook.common.color;
 
 import java.awt.Color;
 
+import org.eclipse.swt.graphics.Device;
+
 public class ColorUtil {
+
+	/**
+	 * Compute a background color that contrasts with the text color.
+	 * 
+	 * @param red
+	 * @param green
+	 * @param blue
+	 * @return Returns white or black that contrasts with the background color.
+	 */
+	public static org.eclipse.swt.graphics.Color getContrastColor(final Device display, final int red, final int green, final int blue) {
+
+		final int yiq = ((red * 299) + (green * 587) + (blue * 114)) / 1000;
+
+		if (yiq >= 128) {
+			return new org.eclipse.swt.graphics.Color(display, 0, 0, 0);
+		} else {
+			return new org.eclipse.swt.graphics.Color(display, 0xff, 0xff, 0xff);
+		}
+	}
 
 	/**
 	 * Compute a background color that contrasts with the text color.

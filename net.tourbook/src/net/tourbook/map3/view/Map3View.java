@@ -286,7 +286,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 		return altitudeOffset;
 	}
 
-	void actionOpenTrackColorDialog() {
+	public void actionOpenTrackColorDialog() {
 
 		// set color before menu is filled, this sets the action image and color provider
 		_actionMapColor.setColorId(_tourColorId);
@@ -1221,7 +1221,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 		return sliderYPosition;
 	}
 
-	MapColorId getTrackColorId() {
+	public MapColorId getTrackColorId() {
 		return _tourColorId;
 	}
 
@@ -1280,7 +1280,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 		}
 	}
 
-	void onModifyConfig() {
+	public void onModifyConfig() {
 
 		// altitude mode can have been changed, do a slider repositioning
 		updateTrackSlider();

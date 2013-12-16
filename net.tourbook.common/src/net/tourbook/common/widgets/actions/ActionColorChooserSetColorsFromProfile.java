@@ -13,21 +13,26 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.map3.view;
+package net.tourbook.common.widgets.actions;
 
-import net.tourbook.common.UI;
-import net.tourbook.common.util.TreeViewerItem;
+import net.tourbook.common.Messages;
+import net.tourbook.common.widgets.ColorChooser;
 
-public abstract class TVIMap3Item extends TreeViewerItem {
+import org.eclipse.jface.action.Action;
 
-	public String	name	= UI.EMPTY_STRING;
+public final class ActionColorChooserSetColorsFromProfile extends Action {
 
-	public TVIMap3Item() {}
+	private ColorChooser	_colorChooser;
 
-	@Override
-	public String toString() {
-		return "TVIMap3Item [name=" + name + "]"; //$NON-NLS-1$ //$NON-NLS-2$
+	public ActionColorChooserSetColorsFromProfile(final ColorChooser colorChooser) {
+
+		_colorChooser = colorChooser;
+
+		setText(Messages.Color_Chooser_Action_SetColorsFromProfile);
 	}
 
-
+	@Override
+	public void run() {
+		_colorChooser.actionSetColorsFromProfile();
+	}
 }

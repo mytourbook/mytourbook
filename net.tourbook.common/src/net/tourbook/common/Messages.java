@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -31,6 +31,15 @@ public class Messages extends NLS {
 	public static String		color_chooser_hue;
 	public static String		color_chooser_saturation;
 	public static String		color_chooser_brightness;
+
+	public static String		Color_Chooser_Action_AddColorsFromProfile;
+	public static String		Color_Chooser_Action_ResetImages;
+	public static String		Color_Chooser_Action_SetColorsFromProfile;
+	public static String		Color_Chooser_Dialog_SetColorsFromProfile_Message;
+	public static String		Color_Chooser_Dialog_SetColorsFromProfile_Title;
+	public static String		Color_Chooser_Label_ColorCustomColors_Tooltip;
+	public static String		Color_Chooser_Link_CustomColors;
+	public static String		Color_Chooser_Link_CustomColors_Tooltip;
 
 	public static String		Graph_Label_Altimeter;
 	public static String		Graph_Label_Altitude;
@@ -80,7 +89,7 @@ public class Messages extends NLS {
 	public static String		Image_Action_PhotoFilterNoPhotos;
 	public static String		Image_Action_PhotoFilterWithPhotos;
 
-	public static String	Map3_Color_DefaultProfileName;
+	public static String		Map3_Color_DefaultProfileName;
 
 	public static String		Map3_PropertyTooltip_Action_Close_Tooltip;
 	public static String		Map3_PropertyTooltip_Action_MoveToDefaultLocation_Tooltip;
@@ -134,6 +143,8 @@ public class Messages extends NLS {
 	public static String		legend_color_dim_color;
 	public static String		legend_color_keep_color;
 	public static String		legend_color_lighten_color;
+
+	public static String		rgv_vertex_class_cast_exception;
 
 	static {
 		// initialize resource bundle

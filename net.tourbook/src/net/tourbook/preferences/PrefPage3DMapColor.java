@@ -22,7 +22,7 @@ import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.color.Map3ColorDefinition;
 import net.tourbook.common.color.Map3ColorManager;
 import net.tourbook.common.color.Map3ColorProfile;
-import net.tourbook.srtm.DialogSelectSRTMColors;
+import net.tourbook.map3.ui.DialogSelectMap3Color;
 import net.tourbook.ui.UI;
 
 import org.eclipse.jface.layout.GridDataFactory;
@@ -66,19 +66,21 @@ public class PrefPage3DMapColor extends PreferencePage implements IWorkbenchPref
 
 	private boolean					_isModified;
 
-	private TreeViewer				_colorViewer;
+	private TreeViewer				_colorProfileViewer;
 	private Map3ColorDefinition		_expandedItem;
 
 	/*
 	 * UI controls
 	 */
-// this is currently disabled because it's not a 1 minute implementation
-//	private Button					_chkAutoExpandCollapse;
+	private Composite				_colorProfileViewerContainer;
 
 	private Button					_btnAddProfile;
 	private Button					_btnDuplicateProfile;
 	private Button					_btnEditProfile;
 	private Button					_btnRemoveProfile;
+
+// this is currently disabled because it's not a 1 minute implementation
+//	private Button					_chkAutoExpandCollapse;
 
 	/**
 	 * the color content provider has the following structure<br>
@@ -111,13 +113,18 @@ public class PrefPage3DMapColor extends PreferencePage implements IWorkbenchPref
 
 				return colorProfiles.toArray(new Map3ColorProfile[colorProfiles.size()]);
 			}
+
 			return null;
 		}
 
 		public Object[] getElements(final Object inputElement) {
 			if (inputElement instanceof PrefPage3DMapColor) {
-				return Map3ColorManager.getMapColorDefinitions();
+
+				final ArrayList<Map3ColorDefinition> colorDefinitions = Map3ColorManager.getMapColorDefinitions();
+
+				return colorDefinitions.toArray(new Map3ColorDefinition[colorDefinitions.size()]);
 			}
+
 			return null;
 		}
 
@@ -133,7 +140,25 @@ public class PrefPage3DMapColor extends PreferencePage implements IWorkbenchPref
 		}
 
 		public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
+	}
 
+	private void autoExpandCollapse(final Map3ColorDefinition treeItem) {
+
+		if (_colorProfileViewer.getExpandedState(treeItem)) {
+
+			_colorProfileViewer.collapseToLevel(treeItem, 1);
+
+		} else {
+
+			if (_expandedItem != null) {
+				_colorProfileViewer.collapseToLevel(_expandedItem, 1);
+			}
+			_colorProfileViewer.expandToLevel(treeItem, 1);
+			_expandedItem = treeItem;
+
+			// expanding the treeangle, the layout is correctly done but not with double click
+			_colorProfileViewerContainer.layout(true, true);
+		}
 	}
 
 	@Override
@@ -145,7 +170,7 @@ public class PrefPage3DMapColor extends PreferencePage implements IWorkbenchPref
 
 		enableControls();
 
-		_colorViewer.setInput(this);
+		_colorProfileViewer.setInput(this);
 
 		return ui;
 	}
@@ -170,71 +195,47 @@ public class PrefPage3DMapColor extends PreferencePage implements IWorkbenchPref
 		/*
 		 * create tree layout
 		 */
-		final Composite layoutContainer = new Composite(parent, SWT.NONE);
+		_colorProfileViewerContainer = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults()//
 				.grab(true, true)
 				.hint(200, 100)
-				.applyTo(layoutContainer);
+				.applyTo(_colorProfileViewerContainer);
 
 		final TreeColumnLayout treeLayout = new TreeColumnLayout();
-		layoutContainer.setLayout(treeLayout);
+		_colorProfileViewerContainer.setLayout(treeLayout);
 
 		/*
 		 * create viewer
 		 */
-		final Tree tree = new Tree(layoutContainer, SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER
-//				| SWT.MULTI
+		final Tree tree = new Tree(_colorProfileViewerContainer, SWT.H_SCROLL
+				| SWT.V_SCROLL
+				| SWT.BORDER
 				| SWT.FULL_SELECTION);
 
 		tree.setHeaderVisible(false);
 		tree.setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
 
-		_colorViewer = new TreeViewer(tree);
+		_colorProfileViewer = new TreeViewer(tree);
 		defineAllColumns(treeLayout, tree);
 
-		_colorViewer.setContentProvider(new ColorContentProvider());
+		_colorProfileViewer.setContentProvider(new ColorContentProvider());
 
 //		_graphColorPainter = new GraphColorPainter(this);
 
-		_colorViewer.addSelectionChangedListener(new ISelectionChangedListener() {
+		_colorProfileViewer.addSelectionChangedListener(new ISelectionChangedListener() {
 			public void selectionChanged(final SelectionChangedEvent event) {
-//				onSelectColorInColorViewer();
+				onColorViewerSelect();
 			}
 		});
 
-		_colorViewer.addDoubleClickListener(new IDoubleClickListener() {
+		_colorProfileViewer.addDoubleClickListener(new IDoubleClickListener() {
 			public void doubleClick(final DoubleClickEvent event) {
-
-				final Object selection = ((IStructuredSelection) _colorViewer.getSelection()).getFirstElement();
-
-				if (selection instanceof Map3ColorDefinition) {
-
-					// expand/collapse current item
-
-					final Map3ColorDefinition treeItem = (Map3ColorDefinition) selection;
-
-					if (_colorViewer.getExpandedState(treeItem)) {
-						_colorViewer.collapseToLevel(treeItem, 1);
-					} else {
-						if (_expandedItem != null) {
-							_colorViewer.collapseToLevel(_expandedItem, 1);
-						}
-						_colorViewer.expandToLevel(treeItem, 1);
-						_expandedItem = treeItem;
-
-						// expanding the treeangle, the layout is correctly done but not with double click
-						layoutContainer.layout(true, true);
-					}
-
-				} else if (selection instanceof Map3ColorProfile) {
-
-					// edit selected color
-					onEditProfile();
-				}
+				onColorViewerDoubleClick();
 			}
+
 		});
 
-		_colorViewer.addTreeListener(new ITreeViewerListener() {
+		_colorProfileViewer.addTreeListener(new ITreeViewerListener() {
 
 			public void treeCollapsed(final TreeExpansionEvent event) {
 
@@ -248,15 +249,17 @@ public class PrefPage3DMapColor extends PreferencePage implements IWorkbenchPref
 				final Object element = event.getElement();
 
 				if (element instanceof Map3ColorDefinition) {
-					final Map3ColorDefinition treeItem = (Map3ColorDefinition) element;
 
 					if (_expandedItem != null) {
-						_colorViewer.collapseToLevel(_expandedItem, 1);
+						_colorProfileViewer.collapseToLevel(_expandedItem, 1);
 					}
 
 					Display.getCurrent().asyncExec(new Runnable() {
 						public void run() {
-							_colorViewer.expandToLevel(treeItem, 1);
+
+							final Map3ColorDefinition treeItem = (Map3ColorDefinition) element;
+
+							_colorProfileViewer.expandToLevel(treeItem, 1);
 							_expandedItem = treeItem;
 						}
 					});
@@ -369,7 +372,7 @@ public class PrefPage3DMapColor extends PreferencePage implements IWorkbenchPref
 		/*
 		 * 1. column: color item/color definition
 		 */
-		tvc = new TreeViewerColumn(_colorViewer, SWT.TRAIL);
+		tvc = new TreeViewerColumn(_colorProfileViewer, SWT.TRAIL);
 		tc = tvc.getColumn();
 		tvc.setLabelProvider(new StyledCellLabelProvider() {
 			@Override
@@ -391,7 +394,7 @@ public class PrefPage3DMapColor extends PreferencePage implements IWorkbenchPref
 		/*
 		 * 2. column: color for definition/item
 		 */
-		tvc = new TreeViewerColumn(_colorViewer, SWT.TRAIL);
+		tvc = new TreeViewerColumn(_colorProfileViewer, SWT.TRAIL);
 		tc = tvc.getColumn();
 		tvc.setLabelProvider(new StyledCellLabelProvider() {
 			@Override
@@ -444,33 +447,90 @@ public class PrefPage3DMapColor extends PreferencePage implements IWorkbenchPref
 		return super.okToLeave();
 	}
 
+	private void onColorViewerDoubleClick() {
+
+		final Object selection = ((IStructuredSelection) _colorProfileViewer.getSelection()).getFirstElement();
+
+		if (selection instanceof Map3ColorDefinition) {
+
+			// expand/collapse current item
+
+			autoExpandCollapse((Map3ColorDefinition) selection);
+
+		} else if (selection instanceof Map3ColorProfile) {
+
+			// edit selected color
+			onEditProfile();
+		}
+	}
+
+	/**
+	 * Is called when the color in the color viewer was selected.
+	 */
+	private void onColorViewerSelect() {
+
+		final IStructuredSelection selection = (IStructuredSelection) _colorProfileViewer.getSelection();
+
+//		_btnLegend.setEnabled(false);
+//		_colorSelector.setEnabled(false);
+
+		final Object firstSelectedItem = selection.getFirstElement();
+
+		if (firstSelectedItem instanceof Map3ColorProfile) {
+
+			// graph color is selected
+
+			final Map3ColorProfile graphColor = (Map3ColorProfile) firstSelectedItem;
+
+//			// keep selected color
+//			_selectedColor = graphColor;
+//
+//			if (graphColor.isMapColor()) {
+//
+//				// legend color is selected
+//
+//				_btnLegend.setEnabled(true);
+//
+//			} else {
+//
+//				// 'normal' color is selected
+//
+//				// prepare color selector
+//				_colorSelector.setColorValue(graphColor.getNewRGB());
+//				_colorSelector.setEnabled(true);
+//			}
+
+		} else if (firstSelectedItem instanceof Map3ColorDefinition) {
+
+			// color definition is selected
+
+			autoExpandCollapse((Map3ColorDefinition) firstSelectedItem);
+		}
+	}
+
 	private void onEditProfile() {
 
-		final Object firstElement = ((StructuredSelection) _colorViewer.getSelection()).getFirstElement();
+		final Object firstElement = ((StructuredSelection) _colorProfileViewer.getSelection()).getFirstElement();
 		if (firstElement instanceof Map3ColorProfile) {
 
-			final Map3ColorProfile originalProfile = (Map3ColorProfile) firstElement;
+			final Map3ColorProfile selectedProfile = (Map3ColorProfile) firstElement;
 
 			try {
 
 				// open color chooser dialog
 
-				final Map3ColorProfile dialogProfile = new Map3ColorProfile(originalProfile);
-
-				final DialogSelectSRTMColors dialog = new DialogSelectSRTMColors(
+				final DialogSelectMap3Color dialog = new DialogSelectMap3Color(
 						Display.getCurrent().getActiveShell(),
-						originalProfile,
-						dialogProfile,
-						_profileList,
-						this,
-						false);
+						selectedProfile,
+						false,
+						this);
 
 				if (dialog.open() == Window.OK) {
-					saveProfileModified(originalProfile, dialogProfile);
+//					saveProfileModified(selectedProfile, dialogProfile);
 				}
 
 				// image orientation has changed
-				disposeProfileImages();
+				Map3ColorManager.disposeProfileImages();
 
 			} catch (final Exception e) {
 				e.printStackTrace();

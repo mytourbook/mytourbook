@@ -86,6 +86,10 @@ public class ImageCanvas extends Canvas {
 		_image.dispose();
 	}
 
+	public Image getImage() {
+		return _image;
+	}
+
 	/**
 	 * Sets and draws the image, dispose previous image
 	 * 
@@ -98,6 +102,7 @@ public class ImageCanvas extends Canvas {
 		}
 
 		_image = image;
+
 		redraw();
 	}
 

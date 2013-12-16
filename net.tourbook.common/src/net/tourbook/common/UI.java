@@ -526,6 +526,32 @@ public class UI {
 		return result;
 	}
 
+	public static boolean isCtrlKey(final MouseEvent event) {
+
+		boolean isCtrlKey;
+
+		if (UI.IS_OSX) {
+			isCtrlKey = (event.stateMask & SWT.MOD1) > 0;
+		} else {
+			isCtrlKey = (event.stateMask & SWT.MOD1) > 0;
+		}
+
+		return isCtrlKey;
+	}
+
+	public static boolean isShiftKey(final MouseEvent event) {
+
+		boolean isShiftKey;
+
+		if (UI.IS_OSX) {
+			isShiftKey = (event.stateMask & SWT.MOD3) > 0;
+		} else {
+			isShiftKey = (event.stateMask & SWT.MOD2) > 0;
+		}
+
+		return isShiftKey;
+	}
+
 	/**
 	 * Opens the control context menu, the menue is aligned below the control to the right side
 	 * 

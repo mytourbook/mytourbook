@@ -18,7 +18,7 @@ package net.tourbook.map3.action;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.map2.Messages;
-import net.tourbook.map3.view.DialogTourTrackConfig;
+import net.tourbook.map3.ui.DialogTourTrackConfig;
 import net.tourbook.map3.view.Map3View;
 
 import org.eclipse.jface.action.ContributionItem;

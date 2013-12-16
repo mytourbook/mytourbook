@@ -20,13 +20,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.color.ColorCacheInt;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.TourDoubleClickState;
 import net.tourbook.tour.TourManager;
-import net.tourbook.ui.ColorCacheInt;
 import net.tourbook.ui.ITourProviderAll;
 import net.tourbook.ui.UI;
 import net.tourbook.ui.views.calendar.CalendarView.TourInfoFormatter;

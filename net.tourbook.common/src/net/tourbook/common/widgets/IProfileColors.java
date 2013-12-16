@@ -13,21 +13,18 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.map3.view;
+/**
+ * @author Alfred Barten
+ */
+package net.tourbook.common.widgets;
 
-import net.tourbook.common.UI;
-import net.tourbook.common.util.TreeViewerItem;
+import org.eclipse.swt.graphics.RGB;
 
-public abstract class TVIMap3Item extends TreeViewerItem {
+public interface IProfileColors {
 
-	public String	name	= UI.EMPTY_STRING;
-
-	public TVIMap3Item() {}
-
-	@Override
-	public String toString() {
-		return "TVIMap3Item [name=" + name + "]"; //$NON-NLS-1$ //$NON-NLS-2$
-	}
-
+	/**
+	 * @return Returns a list with all profile colors.
+	 */
+	RGB[] getProfileColors();
 
 }

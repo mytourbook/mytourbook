@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -13,7 +13,7 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.map3.view;
+package net.tourbook.map3.ui;
 
 import gov.nasa.worldwind.layers.Layer;
 import net.tourbook.common.UI;
@@ -21,6 +21,7 @@ import net.tourbook.common.tooltip.IToolProvider;
 import net.tourbook.common.tooltip.ToolProviderAdapter;
 import net.tourbook.common.tooltip.ToolTip3;
 import net.tourbook.map3.Messages;
+import net.tourbook.map3.view.TVIMap3Layer;
 
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.resource.JFaceResources;
@@ -150,7 +151,7 @@ public class DialogPropertyViewerToolTip extends ToolTip3 {
 	 *         Sensitive area is 1/3 of the right side of the row which is set in
 	 *         {@link #HOVERED_SENSITIVE_AREA} = {@value #HOVERED_SENSITIVE_AREA}
 	 */
-	ViewerRow getHoveredRow() {
+	public ViewerRow getHoveredRow() {
 
 		return _sensitiveRowArea;
 	}
@@ -276,7 +277,7 @@ public class DialogPropertyViewerToolTip extends ToolTip3 {
 
 	}
 
-	void setLayerVisibility(final TVIMap3Layer mapLayer, final boolean isUpdateUI) {
+	public void setLayerVisibility(final TVIMap3Layer mapLayer, final boolean isUpdateUI) {
 
 		if (mapLayer == null) {
 			return;

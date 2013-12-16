@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -56,6 +56,7 @@ import net.tourbook.map3.layer.TourInfoLayer;
 import net.tourbook.map3.layer.TourLegendLayer;
 import net.tourbook.map3.layer.TrackSliderLayer;
 import net.tourbook.map3.layer.tourtrack.TourTrackLayer;
+import net.tourbook.map3.ui.DialogTerrainProfileConfig;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Platform;
@@ -799,7 +800,7 @@ public class Map3Manager {
 	/**
 	 * @return Returns instance of {@link Map3LayerView} or null when view is not created.
 	 */
-	static Map3LayerView getMap3LayerView() {
+	public static Map3LayerView getMap3LayerView() {
 		return _map3LayerView;
 	}
 

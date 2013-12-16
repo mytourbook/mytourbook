@@ -1,17 +1,17 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
- *  
+ * 
  * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software 
+ * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- *  
- * This program is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public License along with 
+ * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.srtm;
 
@@ -95,13 +95,14 @@ public class Messages extends NLS {
 	public static String		dialog_adjust_srtm_colors_button_sort;
 	public static String		dialog_adjust_srtm_colors_button_update;
 	public static String		dialog_adjust_srtm_colors_checkbutton_ttt;
-	public static String		dialog_adjust_srtm_colors_color_tooltip;
 	public static String		dialog_adjust_srtm_colors_dialog_title;
 	public static String		dialog_adjust_srtm_colors_dialog_message;
 	public static String		dialog_adjust_srtm_colors_error_invalid_shadow_value;
 	public static String		dialog_adjust_srtm_colors_error_invalid_tile_path;
 	public static String		dialog_adjust_srtm_colors_label_profile_name;
 	public static String		dialog_adjust_srtm_colors_label_tile_path;
+
+	public static String		Dialog_Adjust_SRTMColors_Color_Tooltip;
 
 	public static String		dialog_multipleVertexes_label_eleDiff;
 	public static String		dialog_multipleVertexes_label_endElevation;
@@ -114,8 +115,6 @@ public class Messages extends NLS {
 	public static String		job_name_downloadMonitor;
 	public static String		job_name_ftpDownload;
 	public static String		job_name_httpDownload;
-
-	public static String		rgv_vertex_class_cast_exception;
 
 	static {
 		// initialize resource bundle

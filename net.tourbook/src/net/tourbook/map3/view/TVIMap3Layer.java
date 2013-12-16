@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -22,7 +22,7 @@ public class TVIMap3Layer extends TVIMap3Item {
 
 	private String				id;
 
-	Layer						wwLayer;
+	public Layer				wwLayer;
 
 	public boolean				isLayerVisible;
 	boolean						isDefaultLayer;
@@ -31,7 +31,7 @@ public class TVIMap3Layer extends TVIMap3Item {
 
 	private ICheckStateListener	_checkStateListener;
 
-	IToolProvider				toolProvider;
+	public IToolProvider		toolProvider;
 
 	public TVIMap3Layer(final String id, final Layer wwLayer, final String uiLayerName) {
 

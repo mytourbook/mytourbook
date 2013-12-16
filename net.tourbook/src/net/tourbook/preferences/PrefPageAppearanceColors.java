@@ -238,14 +238,14 @@ public class PrefPageAppearanceColors extends PreferencePage implements IWorkben
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
 		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
 		{
-			createUI10ColorViewer(container);
-			createUI20ColorControl(container);
+			createUI_10_ColorViewer(container);
+			createUI_20_ColorControl(container);
 		}
 
 		return container;
 	}
 
-	private void createUI10ColorViewer(final Composite parent) {
+	private void createUI_10_ColorViewer(final Composite parent) {
 
 		/*
 		 * create tree layout
@@ -360,7 +360,7 @@ public class PrefPageAppearanceColors extends PreferencePage implements IWorkben
 	 * 
 	 * @param parent
 	 */
-	private void createUI20ColorControl(final Composite parent) {
+	private void createUI_20_ColorControl(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(false, false).applyTo(container);

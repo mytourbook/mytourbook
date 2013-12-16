@@ -19,4 +19,5 @@ Export-Package: net.tourbook.common,
  net.tourbook.common.util,
  net.tourbook.common.weather,
  net.tourbook.common.widgets
-Import-Package: org.joda.time
+Import-Package: gnu.trove.map.hash,
+ org.joda.time

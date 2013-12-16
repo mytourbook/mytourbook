@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -13,7 +13,7 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.map3.view;
+package net.tourbook.map3.ui;
 
 import gov.nasa.worldwind.awt.WorldWindowGLCanvas;
 import gov.nasa.worldwind.layers.TerrainProfileLayer;
@@ -26,6 +26,7 @@ import net.tourbook.common.tooltip.ToolTip3;
 import net.tourbook.common.tooltip.ToolTip3Tool;
 import net.tourbook.common.util.Util;
 import net.tourbook.map3.Messages;
+import net.tourbook.map3.view.Map3Manager;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
@@ -136,9 +137,9 @@ public class DialogTerrainProfileConfig {
 		}
 	};
 
-	DialogTerrainProfileConfig(final WorldWindowGLCanvas wwcanvas,
-								final TerrainProfileLayer profileLayer,
-								final IDialogSettings state) {
+	public DialogTerrainProfileConfig(	final WorldWindowGLCanvas wwcanvas,
+										final TerrainProfileLayer profileLayer,
+										final IDialogSettings state) {
 
 		_wwcanvas = wwcanvas;
 		_profileLayer = profileLayer;
@@ -308,7 +309,7 @@ public class DialogTerrainProfileConfig {
 		}
 	}
 
-	IToolProvider getToolProvider() {
+	public IToolProvider getToolProvider() {
 		return _toolProvider;
 	}
 
@@ -450,8 +451,7 @@ public class DialogTerrainProfileConfig {
 	@Override
 	public String toString() {
 		final StringBuilder builder = new StringBuilder();
-		builder
-				.append("\nTerrainProfileConfiguration\n   getToolTipArea()=") //$NON-NLS-1$
+		builder.append("\nTerrainProfileConfiguration\n   getToolTipArea()=") //$NON-NLS-1$
 				.append(_toolProvider.getToolTipArea())
 				.append(", \n   getToolTitle()=") //$NON-NLS-1$
 				.append(_toolProvider.getToolTitle())

@@ -35,6 +35,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
+import net.tourbook.common.color.RGBVertex;
 import net.tourbook.common.util.ColumnManager;
 import net.tourbook.common.util.ITourViewer;
 import net.tourbook.common.util.TableColumnDefinition;
@@ -695,7 +696,10 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 
 					final TableItem item = (TableItem) event.item;
 					final SRTMProfile profile = (SRTMProfile) item.getData();
-					final Image image = profile.getImage(getImageWidth(), _imageHeight, true);
+					final Image image = profile.getRgbVertexImage().getValidatedImage(
+							getImageWidth(),
+							_imageHeight,
+							true);
 
 					if (image != null) {
 
@@ -1578,8 +1582,10 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 						profile.getShadowValue(),
 						profile.getResolution());
 
-				for (final RGBVertex vertex : profile.getVertexList()) {
+				for (final RGBVertex vertex : profile.getRgbVertexImage().getRgbVerticies()) {
+
 					final RGB rgb = vertex.getRGB();
+
 					createXmlVertex(xmlProfile, (int) vertex.getElevation(), rgb.red, rgb.green, rgb.blue);
 				}
 			}

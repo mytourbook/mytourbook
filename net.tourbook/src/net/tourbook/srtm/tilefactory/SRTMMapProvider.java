@@ -1,20 +1,21 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
- *  
+ * 
  * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software 
+ * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- *  
- * This program is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public License along with 
+ * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.srtm.tilefactory;
 
+import net.tourbook.common.color.RGBVertexImage;
 import net.tourbook.srtm.ElevationColor;
 import net.tourbook.srtm.ElevationLayer;
 import net.tourbook.srtm.GeoLat;
@@ -92,7 +93,7 @@ public class SRTMMapProvider extends MPPlugin implements ITilePainter {
 
 		elevationLayer.setZoom(tileZoom);
 
-		// elevation is used at every grid-th pixel in both directions; 
+		// elevation is used at every grid-th pixel in both directions;
 		// the other values are interpolated
 		// i.e. it gives the resolution of the image!
 		final int grid = srtmProfile.getResolutionValue();
@@ -111,9 +112,12 @@ public class SRTMMapProvider extends MPPlugin implements ITilePainter {
 		final double constMx1 = 360. / pi;
 		final double constMx2 = twoPi / mapPower;
 		final double constMy = 360. / mapPower;
+
 		int mapStartX = tileX * tileSize;
 		final int mapStartY = tileY * tileSize;
+
 		int rgb;
+		final RGBVertexImage rgbVertexImage = srtmProfile.getRgbVertexImage();
 
 		if (grid == 1) {
 
@@ -143,7 +147,7 @@ public class SRTMMapProvider extends MPPlugin implements ITilePainter {
 					if (isShadowState && elev < elevOld) {
 						rgb = srtmProfile.getShadowRGB((int) elev);
 					} else {
-						rgb = srtmProfile.getRGB((int) elev);
+						rgb = rgbVertexImage.getRGB((int) elev);
 					}
 
 					rgbData[drawY][drawX] = rgb;
@@ -170,8 +174,9 @@ public class SRTMMapProvider extends MPPlugin implements ITilePainter {
 
 					lon = constMy * mapX - 180.; // Mercator
 					geoLon.set(lon);
-					if (pixelX == 0 || pixelY == 0)
+					if (pixelX == 0 || pixelY == 0) {
 						continue;
+					}
 
 					final double elev00 = elevationLayer.getElevation(geoLatOld, geoLonOld);
 					final double elev01 = elevationLayer.getElevation(geoLatOld, geoLon);
@@ -192,7 +197,7 @@ public class SRTMMapProvider extends MPPlugin implements ITilePainter {
 						double elev = elevStart;
 						for (int drawX = pixelX - grid; drawX < pixelX; drawX++, elev += elevGridXAdd) {
 
-							rgb = srtmProfile.getRGB((int) elev);
+							rgb = rgbVertexImage.getRGB((int) elev);
 
 							rgbData[drawY][drawX] = rgb;
 						}

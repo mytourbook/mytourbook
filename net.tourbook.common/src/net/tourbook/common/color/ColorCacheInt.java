@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2012  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -13,7 +13,7 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.ui;
+package net.tourbook.common.color;
 
 import gnu.trove.map.hash.TIntObjectHashMap;
 
@@ -53,7 +53,6 @@ public class ColorCacheInt {
 	 */
 	public Color get(final int colorValue) {
 
-//		Color color = _colors.get(new Integer(colorValue));
 		Color color = _colors.get(colorValue);
 		if (color != null) {
 			return color;

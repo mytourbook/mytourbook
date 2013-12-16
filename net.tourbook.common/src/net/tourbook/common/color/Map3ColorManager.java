@@ -16,7 +16,6 @@
 package net.tourbook.common.color;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import net.tourbook.common.Messages;
 
@@ -25,13 +24,13 @@ import net.tourbook.common.Messages;
  */
 public class Map3ColorManager {
 
-	private static Map3ColorDefinition[]	_map3ColorDefinitions;
+	private static ArrayList<Map3ColorDefinition>	_map3ColorDefinitions;
 
-	private static final Map3ColorProfile	MAP3_DEFAULT_COLOR_ALTITUDE;
-	private static final Map3ColorProfile	MAP3_DEFAULT_COLOR_GRADIENT;
-	private static final Map3ColorProfile	MAP3_DEFAULT_COLOR_PACE;
-	private static final Map3ColorProfile	MAP3_DEFAULT_COLOR_PULSE;
-	private static final Map3ColorProfile	MAP3_DEFAULT_COLOR_SPEED;
+	private static final Map3ColorProfile			MAP3_DEFAULT_COLOR_ALTITUDE;
+	private static final Map3ColorProfile			MAP3_DEFAULT_COLOR_GRADIENT;
+	private static final Map3ColorProfile			MAP3_DEFAULT_COLOR_PACE;
+	private static final Map3ColorProfile			MAP3_DEFAULT_COLOR_PULSE;
+	private static final Map3ColorProfile			MAP3_DEFAULT_COLOR_SPEED;
 
 	/**
 	 * Define 3D map default colors.
@@ -117,9 +116,9 @@ public class Map3ColorManager {
 
 	private Map3ColorManager() {}
 
-	private static List<Map3ColorDefinition> createDefaultColors() {
+	private static ArrayList<Map3ColorDefinition> createDefaultColors() {
 
-		final List<Map3ColorDefinition> allColorDef = new ArrayList<Map3ColorDefinition>();
+		final ArrayList<Map3ColorDefinition> allColorDef = new ArrayList<Map3ColorDefinition>();
 
 		allColorDef.add(new Map3ColorDefinition(MapColorId.Altitude, //
 				Messages.Graph_Label_Altitude,
@@ -144,19 +143,26 @@ public class Map3ColorManager {
 		return allColorDef;
 	}
 
+	public static void disposeProfileImages() {
+
+		for (final Map3ColorDefinition colorDef : _map3ColorDefinitions) {
+			for (final Map3ColorProfile colorProfile : colorDef.getColorProfiles()) {
+
+			}
+		}
+	}
+
 	/**
 	 * @return Returns color definitions which are defined for the 3D map.
 	 */
-	public static Map3ColorDefinition[] getMapColorDefinitions() {
+	public static ArrayList<Map3ColorDefinition> getMapColorDefinitions() {
 
 		if (_map3ColorDefinitions != null) {
 			return _map3ColorDefinitions;
 		}
 
 		// create and set default colors
-		final List<Map3ColorDefinition> allColorDef = createDefaultColors();
-
-		_map3ColorDefinitions = allColorDef.toArray(new Map3ColorDefinition[allColorDef.size()]);
+		_map3ColorDefinitions = createDefaultColors();
 
 		// overwrite default colors with saved colors
 //		readXmlMapColors();

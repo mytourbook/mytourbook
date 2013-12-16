@@ -26,6 +26,7 @@ import java.util.Set;
 
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.Util;
+import net.tourbook.common.color.ColorCacheInt;
 import net.tourbook.common.color.IGradientColors;
 import net.tourbook.common.color.IMapColorProvider;
 import net.tourbook.common.color.LegendUnitFormat;
@@ -46,7 +47,6 @@ import net.tourbook.photo.PhotoLoadingState;
 import net.tourbook.photo.PhotoUI;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.PrefPageAppearanceMap;
-import net.tourbook.ui.ColorCacheInt;
 import net.tourbook.ui.UI;
 
 import org.eclipse.jface.preference.IPreferenceStore;
