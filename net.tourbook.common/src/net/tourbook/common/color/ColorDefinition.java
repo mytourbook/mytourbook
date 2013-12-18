@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -47,9 +47,9 @@ public class ColorDefinition {
 	private RGB						_textColorDefault;
 	private RGB						_textColorNew;
 
-	private MapColor				_mapColor;
-	private MapColor				_defaultMapColor;
-	private MapColor				_newMapColor;
+	private Map2ColorProfile		_mapColor;
+	private Map2ColorProfile		_defaultMapColor;
+	private Map2ColorProfile		_newMapColor;
 
 	/**
 	 * Sets the color for the default, current and changes
@@ -75,7 +75,7 @@ public class ColorDefinition {
 								final RGB defaultGradientDark,
 								final RGB defaultLineColor,
 								final RGB defaultTextColor,
-								final MapColor defaultMapColor) {
+								final Map2ColorProfile defaultMapColor) {
 
 		_prefName = prefName;
 		_visibleName = visibleName;
@@ -134,6 +134,11 @@ public class ColorDefinition {
 		_textColorNew = _textColor;
 	}
 
+	public void dumpAsJava() {
+		// TODO Auto-generated method stub
+
+	}
+
 	@Override
 	public boolean equals(final Object obj) {
 
@@ -167,12 +172,12 @@ public class ColorDefinition {
 		return _gradientDarkDefault;
 	}
 
-	public MapColor getDefaultMapColor() {
-		return _defaultMapColor;
-	}
-
 	public RGB getDefaultLineColor() {
 		return _lineColorDefault;
+	}
+
+	public Map2ColorProfile getDefaultMapColor() {
+		return _defaultMapColor;
 	}
 
 	public RGB getDefaultTextColor() {
@@ -203,7 +208,7 @@ public class ColorDefinition {
 		return _lineColor;
 	}
 
-	public MapColor getMapColor() {
+	public Map2ColorProfile getMapColor() {
 		return _mapColor;
 	}
 
@@ -219,7 +224,7 @@ public class ColorDefinition {
 		return _lineColorNew;
 	}
 
-	public MapColor getNewMapColor() {
+	public Map2ColorProfile getNewMapColor() {
 		return _newMapColor;
 	}
 
@@ -268,7 +273,7 @@ public class ColorDefinition {
 		_lineColor = lineColor;
 	}
 
-	public void setMapColor(final MapColor mapColor) {
+	public void setMapColor(final Map2ColorProfile mapColor) {
 		_mapColor = mapColor;
 	}
 
@@ -284,7 +289,7 @@ public class ColorDefinition {
 		_lineColorNew = newLineColor;
 	}
 
-	public void setNewMapColor(final MapColor newMapColor) {
+	public void setNewMapColor(final Map2ColorProfile newMapColor) {
 		_newMapColor = newMapColor;
 	}
 

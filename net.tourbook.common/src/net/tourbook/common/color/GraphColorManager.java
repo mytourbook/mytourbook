@@ -102,18 +102,18 @@ public class GraphColorManager {
 			{ PREF_COLOR_TEXT, Messages.Graph_Pref_ColorText },
 			{ PREF_COLOR_MAPPING, Messages.Graph_Pref_color_mapping } };
 
-	private static final MapColor		MAP_COLOR_ALTITUDE;
-	private static final MapColor		MAP_COLOR_GRADIENT;
-	private static final MapColor		MAP_COLOR_PACE;
-	private static final MapColor		MAP_COLOR_PULSE;
-	private static final MapColor		MAP_COLOR_SPEED;
+	private static final Map2ColorProfile		MAP_COLOR_ALTITUDE;
+	private static final Map2ColorProfile		MAP_COLOR_GRADIENT;
+	private static final Map2ColorProfile		MAP_COLOR_PACE;
+	private static final Map2ColorProfile		MAP_COLOR_PULSE;
+	private static final Map2ColorProfile		MAP_COLOR_SPEED;
 
 	/**
 	 * Set map default colors.
 	 */
 	static {
 
-		MAP_COLOR_ALTITUDE = new MapColor(//
+		MAP_COLOR_ALTITUDE = new Map2ColorProfile(//
 				//
 				new ColorValue[] {
 			new ColorValue(10, 0xEC, 0x20, 0x20),
@@ -122,12 +122,12 @@ public class GraphColorManager {
 			new ColorValue(150, 0, 170, 9),
 			new ColorValue(190, 23, 163, 255) },
 				//
-				MapColor.BRIGHTNESS_DIMMING,
+				MapColorProfile.BRIGHTNESS_DIMMING,
 				38,
-				MapColor.BRIGHTNESS_LIGHTNING,
+				MapColorProfile.BRIGHTNESS_LIGHTNING,
 				39);
 
-		MAP_COLOR_GRADIENT = new MapColor(//
+		MAP_COLOR_GRADIENT = new Map2ColorProfile(//
 				//
 				new ColorValue[] {
 			new ColorValue(10, 0, 0, 255),
@@ -136,9 +136,9 @@ public class GraphColorManager {
 			new ColorValue(150, 255, 255, 0),
 			new ColorValue(190, 255, 0, 0) },
 				//
-				MapColor.BRIGHTNESS_DIMMING,
+				MapColorProfile.BRIGHTNESS_DIMMING,
 				23,
-				MapColor.BRIGHTNESS_DIMMING,
+				MapColorProfile.BRIGHTNESS_DIMMING,
 				10,
 				//
 				// overwrite min/max values
@@ -147,7 +147,7 @@ public class GraphColorManager {
 				true,
 				10);
 
-		MAP_COLOR_PACE = new MapColor(//
+		MAP_COLOR_PACE = new Map2ColorProfile(//
 				//
 				new ColorValue[] {
 			new ColorValue(10, 255, 0, 0),
@@ -156,12 +156,12 @@ public class GraphColorManager {
 			new ColorValue(150, 0, 255, 255),
 			new ColorValue(190, 0, 0, 255) },
 				//
-				MapColor.BRIGHTNESS_DIMMING,
+				MapColorProfile.BRIGHTNESS_DIMMING,
 				17,
-				MapColor.BRIGHTNESS_DIMMING,
+				MapColorProfile.BRIGHTNESS_DIMMING,
 				8);
 
-		MAP_COLOR_PULSE = new MapColor(//
+		MAP_COLOR_PULSE = new Map2ColorProfile(//
 				//
 				new ColorValue[] {
 			new ColorValue(10, 0, 203, 0),
@@ -170,12 +170,12 @@ public class GraphColorManager {
 			new ColorValue(150, 255, 0, 0),
 			new ColorValue(190, 255, 0, 247) },
 				//
-				MapColor.BRIGHTNESS_DIMMING,
+				MapColorProfile.BRIGHTNESS_DIMMING,
 				11,
-				MapColor.BRIGHTNESS_DIMMING,
+				MapColorProfile.BRIGHTNESS_DIMMING,
 				10);
 
-		MAP_COLOR_SPEED = new MapColor(//
+		MAP_COLOR_SPEED = new Map2ColorProfile(//
 				//
 				new ColorValue[] {
 			new ColorValue(10, 0, 0, 255),
@@ -184,9 +184,9 @@ public class GraphColorManager {
 			new ColorValue(150, 255, 255, 0),
 			new ColorValue(190, 255, 0, 0) },
 				//
-				MapColor.BRIGHTNESS_DIMMING,
+				MapColorProfile.BRIGHTNESS_DIMMING,
 				17,
-				MapColor.BRIGHTNESS_DIMMING,
+				MapColorProfile.BRIGHTNESS_DIMMING,
 				8);
 	}
 
@@ -269,7 +269,7 @@ public class GraphColorManager {
 
 			for (final ColorDefinition graphDefinition : getInstance().getGraphColorDefinitions()) {
 
-				final MapColor mapColor = graphDefinition.getNewMapColor();
+				final Map2ColorProfile mapColor = graphDefinition.getNewMapColor();
 
 				// map color can be null when it's not defined
 				if (mapColor == null) {
@@ -279,7 +279,7 @@ public class GraphColorManager {
 				final IMemento mementoLegendColor = xmlMemento.createChild(MEMENTO_CHILD_LEGEND_COLOR);
 				mementoLegendColor.putString(TAG_LEGEND_COLOR_PREF_NAME, graphDefinition.getPrefName());
 
-				for (final ColorValue valueColor : mapColor.colorValues) {
+				for (final ColorValue valueColor : mapColor.getColorValues()) {
 
 					final IMemento mementoValueColor = mementoLegendColor.createChild(MEMENTO_CHILD_VALUE_COLOR);
 
@@ -290,16 +290,16 @@ public class GraphColorManager {
 				}
 
 				final IMemento mementoBrightness = mementoLegendColor.createChild(MEMENTO_CHILD_BRIGHTNESS);
-				mementoBrightness.putInteger(TAG_BRIGHTNESS_MIN, mapColor.minBrightness);
-				mementoBrightness.putInteger(TAG_BRIGHTNESS_MIN_FACTOR, mapColor.minBrightnessFactor);
-				mementoBrightness.putInteger(TAG_BRIGHTNESS_MAX, mapColor.maxBrightness);
-				mementoBrightness.putInteger(TAG_BRIGHTNESS_MAX_FACTOR, mapColor.maxBrightnessFactor);
+				mementoBrightness.putInteger(TAG_BRIGHTNESS_MIN, mapColor.getMinBrightness());
+				mementoBrightness.putInteger(TAG_BRIGHTNESS_MIN_FACTOR, mapColor.getMinBrightnessFactor());
+				mementoBrightness.putInteger(TAG_BRIGHTNESS_MAX, mapColor.getMaxBrightness());
+				mementoBrightness.putInteger(TAG_BRIGHTNESS_MAX_FACTOR, mapColor.getMaxBrightnessFactor());
 
 				final IMemento mementoMinMaxValue = mementoLegendColor.createChild(MEMENTO_CHILD_MIN_MAX_VALUE);
-				mementoMinMaxValue.putInteger(TAG_IS_MIN_VALUE_OVERWRITE, mapColor.isMinValueOverwrite ? 1 : 0);
-				mementoMinMaxValue.putInteger(TAG_MIN_VALUE_OVERWRITE, mapColor.overwriteMinValue);
-				mementoMinMaxValue.putInteger(TAG_IS_MAX_VALUE_OVERWRITE, mapColor.isMaxValueOverwrite ? 1 : 0);
-				mementoMinMaxValue.putInteger(TAG_MAX_VALUE_OVERWRITE, mapColor.overwriteMaxValue);
+				mementoMinMaxValue.putInteger(TAG_IS_MIN_VALUE_OVERWRITE, mapColor.isMinValueOverwrite() ? 1 : 0);
+				mementoMinMaxValue.putInteger(TAG_MIN_VALUE_OVERWRITE, mapColor.getOverwriteMinValue());
+				mementoMinMaxValue.putInteger(TAG_IS_MAX_VALUE_OVERWRITE, mapColor.isMaxValueOverwrite() ? 1 : 0);
+				mementoMinMaxValue.putInteger(TAG_MAX_VALUE_OVERWRITE, mapColor.getOverwriteMaxValue());
 			}
 
 			xmlMemento.save(writer);
@@ -530,7 +530,7 @@ public class GraphColorManager {
 					continue;
 				}
 
-				final MapColor loadedMapColor = new MapColor();
+				final Map2ColorProfile loadedMapColor = new Map2ColorProfile();
 
 				/*
 				 * value colors
@@ -549,7 +549,7 @@ public class GraphColorManager {
 						valueColors.add(new ColorValue(value, red, green, blue));
 					}
 				}
-				loadedMapColor.colorValues = valueColors.toArray(new ColorValue[valueColors.size()]);
+				loadedMapColor.setColorValues(valueColors.toArray(new ColorValue[valueColors.size()]));
 
 				/*
 				 * min/max brightness
@@ -561,19 +561,19 @@ public class GraphColorManager {
 
 					final Integer minBrightness = mementoBrightness0.getInteger(TAG_BRIGHTNESS_MIN);
 					if (minBrightness != null) {
-						loadedMapColor.minBrightness = minBrightness;
+						loadedMapColor.setMinBrightness(minBrightness);
 					}
 					final Integer minBrightnessFactor = mementoBrightness0.getInteger(TAG_BRIGHTNESS_MIN_FACTOR);
 					if (minBrightness != null) {
-						loadedMapColor.minBrightnessFactor = minBrightnessFactor;
+						loadedMapColor.setMinBrightnessFactor(minBrightnessFactor);
 					}
 					final Integer maxBrightness = mementoBrightness0.getInteger(TAG_BRIGHTNESS_MAX);
 					if (maxBrightness != null) {
-						loadedMapColor.maxBrightness = maxBrightness;
+						loadedMapColor.setMaxBrightness(maxBrightness);
 					}
 					final Integer maxBrightnessFactor = mementoBrightness0.getInteger(TAG_BRIGHTNESS_MAX_FACTOR);
 					if (minBrightness != null) {
-						loadedMapColor.maxBrightnessFactor = maxBrightnessFactor;
+						loadedMapColor.setMaxBrightnessFactor(maxBrightnessFactor);
 					}
 				}
 
@@ -587,20 +587,20 @@ public class GraphColorManager {
 
 					final Integer isMinOverwrite = mementoMinMaxValue0.getInteger(TAG_IS_MIN_VALUE_OVERWRITE);
 					if (isMinOverwrite != null) {
-						loadedMapColor.isMinValueOverwrite = isMinOverwrite == 1;
+						loadedMapColor.setMinValueOverwrite(isMinOverwrite == 1);
 					}
 					final Integer minValue = mementoMinMaxValue0.getInteger(TAG_MIN_VALUE_OVERWRITE);
 					if (minValue != null) {
-						loadedMapColor.overwriteMinValue = minValue;
+						loadedMapColor.setOverwriteMinValue(minValue);
 					}
 
 					final Integer isMaxOverwrite = mementoMinMaxValue0.getInteger(TAG_IS_MAX_VALUE_OVERWRITE);
 					if (isMaxOverwrite != null) {
-						loadedMapColor.isMaxValueOverwrite = isMaxOverwrite == 1;
+						loadedMapColor.setMaxValueOverwrite(isMaxOverwrite == 1);
 					}
 					final Integer maxValue = mementoMinMaxValue0.getInteger(TAG_MAX_VALUE_OVERWRITE);
 					if (maxValue != null) {
-						loadedMapColor.overwriteMaxValue = maxValue;
+						loadedMapColor.setOverwriteMaxValue(maxValue);
 					}
 				}
 
@@ -650,15 +650,15 @@ public class GraphColorManager {
 
 				// legend color is not set, try to get default when available
 
-				final MapColor defaultMapColor = colorDefinition.getDefaultMapColor();
+				final Map2ColorProfile defaultMapColor = colorDefinition.getDefaultMapColor();
 
 				if (defaultMapColor != null) {
-					colorDefinition.setMapColor(defaultMapColor.getCopy());
+					colorDefinition.setMapColor(defaultMapColor.clone());
 				}
 			}
 
 			// set new map color
-			final MapColor mapColor = colorDefinition.getMapColor();
+			final Map2ColorProfile mapColor = colorDefinition.getMapColor();
 			colorDefinition.setNewMapColor(mapColor);
 		}
 	}

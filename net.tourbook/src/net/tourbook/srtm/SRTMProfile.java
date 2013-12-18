@@ -20,12 +20,14 @@ package net.tourbook.srtm;
 
 import java.util.ArrayList;
 
+import net.tourbook.common.color.ProfileImage;
 import net.tourbook.common.color.RGBVertex;
-import net.tourbook.common.color.RGBVertexImage;
+import net.tourbook.common.color.SRTMProfileImage;
+import net.tourbook.common.util.StatusUtil;
 
 import org.eclipse.swt.graphics.Image;
 
-public class SRTMProfile {
+public class SRTMProfile implements Cloneable {
 
 	static final String		DEFAULT_SRTM_RESOLUTION	= IPreferences.SRTM_RESOLUTION_VERY_FINE;
 	static final boolean	DEFAULT_IS_SHADOW		= false;
@@ -37,46 +39,57 @@ public class SRTMProfile {
 	private int				_profileId;
 	private String			_profileName;
 	private String			_tilePath;
-	private boolean			_sShadow				= DEFAULT_IS_SHADOW;
-	private String			_rResolution			= DEFAULT_SRTM_RESOLUTION;
+	private boolean			_shadow					= DEFAULT_IS_SHADOW;
+	private String			_resolution				= DEFAULT_SRTM_RESOLUTION;
 	private float			_shadowValue			= DEFAULT_SHADOW_VALUE;
+
+	private ProfileImage	_profileImage			= new SRTMProfileImage();
 
 	/*
 	 * not saved fields
 	 */
 	private int				_savedProfileKeyHashCode;
 
-	private RGBVertexImage	_rgbVertexImage			= new RGBVertexImage();
-
 	public SRTMProfile() {}
 
-	/**
-	 * Creates a clone from another profile
-	 * 
-	 * @param otherProfile
-	 *            profile which gets cloned
-	 */
-	public SRTMProfile(final SRTMProfile otherProfile) {
-		cloneProfile(otherProfile);
+	@Override
+	public SRTMProfile clone() {
+
+		SRTMProfile clonedObject = null;
+
+		try {
+
+			clonedObject = (SRTMProfile) super.clone();
+
+			clonedObject._profileName = new String(_profileName);
+			clonedObject._resolution = new String(_resolution);
+			clonedObject._tilePath = new String(_tilePath);
+
+			clonedObject._profileImage = _profileImage.clone();
+
+		} catch (final CloneNotSupportedException e) {
+			StatusUtil.log(e);
+		}
+
+		return clonedObject;
 	}
 
 	/**
-	 * clone a profile from another profile
+	 * Create a copy from another profile.
 	 * 
-	 * @param newProfile
+	 * @param sourceProfile
 	 */
-	public void cloneProfile(final SRTMProfile newProfile) {
+	public void copyFromOtherProfile(final SRTMProfile sourceProfile) {
 
-		// copy vertex list and it's content
+		_profileId = sourceProfile.getProfileId();
+		_shadow = sourceProfile.isShadowState();
+		_shadowValue = sourceProfile.getShadowValue();
 
-		_rgbVertexImage.cloneVertices(newProfile.getRgbVertexImage());
+		_profileName = new String(sourceProfile.getProfileName());
+		_resolution = new String(sourceProfile.getResolution());
+		_tilePath = new String(sourceProfile.getTilePath());
 
-		_profileId = newProfile.getProfileId();
-		_profileName = new String(newProfile.getProfileName());
-		_tilePath = new String(newProfile.getTilePath());
-		_sShadow = newProfile.isShadowState();
-		_shadowValue = newProfile.getShadowValue();
-		_rResolution = new String(newProfile.getResolution());
+		_profileImage = sourceProfile._profileImage.clone();
 	}
 
 	/**
@@ -89,7 +102,7 @@ public class SRTMProfile {
 	 */
 	public Image createImage(final int width, final int height, final boolean isHorizontal) {
 
-		return _rgbVertexImage.createVertexImage(width, height, isHorizontal);
+		return _profileImage.createImage(width, height, isHorizontal);
 	}
 
 	/**
@@ -100,11 +113,12 @@ public class SRTMProfile {
 	}
 
 	public void disposeImage() {
-		_rgbVertexImage.disposeImage();
+		_profileImage.disposeImage();
 	}
 
 	@Override
 	public boolean equals(final Object obj) {
+
 		if (this == obj) {
 			return true;
 		}
@@ -114,10 +128,12 @@ public class SRTMProfile {
 		if (!(obj instanceof SRTMProfile)) {
 			return false;
 		}
+
 		final SRTMProfile other = (SRTMProfile) obj;
 		if (_profileId != other._profileId) {
 			return false;
 		}
+
 		return true;
 	}
 
@@ -126,7 +142,8 @@ public class SRTMProfile {
 	}
 
 	public String getProfileKey() {
-		return _rgbVertexImage.getVertexKey()
+
+		return _profileImage.getVertexKey()
 				+ isShadowState()
 				+ getResolutionValue()
 				+ _tilePath
@@ -142,7 +159,7 @@ public class SRTMProfile {
 	}
 
 	public String getResolution() {
-		return _rResolution;
+		return _resolution;
 	}
 
 	/**
@@ -150,21 +167,21 @@ public class SRTMProfile {
 	 * interpolated i.e. it gives the resolution of the image!
 	 */
 	public int getResolutionValue() {
-		if (_rResolution.equals(IPreferences.SRTM_RESOLUTION_VERY_ROUGH)) {
+		if (_resolution.equals(IPreferences.SRTM_RESOLUTION_VERY_ROUGH)) {
 			return 64;
-		} else if (_rResolution.equals(IPreferences.SRTM_RESOLUTION_ROUGH)) {
+		} else if (_resolution.equals(IPreferences.SRTM_RESOLUTION_ROUGH)) {
 			return 16;
-		} else if (_rResolution.equals(IPreferences.SRTM_RESOLUTION_FINE)) {
+		} else if (_resolution.equals(IPreferences.SRTM_RESOLUTION_FINE)) {
 			return 4;
-		} else if (_rResolution.equals(IPreferences.SRTM_RESOLUTION_VERY_FINE)) {
+		} else if (_resolution.equals(IPreferences.SRTM_RESOLUTION_VERY_FINE)) {
 			return 1;
 		} else {
 			return 4;
 		}
 	}
 
-	public RGBVertexImage getRgbVertexImage() {
-		return _rgbVertexImage;
+	public ProfileImage getRgbVertexImage() {
+		return _profileImage;
 	}
 
 	public int getSavedProfileKeyHashCode() {
@@ -174,7 +191,7 @@ public class SRTMProfile {
 	public int getShadowRGB(final int elev) {
 
 		final float dimFactor = _shadowValue;
-		final int rgb = _rgbVertexImage.getRGB(elev);
+		final int rgb = _profileImage.getRGB(elev);
 
 		byte blue = (byte) ((rgb & 0xFF0000) >> 16);
 		byte green = (byte) ((rgb & 0xFF00) >> 8);
@@ -184,7 +201,6 @@ public class SRTMProfile {
 		green *= dimFactor;
 		blue *= dimFactor;
 
-//		return rgb;
 		return (//
 				(blue & 0xFF) << 16)
 				+ ((green & 0xFF) << 8)
@@ -207,36 +223,8 @@ public class SRTMProfile {
 		return result;
 	}
 
-//	public void setHorizontal() {
-//		fIsHorizontal = true;
-//	}
-//
-//	public void set(String s) {
-//		final Pattern pattern = Pattern.compile("^([-]*[0-9]*),([0-9]*),([0-9]*),([0-9]*);(.*)$"); //$NON-NLS-1$
-//		_vertexList.clear();
-//		int ix = 0;
-//		while (s.length() > 0) {
-//			final Matcher matcher = pattern.matcher(s);
-//			if (matcher.matches()) {
-//				final Long elev = new Long(matcher.group(1));
-//				final Integer red = new Integer(matcher.group(2));
-//				final Integer green = new Integer(matcher.group(3));
-//				final Integer blue = new Integer(matcher.group(4));
-//				final RGBVertex rgbVertex = new RGBVertex();
-//				rgbVertex.setElevation(elev.longValue());
-//				rgbVertex.setRGB(new RGB(red.intValue(), green.intValue(), blue.intValue()));
-//				_vertexList.add(ix, rgbVertex);
-//				ix++;
-//				s = matcher.group(5); // rest
-//			}
-//		}
-//		sort();
-//
-//		_vertexArray = _vertexList.toArray(new RGBVertex[_vertexList.size()]);
-//	}
-
 	public boolean isShadowState() {
-		return _sShadow;
+		return _shadow;
 	}
 
 	/**
@@ -244,7 +232,7 @@ public class SRTMProfile {
 	 */
 	public void setDefaultVertexes() {
 
-		final ArrayList<RGBVertex> verticies = _rgbVertexImage.getRgbVerticies();
+		final ArrayList<RGBVertex> verticies = _profileImage.getRgbVerticies();
 
 		if (verticies.size() > 0) {
 			return;
@@ -252,11 +240,11 @@ public class SRTMProfile {
 
 		final ArrayList<RGBVertex> defaultVerticies = new ArrayList<RGBVertex>();
 
-		defaultVerticies.add(0, new RGBVertex(0, 0, 255, 0));
-		defaultVerticies.add(1, new RGBVertex(0, 255, 0, 1000));
-		defaultVerticies.add(2, new RGBVertex(255, 0, 0, 2000));
+		defaultVerticies.add(0, new RGBVertex(0, 0, 0, 255));
+		defaultVerticies.add(1, new RGBVertex(1000, 0, 255, 0));
+		defaultVerticies.add(2, new RGBVertex(2000, 255, 0, 0));
 
-		_rgbVertexImage.setVerticies(defaultVerticies);
+		_profileImage.setVertices(defaultVerticies);
 	}
 
 	/**
@@ -273,11 +261,11 @@ public class SRTMProfile {
 	}
 
 	public void setResolution(final String resolution) {
-		_rResolution = resolution;
+		_resolution = resolution;
 	}
 
 	public void setShadowState(final Boolean isShadow) {
-		_sShadow = isShadow;
+		_shadow = isShadow;
 	}
 
 	public void setShadowValue(final float value) {
@@ -288,19 +276,8 @@ public class SRTMProfile {
 		_tilePath = tilePath;
 	}
 
-	public void setVertexList(final ArrayList<RGBVertex> vertexList) {
-		_rgbVertexImage.setVerticies(vertexList);
+	public void setVertices(final ArrayList<RGBVertex> vertices) {
+		_profileImage.setVertices(vertices);
 	}
-
-//	/**
-//	 * paint the profile image vertical, default is horizontal
-//	 */
-//	public void setVertical() {
-//		fIsHorizontal = false;
-//	}
-//	public void sort() {
-//		Collections.sort(_vertexList);
-//		_vertexArray = _vertexList.toArray(new RGBVertex[_vertexList.size()]);
-//	}
 
 }

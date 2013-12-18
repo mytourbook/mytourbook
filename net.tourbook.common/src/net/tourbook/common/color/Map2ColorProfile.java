@@ -15,56 +15,36 @@
  *******************************************************************************/
 package net.tourbook.common.color;
 
-import net.tourbook.common.Messages;
 import net.tourbook.common.util.StatusUtil;
 
-import org.eclipse.swt.graphics.Image;
-
 /**
- * Contains all colors for one graph to paint a tour in the 3D map.
+ * Contains all colors to paint a tour in a map.
  */
-public class Map3ColorProfile extends MapColorProfile implements Cloneable {
+public class Map2ColorProfile extends MapColorProfile implements Cloneable {
+
+	private ColorValue[]	colorValues	= new ColorValue[] {
+			new ColorValue(10, 255, 0, 0),
+			new ColorValue(50, 100, 100, 0),
+			new ColorValue(100, 0, 255, 0),
+			new ColorValue(150, 0, 100, 100),
+			new ColorValue(190, 0, 0, 255) };
+
+	public Map2ColorProfile() {}
 
 	/**
-	 * Unique id to identify a color profile.
-	 */
-	private int				_profileId;
-
-	/**
-	 * 
-	 */
-	private MapColorId		_mapColorId;
-
-	/**
-	 * Name which is visible in the UI.
-	 */
-	private String			_profileName	= Messages.Map3_Color_DefaultProfileName;
-
-	private ProfileImage	_profileImage	= new Map3ProfileImage();
-
-	private static int		_idCounter		= 0;
-
-	public Map3ColorProfile(final MapColorId mapColorId) {
-		_mapColorId = mapColorId;
-	}
-
-	/**
-	 * @param rgbVertices
+	 * @param valueColors
 	 * @param minBrightness
 	 * @param minBrightnessFactor
 	 * @param maxBrightness
 	 * @param maxBrightnessFactor
 	 */
-	public Map3ColorProfile(final RGBVertex[] rgbVertices,
-	//
+	public Map2ColorProfile(final ColorValue[] valueColors,
 							final int minBrightness,
 							final int minBrightnessFactor,
 							final int maxBrightness,
 							final int maxBrightnessFactor) {
 
-		_profileId = createProfileId();
-
-		_profileImage.setVertices(rgbVertices);
+		this.colorValues = valueColors;
 
 		this.minBrightness = minBrightness;
 		this.minBrightnessFactor = minBrightnessFactor;
@@ -83,21 +63,17 @@ public class Map3ColorProfile extends MapColorProfile implements Cloneable {
 	 * @param isMaxOverwrite
 	 * @param maxOverwrite
 	 */
-	public Map3ColorProfile(final RGBVertex[] rgbVertices,
-	//
+	public Map2ColorProfile(final ColorValue[] valueColors,
 							final int minBrightness,
 							final int minBrightnessFactor,
 							final int maxBrightness,
 							final int maxBrightnessFactor,
-							//
 							final boolean isMinOverwrite,
 							final int minOverwrite,
 							final boolean isMaxOverwrite,
-							final int maxOverwrite
-	//
-	) {
+							final int maxOverwrite) {
 
-		this(rgbVertices, minBrightness, minBrightnessFactor, maxBrightness, maxBrightnessFactor);
+		this(valueColors, minBrightness, minBrightnessFactor, maxBrightness, maxBrightnessFactor);
 
 		this.isMinValueOverwrite = isMinOverwrite;
 		this.overwriteMinValue = minOverwrite;
@@ -106,18 +82,19 @@ public class Map3ColorProfile extends MapColorProfile implements Cloneable {
 	}
 
 	@Override
-	public Map3ColorProfile clone() {
+	public Map2ColorProfile clone() {
 
-		Map3ColorProfile clonedObject = null;
+		Map2ColorProfile clonedObject = null;
 
 		try {
 
-			clonedObject = (Map3ColorProfile) super.clone();
+			clonedObject = (Map2ColorProfile) super.clone();
 
-			clonedObject._profileId = createProfileId();
-			clonedObject._profileName = new String(_profileName);
+			clonedObject.colorValues = new ColorValue[colorValues.length];
 
-			clonedObject._profileImage = _profileImage.clone();
+			for (int colorIndex = 0; colorIndex < colorValues.length; colorIndex++) {
+				clonedObject.colorValues[colorIndex] = colorValues[colorIndex].clone();
+			}
 
 		} catch (final CloneNotSupportedException e) {
 			StatusUtil.log(e);
@@ -126,51 +103,12 @@ public class Map3ColorProfile extends MapColorProfile implements Cloneable {
 		return clonedObject;
 	}
 
-	/**
-	 * Creates profile image, this image must be disposed who created it.
-	 * 
-	 * @param width
-	 * @param height
-	 * @param isHorizontal
-	 * @return
-	 */
-	public Image createImage(final int width, final int height, final boolean isHorizontal) {
-
-		return _profileImage.createImage(width, height, isHorizontal);
+	public ColorValue[] getColorValues() {
+		return colorValues;
 	}
 
-	/**
-	 * Create a unique id.
-	 * 
-	 * @return
-	 */
-	private int createProfileId() {
-
-		return ++_idCounter;
-	}
-
-	public MapColorId getMapColorId() {
-		return _mapColorId;
-	}
-
-	public int getProfileId() {
-		return _profileId;
-	}
-
-	public ProfileImage getProfileImage() {
-		return _profileImage;
-	}
-
-	public String getProfileName() {
-		return _profileName;
-	}
-
-	public void setProfileId(final int profileId) {
-		_profileId = profileId;
-	}
-
-	public void setProfileName(final String name) {
-		_profileName = name;
+	public void setColorValues(ColorValue[] colorValues) {
+		this.colorValues = colorValues;
 	}
 
 }

@@ -26,6 +26,9 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 
+/**
+ * Simple canvas which draws an image. The image is disposed when the canvas is disposed.
+ */
 public class ImageCanvas extends Canvas {
 
 	private Image	_image;
@@ -91,16 +94,18 @@ public class ImageCanvas extends Canvas {
 	}
 
 	/**
-	 * Sets and draws the image, dispose previous image
+	 * Sets a new image and draws it, the old image is disposed.
 	 * 
 	 * @param image
 	 */
 	public void setImage(final Image image) {
 
+		// dispose old image
 		if (_image != null) {
 			_image.dispose();
 		}
 
+		// set new image
 		_image = image;
 
 		redraw();

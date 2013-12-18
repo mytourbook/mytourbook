@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -25,15 +25,15 @@ import net.tourbook.common.color.IGradientColors;
 import net.tourbook.common.color.IMapColorProvider;
 import net.tourbook.common.color.MapColorId;
 import net.tourbook.data.TourData;
+import net.tourbook.map.MapColorProvider;
 import net.tourbook.map.MapUtils;
 import net.tourbook.map3.layer.ColorCacheAWT;
-import net.tourbook.map3.layer.Map3Colors;
 
 class TourPositionColors implements Path.PositionColors {
 
 	private final ColorCacheAWT	_awtColorCache	= new ColorCacheAWT();
 
-	private IMapColorProvider	_colorProvider	= Map3Colors.getColorProvider(MapColorId.Altitude);
+	private IMapColorProvider	_colorProvider	= MapColorProvider.getMap3ColorProvider(MapColorId.Altitude);
 
 	public Color getColor(final Position position, final int ordinal) {
 

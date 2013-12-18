@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -107,7 +107,7 @@ public class GraphColorPainter {
 					 * tell the legend provider with which color the legend should be painted
 					 */
 					final IGradientColors legendProvider = _colorTreeViewer.getMapLegendColorProvider();
-					legendProvider.setMapColorColors(graphColor.getColorDefinition().getNewMapColor());
+					legendProvider.setColorProfile(graphColor.getColorDefinition().getNewMapColor());
 
 					TourMapPainter.drawMapLegend(gc, borderRect, legendProvider, false);
 
@@ -168,7 +168,7 @@ public class GraphColorPainter {
 
 						// tell the legend provider how to draw the legend
 						final IGradientColors legendProvider = _colorTreeViewer.getMapLegendColorProvider();
-						legendProvider.setMapColorColors(graphColorItem.getColorDefinition().getNewMapColor());
+						legendProvider.setColorProfile(graphColorItem.getColorDefinition().getNewMapColor());
 
 						TourMapPainter.drawMapLegend(gc, borderRect, legendProvider, false);
 

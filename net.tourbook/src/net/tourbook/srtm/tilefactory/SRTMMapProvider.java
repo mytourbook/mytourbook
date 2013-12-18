@@ -15,7 +15,7 @@
  *******************************************************************************/
 package net.tourbook.srtm.tilefactory;
 
-import net.tourbook.common.color.RGBVertexImage;
+import net.tourbook.common.color.ProfileImage;
 import net.tourbook.srtm.ElevationColor;
 import net.tourbook.srtm.ElevationLayer;
 import net.tourbook.srtm.GeoLat;
@@ -117,7 +117,7 @@ public class SRTMMapProvider extends MPPlugin implements ITilePainter {
 		final int mapStartY = tileY * tileSize;
 
 		int rgb;
-		final RGBVertexImage rgbVertexImage = srtmProfile.getRgbVertexImage();
+		final ProfileImage rgbVertexImage = srtmProfile.getRgbVertexImage();
 
 		if (grid == 1) {
 

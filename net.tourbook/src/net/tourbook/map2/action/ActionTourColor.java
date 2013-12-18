@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -23,7 +23,7 @@ import org.eclipse.jface.action.Action;
 
 public class ActionTourColor extends Action {
 
-	private Map2View	_mapView;
+	private Map2View	_map2View;
 	private MapColorId	_colorId;
 
 	public ActionTourColor(	final Map2View mapView,
@@ -34,7 +34,7 @@ public class ActionTourColor extends Action {
 
 		super(null, AS_RADIO_BUTTON);
 
-		_mapView = mapView;
+		_map2View = mapView;
 		_colorId = colorId;
 
 		setToolTipText(toolTipText);
@@ -48,7 +48,7 @@ public class ActionTourColor extends Action {
 
 		// !!! this method is also called when the button is unchecked !!!
 		if (isChecked()) {
-			_mapView.actionSetTourColor(_colorId);
+			_map2View.actionSetTourColor(_colorId);
 		}
 	}
 

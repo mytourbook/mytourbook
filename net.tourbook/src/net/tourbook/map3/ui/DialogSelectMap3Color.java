@@ -26,14 +26,15 @@ import java.util.LinkedHashSet;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.color.Map3ColorProfile;
+import net.tourbook.common.color.Map3GradientColorProvider;
+import net.tourbook.common.color.ProfileImage;
 import net.tourbook.common.color.RGBVertex;
-import net.tourbook.common.color.RGBVertexImage;
 import net.tourbook.common.widgets.ColorChooser;
 import net.tourbook.common.widgets.IProfileColors;
 import net.tourbook.common.widgets.ImageCanvas;
+import net.tourbook.map2.view.TourMapPainter;
 import net.tourbook.map3.Messages;
 import net.tourbook.preferences.PrefPageMap3Color;
-import net.tourbook.srtm.SRTMProfile;
 
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -54,6 +55,7 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.RGB;
@@ -71,66 +73,78 @@ import org.eclipse.swt.widgets.Widget;
 
 public class DialogSelectMap3Color extends TitleAreaDialog implements IProfileColors {
 
-	private final IDialogSettings	_state;
+	private final IDialogSettings		_state	= TourbookPlugin.getDefault()//
+														.getDialogSettingsSection(getClass().getName());
 
-	private ColorChooser			_colorChooser;
-	private SRTMProfile				_dialogSRTMProfile;
+	private Map3ColorProfile			_dialogProfile;
+	private Map3ColorProfile			_originalProfile;
+	private boolean						_isNewProfile;
 
-	private Map3ColorProfile		_dialogProfile;
-	private SRTMProfile				_selectedProfile;
+	private PrefPageMap3Color			_prefPageMap3Color;
 
-	private PrefPageMap3Color		_prefPageMap3Color;
-	private boolean					_isNewProfile;
-
-	private boolean					_isUIUpdated;
+	private boolean						_isUIUpdated;
 
 	/*
 	 * UI resources
 	 */
+	private ColorChooser				_colorChooser;
+
 	/**
 	 * keep colors which must be disposed when the dialog gets disposed
 	 */
-	private ArrayList<Color>		_colors	= new ArrayList<Color>();
+	private ArrayList<Color>			_colors	= new ArrayList<Color>();
 
 	/*
 	 * UI controls
 	 */
-	private Shell					_shell;
-	private Composite				_vertexOuterContainer;
-	private ScrolledComposite		_vertexScrolledContainer;
+	private Shell						_shell;
+	private Composite					_vertexOuterContainer;
+	private ScrolledComposite			_vertexScrolledContainer;
 
-	private Text					_txtProfileName;
+	private Text						_txtProfileName;
 
-	private ImageCanvas				_canvasProfileImage;
+	private ImageCanvas					_canvasProfileImage;
 
 	// vertex fields
-	private Spinner[]				_spinnerValue;
-	private Label[]					_lblColor;
-	private Button[]				_chkDelete;
+	private Spinner[]					_spinnerValue;
+	private Label[]						_lblColor;
+	private Button[]					_chkDelete;
 
-	private Button					_btnApply;
-	private Button					_btnOK;
-	private Button					_btnRemove;
+	private Button						_btnApply;
+	private Button						_btnOK;
+	private Button						_btnRemove;
 
-	private Image					_profileImage;
+	private Image						_profileImage;
 
+	private Map3GradientColorProvider	_colorProvider;
+
+	/**
+	 * @param parentShell
+	 * @param prefPageMap3Color
+	 * @param originalProfile
+	 * @param isNewProfile
+	 */
 	public DialogSelectMap3Color(	final Shell parentShell,
-									final Map3ColorProfile selectedProfile,
-									final boolean isNewProfile,
-									final PrefPageMap3Color prefPage3DMapColor) {
+									final PrefPageMap3Color prefPageMap3Color,
+									final Map3ColorProfile originalProfile,
+									final boolean isNewProfile) {
 
 		super(parentShell);
 
-		_dialogProfile = selectedProfile;
-		_selectedProfile = originalProfile;
+		_prefPageMap3Color = prefPageMap3Color;
 
-		_prefPageMap3Color = prefPage3DMapColor;
+		_originalProfile = originalProfile;
+
+		// create a profile working copy
+		_dialogProfile = originalProfile.clone();
+		_colorProvider = new Map3GradientColorProvider(//
+				_dialogProfile.getMapColorId(),
+				_dialogProfile);
+
 		_isNewProfile = isNewProfile;
 
 		// make dialog resizable
 		setShellStyle(getShellStyle() | SWT.RESIZE);
-
-		_state = TourbookPlugin.getDefault().getDialogSettingsSection(getClass().getName());
 	}
 
 	@Override
@@ -148,7 +162,7 @@ public class DialogSelectMap3Color extends TitleAreaDialog implements IProfileCo
 
 		_shell = shell;
 
-		shell.setText(Messages.dialog_adjust_srtm_colors_dialog_title);
+		shell.setText(Messages.Map3Color_Dialog_Title);
 
 		shell.addDisposeListener(new DisposeListener() {
 			public void widgetDisposed(final DisposeEvent e) {
@@ -182,8 +196,8 @@ public class DialogSelectMap3Color extends TitleAreaDialog implements IProfileCo
 
 		super.create();
 
-		setTitle(Messages.dialog_adjust_srtm_colors_dialog_title);
-		setMessage(Messages.dialog_adjust_srtm_colors_dialog_message);
+		setTitle(Messages.Map3Color_Dialog_Title);
+		setMessage(Messages.Map3Color_Dialog_Message);
 
 		restoreState();
 		updateUI();
@@ -201,11 +215,7 @@ public class DialogSelectMap3Color extends TitleAreaDialog implements IProfileCo
 		/*
 		 * button: add vertex
 		 */
-		button = createButton(
-				parent,
-				IDialogConstants.CLIENT_ID + 1,
-				Messages.dialog_adjust_srtm_colors_button_add,
-				false);
+		button = createButton(parent, IDialogConstants.CLIENT_ID + 1, Messages.Map3Color_Dialog_Button_Add, false);
 
 		button.addSelectionListener(new SelectionAdapter() {
 			@Override
@@ -220,7 +230,7 @@ public class DialogSelectMap3Color extends TitleAreaDialog implements IProfileCo
 		_btnRemove = createButton(
 				parent,
 				IDialogConstants.CLIENT_ID + 4,
-				Messages.dialog_adjust_srtm_colors_button_remove,
+				Messages.Map3Color_Dialog_Button_Remove,
 				false);
 		_btnRemove.addSelectionListener(new SelectionAdapter() {
 			@Override
@@ -232,11 +242,7 @@ public class DialogSelectMap3Color extends TitleAreaDialog implements IProfileCo
 		/*
 		 * button: sort vertexes
 		 */
-		button = createButton(
-				parent,
-				IDialogConstants.CLIENT_ID + 5,
-				Messages.dialog_adjust_srtm_colors_button_sort,
-				false);
+		button = createButton(parent, IDialogConstants.CLIENT_ID + 5, Messages.Map3Color_Dialog_Button_Sort, false);
 		button.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(final SelectionEvent e) {
@@ -247,11 +253,7 @@ public class DialogSelectMap3Color extends TitleAreaDialog implements IProfileCo
 		/*
 		 * button: apply
 		 */
-		_btnApply = createButton(
-				parent,
-				IDialogConstants.CLIENT_ID + 6,
-				Messages.dialog_adjust_srtm_colors_button_apply,
-				false);
+		_btnApply = createButton(parent, IDialogConstants.CLIENT_ID + 6, Messages.Map3Color_Dialog_Button_Apply, false);
 		_btnApply.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(final SelectionEvent e) {
@@ -263,7 +265,7 @@ public class DialogSelectMap3Color extends TitleAreaDialog implements IProfileCo
 
 		// set text for the OK button
 		_btnOK = getButton(IDialogConstants.OK_ID);
-		_btnOK.setText(Messages.dialog_adjust_srtm_colors_button_update);
+		_btnOK.setText(Messages.Map3Color_Dialog_Button_Save);
 	}
 
 	@Override
@@ -290,9 +292,20 @@ public class DialogSelectMap3Color extends TitleAreaDialog implements IProfileCo
 		GridLayoutFactory.swtDefaults().numColumns(2).applyTo(colorContainer);
 //		colorContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
 		{
-			createUI_30_VertexImage(colorContainer);
-			createUI_40_ColorChooser(colorContainer);
+			createUI_10_ColorChooser(colorContainer);
+			createUI_30_ProfileImage(colorContainer);
 		}
+	}
+
+	/**
+	 * color chooser
+	 */
+	private void createUI_10_ColorChooser(final Composite parent) {
+
+		_colorChooser = new ColorChooser(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().applyTo(_colorChooser);
+
+		_colorChooser.setProfileColors(this);
 	}
 
 	private void createUI_10_Names(final Composite parent) {
@@ -309,7 +322,7 @@ public class DialogSelectMap3Color extends TitleAreaDialog implements IProfileCo
 				 * lable: profile name
 				 */
 				final Label label = new Label(nameContainer, SWT.NONE);
-				label.setText(Messages.dialog_adjust_srtm_colors_label_profile_name);
+				label.setText(Messages.Map3Color_Dialog_Button_Label_ProfileName);
 
 				/*
 				 * text: profile name
@@ -320,7 +333,7 @@ public class DialogSelectMap3Color extends TitleAreaDialog implements IProfileCo
 		}
 	}
 
-	private void createUI_30_VertexImage(final Composite parent) {
+	private void createUI_30_ProfileImage(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, true).indent(0, 0).applyTo(container);
@@ -350,24 +363,13 @@ public class DialogSelectMap3Color extends TitleAreaDialog implements IProfileCo
 	}
 
 	/**
-	 * color chooser
-	 */
-	private void createUI_40_ColorChooser(final Composite parent) {
-
-		_colorChooser = new ColorChooser(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().applyTo(_colorChooser);
-
-		_colorChooser.setProfileColors(this);
-	}
-
-	/**
 	 * Create the vertex fields from the vertex list
 	 * 
 	 * @param parent
 	 */
 	private void createUI_70_VertexFieds() {
 
-		final ArrayList<RGBVertex> rgbVerticies = getVertexImage().getRgbVerticies();
+		final ArrayList<RGBVertex> rgbVerticies = getProfileImage().getRgbVerticies();
 
 		final int vertexSize = rgbVerticies.size();
 		if (vertexSize == 0) {
@@ -436,6 +438,7 @@ public class DialogSelectMap3Color extends TitleAreaDialog implements IProfileCo
 
 				final RGBVertex vertex = rgbVerticies.get(vertexIndex);
 				final RGB vertexRGB = vertex.getRGB();
+
 				final Color bgColor = new Color(display, vertexRGB);
 				_colors.add(bgColor);
 
@@ -448,7 +451,7 @@ public class DialogSelectMap3Color extends TitleAreaDialog implements IProfileCo
 				spinnerValue.setMaximum(Integer.MAX_VALUE);
 				spinnerValue.addSelectionListener(eleSelectionListener);
 				spinnerValue.setData(vertex);
-				spinnerValue.setSelection((int) vertex.getElevation());
+				spinnerValue.setSelection((int) vertex.getValue());
 				spinnerValue.addMouseWheelListener(new MouseWheelListener() {
 					public void mouseScrolled(final MouseEvent event) {
 						UI.adjustSpinnerValueOnMouseScroll(event);
@@ -467,7 +470,7 @@ public class DialogSelectMap3Color extends TitleAreaDialog implements IProfileCo
 				lblColor.addMouseListener(colorMouseListener);
 				lblColor.setData(vertex);
 				lblColor.setToolTipText(NLS.bind(//
-						Messages.Dialog_Adjust_SRTMColors_Color_Tooltip,
+						Messages.Map3Color_Dialog_ProfileColor_Tooltip,
 						new Object[] { vertexRGB.red, vertexRGB.green, vertexRGB.blue }));
 
 				/*
@@ -475,7 +478,7 @@ public class DialogSelectMap3Color extends TitleAreaDialog implements IProfileCo
 				 */
 				final Button checkbox = _chkDelete[vertexIndex] = new Button(vertexContainer, SWT.CHECK);
 				checkbox.setLayoutData(gdCheckbox);
-				checkbox.setToolTipText(Messages.dialog_adjust_srtm_colors_checkbutton_ttt);
+				checkbox.setToolTipText(Messages.Map3Color_Dialog_Checkbox_Delete_Tooltip);
 				checkbox.addSelectionListener(checkboxListener);
 			}
 		}
@@ -522,13 +525,6 @@ public class DialogSelectMap3Color extends TitleAreaDialog implements IProfileCo
 		return vertexContainer;
 	}
 
-	private void disposeProfileImage() {
-
-		if (_profileImage != null && _profileImage.isDisposed() == false) {
-			_profileImage.dispose();
-		}
-	}
-
 	private void enableActions() {
 
 		if (validateFields() == false) {
@@ -538,7 +534,7 @@ public class DialogSelectMap3Color extends TitleAreaDialog implements IProfileCo
 		/*
 		 * remove buttons
 		 */
-		final ArrayList<RGBVertex> rgbVerticies = getVertexImage().getRgbVerticies();
+		final ArrayList<RGBVertex> rgbVerticies = getProfileImage().getRgbVerticies();
 		final int vertexSize = rgbVerticies.size();
 
 		int checked = 0;
@@ -583,15 +579,15 @@ public class DialogSelectMap3Color extends TitleAreaDialog implements IProfileCo
 		 */
 		final LinkedHashSet<RGB> profileColors = new LinkedHashSet<RGB>();
 
-		for (final RGBVertex rgbVertex : getVertexImage().getRgbVerticies()) {
+		for (final RGBVertex rgbVertex : getProfileImage().getRgbVerticies()) {
 			profileColors.add(rgbVertex.getRGB());
 		}
 
 		return profileColors.toArray(new RGB[profileColors.size()]);
 	}
 
-	private RGBVertexImage getVertexImage() {
-		return _dialogSRTMProfile.getRgbVertexImage();
+	private ProfileImage getProfileImage() {
+		return _dialogProfile.getProfileImage();
 	}
 
 	@Override
@@ -606,15 +602,16 @@ public class DialogSelectMap3Color extends TitleAreaDialog implements IProfileCo
 
 		updateProfileFromUI();
 
-		_prefPageMap3Color.saveProfile(_selectedProfile, _dialogSRTMProfile, _isNewProfile);
+//		_prefPageMap3Color.saveProfile(_originalProfile, _dialogProfile, _isNewProfile);
 	}
 
 	private void onDispose() {
+
 		for (final Color color : _colors) {
 			color.dispose();
 		}
 
-		disposeProfileImage();
+		UI.disposeResource(_profileImage);
 	}
 
 	private void onFieldMouseDown(final Display display, final MouseEvent e) {
@@ -677,7 +674,7 @@ public class DialogSelectMap3Color extends TitleAreaDialog implements IProfileCo
 		final Spinner spinner = (Spinner) widget;
 		final RGBVertex vertex = (RGBVertex) spinner.getData();
 
-		vertex.setElevation(spinner.getSelection());
+		vertex.setValue(spinner.getSelection());
 	}
 
 	private void onVertexAdd() {
@@ -686,7 +683,7 @@ public class DialogSelectMap3Color extends TitleAreaDialog implements IProfileCo
 		sortVertexsAndUpdateProfile();
 
 		// create new vertex at the end of the list
-		final RGBVertexImage vertexImage = getVertexImage();
+		final ProfileImage vertexImage = getProfileImage();
 		vertexImage.addVertex(new RGBVertex(_colorChooser.getRGB()));
 
 		createUI_70_VertexFieds();
@@ -704,7 +701,7 @@ public class DialogSelectMap3Color extends TitleAreaDialog implements IProfileCo
 
 	private void onVertexRemove() {
 
-		final RGBVertexImage rgbVertexImage = getVertexImage();
+		final ProfileImage rgbVertexImage = getProfileImage();
 		final ArrayList<Integer> vertexRemoveIndex = new ArrayList<Integer>();
 
 		// get all checked checkedboxes
@@ -723,10 +720,22 @@ public class DialogSelectMap3Color extends TitleAreaDialog implements IProfileCo
 
 	private void paintProfileImage() {
 
-		disposeProfileImage();
+//		_dialogProfile.
+
+		UI.disposeResource(_profileImage);
 
 		final Rectangle imageBounds = _canvasProfileImage.getBounds();
-		_profileImage = _dialogSRTMProfile.createImage(imageBounds.width, imageBounds.height, false);
+
+		final Image image = new Image(Display.getCurrent(), imageBounds.width, imageBounds.height);
+
+		final GC gc = new GC(image);
+		{
+			TourMapPainter.drawMapLegend(gc, imageBounds, _colorProvider, true);
+		}
+		gc.dispose();
+
+		_profileImage = image;
+
 		_canvasProfileImage.setImage(_profileImage);
 	}
 
@@ -745,7 +754,7 @@ public class DialogSelectMap3Color extends TitleAreaDialog implements IProfileCo
 	 */
 	private void sortVertexsAndUpdateProfile() {
 
-		final int rgbVertexListSize = getVertexImage().getRgbVerticies().size();
+		final int rgbVertexListSize = getProfileImage().getRgbVerticies().size();
 		final ArrayList<RGBVertex> newRgbVerticies = new ArrayList<RGBVertex>();
 
 		for (int vertexIndex = 0; vertexIndex < rgbVertexListSize; vertexIndex++) {
@@ -757,7 +766,7 @@ public class DialogSelectMap3Color extends TitleAreaDialog implements IProfileCo
 			final RGB rgb = _lblColor[vertexIndex].getBackground().getRGB();
 
 			final RGBVertex rgbVertex = new RGBVertex();
-			rgbVertex.setElevation(elevation);
+			rgbVertex.setValue(elevation);
 			rgbVertex.setRGB(rgb);
 
 			newRgbVerticies.add(rgbVertex);
@@ -767,7 +776,7 @@ public class DialogSelectMap3Color extends TitleAreaDialog implements IProfileCo
 		Collections.sort(newRgbVerticies);
 
 		// update model
-		getVertexImage().setVerticies(newRgbVerticies);
+		getProfileImage().setVertices(newRgbVerticies);
 
 		createUI_70_VertexFieds();
 
@@ -778,12 +787,12 @@ public class DialogSelectMap3Color extends TitleAreaDialog implements IProfileCo
 
 		sortVertexsAndUpdateProfile();
 
-		_dialogSRTMProfile.setProfileName(_txtProfileName.getText());
+		_dialogProfile.setProfileName(_txtProfileName.getText());
 	}
 
 	private void updateUI() {
 
-		_txtProfileName.setText(_dialogSRTMProfile.getProfileName());
+		_txtProfileName.setText(_dialogProfile.getProfileName());
 	}
 
 	private boolean validateFields() {

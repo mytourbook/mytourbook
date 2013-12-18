@@ -21,6 +21,8 @@ import org.osgi.framework.Version;
 
 public class ApplicationVersion {
 
+	public static final String	SPLASH_COPYRIGHT_YEAR			= "2014";											//$NON-NLS-1$
+
 //	private static final String	DEVELOPMENT_VERSION_TEXT	= UI.EMPTY_STRING;
 //	private static final String	DEV_WINDOW_TITLE			= UI.EMPTY_STRING;
 //	private static String		_subVersion					= UI.EMPTY_STRING;

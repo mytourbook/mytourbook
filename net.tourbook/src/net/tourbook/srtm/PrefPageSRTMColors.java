@@ -513,7 +513,7 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 						continue;
 					}
 
-					vertexList.add(new RGBVertex(red, green, blue, altitude));
+					vertexList.add(new RGBVertex(altitude, red, green, blue));
 				}
 
 				/*
@@ -529,7 +529,7 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 				profile.setShadowValue(profileShadowValue);
 				profile.setResolution(profileResolution);
 
-				profile.setVertexList(vertexList);
+				profile.setVertices(vertexList);
 
 				// get max profile id
 				_maxProfileId = Math.max(_maxProfileId, profileId);
@@ -1093,6 +1093,10 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 		try {
 
 			final MP mp = ElevationColor.getMapProvider();
+			if (mp == null) {
+				// TODO initialize map provider
+				return;
+			}
 
 			final IPath tileCacheOSPathFolder = getOfflineFolder(mp);
 			if (tileCacheOSPathFolder == null) {
@@ -1126,6 +1130,10 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 		try {
 
 			final MP mp = ElevationColor.getMapProvider();
+			if (mp == null) {
+				// TODO initialize map provider
+				return;
+			}
 
 			final IPath tileCacheOSPathFolder = getOfflineFolder(mp);
 			if (tileCacheOSPathFolder == null) {
@@ -1283,7 +1291,7 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 
 	private void onDuplicateProfile() {
 
-		final SRTMProfile newProfile = new SRTMProfile(_selectedProfile);
+		final SRTMProfile newProfile = _selectedProfile.clone();
 
 		final int newProfileId = ++_maxProfileId;
 
@@ -1303,7 +1311,7 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 
 				// open color chooser dialog
 
-				final SRTMProfile dialogProfile = new SRTMProfile(originalProfile);
+				final SRTMProfile dialogProfile = originalProfile.clone();
 
 				final DialogSelectSRTMColors dialog = new DialogSelectSRTMColors(
 						Display.getCurrent().getActiveShell(),
@@ -1501,11 +1509,12 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 		}
 
 		if (originalProfile.equals(dialogProfile) == false) {
+
 			/*
 			 * when a new profile is applied in the color dialog, both profiles are the same,
 			 * cloning is not required, it would remove the vertexes
 			 */
-			originalProfile.cloneProfile(dialogProfile);
+			originalProfile.copyFromOtherProfile(dialogProfile);
 		}
 
 		originalProfile.disposeImage();
@@ -1586,7 +1595,7 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 
 					final RGB rgb = vertex.getRGB();
 
-					createXmlVertex(xmlProfile, (int) vertex.getElevation(), rgb.red, rgb.green, rgb.blue);
+					createXmlVertex(xmlProfile, (int) vertex.getValue(), rgb.red, rgb.green, rgb.blue);
 				}
 			}
 

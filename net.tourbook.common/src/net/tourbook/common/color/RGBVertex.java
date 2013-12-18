@@ -19,47 +19,52 @@
 package net.tourbook.common.color;
 
 import net.tourbook.common.Messages;
-import net.tourbook.common.UI;
+import net.tourbook.common.util.StatusUtil;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.RGB;
 
-public class RGBVertex implements Comparable<Object> {
+public class RGBVertex implements Comparable<Object>, Cloneable {
 
+	private long	_value;
 	private RGB		_rgb;
-	private long	_elevation;
 
 	public RGBVertex() {
-		_elevation = 0;
+		_value = 0;
 		_rgb = new RGB(255, 255, 255); // WHITE
 	}
 
-	public RGBVertex(final int red, final int green, final int blue, final long elevation) {
+	public RGBVertex(final long value, final int red, final int green, final int blue) {
 
 		if ((red > 255) || (red < 0) || (green > 255) || (green < 0) || (blue > 255) || (blue < 0)) {
 			SWT.error(SWT.ERROR_INVALID_ARGUMENT);
 		}
 
-		_elevation = elevation;
+		_value = value;
 		_rgb = new RGB(red, green, blue);
 	}
 
 	public RGBVertex(final RGB rgb) {
-		_elevation = 0;
+		_value = 0;
 		_rgb = rgb;
 	}
 
-	/**
-	 * Make a clone of another {@link RGBVertex}.
-	 * 
-	 * @param vertexSource
-	 */
-	public RGBVertex(final RGBVertex vertexSource) {
+	@Override
+	public RGBVertex clone() {
 
-		final RGB sourceRGB = vertexSource.getRGB();
+		RGBVertex clonedObject = null;
 
-		_rgb = new RGB(sourceRGB.red, sourceRGB.green, sourceRGB.blue);
-		_elevation = vertexSource._elevation;
+		try {
+
+			clonedObject = (RGBVertex) super.clone();
+
+			clonedObject._rgb = new RGB(_rgb.red, _rgb.green, _rgb.blue);
+
+		} catch (final CloneNotSupportedException e) {
+			StatusUtil.log(e);
+		}
+
+		return clonedObject;
 	}
 
 	public int compareTo(final Object anotherRGBVertex) throws ClassCastException {
@@ -68,37 +73,37 @@ public class RGBVertex implements Comparable<Object> {
 			throw new ClassCastException(Messages.rgv_vertex_class_cast_exception);
 		}
 
-		final long anotherElev = ((RGBVertex) anotherRGBVertex).getElevation();
+		final long anotherValue = ((RGBVertex) anotherRGBVertex).getValue();
 
-		if (_elevation < anotherElev) {
+		if (_value < anotherValue) {
 			return (-1);
 		}
 
-		if (_elevation > anotherElev) {
+		if (_value > anotherValue) {
 			return 1;
 		}
 
 		return 0;
 	}
 
-	public long getElevation() {
-		return _elevation;
-	}
-
 	public RGB getRGB() {
 		return _rgb;
 	}
 
-	public void setElevation(final long l) {
-		_elevation = l;
+	public long getValue() {
+		return _value;
 	}
 
 	public void setRGB(final RGB rgb) {
 		_rgb = rgb;
 	}
 
+	public void setValue(final long l) {
+		_value = l;
+	}
+
 	@Override
 	public String toString() {
-		return UI.EMPTY_STRING + _elevation + "," + _rgb.red + "," + _rgb.green + "," + _rgb.blue + ";"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+		return String.format("\n\tRGBVertex [_value=%s, _rgb=%s]", _value, _rgb);
 	}
 }

@@ -37,10 +37,12 @@ import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourWayPoint;
 import net.tourbook.importdata.RawDataManager;
+import net.tourbook.map.MapColorProvider;
 import net.tourbook.map.MapUtils;
 import net.tourbook.map2.Messages;
 import net.tourbook.map2.action.ActionDimMap;
 import net.tourbook.map2.action.ActionManageMapProviders;
+import net.tourbook.map2.action.ActionMap2Color;
 import net.tourbook.map2.action.ActionPhotoProperties;
 import net.tourbook.map2.action.ActionReloadFailedMapImages;
 import net.tourbook.map2.action.ActionSaveDefaultPosition;
@@ -68,7 +70,6 @@ import net.tourbook.map2.action.ActionZoomIn;
 import net.tourbook.map2.action.ActionZoomOut;
 import net.tourbook.map2.action.ActionZoomShowEntireEarth;
 import net.tourbook.map2.action.ActionZoomShowEntireTour;
-import net.tourbook.map3.action.ActionMapColor;
 import net.tourbook.photo.IPhotoEventListener;
 import net.tourbook.photo.IPhotoPropertiesListener;
 import net.tourbook.photo.Photo;
@@ -284,7 +285,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 	private ActionTourColor					_actionTourColorHrZone;
 
 	private ActionDimMap					_actionDimMap;
-	private ActionMapColor					_actionMapColor;
+	private ActionMap2Color					_actionMapColor;
 	private ActionManageMapProviders		_actionManageProvider;
 	private ActionPhotoProperties			_actionPhotoFilter;
 	private ActionReloadFailedMapImages		_actionReloadFailedMapImages;
@@ -1253,7 +1254,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 		_actionSynchWithSlider = new ActionSynchWithSlider(this);
 		_actionSynchTourZoomLevel = new ActionSynchTourZoomLevel(this);
 
-		_actionMapColor = new ActionMapColor();
+		_actionMapColor = new ActionMap2Color();
 		_actionSelectMapProvider = new ActionSelectMapProvider(this);
 		_actionSetDefaultPosition = new ActionSetDefaultPosition(this);
 		_actionSaveDefaultPosition = new ActionSaveDefaultPosition(this);
@@ -1698,7 +1699,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 	}
 
 	private IMapColorProvider getColorProvider(final MapColorId colorId) {
-		return TourMapColors.getColorProvider(colorId);
+		return MapColorProvider.getMap2ColorProvider(colorId);
 	}
 
 	public Map getMap() {

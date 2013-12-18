@@ -26,7 +26,7 @@ import java.util.LinkedHashSet;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.color.RGBVertex;
-import net.tourbook.common.color.RGBVertexImage;
+import net.tourbook.common.color.ProfileImage;
 import net.tourbook.common.widgets.ColorChooser;
 import net.tourbook.common.widgets.IProfileColors;
 import net.tourbook.common.widgets.ImageCanvas;
@@ -574,7 +574,7 @@ public class DialogSelectSRTMColors extends TitleAreaDialog implements IProfileC
 				spinnerElevation.setMaximum(Integer.MAX_VALUE);
 				spinnerElevation.addSelectionListener(eleSelectionListener);
 				spinnerElevation.setData(vertex);
-				spinnerElevation.setSelection((int) vertex.getElevation());
+				spinnerElevation.setSelection((int) vertex.getValue());
 				spinnerElevation.addMouseWheelListener(new MouseWheelListener() {
 					public void mouseScrolled(final MouseEvent event) {
 						UI.adjustSpinnerValueOnMouseScroll(event);
@@ -648,12 +648,12 @@ public class DialogSelectSRTMColors extends TitleAreaDialog implements IProfileC
 		return vertexContainer;
 	}
 
-	private void disposeProfileImage() {
-
-		if (_profileImage != null && _profileImage.isDisposed() == false) {
-			_profileImage.dispose();
-		}
-	}
+//	private void disposeProfileImage() {
+//
+//		if (_profileImage != null && _profileImage.isDisposed() == false) {
+//			_profileImage.dispose();
+//		}
+//	}
 
 	private void enableActions() {
 
@@ -735,7 +735,7 @@ public class DialogSelectSRTMColors extends TitleAreaDialog implements IProfileC
 		}
 	}
 
-	private RGBVertexImage getVertexImage() {
+	private ProfileImage getVertexImage() {
 		return _dialogProfile.getRgbVertexImage();
 	}
 
@@ -753,11 +753,12 @@ public class DialogSelectSRTMColors extends TitleAreaDialog implements IProfileC
 	}
 
 	private void onDispose() {
+
 		for (final Color color : _colors) {
 			color.dispose();
 		}
 
-		disposeProfileImage();
+		UI.disposeResource(_profileImage);
 	}
 
 	private void onFieldMouseDown(final Display display, final MouseEvent e) {
@@ -820,7 +821,7 @@ public class DialogSelectSRTMColors extends TitleAreaDialog implements IProfileC
 		final Spinner spinner = (Spinner) widget;
 		final RGBVertex vertex = (RGBVertex) spinner.getData();
 
-		vertex.setElevation(spinner.getSelection());
+		vertex.setValue(spinner.getSelection());
 	}
 
 	private void onVertexAdd() {
@@ -829,7 +830,7 @@ public class DialogSelectSRTMColors extends TitleAreaDialog implements IProfileC
 		sortVertexsAndUpdateProfile();
 
 		// create new vertex at the end of the list
-		final RGBVertexImage vertexImage = getVertexImage();
+		final ProfileImage vertexImage = getVertexImage();
 		vertexImage.addVertex(new RGBVertex(_colorChooser.getRGB()));
 
 		createUI_70_VertexFieds();
@@ -862,13 +863,13 @@ public class DialogSelectSRTMColors extends TitleAreaDialog implements IProfileC
 
 				boolean isNewEle = true;
 
-				final RGBVertexImage rgbVertexImage = getVertexImage();
+				final ProfileImage rgbVertexImage = getVertexImage();
 
 				/*
 				 * check if elevation is already available, they will be ignored
 				 */
 				for (final RGBVertex vertex : rgbVertexImage.getRgbVerticies()) {
-					if (vertex.getElevation() == elevation) {
+					if (vertex.getValue() == elevation) {
 						isNewEle = false;
 						break;
 					}
@@ -879,7 +880,7 @@ public class DialogSelectSRTMColors extends TitleAreaDialog implements IProfileC
 					// create new vertex
 
 					final RGBVertex vertex = new RGBVertex(_colorChooser.getRGB());
-					vertex.setElevation(elevation);
+					vertex.setValue(elevation);
 
 					rgbVertexImage.addVertex(vertex);
 				}
@@ -898,7 +899,7 @@ public class DialogSelectSRTMColors extends TitleAreaDialog implements IProfileC
 
 	private void onVertexRemove() {
 
-		final RGBVertexImage rgbVertexImage = getVertexImage();
+		final ProfileImage rgbVertexImage = getVertexImage();
 		final ArrayList<Integer> vertexRemoveIndex = new ArrayList<Integer>();
 
 		// get all checked checkedboxes
@@ -917,10 +918,12 @@ public class DialogSelectSRTMColors extends TitleAreaDialog implements IProfileC
 
 	private void paintProfileImage() {
 
-		disposeProfileImage();
+		// force a redraw
+		UI.disposeResource(_profileImage);
 
 		final Rectangle imageBounds = _canvasProfileImage.getBounds();
 		_profileImage = _dialogProfile.createImage(imageBounds.width, imageBounds.height, false);
+
 		_canvasProfileImage.setImage(_profileImage);
 	}
 
@@ -972,7 +975,7 @@ public class DialogSelectSRTMColors extends TitleAreaDialog implements IProfileC
 			final RGB rgb = _lblColor[vertexIndex].getBackground().getRGB();
 
 			final RGBVertex rgbVertex = new RGBVertex();
-			rgbVertex.setElevation(elevation);
+			rgbVertex.setValue(elevation);
 			rgbVertex.setRGB(rgb);
 
 			newRgbVerticies.add(rgbVertex);
@@ -982,7 +985,7 @@ public class DialogSelectSRTMColors extends TitleAreaDialog implements IProfileC
 		Collections.sort(newRgbVerticies);
 
 		// update model
-		getVertexImage().setVerticies(newRgbVerticies);
+		getVertexImage().setVertices(newRgbVerticies);
 
 		createUI_70_VertexFieds();
 

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,27 +15,15 @@
  *******************************************************************************/
 package net.tourbook.common.color;
 
-public class ColorValue {
+import net.tourbook.common.util.StatusUtil;
+
+public class ColorValue implements Cloneable {
 
 	public float	value;
 
 	public int		red;
 	public int		green;
 	public int		blue;
-
-	/**
-	 * Create a copy
-	 * 
-	 * @param colorValue
-	 */
-	public ColorValue(final ColorValue colorValue) {
-
-		value = colorValue.value;
-
-		red = colorValue.red;
-		green = colorValue.green;
-		blue = colorValue.blue;
-	}
 
 	public ColorValue(final float value, final int red, final int green, final int blue) {
 
@@ -47,8 +35,24 @@ public class ColorValue {
 	}
 
 	@Override
+	protected ColorValue clone() throws CloneNotSupportedException {
+
+		ColorValue clonedObject = null;
+
+		try {
+
+			clonedObject = (ColorValue) super.clone();
+
+		} catch (final CloneNotSupportedException e) {
+			StatusUtil.log(e);
+		}
+
+		return clonedObject;
+	}
+
+	@Override
 	public String toString() {
-		return "new ColorValue(" + value + ", " + red + ", " + green + ", " + blue + ")"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+		return "ColorValue(" + value + ", " + red + ", " + green + ", " + blue + ")"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
 	}
 
 }

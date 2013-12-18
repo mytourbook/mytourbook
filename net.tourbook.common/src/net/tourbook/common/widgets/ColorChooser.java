@@ -70,7 +70,7 @@ import org.eclipse.ui.XMLMemento;
 
 public class ColorChooser extends Composite {
 
-	private static final int						NUMBER_OF_HORIZONTAL_COLORS			= 10;
+	private static final int						NUMBER_OF_HORIZONTAL_COLORS			= 12;
 	private static final int						NUMBER_OF_VERTICAL_COLORS			= 4;
 
 	private static final String						STATE_COLOR_CHOOSER_CUSTOM_COLORS	= "STATE_COLOR_CHOOSER_CUSTOM_COLORS";	//$NON-NLS-1$
@@ -112,6 +112,8 @@ public class ColorChooser extends Composite {
 	private boolean									_hexagonChangeState					= false;
 
 	private MouseAdapter							_customColorMouseListener;
+
+	private Object									DEFAULT_COLOR_ID					= new Object();
 
 	private RGB										_defaultRGB							= Display
 																								.getCurrent()
@@ -188,7 +190,7 @@ public class ColorChooser extends Composite {
 				}
 
 				final Label colorLabel = _customColors[vPos][hPos];
-				if (colorLabel.getData() == null) {
+				if (colorLabel.getData() == DEFAULT_COLOR_ID) {
 
 					// a free position is available
 
@@ -734,6 +736,25 @@ public class ColorChooser extends Composite {
 		menuMgr.add(_actionColorChooserClearCustomColors);
 	}
 
+	private void fillupCustomColorsWithDefaultColors() {
+
+		for (int verticalIndex = 0; verticalIndex < NUMBER_OF_VERTICAL_COLORS; verticalIndex++) {
+
+			final Label[] _horizontalColors = _customColors[verticalIndex];
+
+			for (int horizontalIndex = 0; horizontalIndex < NUMBER_OF_HORIZONTAL_COLORS; horizontalIndex++) {
+
+				final Label colorLabel = _horizontalColors[horizontalIndex];
+
+				// set color only when not yet set
+				if (!(colorLabel.getData() instanceof RGB)) {
+
+					setColorInColorLabel(colorLabel, _defaultRGB);
+				}
+			}
+		}
+	}
+
 	/**
 	 * Fillup grid with default colors.
 	 * 
@@ -1012,7 +1033,6 @@ public class ColorChooser extends Composite {
 
 	private void restoreState_CustomColors_Colors(final XMLMemento xmlMemento) {
 
-
 		final Integer xmlNumberOfHorizontalColors = xmlMemento.getInteger(ATTR_NUMBER_OF_HORIZONTAL_COLORS);
 		final Integer xmlNumberOfVerticalColors = xmlMemento.getInteger(ATTR_NUMBER_OF_VERTICAL_COLORS);
 
@@ -1060,7 +1080,7 @@ public class ColorChooser extends Composite {
 		}
 
 		// fillup to show tooltips
-		fillupCustomColorsWithDefaultColors(colorPosCounter);
+		fillupCustomColorsWithDefaultColors();
 	}
 
 	public void saveState(final IDialogSettings state) {
@@ -1142,9 +1162,9 @@ public class ColorChooser extends Composite {
 		// set data
 		if (rgb == _defaultRGB) {
 
-			// set default color
+			// set default color data, this indicates that the color is not set
 
-			colorLabel.setData(null);
+			colorLabel.setData(DEFAULT_COLOR_ID);
 
 		} else {
 

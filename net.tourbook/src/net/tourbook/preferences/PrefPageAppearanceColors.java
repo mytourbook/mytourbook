@@ -24,11 +24,11 @@ import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.color.ColorDefinition;
 import net.tourbook.common.color.ColorValue;
-import net.tourbook.common.color.GradientColorProvider;
 import net.tourbook.common.color.GraphColorItem;
 import net.tourbook.common.color.GraphColorManager;
 import net.tourbook.common.color.IGradientColors;
-import net.tourbook.common.color.MapColor;
+import net.tourbook.common.color.Map2ColorProfile;
+import net.tourbook.common.color.Map2GradientColorProvider;
 import net.tourbook.common.color.MapColorId;
 import net.tourbook.common.color.MapLegendImageConfig;
 import net.tourbook.map2.view.DialogMappingColor;
@@ -160,29 +160,26 @@ public class PrefPageAppearanceColors extends PreferencePage implements IWorkben
 
 	}
 
-	public static GradientColorProvider createLegendImageColorProvider() {
+	public static Map2GradientColorProvider createLegendImageColorProvider() {
 
-		final MapLegendImageConfig legendConfig = new MapLegendImageConfig();
+		final Map2GradientColorProvider colorProvider = new Map2GradientColorProvider(MapColorId.Altitude);
 
+		final Map2ColorProfile colorProfile = colorProvider.getMapColorProfile();
+		colorProfile.setColorValues(_legendImageColors);
+
+		// update legend configuations
+		final MapLegendImageConfig legendConfig = colorProvider.getMapLegendImageConfig();
 		legendConfig.units = _legendImageUnitValues;
 		legendConfig.unitLabels = _legendImageUnitLabels;
 		legendConfig.unitText = UI.EMPTY_STRING;
 		legendConfig.legendMinValue = 0;
 		legendConfig.legendMaxValue = 200;
 
-		final MapColor legendColor = new MapColor();
-		legendColor.colorValues = _legendImageColors;
-
-		final GradientColorProvider legendImageColorProvider = new GradientColorProvider(
-				MapColorId.Altitude,
-				legendConfig,
-				legendColor);
-
-		return legendImageColorProvider;
+		return colorProvider;
 	}
 
 	@Override
-	public void applyMapColors(final MapColor newMapColor) {
+	public void applyMapColors(final Map2ColorProfile newMapColor) {
 
 		updateColorsFromDialog(_selectedColor.getColorDefinition(), newMapColor);
 		updateAndSaveColors();
@@ -591,9 +588,9 @@ public class PrefPageAppearanceColors extends PreferencePage implements IWorkben
 			graphDefinition.setNewLineColor(graphDefinition.getDefaultLineColor());
 			graphDefinition.setNewTextColor(graphDefinition.getDefaultTextColor());
 
-			final MapColor defaultLegendColor = graphDefinition.getDefaultMapColor();
+			final Map2ColorProfile defaultLegendColor = graphDefinition.getDefaultMapColor();
 			if (defaultLegendColor != null) {
-				graphDefinition.setNewMapColor(defaultLegendColor.getCopy());
+				graphDefinition.setNewMapColor(defaultLegendColor.clone());
 			}
 		}
 
@@ -639,7 +636,8 @@ public class PrefPageAppearanceColors extends PreferencePage implements IWorkben
 				.setValue(ITourbookPreferences.GRAPH_COLORS_HAS_CHANGED, Math.random());
 	}
 
-	private void updateColorsFromDialog(final ColorDefinition selectedColorDefinition, final MapColor newMapColor) {
+	private void updateColorsFromDialog(final ColorDefinition selectedColorDefinition,
+										final Map2ColorProfile newMapColor) {
 
 		// set new legend color
 		selectedColorDefinition.setNewMapColor(newMapColor);

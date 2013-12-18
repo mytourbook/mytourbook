@@ -29,7 +29,6 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.branding.IProductConstants;
 import org.eclipse.ui.splash.BasicSplashHandler;
-import org.joda.time.DateTime;
 
 /**
  * This was a copy of EclipseSplashHandler Parses the well known product constants and constructs a
@@ -106,7 +105,7 @@ public class MyTourbookSplashHandler extends BasicSplashHandler {
 		final int borderRight = 385;
 		final int borderBottom = 101;
 
-		final String copyRight = NLS.bind(Messages.App_Splash_Copyright, new DateTime().getYear());
+		final String copyRight = NLS.bind(Messages.App_Splash_Copyright, ApplicationVersion.SPLASH_COPYRIGHT_YEAR);
 		final int textHeight = gc.textExtent(copyRight).y;
 
 		final String version = "Version " + ApplicationVersion.getVersionSimple(); //$NON-NLS-1$

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -23,7 +23,7 @@ public interface IGradientColors extends IMapColorProvider {
 	 */
 	abstract int getColorValue(float graphValue);
 
-	abstract MapColor getMapColor();
+	abstract MapColorProfile getMapColorProfile();
 
 	/**
 	 * @return Returns configuration how a map legend image is painted.
@@ -31,11 +31,11 @@ public interface IGradientColors extends IMapColorProvider {
 	abstract MapLegendImageConfig getMapLegendImageConfig();
 
 	/**
-	 * Set the colors for the map legend, the values will not be changed.
+	 * Set the colors for the map legend.
 	 * 
 	 * @param newMapColor
 	 */
-	abstract void setMapColorColors(MapColor newMapColor);
+	abstract void setColorProfile(MapColorProfile mapColorProfile);
 
 	abstract void setMapConfigValues(	int legendHeight,
 										float minValue,

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -45,13 +45,13 @@ public class MapLegendImageConfig {
 		return String.format(
 				"\n" //$NON-NLS-1$
 						+ "MapLegendImageConfig\n" //$NON-NLS-1$
-						+ "   legendMinValue=%s\n" //$NON-NLS-1$
-						+ "   legendMaxValue=%s\n" //$NON-NLS-1$
-						+ "   units=%s\n" //$NON-NLS-1$
-						+ "   unitLabels=%s\n" //$NON-NLS-1$
-						+ "   unitFormat=%s\n" //$NON-NLS-1$
-						+ "   unitText=%s\n" //$NON-NLS-1$
-						+ "   numberFormatDigits=%s\n", //$NON-NLS-1$
+				+ "   legendMinValue		=%s\n" //$NON-NLS-1$
+				+ "   legendMaxValue		=%s\n" //$NON-NLS-1$
+				+ "   units					=%s\n" //$NON-NLS-1$
+				+ "   unitLabels			=%s\n" //$NON-NLS-1$
+				+ "   unitFormat			=%s\n" //$NON-NLS-1$
+				+ "   unitText				=%s\n" //$NON-NLS-1$
+				+ "   numberFormatDigits	=%s\n", //$NON-NLS-1$
 				legendMinValue,
 				legendMaxValue,
 				units != null ? units.subList(0, Math.min(units.size(), maxLen)) : null,

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -17,18 +17,18 @@ package net.tourbook.common.color;
 
 public interface IMapColorProvider {
 
-	public static final int	DEFAULT_LEGEND_GRAPHIC_WIDTH		= 20;
+	public static final int	DEFAULT_LEGEND_GRAPHIC_WIDTH	= 20;
 
-	public static final int	DEFAULT_LEGEND_WIDTH		= 150;
-	public static final int	DEFAULT_LEGEND_HEIGHT		= 300;
+	public static final int	DEFAULT_LEGEND_WIDTH			= 150;
+	public static final int	DEFAULT_LEGEND_HEIGHT			= 300;
 
-	public static final int	LEGEND_TOP_MARGIN			= 20;
-	public static final int	LEGEND_MARGIN_TOP_BOTTOM	= 10;
+	public static final int	LEGEND_TOP_MARGIN				= 20;
+	public static final int	LEGEND_MARGIN_TOP_BOTTOM		= 10;
 
-	public static final int	LEGEND_UNIT_DISTANCE		= 60;
+	public static final int	LEGEND_UNIT_DISTANCE			= 60;
 
 	/**
-	 * @return Returns an id to identify the {@link IMapColorProvider}
+	 * @return Returns an id to identify the map color provider.
 	 */
 	public abstract MapColorId getMapColorId();
 

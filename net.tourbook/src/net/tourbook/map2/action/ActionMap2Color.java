@@ -13,28 +13,35 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.map3.action;
+package net.tourbook.map2.action;
 
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.color.ColorDefinition;
 import net.tourbook.common.color.GraphColorManager;
+import net.tourbook.common.color.IGradientColors;
+import net.tourbook.common.color.IMapColorProvider;
 import net.tourbook.common.color.Map2ColorProfile;
+import net.tourbook.common.color.Map2GradientColorProvider;
 import net.tourbook.common.color.MapColorId;
+import net.tourbook.common.util.StatusUtil;
+import net.tourbook.map.MapColorProvider;
 import net.tourbook.map2.view.DialogMappingColor;
 import net.tourbook.map2.view.IMapColorUpdater;
 import net.tourbook.map3.Messages;
 import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.preferences.PrefPageAppearanceColors;
 import net.tourbook.ui.UI;
 
 import org.eclipse.jface.action.Action;
+import org.eclipse.swt.widgets.Display;
 
-public class ActionMapColor extends Action implements IMapColorUpdater {
+public class ActionMap2Color extends Action implements IMapColorUpdater {
 
 	private MapColorId			_mapColorId;
 	private DialogMappingColor	_dialogMappingColor;
 	private ColorDefinition		_colorDefinition;
 
-	public ActionMapColor() {
+	public ActionMap2Color() {
 
 		super(null, AS_PUSH_BUTTON);
 
@@ -65,57 +72,54 @@ public class ActionMapColor extends Action implements IMapColorUpdater {
 	@Override
 	public void run() {
 
-// this must be updated for map3colorprofile !!!
+		final IMapColorProvider mapColorProvider = MapColorProvider.getMap2ColorProvider(_mapColorId);
 
-//		final IMapColorProvider mapColorProvider = MapColorProvider.getMap3ColorProvider(_mapColorId);
-//
-//		if (mapColorProvider instanceof IGradientColors) {
-//
-//			final Map2GradientColorProvider mapLegendColorProvider = PrefPageAppearanceColors
-//					.createLegendImageColorProvider();
-//
-//			_dialogMappingColor = new DialogMappingColor(
-//					Display.getCurrent().getActiveShell(),
-//					mapLegendColorProvider,
-//					this);
-//
-//			_colorDefinition = null;
-//
-//			final GraphColorManager colorManager = GraphColorManager.getInstance();
-//
-//			switch (_mapColorId) {
-//			case Altitude:
-//				_colorDefinition = colorManager.getGraphColorDefinition(GraphColorManager.PREF_GRAPH_ALTITUDE);
-//				break;
-//			case Gradient:
-//				_colorDefinition = colorManager.getGraphColorDefinition(GraphColorManager.PREF_GRAPH_GRADIENT);
-//				break;
-//			case Pace:
-//				_colorDefinition = colorManager.getGraphColorDefinition(GraphColorManager.PREF_GRAPH_PACE);
-//				break;
-//			case Pulse:
-//				_colorDefinition = colorManager.getGraphColorDefinition(GraphColorManager.PREF_GRAPH_HEARTBEAT);
-//				break;
-//			case Speed:
-//				_colorDefinition = colorManager.getGraphColorDefinition(GraphColorManager.PREF_GRAPH_SPEED);
-//				break;
-//
-//			default:
-//				break;
-//			}
-//
-//			if (_colorDefinition == null) {
-//				StatusUtil.logError("Colordefinition is null"); //$NON-NLS-1$
-//				return;
-//			}
-//
-//			// set the color which should be modified in the dialog
-//			_dialogMappingColor.setLegendColor(_colorDefinition);
-//
-//			// new colors will be set with applyMapColors
-//			_dialogMappingColor.open();
-//		}
+		if (mapColorProvider instanceof IGradientColors) {
 
+			final Map2GradientColorProvider mapLegendColorProvider = PrefPageAppearanceColors
+					.createLegendImageColorProvider();
+
+			_dialogMappingColor = new DialogMappingColor(
+					Display.getCurrent().getActiveShell(),
+					mapLegendColorProvider,
+					this);
+
+			_colorDefinition = null;
+
+			final GraphColorManager colorManager = GraphColorManager.getInstance();
+
+			switch (_mapColorId) {
+			case Altitude:
+				_colorDefinition = colorManager.getGraphColorDefinition(GraphColorManager.PREF_GRAPH_ALTITUDE);
+				break;
+			case Gradient:
+				_colorDefinition = colorManager.getGraphColorDefinition(GraphColorManager.PREF_GRAPH_GRADIENT);
+				break;
+			case Pace:
+				_colorDefinition = colorManager.getGraphColorDefinition(GraphColorManager.PREF_GRAPH_PACE);
+				break;
+			case Pulse:
+				_colorDefinition = colorManager.getGraphColorDefinition(GraphColorManager.PREF_GRAPH_HEARTBEAT);
+				break;
+			case Speed:
+				_colorDefinition = colorManager.getGraphColorDefinition(GraphColorManager.PREF_GRAPH_SPEED);
+				break;
+
+			default:
+				break;
+			}
+
+			if (_colorDefinition == null) {
+				StatusUtil.logError("Colordefinition is null"); //$NON-NLS-1$
+				return;
+			}
+
+			// set the color which should be modified in the dialog
+			_dialogMappingColor.setLegendColor(_colorDefinition);
+
+			// new colors will be set with applyMapColors
+			_dialogMappingColor.open();
+		}
 	}
 
 	public void setColorId(final MapColorId mapColorId) {

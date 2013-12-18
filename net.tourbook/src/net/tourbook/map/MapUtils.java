@@ -22,6 +22,7 @@ import net.tourbook.common.color.ColorDefinition;
 import net.tourbook.common.color.GraphColorManager;
 import net.tourbook.common.color.IGradientColors;
 import net.tourbook.common.color.LegendUnitFormat;
+import net.tourbook.common.color.Map2ColorProfile;
 import net.tourbook.common.color.MapLegendImageConfig;
 import net.tourbook.data.TourData;
 import net.tourbook.map2.Messages;
@@ -38,8 +39,8 @@ public class MapUtils {
 	 *         when data are not available
 	 */
 	public static boolean updateLegendMinMaxValues(	final ArrayList<TourData> allTourData,
-												final IGradientColors mapColorProvider,
-												final int legendHeight) {
+													final IGradientColors mapColorProvider,
+													final int legendHeight) {
 
 		if (allTourData.size() == 0) {
 			return false;
@@ -47,8 +48,8 @@ public class MapUtils {
 
 		final GraphColorManager colorProvider = GraphColorManager.getInstance();
 
-		ColorDefinition colorDefinition = null;
-		final MapLegendImageConfig mapColorConfig = mapColorProvider.getMapLegendImageConfig();
+		final MapLegendImageConfig legendConfig = mapColorProvider.getMapLegendImageConfig();
+		ColorDefinition colorDefinition;
 
 		// tell the legend provider how to draw the legend
 		switch (mapColorProvider.getMapColorId()) {
@@ -92,8 +93,9 @@ public class MapUtils {
 			}
 
 			colorDefinition = colorProvider.getGraphColorDefinition(GraphColorManager.PREF_GRAPH_ALTITUDE);
+			final Map2ColorProfile colorProfile = colorDefinition.getNewMapColor();
 
-			mapColorProvider.setMapColorColors(colorDefinition.getNewMapColor());
+			mapColorProvider.setColorProfile(colorProfile);
 			mapColorProvider.setMapConfigValues(
 					legendHeight,
 					minValue,
@@ -140,10 +142,10 @@ public class MapUtils {
 				return false;
 			}
 
-			mapColorConfig.numberFormatDigits = 1;
+			legendConfig.numberFormatDigits = 1;
 			colorDefinition = colorProvider.getGraphColorDefinition(GraphColorManager.PREF_GRAPH_GRADIENT);
 
-			mapColorProvider.setMapColorColors(colorDefinition.getNewMapColor());
+			mapColorProvider.setColorProfile(colorDefinition.getNewMapColor());
 			mapColorProvider.setMapConfigValues(
 					legendHeight,
 					minValue,
@@ -190,10 +192,10 @@ public class MapUtils {
 				return false;
 			}
 
-			mapColorConfig.unitFormat = LegendUnitFormat.Pace;
+			legendConfig.unitFormat = LegendUnitFormat.Pace;
 			colorDefinition = colorProvider.getGraphColorDefinition(GraphColorManager.PREF_GRAPH_PACE);
 
-			mapColorProvider.setMapColorColors(colorDefinition.getNewMapColor());
+			mapColorProvider.setColorProfile(colorDefinition.getNewMapColor());
 			mapColorProvider.setMapConfigValues(
 					legendHeight,
 					minValue,
@@ -242,7 +244,7 @@ public class MapUtils {
 
 			colorDefinition = colorProvider.getGraphColorDefinition(GraphColorManager.PREF_GRAPH_HEARTBEAT);
 
-			mapColorProvider.setMapColorColors(colorDefinition.getNewMapColor());
+			mapColorProvider.setColorProfile(colorDefinition.getNewMapColor());
 			mapColorProvider.setMapConfigValues(
 					legendHeight,
 					minValue,
@@ -289,10 +291,10 @@ public class MapUtils {
 				return false;
 			}
 
-			mapColorConfig.numberFormatDigits = 1;
+			legendConfig.numberFormatDigits = 1;
 			colorDefinition = colorProvider.getGraphColorDefinition(GraphColorManager.PREF_GRAPH_SPEED);
 
-			mapColorProvider.setMapColorColors(colorDefinition.getNewMapColor());
+			mapColorProvider.setColorProfile(colorDefinition.getNewMapColor());
 			mapColorProvider.setMapConfigValues(
 					legendHeight,
 					minValue,

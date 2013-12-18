@@ -57,10 +57,9 @@ import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.extension.export.ActionExport;
 import net.tourbook.importdata.RawDataManager;
+import net.tourbook.map.MapColorProvider;
 import net.tourbook.map2.view.IDiscreteColors;
 import net.tourbook.map2.view.SelectionMapPosition;
-import net.tourbook.map2.view.TourMapColors;
-import net.tourbook.map3.action.ActionMapColor;
 import net.tourbook.map3.action.ActionOpenGLVersions;
 import net.tourbook.map3.action.ActionOpenMap3LayerView;
 import net.tourbook.map3.action.ActionOpenMap3StatisticsView;
@@ -156,10 +155,11 @@ public class Map3View extends ViewPart implements ITourProvider {
 
 	private static final WorldWindowGLCanvas	_wwCanvas								= Map3Manager.getWWCanvas();
 
+// this must be enabled for the new map3 color provider
+//	private ActionMapColor						_actionMapColor;
 	private ActionOpenGLVersions				_actionOpenGLVersions;
 	private ActionOpenMap3LayerView				_actionOpenMap3LayerView;
 	private ActionOpenMap3StatisticsView		_actionOpenMap3StatisticsView;
-	private ActionMapColor						_actionMapColor;
 	private ActionSetTrackSliderPositionLeft	_actionSetTrackSliderLeft;
 	private ActionSetTrackSliderPositionRight	_actionSetTrackSliderRight;
 	private ActionShowTrackSlider				_actionShowTrackSlider;
@@ -288,10 +288,10 @@ public class Map3View extends ViewPart implements ITourProvider {
 
 	public void actionOpenTrackColorDialog() {
 
-		// set color before menu is filled, this sets the action image and color provider
-		_actionMapColor.setColorId(_tourColorId);
-
-		_actionMapColor.run();
+//		// set color before menu is filled, this sets the action image and color provider
+//		_actionMapColor.setColorId(_tourColorId);
+//
+//		_actionMapColor.run();
 	}
 
 	public void actionSetMapColor(final MapColorId colorId) {
@@ -696,7 +696,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 		_actionOpenMap3LayerView = new ActionOpenMap3LayerView();
 		_actionOpenMap3StatisticsView = new ActionOpenMap3StatisticsView();
 
-		_actionMapColor = new ActionMapColor();
+//		_actionMapColor = new ActionMapColor();
 
 		_actionSetTrackSliderLeft = new ActionSetTrackSliderPositionLeft(this);
 		_actionSetTrackSliderRight = new ActionSetTrackSliderPositionRight(this);
@@ -991,7 +991,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 		_actionShowTrackSlider.setEnabled(isTourAvailable);
 		_actionShowLegendInMap.setEnabled(isTourAvailable);
 
-		_actionMapColor.setEnabled(isTourAvailable);
+//		_actionMapColor.setEnabled(isTourAvailable);
 
 		_actionEditQuick.setEnabled(isTourSelected);
 		_actionEditTour.setEnabled(isTourSelected);
@@ -1049,16 +1049,16 @@ public class Map3View extends ViewPart implements ITourProvider {
 		fillMenuItem(menu, _actionShowTrackSlider);
 		fillMenuItem(menu, _actionShowLegendInMap);
 
-		// set color before menu is filled, this sets the action image and color id
-		_actionMapColor.setColorId(_tourColorId);
-
-		if (_tourColorId != MapColorId.HrZone) {
-
-			// hr zone has a different color provider and is not yet supported
-
-			(new Separator()).fill(menu, -1);
-			fillMenuItem(menu, _actionMapColor);
-		}
+//		// set color before menu is filled, this sets the action image and color id
+//		_actionMapColor.setColorId(_tourColorId);
+//
+//		if (_tourColorId != MapColorId.HrZone) {
+//
+//			// hr zone has a different color provider and is not yet supported
+//
+//			(new Separator()).fill(menu, -1);
+//			fillMenuItem(menu, _actionMapColor);
+//		}
 
 		(new Separator()).fill(menu, -1);
 		fillMenuItem(menu, _actionEditQuick);
@@ -1485,7 +1485,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 		final Color bgColor;
 		final Color fgColor;
 
-		final IMapColorProvider colorProvider = TourMapColors.getColorProvider(_tourColorId);
+		final IMapColorProvider colorProvider = MapColorProvider.getMap3ColorProvider(_tourColorId);
 
 		Integer colorValue = null;
 
@@ -1589,7 +1589,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 
 	private void setColorProvider(final MapColorId colorId) {
 
-		final IMapColorProvider colorProvider = TourMapColors.getColorProvider(colorId);
+		final IMapColorProvider colorProvider = MapColorProvider.getMap3ColorProvider(colorId);
 
 		Map3Manager.getLayer_TourTrack().setColorProvider(colorProvider);
 		Map3Manager.getLayer_TourLegend().setColorProvider(colorProvider);

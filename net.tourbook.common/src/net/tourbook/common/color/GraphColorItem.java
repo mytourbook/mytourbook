@@ -76,7 +76,7 @@ public class GraphColorItem {
 
 	/**
 	 * @return Returns <code>true</code> when this {@link GraphColorItem} represents a
-	 *         {@link MapColor}
+	 *         {@link Map2ColorProfile}
 	 */
 	public boolean isMapColor() {
 		return _isMapColor;
