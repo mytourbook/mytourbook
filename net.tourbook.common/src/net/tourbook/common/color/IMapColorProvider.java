@@ -25,7 +25,7 @@ public interface IMapColorProvider {
 	public static final int	LEGEND_TOP_MARGIN				= 20;
 	public static final int	LEGEND_MARGIN_TOP_BOTTOM		= 10;
 
-	public static final int	LEGEND_UNIT_DISTANCE			= 60;
+	public static final int	LEGEND_UNIT_DISTANCE			= 100;
 
 	/**
 	 * @return Returns an id to identify the map color provider.

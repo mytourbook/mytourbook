@@ -22,7 +22,7 @@ import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.color.Map3ColorDefinition;
 import net.tourbook.common.color.Map3ColorManager;
 import net.tourbook.common.color.Map3ColorProfile;
-import net.tourbook.map3.ui.DialogSelectMap3Color;
+import net.tourbook.map3.ui.DialogMap3ColorEditor;
 import net.tourbook.ui.UI;
 
 import org.eclipse.jface.layout.GridDataFactory;
@@ -490,7 +490,7 @@ public class PrefPageMap3Color extends PreferencePage implements IWorkbenchPrefe
 			final Map3ColorProfile originalProfile = (Map3ColorProfile) firstElement;
 
 			// open color chooser dialog
-			final DialogSelectMap3Color dialog = new DialogSelectMap3Color(
+			final DialogMap3ColorEditor dialog = new DialogMap3ColorEditor(
 					Display.getCurrent().getActiveShell(),
 					this,
 					originalProfile,

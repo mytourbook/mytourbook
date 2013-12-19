@@ -331,7 +331,7 @@ public class GraphColorManager {
 			graphDefinition.setLineColor(graphDefinition.getNewLineColor());
 			graphDefinition.setTextColor(graphDefinition.getNewTextColor());
 
-			graphDefinition.setMapColor(graphDefinition.getNewMapColor());
+			graphDefinition.setMapColorProfile(graphDefinition.getNewMapColor());
 		}
 	}
 
@@ -613,7 +613,7 @@ public class GraphColorManager {
 
 						// color definition found
 
-						colorDefinition.setMapColor(loadedMapColor);
+						colorDefinition.setMapColorProfile(loadedMapColor);
 						break;
 					}
 				}
@@ -653,7 +653,7 @@ public class GraphColorManager {
 				final Map2ColorProfile defaultMapColor = colorDefinition.getDefaultMapColor();
 
 				if (defaultMapColor != null) {
-					colorDefinition.setMapColor(defaultMapColor.clone());
+					colorDefinition.setMapColorProfile(defaultMapColor.clone());
 				}
 			}
 

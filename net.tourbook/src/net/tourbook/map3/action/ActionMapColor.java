@@ -20,7 +20,7 @@ import net.tourbook.common.color.ColorDefinition;
 import net.tourbook.common.color.GraphColorManager;
 import net.tourbook.common.color.Map2ColorProfile;
 import net.tourbook.common.color.MapColorId;
-import net.tourbook.map2.view.DialogMappingColor;
+import net.tourbook.map2.view.DialogMap2ColorEditor;
 import net.tourbook.map2.view.IMapColorUpdater;
 import net.tourbook.map3.Messages;
 import net.tourbook.preferences.ITourbookPreferences;
@@ -31,7 +31,7 @@ import org.eclipse.jface.action.Action;
 public class ActionMapColor extends Action implements IMapColorUpdater {
 
 	private MapColorId			_mapColorId;
-	private DialogMappingColor	_dialogMappingColor;
+	private DialogMap2ColorEditor	_dialogMappingColor;
 	private ColorDefinition		_colorDefinition;
 
 	public ActionMapColor() {

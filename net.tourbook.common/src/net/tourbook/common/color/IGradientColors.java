@@ -18,8 +18,24 @@ package net.tourbook.common.color;
 public interface IGradientColors extends IMapColorProvider {
 
 	/**
+	 * Configure color provider by setting min/max values, units ..., the common color provider do
+	 * not contain data values only subclasses.
+	 * 
+	 * @param legendHeight
+	 * @param minValue
+	 * @param maxValue
+	 * @param unitText
+	 * @param unitFormat
+	 */
+	abstract void configureColorProvider(	int legendHeight,
+											float minValue,
+											float maxValue,
+											String unitText,
+											LegendUnitFormat unitFormat);
+
+	/**
 	 * @param graphValue
-	 * @return Returns the RGB value for a graph value.
+	 * @return Returns RGB value for a graph value.
 	 */
 	abstract int getColorValue(float graphValue);
 
@@ -28,18 +44,12 @@ public interface IGradientColors extends IMapColorProvider {
 	/**
 	 * @return Returns configuration how a map legend image is painted.
 	 */
-	abstract MapLegendImageConfig getMapLegendImageConfig();
+	abstract MapUnitsConfiguration getMapUnitsConfiguration();
 
 	/**
-	 * Set the colors for the map legend.
+	 * Set the colors for the map.
 	 * 
 	 * @param newMapColor
 	 */
 	abstract void setColorProfile(MapColorProfile mapColorProfile);
-
-	abstract void setMapConfigValues(	int legendHeight,
-										float minValue,
-										float maxValue,
-										String unitText,
-										LegendUnitFormat unitFormat);
 }

@@ -45,14 +45,9 @@ import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.graphics.ImageData;
-import org.eclipse.swt.graphics.PaletteData;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.RGB;
-import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Combo;
@@ -65,7 +60,7 @@ import org.eclipse.swt.widgets.Scale;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Spinner;
 
-public class DialogMappingColor extends TitleAreaDialog {
+public class DialogMap2ColorEditor extends TitleAreaDialog {
 
 	private static final String		VALUE_SPACER		= "999";												//$NON-NLS-1$
 
@@ -132,7 +127,7 @@ public class DialogMappingColor extends TitleAreaDialog {
 
 	}
 
-	public DialogMappingColor(	final Shell parentShell,
+	public DialogMap2ColorEditor(	final Shell parentShell,
 								final IGradientColors colorProvider,
 								final IMapColorUpdater mapColorUpdater) {
 
@@ -218,32 +213,15 @@ public class DialogMappingColor extends TitleAreaDialog {
 		UI.disposeResource(_imageMappingColor);
 
 		final Point legendSize = _canvasMappingColor.getSize();
+
 		final int legendWidth = Math.max(140, legendSize.x);
 		final int legendHeight = Math.max(100, legendSize.y);
-		final RGB rgbTransparent = new RGB(0xfe, 0xfe, 0xfe);
 
-		final ImageData overlayImageData = new ImageData(//
+		_imageMappingColor = TourMapPainter.createMapLegendImage(
+				Display.getCurrent(),
+				_colorProvider,
 				legendWidth,
-				legendHeight,
-				24,
-				new PaletteData(0xff, 0xff00, 0xff0000));
-
-		overlayImageData.transparentPixel = overlayImageData.palette.getPixel(rgbTransparent);
-
-		final Display display = Display.getCurrent();
-		_imageMappingColor = new Image(display, overlayImageData);
-		final Rectangle imageBounds = _imageMappingColor.getBounds();
-
-		final Color transparentColor = new Color(display, rgbTransparent);
-		final GC gc = new GC(_imageMappingColor);
-		{
-			gc.setBackground(transparentColor);
-			gc.fillRectangle(imageBounds);
-
-			TourMapPainter.drawMapLegend(gc, imageBounds, _colorProvider, true);
-		}
-		gc.dispose();
-		transparentColor.dispose();
+				legendHeight);
 	}
 
 	private void createUI(final Composite parent) {

@@ -18,7 +18,7 @@ package net.tourbook.common.color;
 import net.tourbook.common.util.StatusUtil;
 
 /**
- * Contains all colors to paint a tour in a map.
+ * Contains all colors and data to paint a tour or legend in a map.
  */
 public class Map2ColorProfile extends MapColorProfile implements Cloneable {
 
@@ -107,7 +107,7 @@ public class Map2ColorProfile extends MapColorProfile implements Cloneable {
 		return colorValues;
 	}
 
-	public void setColorValues(ColorValue[] colorValues) {
+	public void setColorValues(final ColorValue[] colorValues) {
 		this.colorValues = colorValues;
 	}
 

@@ -1342,6 +1342,8 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 
 			if (isDataAvailable) {
 				TourMapPainter.drawMapLegend(gc, legendImageBounds, mapColorProvider, true);
+			} else {
+				// draws only a transparent image to hide the legend
 			}
 		}
 		gc.dispose();

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -23,7 +23,7 @@ import net.tourbook.common.color.GraphColorManager;
 import net.tourbook.common.color.IGradientColors;
 import net.tourbook.common.color.LegendUnitFormat;
 import net.tourbook.common.color.Map2ColorProfile;
-import net.tourbook.common.color.MapLegendImageConfig;
+import net.tourbook.common.color.MapUnitsConfiguration;
 import net.tourbook.data.TourData;
 import net.tourbook.map2.Messages;
 
@@ -33,26 +33,26 @@ public class MapUtils {
 	 * Update the min/max values in the {@link IGradientColors} for the currently displayed legend.
 	 * 
 	 * @param allTourData
-	 * @param mapColorProvider
+	 * @param colorProvider
 	 * @param legendHeight
 	 * @return Return <code>true</code> when the legend value could be updated, <code>false</code>
 	 *         when data are not available
 	 */
 	public static boolean updateLegendMinMaxValues(	final ArrayList<TourData> allTourData,
-													final IGradientColors mapColorProvider,
+													final IGradientColors colorProvider,
 													final int legendHeight) {
 
 		if (allTourData.size() == 0) {
 			return false;
 		}
 
-		final GraphColorManager colorProvider = GraphColorManager.getInstance();
+		final GraphColorManager colorManager = GraphColorManager.getInstance();
 
-		final MapLegendImageConfig legendConfig = mapColorProvider.getMapLegendImageConfig();
+		final MapUnitsConfiguration legendConfig = colorProvider.getMapUnitsConfiguration();
 		ColorDefinition colorDefinition;
 
 		// tell the legend provider how to draw the legend
-		switch (mapColorProvider.getMapColorId()) {
+		switch (colorProvider.getMapColorId()) {
 
 		case Altitude:
 
@@ -92,11 +92,11 @@ public class MapUtils {
 				return false;
 			}
 
-			colorDefinition = colorProvider.getGraphColorDefinition(GraphColorManager.PREF_GRAPH_ALTITUDE);
+			colorDefinition = colorManager.getGraphColorDefinition(GraphColorManager.PREF_GRAPH_ALTITUDE);
 			final Map2ColorProfile colorProfile = colorDefinition.getNewMapColor();
 
-			mapColorProvider.setColorProfile(colorProfile);
-			mapColorProvider.setMapConfigValues(
+			colorProvider.setColorProfile(colorProfile);
+			colorProvider.configureColorProvider(
 					legendHeight,
 					minValue,
 					maxValue,
@@ -143,10 +143,10 @@ public class MapUtils {
 			}
 
 			legendConfig.numberFormatDigits = 1;
-			colorDefinition = colorProvider.getGraphColorDefinition(GraphColorManager.PREF_GRAPH_GRADIENT);
+			colorDefinition = colorManager.getGraphColorDefinition(GraphColorManager.PREF_GRAPH_GRADIENT);
 
-			mapColorProvider.setColorProfile(colorDefinition.getNewMapColor());
-			mapColorProvider.setMapConfigValues(
+			colorProvider.setColorProfile(colorDefinition.getNewMapColor());
+			colorProvider.configureColorProvider(
 					legendHeight,
 					minValue,
 					maxValue,
@@ -193,10 +193,10 @@ public class MapUtils {
 			}
 
 			legendConfig.unitFormat = LegendUnitFormat.Pace;
-			colorDefinition = colorProvider.getGraphColorDefinition(GraphColorManager.PREF_GRAPH_PACE);
+			colorDefinition = colorManager.getGraphColorDefinition(GraphColorManager.PREF_GRAPH_PACE);
 
-			mapColorProvider.setColorProfile(colorDefinition.getNewMapColor());
-			mapColorProvider.setMapConfigValues(
+			colorProvider.setColorProfile(colorDefinition.getNewMapColor());
+			colorProvider.configureColorProvider(
 					legendHeight,
 					minValue,
 					maxValue,
@@ -242,10 +242,10 @@ public class MapUtils {
 				return false;
 			}
 
-			colorDefinition = colorProvider.getGraphColorDefinition(GraphColorManager.PREF_GRAPH_HEARTBEAT);
+			colorDefinition = colorManager.getGraphColorDefinition(GraphColorManager.PREF_GRAPH_HEARTBEAT);
 
-			mapColorProvider.setColorProfile(colorDefinition.getNewMapColor());
-			mapColorProvider.setMapConfigValues(
+			colorProvider.setColorProfile(colorDefinition.getNewMapColor());
+			colorProvider.configureColorProvider(
 					legendHeight,
 					minValue,
 					maxValue,
@@ -292,10 +292,10 @@ public class MapUtils {
 			}
 
 			legendConfig.numberFormatDigits = 1;
-			colorDefinition = colorProvider.getGraphColorDefinition(GraphColorManager.PREF_GRAPH_SPEED);
+			colorDefinition = colorManager.getGraphColorDefinition(GraphColorManager.PREF_GRAPH_SPEED);
 
-			mapColorProvider.setColorProfile(colorDefinition.getNewMapColor());
-			mapColorProvider.setMapConfigValues(
+			colorProvider.setColorProfile(colorDefinition.getNewMapColor());
+			colorProvider.configureColorProvider(
 					legendHeight,
 					minValue,
 					maxValue,

@@ -25,7 +25,7 @@ import net.tourbook.common.color.Map2GradientColorProvider;
 import net.tourbook.common.color.MapColorId;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.map.MapColorProvider;
-import net.tourbook.map2.view.DialogMappingColor;
+import net.tourbook.map2.view.DialogMap2ColorEditor;
 import net.tourbook.map2.view.IMapColorUpdater;
 import net.tourbook.map3.Messages;
 import net.tourbook.preferences.ITourbookPreferences;
@@ -38,7 +38,7 @@ import org.eclipse.swt.widgets.Display;
 public class ActionMap2Color extends Action implements IMapColorUpdater {
 
 	private MapColorId			_mapColorId;
-	private DialogMappingColor	_dialogMappingColor;
+	private DialogMap2ColorEditor	_dialogMappingColor;
 	private ColorDefinition		_colorDefinition;
 
 	public ActionMap2Color() {
@@ -79,7 +79,7 @@ public class ActionMap2Color extends Action implements IMapColorUpdater {
 			final Map2GradientColorProvider mapLegendColorProvider = PrefPageAppearanceColors
 					.createLegendImageColorProvider();
 
-			_dialogMappingColor = new DialogMappingColor(
+			_dialogMappingColor = new DialogMap2ColorEditor(
 					Display.getCurrent().getActiveShell(),
 					mapLegendColorProvider,
 					this);

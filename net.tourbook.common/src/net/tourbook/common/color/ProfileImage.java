@@ -61,14 +61,6 @@ public abstract class ProfileImage implements Cloneable {
 		_vertexArray = null;
 	}
 
-	protected void checkVerticesArray() {
-
-		// ensure array is valid
-		if (_vertexArray == null) {
-			_vertexArray = _rgbVertices.toArray(new RGBVertex[_rgbVertices.size()]);
-		}
-	}
-
 	@Override
 	public ProfileImage clone() {
 
@@ -103,16 +95,22 @@ public abstract class ProfileImage implements Cloneable {
 
 	public abstract int getRGB(final long value);
 
-	protected RGBVertex[] getRgbVertexArray() {
-		return _vertexArray;
-	}
-
 	/**
 	 * @return Return rgb verticies, this list should not be modified, use
 	 *         {@link #setVertices(ArrayList)} to modify this list.
 	 */
-	public ArrayList<RGBVertex> getRgbVerticies() {
+	public ArrayList<RGBVertex> getRgbVertices() {
 		return _rgbVertices;
+	}
+
+	public RGBVertex[] getRgbVerticesArray() {
+
+		// ensure array is valid
+		if (_vertexArray == null) {
+			_vertexArray = _rgbVertices.toArray(new RGBVertex[_rgbVertices.size()]);
+		}
+
+		return _vertexArray;
 	}
 
 	/**

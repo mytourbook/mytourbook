@@ -98,8 +98,8 @@ public class RGBVertex implements Comparable<Object>, Cloneable {
 		_rgb = rgb;
 	}
 
-	public void setValue(final long l) {
-		_value = l;
+	public void setValue(final long value) {
+		_value = value;
 	}
 
 	@Override

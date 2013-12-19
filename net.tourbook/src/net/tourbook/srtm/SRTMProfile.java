@@ -232,7 +232,7 @@ public class SRTMProfile implements Cloneable {
 	 */
 	public void setDefaultVertexes() {
 
-		final ArrayList<RGBVertex> verticies = _profileImage.getRgbVerticies();
+		final ArrayList<RGBVertex> verticies = _profileImage.getRgbVertices();
 
 		if (verticies.size() > 0) {
 			return;

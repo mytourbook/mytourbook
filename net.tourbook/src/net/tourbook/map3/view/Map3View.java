@@ -51,7 +51,7 @@ import net.tourbook.common.color.ColorUtil;
 import net.tourbook.common.color.IGradientColors;
 import net.tourbook.common.color.IMapColorProvider;
 import net.tourbook.common.color.MapColorId;
-import net.tourbook.common.color.MapLegendImageConfig;
+import net.tourbook.common.color.MapUnitsConfiguration;
 import net.tourbook.common.util.SWTPopupOverAWT;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
@@ -1493,7 +1493,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 
 			final IGradientColors gradientColorProvider = (IGradientColors) colorProvider;
 
-			final MapLegendImageConfig legendImageConfig = gradientColorProvider.getMapLegendImageConfig();
+			final MapUnitsConfiguration legendImageConfig = gradientColorProvider.getMapUnitsConfiguration();
 			final float legendMinValue = legendImageConfig.legendMinValue;
 
 			float graphValue = legendMinValue;

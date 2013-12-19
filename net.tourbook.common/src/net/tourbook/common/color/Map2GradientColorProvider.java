@@ -26,7 +26,7 @@ public class Map2GradientColorProvider extends MapGradientColorProvider implemen
 
 	private Map2ColorProfile		_map2ColorProfile;
 
-	private MapLegendImageConfig	_mapLegendImageConfig	= new MapLegendImageConfig();
+	private MapUnitsConfiguration	_mapUnitsConfig	= new MapUnitsConfiguration();
 
 	/**
 	 * Contructor for a 2D color profile {@link Map2ColorProfile}.
@@ -41,6 +41,78 @@ public class Map2GradientColorProvider extends MapGradientColorProvider implemen
 		_map2ColorProfile = new Map2ColorProfile();
 	}
 
+	/**
+	 * Set legend values from a dataserie
+	 * 
+	 * @param legendHeight
+	 * @param dataSerie
+	 * @param legendProvider
+	 * @param unitText
+	 */
+	@Override
+	public void configureColorProvider(	final int legendHeight,
+										float minValue,
+										float maxValue,
+										final String unitText,
+										final LegendUnitFormat unitFormat) {
+
+		/*
+		 * enforce min/max values, another option is necessary in the pref dialog to not enforce
+		 * min/max values
+		 */
+		if (_map2ColorProfile.isMinValueOverwrite()) {
+			minValue = _map2ColorProfile.getOverwriteMinValue();
+
+			if (unitFormat == LegendUnitFormat.Pace) {
+				// adjust value from minutes->seconds
+				minValue *= 60;
+			}
+		}
+		if (_map2ColorProfile.isMaxValueOverwrite()) {
+			maxValue = _map2ColorProfile.getOverwriteMaxValue();
+
+			if (unitFormat == LegendUnitFormat.Pace) {
+				// adjust value from minutes->seconds
+				maxValue *= 60;
+			}
+		}
+
+		// ensure max is larger than min
+		if (maxValue <= minValue) {
+			maxValue = minValue + 1;
+		}
+
+		final List<Float> legendUnits = getLegendUnits(legendHeight, minValue, maxValue, unitFormat);
+
+		if (legendUnits.size() > 0) {
+
+			final Float legendMinValue = legendUnits.get(0);
+			final Float legendMaxValue = legendUnits.get(legendUnits.size() - 1);
+
+			_mapUnitsConfig.units = legendUnits;
+			_mapUnitsConfig.unitText = unitText;
+			_mapUnitsConfig.legendMinValue = legendMinValue;
+			_mapUnitsConfig.legendMaxValue = legendMaxValue;
+
+			/*
+			 * set color configuration, each tour has a different altitude config
+			 */
+
+			final float diffMinMax = legendMaxValue - legendMinValue;
+			final float diffMinMax2 = diffMinMax / 2;
+			final float diffMinMax10 = diffMinMax / 10;
+			final float midValueAbsolute = legendMinValue + diffMinMax2;
+
+			final ColorValue[] valueColors = _map2ColorProfile.getColorValues();
+
+			valueColors[0].value = legendMinValue + diffMinMax10;
+			valueColors[1].value = legendMinValue + diffMinMax2 / 2;
+			valueColors[2].value = midValueAbsolute;
+			valueColors[3].value = legendMaxValue - diffMinMax2 / 2;
+			valueColors[4].value = legendMaxValue - diffMinMax10;
+		}
+	}
+
 	@Override
 	public int getColorValue(final float graphValue) {
 
@@ -53,7 +125,7 @@ public class Map2GradientColorProvider extends MapGradientColorProvider implemen
 		final float maxBrightnessFactor = _map2ColorProfile.getMaxBrightnessFactor() / 100.0f;
 
 		/*
-		 * find the valueColor for the current value
+		 * find the ColorValue for the current value
 		 */
 		ColorValue valueColor;
 		ColorValue minValueColor = null;
@@ -84,7 +156,7 @@ public class Map2GradientColorProvider extends MapGradientColorProvider implemen
 			blue = valueColor.blue;
 
 			final float minValue = valueColor.value;
-			final float minDiff = _mapLegendImageConfig.legendMinValue - minValue;
+			final float minDiff = _mapUnitsConfig.legendMinValue - minValue;
 
 			final float ratio = minDiff == 0 ? 1 : (graphValue - minValue) / minDiff;
 			final float dimmRatio = minBrightnessFactor * ratio;
@@ -112,7 +184,7 @@ public class Map2GradientColorProvider extends MapGradientColorProvider implemen
 			blue = valueColor.blue;
 
 			final float maxValue = valueColor.value;
-			final float maxDiff = _mapLegendImageConfig.legendMaxValue - maxValue;
+			final float maxDiff = _mapUnitsConfig.legendMaxValue - maxValue;
 
 			final float ratio = maxDiff == 0 ? 1 : (graphValue - maxValue) / maxDiff;
 			final float dimmRatio = maxBrightnessFactor * ratio;
@@ -162,6 +234,7 @@ public class Map2GradientColorProvider extends MapGradientColorProvider implemen
 		blue = (255 <= maxBlue) ? 255 : maxBlue;
 
 		final int graphColor = ((red & 0xFF) << 0) | ((green & 0xFF) << 8) | ((blue & 0xFF) << 16);
+
 		return graphColor;
 	}
 
@@ -174,8 +247,8 @@ public class Map2GradientColorProvider extends MapGradientColorProvider implemen
 		return _map2ColorProfile;
 	}
 
-	public MapLegendImageConfig getMapLegendImageConfig() {
-		return _mapLegendImageConfig;
+	public MapUnitsConfiguration getMapUnitsConfiguration() {
+		return _mapUnitsConfig;
 	}
 
 	@Override
@@ -210,77 +283,6 @@ public class Map2GradientColorProvider extends MapGradientColorProvider implemen
 
 			_map2ColorProfile.setOverwriteMinValue(map2ColorProfile.getOverwriteMinValue());
 			_map2ColorProfile.setOverwriteMaxValue(map2ColorProfile.getOverwriteMaxValue());
-		}
-	}
-
-	/**
-	 * Set legend values from a dataserie
-	 * 
-	 * @param legendHeight
-	 * @param dataSerie
-	 * @param legendProvider
-	 * @param unitText
-	 */
-	@Override
-	public void setMapConfigValues(	final int legendHeight,
-									float minValue,
-									float maxValue,
-									final String unitText,
-									final LegendUnitFormat unitFormat) {
-
-		/*
-		 * enforce min/max values, another option is necessary in the pref dialog to not enforce
-		 * min/max values
-		 */
-		if (_map2ColorProfile.isMinValueOverwrite()) {
-			minValue = _map2ColorProfile.getOverwriteMinValue();
-
-			if (unitFormat == LegendUnitFormat.Pace) {
-				// adjust value from minutes->seconds
-				minValue *= 60;
-			}
-		}
-		if (_map2ColorProfile.isMaxValueOverwrite()) {
-			maxValue = _map2ColorProfile.getOverwriteMaxValue();
-
-			if (unitFormat == LegendUnitFormat.Pace) {
-				// adjust value from minutes->seconds
-				maxValue *= 60;
-			}
-		}
-
-		if (maxValue < minValue) {
-			maxValue = minValue + 1;
-		}
-
-		final List<Float> legendUnits = getLegendUnits(legendHeight, minValue, maxValue, unitFormat);
-
-		if (legendUnits.size() > 0) {
-
-			final Float legendMinValue = legendUnits.get(0);
-			final Float legendMaxValue = legendUnits.get(legendUnits.size() - 1);
-
-			_mapLegendImageConfig.units = legendUnits;
-			_mapLegendImageConfig.unitText = unitText;
-			_mapLegendImageConfig.legendMinValue = legendMinValue;
-			_mapLegendImageConfig.legendMaxValue = legendMaxValue;
-
-			/*
-			 * set color configuration, each tour has a different altitude config
-			 */
-
-			final float diffMinMax = legendMaxValue - legendMinValue;
-			final float diffMinMax2 = diffMinMax / 2;
-			final float diffMinMax10 = diffMinMax / 10;
-			final float midValueAbsolute = legendMinValue + diffMinMax2;
-
-			final ColorValue[] valueColors = _map2ColorProfile.getColorValues();
-
-			valueColors[0].value = legendMinValue + diffMinMax10;
-			valueColors[1].value = legendMinValue + diffMinMax2 / 2;
-			valueColors[2].value = midValueAbsolute;
-			valueColors[3].value = legendMaxValue - diffMinMax2 / 2;
-			valueColors[4].value = legendMaxValue - diffMinMax10;
 		}
 	}
 

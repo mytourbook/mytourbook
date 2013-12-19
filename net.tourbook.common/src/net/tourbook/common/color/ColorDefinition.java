@@ -22,6 +22,9 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferenceConverter;
 import org.eclipse.swt.graphics.RGB;
 
+/**
+ * Contains all color for one graph type.
+ */
 public class ColorDefinition {
 
 	private final IPreferenceStore	_commonPrefStore	= CommonActivator.getPrefStore();
@@ -47,9 +50,13 @@ public class ColorDefinition {
 	private RGB						_textColorDefault;
 	private RGB						_textColorNew;
 
-	private Map2ColorProfile		_mapColor;
-	private Map2ColorProfile		_defaultMapColor;
-	private Map2ColorProfile		_newMapColor;
+	/*
+	 * One color definition contains different profiles which are used depending on the current
+	 * situation.
+	 */
+	private Map2ColorProfile		_mapColorProfile;
+	private Map2ColorProfile		_mapColorProfile_Default;
+	private Map2ColorProfile		_mapColorProfile_New;
 
 	/**
 	 * Sets the color for the default, current and changes
@@ -66,7 +73,7 @@ public class ColorDefinition {
 	 *            default line color
 	 * @param defaultTextColor
 	 *            default text color
-	 * @param defaultMapColor
+	 * @param defaultMapColorProfile
 	 *            Map color configuration or <code>null</code> when not available.
 	 */
 	protected ColorDefinition(	final String prefName,
@@ -75,7 +82,7 @@ public class ColorDefinition {
 								final RGB defaultGradientDark,
 								final RGB defaultLineColor,
 								final RGB defaultTextColor,
-								final Map2ColorProfile defaultMapColor) {
+								final Map2ColorProfile defaultMapColorProfile) {
 
 		_prefName = prefName;
 		_visibleName = visibleName;
@@ -85,7 +92,7 @@ public class ColorDefinition {
 		_lineColorDefault = defaultLineColor;
 		_textColorDefault = defaultTextColor;
 
-		_defaultMapColor = defaultMapColor;
+		_mapColorProfile_Default = defaultMapColorProfile;
 
 		final String graphPrefName = getGraphPrefName();
 
@@ -134,11 +141,6 @@ public class ColorDefinition {
 		_textColorNew = _textColor;
 	}
 
-	public void dumpAsJava() {
-		// TODO Auto-generated method stub
-
-	}
-
 	@Override
 	public boolean equals(final Object obj) {
 
@@ -177,7 +179,7 @@ public class ColorDefinition {
 	}
 
 	public Map2ColorProfile getDefaultMapColor() {
-		return _defaultMapColor;
+		return _mapColorProfile_Default;
 	}
 
 	public RGB getDefaultTextColor() {
@@ -209,7 +211,7 @@ public class ColorDefinition {
 	}
 
 	public Map2ColorProfile getMapColor() {
-		return _mapColor;
+		return _mapColorProfile;
 	}
 
 	public RGB getNewGradientBright() {
@@ -225,7 +227,7 @@ public class ColorDefinition {
 	}
 
 	public Map2ColorProfile getNewMapColor() {
-		return _newMapColor;
+		return _mapColorProfile_New;
 	}
 
 	public RGB getNewTextColor() {
@@ -273,8 +275,8 @@ public class ColorDefinition {
 		_lineColor = lineColor;
 	}
 
-	public void setMapColor(final Map2ColorProfile mapColor) {
-		_mapColor = mapColor;
+	public void setMapColorProfile(final Map2ColorProfile mapColor) {
+		_mapColorProfile = mapColor;
 	}
 
 	public void setNewGradientBright(final RGB newGradientBright) {
@@ -290,7 +292,7 @@ public class ColorDefinition {
 	}
 
 	public void setNewMapColor(final Map2ColorProfile newMapColor) {
-		_newMapColor = newMapColor;
+		_mapColorProfile_New = newMapColor;
 	}
 
 	public void setNewTextColor(final RGB _textColorNew) {

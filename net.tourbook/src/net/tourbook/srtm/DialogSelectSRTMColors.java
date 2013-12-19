@@ -491,7 +491,7 @@ public class DialogSelectSRTMColors extends TitleAreaDialog implements IProfileC
 	 */
 	private void createUI_70_VertexFieds() {
 
-		final ArrayList<RGBVertex> rgbVerticies = getVertexImage().getRgbVerticies();
+		final ArrayList<RGBVertex> rgbVerticies = getVertexImage().getRgbVertices();
 
 		final int vertexSize = rgbVerticies.size();
 		if (vertexSize == 0) {
@@ -668,7 +668,7 @@ public class DialogSelectSRTMColors extends TitleAreaDialog implements IProfileC
 
 		// remove buttons
 
-		final ArrayList<RGBVertex> rgbVerticies = getVertexImage().getRgbVerticies();
+		final ArrayList<RGBVertex> rgbVerticies = getVertexImage().getRgbVertices();
 		final int vertexSize = rgbVerticies.size();
 
 		int checked = 0;
@@ -713,7 +713,7 @@ public class DialogSelectSRTMColors extends TitleAreaDialog implements IProfileC
 		 */
 		final LinkedHashSet<RGB> profileColors = new LinkedHashSet<RGB>();
 
-		for (final RGBVertex rgbVertex : getVertexImage().getRgbVerticies()) {
+		for (final RGBVertex rgbVertex : getVertexImage().getRgbVertices()) {
 			profileColors.add(rgbVertex.getRGB());
 		}
 
@@ -868,7 +868,7 @@ public class DialogSelectSRTMColors extends TitleAreaDialog implements IProfileC
 				/*
 				 * check if elevation is already available, they will be ignored
 				 */
-				for (final RGBVertex vertex : rgbVertexImage.getRgbVerticies()) {
+				for (final RGBVertex vertex : rgbVertexImage.getRgbVertices()) {
 					if (vertex.getValue() == elevation) {
 						isNewEle = false;
 						break;
@@ -962,7 +962,7 @@ public class DialogSelectSRTMColors extends TitleAreaDialog implements IProfileC
 
 //		final ArrayList<RGBVertex> rgbVerticies = _dialogProfile.getRgbVertexImage().getRgbVerticies();
 
-		final int rgbVertexListSize = getVertexImage().getRgbVerticies().size();
+		final int rgbVertexListSize = getVertexImage().getRgbVertices().size();
 
 		final ArrayList<RGBVertex> newRgbVerticies = new ArrayList<RGBVertex>();
 

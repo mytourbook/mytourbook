@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -30,8 +30,8 @@ import net.tourbook.common.color.IGradientColors;
 import net.tourbook.common.color.Map2ColorProfile;
 import net.tourbook.common.color.Map2GradientColorProvider;
 import net.tourbook.common.color.MapColorId;
-import net.tourbook.common.color.MapLegendImageConfig;
-import net.tourbook.map2.view.DialogMappingColor;
+import net.tourbook.common.color.MapUnitsConfiguration;
+import net.tourbook.map2.view.DialogMap2ColorEditor;
 import net.tourbook.map2.view.IMapColorUpdater;
 import net.tourbook.ui.UI;
 
@@ -75,6 +75,12 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 public class PrefPageAppearanceColors extends PreferencePage implements IWorkbenchPreferencePage, IColorTreeViewer,
 		IMapColorUpdater {
 
+	/*
+	 * Legend is created with dummy values 0...200.
+	 */
+	private static final int			LEGEND_MIN_VALUE		= 0;
+	private static final int			LEGEND_MAX_VALUE		= 200;
+
 	private static ColorValue[]			_legendImageColors		= new ColorValue[] {
 			new ColorValue(10, 255, 0, 0),
 			new ColorValue(50, 100, 100, 0),
@@ -82,7 +88,13 @@ public class PrefPageAppearanceColors extends PreferencePage implements IWorkben
 			new ColorValue(150, 0, 100, 100),
 			new ColorValue(190, 0, 0, 255)						};
 
-	private static final List<Float>	_legendImageUnitValues	= Arrays.asList(10f, 50f, 100f, 150f, 190f);
+	private static final List<Float>	_legendImageUnitValues	= Arrays.asList(//
+																		10f,
+																		50f,
+																		100f,
+																		150f,
+																		190f);
+
 	private static final List<String>	_legendImageUnitLabels	= Arrays.asList(
 																		Messages.Pref_ChartColors_unit_min,
 																		Messages.Pref_ChartColors_unit_low,
@@ -104,7 +116,7 @@ public class PrefPageAppearanceColors extends PreferencePage implements IWorkben
 	private ColorDefinition				_expandedItem;
 
 	private IGradientColors				_legendImageColorProvider;
-	private DialogMappingColor			_dialogMappingColor;
+	private DialogMap2ColorEditor			_dialogMappingColor;
 	private GraphColorPainter			_graphColorPainter;
 
 	/**
@@ -168,12 +180,14 @@ public class PrefPageAppearanceColors extends PreferencePage implements IWorkben
 		colorProfile.setColorValues(_legendImageColors);
 
 		// update legend configuations
-		final MapLegendImageConfig legendConfig = colorProvider.getMapLegendImageConfig();
+		final MapUnitsConfiguration legendConfig = colorProvider.getMapUnitsConfiguration();
+
 		legendConfig.units = _legendImageUnitValues;
 		legendConfig.unitLabels = _legendImageUnitLabels;
 		legendConfig.unitText = UI.EMPTY_STRING;
-		legendConfig.legendMinValue = 0;
-		legendConfig.legendMaxValue = 200;
+
+		legendConfig.legendMinValue = LEGEND_MIN_VALUE;
+		legendConfig.legendMaxValue = LEGEND_MAX_VALUE;
 
 		return colorProvider;
 	}
@@ -463,7 +477,7 @@ public class PrefPageAppearanceColors extends PreferencePage implements IWorkben
 
 		_legendImageColorProvider = createLegendImageColorProvider();
 
-		_dialogMappingColor = new DialogMappingColor(
+		_dialogMappingColor = new DialogMap2ColorEditor(
 				Display.getCurrent().getActiveShell(),
 				_legendImageColorProvider,
 				this);

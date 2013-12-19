@@ -50,7 +50,7 @@ public class SRTMProfileImage extends ProfileImage implements Cloneable {
 		 */
 		final GC gc = new GC(profileImage);
 
-		final ArrayList<RGBVertex> rgbVertices = getRgbVerticies();
+		final ArrayList<RGBVertex> rgbVertices = getRgbVertices();
 
 		final long maxValue = rgbVertices.size() == 0 //
 				? MAX_VERTICES_VALUE
@@ -151,9 +151,7 @@ public class SRTMProfileImage extends ProfileImage implements Cloneable {
 	@Override
 	public int getRGB(final long value) {
 
-		checkVerticesArray();
-		
-		final RGBVertex[] vertexArray = getRgbVertexArray();
+		final RGBVertex[] vertexArray = getRgbVerticesArray();
 
 		final int vertexSize = vertexArray.length;
 

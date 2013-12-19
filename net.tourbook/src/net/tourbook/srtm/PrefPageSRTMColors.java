@@ -1591,7 +1591,7 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 						profile.getShadowValue(),
 						profile.getResolution());
 
-				for (final RGBVertex vertex : profile.getRgbVertexImage().getRgbVerticies()) {
+				for (final RGBVertex vertex : profile.getRgbVertexImage().getRgbVertices()) {
 
 					final RGB rgb = vertex.getRGB();
 

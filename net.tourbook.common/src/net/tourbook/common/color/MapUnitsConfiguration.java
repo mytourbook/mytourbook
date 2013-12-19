@@ -20,9 +20,9 @@ import java.util.List;
 import net.tourbook.common.UI;
 
 /**
- * Configuration for the map legend to visualize one unit in a tour.
+ * Configuration for the units in a map color provider.
  */
-public class MapLegendImageConfig {
+public class MapUnitsConfiguration {
 
 	public float			legendMinValue;
 	public float			legendMaxValue;
@@ -42,9 +42,8 @@ public class MapLegendImageConfig {
 	@Override
 	public String toString() {
 		final int maxLen = 10;
-		return String.format(
-				"\n" //$NON-NLS-1$
-						+ "MapLegendImageConfig\n" //$NON-NLS-1$
+		return String.format("\n" //$NON-NLS-1$
+				+ "MapUnitsConfiguration\n" //$NON-NLS-1$
 				+ "   legendMinValue		=%s\n" //$NON-NLS-1$
 				+ "   legendMaxValue		=%s\n" //$NON-NLS-1$
 				+ "   units					=%s\n" //$NON-NLS-1$
