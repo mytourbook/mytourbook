@@ -72,25 +72,18 @@ public class Messages extends NLS {
 
 	public static String		Map3_Dialog_OpenGLVersion_Title;
 
-	public static String	Map3Color_Dialog_Button_Add;
+	public static String		Map3Color_Dialog_Button_Add;
+	public static String		Map3Color_Dialog_Button_Apply;
+	public static String	Map3Color_Dialog_Button_Label_GraphType;
 
-	public static String	Map3Color_Dialog_Button_Apply;
-
-	public static String	Map3Color_Dialog_Button_Label_ProfileName;
-
-	public static String	Map3Color_Dialog_Button_Remove;
-
-	public static String	Map3Color_Dialog_Button_Save;
-
-	public static String	Map3Color_Dialog_Button_Sort;
-
-	public static String	Map3Color_Dialog_Checkbox_Delete_Tooltip;
-
-	public static String	Map3Color_Dialog_Message;
-
-	public static String	Map3Color_Dialog_ProfileColor_Tooltip;
-
-	public static String	Map3Color_Dialog_Title;
+	public static String		Map3Color_Dialog_Button_Label_ProfileName;
+	public static String		Map3Color_Dialog_Button_Remove;
+	public static String		Map3Color_Dialog_Button_Save;
+	public static String		Map3Color_Dialog_Button_Sort;
+	public static String		Map3Color_Dialog_Checkbox_Delete_Tooltip;
+	public static String		Map3Color_Dialog_Message;
+	public static String		Map3Color_Dialog_ProfileColor_Tooltip;
+	public static String		Map3Color_Dialog_Title;
 
 	public static String		Prop_Viewer_Label_AltitudeRange_Tooltip;
 

@@ -25,8 +25,8 @@ import java.util.LinkedHashSet;
 
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
-import net.tourbook.common.color.RGBVertex;
 import net.tourbook.common.color.ProfileImage;
+import net.tourbook.common.color.RGBVertex;
 import net.tourbook.common.widgets.ColorChooser;
 import net.tourbook.common.widgets.IProfileColors;
 import net.tourbook.common.widgets.ImageCanvas;
@@ -909,7 +909,7 @@ public class DialogSelectSRTMColors extends TitleAreaDialog implements IProfileC
 			}
 		}
 
-		rgbVertexImage.removeVertices(vertexRemoveIndex);
+		rgbVertexImage.removeVerticesByIndex(vertexRemoveIndex);
 
 		createUI_70_VertexFieds();
 		paintProfileImage();

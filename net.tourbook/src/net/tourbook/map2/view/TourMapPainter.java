@@ -163,35 +163,39 @@ public class TourMapPainter extends MapPainter {
 	 * 
 	 * @param display
 	 * @param colorProvider
-	 * @param legendWidth
-	 * @param legendHeight
+	 * @param legendImageWidth
+	 * @param legendImageHeight
 	 * @return
 	 */
 	public static Image createMapLegendImage(	final Display display,
 												final IGradientColors colorProvider,
-												final int legendWidth,
-												final int legendHeight) {
+												final int legendImageWidth,
+												final int legendImageHeight) {
 
-		final RGB rgbTransparent = new RGB(0xfe, 0xfe, 0xfe);
+		/*
+		 * Use a color which is likely not used, the previous color 0xfefefe was used and had bad
+		 * effects.
+		 */
+		final RGB rgbTransparent = new RGB(0xfa, 0xfb, 0xfc);
 
 		final ImageData overlayImageData = new ImageData(//
-				legendWidth,
-				legendHeight,
+				legendImageWidth,
+				legendImageHeight,
 				24,
 				new PaletteData(0xff, 0xff00, 0xff0000));
 
 		overlayImageData.transparentPixel = overlayImageData.palette.getPixel(rgbTransparent);
 
 		final Image image = new Image(display, overlayImageData);
-		final Rectangle imageBounds = image.getBounds();
+		final Rectangle legendImageBounds = image.getBounds();
 
 		final Color transparentColor = new Color(display, rgbTransparent);
 		final GC gc = new GC(image);
 		{
 			gc.setBackground(transparentColor);
-			gc.fillRectangle(imageBounds);
+			gc.fillRectangle(legendImageBounds);
 
-			drawMapLegend(gc, imageBounds, colorProvider, true);
+			drawMapLegend(gc, legendImageBounds, colorProvider, true);
 		}
 		gc.dispose();
 		transparentColor.dispose();
@@ -246,7 +250,7 @@ public class TourMapPainter extends MapPainter {
 	}
 
 	private static void drawLegendGradientColors_SWT(	final GC gc,
-														final Rectangle legendBounds,
+														final Rectangle legendImageBounds,
 														final IGradientColors colorProvider,
 														final boolean isDrawVertical) {
 
@@ -256,6 +260,10 @@ public class TourMapPainter extends MapPainter {
 		if (legendImageConfig.units == null) {
 			return;
 		}
+
+		// debug: draw background
+//		gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WHITE));
+//		gc.fillRectangle(legendImageBounds);
 
 		final Device display = gc.getDevice();
 
@@ -271,8 +279,8 @@ public class TourMapPainter extends MapPainter {
 
 		Rectangle legendBorder;
 
-		int legendPositionX;
-		int legendPositionY;
+		int devX;
+		int devY;
 		int legendWidth;
 		int legendHeight;
 		int availableLegendPixels;
@@ -281,37 +289,45 @@ public class TourMapPainter extends MapPainter {
 
 			// vertical legend
 
-			legendPositionX = legendBounds.x + 1;
-			legendPositionY = legendBounds.y + IMapColorProvider.LEGEND_MARGIN_TOP_BOTTOM;
+			final int borderWidth = IMapColorProvider.LEGEND_IMAGE_BORDER_WIDTH;
+			final int marginTopBottom = IMapColorProvider.LEGEND_MARGIN_TOP_BOTTOM;
+
+			devX = borderWidth;
+			devY = marginTopBottom + borderWidth;
+
 			legendWidth = IMapColorProvider.DEFAULT_LEGEND_GRAPHIC_WIDTH;
-			legendHeight = legendBounds.height - 2 * IMapColorProvider.LEGEND_MARGIN_TOP_BOTTOM;
+			legendHeight = legendImageBounds.height - 2 * marginTopBottom - 2 * borderWidth;
 
-			availableLegendPixels = legendHeight - 1;
+			availableLegendPixels = legendHeight - 0;
 
-			legendBorder = new Rectangle(legendPositionX - 1, //
-					legendPositionY - 1,
-					legendWidth + 1,
-					legendHeight + 1);
+			legendBorder = new Rectangle(devX - borderWidth, //
+					devY - borderWidth,
+					legendWidth + borderWidth,
+					legendHeight + 2 * borderWidth + 0);
 
 		} else {
 
 			// horizontal legend
 
-			legendPositionX = legendBounds.x + 1;
-			legendPositionY = legendBounds.y + 1;
-			legendWidth = legendBounds.width - 1;
-			legendHeight = legendBounds.height;
+			devX = 1;
+			devY = 1;
+
+			legendWidth = legendImageBounds.width - 1;
+			legendHeight = legendImageBounds.height;
 
 			availableLegendPixels = legendWidth - 1;
 
-			legendBorder = legendBounds;
+			legendBorder = legendImageBounds;
 		}
 
 		// pixelValue contains the value for ONE pixel
 		final float pixelValue = legendDiffValue / availableLegendPixels;
 
+		final float roundingValue = pixelValue / 100;
+
 		// draw border around the colors
 		final Color borderColor = display.getSystemColor(SWT.COLOR_GRAY);
+//		final Color borderColor = display.getSystemColor(SWT.COLOR_RED);
 		gc.setForeground(borderColor);
 		gc.drawRectangle(legendBorder);
 
@@ -324,15 +340,17 @@ public class TourMapPainter extends MapPainter {
 
 		final Color textBorderColor = new Color(display, 0xF1, 0xEE, 0xE8);
 
-		for (int pixelIndex = 0; pixelIndex <= availableLegendPixels; pixelIndex++) {
+		for (int pixelIndex = 0; pixelIndex < availableLegendPixels + 1; pixelIndex++) {
 
 			legendValue = legendMinValue + pixelValue * pixelIndex;
+			;
 
-			int valuePosition;
+			int devValue;
+
 			if (isDrawVertical) {
-				valuePosition = legendPositionY + availableLegendPixels - pixelIndex;
+				devValue = devY + availableLegendPixels - pixelIndex;
 			} else {
-				valuePosition = legendPositionX + availableLegendPixels - pixelIndex;
+				devValue = devX + availableLegendPixels - pixelIndex;
 			}
 
 			/*
@@ -343,8 +361,12 @@ public class TourMapPainter extends MapPainter {
 
 				// find a unit which corresponds to the current legend value
 
+				// Rounding value is necessary otherwise the uppermost unit is sometimes not drawn.
+				final float legendUnitValue = legendValue + roundingValue;
+
 				for (final Float unitValue : legendUnits) {
-					if (legendValue >= unitValue) {
+
+					if (legendUnitValue >= unitValue) {
 
 						/*
 						 * get unit label
@@ -377,10 +399,10 @@ public class TourMapPainter extends MapPainter {
 						gc.setForeground(legendTextColor);
 						gc.setBackground(legendTextBackgroundColor);
 
-						gc.drawLine(legendWidth, valuePosition, legendWidth + 5, valuePosition);
+						gc.drawLine(legendWidth + 3, devValue, legendWidth + 5, devValue);
 
 						final int devXText = legendWidth + 10;
-						final int devYText = valuePosition - valueTextExtent.y / 2;
+						final int devYText = devValue - valueTextExtent.y / 2;
 
 						gc.setForeground(textBorderColor);
 						gc.drawText(valueText, devXText - 1, devYText, true);
@@ -412,15 +434,14 @@ public class TourMapPainter extends MapPainter {
 
 				// vertial legend
 
-				gc.drawLine(legendPositionX, valuePosition, legendWidth, valuePosition);
+				gc.drawLine(devX, devValue, legendWidth, devValue);
 
 			} else {
 
 				// horizontal legend
 
-				gc.drawLine(valuePosition, legendPositionY, valuePosition, legendHeight);
+				gc.drawLine(devValue, devY, devValue, legendHeight);
 			}
-
 		}
 
 		_colorCache.dispose();
@@ -431,19 +452,19 @@ public class TourMapPainter extends MapPainter {
 	 * Draws map legend colors into the legend bounds.
 	 * 
 	 * @param gc
-	 * @param legendBounds
+	 * @param legendImageBounds
 	 * @param colorProvider
 	 * @param isDrawVertical
 	 *            When <code>true</code> the legend is drawn vertically otherwise it's drawn
 	 *            horizontally.
 	 */
 	public static void drawMapLegend(	final GC gc,
-										final Rectangle legendBounds,
+										final Rectangle legendImageBounds,
 										final IMapColorProvider colorProvider,
 										final boolean isDrawVertical) {
 
 		if (colorProvider instanceof IGradientColors) {
-			drawLegendGradientColors_SWT(gc, legendBounds, (IGradientColors) colorProvider, isDrawVertical);
+			drawLegendGradientColors_SWT(gc, legendImageBounds, (IGradientColors) colorProvider, isDrawVertical);
 		}
 	}
 

@@ -124,12 +124,11 @@ public class DialogMap2ColorEditor extends TitleAreaDialog {
 				doLiveUpdate();
 			}
 		};
-
 	}
 
 	public DialogMap2ColorEditor(	final Shell parentShell,
-								final IGradientColors colorProvider,
-								final IMapColorUpdater mapColorUpdater) {
+									final IGradientColors colorProvider,
+									final IMapColorUpdater mapColorUpdater) {
 
 		super(parentShell);
 
@@ -232,12 +231,15 @@ public class DialogMap2ColorEditor extends TitleAreaDialog {
 		 * dialog container
 		 */
 		final Composite dlgContainer = new Composite(parent, SWT.NONE);
-		GridLayoutFactory.swtDefaults().extendedMargins(10, 10, 5, 5).numColumns(3).applyTo(dlgContainer);
+		GridLayoutFactory.swtDefaults()//
+				.extendedMargins(10, 10, 5, 5)
+				.numColumns(3)
+				.applyTo(dlgContainer);
 		GridDataFactory.fillDefaults().grab(true, true).applyTo(dlgContainer);
 //		dlgContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
 		{
-			createUI10Legend(dlgContainer);
-			createUI20LegendColorSelector(dlgContainer);
+			createUI_10_Legend(dlgContainer);
+			createUI_20_LegendColorSelector(dlgContainer);
 
 			// value container
 			final Composite valueContainer = new Composite(dlgContainer, SWT.NONE);
@@ -247,7 +249,6 @@ public class DialogMap2ColorEditor extends TitleAreaDialog {
 			{
 				createUI_30_MinMaxValue(valueContainer);
 				createUI_40_Brightness(valueContainer);
-
 				createUI_50_Apply(valueContainer);
 
 // this is not yet implemented
@@ -256,205 +257,7 @@ public class DialogMap2ColorEditor extends TitleAreaDialog {
 		}
 	}
 
-	private void createUI_30_MinMaxValue(final Composite parent) {
-
-		final Group group = new Group(parent, SWT.NONE);
-		group.setText(Messages.legendcolor_dialog_group_minmax_value);
-		GridLayoutFactory.swtDefaults().numColumns(3).applyTo(group);
-		GridDataFactory.fillDefaults().grab(true, false).indent(0, 0).applyTo(group);
-		{
-			/*
-			 * checkbox: overwrite min value
-			 */
-			_chkForceMinValue = new Button(group, SWT.CHECK);
-			_chkForceMinValue.setText(Messages.legendcolor_dialog_chk_min_value_text);
-			_chkForceMinValue.setToolTipText(Messages.legendcolor_dialog_chk_min_value_tooltip);
-			GridDataFactory.swtDefaults().applyTo(_chkForceMinValue);
-			_chkForceMinValue.addSelectionListener(new SelectionAdapter() {
-				@Override
-				public void widgetSelected(final SelectionEvent e) {
-					enableControls();
-					validateFields();
-				}
-			});
-
-			/*
-			 * input: min value
-			 */
-			_lblMinValue = new Label(group, SWT.NONE);
-			_lblMinValue.setText(Messages.legendcolor_dialog_txt_min_value);
-			GridDataFactory.fillDefaults().indent(20, 0).align(SWT.FILL, SWT.CENTER).applyTo(_lblMinValue);
-
-			_spinMinValue = new Spinner(group, SWT.BORDER);
-			_spinMinValue.setMinimum(SPINNER_MIN_VALUE);
-			_spinMinValue.setMaximum(SPINNER_MAX_VALUE);
-			_spinMinValue.addSelectionListener(new SelectionAdapter() {
-				@Override
-				public void widgetSelected(final SelectionEvent e) {
-					validateFields();
-				}
-			});
-			_spinMinValue.addMouseWheelListener(new MouseWheelListener() {
-				public void mouseScrolled(final MouseEvent event) {
-					UI.adjustSpinnerValueOnMouseScroll(event);
-					validateFields();
-				}
-			});
-
-			/*
-			 * checkbox: overwrite max value
-			 */
-
-			_chkForceMaxValue = new Button(group, SWT.CHECK);
-			_chkForceMaxValue.setText(Messages.legendcolor_dialog_chk_max_value_text);
-			_chkForceMaxValue.setToolTipText(Messages.legendcolor_dialog_chk_max_value_tooltip);
-			GridDataFactory.swtDefaults().applyTo(_chkForceMaxValue);
-			_chkForceMaxValue.addSelectionListener(new SelectionAdapter() {
-				@Override
-				public void widgetSelected(final SelectionEvent e) {
-					enableControls();
-					validateFields();
-				}
-			});
-
-			/*
-			 * input: max value
-			 */
-			_lblMaxValue = new Label(group, SWT.NONE);
-			_lblMaxValue.setText(Messages.legendcolor_dialog_txt_max_value);
-			GridDataFactory.fillDefaults().indent(20, 0).align(SWT.FILL, SWT.CENTER).applyTo(_lblMaxValue);
-
-			_spinMaxValue = new Spinner(group, SWT.BORDER);
-			_spinMaxValue.setMinimum(SPINNER_MIN_VALUE);
-			_spinMaxValue.setMaximum(SPINNER_MAX_VALUE);
-			_spinMaxValue.addSelectionListener(new SelectionAdapter() {
-				@Override
-				public void widgetSelected(final SelectionEvent e) {
-					validateFields();
-				}
-			});
-			_spinMaxValue.addMouseWheelListener(new MouseWheelListener() {
-				public void mouseScrolled(final MouseEvent event) {
-					UI.adjustSpinnerValueOnMouseScroll(event);
-					validateFields();
-				}
-			});
-		}
-	}
-
-	private void createUI_40_Brightness(final Composite parent) {
-
-		Label label;
-
-		final Group group = new Group(parent, SWT.NONE);
-		group.setText(Messages.legendcolor_dialog_group_minmax_brightness);
-		GridLayoutFactory.swtDefaults().numColumns(4).applyTo(group);
-		GridDataFactory.fillDefaults().grab(true, false).indent(0, 0).applyTo(group);
-		{
-			{
-				/*
-				 * combobox: min brightness
-				 */
-
-				label = new Label(group, SWT.NONE);
-				label.setText(Messages.legendcolor_dialog_min_brightness_label);
-				label.setToolTipText(Messages.legendcolor_dialog_min_brightness_tooltip);
-
-				_cboMinBrightness = new Combo(group, SWT.DROP_DOWN | SWT.READ_ONLY);
-				_cboMinBrightness.addSelectionListener(_defaultSelectionAdapter);
-				for (final String comboLabel : MapColorProfile.BRIGHTNESS_LABELS) {
-					_cboMinBrightness.add(comboLabel);
-				}
-
-				/*
-				 * scale: min brightness factor
-				 */
-				_scaleMinBrightness = new Scale(group, SWT.NONE);
-				GridDataFactory.fillDefaults().grab(true, false).applyTo(_scaleMinBrightness);
-				_scaleMinBrightness.setMinimum(0);
-				_scaleMinBrightness.setMaximum(100);
-				_scaleMinBrightness.setPageIncrement(10);
-				_scaleMinBrightness.addSelectionListener(_defaultSelectionAdapter);
-
-				_lblMinBrightnessValue = new Label(group, SWT.NONE);
-				_lblMinBrightnessValue.setText(VALUE_SPACER);
-				_lblMinBrightnessValue.pack(true);
-			}
-
-			{
-				/*
-				 * combobox: max brightness
-				 */
-
-				label = new Label(group, SWT.NONE);
-				label.setText(Messages.legendcolor_dialog_max_brightness_label);
-				label.setToolTipText(Messages.legendcolor_dialog_max_brightness_tooltip);
-
-				_cboMaxBrightness = new Combo(group, SWT.DROP_DOWN | SWT.READ_ONLY);
-				_cboMaxBrightness.addSelectionListener(_defaultSelectionAdapter);
-				for (final String comboLabel : MapColorProfile.BRIGHTNESS_LABELS) {
-					_cboMaxBrightness.add(comboLabel);
-				}
-
-				/*
-				 * scale: max brightness factor
-				 */
-				_scaleMaxBrightness = new Scale(group, SWT.NONE);
-				GridDataFactory.fillDefaults().grab(true, false).applyTo(_scaleMaxBrightness);
-				_scaleMaxBrightness.setMinimum(0);
-				_scaleMaxBrightness.setMaximum(100);
-				_scaleMaxBrightness.setPageIncrement(10);
-				_scaleMaxBrightness.addSelectionListener(_defaultSelectionAdapter);
-
-				_lblMaxBrightnessValue = new Label(group, SWT.NONE);
-				_lblMaxBrightnessValue.setText(VALUE_SPACER);
-				_lblMaxBrightnessValue.pack(true);
-			}
-
-		}
-	}
-
-	private void createUI_50_Apply(final Composite parent) {
-
-		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults()//
-				.grab(true, true)
-				.indent(0, 20)
-				.align(SWT.FILL, SWT.END)
-				.applyTo(container);
-		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
-//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
-		{
-			/*
-			 * button: live update
-			 */
-			_chkLiveUpdate = new Button(container, SWT.CHECK);
-			GridDataFactory.fillDefaults().grab(true, false).applyTo(_chkLiveUpdate);
-			_chkLiveUpdate.setText(Messages.LegendColor_Dialog_Check_LiveUpdate);
-			_chkLiveUpdate.setToolTipText(Messages.LegendColor_Dialog_Check_LiveUpdate_Tooltip);
-			_chkLiveUpdate.addSelectionListener(new SelectionAdapter() {
-				@Override
-				public void widgetSelected(final SelectionEvent e) {
-					enableControls();
-				}
-			});
-
-			/*
-			 * button: apply
-			 */
-			_btnApply = new Button(container, SWT.NONE);
-			_btnApply.setText(Messages.App_Action_Apply);
-			_btnApply.addSelectionListener(new SelectionAdapter() {
-				@Override
-				public void widgetSelected(final SelectionEvent e) {
-					_mapColorUpdater.applyMapColors(_mapColorWorkingCopy);
-				}
-			});
-			setButtonLayoutData(_btnApply);
-		}
-	}
-
-	private void createUI10Legend(final Composite parent) {
+	private void createUI_10_Legend(final Composite parent) {
 
 		/*
 		 * legend
@@ -491,7 +294,7 @@ public class DialogMap2ColorEditor extends TitleAreaDialog {
 		});
 	}
 
-	private void createUI20LegendColorSelector(final Composite parent) {
+	private void createUI_20_LegendColorSelector(final Composite parent) {
 
 		final Composite selectorContainer = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(false, true).applyTo(selectorContainer);
@@ -590,6 +393,193 @@ public class DialogMap2ColorEditor extends TitleAreaDialog {
 					onSelectColor(_colorSelectorMin, 4);
 				}
 			});
+		}
+	}
+
+	private void createUI_30_MinMaxValue(final Composite parent) {
+
+		final Group group = new Group(parent, SWT.NONE);
+		group.setText(Messages.legendcolor_dialog_group_minmax_value);
+		GridLayoutFactory.swtDefaults().numColumns(3).applyTo(group);
+		GridDataFactory.fillDefaults().grab(true, false).indent(0, 0).applyTo(group);
+		{
+			{
+				/*
+				 * Overwrite min value
+				 */
+				_chkForceMinValue = new Button(group, SWT.CHECK);
+				_chkForceMinValue.setText(Messages.legendcolor_dialog_chk_min_value_text);
+				_chkForceMinValue.setToolTipText(Messages.legendcolor_dialog_chk_min_value_tooltip);
+				GridDataFactory.swtDefaults().applyTo(_chkForceMinValue);
+				_chkForceMinValue.addSelectionListener(new SelectionAdapter() {
+					@Override
+					public void widgetSelected(final SelectionEvent e) {
+						enableControls();
+						validateFields();
+					}
+				});
+
+				_lblMinValue = new Label(group, SWT.NONE);
+				_lblMinValue.setText(Messages.legendcolor_dialog_txt_min_value);
+				GridDataFactory.fillDefaults().indent(20, 0).align(SWT.FILL, SWT.CENTER).applyTo(_lblMinValue);
+
+				_spinMinValue = new Spinner(group, SWT.BORDER);
+				_spinMinValue.setMinimum(SPINNER_MIN_VALUE);
+				_spinMinValue.setMaximum(SPINNER_MAX_VALUE);
+				_spinMinValue.addSelectionListener(new SelectionAdapter() {
+					@Override
+					public void widgetSelected(final SelectionEvent e) {
+						validateFields();
+					}
+				});
+				_spinMinValue.addMouseWheelListener(new MouseWheelListener() {
+					public void mouseScrolled(final MouseEvent event) {
+						UI.adjustSpinnerValueOnMouseScroll(event);
+						validateFields();
+					}
+				});
+			}
+
+			{
+				/*
+				 * Overwrite max value
+				 */
+				_chkForceMaxValue = new Button(group, SWT.CHECK);
+				_chkForceMaxValue.setText(Messages.legendcolor_dialog_chk_max_value_text);
+				_chkForceMaxValue.setToolTipText(Messages.legendcolor_dialog_chk_max_value_tooltip);
+				GridDataFactory.swtDefaults().applyTo(_chkForceMaxValue);
+				_chkForceMaxValue.addSelectionListener(new SelectionAdapter() {
+					@Override
+					public void widgetSelected(final SelectionEvent e) {
+						enableControls();
+						validateFields();
+					}
+				});
+
+				_lblMaxValue = new Label(group, SWT.NONE);
+				_lblMaxValue.setText(Messages.legendcolor_dialog_txt_max_value);
+				GridDataFactory.fillDefaults().indent(20, 0).align(SWT.FILL, SWT.CENTER).applyTo(_lblMaxValue);
+
+				_spinMaxValue = new Spinner(group, SWT.BORDER);
+				_spinMaxValue.setMinimum(SPINNER_MIN_VALUE);
+				_spinMaxValue.setMaximum(SPINNER_MAX_VALUE);
+				_spinMaxValue.addSelectionListener(new SelectionAdapter() {
+					@Override
+					public void widgetSelected(final SelectionEvent e) {
+						validateFields();
+					}
+				});
+				_spinMaxValue.addMouseWheelListener(new MouseWheelListener() {
+					public void mouseScrolled(final MouseEvent event) {
+						UI.adjustSpinnerValueOnMouseScroll(event);
+						validateFields();
+					}
+				});
+			}
+		}
+	}
+
+	private void createUI_40_Brightness(final Composite parent) {
+
+		Label label;
+
+		final Group group = new Group(parent, SWT.NONE);
+		group.setText(Messages.legendcolor_dialog_group_minmax_brightness);
+		GridLayoutFactory.swtDefaults().numColumns(4).applyTo(group);
+		GridDataFactory.fillDefaults().grab(true, false).indent(0, 0).applyTo(group);
+		{
+			{
+				/*
+				 * Min brightness
+				 */
+				label = new Label(group, SWT.NONE);
+				label.setText(Messages.legendcolor_dialog_min_brightness_label);
+				label.setToolTipText(Messages.legendcolor_dialog_min_brightness_tooltip);
+
+				_cboMinBrightness = new Combo(group, SWT.DROP_DOWN | SWT.READ_ONLY);
+				_cboMinBrightness.addSelectionListener(_defaultSelectionAdapter);
+				for (final String comboLabel : MapColorProfile.BRIGHTNESS_LABELS) {
+					_cboMinBrightness.add(comboLabel);
+				}
+
+				_scaleMinBrightness = new Scale(group, SWT.NONE);
+				GridDataFactory.fillDefaults().grab(true, false).applyTo(_scaleMinBrightness);
+				_scaleMinBrightness.setMinimum(0);
+				_scaleMinBrightness.setMaximum(100);
+				_scaleMinBrightness.setPageIncrement(10);
+				_scaleMinBrightness.addSelectionListener(_defaultSelectionAdapter);
+
+				_lblMinBrightnessValue = new Label(group, SWT.NONE);
+				_lblMinBrightnessValue.setText(VALUE_SPACER);
+				_lblMinBrightnessValue.pack(true);
+			}
+
+			{
+				/*
+				 * Max brightness
+				 */
+				label = new Label(group, SWT.NONE);
+				label.setText(Messages.legendcolor_dialog_max_brightness_label);
+				label.setToolTipText(Messages.legendcolor_dialog_max_brightness_tooltip);
+
+				_cboMaxBrightness = new Combo(group, SWT.DROP_DOWN | SWT.READ_ONLY);
+				_cboMaxBrightness.addSelectionListener(_defaultSelectionAdapter);
+				for (final String comboLabel : MapColorProfile.BRIGHTNESS_LABELS) {
+					_cboMaxBrightness.add(comboLabel);
+				}
+
+				_scaleMaxBrightness = new Scale(group, SWT.NONE);
+				GridDataFactory.fillDefaults().grab(true, false).applyTo(_scaleMaxBrightness);
+				_scaleMaxBrightness.setMinimum(0);
+				_scaleMaxBrightness.setMaximum(100);
+				_scaleMaxBrightness.setPageIncrement(10);
+				_scaleMaxBrightness.addSelectionListener(_defaultSelectionAdapter);
+
+				_lblMaxBrightnessValue = new Label(group, SWT.NONE);
+				_lblMaxBrightnessValue.setText(VALUE_SPACER);
+				_lblMaxBrightnessValue.pack(true);
+			}
+
+		}
+	}
+
+	private void createUI_50_Apply(final Composite parent) {
+
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults()//
+				.grab(true, true)
+				.indent(0, 20)
+				.align(SWT.FILL, SWT.END)
+				.applyTo(container);
+		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
+		{
+			/*
+			 * button: live update
+			 */
+			_chkLiveUpdate = new Button(container, SWT.CHECK);
+			GridDataFactory.fillDefaults().grab(true, false).applyTo(_chkLiveUpdate);
+			_chkLiveUpdate.setText(Messages.LegendColor_Dialog_Check_LiveUpdate);
+			_chkLiveUpdate.setToolTipText(Messages.LegendColor_Dialog_Check_LiveUpdate_Tooltip);
+			_chkLiveUpdate.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(final SelectionEvent e) {
+					enableControls();
+				}
+			});
+
+			/*
+			 * button: apply
+			 */
+			_btnApply = new Button(container, SWT.NONE);
+			_btnApply.setText(Messages.App_Action_Apply);
+			_btnApply.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(final SelectionEvent e) {
+					_mapColorUpdater.applyMapColors(_mapColorWorkingCopy);
+				}
+			});
+			setButtonLayoutData(_btnApply);
 		}
 	}
 

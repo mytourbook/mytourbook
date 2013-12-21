@@ -70,30 +70,31 @@ import org.eclipse.ui.XMLMemento;
 
 public class ColorChooser extends Composite {
 
-	private static final int						NUMBER_OF_HORIZONTAL_COLORS			= 12;
-	private static final int						NUMBER_OF_VERTICAL_COLORS			= 4;
+	private static final int						NUMBER_OF_HORIZONTAL_COLORS				= 12;
+	private static final int						NUMBER_OF_VERTICAL_COLORS				= 4;
 
-	private static final String						STATE_COLOR_CHOOSER_CUSTOM_COLORS	= "STATE_COLOR_CHOOSER_CUSTOM_COLORS";	//$NON-NLS-1$
-	private static final String						STATE_COLOR_CHOOSER_SELECTED_COL3	= "STATE_COLOR_CHOOSER_SELECTED_COL3";	//$NON-NLS-1$
-	private static final String						STATE_COLOR_CHOOSER_SELECTED_TAB	= "STATE_COLOR_CHOOSER_SELECTED_TAB";	//$NON-NLS-1$
+	private static final String						STATE_COLOR_CHOOSER_SELECTED_COL3		= "STATE_COLOR_CHOOSER_SELECTED_COL3";		//$NON-NLS-1$
+	private static final String						STATE_COLOR_CHOOSER_SELECTED_COLOR		= "STATE_COLOR_CHOOSER_SELECTED_COLOR";	//$NON-NLS-1$
+	private static final String						STATE_COLOR_CHOOSER_SELECTED_TAB		= "STATE_COLOR_CHOOSER_SELECTED_TAB";		//$NON-NLS-1$
+	private static final String						XML_STATE_COLOR_CHOOSER_CUSTOM_COLORS	= "XML_STATE_COLOR_CHOOSER_CUSTOM_COLORS";	//$NON-NLS-1$
 
-	private static final String						TAG_CUSTOM_COLOR					= "color";								//$NON-NLS-1$
-	private static final String						ATTR_RED							= "red";								//$NON-NLS-1$
-	private static final String						ATTR_GREEN							= "green";								//$NON-NLS-1$
-	private static final String						ATTR_BLUE							= "blue";								//$NON-NLS-1$
-	private static final String						ATTR_NUMBER_OF_HORIZONTAL_COLORS	= "hColors";							//$NON-NLS-1$
-	private static final String						ATTR_NUMBER_OF_VERTICAL_COLORS		= "vColors";							//$NON-NLS-1$
-	private static final String						ATTR_POSITION_HORIZONTAL			= "hPos";								//$NON-NLS-1$
-	private static final String						ATTR_POSITION_VERTICAL				= "vPos";								//$NON-NLS-1$
+	private static final String						TAG_CUSTOM_COLOR						= "color";									//$NON-NLS-1$
+	private static final String						ATTR_RED								= "red";									//$NON-NLS-1$
+	private static final String						ATTR_GREEN								= "green";									//$NON-NLS-1$
+	private static final String						ATTR_BLUE								= "blue";									//$NON-NLS-1$
+	private static final String						ATTR_NUMBER_OF_HORIZONTAL_COLORS		= "hColors";								//$NON-NLS-1$
+	private static final String						ATTR_NUMBER_OF_VERTICAL_COLORS			= "vColors";								//$NON-NLS-1$
+	private static final String						ATTR_POSITION_HORIZONTAL				= "hPos";									//$NON-NLS-1$
+	private static final String						ATTR_POSITION_VERTICAL					= "vPos";									//$NON-NLS-1$
 
-	private static final double						A_120								= 2 * Math.PI / 3;
-	private static final double						SQRT_3								= Math.sqrt(3);
-	private static final double						TWO_DIV_SQRT_3						= 2. / SQRT_3;
+	private static final double						A_120									= 2 * Math.PI / 3;
+	private static final double						SQRT_3									= Math.sqrt(3);
+	private static final double						TWO_DIV_SQRT_3							= 2. / SQRT_3;
 
-	private static final double						SINUS_120							= Math.sin(A_120);
-	private static final double						SINUS_240							= -SINUS_120;
-	private static final double						COSINUS120							= Math.cos(A_120);
-	private static final double						COSINUS_240							= COSINUS120;
+	private static final double						SINUS_120								= Math.sin(A_120);
+	private static final double						SINUS_240								= -SINUS_120;
+	private static final double						COSINUS120								= Math.cos(A_120);
+	private static final double						COSINUS_240								= COSINUS120;
 
 	private RGB										_chooserRGB;
 	private int										_chooserSize;
@@ -109,17 +110,14 @@ public class ColorChooser extends Composite {
 	private int										_selectedValueSaturation;
 	private int										_selectedValueBrightness;
 
-	private boolean									_hexagonChangeState					= false;
+	private boolean									_hexagonChangeState						= false;
 
 	private MouseAdapter							_customColorMouseListener;
 
-	private Object									DEFAULT_COLOR_ID					= new Object();
+	private Object									DEFAULT_COLOR_ID						= new Object();
 
-	private RGB										_defaultRGB							= Display
-																								.getCurrent()
-																								.getSystemColor(
-																										SWT.COLOR_WIDGET_BACKGROUND)
-																								.getRGB();
+	private RGB										_hexagonDefaultColor;
+	private RGB										_customColorsDefaultRGB;
 
 	private IProfileColors							_profileColors;
 
@@ -136,6 +134,7 @@ public class ColorChooser extends Composite {
 	private Scale									_scaleHexagon;
 	private Spinner									_spinnerHexagon;
 
+	private Label									_lblHoveredColor;
 	private Label									_lblSelectedColor;
 	private Label[][]								_customColors;
 
@@ -153,11 +152,20 @@ public class ColorChooser extends Composite {
 	private Spinner									_spinnerSaturation;
 	private Spinner									_spinnerBrightness;
 
+	{
+		final Display display = Display.getCurrent();
+
+//		_hexagonDefaultColor = display.getSystemColor(SWT.COLOR_LIST_BACKGROUND).getRGB();
+//		_hexagonDefaultColor = display.getSystemColor(SWT.COLOR_WIDGET_BACKGROUND).getRGB();
+		_hexagonDefaultColor = new RGB(0x80, 0x80, 0x80);
+		_customColorsDefaultRGB = display.getSystemColor(SWT.COLOR_WIDGET_BACKGROUND).getRGB();
+	}
+
 	public ColorChooser(final Composite parent, final int style) {
 
 		super(parent, style);
 
-		setSize(330);
+		setHexagonSize();
 
 		initUI();
 		createUI(parent);
@@ -212,7 +220,7 @@ public class ColorChooser extends Composite {
 
 			for (int horizontalIndex = 0; horizontalIndex < NUMBER_OF_HORIZONTAL_COLORS; horizontalIndex++) {
 
-				setColorInColorLabel(_horizontalColors[horizontalIndex], _defaultRGB);
+				setColorInColorLabel(_horizontalColors[horizontalIndex], _customColorsDefaultRGB);
 			}
 		}
 	}
@@ -247,10 +255,7 @@ public class ColorChooser extends Composite {
 
 	public void chooseRGBFromHexagon(final MouseEvent e) {
 
-		final int x = e.x - _chooserRadius;
-		final int y = e.y - _chooserRadius;
-
-		_chooserRGB = getRGBFromHexagon(x, y);
+		setChooserRGB(getRgbFromHexagon(e));
 
 		updateUI();
 	}
@@ -264,30 +269,24 @@ public class ColorChooser extends Composite {
 
 	private void createUI(final Composite parent) {
 
-		GridLayoutFactory.fillDefaults().applyTo(this);
+		// force layout
+		GridLayoutFactory.fillDefaults().spacing(0, 5).applyTo(this);
+//		setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_MAGENTA));
 		{
-			createUI_10_SelectedColor(this);
-			createUI_20_Tabs(this);
+			createUI_10_Tabs(this);
+			createUI_40_SelectedColor(this);
 			createUI_50_CustomColors(this);
 		}
 
 		// set selected color
-		_chooserRGB = new RGB(_selectedValueRed, _selectedValueGreen, _selectedValueBlue);
-
-		updateUI_SelectedColor();
+		setChooserRGB(new RGB(_selectedValueRed, _selectedValueGreen, _selectedValueBlue));
 	}
 
-	private void createUI_10_SelectedColor(final Composite parent) {
-
-		// Color Label: Selected color
-		_lblSelectedColor = new Label(parent, SWT.BORDER | SWT.SHADOW_NONE);
-		GridDataFactory.fillDefaults().hint(SWT.DEFAULT, _chooserSize / 6).applyTo(_lblSelectedColor);
-		_lblSelectedColor.setToolTipText(Messages.color_chooser_choosed_color);
-	}
-
-	private void createUI_20_Tabs(final Composite parent) {
+	private void createUI_10_Tabs(final Composite parent) {
 
 		_tabFolder = new TabFolder(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(_tabFolder);
+//		_tabFolder.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
 
 		// hexagon
 		final TabItem hexagonTab = new TabItem(_tabFolder, SWT.NONE);
@@ -312,14 +311,22 @@ public class ColorChooser extends Composite {
 		GridLayoutFactory.swtDefaults().applyTo(container);
 		{
 			{
-				_hexagonCanvas = new ImageCanvas(container, SWT.NO_BACKGROUND);
-				GridDataFactory.fillDefaults().hint(_chooserSize, _chooserSize).applyTo(_hexagonCanvas);
+//				_hexagonCanvas = new ImageCanvas(container, SWT.NO_BACKGROUND);
+				_hexagonCanvas = new ImageCanvas(container, SWT.NONE);
+				GridDataFactory.fillDefaults()//
+						.hint(_chooserSize, _chooserSize)
+						.grab(true, false)
+						.align(SWT.CENTER, SWT.FILL)
+						.applyTo(_hexagonCanvas);
+				_hexagonCanvas.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
 
 				final Image hexagonImage = new Image(container.getDisplay(), _chooserSize, _chooserSize);
 				_hexagonCanvas.setImage(hexagonImage);
 
 				_hexagonCanvas.setToolTipText(Messages.color_chooser_hexagon_move);
+
 				_hexagonCanvas.addMouseListener(new MouseListener() {
+
 					public void mouseDoubleClick(final MouseEvent e) {}
 
 					public void mouseDown(final MouseEvent e) {
@@ -331,12 +338,10 @@ public class ColorChooser extends Composite {
 						_hexagonChangeState = false;
 					}
 				});
+
 				_hexagonCanvas.addMouseMoveListener(new MouseMoveListener() {
 					public void mouseMove(final MouseEvent e) {
-						if (!_hexagonChangeState) {
-							return;
-						}
-						chooseRGBFromHexagon(e);
+						onHexagonMouseMove(e);
 					}
 				});
 			}
@@ -388,7 +393,7 @@ public class ColorChooser extends Composite {
 		GridDataFactory.fillDefaults().grab(false, false).applyTo(container);
 		GridLayoutFactory.swtDefaults()//
 				.numColumns(3)
-				.spacing(5, 10)
+//				.spacing(5, 10)
 				.applyTo(container);
 //		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
 
@@ -397,7 +402,7 @@ public class ColorChooser extends Composite {
 
 			// vertical spacer
 			final Label label = new Label(container, SWT.NONE);
-			GridDataFactory.fillDefaults().span(3, 1).indent(0, 5).applyTo(label);
+			GridDataFactory.fillDefaults().span(3, 1).indent(0, 10).applyTo(label);
 
 			createUI_34_HSB(container, gd, scaleStyle);
 		}
@@ -642,7 +647,7 @@ public class ColorChooser extends Composite {
 		final Composite rgbContainer = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(rgbContainer);
 		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(rgbContainer);
-//				redContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
+//		rgbContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
 		{
 			final Label label = new Label(rgbContainer, SWT.NONE);
 			GridDataFactory.fillDefaults().grab(true, true).align(SWT.FILL, SWT.CENTER).applyTo(label);
@@ -658,14 +663,58 @@ public class ColorChooser extends Composite {
 		}
 	}
 
+	private void createUI_40_SelectedColor(final Composite parent) {
+
+		final int colorHeight = _chooserSize / 10;
+
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults()//
+				.grab(true, true)
+				.minSize(SWT.DEFAULT, SWT.DEFAULT)
+				.applyTo(container);
+		GridLayoutFactory.fillDefaults()//
+				.numColumns(2)
+				.spacing(5, 1)
+				.equalWidth(true)
+				.applyTo(container);
+		{
+			{
+				// Label: Selected color
+				Label label = new Label(container, SWT.NONE);
+				label.setText(Messages.Color_Chooser_Label_SelectedColor);
+
+				// Label: Hovered color
+				label = new Label(container, SWT.NONE);
+				label.setText(Messages.Color_Chooser_Label_HoveredColor);
+			}
+
+			{
+				// Color Label: Selected color
+				_lblSelectedColor = new Label(container, SWT.BORDER | SWT.SHADOW_NONE);
+				GridDataFactory.fillDefaults()//
+						.grab(true, true)
+						.hint(SWT.DEFAULT, colorHeight)
+						.applyTo(_lblSelectedColor);
+
+				// Color Label: Hovered color
+				_lblHoveredColor = new Label(container, SWT.BORDER | SWT.SHADOW_NONE);
+				GridDataFactory.fillDefaults()//
+						.grab(true, true)
+						.applyTo(_lblHoveredColor);
+				_lblHoveredColor.setToolTipText(Messages.Color_Chooser_HoveredColor_Tooltip);
+			}
+		}
+	}
+
 	private void createUI_50_CustomColors(final Composite parent) {
 
 		// Link: Custom colors
 		{
 			final Link linkCustomColor = new Link(parent, SWT.NONE);
-			GridDataFactory.fillDefaults().grab(true, false).indent(0, 10).applyTo(linkCustomColor);
+			GridDataFactory.fillDefaults().grab(true, false).indent(0, 0).applyTo(linkCustomColor);
 			linkCustomColor.setText(Messages.Color_Chooser_Link_CustomColors);
 			linkCustomColor.setToolTipText(Messages.Color_Chooser_Link_CustomColors_Tooltip);
+
 			linkCustomColor.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(final SelectionEvent e) {
@@ -725,6 +774,25 @@ public class ColorChooser extends Composite {
 		}
 	}
 
+	private void drawHexagon() {
+
+		final GC gc = new GC(_hexagonCanvas.getImage());
+		{
+			for (int x = -_chooserRadius; x < _chooserRadius; x++) {
+				for (int y = -_chooserRadius; y < _chooserRadius; y++) {
+
+					final Color fgColor = new Color(this.getDisplay(), getRgbFromHexagon(x, y));
+					{
+						gc.setForeground(fgColor);
+						gc.drawPoint(x + _chooserRadius, y + _chooserRadius);
+					}
+					fgColor.dispose();
+				}
+			}
+		}
+		gc.dispose();
+	}
+
 	private void fillContextMenu(final IMenuManager menuMgr) {
 
 		if (_profileColors != null) {
@@ -749,7 +817,7 @@ public class ColorChooser extends Composite {
 				// set color only when not yet set
 				if (!(colorLabel.getData() instanceof RGB)) {
 
-					setColorInColorLabel(colorLabel, _defaultRGB);
+					setColorInColorLabel(colorLabel, _customColorsDefaultRGB);
 				}
 			}
 		}
@@ -773,7 +841,7 @@ public class ColorChooser extends Composite {
 				break;
 			}
 
-			setColorInColorLabel(_customColors[vPos][hPos], _defaultRGB);
+			setColorInColorLabel(_customColors[vPos][hPos], _customColorsDefaultRGB);
 
 			colorPosCounter++;
 		}
@@ -786,10 +854,11 @@ public class ColorChooser extends Composite {
 		return _chooserRGB;
 	}
 
-	private RGB getRGBFromHexagon(final int x, final int y) {
+	private RGB getRgbFromHexagon(final int x, final int y) {
 
 		final double a = Math.atan2(y, x);
 		int sector, xr, yr;
+
 		// rotate sector to positive y
 		if (a < -A_120 || a > A_120) {
 			sector = 2;
@@ -804,12 +873,16 @@ public class ColorChooser extends Composite {
 			xr = x;
 			yr = y;
 		}
+
 		// shear sector to square in positive x to ask for the borders
 		final int xs = (int) (xr + yr / SQRT_3);
 		final int ys = (int) (yr * TWO_DIV_SQRT_3);
+
 		if (xs >= 0 && xs < _hexagonRadius && ys >= 0 && ys < _hexagonRadius) {
+
 			final int col1 = (255 * xs / _hexagonRadius);
 			final int col2 = (255 * ys / _hexagonRadius);
+
 			switch (sector) {
 			case 0:
 				return new RGB(_col3, col2, col1);
@@ -821,7 +894,15 @@ public class ColorChooser extends Composite {
 		}
 
 		// return grey
-		return new RGB(127, 127, 127);
+		return _hexagonDefaultColor;
+	}
+
+	private RGB getRgbFromHexagon(final MouseEvent event) {
+
+		final int x = event.x - _chooserRadius;
+		final int y = event.y - _chooserRadius;
+
+		return getRgbFromHexagon(x, y);
 	}
 
 	private void initUI() {
@@ -830,30 +911,12 @@ public class ColorChooser extends Composite {
 
 			@Override
 			public void mouseDown(final MouseEvent e) {
-				onMouseDown(e);
+				onColorLabelMouseDown(e);
 			}
 		};
 	}
 
-	private void onHexagonScale() {
-
-		_col3 = _scaleHexagon.getSelection();
-		_spinnerHexagon.setSelection(_col3);
-
-		paintHexagon();
-		_hexagonCanvas.redraw();
-	}
-
-	private void onHexagonSpinner() {
-
-		_col3 = _spinnerHexagon.getSelection();
-		_scaleHexagon.setSelection(_col3);
-
-		paintHexagon();
-		_hexagonCanvas.redraw();
-	}
-
-	private void onMouseDown(final MouseEvent event) {
+	private void onColorLabelMouseDown(final MouseEvent event) {
 
 		final Label colorLabel = (Label) (event.widget);
 
@@ -871,10 +934,10 @@ public class ColorChooser extends Composite {
 
 				// set default color
 
-				rgb = _defaultRGB;
+				rgb = _customColorsDefaultRGB;
 			}
 
-			_chooserRGB = rgb;
+			setChooserRGB(rgb);
 
 			updateUI();
 
@@ -886,7 +949,7 @@ public class ColorChooser extends Composite {
 
 				// set default color
 
-				setColorInColorLabel(colorLabel, _defaultRGB);
+				setColorInColorLabel(colorLabel, _customColorsDefaultRGB);
 
 			} else {
 
@@ -895,6 +958,36 @@ public class ColorChooser extends Composite {
 				setColorInColorLabel(colorLabel, _chooserRGB);
 			}
 		}
+	}
+
+	private void onHexagonMouseMove(final MouseEvent event) {
+
+		// update hovered color
+		updateUI_HoveredColor(getRgbFromHexagon(event));
+
+		if (!_hexagonChangeState) {
+			return;
+		}
+
+		chooseRGBFromHexagon(event);
+	}
+
+	private void onHexagonScale() {
+
+		_col3 = _scaleHexagon.getSelection();
+		_spinnerHexagon.setSelection(_col3);
+
+		drawHexagon();
+		_hexagonCanvas.redraw();
+	}
+
+	private void onHexagonSpinner() {
+
+		_col3 = _spinnerHexagon.getSelection();
+		_scaleHexagon.setSelection(_col3);
+
+		drawHexagon();
+		_hexagonCanvas.redraw();
 	}
 
 	private void onScaleHsbBrightness() {
@@ -981,40 +1074,24 @@ public class ColorChooser extends Composite {
 		updateUI_HSB();
 	}
 
-	private void paintHexagon() {
-
-		final GC gc = new GC(_hexagonCanvas.getImage());
-		{
-			for (int x = -_chooserRadius; x < _chooserRadius; x++) {
-				for (int y = -_chooserRadius; y < _chooserRadius; y++) {
-
-					final Color fgColor = new Color(this.getDisplay(), getRGBFromHexagon(x, y));
-					{
-						gc.setForeground(fgColor);
-						gc.drawPoint(x + _chooserRadius, y + _chooserRadius);
-					}
-					fgColor.dispose();
-				}
-			}
-		}
-		gc.dispose();
-	}
-
 	public void restoreState(final IDialogSettings state) {
 
 		_tabFolder.setSelection(Util.getStateInt(state, STATE_COLOR_CHOOSER_SELECTED_TAB, 0));
 
+		final RGB stateRGB = Util.getStateRGB(state, STATE_COLOR_CHOOSER_SELECTED_COLOR, _chooserRGB);
+		setChooserRGB(stateRGB);
+
 		_col3 = Util.getStateInt(state, STATE_COLOR_CHOOSER_SELECTED_COL3, 0);
 		_spinnerHexagon.setSelection(_col3);
 		_scaleHexagon.setSelection(_col3);
-		paintHexagon();
+		drawHexagon();
 
 		restoreState_CustomColors(state);
 	}
 
 	private void restoreState_CustomColors(final IDialogSettings state) {
 
-		final String stateValue = Util.getStateString(state, STATE_COLOR_CHOOSER_CUSTOM_COLORS, null);
+		final String stateValue = Util.getStateString(state, XML_STATE_COLOR_CHOOSER_CUSTOM_COLORS, null);
 
 		if ((stateValue != null) && (stateValue.length() > 0)) {
 
@@ -1088,13 +1165,15 @@ public class ColorChooser extends Composite {
 		state.put(STATE_COLOR_CHOOSER_SELECTED_TAB, _tabFolder.getSelectionIndex());
 		state.put(STATE_COLOR_CHOOSER_SELECTED_COL3, _col3);
 
+		Util.setState(state, STATE_COLOR_CHOOSER_SELECTED_COLOR, _chooserRGB);
+
 		saveState_CustomColors(state);
 	}
 
 	private void saveState_CustomColors(final IDialogSettings state) {
 
 		// Build the XML block for writing the bindings and active scheme.
-		final XMLMemento xmlMemento = XMLMemento.createWriteRoot(STATE_COLOR_CHOOSER_CUSTOM_COLORS);
+		final XMLMemento xmlMemento = XMLMemento.createWriteRoot(XML_STATE_COLOR_CHOOSER_CUSTOM_COLORS);
 
 		saveState_CustomColors_Colors(xmlMemento);
 
@@ -1103,7 +1182,7 @@ public class ColorChooser extends Composite {
 		try {
 
 			xmlMemento.save(writer);
-			state.put(STATE_COLOR_CHOOSER_CUSTOM_COLORS, writer.toString());
+			state.put(XML_STATE_COLOR_CHOOSER_CUSTOM_COLORS, writer.toString());
 
 		} catch (final IOException e) {
 
@@ -1150,6 +1229,17 @@ public class ColorChooser extends Composite {
 		}
 	}
 
+	private void setChooserRGB(final RGB rgb) {
+
+		_chooserRGB = rgb;
+
+		updateUI_SelectedColor();
+
+		_lblSelectedColor.setToolTipText(NLS.bind(//
+				Messages.Color_Chooser_SelectedColor_Tooltip,
+				new Object[] { rgb.red, rgb.green, rgb.blue }));
+	}
+
 	private void setColorInColorLabel(final Label colorLabel, final RGB rgb) {
 
 		// set background color
@@ -1160,7 +1250,7 @@ public class ColorChooser extends Composite {
 		labelColor.dispose();
 
 		// set data
-		if (rgb == _defaultRGB) {
+		if (rgb == _customColorsDefaultRGB) {
 
 			// set default color data, this indicates that the color is not set
 
@@ -1179,6 +1269,14 @@ public class ColorChooser extends Composite {
 				new Object[] { rgb.red, rgb.green, rgb.blue }));
 	}
 
+	private void setHexagonSize() {
+
+		_chooserSize = 300;
+
+		_chooserRadius = _chooserSize / 2;
+		_hexagonRadius = (int) (_chooserSize / 2.1);
+	}
+
 	public void setProfileColors(final IProfileColors profileColors) {
 
 		_profileColors = profileColors;
@@ -1191,16 +1289,9 @@ public class ColorChooser extends Composite {
 	 */
 	public void setRGB(final RGB rgb) {
 
-		_chooserRGB = rgb;
+		setChooserRGB(rgb);
 
 		updateUI();
-	}
-
-	private void setSize(final int size) {
-
-		_chooserSize = size;
-		_chooserRadius = _chooserSize / 2;
-		_hexagonRadius = (int) (_chooserSize / 2.2);
 	}
 
 	private void showProfileWarning() {
@@ -1253,14 +1344,23 @@ public class ColorChooser extends Composite {
 		_spinnerBrightness.setSelection(brightness);
 	}
 
+	private void updateUI_HoveredColor(final RGB hoveredRGB) {
+
+		final Color color = new Color(Display.getCurrent(), hoveredRGB);
+		{
+			_lblHoveredColor.setBackground(color);
+			_lblHoveredColor.setForeground(color);
+		}
+		color.dispose();
+	}
+
 	private void updateUI_HSB() {
 
-		_chooserRGB = new RGB(//
+		setChooserRGB(new RGB(//
 				_selectedValueRed,
 				_selectedValueGreen,
-				_selectedValueBlue);
+				_selectedValueBlue));
 
-		updateUI_SelectedColor();
 		updateUI_Controls();
 
 		updateValues_HSB();
@@ -1268,12 +1368,11 @@ public class ColorChooser extends Composite {
 
 	private void updateUI_RGB() {
 
-		_chooserRGB = new RGB(//
+		setChooserRGB(new RGB(//
 				_selectedValueHue,
 				(float) _selectedValueSaturation / 100,
-				(float) _selectedValueBrightness / 100);
+				(float) _selectedValueBrightness / 100));
 
-		updateUI_SelectedColor();
 		updateUI_Controls();
 
 		updateValues_RGB();

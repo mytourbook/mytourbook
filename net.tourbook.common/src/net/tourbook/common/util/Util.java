@@ -674,7 +674,7 @@ public class Util {
 		return state.get(key) == null ? defaultValue : state.getBoolean(key);
 	}
 
-	public static RGB getStateColor(final IDialogSettings state, final String key, final RGB defaultRGB) {
+	public static RGB getStateRGB(final IDialogSettings state, final String key, final RGB defaultRGB) {
 
 		if (state == null) {
 			return defaultRGB;

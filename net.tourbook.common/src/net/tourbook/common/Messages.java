@@ -21,7 +21,6 @@ public class Messages extends NLS {
 
 	private static final String	BUNDLE_NAME	= "net.tourbook.common.messages";				//$NON-NLS-1$
 
-	public static String		color_chooser_choosed_color;
 	public static String		color_chooser_hexagon;
 	public static String		color_chooser_hexagon_move;
 	public static String		color_chooser_rgb;
@@ -37,9 +36,14 @@ public class Messages extends NLS {
 	public static String		Color_Chooser_Action_SetColorsFromProfile;
 	public static String		Color_Chooser_Dialog_SetColorsFromProfile_Message;
 	public static String		Color_Chooser_Dialog_SetColorsFromProfile_Title;
+
+	public static String		Color_Chooser_HoveredColor_Tooltip;
 	public static String		Color_Chooser_Label_ColorCustomColors_Tooltip;
+	public static String		Color_Chooser_Label_HoveredColor;
+	public static String		Color_Chooser_Label_SelectedColor;
 	public static String		Color_Chooser_Link_CustomColors;
 	public static String		Color_Chooser_Link_CustomColors_Tooltip;
+	public static String		Color_Chooser_SelectedColor_Tooltip;
 
 	public static String		Graph_Label_Altimeter;
 	public static String		Graph_Label_Altitude;

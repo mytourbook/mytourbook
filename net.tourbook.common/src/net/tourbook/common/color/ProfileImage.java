@@ -51,14 +51,18 @@ public abstract class ProfileImage implements Cloneable {
 	 */
 	private Image					_profileImage;
 
-//	private ProfileImage() {}
+	public void addVertex(final int vertexPosition, final RGBVertex rgbVertex) {
+
+		_rgbVertices.add(vertexPosition, rgbVertex);
+
+		invalidateVertexArray();
+	}
 
 	public void addVertex(final RGBVertex rgbVertex) {
 
 		_rgbVertices.add(rgbVertex);
 
-		// invalidate array
-		_vertexArray = null;
+		invalidateVertexArray();
 	}
 
 	@Override
@@ -154,12 +158,29 @@ public abstract class ProfileImage implements Cloneable {
 		return sb.toString();
 	}
 
+	private void invalidateVertexArray() {
+
+		_vertexArray = null;
+	}
+
+	/**
+	 * Removes vertices.
+	 * 
+	 * @param removedVertices
+	 */
+	public void removeVertices(final ArrayList<RGBVertex> removedVertices) {
+
+		_rgbVertices.removeAll(removedVertices);
+
+		invalidateVertexArray();
+	}
+
 	/**
 	 * Removes vertices by index.
 	 * 
 	 * @param vertexRemoveIndex
 	 */
-	public void removeVertices(final ArrayList<Integer> vertexRemoveIndex) {
+	public void removeVerticesByIndex(final ArrayList<Integer> vertexRemoveIndex) {
 
 		final ArrayList<RGBVertex> removedVertices = new ArrayList<RGBVertex>();
 
@@ -178,8 +199,7 @@ public abstract class ProfileImage implements Cloneable {
 		_rgbVertices.clear();
 		_rgbVertices.addAll(rgbVertices);
 
-		// invalidate array
-		_vertexArray = null;
+		invalidateVertexArray();
 	}
 
 	public void setVertices(final RGBVertex[] rgbVertices) {
@@ -187,8 +207,7 @@ public abstract class ProfileImage implements Cloneable {
 		_rgbVertices.clear();
 		_rgbVertices.addAll(Arrays.asList(rgbVertices));
 
-		// invalidate array
-		_vertexArray = null;
+		invalidateVertexArray();
 	}
 
 	@Override

@@ -19,6 +19,8 @@ public interface IMapColorProvider {
 
 	public static final int	DEFAULT_LEGEND_GRAPHIC_WIDTH	= 20;
 
+	public static final int	LEGEND_IMAGE_BORDER_WIDTH		= 1;
+
 	public static final int	DEFAULT_LEGEND_WIDTH			= 150;
 	public static final int	DEFAULT_LEGEND_HEIGHT			= 300;
 

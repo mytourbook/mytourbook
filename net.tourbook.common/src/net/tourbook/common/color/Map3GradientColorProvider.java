@@ -113,12 +113,13 @@ public class Map3GradientColorProvider extends MapGradientColorProvider implemen
 		for (final RGBVertex rgbVertexFromArray : rgbVerticies) {
 
 			rgbVertex = rgbVertexFromArray;
+			final long vertexValue = rgbVertex.getValue();
 
-			if (graphValue > rgbVertex.getValue()) {
+			if (graphValue >= vertexValue) {
 				minRgbVertex = rgbVertex;
 			}
 
-			if (graphValue <= rgbVertex.getValue()) {
+			if (graphValue <= vertexValue) {
 				maxRgbVertex = rgbVertex;
 			}
 
@@ -232,8 +233,6 @@ public class Map3GradientColorProvider extends MapGradientColorProvider implemen
 		final int graphColor = ((red & 0xFF) << 0) | ((green & 0xFF) << 8) | ((blue & 0xFF) << 16);
 
 		return graphColor;
-
-//		return 0xAF50AF;
 	}
 
 	public MapColorId getMapColorId() {
