@@ -22,11 +22,11 @@ import java.util.List;
  */
 public class Map2GradientColorProvider extends MapGradientColorProvider implements IGradientColors {
 
-	private MapColorId				_mapColorId;
+	private MapGraphId				_mapColorId;
 
 	private Map2ColorProfile		_map2ColorProfile;
 
-	private MapUnitsConfiguration	_mapUnitsConfig	= new MapUnitsConfiguration();
+	private MapUnits	_mapUnitsConfig	= new MapUnits();
 
 	/**
 	 * Contructor for a 2D color profile {@link Map2ColorProfile}.
@@ -35,7 +35,7 @@ public class Map2GradientColorProvider extends MapGradientColorProvider implemen
 	 *            Unique id for this color, it can be e.g. altitude, speed, ...
 	 * @param map2ColorProfile
 	 */
-	public Map2GradientColorProvider(final MapColorId mapColorId) {
+	public Map2GradientColorProvider(final MapGraphId mapColorId) {
 
 		_mapColorId = mapColorId;
 		_map2ColorProfile = new Map2ColorProfile();
@@ -61,7 +61,7 @@ public class Map2GradientColorProvider extends MapGradientColorProvider implemen
 		 * min/max values
 		 */
 		if (_map2ColorProfile.isMinValueOverwrite()) {
-			minValue = _map2ColorProfile.getOverwriteMinValue();
+			minValue = _map2ColorProfile.getMinValueOverwrite();
 
 			if (unitFormat == LegendUnitFormat.Pace) {
 				// adjust value from minutes->seconds
@@ -69,7 +69,7 @@ public class Map2GradientColorProvider extends MapGradientColorProvider implemen
 			}
 		}
 		if (_map2ColorProfile.isMaxValueOverwrite()) {
-			maxValue = _map2ColorProfile.getOverwriteMaxValue();
+			maxValue = _map2ColorProfile.getMaxValueOverwrite();
 
 			if (unitFormat == LegendUnitFormat.Pace) {
 				// adjust value from minutes->seconds
@@ -238,7 +238,7 @@ public class Map2GradientColorProvider extends MapGradientColorProvider implemen
 		return graphColor;
 	}
 
-	public MapColorId getMapColorId() {
+	public MapGraphId getGraphId() {
 		return _mapColorId;
 	}
 
@@ -247,7 +247,7 @@ public class Map2GradientColorProvider extends MapGradientColorProvider implemen
 		return _map2ColorProfile;
 	}
 
-	public MapUnitsConfiguration getMapUnitsConfiguration() {
+	public MapUnits getMapUnits() {
 		return _mapUnitsConfig;
 	}
 
@@ -278,11 +278,11 @@ public class Map2GradientColorProvider extends MapGradientColorProvider implemen
 			_map2ColorProfile.setMaxBrightness(map2ColorProfile.getMaxBrightness());
 			_map2ColorProfile.setMaxBrightnessFactor(map2ColorProfile.getMaxBrightnessFactor());
 
-			_map2ColorProfile.setMinValueOverwrite(map2ColorProfile.isMinValueOverwrite());
-			_map2ColorProfile.setMaxValueOverwrite(map2ColorProfile.isMaxValueOverwrite());
+			_map2ColorProfile.setIsMinValueOverwrite(map2ColorProfile.isMinValueOverwrite());
+			_map2ColorProfile.setIsMaxValueOverwrite(map2ColorProfile.isMaxValueOverwrite());
 
-			_map2ColorProfile.setOverwriteMinValue(map2ColorProfile.getOverwriteMinValue());
-			_map2ColorProfile.setOverwriteMaxValue(map2ColorProfile.getOverwriteMaxValue());
+			_map2ColorProfile.setMinValueOverwrite(map2ColorProfile.getMinValueOverwrite());
+			_map2ColorProfile.setMaxValueOverwrite(map2ColorProfile.getMaxValueOverwrite());
 		}
 	}
 

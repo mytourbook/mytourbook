@@ -29,10 +29,10 @@ import net.tourbook.common.color.GraphColorManager;
 import net.tourbook.common.color.IGradientColors;
 import net.tourbook.common.color.Map2ColorProfile;
 import net.tourbook.common.color.Map2GradientColorProvider;
-import net.tourbook.common.color.MapColorId;
-import net.tourbook.common.color.MapUnitsConfiguration;
+import net.tourbook.common.color.MapGraphId;
+import net.tourbook.common.color.MapUnits;
 import net.tourbook.map2.view.DialogMap2ColorEditor;
-import net.tourbook.map2.view.IMapColorUpdater;
+import net.tourbook.map2.view.IMap2ColorUpdater;
 import net.tourbook.ui.UI;
 
 import org.eclipse.jface.layout.GridDataFactory;
@@ -73,7 +73,7 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
 public class PrefPageAppearanceColors extends PreferencePage implements IWorkbenchPreferencePage, IColorTreeViewer,
-		IMapColorUpdater {
+		IMap2ColorUpdater {
 
 	/*
 	 * Legend is created with dummy values 0...200.
@@ -174,13 +174,13 @@ public class PrefPageAppearanceColors extends PreferencePage implements IWorkben
 
 	public static Map2GradientColorProvider createLegendImageColorProvider() {
 
-		final Map2GradientColorProvider colorProvider = new Map2GradientColorProvider(MapColorId.Altitude);
+		final Map2GradientColorProvider colorProvider = new Map2GradientColorProvider(MapGraphId.Altitude);
 
 		final Map2ColorProfile colorProfile = colorProvider.getMapColorProfile();
 		colorProfile.setColorValues(_legendImageColors);
 
 		// update legend configuations
-		final MapUnitsConfiguration legendConfig = colorProvider.getMapUnitsConfiguration();
+		final MapUnits legendConfig = colorProvider.getMapUnits();
 
 		legendConfig.units = _legendImageUnitValues;
 		legendConfig.unitLabels = _legendImageUnitLabels;

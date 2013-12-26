@@ -13,25 +13,12 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.common.color;
+package net.tourbook.map2.view;
 
-public interface IMapColorProvider {
+import net.tourbook.common.color.Map2ColorProfile;
 
-	public static final int	DEFAULT_LEGEND_GRAPHIC_WIDTH	= 20;
+public interface IMap2ColorUpdater {
 
-	public static final int	LEGEND_IMAGE_BORDER_WIDTH		= 1;
-
-	public static final int	DEFAULT_LEGEND_WIDTH			= 150;
-	public static final int	DEFAULT_LEGEND_HEIGHT			= 300;
-
-	public static final int	LEGEND_TOP_MARGIN				= 20;
-	public static final int	LEGEND_MARGIN_TOP_BOTTOM		= 10;
-
-	public static final int	LEGEND_UNIT_DISTANCE			= 100;
-
-	/**
-	 * @return Returns an id to identify the map color provider.
-	 */
-	public abstract MapGraphId getGraphId();
+	void applyMapColors(Map2ColorProfile newMapColor);
 
 }

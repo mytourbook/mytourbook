@@ -30,7 +30,7 @@ import net.tourbook.common.color.ColorCacheInt;
 import net.tourbook.common.color.IGradientColors;
 import net.tourbook.common.color.IMapColorProvider;
 import net.tourbook.common.color.LegendUnitFormat;
-import net.tourbook.common.color.MapUnitsConfiguration;
+import net.tourbook.common.color.MapUnits;
 import net.tourbook.common.map.GeoPosition;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
@@ -208,7 +208,7 @@ public class TourMapPainter extends MapPainter {
 														final int legendHeight,
 														final IGradientColors colorProvider) {
 
-		final MapUnitsConfiguration legendImageConfig = colorProvider.getMapUnitsConfiguration();
+		final MapUnits legendImageConfig = colorProvider.getMapUnits();
 
 		// ensure units are available
 		if (legendImageConfig.units == null) {
@@ -254,7 +254,7 @@ public class TourMapPainter extends MapPainter {
 														final IGradientColors colorProvider,
 														final boolean isDrawVertical) {
 
-		final MapUnitsConfiguration legendImageConfig = colorProvider.getMapUnitsConfiguration();
+		final MapUnits legendImageConfig = colorProvider.getMapUnits();
 
 		// ensure units are available
 		if (legendImageConfig.units == null) {
@@ -484,7 +484,7 @@ public class TourMapPainter extends MapPainter {
 
 		final ArrayList<TourLegendLabel> legendLabels = new ArrayList<TourLegendLabel>();
 
-		final MapUnitsConfiguration legendImageConfig = colorProvider.getMapUnitsConfiguration();
+		final MapUnits legendImageConfig = colorProvider.getMapUnits();
 
 		// ensure units are available
 		if (legendImageConfig.units == null) {
@@ -1494,7 +1494,7 @@ public class TourMapPainter extends MapPainter {
 
 		int valuePosition = 0;
 
-		final MapUnitsConfiguration config = ((IGradientColors) _legendProvider).getMapUnitsConfiguration();
+		final MapUnits config = ((IGradientColors) _legendProvider).getMapUnits();
 
 //		final Integer unitFactor = config.unitFactor;
 //		dataValue /= unitFactor;
@@ -1942,7 +1942,7 @@ public class TourMapPainter extends MapPainter {
 
 		_legendProvider = legendProvider;
 
-		switch (_legendProvider.getMapColorId()) {
+		switch (_legendProvider.getGraphId()) {
 		case Altitude:
 			_dataSerie = tourData.getAltitudeSerie();
 			break;

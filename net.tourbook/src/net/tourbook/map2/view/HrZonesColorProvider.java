@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -17,7 +17,7 @@ package net.tourbook.map2.view;
 
 import java.util.ArrayList;
 
-import net.tourbook.common.color.MapColorId;
+import net.tourbook.common.color.MapGraphId;
 import net.tourbook.data.HrZoneContext;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourPersonHRZone;
@@ -30,7 +30,7 @@ import org.eclipse.swt.graphics.RGB;
  */
 public class HrZonesColorProvider implements IDiscreteColors {
 
-	private MapColorId					_mapColorId;
+	private MapGraphId					_graphId;
 
 	/**
 	 * {@link TourData} which are checked if they contain valid HR zone data
@@ -44,8 +44,8 @@ public class HrZonesColorProvider implements IDiscreteColors {
 	private HrZoneContext				_hrZoneContext;
 	private float[]						_pulseData;
 
-	public HrZonesColorProvider(final MapColorId mapColorId) {
-		_mapColorId = mapColorId;
+	public HrZonesColorProvider(final MapGraphId graphId) {
+		_graphId = graphId;
 	}
 
 	private void checkHrData(final TourData tourData) {
@@ -100,6 +100,12 @@ public class HrZonesColorProvider implements IDiscreteColors {
 		return getHrColor(adjustedValueIndex);
 	}
 
+	@Override
+	public MapGraphId getGraphId() {
+		return _graphId;
+	}
+
+
 	private int getHrColor(final int serieIndex) {
 
 		final float pulse = _pulseData[serieIndex];
@@ -113,11 +119,6 @@ public class HrZonesColorProvider implements IDiscreteColors {
 				| ((rgb.blue & 0xFF) << 16);
 
 		return rgbValue;
-	}
-
-	@Override
-	public MapColorId getMapColorId() {
-		return _mapColorId;
 	}
 
 }

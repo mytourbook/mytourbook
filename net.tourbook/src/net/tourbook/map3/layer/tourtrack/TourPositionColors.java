@@ -23,7 +23,7 @@ import java.util.ArrayList;
 
 import net.tourbook.common.color.IGradientColors;
 import net.tourbook.common.color.IMapColorProvider;
-import net.tourbook.common.color.MapColorId;
+import net.tourbook.common.color.MapGraphId;
 import net.tourbook.data.TourData;
 import net.tourbook.map.MapColorProvider;
 import net.tourbook.map.MapUtils;
@@ -33,7 +33,7 @@ class TourPositionColors implements Path.PositionColors {
 
 	private final ColorCacheAWT	_awtColorCache	= new ColorCacheAWT();
 
-	private IMapColorProvider	_colorProvider	= MapColorProvider.getMap3ColorProvider(MapColorId.Altitude);
+	private IMapColorProvider	_colorProvider	= MapColorProvider.getMap3ColorProvider(MapGraphId.Altitude);
 
 	public Color getColor(final Position position, final int ordinal) {
 
@@ -86,7 +86,7 @@ class TourPositionColors implements Path.PositionColors {
 
 			final IGradientColors colorProvider = (IGradientColors) _colorProvider;
 
-			MapUtils.updateLegendMinMaxValues(allTours, colorProvider, 300);
+			MapUtils.setMinMaxValues(allTours, colorProvider, 300);
 		}
 	}
 

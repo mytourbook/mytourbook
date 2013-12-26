@@ -19,30 +19,33 @@ import net.tourbook.common.Messages;
 
 public abstract class MapColorProfile {
 
-	public static final String[]	BRIGHTNESS_LABELS		= new String[] //
-															{
+	public static final String[]	BRIGHTNESS_LABELS			= new String[] //
+																{
 			Messages.legend_color_keep_color,
 			Messages.legend_color_dim_color,
-			Messages.legend_color_lighten_color			};
+			Messages.legend_color_lighten_color				};
 
-	public static final int			BRIGHTNESS_DEFAULT		= 0;
-	public static final int			BRIGHTNESS_DIMMING		= 1;
-	public static final int			BRIGHTNESS_LIGHTNING	= 2;
+	public static final int			BRIGHTNESS_DEFAULT			= 0;
+	public static final int			BRIGHTNESS_DIMMING			= 1;
+	public static final int			BRIGHTNESS_LIGHTNING		= 2;
+
+	public static final int			BRIGHTNESS_FACTOR_DEFAULT	= 100;
 
 	/**
 	 * min and max value is painted black when {@link #minBrightnessFactor}==100, a value below 100
 	 * will dim the color
 	 */
-	protected int					minBrightness			= BRIGHTNESS_DEFAULT;
-	protected int					minBrightnessFactor		= 100;
-	protected int					maxBrightness			= BRIGHTNESS_DEFAULT;
-	protected int					maxBrightnessFactor		= 100;
+	protected int					minBrightness				= BRIGHTNESS_DEFAULT;
+	protected int					maxBrightness				= BRIGHTNESS_DEFAULT;
 
-	protected boolean				isMinValueOverwrite		= false;
-	protected boolean				isMaxValueOverwrite		= false;
+	protected int					minBrightnessFactor			= BRIGHTNESS_FACTOR_DEFAULT;
+	protected int					maxBrightnessFactor			= BRIGHTNESS_FACTOR_DEFAULT;
 
-	protected int					overwriteMinValue;
-	protected int					overwriteMaxValue;
+	protected boolean				isMinValueOverwrite			= false;
+	protected boolean				isMaxValueOverwrite			= false;
+
+	protected int					minValueOverwrite;
+	protected int					maxValueOverwrite;
 
 	public MapColorProfile() {
 		super();
@@ -56,6 +59,10 @@ public abstract class MapColorProfile {
 		return maxBrightnessFactor;
 	}
 
+	public int getMaxValueOverwrite() {
+		return maxValueOverwrite;
+	}
+
 	public int getMinBrightness() {
 		return minBrightness;
 	}
@@ -64,12 +71,8 @@ public abstract class MapColorProfile {
 		return minBrightnessFactor;
 	}
 
-	public int getOverwriteMaxValue() {
-		return overwriteMaxValue;
-	}
-
-	public int getOverwriteMinValue() {
-		return overwriteMinValue;
+	public int getMinValueOverwrite() {
+		return minValueOverwrite;
 	}
 
 	public boolean isMaxValueOverwrite() {
@@ -80,6 +83,14 @@ public abstract class MapColorProfile {
 		return isMinValueOverwrite;
 	}
 
+	public void setIsMaxValueOverwrite(final boolean isMaxValueOverwrite) {
+		this.isMaxValueOverwrite = isMaxValueOverwrite;
+	}
+
+	public void setIsMinValueOverwrite(final boolean isMinValueOverwrite) {
+		this.isMinValueOverwrite = isMinValueOverwrite;
+	}
+
 	public void setMaxBrightness(final int maxBrightness) {
 		this.maxBrightness = maxBrightness;
 	}
@@ -88,8 +99,8 @@ public abstract class MapColorProfile {
 		this.maxBrightnessFactor = maxBrightnessFactor;
 	}
 
-	public void setMaxValueOverwrite(final boolean isMaxValueOverwrite) {
-		this.isMaxValueOverwrite = isMaxValueOverwrite;
+	public void setMaxValueOverwrite(final int overwriteMaxValue) {
+		this.maxValueOverwrite = overwriteMaxValue;
 	}
 
 	public void setMinBrightness(final int minBrightness) {
@@ -100,20 +111,11 @@ public abstract class MapColorProfile {
 		this.minBrightnessFactor = minBrightnessFactor;
 	}
 
-	public void setMinValueOverwrite(final boolean isMinValueOverwrite) {
-		this.isMinValueOverwrite = isMinValueOverwrite;
+	public void setMinValueOverwrite(final int overwriteMinValue) {
+		this.minValueOverwrite = overwriteMinValue;
 	}
 
-	public void setOverwriteMaxValue(final int overwriteMaxValue) {
-		this.overwriteMaxValue = overwriteMaxValue;
-	}
-
-	public void setOverwriteMinValue(final int overwriteMinValue) {
-		this.overwriteMinValue = overwriteMinValue;
-	}
-
-	@Override
-	public String toString() {
+	public String toString_dis() {
 
 		return String.format("\n" //$NON-NLS-1$
 				+ "MapColorProfile\n" //$NON-NLS-1$
@@ -130,8 +132,8 @@ public abstract class MapColorProfile {
 				maxBrightness,
 				maxBrightnessFactor,
 				isMaxValueOverwrite,
-				overwriteMaxValue,
+				maxValueOverwrite,
 				isMinValueOverwrite,
-				overwriteMinValue);
+				minValueOverwrite);
 	}
 }

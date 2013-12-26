@@ -50,8 +50,8 @@ import net.tourbook.common.UI;
 import net.tourbook.common.color.ColorUtil;
 import net.tourbook.common.color.IGradientColors;
 import net.tourbook.common.color.IMapColorProvider;
-import net.tourbook.common.color.MapColorId;
-import net.tourbook.common.color.MapUnitsConfiguration;
+import net.tourbook.common.color.MapGraphId;
+import net.tourbook.common.color.MapUnits;
 import net.tourbook.common.util.SWTPopupOverAWT;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
@@ -214,7 +214,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 	/**
 	 * Color id for the currently displayed tour tracks.
 	 */
-	private MapColorId							_tourColorId;
+	private MapGraphId							_tourColorId;
 
 	/*
 	 * current position for the x-sliders (vertical slider)
@@ -294,7 +294,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 //		_actionMapColor.run();
 	}
 
-	public void actionSetMapColor(final MapColorId colorId) {
+	public void actionSetMapColor(final MapGraphId colorId) {
 
 		_tourColorId = colorId;
 
@@ -709,12 +709,12 @@ public class Map3View extends ViewPart implements ITourProvider {
 		_actionSynMapWithChartSlider = new ActionSyncMapWithChartSlider(this);
 		_actionSynMapWithTour = new ActionSyncMapWithTour(this);
 
-		_actionTourColorAltitude = ActionTourColor.createAction(this, MapColorId.Altitude);
-		_actionTourColorGradient = ActionTourColor.createAction(this, MapColorId.Gradient);
-		_actionTourColorPace = ActionTourColor.createAction(this, MapColorId.Pace);
-		_actionTourColorPulse = ActionTourColor.createAction(this, MapColorId.Pulse);
-		_actionTourColorSpeed = ActionTourColor.createAction(this, MapColorId.Speed);
-		_actionTourColorHrZone = ActionTourColor.createAction(this, MapColorId.HrZone);
+		_actionTourColorAltitude = ActionTourColor.createAction(this, MapGraphId.Altitude);
+		_actionTourColorGradient = ActionTourColor.createAction(this, MapGraphId.Gradient);
+		_actionTourColorPace = ActionTourColor.createAction(this, MapGraphId.Pace);
+		_actionTourColorPulse = ActionTourColor.createAction(this, MapGraphId.Pulse);
+		_actionTourColorSpeed = ActionTourColor.createAction(this, MapGraphId.Speed);
+		_actionTourColorHrZone = ActionTourColor.createAction(this, MapGraphId.HrZone);
 
 		// context menu actions
 		_actionEditQuick = new ActionEditQuick(this);
@@ -1035,7 +1035,9 @@ public class Map3View extends ViewPart implements ITourProvider {
 		final IMenuManager menuMgr = actionBars.getMenuManager();
 
 		menuMgr.add(_actionOpenMap3StatisticsView);
-		menuMgr.add(_actionOpenGLVersions);
+
+// this is NOT working any more :-(((
+//		menuMgr.add(_actionOpenGLVersions);
 	}
 
 	private void fillContextMenu(final Menu menu) {
@@ -1221,7 +1223,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 		return sliderYPosition;
 	}
 
-	public MapColorId getTrackColorId() {
+	public MapGraphId getTrackColorId() {
 		return _tourColorId;
 	}
 
@@ -1397,13 +1399,13 @@ public class Map3View extends ViewPart implements ITourProvider {
 		Map3Manager.setLayerVisible_TrackSlider(isTrackSliderVisible);
 
 		// tour color
-		final String stateColorId = Util.getStateString(_state, STATE_TOUR_COLOR_ID, MapColorId.Altitude.name());
+		final String stateColorId = Util.getStateString(_state, STATE_TOUR_COLOR_ID, MapGraphId.Altitude.name());
 
 		try {
-			_tourColorId = MapColorId.valueOf(stateColorId);
+			_tourColorId = MapGraphId.valueOf(stateColorId);
 		} catch (final Exception e) {
 			// set default
-			_tourColorId = MapColorId.Altitude;
+			_tourColorId = MapGraphId.Altitude;
 		}
 
 		switch (_tourColorId) {
@@ -1432,7 +1434,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 			break;
 
 		default:
-			_tourColorId = MapColorId.Altitude;
+			_tourColorId = MapGraphId.Altitude;
 			_actionTourColorAltitude.setChecked(true);
 			break;
 		}
@@ -1493,7 +1495,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 
 			final IGradientColors gradientColorProvider = (IGradientColors) colorProvider;
 
-			final MapUnitsConfiguration legendImageConfig = gradientColorProvider.getMapUnitsConfiguration();
+			final MapUnits legendImageConfig = gradientColorProvider.getMapUnits();
 			final float legendMinValue = legendImageConfig.legendMinValue;
 
 			float graphValue = legendMinValue;
@@ -1587,7 +1589,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 		sliderAnnotation.setAltitudeMode(config.altitudeMode);
 	}
 
-	private void setColorProvider(final MapColorId colorId) {
+	private void setColorProvider(final MapGraphId colorId) {
 
 		final IMapColorProvider colorProvider = MapColorProvider.getMap3ColorProvider(colorId);
 

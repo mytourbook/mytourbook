@@ -20,7 +20,7 @@ import java.util.HashMap;
 import net.tourbook.common.color.IMapColorProvider;
 import net.tourbook.common.color.Map2GradientColorProvider;
 import net.tourbook.common.color.Map3GradientColorProvider;
-import net.tourbook.common.color.MapColorId;
+import net.tourbook.common.color.MapGraphId;
 import net.tourbook.map2.view.HrZonesColorProvider;
 
 /**
@@ -32,53 +32,53 @@ public class MapColorProvider {
 	/**
 	 * Key is the color id.
 	 */
-	private static HashMap<MapColorId, IMapColorProvider>	_map2ColorProvider;
+	private static HashMap<MapGraphId, IMapColorProvider>	_map2ColorProvider;
 
 	/**
 	 * Key is the color id.
 	 */
-	private static HashMap<MapColorId, IMapColorProvider>	_map3ColorProvider;
+	private static HashMap<MapGraphId, IMapColorProvider>	_map3ColorProvider;
 
 	private static void checkColorProvider() {
 
 		if (_map2ColorProvider == null) {
 
-			_map2ColorProvider = new HashMap<MapColorId, IMapColorProvider>();
-			_map3ColorProvider = new HashMap<MapColorId, IMapColorProvider>();
+			_map2ColorProvider = new HashMap<MapGraphId, IMapColorProvider>();
+			_map3ColorProvider = new HashMap<MapGraphId, IMapColorProvider>();
 
 			createColorProviders();
 		}
 	}
 
 	/**
-	 * Create legend provider for all graphs which can be displayed.
+	 * Create color provider for all graphs which can be displayed.
 	 */
 	private static void createColorProviders() {
 
 		/*
 		 * 2D Map
 		 */
-		_map2ColorProvider.put(MapColorId.Altitude, new Map2GradientColorProvider(MapColorId.Altitude));
-		_map2ColorProvider.put(MapColorId.Gradient, new Map2GradientColorProvider(MapColorId.Gradient));
-		_map2ColorProvider.put(MapColorId.Pace, new Map2GradientColorProvider(MapColorId.Pace));
-		_map2ColorProvider.put(MapColorId.Pulse, new Map2GradientColorProvider(MapColorId.Pulse));
-		_map2ColorProvider.put(MapColorId.Speed, new Map2GradientColorProvider(MapColorId.Speed));
+		_map2ColorProvider.put(MapGraphId.Altitude, new Map2GradientColorProvider(MapGraphId.Altitude));
+		_map2ColorProvider.put(MapGraphId.Gradient, new Map2GradientColorProvider(MapGraphId.Gradient));
+		_map2ColorProvider.put(MapGraphId.Pace, new Map2GradientColorProvider(MapGraphId.Pace));
+		_map2ColorProvider.put(MapGraphId.Pulse, new Map2GradientColorProvider(MapGraphId.Pulse));
+		_map2ColorProvider.put(MapGraphId.Speed, new Map2GradientColorProvider(MapGraphId.Speed));
 
-		_map2ColorProvider.put(MapColorId.HrZone, new HrZonesColorProvider(MapColorId.HrZone));
+		_map2ColorProvider.put(MapGraphId.HrZone, new HrZonesColorProvider(MapGraphId.HrZone));
 
 		/*
 		 * 3D Map
 		 */
-		_map3ColorProvider.put(MapColorId.Altitude, new Map3GradientColorProvider(MapColorId.Altitude));
-		_map3ColorProvider.put(MapColorId.Pace, new Map3GradientColorProvider(MapColorId.Pace));
-		_map3ColorProvider.put(MapColorId.Gradient, new Map3GradientColorProvider(MapColorId.Gradient));
-		_map3ColorProvider.put(MapColorId.Pulse, new Map3GradientColorProvider(MapColorId.Pulse));
-		_map3ColorProvider.put(MapColorId.Speed, new Map3GradientColorProvider(MapColorId.Speed));
+		_map3ColorProvider.put(MapGraphId.Altitude, new Map3GradientColorProvider(MapGraphId.Altitude));
+		_map3ColorProvider.put(MapGraphId.Pace, new Map3GradientColorProvider(MapGraphId.Pace));
+		_map3ColorProvider.put(MapGraphId.Gradient, new Map3GradientColorProvider(MapGraphId.Gradient));
+		_map3ColorProvider.put(MapGraphId.Pulse, new Map3GradientColorProvider(MapGraphId.Pulse));
+		_map3ColorProvider.put(MapGraphId.Speed, new Map3GradientColorProvider(MapGraphId.Speed));
 
-		_map3ColorProvider.put(MapColorId.HrZone, new HrZonesColorProvider(MapColorId.HrZone));
+		_map3ColorProvider.put(MapGraphId.HrZone, new HrZonesColorProvider(MapGraphId.HrZone));
 	}
 
-	public static IMapColorProvider getMap2ColorProvider(final MapColorId colorId) {
+	public static IMapColorProvider getMap2ColorProvider(final MapGraphId colorId) {
 
 		checkColorProvider();
 
@@ -86,13 +86,13 @@ public class MapColorProvider {
 
 		// use default when not available
 		if (mapColorProvider == null) {
-			mapColorProvider = _map2ColorProvider.get(MapColorId.Altitude);
+			mapColorProvider = _map2ColorProvider.get(MapGraphId.Altitude);
 		}
 
 		return mapColorProvider;
 	}
 
-	public static IMapColorProvider getMap3ColorProvider(final MapColorId colorId) {
+	public static IMapColorProvider getMap3ColorProvider(final MapGraphId colorId) {
 
 		checkColorProvider();
 
@@ -100,7 +100,7 @@ public class MapColorProvider {
 
 		// use default when not available
 		if (mapColorProvider == null) {
-			mapColorProvider = _map3ColorProvider.get(MapColorId.Altitude);
+			mapColorProvider = _map3ColorProvider.get(MapGraphId.Altitude);
 		}
 
 		return mapColorProvider;

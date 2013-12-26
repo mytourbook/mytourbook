@@ -22,11 +22,11 @@ import net.tourbook.common.color.IGradientColors;
 import net.tourbook.common.color.IMapColorProvider;
 import net.tourbook.common.color.Map2ColorProfile;
 import net.tourbook.common.color.Map2GradientColorProvider;
-import net.tourbook.common.color.MapColorId;
+import net.tourbook.common.color.MapGraphId;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.map.MapColorProvider;
 import net.tourbook.map2.view.DialogMap2ColorEditor;
-import net.tourbook.map2.view.IMapColorUpdater;
+import net.tourbook.map2.view.IMap2ColorUpdater;
 import net.tourbook.map3.Messages;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.PrefPageAppearanceColors;
@@ -35,9 +35,9 @@ import net.tourbook.ui.UI;
 import org.eclipse.jface.action.Action;
 import org.eclipse.swt.widgets.Display;
 
-public class ActionMap2Color extends Action implements IMapColorUpdater {
+public class ActionMap2Color extends Action implements IMap2ColorUpdater {
 
-	private MapColorId			_mapColorId;
+	private MapGraphId			_mapColorId;
 	private DialogMap2ColorEditor	_dialogMappingColor;
 	private ColorDefinition		_colorDefinition;
 
@@ -122,7 +122,7 @@ public class ActionMap2Color extends Action implements IMapColorUpdater {
 		}
 	}
 
-	public void setColorId(final MapColorId mapColorId) {
+	public void setColorId(final MapGraphId mapColorId) {
 
 		_mapColorId = mapColorId;
 

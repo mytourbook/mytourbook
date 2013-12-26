@@ -15,26 +15,23 @@
  *******************************************************************************/
 package net.tourbook.map3.action;
 
-import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.color.ColorDefinition;
-import net.tourbook.common.color.GraphColorManager;
-import net.tourbook.common.color.Map2ColorProfile;
-import net.tourbook.common.color.MapColorId;
+import net.tourbook.common.color.Map3ColorProfile;
+import net.tourbook.common.color.MapGraphId;
 import net.tourbook.map2.view.DialogMap2ColorEditor;
-import net.tourbook.map2.view.IMapColorUpdater;
 import net.tourbook.map3.Messages;
-import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.map3.ui.IMap3ColorUpdater;
 import net.tourbook.ui.UI;
 
 import org.eclipse.jface.action.Action;
 
-public class ActionMapColor extends Action implements IMapColorUpdater {
+public class ActionMap3Color extends Action implements IMap3ColorUpdater {
 
-	private MapColorId			_mapColorId;
+	private MapGraphId				_mapColorId;
 	private DialogMap2ColorEditor	_dialogMappingColor;
-	private ColorDefinition		_colorDefinition;
+	private ColorDefinition			_colorDefinition;
 
-	public ActionMapColor() {
+	public ActionMap3Color() {
 
 		super(null, AS_PUSH_BUTTON);
 
@@ -42,16 +39,18 @@ public class ActionMapColor extends Action implements IMapColorUpdater {
 	}
 
 	@Override
-	public void applyMapColors(final Map2ColorProfile newMapColor) {
+	public void applyMapColors(	final Map3ColorProfile originalProfile,
+								final Map3ColorProfile modifiedProfile,
+								final boolean isNewProfile) {
 
-		// update color definition with new color from the color dialog
-		_colorDefinition.setNewMapColor(newMapColor);
-
-		GraphColorManager.saveNewColors();
-
-		// force to change the status
-		TourbookPlugin.getDefault().getPreferenceStore()//
-				.setValue(ITourbookPreferences.GRAPH_COLORS_HAS_CHANGED, Math.random());
+//		// update color definition with new color from the color dialog
+//		_colorDefinition.setNewMapColor(newMapColor);
+//
+//		GraphColorManager.saveNewColors();
+//
+//		// force to change the status
+//		TourbookPlugin.getDefault().getPreferenceStore()//
+//				.setValue(ITourbookPreferences.GRAPH_COLORS_HAS_CHANGED, Math.random());
 	}
 
 	/**
@@ -118,7 +117,7 @@ public class ActionMapColor extends Action implements IMapColorUpdater {
 
 	}
 
-	public void setColorId(final MapColorId mapColorId) {
+	public void setColorId(final MapGraphId mapColorId) {
 
 		_mapColorId = mapColorId;
 

@@ -26,15 +26,15 @@ import org.eclipse.swt.graphics.RGB;
 
 public class RGBVertex implements Comparable<Object>, Cloneable {
 
-	private long	_value;
-	private RGB		_rgb;
+	private int	_value;
+	private RGB	_rgb;
 
 	public RGBVertex() {
 		_value = 0;
 		_rgb = new RGB(255, 255, 255); // WHITE
 	}
 
-	public RGBVertex(final long value, final int red, final int green, final int blue) {
+	public RGBVertex(final int value, final int red, final int green, final int blue) {
 
 		if ((red > 255) || (red < 0) || (green > 255) || (green < 0) || (blue > 255) || (blue < 0)) {
 			SWT.error(SWT.ERROR_INVALID_ARGUMENT);
@@ -44,7 +44,14 @@ public class RGBVertex implements Comparable<Object>, Cloneable {
 		_rgb = new RGB(red, green, blue);
 	}
 
+	public RGBVertex(final int value, final RGB rgb) {
+
+		_value = value;
+		_rgb = rgb;
+	}
+
 	public RGBVertex(final RGB rgb) {
+
 		_value = 0;
 		_rgb = rgb;
 	}
@@ -73,7 +80,7 @@ public class RGBVertex implements Comparable<Object>, Cloneable {
 			throw new ClassCastException(Messages.rgv_vertex_class_cast_exception);
 		}
 
-		final long anotherValue = ((RGBVertex) anotherRGBVertex).getValue();
+		final int anotherValue = ((RGBVertex) anotherRGBVertex).getValue();
 
 		if (_value < anotherValue) {
 			return (-1);
@@ -90,7 +97,7 @@ public class RGBVertex implements Comparable<Object>, Cloneable {
 		return _rgb;
 	}
 
-	public long getValue() {
+	public int getValue() {
 		return _value;
 	}
 
@@ -98,7 +105,7 @@ public class RGBVertex implements Comparable<Object>, Cloneable {
 		_rgb = rgb;
 	}
 
-	public void setValue(final long value) {
+	public void setValue(final int value) {
 		_value = value;
 	}
 

@@ -674,19 +674,6 @@ public class Util {
 		return state.get(key) == null ? defaultValue : state.getBoolean(key);
 	}
 
-	public static RGB getStateRGB(final IDialogSettings state, final String key, final RGB defaultRGB) {
-
-		if (state == null) {
-			return defaultRGB;
-		}
-
-		final int[] defaultValue = { defaultRGB.red, defaultRGB.green, defaultRGB.blue };
-
-		final int[] colorValues = getStateIntArray(state, key, defaultValue);
-
-		return new RGB(colorValues[0], colorValues[1], colorValues[2]);
-	}
-
 	/**
 	 * @param state
 	 * @param stateKey
@@ -897,6 +884,19 @@ public class Util {
 		return longlongValues;
 	}
 
+	public static RGB getStateRGB(final IDialogSettings state, final String key, final RGB defaultRGB) {
+
+		if (state == null) {
+			return defaultRGB;
+		}
+
+		final int[] defaultValue = { defaultRGB.red, defaultRGB.green, defaultRGB.blue };
+
+		final int[] colorValues = getStateIntArray(state, key, defaultValue);
+
+		return new RGB(colorValues[0], colorValues[1], colorValues[2]);
+	}
+
 	/**
 	 * @param state
 	 * @param key
@@ -977,7 +977,7 @@ public class Util {
 		}
 	}
 
-	public static boolean getXmlBoolean(final XMLMemento xmlMemento, final String key, final Boolean defaultValue) {
+	public static boolean getXmlBoolean(final IMemento xmlMemento, final String key, final Boolean defaultValue) {
 
 		Boolean value = xmlMemento.getBoolean(key);
 
@@ -988,7 +988,7 @@ public class Util {
 		return value;
 	}
 
-	public static float getXmlFloat(final XMLMemento xmlMemento,
+	public static float getXmlFloat(final IMemento xmlMemento,
 									final String key,
 									final float defaultValue,
 									final int minValue,
@@ -1007,7 +1007,7 @@ public class Util {
 		return value;
 	}
 
-	public static Float getXmlFloat(final XMLMemento xmlMemento, final String key, final Float defaultValue) {
+	public static Float getXmlFloat(final IMemento xmlMemento, final String key, final Float defaultValue) {
 
 		Float value = xmlMemento.getFloat(key);
 
@@ -1018,7 +1018,7 @@ public class Util {
 		return value;
 	}
 
-	public static int getXmlInteger(final XMLMemento xmlMemento,
+	public static int getXmlInteger(final IMemento xmlMemento,
 									final String key,
 									final int defaultValue,
 									final int minValue,
@@ -1037,7 +1037,7 @@ public class Util {
 		return value;
 	}
 
-	public static int getXmlInteger(final XMLMemento xmlMemento, final String key, final Integer defaultValue) {
+	public static int getXmlInteger(final IMemento xmlMemento, final String key, final Integer defaultValue) {
 
 		Integer value = xmlMemento.getInteger(key);
 
@@ -1048,7 +1048,12 @@ public class Util {
 		return value;
 	}
 
-	public static RGB getXmlRgb(final XMLMemento xmlMemento, final String key, final RGB defaultValue) {
+	/**
+	 * @param xmlMemento
+	 * @param defaultValue
+	 * @return Returns {@link RGB} from the attributes red, green and blue attributes.
+	 */
+	public static RGB getXmlRgb(final IMemento xmlMemento, final RGB defaultValue) {
 
 		final int red = getXmlInteger(xmlMemento, ATTR_COLOR_RED, defaultValue.red);
 		final int green = getXmlInteger(xmlMemento, ATTR_COLOR_GREEN, defaultValue.green);
@@ -1057,7 +1062,7 @@ public class Util {
 		return new RGB(red, green, blue);
 	}
 
-	public static String getXmlString(final XMLMemento xmlConfig, final String key, final String defaultValue) {
+	public static String getXmlString(final IMemento xmlConfig, final String key, final String defaultValue) {
 
 		String value = xmlConfig.getString(key);
 

@@ -257,30 +257,25 @@ public class Messages extends NLS {
 	public static String		app_unit_seconds;
 
 	public static String		App_Action_About;
-
-	public static String	App_Action_Add;
 	public static String		App_Action_Cancel;
 	public static String		App_Action_Close_ToolTip;
-
-	public static String	App_Action_Columns;
-
-	public static String	App_Action_Duplicate;
+	public static String		App_Action_Columns;
+	public static String		App_Action_Duplicate;
 	public static String		App_Action_edit_tour;
-	public static String	App_Action_Edit;
-
+	public static String		App_Action_Edit;
 	public static String		App_Action_ExtractTour;
 	public static String		App_Action_JoinTours;
 	public static String		App_Action_Menu_file;
 	public static String		App_Action_Menu_help;
 	public static String		App_Action_Menu_tools;
 	public static String		App_Action_Menu_view;
+	public static String		App_Action_New;
 	public static String		App_Action_open_perspective;
 	public static String		App_Action_open_preferences;
 	public static String		App_Action_open_tour_segmenter;
 	public static String		App_Action_open_tour_segmenter_tooltip;
 	public static String		App_Action_OpenOtherViews;
-
-	public static String	App_Action_Remove;
+	public static String		App_Action_Remove;
 	public static String		App_Action_set_tour_type;
 	public static String		App_Action_Save;
 	public static String		App_Action_SetPerson;
@@ -886,6 +881,10 @@ public class Messages extends NLS {
 	public static String		Pref_Graphs_Text_max_value;
 	public static String		Pref_Graphs_Text_min_value;
 
+	public static String	Pref_Map3Color_Dialog_RemoveProfile_Message;
+
+	public static String	Pref_Map3Color_Dialog_RemoveProfile_Title;
+
 	public static String		Pref_MapLayout_Dialog_OSX_Warning_Message;
 	public static String		Pref_MapLayout_Dialog_OSX_Warning_Title;
 	public static String		Pref_MapLayout_Group_TourInMapProperties;
@@ -1042,8 +1041,7 @@ public class Messages extends NLS {
 	public static String		Pref_TourTypes_root_title;
 	public static String		Pref_TourTypes_Title;
 
-	public static String	PrefPage_Map3Color_Checkbox_AutoExpandCollapse;
-
+	public static String		PrefPage_Map3Color_Checkbox_AutoExpandCollapse;
 
 	public static String		PrefPage_ViewActions_Group;
 	public static String		PrefPage_ViewActions_Label_DoubleClick;

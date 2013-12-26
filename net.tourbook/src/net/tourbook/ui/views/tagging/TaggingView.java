@@ -387,7 +387,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 
 					_columnManager.saveState(_state);
 					_columnManager.clearColumns();
-					defineAllColumns(_viewerContainer);
+					defineAllColumns();
 
 					_tagViewer = (TreeViewer) recreateViewer(_tagViewer);
 
@@ -508,7 +508,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 
 		// define all columns
 		_columnManager = new ColumnManager(this, _state);
-		defineAllColumns(parent);
+		defineAllColumns();
 
 		createActions();
 		fillViewMenu();
@@ -537,13 +537,15 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 		_viewerContainer = new Composite(parent, SWT.NONE);
 		GridLayoutFactory.fillDefaults().applyTo(_viewerContainer);
 		{
-			createUI10TagViewer(_viewerContainer);
+			createUI_10_TagViewer(_viewerContainer);
 		}
 	}
 
-	private void createUI10TagViewer(final Composite parent) {
+	private void createUI_10_TagViewer(final Composite parent) {
 
-		// tour tree
+		/*
+		 * Create tree
+		 */
 		final Tree tree = new Tree(parent, SWT.H_SCROLL | SWT.V_SCROLL | SWT.FLAT | SWT.FULL_SELECTION | SWT.MULTI);
 
 		tree.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
@@ -551,6 +553,9 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 		tree.setHeaderVisible(true);
 		tree.setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
 
+		/*
+		 * Create viewer
+		 */
 		_tagViewer = new TreeViewer(tree);
 		_columnManager.createColumns(_tagViewer);
 
@@ -624,7 +629,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 		 * measurement system has changed, if not, the context menu is not displayed because it
 		 * belongs to the old viewer
 		 */
-		createUI20ContextMenu();
+		createUI_20_ContextMenu();
 
 		fillToolBar();
 
@@ -635,7 +640,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 	/**
 	 * create the views context menu
 	 */
-	private void createUI20ContextMenu() {
+	private void createUI_20_ContextMenu() {
 
 		final Tree tree = (Tree) _tagViewer.getControl();
 
@@ -668,10 +673,8 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 
 	/**
 	 * Defines all columns for the table viewer in the column manager
-	 * 
-	 * @param parent
 	 */
-	private void defineAllColumns(final Composite parent) {
+	private void defineAllColumns() {
 
 		defineColumn1stColumn();
 		defineColumnTitle();
@@ -1456,7 +1459,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 
 			_tagViewer.getTree().dispose();
 
-			createUI10TagViewer(_viewerContainer);
+			createUI_10_TagViewer(_viewerContainer);
 			_viewerContainer.layout();
 
 			_tagViewer.setInput(_bootItem = new TVITagViewRoot(this, _tagViewLayout));

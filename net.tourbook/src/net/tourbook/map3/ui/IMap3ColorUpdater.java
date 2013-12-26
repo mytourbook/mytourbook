@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -13,12 +13,18 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.map2.view;
+package net.tourbook.map3.ui;
 
-import net.tourbook.common.color.Map2ColorProfile;
+import net.tourbook.common.color.Map3ColorProfile;
 
-public interface IMapColorUpdater {
+public interface IMap3ColorUpdater {
 
-	void applyMapColors(Map2ColorProfile newMapColor);
+	/**
+	 * @param originalProfile
+	 * @param modifiedProfile
+	 *            This is a clone from the original profile which is modified in color editor.
+	 * @param isNewProfile
+	 */
+	void applyMapColors(Map3ColorProfile originalProfile, Map3ColorProfile modifiedProfile, boolean isNewProfile);
 
 }

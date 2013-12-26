@@ -39,7 +39,7 @@ import java.util.ArrayList;
 import net.tourbook.common.UI;
 import net.tourbook.common.color.IGradientColors;
 import net.tourbook.common.color.IMapColorProvider;
-import net.tourbook.common.color.MapUnitsConfiguration;
+import net.tourbook.common.color.MapUnits;
 import net.tourbook.map.MapUtils;
 import net.tourbook.map2.view.TourMapPainter;
 import net.tourbook.map3.view.Map3Manager;
@@ -399,7 +399,7 @@ public class TourLegendLayer extends RenderableLayer {
 				IMapColorProvider.DEFAULT_LEGEND_HEIGHT,
 				mapHeight - IMapColorProvider.LEGEND_TOP_MARGIN));
 
-		MapUtils.updateLegendMinMaxValues(//
+		MapUtils.setMinMaxValues(//
 				Map3Manager.getMap3View().getAllTours(),
 				gradientColorProvider,
 				_legendImageHeight);
@@ -451,7 +451,7 @@ public class TourLegendLayer extends RenderableLayer {
 					0d));
 		}
 
-		final MapUnitsConfiguration mapLegendImageConfig = gradientColorProvider.getMapUnitsConfiguration();
+		final MapUnits mapLegendImageConfig = gradientColorProvider.getMapUnits();
 
 		_labels = createColorGradientLegendLabels(
 				legendWidth,

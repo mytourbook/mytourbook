@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import net.tourbook.common.UI;
 import net.tourbook.common.color.ColorSelectorExtended;
 import net.tourbook.common.color.IColorSelectorListener;
-import net.tourbook.common.color.MapColorId;
+import net.tourbook.common.color.MapGraphId;
 import net.tourbook.common.tooltip.AnimatedToolTipShell;
 import net.tourbook.common.util.Util;
 import net.tourbook.map3.Messages;
@@ -83,7 +83,7 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 	private SelectionAdapter		_defaultSelectionListener;
 
 	private boolean					_isAnotherDialogOpened;
-	private MapColorId				_trackColorId;
+	private MapGraphId				_trackColorId;
 
 	private boolean					_isUpdateUI;
 
@@ -992,7 +992,7 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 				&& config.interiorColorMode_Selected == TourTrackConfig.COLOR_MODE_SOLID_COLOR;
 
 		// Hr zones are not yet supported
-		final boolean isGradientColor = _trackColorId != MapColorId.HrZone;
+		final boolean isGradientColor = _trackColorId != MapGraphId.HrZone;
 
 		// altitude
 		_chkAltitudeOffset.setEnabled(isAbsoluteAltitudeMode);

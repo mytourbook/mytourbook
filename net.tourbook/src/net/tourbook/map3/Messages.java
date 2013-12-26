@@ -76,6 +76,8 @@ public class Messages extends NLS {
 	public static String		Map3Color_Dialog_Button_Apply;
 	public static String	Map3Color_Dialog_Button_Label_GraphType;
 
+	public static String	Map3Color_Dialog_Button_Label_GraphType_Tooltip;
+
 	public static String		Map3Color_Dialog_Button_Label_ProfileName;
 	public static String		Map3Color_Dialog_Button_Remove;
 	public static String		Map3Color_Dialog_Button_Save;

@@ -194,7 +194,7 @@ public class TourTrackLayer extends RenderableLayer implements SelectListener, I
 	 */
 	private float[] getDataSerie(final TourData tourData) {
 
-		switch (_colorProvider.getMapColorId()) {
+		switch (_colorProvider.getGraphId()) {
 		case Altitude:
 			return tourData.altitudeSerie;
 

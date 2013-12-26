@@ -31,25 +31,29 @@ import org.eclipse.swt.graphics.Image;
  */
 public abstract class ProfileImage implements Cloneable {
 
-	protected static final int		IMAGE_MIN_WIDTH		= 10;
-	protected static final int		IMAGE_MIN_HEIGHT	= 10;
+	protected static final int			IMAGE_MIN_WIDTH		= 10;
+	protected static final int			IMAGE_MIN_HEIGHT	= 10;
 
-	private int						_imageWidth;
-	private int						_imageHeight;
+	private int							_imageWidth;
+	private int							_imageHeight;
 
-	private boolean					_isHorizontal		= true;
+	private boolean						_isHorizontal		= true;
 
+	private static final RGBVertex[]	DEFAULT_VERTICES	= new RGBVertex[] {
+			new RGBVertex(0, 0xff, 0, 0),
+			new RGBVertex(10, 0, 0xff, 0),
+			new RGBVertex(20, 0, 0, 0xff)					};
 	/**
 	 * Contains all vertices.
 	 */
-	private ArrayList<RGBVertex>	_rgbVertices		= new ArrayList<RGBVertex>();
+	private ArrayList<RGBVertex>		_rgbVertices		= new ArrayList<RGBVertex>(Arrays.asList(DEFAULT_VERTICES));
 
-	private RGBVertex[]				_vertexArray;
+	private RGBVertex[]					_vertexArray;
 
 	/*
 	 * UI controls
 	 */
-	private Image					_profileImage;
+	private Image						_profileImage;
 
 	public void addVertex(final int vertexPosition, final RGBVertex rgbVertex) {
 

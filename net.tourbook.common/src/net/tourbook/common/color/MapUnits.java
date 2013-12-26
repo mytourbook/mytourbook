@@ -22,7 +22,7 @@ import net.tourbook.common.UI;
 /**
  * Configuration for the units in a map color provider.
  */
-public class MapUnitsConfiguration {
+public class MapUnits {
 
 	public float			legendMinValue;
 	public float			legendMaxValue;
@@ -43,7 +43,7 @@ public class MapUnitsConfiguration {
 	public String toString() {
 		final int maxLen = 10;
 		return String.format("\n" //$NON-NLS-1$
-				+ "MapUnitsConfiguration\n" //$NON-NLS-1$
+				+ "MapUnits\n" //$NON-NLS-1$
 				+ "   legendMinValue		=%s\n" //$NON-NLS-1$
 				+ "   legendMaxValue		=%s\n" //$NON-NLS-1$
 				+ "   units					=%s\n" //$NON-NLS-1$

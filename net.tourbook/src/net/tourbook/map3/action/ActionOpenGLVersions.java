@@ -47,6 +47,7 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.forms.widgets.FormToolkit;
@@ -147,11 +148,22 @@ public class ActionOpenGLVersions extends Action {
 
 	private class GLInfo implements GLEventListener {
 
-		public void display(final GLAutoDrawable drawable) {}
+		public void display(final GLAutoDrawable drawable) {
 
-		public void dispose(final GLAutoDrawable drawable) {}
+			System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") + ("\tdisplay"));
+			// TODO remove SYSTEM.OUT.PRINTLN
+		}
+
+		public void dispose(final GLAutoDrawable drawable) {
+
+			System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") + ("\tdispose"));
+			// TODO remove SYSTEM.OUT.PRINTLN
+		}
 
 		public void init(final GLAutoDrawable drawable) {
+
+			System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") + ("\tinit"));
+			// TODO remove SYSTEM.OUT.PRINTLN
 
 			// update UI in UI thread
 			Display.getDefault().asyncExec(new Runnable() {
@@ -161,7 +173,11 @@ public class ActionOpenGLVersions extends Action {
 			});
 		}
 
-		public void reshape(final GLAutoDrawable drawable, final int x, final int y, final int width, final int height) {}
+		public void reshape(final GLAutoDrawable drawable, final int x, final int y, final int width, final int height) {
+
+			System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") + ("\treshape"));
+			// TODO remove SYSTEM.OUT.PRINTLN
+		}
 	}
 
 	public ActionOpenGLVersions() {
@@ -208,6 +224,11 @@ public class ActionOpenGLVersions extends Action {
 			_txtInfo.setFont(JFaceResources.getTextFont());
 
 			createUI_90_OpenGL(container);
+
+			final Label label = new Label(container, SWT.NONE);
+			GridDataFactory.fillDefaults().applyTo(label);
+			label.setText("test");
+
 		}
 
 		return container;
@@ -224,7 +245,7 @@ public class ActionOpenGLVersions extends Action {
 
 		// build GUI: container(SWT) -> Frame(AWT) -> Panel(AWT) -> WorldWindowGLCanvas(AWT)
 		_mapContainer = _tk.createComposite(parent, SWT.EMBEDDED);
-		GridDataFactory.fillDefaults().hint(1, 2).applyTo(_mapContainer);
+		GridDataFactory.fillDefaults().hint(10, 20).applyTo(_mapContainer);
 		{
 			_awtFrame = SWT_AWT.new_Frame(_mapContainer);
 			final java.awt.Panel awtPanel = new java.awt.Panel(new java.awt.BorderLayout());

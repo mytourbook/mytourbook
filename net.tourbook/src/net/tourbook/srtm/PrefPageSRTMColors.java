@@ -135,7 +135,7 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 	private int								_imageHeight			= 40;
 
 	private int								_oldImageWidth			= -1;
-	private Composite						_profileContainer;
+	private Composite						_viewerContainer;
 
 	private CheckboxTableViewer				_profileViewer;
 	private ColumnManager					_columnManager;
@@ -653,8 +653,8 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 			GridDataFactory.fillDefaults().grab(true, true).applyTo(profileContainer);
 			GridLayoutFactory.fillDefaults().numColumns(2).extendedMargins(0, 0, 0, 0).applyTo(profileContainer);
 			{
-				createUI10ProfileList(profileContainer);
-				createUI20Buttons(profileContainer);
+				createUI_10_ProfileViewer(profileContainer);
+				createUI_20_Actions(profileContainer);
 			}
 		}
 
@@ -663,21 +663,21 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 		return container;
 	}
 
-	private void createUI10ProfileList(final Composite parent) {
+	private void createUI_10_ProfileViewer(final Composite parent) {
 
 		// define all columns for the viewer
 		_columnManager = new ColumnManager(this, _state);
-		defineViewerColumn(parent);
+		defineAllColumns();
 
-		_profileContainer = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, true).applyTo(_profileContainer);
-		GridLayoutFactory.fillDefaults().applyTo(_profileContainer);
+		_viewerContainer = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, true).applyTo(_viewerContainer);
+		GridLayoutFactory.fillDefaults().applyTo(_viewerContainer);
 		{
-			createUI12ProfileViewer(_profileContainer);
+			createUI_12_ProfileViewer(_viewerContainer);
 		}
 	}
 
-	private void createUI12ProfileViewer(final Composite parent) {
+	private void createUI_12_ProfileViewer(final Composite parent) {
 
 		final Table table = new Table(parent, SWT.FULL_SELECTION | SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL | SWT.CHECK);
 		GridDataFactory.fillDefaults().grab(true, true).applyTo(table);
@@ -734,6 +734,7 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 		_profileViewer = new CheckboxTableViewer(table);
 
 		_columnManager.createColumns(_profileViewer);
+
 		_tcProfileImage = _colDefImage.getTableColumn();
 		_profileImageColumn = _colDefImage.getCreateIndex();
 
@@ -777,7 +778,7 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 
 	}
 
-	private void createUI20Buttons(final Composite parent) {
+	private void createUI_20_Actions(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().applyTo(container);
@@ -876,21 +877,21 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 		});
 	}
 
-	private void defineViewerColumn(final Composite parent) {
+	private void defineAllColumns() {
 
-		defineViewerColumnProfileName();
-		defineViewerColumnShadowState();
-		defineViewerColumnShadowValue();
-		defineViewerColumnResolution();
-		defineViewerColumnColor();
-		defineViewerColumnTileImagePath();
-		defineViewerColumnProfileId();
+		defineColumn_ProfileName();
+		defineColumn_ShadowState();
+		defineColumn_ShadowValue();
+		defineColumn_Resolution();
+		defineColumn_Color();
+		defineColumn_TileImagePath();
+		defineColumn_ProfileId();
 	}
 
 	/**
 	 * column: color
 	 */
-	private void defineViewerColumnColor() {
+	private void defineColumn_Color() {
 
 		final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager, "color", SWT.LEAD); //$NON-NLS-1$
 		_colDefImage = colDef;
@@ -920,7 +921,7 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 	/**
 	 * column: id
 	 */
-	private void defineViewerColumnProfileId() {
+	private void defineColumn_ProfileId() {
 
 		final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager, "profileId", SWT.TRAIL); //$NON-NLS-1$
 
@@ -941,7 +942,7 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 	/**
 	 * column: profile name
 	 */
-	private void defineViewerColumnProfileName() {
+	private void defineColumn_ProfileName() {
 
 		final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager, "profileName", SWT.LEAD); //$NON-NLS-1$
 
@@ -963,7 +964,7 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 	/**
 	 * column: resolution
 	 */
-	private void defineViewerColumnResolution() {
+	private void defineColumn_Resolution() {
 
 		final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager, "resolution", SWT.LEAD); //$NON-NLS-1$
 
@@ -985,7 +986,7 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 	/**
 	 * column: shadow state
 	 */
-	private void defineViewerColumnShadowState() {
+	private void defineColumn_ShadowState() {
 
 		final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager, "shadowState", SWT.LEAD); //$NON-NLS-1$
 
@@ -1007,7 +1008,7 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 	/**
 	 * column: shadow value
 	 */
-	private void defineViewerColumnShadowValue() {
+	private void defineColumn_ShadowValue() {
 
 		final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager, "shadowValue", SWT.LEAD); //$NON-NLS-1$
 
@@ -1029,7 +1030,7 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 	/**
 	 * column: image path
 	 */
-	private void defineViewerColumnTileImagePath() {
+	private void defineColumn_TileImagePath() {
 
 		final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager, "tileImagePath", SWT.LEAD); //$NON-NLS-1$
 		colDef.setColumnLabel(Messages.profileViewer_column_label_imagePath);
@@ -1453,17 +1454,17 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 
 	public ColumnViewer recreateViewer(final ColumnViewer columnViewer) {
 
-		_profileContainer.setRedraw(false);
+		_viewerContainer.setRedraw(false);
 		{
 			_profileViewer.getTable().dispose();
 
-			createUI12ProfileViewer(_profileContainer);
-			_profileContainer.layout();
+			createUI_12_ProfileViewer(_viewerContainer);
+			_viewerContainer.layout();
 
 			// update the viewer
 			reloadViewer();
 		}
-		_profileContainer.setRedraw(true);
+		_viewerContainer.setRedraw(true);
 
 		return _profileViewer;
 	}
@@ -1595,7 +1596,7 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 
 					final RGB rgb = vertex.getRGB();
 
-					createXmlVertex(xmlProfile, (int) vertex.getValue(), rgb.red, rgb.green, rgb.blue);
+					createXmlVertex(xmlProfile, vertex.getValue(), rgb.red, rgb.green, rgb.blue);
 				}
 			}
 

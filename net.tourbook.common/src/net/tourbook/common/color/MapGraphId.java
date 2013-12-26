@@ -16,11 +16,11 @@
 package net.tourbook.common.color;
 
 /**
- * Color id for tour tracks which are displayed in a 2D/3D map.
+ * Graph id for tour tracks which are displayed in a 2D/3D map.
  * <p>
  * This id defines, which tour data are displayed, e.g. altitude, speed...
  */
-public enum MapColorId {
+public enum MapGraphId {
 
 	Altitude,
 	//

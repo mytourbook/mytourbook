@@ -23,14 +23,15 @@ import net.tourbook.common.color.GraphColorManager;
 import net.tourbook.common.color.IGradientColors;
 import net.tourbook.common.color.LegendUnitFormat;
 import net.tourbook.common.color.Map2ColorProfile;
-import net.tourbook.common.color.MapUnitsConfiguration;
+import net.tourbook.common.color.MapUnits;
 import net.tourbook.data.TourData;
 import net.tourbook.map2.Messages;
 
 public class MapUtils {
 
 	/**
-	 * Update the min/max values in the {@link IGradientColors} for the currently displayed legend.
+	 * Update the min/max values in the {@link IGradientColors} for the currently displayed
+	 * legend/tour.
 	 * 
 	 * @param allTourData
 	 * @param colorProvider
@@ -38,9 +39,9 @@ public class MapUtils {
 	 * @return Return <code>true</code> when the legend value could be updated, <code>false</code>
 	 *         when data are not available
 	 */
-	public static boolean updateLegendMinMaxValues(	final ArrayList<TourData> allTourData,
-													final IGradientColors colorProvider,
-													final int legendHeight) {
+	public static boolean setMinMaxValues(	final ArrayList<TourData> allTourData,
+											final IGradientColors colorProvider,
+											final int legendHeight) {
 
 		if (allTourData.size() == 0) {
 			return false;
@@ -48,11 +49,11 @@ public class MapUtils {
 
 		final GraphColorManager colorManager = GraphColorManager.getInstance();
 
-		final MapUnitsConfiguration legendConfig = colorProvider.getMapUnitsConfiguration();
+		final MapUnits legendConfig = colorProvider.getMapUnits();
 		ColorDefinition colorDefinition;
 
 		// tell the legend provider how to draw the legend
-		switch (colorProvider.getMapColorId()) {
+		switch (colorProvider.getGraphId()) {
 
 		case Altitude:
 

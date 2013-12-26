@@ -17,6 +17,8 @@ package net.tourbook.common.color;
 
 import java.util.List;
 
+import net.tourbook.common.util.StatusUtil;
+
 import org.eclipse.swt.graphics.RGB;
 
 /**
@@ -27,22 +29,22 @@ import org.eclipse.swt.graphics.RGB;
  */
 public class Map3GradientColorProvider extends MapGradientColorProvider implements IGradientColors {
 
-	private MapColorId				_mapColorId;
+	private MapGraphId			_graphId;
 
-	private Map3ColorProfile		_map3ColorProfile;
+	private Map3ColorProfile	_colorProfile;
 
-	private MapUnitsConfiguration	_mapUnitsConfig	= new MapUnitsConfiguration();
+	private MapUnits			_mapUnits	= new MapUnits();
 
 	public Map3GradientColorProvider(final Map3ColorProfile map3ColorProfile) {
 
-		_mapColorId = map3ColorProfile.getMapColorId();
-		_map3ColorProfile = map3ColorProfile;
+		_graphId = map3ColorProfile.getGraphId();
+		_colorProfile = map3ColorProfile;
 	}
 
-	public Map3GradientColorProvider(final MapColorId mapColorId) {
+	public Map3GradientColorProvider(final MapGraphId graphId) {
 
-		_mapColorId = mapColorId;
-		_map3ColorProfile = new Map3ColorProfile(mapColorId);
+		_graphId = graphId;
+		_colorProfile = new Map3ColorProfile(graphId);
 	}
 
 	@Override
@@ -53,9 +55,9 @@ public class Map3GradientColorProvider extends MapGradientColorProvider implemen
 										final LegendUnitFormat unitFormat) {
 
 		// overwrite min value
-		if (_map3ColorProfile.isMinValueOverwrite()) {
+		if (_colorProfile.isMinValueOverwrite()) {
 
-			minValue = _map3ColorProfile.getOverwriteMinValue();
+			minValue = _colorProfile.getMinValueOverwrite();
 
 			if (unitFormat == LegendUnitFormat.Pace) {
 
@@ -65,9 +67,9 @@ public class Map3GradientColorProvider extends MapGradientColorProvider implemen
 		}
 
 		// overwrite max value
-		if (_map3ColorProfile.isMaxValueOverwrite()) {
+		if (_colorProfile.isMaxValueOverwrite()) {
 
-			maxValue = _map3ColorProfile.getOverwriteMaxValue();
+			maxValue = _colorProfile.getMaxValueOverwrite();
 
 			if (unitFormat == LegendUnitFormat.Pace) {
 
@@ -88,20 +90,24 @@ public class Map3GradientColorProvider extends MapGradientColorProvider implemen
 			final Float legendMinValue = legendUnits.get(0);
 			final Float legendMaxValue = legendUnits.get(legendUnits.size() - 1);
 
-			_mapUnitsConfig.units = legendUnits;
-			_mapUnitsConfig.unitText = unitText;
-			_mapUnitsConfig.legendMinValue = legendMinValue;
-			_mapUnitsConfig.legendMaxValue = legendMaxValue;
+			_mapUnits.units = legendUnits;
+			_mapUnits.unitText = unitText;
+			_mapUnits.legendMinValue = legendMinValue;
+			_mapUnits.legendMaxValue = legendMaxValue;
 		}
 	}
 
 	@Override
 	public int getColorValue(final float graphValue) {
 
-		final RGBVertex[] rgbVerticies = _map3ColorProfile.getProfileImage().getRgbVerticesArray();
+		final RGBVertex[] rgbVerticies = _colorProfile.getProfileImage().getRgbVerticesArray();
 
-		final float minBrightnessFactor = _map3ColorProfile.getMinBrightnessFactor() / 100.0f;
-		final float maxBrightnessFactor = _map3ColorProfile.getMaxBrightnessFactor() / 100.0f;
+		if (rgbVerticies.length == 0) {
+			return 0xff00ff;
+		}
+
+		final float minBrightnessFactor = _colorProfile.getMinBrightnessFactor() / 100.0f;
+		final float maxBrightnessFactor = _colorProfile.getMaxBrightnessFactor() / 100.0f;
 
 		/*
 		 * find the ColorValue for the current value
@@ -145,18 +151,18 @@ public class Map3GradientColorProvider extends MapGradientColorProvider implemen
 			blue = minRGB.blue;
 
 			final float minValue = rgbVertex.getValue();
-			final float minDiff = _mapUnitsConfig.legendMinValue - minValue;
+			final float minDiff = _mapUnits.legendMinValue - minValue;
 
 			final float ratio = minDiff == 0 ? 1 : (graphValue - minValue) / minDiff;
 			final float dimmRatio = minBrightnessFactor * ratio;
 
-			if (_map3ColorProfile.getMinBrightness() == MapColorProfile.BRIGHTNESS_DIMMING) {
+			if (_colorProfile.getMinBrightness() == MapColorProfile.BRIGHTNESS_DIMMING) {
 
 				red = red - (int) (dimmRatio * red);
 				green = green - (int) (dimmRatio * green);
 				blue = blue - (int) (dimmRatio * blue);
 
-			} else if (_map3ColorProfile.getMinBrightness() == MapColorProfile.BRIGHTNESS_LIGHTNING) {
+			} else if (_colorProfile.getMinBrightness() == MapColorProfile.BRIGHTNESS_LIGHTNING) {
 
 				red = red + (int) (dimmRatio * (255 - red));
 				green = green + (int) (dimmRatio * (255 - green));
@@ -176,18 +182,18 @@ public class Map3GradientColorProvider extends MapGradientColorProvider implemen
 			blue = maxRGB.blue;
 
 			final float maxValue = rgbVertex.getValue();
-			final float maxDiff = _mapUnitsConfig.legendMaxValue - maxValue;
+			final float maxDiff = _mapUnits.legendMaxValue - maxValue;
 
 			final float ratio = maxDiff == 0 ? 1 : (graphValue - maxValue) / maxDiff;
 			final float dimmRatio = maxBrightnessFactor * ratio;
 
-			if (_map3ColorProfile.getMaxBrightness() == MapColorProfile.BRIGHTNESS_DIMMING) {
+			if (_colorProfile.getMaxBrightness() == MapColorProfile.BRIGHTNESS_DIMMING) {
 
 				red = red - (int) (dimmRatio * red);
 				green = green - (int) (dimmRatio * green);
 				blue = blue - (int) (dimmRatio * blue);
 
-			} else if (_map3ColorProfile.getMaxBrightness() == MapColorProfile.BRIGHTNESS_LIGHTNING) {
+			} else if (_colorProfile.getMaxBrightness() == MapColorProfile.BRIGHTNESS_LIGHTNING) {
 
 				red = red + (int) (dimmRatio * (255 - red));
 				green = green + (int) (dimmRatio * (255 - green));
@@ -235,22 +241,33 @@ public class Map3GradientColorProvider extends MapGradientColorProvider implemen
 		return graphColor;
 	}
 
-	public MapColorId getMapColorId() {
-		return _mapColorId;
+	public MapGraphId getGraphId() {
+		return _graphId;
 	}
 
 	@Override
 	public MapColorProfile getMapColorProfile() {
-		return _map3ColorProfile;
+		return _colorProfile;
 	}
 
-	public MapUnitsConfiguration getMapUnitsConfiguration() {
-		return _mapUnitsConfig;
+	public MapUnits getMapUnits() {
+		return _mapUnits;
 	}
 
 	@Override
-	public void setColorProfile(final MapColorProfile mapColorProfile) {
+	public void setColorProfile(final MapColorProfile colorProfile) {
 
+		if (colorProfile instanceof Map3ColorProfile) {
+
+			_colorProfile = (Map3ColorProfile) colorProfile;
+
+		} else {
+
+			StatusUtil.log(new Throwable(String.format(
+					"Color profile '%s' is not of type '%s'",
+					colorProfile,
+					Map3ColorProfile.class.getSimpleName())));
+		}
 	}
 
 }

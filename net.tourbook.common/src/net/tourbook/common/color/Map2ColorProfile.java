@@ -76,9 +76,9 @@ public class Map2ColorProfile extends MapColorProfile implements Cloneable {
 		this(valueColors, minBrightness, minBrightnessFactor, maxBrightness, maxBrightnessFactor);
 
 		this.isMinValueOverwrite = isMinOverwrite;
-		this.overwriteMinValue = minOverwrite;
+		this.minValueOverwrite = minOverwrite;
 		this.isMaxValueOverwrite = isMaxOverwrite;
-		this.overwriteMaxValue = maxOverwrite;
+		this.maxValueOverwrite = maxOverwrite;
 	}
 
 	@Override

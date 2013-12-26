@@ -93,7 +93,8 @@ public class Messages extends NLS {
 	public static String		Image_Action_PhotoFilterNoPhotos;
 	public static String		Image_Action_PhotoFilterWithPhotos;
 
-	public static String		Map3_Color_DefaultProfileName;
+	public static String		Map3_Color_ProfileName_Default;
+	public static String		Map3_Color_ProfileName_New;
 
 	public static String		Map3_PropertyTooltip_Action_Close_Tooltip;
 	public static String		Map3_PropertyTooltip_Action_MoveToDefaultLocation_Tooltip;

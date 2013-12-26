@@ -50,63 +50,63 @@ import org.w3c.dom.Element;
  */
 public class GraphColorManager {
 
-	public static final String			PREF_GRAPH_ALTIMETER		= "altimeter";			//$NON-NLS-1$
-	public static final String			PREF_GRAPH_ALTITUDE			= "altitude";			//$NON-NLS-1$
-	public static final String			PREF_GRAPH_CADENCE			= "cadence";			//$NON-NLS-1$
-	public static final String			PREF_GRAPH_DISTANCE			= "distance";			//$NON-NLS-1$
-	public static final String			PREF_GRAPH_HEARTBEAT		= "heartbeat";			//$NON-NLS-1$
-	public static final String			PREF_GRAPH_HISTORY			= "History";			//$NON-NLS-1$
-	public static final String			PREF_GRAPH_GRADIENT			= "gradient";			//$NON-NLS-1$
-	public static final String			PREF_GRAPH_PACE				= "pace";				//$NON-NLS-1$
-	public static final String			PREF_GRAPH_POWER			= "power";				//$NON-NLS-1$
-	public static final String			PREF_GRAPH_SPEED			= "speed";				//$NON-NLS-1$
-	public static final String			PREF_GRAPH_TEMPTERATURE		= "tempterature";		//$NON-NLS-1$
-	public static final String			PREF_GRAPH_TIME				= "duration";			//$NON-NLS-1$
-	public static final String			PREF_GRAPH_TOUR				= "tour";				//$NON-NLS-1$
-	public static final String			PREF_GRAPH_TOUR_COMPARE		= "tourCompare";		//$NON-NLS-1$
+	public static final String				PREF_GRAPH_ALTIMETER		= "altimeter";			//$NON-NLS-1$
+	public static final String				PREF_GRAPH_ALTITUDE			= "altitude";			//$NON-NLS-1$
+	public static final String				PREF_GRAPH_CADENCE			= "cadence";			//$NON-NLS-1$
+	public static final String				PREF_GRAPH_DISTANCE			= "distance";			//$NON-NLS-1$
+	public static final String				PREF_GRAPH_HEARTBEAT		= "heartbeat";			//$NON-NLS-1$
+	public static final String				PREF_GRAPH_HISTORY			= "History";			//$NON-NLS-1$
+	public static final String				PREF_GRAPH_GRADIENT			= "gradient";			//$NON-NLS-1$
+	public static final String				PREF_GRAPH_PACE				= "pace";				//$NON-NLS-1$
+	public static final String				PREF_GRAPH_POWER			= "power";				//$NON-NLS-1$
+	public static final String				PREF_GRAPH_SPEED			= "speed";				//$NON-NLS-1$
+	public static final String				PREF_GRAPH_TEMPTERATURE		= "tempterature";		//$NON-NLS-1$
+	public static final String				PREF_GRAPH_TIME				= "duration";			//$NON-NLS-1$
+	public static final String				PREF_GRAPH_TOUR				= "tour";				//$NON-NLS-1$
+	public static final String				PREF_GRAPH_TOUR_COMPARE		= "tourCompare";		//$NON-NLS-1$
 
-	public static final String			PREF_COLOR_BRIGHT			= "bright";			//$NON-NLS-1$
-	public static final String			PREF_COLOR_DARK				= "dark";				//$NON-NLS-1$
-	public static final String			PREF_COLOR_LINE				= "line";				//$NON-NLS-1$
-	public static final String			PREF_COLOR_TEXT				= "text";				//$NON-NLS-1$
-	public static final String			PREF_COLOR_MAPPING			= "mapping";			//$NON-NLS-1$
+	public static final String				PREF_COLOR_BRIGHT			= "bright";			//$NON-NLS-1$
+	public static final String				PREF_COLOR_DARK				= "dark";				//$NON-NLS-1$
+	public static final String				PREF_COLOR_LINE				= "line";				//$NON-NLS-1$
+	public static final String				PREF_COLOR_TEXT				= "text";				//$NON-NLS-1$
+	public static final String				PREF_COLOR_MAPPING			= "mapping";			//$NON-NLS-1$
 
-	private static final String			MEMENTO_LEGEND_COLOR_FILE	= "legendcolor.xml";	//$NON-NLS-1$
-	private static final String			MEMENTO_ROOT				= "legendcolorlist";	//$NON-NLS-1$
+	private static final String				MEMENTO_LEGEND_COLOR_FILE	= "legendcolor.xml";	//$NON-NLS-1$
+	private static final String				MEMENTO_ROOT				= "legendcolorlist";	//$NON-NLS-1$
 
-	private static final String			MEMENTO_CHILD_LEGEND_COLOR	= "legendcolor";		//$NON-NLS-1$
-	private static final String			TAG_LEGEND_COLOR_PREF_NAME	= "prefname";			//$NON-NLS-1$
+	private static final String				MEMENTO_CHILD_LEGEND_COLOR	= "legendcolor";		//$NON-NLS-1$
+	private static final String				TAG_LEGEND_COLOR_PREF_NAME	= "prefname";			//$NON-NLS-1$
 
-	private static final String			MEMENTO_CHILD_VALUE_COLOR	= "valuecolor";		//$NON-NLS-1$
-	private static final String			TAG_VALUE_COLOR_VALUE		= "value";				//$NON-NLS-1$
-	private static final String			TAG_VALUE_COLOR_RED			= "red";				//$NON-NLS-1$
-	private static final String			TAG_VALUE_COLOR_GREEN		= "green";				//$NON-NLS-1$
-	private static final String			TAG_VALUE_COLOR_BLUE		= "blue";				//$NON-NLS-1$
+	private static final String				MEMENTO_CHILD_VALUE_COLOR	= "valuecolor";		//$NON-NLS-1$
+	private static final String				TAG_VALUE_COLOR_VALUE		= "value";				//$NON-NLS-1$
+	private static final String				TAG_VALUE_COLOR_RED			= "red";				//$NON-NLS-1$
+	private static final String				TAG_VALUE_COLOR_GREEN		= "green";				//$NON-NLS-1$
+	private static final String				TAG_VALUE_COLOR_BLUE		= "blue";				//$NON-NLS-1$
 
-	private static final String			MEMENTO_CHILD_BRIGHTNESS	= "brightness";		//$NON-NLS-1$
-	private static final String			TAG_BRIGHTNESS_MIN			= "min";				//$NON-NLS-1$
-	private static final String			TAG_BRIGHTNESS_MIN_FACTOR	= "minFactor";			//$NON-NLS-1$
-	private static final String			TAG_BRIGHTNESS_MAX			= "max";				//$NON-NLS-1$
-	private static final String			TAG_BRIGHTNESS_MAX_FACTOR	= "maxFactor";			//$NON-NLS-1$
+	static final String						MEMENTO_CHILD_BRIGHTNESS	= "brightness";		//$NON-NLS-1$
+	static final String						TAG_BRIGHTNESS_MIN			= "min";				//$NON-NLS-1$
+	static final String						TAG_BRIGHTNESS_MIN_FACTOR	= "minFactor";			//$NON-NLS-1$
+	static final String						TAG_BRIGHTNESS_MAX			= "max";				//$NON-NLS-1$
+	static final String						TAG_BRIGHTNESS_MAX_FACTOR	= "maxFactor";			//$NON-NLS-1$
 
-	private static final String			MEMENTO_CHILD_MIN_MAX_VALUE	= "minmaxValue";		//$NON-NLS-1$
-	private static final String			TAG_IS_MIN_VALUE_OVERWRITE	= "isMinOverwrite";	//$NON-NLS-1$
-	private static final String			TAG_MIN_VALUE_OVERWRITE		= "minValueOverwrite";	//$NON-NLS-1$
-	private static final String			TAG_IS_MAX_VALUE_OVERWRITE	= "isMaxOverwrite";	//$NON-NLS-1$
-	private static final String			TAG_MAX_VALUE_OVERWRITE		= "maxValueOverwrite";	//$NON-NLS-1$
+	static final String						MEMENTO_CHILD_MIN_MAX_VALUE	= "minmaxValue";		//$NON-NLS-1$
+	static final String						TAG_IS_MIN_VALUE_OVERWRITE	= "isMinOverwrite";	//$NON-NLS-1$
+	static final String						TAG_MIN_VALUE_OVERWRITE		= "minValueOverwrite";	//$NON-NLS-1$
+	static final String						TAG_IS_MAX_VALUE_OVERWRITE	= "isMaxOverwrite";	//$NON-NLS-1$
+	static final String						TAG_MAX_VALUE_OVERWRITE		= "maxValueOverwrite";	//$NON-NLS-1$
 
-	public static String[][]			colorNames					= new String[][] {
+	public static String[][]				colorNames					= new String[][] {
 			{ PREF_COLOR_BRIGHT, Messages.Graph_Pref_color_gradient_bright },
 			{ PREF_COLOR_DARK, Messages.Graph_Pref_color_gradient_dark },
 			{ PREF_COLOR_LINE, Messages.Graph_Pref_color_line },
 			{ PREF_COLOR_TEXT, Messages.Graph_Pref_ColorText },
-			{ PREF_COLOR_MAPPING, Messages.Graph_Pref_color_mapping } };
+			{ PREF_COLOR_MAPPING, Messages.Graph_Pref_color_mapping }	};
 
-	private static final Map2ColorProfile		MAP_COLOR_ALTITUDE;
-	private static final Map2ColorProfile		MAP_COLOR_GRADIENT;
-	private static final Map2ColorProfile		MAP_COLOR_PACE;
-	private static final Map2ColorProfile		MAP_COLOR_PULSE;
-	private static final Map2ColorProfile		MAP_COLOR_SPEED;
+	private static final Map2ColorProfile	MAP_COLOR_ALTITUDE;
+	private static final Map2ColorProfile	MAP_COLOR_GRADIENT;
+	private static final Map2ColorProfile	MAP_COLOR_PACE;
+	private static final Map2ColorProfile	MAP_COLOR_PULSE;
+	private static final Map2ColorProfile	MAP_COLOR_SPEED;
 
 	/**
 	 * Set map default colors.
@@ -190,9 +190,9 @@ public class GraphColorManager {
 				8);
 	}
 
-	private static GraphColorManager	_instance;
+	private static GraphColorManager		_instance;
 
-	private ColorDefinition[]			_graphColorDefinitions;
+	private ColorDefinition[]				_graphColorDefinitions;
 
 	public GraphColorManager() {}
 
@@ -297,9 +297,9 @@ public class GraphColorManager {
 
 				final IMemento mementoMinMaxValue = mementoLegendColor.createChild(MEMENTO_CHILD_MIN_MAX_VALUE);
 				mementoMinMaxValue.putInteger(TAG_IS_MIN_VALUE_OVERWRITE, mapColor.isMinValueOverwrite() ? 1 : 0);
-				mementoMinMaxValue.putInteger(TAG_MIN_VALUE_OVERWRITE, mapColor.getOverwriteMinValue());
+				mementoMinMaxValue.putInteger(TAG_MIN_VALUE_OVERWRITE, mapColor.getMinValueOverwrite());
 				mementoMinMaxValue.putInteger(TAG_IS_MAX_VALUE_OVERWRITE, mapColor.isMaxValueOverwrite() ? 1 : 0);
-				mementoMinMaxValue.putInteger(TAG_MAX_VALUE_OVERWRITE, mapColor.getOverwriteMaxValue());
+				mementoMinMaxValue.putInteger(TAG_MAX_VALUE_OVERWRITE, mapColor.getMaxValueOverwrite());
 			}
 
 			xmlMemento.save(writer);
@@ -587,20 +587,20 @@ public class GraphColorManager {
 
 					final Integer isMinOverwrite = mementoMinMaxValue0.getInteger(TAG_IS_MIN_VALUE_OVERWRITE);
 					if (isMinOverwrite != null) {
-						loadedMapColor.setMinValueOverwrite(isMinOverwrite == 1);
+						loadedMapColor.setIsMinValueOverwrite(isMinOverwrite == 1);
 					}
 					final Integer minValue = mementoMinMaxValue0.getInteger(TAG_MIN_VALUE_OVERWRITE);
 					if (minValue != null) {
-						loadedMapColor.setOverwriteMinValue(minValue);
+						loadedMapColor.setMinValueOverwrite(minValue);
 					}
 
 					final Integer isMaxOverwrite = mementoMinMaxValue0.getInteger(TAG_IS_MAX_VALUE_OVERWRITE);
 					if (isMaxOverwrite != null) {
-						loadedMapColor.setMaxValueOverwrite(isMaxOverwrite == 1);
+						loadedMapColor.setIsMaxValueOverwrite(isMaxOverwrite == 1);
 					}
 					final Integer maxValue = mementoMinMaxValue0.getInteger(TAG_MAX_VALUE_OVERWRITE);
 					if (maxValue != null) {
-						loadedMapColor.setOverwriteMaxValue(maxValue);
+						loadedMapColor.setMaxValueOverwrite(maxValue);
 					}
 				}
 

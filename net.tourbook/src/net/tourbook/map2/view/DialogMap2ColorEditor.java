@@ -71,7 +71,7 @@ public class DialogMap2ColorEditor extends TitleAreaDialog {
 
 	private final IDialogSettings	_state				= TourbookPlugin.getStateSection("DialogMappingColor"); //$NON-NLS-1$
 
-	private IMapColorUpdater		_mapColorUpdater;
+	private IMap2ColorUpdater		_mapColorUpdater;
 
 	private final IGradientColors	_colorProvider;
 	private Map2ColorProfile		_mapColorWorkingCopy;
@@ -128,7 +128,7 @@ public class DialogMap2ColorEditor extends TitleAreaDialog {
 
 	public DialogMap2ColorEditor(	final Shell parentShell,
 									final IGradientColors colorProvider,
-									final IMapColorUpdater mapColorUpdater) {
+									final IMap2ColorUpdater mapColorUpdater) {
 
 		super(parentShell);
 
@@ -712,11 +712,11 @@ public class DialogMap2ColorEditor extends TitleAreaDialog {
 		_mapColorWorkingCopy.setMaxBrightness(_cboMaxBrightness.getSelectionIndex());
 		_mapColorWorkingCopy.setMaxBrightnessFactor(_scaleMaxBrightness.getSelection());
 
-		_mapColorWorkingCopy.setMinValueOverwrite(_chkForceMinValue.getSelection());
-		_mapColorWorkingCopy.setOverwriteMinValue(_spinMinValue.getSelection());
+		_mapColorWorkingCopy.setIsMinValueOverwrite(_chkForceMinValue.getSelection());
+		_mapColorWorkingCopy.setMinValueOverwrite(_spinMinValue.getSelection());
 
-		_mapColorWorkingCopy.setMaxValueOverwrite(_chkForceMaxValue.getSelection());
-		_mapColorWorkingCopy.setOverwriteMaxValue(_spinMaxValue.getSelection());
+		_mapColorWorkingCopy.setIsMaxValueOverwrite(_chkForceMaxValue.getSelection());
+		_mapColorWorkingCopy.setMaxValueOverwrite(_spinMaxValue.getSelection());
 
 		enableControls();
 
@@ -737,9 +737,9 @@ public class DialogMap2ColorEditor extends TitleAreaDialog {
 
 		// update min/max value
 		_chkForceMinValue.setSelection(_mapColorWorkingCopy.isMinValueOverwrite());
-		_spinMinValue.setSelection(_mapColorWorkingCopy.getOverwriteMinValue());
+		_spinMinValue.setSelection(_mapColorWorkingCopy.getMinValueOverwrite());
 		_chkForceMaxValue.setSelection(_mapColorWorkingCopy.isMaxValueOverwrite());
-		_spinMaxValue.setSelection(_mapColorWorkingCopy.getOverwriteMaxValue());
+		_spinMaxValue.setSelection(_mapColorWorkingCopy.getMaxValueOverwrite());
 
 		updateUI_Labels();
 		enableControls();
@@ -772,10 +772,10 @@ public class DialogMap2ColorEditor extends TitleAreaDialog {
 			map2ColorProfile.setMinBrightness(_mapColorWorkingCopy.getMinBrightness());
 			map2ColorProfile.setMaxBrightness(_mapColorWorkingCopy.getMaxBrightness());
 
-			map2ColorProfile.setMinValueOverwrite(_mapColorWorkingCopy.isMinValueOverwrite());
-			map2ColorProfile.setOverwriteMinValue(_mapColorWorkingCopy.getOverwriteMinValue());
-			map2ColorProfile.setMaxValueOverwrite(_mapColorWorkingCopy.isMaxValueOverwrite());
-			map2ColorProfile.setOverwriteMaxValue(_mapColorWorkingCopy.getOverwriteMaxValue());
+			map2ColorProfile.setIsMinValueOverwrite(_mapColorWorkingCopy.isMinValueOverwrite());
+			map2ColorProfile.setMinValueOverwrite(_mapColorWorkingCopy.getMinValueOverwrite());
+			map2ColorProfile.setIsMaxValueOverwrite(_mapColorWorkingCopy.isMaxValueOverwrite());
+			map2ColorProfile.setMaxValueOverwrite(_mapColorWorkingCopy.getMaxValueOverwrite());
 
 			createLegendImage();
 

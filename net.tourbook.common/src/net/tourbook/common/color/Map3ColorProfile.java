@@ -25,44 +25,52 @@ import org.eclipse.swt.graphics.Image;
  */
 public class Map3ColorProfile extends MapColorProfile implements Cloneable {
 
+	private static final String	PROFILE_NAME_DEFAULTA	= Messages.Map3_Color_ProfileName_Default;
+	public static final String	PROFILE_NAME_NEW		= Messages.Map3_Color_ProfileName_New;
+
 	/**
 	 * Unique id to identify a color profile.
 	 */
-	private int				_profileId;
+	private int					_profileId;
 
 	/**
 	 * 
 	 */
-	private MapColorId		_mapColorId;
+	private MapGraphId			_graphId;
 
 	/**
 	 * Name which is visible in the UI.
 	 */
-	private String			_profileName	= Messages.Map3_Color_DefaultProfileName;
+	private String				_profileName			= PROFILE_NAME_DEFAULTA;
 
-	private ProfileImage	_profileImage	= new Map3ProfileImage();
+	private ProfileImage		_profileImage			= new Map3ProfileImage();
 
-	private static int		_idCounter		= 0;
+	private static int			_idCounter				= 0;
 
-	public Map3ColorProfile(final MapColorId mapColorId) {
-		_mapColorId = mapColorId;
+	public Map3ColorProfile(final MapGraphId graphId) {
+
+		_graphId = graphId;
+		_profileId = createProfileId();
 	}
 
 	/**
+	 * @param graphId
 	 * @param rgbVertices
 	 * @param minBrightness
 	 * @param minBrightnessFactor
 	 * @param maxBrightness
 	 * @param maxBrightnessFactor
 	 */
-	public Map3ColorProfile(final RGBVertex[] rgbVertices,
-	//
+	public Map3ColorProfile(final MapGraphId graphId, //
+							//
+							final RGBVertex[] rgbVertices,
+							//
 							final int minBrightness,
 							final int minBrightnessFactor,
 							final int maxBrightness,
 							final int maxBrightnessFactor) {
 
-		_profileId = createProfileId();
+		this(graphId);
 
 		_profileImage.setVertices(rgbVertices);
 
@@ -83,8 +91,10 @@ public class Map3ColorProfile extends MapColorProfile implements Cloneable {
 	 * @param isMaxOverwrite
 	 * @param maxOverwrite
 	 */
-	public Map3ColorProfile(final RGBVertex[] rgbVertices,
+	public Map3ColorProfile(final MapGraphId graphId,
 	//
+							final RGBVertex[] rgbVertices,
+							//
 							final int minBrightness,
 							final int minBrightnessFactor,
 							final int maxBrightness,
@@ -97,12 +107,17 @@ public class Map3ColorProfile extends MapColorProfile implements Cloneable {
 	//
 	) {
 
-		this(rgbVertices, minBrightness, minBrightnessFactor, maxBrightness, maxBrightnessFactor);
+		this(graphId, //
+				rgbVertices,
+				minBrightness,
+				minBrightnessFactor,
+				maxBrightness,
+				maxBrightnessFactor);
 
 		this.isMinValueOverwrite = isMinOverwrite;
-		this.overwriteMinValue = minOverwrite;
+		this.minValueOverwrite = minOverwrite;
 		this.isMaxValueOverwrite = isMaxOverwrite;
-		this.overwriteMaxValue = maxOverwrite;
+		this.maxValueOverwrite = maxOverwrite;
 	}
 
 	@Override
@@ -140,17 +155,34 @@ public class Map3ColorProfile extends MapColorProfile implements Cloneable {
 	}
 
 	/**
-	 * Create a unique id.
-	 * 
-	 * @return
+	 * @return Returns a unique id.
 	 */
 	private int createProfileId() {
 
 		return ++_idCounter;
 	}
 
-	public MapColorId getMapColorId() {
-		return _mapColorId;
+	@Override
+	public boolean equals(final Object obj) {
+
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (!(obj instanceof Map3ColorProfile)) {
+			return false;
+		}
+		final Map3ColorProfile other = (Map3ColorProfile) obj;
+		if (_profileId != other._profileId) {
+			return false;
+		}
+		return true;
+	}
+
+	public MapGraphId getGraphId() {
+		return _graphId;
 	}
 
 	public int getProfileId() {
@@ -165,12 +197,32 @@ public class Map3ColorProfile extends MapColorProfile implements Cloneable {
 		return _profileName;
 	}
 
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + _profileId;
+		return result;
+	}
+
+	public void setGraphId(final MapGraphId graphId) {
+		_graphId = graphId;
+	}
+
 	public void setProfileId(final int profileId) {
 		_profileId = profileId;
 	}
 
 	public void setProfileName(final String name) {
 		_profileName = name;
+	}
+
+	@Override
+	public String toString() {
+		return String.format("Map3ColorProfile [_profileId=%s, _graphId=%s, _profileName=%s]", //$NON-NLS-1$
+				_profileId,
+				_graphId,
+				_profileName);
 	}
 
 }

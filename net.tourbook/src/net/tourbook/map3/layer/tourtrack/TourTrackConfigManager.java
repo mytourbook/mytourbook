@@ -220,7 +220,7 @@ public class TourTrackConfigManager {
 	private static final String						TAG_ALTITUDE								= "altitude";										//$NON-NLS-1$
 	private static final String						ATTR_ALTITUDE_MODE							= "altitudeMode";									//$NON-NLS-1$
 	private static final String						ATTR_IS_ABSOLUTE_OFFSET						= "isAbsoluteOffset";								//$NON-NLS-1$
-	private static final String						ATTR_IS_ABSOLUTE_OFFSET_RANDOM				= "isAbsoluteOffsetRandom"; //$NON-NLS-1$
+	private static final String						ATTR_IS_ABSOLUTE_OFFSET_RANDOM				= "isAbsoluteOffsetRandom";						//$NON-NLS-1$
 	private static final String						ATTR_ALTITUDE_OFFSET_MODE					= "offsetMode";									//$NON-NLS-1$
 	private static final String						ATTR_ALTITUDE_OFFSET_ABSOLUTE				= "absoluteOffset";								//$NON-NLS-1$
 	private static final String						ATTR_ALTITUDE_OFFSET_RELATIVE				= "relativeOffset";								//$NON-NLS-1$
@@ -904,27 +904,19 @@ public class TourTrackConfigManager {
 
 			if (colorChildTag.equals(TAG_COLOR_NORMAL)) {
 
-				config.outlineColor = Util.getXmlRgb(xmlColorChild,//
-						ATTR_NORMAL,
-						RGB_NORMAL_DEFAULT);
+				config.outlineColor = Util.getXmlRgb(xmlColorChild, RGB_NORMAL_DEFAULT);
 
 			} else if (colorChildTag.equals(TAG_COLOR_HOVERED)) {
 
-				config.outlineColor_Hovered = Util.getXmlRgb(xmlColorChild,//
-						ATTR_HOVERED,
-						RGB_HOVERED_DEFAULT);
+				config.outlineColor_Hovered = Util.getXmlRgb(xmlColorChild, RGB_HOVERED_DEFAULT);
 
 			} else if (colorChildTag.equals(TAG_COLOR_SELECTED)) {
 
-				config.outlineColor_Selected = Util.getXmlRgb(xmlColorChild,//
-						ATTR_SELECTED,
-						RGB_SELECTED_DEFAULT);
+				config.outlineColor_Selected = Util.getXmlRgb(xmlColorChild, RGB_SELECTED_DEFAULT);
 
 			} else if (colorChildTag.equals(TAG_COLOR_HOV_AND_SEL)) {
 
-				config.outlineColor_HovSel = Util.getXmlRgb(xmlColorChild,//
-						ATTR_HOV_AND_SEL,
-						RGB_HOV_SEL_DEFAULT);
+				config.outlineColor_HovSel = Util.getXmlRgb(xmlColorChild, RGB_HOV_SEL_DEFAULT);
 			}
 		}
 	}
@@ -1016,27 +1008,19 @@ public class TourTrackConfigManager {
 
 			if (colorChildTag.equals(TAG_COLOR_NORMAL)) {
 
-				config.interiorColor = Util.getXmlRgb(xmlColorChild,//
-						ATTR_NORMAL,
-						RGB_NORMAL_DEFAULT);
+				config.interiorColor = Util.getXmlRgb(xmlColorChild, RGB_NORMAL_DEFAULT);
 
 			} else if (colorChildTag.equals(TAG_COLOR_HOVERED)) {
 
-				config.interiorColor_Hovered = Util.getXmlRgb(xmlColorChild,//
-						ATTR_HOVERED,
-						RGB_HOVERED_DEFAULT);
+				config.interiorColor_Hovered = Util.getXmlRgb(xmlColorChild, RGB_HOVERED_DEFAULT);
 
 			} else if (colorChildTag.equals(TAG_COLOR_SELECTED)) {
 
-				config.interiorColor_Selected = Util.getXmlRgb(xmlColorChild,//
-						ATTR_SELECTED,
-						RGB_SELECTED_DEFAULT);
+				config.interiorColor_Selected = Util.getXmlRgb(xmlColorChild, RGB_SELECTED_DEFAULT);
 
 			} else if (colorChildTag.equals(TAG_COLOR_HOV_AND_SEL)) {
 
-				config.interiorColor_HovSel = Util.getXmlRgb(xmlColorChild,//
-						ATTR_HOV_AND_SEL,
-						RGB_HOV_SEL_DEFAULT);
+				config.interiorColor_HovSel = Util.getXmlRgb(xmlColorChild, RGB_HOV_SEL_DEFAULT);
 			}
 		}
 	}

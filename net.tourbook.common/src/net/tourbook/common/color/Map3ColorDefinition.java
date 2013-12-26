@@ -17,41 +17,52 @@ package net.tourbook.common.color;
 
 import java.util.ArrayList;
 
-import net.tourbook.common.preferences.ICommonPreferences;
-
 /**
  * Contains all colors for one graph type (e.g. altitude) but only one is currently active.
  */
-public class Map3ColorDefinition {
+public class Map3ColorDefinition implements Comparable<Map3ColorDefinition> {
 
-	private MapColorId					_colorId;
+	private MapGraphId					_graphId;
 	private String						_visibleName;
 
 	/**
-	 * Contains all color profiles for one {@link MapColorId}.
+	 * Contains all color profiles for one {@link MapGraphId}.
 	 */
 	private ArrayList<Map3ColorProfile>	_colorProfiles	= new ArrayList<Map3ColorProfile>();
 
-	private Map3ColorProfile			_activeMapColor;
-	private Map3ColorProfile			_defaultMapColor;
-	private Map3ColorProfile			_newMapColor;
+	public Map3ColorDefinition(final MapGraphId graphId) {
+
+		_graphId = graphId;
+	}
 
 	/**
 	 * Sets the color for the default, current and changes
 	 * 
-	 * @param colorId
+	 * @param graphId
 	 * @param visibleName
-	 * @param defaultMapColor
+	 * @param colorProfile
 	 */
-	protected Map3ColorDefinition(	final MapColorId colorId,
+	protected Map3ColorDefinition(	final MapGraphId graphId,
 									final String visibleName,
-									final Map3ColorProfile defaultMapColor) {
+									final Map3ColorProfile colorProfile) {
 
-		_colorId = colorId;
+		this(graphId);
+
 		_visibleName = visibleName;
-		_defaultMapColor = defaultMapColor;
 
-		_colorProfiles.add(defaultMapColor);
+		_colorProfiles.add(colorProfile);
+	}
+
+	public void addProfile(final Map3ColorProfile colorProfile) {
+
+		_colorProfiles.add(colorProfile);
+	}
+
+	@Override
+	public int compareTo(final Map3ColorDefinition otherDef) {
+
+		// sort by name
+		return _visibleName.compareTo(otherDef._visibleName);
 	}
 
 	@Override
@@ -68,43 +79,27 @@ public class Map3ColorDefinition {
 		}
 
 		final Map3ColorDefinition other = (Map3ColorDefinition) obj;
-		if (_colorId == null) {
-			if (other._colorId != null) {
+		if (_graphId == null) {
+			if (other._graphId != null) {
 				return false;
 			}
-		} else if (!_colorId.equals(other._colorId)) {
+		} else if (!_graphId.equals(other._graphId)) {
 			return false;
 		}
 
 		return true;
 	}
 
-	public MapColorId getColorId() {
-		return _colorId;
-	}
-
 	public ArrayList<Map3ColorProfile> getColorProfiles() {
 		return _colorProfiles;
 	}
 
-	public Map3ColorProfile getDefaultMapColor() {
-		return _defaultMapColor;
+	public MapGraphId getGraphId() {
+		return _graphId;
 	}
 
-	public String getGraphPrefName() {
-		return ICommonPreferences.GRAPH_COLORS + _colorId + "."; //$NON-NLS-1$
-	}
-
-	public MapColorId getImageId() {
-		return _colorId;
-	}
-
-	public Map3ColorProfile getMapColor() {
-		return _activeMapColor;
-	}
-
-	public Map3ColorProfile getNewMapColor() {
-		return _newMapColor;
+	public MapGraphId getImageId() {
+		return _graphId;
 	}
 
 	public String getVisibleName() {
@@ -115,24 +110,27 @@ public class Map3ColorDefinition {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((_colorId == null) ? 0 : _colorId.hashCode());
+		result = prime * result + ((_graphId == null) ? 0 : _graphId.hashCode());
 		return result;
 	}
 
-	public void setColorId(final MapColorId colorId) {
-		_colorId = colorId;
+	public void setColorProfiles(final ArrayList<Map3ColorProfile> colorProfiles) {
+
+		_colorProfiles.clear();
+		_colorProfiles.addAll(colorProfiles);
 	}
 
-	public void setMapColor(final Map3ColorProfile mapColor) {
-		_activeMapColor = mapColor;
-	}
-
-	public void setNewMapColor(final Map3ColorProfile newMapColor) {
-		_newMapColor = newMapColor;
+	public void setGraphId(final MapGraphId graphId) {
+		_graphId = graphId;
 	}
 
 	public void setVisibleName(final String visibleName) {
 		_visibleName = visibleName;
+	}
+
+	@Override
+	public String toString() {
+		return String.format("Map3ColorDefinition [_graphId=%s]", _graphId);
 	}
 
 }

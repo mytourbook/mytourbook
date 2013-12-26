@@ -16,7 +16,7 @@
 package net.tourbook.map3.action;
 
 import net.tourbook.application.TourbookPlugin;
-import net.tourbook.common.color.MapColorId;
+import net.tourbook.common.color.MapGraphId;
 import net.tourbook.map2.Messages;
 import net.tourbook.map3.view.Map3View;
 
@@ -25,10 +25,10 @@ import org.eclipse.jface.action.Action;
 public class ActionTourColor extends Action {
 
 	private Map3View	_mapView;
-	private MapColorId	_colorId;
+	private MapGraphId	_colorId;
 
 	public ActionTourColor(	final Map3View mapView,
-							final MapColorId colorId,
+							final MapGraphId colorId,
 							final String toolTipText,
 							final String imageEnabled,
 							final String imageDisabled) {
@@ -51,14 +51,14 @@ public class ActionTourColor extends Action {
 	 * @param colorId
 	 * @return
 	 */
-	public static ActionTourColor createAction(final Map3View map3View, final MapColorId colorId) {
+	public static ActionTourColor createAction(final Map3View map3View, final MapGraphId colorId) {
 
 		switch (colorId) {
 		case Altitude:
 
 			return new ActionTourColor(
 					map3View,
-					MapColorId.Altitude,
+					MapGraphId.Altitude,
 					Messages.map_action_tour_color_altitude_tooltip,
 					Messages.image_action_tour_color_altitude,
 					Messages.image_action_tour_color_altitude_disabled);
@@ -67,7 +67,7 @@ public class ActionTourColor extends Action {
 
 			return new ActionTourColor(
 					map3View,
-					MapColorId.Gradient,
+					MapGraphId.Gradient,
 					Messages.map_action_tour_color_gradient_tooltip,
 					Messages.image_action_tour_color_gradient,
 					Messages.image_action_tour_color_gradient_disabled);
@@ -76,7 +76,7 @@ public class ActionTourColor extends Action {
 
 			return new ActionTourColor(
 					map3View,
-					MapColorId.Pace,
+					MapGraphId.Pace,
 					Messages.map_action_tour_color_pase_tooltip,
 					Messages.image_action_tour_color_pace,
 					Messages.image_action_tour_color_pace_disabled);
@@ -85,7 +85,7 @@ public class ActionTourColor extends Action {
 
 			return new ActionTourColor(
 					map3View,
-					MapColorId.Pulse,
+					MapGraphId.Pulse,
 					Messages.map_action_tour_color_pulse_tooltip,
 					Messages.image_action_tour_color_pulse,
 					Messages.image_action_tour_color_pulse_disabled);
@@ -94,7 +94,7 @@ public class ActionTourColor extends Action {
 
 			return new ActionTourColor(
 					map3View,
-					MapColorId.Speed,
+					MapGraphId.Speed,
 					Messages.map_action_tour_color_speed_tooltip,
 					Messages.image_action_tour_color_speed,
 					Messages.image_action_tour_color_speed_disabled);
@@ -103,7 +103,7 @@ public class ActionTourColor extends Action {
 
 			return new ActionTourColor(
 					map3View,
-					MapColorId.HrZone,
+					MapGraphId.HrZone,
 					Messages.Tour_Action_ShowHrZones_Tooltip,
 					Messages.Image__PulseZones,
 					Messages.Image__PulseZones_Disabled);

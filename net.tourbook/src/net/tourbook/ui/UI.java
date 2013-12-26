@@ -26,7 +26,7 @@ import java.util.Set;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
-import net.tourbook.common.color.MapColorId;
+import net.tourbook.common.color.MapGraphId;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
@@ -817,7 +817,7 @@ public class UI {
 		return _timeFormatterShort;
 	}
 
-	public static Image getGraphImage(final MapColorId mapColorId) {
+	public static Image getGraphImage(final MapGraphId mapColorId) {
 
 		switch (mapColorId) {
 		case Altitude:
@@ -843,7 +843,7 @@ public class UI {
 		}
 	}
 
-	public static ImageDescriptor getGraphImageDescriptor(final MapColorId mapColorId) {
+	public static ImageDescriptor getGraphImageDescriptor(final MapGraphId mapColorId) {
 
 		switch (mapColorId) {
 		case Altitude:

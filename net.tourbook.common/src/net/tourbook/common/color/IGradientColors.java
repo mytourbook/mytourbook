@@ -44,7 +44,7 @@ public interface IGradientColors extends IMapColorProvider {
 	/**
 	 * @return Returns configuration how a map legend image is painted.
 	 */
-	abstract MapUnitsConfiguration getMapUnitsConfiguration();
+	abstract MapUnits getMapUnits();
 
 	/**
 	 * Set the colors for the map.
