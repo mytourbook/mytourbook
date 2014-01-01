@@ -72,6 +72,10 @@ public class Messages extends NLS {
 
 	public static String		Map3_Dialog_OpenGLVersion_Title;
 
+	public static String	Map3Color_Dialog_Action_AddVertex_Tooltip;
+
+	public static String	Map3Color_Dialog_Action_RemoveVertex_Tooltip;
+
 	public static String		Map3Color_Dialog_Button_Add;
 	public static String		Map3Color_Dialog_Button_Apply;
 	public static String	Map3Color_Dialog_Button_Label_GraphType;

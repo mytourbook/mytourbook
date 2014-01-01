@@ -26,15 +26,28 @@ import org.eclipse.swt.graphics.RGB;
 
 public class RGBVertex implements Comparable<Object>, Cloneable {
 
-	private int	_value;
-	private RGB	_rgb;
+	private int			_value;
+	private RGB			_rgb;
 
-	public RGBVertex() {
+	/**
+	 * Created id is needed that vertices can be sorted correctly when the value of two vertices are
+	 * the same. This occures when new vertices are created and the value is not yet set.
+	 */
+	private int			_sortId;
+
+	private static int	_sortIdCreator;
+
+	public RGBVertex(final int sortId) {
+
+		_sortId = sortId;
+
 		_value = 0;
 		_rgb = new RGB(255, 255, 255); // WHITE
 	}
 
 	public RGBVertex(final int value, final int red, final int green, final int blue) {
+
+		setCreateId();
 
 		if ((red > 255) || (red < 0) || (green > 255) || (green < 0) || (blue > 255) || (blue < 0)) {
 			SWT.error(SWT.ERROR_INVALID_ARGUMENT);
@@ -46,11 +59,15 @@ public class RGBVertex implements Comparable<Object>, Cloneable {
 
 	public RGBVertex(final int value, final RGB rgb) {
 
+		setCreateId();
+
 		_value = value;
 		_rgb = rgb;
 	}
 
 	public RGBVertex(final RGB rgb) {
+
+		setCreateId();
 
 		_value = 0;
 		_rgb = rgb;
@@ -74,31 +91,45 @@ public class RGBVertex implements Comparable<Object>, Cloneable {
 		return clonedObject;
 	}
 
-	public int compareTo(final Object anotherRGBVertex) throws ClassCastException {
+	public int compareTo(final Object anotherObject) throws ClassCastException {
 
-		if (!(anotherRGBVertex instanceof RGBVertex)) {
+		if (!(anotherObject instanceof RGBVertex)) {
 			throw new ClassCastException(Messages.rgv_vertex_class_cast_exception);
 		}
 
-		final int anotherValue = ((RGBVertex) anotherRGBVertex).getValue();
+		final RGBVertex anotherRGBVertex = (RGBVertex) anotherObject;
+		final int anotherValue = anotherRGBVertex.getValue();
 
-		if (_value < anotherValue) {
-			return (-1);
+		if (_value == anotherValue) {
+
+			// both values are the same, compare/sort by create id
+
+			return _sortId - anotherRGBVertex._sortId;
+
+		} else {
+
+			return _value - anotherValue;
 		}
-
-		if (_value > anotherValue) {
-			return 1;
-		}
-
-		return 0;
 	}
 
 	public RGB getRGB() {
 		return _rgb;
 	}
 
+	public int getSortId() {
+		return _sortId;
+	}
+
 	public int getValue() {
 		return _value;
+	}
+
+	/**
+	 * @return Returns a unique id.
+	 */
+	private void setCreateId() {
+
+		_sortId = ++_sortIdCreator;
 	}
 
 	public void setRGB(final RGB rgb) {

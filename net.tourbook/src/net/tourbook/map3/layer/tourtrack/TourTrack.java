@@ -21,10 +21,10 @@ import gov.nasa.worldwind.render.Path.PositionColors;
 import java.awt.Color;
 import java.util.ArrayList;
 
-import net.tourbook.common.color.IGradientColors;
+import net.tourbook.common.color.IGradientColorProvider;
 import net.tourbook.common.color.IMapColorProvider;
 import net.tourbook.data.TourData;
-import net.tourbook.map2.view.IDiscreteColors;
+import net.tourbook.map2.view.IDiscreteColorProvider;
 
 public class TourTrack {
 
@@ -65,11 +65,11 @@ public class TourTrack {
 			final TourPositionColors tourPosColors = (TourPositionColors) positionColors;
 			final TourMap3Position trackPosition = _trackPositions[ordinal];
 
-			if (_colorProvider instanceof IGradientColors) {
+			if (_colorProvider instanceof IGradientColorProvider) {
 
 				return tourPosColors.getGradientColor(trackPosition.dataSerieValue, ordinal, _tourTrackHoverIndex);
 
-			} else if (_colorProvider instanceof IDiscreteColors) {
+			} else if (_colorProvider instanceof IDiscreteColorProvider) {
 
 				return tourPosColors.getDiscreteColor(trackPosition.colorValue);
 			}

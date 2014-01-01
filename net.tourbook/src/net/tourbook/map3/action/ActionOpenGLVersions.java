@@ -58,7 +58,7 @@ import com.jogamp.opengl.JoglVersion;
 
 public class ActionOpenGLVersions extends Action {
 
-	private final IDialogSettings	_state	= TourbookPlugin.getStateSection(//
+	private final IDialogSettings	_state	= TourbookPlugin.getState(//
 													getClass().getCanonicalName());
 
 	private GLProfile				_glProfile;

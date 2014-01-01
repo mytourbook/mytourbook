@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import net.tourbook.common.UI;
 import net.tourbook.common.color.ColorDefinition;
 import net.tourbook.common.color.GraphColorManager;
-import net.tourbook.common.color.IGradientColors;
+import net.tourbook.common.color.IGradientColorProvider;
 import net.tourbook.common.color.LegendUnitFormat;
 import net.tourbook.common.color.Map2ColorProfile;
 import net.tourbook.common.color.MapUnits;
@@ -30,7 +30,7 @@ import net.tourbook.map2.Messages;
 public class MapUtils {
 
 	/**
-	 * Update the min/max values in the {@link IGradientColors} for the currently displayed
+	 * Update the min/max values in the {@link IGradientColorProvider} for the currently displayed
 	 * legend/tour.
 	 * 
 	 * @param allTourData
@@ -40,7 +40,7 @@ public class MapUtils {
 	 *         when data are not available
 	 */
 	public static boolean setMinMaxValues(	final ArrayList<TourData> allTourData,
-											final IGradientColors colorProvider,
+											final IGradientColorProvider colorProvider,
 											final int legendHeight) {
 
 		if (allTourData.size() == 0) {

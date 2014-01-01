@@ -20,13 +20,13 @@ import java.util.List;
 /**
  * Provides colors to draw a tour or legend.
  */
-public class Map2GradientColorProvider extends MapGradientColorProvider implements IGradientColors {
+public class Map2GradientColorProvider extends MapGradientColorProvider implements IGradientColorProvider {
 
-	private MapGraphId				_mapColorId;
+	private MapGraphId			_mapColorId;
 
-	private Map2ColorProfile		_map2ColorProfile;
+	private Map2ColorProfile	_map2ColorProfile;
 
-	private MapUnits	_mapUnitsConfig	= new MapUnits();
+	private MapUnits			_mapUnits	= new MapUnits();
 
 	/**
 	 * Contructor for a 2D color profile {@link Map2ColorProfile}.
@@ -89,10 +89,10 @@ public class Map2GradientColorProvider extends MapGradientColorProvider implemen
 			final Float legendMinValue = legendUnits.get(0);
 			final Float legendMaxValue = legendUnits.get(legendUnits.size() - 1);
 
-			_mapUnitsConfig.units = legendUnits;
-			_mapUnitsConfig.unitText = unitText;
-			_mapUnitsConfig.legendMinValue = legendMinValue;
-			_mapUnitsConfig.legendMaxValue = legendMaxValue;
+			_mapUnits.units = legendUnits;
+			_mapUnits.unitText = unitText;
+			_mapUnits.legendMinValue = legendMinValue;
+			_mapUnits.legendMaxValue = legendMaxValue;
 
 			/*
 			 * set color configuration, each tour has a different altitude config
@@ -156,7 +156,7 @@ public class Map2GradientColorProvider extends MapGradientColorProvider implemen
 			blue = valueColor.blue;
 
 			final float minValue = valueColor.value;
-			final float minDiff = _mapUnitsConfig.legendMinValue - minValue;
+			final float minDiff = _mapUnits.legendMinValue - minValue;
 
 			final float ratio = minDiff == 0 ? 1 : (graphValue - minValue) / minDiff;
 			final float dimmRatio = minBrightnessFactor * ratio;
@@ -184,7 +184,7 @@ public class Map2GradientColorProvider extends MapGradientColorProvider implemen
 			blue = valueColor.blue;
 
 			final float maxValue = valueColor.value;
-			final float maxDiff = _mapUnitsConfig.legendMaxValue - maxValue;
+			final float maxDiff = _mapUnits.legendMaxValue - maxValue;
 
 			final float ratio = maxDiff == 0 ? 1 : (graphValue - maxValue) / maxDiff;
 			final float dimmRatio = maxBrightnessFactor * ratio;
@@ -243,12 +243,12 @@ public class Map2GradientColorProvider extends MapGradientColorProvider implemen
 	}
 
 	@Override
-	public Map2ColorProfile getMapColorProfile() {
+	public Map2ColorProfile getColorProfile() {
 		return _map2ColorProfile;
 	}
 
 	public MapUnits getMapUnits() {
-		return _mapUnitsConfig;
+		return _mapUnits;
 	}
 
 	@Override

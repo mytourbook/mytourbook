@@ -28,7 +28,7 @@ import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.color.ColorDefinition;
 import net.tourbook.common.color.GraphColorItem;
 import net.tourbook.common.color.GraphColorManager;
-import net.tourbook.common.color.IGradientColors;
+import net.tourbook.common.color.IGradientColorProvider;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
@@ -594,7 +594,7 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 		}
 	}
 
-	public IGradientColors getMapLegendColorProvider() {
+	public IGradientColorProvider getMapLegendColorProvider() {
 		return null;
 	}
 

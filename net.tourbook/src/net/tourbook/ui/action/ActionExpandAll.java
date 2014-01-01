@@ -21,50 +21,45 @@ import net.tourbook.common.util.ITourViewer;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.viewers.ColumnViewer;
-import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.widgets.Tree;
 
-public class ActionCollapseAll extends Action {
+public class ActionExpandAll extends Action {
 
 	private ITourViewer	_tourViewer;
 
-	public ActionCollapseAll(final ITourViewer tourViewer) {
+	public ActionExpandAll(final ITourViewer tourViewer) {
 
 		super(null, AS_PUSH_BUTTON);
 
 		_tourViewer = tourViewer;
 
-		setText(Messages.app_action_collapse_all_tooltip);
-		setToolTipText(Messages.app_action_collapse_all_tooltip);
-		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__collapse_all));
+		setText(Messages.App_Action_Expand_All_Tooltip);
+		setToolTipText(Messages.App_Action_Expand_All_Tooltip);
+
+		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__expand_all));
 	}
 
 	@Override
 	public void run() {
 
-		if (_tourViewer != null) {
+		if (_tourViewer == null) {
+			return;
+		}
 
-			final ColumnViewer viewer = _tourViewer.getViewer();
+		final ColumnViewer viewer = _tourViewer.getViewer();
+		if (viewer instanceof TreeViewer) {
 
-			if (viewer instanceof TreeViewer) {
+			final TreeViewer treeViewer = (TreeViewer) viewer;
+			final Tree tree = treeViewer.getTree();
 
-				final TreeViewer treeViewer = (TreeViewer) viewer;
-
-				final Tree tree = treeViewer.getTree();
-
-				// disable redraw that the UI in not flickering
-				tree.setRedraw(false);
-				{
-					treeViewer.collapseAll();
-				}
-				tree.setRedraw(true);
-
-				final Object firstElement = ((StructuredSelection) treeViewer.getSelection()).getFirstElement();
-				if (firstElement != null) {
-					treeViewer.reveal(firstElement);
-				}
+			// disable redraw that the UI in not flickering
+			tree.setRedraw(false);
+			{
+				treeViewer.expandAll();
 			}
+			tree.setRedraw(true);
+
 		}
 	}
 }

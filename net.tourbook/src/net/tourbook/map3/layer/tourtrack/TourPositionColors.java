@@ -21,7 +21,7 @@ import gov.nasa.worldwind.render.Path;
 import java.awt.Color;
 import java.util.ArrayList;
 
-import net.tourbook.common.color.IGradientColors;
+import net.tourbook.common.color.IGradientColorProvider;
 import net.tourbook.common.color.IMapColorProvider;
 import net.tourbook.common.color.MapGraphId;
 import net.tourbook.data.TourData;
@@ -53,9 +53,9 @@ class TourPositionColors implements Path.PositionColors {
 
 		int colorValue = -1;
 
-		if (_colorProvider instanceof IGradientColors) {
+		if (_colorProvider instanceof IGradientColorProvider) {
 
-			final IGradientColors gradientColorProvider = (IGradientColors) _colorProvider;
+			final IGradientColorProvider gradientColorProvider = (IGradientColorProvider) _colorProvider;
 
 			colorValue = gradientColorProvider.getColorValue(graphValue);
 		}
@@ -82,9 +82,9 @@ class TourPositionColors implements Path.PositionColors {
 	 */
 	public void updateColorProvider(final ArrayList<TourData> allTours) {
 
-		if (_colorProvider instanceof IGradientColors) {
+		if (_colorProvider instanceof IGradientColorProvider) {
 
-			final IGradientColors colorProvider = (IGradientColors) _colorProvider;
+			final IGradientColorProvider colorProvider = (IGradientColorProvider) _colorProvider;
 
 			MapUtils.setMinMaxValues(allTours, colorProvider, 300);
 		}

@@ -37,7 +37,7 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
 import net.tourbook.common.UI;
-import net.tourbook.common.color.IGradientColors;
+import net.tourbook.common.color.IGradientColorProvider;
 import net.tourbook.common.color.IMapColorProvider;
 import net.tourbook.common.color.MapUnits;
 import net.tourbook.map.MapUtils;
@@ -352,7 +352,7 @@ public class TourLegendLayer extends RenderableLayer {
 
 		_colorProvider = colorProvider;
 
-		if (_colorProvider instanceof IGradientColors) {
+		if (_colorProvider instanceof IGradientColorProvider) {
 
 			// prevent to add legend image more than once
 			if (_isVisible == false) {
@@ -380,11 +380,11 @@ public class TourLegendLayer extends RenderableLayer {
 	 */
 	public void updateLegendImage() {
 
-		IGradientColors gradientColorProvider;
+		IGradientColorProvider gradientColorProvider;
 
-		if (_colorProvider instanceof IGradientColors) {
+		if (_colorProvider instanceof IGradientColorProvider) {
 
-			gradientColorProvider = (IGradientColors) _colorProvider;
+			gradientColorProvider = (IGradientColorProvider) _colorProvider;
 
 		} else {
 

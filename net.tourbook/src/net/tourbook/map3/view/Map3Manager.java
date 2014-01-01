@@ -109,7 +109,7 @@ public class Map3Manager {
 																								.getBundle();
 
 	private static final IDialogSettings				_state							= TourbookPlugin
-																								.getStateSection(Map3Manager.class
+																								.getState(Map3Manager.class
 																										.getCanonicalName());
 	private static final IPath							_stateLocation					= Platform
 																								.getStateLocation(_bundle);

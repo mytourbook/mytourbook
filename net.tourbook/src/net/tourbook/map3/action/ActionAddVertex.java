@@ -13,20 +13,34 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.map3.ui;
+package net.tourbook.map3.action;
 
-import net.tourbook.common.color.Map3GradientColorProvider;
+import net.tourbook.application.TourbookPlugin;
+import net.tourbook.map3.Messages;
+import net.tourbook.map3.ui.DialogMap3ColorEditor;
 
-public interface IMap3ColorUpdater {
+import org.eclipse.jface.action.Action;
 
-	/**
-	 * @param originalColorProvider
-	 * @param modifiedColorProvider
-	 *            This is a clone from the original profile which is modified in color editor.
-	 * @param isNewProfile
-	 */
-	void applyMapColors(Map3GradientColorProvider originalColorProvider,
-						Map3GradientColorProvider modifiedColorProvider,
-						boolean isNewProfile);
+public class ActionAddVertex extends Action {
+
+	private DialogMap3ColorEditor	_dialogMap3ColorEditor;
+
+	public ActionAddVertex(final DialogMap3ColorEditor dialogMap3ColorEditor) {
+
+		super(null, AS_PUSH_BUTTON);
+
+		_dialogMap3ColorEditor = dialogMap3ColorEditor;
+
+		setText(Messages.Map3Color_Dialog_Action_AddVertex_Tooltip);
+		setToolTipText(Messages.Map3Color_Dialog_Action_AddVertex_Tooltip);
+
+		setImageDescriptor(TourbookPlugin.getImageDescriptor(net.tourbook.Messages.Image__App_Add));
+	}
+
+	@Override
+	public void run() {
+
+		_dialogMap3ColorEditor.actionAddVertex();
+	}
 
 }

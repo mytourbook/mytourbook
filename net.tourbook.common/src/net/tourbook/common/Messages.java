@@ -37,6 +37,8 @@ public class Messages extends NLS {
 	public static String		Color_Chooser_Dialog_SetColorsFromProfile_Message;
 	public static String		Color_Chooser_Dialog_SetColorsFromProfile_Title;
 
+	public static String	Color_Chooser_Hexagon_Tooltip;
+
 	public static String		Color_Chooser_HoveredColor_Tooltip;
 	public static String		Color_Chooser_Label_ColorCustomColors_Tooltip;
 	public static String		Color_Chooser_Label_HoveredColor;

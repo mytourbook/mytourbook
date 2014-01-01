@@ -311,7 +311,6 @@ public class ColorChooser extends Composite {
 		GridLayoutFactory.swtDefaults().applyTo(container);
 		{
 			{
-//				_hexagonCanvas = new ImageCanvas(container, SWT.NO_BACKGROUND);
 				_hexagonCanvas = new ImageCanvas(container, SWT.NONE);
 				GridDataFactory.fillDefaults()//
 						.hint(_chooserSize, _chooserSize)
@@ -323,7 +322,7 @@ public class ColorChooser extends Composite {
 				final Image hexagonImage = new Image(container.getDisplay(), _chooserSize, _chooserSize);
 				_hexagonCanvas.setImage(hexagonImage);
 
-				_hexagonCanvas.setToolTipText(Messages.color_chooser_hexagon_move);
+				_hexagonCanvas.setToolTipText(Messages.Color_Chooser_Hexagon_Tooltip);
 
 				_hexagonCanvas.addMouseListener(new MouseListener() {
 

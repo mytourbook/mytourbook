@@ -19,7 +19,7 @@ import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.color.ColorDefinition;
 import net.tourbook.common.color.ColorValue;
-import net.tourbook.common.color.IGradientColors;
+import net.tourbook.common.color.IGradientColorProvider;
 import net.tourbook.common.color.Map2ColorProfile;
 import net.tourbook.common.color.MapColorProfile;
 import net.tourbook.map2.Messages;
@@ -69,11 +69,11 @@ public class DialogMap2ColorEditor extends TitleAreaDialog {
 
 	private static final String		STATE_LIVE_UPDATE	= "IsLiveUpdate";										//$NON-NLS-1$
 
-	private final IDialogSettings	_state				= TourbookPlugin.getStateSection("DialogMappingColor"); //$NON-NLS-1$
+	private final IDialogSettings	_state				= TourbookPlugin.getState("DialogMappingColor"); //$NON-NLS-1$
 
 	private IMap2ColorUpdater		_mapColorUpdater;
 
-	private final IGradientColors	_colorProvider;
+	private final IGradientColorProvider	_colorProvider;
 	private Map2ColorProfile		_mapColorWorkingCopy;
 
 	private final SelectionAdapter	_defaultSelectionAdapter;
@@ -127,7 +127,7 @@ public class DialogMap2ColorEditor extends TitleAreaDialog {
 	}
 
 	public DialogMap2ColorEditor(	final Shell parentShell,
-									final IGradientColors colorProvider,
+									final IGradientColorProvider colorProvider,
 									final IMap2ColorUpdater mapColorUpdater) {
 
 		super(parentShell);
@@ -759,7 +759,7 @@ public class DialogMap2ColorEditor extends TitleAreaDialog {
 
 	private void updateUI_LegendImage() {
 
-		final MapColorProfile mapColorProfile = _colorProvider.getMapColorProfile();
+		final MapColorProfile mapColorProfile = _colorProvider.getColorProfile();
 
 		if (mapColorProfile instanceof Map2ColorProfile) {
 

@@ -26,7 +26,7 @@ import net.tourbook.common.color.ColorDefinition;
 import net.tourbook.common.color.ColorValue;
 import net.tourbook.common.color.GraphColorItem;
 import net.tourbook.common.color.GraphColorManager;
-import net.tourbook.common.color.IGradientColors;
+import net.tourbook.common.color.IGradientColorProvider;
 import net.tourbook.common.color.Map2ColorProfile;
 import net.tourbook.common.color.Map2GradientColorProvider;
 import net.tourbook.common.color.MapGraphId;
@@ -115,7 +115,7 @@ public class PrefPageAppearanceColors extends PreferencePage implements IWorkben
 
 	private ColorDefinition				_expandedItem;
 
-	private IGradientColors				_legendImageColorProvider;
+	private IGradientColorProvider				_legendImageColorProvider;
 	private DialogMap2ColorEditor			_dialogMappingColor;
 	private GraphColorPainter			_graphColorPainter;
 
@@ -176,7 +176,7 @@ public class PrefPageAppearanceColors extends PreferencePage implements IWorkben
 
 		final Map2GradientColorProvider colorProvider = new Map2GradientColorProvider(MapGraphId.Altitude);
 
-		final Map2ColorProfile colorProfile = colorProvider.getMapColorProfile();
+		final Map2ColorProfile colorProfile = colorProvider.getColorProfile();
 		colorProfile.setColorValues(_legendImageColors);
 
 		// update legend configuations
@@ -458,7 +458,7 @@ public class PrefPageAppearanceColors extends PreferencePage implements IWorkben
 		treeLayout.setColumnData(tc, new ColumnPixelData(colorWidth, true));
 	}
 
-	public IGradientColors getMapLegendColorProvider() {
+	public IGradientColorProvider getMapLegendColorProvider() {
 		return _legendImageColorProvider;
 	}
 

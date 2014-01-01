@@ -20,6 +20,7 @@ package net.tourbook.common.color;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 
 import net.tourbook.common.UI;
 import net.tourbook.common.util.StatusUtil;
@@ -48,7 +49,7 @@ public abstract class ProfileImage implements Cloneable {
 	 */
 	private ArrayList<RGBVertex>		_rgbVertices		= new ArrayList<RGBVertex>(Arrays.asList(DEFAULT_VERTICES));
 
-	private RGBVertex[]					_vertexArray;
+	private RGBVertex[]					_cachedVertices;
 
 	/*
 	 * UI controls
@@ -59,14 +60,17 @@ public abstract class ProfileImage implements Cloneable {
 
 		_rgbVertices.add(vertexPosition, rgbVertex);
 
-		invalidateVertexArray();
+		// sort vertices by value
+		Collections.sort(_rgbVertices);
+
+		invalidateVertices();
 	}
 
 	public void addVertex(final RGBVertex rgbVertex) {
 
 		_rgbVertices.add(rgbVertex);
 
-		invalidateVertexArray();
+		invalidateVertices();
 	}
 
 	@Override
@@ -114,11 +118,11 @@ public abstract class ProfileImage implements Cloneable {
 	public RGBVertex[] getRgbVerticesArray() {
 
 		// ensure array is valid
-		if (_vertexArray == null) {
-			_vertexArray = _rgbVertices.toArray(new RGBVertex[_rgbVertices.size()]);
+		if (_cachedVertices == null) {
+			_cachedVertices = _rgbVertices.toArray(new RGBVertex[_rgbVertices.size()]);
 		}
 
-		return _vertexArray;
+		return _cachedVertices;
 	}
 
 	/**
@@ -162,21 +166,26 @@ public abstract class ProfileImage implements Cloneable {
 		return sb.toString();
 	}
 
-	private void invalidateVertexArray() {
+	public void invalidateCachedColors() {
 
-		_vertexArray = null;
+		invalidateVertices();
+	}
+
+	private void invalidateVertices() {
+
+		_cachedVertices = null;
 	}
 
 	/**
 	 * Removes vertices.
 	 * 
-	 * @param removedVertices
+	 * @param removedVertex
 	 */
-	public void removeVertices(final ArrayList<RGBVertex> removedVertices) {
+	public void removeVertex(final RGBVertex removedVertex) {
 
-		_rgbVertices.removeAll(removedVertices);
+		_rgbVertices.remove(removedVertex);
 
-		invalidateVertexArray();
+		invalidateVertices();
 	}
 
 	/**
@@ -194,8 +203,7 @@ public abstract class ProfileImage implements Cloneable {
 
 		_rgbVertices.removeAll(removedVertices);
 
-		// invalidate array
-		_vertexArray = null;
+		invalidateVertices();
 	}
 
 	public void setVertices(final ArrayList<RGBVertex> rgbVertices) {
@@ -203,7 +211,7 @@ public abstract class ProfileImage implements Cloneable {
 		_rgbVertices.clear();
 		_rgbVertices.addAll(rgbVertices);
 
-		invalidateVertexArray();
+		invalidateVertices();
 	}
 
 	public void setVertices(final RGBVertex[] rgbVertices) {
@@ -211,7 +219,7 @@ public abstract class ProfileImage implements Cloneable {
 		_rgbVertices.clear();
 		_rgbVertices.addAll(Arrays.asList(rgbVertices));
 
-		invalidateVertexArray();
+		invalidateVertices();
 	}
 
 	@Override

@@ -16,19 +16,37 @@
 package net.tourbook.common.color;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 /**
  * Contains all colors for one graph type (e.g. altitude) but only one is currently active.
  */
 public class Map3ColorDefinition implements Comparable<Map3ColorDefinition> {
 
-	private MapGraphId					_graphId;
-	private String						_visibleName;
+	private MapGraphId											_graphId;
+	private String												_visibleName;
 
 	/**
-	 * Contains all color profiles for one {@link MapGraphId}.
+	 * Contains all color provider for one {@link MapGraphId}.
 	 */
-	private ArrayList<Map3ColorProfile>	_colorProfiles	= new ArrayList<Map3ColorProfile>();
+	private ArrayList<Map3GradientColorProvider>				_colorProviders	= new ArrayList<Map3GradientColorProvider>();
+
+	private final Comparator<? super Map3GradientColorProvider>	_colorProviderComparator;
+
+	{
+		_colorProviderComparator = new Comparator<Map3GradientColorProvider>() {
+			@Override
+			public int compare(final Map3GradientColorProvider cp1, final Map3GradientColorProvider cp2) {
+
+				final String profileName1 = cp1.getMap3ColorProfile().getProfileName();
+				final String profileName2 = cp2.getMap3ColorProfile().getProfileName();
+
+				return profileName1.compareTo(profileName2);
+			}
+		};
+
+	}
 
 	public Map3ColorDefinition(final MapGraphId graphId) {
 
@@ -50,12 +68,38 @@ public class Map3ColorDefinition implements Comparable<Map3ColorDefinition> {
 
 		_visibleName = visibleName;
 
-		_colorProfiles.add(colorProfile);
+		_colorProviders.add(new Map3GradientColorProvider(graphId, colorProfile));
 	}
 
-	public void addProfile(final Map3ColorProfile colorProfile) {
+	void addColorProvider(final Map3GradientColorProvider newColorProvider) {
 
-		_colorProfiles.add(colorProfile);
+		_colorProviders.add(newColorProvider);
+
+		Collections.sort(_colorProviders, _colorProviderComparator);
+
+		// ensure that only one profile is active
+		final Map3ColorProfile newColorProfile = newColorProvider.getMap3ColorProfile();
+		if (newColorProfile.isActiveColorProfile()) {
+
+			// new color provider is active, set all other profiles to be inactive
+
+			for (final Map3GradientColorProvider colorProvider : _colorProviders) {
+
+				final Map3ColorProfile colorProfile = colorProvider.getMap3ColorProfile();
+
+				if (colorProfile != newColorProfile) {
+					colorProfile.setIsActiveColorProfile(false);
+				}
+			}
+		}
+	}
+
+	void addProfile(final Map3ColorProfile newColorProfile) {
+
+		// wrap into a new color provider
+		final Map3GradientColorProvider newColorProvider = new Map3GradientColorProvider(_graphId, newColorProfile);
+
+		addColorProvider(newColorProvider);
 	}
 
 	@Override
@@ -90,8 +134,8 @@ public class Map3ColorDefinition implements Comparable<Map3ColorDefinition> {
 		return true;
 	}
 
-	public ArrayList<Map3ColorProfile> getColorProfiles() {
-		return _colorProfiles;
+	public ArrayList<Map3GradientColorProvider> getColorProviders() {
+		return _colorProviders;
 	}
 
 	public MapGraphId getGraphId() {
@@ -114,10 +158,47 @@ public class Map3ColorDefinition implements Comparable<Map3ColorDefinition> {
 		return result;
 	}
 
-	public void setColorProfiles(final ArrayList<Map3ColorProfile> colorProfiles) {
+	public void removeColorProvider(final Map3GradientColorProvider removableColorProvider) {
 
-		_colorProfiles.clear();
-		_colorProfiles.addAll(colorProfiles);
+		int removedIndex = -1;
+		for (int providerIndex = 0; providerIndex < _colorProviders.size(); providerIndex++) {
+
+			final Map3GradientColorProvider colorProvider = _colorProviders.get(providerIndex);
+
+			if (colorProvider == removableColorProvider) {
+				removedIndex = providerIndex;
+				break;
+			}
+		}
+
+		if (removedIndex == -1) {
+			// this case should not happen
+			return;
+		}
+
+		final Map3GradientColorProvider removedColorProvider = _colorProviders.remove(removedIndex);
+
+		// check if the color provider is the active color provider
+		if (removedColorProvider.getMap3ColorProfile().isActiveColorProfile()) {
+
+			// set a new color provider as active which is at the current position
+
+			int activeIndex = removedIndex;
+
+			// ensure array bounds
+			final int lastIndex = _colorProviders.size() - 1;
+			if (activeIndex > lastIndex) {
+				activeIndex = lastIndex;
+			}
+
+			_colorProviders.get(activeIndex).getMap3ColorProfile().setIsActiveColorProfile(true);
+		}
+	}
+
+	public void setColorProvider(final ArrayList<Map3GradientColorProvider> colorProvider) {
+
+		_colorProviders.clear();
+		_colorProviders.addAll(colorProvider);
 	}
 
 	public void setGraphId(final MapGraphId graphId) {

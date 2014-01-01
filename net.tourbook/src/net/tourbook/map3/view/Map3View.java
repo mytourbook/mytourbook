@@ -48,7 +48,7 @@ import net.tourbook.chart.SelectionChartXSliderPosition;
 import net.tourbook.common.Messages;
 import net.tourbook.common.UI;
 import net.tourbook.common.color.ColorUtil;
-import net.tourbook.common.color.IGradientColors;
+import net.tourbook.common.color.IGradientColorProvider;
 import net.tourbook.common.color.IMapColorProvider;
 import net.tourbook.common.color.MapGraphId;
 import net.tourbook.common.color.MapUnits;
@@ -58,7 +58,7 @@ import net.tourbook.data.TourData;
 import net.tourbook.extension.export.ActionExport;
 import net.tourbook.importdata.RawDataManager;
 import net.tourbook.map.MapColorProvider;
-import net.tourbook.map2.view.IDiscreteColors;
+import net.tourbook.map2.view.IDiscreteColorProvider;
 import net.tourbook.map2.view.SelectionMapPosition;
 import net.tourbook.map3.action.ActionOpenGLVersions;
 import net.tourbook.map3.action.ActionOpenMap3LayerView;
@@ -150,7 +150,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 																								.getPreferenceStore();
 
 	private final IDialogSettings				_state									= TourbookPlugin
-																								.getStateSection(getClass()
+																								.getState(getClass()
 																										.getCanonicalName());
 
 	private static final WorldWindowGLCanvas	_wwCanvas								= Map3Manager.getWWCanvas();
@@ -1491,9 +1491,9 @@ public class Map3View extends ViewPart implements ITourProvider {
 
 		Integer colorValue = null;
 
-		if (colorProvider instanceof IGradientColors) {
+		if (colorProvider instanceof IGradientColorProvider) {
 
-			final IGradientColors gradientColorProvider = (IGradientColors) colorProvider;
+			final IGradientColorProvider gradientColorProvider = (IGradientColorProvider) colorProvider;
 
 			final MapUnits legendImageConfig = gradientColorProvider.getMapUnits();
 			final float legendMinValue = legendImageConfig.legendMinValue;
@@ -1534,9 +1534,9 @@ public class Map3View extends ViewPart implements ITourProvider {
 			// get color according to the value
 			colorValue = gradientColorProvider.getColorValue(graphValue);
 
-		} else if (colorProvider instanceof IDiscreteColors) {
+		} else if (colorProvider instanceof IDiscreteColorProvider) {
 
-			final IDiscreteColors discreteColorProvider = (IDiscreteColors) colorProvider;
+			final IDiscreteColorProvider discreteColorProvider = (IDiscreteColorProvider) colorProvider;
 
 			colorValue = discreteColorProvider.getColorValue(tourData, positionIndex);
 		}

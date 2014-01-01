@@ -693,35 +693,7 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 			public void handleEvent(final Event event) {
 
 				if (event.index == _profileImageColumn) {
-
-					final TableItem item = (TableItem) event.item;
-					final SRTMProfile profile = (SRTMProfile) item.getData();
-					final Image image = profile.getRgbVertexImage().getValidatedImage(
-							getImageWidth(),
-							_imageHeight,
-							true);
-
-					if (image != null) {
-
-						final Rectangle rect = image.getBounds();
-
-						switch (event.type) {
-						case SWT.MeasureItem:
-
-							event.width += rect.width;
-							event.height = Math.max(event.height, rect.height + 2);
-
-							break;
-
-						case SWT.PaintItem:
-
-							final int x = event.x + event.width;
-							final int offset = Math.max(0, (event.height - rect.height) / 2);
-							event.gc.drawImage(image, x, event.y + offset);
-
-							break;
-						}
-					}
+					onPaintColorImage(event);
 				}
 			}
 		};
@@ -883,15 +855,15 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 		defineColumn_ShadowState();
 		defineColumn_ShadowValue();
 		defineColumn_Resolution();
-		defineColumn_Color();
+		defineColumn_ColorImage();
 		defineColumn_TileImagePath();
 		defineColumn_ProfileId();
 	}
 
 	/**
-	 * column: color
+	 * Column: Color image
 	 */
-	private void defineColumn_Color() {
+	private void defineColumn_ColorImage() {
 
 		final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager, "color", SWT.LEAD); //$NON-NLS-1$
 		_colDefImage = colDef;
@@ -1331,6 +1303,36 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 
 			} catch (final Exception e) {
 				e.printStackTrace();
+			}
+		}
+	}
+
+	private void onPaintColorImage(final Event event) {
+		
+		final TableItem item = (TableItem) event.item;
+		final SRTMProfile profile = (SRTMProfile) item.getData();
+		
+		final Image image = profile.getRgbVertexImage().getValidatedImage(getImageWidth(), _imageHeight, true);
+
+		if (image != null) {
+
+			final Rectangle rect = image.getBounds();
+
+			switch (event.type) {
+			case SWT.MeasureItem:
+
+				event.width += rect.width;
+				event.height = Math.max(event.height, rect.height + 2);
+
+				break;
+
+			case SWT.PaintItem:
+
+				final int x = event.x + event.width;
+				final int offset = Math.max(0, (event.height - rect.height) / 2);
+				event.gc.drawImage(image, x, event.y + offset);
+
+				break;
 			}
 		}
 	}

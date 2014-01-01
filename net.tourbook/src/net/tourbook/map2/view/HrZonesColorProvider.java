@@ -28,7 +28,7 @@ import org.eclipse.swt.graphics.RGB;
 /**
  * Contains all data to draw the legend image for discrete colors.
  */
-public class HrZonesColorProvider implements IDiscreteColors {
+public class HrZonesColorProvider implements IDiscreteColorProvider {
 
 	private MapGraphId					_graphId;
 

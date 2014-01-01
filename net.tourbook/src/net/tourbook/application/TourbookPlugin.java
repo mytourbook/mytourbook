@@ -25,6 +25,7 @@ import net.tourbook.ui.TourTypeFilter;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.IDialogSettings;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.osgi.framework.internal.core.AbstractBundle;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
@@ -116,6 +117,15 @@ public class TourbookPlugin extends AbstractUIPlugin {
 	}
 
 	/**
+	 * This is a shortcut for {@link TourbookPlugin#getDefault()#getPreferenceStore()}
+	 * 
+	 * @return
+	 */
+	public static IPreferenceStore getPrefStore() {
+		return TourbookPlugin.getDefault().getPreferenceStore();
+	}
+
+	/**
 	 * Returns the plugin's resource bundle,
 	 */
 	private static ResourceBundle getResourceBundle() {
@@ -153,7 +163,7 @@ public class TourbookPlugin extends AbstractUIPlugin {
 	 * @param stateSectionName
 	 * @return
 	 */
-	public static IDialogSettings getStateSection(final String stateSectionName) {
+	public static IDialogSettings getState(final String stateSectionName) {
 		return getDefault().getDialogSettingsSection(stateSectionName);
 	}
 

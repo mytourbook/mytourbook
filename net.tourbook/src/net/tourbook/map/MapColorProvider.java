@@ -24,8 +24,8 @@ import net.tourbook.common.color.MapGraphId;
 import net.tourbook.map2.view.HrZonesColorProvider;
 
 /**
- * Contains the color provider which are set and selected (3D) in the preferences and which are used
- * to paint a tour/legend in a 2D/3D map.
+ * Contains the color provider which are selected in the preferences as the default color provider,
+ * they are used to paint a tour/legend in a 2D/3D map.
  */
 public class MapColorProvider {
 

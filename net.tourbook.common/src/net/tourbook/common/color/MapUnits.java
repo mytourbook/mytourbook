@@ -18,11 +18,12 @@ package net.tourbook.common.color;
 import java.util.List;
 
 import net.tourbook.common.UI;
+import net.tourbook.common.util.StatusUtil;
 
 /**
  * Configuration for the units in a map color provider.
  */
-public class MapUnits {
+public class MapUnits implements Cloneable {
 
 	public float			legendMinValue;
 	public float			legendMaxValue;
@@ -38,6 +39,24 @@ public class MapUnits {
 	 * Number of digits when label is formatted, default is 0.
 	 */
 	public int				numberFormatDigits;
+
+	@Override
+	public MapUnits clone() {
+
+		MapUnits clonedObject = null;
+
+		// !!! fields are not cloned because they are overwritten when color provider is set !!!
+
+		try {
+
+			clonedObject = (MapUnits) super.clone();
+
+		} catch (final CloneNotSupportedException e) {
+			StatusUtil.log(e);
+		}
+
+		return clonedObject;
+	}
 
 	@Override
 	public String toString() {

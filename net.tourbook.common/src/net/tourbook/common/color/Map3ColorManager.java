@@ -79,13 +79,14 @@ public class Map3ColorManager {
 	private static final String								TAG_VERTEX						= "vertex";										//$NON-NLS-1$
 
 	// common attributes
-	private static final String								ATTR_VERSION					= "version";										//$NON-NLS-1$
-	private static final String								ATTR_GRAPH_ID					= "graphId";										//$NON-NLS-1$
-	private static final String								ATTR_NAME						= "name";											//$NON-NLS-1$
-	private static final String								ATTR_VALUE						= "value";											//$NON-NLS-1$
-	private static final String								ATTR_RED						= "red";											//$NON-NLS-1$
-	private static final String								ATTR_GREEN						= "green";											//$NON-NLS-1$
 	private static final String								ATTR_BLUE						= "blue";											//$NON-NLS-1$
+	private static final String								ATTR_GRAPH_ID					= "graphId";										//$NON-NLS-1$
+	private static final String								ATTR_GREEN						= "green";											//$NON-NLS-1$
+	private static final String								ATTR_IS_ACTIVE_PROFILE			= "isActive";										//$NON-NLS-1$
+	private static final String								ATTR_NAME						= "name";											//$NON-NLS-1$
+	private static final String								ATTR_RED						= "red";											//$NON-NLS-1$
+	private static final String								ATTR_VALUE						= "value";											//$NON-NLS-1$
+	private static final String								ATTR_VERSION					= "version";										//$NON-NLS-1$
 
 	private static final RGB								DEFAULT_RGB						= new RGB(0xFF, 0x8B, 0x8B);
 
@@ -104,8 +105,8 @@ public class Map3ColorManager {
 //		<valuecolor blue="255" green="128" red="0" value="150.0"/>
 //		<valuecolor blue="255" green="128" red="0" value="190.0"/>
 
-		DEFAULT_PROFILE_ALTITUDE = new Map3ColorProfile(MapGraphId.Altitude,//
-				//
+		DEFAULT_PROFILE_ALTITUDE = new Map3ColorProfile(
+		//
 				new RGBVertex[] {
 			new RGBVertex(0, 128, 64, 0),
 			new RGBVertex(200, 255, 255, 0),
@@ -126,7 +127,7 @@ public class Map3ColorManager {
 //		<valuecolor blue="223" green="0" red="223" value="150.0"/>
 //		<valuecolor blue="255" green="255" red="255" value="190.0"/>
 
-		DEFAULT_PROFILE_GRADIENT = new Map3ColorProfile(MapGraphId.Gradient, //
+		DEFAULT_PROFILE_GRADIENT = new Map3ColorProfile(//
 				//
 				new RGBVertex[] {
 			new RGBVertex(-10, 0, 0, 0),
@@ -145,7 +146,7 @@ public class Map3ColorManager {
 //		<valuecolor blue="255" green="255" red="0" value="150.0"/>
 //		<valuecolor blue="255" green="0" red="0" value="190.0"/>
 
-		DEFAULT_PROFILE_PACE = new Map3ColorProfile(MapGraphId.Pace, //
+		DEFAULT_PROFILE_PACE = new Map3ColorProfile( //
 				//
 				new RGBVertex[] {
 			new RGBVertex(0, 255, 0, 0),
@@ -163,7 +164,7 @@ public class Map3ColorManager {
 //		<valuecolor blue="0" green="0" red="204" value="150.0"/>
 //		<valuecolor blue="255" green="0" red="0" value="190.0"/>
 
-		DEFAULT_PROFILE_PULSE = new Map3ColorProfile(MapGraphId.Pulse, //
+		DEFAULT_PROFILE_PULSE = new Map3ColorProfile( //
 				//
 				new RGBVertex[] {
 			new RGBVertex(60, 0, 203, 0),
@@ -182,7 +183,7 @@ public class Map3ColorManager {
 //		<valuecolor blue="255" green="128" red="0" value="150.0"/>
 //		<valuecolor blue="255" green="128" red="0" value="190.0"/>
 
-		DEFAULT_PROFILE_SPEED = new Map3ColorProfile(MapGraphId.Speed, //
+		DEFAULT_PROFILE_SPEED = new Map3ColorProfile( //
 				//
 				new RGBVertex[] {
 			new RGBVertex(0, 198, 255, 0),
@@ -244,16 +245,53 @@ public class Map3ColorManager {
 		Collections.sort(_sortedColorDefinitions);
 	}
 
+	public static void addColorProvider(final Map3GradientColorProvider newColorProvider) {
+
+		final MapGraphId graphId = newColorProvider.getGraphId();
+
+		getColorDefinition(graphId).addColorProvider(newColorProvider);
+	}
+
 	/**
 	 * Disposes all profile images.
 	 */
 	public static void disposeProfileImages() {
 
 		for (final Map3ColorDefinition colorDef : _map3ColorDefinitions.values()) {
-			for (final Map3ColorProfile colorProfile : colorDef.getColorProfiles()) {
-				UI.disposeResource(colorProfile.getProfileImage().getImage());
+			for (final Map3GradientColorProvider colorProvider : colorDef.getColorProviders()) {
+
+				final Map3ColorProfile map3ColorProfile = colorProvider.getMap3ColorProfile();
+
+				UI.disposeResource(map3ColorProfile.getProfileImage().getImage());
 			}
 		}
+	}
+
+	public static Map3GradientColorProvider getActiveColorProvider(final MapGraphId graphId) {
+
+		Map3GradientColorProvider activeColorProvider = null;
+
+		final ArrayList<Map3GradientColorProvider> colorProviders = getColorProviders(graphId);
+
+		for (final Map3GradientColorProvider colorProvider : colorProviders) {
+
+			if (colorProvider.getMap3ColorProfile().isActiveColorProfile()) {
+
+				activeColorProvider = colorProvider;
+				break;
+			}
+		}
+
+		if (activeColorProvider == null) {
+
+			// this case should not happen, set first as active
+
+			activeColorProvider = colorProviders.get(0);
+
+			activeColorProvider.getMap3ColorProfile().setIsActiveColorProfile(true);
+		}
+
+		return activeColorProvider;
 	}
 
 	public static Map3ColorDefinition getColorDefinition(final MapGraphId graphId) {
@@ -284,9 +322,9 @@ public class Map3ColorManager {
 	 * @param graphId
 	 * @return Returns all color profiles for the requested {@link MapGraphId}.
 	 */
-	public static ArrayList<Map3ColorProfile> getColorProfiles(final MapGraphId graphId) {
+	public static ArrayList<Map3GradientColorProvider> getColorProviders(final MapGraphId graphId) {
 
-		return getColorDefinition(graphId).getColorProfiles();
+		return getColorDefinition(graphId).getColorProviders();
 	}
 
 	/**
@@ -314,22 +352,69 @@ public class Map3ColorManager {
 
 	private static void readColors() {
 
+		// get loaded color definitions
 		final ArrayList<Map3ColorDefinition> xmlColorDefinitions = readColors_0_FromXml();
 
 		if (xmlColorDefinitions == null) {
+
+			// set all default color profiles as active
+
+			for (final Map3ColorDefinition colorDef : _map3ColorDefinitions.values()) {
+
+				for (final Map3GradientColorProvider colorProvider : colorDef.getColorProviders()) {
+
+					final Map3ColorProfile colorProfile = colorProvider.getMap3ColorProfile();
+
+					colorProfile.setIsActiveColorProfile(true);
+				}
+			}
+
 			return;
 		}
 
+		// replace existing color providers with loaded color providers
 		for (final Map3ColorDefinition xmlColorDef : xmlColorDefinitions) {
 
-			final MapGraphId xmlGraphId = xmlColorDef.getGraphId();
+			final ArrayList<Map3GradientColorProvider> xmlColorProvider = xmlColorDef.getColorProviders();
+			if (xmlColorProvider.size() > 0) {
 
-			final Map3ColorDefinition defaultColorDef = getColorDefinition(xmlGraphId);
+				final MapGraphId xmlGraphId = xmlColorDef.getGraphId();
+				final Map3ColorDefinition defaultColorDef = getColorDefinition(xmlGraphId);
 
-			final ArrayList<Map3ColorProfile> xmlProfiles = xmlColorDef.getColorProfiles();
-			if (xmlProfiles.size() > 0) {
-				// replace existing profiles with loaded profiles
-				defaultColorDef.setColorProfiles(xmlProfiles);
+				defaultColorDef.setColorProvider(xmlColorProvider);
+			}
+		}
+
+		// ensure that only one color provider for each graph id is active
+		for (final Map3ColorDefinition colorDef : getColorDefinitions().values()) {
+
+			final ArrayList<Map3GradientColorProvider> colorProviders = colorDef.getColorProviders();
+
+			Map3GradientColorProvider activeColorProvider = null;
+
+			for (final Map3GradientColorProvider colorProvider : colorProviders) {
+
+				final Map3ColorProfile colorProfile = colorProvider.getMap3ColorProfile();
+
+				final boolean isActiveColorProfile = colorProfile.isActiveColorProfile();
+
+				if (activeColorProvider == null && isActiveColorProfile) {
+
+					activeColorProvider = colorProvider;
+
+				} else {
+
+					// ensure that all other color providers are NOT active
+
+					colorProfile.setIsActiveColorProfile(false);
+				}
+			}
+
+			if (activeColorProvider == null) {
+
+				// ensure that one active color provider is set, set first as active
+
+				colorProviders.get(0).getMap3ColorProfile().setIsActiveColorProfile(true);
 			}
 		}
 	}
@@ -354,11 +439,11 @@ public class Map3ColorManager {
 		ArrayList<Map3ColorDefinition> xmlColorDefinitions = null;
 
 		try {
-			reader = new InputStreamReader(new FileInputStream(file), "UTF-8"); //$NON-NLS-1$
+			reader = new InputStreamReader(new FileInputStream(file), UI.UTF_8);
 
 			final XMLMemento mementoRoot = XMLMemento.createReadRoot(reader);
 
-			xmlColorDefinitions = readColors_10(mementoRoot);
+			xmlColorDefinitions = readColors_10_MapColors(mementoRoot);
 
 		} catch (final UnsupportedEncodingException e) {
 			StatusUtil.log(e);
@@ -379,7 +464,7 @@ public class Map3ColorManager {
 		return xmlColorDefinitions;
 	}
 
-	private static ArrayList<Map3ColorDefinition> readColors_10(final XMLMemento xmlRoot) {
+	private static ArrayList<Map3ColorDefinition> readColors_10_MapColors(final XMLMemento xmlRoot) {
 
 		final ArrayList<Map3ColorDefinition> colorDefinitions = new ArrayList<Map3ColorDefinition>();
 
@@ -409,10 +494,11 @@ public class Map3ColorManager {
 
 			for (final IMemento xmlProfile : xmlProfiles) {
 
-				final Map3ColorProfile colorProfile = new Map3ColorProfile(graphId);
+				final Map3ColorProfile colorProfile = new Map3ColorProfile();
 				colorDef.addProfile(colorProfile);
 
 				colorProfile.setProfileName(Util.getXmlString(xmlProfile, ATTR_NAME, UI.EMPTY_STRING));
+				colorProfile.setIsActiveColorProfile(Util.getXmlBoolean(xmlProfile, ATTR_IS_ACTIVE_PROFILE, false));
 
 				readColors_20_Brightness(xmlProfile, colorProfile);
 				readColors_22_MinMaxValue(xmlProfile, colorProfile);
@@ -501,42 +587,54 @@ public class Map3ColorManager {
 		colorProfile.getProfileImage().setVertices(vertices);
 	}
 
+//	// ensure that only one profile is active
+//	if (newColorProfile.isActiveColorProfile()) {
+//
+//		for (final Map3GradientColorProvider colorProvider : _colorProviders) {
+//
+//			final Map3ColorProfile colorProfile = colorProvider.getMap3ColorProfile();
+//
+//			if (colorProfile != newColorProfile) {
+//				colorProfile.setIsActiveColorProfile(false);
+//			}
+//		}
+//	}
+
 	/**
 	 * Replace a profile with another profile.
 	 * 
-	 * @param originalProfile
-	 * @param modifiedProfile
+	 * @param originalColorProvider
+	 * @param modifiedColorProvider
 	 */
-	public static void replaceColorProfile(	final Map3ColorProfile originalProfile,
-											final Map3ColorProfile modifiedProfile) {
+	public static void replaceColorProvider(final Map3GradientColorProvider originalColorProvider,
+											final Map3GradientColorProvider modifiedColorProvider) {
 
-		final MapGraphId originalGraphId = originalProfile.getGraphId();
-		final MapGraphId modifiedGraphId = modifiedProfile.getGraphId();
+		final MapGraphId originalGraphId = originalColorProvider.getGraphId();
+		final MapGraphId modifiedGraphId = modifiedColorProvider.getGraphId();
 
 		// remove old profile
-		final ArrayList<Map3ColorProfile> originalProfiles = getColorProfiles(originalGraphId);
+		final ArrayList<Map3GradientColorProvider> allOriginalProviders = getColorProviders(originalGraphId);
 
 		// add new/modified profile
 		if (originalGraphId == modifiedGraphId) {
 
 			// graph id has not changed, replace original with modified profile
 
-			originalProfiles.remove(originalProfile);
-			originalProfiles.add(modifiedProfile);
+			allOriginalProviders.remove(originalColorProvider);
+			allOriginalProviders.add(modifiedColorProvider);
 
 		} else {
 
 			// graph id has changed, remove original and set new profile
 
-			if (originalProfiles.size() < 2) {
+			if (allOriginalProviders.size() < 2) {
 				StatusUtil.log(new Throwable(
 						"Color profile cannot be removed because the color definition contains only 1 color profile."));//$NON-NLS-1$
 				return;
 			}
 
-			originalProfiles.remove(originalProfile);
-
-			getColorProfiles(modifiedGraphId).add(modifiedProfile);
+			getColorDefinition(originalGraphId).removeColorProvider(originalColorProvider);
+			getColorDefinition(modifiedGraphId).addColorProvider(modifiedColorProvider);
 		}
 	}
 
@@ -552,9 +650,9 @@ public class Map3ColorManager {
 			final IPath stateLocation = Platform.getStateLocation(CommonActivator.getDefault().getBundle());
 			final File file = stateLocation.append(MAP3_COLOR_FILE).toFile();
 
-			writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "UTF-8")); //$NON-NLS-1$
+			writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), UI.UTF_8));
 
-			final XMLMemento xmlRoot = saveColors_01_getXMLRoot();
+			final XMLMemento xmlRoot = saveColors_0_getXMLRoot();
 
 			saveColors_10_MapColors(xmlRoot);
 
@@ -574,7 +672,7 @@ public class Map3ColorManager {
 		}
 	}
 
-	private static XMLMemento saveColors_01_getXMLRoot() {
+	private static XMLMemento saveColors_0_getXMLRoot() {
 
 		Document document;
 		try {
@@ -600,16 +698,23 @@ public class Map3ColorManager {
 
 			xmlColor.putString(ATTR_GRAPH_ID, colorDef.getGraphId().name());
 
-			for (final Map3ColorProfile colorProfile : colorDef.getColorProfiles()) {
+			for (final Map3GradientColorProvider colorProvider : colorDef.getColorProviders()) {
 
-				final IMemento xmlProfile = xmlColor.createChild(TAG_COLOR_PROFILE);
+				final MapColorProfile colorProfile = colorProvider.getColorProfile();
+				if (colorProfile instanceof Map3ColorProfile) {
 
-				xmlProfile.putString(ATTR_NAME, colorProfile.getProfileName());
+					final Map3ColorProfile map3ColorProfile = (Map3ColorProfile) colorProfile;
 
-				saveColors_20_Brightness(xmlProfile, colorProfile);
-				saveColors_22_MinMaxValue(xmlProfile, colorProfile);
+					final IMemento xmlProfile = xmlColor.createChild(TAG_COLOR_PROFILE);
 
-				saveColors_50_Vertices(xmlProfile, colorProfile);
+					xmlProfile.putString(ATTR_NAME, map3ColorProfile.getProfileName());
+					xmlProfile.putBoolean(ATTR_IS_ACTIVE_PROFILE, map3ColorProfile.isActiveColorProfile());
+
+					saveColors_20_Brightness(xmlProfile, map3ColorProfile);
+					saveColors_22_MinMaxValue(xmlProfile, map3ColorProfile);
+
+					saveColors_30_Vertices(xmlProfile, map3ColorProfile);
+				}
 			}
 		}
 	}
@@ -646,7 +751,7 @@ public class Map3ColorManager {
 		xmlMinMaxValue.putInteger(GraphColorManager.TAG_MAX_VALUE_OVERWRITE, colorProfile.getMaxValueOverwrite());
 	}
 
-	private static void saveColors_50_Vertices(final IMemento xmlColor, final Map3ColorProfile colorProfile) {
+	private static void saveColors_30_Vertices(final IMemento xmlColor, final Map3ColorProfile colorProfile) {
 
 		final IMemento xmlVertices = xmlColor.createChild(TAG_VERTICES);
 
@@ -660,6 +765,19 @@ public class Map3ColorManager {
 			xmlVertex.putInteger(ATTR_RED, rgb.red);
 			xmlVertex.putInteger(ATTR_GREEN, rgb.green);
 			xmlVertex.putInteger(ATTR_BLUE, rgb.blue);
+		}
+	}
+
+	/**
+	 * @param activeColorProvider
+	 */
+	public static void setActiveColorProvider(final Map3GradientColorProvider activeColorProvider) {
+
+		final ArrayList<Map3GradientColorProvider> colorProviders = getColorProviders(activeColorProvider.getGraphId());
+
+		for (final Map3GradientColorProvider colorProvider : colorProviders) {
+
+			colorProvider.getMap3ColorProfile().setIsActiveColorProfile(colorProvider == activeColorProvider);
 		}
 	}
 }

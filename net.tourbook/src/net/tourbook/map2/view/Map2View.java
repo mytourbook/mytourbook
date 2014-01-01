@@ -27,7 +27,7 @@ import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.SelectionChartInfo;
 import net.tourbook.chart.SelectionChartXSliderPosition;
 import net.tourbook.common.UI;
-import net.tourbook.common.color.IGradientColors;
+import net.tourbook.common.color.IGradientColorProvider;
 import net.tourbook.common.color.IMapColorProvider;
 import net.tourbook.common.color.MapGraphId;
 import net.tourbook.common.map.GeoPosition;
@@ -1320,17 +1320,17 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 		final int legendHeightNoMargin = legendImageBounds.height - 2 * IMapColorProvider.LEGEND_MARGIN_TOP_BOTTOM;
 
 		boolean isDataAvailable = false;
-		if (mapColorProvider instanceof IGradientColors) {
+		if (mapColorProvider instanceof IGradientColorProvider) {
 
 			isDataAvailable = MapUtils.setMinMaxValues(
 					_allTourData,
-					(IGradientColors) mapColorProvider,
+					(IGradientColorProvider) mapColorProvider,
 					legendHeightNoMargin);
 
-		} else if (mapColorProvider instanceof IDiscreteColors) {
+		} else if (mapColorProvider instanceof IDiscreteColorProvider) {
 
 			isDataAvailable = createLegendImage_20_SetProviderValues(
-					(IDiscreteColors) mapColorProvider,
+					(IDiscreteColorProvider) mapColorProvider,
 					legendHeightNoMargin);
 		}
 
@@ -1352,7 +1352,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 		_mapLegend.setImage(legendImage);
 	}
 
-	private boolean createLegendImage_20_SetProviderValues(final IDiscreteColors legendProvider, final int legendHeight) {
+	private boolean createLegendImage_20_SetProviderValues(final IDiscreteColorProvider legendProvider, final int legendHeight) {
 
 		if (_allTourData.size() == 0) {
 			return false;

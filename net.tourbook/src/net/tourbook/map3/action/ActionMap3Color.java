@@ -16,7 +16,7 @@
 package net.tourbook.map3.action;
 
 import net.tourbook.common.color.ColorDefinition;
-import net.tourbook.common.color.Map3ColorProfile;
+import net.tourbook.common.color.Map3GradientColorProvider;
 import net.tourbook.common.color.MapGraphId;
 import net.tourbook.map2.view.DialogMap2ColorEditor;
 import net.tourbook.map3.Messages;
@@ -39,8 +39,8 @@ public class ActionMap3Color extends Action implements IMap3ColorUpdater {
 	}
 
 	@Override
-	public void applyMapColors(	final Map3ColorProfile originalProfile,
-								final Map3ColorProfile modifiedProfile,
+	public void applyMapColors(	final Map3GradientColorProvider originalColorProvider,
+								final Map3GradientColorProvider modifiedColorProvider,
 								final boolean isNewProfile) {
 
 //		// update color definition with new color from the color dialog

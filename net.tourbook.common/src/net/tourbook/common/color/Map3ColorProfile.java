@@ -18,8 +18,6 @@ package net.tourbook.common.color;
 import net.tourbook.common.Messages;
 import net.tourbook.common.util.StatusUtil;
 
-import org.eclipse.swt.graphics.Image;
-
 /**
  * Contains all colors for one graph to paint a tour in the 3D map.
  */
@@ -34,22 +32,18 @@ public class Map3ColorProfile extends MapColorProfile implements Cloneable {
 	private int					_profileId;
 
 	/**
-	 * 
-	 */
-	private MapGraphId			_graphId;
-
-	/**
 	 * Name which is visible in the UI.
 	 */
 	private String				_profileName			= PROFILE_NAME_DEFAULTA;
 
 	private ProfileImage		_profileImage			= new Map3ProfileImage();
 
+	private boolean				_isActiveColorProfile;
+
 	private static int			_idCounter				= 0;
 
-	public Map3ColorProfile(final MapGraphId graphId) {
+	public Map3ColorProfile() {
 
-		_graphId = graphId;
 		_profileId = createProfileId();
 	}
 
@@ -61,16 +55,14 @@ public class Map3ColorProfile extends MapColorProfile implements Cloneable {
 	 * @param maxBrightness
 	 * @param maxBrightnessFactor
 	 */
-	public Map3ColorProfile(final MapGraphId graphId, //
-							//
-							final RGBVertex[] rgbVertices,
-							//
+	public Map3ColorProfile(final RGBVertex[] rgbVertices,
+	//
 							final int minBrightness,
 							final int minBrightnessFactor,
 							final int maxBrightness,
 							final int maxBrightnessFactor) {
 
-		this(graphId);
+		this();
 
 		_profileImage.setVertices(rgbVertices);
 
@@ -91,10 +83,7 @@ public class Map3ColorProfile extends MapColorProfile implements Cloneable {
 	 * @param isMaxOverwrite
 	 * @param maxOverwrite
 	 */
-	public Map3ColorProfile(final MapGraphId graphId,
-	//
-							final RGBVertex[] rgbVertices,
-							//
+	public Map3ColorProfile(final RGBVertex[] rgbVertices,
 							final int minBrightness,
 							final int minBrightnessFactor,
 							final int maxBrightness,
@@ -103,11 +92,9 @@ public class Map3ColorProfile extends MapColorProfile implements Cloneable {
 							final boolean isMinOverwrite,
 							final int minOverwrite,
 							final boolean isMaxOverwrite,
-							final int maxOverwrite
-	//
-	) {
+							final int maxOverwrite) {
 
-		this(graphId, //
+		this(//
 				rgbVertices,
 				minBrightness,
 				minBrightnessFactor,
@@ -142,19 +129,6 @@ public class Map3ColorProfile extends MapColorProfile implements Cloneable {
 	}
 
 	/**
-	 * Creates profile image, this image must be disposed who created it.
-	 * 
-	 * @param width
-	 * @param height
-	 * @param isHorizontal
-	 * @return
-	 */
-	public Image createImage(final int width, final int height, final boolean isHorizontal) {
-
-		return _profileImage.createImage(width, height, isHorizontal);
-	}
-
-	/**
 	 * @return Returns a unique id.
 	 */
 	private int createProfileId() {
@@ -181,10 +155,6 @@ public class Map3ColorProfile extends MapColorProfile implements Cloneable {
 		return true;
 	}
 
-	public MapGraphId getGraphId() {
-		return _graphId;
-	}
-
 	public int getProfileId() {
 		return _profileId;
 	}
@@ -205,8 +175,12 @@ public class Map3ColorProfile extends MapColorProfile implements Cloneable {
 		return result;
 	}
 
-	public void setGraphId(final MapGraphId graphId) {
-		_graphId = graphId;
+	public boolean isActiveColorProfile() {
+		return _isActiveColorProfile;
+	}
+
+	public void setIsActiveColorProfile(final boolean isActiveColorProfile) {
+		_isActiveColorProfile = isActiveColorProfile;
 	}
 
 	public void setProfileId(final int profileId) {
@@ -219,10 +193,11 @@ public class Map3ColorProfile extends MapColorProfile implements Cloneable {
 
 	@Override
 	public String toString() {
-		return String.format("Map3ColorProfile [_profileId=%s, _graphId=%s, _profileName=%s]", //$NON-NLS-1$
+		return String.format(
+				"Map3ColorProfile [_profileId=%s, _profileName=%s, _isActiveColorProfile=%s]",
 				_profileId,
-				_graphId,
-				_profileName);
+				_profileName,
+				_isActiveColorProfile);
 	}
 
 }

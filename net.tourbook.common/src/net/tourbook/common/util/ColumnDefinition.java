@@ -215,6 +215,9 @@ public class ColumnDefinition implements Cloneable {
 		return _isColumnHidden;
 	}
 
+	/**
+	 * @return Returns <code>true</code> when the column is movable, default is <code>true</code>.
+	 */
 	public boolean isColumnMoveable() {
 		return _isColumnMoveable;
 	}

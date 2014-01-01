@@ -29,28 +29,28 @@ public class MapGradientColorProvider {
 	/**
 	 * Converts graph min/max values into legend values which adjusted min/max values.
 	 * 
-	 * @param legendHeight
+	 * @param legendSize
 	 * @param graphMinValue
 	 * @param graphMaxValue
 	 * @param unitFormat
 	 * @return
 	 */
-	static List<Float> getLegendUnits(	final int legendHeight,
-												final float graphMinValue,
-												final float graphMaxValue,
-												final LegendUnitFormat unitFormat) {
+	static List<Float> getLegendUnits(	final int legendSize,
+										final float graphMinValue,
+										final float graphMaxValue,
+										final LegendUnitFormat unitFormat) {
 
 		if (unitFormat == LegendUnitFormat.Pace) {
 
-			return getLegendUnits_20_Pace(legendHeight, (int) graphMinValue, (int) graphMaxValue, unitFormat);
+			return getLegendUnits_20_Pace(legendSize, (int) graphMinValue, (int) graphMaxValue, unitFormat);
 
 		} else {
 
-			return getLegendUnits_10_Number(legendHeight, graphMinValue, graphMaxValue, unitFormat);
+			return getLegendUnits_10_Number(legendSize, graphMinValue, graphMaxValue, unitFormat);
 		}
 	}
 
-	private static List<Float> getLegendUnits_10_Number(final int legendHeight,
+	private static List<Float> getLegendUnits_10_Number(final int legendSize,
 														final float graphMinValue,
 														final float graphMaxValue,
 														final LegendUnitFormat unitFormat) {
@@ -62,7 +62,7 @@ public class MapGradientColorProvider {
 		 */
 		final float graphRange = graphMaxValue - graphMinValue;
 
-		final int defaultUnitCount = legendHeight / IMapColorProvider.LEGEND_UNIT_DISTANCE;
+		final int defaultUnitCount = legendSize / IMapColorProvider.LEGEND_UNIT_DISTANCE;
 
 		// get range for one unit
 		final float graphUnitValue = graphRange / Math.max(1, defaultUnitCount);

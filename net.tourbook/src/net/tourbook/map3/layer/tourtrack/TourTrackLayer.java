@@ -34,7 +34,7 @@ import java.util.ArrayList;
 
 import net.tourbook.common.color.IMapColorProvider;
 import net.tourbook.data.TourData;
-import net.tourbook.map2.view.IDiscreteColors;
+import net.tourbook.map2.view.IDiscreteColorProvider;
 import net.tourbook.map3.view.ICheckStateListener;
 import net.tourbook.map3.view.Map3Manager;
 import net.tourbook.map3.view.Map3View;
@@ -135,9 +135,9 @@ public class TourTrackLayer extends RenderableLayer implements SelectListener, I
 						altitude,
 						dataSerieValue);
 
-				if (_colorProvider instanceof IDiscreteColors) {
+				if (_colorProvider instanceof IDiscreteColorProvider) {
 
-					final IDiscreteColors discreteColorProvider = (IDiscreteColors) _colorProvider;
+					final IDiscreteColorProvider discreteColorProvider = (IDiscreteColorProvider) _colorProvider;
 
 					trackPosition.colorValue = discreteColorProvider.getColorValue(tourData, serieIndex);
 				}

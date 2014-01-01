@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -266,12 +266,12 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 				.numColumns(2)
 				.applyTo(container);
 		{
-			createUI10Title(container);
+			createUI_10_Title(container);
 
-			createUI20TagViewer(container);
-			createUI30Buttons(container);
+			createUI_20_TagViewer(container);
+			createUI_30_Buttons(container);
 
-			createUI40Bottom(container);
+			createUI_40_Bottom(container);
 		}
 
 		// spacer
@@ -280,7 +280,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 		return container;
 	}
 
-	private void createUI10Title(final Composite parent) {
+	private void createUI_10_Title(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
@@ -299,7 +299,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 		new Label(parent, SWT.NONE);
 	}
 
-	private void createUI20TagViewer(final Composite parent) {
+	private void createUI_20_TagViewer(final Composite parent) {
 
 		/*
 		 * create tree layout
@@ -462,7 +462,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 		treeLayout.setColumnData(tvcColumn, new ColumnWeightData(100, true));
 	}
 
-	private void createUI30Buttons(final Composite parent) {
+	private void createUI_30_Buttons(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults()//
@@ -519,7 +519,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 		}
 	}
 
-	private void createUI40Bottom(final Composite parent) {
+	private void createUI_40_Bottom(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(container);

@@ -15,8 +15,10 @@
  *******************************************************************************/
 package net.tourbook.common.color;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import net.tourbook.common.UI;
 import net.tourbook.common.util.StatusUtil;
 
 import org.eclipse.swt.graphics.RGB;
@@ -27,7 +29,7 @@ import org.eclipse.swt.graphics.RGB;
  * A color provider do not contain data values only min/max values needs to be set in the
  * configuration.
  */
-public class Map3GradientColorProvider extends MapGradientColorProvider implements IGradientColors {
+public class Map3GradientColorProvider extends MapGradientColorProvider implements IGradientColorProvider, Cloneable {
 
 	private MapGraphId			_graphId;
 
@@ -35,20 +37,78 @@ public class Map3GradientColorProvider extends MapGradientColorProvider implemen
 
 	private MapUnits			_mapUnits	= new MapUnits();
 
-	public Map3GradientColorProvider(final Map3ColorProfile map3ColorProfile) {
-
-		_graphId = map3ColorProfile.getGraphId();
-		_colorProfile = map3ColorProfile;
-	}
-
 	public Map3GradientColorProvider(final MapGraphId graphId) {
 
 		_graphId = graphId;
-		_colorProfile = new Map3ColorProfile(graphId);
+		_colorProfile = new Map3ColorProfile();
+	}
+
+	public Map3GradientColorProvider(final MapGraphId graphId, final Map3ColorProfile colorProfile) {
+
+		_graphId = graphId;
+		_colorProfile = colorProfile;
 	}
 
 	@Override
-	public void configureColorProvider(	final int imageHeight,
+	public Map3GradientColorProvider clone() {
+
+		Map3GradientColorProvider clonedObject = null;
+
+		try {
+
+			clonedObject = (Map3GradientColorProvider) super.clone();
+
+			clonedObject._colorProfile = _colorProfile.clone();
+			clonedObject._mapUnits = _mapUnits.clone();
+
+		} catch (final CloneNotSupportedException e) {
+			StatusUtil.log(e);
+		}
+
+		return clonedObject;
+	}
+
+	public void configureColorProvider(final int legendSize, final ArrayList<RGBVertex> rgbVertices) {
+
+		final String unitText = UI.EMPTY_STRING;
+
+		/*
+		 * Get min/max values from the values which are displayed
+		 */
+		float minValue = 0;
+		float maxValue = 0;
+
+		for (int vertexIndex = 0; vertexIndex < rgbVertices.size(); vertexIndex++) {
+
+			final long value = rgbVertices.get(vertexIndex).getValue();
+
+			if (vertexIndex == 0) {
+
+				// initialize min/max values
+
+				minValue = maxValue = value;
+
+			} else {
+
+				if (value < minValue) {
+					minValue = value;
+				} else if (value > maxValue) {
+					maxValue = value;
+				}
+			}
+		}
+
+		configureColorProvider(//
+				legendSize,
+				minValue,
+				maxValue,
+				unitText,
+				LegendUnitFormat.Number);
+
+	}
+
+	@Override
+	public void configureColorProvider(	final int legendSize,
 										float minValue,
 										float maxValue,
 										final String unitText,
@@ -83,7 +143,7 @@ public class Map3GradientColorProvider extends MapGradientColorProvider implemen
 			maxValue = minValue + 1;
 		}
 
-		final List<Float> legendUnits = getLegendUnits(imageHeight, minValue, maxValue, unitFormat);
+		final List<Float> legendUnits = getLegendUnits(legendSize, minValue, maxValue, unitFormat);
 
 		if (legendUnits.size() > 0) {
 
@@ -95,6 +155,33 @@ public class Map3GradientColorProvider extends MapGradientColorProvider implemen
 			_mapUnits.legendMinValue = legendMinValue;
 			_mapUnits.legendMaxValue = legendMaxValue;
 		}
+	}
+
+	@Override
+	public boolean equals(final Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (!(obj instanceof Map3GradientColorProvider)) {
+			return false;
+		}
+		final Map3GradientColorProvider other = (Map3GradientColorProvider) obj;
+		if (_colorProfile == null) {
+			if (other._colorProfile != null) {
+				return false;
+			}
+		} else if (!_colorProfile.equals(other._colorProfile)) {
+			return false;
+		}
+		return true;
+	}
+
+	@Override
+	public MapColorProfile getColorProfile() {
+		return _colorProfile;
 	}
 
 	@Override
@@ -245,13 +332,20 @@ public class Map3GradientColorProvider extends MapGradientColorProvider implemen
 		return _graphId;
 	}
 
-	@Override
-	public MapColorProfile getMapColorProfile() {
+	public Map3ColorProfile getMap3ColorProfile() {
 		return _colorProfile;
 	}
 
 	public MapUnits getMapUnits() {
 		return _mapUnits;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((_colorProfile == null) ? 0 : _colorProfile.hashCode());
+		return result;
 	}
 
 	@Override
@@ -266,8 +360,18 @@ public class Map3GradientColorProvider extends MapGradientColorProvider implemen
 			StatusUtil.log(new Throwable(String.format(
 					"Color profile '%s' is not of type '%s'",
 					colorProfile,
-					Map3ColorProfile.class.getSimpleName())));
+					Map3ColorProfile.class.getName())));
 		}
+	}
+
+	public void setGraphId(final MapGraphId graphId) {
+
+		_graphId = graphId;
+	}
+
+	@Override
+	public String toString() {
+		return String.format("Map3GradientColorProvider [_graphId=%s, _colorProfile=%s]", _graphId, _colorProfile);
 	}
 
 }

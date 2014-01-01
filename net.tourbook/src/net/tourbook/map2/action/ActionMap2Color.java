@@ -18,7 +18,7 @@ package net.tourbook.map2.action;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.color.ColorDefinition;
 import net.tourbook.common.color.GraphColorManager;
-import net.tourbook.common.color.IGradientColors;
+import net.tourbook.common.color.IGradientColorProvider;
 import net.tourbook.common.color.IMapColorProvider;
 import net.tourbook.common.color.Map2ColorProfile;
 import net.tourbook.common.color.Map2GradientColorProvider;
@@ -74,7 +74,7 @@ public class ActionMap2Color extends Action implements IMap2ColorUpdater {
 
 		final IMapColorProvider mapColorProvider = MapColorProvider.getMap2ColorProvider(_mapColorId);
 
-		if (mapColorProvider instanceof IGradientColors) {
+		if (mapColorProvider instanceof IGradientColorProvider) {
 
 			final Map2GradientColorProvider mapLegendColorProvider = PrefPageAppearanceColors
 					.createLegendImageColorProvider();

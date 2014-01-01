@@ -15,31 +15,32 @@
  *******************************************************************************/
 package net.tourbook.common.color;
 
-public interface IGradientColors extends IMapColorProvider {
+public interface IGradientColorProvider extends IMapColorProvider {
 
 	/**
 	 * Configure color provider by setting min/max values, units ..., the common color provider do
 	 * not contain data values only subclasses.
 	 * 
-	 * @param legendHeight
+	 * @param imageSize
+	 *            Width or height of the image.
 	 * @param minValue
 	 * @param maxValue
 	 * @param unitText
 	 * @param unitFormat
 	 */
-	abstract void configureColorProvider(	int legendHeight,
+	abstract void configureColorProvider(	int imageSize,
 											float minValue,
 											float maxValue,
 											String unitText,
 											LegendUnitFormat unitFormat);
+
+	abstract MapColorProfile getColorProfile();
 
 	/**
 	 * @param graphValue
 	 * @return Returns RGB value for a graph value.
 	 */
 	abstract int getColorValue(float graphValue);
-
-	abstract MapColorProfile getMapColorProfile();
 
 	/**
 	 * @return Returns configuration how a map legend image is painted.

@@ -263,6 +263,7 @@ public class Messages extends NLS {
 	public static String		App_Action_Duplicate;
 	public static String		App_Action_edit_tour;
 	public static String		App_Action_Edit;
+	public static String		App_Action_Expand_All_Tooltip;
 	public static String		App_Action_ExtractTour;
 	public static String		App_Action_JoinTours;
 	public static String		App_Action_Menu_file;
@@ -563,10 +564,14 @@ public class Messages extends NLS {
 	public static String		HRMaxFormula_Name_HRmax_220_age;
 	public static String		HRMaxFormula_Name_Manual;
 
+	public static String	Image__App_Add;
+
 	public static String		Image__App_Cancel;
 	public static String		Image__App_Close;
 	public static String		Image__App_OK;
 	public static String		Image__App_Trash;
+
+	public static String	Image__App_Trash_Disabled;
 	public static String		Image__ArrowDown;
 	public static String		Image__ArrowUp;
 	public static String		Image__assignMergedTour;
@@ -881,9 +886,21 @@ public class Messages extends NLS {
 	public static String		Pref_Graphs_Text_max_value;
 	public static String		Pref_Graphs_Text_min_value;
 
-	public static String	Pref_Map3Color_Dialog_RemoveProfile_Message;
+	public static String		Pref_Map3Color_Column_Colors;
 
-	public static String	Pref_Map3Color_Dialog_RemoveProfile_Title;
+	public static String		Pref_Map3Color_Column_Id_Header;
+
+	public static String		Pref_Map3Color_Column_Id_Label;
+
+	public static String		Pref_Map3Color_Column_Id_Tooltip;
+
+	public static String		Pref_Map3Color_Column_ProfileName;
+
+	public static String		Pref_Map3Color_Dialog_RemoveProfile_Message;
+
+	public static String		Pref_Map3Color_Dialog_RemoveProfile_Title;
+
+	public static String		Pref_Map3Color_Label_Title;
 
 	public static String		Pref_MapLayout_Dialog_OSX_Warning_Message;
 	public static String		Pref_MapLayout_Dialog_OSX_Warning_Title;
