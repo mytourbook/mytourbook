@@ -31,6 +31,7 @@ import net.tourbook.common.color.Map2ColorProfile;
 import net.tourbook.common.color.Map2GradientColorProvider;
 import net.tourbook.common.color.MapGraphId;
 import net.tourbook.common.color.MapUnits;
+import net.tourbook.map.MapColorProvider;
 import net.tourbook.map2.view.DialogMap2ColorEditor;
 import net.tourbook.map2.view.IMap2ColorUpdater;
 import net.tourbook.ui.UI;
@@ -115,8 +116,8 @@ public class PrefPageAppearanceColors extends PreferencePage implements IWorkben
 
 	private ColorDefinition				_expandedItem;
 
-	private IGradientColorProvider				_legendImageColorProvider;
-	private DialogMap2ColorEditor			_dialogMappingColor;
+	private IGradientColorProvider		_legendImageColorProvider;
+	private DialogMap2ColorEditor		_dialogMappingColor;
 	private GraphColorPainter			_graphColorPainter;
 
 	/**
@@ -172,7 +173,7 @@ public class PrefPageAppearanceColors extends PreferencePage implements IWorkben
 
 	}
 
-	public static Map2GradientColorProvider createLegendImageColorProvider() {
+	public static Map2GradientColorProvider createMap2ColorProvider() {
 
 		final Map2GradientColorProvider colorProvider = new Map2GradientColorProvider(MapGraphId.Altitude);
 
@@ -196,6 +197,7 @@ public class PrefPageAppearanceColors extends PreferencePage implements IWorkben
 	public void applyMapColors(final Map2ColorProfile newMapColor) {
 
 		updateColorsFromDialog(_selectedColor.getColorDefinition(), newMapColor);
+
 		updateAndSaveColors();
 	}
 
@@ -211,7 +213,7 @@ public class PrefPageAppearanceColors extends PreferencePage implements IWorkben
 
 			final ArrayList<GraphColorItem> graphColors = new ArrayList<GraphColorItem>();
 
-			final boolean isMapColorAvailable = colorDefinition.getMapColor() != null;
+			final boolean isMapColorAvailable = colorDefinition.getMap2Color_Active() != null;
 
 			for (final String[] colorName : colorNames) {
 
@@ -413,9 +415,16 @@ public class PrefPageAppearanceColors extends PreferencePage implements IWorkben
 	 */
 	private void defineAllColumns(final TreeColumnLayout treeLayout, final Tree tree) {
 
-		TreeViewerColumn tvc;
+		final int numberOfHorizontalImages = 5;
+		final int trailingOffset = 10;
+
+		final int itemHeight = tree.getItemHeight();
+		final int colorWidth = (itemHeight + GraphColorPainter.GRAPH_COLOR_SPACING)
+				* numberOfHorizontalImages
+				+ trailingOffset;
+
 		TreeColumn tc;
-		final int colorWidth = (tree.getItemHeight() + 0) * 5 + 10;
+		TreeViewerColumn tvc;
 
 		// 1. column: color item/color definition
 		tvc = new TreeViewerColumn(_colorViewer, SWT.TRAIL);
@@ -447,10 +456,19 @@ public class PrefPageAppearanceColors extends PreferencePage implements IWorkben
 				final Object element = cell.getElement();
 
 				if (element instanceof ColorDefinition) {
-					cell.setImage(_graphColorPainter.drawDefinitionImage((ColorDefinition) element));
+
+					cell.setImage(_graphColorPainter.drawDefinitionImage(
+							(ColorDefinition) element,
+							numberOfHorizontalImages));
+
 				} else if (element instanceof GraphColorItem) {
-					cell.setImage(_graphColorPainter.drawColorImage((GraphColorItem) element));
+
+					cell.setImage(_graphColorPainter.drawColorImage(//
+							(GraphColorItem) element,
+							numberOfHorizontalImages));
+
 				} else {
+
 					cell.setImage(null);
 				}
 			}
@@ -475,7 +493,7 @@ public class PrefPageAppearanceColors extends PreferencePage implements IWorkben
 	 */
 	private void initializeLegend() {
 
-		_legendImageColorProvider = createLegendImageColorProvider();
+		_legendImageColorProvider = createMap2ColorProvider();
 
 		_dialogMappingColor = new DialogMap2ColorEditor(
 				Display.getCurrent().getActiveShell(),
@@ -597,14 +615,14 @@ public class PrefPageAppearanceColors extends PreferencePage implements IWorkben
 		// update current colors
 		for (final ColorDefinition graphDefinition : graphColorDefinitions) {
 
-			graphDefinition.setNewGradientBright(graphDefinition.getDefaultGradientBright());
-			graphDefinition.setNewGradientDark(graphDefinition.getDefaultGradientDark());
-			graphDefinition.setNewLineColor(graphDefinition.getDefaultLineColor());
-			graphDefinition.setNewTextColor(graphDefinition.getDefaultTextColor());
+			graphDefinition.setGradientBright_New(graphDefinition.getGradientBright_Default());
+			graphDefinition.setGradientDark_New(graphDefinition.getGradientDark_Default());
+			graphDefinition.setLineColor_New(graphDefinition.getLineColor_Default());
+			graphDefinition.setTextColor_New(graphDefinition.getTextColor_Default());
 
-			final Map2ColorProfile defaultLegendColor = graphDefinition.getDefaultMapColor();
+			final Map2ColorProfile defaultLegendColor = graphDefinition.getMap2Color_Default();
 			if (defaultLegendColor != null) {
-				graphDefinition.setNewMapColor(defaultLegendColor.clone());
+				graphDefinition.setMap2Color_New(defaultLegendColor.clone());
 			}
 		}
 
@@ -632,18 +650,20 @@ public class PrefPageAppearanceColors extends PreferencePage implements IWorkben
 
 		for (final ColorDefinition graphDefinition : GraphColorManager.getInstance().getGraphColorDefinitions()) {
 
-			graphDefinition.setNewGradientBright(graphDefinition.getGradientBright());
-			graphDefinition.setNewGradientDark(graphDefinition.getGradientDark());
-			graphDefinition.setNewLineColor(graphDefinition.getLineColor());
-			graphDefinition.setNewTextColor(graphDefinition.getTextColor());
+			graphDefinition.setGradientBright_New(graphDefinition.getGradientBright_Active());
+			graphDefinition.setGradientDark_New(graphDefinition.getGradientDark_Active());
+			graphDefinition.setLineColor_New(graphDefinition.getLineColor_Active());
+			graphDefinition.setTextColor_New(graphDefinition.getTextColor_Active());
 
-			graphDefinition.setNewMapColor(graphDefinition.getMapColor());
+			graphDefinition.setMap2Color_New(graphDefinition.getMap2Color_Active());
 		}
 	}
 
 	private void updateAndSaveColors() {
 
-		GraphColorManager.saveNewColors();
+		GraphColorManager.saveColors();
+
+		MapColorProvider.updateMap2Colors();
 
 		// force to change the status
 		TourbookPlugin.getDefault().getPreferenceStore()//
@@ -654,7 +674,7 @@ public class PrefPageAppearanceColors extends PreferencePage implements IWorkben
 										final Map2ColorProfile newMapColor) {
 
 		// set new legend color
-		selectedColorDefinition.setNewMapColor(newMapColor);
+		selectedColorDefinition.setMap2Color_New(newMapColor);
 
 		/*
 		 * dispose old color and image for the graph

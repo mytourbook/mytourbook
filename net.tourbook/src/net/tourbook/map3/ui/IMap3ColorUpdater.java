@@ -23,10 +23,10 @@ public interface IMap3ColorUpdater {
 	 * @param originalColorProvider
 	 * @param modifiedColorProvider
 	 *            This is a clone from the original profile which is modified in color editor.
-	 * @param isNewProfile
+	 * @param isNewColorProvider
 	 */
 	void applyMapColors(Map3GradientColorProvider originalColorProvider,
 						Map3GradientColorProvider modifiedColorProvider,
-						boolean isNewProfile);
+						boolean isNewColorProvider);
 
 }

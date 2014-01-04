@@ -399,7 +399,7 @@ public class TourLegendLayer extends RenderableLayer {
 				IMapColorProvider.DEFAULT_LEGEND_HEIGHT,
 				mapHeight - IMapColorProvider.LEGEND_TOP_MARGIN));
 
-		MapUtils.setMinMaxValues(//
+		MapUtils.configureColorProvider(//
 				Map3Manager.getMap3View().getAllTours(),
 				gradientColorProvider,
 				_legendImageHeight);

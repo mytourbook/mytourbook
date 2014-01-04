@@ -23,6 +23,7 @@ import net.tourbook.common.color.GraphColorManager;
 import net.tourbook.common.color.IGradientColorProvider;
 import net.tourbook.common.color.LegendUnitFormat;
 import net.tourbook.common.color.Map2ColorProfile;
+import net.tourbook.common.color.Map3GradientColorProvider;
 import net.tourbook.common.color.MapUnits;
 import net.tourbook.data.TourData;
 import net.tourbook.map2.Messages;
@@ -39,18 +40,15 @@ public class MapUtils {
 	 * @return Return <code>true</code> when the legend value could be updated, <code>false</code>
 	 *         when data are not available
 	 */
-	public static boolean setMinMaxValues(	final ArrayList<TourData> allTourData,
-											final IGradientColorProvider colorProvider,
-											final int legendHeight) {
+	public static boolean configureColorProvider(	final ArrayList<TourData> allTourData,
+													final IGradientColorProvider colorProvider,
+													final int legendHeight) {
 
 		if (allTourData.size() == 0) {
 			return false;
 		}
 
-		final GraphColorManager colorManager = GraphColorManager.getInstance();
-
-		final MapUnits legendConfig = colorProvider.getMapUnits();
-		ColorDefinition colorDefinition;
+		final MapUnits mapUnits = colorProvider.getMapUnits();
 
 		// tell the legend provider how to draw the legend
 		switch (colorProvider.getGraphId()) {
@@ -59,6 +57,7 @@ public class MapUtils {
 
 			float minValue = Float.MIN_VALUE;
 			float maxValue = Float.MAX_VALUE;
+
 			boolean setInitialValue = true;
 
 			for (final TourData tourData : allTourData) {
@@ -93,16 +92,22 @@ public class MapUtils {
 				return false;
 			}
 
-			colorDefinition = colorManager.getGraphColorDefinition(GraphColorManager.PREF_GRAPH_ALTITUDE);
-			final Map2ColorProfile colorProfile = colorDefinition.getNewMapColor();
+			if (colorProvider instanceof Map3GradientColorProvider) {
 
-			colorProvider.setColorProfile(colorProfile);
+				// the colorProvider already contains the active color profile
+
+			} else {
+
+				setMap2ColorProfile(colorProvider, GraphColorManager.PREF_GRAPH_ALTITUDE);
+			}
+
 			colorProvider.configureColorProvider(
 					legendHeight,
 					minValue,
 					maxValue,
 					UI.UNIT_LABEL_ALTITUDE,
-					LegendUnitFormat.Number);
+					LegendUnitFormat.Number,
+					true);
 
 			break;
 
@@ -110,6 +115,7 @@ public class MapUtils {
 
 			minValue = Float.MIN_VALUE;
 			maxValue = Float.MAX_VALUE;
+
 			setInitialValue = true;
 
 			for (final TourData tourData : allTourData) {
@@ -143,16 +149,24 @@ public class MapUtils {
 				return false;
 			}
 
-			legendConfig.numberFormatDigits = 1;
-			colorDefinition = colorManager.getGraphColorDefinition(GraphColorManager.PREF_GRAPH_GRADIENT);
+			mapUnits.numberFormatDigits = 1;
 
-			colorProvider.setColorProfile(colorDefinition.getNewMapColor());
+			if (colorProvider instanceof Map3GradientColorProvider) {
+
+				// the colorProvider already contains the active color profile
+
+			} else {
+
+				setMap2ColorProfile(colorProvider, GraphColorManager.PREF_GRAPH_GRADIENT);
+			}
+
 			colorProvider.configureColorProvider(
 					legendHeight,
 					minValue,
 					maxValue,
 					Messages.graph_label_gradient_unit,
-					LegendUnitFormat.Number);
+					LegendUnitFormat.Number,
+					true);
 
 			break;
 
@@ -160,6 +174,7 @@ public class MapUtils {
 
 			minValue = Float.MIN_VALUE;
 			maxValue = Float.MAX_VALUE;
+
 			setInitialValue = true;
 
 			for (final TourData tourData : allTourData) {
@@ -193,16 +208,24 @@ public class MapUtils {
 				return false;
 			}
 
-			legendConfig.unitFormat = LegendUnitFormat.Pace;
-			colorDefinition = colorManager.getGraphColorDefinition(GraphColorManager.PREF_GRAPH_PACE);
+			mapUnits.unitFormat = LegendUnitFormat.Pace;
 
-			colorProvider.setColorProfile(colorDefinition.getNewMapColor());
+			if (colorProvider instanceof Map3GradientColorProvider) {
+
+				// the colorProvider already contains the active color profile
+
+			} else {
+
+				setMap2ColorProfile(colorProvider, GraphColorManager.PREF_GRAPH_PACE);
+			}
+
 			colorProvider.configureColorProvider(
 					legendHeight,
 					minValue,
 					maxValue,
 					UI.UNIT_LABEL_PACE,
-					LegendUnitFormat.Pace);
+					LegendUnitFormat.Pace,
+					true);
 
 			break;
 
@@ -210,6 +233,7 @@ public class MapUtils {
 
 			minValue = Float.MIN_VALUE;
 			maxValue = Float.MAX_VALUE;
+
 			setInitialValue = true;
 
 			for (final TourData tourData : allTourData) {
@@ -243,15 +267,22 @@ public class MapUtils {
 				return false;
 			}
 
-			colorDefinition = colorManager.getGraphColorDefinition(GraphColorManager.PREF_GRAPH_HEARTBEAT);
+			if (colorProvider instanceof Map3GradientColorProvider) {
 
-			colorProvider.setColorProfile(colorDefinition.getNewMapColor());
+				// the colorProvider already contains the active color profile
+
+			} else {
+
+				setMap2ColorProfile(colorProvider, GraphColorManager.PREF_GRAPH_HEARTBEAT);
+			}
+
 			colorProvider.configureColorProvider(
 					legendHeight,
 					minValue,
 					maxValue,
 					Messages.graph_label_heartbeat_unit,
-					LegendUnitFormat.Number);
+					LegendUnitFormat.Number,
+					true);
 
 			break;
 
@@ -259,6 +290,7 @@ public class MapUtils {
 
 			minValue = Float.MIN_VALUE;
 			maxValue = Float.MAX_VALUE;
+
 			setInitialValue = true;
 
 			for (final TourData tourData : allTourData) {
@@ -292,16 +324,24 @@ public class MapUtils {
 				return false;
 			}
 
-			legendConfig.numberFormatDigits = 1;
-			colorDefinition = colorManager.getGraphColorDefinition(GraphColorManager.PREF_GRAPH_SPEED);
+			mapUnits.numberFormatDigits = 1;
 
-			colorProvider.setColorProfile(colorDefinition.getNewMapColor());
+			if (colorProvider instanceof Map3GradientColorProvider) {
+
+				// the colorProvider already contains the active color profile
+
+			} else {
+
+				setMap2ColorProfile(colorProvider, GraphColorManager.PREF_GRAPH_SPEED);
+			}
+
 			colorProvider.configureColorProvider(
 					legendHeight,
 					minValue,
 					maxValue,
 					UI.UNIT_LABEL_SPEED,
-					LegendUnitFormat.Number);
+					LegendUnitFormat.Number,
+					true);
 
 			break;
 
@@ -310,5 +350,20 @@ public class MapUtils {
 		}
 
 		return true;
+	}
+
+	/**
+	 * Set 2D map active color profile into the color provider.
+	 * 
+	 * @param colorProvider
+	 * @param graphName
+	 */
+	private static void setMap2ColorProfile(final IGradientColorProvider colorProvider, final String graphName) {
+
+		final GraphColorManager colorManager = GraphColorManager.getInstance();
+		final ColorDefinition colorDefinition = colorManager.getGraphColorDefinition(graphName);
+		final Map2ColorProfile colorProfile = colorDefinition.getMap2Color_New();
+
+		colorProvider.setColorProfile(colorProfile);
 	}
 }

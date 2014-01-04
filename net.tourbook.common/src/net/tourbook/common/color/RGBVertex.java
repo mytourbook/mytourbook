@@ -37,6 +37,11 @@ public class RGBVertex implements Comparable<Object>, Cloneable {
 
 	private static int	_sortIdCreator;
 
+	public RGBVertex() {
+
+		setSortId();
+	}
+
 	public RGBVertex(final int sortId) {
 
 		_sortId = sortId;
@@ -47,7 +52,7 @@ public class RGBVertex implements Comparable<Object>, Cloneable {
 
 	public RGBVertex(final int value, final int red, final int green, final int blue) {
 
-		setCreateId();
+		setSortId();
 
 		if ((red > 255) || (red < 0) || (green > 255) || (green < 0) || (blue > 255) || (blue < 0)) {
 			SWT.error(SWT.ERROR_INVALID_ARGUMENT);
@@ -59,7 +64,7 @@ public class RGBVertex implements Comparable<Object>, Cloneable {
 
 	public RGBVertex(final int value, final RGB rgb) {
 
-		setCreateId();
+		setSortId();
 
 		_value = value;
 		_rgb = rgb;
@@ -67,7 +72,7 @@ public class RGBVertex implements Comparable<Object>, Cloneable {
 
 	public RGBVertex(final RGB rgb) {
 
-		setCreateId();
+		setSortId();
 
 		_value = 0;
 		_rgb = rgb;
@@ -83,6 +88,8 @@ public class RGBVertex implements Comparable<Object>, Cloneable {
 			clonedObject = (RGBVertex) super.clone();
 
 			clonedObject._rgb = new RGB(_rgb.red, _rgb.green, _rgb.blue);
+
+// ???		setSortId();
 
 		} catch (final CloneNotSupportedException e) {
 			StatusUtil.log(e);
@@ -124,16 +131,16 @@ public class RGBVertex implements Comparable<Object>, Cloneable {
 		return _value;
 	}
 
+	public void setRGB(final RGB rgb) {
+		_rgb = rgb;
+	}
+
 	/**
 	 * @return Returns a unique id.
 	 */
-	private void setCreateId() {
+	private void setSortId() {
 
 		_sortId = ++_sortIdCreator;
-	}
-
-	public void setRGB(final RGB rgb) {
-		_rgb = rgb;
 	}
 
 	public void setValue(final int value) {

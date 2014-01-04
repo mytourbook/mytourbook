@@ -32,7 +32,7 @@ import org.eclipse.swt.graphics.Image;
  */
 public abstract class ProfileImage implements Cloneable {
 
-	protected static final int			IMAGE_MIN_WIDTH		= 10;
+	protected static final int			IMAGE_MIN_WIDTH		= 20;
 	protected static final int			IMAGE_MIN_HEIGHT	= 10;
 
 	private int							_imageWidth;

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -21,6 +21,15 @@ import org.eclipse.swt.graphics.Device;
 
 public class ColorUtil {
 
+	public static org.eclipse.swt.graphics.Color getContrastColor(final Device device, final int rgbValue) {
+
+		final byte blue = (byte) ((rgbValue & 0xFF0000) >> 16);
+		final byte green = (byte) ((rgbValue & 0xFF00) >> 8);
+		final byte red = (byte) ((rgbValue & 0xFF) >> 0);
+
+		return getContrastColor(device, red & 0xFF, green & 0xFF, blue & 0xFF);
+	}
+
 	/**
 	 * Compute a background color that contrasts with the text color.
 	 * 
@@ -29,7 +38,10 @@ public class ColorUtil {
 	 * @param blue
 	 * @return Returns white or black that contrasts with the background color.
 	 */
-	public static org.eclipse.swt.graphics.Color getContrastColor(final Device display, final int red, final int green, final int blue) {
+	public static org.eclipse.swt.graphics.Color getContrastColor(	final Device display,
+																	final int red,
+																	final int green,
+																	final int blue) {
 
 		final int yiq = ((red * 299) + (green * 587) + (blue * 114)) / 1000;
 

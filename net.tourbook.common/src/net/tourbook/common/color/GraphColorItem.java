@@ -57,16 +57,16 @@ public class GraphColorItem {
 	public RGB getNewRGB() {
 
 		if (_colorPrefName.compareTo(GraphColorManager.PREF_COLOR_LINE) == 0) {
-			return _colorDefinition.getNewLineColor();
+			return _colorDefinition.getLineColor_New();
 
 		} else if (_colorPrefName.compareTo(GraphColorManager.PREF_COLOR_TEXT) == 0) {
-			return _colorDefinition.getNewTextColor();
+			return _colorDefinition.getTextColor_New();
 
 		} else if (_colorPrefName.compareTo(GraphColorManager.PREF_COLOR_BRIGHT) == 0) {
-			return _colorDefinition.getNewGradientBright();
+			return _colorDefinition.getGradientBright_New();
 
 		} else {
-			return _colorDefinition.getNewGradientDark();
+			return _colorDefinition.getGradientDark_New();
 		}
 	}
 
@@ -90,18 +90,18 @@ public class GraphColorItem {
 
 		if (_colorPrefName.compareTo(GraphColorManager.PREF_COLOR_LINE) == 0) {
 
-			_colorDefinition.setNewLineColor(rgb);
+			_colorDefinition.setLineColor_New(rgb);
 
 		} else if (_colorPrefName.compareTo(GraphColorManager.PREF_COLOR_TEXT) == 0) {
 
-			_colorDefinition.setNewTextColor(rgb);
+			_colorDefinition.setTextColor_New(rgb);
 
 		} else if (_colorPrefName.compareTo(GraphColorManager.PREF_COLOR_BRIGHT) == 0) {
 
-			_colorDefinition.setNewGradientBright(rgb);
+			_colorDefinition.setGradientBright_New(rgb);
 
 		} else {
-			_colorDefinition.setNewGradientDark(rgb);
+			_colorDefinition.setGradientDark_New(rgb);
 		}
 	}
 

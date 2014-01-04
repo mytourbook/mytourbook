@@ -18,12 +18,9 @@ package net.tourbook.map2.action;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.color.ColorDefinition;
 import net.tourbook.common.color.GraphColorManager;
-import net.tourbook.common.color.IGradientColorProvider;
-import net.tourbook.common.color.IMapColorProvider;
 import net.tourbook.common.color.Map2ColorProfile;
 import net.tourbook.common.color.Map2GradientColorProvider;
 import net.tourbook.common.color.MapGraphId;
-import net.tourbook.common.util.StatusUtil;
 import net.tourbook.map.MapColorProvider;
 import net.tourbook.map2.view.DialogMap2ColorEditor;
 import net.tourbook.map2.view.IMap2ColorUpdater;
@@ -37,9 +34,8 @@ import org.eclipse.swt.widgets.Display;
 
 public class ActionMap2Color extends Action implements IMap2ColorUpdater {
 
-	private MapGraphId			_mapColorId;
-	private DialogMap2ColorEditor	_dialogMappingColor;
-	private ColorDefinition		_colorDefinition;
+	private MapGraphId		_mapColorId;
+	private ColorDefinition	_colorDefinition;
 
 	public ActionMap2Color() {
 
@@ -51,10 +47,12 @@ public class ActionMap2Color extends Action implements IMap2ColorUpdater {
 	@Override
 	public void applyMapColors(final Map2ColorProfile newMapColor) {
 
-		// update color definition with new color from the color dialog
-		_colorDefinition.setNewMapColor(newMapColor);
+		// update color profiles/definition with new color from the color dialog
+		_colorDefinition.setMap2Color_New(newMapColor);
 
-		GraphColorManager.saveNewColors();
+		GraphColorManager.saveColors();
+
+		MapColorProvider.updateMap2Colors();
 
 		// force to change the status
 		TourbookPlugin.getDefault().getPreferenceStore()//
@@ -72,54 +70,24 @@ public class ActionMap2Color extends Action implements IMap2ColorUpdater {
 	@Override
 	public void run() {
 
-		final IMapColorProvider mapColorProvider = MapColorProvider.getMap2ColorProvider(_mapColorId);
+		_colorDefinition = GraphColorManager.getInstance().getColorDefinition(_mapColorId);
 
-		if (mapColorProvider instanceof IGradientColorProvider) {
-
-			final Map2GradientColorProvider mapLegendColorProvider = PrefPageAppearanceColors
-					.createLegendImageColorProvider();
-
-			_dialogMappingColor = new DialogMap2ColorEditor(
-					Display.getCurrent().getActiveShell(),
-					mapLegendColorProvider,
-					this);
-
-			_colorDefinition = null;
-
-			final GraphColorManager colorManager = GraphColorManager.getInstance();
-
-			switch (_mapColorId) {
-			case Altitude:
-				_colorDefinition = colorManager.getGraphColorDefinition(GraphColorManager.PREF_GRAPH_ALTITUDE);
-				break;
-			case Gradient:
-				_colorDefinition = colorManager.getGraphColorDefinition(GraphColorManager.PREF_GRAPH_GRADIENT);
-				break;
-			case Pace:
-				_colorDefinition = colorManager.getGraphColorDefinition(GraphColorManager.PREF_GRAPH_PACE);
-				break;
-			case Pulse:
-				_colorDefinition = colorManager.getGraphColorDefinition(GraphColorManager.PREF_GRAPH_HEARTBEAT);
-				break;
-			case Speed:
-				_colorDefinition = colorManager.getGraphColorDefinition(GraphColorManager.PREF_GRAPH_SPEED);
-				break;
-
-			default:
-				break;
-			}
-
-			if (_colorDefinition == null) {
-				StatusUtil.logError("Colordefinition is null"); //$NON-NLS-1$
-				return;
-			}
-
-			// set the color which should be modified in the dialog
-			_dialogMappingColor.setLegendColor(_colorDefinition);
-
-			// new colors will be set with applyMapColors
-			_dialogMappingColor.open();
+		if ((_colorDefinition instanceof ColorDefinition) == false) {
+			return;
 		}
+
+		final Map2GradientColorProvider newColorProvider = PrefPageAppearanceColors.createMap2ColorProvider();
+
+		final DialogMap2ColorEditor dialogMap2Color = new DialogMap2ColorEditor(//
+				Display.getCurrent().getActiveShell(),
+				newColorProvider,
+				this);
+
+		// set the color which should be modified in the dialog
+		dialogMap2Color.setLegendColor(_colorDefinition);
+
+		// new colors will be set with applyMapColors
+		dialogMap2Color.open();
 	}
 
 	public void setColorId(final MapGraphId mapColorId) {

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -221,7 +221,27 @@ public class GraphColorManager {
 		}
 	}
 
-	private static void saveGraphColors_InPrefStore() {
+	public static void saveColors() {
+
+		// save all graph colors, in the pref store and the map color in a xml file.
+		saveColors_GraphColors_InPrefStore();
+		saveColors_MapColors_InXml();
+
+		// update active colors
+		for (final ColorDefinition graphDefinition : getInstance().getGraphColorDefinitions()) {
+
+			// graph color
+			graphDefinition.setGradientBright_Active(graphDefinition.getGradientBright_New());
+			graphDefinition.setGradientDark_Active(graphDefinition.getGradientDark_New());
+			graphDefinition.setLineColor_Active(graphDefinition.getLineColor_New());
+			graphDefinition.setTextColor_Active(graphDefinition.getTextColor_New());
+
+			// 2D map color
+			graphDefinition.setMap2Color_Active(graphDefinition.getMap2Color_New());
+		}
+	}
+
+	private static void saveColors_GraphColors_InPrefStore() {
 
 		final IPreferenceStore commonPrefStore = CommonActivator.getPrefStore();
 
@@ -232,29 +252,29 @@ public class GraphColorManager {
 			PreferenceConverter.setValue(
 					commonPrefStore,
 					prefGraphName + PREF_COLOR_BRIGHT,
-					graphDefinition.getNewGradientBright());
+					graphDefinition.getGradientBright_New());
 
 			PreferenceConverter.setValue(
 					commonPrefStore,
 					prefGraphName + PREF_COLOR_DARK,
-					graphDefinition.getNewGradientDark());
+					graphDefinition.getGradientDark_New());
 
 			PreferenceConverter.setValue(
 					commonPrefStore,
 					prefGraphName + PREF_COLOR_LINE,
-					graphDefinition.getNewLineColor());
+					graphDefinition.getLineColor_New());
 
 			PreferenceConverter.setValue(
 					commonPrefStore,
 					prefGraphName + PREF_COLOR_TEXT,
-					graphDefinition.getNewTextColor());
+					graphDefinition.getTextColor_New());
 		}
 	}
 
 	/**
 	 * Write the map color data into a xml file.
 	 */
-	private static void saveGraphColors_InXml_MapColors() {
+	private static void saveColors_MapColors_InXml() {
 
 		BufferedWriter writer = null;
 
@@ -269,7 +289,7 @@ public class GraphColorManager {
 
 			for (final ColorDefinition graphDefinition : getInstance().getGraphColorDefinitions()) {
 
-				final Map2ColorProfile mapColor = graphDefinition.getNewMapColor();
+				final Map2ColorProfile mapColor = graphDefinition.getMap2Color_New();
 
 				// map color can be null when it's not defined
 				if (mapColor == null) {
@@ -314,24 +334,6 @@ public class GraphColorManager {
 					e.printStackTrace();
 				}
 			}
-		}
-	}
-
-	public static void saveNewColors() {
-
-		// save all graph colors, in the pref store and the map color in a xml file.
-		saveGraphColors_InPrefStore();
-		saveGraphColors_InXml_MapColors();
-
-		// update current colors
-		for (final ColorDefinition graphDefinition : getInstance().getGraphColorDefinitions()) {
-
-			graphDefinition.setGradientBright(graphDefinition.getNewGradientBright());
-			graphDefinition.setGradientDark(graphDefinition.getNewGradientDark());
-			graphDefinition.setLineColor(graphDefinition.getNewLineColor());
-			graphDefinition.setTextColor(graphDefinition.getNewTextColor());
-
-			graphDefinition.setMapColorProfile(graphDefinition.getNewMapColor());
 		}
 	}
 
@@ -453,6 +455,26 @@ public class GraphColorManager {
 		return allColorDef;
 	}
 
+	public ColorDefinition getColorDefinition(final MapGraphId graphId) {
+
+		switch (graphId) {
+		case Altitude:
+			return getGraphColorDefinition(GraphColorManager.PREF_GRAPH_ALTITUDE);
+		case Gradient:
+			return getGraphColorDefinition(GraphColorManager.PREF_GRAPH_GRADIENT);
+		case Pace:
+			return getGraphColorDefinition(GraphColorManager.PREF_GRAPH_PACE);
+		case Pulse:
+			return getGraphColorDefinition(GraphColorManager.PREF_GRAPH_HEARTBEAT);
+		case Speed:
+			return getGraphColorDefinition(GraphColorManager.PREF_GRAPH_SPEED);
+		default:
+			break;
+		}
+
+		return null;
+	}
+
 	/**
 	 * @param preferenceName
 	 *            preference name PREF_GRAPH_...
@@ -530,7 +552,7 @@ public class GraphColorManager {
 					continue;
 				}
 
-				final Map2ColorProfile loadedMapColor = new Map2ColorProfile();
+				final Map2ColorProfile loadedProfile = new Map2ColorProfile();
 
 				/*
 				 * value colors
@@ -549,7 +571,7 @@ public class GraphColorManager {
 						valueColors.add(new ColorValue(value, red, green, blue));
 					}
 				}
-				loadedMapColor.setColorValues(valueColors.toArray(new ColorValue[valueColors.size()]));
+				loadedProfile.setColorValues(valueColors.toArray(new ColorValue[valueColors.size()]));
 
 				/*
 				 * min/max brightness
@@ -561,19 +583,19 @@ public class GraphColorManager {
 
 					final Integer minBrightness = mementoBrightness0.getInteger(TAG_BRIGHTNESS_MIN);
 					if (minBrightness != null) {
-						loadedMapColor.setMinBrightness(minBrightness);
+						loadedProfile.setMinBrightness(minBrightness);
 					}
 					final Integer minBrightnessFactor = mementoBrightness0.getInteger(TAG_BRIGHTNESS_MIN_FACTOR);
 					if (minBrightness != null) {
-						loadedMapColor.setMinBrightnessFactor(minBrightnessFactor);
+						loadedProfile.setMinBrightnessFactor(minBrightnessFactor);
 					}
 					final Integer maxBrightness = mementoBrightness0.getInteger(TAG_BRIGHTNESS_MAX);
 					if (maxBrightness != null) {
-						loadedMapColor.setMaxBrightness(maxBrightness);
+						loadedProfile.setMaxBrightness(maxBrightness);
 					}
 					final Integer maxBrightnessFactor = mementoBrightness0.getInteger(TAG_BRIGHTNESS_MAX_FACTOR);
 					if (minBrightness != null) {
-						loadedMapColor.setMaxBrightnessFactor(maxBrightnessFactor);
+						loadedProfile.setMaxBrightnessFactor(maxBrightnessFactor);
 					}
 				}
 
@@ -587,20 +609,20 @@ public class GraphColorManager {
 
 					final Integer isMinOverwrite = mementoMinMaxValue0.getInteger(TAG_IS_MIN_VALUE_OVERWRITE);
 					if (isMinOverwrite != null) {
-						loadedMapColor.setIsMinValueOverwrite(isMinOverwrite == 1);
+						loadedProfile.setIsMinValueOverwrite(isMinOverwrite == 1);
 					}
 					final Integer minValue = mementoMinMaxValue0.getInteger(TAG_MIN_VALUE_OVERWRITE);
 					if (minValue != null) {
-						loadedMapColor.setMinValueOverwrite(minValue);
+						loadedProfile.setMinValueOverwrite(minValue);
 					}
 
 					final Integer isMaxOverwrite = mementoMinMaxValue0.getInteger(TAG_IS_MAX_VALUE_OVERWRITE);
 					if (isMaxOverwrite != null) {
-						loadedMapColor.setIsMaxValueOverwrite(isMaxOverwrite == 1);
+						loadedProfile.setIsMaxValueOverwrite(isMaxOverwrite == 1);
 					}
 					final Integer maxValue = mementoMinMaxValue0.getInteger(TAG_MAX_VALUE_OVERWRITE);
 					if (maxValue != null) {
-						loadedMapColor.setMaxValueOverwrite(maxValue);
+						loadedProfile.setMaxValueOverwrite(maxValue);
 					}
 				}
 
@@ -613,7 +635,7 @@ public class GraphColorManager {
 
 						// color definition found
 
-						colorDefinition.setMapColorProfile(loadedMapColor);
+						colorDefinition.setMap2Color_Active(loadedProfile);
 						break;
 					}
 				}
@@ -646,20 +668,20 @@ public class GraphColorManager {
 		for (final ColorDefinition colorDefinition : _graphColorDefinitions) {
 
 			// set legend color
-			if (colorDefinition.getMapColor() == null) {
+			if (colorDefinition.getMap2Color_Active() == null) {
 
 				// legend color is not set, try to get default when available
 
-				final Map2ColorProfile defaultMapColor = colorDefinition.getDefaultMapColor();
+				final Map2ColorProfile defaultMapColor = colorDefinition.getMap2Color_Default();
 
 				if (defaultMapColor != null) {
-					colorDefinition.setMapColorProfile(defaultMapColor.clone());
+					colorDefinition.setMap2Color_Active(defaultMapColor.clone());
 				}
 			}
 
 			// set new map color
-			final Map2ColorProfile mapColor = colorDefinition.getMapColor();
-			colorDefinition.setNewMapColor(mapColor);
+			final Map2ColorProfile mapColor = colorDefinition.getMap2Color_Active();
+			colorDefinition.setMap2Color_New(mapColor);
 		}
 	}
 }

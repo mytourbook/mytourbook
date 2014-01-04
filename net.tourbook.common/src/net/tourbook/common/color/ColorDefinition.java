@@ -34,29 +34,29 @@ public class ColorDefinition {
 
 	private GraphColorItem[]		_colorParts;
 
-	private RGB						_lineColor;
-	private RGB						_lineColorDefault;
-	private RGB						_lineColorNew;
+	private RGB						_lineColor_Active;
+	private RGB						_lineColor_Default;
+	private RGB						_lineColor_New;
 
-	private RGB						_gradientBright;
-	private RGB						_gradientBrightDefault;
-	private RGB						_gradientBrightNew;
+	private RGB						_gradientBright_Active;
+	private RGB						_gradientBright_Default;
+	private RGB						_gradientBright_New;
 
-	private RGB						_gradientDark;
-	private RGB						_gradientDarkDefault;
-	private RGB						_gradientDarkNew;
+	private RGB						_gradientDark_Active;
+	private RGB						_gradientDark_Default;
+	private RGB						_gradientDark_New;
 
-	private RGB						_textColor;
-	private RGB						_textColorDefault;
-	private RGB						_textColorNew;
+	private RGB						_textColor_Active;
+	private RGB						_textColor_Default;
+	private RGB						_textColor_New;
 
 	/*
 	 * One color definition contains different profiles which are used depending on the current
 	 * situation.
 	 */
-	private Map2ColorProfile		_mapColorProfile;
-	private Map2ColorProfile		_mapColorProfile_Default;
-	private Map2ColorProfile		_mapColorProfile_New;
+	private Map2ColorProfile		_map2ColorProfile_Active;
+	private Map2ColorProfile		_map2ColorProfile_Default;
+	private Map2ColorProfile		_map2ColorProfile_New;
 
 	/**
 	 * Sets the color for the default, current and changes
@@ -87,12 +87,12 @@ public class ColorDefinition {
 		_prefName = prefName;
 		_visibleName = visibleName;
 
-		_gradientBrightDefault = defaultGradientBright;
-		_gradientDarkDefault = defaultGradientDark;
-		_lineColorDefault = defaultLineColor;
-		_textColorDefault = defaultTextColor;
+		_gradientBright_Default = defaultGradientBright;
+		_gradientDark_Default = defaultGradientDark;
+		_lineColor_Default = defaultLineColor;
+		_textColor_Default = defaultTextColor;
 
-		_mapColorProfile_Default = defaultMapColorProfile;
+		_map2ColorProfile_Default = defaultMapColorProfile;
 
 		final String graphPrefName = getGraphPrefName();
 
@@ -101,44 +101,44 @@ public class ColorDefinition {
 		 */
 		final String prefColorGradientBright = graphPrefName + GraphColorManager.PREF_COLOR_BRIGHT;
 		if (_commonPrefStore.contains(prefColorGradientBright)) {
-			_gradientBright = PreferenceConverter.getColor(_commonPrefStore, prefColorGradientBright);
+			_gradientBright_Active = PreferenceConverter.getColor(_commonPrefStore, prefColorGradientBright);
 		} else {
-			_gradientBright = _gradientBrightDefault;
+			_gradientBright_Active = _gradientBright_Default;
 		}
-		_gradientBrightNew = _gradientBright;
+		_gradientBright_New = _gradientBright_Active;
 
 		/*
 		 * gradient dark
 		 */
 		final String prefColorGradientDark = graphPrefName + GraphColorManager.PREF_COLOR_DARK;
 		if (_commonPrefStore.contains(prefColorGradientDark)) {
-			_gradientDark = PreferenceConverter.getColor(_commonPrefStore, prefColorGradientDark);
+			_gradientDark_Active = PreferenceConverter.getColor(_commonPrefStore, prefColorGradientDark);
 		} else {
-			_gradientDark = _gradientDarkDefault;
+			_gradientDark_Active = _gradientDark_Default;
 		}
-		_gradientDarkNew = _gradientDark;
+		_gradientDark_New = _gradientDark_Active;
 
 		/*
 		 * line color
 		 */
 		final String prefColorLine = graphPrefName + GraphColorManager.PREF_COLOR_LINE;
 		if (_commonPrefStore.contains(prefColorLine)) {
-			_lineColor = PreferenceConverter.getColor(_commonPrefStore, prefColorLine);
+			_lineColor_Active = PreferenceConverter.getColor(_commonPrefStore, prefColorLine);
 		} else {
-			_lineColor = _lineColorDefault;
+			_lineColor_Active = _lineColor_Default;
 		}
-		_lineColorNew = _lineColor;
+		_lineColor_New = _lineColor_Active;
 
 		/*
 		 * text color
 		 */
 		final String prefColorText = graphPrefName + GraphColorManager.PREF_COLOR_TEXT;
 		if (_commonPrefStore.contains(prefColorText)) {
-			_textColor = PreferenceConverter.getColor(_commonPrefStore, prefColorText);
+			_textColor_Active = PreferenceConverter.getColor(_commonPrefStore, prefColorText);
 		} else {
-			_textColor = _textColorDefault;
+			_textColor_Active = _textColor_Default;
 		}
-		_textColorNew = _textColor;
+		_textColor_New = _textColor_Active;
 	}
 
 	@Override
@@ -166,32 +166,28 @@ public class ColorDefinition {
 		return true;
 	}
 
-	public RGB getDefaultGradientBright() {
-		return _gradientBrightDefault;
+	public RGB getGradientBright_Active() {
+		return _gradientBright_Active;
 	}
 
-	public RGB getDefaultGradientDark() {
-		return _gradientDarkDefault;
+	public RGB getGradientBright_Default() {
+		return _gradientBright_Default;
 	}
 
-	public RGB getDefaultLineColor() {
-		return _lineColorDefault;
+	public RGB getGradientBright_New() {
+		return _gradientBright_New;
 	}
 
-	public Map2ColorProfile getDefaultMapColor() {
-		return _mapColorProfile_Default;
+	public RGB getGradientDark_Active() {
+		return _gradientDark_Active;
 	}
 
-	public RGB getDefaultTextColor() {
-		return _textColorDefault;
+	public RGB getGradientDark_Default() {
+		return _gradientDark_Default;
 	}
 
-	public RGB getGradientBright() {
-		return _gradientBright;
-	}
-
-	public RGB getGradientDark() {
-		return _gradientDark;
+	public RGB getGradientDark_New() {
+		return _gradientDark_New;
 	}
 
 	public GraphColorItem[] getGraphColorParts() {
@@ -206,40 +202,44 @@ public class ColorDefinition {
 		return _prefName;
 	}
 
-	public RGB getLineColor() {
-		return _lineColor;
+	public RGB getLineColor_Active() {
+		return _lineColor_Active;
 	}
 
-	public Map2ColorProfile getMapColor() {
-		return _mapColorProfile;
+	public RGB getLineColor_Default() {
+		return _lineColor_Default;
 	}
 
-	public RGB getNewGradientBright() {
-		return _gradientBrightNew;
+	public RGB getLineColor_New() {
+		return _lineColor_New;
 	}
 
-	public RGB getNewGradientDark() {
-		return _gradientDarkNew;
+	public Map2ColorProfile getMap2Color_Active() {
+		return _map2ColorProfile_Active;
 	}
 
-	public RGB getNewLineColor() {
-		return _lineColorNew;
+	public Map2ColorProfile getMap2Color_Default() {
+		return _map2ColorProfile_Default;
 	}
 
-	public Map2ColorProfile getNewMapColor() {
-		return _mapColorProfile_New;
-	}
-
-	public RGB getNewTextColor() {
-		return _textColorNew;
+	public Map2ColorProfile getMap2Color_New() {
+		return _map2ColorProfile_New;
 	}
 
 	public String getPrefName() {
 		return _prefName;
 	}
 
-	public RGB getTextColor() {
-		return _textColor;
+	public RGB getTextColor_Active() {
+		return _textColor_Active;
+	}
+
+	public RGB getTextColor_Default() {
+		return _textColor_Default;
+	}
+
+	public RGB getTextColor_New() {
+		return _textColor_New;
 	}
 
 	public String getVisibleName() {
@@ -263,48 +263,48 @@ public class ColorDefinition {
 		_colorParts = children;
 	}
 
-	public void setGradientBright(final RGB gradientBright) {
-		_gradientBright = gradientBright;
+	public void setGradientBright_Active(final RGB gradientBright) {
+		_gradientBright_Active = gradientBright;
 	}
 
-	public void setGradientDark(final RGB gradientDark) {
-		_gradientDark = gradientDark;
+	public void setGradientBright_New(final RGB newGradientBright) {
+		_gradientBright_New = newGradientBright;
 	}
 
-	public void setLineColor(final RGB lineColor) {
-		_lineColor = lineColor;
+	public void setGradientDark_Active(final RGB gradientDark) {
+		_gradientDark_Active = gradientDark;
 	}
 
-	public void setMapColorProfile(final Map2ColorProfile mapColor) {
-		_mapColorProfile = mapColor;
+	public void setGradientDark_New(final RGB newGradientDark) {
+		_gradientDark_New = newGradientDark;
 	}
 
-	public void setNewGradientBright(final RGB newGradientBright) {
-		_gradientBrightNew = newGradientBright;
+	public void setLineColor_Active(final RGB lineColor) {
+		_lineColor_Active = lineColor;
 	}
 
-	public void setNewGradientDark(final RGB newGradientDark) {
-		_gradientDarkNew = newGradientDark;
+	public void setLineColor_New(final RGB newLineColor) {
+		_lineColor_New = newLineColor;
 	}
 
-	public void setNewLineColor(final RGB newLineColor) {
-		_lineColorNew = newLineColor;
+	public void setMap2Color_Active(final Map2ColorProfile mapColor) {
+		_map2ColorProfile_Active = mapColor;
 	}
 
-	public void setNewMapColor(final Map2ColorProfile newMapColor) {
-		_mapColorProfile_New = newMapColor;
-	}
-
-	public void setNewTextColor(final RGB _textColorNew) {
-		this._textColorNew = _textColorNew;
+	public void setMap2Color_New(final Map2ColorProfile newMapColor) {
+		_map2ColorProfile_New = newMapColor;
 	}
 
 	public void setPrefName(final String prefName) {
 		_prefName = prefName;
 	}
 
-	public void setTextColor(final RGB textColor) {
-		_textColor = textColor;
+	public void setTextColor_Active(final RGB textColor) {
+		_textColor_Active = textColor;
+	}
+
+	public void setTextColor_New(final RGB _textColorNew) {
+		_textColor_New = _textColorNew;
 	}
 
 	public void setVisibleName(final String visibleName) {

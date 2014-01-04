@@ -43,17 +43,17 @@ public class CommonPreferenceInitializer extends AbstractPreferenceInitializer {
 			PreferenceConverter.setDefault(
 					commonPrefStore,
 					graphPrefName + GraphColorManager.PREF_COLOR_BRIGHT,
-					graphDefinition.getDefaultGradientBright());
+					graphDefinition.getGradientBright_Default());
 
 			PreferenceConverter.setDefault(
 					commonPrefStore,
 					graphPrefName + GraphColorManager.PREF_COLOR_DARK,
-					graphDefinition.getDefaultGradientDark());
+					graphDefinition.getGradientDark_Default());
 
 			PreferenceConverter.setDefault(
 					commonPrefStore,
 					graphPrefName + GraphColorManager.PREF_COLOR_LINE,
-					graphDefinition.getDefaultLineColor());
+					graphDefinition.getLineColor_Default());
 
 		}
 

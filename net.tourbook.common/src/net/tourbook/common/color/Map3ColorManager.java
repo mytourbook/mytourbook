@@ -248,8 +248,9 @@ public class Map3ColorManager {
 	public static void addColorProvider(final Map3GradientColorProvider newColorProvider) {
 
 		final MapGraphId graphId = newColorProvider.getGraphId();
+		final Map3ColorDefinition colorDefinition = getColorDefinition(graphId);
 
-		getColorDefinition(graphId).addColorProvider(newColorProvider);
+		colorDefinition.addColorProvider(newColorProvider);
 	}
 
 	/**
@@ -586,19 +587,6 @@ public class Map3ColorManager {
 
 		colorProfile.getProfileImage().setVertices(vertices);
 	}
-
-//	// ensure that only one profile is active
-//	if (newColorProfile.isActiveColorProfile()) {
-//
-//		for (final Map3GradientColorProvider colorProvider : _colorProviders) {
-//
-//			final Map3ColorProfile colorProfile = colorProvider.getMap3ColorProfile();
-//
-//			if (colorProfile != newColorProfile) {
-//				colorProfile.setIsActiveColorProfile(false);
-//			}
-//		}
-//	}
 
 	/**
 	 * Replace a profile with another profile.

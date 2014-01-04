@@ -888,11 +888,29 @@ public class Messages extends NLS {
 
 	public static String		Pref_Map3Color_Column_Colors;
 
+	public static String	Pref_Map3Color_Column_GraphImage;
+
 	public static String		Pref_Map3Color_Column_Id_Header;
 
 	public static String		Pref_Map3Color_Column_Id_Label;
 
 	public static String		Pref_Map3Color_Column_Id_Tooltip;
+
+	public static String	Pref_Map3Color_Column_MaxValue_Header;
+
+	public static String	Pref_Map3Color_Column_MaxValue_Label;
+
+	public static String	Pref_Map3Color_Column_MaxValueOverwrite_Label;
+
+	public static String	Pref_Map3Color_Column_MaxValueOverwrite_Tooltip;
+
+	public static String	Pref_Map3Color_Column_MinValue_Header;
+
+	public static String	Pref_Map3Color_Column_MinValue_Label;
+
+	public static String	Pref_Map3Color_Column_MinValueOverwrite_Label;
+
+	public static String	Pref_Map3Color_Column_MinValueOverwrite_Tooltip;
 
 	public static String		Pref_Map3Color_Column_ProfileName;
 

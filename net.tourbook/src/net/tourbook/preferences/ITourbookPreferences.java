@@ -328,7 +328,6 @@ public interface ITourbookPreferences {
 	/*
 	 * Pref page: Map3 color
 	 */
-	public static final String	MAP3_COLOR_IS_AUTO_EXPAND_COLLAPSE			= "MAP3_COLOR_IS_AUTO_EXPAND_COLLAPSE";					//$NON-NLS-1$
 	public static final String	MAP3_COLOR_IS_MODIFIED						= "MAP3_COLOR_IS_MODIFIED";								//$NON-NLS-1$
 
 }

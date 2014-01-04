@@ -234,6 +234,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
 		_actionPreferences = ActionFactory.PREFERENCES.create(window);
 		_actionPreferences.setText(Messages.App_Action_open_preferences);
+		_actionPreferences.setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__options));
 		register(_actionPreferences);
 
 		_actionOtherViews = new ActionOtherViews(window);

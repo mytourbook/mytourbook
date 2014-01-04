@@ -52,7 +52,7 @@ public class ColumnDefinition implements Cloneable {
 
 	private String				_columnText;
 
-	private String				_oolumnToolTipText;
+	private String				_columnToolTipText;
 	private int					_columnWidth;
 	private String				_columnUnit;
 	private boolean				_isColumnResizable		= true;
@@ -108,7 +108,7 @@ public class ColumnDefinition implements Cloneable {
 
 		clone._cellLabelProvider = _cellLabelProvider;
 		clone._columnText = _columnText;
-		clone._oolumnToolTipText = _oolumnToolTipText;
+		clone._columnToolTipText = _columnToolTipText;
 		clone._columnWidth = _columnWidth;
 		clone._defaultColumnWidth = _defaultColumnWidth;
 		clone._isColumnResizable = _isColumnResizable;
@@ -172,7 +172,7 @@ public class ColumnDefinition implements Cloneable {
 	}
 
 	public String getColumnToolTipText() {
-		return _oolumnToolTipText;
+		return _columnToolTipText;
 	}
 
 	public String getColumnUnit() {
@@ -274,7 +274,7 @@ public class ColumnDefinition implements Cloneable {
 	 *            Text is displayed as tooltip in the column header
 	 */
 	public void setColumnToolTipText(final String toolTipText) {
-		_oolumnToolTipText = toolTipText;
+		_columnToolTipText = toolTipText;
 	}
 
 	/**

@@ -1316,13 +1316,13 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 
 		final Display display = Display.getCurrent();
 		legendImage = new Image(display, overlayImageData);
-		final Rectangle legendImageBounds = legendImage.getBounds();
-		final int legendHeightNoMargin = legendImageBounds.height - 2 * IMapColorProvider.LEGEND_MARGIN_TOP_BOTTOM;
+		final Rectangle imageBounds = legendImage.getBounds();
+		final int legendHeightNoMargin = imageBounds.height - 2 * IMapColorProvider.LEGEND_MARGIN_TOP_BOTTOM;
 
 		boolean isDataAvailable = false;
 		if (mapColorProvider instanceof IGradientColorProvider) {
 
-			isDataAvailable = MapUtils.setMinMaxValues(
+			isDataAvailable = MapUtils.configureColorProvider(
 					_allTourData,
 					(IGradientColorProvider) mapColorProvider,
 					legendHeightNoMargin);
@@ -1338,10 +1338,10 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 		final GC gc = new GC(legendImage);
 		{
 			gc.setBackground(transparentColor);
-			gc.fillRectangle(legendImageBounds);
+			gc.fillRectangle(imageBounds);
 
 			if (isDataAvailable) {
-				TourMapPainter.drawMapLegend(gc, legendImageBounds, mapColorProvider, true);
+				TourMapPainter.drawMapLegend(gc, imageBounds, mapColorProvider, true, false);
 			} else {
 				// draws only a transparent image to hide the legend
 			}
@@ -1352,7 +1352,8 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 		_mapLegend.setImage(legendImage);
 	}
 
-	private boolean createLegendImage_20_SetProviderValues(final IDiscreteColorProvider legendProvider, final int legendHeight) {
+	private boolean createLegendImage_20_SetProviderValues(	final IDiscreteColorProvider legendProvider,
+															final int legendHeight) {
 
 		if (_allTourData.size() == 0) {
 			return false;
@@ -1701,7 +1702,14 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 	}
 
 	private IMapColorProvider getColorProvider(final MapGraphId colorId) {
-		return MapColorProvider.getMap2ColorProvider(colorId);
+
+//		final ColorDefinition colorDefinition = GraphColorManager.getInstance().getColorDefinition(colorId);
+//
+//		final IMapColorProvider colorProvider = colorDefinition.getMap2Color_Active();
+//
+//		return colorProvider;
+
+		return MapColorProvider.getActiveMap2ColorProvider(colorId);
 	}
 
 	public Map getMap() {

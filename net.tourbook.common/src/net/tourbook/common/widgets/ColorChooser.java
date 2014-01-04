@@ -116,7 +116,7 @@ public class ColorChooser extends Composite {
 
 	private Object									DEFAULT_COLOR_ID						= new Object();
 
-	private RGB										_hexagonDefaultColor;
+	private RGB										_hexagonDefaultRGB;
 	private RGB										_customColorsDefaultRGB;
 
 	private IProfileColors							_profileColors;
@@ -155,10 +155,9 @@ public class ColorChooser extends Composite {
 	{
 		final Display display = Display.getCurrent();
 
-//		_hexagonDefaultColor = display.getSystemColor(SWT.COLOR_LIST_BACKGROUND).getRGB();
-//		_hexagonDefaultColor = display.getSystemColor(SWT.COLOR_WIDGET_BACKGROUND).getRGB();
-		_hexagonDefaultColor = new RGB(0x80, 0x80, 0x80);
-		_customColorsDefaultRGB = display.getSystemColor(SWT.COLOR_WIDGET_BACKGROUND).getRGB();
+		_hexagonDefaultRGB = new RGB(0x80, 0x80, 0x80);
+//		_customColorsDefaultRGB = display.getSystemColor(SWT.COLOR_WIDGET_BACKGROUND).getRGB();
+		_customColorsDefaultRGB = display.getSystemColor(SWT.COLOR_WIDGET_LIGHT_SHADOW).getRGB();
 	}
 
 	public ColorChooser(final Composite parent, final int style) {
@@ -286,7 +285,7 @@ public class ColorChooser extends Composite {
 
 		_tabFolder = new TabFolder(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(_tabFolder);
-//		_tabFolder.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
+		_tabFolder.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
 
 		// hexagon
 		final TabItem hexagonTab = new TabItem(_tabFolder, SWT.NONE);
@@ -645,20 +644,20 @@ public class ColorChooser extends Composite {
 
 		final Composite rgbContainer = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(rgbContainer);
-		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(rgbContainer);
+		GridLayoutFactory.fillDefaults().numColumns(1).applyTo(rgbContainer);
 //		rgbContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
 		{
 			final Label label = new Label(rgbContainer, SWT.NONE);
 			GridDataFactory.fillDefaults().grab(true, true).align(SWT.FILL, SWT.CENTER).applyTo(label);
 			label.setText(labelText);
 
-			final Label redLabel = new Label(rgbContainer, SWT.NONE);
-			GridDataFactory.fillDefaults()//
-//							.grab(false, true)
-					.align(SWT.END, SWT.FILL)
-					.hint(5, 10)
-					.applyTo(redLabel);
-			redLabel.setBackground(rgbColor);
+//			final Label redLabel = new Label(rgbContainer, SWT.NONE);
+//			GridDataFactory.fillDefaults()//
+////							.grab(false, true)
+//					.align(SWT.END, SWT.FILL)
+//					.hint(5, 10)
+//					.applyTo(redLabel);
+//			redLabel.setBackground(rgbColor);
 		}
 	}
 
@@ -689,18 +688,21 @@ public class ColorChooser extends Composite {
 
 			{
 				// Color Label: Selected color
-				_lblSelectedColor = new Label(container, SWT.BORDER | SWT.SHADOW_NONE);
+				_lblSelectedColor = new Label(container, SWT.NONE);
 				GridDataFactory.fillDefaults()//
 						.grab(true, true)
 						.hint(SWT.DEFAULT, colorHeight)
 						.applyTo(_lblSelectedColor);
 
 				// Color Label: Hovered color
-				_lblHoveredColor = new Label(container, SWT.BORDER | SWT.SHADOW_NONE);
+				_lblHoveredColor = new Label(container, SWT.NONE);
 				GridDataFactory.fillDefaults()//
 						.grab(true, true)
 						.applyTo(_lblHoveredColor);
 				_lblHoveredColor.setToolTipText(Messages.Color_Chooser_HoveredColor_Tooltip);
+
+				// set initial color that the label is slightly visible
+				_lblHoveredColor.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WIDGET_LIGHT_SHADOW));
 			}
 		}
 	}
@@ -742,9 +744,10 @@ public class ColorChooser extends Composite {
 	private void createUI_52_CustomColors_Colors(final Composite parent) {
 
 		final int colorSpacing = 5;
-		final int columnSpacing = (NUMBER_OF_HORIZONTAL_COLORS - 1) * colorSpacing;
+		final int columnSpacing = (NUMBER_OF_HORIZONTAL_COLORS - 5) * colorSpacing;
 
 		final int customColorSize = (_chooserSize - columnSpacing) / NUMBER_OF_HORIZONTAL_COLORS;
+//		final int customColorSize = (_chooserSize) / NUMBER_OF_HORIZONTAL_COLORS;
 
 		_customColors = new Label[NUMBER_OF_VERTICAL_COLORS][NUMBER_OF_HORIZONTAL_COLORS];
 
@@ -759,7 +762,8 @@ public class ColorChooser extends Composite {
 			for (int rowIndex = 0; rowIndex < NUMBER_OF_VERTICAL_COLORS; rowIndex++) {
 				for (int columnIndex = 0; columnIndex < NUMBER_OF_HORIZONTAL_COLORS; columnIndex++) {
 
-					final Label colorLabel = new Label(container, SWT.BORDER);
+//					final Label colorLabel = new Label(container, SWT.BORDER);
+					final Label colorLabel = new Label(container, SWT.NONE);
 					GridDataFactory.fillDefaults()//
 							.align(SWT.BEGINNING, SWT.CENTER)
 							.hint(customColorSize, customColorSize)
@@ -893,7 +897,7 @@ public class ColorChooser extends Composite {
 		}
 
 		// return grey
-		return _hexagonDefaultColor;
+		return _hexagonDefaultRGB;
 	}
 
 	private RGB getRgbFromHexagon(final MouseEvent event) {

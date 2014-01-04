@@ -855,7 +855,7 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 
 			final Color fgColor = _colorCache.getColor(//
 					colorId, //
-					_colorManager.getGraphColorDefinition(colorId).getTextColor());
+					_colorManager.getGraphColorDefinition(colorId).getTextColor_Active());
 
 			label.setForeground(fgColor);
 		}
@@ -912,7 +912,7 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 		} else {
 			final Color fgColor = _colorCache.getColor(//
 					colorId, //
-					_colorManager.getGraphColorDefinition(colorId).getTextColor());
+					_colorManager.getGraphColorDefinition(colorId).getTextColor_Active());
 			label.setForeground(fgColor);
 		}
 

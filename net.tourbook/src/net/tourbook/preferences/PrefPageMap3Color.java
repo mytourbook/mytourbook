@@ -26,6 +26,7 @@ import net.tourbook.common.color.Map3ColorManager;
 import net.tourbook.common.color.Map3ColorProfile;
 import net.tourbook.common.color.Map3GradientColorProvider;
 import net.tourbook.common.color.MapGraphId;
+import net.tourbook.common.color.ProfileImage;
 import net.tourbook.common.color.RGBVertex;
 import net.tourbook.common.util.ColumnManager;
 import net.tourbook.common.util.ITourViewer;
@@ -95,9 +96,10 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 public class PrefPageMap3Color extends PreferencePage implements IWorkbenchPreferencePage, IMap3ColorUpdater,
 		ITourViewer {
 
+	public static final String							ID									= "net.tourbook.preferences.PrefPageMap3Color";	//$NON-NLS-1$
+
 	private static final int							PROFILE_IMAGE_HEIGHT				= 30;
 	private static final int							PROFILE_IMAGE_MIN_SIZE				= 30;
-	private static final int							PROFILE_IMAGE_X_OFFSET				= 10;
 
 	private static final String							STATE_EXPANDED_COLOR_DEFINITIONS	= "STATE_EXPANDED_COLOR_DEFINITIONS";				//$NON-NLS-1$
 
@@ -120,17 +122,19 @@ public class PrefPageMap3Color extends PreferencePage implements IWorkbenchPrefe
 	private int											_oldImageWidth						= -1;
 
 	/**
-	 * contains the table column widget for the profile color
+	 * Contains the table column widget for the profile image.
 	 */
 	private TreeColumn									_tcProfileImage;
 
-	private TreeColumnDefinition						_colDefImage;
+	private TreeColumnDefinition						_colDefGraphImage;
+	private TreeColumnDefinition						_colDefProfileImage;
 
 	/**
 	 * index of the profile image, this can be changed when the columns are reordered with the mouse
 	 * or the column manager
 	 */
-	private int											_profileImageColumn					= 0;
+	private int											_columnIndexGraphImage				= 0;
+	private int											_columnIndexProfileImage			= 0;
 
 	private HashMap<Map3GradientColorProvider, Image>	_profileImages						= new HashMap<Map3GradientColorProvider, Image>();
 
@@ -240,53 +244,45 @@ public class PrefPageMap3Color extends PreferencePage implements IWorkbenchPrefe
 	@Override
 	public void applyMapColors(	final Map3GradientColorProvider originalColorProvider,
 								final Map3GradientColorProvider modifiedColorProvider,
-								final boolean isNewProfile) {
+								final boolean isNewColorProvider) {
 
 		final MapGraphId originalGraphId = originalColorProvider.getGraphId();
 		final MapGraphId modifiedGraphId = modifiedColorProvider.getGraphId();
 
-		// update color provider
-		final IMapColorProvider colorProvider = MapColorProvider.getMap3ColorProvider(modifiedGraphId);
+		final IMapColorProvider activeColorProvider = MapColorProvider.getActiveMap3ColorProvider(modifiedGraphId);
 
-		if (colorProvider instanceof Map3GradientColorProvider) {
+		// apply colors only to gradient color provider
+		if (activeColorProvider instanceof Map3GradientColorProvider) {
 
-			final Map3GradientColorProvider map3GradientColorProvider = (Map3GradientColorProvider) colorProvider;
+			// update active color provider
+			final Map3GradientColorProvider activeMap3ColorProvider = (Map3GradientColorProvider) activeColorProvider;
+			activeMap3ColorProvider.setColorProfile(modifiedColorProvider.getColorProfile());
 
-			map3GradientColorProvider.setColorProfile(modifiedColorProvider.getColorProfile());
+			// update model
+			if (isNewColorProvider) {
 
-		} else {
-			return;
+				// a new profile is edited
+				Map3ColorManager.addColorProvider(modifiedColorProvider);
+
+			} else {
+
+				// an existing profile is modified
+				Map3ColorManager.replaceColorProvider(originalColorProvider, modifiedColorProvider);
+			}
+			Map3ColorManager.saveColors();
+
+			// update UI
+			_colorProfileViewer.refresh(Map3ColorManager.getColorDefinition(originalGraphId));
+
+			if (originalGraphId != modifiedGraphId) {
+
+				// both color definitions are modified
+				_colorProfileViewer.refresh(Map3ColorManager.getColorDefinition(modifiedGraphId));
+			}
+			_colorProfileViewer.setSelection(new StructuredSelection(modifiedColorProvider));
+
+			fireModifyEvent();
 		}
-
-		// update model
-		if (isNewProfile) {
-
-			// a new profile is edited
-
-			Map3ColorManager.addColorProvider(modifiedColorProvider);
-
-		} else {
-
-			// an existing profile is modified
-
-			Map3ColorManager.replaceColorProvider(originalColorProvider, modifiedColorProvider);
-		}
-
-		// update UI
-		_colorProfileViewer.refresh(Map3ColorManager.getColorDefinition(originalGraphId));
-
-		if (originalGraphId != modifiedGraphId) {
-
-			// both color definitions are modified
-			_colorProfileViewer.refresh(Map3ColorManager.getColorDefinition(modifiedGraphId));
-		}
-		_colorProfileViewer.setSelection(new StructuredSelection(modifiedColorProvider));
-
-		Map3ColorManager.saveColors();
-
-		// fire event that color has changed
-		TourbookPlugin.getDefault().getPreferenceStore()//
-				.setValue(ITourbookPreferences.GRAPH_COLORS_HAS_CHANGED, Math.random());
 	}
 
 	@Override
@@ -410,14 +406,9 @@ public class PrefPageMap3Color extends PreferencePage implements IWorkbenchPrefe
 		final Listener paintListener = new Listener() {
 			public void handleEvent(final Event event) {
 
-				if (event.index == _profileImageColumn) {
+				if (event.type == SWT.MeasureItem || event.type == SWT.PaintItem) {
 
-					// paint image at image column
-
-					if (event.type == SWT.MeasureItem || event.type == SWT.PaintItem) {
-
-						onViewerPaint(event);
-					}
+					onViewerPaint(event);
 				}
 			}
 		};
@@ -430,8 +421,10 @@ public class PrefPageMap3Color extends PreferencePage implements IWorkbenchPrefe
 		_colorProfileViewer = new CheckboxTreeViewer(tree);
 		_columnManager.createColumns(_colorProfileViewer);
 
-		_tcProfileImage = _colDefImage.getTreeColumn();
-		_profileImageColumn = _colDefImage.getCreateIndex();
+		_tcProfileImage = _colDefProfileImage.getTreeColumn();
+
+		_columnIndexProfileImage = _colDefProfileImage.getCreateIndex();
+		_columnIndexGraphImage = _colDefGraphImage.getCreateIndex();
 
 		_colorProfileViewer.setContentProvider(new ContentProvider());
 		_colorProfileViewer.setComparator(new ProfileComparator());
@@ -561,7 +554,16 @@ public class PrefPageMap3Color extends PreferencePage implements IWorkbenchPrefe
 	private void defineAllColumns() {
 
 		defineColumn_10_ProfileName();
-		defineColumn_20_ColorImage();
+		defineColumn_20_GraphImage();
+
+		defineColumn_32_MinValue();
+		defineColumn_33_MinValueOverwrite();
+
+		defineColumn_30_ColorImage();
+
+		defineColumn_36_MaxValueOverwrite();
+		defineColumn_35_MaxValue();
+
 		defineColumn_99_ProfileId();
 	}
 
@@ -585,10 +587,17 @@ public class PrefPageMap3Color extends PreferencePage implements IWorkbenchPrefe
 				final Object element = cell.getElement();
 
 				if (element instanceof Map3ColorDefinition) {
-					cell.setText(((Map3ColorDefinition) (element)).getVisibleName());
+
+					final Map3ColorDefinition colorDefinition = (Map3ColorDefinition) (element);
+
+					cell.setText(colorDefinition.getVisibleName());
+
 				} else if (element instanceof Map3GradientColorProvider) {
+
 					cell.setText(((Map3GradientColorProvider) (element)).getMap3ColorProfile().getProfileName());
+
 				} else {
+
 					cell.setText(UI.EMPTY_STRING);
 				}
 			}
@@ -596,12 +605,31 @@ public class PrefPageMap3Color extends PreferencePage implements IWorkbenchPrefe
 	}
 
 	/**
+	 * Column: Graph image
+	 */
+	private void defineColumn_20_GraphImage() {
+
+		final TreeColumnDefinition colDef = new TreeColumnDefinition(_columnManager, "graphImage", SWT.LEAD); //$NON-NLS-1$
+		_colDefGraphImage = colDef;
+
+		colDef.setColumnLabel(Messages.Pref_Map3Color_Column_GraphImage);
+		colDef.setDefaultColumnWidth(20);
+		colDef.setIsDefaultColumn();
+		colDef.setLabelProvider(new CellLabelProvider() {
+
+			// !!! set dummy label provider, otherwise an error occures !!!
+			@Override
+			public void update(final ViewerCell cell) {}
+		});
+	}
+
+	/**
 	 * Column: Color image
 	 */
-	private void defineColumn_20_ColorImage() {
+	private void defineColumn_30_ColorImage() {
 
 		final TreeColumnDefinition colDef = new TreeColumnDefinition(_columnManager, "colorImage", SWT.LEAD); //$NON-NLS-1$
-		_colDefImage = colDef;
+		_colDefProfileImage = colDef;
 
 		colDef.setColumnLabel(Messages.Pref_Map3Color_Column_Colors);
 		colDef.setColumnHeader(Messages.Pref_Map3Color_Column_Colors);
@@ -620,6 +648,170 @@ public class PrefPageMap3Color extends PreferencePage implements IWorkbenchPrefe
 			@Override
 			public void controlResized(final ControlEvent e) {
 				onResizeImageColumn();
+			}
+		});
+	}
+
+	/**
+	 * Column: Min value
+	 */
+	private void defineColumn_32_MinValue() {
+
+		final TreeColumnDefinition colDef = new TreeColumnDefinition(_columnManager, "minValue", SWT.TRAIL); //$NON-NLS-1$
+
+		colDef.setColumnLabel(Messages.Pref_Map3Color_Column_MinValue_Label);
+		colDef.setColumnHeader(Messages.Pref_Map3Color_Column_MinValue_Header);
+		colDef.setColumnToolTipText(Messages.Pref_Map3Color_Column_MinValue_Label);
+		colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(8));
+		colDef.setIsDefaultColumn();
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final Object element = cell.getElement();
+
+				if (element instanceof Map3GradientColorProvider) {
+
+					final String valueText;
+					final Map3ColorProfile colorProfile = ((Map3GradientColorProvider) (element)).getMap3ColorProfile();
+
+					if (colorProfile.isMinValueOverwrite()) {
+
+						valueText = Integer.toString(colorProfile.getMinValueOverwrite());
+
+					} else {
+
+						final ProfileImage profileImage = colorProfile.getProfileImage();
+
+						final ArrayList<RGBVertex> vertices = profileImage.getRgbVertices();
+						final RGBVertex firstVertex = vertices.get(0);
+
+						valueText = Integer.toString(firstVertex.getValue());
+					}
+
+					cell.setText(valueText);
+
+				} else {
+
+					cell.setText(UI.EMPTY_STRING);
+				}
+			}
+		});
+	}
+
+	/**
+	 * Column: Min value overwrite
+	 */
+	private void defineColumn_33_MinValueOverwrite() {
+
+		final TreeColumnDefinition colDef = new TreeColumnDefinition(_columnManager, "minValueOverwrite", SWT.CENTER); //$NON-NLS-1$
+
+		colDef.setColumnLabel(Messages.Pref_Map3Color_Column_MinValueOverwrite_Label);
+		colDef.setColumnToolTipText(Messages.Pref_Map3Color_Column_MinValueOverwrite_Tooltip);
+		colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(2));
+		colDef.setIsDefaultColumn();
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final Object element = cell.getElement();
+
+				if (element instanceof Map3GradientColorProvider) {
+
+					final Map3ColorProfile colorProfile = ((Map3GradientColorProvider) (element)).getMap3ColorProfile();
+
+					if (colorProfile.isMinValueOverwrite()) {
+						cell.setText(UI.SYMBOL_EXCLAMATION_POINT);
+					} else {
+						cell.setText(UI.EMPTY_STRING);
+					}
+
+				} else {
+
+					cell.setText(UI.EMPTY_STRING);
+				}
+			}
+		});
+	}
+
+	/**
+	 * Column: Min value
+	 */
+	private void defineColumn_35_MaxValue() {
+
+		final TreeColumnDefinition colDef = new TreeColumnDefinition(_columnManager, "maxValue", SWT.LEAD); //$NON-NLS-1$
+
+		colDef.setColumnLabel(Messages.Pref_Map3Color_Column_MaxValue_Label);
+		colDef.setColumnHeader(Messages.Pref_Map3Color_Column_MaxValue_Header);
+		colDef.setColumnToolTipText(Messages.Pref_Map3Color_Column_MaxValue_Label);
+		colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(8));
+		colDef.setIsDefaultColumn();
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final Object element = cell.getElement();
+
+				if (element instanceof Map3GradientColorProvider) {
+
+					final String valueText;
+					final Map3ColorProfile colorProfile = ((Map3GradientColorProvider) (element)).getMap3ColorProfile();
+
+					if (colorProfile.isMaxValueOverwrite()) {
+
+						valueText = Integer.toString(colorProfile.getMaxValueOverwrite());
+
+					} else {
+
+						final ProfileImage profileImage = colorProfile.getProfileImage();
+
+						final ArrayList<RGBVertex> vertices = profileImage.getRgbVertices();
+						final RGBVertex lastVertex = vertices.get(vertices.size() - 1);
+
+						valueText = Integer.toString(lastVertex.getValue());
+					}
+
+					cell.setText(valueText);
+
+				} else {
+
+					cell.setText(UI.EMPTY_STRING);
+				}
+			}
+		});
+	}
+
+	/**
+	 * Column: Min value overwrite
+	 */
+	private void defineColumn_36_MaxValueOverwrite() {
+
+		final TreeColumnDefinition colDef = new TreeColumnDefinition(_columnManager, "maxValueOverwrite", SWT.CENTER); //$NON-NLS-1$
+
+		colDef.setColumnLabel(Messages.Pref_Map3Color_Column_MaxValueOverwrite_Label);
+		colDef.setColumnToolTipText(Messages.Pref_Map3Color_Column_MaxValueOverwrite_Tooltip);
+		colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(2));
+		colDef.setIsDefaultColumn();
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final Object element = cell.getElement();
+
+				if (element instanceof Map3GradientColorProvider) {
+
+					final Map3ColorProfile colorProfile = ((Map3GradientColorProvider) (element)).getMap3ColorProfile();
+
+					if (colorProfile.isMaxValueOverwrite()) {
+						cell.setText(UI.SYMBOL_EXCLAMATION_POINT);
+					} else {
+						cell.setText(UI.EMPTY_STRING);
+					}
+
+				} else {
+
+					cell.setText(UI.EMPTY_STRING);
+				}
 			}
 		});
 	}
@@ -743,12 +935,20 @@ public class PrefPageMap3Color extends PreferencePage implements IWorkbenchPrefe
 		tbm.update(true);
 	}
 
+	/**
+	 * Fire event that 3D map colors have changed.
+	 */
+	private void fireModifyEvent() {
+
+		TourbookPlugin.getPrefStore().setValue(ITourbookPreferences.MAP3_COLOR_IS_MODIFIED, Math.random());
+	}
+
 	@Override
 	public ColumnManager getColumnManager() {
 		return _columnManager;
 	}
 
-	private int getImageSize() {
+	private int getImageColumnWidth() {
 
 		int width;
 
@@ -763,7 +963,7 @@ public class PrefPageMap3Color extends PreferencePage implements IWorkbenchPrefe
 			width = PROFILE_IMAGE_MIN_SIZE;
 		}
 
-		return width + PROFILE_IMAGE_X_OFFSET;
+		return width;
 	}
 
 	private Image getProfileImage(final Map3GradientColorProvider colorProvider) {
@@ -772,19 +972,27 @@ public class PrefPageMap3Color extends PreferencePage implements IWorkbenchPrefe
 
 		if (isProfileImageValid(image) == false) {
 
-			final int imageSize = getImageSize();
-			final int legendSize = imageSize - PROFILE_IMAGE_X_OFFSET;
+			/*
+			 * This offset prevents that the color is painted just beside the vertical scollbar when
+			 * default size is used.
+			 */
+			final int trailingOffset = 0;//10;
+
+			final int columnWidth = getImageColumnWidth();
+			final int imageWidth = columnWidth - trailingOffset;
 
 			final Map3ColorProfile colorProfile = colorProvider.getMap3ColorProfile();
 			final ArrayList<RGBVertex> rgbVertices = colorProfile.getProfileImage().getRgbVertices();
 
-			colorProvider.configureColorProvider(legendSize, rgbVertices);
+			colorProvider.configureColorProvider(imageWidth, rgbVertices);
 
 			image = TourMapPainter.createMapLegendImage(//
 					Display.getCurrent(),
 					colorProvider,
-					legendSize,
-					PROFILE_IMAGE_HEIGHT);
+					imageWidth,
+					PROFILE_IMAGE_HEIGHT - 1,
+					false,
+					false);
 
 			final Image oldImage = _profileImages.put(colorProvider, image);
 
@@ -814,7 +1022,7 @@ public class PrefPageMap3Color extends PreferencePage implements IWorkbenchPrefe
 
 		}
 
-		if (image.getBounds().width != getImageSize()) {
+		if (image.getBounds().width != getImageColumnWidth()) {
 
 			image.dispose();
 
@@ -892,11 +1100,11 @@ public class PrefPageMap3Color extends PreferencePage implements IWorkbenchPrefe
 		final Object firstElement = ((StructuredSelection) _colorProfileViewer.getSelection()).getFirstElement();
 		if (firstElement instanceof Map3GradientColorProvider) {
 
-			final Map3GradientColorProvider originalProfile = (Map3GradientColorProvider) firstElement;
+			final Map3GradientColorProvider colorProvider = (Map3GradientColorProvider) firstElement;
 
 			new DialogMap3ColorEditor(//
 					Display.getCurrent().getActiveShell(),
-					originalProfile,
+					colorProvider,
 					this,
 					false).open();
 		}
@@ -939,7 +1147,7 @@ public class PrefPageMap3Color extends PreferencePage implements IWorkbenchPrefe
 
 	private void onResizeImageColumn() {
 
-		final int newImageWidth = getImageSize();
+		final int newImageWidth = getImageColumnWidth();
 
 		// check if the width has changed
 		if (newImageWidth == _oldImageWidth) {
@@ -1026,6 +1234,23 @@ public class PrefPageMap3Color extends PreferencePage implements IWorkbenchPrefe
 
 	private void onViewerPaint(final Event event) {
 
+		// paint images at the correct column
+
+		final int columnIndex = event.index;
+
+		if (columnIndex == _columnIndexProfileImage) {
+
+			onViewerPaint_ProfileImage(event);
+
+		} else if (columnIndex == _columnIndexGraphImage) {
+
+			onViewerPaint_GraphImage(event);
+		}
+
+	}
+
+	private void onViewerPaint_GraphImage(final Event event) {
+
 		switch (event.type) {
 		case SWT.MeasureItem:
 
@@ -1034,7 +1259,7 @@ public class PrefPageMap3Color extends PreferencePage implements IWorkbenchPrefe
 			 * will be adjusted when an item is expanded.
 			 */
 
-			event.width += getImageSize();
+//			event.width += getImageColumnWidth();
 			event.height = PROFILE_IMAGE_HEIGHT;
 
 			break;
@@ -1055,12 +1280,39 @@ public class PrefPageMap3Color extends PreferencePage implements IWorkbenchPrefe
 					final Rectangle rect = image.getBounds();
 
 					final int x = event.x + event.width;
+
+					// center vertical
 					final int yOffset = Math.max(0, (event.height - rect.height) / 2);
 
 					event.gc.drawImage(image, x, event.y + yOffset);
 				}
+			}
 
-			} else if (itemData instanceof Map3GradientColorProvider) {
+			break;
+		}
+	}
+
+	private void onViewerPaint_ProfileImage(final Event event) {
+
+		switch (event.type) {
+		case SWT.MeasureItem:
+
+			/*
+			 * Set height also for color def, when not set and all is collapsed, the color def size
+			 * will be adjusted when an item is expanded.
+			 */
+
+			event.width += getImageColumnWidth();
+			event.height = PROFILE_IMAGE_HEIGHT;
+
+			break;
+
+		case SWT.PaintItem:
+
+			final TreeItem item = (TreeItem) event.item;
+			final Object itemData = item.getData();
+
+			if (itemData instanceof Map3GradientColorProvider) {
 
 				final Map3GradientColorProvider colorProvider = (Map3GradientColorProvider) itemData;
 
@@ -1070,7 +1322,7 @@ public class PrefPageMap3Color extends PreferencePage implements IWorkbenchPrefe
 
 					final Rectangle rect = image.getBounds();
 
-					final int x = event.x + event.width + PROFILE_IMAGE_X_OFFSET;
+					final int x = event.x + event.width;
 					final int yOffset = Math.max(0, (event.height - rect.height) / 2);
 
 					event.gc.drawImage(image, x, event.y + yOffset);
@@ -1098,6 +1350,8 @@ public class PrefPageMap3Color extends PreferencePage implements IWorkbenchPrefe
 		}
 
 		enableControls();
+
+		fireModifyEvent();
 	}
 
 	@Override
@@ -1192,9 +1446,19 @@ public class PrefPageMap3Color extends PreferencePage implements IWorkbenchPrefe
 				expandedColorDefIds.toArray(new String[expandedColorDefIds.size()]));
 	}
 
-	private void setActiveColorProvider(final Map3GradientColorProvider colorProvider) {
+	/**
+	 * @param selectedColorProvider
+	 */
+	private void setActiveColorProvider(final Map3GradientColorProvider selectedColorProvider) {
 
-		final MapGraphId graphId = colorProvider.getGraphId();
+		final Map3ColorProfile selectedColorProfile = selectedColorProvider.getMap3ColorProfile();
+
+		// check if the selected color provider is already the active color provider
+		if (selectedColorProfile.isActiveColorProfile()) {
+			return;
+		}
+
+		final MapGraphId graphId = selectedColorProvider.getGraphId();
 		final Map3ColorDefinition colorDefinition = Map3ColorManager.getColorDefinition(graphId);
 
 		final ArrayList<Map3GradientColorProvider> allGraphIdColorProvider = colorDefinition.getColorProviders();
@@ -1207,21 +1471,36 @@ public class PrefPageMap3Color extends PreferencePage implements IWorkbenchPrefe
 
 			// set as active color provider
 
-			if (colorProvider.getMap3ColorProfile().isActiveColorProfile()) {
-				return;
+			final IMapColorProvider activeColorProvider = MapColorProvider.getActiveMap3ColorProvider(graphId);
+
+			// apply colors only to gradient color provider
+			if (activeColorProvider instanceof Map3GradientColorProvider) {
+
+				/*
+				 * Update model
+				 */
+				Map3ColorManager.setActiveColorProvider(selectedColorProvider);
+
+				// update active color provider
+				final Map3GradientColorProvider activeMap3ColorProvider = (Map3GradientColorProvider) activeColorProvider;
+
+				activeMap3ColorProvider.setColorProfile(selectedColorProfile);
+
+				/*
+				 * Update UI
+				 */
+
+				// reset state for previous color provider
+				final Map3GradientColorProvider currentActiveColorProvider = Map3ColorManager
+						.getActiveColorProvider(graphId);
+				_colorProfileViewer.setChecked(currentActiveColorProvider, false);
+
+				// set state for selected color provider
+				_colorProfileViewer.setChecked(selectedColorProvider, true);
+
+				// also select a checked color provider
+				_colorProfileViewer.setSelection(new StructuredSelection(selectedColorProvider));
 			}
-
-			// reset state for previous color provider
-			final Map3GradientColorProvider currentActiveColorProvider = Map3ColorManager
-					.getActiveColorProvider(graphId);
-			_colorProfileViewer.setChecked(currentActiveColorProvider, false);
-
-			// set state for selected color provider
-			Map3ColorManager.setActiveColorProvider(colorProvider);
-			_colorProfileViewer.setChecked(colorProvider, true);
-
-			// also select a checked color provider
-			_colorProfileViewer.setSelection(new StructuredSelection(colorProvider));
 		}
 	}
 

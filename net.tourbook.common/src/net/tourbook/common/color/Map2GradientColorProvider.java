@@ -54,7 +54,8 @@ public class Map2GradientColorProvider extends MapGradientColorProvider implemen
 										float minValue,
 										float maxValue,
 										final String unitText,
-										final LegendUnitFormat unitFormat) {
+										final LegendUnitFormat unitFormat,
+										final boolean isConvertIntoAbsoluteValues) {
 
 		/*
 		 * enforce min/max values, another option is necessary in the pref dialog to not enforce
@@ -111,6 +112,11 @@ public class Map2GradientColorProvider extends MapGradientColorProvider implemen
 			valueColors[3].value = legendMaxValue - diffMinMax2 / 2;
 			valueColors[4].value = legendMaxValue - diffMinMax10;
 		}
+	}
+
+	@Override
+	public Map2ColorProfile getColorProfile() {
+		return _map2ColorProfile;
 	}
 
 	@Override
@@ -240,11 +246,6 @@ public class Map2GradientColorProvider extends MapGradientColorProvider implemen
 
 	public MapGraphId getGraphId() {
 		return _mapColorId;
-	}
-
-	@Override
-	public Map2ColorProfile getColorProfile() {
-		return _map2ColorProfile;
 	}
 
 	public MapUnits getMapUnits() {

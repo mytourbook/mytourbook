@@ -45,8 +45,8 @@ import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.SelectionChartInfo;
 import net.tourbook.chart.SelectionChartXSliderPosition;
-import net.tourbook.common.Messages;
 import net.tourbook.common.UI;
+import net.tourbook.common.action.ActionOpenPrefDialog;
 import net.tourbook.common.color.ColorUtil;
 import net.tourbook.common.color.IGradientColorProvider;
 import net.tourbook.common.color.IMapColorProvider;
@@ -60,6 +60,8 @@ import net.tourbook.importdata.RawDataManager;
 import net.tourbook.map.MapColorProvider;
 import net.tourbook.map2.view.IDiscreteColorProvider;
 import net.tourbook.map2.view.SelectionMapPosition;
+import net.tourbook.map3.Messages;
+import net.tourbook.map3.action.ActionMap3Color;
 import net.tourbook.map3.action.ActionOpenGLVersions;
 import net.tourbook.map3.action.ActionOpenMap3LayerView;
 import net.tourbook.map3.action.ActionOpenMap3StatisticsView;
@@ -84,6 +86,7 @@ import net.tourbook.map3.layer.tourtrack.TourTrackConfig;
 import net.tourbook.map3.layer.tourtrack.TourTrackConfigManager;
 import net.tourbook.map3.layer.tourtrack.TourTrackLayer;
 import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.preferences.PrefPageMap3Color;
 import net.tourbook.printing.ActionPrint;
 import net.tourbook.tour.ActionOpenAdjustAltitudeDialog;
 import net.tourbook.tour.ActionOpenMarkerDialog;
@@ -130,6 +133,8 @@ import org.eclipse.ui.part.ViewPart;
  */
 public class Map3View extends ViewPart implements ITourProvider {
 
+	private static final String					OTHER_MESSAGES_01						= net.tourbook.common.Messages.Graph_Label_Heartbeat_unit;
+
 	private static final String					SLIDER_TEXT_ALTITUDE					= "%.1f %s";								//$NON-NLS-1$
 	private static final String					SLIDER_TEXT_GRADIENT					= "%.1f %%";								//$NON-NLS-1$
 	private static final String					SLIDER_TEXT_PACE						= "%s %s";									//$NON-NLS-1$
@@ -155,8 +160,8 @@ public class Map3View extends ViewPart implements ITourProvider {
 
 	private static final WorldWindowGLCanvas	_wwCanvas								= Map3Manager.getWWCanvas();
 
-// this must be enabled for the new map3 color provider
-//	private ActionMapColor						_actionMapColor;
+	private ActionMap3Color						_actionMap3Color;
+	private ActionOpenPrefDialog				_actionMap3Colors;
 	private ActionOpenGLVersions				_actionOpenGLVersions;
 	private ActionOpenMap3LayerView				_actionOpenMap3LayerView;
 	private ActionOpenMap3StatisticsView		_actionOpenMap3StatisticsView;
@@ -288,10 +293,10 @@ public class Map3View extends ViewPart implements ITourProvider {
 
 	public void actionOpenTrackColorDialog() {
 
-//		// set color before menu is filled, this sets the action image and color provider
-//		_actionMapColor.setColorId(_tourColorId);
-//
-//		_actionMapColor.run();
+		// set color before menu is filled, this sets the action image and color provider
+		_actionMap3Color.setColorId(_tourColorId);
+
+		_actionMap3Color.run();
 	}
 
 	public void actionSetMapColor(final MapGraphId colorId) {
@@ -299,8 +304,6 @@ public class Map3View extends ViewPart implements ITourProvider {
 		_tourColorId = colorId;
 
 		setColorProvider(colorId);
-
-		updateMapColors();
 	}
 
 	public void actionSetTrackSlider(final boolean isLeftSlider) {
@@ -552,7 +555,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 
 				final String property = event.getProperty();
 
-				if (property.equals(ITourbookPreferences.GRAPH_COLORS_HAS_CHANGED)) {
+				if (property.equals(ITourbookPreferences.MAP3_COLOR_IS_MODIFIED)) {
 
 					// update map colors
 
@@ -696,7 +699,8 @@ public class Map3View extends ViewPart implements ITourProvider {
 		_actionOpenMap3LayerView = new ActionOpenMap3LayerView();
 		_actionOpenMap3StatisticsView = new ActionOpenMap3StatisticsView();
 
-//		_actionMapColor = new ActionMapColor();
+		_actionMap3Color = new ActionMap3Color();
+		_actionMap3Colors = new ActionOpenPrefDialog(Messages.Map3_Action_TrackColors, PrefPageMap3Color.ID);
 
 		_actionSetTrackSliderLeft = new ActionSetTrackSliderPositionLeft(this);
 		_actionSetTrackSliderRight = new ActionSetTrackSliderPositionRight(this);
@@ -883,10 +887,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 
 			final float[] pulseSerie = tourData.pulseSerie;
 			if (pulseSerie != null) {
-				graphValueText = String.format(
-						SLIDER_TEXT_PULSE,
-						pulseSerie[positionIndex],
-						Messages.Graph_Label_Heartbeat_unit);
+				graphValueText = String.format(SLIDER_TEXT_PULSE, pulseSerie[positionIndex], OTHER_MESSAGES_01);
 			}
 
 			break;
@@ -991,7 +992,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 		_actionShowTrackSlider.setEnabled(isTourAvailable);
 		_actionShowLegendInMap.setEnabled(isTourAvailable);
 
-//		_actionMapColor.setEnabled(isTourAvailable);
+		_actionMap3Color.setEnabled(isTourAvailable);
 
 		_actionEditQuick.setEnabled(isTourSelected);
 		_actionEditTour.setEnabled(isTourSelected);
@@ -1042,6 +1043,9 @@ public class Map3View extends ViewPart implements ITourProvider {
 
 	private void fillContextMenu(final Menu menu) {
 
+		// set color before menu is filled, this sets the action image and color id
+		_actionMap3Color.setColorId(_tourColorId);
+
 		fillMenuItem(menu, _actionSetTrackSliderLeft);
 		fillMenuItem(menu, _actionSetTrackSliderRight);
 
@@ -1051,16 +1055,14 @@ public class Map3View extends ViewPart implements ITourProvider {
 		fillMenuItem(menu, _actionShowTrackSlider);
 		fillMenuItem(menu, _actionShowLegendInMap);
 
-//		// set color before menu is filled, this sets the action image and color id
-//		_actionMapColor.setColorId(_tourColorId);
-//
-//		if (_tourColorId != MapColorId.HrZone) {
-//
-//			// hr zone has a different color provider and is not yet supported
-//
-//			(new Separator()).fill(menu, -1);
-//			fillMenuItem(menu, _actionMapColor);
-//		}
+		if (_tourColorId != MapGraphId.HrZone) {
+
+			// hr zone has a different color provider and is not yet supported
+
+			(new Separator()).fill(menu, -1);
+			fillMenuItem(menu, _actionMap3Color);
+		}
+		fillMenuItem(menu, _actionMap3Colors);
 
 		(new Separator()).fill(menu, -1);
 		fillMenuItem(menu, _actionEditQuick);
@@ -1487,7 +1489,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 		final Color bgColor;
 		final Color fgColor;
 
-		final IMapColorProvider colorProvider = MapColorProvider.getMap3ColorProvider(_tourColorId);
+		final IMapColorProvider colorProvider = MapColorProvider.getActiveMap3ColorProvider(_tourColorId);
 
 		Integer colorValue = null;
 
@@ -1591,10 +1593,12 @@ public class Map3View extends ViewPart implements ITourProvider {
 
 	private void setColorProvider(final MapGraphId colorId) {
 
-		final IMapColorProvider colorProvider = MapColorProvider.getMap3ColorProvider(colorId);
+		final IMapColorProvider colorProvider = MapColorProvider.getActiveMap3ColorProvider(colorId);
 
 		Map3Manager.getLayer_TourTrack().setColorProvider(colorProvider);
 		Map3Manager.getLayer_TourLegend().setColorProvider(colorProvider);
+
+		updateMapColors();
 	}
 
 	public void setContextMenuVisible(final boolean isVisible) {
@@ -1998,10 +2002,12 @@ public class Map3View extends ViewPart implements ITourProvider {
 		_actionShowMarker.setChecked(isMarkerVisible);
 	}
 
+	/**
+	 * The color provider has not changed only the colors of the current color provider.
+	 */
 	private void updateMapColors() {
 
 		Map3Manager.getLayer_TourTrack().updateColors(_allTours);
-//		Map3Manager.getLayer_TourLegend().updateLegendImage();
 
 		showAllTours(false);
 	}

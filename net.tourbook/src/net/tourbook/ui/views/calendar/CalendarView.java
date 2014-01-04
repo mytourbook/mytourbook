@@ -635,9 +635,9 @@ public class CalendarView extends ViewPart implements ITourProvider {
 
 		RGB getColor() {
 			if (_useLineColorForWeekSummary) {
-				return cd.getLineColor();
+				return cd.getLineColor_Active();
 			} else {
-				return cd.getTextColor();
+				return cd.getTextColor_Active();
 				// return new RGB(64, 64, 64); // 0x404040
 			}
 		}

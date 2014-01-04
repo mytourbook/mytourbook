@@ -335,9 +335,9 @@ public class TourChart extends Chart {
 		final GraphColorManager colorProvider = GraphColorManager.getInstance();
 
 		_photoOverlayBGColorLink = new Color(getDisplay(), //
-				colorProvider.getGraphColorDefinition(GraphColorManager.PREF_GRAPH_HISTORY).getLineColor());
+				colorProvider.getGraphColorDefinition(GraphColorManager.PREF_GRAPH_HISTORY).getLineColor_Active());
 		_photoOverlayBGColorTour = new Color(getDisplay(), //
-				colorProvider.getGraphColorDefinition(GraphColorManager.PREF_GRAPH_TOUR).getLineColor());
+				colorProvider.getGraphColorDefinition(GraphColorManager.PREF_GRAPH_TOUR).getLineColor_Active());
 
 		/*
 		 * set values from pref store

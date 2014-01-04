@@ -62,59 +62,59 @@ import org.eclipse.swt.widgets.Spinner;
 
 public class DialogMap2ColorEditor extends TitleAreaDialog {
 
-	private static final String		VALUE_SPACER		= "999";												//$NON-NLS-1$
+	private static final String				VALUE_SPACER		= "999";											//$NON-NLS-1$
 
-	private static final int		SPINNER_MIN_VALUE	= -200;
-	private static final int		SPINNER_MAX_VALUE	= 10000;
+	private static final int				SPINNER_MIN_VALUE	= -200;
+	private static final int				SPINNER_MAX_VALUE	= 10000;
 
-	private static final String		STATE_LIVE_UPDATE	= "IsLiveUpdate";										//$NON-NLS-1$
+	private static final String				STATE_LIVE_UPDATE	= "IsLiveUpdate";									//$NON-NLS-1$
 
-	private final IDialogSettings	_state				= TourbookPlugin.getState("DialogMappingColor"); //$NON-NLS-1$
+	private final IDialogSettings			_state				= TourbookPlugin.getState("DialogMappingColor");	//$NON-NLS-1$
 
-	private IMap2ColorUpdater		_mapColorUpdater;
+	private IMap2ColorUpdater				_mapColorUpdater;
 
 	private final IGradientColorProvider	_colorProvider;
-	private Map2ColorProfile		_mapColorWorkingCopy;
+	private Map2ColorProfile				_mapColorWorkingCopy;
 
-	private final SelectionAdapter	_defaultSelectionAdapter;
+	private final SelectionAdapter			_defaultSelectionAdapter;
 
-	private ColorDefinition			_colorDefinition;
+	private ColorDefinition					_colorDefinition;
 
-	private boolean					_isInitializeControls;
+	private boolean							_isInitializeControls;
 
-	private PixelConverter			_pc;
+	private PixelConverter					_pc;
 
 	/*
 	 * UI controls
 	 */
-	private Canvas					_canvasMappingColor;
-	private Image					_imageMappingColor;
+	private Canvas							_canvasMappingColor;
+	private Image							_imageMappingColor;
 
-	private Button					_btnApply;
+	private Button							_btnApply;
 
-	private Button					_chkForceMinValue;
-	private Button					_chkForceMaxValue;
-	private Button					_chkLiveUpdate;
+	private Button							_chkForceMinValue;
+	private Button							_chkForceMaxValue;
+	private Button							_chkLiveUpdate;
 
-	private Combo					_cboMaxBrightness;
-	private Combo					_cboMinBrightness;
+	private Combo							_cboMaxBrightness;
+	private Combo							_cboMinBrightness;
 
-	private Label					_lblMinBrightnessValue;
-	private Label					_lblMaxBrightnessValue;
-	private Label					_lblMinValue;
-	private Label					_lblMaxValue;
+	private Label							_lblMinBrightnessValue;
+	private Label							_lblMaxBrightnessValue;
+	private Label							_lblMinValue;
+	private Label							_lblMaxValue;
 
-	private Scale					_scaleMinBrightness;
-	private Scale					_scaleMaxBrightness;
+	private Scale							_scaleMinBrightness;
+	private Scale							_scaleMaxBrightness;
 
-	private Spinner					_spinMinValue;
-	private Spinner					_spinMaxValue;
+	private Spinner							_spinMinValue;
+	private Spinner							_spinMaxValue;
 
-	private ColorSelector			_colorSelectorMax;
-	private ColorSelector			_colorSelectorHigh;
-	private ColorSelector			_colorSelectorMid;
-	private ColorSelector			_colorSelectorLow;
-	private ColorSelector			_colorSelectorMin;
+	private ColorSelector					_colorSelectorMax;
+	private ColorSelector					_colorSelectorHigh;
+	private ColorSelector					_colorSelectorMid;
+	private ColorSelector					_colorSelectorLow;
+	private ColorSelector					_colorSelectorMin;
 
 	{
 		_defaultSelectionAdapter = new SelectionAdapter() {
@@ -211,16 +211,18 @@ public class DialogMap2ColorEditor extends TitleAreaDialog {
 		// dispose old image
 		UI.disposeResource(_imageMappingColor);
 
-		final Point legendSize = _canvasMappingColor.getSize();
+		final Point canvasSize = _canvasMappingColor.getSize();
 
-		final int legendWidth = Math.max(140, legendSize.x);
-		final int legendHeight = Math.max(100, legendSize.y);
+		final int legendWidth = Math.max(140, canvasSize.x);
+		final int legendHeight = Math.max(100, canvasSize.y);
 
 		_imageMappingColor = TourMapPainter.createMapLegendImage(
 				Display.getCurrent(),
 				_colorProvider,
 				legendWidth,
-				legendHeight);
+				legendHeight,
+				true,
+				false);
 	}
 
 	private void createUI(final Composite parent) {
@@ -247,8 +249,8 @@ public class DialogMap2ColorEditor extends TitleAreaDialog {
 			GridDataFactory.fillDefaults().grab(true, false).applyTo(valueContainer);
 //			valueContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_MAGENTA));
 			{
-				createUI_30_MinMaxValue(valueContainer);
 				createUI_40_Brightness(valueContainer);
+				createUI_30_MinMaxValue(valueContainer);
 				createUI_50_Apply(valueContainer);
 
 // this is not yet implemented
@@ -405,43 +407,6 @@ public class DialogMap2ColorEditor extends TitleAreaDialog {
 		{
 			{
 				/*
-				 * Overwrite min value
-				 */
-				_chkForceMinValue = new Button(group, SWT.CHECK);
-				_chkForceMinValue.setText(Messages.legendcolor_dialog_chk_min_value_text);
-				_chkForceMinValue.setToolTipText(Messages.legendcolor_dialog_chk_min_value_tooltip);
-				GridDataFactory.swtDefaults().applyTo(_chkForceMinValue);
-				_chkForceMinValue.addSelectionListener(new SelectionAdapter() {
-					@Override
-					public void widgetSelected(final SelectionEvent e) {
-						enableControls();
-						validateFields();
-					}
-				});
-
-				_lblMinValue = new Label(group, SWT.NONE);
-				_lblMinValue.setText(Messages.legendcolor_dialog_txt_min_value);
-				GridDataFactory.fillDefaults().indent(20, 0).align(SWT.FILL, SWT.CENTER).applyTo(_lblMinValue);
-
-				_spinMinValue = new Spinner(group, SWT.BORDER);
-				_spinMinValue.setMinimum(SPINNER_MIN_VALUE);
-				_spinMinValue.setMaximum(SPINNER_MAX_VALUE);
-				_spinMinValue.addSelectionListener(new SelectionAdapter() {
-					@Override
-					public void widgetSelected(final SelectionEvent e) {
-						validateFields();
-					}
-				});
-				_spinMinValue.addMouseWheelListener(new MouseWheelListener() {
-					public void mouseScrolled(final MouseEvent event) {
-						UI.adjustSpinnerValueOnMouseScroll(event);
-						validateFields();
-					}
-				});
-			}
-
-			{
-				/*
 				 * Overwrite max value
 				 */
 				_chkForceMaxValue = new Button(group, SWT.CHECK);
@@ -476,6 +441,43 @@ public class DialogMap2ColorEditor extends TitleAreaDialog {
 					}
 				});
 			}
+
+			{
+				/*
+				 * Overwrite min value
+				 */
+				_chkForceMinValue = new Button(group, SWT.CHECK);
+				_chkForceMinValue.setText(Messages.legendcolor_dialog_chk_min_value_text);
+				_chkForceMinValue.setToolTipText(Messages.legendcolor_dialog_chk_min_value_tooltip);
+				GridDataFactory.swtDefaults().applyTo(_chkForceMinValue);
+				_chkForceMinValue.addSelectionListener(new SelectionAdapter() {
+					@Override
+					public void widgetSelected(final SelectionEvent e) {
+						enableControls();
+						validateFields();
+					}
+				});
+
+				_lblMinValue = new Label(group, SWT.NONE);
+				_lblMinValue.setText(Messages.legendcolor_dialog_txt_min_value);
+				GridDataFactory.fillDefaults().indent(20, 0).align(SWT.FILL, SWT.CENTER).applyTo(_lblMinValue);
+
+				_spinMinValue = new Spinner(group, SWT.BORDER);
+				_spinMinValue.setMinimum(SPINNER_MIN_VALUE);
+				_spinMinValue.setMaximum(SPINNER_MAX_VALUE);
+				_spinMinValue.addSelectionListener(new SelectionAdapter() {
+					@Override
+					public void widgetSelected(final SelectionEvent e) {
+						validateFields();
+					}
+				});
+				_spinMinValue.addMouseWheelListener(new MouseWheelListener() {
+					public void mouseScrolled(final MouseEvent event) {
+						UI.adjustSpinnerValueOnMouseScroll(event);
+						validateFields();
+					}
+				});
+			}
 		}
 	}
 
@@ -488,32 +490,6 @@ public class DialogMap2ColorEditor extends TitleAreaDialog {
 		GridLayoutFactory.swtDefaults().numColumns(4).applyTo(group);
 		GridDataFactory.fillDefaults().grab(true, false).indent(0, 0).applyTo(group);
 		{
-			{
-				/*
-				 * Min brightness
-				 */
-				label = new Label(group, SWT.NONE);
-				label.setText(Messages.legendcolor_dialog_min_brightness_label);
-				label.setToolTipText(Messages.legendcolor_dialog_min_brightness_tooltip);
-
-				_cboMinBrightness = new Combo(group, SWT.DROP_DOWN | SWT.READ_ONLY);
-				_cboMinBrightness.addSelectionListener(_defaultSelectionAdapter);
-				for (final String comboLabel : MapColorProfile.BRIGHTNESS_LABELS) {
-					_cboMinBrightness.add(comboLabel);
-				}
-
-				_scaleMinBrightness = new Scale(group, SWT.NONE);
-				GridDataFactory.fillDefaults().grab(true, false).applyTo(_scaleMinBrightness);
-				_scaleMinBrightness.setMinimum(0);
-				_scaleMinBrightness.setMaximum(100);
-				_scaleMinBrightness.setPageIncrement(10);
-				_scaleMinBrightness.addSelectionListener(_defaultSelectionAdapter);
-
-				_lblMinBrightnessValue = new Label(group, SWT.NONE);
-				_lblMinBrightnessValue.setText(VALUE_SPACER);
-				_lblMinBrightnessValue.pack(true);
-			}
-
 			{
 				/*
 				 * Max brightness
@@ -540,6 +516,31 @@ public class DialogMap2ColorEditor extends TitleAreaDialog {
 				_lblMaxBrightnessValue.pack(true);
 			}
 
+			{
+				/*
+				 * Min brightness
+				 */
+				label = new Label(group, SWT.NONE);
+				label.setText(Messages.legendcolor_dialog_min_brightness_label);
+				label.setToolTipText(Messages.legendcolor_dialog_min_brightness_tooltip);
+
+				_cboMinBrightness = new Combo(group, SWT.DROP_DOWN | SWT.READ_ONLY);
+				_cboMinBrightness.addSelectionListener(_defaultSelectionAdapter);
+				for (final String comboLabel : MapColorProfile.BRIGHTNESS_LABELS) {
+					_cboMinBrightness.add(comboLabel);
+				}
+
+				_scaleMinBrightness = new Scale(group, SWT.NONE);
+				GridDataFactory.fillDefaults().grab(true, false).applyTo(_scaleMinBrightness);
+				_scaleMinBrightness.setMinimum(0);
+				_scaleMinBrightness.setMaximum(100);
+				_scaleMinBrightness.setPageIncrement(10);
+				_scaleMinBrightness.addSelectionListener(_defaultSelectionAdapter);
+
+				_lblMinBrightnessValue = new Label(group, SWT.NONE);
+				_lblMinBrightnessValue.setText(VALUE_SPACER);
+				_lblMinBrightnessValue.pack(true);
+			}
 		}
 	}
 
@@ -672,7 +673,7 @@ public class DialogMap2ColorEditor extends TitleAreaDialog {
 		_colorDefinition = colorDefinition;
 
 		// use a copy of the legendColor to support the cancel feature
-		_mapColorWorkingCopy = colorDefinition.getNewMapColor().clone();
+		_mapColorWorkingCopy = colorDefinition.getMap2Color_New().clone();
 
 //		System.out.println(UI.timeStampNano()
 //				+ " ["

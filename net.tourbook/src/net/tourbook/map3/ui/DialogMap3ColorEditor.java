@@ -381,8 +381,8 @@ public class DialogMap3ColorEditor extends TitleAreaDialog implements IProfileCo
 //					vertexContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
 					{
 						createUI_40_VertexFields(vertexContainer);
-						createUI_60_MinMaxValue(vertexContainer);
 						createUI_62_Brightness(vertexContainer);
+						createUI_60_MinMaxValue(vertexContainer);
 					}
 				}
 			}
@@ -548,6 +548,7 @@ public class DialogMap3ColorEditor extends TitleAreaDialog implements IProfileCo
 			 * Spinner: Vertex value
 			 */
 			final Spinner spinnerValue = new Spinner(vertexContainer, SWT.BORDER);
+//			final Spinner spinnerValue = new Spinner(vertexContainer, SWT.NONE);
 			GridDataFactory.fillDefaults().align(SWT.CENTER, SWT.CENTER).applyTo(spinnerValue);
 			spinnerValue.setMinimum(Integer.MIN_VALUE);
 			spinnerValue.setMaximum(Integer.MAX_VALUE);
@@ -557,7 +558,8 @@ public class DialogMap3ColorEditor extends TitleAreaDialog implements IProfileCo
 			/*
 			 * Label: Value color
 			 */
-			final Label lblColor = new Label(vertexContainer, SWT.CENTER | SWT.BORDER | SWT.SHADOW_NONE);
+//			final Label lblColor = new Label(vertexContainer, SWT.CENTER | SWT.BORDER | SWT.SHADOW_NONE);
+			final Label lblColor = new Label(vertexContainer, SWT.NONE);
 			GridDataFactory.fillDefaults()//
 					.grab(true, false)
 					.hint(70, 10)
@@ -635,7 +637,6 @@ public class DialogMap3ColorEditor extends TitleAreaDialog implements IProfileCo
 		final Group group = new Group(parent, SWT.NONE);
 		GridDataFactory.fillDefaults()//
 				.grab(true, false)
-				.indent(0, 10)
 				.applyTo(group);
 		GridLayoutFactory.swtDefaults().numColumns(3).applyTo(group);
 		group.setText(MAP2_MESSAGE_1);
@@ -701,7 +702,6 @@ public class DialogMap3ColorEditor extends TitleAreaDialog implements IProfileCo
 		final Group group = new Group(parent, SWT.NONE);
 		GridDataFactory.fillDefaults()//
 				.grab(true, false)
-//				.indent(0, 40)
 				.applyTo(group);
 		GridLayoutFactory.swtDefaults().numColumns(3).applyTo(group);
 		group.setText(MAP2_MESSAGE_8);
@@ -860,7 +860,9 @@ public class DialogMap3ColorEditor extends TitleAreaDialog implements IProfileCo
 				Display.getCurrent(),
 				_dialogColorProider,
 				imageWidth,
-				imageHeight);
+				imageHeight,
+				true,
+				false);
 
 		_canvasProfileImage.setImage(_profileImage);
 	}

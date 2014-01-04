@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -26,6 +26,10 @@ public final class ActionOpenPrefDialog extends Action {
 
 	private String	_prefPageId;
 
+	/**
+	 * @param text
+	 * @param prefPageId
+	 */
 	public ActionOpenPrefDialog(final String text, final String prefPageId) {
 
 		setText(text);

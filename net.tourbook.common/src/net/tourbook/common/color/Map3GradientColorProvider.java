@@ -16,11 +16,13 @@
 package net.tourbook.common.color;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import net.tourbook.common.UI;
 import net.tourbook.common.util.StatusUtil;
 
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.graphics.RGB;
 
 /**
@@ -37,11 +39,7 @@ public class Map3GradientColorProvider extends MapGradientColorProvider implemen
 
 	private MapUnits			_mapUnits	= new MapUnits();
 
-	public Map3GradientColorProvider(final MapGraphId graphId) {
-
-		_graphId = graphId;
-		_colorProfile = new Map3ColorProfile();
-	}
+	private RGBVertex[]			_absoluteVertices;
 
 	public Map3GradientColorProvider(final MapGraphId graphId, final Map3ColorProfile colorProfile) {
 
@@ -66,6 +64,17 @@ public class Map3GradientColorProvider extends MapGradientColorProvider implemen
 		}
 
 		return clonedObject;
+	}
+
+	private RGBVertex[] cloneVertices(final RGBVertex[] relativeVertices) {
+
+		final RGBVertex[] absoluteVertices = new RGBVertex[relativeVertices.length];
+
+		for (int vertexIndex = 0; vertexIndex < relativeVertices.length; vertexIndex++) {
+			absoluteVertices[vertexIndex] = relativeVertices[vertexIndex].clone();
+		}
+
+		return absoluteVertices;
 	}
 
 	public void configureColorProvider(final int legendSize, final ArrayList<RGBVertex> rgbVertices) {
@@ -98,12 +107,15 @@ public class Map3GradientColorProvider extends MapGradientColorProvider implemen
 			}
 		}
 
+		_absoluteVertices = rgbVertices.toArray(new RGBVertex[rgbVertices.size()]);
+
 		configureColorProvider(//
 				legendSize,
 				minValue,
 				maxValue,
 				unitText,
-				LegendUnitFormat.Number);
+				LegendUnitFormat.Number,
+				false);
 
 	}
 
@@ -112,7 +124,8 @@ public class Map3GradientColorProvider extends MapGradientColorProvider implemen
 										float minValue,
 										float maxValue,
 										final String unitText,
-										final LegendUnitFormat unitFormat) {
+										final LegendUnitFormat unitFormat,
+										final boolean isConvertIntoAbsoluteValues) {
 
 		// overwrite min value
 		if (_colorProfile.isMinValueOverwrite()) {
@@ -144,17 +157,100 @@ public class Map3GradientColorProvider extends MapGradientColorProvider implemen
 		}
 
 		final List<Float> legendUnits = getLegendUnits(legendSize, minValue, maxValue, unitFormat);
+		Assert.isTrue(legendUnits.size() > 0);
 
-		if (legendUnits.size() > 0) {
+		final Float legendMinValue = legendUnits.get(0);
+		final Float legendMaxValue = legendUnits.get(legendUnits.size() - 1);
 
-			final Float legendMinValue = legendUnits.get(0);
-			final Float legendMaxValue = legendUnits.get(legendUnits.size() - 1);
+		_mapUnits.units = legendUnits;
+		_mapUnits.unitText = unitText;
+		_mapUnits.legendMinValue = legendMinValue;
+		_mapUnits.legendMaxValue = legendMaxValue;
 
-			_mapUnits.units = legendUnits;
-			_mapUnits.unitText = unitText;
-			_mapUnits.legendMinValue = legendMinValue;
-			_mapUnits.legendMaxValue = legendMaxValue;
+		if (isConvertIntoAbsoluteValues) {
+			configureColorProvider_SetVertices(minValue, maxValue);
 		}
+	}
+
+	/**
+	 * Convert relative vertices into absolute values.
+	 * <p>
+	 * minVertex ^ minValue<br>
+	 * maxVertex ^ maxValue
+	 * 
+	 * @param minValue
+	 *            Absolute minimum value.
+	 * @param maxValue
+	 *            Absolute maximum value.
+	 */
+	private void configureColorProvider_SetVertices(final float minValue, final float maxValue) {
+
+		final RGBVertex[] relativeVertices = _colorProfile.getProfileImage().getRgbVerticesArray();
+		final RGBVertex[] absoluteVertices = cloneVertices(relativeVertices);
+
+		final RGBVertex minRelativeVertex = relativeVertices[0];
+		final RGBVertex maxRelativeVertex = relativeVertices[relativeVertices.length - 1];
+
+		final int relativeMinValue = minRelativeVertex.getValue();
+
+		final int relativeDiff = maxRelativeVertex.getValue() - relativeMinValue;
+		final int absoluteDiff = (int) (maxValue - minValue);
+
+		final float diffRatio = (float) relativeDiff / (float) absoluteDiff;
+
+		final int absoluteMinValue = (int) minValue;
+
+		for (int vertexIndex = 0; vertexIndex < relativeVertices.length; vertexIndex++) {
+
+			int absoluteValue;
+
+			if (vertexIndex == 0) {
+
+				// first value
+
+				absoluteValue = absoluteMinValue;
+
+			} else if (vertexIndex == relativeVertices.length - 1) {
+
+				// last value
+
+				absoluteValue = (int) maxValue;
+
+			} else {
+
+				// in between value
+
+				final RGBVertex relativeVertex = relativeVertices[vertexIndex];
+
+				final int relativeValue = relativeVertex.getValue();
+
+				final int relative0Value = relativeValue - relativeMinValue;
+
+				final int absolutInBetweenValue = (int) (relative0Value / diffRatio);
+
+				absoluteValue = absoluteMinValue + absolutInBetweenValue;
+			}
+
+			absoluteVertices[vertexIndex].setValue(absoluteValue);
+		}
+
+		_absoluteVertices = absoluteVertices;
+
+		dumpVertices();
+	}
+
+	void dumpVertices() {
+
+		final int maxLen = 20;
+
+		final String dump = String.format(//
+				"Map3GradientColorProvider [_absoluteVertices=%s]",
+				_absoluteVertices != null ? Arrays.asList(_absoluteVertices).subList(
+						0,
+						Math.min(_absoluteVertices.length, maxLen)) : null);
+
+		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") + ("\t" + dump) + "\n");
+		// TODO remove SYSTEM.OUT.PRINTLN
 	}
 
 	@Override
@@ -187,9 +283,9 @@ public class Map3GradientColorProvider extends MapGradientColorProvider implemen
 	@Override
 	public int getColorValue(final float graphValue) {
 
-		final RGBVertex[] rgbVerticies = _colorProfile.getProfileImage().getRgbVerticesArray();
+		if (_absoluteVertices.length == 0) {
 
-		if (rgbVerticies.length == 0) {
+			// return a valid value
 			return 0xff00ff;
 		}
 
@@ -203,7 +299,7 @@ public class Map3GradientColorProvider extends MapGradientColorProvider implemen
 		RGBVertex minRgbVertex = null;
 		RGBVertex maxRgbVertex = null;
 
-		for (final RGBVertex rgbVertexFromArray : rgbVerticies) {
+		for (final RGBVertex rgbVertexFromArray : _absoluteVertices) {
 
 			rgbVertex = rgbVertexFromArray;
 			final long vertexValue = rgbVertex.getValue();
@@ -229,7 +325,7 @@ public class Map3GradientColorProvider extends MapGradientColorProvider implemen
 
 			// legend value is smaller than minimum value
 
-			rgbVertex = rgbVerticies[0];
+			rgbVertex = _absoluteVertices[0];
 
 			final RGB minRGB = rgbVertex.getRGB();
 
@@ -260,7 +356,7 @@ public class Map3GradientColorProvider extends MapGradientColorProvider implemen
 
 			// legend value is larger than maximum value
 
-			rgbVertex = rgbVerticies[rgbVerticies.length - 1];
+			rgbVertex = _absoluteVertices[_absoluteVertices.length - 1];
 
 			final RGB maxRGB = rgbVertex.getRGB();
 

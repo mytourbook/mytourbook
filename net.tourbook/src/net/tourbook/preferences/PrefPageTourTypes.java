@@ -421,9 +421,16 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 	 */
 	private void defineAllColumns(final TreeColumnLayout treeLayout, final Tree tree) {
 
-		TreeViewerColumn tvc;
+		final int numberOfHorizontalImages = 4;
+		final int trailingOffset = 10;
+
+		final int itemHeight = tree.getItemHeight();
+		final int colorWidth = (itemHeight + GraphColorPainter.GRAPH_COLOR_SPACING)
+				* numberOfHorizontalImages
+				+ trailingOffset;
+
 		TreeColumn tc;
-		final int colorWidth = (tree.getItemHeight() + 0) * 5 + 10;
+		TreeViewerColumn tvc;
 
 		// 1. column: color item/color definition
 		tvc = new TreeViewerColumn(_tourTypeViewer, SWT.TRAIL);
@@ -455,9 +462,17 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 				final Object element = cell.getElement();
 
 				if (element instanceof ColorDefinition) {
-					cell.setImage(_graphColorPainter.drawDefinitionImage((ColorDefinition) element));
+
+					cell.setImage(_graphColorPainter.drawDefinitionImage(
+							(ColorDefinition) element,
+							numberOfHorizontalImages));
+
 				} else if (element instanceof GraphColorItem) {
-					cell.setImage(_graphColorPainter.drawColorImage((GraphColorItem) element));
+
+					cell.setImage(_graphColorPainter.drawColorImage(//
+							(GraphColorItem) element,
+							numberOfHorizontalImages));
+
 				} else {
 					cell.setImage(null);
 				}
@@ -656,10 +671,10 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 				"crId" + newTourType.getCreateId(), //$NON-NLS-1$
 				newTourType.getName());
 
-		newTourType.setColorBright(newColorDefinition.getDefaultGradientBright());
-		newTourType.setColorDark(newColorDefinition.getDefaultGradientDark());
-		newTourType.setColorLine(newColorDefinition.getDefaultLineColor());
-		newTourType.setColorText(newColorDefinition.getDefaultTextColor());
+		newTourType.setColorBright(newColorDefinition.getGradientBright_Default());
+		newTourType.setColorDark(newColorDefinition.getGradientDark_Default());
+		newTourType.setColorLine(newColorDefinition.getLineColor_Default());
+		newTourType.setColorText(newColorDefinition.getTextColor_Default());
 
 		// add new entity to db
 		final TourType saveTourType = TourDatabase.saveEntity(newTourType, newTourType.getTypeId(), TourType.class);
@@ -726,10 +741,10 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 			final TourTypeColorDefinition tourTypeColorDefinition = (TourTypeColorDefinition) colorDefinition;
 			final TourType oldTourType = tourTypeColorDefinition.getTourType();
 
-			oldTourType.setColorBright(colorDefinition.getNewGradientBright());
-			oldTourType.setColorDark(colorDefinition.getNewGradientDark());
-			oldTourType.setColorLine(colorDefinition.getNewLineColor());
-			oldTourType.setColorText(colorDefinition.getNewTextColor());
+			oldTourType.setColorBright(colorDefinition.getGradientBright_New());
+			oldTourType.setColorDark(colorDefinition.getGradientDark_New());
+			oldTourType.setColorLine(colorDefinition.getLineColor_New());
+			oldTourType.setColorText(colorDefinition.getTextColor_New());
 
 			final TourType savedTourType = TourDatabase
 					.saveEntity(oldTourType, oldTourType.getTypeId(), TourType.class);

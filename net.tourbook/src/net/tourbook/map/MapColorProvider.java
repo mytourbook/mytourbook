@@ -17,15 +17,20 @@ package net.tourbook.map;
 
 import java.util.HashMap;
 
+import net.tourbook.common.color.ColorDefinition;
+import net.tourbook.common.color.GraphColorManager;
 import net.tourbook.common.color.IMapColorProvider;
+import net.tourbook.common.color.Map2ColorProfile;
 import net.tourbook.common.color.Map2GradientColorProvider;
-import net.tourbook.common.color.Map3GradientColorProvider;
+import net.tourbook.common.color.Map3ColorManager;
 import net.tourbook.common.color.MapGraphId;
 import net.tourbook.map2.view.HrZonesColorProvider;
 
 /**
- * Contains the color provider which are selected in the preferences as the default color provider,
- * they are used to paint a tour/legend in a 2D/3D map.
+ * Color providers are used to paint a tour/legend in a 2D/3D map.
+ * <p>
+ * It contains all active color providers, the selected in the pref dialog is the active color
+ * provider.
  */
 public class MapColorProvider {
 
@@ -69,16 +74,16 @@ public class MapColorProvider {
 		/*
 		 * 3D Map
 		 */
-		_map3ColorProvider.put(MapGraphId.Altitude, new Map3GradientColorProvider(MapGraphId.Altitude));
-		_map3ColorProvider.put(MapGraphId.Pace, new Map3GradientColorProvider(MapGraphId.Pace));
-		_map3ColorProvider.put(MapGraphId.Gradient, new Map3GradientColorProvider(MapGraphId.Gradient));
-		_map3ColorProvider.put(MapGraphId.Pulse, new Map3GradientColorProvider(MapGraphId.Pulse));
-		_map3ColorProvider.put(MapGraphId.Speed, new Map3GradientColorProvider(MapGraphId.Speed));
+		_map3ColorProvider.put(MapGraphId.Altitude, Map3ColorManager.getActiveColorProvider(MapGraphId.Altitude));
+		_map3ColorProvider.put(MapGraphId.Pace, Map3ColorManager.getActiveColorProvider(MapGraphId.Pace));
+		_map3ColorProvider.put(MapGraphId.Gradient, Map3ColorManager.getActiveColorProvider(MapGraphId.Gradient));
+		_map3ColorProvider.put(MapGraphId.Pulse, Map3ColorManager.getActiveColorProvider(MapGraphId.Pulse));
+		_map3ColorProvider.put(MapGraphId.Speed, Map3ColorManager.getActiveColorProvider(MapGraphId.Speed));
 
 		_map3ColorProvider.put(MapGraphId.HrZone, new HrZonesColorProvider(MapGraphId.HrZone));
 	}
 
-	public static IMapColorProvider getMap2ColorProvider(final MapGraphId colorId) {
+	public static IMapColorProvider getActiveMap2ColorProvider(final MapGraphId colorId) {
 
 		checkColorProvider();
 
@@ -92,7 +97,11 @@ public class MapColorProvider {
 		return mapColorProvider;
 	}
 
-	public static IMapColorProvider getMap3ColorProvider(final MapGraphId colorId) {
+	/**
+	 * @param colorId
+	 * @return Returns the active color provider which is set active in the pref store.
+	 */
+	public static IMapColorProvider getActiveMap3ColorProvider(final MapGraphId colorId) {
 
 		checkColorProvider();
 
@@ -104,5 +113,28 @@ public class MapColorProvider {
 		}
 
 		return mapColorProvider;
+	}
+
+	/**
+	 * Set active color profile (net.tourbook.common) into the active color provider
+	 * (net.tourbook.map).
+	 */
+	public static void updateMap2Colors() {
+
+		for (final IMapColorProvider colorProvider : _map2ColorProvider.values()) {
+
+			if (colorProvider instanceof Map2GradientColorProvider) {
+
+				final Map2GradientColorProvider map2Provider = (Map2GradientColorProvider) colorProvider;
+
+				final MapGraphId graphId = map2Provider.getGraphId();
+
+				final ColorDefinition colorDefinition = GraphColorManager.getInstance().getColorDefinition(graphId);
+				final Map2ColorProfile map2Profile = colorDefinition.getMap2Color_New();
+
+				map2Provider.setColorProfile(map2Profile);
+			}
+		}
+
 	}
 }

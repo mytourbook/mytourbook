@@ -744,7 +744,7 @@
 		   
 		      <command
 		            commandId="org.eclipse.ui.window.preferences"
-		            icon="icons/options.gif"
+		            icon="icons/options.png"
 		            label="%command_general_preferences"
 		            style="push"
 		            />

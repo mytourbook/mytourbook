@@ -33,7 +33,7 @@ class TourPositionColors implements Path.PositionColors {
 
 	private final ColorCacheAWT	_awtColorCache	= new ColorCacheAWT();
 
-	private IMapColorProvider	_colorProvider	= MapColorProvider.getMap3ColorProvider(MapGraphId.Altitude);
+	private IMapColorProvider	_colorProvider	= MapColorProvider.getActiveMap3ColorProvider(MapGraphId.Altitude);
 
 	public Color getColor(final Position position, final int ordinal) {
 
@@ -86,7 +86,7 @@ class TourPositionColors implements Path.PositionColors {
 
 			final IGradientColorProvider colorProvider = (IGradientColorProvider) _colorProvider;
 
-			MapUtils.setMinMaxValues(allTours, colorProvider, 300);
+			MapUtils.configureColorProvider(allTours, colorProvider, 300);
 		}
 	}
 

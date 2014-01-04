@@ -23,16 +23,19 @@ public interface IGradientColorProvider extends IMapColorProvider {
 	 * 
 	 * @param imageSize
 	 *            Width or height of the image.
+	 * @param imageSize
 	 * @param minValue
 	 * @param maxValue
 	 * @param unitText
 	 * @param unitFormat
+	 * @param isConvertIntoAbsoluteValues
 	 */
 	abstract void configureColorProvider(	int imageSize,
 											float minValue,
 											float maxValue,
 											String unitText,
-											LegendUnitFormat unitFormat);
+											LegendUnitFormat unitFormat,
+											boolean isConvertIntoAbsoluteValues);
 
 	abstract MapColorProfile getColorProfile();
 

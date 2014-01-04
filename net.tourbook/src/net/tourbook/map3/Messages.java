@@ -70,6 +70,8 @@ public class Messages extends NLS {
 	public static String		Map3_Action_ShowTrackSlider;
 	public static String		Map3_Action_TrackColor;
 
+	public static String	Map3_Action_TrackColors;
+
 	public static String		Map3_Dialog_OpenGLVersion_Title;
 
 	public static String	Map3Color_Dialog_Action_AddVertex_Tooltip;
