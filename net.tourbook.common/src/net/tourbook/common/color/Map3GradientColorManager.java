@@ -47,9 +47,9 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 /**
- * Manage colors which are displayed in a 3D map.
+ * Manage gradient colors which are displayed in a 3D map.
  */
-public class Map3ColorManager {
+public class Map3GradientColorManager {
 
 	private static final int								FILE_VERSION					= 1;
 
@@ -109,10 +109,10 @@ public class Map3ColorManager {
 		//
 				new RGBVertex[] {
 			new RGBVertex(0, 128, 64, 0),
-			new RGBVertex(200, 255, 255, 0),
-			new RGBVertex(500, 255, 0, 0),
-			new RGBVertex(600, 0, 128, 255),
-			new RGBVertex(1000, 0, 128, 255),
+			new RGBVertex(20, 255, 255, 0),
+			new RGBVertex(50, 255, 0, 0),
+			new RGBVertex(60, 0, 128, 255),
+			new RGBVertex(100, 0, 128, 255),
 				//
 				},
 				//
@@ -233,7 +233,7 @@ public class Map3ColorManager {
 		_initColorDefinitions();
 	}
 
-	private Map3ColorManager() {}
+	private Map3GradientColorManager() {}
 
 	private static void _initColorDefinitions() {
 
@@ -268,14 +268,13 @@ public class Map3ColorManager {
 		}
 	}
 
-	public static Map3GradientColorProvider getActiveColorProvider(final MapGraphId graphId) {
+	public static Map3GradientColorProvider getActiveMap3ColorProvider(final MapGraphId graphId) {
 
 		Map3GradientColorProvider activeColorProvider = null;
 
 		final ArrayList<Map3GradientColorProvider> colorProviders = getColorProviders(graphId);
 
 		for (final Map3GradientColorProvider colorProvider : colorProviders) {
-
 			if (colorProvider.getMap3ColorProfile().isActiveColorProfile()) {
 
 				activeColorProvider = colorProvider;
@@ -288,7 +287,6 @@ public class Map3ColorManager {
 			// this case should not happen, set first as active
 
 			activeColorProvider = colorProviders.get(0);
-
 			activeColorProvider.getMap3ColorProfile().setIsActiveColorProfile(true);
 		}
 
@@ -606,7 +604,7 @@ public class Map3ColorManager {
 		// add new/modified profile
 		if (originalGraphId == modifiedGraphId) {
 
-			// graph id has not changed, replace original with modified profile
+			// graph id has not changed, replace original with modified color provider
 
 			allOriginalProviders.remove(originalColorProvider);
 			allOriginalProviders.add(modifiedColorProvider);
@@ -757,6 +755,8 @@ public class Map3ColorManager {
 	}
 
 	/**
+	 * Set one color provider as active color provider and reset all others.
+	 * 
 	 * @param activeColorProvider
 	 */
 	public static void setActiveColorProvider(final Map3GradientColorProvider activeColorProvider) {
@@ -765,7 +765,11 @@ public class Map3ColorManager {
 
 		for (final Map3GradientColorProvider colorProvider : colorProviders) {
 
-			colorProvider.getMap3ColorProfile().setIsActiveColorProfile(colorProvider == activeColorProvider);
+			final boolean isActiveColorProfile = colorProvider == activeColorProvider;
+
+			final Map3ColorProfile map3ColorProfile = colorProvider.getMap3ColorProfile();
+
+			map3ColorProfile.setIsActiveColorProfile(isActiveColorProfile);
 		}
 	}
 }

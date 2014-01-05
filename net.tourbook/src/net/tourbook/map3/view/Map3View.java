@@ -62,7 +62,6 @@ import net.tourbook.map2.view.IDiscreteColorProvider;
 import net.tourbook.map2.view.SelectionMapPosition;
 import net.tourbook.map3.Messages;
 import net.tourbook.map3.action.ActionMap3Color;
-import net.tourbook.map3.action.ActionOpenGLVersions;
 import net.tourbook.map3.action.ActionOpenMap3LayerView;
 import net.tourbook.map3.action.ActionOpenMap3StatisticsView;
 import net.tourbook.map3.action.ActionSetTrackSliderPositionLeft;
@@ -162,7 +161,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 
 	private ActionMap3Color						_actionMap3Color;
 	private ActionOpenPrefDialog				_actionMap3Colors;
-	private ActionOpenGLVersions				_actionOpenGLVersions;
+//	private ActionOpenGLVersions				_actionOpenGLVersions;
 	private ActionOpenMap3LayerView				_actionOpenMap3LayerView;
 	private ActionOpenMap3StatisticsView		_actionOpenMap3StatisticsView;
 	private ActionSetTrackSliderPositionLeft	_actionSetTrackSliderLeft;
@@ -559,7 +558,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 
 					// update map colors
 
-					updateMapColors();
+					setColorProvider(_tourColorId);
 
 				} else if (property.equals(ITourbookPreferences.MEASUREMENT_SYSTEM)) {
 
@@ -695,7 +694,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 
 	private void createActions(final Composite parent) {
 
-		_actionOpenGLVersions = new ActionOpenGLVersions();
+//		_actionOpenGLVersions = new ActionOpenGLVersions();
 		_actionOpenMap3LayerView = new ActionOpenMap3LayerView();
 		_actionOpenMap3StatisticsView = new ActionOpenMap3StatisticsView();
 
@@ -1598,7 +1597,9 @@ public class Map3View extends ViewPart implements ITourProvider {
 		Map3Manager.getLayer_TourTrack().setColorProvider(colorProvider);
 		Map3Manager.getLayer_TourLegend().setColorProvider(colorProvider);
 
-		updateMapColors();
+		Map3Manager.getLayer_TourTrack().updateColors(_allTours);
+		
+		showAllTours(false);
 	}
 
 	public void setContextMenuVisible(final boolean isVisible) {
@@ -2002,15 +2003,6 @@ public class Map3View extends ViewPart implements ITourProvider {
 		_actionShowMarker.setChecked(isMarkerVisible);
 	}
 
-	/**
-	 * The color provider has not changed only the colors of the current color provider.
-	 */
-	private void updateMapColors() {
-
-		Map3Manager.getLayer_TourTrack().updateColors(_allTours);
-
-		showAllTours(false);
-	}
 
 	private void updateModifiedTours(final ArrayList<TourData> modifiedTours) {
 

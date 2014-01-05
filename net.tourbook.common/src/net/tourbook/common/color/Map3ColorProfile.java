@@ -194,10 +194,11 @@ public class Map3ColorProfile extends MapColorProfile implements Cloneable {
 	@Override
 	public String toString() {
 		return String.format(
-				"Map3ColorProfile [_profileId=%s, _profileName=%s, _isActiveColorProfile=%s]",
+				"Map3ColorProfile [_profileId=%s, _profileName=%s, _isActiveColorProfile=%s, _profileImage=%s]",
 				_profileId,
 				_profileName,
-				_isActiveColorProfile);
+				_isActiveColorProfile,
+				_profileImage);
 	}
 
 }

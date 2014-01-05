@@ -16,11 +16,9 @@
 package net.tourbook.map3.action;
 
 import net.tourbook.application.TourbookPlugin;
-import net.tourbook.common.color.IMapColorProvider;
-import net.tourbook.common.color.Map3ColorManager;
+import net.tourbook.common.color.Map3GradientColorManager;
 import net.tourbook.common.color.Map3GradientColorProvider;
 import net.tourbook.common.color.MapGraphId;
-import net.tourbook.map.MapColorProvider;
 import net.tourbook.map3.Messages;
 import net.tourbook.map3.ui.DialogMap3ColorEditor;
 import net.tourbook.map3.ui.IMap3ColorUpdater;
@@ -42,31 +40,25 @@ public class ActionMap3Color extends Action implements IMap3ColorUpdater {
 	}
 
 	@Override
-	public void applyMapColors(	final Map3GradientColorProvider originalColorProvider,
-								final Map3GradientColorProvider modifiedColorProvider,
+	public void applyMapColors(	final Map3GradientColorProvider originalCP,
+								final Map3GradientColorProvider modifiedCP,
 								final boolean isNewColorProvider) {
 
 		// ignore isNewColorProvider because the current profile is edited
 
-		final MapGraphId modifiedGraphId = modifiedColorProvider.getGraphId();
+//		// update active color provider
+//		final MapGraphId modifiedGraphId = modifiedCP.getGraphId();
+//		final Map3GradientColorProvider activeCP = Map3GradientColorManager.getActiveMap3ColorProvider(modifiedGraphId);
+//		final MapColorProfile modifiedProfile = modifiedCP.getColorProfile();
+//		activeCP.setColorProfile(modifiedProfile);
+		
+		// update model
+		Map3GradientColorManager.replaceColorProvider(originalCP, modifiedCP);
 
-		// apply colors only to gradient color provider
-		final IMapColorProvider activeColorProvider = MapColorProvider.getActiveMap3ColorProvider(modifiedGraphId);
+		Map3GradientColorManager.saveColors();
 
-		if (activeColorProvider instanceof Map3GradientColorProvider) {
-
-			// update active color provider
-			final Map3GradientColorProvider activeMap3ColorProvider = (Map3GradientColorProvider) activeColorProvider;
-			activeMap3ColorProvider.setColorProfile(modifiedColorProvider.getColorProfile());
-
-			// update model
-			Map3ColorManager.replaceColorProvider(originalColorProvider, modifiedColorProvider);
-
-			Map3ColorManager.saveColors();
-
-			// fire event that color has changed
-			TourbookPlugin.getPrefStore().setValue(ITourbookPreferences.MAP3_COLOR_IS_MODIFIED, Math.random());
-		}
+		// fire event that color has changed
+		TourbookPlugin.getPrefStore().setValue(ITourbookPreferences.MAP3_COLOR_IS_MODIFIED, Math.random());
 	}
 
 	/**
@@ -80,18 +72,13 @@ public class ActionMap3Color extends Action implements IMap3ColorUpdater {
 	@Override
 	public void run() {
 
-		final IMapColorProvider colorProvider = MapColorProvider.getActiveMap3ColorProvider(_mapColorId);
+		final Map3GradientColorProvider activeCP = Map3GradientColorManager.getActiveMap3ColorProvider(_mapColorId);
 
-		if (colorProvider instanceof Map3GradientColorProvider) {
-
-			final Map3GradientColorProvider map3ColorProvider = (Map3GradientColorProvider) colorProvider;
-
-			new DialogMap3ColorEditor(//
-					Display.getCurrent().getActiveShell(),
-					map3ColorProvider,
-					this,
-					false).open();
-		}
+		new DialogMap3ColorEditor(//
+				Display.getCurrent().getActiveShell(),
+				activeCP,
+				this,
+				false).open();
 	}
 
 	public void setColorId(final MapGraphId mapColorId) {

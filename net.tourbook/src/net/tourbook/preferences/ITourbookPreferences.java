@@ -17,6 +17,8 @@ package net.tourbook.preferences;
 
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.CommonActivator;
+import net.tourbook.common.color.MapGraphId;
+import net.tourbook.map.MapColorProvider;
 import net.tourbook.ui.UI;
 
 public interface ITourbookPreferences {
@@ -327,6 +329,10 @@ public interface ITourbookPreferences {
 
 	/*
 	 * Pref page: Map3 color
+	 */
+	/**
+	 * Colors must be retrieved again from the {@link MapColorProvider}, another instance is used
+	 * for the same {@link MapGraphId}.
 	 */
 	public static final String	MAP3_COLOR_IS_MODIFIED						= "MAP3_COLOR_IS_MODIFIED";								//$NON-NLS-1$
 

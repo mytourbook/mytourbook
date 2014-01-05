@@ -236,7 +236,7 @@ public class Map3GradientColorProvider extends MapGradientColorProvider implemen
 
 		_absoluteVertices = absoluteVertices;
 
-		dumpVertices();
+//		dumpVertices();
 	}
 
 	void dumpVertices() {

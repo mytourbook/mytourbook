@@ -27,8 +27,8 @@ import java.util.LinkedHashSet;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.color.Map3ColorDefinition;
-import net.tourbook.common.color.Map3ColorManager;
 import net.tourbook.common.color.Map3ColorProfile;
+import net.tourbook.common.color.Map3GradientColorManager;
 import net.tourbook.common.color.Map3GradientColorProvider;
 import net.tourbook.common.color.MapColorProfile;
 import net.tourbook.common.color.MapGraphId;
@@ -57,14 +57,14 @@ import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
-import org.eclipse.swt.events.FocusEvent;
-import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.events.TraverseEvent;
+import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
@@ -199,7 +199,7 @@ public class DialogMap3ColorEditor extends TitleAreaDialog implements IProfileCo
 	 * @param parentShell
 	 * @param originalColorProvider
 	 * @param mapColorUpdater
-	 *            This updater is called when OK or Apply are pressed or Live Update is done.
+	 *            This updater is called when OK or Apply is pressed or when a Live Update is done.
 	 * @param isNewProfile
 	 */
 	public DialogMap3ColorEditor(	final Shell parentShell,
@@ -419,12 +419,11 @@ public class DialogMap3ColorEditor extends TitleAreaDialog implements IProfileCo
 				_txtProfileName = new Text(container, SWT.BORDER);
 				GridDataFactory.fillDefaults().grab(true, false).applyTo(_txtProfileName);
 
-				_txtProfileName.addFocusListener(new FocusListener() {
-					@Override
-					public void focusGained(final FocusEvent e) {}
+				_txtProfileName.addTraverseListener(new TraverseListener() {
 
 					@Override
-					public void focusLost(final FocusEvent e) {
+					public void keyTraversed(final TraverseEvent e) {
+
 						// do live update
 						onModifyProfileName();
 					}
@@ -928,7 +927,7 @@ public class DialogMap3ColorEditor extends TitleAreaDialog implements IProfileCo
 
 			final MapGraphId graphId = _dialogColorProider.getGraphId();
 
-			canEnableGraphType = Map3ColorManager.getColorProviders(graphId).size() > 1;
+			canEnableGraphType = Map3GradientColorManager.getColorProviders(graphId).size() > 1;
 		}
 
 		_cboGraphType.setEnabled(canEnableGraphType);
@@ -943,7 +942,7 @@ public class DialogMap3ColorEditor extends TitleAreaDialog implements IProfileCo
 
 	private int getGraphIdIndex(final MapGraphId colorId) {
 
-		final ArrayList<Map3ColorDefinition> colorDefinitions = Map3ColorManager.getSortedColorDefinitions();
+		final ArrayList<Map3ColorDefinition> colorDefinitions = Map3GradientColorManager.getSortedColorDefinitions();
 
 		for (int devIndex = 0; devIndex < colorDefinitions.size(); devIndex++) {
 
@@ -998,7 +997,7 @@ public class DialogMap3ColorEditor extends TitleAreaDialog implements IProfileCo
 
 	private MapGraphId getSelectedGraphId() {
 
-		final ArrayList<Map3ColorDefinition> colorDefinitions = Map3ColorManager.getSortedColorDefinitions();
+		final ArrayList<Map3ColorDefinition> colorDefinitions = Map3GradientColorManager.getSortedColorDefinitions();
 		final int selectionIndex = _cboGraphType.getSelectionIndex();
 
 		final Map3ColorDefinition selectedColorDef = colorDefinitions.get(selectionIndex);
@@ -1297,7 +1296,7 @@ public class DialogMap3ColorEditor extends TitleAreaDialog implements IProfileCo
 	 */
 	private void updateUI_Initialize() {
 
-		final Collection<Map3ColorDefinition> colorDefinitions = Map3ColorManager.getSortedColorDefinitions();
+		final Collection<Map3ColorDefinition> colorDefinitions = Map3GradientColorManager.getSortedColorDefinitions();
 
 		for (final Map3ColorDefinition colorDef : colorDefinitions) {
 			_cboGraphType.add(colorDef.getVisibleName());

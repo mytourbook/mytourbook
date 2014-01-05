@@ -22,7 +22,7 @@ import net.tourbook.common.color.GraphColorManager;
 import net.tourbook.common.color.IMapColorProvider;
 import net.tourbook.common.color.Map2ColorProfile;
 import net.tourbook.common.color.Map2GradientColorProvider;
-import net.tourbook.common.color.Map3ColorManager;
+import net.tourbook.common.color.Map3GradientColorManager;
 import net.tourbook.common.color.MapGraphId;
 import net.tourbook.map2.view.HrZonesColorProvider;
 
@@ -72,14 +72,8 @@ public class MapColorProvider {
 		_map2ColorProvider.put(MapGraphId.HrZone, new HrZonesColorProvider(MapGraphId.HrZone));
 
 		/*
-		 * 3D Map
+		 * 3D Map, gradient color providers are managed by the Map3ColorManager.
 		 */
-		_map3ColorProvider.put(MapGraphId.Altitude, Map3ColorManager.getActiveColorProvider(MapGraphId.Altitude));
-		_map3ColorProvider.put(MapGraphId.Pace, Map3ColorManager.getActiveColorProvider(MapGraphId.Pace));
-		_map3ColorProvider.put(MapGraphId.Gradient, Map3ColorManager.getActiveColorProvider(MapGraphId.Gradient));
-		_map3ColorProvider.put(MapGraphId.Pulse, Map3ColorManager.getActiveColorProvider(MapGraphId.Pulse));
-		_map3ColorProvider.put(MapGraphId.Speed, Map3ColorManager.getActiveColorProvider(MapGraphId.Speed));
-
 		_map3ColorProvider.put(MapGraphId.HrZone, new HrZonesColorProvider(MapGraphId.HrZone));
 	}
 
@@ -98,18 +92,22 @@ public class MapColorProvider {
 	}
 
 	/**
-	 * @param colorId
-	 * @return Returns the active color provider which is set active in the pref store.
+	 * @param graphId
+	 * @return Returns the active color provider which is actived in the pref store.
 	 */
-	public static IMapColorProvider getActiveMap3ColorProvider(final MapGraphId colorId) {
+	public static IMapColorProvider getActiveMap3ColorProvider(final MapGraphId graphId) {
 
 		checkColorProvider();
 
-		IMapColorProvider mapColorProvider = _map3ColorProvider.get(colorId);
+		IMapColorProvider mapColorProvider;
 
-		// use default when not available
-		if (mapColorProvider == null) {
-			mapColorProvider = _map3ColorProvider.get(MapGraphId.Altitude);
+		if (graphId == MapGraphId.HrZone) {
+
+			mapColorProvider = _map3ColorProvider.get(graphId);
+
+		} else {
+
+			mapColorProvider = Map3GradientColorManager.getActiveMap3ColorProvider(graphId);
 		}
 
 		return mapColorProvider;

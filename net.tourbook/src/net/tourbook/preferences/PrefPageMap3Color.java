@@ -20,10 +20,9 @@ import java.util.HashMap;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
-import net.tourbook.common.color.IMapColorProvider;
 import net.tourbook.common.color.Map3ColorDefinition;
-import net.tourbook.common.color.Map3ColorManager;
 import net.tourbook.common.color.Map3ColorProfile;
+import net.tourbook.common.color.Map3GradientColorManager;
 import net.tourbook.common.color.Map3GradientColorProvider;
 import net.tourbook.common.color.MapGraphId;
 import net.tourbook.common.color.ProfileImage;
@@ -32,7 +31,6 @@ import net.tourbook.common.util.ColumnManager;
 import net.tourbook.common.util.ITourViewer;
 import net.tourbook.common.util.TreeColumnDefinition;
 import net.tourbook.common.util.Util;
-import net.tourbook.map.MapColorProvider;
 import net.tourbook.map2.view.TourMapPainter;
 import net.tourbook.map3.ui.DialogMap3ColorEditor;
 import net.tourbook.map3.ui.IMap3ColorUpdater;
@@ -111,12 +109,16 @@ public class PrefPageMap3Color extends PreferencePage implements IWorkbenchPrefe
 																											.getClass()
 																											.getName());
 
+	/**
+	 * Displays all {@link Map3ColorDefinition}s and all {@link Map3GradientColorProvider}s which
+	 * are managed by the {@link Map3GradientColorManager}.
+	 */
 	private CheckboxTreeViewer							_colorProfileViewer;
 	private ColumnManager								_columnManager;
 
 	private PixelConverter								_pc;
 
-	private boolean										_isTreeExpading;
+	private boolean										_isInUIUpdate;
 
 	private int											_defaultImageWidth					= 300;
 	private int											_oldImageWidth						= -1;
@@ -234,55 +236,56 @@ public class PrefPageMap3Color extends PreferencePage implements IWorkbenchPrefe
 		noDefaultAndApplyButton();
 	}
 
+	/**
+	 * @return Returns all sorted {@link Map3ColorDefinition}s.
+	 */
 	private static Object[] getColorDefinitions() {
 
-		final ArrayList<Map3ColorDefinition> colorDefinitions = Map3ColorManager.getSortedColorDefinitions();
+		final ArrayList<Map3ColorDefinition> colorDefinitions = Map3GradientColorManager.getSortedColorDefinitions();
 
 		return colorDefinitions.toArray(new Map3ColorDefinition[colorDefinitions.size()]);
 	}
 
 	@Override
-	public void applyMapColors(	final Map3GradientColorProvider originalColorProvider,
-								final Map3GradientColorProvider modifiedColorProvider,
+	public void applyMapColors(	final Map3GradientColorProvider originalCP,
+								final Map3GradientColorProvider modifiedCP,
 								final boolean isNewColorProvider) {
 
-		final MapGraphId originalGraphId = originalColorProvider.getGraphId();
-		final MapGraphId modifiedGraphId = modifiedColorProvider.getGraphId();
+		final MapGraphId originalGraphId = originalCP.getGraphId();
+		final MapGraphId modifiedGraphId = modifiedCP.getGraphId();
 
-		final IMapColorProvider activeColorProvider = MapColorProvider.getActiveMap3ColorProvider(modifiedGraphId);
+		// update model
+		if (isNewColorProvider) {
 
-		// apply colors only to gradient color provider
-		if (activeColorProvider instanceof Map3GradientColorProvider) {
+			// a new profile is edited
+			Map3GradientColorManager.addColorProvider(modifiedCP);
 
-			// update active color provider
-			final Map3GradientColorProvider activeMap3ColorProvider = (Map3GradientColorProvider) activeColorProvider;
-			activeMap3ColorProvider.setColorProfile(modifiedColorProvider.getColorProfile());
+		} else {
 
-			// update model
-			if (isNewColorProvider) {
-
-				// a new profile is edited
-				Map3ColorManager.addColorProvider(modifiedColorProvider);
-
-			} else {
-
-				// an existing profile is modified
-				Map3ColorManager.replaceColorProvider(originalColorProvider, modifiedColorProvider);
-			}
-			Map3ColorManager.saveColors();
-
-			// update UI
-			_colorProfileViewer.refresh(Map3ColorManager.getColorDefinition(originalGraphId));
-
-			if (originalGraphId != modifiedGraphId) {
-
-				// both color definitions are modified
-				_colorProfileViewer.refresh(Map3ColorManager.getColorDefinition(modifiedGraphId));
-			}
-			_colorProfileViewer.setSelection(new StructuredSelection(modifiedColorProvider));
-
-			fireModifyEvent();
+			// an existing profile is modified
+			Map3GradientColorManager.replaceColorProvider(originalCP, modifiedCP);
 		}
+
+//		// update active color provider
+//		final Map3GradientColorProvider activeCP = Map3GradientColorManager.getActiveMap3ColorProvider(modifiedGraphId);
+//		final MapColorProfile modifiedProfile = modifiedCP.getColorProfile();
+//		activeCP.setColorProfile(modifiedProfile);
+
+		Map3GradientColorManager.saveColors();
+
+		// update UI
+		_colorProfileViewer.refresh(Map3GradientColorManager.getColorDefinition(originalGraphId));
+
+		if (originalGraphId != modifiedGraphId) {
+
+			// both color definitions are modified
+			_colorProfileViewer.refresh(Map3GradientColorManager.getColorDefinition(modifiedGraphId));
+		}
+
+		// select active color provider
+		_colorProfileViewer.setSelection(new StructuredSelection(modifiedCP));
+
+		fireModifyEvent();
 	}
 
 	@Override
@@ -891,7 +894,7 @@ public class PrefPageMap3Color extends PreferencePage implements IWorkbenchPrefe
 			final MapGraphId graphId = colorProvider.getGraphId();
 
 			// profiles can only be removed when more than one profile is available for a graph type
-			final ArrayList<Map3GradientColorProvider> graphIdColorProviders = Map3ColorManager
+			final ArrayList<Map3GradientColorProvider> graphIdColorProviders = Map3GradientColorManager
 					.getColorProviders(graphId);
 			canRemoveProfiles = graphIdColorProviders.size() > 1;
 		}
@@ -902,12 +905,6 @@ public class PrefPageMap3Color extends PreferencePage implements IWorkbenchPrefe
 	}
 
 	private void expandCollapseTreeItem(final Map3ColorDefinition treeItem) {
-
-		if (_isTreeExpading) {
-
-			// prevent runtime exception: Ignored reentrant call while viewer is busy.
-			return;
-		}
 
 		if (_colorProfileViewer.getExpandedState(treeItem)) {
 
@@ -1055,7 +1052,7 @@ public class PrefPageMap3Color extends PreferencePage implements IWorkbenchPrefe
 			graphId = ((Map3GradientColorProvider) selection).getGraphId();
 		}
 
-		final Map3ColorProfile newColorProfile = Map3ColorManager.getDefaultColorProfile(graphId);
+		final Map3ColorProfile newColorProfile = Map3GradientColorManager.getDefaultColorProfile(graphId);
 
 		// set profile name
 		newColorProfile.setProfileName(Map3ColorProfile.PROFILE_NAME_NEW);
@@ -1082,11 +1079,9 @@ public class PrefPageMap3Color extends PreferencePage implements IWorkbenchPrefe
 
 		final Map3GradientColorProvider duplicatedColorProvider = selectedColorProvider.clone();
 
-		// create a profile name
+		// create a new profile name by setting it to the profile id which is unique
 		duplicatedColorProvider.getMap3ColorProfile().setProfileName(
-				selectedColorProvider.getMap3ColorProfile().getProfileName()
-						+ UI.SPACE
-						+ duplicatedColorProvider.getMap3ColorProfile().getProfileId());
+				Integer.toString(duplicatedColorProvider.getMap3ColorProfile().getProfileId()));
 
 		new DialogMap3ColorEditor(//
 				Display.getCurrent().getActiveShell(),
@@ -1128,7 +1123,7 @@ public class PrefPageMap3Color extends PreferencePage implements IWorkbenchPrefe
 					message)) {
 
 				// update model
-				final Map3ColorDefinition colorDef = Map3ColorManager.getColorDefinition(selectedColorProvider
+				final Map3ColorDefinition colorDef = Map3GradientColorManager.getColorDefinition(selectedColorProvider
 						.getGraphId());
 
 				colorDef.removeColorProvider(selectedColorProvider);
@@ -1138,7 +1133,7 @@ public class PrefPageMap3Color extends PreferencePage implements IWorkbenchPrefe
 
 				// select active color provider
 				_colorProfileViewer.setSelection(new StructuredSelection(//
-						Map3ColorManager.getActiveColorProvider(colorDef.getGraphId())));
+						Map3GradientColorManager.getActiveMap3ColorProvider(colorDef.getGraphId())));
 
 				_colorProfileViewer.getTree().setFocus();
 			}
@@ -1164,6 +1159,8 @@ public class PrefPageMap3Color extends PreferencePage implements IWorkbenchPrefe
 
 		if (viewerItem instanceof Map3ColorDefinition) {
 
+			// prevent to check a color definition
+
 			final Map3ColorDefinition colorDef = (Map3ColorDefinition) viewerItem;
 
 			if (event.getChecked()) {
@@ -1182,7 +1179,7 @@ public class PrefPageMap3Color extends PreferencePage implements IWorkbenchPrefe
 
 			} else {
 
-				// color provider cannot be unchecked because at least one color provider must be checked
+				// a color provider cannot be unchecked, to be unckecked, another color provider must be checked
 
 				_colorProfileViewer.setChecked(colorProvider, true);
 			}
@@ -1214,8 +1211,8 @@ public class PrefPageMap3Color extends PreferencePage implements IWorkbenchPrefe
 
 			// set checked only active color providers
 
-			final Map3GradientColorProvider colorProvider = (Map3GradientColorProvider) element;
-			final boolean isActiveColorProfile = colorProvider.getMap3ColorProfile().isActiveColorProfile();
+			final Map3GradientColorProvider mgrColorProvider = (Map3GradientColorProvider) element;
+			final boolean isActiveColorProfile = mgrColorProvider.getMap3ColorProfile().isActiveColorProfile();
 
 			return isActiveColorProfile;
 		}
@@ -1338,6 +1335,10 @@ public class PrefPageMap3Color extends PreferencePage implements IWorkbenchPrefe
 	 */
 	private void onViewerSelectColor() {
 
+		if (_isInUIUpdate) {
+			return;
+		}
+
 		final IStructuredSelection selection = (IStructuredSelection) _colorProfileViewer.getSelection();
 
 		final Object selectedItem = selection.getFirstElement();
@@ -1350,8 +1351,6 @@ public class PrefPageMap3Color extends PreferencePage implements IWorkbenchPrefe
 		}
 
 		enableControls();
-
-		fireModifyEvent();
 	}
 
 	@Override
@@ -1399,6 +1398,7 @@ public class PrefPageMap3Color extends PreferencePage implements IWorkbenchPrefe
 
 		_colorProfileViewer.setInput(this);
 
+		// prevent to check color defintions
 		_colorProfileViewer.setGrayedElements(getColorDefinitions());
 	}
 
@@ -1418,7 +1418,7 @@ public class PrefPageMap3Color extends PreferencePage implements IWorkbenchPrefe
 				final MapGraphId graphId = MapGraphId.valueOf(graphIdValue);
 
 				if (graphId != null) {
-					expandedColorDefs.add(Map3ColorManager.getColorDefinition(graphId));
+					expandedColorDefs.add(Map3GradientColorManager.getColorDefinition(graphId));
 				}
 			}
 
@@ -1448,18 +1448,20 @@ public class PrefPageMap3Color extends PreferencePage implements IWorkbenchPrefe
 
 	/**
 	 * @param selectedColorProvider
+	 * @return Returns <code>true</code> when a new color provider is set, otherwise
+	 *         <code>false</code>.
 	 */
-	private void setActiveColorProvider(final Map3GradientColorProvider selectedColorProvider) {
+	private boolean setActiveColorProvider(final Map3GradientColorProvider selectedColorProvider) {
 
 		final Map3ColorProfile selectedColorProfile = selectedColorProvider.getMap3ColorProfile();
 
 		// check if the selected color provider is already the active color provider
 		if (selectedColorProfile.isActiveColorProfile()) {
-			return;
+			return false;
 		}
 
 		final MapGraphId graphId = selectedColorProvider.getGraphId();
-		final Map3ColorDefinition colorDefinition = Map3ColorManager.getColorDefinition(graphId);
+		final Map3ColorDefinition colorDefinition = Map3GradientColorManager.getColorDefinition(graphId);
 
 		final ArrayList<Map3GradientColorProvider> allGraphIdColorProvider = colorDefinition.getColorProviders();
 
@@ -1469,39 +1471,32 @@ public class PrefPageMap3Color extends PreferencePage implements IWorkbenchPrefe
 
 		} else {
 
-			// set as active color provider
+			// set selected color provider as active color provider
 
-			final IMapColorProvider activeColorProvider = MapColorProvider.getActiveMap3ColorProvider(graphId);
+			// reset state for previous color provider
+			final Map3GradientColorProvider oldActiveColorProvider = Map3GradientColorManager
+					.getActiveMap3ColorProvider(graphId);
+			_colorProfileViewer.setChecked(oldActiveColorProvider, false);
 
-			// apply colors only to gradient color provider
-			if (activeColorProvider instanceof Map3GradientColorProvider) {
+			// set state for selected color provider
+			_colorProfileViewer.setChecked(selectedColorProvider, true);
 
-				/*
-				 * Update model
-				 */
-				Map3ColorManager.setActiveColorProvider(selectedColorProvider);
+			// set new active color provider
+			Map3GradientColorManager.setActiveColorProvider(selectedColorProvider);
 
-				// update active color provider
-				final Map3GradientColorProvider activeMap3ColorProvider = (Map3GradientColorProvider) activeColorProvider;
-
-				activeMap3ColorProvider.setColorProfile(selectedColorProfile);
-
-				/*
-				 * Update UI
-				 */
-
-				// reset state for previous color provider
-				final Map3GradientColorProvider currentActiveColorProvider = Map3ColorManager
-						.getActiveColorProvider(graphId);
-				_colorProfileViewer.setChecked(currentActiveColorProvider, false);
-
-				// set state for selected color provider
-				_colorProfileViewer.setChecked(selectedColorProvider, true);
-
+			_isInUIUpdate = true;
+			{
 				// also select a checked color provider
 				_colorProfileViewer.setSelection(new StructuredSelection(selectedColorProvider));
 			}
+			_isInUIUpdate = false;
+
+			fireModifyEvent();
+
+			return true;
 		}
+
+		return false;
 	}
 
 }
