@@ -52,7 +52,7 @@ import de.byteholder.geoclipse.map.UI;
 /**
  * Photo properties dialog.
  */
-public class PhotoProperties extends AnimatedToolTipShell implements IPhotoEventListener {
+public class DialogPhotoProperties extends AnimatedToolTipShell implements IPhotoEventListener {
 
 	private static final int		SHELL_MARGIN							= 5;
 
@@ -140,7 +140,7 @@ public class PhotoProperties extends AnimatedToolTipShell implements IPhotoEvent
 		}
 	}
 
-	public PhotoProperties(final Control ownerControl, final ToolBar toolBar, final IDialogSettings state) {
+	public DialogPhotoProperties(final Control ownerControl, final ToolBar toolBar, final IDialogSettings state) {
 
 		super(ownerControl);
 
@@ -195,7 +195,7 @@ public class PhotoProperties extends AnimatedToolTipShell implements IPhotoEvent
 
 		updateUI();
 
-		updateUI_Colors(parent);
+		net.tourbook.common.UI.updateChildColors(parent, _fgColor, _bgColor);
 
 		if (_oldMapFilterData != null) {
 
@@ -600,29 +600,6 @@ public class PhotoProperties extends AnimatedToolTipShell implements IPhotoEvent
 
 		// image size
 		_spinnerImageSize.setSelection(_imageSize);
-	}
-
-	private void updateUI_Colors(final Control child) {
-
-		/*
-		 * ignore these controls because they do not look very good on Linux & OSX
-		 */
-		if (child instanceof Spinner || child instanceof Combo) {
-			return;
-		}
-
-		child.setForeground(_fgColor);
-		child.setBackground(_bgColor);
-
-		if (child instanceof Composite) {
-			final Control[] children = ((Composite) child).getChildren();
-			for (final Control element : children) {
-
-				if (element != null && element.isDisposed() == false) {
-					updateUI_Colors(element);
-				}
-			}
-		}
 	}
 
 }

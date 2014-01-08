@@ -111,8 +111,6 @@ public class ActionShowTourInMap3 extends ContributionItem {
 			_actionTrackLayer.setSelection(_isActionSelected);
 			_actionTrackLayer.setEnabled(_isActionEnabled);
 
-			_actionTrackLayer.setImage(_actionImage);
-
 			_actionTrackLayer.setToolTipText(Messages.map_action_show_tour_in_map);
 
 			_actionTrackLayer.addSelectionListener(new SelectionAdapter() {

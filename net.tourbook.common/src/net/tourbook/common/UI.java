@@ -783,6 +783,36 @@ public class UI {
 		return (new Timestamp()).toString();
 	}
 
+	/**
+	 * Update colors for all decendants.
+	 * 
+	 * @param child
+	 * @param bgColor
+	 * @param fgColor
+	 */
+	public static void updateChildColors(final Control child, final Color fgColor, final Color bgColor) {
+
+		/*
+		 * ignore these controls because they do not look very good on Linux & OSX
+		 */
+		if (child instanceof Spinner || child instanceof Combo) {
+			return;
+		}
+
+		child.setForeground(fgColor);
+		child.setBackground(bgColor);
+
+		if (child instanceof Composite) {
+			final Control[] children = ((Composite) child).getChildren();
+			for (final Control element : children) {
+
+				if (element != null && element.isDisposed() == false) {
+					updateChildColors(element, fgColor, bgColor);
+				}
+			}
+		}
+	}
+
 	public static void updateScrolledContent(final Composite composite) {
 
 		Composite child = composite;

@@ -75,7 +75,7 @@ import net.tourbook.photo.IPhotoPropertiesListener;
 import net.tourbook.photo.Photo;
 import net.tourbook.photo.PhotoEventId;
 import net.tourbook.photo.PhotoManager;
-import net.tourbook.photo.PhotoProperties;
+import net.tourbook.photo.DialogPhotoProperties;
 import net.tourbook.photo.PhotoPropertiesEvent;
 import net.tourbook.photo.PhotoSelection;
 import net.tourbook.photo.TourPhotoLink;
@@ -2760,9 +2760,9 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 		if (_isPhotoFilterActive) {
 
 			final boolean isNoStar = _photoFilterRatingStars == 0;
-			final boolean isEqual = _photoFilterRatingStarOperator == PhotoProperties.OPERATOR_IS_EQUAL;
-			final boolean isMore = _photoFilterRatingStarOperator == PhotoProperties.OPERATOR_IS_MORE_OR_EQUAL;
-			final boolean isLess = _photoFilterRatingStarOperator == PhotoProperties.OPERATOR_IS_LESS_OR_EQUAL;
+			final boolean isEqual = _photoFilterRatingStarOperator == DialogPhotoProperties.OPERATOR_IS_EQUAL;
+			final boolean isMore = _photoFilterRatingStarOperator == DialogPhotoProperties.OPERATOR_IS_MORE_OR_EQUAL;
+			final boolean isLess = _photoFilterRatingStarOperator == DialogPhotoProperties.OPERATOR_IS_LESS_OR_EQUAL;
 
 			for (final Photo photo : _allPhotos) {
 

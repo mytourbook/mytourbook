@@ -283,9 +283,9 @@ public class Map3GradientColorProvider extends MapGradientColorProvider implemen
 	@Override
 	public int getColorValue(final float graphValue) {
 
-		if (_absoluteVertices.length == 0) {
+		if (_absoluteVertices == null || _absoluteVertices.length == 0) {
 
-			// return a valid value
+			// color provider is not yet initialized, return a valid value
 			return 0xff00ff;
 		}
 

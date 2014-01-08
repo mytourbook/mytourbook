@@ -20,7 +20,7 @@ import net.tourbook.common.util.Util;
 import net.tourbook.map2.Messages;
 import net.tourbook.map2.view.Map2View;
 import net.tourbook.map2.view.MapFilterData;
-import net.tourbook.photo.PhotoProperties;
+import net.tourbook.photo.DialogPhotoProperties;
 
 import org.eclipse.jface.action.ContributionItem;
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -46,7 +46,7 @@ public class ActionPhotoProperties extends ContributionItem {
 
 	private Map2View			_mapView;
 
-	private PhotoProperties		_photoProperties;
+	private DialogPhotoProperties		_photoProperties;
 
 	private ToolBar				_toolBar;
 
@@ -63,7 +63,7 @@ public class ActionPhotoProperties extends ContributionItem {
 	private Image				_imageEnabledWithPhotos;
 	private Image				_imageDisabled;
 
-	public class PhotoPropertiesUI extends PhotoProperties {
+	public class PhotoPropertiesUI extends DialogPhotoProperties {
 
 		public PhotoPropertiesUI(final Control parent, final ToolBar toolBar, final IDialogSettings state) {
 			super(parent, toolBar, state);

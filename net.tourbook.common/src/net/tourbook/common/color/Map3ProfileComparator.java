@@ -15,31 +15,24 @@
  *******************************************************************************/
 package net.tourbook.common.color;
 
-/**
- * Graph id for tour tracks which are displayed in a 2D/3D map.
- * <p>
- * This id defines, which tour data are displayed, e.g. altitude, speed...
- */
-public enum MapGraphId {
+import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.jface.viewers.ViewerComparator;
 
-	Altitude,
-	//
-	Gradient,
-	//
-	Pulse,
-	//
-	Speed,
-	//
-	Pace,
-	//
-	HrZone,
+public class Map3ProfileComparator extends ViewerComparator {
 
-	// other graph id's
-	Altimeter,
+	@Override
+	public int compare(final Viewer viewer, final Object c1, final Object c2) {
 
-	Cadence,
+		if (c1 instanceof Map3GradientColorProvider && c2 instanceof Map3GradientColorProvider) {
 
-	Power,
+			// compare color profiles by name
 
-	Temperature
+			final Map3GradientColorProvider cp1 = (Map3GradientColorProvider) c1;
+			final Map3GradientColorProvider cp2 = (Map3GradientColorProvider) c2;
+
+			return cp1.getMap3ColorProfile().getProfileName().compareTo(cp2.getMap3ColorProfile().getProfileName());
+		}
+
+		return 0;
+	}
 }

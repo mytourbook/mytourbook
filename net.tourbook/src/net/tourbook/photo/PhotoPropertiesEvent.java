@@ -25,8 +25,8 @@ public class PhotoPropertiesEvent {
 	/**
 	 * Can be one of these operators:
 	 * <p>
-	 * {@link PhotoProperties#OPERATOR_IS_EQUAL}, {@link PhotoProperties#OPERATOR_IS_LESS_OR_EQUAL} or
-	 * {@link PhotoProperties#OPERATOR_IS_MORE_OR_EQUAL}
+	 * {@link DialogPhotoProperties#OPERATOR_IS_EQUAL}, {@link DialogPhotoProperties#OPERATOR_IS_LESS_OR_EQUAL} or
+	 * {@link DialogPhotoProperties#OPERATOR_IS_MORE_OR_EQUAL}
 	 */
 	public int	fiterRatingStarOperator;
 

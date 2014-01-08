@@ -24,6 +24,7 @@ import net.tourbook.common.color.Map3ColorDefinition;
 import net.tourbook.common.color.Map3ColorProfile;
 import net.tourbook.common.color.Map3GradientColorManager;
 import net.tourbook.common.color.Map3GradientColorProvider;
+import net.tourbook.common.color.Map3ProfileComparator;
 import net.tourbook.common.color.MapGraphId;
 import net.tourbook.common.color.ProfileImage;
 import net.tourbook.common.color.RGBVertex;
@@ -66,7 +67,6 @@ import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
-import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlAdapter;
@@ -210,25 +210,6 @@ public class PrefPageMap3Color extends PreferencePage implements IWorkbenchPrefe
 		}
 
 		public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
-	}
-
-	private class ProfileComparator extends ViewerComparator {
-
-		@Override
-		public int compare(final Viewer viewer, final Object c1, final Object c2) {
-
-			if (c1 instanceof Map3GradientColorProvider && c2 instanceof Map3GradientColorProvider) {
-
-				// compare color profiles by name
-
-				final Map3GradientColorProvider cp1 = (Map3GradientColorProvider) c1;
-				final Map3GradientColorProvider cp2 = (Map3GradientColorProvider) c2;
-
-				return cp1.getMap3ColorProfile().getProfileName().compareTo(cp2.getMap3ColorProfile().getProfileName());
-			}
-
-			return 0;
-		}
 	}
 
 	public PrefPageMap3Color() {
@@ -430,7 +411,7 @@ public class PrefPageMap3Color extends PreferencePage implements IWorkbenchPrefe
 		_columnIndexGraphImage = _colDefGraphImage.getCreateIndex();
 
 		_colorProfileViewer.setContentProvider(new ContentProvider());
-		_colorProfileViewer.setComparator(new ProfileComparator());
+		_colorProfileViewer.setComparator(new Map3ProfileComparator());
 
 		_colorProfileViewer.addSelectionChangedListener(new ISelectionChangedListener() {
 			public void selectionChanged(final SelectionChangedEvent event) {
@@ -738,7 +719,7 @@ public class PrefPageMap3Color extends PreferencePage implements IWorkbenchPrefe
 	}
 
 	/**
-	 * Column: Min value
+	 * Column: Max value
 	 */
 	private void defineColumn_35_MaxValue() {
 
@@ -785,7 +766,7 @@ public class PrefPageMap3Color extends PreferencePage implements IWorkbenchPrefe
 	}
 
 	/**
-	 * Column: Min value overwrite
+	 * Column: Max value overwrite
 	 */
 	private void defineColumn_36_MaxValueOverwrite() {
 
@@ -994,6 +975,8 @@ public class PrefPageMap3Color extends PreferencePage implements IWorkbenchPrefe
 			final Image oldImage = _profileImages.put(colorProvider, image);
 
 			Util.disposeResource(oldImage);
+
+			_oldImageWidth = imageWidth;
 		}
 
 		return image;

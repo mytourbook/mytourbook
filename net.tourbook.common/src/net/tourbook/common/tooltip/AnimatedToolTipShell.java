@@ -105,6 +105,7 @@ public abstract class AnimatedToolTipShell {
 
 	private int							_fadeInSteps							= FADE_IN_STEPS;
 	private int							_fadeOutSteps							= FADE_OUT_STEPS;
+	private int							_fadeOutDelaySteps						= FADE_OUT_DELAY_STEPS;
 
 	/*
 	 * these settings are modifying the default behaviour which was implemented to show a photo
@@ -375,7 +376,7 @@ public abstract class AnimatedToolTipShell {
 
 //		final long start = System.nanoTime();
 
-		if (_shell == null || _shell.isDisposed() || _shell.isVisible() == false) {
+		if (isShellHidden()) {
 			return;
 		}
 
@@ -443,7 +444,7 @@ public abstract class AnimatedToolTipShell {
 
 				} else if (_isShellFadingOut) {
 
-					if (_fadeOutDelayCounter++ < FADE_OUT_DELAY_STEPS) {
+					if (_fadeOutDelayCounter++ < _fadeOutDelaySteps) {
 
 						// delay fade out
 
@@ -518,7 +519,7 @@ public abstract class AnimatedToolTipShell {
 	}
 
 	/**
-	 * Is called before the tooltip shell is set to hidden.
+	 * Is called before the tooltip shell is set hidden.
 	 */
 	protected abstract void beforeHideToolTip();
 
@@ -698,6 +699,30 @@ public abstract class AnimatedToolTipShell {
 		ttHide();
 	}
 
+	/**
+	 * Hide the currently active tool tip without delay.
+	 */
+	public void hideNow() {
+
+		if (isShellHidden()) {
+			return;
+		}
+
+		_shell.setAlpha(0);
+
+		// hide shell
+		setShellVisible(false);
+	}
+
+	/**
+	 * @return Return <code>true</code> when the tooltip shell is <code>null</code>, disposed or not
+	 *         visible.
+	 */
+	private boolean isShellHidden() {
+
+		return _shell == null || _shell.isDisposed() || _shell.isVisible() == false;
+	}
+
 	protected boolean isToolTipVisible() {
 
 		if (_shell == null || _shell.isDisposed()) {
@@ -727,7 +752,7 @@ public abstract class AnimatedToolTipShell {
 
 //		final long start = System.nanoTime();
 
-		if (_shell == null || _shell.isDisposed() || _shell.isVisible() == false) {
+		if (isShellHidden()) {
 			return false;
 		}
 
@@ -1134,6 +1159,10 @@ public abstract class AnimatedToolTipShell {
 		_fadeInSteps = fadeInSteps;
 	}
 
+	public void setFadeOutDelaySteps(final int fadeOutDelaySteps) {
+		_fadeOutDelaySteps = fadeOutDelaySteps;
+	}
+
 	public void setFadeOutSteps(final int fadeOutSteps) {
 		_fadeOutSteps = fadeOutSteps;
 	}
@@ -1189,7 +1218,7 @@ public abstract class AnimatedToolTipShell {
 			return;
 		}
 
-		if (_shell == null || _shell.isDisposed() || _shell.isVisible() == false) {
+		if (isShellHidden()) {
 			return;
 		}
 
@@ -1214,7 +1243,7 @@ public abstract class AnimatedToolTipShell {
 
 	private void ttHide() {
 
-		if (_shell == null || _shell.isDisposed() || _shell.isVisible() == false) {
+		if (isShellHidden()) {
 			return;
 		}
 
@@ -1247,5 +1276,9 @@ public abstract class AnimatedToolTipShell {
 		_isShellFadingOut = false;
 
 		animation10_Start();
+	}
+
+	public int xxxget_fadeOutDelaySteps() {
+		return _fadeOutDelaySteps;
 	}
 }

@@ -120,6 +120,7 @@ import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISelectionListener;
@@ -134,21 +135,21 @@ public class Map3View extends ViewPart implements ITourProvider {
 
 	private static final String					OTHER_MESSAGES_01						= net.tourbook.common.Messages.Graph_Label_Heartbeat_unit;
 
-	private static final String					SLIDER_TEXT_ALTITUDE					= "%.1f %s";								//$NON-NLS-1$
-	private static final String					SLIDER_TEXT_GRADIENT					= "%.1f %%";								//$NON-NLS-1$
-	private static final String					SLIDER_TEXT_PACE						= "%s %s";									//$NON-NLS-1$
-	private static final String					SLIDER_TEXT_PULSE						= "%.0f %s";								//$NON-NLS-1$
-	private static final String					SLIDER_TEXT_SPEED						= "%.1f %s";								//$NON-NLS-1$
+	private static final String					SLIDER_TEXT_ALTITUDE					= "%.1f %s";												//$NON-NLS-1$
+	private static final String					SLIDER_TEXT_GRADIENT					= "%.1f %%";												//$NON-NLS-1$
+	private static final String					SLIDER_TEXT_PACE						= "%s %s";													//$NON-NLS-1$
+	private static final String					SLIDER_TEXT_PULSE						= "%.0f %s";												//$NON-NLS-1$
+	private static final String					SLIDER_TEXT_SPEED						= "%.1f %s";												//$NON-NLS-1$
 
-	public static final String					ID										= "net.tourbook.map3.view.Map3ViewId";		//$NON-NLS-1$
+	public static final String					ID										= "net.tourbook.map3.view.Map3ViewId";						//$NON-NLS-1$
 
-	private static final String					STATE_IS_LEGEND_VISIBLE					= "STATE_IS_LEGEND_VISIBLE";				//$NON-NLS-1$
-	private static final String					STATE_IS_SYNC_MAP_VIEW_WITH_TOUR		= "STATE_IS_SYNC_MAP_VIEW_WITH_TOUR";		//$NON-NLS-1$
-	private static final String					STATE_IS_SYNC_MAP_POSITION_WITH_SLIDER	= "STATE_IS_SYNC_MAP_POSITION_WITH_SLIDER"; //$NON-NLS-1$
-	private static final String					STATE_IS_TOUR_VISIBLE					= "STATE_IS_TOUR_VISIBLE";					//$NON-NLS-1$
-	private static final String					STATE_IS_TRACK_SLIDER_VISIBLE			= "STATE_IS_TRACK_SLIDERVISIBLE";			//$NON-NLS-1$
-	private static final String					STATE_MAP3_VIEW							= "STATE_MAP3_VIEW";						//$NON-NLS-1$
-	private static final String					STATE_TOUR_COLOR_ID						= "STATE_TOUR_COLOR_ID";					//$NON-NLS-1$
+	private static final String					STATE_IS_LEGEND_VISIBLE					= "STATE_IS_LEGEND_VISIBLE";								//$NON-NLS-1$
+	private static final String					STATE_IS_SYNC_MAP_VIEW_WITH_TOUR		= "STATE_IS_SYNC_MAP_VIEW_WITH_TOUR";						//$NON-NLS-1$
+	private static final String					STATE_IS_SYNC_MAP_POSITION_WITH_SLIDER	= "STATE_IS_SYNC_MAP_POSITION_WITH_SLIDER";				//$NON-NLS-1$
+	private static final String					STATE_IS_TOUR_VISIBLE					= "STATE_IS_TOUR_VISIBLE";									//$NON-NLS-1$
+	private static final String					STATE_IS_TRACK_SLIDER_VISIBLE			= "STATE_IS_TRACK_SLIDERVISIBLE";							//$NON-NLS-1$
+	private static final String					STATE_MAP3_VIEW							= "STATE_MAP3_VIEW";										//$NON-NLS-1$
+	private static final String					STATE_TOUR_COLOR_ID						= "STATE_TOUR_COLOR_ID";									//$NON-NLS-1$
 
 	private final IPreferenceStore				_prefStore								= TourbookPlugin.getDefault()//
 																								.getPreferenceStore();
@@ -180,6 +181,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 	private ActionTourColor						_actionTourColorSpeed;
 	private ActionTourColor						_actionTourColorPace;
 	private ActionTourColor						_actionTourColorHrZone;
+	private ArrayList<ActionTourColor>			_allColorActions;
 
 	// context menu actions
 	private ActionEditQuick						_actionEditQuick;
@@ -624,6 +626,39 @@ public class Map3View extends ViewPart implements ITourProvider {
 		TourManager.getInstance().addTourEventListener(_tourEventListener);
 	}
 
+	/**
+	 * @param colorId
+	 * @param selectedToolItem
+	 */
+	public void checkSelectedColorActions(final MapGraphId colorId, final ToolItem selectedToolItem) {
+
+		final boolean isChecked = selectedToolItem.getSelection();
+
+		if (colorId == _tourColorId) {
+
+			// active color is selected
+
+			if (isChecked == false) {
+
+				// prevent unchecking selected color
+				selectedToolItem.setSelection(true);
+			}
+
+			return;
+		}
+
+		// a new color is selected, uncheck previous color
+		for (final ActionTourColor colorAction : _allColorActions) {
+
+			final ToolItem actionToolItem = colorAction.getToolItem();
+
+			// unckeck other colors
+			if (actionToolItem != selectedToolItem) {
+				actionToolItem.setSelection(false);
+			}
+		}
+	}
+
 	private void cleanupOldTours() {
 
 		_currentTrackInfoSliderPosition = null;
@@ -640,6 +675,18 @@ public class Map3View extends ViewPart implements ITourProvider {
 		cleanupOldTours();
 
 		showAllTours_InternalTours();
+	}
+
+	public void closeOtherColorSelectDialogs(final ActionTourColor actionTourColor) {
+
+		for (final ActionTourColor colorAction : _allColorActions) {
+
+			// close only other dialogs
+
+			if (colorAction != actionTourColor) {
+				colorAction.closeDialog();
+			}
+		}
 	}
 
 	/**
@@ -712,12 +759,20 @@ public class Map3View extends ViewPart implements ITourProvider {
 		_actionSynMapWithChartSlider = new ActionSyncMapWithChartSlider(this);
 		_actionSynMapWithTour = new ActionSyncMapWithTour(this);
 
-		_actionTourColorAltitude = ActionTourColor.createAction(this, MapGraphId.Altitude);
-		_actionTourColorGradient = ActionTourColor.createAction(this, MapGraphId.Gradient);
-		_actionTourColorPace = ActionTourColor.createAction(this, MapGraphId.Pace);
-		_actionTourColorPulse = ActionTourColor.createAction(this, MapGraphId.Pulse);
-		_actionTourColorSpeed = ActionTourColor.createAction(this, MapGraphId.Speed);
-		_actionTourColorHrZone = ActionTourColor.createAction(this, MapGraphId.HrZone);
+		_actionTourColorAltitude = ActionTourColor.createAction(MapGraphId.Altitude, this, parent);
+		_actionTourColorGradient = ActionTourColor.createAction(MapGraphId.Gradient, this, parent);
+		_actionTourColorPace = ActionTourColor.createAction(MapGraphId.Pace, this, parent);
+		_actionTourColorPulse = ActionTourColor.createAction(MapGraphId.Pulse, this, parent);
+		_actionTourColorSpeed = ActionTourColor.createAction(MapGraphId.Speed, this, parent);
+		_actionTourColorHrZone = ActionTourColor.createAction(MapGraphId.HrZone, this, parent);
+
+		_allColorActions = new ArrayList<ActionTourColor>();
+		_allColorActions.add(_actionTourColorAltitude);
+		_allColorActions.add(_actionTourColorGradient);
+		_allColorActions.add(_actionTourColorPace);
+		_allColorActions.add(_actionTourColorPulse);
+		_allColorActions.add(_actionTourColorSpeed);
+		_allColorActions.add(_actionTourColorHrZone);
 
 		// context menu actions
 		_actionEditQuick = new ActionEditQuick(this);
@@ -976,6 +1031,20 @@ public class Map3View extends ViewPart implements ITourProvider {
 		if (_swtContextMenu != null) {
 			_swtContextMenu.dispose();
 		}
+	}
+
+	private void enableActions() {
+
+		final boolean isTrackVisible = Map3Manager.getLayer_TourTrack().isEnabled();
+		final boolean isTourAvailable = _allTours.size() > 0;
+		final boolean canTourBeDisplayed = isTrackVisible && isTourAvailable;
+
+		_actionTourColorAltitude.setEnabled(canTourBeDisplayed);
+		_actionTourColorGradient.setEnabled(canTourBeDisplayed);
+		_actionTourColorPace.setEnabled(canTourBeDisplayed);
+		_actionTourColorPulse.setEnabled(canTourBeDisplayed);
+		_actionTourColorSpeed.setEnabled(canTourBeDisplayed);
+		_actionTourColorHrZone.setEnabled(canTourBeDisplayed);
 	}
 
 	private void enableContextMenuActions() {
@@ -1409,6 +1478,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 			_tourColorId = MapGraphId.Altitude;
 		}
 
+		// select/check active color
 		switch (_tourColorId) {
 		case Altitude:
 			_actionTourColorAltitude.setChecked(true);
@@ -1435,8 +1505,6 @@ public class Map3View extends ViewPart implements ITourProvider {
 			break;
 
 		default:
-			_tourColorId = MapGraphId.Altitude;
-			_actionTourColorAltitude.setChecked(true);
 			break;
 		}
 
@@ -1598,7 +1666,11 @@ public class Map3View extends ViewPart implements ITourProvider {
 		Map3Manager.getLayer_TourLegend().setColorProvider(colorProvider);
 
 		Map3Manager.getLayer_TourTrack().updateColors(_allTours);
-		
+
+		for (final ActionTourColor colorAction : _allColorActions) {
+			colorAction.disposeColors();
+		}
+
 		showAllTours(false);
 	}
 
@@ -1725,6 +1797,8 @@ public class Map3View extends ViewPart implements ITourProvider {
 		updateTrackSlider();
 
 		Map3Manager.redrawMap();
+
+		enableActions();
 	}
 
 	private void showAllTours_InternalTours() {
@@ -1806,6 +1880,44 @@ public class Map3View extends ViewPart implements ITourProvider {
 			showAllTours_NewTours(_allTours);
 		}
 	}
+
+	//	public static final String	ALL						= "gov.nasa.worldwind.perfstat.All";
+//
+//	public static final String	FRAME_RATE				= "gov.nasa.worldwind.perfstat.FrameRate";
+//	public static final String	FRAME_TIME				= "gov.nasa.worldwind.perfstat.FrameTime";
+//	public static final String	PICK_TIME				= "gov.nasa.worldwind.perfstat.PickTime";
+//
+//	public static final String	TERRAIN_TILE_COUNT		= "gov.nasa.worldwind.perfstat.TerrainTileCount";
+//	public static final String	IMAGE_TILE_COUNT		= "gov.nasa.worldwind.perfstat.ImageTileCount";
+//
+//	public static final String	AIRSPACE_GEOMETRY_COUNT	= "gov.nasa.worldwind.perfstat.AirspaceGeometryCount";
+//	public static final String	AIRSPACE_VERTEX_COUNT	= "gov.nasa.worldwind.perfstat.AirspaceVertexCount";
+//
+//	public static final String	JVM_HEAP				= "gov.nasa.worldwind.perfstat.JvmHeap";
+//	public static final String	JVM_HEAP_USED			= "gov.nasa.worldwind.perfstat.JvmHeapUsed";
+//
+//	public static final String	MEMORY_CACHE			= "gov.nasa.worldwind.perfstat.MemoryCache";
+//	public static final String	TEXTURE_CACHE			= "gov.nasa.worldwind.perfstat.TextureCache";
+
+//2013-10-06 10:12:12.317'955 [Map3View] 	         0  Frame Rate (fps)
+//2013-10-06 10:12:12.317'982 [Map3View] 	       152  Frame Time (ms)
+//2013-10-06 10:12:12.318'366 [Map3View] 	         8  Pick Time (ms)
+
+//2013-10-06 10:12:12.318'392 [Map3View] 	        91  Terrain Tiles
+
+//2013-10-06 10:12:12.318'169 [Map3View] 	      6252  Cache Size (Kb): Terrain
+//2013-10-06 10:12:12.318'191 [Map3View] 	         0  Cache Size (Kb): Placename Tiles
+//2013-10-06 10:12:12.318'214 [Map3View] 	      1860  Cache Size (Kb): Texture Tiles
+//2013-10-06 10:12:12.318'289 [Map3View] 	      3870  Cache Size (Kb): Elevation Tiles
+//2013-10-06 10:12:12.318'414 [Map3View] 	    422617  Texture Cache size (Kb)
+
+//2013-10-06 10:12:12.318'007 [Map3View] 	         2  Blue Marble (WMS) 2004 Tiles
+//2013-10-06 10:12:12.318'044 [Map3View] 	        35  i-cubed Landsat Tiles
+//2013-10-06 10:12:12.318'069 [Map3View] 	        84  MS Virtual Earth Aerial Tiles
+//2013-10-06 10:12:12.318'093 [Map3View] 	        84  Bing Imagery Tiles
+
+//2013-10-06 10:12:12.318'118 [Map3View] 	    463659  JVM total memory (Kb)
+//2013-10-06 10:12:12.318'141 [Map3View] 	    431273  JVM used memory (Kb)
 
 	private void showToursFromTourProvider() {
 
@@ -1944,44 +2056,6 @@ public class Map3View extends ViewPart implements ITourProvider {
 		}
 	}
 
-	//	public static final String	ALL						= "gov.nasa.worldwind.perfstat.All";
-//
-//	public static final String	FRAME_RATE				= "gov.nasa.worldwind.perfstat.FrameRate";
-//	public static final String	FRAME_TIME				= "gov.nasa.worldwind.perfstat.FrameTime";
-//	public static final String	PICK_TIME				= "gov.nasa.worldwind.perfstat.PickTime";
-//
-//	public static final String	TERRAIN_TILE_COUNT		= "gov.nasa.worldwind.perfstat.TerrainTileCount";
-//	public static final String	IMAGE_TILE_COUNT		= "gov.nasa.worldwind.perfstat.ImageTileCount";
-//
-//	public static final String	AIRSPACE_GEOMETRY_COUNT	= "gov.nasa.worldwind.perfstat.AirspaceGeometryCount";
-//	public static final String	AIRSPACE_VERTEX_COUNT	= "gov.nasa.worldwind.perfstat.AirspaceVertexCount";
-//
-//	public static final String	JVM_HEAP				= "gov.nasa.worldwind.perfstat.JvmHeap";
-//	public static final String	JVM_HEAP_USED			= "gov.nasa.worldwind.perfstat.JvmHeapUsed";
-//
-//	public static final String	MEMORY_CACHE			= "gov.nasa.worldwind.perfstat.MemoryCache";
-//	public static final String	TEXTURE_CACHE			= "gov.nasa.worldwind.perfstat.TextureCache";
-
-//2013-10-06 10:12:12.317'955 [Map3View] 	         0  Frame Rate (fps)
-//2013-10-06 10:12:12.317'982 [Map3View] 	       152  Frame Time (ms)
-//2013-10-06 10:12:12.318'366 [Map3View] 	         8  Pick Time (ms)
-
-//2013-10-06 10:12:12.318'392 [Map3View] 	        91  Terrain Tiles
-
-//2013-10-06 10:12:12.318'169 [Map3View] 	      6252  Cache Size (Kb): Terrain
-//2013-10-06 10:12:12.318'191 [Map3View] 	         0  Cache Size (Kb): Placename Tiles
-//2013-10-06 10:12:12.318'214 [Map3View] 	      1860  Cache Size (Kb): Texture Tiles
-//2013-10-06 10:12:12.318'289 [Map3View] 	      3870  Cache Size (Kb): Elevation Tiles
-//2013-10-06 10:12:12.318'414 [Map3View] 	    422617  Texture Cache size (Kb)
-
-//2013-10-06 10:12:12.318'007 [Map3View] 	         2  Blue Marble (WMS) 2004 Tiles
-//2013-10-06 10:12:12.318'044 [Map3View] 	        35  i-cubed Landsat Tiles
-//2013-10-06 10:12:12.318'069 [Map3View] 	        84  MS Virtual Earth Aerial Tiles
-//2013-10-06 10:12:12.318'093 [Map3View] 	        84  Bing Imagery Tiles
-
-//2013-10-06 10:12:12.318'118 [Map3View] 	    463659  JVM total memory (Kb)
-//2013-10-06 10:12:12.318'141 [Map3View] 	    431273  JVM used memory (Kb)
-
 	/**
 	 * Enable actions according to the available tours in {@link #_allTours}.
 	 */
@@ -2002,7 +2076,6 @@ public class Map3View extends ViewPart implements ITourProvider {
 		_actionShowTrackSlider.setChecked(isTrackSliderVisible);
 		_actionShowMarker.setChecked(isMarkerVisible);
 	}
-
 
 	private void updateModifiedTours(final ArrayList<TourData> modifiedTours) {
 

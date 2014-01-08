@@ -501,7 +501,7 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 				 * Button: Track color
 				 */
 				_btnTrackColor = new Button(container, SWT.PUSH);
-				_btnTrackColor.setImage(net.tourbook.ui.UI.IMAGE_REGISTRY.get(net.tourbook.ui.UI.GRAPH_ALTITUDE));
+				_btnTrackColor.setImage(net.tourbook.ui.UI.getGraphImage(MapGraphId.Altitude));
 				_btnTrackColor.addSelectionListener(new SelectionAdapter() {
 					@Override
 					public void widgetSelected(final SelectionEvent e) {
