@@ -68,7 +68,7 @@ public class VersionApplet extends Applet {
 	}
 
 	public static void main(final String[] args) {
-		final Frame frame = new Frame("JOGL Version Applet");
+		final Frame frame = new Frame("JOGL Version Applet"); //$NON-NLS-1$
 		frame.setSize(800, 600);
 		frame.setLayout(new BorderLayout());
 
@@ -85,16 +85,16 @@ public class VersionApplet extends Applet {
 
 	@Override
 	public void destroy() {
-		System.err.println("VersionApplet: destroy() - start");
+		System.err.println("VersionApplet: destroy() - start"); //$NON-NLS-1$
 		my_release();
-		System.err.println("VersionApplet: destroy() - end");
+		System.err.println("VersionApplet: destroy() - end"); //$NON-NLS-1$
 	}
 
 	@Override
 	public void init() {
-		System.err.println("VersionApplet: init() - begin");
+		System.err.println("VersionApplet: init() - begin"); //$NON-NLS-1$
 		my_init();
-		System.err.println("VersionApplet: init() - end");
+		System.err.println("VersionApplet: init() - end"); //$NON-NLS-1$
 	}
 
 	private synchronized void my_init() {
@@ -165,16 +165,16 @@ public class VersionApplet extends Applet {
 
 	@Override
 	public void start() {
-		System.err.println("VersionApplet: start() - begin");
+		System.err.println("VersionApplet: start() - begin"); //$NON-NLS-1$
 		canvas.setVisible(true);
-		System.err.println("VersionApplet: start() - end");
+		System.err.println("VersionApplet: start() - end"); //$NON-NLS-1$
 	}
 
 	@Override
 	public void stop() {
-		System.err.println("VersionApplet: stop() - begin");
+		System.err.println("VersionApplet: stop() - begin"); //$NON-NLS-1$
 		canvas.setVisible(false);
-		System.err.println("VersionApplet: stop() - end");
+		System.err.println("VersionApplet: stop() - end"); //$NON-NLS-1$
 	}
 
 }

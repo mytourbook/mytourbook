@@ -41,12 +41,6 @@ public abstract class MapColorProfile {
 	protected int					minBrightnessFactor			= BRIGHTNESS_FACTOR_DEFAULT;
 	protected int					maxBrightnessFactor			= BRIGHTNESS_FACTOR_DEFAULT;
 
-	protected boolean				isMinValueOverwrite			= false;
-	protected boolean				isMaxValueOverwrite			= false;
-
-	protected int					minValueOverwrite;
-	protected int					maxValueOverwrite;
-
 	public MapColorProfile() {
 		super();
 	}
@@ -59,36 +53,12 @@ public abstract class MapColorProfile {
 		return maxBrightnessFactor;
 	}
 
-	public int getMaxValueOverwrite() {
-		return maxValueOverwrite;
-	}
-
 	public int getMinBrightness() {
 		return minBrightness;
 	}
 
 	public int getMinBrightnessFactor() {
 		return minBrightnessFactor;
-	}
-
-	public int getMinValueOverwrite() {
-		return minValueOverwrite;
-	}
-
-	public boolean isMaxValueOverwrite() {
-		return isMaxValueOverwrite;
-	}
-
-	public boolean isMinValueOverwrite() {
-		return isMinValueOverwrite;
-	}
-
-	public void setIsMaxValueOverwrite(final boolean isMaxValueOverwrite) {
-		this.isMaxValueOverwrite = isMaxValueOverwrite;
-	}
-
-	public void setIsMinValueOverwrite(final boolean isMinValueOverwrite) {
-		this.isMinValueOverwrite = isMinValueOverwrite;
 	}
 
 	public void setMaxBrightness(final int maxBrightness) {
@@ -99,20 +69,12 @@ public abstract class MapColorProfile {
 		this.maxBrightnessFactor = maxBrightnessFactor;
 	}
 
-	public void setMaxValueOverwrite(final int overwriteMaxValue) {
-		this.maxValueOverwrite = overwriteMaxValue;
-	}
-
 	public void setMinBrightness(final int minBrightness) {
 		this.minBrightness = minBrightness;
 	}
 
 	public void setMinBrightnessFactor(final int minBrightnessFactor) {
 		this.minBrightnessFactor = minBrightnessFactor;
-	}
-
-	public void setMinValueOverwrite(final int overwriteMinValue) {
-		this.minValueOverwrite = overwriteMinValue;
 	}
 
 	public String toString_dis() {
@@ -122,18 +84,10 @@ public abstract class MapColorProfile {
 				+ "   minBrightness			=%s\n" //$NON-NLS-1$
 				+ "   minBrightnessFactor	=%s\n" //$NON-NLS-1$
 				+ "   maxBrightness			=%s\n" //$NON-NLS-1$
-				+ "   maxBrightnessFactor	=%s\n" //$NON-NLS-1$
-				+ "   isMaxValueOverwrite	=%s\n" //$NON-NLS-1$
-				+ "   overwriteMaxValue		=%s\n" //$NON-NLS-1$
-				+ "   isMinValueOverwrite	=%s\n" //$NON-NLS-1$
-				+ "   overwriteMinValue		=%s\n", //$NON-NLS-1$
+				+ "   maxBrightnessFactor	=%s\n", //$NON-NLS-1$
 				minBrightness,
 				minBrightnessFactor,
 				maxBrightness,
-				maxBrightnessFactor,
-				isMaxValueOverwrite,
-				maxValueOverwrite,
-				isMinValueOverwrite,
-				minValueOverwrite);
+				maxBrightnessFactor);
 	}
 }

@@ -384,7 +384,7 @@ public class ConconiChartView extends ViewPart {
 		 */
 		final ChartDataXSerie xDataPower = new ChartDataXSerie(powerSerie);
 		xDataPower.setLabel(net.tourbook.common.Messages.Graph_Label_Power);
-		xDataPower.setUnitLabel(net.tourbook.common.Messages.Graph_Label_Power_unit);
+		xDataPower.setUnitLabel(net.tourbook.common.Messages.Graph_Label_Power_Unit);
 
 		/*
 		 * double is not yet supported for the y-axis
@@ -396,7 +396,7 @@ public class ConconiChartView extends ViewPart {
 		 */
 		_yDataPulse = new ChartDataYSerie(ChartType.XY_SCATTER, pulseSerieFloat);
 		_yDataPulse.setYTitle(net.tourbook.common.Messages.Graph_Label_Heartbeat);
-		_yDataPulse.setUnitLabel(net.tourbook.common.Messages.Graph_Label_Heartbeat_unit);
+		_yDataPulse.setUnitLabel(net.tourbook.common.Messages.Graph_Label_Heartbeat_Unit);
 		_yDataPulse.setDefaultRGB(rgbPrefLine);
 		_yDataPulse.setRgbLine(rgbLine);
 		_yDataPulse.setRgbDark(rgbDark);
@@ -614,7 +614,7 @@ public class ConconiChartView extends ViewPart {
 					// label: heartbeat unit
 					label = new Label(containerValues, SWT.NONE);
 					GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(label);
-					label.setText(net.tourbook.common.Messages.Graph_Label_Heartbeat_unit);
+					label.setText(net.tourbook.common.Messages.Graph_Label_Heartbeat_Unit);
 
 					// label: power value
 					_lblDeflactionPower = new Label(containerValues, SWT.TRAIL);

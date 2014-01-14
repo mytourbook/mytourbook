@@ -181,14 +181,14 @@ public class PrefPageAppearanceColors extends PreferencePage implements IWorkben
 		colorProfile.setColorValues(_legendImageColors);
 
 		// update legend configuations
-		final MapUnits legendConfig = colorProvider.getMapUnits();
+		final MapUnits mapUnits = colorProvider.getMapUnits();
 
-		legendConfig.units = _legendImageUnitValues;
-		legendConfig.unitLabels = _legendImageUnitLabels;
-		legendConfig.unitText = UI.EMPTY_STRING;
+		mapUnits.units = _legendImageUnitValues;
+		mapUnits.unitLabels = _legendImageUnitLabels;
+		mapUnits.unitText = UI.EMPTY_STRING;
 
-		legendConfig.legendMinValue = LEGEND_MIN_VALUE;
-		legendConfig.legendMaxValue = LEGEND_MAX_VALUE;
+		mapUnits.legendMinValue = LEGEND_MIN_VALUE;
+		mapUnits.legendMaxValue = LEGEND_MAX_VALUE;
 
 		return colorProvider;
 	}

@@ -50,6 +50,7 @@ import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
@@ -75,7 +76,6 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Spinner;
@@ -94,32 +94,23 @@ public class DialogMap3ColorEditor extends TitleAreaDialog implements IProfileCo
 	 * Map2 massages are defined here that externalizing strings can be done easily by disabling
 	 * temporarily the messages.
 	 */
-	private static final String			MAP2_MESSAGE_1			= net.tourbook.map2.Messages.legendcolor_dialog_group_minmax_value;
-	private static final String			MAP2_MESSAGE_2			= net.tourbook.map2.Messages.legendcolor_dialog_chk_max_value_text;
-	private static final String			MAP2_MESSAGE_3			= net.tourbook.map2.Messages.legendcolor_dialog_chk_max_value_tooltip;
-	private static final String			MAP2_MESSAGE_4			= net.tourbook.map2.Messages.legendcolor_dialog_txt_max_value;
-	private static final String			MAP2_MESSAGE_5			= net.tourbook.map2.Messages.legendcolor_dialog_chk_min_value_text;
-	private static final String			MAP2_MESSAGE_6			= net.tourbook.map2.Messages.legendcolor_dialog_chk_min_value_tooltip;
-	private static final String			MAP2_MESSAGE_7			= net.tourbook.map2.Messages.legendcolor_dialog_txt_min_value;
-	private static final String			MAP2_MESSAGE_8			= net.tourbook.map2.Messages.legendcolor_dialog_group_minmax_brightness;
-	private static final String			MAP2_MESSAGE_9			= net.tourbook.map2.Messages.legendcolor_dialog_max_brightness_label;
-	private static final String			MAP2_MESSAGE_10			= net.tourbook.map2.Messages.legendcolor_dialog_max_brightness_tooltip;
-	private static final String			MAP2_MESSAGE_11			= net.tourbook.map2.Messages.legendcolor_dialog_min_brightness_label;
-	private static final String			MAP2_MESSAGE_12			= net.tourbook.map2.Messages.legendcolor_dialog_min_brightness_tooltip;
-	private static final String			MAP2_MESSAGE_13			= net.tourbook.map2.Messages.LegendColor_Dialog_Check_LiveUpdate;
-	private static final String			MAP2_MESSAGE_14			= net.tourbook.map2.Messages.LegendColor_Dialog_Check_LiveUpdate_Tooltip;
-	private static final String			MAP2_MESSAGE_15			= net.tourbook.map2.Messages.legendcolor_dialog_error_max_greater_min;
-	//
-	private static final int			SPINNER_MIN_VALUE		= -200;
-	private static final int			SPINNER_MAX_VALUE		= 10000;
+	private static final String			LEGEND_COLOR_DIALOG_CHECK_LIVE_UPDATE			= net.tourbook.map2.Messages.LegendColor_Dialog_Check_LiveUpdate;
+	private static final String			LEGEND_COLOR_DIALOG_CHECK_LIVE_UPDATE_TOOLTIP	= net.tourbook.map2.Messages.LegendColor_Dialog_Check_LiveUpdate_Tooltip;
+	private static final String			LEGENDCOLOR_DIALOG_MIN_BRIGHTNESS_LABEL			= net.tourbook.map2.Messages.legendcolor_dialog_min_brightness_label;
+	private static final String			LEGENDCOLOR_DIALOG_MIN_BRIGHTNESS_TOOLTIP		= net.tourbook.map2.Messages.legendcolor_dialog_min_brightness_tooltip;
+	private static final String			LEGENDCOLOR_DIALOG_MAX_BRIGHTNESS_LABEL			= net.tourbook.map2.Messages.legendcolor_dialog_max_brightness_label;
+	private static final String			LEGENDCOLOR_DIALOG_MAX_BRIGHTNESS_TOOLTIP		= net.tourbook.map2.Messages.legendcolor_dialog_max_brightness_tooltip;
 
-	private static final String			STATE_IS_LIVE_UPDATE	= "STATE_IS_LIVE_UPDATE";													//$NON-NLS-1$
+	private static final String			STATE_IS_LIVE_UPDATE							= "STATE_IS_LIVE_UPDATE";													//$NON-NLS-1$
 
-	private static final String			DATA_KEY_VERTEX_INDEX	= "DATA_KEY_VERTEX_INDEX";													//$NON-NLS-1$
-	private static final String			DATA_KEY_SORT_ID		= "DATA_KEY_SORT_ID";														//$NON-NLS-1$
+	private static final String			DATA_KEY_VERTEX_INDEX							= "DATA_KEY_VERTEX_INDEX";													//$NON-NLS-1$
+	private static final String			DATA_KEY_SORT_ID								= "DATA_KEY_SORT_ID";														//$NON-NLS-1$
 
-	private final IDialogSettings		_state					= TourbookPlugin.getDefault().getDialogSettingsSection(
-																		getClass().getName());
+	private final IDialogSettings		_state											= TourbookPlugin
+																								.getDefault()
+																								.getDialogSettingsSection(
+																										getClass()
+																												.getName());
 
 	/**
 	 * Contains a clone from {@link #_originalColorProvider}.
@@ -132,15 +123,15 @@ public class DialogMap3ColorEditor extends TitleAreaDialog implements IProfileCo
 	private boolean						_isUIValid;
 	private boolean						_isInUIUpdate;
 
+	private IMap3ColorUpdater			_mapColorUpdater;
+
+	private MouseWheelListener			_defaultMouseWheelListener;
+	private SelectionAdapter			_defaultSelectionAdapter;
+
 	/*
 	 * UI resources
 	 */
-	private ColorChooser				_colorChooser;
-
-	private IMap3ColorUpdater			_mapColorUpdater;
-
-	private MouseWheelListener			_mouseWheelListener;
-	private SelectionAdapter			_selectionAdapter;
+	private PixelConverter				_pc;
 
 	/*
 	 * UI controls
@@ -149,27 +140,26 @@ public class DialogMap3ColorEditor extends TitleAreaDialog implements IProfileCo
 	private Composite					_vertexOuterContainer;
 	private ScrolledComposite			_vertexScrolledContainer;
 
+	private ColorChooser				_colorChooser;
 	private ImageCanvas					_canvasProfileImage;
 	private Image						_profileImage;
 
 	private Button						_btnApply;
 	private Button						_btnSave;
-//	private Button						_btnRemove;
-	private Button						_chkForceMinValue;
-	private Button						_chkForceMaxValue;
 	private Button						_chkLiveUpdate;
 
 	private Combo						_cboGraphType;
 	private Combo						_cboMinBrightness;
 	private Combo						_cboMaxBrightness;
 
-	private Label						_lblMinValue;
-	private Label						_lblMaxValue;
+	private Label						_lblMaxBrightness;
+	private Label						_lblMinBrightness;
+
+	private Button						_rdoAbsoluteValues;
+	private Button						_rdoRelativeValues;
 
 	private Spinner						_spinMinBrightness;
 	private Spinner						_spinMaxBrightness;
-	private Spinner						_spinMinValue;
-	private Spinner						_spinMaxValue;
 
 	private Text						_txtProfileName;
 
@@ -180,14 +170,14 @@ public class DialogMap3ColorEditor extends TitleAreaDialog implements IProfileCo
 //	private Label[]						_lblDebug;
 
 	{
-		_selectionAdapter = new SelectionAdapter() {
+		_defaultSelectionAdapter = new SelectionAdapter() {
 			@Override
 			public void widgetSelected(final SelectionEvent e) {
 				onSelectControl();
 			}
 		};
 
-		_mouseWheelListener = new MouseWheelListener() {
+		_defaultMouseWheelListener = new MouseWheelListener() {
 			public void mouseScrolled(final MouseEvent event) {
 				UI.adjustSpinnerValueOnMouseScroll(event);
 				onSelectControl();
@@ -345,6 +335,8 @@ public class DialogMap3ColorEditor extends TitleAreaDialog implements IProfileCo
 	@Override
 	protected Control createDialogArea(final Composite parent) {
 
+		_pc = new PixelConverter(parent);
+
 		final Composite dlgContainer = (Composite) super.createDialogArea(parent);
 
 		createUI(dlgContainer);
@@ -381,8 +373,7 @@ public class DialogMap3ColorEditor extends TitleAreaDialog implements IProfileCo
 //					vertexContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
 					{
 						createUI_40_VertexFields(vertexContainer);
-						createUI_62_Brightness(vertexContainer);
-						createUI_60_MinMaxValue(vertexContainer);
+						createUI_60_AdjustValues(vertexContainer);
 					}
 				}
 			}
@@ -406,7 +397,7 @@ public class DialogMap3ColorEditor extends TitleAreaDialog implements IProfileCo
 				label.setToolTipText(Messages.Map3Color_Dialog_Button_Label_GraphType_Tooltip);
 
 				_cboGraphType = new Combo(container, SWT.DROP_DOWN | SWT.READ_ONLY);
-				_cboGraphType.addSelectionListener(_selectionAdapter);
+				_cboGraphType.addSelectionListener(_defaultSelectionAdapter);
 			}
 
 			{
@@ -425,7 +416,7 @@ public class DialogMap3ColorEditor extends TitleAreaDialog implements IProfileCo
 					public void keyTraversed(final TraverseEvent e) {
 
 						// do live update
-						onModifyProfileName();
+						onModifyProfileName(e);
 					}
 				});
 			}
@@ -441,7 +432,7 @@ public class DialogMap3ColorEditor extends TitleAreaDialog implements IProfileCo
 		GridDataFactory.fillDefaults()//
 				.grab(true, true)
 //				.minSize(SWT.DEFAULT, 20)
-//				.hint(SWT.DEFAULT, 20)
+				.hint(_pc.convertWidthInCharsToPixels(20), SWT.DEFAULT)
 				.applyTo(_canvasProfileImage);
 
 		_canvasProfileImage.addControlListener(new ControlAdapter() {
@@ -557,7 +548,6 @@ public class DialogMap3ColorEditor extends TitleAreaDialog implements IProfileCo
 			/*
 			 * Label: Value color
 			 */
-//			final Label lblColor = new Label(vertexContainer, SWT.CENTER | SWT.BORDER | SWT.SHADOW_NONE);
 			final Label lblColor = new Label(vertexContainer, SWT.NONE);
 			GridDataFactory.fillDefaults()//
 					.grab(true, false)
@@ -631,124 +621,116 @@ public class DialogMap3ColorEditor extends TitleAreaDialog implements IProfileCo
 		return vertexContainer;
 	}
 
-	private void createUI_60_MinMaxValue(final Composite parent) {
+	private void createUI_60_AdjustValues(final Composite parent) {
 
-		final Group group = new Group(parent, SWT.NONE);
-		GridDataFactory.fillDefaults()//
-				.grab(true, false)
-				.applyTo(group);
-		GridLayoutFactory.swtDefaults().numColumns(3).applyTo(group);
-		group.setText(MAP2_MESSAGE_1);
-//		group.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_MAGENTA));
+//		final Group group = new Group(parent, SWT.NONE);
+//		GridDataFactory.fillDefaults()//
+//				.grab(true, false)
+//				.applyTo(group);
+//		GridLayoutFactory.swtDefaults().numColumns(2).applyTo(group);
+//		group.setText(Messages.Map3Color_Dialog_Group_AdjustValues);
+//		group.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_CYAN));
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
 		{
-			{
-				/*
-				 * Overwrite max value
-				 */
-				_chkForceMaxValue = new Button(group, SWT.CHECK);
-				GridDataFactory.fillDefaults()//
-						.grab(true, false)
-						.applyTo(_chkForceMaxValue);
-				_chkForceMaxValue.setText(MAP2_MESSAGE_2);
-				_chkForceMaxValue.setToolTipText(MAP2_MESSAGE_3);
-				_chkForceMaxValue.addSelectionListener(_selectionAdapter);
-
-				_lblMaxValue = new Label(group, SWT.NONE);
-				_lblMaxValue.setText(MAP2_MESSAGE_4);
-				GridDataFactory.fillDefaults()//
-//						.indent(20, 0)
-						.align(SWT.FILL, SWT.CENTER)
-						.applyTo(_lblMaxValue);
-
-				_spinMaxValue = new Spinner(group, SWT.BORDER);
-				_spinMaxValue.setMinimum(SPINNER_MIN_VALUE);
-				_spinMaxValue.setMaximum(SPINNER_MAX_VALUE);
-				_spinMaxValue.addSelectionListener(_selectionAdapter);
-				_spinMaxValue.addMouseWheelListener(_mouseWheelListener);
-			}
-			{
-				/*
-				 * Overwrite min value
-				 */
-				_chkForceMinValue = new Button(group, SWT.CHECK);
-				GridDataFactory.fillDefaults()//
-						.grab(true, false)
-						.applyTo(_chkForceMinValue);
-				_chkForceMinValue.setText(MAP2_MESSAGE_5);
-				_chkForceMinValue.setToolTipText(MAP2_MESSAGE_6);
-				_chkForceMinValue.addSelectionListener(_selectionAdapter);
-
-				_lblMinValue = new Label(group, SWT.NONE);
-				GridDataFactory.fillDefaults()//
-//						.indent(20, 0)
-						.align(SWT.FILL, SWT.CENTER)
-						.applyTo(_lblMinValue);
-				_lblMinValue.setText(MAP2_MESSAGE_7);
-
-				_spinMinValue = new Spinner(group, SWT.BORDER);
-				_spinMinValue.setMinimum(SPINNER_MIN_VALUE);
-				_spinMinValue.setMaximum(SPINNER_MAX_VALUE);
-				_spinMinValue.addSelectionListener(_selectionAdapter);
-				_spinMinValue.addMouseWheelListener(_mouseWheelListener);
-			}
+			createUI_62_AbsoluteRelativeValue(container);
+			createUI_64_Brightness(container);
 		}
 	}
 
-	private void createUI_62_Brightness(final Composite parent) {
+	private void createUI_62_AbsoluteRelativeValue(final Composite parent) {
 
-		Label label;
+		final Label label = new Label(parent, SWT.NONE);
+//		GridDataFactory.fillDefaults().applyTo(label);
+		label.setText(Messages.Map3Color_Dialog_Label_Values);
 
-		final Group group = new Group(parent, SWT.NONE);
+		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults()//
-				.grab(true, false)
-				.applyTo(group);
-		GridLayoutFactory.swtDefaults().numColumns(3).applyTo(group);
-		group.setText(MAP2_MESSAGE_8);
-//		group.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_CYAN));
+//					.grab(true, false)
+//				.span(3, 1)
+				.applyTo(container);
+		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
 		{
+			/*
+			 * Radio: Relative
+			 */
+			_rdoRelativeValues = new Button(container, SWT.RADIO);
+//				GridDataFactory.fillDefaults().applyTo(_rdoRelativeValues);
+			_rdoRelativeValues.setText(Messages.Map3Color_Dialog_Radio_RelativeValues);
+			_rdoRelativeValues.setToolTipText(Messages.Map3Color_Dialog_Radio_RelativeValues_Tooltip);
+			_rdoRelativeValues.addSelectionListener(_defaultSelectionAdapter);
+		}
+
+		{
+
+			/*
+			 * Radio: Absolute
+			 */
+			_rdoAbsoluteValues = new Button(container, SWT.RADIO);
+//				GridDataFactory.fillDefaults().applyTo(_rdoAbsoluteValues);
+			_rdoAbsoluteValues.setText(Messages.Map3Color_Dialog_Radio_AbsoluteValues);
+			_rdoAbsoluteValues.setToolTipText(Messages.Map3Color_Dialog_Radio_AbsoluteValues_Tooltip);
+			_rdoAbsoluteValues.addSelectionListener(_defaultSelectionAdapter);
+		}
+	}
+
+	private void createUI_64_Brightness(final Composite parent) {
+
+		{
+			/*
+			 * Max brightness
+			 */
+			_lblMaxBrightness = new Label(parent, SWT.NONE);
+			GridDataFactory.fillDefaults()//
+					.grab(true, false)
+					.align(SWT.FILL, SWT.CENTER)
+					.applyTo(_lblMaxBrightness);
+			_lblMaxBrightness.setText(LEGENDCOLOR_DIALOG_MAX_BRIGHTNESS_LABEL);
+			_lblMaxBrightness.setToolTipText(LEGENDCOLOR_DIALOG_MAX_BRIGHTNESS_TOOLTIP);
+
+			final Composite containerMax = new Composite(parent, SWT.NONE);
+			GridDataFactory.fillDefaults().grab(true, false).applyTo(containerMax);
+			GridLayoutFactory.fillDefaults().numColumns(2).applyTo(containerMax);
 			{
-				/*
-				 * Max brightness
-				 */
-				label = new Label(group, SWT.NONE);
-				GridDataFactory.fillDefaults()//
-						.grab(true, false)
-						.align(SWT.FILL, SWT.CENTER)
-						.applyTo(label);
-				label.setText(MAP2_MESSAGE_9);
-				label.setToolTipText(MAP2_MESSAGE_10);
+				_cboMaxBrightness = new Combo(containerMax, SWT.DROP_DOWN | SWT.READ_ONLY);
+				_cboMaxBrightness.addSelectionListener(_defaultSelectionAdapter);
 
-				_cboMaxBrightness = new Combo(group, SWT.DROP_DOWN | SWT.READ_ONLY);
-				_cboMaxBrightness.addSelectionListener(_selectionAdapter);
-
-				_spinMaxBrightness = new Spinner(group, SWT.BORDER);
+				_spinMaxBrightness = new Spinner(containerMax, SWT.BORDER);
 				_spinMaxBrightness.setMinimum(0);
 				_spinMaxBrightness.setMaximum(100);
 				_spinMaxBrightness.setPageIncrement(10);
-				_spinMaxBrightness.addSelectionListener(_selectionAdapter);
-				_spinMaxBrightness.addMouseWheelListener(_mouseWheelListener);
+				_spinMaxBrightness.addSelectionListener(_defaultSelectionAdapter);
+				_spinMaxBrightness.addMouseWheelListener(_defaultMouseWheelListener);
 			}
+		}
+
+		{
+			/*
+			 * Min brightness
+			 */
+			_lblMinBrightness = new Label(parent, SWT.NONE);
+			GridDataFactory.fillDefaults()//
+					.grab(true, false)
+					.align(SWT.FILL, SWT.CENTER)
+					.applyTo(_lblMinBrightness);
+			_lblMinBrightness.setText(LEGENDCOLOR_DIALOG_MIN_BRIGHTNESS_LABEL);
+			_lblMinBrightness.setToolTipText(LEGENDCOLOR_DIALOG_MIN_BRIGHTNESS_TOOLTIP);
+
+			final Composite containerMin = new Composite(parent, SWT.NONE);
+			GridDataFactory.fillDefaults().grab(true, false).applyTo(containerMin);
+			GridLayoutFactory.fillDefaults().numColumns(2).applyTo(containerMin);
 			{
-				/*
-				 * Min brightness
-				 */
-				label = new Label(group, SWT.NONE);
-				GridDataFactory.fillDefaults()//
-						.grab(true, false)
-						.align(SWT.FILL, SWT.CENTER)
-						.applyTo(label);
-				label.setText(MAP2_MESSAGE_11);
-				label.setToolTipText(MAP2_MESSAGE_12);
 
-				_cboMinBrightness = new Combo(group, SWT.DROP_DOWN | SWT.READ_ONLY);
-				_cboMinBrightness.addSelectionListener(_selectionAdapter);
+				_cboMinBrightness = new Combo(containerMin, SWT.DROP_DOWN | SWT.READ_ONLY);
+				_cboMinBrightness.addSelectionListener(_defaultSelectionAdapter);
 
-				_spinMinBrightness = new Spinner(group, SWT.BORDER);
+				_spinMinBrightness = new Spinner(containerMin, SWT.BORDER);
 				_spinMinBrightness.setMinimum(0);
 				_spinMinBrightness.setMaximum(100);
 				_spinMinBrightness.setPageIncrement(10);
-				_spinMinBrightness.addSelectionListener(_selectionAdapter);
-				_spinMinBrightness.addMouseWheelListener(_mouseWheelListener);
+				_spinMinBrightness.addSelectionListener(_defaultSelectionAdapter);
+				_spinMinBrightness.addMouseWheelListener(_defaultMouseWheelListener);
 			}
 		}
 	}
@@ -794,14 +776,9 @@ public class DialogMap3ColorEditor extends TitleAreaDialog implements IProfileCo
 						.grab(true, false)
 						.indent(convertHorizontalDLUsToPixels(IDialogConstants.HORIZONTAL_MARGIN), 0)
 						.applyTo(_chkLiveUpdate);
-				_chkLiveUpdate.setText(MAP2_MESSAGE_13);
-				_chkLiveUpdate.setToolTipText(MAP2_MESSAGE_14);
-				_chkLiveUpdate.addSelectionListener(new SelectionAdapter() {
-					@Override
-					public void widgetSelected(final SelectionEvent e) {
-						onSelectControl();
-					}
-				});
+				_chkLiveUpdate.setText(LEGEND_COLOR_DIALOG_CHECK_LIVE_UPDATE);
+				_chkLiveUpdate.setToolTipText(LEGEND_COLOR_DIALOG_CHECK_LIVE_UPDATE_TOOLTIP);
+				_chkLiveUpdate.addSelectionListener(_defaultSelectionAdapter);
 			}
 
 			containerButtonBar = super.createButtonBar(container);
@@ -853,15 +830,17 @@ public class DialogMap3ColorEditor extends TitleAreaDialog implements IProfileCo
 		final int imageWidth = imageBounds.width;
 		final int imageHeight = imageBounds.height;
 
-		_dialogColorProider.configureColorProvider(imageHeight, getRgbVertices());
+		_dialogColorProider.configureColorProvider(//
+				imageHeight,
+				getRgbVertices(),
+				_dialogColorProider.getMap3ColorProfile().isAbsoluteValues());
 
 		_profileImage = TourMapPainter.createMapLegendImage(
 				Display.getCurrent(),
 				_dialogColorProider,
 				imageWidth,
 				imageHeight,
-				true,
-				false);
+				true);
 
 		_canvasProfileImage.setImage(_profileImage);
 	}
@@ -872,27 +851,22 @@ public class DialogMap3ColorEditor extends TitleAreaDialog implements IProfileCo
 		final int verticesSize = rgbVertices.size();
 
 		final boolean isValid = verticesSize > 0 && validateFields();
+		final boolean isAbsolute = _rdoAbsoluteValues.getSelection();
+		final int minBrightnessValue = _cboMinBrightness.getSelectionIndex();
+		final int maxBrightnessValue = _cboMaxBrightness.getSelectionIndex();
 
 		// min brightness
-		final int minBrightness = _cboMinBrightness.getSelectionIndex();
-		_spinMinBrightness.setEnabled(minBrightness != 0);
+		_lblMinBrightness.setEnabled(isAbsolute);
+		_cboMinBrightness.setEnabled(isAbsolute);
+		_spinMinBrightness.setEnabled(isAbsolute && minBrightnessValue != 0);
 
 		// max brightness
-		final int maxBrightness = _cboMaxBrightness.getSelectionIndex();
-		_spinMaxBrightness.setEnabled(maxBrightness != 0);
-
-		// min value
-		boolean isChecked = _chkForceMinValue.getSelection();
-		_lblMinValue.setEnabled(isChecked);
-		_spinMinValue.setEnabled(isChecked);
-
-		// max value
-		isChecked = _chkForceMaxValue.getSelection();
-		_lblMaxValue.setEnabled(isChecked);
-		_spinMaxValue.setEnabled(isChecked);
+		_lblMaxBrightness.setEnabled(isAbsolute);
+		_cboMaxBrightness.setEnabled(isAbsolute);
+		_spinMaxBrightness.setEnabled(isAbsolute && maxBrightnessValue != 0);
 
 		/*
-		 * Vertex trash actions
+		 * Vertex delete actions
 		 */
 		final boolean canRemoveVertices = verticesSize > 2;
 		for (final ActionDeleteVertex actionDeletevertex : _actionDeleteVertex) {
@@ -1018,7 +992,13 @@ public class DialogMap3ColorEditor extends TitleAreaDialog implements IProfileCo
 		super.okPressed();
 	}
 
-	private void onApply(final boolean isForceLiveUpdate) {
+	/**
+	 * Updates model from the UI and do a live update when selected.
+	 * 
+	 * @param isForceLiveUpdate
+	 * @return Returns <code>true</code> when live update and UI update from the model is done.
+	 */
+	private boolean onApply(final boolean isForceLiveUpdate) {
 
 		updateModel_FromUI();
 
@@ -1036,7 +1016,11 @@ public class DialogMap3ColorEditor extends TitleAreaDialog implements IProfileCo
 			updateUI_FromModel();
 
 			enableGraphType();
+
+			return true;
 		}
+
+		return false;
 	}
 
 	private void onDispose() {
@@ -1101,9 +1085,20 @@ public class DialogMap3ColorEditor extends TitleAreaDialog implements IProfileCo
 		onApply(false);
 	}
 
-	private void onModifyProfileName() {
+	private void onModifyProfileName(final TraverseEvent event) {
 
 		if (_isInUIUpdate) {
+			return;
+		}
+
+		if (
+
+		// Ignore arrow left/right that within the text it can be navigated
+		event.keyCode == SWT.ARROW_LEFT || event.keyCode == SWT.ARROW_RIGHT
+
+		// Ignore Escape key, otherwise a new profile can be created when immediatedly closing a new created profile without doing anything.
+				|| event.keyCode == SWT.ESC) {
+
 			return;
 		}
 
@@ -1113,9 +1108,12 @@ public class DialogMap3ColorEditor extends TitleAreaDialog implements IProfileCo
 	private void onSelectControl() {
 
 		updateModel_FromUI();
-		updateUI_FromModel();
 
-		onApply(false);
+		if (onApply(false) == false) {
+
+			// UI is not yet updated from the model
+			updateUI_FromModel();
+		}
 	}
 
 	private void restoreState() {
@@ -1144,18 +1142,13 @@ public class DialogMap3ColorEditor extends TitleAreaDialog implements IProfileCo
 		final Map3ColorProfile colorProfile = _dialogColorProider.getMap3ColorProfile();
 
 		colorProfile.setProfileName(_txtProfileName.getText());
+		colorProfile.setIsAbsoluteValues(_rdoAbsoluteValues.getSelection());
 
 		// update min/max brightness
 		colorProfile.setMinBrightness(_cboMinBrightness.getSelectionIndex());
 		colorProfile.setMaxBrightness(_cboMaxBrightness.getSelectionIndex());
 		colorProfile.setMinBrightnessFactor(_spinMinBrightness.getSelection());
 		colorProfile.setMaxBrightnessFactor(_spinMaxBrightness.getSelection());
-
-		// update min/max value
-		colorProfile.setIsMinValueOverwrite(_chkForceMinValue.getSelection());
-		colorProfile.setIsMaxValueOverwrite(_chkForceMaxValue.getSelection());
-		colorProfile.setMinValueOverwrite(_spinMinValue.getSelection());
-		colorProfile.setMaxValueOverwrite(_spinMaxValue.getSelection());
 
 		updateModel_FromUI_Vertices();
 	}
@@ -1203,8 +1196,11 @@ public class DialogMap3ColorEditor extends TitleAreaDialog implements IProfileCo
 
 			_txtProfileName.setText(colorProfile.getProfileName());
 
-			final MapGraphId graphId = _dialogColorProider.getGraphId();
+			final boolean isAbsoluteValues = colorProfile.isAbsoluteValues();
+			_rdoAbsoluteValues.setSelection(isAbsoluteValues);
+			_rdoRelativeValues.setSelection(!isAbsoluteValues);
 
+			final MapGraphId graphId = _dialogColorProider.getGraphId();
 			_cboGraphType.select(getGraphIdIndex(graphId));
 
 			// update min/max brightness
@@ -1212,12 +1208,6 @@ public class DialogMap3ColorEditor extends TitleAreaDialog implements IProfileCo
 			_cboMaxBrightness.select(colorProfile.getMaxBrightness());
 			_spinMinBrightness.setSelection(colorProfile.getMinBrightnessFactor());
 			_spinMaxBrightness.setSelection(colorProfile.getMaxBrightnessFactor());
-
-			// update min/max value
-			_chkForceMinValue.setSelection(colorProfile.isMinValueOverwrite());
-			_chkForceMaxValue.setSelection(colorProfile.isMaxValueOverwrite());
-			_spinMinValue.setSelection(colorProfile.getMinValueOverwrite());
-			_spinMaxValue.setSelection(colorProfile.getMaxValueOverwrite());
 		}
 		_isInUIUpdate = false;
 
@@ -1323,16 +1313,6 @@ public class DialogMap3ColorEditor extends TitleAreaDialog implements IProfileCo
 	private boolean validateFields() {
 
 		_isUIValid = true;
-
-		final boolean isMinEnabled = _chkForceMinValue.getSelection();
-		final boolean isMaxEnabled = _chkForceMaxValue.getSelection();
-
-		// check that max is larger than min
-		if (isMinEnabled && isMaxEnabled && (_spinMaxValue.getSelection() <= _spinMinValue.getSelection())) {
-
-			setErrorMessage(MAP2_MESSAGE_15);
-			_isUIValid = false;
-		}
 
 		if (_isUIValid) {
 			setErrorMessage(null);

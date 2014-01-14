@@ -70,6 +70,10 @@ class TourPositionColors implements Path.PositionColors {
 
 	public void setColorProvider(final IMapColorProvider legendProvider) {
 
+//		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
+//				+ ("\tsetColorProvider() " + legendProvider));
+//		// TODO remove SYSTEM.OUT.PRINTLN
+
 		_colorProvider = legendProvider;
 
 		_awtColorCache.clear();

@@ -44,25 +44,13 @@ public class MapColorProvider {
 	 */
 	private static HashMap<MapGraphId, IMapColorProvider>	_map3ColorProvider;
 
-	private static void checkColorProvider() {
-
-		if (_map2ColorProvider == null) {
-
-			_map2ColorProvider = new HashMap<MapGraphId, IMapColorProvider>();
-			_map3ColorProvider = new HashMap<MapGraphId, IMapColorProvider>();
-
-			createColorProviders();
-		}
-	}
-
-	/**
-	 * Create color provider for all graphs which can be displayed.
-	 */
-	private static void createColorProviders() {
+	static {
 
 		/*
 		 * 2D Map
 		 */
+		_map2ColorProvider = new HashMap<MapGraphId, IMapColorProvider>();
+
 		_map2ColorProvider.put(MapGraphId.Altitude, new Map2GradientColorProvider(MapGraphId.Altitude));
 		_map2ColorProvider.put(MapGraphId.Gradient, new Map2GradientColorProvider(MapGraphId.Gradient));
 		_map2ColorProvider.put(MapGraphId.Pace, new Map2GradientColorProvider(MapGraphId.Pace));
@@ -74,12 +62,14 @@ public class MapColorProvider {
 		/*
 		 * 3D Map, gradient color providers are managed by the Map3ColorManager.
 		 */
+		_map3ColorProvider = new HashMap<MapGraphId, IMapColorProvider>();
+
 		_map3ColorProvider.put(MapGraphId.HrZone, new HrZonesColorProvider(MapGraphId.HrZone));
 	}
 
-	public static IMapColorProvider getActiveMap2ColorProvider(final MapGraphId colorId) {
+	private MapColorProvider() {}
 
-		checkColorProvider();
+	public static IMapColorProvider getActiveMap2ColorProvider(final MapGraphId colorId) {
 
 		IMapColorProvider mapColorProvider = _map2ColorProvider.get(colorId);
 
@@ -97,20 +87,14 @@ public class MapColorProvider {
 	 */
 	public static IMapColorProvider getActiveMap3ColorProvider(final MapGraphId graphId) {
 
-		checkColorProvider();
-
-		IMapColorProvider mapColorProvider;
-
 		if (graphId == MapGraphId.HrZone) {
 
-			mapColorProvider = _map3ColorProvider.get(graphId);
+			return _map3ColorProvider.get(graphId);
 
 		} else {
 
-			mapColorProvider = Map3GradientColorManager.getActiveMap3ColorProvider(graphId);
+			return Map3GradientColorManager.getActiveMap3ColorProvider(graphId);
 		}
-
-		return mapColorProvider;
 	}
 
 	/**

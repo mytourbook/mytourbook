@@ -149,6 +149,6 @@ public class RGBVertex implements Comparable<Object>, Cloneable {
 
 	@Override
 	public String toString() {
-		return String.format("\n\tRGBVertex [_value=%s, _rgb=%s]", _value, _rgb);
+		return String.format("\n\tRGBVertex [_value=%s, _rgb=%s]", _value, _rgb); //$NON-NLS-1$
 	}
 }

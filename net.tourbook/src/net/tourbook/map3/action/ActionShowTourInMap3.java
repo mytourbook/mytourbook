@@ -42,7 +42,7 @@ public class ActionShowTourInMap3 extends ContributionItem {
 
 	private Map3View				_map3View;
 
-	private DialogTourTrackConfig	_trackLayerPropertiesDialog;
+	private DialogTourTrackConfig	_tourTrackConfigDialog;
 
 	private ToolBar					_toolBar;
 	private ToolItem				_actionTrackLayer;
@@ -75,6 +75,11 @@ public class ActionShowTourInMap3 extends ContributionItem {
 		_actionImageDisabled = TourbookPlugin//
 				.getImageDescriptor(Messages.image_action_show_tour_in_map_disabled)
 				.createImage();
+	}
+
+	public void closeDialog() {
+
+		_tourTrackConfigDialog.hideNow();
 	}
 
 	@Override
@@ -120,7 +125,7 @@ public class ActionShowTourInMap3 extends ContributionItem {
 				}
 			});
 
-			_trackLayerPropertiesDialog = new DialogTourTrackConfig(_parent, _toolBar, _map3View);
+			_tourTrackConfigDialog = new DialogTourTrackConfig(_parent, _toolBar, _map3View);
 
 			updateUI_Tooltip();
 		}
@@ -156,9 +161,9 @@ public class ActionShowTourInMap3 extends ContributionItem {
 
 			itemBounds.x = itemDisplayPosition.x;
 			itemBounds.y = itemDisplayPosition.y;
-		}
 
-		_trackLayerPropertiesDialog.open(itemBounds, true);
+			openConfigDialog(itemBounds, true);
+		}
 	}
 
 	private void onSelect() {
@@ -179,14 +184,22 @@ public class ActionShowTourInMap3 extends ContributionItem {
 			itemBounds.x = itemDisplayPosition.x;
 			itemBounds.y = itemDisplayPosition.y;
 
-			_trackLayerPropertiesDialog.open(itemBounds, false);
+			openConfigDialog(itemBounds, false);
 
 		} else {
 
-			_trackLayerPropertiesDialog.close();
+			_tourTrackConfigDialog.close();
 		}
 
 		_map3View.actionShowTour(isTrackVisible);
+	}
+
+	private void openConfigDialog(final Rectangle itemBounds, final boolean isOpenDelayed) {
+
+		// ensure other dialogs are closed
+		_map3View.closeAllColorSelectDialogs();
+
+		_tourTrackConfigDialog.open(itemBounds, isOpenDelayed);
 	}
 
 	/**
@@ -213,11 +226,11 @@ public class ActionShowTourInMap3 extends ContributionItem {
 
 	public void updateMeasurementSystem() {
 
-		if (_trackLayerPropertiesDialog == null) {
+		if (_tourTrackConfigDialog == null) {
 			return;
 		}
 
-		_trackLayerPropertiesDialog.updateMeasurementSystem();
+		_tourTrackConfigDialog.updateMeasurementSystem();
 	}
 
 	private void updateUI_Tooltip() {

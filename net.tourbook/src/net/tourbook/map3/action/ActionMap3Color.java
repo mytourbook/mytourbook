@@ -45,12 +45,6 @@ public class ActionMap3Color extends Action implements IMap3ColorUpdater {
 								final boolean isNewColorProvider) {
 
 		// ignore isNewColorProvider because the current profile is edited
-
-//		// update active color provider
-//		final MapGraphId modifiedGraphId = modifiedCP.getGraphId();
-//		final Map3GradientColorProvider activeCP = Map3GradientColorManager.getActiveMap3ColorProvider(modifiedGraphId);
-//		final MapColorProfile modifiedProfile = modifiedCP.getColorProfile();
-//		activeCP.setColorProfile(modifiedProfile);
 		
 		// update model
 		Map3GradientColorManager.replaceColorProvider(originalCP, modifiedCP);

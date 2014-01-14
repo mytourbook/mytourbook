@@ -564,14 +564,12 @@ public class Messages extends NLS {
 	public static String		HRMaxFormula_Name_HRmax_220_age;
 	public static String		HRMaxFormula_Name_Manual;
 
-	public static String	Image__App_Add;
-
+	public static String		Image__App_Add;
 	public static String		Image__App_Cancel;
 	public static String		Image__App_Close;
 	public static String		Image__App_OK;
 	public static String		Image__App_Trash;
-
-	public static String	Image__App_Trash_Disabled;
+	public static String		Image__App_Trash_Disabled;
 	public static String		Image__ArrowDown;
 	public static String		Image__ArrowUp;
 	public static String		Image__assignMergedTour;
@@ -592,6 +590,7 @@ public class Messages extends NLS {
 	public static String		Image__edit_tour_marker_new;
 	public static String		Image__edit_tour_marker_new_disabled;
 	public static String		Image__expand_all;
+	public static String		Image__Graph_All;
 	public static String		Image__graph_altimeter;
 	public static String		Image__graph_altitude;
 	public static String		Image__graph_cadence;
@@ -886,40 +885,6 @@ public class Messages extends NLS {
 	public static String		Pref_Graphs_Text_max_value;
 	public static String		Pref_Graphs_Text_min_value;
 
-	public static String		Pref_Map3Color_Column_Colors;
-
-	public static String	Pref_Map3Color_Column_GraphImage;
-
-	public static String		Pref_Map3Color_Column_Id_Header;
-
-	public static String		Pref_Map3Color_Column_Id_Label;
-
-	public static String		Pref_Map3Color_Column_Id_Tooltip;
-
-	public static String	Pref_Map3Color_Column_MaxValue_Header;
-
-	public static String	Pref_Map3Color_Column_MaxValue_Label;
-
-	public static String	Pref_Map3Color_Column_MaxValueOverwrite_Label;
-
-	public static String	Pref_Map3Color_Column_MaxValueOverwrite_Tooltip;
-
-	public static String	Pref_Map3Color_Column_MinValue_Header;
-
-	public static String	Pref_Map3Color_Column_MinValue_Label;
-
-	public static String	Pref_Map3Color_Column_MinValueOverwrite_Label;
-
-	public static String	Pref_Map3Color_Column_MinValueOverwrite_Tooltip;
-
-	public static String		Pref_Map3Color_Column_ProfileName;
-
-	public static String		Pref_Map3Color_Dialog_RemoveProfile_Message;
-
-	public static String		Pref_Map3Color_Dialog_RemoveProfile_Title;
-
-	public static String		Pref_Map3Color_Label_Title;
-
 	public static String		Pref_MapLayout_Dialog_OSX_Warning_Message;
 	public static String		Pref_MapLayout_Dialog_OSX_Warning_Title;
 	public static String		Pref_MapLayout_Group_TourInMapProperties;
@@ -1075,8 +1040,6 @@ public class Messages extends NLS {
 	public static String		Pref_TourTypes_dnd_hint;
 	public static String		Pref_TourTypes_root_title;
 	public static String		Pref_TourTypes_Title;
-
-	public static String		PrefPage_Map3Color_Checkbox_AutoExpandCollapse;
 
 	public static String		PrefPage_ViewActions_Group;
 	public static String		PrefPage_ViewActions_Label_DoubleClick;

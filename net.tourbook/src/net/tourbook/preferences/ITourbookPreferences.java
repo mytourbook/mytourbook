@@ -336,4 +336,7 @@ public interface ITourbookPreferences {
 	 */
 	public static final String	MAP3_COLOR_IS_MODIFIED						= "MAP3_COLOR_IS_MODIFIED";								//$NON-NLS-1$
 
+	public static final String	MAP3_IS_COLOR_SELECTOR_DISPLAYED			= "MAP3_IS_COLOR_SELECTOR_DISPLAYED";						//$NON-NLS-1$
+	public static final String	MAP3_NUMBER_OF_COLOR_SELECTORS				= "MAP3_NUMBER_OF_COLOR_SELECTORS";						//$NON-NLS-1$
+
 }

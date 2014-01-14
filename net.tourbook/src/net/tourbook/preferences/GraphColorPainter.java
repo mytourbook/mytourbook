@@ -123,7 +123,11 @@ public class GraphColorPainter {
 					final IGradientColorProvider colorProvider = _colorTreeViewer.getMapLegendColorProvider();
 					colorProvider.setColorProfile(graphColorItem.getColorDefinition().getMap2Color_New());
 
-					TourMapPainter.drawMapLegend(gc, drawableBounds, colorProvider, false, false);
+					TourMapPainter.drawMapLegend(//
+							gc,
+							drawableBounds,
+							colorProvider,
+							false);
 
 				} else {
 
@@ -209,7 +213,11 @@ public class GraphColorPainter {
 						final IGradientColorProvider colorProvider = _colorTreeViewer.getMapLegendColorProvider();
 						colorProvider.setColorProfile(graphColorItem.getColorDefinition().getMap2Color_New());
 
-						TourMapPainter.drawMapLegend(gc, imageBounds, colorProvider, false, false);
+						TourMapPainter.drawMapLegend(//
+								gc,
+								imageBounds,
+								colorProvider,
+								false);
 
 					} else {
 

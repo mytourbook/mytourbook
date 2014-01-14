@@ -15,13 +15,16 @@
  *******************************************************************************/
 package net.tourbook.map3.action;
 
+import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.color.MapGraphId;
 import net.tourbook.map2.Messages;
 import net.tourbook.map3.ui.DialogSelectMap3Color;
 import net.tourbook.map3.view.Map3View;
+import net.tourbook.preferences.ITourbookPreferences;
 
 import org.eclipse.jface.action.ContributionItem;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
@@ -38,6 +41,8 @@ import org.eclipse.swt.widgets.ToolItem;
 
 public class ActionTourColor extends ContributionItem {
 
+	private final IPreferenceStore	_prefStore	= TourbookPlugin.getPrefStore();
+
 	private MapGraphId				_graphId;
 	private boolean					_isGradientColorProvider;
 
@@ -51,7 +56,7 @@ public class ActionTourColor extends ContributionItem {
 	private boolean					_isActionEnabled;
 	private boolean					_isActionChecked;
 
-	private DialogSelectMap3Color	_colorDialog;
+	private DialogSelectMap3Color	_colorSelectDialog;
 
 	/*
 	 * UI controls
@@ -139,31 +144,36 @@ public class ActionTourColor extends ContributionItem {
 		return null;
 	}
 
+	private boolean canColorSelectorBeDisplayed() {
+
+		return _prefStore.getBoolean(ITourbookPreferences.MAP3_IS_COLOR_SELECTOR_DISPLAYED);
+	}
+
 	public void closeDialog() {
 
-		if (_colorDialog != null) {
+		if (_colorSelectDialog != null) {
 
-//			_colorDialog.hideNow();
+			_colorSelectDialog.hideNow();
 
 			// dispose dialog for testing only otherwise use hideNow()
-			_colorDialog.close();
+//			_colorSelectDialog.close();
 		}
 	}
 
 	public void disposeColors() {
 
-		if (_colorDialog != null) {
+		if (_colorSelectDialog != null) {
 
 			// ensure the dialog is recreated when needed
 
-			if (_colorDialog.disposeColors()) {
+			if (_colorSelectDialog.disposeColors()) {
 
 				/*
 				 * When colors are disposed, the dialog needs to be recreated. It's possible that
 				 * color providers are added or removed.
 				 */
 
-				_colorDialog.close();
+				_colorSelectDialog.close();
 			}
 		}
 	}
@@ -216,7 +226,7 @@ public class ActionTourColor extends ContributionItem {
 
 				// only gradient color provider can selected in the color selection dialog
 
-				_colorDialog = new DialogSelectMap3Color(_parent, _toolBar, _map3View, _graphId);
+				_colorSelectDialog = new DialogSelectMap3Color(_parent, _toolBar, _map3View, _graphId);
 			}
 
 			updateUI_Tooltip();
@@ -236,74 +246,93 @@ public class ActionTourColor extends ContributionItem {
 
 	private void onMouseMove(final ToolItem hoveredItem, final MouseEvent mouseEvent) {
 
-		if (_colorDialog == null || _actionColor.getSelection() == false || _actionColor.isEnabled() == false) {
+		if (_colorSelectDialog == null || _actionColor.getSelection() == false || _actionColor.isEnabled() == false) {
 
 			// color is not active
 
 			return;
 		}
 
-		final boolean isToolItemHovered = hoveredItem == _actionColor;
+		if (canColorSelectorBeDisplayed()) {
 
-		Rectangle itemBounds = null;
+			final boolean isToolItemHovered = hoveredItem == _actionColor;
 
-		if (isToolItemHovered) {
+			Rectangle itemBounds = null;
 
-			itemBounds = hoveredItem.getBounds();
+			if (isToolItemHovered) {
 
-			final Point itemDisplayPosition = _toolBar.toDisplay(itemBounds.x, itemBounds.y);
-
-			itemBounds.x = itemDisplayPosition.x;
-			itemBounds.y = itemDisplayPosition.y;
-		}
-
-		openDialog(itemBounds, true);
-	}
-
-	private void onSelect() {
-
-		// ensure only one color is selected
-		_map3View.checkSelectedColorActions(_graphId, _actionColor);
-
-		updateUI_Tooltip();
-
-		_map3View.actionSetMapColor(_graphId);
-
-		if (_colorDialog == null) {
-
-			// even when a select dialog is not available, close other dialogs also
-
-			_map3View.closeOtherColorSelectDialogs(this);
-
-		} else {
-
-			final boolean isColorSelected = _actionColor.getSelection();
-
-			// Show/hide color dialog
-			if (isColorSelected) {
-
-				final Rectangle itemBounds = _actionColor.getBounds();
+				itemBounds = hoveredItem.getBounds();
 
 				final Point itemDisplayPosition = _toolBar.toDisplay(itemBounds.x, itemBounds.y);
 
 				itemBounds.x = itemDisplayPosition.x;
 				itemBounds.y = itemDisplayPosition.y;
 
-				openDialog(itemBounds, false);
+				openDialog(itemBounds, true);
+			}
+		}
+	}
+
+	private void onSelect() {
+
+		if (_colorSelectDialog != null && _colorSelectDialog.isToolTipVisible()) {
+
+			// color select dialog is already open
+
+			// ensure this action is checked
+			_actionColor.setSelection(true);
+
+			return;
+		}
+
+		// ensure only one color is selected
+		_map3View.checkSelectedColorActions(_graphId, _actionColor);
+
+		updateUI_Tooltip();
+
+		// set color in map
+		_map3View.actionSetMapColor(_graphId);
+
+		if (canColorSelectorBeDisplayed()) {
+
+			// show drop down color select dialog
+
+			if (_colorSelectDialog == null) {
+
+				// even when a select dialog is not available, close other dialogs also
+
+				_map3View.closeOtherDialogs(this);
 
 			} else {
 
-				_colorDialog.close();
+				final boolean isColorSelected = _actionColor.getSelection();
+
+				// Show/hide color dialog
+				if (isColorSelected) {
+
+					final Rectangle itemBounds = _actionColor.getBounds();
+
+					final Point itemDisplayPosition = _toolBar.toDisplay(itemBounds.x, itemBounds.y);
+
+					itemBounds.x = itemDisplayPosition.x;
+					itemBounds.y = itemDisplayPosition.y;
+
+					openDialog(itemBounds, false);
+
+				} else {
+
+					_colorSelectDialog.close();
+				}
 			}
 		}
 	}
 
 	private void openDialog(final Rectangle itemBounds, final boolean isOpenDelayed) {
 
-		_colorDialog.open(itemBounds, isOpenDelayed);
+		// ensure other dialogs are closed
+		_map3View.closeOtherDialogs(this);
 
-		// ensure other color dialogs are closed
-		_map3View.closeOtherColorSelectDialogs(this);
+		_colorSelectDialog.open(itemBounds, isOpenDelayed);
 	}
 
 	/**
@@ -347,7 +376,7 @@ public class ActionTourColor extends ContributionItem {
 
 	@Override
 	public String toString() {
-		return String.format("ActionTourColor [_graphId=%s]", _graphId);
+		return String.format("ActionTourColor [_graphId=%s]", _graphId); //$NON-NLS-1$
 	}
 
 	/**
@@ -359,7 +388,7 @@ public class ActionTourColor extends ContributionItem {
 			return;
 		}
 
-		if (_colorDialog != null && _actionColor.getSelection()) {
+		if (_colorSelectDialog != null && _actionColor.getSelection()) {
 
 			// hide tooltip because the color selection dialog is displayed
 

@@ -1952,7 +1952,7 @@ public class TourManager {
 			yDataPulse = createChartDataSerie(pulseSerie, chartType);
 
 			yDataPulse.setYTitle(net.tourbook.common.Messages.Graph_Label_Heartbeat);
-			yDataPulse.setUnitLabel(net.tourbook.common.Messages.Graph_Label_Heartbeat_unit);
+			yDataPulse.setUnitLabel(net.tourbook.common.Messages.Graph_Label_Heartbeat_Unit);
 			yDataPulse.setShowYSlider(true);
 			yDataPulse.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_PULSE);
 			yDataPulse.setCustomData(CUSTOM_DATA_ANALYZER_INFO, new TourChartAnalyzerInfo(true));
@@ -2040,7 +2040,7 @@ public class TourManager {
 			yDataPower = createChartDataSerie(powerSerie, chartType);
 
 			yDataPower.setYTitle(net.tourbook.common.Messages.Graph_Label_Power);
-			yDataPower.setUnitLabel(net.tourbook.common.Messages.Graph_Label_Power_unit);
+			yDataPower.setUnitLabel(net.tourbook.common.Messages.Graph_Label_Power_Unit);
 			yDataPower.setShowYSlider(true);
 			yDataPower.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_POWER);
 			yDataPower.setCustomData(CUSTOM_DATA_ANALYZER_INFO, //
@@ -2099,7 +2099,7 @@ public class TourManager {
 			yDataGradient = createChartDataSerie(gradientSerie, chartType);
 
 			yDataGradient.setYTitle(net.tourbook.common.Messages.Graph_Label_Gradient);
-			yDataGradient.setUnitLabel(net.tourbook.common.Messages.Graph_Label_Gradiend_unit);
+			yDataGradient.setUnitLabel(net.tourbook.common.Messages.Graph_Label_Gradient_Unit);
 			yDataGradient.setShowYSlider(true);
 			yDataGradient.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_GRADIENT);
 			yDataGradient.setCustomData(CUSTOM_DATA_ANALYZER_INFO, //
@@ -2132,7 +2132,7 @@ public class TourManager {
 			yDataCadence = createChartDataSerie(cadenceSerie, chartType);
 
 			yDataCadence.setYTitle(net.tourbook.common.Messages.Graph_Label_Cadence);
-			yDataCadence.setUnitLabel(net.tourbook.common.Messages.Graph_Label_Cadence_unit);
+			yDataCadence.setUnitLabel(net.tourbook.common.Messages.Graph_Label_Cadence_Unit);
 			yDataCadence.setShowYSlider(true);
 			yDataCadence.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_CADENCE);
 			yDataCadence.setCustomData(CUSTOM_DATA_ANALYZER_INFO, new TourChartAnalyzerInfo(true));
@@ -2183,7 +2183,7 @@ public class TourManager {
 			yDataTourCompare = createChartDataSerie(tourCompareSerie, chartType);
 
 			yDataTourCompare.setYTitle(net.tourbook.common.Messages.Graph_Label_Tour_Compare);
-			yDataTourCompare.setUnitLabel(net.tourbook.common.Messages.Graph_Label_Tour_Compare_unit);
+			yDataTourCompare.setUnitLabel(net.tourbook.common.Messages.Graph_Label_Tour_Compare_Unit);
 			yDataTourCompare.setShowYSlider(true);
 			yDataTourCompare.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_FILL_BOTTOM);
 			yDataTourCompare.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_TOUR_COMPARE);

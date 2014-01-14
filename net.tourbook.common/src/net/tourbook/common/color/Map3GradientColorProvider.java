@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import net.tourbook.common.Messages;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.StatusUtil;
 
@@ -77,9 +78,39 @@ public class Map3GradientColorProvider extends MapGradientColorProvider implemen
 		return absoluteVertices;
 	}
 
-	public void configureColorProvider(final int legendSize, final ArrayList<RGBVertex> rgbVertices) {
+	public void configureColorProvider(	final int legendSize,
+										final ArrayList<RGBVertex> rgbVertices,
+										final boolean isDrawUnits) {
 
-		final String unitText = UI.EMPTY_STRING;
+		String unitText = UI.EMPTY_STRING;
+
+		if (isDrawUnits) {
+
+			switch (_graphId) {
+			case Altitude:
+				unitText = UI.UNIT_LABEL_ALTITUDE;
+				break;
+
+			case Gradient:
+				unitText = Messages.Graph_Label_Gradient_Unit;
+				break;
+
+			case Pace:
+				unitText = UI.UNIT_LABEL_PACE;
+				break;
+
+			case Pulse:
+				unitText = Messages.Graph_Label_Heartbeat_Unit;
+				break;
+
+			case Speed:
+				unitText = UI.UNIT_LABEL_SPEED;
+				break;
+
+			default:
+				break;
+			}
+		}
 
 		/*
 		 * Get min/max values from the values which are displayed
@@ -107,7 +138,7 @@ public class Map3GradientColorProvider extends MapGradientColorProvider implemen
 			}
 		}
 
-		_absoluteVertices = rgbVertices.toArray(new RGBVertex[rgbVertices.size()]);
+//		_absoluteVertices = rgbVertices.toArray(new RGBVertex[rgbVertices.size()]);
 
 		configureColorProvider(//
 				legendSize,
@@ -115,41 +146,41 @@ public class Map3GradientColorProvider extends MapGradientColorProvider implemen
 				maxValue,
 				unitText,
 				LegendUnitFormat.Number,
-				false);
+				true);
 
 	}
 
 	@Override
 	public void configureColorProvider(	final int legendSize,
-										float minValue,
+										final float minValue,
 										float maxValue,
 										final String unitText,
 										final LegendUnitFormat unitFormat,
 										final boolean isConvertIntoAbsoluteValues) {
 
-		// overwrite min value
-		if (_colorProfile.isMinValueOverwrite()) {
-
-			minValue = _colorProfile.getMinValueOverwrite();
-
-			if (unitFormat == LegendUnitFormat.Pace) {
-
-				// adjust value from minutes->seconds
-				minValue *= 60;
-			}
-		}
-
-		// overwrite max value
-		if (_colorProfile.isMaxValueOverwrite()) {
-
-			maxValue = _colorProfile.getMaxValueOverwrite();
-
-			if (unitFormat == LegendUnitFormat.Pace) {
-
-				// adjust value from minutes->seconds
-				maxValue *= 60;
-			}
-		}
+//		// overwrite min value
+//		if (_colorProfile.isMinValueOverwrite()) {
+//
+//			minValue = _colorProfile.getMinValueOverwrite();
+//
+//			if (unitFormat == LegendUnitFormat.Pace) {
+//
+//				// adjust value from minutes->seconds
+//				minValue *= 60;
+//			}
+//		}
+//
+//		// overwrite max value
+//		if (_colorProfile.isMaxValueOverwrite()) {
+//
+//			maxValue = _colorProfile.getMaxValueOverwrite();
+//
+//			if (unitFormat == LegendUnitFormat.Pace) {
+//
+//				// adjust value from minutes->seconds
+//				maxValue *= 60;
+//			}
+//		}
 
 		// ensure max is larger than min
 		if (maxValue <= minValue) {
@@ -244,12 +275,12 @@ public class Map3GradientColorProvider extends MapGradientColorProvider implemen
 		final int maxLen = 20;
 
 		final String dump = String.format(//
-				"Map3GradientColorProvider [_absoluteVertices=%s]",
+				"Map3GradientColorProvider [_absoluteVertices=%s]", //$NON-NLS-1$
 				_absoluteVertices != null ? Arrays.asList(_absoluteVertices).subList(
 						0,
 						Math.min(_absoluteVertices.length, maxLen)) : null);
 
-		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") + ("\t" + dump) + "\n");
+		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") + ("\t" + dump) + "\n"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 		// TODO remove SYSTEM.OUT.PRINTLN
 	}
 
@@ -453,8 +484,7 @@ public class Map3GradientColorProvider extends MapGradientColorProvider implemen
 
 		} else {
 
-			StatusUtil.log(new Throwable(String.format(
-					"Color profile '%s' is not of type '%s'",
+			StatusUtil.log(new Throwable(String.format("Color profile '%s' is not of type '%s'", //$NON-NLS-1$
 					colorProfile,
 					Map3ColorProfile.class.getName())));
 		}
@@ -467,7 +497,7 @@ public class Map3GradientColorProvider extends MapGradientColorProvider implemen
 
 	@Override
 	public String toString() {
-		return String.format("Map3GradientColorProvider [_graphId=%s, _colorProfile=%s]", _graphId, _colorProfile);
+		return String.format("Map3GradientColorProvider [_graphId=%s, _colorProfile=%s]", _graphId, _colorProfile); //$NON-NLS-1$
 	}
 
 }

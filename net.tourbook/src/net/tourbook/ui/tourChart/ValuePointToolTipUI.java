@@ -507,7 +507,7 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 
 				createUILabel(
 						container,
-						net.tourbook.common.Messages.Graph_Label_Cadence_unit,
+						net.tourbook.common.Messages.Graph_Label_Cadence_Unit,
 						net.tourbook.common.Messages.Graph_Label_Cadence,
 						GraphColorManager.PREF_GRAPH_CADENCE);
 			}
@@ -579,7 +579,7 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 
 				createUILabel(
 						container,
-						net.tourbook.common.Messages.Graph_Label_Gradiend_unit,
+						net.tourbook.common.Messages.Graph_Label_Gradient_Unit,
 						net.tourbook.common.Messages.Graph_Label_Gradient,
 						GraphColorManager.PREF_GRAPH_GRADIENT);
 			}
@@ -629,7 +629,7 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 
 				createUILabel(
 						container,
-						net.tourbook.common.Messages.Graph_Label_Power_unit,
+						net.tourbook.common.Messages.Graph_Label_Power_Unit,
 						net.tourbook.common.Messages.Graph_Label_Power,
 						GraphColorManager.PREF_GRAPH_POWER);
 			}
@@ -653,7 +653,7 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 
 				createUILabel(
 						container,
-						net.tourbook.common.Messages.Graph_Label_Heartbeat_unit,
+						net.tourbook.common.Messages.Graph_Label_Heartbeat_Unit,
 						net.tourbook.common.Messages.Graph_Label_Heartbeat,
 						GraphColorManager.PREF_GRAPH_HEARTBEAT);
 			}

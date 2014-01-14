@@ -221,8 +221,7 @@ public class DialogMap2ColorEditor extends TitleAreaDialog {
 				_colorProvider,
 				legendWidth,
 				legendHeight,
-				true,
-				false);
+				true);
 	}
 
 	private void createUI(final Composite parent) {

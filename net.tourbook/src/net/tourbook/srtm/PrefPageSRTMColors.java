@@ -658,7 +658,7 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 			}
 		}
 
-		createUI30ApplyOption(parent);
+		createUI_30_ApplyOption(parent);
 
 		return container;
 	}
@@ -825,7 +825,7 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 		}
 	}
 
-	private void createUI30ApplyOption(final Composite parent) {
+	private void createUI_30_ApplyOption(final Composite parent) {
 
 		/*
 		 * checkbox: pace min/max value

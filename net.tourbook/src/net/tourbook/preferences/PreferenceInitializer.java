@@ -343,5 +343,11 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 				ITourbookPreferences.VIEW_DOUBLE_CLICK_ACTIONS,
 				PrefPageViews.VIEW_DOUBLE_CLICK_ACTION_QUICK_EDIT);
 
+		/*
+		 * Pref page: Map3 color
+		 */
+		store.setDefault(ITourbookPreferences.MAP3_IS_COLOR_SELECTOR_DISPLAYED, true);
+		store.setDefault(ITourbookPreferences.MAP3_NUMBER_OF_COLOR_SELECTORS, 5);
+
 	}
 }

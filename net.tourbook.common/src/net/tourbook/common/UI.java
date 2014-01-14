@@ -56,6 +56,7 @@ import org.eclipse.swt.widgets.Sash;
 import org.eclipse.swt.widgets.Scale;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Spinner;
+import org.eclipse.swt.widgets.ToolBar;
 import org.epics.css.dal.Timestamp;
 import org.epics.css.dal.Timestamp.Format;
 import org.joda.time.DateTime;
@@ -797,6 +798,13 @@ public class UI {
 		 */
 		if (child instanceof Spinner || child instanceof Combo) {
 			return;
+		}
+
+		/*
+		 * Toolbar action render awfully on Win7.
+		 */
+		if (child instanceof ToolBar) {
+//			return;
 		}
 
 		child.setForeground(fgColor);

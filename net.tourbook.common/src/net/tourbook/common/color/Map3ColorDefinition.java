@@ -106,7 +106,7 @@ public class Map3ColorDefinition implements Comparable<Map3ColorDefinition> {
 	public int compareTo(final Map3ColorDefinition otherDef) {
 
 		// sort by name
-		return _visibleName.compareTo(otherDef._visibleName);
+//		return _visibleName.compareTo(otherDef._visibleName);
 	}
 
 	@Override
@@ -211,7 +211,7 @@ public class Map3ColorDefinition implements Comparable<Map3ColorDefinition> {
 
 	@Override
 	public String toString() {
-		return String.format("Map3ColorDefinition [_graphId=%s]", _graphId);
+		return String.format("Map3ColorDefinition [_graphId=%s]", _graphId); //$NON-NLS-1$
 	}
 
 }

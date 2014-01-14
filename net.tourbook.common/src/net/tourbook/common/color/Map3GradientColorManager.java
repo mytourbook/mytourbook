@@ -82,7 +82,8 @@ public class Map3GradientColorManager {
 	private static final String								ATTR_BLUE						= "blue";											//$NON-NLS-1$
 	private static final String								ATTR_GRAPH_ID					= "graphId";										//$NON-NLS-1$
 	private static final String								ATTR_GREEN						= "green";											//$NON-NLS-1$
-	private static final String								ATTR_IS_ACTIVE_PROFILE			= "isActive";										//$NON-NLS-1$
+	private static final String								ATTR_IS_ABSOLUTE_VALUES			= "isAbsoluteValues";								//$NON-NLS-1$
+	private static final String								ATTR_IS_ACTIVE_PROFILE			= "isActiveProfile";								//$NON-NLS-1$
 	private static final String								ATTR_NAME						= "name";											//$NON-NLS-1$
 	private static final String								ATTR_RED						= "red";											//$NON-NLS-1$
 	private static final String								ATTR_VALUE						= "value";											//$NON-NLS-1$
@@ -96,17 +97,13 @@ public class Map3GradientColorManager {
 	static {
 
 		/*
-		 * Define all color profiles.
+		 * Define default color profiles.
 		 */
 
-//		<valuecolor blue="0" green="64" red="128" value="10.0"/>
-//		<valuecolor blue="0" green="255" red="255" value="50.0"/>
-//		<valuecolor blue="0" green="0" red="255" value="100.0"/>
-//		<valuecolor blue="255" green="128" red="0" value="150.0"/>
-//		<valuecolor blue="255" green="128" red="0" value="190.0"/>
-
-		DEFAULT_PROFILE_ALTITUDE = new Map3ColorProfile(
-		//
+		DEFAULT_PROFILE_ALTITUDE = new Map3ColorProfile(//
+				//
+				false,
+				//
 				new RGBVertex[] {
 			new RGBVertex(0, 128, 64, 0),
 			new RGBVertex(20, 255, 255, 0),
@@ -121,13 +118,9 @@ public class Map3GradientColorManager {
 				MapColorProfile.BRIGHTNESS_LIGHTNING,
 				10);
 
-//		<valuecolor blue="0" green="0" red="0" value="10.0"/>
-//		<valuecolor blue="0" green="0" red="0" value="50.0"/>
-//		<valuecolor blue="128" green="0" red="128" value="100.0"/>
-//		<valuecolor blue="223" green="0" red="223" value="150.0"/>
-//		<valuecolor blue="255" green="255" red="255" value="190.0"/>
-
 		DEFAULT_PROFILE_GRADIENT = new Map3ColorProfile(//
+				//
+				true,
 				//
 				new RGBVertex[] {
 			new RGBVertex(-10, 0, 0, 0),
@@ -140,13 +133,9 @@ public class Map3GradientColorManager {
 				MapColorProfile.BRIGHTNESS_DIMMING,
 				10);
 
-//		<valuecolor blue="0" green="0" red="255" value="10.0"/>
-//		<valuecolor blue="0" green="255" red="255" value="50.0"/>
-//		<valuecolor blue="0" green="169" red="0" value="100.0"/>
-//		<valuecolor blue="255" green="255" red="0" value="150.0"/>
-//		<valuecolor blue="255" green="0" red="0" value="190.0"/>
-
-		DEFAULT_PROFILE_PACE = new Map3ColorProfile( //
+		DEFAULT_PROFILE_PACE = new Map3ColorProfile(//
+				//
+				false,
 				//
 				new RGBVertex[] {
 			new RGBVertex(0, 255, 0, 0),
@@ -158,13 +147,9 @@ public class Map3GradientColorManager {
 				MapColorProfile.BRIGHTNESS_DIMMING,
 				10);
 
-//		<valuecolor blue="0" green="203" red="0" value="10.0"/>
-//		<valuecolor blue="0" green="255" red="57" value="50.0"/>
-//		<valuecolor blue="0" green="0" red="255" value="100.0"/>
-//		<valuecolor blue="0" green="0" red="204" value="150.0"/>
-//		<valuecolor blue="255" green="0" red="0" value="190.0"/>
-
-		DEFAULT_PROFILE_PULSE = new Map3ColorProfile( //
+		DEFAULT_PROFILE_PULSE = new Map3ColorProfile(//
+				//
+				true,
 				//
 				new RGBVertex[] {
 			new RGBVertex(60, 0, 203, 0),
@@ -177,13 +162,9 @@ public class Map3GradientColorManager {
 				MapColorProfile.BRIGHTNESS_DIMMING,
 				10);
 
-//		<valuecolor blue="255" green="255" red="255" value="10.0"/>
-//		<valuecolor blue="0" green="255" red="198" value="50.0"/>
-//		<valuecolor blue="0" green="255" red="198" value="100.0"/>
-//		<valuecolor blue="255" green="128" red="0" value="150.0"/>
-//		<valuecolor blue="255" green="128" red="0" value="190.0"/>
-
-		DEFAULT_PROFILE_SPEED = new Map3ColorProfile( //
+		DEFAULT_PROFILE_SPEED = new Map3ColorProfile(//
+				//
+				false,
 				//
 				new RGBVertex[] {
 			new RGBVertex(0, 198, 255, 0),
@@ -498,9 +479,9 @@ public class Map3GradientColorManager {
 
 				colorProfile.setProfileName(Util.getXmlString(xmlProfile, ATTR_NAME, UI.EMPTY_STRING));
 				colorProfile.setIsActiveColorProfile(Util.getXmlBoolean(xmlProfile, ATTR_IS_ACTIVE_PROFILE, false));
+				colorProfile.setIsAbsoluteValues(Util.getXmlBoolean(xmlProfile, ATTR_IS_ABSOLUTE_VALUES, false));
 
 				readColors_20_Brightness(xmlProfile, colorProfile);
-				readColors_22_MinMaxValue(xmlProfile, colorProfile);
 				readColors_30_Vertices(xmlProfile, colorProfile);
 			}
 		}
@@ -535,35 +516,6 @@ public class Map3GradientColorManager {
 				xmlBrightness,
 				GraphColorManager.TAG_BRIGHTNESS_MAX_FACTOR,
 				MapColorProfile.BRIGHTNESS_FACTOR_DEFAULT));
-	}
-
-	private static void readColors_22_MinMaxValue(final IMemento xmlProfile, final Map3ColorProfile colorProfile) {
-
-		final IMemento xmlMinMaxValue = xmlProfile.getChild(GraphColorManager.MEMENTO_CHILD_MIN_MAX_VALUE);
-
-		if (xmlMinMaxValue == null) {
-			return;
-		}
-
-		colorProfile.setIsMinValueOverwrite(Util.getXmlBoolean(
-				xmlMinMaxValue,
-				GraphColorManager.TAG_IS_MIN_VALUE_OVERWRITE,
-				false));
-
-		colorProfile.setIsMaxValueOverwrite(Util.getXmlBoolean(
-				xmlMinMaxValue,
-				GraphColorManager.TAG_IS_MAX_VALUE_OVERWRITE,
-				false));
-
-		colorProfile.setMinValueOverwrite(Util.getXmlInteger(
-				xmlMinMaxValue,
-				GraphColorManager.TAG_MIN_VALUE_OVERWRITE,
-				0));
-
-		colorProfile.setMaxValueOverwrite(Util.getXmlInteger(
-				xmlMinMaxValue,
-				GraphColorManager.TAG_MAX_VALUE_OVERWRITE,
-				0));
 	}
 
 	private static void readColors_30_Vertices(final IMemento xmlProfile, final Map3ColorProfile colorProfile) {
@@ -695,10 +647,9 @@ public class Map3GradientColorManager {
 
 					xmlProfile.putString(ATTR_NAME, map3ColorProfile.getProfileName());
 					xmlProfile.putBoolean(ATTR_IS_ACTIVE_PROFILE, map3ColorProfile.isActiveColorProfile());
+					xmlProfile.putBoolean(ATTR_IS_ABSOLUTE_VALUES, map3ColorProfile.isAbsoluteValues());
 
 					saveColors_20_Brightness(xmlProfile, map3ColorProfile);
-					saveColors_22_MinMaxValue(xmlProfile, map3ColorProfile);
-
 					saveColors_30_Vertices(xmlProfile, map3ColorProfile);
 				}
 			}
@@ -716,25 +667,6 @@ public class Map3GradientColorManager {
 		xmlBrightness.putInteger(GraphColorManager.TAG_BRIGHTNESS_MIN_FACTOR, colorProfile.getMinBrightnessFactor());
 		xmlBrightness.putInteger(GraphColorManager.TAG_BRIGHTNESS_MAX, colorProfile.getMaxBrightness());
 		xmlBrightness.putInteger(GraphColorManager.TAG_BRIGHTNESS_MAX_FACTOR, colorProfile.getMaxBrightnessFactor());
-	}
-
-	/**
-	 * Min/max value
-	 */
-	private static void saveColors_22_MinMaxValue(final IMemento xmlColor, final Map3ColorProfile colorProfile) {
-
-		final IMemento xmlMinMaxValue = xmlColor.createChild(GraphColorManager.MEMENTO_CHILD_MIN_MAX_VALUE);
-
-		xmlMinMaxValue.putInteger(GraphColorManager.TAG_IS_MIN_VALUE_OVERWRITE, colorProfile.isMinValueOverwrite()
-				? 1
-				: 0);
-
-		xmlMinMaxValue.putInteger(//
-				GraphColorManager.TAG_IS_MAX_VALUE_OVERWRITE,
-				colorProfile.isMaxValueOverwrite() ? 1 : 0);
-
-		xmlMinMaxValue.putInteger(GraphColorManager.TAG_MIN_VALUE_OVERWRITE, colorProfile.getMinValueOverwrite());
-		xmlMinMaxValue.putInteger(GraphColorManager.TAG_MAX_VALUE_OVERWRITE, colorProfile.getMaxValueOverwrite());
 	}
 
 	private static void saveColors_30_Vertices(final IMemento xmlColor, final Map3ColorProfile colorProfile) {

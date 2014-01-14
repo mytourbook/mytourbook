@@ -22,7 +22,6 @@ public class Messages extends NLS {
 	private static final String	BUNDLE_NAME	= "net.tourbook.common.messages";				//$NON-NLS-1$
 
 	public static String		color_chooser_hexagon;
-	public static String		color_chooser_hexagon_move;
 	public static String		color_chooser_rgb;
 	public static String		color_chooser_red;
 	public static String		color_chooser_green;
@@ -36,9 +35,7 @@ public class Messages extends NLS {
 	public static String		Color_Chooser_Action_SetColorsFromProfile;
 	public static String		Color_Chooser_Dialog_SetColorsFromProfile_Message;
 	public static String		Color_Chooser_Dialog_SetColorsFromProfile_Title;
-
-	public static String	Color_Chooser_Hexagon_Tooltip;
-
+	public static String		Color_Chooser_Hexagon_Tooltip;
 	public static String		Color_Chooser_HoveredColor_Tooltip;
 	public static String		Color_Chooser_Label_ColorCustomColors_Tooltip;
 	public static String		Color_Chooser_Label_HoveredColor;
@@ -50,16 +47,16 @@ public class Messages extends NLS {
 	public static String		Graph_Label_Altimeter;
 	public static String		Graph_Label_Altitude;
 	public static String		Graph_Label_Cadence;
-	public static String		Graph_Label_Cadence_unit;
+	public static String		Graph_Label_Cadence_Unit;
 	public static String		Graph_Label_Distance;
-	public static String		Graph_Label_Gradiend_unit;
 	public static String		Graph_Label_Gradient;
+	public static String		Graph_Label_Gradient_Unit;
 	public static String		Graph_Label_Heartbeat;
-	public static String		Graph_Label_Heartbeat_unit;
+	public static String		Graph_Label_Heartbeat_Unit;
 	public static String		Graph_Label_History;
 	public static String		Graph_Label_Pace;
 	public static String		Graph_Label_Power;
-	public static String		Graph_Label_Power_unit;
+	public static String		Graph_Label_Power_Unit;
 	public static String		Graph_Label_ShowHrZoneBackground;
 	public static String		Graph_Label_ShowHrZoneBackground_Tooltip;
 	public static String		Graph_Label_Speed;
@@ -68,7 +65,7 @@ public class Messages extends NLS {
 	public static String		Graph_Label_TimeOfDay;
 	public static String		Graph_Label_Tour;
 	public static String		Graph_Label_Tour_Compare;
-	public static String		Graph_Label_Tour_Compare_unit;
+	public static String		Graph_Label_Tour_Compare_Unit;
 
 	public static String		Graph_Pref_color_gradient_bright;
 	public static String		Graph_Pref_color_gradient_dark;

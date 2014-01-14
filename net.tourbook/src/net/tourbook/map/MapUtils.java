@@ -48,6 +48,14 @@ public class MapUtils {
 			return false;
 		}
 
+		/**
+		 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+		 * <p>
+		 * Map units must be set because it is possible that a color provider is moved between
+		 * different graphs, e.g. pace -> gradient which has a total different unit.
+		 * <p>
+		 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+		 */
 		final MapUnits mapUnits = colorProvider.getMapUnits();
 
 		// tell the legend provider how to draw the legend
@@ -101,6 +109,9 @@ public class MapUtils {
 				setMap2ColorProfile(colorProvider, GraphColorManager.PREF_GRAPH_ALTITUDE);
 			}
 
+			mapUnits.numberFormatDigits = 0;
+			mapUnits.unitFormat = LegendUnitFormat.Number;
+
 			colorProvider.configureColorProvider(
 					legendHeight,
 					minValue,
@@ -150,6 +161,7 @@ public class MapUtils {
 			}
 
 			mapUnits.numberFormatDigits = 1;
+			mapUnits.unitFormat = LegendUnitFormat.Number;
 
 			if (colorProvider instanceof Map3GradientColorProvider) {
 
@@ -208,6 +220,7 @@ public class MapUtils {
 				return false;
 			}
 
+			mapUnits.numberFormatDigits = 0;
 			mapUnits.unitFormat = LegendUnitFormat.Pace;
 
 			if (colorProvider instanceof Map3GradientColorProvider) {
@@ -276,6 +289,9 @@ public class MapUtils {
 				setMap2ColorProfile(colorProvider, GraphColorManager.PREF_GRAPH_HEARTBEAT);
 			}
 
+			mapUnits.numberFormatDigits = 0;
+			mapUnits.unitFormat = LegendUnitFormat.Number;
+
 			colorProvider.configureColorProvider(
 					legendHeight,
 					minValue,
@@ -325,6 +341,7 @@ public class MapUtils {
 			}
 
 			mapUnits.numberFormatDigits = 1;
+			mapUnits.unitFormat = LegendUnitFormat.Number;
 
 			if (colorProvider instanceof Map3GradientColorProvider) {
 

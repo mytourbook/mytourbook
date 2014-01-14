@@ -22,12 +22,17 @@ import net.tourbook.common.util.StatusUtil;
  */
 public class Map2ColorProfile extends MapColorProfile implements Cloneable {
 
-	private ColorValue[]	colorValues	= new ColorValue[] {
+	protected boolean		isMinValueOverwrite	= false;
+	protected boolean		isMaxValueOverwrite	= false;
+	protected int			minValueOverwrite;
+	protected int			maxValueOverwrite;
+
+	private ColorValue[]	colorValues			= new ColorValue[] {
 			new ColorValue(10, 255, 0, 0),
 			new ColorValue(50, 100, 100, 0),
 			new ColorValue(100, 0, 255, 0),
 			new ColorValue(150, 0, 100, 100),
-			new ColorValue(190, 0, 0, 255) };
+			new ColorValue(190, 0, 0, 255)		};
 
 	public Map2ColorProfile() {}
 
@@ -107,8 +112,40 @@ public class Map2ColorProfile extends MapColorProfile implements Cloneable {
 		return colorValues;
 	}
 
+	public int getMaxValueOverwrite() {
+		return maxValueOverwrite;
+	}
+
+	public int getMinValueOverwrite() {
+		return minValueOverwrite;
+	}
+
+	public boolean isMaxValueOverwrite() {
+		return isMaxValueOverwrite;
+	}
+
+	public boolean isMinValueOverwrite() {
+		return isMinValueOverwrite;
+	}
+
 	public void setColorValues(final ColorValue[] colorValues) {
 		this.colorValues = colorValues;
+	}
+
+	public void setIsMaxValueOverwrite(final boolean isMaxValueOverwrite) {
+		this.isMaxValueOverwrite = isMaxValueOverwrite;
+	}
+
+	public void setIsMinValueOverwrite(final boolean isMinValueOverwrite) {
+		this.isMinValueOverwrite = isMinValueOverwrite;
+	}
+
+	public void setMaxValueOverwrite(final int overwriteMaxValue) {
+		this.maxValueOverwrite = overwriteMaxValue;
+	}
+
+	public void setMinValueOverwrite(final int overwriteMinValue) {
+		this.minValueOverwrite = overwriteMinValue;
 	}
 
 }

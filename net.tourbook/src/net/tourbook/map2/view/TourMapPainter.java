@@ -27,7 +27,6 @@ import java.util.Set;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.Util;
 import net.tourbook.common.color.ColorCacheInt;
-import net.tourbook.common.color.ColorUtil;
 import net.tourbook.common.color.IGradientColorProvider;
 import net.tourbook.common.color.IMapColorProvider;
 import net.tourbook.common.color.LegendUnitFormat;
@@ -179,8 +178,7 @@ public class TourMapPainter extends MapPainter {
 												final IGradientColorProvider colorProvider,
 												final int imageWidth,
 												final int imageHeight,
-												final boolean isDrawVertical,
-												final boolean isDrawLegendText) {
+												final boolean isDrawVertical) {
 
 		/*
 		 * Use a color which is likely not used, the previous color 0xfefefe was used and had bad
@@ -205,7 +203,7 @@ public class TourMapPainter extends MapPainter {
 			gc.setBackground(transparentColor);
 			gc.fillRectangle(legendImageBounds);
 
-			drawMapLegend(gc, legendImageBounds, colorProvider, isDrawVertical, isDrawLegendText);
+			drawMapLegend(gc, legendImageBounds, colorProvider, isDrawVertical);
 		}
 		gc.dispose();
 		transparentColor.dispose();
@@ -262,8 +260,7 @@ public class TourMapPainter extends MapPainter {
 	private static void drawLegendGradientColors_SWT(	final GC gc,
 														final Rectangle imageBounds,
 														final IGradientColorProvider colorProvider,
-														final boolean isDrawVertical,
-														final boolean isDrawLegendText) {
+														final boolean isDrawVertical) {
 
 		final MapUnits mapUnits = colorProvider.getMapUnits();
 
@@ -286,10 +283,11 @@ public class TourMapPainter extends MapPainter {
 		final float legendMaxValue = mapUnits.legendMaxValue;
 		final float legendMinValue = mapUnits.legendMinValue;
 		final float legendDiffValue = legendMaxValue - legendMinValue;
-		final String unitText = mapUnits.unitText;
 		final List<String> unitLabels = mapUnits.unitLabels;
 		final int legendFormatDigits = mapUnits.numberFormatDigits;
 		final LegendUnitFormat unitFormat = mapUnits.unitFormat;
+
+		final String unitText = UI.SPACE + mapUnits.unitText;
 
 		Rectangle contentBorder;
 
@@ -394,7 +392,7 @@ public class TourMapPainter extends MapPainter {
 
 							if (unitFormat == LegendUnitFormat.Pace) {
 
-								valueText = Util.format_mm_ss(unitValue.longValue()) + UI.SPACE + unitText;
+								valueText = Util.format_mm_ss(unitValue.longValue()) + unitText;
 
 							} else {
 
@@ -455,48 +453,7 @@ public class TourMapPainter extends MapPainter {
 			}
 		}
 
-		/*
-		 * draw text
-		 */
-		if (isDrawLegendText) {
-
-			drawLegendText(gc, colorProvider, legendMinValue, contentWidth, contentHeight, true);
-			drawLegendText(gc, colorProvider, legendMaxValue, contentWidth, contentHeight, false);
-		}
-
 		_colorCache.dispose();
-	}
-
-	private static void drawLegendText(	final GC gc,
-										final IGradientColorProvider colorProvider,
-										final float legendValue,
-										final int contentWidth,
-										final int contentHeight,
-										final boolean isLeft) {
-
-		final String legendValueText = String.format(VALUE_FORMAT, legendValue);
-		final int rgbValue = colorProvider.getColorValue(legendValue);
-
-		final Color fgColor = ColorUtil.getContrastColor(gc.getDevice(), rgbValue);
-		{
-			final org.eclipse.swt.graphics.Point textExtent = gc.textExtent(legendValueText);
-			final int textWidth = textExtent.x;
-			final int textHeight = textExtent.y;
-			final int textMargin = 3;
-
-			int textX;
-			final int textY = contentHeight / 2 - textHeight / 2;
-
-			if (isLeft) {
-				textX = textMargin;
-			} else {
-				textX = contentWidth - textWidth - textMargin;
-			}
-
-			gc.setForeground(fgColor);
-			gc.drawText(legendValueText, textX, textY, true);
-		}
-		fgColor.dispose();
 	}
 
 	/**
@@ -514,17 +471,15 @@ public class TourMapPainter extends MapPainter {
 	public static void drawMapLegend(	final GC gc,
 										final Rectangle legendImageBounds,
 										final IMapColorProvider colorProvider,
-										final boolean isDrawVertical,
-										final boolean isDrawLegendText) {
+										final boolean isDrawVertical) {
 
 		if (colorProvider instanceof IGradientColorProvider) {
 
-			drawLegendGradientColors_SWT(
+			drawLegendGradientColors_SWT(//
 					gc,
 					legendImageBounds,
 					(IGradientColorProvider) colorProvider,
-					isDrawVertical,
-					isDrawLegendText);
+					isDrawVertical);
 		}
 	}
 

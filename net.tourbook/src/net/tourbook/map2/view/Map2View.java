@@ -70,12 +70,12 @@ import net.tourbook.map2.action.ActionZoomIn;
 import net.tourbook.map2.action.ActionZoomOut;
 import net.tourbook.map2.action.ActionZoomShowEntireEarth;
 import net.tourbook.map2.action.ActionZoomShowEntireTour;
+import net.tourbook.photo.DialogPhotoProperties;
 import net.tourbook.photo.IPhotoEventListener;
 import net.tourbook.photo.IPhotoPropertiesListener;
 import net.tourbook.photo.Photo;
 import net.tourbook.photo.PhotoEventId;
 import net.tourbook.photo.PhotoManager;
-import net.tourbook.photo.DialogPhotoProperties;
 import net.tourbook.photo.PhotoPropertiesEvent;
 import net.tourbook.photo.PhotoSelection;
 import net.tourbook.photo.TourPhotoLink;
@@ -1341,7 +1341,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 			gc.fillRectangle(imageBounds);
 
 			if (isDataAvailable) {
-				TourMapPainter.drawMapLegend(gc, imageBounds, mapColorProvider, true, false);
+				TourMapPainter.drawMapLegend(gc, imageBounds, mapColorProvider, true);
 			} else {
 				// draws only a transparent image to hide the legend
 			}

@@ -120,6 +120,7 @@ import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IPartListener2;
@@ -133,7 +134,8 @@ import org.eclipse.ui.part.ViewPart;
  */
 public class Map3View extends ViewPart implements ITourProvider {
 
-	private static final String					OTHER_MESSAGES_01						= net.tourbook.common.Messages.Graph_Label_Heartbeat_unit;
+	private static final String					IMAGE_GRAPH_ALL							= net.tourbook.Messages.Image__Graph_All;
+	private static final String					GRAPH_LABEL_HEARTBEAT_UNIT				= net.tourbook.common.Messages.Graph_Label_Heartbeat_Unit;
 
 	private static final String					SLIDER_TEXT_ALTITUDE					= "%.1f %s";												//$NON-NLS-1$
 	private static final String					SLIDER_TEXT_GRADIENT					= "%.1f %%";												//$NON-NLS-1$
@@ -151,8 +153,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 	private static final String					STATE_MAP3_VIEW							= "STATE_MAP3_VIEW";										//$NON-NLS-1$
 	private static final String					STATE_TOUR_COLOR_ID						= "STATE_TOUR_COLOR_ID";									//$NON-NLS-1$
 
-	private final IPreferenceStore				_prefStore								= TourbookPlugin.getDefault()//
-																								.getPreferenceStore();
+	private final IPreferenceStore				_prefStore								= TourbookPlugin.getPrefStore();
 
 	private final IDialogSettings				_state									= TourbookPlugin
 																								.getState(getClass()
@@ -677,16 +678,19 @@ public class Map3View extends ViewPart implements ITourProvider {
 		showAllTours_InternalTours();
 	}
 
-	public void closeOtherColorSelectDialogs(final ActionTourColor actionTourColor) {
+	public void closeAllColorSelectDialogs() {
 
 		for (final ActionTourColor colorAction : _allColorActions) {
-
-			// close only other dialogs
-
-			if (colorAction != actionTourColor) {
-				colorAction.closeDialog();
-			}
+			colorAction.closeDialog();
 		}
+	}
+
+	public void closeOtherDialogs(final ActionTourColor actionTourColor) {
+
+		// other color dialogs are hidden very quickly so they don't need to be closed here
+
+		// hide slowly hidden dialog
+		_actionShowTourInMap3.closeDialog();
 	}
 
 	/**
@@ -747,6 +751,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 
 		_actionMap3Color = new ActionMap3Color();
 		_actionMap3Colors = new ActionOpenPrefDialog(Messages.Map3_Action_TrackColors, PrefPageMap3Color.ID);
+		_actionMap3Colors.setImageDescriptor(TourbookPlugin.getImageDescriptor(IMAGE_GRAPH_ALL));
 
 		_actionSetTrackSliderLeft = new ActionSetTrackSliderPositionLeft(this);
 		_actionSetTrackSliderRight = new ActionSetTrackSliderPositionRight(this);
@@ -941,7 +946,8 @@ public class Map3View extends ViewPart implements ITourProvider {
 
 			final float[] pulseSerie = tourData.pulseSerie;
 			if (pulseSerie != null) {
-				graphValueText = String.format(SLIDER_TEXT_PULSE, pulseSerie[positionIndex], OTHER_MESSAGES_01);
+				graphValueText = String
+						.format(SLIDER_TEXT_PULSE, pulseSerie[positionIndex], GRAPH_LABEL_HEARTBEAT_UNIT);
 			}
 
 			break;
@@ -1264,6 +1270,10 @@ public class Map3View extends ViewPart implements ITourProvider {
 		}
 
 		return null;
+	}
+
+	public Shell getShell() {
+		return _mapContainer.getShell();
 	}
 
 	private double getSliderYPosition(final float trackAltitude, final Position eyePosition) {
@@ -1820,6 +1830,44 @@ public class Map3View extends ViewPart implements ITourProvider {
 		showAllTours_InternalTours();
 	}
 
+	//	public static final String	ALL						= "gov.nasa.worldwind.perfstat.All";
+//
+//	public static final String	FRAME_RATE				= "gov.nasa.worldwind.perfstat.FrameRate";
+//	public static final String	FRAME_TIME				= "gov.nasa.worldwind.perfstat.FrameTime";
+//	public static final String	PICK_TIME				= "gov.nasa.worldwind.perfstat.PickTime";
+//
+//	public static final String	TERRAIN_TILE_COUNT		= "gov.nasa.worldwind.perfstat.TerrainTileCount";
+//	public static final String	IMAGE_TILE_COUNT		= "gov.nasa.worldwind.perfstat.ImageTileCount";
+//
+//	public static final String	AIRSPACE_GEOMETRY_COUNT	= "gov.nasa.worldwind.perfstat.AirspaceGeometryCount";
+//	public static final String	AIRSPACE_VERTEX_COUNT	= "gov.nasa.worldwind.perfstat.AirspaceVertexCount";
+//
+//	public static final String	JVM_HEAP				= "gov.nasa.worldwind.perfstat.JvmHeap";
+//	public static final String	JVM_HEAP_USED			= "gov.nasa.worldwind.perfstat.JvmHeapUsed";
+//
+//	public static final String	MEMORY_CACHE			= "gov.nasa.worldwind.perfstat.MemoryCache";
+//	public static final String	TEXTURE_CACHE			= "gov.nasa.worldwind.perfstat.TextureCache";
+
+//2013-10-06 10:12:12.317'955 [Map3View] 	         0  Frame Rate (fps)
+//2013-10-06 10:12:12.317'982 [Map3View] 	       152  Frame Time (ms)
+//2013-10-06 10:12:12.318'366 [Map3View] 	         8  Pick Time (ms)
+
+//2013-10-06 10:12:12.318'392 [Map3View] 	        91  Terrain Tiles
+
+//2013-10-06 10:12:12.318'169 [Map3View] 	      6252  Cache Size (Kb): Terrain
+//2013-10-06 10:12:12.318'191 [Map3View] 	         0  Cache Size (Kb): Placename Tiles
+//2013-10-06 10:12:12.318'214 [Map3View] 	      1860  Cache Size (Kb): Texture Tiles
+//2013-10-06 10:12:12.318'289 [Map3View] 	      3870  Cache Size (Kb): Elevation Tiles
+//2013-10-06 10:12:12.318'414 [Map3View] 	    422617  Texture Cache size (Kb)
+
+//2013-10-06 10:12:12.318'007 [Map3View] 	         2  Blue Marble (WMS) 2004 Tiles
+//2013-10-06 10:12:12.318'044 [Map3View] 	        35  i-cubed Landsat Tiles
+//2013-10-06 10:12:12.318'069 [Map3View] 	        84  MS Virtual Earth Aerial Tiles
+//2013-10-06 10:12:12.318'093 [Map3View] 	        84  Bing Imagery Tiles
+
+//2013-10-06 10:12:12.318'118 [Map3View] 	    463659  JVM total memory (Kb)
+//2013-10-06 10:12:12.318'141 [Map3View] 	    431273  JVM used memory (Kb)
+
 	private void showTour(final TourData newTourData) {
 
 		if (newTourData == null) {
@@ -1880,44 +1928,6 @@ public class Map3View extends ViewPart implements ITourProvider {
 			showAllTours_NewTours(_allTours);
 		}
 	}
-
-	//	public static final String	ALL						= "gov.nasa.worldwind.perfstat.All";
-//
-//	public static final String	FRAME_RATE				= "gov.nasa.worldwind.perfstat.FrameRate";
-//	public static final String	FRAME_TIME				= "gov.nasa.worldwind.perfstat.FrameTime";
-//	public static final String	PICK_TIME				= "gov.nasa.worldwind.perfstat.PickTime";
-//
-//	public static final String	TERRAIN_TILE_COUNT		= "gov.nasa.worldwind.perfstat.TerrainTileCount";
-//	public static final String	IMAGE_TILE_COUNT		= "gov.nasa.worldwind.perfstat.ImageTileCount";
-//
-//	public static final String	AIRSPACE_GEOMETRY_COUNT	= "gov.nasa.worldwind.perfstat.AirspaceGeometryCount";
-//	public static final String	AIRSPACE_VERTEX_COUNT	= "gov.nasa.worldwind.perfstat.AirspaceVertexCount";
-//
-//	public static final String	JVM_HEAP				= "gov.nasa.worldwind.perfstat.JvmHeap";
-//	public static final String	JVM_HEAP_USED			= "gov.nasa.worldwind.perfstat.JvmHeapUsed";
-//
-//	public static final String	MEMORY_CACHE			= "gov.nasa.worldwind.perfstat.MemoryCache";
-//	public static final String	TEXTURE_CACHE			= "gov.nasa.worldwind.perfstat.TextureCache";
-
-//2013-10-06 10:12:12.317'955 [Map3View] 	         0  Frame Rate (fps)
-//2013-10-06 10:12:12.317'982 [Map3View] 	       152  Frame Time (ms)
-//2013-10-06 10:12:12.318'366 [Map3View] 	         8  Pick Time (ms)
-
-//2013-10-06 10:12:12.318'392 [Map3View] 	        91  Terrain Tiles
-
-//2013-10-06 10:12:12.318'169 [Map3View] 	      6252  Cache Size (Kb): Terrain
-//2013-10-06 10:12:12.318'191 [Map3View] 	         0  Cache Size (Kb): Placename Tiles
-//2013-10-06 10:12:12.318'214 [Map3View] 	      1860  Cache Size (Kb): Texture Tiles
-//2013-10-06 10:12:12.318'289 [Map3View] 	      3870  Cache Size (Kb): Elevation Tiles
-//2013-10-06 10:12:12.318'414 [Map3View] 	    422617  Texture Cache size (Kb)
-
-//2013-10-06 10:12:12.318'007 [Map3View] 	         2  Blue Marble (WMS) 2004 Tiles
-//2013-10-06 10:12:12.318'044 [Map3View] 	        35  i-cubed Landsat Tiles
-//2013-10-06 10:12:12.318'069 [Map3View] 	        84  MS Virtual Earth Aerial Tiles
-//2013-10-06 10:12:12.318'093 [Map3View] 	        84  Bing Imagery Tiles
-
-//2013-10-06 10:12:12.318'118 [Map3View] 	    463659  JVM total memory (Kb)
-//2013-10-06 10:12:12.318'141 [Map3View] 	    431273  JVM used memory (Kb)
 
 	private void showToursFromTourProvider() {
 

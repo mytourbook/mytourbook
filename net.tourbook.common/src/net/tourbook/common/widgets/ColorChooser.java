@@ -136,6 +136,8 @@ public class ColorChooser extends Composite {
 
 	private Label									_lblHoveredColor;
 	private Label									_lblSelectedColor;
+	private Label									_lblHue;
+	private Label									_lblSaturation;
 	private Label[][]								_customColors;
 
 	private Scale									_scaleRed;
@@ -279,6 +281,9 @@ public class ColorChooser extends Composite {
 
 		// set selected color
 		setChooserRGB(new RGB(_selectedValueRed, _selectedValueGreen, _selectedValueBlue));
+
+
+		enableControls();
 	}
 
 	private void createUI_10_Tabs(final Composite parent) {
@@ -534,8 +539,8 @@ public class ColorChooser extends Composite {
 		 * HUE
 		 */
 		{
-			final Label hueLabel = new Label(parent, SWT.NONE);
-			hueLabel.setText(Messages.color_chooser_hue);
+			_lblHue = new Label(parent, SWT.NONE);
+			_lblHue.setText(Messages.color_chooser_hue);
 
 			_scaleHue = new Scale(parent, scaleStyle);
 			_scaleHue.setLayoutData(gd);
@@ -571,8 +576,8 @@ public class ColorChooser extends Composite {
 		 * saturation
 		 */
 		{
-			final Label saturationLabel = new Label(parent, SWT.NONE);
-			saturationLabel.setText(Messages.color_chooser_saturation);
+			_lblSaturation = new Label(parent, SWT.NONE);
+			_lblSaturation.setText(Messages.color_chooser_saturation);
 
 			_scaleSaturation = new Scale(parent, scaleStyle);
 			_scaleSaturation.setLayoutData(gd);
@@ -794,6 +799,20 @@ public class ColorChooser extends Composite {
 			}
 		}
 		gc.dispose();
+	}
+
+	private void enableControls() {
+
+		final boolean isHueEnabled = _scaleSaturation.getSelection() != 0;
+		final boolean isSaturationEnabled = _scaleBrightness.getSelection() != 0;
+
+		_lblHue.setEnabled(isHueEnabled);
+		_scaleHue.setEnabled(isHueEnabled);
+		_spinnerHue.setEnabled(isHueEnabled);
+
+		_lblSaturation.setEnabled(isSaturationEnabled);
+		_scaleSaturation.setEnabled(isSaturationEnabled);
+		_spinnerSaturation.setEnabled(isSaturationEnabled);
 	}
 
 	private void fillContextMenu(final IMenuManager menuMgr) {
@@ -1345,6 +1364,8 @@ public class ColorChooser extends Composite {
 		_spinnerHue.setSelection(hue);
 		_spinnerSaturation.setSelection(saturation);
 		_spinnerBrightness.setSelection(brightness);
+
+		enableControls();
 	}
 
 	private void updateUI_HoveredColor(final RGB hoveredRGB) {
@@ -1367,6 +1388,8 @@ public class ColorChooser extends Composite {
 		updateUI_Controls();
 
 		updateValues_HSB();
+
+		enableControls();
 	}
 
 	private void updateUI_RGB() {
@@ -1379,6 +1402,8 @@ public class ColorChooser extends Composite {
 		updateUI_Controls();
 
 		updateValues_RGB();
+
+		enableControls();
 	}
 
 	private void updateUI_SelectedColor() {

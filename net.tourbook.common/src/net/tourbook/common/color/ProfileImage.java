@@ -226,7 +226,7 @@ public abstract class ProfileImage implements Cloneable {
 	public String toString() {
 		final int maxLen = 10;
 		return String.format(
-				"RGBVertices [_rgbVertices=%s]",
+				"RGBVertices [_rgbVertices=%s]", //$NON-NLS-1$
 				_rgbVertices != null ? _rgbVertices.subList(0, Math.min(_rgbVertices.size(), maxLen)) : null);
 	}
 

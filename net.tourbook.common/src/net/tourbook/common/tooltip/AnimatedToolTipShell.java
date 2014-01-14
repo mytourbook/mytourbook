@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -544,7 +544,8 @@ public abstract class AnimatedToolTipShell {
 	 */
 	public void close() {
 
-		if (_shell != null) {
+		if (_shell != null && _shell.isDisposed() == false) {
+
 			_shell.close();
 			_shell = null;
 		}
@@ -614,12 +615,8 @@ public abstract class AnimatedToolTipShell {
 			createToolTipContentArea(_shell);
 		}
 
-		if (isShellCreated) {
-			_shell.pack(true);
-		} else {
-			_shell.layout();
-			_shell.pack(true);
-		}
+		_shell.layout();
+		_shell.pack(true);
 
 		_shell.setRedraw(true);
 
@@ -723,7 +720,7 @@ public abstract class AnimatedToolTipShell {
 		return _shell == null || _shell.isDisposed() || _shell.isVisible() == false;
 	}
 
-	protected boolean isToolTipVisible() {
+	public boolean isToolTipVisible() {
 
 		if (_shell == null || _shell.isDisposed()) {
 			return false;
@@ -1278,7 +1275,4 @@ public abstract class AnimatedToolTipShell {
 		animation10_Start();
 	}
 
-	public int xxxget_fadeOutDelaySteps() {
-		return _fadeOutDelaySteps;
-	}
 }

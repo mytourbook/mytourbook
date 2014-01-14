@@ -150,19 +150,19 @@ public class ActionOpenGLVersions extends Action {
 
 		public void display(final GLAutoDrawable drawable) {
 
-			System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") + ("\tdisplay"));
+			System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") + ("\tdisplay")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			// TODO remove SYSTEM.OUT.PRINTLN
 		}
 
 		public void dispose(final GLAutoDrawable drawable) {
 
-			System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") + ("\tdispose"));
+			System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") + ("\tdispose")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			// TODO remove SYSTEM.OUT.PRINTLN
 		}
 
 		public void init(final GLAutoDrawable drawable) {
 
-			System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") + ("\tinit"));
+			System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") + ("\tinit")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			// TODO remove SYSTEM.OUT.PRINTLN
 
 			// update UI in UI thread
@@ -175,7 +175,7 @@ public class ActionOpenGLVersions extends Action {
 
 		public void reshape(final GLAutoDrawable drawable, final int x, final int y, final int width, final int height) {
 
-			System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") + ("\treshape"));
+			System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") + ("\treshape")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			// TODO remove SYSTEM.OUT.PRINTLN
 		}
 	}
@@ -227,7 +227,7 @@ public class ActionOpenGLVersions extends Action {
 
 			final Label label = new Label(container, SWT.NONE);
 			GridDataFactory.fillDefaults().applyTo(label);
-			label.setText("test");
+			label.setText("test"); //$NON-NLS-1$
 
 		}
 

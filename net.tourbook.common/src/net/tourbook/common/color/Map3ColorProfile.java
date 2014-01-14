@@ -16,6 +16,7 @@
 package net.tourbook.common.color;
 
 import net.tourbook.common.Messages;
+import net.tourbook.common.UI;
 import net.tourbook.common.util.StatusUtil;
 
 /**
@@ -23,7 +24,7 @@ import net.tourbook.common.util.StatusUtil;
  */
 public class Map3ColorProfile extends MapColorProfile implements Cloneable {
 
-	private static final String	PROFILE_NAME_DEFAULTA	= Messages.Map3_Color_ProfileName_Default;
+	private static final String	PROFILE_NAME_DEFAULT	= Messages.Map3_Color_ProfileName_Default;
 	public static final String	PROFILE_NAME_NEW		= Messages.Map3_Color_ProfileName_New;
 
 	/**
@@ -34,7 +35,13 @@ public class Map3ColorProfile extends MapColorProfile implements Cloneable {
 	/**
 	 * Name which is visible in the UI.
 	 */
-	private String				_profileName			= PROFILE_NAME_DEFAULTA;
+	private String				_profileName			= PROFILE_NAME_DEFAULT;
+
+	/**
+	 * When <code>true</code>, the vertex values in {@link #_profileImage} are absolute, otherwise
+	 * they are relative.
+	 */
+	private boolean				_isAbsoluteValues;
 
 	private ProfileImage		_profileImage			= new Map3ProfileImage();
 
@@ -48,15 +55,15 @@ public class Map3ColorProfile extends MapColorProfile implements Cloneable {
 	}
 
 	/**
-	 * @param graphId
+	 * @param isValueAbsolute
 	 * @param rgbVertices
 	 * @param minBrightness
 	 * @param minBrightnessFactor
 	 * @param maxBrightness
 	 * @param maxBrightnessFactor
 	 */
-	public Map3ColorProfile(final RGBVertex[] rgbVertices,
-	//
+	public Map3ColorProfile(final boolean isValueAbsolute,
+							final RGBVertex[] rgbVertices,
 							final int minBrightness,
 							final int minBrightnessFactor,
 							final int maxBrightness,
@@ -64,47 +71,13 @@ public class Map3ColorProfile extends MapColorProfile implements Cloneable {
 
 		this();
 
+		_isAbsoluteValues = isValueAbsolute;
 		_profileImage.setVertices(rgbVertices);
 
 		this.minBrightness = minBrightness;
 		this.minBrightnessFactor = minBrightnessFactor;
 		this.maxBrightness = maxBrightness;
 		this.maxBrightnessFactor = maxBrightnessFactor;
-	}
-
-	/**
-	 * @param valueColors
-	 * @param minBrightness
-	 * @param minBrightnessFactor
-	 * @param maxBrightness
-	 * @param maxBrightnessFactor
-	 * @param isMinOverwrite
-	 * @param minOverwrite
-	 * @param isMaxOverwrite
-	 * @param maxOverwrite
-	 */
-	public Map3ColorProfile(final RGBVertex[] rgbVertices,
-							final int minBrightness,
-							final int minBrightnessFactor,
-							final int maxBrightness,
-							final int maxBrightnessFactor,
-							//
-							final boolean isMinOverwrite,
-							final int minOverwrite,
-							final boolean isMaxOverwrite,
-							final int maxOverwrite) {
-
-		this(//
-				rgbVertices,
-				minBrightness,
-				minBrightnessFactor,
-				maxBrightness,
-				maxBrightnessFactor);
-
-		this.isMinValueOverwrite = isMinOverwrite;
-		this.minValueOverwrite = minOverwrite;
-		this.isMaxValueOverwrite = isMaxOverwrite;
-		this.maxValueOverwrite = maxOverwrite;
 	}
 
 	@Override
@@ -175,8 +148,21 @@ public class Map3ColorProfile extends MapColorProfile implements Cloneable {
 		return result;
 	}
 
+	public boolean isAbsoluteValues() {
+		return _isAbsoluteValues;
+	}
+
 	public boolean isActiveColorProfile() {
 		return _isActiveColorProfile;
+	}
+
+	public void setDuplicatedName() {
+
+		_profileName = _profileName + UI.SPACE + getProfileId();
+	}
+
+	public void setIsAbsoluteValues(final boolean isAbsoluteValues) {
+		_isAbsoluteValues = isAbsoluteValues;
 	}
 
 	public void setIsActiveColorProfile(final boolean isActiveColorProfile) {
@@ -194,7 +180,7 @@ public class Map3ColorProfile extends MapColorProfile implements Cloneable {
 	@Override
 	public String toString() {
 		return String.format(
-				"Map3ColorProfile [_profileId=%s, _profileName=%s, _isActiveColorProfile=%s, _profileImage=%s]",
+				"Map3ColorProfile [_profileId=%s, _profileName=%s, _isActiveColorProfile=%s, _profileImage=%s]", //$NON-NLS-1$
 				_profileId,
 				_profileName,
 				_isActiveColorProfile,
