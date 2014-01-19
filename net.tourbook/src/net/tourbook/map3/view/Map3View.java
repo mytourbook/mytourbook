@@ -134,7 +134,7 @@ import org.eclipse.ui.part.ViewPart;
  */
 public class Map3View extends ViewPart implements ITourProvider {
 
-	private static final String					IMAGE_GRAPH_ALL							= net.tourbook.Messages.Image__Graph_All;
+	private static final String					IMAGE_GRAPH_ALL							= net.tourbook.Messages.Image__options;
 	private static final String					GRAPH_LABEL_HEARTBEAT_UNIT				= net.tourbook.common.Messages.Graph_Label_Heartbeat_Unit;
 
 	private static final String					SLIDER_TEXT_ALTITUDE					= "%.1f %s";												//$NON-NLS-1$
@@ -221,7 +221,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 	/**
 	 * Color id for the currently displayed tour tracks.
 	 */
-	private MapGraphId							_tourColorId;
+	private MapGraphId							_graphId;
 
 	/*
 	 * current position for the x-sliders (vertical slider)
@@ -296,16 +296,16 @@ public class Map3View extends ViewPart implements ITourProvider {
 	public void actionOpenTrackColorDialog() {
 
 		// set color before menu is filled, this sets the action image and color provider
-		_actionMap3Color.setColorId(_tourColorId);
+		_actionMap3Color.setColorId(_graphId);
 
 		_actionMap3Color.run();
 	}
 
-	public void actionSetMapColor(final MapGraphId colorId) {
+	public void actionSetMapColor(final MapGraphId graphId) {
 
-		_tourColorId = colorId;
+		_graphId = graphId;
 
-		setColorProvider(colorId);
+		setColorProvider(graphId);
 	}
 
 	public void actionSetTrackSlider(final boolean isLeftSlider) {
@@ -561,7 +561,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 
 					// update map colors
 
-					setColorProvider(_tourColorId);
+					setColorProvider(_graphId);
 
 				} else if (property.equals(ITourbookPreferences.MEASUREMENT_SYSTEM)) {
 
@@ -635,7 +635,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 
 		final boolean isChecked = selectedToolItem.getSelection();
 
-		if (colorId == _tourColorId) {
+		if (colorId == _graphId) {
 
 			// active color is selected
 
@@ -750,7 +750,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 		_actionOpenMap3StatisticsView = new ActionOpenMap3StatisticsView();
 
 		_actionMap3Color = new ActionMap3Color();
-		_actionMap3Colors = new ActionOpenPrefDialog(Messages.Map3_Action_TrackColors, PrefPageMap3Color.ID);
+		_actionMap3Colors = new ActionOpenPrefDialog(Messages.Map3_Action_TrackColors, PrefPageMap3Color.ID, _graphId);
 		_actionMap3Colors.setImageDescriptor(TourbookPlugin.getImageDescriptor(IMAGE_GRAPH_ALL));
 
 		_actionSetTrackSliderLeft = new ActionSetTrackSliderPositionLeft(this);
@@ -907,7 +907,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 
 		String graphValueText = null;
 
-		switch (_tourColorId) {
+		switch (_graphId) {
 
 		case Altitude:
 
@@ -1118,7 +1118,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 	private void fillContextMenu(final Menu menu) {
 
 		// set color before menu is filled, this sets the action image and color id
-		_actionMap3Color.setColorId(_tourColorId);
+		_actionMap3Color.setColorId(_graphId);
 
 		fillMenuItem(menu, _actionSetTrackSliderLeft);
 		fillMenuItem(menu, _actionSetTrackSliderRight);
@@ -1129,7 +1129,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 		fillMenuItem(menu, _actionShowTrackSlider);
 		fillMenuItem(menu, _actionShowLegendInMap);
 
-		if (_tourColorId != MapGraphId.HrZone) {
+		if (_graphId != MapGraphId.HrZone) {
 
 			// hr zone has a different color provider and is not yet supported
 
@@ -1304,7 +1304,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 	}
 
 	public MapGraphId getTrackColorId() {
-		return _tourColorId;
+		return _graphId;
 	}
 
 	/**
@@ -1482,14 +1482,14 @@ public class Map3View extends ViewPart implements ITourProvider {
 		final String stateColorId = Util.getStateString(_state, STATE_TOUR_COLOR_ID, MapGraphId.Altitude.name());
 
 		try {
-			_tourColorId = MapGraphId.valueOf(stateColorId);
+			_graphId = MapGraphId.valueOf(stateColorId);
 		} catch (final Exception e) {
 			// set default
-			_tourColorId = MapGraphId.Altitude;
+			_graphId = MapGraphId.Altitude;
 		}
 
 		// select/check active color
-		switch (_tourColorId) {
+		switch (_graphId) {
 		case Altitude:
 			_actionTourColorAltitude.setChecked(true);
 			break;
@@ -1518,7 +1518,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 			break;
 		}
 
-		setColorProvider(_tourColorId);
+		setColorProvider(_graphId);
 
 		_actionShowDirectionArrows.setChecked(TourTrackConfigManager.getActiveConfig().isShowDirectionArrows);
 
@@ -1540,7 +1540,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 		 * It can happen that this view is not yet restored with restoreState() but the saveState()
 		 * method is called which causes a NPE
 		 */
-		if (_tourColorId == null) {
+		if (_graphId == null) {
 			return;
 		}
 
@@ -1554,7 +1554,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 		_state.put(STATE_IS_SYNC_MAP_VIEW_WITH_TOUR, _isSyncMapViewWithTour);
 		_state.put(STATE_IS_TOUR_VISIBLE, isTrackVisible);
 
-		_state.put(STATE_TOUR_COLOR_ID, _tourColorId.name());
+		_state.put(STATE_TOUR_COLOR_ID, _graphId.name());
 
 		final View view = _wwCanvas.getView();
 
@@ -1566,7 +1566,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 		final Color bgColor;
 		final Color fgColor;
 
-		final IMapColorProvider colorProvider = MapColorProvider.getActiveMap3ColorProvider(_tourColorId);
+		final IMapColorProvider colorProvider = MapColorProvider.getActiveMap3ColorProvider(_graphId);
 
 		Integer colorValue = null;
 
@@ -1579,7 +1579,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 
 			float graphValue = legendMinValue;
 
-			switch (_tourColorId) {
+			switch (_graphId) {
 
 			case Altitude:
 
@@ -1611,7 +1611,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 			}
 
 			// get color according to the value
-			colorValue = gradientColorProvider.getColorValue(graphValue);
+			colorValue = gradientColorProvider.getRGBValue(graphValue);
 
 		} else if (colorProvider instanceof IDiscreteColorProvider) {
 
@@ -1629,12 +1629,13 @@ public class Map3View extends ViewPart implements ITourProvider {
 
 		} else {
 
-			final int red = (colorValue & 0xFF) >>> 0;
-			final int green = (colorValue & 0xFF00) >>> 8;
-			final int blue = (colorValue & 0xFF0000) >>> 16;
+			final int r = (colorValue & 0xFF) >>> 0;
+			final int g = (colorValue & 0xFF00) >>> 8;
+			final int b = (colorValue & 0xFF0000) >>> 16;
+			final int o = (colorValue & 0xFF000000) >>> 24;
 
-			bgColor = new Color(red, green, blue);
-			fgColor = ColorUtil.getContrastColor(red, green, blue);
+			bgColor = new Color(r, g, b, 0xff);
+			fgColor = ColorUtil.getContrastColorAWT(r, g, b, 0xff);
 		}
 
 		final AnnotationAttributes attributes = trackPoint.getAttributes();
@@ -1668,9 +1669,11 @@ public class Map3View extends ViewPart implements ITourProvider {
 		sliderAnnotation.setAltitudeMode(config.altitudeMode);
 	}
 
-	private void setColorProvider(final MapGraphId colorId) {
+	private void setColorProvider(final MapGraphId graphId) {
 
-		final IMapColorProvider colorProvider = MapColorProvider.getActiveMap3ColorProvider(colorId);
+		_actionMap3Colors.setData(graphId);
+
+		final IMapColorProvider colorProvider = MapColorProvider.getActiveMap3ColorProvider(graphId);
 
 		Map3Manager.getLayer_TourTrack().setColorProvider(colorProvider);
 		Map3Manager.getLayer_TourLegend().setColorProvider(colorProvider);

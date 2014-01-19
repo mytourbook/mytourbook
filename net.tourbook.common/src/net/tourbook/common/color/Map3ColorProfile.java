@@ -37,15 +37,16 @@ public class Map3ColorProfile extends MapColorProfile implements Cloneable {
 	 */
 	private String				_profileName			= PROFILE_NAME_DEFAULT;
 
+	private ProfileImage		_profileImage			= new Map3ProfileImage();
+
 	/**
 	 * When <code>true</code>, the vertex values in {@link #_profileImage} are absolute, otherwise
 	 * they are relative.
 	 */
 	private boolean				_isAbsoluteValues;
 
-	private ProfileImage		_profileImage			= new Map3ProfileImage();
-
 	private boolean				_isActiveColorProfile;
+	private boolean				_isOverwriteLegendValues;
 
 	private static int			_idCounter				= 0;
 
@@ -156,6 +157,10 @@ public class Map3ColorProfile extends MapColorProfile implements Cloneable {
 		return _isActiveColorProfile;
 	}
 
+	public boolean isOverwriteLegendValues() {
+		return _isOverwriteLegendValues;
+	}
+
 	public void setDuplicatedName() {
 
 		_profileName = _profileName + UI.SPACE + getProfileId();
@@ -167,6 +172,10 @@ public class Map3ColorProfile extends MapColorProfile implements Cloneable {
 
 	public void setIsActiveColorProfile(final boolean isActiveColorProfile) {
 		_isActiveColorProfile = isActiveColorProfile;
+	}
+
+	public void setIsOverwriteLegendValues(final boolean isOverwriteLegendValues) {
+		_isOverwriteLegendValues = isOverwriteLegendValues;
 	}
 
 	public void setProfileId(final int profileId) {

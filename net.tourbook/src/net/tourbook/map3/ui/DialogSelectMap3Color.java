@@ -89,7 +89,7 @@ import org.eclipse.ui.dialogs.PreferencesUtil;
 public class DialogSelectMap3Color extends AnimatedToolTipShell implements IMap3ColorUpdater {
 
 	private static final String							IMAGE_APP_ADD					= net.tourbook.Messages.Image__App_Add;
-	private static final String							IMAGE_GRAPH_ALL					= net.tourbook.Messages.Image__Graph_All;
+	private static final String							IMAGE_GRAPH_ALL					= net.tourbook.Messages.Image__Options_Bright;
 
 	private static final int							SHELL_MARGIN					= 0;
 
@@ -191,7 +191,7 @@ public class DialogSelectMap3Color extends AnimatedToolTipShell implements IMap3
 				_map3View.getShell(),
 				PrefPageMap3Color.ID,
 				null,
-				null).open();
+				_graphId).open();
 	}
 
 	private void actionEditSelectedColor() {
@@ -725,6 +725,7 @@ public class DialogSelectMap3Color extends AnimatedToolTipShell implements IMap3
 		} else {
 
 			final int imageWidth = _tcProfileImage.getWidth();
+			final int imageHeight = PROFILE_IMAGE_HEIGHT - 1;
 
 			final Map3ColorProfile colorProfile = colorProvider.getMap3ColorProfile();
 			final ArrayList<RGBVertex> rgbVertices = colorProfile.getProfileImage().getRgbVertices();
@@ -732,10 +733,11 @@ public class DialogSelectMap3Color extends AnimatedToolTipShell implements IMap3
 			colorProvider.configureColorProvider(imageWidth, rgbVertices, false);
 
 			image = TourMapPainter.createMapLegendImage(//
-					Display.getCurrent(),
 					colorProvider,
 					imageWidth,
-					PROFILE_IMAGE_HEIGHT - 1,
+					imageHeight,
+					false,
+					false,
 					false);
 
 			final Image oldImage = _profileImages.put(colorProvider, image);
@@ -749,9 +751,9 @@ public class DialogSelectMap3Color extends AnimatedToolTipShell implements IMap3
 	@Override
 	public Point getToolTipLocation(final Point tipSize) {
 
-		final int tipWidth = tipSize.x;
-
-		final int itemWidth = _toolTipItemBounds.width;
+//		final int tipWidth = tipSize.x;
+//
+//		final int itemWidth = _toolTipItemBounds.width;
 		final int itemHeight = _toolTipItemBounds.height;
 
 		// center horizontally

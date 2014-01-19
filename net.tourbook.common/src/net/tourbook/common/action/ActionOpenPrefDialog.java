@@ -26,6 +26,8 @@ public final class ActionOpenPrefDialog extends Action {
 
 	private String	_prefPageId;
 
+	private Object	_data;
+
 	/**
 	 * @param text
 	 * @param prefPageId
@@ -38,13 +40,30 @@ public final class ActionOpenPrefDialog extends Action {
 		_prefPageId = prefPageId;
 	}
 
+	/**
+	 * @param text
+	 * @param prefPageId
+	 * @param data
+	 */
+	public ActionOpenPrefDialog(final String text, final String prefPageId, final Object data) {
+
+		this(text, prefPageId);
+
+		_data = data;
+	}
+
 	@Override
 	public void run() {
 
 		PreferencesUtil.createPreferenceDialogOn(//
-		Display.getCurrent().getActiveShell(),
+				Display.getCurrent().getActiveShell(),
 				_prefPageId,
 				null,
-				null).open();
+				_data).open();
+	}
+
+	public void setData(final Object data) {
+
+		_data = data;
 	}
 }

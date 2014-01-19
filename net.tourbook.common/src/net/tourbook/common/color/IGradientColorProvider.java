@@ -23,32 +23,30 @@ public interface IGradientColorProvider extends IMapColorProvider {
 	 * 
 	 * @param imageSize
 	 *            Width or height of the image.
-	 * @param imageSize
 	 * @param minValue
 	 * @param maxValue
 	 * @param unitText
 	 * @param unitFormat
-	 * @param isConvertIntoAbsoluteValues
 	 */
 	abstract void configureColorProvider(	int imageSize,
 											float minValue,
 											float maxValue,
 											String unitText,
-											LegendUnitFormat unitFormat,
-											boolean isConvertIntoAbsoluteValues);
+											LegendUnitFormat unitFormat);
 
 	abstract MapColorProfile getColorProfile();
-
-	/**
-	 * @param graphValue
-	 * @return Returns RGB value for a graph value.
-	 */
-	abstract int getColorValue(float graphValue);
 
 	/**
 	 * @return Returns configuration how a map legend image is painted.
 	 */
 	abstract MapUnits getMapUnits();
+
+	/**
+	 * @param graphValue
+	 * @return Returns RGB value for a graph value, it can contain transparency when the color
+	 *         provider is supporting this feature.
+	 */
+	abstract int getRGBValue(float graphValue);
 
 	/**
 	 * Set the colors for the map.

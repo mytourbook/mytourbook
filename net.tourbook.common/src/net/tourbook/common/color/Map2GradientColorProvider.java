@@ -44,18 +44,17 @@ public class Map2GradientColorProvider extends MapGradientColorProvider implemen
 	/**
 	 * Set legend values from a dataserie
 	 * 
+	 * @param unitText
 	 * @param legendHeight
 	 * @param dataSerie
 	 * @param legendProvider
-	 * @param unitText
 	 */
 	@Override
 	public void configureColorProvider(	final int legendHeight,
 										float minValue,
 										float maxValue,
 										final String unitText,
-										final LegendUnitFormat unitFormat,
-										final boolean isConvertIntoAbsoluteValues) {
+										final LegendUnitFormat unitFormat) {
 
 		/*
 		 * enforce min/max values, another option is necessary in the pref dialog to not enforce
@@ -119,8 +118,16 @@ public class Map2GradientColorProvider extends MapGradientColorProvider implemen
 		return _map2ColorProfile;
 	}
 
+	public MapGraphId getGraphId() {
+		return _mapColorId;
+	}
+
+	public MapUnits getMapUnits() {
+		return _mapUnits;
+	}
+
 	@Override
-	public int getColorValue(final float graphValue) {
+	public int getRGBValue(final float graphValue) {
 
 		int red = 0;
 		int green = 0;
@@ -239,17 +246,12 @@ public class Map2GradientColorProvider extends MapGradientColorProvider implemen
 		green = (255 <= maxGreen) ? 255 : maxGreen;
 		blue = (255 <= maxBlue) ? 255 : maxBlue;
 
-		final int graphColor = ((red & 0xFF) << 0) | ((green & 0xFF) << 8) | ((blue & 0xFF) << 16);
+		final int graphColor = ((red & 0xFF) << 0) //
+				| ((green & 0xFF) << 8)
+				| ((blue & 0xFF) << 16)
+				| ((0xFF) << 24);
 
 		return graphColor;
-	}
-
-	public MapGraphId getGraphId() {
-		return _mapColorId;
-	}
-
-	public MapUnits getMapUnits() {
-		return _mapUnits;
 	}
 
 	@Override

@@ -565,6 +565,7 @@ public class Messages extends NLS {
 	public static String		HRMaxFormula_Name_Manual;
 
 	public static String		Image__App_Add;
+	public static String		Image__App_Add_2x;
 	public static String		Image__App_Cancel;
 	public static String		Image__App_Close;
 	public static String		Image__App_OK;
@@ -590,7 +591,6 @@ public class Messages extends NLS {
 	public static String		Image__edit_tour_marker_new;
 	public static String		Image__edit_tour_marker_new_disabled;
 	public static String		Image__expand_all;
-	public static String		Image__Graph_All;
 	public static String		Image__graph_altimeter;
 	public static String		Image__graph_altitude;
 	public static String		Image__graph_cadence;
@@ -617,6 +617,7 @@ public class Messages extends NLS {
 	public static String		Image__link;
 	public static String		Image__MyTourbook16;
 	public static String		Image__options;
+	public static String		Image__Options_Bright;
 	public static String		Image__Photo_FilterNotSavedPhotos;
 	public static String		Image__Photo_FilterNotSavedPhotos_Disabled;
 	public static String		Image__Photo_FilterOneHistoryTour;

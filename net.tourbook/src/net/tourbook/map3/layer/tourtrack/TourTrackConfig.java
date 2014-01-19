@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -16,6 +16,7 @@
 package net.tourbook.map3.layer.tourtrack;
 
 import gov.nasa.worldwind.WorldWind;
+import net.tourbook.common.color.Map3GradientColorManager;
 import net.tourbook.map3.Messages;
 
 import org.eclipse.swt.graphics.RGB;
@@ -168,10 +169,10 @@ public class TourTrackConfig implements Cloneable {
 	public boolean						isFollowTerrain					= TourTrackConfigManager.CONFIG_IS_FOLLOW_TERRAIN_DEFAULT;
 
 	/**
-	 * Opacity of the track color: outline/interior, separate colors are not yet supported, it not a
-	 * simple task.
+	 * Opacity 0...1.0 of the track color: outline/interior, separate colors are not yet supported,
+	 * it not a simple task.
 	 */
-	public double						trackColorOpacity				= TourTrackConfigManager.CONFIG_TRACK_COLOR_OPACITY_DEFAULT;
+	public double						trackColorOpacity				= Map3GradientColorManager.OPACITY_DEFAULT;
 
 	TourTrackConfig() {}
 

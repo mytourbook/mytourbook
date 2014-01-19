@@ -651,7 +651,7 @@ public class TrackPathOptimized extends MTMultiResolutionPath implements ITrackP
 			gl.glDrawArrays(GL2.GL_TRIANGLES, 0, _numberOfDirectionArrows);
 
 			// draw border
-			final Color borderColor = ColorUtil.getContrastColor(rgb.red, rgb.green, rgb.blue);
+			final Color borderColor = ColorUtil.getContrastColorAWT(rgb.red, rgb.green, rgb.blue, opacity);
 			gl.glLineWidth(2.0f);
 			gl.glColor4ub(
 					(byte) borderColor.getRed(),

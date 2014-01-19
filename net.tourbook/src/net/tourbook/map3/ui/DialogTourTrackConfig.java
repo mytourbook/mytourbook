@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import net.tourbook.common.UI;
 import net.tourbook.common.color.ColorSelectorExtended;
 import net.tourbook.common.color.IColorSelectorListener;
+import net.tourbook.common.color.Map3GradientColorManager;
 import net.tourbook.common.color.MapGraphId;
 import net.tourbook.common.tooltip.AnimatedToolTipShell;
 import net.tourbook.common.util.Util;
@@ -932,9 +933,9 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 				.align(SWT.BEGINNING, SWT.FILL)
 				.applyTo(spinnerOpacity);
 
-		spinnerOpacity.setMinimum(TourTrackConfigManager.OPACITY_MIN);
-		spinnerOpacity.setMaximum(TourTrackConfigManager.OPACITY_MAX);
-		spinnerOpacity.setDigits(TourTrackConfigManager.OPACITY_DIGITS);
+		spinnerOpacity.setMinimum(Map3GradientColorManager.OPACITY_MIN);
+		spinnerOpacity.setMaximum(Map3GradientColorManager.OPACITY_MAX);
+		spinnerOpacity.setDigits(Map3GradientColorManager.OPACITY_DIGITS);
 		spinnerOpacity.setIncrement(1);
 		spinnerOpacity.setPageIncrement(10);
 		spinnerOpacity.addSelectionListener(_defaultSelectionListener);
@@ -1267,7 +1268,7 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 		_spinnerDirectionArrowDistance.setSelection((int) (config.directionArrowDistance));
 		_spinnerDirectionArrowSize.setSelection((int) (config.directionArrowSize));
 		_spinnerTrackColorOpacity.setSelection(//
-				(int) (config.trackColorOpacity * TourTrackConfigManager.OPACITY_DIGITS_FACTOR));
+				(int) (config.trackColorOpacity * Map3GradientColorManager.OPACITY_DIGITS_FACTOR));
 
 		// line color
 		_spinnerOutlineWidth.setSelection((int) (config.outlineWidth));
@@ -1283,13 +1284,13 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 		_colorOutlineColor_Selected.setColorValue(config.outlineColor_Selected);
 
 		_spinnerOutlineOpacity.setSelection(//
-				(int) (config.outlineOpacity * TourTrackConfigManager.OPACITY_DIGITS_FACTOR));
+				(int) (config.outlineOpacity * Map3GradientColorManager.OPACITY_DIGITS_FACTOR));
 		_spinnerOutlineOpacity_Hovered.setSelection(//
-				(int) (config.outlineOpacity_Hovered * TourTrackConfigManager.OPACITY_DIGITS_FACTOR));
+				(int) (config.outlineOpacity_Hovered * Map3GradientColorManager.OPACITY_DIGITS_FACTOR));
 		_spinnerOutlineOpacity_HovSel.setSelection(//
-				(int) (config.outlineOpacity_HovSel * TourTrackConfigManager.OPACITY_DIGITS_FACTOR));
+				(int) (config.outlineOpacity_HovSel * Map3GradientColorManager.OPACITY_DIGITS_FACTOR));
 		_spinnerOutlineOpacity_Selected.setSelection(//
-				(int) (config.outlineOpacity_Selected * TourTrackConfigManager.OPACITY_DIGITS_FACTOR));
+				(int) (config.outlineOpacity_Selected * Map3GradientColorManager.OPACITY_DIGITS_FACTOR));
 
 		// curtain color
 		_chkShowInterior.setSelection(config.isShowInterior);
@@ -1305,13 +1306,13 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 		_colorInteriorColor_Selected.setColorValue(config.interiorColor_Selected);
 
 		_spinnerInteriorOpacity.setSelection(//
-				(int) (config.interiorOpacity * TourTrackConfigManager.OPACITY_DIGITS_FACTOR));
+				(int) (config.interiorOpacity * Map3GradientColorManager.OPACITY_DIGITS_FACTOR));
 		_spinnerInteriorOpacity_Hovered.setSelection(//
-				(int) (config.interiorOpacity_Hovered * TourTrackConfigManager.OPACITY_DIGITS_FACTOR));
+				(int) (config.interiorOpacity_Hovered * Map3GradientColorManager.OPACITY_DIGITS_FACTOR));
 		_spinnerInteriorOpacity_HovSel.setSelection(//
-				(int) (config.interiorOpacity_HovSel * TourTrackConfigManager.OPACITY_DIGITS_FACTOR));
+				(int) (config.interiorOpacity_HovSel * Map3GradientColorManager.OPACITY_DIGITS_FACTOR));
 		_spinnerInteriorOpacity_Selected.setSelection(//
-				(int) (config.interiorOpacity_Selected * TourTrackConfigManager.OPACITY_DIGITS_FACTOR));
+				(int) (config.interiorOpacity_Selected * Map3GradientColorManager.OPACITY_DIGITS_FACTOR));
 
 		// verticals
 		_chkDrawVerticals.setSelection(config.isDrawVerticals);
@@ -1354,7 +1355,7 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 		config.directionArrowSize = _spinnerDirectionArrowSize.getSelection();
 		config.directionArrowDistance = _spinnerDirectionArrowDistance.getSelection();
 		config.trackColorOpacity = _spinnerTrackColorOpacity.getSelection()
-				/ TourTrackConfigManager.OPACITY_DIGITS_FACTOR;
+				/ Map3GradientColorManager.OPACITY_DIGITS_FACTOR;
 
 		// line
 		config.outlineWidth = _spinnerOutlineWidth.getSelection();
@@ -1367,13 +1368,13 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 		config.outlineColor_HovSel = _colorOutlineColor_HovSel.getColorValue();
 		config.outlineColor_Selected = _colorOutlineColor_Selected.getColorValue();
 
-		config.outlineOpacity = _spinnerOutlineOpacity.getSelection() / TourTrackConfigManager.OPACITY_DIGITS_FACTOR;
+		config.outlineOpacity = _spinnerOutlineOpacity.getSelection() / Map3GradientColorManager.OPACITY_DIGITS_FACTOR;
 		config.outlineOpacity_Hovered = _spinnerOutlineOpacity_Hovered.getSelection()
-				/ TourTrackConfigManager.OPACITY_DIGITS_FACTOR;
+				/ Map3GradientColorManager.OPACITY_DIGITS_FACTOR;
 		config.outlineOpacity_HovSel = _spinnerOutlineOpacity_HovSel.getSelection()
-				/ TourTrackConfigManager.OPACITY_DIGITS_FACTOR;
+				/ Map3GradientColorManager.OPACITY_DIGITS_FACTOR;
 		config.outlineOpacity_Selected = _spinnerOutlineOpacity_Selected.getSelection()
-				/ TourTrackConfigManager.OPACITY_DIGITS_FACTOR;
+				/ Map3GradientColorManager.OPACITY_DIGITS_FACTOR;
 
 		// interior
 		config.isShowInterior = _chkShowInterior.getSelection();
@@ -1386,13 +1387,14 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 		config.interiorColor_HovSel = _colorInteriorColor_HovSel.getColorValue();
 		config.interiorColor_Selected = _colorInteriorColor_Selected.getColorValue();
 
-		config.interiorOpacity = _spinnerInteriorOpacity.getSelection() / TourTrackConfigManager.OPACITY_DIGITS_FACTOR;
+		config.interiorOpacity = _spinnerInteriorOpacity.getSelection()
+				/ Map3GradientColorManager.OPACITY_DIGITS_FACTOR;
 		config.interiorOpacity_Hovered = _spinnerInteriorOpacity_Hovered.getSelection()
-				/ TourTrackConfigManager.OPACITY_DIGITS_FACTOR;
+				/ Map3GradientColorManager.OPACITY_DIGITS_FACTOR;
 		config.interiorOpacity_HovSel = _spinnerInteriorOpacity_HovSel.getSelection()
-				/ TourTrackConfigManager.OPACITY_DIGITS_FACTOR;
+				/ Map3GradientColorManager.OPACITY_DIGITS_FACTOR;
 		config.interiorOpacity_Selected = _spinnerInteriorOpacity_Selected.getSelection()
-				/ TourTrackConfigManager.OPACITY_DIGITS_FACTOR;
+				/ Map3GradientColorManager.OPACITY_DIGITS_FACTOR;
 
 		// verticals
 		config.isDrawVerticals = _chkDrawVerticals.getSelection();

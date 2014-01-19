@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -38,7 +38,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
-public class DialogCreateMultipleVertexes extends Dialog {
+public class DialogCreateMultipleVertices extends Dialog {
 
 	private static final String		DEFAULT_ELEVATION_START			= "0";										//$NON-NLS-1$
 	private static final String		DEFAULT_ELEVATION_END			= "2000";									//$NON-NLS-1$
@@ -59,7 +59,7 @@ public class DialogCreateMultipleVertexes extends Dialog {
 	private int						fEndEle;
 	private int						fEleDiff;
 
-	public DialogCreateMultipleVertexes(final Shell shell) {
+	public DialogCreateMultipleVertices(final Shell shell) {
 		super(shell);
 	}
 

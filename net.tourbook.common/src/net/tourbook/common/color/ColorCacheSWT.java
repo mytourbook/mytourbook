@@ -20,13 +20,16 @@ import gnu.trove.map.hash.TIntObjectHashMap;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Display;
 
-public class ColorCacheInt {
+/**
+ * Cache for SWT {@link Color}'s which do <b>not</b> contain transparency.
+ */
+public class ColorCacheSWT {
 
 	private Display						_display;
 
 	private TIntObjectHashMap<Color>	_colors	= new TIntObjectHashMap<Color>();
 
-	public ColorCacheInt() {
+	public ColorCacheSWT() {
 		_display = Display.getCurrent();
 	}
 
@@ -51,7 +54,7 @@ public class ColorCacheInt {
 	 * @return Returns the color for the <code>colorValue</code> from the color cache, color is
 	 *         created when it is not available
 	 */
-	public Color get(final int colorValue) {
+	public Color getRGB(final int colorValue) {
 
 		Color color = _colors.get(colorValue);
 		if (color != null) {

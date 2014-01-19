@@ -120,7 +120,7 @@ public class Map3GradientColorProvider extends MapGradientColorProvider implemen
 
 		for (int vertexIndex = 0; vertexIndex < rgbVertices.size(); vertexIndex++) {
 
-			final long value = rgbVertices.get(vertexIndex).getValue();
+			final int value = rgbVertices.get(vertexIndex).getValue();
 
 			if (vertexIndex == 0) {
 
@@ -138,69 +138,55 @@ public class Map3GradientColorProvider extends MapGradientColorProvider implemen
 			}
 		}
 
-//		_absoluteVertices = rgbVertices.toArray(new RGBVertex[rgbVertices.size()]);
-
 		configureColorProvider(//
 				legendSize,
 				minValue,
 				maxValue,
 				unitText,
-				LegendUnitFormat.Number,
-				true);
+				LegendUnitFormat.Number);
 
 	}
 
 	@Override
 	public void configureColorProvider(	final int legendSize,
-										final float minValue,
-										float maxValue,
+										final float dataMinValue,
+										final float dataMaxValue,
 										final String unitText,
-										final LegendUnitFormat unitFormat,
-										final boolean isConvertIntoAbsoluteValues) {
+										final LegendUnitFormat unitFormat) {
 
-//		// overwrite min value
-//		if (_colorProfile.isMinValueOverwrite()) {
-//
-//			minValue = _colorProfile.getMinValueOverwrite();
-//
-//			if (unitFormat == LegendUnitFormat.Pace) {
-//
-//				// adjust value from minutes->seconds
-//				minValue *= 60;
-//			}
-//		}
-//
-//		// overwrite max value
-//		if (_colorProfile.isMaxValueOverwrite()) {
-//
-//			maxValue = _colorProfile.getMaxValueOverwrite();
-//
-//			if (unitFormat == LegendUnitFormat.Pace) {
-//
-//				// adjust value from minutes->seconds
-//				maxValue *= 60;
-//			}
-//		}
+		float dataMaxValueAdjusted = dataMaxValue;
 
 		// ensure max is larger than min
-		if (maxValue <= minValue) {
-			maxValue = minValue + 1;
+		if (dataMaxValue <= dataMinValue) {
+			dataMaxValueAdjusted = dataMinValue + 1;
 		}
 
-		final List<Float> legendUnits = getLegendUnits(legendSize, minValue, maxValue, unitFormat);
-		Assert.isTrue(legendUnits.size() > 0);
+		float legendMinValue = dataMinValue;
+		float legendMaxValue = dataMaxValueAdjusted;
 
-		final Float legendMinValue = legendUnits.get(0);
-		final Float legendMaxValue = legendUnits.get(legendUnits.size() - 1);
+		final RGBVertex[] vertexValues = _colorProfile.getProfileImage().getRgbVerticesArray();
 
-		_mapUnits.units = legendUnits;
+		if (_colorProfile.isAbsoluteValues() && _colorProfile.isOverwriteLegendValues()) {
+
+			final RGBVertex minVertexValue = vertexValues[0];
+			final RGBVertex maxVertexValue = vertexValues[vertexValues.length - 1];
+
+			legendMinValue = minVertexValue.getValue();
+			legendMaxValue = maxVertexValue.getValue();
+		}
+
+		final List<Float> dataUnits = getLegendUnits(legendSize, legendMinValue, legendMaxValue, unitFormat);
+		Assert.isTrue(dataUnits.size() > 0);
+
+		final Float adjustedLegendMinValue = dataUnits.get(0);
+		final Float adjustedLegendMaxValue = dataUnits.get(dataUnits.size() - 1);
+
+		_mapUnits.units = dataUnits;
 		_mapUnits.unitText = unitText;
-		_mapUnits.legendMinValue = legendMinValue;
-		_mapUnits.legendMaxValue = legendMaxValue;
+		_mapUnits.legendMinValue = adjustedLegendMinValue;
+		_mapUnits.legendMaxValue = adjustedLegendMaxValue;
 
-		if (isConvertIntoAbsoluteValues) {
-			configureColorProvider_SetVertices(minValue, maxValue);
-		}
+		configureColorProvider_SetVertices(legendMinValue, legendMaxValue);
 	}
 
 	/**
@@ -209,15 +195,22 @@ public class Map3GradientColorProvider extends MapGradientColorProvider implemen
 	 * minVertex ^ minValue<br>
 	 * maxVertex ^ maxValue
 	 * 
-	 * @param minValue
+	 * @param dataMinValue
 	 *            Absolute minimum value.
-	 * @param maxValue
+	 * @param dataMaxValue
 	 *            Absolute maximum value.
 	 */
-	private void configureColorProvider_SetVertices(final float minValue, final float maxValue) {
+	private void configureColorProvider_SetVertices(final float dataMinValue, final float dataMaxValue) {
 
 		final RGBVertex[] relativeVertices = _colorProfile.getProfileImage().getRgbVerticesArray();
 		final RGBVertex[] absoluteVertices = cloneVertices(relativeVertices);
+
+		if (_colorProfile.isAbsoluteValues()) {
+
+			_absoluteVertices = absoluteVertices;
+
+			return;
+		}
 
 		final RGBVertex minRelativeVertex = relativeVertices[0];
 		final RGBVertex maxRelativeVertex = relativeVertices[relativeVertices.length - 1];
@@ -225,11 +218,11 @@ public class Map3GradientColorProvider extends MapGradientColorProvider implemen
 		final int relativeMinValue = minRelativeVertex.getValue();
 
 		final int relativeDiff = maxRelativeVertex.getValue() - relativeMinValue;
-		final int absoluteDiff = (int) (maxValue - minValue);
+		final int absoluteDiff = (int) (dataMaxValue - dataMinValue);
 
 		final float diffRatio = (float) relativeDiff / (float) absoluteDiff;
 
-		final int absoluteMinValue = (int) minValue;
+		final int absoluteMinValue = (int) dataMinValue;
 
 		for (int vertexIndex = 0; vertexIndex < relativeVertices.length; vertexIndex++) {
 
@@ -237,19 +230,19 @@ public class Map3GradientColorProvider extends MapGradientColorProvider implemen
 
 			if (vertexIndex == 0) {
 
-				// first value
+				// set first value
 
 				absoluteValue = absoluteMinValue;
 
 			} else if (vertexIndex == relativeVertices.length - 1) {
 
-				// last value
+				// set last value
 
-				absoluteValue = (int) maxValue;
+				absoluteValue = (int) dataMaxValue;
 
 			} else {
 
-				// in between value
+				// set in between value
 
 				final RGBVertex relativeVertex = relativeVertices[vertexIndex];
 
@@ -311,13 +304,28 @@ public class Map3GradientColorProvider extends MapGradientColorProvider implemen
 		return _colorProfile;
 	}
 
+	public MapGraphId getGraphId() {
+		return _graphId;
+	}
+
+	public Map3ColorProfile getMap3ColorProfile() {
+		return _colorProfile;
+	}
+
+	public MapUnits getMapUnits() {
+		return _mapUnits;
+	}
+
+	/**
+	 * Returns a RGB value with opacity.
+	 */
 	@Override
-	public int getColorValue(final float graphValue) {
+	public int getRGBValue(final float graphValue) {
 
 		if (_absoluteVertices == null || _absoluteVertices.length == 0) {
 
 			// color provider is not yet initialized, return a valid value
-			return 0xff00ff;
+			return 0xffff00ff;
 		}
 
 		final float minBrightnessFactor = _colorProfile.getMinBrightnessFactor() / 100.0f;
@@ -348,9 +356,10 @@ public class Map3GradientColorProvider extends MapGradientColorProvider implemen
 			}
 		}
 
-		int red;
-		int green;
-		int blue;
+		int r;
+		int g;
+		int b;
+		int o;
 
 		if (minRgbVertex == null) {
 
@@ -360,9 +369,9 @@ public class Map3GradientColorProvider extends MapGradientColorProvider implemen
 
 			final RGB minRGB = rgbVertex.getRGB();
 
-			red = minRGB.red;
-			green = minRGB.green;
-			blue = minRGB.blue;
+			r = minRGB.red;
+			g = minRGB.green;
+			b = minRGB.blue;
 
 			final float minValue = rgbVertex.getValue();
 			final float minDiff = _mapUnits.legendMinValue - minValue;
@@ -372,16 +381,18 @@ public class Map3GradientColorProvider extends MapGradientColorProvider implemen
 
 			if (_colorProfile.getMinBrightness() == MapColorProfile.BRIGHTNESS_DIMMING) {
 
-				red = red - (int) (dimmRatio * red);
-				green = green - (int) (dimmRatio * green);
-				blue = blue - (int) (dimmRatio * blue);
+				r = r - (int) (dimmRatio * r);
+				g = g - (int) (dimmRatio * g);
+				b = b - (int) (dimmRatio * b);
 
 			} else if (_colorProfile.getMinBrightness() == MapColorProfile.BRIGHTNESS_LIGHTNING) {
 
-				red = red + (int) (dimmRatio * (255 - red));
-				green = green + (int) (dimmRatio * (255 - green));
-				blue = blue + (int) (dimmRatio * (255 - blue));
+				r = r + (int) (dimmRatio * (255 - r));
+				g = g + (int) (dimmRatio * (255 - g));
+				b = b + (int) (dimmRatio * (255 - b));
 			}
+
+			o = (int) (rgbVertex.getOpacity() * 0xff);
 
 		} else if (maxRgbVertex == null) {
 
@@ -391,9 +402,9 @@ public class Map3GradientColorProvider extends MapGradientColorProvider implemen
 
 			final RGB maxRGB = rgbVertex.getRGB();
 
-			red = maxRGB.red;
-			green = maxRGB.green;
-			blue = maxRGB.blue;
+			r = maxRGB.red;
+			g = maxRGB.green;
+			b = maxRGB.blue;
 
 			final float maxValue = rgbVertex.getValue();
 			final float maxDiff = _mapUnits.legendMaxValue - maxValue;
@@ -403,16 +414,18 @@ public class Map3GradientColorProvider extends MapGradientColorProvider implemen
 
 			if (_colorProfile.getMaxBrightness() == MapColorProfile.BRIGHTNESS_DIMMING) {
 
-				red = red - (int) (dimmRatio * red);
-				green = green - (int) (dimmRatio * green);
-				blue = blue - (int) (dimmRatio * blue);
+				r = r - (int) (dimmRatio * r);
+				g = g - (int) (dimmRatio * g);
+				b = b - (int) (dimmRatio * b);
 
 			} else if (_colorProfile.getMaxBrightness() == MapColorProfile.BRIGHTNESS_LIGHTNING) {
 
-				red = red + (int) (dimmRatio * (255 - red));
-				green = green + (int) (dimmRatio * (255 - green));
-				blue = blue + (int) (dimmRatio * (255 - blue));
+				r = r + (int) (dimmRatio * (255 - r));
+				g = g + (int) (dimmRatio * (255 - g));
+				b = b + (int) (dimmRatio * (255 - b));
 			}
+
+			o = (int) (rgbVertex.getOpacity() * 0xff);
 
 		} else {
 
@@ -423,48 +436,49 @@ public class Map3GradientColorProvider extends MapGradientColorProvider implemen
 
 			final RGB minRGB = minRgbVertex.getRGB();
 
-			final float minRed = minRGB.red;
-			final float minGreen = minRGB.green;
-			final float minBlue = minRGB.blue;
+			final float minR = minRGB.red;
+			final float minG = minRGB.green;
+			final float minB = minRGB.blue;
+			final float minO = minRgbVertex.getOpacity();
 
 			final RGB maxRGB = maxRgbVertex.getRGB();
+			final float maxO = maxRgbVertex.getOpacity();
 
-			final float redDiff = maxRGB.red - minRed;
-			final float greenDiff = maxRGB.green - minGreen;
-			final float blueDiff = maxRGB.blue - minBlue;
+			final float rDiff = maxRGB.red - minR;
+			final float gDiff = maxRGB.green - minG;
+			final float bDiff = maxRGB.blue - minB;
+			final float oDiff = maxO - minO;
 
 			final float ratioDiff = maxValue - minValue;
 			final float ratio = ratioDiff == 0 ? 1 : (graphValue - minValue) / (ratioDiff);
 
-			red = (int) (minRed + redDiff * ratio);
-			green = (int) (minGreen + greenDiff * ratio);
-			blue = (int) (minBlue + blueDiff * ratio);
+			r = (int) (minR + rDiff * ratio);
+			g = (int) (minG + gDiff * ratio);
+			b = (int) (minB + bDiff * ratio);
+
+			final float a = (minO + oDiff * ratio);
+			o = (int) (a * 0xff);
 		}
 
 		// adjust color values to 0...255, this is optimized
-		final int maxRed = (0 >= red) ? 0 : red;
-		final int maxGreen = (0 >= green) ? 0 : green;
-		final int maxBlue = (0 >= blue) ? 0 : blue;
+		final int maxR = (0 >= r) ? 0 : r;
+		final int maxG = (0 >= g) ? 0 : g;
+		final int maxB = (0 >= b) ? 0 : b;
+		final int maxO = (0 >= o) ? 0 : o;
 
-		red = (255 <= maxRed) ? 255 : maxRed;
-		green = (255 <= maxGreen) ? 255 : maxGreen;
-		blue = (255 <= maxBlue) ? 255 : maxBlue;
+		r = (255 <= maxR) ? 255 : maxR;
+		g = (255 <= maxG) ? 255 : maxG;
+		b = (255 <= maxB) ? 255 : maxB;
+		o = (255 <= maxO) ? 255 : maxO;
 
-		final int graphColor = ((red & 0xFF) << 0) | ((green & 0xFF) << 8) | ((blue & 0xFF) << 16);
+		final int rgba = (r & 0xFF) << 0 //
+				| (g & 0xFF) << 8
+				| (b & 0xFF) << 16
+				| (o & 0xff) << 24
+		//
+		;
 
-		return graphColor;
-	}
-
-	public MapGraphId getGraphId() {
-		return _graphId;
-	}
-
-	public Map3ColorProfile getMap3ColorProfile() {
-		return _colorProfile;
-	}
-
-	public MapUnits getMapUnits() {
-		return _mapUnits;
+		return rgba;
 	}
 
 	@Override

@@ -25,6 +25,7 @@ import java.util.ArrayList;
 
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
+import net.tourbook.common.color.Map3GradientColorManager;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 import net.tourbook.map3.Messages;
@@ -73,7 +74,6 @@ public class TourTrackConfigManager {
 	static final String								CONFIG_NAME_UNKNOWN							= Messages.Track_Config_ConfigName_Unknown;
 
 	public static final Boolean						CONFIG_IS_FOLLOW_TERRAIN_DEFAULT			= Boolean.FALSE;
-	public static final float						CONFIG_TRACK_COLOR_OPACITY_DEFAULT			= 1.0f;
 
 	// direction arrows
 	public static final Boolean						IS_DIRECTION_ARROWS_VISIBLE_DEFAULT			= Boolean.TRUE;
@@ -151,12 +151,6 @@ public class TourTrackConfigManager {
 	public static final int							ALTITUDE_OFFSET_RELATIVE_MIN				= 0;
 	public static final int							ALTITUDE_OFFSET_RELATIVE_MAX				= 50;
 	public static final int							ALTITUDE_OFFSET_RELATIVE_DEFAULT			= 3;
-
-	// opacity
-	public static final int							OPACITY_MIN									= 0;
-	public static final int							OPACITY_MAX									= 100;
-	public static final double						OPACITY_DIGITS_FACTOR						= 100.0;
-	public static final int							OPACITY_DIGITS								= 2;
 
 	// colors
 	public static final RGB							RGB_BLACK;
@@ -338,7 +332,7 @@ public class TourTrackConfigManager {
 			xmlConfig.putString(ATTR_CONFIG_NAME, configName);
 
 			xmlConfig.putBoolean(ATTR_IS_FOLLOW_TERRAIN, CONFIG_IS_FOLLOW_TERRAIN_DEFAULT);
-			xmlConfig.putFloat(ATTR_TRACK_COLOR_OPACITY_DEFAULT, CONFIG_TRACK_COLOR_OPACITY_DEFAULT);
+			xmlConfig.putFloat(ATTR_TRACK_COLOR_OPACITY_DEFAULT, Map3GradientColorManager.OPACITY_DEFAULT);
 
 			// <directionArrows>
 			final IMemento xmlDirectionArrows = xmlConfig.createChild(TAG_DIRECTION_ARROWS);
@@ -823,9 +817,9 @@ public class TourTrackConfigManager {
 		config.trackColorOpacity = Util.getXmlFloat(
 				xmlConfig,
 				ATTR_TRACK_COLOR_OPACITY_DEFAULT,
-				CONFIG_TRACK_COLOR_OPACITY_DEFAULT,
-				OPACITY_MIN,
-				OPACITY_MAX);
+				Map3GradientColorManager.OPACITY_DEFAULT,
+				Map3GradientColorManager.OPACITY_MIN,
+				Map3GradientColorManager.OPACITY_MAX);
 	}
 
 	private static void parse_200_DirectionArrows(final XMLMemento xmlDirectionArrow, final TourTrackConfig config) {
@@ -926,26 +920,26 @@ public class TourTrackConfigManager {
 		trackConfig.outlineOpacity = Util.getXmlFloat(xmlOpacity,//
 				ATTR_NORMAL,
 				OUTLINE_OPACITY_NORMAL_DEFAULT,
-				OPACITY_MIN,
-				OPACITY_MAX);
+				Map3GradientColorManager.OPACITY_MIN,
+				Map3GradientColorManager.OPACITY_MAX);
 
 		trackConfig.outlineOpacity_Hovered = Util.getXmlFloat(xmlOpacity,//
 				ATTR_HOVERED,
 				OUTLINE_OPACITY_HOVERED_DEFAULT,
-				OPACITY_MIN,
-				OPACITY_MAX);
+				Map3GradientColorManager.OPACITY_MIN,
+				Map3GradientColorManager.OPACITY_MAX);
 
 		trackConfig.outlineOpacity_Selected = Util.getXmlFloat(xmlOpacity,//
 				ATTR_SELECTED,
 				OUTLINE_OPACITY_SELECTED_DEFAULT,
-				OPACITY_MIN,
-				OPACITY_MAX);
+				Map3GradientColorManager.OPACITY_MIN,
+				Map3GradientColorManager.OPACITY_MAX);
 
 		trackConfig.outlineOpacity_HovSel = Util.getXmlFloat(xmlOpacity,//
 				ATTR_HOV_AND_SEL,
 				OUTLINE_OPACITY_HOV_SEL_DEFAULT,
-				OPACITY_MIN,
-				OPACITY_MAX);
+				Map3GradientColorManager.OPACITY_MIN,
+				Map3GradientColorManager.OPACITY_MAX);
 	}
 
 	private static void parse_400_Interior(final XMLMemento xmlInterior, final TourTrackConfig trackConfig) {
@@ -1030,26 +1024,26 @@ public class TourTrackConfigManager {
 		config.interiorOpacity = Util.getXmlFloat(xmlOpacity,//
 				ATTR_NORMAL,
 				INTERIOR_OPACITY_NORMAL_DEFAULT,
-				OPACITY_MIN,
-				OPACITY_MAX);
+				Map3GradientColorManager.OPACITY_MIN,
+				Map3GradientColorManager.OPACITY_MAX);
 
 		config.interiorOpacity_Hovered = Util.getXmlFloat(xmlOpacity,//
 				ATTR_HOVERED,
 				INTERIOR_OPACITY_HOVERED_DEFAULT,
-				OPACITY_MIN,
-				OPACITY_MAX);
+				Map3GradientColorManager.OPACITY_MIN,
+				Map3GradientColorManager.OPACITY_MAX);
 
 		config.interiorOpacity_Selected = Util.getXmlFloat(xmlOpacity,//
 				ATTR_SELECTED,
 				INTERIOR_OPACITY_SELECTED_DEFAULT,
-				OPACITY_MIN,
-				OPACITY_MAX);
+				Map3GradientColorManager.OPACITY_MIN,
+				Map3GradientColorManager.OPACITY_MAX);
 
 		config.interiorOpacity_HovSel = Util.getXmlFloat(xmlOpacity,//
 				ATTR_HOV_AND_SEL,
 				INTERIOR_OPACITY_HOV_SEL_DEFAULT,
-				OPACITY_MIN,
-				OPACITY_MAX);
+				Map3GradientColorManager.OPACITY_MIN,
+				Map3GradientColorManager.OPACITY_MAX);
 	}
 
 	private static void parse_500_TrackPosition(final XMLMemento xmlTrackPosition, final TourTrackConfig config) {

@@ -24,6 +24,7 @@ import org.eclipse.jface.action.Action;
 public class ActionAddVertex extends Action {
 
 	private DialogMap3ColorEditor	_dialogMap3ColorEditor;
+	private int						_vertexIndex;
 
 	public ActionAddVertex(final DialogMap3ColorEditor dialogMap3ColorEditor) {
 
@@ -31,7 +32,6 @@ public class ActionAddVertex extends Action {
 
 		_dialogMap3ColorEditor = dialogMap3ColorEditor;
 
-		setText(Messages.Map3Color_Dialog_Action_AddVertex_Tooltip);
 		setToolTipText(Messages.Map3Color_Dialog_Action_AddVertex_Tooltip);
 
 		setImageDescriptor(TourbookPlugin.getImageDescriptor(net.tourbook.Messages.Image__App_Add));
@@ -40,7 +40,11 @@ public class ActionAddVertex extends Action {
 	@Override
 	public void run() {
 
-		_dialogMap3ColorEditor.actionAddVertex();
+		_dialogMap3ColorEditor.actionAddVertex(_vertexIndex);
 	}
 
+	public void setData(final String key, final int vertexIndex) {
+
+		_vertexIndex = vertexIndex;
+	}
 }

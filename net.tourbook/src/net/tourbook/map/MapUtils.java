@@ -117,8 +117,7 @@ public class MapUtils {
 					minValue,
 					maxValue,
 					UI.UNIT_LABEL_ALTITUDE,
-					LegendUnitFormat.Number,
-					true);
+					LegendUnitFormat.Number);
 
 			break;
 
@@ -177,8 +176,7 @@ public class MapUtils {
 					minValue,
 					maxValue,
 					Messages.graph_label_gradient_unit,
-					LegendUnitFormat.Number,
-					true);
+					LegendUnitFormat.Number);
 
 			break;
 
@@ -237,8 +235,7 @@ public class MapUtils {
 					minValue,
 					maxValue,
 					UI.UNIT_LABEL_PACE,
-					LegendUnitFormat.Pace,
-					true);
+					LegendUnitFormat.Pace);
 
 			break;
 
@@ -297,8 +294,7 @@ public class MapUtils {
 					minValue,
 					maxValue,
 					Messages.graph_label_heartbeat_unit,
-					LegendUnitFormat.Number,
-					true);
+					LegendUnitFormat.Number);
 
 			break;
 
@@ -357,8 +353,7 @@ public class MapUtils {
 					minValue,
 					maxValue,
 					UI.UNIT_LABEL_SPEED,
-					LegendUnitFormat.Number,
-					true);
+					LegendUnitFormat.Number);
 
 			break;
 

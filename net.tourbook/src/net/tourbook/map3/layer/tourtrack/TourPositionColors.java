@@ -46,26 +46,22 @@ class TourPositionColors implements Path.PositionColors {
 	}
 
 	public Color getDiscreteColor(final int colorValue) {
-		return _awtColorCache.get(colorValue);
+		return _awtColorCache.getColorRGBA(colorValue);
 	}
 
 	public Color getGradientColor(final float graphValue, final Integer positionIndex, final int tourTrackPickIndex) {
-
-		int colorValue = -1;
 
 		if (_colorProvider instanceof IGradientColorProvider) {
 
 			final IGradientColorProvider gradientColorProvider = (IGradientColorProvider) _colorProvider;
 
-			colorValue = gradientColorProvider.getColorValue(graphValue);
+			final int rgbaValue = gradientColorProvider.getRGBValue(graphValue);
+
+			return _awtColorCache.getColorRGBA(rgbaValue);
 		}
 
-		if (colorValue == -1) {
-			// set ugly default value, this case should not happen
-			return Color.MAGENTA;
-		}
-
-		return _awtColorCache.get(colorValue);
+		// set ugly default value, this case should not happen
+		return Color.MAGENTA;
 	}
 
 	public void setColorProvider(final IMapColorProvider legendProvider) {
@@ -96,7 +92,7 @@ class TourPositionColors implements Path.PositionColors {
 
 	void updateColors(final double trackOpacity) {
 
-		_awtColorCache.setOpacity(trackOpacity);
+		_awtColorCache.setTrackOpacity(trackOpacity);
 	}
 
 }

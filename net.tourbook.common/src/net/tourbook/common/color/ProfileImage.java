@@ -26,6 +26,7 @@ import net.tourbook.common.UI;
 import net.tourbook.common.util.StatusUtil;
 
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.RGB;
 
 /**
  * Contains the profile image and all rgb vertices.
@@ -71,6 +72,42 @@ public abstract class ProfileImage implements Cloneable {
 		_rgbVertices.add(rgbVertex);
 
 		invalidateVertices();
+	}
+
+	public void addVertices(final int startValue, final int endValue, final int valueDifference, final RGB rgb) {
+
+		final ArrayList<RGBVertex> newVertices = new ArrayList<RGBVertex>();
+
+		for (int currentValue = startValue; currentValue <= endValue; currentValue += valueDifference) {
+
+			boolean isNewValue = true;
+
+			// check if the current value is already available
+			for (final RGBVertex vertex : _rgbVertices) {
+				if (vertex.getValue() == currentValue) {
+					// value is already available
+					isNewValue = false;
+					break;
+				}
+			}
+
+			if (isNewValue) {
+
+				// create new vertex
+
+				newVertices.add(new RGBVertex(currentValue, rgb, Map3GradientColorManager.OPACITY_DEFAULT));
+			}
+		}
+
+		if (newVertices.size() > 0) {
+
+			_rgbVertices.addAll(newVertices);
+
+			// sort vertices by value
+			Collections.sort(_rgbVertices);
+
+			invalidateVertices();
+		}
 	}
 
 	@Override
@@ -225,8 +262,7 @@ public abstract class ProfileImage implements Cloneable {
 	@Override
 	public String toString() {
 		final int maxLen = 10;
-		return String.format(
-				"RGBVertices [_rgbVertices=%s]", //$NON-NLS-1$
+		return String.format("RGBVertices [_rgbVertices=%s]", //$NON-NLS-1$
 				_rgbVertices != null ? _rgbVertices.subList(0, Math.min(_rgbVertices.size(), maxLen)) : null);
 	}
 

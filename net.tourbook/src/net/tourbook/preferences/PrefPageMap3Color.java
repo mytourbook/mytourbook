@@ -364,6 +364,31 @@ public class PrefPageMap3Color extends PreferencePage implements IWorkbenchPrefe
 	}
 
 	@Override
+	public void applyData(final Object data) {
+
+		if (data instanceof MapGraphId) {
+
+			// expand color definition for the graph id
+
+			final MapGraphId graphId = (MapGraphId) data;
+			final Map3ColorDefinition expandedColorDefinition = Map3GradientColorManager.getColorDefinition(graphId);
+			final Map3GradientColorProvider activeColorProvider = Map3GradientColorManager
+					.getActiveMap3ColorProvider(graphId);
+
+			_viewerContainer.setRedraw(false);
+			{
+				_colorProfileViewer.collapseAll();
+
+				_colorProfileViewer.setExpandedElements(new Object[] { expandedColorDefinition });
+				_colorProfileViewer.setSelection(new StructuredSelection(activeColorProvider));
+
+				_colorProfileViewer.getTree().setFocus();
+			}
+			_viewerContainer.setRedraw(true);
+		}
+	}
+
+	@Override
 	public void applyMapColors(	final Map3GradientColorProvider originalCP,
 								final Map3GradientColorProvider modifiedCP,
 								final boolean isNewColorProvider) {
@@ -688,8 +713,9 @@ public class PrefPageMap3Color extends PreferencePage implements IWorkbenchPrefe
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
 		GridLayoutFactory.fillDefaults()//
-				.margins(0, 5)
-				.numColumns(1)
+//				.margins(0, 5)
+				.extendedMargins(0, 0, 5, 20)
+				.numColumns(2)
 				.applyTo(container);
 //		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
 		{
@@ -712,6 +738,7 @@ public class PrefPageMap3Color extends PreferencePage implements IWorkbenchPrefe
 			final Composite rowContainer = new Composite(container, SWT.NONE);
 			GridDataFactory.fillDefaults().grab(true, false).applyTo(rowContainer);
 			GridLayoutFactory.fillDefaults().numColumns(2).applyTo(rowContainer);
+//			rowContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_MAGENTA));
 			{
 				{
 					/*
@@ -719,7 +746,11 @@ public class PrefPageMap3Color extends PreferencePage implements IWorkbenchPrefe
 					 */
 					_lblNumberOfColors = new Label(rowContainer, SWT.NONE);
 					GridDataFactory.fillDefaults()//
-							.indent(16, 0)
+//							.indent(16, 0)
+//							.grab(true, false)
+//							.align(SWT.END, SWT.CENTER)
+							.indent(20, 0)
+							.align(SWT.FILL, SWT.CENTER)
 							.applyTo(_lblNumberOfColors);
 					_lblNumberOfColors.setText(Messages.Pref_Map3Color_Label_NumberOfColors);
 					_lblNumberOfColors.setToolTipText(Messages.Pref_Map3Color_Label_NumberOfColors_Tooltip);
@@ -818,7 +849,7 @@ public class PrefPageMap3Color extends PreferencePage implements IWorkbenchPrefe
 
 		colDef.setColumnLabel(Messages.Pref_Map3Color_Column_Colors);
 		colDef.setColumnHeader(Messages.Pref_Map3Color_Column_Colors);
-		colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(30));
+		colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(20));
 		colDef.setIsDefaultColumn();
 		colDef.setIsColumnMoveable(false);
 		colDef.setCanModifyVisibility(false);
@@ -1115,7 +1146,9 @@ public class PrefPageMap3Color extends PreferencePage implements IWorkbenchPrefe
 			final int trailingOffset = 0;//10;
 
 			final int columnWidth = getImageColumnWidth();
+
 			final int imageWidth = columnWidth - trailingOffset;
+			final int imageHeight = PROFILE_IMAGE_HEIGHT - 1;
 
 			final Map3ColorProfile colorProfile = colorProvider.getMap3ColorProfile();
 			final ArrayList<RGBVertex> rgbVertices = colorProfile.getProfileImage().getRgbVertices();
@@ -1123,10 +1156,11 @@ public class PrefPageMap3Color extends PreferencePage implements IWorkbenchPrefe
 			colorProvider.configureColorProvider(imageWidth, rgbVertices, false);
 
 			image = TourMapPainter.createMapLegendImage(//
-					Display.getCurrent(),
 					colorProvider,
 					imageWidth,
-					PROFILE_IMAGE_HEIGHT - 1,
+					imageHeight,
+					false,
+					false,
 					false);
 
 			final Image oldImage = _profileImages.put(colorProvider, image);
@@ -1406,6 +1440,8 @@ public class PrefPageMap3Color extends PreferencePage implements IWorkbenchPrefe
 
 		_spinNumberOfColors.setSelection(//
 				_prefStore.getDefaultInt(ITourbookPreferences.MAP3_NUMBER_OF_COLOR_SELECTORS));
+
+		enableControls();
 
 		super.performDefaults();
 	}

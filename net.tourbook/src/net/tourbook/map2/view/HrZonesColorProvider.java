@@ -71,7 +71,7 @@ public class HrZonesColorProvider implements IDiscreteColorProvider {
 		checkHrData(tourData);
 
 		if (_isValidHrZoneData == false) {
-			return 0xFF0AE3;
+			return 0xffFF0AE3;
 		}
 
 		return getHrColor(serieIndex);
@@ -105,7 +105,6 @@ public class HrZonesColorProvider implements IDiscreteColorProvider {
 		return _graphId;
 	}
 
-
 	private int getHrColor(final int serieIndex) {
 
 		final float pulse = _pulseData[serieIndex];
@@ -116,7 +115,8 @@ public class HrZonesColorProvider implements IDiscreteColorProvider {
 
 		final int rgbValue = ((rgb.red & 0xFF) << 0) //
 				| ((rgb.green & 0xFF) << 8)
-				| ((rgb.blue & 0xFF) << 16);
+				| ((rgb.blue & 0xFF) << 16)
+				| ((0xFF) << 24);
 
 		return rgbValue;
 	}

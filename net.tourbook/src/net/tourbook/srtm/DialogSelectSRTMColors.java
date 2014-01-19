@@ -574,7 +574,7 @@ public class DialogSelectSRTMColors extends TitleAreaDialog implements IProfileC
 				spinnerElevation.setMaximum(Integer.MAX_VALUE);
 				spinnerElevation.addSelectionListener(eleSelectionListener);
 				spinnerElevation.setData(vertex);
-				spinnerElevation.setSelection((int) vertex.getValue());
+				spinnerElevation.setSelection(vertex.getValue());
 				spinnerElevation.addMouseWheelListener(new MouseWheelListener() {
 					public void mouseScrolled(final MouseEvent event) {
 						UI.adjustSpinnerValueOnMouseScroll(event);
@@ -850,7 +850,7 @@ public class DialogSelectSRTMColors extends TitleAreaDialog implements IProfileC
 		// ensure the field list is updated and not unsorted
 		sortVertexsAndUpdateProfile();
 
-		final DialogCreateMultipleVertexes dialog = new DialogCreateMultipleVertexes(Display
+		final DialogCreateMultipleVertices dialog = new DialogCreateMultipleVertices(Display
 				.getCurrent()
 				.getActiveShell());
 		if (dialog.open() == Window.OK) {
@@ -935,6 +935,11 @@ public class DialogSelectSRTMColors extends TitleAreaDialog implements IProfileC
 	private void saveState() {
 
 		_colorChooser.saveState(_state);
+	}
+
+	@Override
+	public void modifiedColor(final RGB modifiedRGB) {
+		// is not used here
 	}
 
 	private void setResolutionIntoUI(final String resolution) {

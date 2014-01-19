@@ -282,7 +282,6 @@ public class ColorChooser extends Composite {
 		// set selected color
 		setChooserRGB(new RGB(_selectedValueRed, _selectedValueGreen, _selectedValueBlue));
 
-
 		enableControls();
 	}
 
@@ -1414,6 +1413,10 @@ public class ColorChooser extends Composite {
 			_lblSelectedColor.setForeground(color);
 		}
 		color.dispose();
+
+		if (_profileColors != null) {
+			_profileColors.modifiedColor(_chooserRGB);
+		}
 	}
 
 	private void updateValues_HSB() {

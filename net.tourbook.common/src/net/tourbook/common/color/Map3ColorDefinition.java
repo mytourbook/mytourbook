@@ -27,6 +27,8 @@ public class Map3ColorDefinition implements Comparable<Map3ColorDefinition> {
 	private MapGraphId											_graphId;
 	private String												_visibleName;
 
+	private int													_sortId;
+
 	/**
 	 * Contains all color provider for one {@link MapGraphId}.
 	 */
@@ -51,6 +53,8 @@ public class Map3ColorDefinition implements Comparable<Map3ColorDefinition> {
 	public Map3ColorDefinition(final MapGraphId graphId) {
 
 		_graphId = graphId;
+
+		_sortId = getSortId(graphId);
 	}
 
 	/**
@@ -105,8 +109,8 @@ public class Map3ColorDefinition implements Comparable<Map3ColorDefinition> {
 	@Override
 	public int compareTo(final Map3ColorDefinition otherDef) {
 
-		// sort by name
-//		return _visibleName.compareTo(otherDef._visibleName);
+		// sort by sort id
+		return _sortId - otherDef._sortId;
 	}
 
 	@Override
@@ -144,6 +148,44 @@ public class Map3ColorDefinition implements Comparable<Map3ColorDefinition> {
 
 	public MapGraphId getImageId() {
 		return _graphId;
+	}
+
+	private int getSortId(final MapGraphId graphId) {
+
+		switch (graphId) {
+		case Altitude:
+			return 1;
+
+		case Pulse:
+			return 2;
+
+		case Speed:
+			return 3;
+
+		case Pace:
+			return 4;
+
+		case Power:
+			return 5;
+
+		case Temperature:
+			return 6;
+
+		case Gradient:
+			return 7;
+
+		case Altimeter:
+			return 8;
+
+		case Cadence:
+			return 9;
+
+		case HrZone:
+			return 10;
+
+		default:
+			return 1;
+		}
 	}
 
 	public String getVisibleName() {

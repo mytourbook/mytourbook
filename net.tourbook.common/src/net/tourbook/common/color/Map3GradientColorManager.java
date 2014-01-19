@@ -84,12 +84,21 @@ public class Map3GradientColorManager {
 	private static final String								ATTR_GREEN						= "green";											//$NON-NLS-1$
 	private static final String								ATTR_IS_ABSOLUTE_VALUES			= "isAbsoluteValues";								//$NON-NLS-1$
 	private static final String								ATTR_IS_ACTIVE_PROFILE			= "isActiveProfile";								//$NON-NLS-1$
+	private static final String								ATTR_IS_OVERWRITE_LEGEND_VALUES	= "isOverwriteLegendValues";						//$NON-NLS-1$
 	private static final String								ATTR_NAME						= "name";											//$NON-NLS-1$
+	private static final String								ATTR_OPACITY					= "opacity";										//$NON-NLS-1$
 	private static final String								ATTR_RED						= "red";											//$NON-NLS-1$
 	private static final String								ATTR_VALUE						= "value";											//$NON-NLS-1$
 	private static final String								ATTR_VERSION					= "version";										//$NON-NLS-1$
 
 	private static final RGB								DEFAULT_RGB						= new RGB(0xFF, 0x8B, 0x8B);
+
+	// opacity
+	public static final int									OPACITY_MIN						= 0;
+	public static final int									OPACITY_MAX						= 100;
+	public static final double								OPACITY_DIGITS_FACTOR			= 100.0;
+	public static final int									OPACITY_DIGITS					= 2;
+	public static final float								OPACITY_DEFAULT					= 1.0f;
 
 	/**
 	 * Define 3D map default colors.
@@ -480,6 +489,9 @@ public class Map3GradientColorManager {
 				colorProfile.setProfileName(Util.getXmlString(xmlProfile, ATTR_NAME, UI.EMPTY_STRING));
 				colorProfile.setIsActiveColorProfile(Util.getXmlBoolean(xmlProfile, ATTR_IS_ACTIVE_PROFILE, false));
 				colorProfile.setIsAbsoluteValues(Util.getXmlBoolean(xmlProfile, ATTR_IS_ABSOLUTE_VALUES, false));
+				colorProfile.setIsOverwriteLegendValues(Util.getXmlBoolean(xmlProfile,//
+						ATTR_IS_OVERWRITE_LEGEND_VALUES,
+						true));
 
 				readColors_20_Brightness(xmlProfile, colorProfile);
 				readColors_30_Vertices(xmlProfile, colorProfile);
@@ -532,7 +544,8 @@ public class Map3GradientColorManager {
 
 			vertices.add(new RGBVertex(//
 					Util.getXmlInteger(xmlVertex, ATTR_VALUE, 0),
-					Util.getXmlRgb(xmlVertex, DEFAULT_RGB)));
+					Util.getXmlRgb(xmlVertex, DEFAULT_RGB),
+					Util.getXmlFloat(xmlVertex, ATTR_OPACITY, OPACITY_DEFAULT, OPACITY_MIN, OPACITY_MAX)));
 		}
 
 		colorProfile.getProfileImage().setVertices(vertices);
@@ -648,6 +661,7 @@ public class Map3GradientColorManager {
 					xmlProfile.putString(ATTR_NAME, map3ColorProfile.getProfileName());
 					xmlProfile.putBoolean(ATTR_IS_ACTIVE_PROFILE, map3ColorProfile.isActiveColorProfile());
 					xmlProfile.putBoolean(ATTR_IS_ABSOLUTE_VALUES, map3ColorProfile.isAbsoluteValues());
+					xmlProfile.putBoolean(ATTR_IS_OVERWRITE_LEGEND_VALUES, map3ColorProfile.isOverwriteLegendValues());
 
 					saveColors_20_Brightness(xmlProfile, map3ColorProfile);
 					saveColors_30_Vertices(xmlProfile, map3ColorProfile);
@@ -680,9 +694,12 @@ public class Map3GradientColorManager {
 			final RGB rgb = vertex.getRGB();
 
 			xmlVertex.putInteger(ATTR_VALUE, vertex.getValue());
+
 			xmlVertex.putInteger(ATTR_RED, rgb.red);
 			xmlVertex.putInteger(ATTR_GREEN, rgb.green);
 			xmlVertex.putInteger(ATTR_BLUE, rgb.blue);
+
+			xmlVertex.putFloat(ATTR_OPACITY, vertex.getOpacity());
 		}
 	}
 

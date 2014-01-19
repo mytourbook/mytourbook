@@ -30,6 +30,11 @@ public class RGBVertex implements Comparable<Object>, Cloneable {
 	private RGB			_rgb;
 
 	/**
+	 * Opacity 0.0 ... 1.0
+	 */
+	private float		_opacity;
+
+	/**
 	 * Created id is needed that vertices can be sorted correctly when the value of two vertices are
 	 * the same. This occures when new vertices are created and the value is not yet set.
 	 */
@@ -62,12 +67,13 @@ public class RGBVertex implements Comparable<Object>, Cloneable {
 		_rgb = new RGB(red, green, blue);
 	}
 
-	public RGBVertex(final int value, final RGB rgb) {
+	public RGBVertex(final int value, final RGB rgb, final float opacity) {
 
 		setSortId();
 
 		_value = value;
 		_rgb = rgb;
+		_opacity = opacity;
 	}
 
 	public RGBVertex(final RGB rgb) {
@@ -87,9 +93,9 @@ public class RGBVertex implements Comparable<Object>, Cloneable {
 
 			clonedObject = (RGBVertex) super.clone();
 
-			clonedObject._rgb = new RGB(_rgb.red, _rgb.green, _rgb.blue);
+			setSortId();
 
-// ???		setSortId();
+			clonedObject._rgb = new RGB(_rgb.red, _rgb.green, _rgb.blue);
 
 		} catch (final CloneNotSupportedException e) {
 			StatusUtil.log(e);
@@ -119,6 +125,10 @@ public class RGBVertex implements Comparable<Object>, Cloneable {
 		}
 	}
 
+	public float getOpacity() {
+		return _opacity;
+	}
+
 	public RGB getRGB() {
 		return _rgb;
 	}
@@ -129,6 +139,10 @@ public class RGBVertex implements Comparable<Object>, Cloneable {
 
 	public int getValue() {
 		return _value;
+	}
+
+	public void setOpacity(final float opacity) {
+		_opacity = opacity;
 	}
 
 	public void setRGB(final RGB rgb) {

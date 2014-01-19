@@ -13,26 +13,33 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.map3.layer.tourtrack;
+package net.tourbook.map3.action;
 
-import gov.nasa.worldwind.geom.LatLon;
-import gov.nasa.worldwind.geom.Position;
+import net.tourbook.application.TourbookPlugin;
+import net.tourbook.map3.Messages;
+import net.tourbook.map3.ui.DialogMap3ColorEditor;
 
-public class TourMap3Position extends Position {
+import org.eclipse.jface.action.Action;
 
-	/**
-	 * Contains the value from the data serie which is painted in the map, this can be altitude,
-	 * pulse, ...
-	 */
-	float		dataSerieValue;
+public class ActionAddVertices extends Action {
 
-	public int	colorValue;
+	private DialogMap3ColorEditor	_dialogMap3ColorEditor;
 
-	public TourMap3Position(final LatLon fromDegrees, final float alti, final float dataSerieValue) {
+	public ActionAddVertices(final DialogMap3ColorEditor dialogMap3ColorEditor) {
 
-		super(fromDegrees, alti);
+		super(null, AS_PUSH_BUTTON);
 
-		this.dataSerieValue = dataSerieValue;
+		_dialogMap3ColorEditor = dialogMap3ColorEditor;
+
+		setToolTipText(Messages.Map3Color_Dialog_Action_AddVertices_Tooltip);
+
+		setImageDescriptor(TourbookPlugin.getImageDescriptor(net.tourbook.Messages.Image__App_Add_2x));
+	}
+
+	@Override
+	public void run() {
+
+		_dialogMap3ColorEditor.actionAddVertices();
 	}
 
 }

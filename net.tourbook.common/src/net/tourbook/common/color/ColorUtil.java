@@ -60,14 +60,16 @@ public class ColorUtil {
 	 * @param blue
 	 * @return Returns white or black that contrasts with the background color.
 	 */
-	public static Color getContrastColor(final int red, final int green, final int blue) {
+	public static Color getContrastColorAWT(final int red, final int green, final int blue, final int alpha) {
 
 		final int yiq = ((red * 299) + (green * 587) + (blue * 114)) / 1000;
 
+		final float newAlpha = (float) alpha / 0xff;
+
 		if (yiq >= 128) {
-			return new Color(0, 0, 0, 0.99f);
+			return new Color(0, 0, 0, newAlpha);
 		} else {
-			return new Color(1, 1, 1, 0.99f);
+			return new Color(1, 1, 1, newAlpha);
 		}
 	}
 }

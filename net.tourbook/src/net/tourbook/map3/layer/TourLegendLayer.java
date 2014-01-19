@@ -53,7 +53,7 @@ import com.jogamp.opengl.util.awt.TextRenderer;
  */
 public class TourLegendLayer extends RenderableLayer {
 
-	public static final String				MAP3_LAYER_ID	= "TourLegendLayer";				//$NON-NLS-1$
+	public static final String				MAP3_LAYER_ID	= "TourLegendLayer";	//$NON-NLS-1$
 
 	private static final Font				DEFAULT_FONT	= UI.AWT_FONT_ARIAL_12;
 //	private static final Font				DEFAULT_FONT	= Font.decode("Arial-PLAIN-12"); //$NON-NLS-1$
@@ -61,14 +61,13 @@ public class TourLegendLayer extends RenderableLayer {
 //	private final Font						DEFAULT_FONT	= Font.decode("Arial-12");
 	private static final Color				DEFAULT_COLOR	= Color.WHITE;
 
-
 	private IMapColorProvider				_colorProvider;
 
 	private Renderable						_legendRenderable;
 	private ScreenImage						_legendImage;
 	private Iterable<? extends Renderable>	_labels;
 
-	private int								_legendImageHeight;
+//	private int								_legendImageHeight;
 	private Point							_legendImageLocation;
 
 	private boolean							_isVisible		= false;
@@ -291,14 +290,12 @@ public class TourLegendLayer extends RenderableLayer {
 
 			// Draw the text outline, in a contrasting color.
 			tr.setColor(WWUtil.computeContrastingColor(color));
-//			tr.draw(text, (int) x - 1, (int) yInGLCoords - 1);
 			tr.draw(text, (int) x + 1, (int) yInGLCoords - 1);
-//			tr.draw(text, (int) x + 1, (int) yInGLCoords + 1);
-//			tr.draw(text, (int) x - 1, (int) yInGLCoords + 1);
 
 			// Draw the text over its outline, in the specified color.
 			tr.setColor(color);
 			tr.draw(text, (int) x, (int) yInGLCoords);
+
 		} finally {
 			tr.endRendering();
 		}
@@ -395,27 +392,26 @@ public class TourLegendLayer extends RenderableLayer {
 
 		final int mapHeight = Map3Manager.getMap3View().getMapSize().height;
 
-		_legendImageHeight = Math.max(1, Math.min(//
-				IMapColorProvider.DEFAULT_LEGEND_HEIGHT,
-				mapHeight - IMapColorProvider.LEGEND_TOP_MARGIN));
+		final int legendMinHeight = Math.min(IMapColorProvider.DEFAULT_LEGEND_HEIGHT, mapHeight - 40);
+		final int legendHeight = Math.max(40, legendMinHeight);
 
 		MapUtils.configureColorProvider(//
 				Map3Manager.getMap3View().getAllTours(),
 				gradientColorProvider,
-				_legendImageHeight);
+				legendHeight);
 
 		final BufferedImage image = new BufferedImage(
 				IMapColorProvider.DEFAULT_LEGEND_GRAPHIC_WIDTH,
-				_legendImageHeight,
+				legendHeight,
 				BufferedImage.TYPE_4BYTE_ABGR);
 
 		final int legendWidth = image.getWidth();
-		final int legendHeight = image.getHeight() - 2 * IMapColorProvider.LEGEND_MARGIN_TOP_BOTTOM;
+//		final int legendHeight = image.getHeight();
 
 		final Graphics2D g2d = image.createGraphics();
 		try {
 
-			TourMapPainter.drawMapLegend(g2d, legendWidth, legendHeight, gradientColorProvider);
+			TourMapPainter.drawMapLegend(g2d, gradientColorProvider, legendWidth, legendHeight);
 
 		} finally {
 			g2d.dispose();
@@ -427,8 +423,8 @@ public class TourLegendLayer extends RenderableLayer {
 		/*
 		 * set legend positon at left/bottom
 		 */
-		final int devXCenter = (int) (5 + IMapColorProvider.DEFAULT_LEGEND_GRAPHIC_WIDTH / 2.0);
-		final int devYCenter = (int) (mapHeight - 10 - _legendImageHeight / 2.0);
+		final int devXCenter = 5 + (int) (IMapColorProvider.DEFAULT_LEGEND_GRAPHIC_WIDTH / 2.0);
+		final int devYCenter = (int) (mapHeight - (legendHeight / 2.0)) - 30;
 
 		_legendImageLocation = new Point(devXCenter, devYCenter);
 		_legendImage.setScreenLocation(_legendImageLocation);
