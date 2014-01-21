@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -31,7 +31,6 @@ import net.tourbook.map2.Messages;
 
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.swt.graphics.Image;
-
 
 @Entity
 public class TourWayPoint implements Cloneable, Comparable<Object>, IHoveredArea {
@@ -95,16 +94,20 @@ public class TourWayPoint implements Cloneable, Comparable<Object>, IHoveredArea
 
 	public TourWayPoint() {}
 
-	@Override
-	public Object clone() {
+
+	public TourWayPoint clone(final TourData wpTourData) {
 
 		try {
 
-			// creates a shallow copy
+			// create a shallow copy
 			final TourWayPoint newWayPoint = (TourWayPoint) super.clone();
 
 			// set create id to uniquely identify the way point
 			newWayPoint._createId = ++_createCounter;
+
+			newWayPoint.wayPointId = TourDatabase.ENTITY_IS_NOT_SAVED;
+
+			newWayPoint.tourData = wpTourData;
 
 			return newWayPoint;
 
@@ -325,14 +328,6 @@ public class TourWayPoint implements Cloneable, Comparable<Object>, IHoveredArea
 
 	public void setTime(final long time) {
 		this.time = time;
-	}
-
-	public void setTourData(final TourData tourData) {
-
-		this.tourData = tourData;
-
-		// set create id to uniquely identify way points which not created from the database
-		_createId = ++_createCounter;
 	}
 
 	@Override

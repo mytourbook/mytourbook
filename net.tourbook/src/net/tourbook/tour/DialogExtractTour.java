@@ -927,8 +927,8 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
 			/*
 			 * copy all way points, they can be independant of the tour
 			 */
-			for (final TourWayPoint wayPoint : _tourDataSource.getTourWayPoints()) {
-				extractedWayPoints.add((TourWayPoint) wayPoint.clone());
+			for (final TourWayPoint sourceWayPoint : _tourDataSource.getTourWayPoints()) {
+				extractedWayPoints.add(sourceWayPoint.clone(_tourDataTarget));
 			}
 		}
 
@@ -964,6 +964,7 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
 
 		_tourDataTarget.setTourMarkers(extractedTourMarker);
 		_tourDataTarget.setWayPoints(extractedWayPoints);
+
 		_tourDataTarget.setDeviceName(_isSplitTour
 				? Messages.Dialog_SplitTour_Label_DeviceName
 				: Messages.Dialog_ExtractTour_Label_DeviceName);

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2012  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -591,6 +591,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	@Basic(optional = false)
 	private SerieData											serieData;
 
+	// ############################################# ASSOCIATED ENTITIES #############################################
+
 	/**
 	 * Photos for this tour
 	 */
@@ -606,8 +608,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	@XmlElementWrapper(name = "TourMarkers")
 	@XmlElement(name = "TourMarker")
 	private Set<TourMarker>										tourMarkers							= new HashSet<TourMarker>();
-
-	// ############################################# ASSOCIATED ENTITIES #############################################
 
 	/**
 	 * Contains the tour way points
@@ -6291,14 +6291,12 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 			/**
 			 * !!!! <br>
-			 * way point must be cloned because the entity could be saved within different tour data
-			 * instances, otherwise hibernate exceptions occure <br>
-			 * this also sets the createId <br>
+			 * Way point must be cloned because the entity could be saved within different tour data
+			 * instances, otherwise hibernate exceptions occure this also sets the createId. <br>
 			 * !!!!
 			 */
-			final TourWayPoint clonedWP = (TourWayPoint) tourWayPoint.clone();
+			final TourWayPoint clonedWP = tourWayPoint.clone(this);
 
-			clonedWP.setTourData(this);
 			tourWayPoints.add(clonedWP);
 		}
 	}

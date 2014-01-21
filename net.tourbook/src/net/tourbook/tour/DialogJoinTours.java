@@ -1164,7 +1164,7 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
 				 * copy way points
 				 */
 				for (final TourWayPoint wayPoint : tourTourData.getTourWayPoints()) {
-					joinedWayPoints.add((TourWayPoint) wayPoint.clone());
+					joinedWayPoints.add(wayPoint.clone(_joinedTourData));
 				}
 			}
 

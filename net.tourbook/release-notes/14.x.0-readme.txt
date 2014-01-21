@@ -1,16 +1,13 @@
-Version: 14.?.0                                       ?. ? 2014
+Version: 14.2.0                                       ?. February 2014
 
 
 
 New 3D Map Features 	
 
-* 
-
-* 
+* Display tour tracks with color profiles.
 
 * Display runtime statistics, e.g. frames per second.
     
-* Show OpenGL version.
 
 
 
@@ -23,11 +20,14 @@ Other New Features
 * Reorganizes structure in preference dialog, moved some appearance pages to their correct parent.
 
 
+
 Fixed Bugs 
 
 * Power and gradient was 10 times higher when using initial smoothing algorithm.
 
 * Removed delay when app is closing and map3 is not displayed
 
+* #77: new tours by dividing/concenated tours: not saved in database 
+  https://sourceforge.net/p/mytourbook/bugs/77/
 
 
