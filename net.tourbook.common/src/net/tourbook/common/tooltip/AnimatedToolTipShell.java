@@ -582,6 +582,7 @@ public abstract class AnimatedToolTipShell {
 							 * SWT.TOOL must be disabled that NO_FOCUS is working !!!
 							 */
 //							| SWT.TOOL
+//							| SWT.RESIZE
 							| SWT.NO_FOCUS);
 
 			_shell.setLayout(new FillLayout());

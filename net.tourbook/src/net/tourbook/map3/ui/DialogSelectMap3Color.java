@@ -440,6 +440,7 @@ public class DialogSelectMap3Color extends AnimatedToolTipShell implements IMap3
 			defineColumn_30_ColorImage();
 			defineColumn_40_MaxValue();
 			defineColumn_50_RelativeAbsolute();
+			defineColumn_52_OverwriteLegendMinMax();
 
 			_colorViewer.setComparator(new Map3ProfileComparator());
 
@@ -642,7 +643,7 @@ public class DialogSelectMap3Color extends AnimatedToolTipShell implements IMap3
 	}
 
 	/**
-	 * Column: Max value
+	 * Column: Relative/absolute values
 	 */
 	private void defineColumn_50_RelativeAbsolute() {
 
@@ -662,9 +663,43 @@ public class DialogSelectMap3Color extends AnimatedToolTipShell implements IMap3
 					final Map3ColorProfile colorProfile = ((Map3GradientColorProvider) (element)).getMap3ColorProfile();
 
 					if (colorProfile.isAbsoluteValues()) {
-						cell.setText(UI.EMPTY_STRING);
+						cell.setText(Messages.Pref_Map3Color_Column_ValueMarker_Absolute);
 					} else {
-						cell.setText(Messages.Pref_Map3Color_Column_AbsoluteRelativValue_Marker);
+						cell.setText(Messages.Pref_Map3Color_Column_ValueMarker_Relative);
+					}
+
+				} else {
+
+					cell.setText(UI.EMPTY_STRING);
+				}
+			}
+		});
+	}
+
+	/**
+	 * Column: Legend overwrite marker
+	 */
+	private void defineColumn_52_OverwriteLegendMinMax() {
+
+		final TableViewerColumn tvc = new TableViewerColumn(_colorViewer, SWT.TRAIL);
+
+		final TableColumn tc = tvc.getColumn();
+		tc.setWidth(_pc.convertWidthInCharsToPixels(COLUMN_WITH_ABSOLUTE_RELATIVE));
+
+		tvc.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final Object element = cell.getElement();
+
+				if (element instanceof Map3GradientColorProvider) {
+
+					final Map3ColorProfile colorProfile = ((Map3GradientColorProvider) (element)).getMap3ColorProfile();
+
+					if (colorProfile.isAbsoluteValues() && colorProfile.isOverwriteLegendValues()) {
+						cell.setText(Messages.Pref_Map3Color_Column_Legend_Marker);
+					} else {
+						cell.setText(UI.EMPTY_STRING);
 					}
 
 				} else {

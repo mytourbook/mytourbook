@@ -122,20 +122,32 @@ public class Messages extends NLS {
 	public static String		Pref_Map3Color_Checkbox_ShowDropDownColorSelector;
 	public static String		Pref_Map3Color_Checkbox_ShowDropDownColorSelector_Tooltip;
 	public static String		Pref_Map3Color_Column_AbsoluteRelativValue_Label;
-	public static String		Pref_Map3Color_Column_AbsoluteRelativValue_Marker;
 	public static String		Pref_Map3Color_Column_AbsoluteRelativValue_Tooltip;
+
 	public static String		Pref_Map3Color_Column_Colors;
 	public static String		Pref_Map3Color_Column_GraphImage;
 	public static String		Pref_Map3Color_Column_Id_Header;
 	public static String		Pref_Map3Color_Column_Id_Label;
 	public static String		Pref_Map3Color_Column_Id_Tooltip;
+
+	public static String	Pref_Map3Color_Column_Legend_Marker;
 	public static String		Pref_Map3Color_Column_MaxValue_Header;
 	public static String		Pref_Map3Color_Column_MaxValue_Label;
 	public static String		Pref_Map3Color_Column_MinValue_Header;
 	public static String		Pref_Map3Color_Column_MinValue_Label;
 	public static String		Pref_Map3Color_Column_MinValueOverwrite_Label;
 	public static String		Pref_Map3Color_Column_MinValueOverwrite_Tooltip;
+
+	public static String	Pref_Map3Color_Column_OverwriteLegendMinMax_Label;
+
+	public static String	Pref_Map3Color_Column_OverwriteLegendMinMax_Label_Tooltip;
+
 	public static String		Pref_Map3Color_Column_ProfileName;
+
+	public static String	Pref_Map3Color_Column_ValueMarker_Absolute;
+
+	public static String	Pref_Map3Color_Column_ValueMarker_Relative;
+
 	public static String		Pref_Map3Color_Dialog_RemoveProfile_Message;
 	public static String		Pref_Map3Color_Dialog_RemoveProfile_Title;
 	public static String		Pref_Map3Color_Label_NumberOfColors;

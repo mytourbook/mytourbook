@@ -778,7 +778,9 @@ public class PrefPageMap3Color extends PreferencePage implements IWorkbenchPrefe
 		defineColumn_32_MinValue();
 		defineColumn_30_ColorImage();
 		defineColumn_35_MaxValue();
-		defineColumn_31_RelativeAbsoluteValues();
+
+		defineColumn_40_ValueMarker();
+		defineColumn_42_LegendMarker();
 
 		defineColumn_99_ProfileId();
 	}
@@ -869,41 +871,6 @@ public class PrefPageMap3Color extends PreferencePage implements IWorkbenchPrefe
 	}
 
 	/**
-	 * Column: Max value overwrite
-	 */
-	private void defineColumn_31_RelativeAbsoluteValues() {
-
-		final TreeColumnDefinition colDef = new TreeColumnDefinition(_columnManager, "maxValueOverwrite", SWT.CENTER); //$NON-NLS-1$
-
-		colDef.setColumnLabel(Messages.Pref_Map3Color_Column_AbsoluteRelativValue_Label);
-		colDef.setColumnToolTipText(Messages.Pref_Map3Color_Column_AbsoluteRelativValue_Tooltip);
-		colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(3));
-		colDef.setIsDefaultColumn();
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-
-				final Object element = cell.getElement();
-
-				if (element instanceof Map3GradientColorProvider) {
-
-					final Map3ColorProfile colorProfile = ((Map3GradientColorProvider) (element)).getMap3ColorProfile();
-
-					if (colorProfile.isAbsoluteValues()) {
-						cell.setText(UI.EMPTY_STRING);
-					} else {
-						cell.setText(Messages.Pref_Map3Color_Column_AbsoluteRelativValue_Marker);
-					}
-
-				} else {
-
-					cell.setText(UI.EMPTY_STRING);
-				}
-			}
-		});
-	}
-
-	/**
 	 * Column: Min value
 	 */
 	private void defineColumn_32_MinValue() {
@@ -923,24 +890,13 @@ public class PrefPageMap3Color extends PreferencePage implements IWorkbenchPrefe
 
 				if (element instanceof Map3GradientColorProvider) {
 
-					final String valueText;
 					final Map3ColorProfile colorProfile = ((Map3GradientColorProvider) (element)).getMap3ColorProfile();
 
-//					if (colorProfile.isMinValueOverwrite()) {
-//
-//						valueText = Integer.toString(colorProfile.getMinValueOverwrite());
-//
-//					} else {
-//
 					final ProfileImage profileImage = colorProfile.getProfileImage();
-
 					final ArrayList<RGBVertex> vertices = profileImage.getRgbVertices();
 					final RGBVertex firstVertex = vertices.get(0);
 
-					valueText = Integer.toString(firstVertex.getValue());
-//					}
-
-					cell.setText(valueText);
+					cell.setText(Integer.toString(firstVertex.getValue()));
 
 				} else {
 
@@ -970,24 +926,85 @@ public class PrefPageMap3Color extends PreferencePage implements IWorkbenchPrefe
 
 				if (element instanceof Map3GradientColorProvider) {
 
-					final String valueText;
 					final Map3ColorProfile colorProfile = ((Map3GradientColorProvider) (element)).getMap3ColorProfile();
 
-//					if (colorProfile.isMaxValueOverwrite()) {
-//
-//						valueText = Integer.toString(colorProfile.getMaxValueOverwrite());
-//
-//					} else {
-//
 					final ProfileImage profileImage = colorProfile.getProfileImage();
-
 					final ArrayList<RGBVertex> vertices = profileImage.getRgbVertices();
 					final RGBVertex lastVertex = vertices.get(vertices.size() - 1);
 
-					valueText = Integer.toString(lastVertex.getValue());
-//					}
+					cell.setText(Integer.toString(lastVertex.getValue()));
 
-					cell.setText(valueText);
+				} else {
+
+					cell.setText(UI.EMPTY_STRING);
+				}
+			}
+		});
+	}
+
+	/**
+	 * Column: Relative value marker
+	 */
+	private void defineColumn_40_ValueMarker() {
+
+		final TreeColumnDefinition colDef = new TreeColumnDefinition(_columnManager, "relativeMarker", SWT.CENTER); //$NON-NLS-1$
+
+		colDef.setColumnLabel(Messages.Pref_Map3Color_Column_AbsoluteRelativValue_Label);
+		colDef.setColumnToolTipText(Messages.Pref_Map3Color_Column_AbsoluteRelativValue_Tooltip);
+		colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(3));
+		colDef.setIsDefaultColumn();
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final Object element = cell.getElement();
+
+				if (element instanceof Map3GradientColorProvider) {
+
+					final Map3ColorProfile colorProfile = ((Map3GradientColorProvider) (element)).getMap3ColorProfile();
+
+					if (colorProfile.isAbsoluteValues()) {
+						cell.setText(Messages.Pref_Map3Color_Column_ValueMarker_Absolute);
+					} else {
+						cell.setText(Messages.Pref_Map3Color_Column_ValueMarker_Relative);
+					}
+
+				} else {
+
+					cell.setText(UI.EMPTY_STRING);
+				}
+			}
+		});
+	}
+
+	/**
+	 * Column: Legend overwrite marker
+	 */
+	private void defineColumn_42_LegendMarker() {
+
+		final TreeColumnDefinition colDef = new TreeColumnDefinition(
+				_columnManager,
+				"legendMinMaxOverwrite", SWT.CENTER); //$NON-NLS-1$
+
+		colDef.setColumnLabel(Messages.Pref_Map3Color_Column_OverwriteLegendMinMax_Label);
+		colDef.setColumnToolTipText(Messages.Pref_Map3Color_Column_OverwriteLegendMinMax_Label_Tooltip);
+		colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(3));
+		colDef.setIsDefaultColumn();
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final Object element = cell.getElement();
+
+				if (element instanceof Map3GradientColorProvider) {
+
+					final Map3ColorProfile colorProfile = ((Map3GradientColorProvider) (element)).getMap3ColorProfile();
+
+					if (colorProfile.isAbsoluteValues() && colorProfile.isOverwriteLegendValues()) {
+						cell.setText(Messages.Pref_Map3Color_Column_Legend_Marker);
+					} else {
+						cell.setText(UI.EMPTY_STRING);
+					}
 
 				} else {
 
