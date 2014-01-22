@@ -627,7 +627,7 @@ public class DialogMap3ColorEditor extends TitleAreaDialog implements IProfileCo
 				 * Radio: Pronto Color
 				 */
 				final Button prontoColor = new Button(vertexContainer, SWT.RADIO);
-				prontoColor.setToolTipText(Messages.Map3Color_Dialog_Radio_ProntoColor);
+				prontoColor.setToolTipText(Messages.Map3Color_Dialog_Radio_ProntoColor_Tooltip);
 				prontoColor.addSelectionListener(prontoListener);
 
 				/*

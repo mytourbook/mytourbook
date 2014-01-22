@@ -47,7 +47,7 @@ public class DialogCreateMultipleVertices extends Dialog {
 	private static final int		DEFAULT_DIFFERENCE_VALUE	= 200;
 	private static final int		MAX_OF_CREATED_VALUES		= 20;
 
-	private static final String		ERROR_TEXT					= "%d > %d";
+	private static final String		ERROR_TEXT					= "%d > %d"; //$NON-NLS-1$
 
 	private static final String		STATE_START_VALUE			= "STATE_START_VALUE";								//$NON-NLS-1$
 	private static final String		STATE_END_VALUE				= "STATE_END_VALUE";								//$NON-NLS-1$

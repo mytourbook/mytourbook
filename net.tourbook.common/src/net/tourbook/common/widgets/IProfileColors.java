@@ -32,8 +32,8 @@ public interface IProfileColors {
 	 */
 	/**
 	 * @param modifiedRGB
-	 *            Contains color which is currently hovered in the hexagon when the mouse button is
-	 *            pressed or modified with the RGB/HSL sliders.
+	 *            Contains a color which is currently hovered in the hexagon when the mouse button
+	 *            is pressed or modified with the RGB/HSL sliders.
 	 */
 	void modifiedColor(RGB modifiedRGB);
 }

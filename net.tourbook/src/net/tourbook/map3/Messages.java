@@ -74,80 +74,59 @@ public class Messages extends NLS {
 	public static String		Map3_Dialog_OpenGLVersion_Title;
 
 	public static String		Map3Color_Dialog_Action_AddVertex_Tooltip;
-
-	public static String	Map3Color_Dialog_Action_AddVertices_Tooltip;
+	public static String		Map3Color_Dialog_Action_AddVertices_Tooltip;
 	public static String		Map3Color_Dialog_Action_RemoveVertex_Tooltip;
 	public static String		Map3Color_Dialog_Button_Apply;
 	public static String		Map3Color_Dialog_Button_Label_GraphType;
 	public static String		Map3Color_Dialog_Button_Label_GraphType_Tooltip;
 	public static String		Map3Color_Dialog_Button_Label_ProfileName;
 	public static String		Map3Color_Dialog_Button_Save;
-
-	public static String	Map3Color_Dialog_Checkbox_EnableProntoColor;
-
-	public static String	Map3Color_Dialog_Checkbox_EnableProntoColor_Tooltip;
-
-	public static String	Map3Color_Dialog_Checkbox_OverwriteLegendValues;
-
-	public static String	Map3Color_Dialog_Checkbox_OverwriteLegendValues_Tooltip;
+	public static String		Map3Color_Dialog_Checkbox_EnableProntoColor;
+	public static String		Map3Color_Dialog_Checkbox_EnableProntoColor_Tooltip;
+	public static String		Map3Color_Dialog_Checkbox_OverwriteLegendValues;
+	public static String		Map3Color_Dialog_Checkbox_OverwriteLegendValues_Tooltip;
 	public static String		Map3Color_Dialog_Label_Values;
 	public static String		Map3Color_Dialog_Message;
 	public static String		Map3Color_Dialog_ProfileColor_Tooltip;
 	public static String		Map3Color_Dialog_Radio_AbsoluteValues;
 	public static String		Map3Color_Dialog_Radio_AbsoluteValues_Tooltip;
 
-	public static String	Map3Color_Dialog_Radio_ProntoColor;
+	public static String	Map3Color_Dialog_Radio_ProntoColor_Tooltip;
 	public static String		Map3Color_Dialog_Radio_RelativeValues;
 	public static String		Map3Color_Dialog_Radio_RelativeValues_Tooltip;
-	public static String	Map3Color_Dialog_Spinner_ColorOpacity_Tooltip;
-
-	public static String	Map3Color_Dialog_Spinner_ColorValue_Tooltip;
-
+	public static String		Map3Color_Dialog_Spinner_ColorOpacity_Tooltip;
+	public static String		Map3Color_Dialog_Spinner_ColorValue_Tooltip;
 	public static String		Map3Color_Dialog_Title;
 
 	public static String		Map3SelectColor_Dialog_Action_AddColor_Tooltip;
 	public static String		Map3SelectColor_Dialog_Action_EditAllColors;
 	public static String		Map3SelectColor_Dialog_Action_EditSelectedColors;
 
-	public static String	Map3Vertices_Dialog_Label_EndValue;
-
-	public static String	Map3Vertices_Dialog_Label_NumberOfCreatedValues;
-
-	public static String	Map3Vertices_Dialog_Label_StartValue;
-
-	public static String	Map3Vertices_Dialog_Label_ValueDifference;
-
-	public static String	Map3Vertices_Dialog_Title;
+	public static String		Map3Vertices_Dialog_Label_EndValue;
+	public static String		Map3Vertices_Dialog_Label_NumberOfCreatedValues;
+	public static String		Map3Vertices_Dialog_Label_StartValue;
+	public static String		Map3Vertices_Dialog_Label_ValueDifference;
+	public static String		Map3Vertices_Dialog_Title;
 
 	public static String		Pref_Map3Color_Checkbox_ShowDropDownColorSelector;
 	public static String		Pref_Map3Color_Checkbox_ShowDropDownColorSelector_Tooltip;
 	public static String		Pref_Map3Color_Column_AbsoluteRelativValue_Label;
 	public static String		Pref_Map3Color_Column_AbsoluteRelativValue_Tooltip;
-
 	public static String		Pref_Map3Color_Column_Colors;
 	public static String		Pref_Map3Color_Column_GraphImage;
 	public static String		Pref_Map3Color_Column_Id_Header;
 	public static String		Pref_Map3Color_Column_Id_Label;
 	public static String		Pref_Map3Color_Column_Id_Tooltip;
-
-	public static String	Pref_Map3Color_Column_Legend_Marker;
+	public static String		Pref_Map3Color_Column_Legend_Marker;
 	public static String		Pref_Map3Color_Column_MaxValue_Header;
 	public static String		Pref_Map3Color_Column_MaxValue_Label;
 	public static String		Pref_Map3Color_Column_MinValue_Header;
 	public static String		Pref_Map3Color_Column_MinValue_Label;
-	public static String		Pref_Map3Color_Column_MinValueOverwrite_Label;
-	public static String		Pref_Map3Color_Column_MinValueOverwrite_Tooltip;
-
-	public static String	Pref_Map3Color_Column_OverwriteLegendMinMax_Label;
-
-	public static String	Pref_Map3Color_Column_OverwriteLegendMinMax_Label_Tooltip;
-
+	public static String		Pref_Map3Color_Column_OverwriteLegendMinMax_Label;
+	public static String		Pref_Map3Color_Column_OverwriteLegendMinMax_Label_Tooltip;
 	public static String		Pref_Map3Color_Column_ProfileName;
-
-	public static String	Pref_Map3Color_Column_ValueMarker_Absolute;
-
-	public static String	Pref_Map3Color_Column_ValueMarker_Relative;
-
+	public static String		Pref_Map3Color_Column_ValueMarker_Absolute;
+	public static String		Pref_Map3Color_Column_ValueMarker_Relative;
 	public static String		Pref_Map3Color_Dialog_RemoveProfile_Message;
 	public static String		Pref_Map3Color_Dialog_RemoveProfile_Title;
 	public static String		Pref_Map3Color_Label_NumberOfColors;
