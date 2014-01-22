@@ -37,6 +37,7 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
 import net.tourbook.common.UI;
+import net.tourbook.common.color.ColorProviderConfig;
 import net.tourbook.common.color.IGradientColorProvider;
 import net.tourbook.common.color.IMapColorProvider;
 import net.tourbook.common.color.MapUnits;
@@ -395,23 +396,31 @@ public class TourLegendLayer extends RenderableLayer {
 		final int legendMinHeight = Math.min(IMapColorProvider.DEFAULT_LEGEND_HEIGHT, mapHeight - 40);
 		final int legendHeight = Math.max(40, legendMinHeight);
 
-		MapUtils.configureColorProvider(//
-				Map3Manager.getMap3View().getAllTours(),
-				gradientColorProvider,
-				legendHeight);
-
 		final BufferedImage image = new BufferedImage(
 				IMapColorProvider.DEFAULT_LEGEND_GRAPHIC_WIDTH,
 				legendHeight,
 				BufferedImage.TYPE_4BYTE_ABGR);
 
 		final int legendWidth = image.getWidth();
-//		final int legendHeight = image.getHeight();
 
 		final Graphics2D g2d = image.createGraphics();
 		try {
 
-			TourMapPainter.drawMapLegend(g2d, gradientColorProvider, legendWidth, legendHeight);
+			final boolean isDataAvailable = MapUtils.configureColorProvider(//
+					Map3Manager.getMap3View().getAllTours(),
+					gradientColorProvider,
+					ColorProviderConfig.MAP3_TOUR,
+					legendHeight);
+
+			if (isDataAvailable) {
+
+				TourMapPainter.drawMapLegend(
+						g2d,
+						gradientColorProvider,
+						ColorProviderConfig.MAP3_TOUR,
+						legendWidth,
+						legendHeight);
+			}
 
 		} finally {
 			g2d.dispose();
@@ -432,7 +441,8 @@ public class TourLegendLayer extends RenderableLayer {
 		final ArrayList<TourLegendLabel> legendLabels = TourMapPainter.getMapLegendLabels(
 				legendWidth,
 				legendHeight,
-				gradientColorProvider);
+				gradientColorProvider,
+				ColorProviderConfig.MAP3_TOUR);
 
 		final ArrayList<LabelAttributes> labels = new ArrayList<TourLegendLayer.LabelAttributes>();
 
@@ -447,7 +457,7 @@ public class TourLegendLayer extends RenderableLayer {
 					0d));
 		}
 
-		final MapUnits mapLegendImageConfig = gradientColorProvider.getMapUnits();
+		final MapUnits mapLegendImageConfig = gradientColorProvider.getMapUnits(ColorProviderConfig.MAP3_TOUR);
 
 		_labels = createColorGradientLegendLabels(
 				legendWidth,

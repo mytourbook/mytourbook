@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.color.ColorProviderConfig;
 import net.tourbook.common.color.Map3ColorDefinition;
 import net.tourbook.common.color.Map3ColorProfile;
 import net.tourbook.common.color.Map3GradientColorManager;
@@ -1170,10 +1171,11 @@ public class PrefPageMap3Color extends PreferencePage implements IWorkbenchPrefe
 			final Map3ColorProfile colorProfile = colorProvider.getMap3ColorProfile();
 			final ArrayList<RGBVertex> rgbVertices = colorProfile.getProfileImage().getRgbVertices();
 
-			colorProvider.configureColorProvider(imageWidth, rgbVertices, false);
+			colorProvider.configureColorProvider(ColorProviderConfig.MAP3_PROFILE, imageWidth, rgbVertices, false);
 
 			image = TourMapPainter.createMapLegendImage(//
 					colorProvider,
+					ColorProviderConfig.MAP3_PROFILE,
 					imageWidth,
 					imageHeight,
 					false,

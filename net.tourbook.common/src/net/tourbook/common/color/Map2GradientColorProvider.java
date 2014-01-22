@@ -50,7 +50,8 @@ public class Map2GradientColorProvider extends MapGradientColorProvider implemen
 	 * @param legendProvider
 	 */
 	@Override
-	public void configureColorProvider(	final int legendHeight,
+	public void configureColorProvider(	final ColorProviderConfig config,
+										final int legendHeight,
 										float minValue,
 										float maxValue,
 										final String unitText,
@@ -122,12 +123,12 @@ public class Map2GradientColorProvider extends MapGradientColorProvider implemen
 		return _mapColorId;
 	}
 
-	public MapUnits getMapUnits() {
+	public MapUnits getMapUnits(final ColorProviderConfig config) {
 		return _mapUnits;
 	}
 
 	@Override
-	public int getRGBValue(final float graphValue) {
+	public int getRGBValue(final ColorProviderConfig config, final float graphValue) {
 
 		int red = 0;
 		int green = 0;

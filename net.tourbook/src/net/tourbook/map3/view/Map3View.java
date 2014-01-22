@@ -47,6 +47,7 @@ import net.tourbook.chart.SelectionChartInfo;
 import net.tourbook.chart.SelectionChartXSliderPosition;
 import net.tourbook.common.UI;
 import net.tourbook.common.action.ActionOpenPrefDialog;
+import net.tourbook.common.color.ColorProviderConfig;
 import net.tourbook.common.color.ColorUtil;
 import net.tourbook.common.color.IGradientColorProvider;
 import net.tourbook.common.color.IMapColorProvider;
@@ -1574,8 +1575,8 @@ public class Map3View extends ViewPart implements ITourProvider {
 
 			final IGradientColorProvider gradientColorProvider = (IGradientColorProvider) colorProvider;
 
-			final MapUnits legendImageConfig = gradientColorProvider.getMapUnits();
-			final float legendMinValue = legendImageConfig.legendMinValue;
+			final MapUnits mapUnits = gradientColorProvider.getMapUnits(ColorProviderConfig.MAP3_TOUR);
+			final float legendMinValue = mapUnits.legendMinValue;
 
 			float graphValue = legendMinValue;
 
@@ -1611,7 +1612,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 			}
 
 			// get color according to the value
-			colorValue = gradientColorProvider.getRGBValue(graphValue);
+			colorValue = gradientColorProvider.getRGBValue(ColorProviderConfig.MAP3_TOUR, graphValue);
 
 		} else if (colorProvider instanceof IDiscreteColorProvider) {
 

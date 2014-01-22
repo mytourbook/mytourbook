@@ -123,7 +123,7 @@ public class GraphColorPainter {
 					final IGradientColorProvider colorProvider = _colorTreeViewer.getMapLegendColorProvider();
 					colorProvider.setColorProfile(graphColorItem.getColorDefinition().getMap2Color_New());
 
-					TourMapPainter.drawMapLegend(//
+					TourMapPainter.drawMap2Legend(//
 							gc,
 							drawableBounds,
 							colorProvider,
@@ -213,7 +213,7 @@ public class GraphColorPainter {
 						final IGradientColorProvider colorProvider = _colorTreeViewer.getMapLegendColorProvider();
 						colorProvider.setColorProfile(graphColorItem.getColorDefinition().getMap2Color_New());
 
-						TourMapPainter.drawMapLegend(//
+						TourMapPainter.drawMap2Legend(//
 								gc,
 								imageBounds,
 								colorProvider,

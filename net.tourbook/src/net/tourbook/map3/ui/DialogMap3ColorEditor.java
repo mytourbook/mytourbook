@@ -26,6 +26,7 @@ import java.util.LinkedHashSet;
 
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
+import net.tourbook.common.color.ColorProviderConfig;
 import net.tourbook.common.color.Map3ColorDefinition;
 import net.tourbook.common.color.Map3ColorProfile;
 import net.tourbook.common.color.Map3GradientColorManager;
@@ -933,12 +934,14 @@ public class DialogMap3ColorEditor extends TitleAreaDialog implements IProfileCo
 		final boolean isDrawUnits = _dialogColorProvider.getMap3ColorProfile().isAbsoluteValues();
 
 		_dialogColorProvider.configureColorProvider(//
+				ColorProviderConfig.MAP3_PROFILE,
 				imageHeight,
 				getRgbVertices(),
 				isDrawUnits);
 
 		_profileImage = TourMapPainter.createMapLegendImage(//
 				_dialogColorProvider,
+				ColorProviderConfig.MAP3_PROFILE,
 				imageWidth,
 				imageHeight,
 				true,

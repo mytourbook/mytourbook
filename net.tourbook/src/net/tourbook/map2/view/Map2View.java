@@ -27,6 +27,7 @@ import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.SelectionChartInfo;
 import net.tourbook.chart.SelectionChartXSliderPosition;
 import net.tourbook.common.UI;
+import net.tourbook.common.color.ColorProviderConfig;
 import net.tourbook.common.color.IGradientColorProvider;
 import net.tourbook.common.color.IMapColorProvider;
 import net.tourbook.common.color.MapGraphId;
@@ -1325,6 +1326,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 			isDataAvailable = MapUtils.configureColorProvider(
 					_allTourData,
 					(IGradientColorProvider) mapColorProvider,
+					ColorProviderConfig.MAP2,
 					legendHeightNoMargin);
 
 		} else if (mapColorProvider instanceof IDiscreteColorProvider) {
@@ -1341,7 +1343,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 			gc.fillRectangle(imageBounds);
 
 			if (isDataAvailable) {
-				TourMapPainter.drawMapLegend(gc, imageBounds, mapColorProvider, true);
+				TourMapPainter.drawMap2Legend(gc, imageBounds, mapColorProvider, true);
 			} else {
 				// draws only a transparent image to hide the legend
 			}

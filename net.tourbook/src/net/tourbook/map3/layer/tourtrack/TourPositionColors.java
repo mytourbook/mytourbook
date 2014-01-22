@@ -21,6 +21,7 @@ import gov.nasa.worldwind.render.Path;
 import java.awt.Color;
 import java.util.ArrayList;
 
+import net.tourbook.common.color.ColorProviderConfig;
 import net.tourbook.common.color.IGradientColorProvider;
 import net.tourbook.common.color.IMapColorProvider;
 import net.tourbook.common.color.MapGraphId;
@@ -55,7 +56,7 @@ class TourPositionColors implements Path.PositionColors {
 
 			final IGradientColorProvider gradientColorProvider = (IGradientColorProvider) _colorProvider;
 
-			final int rgbaValue = gradientColorProvider.getRGBValue(graphValue);
+			final int rgbaValue = gradientColorProvider.getRGBValue(ColorProviderConfig.MAP3_TOUR, graphValue);
 
 			return _awtColorCache.getColorRGBA(rgbaValue);
 		}
@@ -86,7 +87,7 @@ class TourPositionColors implements Path.PositionColors {
 
 			final IGradientColorProvider colorProvider = (IGradientColorProvider) _colorProvider;
 
-			MapUtils.configureColorProvider(allTours, colorProvider, 300);
+			MapUtils.configureColorProvider(allTours, colorProvider, ColorProviderConfig.MAP3_TOUR, 300);
 		}
 	}
 

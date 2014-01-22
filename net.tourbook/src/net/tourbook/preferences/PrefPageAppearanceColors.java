@@ -23,6 +23,7 @@ import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.color.ColorDefinition;
+import net.tourbook.common.color.ColorProviderConfig;
 import net.tourbook.common.color.ColorValue;
 import net.tourbook.common.color.GraphColorItem;
 import net.tourbook.common.color.GraphColorManager;
@@ -181,7 +182,7 @@ public class PrefPageAppearanceColors extends PreferencePage implements IWorkben
 		colorProfile.setColorValues(_legendImageColors);
 
 		// update legend configuations
-		final MapUnits mapUnits = colorProvider.getMapUnits();
+		final MapUnits mapUnits = colorProvider.getMapUnits(ColorProviderConfig.MAP3_PROFILE);
 
 		mapUnits.units = _legendImageUnitValues;
 		mapUnits.unitLabels = _legendImageUnitLabels;

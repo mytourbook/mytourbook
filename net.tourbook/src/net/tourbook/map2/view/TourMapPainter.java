@@ -32,6 +32,7 @@ import java.util.Set;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.Util;
 import net.tourbook.common.color.ColorCacheSWT;
+import net.tourbook.common.color.ColorProviderConfig;
 import net.tourbook.common.color.IGradientColorProvider;
 import net.tourbook.common.color.IMapColorProvider;
 import net.tourbook.common.color.LegendUnitFormat;
@@ -57,6 +58,7 @@ import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.PrefPageMap2Appearance;
 import net.tourbook.ui.UI;
 
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.ColorRegistry;
 import org.eclipse.jface.resource.JFaceResources;
@@ -212,7 +214,7 @@ public class TourMapPainter extends MapPainter {
 			gc.setBackground(transparentColor);
 			gc.fillRectangle(legendImageBounds);
 
-			drawMapLegend(gc, legendImageBounds, colorProvider, isDrawVertical);
+			drawMap2Legend(gc, legendImageBounds, colorProvider, isDrawVertical);
 		}
 		gc.dispose();
 		transparentColor.dispose();
@@ -221,6 +223,7 @@ public class TourMapPainter extends MapPainter {
 	}
 
 	public static Image createMapLegendImage(	final Map3GradientColorProvider colorProvider,
+												final ColorProviderConfig config,
 												final int imageWidth,
 												final int imageHeight,
 												final boolean isVertical,
@@ -238,6 +241,7 @@ public class TourMapPainter extends MapPainter {
 			drawMapLegend_GradientColors_AWT(
 					g2d,
 					colorProvider,
+					config,
 					imageWidth,
 					imageHeight,
 					isVertical,
@@ -263,7 +267,7 @@ public class TourMapPainter extends MapPainter {
 	 *            horizontally.
 	 * @param isDrawLegendText
 	 */
-	public static void drawMapLegend(	final GC gc,
+	public static void drawMap2Legend(	final GC gc,
 										final Rectangle legendImageBounds,
 										final IMapColorProvider colorProvider,
 										final boolean isDrawVertical) {
@@ -280,6 +284,7 @@ public class TourMapPainter extends MapPainter {
 
 	public static void drawMapLegend(	final Graphics2D g2d,
 										final IMapColorProvider colorProvider,
+										final ColorProviderConfig config,
 										final int legendWidth,
 										final int legendHeight) {
 
@@ -288,6 +293,7 @@ public class TourMapPainter extends MapPainter {
 			drawMapLegend_GradientColors_AWT(
 					g2d,
 					(IGradientColorProvider) colorProvider,
+					config,
 					legendWidth,
 					legendHeight,
 					true,
@@ -298,18 +304,20 @@ public class TourMapPainter extends MapPainter {
 
 	private static void drawMapLegend_GradientColors_AWT(	final Graphics2D g2,
 															final IGradientColorProvider colorProvider,
+															final ColorProviderConfig config,
 															final int legendWidth,
 															final int legendHeight,
 															final boolean isDrawVertical,
 															final boolean isDrawUnits,
 															final boolean isDrawBorder) {
 
-		final MapUnits mapUnits = colorProvider.getMapUnits();
+		final MapUnits mapUnits = colorProvider.getMapUnits(config);
 
 		// ensure units are available
-		if (mapUnits.units == null) {
-			return;
-		}
+		Assert.isNotNull(mapUnits.units);
+//		if (mapUnits.units == null) {
+//			return;
+//		}
 
 		/*
 		 * Setup units
@@ -489,7 +497,7 @@ public class TourMapPainter extends MapPainter {
 			/*
 			 * draw color line
 			 */
-			final int rgba = colorProvider.getRGBValue(legendValue);
+			final int rgba = colorProvider.getRGBValue(config, legendValue);
 			g2.setColor(new java.awt.Color(
 					(rgba & 0xFF) >>> 0,
 					(rgba & 0xFF00) >>> 8,
@@ -515,7 +523,7 @@ public class TourMapPainter extends MapPainter {
 															final IGradientColorProvider colorProvider,
 															final boolean isDrawVertical) {
 
-		final MapUnits mapUnits = colorProvider.getMapUnits();
+		final MapUnits mapUnits = colorProvider.getMapUnits(ColorProviderConfig.MAP2);
 
 		// ensure units are available
 		if (mapUnits.units == null) {
@@ -684,7 +692,7 @@ public class TourMapPainter extends MapPainter {
 			 * draw legend color line
 			 */
 
-			final long valueRGB = colorProvider.getRGBValue(legendValue);
+			final long valueRGB = colorProvider.getRGBValue(ColorProviderConfig.MAP2, legendValue);
 			final Color valueColor = _colorCache.getRGB((int) valueRGB);
 
 			gc.setForeground(valueColor);
@@ -708,28 +716,29 @@ public class TourMapPainter extends MapPainter {
 
 	public static ArrayList<TourLegendLabel> getMapLegendLabels(final int legendWidth,
 																final int legendHeight,
-																final IGradientColorProvider colorProvider) {
+																final IGradientColorProvider colorProvider,
+																final ColorProviderConfig config) {
 
 		final ArrayList<TourLegendLabel> legendLabels = new ArrayList<TourLegendLabel>();
 
-		final MapUnits legendImageConfig = colorProvider.getMapUnits();
+		final MapUnits mapUnits = colorProvider.getMapUnits(config);
 
 		// ensure units are available
-		if (legendImageConfig.units == null) {
+		if (mapUnits.units == null) {
 			return legendLabels;
 		}
 
 		// get configuration for the legend
-		final ArrayList<Float> allLegendUnits = new ArrayList<Float>(legendImageConfig.units);
+		final ArrayList<Float> allLegendUnits = new ArrayList<Float>(mapUnits.units);
 
-		final String unitText = legendImageConfig.unitText;
-		final List<String> unitLabels = legendImageConfig.unitLabels;
-		final int legendFormatDigits = legendImageConfig.numberFormatDigits;
-		final LegendUnitFormat unitFormat = legendImageConfig.unitFormat;
+		final String unitText = mapUnits.unitText;
+		final List<String> unitLabels = mapUnits.unitLabels;
+		final int legendFormatDigits = mapUnits.numberFormatDigits;
+		final LegendUnitFormat unitFormat = mapUnits.unitFormat;
 
 		// get configuration for the legend
-		final float legendMaxValue = legendImageConfig.legendMaxValue;
-		final float legendMinValue = legendImageConfig.legendMinValue;
+		final float legendMaxValue = mapUnits.legendMaxValue;
+		final float legendMinValue = mapUnits.legendMinValue;
 		final float legendDiffValue = legendMaxValue - legendMinValue;
 
 		final int legendPositionY = 1;
@@ -1697,12 +1706,15 @@ public class TourMapPainter extends MapPainter {
 	}
 
 	/**
+	 * @param config
 	 * @param legendBounds
 	 * @param valueIndex
 	 * @return Returns the position for the value according to the value index in the legend,
 	 *         {@link Integer#MIN_VALUE} when data are not initialized
 	 */
-	public int getLegendValuePosition(final Rectangle legendBounds, final int valueIndex) {
+	public int getLegendValuePosition(	final ColorProviderConfig config,
+										final Rectangle legendBounds,
+										final int valueIndex) {
 
 		if (_dataSerie == null || valueIndex >= _dataSerie.length || //
 				// check legend provider type
@@ -1719,13 +1731,13 @@ public class TourMapPainter extends MapPainter {
 
 		int valuePosition = 0;
 
-		final MapUnits config = ((IGradientColorProvider) _legendProvider).getMapUnits();
+		final MapUnits mapUnits = ((IGradientColorProvider) _legendProvider).getMapUnits(config);
 
 //		final Integer unitFactor = config.unitFactor;
 //		dataValue /= unitFactor;
 
-		final float legendMaxValue = config.legendMaxValue;
-		final float legendMinValue = config.legendMinValue;
+		final float legendMaxValue = mapUnits.legendMaxValue;
+		final float legendMinValue = mapUnits.legendMinValue;
 		final float legendDiffValue = legendMaxValue - legendMinValue;
 
 		if (dataValue >= legendMaxValue) {
@@ -1796,7 +1808,9 @@ public class TourMapPainter extends MapPainter {
 		long colorValue = 0;
 		if (_legendProvider instanceof IGradientColorProvider) {
 
-			colorValue = ((IGradientColorProvider) _legendProvider).getRGBValue(_dataSerie[serieIndex]);
+			colorValue = ((IGradientColorProvider) _legendProvider).getRGBValue(
+					ColorProviderConfig.MAP2,
+					_dataSerie[serieIndex]);
 
 		} else if (_legendProvider instanceof IDiscreteColorProvider) {
 

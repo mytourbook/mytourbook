@@ -19,6 +19,7 @@ import java.util.ArrayList;
 
 import net.tourbook.common.UI;
 import net.tourbook.common.color.ColorDefinition;
+import net.tourbook.common.color.ColorProviderConfig;
 import net.tourbook.common.color.GraphColorManager;
 import net.tourbook.common.color.IGradientColorProvider;
 import net.tourbook.common.color.LegendUnitFormat;
@@ -42,6 +43,7 @@ public class MapUtils {
 	 */
 	public static boolean configureColorProvider(	final ArrayList<TourData> allTourData,
 													final IGradientColorProvider colorProvider,
+													final ColorProviderConfig config,
 													final int legendHeight) {
 
 		if (allTourData.size() == 0) {
@@ -56,7 +58,7 @@ public class MapUtils {
 		 * <p>
 		 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 		 */
-		final MapUnits mapUnits = colorProvider.getMapUnits();
+		final MapUnits mapUnits = colorProvider.getMapUnits(config);
 
 		// tell the legend provider how to draw the legend
 		switch (colorProvider.getGraphId()) {
@@ -113,6 +115,7 @@ public class MapUtils {
 			mapUnits.unitFormat = LegendUnitFormat.Number;
 
 			colorProvider.configureColorProvider(
+					config,
 					legendHeight,
 					minValue,
 					maxValue,
@@ -172,6 +175,7 @@ public class MapUtils {
 			}
 
 			colorProvider.configureColorProvider(
+					config,
 					legendHeight,
 					minValue,
 					maxValue,
@@ -231,6 +235,7 @@ public class MapUtils {
 			}
 
 			colorProvider.configureColorProvider(
+					config,
 					legendHeight,
 					minValue,
 					maxValue,
@@ -290,6 +295,7 @@ public class MapUtils {
 			mapUnits.unitFormat = LegendUnitFormat.Number;
 
 			colorProvider.configureColorProvider(
+					config,
 					legendHeight,
 					minValue,
 					maxValue,
@@ -349,6 +355,7 @@ public class MapUtils {
 			}
 
 			colorProvider.configureColorProvider(
+					config,
 					legendHeight,
 					minValue,
 					maxValue,

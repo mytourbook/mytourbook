@@ -178,10 +178,6 @@ public class Map3ColorProfile extends MapColorProfile implements Cloneable {
 		_isOverwriteLegendValues = isOverwriteLegendValues;
 	}
 
-	public void setProfileId(final int profileId) {
-		_profileId = profileId;
-	}
-
 	public void setProfileName(final String name) {
 		_profileName = name;
 	}

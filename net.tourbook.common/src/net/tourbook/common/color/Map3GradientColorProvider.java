@@ -16,7 +16,6 @@
 package net.tourbook.common.color;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import net.tourbook.common.Messages;
@@ -38,9 +37,16 @@ public class Map3GradientColorProvider extends MapGradientColorProvider implemen
 
 	private Map3ColorProfile	_colorProfile;
 
-	private MapUnits			_mapUnits	= new MapUnits();
+	private MapUnits			_mapUnitsProfile	= new MapUnits();
+	private MapUnits			_mapUnitsTour		= new MapUnits();
 
-	private RGBVertex[]			_absoluteVertices;
+	private RGBVertex[]			_verticesProfile;
+	private RGBVertex[]			_verticesTour;
+
+//	/**
+//	 * Reference of the original color provider when this color provider is a clone.
+//	 */
+//	private Map3GradientColorProvider	_originalColorProvider;
 
 	public Map3GradientColorProvider(final MapGraphId graphId, final Map3ColorProfile colorProfile) {
 
@@ -51,20 +57,22 @@ public class Map3GradientColorProvider extends MapGradientColorProvider implemen
 	@Override
 	public Map3GradientColorProvider clone() {
 
-		Map3GradientColorProvider clonedObject = null;
-
 		try {
 
-			clonedObject = (Map3GradientColorProvider) super.clone();
+			final Map3GradientColorProvider clonedObject = (Map3GradientColorProvider) super.clone();
 
 			clonedObject._colorProfile = _colorProfile.clone();
-			clonedObject._mapUnits = _mapUnits.clone();
+
+			clonedObject._mapUnitsProfile = _mapUnitsProfile.clone();
+			clonedObject._mapUnitsTour = _mapUnitsTour.clone();
+
+			return clonedObject;
 
 		} catch (final CloneNotSupportedException e) {
 			StatusUtil.log(e);
 		}
 
-		return clonedObject;
+		return null;
 	}
 
 	private RGBVertex[] cloneVertices(final RGBVertex[] relativeVertices) {
@@ -78,7 +86,8 @@ public class Map3GradientColorProvider extends MapGradientColorProvider implemen
 		return absoluteVertices;
 	}
 
-	public void configureColorProvider(	final int legendSize,
+	public void configureColorProvider(	final ColorProviderConfig config,
+										final int legendSize,
 										final ArrayList<RGBVertex> rgbVertices,
 										final boolean isDrawUnits) {
 
@@ -139,6 +148,7 @@ public class Map3GradientColorProvider extends MapGradientColorProvider implemen
 		}
 
 		configureColorProvider(//
+				config,
 				legendSize,
 				minValue,
 				maxValue,
@@ -148,7 +158,8 @@ public class Map3GradientColorProvider extends MapGradientColorProvider implemen
 	}
 
 	@Override
-	public void configureColorProvider(	final int legendSize,
+	public void configureColorProvider(	final ColorProviderConfig config,
+										final int legendSize,
 										final float dataMinValue,
 										final float dataMaxValue,
 										final String unitText,
@@ -181,12 +192,13 @@ public class Map3GradientColorProvider extends MapGradientColorProvider implemen
 		final Float adjustedLegendMinValue = dataUnits.get(0);
 		final Float adjustedLegendMaxValue = dataUnits.get(dataUnits.size() - 1);
 
-		_mapUnits.units = dataUnits;
-		_mapUnits.unitText = unitText;
-		_mapUnits.legendMinValue = adjustedLegendMinValue;
-		_mapUnits.legendMaxValue = adjustedLegendMaxValue;
+		final MapUnits mapUnits = getMapUnits(config);
+		mapUnits.units = dataUnits;
+		mapUnits.unitText = unitText;
+		mapUnits.legendMinValue = adjustedLegendMinValue;
+		mapUnits.legendMaxValue = adjustedLegendMaxValue;
 
-		configureColorProvider_SetVertices(legendMinValue, legendMaxValue);
+		configureColorProvider_SetVertices(config, legendMinValue, legendMaxValue);
 	}
 
 	/**
@@ -195,25 +207,28 @@ public class Map3GradientColorProvider extends MapGradientColorProvider implemen
 	 * minVertex ^ minValue<br>
 	 * maxVertex ^ maxValue
 	 * 
+	 * @param config
 	 * @param dataMinValue
 	 *            Absolute minimum value.
 	 * @param dataMaxValue
 	 *            Absolute maximum value.
 	 */
-	private void configureColorProvider_SetVertices(final float dataMinValue, final float dataMaxValue) {
+	private void configureColorProvider_SetVertices(final ColorProviderConfig config,
+													final float dataMinValue,
+													final float dataMaxValue) {
 
-		final RGBVertex[] relativeVertices = _colorProfile.getProfileImage().getRgbVerticesArray();
-		final RGBVertex[] absoluteVertices = cloneVertices(relativeVertices);
+		final RGBVertex[] profileVertices = _colorProfile.getProfileImage().getRgbVerticesArray();
+		final RGBVertex[] dataVertices = cloneVertices(profileVertices);
 
 		if (_colorProfile.isAbsoluteValues()) {
 
-			_absoluteVertices = absoluteVertices;
+			setVertices(config, dataVertices);
 
 			return;
 		}
 
-		final RGBVertex minRelativeVertex = relativeVertices[0];
-		final RGBVertex maxRelativeVertex = relativeVertices[relativeVertices.length - 1];
+		final RGBVertex minRelativeVertex = profileVertices[0];
+		final RGBVertex maxRelativeVertex = profileVertices[profileVertices.length - 1];
 
 		final int relativeMinValue = minRelativeVertex.getValue();
 
@@ -224,7 +239,7 @@ public class Map3GradientColorProvider extends MapGradientColorProvider implemen
 
 		final int absoluteMinValue = (int) dataMinValue;
 
-		for (int vertexIndex = 0; vertexIndex < relativeVertices.length; vertexIndex++) {
+		for (int vertexIndex = 0; vertexIndex < profileVertices.length; vertexIndex++) {
 
 			int absoluteValue;
 
@@ -234,7 +249,7 @@ public class Map3GradientColorProvider extends MapGradientColorProvider implemen
 
 				absoluteValue = absoluteMinValue;
 
-			} else if (vertexIndex == relativeVertices.length - 1) {
+			} else if (vertexIndex == profileVertices.length - 1) {
 
 				// set last value
 
@@ -244,7 +259,7 @@ public class Map3GradientColorProvider extends MapGradientColorProvider implemen
 
 				// set in between value
 
-				final RGBVertex relativeVertex = relativeVertices[vertexIndex];
+				final RGBVertex relativeVertex = profileVertices[vertexIndex];
 
 				final int relativeValue = relativeVertex.getValue();
 
@@ -255,26 +270,26 @@ public class Map3GradientColorProvider extends MapGradientColorProvider implemen
 				absoluteValue = absoluteMinValue + absolutInBetweenValue;
 			}
 
-			absoluteVertices[vertexIndex].setValue(absoluteValue);
+			dataVertices[vertexIndex].setValue(absoluteValue);
 		}
 
-		_absoluteVertices = absoluteVertices;
+		setVertices(config, dataVertices);
 
 //		dumpVertices();
 	}
 
 	void dumpVertices() {
 
-		final int maxLen = 20;
-
-		final String dump = String.format(//
-				"Map3GradientColorProvider [_absoluteVertices=%s]", //$NON-NLS-1$
-				_absoluteVertices != null ? Arrays.asList(_absoluteVertices).subList(
-						0,
-						Math.min(_absoluteVertices.length, maxLen)) : null);
-
-		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") + ("\t" + dump) + "\n"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-		// TODO remove SYSTEM.OUT.PRINTLN
+//		final int maxLen = 20;
+//
+//		final String dump = String.format(//
+//				"Map3GradientColorProvider [_absoluteVertices=%s]", //$NON-NLS-1$
+//				_absoluteVertices != null ? Arrays.asList(_absoluteVertices).subList(
+//						0,
+//						Math.min(_absoluteVertices.length, maxLen)) : null);
+//
+//		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") + ("\t" + dump) + "\n"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+//		// TODO remove SYSTEM.OUT.PRINTLN
 	}
 
 	@Override
@@ -312,21 +327,32 @@ public class Map3GradientColorProvider extends MapGradientColorProvider implemen
 		return _colorProfile;
 	}
 
-	public MapUnits getMapUnits() {
-		return _mapUnits;
+	public MapUnits getMapUnits(final ColorProviderConfig config) {
+
+		switch (config) {
+		case MAP3_TOUR:
+			return _mapUnitsTour;
+
+		default:
+			return _mapUnitsProfile;
+		}
 	}
 
 	/**
 	 * Returns a RGB value with opacity.
 	 */
 	@Override
-	public int getRGBValue(final float graphValue) {
+	public int getRGBValue(final ColorProviderConfig config, final float graphValue) {
 
-		if (_absoluteVertices == null || _absoluteVertices.length == 0) {
+		final RGBVertex[] vertices = getVertices(config);
+
+		if (vertices == null || vertices.length == 0) {
 
 			// color provider is not yet initialized, return a valid value
 			return 0xffff00ff;
 		}
+
+		final MapUnits mapUnits = getMapUnits(config);
 
 		final float minBrightnessFactor = _colorProfile.getMinBrightnessFactor() / 100.0f;
 		final float maxBrightnessFactor = _colorProfile.getMaxBrightnessFactor() / 100.0f;
@@ -338,7 +364,7 @@ public class Map3GradientColorProvider extends MapGradientColorProvider implemen
 		RGBVertex minRgbVertex = null;
 		RGBVertex maxRgbVertex = null;
 
-		for (final RGBVertex rgbVertexFromArray : _absoluteVertices) {
+		for (final RGBVertex rgbVertexFromArray : vertices) {
 
 			rgbVertex = rgbVertexFromArray;
 			final long vertexValue = rgbVertex.getValue();
@@ -365,7 +391,7 @@ public class Map3GradientColorProvider extends MapGradientColorProvider implemen
 
 			// legend value is smaller than minimum value
 
-			rgbVertex = _absoluteVertices[0];
+			rgbVertex = vertices[0];
 
 			final RGB minRGB = rgbVertex.getRGB();
 
@@ -374,7 +400,7 @@ public class Map3GradientColorProvider extends MapGradientColorProvider implemen
 			b = minRGB.blue;
 
 			final float minValue = rgbVertex.getValue();
-			final float minDiff = _mapUnits.legendMinValue - minValue;
+			final float minDiff = mapUnits.legendMinValue - minValue;
 
 			final float ratio = minDiff == 0 ? 1 : (graphValue - minValue) / minDiff;
 			final float dimmRatio = minBrightnessFactor * ratio;
@@ -398,7 +424,7 @@ public class Map3GradientColorProvider extends MapGradientColorProvider implemen
 
 			// legend value is larger than maximum value
 
-			rgbVertex = _absoluteVertices[_absoluteVertices.length - 1];
+			rgbVertex = vertices[vertices.length - 1];
 
 			final RGB maxRGB = rgbVertex.getRGB();
 
@@ -407,7 +433,7 @@ public class Map3GradientColorProvider extends MapGradientColorProvider implemen
 			b = maxRGB.blue;
 
 			final float maxValue = rgbVertex.getValue();
-			final float maxDiff = _mapUnits.legendMaxValue - maxValue;
+			final float maxDiff = mapUnits.legendMaxValue - maxValue;
 
 			final float ratio = maxDiff == 0 ? 1 : (graphValue - maxValue) / maxDiff;
 			final float dimmRatio = maxBrightnessFactor * ratio;
@@ -481,6 +507,18 @@ public class Map3GradientColorProvider extends MapGradientColorProvider implemen
 		return rgba;
 	}
 
+	private RGBVertex[] getVertices(final ColorProviderConfig config) {
+
+		if (config == ColorProviderConfig.MAP3_TOUR) {
+
+			return _verticesTour;
+
+		} else {
+
+			return _verticesProfile;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -507,6 +545,17 @@ public class Map3GradientColorProvider extends MapGradientColorProvider implemen
 	public void setGraphId(final MapGraphId graphId) {
 
 		_graphId = graphId;
+	}
+
+	private void setVertices(final ColorProviderConfig config, final RGBVertex[] vertices) {
+
+		if (config == ColorProviderConfig.MAP3_TOUR) {
+
+			_verticesTour = vertices;
+
+		} else {
+			_verticesProfile = vertices;
+		}
 	}
 
 	@Override

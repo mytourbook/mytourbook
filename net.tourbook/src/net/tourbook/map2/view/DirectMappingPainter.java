@@ -18,6 +18,7 @@ package net.tourbook.map2.view;
 import java.util.List;
 
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.color.ColorProviderConfig;
 import net.tourbook.common.map.GeoPosition;
 import net.tourbook.data.TourData;
 import net.tourbook.map2.Messages;
@@ -150,6 +151,7 @@ public class DirectMappingPainter implements IDirectPainter {
 		final Rectangle legendImageBounds = legendImage.getBounds();
 
 		final int leftValueInlegendPosition = tourPainter.getLegendValuePosition(
+				ColorProviderConfig.MAP2,
 				legendImageBounds,
 				_leftSliderValueIndex);
 
@@ -158,6 +160,7 @@ public class DirectMappingPainter implements IDirectPainter {
 		}
 
 		final int rightValueInlegendPosition = tourPainter.getLegendValuePosition(
+				ColorProviderConfig.MAP2,
 				legendImageBounds,
 				_rightSliderValueIndex);
 
