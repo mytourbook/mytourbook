@@ -48,84 +48,84 @@
          id="net.tourbook.branding"
          download-size="0"
          install-size="0"
-         version="13.11.1.qualifier"
+         version="14.2.0.qualifier"
          unpack="false"/>
 
    <plugin
          id="net.tourbook.chart"
          download-size="0"
          install-size="0"
-         version="13.11.1.qualifier"
+         version="14.2.0.qualifier"
          unpack="false"/>
 
    <plugin
          id="net.tourbook.export"
          download-size="0"
          install-size="0"
-         version="13.11.1.qualifier"
+         version="14.2.0.qualifier"
          unpack="false"/>
 
    <plugin
          id="net.tourbook.printing"
          download-size="0"
          install-size="0"
-         version="13.11.1.qualifier"
+         version="14.2.0.qualifier"
          unpack="false"/>
 
    <plugin
          id="net.tourbook.device"
          download-size="0"
          install-size="0"
-         version="13.11.1.qualifier"
+         version="14.2.0.qualifier"
          unpack="false"/>
 
    <plugin
          id="net.tourbook.device.garmin"
          download-size="0"
          install-size="0"
-         version="13.11.1.qualifier"
+         version="14.2.0.qualifier"
          unpack="false"/>
 
    <plugin
          id="net.tourbook.device.garmin.fit"
          download-size="0"
          install-size="0"
-         version="13.11.1.qualifier"
+         version="14.2.0.qualifier"
          unpack="false"/>
 
    <plugin
          id="net.tourbook.device.nmea"
          download-size="0"
          install-size="0"
-         version="13.11.1.qualifier"
+         version="14.2.0.qualifier"
          unpack="false"/>
 
    <plugin
          id="net.tourbook.statistics"
          download-size="0"
          install-size="0"
-         version="13.11.1.qualifier"
+         version="14.2.0.qualifier"
          unpack="false"/>
 
    <plugin
          id="net.tourbook.common"
          download-size="0"
          install-size="0"
-         version="13.11.1.qualifier"
+         version="14.2.0.qualifier"
          unpack="false"/>
 
    <plugin
          id="net.tourbook.photo"
          download-size="0"
          install-size="0"
-         version="13.11.1.qualifier"
+         version="14.2.0.qualifier"
          unpack="false"/>
 
    <plugin
          id="net.tourbook"
          download-size="0"
          install-size="0"
-         version="13.11.1.qualifier"
+         version="14.2.0.qualifier"
          unpack="false"/>
 
 </feature>
