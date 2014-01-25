@@ -41,6 +41,7 @@ import java.util.LinkedHashMap;
 
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
+import net.tourbook.common.color.Map3GradientColorManager;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.TreeViewerItem;
 import net.tourbook.common.util.Util;
@@ -1193,6 +1194,8 @@ public class Map3Manager {
 	}
 
 	public static void saveState() {
+
+		Map3GradientColorManager.saveColors();
 
 		_wwLayer_TourTrack.saveState(_state);
 

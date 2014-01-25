@@ -323,11 +323,8 @@ public class DialogMap3ColorEditor extends TitleAreaDialog implements IProfileCo
 		// set UI default behaviour
 		_txtProfileName.setFocus();
 
-		if (_isNewColorProvider) {
-
-			// select whole profile name that it can be easily overwritten
-			_txtProfileName.selectAll();
-		}
+		// select whole profile name that it can be easily overwritten
+		_txtProfileName.selectAll();
 	}
 
 	/**

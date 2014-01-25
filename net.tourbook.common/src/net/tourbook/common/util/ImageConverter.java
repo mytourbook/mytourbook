@@ -94,28 +94,35 @@ public class ImageConverter {
 	 */
 	public static Image convertIntoSWT(final BufferedImage srcImage) {
 
+		final int imageWidth = srcImage.getWidth();
+		final int imageHeight = srcImage.getHeight();
+
 		// We can force bitdepth to be 24 bit because BufferedImage getRGB allows us to always
 		// retrieve 24 bit data regardless of source color depth.
-		final ImageData swtImageData = new ImageData(srcImage.getWidth(), srcImage.getHeight(), 24, PALETTE_DATA);
+		final ImageData swtImageData = new ImageData(imageWidth, imageHeight, 24, PALETTE_DATA);
 
 		// ensure scansize is aligned on 32 bit.
-		final int scansize = (((srcImage.getWidth() * 3) + 3) * 4) / 4;
+		final int scansize = (((imageWidth * 3) + 3) * 4) / 4;
 
 		final WritableRaster alphaRaster = srcImage.getAlphaRaster();
-		final byte[] alphaBytes = new byte[srcImage.getWidth()];
+		final byte[] alphaBytes = new byte[imageWidth];
 
-		for (int y = 0; y < srcImage.getHeight(); y++) {
+		for (int y = 0; y < imageHeight; y++) {
 
-			final int[] buff = srcImage.getRGB(0, y, srcImage.getWidth(), 1, null, 0, scansize);
-			swtImageData.setPixels(0, y, srcImage.getWidth(), buff, 0);
+			final int[] buff = srcImage.getRGB(0, y, imageWidth, 1, null, 0, scansize);
+
+			swtImageData.setPixels(0, y, imageWidth, buff, 0);
 
 			// check for alpha channel
 			if (alphaRaster != null) {
-				final int[] alpha = alphaRaster.getPixels(0, y, srcImage.getWidth(), 1, (int[]) null);
-				for (int i = 0; i < srcImage.getWidth(); i++) {
+
+				final int[] alpha = alphaRaster.getPixels(0, y, imageWidth, 1, (int[]) null);
+
+				for (int i = 0; i < imageWidth; i++) {
 					alphaBytes[i] = (byte) alpha[i];
 				}
-				swtImageData.setAlphas(0, y, srcImage.getWidth(), alphaBytes, 0);
+
+				swtImageData.setAlphas(0, y, imageWidth, alphaBytes, 0);
 			}
 		}
 

@@ -63,7 +63,9 @@ public class Map3ColorProfile extends MapColorProfile implements Cloneable {
 	 * @param maxBrightness
 	 * @param maxBrightnessFactor
 	 */
-	public Map3ColorProfile(final boolean isValueAbsolute,
+	public Map3ColorProfile(final String profileName,
+							final boolean isValueAbsolute,
+							final boolean isOverwriteLegendValues,
 							final RGBVertex[] rgbVertices,
 							final int minBrightness,
 							final int minBrightnessFactor,
@@ -72,7 +74,11 @@ public class Map3ColorProfile extends MapColorProfile implements Cloneable {
 
 		this();
 
+		_profileName = profileName;
+
 		_isAbsoluteValues = isValueAbsolute;
+		_isOverwriteLegendValues = isOverwriteLegendValues;
+
 		_profileImage.setVertices(rgbVertices);
 
 		this.minBrightness = minBrightness;

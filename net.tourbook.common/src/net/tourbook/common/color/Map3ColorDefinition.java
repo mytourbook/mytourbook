@@ -66,13 +66,15 @@ public class Map3ColorDefinition implements Comparable<Map3ColorDefinition> {
 	 */
 	protected Map3ColorDefinition(	final MapGraphId graphId,
 									final String visibleName,
-									final Map3ColorProfile colorProfile) {
+									final ArrayList<Map3ColorProfile> colorProfiles) {
 
 		this(graphId);
 
 		_visibleName = visibleName;
 
-		_colorProviders.add(new Map3GradientColorProvider(graphId, colorProfile));
+		for (final Map3ColorProfile colorProfile : colorProfiles) {
+			_colorProviders.add(new Map3GradientColorProvider(graphId, colorProfile));
+		}
 	}
 
 	void addColorProvider(final Map3GradientColorProvider newColorProvider) {

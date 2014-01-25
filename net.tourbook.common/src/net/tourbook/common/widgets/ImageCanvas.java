@@ -85,7 +85,9 @@ public class ImageCanvas extends Canvas {
 
 	@Override
 	public void dispose() {
+
 		super.dispose();
+
 		_image.dispose();
 	}
 

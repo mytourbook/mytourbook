@@ -340,8 +340,7 @@ public class PrefPageMap3Color extends PreferencePage implements IWorkbenchPrefe
 			final Map3ColorProfile colorProfile = selectedColorProvider.getMap3ColorProfile();
 
 			final String message = NLS.bind(Messages.Pref_Map3Color_Dialog_RemoveProfile_Message, //
-					colorProfile.getProfileName(),
-					colorProfile.getProfileId());
+					colorProfile.getProfileName());
 
 			if (MessageDialog.openQuestion(
 					Display.getCurrent().getActiveShell(),
@@ -354,7 +353,7 @@ public class PrefPageMap3Color extends PreferencePage implements IWorkbenchPrefe
 
 				colorDef.removeColorProvider(selectedColorProvider);
 
-				Map3GradientColorManager.saveColors();
+//				Map3GradientColorManager.saveColors();
 
 				// update UI
 				_colorProfileViewer.refresh(colorDef);
@@ -407,7 +406,7 @@ public class PrefPageMap3Color extends PreferencePage implements IWorkbenchPrefe
 			// an existing profile is modified
 			Map3GradientColorManager.replaceColorProvider(originalCP, modifiedCP);
 		}
-		Map3GradientColorManager.saveColors();
+//		Map3GradientColorManager.saveColors();
 
 		/*
 		 * Update UI

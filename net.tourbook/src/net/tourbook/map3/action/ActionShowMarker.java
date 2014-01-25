@@ -23,17 +23,17 @@ import org.eclipse.jface.action.Action;
 
 public class ActionShowMarker extends Action {
 
-	private Map3View	_mapView;
+	private static final String	IMAGE_EDIT_TOUR_MARKER_DISABLED	= net.tourbook.Messages.Image__edit_tour_marker_disabled;
+	private static final String	IMAGE_EDIT_TOUR_MARKER			= net.tourbook.Messages.Image__edit_tour_marker;
+
+	private Map3View			_mapView;
 
 	public ActionShowMarker(final Map3View mapView) {
 
 		super(Messages.Map3_Action_ShowMarker, AS_CHECK_BOX);
 
-		setImageDescriptor(TourbookPlugin.getImageDescriptor(//
-				net.tourbook.Messages.Image__edit_tour_marker));
-
-		setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(//
-				net.tourbook.Messages.Image__edit_tour_marker_disabled));
+		setImageDescriptor(TourbookPlugin.getImageDescriptor(IMAGE_EDIT_TOUR_MARKER));
+		setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(IMAGE_EDIT_TOUR_MARKER_DISABLED));
 
 		_mapView = mapView;
 	}

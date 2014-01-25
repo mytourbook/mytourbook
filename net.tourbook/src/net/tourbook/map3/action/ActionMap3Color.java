@@ -49,7 +49,7 @@ public class ActionMap3Color extends Action implements IMap3ColorUpdater {
 		// update model
 		Map3GradientColorManager.replaceColorProvider(originalCP, modifiedCP);
 
-		Map3GradientColorManager.saveColors();
+//		Map3GradientColorManager.saveColors();
 
 		// fire event that color has changed
 		TourbookPlugin.getPrefStore().setValue(ITourbookPreferences.MAP3_COLOR_IS_MODIFIED, Math.random());

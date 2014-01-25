@@ -49,23 +49,29 @@ import org.w3c.dom.Element;
 /**
  * Manage gradient colors which are displayed in a 3D map.
  */
+/**
+ * @author IBM_ADMIN
+ *
+ */
+/**
+ * @author IBM_ADMIN
+ */
 public class Map3GradientColorManager {
 
 	private static final int								FILE_VERSION					= 1;
 
 	/**
 	 * Key is the color id.
+	 * <p>
+	 * Default colors are defined in the UI and then replaced with created code from
+	 * {@link #createCodeForDefaultColors(ArrayList)}.
 	 */
 	private static HashMap<MapGraphId, Map3ColorDefinition>	_map3ColorDefinitions			= new HashMap<MapGraphId, Map3ColorDefinition>();
 	private static ArrayList<Map3ColorDefinition>			_sortedColorDefinitions;
 
 	private static HashMap<MapGraphId, Map3ColorProfile>	DEFAULT_PROFILES				= new HashMap<MapGraphId, Map3ColorProfile>();
 
-	private static final Map3ColorProfile					DEFAULT_PROFILE_ALTITUDE;
-	private static final Map3ColorProfile					DEFAULT_PROFILE_GRADIENT;
-	private static final Map3ColorProfile					DEFAULT_PROFILE_PACE;
-	private static final Map3ColorProfile					DEFAULT_PROFILE_PULSE;
-	private static final Map3ColorProfile					DEFAULT_PROFILE_SPEED;
+	private static final Map3ColorProfile					DEFAULT_PROFILE;
 
 	private static final String								ERROR_GRAPH_ID_IS_NOT_AVAILABLE	= "Requested graph id '%s' is not available.";		//$NON-NLS-1$
 
@@ -102,123 +108,597 @@ public class Map3GradientColorManager {
 
 	/**
 	 * Define 3D map default colors.
+	 * <p>
+	 * Default colors are defined in the UI and the default colors are then replaced with created
+	 * code from {@link #createCodeForDefaultColors(ArrayList)}.
 	 */
 	static {
 
-		/*
-		 * Define default color profiles.
+		final ArrayList<Map3ColorProfile> defaultAltitude = new ArrayList<Map3ColorProfile>();
+
+		defaultAltitude.add(new Map3ColorProfile(
+				"0",
+				false,
+				true,
+				new RGBVertex[] {
+			new RGBVertex(0, 181, 0, 0, 1.0f),
+			new RGBVertex(10, 255, 106, 0, 1.0f),
+			new RGBVertex(20, 255, 255, 255, 1.0f),
+			new RGBVertex(30, 0, 170, 255, 1.0f), },
+				MapColorProfile.BRIGHTNESS_DEFAULT,
+				60,
+				MapColorProfile.BRIGHTNESS_DEFAULT,
+				100));
+
+		defaultAltitude.add(new Map3ColorProfile(
+				"10",
+				false,
+				true,
+				new RGBVertex[] {
+			new RGBVertex(400, 19, 77, 0, 1.0f),
+			new RGBVertex(500, 255, 255, 0, 1.0f),
+			new RGBVertex(600, 204, 0, 0, 1.0f), },
+				MapColorProfile.BRIGHTNESS_DEFAULT,
+				60,
+				MapColorProfile.BRIGHTNESS_DEFAULT,
+				50));
+
+		defaultAltitude.add(new Map3ColorProfile(
+				"14",
+				false,
+				true,
+				new RGBVertex[] {
+			new RGBVertex(400, 98, 132, 0, 1.0f),
+			new RGBVertex(500, 191, 255, 0, 1.0f),
+			new RGBVertex(700, 255, 102, 0, 1.0f),
+			new RGBVertex(900, 0, 180, 235, 1.0f),
+			new RGBVertex(1000, 162, 218, 235, 1.0f), },
+				MapColorProfile.BRIGHTNESS_DEFAULT,
+				60,
+				MapColorProfile.BRIGHTNESS_DEFAULT,
+				100));
+
+		defaultAltitude.add(new Map3ColorProfile(
+				"15",
+				false,
+				true,
+				new RGBVertex[] {
+			new RGBVertex(400, 38, 24, 0, 1.0f),
+			new RGBVertex(600, 255, 255, 0, 1.0f),
+			new RGBVertex(750, 255, 50, 0, 1.0f),
+			new RGBVertex(1000, 0, 144, 255, 1.0f),
+			new RGBVertex(1100, 87, 182, 255, 1.0f), },
+				MapColorProfile.BRIGHTNESS_DIMMING,
+				60,
+				MapColorProfile.BRIGHTNESS_LIGHTNING,
+				20));
+
+		defaultAltitude.add(new Map3ColorProfile(
+				"30",
+				false,
+				true,
+				new RGBVertex[] { new RGBVertex(400, 255, 3, 158, 1.0f), new RGBVertex(500, 8, 255, 14, 1.0f), },
+				MapColorProfile.BRIGHTNESS_DEFAULT,
+				60,
+				MapColorProfile.BRIGHTNESS_DEFAULT,
+				100));
+
+		defaultAltitude.add(new Map3ColorProfile(
+				"31",
+				false,
+				true,
+				new RGBVertex[] {
+			new RGBVertex(0, 0, 0, 0, 1.0f),
+			new RGBVertex(10, 0, 234, 255, 1.0f),
+			new RGBVertex(15, 255, 255, 255, 1.0f), },
+				MapColorProfile.BRIGHTNESS_DEFAULT,
+				60,
+				MapColorProfile.BRIGHTNESS_DEFAULT,
+				100));
+
+		defaultAltitude.add(new Map3ColorProfile(
+				"50",
+				false,
+				true,
+				new RGBVertex[] {
+			new RGBVertex(0, 0, 0, 0, 1.0f),
+			new RGBVertex(200, 255, 255, 255, 1.0f),
+			new RGBVertex(400, 0, 0, 0, 1.0f),
+			new RGBVertex(600, 255, 255, 255, 1.0f),
+			new RGBVertex(800, 0, 0, 0, 1.0f),
+			new RGBVertex(1000, 255, 255, 255, 1.0f), },
+				MapColorProfile.BRIGHTNESS_DIMMING,
+				100,
+				MapColorProfile.BRIGHTNESS_LIGHTNING,
+				100));
+
+		defaultAltitude.add(new Map3ColorProfile(
+				"51",
+				false,
+				false,
+				new RGBVertex[] {
+			new RGBVertex(0, 247, 71, 0, 1.0f),
+			new RGBVertex(100, 0, 0, 0, 1.0f),
+			new RGBVertex(200, 247, 71, 0, 1.0f),
+			new RGBVertex(300, 0, 0, 0, 1.0f),
+			new RGBVertex(400, 247, 71, 0, 1.0f),
+			new RGBVertex(500, 237, 255, 167, 1.0f),
+			new RGBVertex(600, 247, 71, 0, 1.0f),
+			new RGBVertex(700, 0, 0, 0, 1.0f),
+			new RGBVertex(800, 247, 71, 0, 1.0f),
+			new RGBVertex(900, 0, 0, 0, 1.0f),
+			new RGBVertex(1000, 247, 71, 0, 1.0f),
+			new RGBVertex(1100, 215, 251, 255, 1.0f),
+			new RGBVertex(1200, 247, 71, 0, 1.0f),
+			new RGBVertex(1300, 0, 0, 0, 1.0f),
+			new RGBVertex(1400, 247, 71, 0, 1.0f),
+			new RGBVertex(2000, 0, 0, 0, 1.0f), },
+				MapColorProfile.BRIGHTNESS_DIMMING,
+				60,
+				MapColorProfile.BRIGHTNESS_DIMMING,
+				100));
+
+		defaultAltitude.add(new Map3ColorProfile(
+				"55",
+				false,
+				false,
+				new RGBVertex[] {
+			new RGBVertex(0, 6, 217, 249, 1.0f),
+			new RGBVertex(100, 0, 0, 0, 1.0f),
+			new RGBVertex(200, 6, 217, 249, 1.0f),
+			new RGBVertex(300, 0, 0, 0, 1.0f),
+			new RGBVertex(400, 6, 217, 249, 1.0f),
+			new RGBVertex(500, 0, 0, 0, 1.0f),
+			new RGBVertex(600, 6, 217, 249, 1.0f),
+			new RGBVertex(700, 0, 0, 0, 1.0f),
+			new RGBVertex(800, 6, 217, 249, 1.0f),
+			new RGBVertex(900, 0, 0, 0, 1.0f),
+			new RGBVertex(1000, 6, 217, 249, 1.0f),
+			new RGBVertex(1100, 0, 0, 0, 1.0f),
+			new RGBVertex(1200, 6, 217, 249, 1.0f),
+			new RGBVertex(1300, 0, 0, 0, 1.0f),
+			new RGBVertex(1400, 6, 217, 249, 1.0f),
+			new RGBVertex(2000, 0, 0, 0, 1.0f), },
+				MapColorProfile.BRIGHTNESS_DIMMING,
+				60,
+				MapColorProfile.BRIGHTNESS_DIMMING,
+				100));
+
+		defaultAltitude.add(new Map3ColorProfile(
+				"56",
+				false,
+				false,
+				new RGBVertex[] {
+			new RGBVertex(0, 6, 217, 249, 1.0f),
+			new RGBVertex(100, 255, 255, 255, 0.0f),
+			new RGBVertex(200, 6, 217, 249, 1.0f),
+			new RGBVertex(300, 255, 255, 255, 0.0f),
+			new RGBVertex(400, 6, 217, 249, 1.0f),
+			new RGBVertex(500, 255, 255, 255, 0.0f),
+			new RGBVertex(600, 6, 217, 249, 1.0f),
+			new RGBVertex(700, 255, 255, 255, 0.0f),
+			new RGBVertex(800, 6, 217, 249, 1.0f),
+			new RGBVertex(900, 255, 255, 255, 0.0f),
+			new RGBVertex(1000, 6, 217, 249, 1.0f),
+			new RGBVertex(1100, 255, 255, 255, 0.0f),
+			new RGBVertex(1200, 6, 217, 249, 1.0f),
+			new RGBVertex(1300, 255, 255, 255, 0.0f),
+			new RGBVertex(1400, 6, 217, 249, 1.0f),
+			new RGBVertex(2000, 255, 255, 255, 0.0f), },
+				MapColorProfile.BRIGHTNESS_DIMMING,
+				60,
+				MapColorProfile.BRIGHTNESS_DIMMING,
+				100));
+
+		defaultAltitude.add(new Map3ColorProfile(
+				"57",
+				false,
+				false,
+				new RGBVertex[] {
+			new RGBVertex(0, 6, 217, 249, 1.0f),
+			new RGBVertex(100, 255, 255, 255, 1.0f),
+			new RGBVertex(200, 6, 217, 249, 1.0f),
+			new RGBVertex(300, 255, 255, 255, 1.0f),
+			new RGBVertex(400, 6, 217, 249, 1.0f),
+			new RGBVertex(500, 255, 255, 255, 1.0f),
+			new RGBVertex(600, 6, 217, 249, 1.0f),
+			new RGBVertex(700, 255, 255, 255, 1.0f),
+			new RGBVertex(800, 6, 217, 249, 1.0f),
+			new RGBVertex(900, 255, 255, 255, 1.0f),
+			new RGBVertex(1000, 6, 217, 249, 1.0f),
+			new RGBVertex(1100, 255, 255, 255, 1.0f),
+			new RGBVertex(1200, 6, 217, 249, 1.0f),
+			new RGBVertex(1300, 255, 255, 255, 1.0f),
+			new RGBVertex(1400, 6, 217, 249, 1.0f),
+			new RGBVertex(2000, 255, 255, 255, 1.0f), },
+				MapColorProfile.BRIGHTNESS_DIMMING,
+				60,
+				MapColorProfile.BRIGHTNESS_DIMMING,
+				100));
+
+		defaultAltitude.add(new Map3ColorProfile(
+				"60",
+				false,
+				true,
+				new RGBVertex[] {
+			new RGBVertex(400, 246, 255, 3, 1.0f),
+			new RGBVertex(450, 246, 255, 3, 1.0f),
+			new RGBVertex(450, 167, 8, 255, 1.0f),
+			new RGBVertex(500, 167, 8, 255, 1.0f), },
+				MapColorProfile.BRIGHTNESS_DEFAULT,
+				60,
+				MapColorProfile.BRIGHTNESS_DEFAULT,
+				100));
+
+		defaultAltitude.add(new Map3ColorProfile(
+				"61",
+				false,
+				true,
+				new RGBVertex[] {
+			new RGBVertex(0, 246, 255, 3, 1.0f),
+			new RGBVertex(200, 246, 255, 3, 1.0f),
+			new RGBVertex(200, 167, 8, 255, 1.0f),
+			new RGBVertex(400, 167, 8, 255, 1.0f),
+			new RGBVertex(400, 255, 255, 255, 1.0f),
+			new RGBVertex(600, 255, 255, 255, 1.0f),
+			new RGBVertex(600, 251, 0, 109, 1.0f),
+			new RGBVertex(800, 251, 0, 109, 1.0f),
+			new RGBVertex(800, 0, 147, 255, 1.0f),
+			new RGBVertex(1000, 0, 147, 255, 1.0f), },
+				MapColorProfile.BRIGHTNESS_DEFAULT,
+				60,
+				MapColorProfile.BRIGHTNESS_LIGHTNING,
+				80));
+
+		defaultAltitude.add(new Map3ColorProfile(
+				"32",
+				false,
+				true,
+				new RGBVertex[] { new RGBVertex(0, 0, 0, 0, 1.0f), new RGBVertex(1, 255, 255, 255, 1.0f), },
+				MapColorProfile.BRIGHTNESS_DEFAULT,
+				60,
+				MapColorProfile.BRIGHTNESS_DEFAULT,
+				100));
+
+		final ArrayList<Map3ColorProfile> defaultPulse = new ArrayList<Map3ColorProfile>();
+
+		defaultPulse.add(new Map3ColorProfile(
+				"0",
+				true,
+				true,
+				new RGBVertex[] {
+			new RGBVertex(100, 181, 0, 0, 1.0f),
+			new RGBVertex(145, 255, 106, 0, 1.0f),
+			new RGBVertex(155, 255, 255, 255, 1.0f),
+			new RGBVertex(200, 0, 170, 255, 1.0f), },
+				MapColorProfile.BRIGHTNESS_DEFAULT,
+				60,
+				MapColorProfile.BRIGHTNESS_DEFAULT,
+				100));
+
+		defaultPulse.add(new Map3ColorProfile(
+				"10",
+				true,
+				true,
+				new RGBVertex[] {
+			new RGBVertex(60, 89, 255, 0, 1.0f),
+			new RGBVertex(120, 255, 251, 0, 1.0f),
+			new RGBVertex(200, 255, 36, 0, 1.0f), },
+				MapColorProfile.BRIGHTNESS_DEFAULT,
+				50,
+				MapColorProfile.BRIGHTNESS_DEFAULT,
+				100));
+
+		defaultPulse.add(new Map3ColorProfile(
+				"11",
+				true,
+				true,
+				new RGBVertex[] {
+			new RGBVertex(100, 28, 206, 6, 0.0f),
+			new RGBVertex(110, 28, 206, 6, 0.0f),
+			new RGBVertex(120, 28, 206, 6, 1.0f),
+			new RGBVertex(140, 251, 240, 6, 1.0f),
+			new RGBVertex(155, 247, 6, 1, 1.0f),
+			new RGBVertex(160, 247, 6, 1, 1.0f), },
+				MapColorProfile.BRIGHTNESS_DIMMING,
+				50,
+				MapColorProfile.BRIGHTNESS_LIGHTNING,
+				100));
+
+		defaultPulse.add(new Map3ColorProfile(
+				"20",
+				true,
+				true,
+				new RGBVertex[] {
+			new RGBVertex(80, 201, 246, 0, 1.0f),
+			new RGBVertex(100, 1, 237, 0, 1.0f),
+			new RGBVertex(101, 0, 0, 0, 0.0f),
+			new RGBVertex(140, 255, 255, 255, 0.0f),
+			new RGBVertex(155, 0, 0, 0, 0.0f),
+			new RGBVertex(155, 250, 8, 1, 1.0f),
+			new RGBVertex(180, 255, 255, 255, 1.0f), },
+				MapColorProfile.BRIGHTNESS_DEFAULT,
+				50,
+				MapColorProfile.BRIGHTNESS_DEFAULT,
+				100));
+
+		defaultPulse.add(new Map3ColorProfile(
+				"22",
+				true,
+				true,
+				new RGBVertex[] {
+			new RGBVertex(80, 255, 255, 255, 0.0f),
+			new RGBVertex(155, 255, 255, 255, 0.0f),
+			new RGBVertex(155, 250, 8, 1, 1.0f),
+			new RGBVertex(180, 255, 255, 255, 1.0f), },
+				MapColorProfile.BRIGHTNESS_DEFAULT,
+				50,
+				MapColorProfile.BRIGHTNESS_DEFAULT,
+				10));
+
+		final ArrayList<Map3ColorProfile> defaultSpeed = new ArrayList<Map3ColorProfile>();
+
+		defaultSpeed.add(new Map3ColorProfile(
+				"0",
+				false,
+				true,
+				new RGBVertex[] {
+			new RGBVertex(0, 181, 0, 0, 1.0f),
+			new RGBVertex(10, 255, 106, 0, 1.0f),
+			new RGBVertex(20, 255, 255, 255, 1.0f),
+			new RGBVertex(30, 0, 170, 255, 1.0f), },
+				MapColorProfile.BRIGHTNESS_DEFAULT,
+				60,
+				MapColorProfile.BRIGHTNESS_DEFAULT,
+				100));
+
+		defaultSpeed.add(new Map3ColorProfile(
+				"10",
+				false,
+				true,
+				new RGBVertex[] {
+			new RGBVertex(0, 53, 91, 0, 1.0f),
+			new RGBVertex(10, 166, 227, 0, 1.0f),
+			new RGBVertex(20, 255, 64, 0, 1.0f),
+			new RGBVertex(30, 161, 40, 0, 1.0f), },
+				MapColorProfile.BRIGHTNESS_DEFAULT,
+				60,
+				MapColorProfile.BRIGHTNESS_DEFAULT,
+				100));
+
+		defaultSpeed.add(new Map3ColorProfile(
+				"11",
+				false,
+				true,
+				new RGBVertex[] {
+			new RGBVertex(0, 21, 36, 0, 1.0f),
+			new RGBVertex(10, 94, 128, 0, 1.0f),
+			new RGBVertex(20, 130, 30, 0, 1.0f),
+			new RGBVertex(30, 51, 12, 0, 1.0f), },
+				MapColorProfile.BRIGHTNESS_DEFAULT,
+				60,
+				MapColorProfile.BRIGHTNESS_DEFAULT,
+				100));
+
+		defaultSpeed.add(new Map3ColorProfile(
+				"20",
+				false,
+				true,
+				new RGBVertex[] {
+			new RGBVertex(9, 156, 213, 0, 1.0f),
+			new RGBVertex(10, 156, 213, 0, 1.0f),
+			new RGBVertex(15, 255, 255, 255, 0.0f),
+			new RGBVertex(20, 0, 0, 0, 0.0f),
+			new RGBVertex(25, 255, 255, 255, 0.0f),
+			new RGBVertex(30, 231, 61, 0, 1.0f),
+			new RGBVertex(31, 231, 61, 0, 1.0f), },
+				MapColorProfile.BRIGHTNESS_DIMMING,
+				100,
+				MapColorProfile.BRIGHTNESS_DIMMING,
+				30));
+
+		defaultSpeed.add(new Map3ColorProfile(
+				"Breaktime",
+				true,
+				true,
+				new RGBVertex[] {
+			new RGBVertex(0, 219, 251, 0, 1.0f),
+			new RGBVertex(3, 219, 251, 0, 1.0f),
+			new RGBVertex(5, 219, 251, 0, 0.0f),
+			new RGBVertex(20, 255, 255, 255, 0.0f), },
+				MapColorProfile.BRIGHTNESS_DEFAULT,
+				60,
+				MapColorProfile.BRIGHTNESS_DEFAULT,
+				100));
+
+		defaultSpeed.add(new Map3ColorProfile(
+				"12",
+				false,
+				false,
+				new RGBVertex[] {
+			new RGBVertex(5, 82, 0, 172, 1.0f),
+			new RGBVertex(20, 249, 244, 0, 1.0f),
+			new RGBVertex(25, 249, 244, 0, 1.0f), },
+				MapColorProfile.BRIGHTNESS_DEFAULT,
+				100,
+				MapColorProfile.BRIGHTNESS_DEFAULT,
+				100));
+
+		final ArrayList<Map3ColorProfile> defaultPace = new ArrayList<Map3ColorProfile>();
+
+		defaultPace.add(new Map3ColorProfile(
+				"0",
+				true,
+				true,
+				new RGBVertex[] {
+			new RGBVertex(0, 181, 0, 0, 1.0f),
+			new RGBVertex(150, 255, 106, 0, 1.0f),
+			new RGBVertex(300, 255, 255, 255, 1.0f),
+			new RGBVertex(450, 0, 170, 255, 1.0f), },
+				MapColorProfile.BRIGHTNESS_DEFAULT,
+				60,
+				MapColorProfile.BRIGHTNESS_DEFAULT,
+				100));
+
+		defaultPace.add(new Map3ColorProfile(
+				"1",
+				true,
+				true,
+				new RGBVertex[] {
+			new RGBVertex(0, 0, 0, 0, 1.0f),
+			new RGBVertex(90, 43, 80, 255, 1.0f),
+			new RGBVertex(240, 255, 255, 0, 1.0f), },
+				MapColorProfile.BRIGHTNESS_DEFAULT,
+				60,
+				MapColorProfile.BRIGHTNESS_DEFAULT,
+				100));
+
+		final ArrayList<Map3ColorProfile> defaultGradient = new ArrayList<Map3ColorProfile>();
+
+		defaultGradient.add(new Map3ColorProfile(
+				"1",
+				true,
+				true,
+				new RGBVertex[] {
+			new RGBVertex(-10, 181, 0, 0, 1.0f),
+			new RGBVertex(-5, 255, 106, 0, 1.0f),
+			new RGBVertex(0, 255, 255, 255, 1.0f),
+			new RGBVertex(10, 0, 170, 255, 1.0f), },
+				MapColorProfile.BRIGHTNESS_DEFAULT,
+				60,
+				MapColorProfile.BRIGHTNESS_DEFAULT,
+				100));
+
+		defaultGradient.add(new Map3ColorProfile(
+				"10",
+				true,
+				true,
+				new RGBVertex[] {
+			new RGBVertex(-10, 181, 0, 0, 1.0f),
+			new RGBVertex(-5, 255, 106, 0, 1.0f),
+			new RGBVertex(0, 255, 255, 255, 0.0f),
+			new RGBVertex(10, 0, 170, 255, 1.0f), },
+				MapColorProfile.BRIGHTNESS_DEFAULT,
+				60,
+				MapColorProfile.BRIGHTNESS_DEFAULT,
+				100));
+
+		defaultGradient.add(new Map3ColorProfile(
+				"11",
+				true,
+				true,
+				new RGBVertex[] {
+			new RGBVertex(-10, 181, 0, 0, 1.0f),
+			new RGBVertex(-6, 181, 0, 0, 1.0f),
+			new RGBVertex(-6, 255, 106, 0, 1.0f),
+			new RGBVertex(-2, 255, 106, 0, 1.0f),
+			new RGBVertex(-2, 255, 255, 255, 0.0f),
+			new RGBVertex(2, 255, 255, 255, 0.0f),
+			new RGBVertex(2, 140, 217, 255, 1.0f),
+			new RGBVertex(6, 140, 217, 255, 1.0f),
+			new RGBVertex(6, 0, 170, 255, 1.0f),
+			new RGBVertex(10, 0, 170, 255, 1.0f), },
+				MapColorProfile.BRIGHTNESS_DEFAULT,
+				60,
+				MapColorProfile.BRIGHTNESS_DEFAULT,
+				100));
+
+		defaultGradient.add(new Map3ColorProfile(
+				"12",
+				true,
+				true,
+				new RGBVertex[] {
+			new RGBVertex(-10, 0, 255, 0, 1.0f),
+			new RGBVertex(0, 0, 0, 0, 1.0f),
+			new RGBVertex(10, 255, 0, 0, 1.0f), },
+				MapColorProfile.BRIGHTNESS_DIMMING,
+				60,
+				MapColorProfile.BRIGHTNESS_LIGHTNING,
+				20));
+
+		defaultGradient.add(new Map3ColorProfile(
+				"20",
+				true,
+				true,
+				new RGBVertex[] {
+			new RGBVertex(-7, 0, 0, 0, 1.0f),
+			new RGBVertex(0, 0, 171, 245, 1.0f),
+			new RGBVertex(7, 255, 255, 255, 1.0f), },
+				MapColorProfile.BRIGHTNESS_DIMMING,
+				100,
+				MapColorProfile.BRIGHTNESS_LIGHTNING,
+				74));
+
+		defaultGradient.add(new Map3ColorProfile(
+				"21",
+				true,
+				true,
+				new RGBVertex[] {
+			new RGBVertex(-7, 0, 0, 0, 1.0f),
+			new RGBVertex(0, 245, 0, 163, 1.0f),
+			new RGBVertex(7, 255, 255, 255, 1.0f), },
+				MapColorProfile.BRIGHTNESS_DIMMING,
+				100,
+				MapColorProfile.BRIGHTNESS_LIGHTNING,
+				74));
+
+		defaultGradient.add(new Map3ColorProfile(
+				"13",
+				true,
+				true,
+				new RGBVertex[] {
+			new RGBVertex(-11, 87, 219, 6, 1.0f),
+			new RGBVertex(-5, 87, 219, 6, 1.0f),
+			new RGBVertex(-5, 87, 219, 6, 0.0f),
+			new RGBVertex(0, 255, 255, 255, 0.0f),
+			new RGBVertex(5, 237, 6, 55, 0.0f),
+			new RGBVertex(5, 237, 6, 55, 1.0f),
+			new RGBVertex(11, 237, 6, 55, 1.0f), },
+				MapColorProfile.BRIGHTNESS_DIMMING,
+				100,
+				MapColorProfile.BRIGHTNESS_LIGHTNING,
+				80));
+
+		/**
+		 * ----------------------------------------------------------------------------------------
 		 */
 
-		DEFAULT_PROFILE_ALTITUDE = new Map3ColorProfile(//
-				//
-				false,
-				//
-				new RGBVertex[] {
-			new RGBVertex(0, 128, 64, 0),
-			new RGBVertex(20, 255, 255, 0),
-			new RGBVertex(50, 255, 0, 0),
-			new RGBVertex(60, 0, 128, 255),
-			new RGBVertex(100, 0, 128, 255),
-				//
-				},
-				//
-				MapColorProfile.BRIGHTNESS_DIMMING,
-				10,
-				MapColorProfile.BRIGHTNESS_LIGHTNING,
-				10);
+		// set default default value
+		DEFAULT_PROFILE = defaultAltitude.get(0);
 
-		DEFAULT_PROFILE_GRADIENT = new Map3ColorProfile(//
-				//
-				true,
-				//
-				new RGBVertex[] {
-			new RGBVertex(-10, 0, 0, 0),
-			new RGBVertex(0, 128, 0, 128),
-			new RGBVertex(5, 223, 0, 223),
-			new RGBVertex(10, 255, 255, 255), },
-				//
-				MapColorProfile.BRIGHTNESS_DIMMING,
-				10,
-				MapColorProfile.BRIGHTNESS_DIMMING,
-				10);
-
-		DEFAULT_PROFILE_PACE = new Map3ColorProfile(//
-				//
-				false,
-				//
-				new RGBVertex[] {
-			new RGBVertex(0, 255, 0, 0),
-			new RGBVertex(5, 0, 169, 0),
-			new RGBVertex(10, 0, 255, 255) },
-				//
-				MapColorProfile.BRIGHTNESS_DIMMING,
-				10,
-				MapColorProfile.BRIGHTNESS_DIMMING,
-				10);
-
-		DEFAULT_PROFILE_PULSE = new Map3ColorProfile(//
-				//
-				true,
-				//
-				new RGBVertex[] {
-			new RGBVertex(60, 0, 203, 0),
-			new RGBVertex(100, 57, 255, 0),
-			new RGBVertex(140, 255, 0, 0),
-			new RGBVertex(180, 204, 0, 247) },
-				//
-				MapColorProfile.BRIGHTNESS_DIMMING,
-				10,
-				MapColorProfile.BRIGHTNESS_DIMMING,
-				10);
-
-		DEFAULT_PROFILE_SPEED = new Map3ColorProfile(//
-				//
-				false,
-				//
-				new RGBVertex[] {
-			new RGBVertex(0, 198, 255, 0),
-			new RGBVertex(25, 0, 255, 198),
-			new RGBVertex(50, 255, 128, 0),
-			new RGBVertex(100, 0, 128, 255), },
-				//
-				MapColorProfile.BRIGHTNESS_DIMMING,
-				10,
-				MapColorProfile.BRIGHTNESS_DIMMING,
-				10);
-
-		DEFAULT_PROFILES.put(MapGraphId.Altitude, DEFAULT_PROFILE_ALTITUDE);
-		DEFAULT_PROFILES.put(MapGraphId.Gradient, DEFAULT_PROFILE_GRADIENT);
-		DEFAULT_PROFILES.put(MapGraphId.Pace, DEFAULT_PROFILE_PACE);
-		DEFAULT_PROFILES.put(MapGraphId.Pulse, DEFAULT_PROFILE_PULSE);
-		DEFAULT_PROFILES.put(MapGraphId.Speed, DEFAULT_PROFILE_SPEED);
+		DEFAULT_PROFILES.put(MapGraphId.Altitude, defaultAltitude.get(0).clone());
+		DEFAULT_PROFILES.put(MapGraphId.Gradient, defaultGradient.get(0).clone());
+		DEFAULT_PROFILES.put(MapGraphId.Pace, defaultPace.get(0).clone());
+		DEFAULT_PROFILES.put(MapGraphId.Pulse, defaultPulse.get(0).clone());
+		DEFAULT_PROFILES.put(MapGraphId.Speed, defaultSpeed.get(0).clone());
 
 		/*
 		 * Setup all color definitions with defaults.
 		 */
-		_map3ColorDefinitions.put(MapGraphId.Altitude, new Map3ColorDefinition(//
+		_map3ColorDefinitions.put(MapGraphId.Altitude, new Map3ColorDefinition(
 				MapGraphId.Altitude,
 				Messages.Graph_Label_Altitude,
-				DEFAULT_PROFILE_ALTITUDE.clone()));
-
-		_map3ColorDefinitions.put(MapGraphId.Pulse, new Map3ColorDefinition(//
-				MapGraphId.Pulse,
-				Messages.Graph_Label_Heartbeat,
-				DEFAULT_PROFILE_PULSE.clone()));
-
-		_map3ColorDefinitions.put(MapGraphId.Speed, new Map3ColorDefinition(//
-				MapGraphId.Speed,
-				Messages.Graph_Label_Speed,
-				DEFAULT_PROFILE_SPEED.clone()));
-
-		_map3ColorDefinitions.put(MapGraphId.Pace, new Map3ColorDefinition(//
-				MapGraphId.Pace,
-				Messages.Graph_Label_Pace,
-				DEFAULT_PROFILE_PACE.clone()));
+				defaultAltitude));
 
 		_map3ColorDefinitions.put(MapGraphId.Gradient, new Map3ColorDefinition(
 				MapGraphId.Gradient,
 				Messages.Graph_Label_Gradient,
-				DEFAULT_PROFILE_GRADIENT.clone()));
+				defaultGradient));
+
+		_map3ColorDefinitions.put(MapGraphId.Pace, new Map3ColorDefinition(//
+				MapGraphId.Pace,
+				Messages.Graph_Label_Pace,
+				defaultPace));
+
+		_map3ColorDefinitions.put(MapGraphId.Pulse, new Map3ColorDefinition(//
+				MapGraphId.Pulse,
+				Messages.Graph_Label_Heartbeat,
+				defaultPulse));
+
+		_map3ColorDefinitions.put(MapGraphId.Speed, new Map3ColorDefinition(//
+				MapGraphId.Speed,
+				Messages.Graph_Label_Speed,
+				defaultSpeed));
 
 		_initColorDefinitions();
 	}
@@ -241,6 +721,79 @@ public class Map3GradientColorManager {
 		final Map3ColorDefinition colorDefinition = getColorDefinition(graphId);
 
 		colorDefinition.addColorProvider(newColorProvider);
+	}
+
+	private static void createCodeForDefaultColors(final ArrayList<Map3ColorDefinition> colorDefinitions) {
+
+		for (final Map3ColorDefinition colorDefinition : colorDefinitions) {
+
+			final ArrayList<Map3GradientColorProvider> colorProviders = colorDefinition.getColorProviders();
+
+			final MapGraphId graphId = colorDefinition.getGraphId();
+
+			final String dumpDef = UI.NEW_LINE
+					+ "final ArrayList<Map3ColorProfile> default"
+					+ graphId
+					+ " = new ArrayList<Map3ColorProfile>();";
+
+			System.out.println(dumpDef);
+
+			for (int providerIndex = 0; providerIndex < colorProviders.size(); providerIndex++) {
+
+				final Map3GradientColorProvider colorProvider = colorProviders.get(providerIndex);
+				final Map3ColorProfile colorProfile = colorProvider.getMap3ColorProfile();
+
+				final StringBuilder sbVertices = new StringBuilder();
+
+				for (final RGBVertex vertex : colorProfile.getProfileImage().getRgbVertices()) {
+					final RGB rgb = vertex.getRGB();
+					sbVertices.append(//
+							("new RGBVertex(" + UI.NEW_LINE)
+									+ (vertex.getValue() + ", ")
+									+ (rgb.red + ", ")
+									+ (rgb.green + ", ")
+									+ (rgb.blue + ", ")
+									+ (Float.toString(vertex.getOpacity()) + "f), ")
+									+ "\n");
+				}
+
+				final String vertices = "" + //
+						("new RGBVertex[] {" + UI.NEW_LINE)
+						+ sbVertices.toString()
+						+ "},";
+
+				final String dump = UI.NEW_LINE//
+						+ ("default" + graphId + ".add(")
+						+ ("new Map3ColorProfile" + "(" + UI.NEW_LINE)
+						+ ("\"" + colorProfile.getProfileName() + "\"," + UI.NEW_LINE)
+						+ (Boolean.toString(colorProfile.isAbsoluteValues()) + "," + UI.NEW_LINE)
+						+ (Boolean.toString(colorProfile.isOverwriteLegendValues()) + "," + UI.NEW_LINE)
+						+ vertices
+						+ (createCodeForDefaultColors_GetBrightness(colorProfile.minBrightness) + "," + UI.NEW_LINE)
+						+ (colorProfile.minBrightnessFactor + "," + UI.NEW_LINE)
+						+ (createCodeForDefaultColors_GetBrightness(colorProfile.maxBrightness) + "," + UI.NEW_LINE)
+						+ (colorProfile.maxBrightnessFactor + UI.NEW_LINE)
+						+ "));"
+						+ UI.NEW_LINE
+						+ UI.NEW_LINE;
+
+				System.out.println(dump);
+			}
+		}
+	}
+
+	private static String createCodeForDefaultColors_GetBrightness(final int brightness) {
+
+		switch (brightness) {
+		case MapColorProfile.BRIGHTNESS_DIMMING:
+			return "MapColorProfile.BRIGHTNESS_DIMMING";
+
+		case MapColorProfile.BRIGHTNESS_LIGHTNING:
+			return "MapColorProfile.BRIGHTNESS_LIGHTNING";
+
+		default:
+			return "MapColorProfile.BRIGHTNESS_DEFAULT";
+		}
 	}
 
 	/**
@@ -331,7 +884,7 @@ public class Map3GradientColorManager {
 		// this case should not happen
 		StatusUtil.logError(String.format(ERROR_GRAPH_ID_IS_NOT_AVAILABLE, graphId));
 
-		return DEFAULT_PROFILE_ALTITUDE.clone();
+		return DEFAULT_PROFILE.clone();
 	}
 
 	public static ArrayList<Map3ColorDefinition> getSortedColorDefinitions() {
@@ -346,8 +899,6 @@ public class Map3GradientColorManager {
 
 		if (xmlColorDefinitions == null) {
 
-			// set all default color profiles as active
-
 			for (final Map3ColorDefinition colorDef : _map3ColorDefinitions.values()) {
 
 				for (final Map3GradientColorProvider colorProvider : colorDef.getColorProviders()) {
@@ -355,6 +906,9 @@ public class Map3GradientColorManager {
 					final Map3ColorProfile colorProfile = colorProvider.getMap3ColorProfile();
 
 					colorProfile.setIsActiveColorProfile(true);
+
+					// set only first default color profile as active
+					break;
 				}
 			}
 
@@ -425,14 +979,14 @@ public class Map3GradientColorManager {
 
 		InputStreamReader reader = null;
 
-		ArrayList<Map3ColorDefinition> xmlColorDefinitions = null;
+		ArrayList<Map3ColorDefinition> colorDefinitions = null;
 
 		try {
 			reader = new InputStreamReader(new FileInputStream(file), UI.UTF_8);
 
-			final XMLMemento mementoRoot = XMLMemento.createReadRoot(reader);
+			final XMLMemento xmlRoot = XMLMemento.createReadRoot(reader);
 
-			xmlColorDefinitions = readColors_10_MapColors(mementoRoot);
+			colorDefinitions = readColors_10_MapColors(xmlRoot);
 
 		} catch (final UnsupportedEncodingException e) {
 			StatusUtil.log(e);
@@ -450,7 +1004,15 @@ public class Map3GradientColorManager {
 			}
 		}
 
-		return xmlColorDefinitions;
+		/*
+		 * This code is only run when default colors are needed to be modified.
+		 */
+		final boolean isCreateDefaultCode = false;
+		if (isCreateDefaultCode) {
+			createCodeForDefaultColors(colorDefinitions);
+		}
+
+		return colorDefinitions;
 	}
 
 	private static ArrayList<Map3ColorDefinition> readColors_10_MapColors(final XMLMemento xmlRoot) {
@@ -592,7 +1154,7 @@ public class Map3GradientColorManager {
 	/**
 	 * Write map color data into a xml file.
 	 */
-	public static void saveColors() {
+	public static void saveColors() { 
 
 		BufferedWriter writer = null;
 

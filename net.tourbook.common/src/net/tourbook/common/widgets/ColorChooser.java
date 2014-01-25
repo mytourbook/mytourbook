@@ -42,6 +42,8 @@ import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
@@ -165,6 +167,13 @@ public class ColorChooser extends Composite {
 	public ColorChooser(final Composite parent, final int style) {
 
 		super(parent, style);
+
+		addDisposeListener(new DisposeListener() {
+			@Override
+			public void widgetDisposed(final DisposeEvent e) {
+				onDispose();
+			}
+		});
 
 		setHexagonSize();
 
@@ -783,20 +792,40 @@ public class ColorChooser extends Composite {
 
 	private void drawHexagon() {
 
+		final Display display = getDisplay();
+
 		final GC gc = new GC(_hexagonCanvas.getImage());
+		final Color defaultColor = new Color(display, _hexagonDefaultRGB);
 		{
 			for (int x = -_chooserRadius; x < _chooserRadius; x++) {
 				for (int y = -_chooserRadius; y < _chooserRadius; y++) {
 
-					final Color fgColor = new Color(this.getDisplay(), getRgbFromHexagon(x, y));
+					/*
+					 * This code is optimized that default color is not created all the time and
+					 * disposed, this reduced drawing time from 700 to 500 ms.
+					 */
+					final RGB rgbFromHexagon = getRgbFromHexagon(x, y);
+
+					Color fgColor;
+					if (rgbFromHexagon == _hexagonDefaultRGB) {
+						fgColor = defaultColor;
+					} else {
+						fgColor = new Color(display, rgbFromHexagon);
+					}
+
 					{
 						gc.setForeground(fgColor);
 						gc.drawPoint(x + _chooserRadius, y + _chooserRadius);
 					}
-					fgColor.dispose();
+
+					if (rgbFromHexagon != _hexagonDefaultRGB) {
+						fgColor.dispose();
+					}
+
 				}
 			}
 		}
+		defaultColor.dispose();
 		gc.dispose();
 	}
 
@@ -979,6 +1008,11 @@ public class ColorChooser extends Composite {
 				setColorInColorLabel(colorLabel, _chooserRGB);
 			}
 		}
+	}
+
+	private void onDispose() {
+
+		_hexagonCanvas.dispose();
 	}
 
 	private void onHexagonMouseMove(final MouseEvent event) {

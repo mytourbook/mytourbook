@@ -222,12 +222,12 @@ public class DialogSelectMap3Color extends AnimatedToolTipShell implements IMap3
 			}
 		});
 
-		ownerControl.addDisposeListener(new DisposeListener() {
-			@Override
-			public void widgetDisposed(final DisposeEvent e) {
-				onDispose();
-			}
-		});
+//		ownerControl.addDisposeListener(new DisposeListener() {
+//			@Override
+//			public void widgetDisposed(final DisposeEvent e) {
+//				onDispose();
+//			}
+//		});
 	}
 
 	@Override
@@ -248,12 +248,6 @@ public class DialogSelectMap3Color extends AnimatedToolTipShell implements IMap3
 			// an existing profile is modified
 			Map3GradientColorManager.replaceColorProvider(originalCP, modifiedCP);
 		}
-		Map3GradientColorManager.saveColors();
-
-//		// update model
-//		Map3GradientColorManager.replaceColorProvider(originalCP, modifiedCP);
-//
-//		Map3GradientColorManager.saveColors();
 
 		// fire event that color has changed
 		TourbookPlugin.getPrefStore().setValue(ITourbookPreferences.MAP3_COLOR_IS_MODIFIED, Math.random());
@@ -352,6 +346,14 @@ public class DialogSelectMap3Color extends AnimatedToolTipShell implements IMap3
 		final Color bgColor = colorRegistry.get(IPhotoPreferences.PHOTO_VIEWER_COLOR_BACKGROUND);
 
 		net.tourbook.common.UI.updateChildColors(_shellContainer, fgColor, bgColor);
+
+		_shellContainer.addDisposeListener(new DisposeListener() {
+
+			@Override
+			public void widgetDisposed(final DisposeEvent e) {
+				onDispose();
+			}
+		});
 
 		return _shellContainer;
 	}

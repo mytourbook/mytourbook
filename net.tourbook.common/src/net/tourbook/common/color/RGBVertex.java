@@ -30,9 +30,9 @@ public class RGBVertex implements Comparable<Object>, Cloneable {
 	private RGB			_rgb;
 
 	/**
-	 * Opacity 0.0 ... 1.0
+	 * Opacity 0.0 ... 1.0, default is 1.0 to ensure that color is visible.
 	 */
-	private float		_opacity;
+	private float		_opacity	= 1.0f;
 
 	/**
 	 * Created id is needed that vertices can be sorted correctly when the value of two vertices are
@@ -65,6 +65,13 @@ public class RGBVertex implements Comparable<Object>, Cloneable {
 
 		_value = value;
 		_rgb = new RGB(red, green, blue);
+	}
+
+	public RGBVertex(final int value, final int red, final int green, final int blue, final float opacity) {
+
+		this(value, red, green, blue);
+
+		_opacity = opacity;
 	}
 
 	public RGBVertex(final int value, final RGB rgb, final float opacity) {

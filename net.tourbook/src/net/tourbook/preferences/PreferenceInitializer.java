@@ -347,7 +347,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 		 * Pref page: Map3 color
 		 */
 		store.setDefault(ITourbookPreferences.MAP3_IS_COLOR_SELECTOR_DISPLAYED, true);
-		store.setDefault(ITourbookPreferences.MAP3_NUMBER_OF_COLOR_SELECTORS, 5);
+		store.setDefault(ITourbookPreferences.MAP3_NUMBER_OF_COLOR_SELECTORS, 10);
 
 	}
 }
