@@ -31,6 +31,7 @@ import net.tourbook.photo.internal.gallery.MT20.RendererHelper;
 
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseEvent;
@@ -88,6 +89,8 @@ public class PhotoGalleryToolTip extends AnimatedToolTipShell {
 		_nfMByte.setMinimumIntegerDigits(1);
 	}
 
+	private PixelConverter			_pc;
+
 	/*
 	 * UI resources
 	 */
@@ -121,6 +124,9 @@ public class PhotoGalleryToolTip extends AnimatedToolTipShell {
 		if (_photo == null) {
 			return null;
 		}
+
+		_pc = new PixelConverter(parent);
+		_defaultTextWidthPixel = _pc.convertWidthInCharsToPixels(DEFAULT_TEXT_WIDTH);
 
 		final Composite container = createUI(parent);
 
@@ -299,7 +305,8 @@ public class PhotoGalleryToolTip extends AnimatedToolTipShell {
 		/*
 		 * use hint only when text is too large, otherwise it will displays the white space allways
 		 */
-		final int hintX = value.length() > DEFAULT_TEXT_WIDTH ? _defaultTextWidthPixel : SWT.DEFAULT;
+		final String valueText = getMaxValueText(value);
+		final int hintX = valueText.length() > DEFAULT_TEXT_WIDTH ? _defaultTextWidthPixel : SWT.DEFAULT;
 
 		/*
 		 * name
@@ -317,8 +324,7 @@ public class PhotoGalleryToolTip extends AnimatedToolTipShell {
 				.align(SWT.BEGINNING, SWT.BEGINNING)
 				.hint(hintX, SWT.DEFAULT)
 				.applyTo(label);
-		label.setText(value);
-//		label.pack();
+		label.setText(valueText);
 	}
 
 	private void createUI_MetadataLine2(final Composite container,
@@ -469,6 +475,24 @@ public class PhotoGalleryToolTip extends AnimatedToolTipShell {
 				}
 			});
 		}
+	}
+
+	private String getMaxValueText(final String value) {
+
+		/*
+		 * use hint only when text is too large, otherwise it will displays the white space allways
+		 */
+		final boolean isLargeText = value.length() > DEFAULT_TEXT_WIDTH;
+		if (isLargeText) {
+
+			// ensure the text is not longer than 5 lines, this should fix bug #82
+
+			final int maxText = Math.min(value.length(), DEFAULT_TEXT_WIDTH * 5);
+
+			return value.substring(0, maxText);
+		}
+
+		return value;
 	}
 
 	@Override
