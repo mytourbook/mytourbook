@@ -50,6 +50,8 @@ public class Messages extends NLS {
 	public static String		Default_Layer_WMS_USGS_Topo250;
 	public static String		Default_Layer_WorldMap;
 
+	public static String		Image_Map3_DirectionArrow;
+	public static String		Image_Map3_DirectionArrow_Disabled;
 	public static String		Image_Map3_Map3PropertiesView;
 	public static String		Image_Map3_OpenGL_Version;
 	public static String		Image_Map3_StatisticsView;
@@ -91,7 +93,7 @@ public class Messages extends NLS {
 	public static String		Map3Color_Dialog_Radio_AbsoluteValues;
 	public static String		Map3Color_Dialog_Radio_AbsoluteValues_Tooltip;
 
-	public static String	Map3Color_Dialog_Radio_ProntoColor_Tooltip;
+	public static String		Map3Color_Dialog_Radio_ProntoColor_Tooltip;
 	public static String		Map3Color_Dialog_Radio_RelativeValues;
 	public static String		Map3Color_Dialog_Radio_RelativeValues_Tooltip;
 	public static String		Map3Color_Dialog_Spinner_ColorOpacity_Tooltip;

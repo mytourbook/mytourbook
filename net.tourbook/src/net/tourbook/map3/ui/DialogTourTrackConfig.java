@@ -256,7 +256,7 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 
 		final Composite container = createUI(parent);
 
-		updateUI_initial();
+		updateUI_Initial();
 
 		restoreState();
 
@@ -1110,14 +1110,10 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 
 		enableControls();
 
-		// update layer
 		Map3Manager.getLayer_TourTrack().onModifyConfig();
 
 		// update sliders
-		final Map3View map3View = Map3Manager.getMap3View();
-		if (map3View != null) {
-			map3View.onModifyConfig();
-		}
+		updateUI_Map3();
 	}
 
 	private void onModifyName() {
@@ -1502,7 +1498,7 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 		}
 	}
 
-	private void updateUI_initial() {
+	private void updateUI_Initial() {
 
 		updateUI_ComboConfigName(false);
 
@@ -1522,6 +1518,15 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 		updateUI_FillCombo(_comboInteriorColorMode_Selected);
 	}
 
+	private void updateUI_Map3() {
+		
+		final Map3View map3View = Map3Manager.getMap3View();
+
+		if (map3View != null) {
+			map3View.onModifyConfig();
+		}
+	}
+
 	private void updateUI_SetActiveConfig(final TourTrackConfig previousConfig) {
 
 		restoreState();
@@ -1529,11 +1534,11 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 		enableControls();
 
 		final TourTrackConfig config = TourTrackConfigManager.getActiveConfig();
-
 		config.checkTrackRecreation(previousConfig);
 
-		// update track layer
 		Map3Manager.getLayer_TourTrack().onModifyConfig();
+
+		updateUI_Map3();
 	}
 
 }

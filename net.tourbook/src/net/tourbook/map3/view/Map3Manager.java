@@ -1318,14 +1318,15 @@ public class Map3Manager {
 		setCustomLayerVisibleInLayerView(isLegendVisible, TourLegendLayer.MAP3_LAYER_ID);
 	}
 
-	static void setLayerVisible_Marker(final boolean isVisible) {
+	static void setLayerVisible_Marker(final boolean isMarkerVisible) {
 
 		// update model
-		_wwLayer_Marker.setEnabled(isVisible);
+		_wwLayer_Marker.setEnabled(isMarkerVisible);
 
 		// update UI
-		setCustomLayerVisibleInLayerView(isVisible, MarkerLayer.MAP3_LAYER_ID);
+		setCustomLayerVisibleInLayerView(isMarkerVisible, MarkerLayer.MAP3_LAYER_ID);
 	}
+
 
 	/**
 	 * Show/hide tour track layer.
@@ -1336,7 +1337,7 @@ public class Map3Manager {
 
 		if (_map3LayerView == null) {
 
-			// layer viewer is not displayed, update model
+			// update model, layer viewer is not displayed
 
 			_wwLayer_TourTrack.setEnabled(isTrackVisible);
 

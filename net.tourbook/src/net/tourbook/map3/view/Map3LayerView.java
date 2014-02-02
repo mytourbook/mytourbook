@@ -430,13 +430,16 @@ public class Map3LayerView extends ViewPart {
 		_layerViewer.getTree().setFocus();
 	}
 
-	void setLayerVisible(final TVIMap3Layer tviLayer, final boolean isLegendVisible) {
+	void setLayerVisible(final TVIMap3Layer tviLayer, final boolean isVisible) {
 
 		// update model
-		tviLayer.isLayerVisible = isLegendVisible;
+		tviLayer.isLayerVisible = isVisible;
 
 		// update viewer
-		_layerViewer.setChecked(tviLayer, isLegendVisible);
+		_layerViewer.setChecked(tviLayer, isVisible);
+
+		// add/remove layer listener
+		tviLayer.fireCheckStateListener();
 	}
 
 	void setLayerVisible_TourTrack(final TVIMap3Layer tviLayer, final boolean isTrackVisible) {
@@ -471,9 +474,8 @@ public class Map3LayerView extends ViewPart {
 		// update tooltip
 		_propToolTip.setLayerVisibility(tviLayer, isUpdateTooltip);
 
+		// update viewer
 		if (isUpdateViewer) {
-
-			// update viewer
 			_layerViewer.setChecked(tviLayer, isLayerVisible);
 		}
 

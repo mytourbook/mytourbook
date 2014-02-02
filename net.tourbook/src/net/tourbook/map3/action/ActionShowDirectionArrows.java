@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.map3.action;
 
+import net.tourbook.application.TourbookPlugin;
 import net.tourbook.map3.Messages;
 import net.tourbook.map3.view.Map3View;
 
@@ -29,6 +30,9 @@ public class ActionShowDirectionArrows extends Action {
 		super(Messages.Map3_Action_DirectionArrows, AS_CHECK_BOX);
 
 		_mapView = mapView;
+
+		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image_Map3_DirectionArrow));
+		setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image_Map3_DirectionArrow_Disabled));
 	}
 
 	@Override

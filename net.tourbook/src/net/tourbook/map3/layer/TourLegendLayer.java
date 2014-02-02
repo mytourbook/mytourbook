@@ -57,9 +57,6 @@ public class TourLegendLayer extends RenderableLayer {
 	public static final String				MAP3_LAYER_ID	= "TourLegendLayer";	//$NON-NLS-1$
 
 	private static final Font				DEFAULT_FONT	= UI.AWT_FONT_ARIAL_12;
-//	private static final Font				DEFAULT_FONT	= Font.decode("Arial-PLAIN-12"); //$NON-NLS-1$
-//	private final Font						DEFAULT_FONT	= Font.decode("Arial-BOLD-12");
-//	private final Font						DEFAULT_FONT	= Font.decode("Arial-12");
 	private static final Color				DEFAULT_COLOR	= Color.WHITE;
 
 	private IMapColorProvider				_colorProvider;
@@ -68,10 +65,11 @@ public class TourLegendLayer extends RenderableLayer {
 	private ScreenImage						_legendImage;
 	private Iterable<? extends Renderable>	_labels;
 
-//	private int								_legendImageHeight;
 	private Point							_legendImageLocation;
 
 	private boolean							_isVisible		= false;
+	private boolean							_isTourAvailable;
+	private boolean							_canDisplayLegend;
 
 	public interface LabelAttributes {
 
@@ -150,7 +148,7 @@ public class TourLegendLayer extends RenderableLayer {
 		setPickEnabled(false);
 	}
 
-	public static TourLegendLayer.LabelAttributes createLegendLabelAttributes(	final double value,
+	private static TourLegendLayer.LabelAttributes createLegendLabelAttributes(	final double value,
 																				final String text,
 																				final Font font,
 																				final Color color,
@@ -180,11 +178,11 @@ public class TourLegendLayer extends RenderableLayer {
 		};
 	}
 
-	protected Iterable<? extends Renderable> createColorGradientLegendLabels(	final int width,
-																				final int height,
-																				final double minValue,
-																				final double maxValue,
-																				final Iterable<? extends LabelAttributes> labels) {
+	private Iterable<? extends Renderable> createColorGradientLegendLabels(	final int width,
+																			final int height,
+																			final double minValue,
+																			final double maxValue,
+																			final Iterable<? extends LabelAttributes> labels) {
 		final ArrayList<Renderable> list = new ArrayList<Renderable>();
 
 		if (labels != null) {
@@ -208,32 +206,19 @@ public class TourLegendLayer extends RenderableLayer {
 	private Renderable createRenderable(final TourLegendLayer tourLegendLayer) {
 
 		return new Renderable() {
+
 			public void render(final DrawContext dc) {
 				tourLegendLayer.render(dc);
 			}
 		};
 	}
 
-	private void doRenderLegend(final DrawContext dc) {
-
-		_legendImage.render(dc);
-
-		if (!dc.isPickingMode() && _labels != null) {
-
-			for (final Renderable renderable : _labels) {
-				if (renderable != null) {
-					renderable.render(dc);
-				}
-			}
-		}
-	}
-
-	protected void drawLabel(	final DrawContext dc,
-								final LabelAttributes attr,
-								double x,
-								double y,
-								final String halign,
-								final String valign) {
+	private void drawLabel(	final DrawContext dc,
+							final LabelAttributes attr,
+							double x,
+							double y,
+							final String halign,
+							final String valign) {
 
 		final String text = attr.getText();
 		if (WWUtil.isEmpty(text)) {
@@ -302,8 +287,15 @@ public class TourLegendLayer extends RenderableLayer {
 		}
 	}
 
-	public Point getScreenLocation(final DrawContext dc) {
+	private Point getScreenLocation(final DrawContext dc) {
 		return _legendImage.getScreenLocation(dc);
+	}
+
+	private void hideLegend() {
+
+		_isVisible = false;
+
+		removeRenderable(_legendRenderable);
 	}
 
 	@Override
@@ -323,8 +315,20 @@ public class TourLegendLayer extends RenderableLayer {
 			return;
 		}
 
-		doRenderLegend(dc);
+		/*
+		 * Start rendering
+		 */
 
+		_legendImage.render(dc);
+
+		if (!dc.isPickingMode() && _labels != null) {
+
+			for (final Renderable renderable : _labels) {
+				if (renderable != null) {
+					renderable.render(dc);
+				}
+			}
+		}
 	}
 
 	public void resizeLegendImage() {
@@ -343,7 +347,7 @@ public class TourLegendLayer extends RenderableLayer {
 //			return;
 //		}
 
-		updateLegendImage();
+		updateLegendImage(_isTourAvailable);
 	}
 
 	public void setColorProvider(final IMapColorProvider colorProvider) {
@@ -352,31 +356,52 @@ public class TourLegendLayer extends RenderableLayer {
 
 		if (_colorProvider instanceof IGradientColorProvider) {
 
-			// prevent to add legend image more than once
-			if (_isVisible == false) {
+			_canDisplayLegend = true;
 
-				_isVisible = true;
-
-				addRenderable(_legendRenderable);
-			}
+			showLegend();
 
 		} else {
 
 			// other color providers are not yet supported
 
-			_isVisible = false;
+			_canDisplayLegend = false;
 
-			removeRenderable(_legendRenderable);
+			hideLegend();
+		}
+	}
+
+	private void showLegend() {
+
+		// prevent to add legend image more than once
+		if (_canDisplayLegend && _isVisible == false) {
+
+			_isVisible = true;
+
+			addRenderable(_legendRenderable);
 		}
 	}
 
 	/**
 	 * Creates a new legend image.
 	 * 
+	 * @param isTourAvailable
 	 * @param isUpdateMinMax
 	 * @param mapColorProvider
 	 */
-	public void updateLegendImage() {
+	public void updateLegendImage(final boolean isTourAvailable) {
+
+		_isTourAvailable = isTourAvailable;
+
+		if (isTourAvailable) {
+
+			showLegend();
+
+		} else {
+
+			// a tour is not displayed, hide legend
+
+			hideLegend();
+		}
 
 		IGradientColorProvider gradientColorProvider;
 
@@ -444,11 +469,11 @@ public class TourLegendLayer extends RenderableLayer {
 				gradientColorProvider,
 				ColorProviderConfig.MAP3_TOUR);
 
-		final ArrayList<LabelAttributes> labels = new ArrayList<TourLegendLayer.LabelAttributes>();
+		final ArrayList<LabelAttributes> labelAttributes = new ArrayList<TourLegendLayer.LabelAttributes>();
 
 		for (final TourLegendLabel mapLegendLabel : legendLabels) {
 
-			labels.add(createLegendLabelAttributes(
+			labelAttributes.add(createLegendLabelAttributes(
 					mapLegendLabel.legendValue,
 					mapLegendLabel.legendText,
 					DEFAULT_FONT,
@@ -457,14 +482,14 @@ public class TourLegendLayer extends RenderableLayer {
 					0d));
 		}
 
-		final MapUnits mapLegendImageConfig = gradientColorProvider.getMapUnits(ColorProviderConfig.MAP3_TOUR);
+		final MapUnits mapUnits = gradientColorProvider.getMapUnits(ColorProviderConfig.MAP3_TOUR);
 
 		_labels = createColorGradientLegendLabels(
 				legendWidth,
 				legendHeight,
-				mapLegendImageConfig.legendMinValue,
-				mapLegendImageConfig.legendMaxValue,
-				labels);
+				mapUnits.legendMinValue,
+				mapUnits.legendMaxValue,
+				labelAttributes);
 
 	}
 }

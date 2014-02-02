@@ -397,9 +397,13 @@ public class Map3View extends ViewPart implements ITourProvider {
 		Map3Manager.setLayerVisible_Legend(isLegendVisible);
 	}
 
-	public void actionShowMarker(final boolean isVisible) {
+	public void actionShowMarker(final boolean isMarkerVisible) {
 
-		Map3Manager.setLayerVisible_Marker(isVisible);
+		Map3Manager.setLayerVisible_Marker(isMarkerVisible);
+
+		updateUI_CreateMarker();
+
+		Map3Manager.redrawMap();
 	}
 
 	public void actionShowTour(final boolean isTrackVisible) {
@@ -1367,6 +1371,8 @@ public class Map3View extends ViewPart implements ITourProvider {
 
 		// altitude mode can have been changed, do a slider repositioning
 		updateTrackSlider();
+
+		Map3Manager.getLayer_Marker().onModifyConfig(_allTours);
 	}
 
 	private void onSelection(final ISelection selection) {
@@ -1783,20 +1789,17 @@ public class Map3View extends ViewPart implements ITourProvider {
 			// track layer is displayed
 
 			final ArrayList<TourMap3Position> allPositions = tourTrackLayer.createTrackPaths(_allTours);
-			Map3Manager.getLayer_TourLegend().updateLegendImage();
+
+			final boolean isTourAvailable = _allTours.size() > 0;
+
+			Map3Manager.getLayer_TourLegend().updateLegendImage(isTourAvailable);
 
 			showAllTours_Final(isSyncMapViewWithTour, allPositions);
 		}
 
-		final MarkerLayer markerLayer = Map3Manager.getLayer_Marker();
-		if (markerLayer.isEnabled()) {
+		updateUI_CreateMarker();
 
-			// poi layer is displayed
-
-			markerLayer.createMarker(_allTours);
-
-			Map3Manager.redrawMap();
-		}
+		Map3Manager.redrawMap();
 	}
 
 	private void showAllTours_Final(final boolean isSyncMapViewWithTour, final ArrayList<TourMap3Position> allPositions) {
@@ -1833,44 +1836,6 @@ public class Map3View extends ViewPart implements ITourProvider {
 
 		showAllTours_InternalTours();
 	}
-
-	//	public static final String	ALL						= "gov.nasa.worldwind.perfstat.All";
-//
-//	public static final String	FRAME_RATE				= "gov.nasa.worldwind.perfstat.FrameRate";
-//	public static final String	FRAME_TIME				= "gov.nasa.worldwind.perfstat.FrameTime";
-//	public static final String	PICK_TIME				= "gov.nasa.worldwind.perfstat.PickTime";
-//
-//	public static final String	TERRAIN_TILE_COUNT		= "gov.nasa.worldwind.perfstat.TerrainTileCount";
-//	public static final String	IMAGE_TILE_COUNT		= "gov.nasa.worldwind.perfstat.ImageTileCount";
-//
-//	public static final String	AIRSPACE_GEOMETRY_COUNT	= "gov.nasa.worldwind.perfstat.AirspaceGeometryCount";
-//	public static final String	AIRSPACE_VERTEX_COUNT	= "gov.nasa.worldwind.perfstat.AirspaceVertexCount";
-//
-//	public static final String	JVM_HEAP				= "gov.nasa.worldwind.perfstat.JvmHeap";
-//	public static final String	JVM_HEAP_USED			= "gov.nasa.worldwind.perfstat.JvmHeapUsed";
-//
-//	public static final String	MEMORY_CACHE			= "gov.nasa.worldwind.perfstat.MemoryCache";
-//	public static final String	TEXTURE_CACHE			= "gov.nasa.worldwind.perfstat.TextureCache";
-
-//2013-10-06 10:12:12.317'955 [Map3View] 	         0  Frame Rate (fps)
-//2013-10-06 10:12:12.317'982 [Map3View] 	       152  Frame Time (ms)
-//2013-10-06 10:12:12.318'366 [Map3View] 	         8  Pick Time (ms)
-
-//2013-10-06 10:12:12.318'392 [Map3View] 	        91  Terrain Tiles
-
-//2013-10-06 10:12:12.318'169 [Map3View] 	      6252  Cache Size (Kb): Terrain
-//2013-10-06 10:12:12.318'191 [Map3View] 	         0  Cache Size (Kb): Placename Tiles
-//2013-10-06 10:12:12.318'214 [Map3View] 	      1860  Cache Size (Kb): Texture Tiles
-//2013-10-06 10:12:12.318'289 [Map3View] 	      3870  Cache Size (Kb): Elevation Tiles
-//2013-10-06 10:12:12.318'414 [Map3View] 	    422617  Texture Cache size (Kb)
-
-//2013-10-06 10:12:12.318'007 [Map3View] 	         2  Blue Marble (WMS) 2004 Tiles
-//2013-10-06 10:12:12.318'044 [Map3View] 	        35  i-cubed Landsat Tiles
-//2013-10-06 10:12:12.318'069 [Map3View] 	        84  MS Virtual Earth Aerial Tiles
-//2013-10-06 10:12:12.318'093 [Map3View] 	        84  Bing Imagery Tiles
-
-//2013-10-06 10:12:12.318'118 [Map3View] 	    463659  JVM total memory (Kb)
-//2013-10-06 10:12:12.318'141 [Map3View] 	    431273  JVM used memory (Kb)
 
 	private void showTour(final TourData newTourData) {
 
@@ -1911,6 +1876,44 @@ public class Map3View extends ViewPart implements ITourProvider {
 
 		showAllTours_NewTours(allTours);
 	}
+
+	//	public static final String	ALL						= "gov.nasa.worldwind.perfstat.All";
+//
+//	public static final String	FRAME_RATE				= "gov.nasa.worldwind.perfstat.FrameRate";
+//	public static final String	FRAME_TIME				= "gov.nasa.worldwind.perfstat.FrameTime";
+//	public static final String	PICK_TIME				= "gov.nasa.worldwind.perfstat.PickTime";
+//
+//	public static final String	TERRAIN_TILE_COUNT		= "gov.nasa.worldwind.perfstat.TerrainTileCount";
+//	public static final String	IMAGE_TILE_COUNT		= "gov.nasa.worldwind.perfstat.ImageTileCount";
+//
+//	public static final String	AIRSPACE_GEOMETRY_COUNT	= "gov.nasa.worldwind.perfstat.AirspaceGeometryCount";
+//	public static final String	AIRSPACE_VERTEX_COUNT	= "gov.nasa.worldwind.perfstat.AirspaceVertexCount";
+//
+//	public static final String	JVM_HEAP				= "gov.nasa.worldwind.perfstat.JvmHeap";
+//	public static final String	JVM_HEAP_USED			= "gov.nasa.worldwind.perfstat.JvmHeapUsed";
+//
+//	public static final String	MEMORY_CACHE			= "gov.nasa.worldwind.perfstat.MemoryCache";
+//	public static final String	TEXTURE_CACHE			= "gov.nasa.worldwind.perfstat.TextureCache";
+
+//2013-10-06 10:12:12.317'955 [Map3View] 	         0  Frame Rate (fps)
+//2013-10-06 10:12:12.317'982 [Map3View] 	       152  Frame Time (ms)
+//2013-10-06 10:12:12.318'366 [Map3View] 	         8  Pick Time (ms)
+
+//2013-10-06 10:12:12.318'392 [Map3View] 	        91  Terrain Tiles
+
+//2013-10-06 10:12:12.318'169 [Map3View] 	      6252  Cache Size (Kb): Terrain
+//2013-10-06 10:12:12.318'191 [Map3View] 	         0  Cache Size (Kb): Placename Tiles
+//2013-10-06 10:12:12.318'214 [Map3View] 	      1860  Cache Size (Kb): Texture Tiles
+//2013-10-06 10:12:12.318'289 [Map3View] 	      3870  Cache Size (Kb): Elevation Tiles
+//2013-10-06 10:12:12.318'414 [Map3View] 	    422617  Texture Cache size (Kb)
+
+//2013-10-06 10:12:12.318'007 [Map3View] 	         2  Blue Marble (WMS) 2004 Tiles
+//2013-10-06 10:12:12.318'044 [Map3View] 	        35  i-cubed Landsat Tiles
+//2013-10-06 10:12:12.318'069 [Map3View] 	        84  MS Virtual Earth Aerial Tiles
+//2013-10-06 10:12:12.318'093 [Map3View] 	        84  Bing Imagery Tiles
+
+//2013-10-06 10:12:12.318'118 [Map3View] 	    463659  JVM total memory (Kb)
+//2013-10-06 10:12:12.318'141 [Map3View] 	    431273  JVM used memory (Kb)
 
 	private void showTours(final ArrayList<Long> allTourIds) {
 
@@ -2166,6 +2169,20 @@ public class Map3View extends ViewPart implements ITourProvider {
 		setAnnotationColors(tourData, positionIndex, slider);
 
 		slider.setText(createSliderText(positionIndex, tourData));
+	}
+
+	/**
+	 * 
+	 */
+	private void updateUI_CreateMarker() {
+		
+		final MarkerLayer markerLayer = Map3Manager.getLayer_Marker();
+		if (markerLayer.isEnabled()) {
+
+			// poi layer is visible
+
+			markerLayer.createMarker(_allTours);
+		}
 	}
 
 }

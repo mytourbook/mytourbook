@@ -203,32 +203,8 @@ public class TourTrackConfig implements Cloneable {
 
 		} else {
 
-//			final boolean backupIsFollowTerrain = previousConfig.isFollowTerrain;
-//
-//			/*
-//			 * check if tracks must be recreated
-//			 */
-//			if (//
-//			// follow terrain is  modified
-//			backupIsFollowTerrain != isFollowTerrain //
-//			) {
-//
-//				_isRecreateTracks = true;
-//
-//			} else {
-//
-//				_isRecreateTracks = false;
-//			}
-
 			_isRecreateTracks = false;
 		}
-
-//		System.out.println(UI.timeStampNano()
-//				+ " ["
-//				+ getClass().getSimpleName()
-//				+ "] \t_isRecreateTracks: "
-//				+ _isRecreateTracks);
-//		// TODO remove SYSTEM.OUT.PRINTLN
 	}
 
 	/**

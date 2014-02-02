@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.map3.layer;
 
+import gov.nasa.worldwind.WorldWind;
 import gov.nasa.worldwind.avlist.AVKey;
 import gov.nasa.worldwind.awt.WorldWindowGLCanvas;
 import gov.nasa.worldwind.event.SelectEvent;
@@ -22,13 +23,17 @@ import gov.nasa.worldwind.event.SelectListener;
 import gov.nasa.worldwind.geom.Position;
 import gov.nasa.worldwind.layers.RenderableLayer;
 import gov.nasa.worldwind.pick.PickedObject;
-import gov.nasa.worldwind.render.PointPlacemark;
+import gov.nasa.worldwind.render.Offset;
 import gov.nasa.worldwind.render.PointPlacemarkAttributes;
 
+import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Set;
 
+import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
+import net.tourbook.common.util.StatusUtil;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.map3.layer.tourtrack.TourTrackConfig;
@@ -37,6 +42,7 @@ import net.tourbook.map3.view.ICheckStateListener;
 import net.tourbook.map3.view.Map3Manager;
 import net.tourbook.map3.view.TVIMap3Layer;
 
+import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.jface.dialogs.IDialogSettings;
 
 public class MarkerLayer extends RenderableLayer implements SelectListener, ICheckStateListener {
@@ -48,27 +54,38 @@ public class MarkerLayer extends RenderableLayer implements SelectListener, IChe
 	 */
 	private int					_lastAddRemoveAction	= -1;
 
-	private MTClutterFilter		_clutterFilter;
-
 	public MarkerLayer(final IDialogSettings state) {
-
-		_clutterFilter = new MTClutterFilter();
 
 //		addPropertyChangeListener(this);
 	}
 
-	public void createMarker(final ArrayList<TourData> _allTours) {
+	public void createMarker(final ArrayList<TourData> allTours) {
 
 		removeAllRenderables();
 
 		final PointPlacemarkAttributes ppAttributes = new PointPlacemarkAttributes();
-		ppAttributes.setScale(3.0);
-		ppAttributes.setLabelScale(1.0);
-		ppAttributes.setLabelFont(UI.AWT_FONT_ARIAL_BOLD_24);
+		ppAttributes.setScale(0.3);
+//		ppAttributes.setLabelScale(1.2);
+		ppAttributes.setLabelFont(UI.AWT_FONT_ARIAL_14);
+		ppAttributes.setLabelOffset(new Offset(67.0, 12.0, AVKey.PIXELS, AVKey.PIXELS));
+
+		try {
+
+			final URL url = TourbookPlugin.getDefault().getBundle().getEntry("/images/map3/map3-marker.png");
+
+			final String fileURL = FileLocator.toFileURL(url).toString();
+
+			ppAttributes.setImageAddress(fileURL);
+			ppAttributes.setImageOffset(new Offset(32.0, -5.0, AVKey.PIXELS, AVKey.PIXELS));
+
+		} catch (final IOException e) {
+			// ignore
+			StatusUtil.log(e);
+		}
 
 		final TourTrackConfig config = TourTrackConfigManager.getActiveConfig();
 
-		for (final TourData tourData : _allTours) {
+		for (final TourData tourData : allTours) {
 
 			final Set<TourMarker> tourMarkerList = tourData.getTourMarkers();
 			if (tourMarkerList.size() == 0) {
@@ -104,26 +121,26 @@ public class MarkerLayer extends RenderableLayer implements SelectListener, IChe
 				 */
 
 				int altitudeMode;
-				double altitude = 0;
+				double absoluteAltitude = 0;
 				final float[] altitudeSerie = tourData.altitudeSerie;
 
-//				if (altitudeSerie == null) {
-//
-//					altitudeMode = WorldWind.CLAMP_TO_GROUND;
-//
-//				} else {
-//
-				altitude = altitudeSerie[serieIndex] + 000;
-				altitudeMode = config.altitudeMode;
-//				}
+				if (altitudeSerie == null) {
 
-				final PointPlacemark pp = new PointPlacemark(Position.fromDegrees(
+					altitudeMode = WorldWind.CLAMP_TO_GROUND;
+
+				} else {
+
+					altitudeMode = config.altitudeMode;
+					absoluteAltitude = altitudeSerie[serieIndex];
+				}
+
+				final MarkerPlacemark pp = new MarkerPlacemark(Position.fromDegrees(
 						latitudeSerie[serieIndex],
 						longitudeSerie[serieIndex],
-						altitude));
+						absoluteAltitude));
 
 				pp.setAltitudeMode(altitudeMode);
-//				pp.setEnableDecluttering(true);
+				pp.setEnableDecluttering(true);
 
 				pp.setLabelText(tourMarker.getLabel());
 
@@ -136,6 +153,26 @@ public class MarkerLayer extends RenderableLayer implements SelectListener, IChe
 
 				addRenderable(pp);
 			}
+		}
+	}
+
+	public void onModifyConfig(final ArrayList<TourData> allTours) {
+
+		final TourTrackConfig trackConfig = TourTrackConfigManager.getActiveConfig();
+
+		if (trackConfig.isRecreateTracks()) {
+
+			// track data has changed
+
+			Map3Manager.getMap3View().showAllTours(false);
+
+		} else {
+
+			createMarker(allTours);
+
+			// ensure marker modifications are redrawn
+//			Map3Manager.getWWCanvas().redraw();
+			Map3Manager.redrawMap();
 		}
 	}
 
