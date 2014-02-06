@@ -147,6 +147,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 	public static final String					ID										= "net.tourbook.map3.view.Map3ViewId";						//$NON-NLS-1$
 
 	private static final String					STATE_IS_LEGEND_VISIBLE					= "STATE_IS_LEGEND_VISIBLE";								//$NON-NLS-1$
+	private static final String					STATE_IS_MARKER_VISIBLE					= "STATE_IS_MARKER_VISIBLE";								//$NON-NLS-1$
 	private static final String					STATE_IS_SYNC_MAP_VIEW_WITH_TOUR		= "STATE_IS_SYNC_MAP_VIEW_WITH_TOUR";						//$NON-NLS-1$
 	private static final String					STATE_IS_SYNC_MAP_POSITION_WITH_SLIDER	= "STATE_IS_SYNC_MAP_POSITION_WITH_SLIDER";				//$NON-NLS-1$
 	private static final String					STATE_IS_TOUR_VISIBLE					= "STATE_IS_TOUR_VISIBLE";									//$NON-NLS-1$
@@ -1470,17 +1471,29 @@ public class Map3View extends ViewPart implements ITourProvider {
 		_isSyncMapWithChartSlider = Util.getStateBoolean(_state, STATE_IS_SYNC_MAP_POSITION_WITH_SLIDER, false);
 		_actionSynMapWithChartSlider.setChecked(_isSyncMapWithChartSlider);
 
-		// is tour visible / available
+		/*
+		 * Tour
+		 */
 		final boolean isTourVisible = Util.getStateBoolean(_state, STATE_IS_TOUR_VISIBLE, true);
 		_actionShowTourInMap3.setState(isTourVisible, isTourAvailable);
 		Map3Manager.setLayerVisible_TourTrack(isTourVisible);
 
-		// is legend visible
+		/*
+		 * Marker
+		 */
+		final boolean isMarkerVisible = Util.getStateBoolean(_state, STATE_IS_MARKER_VISIBLE, true);
+		Map3Manager.setLayerVisible_Marker(isMarkerVisible);
+
+		/*
+		 * Legend
+		 */
 		final boolean isLegendVisible = Util.getStateBoolean(_state, STATE_IS_LEGEND_VISIBLE, true);
 		_actionShowLegendInMap.setChecked(isLegendVisible);
 		Map3Manager.setLayerVisible_Legend(isLegendVisible);
 
-		// is chart slider visible
+		/*
+		 * Chart slider
+		 */
 		final boolean isTrackSliderVisible = Util.getStateBoolean(_state, STATE_IS_TRACK_SLIDER_VISIBLE, true);
 		_actionShowTrackSlider.setChecked(isTrackSliderVisible);
 		Map3Manager.setLayerVisible_TrackSlider(isTrackSliderVisible);
@@ -1551,15 +1564,17 @@ public class Map3View extends ViewPart implements ITourProvider {
 			return;
 		}
 
-		final boolean isTrackSliderVisible = Map3Manager.getLayer_TrackSlider().isEnabled();
 		final boolean isLegendVisible = Map3Manager.getLayer_TourLegend().isEnabled();
+		final boolean isMarkerVisible = Map3Manager.getLayer_Marker().isEnabled();
+		final boolean isSliderVisible = Map3Manager.getLayer_TrackSlider().isEnabled();
 		final boolean isTrackVisible = Map3Manager.getLayer_TourTrack().isEnabled();
 
-		_state.put(STATE_IS_TRACK_SLIDER_VISIBLE, isTrackSliderVisible);
 		_state.put(STATE_IS_LEGEND_VISIBLE, isLegendVisible);
+		_state.put(STATE_IS_MARKER_VISIBLE, isMarkerVisible);
 		_state.put(STATE_IS_SYNC_MAP_POSITION_WITH_SLIDER, _isSyncMapWithChartSlider);
 		_state.put(STATE_IS_SYNC_MAP_VIEW_WITH_TOUR, _isSyncMapViewWithTour);
 		_state.put(STATE_IS_TOUR_VISIBLE, isTrackVisible);
+		_state.put(STATE_IS_TRACK_SLIDER_VISIBLE, isSliderVisible);
 
 		_state.put(STATE_TOUR_COLOR_ID, _graphId.name());
 
@@ -2175,7 +2190,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 	 * 
 	 */
 	private void updateUI_CreateMarker() {
-		
+
 		final MarkerLayer markerLayer = Map3Manager.getLayer_Marker();
 		if (markerLayer.isEnabled()) {
 

@@ -22,7 +22,6 @@ import gov.nasa.worldwind.event.SelectEvent;
 import gov.nasa.worldwind.event.SelectListener;
 import gov.nasa.worldwind.geom.Position;
 import gov.nasa.worldwind.layers.RenderableLayer;
-import gov.nasa.worldwind.pick.PickedObject;
 import gov.nasa.worldwind.render.Offset;
 import gov.nasa.worldwind.render.PointPlacemarkAttributes;
 
@@ -54,29 +53,29 @@ public class MarkerLayer extends RenderableLayer implements SelectListener, IChe
 	 */
 	private int					_lastAddRemoveAction	= -1;
 
-	public MarkerLayer(final IDialogSettings state) {
+	private MarkerPlacemark		_previousHoveredMarker;
 
-//		addPropertyChangeListener(this);
-	}
+	public MarkerLayer() {}
 
 	public void createMarker(final ArrayList<TourData> allTours) {
 
 		removeAllRenderables();
 
 		final PointPlacemarkAttributes ppAttributes = new PointPlacemarkAttributes();
-		ppAttributes.setScale(0.3);
 //		ppAttributes.setLabelScale(1.2);
 		ppAttributes.setLabelFont(UI.AWT_FONT_ARIAL_14);
-		ppAttributes.setLabelOffset(new Offset(67.0, 12.0, AVKey.PIXELS, AVKey.PIXELS));
+		ppAttributes.setLabelOffset(new Offset(34.0, 9.0, AVKey.PIXELS, AVKey.PIXELS));
+
+//		ppAttributes.setLabelMaterial(new Material(new Color(0xff, 0x0, 0x0, 0x80)));
 
 		try {
 
 			final URL url = TourbookPlugin.getDefault().getBundle().getEntry("/images/map3/map3-marker.png");
-
 			final String fileURL = FileLocator.toFileURL(url).toString();
 
+			ppAttributes.setScale(0.7);
 			ppAttributes.setImageAddress(fileURL);
-			ppAttributes.setImageOffset(new Offset(32.0, -5.0, AVKey.PIXELS, AVKey.PIXELS));
+			ppAttributes.setImageOffset(new Offset(16.0, -0.0, AVKey.PIXELS, AVKey.PIXELS));
 
 		} catch (final IOException e) {
 			// ignore
@@ -131,27 +130,25 @@ public class MarkerLayer extends RenderableLayer implements SelectListener, IChe
 				} else {
 
 					altitudeMode = config.altitudeMode;
-					absoluteAltitude = altitudeSerie[serieIndex];
+					absoluteAltitude = altitudeSerie[serieIndex];// + 300;
 				}
 
-				final MarkerPlacemark pp = new MarkerPlacemark(Position.fromDegrees(
+				final MarkerPlacemark markerPl = new MarkerPlacemark(Position.fromDegrees(
 						latitudeSerie[serieIndex],
 						longitudeSerie[serieIndex],
 						absoluteAltitude));
 
-				pp.setAltitudeMode(altitudeMode);
-				pp.setEnableDecluttering(true);
+				markerPl.setAltitudeMode(altitudeMode);
+				markerPl.setEnableDecluttering(true);
 
-				pp.setLabelText(tourMarker.getLabel());
+//				markerPl.setLabelText(UI.SPACE);
+				markerPl.setLabelText(tourMarker.getLabel());
 
-				// set tooltip
-				pp.setValue(AVKey.DISPLAY_NAME, "Tooltip: " + tourMarker.getLabel());
+				markerPl.setLineEnabled(true);
 
-				pp.setLineEnabled(true);
+				markerPl.setAttributes(ppAttributes);
 
-				pp.setAttributes(ppAttributes);
-
-				addRenderable(pp);
+				addRenderable(markerPl);
 			}
 		}
 	}
@@ -182,9 +179,20 @@ public class MarkerLayer extends RenderableLayer implements SelectListener, IChe
 		setupWWSelectionListener(tviMap3Layer.isLayerVisible);
 	}
 
+	private void resetPreviousHoveredMarker() {
+
+		if (_previousHoveredMarker != null) {
+
+			// reset previous hovered marker
+
+//			_previousHoveredMarker.setLabelText(null);
+
+			_previousHoveredMarker = null;
+		}
+	}
+
 	public void saveState(final IDialogSettings state) {
 
-		TourTrackConfigManager.saveState();
 	}
 
 	/**
@@ -197,30 +205,61 @@ public class MarkerLayer extends RenderableLayer implements SelectListener, IChe
 	@Override
 	public void selected(final SelectEvent event) {
 
-		// check if mouse is consumed
-		if (event.getMouseEvent() != null && event.getMouseEvent().isConsumed()) {
-			return;
-		}
-
-		// prevent actions when context menu is visible
-		if (Map3Manager.getMap3View().isContextMenuVisible()) {
-			return;
-		}
-
-		final String eventAction = event.getEventAction();
-
-//		System.out.println(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] \teventAction: " + eventAction);
-//		// TODO remove SYSTEM.OUT.PRINTLN
-
-		if (eventAction == SelectEvent.HOVER) {
-
-			// not yet used
-
-		} else {
-
-			final PickedObject pickedObject = event.getTopPickedObject();
-
-		}
+//		// check if mouse is consumed
+//		if (event.getMouseEvent() != null && event.getMouseEvent().isConsumed()) {
+//			return;
+//		}
+//
+//		// prevent actions when context menu is visible
+//		if (Map3Manager.getMap3View().isContextMenuVisible()) {
+//			return;
+//		}
+//
+//		final String eventAction = event.getEventAction();
+//
+//		if (eventAction == SelectEvent.HOVER) {
+//
+//			// not yet used
+//
+//		} else {
+//
+//			final PickedObject pickedObject = event.getTopPickedObject();
+//
+////			System.out.println(UI.timeStampNano()
+////					+ " ["
+////					+ getClass().getSimpleName()
+////					+ "] \teventAction: "
+////					+ eventAction
+////					+ ("\t" + pickedObject));
+////			// TODO remove SYSTEM.OUT.PRINTLN
+//
+//			if (pickedObject != null && pickedObject.getObject() instanceof MarkerPlacemark) {
+//
+//				final MarkerPlacemark hoveredMarker = (MarkerPlacemark) pickedObject.getObject();
+//
+//				if (hoveredMarker == _previousHoveredMarker) {
+//
+//					// do nothing
+//
+//					return;
+//
+//				} else {
+//
+//					resetPreviousHoveredMarker();
+//
+//					// set new hovered marker
+//
+//					hoveredMarker.setLabelText(hoveredMarker.markerText);
+//
+//					_previousHoveredMarker = hoveredMarker;
+//
+//					return;
+//				}
+//			}
+//		}
+//
+//		// ensure hovered marker is reset
+//		resetPreviousHoveredMarker();
 	}
 
 	private void setupWWSelectionListener(final boolean isLayerVisible) {

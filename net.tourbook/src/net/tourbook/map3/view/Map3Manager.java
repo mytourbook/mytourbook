@@ -330,7 +330,7 @@ public class Map3Manager {
 		/*
 		 * create WW layer
 		 */
-		_wwLayer_Marker = new MarkerLayer(_state);
+		_wwLayer_Marker = new MarkerLayer();
 
 		/*
 		 * create UI model layer
@@ -1302,31 +1302,40 @@ public class Map3Manager {
 
 	}
 
-	private static void setCustomLayerVisibleInLayerView(final boolean isVisible, final String customLayerId) {
+	private static void setCustomLayerVisibleInTVIModel(final boolean isVisible, final String customLayerId) {
+
+		final TVIMap3Layer tviLayer = _uiCustomLayers.get(customLayerId);
+
+		// update tvi model
+		tviLayer.isLayerVisible = isVisible;
 
 		if (_map3LayerView != null) {
-			_map3LayerView.setLayerVisible(_uiCustomLayers.get(customLayerId), isVisible);
+
+			// update viewer
+			_map3LayerView.setLayerVisible(tviLayer, isVisible);
 		}
+
+		// add/remove layer listener
+		tviLayer.fireCheckStateListener();
 	}
 
 	static void setLayerVisible_Legend(final boolean isLegendVisible) {
 
-		// update model
+		// update ww model
 		_wwLayer_TourLegend.setEnabled(isLegendVisible);
 
 		// update UI
-		setCustomLayerVisibleInLayerView(isLegendVisible, TourLegendLayer.MAP3_LAYER_ID);
+		setCustomLayerVisibleInTVIModel(isLegendVisible, TourLegendLayer.MAP3_LAYER_ID);
 	}
 
 	static void setLayerVisible_Marker(final boolean isMarkerVisible) {
 
-		// update model
+		// update ww model
 		_wwLayer_Marker.setEnabled(isMarkerVisible);
 
 		// update UI
-		setCustomLayerVisibleInLayerView(isMarkerVisible, MarkerLayer.MAP3_LAYER_ID);
+		setCustomLayerVisibleInTVIModel(isMarkerVisible, MarkerLayer.MAP3_LAYER_ID);
 	}
-
 
 	/**
 	 * Show/hide tour track layer.
@@ -1353,11 +1362,11 @@ public class Map3Manager {
 
 	static void setLayerVisible_TrackSlider(final boolean isVisible) {
 
-		// update model
+		// update ww model
 		_wwLayer_TrackSlider.setEnabled(isVisible);
 
 		// update UI
-		setCustomLayerVisibleInLayerView(isVisible, TrackSliderLayer.MAP3_LAYER_ID);
+		setCustomLayerVisibleInTVIModel(isVisible, TrackSliderLayer.MAP3_LAYER_ID);
 	}
 
 	/**

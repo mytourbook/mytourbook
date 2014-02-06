@@ -15,13 +15,15 @@
  *******************************************************************************/
 package net.tourbook.map3.layer;
 
-import gnu.trove.map.hash.TIntObjectHashMap;
-
 import java.awt.Color;
 
 public class ColorCacheAWT {
 
-	private TIntObjectHashMap<Color>	_colors			= new TIntObjectHashMap<Color>();
+	/*
+	 * PERFORMANCE: it performs (#1'750'000) 340 ms to 380 ms without hash map.
+	 */
+
+//	private TIntObjectHashMap<Color>	_colors			= new TIntObjectHashMap<Color>();
 
 	/**
 	 * Opacity for the whole track.
@@ -32,7 +34,7 @@ public class ColorCacheAWT {
 	 * Removes existing color values from the cache.
 	 */
 	public void clear() {
-		_colors.clear();
+//		_colors.clear();
 	}
 
 	/**
@@ -42,11 +44,11 @@ public class ColorCacheAWT {
 	 */
 	public Color getColorRGBA(final int colorValue) {
 
-		Color color = _colors.get(colorValue);
-
-		if (color != null) {
-			return color;
-		}
+//		Color color = _colors.get(colorValue);
+//
+//		if (color != null) {
+//			return color;
+//		}
 
 		final int r = (colorValue & 0xFF) >>> 0;
 		final int g = (colorValue & 0xFF00) >>> 8;
@@ -55,9 +57,9 @@ public class ColorCacheAWT {
 
 		final int colorOpacity = (int) (o * _trackOpacity);
 
-		color = new Color(r, g, b, colorOpacity);
+		final Color color = new Color(r, g, b, colorOpacity);
 
-		_colors.put(colorValue, color);
+//		_colors.put(colorValue, color);
 
 		return color;
 	}
@@ -70,6 +72,6 @@ public class ColorCacheAWT {
 
 		_trackOpacity = opacity;
 
-		_colors.clear();
+//		_colors.clear();
 	}
 }

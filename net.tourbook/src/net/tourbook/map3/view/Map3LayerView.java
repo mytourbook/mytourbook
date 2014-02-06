@@ -432,14 +432,8 @@ public class Map3LayerView extends ViewPart {
 
 	void setLayerVisible(final TVIMap3Layer tviLayer, final boolean isVisible) {
 
-		// update model
-		tviLayer.isLayerVisible = isVisible;
-
 		// update viewer
 		_layerViewer.setChecked(tviLayer, isVisible);
-
-		// add/remove layer listener
-		tviLayer.fireCheckStateListener();
 	}
 
 	void setLayerVisible_TourTrack(final TVIMap3Layer tviLayer, final boolean isTrackVisible) {

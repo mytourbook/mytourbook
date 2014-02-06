@@ -116,8 +116,8 @@ public class Map3GradientColorManager {
 
 		final ArrayList<Map3ColorProfile> defaultAltitude = new ArrayList<Map3ColorProfile>();
 
-		defaultAltitude.add(new Map3ColorProfile(
-				"0",
+		defaultAltitude.add(new Map3ColorProfile( //
+				"0", //$NON-NLS-1$
 				false,
 				true,
 				new RGBVertex[] {
@@ -130,8 +130,8 @@ public class Map3GradientColorManager {
 				MapColorProfile.BRIGHTNESS_DEFAULT,
 				100));
 
-		defaultAltitude.add(new Map3ColorProfile(
-				"10",
+		defaultAltitude.add(new Map3ColorProfile( //
+				"10", //$NON-NLS-1$
 				false,
 				true,
 				new RGBVertex[] {
@@ -143,8 +143,8 @@ public class Map3GradientColorManager {
 				MapColorProfile.BRIGHTNESS_DEFAULT,
 				50));
 
-		defaultAltitude.add(new Map3ColorProfile(
-				"14",
+		defaultAltitude.add(new Map3ColorProfile( //
+				"14", //$NON-NLS-1$
 				false,
 				true,
 				new RGBVertex[] {
@@ -158,8 +158,8 @@ public class Map3GradientColorManager {
 				MapColorProfile.BRIGHTNESS_DEFAULT,
 				100));
 
-		defaultAltitude.add(new Map3ColorProfile(
-				"15",
+		defaultAltitude.add(new Map3ColorProfile( //
+				"15", //$NON-NLS-1$
 				false,
 				true,
 				new RGBVertex[] {
@@ -173,8 +173,8 @@ public class Map3GradientColorManager {
 				MapColorProfile.BRIGHTNESS_LIGHTNING,
 				20));
 
-		defaultAltitude.add(new Map3ColorProfile(
-				"30",
+		defaultAltitude.add(new Map3ColorProfile( //
+				"30", //$NON-NLS-1$
 				false,
 				true,
 				new RGBVertex[] { new RGBVertex(400, 255, 3, 158, 1.0f), new RGBVertex(500, 8, 255, 14, 1.0f), },
@@ -183,8 +183,8 @@ public class Map3GradientColorManager {
 				MapColorProfile.BRIGHTNESS_DEFAULT,
 				100));
 
-		defaultAltitude.add(new Map3ColorProfile(
-				"31",
+		defaultAltitude.add(new Map3ColorProfile( //
+				"31", //$NON-NLS-1$
 				false,
 				true,
 				new RGBVertex[] {
@@ -196,8 +196,8 @@ public class Map3GradientColorManager {
 				MapColorProfile.BRIGHTNESS_DEFAULT,
 				100));
 
-		defaultAltitude.add(new Map3ColorProfile(
-				"50",
+		defaultAltitude.add(new Map3ColorProfile( //
+				"50", //$NON-NLS-1$
 				false,
 				true,
 				new RGBVertex[] {
@@ -212,8 +212,8 @@ public class Map3GradientColorManager {
 				MapColorProfile.BRIGHTNESS_LIGHTNING,
 				100));
 
-		defaultAltitude.add(new Map3ColorProfile(
-				"51",
+		defaultAltitude.add(new Map3ColorProfile( //
+				"51", //$NON-NLS-1$
 				false,
 				false,
 				new RGBVertex[] {
@@ -238,8 +238,8 @@ public class Map3GradientColorManager {
 				MapColorProfile.BRIGHTNESS_DIMMING,
 				100));
 
-		defaultAltitude.add(new Map3ColorProfile(
-				"55",
+		defaultAltitude.add(new Map3ColorProfile( //
+				"55", //$NON-NLS-1$
 				false,
 				false,
 				new RGBVertex[] {
@@ -264,8 +264,8 @@ public class Map3GradientColorManager {
 				MapColorProfile.BRIGHTNESS_DIMMING,
 				100));
 
-		defaultAltitude.add(new Map3ColorProfile(
-				"56",
+		defaultAltitude.add(new Map3ColorProfile( //
+				"56", //$NON-NLS-1$
 				false,
 				false,
 				new RGBVertex[] {
@@ -290,8 +290,8 @@ public class Map3GradientColorManager {
 				MapColorProfile.BRIGHTNESS_DIMMING,
 				100));
 
-		defaultAltitude.add(new Map3ColorProfile(
-				"57",
+		defaultAltitude.add(new Map3ColorProfile( //
+				"57", //$NON-NLS-1$
 				false,
 				false,
 				new RGBVertex[] {
@@ -316,8 +316,8 @@ public class Map3GradientColorManager {
 				MapColorProfile.BRIGHTNESS_DIMMING,
 				100));
 
-		defaultAltitude.add(new Map3ColorProfile(
-				"60",
+		defaultAltitude.add(new Map3ColorProfile( //
+				"60", //$NON-NLS-1$
 				false,
 				true,
 				new RGBVertex[] {
@@ -330,8 +330,8 @@ public class Map3GradientColorManager {
 				MapColorProfile.BRIGHTNESS_DEFAULT,
 				100));
 
-		defaultAltitude.add(new Map3ColorProfile(
-				"61",
+		defaultAltitude.add(new Map3ColorProfile( //
+				"61", //$NON-NLS-1$
 				false,
 				true,
 				new RGBVertex[] {
@@ -350,8 +350,8 @@ public class Map3GradientColorManager {
 				MapColorProfile.BRIGHTNESS_LIGHTNING,
 				80));
 
-		defaultAltitude.add(new Map3ColorProfile(
-				"32",
+		defaultAltitude.add(new Map3ColorProfile( //
+				"32", //$NON-NLS-1$
 				false,
 				true,
 				new RGBVertex[] { new RGBVertex(0, 0, 0, 0, 1.0f), new RGBVertex(1, 255, 255, 255, 1.0f), },
@@ -362,8 +362,8 @@ public class Map3GradientColorManager {
 
 		final ArrayList<Map3ColorProfile> defaultPulse = new ArrayList<Map3ColorProfile>();
 
-		defaultPulse.add(new Map3ColorProfile(
-				"0",
+		defaultPulse.add(new Map3ColorProfile( //
+				"0", //$NON-NLS-1$
 				true,
 				true,
 				new RGBVertex[] {
@@ -376,8 +376,8 @@ public class Map3GradientColorManager {
 				MapColorProfile.BRIGHTNESS_DEFAULT,
 				100));
 
-		defaultPulse.add(new Map3ColorProfile(
-				"10",
+		defaultPulse.add(new Map3ColorProfile( //
+				"10", //$NON-NLS-1$
 				true,
 				true,
 				new RGBVertex[] {
@@ -389,8 +389,8 @@ public class Map3GradientColorManager {
 				MapColorProfile.BRIGHTNESS_DEFAULT,
 				100));
 
-		defaultPulse.add(new Map3ColorProfile(
-				"11",
+		defaultPulse.add(new Map3ColorProfile( //
+				"11", //$NON-NLS-1$
 				true,
 				true,
 				new RGBVertex[] {
@@ -405,8 +405,8 @@ public class Map3GradientColorManager {
 				MapColorProfile.BRIGHTNESS_LIGHTNING,
 				100));
 
-		defaultPulse.add(new Map3ColorProfile(
-				"20",
+		defaultPulse.add(new Map3ColorProfile( //
+				"20", //$NON-NLS-1$
 				true,
 				true,
 				new RGBVertex[] {
@@ -422,8 +422,8 @@ public class Map3GradientColorManager {
 				MapColorProfile.BRIGHTNESS_DEFAULT,
 				100));
 
-		defaultPulse.add(new Map3ColorProfile(
-				"22",
+		defaultPulse.add(new Map3ColorProfile( //
+				"22", //$NON-NLS-1$
 				true,
 				true,
 				new RGBVertex[] {
@@ -438,8 +438,8 @@ public class Map3GradientColorManager {
 
 		final ArrayList<Map3ColorProfile> defaultSpeed = new ArrayList<Map3ColorProfile>();
 
-		defaultSpeed.add(new Map3ColorProfile(
-				"0",
+		defaultSpeed.add(new Map3ColorProfile( //
+				"0", //$NON-NLS-1$
 				false,
 				true,
 				new RGBVertex[] {
@@ -452,8 +452,8 @@ public class Map3GradientColorManager {
 				MapColorProfile.BRIGHTNESS_DEFAULT,
 				100));
 
-		defaultSpeed.add(new Map3ColorProfile(
-				"10",
+		defaultSpeed.add(new Map3ColorProfile( //
+				"10", //$NON-NLS-1$
 				false,
 				true,
 				new RGBVertex[] {
@@ -466,8 +466,8 @@ public class Map3GradientColorManager {
 				MapColorProfile.BRIGHTNESS_DEFAULT,
 				100));
 
-		defaultSpeed.add(new Map3ColorProfile(
-				"11",
+		defaultSpeed.add(new Map3ColorProfile( //
+				"11", //$NON-NLS-1$
 				false,
 				true,
 				new RGBVertex[] {
@@ -480,8 +480,8 @@ public class Map3GradientColorManager {
 				MapColorProfile.BRIGHTNESS_DEFAULT,
 				100));
 
-		defaultSpeed.add(new Map3ColorProfile(
-				"20",
+		defaultSpeed.add(new Map3ColorProfile( //
+				"20", //$NON-NLS-1$
 				false,
 				true,
 				new RGBVertex[] {
@@ -497,8 +497,8 @@ public class Map3GradientColorManager {
 				MapColorProfile.BRIGHTNESS_DIMMING,
 				30));
 
-		defaultSpeed.add(new Map3ColorProfile(
-				"Breaktime",
+		defaultSpeed.add(new Map3ColorProfile( //
+				"Breaktime", //$NON-NLS-1$
 				true,
 				true,
 				new RGBVertex[] {
@@ -511,8 +511,8 @@ public class Map3GradientColorManager {
 				MapColorProfile.BRIGHTNESS_DEFAULT,
 				100));
 
-		defaultSpeed.add(new Map3ColorProfile(
-				"12",
+		defaultSpeed.add(new Map3ColorProfile( //
+				"12", //$NON-NLS-1$
 				false,
 				false,
 				new RGBVertex[] {
@@ -526,8 +526,8 @@ public class Map3GradientColorManager {
 
 		final ArrayList<Map3ColorProfile> defaultPace = new ArrayList<Map3ColorProfile>();
 
-		defaultPace.add(new Map3ColorProfile(
-				"0",
+		defaultPace.add(new Map3ColorProfile( //
+				"0", //$NON-NLS-1$
 				true,
 				true,
 				new RGBVertex[] {
@@ -540,8 +540,8 @@ public class Map3GradientColorManager {
 				MapColorProfile.BRIGHTNESS_DEFAULT,
 				100));
 
-		defaultPace.add(new Map3ColorProfile(
-				"1",
+		defaultPace.add(new Map3ColorProfile( //
+				"1", //$NON-NLS-1$
 				true,
 				true,
 				new RGBVertex[] {
@@ -555,22 +555,8 @@ public class Map3GradientColorManager {
 
 		final ArrayList<Map3ColorProfile> defaultGradient = new ArrayList<Map3ColorProfile>();
 
-		defaultGradient.add(new Map3ColorProfile(
-				"1",
-				true,
-				true,
-				new RGBVertex[] {
-			new RGBVertex(-10, 181, 0, 0, 1.0f),
-			new RGBVertex(-5, 255, 106, 0, 1.0f),
-			new RGBVertex(0, 255, 255, 255, 1.0f),
-			new RGBVertex(10, 0, 170, 255, 1.0f), },
-				MapColorProfile.BRIGHTNESS_DEFAULT,
-				60,
-				MapColorProfile.BRIGHTNESS_DEFAULT,
-				100));
-
-		defaultGradient.add(new Map3ColorProfile(
-				"10",
+		defaultGradient.add(new Map3ColorProfile( //
+				"10", //$NON-NLS-1$
 				true,
 				true,
 				new RGBVertex[] {
@@ -583,8 +569,8 @@ public class Map3GradientColorManager {
 				MapColorProfile.BRIGHTNESS_DEFAULT,
 				100));
 
-		defaultGradient.add(new Map3ColorProfile(
-				"11",
+		defaultGradient.add(new Map3ColorProfile( //
+				"11", //$NON-NLS-1$
 				true,
 				true,
 				new RGBVertex[] {
@@ -603,8 +589,8 @@ public class Map3GradientColorManager {
 				MapColorProfile.BRIGHTNESS_DEFAULT,
 				100));
 
-		defaultGradient.add(new Map3ColorProfile(
-				"12",
+		defaultGradient.add(new Map3ColorProfile( //
+				"12", //$NON-NLS-1$
 				true,
 				true,
 				new RGBVertex[] {
@@ -616,8 +602,25 @@ public class Map3GradientColorManager {
 				MapColorProfile.BRIGHTNESS_LIGHTNING,
 				20));
 
-		defaultGradient.add(new Map3ColorProfile(
-				"20",
+		defaultGradient.add(new Map3ColorProfile( //
+				"13", //$NON-NLS-1$
+				true,
+				true,
+				new RGBVertex[] {
+			new RGBVertex(-7, 87, 219, 6, 1.0f),
+			new RGBVertex(-4, 139, 255, 66, 1.0f),
+			new RGBVertex(-4, 200, 255, 166, 0.0f),
+			new RGBVertex(0, 255, 255, 255, 0.0f),
+			new RGBVertex(3, 166, 0, 0, 0.0f),
+			new RGBVertex(8, 255, 4, 0, 1.0f),
+			new RGBVertex(11, 255, 4, 0, 1.0f), },
+				MapColorProfile.BRIGHTNESS_DIMMING,
+				60,
+				MapColorProfile.BRIGHTNESS_LIGHTNING,
+				80));
+
+		defaultGradient.add(new Map3ColorProfile( //
+				"20", //$NON-NLS-1$
 				true,
 				true,
 				new RGBVertex[] {
@@ -629,8 +632,8 @@ public class Map3GradientColorManager {
 				MapColorProfile.BRIGHTNESS_LIGHTNING,
 				74));
 
-		defaultGradient.add(new Map3ColorProfile(
-				"21",
+		defaultGradient.add(new Map3ColorProfile( //
+				"21", //$NON-NLS-1$
 				true,
 				true,
 				new RGBVertex[] {
@@ -642,22 +645,19 @@ public class Map3GradientColorManager {
 				MapColorProfile.BRIGHTNESS_LIGHTNING,
 				74));
 
-		defaultGradient.add(new Map3ColorProfile(
-				"13",
+		defaultGradient.add(new Map3ColorProfile( //
+				"1", //$NON-NLS-1$
 				true,
 				true,
 				new RGBVertex[] {
-			new RGBVertex(-11, 87, 219, 6, 1.0f),
-			new RGBVertex(-5, 87, 219, 6, 1.0f),
-			new RGBVertex(-5, 87, 219, 6, 0.0f),
-			new RGBVertex(0, 255, 255, 255, 0.0f),
-			new RGBVertex(5, 237, 6, 55, 0.0f),
-			new RGBVertex(5, 237, 6, 55, 1.0f),
-			new RGBVertex(11, 237, 6, 55, 1.0f), },
-				MapColorProfile.BRIGHTNESS_DIMMING,
-				100,
-				MapColorProfile.BRIGHTNESS_LIGHTNING,
-				80));
+			new RGBVertex(-10, 181, 0, 0, 1.0f),
+			new RGBVertex(-5, 255, 106, 0, 1.0f),
+			new RGBVertex(0, 255, 255, 255, 1.0f),
+			new RGBVertex(10, 0, 170, 255, 1.0f), },
+				MapColorProfile.BRIGHTNESS_DEFAULT,
+				60,
+				MapColorProfile.BRIGHTNESS_DEFAULT,
+				100));
 
 		/**
 		 * ----------------------------------------------------------------------------------------
@@ -731,10 +731,10 @@ public class Map3GradientColorManager {
 
 			final MapGraphId graphId = colorDefinition.getGraphId();
 
-			final String dumpDef = UI.NEW_LINE
-					+ "final ArrayList<Map3ColorProfile> default"
+			final String dumpDef = UI.NEW_LINE //
+					+ "final ArrayList<Map3ColorProfile> default" //$NON-NLS-1$
 					+ graphId
-					+ " = new ArrayList<Map3ColorProfile>();";
+					+ " = new ArrayList<Map3ColorProfile>();"; //$NON-NLS-1$
 
 			System.out.println(dumpDef);
 
@@ -748,32 +748,32 @@ public class Map3GradientColorManager {
 				for (final RGBVertex vertex : colorProfile.getProfileImage().getRgbVertices()) {
 					final RGB rgb = vertex.getRGB();
 					sbVertices.append(//
-							("new RGBVertex(" + UI.NEW_LINE)
-									+ (vertex.getValue() + ", ")
-									+ (rgb.red + ", ")
-									+ (rgb.green + ", ")
-									+ (rgb.blue + ", ")
-									+ (Float.toString(vertex.getOpacity()) + "f), ")
-									+ "\n");
+							("new RGBVertex(" + UI.NEW_LINE) //$NON-NLS-1$
+									+ (vertex.getValue() + ", ") //$NON-NLS-1$
+									+ (rgb.red + ", ") //$NON-NLS-1$
+									+ (rgb.green + ", ") //$NON-NLS-1$
+									+ (rgb.blue + ", ") //$NON-NLS-1$
+									+ (Float.toString(vertex.getOpacity()) + "f), ") //$NON-NLS-1$
+									+ "\n"); //$NON-NLS-1$
 				}
 
-				final String vertices = "" + //
-						("new RGBVertex[] {" + UI.NEW_LINE)
+				final String vertices = "" + // //$NON-NLS-1$
+						("new RGBVertex[] {" + UI.NEW_LINE) //$NON-NLS-1$
 						+ sbVertices.toString()
-						+ "},";
+						+ "},"; //$NON-NLS-1$
 
 				final String dump = UI.NEW_LINE//
-						+ ("default" + graphId + ".add(")
-						+ ("new Map3ColorProfile" + "(" + UI.NEW_LINE)
-						+ ("\"" + colorProfile.getProfileName() + "\"," + UI.NEW_LINE)
-						+ (Boolean.toString(colorProfile.isAbsoluteValues()) + "," + UI.NEW_LINE)
-						+ (Boolean.toString(colorProfile.isOverwriteLegendValues()) + "," + UI.NEW_LINE)
+						+ ("default" + graphId + ".add(") //$NON-NLS-1$ //$NON-NLS-2$
+						+ ("new Map3ColorProfile" + "( //" + UI.NEW_LINE) //$NON-NLS-1$ //$NON-NLS-2$
+						+ ("\"" + colorProfile.getProfileName() + "\", //$NON-NLS-1$" + UI.NEW_LINE) //$NON-NLS-1$ //$NON-NLS-2$
+						+ (Boolean.toString(colorProfile.isAbsoluteValues()) + "," + UI.NEW_LINE) //$NON-NLS-1$
+						+ (Boolean.toString(colorProfile.isOverwriteLegendValues()) + "," + UI.NEW_LINE) //$NON-NLS-1$
 						+ vertices
-						+ (createCodeForDefaultColors_GetBrightness(colorProfile.minBrightness) + "," + UI.NEW_LINE)
-						+ (colorProfile.minBrightnessFactor + "," + UI.NEW_LINE)
-						+ (createCodeForDefaultColors_GetBrightness(colorProfile.maxBrightness) + "," + UI.NEW_LINE)
+						+ (createCodeForDefaultColors_GetBrightness(colorProfile.minBrightness) + "," + UI.NEW_LINE) //$NON-NLS-1$
+						+ (colorProfile.minBrightnessFactor + "," + UI.NEW_LINE) //$NON-NLS-1$
+						+ (createCodeForDefaultColors_GetBrightness(colorProfile.maxBrightness) + "," + UI.NEW_LINE) //$NON-NLS-1$
 						+ (colorProfile.maxBrightnessFactor + UI.NEW_LINE)
-						+ "));"
+						+ "));" //$NON-NLS-1$
 						+ UI.NEW_LINE
 						+ UI.NEW_LINE;
 
@@ -786,13 +786,13 @@ public class Map3GradientColorManager {
 
 		switch (brightness) {
 		case MapColorProfile.BRIGHTNESS_DIMMING:
-			return "MapColorProfile.BRIGHTNESS_DIMMING";
+			return "MapColorProfile.BRIGHTNESS_DIMMING"; //$NON-NLS-1$
 
 		case MapColorProfile.BRIGHTNESS_LIGHTNING:
-			return "MapColorProfile.BRIGHTNESS_LIGHTNING";
+			return "MapColorProfile.BRIGHTNESS_LIGHTNING"; //$NON-NLS-1$
 
 		default:
-			return "MapColorProfile.BRIGHTNESS_DEFAULT";
+			return "MapColorProfile.BRIGHTNESS_DEFAULT"; //$NON-NLS-1$
 		}
 	}
 
@@ -1154,7 +1154,7 @@ public class Map3GradientColorManager {
 	/**
 	 * Write map color data into a xml file.
 	 */
-	public static void saveColors() { 
+	public static void saveColors() {
 
 		BufferedWriter writer = null;
 

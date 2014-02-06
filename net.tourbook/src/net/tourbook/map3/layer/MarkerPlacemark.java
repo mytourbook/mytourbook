@@ -23,6 +23,7 @@ import net.tourbook.map3.view.Map3View;
 
 public class MarkerPlacemark extends PointPlacemark {
 
+	String	markerText;
 	double	absoluteAltitude;
 
 	public MarkerPlacemark(final Position position) {
@@ -85,6 +86,11 @@ public class MarkerPlacemark extends PointPlacemark {
 		// Compute the placemark point's screen location.
 		this.screenPoint = dc.getView().project(this.placePoint);
 		this.eyeDistance = this.placePoint.distanceTo3(dc.getView().getEyePoint());
+	}
+
+	public void setMarkerText(final String markerText) {
+
+		this.markerText = markerText;
 	}
 
 }

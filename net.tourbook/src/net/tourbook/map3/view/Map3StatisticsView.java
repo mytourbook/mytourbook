@@ -243,6 +243,10 @@ public class Map3StatisticsView extends ViewPart {
 
 	private void updateUI_Container() {
 
+		if (_containerStatistics == null || _containerStatistics.isDisposed()) {
+			return;
+		}
+
 		_containerStatistics.setRedraw(false);
 		{
 			// dispose previous statistic controls
