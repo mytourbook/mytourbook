@@ -1,33 +1,37 @@
-Version: 14.2.0                                       ?. February 2014
-
+Version: 14.2.0                                       8. February 2014
 
 
 New 3D Map Features 	
 
 * Display tour tracks with color profiles.
 
-* Display runtime statistics, e.g. frames per second.
-    
+* Manage color profiles.
 
+* Improved drawing of tour markers, they will have more options in the 
+next version. 
 
+*  Display runtime statistics, e.g. frames per second.
 
-Other New Features
+ 
+
+Other New Features	
 
 * Set track color in 2D map context menu.
 
-* Moved time slice clipping from tour chart properties view into the initial smoothing algorithm UI.
+* Moved time slice clipping from tour chart properties view into the 
+initial smoothing algorithm UI. 
 
-* Reorganizes structure in preference dialog, moved some appearance pages to their correct parent.
+* Reorganizes structure in preference dialog, moved some appearance 
+pages to their correct parent. 
 
 
 
-Fixed Bugs 
+Fixed Bugs
 
-* Power and gradient was 10 times higher when using initial smoothing algorithm.
+* Power and gradient was 10 times higher when using initial smoothing 
+algorithm. 
 
-* Removed delay when app is closing and map3 is not displayed
+* Removed delay when app is closing and 3D map was not displayed. 
 
-* #77: new tours by dividing/concenated tours: not saved in database 
-  https://sourceforge.net/p/mytourbook/bugs/77/
-
+* #77: new tours by dividing/concenated tours: not saved in database.
 

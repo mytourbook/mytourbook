@@ -56,16 +56,6 @@ public class Messages extends NLS {
 	public static String		image_action_synch_with_slider_disabled;
 	public static String		image_action_synch_with_tour;
 	public static String		image_action_synch_with_tour_disabled;
-	public static String		image_action_tour_color_altitude;
-	public static String		image_action_tour_color_altitude_disabled;
-	public static String		image_action_tour_color_gradient;
-	public static String		image_action_tour_color_gradient_disabled;
-	public static String		image_action_tour_color_pace;
-	public static String		image_action_tour_color_pace_disabled;
-	public static String		image_action_tour_color_pulse;
-	public static String		image_action_tour_color_pulse_disabled;
-	public static String		image_action_tour_color_speed;
-	public static String		image_action_tour_color_speed_disabled;
 	public static String		image_action_zoom_centered;
 	public static String		image_action_zoom_in;
 	public static String		image_action_zoom_in_disabled;
