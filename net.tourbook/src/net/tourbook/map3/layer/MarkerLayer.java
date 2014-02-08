@@ -25,7 +25,6 @@ import gov.nasa.worldwind.layers.RenderableLayer;
 import gov.nasa.worldwind.render.Offset;
 import gov.nasa.worldwind.render.PointPlacemarkAttributes;
 
-import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Set;
@@ -77,7 +76,7 @@ public class MarkerLayer extends RenderableLayer implements SelectListener, IChe
 			ppAttributes.setImageAddress(fileURL);
 			ppAttributes.setImageOffset(new Offset(16.0, -0.0, AVKey.PIXELS, AVKey.PIXELS));
 
-		} catch (final IOException e) {
+		} catch (final Exception e) {
 			// ignore
 			StatusUtil.log(e);
 		}
