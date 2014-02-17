@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -60,19 +60,21 @@ public class GarminSAXHandler extends DefaultHandler {
 	private static final String				TAG_CREATOR_VERSION_MAJOR	= "VersionMajor";												//$NON-NLS-1$
 	private static final String				TAG_CREATOR_VERSION_MINOR	= "VersionMinor";												//$NON-NLS-1$
 	//
-	private static final String				TAG_LAP						= "Lap";														//$NON-NLS-1$
-	private static final String				TAG_NOTES					= "Notes";														//$NON-NLS-1$
-	private static final String				TAG_TRACKPOINT				= "Trackpoint";												//$NON-NLS-1$
-	private static final String				TAG_CALORIES				= "Calories";													//$NON-NLS-1$
-	private static final String				TAG_LONGITUDE_DEGREES		= "LongitudeDegrees";											//$NON-NLS-1$
-	private static final String				TAG_LATITUDE_DEGREES		= "LatitudeDegrees";											//$NON-NLS-1$
 	private static final String				TAG_ALTITUDE_METERS			= "AltitudeMeters";											//$NON-NLS-1$
-	private static final String				TAG_DISTANCE_METERS			= "DistanceMeters";											//$NON-NLS-1$
+	private static final String				TAG_CALORIES				= "Calories";													//$NON-NLS-1$
 	private static final String				TAG_CADENCE					= "Cadence";													//$NON-NLS-1$
+	private static final String				TAG_DISTANCE_METERS			= "DistanceMeters";											//$NON-NLS-1$
 	private static final String				TAG_HEART_RATE_BPM			= "HeartRateBpm";												//$NON-NLS-1$
+	private static final String				TAG_LAP						= "Lap";														//$NON-NLS-1$
+	private static final String				TAG_LATITUDE_DEGREES		= "LatitudeDegrees";											//$NON-NLS-1$
+	private static final String				TAG_LONGITUDE_DEGREES		= "LongitudeDegrees";											//$NON-NLS-1$
+	private static final String				TAG_NOTES					= "Notes";														//$NON-NLS-1$
+	private static final String				TAG_SENSOR_STATE			= "SensorState";												//$NON-NLS-1$
+	private static final String				TAG_TRACKPOINT				= "Trackpoint";												//$NON-NLS-1$
 	private static final String				TAG_TIME					= "Time";														//$NON-NLS-1$
 	private static final String				TAG_VALUE					= "Value";														//$NON-NLS-1$
-	private static final String				TAG_SENSOR_STATE			= "SensorState";												//$NON-NLS-1$
+	private static final String				TAG_NS3_SPEED				= "ns3:Speed";													//$NON-NLS-1$
+	private static final String				TAG_NS3_WATTS				= "ns3:Watts";													//$NON-NLS-1$
 
 	private static final String				SENSOR_STATE_PRESENT		= "Present";													//$NON-NLS-1$
 	private static final String				ATTR_VALUE_SPORT			= "Sport";														//$NON-NLS-1$
@@ -102,6 +104,8 @@ public class GarminSAXHandler extends DefaultHandler {
 	private boolean							_isInHeartRate				= false;
 	private boolean							_isInHeartRateValue			= false;
 	private boolean							_isInNotes;
+	private boolean							_isInNs3Speed;
+	private boolean							_isInNs3Watts;
 	//
 	private boolean							_isInCreator;
 	private boolean							_isInCreatorName;
@@ -413,6 +417,9 @@ public class GarminSAXHandler extends DefaultHandler {
 				|| _isInHeartRate
 				|| _isInHeartRateValue
 				//
+				|| _isInNs3Speed
+				|| _isInNs3Watts
+				//
 				|| _isInCreatorName
 				|| _isInCreatorVersionMajor
 				|| _isInCreatorVersionMinor
@@ -712,6 +719,14 @@ public class GarminSAXHandler extends DefaultHandler {
 			_isInLongitude = true;
 			_characters.delete(0, _characters.length());
 
+		} else if (name.equals(TAG_NS3_SPEED)) {
+			_isInNs3Speed = true;
+			_characters.delete(0, _characters.length());
+
+		} else if (name.equals(TAG_NS3_WATTS)) {
+			_isInNs3Watts = true;
+			_characters.delete(0, _characters.length());
+
 		} else if (_isInHeartRate && name.equals(TAG_VALUE)) {
 			_isInHeartRateValue = true;
 			_characters.delete(0, _characters.length());
@@ -769,6 +784,18 @@ public class GarminSAXHandler extends DefaultHandler {
 			_isInLongitude = false;
 
 			_timeData.longitude = getDoubleValue(_characters.toString());
+
+		} else if (name.equals(TAG_NS3_SPEED)) {
+
+			_isInNs3Speed = false;
+
+			_timeData.speed = getFloatValue(_characters.toString());
+
+		} else if (name.equals(TAG_NS3_WATTS)) {
+
+			_isInNs3Watts = false;
+
+			_timeData.power = getFloatValue(_characters.toString());
 
 		} else if (name.equals(TAG_TIME)) {
 
