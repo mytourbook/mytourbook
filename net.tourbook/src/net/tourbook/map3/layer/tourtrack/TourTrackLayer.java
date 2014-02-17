@@ -665,17 +665,13 @@ public class TourTrackLayer extends RenderableLayer implements SelectListener, I
 		setPathAttributes_Selected();
 		setPathAttributes_HovSel();
 
-//		System.out.println(UI.timeStampNano()
-//				+ " ["
-//				+ getClass().getSimpleName()
-//				+ "] \t\trgb: "
-//				+ _normalAttributes.getOutlineMaterial().getDiffuse());
-//		// TODO remove SYSTEM.OUT.PRINTLN
-
 		path.setAttributes(_normalAttributes);
 		setPathHighlighAttributes(trackPath);
 
-		path.setEnableDepthOffset(true);
+		/*
+		 * I don't know why this is enabled, 12.2.2014
+		 */
+//		path.setEnableDepthOffset(true);
 
 		/*
 		 * ensure that cached data are recreated, e.g. direction arrow size

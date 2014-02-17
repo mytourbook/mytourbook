@@ -1106,8 +1106,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 		tbm.add(_actionSynMapWithChartSlider);
 		tbm.add(new Separator());
 
-		tbm.add(new Separator());
-
+		tbm.add(_actionShowMarker);
 		tbm.add(_actionOpenMap3LayerView);
 
 		/*
