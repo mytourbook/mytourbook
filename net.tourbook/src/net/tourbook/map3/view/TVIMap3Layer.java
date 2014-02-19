@@ -40,7 +40,7 @@ public class TVIMap3Layer extends TVIMap3Item {
 		this.name = uiLayerName;
 	}
 
-	void addCheckStateListener(final ICheckStateListener checkStateListener) {
+	void setCheckStateListener(final ICheckStateListener checkStateListener) {
 		_checkStateListener = checkStateListener;
 	}
 
@@ -49,7 +49,7 @@ public class TVIMap3Layer extends TVIMap3Item {
 		// default layer has no children
 	}
 
-	void fireCheckStateListener() {
+	public void fireCheckStateListener() {
 
 		if (_checkStateListener != null) {
 			_checkStateListener.onSetCheckState(this);

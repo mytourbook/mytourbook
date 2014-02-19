@@ -235,7 +235,9 @@ public class DialogPropertyViewerToolTip extends ToolTip3 {
 	}
 
 	@Override
-	public Point getToolTipLocation(final Point tipSize, final Point mouseOwnerPosition) {
+	protected Point getToolTipLocation(	final Point tipSize,
+										final Point mouseOwnerPosition,
+										final IToolProvider toolProvider) {
 
 		if (_viewerRow == null) {
 			return null;
@@ -258,7 +260,16 @@ public class DialogPropertyViewerToolTip extends ToolTip3 {
 
 		if (ttDisplayLocation.x + tipSizeWidth > displayBounds.width) {
 
-			ttDisplayLocation.x = ttDisplayLocation.x - tipSizeWidth - rowWidth;
+			if (toolProvider == _defaultToolProvider) {
+
+				ttDisplayLocation.x = ttDisplayLocation.x - tipSizeWidth - _columnWidth;
+
+			} else {
+
+				// locate tooltip closer that it can be accessed with the mouse
+
+				ttDisplayLocation.x = ttDisplayLocation.x - tipSizeWidth - rowWidth;
+			}
 		}
 
 		if (ttDisplayLocation.y + tipSizeHeight > displayBounds.height) {

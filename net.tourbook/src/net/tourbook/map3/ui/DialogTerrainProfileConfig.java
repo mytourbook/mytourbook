@@ -45,7 +45,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Spinner;
-import org.eclipse.ui.IViewPart;
 
 public class DialogTerrainProfileConfig {
 
@@ -388,17 +387,17 @@ public class DialogTerrainProfileConfig {
 		final boolean isTTMoved = Util.getStateBoolean(_state, STATE_TERRAIN_PROFILE_IS_TOOLTIP_MOVED, false);
 		if (isTTMoved) {
 
-			final IViewPart ttParentView = Map3Manager.getMap3LayerView();
-			if (ttParentView != null) {
+			final DialogMap3Layer map3LayerDialog = Map3Manager.getMap3LayerDialog();
+			if (map3LayerDialog != null) {
 
-				final Shell wbShell = ttParentView.getViewSite().getWorkbenchWindow().getShell();
+				final Shell dialogShell = map3LayerDialog.getShell();
+				if (dialogShell != null) {
 
-				if (wbShell != null) {
 					_initialTTLocation = UI.getInitialLocation(
 							_state,
 							STATE_PREFIX,
 							_comboDimension.getShell(),
-							wbShell);
+							dialogShell);
 				}
 			}
 		}
@@ -435,13 +434,13 @@ public class DialogTerrainProfileConfig {
 
 				// save dialog position ONLY when moved, when not moved the tooltip is displayed at the default location
 
-				final IViewPart ttParentView = Map3Manager.getMap3LayerView();
-				if (ttParentView != null) {
+				final DialogMap3Layer map3LayerDialog = Map3Manager.getMap3LayerDialog();
+				if (map3LayerDialog != null) {
 
-					final Shell wbShell = ttParentView.getViewSite().getWorkbenchWindow().getShell();
+					final Shell dialogShell = map3LayerDialog.getShell();
 
-					if (wbShell != null) {
-						UI.saveDialogBounds(_state, STATE_PREFIX, ttShell, wbShell);
+					if (dialogShell != null) {
+						UI.saveDialogBounds(_state, STATE_PREFIX, ttShell, dialogShell);
 					}
 				}
 			}

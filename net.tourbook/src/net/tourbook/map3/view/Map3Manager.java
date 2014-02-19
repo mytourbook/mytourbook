@@ -57,6 +57,7 @@ import net.tourbook.map3.layer.TourInfoLayer;
 import net.tourbook.map3.layer.TourLegendLayer;
 import net.tourbook.map3.layer.TrackSliderLayer;
 import net.tourbook.map3.layer.tourtrack.TourTrackLayer;
+import net.tourbook.map3.ui.DialogMap3Layer;
 import net.tourbook.map3.ui.DialogTerrainProfileConfig;
 
 import org.eclipse.core.runtime.IPath;
@@ -127,9 +128,10 @@ public class Map3Manager {
 	private static Map3View								_map3View;
 
 	/**
-	 * Instance of {@link Map3LayerView} or <code>null</code> when view is not created or disposed.
+	 * Instance of the map 3 layer viewer dialog or <code>null</code> when dialog is not created or
+	 * disposed.
 	 */
-	private static Map3LayerView						_map3LayerView;
+	private static DialogMap3Layer						_map3LayerDialog;
 
 	/**
 	 * Contains default layers with locale layer names which are used as a layer id.
@@ -348,7 +350,7 @@ public class Map3Manager {
 			_uiVisibleLayersFromXml.add(tviLayer);
 		}
 
-		tviLayer.addCheckStateListener(_wwLayer_Marker);
+		tviLayer.setCheckStateListener(_wwLayer_Marker);
 
 		_uiCustomLayers.put(layerId, tviLayer);
 	}
@@ -410,7 +412,7 @@ public class Map3Manager {
 			_uiVisibleLayersFromXml.add(tviLayer);
 		}
 
-		tviLayer.addCheckStateListener(_wwLayer_TourTrack);
+		tviLayer.setCheckStateListener(_wwLayer_TourTrack);
 
 		_uiCustomLayers.put(layerId, tviLayer);
 	}
@@ -458,7 +460,7 @@ public class Map3Manager {
 				Messages.Custom_Layer_ViewerController);
 
 		tviLayer.defaultPosition = INSERT_BEFORE_COMPASS;
-		tviLayer.addCheckStateListener(new ViewerControllerCheckStateListener(viewControlsLayer));
+		tviLayer.setCheckStateListener(new ViewerControllerCheckStateListener(viewControlsLayer));
 
 		_uiCustomLayers.put(layerId, tviLayer);
 	}
@@ -761,7 +763,7 @@ public class Map3Manager {
 	/**
 	 * @param isTrackVisible
 	 */
-	static void enableMap3Actions() {
+	public static void enableMap3Actions() {
 
 		if (_map3View == null) {
 			// ignore when view is not created
@@ -799,28 +801,29 @@ public class Map3Manager {
 	}
 
 	/**
-	 * @return Returns instance of {@link Map3LayerView} or null when view is not created.
+	 * @return Returns an instance of {@link DialogMap3Layer} or <code>null</code> when view is not
+	 *         created.
 	 */
-	public static Map3LayerView getMap3LayerView() {
-		return _map3LayerView;
+	public static DialogMap3Layer getMap3LayerDialog() {
+		return _map3LayerDialog;
 	}
 
 	/**
-	 * @return Returns instance of {@link Map3View} or null when view is not created.
+	 * @return Returns instance of {@link Map3View} or <code>null</code> when view is not created.
 	 */
 	public static Map3View getMap3View() {
 		return _map3View;
 	}
 
-	static TVIMap3Root getRootItem() {
+	public static TVIMap3Root getRootItem() {
 		return _uiRootItem;
 	}
 
-	static Object[] getUIExpandedCategories() {
+	public static Object[] getUIExpandedCategories() {
 		return _uiExpandedCategories;
 	}
 
-	static Object[] getUIVisibleLayers() {
+	public static Object[] getUIVisibleLayers() {
 		return _uiVisibleLayers;
 	}
 
@@ -1238,7 +1241,7 @@ public class Map3Manager {
 	 * </pre>
 	 */
 
-	static void saveUIState(final Object[] checkedElements, final Object[] expandedElements) {
+	public static void saveUIState(final Object[] checkedElements, final Object[] expandedElements) {
 
 		/*
 		 * remove categories because they are contained in this list even when only a part of the
@@ -1296,8 +1299,8 @@ public class Map3Manager {
 		}
 
 		// update UI
-		if (_map3LayerView != null && insertedLayers.size() > 0) {
-			_map3LayerView.updateUI_NewLayer(insertedLayers);
+		if (_map3LayerDialog != null && insertedLayers.size() > 0) {
+			_map3LayerDialog.updateUI_NewLayer(insertedLayers);
 		}
 
 	}
@@ -1309,10 +1312,10 @@ public class Map3Manager {
 		// update tvi model
 		tviLayer.isLayerVisible = isVisible;
 
-		if (_map3LayerView != null) {
+		if (_map3LayerDialog != null) {
 
 			// update viewer
-			_map3LayerView.setLayerVisible(tviLayer, isVisible);
+			_map3LayerDialog.setLayerVisible(tviLayer, isVisible);
 		}
 
 		// add/remove layer listener
@@ -1344,7 +1347,7 @@ public class Map3Manager {
 	 */
 	static void setLayerVisible_TourTrack(final boolean isTrackVisible) {
 
-		if (_map3LayerView == null) {
+		if (_map3LayerDialog == null) {
 
 			// update model, layer viewer is not displayed
 
@@ -1354,9 +1357,9 @@ public class Map3Manager {
 
 			// update model and UI
 
-			_map3LayerView.setLayerVisible_TourTrack(//
-					_uiCustomLayers.get(TourTrackLayer.MAP3_LAYER_ID),
-					isTrackVisible);
+			final TVIMap3Layer tviMap3Layer = _uiCustomLayers.get(TourTrackLayer.MAP3_LAYER_ID);
+
+			_map3LayerDialog.setLayerVisible_TourTrack(tviMap3Layer, isTrackVisible);
 		}
 	}
 
@@ -1369,11 +1372,9 @@ public class Map3Manager {
 		setCustomLayerVisibleInTVIModel(isVisible, TrackSliderLayer.MAP3_LAYER_ID);
 	}
 
-	/**
-	 * @param map3PropertiesView
-	 */
-	static void setMap3PropertiesView(final Map3LayerView map3PropertiesView) {
-		_map3LayerView = map3PropertiesView;
+	public static void setMap3LayerDialog(final DialogMap3Layer dialogMap3LayerViewer) {
+
+		_map3LayerDialog = dialogMap3LayerViewer;
 	}
 
 	/**

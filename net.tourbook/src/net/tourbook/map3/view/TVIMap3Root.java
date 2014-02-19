@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,7 +15,12 @@
  *******************************************************************************/
 package net.tourbook.map3.view;
 
+import org.eclipse.ui.dialogs.ContainerCheckedTreeViewer;
+
+
 public class TVIMap3Root extends TVIMap3Item {
+
+	private ContainerCheckedTreeViewer	_treeViewer;
 
 	public TVIMap3Root() {
 		super();
@@ -25,6 +30,14 @@ public class TVIMap3Root extends TVIMap3Item {
 	protected void fetchChildren() {
 
 		// tree items are created from a xml file
+	}
+
+	protected ContainerCheckedTreeViewer getTreeViewer() {
+		return _treeViewer;
+	}
+
+	public void setTreeViewer(final ContainerCheckedTreeViewer treeViewer) {
+		_treeViewer = treeViewer;
 	}
 
 }

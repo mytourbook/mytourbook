@@ -20,6 +20,7 @@ import net.tourbook.common.UI;
 import net.tourbook.common.color.MapGraphId;
 import net.tourbook.map2.Messages;
 import net.tourbook.map3.ui.DialogSelectMap3Color;
+import net.tourbook.map3.view.IOpeningDialog;
 import net.tourbook.map3.view.Map3View;
 import net.tourbook.preferences.ITourbookPreferences;
 
@@ -39,11 +40,12 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 
-public class ActionTourColor extends ContributionItem {
+public class ActionTourColor extends ContributionItem implements IOpeningDialog {
 
 	private final IPreferenceStore	_prefStore	= TourbookPlugin.getPrefStore();
 
 	private MapGraphId				_graphId;
+	private String					_dialogId;
 	private boolean					_isGradientColorProvider;
 
 	private Map3View				_map3View;
@@ -70,6 +72,8 @@ public class ActionTourColor extends ContributionItem {
 					final String toolTipText) {
 
 		_graphId = graphId;
+		_dialogId = getClass().getCanonicalName() + _graphId.name();
+
 		_isGradientColorProvider = isGradientColorProvider;
 
 		_map3View = mapView;
@@ -149,17 +153,6 @@ public class ActionTourColor extends ContributionItem {
 		return _prefStore.getBoolean(ITourbookPreferences.MAP3_IS_COLOR_SELECTOR_DISPLAYED);
 	}
 
-	public void closeDialog() {
-
-		if (_colorSelectDialog != null) {
-
-			_colorSelectDialog.hideNow();
-
-			// dispose dialog for testing only otherwise use hideNow()
-//			_colorSelectDialog.close();
-		}
-	}
-
 	public void disposeColors() {
 
 		if (_colorSelectDialog != null) {
@@ -233,9 +226,27 @@ public class ActionTourColor extends ContributionItem {
 		}
 	}
 
+	@Override
+	public String getDialogId() {
+
+		return _dialogId;
+	}
+
 	public ToolItem getToolItem() {
 
 		return _actionColor;
+	}
+
+	@Override
+	public void hideDialog() {
+
+		if (_colorSelectDialog != null) {
+
+			_colorSelectDialog.hideNow();
+
+			// dispose dialog for testing only otherwise use hideNow()
+//			_colorSelectDialog.close();
+		}
 	}
 
 	private void onDispose() {
@@ -301,7 +312,7 @@ public class ActionTourColor extends ContributionItem {
 
 				// even when a select dialog is not available, close other dialogs also
 
-				_map3View.closeOtherDialogs(this);
+				_map3View.closeOpenedDialogs(this);
 
 			} else {
 
@@ -330,7 +341,7 @@ public class ActionTourColor extends ContributionItem {
 	private void openDialog(final Rectangle itemBounds, final boolean isOpenDelayed) {
 
 		// ensure other dialogs are closed
-		_map3View.closeOtherDialogs(this);
+		_map3View.closeOpenedDialogs(this);
 
 		_colorSelectDialog.open(itemBounds, isOpenDelayed);
 	}

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -21,6 +21,5 @@ package net.tourbook.application;
 public interface IExternalIds {
 
 	public static final String	VIEW_ID_NET_TOURBOOK_MAP3_MAP3_VIEW_ID		= "net.tourbook.map3.view.Map3ViewId";	//$NON-NLS-1$
-	public static final String	VIEW_ID_NET_TOURBOOK_MAP3_MAP3_LAYER_VIEW	= "net.tourbook.map3.Map3LayerView";	//$NON-NLS-1$
 
 }
