@@ -1,0 +1,32 @@
+Version: 14.x.0                                       ?. ? 2014
+
+
+New 3D Map Features 	
+
+* 
+
+* 
+
+* 
+
+* Converted layer view into a slideout.
+
+ 
+
+Other New Features	
+
+* 
+
+* 
+
+* 
+
+
+
+Fixed Bugs
+
+*  
+
+* 
+
+* 

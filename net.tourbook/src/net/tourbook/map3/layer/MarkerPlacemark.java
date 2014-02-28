@@ -16,6 +16,7 @@
 package net.tourbook.map3.layer;
 
 import gov.nasa.worldwind.WorldWind;
+import gov.nasa.worldwind.avlist.AVKey;
 import gov.nasa.worldwind.geom.Position;
 import gov.nasa.worldwind.geom.Vec4;
 import gov.nasa.worldwind.pick.PickSupport;
@@ -23,11 +24,14 @@ import gov.nasa.worldwind.render.DrawContext;
 import gov.nasa.worldwind.render.Offset;
 import gov.nasa.worldwind.render.PointPlacemark;
 import gov.nasa.worldwind.render.PointPlacemarkAttributes;
+import gov.nasa.worldwind.util.OGLStackHandler;
 import gov.nasa.worldwind.util.OGLTextRenderer;
+import gov.nasa.worldwind.util.OGLUtil;
 
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Point;
+import java.util.concurrent.atomic.AtomicLong;
 
 import javax.media.opengl.GL;
 import javax.media.opengl.GL2;
@@ -39,8 +43,10 @@ import com.jogamp.opengl.util.awt.TextRenderer;
 
 public class MarkerPlacemark extends PointPlacemark {
 
-	String	markerText;
-	double	absoluteAltitude;
+	String						markerText;
+	double						absoluteAltitude;
+	private static AtomicLong	_counterDraw	= new AtomicLong();
+	private static AtomicLong	_counterMake	= new AtomicLong();
 
 	public MarkerPlacemark(final Position position) {
 
@@ -119,6 +125,152 @@ public class MarkerPlacemark extends PointPlacemark {
 	}
 
 	/**
+	 * Draw this placemark as an ordered renderable. If in picking mode, add it to the picked object
+	 * list of specified {@link PickSupport}. The <code>PickSupport</code> may not be the one
+	 * associated with this instance. During batch picking the <code>PickSupport</code> of the
+	 * instance initiating the batch picking is used so that all shapes rendered in batch are added
+	 * to the same pick list.
+	 * 
+	 * @param dc
+	 *            the current draw context.
+	 * @param pickCandidates
+	 *            a pick support holding the picked object list to add this shape to.
+	 */
+	@Override
+	protected void doDrawOrderedRenderable(final DrawContext dc, final PickSupport pickCandidates) {
+
+		if (this.isDrawLine(dc)) {
+			this.drawLine(dc, pickCandidates);
+		}
+
+		if (this.activeTexture == null) {
+			if (this.isDrawPoint(dc)) {
+				this.drawPoint(dc, pickCandidates);
+			}
+			return;
+		}
+
+		final GL2 gl = dc.getGL().getGL2(); // GL initialization checks for GL2 compatibility.
+
+		final OGLStackHandler osh = new OGLStackHandler();
+		try {
+			if (dc.isPickingMode()) {
+				// Set up to replace the non-transparent texture colors with the single pick color.
+				gl.glEnable(GL.GL_TEXTURE_2D);
+				gl.glTexEnvf(GL2.GL_TEXTURE_ENV, GL2.GL_TEXTURE_ENV_MODE, GL2.GL_COMBINE);
+				gl.glTexEnvf(GL2.GL_TEXTURE_ENV, GL2.GL_SRC0_RGB, GL2.GL_PREVIOUS);
+				gl.glTexEnvf(GL2.GL_TEXTURE_ENV, GL2.GL_COMBINE_RGB, GL2.GL_REPLACE);
+
+				final Color pickColor = dc.getUniquePickColor();
+				pickCandidates.addPickableObject(this.createPickedObject(dc, pickColor));
+				gl.glColor3ub((byte) pickColor.getRed(), (byte) pickColor.getGreen(), (byte) pickColor.getBlue());
+			} else {
+				gl.glEnable(GL.GL_TEXTURE_2D);
+				Color color = this.getActiveAttributes().getImageColor();
+				if (color == null) {
+					color = Color.WHITE;
+				}
+				gl.glColor4ub(
+						(byte) color.getRed(),
+						(byte) color.getGreen(),
+						(byte) color.getBlue(),
+						(byte) color.getAlpha());
+			}
+
+			// The image is drawn using a parallel projection.
+			osh.pushProjectionIdentity(gl);
+			gl.glOrtho(0d, dc.getView().getViewport().width, 0d, dc.getView().getViewport().height, -1d, 1d);
+
+			// Apply the depth buffer but don't change it (for screen-space shapes).
+			if ((!dc.isDeepPickingEnabled())) {
+				gl.glEnable(GL.GL_DEPTH_TEST);
+			}
+//			gl.glDepthMask(false);
+			gl.glDepthMask(true);
+
+			// Suppress any fully transparent image pixels.
+			gl.glEnable(GL2.GL_ALPHA_TEST);
+			gl.glAlphaFunc(GL2.GL_GREATER, 0.001f);
+
+			// Adjust depth of image to bring it slightly forward
+			double depth = screenPoint.z - (8d * 0.00048875809d);
+			depth = depth < 0d ? 0d : (depth > 1d ? 1d : depth);
+			gl.glDepthFunc(GL.GL_LESS);
+			gl.glDepthRange(depth, depth);
+
+			// The image is drawn using a translated and scaled unit quad.
+			// Translate to screen point and adjust to align hot spot.
+			osh.pushModelviewIdentity(gl);
+			gl.glTranslated(screenPoint.x + this.dx, screenPoint.y + this.dy, 0);
+
+			// Compute the scale
+			double xscale;
+			final Double scale = this.getActiveAttributes().getScale();
+			if (scale != null) {
+				xscale = scale * this.activeTexture.getWidth(dc);
+			} else {
+				xscale = this.activeTexture.getWidth(dc);
+			}
+
+			double yscale;
+			if (scale != null) {
+				yscale = scale * this.activeTexture.getHeight(dc);
+			} else {
+				yscale = this.activeTexture.getHeight(dc);
+			}
+
+			Double heading = getActiveAttributes().getHeading();
+			final Double pitch = getActiveAttributes().getPitch();
+
+			// Adjust heading to be relative to globe or screen
+			if (heading != null) {
+				if (AVKey.RELATIVE_TO_GLOBE.equals(this.getActiveAttributes().getHeadingReference())) {
+					heading = dc.getView().getHeading().degrees - heading;
+				} else {
+					heading = -heading;
+				}
+			}
+
+			// Apply the heading and pitch if specified.
+			if (heading != null || pitch != null) {
+				gl.glTranslated(xscale / 2, yscale / 2, 0);
+				if (pitch != null) {
+					gl.glRotated(pitch, 1, 0, 0);
+				}
+				if (heading != null) {
+					gl.glRotated(heading, 0, 0, 1);
+				}
+				gl.glTranslated(-xscale / 2, -yscale / 2, 0);
+			}
+
+			// Scale the unit quad
+			gl.glScaled(xscale, yscale, 1);
+
+			if (this.activeTexture.bind(dc)) {
+				dc.drawUnitQuad(activeTexture.getTexCoords());
+			}
+
+			gl.glDepthRange(0, 1); // reset depth range to the OGL default
+//
+//            gl.glDisable(GL.GL_TEXTURE_2D);
+//            dc.drawUnitQuadOutline(); // for debugging label placement
+
+			if (this.mustDrawLabel() && !dc.isPickingMode()) {
+				this.drawLabel(dc);
+			}
+		} finally {
+			if (dc.isPickingMode()) {
+				gl.glTexEnvf(GL2.GL_TEXTURE_ENV, GL2.GL_TEXTURE_ENV_MODE, OGLUtil.DEFAULT_TEX_ENV_MODE);
+				gl.glTexEnvf(GL2.GL_TEXTURE_ENV, GL2.GL_SRC0_RGB, OGLUtil.DEFAULT_SRC0_RGB);
+				gl.glTexEnvf(GL2.GL_TEXTURE_ENV, GL2.GL_COMBINE_RGB, OGLUtil.DEFAULT_COMBINE_RGB);
+			}
+
+			gl.glDisable(GL.GL_TEXTURE_2D);
+			osh.pop(gl);
+		}
+	}
+
+	/**
 	 * Use depth mask, otherwise the label is drawn behind the curtain.
 	 * <p>
 	 * ------------
@@ -127,6 +279,15 @@ public class MarkerPlacemark extends PointPlacemark {
 	 */
 	@Override
 	protected void drawLabel(final DrawContext dc) {
+//
+//		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
+//				+ ("\tdrawLabel()")
+//				+ ("\tframe: " + dc.getFrameTimeStamp())
+//				+ ("\tisPickingMode: " + dc.isPickingMode())
+//				+ ("\tisOrderedRenderingMode: " + dc.isOrderedRenderingMode())
+//		//
+//				);
+//		// TODO remove SYSTEM.OUT.PRINTLN
 
 		if (this.labelText == null) {
 			return;
@@ -182,20 +343,25 @@ public class MarkerPlacemark extends PointPlacemark {
 		}
 
 		// Do not depth buffer the label. (Placemarks beyond the horizon are culled above.)
-		gl.glDisable(GL.GL_DEPTH_TEST);
-		gl.glDepthMask(false);
-//		gl.glEnable(GL.GL_DEPTH_TEST);
-//		gl.glDepthFunc(GL.GL_LEQUAL);
-//		gl.glDepthMask(true);
+//		gl.glDisable(GL.GL_DEPTH_TEST);
 //		gl.glDepthMask(false);
+		gl.glEnable(GL.GL_DEPTH_TEST);
+		gl.glDepthFunc(GL.GL_LEQUAL);
+		gl.glDepthMask(true);
 
 		final TextRenderer textRenderer = OGLTextRenderer.getOrCreateTextRenderer(dc.getTextRendererCache(), font);
 		try {
+
 			textRenderer.begin3DRendering();
+
+			// draw background shade
 			textRenderer.setColor(backgroundColor);
 			textRenderer.draw3D(this.labelText, x + 1, y - 1, 0, 1);
+
+			// draw foreground color
 			textRenderer.setColor(color);
 			textRenderer.draw3D(this.labelText, x, y, 0, 1);
+
 		} finally {
 			textRenderer.end3DRendering();
 		}
@@ -223,6 +389,9 @@ public class MarkerPlacemark extends PointPlacemark {
 
 			dc.getView().pushReferenceCenter(dc, this.placePoint); // draw relative to the place point
 
+			// Pull the arrow triangles forward just a bit to ensure they show over the terrain.
+			dc.pushProjectionOffest(0.99);
+
 			this.setLineWidth(dc);
 			this.setLineColor(dc, pickCandidates);
 
@@ -238,8 +407,39 @@ public class MarkerPlacemark extends PointPlacemark {
 
 		} finally {
 
+			dc.popProjectionOffest();
 			dc.getView().popReferenceCenter(dc);
 		}
+	}
+
+	@Override
+	protected void drawOrderedRenderable(final DrawContext dc) {
+
+//		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
+//				+ ("\tdraw... " + _counterDraw.incrementAndGet())
+//				+ ("\tframe: " + dc.getFrameTimeStamp())
+//				+ ("\tisPickingMode: " + dc.isPickingMode())
+//				+ ("\tisOrderedRenderingMode: " + dc.isOrderedRenderingMode())
+//		//
+//				);
+//		// TODO remove SYSTEM.OUT.PRINTLN
+
+		super.drawOrderedRenderable(dc);
+	}
+
+	@Override
+	protected void makeOrderedRenderable(final DrawContext dc) {
+
+//		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
+//				+ ("\tmake... " + _counterMake++)
+//				+ ("\tframe: " + dc.getFrameTimeStamp())
+//				+ ("\tisPickingMode: " + dc.isPickingMode())
+//				+ ("\tisOrderedRenderingMode: " + dc.isOrderedRenderingMode())
+//		//
+//				);
+//		// TODO remove SYSTEM.OUT.PRINTLN
+
+		super.makeOrderedRenderable(dc);
 	}
 
 	private void setDepthFunc(final DrawContext dc, final Vec4 screenPoint) {

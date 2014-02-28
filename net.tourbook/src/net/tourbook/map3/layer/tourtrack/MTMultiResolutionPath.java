@@ -43,12 +43,12 @@ public class MTMultiResolutionPath extends MultiResolutionPath {
 	}
 
 	/**
-	 * {@inheritDoc}
-	 * <p/>
 	 * Overridden to skip positions from this Path's original positions list. Positions are skipped
 	 * first according to this Path's skipCountComputer. The skipCountComputer determines how many
 	 * positions this path skips between tessellated positions. Any positions remaining after this
 	 * step are skipped if the segment they are part of is either very small or not visible.
+	 * <p/>
+	 * {@inheritDoc}
 	 */
 	@Override
 	protected void makePositions(final DrawContext dc, final PathData pathData) {
