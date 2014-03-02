@@ -370,6 +370,14 @@ public class TourLegendLayer extends RenderableLayer {
 		}
 	}
 
+	@Override
+	public void setOpacity(final double opacity) {
+
+		_legendImage.setOpacity(opacity);
+		
+		super.setOpacity(opacity);
+	}
+
 	private void showLegend() {
 
 		// prevent to add legend image more than once
@@ -451,7 +459,7 @@ public class TourLegendLayer extends RenderableLayer {
 			g2d.dispose();
 		}
 
-		_legendImage.setOpacity(0.999);
+		_legendImage.setOpacity(getOpacity());
 		_legendImage.setImageSource(image);
 
 		/*

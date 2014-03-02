@@ -100,6 +100,12 @@ public class Messages extends NLS {
 	public static String		Map3Color_Dialog_Spinner_ColorValue_Tooltip;
 	public static String		Map3Color_Dialog_Title;
 
+	public static String	Map3Layer_Viewer_Column_Layer;
+
+	public static String	Map3Layer_Viewer_Column_Opacity;
+
+	public static String	Map3Layer_Viewer_Column_Opacity_Tooltip;
+
 	public static String		Map3SelectColor_Dialog_Action_AddColor_Tooltip;
 	public static String		Map3SelectColor_Dialog_Action_EditAllColors;
 	public static String		Map3SelectColor_Dialog_Action_EditSelectedColors;

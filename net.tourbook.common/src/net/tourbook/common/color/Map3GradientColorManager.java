@@ -1107,7 +1107,7 @@ public class Map3GradientColorManager {
 			vertices.add(new RGBVertex(//
 					Util.getXmlInteger(xmlVertex, ATTR_VALUE, 0),
 					Util.getXmlRgb(xmlVertex, DEFAULT_RGB),
-					Util.getXmlFloat(xmlVertex, ATTR_OPACITY, OPACITY_DEFAULT, OPACITY_MIN, OPACITY_MAX)));
+					Util.getXmlFloatInt(xmlVertex, ATTR_OPACITY, OPACITY_DEFAULT, OPACITY_MIN, OPACITY_MAX)));
 		}
 
 		colorProfile.getProfileImage().setVertices(vertices);

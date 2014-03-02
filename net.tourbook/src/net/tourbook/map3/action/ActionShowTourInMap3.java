@@ -183,7 +183,7 @@ public class ActionShowTourInMap3 extends ContributionItem implements IOpeningDi
 		final boolean isTrackVisible = _actionTrackLayer.getSelection();
 
 		/*
-		 * show/hide tour track properties
+		 * show/hide tour track layer
 		 */
 		if (isTrackVisible) {
 

@@ -988,11 +988,32 @@ public class Util {
 		return value;
 	}
 
-	public static float getXmlFloat(final IMemento xmlMemento,
-									final String key,
-									final float defaultValue,
-									final int minValue,
-									final int maxValue) {
+	private static Float getXmlFloat(final IMemento xmlMemento, final String key, final Float defaultValue) {
+
+		Float value = xmlMemento.getFloat(key);
+
+		if (value == null) {
+			value = defaultValue;
+		}
+
+		return value;
+	}
+
+	/**
+	 * @param xmlMemento
+	 * @param key
+	 * @param defaultValue
+	 * @param minValue
+	 *            Float min value.
+	 * @param maxValue
+	 *            Float max value.
+	 * @return
+	 */
+	public static float getXmlFloatFloat(	final XMLMemento xmlMemento,
+											final String key,
+											final float defaultValue,
+											final float minValue,
+											final float maxValue) {
 
 		final Float value = getXmlFloat(xmlMemento, key, defaultValue);
 
@@ -1007,12 +1028,30 @@ public class Util {
 		return value;
 	}
 
-	public static Float getXmlFloat(final IMemento xmlMemento, final String key, final Float defaultValue) {
+	/**
+	 * @param xmlMemento
+	 * @param key
+	 * @param defaultValue
+	 * @param minValue
+	 *            Integer min value.
+	 * @param maxValue
+	 *            Integer max value.
+	 * @return
+	 */
+	public static float getXmlFloatInt(	final IMemento xmlMemento,
+										final String key,
+										final float defaultValue,
+										final int minValue,
+										final int maxValue) {
 
-		Float value = xmlMemento.getFloat(key);
+		final Float value = getXmlFloat(xmlMemento, key, defaultValue);
 
-		if (value == null) {
-			value = defaultValue;
+		if (value < minValue) {
+			return minValue;
+		}
+
+		if (value > maxValue) {
+			return maxValue;
 		}
 
 		return value;

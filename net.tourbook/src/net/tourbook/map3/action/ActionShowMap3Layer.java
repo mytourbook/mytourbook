@@ -146,7 +146,7 @@ public class ActionShowMap3Layer extends ContributionItem implements IOpeningDia
 			itemBounds.x = itemDisplayPosition.x;
 			itemBounds.y = itemDisplayPosition.y;
 
-			openConfigDialog(itemBounds, true);
+			openLayerDialog(itemBounds, true);
 		}
 	}
 
@@ -154,12 +154,7 @@ public class ActionShowMap3Layer extends ContributionItem implements IOpeningDia
 
 		updateUI_Tooltip();
 
-		final boolean isSelected = _actionToolItem.getSelection();
-
-		/*
-		 * show/hide tour track properties
-		 */
-		if (isSelected) {
+		if (_map3LayerDialog.isToolTipVisible() == false) {
 
 			final Rectangle itemBounds = _actionToolItem.getBounds();
 
@@ -168,17 +163,15 @@ public class ActionShowMap3Layer extends ContributionItem implements IOpeningDia
 			itemBounds.x = itemDisplayPosition.x;
 			itemBounds.y = itemDisplayPosition.y;
 
-			openConfigDialog(itemBounds, false);
+			openLayerDialog(itemBounds, false);
 
 		} else {
 
 			_map3LayerDialog.close();
 		}
-
-		_map3View.actionShowTour(isSelected);
 	}
 
-	private void openConfigDialog(final Rectangle itemBounds, final boolean isOpenDelayed) {
+	private void openLayerDialog(final Rectangle itemBounds, final boolean isOpenDelayed) {
 
 		// ensure other dialogs are closed
 		_map3View.closeOpenedDialogs(this);

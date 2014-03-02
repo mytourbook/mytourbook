@@ -17,12 +17,14 @@ package net.tourbook.map3.ui;
 
 import gov.nasa.worldwind.layers.Layer;
 
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.HashSet;
 
 import net.tourbook.common.UI;
 import net.tourbook.common.tooltip.AnimatedToolTipShell;
 import net.tourbook.common.util.TreeViewerItem;
+import net.tourbook.map3.Messages;
 import net.tourbook.map3.view.Map3Manager;
 import net.tourbook.map3.view.TVIMap3Category;
 import net.tourbook.map3.view.TVIMap3Item;
@@ -32,16 +34,21 @@ import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.layout.TreeColumnLayout;
+import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.CheckStateChangedEvent;
+import org.eclipse.jface.viewers.ColumnPixelData;
 import org.eclipse.jface.viewers.ColumnWeightData;
 import org.eclipse.jface.viewers.DoubleClickEvent;
+import org.eclipse.jface.viewers.EditingSupport;
+import org.eclipse.jface.viewers.ICellEditorListener;
 import org.eclipse.jface.viewers.ICheckStateListener;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.ITreeViewerListener;
 import org.eclipse.jface.viewers.TreeExpansionEvent;
+import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.TreeViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
@@ -63,12 +70,17 @@ import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.ui.dialogs.ContainerCheckedTreeViewer;
 
+import cop.swt.widgets.viewers.table.celleditors.RangeContent;
+import cop.swt.widgets.viewers.table.celleditors.SpinnerCellEditor;
+
 /**
  * Map3 tour track layer properties dialog.
  */
 public class DialogMap3Layer extends AnimatedToolTipShell {
 
 	private static final int			SHELL_MARGIN		= 0;
+
+	public static final Double			DEFAULT_OPACITY		= new Double(1.0);
 
 	// initialize with default values which are (should) never be used
 	private Rectangle					_toolTipItemBounds	= new Rectangle(0, 0, 50, 50);
@@ -80,21 +92,28 @@ public class DialogMap3Layer extends AnimatedToolTipShell {
 
 	private ContainerCheckedTreeViewer	_layerViewer;
 
-	private DialogPropertyViewerToolTip	_propToolTip;
+	private DialogLayerViewerToolTip	_propToolTip;
 
-	private PixelConverter				_pc;
+	private OpacityEditingSupport		_opacityEditingSupport;
+	private final RangeContent			_opacityRange		= new RangeContent(0.0, 1.0, 0.01, 100);
+	private final NumberFormat			_nf2				= NumberFormat.getNumberInstance();
+	{
+		_nf2.setMinimumFractionDigits(2);
+		_nf2.setMaximumFractionDigits(2);
+	}
 
 	/*
 	 * UI resources
 	 */
+	private PixelConverter				_pc;
 
 	/*
 	 * UI controls
 	 */
+
 	private Composite					_shellContainer;
 
-
-	private class PropertiesContentProvider implements ITreeContentProvider {
+	private class LayerContentProvider implements ITreeContentProvider {
 
 		@Override
 		public void dispose() {}
@@ -121,6 +140,114 @@ public class DialogMap3Layer extends AnimatedToolTipShell {
 
 		@Override
 		public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
+	}
+
+	private final class OpacityEditingSupport extends EditingSupport {
+
+		private final TreeViewer		_treeViewer;
+		private TVIMap3Layer			_currentLayerItem;
+
+		private final SpinnerCellEditor	_cellEditor;
+
+		private OpacityEditingSupport(final TreeViewer treeViewer) {
+
+			super(treeViewer);
+
+			_treeViewer = treeViewer;
+
+			_cellEditor = new SpinnerCellEditor(treeViewer.getTree(), _nf2, _opacityRange, SWT.BORDER);
+
+			_cellEditor.addListener(new ICellEditorListener() {
+
+				@Override
+				public void applyEditorValue() {}
+
+				@Override
+				public void cancelEditor() {}
+
+				@Override
+				public void editorValueChanged(final boolean oldValidState, final boolean newValidState) {
+					onSelectOpacity();
+				}
+			});
+		}
+
+		@Override
+		protected boolean canEdit(final Object element) {
+
+			if (element instanceof TVIMap3Layer) {
+
+				final TVIMap3Layer layerItem = (TVIMap3Layer) element;
+
+				return layerItem.canSetOpacity();
+			}
+
+			return false;
+		}
+
+		@Override
+		protected CellEditor getCellEditor(final Object element) {
+			return _cellEditor;
+		}
+
+		@Override
+		protected Object getValue(final Object element) {
+
+			if (element instanceof TVIMap3Layer) {
+
+				final TVIMap3Layer layerItem = (TVIMap3Layer) element;
+
+				// keep current layer
+				_currentLayerItem = layerItem;
+
+				final Double opacity = layerItem.canSetOpacity() //
+						? Double.valueOf(layerItem.getOpacity())
+						: DEFAULT_OPACITY;
+
+				return opacity;
+			}
+
+			return DEFAULT_OPACITY;
+		}
+
+		boolean isEditorActive() {
+			return _cellEditor.isActivated();
+		}
+
+		/**
+		 * This is a very complex hack to get modified spinner values and update the map
+		 * immediately.
+		 */
+		private void onSelectOpacity() {
+
+			final Object editorValue = _cellEditor.getValue();
+
+			updateUIAndModel(_currentLayerItem, editorValue);
+		}
+
+		@Override
+		protected void setValue(final Object element, final Object value) {
+
+			if (element instanceof TVIMap3Layer) {
+
+				final TVIMap3Layer layerItem = (TVIMap3Layer) element;
+
+				updateUIAndModel(layerItem, value);
+			}
+		}
+
+		private void updateUIAndModel(final TVIMap3Layer layerItem, final Object value) {
+
+			final double newOpacity = (Double) value;
+			final float newOpacityFloat = (float) newOpacity;
+
+			// update model
+			layerItem.setOpacity(newOpacityFloat);
+
+			// update UI
+			_treeViewer.update(layerItem, null);
+			Map3Manager.redrawMap();
+		}
 	}
 
 	private final class WaitTimer implements Runnable {
@@ -226,15 +353,15 @@ public class DialogMap3Layer extends AnimatedToolTipShell {
 				.grab(true, true)
 				.hint(_pc.convertWidthInCharsToPixels(45), SWT.DEFAULT)
 				.applyTo(layoutContainer);
+
 		Tree tree;
 		{
-
 			tree = new Tree(layoutContainer, SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER
 //					| SWT.MULTI
 					| SWT.FULL_SELECTION
 					| SWT.CHECK);
 
-			tree.setHeaderVisible(false);
+			tree.setHeaderVisible(true);
 			tree.setLinesVisible(false);
 
 //			tree.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
@@ -259,7 +386,7 @@ public class DialogMap3Layer extends AnimatedToolTipShell {
 			 */
 			_layerViewer = new ContainerCheckedTreeViewer(tree);
 
-			_layerViewer.setContentProvider(new PropertiesContentProvider());
+			_layerViewer.setContentProvider(new LayerContentProvider());
 			_layerViewer.setUseHashlookup(true);
 
 			_layerViewer.addDoubleClickListener(new IDoubleClickListener() {
@@ -300,7 +427,7 @@ public class DialogMap3Layer extends AnimatedToolTipShell {
 		// hide default tooltip and display the custom tooltip
 		tree.setToolTipText(UI.EMPTY_STRING);
 
-		_propToolTip = new DialogPropertyViewerToolTip(_layerViewer);
+		_propToolTip = new DialogLayerViewerToolTip(_layerViewer);
 
 		return layoutContainer;
 	}
@@ -308,7 +435,7 @@ public class DialogMap3Layer extends AnimatedToolTipShell {
 	private void defineAllColumn(final TreeColumnLayout treeLayout) {
 
 		defineColumn_CategoryLayer(treeLayout);
-//		defineColumn_Info(treeLayout);
+		defineColumn_Opacity(treeLayout);
 	}
 
 	/**
@@ -324,6 +451,8 @@ public class DialogMap3Layer extends AnimatedToolTipShell {
 		 */
 		tvc = new TreeViewerColumn(_layerViewer, SWT.LEAD);
 		tc = tvc.getColumn();
+		tc.setText(Messages.Map3Layer_Viewer_Column_Layer);
+
 		tvc.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -339,6 +468,58 @@ public class DialogMap3Layer extends AnimatedToolTipShell {
 			}
 		});
 		treeLayout.setColumnData(tc, new ColumnWeightData(100, true));
+	}
+
+	/**
+	 * column: marker
+	 */
+	private void defineColumn_Opacity(final TreeColumnLayout treeLayout) {
+
+		final TreeViewerColumn tvc = new TreeViewerColumn(_layerViewer, SWT.CENTER);
+		final TreeColumn tc = tvc.getColumn();
+
+		tc.setText(Messages.Map3Layer_Viewer_Column_Opacity);
+		tc.setToolTipText(Messages.Map3Layer_Viewer_Column_Opacity_Tooltip);
+
+		_opacityEditingSupport = new OpacityEditingSupport(_layerViewer);
+		tvc.setEditingSupport(_opacityEditingSupport);
+
+		tvc.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final Object element = cell.getElement();
+
+				if (element instanceof TVIMap3Layer) {
+
+					final TVIMap3Layer layerItem = (TVIMap3Layer) element;
+
+					final float opacity = layerItem.getOpacity();
+
+					final String opacityText;
+					if (layerItem.canSetOpacity()) {
+
+						if (layerItem.isLayerVisible) {
+
+							if (opacity == 1.0) {
+								opacityText = UI.SYMBOL_FULL_BLOCK;
+							} else {
+								opacityText = _nf2.format(opacity);
+							}
+						} else {
+
+							// layer is hidden
+							opacityText = UI.EMPTY_STRING;
+						}
+					} else {
+						opacityText = UI.SYMBOL_FIGURE_DASH;
+					}
+
+					cell.setText(opacityText);
+				}
+			}
+		});
+		treeLayout.setColumnData(tc, new ColumnPixelData(_pc.convertWidthInCharsToPixels(8), false));
 	}
 
 	public Shell getShell() {
@@ -368,7 +549,6 @@ public class DialogMap3Layer extends AnimatedToolTipShell {
 	private void initUI(final Composite parent) {
 
 		_pc = new PixelConverter(parent);
-
 	}
 
 	@Override
@@ -426,6 +606,9 @@ public class DialogMap3Layer extends AnimatedToolTipShell {
 
 					// update tooltip
 					_propToolTip.setLayerVisibility(tviLayer, false);
+
+					// update viewer
+					_layerViewer.update(tviLayer, null);
 				}
 			}
 
@@ -433,7 +616,6 @@ public class DialogMap3Layer extends AnimatedToolTipShell {
 			if (isMapModified) {
 				Map3Manager.redrawMap();
 			}
-
 		}
 	}
 
@@ -458,6 +640,11 @@ public class DialogMap3Layer extends AnimatedToolTipShell {
 	}
 
 	private void onSelectTreeItem() {
+
+		// ignore mouse when cell editor is active
+		if (_opacityEditingSupport.isEditorActive()) {
+			return;
+		}
 
 		/*
 		 * the following actions will only be done, when the sensitive area of the row is hovered
@@ -645,6 +832,9 @@ public class DialogMap3Layer extends AnimatedToolTipShell {
 		final boolean isLayerVisible = !tviLayer.wwLayer.isEnabled();
 
 		setLayerVisible_TourTrack(tviLayer, isLayerVisible, isUpdateViewer, isUpdateTooltip);
+
+		// update viewer
+		_layerViewer.update(tviLayer, null);
 	}
 
 	public void updateUI_NewLayer(final ArrayList<TVIMap3Layer> insertedLayers) {

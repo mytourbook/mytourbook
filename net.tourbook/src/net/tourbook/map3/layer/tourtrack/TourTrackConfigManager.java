@@ -814,7 +814,7 @@ public class TourTrackConfigManager {
 				ATTR_IS_FOLLOW_TERRAIN,
 				CONFIG_IS_FOLLOW_TERRAIN_DEFAULT);
 
-		config.trackColorOpacity = Util.getXmlFloat(
+		config.trackColorOpacity = Util.getXmlFloatInt(
 				xmlConfig,
 				ATTR_TRACK_COLOR_OPACITY_DEFAULT,
 				Map3GradientColorManager.OPACITY_DEFAULT,
@@ -828,13 +828,13 @@ public class TourTrackConfigManager {
 				ATTR_IS_VISIBLE,
 				IS_DIRECTION_ARROWS_VISIBLE_DEFAULT);
 
-		config.directionArrowSize = Util.getXmlFloat(xmlDirectionArrow,//
+		config.directionArrowSize = Util.getXmlFloatInt(xmlDirectionArrow,//
 				ATTR_DIRECTION_ARROW_SIZE,
 				DIRECTION_ARROW_SIZE_DEFAULT,
 				DIRECTION_ARROW_SIZE_MIN,
 				DIRECTION_ARROW_SIZE_MAX);
 
-		config.directionArrowDistance = Util.getXmlFloat(xmlDirectionArrow,//
+		config.directionArrowDistance = Util.getXmlFloatInt(xmlDirectionArrow,//
 				ATTR_VERTICAL_DISTANCE,
 				DIRECTION_ARROW_VERTICAL_DISTANCE_DEFAULT,
 				DIRECTION_ARROW_VERTICAL_DISTANCE_MIN,
@@ -843,7 +843,7 @@ public class TourTrackConfigManager {
 
 	private static void parse_300_Outline(final XMLMemento xmlOutline, final TourTrackConfig config) {
 
-		config.outlineWidth = Util.getXmlFloat(
+		config.outlineWidth = Util.getXmlFloatInt(
 				xmlOutline,
 				ATTR_OUTLINE_WIDTH,
 				OUTLINE_WIDTH_DEFAULT,
@@ -917,25 +917,25 @@ public class TourTrackConfigManager {
 
 	private static void parse_330__Opacity(final XMLMemento xmlOpacity, final TourTrackConfig trackConfig) {
 
-		trackConfig.outlineOpacity = Util.getXmlFloat(xmlOpacity,//
+		trackConfig.outlineOpacity = Util.getXmlFloatInt(xmlOpacity,//
 				ATTR_NORMAL,
 				OUTLINE_OPACITY_NORMAL_DEFAULT,
 				Map3GradientColorManager.OPACITY_MIN,
 				Map3GradientColorManager.OPACITY_MAX);
 
-		trackConfig.outlineOpacity_Hovered = Util.getXmlFloat(xmlOpacity,//
+		trackConfig.outlineOpacity_Hovered = Util.getXmlFloatInt(xmlOpacity,//
 				ATTR_HOVERED,
 				OUTLINE_OPACITY_HOVERED_DEFAULT,
 				Map3GradientColorManager.OPACITY_MIN,
 				Map3GradientColorManager.OPACITY_MAX);
 
-		trackConfig.outlineOpacity_Selected = Util.getXmlFloat(xmlOpacity,//
+		trackConfig.outlineOpacity_Selected = Util.getXmlFloatInt(xmlOpacity,//
 				ATTR_SELECTED,
 				OUTLINE_OPACITY_SELECTED_DEFAULT,
 				Map3GradientColorManager.OPACITY_MIN,
 				Map3GradientColorManager.OPACITY_MAX);
 
-		trackConfig.outlineOpacity_HovSel = Util.getXmlFloat(xmlOpacity,//
+		trackConfig.outlineOpacity_HovSel = Util.getXmlFloatInt(xmlOpacity,//
 				ATTR_HOV_AND_SEL,
 				OUTLINE_OPACITY_HOV_SEL_DEFAULT,
 				Map3GradientColorManager.OPACITY_MIN,
@@ -1021,25 +1021,25 @@ public class TourTrackConfigManager {
 
 	private static void parse_430__Opacity(final XMLMemento xmlOpacity, final TourTrackConfig config) {
 
-		config.interiorOpacity = Util.getXmlFloat(xmlOpacity,//
+		config.interiorOpacity = Util.getXmlFloatInt(xmlOpacity,//
 				ATTR_NORMAL,
 				INTERIOR_OPACITY_NORMAL_DEFAULT,
 				Map3GradientColorManager.OPACITY_MIN,
 				Map3GradientColorManager.OPACITY_MAX);
 
-		config.interiorOpacity_Hovered = Util.getXmlFloat(xmlOpacity,//
+		config.interiorOpacity_Hovered = Util.getXmlFloatInt(xmlOpacity,//
 				ATTR_HOVERED,
 				INTERIOR_OPACITY_HOVERED_DEFAULT,
 				Map3GradientColorManager.OPACITY_MIN,
 				Map3GradientColorManager.OPACITY_MAX);
 
-		config.interiorOpacity_Selected = Util.getXmlFloat(xmlOpacity,//
+		config.interiorOpacity_Selected = Util.getXmlFloatInt(xmlOpacity,//
 				ATTR_SELECTED,
 				INTERIOR_OPACITY_SELECTED_DEFAULT,
 				Map3GradientColorManager.OPACITY_MIN,
 				Map3GradientColorManager.OPACITY_MAX);
 
-		config.interiorOpacity_HovSel = Util.getXmlFloat(xmlOpacity,//
+		config.interiorOpacity_HovSel = Util.getXmlFloatInt(xmlOpacity,//
 				ATTR_HOV_AND_SEL,
 				INTERIOR_OPACITY_HOV_SEL_DEFAULT,
 				Map3GradientColorManager.OPACITY_MIN,
@@ -1062,25 +1062,25 @@ public class TourTrackConfigManager {
 
 			final XMLMemento xmlTrackSize = (XMLMemento) mementoTrackSize;
 
-			config.trackPositionSize = Util.getXmlFloat(xmlTrackSize,//
+			config.trackPositionSize = Util.getXmlFloatInt(xmlTrackSize,//
 					ATTR_NORMAL,
 					TRACK_POSITION_SIZE_NORMAL_DEFAULT,
 					TRACK_POSITION_SIZE_MIN,
 					TRACK_POSITION_SIZE_MAX);
 
-			config.trackPositionSize_Hovered = Util.getXmlFloat(xmlTrackSize,//
+			config.trackPositionSize_Hovered = Util.getXmlFloatInt(xmlTrackSize,//
 					ATTR_HOVERED,
 					TRACK_POSITION_SIZE_HOVERED_DEFAULT,
 					TRACK_POSITION_SIZE_MIN,
 					TRACK_POSITION_SIZE_MAX);
 
-			config.trackPositionSize_Selected = Util.getXmlFloat(xmlTrackSize,//
+			config.trackPositionSize_Selected = Util.getXmlFloatInt(xmlTrackSize,//
 					ATTR_SELECTED,
 					TRACK_POSITION_SIZE_SELECTED_DEFAULT,
 					TRACK_POSITION_SIZE_MIN,
 					TRACK_POSITION_SIZE_MAX);
 
-			config.trackPositionSize_HovSel = Util.getXmlFloat(xmlTrackSize,//
+			config.trackPositionSize_HovSel = Util.getXmlFloatInt(xmlTrackSize,//
 					ATTR_HOV_AND_SEL,
 					TRACK_POSITION_SIZE_HOV_SEL_DEFAULT,
 					TRACK_POSITION_SIZE_MIN,
