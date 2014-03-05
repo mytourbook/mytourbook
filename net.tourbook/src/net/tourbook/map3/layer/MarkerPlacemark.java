@@ -390,7 +390,8 @@ public class MarkerPlacemark extends PointPlacemark {
 			dc.getView().pushReferenceCenter(dc, this.placePoint); // draw relative to the place point
 
 			// Pull the arrow triangles forward just a bit to ensure they show over the terrain.
-			dc.pushProjectionOffest(0.99);
+//			dc.pushProjectionOffest(0.99);
+			dc.pushProjectionOffest(1.02);
 
 			this.setLineWidth(dc);
 			this.setLineColor(dc, pickCandidates);
@@ -408,6 +409,7 @@ public class MarkerPlacemark extends PointPlacemark {
 		} finally {
 
 			dc.popProjectionOffest();
+
 			dc.getView().popReferenceCenter(dc);
 		}
 	}
