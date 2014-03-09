@@ -78,13 +78,15 @@ public class GPX_SAX_Handler extends DefaultHandler {
 	private static final String				TAG_GPX_DATA_INDEX			= "gpxdata:index";									//$NON-NLS-1$
 	private static final String				TAG_GPX_DATA_START_TIME		= "gpxdata:startTime";								//$NON-NLS-1$
 	private static final String				TAG_GPX_DATA_ELAPSED_TIME	= "gpxdata:elapsedTime";							//$NON-NLS-1$
-	private static final String				TAG_GPX_DATA_START_POINT	= "gpxdata:startPoint";							//$NON-NLS-1$
+//	private static final String				TAG_GPX_DATA_START_POINT	= "gpxdata:startPoint";							//$NON-NLS-1$
 	private static final String				TAG_GPX_DATA_END_POINT		= "gpxdata:endPoint";								//$NON-NLS-1$
 
 	// Extension element for temperature, heart rate, cadence
 	private static final String				TAG_EXT_CAD					= "gpxtpx:cad";									//$NON-NLS-1$
+	private static final String				TAG_EXT_CAD_1				= "cadence";										//$NON-NLS-1$
 	private static final String				TAG_EXT_HR					= "gpxtpx:hr";										//$NON-NLS-1$
 	private static final String				TAG_EXT_HR_1				= "gpxdata:hr";									//$NON-NLS-1$
+	private static final String				TAG_EXT_HR_2				= "heartrate";										//$NON-NLS-1$
 	private static final String				TAG_EXT_TEMP				= "gpxtpx:atemp";									//$NON-NLS-1$
 	private static final String				TAG_EXT_DISTANCE			= "gpxdata:distance";								//$NON-NLS-1$
 
@@ -306,6 +308,13 @@ public class GPX_SAX_Handler extends DefaultHandler {
 						_isInCadence = false;
 						_timeSlice.cadence = getFloatValue(charData);
 
+					} else if (name.equals(TAG_EXT_CAD_1)) {
+
+						// </cadence>
+
+						_isInCadence = false;
+						_timeSlice.cadence = getIntValue(charData);
+
 					} else if (name.equals(TAG_EXT_HR)) {
 
 						// </gpxtpx:hr>
@@ -313,9 +322,10 @@ public class GPX_SAX_Handler extends DefaultHandler {
 						_isInHr = false;
 						_timeSlice.pulse = getFloatValue(charData);
 
-					} else if (name.equals(TAG_EXT_HR_1)) {
+					} else if (name.equals(TAG_EXT_HR_1) || name.equals(TAG_EXT_HR_2)) {
 
 						// </gpxdata:hr>
+						// </heartrate>
 
 						_isInHr = false;
 						_timeSlice.pulse = getIntValue(charData);
@@ -899,17 +909,12 @@ public class GPX_SAX_Handler extends DefaultHandler {
 						_isInTime = true;
 						_characters.delete(0, _characters.length());
 
-					} else if (name.equals(TAG_EXT_CAD)) {
+					} else if (name.equals(TAG_EXT_CAD) || name.equals(TAG_EXT_CAD_1)) {
 
 						_isInCadence = true;
 						_characters.delete(0, _characters.length());
 
-					} else if (name.equals(TAG_EXT_HR)) {
-
-						_isInHr = true;
-						_characters.delete(0, _characters.length());
-
-					} else if (name.equals(TAG_EXT_HR_1)) {
+					} else if (name.equals(TAG_EXT_HR) || name.equals(TAG_EXT_HR_1) || name.equals(TAG_EXT_HR_2)) {
 
 						_isInHr = true;
 						_characters.delete(0, _characters.length());
