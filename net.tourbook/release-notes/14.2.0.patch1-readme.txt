@@ -1,0 +1,15 @@
+                                                       17. February 2014
+
+Feature
+=======
+This patch can import power and speed data from .tcx files when the data 
+are enclosed in these tags: 
+
+<ns3:Speed>
+<ns3:Watts>
+
+
+Installation
+============
+To install this patch, copy the .jar file into the "plugins" folder 
+where MyTourbook is installed and restart the application. 

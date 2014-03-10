@@ -1,0 +1,17 @@
+                                                           5. March 2014
+
+New Feature
+===========
+This patch can import cadence and heartrate data from .gpx files when 
+the data are enclosed in these tags: 
+
+
+<cadence>
+<heartrate>
+
+
+Installation
+============
+To install this patch, copy the .jar file into the "plugins" folder 
+where MyTourbook is installed and restart the application. 
+
