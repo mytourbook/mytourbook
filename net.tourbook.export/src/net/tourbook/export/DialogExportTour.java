@@ -842,9 +842,11 @@ public class DialogExportTour extends TitleAreaDialog {
 					_numberFormatter.setMinimumFractionDigits(3);
 					_numberFormatter.setMaximumFractionDigits(3);
 
-					tourRangeUI = NLS.bind(Messages.dialog_export_chk_tourRangeWithDistance, new Object[] {
-							uiStartTime,
-							uiEndTime,
+					tourRangeUI = NLS.bind(
+							Messages.dialog_export_chk_tourRangeWithDistance,
+							new Object[] {
+									uiStartTime,
+									uiEndTime,
 
 									_numberFormatter.format(distanceSerie[_tourStartIndex]
 											/ 1000
@@ -854,11 +856,11 @@ public class DialogExportTour extends TitleAreaDialog {
 											/ 1000
 											/ net.tourbook.ui.UI.UNIT_VALUE_DISTANCE),
 
-							UI.UNIT_LABEL_DISTANCE,
+									UI.UNIT_LABEL_DISTANCE,
 
-							// adjust by 1 to corresponds to the number in the tour editor
-							_tourStartIndex + 1,
-							_tourEndIndex + 1 });
+									// adjust by 1 to corresponds to the number in the tour editor
+									_tourStartIndex + 1,
+									_tourEndIndex + 1 });
 
 				} else {
 
@@ -1146,10 +1148,9 @@ public class DialogExportTour extends TitleAreaDialog {
 						for (final TourData tourData : _tourDataList) {
 
 							// get filepath
-							final IPath filePath = exportFilePath
-.append(
-									net.tourbook.ui.UI.format_yyyymmdd_hhmmss(tourData))
-									.addFileExtension(_exportExtensionPoint.getFileExtension());
+							final IPath filePath = exportFilePath.append(
+									net.tourbook.ui.UI.format_yyyymmdd_hhmmss(tourData)).addFileExtension(
+									_exportExtensionPoint.getFileExtension());
 
 							final GarminLap tourLap = createExportLap(tourData, addNotes);
 
@@ -1239,8 +1240,20 @@ public class DialogExportTour extends TitleAreaDialog {
 		final VelocityContext context = new VelocityContext();
 
 		if (_isTCX) {
-			context.put("iscourses", Boolean.valueOf(_rdoTcxCourses.getSelection())); //$NON-NLS-1$
-			context.put("coursename", _comboTcxCourseName.getText()); //$NON-NLS-1$
+
+			final boolean[] isCourses = { false };
+			final String[] courseName = { UI.EMPTY_STRING };
+
+			Display.getDefault().syncExec(new Runnable() {
+				public void run() {
+
+					isCourses[0] = _rdoTcxCourses.getSelection();
+					courseName[0] = _comboTcxCourseName.getText();
+				}
+			});
+
+			context.put("iscourses", Boolean.valueOf(isCourses[0])); //$NON-NLS-1$
+			context.put("coursename", courseName[0]); //$NON-NLS-1$
 		}
 
 		context.put("tracks", garminTracks); //$NON-NLS-1$
