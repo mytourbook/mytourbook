@@ -3130,8 +3130,7 @@ public class TourDatabase {
 
 			while (result.next()) {
 
-				System.out.println(net.tourbook.common.UI.timeStampNano()
-						+ " \tcolumn name is available: " //$NON-NLS-1$
+				System.out.println(net.tourbook.common.UI.timeStampNano() + " \tcolumn name is available: " //$NON-NLS-1$
 						+ result.getString("COLUMN_NAME")); //$NON-NLS-1$
 				// TODO remove SYSTEM.OUT.PRINTLN
 
@@ -4668,7 +4667,7 @@ public class TourDatabase {
 				exec(stmt, sqlTourData);
 			}
 		}
-		
+
 		stmt.close();
 
 		logDbUpdateEnd(newDbVersion);
