@@ -6,7 +6,8 @@ Bundle-Version: 14.2.0.qualifier
 Bundle-Activator: net.tourbook.common.CommonActivator
 Bundle-Vendor: MyTourbook
 Require-Bundle: org.eclipse.ui,
- org.eclipse.core.runtime
+ org.eclipse.core.runtime,
+ net.tourbook.ext.worldwind_2.0_src;bundle-version="2.0.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Export-Package: cop.swt.widgets.viewers.table.celleditors,
@@ -19,6 +20,7 @@ Export-Package: cop.swt.widgets.viewers.table.celleditors,
  net.tourbook.common.tooltip,
  net.tourbook.common.util,
  net.tourbook.common.weather,
- net.tourbook.common.widgets
+ net.tourbook.common.widgets,
+ net.tourbook.opengl
 Import-Package: gnu.trove.map.hash,
  org.joda.time

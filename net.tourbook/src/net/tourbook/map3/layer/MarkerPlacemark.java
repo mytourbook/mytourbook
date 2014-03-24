@@ -377,6 +377,7 @@ public class MarkerPlacemark extends PointPlacemark {
 	 */
 	@Override
 	protected void drawLine(final DrawContext dc, final PickSupport pickCandidates) {
+
 		final GL2 gl = dc.getGL().getGL2(); // GL initialization checks for GL2 compatibility.
 
 		if ((!dc.isDeepPickingEnabled())) {
@@ -387,11 +388,16 @@ public class MarkerPlacemark extends PointPlacemark {
 
 		try {
 
+//			System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
+//					+ ("\t\tMarker line:\t" + placePoint + "\t" + terrainPoint.subtract3(placePoint)));
+//			System.out.println();
+//			// TODO remove SYSTEM.OUT.PRINTLN
+
 			dc.getView().pushReferenceCenter(dc, this.placePoint); // draw relative to the place point
 
 			// Pull the arrow triangles forward just a bit to ensure they show over the terrain.
-//			dc.pushProjectionOffest(0.99);
-			dc.pushProjectionOffest(1.02);
+			dc.pushProjectionOffest(0.99);
+//			dc.pushProjectionOffest(1.02);
 
 			this.setLineWidth(dc);
 			this.setLineColor(dc, pickCandidates);
@@ -433,7 +439,7 @@ public class MarkerPlacemark extends PointPlacemark {
 	protected void makeOrderedRenderable(final DrawContext dc) {
 
 //		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
-//				+ ("\tmake... " + _counterMake++)
+//				+ ("\tmake... " + _counterMake.incrementAndGet())
 //				+ ("\tframe: " + dc.getFrameTimeStamp())
 //				+ ("\tisPickingMode: " + dc.isPickingMode())
 //				+ ("\tisOrderedRenderingMode: " + dc.isOrderedRenderingMode())

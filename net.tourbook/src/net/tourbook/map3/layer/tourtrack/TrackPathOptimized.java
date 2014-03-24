@@ -767,6 +767,10 @@ public class TrackPathOptimized extends MTMultiResolutionPath implements ITrackP
 	@Override
 	protected void fillVBO(final DrawContext dc) {
 
+//		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
+//				+ ("\tfillVBO " + dc.getFrameTimeStamp()));
+//		// TODO remove SYSTEM.OUT.PRINTLN
+
 		final TourTrackConfig config = TourTrackConfigManager.getActiveConfig();
 		final PathData pathData = getCurrentPathData();
 

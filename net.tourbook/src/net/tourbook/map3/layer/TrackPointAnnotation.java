@@ -22,6 +22,7 @@ import gov.nasa.worldwind.geom.Vec4;
 import gov.nasa.worldwind.render.DrawContext;
 import gov.nasa.worldwind.render.GlobeAnnotation;
 import gov.nasa.worldwind.render.Polyline;
+import gov.nasa.worldwind.util.OGLStackHandler;
 
 import java.awt.Color;
 
@@ -31,6 +32,7 @@ import javax.media.opengl.GL2;
 import net.tourbook.map3.layer.tourtrack.TourTrackConfig;
 import net.tourbook.map3.layer.tourtrack.TourTrackConfigManager;
 import net.tourbook.map3.view.Map3View;
+import net.tourbook.opengl.GLTools;
 
 public class TrackPointAnnotation extends GlobeAnnotation {
 
@@ -43,6 +45,8 @@ public class TrackPointAnnotation extends GlobeAnnotation {
 
 	@Override
 	protected void doRenderNow(final DrawContext dc) {
+
+		GLTools.dumpModelViewPerspective(dc);
 
 		if (dc.isPickingMode() && this.getPickSupport() == null) {
 			return;
@@ -57,15 +61,9 @@ public class TrackPointAnnotation extends GlobeAnnotation {
 			return;
 		}
 
-		final Vec4 screenPoint = dc.getView().project(annotationPoint);
-		if (screenPoint == null) {
+		final Vec4 screenAnnotationPoint = dc.getView().project(annotationPoint);
+		if (screenAnnotationPoint == null) {
 			return;
-		}
-
-		// Compute a terrain point if needed.
-		Vec4 terrainPoint = null;
-		if (this.altitudeMode != WorldWind.CLAMP_TO_GROUND) {
-			terrainPoint = dc.computeTerrainPoint(position.getLatitude(), position.getLongitude(), 0);
 		}
 
 		final java.awt.Dimension size = this.getPreferredSize(dc);
@@ -74,21 +72,50 @@ public class TrackPointAnnotation extends GlobeAnnotation {
 		// Scale and opacity depending on distance from eye
 		final double[] scaleAndOpacity = computeDistanceScaleAndOpacity(dc, annotationPoint, size);
 
-		this.setDepthFunc(dc, screenPoint);
+		this.setDepthFunc(dc, screenAnnotationPoint);
 
 		this.drawTopLevelAnnotation(
 				dc,
-				(int) screenPoint.x,
-				(int) screenPoint.y,
+				(int) screenAnnotationPoint.x,
+				(int) screenAnnotationPoint.y,
 				size.width,
 				size.height,
 				scaleAndOpacity[0],
 				scaleAndOpacity[1],
 				pos);
 
-// is not working
-		if (terrainPoint != null) {
-			drawLine(dc, annotationPoint, terrainPoint);
+		drawLine(dc, screenAnnotationPoint);
+	}
+
+	private void drawLine(final DrawContext dc, final Vec4 screenPlacePoint) {
+
+		// Compute a terrain point if needed.
+		Vec4 terrainPoint = null;
+		if (this.altitudeMode != WorldWind.CLAMP_TO_GROUND) {
+			terrainPoint = dc.computeTerrainPoint(position.getLatitude(), position.getLongitude(), 0);
+		}
+		if (terrainPoint == null) {
+			return;
+		}
+
+		final Vec4 screenTerrainPoint = dc.getView().project(terrainPoint);
+		if (screenTerrainPoint == null) {
+			return;
+		}
+
+//		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
+//				+ ("\tscreenPlacePoint: " + screenPlacePoint)
+//				+ ("\tscreenTerrainPoint: " + screenTerrainPoint));
+//		// TODO remove SYSTEM.OUT.PRINTLN
+
+		final OGLStackHandler stackHandler = new OGLStackHandler();
+		this.beginDraw(dc, stackHandler);
+
+		try {
+//			this.applyScreenTransform(dc, x, y, width, height, scale);
+//			this.draw(dc, width, height, opacity, pickPosition);
+		} finally {
+			this.endDraw(dc, stackHandler);
 		}
 	}
 
@@ -102,27 +129,34 @@ public class TrackPointAnnotation extends GlobeAnnotation {
 	 * @param pickCandidates
 	 *            the pick support object to use when adding this as a pick candidate.
 	 */
-	protected void drawLine(final DrawContext dc, final Vec4 placePoint, final Vec4 terrainPoint) {
+	private void drawLine_OLD(final DrawContext dc, final Vec4 placePoint, final Vec4 terrainPoint) {
 
 		final GL2 gl = dc.getGL().getGL2(); // GL initialization checks for GL2 compatibility.
 
-		// Do not depth buffer the label. (Placemarks beyond the horizon are culled above.)
-		gl.glDisable(GL.GL_DEPTH_TEST);
-		gl.glDepthMask(false);
+//		// Do not depth buffer the label. (Placemarks beyond the horizon are culled above.)
+//		gl.glDisable(GL.GL_DEPTH_TEST);
+//		gl.glDepthMask(false);
 
 //		gl.glDepthFunc(GL.GL_ALWAYS);
 //		gl.glDisable(GL.GL_DEPTH_TEST);
 
-//		if ((!dc.isDeepPickingEnabled())) {
-//			gl.glEnable(GL.GL_DEPTH_TEST);
-//		}
-////		gl.glDepthFunc(GL.GL_LEQUAL);
+		if ((!dc.isDeepPickingEnabled())) {
+			gl.glEnable(GL.GL_DEPTH_TEST);
+		}
+		gl.glDepthFunc(GL.GL_LEQUAL);
 //		gl.glDepthFunc(GL.GL_ALWAYS);
-//		gl.glDepthMask(true);
+		gl.glDepthMask(true);
 
 		try {
 
+//			System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
+//					+ ("\tTrack line:\t" + placePoint + "\t" + terrainPoint.subtract3(placePoint)));
+//			// TODO remove SYSTEM.OUT.PRINTLN
+
 			dc.getView().pushReferenceCenter(dc, placePoint); // draw relative to the place point
+
+			// Pull the arrow triangles forward just a bit to ensure they show over the terrain.
+			dc.pushProjectionOffest(0.95);
 
 			this.setLineWidth(dc);
 			this.setLineColor(dc);
@@ -138,6 +172,8 @@ public class TrackPointAnnotation extends GlobeAnnotation {
 			gl.glEnd();
 
 		} finally {
+
+			dc.popProjectionOffest();
 
 			dc.getView().popReferenceCenter(dc);
 		}
@@ -156,7 +192,7 @@ public class TrackPointAnnotation extends GlobeAnnotation {
 		if (!dc.isPickingMode()) {
 
 //			Color color = this.getActiveAttributes().getLineColor();
-			final Color color = Color.WHITE;
+			final Color color = Color.GREEN;
 
 //			if (color == null) {
 //				color = PointPlacemarkAttributes.DEFAULT_LINE_COLOR;
