@@ -26,14 +26,11 @@ import net.tourbook.common.UI;
 
 public class GLTools {
 
-//	private static final NumberFormat	_nf	= NumberFormat.getNumberInstance();
-	private static DecimalFormat	_nf	= new DecimalFormat();
+	private static DecimalFormat	_logFormat	= new DecimalFormat();
 
 	static {
-//		_nf.setMinimumFractionDigits(6);
-//		_nf.setMaximumFractionDigits(6);
-		_nf.applyPattern("#.######");
-		_nf.setPositivePrefix(" ");
+		_logFormat.applyPattern("#.######");
+		_logFormat.setPositivePrefix(" ");
 	}
 
 // Dump depth settings
@@ -58,8 +55,6 @@ public class GLTools {
 
 	private static String dumpMatrix(final FloatBuffer buffer) {
 
-		buffer.rewind();
-
 		final String dump = String.format("\n"
 		//
 				+ "%-12s %-12s %-12s %-12s\n"
@@ -67,25 +62,82 @@ public class GLTools {
 				+ "%-12s %-12s %-12s %-12s\n"
 				+ "%-12s %-12s %-12s %-12s\n",
 		//
-				_nf.format(buffer.get(0)),
-				_nf.format(buffer.get(4)),
-				_nf.format(buffer.get(8)),
-				_nf.format(buffer.get(12)),
+				_logFormat.format(buffer.get(0)),
+				_logFormat.format(buffer.get(4)),
+				_logFormat.format(buffer.get(8)),
+				_logFormat.format(buffer.get(12)),
 				//
-				_nf.format(buffer.get(1)),
-				_nf.format(buffer.get(5)),
-				_nf.format(buffer.get(6)),
-				_nf.format(buffer.get(13)),
+				_logFormat.format(buffer.get(1)),
+				_logFormat.format(buffer.get(5)),
+				_logFormat.format(buffer.get(6)),
+				_logFormat.format(buffer.get(13)),
 				//
-				_nf.format(buffer.get(2)),
-				_nf.format(buffer.get(6)),
-				_nf.format(buffer.get(10)),
-				_nf.format(buffer.get(14)),
+				_logFormat.format(buffer.get(2)),
+				_logFormat.format(buffer.get(6)),
+				_logFormat.format(buffer.get(10)),
+				_logFormat.format(buffer.get(14)),
 				//
-				_nf.format(buffer.get(3)),
-				_nf.format(buffer.get(7)),
-				_nf.format(buffer.get(11)),
-				_nf.format(buffer.get(15))
+				_logFormat.format(buffer.get(3)),
+				_logFormat.format(buffer.get(7)),
+				_logFormat.format(buffer.get(11)),
+				_logFormat.format(buffer.get(15))
+		//
+				);
+
+		return dump;
+	}
+
+	private static String dumpMatrix_MVP(final FloatBuffer bufferMV, final FloatBuffer bufferP) {
+
+		final String dump = String.format("\n%-52s\t\t\t%-52s\n"
+		//
+				+ "%-12s %-12s %-12s %-12s\t\t\t%-12s %-12s %-12s %-12s\n"
+				+ "%-12s %-12s %-12s %-12s\t\t\t%-12s %-12s %-12s %-12s\n"
+				+ "%-12s %-12s %-12s %-12s\t\t\t%-12s %-12s %-12s %-12s\n"
+				+ "%-12s %-12s %-12s %-12s\t\t\t%-12s %-12s %-12s %-12s\n",
+		//
+				"GL_MODELVIEW_MATRIX",
+				"GL_PROJECTION_MATRIX",
+				//
+				_logFormat.format(bufferMV.get(0)),
+				_logFormat.format(bufferMV.get(4)),
+				_logFormat.format(bufferMV.get(8)),
+				_logFormat.format(bufferMV.get(12)),
+				//
+				_logFormat.format(bufferP.get(0)),
+				_logFormat.format(bufferP.get(4)),
+				_logFormat.format(bufferP.get(8)),
+				_logFormat.format(bufferP.get(12)),
+				//
+				_logFormat.format(bufferMV.get(1)),
+				_logFormat.format(bufferMV.get(5)),
+				_logFormat.format(bufferMV.get(6)),
+				_logFormat.format(bufferMV.get(13)),
+				//
+				_logFormat.format(bufferP.get(1)),
+				_logFormat.format(bufferP.get(5)),
+				_logFormat.format(bufferP.get(6)),
+				_logFormat.format(bufferP.get(13)),
+				//
+				_logFormat.format(bufferMV.get(2)),
+				_logFormat.format(bufferMV.get(6)),
+				_logFormat.format(bufferMV.get(10)),
+				_logFormat.format(bufferMV.get(14)),
+				//
+				_logFormat.format(bufferP.get(2)),
+				_logFormat.format(bufferP.get(6)),
+				_logFormat.format(bufferP.get(10)),
+				_logFormat.format(bufferP.get(14)),
+				//
+				_logFormat.format(bufferMV.get(3)),
+				_logFormat.format(bufferMV.get(7)),
+				_logFormat.format(bufferMV.get(11)),
+				_logFormat.format(bufferMV.get(15)),
+				//
+				_logFormat.format(bufferP.get(3)),
+				_logFormat.format(bufferP.get(7)),
+				_logFormat.format(bufferP.get(11)),
+				_logFormat.format(bufferP.get(15))
 		//
 				);
 
@@ -106,9 +158,7 @@ public class GLTools {
 		gl.glGetFloatv(GL2.GL_PROJECTION_MATRIX, perspective);
 
 		System.out.println((UI.timeStampNano() + " [" + GLTools.class.getSimpleName() + "] ")
-				+ ("\tGL_MODELVIEW_MATRIX:\t" + dumpMatrix(modelview)));
+				+ dumpMatrix_MVP(modelview, perspective));
 
-		System.out.println((UI.timeStampNano() + " [" + GLTools.class.getSimpleName() + "] ")
-				+ ("\tGL_PROJECTION_MATRIX:\t" + dumpMatrix(perspective)));
 	}
 }

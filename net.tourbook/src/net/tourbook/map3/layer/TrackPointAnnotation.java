@@ -15,8 +15,10 @@
  *******************************************************************************/
 package net.tourbook.map3.layer;
 
+import gov.nasa.worldwind.View;
 import gov.nasa.worldwind.WorldWind;
 import gov.nasa.worldwind.geom.LatLon;
+import gov.nasa.worldwind.geom.Matrix;
 import gov.nasa.worldwind.geom.Position;
 import gov.nasa.worldwind.geom.Vec4;
 import gov.nasa.worldwind.render.DrawContext;
@@ -46,7 +48,7 @@ public class TrackPointAnnotation extends GlobeAnnotation {
 	@Override
 	protected void doRenderNow(final DrawContext dc) {
 
-		GLTools.dumpModelViewPerspective(dc);
+//		GLTools.dumpModelViewPerspective(dc);
 
 		if (dc.isPickingMode() && this.getPickSupport() == null) {
 			return;
@@ -84,10 +86,53 @@ public class TrackPointAnnotation extends GlobeAnnotation {
 				scaleAndOpacity[1],
 				pos);
 
-		drawLine(dc, screenAnnotationPoint);
+		drawLine(dc, annotationPoint);
 	}
 
-	private void drawLine(final DrawContext dc, final Vec4 screenPlacePoint) {
+	private void drawLine(final DrawContext dc, final Vec4 annotationPoint) {
+
+
+		final GL2 gl = dc.getGL().getGL2();
+		final OGLStackHandler ogsh = new OGLStackHandler();
+
+		try {
+
+			/*
+			 * Current modelview is identity, load default modelview
+			 */
+
+			GLTools.dumpModelViewPerspective(dc);
+
+			final double[] matrixArray = new double[16];
+
+			final View view = dc.getView();
+			final Matrix modelviewMatrix = view.getModelviewMatrix();
+			final Matrix projectionMatrix = view.getProjectionMatrix();
+
+			ogsh.pushAttrib(gl, GL2.GL_TRANSFORM_BIT);
+
+			// set default model-view matrix
+			ogsh.pushModelview(gl);
+			modelviewMatrix.toArray(matrixArray, 0, false);
+			gl.glLoadMatrixd(matrixArray, 0);
+
+			// set default projection matrix
+			ogsh.pushProjection(gl);
+			projectionMatrix.toArray(matrixArray, 0, false);
+			gl.glLoadMatrixd(matrixArray, 0);
+
+			GLTools.dumpModelViewPerspective(dc);
+
+			drawLine_Line(dc, annotationPoint);
+
+		} finally {
+
+			ogsh.pop(gl);
+		}
+
+	}
+
+	private void drawLine_Line(final DrawContext dc, final Vec4 annotationPoint) {
 
 		// Compute a terrain point if needed.
 		Vec4 terrainPoint = null;
@@ -98,38 +143,15 @@ public class TrackPointAnnotation extends GlobeAnnotation {
 			return;
 		}
 
-		final Vec4 screenTerrainPoint = dc.getView().project(terrainPoint);
-		if (screenTerrainPoint == null) {
-			return;
-		}
-
+//		final Vec4 screenTerrainPoint = dc.getView().project(terrainPoint);
+//		if (screenTerrainPoint == null) {
+//			return;
+//		}
+//
 //		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
 //				+ ("\tscreenPlacePoint: " + screenPlacePoint)
 //				+ ("\tscreenTerrainPoint: " + screenTerrainPoint));
 //		// TODO remove SYSTEM.OUT.PRINTLN
-
-		final OGLStackHandler stackHandler = new OGLStackHandler();
-		this.beginDraw(dc, stackHandler);
-
-		try {
-//			this.applyScreenTransform(dc, x, y, width, height, scale);
-//			this.draw(dc, width, height, opacity, pickPosition);
-		} finally {
-			this.endDraw(dc, stackHandler);
-		}
-	}
-
-	/**
-	 * Draws the placemark's line.
-	 * 
-	 * @param dc
-	 *            the current draw context.
-	 * @param placePoint
-	 * @param terrainPoint
-	 * @param pickCandidates
-	 *            the pick support object to use when adding this as a pick candidate.
-	 */
-	private void drawLine_OLD(final DrawContext dc, final Vec4 placePoint, final Vec4 terrainPoint) {
 
 		final GL2 gl = dc.getGL().getGL2(); // GL initialization checks for GL2 compatibility.
 
@@ -153,7 +175,7 @@ public class TrackPointAnnotation extends GlobeAnnotation {
 //					+ ("\tTrack line:\t" + placePoint + "\t" + terrainPoint.subtract3(placePoint)));
 //			// TODO remove SYSTEM.OUT.PRINTLN
 
-			dc.getView().pushReferenceCenter(dc, placePoint); // draw relative to the place point
+			dc.getView().pushReferenceCenter(dc, annotationPoint); // draw relative to the place point
 
 			// Pull the arrow triangles forward just a bit to ensure they show over the terrain.
 			dc.pushProjectionOffest(0.95);
@@ -165,9 +187,9 @@ public class TrackPointAnnotation extends GlobeAnnotation {
 			{
 				gl.glVertex3d(Vec4.ZERO.x, Vec4.ZERO.y, Vec4.ZERO.z);
 				gl.glVertex3d(//
-						terrainPoint.x - placePoint.x,
-						terrainPoint.y - placePoint.y,
-						terrainPoint.z - placePoint.z);
+						terrainPoint.x - annotationPoint.x,
+						terrainPoint.y - annotationPoint.y,
+						terrainPoint.z - annotationPoint.z);
 			}
 			gl.glEnd();
 
