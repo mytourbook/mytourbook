@@ -17,14 +17,17 @@ package net.tourbook.opengl;
 
 import gov.nasa.worldwind.render.DrawContext;
 
+import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
+import java.nio.IntBuffer;
 import java.text.DecimalFormat;
 
+import javax.media.opengl.GL;
 import javax.media.opengl.GL2;
 
 import net.tourbook.common.UI;
 
-public class GLTools {
+public class GLLogger {
 
 	private static DecimalFormat	_logFormat	= new DecimalFormat();
 
@@ -32,26 +35,6 @@ public class GLTools {
 		_logFormat.applyPattern("#.######");
 		_logFormat.setPositivePrefix(" ");
 	}
-
-// Dump depth settings
-//
-//			final ByteBuffer writeMask = ByteBuffer.allocate(2);
-//			gl.glGetBooleanv(GL.GL_DEPTH_WRITEMASK, writeMask);
-//
-//			final FloatBuffer depthRange = FloatBuffer.allocate(10);
-//			gl.glGetFloatv(GL.GL_DEPTH_RANGE, depthRange);
-//
-//			final IntBuffer depthFunc = IntBuffer.allocate(1);
-//			gl.glGetIntegerv(GL.GL_DEPTH_FUNC, depthFunc);
-//
-//			System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
-//					+ ("\tGL_DEPTH_TEST: " + gl.glIsEnabled(GL.GL_DEPTH_TEST))
-//					+ ("\tRange: " + depthRange.get(0) + "\t" + depthRange.get(1))
-//					+ ("\tGL_DEPTH_WRITEMASK: " + writeMask.get(0))
-//					+ ("\tGL_DEPTH_FUNC: " + depthFunc.get(0))
-////
-//					);
-//			// TODO remove SYSTEM.OUT.PRINTLN
 
 	private static String dumpMatrix(final FloatBuffer buffer) {
 
@@ -144,10 +127,83 @@ public class GLTools {
 		return dump;
 	}
 
+	private static String getGLErrors(final DrawContext dc) {
+
+		final GL gl = dc.getGL();
+
+		String errors = UI.EMPTY_STRING;
+
+		for (int glError = gl.glGetError(); glError != GL.GL_NO_ERROR; glError = gl.glGetError()) {
+			errors = dc.getGLU().gluErrorString(glError) + glError + "\t";
+		}
+
+		return errors;
+	}
+
+	/**
+	 * Log depth settings.
+	 * 
+	 * @param dc
+	 * @param logId
+	 */
+	public static void logDepth(final DrawContext dc, final String logId) {
+
+		final GL gl = dc.getGL();
+
+		final ByteBuffer writeMask = ByteBuffer.allocate(2);
+		gl.glGetBooleanv(GL.GL_DEPTH_WRITEMASK, writeMask);
+
+		final FloatBuffer depthRange = FloatBuffer.allocate(10);
+		gl.glGetFloatv(GL.GL_DEPTH_RANGE, depthRange);
+
+		final IntBuffer depthFunc = IntBuffer.allocate(1);
+		gl.glGetIntegerv(GL.GL_DEPTH_FUNC, depthFunc);
+
+		System.out.println((UI.timeStampNano() + " [" + logId + "] ")
+				+ ("\tGL_DEPTH_TEST: " + gl.glIsEnabled(GL.GL_DEPTH_TEST))
+				+ ("\tGL_DEPTH_WRITEMASK: " + writeMask.get(0))
+				+ ("\tGL_DEPTH_FUNC: " + depthFunc.get(0))
+				+ ("\tRange: " + _logFormat.format(depthRange.get(0)) + "\t" + _logFormat.format(depthRange.get(1)))
+		//
+				);
+	}
+
+	/**
+	 * Called to check for openGL errors. This method includes a "round-trip" between the
+	 * application and renderer, which is slow. Therefore, this method is excluded from the "normal"
+	 * render pass. It is here as a matter of convenience to developers, and is not part of the API.
+	 * 
+	 * @param dc
+	 *            the relevant <code>DrawContext</code>
+	 * @param logId
+	 */
+	public static void logGLErrors(final DrawContext dc, final String logId) {
+
+		// This is a copy from gov.nasa.worldwind.AbstractSceneController.checkGLErrors(DrawContext)
+
+		final GL gl = dc.getGL();
+
+		boolean isError = false;
+
+		for (int err = gl.glGetError(); err != GL.GL_NO_ERROR; err = gl.glGetError()) {
+
+			isError = true;
+
+			String msg = dc.getGLU().gluErrorString(err);
+			msg += err;
+
+			System.out.println((UI.timeStampNano() + " [" + logId + "]\t") + msg);
+		}
+
+		if (isError == false) {
+			System.out.println((UI.timeStampNano() + " [" + logId + "]\tNo OpenGL error") + ("\t"));
+		}
+	}
+
 	/**
 	 * Dumps the current modelview and perspective.
 	 */
-	public static void dumpModelViewPerspective(final DrawContext dc) {
+	public static void logModelViewPerspective(final DrawContext dc) {
 
 		final GL2 gl = dc.getGL().getGL2();
 
@@ -157,8 +213,30 @@ public class GLTools {
 		final FloatBuffer perspective = FloatBuffer.allocate(16);
 		gl.glGetFloatv(GL2.GL_PROJECTION_MATRIX, perspective);
 
-		System.out.println((UI.timeStampNano() + " [" + GLTools.class.getSimpleName() + "] ")
+		System.out.println((UI.timeStampNano() + " [" + GLLogger.class.getSimpleName() + "]\t")
 				+ dumpMatrix_MVP(modelview, perspective));
+	}
 
+	/**
+	 * Dumps the current modelview and perspective.
+	 */
+	public static void logStack(final DrawContext dc, final String logId) {
+
+		final GL2 gl = dc.getGL().getGL2();
+
+		final IntBuffer depthModel = IntBuffer.allocate(1);
+		final IntBuffer depthPerspective = IntBuffer.allocate(1);
+
+		gl.glGetIntegerv(GL2.GL_MODELVIEW_STACK_DEPTH, depthModel);
+		gl.glGetIntegerv(GL2.GL_PROJECTION_STACK_DEPTH, depthPerspective);
+
+		System.out.println((UI.timeStampNano() + " [" + logId + "]\t")
+				+ ("GL_MODELVIEW_STACK_DEPTH:\t" + depthModel.get(0))
+				+ "\t\t"
+				+ ("GL_PROJECTION_STACK_DEPTH:\t" + depthPerspective.get(0))
+				+ "\t"
+				+ getGLErrors(dc)
+		//
+				);
 	}
 }

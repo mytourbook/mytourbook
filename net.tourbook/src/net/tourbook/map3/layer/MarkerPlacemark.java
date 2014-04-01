@@ -258,6 +258,7 @@ public class MarkerPlacemark extends PointPlacemark {
 			if (this.mustDrawLabel() && !dc.isPickingMode()) {
 				this.drawLabel(dc);
 			}
+
 		} finally {
 			if (dc.isPickingMode()) {
 				gl.glTexEnvf(GL2.GL_TEXTURE_ENV, GL2.GL_TEXTURE_ENV_MODE, OGLUtil.DEFAULT_TEX_ENV_MODE);
@@ -343,11 +344,11 @@ public class MarkerPlacemark extends PointPlacemark {
 		}
 
 		// Do not depth buffer the label. (Placemarks beyond the horizon are culled above.)
-//		gl.glDisable(GL.GL_DEPTH_TEST);
-//		gl.glDepthMask(false);
-		gl.glEnable(GL.GL_DEPTH_TEST);
-		gl.glDepthFunc(GL.GL_LEQUAL);
-		gl.glDepthMask(true);
+		gl.glDisable(GL.GL_DEPTH_TEST);
+		gl.glDepthMask(false);
+//		gl.glEnable(GL.GL_DEPTH_TEST);
+//		gl.glDepthFunc(GL.GL_LEQUAL);
+//		gl.glDepthMask(true);
 
 		final TextRenderer textRenderer = OGLTextRenderer.getOrCreateTextRenderer(dc.getTextRendererCache(), font);
 		try {
@@ -385,6 +386,7 @@ public class MarkerPlacemark extends PointPlacemark {
 		}
 		gl.glDepthFunc(GL.GL_LEQUAL);
 		gl.glDepthMask(true);
+//		gl.glDepthMask(false);
 
 		try {
 
@@ -396,11 +398,17 @@ public class MarkerPlacemark extends PointPlacemark {
 			dc.getView().pushReferenceCenter(dc, this.placePoint); // draw relative to the place point
 
 			// Pull the arrow triangles forward just a bit to ensure they show over the terrain.
-			dc.pushProjectionOffest(0.99);
+//			dc.pushProjectionOffest(0.99);
 //			dc.pushProjectionOffest(1.02);
 
 			this.setLineWidth(dc);
 			this.setLineColor(dc, pickCandidates);
+
+//			System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
+//					+ ("\t\t" + dc.getFrameTimeStamp()));
+//			GLLogger.logDepth(dc, getClass().getSimpleName());
+////			GLLogger.logModelViewPerspective(dc);
+//			// TODO remove SYSTEM.OUT.PRINTLN
 
 			gl.glBegin(GL2.GL_LINE_STRIP);
 			{
@@ -409,76 +417,20 @@ public class MarkerPlacemark extends PointPlacemark {
 						this.terrainPoint.x - this.placePoint.x,
 						this.terrainPoint.y - this.placePoint.y,
 						this.terrainPoint.z - this.placePoint.z);
+
+				gl.glVertex3d(14, Vec4.ZERO.y, Vec4.ZERO.z);
+				gl.glVertex3d(
+						this.terrainPoint.x + 14 - this.placePoint.x,
+						this.terrainPoint.y - this.placePoint.y,
+						this.terrainPoint.z - this.placePoint.z);
 			}
 			gl.glEnd();
 
 		} finally {
 
-			dc.popProjectionOffest();
+//			dc.popProjectionOffest();
 
 			dc.getView().popReferenceCenter(dc);
-		}
-	}
-
-	@Override
-	protected void drawOrderedRenderable(final DrawContext dc) {
-
-//		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
-//				+ ("\tdraw... " + _counterDraw.incrementAndGet())
-//				+ ("\tframe: " + dc.getFrameTimeStamp())
-//				+ ("\tisPickingMode: " + dc.isPickingMode())
-//				+ ("\tisOrderedRenderingMode: " + dc.isOrderedRenderingMode())
-//		//
-//				);
-//		// TODO remove SYSTEM.OUT.PRINTLN
-
-		super.drawOrderedRenderable(dc);
-	}
-
-	@Override
-	protected void makeOrderedRenderable(final DrawContext dc) {
-
-//		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
-//				+ ("\tmake... " + _counterMake.incrementAndGet())
-//				+ ("\tframe: " + dc.getFrameTimeStamp())
-//				+ ("\tisPickingMode: " + dc.isPickingMode())
-//				+ ("\tisOrderedRenderingMode: " + dc.isOrderedRenderingMode())
-//		//
-//				);
-//		// TODO remove SYSTEM.OUT.PRINTLN
-
-		super.makeOrderedRenderable(dc);
-	}
-
-	private void setDepthFunc(final DrawContext dc, final Vec4 screenPoint) {
-
-		final GL gl = dc.getGL();
-
-		final Position eyePos = dc.getView().getEyePosition();
-		if (eyePos == null) {
-			gl.glDepthFunc(GL.GL_ALWAYS);
-			return;
-		}
-
-		final double altitude = eyePos.getElevation();
-		final double maxAltitude = dc.getGlobe().getMaxElevation() * dc.getVerticalExaggeration();
-
-		if (altitude < maxAltitude) {
-
-			double depth = screenPoint.z - (8d * 0.00048875809d);
-			depth = depth < 0d ? 0d : (depth > 1d ? 1d : depth);
-
-			gl.glDepthFunc(GL.GL_LESS);
-			gl.glDepthRange(depth, depth);
-
-		} else if (screenPoint.z >= 1d) {
-
-			gl.glDepthFunc(GL.GL_EQUAL);
-			gl.glDepthRange(1d, 1d);
-
-		} else {
-
-			gl.glDepthFunc(GL.GL_ALWAYS);
 		}
 	}
 

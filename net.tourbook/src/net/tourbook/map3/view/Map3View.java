@@ -1782,6 +1782,8 @@ public class Map3View extends ViewPart implements ITourProvider {
 				setAnnotationPosition(trackPoint, tourData, hoveredPositionIndex);
 				setAnnotationColors(tourData, hoveredPositionIndex, trackPoint);
 
+//				final TrackPointLine trackPointLine = tourInfoLayer.getHoveredTrackPointLine();
+
 				tourInfoLayer.setTrackPointVisible(true);
 			}
 		}
