@@ -456,20 +456,13 @@ public class HAC4DeviceReader extends TourbookDevice {
 					}
 				}
 
-				// after all data are added, the tour id can be created
-				final Long tourId = tourData.createTourId(//
-						Integer.toString((int) Math.abs(tourData.getStartDistance())));
+				/*
+				 * disable data series when no data are available
+				 */
+				if (timeDataList.size() > 0) {
 
-				// check if the tour is in the tour map
-				if (alreadyImportedTours.containsKey(tourId) == false && timeDataList.size() > 0) {
-
-					// add new tour to the map
-					newlyImportedTours.put(tourId, tourData);
-
-					/*
-					 * disable data series when no data are available
-					 */
 					final TimeData firstTimeData = timeDataList.get(0);
+
 					if (sumDistance == 0) {
 						firstTimeData.distance = Float.MIN_VALUE;
 					}
@@ -482,18 +475,31 @@ public class HAC4DeviceReader extends TourbookDevice {
 					if (sumCadence == 0) {
 						firstTimeData.cadence = Float.MIN_VALUE;
 					}
+				}
+				
+				tourData.createTimeSeries(timeDataList, true);
+				tourData.setTourType(defaultTourType);
+				
+				tourData.setDeviceId(deviceId);
+				tourData.setDeviceName(visibleName);
 
-					tourData.createTimeSeries(timeDataList, true);
-					tourData.setTourType(defaultTourType);
+				final Short profileId = Short.valueOf(tourData.getDeviceTourType(), 16);
+				tourData.setDeviceMode(profileId);
+				tourData.setDeviceModeName(getDeviceModeName(profileId));
+
+				// after all data are added, the tour id can be created
+				final int tourIdSuffix = (int) Math.abs(tourData.getStartDistance());
+				final String uniqueId = createUniqueIdSuffix(tourData, tourIdSuffix);
+				final Long tourId = tourData.createTourId(uniqueId);
+
+				// check if the tour is in the tour map
+				if (alreadyImportedTours.containsKey(tourId) == false) {
+
+					// add new tour to the map
+					newlyImportedTours.put(tourId, tourData);
+
 					tourData.computeTourDrivingTime();
 					tourData.computeComputedValues();
-
-					tourData.setDeviceId(deviceId);
-					tourData.setDeviceName(visibleName);
-
-					final Short profileId = Short.valueOf(tourData.getDeviceTourType(), 16);
-					tourData.setDeviceMode(profileId);
-					tourData.setDeviceModeName(getDeviceModeName(profileId));
 				}
 
 				// tourData.dumpTourTotal();

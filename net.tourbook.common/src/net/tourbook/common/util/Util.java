@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -64,6 +64,7 @@ public class Util {
 	private static final String	URL_SPACE								= " ";					//$NON-NLS-1$
 	private static final String	URL_SPACE_REPLACEMENT					= "%20";				//$NON-NLS-1$
 
+//	public static final String	UNIQUE_ID_SUFFIX_CICLO_TOUR				= "83582";				//$NON-NLS-1$
 	public static final String	UNIQUE_ID_SUFFIX_GARMIN_FIT				= "12653";				//$NON-NLS-1$
 	public static final String	UNIQUE_ID_SUFFIX_GARMIN_TCX				= "42984";				//$NON-NLS-1$
 	public static final String	UNIQUE_ID_SUFFIX_GPX					= "31683";				//$NON-NLS-1$
@@ -105,6 +106,28 @@ public class Util {
 		final int newValue = ((event.count > 0 ? 1 : -1) * accelerator);
 
 		spinner.setSelection(spinner.getSelection() + newValue);
+	}
+
+	public static void closeReader(final BufferedReader reader) {
+
+		if (reader != null) {
+			try {
+				reader.close();
+			} catch (final IOException e) {
+				StatusUtil.showStatus(e);
+			}
+		}
+	}
+
+	public static void closeSql(final Statement stmt) {
+
+		if (stmt != null) {
+			try {
+				stmt.close();
+			} catch (final SQLException e) {
+				showSQLException(e);
+			}
+		}
 	}
 
 	/**
@@ -1806,17 +1829,6 @@ public class Util {
 		}
 
 		return null;
-	}
-
-	public static void sqlClose(final Statement stmt) {
-
-		if (stmt != null) {
-			try {
-				stmt.close();
-			} catch (final SQLException e) {
-				showSQLException(e);
-			}
-		}
 	}
 
 	/**

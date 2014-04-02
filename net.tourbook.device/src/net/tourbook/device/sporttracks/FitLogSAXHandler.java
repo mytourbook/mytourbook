@@ -289,9 +289,8 @@ public class FitLogSAXHandler extends DefaultHandler {
 		}
 
 		// after all data are added, the tour id can be created because it depends on the tour distance
-		final Long tourId = tourData.createTourId(_device.createUniqueId(
-				tourData,
-				Util.UNIQUE_ID_SUFFIX_SPORT_TRACKS_FITLOG));
+		final String uniqueId = _device.createUniqueId(tourData, Util.UNIQUE_ID_SUFFIX_SPORT_TRACKS_FITLOG);
+		final Long tourId = tourData.createTourId(uniqueId);
 
 		// check if the tour is already imported
 		if (_alreadyImportedTours.containsKey(tourId) == false) {

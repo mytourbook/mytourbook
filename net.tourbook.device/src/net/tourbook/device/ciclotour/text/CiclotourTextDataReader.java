@@ -1,3 +1,18 @@
+/*******************************************************************************
+ * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
+ * 
+ * This program is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation version 2 of the License.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License along with
+ * this program; if not, write to the Free Software Foundation,
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
+ *******************************************************************************/
 package net.tourbook.device.ciclotour.text;
 
 import java.io.BufferedReader;
@@ -12,6 +27,7 @@ import java.util.Locale;
 import java.util.StringTokenizer;
 
 import net.tourbook.common.util.StatusUtil;
+import net.tourbook.common.util.Util;
 import net.tourbook.data.TimeData;
 import net.tourbook.data.TourData;
 import net.tourbook.importdata.DeviceData;
@@ -168,8 +184,11 @@ public class CiclotourTextDataReader extends TourbookDevice {
 		int previousAlt = 0;
 		int altDelta = 0;
 
+		BufferedReader reader = null;
+
 		try {
-			final BufferedReader reader = new BufferedReader(new FileReader(file));
+
+			reader = new BufferedReader(new FileReader(file));
 
 			// skip the header line
 			reader.readLine();
@@ -188,12 +207,14 @@ public class CiclotourTextDataReader extends TourbookDevice {
 				alt = Integer.parseInt(tokenizer.nextToken());
 
 				// not recorded, but read for the fun of it.
+				@SuppressWarnings("unused")
 				final float speed = Float.parseFloat(tokenizer.nextToken());
 
 				final int heartrate = Integer.parseInt(tokenizer.nextToken());
 				final float temperature = Float.parseFloat(tokenizer.nextToken());
 
 				// same as with speed ...
+				@SuppressWarnings("unused")
 				final float gradient = Float.parseFloat(tokenizer.nextToken());
 
 				final int cadence = Integer.parseInt(tokenizer.nextToken());
@@ -229,7 +250,19 @@ public class CiclotourTextDataReader extends TourbookDevice {
 			}
 
 			tourData.setStartDistance(Math.round(distance));
-			final Long tourId = tourData.createTourId(Integer.toString((int) Math.abs(tourData.getStartDistance())));
+
+			tourData.importRawDataFile = importFilePath;
+			tourData.setTourImportFilePath(importFilePath);
+
+			tourData.setDeviceId(deviceId);
+			tourData.setDeviceName(visibleName);
+
+			tourData.createTimeSeries(timeDataList, false);
+
+			// after all data are added, the tour id can be created
+			final int tourIdSuffix = (int) Math.abs(tourData.getStartDistance());
+			final String uniqueId = createUniqueIdSuffix(tourData, tourIdSuffix);
+			final Long tourId = tourData.createTourId(uniqueId);
 
 			// check if the tour is in the tour map
 			if (alreadyImportedTours.containsKey(tourId) == false) {
@@ -237,20 +270,18 @@ public class CiclotourTextDataReader extends TourbookDevice {
 				// add new tour to the map
 				newlyImportedTours.put(tourId, tourData);
 
-				tourData.importRawDataFile = importFilePath;
-				tourData.setTourImportFilePath(importFilePath);
-
 				// create additional data
-				tourData.createTimeSeries(timeDataList, false);
 				tourData.computeTourDrivingTime();
 				tourData.computeComputedValues();
-
-				tourData.setDeviceId(deviceId);
-				tourData.setDeviceName(visibleName);
 			}
 
 		} catch (final Exception e) {
+
 			StatusUtil.showStatus(e);
+
+		} finally {
+
+			Util.closeReader(reader);
 		}
 
 		return true;
