@@ -261,12 +261,12 @@ public class CiclotourTextDataReader extends TourbookDevice {
 
 			// after all data are added, the tour id can be created
 			final int tourIdSuffix = (int) Math.abs(tourData.getStartDistance());
-			final String uniqueId = createUniqueIdSuffix(tourData, tourIdSuffix);
+			final String uniqueId = createUniqueId_Legacy(tourData, tourIdSuffix);
 			final Long tourId = tourData.createTourId(uniqueId);
 
 			// check if the tour is in the tour map
 			if (alreadyImportedTours.containsKey(tourId) == false) {
-
+				
 				// add new tour to the map
 				newlyImportedTours.put(tourId, tourData);
 

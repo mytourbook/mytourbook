@@ -82,7 +82,7 @@ public abstract class TourbookDevice implements IRawDataReader {
 	public boolean	isChecksumValidation	= true;
 
 	/**
-	 * when <code>true</code> the tour id will be created with the recording time
+	 * A tour id will be created with recording time when <code>true</code>.
 	 */
 	public boolean	isCreateTourIdWithRecordingTime;
 
@@ -109,6 +109,9 @@ public abstract class TourbookDevice implements IRawDataReader {
 	/**
 	 * Creates a unique id for the tour, {@link TourData#createTimeSeries()} must be called ahead,
 	 * to create recording time.
+	 * <p>
+	 * Recording time is added to the tour id when {@link #isCreateTourIdWithRecordingTime} is
+	 * <code>true</code>.
 	 * 
 	 * @param tourData
 	 * @param distanceSerie
@@ -154,7 +157,16 @@ public abstract class TourbookDevice implements IRawDataReader {
 		return uniqueKey;
 	}
 
-	public String createUniqueIdSuffix(final TourData tourData, final int tourDistance) {
+	/**
+	 * @param tourData
+	 * @param tourDistance
+	 * @return Returns the legacy tour id with
+	 *         <p>
+	 *         <code>Integer.toString(tourDistance)</code>
+	 *         <p>
+	 *         as default, when recording time is not used as it was in the initial implementation.
+	 */
+	public String createUniqueId_Legacy(final TourData tourData, final int tourDistance) {
 
 		String uniqueKey;
 

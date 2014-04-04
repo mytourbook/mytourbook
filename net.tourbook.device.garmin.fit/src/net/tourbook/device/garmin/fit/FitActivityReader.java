@@ -83,6 +83,7 @@ public class FitActivityReader extends TourbookDevice {
 			final MesgBroadcaster broadcaster = new MesgBroadcaster(decode);
 
 			final FitActivityContext context = new FitActivityContext(
+					this,
 					importFilePath,
 					alreadyImportedTours,
 					newlyImportedTours);

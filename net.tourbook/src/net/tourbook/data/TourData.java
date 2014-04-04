@@ -894,8 +894,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	public float[]												segmentSeriePulse;
 
 	/**
-	 * Contains the filename from which the data are imported, when set to <code>null</code> the
-	 * data it not imported they are from the database
+	 * Contains the filename from which the data is imported. When <code>null</code> the data is not
+	 * imported it is from the database.
 	 */
 	@Transient
 	public String												importRawDataFile;
@@ -1607,7 +1607,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 		final int prefMinAltitude = _prefStore.getInt(PrefPageComputedValues.STATE_COMPUTED_VALUE_MIN_ALTITUDE);
 
-		final AltitudeUpDown altiUpDown = computeAltitudeUpDownInternal(null, prefMinAltitude);
+		final AltitudeUpDown altiUpDown = computeAltitudeUpDown_Internal(null, prefMinAltitude);
 
 		if (altiUpDown == null) {
 			return false;
@@ -1621,7 +1621,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 	public AltitudeUpDown computeAltitudeUpDown(final ArrayList<AltitudeUpDownSegment> segmentSerieIndexParameter,
 												final int minAltiDiff) {
-		return computeAltitudeUpDownInternal(segmentSerieIndexParameter, minAltiDiff);
+		return computeAltitudeUpDown_Internal(segmentSerieIndexParameter, minAltiDiff);
 	}
 
 	/**
@@ -1633,7 +1633,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	 * @param altitudeMinDiff
 	 * @return Returns <code>null</code> when altitude up/down cannot be computed
 	 */
-	private AltitudeUpDown computeAltitudeUpDownInternal(	final ArrayList<AltitudeUpDownSegment> segmentSerie,
+	private AltitudeUpDown computeAltitudeUpDown_Internal(	final ArrayList<AltitudeUpDownSegment> segmentSerie,
 															final int altitudeMinDiff) {
 
 		// check if data are available

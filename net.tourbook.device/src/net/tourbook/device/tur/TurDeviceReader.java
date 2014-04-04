@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2011 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -54,10 +54,6 @@ public class TurDeviceReader extends TourbookDevice {
 		return null;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see net.tourbook.importdata.TourbookDevice#checkStartSequence(int, int)
-	 */
 	@Override
 	public boolean checkStartSequence(final int byteIndex, final int newByte) {
 		/*
@@ -115,28 +111,16 @@ public class TurDeviceReader extends TourbookDevice {
 		return false;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see net.tourbook.importdata.IRawDataReader#getDeviceModeName(int)
-	 */
 	public String getDeviceModeName(final int modeId) {
 		return UI.EMPTY_STRING;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see net.tourbook.importdata.TourbookDevice#getPortParameters(java.lang.String)
-	 */
 	@Override
 	public SerialParameters getPortParameters(final String portName) {
 		// we don't have a device but a file
 		return null;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see net.tourbook.importdata.TourbookDevice#getStartSequenceSize()
-	 */
 	@Override
 	public int getStartSequenceSize() {
 		return 16;
@@ -146,10 +130,6 @@ public class TurDeviceReader extends TourbookDevice {
 		return null;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see net.tourbook.importdata.IRawDataReader#getImportDataSize()
-	 */
 	public int getTransferDataSize() {
 		// We dont't have a com-port device so this is not neccessary
 		return 0;
@@ -167,6 +147,7 @@ public class TurDeviceReader extends TourbookDevice {
 		final TourType defaultTourType = getTourType();
 
 		try {
+
 			fileTurData = new FileInputStream(importFilePath);
 
 			turDeviceData.readFromFile(fileTurData);
@@ -251,6 +232,7 @@ public class TurDeviceReader extends TourbookDevice {
 				TurFileUtil.readByte(fileTurData);
 
 				// Calculate values
+				@SuppressWarnings("unused")
 				final int secStart = secStart1
 						+ (256 * secStart2)
 						+ (256 * 256 * secStart3)
@@ -311,19 +293,13 @@ public class TurDeviceReader extends TourbookDevice {
 //				}
 			}
 
-			// after all data are added, the tour id can be created
-			final Long tourId = tourData.createTourId(Integer.toString((int) Math.abs(tourData.getStartDistance())));
+			/*
+			 * disable data series when no data are available
+			 */
+			if (timeDataList.size() > 0) {
 
-			// check if the tour is in the tour map
-			if (alreadyImportedTours.containsKey(tourId) == false) {
-
-				// add new tour to the map
-				newlyImportedTours.put(tourId, tourData);
-
-				/*
-				 * disable data series when no data are available
-				 */
 				final TimeData firstTimeData = timeDataList.get(0);
+				
 				if (sumDistance == 0) {
 					firstTimeData.distance = Float.MIN_VALUE;
 				}
@@ -339,56 +315,31 @@ public class TurDeviceReader extends TourbookDevice {
 				if (sumTemperature == 0) {
 					firstTimeData.temperature = Float.MIN_VALUE;
 				}
+			}
 
-				tourData.createTimeSeries(timeDataList, true);
+			tourData.setTourType(defaultTourType);
+
+			tourData.setDeviceId(deviceId);
+			tourData.setDeviceName(visibleName);
+
+			tourData.createTimeSeries(timeDataList, true);
+
+			// after all data are added, the tour id can be created
+			final int tourDistance = (int) Math.abs(tourData.getStartDistance());
+			final String uniqueId = createUniqueId_Legacy(tourData, tourDistance);
+			final Long tourId = tourData.createTourId(uniqueId);
+
+			// check if the tour is in the tour map
+			if (alreadyImportedTours.containsKey(tourId) == false) {
+
+				// add new tour to the map
+				newlyImportedTours.put(tourId, tourData);
+
+				// create additional data
 				tourData.computeComputedValues();
-
-				// Read last 0A from binary block
-				TurFileUtil.readByte(fileTurData);
-				// Read Marker
-				final int markerCount = Integer.parseInt(TurFileUtil.readText(fileTurData));
-
-				final float[] distanceSerie = tourData.getMetricDistanceSerie();
-
-				// create new markers
-				for (int i = 0; i < markerCount; i++) {
-
-					final TourMarker tourMarker = new TourMarker(tourData, ChartLabel.MARKER_TYPE_DEVICE);
-					tourMarker.setTime(Integer.parseInt(TurFileUtil.readText(fileTurData)));
-
-					String label = TurFileUtil.readText(fileTurData);
-					label = label.substring(0, label.indexOf(';'));
-					final int index = label.indexOf(", Type:"); //$NON-NLS-1$
-					if (index > 0) {
-						label = label.substring(0, index);
-					} else if (index == 0) {
-						label = Messages.TourData_Tour_Marker_unnamed;
-					}
-					tourMarker.setLabel(label);
-					tourMarker.setVisualPosition(ChartLabel.VISUAL_HORIZONTAL_ABOVE_GRAPH_CENTERED);
-
-					final int[] timeSerie = tourData.timeSerie;
-					if (timeSerie != null && timeSerie.length > 0) {
-
-						for (int j = 0; j < timeSerie.length; j++) {
-							if (timeSerie[j] > tourMarker.getTime()) {
-								if (distanceSerie != null) {
-									tourMarker.setDistance(distanceSerie[j - 1]);
-								}
-								tourMarker.setSerieIndex(j - 1);
-								break;
-							}
-						}
-					}
-
-					tourData.getTourMarkers().add(tourMarker);
-				}
-
-				tourData.setTourType(defaultTourType);
 				tourData.computeTourDrivingTime();
 
-				tourData.setDeviceId(deviceId);
-				tourData.setDeviceName(visibleName);
+				processDeviceData_10_CreateMarker(tourData, fileTurData);
 			}
 
 		} catch (final FileNotFoundException e) {
@@ -413,10 +364,51 @@ public class TurDeviceReader extends TourbookDevice {
 		return true;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see net.tourbook.importdata.IRawDataReader#validateRawData(java.lang.String)
-	 */
+	private void processDeviceData_10_CreateMarker(final TourData tourData, final FileInputStream fileTurData)
+			throws IOException {
+
+		// Read last 0A from binary block
+		TurFileUtil.readByte(fileTurData);
+		// Read Marker
+		final int markerCount = Integer.parseInt(TurFileUtil.readText(fileTurData));
+
+		final float[] distanceSerie = tourData.getMetricDistanceSerie();
+
+		// create new markers
+		for (int i = 0; i < markerCount; i++) {
+
+			final TourMarker tourMarker = new TourMarker(tourData, ChartLabel.MARKER_TYPE_DEVICE);
+			tourMarker.setTime(Integer.parseInt(TurFileUtil.readText(fileTurData)));
+
+			String label = TurFileUtil.readText(fileTurData);
+			label = label.substring(0, label.indexOf(';'));
+			final int index = label.indexOf(", Type:"); //$NON-NLS-1$
+			if (index > 0) {
+				label = label.substring(0, index);
+			} else if (index == 0) {
+				label = Messages.TourData_Tour_Marker_unnamed;
+			}
+			tourMarker.setLabel(label);
+			tourMarker.setVisualPosition(ChartLabel.VISUAL_HORIZONTAL_ABOVE_GRAPH_CENTERED);
+
+			final int[] timeSerie = tourData.timeSerie;
+			if (timeSerie != null && timeSerie.length > 0) {
+
+				for (int j = 0; j < timeSerie.length; j++) {
+					if (timeSerie[j] > tourMarker.getTime()) {
+						if (distanceSerie != null) {
+							tourMarker.setDistance(distanceSerie[j - 1]);
+						}
+						tourMarker.setSerieIndex(j - 1);
+						break;
+					}
+				}
+			}
+
+			tourData.getTourMarkers().add(tourMarker);
+		}
+	}
+
 	public boolean validateRawData(final String fileName) {
 
 		boolean isValid = false;

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2011 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -157,7 +157,7 @@ public class GPX_SAX_Handler extends DefaultHandler {
 	private TimeData						_prevTimeSlice;
 	private String							_trkName;
 
-	private final TourbookDevice			_deviceDataReader;
+	private final TourbookDevice			_device;
 	private final String					_importFilePath;
 	private HashMap<Long, TourData>			_alreadyImportedTours;
 	private HashMap<Long, TourData>			_newlyImportedTours;
@@ -200,7 +200,7 @@ public class GPX_SAX_Handler extends DefaultHandler {
 							final HashMap<Long, TourData> alreadyImportedTours,
 							final HashMap<Long, TourData> newlyImportedTours) {
 
-		_deviceDataReader = deviceDataReader;
+		_device = deviceDataReader;
 		_importFilePath = importFileName;
 		_alreadyImportedTours = alreadyImportedTours;
 		_newlyImportedTours = newlyImportedTours;
@@ -493,7 +493,7 @@ public class GPX_SAX_Handler extends DefaultHandler {
 
 				_isInTrk = false;
 
-				if (_deviceDataReader.isMergeTracks == false) {
+				if (_device.isMergeTracks == false) {
 					finalizeTour();
 				}
 
@@ -513,7 +513,7 @@ public class GPX_SAX_Handler extends DefaultHandler {
 				 * file end
 				 */
 
-				if (_deviceDataReader.isMergeTracks) {
+				if (_device.isMergeTracks) {
 					finalizeTour();
 				}
 
@@ -564,7 +564,7 @@ public class GPX_SAX_Handler extends DefaultHandler {
 		 */
 		DateTime dtTourStart;
 		if (_gpxHasLocalTime) {
-			// Polar WebSync create GPX files with local time :-(
+			// Polar WebSync creates GPX files with local time :-(
 			// workaround: create DateTime object with UTC TimeZone => time is NOT converted to localtime
 			dtTourStart = new DateTime(firstTimeData.absoluteTime, DateTimeZone.UTC);
 		} else {
@@ -578,66 +578,31 @@ public class GPX_SAX_Handler extends DefaultHandler {
 		tourData.importRawDataFile = _importFilePath;
 		tourData.setTourImportFilePath(_importFilePath);
 
-		tourData.createTimeSeries(_timeDataList, true);
-		tourData.computeAltitudeUpDown();
-
 		tourData.setWayPoints(_wptList);
 
-		/*
-		 * adjust default marker which are created in tourData.createTimeSeries()
-		 */
-		for (final TourMarker tourMarker : tourData.getTourMarkers()) {
+		tourData.setDeviceId(_device.deviceId);
+		tourData.setDeviceName(_device.visibleName);
 
-			tourMarker.setVisualPosition(ChartLabel.VISUAL_VERTICAL_BOTTOM_CHART);
-		}
+		tourData.createTimeSeries(_timeDataList, true);
 
 		// after all data are added, the tour id can be created
-		final float[] distanceSerie = tourData.getMetricDistanceSerie();
-		String uniqueKey;
-
-		if (_deviceDataReader.isCreateTourIdWithRecordingTime) {
-
-			/*
-			 * 23.3.2009: added recording time to the tour distance for the unique key because tour
-			 * export and import found a wrong tour when exporting was done with camouflage speed ->
-			 * this will result in a NEW tour
-			 */
-			final int tourRecordingTime = (int) tourData.getTourRecordingTime();
-
-			if (distanceSerie == null) {
-				uniqueKey = Integer.toString(tourRecordingTime);
-			} else {
-
-				final long tourDistance = (long) distanceSerie[(distanceSerie.length - 1)];
-
-				uniqueKey = Long.toString(tourDistance + tourRecordingTime);
-			}
-
-		} else {
-
-			/*
-			 * original version to create tour id
-			 */
-			if (distanceSerie == null) {
-				uniqueKey = Util.UNIQUE_ID_SUFFIX_GPX;
-			} else {
-				uniqueKey = Integer.toString((int) distanceSerie[distanceSerie.length - 1]);
-			}
-		}
-
-		final Long tourId = tourData.createTourId(uniqueKey);
+		final String uniqueId = _device.createUniqueId(tourData, Util.UNIQUE_ID_SUFFIX_GPX);
+		final Long tourId = tourData.createTourId(uniqueId);
 
 		// check if the tour is already imported
 		if (_alreadyImportedTours.containsKey(tourId) == false) {
 
+			// add new tour to other tours
+			_newlyImportedTours.put(tourId, tourData);
+
+			tourData.computeAltitudeUpDown();
 			tourData.computeTourDrivingTime();
 			tourData.computeComputedValues();
 
-			tourData.setDeviceId(_deviceDataReader.deviceId);
-			tourData.setDeviceName(_deviceDataReader.visibleName);
-
-			// add new tour to other tours
-			_newlyImportedTours.put(tourId, tourData);
+			// adjust default marker which are created in tourData.createTimeSeries()
+			for (final TourMarker tourMarker : tourData.getTourMarkers()) {
+				tourMarker.setVisualPosition(ChartLabel.VISUAL_VERTICAL_BOTTOM_CHART);
+			}
 		}
 
 		_isImported = true;
@@ -862,7 +827,7 @@ public class GPX_SAX_Handler extends DefaultHandler {
 
 						_gpxVersion = GPX_VERSION_1_0;
 
-						if (_deviceDataReader.isMergeTracks) {
+						if (_device.isMergeTracks) {
 							initNewTrack();
 						}
 
@@ -872,7 +837,7 @@ public class GPX_SAX_Handler extends DefaultHandler {
 
 						_gpxVersion = GPX_VERSION_1_1;
 
-						if (_deviceDataReader.isMergeTracks) {
+						if (_device.isMergeTracks) {
 							initNewTrack();
 						}
 
@@ -1041,7 +1006,7 @@ public class GPX_SAX_Handler extends DefaultHandler {
 
 				_isInTrk = true;
 
-				if (_deviceDataReader.isMergeTracks) {
+				if (_device.isMergeTracks) {
 
 					_trackCounter++;
 

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -285,8 +285,23 @@ public class FitLogSAXHandler extends DefaultHandler {
 			tourData.setTourAltDown(_currentActivity.elevationDown);
 
 		} else {
+			
+			// create 'normal' tour
+			
 			tourData.createTimeSeries(_currentActivity.timeSlices, false);
 		}
+
+		if (tourData.pulseSerie == null) {
+			tourData.setAvgPulse(_currentActivity.avgPulse);
+			tourData.setMaxPulse(_currentActivity.maxPulse);
+		}
+
+		if (tourData.cadenceSerie == null) {
+			tourData.setAvgCadence(_currentActivity.avgCadence);
+		}
+
+		tourData.setDeviceId(_device.deviceId);
+		tourData.setDeviceName(_device.visibleName);
 
 		// after all data are added, the tour id can be created because it depends on the tour distance
 		final String uniqueId = _device.createUniqueId(tourData, Util.UNIQUE_ID_SUFFIX_SPORT_TRACKS_FITLOG);
@@ -295,30 +310,20 @@ public class FitLogSAXHandler extends DefaultHandler {
 		// check if the tour is already imported
 		if (_alreadyImportedTours.containsKey(tourId) == false) {
 
+			// add new tour to other tours
+			_newlyImportedTours.put(tourId, tourData);
+
+			// create additional data
 			if (isComputeDrivingTime) {
 				tourData.computeTourDrivingTime();
 			}
+			
 			tourData.computeAltitudeUpDown();
 			tourData.computeComputedValues();
 
-			if (tourData.pulseSerie == null) {
-				tourData.setAvgPulse(_currentActivity.avgPulse);
-				tourData.setMaxPulse(_currentActivity.maxPulse);
-			}
-
-			if (tourData.cadenceSerie == null) {
-				tourData.setAvgCadence(_currentActivity.avgCadence);
-			}
-
-			tourData.setDeviceId(_device.deviceId);
-			tourData.setDeviceName(_device.visibleName);
-
-			finalizeTour10SetTourType(tourData);
-			finalizeTour20SetTags(tourData);
-			finalizeTour30CreateMarkers(tourData);
-
-			// add new tour to other tours
-			_newlyImportedTours.put(tourId, tourData);
+			finalizeTour_10_SetTourType(tourData);
+			finalizeTour_20_SetTags(tourData);
+			finalizeTour_30_CreateMarkers(tourData);
 		}
 
 		// cleanup
@@ -334,7 +339,7 @@ public class FitLogSAXHandler extends DefaultHandler {
 	 * 
 	 * @param tourData
 	 */
-	private void finalizeTour10SetTourType(final TourData tourData) {
+	private void finalizeTour_10_SetTourType(final TourData tourData) {
 
 		final String categoryName = _currentActivity.categoryName;
 
@@ -383,7 +388,7 @@ public class FitLogSAXHandler extends DefaultHandler {
 		_isNewTourType |= newSavedTourType != null;
 	}
 
-	private void finalizeTour20SetTags(final TourData tourData) {
+	private void finalizeTour_20_SetTags(final TourData tourData) {
 
 		final ArrayList<String> equipmentNames = _currentActivity.equipmentName;
 		if (equipmentNames.size() == 0) {
@@ -454,7 +459,7 @@ public class FitLogSAXHandler extends DefaultHandler {
 		_isNewTag |= isNewTag;
 	}
 
-	private void finalizeTour30CreateMarkers(final TourData tourData) {
+	private void finalizeTour_30_CreateMarkers(final TourData tourData) {
 
 		final ArrayList<Lap> _laps = _currentActivity.laps;
 		if (_laps.size() == 0) {

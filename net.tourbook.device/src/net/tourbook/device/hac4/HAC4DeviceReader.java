@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -97,11 +97,17 @@ public class HAC4DeviceReader extends TourbookDevice {
 			}
 		}
 
-		return new Formatter().format(
+		final Formatter formatter = new Formatter();
+
+		final String fileName = formatter.format(
 				net.tourbook.Messages.Format_rawdata_file_yyyy_mm_dd + fileExtension,
 				hac4DeviceData.transferYear,
 				hac4DeviceData.transferMonth,
 				hac4DeviceData.transferDay).toString();
+
+		formatter.close();
+
+		return fileName;
 	}
 
 	@Override
@@ -476,10 +482,9 @@ public class HAC4DeviceReader extends TourbookDevice {
 						firstTimeData.cadence = Float.MIN_VALUE;
 					}
 				}
-				
-				tourData.createTimeSeries(timeDataList, true);
+
 				tourData.setTourType(defaultTourType);
-				
+
 				tourData.setDeviceId(deviceId);
 				tourData.setDeviceName(visibleName);
 
@@ -487,9 +492,11 @@ public class HAC4DeviceReader extends TourbookDevice {
 				tourData.setDeviceMode(profileId);
 				tourData.setDeviceModeName(getDeviceModeName(profileId));
 
+				tourData.createTimeSeries(timeDataList, true);
+
 				// after all data are added, the tour id can be created
-				final int tourIdSuffix = (int) Math.abs(tourData.getStartDistance());
-				final String uniqueId = createUniqueIdSuffix(tourData, tourIdSuffix);
+				final int tourDistance = (int) Math.abs(tourData.getStartDistance());
+				final String uniqueId = createUniqueId_Legacy(tourData, tourDistance);
 				final Long tourId = tourData.createTourId(uniqueId);
 
 				// check if the tour is in the tour map
@@ -498,6 +505,7 @@ public class HAC4DeviceReader extends TourbookDevice {
 					// add new tour to the map
 					newlyImportedTours.put(tourId, tourData);
 
+					// create additional data
 					tourData.computeTourDrivingTime();
 					tourData.computeComputedValues();
 				}

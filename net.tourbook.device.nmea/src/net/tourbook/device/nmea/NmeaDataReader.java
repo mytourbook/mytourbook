@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -276,18 +276,14 @@ public class NmeaDataReader extends TourbookDevice {
 		tourData.importRawDataFile = _importFilePath;
 		tourData.setTourImportFilePath(_importFilePath);
 
+		tourData.setDeviceId(deviceId);
+		tourData.setDeviceName(visibleName);
+
 		tourData.createTimeSeries(_timeDataList, true);
-		tourData.computeAltitudeUpDown();
 
 		// after all data are added, the tour id can be created
-		final float[] distanceSerie = tourData.getMetricDistanceSerie();
-		String uniqueKey;
-		if (distanceSerie == null) {
-			uniqueKey = Util.UNIQUE_ID_SUFFIX_NMEA;
-		} else {
-			uniqueKey = Integer.toString((int) distanceSerie[distanceSerie.length - 1]);
-		}
-		final Long tourId = tourData.createTourId(uniqueKey);
+		final String uniqueId = createUniqueId(tourData, Util.UNIQUE_ID_SUFFIX_NMEA);
+		final Long tourId = tourData.createTourId(uniqueId);
 
 		// check if the tour is already imported
 		if (_alreadyImportedTours.containsKey(tourId) == false) {
@@ -295,11 +291,10 @@ public class NmeaDataReader extends TourbookDevice {
 			// add new tour to other tours
 			_newlyImportedTours.put(tourId, tourData);
 
+			// create additional data
 			tourData.computeTourDrivingTime();
 			tourData.computeComputedValues();
-
-			tourData.setDeviceId(deviceId);
-			tourData.setDeviceName(visibleName);
+			tourData.computeAltitudeUpDown();
 		}
 
 		return true;

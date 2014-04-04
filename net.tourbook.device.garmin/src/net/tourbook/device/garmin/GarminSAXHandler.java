@@ -552,6 +552,22 @@ public class GarminSAXHandler extends DefaultHandler {
 		tourData.setDeviceModeName(_activitySport);
 		tourData.setCalories(_tourCalories);
 
+		final String deviceName = _sport.creatorName;
+		final String majorVersion = _sport.creatorVersionMajor;
+		final String minorVersion = _sport.creatorVersionMinor;
+
+		tourData.setDeviceId(_device.deviceId);
+
+		tourData.setDeviceName(_device.visibleName + (deviceName == null //
+				? UI.EMPTY_STRING
+				: UI.SPACE + deviceName));
+
+		tourData.setDeviceFirmwareVersion(majorVersion == null //
+				? UI.EMPTY_STRING
+				: majorVersion + (minorVersion == null //
+						? UI.EMPTY_STRING
+						: UI.SYMBOL_DOT + minorVersion));
+
 		tourData.createTimeSeries(_dtList, true);
 
 		// after all data are added, the tour id can be created
@@ -561,28 +577,13 @@ public class GarminSAXHandler extends DefaultHandler {
 		// check if the tour is already imported
 		if (_alreadyImportedTours.containsKey(tourId) == false) {
 
+			// add new tour to other tours
+			_newlyImportedTours.put(tourId, tourData);
+
+			// create additional data
 			tourData.computeAltitudeUpDown();
 			tourData.computeTourDrivingTime();
 			tourData.computeComputedValues();
-
-			final String deviceName = _sport.creatorName;
-			final String majorVersion = _sport.creatorVersionMajor;
-			final String minorVersion = _sport.creatorVersionMinor;
-
-			tourData.setDeviceId(_device.deviceId);
-
-			tourData.setDeviceName(_device.visibleName + (deviceName == null //
-					? UI.EMPTY_STRING
-					: UI.SPACE + deviceName));
-
-			tourData.setDeviceFirmwareVersion(majorVersion == null //
-					? UI.EMPTY_STRING
-					: majorVersion + (minorVersion == null //
-							? UI.EMPTY_STRING
-							: UI.SYMBOL_DOT + minorVersion));
-
-			// add new tour to other tours
-			_newlyImportedTours.put(tourId, tourData);
 		}
 
 		_isImported = true;

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -332,17 +332,18 @@ public class CSVTourDataReader extends TourbookDevice {
 					tourData.importRawDataFile = importFilePath;
 					tourData.setTourImportFilePath(importFilePath);
 
-					// create unique tour id
-					final Long tourId = tourData.createTourId(Integer.toString(distance));
+					tourData.setDeviceId(deviceId);
+					tourData.setDeviceName(visibleName);
+
+					// after all data are added, the tour id can be created
+					final String uniqueId = createUniqueId_Legacy(tourData, distance);
+					final Long tourId = tourData.createTourId(uniqueId);
 
 					// check if the tour is in the tour map
 					if (alreadyImportedTours.containsKey(tourId) == false) {
 
 						// add new tour to the map
 						newlyImportedTours.put(tourId, tourData);
-
-						tourData.setDeviceId(deviceId);
-						tourData.setDeviceName(visibleName);
 
 						returnValue = true;
 					}

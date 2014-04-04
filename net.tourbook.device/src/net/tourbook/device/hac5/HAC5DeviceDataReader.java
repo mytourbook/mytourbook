@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -451,19 +451,11 @@ public class HAC5DeviceDataReader extends TourbookDevice {
 				 */
 				readDDRecord(recordBuffer, tourData);
 
-				// after all data are added, the tour id can be created
-				final Long tourId = tourData.createTourId(//
-						Integer.toString((int) Math.abs(tourData.getStartDistance())));
+				/*
+				 * disable data series when no data are available
+				 */
+				if (timeDataList.size() > 0) {
 
-				// check if the tour is in the tour map
-				if (alreadyImportedTours.containsKey(tourId) == false) {
-
-					// add new tour to the map
-					newlyImportedTours.put(tourId, tourData);
-
-					/*
-					 * disable data series when no data are available
-					 */
 					final TimeData firstTimeData = timeDataList.get(0);
 					if (sumDistance == 0) {
 						firstTimeData.distance = Float.MIN_VALUE;
@@ -474,13 +466,27 @@ public class HAC5DeviceDataReader extends TourbookDevice {
 					if (sumCadence == 0) {
 						firstTimeData.cadence = Float.MIN_VALUE;
 					}
+				}
 
-					tourData.createTimeSeries(timeDataList, true);
+				tourData.setDeviceId(deviceId);
+				tourData.setDeviceName(visibleName);
+
+				tourData.createTimeSeries(timeDataList, true);
+
+				// after all data are added, the tour id can be created
+				final int tourDistance = (int) Math.abs(tourData.getStartDistance());
+				final String uniqueId = createUniqueId_Legacy(tourData, tourDistance);
+				final Long tourId = tourData.createTourId(uniqueId);
+
+				// check if the tour is in the tour map
+				if (alreadyImportedTours.containsKey(tourId) == false) {
+
+					// add new tour to the map
+					newlyImportedTours.put(tourId, tourData);
+
+					// create additional data
 					tourData.computeTourDrivingTime();
 					tourData.computeComputedValues();
-
-					tourData.setDeviceId(deviceId);
-					tourData.setDeviceName(visibleName);
 				}
 
 				// dump DD block
