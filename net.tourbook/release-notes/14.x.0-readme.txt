@@ -25,7 +25,7 @@ New 3D Map Features
 
 Other New Features	
 
-* Restructured creation of the tour id for ALL supported tour import formats. A tour id can be created with/without tour distance, this allows to save the same tour twice.
+* Restructured creation of the tour id for ALL supported tour import formats. A tour id can now be created with/without tour distance (default is without). This feature allows, to save the same tour twice.
 
 VERY IMPORTANT
 The algorithm to import any supported data formats have been changed. Please report a bug when tours are imported and could be saved twice when it should not.
