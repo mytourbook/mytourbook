@@ -1688,8 +1688,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		menuMgr.add(_actionRemoveToursWhenClosed);
 
 		menuMgr.add(new Separator());
-		menuMgr.add(_actionMergeGPXTours);
 		menuMgr.add(_actionCreateTourIdWithTime);
+		menuMgr.add(_actionMergeGPXTours);
 		menuMgr.add(_actionDisableChecksumValidation);
 		menuMgr.add(_actionAdjustImportedYear);
 

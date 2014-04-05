@@ -3439,7 +3439,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 			}
 		}
 
-		createTimeSeries10DataCompleting();
+		createTimeSeries_10_DataCompleting();
 
 		tourDistance = isDistance ? distanceSerie[serieSize - 1] : 0;
 		tourRecordingTime = recordingTime;
@@ -3476,20 +3476,21 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	/**
 	 * Interpolations of missing data
 	 */
-	private void createTimeSeries10DataCompleting() {
+	private void createTimeSeries_10_DataCompleting() {
 
-		createTimeSeries12RemoveInvalidDistanceValues();
+		createTimeSeries_12_RemoveInvalidDistanceValues();
+		createTimeSeries_14_RemoveInvalidDistanceValues();
 
-		createTimeSeries20data_completing(latitudeSerie, timeSerie);
-		createTimeSeries20data_completing(longitudeSerie, timeSerie);
+		createTimeSeries_20_data_completing(latitudeSerie, timeSerie);
+		createTimeSeries_20_data_completing(longitudeSerie, timeSerie);
 
-		createTimeSeries30data_completing(altitudeSerie, timeSerie);
-		createTimeSeries30data_completing(distanceSerie, timeSerie);
-		createTimeSeries30data_completing(temperatureSerie, timeSerie);
-		createTimeSeries30data_completing(pulseSerie, timeSerie);
+		createTimeSeries_30_data_completing(altitudeSerie, timeSerie);
+		createTimeSeries_30_data_completing(distanceSerie, timeSerie);
+		createTimeSeries_30_data_completing(temperatureSerie, timeSerie);
+		createTimeSeries_30_data_completing(pulseSerie, timeSerie);
 	}
 
-	private void createTimeSeries12RemoveInvalidDistanceValues() {
+	private void createTimeSeries_12_RemoveInvalidDistanceValues() {
 
 		if (isDistanceFromSensor == 1 || latitudeSerie == null || distanceSerie == null) {
 			return;
@@ -3510,7 +3511,55 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		}
 	}
 
-	private void createTimeSeries20data_completing(final double[] field, final int[] time) {
+	/**
+	 * Because of the current algorithm, the first distance value can be <code>0</code> and the
+	 * other values can be {@link Float#MIN_VALUE}.
+	 * <p>
+	 * When this occures, set all distance values to {@link Float#MIN_VALUE}, that distance values
+	 * are not recognized.
+	 */
+	private void createTimeSeries_14_RemoveInvalidDistanceValues() {
+
+		if (distanceSerie == null || distanceSerie.length < 2) {
+			return;
+		}
+
+		boolean isDataValid = false;
+
+		for (int serieIndex = 1; serieIndex < distanceSerie.length; serieIndex++) {
+
+			final float distanceValue = distanceSerie[serieIndex];
+
+			if (distanceValue < 0) {
+
+				// distance is invalid, set to a 'valid' value which is corrected in DataCompleting
+
+				distanceSerie[serieIndex] = Float.MIN_VALUE;
+
+			} else if (distanceValue != Float.MIN_VALUE) {
+
+				// there are valid values, data are OK
+				isDataValid = true;
+			}
+		}
+
+		if (isDataValid) {
+			return;
+		}
+
+		if (distanceSerie[0] == 0.0) {
+
+			// set distance to be unavailable
+
+			distanceSerie[0] = Float.MIN_VALUE;
+
+		} else {
+
+			// this case needs more investigation if it occures
+		}
+	}
+
+	private void createTimeSeries_20_data_completing(final double[] field, final int[] time) {
 
 		if (field == null) {
 			return;
@@ -3550,7 +3599,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 				for (int interpolationIndex = serieIndex; interpolationIndex < nextValidIndex; interpolationIndex++) {
 
-					field[interpolationIndex] = createTimeSeries40linear_interpolation(
+					field[interpolationIndex] = createTimeSeries_40_linear_interpolation(
 							time1,
 							time2,
 							val1,
@@ -3563,7 +3612,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		}
 	}
 
-	private void createTimeSeries30data_completing(final float[] field, final int[] time) {
+	private void createTimeSeries_30_data_completing(final float[] field, final int[] time) {
 
 		if (field == null) {
 			return;
@@ -3605,7 +3654,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 				for (int interpolationIndex = serieIndex; interpolationIndex < nextValidIndex; interpolationIndex++) {
 
-					final double linearInterpolation = createTimeSeries40linear_interpolation(
+					final double linearInterpolation = createTimeSeries_40_linear_interpolation(
 							time1,
 							time2,
 							val1,
@@ -3620,7 +3669,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		}
 	}
 
-	private double createTimeSeries40linear_interpolation(	final double time1,
+	private double createTimeSeries_40_linear_interpolation(final double time1,
 															final double time2,
 															final double val1,
 															final double val2,
