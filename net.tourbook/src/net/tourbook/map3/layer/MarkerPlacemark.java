@@ -36,7 +36,6 @@ import java.util.concurrent.atomic.AtomicLong;
 import javax.media.opengl.GL;
 import javax.media.opengl.GL2;
 
-import net.tourbook.common.UI;
 import net.tourbook.map3.view.Map3View;
 
 import com.jogamp.opengl.util.awt.TextRenderer;
@@ -406,11 +405,11 @@ public class MarkerPlacemark extends PointPlacemark {
 						this.terrainPoint.y - this.placePoint.y,
 						this.terrainPoint.z - this.placePoint.z);
 
-				gl.glVertex3d(14, Vec4.ZERO.y, Vec4.ZERO.z);
-				gl.glVertex3d(
-						this.terrainPoint.x + 14 - this.placePoint.x,
-						this.terrainPoint.y - this.placePoint.y,
-						this.terrainPoint.z - this.placePoint.z);
+//				gl.glVertex3d(14, Vec4.ZERO.y, Vec4.ZERO.z);
+//				gl.glVertex3d(
+//						this.terrainPoint.x + 14 - this.placePoint.x,
+//						this.terrainPoint.y - this.placePoint.y,
+//						this.terrainPoint.z - this.placePoint.z);
 			}
 			gl.glEnd();
 

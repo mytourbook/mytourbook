@@ -42,13 +42,11 @@ Create Build
 requirements:
 - buckminster is installed to see better error messages
 
-- set version number in
-
-	- about.mappings
-	- net.tourbook.application.ApplicationVersion
-
-
 - switch to workspace "C:\DAT\ws_mt-with-GIT"
+
+	- set version number in
+		- about.mappings
+		- net.tourbook.application.ApplicationVersion
 	
 	- run script "Create_MyTourbook_BuildFiles" in plugin net.tourbook/build-files
 

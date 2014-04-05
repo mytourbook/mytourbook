@@ -2,7 +2,7 @@
 <feature
       id="feature.net.tourbook.app.nl"
       label="MyTourbook Language Support"
-      version="14.2.0.qualifier"
+      version="14.4.0.qualifier"
       provider-name="MyTourbook"
       plugin="net.tourbook.branding">
 
