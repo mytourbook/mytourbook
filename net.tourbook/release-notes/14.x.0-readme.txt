@@ -27,7 +27,10 @@ Other New Features
 
 * Restructured creation of the tour id for ALL supported tour import formats. A tour id can be created with/without tour distance, this allows to save the same tour twice.
 
-INFO: The algorithm to import any supported data formats have been changed. Please report a bug when tours are imported and saved twice when it should not.
+VERY IMPORTANT
+The algorithm to import any supported data formats have been changed. Please report a bug when tours are imported and could be saved twice when it should not.
+For .fit formatted data files, it is possible, that the same tour can be imported 3 times, 1x with the previous versions of MyTourbook and 2x with the new version.
+I'm not happy with this problem, the old implementation used a wrong algorithm to create the tour id.
 
 * 
 
