@@ -41,7 +41,6 @@ public class PerspectiveFactoryRawData implements IPerspectiveFactory {
 				IPageLayout.ID_EDITOR_AREA);
 
 		leftFolder.addView(RawDataView.ID);
-		leftFolder.addPlaceholder(IExternalIds.VIEW_ID_NET_TOURBOOK_MAP3_MAP3_LAYER_VIEW);
 
 		//--------------------------------------------------------------------------------
 

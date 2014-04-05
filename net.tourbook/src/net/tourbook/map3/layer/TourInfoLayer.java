@@ -39,6 +39,7 @@ public class TourInfoLayer extends AnnotationLayer implements IToolLayer {
 	 * Track point annotation when a tour track is hovered.
 	 */
 	private TrackPointAnnotation	_hoveredTrackPoint;
+	private TrackPointLine			_hoveredTrackPointLine;
 
 	public TourInfoLayer(final IDialogSettings state) {
 
@@ -50,6 +51,7 @@ public class TourInfoLayer extends AnnotationLayer implements IToolLayer {
 	public void createAllSlider() {
 
 		_hoveredTrackPoint = createHoveredTrackPoint();
+		_hoveredTrackPointLine = new TrackPointLine();
 
 		addAnnotation(_hoveredTrackPoint);
 	}
@@ -82,7 +84,14 @@ public class TourInfoLayer extends AnnotationLayer implements IToolLayer {
 	@Override
 	protected void doRender(final DrawContext dc) {
 
-		_hoveredTrackPoint.setSliderPosition(dc);
+		final Position sliderPosition = _hoveredTrackPoint.setSliderPosition(dc);
+
+		if (sliderPosition != null) {
+			_hoveredTrackPointLine.makeOrderedRenderable(//
+					dc,
+					sliderPosition,
+					_hoveredTrackPoint.getAttributes().getTextColor());
+		}
 
 		super.doRender(dc);
 	}
@@ -100,6 +109,7 @@ public class TourInfoLayer extends AnnotationLayer implements IToolLayer {
 
 		// show/hide track point
 		_hoveredTrackPoint.getAttributes().setVisible(isVisible);
+		_hoveredTrackPointLine.setVisible(isVisible);
 
 		// show/hide layer
 		setEnabled(isVisible);

@@ -19,6 +19,7 @@ import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.map2.Messages;
 import net.tourbook.map3.ui.DialogTourTrackConfig;
+import net.tourbook.map3.view.IOpeningDialog;
 import net.tourbook.map3.view.Map3View;
 
 import org.eclipse.jface.action.ContributionItem;
@@ -36,9 +37,9 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 
-public class ActionShowTourInMap3 extends ContributionItem {
+public class ActionShowTourInMap3 extends ContributionItem implements IOpeningDialog {
 
-	private static final String		ID	= "ACTION_TRACK_LAYER_PROPERTIES_ID";	//$NON-NLS-1$
+	private static final String		ID			= "ACTION_TRACK_LAYER_PROPERTIES_ID";	//$NON-NLS-1$
 
 	private Map3View				_map3View;
 
@@ -49,6 +50,8 @@ public class ActionShowTourInMap3 extends ContributionItem {
 
 	private boolean					_isActionEnabled;
 	private boolean					_isActionSelected;
+
+	private String					_dialogId	= getClass().getCanonicalName();
 
 	/*
 	 * UI controls
@@ -75,11 +78,6 @@ public class ActionShowTourInMap3 extends ContributionItem {
 		_actionImageDisabled = TourbookPlugin//
 				.getImageDescriptor(Messages.image_action_show_tour_in_map_disabled)
 				.createImage();
-	}
-
-	public void closeDialog() {
-
-		_tourTrackConfigDialog.hideNow();
 	}
 
 	@Override
@@ -131,6 +129,18 @@ public class ActionShowTourInMap3 extends ContributionItem {
 		}
 	}
 
+	@Override
+	public String getDialogId() {
+
+		return _dialogId;
+	}
+
+	@Override
+	public void hideDialog() {
+
+		_tourTrackConfigDialog.hideNow();
+	}
+
 	private void onDispose() {
 
 		_actionImage.dispose();
@@ -173,7 +183,7 @@ public class ActionShowTourInMap3 extends ContributionItem {
 		final boolean isTrackVisible = _actionTrackLayer.getSelection();
 
 		/*
-		 * show/hide tour track properties
+		 * show/hide tour track layer
 		 */
 		if (isTrackVisible) {
 
@@ -197,7 +207,7 @@ public class ActionShowTourInMap3 extends ContributionItem {
 	private void openConfigDialog(final Rectangle itemBounds, final boolean isOpenDelayed) {
 
 		// ensure other dialogs are closed
-		_map3View.closeAllColorSelectDialogs();
+		_map3View.closeOpenedDialogs(this);
 
 		_tourTrackConfigDialog.open(itemBounds, isOpenDelayed);
 	}

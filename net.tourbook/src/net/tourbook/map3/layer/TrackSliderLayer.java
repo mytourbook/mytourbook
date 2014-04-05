@@ -44,6 +44,8 @@ public class TrackSliderLayer extends AnnotationLayer implements SelectListener 
 
 	private TrackPointAnnotation	_leftSlider;
 	private TrackPointAnnotation	_rightSlider;
+	private TrackPointLine			_leftSliderLine;
+	private TrackPointLine			_rightSliderLine;
 
 	public TrackSliderLayer(final IDialogSettings state) {
 
@@ -59,6 +61,9 @@ public class TrackSliderLayer extends AnnotationLayer implements SelectListener 
 
 		addAnnotation(_leftSlider);
 		addAnnotation(_rightSlider);
+
+		_leftSliderLine = new TrackPointLine();
+		_rightSliderLine = new TrackPointLine();
 	}
 
 	private TrackPointAnnotation createSlider(final boolean isLeftSlider) {
@@ -97,8 +102,22 @@ public class TrackSliderLayer extends AnnotationLayer implements SelectListener 
 	@Override
 	protected void doRender(final DrawContext dc) {
 
-		_leftSlider.setSliderPosition(dc);
-		_rightSlider.setSliderPosition(dc);
+		final Position leftSliderPosition = _leftSlider.setSliderPosition(dc);
+		final Position rightSliderPosition = _rightSlider.setSliderPosition(dc);
+
+		if (rightSliderPosition != null) {
+			_rightSliderLine.makeOrderedRenderable(//
+					dc,
+					rightSliderPosition,
+					_rightSlider.getAttributes().getTextColor());
+		}
+
+		if (leftSliderPosition != null) {
+			_leftSliderLine.makeOrderedRenderable(//
+					dc,
+					leftSliderPosition,
+					_leftSlider.getAttributes().getTextColor());
+		}
 
 		super.doRender(dc);
 	}
@@ -149,6 +168,9 @@ public class TrackSliderLayer extends AnnotationLayer implements SelectListener 
 
 		_rightSlider.getAttributes().setVisible(isVisible);
 		_leftSlider.getAttributes().setVisible(isVisible);
+
+		_rightSliderLine.setVisible(isVisible);
+		_leftSliderLine.setVisible(isVisible);
 	}
 
 }

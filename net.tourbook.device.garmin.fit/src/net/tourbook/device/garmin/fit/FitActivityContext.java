@@ -9,6 +9,7 @@ import net.tourbook.common.util.Util;
 import net.tourbook.data.TimeData;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
+import net.tourbook.importdata.TourbookDevice;
 
 import org.apache.commons.io.FilenameUtils;
 
@@ -20,6 +21,7 @@ import org.apache.commons.io.FilenameUtils;
  */
 public class FitActivityContext {
 
+	private TourbookDevice			_device;
 	private final String			_filimportFilePathename;
 
 	private FitActivityContextData	_contextData;
@@ -42,10 +44,12 @@ public class FitActivityContext {
 	private Map<Long, TourData>		_alreadyImportedTours;
 	private HashMap<Long, TourData>	_newlyImportedTours;
 
-	public FitActivityContext(	final String importFilePath,
+	public FitActivityContext(	final TourbookDevice device,
+								final String importFilePath,
 								final Map<Long, TourData> alreadyImportedTours,
 								final HashMap<Long, TourData> newlyImportedTours) {
 
+		_device = device;
 		_filimportFilePathename = importFilePath;
 		_alreadyImportedTours = alreadyImportedTours;
 		_newlyImportedTours = newlyImportedTours;
@@ -153,12 +157,14 @@ public class FitActivityContext {
 	}
 
 	public void processData() {
+
 		_contextData.processData(new FitActivityContextDataHandler() {
 
 			@Override
 			public void handleTour(	final TourData tourData,
 									final ArrayList<TimeData> timeDataList,
 									final Set<TourMarker> tourMarkerSet) {
+
 				resetSpeedAtFirstPosition(timeDataList);
 
 				tourData.setTourTitle(getTourTitle());
@@ -173,17 +179,22 @@ public class FitActivityContext {
 
 				tourData.setIsDistanceFromSensor(isSpeedSensorPresent());
 
-				final Long tourId = tourData.createTourId(Util.UNIQUE_ID_SUFFIX_GARMIN_FIT);
-				if (_alreadyImportedTours.containsKey(tourId) == false) {
-					tourData.createTimeSeries(timeDataList, false);
+				tourData.createTimeSeries(timeDataList, false);
 
-					//tourData.computeTourDrivingTime();
+				// after all data are added, the tour id can be created
+				final String uniqueId = _device.createUniqueId(tourData, Util.UNIQUE_ID_SUFFIX_GARMIN_FIT);
+				final Long tourId = tourData.createTourId(uniqueId);
+
+				if (_alreadyImportedTours.containsKey(tourId) == false) {
+
+					// add new tour to the map
+					_newlyImportedTours.put(tourId, tourData);
+
+					// create additional data
 					tourData.computeComputedValues();
 					tourData.computeAltimeterGradientSerie();
 
 					tourData.setTourMarkers(tourMarkerSet);
-
-					_newlyImportedTours.put(tourId, tourData);
 				}
 			}
 		});

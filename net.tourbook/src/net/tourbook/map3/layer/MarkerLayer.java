@@ -69,7 +69,7 @@ public class MarkerLayer extends RenderableLayer implements SelectListener, IChe
 
 		try {
 
-			final URL url = TourbookPlugin.getDefault().getBundle().getEntry("/images/map3/map3-marker.png");
+			final URL url = TourbookPlugin.getDefault().getBundle().getEntry("/images/map3/map3-marker.png"); //$NON-NLS-1$
 			final String fileURL = FileLocator.toFileURL(url).toString();
 
 			ppAttributes.setScale(0.7);

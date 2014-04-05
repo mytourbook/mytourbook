@@ -57,6 +57,7 @@ import net.tourbook.map3.layer.TourInfoLayer;
 import net.tourbook.map3.layer.TourLegendLayer;
 import net.tourbook.map3.layer.TrackSliderLayer;
 import net.tourbook.map3.layer.tourtrack.TourTrackLayer;
+import net.tourbook.map3.ui.DialogMap3Layer;
 import net.tourbook.map3.ui.DialogTerrainProfileConfig;
 
 import org.eclipse.core.runtime.IPath;
@@ -78,7 +79,7 @@ public class Map3Manager {
 	 * This version number is incremented, when structural changes (e.g. new category) are done.
 	 * When this happens, the <b>default</b> structure is created.
 	 */
-	private static final int							MAP3_LAYER_STRUCTURE_VERSION	= 18;
+	private static final int							MAP3_LAYER_STRUCTURE_VERSION	= 20;
 
 	public static final String							PROPERTY_NAME_ENABLED			= "Enabled";														//$NON-NLS-1$
 
@@ -90,10 +91,12 @@ public class Map3Manager {
 	private static final String							TAG_CATEGORY					= "category";														//$NON-NLS-1$
 	private static final String							TAG_LAYER						= "layer";															//$NON-NLS-1$
 	//
+	private static final String							ATTR_CAN_SET_OPACITY			= "canSetOpacity";													//$NON-NLS-1$
 	private static final String							ATTR_ID							= "id";															//$NON-NLS-1$
 	private static final String							ATTR_IS_DEFAULT_LAYER			= "isDefaultLayer";												//$NON-NLS-1$
 	private static final String							ATTR_IS_ENABLED					= "isEnabled";														//$NON-NLS-1$
 	private static final String							ATTR_IS_EXPANDED				= "isExpanded";													//$NON-NLS-1$
+	private static final String							ATTR_OPACITY					= "opacity";														//$NON-NLS-1$
 	//
 	private static final int							INSERT_BEFORE_COMPASS			= 1;
 	public static final int								INSERT_BEFORE_PLACE_NAMES		= 2;
@@ -127,9 +130,10 @@ public class Map3Manager {
 	private static Map3View								_map3View;
 
 	/**
-	 * Instance of {@link Map3LayerView} or <code>null</code> when view is not created or disposed.
+	 * Instance of the map 3 layer viewer dialog or <code>null</code> when dialog is not created or
+	 * disposed.
 	 */
-	private static Map3LayerView						_map3LayerView;
+	private static DialogMap3Layer						_map3LayerDialog;
 
 	/**
 	 * Contains default layers with locale layer names which are used as a layer id.
@@ -325,6 +329,42 @@ public class Map3Manager {
 		setToolLayerInWWModel();
 	}
 
+	private static void createDefaultLayer_10_Map(final IMemento xml) {
+
+		createLayerXml_120_Default(xml, true, true, 1.0f, MapDefaultLayer.ID_STARS);
+		createLayerXml_120_Default(xml, true, true, 1.0f, MapDefaultLayer.ID_ATMOSPHERE);
+		createLayerXml_120_Default(xml, true, true, 1.0f, MapDefaultLayer.ID_NASA_BLUE_MARBLE_IMAGE);
+		createLayerXml_120_Default(xml, true, true, 1.0f, MapDefaultLayer.ID_BLUE_MARBLE_WMS_2004);
+		createLayerXml_120_Default(xml, true, true, 1.0f, MapDefaultLayer.ID_I_CUBED_LANDSAT);
+		createLayerXml_120_Default(xml, false, true, 1.0f, MapDefaultLayer.ID_USDA_NAIP);
+		createLayerXml_120_Default(xml, false, true, 1.0f, MapDefaultLayer.ID_USDA_NAIP_USGS);
+		createLayerXml_120_Default(xml, true, true, 1.0f, MapDefaultLayer.ID_MS_VIRTUAL_EARTH_AERIAL);
+		createLayerXml_120_Default(xml, true, true, 1.0f, MapDefaultLayer.ID_BING_IMAGERY);
+		createLayerXml_120_Default(xml, false, true, 1.0f, MapDefaultLayer.ID_USGS_TOPOGRAPHIC_MAPS_1_250K);
+		createLayerXml_120_Default(xml, false, true, 1.0f, MapDefaultLayer.ID_USGS_TOPOGRAPHIC_MAPS_1_100K);
+		createLayerXml_120_Default(xml, false, true, 1.0f, MapDefaultLayer.ID_USGS_TOPOGRAPHIC_MAPS_1_24K);
+		createLayerXml_120_Default(xml, false, true, 1.0f, MapDefaultLayer.ID_USGS_URBAN_AREA_ORTHO);
+		createLayerXml_120_Default(xml, true, true, 1.0f, MapDefaultLayer.ID_POLITICAL_BOUNDARIES);
+		createLayerXml_120_Default(xml, false, true, 1.0f, MapDefaultLayer.ID_OPEN_STREET_MAP);
+		createLayerXml_120_Default(xml, false, true, 1.0f, MapDefaultLayer.ID_EARTH_AT_NIGHT);
+	}
+
+	private static void createDefaultLayer_20_Tour(final IMemento xml) {
+
+		createLayerXml_120_Default(xml, true, false, 1.0f, MapDefaultLayer.ID_PLACE_NAMES);
+	}
+
+	private static void createDefaultLayer_30_Info(final IMemento xml) {
+
+		createLayerXml_120_Default(xml, true, true, 0.6f, MapDefaultLayer.ID_WORLD_MAP);
+		createLayerXml_120_Default(xml, true, true, 1.0f, MapDefaultLayer.ID_SCALE_BAR);
+	}
+
+	private static void createDefaultLayer_40_Tools(final IMemento xml) {
+
+		createLayerXml_120_Default(xml, true, true, 0.7f, MapDefaultLayer.ID_COMPASS);
+	}
+
 	private static void createLayer_MT_Marker() {
 
 		/*
@@ -348,7 +388,7 @@ public class Map3Manager {
 			_uiVisibleLayersFromXml.add(tviLayer);
 		}
 
-		tviLayer.addCheckStateListener(_wwLayer_Marker);
+		tviLayer.setCheckStateListener(_wwLayer_Marker);
 
 		_uiCustomLayers.put(layerId, tviLayer);
 	}
@@ -379,6 +419,8 @@ public class Map3Manager {
 		// default is enabled
 		tviLayer.isLayerVisible = isVisible;
 		tviLayer.defaultPosition = INSERT_BEFORE_PLACE_NAMES;
+		tviLayer.setCanSetOpacity(true);
+		tviLayer.setOpacity(1.0f);
 
 		if (isVisible) {
 			_uiVisibleLayersFromXml.add(tviLayer);
@@ -410,7 +452,8 @@ public class Map3Manager {
 			_uiVisibleLayersFromXml.add(tviLayer);
 		}
 
-		tviLayer.addCheckStateListener(_wwLayer_TourTrack);
+		tviLayer.setCanSetOpacity(false);
+		tviLayer.setCheckStateListener(_wwLayer_TourTrack);
 
 		_uiCustomLayers.put(layerId, tviLayer);
 	}
@@ -429,6 +472,7 @@ public class Map3Manager {
 		final boolean isVisible = true;
 
 		// default is enabled
+		tviLayer.setCanSetOpacity(false);
 		tviLayer.isLayerVisible = isVisible;
 		tviLayer.defaultPosition = INSERT_BEFORE_PLACE_NAMES;
 
@@ -458,7 +502,9 @@ public class Map3Manager {
 				Messages.Custom_Layer_ViewerController);
 
 		tviLayer.defaultPosition = INSERT_BEFORE_COMPASS;
-		tviLayer.addCheckStateListener(new ViewerControllerCheckStateListener(viewControlsLayer));
+		tviLayer.setCanSetOpacity(true);
+		tviLayer.setOpacity(1.0f);
+		tviLayer.setCheckStateListener(new ViewerControllerCheckStateListener(viewControlsLayer));
 
 		_uiCustomLayers.put(layerId, tviLayer);
 	}
@@ -488,6 +534,7 @@ public class Map3Manager {
 		// default is enabled
 		tviLayer.isLayerVisible = isVisible;
 		tviLayer.defaultPosition = INSERT_BEFORE_COMPASS;
+		tviLayer.setCanSetOpacity(false);
 
 		if (isVisible) {
 			_uiVisibleLayersFromXml.add(tviLayer);
@@ -515,6 +562,8 @@ public class Map3Manager {
 		final TVIMap3Layer tviLayer = new TVIMap3Layer(layerId, profileLayer, Messages.Custom_Layer_TerrainProfile);
 
 		tviLayer.defaultPosition = INSERT_BEFORE_COMPASS;
+		tviLayer.setCanSetOpacity(true);
+		tviLayer.setOpacity(1.0f);
 
 		final DialogTerrainProfileConfig terrainProfileConfig = new DialogTerrainProfileConfig(
 				_ww,
@@ -566,24 +615,9 @@ public class Map3Manager {
 			/*
 			 * Category: Map
 			 */
-			final IMemento xmlCategoryMap = createLayerXml_110_DefaultCategory(xmlRoot, MapDefaultCategory.ID_MAP);
+			final IMemento xmlCatMap = createLayerXml_110_DefaultCategory(xmlRoot, MapDefaultCategory.ID_MAP);
 			{
-				createLayerXml_120_DefaultLayer(xmlCategoryMap, true, MapDefaultLayer.ID_STARS);
-				createLayerXml_120_DefaultLayer(xmlCategoryMap, true, MapDefaultLayer.ID_ATMOSPHERE);
-				createLayerXml_120_DefaultLayer(xmlCategoryMap, true, MapDefaultLayer.ID_NASA_BLUE_MARBLE_IMAGE);
-				createLayerXml_120_DefaultLayer(xmlCategoryMap, true, MapDefaultLayer.ID_BLUE_MARBLE_WMS_2004);
-				createLayerXml_120_DefaultLayer(xmlCategoryMap, true, MapDefaultLayer.ID_I_CUBED_LANDSAT);
-				createLayerXml_120_DefaultLayer(xmlCategoryMap, false, MapDefaultLayer.ID_USDA_NAIP);
-				createLayerXml_120_DefaultLayer(xmlCategoryMap, false, MapDefaultLayer.ID_USDA_NAIP_USGS);
-				createLayerXml_120_DefaultLayer(xmlCategoryMap, true, MapDefaultLayer.ID_MS_VIRTUAL_EARTH_AERIAL);
-				createLayerXml_120_DefaultLayer(xmlCategoryMap, true, MapDefaultLayer.ID_BING_IMAGERY);
-				createLayerXml_120_DefaultLayer(xmlCategoryMap, false, MapDefaultLayer.ID_USGS_TOPOGRAPHIC_MAPS_1_250K);
-				createLayerXml_120_DefaultLayer(xmlCategoryMap, false, MapDefaultLayer.ID_USGS_TOPOGRAPHIC_MAPS_1_100K);
-				createLayerXml_120_DefaultLayer(xmlCategoryMap, false, MapDefaultLayer.ID_USGS_TOPOGRAPHIC_MAPS_1_24K);
-				createLayerXml_120_DefaultLayer(xmlCategoryMap, false, MapDefaultLayer.ID_USGS_URBAN_AREA_ORTHO);
-				createLayerXml_120_DefaultLayer(xmlCategoryMap, true, MapDefaultLayer.ID_POLITICAL_BOUNDARIES);
-				createLayerXml_120_DefaultLayer(xmlCategoryMap, false, MapDefaultLayer.ID_OPEN_STREET_MAP);
-				createLayerXml_120_DefaultLayer(xmlCategoryMap, false, MapDefaultLayer.ID_EARTH_AT_NIGHT);
+				createDefaultLayer_10_Map(xmlCatMap);
 			}
 
 			/*
@@ -591,7 +625,7 @@ public class Map3Manager {
 			 */
 			final IMemento xmlCategoryTour = createLayerXml_110_DefaultCategory(xmlRoot, MapDefaultCategory.ID_TOUR);
 			{
-				createLayerXml_120_DefaultLayer(xmlCategoryTour, true, MapDefaultLayer.ID_PLACE_NAMES);
+				createDefaultLayer_20_Tour(xmlCategoryTour);
 			}
 
 			/*
@@ -599,8 +633,7 @@ public class Map3Manager {
 			 */
 			final IMemento xmlCategoryInfo = createLayerXml_110_DefaultCategory(xmlRoot, MapDefaultCategory.ID_INFO);
 			{
-				createLayerXml_120_DefaultLayer(xmlCategoryInfo, true, MapDefaultLayer.ID_WORLD_MAP);
-				createLayerXml_120_DefaultLayer(xmlCategoryInfo, true, MapDefaultLayer.ID_SCALE_BAR);
+				createDefaultLayer_30_Info(xmlCategoryInfo);
 			}
 
 			/*
@@ -608,7 +641,7 @@ public class Map3Manager {
 			 */
 			final IMemento xmlCategoryTools = createLayerXml_110_DefaultCategory(xmlRoot, MapDefaultCategory.ID_TOOL);
 			{
-				createLayerXml_120_DefaultLayer(xmlCategoryTools, true, MapDefaultLayer.ID_COMPASS);
+				createDefaultLayer_40_Tools(xmlCategoryTools);
 			}
 
 		} catch (final Exception e) {
@@ -648,9 +681,11 @@ public class Map3Manager {
 		return xmlCategory;
 	}
 
-	private static void createLayerXml_120_DefaultLayer(final IMemento xmlCategory,
-														final boolean isEnabled,
-														final String defaultLayerId) {
+	private static void createLayerXml_120_Default(	final IMemento xmlCategory,
+													final boolean isEnabled,
+													final boolean canSetOpacity,
+													final float opacity,
+													final String defaultLayerId) {
 
 		final DefaultLayer mapDefaultLayer = MapDefaultLayer.getLayer(defaultLayerId);
 
@@ -663,6 +698,10 @@ public class Map3Manager {
 		xmlLayer.putString(ATTR_ID, defaultLayerId);
 		xmlLayer.putBoolean(ATTR_IS_ENABLED, isEnabled);
 		xmlLayer.putBoolean(ATTR_IS_DEFAULT_LAYER, true);
+
+		// opacity
+		xmlLayer.putFloat(ATTR_OPACITY, opacity);
+		xmlLayer.putBoolean(ATTR_CAN_SET_OPACITY, canSetOpacity);
 	}
 
 	/**
@@ -724,6 +763,9 @@ public class Map3Manager {
 				xmlLayer.putString(ATTR_ID, tviLayer.getId());
 				xmlLayer.putBoolean(ATTR_IS_ENABLED, tviLayer.isLayerVisible);
 				xmlLayer.putBoolean(ATTR_IS_DEFAULT_LAYER, tviLayer.isDefaultLayer);
+
+				xmlLayer.putBoolean(ATTR_CAN_SET_OPACITY, tviLayer.canSetOpacity());
+				xmlLayer.putFloat(ATTR_OPACITY, tviLayer.getOpacity());
 			}
 		}
 	}
@@ -761,7 +803,7 @@ public class Map3Manager {
 	/**
 	 * @param isTrackVisible
 	 */
-	static void enableMap3Actions() {
+	public static void enableMap3Actions() {
 
 		if (_map3View == null) {
 			// ignore when view is not created
@@ -799,28 +841,29 @@ public class Map3Manager {
 	}
 
 	/**
-	 * @return Returns instance of {@link Map3LayerView} or null when view is not created.
+	 * @return Returns an instance of {@link DialogMap3Layer} or <code>null</code> when view is not
+	 *         created.
 	 */
-	public static Map3LayerView getMap3LayerView() {
-		return _map3LayerView;
+	public static DialogMap3Layer getMap3LayerDialog() {
+		return _map3LayerDialog;
 	}
 
 	/**
-	 * @return Returns instance of {@link Map3View} or null when view is not created.
+	 * @return Returns instance of {@link Map3View} or <code>null</code> when view is not created.
 	 */
 	public static Map3View getMap3View() {
 		return _map3View;
 	}
 
-	static TVIMap3Root getRootItem() {
+	public static TVIMap3Root getRootItem() {
 		return _uiRootItem;
 	}
 
-	static Object[] getUIExpandedCategories() {
+	public static Object[] getUIExpandedCategories() {
 		return _uiExpandedCategories;
 	}
 
-	static Object[] getUIVisibleLayers() {
+	public static Object[] getUIVisibleLayers() {
 		return _uiVisibleLayers;
 	}
 
@@ -1148,6 +1191,12 @@ public class Map3Manager {
 							_uiVisibleLayersFromXml.remove(tviLayer);
 						}
 
+						/*
+						 * Opacity
+						 */
+						tviLayer.setOpacity(Util.getXmlFloatFloat(xmlChild, ATTR_OPACITY, 1.0f, 0.0f, 1.0f));
+						tviLayer.setCanSetOpacity(Util.getXmlBoolean(xmlChild, ATTR_CAN_SET_OPACITY, true));
+
 						tviParent.addChild(tviLayer);
 
 					} else if (xmlType.equals(TAG_CATEGORY)) {
@@ -1238,7 +1287,7 @@ public class Map3Manager {
 	 * </pre>
 	 */
 
-	static void saveUIState(final Object[] checkedElements, final Object[] expandedElements) {
+	public static void saveUIState(final Object[] checkedElements, final Object[] expandedElements) {
 
 		/*
 		 * remove categories because they are contained in this list even when only a part of the
@@ -1296,8 +1345,8 @@ public class Map3Manager {
 		}
 
 		// update UI
-		if (_map3LayerView != null && insertedLayers.size() > 0) {
-			_map3LayerView.updateUI_NewLayer(insertedLayers);
+		if (_map3LayerDialog != null && insertedLayers.size() > 0) {
+			_map3LayerDialog.updateUI_NewLayer(insertedLayers);
 		}
 
 	}
@@ -1309,10 +1358,10 @@ public class Map3Manager {
 		// update tvi model
 		tviLayer.isLayerVisible = isVisible;
 
-		if (_map3LayerView != null) {
+		if (_map3LayerDialog != null) {
 
 			// update viewer
-			_map3LayerView.setLayerVisible(tviLayer, isVisible);
+			_map3LayerDialog.setLayerVisible(tviLayer, isVisible);
 		}
 
 		// add/remove layer listener
@@ -1344,7 +1393,7 @@ public class Map3Manager {
 	 */
 	static void setLayerVisible_TourTrack(final boolean isTrackVisible) {
 
-		if (_map3LayerView == null) {
+		if (_map3LayerDialog == null) {
 
 			// update model, layer viewer is not displayed
 
@@ -1354,9 +1403,9 @@ public class Map3Manager {
 
 			// update model and UI
 
-			_map3LayerView.setLayerVisible_TourTrack(//
-					_uiCustomLayers.get(TourTrackLayer.MAP3_LAYER_ID),
-					isTrackVisible);
+			final TVIMap3Layer tviMap3Layer = _uiCustomLayers.get(TourTrackLayer.MAP3_LAYER_ID);
+
+			_map3LayerDialog.setLayerVisible_TourTrack(tviMap3Layer, isTrackVisible);
 		}
 	}
 
@@ -1369,11 +1418,9 @@ public class Map3Manager {
 		setCustomLayerVisibleInTVIModel(isVisible, TrackSliderLayer.MAP3_LAYER_ID);
 	}
 
-	/**
-	 * @param map3PropertiesView
-	 */
-	static void setMap3PropertiesView(final Map3LayerView map3PropertiesView) {
-		_map3LayerView = map3PropertiesView;
+	public static void setMap3LayerDialog(final DialogMap3Layer dialogMap3LayerViewer) {
+
+		_map3LayerDialog = dialogMap3LayerViewer;
 	}
 
 	/**

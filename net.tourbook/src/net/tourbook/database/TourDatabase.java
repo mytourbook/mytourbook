@@ -521,7 +521,7 @@ public class TourDatabase {
 		} catch (final SQLException e) {
 			UI.showSQLException(e);
 		} finally {
-			Util.sqlClose(stmt);
+			Util.closeSql(stmt);
 			closeConnection(conn);
 		}
 
@@ -726,7 +726,7 @@ public class TourDatabase {
 						} catch (final SQLException e) {
 							UI.showSQLException(e);
 						} finally {
-							Util.sqlClose(stmt);
+							Util.closeSql(stmt);
 							closeConnection(conn);
 						}
 
@@ -1853,7 +1853,7 @@ public class TourDatabase {
 			} catch (final SQLException e) {
 				UI.showSQLException(e);
 			} finally {
-				Util.sqlClose(stmt);
+				Util.closeSql(stmt);
 			}
 
 		} catch (final SQLException e) {
@@ -1947,8 +1947,8 @@ public class TourDatabase {
 			} catch (final SQLException e) {
 				UI.showSQLException(e);
 			}
-			Util.sqlClose(stmt1);
-			Util.sqlClose(stmt2);
+			Util.closeSql(stmt1);
+			Util.closeSql(stmt2);
 		}
 
 		return true;
@@ -3130,8 +3130,7 @@ public class TourDatabase {
 
 			while (result.next()) {
 
-				System.out.println(net.tourbook.common.UI.timeStampNano()
-						+ " \tcolumn name is available: " //$NON-NLS-1$
+				System.out.println(net.tourbook.common.UI.timeStampNano() + " \tcolumn name is available: " //$NON-NLS-1$
 						+ result.getString("COLUMN_NAME")); //$NON-NLS-1$
 				// TODO remove SYSTEM.OUT.PRINTLN
 
@@ -4668,7 +4667,7 @@ public class TourDatabase {
 				exec(stmt, sqlTourData);
 			}
 		}
-		
+
 		stmt.close();
 
 		logDbUpdateEnd(newDbVersion);

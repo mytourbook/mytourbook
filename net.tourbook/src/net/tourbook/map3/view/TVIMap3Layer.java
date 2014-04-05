@@ -27,6 +27,9 @@ public class TVIMap3Layer extends TVIMap3Item {
 	public boolean				isLayerVisible;
 	boolean						isDefaultLayer;
 
+	private boolean				_canSetOpacity;
+	private float				_opacity;
+
 	int							defaultPosition;
 
 	private ICheckStateListener	_checkStateListener;
@@ -40,8 +43,8 @@ public class TVIMap3Layer extends TVIMap3Item {
 		this.name = uiLayerName;
 	}
 
-	void addCheckStateListener(final ICheckStateListener checkStateListener) {
-		_checkStateListener = checkStateListener;
+	public boolean canSetOpacity() {
+		return _canSetOpacity;
 	}
 
 	@Override
@@ -49,7 +52,7 @@ public class TVIMap3Layer extends TVIMap3Item {
 		// default layer has no children
 	}
 
-	void fireCheckStateListener() {
+	public void fireCheckStateListener() {
 
 		if (_checkStateListener != null) {
 			_checkStateListener.onSetCheckState(this);
@@ -60,9 +63,32 @@ public class TVIMap3Layer extends TVIMap3Item {
 		return id;
 	}
 
+	public float getOpacity() {
+		return _opacity;
+	}
+
 	@Override
 	public boolean hasChildren() {
 		return false;
+	}
+
+	public void setCanSetOpacity(final boolean canSetOpacity) {
+		_canSetOpacity = canSetOpacity;
+	}
+
+	void setCheckStateListener(final ICheckStateListener checkStateListener) {
+		_checkStateListener = checkStateListener;
+	}
+
+	/**
+	 * Set opacity to the tree item and the ww layer.
+	 * 
+	 * @param opacity
+	 */
+	public void setOpacity(final float opacity) {
+
+		_opacity = opacity;
+		wwLayer.setOpacity(_opacity);
 	}
 
 	@Override

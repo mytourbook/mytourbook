@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -948,13 +948,18 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
+
 				final TourData tourData = ((TourData) cell.getElement());
 				final float tourDistance = tourData.getTourDistance();
 				final long drivingTime = tourData.getTourDrivingTime();
-				if (drivingTime != 0) {
 
-					cell.setText(_nf1.format(tourDistance / drivingTime * 3.6 / UI.UNIT_VALUE_DISTANCE));
+				double speed = 0;
+
+				if (drivingTime != 0) {
+					speed = tourDistance / drivingTime * 3.6 / UI.UNIT_VALUE_DISTANCE;
 				}
+
+				cell.setText(speed == 0.0 ? UI.EMPTY_STRING : _nf1.format(speed));
 			}
 		});
 	}
@@ -969,8 +974,10 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
+
 				final int tourCalories = ((TourData) cell.getElement()).getCalories();
-				cell.setText(Integer.toString(tourCalories));
+
+				cell.setText(tourCalories == 0 ? UI.EMPTY_STRING : Integer.toString(tourCalories));
 			}
 		});
 	}
@@ -1152,7 +1159,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 					if (wayPoints != null) {
 						size += wayPoints.size();
 					}
-					cell.setText(Integer.toString(size));
+					cell.setText(size == 0 ? UI.EMPTY_STRING : Integer.toString(size));
 				}
 			}
 		});
@@ -1681,8 +1688,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		menuMgr.add(_actionRemoveToursWhenClosed);
 
 		menuMgr.add(new Separator());
-		menuMgr.add(_actionMergeGPXTours);
 		menuMgr.add(_actionCreateTourIdWithTime);
+		menuMgr.add(_actionMergeGPXTours);
 		menuMgr.add(_actionDisableChecksumValidation);
 		menuMgr.add(_actionAdjustImportedYear);
 

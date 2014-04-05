@@ -84,7 +84,6 @@ public class PerspectiveFactoryPhoto implements IPerspectiveFactory {
 				FOLDER_PHOTO_GALLERY);
 
 		folderLink.addView(TourPhotoLinkView.ID);
-		folderLink.addPlaceholder(IExternalIds.VIEW_ID_NET_TOURBOOK_MAP3_MAP3_LAYER_VIEW);
 	}
 
 }

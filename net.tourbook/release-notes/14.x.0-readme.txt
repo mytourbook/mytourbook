@@ -1,0 +1,58 @@
+Version: 14.x.0                                       ?. ? 2014
+
+
+HINT for docu
+Delete 3D map images in C:\ProgramData\WorldWindData\Earth\... because it is possible that newer images are available but they are not downloaded because they are cached in these folders.
+
+
+INFO
+An error can occure when MT (or a perspective) is opened the first time after installing this version. The reason is that the "3D Map Layer" view is not available any more as an Eclipse view, now it's displayed as a slideout which is not an Eclipse view. This was done to have a consistent UI with slideouts to configure the 3D map.
+
+TIP
+Improve performance by disabling layers, e.g. "Bing Imagery" and "MS Virtual Earth Areal", these layers can slow down the map drawing.
+
+
+New 3D Map Features 	
+
+* Draw a line to the surface from a slider (right/left/hovered).
+
+* Converted layer view into a slideout.
+
+ 
+
+Improvements
+
+* The same tour can be saved twice, however this needed to restructured the creation of the tour id for ALL supported import formats. A tour id can now be created with/without tour distance (default is without), see here for more details.
+
+
+VERY IMPORTANT
+
+.fit data files
+
+Imported and saved .fit files from previous versions (14.2 and older) of MyTourbook are not recognized as already saved tours, because the old implementation used a wrong algorithm to create the tour id. The import of .fit files with the current version 14.4 and future versions of MyTourbook will create a different tour id. 
+
+Already imported and saved .fit tours work as before, it's just the creation (and first save) of a tour which creates the tour id.
+
+So, please take care when you try to import already saved .fit tours because the 'Database Status' column (first column) in the import view do not display the correct state.
+
+
+Other data file formats
+
+It's possible that other data file formats can have the same problem like the .fit files. 
+During my testing this problem occured when a tour contained only a few (e.g. 2) timeslices or had other issues. 
+The 'Database Status' for 'normal' imported tours should be displayed correctly.
+
+
+* 
+
+* 
+
+
+
+Fixed Bugs
+
+*  Fixed bug in TCX import when <DistanceMeters> are < 0
+
+* 
+
+* 

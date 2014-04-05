@@ -345,7 +345,7 @@ public abstract class ToolTip3 {
 			}
 
 			if (defaultLocation == null) {
-				defaultLocation = getToolTipLocation(shellSize, _ownerHoverPosition);
+				defaultLocation = getToolTipLocation(shellSize, _ownerHoverPosition, _hoveredTool.getToolProvider());
 			}
 
 			if (defaultLocation == null) {
@@ -884,9 +884,12 @@ public abstract class ToolTip3 {
 	 * 
 	 * @param size
 	 *            Tooltip size
+	 * @param toolProvider
 	 * @return Returns location relative to the device.
 	 */
-	protected abstract Point getToolTipLocation(Point size, final Point mouseOwnerPosition);
+	protected abstract Point getToolTipLocation(Point tipSize,
+												final Point mouseOwnerPosition,
+												IToolProvider toolProvider);
 
 	/**
 	 * Hide the currently active tool tip

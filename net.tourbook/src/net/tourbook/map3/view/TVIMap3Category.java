@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -38,23 +38,21 @@ public class TVIMap3Category extends TVIMap3Item {
 		return id;
 	}
 
-	void setCheckState() {
+	public void setCheckState() {
 
 		if (_checkStateNotSet.size() == 0) {
 			// nothing to do
 			return;
 		}
 
-		ContainerCheckedTreeViewer propViewer = null;
 
-		final Map3LayerView propView = Map3Manager.getMap3LayerView();
-		if (propView != null) {
+		final ContainerCheckedTreeViewer layerViewer = getTreeItemViewer();
+		if (layerViewer != null) {
 
-			propViewer = propView.getPropertiesViewer();
 
 			// set check state in the viewer
 			for (final TVIMap3Layer layerItem : _checkStateNotSet) {
-				propViewer.setChecked(layerItem, layerItem.isLayerVisible);
+				layerViewer.setChecked(layerItem, layerItem.isLayerVisible);
 			}
 
 			// reset

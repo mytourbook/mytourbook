@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -369,7 +369,7 @@ public class PolarTrainerSAXHandler extends DefaultHandler {
 
 	private void finalizeTour() throws InvalidDeviceSAXException {
 
-		if (finalizeTour10CreateTimeSlices() == false) {
+		if (finalizeTour_10_CreateTimeSlices() == false) {
 			_isImported = false;
 			return;
 		}
@@ -392,30 +392,30 @@ public class PolarTrainerSAXHandler extends DefaultHandler {
 		tourData.setCalories(_currentExercise.calories);
 		tourData.setRestPulse(_currentExercise.restPulse);
 
+		tourData.setDeviceId(_device.deviceId);
+		tourData.setDeviceName(DEVICE_NAME_POLAR_PERSONALTRAINER);
+
+		tourData.setDeviceFirmwareVersion(_dataVersion == 1 ? TAG_ROOT_VERSION_1 : UI.EMPTY_STRING);
+
 		tourData.createTimeSeries(_timeSlices, true);
 
-		finalizeTour20CreateMarkers(tourData);
-		finalizeTour30SetTourType(tourData);
-
-		tourData.computeAltitudeUpDown();
-
 		// after all data are added, the tour id can be created
-		final Long tourId = tourData
-				.createTourId(_device.createUniqueId(tourData, Util.UNIQUE_ID_SUFFIX_POLAR_TRAINER));
+		final String uniqueId = _device.createUniqueId(tourData, Util.UNIQUE_ID_SUFFIX_POLAR_TRAINER);
+		final Long tourId = tourData.createTourId(uniqueId);
 
 		// check if the tour is already imported
 		if (_alreadyImportedTours.containsKey(tourId) == false) {
 
-			tourData.computeTourDrivingTime();
-			tourData.computeComputedValues();
-
-			tourData.setDeviceId(_device.deviceId);
-			tourData.setDeviceName(DEVICE_NAME_POLAR_PERSONALTRAINER);
-
-			tourData.setDeviceFirmwareVersion(_dataVersion == 1 ? TAG_ROOT_VERSION_1 : UI.EMPTY_STRING);
-
 			// add new tour to other tours
 			_newlyImportedTours.put(tourId, tourData);
+
+			finalizeTour_20_CreateMarkers(tourData);
+			finalizeTour_30_SetTourType(tourData);
+
+			// create additional data
+			tourData.computeAltitudeUpDown();
+			tourData.computeTourDrivingTime();
+			tourData.computeComputedValues();
 		}
 
 		_isImported = true;
@@ -424,7 +424,7 @@ public class PolarTrainerSAXHandler extends DefaultHandler {
 	/**
 	 * @throws InvalidDeviceSAXException
 	 */
-	private boolean finalizeTour10CreateTimeSlices() throws InvalidDeviceSAXException {
+	private boolean finalizeTour_10_CreateTimeSlices() throws InvalidDeviceSAXException {
 
 		_timeSlices.clear();
 
@@ -543,7 +543,7 @@ public class PolarTrainerSAXHandler extends DefaultHandler {
 		return true;
 	}
 
-	private void finalizeTour20CreateMarkers(final TourData tourData) {
+	private void finalizeTour_20_CreateMarkers(final TourData tourData) {
 
 		if (_laps.size() == 0) {
 			return;
@@ -601,7 +601,7 @@ public class PolarTrainerSAXHandler extends DefaultHandler {
 	 * 
 	 * @param tourData
 	 */
-	private void finalizeTour30SetTourType(final TourData tourData) {
+	private void finalizeTour_30_SetTourType(final TourData tourData) {
 
 		final String sport = _currentExercise.sport;
 

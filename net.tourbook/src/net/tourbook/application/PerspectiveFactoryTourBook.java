@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -79,7 +79,6 @@ public class PerspectiveFactoryTourBook implements IPerspectiveFactory {
 		listFolder.addView(CalendarView.ID);
 		listFolder.addView(TourStatisticsView.ID);
 		listFolder.addPlaceholder(PicDirView.ID);
-		listFolder.addPlaceholder(IExternalIds.VIEW_ID_NET_TOURBOOK_MAP3_MAP3_LAYER_VIEW);
 
 		//--------------------------------------------------------------------------------
 

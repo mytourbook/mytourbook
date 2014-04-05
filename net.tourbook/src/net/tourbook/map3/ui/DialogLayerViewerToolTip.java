@@ -40,7 +40,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.ui.dialogs.ContainerCheckedTreeViewer;
 
-public class DialogPropertyViewerToolTip extends ToolTip3 {
+public class DialogLayerViewerToolTip extends ToolTip3 {
 
 	/**
 	 * Relative horizontal start of the sensitive area in a hovered row.
@@ -58,7 +58,7 @@ public class DialogPropertyViewerToolTip extends ToolTip3 {
 	private TVIMap3Layer				_mapLayer;
 	private int							_hoverLeftBorder;
 
-	private int							_columnWidth;
+	private int							_column0_Width;
 
 	/*
 	 * UI resources
@@ -74,7 +74,7 @@ public class DialogPropertyViewerToolTip extends ToolTip3 {
 		}
 	}
 
-	public DialogPropertyViewerToolTip(final ContainerCheckedTreeViewer propViewer) {
+	public DialogLayerViewerToolTip(final ContainerCheckedTreeViewer propViewer) {
 
 		super(propViewer.getTree());
 
@@ -197,19 +197,19 @@ public class DialogPropertyViewerToolTip extends ToolTip3 {
 		if (viewerCell != null) {
 
 			/*
-			 * use the whole row as content area that when mouse is hovering other cells in the same
+			 * Use the first column as content area, when mouse is hovering other cells in the same
 			 * row, the tooltip keeps open
 			 */
 			_viewerRow = viewerCell.getViewerRow();
 
-			_columnWidth = _tree.getColumn(0).getWidth();
+			_column0_Width = _tree.getColumn(0).getWidth();
+			_hoverLeftBorder = (int) (_column0_Width * HOVERED_SENSITIVE_AREA);
+			final int ownerHoveredPositionX = ownerHoverPosition.x;
 
-			_hoverLeftBorder = (int) (_columnWidth * HOVERED_SENSITIVE_AREA);
-
-			if (ownerHoverPosition.x > _hoverLeftBorder) {
+			if (ownerHoveredPositionX > _hoverLeftBorder && ownerHoveredPositionX < _column0_Width) {
 
 				/*
-				 * the info tooltip is opened when the mouse is in the last 1/3 part of the row
+				 * the info tooltip is opened when the mouse is in the last 1/3 part of the column 0
 				 */
 
 				_sensitiveRowArea = _viewerRow;
@@ -235,7 +235,9 @@ public class DialogPropertyViewerToolTip extends ToolTip3 {
 	}
 
 	@Override
-	public Point getToolTipLocation(final Point tipSize, final Point mouseOwnerPosition) {
+	protected Point getToolTipLocation(	final Point tipSize,
+										final Point mouseOwnerPosition,
+										final IToolProvider toolProvider) {
 
 		if (_viewerRow == null) {
 			return null;
@@ -249,25 +251,39 @@ public class DialogPropertyViewerToolTip extends ToolTip3 {
 		final int rowWidth = rowBounds.width;
 		final int rowHeight = rowBounds.height;
 
-		final int devX = _columnWidth;
+		final int tipWidth = tipSize.x;
+		final int tipHeight = tipSize.y;
+
+		final int devX = -tipWidth;
 		final int devY = rowBounds.y;// + cellHeight;
 
 		final Point ttDisplayLocation = _tree.toDisplay(devX, devY);
-		final int tipSizeWidth = tipSize.x;
-		final int tipSizeHeight = tipSize.y;
 
-		if (ttDisplayLocation.x + tipSizeWidth > displayBounds.width) {
+		if (toolProvider != _defaultToolProvider) {
 
-			ttDisplayLocation.x = ttDisplayLocation.x - tipSizeWidth - rowWidth;
+			// locate tooltip closer that it can be accessed with the mouse
+
+			ttDisplayLocation.x = ttDisplayLocation.x + _hoverLeftBorder + 5;
 		}
 
-		if (ttDisplayLocation.y + tipSizeHeight > displayBounds.height) {
+//		if (ttDisplayLocation.x < 0) {
+//
+//			if (toolProvider == _defaultToolProvider) {
+//
+//				ttDisplayLocation.x = ttDisplayLocation.x - tipWidth - _column0_Width;
+//
+//			} else {
+//
+//			}
+//		}
+
+		if (ttDisplayLocation.y + tipHeight > displayBounds.height) {
 
 			/*
 			 * adjust vertical position, it is outside of the display, prevent default repositioning
 			 */
 
-			ttDisplayLocation.y = ttDisplayLocation.y - tipSizeHeight - rowHeight;
+			ttDisplayLocation.y = ttDisplayLocation.y - tipHeight - rowHeight;
 		}
 
 		return ttDisplayLocation;

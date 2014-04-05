@@ -1492,14 +1492,6 @@
 			id="net.tourbook.map3.view.Map3ViewId"
 			name="%View_Name_TourMap3"
 		/>
-   
-		<view
-			category="net.tourbook.category.map"
-			class="net.tourbook.map3.view.Map3LayerView"
-			icon="icons/map3-properties.png"
-			id="net.tourbook.map3.Map3LayerView"
-			name="%View_Name_Map3Properties"
-		/>
 
 		<view
 			category="net.tourbook.category.map"

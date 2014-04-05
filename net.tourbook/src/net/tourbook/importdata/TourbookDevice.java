@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import net.tourbook.data.TourData;
 
 public abstract class TourbookDevice implements IRawDataReader {
-	
+
 	/**
 	 * Temperature scale when a device supports scaled temperature values. A value greater than 10
 	 * does not make sense for a tour program.
@@ -35,22 +35,22 @@ public abstract class TourbookDevice implements IRawDataReader {
 	/**
 	 * Unique id for each device reader
 	 */
-	public String			deviceId;
+	public String	deviceId;
 
 	/**
 	 * Visible device name, e.g. HAC4, HAC5
 	 */
-	public String			visibleName;
+	public String	visibleName;
 
 	/**
 	 * File extension used when tour data are imported from a file
 	 */
-	public String			fileExtension;
+	public String	fileExtension;
 
 	/**
 	 * Sort priority (since version 10.11), default will sort devices to the end.
 	 */
-	public int				extensionSortPriority	= Integer.MAX_VALUE;
+	public int		extensionSortPriority	= Integer.MAX_VALUE;
 
 // disabled in version 10.10, it seems to be not used anymore
 //	/**
@@ -68,23 +68,23 @@ public abstract class TourbookDevice implements IRawDataReader {
 	/**
 	 * when set to <code>-1</code> this is ignored otherwise this year is used as the import year
 	 */
-	public int				importYear				= -1;
+	public int		importYear				= -1;
 
 	/**
 	 * When <code>true</code> the tracks in one file will be merged into one track, a marker is
 	 * created for each track
 	 */
-	public boolean			isMergeTracks			= false;
+	public boolean	isMergeTracks			= false;
 
 	/**
 	 * when <code>true</code> validate the checksum when importing data
 	 */
-	public boolean			isChecksumValidation	= true;
+	public boolean	isChecksumValidation	= true;
 
 	/**
-	 * when <code>true</code> the tour id will be created with the recording time
+	 * A tour id will be created with recording time when <code>true</code>.
 	 */
-	public boolean			isCreateTourIdWithRecordingTime;
+	public boolean	isCreateTourIdWithRecordingTime;
 
 	public TourbookDevice() {}
 
@@ -109,14 +109,17 @@ public abstract class TourbookDevice implements IRawDataReader {
 	/**
 	 * Creates a unique id for the tour, {@link TourData#createTimeSeries()} must be called ahead,
 	 * to create recording time.
+	 * <p>
+	 * Recording time is added to the tour id when {@link #isCreateTourIdWithRecordingTime} is
+	 * <code>true</code>.
 	 * 
 	 * @param tourData
 	 * @param distanceSerie
-	 * @param dummyKey
-	 *            The dummy key is used when distance serie is not available
-	 * @return Returns a unique key for a tour
+	 * @param defaultKey
+	 *            The default key is used when distance serie is not available.
+	 * @return Returns a unique key for a tour.
 	 */
-	public String createUniqueId(final TourData tourData, final String dummyKey) {
+	public String createUniqueId(final TourData tourData, final String defaultKey) {
 
 		String uniqueKey;
 		final float[] distanceSerie = tourData.getMetricDistanceSerie();
@@ -145,10 +148,39 @@ public abstract class TourbookDevice implements IRawDataReader {
 			 * original version to create a tour id
 			 */
 			if (distanceSerie == null) {
-				uniqueKey = dummyKey;
+				uniqueKey = defaultKey;
 			} else {
 				uniqueKey = Integer.toString((int) distanceSerie[distanceSerie.length - 1]);
 			}
+		}
+
+		return uniqueKey;
+	}
+
+	/**
+	 * @param tourData
+	 * @param tourDistance
+	 * @return Returns the legacy tour id with
+	 *         <p>
+	 *         <code>Integer.toString(tourDistance)</code>
+	 *         <p>
+	 *         as default, when recording time is not used as it was in the initial implementation.
+	 */
+	public String createUniqueId_Legacy(final TourData tourData, final int tourDistance) {
+
+		String uniqueKey;
+
+		if (isCreateTourIdWithRecordingTime) {
+
+			uniqueKey = Long.toString(tourDistance + tourData.getTourRecordingTime());
+
+		} else {
+
+			/*
+			 * This represents the original (1st) implementation without recording time.
+			 */
+
+			uniqueKey = Integer.toString(tourDistance);
 		}
 
 		return uniqueKey;
@@ -205,7 +237,7 @@ public abstract class TourbookDevice implements IRawDataReader {
 				+ extensionSortPriority
 				+ "]"; //$NON-NLS-1$
 	}
-	
+
 	public String userConfirmationMessage() {
 		return ""; //$NON-NLS-1$
 	}
@@ -213,5 +245,5 @@ public abstract class TourbookDevice implements IRawDataReader {
 	public boolean userConfirmationRequired() {
 		return false;
 	}
-	
+
 }

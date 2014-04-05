@@ -64,46 +64,38 @@ import org.joda.time.DateTimeZone;
 
 public class UI {
 
+	public static final char			TAB										= '\t';
+
+	public static final String			COMMA_SPACE								= ", ";																	//$NON-NLS-1$
 	public static final String			DASH									= "-";																		//$NON-NLS-1$
 	public static final String			DASH_WITH_SPACE							= " - ";																	//$NON-NLS-1$
 	public static final String			DASH_WITH_DOUBLE_SPACE					= "   -   ";																//$NON-NLS-1$
 	public static final String			DIMENSION								= " x ";																	//$NON-NLS-1$
 	public static final String			EMPTY_STRING							= "";																		//$NON-NLS-1$
+	public static final String			NEW_LINE								= "\n";																	//$NON-NLS-1$
+	public static final String			NEW_LINE2								= "\n\n";																	//$NON-NLS-1$
+	public static final String			NEW_LINE3								= "\n\n\n";																//$NON-NLS-1$
 	public static final String			SPACE									= " ";																		//$NON-NLS-1$
 	public static final String			SPACE2									= "  ";																	//$NON-NLS-1$
 	public static final String			SPACE4									= "    ";																	//$NON-NLS-1$
 	public static final String			STRING_0								= "0";																		//$NON-NLS-1$
-	public static final String			COMMA_SPACE								= ", ";																	//$NON-NLS-1$
-	//$NON-NLS-1$
-	public static final char			TAB										= '\t';
-
-	/**
-	 * contains a new line
-	 */
-	public static final String			NEW_LINE								= "\n";																	//$NON-NLS-1$
-
-	/**
-	 * contains 2 new lines
-	 */
-	public static final String			NEW_LINE2								= "\n\n";																	//$NON-NLS-1$
-	public static final String			NEW_LINE3								= "\n\n\n";																//$NON-NLS-1$
 
 	public static final String			SYMBOL_AVERAGE							= "\u00f8";																//$NON-NLS-1$
 	public static final String			SYMBOL_AVERAGE_WITH_SPACE				= "\u00f8 ";																//$NON-NLS-1$
 	public static final String			SYMBOL_DASH								= "\u2212";																//$NON-NLS-1$
+	public static final String			SYMBOL_DEGREE							= "\u00B0";																//$NON-NLS-1$
 	public static final String			SYMBOL_DIFFERENCE						= "\u0394";																//$NON-NLS-1$
 	public static final String			SYMBOL_DIFFERENCE_WITH_SPACE			= "\u0394 ";																//$NON-NLS-1$
 	public static final String			SYMBOL_DOUBLE_HORIZONTAL				= "\u2550";																//$NON-NLS-1$
 	public static final String			SYMBOL_DOUBLE_VERTICAL					= "\u2551";																//$NON-NLS-1$
-	public static final String			SYMBOL_DEGREE							= "\u00B0";																//$NON-NLS-1$
 	public static final String			SYMBOL_ELLIPSIS							= "\u2026";																//$NON-NLS-1$
-	public static final String			SYMBOL_INFINITY							= "\u221E";																//$NON-NLS-1$
+	public static final String			SYMBOL_FIGURE_DASH						= "\u2012";																//$NON-NLS-1$
+	public static final String			SYMBOL_FULL_BLOCK						= "\u2588";																//$NON-NLS-1$
+	public static final String			SYMBOL_INFINITY_MAX						= "\u221E";																//$NON-NLS-1$
+	public static final String			SYMBOL_INFINITY_MIN						= "-\u221E";																//$NON-NLS-1$
 	public static final String			SYMBOL_SUM_WITH_SPACE					= "\u2211 ";																//$NON-NLS-1$
+	public static final String			SYMBOL_SUN								= "\u263C";																//$NON-NLS-1$
 	public static final String			SYMBOL_TAU								= "\u03c4";																//$NON-NLS-1$
-	private static final String			SYMBOL_MIN_INFINITY						= "-\u221E";																//$NON-NLS-1$
-	private static final String			SYMBOL_MAX_INFINITY						= "\u221E";																//$NON-NLS-1$
-//	private static final String			SYMBOL_CONSOLE_MIN_INFINITY				= "-oo";																	//$NON-NLS-1$
-//	private static final String			SYMBOL_CONSOLE_MAX_INFINITY				= "oo";																	//$NON-NLS-1$
 
 	public static final String			SYMBOL_BRACKET_LEFT						= "(";																		//$NON-NLS-1$
 	public static final String			SYMBOL_BRACKET_RIGHT					= ")";																		//$NON-NLS-1$
@@ -455,9 +447,9 @@ public class UI {
 	public static String FormatDoubleMinMax(final double value) {
 
 		if (value == -Double.MAX_VALUE) {
-			return SYMBOL_MIN_INFINITY;
+			return SYMBOL_INFINITY_MIN;
 		} else if (value == Double.MAX_VALUE) {
-			return SYMBOL_MAX_INFINITY;
+			return SYMBOL_INFINITY_MAX;
 		}
 
 		return Double.toString(value);
@@ -466,9 +458,9 @@ public class UI {
 	public static String FormatDoubleMinMaxElevationMeter(final double value) {
 
 		if (value == -Double.MAX_VALUE) {
-			return SYMBOL_MIN_INFINITY;
+			return SYMBOL_INFINITY_MIN;
 		} else if (value == Double.MAX_VALUE) {
-			return SYMBOL_MAX_INFINITY;
+			return SYMBOL_INFINITY_MAX;
 		}
 
 		return Long.toString((long) (value / 1000)) + UI.SPACE + UI.UNIT_DISTANCE_KM;

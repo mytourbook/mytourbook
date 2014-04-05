@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -477,29 +477,31 @@ public class PolarHRMDataReader extends TourbookDevice {
 			tourData.setStartDistance(_sectionTrip.odometer == Integer.MIN_VALUE ? 0 : _sectionTrip.odometer);
 		}
 
-		final ArrayList<TimeData> timeSeries = createTourData10CreateTimeSeries(dtTourStart);
-		createTourData20SetTemperature(tourData, timeSeries);
+		final ArrayList<TimeData> timeSeries = createTourData_10_CreateTimeSeries(dtTourStart);
+		createTourData_20_SetTemperature(tourData, timeSeries);
+
+		tourData.setDeviceId(deviceId);
+		tourData.setDeviceName(_sectionParams.monitorName);
+		tourData.setDeviceFirmwareVersion(Integer.toString(_hrmVersion));
 
 		tourData.createTimeSeries(timeSeries, true);
 
-		createTourData30CreateMarkers(tourData);
-		tourData.computeAltitudeUpDown();
-
 		// after all data are added, the tour id can be created
-		final Long tourId = tourData.createTourId(createUniqueId(tourData, Util.UNIQUE_ID_SUFFIX_POLAR_HRM));
+		final String uniqueId = createUniqueId(tourData, Util.UNIQUE_ID_SUFFIX_POLAR_HRM);
+		final Long tourId = tourData.createTourId(uniqueId);
 
 		// check if the tour is already imported
 		if (alreadyImportedTours.containsKey(tourId) == false) {
 
-			tourData.computeTourDrivingTime();
-			tourData.computeComputedValues();
-
-			tourData.setDeviceId(deviceId);
-			tourData.setDeviceName(_sectionParams.monitorName);
-			tourData.setDeviceFirmwareVersion(Integer.toString(_hrmVersion));
-
 			// add new tour to other tours
 			newlyImportedTours.put(tourId, tourData);
+
+			// create additional data
+			tourData.computeTourDrivingTime();
+			tourData.computeComputedValues();
+			tourData.computeAltitudeUpDown();
+
+			createTourData_30_CreateMarkers(tourData);
 		}
 	}
 
@@ -509,7 +511,7 @@ public class PolarHRMDataReader extends TourbookDevice {
 	 * @param dtTourStart
 	 * @return
 	 */
-	private ArrayList<TimeData> createTourData10CreateTimeSeries(final DateTime dtTourStart) {
+	private ArrayList<TimeData> createTourData_10_CreateTimeSeries(final DateTime dtTourStart) {
 
 		final boolean isImperial = _sectionParams.isUSUnit;
 		final int sliceTimeInterval = _sectionParams.interval;
@@ -563,7 +565,7 @@ public class PolarHRMDataReader extends TourbookDevice {
 		return timeDataList;
 	}
 
-	private void createTourData20SetTemperature(final TourData tourData, final ArrayList<TimeData> timeSeries) {
+	private void createTourData_20_SetTemperature(final TourData tourData, final ArrayList<TimeData> timeSeries) {
 
 		if (_sectionLapData.size() == 0) {
 			return;
@@ -604,7 +606,7 @@ public class PolarHRMDataReader extends TourbookDevice {
 	 * 
 	 * @param tourData
 	 */
-	private void createTourData30CreateMarkers(final TourData tourData) {
+	private void createTourData_30_CreateMarkers(final TourData tourData) {
 
 		if (_sectionLapData.size() == 0) {
 			return;

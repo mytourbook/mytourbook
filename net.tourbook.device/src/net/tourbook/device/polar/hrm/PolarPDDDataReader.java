@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -138,7 +138,8 @@ public class PolarPDDDataReader extends TourbookDevice {
 		exerciseData.setCalories(_currentExercise.calories);
 
 		// after all data are added, the tour id can be created
-		final Long tourId = exerciseData.createTourId(createUniqueId(exerciseData, Util.UNIQUE_ID_SUFFIX_POLAR_PDD));
+		final String uniqueId = createUniqueId(exerciseData, Util.UNIQUE_ID_SUFFIX_POLAR_PDD);
+		final Long tourId = exerciseData.createTourId(uniqueId);
 
 		// check if the tour is already imported
 		if (_alreadyImportedTours.containsKey(tourId) == false) {
@@ -172,7 +173,7 @@ public class PolarPDDDataReader extends TourbookDevice {
 
 		// get .hrm data
 		final IPath hrmFilePath = importPath.append(hrmFileName);
-		final TourData hrmTourData = createExercise10ImportSeparatedFile(hrmFilePath, getPolarHRMDataReader());
+		final TourData hrmTourData = createExercise_10_ImportSeparatedFile(hrmFilePath, getPolarHRMDataReader());
 
 		if (hrmTourData == null) {
 			return false;
@@ -183,11 +184,12 @@ public class PolarPDDDataReader extends TourbookDevice {
 		if (gpxFileName != null) {
 
 			final IPath gpxFilePath = importPath.append(gpxFileName);
-			final TourData gpxTourData = createExercise10ImportSeparatedFile(gpxFilePath, getGPXDeviceDataReader());
+			final TourData gpxTourData = createExercise_10_ImportSeparatedFile(gpxFilePath, getGPXDeviceDataReader());
 
 			if (gpxTourData != null && gpxTourData.latitudeSerie != null) {
-				createExercise20SyncHrmGpx(hrmTourData, gpxTourData);
-				createExercise22AdjustTimeSlices(hrmTourData, gpxTourData);
+
+				createExercise_20_SyncHrmGpx(hrmTourData, gpxTourData);
+				createExercise_22_AdjustTimeSlices(hrmTourData, gpxTourData);
 			}
 
 			_exerciseFiles.add(gpxFilePath.toOSString());
@@ -221,7 +223,8 @@ public class PolarPDDDataReader extends TourbookDevice {
 		hrmTourData.setCalories(_currentExercise.calories);
 
 		// after all data are added, the tour id can be created
-		final Long tourId = hrmTourData.createTourId(createUniqueId(hrmTourData, Util.UNIQUE_ID_SUFFIX_POLAR_PDD));
+		final String uniqueId = createUniqueId(hrmTourData, Util.UNIQUE_ID_SUFFIX_POLAR_PDD);
+		final Long tourId = hrmTourData.createTourId(uniqueId);
 
 		// check if the tour is already imported
 		if (_alreadyImportedTours.containsKey(tourId) == false) {
@@ -242,7 +245,7 @@ public class PolarPDDDataReader extends TourbookDevice {
 		return true;
 	}
 
-	private TourData createExercise10ImportSeparatedFile(	final IPath importFilePath,
+	private TourData createExercise_10_ImportSeparatedFile(	final IPath importFilePath,
 															final TourbookDevice deviceDataReader) throws Exception {
 
 		final File importFile = importFilePath.toFile();
@@ -287,7 +290,7 @@ public class PolarPDDDataReader extends TourbookDevice {
 	 * @param hrmTourData
 	 * @param gpxTourData
 	 */
-	private void createExercise20SyncHrmGpx(final TourData hrmTourData, final TourData gpxTourData) {
+	private void createExercise_20_SyncHrmGpx(final TourData hrmTourData, final TourData gpxTourData) {
 
 		/*
 		 * set gpx tour start to the same time as the hrm tour start
@@ -378,7 +381,7 @@ public class PolarPDDDataReader extends TourbookDevice {
 		}
 	}
 
-	private void createExercise22AdjustTimeSlices(final TourData hrmTourData, final TourData gpxTourData) {
+	private void createExercise_22_AdjustTimeSlices(final TourData hrmTourData, final TourData gpxTourData) {
 
 		int diffGeoSlices = _prefStore.getInt(IPreferences.SLICE_ADJUSTMENT_VALUE);
 

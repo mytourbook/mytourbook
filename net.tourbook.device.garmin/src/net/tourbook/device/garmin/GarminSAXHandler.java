@@ -114,7 +114,7 @@ public class GarminSAXHandler extends DefaultHandler {
 	//
 	private HashMap<Long, TourData>			_alreadyImportedTours;
 	private HashMap<Long, TourData>			_newlyImportedTours;
-	private TourbookDevice					_deviceDataReader;
+	private TourbookDevice					_device;
 	private String							_importFilePath;
 	//
 	private ArrayList<TimeData>				_dtList						= new ArrayList<TimeData>();
@@ -163,7 +163,7 @@ public class GarminSAXHandler extends DefaultHandler {
 							final HashMap<Long, TourData> alreadyImportedTours,
 							final HashMap<Long, TourData> newlyImportedTours) {
 
-		_deviceDataReader = deviceDataReader;
+		_device = deviceDataReader;
 		_importFilePath = importFileName;
 		_alreadyImportedTours = alreadyImportedTours;
 		_newlyImportedTours = newlyImportedTours;
@@ -188,6 +188,39 @@ public class GarminSAXHandler extends DefaultHandler {
 		sbJdk.append(jdkFormatter.format(dt.toDate()));
 		sbJdk.append(" " + weekYear + " | "); //$NON-NLS-1$ //$NON-NLS-2$
 	}
+
+//	private static void weekCheck() {
+//
+//		final DateTime dt = new DateTime(//
+//				2009, /* year */
+//				12, /* monthOfYear */
+//				6, /* dayOfMonth */
+//				23, /* hourOfDay */
+//				0, /* minuteOfHour */
+//				0, /* secondOfMinute */
+//				0 /* millisOfSecond */
+//		);
+//
+//		final StringBuilder buffer = new StringBuilder()//
+//				//
+//				.append("Testing date ") //$NON-NLS-1$
+//				.append(dt.toString())
+//				.append("\n") //$NON-NLS-1$
+//				//
+//				.append("Joda-Time timezone is ") //$NON-NLS-1$
+//				.append(DateTimeZone.getDefault())
+//				.append(" yet joda wrongly thinks week is ") //$NON-NLS-1$
+//				.append(_jodaWeekFormatter.print(dt))
+//				.append("\n") //$NON-NLS-1$
+//				//
+//				.append("JDK timezone is ") //$NON-NLS-1$
+//				.append(TimeZone.getDefault().getID())
+//				.append(" yet jdk rightfully thinks week is ") //$NON-NLS-1$
+//				.append(_jdkWeekFormatter.format(dt.toDate()))
+//				.append(" (jdk got it right ?!?!)"); //$NON-NLS-1$
+//
+//		System.out.println(buffer.toString());
+//	}
 
 	public static void main(final String[] args) {
 
@@ -256,39 +289,6 @@ public class GarminSAXHandler extends DefaultHandler {
 			}
 		}
 	}
-
-//	private static void weekCheck() {
-//
-//		final DateTime dt = new DateTime(//
-//				2009, /* year */
-//				12, /* monthOfYear */
-//				6, /* dayOfMonth */
-//				23, /* hourOfDay */
-//				0, /* minuteOfHour */
-//				0, /* secondOfMinute */
-//				0 /* millisOfSecond */
-//		);
-//
-//		final StringBuilder buffer = new StringBuilder()//
-//				//
-//				.append("Testing date ") //$NON-NLS-1$
-//				.append(dt.toString())
-//				.append("\n") //$NON-NLS-1$
-//				//
-//				.append("Joda-Time timezone is ") //$NON-NLS-1$
-//				.append(DateTimeZone.getDefault())
-//				.append(" yet joda wrongly thinks week is ") //$NON-NLS-1$
-//				.append(_jodaWeekFormatter.print(dt))
-//				.append("\n") //$NON-NLS-1$
-//				//
-//				.append("JDK timezone is ") //$NON-NLS-1$
-//				.append(TimeZone.getDefault().getID())
-//				.append(" yet jdk rightfully thinks week is ") //$NON-NLS-1$
-//				.append(_jdkWeekFormatter.format(dt.toDate()))
-//				.append(" (jdk got it right ?!?!)"); //$NON-NLS-1$
-//
-//		System.out.println(buffer.toString());
-//	}
 
 	/**
 	 * Check if date time starts with the date 2007-04-01, this can happen when the tcx file is
@@ -549,72 +549,41 @@ public class GarminSAXHandler extends DefaultHandler {
 		tourData.importRawDataFile = _importFilePath;
 		tourData.setTourImportFilePath(_importFilePath);
 
-		tourData.createTimeSeries(_dtList, true);
-
 		tourData.setDeviceModeName(_activitySport);
-
 		tourData.setCalories(_tourCalories);
 
+		final String deviceName = _sport.creatorName;
+		final String majorVersion = _sport.creatorVersionMajor;
+		final String minorVersion = _sport.creatorVersionMinor;
+
+		tourData.setDeviceId(_device.deviceId);
+
+		tourData.setDeviceName(_device.visibleName + (deviceName == null //
+				? UI.EMPTY_STRING
+				: UI.SPACE + deviceName));
+
+		tourData.setDeviceFirmwareVersion(majorVersion == null //
+				? UI.EMPTY_STRING
+				: majorVersion + (minorVersion == null //
+						? UI.EMPTY_STRING
+						: UI.SYMBOL_DOT + minorVersion));
+
+		tourData.createTimeSeries(_dtList, true);
+
 		// after all data are added, the tour id can be created
-		final float[] distanceSerie = tourData.getMetricDistanceSerie();
-		String uniqueKey;
-
-		if (_deviceDataReader.isCreateTourIdWithRecordingTime) {
-
-			/*
-			 * 25.5.2009: added recording time to the tour distance for the unique key because tour
-			 * export and import found a wrong tour when exporting was done with camouflage speed ->
-			 * this will result in a NEW tour
-			 */
-			final int tourRecordingTime = (int) tourData.getTourRecordingTime();
-
-			if (distanceSerie == null) {
-				uniqueKey = Integer.toString(tourRecordingTime);
-			} else {
-
-				final long tourDistance = (long) distanceSerie[(distanceSerie.length - 1)];
-
-				uniqueKey = Long.toString(tourDistance + tourRecordingTime);
-			}
-
-		} else {
-
-			/*
-			 * original version to create tour id
-			 */
-			if (distanceSerie == null) {
-				uniqueKey = Util.UNIQUE_ID_SUFFIX_GARMIN_TCX;
-			} else {
-				uniqueKey = Integer.toString((int) distanceSerie[distanceSerie.length - 1]);
-			}
-		}
-
-		final Long tourId = tourData.createTourId(uniqueKey);
+		final String uniqueId = _device.createUniqueId(tourData, Util.UNIQUE_ID_SUFFIX_GARMIN_TCX);
+		final Long tourId = tourData.createTourId(uniqueId);
 
 		// check if the tour is already imported
 		if (_alreadyImportedTours.containsKey(tourId) == false) {
 
+			// add new tour to other tours
+			_newlyImportedTours.put(tourId, tourData);
+
+			// create additional data
 			tourData.computeAltitudeUpDown();
 			tourData.computeTourDrivingTime();
 			tourData.computeComputedValues();
-
-			final String deviceName = _sport.creatorName;
-			final String majorVersion = _sport.creatorVersionMajor;
-			final String minorVersion = _sport.creatorVersionMinor;
-
-			tourData.setDeviceId(_deviceDataReader.deviceId);
-
-			tourData.setDeviceName(_deviceDataReader.visibleName
-					+ (deviceName == null ? UI.EMPTY_STRING : UI.SPACE + deviceName));
-
-			tourData.setDeviceFirmwareVersion(majorVersion == null //
-					? UI.EMPTY_STRING
-					: majorVersion + (minorVersion == null //
-							? UI.EMPTY_STRING
-							: UI.SYMBOL_DOT + minorVersion));
-
-			// add new tour to other tours
-			_newlyImportedTours.put(tourId, tourData);
 		}
 
 		_isImported = true;
