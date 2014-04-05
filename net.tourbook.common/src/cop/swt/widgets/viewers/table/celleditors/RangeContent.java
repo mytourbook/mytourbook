@@ -47,6 +47,6 @@ public final class RangeContent
 	@Override
 	public String toString()
 	{
-		return "[" + minimum + "," + maximum + "]";
+		return "[" + minimum + "," + maximum + "]"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 }

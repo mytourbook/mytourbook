@@ -32,18 +32,18 @@ public class GLLogger {
 	private static DecimalFormat	_logFormat	= new DecimalFormat();
 
 	static {
-		_logFormat.applyPattern("#.######");
-		_logFormat.setPositivePrefix(" ");
+		_logFormat.applyPattern("#.######"); //$NON-NLS-1$
+		_logFormat.setPositivePrefix(" "); //$NON-NLS-1$
 	}
 
 	private static String dumpMatrix(final FloatBuffer buffer) {
 
-		final String dump = String.format("\n"
+		final String dump = String.format("\n" //$NON-NLS-1$
 		//
-				+ "%-12s %-12s %-12s %-12s\n"
-				+ "%-12s %-12s %-12s %-12s\n"
-				+ "%-12s %-12s %-12s %-12s\n"
-				+ "%-12s %-12s %-12s %-12s\n",
+				+ "%-12s %-12s %-12s %-12s\n" //$NON-NLS-1$
+				+ "%-12s %-12s %-12s %-12s\n" //$NON-NLS-1$
+				+ "%-12s %-12s %-12s %-12s\n" //$NON-NLS-1$
+				+ "%-12s %-12s %-12s %-12s\n", //$NON-NLS-1$
 		//
 				_logFormat.format(buffer.get(0)),
 				_logFormat.format(buffer.get(4)),
@@ -72,15 +72,15 @@ public class GLLogger {
 
 	private static String dumpMatrix_MVP(final FloatBuffer bufferMV, final FloatBuffer bufferP) {
 
-		final String dump = String.format("\n%-52s\t\t\t%-52s\n"
+		final String dump = String.format("\n%-52s\t\t\t%-52s\n" //$NON-NLS-1$
 		//
-				+ "%-12s %-12s %-12s %-12s\t\t\t%-12s %-12s %-12s %-12s\n"
-				+ "%-12s %-12s %-12s %-12s\t\t\t%-12s %-12s %-12s %-12s\n"
-				+ "%-12s %-12s %-12s %-12s\t\t\t%-12s %-12s %-12s %-12s\n"
-				+ "%-12s %-12s %-12s %-12s\t\t\t%-12s %-12s %-12s %-12s\n",
+				+ "%-12s %-12s %-12s %-12s\t\t\t%-12s %-12s %-12s %-12s\n" //$NON-NLS-1$
+				+ "%-12s %-12s %-12s %-12s\t\t\t%-12s %-12s %-12s %-12s\n" //$NON-NLS-1$
+				+ "%-12s %-12s %-12s %-12s\t\t\t%-12s %-12s %-12s %-12s\n" //$NON-NLS-1$
+				+ "%-12s %-12s %-12s %-12s\t\t\t%-12s %-12s %-12s %-12s\n", //$NON-NLS-1$
 		//
-				"GL_MODELVIEW_MATRIX",
-				"GL_PROJECTION_MATRIX",
+				"GL_MODELVIEW_MATRIX", //$NON-NLS-1$
+				"GL_PROJECTION_MATRIX", //$NON-NLS-1$
 				//
 				_logFormat.format(bufferMV.get(0)),
 				_logFormat.format(bufferMV.get(4)),
@@ -134,7 +134,7 @@ public class GLLogger {
 		String errors = UI.EMPTY_STRING;
 
 		for (int glError = gl.glGetError(); glError != GL.GL_NO_ERROR; glError = gl.glGetError()) {
-			errors = dc.getGLU().gluErrorString(glError) + glError + "\t";
+			errors = dc.getGLU().gluErrorString(glError) + glError + "\t"; //$NON-NLS-1$
 		}
 
 		return errors;
@@ -159,11 +159,11 @@ public class GLLogger {
 		final IntBuffer depthFunc = IntBuffer.allocate(1);
 		gl.glGetIntegerv(GL.GL_DEPTH_FUNC, depthFunc);
 
-		System.out.println((UI.timeStampNano() + " [" + logId + "] ")
-				+ ("\tGL_DEPTH_TEST: " + gl.glIsEnabled(GL.GL_DEPTH_TEST))
-				+ ("\tGL_DEPTH_WRITEMASK: " + writeMask.get(0))
-				+ ("\tGL_DEPTH_FUNC: " + depthFunc.get(0))
-				+ ("\tRange: " + _logFormat.format(depthRange.get(0)) + "\t" + _logFormat.format(depthRange.get(1)))
+		System.out.println((UI.timeStampNano() + " [" + logId + "] ") //$NON-NLS-1$ //$NON-NLS-2$
+				+ ("\tGL_DEPTH_TEST: " + gl.glIsEnabled(GL.GL_DEPTH_TEST)) //$NON-NLS-1$
+				+ ("\tGL_DEPTH_WRITEMASK: " + writeMask.get(0)) //$NON-NLS-1$
+				+ ("\tGL_DEPTH_FUNC: " + depthFunc.get(0)) //$NON-NLS-1$
+				+ ("\tRange: " + _logFormat.format(depthRange.get(0)) + "\t" + _logFormat.format(depthRange.get(1))) //$NON-NLS-1$ //$NON-NLS-2$
 		//
 				);
 	}
@@ -192,11 +192,11 @@ public class GLLogger {
 			String msg = dc.getGLU().gluErrorString(err);
 			msg += err;
 
-			System.out.println((UI.timeStampNano() + " [" + logId + "]\t") + msg);
+			System.out.println((UI.timeStampNano() + " [" + logId + "]\t") + msg); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 
 		if (isError == false) {
-			System.out.println((UI.timeStampNano() + " [" + logId + "]\tNo OpenGL error") + ("\t"));
+			System.out.println((UI.timeStampNano() + " [" + logId + "]\tNo OpenGL error") + ("\t")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		}
 	}
 
@@ -213,7 +213,7 @@ public class GLLogger {
 		final FloatBuffer perspective = FloatBuffer.allocate(16);
 		gl.glGetFloatv(GL2.GL_PROJECTION_MATRIX, perspective);
 
-		System.out.println((UI.timeStampNano() + " [" + GLLogger.class.getSimpleName() + "]\t")
+		System.out.println((UI.timeStampNano() + " [" + GLLogger.class.getSimpleName() + "]\t") //$NON-NLS-1$ //$NON-NLS-2$
 				+ dumpMatrix_MVP(modelview, perspective));
 	}
 
@@ -230,11 +230,11 @@ public class GLLogger {
 		gl.glGetIntegerv(GL2.GL_MODELVIEW_STACK_DEPTH, depthModel);
 		gl.glGetIntegerv(GL2.GL_PROJECTION_STACK_DEPTH, depthPerspective);
 
-		System.out.println((UI.timeStampNano() + " [" + logId + "]\t")
-				+ ("GL_MODELVIEW_STACK_DEPTH:\t" + depthModel.get(0))
-				+ "\t\t"
-				+ ("GL_PROJECTION_STACK_DEPTH:\t" + depthPerspective.get(0))
-				+ "\t"
+		System.out.println((UI.timeStampNano() + " [" + logId + "]\t") //$NON-NLS-1$ //$NON-NLS-2$
+				+ ("GL_MODELVIEW_STACK_DEPTH:\t" + depthModel.get(0)) //$NON-NLS-1$
+				+ "\t\t" //$NON-NLS-1$
+				+ ("GL_PROJECTION_STACK_DEPTH:\t" + depthPerspective.get(0)) //$NON-NLS-1$
+				+ "\t" //$NON-NLS-1$
 				+ getGLErrors(dc)
 		//
 				);

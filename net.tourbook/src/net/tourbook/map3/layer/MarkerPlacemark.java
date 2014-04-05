@@ -55,18 +55,6 @@ public class MarkerPlacemark extends PointPlacemark {
 		this.absoluteAltitude = position.elevation;
 	}
 
-	private void checkGLError(final GL2 gl) {
-
-		int error;
-
-		while ((error = gl.glGetError()) != GL.GL_NO_ERROR) {
-
-			System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
-					+ ("\tGL error: " + error));
-			// TODO remove SYSTEM.OUT.PRINTLN
-		}
-	}
-
 	/**
 	 * Recognize altitude offset when height is computed.
 	 * <p>
