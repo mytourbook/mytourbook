@@ -1,5 +1,6 @@
 Version: 14.x.0                                       ?. ? 2014
 
+Java 7
 
 HINT for docu
 Delete 3D map images in C:\ProgramData\WorldWindData\Earth\... because it is possible that newer images are available but they are not downloaded because they are cached in these folders.

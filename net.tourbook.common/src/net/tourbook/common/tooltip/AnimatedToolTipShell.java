@@ -504,7 +504,6 @@ public abstract class AnimatedToolTipShell {
 
 						break;
 					}
-
 				}
 			}
 
@@ -549,6 +548,14 @@ public abstract class AnimatedToolTipShell {
 			_shell.close();
 			_shell = null;
 		}
+	}
+
+	/**
+	 * @return Returns <code>true</code> to close the shell after it is completely hidden.
+	 */
+	protected boolean closeShellAfterHidden() {
+		
+		return false;
 	}
 
 	/**
@@ -1192,6 +1199,10 @@ public abstract class AnimatedToolTipShell {
 			_shell.setVisible(false);
 
 			removeDisplayFilterListener();
+			
+			if (closeShellAfterHidden()) {
+				close();
+			}
 		}
 	}
 

@@ -281,6 +281,13 @@
 				category="net.tourbook.preferences.PrefPageMap3"
 			/>
 			
+			<page
+				name="%Pref_Page_Map3_Layer"
+				id="net.tourbook.preferences.PrefPageMap3Layer"
+				class="net.tourbook.preferences.PrefPageMap3Layer"
+				category="net.tourbook.preferences.PrefPageMap3"
+			/>
+			
 
 		<!--
 			Appearance

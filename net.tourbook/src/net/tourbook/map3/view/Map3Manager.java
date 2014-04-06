@@ -329,6 +329,13 @@ public class Map3Manager {
 		setToolLayerInWWModel();
 	}
 
+	public static void closeMap3LayerTooltip() {
+
+		if (_map3LayerDialog != null) {
+			_map3LayerDialog.close();
+		}
+	}
+
 	private static void createDefaultLayer_10_Map(final IMemento xml) {
 
 		createLayerXml_120_Default(xml, true, true, 1.0f, MapDefaultLayer.ID_STARS);

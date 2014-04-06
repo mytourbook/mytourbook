@@ -89,7 +89,7 @@ public class MarkerPlacemark extends PointPlacemark {
 					* (this.isApplyVerticalExaggeration() ? dc.getVerticalExaggeration() : 1);
 
 			// get altitude offset
-			final double altitudeOffset = Map3View.getAltitudeOffset(dc.getView().getEyePosition()) * 0.4;
+			final double altitudeOffset = Map3View.getAltitudeOffset(dc.getView().getEyePosition()) * 1.2;
 
 			this.placePoint = dc.getGlobe().computePointFromPosition(
 					pos.getLatitude(),
@@ -385,7 +385,7 @@ public class MarkerPlacemark extends PointPlacemark {
 			dc.getView().pushReferenceCenter(dc, this.placePoint); // draw relative to the place point
 
 			// Pull the arrow triangles forward just a bit to ensure they show over the terrain.
-//			dc.pushProjectionOffest(0.99);
+			dc.pushProjectionOffest(0.99);
 //			dc.pushProjectionOffest(1.02);
 
 			this.setLineWidth(dc);
@@ -415,7 +415,7 @@ public class MarkerPlacemark extends PointPlacemark {
 
 		} finally {
 
-//			dc.popProjectionOffest();
+			dc.popProjectionOffest();
 
 			dc.getView().popReferenceCenter(dc);
 		}
