@@ -118,35 +118,6 @@ public class TourChartContextProvider implements IChartContextProvider, ITourPro
 				PrefPageAppearanceTourChart.ID);
 	}
 
-	private void enableActions() {
-
-		final TourChart tourChart = _tourChartViewer.getTourChart();
-		final TourData tourData = tourChart.getTourData();
-
-		final boolean isDataAvailable = tourData != null && tourData.getTourPerson() != null;
-		final Set<TourTag> tourTags = tourData == null ? null : tourData.getTourTags();
-
-		long existingTourTypeId = TourDatabase.ENTITY_IS_NOT_SAVED;
-		if (tourData != null) {
-			final TourType tourType = tourData.getTourType();
-			existingTourTypeId = tourType == null ? TourDatabase.ENTITY_IS_NOT_SAVED : tourType.getTypeId();
-		}
-		_actionQuickEdit.setEnabled(isDataAvailable);
-		_actionEditTour.setEnabled(isDataAvailable);
-		_actionOpenMarkerDialog.setEnabled(isDataAvailable);
-		_actionOpenAdjustAltitudeDialog.setEnabled(isDataAvailable);
-		_actionOpenTour.setEnabled(isDataAvailable);
-		_actionExportTour.setEnabled(true);
-
-		_tagMenuMgr.enableTagActions(//
-				isDataAvailable,
-				isDataAvailable && tourTags.size() > 0,
-				tourTags);
-
-		_actionSetTourType.setEnabled(isDataAvailable);
-		TourTypeMenuManager.enableRecentTourTypeActions(isDataAvailable, existingTourTypeId);
-	}
-
 	@Override
 	public void fillBarChartContextMenu(final IMenuManager menuMgr,
 										final int hoveredBarSerieIndex,
@@ -182,7 +153,38 @@ public class TourChartContextProvider implements IChartContextProvider, ITourPro
 		_actionExportTour.setTourRange(tourChart.getLeftSlider().getValuesIndex(), //
 				tourChart.getRightSlider().getValuesIndex());
 
-		enableActions();
+		/////////////////////////////////////////////////////////////////////////////
+		/////////////////////////////////////////////////////////////////////////////
+
+		/*
+		 * enable actions
+		 */
+
+		final TourChart tourChart1 = _tourChartViewer.getTourChart();
+		final TourData tourData = tourChart1.getTourData();
+
+		final boolean isTourSaved = tourData != null && tourData.getTourPerson() != null;
+		final Set<TourTag> tourTags = tourData == null ? null : tourData.getTourTags();
+
+		long existingTourTypeId = TourDatabase.ENTITY_IS_NOT_SAVED;
+		if (tourData != null) {
+			final TourType tourType = tourData.getTourType();
+			existingTourTypeId = tourType == null ? TourDatabase.ENTITY_IS_NOT_SAVED : tourType.getTypeId();
+		}
+		_actionQuickEdit.setEnabled(isTourSaved);
+		_actionEditTour.setEnabled(isTourSaved);
+		_actionOpenMarkerDialog.setEnabled(isTourSaved);
+		_actionOpenAdjustAltitudeDialog.setEnabled(isTourSaved);
+		_actionOpenTour.setEnabled(isTourSaved);
+		_actionExportTour.setEnabled(true);
+
+		_tagMenuMgr.enableTagActions(//
+				isTourSaved,
+				isTourSaved && tourTags.size() > 0,
+				tourTags);
+
+		_actionSetTourType.setEnabled(isTourSaved);
+		TourTypeMenuManager.enableRecentTourTypeActions(isTourSaved, existingTourTypeId);
 	}
 
 	@Override
@@ -205,6 +207,12 @@ public class TourChartContextProvider implements IChartContextProvider, ITourPro
 
 			menuMgr.add(_actionCreateRefTour);
 
+			menuMgr.add(new Separator());
+			menuMgr.add(_actionOpenMarkerDialog);
+
+			/////////////////////////////////////////////////////////////////////////////
+			/////////////////////////////////////////////////////////////////////////////
+
 			/*
 			 * enable actions
 			 */
@@ -221,6 +229,8 @@ public class TourChartContextProvider implements IChartContextProvider, ITourPro
 			_actionCreateMarkerRight.setEnabled(isTourSaved);
 
 			_actionCreateRefTour.setEnabled(canCreateRefTours);
+
+			_actionOpenMarkerDialog.setEnabled(isTourSaved);
 		}
 	}
 

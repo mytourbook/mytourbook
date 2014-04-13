@@ -92,8 +92,9 @@ public class TourDatabase {
 	/**
 	 * version for the database which is required that the tourbook application works successfully
 	 */
-	private static final int						TOURBOOK_DB_VERSION							= 23;
+	private static final int						TOURBOOK_DB_VERSION							= 24;
 
+//	private static final int						TOURBOOK_DB_VERSION							= 24;	// 14.? after 14.4
 //	private static final int						TOURBOOK_DB_VERSION							= 23;	// 13.2.0
 //	private static final int						TOURBOOK_DB_VERSION							= 22;	// 12.12.0
 //	private static final int						TOURBOOK_DB_VERSION							= 21;	// 12.1.1
@@ -2029,6 +2030,23 @@ public class TourDatabase {
 	}
 
 	/**
+	 * Creates a SQL statement to add a column for VARCHAR.
+	 * 
+	 * @param table
+	 * @param columnName
+	 * @param columnWidth
+	 * @return Returns this sql statement:
+	 *         <p>
+	 *         <code>
+	 *         "ALTER TABLE " + table + " ADD COLUMN	" + columnName + " " + " VARCHAR(" + columnWidth + ")\n"
+	 *         </code>
+	 */
+	private String createSQL_AddColumn_VarCar(final String table, final String columnName, final int columnWidth) {
+
+		return "ALTER TABLE " + table + " ADD COLUMN	" + columnName + " " + varCharNoKomma(columnWidth); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+	}
+
+	/**
 	 * create table {@link #TABLE_TOUR_BIKE}
 	 * 
 	 * @param stmt
@@ -2344,7 +2362,7 @@ public class TourDatabase {
 				+ "	" + (TABLE_TOUR_DATA + "_tourId	BIGINT,						\n") //$NON-NLS-1$ //$NON-NLS-2$
 				+ "	time 						INTEGER NOT NULL,				\n" //$NON-NLS-1$
 
-				// before version 20
+// before version 20
 //				+ "	distance 					INTEGER NOT NULL,				\n" //$NON-NLS-1$
 				+ "	distance 					INTEGER,						\n" //$NON-NLS-1$
 
@@ -2360,11 +2378,29 @@ public class TourDatabase {
 				//
 				// Version 22 - end
 
+				// Version 24 - begin
+				//
+				+ ("	description				" + varCharKomma(TourWayPoint.DB_LENGTH_DESCRIPTION)) //	//$NON-NLS-1$
+				+ ("	comment					" + varCharKomma(TourWayPoint.DB_LENGTH_COMMENT)) //		//$NON-NLS-1$
+				+ ("	symbol					" + varCharKomma(TourWayPoint.DB_LENGTH_SYMBOL)) //			//$NON-NLS-1$
+				//
+				// Version 24 - end
+
 				+ "	serieIndex 					INTEGER NOT NULL,				\n" //$NON-NLS-1$
 				+ "	type 						INTEGER NOT NULL,				\n" //$NON-NLS-1$
 				+ "	visualPosition				INTEGER NOT NULL,				\n" //$NON-NLS-1$
-				+ ("	label 					" + varCharKomma(TourMarker.DB_LENGTH_LABEL)) //$NON-NLS-1$
-				+ ("	category 				" + varCharKomma(TourMarker.DB_LENGTH_CATEGORY)) //$NON-NLS-1$
+
+// before 24 - begin
+//				+ ("	label 					" + varCharKomma(TourMarker.DB_LENGTH_LABEL)) //$NON-NLS-1$
+//				+ ("	category 				" + varCharKomma(TourMarker.DB_LENGTH_CATEGORY)) //$NON-NLS-1$
+// before 24 - end
+
+				+ ("	label 					" + varCharKomma(TourWayPoint.DB_LENGTH_NAME)) //$NON-NLS-1$
+				+ ("	category 				" + varCharKomma(TourWayPoint.DB_LENGTH_CATEGORY)) //$NON-NLS-1$
+
+//				modifyColumn_VarChar_Width(stmt, TABLE_TOUR_MARKER, "label", TourWayPoint.DB_LENGTH_NAME); //$NON-NLS-1$
+//				modifyColumn_VarChar_Width(stmt, TABLE_TOUR_MARKER, "category", TourWayPoint.DB_LENGTH_CATEGORY); //$NON-NLS-1$
+
 				//
 				// Version 2
 				+ "	labelXOffset				INTEGER,						\n" //$NON-NLS-1$
@@ -3175,7 +3211,7 @@ public class TourDatabase {
 		System.out.println(NLS.bind(Messages.Tour_Database_Update, dbVersion));
 	}
 
-	private void modifyColumnType(	final String table,
+	private void modifyColumn_Type(	final String table,
 									final String fieldName,
 									final String newFieldType,
 									final Statement stmt,
@@ -3206,6 +3242,21 @@ public class TourDatabase {
 
 		sql = "RENAME COLUMN " + table + "." + tempFieldName + " TO " + fieldName; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		exec(stmt, sql);
+	}
+
+	private void modifyColumn_VarChar_Width(final Statement stmt,
+											final String table,
+											final String field,
+											final int newWidth) throws SQLException {
+
+		final String sql = "" // //$NON-NLS-1$
+				+ ("ALTER TABLE " + table + "\n") //$NON-NLS-1$ //$NON-NLS-2$
+				+ ("	ALTER COLUMN " + field + "\n") //$NON-NLS-1$ //$NON-NLS-2$
+				+ ("	SET DATA TYPE " + varCharNoKomma(newWidth)); //$NON-NLS-1$
+
+		exec(stmt, sql);
+
+		return;
 	}
 
 	public void removePropertyListener(final IPropertyListener listener) {
@@ -3390,6 +3441,13 @@ public class TourDatabase {
 			if (currentDbVersion == 22) {
 				currentDbVersion = newVersion = updateDbDesign_022_to_023(conn, monitor);
 				isPostUpdate23 = true;
+			}
+
+			/*
+			 * 24
+			 */
+			if (currentDbVersion == 23) {
+				currentDbVersion = newVersion = updateDbDesign_023_to_024(conn, monitor);
 			}
 
 			/*
@@ -3743,7 +3801,7 @@ public class TourDatabase {
 			createTable_TourWayPoint(stmt);
 
 			/**
-			 * resize description column: ref derby docu page 24
+			 * Resize description column: ref derby docu page 24
 			 * 
 			 * <pre>
 			 * 
@@ -4420,11 +4478,11 @@ public class TourDatabase {
 			int no = 0;
 			final int max = 5;
 
-			modifyColumnType(TABLE_TOUR_DATA, "maxAltitude", "FLOAT DEFAULT 0", stmt, monitor, ++no, max); //			//$NON-NLS-1$ //$NON-NLS-2$
-			modifyColumnType(TABLE_TOUR_DATA, "maxPulse", "FLOAT DEFAULT 0", stmt, monitor, ++no, max); //				//$NON-NLS-1$ //$NON-NLS-2$
-			modifyColumnType(TABLE_TOUR_DATA, "avgPulse", "FLOAT DEFAULT 0", stmt, monitor, ++no, max); //				//$NON-NLS-1$ //$NON-NLS-2$
-			modifyColumnType(TABLE_TOUR_DATA, "avgCadence", "FLOAT DEFAULT 0", stmt, monitor, ++no, max); //			//$NON-NLS-1$ //$NON-NLS-2$
-			modifyColumnType(TABLE_TOUR_DATA, "avgTemperature", "FLOAT DEFAULT 0", stmt, monitor, ++no, max); //		//$NON-NLS-1$ //$NON-NLS-2$
+			modifyColumn_Type(TABLE_TOUR_DATA, "maxAltitude", "FLOAT DEFAULT 0", stmt, monitor, ++no, max); //			//$NON-NLS-1$ //$NON-NLS-2$
+			modifyColumn_Type(TABLE_TOUR_DATA, "maxPulse", "FLOAT DEFAULT 0", stmt, monitor, ++no, max); //				//$NON-NLS-1$ //$NON-NLS-2$
+			modifyColumn_Type(TABLE_TOUR_DATA, "avgPulse", "FLOAT DEFAULT 0", stmt, monitor, ++no, max); //				//$NON-NLS-1$ //$NON-NLS-2$
+			modifyColumn_Type(TABLE_TOUR_DATA, "avgCadence", "FLOAT DEFAULT 0", stmt, monitor, ++no, max); //			//$NON-NLS-1$ //$NON-NLS-2$
+			modifyColumn_Type(TABLE_TOUR_DATA, "avgTemperature", "FLOAT DEFAULT 0", stmt, monitor, ++no, max); //		//$NON-NLS-1$ //$NON-NLS-2$
 		}
 		stmt.close();
 
@@ -4476,8 +4534,8 @@ public class TourDatabase {
 				int no = 0;
 				final int max = 2;
 
-				modifyColumnType(TABLE_TOUR_DATA, "TourRecordingTime", "BIGINT DEFAULT 0", stmt, monitor, ++no, max); //			//$NON-NLS-1$ //$NON-NLS-2$
-				modifyColumnType(TABLE_TOUR_DATA, "TourDrivingTime", "BIGINT DEFAULT 0", stmt, monitor, ++no, max); //				//$NON-NLS-1$ //$NON-NLS-2$
+				modifyColumn_Type(TABLE_TOUR_DATA, "TourRecordingTime", "BIGINT DEFAULT 0", stmt, monitor, ++no, max); //			//$NON-NLS-1$ //$NON-NLS-2$
+				modifyColumn_Type(TABLE_TOUR_DATA, "TourDrivingTime", "BIGINT DEFAULT 0", stmt, monitor, ++no, max); //				//$NON-NLS-1$ //$NON-NLS-2$
 
 				createIndex_TourData_022(stmt);
 			}
@@ -4719,6 +4777,58 @@ public class TourDatabase {
 
 			em.close();
 		}
+	}
+
+	private int updateDbDesign_023_to_024(final Connection conn, final IProgressMonitor monitor) throws SQLException {
+
+		final int newDbVersion = 24;
+
+		logDbUpdateStart(newDbVersion);
+
+		if (monitor != null) {
+			monitor.subTask(NLS.bind(Messages.Tour_Database_Update, newDbVersion));
+		}
+
+		final Statement stmt = conn.createStatement();
+		{
+			if (isColumnAvailable(conn, TABLE_TOUR_MARKER, "description") == false) {//$NON-NLS-1$
+
+				// description column is not yet created
+
+//				TOURMARKER	TOURMARKER	TOURMARKER	TOURMARKER	TOURMARKER	TOURMARKER	TOURMARKER	TOURMARKER
+//
+//				// Version 24 - begin
+//				//
+//				+ ("	description				" + varCharKomma(TourWayPoint.DB_LENGTH_DESCRIPTION)) //	//$NON-NLS-1$
+//				+ ("	comment					" + varCharKomma(TourWayPoint.DB_LENGTH_COMMENT)) //		//$NON-NLS-1$
+//				+ ("	symbol					" + varCharKomma(TourWayPoint.DB_LENGTH_SYMBOL)) //			//$NON-NLS-1$
+//				//
+//				// Version 24 - end
+
+				/*
+				 * Set column with to TourWayPoint width, that both have the same max size.
+				 */
+				modifyColumn_VarChar_Width(stmt, TABLE_TOUR_MARKER, "label", TourWayPoint.DB_LENGTH_NAME); //$NON-NLS-1$
+				modifyColumn_VarChar_Width(stmt, TABLE_TOUR_MARKER, "category", TourWayPoint.DB_LENGTH_CATEGORY); //$NON-NLS-1$
+
+				/*
+				 * Add new columns
+				 */
+				final String sql[] = {
+						//
+						createSQL_AddColumn_VarCar(TABLE_TOUR_MARKER, "description", TourWayPoint.DB_LENGTH_DESCRIPTION), //	//$NON-NLS-1$
+						createSQL_AddColumn_VarCar(TABLE_TOUR_MARKER, "comment", TourWayPoint.DB_LENGTH_COMMENT), //			//$NON-NLS-1$
+						createSQL_AddColumn_VarCar(TABLE_TOUR_MARKER, "symbol", TourWayPoint.DB_LENGTH_SYMBOL), //				//$NON-NLS-1$
+				};
+
+				exec(stmt, sql);
+			}
+		}
+		stmt.close();
+
+		logDbUpdateEnd(newDbVersion);
+
+		return newDbVersion;
 	}
 
 	private void updateDbVersionNumber(final Connection conn, final int newVersion) throws SQLException {

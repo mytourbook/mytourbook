@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -46,8 +46,15 @@ import org.eclipse.swt.graphics.Rectangle;
 @XmlAccessorType(XmlAccessType.NONE)
 public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializable {
 
-	public static final int			DB_LENGTH_LABEL			= 255;
+	/**
+	 * Replace in db version 24 with {@link TourWayPoint#DB_LENGTH_CATEGORY}
+	 */
 	public static final int			DB_LENGTH_CATEGORY		= 100;
+
+	/**
+	 * Replace in db version 24 with {@link TourWayPoint#DB_LENGTH_NAME}
+	 */
+	public static final int			DB_LENGTH_LABEL			= 255;
 
 	/**
 	 * visual position for markers, they must correspond to the position in {@link ChartLabel}

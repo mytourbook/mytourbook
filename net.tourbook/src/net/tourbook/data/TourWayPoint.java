@@ -32,6 +32,20 @@ import net.tourbook.map2.Messages;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.swt.graphics.Image;
 
+/**
+ * <pre>
+ * 
+ * 	- different icons, size, with/without text
+ * 	- new marker description field
+ * 	- create marker in the map
+ * 	- a marker can have another position than the tour track
+ * 
+ * 	http://mapicons.nicolasmollet.com/
+ * 
+ * 
+ * 
+ * </pre>
+ */
 @Entity
 public class TourWayPoint implements Cloneable, Comparable<Object>, IHoveredArea {
 
@@ -93,7 +107,6 @@ public class TourWayPoint implements Cloneable, Comparable<Object>, IHoveredArea
 	private static int		_createCounter			= 0;
 
 	public TourWayPoint() {}
-
 
 	public TourWayPoint clone(final TourData wpTourData) {
 
