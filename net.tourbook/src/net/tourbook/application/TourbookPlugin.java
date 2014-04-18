@@ -158,7 +158,7 @@ public class TourbookPlugin extends AbstractUIPlugin {
 	}
 
 	/**
-	 * This is a shortcut for {@link #getDialogSettingsSection(String)}
+	 * This is a shortcut for {@link getDefault().getDialogSettingsSection(String)}
 	 * 
 	 * @param stateSectionName
 	 * @return

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2012  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -155,12 +155,20 @@ public class Chart extends ViewForm {
 	/**
 	 * Chart widget
 	 */
-	public Chart(final Composite parent, final int style) {
+	public Chart(final Composite parent, int style) {
 
-		super(parent, style);
-		setBorderVisible(false);
+		// remove border from the inner chart but set the border around the whole chart (with toolbar) when requested
 
-//		setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
+		super(parent, removeBorder(style));
+
+		if ((style & SWT.BORDER) != 0) {
+
+			style = (style & ~SWT.BORDER);
+
+			setBorderVisible(true);
+		}
+
+		//		setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
 
 		final GridLayout gl = new GridLayout(1, false);
 		gl.marginWidth = 0;
@@ -176,6 +184,17 @@ public class Chart extends ViewForm {
 
 		// set the default background color
 		_backgroundColor = getDisplay().getSystemColor(SWT.COLOR_WHITE);
+	}
+
+	private static int removeBorder(final int style) {
+
+		if ((style & SWT.BORDER) != 0) {
+
+			// remove border from style
+			return (style & ~SWT.BORDER);
+		}
+
+		return style;
 	}
 
 	public void addBarSelectionListener(final IBarSelectionListener listener) {
@@ -648,7 +667,10 @@ public class Chart extends ViewForm {
 
 	/**
 	 * Returns the toolbar for the chart, if no toolbar manager is set with setToolbarManager, the
-	 * manager will be created and the toolbar is on top of the chart
+	 * manager will be created and the toolbar is on top of the chart.
+	 * <p>
+	 * A border is painted between the chart and toolbar because {@link ViewForm} draws this line in
+	 * the onPaint() method.
 	 * 
 	 * @return
 	 */

@@ -57,7 +57,6 @@ import org.eclipse.jface.viewers.StyledString.Styler;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
-import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
@@ -71,7 +70,6 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
-import org.eclipse.ui.IMemento;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.widgets.FormToolkit;
@@ -1010,41 +1008,6 @@ public class UI {
 		combo.setText(comboItems[0]);
 	}
 
-	/**
-	 * Restore the sash weight from a memento
-	 * 
-	 * @param sash
-	 * @param fMemento
-	 * @param weightKey
-	 * @param sashDefaultWeight
-	 */
-	public static void restoreSashWeight(	final SashForm sash,
-											final IMemento fMemento,
-											final String weightKey,
-											final int[] sashDefaultWeight) {
-
-		final int[] sashWeights = sash.getWeights();
-		final int[] newWeights = new int[sashWeights.length];
-
-		for (int weightIndex = 0; weightIndex < sashWeights.length; weightIndex++) {
-
-			final Integer mementoWeight = fMemento.getInteger(weightKey + Integer.toString(weightIndex));
-
-			if (mementoWeight == null) {
-				try {
-					newWeights[weightIndex] = sashDefaultWeight[weightIndex];
-
-				} catch (final ArrayIndexOutOfBoundsException e) {
-					newWeights[weightIndex] = 100;
-				}
-			} else {
-				newWeights[weightIndex] = mementoWeight;
-			}
-		}
-
-		sash.setWeights(newWeights);
-	}
-
 	public static ImageData rotate(final ImageData srcData, final int direction) {
 
 		final int bytesPerPixel = srcData.bytesPerLine / srcData.width;
@@ -1090,22 +1053,6 @@ public class UI {
 
 		// destBytesPerLine is used as scanlinePad to ensure that no padding is required
 		return new ImageData(width, height, srcData.depth, srcData.palette, destBytesPerLine, newData);
-	}
-
-	/**
-	 * Store the weights for the sash in a memento
-	 * 
-	 * @param sash
-	 * @param memento
-	 * @param weightKey
-	 */
-	public static void saveSashWeight(final SashForm sash, final IMemento memento, final String weightKey) {
-
-		final int[] weights = sash.getWeights();
-
-		for (int weightIndex = 0; weightIndex < weights.length; weightIndex++) {
-			memento.putInteger(weightKey + Integer.toString(weightIndex), weights[weightIndex]);
-		}
 	}
 
 	/**

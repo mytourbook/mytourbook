@@ -21,12 +21,15 @@ import java.util.ArrayList;
 
 import net.tourbook.common.weather.IWeather;
 
+import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.preference.StringFieldEditor;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabItem;
+import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseTrackListener;
@@ -57,6 +60,7 @@ import org.eclipse.swt.widgets.Scale;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.ToolBar;
+import org.eclipse.ui.IMemento;
 import org.epics.css.dal.Timestamp;
 import org.epics.css.dal.Timestamp.Format;
 import org.joda.time.DateTime;
@@ -401,6 +405,21 @@ public class UI {
 		return new Cursor(display, sourceData, 0, 0);
 	}
 
+	/**
+	 * Creates one action in a toolbar.
+	 * 
+	 * @param parent
+	 * @param action
+	 */
+	public static void createToolbarAction(final Composite parent, final Action action) {
+
+		final ToolBar toolbar = new ToolBar(parent, SWT.FLAT);
+
+		final ToolBarManager tbm = new ToolBarManager(toolbar);
+		tbm.add(action);
+		tbm.update(true);
+	}
+
 	public static Color disposeResource(final Color resource) {
 		if ((resource != null) && !resource.isDisposed()) {
 			resource.dispose();
@@ -572,6 +591,80 @@ public class UI {
 	}
 
 	/**
+	 * Restore the sash weight from a memento
+	 * 
+	 * @param sashForm
+	 * @param state
+	 * @param weightKey
+	 * @param sashDefaultWeight
+	 */
+	public static void restoreSashWeight(	final SashForm sashForm,
+											final IDialogSettings state,
+											final String weightKey,
+											final int[] sashDefaultWeight) {
+
+		final int[] sashWeights = sashForm.getWeights();
+		final int[] newWeights = new int[sashWeights.length];
+
+		for (int weightIndex = 0; weightIndex < sashWeights.length; weightIndex++) {
+
+			try {
+
+				final int mementoWeight = state.getInt(weightKey + Integer.toString(weightIndex));
+
+				newWeights[weightIndex] = mementoWeight;
+
+			} catch (final Exception e) {
+
+				try {
+					newWeights[weightIndex] = sashDefaultWeight[weightIndex];
+
+				} catch (final ArrayIndexOutOfBoundsException e2) {
+					newWeights[weightIndex] = 100;
+				}
+			}
+
+		}
+
+		sashForm.setWeights(newWeights);
+	}
+
+	/**
+	 * Restore the sash weight from a memento
+	 * 
+	 * @param sash
+	 * @param fMemento
+	 * @param weightKey
+	 * @param sashDefaultWeight
+	 */
+	public static void restoreSashWeight(	final SashForm sash,
+											final IMemento fMemento,
+											final String weightKey,
+											final int[] sashDefaultWeight) {
+
+		final int[] sashWeights = sash.getWeights();
+		final int[] newWeights = new int[sashWeights.length];
+
+		for (int weightIndex = 0; weightIndex < sashWeights.length; weightIndex++) {
+
+			final Integer mementoWeight = fMemento.getInteger(weightKey + Integer.toString(weightIndex));
+
+			if (mementoWeight == null) {
+				try {
+					newWeights[weightIndex] = sashDefaultWeight[weightIndex];
+
+				} catch (final ArrayIndexOutOfBoundsException e) {
+					newWeights[weightIndex] = 100;
+				}
+			} else {
+				newWeights[weightIndex] = mementoWeight;
+			}
+		}
+
+		sash.setWeights(newWeights);
+	}
+
+	/**
 	 * This is a copy with modifications from {@link org.eclipse.jface.dialogs.Dialog}
 	 * 
 	 * @param statePrefix
@@ -602,6 +695,38 @@ public class UI {
 			if (fontDatas.length > 0) {
 				state.put(statePrefix + DIALOG_FONT_DATA, fontDatas[0].toString());
 			}
+		}
+	}
+
+	/**
+	 * Store the weights for the sash in a memento
+	 * 
+	 * @param sashForm
+	 * @param state
+	 * @param weightKey
+	 */
+	public static void saveSashWeight(final SashForm sashForm, final IDialogSettings state, final String weightKey) {
+
+		final int[] weights = sashForm.getWeights();
+
+		for (int weightIndex = 0; weightIndex < weights.length; weightIndex++) {
+			state.put(weightKey + Integer.toString(weightIndex), weights[weightIndex]);
+		}
+	}
+
+	/**
+	 * Store the weights for the sash in a memento
+	 * 
+	 * @param sash
+	 * @param memento
+	 * @param weightKey
+	 */
+	public static void saveSashWeight(final SashForm sash, final IMemento memento, final String weightKey) {
+
+		final int[] weights = sash.getWeights();
+
+		for (int weightIndex = 0; weightIndex < weights.length; weightIndex++) {
+			memento.putInteger(weightKey + Integer.toString(weightIndex), weights[weightIndex]);
 		}
 	}
 

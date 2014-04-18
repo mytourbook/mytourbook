@@ -516,6 +516,10 @@ public class Messages extends NLS {
 	public static String		Dlg_TourMarker_Button_undo_tooltip;
 	public static String		Dlg_TourMarker_Dlg_Message;
 	public static String		Dlg_TourMarker_Dlg_title;
+	public static String	Dlg_TourMarker_Label_Comment;
+
+	public static String	Dlg_TourMarker_Label_Description;
+
 	public static String		Dlg_TourMarker_Label_horizontal_offset;
 	public static String		Dlg_TourMarker_Label_marker_name;
 	public static String		Dlg_TourMarker_Label_markers;
@@ -571,6 +575,7 @@ public class Messages extends NLS {
 	public static String		Image__App_OK;
 	public static String		Image__App_Trash;
 	public static String		Image__App_Trash_Disabled;
+
 	public static String		Image__ArrowDown;
 	public static String		Image__ArrowUp;
 	public static String		Image__assignMergedTour;

@@ -78,8 +78,6 @@ import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.jface.viewers.ViewerRow;
 import org.eclipse.jface.viewers.ViewerSorter;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.KeyAdapter;
-import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.layout.GridData;
@@ -413,28 +411,6 @@ public class TourMarkerView extends ViewPart implements ITourProvider {
 		table.setHeaderVisible(true);
 //		table.setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
 		table.setLinesVisible(true);
-
-		table.addKeyListener(new KeyAdapter() {
-			@Override
-			public void keyPressed(final KeyEvent e) {
-
-				if (isTourInDb() == false) {
-					return;
-				}
-
-				final IStructuredSelection selection = (IStructuredSelection) _markerViewer.getSelection();
-				if ((selection.size() > 0) && (e.keyCode == SWT.CR)) {
-
-					// run async, otherwise it would pop up the dialog two times
-					Display.getCurrent().asyncExec(new Runnable() {
-						public void run() {
-							_actionEditTourMarkers.setSelectedMarker((TourMarker) selection.getFirstElement());
-							_actionEditTourMarkers.run();
-						}
-					});
-				}
-			}
-		});
 
 		_markerViewer = new TableViewer(table);
 

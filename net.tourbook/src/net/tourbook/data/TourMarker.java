@@ -134,6 +134,27 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 
 	private String					category				= UI.EMPTY_STRING;
 
+	/**
+	 * Can be <code>null</code>
+	 * 
+	 * @since db version 24
+	 */
+	private String					comment;
+
+	/**
+	 * Can be <code>null</code>
+	 * 
+	 * @since db version 24
+	 */
+	private String					description;
+
+	/**
+	 * Can be <code>null</code>
+	 * 
+	 * @since db version 24
+	 */
+	private String					symbol;
+
 	private int						isMarkerVisible			= 1;
 
 	/**
@@ -213,6 +234,7 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 		// default sorting for tour markers is by index
 
 		if (other instanceof TourMarker) {
+
 			final TourMarker otherTourMarker = (TourMarker) other;
 
 			return serieIndex - otherTourMarker.getSerieIndex();
@@ -234,6 +256,10 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 		if (category.compareTo(comparedMarker.category) != 0) {
 			return false;
 		} else if (label.compareTo(comparedMarker.label) != 0) {
+			return false;
+		} else if (getComment().compareTo(comparedMarker.getComment()) != 0) {
+			return false;
+		} else if (getDescription().compareTo(comparedMarker.getDescription()) != 0) {
 			return false;
 		} else if (distance20 != comparedMarker.distance20) {
 			return false;
@@ -270,6 +296,7 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 	 */
 	@Override
 	public boolean equals(final Object obj) {
+
 		if (this == obj) {
 			return true;
 		}
@@ -301,6 +328,19 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 
 	public String getCategory() {
 		return category;
+	}
+
+	/**
+	 * @return
+	 */
+	public String getComment() {
+
+		return comment == null ? UI.EMPTY_STRING : comment;
+	}
+
+	public String getDescription() {
+
+		return description == null ? UI.EMPTY_STRING : description;
 	}
 
 	/**
@@ -341,6 +381,10 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 	 */
 	public int getSerieIndex() {
 		return serieIndex;
+	}
+
+	public String getSymbol() {
+		return symbol;
 	}
 
 	public int getTime() {
@@ -387,8 +431,10 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 	 */
 	public void restoreMarkerFromBackup(final TourMarker backupMarker) {
 
-		category = backupMarker.category;
 		label = backupMarker.label;
+		category = backupMarker.category;
+		comment = backupMarker.comment;
+		description = backupMarker.description;
 
 		distance20 = backupMarker.distance20;
 		labelXOffset = backupMarker.labelXOffset;
@@ -405,6 +451,14 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 
 	public void setCategory(final String category) {
 		this.category = category;
+	}
+
+	public void setComment(final String comment) {
+		this.comment = comment;
+	}
+
+	public void setDescription(final String description) {
+		this.description = description;
 	}
 
 	/**
@@ -436,8 +490,10 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 	 */
 	public void setMarkerBackup(final TourMarker backupMarker) {
 
-		backupMarker.category = category;
 		backupMarker.label = label;
+		backupMarker.category = category;
+		backupMarker.comment = comment;
+		backupMarker.description = description;
 
 		backupMarker.distance20 = distance20;
 		backupMarker.labelXOffset = labelXOffset;
@@ -465,6 +521,10 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 
 	public void setSerieIndex(final int serieIndex) {
 		this.serieIndex = serieIndex;
+	}
+
+	public void setSymbol(final String symbol) {
+		this.symbol = symbol;
 	}
 
 	/**
