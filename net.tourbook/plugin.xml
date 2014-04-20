@@ -849,10 +849,16 @@
 				icon="icons/photo-link-photo-with-tour.png"
 				label="%Action_PhotoDirectory_LinkPhotoWithTourInGalleryAll"
 				mnemonic="%Action_PhotoDirectory_LinkPhotoWithTourInGalleryAll_Mnemonic"/>
-		            
+
 			<command
 				commandId="command.net.tourbook.photo.LinkPhotoWithTourInGallerySelected"
 				icon="icons/photo-link-photo-with-tour.png"
+				label="%Action_PhotoDirectory_LinkPhotoWithTourInGallerySelected"
+				mnemonic="%Action_PhotoDirectory_LinkPhotoWithTourInGallerySelected_Mnemonic"/>
+
+			<command
+				commandId="command.net.tourbook.tourMarker.ImportTourMarkerIcons"
+				icon="icons/????.png"
 				label="%Action_PhotoDirectory_LinkPhotoWithTourInGallerySelected"
 				mnemonic="%Action_PhotoDirectory_LinkPhotoWithTourInGallerySelected_Mnemonic"/>
 			
@@ -1079,6 +1085,15 @@
 		<command
 			id="net.tourbook.command.PicDir.NavigateHistoryForward"
 			name="%Command_PicDir_History_Forward"
+			/>
+
+		<!--
+			Tour marker
+		-->            
+		
+		<command id="command.net.tourbook.tourMarker.ImportTourMarkerIcons"
+			name="%Action_TourMarker_ImportTourMarkerIcons"
+			defaultHandler="net.tourbook.tourMarker.ActionHandlerImportTourMarkerIcons"
 			/>
 	           
    </extension>

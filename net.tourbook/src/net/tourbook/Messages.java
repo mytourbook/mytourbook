@@ -658,6 +658,8 @@ public class Messages extends NLS {
 	public static String		Image__synch_graph_bySize_disabled;
 	public static String		Image__synch_statistics;
 	public static String		Image__synch_statistics_Disabled;
+	public static String	Image__Symbol_Difference;
+
 	public static String		Image__Synced;
 	public static String		Image__tag;
 	public static String		Image__tag_category;
@@ -1199,6 +1201,14 @@ public class Messages extends NLS {
 	public static String		Tour_Editor_Label_Sensor_Yes;
 	public static String		Tour_Editor_Label_Weather;
 	public static String		Tour_Editor_Label_WindDirection_Unit;
+
+	public static String	Tour_Marker_Action_Delta_Tooltip;
+
+	public static String	Tour_Marker_Column_Description;
+
+	public static String	Tour_Marker_Column_Description_ShortCut;
+
+	public static String	Tour_Marker_Column_Description_Tooltip;
 
 	public static String		Tour_Marker_Column_horizontal_offset;
 	public static String		Tour_Marker_Column_horizontal_offset_tooltip;

@@ -17,6 +17,7 @@ package net.tourbook.chart;
 
 import java.util.HashMap;
 
+import net.tourbook.common.form.ViewForm;
 import net.tourbook.common.util.ITourToolTipProvider;
 
 import org.eclipse.core.runtime.ListenerList;
@@ -28,7 +29,6 @@ import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.ViewForm;
 import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Point;

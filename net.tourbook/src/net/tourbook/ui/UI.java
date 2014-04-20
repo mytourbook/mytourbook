@@ -38,7 +38,9 @@ import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.SelectionTourIds;
 import net.tourbook.tour.TourEvent;
+import net.tourbook.tour.TourManager;
 import net.tourbook.ui.views.rawData.RawDataView;
+import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
 
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -145,8 +147,8 @@ public class UI {
 	public static final String								SYMBOL_AVERAGE_WITH_SPACE		= "\u00f8 ";									//$NON-NLS-1$
 	public static final String								SYMBOL_DASH						= "-";											//$NON-NLS-1$
 //	public static final String								SYMBOL_DASH						= "\u2212";									//$NON-NLS-1$
-	public static final String								SYMBOL_DIFFERENCE				= "\u0394";									//$NON-NLS-1$
-	public static final String								SYMBOL_DIFFERENCE_WITH_SPACE	= "\u0394 ";									//$NON-NLS-1$
+//	public static final String								SYMBOL_DIFFERENCE				= "\u0394";									//$NON-NLS-1$
+//	public static final String								SYMBOL_DIFFERENCE_WITH_SPACE	= "\u0394 ";									//$NON-NLS-1$
 	public static final String								SYMBOL_DOUBLE_HORIZONTAL		= "\u2550";									//$NON-NLS-1$
 	public static final String								SYMBOL_DOUBLE_VERTICAL			= "\u2551";									//$NON-NLS-1$
 	public static final String								SYMBOL_DEGREE					= "\u00B0";									//$NON-NLS-1$
@@ -521,6 +523,26 @@ public class UI {
 		}
 
 		return containedTourId;
+	}
+
+	/**
+	 * Get text for the OK button.
+	 * 
+	 * @param tourData
+	 * @return
+	 */
+	public static String convertOKtoSaveUpdateButton(final TourData tourData) {
+
+		String okText = null;
+
+		final TourDataEditorView tourDataEditor = TourManager.getTourDataEditor();
+		if ((tourDataEditor != null) && tourDataEditor.isDirty() && (tourDataEditor.getTourData() == tourData)) {
+			okText = Messages.app_action_update;
+		} else {
+			okText = Messages.app_action_save;
+		}
+
+		return okText;
 	}
 
 	private static String createGraphImage_Name(final MapGraphId graphId) {

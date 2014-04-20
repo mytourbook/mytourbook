@@ -110,6 +110,7 @@ public class UI {
 	public static final String			SYMBOL_GREATER_THAN						= ">";																		//$NON-NLS-1$
 	public static final String			SYMBOL_LESS_THAN						= "<";																		//$NON-NLS-1$
 	public static final String			SYMBOL_PERCENTAGE						= "%";																		//$NON-NLS-1$
+	public static final String			SYMBOL_STAR								= "*";																		//$NON-NLS-1$
 	public static final String			SYMBOL_UNDERSCORE						= "_";																		//$NON-NLS-1$
 	public static final String			SYMBOL_WIND_WITH_SPACE					= "W ";																	//$NON-NLS-1$
 

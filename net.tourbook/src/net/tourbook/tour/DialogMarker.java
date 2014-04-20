@@ -35,6 +35,7 @@ import net.tourbook.database.TourDatabase;
 import net.tourbook.ui.tourChart.TourChart;
 import net.tourbook.ui.tourChart.TourChartConfiguration;
 
+import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.jface.layout.GridDataFactory;
@@ -155,7 +156,8 @@ public class DialogMarker extends TitleAreaDialog {
 	private Spinner					_spinOffsetX;
 	private Spinner					_spinOffsetY;
 
-	private Text					_txtComment;
+// comment is disabled
+//	private Text					_txtComment;
 	private Text					_txtDescription;
 
 	{
@@ -349,6 +351,16 @@ public class DialogMarker extends TitleAreaDialog {
 	}
 
 	@Override
+	protected final void createButtonsForButtonBar(final Composite parent) {
+
+		super.createButtonsForButtonBar(parent);
+
+		final String okText = net.tourbook.ui.UI.convertOKtoSaveUpdateButton(_tourData);
+
+		getButton(IDialogConstants.OK_ID).setText(okText);
+	}
+
+	@Override
 	protected Control createDialogArea(final Composite parent) {
 
 		final Composite dlgContainer = (Composite) super.createDialogArea(parent);
@@ -474,7 +486,10 @@ public class DialogMarker extends TitleAreaDialog {
 		/*
 		 * create table
 		 */
-		final Table table = new Table(layoutContainer, SWT.FULL_SELECTION | SWT.BORDER | SWT.CHECK);
+		final Table table = new Table(layoutContainer, //
+				SWT.FULL_SELECTION //
+//						| SWT.BORDER
+						| SWT.CHECK);
 
 		table.setLayout(new TableLayout());
 		table.setHeaderVisible(true);
@@ -499,6 +514,7 @@ public class DialogMarker extends TitleAreaDialog {
 		defineColumn_Distance(tableLayout);
 		defineColumn_IsVisible(tableLayout);
 		defineColumn_Marker(tableLayout);
+		defineColumn_Description(tableLayout);
 		defineColumn_OffsetX(tableLayout);
 		defineColumn_OffsetY(tableLayout);
 
@@ -610,25 +626,25 @@ public class DialogMarker extends TitleAreaDialog {
 			/*
 			 * Comment
 			 */
-			{
-				// label
-				final Label label = new Label(container, SWT.NONE);
-				GridDataFactory.fillDefaults()//
-						.align(SWT.BEGINNING, SWT.BEGINNING)
-						.applyTo(label);
-				label.setText(Messages.Dlg_TourMarker_Label_Comment);
-
-				// text
-				_txtComment = new Text(container, SWT.BORDER //
-						| SWT.WRAP
-						| SWT.V_SCROLL
-						| SWT.H_SCROLL);
-				GridDataFactory.fillDefaults()//
-						.grab(true, true)
-//						.hint(SWT.DEFAULT, _pc.convertHeightInCharsToPixels(3))
-						.applyTo(_txtComment);
-				_txtComment.addModifyListener(_defaultModifyListener);
-			}
+//			{
+//				// label
+//				final Label label = new Label(container, SWT.NONE);
+//				GridDataFactory.fillDefaults()//
+//						.align(SWT.BEGINNING, SWT.BEGINNING)
+//						.applyTo(label);
+//				label.setText(Messages.Dlg_TourMarker_Label_Comment);
+//
+//				// text
+//				_txtComment = new Text(container, SWT.BORDER //
+//						| SWT.WRAP
+//						| SWT.V_SCROLL
+//						| SWT.H_SCROLL);
+//				GridDataFactory.fillDefaults()//
+//						.grab(true, true)
+////						.hint(SWT.DEFAULT, _pc.convertHeightInCharsToPixels(3))
+//						.applyTo(_txtComment);
+//				_txtComment.addModifyListener(_defaultModifyListener);
+//			}
 
 			createUI_70_Offset(container);
 		}
@@ -794,6 +810,30 @@ public class DialogMarker extends TitleAreaDialog {
 			}
 		});
 		tableLayout.setColumnData(tc, new ColumnPixelData(0, false));
+	}
+
+	/**
+	 * Column: Description
+	 */
+	private void defineColumn_Description(final TableColumnLayout tableLayout) {
+
+		final TableViewerColumn tvc = new TableViewerColumn(_markerViewer, SWT.CENTER);
+		final TableColumn tc = tvc.getColumn();
+
+		tc.setText(Messages.Tour_Marker_Column_Description_ShortCut);
+		tc.setToolTipText(Messages.Tour_Marker_Column_Description_Tooltip);
+		tvc.setLabelProvider(new CellLabelProvider() {
+
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final TourMarker tourMarker = (TourMarker) cell.getElement();
+				final String description = tourMarker.getDescription();
+
+				cell.setText(description.length() == 0 ? UI.EMPTY_STRING : UI.SYMBOL_STAR);
+			}
+		});
+		tableLayout.setColumnData(tc, new ColumnPixelData(_pc.convertWidthInCharsToPixels(4), false));
 	}
 
 	/**
@@ -1124,7 +1164,7 @@ public class DialogMarker extends TitleAreaDialog {
 		tourMarker.setLabel(_comboMarkerName.getText());
 		tourMarker.setVisualPosition(_comboMarkerPosition.getSelectionIndex());
 
-		tourMarker.setComment(_txtComment.getText());
+//		tourMarker.setComment(_txtComment.getText());
 		tourMarker.setDescription(_txtDescription.getText());
 
 		tourMarker.setLabelXOffset(_spinOffsetX.getSelection());
@@ -1144,7 +1184,7 @@ public class DialogMarker extends TitleAreaDialog {
 			_comboMarkerName.setText(_selectedTourMarker.getLabel());
 			_comboMarkerPosition.select(_selectedTourMarker.getVisualPosition());
 
-			_txtComment.setText(_selectedTourMarker.getComment());
+//			_txtComment.setText(_selectedTourMarker.getComment());
 			_txtDescription.setText(_selectedTourMarker.getDescription());
 
 			_spinOffsetX.setSelection(_selectedTourMarker.getLabelXOffset());

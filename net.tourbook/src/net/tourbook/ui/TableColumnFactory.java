@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -412,7 +412,7 @@ public abstract class TableColumnFactory {
 		public ColumnDefinition createColumn(final ColumnManager columnManager, final PixelConverter pixelConverter) {
 			
 			final ColumnDefinition colDef = new TableColumnDefinition(columnManager, "distance", SWT.TRAIL); //$NON-NLS-1$
-																			final int pixelWidth = pixelConverter.convertWidthInCharsToPixels(11);
+			final int pixelWidth = pixelConverter.convertWidthInCharsToPixels(11);
 		
 			colDef.setColumnLabel(Messages.ColumnFactory_distance_label);
 			colDef.setColumnHeader(UI.UNIT_LABEL_DISTANCE);
@@ -421,6 +421,46 @@ public abstract class TableColumnFactory {
 			colDef.setDefaultColumnWidth(pixelWidth);
 			colDef.setColumnWeightData(new ColumnPixelData(pixelWidth, true));
 
+			return colDef;
+		};
+	};
+	
+	public static final TableColumnFactory DISTANCE_DELTA = new TableColumnFactory() {
+		
+		@Override
+		public ColumnDefinition createColumn(final ColumnManager columnManager, final PixelConverter pixelConverter) {
+			
+			final String deltaDistance = UI.SYMBOL_DIFFERENCE_WITH_SPACE + net.tourbook.common.UI.UNIT_LABEL_DISTANCE;
+
+			final ColumnDefinition colDef = new TableColumnDefinition(columnManager, "distanceDelta", SWT.TRAIL); //$NON-NLS-1$
+			
+			colDef.setColumnLabel(Messages.ColumnFactory_DistanceDelta_Label);
+			colDef.setColumnHeader(deltaDistance);
+			colDef.setColumnUnit(UI.UNIT_LABEL_DISTANCE);
+			colDef.setColumnToolTipText(Messages.ColumnFactory_DistanceDelta_Tooltip);
+			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(11));
+
+ 			return colDef;
+		};
+	};
+
+	public static final TableColumnFactory DISTANCE_DIFF = new TableColumnFactory() {
+		
+		@Override
+		public ColumnDefinition createColumn(final ColumnManager columnManager, final PixelConverter pixelConverter) {
+			
+			final String header = Messages.ColumnFactory_Diff_Header
+					+ UI.SPACE
+					+ UI.UNIT_LABEL_DISTANCE;
+			
+			final ColumnDefinition colDef = new TableColumnDefinition(columnManager, "tourDistanceDiff", SWT.TRAIL); //$NON-NLS-1$
+			
+			colDef.setColumnLabel(Messages.ColumnFactory_TourDistanceDiff_Label);
+			colDef.setColumnHeader(header);
+			colDef.setColumnUnit(UI.UNIT_LABEL_DISTANCE);
+			colDef.setColumnToolTipText(Messages.ColumnFactory_TourDistanceDiff_Tooltip);
+			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
+			
 			return colDef;
 		};
 	};
@@ -592,7 +632,32 @@ public abstract class TableColumnFactory {
 		};
 	};
 
-	
+	public static final TableColumnFactory MAP_MARKER_VISIBLE = new TableColumnFactory() {
+		
+		@Override
+		public ColumnDefinition createColumn(final ColumnManager columnManager, final PixelConverter pixelConverter) {
+			
+			final int pixelWidth = pixelConverter.convertWidthInCharsToPixels(8);
+			final ColumnDefinition colDef = new TableColumnDefinition(columnManager, "markerVisible", SWT.CENTER); //$NON-NLS-1$
+			
+//			colDef.setColumnLabel(net.tourbook.Messages.Tour_Marker_Column_IsVisible);
+////			Visible
+//			colDef.setColumnHeader(net.tourbook.Messages.Tour_Marker_Column_IsVisible);
+//			colDef.setColumnToolTipText(net.tourbook.Messages.Tour_Marker_Column_IsVisibleNoEdit_Tooltip);
+////			Visibility of the marker:
+////
+////				Yes: Visible
+////				No:  Hidden
+			colDef.setColumnLabel(Messages.Tour_Marker_Column_IsVisible);
+			colDef.setColumnHeader(Messages.Tour_Marker_Column_IsVisible);
+			colDef.setColumnToolTipText(Messages.Tour_Marker_Column_IsVisibleNoEdit_Tooltip);
+			colDef.setDefaultColumnWidth(pixelWidth);
+			colDef.setColumnWeightData(new ColumnPixelData(pixelWidth, true));
+			
+			return colDef;
+		};
+	};
+
 	public static final TableColumnFactory MARKER = new TableColumnFactory() {
 		
 		@Override
@@ -832,6 +897,23 @@ public abstract class TableColumnFactory {
 		};
 	};
 	
+	public static final TableColumnFactory TIME_DELTA = new TableColumnFactory() {
+		
+		@Override
+		public ColumnDefinition createColumn(final ColumnManager columnManager, final PixelConverter pixelConverter) {
+			
+			final ColumnDefinition colDef = new TableColumnDefinition(columnManager, "timeDelta", SWT.TRAIL); //$NON-NLS-1$
+			
+			colDef.setColumnLabel(Messages.ColumnFactory_TimeDelta_Label);
+			colDef.setColumnHeader(Messages.ColumnFactory_TimeDelta_Header);
+			colDef.setColumnUnit(UI.UNIT_LABEL_TIME);
+			colDef.setColumnToolTipText(Messages.ColumnFactory_TimeDelta_Tooltip);
+			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(12));
+			
+			return colDef;
+		};
+	};
+	
 	public static final TableColumnFactory TIME_INTERVAL = new TableColumnFactory() {
 		
 		@Override
@@ -1024,27 +1106,6 @@ public abstract class TableColumnFactory {
 			colDef.setColumnHeader(Messages.ColumnFactory_TourTimeDiff_Header);
 			colDef.setColumnUnit(Messages.ColumnFactory_tour_time);
 			colDef.setColumnToolTipText(Messages.ColumnFactory_TourTimeDiff_Tooltip);
-			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
-			
-			return colDef;
-		};
-	};
-	
-	public static final TableColumnFactory DISTANCE_DIFF = new TableColumnFactory() {
-		
-		@Override
-		public ColumnDefinition createColumn(final ColumnManager columnManager, final PixelConverter pixelConverter) {
-			
-			final String header = Messages.ColumnFactory_Diff_Header
-					+ UI.SPACE
-					+ UI.UNIT_LABEL_DISTANCE;
-
-			final ColumnDefinition colDef = new TableColumnDefinition(columnManager, "tourDistanceDiff", SWT.TRAIL); //$NON-NLS-1$
-			
-			colDef.setColumnLabel(Messages.ColumnFactory_TourDistanceDiff_Label);
-			colDef.setColumnHeader(header);
-			colDef.setColumnUnit(UI.UNIT_LABEL_DISTANCE);
-			colDef.setColumnToolTipText(Messages.ColumnFactory_TourDistanceDiff_Tooltip);
 			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
 			
 			return colDef;

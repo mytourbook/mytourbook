@@ -3647,17 +3647,17 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="22.627417"
-     inkscape:cx="27.988707"
-     inkscape:cy="976.70626"
+     inkscape:zoom="14.998095"
+     inkscape:cx="8.8463784"
+     inkscape:cy="940.79433"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="true"
-     inkscape:window-width="1898"
-     inkscape:window-height="1074"
-     inkscape:window-x="77"
-     inkscape:window-y="0"
-     inkscape:window-maximized="0"
+     inkscape:window-width="1525"
+     inkscape:window-height="881"
+     inkscape:window-x="68"
+     inkscape:window-y="-7"
+     inkscape:window-maximized="1"
      inkscape:snap-grids="true"
      inkscape:snap-page="false"
      inkscape:snap-to-guides="false"
@@ -3825,19 +3825,7 @@
        y="51.362183"
        x="15"
        id="image3727"
-       xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABHNCSVQICAgIfAhkiAAAAkVJREFU
-OI2lk01IVFEUx//nvTv3Oc4wjZQf1CJaCLYxMCSC2gRF0UaiTZCb2gSR0q6Q5jU6i6KNGEFQ66BA
-ChRy4aZcqBQRMhEj2qiZ4sc0aToz791372khZClvU//VgfPjz/kE/lMUlrh06+LlhoP7Gw0zVvLL
-7589eD6QTqfJdV3+kxNhBnPJua5T5842eaaC8aejwwAGbGHv4gQAuK5LIIANQzoO8vlpfOKJ9eJG
-IfC0B4bZ7Lh+g5gNpdwUiAhgIJ1OswC2gp3Ox+41w8dP4VMFBr7pe/SQAeziBAB0dnXUk6QaGGYp
-Hfo6P4/Z6o8xH0UoeLBiOnml82rT3voaBCpgJhAUCr09vSsEAK33m98cP9l6wnh+YAsWRAySiiIR
-Im00PF+z8sHKaPjKBJ5gkX2bG/p8d+q8AIA9iVisriaBwNskEQEsK8BGUIJnSjCkkYgnYJFAWREq
-niZPMGQV4r9bWC1l4xOrk1YExpIOYBiIRvYhUdUAcIBCeZoqukgAw/dhlT1GoM22weJrerww+qPZ
-YijbhqUUc0u7ajvaImtt0siOLc5ODaohIUkYDa0JEbmWfAdsbBksDa/37pxupa10pCwna5kIek18
-WHqpr/1NrG5voTvTbRERmA0c6eDLzAJmqvvsqqiBBiBjWtzsvG3VHYiT8gMmssCGkbqTMmGHiPb+
-Q+P9/hn1wj+tLjxpfBXGWWGJbH4lPpLLiZHcpJj+VogCQCbTs+t3Qn9heTCa6R8tHmYATjE5BnyH
-1uEV/7N+AfvwDwRxwQ9NAAAAAElFTkSuQmCC
-"
+       xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABHNCSVQICAgIfAhkiAAAAkVJREFU OI2lk01IVFEUx//nvTv3Oc4wjZQf1CJaCLYxMCSC2gRF0UaiTZCb2gSR0q6Q5jU6i6KNGEFQ66BA ChRy4aZcqBQRMhEj2qiZ4sc0aToz791372khZClvU//VgfPjz/kE/lMUlrh06+LlhoP7Gw0zVvLL 7589eD6QTqfJdV3+kxNhBnPJua5T5842eaaC8aejwwAGbGHv4gQAuK5LIIANQzoO8vlpfOKJ9eJG IfC0B4bZ7Lh+g5gNpdwUiAhgIJ1OswC2gp3Ox+41w8dP4VMFBr7pe/SQAeziBAB0dnXUk6QaGGYp Hfo6P4/Z6o8xH0UoeLBiOnml82rT3voaBCpgJhAUCr09vSsEAK33m98cP9l6wnh+YAsWRAySiiIR Im00PF+z8sHKaPjKBJ5gkX2bG/p8d+q8AIA9iVisriaBwNskEQEsK8BGUIJnSjCkkYgnYJFAWREq niZPMGQV4r9bWC1l4xOrk1YExpIOYBiIRvYhUdUAcIBCeZoqukgAw/dhlT1GoM22weJrerww+qPZ YijbhqUUc0u7ajvaImtt0siOLc5ODaohIUkYDa0JEbmWfAdsbBksDa/37pxupa10pCwna5kIek18 WHqpr/1NrG5voTvTbRERmA0c6eDLzAJmqvvsqqiBBiBjWtzsvG3VHYiT8gMmssCGkbqTMmGHiPb+ Q+P9/hn1wj+tLjxpfBXGWWGJbH4lPpLLiZHcpJj+VogCQCbTs+t3Qn9heTCa6R8tHmYATjE5BnyH 1uEV/7N+AfvwDwRxwQ9NAAAAAElFTkSuQmCC "
        height="16"
        width="16" />
     <rect
@@ -3889,6 +3877,24 @@ Q+P9/hn1wj+tLjxpfBXGWWGJbH4lPpLLiZHcpJj+VogCQCbTs+t3Qn9heTCa6R8tHmYATjE5BnyH
        inkscape:connector-curvature="0"
        sodipodi:nodetypes="ccccccccccccc"
        inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook\icons\app-add-2x.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <rect
+       style="color:#000000;fill:none;stroke:none;stroke-width:0.17900001;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+       id="rect2998"
+       width="16"
+       height="16"
+       x="15"
+       y="91.362183"
+       inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook\icons\symbol-delta.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <path
+       style="fill:none;stroke:#4e4e4e;stroke-width:1.29999994999999990;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       d="m 17,105.36218 12,0 -6,-11.999993 z"
+       id="path3768"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook\icons\symbol-delta.png"
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90" />
   </g>

@@ -338,6 +338,9 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 		return comment == null ? UI.EMPTY_STRING : comment;
 	}
 
+	/**
+	 * @return Returns description of the marker when available, otherwise an empty string.
+	 */
 	public String getDescription() {
 
 		return description == null ? UI.EMPTY_STRING : description;
