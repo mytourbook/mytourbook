@@ -857,10 +857,10 @@
 				mnemonic="%Action_PhotoDirectory_LinkPhotoWithTourInGallerySelected_Mnemonic"/>
 
 			<command
-				commandId="command.net.tourbook.tourMarker.ImportTourMarkerIcons"
-				icon="icons/????.png"
-				label="%Action_PhotoDirectory_LinkPhotoWithTourInGallerySelected"
-				mnemonic="%Action_PhotoDirectory_LinkPhotoWithTourInGallerySelected_Mnemonic"/>
+				commandId="command.net.tourbook.tourMarker.ImportTourSigns"
+				icon="icons/tour-sign-import.png"
+				label="%Action_TourMarker_ImportTourSigns"
+				mnemonic="%Action_TourMarker_ImportTourSigns_Mnemonic"/>
 			
 		</menuContribution>
 
@@ -1091,9 +1091,9 @@
 			Tour marker
 		-->            
 		
-		<command id="command.net.tourbook.tourMarker.ImportTourMarkerIcons"
-			name="%Action_TourMarker_ImportTourMarkerIcons"
-			defaultHandler="net.tourbook.tourMarker.ActionHandlerImportTourMarkerIcons"
+		<command id="command.net.tourbook.tourMarker.ImportTourSigns"
+			name="%Action_TourMarker_ImportTourSigns"
+			defaultHandler="net.tourbook.sign.ActionHandlerImportSigns"
 			/>
 	           
    </extension>

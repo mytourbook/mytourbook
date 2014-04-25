@@ -1,6 +1,7 @@
--update file META-INF\persistence.xml in persistence.zip
--replace file META-INF\persistence.xml in file persistence.zip
--copy persistence.zip in net.tourbook folder
--rename persistence.zip into persistence.jar
-
-update file persistence.xml in net.tourbook\src\META-INF
+- edit + save META-INF\persistence.xml 
+- zip META-INF
+- delete persistence.zip
+- rename META-INF.zip into persistence.zip
+- copy persistence.zip in net.tourbook folder
+- rename persistence.zip into persistence.jar
+- update file persistence.xml in net.tourbook\src\META-INF

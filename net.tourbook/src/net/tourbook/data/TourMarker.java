@@ -40,6 +40,23 @@ import net.tourbook.ui.UI;
 
 import org.eclipse.swt.graphics.Rectangle;
 
+/**
+ * A tour marker has a position within a tour.
+ * 
+ * <pre>
+ * 
+ *  Planned features:
+ * 
+ * 	- different icons, size, with/without text
+ * 	- new marker description field
+ * 	- create marker in the map
+ * 	- a marker can have another position than the tour track
+ * 
+ * 	icons from http://mapicons.nicolasmollet.com/
+ * 
+ * </pre>
+ */
+
 @Entity
 @XmlType(name = "TourMarker")
 @XmlRootElement(name = "TourMarker")
@@ -83,6 +100,12 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 
 	@ManyToOne(optional = false)
 	private TourData				tourData;
+
+	/**
+	 * @since Db version 24
+	 */
+	@ManyToOne(optional = true)
+	private TourSign				tourSign;
 
 	/**
 	 * Contains the marker type which is defined in {@link ChartLabel} like
@@ -132,6 +155,10 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 	@XmlElement
 	private String					label					= UI.EMPTY_STRING;
 
+	/**
+	 * This field is disable since db version 24 because the TourSign can be categorized.
+	 */
+	@SuppressWarnings("unused")
 	private String					category				= UI.EMPTY_STRING;
 
 	/**
@@ -147,13 +174,6 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 	 * @since db version 24
 	 */
 	private String					description;
-
-	/**
-	 * Can be <code>null</code>
-	 * 
-	 * @since db version 24
-	 */
-	private String					symbol;
 
 	private int						isMarkerVisible			= 1;
 
@@ -253,9 +273,10 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 	 */
 	public boolean compareTo(final TourMarker comparedMarker, final boolean ignoreType) {
 
-		if (category.compareTo(comparedMarker.category) != 0) {
-			return false;
-		} else if (label.compareTo(comparedMarker.label) != 0) {
+//		if (category.compareTo(comparedMarker.category) != 0) {
+//			return false;
+//		} else
+		if (label.compareTo(comparedMarker.label) != 0) {
 			return false;
 		} else if (getComment().compareTo(comparedMarker.getComment()) != 0) {
 			return false;
@@ -326,9 +347,9 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 		return true;
 	}
 
-	public String getCategory() {
-		return category;
-	}
+//	public String getCategory() {
+//		return category;
+//	}
 
 	/**
 	 * @return
@@ -386,10 +407,6 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 		return serieIndex;
 	}
 
-	public String getSymbol() {
-		return symbol;
-	}
-
 	public int getTime() {
 		return time;
 	}
@@ -435,7 +452,7 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 	public void restoreMarkerFromBackup(final TourMarker backupMarker) {
 
 		label = backupMarker.label;
-		category = backupMarker.category;
+//		category = backupMarker.category;
 		comment = backupMarker.comment;
 		description = backupMarker.description;
 
@@ -452,9 +469,9 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 		tourData = backupMarker.tourData;
 	}
 
-	public void setCategory(final String category) {
-		this.category = category;
-	}
+//	public void setCategory(final String category) {
+//		this.category = category;
+//	}
 
 	public void setComment(final String comment) {
 		this.comment = comment;
@@ -494,7 +511,7 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 	public void setMarkerBackup(final TourMarker backupMarker) {
 
 		backupMarker.label = label;
-		backupMarker.category = category;
+//		backupMarker.category = category;
 		backupMarker.comment = comment;
 		backupMarker.description = description;
 
@@ -524,10 +541,6 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 
 	public void setSerieIndex(final int serieIndex) {
 		this.serieIndex = serieIndex;
-	}
-
-	public void setSymbol(final String symbol) {
-		this.symbol = symbol;
 	}
 
 	/**
@@ -583,6 +596,7 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 	 * Convert fields from old to new data type.
 	 */
 	public void updateDatabase_019_to_020() {
+
 		distance20 = distance;
 		distance = 0;
 	}

@@ -33,18 +33,8 @@ import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.swt.graphics.Image;
 
 /**
- * <pre>
- * 
- * 	- different icons, size, with/without text
- * 	- new marker description field
- * 	- create marker in the map
- * 	- a marker can have another position than the tour track
- * 
- * 	http://mapicons.nicolasmollet.com/
- * 
- * 
- * 
- * </pre>
+ * A waypoint is associated with a tour but the way point position is independently from a tour, it
+ * has it's own lat/lon position.
  */
 @Entity
 public class TourWayPoint implements Cloneable, Comparable<Object>, IHoveredArea {
@@ -64,6 +54,12 @@ public class TourWayPoint implements Cloneable, Comparable<Object>, IHoveredArea
 
 	@ManyToOne(optional = false)
 	private TourData		tourData;
+
+//	/**
+//	 * @since Db version 24
+//	 */
+//	@ManyToOne
+//	private TourSign		tourSign;
 
 	// initialize with invalid values
 	private double			longitude				= Double.MIN_VALUE;

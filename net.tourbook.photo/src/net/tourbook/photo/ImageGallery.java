@@ -631,8 +631,8 @@ public abstract class ImageGallery implements IItemListener, IGalleryContextMenu
 
 			MessageDialog.openInformation(
 					_display.getActiveShell(),
-					Messages.Pic_Dir_Dialog_LinkPhotos_Title,
-					Messages.Pic_Dir_Dialog_LinkPhotos_DialogInterrupted_Message);
+					Messages.Pic_Dir_Dialog_Photos_Title,
+					Messages.Pic_Dir_Dialog_Photos_DialogInterrupted_Message);
 
 			return null;
 		}
@@ -646,16 +646,16 @@ public abstract class ImageGallery implements IItemListener, IGalleryContextMenu
 
 				MessageDialog.openInformation(
 						_display.getActiveShell(),
-						Messages.Pic_Dir_Dialog_LinkPhotos_Title,
-						NLS.bind(Messages.Pic_Dir_Dialog_LinkPhotos_NoSelectedImagesInFolder_Message,//
+						Messages.Pic_Dir_Dialog_Photos_Title,
+						NLS.bind(Messages.Pic_Dir_Dialog_Photos_NoSelectedImagesInFolder_Message,//
 								_photoFolderWhichShouldBeDisplayed.getAbsolutePath()));
 
 			} else {
 
 				MessageDialog.openInformation(
 						_display.getActiveShell(),
-						Messages.Pic_Dir_Dialog_LinkPhotos_Title,
-						Messages.Pic_Dir_Dialog_LinkPhotos_NoSelectedImage_Message);
+						Messages.Pic_Dir_Dialog_Photos_Title,
+						Messages.Pic_Dir_Dialog_Photos_NoSelectedImage_Message);
 			}
 
 			return null;

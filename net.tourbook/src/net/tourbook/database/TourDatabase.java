@@ -57,6 +57,8 @@ import net.tourbook.data.TourPerson;
 import net.tourbook.data.TourPersonHRZone;
 import net.tourbook.data.TourPhoto;
 import net.tourbook.data.TourReference;
+import net.tourbook.data.TourSign;
+import net.tourbook.data.TourSignCategory;
 import net.tourbook.data.TourTag;
 import net.tourbook.data.TourTagCategory;
 import net.tourbook.data.TourType;
@@ -126,19 +128,21 @@ public class TourDatabase {
 	 * work !!! </b>
 	 */
 	public static final String						TABLE_SCHEMA								= "USER";									//$NON-NLS-1$
-	private static final String						TABLE_DB_VERSION							= "DBVERSION";								// "DbVersion";			//$NON-NLS-1$
-	public static final String						TABLE_TOUR_PHOTO							= "TOURPHOTO";								//"TourBike";			//$NON-NLS-1$
-	public static final String						TABLE_TOUR_BIKE								= "TOURBIKE";								//"TourBike";			//$NON-NLS-1$
-	public static final String						TABLE_TOUR_COMPARED							= "TOURCOMPARED";							// "TourCompared";		//$NON-NLS-1$
-	public static final String						TABLE_TOUR_DATA								= "TOURDATA";								// "TourData";			//$NON-NLS-1$
-	public static final String						TABLE_TOUR_MARKER							= "TOURMARKER";							// "TourMarker";			//$NON-NLS-1$
-	public static final String						TABLE_TOUR_WAYPOINT							= "TOURWAYPOINT";							// "TourWayPoint";		//$NON-NLS-1$
-	public static final String						TABLE_TOUR_PERSON							= "TOURPERSON";							// "TourPerson";			//$NON-NLS-1$
-	public static final String						TABLE_TOUR_PERSON_HRZONE					= "TOURPERSONHRZONE";						// "TourPersonHRZone";			//$NON-NLS-1$
-	public static final String						TABLE_TOUR_REFERENCE						= "TOURREFERENCE";							// "TourReference";		//$NON-NLS-1$
-	public static final String						TABLE_TOUR_TAG								= "TOURTAG";								// "TourTag";			//$NON-NLS-1$
-	public static final String						TABLE_TOUR_TAG_CATEGORY						= "TOURTAGCATEGORY";						// "TourTagCategory";	//$NON-NLS-1$
-	public static final String						TABLE_TOUR_TYPE								= "TOURTYPE";								// "TourType";			//$NON-NLS-1$
+	private static final String						TABLE_DB_VERSION							= "DBVERSION";								//$NON-NLS-1$
+	public static final String						TABLE_TOUR_BIKE								= "TOURBIKE";								//$NON-NLS-1$
+	public static final String						TABLE_TOUR_COMPARED							= "TOURCOMPARED";							//$NON-NLS-1$
+	public static final String						TABLE_TOUR_DATA								= "TOURDATA";								//$NON-NLS-1$
+	public static final String						TABLE_TOUR_MARKER							= "TOURMARKER";							//$NON-NLS-1$
+	public static final String						TABLE_TOUR_PERSON							= "TOURPERSON";							//$NON-NLS-1$
+	public static final String						TABLE_TOUR_PERSON_HRZONE					= "TOURPERSONHRZONE";						//$NON-NLS-1$
+	public static final String						TABLE_TOUR_PHOTO							= "TOURPHOTO";								//$NON-NLS-1$
+	public static final String						TABLE_TOUR_REFERENCE						= "TOURREFERENCE";							//$NON-NLS-1$
+	public static final String						TABLE_TOUR_SIGN								= "TOURSIGN";								//$NON-NLS-1$
+	public static final String						TABLE_TOUR_SIGN_CATEGORY					= "TOURSIGNCATEGORY";						//$NON-NLS-1$
+	public static final String						TABLE_TOUR_TAG								= "TOURTAG";								//$NON-NLS-1$
+	public static final String						TABLE_TOUR_TAG_CATEGORY						= "TOURTAGCATEGORY";						//$NON-NLS-1$
+	public static final String						TABLE_TOUR_TYPE								= "TOURTYPE";								//$NON-NLS-1$
+	public static final String						TABLE_TOUR_WAYPOINT							= "TOURWAYPOINT";							//$NON-NLS-1$
 
 	public static final String						JOINTABLE_TOURDATA__TOURTAG					= (TABLE_TOUR_DATA
 																										+ "_" + TABLE_TOUR_TAG);			//$NON-NLS-1$
@@ -150,12 +154,14 @@ public class TourDatabase {
 																										+ "_" + TABLE_TOUR_WAYPOINT);		//$NON-NLS-1$
 	public static final String						JOINTABLE_TOURDATA__TOURREFERENCE			= (TABLE_TOUR_DATA
 																										+ "_" + TABLE_TOUR_REFERENCE);		//$NON-NLS-1$
+	public static final String						JOINTABLE_TOURMARKER__TOURSIGN				= (TABLE_TOUR_MARKER
+																										+ "_" + TABLE_TOUR_SIGN);			//$NON-NLS-1$
+	public static final String						JOINTABLE_TOURPERSON__TOURPERSON_HRZONE		= (TABLE_TOUR_PERSON
+																										+ "_" + TABLE_TOUR_PERSON_HRZONE);	//$NON-NLS-1$
 	public static final String						JOINTABLE_TOURTAGCATEGORY_TOURTAG			= (TABLE_TOUR_TAG_CATEGORY
 																										+ "_" + TABLE_TOUR_TAG);			//$NON-NLS-1$
 	public static final String						JOINTABLE_TOURTAGCATEGORY_TOURTAGCATEGORY	= (TABLE_TOUR_TAG_CATEGORY
 																										+ "_" + TABLE_TOUR_TAG_CATEGORY);	//$NON-NLS-1$
-	public static final String						JOINTABLE_TOURPERSON__TOURPERSON_HRZONE		= (TABLE_TOUR_PERSON
-																										+ "_" + TABLE_TOUR_PERSON_HRZONE);	//$NON-NLS-1$
 	/**
 	 * contains <code>-1</code> which is the Id for a not saved entity
 	 */
@@ -488,6 +494,29 @@ public class TourDatabase {
 		} finally {
 			closeConnection(conn);
 		}
+	}
+
+	private static void exec(final Statement stmt, final String sql) throws SQLException {
+
+		StatusUtil.log(sql);
+		System.out.println();
+
+		stmt.execute(sql);
+	}
+
+	private static void exec(final Statement stmt, final String[] sqlStatements) throws SQLException {
+
+		for (final String sql : sqlStatements) {
+			exec(stmt, sql);
+		}
+	}
+
+	private static void execUpdate(final Statement stmt, final String sql) throws SQLException {
+
+		StatusUtil.log(sql);
+		System.out.println();
+
+		stmt.executeUpdate(sql);
 	}
 
 	/**
@@ -835,9 +864,9 @@ public class TourDatabase {
 		Query emQuery = em.createQuery(//
 				//
 				"SELECT ttCategory" //$NON-NLS-1$
-						+ (" FROM TourTagCategory AS ttCategory") //$NON-NLS-1$
+						+ (" FROM " + TourDatabase.TABLE_TOUR_TAG_CATEGORY + " AS ttCategory") //$NON-NLS-1$ //$NON-NLS-2$
 						+ (" WHERE ttCategory.isRoot=1") //$NON-NLS-1$
-						+ (" ORDER  BY ttCategory.name")); //$NON-NLS-1$
+						+ (" ORDER BY ttCategory.name")); //$NON-NLS-1$
 
 		rootEntry.tourTagCategories = (ArrayList<TourTagCategory>) emQuery.getResultList();
 
@@ -847,9 +876,9 @@ public class TourDatabase {
 		emQuery = em.createQuery(//
 				//
 				"SELECT tourTag" //$NON-NLS-1$
-						+ (" FROM TourTag AS tourTag ") //$NON-NLS-1$
+						+ (" FROM " + TourDatabase.TABLE_TOUR_TAG + " AS tourTag ") //$NON-NLS-1$ //$NON-NLS-2$
 						+ (" WHERE tourTag.isRoot=1") //$NON-NLS-1$
-						+ (" ORDER  BY tourTag.name")); //$NON-NLS-1$
+						+ (" ORDER BY tourTag.name")); //$NON-NLS-1$
 
 		rootEntry.tourTags = (ArrayList<TourTag>) emQuery.getResultList();
 
@@ -1442,6 +1471,61 @@ public class TourDatabase {
 		return persistedEntity;
 	}
 
+	private static void sql_AddCol_BigInt(final Statement stmt, final String table, final String columnName)
+			throws SQLException {
+
+		final String sql = ""// //$NON-NLS-1$
+				+ ("ALTER TABLE " + table) //$NON-NLS-1$
+				+ ("	ADD COLUMN	" + columnName + " BIGINT"); //$NON-NLS-1$ //$NON-NLS-2$
+
+		exec(stmt, sql);
+
+		return;
+	}
+
+	/**
+	 * Creates a SQL statement to add a column for VARCHAR.
+	 * 
+	 * @param stmt
+	 * @param table
+	 * @param columnName
+	 * @param columnWidth
+	 * @return Returns this sql statement:
+	 *         <p>
+	 *         <code>
+	 *         "ALTER TABLE " + table + " ADD COLUMN	" + columnName + " " + " VARCHAR(" + columnWidth + ")\n"
+	 *         </code>
+	 * @throws SQLException
+	 */
+	private static void sql_AddCol_VarCar(	final Statement stmt,
+											final String table,
+											final String columnName,
+											final int columnWidth) throws SQLException {
+
+		final String sql = ""// //$NON-NLS-1$
+				+ ("ALTER TABLE " + table) //$NON-NLS-1$
+				+ ("	ADD COLUMN	" + columnName + " " + varCharNoKomma(columnWidth)); //$NON-NLS-1$ //$NON-NLS-2$
+
+		exec(stmt, sql);
+
+		return;
+	}
+
+	private static void sql_AlterCol_VarChar_Width(	final Statement stmt,
+													final String table,
+													final String field,
+													final int newWidth) throws SQLException {
+
+		final String sql = "" // //$NON-NLS-1$
+				+ ("ALTER TABLE " + table + "\n") //$NON-NLS-1$ //$NON-NLS-2$
+				+ ("	ALTER COLUMN " + field + "\n") //$NON-NLS-1$ //$NON-NLS-2$
+				+ ("	SET DATA TYPE " + varCharNoKomma(newWidth)); //$NON-NLS-1$
+
+		exec(stmt, sql);
+
+		return;
+	}
+
 	public static void updateActiveTourTypeList(final TourTypeFilter tourTypeFilter) {
 
 		switch (tourTypeFilter.getFilterType()) {
@@ -1608,6 +1692,22 @@ public class TourDatabase {
 		}
 
 		return isUpdated;
+	}
+
+	/**
+	 * @param varCharLength
+	 * @return Returns: " VARCHAR(" + varCharLength + "),\n"
+	 */
+	private static String varCharKomma(final int varCharLength) {
+		return " VARCHAR(" + varCharLength + "),\n"; //$NON-NLS-1$ //$NON-NLS-2$
+	}
+
+	/**
+	 * @param varCharLength
+	 * @return Returns: " VARCHAR(" + varCharLength + ")\n"
+	 */
+	private static String varCharNoKomma(final int varCharLength) {
+		return " VARCHAR(" + varCharLength + ")\n"; //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	public void addPropertyListener(final IPropertyListener listener) {
@@ -1851,6 +1951,9 @@ public class TourDatabase {
 
 				createTable_TourWayPoint(stmt);
 
+				createTable_TourSign(stmt);
+				createTable_TourSignCategory(stmt);
+
 			} catch (final SQLException e) {
 				UI.showSQLException(e);
 			} finally {
@@ -2027,23 +2130,6 @@ public class TourDatabase {
 		 */
 		sql = "CREATE INDEX ImageFilePathName ON " + TABLE_TOUR_PHOTO + " (ImageFilePathName)"; //$NON-NLS-1$ //$NON-NLS-2$
 		exec(stmt, sql);
-	}
-
-	/**
-	 * Creates a SQL statement to add a column for VARCHAR.
-	 * 
-	 * @param table
-	 * @param columnName
-	 * @param columnWidth
-	 * @return Returns this sql statement:
-	 *         <p>
-	 *         <code>
-	 *         "ALTER TABLE " + table + " ADD COLUMN	" + columnName + " " + " VARCHAR(" + columnWidth + ")\n"
-	 *         </code>
-	 */
-	private String createSQL_AddColumn_VarCar(final String table, final String columnName, final int columnWidth) {
-
-		return "ALTER TABLE " + table + " ADD COLUMN	" + columnName + " " + varCharNoKomma(columnWidth); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 
 	/**
@@ -2343,7 +2429,7 @@ public class TourDatabase {
 	}
 
 	/**
-	 * create table {@link #TABLE_TOUR_MARKER}
+	 * Create table {@link #TABLE_TOUR_MARKER} for {@link TourMarker}.
 	 * 
 	 * @param stmt
 	 * @throws SQLException
@@ -2359,11 +2445,13 @@ public class TourDatabase {
 				+ "(															\n" //$NON-NLS-1$
 				//
 				+ "	markerId 					BIGINT NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 0 ,INCREMENT BY 1),\n" //$NON-NLS-1$
+				//
 				+ "	" + (TABLE_TOUR_DATA + "_tourId	BIGINT,						\n") //$NON-NLS-1$ //$NON-NLS-2$
+				//
 				+ "	time 						INTEGER NOT NULL,				\n" //$NON-NLS-1$
 
-// before version 20
-//				+ "	distance 					INTEGER NOT NULL,				\n" //$NON-NLS-1$
+				// before version 20
+				// + "	distance 				INTEGER NOT NULL,				\n" //$NON-NLS-1$
 				+ "	distance 					INTEGER,						\n" //$NON-NLS-1$
 
 				// Version 20 - begin
@@ -2380,9 +2468,10 @@ public class TourDatabase {
 
 				// Version 24 - begin
 				//
+				+ "	" + (TABLE_TOUR_SIGN + "_signId	BIGINT,						\n") //$NON-NLS-1$ //$NON-NLS-2$
+				//
 				+ ("	description				" + varCharKomma(TourWayPoint.DB_LENGTH_DESCRIPTION)) //	//$NON-NLS-1$
 				+ ("	comment					" + varCharKomma(TourWayPoint.DB_LENGTH_COMMENT)) //		//$NON-NLS-1$
-				+ ("	symbol					" + varCharKomma(TourWayPoint.DB_LENGTH_SYMBOL)) //			//$NON-NLS-1$
 				//
 				// Version 24 - end
 
@@ -2390,16 +2479,8 @@ public class TourDatabase {
 				+ "	type 						INTEGER NOT NULL,				\n" //$NON-NLS-1$
 				+ "	visualPosition				INTEGER NOT NULL,				\n" //$NON-NLS-1$
 
-// before 24 - begin
-//				+ ("	label 					" + varCharKomma(TourMarker.DB_LENGTH_LABEL)) //$NON-NLS-1$
-//				+ ("	category 				" + varCharKomma(TourMarker.DB_LENGTH_CATEGORY)) //$NON-NLS-1$
-// before 24 - end
-
 				+ ("	label 					" + varCharKomma(TourWayPoint.DB_LENGTH_NAME)) //$NON-NLS-1$
 				+ ("	category 				" + varCharKomma(TourWayPoint.DB_LENGTH_CATEGORY)) //$NON-NLS-1$
-
-//				modifyColumn_VarChar_Width(stmt, TABLE_TOUR_MARKER, "label", TourWayPoint.DB_LENGTH_NAME); //$NON-NLS-1$
-//				modifyColumn_VarChar_Width(stmt, TABLE_TOUR_MARKER, "category", TourWayPoint.DB_LENGTH_CATEGORY); //$NON-NLS-1$
 
 				//
 				// Version 2
@@ -2420,6 +2501,9 @@ public class TourDatabase {
 
 		exec(stmt, sql);
 
+		/*
+		 * CREATE TABLE TourData_TourMarker
+		 */
 		sql = "CREATE TABLE " + JOINTABLE_TOURDATA__TOURMARKER //							//$NON-NLS-1$
 				+ "(																	\n" //$NON-NLS-1$
 				//
@@ -2497,7 +2581,7 @@ public class TourDatabase {
 	}
 
 	/**
-	 * Create table {@link #TABLE_TOUR_PERSON_HRZONE}
+	 * Create table {@link #TABLE_TOUR_PERSON_HRZONE} for {@link TourPersonHRZone}.
 	 * <p>
 	 * Table is available since db version 16
 	 * 
@@ -2546,6 +2630,9 @@ public class TourDatabase {
 
 		exec(stmt, sql);
 
+		/*
+		 * CREATE TABLE TourPerson_TourPersonHRZone
+		 */
 		sql = "CREATE TABLE " + JOINTABLE_TOURPERSON__TOURPERSON_HRZONE //							//$NON-NLS-1$
 				+ "(																			\n" //$NON-NLS-1$
 				//
@@ -2568,7 +2655,7 @@ public class TourDatabase {
 	}
 
 	/**
-	 * create table {@link #TABLE_TOUR_MARKER}
+	 * Create table {@link #TABLE_TOUR_PHOTO}
 	 * 
 	 * @param stmt
 	 * @throws SQLException
@@ -2705,9 +2792,124 @@ public class TourDatabase {
 	}
 
 	/**
-	 * create table {@link #TABLE_TOUR_TAG} *
+	 * Create table {@link #TABLE_TOUR_SIGN} for {@link TourSign}.
 	 * <p>
-	 * since db version 5
+	 * Since db version 24.
+	 * 
+	 * @param stmt
+	 * @throws SQLException
+	 */
+	private void createTable_TourSign(final Statement stmt) throws SQLException {
+
+		String sql;
+
+		/**
+		 * <code>
+		 * 
+		 * 
+	private long				signId				= TourDatabase.ENTITY_IS_NOT_SAVED;
+	private String				name;
+	private String				imageFilePathName;
+
+	private TourSignCategory	tourSignCategory;
+	private Set<TourMarker>		tourMarker			= new HashSet<TourMarker>();
+	private Set<TourWayPoint>	tourWayPoint		= new HashSet<TourWayPoint>();
+
+		 * 
+		 * </code>
+		 */
+
+		/*
+		 * CREATE TABLE TourSign
+		 */
+		sql = "CREATE TABLE " + TABLE_TOUR_SIGN//									//$NON-NLS-1$
+				+ "(															\n" //$NON-NLS-1$
+				//
+				+ "	signId 		BIGINT NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 0 ,INCREMENT BY 1),\n" //$NON-NLS-1$
+				//
+//				+ "	tourSignCategory_signCategoryId 		BIGINT,				\n" //$NON-NLS-1$
+				//
+				+ ("	name 				" + varCharKomma(TourSign.DB_LENGTH_NAME)) //						//$NON-NLS-1$
+				+ ("	imageFilePathName 	" + varCharNoKomma(TourSign.DB_LENGTH_IMAGE_FILE_PATH)) //			//$NON-NLS-1$
+				//
+				+ ")"; //															//$NON-NLS-1$
+
+		exec(stmt, sql);
+
+		/*
+		 * ALTER TABLE TourSign ADD CONSTRAINT TourSign_pk PRIMARY KEY (signId);
+		 */
+		sql = ("ALTER TABLE " + TABLE_TOUR_SIGN) + "							\n" //$NON-NLS-1$ //$NON-NLS-2$
+				+ ("	ADD CONSTRAINT " + TABLE_TOUR_SIGN + "_pk 				\n")//$NON-NLS-1$ //$NON-NLS-2$
+				+ ("	PRIMARY KEY (signId)									"); //$NON-NLS-1$
+
+		exec(stmt, sql);
+
+		/*
+		 * CREATE TABLE TourMarker_TourSign
+		 */
+		sql = "CREATE TABLE " + JOINTABLE_TOURMARKER__TOURSIGN //				//$NON-NLS-1$
+				+ "(															\n" //$NON-NLS-1$
+				//
+				+ ("	" + TABLE_TOUR_MARKER + "_markerId	BIGINT NOT NULL,	\n")//$NON-NLS-1$ //$NON-NLS-2$
+				+ ("	" + TABLE_TOUR_SIGN + "_signId		BIGINT NOT NULL		\n")//$NON-NLS-1$ //$NON-NLS-2$
+				//
+				+ ")"; //															//$NON-NLS-1$
+
+		exec(stmt, sql);
+
+		/*
+		 * ALTER TABLE TourMarker_TourSign ADD CONSTRAINT TourMarker_TourSign_pk PRIMARY KEY
+		 * (TourMarker_markerId);
+		 */
+		sql = "ALTER TABLE " + JOINTABLE_TOURMARKER__TOURSIGN + "						\n" //$NON-NLS-1$ //$NON-NLS-2$
+				+ "	ADD CONSTRAINT " + JOINTABLE_TOURMARKER__TOURSIGN + "_pk			\n" //$NON-NLS-1$ //$NON-NLS-2$
+				+ "	PRIMARY KEY (" + TABLE_TOUR_MARKER + "_markerId)"; //					//$NON-NLS-1$ //$NON-NLS-2$
+
+		exec(stmt, sql);
+	}
+
+	/**
+	 * Create table {@link #TABLE_TOUR_SIGN_CATEGORY} for {@link TourSignCategory}.
+	 * <p>
+	 * Since db version 24.
+	 * 
+	 * @param stmt
+	 * @throws SQLException
+	 */
+	private void createTable_TourSignCategory(final Statement stmt) throws SQLException {
+
+		String sql;
+
+		/*
+		 * TABLE TourSignCategory
+		 */
+		sql = "CREATE TABLE " + TABLE_TOUR_SIGN_CATEGORY //							//$NON-NLS-1$
+				+ "(															\n" //$NON-NLS-1$
+				//
+				+ "	signCategoryId 	BIGINT NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 0 ,INCREMENT BY 1),\n" //$NON-NLS-1$
+				//
+				+ ("	name 		" + varCharNoKomma(TourTagCategory.DB_LENGTH_NAME)) //$NON-NLS-1$
+				//
+				+ ")"; //															//$NON-NLS-1$
+
+		exec(stmt, sql);
+
+		/*
+		 * ALTER TABLE TourSignCategory ADD CONSTRAINT TourSignCategory_pk PRIMARY KEY
+		 * (signCategoryId);
+		 */
+		sql = ("ALTER TABLE " + TABLE_TOUR_SIGN_CATEGORY) + "							\n" //$NON-NLS-1$ //$NON-NLS-2$
+				+ ("	ADD CONSTRAINT " + TABLE_TOUR_SIGN_CATEGORY + "_pk 				\n")//$NON-NLS-1$ //$NON-NLS-2$
+				+ ("	PRIMARY KEY (signCategoryId)									"); //$NON-NLS-1$
+
+		exec(stmt, sql);
+	}
+
+	/**
+	 * Create table {@link #TABLE_TOUR_TAG}
+	 * <p>
+	 * Since db version 5
 	 * 
 	 * @param stmt
 	 * @throws SQLException
@@ -2779,9 +2981,9 @@ public class TourDatabase {
 	}
 
 	/**
-	 * *
+	 * Create table {@link #TABLE_TOUR_TAG_CATEGORY}
 	 * <p>
-	 * since db version 5
+	 * Since db version 5
 	 * 
 	 * @param stmt
 	 * @throws SQLException
@@ -2957,6 +3159,7 @@ public class TourDatabase {
 				//
 				+ "	wayPointId 			BIGINT NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 0 ,INCREMENT BY 1),\n" //$NON-NLS-1$
 				+ ("	" + TABLE_TOUR_DATA + "_tourId	BIGINT,										\n") //$NON-NLS-1$ //$NON-NLS-2$
+				//
 				+ "	latitude 			DOUBLE NOT NULL,										\n" //$NON-NLS-1$
 				+ "	longitude 			DOUBLE NOT NULL,										\n" //$NON-NLS-1$
 				+ "	time				BIGINT,													\n" //$NON-NLS-1$
@@ -3036,29 +3239,6 @@ public class TourDatabase {
 		}
 
 		return NLS.bind(Messages.Database_Monitor_db_service_task, sb.toString());
-	}
-
-	private void exec(final Statement stmt, final String sql) throws SQLException {
-
-		StatusUtil.log(sql);
-		System.out.println();
-
-		stmt.execute(sql);
-	}
-
-	private void exec(final Statement stmt, final String[] sqlStatements) throws SQLException {
-
-		for (final String sql : sqlStatements) {
-			exec(stmt, sql);
-		}
-	}
-
-	private void execUpdate(final Statement stmt, final String sql) throws SQLException {
-
-		StatusUtil.log(sql);
-		System.out.println();
-
-		stmt.executeUpdate(sql);
 	}
 
 	public void firePropertyChange(final int propertyId) {
@@ -3242,21 +3422,6 @@ public class TourDatabase {
 
 		sql = "RENAME COLUMN " + table + "." + tempFieldName + " TO " + fieldName; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		exec(stmt, sql);
-	}
-
-	private void modifyColumn_VarChar_Width(final Statement stmt,
-											final String table,
-											final String field,
-											final int newWidth) throws SQLException {
-
-		final String sql = "" // //$NON-NLS-1$
-				+ ("ALTER TABLE " + table + "\n") //$NON-NLS-1$ //$NON-NLS-2$
-				+ ("	ALTER COLUMN " + field + "\n") //$NON-NLS-1$ //$NON-NLS-2$
-				+ ("	SET DATA TYPE " + varCharNoKomma(newWidth)); //$NON-NLS-1$
-
-		exec(stmt, sql);
-
-		return;
 	}
 
 	public void removePropertyListener(final IPropertyListener listener) {
@@ -4796,32 +4961,34 @@ public class TourDatabase {
 				// description column is not yet created
 
 //				TOURMARKER	TOURMARKER	TOURMARKER	TOURMARKER	TOURMARKER	TOURMARKER	TOURMARKER	TOURMARKER
-//
-//				// Version 24 - begin
-//				//
-//				+ ("	description				" + varCharKomma(TourWayPoint.DB_LENGTH_DESCRIPTION)) //	//$NON-NLS-1$
-//				+ ("	comment					" + varCharKomma(TourWayPoint.DB_LENGTH_COMMENT)) //		//$NON-NLS-1$
-//				+ ("	symbol					" + varCharKomma(TourWayPoint.DB_LENGTH_SYMBOL)) //			//$NON-NLS-1$
-//				//
-//				// Version 24 - end
 
 				/*
 				 * Set column with to TourWayPoint width, that both have the same max size.
 				 */
-				modifyColumn_VarChar_Width(stmt, TABLE_TOUR_MARKER, "label", TourWayPoint.DB_LENGTH_NAME); //$NON-NLS-1$
-				modifyColumn_VarChar_Width(stmt, TABLE_TOUR_MARKER, "category", TourWayPoint.DB_LENGTH_CATEGORY); //$NON-NLS-1$
+				sql_AlterCol_VarChar_Width(stmt, TABLE_TOUR_MARKER, "label", TourWayPoint.DB_LENGTH_NAME); //$NON-NLS-1$
+				sql_AlterCol_VarChar_Width(stmt, TABLE_TOUR_MARKER, "category", TourWayPoint.DB_LENGTH_CATEGORY); //$NON-NLS-1$
+
+//				// Version 24 - begin
+//				//
+//				+ "	" + (TABLE_TOUR_SIGN + "_signId	BIGINT,						\n") //$NON-NLS-1$ //$NON-NLS-2$
+//				//
+//				+ ("	description				" + varCharKomma(TourWayPoint.DB_LENGTH_DESCRIPTION)) //	//$NON-NLS-1$
+//				+ ("	comment					" + varCharKomma(TourWayPoint.DB_LENGTH_COMMENT)) //		//$NON-NLS-1$
+//				//
+//				// Version 24 - end
 
 				/*
 				 * Add new columns
 				 */
-				final String sql[] = {
-						//
-						createSQL_AddColumn_VarCar(TABLE_TOUR_MARKER, "description", TourWayPoint.DB_LENGTH_DESCRIPTION), //	//$NON-NLS-1$
-						createSQL_AddColumn_VarCar(TABLE_TOUR_MARKER, "comment", TourWayPoint.DB_LENGTH_COMMENT), //			//$NON-NLS-1$
-						createSQL_AddColumn_VarCar(TABLE_TOUR_MARKER, "symbol", TourWayPoint.DB_LENGTH_SYMBOL), //				//$NON-NLS-1$
-				};
+				sql_AddCol_BigInt(stmt, TABLE_TOUR_MARKER, TABLE_TOUR_SIGN + "_signId"); //$NON-NLS-1$
+				sql_AddCol_VarCar(stmt, TABLE_TOUR_MARKER, "description", TourWayPoint.DB_LENGTH_DESCRIPTION); //$NON-NLS-1$
+				sql_AddCol_VarCar(stmt, TABLE_TOUR_MARKER, "comment", TourWayPoint.DB_LENGTH_COMMENT); //$NON-NLS-1$
 
-				exec(stmt, sql);
+				/*
+				 * Create new tables
+				 */
+				createTable_TourSign(stmt);
+				createTable_TourSignCategory(stmt);
 			}
 		}
 		stmt.close();
@@ -4836,22 +5003,6 @@ public class TourDatabase {
 		final String sql = "UPDATE " + TABLE_DB_VERSION + " SET VERSION=" + newVersion; //$NON-NLS-1$ //$NON-NLS-2$
 
 		conn.createStatement().executeUpdate(sql);
-	}
-
-	/**
-	 * @param varCharLength
-	 * @return Returns: " VARCHAR(" + varCharLength + "),\n"
-	 */
-	private String varCharKomma(final int varCharLength) {
-		return " VARCHAR(" + varCharLength + "),\n"; //$NON-NLS-1$ //$NON-NLS-2$
-	}
-
-	/**
-	 * @param varCharLength
-	 * @return Returns: " VARCHAR(" + varCharLength + ")\n"
-	 */
-	private String varCharNoKomma(final int varCharLength) {
-		return " VARCHAR(" + varCharLength + ")\n"; //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 }

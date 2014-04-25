@@ -131,10 +131,10 @@ public class Messages extends NLS {
 	public static String		Pic_Dir_Dialog_CleanupStoreImages_KeepImages;
 	public static String		Pic_Dir_Dialog_CleanupStoreImages_Message;
 	public static String		Pic_Dir_Dialog_CleanupStoreImages_Title;
-	public static String		Pic_Dir_Dialog_LinkPhotos_DialogInterrupted_Message;
-	public static String		Pic_Dir_Dialog_LinkPhotos_NoSelectedImage_Message;
-	public static String		Pic_Dir_Dialog_LinkPhotos_NoSelectedImagesInFolder_Message;
-	public static String		Pic_Dir_Dialog_LinkPhotos_Title;
+	public static String		Pic_Dir_Dialog_Photos_DialogInterrupted_Message;
+	public static String		Pic_Dir_Dialog_Photos_NoSelectedImage_Message;
+	public static String		Pic_Dir_Dialog_Photos_NoSelectedImagesInFolder_Message;
+	public static String		Pic_Dir_Dialog_Photos_Title;
 	public static String		Pic_Dir_Dialog_LoadingEXIFData;
 	public static String		Pic_Dir_Dialog_LoadingEXIFData_Subtask;
 	public static String		Pic_Dir_Dialog_LoadingFolderFiles;

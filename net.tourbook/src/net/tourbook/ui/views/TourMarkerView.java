@@ -27,7 +27,6 @@ import net.tourbook.common.util.ColumnDefinition;
 import net.tourbook.common.util.ColumnManager;
 import net.tourbook.common.util.ITourViewer;
 import net.tourbook.common.util.PostSelectionProvider;
-import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.database.TourDatabase;
@@ -51,10 +50,8 @@ import net.tourbook.ui.views.tourCatalog.TVICatalogComparedTour;
 import net.tourbook.ui.views.tourCatalog.TVICatalogRefTourItem;
 import net.tourbook.ui.views.tourCatalog.TVICompareResultComparedTour;
 
-import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
-import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -98,12 +95,10 @@ import org.eclipse.ui.part.ViewPart;
 
 public class TourMarkerView extends ViewPart implements ITourProvider, ITourViewer {
 
-	public static final String		ID					= "net.tourbook.views.TourMarkerView";			//$NON-NLS-1$
+	public static final String		ID			= "net.tourbook.views.TourMarkerView";			//$NON-NLS-1$
 
-	private final String			STATE_SHOW_DELTA	= "showDelta";									//$NON-NLS-1$
-
-	private final IPreferenceStore	_prefStore			= TourbookPlugin.getPrefStore();
-	private final IDialogSettings	_state				= TourbookPlugin.getState("TourMarkerView");	//$NON-NLS-1$
+	private final IPreferenceStore	_prefStore	= TourbookPlugin.getPrefStore();
+	private final IDialogSettings	_state		= TourbookPlugin.getState("TourMarkerView");	//$NON-NLS-1$
 
 	private TourData				_tourData;
 
@@ -115,15 +110,13 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 
 	private ActionOpenMarkerDialog	_actionEditTourMarkers;
 	private ActionModifyColumns		_actionModifyColumns;
-	private Action					_actionShowDelta;
 
 	private PixelConverter			_pc;
 	private ColumnManager			_columnManager;
 
-	private boolean					_isShowDelta		= false;
-	private Font					_boldFont			= null;
+	private Font					_boldFont	= null;
 
-	private final NumberFormat		_nf_3_3				= NumberFormat.getNumberInstance();
+	private final NumberFormat		_nf_3_3		= NumberFormat.getNumberInstance();
 	{
 		_nf_3_3.setMinimumFractionDigits(3);
 		_nf_3_3.setMaximumFractionDigits(3);
@@ -183,6 +176,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 
 			public void partClosed(final IWorkbenchPartReference partRef) {
 				if (partRef.getPart(false) == TourMarkerView.this) {
+
 //					TourManager.fireEvent(TourEventId.CLEAR_DISPLAYED_TOUR, null, TourMarkerView.this);
 					saveState();
 				}
@@ -313,34 +307,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 	private void createActions() {
 
 		_actionEditTourMarkers = new ActionOpenMarkerDialog(this, true);
-
 		_actionModifyColumns = new ActionModifyColumns(this);
-
-		_actionShowDelta = new Action(null, Action.AS_CHECK_BOX) {
-			@Override
-			public void run() {
-
-				_isShowDelta = this.isChecked();
-
-				recreateViewer(_markerViewer);
-
-//				final Control[] children = _viewerContainer.getChildren();
-//				for (final Control element : children) {
-//					element.dispose();
-//				}
-//				createUI_10_TableViewer(_viewerContainer);
-//
-//				_viewerContainer.layout();
-//
-//				// update the viewer
-//				_markerViewer.setInput(this);
-			}
-		};
-
-		_actionShowDelta.setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__Symbol_Difference));
-		_actionShowDelta.setToolTipText(Messages.Tour_Marker_Action_Delta_Tooltip);
-
-		_actionShowDelta.setChecked(_isShowDelta);
 	}
 
 	@Override
@@ -643,6 +610,10 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 
 				final String text = ((TourMarker) cell.getElement()).getLabel();
 
+				/*
+				 * Show text in red/bold when the text ends with a !, this hidden feature was
+				 * introduced by helmling
+				 */
 				if (text.endsWith(UI.SYMBOL_EXCLAMATION_POINT)) {
 
 					final Display display = Display.getCurrent();
@@ -666,10 +637,12 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 	public void dispose() {
 
 		TourManager.getInstance().removeTourEventListener(_tourPropertyListener);
+
 		getSite().getPage().removePostSelectionListener(_postSelectionListener);
 		getViewSite().getPage().removePartListener(_partListener);
 
 		_prefStore.removePropertyChangeListener(_prefChangeListener);
+
 		if (null != _boldFont) {
 			_boldFont.dispose();
 		}
@@ -711,9 +684,9 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 		/*
 		 * Fill view toolbar
 		 */
-		final IToolBarManager tbm = actionBars.getToolBarManager();
-
-		tbm.add(_actionShowDelta);
+//		final IToolBarManager tbm = actionBars.getToolBarManager();
+//
+//		tbm.add();
 	}
 
 	/**
@@ -892,13 +865,9 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 
 	private void restoreStateBeforeUI() {
 
-		_isShowDelta = Util.getStateBoolean(_state, STATE_SHOW_DELTA, false);
-
 	}
 
 	private void saveState() {
-
-		_state.put(STATE_SHOW_DELTA, _isShowDelta);
 
 		_columnManager.saveState(_state);
 	}

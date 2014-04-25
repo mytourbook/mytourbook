@@ -351,8 +351,8 @@ public class PicDirView extends ViewPart implements IPhotoEventListener {
 	 * @param isAllImages
 	 *            When <code>true</code>, all images which are displayed in the gallery are
 	 *            returned, otherwise the selected images.
-	 * @return Returns a {@link ISelection} for selected or all images or <code>null</code> null
-	 *         when loading EXIF data was canceled by the user.
+	 * @return Returns a {@link ISelection} for selected or all images or <code>null</code> when
+	 *         loading EXIF data was canceled by the user.
 	 */
 	public PhotosWithExifSelection getSelectedPhotosWithExif(final boolean isAllImages) {
 		return _picDirImages.getSelectedPhotosWithExif(isAllImages);

@@ -146,6 +146,10 @@ public class Messages extends NLS {
 	public static String		Dialog_ExtractTour_Label_DeviceName;
 	public static String		Dialog_ExtractTour_Label_SplitMethod;
 
+	public static String	Dialog_ImportSigns_Dialog_Title;
+
+	public static String	Dialog_ImportSigns_Dialog_Title_Message;
+
 	public static String		Dialog_PersonManager_PersonIsNotAvailable_Message;
 	public static String		Dialog_PersonManager_PersonIsNotAvailable_Title;
 
@@ -670,6 +674,8 @@ public class Messages extends NLS {
 	public static String		Image__tour_options;
 	public static String		Image__tour_segmenter;
 	public static String		Image__tour_viewer;
+
+	public static String	Image__TourSignImport;
 	public static String		Image__undo_edit;
 	public static String		Image__undo_edit_disabled;
 	public static String		Image__undo_tour_type_filter;
