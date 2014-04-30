@@ -786,6 +786,13 @@ public class PicDirFolder {
 //		}
 	}
 
+	/**
+	 * @return Returns selected folder or <code>null</code> when a folder is not selected.
+	 */
+	public File getSelectedFolder() {
+		return _selectedFolder;
+	}
+
 	public Tree getTree() {
 		return _folderViewer.getTree();
 	}

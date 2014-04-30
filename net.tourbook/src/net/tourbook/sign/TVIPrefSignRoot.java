@@ -15,14 +15,8 @@
  *******************************************************************************/
 package net.tourbook.sign;
 
-import java.util.ArrayList;
-
-import javax.persistence.EntityManager;
-import javax.persistence.Query;
-
 import net.tourbook.data.TourSign;
 import net.tourbook.data.TourSignCategory;
-import net.tourbook.database.TourDatabase;
 
 import org.eclipse.jface.viewers.TreeViewer;
 
@@ -32,48 +26,29 @@ public class TVIPrefSignRoot extends TVIPrefSignItem {
 		super(signViewer);
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	protected void fetchChildren() {
 
-		final EntityManager em = TourDatabase.getInstance().getEntityManager();
+		final SignCollection rootSigns = SignManager.getRootSigns();
 
-		if (em != null) {
+		/*
+		 * Set sign root categories
+		 */
+		for (final TourSignCategory tourSignCategory : rootSigns.tourSignCategories) {
 
-			/*
-			 * read tour signs from db
-			 */
-			Query query = em.createQuery(//
-					//
-					"SELECT tourSign" //$NON-NLS-1$
-							+ (" FROM " + TourDatabase.TABLE_TOUR_SIGN + " AS tourSign ") //$NON-NLS-1$
-							+ (" WHERE tourSign.isRoot = 1")); //$NON-NLS-1$
+			final TVIPrefSignCategory categoryItem = new TVIPrefSignCategory(getSignViewer(), tourSignCategory);
 
-			final ArrayList<TourSign> tourSigns = (ArrayList<TourSign>) query.getResultList();
+			addChild(categoryItem);
+		}
 
-			for (final TourSign tourSign : tourSigns) {
-				final TVIPrefSign signItem = new TVIPrefSign(getSignViewer(), tourSign);
-				addChild(signItem);
-			}
+		/*
+		 * Set root signs.
+		 */
+		for (final TourSign tourSign : rootSigns.tourSigns) {
 
-			/*
-			 * read sign categories from db
-			 */
-			query = em.createQuery(//
-					//
-					"SELECT tourSignCategory" //$NON-NLS-1$
-							+ (" FROM " + TourDatabase.TABLE_TOUR_SIGN_CATEGORY + " AS tourSignCategory") //$NON-NLS-1$
-							+ (" WHERE tourSignCategory.isRoot = 1")); //$NON-NLS-1$
+			final TVIPrefSign signItem = new TVIPrefSign(getSignViewer(), tourSign);
 
-			final ArrayList<TourSignCategory> tourSignCategories = (ArrayList<TourSignCategory>) query.getResultList();
-
-			for (final TourSignCategory tourSignCategory : tourSignCategories) {
-
-				final TVIPrefSignCategory categoryItem = new TVIPrefSignCategory(getSignViewer(), tourSignCategory);
-				addChild(categoryItem);
-			}
-
-			em.close();
+			addChild(signItem);
 		}
 	}
 }

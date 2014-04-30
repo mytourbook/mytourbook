@@ -35,6 +35,8 @@ public class TourSign implements Comparable<Object> {
 	public static final int		EXPAND_TYPE_FLAT			= 1;
 	public static final int		EXPAND_TYPE_YEAR_DAY		= 2;
 
+	public static final int		EXPAND_TYPE_DEFAULT			= EXPAND_TYPE_YEAR_MONTH_DAY;
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long				signId						= TourDatabase.ENTITY_IS_NOT_SAVED;
@@ -46,8 +48,14 @@ public class TourSign implements Comparable<Object> {
 	private String				name;
 
 	/**
+	 * This key is used to identify imported signs (filesystem filename).
+	 */
+	@Basic(optional = false)
+	private String				signKey;
+
+	/**
 	 * Derby does not support BOOLEAN
-	 * <p>>
+	 * <p>
 	 * 1 = <code>true</code><br>
 	 * 0 = <code>false</code>
 	 */
@@ -69,6 +77,9 @@ public class TourSign implements Comparable<Object> {
 	 */
 	@ManyToOne
 	private TourSignCategory	tourSignCategory;
+
+//	@ManyToMany(mappedBy = "tourSigns", cascade = ALL, fetch = LAZY)
+//	private final Set<TourSignCategory>	tourSignCategory			= new HashSet<TourSignCategory>();
 
 //	/**
 //	 * All tour marker for this tour sign.
@@ -94,10 +105,10 @@ public class TourSign implements Comparable<Object> {
 //
 //
 //	@ManyToMany(mappedBy = "tourSigns", cascade = ALL, fetch = LAZY)
-//	private final Set<TourData>			tourData					= new HashSet<TourData>();
+//	private final Set<TourSignCategory>	tourSignCategory			= new HashSet<TourSignCategory>();
 //
 //	@ManyToMany(mappedBy = "tourSigns", cascade = ALL, fetch = LAZY)
-//	private final Set<TourSignCategory>	tourSignCategory			= new HashSet<TourSignCategory>();
+//	private final Set<TourData>			tourData					= new HashSet<TourData>();
 
 	/**
 	 * unique id for manually created tour types because the {@link #signId} is -1 when it's not
@@ -114,9 +125,11 @@ public class TourSign implements Comparable<Object> {
 
 	public TourSign() {}
 
-	public TourSign(final String signName) {
+	public TourSign(final String signName, final String signKeyName) {
 
 		name = signName.trim();
+		signKey = signKeyName;
+
 		_createId = ++_createCounter;
 	}
 
@@ -211,7 +224,16 @@ public class TourSign implements Comparable<Object> {
 	}
 
 	/**
-	 * Set the name for the tour sign
+	 * Set category for this tour sign.
+	 * 
+	 * @param signCategory
+	 */
+	public void setSignCategory(final TourSignCategory signCategory) {
+		tourSignCategory = signCategory;
+	}
+
+	/**
+	 * Set the name for this tour sign.
 	 * 
 	 * @param signName
 	 */

@@ -894,6 +894,15 @@ public class UI {
 		return shortText;
 	}
 
+	public static String shortenText(final String text, final int textWidth) {
+
+		final int endIndex = text.length();
+		int beginIndex = endIndex - textWidth;
+		beginIndex = beginIndex < 0 ? 0 : beginIndex;
+
+		return text.substring(beginIndex, endIndex);
+	}
+
 	public static String timeStamp() {
 		return (new Timestamp()).toString(Format.Log);
 	}

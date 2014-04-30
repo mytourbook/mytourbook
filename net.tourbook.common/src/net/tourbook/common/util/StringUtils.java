@@ -13,27 +13,31 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.tag;
+package net.tourbook.common.util;
 
-import java.util.ArrayList;
-import java.util.Set;
+/**
+ * String utilities.
+ */
+public final class StringUtils {
 
-import net.tourbook.data.TourTag;
-import net.tourbook.data.TourTagCategory;
+	/**
+	 * @param stringArray
+	 * @param separator
+	 * @return Join a strings with a separator.
+	 */
+	public static String join(final String[] stringArray, final String separator) {
 
-public class TagCollection {
+		final StringBuilder sb = new StringBuilder();
 
-	public ArrayList<TourTagCategory>	tourTagCategories;
-	public ArrayList<TourTag>			tourTags;
+		for (int arrayIndex = 0; arrayIndex < stringArray.length; arrayIndex++) {
 
-	public TagCollection() {}
+			if (arrayIndex > 0) {
+				sb.append(separator);
+			}
 
-	public TagCollection(final ArrayList<TourTag> sortedTags) {
-		tourTags = sortedTags;
+			sb.append(stringArray[arrayIndex]);
+		}
+
+		return sb.toString();
 	}
-
-	public TagCollection(final Set<TourTag> tourTagsInOneTour) {
-		tourTags = new ArrayList<TourTag>(tourTagsInOneTour);
-	}
-
 }

@@ -81,7 +81,9 @@ import org.eclipse.ui.dialogs.PreferencesUtil;
 
 public class PrefPageSigns extends PreferencePage implements IWorkbenchPreferencePage, ITourViewer {
 
-	private static final String		SORT_PROPERTY	= "sort";							//$NON-NLS-1$
+	public static final String		ID				= "net.tourbook.preferences.PrefPageSigns"; //$NON-NLS-1$
+
+	private static final String		SORT_PROPERTY	= "sort";									//$NON-NLS-1$
 
 	private final IPreferenceStore	_prefStore		= TourbookPlugin.getPrefStore();
 

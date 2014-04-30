@@ -346,6 +346,14 @@ public class PicDirView extends ViewPart implements IPhotoEventListener {
 	}
 
 	/**
+	 * @return Returns selected folder or <code>null</code> when a folder is not selected.
+	 */
+	public File getSelectedFolder() {
+
+		return _picDirFolder.getSelectedFolder();
+	}
+
+	/**
 	 * Creates a {@link PhotosWithExifSelection}
 	 * 
 	 * @param isAllImages

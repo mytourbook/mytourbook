@@ -150,6 +150,10 @@ public class Messages extends NLS {
 
 	public static String	Dialog_ImportSigns_Dialog_Title_Message;
 
+	public static String	Dialog_ImportSigns_MonitorTask;
+
+	public static String	Dialog_ImportSigns_MonitorTask_SubTask;
+
 	public static String		Dialog_PersonManager_PersonIsNotAvailable_Message;
 	public static String		Dialog_PersonManager_PersonIsNotAvailable_Title;
 

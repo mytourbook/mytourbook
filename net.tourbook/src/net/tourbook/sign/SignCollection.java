@@ -21,6 +21,9 @@ import java.util.Set;
 import net.tourbook.data.TourSign;
 import net.tourbook.data.TourSignCategory;
 
+/**
+ * Contains all signs and sign categories for a sign category.
+ */
 public class SignCollection {
 
 	public ArrayList<TourSignCategory>	tourSignCategories;

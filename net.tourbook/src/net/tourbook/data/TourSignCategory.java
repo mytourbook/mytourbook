@@ -15,7 +15,11 @@
  *******************************************************************************/
 package net.tourbook.data;
 
+import static javax.persistence.CascadeType.ALL;
+
+import java.util.Collection;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 
 import javax.persistence.Basic;
@@ -24,38 +28,53 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
 import javax.persistence.Transient;
 
 import net.tourbook.database.TourDatabase;
+
+import org.hibernate.annotations.Cascade;
 
 @Entity
 public class TourSignCategory implements Comparable<Object> {
 
 	public static final int				DB_LENGTH_NAME		= 1024;
 
+	public static final String			ROOT_KEY			= "root-key-a8d3-s3g1";			//$NON-NLS-1$
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long						signCategoryId		= TourDatabase.ENTITY_IS_NOT_SAVED;
 
 	/**
-	 * derby does not support BOOLEAN, 1 = <code>true</code>, 0 = <code>false</code>
+	 * Derby does not support BOOLEAN
+	 * <p>>
+	 * 1 = <code>true</code><br>
+	 * 0 = <code>false</code>
 	 */
 	private int							isRoot				= 0;
 
 	@Basic(optional = false)
 	private String						name;
 
-	@ManyToMany(fetch = FetchType.LAZY)
-	@JoinTable(inverseJoinColumns = @JoinColumn(name = "tourSign_signId", referencedColumnName = "signId"), //
-	joinColumns = @JoinColumn(name = "tourSignCategory_signCategoryId", referencedColumnName = "signCategoryId"))
-	private final Set<TourSign>	tourSigns			= new HashSet<TourSign>();
+	/**
+	 * This key is used to identify imported categories (filesystem folders).
+	 */
+	@Basic(optional = false)
+	private String						categoryKey;
 
-	@ManyToMany(fetch = FetchType.LAZY)
-	@JoinTable(joinColumns = @JoinColumn(name = "TourSignCategory_signCategoryId1", referencedColumnName = "signCategoryId"), //
-	inverseJoinColumns = @JoinColumn(name = "tourSignCategory_signCategoryId2", referencedColumnName = "signCategoryId"))
+	/**
+	 * Tour signs for this category.
+	 */
+	@OneToMany(fetch = FetchType.EAGER, cascade = ALL, mappedBy = "tourSignCategory")
+	@Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
+	private Set<TourSign>				tourSigns			= new HashSet<TourSign>();
+
+	/**
+	 * Tour sign child categories.
+	 */
+	@OneToMany(fetch = FetchType.EAGER, cascade = ALL, mappedBy = "signCategoryId")
+	@Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
 	private final Set<TourSignCategory>	tourSignCategories	= new HashSet<TourSignCategory>();
 
 	/**
@@ -64,6 +83,16 @@ public class TourSignCategory implements Comparable<Object> {
 	@Transient
 	private int							_categoryCounter	= -1;
 
+//	@ManyToMany(fetch = FetchType.LAZY)
+//	@JoinTable(inverseJoinColumns = @JoinColumn(name = "tourSign_signId", referencedColumnName = "signId"), //
+//	joinColumns = @JoinColumn(name = "tourSignCategory_signCategoryId", referencedColumnName = "signCategoryId"))
+//	private final Set<TourSign>			tourSigns			= new HashSet<TourSign>();
+//
+//	@ManyToMany(fetch = FetchType.LAZY)
+//	@JoinTable(joinColumns = @JoinColumn(name = "TourSignCategory_signCategoryId1", referencedColumnName = "signCategoryId"), //
+//	inverseJoinColumns = @JoinColumn(name = "tourSignCategory_signCategoryId2", referencedColumnName = "signCategoryId"))
+//	private final Set<TourSignCategory>	tourSignCategories	= new HashSet<TourSignCategory>();
+
 	/**
 	 * contains the number of signs or <code>-1</code> when the signs are not loaded
 	 */
@@ -71,12 +100,24 @@ public class TourSignCategory implements Comparable<Object> {
 	private int							_signCounter		= -1;
 
 	/**
-	 * default constructor used in ejb
+	 * Default constructor used in EJB
 	 */
 	public TourSignCategory() {}
 
-	public TourSignCategory(final String categoryName) {
+	public TourSignCategory(final String categoryName, final String newCategoryKey) {
+
 		name = categoryName;
+		categoryKey = newCategoryKey;
+	}
+
+	public void addTourSign(final TourSign sign) {
+
+		tourSigns.add(sign);
+	}
+
+	public void addTourSignCategory(final TourSignCategory signCategory) {
+
+		tourSignCategories.add(signCategory);
 	}
 
 	public int compareTo(final Object obj) {
@@ -97,25 +138,32 @@ public class TourSignCategory implements Comparable<Object> {
 		return signCategoryId;
 	}
 
+	/**
+	 * @return Returns a unique key for this category, it's the name of the category structure.
+	 */
+	public String getCategoryKey() {
+		return categoryKey;
+	}
+
 	public String getCategoryName() {
 		return name;
 	}
 
-//	public Set<TourSignCategory> getSignCategories() {
-//		return tourSignCategories;
-//	}
+	public Set<TourSignCategory> getSignCategories() {
+		return tourSignCategories;
+	}
 
 	public int getSignCounter() {
 		return _signCounter;
 	}
 
-//	/**
-//	 * @return Returns the signs which belong to this category, the signs will be fetched with the
-//	 *         fetch type {@link FetchType#LAZY}
-//	 */
-//	public Set<TourSign> getTourSigns() {
-//		return tourSigns;
-//	}
+	/**
+	 * @return Returns the signs which belong to this category, the signs will be fetched with the
+	 *         fetch type {@link FetchType#LAZY}
+	 */
+	public Set<TourSign> getTourSigns() {
+		return tourSigns;
+	}
 
 	public boolean isRoot() {
 		return isRoot == 1;
@@ -123,6 +171,10 @@ public class TourSignCategory implements Comparable<Object> {
 
 	public void setCategoryCounter(final int fCategoryCounter) {
 		this._categoryCounter = fCategoryCounter;
+	}
+
+	public void setCategoryKey(final String categoryKey) {
+		this.categoryKey = categoryKey;
 	}
 
 	/**
@@ -148,14 +200,42 @@ public class TourSignCategory implements Comparable<Object> {
 
 	@Override
 	public String toString() {
-		final String category = "TourSignCategory ID:" + signCategoryId + "\tisRoot:" + isRoot + "\t" + name; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-//		if (tourSignCategory.size() > 0) {
-//			category += UI.NEW_LINE + "\tchildren:";
-//			for (final TourSignCategory ttCategory : tourSignCategory) {
-//				category += UI.NEW_LINE + "\t" + ttCategory.toString();
-//			}
-//		}
-		return category;
+
+		final int maxLen = 10;
+
+		return String.format(""
+				+ "TourSignCategory\t"
+				+ "signCategoryId=%s\t"
+				+ "isRoot=%s\t"
+				+ "categoryKey=%30s\t"
+				+ "name=%10s\t"
+//				+ "tourSigns=%s\t"
+//				+ "tourSignCategories=%s\t"//
+				, //
+				signCategoryId,
+				isRoot,
+				categoryKey,
+				name
+//				tourSigns != null ? toString(tourSigns, maxLen) : null,
+//				tourSignCategories != null ? toString(tourSignCategories, maxLen) : null
+				//
+				);
+	}
+
+	private String toString(final Collection<?> collection, final int maxLen) {
+
+		final StringBuilder sb = new StringBuilder();
+		sb.append("[");
+		int i = 0;
+		for (final Iterator<?> iterator = collection.iterator(); iterator.hasNext() && i < maxLen; i++) {
+			if (i > 0) {
+				sb.append(", ");
+			}
+			sb.append(iterator.next());
+		}
+		sb.append("]");
+
+		return sb.toString();
 	}
 
 }

@@ -320,13 +320,20 @@
 				category="net.tourbook.preferences.PrefPageAppearance"
 			/>
 
-      <page
-            class="net.tourbook.preferences.PrefPageDataImport"
-            id="net.tourbook.preferences.PrefPageDataImport"
-            name="%preference_page_data_import">
-      </page>
+
+		<!--
+			Import
+		-->
+		<page
+			class="net.tourbook.preferences.PrefPageDataImport"
+			id="net.tourbook.preferences.PrefPageDataImport"
+			name="%preference_page_data_import"
+		/>
+      
       
 		<!-- 
+		
+			Bycicle
 		
 			pref page for bikes is disabled since version 11.07 because bikes 
 			are currently not used and is confusing the user
@@ -340,21 +347,38 @@
 			People
 		-->
 		<page
-			class="net.tourbook.preferences.PrefPagePeople"
-			id="net.tourbook.preferences.PrefPagePeopleId"
 			name="%preference_page_People"
+			id="net.tourbook.preferences.PrefPagePeopleId"
+			class="net.tourbook.preferences.PrefPagePeople"
 		/>
+
 		  
+		<!--
+			Proxy
+		-->
+
 		<page
-			class="net.tourbook.proxy.PrefPageProxy"
-			id="net.tourbook.preferences.PrefPageProxyId"
 			name="%preference_page_Proxy"
+			id="net.tourbook.preferences.PrefPageProxyId"
+			class="net.tourbook.proxy.PrefPageProxy"
+		/>
+
+
+		<!--
+			Signs
+		-->
+		
+		<page
+			name="%Pref_Page_Signs"
+			id="net.tourbook.preferences.PrefPageSigns"
+			class="net.tourbook.preferences.PrefPageSigns"
 		/>
 
 
 		<!--
 			SRTM
 		-->
+
 		<page
 			name="%Pref_Page_SRTM"
 			id="net.tourbook.srtm.PrefPageSRTMColors"
@@ -368,40 +392,49 @@
 			/>
 
 
-	<!--
-		Tour Type
-	-->
-      <page
-            class="net.tourbook.preferences.PrefPageTourTypeFilterList"
-            id="net.tourbook.preferences.PrefPageTourTypeFilter"
-            name="%preference_page_tour_type_root">
-      </page>
-	      <page
-	            category="net.tourbook.preferences.PrefPageTourTypeFilter"
-	            class="net.tourbook.preferences.PrefPageTourTypes"
-	            id="net.tourbook.preferences.PrefPageTourTypeDefinition"
-	            name="%preference_page_tour_types">
-	      </page>
+		<!--
+			Tags
+		-->
+
+		<page
+			name="%preference_page_tags"
+			id="net.tourbook.preferences.PrefPageTags"
+			class="net.tourbook.preferences.PrefPageTags"
+		/>
 
 
-      <page
-            class="net.tourbook.preferences.PrefPageTags"
-            id="net.tourbook.preferences.PrefPageTags"
-            name="%preference_page_tags">
-      </page>
+		<!--
+			Tour Type
+		-->
+		
+		<page
+			class="net.tourbook.preferences.PrefPageTourTypeFilterList"
+			id="net.tourbook.preferences.PrefPageTourTypeFilter"
+			name="%preference_page_tour_type_root"
+		/>
+			<page
+				name="%preference_page_tour_types"
+				id="net.tourbook.preferences.PrefPageTourTypeDefinition"
+				class="net.tourbook.preferences.PrefPageTourTypes"
+				category="net.tourbook.preferences.PrefPageTourTypeFilter"
+			/>
 
 
-      <page
-            class="net.tourbook.preferences.PrefPageStatistic"
-            id="net.tourbook.preferences.prefPageStatistic"
-            name="%preference_page_statistics">
-      </page>
-	      <page
-	            category="net.tourbook.preferences.prefPageStatistic"
-	            class="net.tourbook.preferences.PrefPageStatisticTourFrequency"
-	            id="net.tourbook.preferences.prefPageStatisticTourFrequency"
-	            name="%preference_page_statistics_tourFrequency">
-	      </page>
+		<!--
+			Statistics
+		-->
+
+		<page
+			name="%preference_page_statistics"
+			id="net.tourbook.preferences.prefPageStatistic"
+			class="net.tourbook.preferences.PrefPageStatistic"
+		/>
+			<page
+				name="%preference_page_statistics_tourFrequency"
+				id="net.tourbook.preferences.prefPageStatisticTourFrequency"
+				class="net.tourbook.preferences.PrefPageStatisticTourFrequency"
+				category="net.tourbook.preferences.prefPageStatistic"
+			/>
 
 
 		<!--
@@ -815,7 +848,7 @@
 		</menuContribution>
 
 		<!--
-			PicDirView
+			Photo folder (PicDirView)
 		-->
 	
 		<menuContribution locationURI="toolbar:net.tourbook.photo.PicDirView?before=PicDirViewToolBar">
@@ -835,11 +868,17 @@
 				icon="icons/photo-link-photo-with-tour.png"
 				label="%Action_PhotoDirectory_LinkPhotoWithTourInFolder"
 				mnemonic="%Action_PhotoDirectory_LinkPhotoWithTourInFolder_Mnemonic"/>
-		
+
+			<command
+				commandId="command.net.tourbook.sign.ImportTourSignsFromFolder"
+				icon="icons/tour-sign-import.png"
+				label="%Action_TourMarker_ImportTourSignsFromFolder"
+				mnemonic="%Action_TourMarker_ImportTourSignsFromFolder_Mnemonic"/>
+
 		</menuContribution>
 
 		<!--
-			PhotoGallery
+			Photo images (PhotoGallery)
 		-->
 
 		<menuContribution locationURI="popup:menu.net.tourbook.photo.PhotoGallery?before=separator.net.tourbook.photo.refresh" >
@@ -857,7 +896,7 @@
 				mnemonic="%Action_PhotoDirectory_LinkPhotoWithTourInGallerySelected_Mnemonic"/>
 
 			<command
-				commandId="command.net.tourbook.tourMarker.ImportTourSigns"
+				commandId="command.net.tourbook.sign.ImportTourSigns"
 				icon="icons/tour-sign-import.png"
 				label="%Action_TourMarker_ImportTourSigns"
 				mnemonic="%Action_TourMarker_ImportTourSigns_Mnemonic"/>
@@ -1088,12 +1127,17 @@
 			/>
 
 		<!--
-			Tour marker
+			Tour signs
 		-->            
 		
-		<command id="command.net.tourbook.tourMarker.ImportTourSigns"
+		<command id="command.net.tourbook.sign.ImportTourSigns"
 			name="%Action_TourMarker_ImportTourSigns"
 			defaultHandler="net.tourbook.sign.ActionHandlerImportSigns"
+			/>
+
+		<command id="command.net.tourbook.sign.ImportTourSignsFromFolder"
+			name="%Action_TourMarker_ImportTourSignsFromFolder"
+			defaultHandler="net.tourbook.sign.ActionHandlerImportSignsFromFolder"
 			/>
 	           
    </extension>

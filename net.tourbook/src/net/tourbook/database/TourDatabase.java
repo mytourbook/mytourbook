@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -144,20 +144,29 @@ public class TourDatabase {
 	public static final String						TABLE_TOUR_TYPE								= "TOURTYPE";								//$NON-NLS-1$
 	public static final String						TABLE_TOUR_WAYPOINT							= "TOURWAYPOINT";							//$NON-NLS-1$
 
-	public static final String						JOINTABLE_TOURDATA__TOURTAG					= (TABLE_TOUR_DATA
-																										+ "_" + TABLE_TOUR_TAG);			//$NON-NLS-1$
 	public static final String						JOINTABLE_TOURDATA__TOURMARKER				= (TABLE_TOUR_DATA
 																										+ "_" + TABLE_TOUR_MARKER);		//$NON-NLS-1$
 	public static final String						JOINTABLE_TOURDATA__TOURPHOTO				= (TABLE_TOUR_DATA
 																										+ "_" + TABLE_TOUR_PHOTO);			//$NON-NLS-1$
-	public static final String						JOINTABLE_TOURDATA__TOURWAYPOINT			= (TABLE_TOUR_DATA
-																										+ "_" + TABLE_TOUR_WAYPOINT);		//$NON-NLS-1$
 	public static final String						JOINTABLE_TOURDATA__TOURREFERENCE			= (TABLE_TOUR_DATA
 																										+ "_" + TABLE_TOUR_REFERENCE);		//$NON-NLS-1$
+	public static final String						JOINTABLE_TOURDATA__TOURTAG					= (TABLE_TOUR_DATA
+																										+ "_" + TABLE_TOUR_TAG);			//$NON-NLS-1$
+	public static final String						JOINTABLE_TOURDATA__TOURWAYPOINT			= (TABLE_TOUR_DATA
+																										+ "_" + TABLE_TOUR_WAYPOINT);		//$NON-NLS-1$
+
 	public static final String						JOINTABLE_TOURMARKER__TOURSIGN				= (TABLE_TOUR_MARKER
 																										+ "_" + TABLE_TOUR_SIGN);			//$NON-NLS-1$
 	public static final String						JOINTABLE_TOURPERSON__TOURPERSON_HRZONE		= (TABLE_TOUR_PERSON
 																										+ "_" + TABLE_TOUR_PERSON_HRZONE);	//$NON-NLS-1$
+
+	public static final String						JOINTABLE_TOURSIGN_TOURSIGNCATEGORY			= (TABLE_TOUR_SIGN
+																										+ "_" + TABLE_TOUR_SIGN_CATEGORY);	//$NON-NLS-1$
+	public static final String						JOINTABLE_TOURSIGNCATEGORY_TOURSIGN			= (TABLE_TOUR_SIGN_CATEGORY
+																										+ "_" + TABLE_TOUR_SIGN);			//$NON-NLS-1$
+	public static final String						JOINTABLE_TOURSIGNCATEGORY_TOURSIGNCATEGORY	= (TABLE_TOUR_SIGN_CATEGORY
+																										+ "_" + TABLE_TOUR_SIGN_CATEGORY);	//$NON-NLS-1$
+
 	public static final String						JOINTABLE_TOURTAGCATEGORY_TOURTAG			= (TABLE_TOUR_TAG_CATEGORY
 																										+ "_" + TABLE_TOUR_TAG);			//$NON-NLS-1$
 	public static final String						JOINTABLE_TOURTAGCATEGORY_TOURTAGCATEGORY	= (TABLE_TOUR_TAG_CATEGORY
@@ -172,8 +181,15 @@ public class TourDatabase {
 	private static ArrayList<TourType>				_activeTourTypes;
 
 	private static volatile ArrayList<TourType>		_tourTypes;
+
+	/**
+	 * Key is tag ID.
+	 */
 	private static volatile HashMap<Long, TourTag>	_tourTags;
 
+	/**
+	 * Key is category ID or <code>-1</code> for the root.
+	 */
 	private static HashMap<Long, TagCollection>		_tagCollections								= new HashMap<Long, TagCollection>();
 
 	/*
@@ -227,6 +243,8 @@ public class TourDatabase {
 	}
 
 	private static final Object						DB_LOCK										= new Object();
+
+	private static final String						SQL_STRING_SEPARATOR						= "'";
 
 	private TourDatabase() {
 
@@ -620,7 +638,9 @@ public class TourDatabase {
 			final EntityManager em = TourDatabase.getInstance().getEntityManager();
 			if (em != null) {
 
-				final Query emQuery = em.createQuery("SELECT tourTag FROM TourTag AS tourTag"); //$NON-NLS-1$
+				final Query emQuery = em.createQuery(""
+						+ "SELECT tourTag"
+						+ (" FROM " + TourTag.class.getSimpleName() + " AS tourTag")); //$NON-NLS-1$ //$NON-NLS-2$
 
 				_tourTags = new HashMap<Long, TourTag>();
 
@@ -864,7 +884,7 @@ public class TourDatabase {
 		Query emQuery = em.createQuery(//
 				//
 				"SELECT ttCategory" //$NON-NLS-1$
-						+ (" FROM " + TourDatabase.TABLE_TOUR_TAG_CATEGORY + " AS ttCategory") //$NON-NLS-1$ //$NON-NLS-2$
+						+ (" FROM " + TourTagCategory.class.getSimpleName() + " AS ttCategory") //$NON-NLS-1$ //$NON-NLS-2$
 						+ (" WHERE ttCategory.isRoot=1") //$NON-NLS-1$
 						+ (" ORDER BY ttCategory.name")); //$NON-NLS-1$
 
@@ -876,7 +896,7 @@ public class TourDatabase {
 		emQuery = em.createQuery(//
 				//
 				"SELECT tourTag" //$NON-NLS-1$
-						+ (" FROM " + TourDatabase.TABLE_TOUR_TAG + " AS tourTag ") //$NON-NLS-1$ //$NON-NLS-2$
+						+ (" FROM " + TourTag.class.getSimpleName() + " AS tourTag ") //$NON-NLS-1$ //$NON-NLS-2$
 						+ (" WHERE tourTag.isRoot=1") //$NON-NLS-1$
 						+ (" ORDER BY tourTag.name")); //$NON-NLS-1$
 
@@ -1227,7 +1247,7 @@ public class TourDatabase {
 	}
 
 	/**
-	 * Persists an entity *
+	 * Persists an entity.
 	 * <p>
 	 * This method is <b>much faster</b> than using this
 	 * {@link #saveEntity(Object, long, Class, EntityManager)}
@@ -1524,6 +1544,23 @@ public class TourDatabase {
 		exec(stmt, sql);
 
 		return;
+	}
+
+	/**
+	 * @param stmt
+	 * @param tableName
+	 * @param indexName
+	 * @param columnNames
+	 * @throws SQLException
+	 */
+	private static void sql_CreateIndex(final Statement stmt,
+										final String tableName,
+										final String indexName,
+										final String columnNames) throws SQLException {
+
+		final String sql = "CREATE INDEX " + indexName + " ON " + tableName + " (" + columnNames + ")"; //$NON-NLS-1$ //$NON-NLS-2$
+
+		exec(stmt, sql);
 	}
 
 	public static void updateActiveTourTypeList(final TourTypeFilter tourTypeFilter) {
@@ -2123,13 +2160,7 @@ public class TourDatabase {
 	 */
 	private void createIndex_TourPhoto_023(final Statement stmt) throws SQLException {
 
-		String sql;
-
-		/*
-		 * CREATE INDEX imageFilePathName
-		 */
-		sql = "CREATE INDEX ImageFilePathName ON " + TABLE_TOUR_PHOTO + " (ImageFilePathName)"; //$NON-NLS-1$ //$NON-NLS-2$
-		exec(stmt, sql);
+		sql_CreateIndex(stmt, TABLE_TOUR_PHOTO, "ImageFilePathName", "ImageFilePathName");
 	}
 
 	/**
@@ -2700,15 +2731,16 @@ public class TourDatabase {
 
 		exec(stmt, sql);
 
-		/*
-		 * ALTER TABLE TourPhoto ADD CONSTRAINT TourPhoto_pk PRIMARY KEY (photoId);
-		 */
+		// Set PK: photoId;
 		sql = "ALTER TABLE " + TABLE_TOUR_PHOTO + "							\n" //$NON-NLS-1$ //$NON-NLS-2$
 				+ "	ADD CONSTRAINT " + TABLE_TOUR_PHOTO + "_pk					\n" //$NON-NLS-1$ //$NON-NLS-2$
 				+ "	PRIMARY KEY (photoId)"; //										//$NON-NLS-1$
 
 		exec(stmt, sql);
 
+		/*
+		 * Create join table: TourData_TourPhoto
+		 */
 		sql = "CREATE TABLE " + JOINTABLE_TOURDATA__TOURPHOTO //							//$NON-NLS-1$
 				+ "(																	\n" //$NON-NLS-1$
 				//
@@ -2719,10 +2751,7 @@ public class TourDatabase {
 
 		exec(stmt, sql);
 
-		/*
-		 * ALTER TABLE TourData_TourPhoto ADD CONSTRAINT TourData_TourPhoto_pk PRIMARY KEY
-		 * (TourData_tourId);
-		 */
+		// Set PK: TourData_tourId;
 		sql = "ALTER TABLE " + JOINTABLE_TOURDATA__TOURPHOTO + "				\n" //$NON-NLS-1$ //$NON-NLS-2$
 				+ "	ADD CONSTRAINT " + JOINTABLE_TOURDATA__TOURPHOTO + "_pk		\n" //$NON-NLS-1$ //$NON-NLS-2$
 				+ "	PRIMARY KEY (" + TABLE_TOUR_DATA + "_tourId)"; //				//$NON-NLS-1$ //$NON-NLS-2$
@@ -2803,69 +2832,49 @@ public class TourDatabase {
 
 		String sql;
 
-		/**
-		 * <code>
-		 * 
-		 * 
-	private long				signId				= TourDatabase.ENTITY_IS_NOT_SAVED;
-	private String				name;
-	private String				imageFilePathName;
-
-	private TourSignCategory	tourSignCategory;
-	private Set<TourMarker>		tourMarker			= new HashSet<TourMarker>();
-	private Set<TourWayPoint>	tourWayPoint		= new HashSet<TourWayPoint>();
-
-		 * 
-		 * </code>
-		 */
-
 		/*
-		 * CREATE TABLE TourSign
+		 * Create table: TourSign
 		 */
-		sql = "CREATE TABLE " + TABLE_TOUR_SIGN//									//$NON-NLS-1$
-				+ "(															\n" //$NON-NLS-1$
+		sql = "CREATE TABLE " + TABLE_TOUR_SIGN //														//$NON-NLS-1$
+				+ "(																				\n" //$NON-NLS-1$
 				//
-				+ "	signId 		BIGINT NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 0 ,INCREMENT BY 1),\n" //$NON-NLS-1$
+				+ ("	signId 				BIGINT NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 0 ,INCREMENT BY 1),\n") //$NON-NLS-1$
 				//
-//				+ "	tourSignCategory_signCategoryId 		BIGINT,				\n" //$NON-NLS-1$
+				// @ManyToOne
+				+ ("	" + TABLE_TOUR_SIGN_CATEGORY + "_signCategoryId		BIGINT,					\n")//$NON-NLS-1$ //$NON-NLS-2$
 				//
-				+ ("	name 				" + varCharKomma(TourSign.DB_LENGTH_NAME)) //						//$NON-NLS-1$
-				+ ("	imageFilePathName 	" + varCharNoKomma(TourSign.DB_LENGTH_IMAGE_FILE_PATH)) //			//$NON-NLS-1$
+				+ ("	name 				" + varCharKomma(TourSign.DB_LENGTH_NAME)) //				//$NON-NLS-1$
+				+ ("	signKey 			" + varCharKomma(TourSign.DB_LENGTH_NAME)) //				//$NON-NLS-1$
+				+ ("	imageFilePathName 	" + varCharKomma(TourSign.DB_LENGTH_IMAGE_FILE_PATH)) //	//$NON-NLS-1$
+				+ ("	expandType			INT DEFAULT " + TourSign.EXPAND_TYPE_DEFAULT + ",		\n")//$NON-NLS-1$
 				//
-				+ ")"; //															//$NON-NLS-1$
+				+ ("	isRoot 				INT DEFAULT 0											\n")//$NON-NLS-1$
+				//
+				+ ")"; //																				//$NON-NLS-1$
+		exec(stmt, sql);
 
+		// Set PK: signId;
+		sql = ("ALTER TABLE " + TABLE_TOUR_SIGN) + "												\n" //$NON-NLS-1$ //$NON-NLS-2$
+				+ "	ADD CONSTRAINT " + TABLE_TOUR_SIGN + "_pk 										\n" //$NON-NLS-1$ //$NON-NLS-2$
+				+ "	PRIMARY KEY (signId)"; //															//$NON-NLS-1$
 		exec(stmt, sql);
 
 		/*
-		 * ALTER TABLE TourSign ADD CONSTRAINT TourSign_pk PRIMARY KEY (signId);
+		 * Create join table: TourSignCategory_TourSign
 		 */
-		sql = ("ALTER TABLE " + TABLE_TOUR_SIGN) + "							\n" //$NON-NLS-1$ //$NON-NLS-2$
-				+ ("	ADD CONSTRAINT " + TABLE_TOUR_SIGN + "_pk 				\n")//$NON-NLS-1$ //$NON-NLS-2$
-				+ ("	PRIMARY KEY (signId)									"); //$NON-NLS-1$
-
+		sql = "CREATE TABLE " + JOINTABLE_TOURSIGNCATEGORY_TOURSIGN //									//$NON-NLS-1$
+				+ "(																				\n" //$NON-NLS-1$
+				//
+				+ ("	" + TABLE_TOUR_SIGN_CATEGORY + "_signCategoryId		BIGINT NOT NULL,		\n")//$NON-NLS-1$ //$NON-NLS-2$
+				+ ("	" + TABLE_TOUR_SIGN + "_signId						BIGINT NOT NULL			\n")//$NON-NLS-1$ //$NON-NLS-2$
+				//
+				+ ")"; //																//$NON-NLS-1$
 		exec(stmt, sql);
 
-		/*
-		 * CREATE TABLE TourMarker_TourSign
-		 */
-		sql = "CREATE TABLE " + JOINTABLE_TOURMARKER__TOURSIGN //				//$NON-NLS-1$
-				+ "(															\n" //$NON-NLS-1$
-				//
-				+ ("	" + TABLE_TOUR_MARKER + "_markerId	BIGINT NOT NULL,	\n")//$NON-NLS-1$ //$NON-NLS-2$
-				+ ("	" + TABLE_TOUR_SIGN + "_signId		BIGINT NOT NULL		\n")//$NON-NLS-1$ //$NON-NLS-2$
-				//
-				+ ")"; //															//$NON-NLS-1$
-
-		exec(stmt, sql);
-
-		/*
-		 * ALTER TABLE TourMarker_TourSign ADD CONSTRAINT TourMarker_TourSign_pk PRIMARY KEY
-		 * (TourMarker_markerId);
-		 */
-		sql = "ALTER TABLE " + JOINTABLE_TOURMARKER__TOURSIGN + "						\n" //$NON-NLS-1$ //$NON-NLS-2$
-				+ "	ADD CONSTRAINT " + JOINTABLE_TOURMARKER__TOURSIGN + "_pk			\n" //$NON-NLS-1$ //$NON-NLS-2$
-				+ "	PRIMARY KEY (" + TABLE_TOUR_MARKER + "_markerId)"; //					//$NON-NLS-1$ //$NON-NLS-2$
-
+		// Set PK: TourSignCategory_signCategoryId;
+		sql = "ALTER TABLE " + JOINTABLE_TOURSIGNCATEGORY_TOURSIGN + "								\n" //$NON-NLS-1$ //$NON-NLS-2$
+				+ "	ADD CONSTRAINT " + JOINTABLE_TOURSIGNCATEGORY_TOURSIGN + "_pk					\n" //$NON-NLS-1$ //$NON-NLS-2$
+				+ "	PRIMARY KEY (" + TABLE_TOUR_SIGN_CATEGORY + "_signCategoryId)"; //					//$NON-NLS-1$ //$NON-NLS-2$
 		exec(stmt, sql);
 	}
 
@@ -2879,31 +2888,67 @@ public class TourDatabase {
 	 */
 	private void createTable_TourSignCategory(final Statement stmt) throws SQLException {
 
-		String sql;
-
 		/*
-		 * TABLE TourSignCategory
+		 * CREATE TABLE TourSignCategory
 		 */
-		sql = "CREATE TABLE " + TABLE_TOUR_SIGN_CATEGORY //							//$NON-NLS-1$
-				+ "(															\n" //$NON-NLS-1$
+		exec(stmt, "CREATE TABLE " + TABLE_TOUR_SIGN_CATEGORY //										//$NON-NLS-1$
+				+ "(																				\n" //$NON-NLS-1$
 				//
 				+ "	signCategoryId 	BIGINT NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 0 ,INCREMENT BY 1),\n" //$NON-NLS-1$
 				//
-				+ ("	name 		" + varCharNoKomma(TourTagCategory.DB_LENGTH_NAME)) //$NON-NLS-1$
+				// @ManyToOne
+				+ ("	" + TABLE_TOUR_SIGN_CATEGORY + "_signCategoryId		BIGINT,					\n")//$NON-NLS-1$ //$NON-NLS-2$
 				//
-				+ ")"; //															//$NON-NLS-1$
-
-		exec(stmt, sql);
+				+ ("	name 				" + varCharKomma(TourSign.DB_LENGTH_NAME)) //				//$NON-NLS-1$
+				+ ("	categoryKey 		" + varCharKomma(TourSign.DB_LENGTH_NAME)) //				//$NON-NLS-1$
+				//
+				+ ("	isRoot 				INT DEFAULT 0											\n")//$NON-NLS-1$
+				//
+				+ ")");
 
 		/*
-		 * ALTER TABLE TourSignCategory ADD CONSTRAINT TourSignCategory_pk PRIMARY KEY
-		 * (signCategoryId);
+		 * Add primary key: signCategoryId;
 		 */
-		sql = ("ALTER TABLE " + TABLE_TOUR_SIGN_CATEGORY) + "							\n" //$NON-NLS-1$ //$NON-NLS-2$
-				+ ("	ADD CONSTRAINT " + TABLE_TOUR_SIGN_CATEGORY + "_pk 				\n")//$NON-NLS-1$ //$NON-NLS-2$
-				+ ("	PRIMARY KEY (signCategoryId)									"); //$NON-NLS-1$
+		exec(stmt, ("ALTER TABLE " + TABLE_TOUR_SIGN_CATEGORY + "									\n")//$NON-NLS-1$ //$NON-NLS-2$
+				+ ("	ADD CONSTRAINT " + TABLE_TOUR_SIGN_CATEGORY + "_pk 							\n")//$NON-NLS-1$ //$NON-NLS-2$
+				+ ("	PRIMARY KEY (signCategoryId)												\n"));
 
-		exec(stmt, sql);
+		// ensure that the category name is unique
+		exec(stmt, ("ALTER TABLE " + TABLE_TOUR_SIGN_CATEGORY + "									\n")//$NON-NLS-1$ //$NON-NLS-2$
+				+ ("	ADD CONSTRAINT categoryKey													\n")//$NON-NLS-1$
+				+ ("	UNIQUE (categoryKey)														\n"));
+
+		/*
+		 * @OneToMany tourSigns - join table: TourSign_TourSignCategory
+		 */
+		exec(stmt, "CREATE TABLE " + JOINTABLE_TOURSIGN_TOURSIGNCATEGORY //								//$NON-NLS-1$
+				+ "(																				\n" //$NON-NLS-1$
+				//
+				+ ("	" + TABLE_TOUR_SIGN + "_signId						BIGINT NOT NULL,		\n")//$NON-NLS-1$ //$NON-NLS-2$
+				+ ("	" + TABLE_TOUR_SIGN_CATEGORY + "_signCategoryId		BIGINT NOT NULL			\n")//$NON-NLS-1$ //$NON-NLS-2$
+				//
+				+ ")");
+
+		// Set PK: TourSign_signId;
+		exec(stmt, ("ALTER TABLE " + JOINTABLE_TOURSIGN_TOURSIGNCATEGORY + "						\n") //$NON-NLS-1$ //$NON-NLS-2$
+				+ ("	ADD CONSTRAINT " + JOINTABLE_TOURSIGN_TOURSIGNCATEGORY + "_pk				\n") //$NON-NLS-1$ //$NON-NLS-2$
+				+ ("	PRIMARY KEY (" + TABLE_TOUR_SIGN + "_signId)"));
+
+		/*
+		 * @OneToMany tourSignCategories - join table: TourSignCategory_TourSignCategory
+		 */
+		exec(stmt, ("CREATE TABLE " + JOINTABLE_TOURSIGNCATEGORY_TOURSIGNCATEGORY) //									//$NON-NLS-1$
+				+ "(																				\n" //$NON-NLS-1$
+				//
+				+ ("	" + TABLE_TOUR_SIGN + "_signCategoryId				BIGINT NOT NULL,		\n")//$NON-NLS-1$ //$NON-NLS-2$
+				+ ("	" + TABLE_TOUR_SIGN_CATEGORY + "_signCategoryId		BIGINT NOT NULL			\n")//$NON-NLS-1$ //$NON-NLS-2$
+				//
+				+ ")");
+
+		// Set PK: TourSignCategory_signCategoryId;
+		exec(stmt, ("ALTER TABLE " + JOINTABLE_TOURSIGNCATEGORY_TOURSIGNCATEGORY + "				\n") //$NON-NLS-1$ //$NON-NLS-2$
+				+ ("	ADD CONSTRAINT " + JOINTABLE_TOURSIGNCATEGORY_TOURSIGNCATEGORY + "_pk		\n") //$NON-NLS-1$ //$NON-NLS-2$
+				+ ("	PRIMARY KEY (" + TABLE_TOUR_SIGN_CATEGORY + "_signCategoryId)"));
 	}
 
 	/**
@@ -2973,7 +3018,7 @@ public class TourDatabase {
 		exec(stmt, sql);
 
 		sql = "ALTER TABLE " + JOINTABLE_TOURDATA__TOURTAG + "					\n" //$NON-NLS-1$ //$NON-NLS-2$
-				+ "	ADD CONSTRAINT fk_" + JOINTABLE_TOURDATA__TOURTAG + "_" + field_TourData_tourId //$NON-NLS-1$ //$NON-NLS-2$
+				+ "	ADD CONSTRAINT fk_" + JOINTABLE_TOURDATA__TOURTAG + "_" + field_TourData_tourId + "\n" //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 				+ "	FOREIGN KEY (" + TABLE_TOUR_DATA + "_tourId)				\n" //$NON-NLS-1$ //$NON-NLS-2$
 				+ "	REFERENCES " + TABLE_TOUR_DATA + " (tourId)"; //			//$NON-NLS-1$ //$NON-NLS-2$
 
