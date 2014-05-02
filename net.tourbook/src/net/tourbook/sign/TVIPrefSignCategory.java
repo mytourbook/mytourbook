@@ -15,9 +15,16 @@
  *******************************************************************************/
 package net.tourbook.sign;
 
+import java.util.Set;
+
+import javax.persistence.EntityManager;
+
+import net.tourbook.data.TourSign;
 import net.tourbook.data.TourSignCategory;
+import net.tourbook.database.TourDatabase;
 
 import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.swt.widgets.Display;
 
 public class TVIPrefSignCategory extends TVIPrefSignItem {
 
@@ -33,41 +40,41 @@ public class TVIPrefSignCategory extends TVIPrefSignItem {
 	@Override
 	protected void fetchChildren() {
 
-//		final EntityManager em = TourDatabase.getInstance().getEntityManager();
-//
-//		if (em == null) {
-//			return;
-//		}
-//
-//		final TourSignCategory tourSignCategory = em.find(TourSignCategory.class, _tourSignCategory.getCategoryId());
-//
-//		// create sign items
-//		final Set<TourSign> lazyTourSigns = tourSignCategory.getTourSigns();
-//		for (final TourSign tourSign : lazyTourSigns) {
-//			addChild(new TVIPrefSign(getSignViewer(), tourSign));
-//		}
-//
-//		// create category items
-//		final Set<TourSignCategory> lazyTourSignCategories = tourSignCategory.getSignCategories();
-//		for (final TourSignCategory signCategory : lazyTourSignCategories) {
-//			addChild(new TVIPrefSignCategory(getSignViewer(), signCategory));
-//		}
-//
-//		// update number of categories/signs
-//		_tourSignCategory.setSignCounter(lazyTourSigns.size());
-//		_tourSignCategory.setCategoryCounter(lazyTourSignCategories.size());
-//
-//		em.close();
-//
-//		/*
-//		 * show number of signs/categories in the viewer, this must be done after the viewer task is
-//		 * finished
-//		 */
-//		Display.getCurrent().asyncExec(new Runnable() {
-//			public void run() {
-//				getSignViewer().update(TVIPrefSignCategory.this, null);
-//			}
-//		});
+		final EntityManager em = TourDatabase.getInstance().getEntityManager();
+
+		if (em == null) {
+			return;
+		}
+
+		final TourSignCategory tourSignCategory = em.find(TourSignCategory.class, _tourSignCategory.getCategoryId());
+
+		// create sign items
+		final Set<TourSign> lazyTourSigns = tourSignCategory.getTourSigns();
+		for (final TourSign tourSign : lazyTourSigns) {
+			addChild(new TVIPrefSign(getSignViewer(), tourSign));
+		}
+
+		// create category items
+		final Set<TourSignCategory> lazyTourSignCategories = tourSignCategory.getTourSignCategories();
+		for (final TourSignCategory signCategory : lazyTourSignCategories) {
+			addChild(new TVIPrefSignCategory(getSignViewer(), signCategory));
+		}
+
+		// update number of categories/signs
+		_tourSignCategory.setSignCounter(lazyTourSigns.size());
+		_tourSignCategory.setCategoryCounter(lazyTourSignCategories.size());
+
+		em.close();
+
+		/*
+		 * show number of signs/categories in the viewer, this must be done after the viewer task is
+		 * finished
+		 */
+		Display.getCurrent().asyncExec(new Runnable() {
+			public void run() {
+				getSignViewer().update(TVIPrefSignCategory.this, null);
+			}
+		});
 	}
 
 	/**

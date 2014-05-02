@@ -45,6 +45,7 @@ import org.eclipse.jface.dialogs.InputDialog;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.layout.TreeColumnLayout;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferencePage;
@@ -129,6 +130,11 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 	private Button					_btnNewTagCategory;
 	private Button					_btnRename;
 	private Button					_btnReset;
+
+	/*
+	 * None UI controls
+	 */
+	private PixelConverter			_pc;
 
 	/**
 	 * Sort the tags and categories
@@ -257,14 +263,17 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 
 	private Composite createUI(final Composite parent) {
 
+		_pc = new PixelConverter(parent);
+
 		// container
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
 		GridLayoutFactory.fillDefaults()//
 				.margins(0, 0)
-				.spacing(SWT.DEFAULT, 0)
+//				.spacing(SWT.DEFAULT, 0)
 				.numColumns(2)
 				.applyTo(container);
+//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
 		{
 			createUI_10_Title(container);
 
@@ -317,9 +326,8 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 		/*
 		 * create viewer
 		 */
-		final Tree tree = new Tree(layoutContainer, SWT.H_SCROLL
-				| SWT.V_SCROLL
-				| SWT.BORDER
+		final Tree tree = new Tree(layoutContainer, SWT.H_SCROLL | SWT.V_SCROLL
+//				| SWT.BORDER
 				| SWT.MULTI
 				| SWT.FULL_SELECTION);
 
@@ -522,8 +530,16 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 	private void createUI_40_Bottom(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(container);
-		GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
+		GridDataFactory.fillDefaults()//
+				.grab(true, false)
+				.span(2, 1)
+//				.indent(0, _pc.convertVerticalDLUsToPixels(4))
+				.applyTo(container);
+		GridLayoutFactory.fillDefaults()//
+				.numColumns(1)
+//				.extendedMargins(0, 0, top, bottom)
+				.applyTo(container);
+//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
 		{
 			final Label label = new Label(container, SWT.WRAP);
 			label.setText(Messages.pref_tourtag_hint);

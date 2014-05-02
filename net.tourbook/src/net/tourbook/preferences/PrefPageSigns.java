@@ -22,6 +22,7 @@ import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.util.ColumnManager;
 import net.tourbook.common.util.ITourViewer;
+import net.tourbook.common.util.TreeColumnDefinition;
 import net.tourbook.common.util.TreeViewerItem;
 import net.tourbook.data.TourSign;
 import net.tourbook.data.TourSignCategory;
@@ -33,36 +34,43 @@ import net.tourbook.ui.UI;
 import net.tourbook.ui.action.ActionCollapseAll;
 import net.tourbook.ui.action.ActionExpandSelection;
 
+import org.eclipse.jface.action.IMenuListener;
+import org.eclipse.jface.action.IMenuManager;
+import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.IDialogConstants;
+import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.InputDialog;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
-import org.eclipse.jface.layout.TreeColumnLayout;
+import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
+import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.ColumnViewer;
-import org.eclipse.jface.viewers.ColumnWeightData;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITreeContentProvider;
+import org.eclipse.jface.viewers.ITreeViewerListener;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.StyledCellLabelProvider;
 import org.eclipse.jface.viewers.StyledString;
+import org.eclipse.jface.viewers.TreeExpansionEvent;
 import org.eclipse.jface.viewers.TreeViewer;
-import org.eclipse.jface.viewers.TreeViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ControlAdapter;
+import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
@@ -70,8 +78,11 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
+import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
@@ -86,10 +97,24 @@ public class PrefPageSigns extends PreferencePage implements IWorkbenchPreferenc
 	private static final String		SORT_PROPERTY	= "sort";									//$NON-NLS-1$
 
 	private final IPreferenceStore	_prefStore		= TourbookPlugin.getPrefStore();
+	private final IDialogSettings	_state			= TourbookPlugin.getState("PrefPageSigns"); //$NON-NLS-1$
 
 	private IPropertyChangeListener	_prefChangeListener;
 
 	private TVIPrefSignRoot			_rootItem;
+
+	private ColumnManager			_columnManager;
+	private TreeColumnDefinition	_colDefImage;
+	private TreeViewerItem			_expandedItem;
+
+	private int						_defaultImageWidth;
+	private int						_oldImageWidth	= -1;
+
+	/**
+	 * Contains the tree column widget for the sign image.
+	 */
+	private TreeColumn				_tcSignImage;
+	private int						_profileImageColumn;
 
 	private boolean					_isModified		= false;
 
@@ -98,13 +123,19 @@ public class PrefPageSigns extends PreferencePage implements IWorkbenchPreferenc
 	/*
 	 * UI constrols
 	 */
-	private TreeViewer				_signViewer;
 	private ToolBar					_toolBar;
+	private TreeViewer				_signViewer;
+	private Composite				_viewerContainer;
 
 	private Button					_btnNewSign;
 	private Button					_btnNewSignCategory;
 	private Button					_btnRename;
 	private Button					_btnReset;
+
+	/*
+	 * None UI controls
+	 */
+	private PixelConverter			_pc;
 
 	/**
 	 * Sort the signs and categories
@@ -217,6 +248,8 @@ public class PrefPageSigns extends PreferencePage implements IWorkbenchPreferenc
 	@Override
 	protected Control createContents(final Composite parent) {
 
+		initUI(parent);
+
 		final Composite ui = createUI(parent);
 
 		fillToolbar();
@@ -231,6 +264,29 @@ public class PrefPageSigns extends PreferencePage implements IWorkbenchPreferenc
 		return ui;
 	}
 
+	/**
+	 * create the views context menu
+	 */
+	private void createContextMenu() {
+
+		final MenuManager menuMgr = new MenuManager();
+
+		menuMgr.setRemoveAllWhenShown(true);
+
+		menuMgr.addMenuListener(new IMenuListener() {
+			public void menuAboutToShow(final IMenuManager menuMgr2) {
+//				fillContextMenu(menuMgr2);
+			}
+		});
+
+		final Tree tree = _signViewer.getTree();
+		final Menu treeContextMenu = menuMgr.createContextMenu(tree);
+
+		tree.setMenu(treeContextMenu);
+
+		_columnManager.createHeaderContextMenu(tree, treeContextMenu);
+	}
+
 	private Composite createUI(final Composite parent) {
 
 		// container
@@ -238,13 +294,14 @@ public class PrefPageSigns extends PreferencePage implements IWorkbenchPreferenc
 		GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
 		GridLayoutFactory.fillDefaults()//
 				.margins(0, 0)
-				.spacing(SWT.DEFAULT, 0)
+//				.spacing(SWT.DEFAULT, 0)
 				.numColumns(2)
 				.applyTo(container);
+//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
 		{
 			createUI_10_Title(container);
 
-			createUI_20_SignViewer(container);
+			createUI_20_SignViewer_Container(container);
 			createUI_30_Buttons(container);
 
 			createUI_40_Bottom(container);
@@ -275,37 +332,66 @@ public class PrefPageSigns extends PreferencePage implements IWorkbenchPreferenc
 		new Label(parent, SWT.NONE);
 	}
 
-	private void createUI_20_SignViewer(final Composite parent) {
+	private void createUI_20_SignViewer_Container(final Composite parent) {
+
+		// define all columns for the viewer
+		_columnManager = new ColumnManager(this, _state);
+		defineAllColumns();
+
+		_viewerContainer = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, true).applyTo(_viewerContainer);
+		GridLayoutFactory.fillDefaults().applyTo(_viewerContainer);
+		{
+			createUI_22_SignViewer_Table(_viewerContainer);
+		}
+	}
+
+	private void createUI_22_SignViewer_Table(final Composite parent) {
 
 		/*
-		 * create tree layout
+		 * Create tree
 		 */
+		final Tree tree = new Tree(parent, //
+				SWT.H_SCROLL //
+						| SWT.V_SCROLL
+//				| SWT.BORDER
+						| SWT.MULTI
+						| SWT.FULL_SELECTION);
+		GridDataFactory.fillDefaults().grab(true, true).applyTo(tree);
 
-		final Composite layoutContainer = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults()//
-				.grab(true, true)
-				.hint(200, 100)
-				.applyTo(layoutContainer);
-
-		final TreeColumnLayout treeLayout = new TreeColumnLayout();
-		layoutContainer.setLayout(treeLayout);
-
-		/*
-		 * create viewer
-		 */
-		final Tree tree = new Tree(layoutContainer, SWT.H_SCROLL
-				| SWT.V_SCROLL
-				| SWT.BORDER
-				| SWT.MULTI
-				| SWT.FULL_SELECTION);
-
-		tree.setHeaderVisible(false);
+		tree.setHeaderVisible(true);
 		tree.setLinesVisible(getPreferenceStore().getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
 
+		/*
+		 * NOTE: MeasureItem, PaintItem and EraseItem are called repeatedly. Therefore, it is
+		 * critical for performance that these methods be as efficient as possible.
+		 */
+		final Listener paintListener = new Listener() {
+			public void handleEvent(final Event event) {
+
+				if (event.index == _profileImageColumn
+						&& (event.type == SWT.MeasureItem || event.type == SWT.PaintItem)) {
+
+					onViewerPaint(event);
+				}
+			}
+		};
+		tree.addListener(SWT.MeasureItem, paintListener);
+		tree.addListener(SWT.PaintItem, paintListener);
+
+		/*
+		 * Create viewer
+		 */
 		_signViewer = new TreeViewer(tree);
+
+		_columnManager.createColumns(_signViewer);
+
+		_tcSignImage = _colDefImage.getTreeColumn();
+		_profileImageColumn = _colDefImage.getCreateIndex();
 
 		_signViewer.setContentProvider(new SignViewerContentProvicer());
 		_signViewer.setComparator(new SignViewerComparator());
+
 		_signViewer.setUseHashlookup(true);
 
 		_signViewer.addDoubleClickListener(new IDoubleClickListener() {
@@ -323,17 +409,77 @@ public class PrefPageSigns extends PreferencePage implements IWorkbenchPreferenc
 
 					// expand/collapse current item
 
-					final TreeViewerItem tourItem = (TreeViewerItem) selection;
+//					final TreeViewerItem tourItem = (TreeViewerItem) selection;
+//
+//					if (_signViewer.getExpandedState(tourItem)) {
+//						_signViewer.collapseToLevel(tourItem, 1);
+//					} else {
+//						_signViewer.expandToLevel(tourItem, 1);
+//					}
 
-					if (_signViewer.getExpandedState(tourItem)) {
-						_signViewer.collapseToLevel(tourItem, 1);
+//
+//
+//
+//
+//
+//
+//
+//
+//
+					// expand/collapse current item
+					final TVIPrefSignCategory treeItem = (TVIPrefSignCategory) selection;
+
+					if (_signViewer.getExpandedState(treeItem)) {
+
+						_signViewer.collapseToLevel(treeItem, 1);
+
 					} else {
-						_signViewer.expandToLevel(tourItem, 1);
+
+						if (_expandedItem != null) {
+							_signViewer.collapseToLevel(_expandedItem, 1);
+						}
+
+						_signViewer.expandToLevel(treeItem, 1);
+						_expandedItem = treeItem;
+
+						// expanding the treeangle, the layout is correctly done but not with double click
+//						layoutContainer.layout(true, true);
 					}
+
 				}
 			}
 		});
 
+		_signViewer.addTreeListener(new ITreeViewerListener() {
+
+			public void treeCollapsed(final TreeExpansionEvent event) {
+
+				if (event.getElement() instanceof TVIPrefSignCategory) {
+					_expandedItem = null;
+				}
+			}
+
+			public void treeExpanded(final TreeExpansionEvent event) {
+
+				final Object element = event.getElement();
+
+				if (element instanceof TVIPrefSignCategory) {
+
+					final TVIPrefSignCategory treeItem = (TVIPrefSignCategory) element;
+
+					if (_expandedItem != null) {
+						_signViewer.collapseToLevel(_expandedItem, 1);
+					}
+
+					Display.getCurrent().asyncExec(new Runnable() {
+						public void run() {
+							_signViewer.expandToLevel(treeItem, 1);
+							_expandedItem = treeItem;
+						}
+					});
+				}
+			}
+		});
 		_signViewer.addSelectionChangedListener(new ISelectionChangedListener() {
 			public void selectionChanged(final SelectionChangedEvent event) {
 				enableButtons();
@@ -379,60 +525,14 @@ public class PrefPageSigns extends PreferencePage implements IWorkbenchPreferenc
 //				new Transfer[] { LocalSelectionTransfer.getTransfer() },
 //				new SignDropAdapter(this, _signViewer));
 
-		/*
-		 * create columns
-		 */
-		TreeViewerColumn tvc;
-		TreeColumn tvcColumn;
+		createContextMenu();
 
-		// column: signs + sign categories
-		tvc = new TreeViewerColumn(_signViewer, SWT.TRAIL);
-		tvcColumn = tvc.getColumn();
-		tvc.setLabelProvider(new StyledCellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-
-				final StyledString styledString = new StyledString();
-
-				final Object element = cell.getElement();
-				if (element instanceof TVIPrefSign) {
-
-					final TourSign tourSign = ((TVIPrefSign) element).getTourSign();
-
-					styledString.append(tourSign.getSignName(), UI.TAG_STYLER);
-
-				} else if (element instanceof TVIPrefSignCategory) {
-
-					final TVIPrefSignCategory tourSignCategoryItem = (TVIPrefSignCategory) element;
-					final TourSignCategory tourSignCategory = tourSignCategoryItem.getTourSignCategory();
-
-					styledString.append(tourSignCategory.getCategoryName(), UI.TAG_CATEGORY_STYLER);
-
-					// get number of categories
-					final int categoryCounter = tourSignCategory.getCategoryCounter();
-					final int signCounter = tourSignCategory.getSignCounter();
-					if (categoryCounter == -1 && signCounter == -1) {
-
-//						styledString.append("  ...", StyledString.COUNTER_STYLER);
-
-					} else {
-
-						String categoryString = UI.EMPTY_STRING;
-						if (categoryCounter > 0) {
-							categoryString = "/" + categoryCounter; //$NON-NLS-1$
-						}
-						styledString.append("   " + signCounter + categoryString, StyledString.QUALIFIER_STYLER); //$NON-NLS-1$
-					}
-
-				} else {
-					styledString.append(element.toString());
-				}
-
-				cell.setText(styledString.getString());
-				cell.setStyleRanges(styledString.getStyleRanges());
-			}
-		});
-		treeLayout.setColumnData(tvcColumn, new ColumnWeightData(100, true));
+//		// set color for all controls
+//		final ColorRegistry colorRegistry = JFaceResources.getColorRegistry();
+//		final Color fgColor = colorRegistry.get(IPhotoPreferences.PHOTO_VIEWER_COLOR_FOREGROUND);
+//		final Color bgColor = colorRegistry.get(IPhotoPreferences.PHOTO_VIEWER_COLOR_BACKGROUND);
+//
+//		net.tourbook.common.UI.updateChildColors(tree, fgColor, bgColor);
 	}
 
 	private void createUI_30_Buttons(final Composite parent) {
@@ -495,7 +595,11 @@ public class PrefPageSigns extends PreferencePage implements IWorkbenchPreferenc
 	private void createUI_40_Bottom(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(container);
+		GridDataFactory.fillDefaults()//
+				.grab(true, false)
+				.span(2, 1)
+//				.indent(0, _pc.convertVerticalDLUsToPixels(4))
+				.applyTo(container);
 		GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
 		{
 			final Label label = new Label(container, SWT.WRAP);
@@ -512,6 +616,102 @@ public class PrefPageSigns extends PreferencePage implements IWorkbenchPreferenc
 				}
 			});
 		}
+	}
+
+	private void defineAllColumns() {
+
+		defineColumn_Name();
+		defineColumn_Image();
+	}
+
+	/**
+	 * Column: Sign image
+	 */
+	private void defineColumn_Image() {
+
+		final TreeColumnDefinition colDef = new TreeColumnDefinition(_columnManager, "image", SWT.LEAD); //$NON-NLS-1$
+		_colDefImage = colDef;
+
+//		colDef.setColumnLabel(Messages.profileViewer_column_label_color);
+//		colDef.setColumnHeader(Messages.profileViewer_column_label_color_header);
+//		colDef.setColumnToolTipText(Messages.profileViewer_column_label_color_tooltip);
+		colDef.setDefaultColumnWidth(_defaultImageWidth);
+		colDef.setIsDefaultColumn();
+		colDef.setCanModifyVisibility(false);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			/*
+			 * !!! set dummy label provider, otherwise an error occures !!!
+			 */
+			@Override
+			public void update(final ViewerCell cell) {}
+		});
+
+		colDef.addControlListener(new ControlAdapter() {
+			@Override
+			public void controlResized(final ControlEvent e) {
+				onResizeImageColumn();
+			}
+		});
+	}
+
+	/**
+	 * Column: Sign name
+	 */
+	private void defineColumn_Name() {
+
+		final TreeColumnDefinition colDef = new TreeColumnDefinition(_columnManager, "name", SWT.LEAD); //$NON-NLS-1$
+
+//		colDef.setColumnLabel(Messages.profileViewer_column_label_name);
+//		colDef.setColumnHeader(Messages.profileViewer_column_label_name_header);
+//		colDef.setColumnToolTipText(Messages.profileViewer_column_label_name_tooltip);
+		colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(30));
+//		colDef.setColumnWeightData(new ColumnWeightData(100, true));
+		colDef.setIsDefaultColumn();
+
+		colDef.setLabelProvider(new StyledCellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final StyledString styledString = new StyledString();
+
+				final Object element = cell.getElement();
+				if (element instanceof TVIPrefSign) {
+
+					final TourSign tourSign = ((TVIPrefSign) element).getTourSign();
+
+					styledString.append(tourSign.getSignName(), UI.TAG_STYLER);
+
+				} else if (element instanceof TVIPrefSignCategory) {
+
+					final TVIPrefSignCategory tourSignCategoryItem = (TVIPrefSignCategory) element;
+					final TourSignCategory tourSignCategory = tourSignCategoryItem.getTourSignCategory();
+
+					styledString.append(tourSignCategory.getCategoryName(), UI.TAG_CATEGORY_STYLER);
+
+					// get number of categories
+					final int categoryCounter = tourSignCategory.getCategoryCounter();
+					final int signCounter = tourSignCategory.getSignCounter();
+					if (categoryCounter == -1 && signCounter == -1) {
+
+//						styledString.append("  ...", StyledString.COUNTER_STYLER);
+
+					} else {
+
+						String categoryString = UI.EMPTY_STRING;
+						if (categoryCounter > 0) {
+							categoryString = "/" + categoryCounter; //$NON-NLS-1$
+						}
+						styledString.append("   " + signCounter + categoryString, StyledString.QUALIFIER_STYLER); //$NON-NLS-1$
+					}
+
+				} else {
+					styledString.append(element.toString());
+				}
+
+				cell.setText(styledString.getString());
+				cell.setStyleRanges(styledString.getStyleRanges());
+			}
+		});
 	}
 
 	@Override
@@ -574,11 +774,23 @@ public class PrefPageSigns extends PreferencePage implements IWorkbenchPreferenc
 	}
 
 	public ColumnManager getColumnManager() {
-		return null;
+		return _columnManager;
 	}
 
 	public long getDragStartTime() {
 		return _dragStartTime;
+	}
+
+	private int getImageWidth() {
+
+		int width;
+		if (_tcSignImage == null) {
+			width = _defaultImageWidth;
+		} else {
+			width = _tcSignImage.getWidth();
+		}
+
+		return width;
 	}
 
 	public TVIPrefSignRoot getRootItem() {
@@ -593,12 +805,98 @@ public class PrefPageSigns extends PreferencePage implements IWorkbenchPreferenc
 		setPreferenceStore(TourbookPlugin.getDefault().getPreferenceStore());
 	}
 
+	public void initUI(final Composite parent) {
+
+		_pc = new PixelConverter(parent);
+
+		_defaultImageWidth = _pc.convertWidthInCharsToPixels(5);
+	}
+
 	@Override
 	public boolean isValid() {
 
 //		saveFilterList();
 
 		return true;
+	}
+
+	@Override
+	public boolean okToLeave() {
+
+		saveViewerState();
+
+		return super.okToLeave();
+	}
+
+	/**
+	 * Rename selected sign/category
+	 */
+	private void onRenameTourSign() {
+
+		final Object selection = ((StructuredSelection) _signViewer.getSelection()).getFirstElement();
+
+		String name = UI.EMPTY_STRING;
+		String dlgTitle = UI.EMPTY_STRING;
+		String dlgMessage = UI.EMPTY_STRING;
+
+		if (selection instanceof TVIPrefSign) {
+
+			dlgTitle = Messages.pref_tourtag_dlg_rename_title;
+			dlgMessage = Messages.pref_tourtag_dlg_rename_message;
+			name = ((TVIPrefSign) selection).getTourSign().getSignName();
+
+		} else if (selection instanceof TVIPrefSignCategory) {
+
+			dlgTitle = Messages.pref_tourtag_dlg_rename_title_category;
+			dlgMessage = Messages.pref_tourtag_dlg_rename_message_category;
+			name = ((TVIPrefSignCategory) selection).getTourSignCategory().getCategoryName();
+		}
+
+		final InputDialog inputDialog = new InputDialog(getShell(), dlgTitle, dlgMessage, name, null);
+
+		if (inputDialog.open() != Window.OK) {
+
+			setFocusToViewer();
+			return;
+		}
+
+		// save changed name
+
+		name = inputDialog.getValue().trim();
+
+		if (selection instanceof TVIPrefSign) {
+
+			// save sign
+
+			final TVIPrefSign tourSignItem = ((TVIPrefSign) selection);
+			final TourSign tourSign = tourSignItem.getTourSign();
+
+			tourSign.setSignName(name);
+
+			// persist sign
+			TourDatabase.saveEntity(tourSign, tourSign.getSignId(), TourSign.class);
+
+			_signViewer.update(tourSignItem, new String[] { SORT_PROPERTY });
+
+		} else if (selection instanceof TVIPrefSignCategory) {
+
+			// save category
+
+			final TVIPrefSignCategory tourCategoryItem = ((TVIPrefSignCategory) selection);
+			final TourSignCategory tourCategory = tourCategoryItem.getTourSignCategory();
+
+			tourCategory.setName(name);
+
+			// persist category
+			TourDatabase.saveEntity(tourCategory, tourCategory.getCategoryId(), TourSignCategory.class);
+
+			_signViewer.update(tourCategoryItem, new String[] { SORT_PROPERTY });
+
+		}
+
+		_isModified = true;
+
+		setFocusToViewer();
 	}
 
 //	private void onNewCategory() {
@@ -879,77 +1177,6 @@ public class PrefPageSigns extends PreferencePage implements IWorkbenchPreferenc
 //		setFocusToViewer();
 //	}
 
-	/**
-	 * Rename selected sign/category
-	 */
-	private void onRenameTourSign() {
-
-		final Object selection = ((StructuredSelection) _signViewer.getSelection()).getFirstElement();
-
-		String name = UI.EMPTY_STRING;
-		String dlgTitle = UI.EMPTY_STRING;
-		String dlgMessage = UI.EMPTY_STRING;
-
-		if (selection instanceof TVIPrefSign) {
-
-			dlgTitle = Messages.pref_tourtag_dlg_rename_title;
-			dlgMessage = Messages.pref_tourtag_dlg_rename_message;
-			name = ((TVIPrefSign) selection).getTourSign().getSignName();
-
-		} else if (selection instanceof TVIPrefSignCategory) {
-
-			dlgTitle = Messages.pref_tourtag_dlg_rename_title_category;
-			dlgMessage = Messages.pref_tourtag_dlg_rename_message_category;
-			name = ((TVIPrefSignCategory) selection).getTourSignCategory().getCategoryName();
-		}
-
-		final InputDialog inputDialog = new InputDialog(getShell(), dlgTitle, dlgMessage, name, null);
-
-		if (inputDialog.open() != Window.OK) {
-
-			setFocusToViewer();
-			return;
-		}
-
-		// save changed name
-
-		name = inputDialog.getValue().trim();
-
-		if (selection instanceof TVIPrefSign) {
-
-			// save sign
-
-			final TVIPrefSign tourSignItem = ((TVIPrefSign) selection);
-			final TourSign tourSign = tourSignItem.getTourSign();
-
-			tourSign.setSignName(name);
-
-			// persist sign
-			TourDatabase.saveEntity(tourSign, tourSign.getSignId(), TourSign.class);
-
-			_signViewer.update(tourSignItem, new String[] { SORT_PROPERTY });
-
-		} else if (selection instanceof TVIPrefSignCategory) {
-
-			// save category
-
-			final TVIPrefSignCategory tourCategoryItem = ((TVIPrefSignCategory) selection);
-			final TourSignCategory tourCategory = tourCategoryItem.getTourSignCategory();
-
-			tourCategory.setName(name);
-
-			// persist category
-			TourDatabase.saveEntity(tourCategory, tourCategory.getCategoryId(), TourSignCategory.class);
-
-			_signViewer.update(tourCategoryItem, new String[] { SORT_PROPERTY });
-
-		}
-
-		_isModified = true;
-
-		setFocusToViewer();
-	}
-
 	private void onReset() {
 
 		final MessageDialog dialog = new MessageDialog(
@@ -1031,23 +1258,76 @@ public class PrefPageSigns extends PreferencePage implements IWorkbenchPreferenc
 		setFocusToViewer();
 	}
 
+	private void onResizeImageColumn() {
+
+		final int newImageWidth = getImageWidth();
+
+		// check if the width has changed
+		if (newImageWidth == _oldImageWidth) {
+			return;
+		}
+
+		// recreate images
+//		disposeProfileImages();
+	}
+
+	private void onViewerPaint(final Event event) {
+
+	}
+
 	@Override
 	public boolean performCancel() {
+
+		saveViewerState();
 		fireModifyEvent();
+
 		return true;
 	}
 
 	@Override
 	public boolean performOk() {
+
+		saveState();
+
 		fireModifyEvent();
+
 		return true;
 	}
 
 	public ColumnViewer recreateViewer(final ColumnViewer columnViewer) {
-		return null;
+
+		_viewerContainer.setRedraw(false);
+		{
+			_signViewer.getTree().dispose();
+
+			createUI_22_SignViewer_Table(_viewerContainer);
+			_viewerContainer.layout();
+
+			// update the viewer
+			reloadViewer();
+		}
+		_viewerContainer.setRedraw(true);
+
+		return _signViewer;
 	}
 
-	public void reloadViewer() {}
+	public void reloadViewer() {
+		_signViewer.setInput(new Object[0]);
+	}
+
+	/**
+	 * save state of the pref page
+	 */
+	private void saveState() {
+
+		saveViewerState();
+	}
+
+	private void saveViewerState() {
+
+		// viewer state
+		_columnManager.saveState(_state);
+	}
 
 	private void setFocusToViewer() {
 

@@ -66,13 +66,14 @@ public class DialogImportSignIcons extends TitleAreaDialog {
 	/**
 	 * Update interval in ms.
 	 */
-	private static final int		MONITOR_UPDATE_INTERVAL	= 200;
+	private static final int		MONITOR_UPDATE_INTERVAL	= 100;
 
 	private final IDialogSettings	_state					= TourbookPlugin.getState("DialogImportTourSignIcons"); //$NON-NLS-1$
 
 	private ArrayList<Photo>		_signIcons;
 
 	private long					_parseUIUpdateTime;
+	private int						_fsItemCounter;
 
 	private Path					_baseFolder;
 	protected int					_folderDepth;
@@ -275,7 +276,7 @@ public class DialogImportSignIcons extends TitleAreaDialog {
 				@Override
 				public void run(final IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 
-					final String taskName = NLS.bind(Messages.Dialog_ImportSigns_MonitorTask, selectedFolder.getName());
+					final String taskName = Messages.Dialog_ImportSigns_MonitorTask;
 					monitor.beginTask(taskName, IProgressMonitor.UNKNOWN);
 
 					// folder depth position is the parent of the root
@@ -335,7 +336,7 @@ public class DialogImportSignIcons extends TitleAreaDialog {
 
 		if (fileOrFolder.isDirectory()) {
 
-			// file item is a folder
+			// fs item is a folder
 
 			// create folder key from folder path.
 			final String[] relativeSegments = fileOrFolderPath.removeFirstSegments(_baseFolderSements).segments();
@@ -374,23 +375,36 @@ public class DialogImportSignIcons extends TitleAreaDialog {
 
 		} else {
 
-			// file item is a file
+			// fs item is a file
 
 			// get/create sign
-			final TourSign sign = SignManager.getImportedSignByKey(//
+			final TourSign importedSign = SignManager.getImportedSignByKey(//
 					fileOrFolderName,
 					categoryKey,
 					isRoot);
 
-			sign.setImageFilePathName(fileOrFolder.getAbsolutePath());
+			if (importedSign.getSignId() == TourDatabase.ENTITY_IS_NOT_SAVED) {
 
-			if (parentSignCategory != null) {
+				// sign entity is not yet saved
 
-				// set category for this sign
-				sign.setSignCategory(parentSignCategory);
+				importedSign.setRoot(isRoot);
+				importedSign.setImageFilePathName(fileOrFolder.getAbsolutePath());
 
-				// this parent category has a new child
-				parentSignCategory.addTourSign(sign);
+				final TourSign savedSign = TourDatabase.saveEntity(//
+						importedSign,
+						importedSign.getSignId(),
+						TourSign.class);
+
+				SignManager.keepImportedSign(savedSign);
+
+				if (parentSignCategory != null) {
+
+					// set category for this sign
+					importedSign.getTourSignCategories().add(parentSignCategory);
+
+					// this parent category has a new child
+					parentSignCategory.addTourSign(savedSign);
+				}
 			}
 		}
 
@@ -455,12 +469,11 @@ public class DialogImportSignIcons extends TitleAreaDialog {
 
 			final String allSql[] = {
 					//
-					"DELETE FROM " + TourDatabase.TABLE_TOUR_SIGN, //$NON-NLS-1$
-					"DELETE FROM " + TourDatabase.TABLE_TOUR_SIGN_CATEGORY, //$NON-NLS-1$
-					//
-					"DELETE FROM " + TourDatabase.JOINTABLE_TOURSIGN_TOURSIGNCATEGORY, //$NON-NLS-1$
 					"DELETE FROM " + TourDatabase.JOINTABLE_TOURSIGNCATEGORY_TOURSIGN, //$NON-NLS-1$
 					"DELETE FROM " + TourDatabase.JOINTABLE_TOURSIGNCATEGORY_TOURSIGNCATEGORY, //$NON-NLS-1$
+					//
+					"DELETE FROM " + TourDatabase.TABLE_TOUR_SIGN, //$NON-NLS-1$
+					"DELETE FROM " + TourDatabase.TABLE_TOUR_SIGN_CATEGORY, //$NON-NLS-1$
 			//
 			};
 
@@ -484,13 +497,15 @@ public class DialogImportSignIcons extends TitleAreaDialog {
 
 		final long time = System.currentTimeMillis();
 
+		_fsItemCounter++;
+
 		if (time > _parseUIUpdateTime + MONITOR_UPDATE_INTERVAL) {
 
 			_parseUIUpdateTime = time;
 
 			monitor.subTask(NLS.bind(
 					Messages.Dialog_ImportSigns_MonitorTask_SubTask,
-					new Object[] { UI.shortenText(fileFolder.toString(), 100) }));
+					new Object[] { _fsItemCounter, UI.shortenText(fileFolder.toString(), 100) }));
 		}
 	}
 

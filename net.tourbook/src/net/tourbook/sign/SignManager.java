@@ -120,7 +120,7 @@ public class SignManager {
 	 * @param categoryKey
 	 * @param isRoot
 	 * @param imageFilePathName
-	 * @return
+	 * @return Returns a cached {@link TourSign} or creates a new.
 	 */
 	public static TourSign getImportedSignByKey(final String signName, final String categoryKey, final boolean isRoot) {
 
@@ -155,14 +155,7 @@ public class SignManager {
 
 			} else {
 
-				final TourSign newSign = new TourSign(signName, signKey);
-
-				newSign.setRoot(isRoot);
-
-				sign = TourDatabase.saveEntity(//
-						newSign,
-						newSign.getSignId(),
-						TourSign.class);
+				sign = new TourSign(signName, signKey);
 			}
 
 			_importedSigns.put(signKey, sign);
@@ -344,7 +337,7 @@ public class SignManager {
 			Collections.sort(categoryEntries.tourSigns);
 
 			// get categories
-			final Set<TourSignCategory> lazyTourSignCategories = tourSignCategory.getSignCategories();
+			final Set<TourSignCategory> lazyTourSignCategories = tourSignCategory.getTourSignCategories();
 			categoryEntries.tourSignCategories = new ArrayList<TourSignCategory>(lazyTourSignCategories);
 			Collections.sort(categoryEntries.tourSignCategories);
 
@@ -360,25 +353,30 @@ public class SignManager {
 		return categoryEntries;
 	}
 
+	public static void keepImportedSign(final TourSign importedSign) {
+
+		_importedSigns.put(importedSign.getSignKey(), importedSign);
+	}
+
 	public static void saveAllImportedSigns() {
 
-		// save imported signs
-		for (final Entry<String, TourSign> tourSignEntry : _importedSigns.entrySet()) {
-
-			final TourSign tourSign = tourSignEntry.getValue();
-
-			final TourSign savedSign = TourDatabase.saveEntity(//
-					tourSign,
-					tourSign.getSignId(),
-					TourSign.class);
-
-			/*
-			 * Replace sign with saved sign, otherwise this error occures: deleted entity passed to
-			 * persist
-			 */
-			final TourSignCategory signCategory = savedSign.getSignCategory();
-			signCategory.addTourSign(savedSign);
-		}
+//		// save imported signs
+//		for (final Entry<String, TourSign> tourSignEntry : _importedSigns.entrySet()) {
+//
+//			final TourSign tourSign = tourSignEntry.getValue();
+//
+//			final TourSign savedSign = TourDatabase.saveEntity(//
+//					tourSign,
+//					tourSign.getSignId(),
+//					TourSign.class);
+//
+//			/*
+//			 * Replace sign with saved sign, otherwise this error occures: deleted entity passed to
+//			 * persist
+//			 */
+//			final TourSignCategory signCategory = savedSign.getSignCategory();
+//			signCategory.addTourSign(savedSign);
+//		}
 
 		// save imported categories
 		for (final Entry<String, TourSignCategory> tourSignCategoryEntry : _importedSignCategories.entrySet()) {

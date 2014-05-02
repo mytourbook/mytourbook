@@ -45,9 +45,9 @@ public class TVIPrefTagRoot extends TVIPrefTagItem {
 			 */
 			Query query = em.createQuery(//
 					//
-					"SELECT tourTag" //$NON-NLS-1$
-							+ (" FROM " + TourDatabase.TABLE_TOUR_TAG + " AS tourTag ") //$NON-NLS-1$ //$NON-NLS-2$
-							+ (" WHERE tourTag.isRoot = 1")); //$NON-NLS-1$
+					"SELECT tag" //$NON-NLS-1$
+							+ (" FROM " + TourTag.class.getSimpleName() + " AS tag ") //$NON-NLS-1$ //$NON-NLS-2$
+							+ (" WHERE tag.isRoot = 1")); //$NON-NLS-1$
 
 			final ArrayList<TourTag> tourTags = (ArrayList<TourTag>) query.getResultList();
 
@@ -61,9 +61,9 @@ public class TVIPrefTagRoot extends TVIPrefTagItem {
 			 */
 			query = em.createQuery(//
 					//
-					"SELECT tourTagCategory" //$NON-NLS-1$
-							+ (" FROM " + TourDatabase.TABLE_TOUR_TAG_CATEGORY + " AS tourTagCategory") //$NON-NLS-1$ //$NON-NLS-2$
-							+ (" WHERE tourTagCategory.isRoot = 1")); //$NON-NLS-1$
+					"SELECT tagCategory" //$NON-NLS-1$
+							+ (" FROM " + TourTagCategory.class.getSimpleName() + " AS tagCategory") //$NON-NLS-1$ //$NON-NLS-2$
+							+ (" WHERE tagCategory.isRoot = 1")); //$NON-NLS-1$
 
 			final ArrayList<TourTagCategory> tourTagCategories = (ArrayList<TourTagCategory>) query.getResultList();
 

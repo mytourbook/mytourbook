@@ -15,8 +15,6 @@
  *******************************************************************************/
 package net.tourbook.data;
 
-import static javax.persistence.CascadeType.ALL;
-
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -28,12 +26,12 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.Transient;
 
 import net.tourbook.database.TourDatabase;
-
-import org.hibernate.annotations.Cascade;
 
 @Entity
 public class TourSignCategory implements Comparable<Object> {
@@ -66,15 +64,19 @@ public class TourSignCategory implements Comparable<Object> {
 	/**
 	 * Tour signs for this category.
 	 */
-	@OneToMany(fetch = FetchType.EAGER, cascade = ALL, mappedBy = "tourSignCategory")
-	@Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
-	private Set<TourSign>				tourSigns			= new HashSet<TourSign>();
+	@ManyToMany(fetch = FetchType.LAZY)
+	@JoinTable(//
+	joinColumns = @JoinColumn(name = "tourSignCategory_signCategoryId", referencedColumnName = "signCategoryId"), //
+	inverseJoinColumns = @JoinColumn(name = "tourSign_signId", referencedColumnName = "signId"))
+	private final Set<TourSign>			tourSigns			= new HashSet<TourSign>();
 
 	/**
 	 * Tour sign child categories.
 	 */
-	@OneToMany(fetch = FetchType.EAGER, cascade = ALL, mappedBy = "signCategoryId")
-	@Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
+	@ManyToMany(fetch = FetchType.LAZY)
+	@JoinTable(//
+	joinColumns = @JoinColumn(name = "TourSignCategory_signCategoryId1", referencedColumnName = "signCategoryId"), //
+	inverseJoinColumns = @JoinColumn(name = "tourSignCategory_signCategoryId2", referencedColumnName = "signCategoryId"))
 	private final Set<TourSignCategory>	tourSignCategories	= new HashSet<TourSignCategory>();
 
 	/**
@@ -82,16 +84,6 @@ public class TourSignCategory implements Comparable<Object> {
 	 */
 	@Transient
 	private int							_categoryCounter	= -1;
-
-//	@ManyToMany(fetch = FetchType.LAZY)
-//	@JoinTable(inverseJoinColumns = @JoinColumn(name = "tourSign_signId", referencedColumnName = "signId"), //
-//	joinColumns = @JoinColumn(name = "tourSignCategory_signCategoryId", referencedColumnName = "signCategoryId"))
-//	private final Set<TourSign>			tourSigns			= new HashSet<TourSign>();
-//
-//	@ManyToMany(fetch = FetchType.LAZY)
-//	@JoinTable(joinColumns = @JoinColumn(name = "TourSignCategory_signCategoryId1", referencedColumnName = "signCategoryId"), //
-//	inverseJoinColumns = @JoinColumn(name = "tourSignCategory_signCategoryId2", referencedColumnName = "signCategoryId"))
-//	private final Set<TourSignCategory>	tourSignCategories	= new HashSet<TourSignCategory>();
 
 	/**
 	 * contains the number of signs or <code>-1</code> when the signs are not loaded
@@ -149,12 +141,12 @@ public class TourSignCategory implements Comparable<Object> {
 		return name;
 	}
 
-	public Set<TourSignCategory> getSignCategories() {
-		return tourSignCategories;
-	}
-
 	public int getSignCounter() {
 		return _signCounter;
+	}
+
+	public Set<TourSignCategory> getTourSignCategories() {
+		return tourSignCategories;
 	}
 
 	/**

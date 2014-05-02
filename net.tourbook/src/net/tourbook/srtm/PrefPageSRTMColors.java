@@ -101,27 +101,25 @@ import de.byteholder.geoclipse.mapprovider.MP;
 
 public final class PrefPageSRTMColors extends PreferencePage implements IWorkbenchPreferencePage, ITourViewer {
 
-	private static final String				PROFILE_FILE_NAME		= "srtmprofiles.xml";								//$NON-NLS-1$
-	private static final String				PROFILE_XML_ROOT		= "srtmprofiles";									//$NON-NLS-1$
+	private static final String				PROFILE_FILE_NAME		= "srtmprofiles.xml";						//$NON-NLS-1$
+	private static final String				PROFILE_XML_ROOT		= "srtmprofiles";							//$NON-NLS-1$
 
-	private static final String				MEMENTO_CHILD_PROFILE	= "profile";										//$NON-NLS-1$
-	private static final String				TAG_PROFILE_ID			= "profileId";										//$NON-NLS-1$
-	private static final String				TAG_NAME				= "name";											//$NON-NLS-1$
-	private static final String				TAG_IMAGE_PATH			= "imagePath";										//$NON-NLS-1$
-	private static final String				TAG_IS_SHADOW			= "isShadow";										//$NON-NLS-1$
-	private static final String				TAG_SHADOW_VALUE		= "shadowValue";									//$NON-NLS-1$
-	private static final String				TAG_RESOLUTION			= "resolution";									//$NON-NLS-1$
+	private static final String				MEMENTO_CHILD_PROFILE	= "profile";								//$NON-NLS-1$
+	private static final String				TAG_PROFILE_ID			= "profileId";								//$NON-NLS-1$
+	private static final String				TAG_NAME				= "name";									//$NON-NLS-1$
+	private static final String				TAG_IMAGE_PATH			= "imagePath";								//$NON-NLS-1$
+	private static final String				TAG_IS_SHADOW			= "isShadow";								//$NON-NLS-1$
+	private static final String				TAG_SHADOW_VALUE		= "shadowValue";							//$NON-NLS-1$
+	private static final String				TAG_RESOLUTION			= "resolution";							//$NON-NLS-1$
 
-	private static final String				MEMENTO_CHILD_VERTEX	= "vertex";										//$NON-NLS-1$
-	private static final String				TAG_ALTITUDE			= "altitude";										//$NON-NLS-1$
-	private static final String				TAG_RED					= "red";											//$NON-NLS-1$
-	private static final String				TAG_GREEN				= "green";											//$NON-NLS-1$
-	private static final String				TAG_BLUE				= "blue";											//$NON-NLS-1$
+	private static final String				MEMENTO_CHILD_VERTEX	= "vertex";								//$NON-NLS-1$
+	private static final String				TAG_ALTITUDE			= "altitude";								//$NON-NLS-1$
+	private static final String				TAG_RED					= "red";									//$NON-NLS-1$
+	private static final String				TAG_GREEN				= "green";									//$NON-NLS-1$
+	private static final String				TAG_BLUE				= "blue";									//$NON-NLS-1$
 
-	private final static IPreferenceStore	_prefStore				= TourbookPlugin.getDefault().getPreferenceStore();
-
-	private final IDialogSettings			_state					= TourbookPlugin.getDefault() //
-																			.getDialogSettingsSection("SRTMColors");	//$NON-NLS-1$
+	private final static IPreferenceStore	_prefStore				= TourbookPlugin.getPrefStore();
+	private final IDialogSettings			_state					= TourbookPlugin.getState("SRTMColors");	//$NON-NLS-1$
 
 	private static ArrayList<SRTMProfile>	_profileList			= new ArrayList<SRTMProfile>();
 	private static SRTMProfile				_selectedProfile		= null;
@@ -851,13 +849,13 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 
 	private void defineAllColumns() {
 
+		defineColumn_ColorImage();
+		defineColumn_ProfileId();
 		defineColumn_ProfileName();
+		defineColumn_Resolution();
 		defineColumn_ShadowState();
 		defineColumn_ShadowValue();
-		defineColumn_Resolution();
-		defineColumn_ColorImage();
 		defineColumn_TileImagePath();
-		defineColumn_ProfileId();
 	}
 
 	/**
@@ -1191,6 +1189,7 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 	private int getImageWidth() {
 
 		int width;
+
 		if (_tcProfileImage == null) {
 			width = _defaultImageWidth;
 		} else {
@@ -1308,10 +1307,10 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 	}
 
 	private void onPaintColorImage(final Event event) {
-		
+
 		final TableItem item = (TableItem) event.item;
 		final SRTMProfile profile = (SRTMProfile) item.getData();
-		
+
 		final Image image = profile.getRgbVertexImage().getValidatedImage(getImageWidth(), _imageHeight, true);
 
 		if (image != null) {
@@ -1634,7 +1633,9 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 	 * save state of the pref page
 	 */
 	private void saveState() {
+
 		_booleanEditorApplyOption.store();
+
 		saveSelectedProfile();
 		saveViewerState();
 	}

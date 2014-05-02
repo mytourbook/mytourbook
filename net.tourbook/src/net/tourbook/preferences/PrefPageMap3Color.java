@@ -569,6 +569,7 @@ public class PrefPageMap3Color extends PreferencePage implements IWorkbenchPrefe
 		 * Create tree viewer
 		 */
 		_colorProfileViewer = new CheckboxTreeViewer(tree);
+
 		_columnManager.createColumns(_colorProfileViewer);
 
 		_tcProfileImage = _colDefProfileImage.getTreeColumn();
@@ -578,6 +579,8 @@ public class PrefPageMap3Color extends PreferencePage implements IWorkbenchPrefe
 
 		_colorProfileViewer.setContentProvider(new ContentProvider());
 		_colorProfileViewer.setComparator(new Map3ProfileComparator());
+
+		_colorProfileViewer.setUseHashlookup(true);
 
 		_colorProfileViewer.addSelectionChangedListener(new ISelectionChangedListener() {
 			public void selectionChanged(final SelectionChangedEvent event) {
