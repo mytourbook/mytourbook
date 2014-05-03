@@ -872,8 +872,8 @@
 			<command
 				commandId="command.net.tourbook.sign.ImportTourSignsFromFolder"
 				icon="icons/tour-sign-import.png"
-				label="%Action_TourMarker_ImportTourSignsFromFolder"
-				mnemonic="%Action_TourMarker_ImportTourSignsFromFolder_Mnemonic"/>
+				label="%Action_TourSign_ImportTourSignsFromFolder"
+				mnemonic="%Action_TourSign_ImportTourSignsFromFolder_Mnemonic"/>
 
 		</menuContribution>
 
@@ -898,8 +898,8 @@
 			<command
 				commandId="command.net.tourbook.sign.ImportTourSigns"
 				icon="icons/tour-sign-import.png"
-				label="%Action_TourMarker_ImportTourSigns"
-				mnemonic="%Action_TourMarker_ImportTourSigns_Mnemonic"/>
+				label="%Action_TourSign_ImportTourSigns"
+				mnemonic="%Action_TourSign_ImportTourSigns_Mnemonic"/>
 			
 		</menuContribution>
 
@@ -1131,12 +1131,12 @@
 		-->            
 		
 		<command id="command.net.tourbook.sign.ImportTourSigns"
-			name="%Action_TourMarker_ImportTourSigns"
+			name="%Action_TourSign_ImportTourSigns"
 			defaultHandler="net.tourbook.sign.ActionHandlerImportSigns"
 			/>
 
 		<command id="command.net.tourbook.sign.ImportTourSignsFromFolder"
-			name="%Action_TourMarker_ImportTourSignsFromFolder"
+			name="%Action_TourSign_ImportTourSignsFromFolder"
 			defaultHandler="net.tourbook.sign.ActionHandlerImportSignsFromFolder"
 			/>
 	           

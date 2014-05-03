@@ -62,6 +62,7 @@ import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
+import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITreeContentProvider;
@@ -170,6 +171,7 @@ public class PrefPageSigns extends PreferencePage implements IWorkbenchPreferenc
 			// run in UI thread
 			Display.getDefault().syncExec(new Runnable() {
 
+				@Override
 				public void run() {
 
 					if (_signViewer.getTree().isDisposed()) {
@@ -187,7 +189,7 @@ public class PrefPageSigns extends PreferencePage implements IWorkbenchPreferenc
 	/**
 	 * Sort the signs and categories
 	 */
-	private final static class SignViewerComparator extends ViewerComparator {
+	private final class SignViewerComparator extends ViewerComparator {
 		@Override
 		public int compare(final Viewer viewer, final Object obj1, final Object obj2) {
 			if (obj1 instanceof TVIPrefSign && obj2 instanceof TVIPrefSign) {
@@ -229,16 +231,20 @@ public class PrefPageSigns extends PreferencePage implements IWorkbenchPreferenc
 
 	private final class SignViewerContentProvicer implements ITreeContentProvider {
 
+		@Override
 		public void dispose() {}
 
+		@Override
 		public Object[] getChildren(final Object parentElement) {
 			return ((TreeViewerItem) parentElement).getFetchedChildrenAsArray();
 		}
 
+		@Override
 		public Object[] getElements(final Object inputElement) {
 			return _rootItem.getFetchedChildrenAsArray();
 		}
 
+		@Override
 		public Object getParent(final Object element) {
 			return ((TreeViewerItem) element).getParentItem();
 		}
@@ -247,10 +253,12 @@ public class PrefPageSigns extends PreferencePage implements IWorkbenchPreferenc
 //			return _rootItem;
 //		}
 
+		@Override
 		public boolean hasChildren(final Object element) {
 			return ((TreeViewerItem) element).hasChildren();
 		}
 
+		@Override
 		public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
 	}
 
@@ -326,6 +334,7 @@ public class PrefPageSigns extends PreferencePage implements IWorkbenchPreferenc
 		menuMgr.setRemoveAllWhenShown(true);
 
 		menuMgr.addMenuListener(new IMenuListener() {
+			@Override
 			public void menuAboutToShow(final IMenuManager menuMgr2) {
 //				fillContextMenu(menuMgr2);
 			}
@@ -406,10 +415,14 @@ public class PrefPageSigns extends PreferencePage implements IWorkbenchPreferenc
 		final Tree tree = new Tree(parent, //
 				SWT.H_SCROLL //
 						| SWT.V_SCROLL
-//				| SWT.BORDER
+//						| SWT.BORDER
 						| SWT.MULTI
 						| SWT.FULL_SELECTION);
-		GridDataFactory.fillDefaults().grab(true, true).applyTo(tree);
+
+		GridDataFactory.fillDefaults()//
+				.grab(true, true)
+				.hint(_pc.convertWidthInCharsToPixels(60), _pc.convertHeightInCharsToPixels(30))
+				.applyTo(tree);
 
 		DEFAULT_ROW_HEIGHT = tree.getItemHeight();
 
@@ -421,9 +434,11 @@ public class PrefPageSigns extends PreferencePage implements IWorkbenchPreferenc
 		 * critical for performance that these methods be as efficient as possible.
 		 */
 		final Listener paintListener = new Listener() {
+			@Override
 			public void handleEvent(final Event event) {
 
-				if (event.index == _signImageColumn && (event.type == SWT.MeasureItem || event.type == SWT.PaintItem)) {
+				if (event.index == _signImageColumn //
+						&& (event.type == SWT.MeasureItem || event.type == SWT.PaintItem)) {
 
 					onViewerPaint(event);
 				}
@@ -448,6 +463,7 @@ public class PrefPageSigns extends PreferencePage implements IWorkbenchPreferenc
 		_signViewer.setUseHashlookup(true);
 
 		_signViewer.addDoubleClickListener(new IDoubleClickListener() {
+			@Override
 			public void doubleClick(final DoubleClickEvent event) {
 
 				final Object selection = ((IStructuredSelection) _signViewer.getSelection()).getFirstElement();
@@ -469,9 +485,9 @@ public class PrefPageSigns extends PreferencePage implements IWorkbenchPreferenc
 
 					} else {
 
-						if (_expandedItem != null) {
-							_signViewer.collapseToLevel(_expandedItem, 1);
-						}
+//						if (_expandedItem != null) {
+//							_signViewer.collapseToLevel(_expandedItem, 1);
+//						}
 
 						_signViewer.expandToLevel(treeItem, 1);
 						_expandedItem = treeItem;
@@ -482,6 +498,7 @@ public class PrefPageSigns extends PreferencePage implements IWorkbenchPreferenc
 
 		_signViewer.addTreeListener(new ITreeViewerListener() {
 
+			@Override
 			public void treeCollapsed(final TreeExpansionEvent event) {
 
 				if (event.getElement() instanceof TVIPrefSignCategory) {
@@ -489,14 +506,15 @@ public class PrefPageSigns extends PreferencePage implements IWorkbenchPreferenc
 				}
 			}
 
+			@Override
 			public void treeExpanded(final TreeExpansionEvent event) {
 
-				final Object element = event.getElement();
-
-				if (element instanceof TVIPrefSignCategory) {
-
-					final TVIPrefSignCategory treeItem = (TVIPrefSignCategory) element;
-
+//				final Object element = event.getElement();
+//
+//				if (element instanceof TVIPrefSignCategory) {
+//
+//					final TVIPrefSignCategory treeItem = (TVIPrefSignCategory) element;
+//
 //					if (_expandedItem != null) {
 //						_signViewer.collapseToLevel(_expandedItem, 1);
 //					}
@@ -507,10 +525,12 @@ public class PrefPageSigns extends PreferencePage implements IWorkbenchPreferenc
 //							_expandedItem = treeItem;
 //						}
 //					});
-				}
+//				}
 			}
 		});
+
 		_signViewer.addSelectionChangedListener(new ISelectionChangedListener() {
+			@Override
 			public void selectionChanged(final SelectionChangedEvent event) {
 				enableButtons();
 			}
@@ -652,6 +672,7 @@ public class PrefPageSigns extends PreferencePage implements IWorkbenchPreferenc
 
 		defineColumn_Name();
 		defineColumn_Image();
+		defineColumn_Spacer();
 	}
 
 	/**
@@ -665,9 +686,12 @@ public class PrefPageSigns extends PreferencePage implements IWorkbenchPreferenc
 //		colDef.setColumnLabel(Messages.profileViewer_column_label_color);
 //		colDef.setColumnHeader(Messages.profileViewer_column_label_color_header);
 //		colDef.setColumnToolTipText(Messages.profileViewer_column_label_color_tooltip);
+
 		colDef.setDefaultColumnWidth(DEFAULT_IMAGE_WIDTH);
 		colDef.setIsDefaultColumn();
+		colDef.setIsColumnMoveable(false);
 		colDef.setCanModifyVisibility(false);
+
 		colDef.setLabelProvider(new CellLabelProvider() {
 			/*
 			 * !!! set dummy label provider, otherwise an error occures !!!
@@ -694,9 +718,11 @@ public class PrefPageSigns extends PreferencePage implements IWorkbenchPreferenc
 //		colDef.setColumnLabel(Messages.profileViewer_column_label_name);
 //		colDef.setColumnHeader(Messages.profileViewer_column_label_name_header);
 //		colDef.setColumnToolTipText(Messages.profileViewer_column_label_name_tooltip);
+
 		colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(30));
-//		colDef.setColumnWeightData(new ColumnWeightData(100, true));
 		colDef.setIsDefaultColumn();
+		colDef.setIsColumnMoveable(false);
+		colDef.setCanModifyVisibility(false);
 
 		colDef.setLabelProvider(new StyledCellLabelProvider() {
 			@Override
@@ -738,8 +764,35 @@ public class PrefPageSigns extends PreferencePage implements IWorkbenchPreferenc
 					styledString.append(element.toString());
 				}
 
-				cell.setText(styledString.getString() + "   #" + _uiCounter++);
+				cell.setText(styledString.getString());
 				cell.setStyleRanges(styledString.getStyleRanges());
+			}
+		});
+	}
+
+	/**
+	 * Column: Spacer
+	 * <p>
+	 * This column is used for Linux that the last column is NOT the image column, otherwise the
+	 * image column width has a strange behaviour.
+	 */
+	private void defineColumn_Spacer() {
+
+		final TreeColumnDefinition colDef = new TreeColumnDefinition(_columnManager, "spacer", SWT.LEAD); //$NON-NLS-1$
+
+//		colDef.setColumnLabel(Messages.profileViewer_column_label_name);
+//		colDef.setColumnHeader(Messages.profileViewer_column_label_name_header);
+//		colDef.setColumnToolTipText(Messages.profileViewer_column_label_name_tooltip);
+
+		colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(2));
+		colDef.setIsDefaultColumn();
+		colDef.setIsColumnMoveable(false);
+		colDef.setCanModifyVisibility(false);
+
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+				cell.setText(UI.EMPTY_STRING);
 			}
 		});
 	}
@@ -803,6 +856,7 @@ public class PrefPageSigns extends PreferencePage implements IWorkbenchPreferenc
 //		}
 	}
 
+	@Override
 	public ColumnManager getColumnManager() {
 		return _columnManager;
 	}
@@ -866,10 +920,17 @@ public class PrefPageSigns extends PreferencePage implements IWorkbenchPreferenc
 		return _rootItem;
 	}
 
+	private int getRowHeight() {
+
+		return Math.min(MAX_ROW_HEIGHT, Math.max(DEFAULT_ROW_HEIGHT, _imageColumnWidth));
+	}
+
+	@Override
 	public ColumnViewer getViewer() {
 		return _signViewer;
 	}
 
+	@Override
 	public void init(final IWorkbench workbench) {
 		setPreferenceStore(TourbookPlugin.getDefault().getPreferenceStore());
 	}
@@ -878,7 +939,7 @@ public class PrefPageSigns extends PreferencePage implements IWorkbenchPreferenc
 
 		_pc = new PixelConverter(parent);
 
-		DEFAULT_IMAGE_WIDTH = _pc.convertWidthInCharsToPixels(5);
+		DEFAULT_IMAGE_WIDTH = _pc.convertWidthInCharsToPixels(6);
 //		MAX_ROW_HEIGHT = _pc.convertVerticalDLUsToPixels(24);
 		MAX_ROW_HEIGHT = _pc.convertVerticalDLUsToPixels(50);
 	}
@@ -970,7 +1031,7 @@ public class PrefPageSigns extends PreferencePage implements IWorkbenchPreferenc
 		setFocusToViewer();
 	}
 
-//	private void onNewCategory() {
+	//	private void onNewCategory() {
 //
 //		final InputDialog inputDialog = new InputDialog(
 //				getShell(),
@@ -1341,9 +1402,9 @@ public class PrefPageSigns extends PreferencePage implements IWorkbenchPreferenc
 		_imageColumnWidth = imageColumnWidth;
 
 		// update images
-		Hack.setTreeItemHeight(
-				_signViewer.getTree(),
-				Math.min(MAX_ROW_HEIGHT, Math.max(DEFAULT_ROW_HEIGHT, imageColumnWidth)));
+		if (UI.IS_WIN) {
+			Hack.setTreeItemHeight(_signViewer.getTree(), getRowHeight());
+		}
 	}
 
 	private void onViewerPaint(final Event event) {
@@ -1365,7 +1426,14 @@ public class PrefPageSigns extends PreferencePage implements IWorkbenchPreferenc
 				switch (event.type) {
 				case SWT.MeasureItem:
 
-					// this is replaced with Hack.setTreeItemHeight()
+					// this is replaced with Hack.setTreeItemHeight() for win
+
+//					event.width += imageRect.width;
+//					event.height = Math.max(event.height, imageRect.height + 2);
+
+					if (UI.IS_WIN == false) {
+						event.height = getRowHeight();
+					}
 
 					break;
 
@@ -1456,23 +1524,34 @@ public class PrefPageSigns extends PreferencePage implements IWorkbenchPreferenc
 		return true;
 	}
 
+	@Override
 	public ColumnViewer recreateViewer(final ColumnViewer columnViewer) {
 
 		_viewerContainer.setRedraw(false);
 		{
+			final Object[] expandedElements = _signViewer.getExpandedElements();
+			final ISelection selection = _signViewer.getSelection();
+
 			_signViewer.getTree().dispose();
 
 			createUI_22_SignViewer_Table(_viewerContainer);
+
 			_viewerContainer.layout();
 
 			// update the viewer
 			reloadViewer();
+
+			_signViewer.setExpandedElements(expandedElements);
+			_signViewer.setSelection(selection);
 		}
 		_viewerContainer.setRedraw(true);
+
+		onResizeImageColumn();
 
 		return _signViewer;
 	}
 
+	@Override
 	public void reloadViewer() {
 		_signViewer.setInput(new Object[0]);
 	}

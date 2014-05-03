@@ -651,7 +651,7 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 			GridDataFactory.fillDefaults().grab(true, true).applyTo(profileContainer);
 			GridLayoutFactory.fillDefaults().numColumns(2).extendedMargins(0, 0, 0, 0).applyTo(profileContainer);
 			{
-				createUI_10_ProfileViewer(profileContainer);
+				createUI_10_ProfileViewer_Container(profileContainer);
 				createUI_20_Actions(profileContainer);
 			}
 		}
@@ -661,7 +661,7 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 		return container;
 	}
 
-	private void createUI_10_ProfileViewer(final Composite parent) {
+	private void createUI_10_ProfileViewer_Container(final Composite parent) {
 
 		// define all columns for the viewer
 		_columnManager = new ColumnManager(this, _state);
@@ -671,11 +671,11 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 		GridDataFactory.fillDefaults().grab(true, true).applyTo(_viewerContainer);
 		GridLayoutFactory.fillDefaults().applyTo(_viewerContainer);
 		{
-			createUI_12_ProfileViewer(_viewerContainer);
+			createUI_12_ProfileViewer_Table(_viewerContainer);
 		}
 	}
 
-	private void createUI_12_ProfileViewer(final Composite parent) {
+	private void createUI_12_ProfileViewer_Table(final Composite parent) {
 
 		final Table table = new Table(parent, SWT.FULL_SELECTION | SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL | SWT.CHECK);
 		GridDataFactory.fillDefaults().grab(true, true).applyTo(table);
@@ -1459,7 +1459,7 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 		{
 			_profileViewer.getTable().dispose();
 
-			createUI_12_ProfileViewer(_viewerContainer);
+			createUI_12_ProfileViewer_Table(_viewerContainer);
 			_viewerContainer.layout();
 
 			// update the viewer

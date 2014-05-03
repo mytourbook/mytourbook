@@ -22,6 +22,8 @@ public class Messages extends NLS {
 	private static final String	BUNDLE_NAME	= "net.tourbook.common.util.messages";	//$NON-NLS-1$
 
 	public static String		Action_App_ConfigureColumns;
+	public static String	Action_App_SizeAllColumnsToDefaults;
+
 	public static String		Action_App_SizeAllColumnsToFit;
 
 	public static String		Advanced_Menu_AnimationSymbol;

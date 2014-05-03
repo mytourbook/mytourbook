@@ -123,6 +123,8 @@ public class DialogImportSignIcons extends TitleAreaDialog {
 
 		super(parentShell);
 
+		TEMP_DB_cleanup();
+
 		// make dialog resizable
 		setShellStyle(getShellStyle() | SWT.RESIZE | SWT.MAX);
 
