@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2012  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -18,9 +18,9 @@ package net.tourbook.photo;
 public interface ILoadCallBack {
 
 	/**
-	 * @param isUpdateUI
+	 * @param isImageLoaded
 	 *            Is <code>false</code> when an image could not be loaded.
 	 */
-	void callBackImageIsLoaded(boolean isUpdateUI);
+	void callBackImageIsLoaded(boolean isImageLoaded);
 
 }

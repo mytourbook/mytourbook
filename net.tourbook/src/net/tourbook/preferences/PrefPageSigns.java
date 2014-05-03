@@ -20,6 +20,7 @@ import java.sql.SQLException;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.Hack;
 import net.tourbook.common.util.ColumnManager;
 import net.tourbook.common.util.ITourViewer;
 import net.tourbook.common.util.TreeColumnDefinition;
@@ -27,6 +28,13 @@ import net.tourbook.common.util.TreeViewerItem;
 import net.tourbook.data.TourSign;
 import net.tourbook.data.TourSignCategory;
 import net.tourbook.database.TourDatabase;
+import net.tourbook.photo.ILoadCallBack;
+import net.tourbook.photo.ImageQuality;
+import net.tourbook.photo.Photo;
+import net.tourbook.photo.PhotoImageCache;
+import net.tourbook.photo.PhotoLoadManager;
+import net.tourbook.photo.PhotoLoadingState;
+import net.tourbook.photo.RendererHelper;
 import net.tourbook.sign.TVIPrefSign;
 import net.tourbook.sign.TVIPrefSignCategory;
 import net.tourbook.sign.TVIPrefSignRoot;
@@ -73,6 +81,9 @@ import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
@@ -86,18 +97,19 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
+import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.eclipse.ui.dialogs.PreferencesUtil;
 
 public class PrefPageSigns extends PreferencePage implements IWorkbenchPreferencePage, ITourViewer {
 
-	public static final String		ID				= "net.tourbook.preferences.PrefPageSigns"; //$NON-NLS-1$
+	public static final String		ID					= "net.tourbook.preferences.PrefPageSigns"; //$NON-NLS-1$
 
-	private static final String		SORT_PROPERTY	= "sort";									//$NON-NLS-1$
+	private static final String		SORT_PROPERTY		= "sort";									//$NON-NLS-1$
 
-	private final IPreferenceStore	_prefStore		= TourbookPlugin.getPrefStore();
-	private final IDialogSettings	_state			= TourbookPlugin.getState("PrefPageSigns"); //$NON-NLS-1$
+	private final IPreferenceStore	_prefStore			= TourbookPlugin.getPrefStore();
+	private final IDialogSettings	_state				= TourbookPlugin.getState("PrefPageSigns"); //$NON-NLS-1$
 
 	private IPropertyChangeListener	_prefChangeListener;
 
@@ -107,16 +119,19 @@ public class PrefPageSigns extends PreferencePage implements IWorkbenchPreferenc
 	private TreeColumnDefinition	_colDefImage;
 	private TreeViewerItem			_expandedItem;
 
-	private int						_defaultImageWidth;
-	private int						_oldImageWidth	= -1;
+	private int						DEFAULT_IMAGE_WIDTH;
+	private int						DEFAULT_ROW_HEIGHT;
+	private int						MAX_ROW_HEIGHT;
+	private int						_imageColumnWidth	= -1;
 
 	/**
 	 * Contains the tree column widget for the sign image.
 	 */
 	private TreeColumn				_tcSignImage;
-	private int						_profileImageColumn;
+	private int						_signImageColumn;
 
-	private boolean					_isModified		= false;
+	private boolean					_isModified			= false;
+	private int						_uiCounter;
 
 	private long					_dragStartTime;
 
@@ -131,11 +146,43 @@ public class PrefPageSigns extends PreferencePage implements IWorkbenchPreferenc
 	private Button					_btnNewSignCategory;
 	private Button					_btnRename;
 	private Button					_btnReset;
-
 	/*
 	 * None UI controls
 	 */
 	private PixelConverter			_pc;
+
+	private class LoadImageCallback implements ILoadCallBack {
+
+		private TVIPrefSign	_prefSign;
+
+		public LoadImageCallback(final TVIPrefSign prefSign) {
+
+			_prefSign = prefSign;
+		}
+
+		@Override
+		public void callBackImageIsLoaded(final boolean isImageLoaded) {
+
+			if (isImageLoaded == false) {
+				return;
+			}
+
+			// run in UI thread
+			Display.getDefault().syncExec(new Runnable() {
+
+				public void run() {
+
+					if (_signViewer.getTree().isDisposed()) {
+						return;
+					}
+
+					// update sign image
+					_signViewer.update(_prefSign, null);
+				}
+			});
+
+		}
+	}
 
 	/**
 	 * Sort the signs and categories
@@ -248,13 +295,18 @@ public class PrefPageSigns extends PreferencePage implements IWorkbenchPreferenc
 	@Override
 	protected Control createContents(final Composite parent) {
 
+		PhotoImageCache.disposeAll();
+
 		initUI(parent);
 
 		final Composite ui = createUI(parent);
 
 		fillToolbar();
 
-		// set root item
+		// set initial row height
+		onResizeImageColumn();
+
+		// set viewer root item
 		_rootItem = new TVIPrefSignRoot(_signViewer);
 
 		updateSignViewer();
@@ -359,6 +411,8 @@ public class PrefPageSigns extends PreferencePage implements IWorkbenchPreferenc
 						| SWT.FULL_SELECTION);
 		GridDataFactory.fillDefaults().grab(true, true).applyTo(tree);
 
+		DEFAULT_ROW_HEIGHT = tree.getItemHeight();
+
 		tree.setHeaderVisible(true);
 		tree.setLinesVisible(getPreferenceStore().getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
 
@@ -369,8 +423,7 @@ public class PrefPageSigns extends PreferencePage implements IWorkbenchPreferenc
 		final Listener paintListener = new Listener() {
 			public void handleEvent(final Event event) {
 
-				if (event.index == _profileImageColumn
-						&& (event.type == SWT.MeasureItem || event.type == SWT.PaintItem)) {
+				if (event.index == _signImageColumn && (event.type == SWT.MeasureItem || event.type == SWT.PaintItem)) {
 
 					onViewerPaint(event);
 				}
@@ -387,7 +440,7 @@ public class PrefPageSigns extends PreferencePage implements IWorkbenchPreferenc
 		_columnManager.createColumns(_signViewer);
 
 		_tcSignImage = _colDefImage.getTreeColumn();
-		_profileImageColumn = _colDefImage.getCreateIndex();
+		_signImageColumn = _colDefImage.getCreateIndex();
 
 		_signViewer.setContentProvider(new SignViewerContentProvicer());
 		_signViewer.setComparator(new SignViewerComparator());
@@ -408,25 +461,6 @@ public class PrefPageSigns extends PreferencePage implements IWorkbenchPreferenc
 				} else if (selection instanceof TVIPrefSignCategory) {
 
 					// expand/collapse current item
-
-//					final TreeViewerItem tourItem = (TreeViewerItem) selection;
-//
-//					if (_signViewer.getExpandedState(tourItem)) {
-//						_signViewer.collapseToLevel(tourItem, 1);
-//					} else {
-//						_signViewer.expandToLevel(tourItem, 1);
-//					}
-
-//
-//
-//
-//
-//
-//
-//
-//
-//
-					// expand/collapse current item
 					final TVIPrefSignCategory treeItem = (TVIPrefSignCategory) selection;
 
 					if (_signViewer.getExpandedState(treeItem)) {
@@ -441,11 +475,7 @@ public class PrefPageSigns extends PreferencePage implements IWorkbenchPreferenc
 
 						_signViewer.expandToLevel(treeItem, 1);
 						_expandedItem = treeItem;
-
-						// expanding the treeangle, the layout is correctly done but not with double click
-//						layoutContainer.layout(true, true);
 					}
-
 				}
 			}
 		});
@@ -467,16 +497,16 @@ public class PrefPageSigns extends PreferencePage implements IWorkbenchPreferenc
 
 					final TVIPrefSignCategory treeItem = (TVIPrefSignCategory) element;
 
-					if (_expandedItem != null) {
-						_signViewer.collapseToLevel(_expandedItem, 1);
-					}
-
-					Display.getCurrent().asyncExec(new Runnable() {
-						public void run() {
-							_signViewer.expandToLevel(treeItem, 1);
-							_expandedItem = treeItem;
-						}
-					});
+//					if (_expandedItem != null) {
+//						_signViewer.collapseToLevel(_expandedItem, 1);
+//					}
+//
+//					Display.getCurrent().asyncExec(new Runnable() {
+//						public void run() {
+//							_signViewer.expandToLevel(treeItem, 1);
+//							_expandedItem = treeItem;
+//						}
+//					});
 				}
 			}
 		});
@@ -635,7 +665,7 @@ public class PrefPageSigns extends PreferencePage implements IWorkbenchPreferenc
 //		colDef.setColumnLabel(Messages.profileViewer_column_label_color);
 //		colDef.setColumnHeader(Messages.profileViewer_column_label_color_header);
 //		colDef.setColumnToolTipText(Messages.profileViewer_column_label_color_tooltip);
-		colDef.setDefaultColumnWidth(_defaultImageWidth);
+		colDef.setDefaultColumnWidth(DEFAULT_IMAGE_WIDTH);
 		colDef.setIsDefaultColumn();
 		colDef.setCanModifyVisibility(false);
 		colDef.setLabelProvider(new CellLabelProvider() {
@@ -679,14 +709,14 @@ public class PrefPageSigns extends PreferencePage implements IWorkbenchPreferenc
 
 					final TourSign tourSign = ((TVIPrefSign) element).getTourSign();
 
-					styledString.append(tourSign.getSignName(), UI.TAG_STYLER);
+					styledString.append(tourSign.getSignName(), null);
 
 				} else if (element instanceof TVIPrefSignCategory) {
 
 					final TVIPrefSignCategory tourSignCategoryItem = (TVIPrefSignCategory) element;
 					final TourSignCategory tourSignCategory = tourSignCategoryItem.getTourSignCategory();
 
-					styledString.append(tourSignCategory.getCategoryName(), UI.TAG_CATEGORY_STYLER);
+					styledString.append(tourSignCategory.getCategoryName(), null);
 
 					// get number of categories
 					final int categoryCounter = tourSignCategory.getCategoryCounter();
@@ -708,7 +738,7 @@ public class PrefPageSigns extends PreferencePage implements IWorkbenchPreferenc
 					styledString.append(element.toString());
 				}
 
-				cell.setText(styledString.getString());
+				cell.setText(styledString.getString() + "   #" + _uiCounter++);
 				cell.setStyleRanges(styledString.getStyleRanges());
 			}
 		});
@@ -749,7 +779,7 @@ public class PrefPageSigns extends PreferencePage implements IWorkbenchPreferenc
 
 		final ToolBarManager tbm = new ToolBarManager(_toolBar);
 
-		tbm.add(new ActionExpandSelection(this));
+		tbm.add(new ActionExpandSelection(this, TreeViewer.ALL_LEVELS));
 		tbm.add(new ActionCollapseAll(this));
 
 		tbm.update(true);
@@ -781,16 +811,55 @@ public class PrefPageSigns extends PreferencePage implements IWorkbenchPreferenc
 		return _dragStartTime;
 	}
 
-	private int getImageWidth() {
+	private int getImageColumnWidth() {
 
 		int width;
 		if (_tcSignImage == null) {
-			width = _defaultImageWidth;
+			width = DEFAULT_IMAGE_WIDTH;
 		} else {
 			width = _tcSignImage.getWidth();
 		}
 
 		return width;
+	}
+
+	/**
+	 * @param prefSign
+	 * @return Returns the photo image or <code>null</code> when image is not loaded.
+	 */
+	private Image getPhotoImage(final TVIPrefSign prefSign) {
+
+		final Photo signPhoto = prefSign.getSignImagePhoto();
+		Image photoImage = null;
+
+		final ImageQuality requestedImageQuality = ImageQuality.THUMB;
+
+		// check if image has an loading error
+		final PhotoLoadingState photoLoadingState = signPhoto.getLoadingState(requestedImageQuality);
+
+		if (photoLoadingState != PhotoLoadingState.IMAGE_IS_INVALID) {
+
+			// image is not yet loaded
+
+			// check if image is in the cache
+			photoImage = PhotoImageCache.getImage(signPhoto, requestedImageQuality);
+
+			if ((photoImage == null || photoImage.isDisposed())
+					&& photoLoadingState == PhotoLoadingState.IMAGE_IS_IN_LOADING_QUEUE == false) {
+
+				// the requested image is not available in the image cache -> image must be loaded
+
+				final ILoadCallBack imageLoadCallback = new LoadImageCallback(prefSign);
+
+				PhotoLoadManager.putImageInLoadingQueueThumbGallery(
+						null,
+						signPhoto,
+						requestedImageQuality,
+						imageLoadCallback);
+			}
+		}
+
+		return photoImage;
 	}
 
 	public TVIPrefSignRoot getRootItem() {
@@ -809,7 +878,9 @@ public class PrefPageSigns extends PreferencePage implements IWorkbenchPreferenc
 
 		_pc = new PixelConverter(parent);
 
-		_defaultImageWidth = _pc.convertWidthInCharsToPixels(5);
+		DEFAULT_IMAGE_WIDTH = _pc.convertWidthInCharsToPixels(5);
+//		MAX_ROW_HEIGHT = _pc.convertVerticalDLUsToPixels(24);
+		MAX_ROW_HEIGHT = _pc.convertVerticalDLUsToPixels(50);
 	}
 
 	@Override
@@ -1260,19 +1331,110 @@ public class PrefPageSigns extends PreferencePage implements IWorkbenchPreferenc
 
 	private void onResizeImageColumn() {
 
-		final int newImageWidth = getImageWidth();
+		final int imageColumnWidth = getImageColumnWidth();
 
 		// check if the width has changed
-		if (newImageWidth == _oldImageWidth) {
+		if (imageColumnWidth == _imageColumnWidth) {
 			return;
 		}
 
-		// recreate images
-//		disposeProfileImages();
+		_imageColumnWidth = imageColumnWidth;
+
+		// update images
+		Hack.setTreeItemHeight(
+				_signViewer.getTree(),
+				Math.min(MAX_ROW_HEIGHT, Math.max(DEFAULT_ROW_HEIGHT, imageColumnWidth)));
 	}
 
 	private void onViewerPaint(final Event event) {
 
+		final TreeItem item = (TreeItem) event.item;
+		final Object itemData = item.getData();
+		if (itemData instanceof TVIPrefSign) {
+
+			final TVIPrefSign prefSign = (TVIPrefSign) itemData;
+
+			final Image signImage = getPhotoImage(prefSign);
+
+			if (signImage != null) {
+
+				final Rectangle imageRect = signImage.getBounds();
+
+				final int photoPosX = event.x;
+				final int photoPosY = event.y;
+				switch (event.type) {
+				case SWT.MeasureItem:
+
+					// this is replaced with Hack.setTreeItemHeight()
+
+					break;
+
+				case SWT.PaintItem:
+
+					final Photo photo = prefSign.getSignImagePhoto();
+
+					final int _paintedImageWidth = imageRect.width;
+					final int _paintedImageHeight = imageRect.height;
+					final int imageCanvasWidth = Math.max(DEFAULT_ROW_HEIGHT, _imageColumnWidth);
+					final int imageCanvasHeight = event.height;
+
+					int paintedDest_Width;
+					int paintedDest_Height;
+					int paintedDest_DevX;
+					int paintedDest_DevY;
+
+					final Point bestSize = RendererHelper.getBestSize(
+							photo,
+							_paintedImageWidth,
+							_paintedImageHeight,
+							imageCanvasWidth,
+							imageCanvasHeight);
+
+					paintedDest_Width = bestSize.x;
+					paintedDest_Height = bestSize.y;
+
+					// get center offset
+					final int centerOffsetX = (imageCanvasWidth - paintedDest_Width) / 2;
+					final int centerOffsetY = (imageCanvasHeight - paintedDest_Height) / 2;
+
+					paintedDest_DevX = photoPosX + centerOffsetX;
+					paintedDest_DevY = photoPosY + centerOffsetY;
+
+					try {
+
+						try {
+
+							event.gc.drawImage(signImage, //
+									0,
+									0,
+									_paintedImageWidth,
+									_paintedImageHeight,
+									//
+									paintedDest_DevX,
+									paintedDest_DevY,
+									paintedDest_Width,
+									paintedDest_Height);
+
+						} catch (final Exception e) {
+
+							System.out
+									.println("SWT exception occured when painting valid image " //$NON-NLS-1$
+											+ photo.imageFilePathName
+											+ " it's potentially this bug: https://bugs.eclipse.org/bugs/show_bug.cgi?id=375845"); //$NON-NLS-1$
+
+							// ensure image is valid after reloading
+							PhotoImageCache.disposeAll();
+						}
+
+					} catch (final Exception e) {
+
+						event.gc.drawString(e.getMessage(), photoPosX, photoPosY);
+					}
+
+					break;
+				}
+			}
+		}
 	}
 
 	@Override

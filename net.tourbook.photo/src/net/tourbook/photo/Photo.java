@@ -27,7 +27,6 @@ import net.tourbook.common.map.CommonMapProvider;
 import net.tourbook.common.map.GeoPosition;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
-import net.tourbook.photo.internal.gallery.MT20.RendererHelper;
 
 import org.apache.commons.imaging.Imaging;
 import org.apache.commons.imaging.ImagingConstants;

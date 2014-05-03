@@ -55,7 +55,6 @@ import net.tourbook.photo.internal.gallery.MT20.IGalleryContextMenuProvider;
 import net.tourbook.photo.internal.gallery.MT20.IItemListener;
 import net.tourbook.photo.internal.manager.ExifCache;
 import net.tourbook.photo.internal.manager.GallerySorting;
-import net.tourbook.photo.internal.manager.ImageUtils;
 import net.tourbook.photo.internal.manager.ThumbnailStore;
 
 import org.eclipse.core.runtime.IProgressMonitor;

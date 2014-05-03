@@ -28,13 +28,13 @@ import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.TreeViewerItem;
 import net.tourbook.common.util.Util;
 import net.tourbook.photo.IPhotoPreferences;
+import net.tourbook.photo.ImageUtils;
 import net.tourbook.photo.PhotoCache;
 import net.tourbook.photo.PhotoImageCache;
 import net.tourbook.photo.PhotoLoadManager;
 import net.tourbook.photo.PhotoUI;
 import net.tourbook.photo.PicDirView;
 import net.tourbook.photo.internal.manager.ExifCache;
-import net.tourbook.photo.internal.manager.ImageUtils;
 import net.tourbook.photo.internal.manager.ThumbnailStore;
 import net.tourbook.photo.internal.preferences.PrefPagePhotoExternalApp;
 

@@ -401,9 +401,16 @@ public class ColumnManager {
 		tc.setData(colDef);
 		colDef.setTreeColumn(tc);
 
+		// add selection listener
 		final SelectionAdapter columnSelectionListener = colDef.getColumnSelectionListener();
 		if (columnSelectionListener != null) {
 			tc.addSelectionListener(columnSelectionListener);
+		}
+
+		// add resize/move listener
+		final ControlListener columnControlListener = colDef.getColumnControlListener();
+		if (columnControlListener != null) {
+			tc.addControlListener(columnControlListener);
 		}
 	}
 

@@ -31,6 +31,7 @@ import net.tourbook.common.util.SWT2Dutil;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.photo.ILoadCallBack;
 import net.tourbook.photo.ImageQuality;
+import net.tourbook.photo.ImageUtils;
 import net.tourbook.photo.Photo;
 import net.tourbook.photo.PhotoImageCache;
 import net.tourbook.photo.PhotoImageMetadata;

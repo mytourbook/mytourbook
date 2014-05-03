@@ -9,9 +9,8 @@
  *    Nicolas Richeton (nicolas.richeton@gmail.com) - initial API and implementation
  *    Richard Michalsky - bug 195439
  *******************************************************************************/
-package net.tourbook.photo.internal.gallery.MT20;
+package net.tourbook.photo;
 
-import net.tourbook.photo.Photo;
 
 import org.eclipse.swt.graphics.Point;
 

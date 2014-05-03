@@ -15,7 +15,10 @@
  *******************************************************************************/
 package net.tourbook.sign;
 
+import java.io.File;
+
 import net.tourbook.data.TourSign;
+import net.tourbook.photo.Photo;
 
 import org.eclipse.jface.viewers.TreeViewer;
 
@@ -23,16 +26,31 @@ public class TVIPrefSign extends TVIPrefSignItem {
 
 	private TourSign	_tourSign;
 
+	/**
+	 * The sign image is wrapped into a {@link Photo} which allows loading of the photo (sign)
+	 * image.
+	 */
+	private Photo		_signImagePhoto;
+
 	public TVIPrefSign(final TreeViewer signViewer, final TourSign tourSign) {
 
 		super(signViewer);
 
 		_tourSign = tourSign;
+
+		// setup sign image
+		final File photoImageFile = new File(tourSign.getImageFilePathName());
+
+		_signImagePhoto = new Photo(photoImageFile);
 	}
 
 	@Override
 	protected void fetchChildren() {
 		// a sign has no children
+	}
+
+	public Photo getSignImagePhoto() {
+		return _signImagePhoto;
 	}
 
 	public TourSign getTourSign() {

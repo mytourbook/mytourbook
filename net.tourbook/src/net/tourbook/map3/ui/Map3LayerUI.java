@@ -269,10 +269,13 @@ public class Map3LayerUI {
 
 		Tree tree;
 		{
-			tree = new Tree(layoutContainer, SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER
-//					| SWT.MULTI
-					| SWT.FULL_SELECTION
-					| SWT.CHECK);
+			tree = new Tree(layoutContainer, //
+					SWT.H_SCROLL //
+							| SWT.V_SCROLL
+//							| SWT.BORDER
+//							| SWT.MULTI
+							| SWT.FULL_SELECTION
+							| SWT.CHECK);
 
 			tree.setHeaderVisible(true);
 			tree.setLinesVisible(false);

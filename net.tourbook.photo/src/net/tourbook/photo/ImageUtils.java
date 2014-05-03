@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2012  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -13,7 +13,7 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.photo.internal.manager;
+package net.tourbook.photo;
 
 import java.awt.Point;
 import java.awt.image.BufferedImage;
@@ -22,7 +22,6 @@ import java.io.File;
 import java.io.FileFilter;
 
 import net.tourbook.common.UI;
-import net.tourbook.photo.IPhotoPreferences;
 import net.tourbook.photo.internal.Activator;
 
 import org.apache.commons.imaging.Imaging;
@@ -303,13 +302,15 @@ public class ImageUtils {
 	 * @return
 	 */
 	public static Image resizeBestSize(final Display display, final Image img, final int maxWidth, final int maxHeight) {
-		// Check for null
+
 		if (img == null) {
 			return null;
 		}
 
+		final Rectangle imageBounds = img.getBounds();
+
 		// Calculate best size
-		final Point newSize = getBestSize(img.getBounds().width, img.getBounds().height, maxWidth, maxHeight);
+		final Point newSize = getBestSize(imageBounds.width, imageBounds.height, maxWidth, maxHeight);
 
 		// Resize image
 		return ImageUtils.resize(display, img, newSize.x, newSize.y);
