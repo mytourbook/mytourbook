@@ -27,14 +27,22 @@ import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.ChartLabel;
 import net.tourbook.chart.SelectionChartXSliderPosition;
 import net.tourbook.common.UI;
+import net.tourbook.common.action.ActionOpenPrefDialog;
 import net.tourbook.common.form.ViewerDetailForm;
 import net.tourbook.common.util.Util;
+import net.tourbook.common.widgets.ImageCanvas;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.database.TourDatabase;
+import net.tourbook.preferences.PrefPageSigns;
+import net.tourbook.sign.SignMenuManager;
 import net.tourbook.ui.tourChart.TourChart;
 import net.tourbook.ui.tourChart.TourChartConfiguration;
 
+import org.eclipse.jface.action.IMenuListener;
+import org.eclipse.jface.action.IMenuManager;
+import org.eclipse.jface.action.MenuManager;
+import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
@@ -79,6 +87,8 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Link;
+import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Sash;
 import org.eclipse.swt.widgets.Shell;
@@ -123,18 +133,22 @@ public class DialogMarker extends TitleAreaDialog {
 	private MouseWheelListener		_defaultMouseWheelListener;
 	private SelectionAdapter		_defaultSelectionAdapter;
 
-	/*
-	 * none UI
-	 */
+	private SignMenuManager			_signMenuManager					= new SignMenuManager();
+	private ActionOpenPrefDialog	_actionOpenTourSignPrefs;
+
 	private boolean					_isOkPressed						= false;
-	protected boolean				_isUpdateUI;
-	private PixelConverter			_pc;
+	private boolean					_isUpdateUI;
 
 	private NumberFormat			_nf3								= NumberFormat.getNumberInstance();
 	{
 		_nf3.setMinimumFractionDigits(3);
 		_nf3.setMaximumFractionDigits(3);
 	}
+
+	/*
+	 * none UI
+	 */
+	private PixelConverter			_pc;
 
 	/*
 	 * UI controls
@@ -152,6 +166,10 @@ public class DialogMarker extends TitleAreaDialog {
 
 	private Combo					_comboMarkerName;
 	private Combo					_comboMarkerPosition;
+
+	private ImageCanvas				_imgTourSign;
+	private Label					_lblSignName;
+	private Link					_linkTourSign;
 
 	private Spinner					_spinOffsetX;
 	private Spinner					_spinOffsetY;
@@ -350,6 +368,13 @@ public class DialogMarker extends TitleAreaDialog {
 		shell.setText(Messages.Dlg_TourMarker_Dlg_title);
 	}
 
+	private void createActions() {
+
+		_actionOpenTourSignPrefs = new ActionOpenPrefDialog(
+				Messages.Dlg_TourMarker_Action_SignPreferences,
+				PrefPageSigns.ID);
+	}
+
 	@Override
 	protected final void createButtonsForButtonBar(final Composite parent) {
 
@@ -364,6 +389,8 @@ public class DialogMarker extends TitleAreaDialog {
 	protected Control createDialogArea(final Composite parent) {
 
 		final Composite dlgContainer = (Composite) super.createDialogArea(parent);
+
+		createActions();
 
 		createUI(dlgContainer);
 
@@ -597,6 +624,72 @@ public class DialogMarker extends TitleAreaDialog {
 				// fill position combo
 				for (final String position : TourMarker.visualPositionLabels) {
 					_comboMarkerPosition.add(position);
+				}
+			}
+			/*
+			 * Sign
+			 */
+			{
+				// label
+				final Label label = new Label(container, SWT.NONE);
+				label.setText(Messages.Dlg_TourMarker_Label_Sign);
+
+				final Composite signContainer = new Composite(container, SWT.NONE);
+				GridDataFactory.fillDefaults().grab(true, false).applyTo(signContainer);
+				GridLayoutFactory.fillDefaults().numColumns(3).applyTo(signContainer);
+				{
+
+					/*
+					 * Image: sign image
+					 */
+					_imgTourSign = new ImageCanvas(signContainer, SWT.DOUBLE_BUFFERED);
+					GridDataFactory.fillDefaults()//
+							.hint(_pc.convertWidthInCharsToPixels(5), _pc.convertHeightInCharsToPixels(2))
+							.applyTo(_imgTourSign);
+
+					/*
+					 * Label: sign name
+					 */
+					_lblSignName = new Label(signContainer, SWT.NONE);
+					GridDataFactory.fillDefaults()//
+							.grab(true, false)
+							.align(SWT.FILL, SWT.CENTER)
+							.applyTo(_lblSignName);
+
+					/*
+					 * Link: contextmenu to select the sign image
+					 */
+					_linkTourSign = new Link(signContainer, SWT.NONE);
+					GridDataFactory.fillDefaults()//
+							.align(SWT.FILL, SWT.CENTER)
+							.applyTo(_linkTourSign);
+					_linkTourSign.setText(Messages.Dlg_TourMarker_Link_Sign);
+					_linkTourSign.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(final SelectionEvent e) {
+							UI.openControlMenu(_linkTourSign);
+						}
+					});
+
+					// link menu
+					final MenuManager menuMgr = new MenuManager();
+
+					menuMgr.setRemoveAllWhenShown(true);
+					menuMgr.addMenuListener(new IMenuListener() {
+						public void menuAboutToShow(final IMenuManager menuMgr) {
+
+							// set menu items
+
+							_signMenuManager.fillSignMenu(menuMgr);
+
+							menuMgr.add(new Separator());
+							menuMgr.add(_actionOpenTourSignPrefs);
+						}
+					});
+
+					// set context menu for the link
+					final Menu signContextMenu = menuMgr.createContextMenu(_linkTourSign);
+					_linkTourSign.setMenu(signContextMenu);
 				}
 			}
 

@@ -48,7 +48,7 @@ import org.eclipse.swt.widgets.MenuItem;
  */
 public class ActionAddSign extends Action implements IMenuCreator, IAdvancedMenuForActions {
 
-	private static final String		SPACE_PRE_TAG		= "   ";						//$NON-NLS-1$
+	private static final String		SPACE_PRE_TAG		= "   ";							//$NON-NLS-1$
 
 	private SignMenuManager			_signMenuMgr;
 	private Menu					_menu;
@@ -217,7 +217,7 @@ public class ActionAddSign extends Action implements IMenuCreator, IAdvancedMenu
 						item.dispose();
 					}
 
-					final SignCollection signCollection = TourDatabase.getSignEntries(__signCategory.getCategoryId());
+					final SignCollection signCollection = SignManager.getSignEntries(__signCategory.getCategoryId());
 
 					// add actions
 					__actionAddTourSign.createCategoryActions(signCollection, __categoryMenu);

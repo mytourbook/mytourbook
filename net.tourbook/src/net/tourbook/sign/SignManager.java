@@ -31,8 +31,15 @@ import net.tourbook.data.TourSign;
 import net.tourbook.data.TourSignCategory;
 import net.tourbook.data.TourTag;
 import net.tourbook.database.TourDatabase;
+import net.tourbook.photo.ILoadCallBack;
+import net.tourbook.photo.ImageQuality;
+import net.tourbook.photo.Photo;
+import net.tourbook.photo.PhotoImageCache;
+import net.tourbook.photo.PhotoLoadManager;
+import net.tourbook.photo.PhotoLoadingState;
 
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.swt.graphics.Image;
 
 /**
  */
@@ -243,6 +250,43 @@ public class SignManager {
 		return signCategory;
 	}
 
+	/**
+	 * @param signPhoto
+	 * @param imageLoadCallback
+	 * @return Returns the photo image or <code>null</code> when image is not loaded.
+	 */
+	public static Image getPhotoImage(final Photo signPhoto, final ILoadCallBack imageLoadCallback) {
+
+		Image photoImage = null;
+
+		final ImageQuality requestedImageQuality = ImageQuality.THUMB;
+
+		// check if image has an loading error
+		final PhotoLoadingState photoLoadingState = signPhoto.getLoadingState(requestedImageQuality);
+
+		if (photoLoadingState != PhotoLoadingState.IMAGE_IS_INVALID) {
+
+			// image is not yet loaded
+
+			// check if image is in the cache
+			photoImage = PhotoImageCache.getImage(signPhoto, requestedImageQuality);
+
+			if ((photoImage == null || photoImage.isDisposed())
+					&& photoLoadingState == PhotoLoadingState.IMAGE_IS_IN_LOADING_QUEUE == false) {
+
+				// the requested image is not available in the image cache -> image must be loaded
+
+				PhotoLoadManager.putImageInLoadingQueueThumbGallery(
+						null,
+						signPhoto,
+						requestedImageQuality,
+						imageLoadCallback);
+			}
+		}
+
+		return photoImage;
+	}
+
 	@SuppressWarnings("unchecked")
 	public static SignCollection getRootSigns() {
 
@@ -316,7 +360,7 @@ public class SignManager {
 		}
 
 		/*
-		 * read sign entries from the database
+		 * read sign category children from the database
 		 */
 
 		final EntityManager em = TourDatabase.getInstance().getEntityManager();

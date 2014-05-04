@@ -29,12 +29,10 @@ import net.tourbook.data.TourSign;
 import net.tourbook.data.TourSignCategory;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.photo.ILoadCallBack;
-import net.tourbook.photo.ImageQuality;
 import net.tourbook.photo.Photo;
 import net.tourbook.photo.PhotoImageCache;
-import net.tourbook.photo.PhotoLoadManager;
-import net.tourbook.photo.PhotoLoadingState;
 import net.tourbook.photo.RendererHelper;
+import net.tourbook.sign.SignManager;
 import net.tourbook.sign.TVIPrefSign;
 import net.tourbook.sign.TVIPrefSignCategory;
 import net.tourbook.sign.TVIPrefSignRoot;
@@ -147,8 +145,9 @@ public class PrefPageSigns extends PreferencePage implements IWorkbenchPreferenc
 	private Button					_btnNewSignCategory;
 	private Button					_btnRename;
 	private Button					_btnReset;
+
 	/*
-	 * None UI controls
+	 * None UI
 	 */
 	private PixelConverter			_pc;
 
@@ -877,45 +876,6 @@ public class PrefPageSigns extends PreferencePage implements IWorkbenchPreferenc
 		return width;
 	}
 
-	/**
-	 * @param prefSign
-	 * @return Returns the photo image or <code>null</code> when image is not loaded.
-	 */
-	private Image getPhotoImage(final TVIPrefSign prefSign) {
-
-		final Photo signPhoto = prefSign.getSignImagePhoto();
-		Image photoImage = null;
-
-		final ImageQuality requestedImageQuality = ImageQuality.THUMB;
-
-		// check if image has an loading error
-		final PhotoLoadingState photoLoadingState = signPhoto.getLoadingState(requestedImageQuality);
-
-		if (photoLoadingState != PhotoLoadingState.IMAGE_IS_INVALID) {
-
-			// image is not yet loaded
-
-			// check if image is in the cache
-			photoImage = PhotoImageCache.getImage(signPhoto, requestedImageQuality);
-
-			if ((photoImage == null || photoImage.isDisposed())
-					&& photoLoadingState == PhotoLoadingState.IMAGE_IS_IN_LOADING_QUEUE == false) {
-
-				// the requested image is not available in the image cache -> image must be loaded
-
-				final ILoadCallBack imageLoadCallback = new LoadImageCallback(prefSign);
-
-				PhotoLoadManager.putImageInLoadingQueueThumbGallery(
-						null,
-						signPhoto,
-						requestedImageQuality,
-						imageLoadCallback);
-			}
-		}
-
-		return photoImage;
-	}
-
 	public TVIPrefSignRoot getRootItem() {
 		return _rootItem;
 	}
@@ -1415,7 +1375,9 @@ public class PrefPageSigns extends PreferencePage implements IWorkbenchPreferenc
 
 			final TVIPrefSign prefSign = (TVIPrefSign) itemData;
 
-			final Image signImage = getPhotoImage(prefSign);
+			final ILoadCallBack imageLoadCallback = new LoadImageCallback(prefSign);
+
+			final Image signImage = SignManager.getPhotoImage(prefSign.getSignImagePhoto(), imageLoadCallback);
 
 			if (signImage != null) {
 

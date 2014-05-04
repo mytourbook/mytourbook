@@ -512,6 +512,8 @@ public class Messages extends NLS {
 	public static String		Dlg_AdjustAltitude_Radio_keep_start_altitude;
 	public static String		Dlg_AdjustAltitude_Radio_keep_start_altitude_tooltip;
 
+	public static String	Dlg_TourMarker_Action_SignPreferences;
+
 	public static String		Dlg_TourMarker_Button_delete;
 	public static String		Dlg_TourMarker_Button_delete_tooltip;
 	public static String		Dlg_TourMarker_Button_HideAllMarker;
@@ -532,7 +534,11 @@ public class Messages extends NLS {
 	public static String		Dlg_TourMarker_Label_marker_name;
 	public static String		Dlg_TourMarker_Label_markers;
 	public static String		Dlg_TourMarker_Label_position;
+
+	public static String	Dlg_TourMarker_Label_Sign;
 	public static String		Dlg_TourMarker_Label_vertical_offset;
+
+	public static String	Dlg_TourMarker_Link_Sign;
 	public static String		Dlg_TourMarker_MsgBox_delete_marker_message;
 	public static String		Dlg_TourMarker_MsgBox_delete_marker_title;
 
