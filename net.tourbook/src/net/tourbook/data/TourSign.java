@@ -31,6 +31,9 @@ import javax.persistence.Transient;
 
 import net.tourbook.database.TourDatabase;
 
+/**
+ * Contains an image which is displayed with tour markers or waypoints.
+ */
 @Entity
 public class TourSign implements Comparable<Object> {
 

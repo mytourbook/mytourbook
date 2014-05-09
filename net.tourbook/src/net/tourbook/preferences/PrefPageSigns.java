@@ -31,7 +31,7 @@ import net.tourbook.database.TourDatabase;
 import net.tourbook.photo.ILoadCallBack;
 import net.tourbook.photo.Photo;
 import net.tourbook.photo.PhotoImageCache;
-import net.tourbook.photo.RendererHelper;
+import net.tourbook.photo.PhotoUI;
 import net.tourbook.sign.SignManager;
 import net.tourbook.sign.TVIPrefSign;
 import net.tourbook.sign.TVIPrefSignCategory;
@@ -80,9 +80,8 @@ import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
@@ -153,12 +152,7 @@ public class PrefPageSigns extends PreferencePage implements IWorkbenchPreferenc
 
 	private class LoadImageCallback implements ILoadCallBack {
 
-		private TVIPrefSign	_prefSign;
-
-		public LoadImageCallback(final TVIPrefSign prefSign) {
-
-			_prefSign = prefSign;
-		}
+		public LoadImageCallback() {}
 
 		@Override
 		public void callBackImageIsLoaded(final boolean isImageLoaded) {
@@ -178,7 +172,9 @@ public class PrefPageSigns extends PreferencePage implements IWorkbenchPreferenc
 					}
 
 					// update sign image
-					_signViewer.update(_prefSign, null);
+
+					// !!! refresh() and update() do not repaint a loaded image but a redraw() do
+					_signViewer.getTree().redraw();
 				}
 			});
 
@@ -867,6 +863,7 @@ public class PrefPageSigns extends PreferencePage implements IWorkbenchPreferenc
 	private int getImageColumnWidth() {
 
 		int width;
+
 		if (_tcSignImage == null) {
 			width = DEFAULT_IMAGE_WIDTH;
 		} else {
@@ -895,12 +892,11 @@ public class PrefPageSigns extends PreferencePage implements IWorkbenchPreferenc
 		setPreferenceStore(TourbookPlugin.getDefault().getPreferenceStore());
 	}
 
-	public void initUI(final Composite parent) {
+	private void initUI(final Composite parent) {
 
 		_pc = new PixelConverter(parent);
 
 		DEFAULT_IMAGE_WIDTH = _pc.convertWidthInCharsToPixels(6);
-//		MAX_ROW_HEIGHT = _pc.convertVerticalDLUsToPixels(24);
 		MAX_ROW_HEIGHT = _pc.convertVerticalDLUsToPixels(50);
 	}
 
@@ -1375,16 +1371,15 @@ public class PrefPageSigns extends PreferencePage implements IWorkbenchPreferenc
 
 			final TVIPrefSign prefSign = (TVIPrefSign) itemData;
 
-			final ILoadCallBack imageLoadCallback = new LoadImageCallback(prefSign);
+			final Photo signImagePhoto = prefSign.getSignImagePhoto();
 
-			final Image signImage = SignManager.getPhotoImage(prefSign.getSignImagePhoto(), imageLoadCallback);
+			final Image signImage = SignManager.getPhotoImage(signImagePhoto, new LoadImageCallback());
 
 			if (signImage != null) {
 
-				final Rectangle imageRect = signImage.getBounds();
-
 				final int photoPosX = event.x;
 				final int photoPosY = event.y;
+
 				switch (event.type) {
 				case SWT.MeasureItem:
 
@@ -1401,65 +1396,20 @@ public class PrefPageSigns extends PreferencePage implements IWorkbenchPreferenc
 
 				case SWT.PaintItem:
 
-					final Photo photo = prefSign.getSignImagePhoto();
+					final GC gc = event.gc;
+					final Photo photo = signImagePhoto;
 
-					final int _paintedImageWidth = imageRect.width;
-					final int _paintedImageHeight = imageRect.height;
 					final int imageCanvasWidth = Math.max(DEFAULT_ROW_HEIGHT, _imageColumnWidth);
 					final int imageCanvasHeight = event.height;
 
-					int paintedDest_Width;
-					int paintedDest_Height;
-					int paintedDest_DevX;
-					int paintedDest_DevY;
-
-					final Point bestSize = RendererHelper.getBestSize(
+					PhotoUI.paintPhotoImage(
+							gc,
 							photo,
-							_paintedImageWidth,
-							_paintedImageHeight,
+							signImage,
+							photoPosX,
+							photoPosY,
 							imageCanvasWidth,
 							imageCanvasHeight);
-
-					paintedDest_Width = bestSize.x;
-					paintedDest_Height = bestSize.y;
-
-					// get center offset
-					final int centerOffsetX = (imageCanvasWidth - paintedDest_Width) / 2;
-					final int centerOffsetY = (imageCanvasHeight - paintedDest_Height) / 2;
-
-					paintedDest_DevX = photoPosX + centerOffsetX;
-					paintedDest_DevY = photoPosY + centerOffsetY;
-
-					try {
-
-						try {
-
-							event.gc.drawImage(signImage, //
-									0,
-									0,
-									_paintedImageWidth,
-									_paintedImageHeight,
-									//
-									paintedDest_DevX,
-									paintedDest_DevY,
-									paintedDest_Width,
-									paintedDest_Height);
-
-						} catch (final Exception e) {
-
-							System.out
-									.println("SWT exception occured when painting valid image " //$NON-NLS-1$
-											+ photo.imageFilePathName
-											+ " it's potentially this bug: https://bugs.eclipse.org/bugs/show_bug.cgi?id=375845"); //$NON-NLS-1$
-
-							// ensure image is valid after reloading
-							PhotoImageCache.disposeAll();
-						}
-
-					} catch (final Exception e) {
-
-						event.gc.drawString(e.getMessage(), photoPosX, photoPosY);
-					}
 
 					break;
 				}

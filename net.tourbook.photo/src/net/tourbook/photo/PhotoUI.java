@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2012  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -26,6 +26,10 @@ import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.StyledString.Styler;
+import org.eclipse.swt.graphics.GC;
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Rectangle;
 
 public class PhotoUI {
 
@@ -97,6 +101,77 @@ public class PhotoUI {
 	 * which is setting the colors in the color registry
 	 */
 	public static void init() {}
+
+	/**
+	 * Paint photo image centered.
+	 * 
+	 * @param gc
+	 * @param photo
+	 * @param signImage
+	 * @param photoPosX
+	 * @param photoPosY
+	 * @param imageCanvasWidth
+	 * @param imageCanvasHeight
+	 */
+	public static void paintPhotoImage(	final GC gc,
+										final Photo photo,
+										final Image signImage,
+										final int photoPosX,
+										final int photoPosY,
+										final int imageCanvasWidth,
+										final int imageCanvasHeight) {
+
+		final Rectangle imageRect = signImage.getBounds();
+		final int _paintedImageWidth = imageRect.width;
+		final int _paintedImageHeight = imageRect.height;
+
+		final Point bestSize = RendererHelper.getBestSize(
+				photo,
+				_paintedImageWidth,
+				_paintedImageHeight,
+				imageCanvasWidth,
+				imageCanvasHeight);
+
+		final int paintedDest_Width = bestSize.x;
+		final int paintedDest_Height = bestSize.y;
+
+		// get center offset
+		final int centerOffsetX = (imageCanvasWidth - paintedDest_Width) / 2;
+		final int centerOffsetY = (imageCanvasHeight - paintedDest_Height) / 2;
+
+		final int paintedDest_DevX = photoPosX + centerOffsetX;
+		final int paintedDest_DevY = photoPosY + centerOffsetY;
+
+		try {
+
+			try {
+
+				gc.drawImage(signImage, //
+						0,
+						0,
+						_paintedImageWidth,
+						_paintedImageHeight,
+						//
+						paintedDest_DevX,
+						paintedDest_DevY,
+						paintedDest_Width,
+						paintedDest_Height);
+
+			} catch (final Exception e) {
+
+				System.out.println("SWT exception occured when painting valid image " //$NON-NLS-1$
+						+ photo.imageFilePathName
+						+ " it's potentially this bug: https://bugs.eclipse.org/bugs/show_bug.cgi?id=375845"); //$NON-NLS-1$
+
+				// ensure image is valid after reloading
+				PhotoImageCache.disposeAll();
+			}
+
+		} catch (final Exception e) {
+
+			gc.drawString(e.getMessage(), photoPosX, photoPosY);
+		}
+	}
 
 	/**
 	 * Set photo colors in the JFace color registry from the pref store

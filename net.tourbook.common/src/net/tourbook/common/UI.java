@@ -487,6 +487,31 @@ public class UI {
 	}
 
 	/**
+	 * Get best-fit size for an image drawn in an area of maxX, maxY
+	 * 
+	 * @param imageWidth
+	 * @param imageHeight
+	 * @param canvasWidth
+	 * @param canvasHeight
+	 * @return
+	 */
+	public static Point getBestFitCanvasSize(	final int imageWidth,
+												final int imageHeight,
+												final int canvasWidth,
+												final int canvasHeight) {
+
+		final double widthRatio = (double) imageWidth / (double) canvasWidth;
+		final double heightRatio = (double) imageHeight / (double) canvasHeight;
+
+		final double bestRatio = widthRatio > heightRatio ? widthRatio : heightRatio;
+
+		final int newWidth = (int) (imageWidth / bestRatio);
+		final int newHeight = (int) (imageHeight / bestRatio);
+
+		return new Point(newWidth, newHeight);
+	}
+
+	/**
 	 * @param degreeDirection
 	 * @return Returns cardinal direction
 	 */

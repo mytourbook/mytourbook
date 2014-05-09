@@ -26,6 +26,8 @@ public class Messages extends NLS {
 	public static String		Action_PhotosAndTours_FilterPhotos_Tooltip;
 	public static String		Action_PhotosAndTours_SavePhotoInTour;
 
+	public static String	Action_Sign_RemoveTourSign;
+
 	public static String		Action_ToolTip_Hide;
 	public static String		Action_ToolTip_SetDefaults;
 

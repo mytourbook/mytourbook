@@ -15,13 +15,16 @@
  *******************************************************************************/
 package net.tourbook.sign;
 
+import net.tourbook.Messages;
 import net.tourbook.data.TourSign;
 import net.tourbook.data.TourSignCategory;
+import net.tourbook.tour.DialogMarker;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ActionContributionItem;
 import org.eclipse.jface.action.IMenuCreator;
 import org.eclipse.jface.action.IMenuManager;
+import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.events.MenuAdapter;
 import org.eclipse.swt.events.MenuEvent;
@@ -30,6 +33,21 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 
 public class SignMenuManager {
+
+	private DialogMarker	_dialogMarker;
+
+	private class ActionRemoveTourSign extends Action {
+
+		public ActionRemoveTourSign() {
+
+			super(Messages.Action_Sign_RemoveTourSign, AS_PUSH_BUTTON);
+		}
+
+		@Override
+		public void run() {
+			_dialogMarker.actionRemoveTourSign();
+		}
+	}
 
 	private class ActionTourSign extends Action {
 
@@ -41,13 +59,13 @@ public class SignMenuManager {
 
 			__tourSign = tourSign;
 
-			// setup sign image
+			// set sign image
 			setImageDescriptor(ImageDescriptor.createFromFile(null, tourSign.getImageFilePathName()));
 		}
 
 		@Override
 		public void run() {
-
+			_dialogMarker.actionSetTourSign(__tourSign);
 		}
 	}
 
@@ -115,6 +133,12 @@ public class SignMenuManager {
 		item.fill(menu, -1);
 	}
 
+	private void createOtherActions(final IMenuManager menuMgr) {
+
+		menuMgr.add(new Separator());
+		menuMgr.add(new ActionRemoveTourSign());
+	}
+
 	private void createSignActions(final SignCollection signCollection, final IMenuManager menuMgr) {
 
 		// add sign items
@@ -149,10 +173,15 @@ public class SignMenuManager {
 
 	/**
 	 * @param menuMgr
+	 * @param dialogMarker
 	 */
-	public void fillSignMenu(final IMenuManager menuMgr) {
+	public void fillSignMenu(final IMenuManager menuMgr, final DialogMarker dialogMarker) {
+
+		_dialogMarker = dialogMarker;
 
 		createSignCategoryActions(SignManager.getRootSigns(), menuMgr);
 		createSignActions(SignManager.getRootSigns(), menuMgr);
+		
+		createOtherActions(menuMgr);
 	}
 }

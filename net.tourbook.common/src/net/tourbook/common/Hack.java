@@ -18,9 +18,39 @@ package net.tourbook.common;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
+import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.Tree;
 
 public class Hack {
+
+	/**
+	 * Use Java Reflection to call protected Table#setItemHeight(int).
+	 * 
+	 * @param table
+	 *            Tree on which to adjust item height.
+	 * @param itemHeight
+	 *            height in pixels to allow for each item.
+	 */
+	public static void setTableItemHeight(final Table table, final int itemHeight) {
+
+		try {
+
+			// Search class hierarchy for protected setter method
+			final Method setter = Tree.class.getDeclaredMethod("setItemHeight", int.class);//$NON-NLS-1$
+
+			setter.setAccessible(true);
+			setter.invoke(table, Integer.valueOf(itemHeight));
+
+		} catch (final NoSuchMethodException e) {
+			// ignore
+		} catch (final IllegalArgumentException e) {
+			// ignore
+		} catch (final IllegalAccessException e) {
+			// ignore
+		} catch (final InvocationTargetException e) {
+			// ignore
+		}
+	}
 
 	/**
 	 * Use Java Reflection to call protected Tree#setItemHeight(int).

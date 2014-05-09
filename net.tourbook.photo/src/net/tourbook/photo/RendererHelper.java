@@ -11,7 +11,6 @@
  *******************************************************************************/
 package net.tourbook.photo;
 
-
 import org.eclipse.swt.graphics.Point;
 
 /**
@@ -30,7 +29,7 @@ public class RendererHelper {
 	/**
 	 * Compute image size for the canvas size.
 	 * 
-	 * @param photoWrapper
+	 * @param photo
 	 * @param imageHeight
 	 * @param imageWidth
 	 * @param imageCanvasWidth

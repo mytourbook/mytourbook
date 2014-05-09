@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -265,11 +265,15 @@ public class Photo {
 	private int											_paintedMapImageWidth;
 
 	/**
-	 * @param galleryItemIndex
 	 */
 	public Photo(final File photoImageFile) {
 
 		setupPhoto(photoImageFile, new Path(photoImageFile.getPath()));
+	}
+
+	public Photo(final String imageFilePathName) {
+
+		this(new File(imageFilePathName));
 	}
 
 	public static String getImageKeyHQ(final String imageFilePathName) {

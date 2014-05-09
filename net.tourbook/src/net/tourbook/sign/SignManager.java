@@ -45,6 +45,8 @@ import org.eclipse.swt.graphics.Image;
  */
 public class SignManager {
 
+	private static final ImageQuality					SIGN_IMAGE_QUALITY		= ImageQuality.THUMB;
+
 	static final String									KEY_PART_SEPARATOR		= "__";									//$NON-NLS-1$
 
 	public static final String[]						EXPAND_TYPE_NAMES		= {
@@ -252,24 +254,32 @@ public class SignManager {
 
 	/**
 	 * @param signPhoto
+	 * @return Returns the photo image or <code>null</code> when image is not loaded.
+	 */
+	public static Image getPhotoImage(final Photo signPhoto) {
+
+		return PhotoImageCache.getImage(signPhoto, SIGN_IMAGE_QUALITY);
+	}
+
+	/**
+	 * @param signPhoto
 	 * @param imageLoadCallback
+	 *            This callback is used to load the photo image.
 	 * @return Returns the photo image or <code>null</code> when image is not loaded.
 	 */
 	public static Image getPhotoImage(final Photo signPhoto, final ILoadCallBack imageLoadCallback) {
 
 		Image photoImage = null;
 
-		final ImageQuality requestedImageQuality = ImageQuality.THUMB;
-
 		// check if image has an loading error
-		final PhotoLoadingState photoLoadingState = signPhoto.getLoadingState(requestedImageQuality);
+		final PhotoLoadingState photoLoadingState = signPhoto.getLoadingState(SIGN_IMAGE_QUALITY);
 
 		if (photoLoadingState != PhotoLoadingState.IMAGE_IS_INVALID) {
 
 			// image is not yet loaded
 
 			// check if image is in the cache
-			photoImage = PhotoImageCache.getImage(signPhoto, requestedImageQuality);
+			photoImage = PhotoImageCache.getImage(signPhoto, SIGN_IMAGE_QUALITY);
 
 			if ((photoImage == null || photoImage.isDisposed())
 					&& photoLoadingState == PhotoLoadingState.IMAGE_IS_IN_LOADING_QUEUE == false) {
@@ -279,7 +289,7 @@ public class SignManager {
 				PhotoLoadManager.putImageInLoadingQueueThumbGallery(
 						null,
 						signPhoto,
-						requestedImageQuality,
+						SIGN_IMAGE_QUALITY,
 						imageLoadCallback);
 			}
 		}

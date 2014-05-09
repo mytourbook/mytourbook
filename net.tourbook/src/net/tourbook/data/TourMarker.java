@@ -543,6 +543,10 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 		this.serieIndex = serieIndex;
 	}
 
+	public void setSign(final TourSign tourSign) {
+		this.tourSign = tourSign;
+	}
+
 	/**
 	 * @param time
 	 *            Time in seconds relative to the tour start. When value is not available it is set
@@ -599,6 +603,14 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 
 		distance20 = distance;
 		distance = 0;
+	}
+
+	public TourSign getTourSign() {
+		return tourSign;
+	}
+
+	public void setTourSign(TourSign tourSign) {
+		this.tourSign = tourSign;
 	}
 
 }
