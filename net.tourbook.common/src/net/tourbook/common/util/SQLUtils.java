@@ -46,6 +46,7 @@ public final class SQLUtils {
 	 *         {@link #getCleanString(String)}.
 	 */
 	public static String getSqlString(final String string) {
+
 		return SQLUtils.SQL_STRING_SEPARATOR + string + SQLUtils.SQL_STRING_SEPARATOR;
 	}
 

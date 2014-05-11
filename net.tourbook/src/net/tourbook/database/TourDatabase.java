@@ -4966,9 +4966,13 @@ public class TourDatabase {
 				/*
 				 * Add new columns
 				 */
-				sql_AddCol_BigInt(stmt, TABLE_TOUR_MARKER, TABLE_TOUR_SIGN + "_signId"); //$NON-NLS-1$
+				final String manyToOne_TourSign = "TourSign_SignId";
+
+				sql_AddCol_BigInt(stmt, TABLE_TOUR_MARKER, manyToOne_TourSign);
 				sql_AddCol_VarCar(stmt, TABLE_TOUR_MARKER, "description", TourWayPoint.DB_LENGTH_DESCRIPTION); //$NON-NLS-1$
 				sql_AddCol_VarCar(stmt, TABLE_TOUR_MARKER, "comment", TourWayPoint.DB_LENGTH_COMMENT); //$NON-NLS-1$
+
+				sql_CreateIndex(stmt, TABLE_TOUR_MARKER, manyToOne_TourSign, manyToOne_TourSign);
 
 				/*
 				 * Create new tables

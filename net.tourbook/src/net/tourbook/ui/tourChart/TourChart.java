@@ -45,6 +45,7 @@ import net.tourbook.common.util.IToolTipHideListener;
 import net.tourbook.common.util.TourToolTip;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
+import net.tourbook.data.TourSign;
 import net.tourbook.photo.Photo;
 import net.tourbook.photo.TourPhotoLink;
 import net.tourbook.preferences.ITourbookPreferences;
@@ -1020,6 +1021,11 @@ public class TourChart extends Chart {
 
 			chartLabel.labelXOffset = tourMarker.getLabelXOffset();
 			chartLabel.labelYOffset = tourMarker.getLabelYOffset();
+
+			final TourSign tourSign = tourMarker.getTourSign();
+			if (tourSign != null) {
+				chartLabel.markerImagePhoto = tourSign.getSignImagePhoto();
+			}
 
 			_layerMarker.addLabel(chartLabel);
 		}

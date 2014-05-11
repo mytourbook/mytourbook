@@ -81,7 +81,7 @@ public class SignManager {
 	private static HashMap<String, TourSignCategory>	_importedSignCategories	= new HashMap<String, TourSignCategory>();
 
 	/**
-	 * Removes all tour signss which are loaded from the database so the next time they will be
+	 * Removes all tour signs which are loaded from the database so the next time they will be
 	 * reloaded.
 	 */
 	public static synchronized void clearTourSigns() {

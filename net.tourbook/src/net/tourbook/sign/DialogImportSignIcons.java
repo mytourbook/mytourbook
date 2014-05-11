@@ -22,8 +22,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
@@ -70,8 +68,6 @@ public class DialogImportSignIcons extends TitleAreaDialog {
 
 	private final IDialogSettings	_state					= TourbookPlugin.getState("DialogImportTourSignIcons"); //$NON-NLS-1$
 
-	private ArrayList<Photo>		_signIcons;
-
 	private long					_parseUIUpdateTime;
 	private int						_fsItemCounter;
 
@@ -107,7 +103,7 @@ public class DialogImportSignIcons extends TitleAreaDialog {
 
 		super(parentShell);
 
-		TEMP_DB_cleanup();
+//		TEMP_DB_cleanup();
 
 		parseFolder(selectedFolder);
 	}
@@ -123,7 +119,7 @@ public class DialogImportSignIcons extends TitleAreaDialog {
 
 		super(parentShell);
 
-		TEMP_DB_cleanup();
+//		TEMP_DB_cleanup();
 
 		// make dialog resizable
 		setShellStyle(getShellStyle() | SWT.RESIZE | SWT.MAX);
@@ -131,15 +127,20 @@ public class DialogImportSignIcons extends TitleAreaDialog {
 		// set icon for the window
 		setDefaultImage(TourbookPlugin.getImageDescriptor(Messages.Image__TourSignImport).createImage());
 
-		// sort icons by filename
-		_signIcons = selectedPhotosWithExif.photos;
-		Collections.sort(_signIcons, new Comparator<Photo>() {
-			@Override
-			public int compare(final Photo photo1, final Photo photo2) {
+		for (final Photo signPhoto : selectedPhotosWithExif.photos) {
 
-				return photo1.imageFilePathName.compareToIgnoreCase(photo2.imageFilePathName);
-			}
-		});
+			// get file/folder name without extension
+			final File fileOrFolder = signPhoto.imageFile;
+			final Path fileOrFolderPath = new Path(fileOrFolder.getAbsolutePath());
+			final String fileOrFolderName = fileOrFolderPath.removeFileExtension().lastSegment();
+
+			parseFolder_20_CreateTourSign(//
+					fileOrFolder,
+					fileOrFolderName,
+					TourSignCategory.ROOT_KEY,
+					null,
+					true);
+		}
 	}
 
 	@Override
@@ -151,6 +152,9 @@ public class DialogImportSignIcons extends TitleAreaDialog {
 
 		Display.getCurrent().asyncExec(new Runnable() {
 			public void run() {
+
+				// ensure newly saved sign are loaded
+				SignManager.clearTourSigns();
 
 				PreferencesUtil.createPreferenceDialogOn(getShell(), PrefPageSigns.ID, null, null).open();
 			}
@@ -284,7 +288,7 @@ public class DialogImportSignIcons extends TitleAreaDialog {
 					// folder depth position is the parent of the root
 					_folderDepth = -1;
 
-					parseFolder_FilesFolder(//
+					parseFolder_10_FilesFolder(//
 							selectedFolder,
 							UI.EMPTY_STRING,
 							null,
@@ -313,7 +317,7 @@ public class DialogImportSignIcons extends TitleAreaDialog {
 	 * @param monitor
 	 * @return Returns <code>true</code> if all deletions were successful
 	 */
-	private void parseFolder_FilesFolder(	final File fileOrFolder,
+	private void parseFolder_10_FilesFolder(final File fileOrFolder,
 											String categoryKey,
 											final TourSignCategory parentSignCategory,
 											final IProgressMonitor monitor) {
@@ -325,9 +329,8 @@ public class DialogImportSignIcons extends TitleAreaDialog {
 		// update monitor every n seconds
 		updateUI_Monitor(fileOrFolder, monitor);
 
-		final Path fileOrFolderPath = new Path(fileOrFolder.getAbsolutePath());
-
 		// get file/folder name without extension
+		final Path fileOrFolderPath = new Path(fileOrFolder.getAbsolutePath());
 		final String fileOrFolderName = fileOrFolderPath.removeFileExtension().lastSegment();
 
 		final boolean isRootParent = _folderDepth == -1;
@@ -366,7 +369,7 @@ public class DialogImportSignIcons extends TitleAreaDialog {
 
 				_folderDepth++;
 
-				parseFolder_FilesFolder(//
+				parseFolder_10_FilesFolder(//
 						new File(fileOrFolder, fsPathName),
 						folderKey,
 						signCategory,
@@ -379,35 +382,12 @@ public class DialogImportSignIcons extends TitleAreaDialog {
 
 			// fs item is a file
 
-			// get/create sign
-			final TourSign importedSign = SignManager.getImportedSignByKey(//
+			parseFolder_20_CreateTourSign(//
+					fileOrFolder,
 					fileOrFolderName,
 					categoryKey,
+					parentSignCategory,
 					isRoot);
-
-			if (importedSign.getSignId() == TourDatabase.ENTITY_IS_NOT_SAVED) {
-
-				// sign entity is not yet saved
-
-				importedSign.setRoot(isRoot);
-				importedSign.setImageFilePathName(fileOrFolder.getAbsolutePath());
-
-				final TourSign savedSign = TourDatabase.saveEntity(//
-						importedSign,
-						importedSign.getSignId(),
-						TourSign.class);
-
-				SignManager.keepImportedSign(savedSign);
-
-				if (parentSignCategory != null) {
-
-					// set category for this sign
-					importedSign.getTourSignCategories().add(parentSignCategory);
-
-					// this parent category has a new child
-					parentSignCategory.addTourSign(savedSign);
-				}
-			}
 		}
 
 		/*
@@ -420,6 +400,51 @@ public class DialogImportSignIcons extends TitleAreaDialog {
 
 		if (true) {
 //			monitor.setCanceled(true);
+		}
+	}
+
+	/**
+	 * @param fileOrFolder
+	 * @param fileOrFolderName
+	 * @param categoryKey
+	 * @param parentSignCategory
+	 *            Parent category for this sign, can be <code>null</code> when sign is in the root.
+	 * @param isRoot
+	 */
+	private void parseFolder_20_CreateTourSign(	final File fileOrFolder,
+												final String fileOrFolderName,
+												final String categoryKey,
+												final TourSignCategory parentSignCategory,
+												final boolean isRoot) {
+
+		// get/create sign
+		final TourSign importedSign = SignManager.getImportedSignByKey(//
+				fileOrFolderName,
+				categoryKey,
+				isRoot);
+
+		if (importedSign.getSignId() == TourDatabase.ENTITY_IS_NOT_SAVED) {
+
+			// sign entity is not yet saved
+
+			importedSign.setRoot(isRoot);
+			importedSign.setImageFilePathName(fileOrFolder.getAbsolutePath());
+
+			final TourSign savedSign = TourDatabase.saveEntity(//
+					importedSign,
+					importedSign.getSignId(),
+					TourSign.class);
+
+			SignManager.keepImportedSign(savedSign);
+
+			if (parentSignCategory != null) {
+
+				// set category for this sign
+				importedSign.getTourSignCategories().add(parentSignCategory);
+
+				// this parent category has a new child
+				parentSignCategory.addTourSign(savedSign);
+			}
 		}
 	}
 

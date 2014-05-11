@@ -262,6 +262,32 @@ public class ImageCanvas extends Canvas implements PaintListener {
 	}
 
 	/**
+	 * Sets a new image and draws it, the old image is disposed when <code>isDispose</code> is
+	 * <code>true</code>, otherwise it will not be disposed and the caller must dispose the image.
+	 * 
+	 * @param image
+	 * @param isDispose
+	 */
+	public void setImage(final Image image, final boolean isDispose) {
+
+		if (_image != null && image != null && _image == image && _image.isDisposed() == false) {
+
+			// the new image is the same as the old image, do nothing
+			return;
+		}
+
+		// dispose old image
+		if (isDispose && _image != null) {
+			_image.dispose();
+		}
+
+		// set new image
+		_image = image;
+
+		redraw();
+	}
+
+	/**
 	 * !!! VERY IMPORTANT !!!
 	 * <p>
 	 * Setting SWT.CENTER or SWT.LEAD in the constructor will disable the traversal events.

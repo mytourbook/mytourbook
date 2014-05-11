@@ -30,6 +30,7 @@ import javax.persistence.ManyToMany;
 import javax.persistence.Transient;
 
 import net.tourbook.database.TourDatabase;
+import net.tourbook.photo.Photo;
 
 /**
  * Contains an image which is displayed with tour markers or waypoints.
@@ -71,7 +72,7 @@ public class TourSign implements Comparable<Object> {
 	private int							isRoot						= 0;
 
 	/**
-	 * Full sign image file name with path.
+	 * Sign image filename with path.
 	 */
 	private String						imageFilePathName;
 
@@ -93,6 +94,9 @@ public class TourSign implements Comparable<Object> {
 	 */
 	@Transient
 	private long						_createId					= 0;
+
+	@Transient
+	private Photo						_signImagePhoto;
 
 	/**
 	 * manually created marker or imported marker create a unique id to identify them, saved marker
@@ -122,6 +126,7 @@ public class TourSign implements Comparable<Object> {
 
 	@Override
 	public boolean equals(final Object obj) {
+
 		if (this == obj) {
 			return true;
 		}
@@ -161,6 +166,16 @@ public class TourSign implements Comparable<Object> {
 
 	public long getSignId() {
 		return signId;
+	}
+
+	public Photo getSignImagePhoto() {
+
+		if (_signImagePhoto == null) {
+
+			_signImagePhoto = new Photo(imageFilePathName);
+		}
+
+		return _signImagePhoto;
 	}
 
 	public String getSignKey() {

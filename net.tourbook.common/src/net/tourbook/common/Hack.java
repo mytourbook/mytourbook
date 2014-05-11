@@ -36,7 +36,7 @@ public class Hack {
 		try {
 
 			// Search class hierarchy for protected setter method
-			final Method setter = Tree.class.getDeclaredMethod("setItemHeight", int.class);//$NON-NLS-1$
+			final Method setter = Table.class.getDeclaredMethod("setItemHeight", int.class);//$NON-NLS-1$
 
 			setter.setAccessible(true);
 			setter.invoke(table, Integer.valueOf(itemHeight));

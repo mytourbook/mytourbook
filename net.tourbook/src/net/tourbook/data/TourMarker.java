@@ -264,50 +264,6 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 	}
 
 	/**
-	 * compares two markers
-	 * 
-	 * @param comparedMarker
-	 * @param ignoreType
-	 *            set <code>true</code> to not compare the type field
-	 * @return Returns true when the content of the markers are equal
-	 */
-	public boolean compareTo(final TourMarker comparedMarker, final boolean ignoreType) {
-
-//		if (category.compareTo(comparedMarker.category) != 0) {
-//			return false;
-//		} else
-		if (label.compareTo(comparedMarker.label) != 0) {
-			return false;
-		} else if (getComment().compareTo(comparedMarker.getComment()) != 0) {
-			return false;
-		} else if (getDescription().compareTo(comparedMarker.getDescription()) != 0) {
-			return false;
-		} else if (distance20 != comparedMarker.distance20) {
-			return false;
-		} else if (labelXOffset != comparedMarker.labelXOffset) {
-			return false;
-		} else if (labelYOffset != comparedMarker.labelYOffset) {
-			return false;
-		} else if (markerId != comparedMarker.markerId) {
-			return false;
-		} else if (markerType != comparedMarker.markerType) {
-			return false;
-		} else if (serieIndex != comparedMarker.serieIndex) {
-			return false;
-		} else if (time != comparedMarker.time) {
-			return false;
-		} else if ((ignoreType == false) && (type != comparedMarker.type)) {
-			return false;
-		} else if (visualPosition != comparedMarker.visualPosition) {
-			return false;
-		} else if (tourData != comparedMarker.tourData) {
-			return false;
-		}
-
-		return true;
-	}
-
-	/**
 	 * !!!!!!!!!!!!!!!!!<br>
 	 * serieIndex is not used for equals or hashcode because this is modified when markers are
 	 * deleted<br>
@@ -347,10 +303,6 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 		return true;
 	}
 
-//	public String getCategory() {
-//		return category;
-//	}
-
 	/**
 	 * @return
 	 */
@@ -358,6 +310,10 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 
 		return comment == null ? UI.EMPTY_STRING : comment;
 	}
+
+//	public String getCategory() {
+//		return category;
+//	}
 
 	/**
 	 * @return Returns description of the marker when available, otherwise an empty string.
@@ -411,6 +367,10 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 		return time;
 	}
 
+	public TourSign getTourSign() {
+		return tourSign;
+	}
+
 	public int getType() {
 		return type;
 	}
@@ -440,9 +400,58 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 		return result;
 	}
 
+	/**
+	 * Compares two markers.
+	 * 
+	 * @param comparedMarker
+	 * @param isIgnoreType
+	 *            When <code>true</code> the type field is not compared.
+	 * @return Returns <code>true</code> when the content of the markers are equal.
+	 */
+	public boolean isEqual(final TourMarker comparedMarker, final boolean isIgnoreType) {
+
+		if (label.compareTo(comparedMarker.label) != 0) {
+			return false;
+		} else if (getComment().compareTo(comparedMarker.getComment()) != 0) {
+			return false;
+		} else if (getDescription().compareTo(comparedMarker.getDescription()) != 0) {
+			return false;
+		} else if (distance20 != comparedMarker.distance20) {
+			return false;
+		} else if (labelXOffset != comparedMarker.labelXOffset) {
+			return false;
+		} else if (labelYOffset != comparedMarker.labelYOffset) {
+			return false;
+		} else if (markerId != comparedMarker.markerId) {
+			return false;
+		} else if (markerType != comparedMarker.markerType) {
+			return false;
+		} else if (serieIndex != comparedMarker.serieIndex) {
+			return false;
+		} else if (time != comparedMarker.time) {
+			return false;
+		} else if ((isIgnoreType == false) && (type != comparedMarker.type)) {
+			return false;
+		} else if (visualPosition != comparedMarker.visualPosition) {
+			return false;
+		} else if (tourData != comparedMarker.tourData) {
+			return false;
+		} else if ((tourSign != null && comparedMarker.tourSign == null)
+				|| (tourSign == null && comparedMarker.tourSign != null)
+				|| (tourSign != null && comparedMarker.tourSign != null && tourSign.equals(comparedMarker.tourSign) == false)) {
+			return false;
+		}
+
+		return true;
+	}
+
 	public boolean isMarkerVisible() {
 		return isMarkerVisible == 1;
 	}
+
+//	public void setCategory(final String category) {
+//		this.category = category;
+//	}
 
 	/**
 	 * restore marker data from a marker backup
@@ -452,7 +461,6 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 	public void restoreMarkerFromBackup(final TourMarker backupMarker) {
 
 		label = backupMarker.label;
-//		category = backupMarker.category;
 		comment = backupMarker.comment;
 		description = backupMarker.description;
 
@@ -467,11 +475,8 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 		visualPosition = backupMarker.visualPosition;
 
 		tourData = backupMarker.tourData;
+		tourSign = backupMarker.tourSign;
 	}
-
-//	public void setCategory(final String category) {
-//		this.category = category;
-//	}
 
 	public void setComment(final String comment) {
 		this.comment = comment;
@@ -511,7 +516,6 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 	public void setMarkerBackup(final TourMarker backupMarker) {
 
 		backupMarker.label = label;
-//		backupMarker.category = category;
 		backupMarker.comment = comment;
 		backupMarker.description = description;
 
@@ -526,6 +530,7 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 		backupMarker.visualPosition = visualPosition;
 
 		backupMarker.tourData = tourData;
+		backupMarker.tourSign = tourSign;
 	}
 
 	/**
@@ -554,6 +559,10 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 	 */
 	public void setTime(final int time) {
 		this.time = time;
+	}
+
+	public void setTourSign(final TourSign tourSign) {
+		this.tourSign = tourSign;
 	}
 
 	public void setVisibleType(final int visibleType) {
@@ -603,14 +612,6 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 
 		distance20 = distance;
 		distance = 0;
-	}
-
-	public TourSign getTourSign() {
-		return tourSign;
-	}
-
-	public void setTourSign(TourSign tourSign) {
-		this.tourSign = tourSign;
 	}
 
 }
