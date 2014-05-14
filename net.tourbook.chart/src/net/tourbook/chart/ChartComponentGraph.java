@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2012  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -26,6 +26,7 @@ import net.tourbook.common.RectangleLong;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
+import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlEvent;
@@ -400,6 +401,8 @@ public class ChartComponentGraph extends Canvas {
 	 */
 	private int							_isCustomOverlayInvalid;
 
+	private PixelConverter				_pc;
+
 	/**
 	 * Constructor
 	 * 
@@ -414,6 +417,8 @@ public class ChartComponentGraph extends Canvas {
 		super(parent, SWT.H_SCROLL | SWT.NO_BACKGROUND);
 
 		_chart = chartWidget;
+
+		_pc = new PixelConverter(_chart);
 
 		_cursorResizeLeftRight = new Cursor(getDisplay(), SWT.CURSOR_SIZEWE);
 		_cursorResizeTopDown = new Cursor(getDisplay(), SWT.CURSOR_SIZENS);
@@ -3833,7 +3838,7 @@ public class ChartComponentGraph extends Canvas {
 				final ArrayList<IChartLayer> customFgLayers = graphDrawingData.getYData().getCustomForegroundLayers();
 
 				for (final IChartLayer layer : customFgLayers) {
-					layer.draw(gcCustom, graphDrawingData, _chart);
+					layer.draw(gcCustom, graphDrawingData, _chart, _pc);
 				}
 			}
 		}
@@ -4662,15 +4667,15 @@ public class ChartComponentGraph extends Canvas {
 
 			gcOverlay.setAlpha(0x40);
 			gcOverlay.fillOval(//
-					devX - devOffsetFill,
-					(int) (devPosition.y - devOffsetFill),
+					devX - devOffsetFill + 1,
+					(int) (devPosition.y - devOffsetFill + 1),
 					devOffsetFill * 2,
 					devOffsetFill * 2);
 
 			gcOverlay.setAlpha(0xff);
 			gcOverlay.fillOval(//
-					devX - devOffsetPoint,
-					(int) (devPosition.y - devOffsetPoint),
+					devX - devOffsetPoint + 1,
+					(int) (devPosition.y - devOffsetPoint + 1),
 					devOffsetPoint * 2,
 					devOffsetPoint * 2);
 

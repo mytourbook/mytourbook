@@ -230,7 +230,7 @@ public class TourEditor extends EditorPart implements IPersistableEditor {
 		});
 
 		_tourChartConfig = TourManager.createDefaultTourChartConfig();
-		_tourChart.createTourEditorActions(_tourChartConfig);
+		_tourChart.createActions_TourEditor(_tourChartConfig);
 
 		updateTourChart();
 	}

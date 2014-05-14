@@ -53,6 +53,7 @@ import net.tourbook.common.color.IGradientColorProvider;
 import net.tourbook.common.color.IMapColorProvider;
 import net.tourbook.common.color.MapGraphId;
 import net.tourbook.common.color.MapUnits;
+import net.tourbook.common.tooltip.IOpeningDialog;
 import net.tourbook.common.util.SWTPopupOverAWT;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;

@@ -1486,6 +1486,18 @@ public class TourDatabase {
 		return;
 	}
 
+	private static void sql_AddCol_Int(final Statement stmt, final String table, final String columnName)
+			throws SQLException {
+
+		final String sql = ""// 												//$NON-NLS-1$
+				+ ("ALTER TABLE " + table) //									//$NON-NLS-1$
+				+ ("	ADD COLUMN	" + columnName + " INTEGER DEFAULT 0"); //	//$NON-NLS-1$ //$NON-NLS-2$
+
+		exec(stmt, sql);
+
+		return;
+	}
+
 	/**
 	 * Creates a SQL statement to add a column for VARCHAR.
 	 * 
@@ -2492,6 +2504,9 @@ public class TourDatabase {
 				//
 				+ "	" + (TABLE_TOUR_SIGN + "_signId	BIGINT,						\n") //$NON-NLS-1$ //$NON-NLS-2$
 				//
+				+ "	signPosition				INTEGER DEFAULT 0,				\n" //$NON-NLS-1$
+				+ "	signXOffset					INTEGER DEFAULT 0,				\n" //$NON-NLS-1$
+				+ "	signYOffset					INTEGER DEFAULT 0,				\n" //$NON-NLS-1$
 				+ ("	description				" + varCharKomma(TourWayPoint.DB_LENGTH_DESCRIPTION)) //	//$NON-NLS-1$
 				+ ("	comment					" + varCharKomma(TourWayPoint.DB_LENGTH_COMMENT)) //		//$NON-NLS-1$
 				//
@@ -2829,7 +2844,7 @@ public class TourDatabase {
 				+ ("	signId 				BIGINT NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 0 ,INCREMENT BY 1),\n") //$NON-NLS-1$
 				//
 				+ ("	name 				" + varCharKomma(TourSign.DB_LENGTH_NAME)) //				//$NON-NLS-1$
-				+ ("	signKey 			" + varChar(TourSign.DB_LENGTH_NAME) + " NOT NULL,		\n") //$NON-NLS-1$
+				+ ("	signKey 			" + varChar(TourSign.DB_LENGTH_NAME) + " NOT NULL,		\n") //$NON-NLS-1$ //$NON-NLS-2$
 				+ ("	imageFilePathName 	" + varCharKomma(TourSign.DB_LENGTH_IMAGE_FILE_PATH)) //	//$NON-NLS-1$
 				+ ("	expandType			INT DEFAULT " + TourSign.EXPAND_TYPE_DEFAULT + ",		\n")//$NON-NLS-1$ //$NON-NLS-2$
 				//
@@ -2866,7 +2881,7 @@ public class TourDatabase {
 				+ ("	signCategoryId 	BIGINT NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 0 ,INCREMENT BY 1),\n") //$NON-NLS-1$
 				//
 				+ ("	name 				" + varCharKomma(TourSign.DB_LENGTH_NAME)) //				//$NON-NLS-1$
-				+ ("	categoryKey 		" + varChar(TourSign.DB_LENGTH_NAME) + " NOT NULL,		\n") //$NON-NLS-1$
+				+ ("	categoryKey 		" + varChar(TourSign.DB_LENGTH_NAME) + " NOT NULL,		\n") //$NON-NLS-1$ //$NON-NLS-2$
 				//
 				+ ("	isRoot 				INT DEFAULT 0											\n")//$NON-NLS-1$
 				//
@@ -4958,6 +4973,9 @@ public class TourDatabase {
 //				//
 //				+ "	" + (TABLE_TOUR_SIGN + "_signId	BIGINT,						\n") //$NON-NLS-1$ //$NON-NLS-2$
 //				//
+//				+ "	signPosition				INTEGER,						\n" //$NON-NLS-1$
+//				+ "	signXOffset					INTEGER,						\n" //$NON-NLS-1$
+//				+ "	signYOffset					INTEGER,						\n" //$NON-NLS-1$
 //				+ ("	description				" + varCharKomma(TourWayPoint.DB_LENGTH_DESCRIPTION)) //	//$NON-NLS-1$
 //				+ ("	comment					" + varCharKomma(TourWayPoint.DB_LENGTH_COMMENT)) //		//$NON-NLS-1$
 //				//
@@ -4966,11 +4984,14 @@ public class TourDatabase {
 				/*
 				 * Add new columns
 				 */
-				final String manyToOne_TourSign = "TourSign_SignId";
+				final String manyToOne_TourSign = "TourSign_SignId"; //$NON-NLS-1$
 
 				sql_AddCol_BigInt(stmt, TABLE_TOUR_MARKER, manyToOne_TourSign);
 				sql_AddCol_VarCar(stmt, TABLE_TOUR_MARKER, "description", TourWayPoint.DB_LENGTH_DESCRIPTION); //$NON-NLS-1$
 				sql_AddCol_VarCar(stmt, TABLE_TOUR_MARKER, "comment", TourWayPoint.DB_LENGTH_COMMENT); //$NON-NLS-1$
+				sql_AddCol_Int(stmt, TABLE_TOUR_MARKER, "signPosition"); //$NON-NLS-1$
+				sql_AddCol_Int(stmt, TABLE_TOUR_MARKER, "signXOffset"); //$NON-NLS-1$
+				sql_AddCol_Int(stmt, TABLE_TOUR_MARKER, "signYOffset"); //$NON-NLS-1$
 
 				sql_CreateIndex(stmt, TABLE_TOUR_MARKER, manyToOne_TourSign, manyToOne_TourSign);
 

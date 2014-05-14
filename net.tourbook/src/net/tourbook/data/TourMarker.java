@@ -66,18 +66,17 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 	/**
 	 * Replace in db version 24 with {@link TourWayPoint#DB_LENGTH_CATEGORY}
 	 */
-	public static final int			DB_LENGTH_CATEGORY		= 100;
+	public static final int			DB_LENGTH_CATEGORY	= 100;
 
 	/**
 	 * Replace in db version 24 with {@link TourWayPoint#DB_LENGTH_NAME}
 	 */
-	public static final int			DB_LENGTH_LABEL			= 255;
+	public static final int			DB_LENGTH_LABEL		= 255;
 
 	/**
 	 * visual position for markers, they must correspond to the position in {@link ChartLabel}
 	 */
-	public static final String[]	visualPositionLabels	= new String[] {
-			Messages.Tour_Marker_Position_vertical_above, // 				0
+	public static final String[]	LABEL_POSITIONS		= new String[] { Messages.Tour_Marker_Position_vertical_above, // 				0
 			Messages.Tour_Marker_Position_vertical_below, //				1
 			Messages.Tour_Marker_Position_vertical_chart_top, // 			2
 			Messages.Tour_Marker_Position_vertical_chart_bottom, // 		3
@@ -89,14 +88,25 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 			Messages.Tour_Marker_Position_horizontal_below_right, // 		9
 			Messages.Tour_Marker_Position_horizontal_left, // 				10
 			Messages.Tour_Marker_Position_horizontal_right, // 				11
-															};
+														};
+
+	public static final String[]	SIGN_POSITIONS		= new String[] {
+			Messages.Tour_Marker_Position_horizontal_above_left, // 		0
+			Messages.Tour_Marker_Position_horizontal_above_centered, // 	1
+			Messages.Tour_Marker_Position_horizontal_above_right, // 		2
+			Messages.Tour_Marker_Position_horizontal_below_left, // 		3
+			Messages.Tour_Marker_Position_horizontal_below_centered, // 	4
+			Messages.Tour_Marker_Position_horizontal_below_right, // 		5
+			Messages.Tour_Marker_Position_horizontal_left, // 				6
+			Messages.Tour_Marker_Position_horizontal_right, // 				7
+														};
 
 	/**
 	 * Unique id for the {@link TourMarker} entity
 	 */
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private long					markerId				= TourDatabase.ENTITY_IS_NOT_SAVED;
+	private long					markerId			= TourDatabase.ENTITY_IS_NOT_SAVED;
 
 	@ManyToOne(optional = false)
 	private TourData				tourData;
@@ -118,13 +128,13 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 	 * <code>-1</code>.
 	 */
 	@XmlElement
-	private int						time					= -1;
+	private int						time				= -1;
 
 	/**
 	 * Distance field before db version 20, this field is required for data conversion AND <b>to
 	 * load entities</b> !!!
 	 */
-	private int						distance				= -1;
+	private int						distance			= -1;
 
 	/**
 	 * Distance in meters in the metric system or <code>-1</code> when the distance is not
@@ -133,16 +143,20 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 	 * 20 == db version 20
 	 */
 	@XmlElement
-	private float					distance20				= -1;
+	private float					distance20			= -1;
 
 	private int						visualPosition;
-
 	private int						labelXOffset;
-
 	private int						labelYOffset;
 
+	private int						signPosition;
+	private int						signXOffset;
+	private int						signYOffset;
+
 	/**
-	 * markerType contains the type of the marker, this can be: crossing, hotel, view point
+	 * Contains the type of the marker, this can be: crossing, hotel, view point.
+	 * <p>
+	 * THIS IS NOT USED.
 	 */
 	private long					markerType;
 
@@ -153,13 +167,13 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 	private int						serieIndex;
 
 	@XmlElement
-	private String					label					= UI.EMPTY_STRING;
+	private String					label				= UI.EMPTY_STRING;
 
 	/**
 	 * This field is disable since db version 24 because the TourSign can be categorized.
 	 */
 	@SuppressWarnings("unused")
-	private String					category				= UI.EMPTY_STRING;
+	private String					category			= UI.EMPTY_STRING;
 
 	/**
 	 * Can be <code>null</code>
@@ -175,7 +189,7 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 	 */
 	private String					description;
 
-	private int						isMarkerVisible			= 1;
+	private int						isMarkerVisible		= 1;
 
 	/**
 	 * visibleType is used to show the marker with different visible effects (color)
@@ -197,13 +211,13 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 	 * not persisted
 	 */
 	@Transient
-	private long					_createId				= 0;
+	private long					_createId			= 0;
 
 	/**
 	 * manually created marker or imported marker create a unique id to identify them, saved marker
 	 * are compared with the marker id
 	 */
-	private static int				_createCounter			= 0;
+	private static int				_createCounter		= 0;
 
 	public TourMarker() {}
 
@@ -338,6 +352,10 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 		return label;
 	}
 
+	public int getLabelPosition() {
+		return visualPosition;
+	}
+
 	public int getLabelXOffset() {
 		return labelXOffset;
 	}
@@ -363,6 +381,18 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 		return serieIndex;
 	}
 
+	public int getSignPosition() {
+		return signPosition;
+	}
+
+	public int getSignXOffset() {
+		return signXOffset;
+	}
+
+	public int getSignYOffset() {
+		return signYOffset;
+	}
+
 	public int getTime() {
 		return time;
 	}
@@ -379,9 +409,9 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 		return _visibleType;
 	}
 
-	public int getVisualPosition() {
-		return visualPosition;
-	}
+//	public void setCategory(final String category) {
+//		this.category = category;
+//	}
 
 	/**
 	 * !!!!!!!!!!!!!!!!!<br>
@@ -428,6 +458,12 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 			return false;
 		} else if (serieIndex != comparedMarker.serieIndex) {
 			return false;
+		} else if (signPosition != comparedMarker.signPosition) {
+			return false;
+		} else if (signXOffset != comparedMarker.signXOffset) {
+			return false;
+		} else if (signYOffset != comparedMarker.signYOffset) {
+			return false;
 		} else if (time != comparedMarker.time) {
 			return false;
 		} else if ((isIgnoreType == false) && (type != comparedMarker.type)) {
@@ -448,10 +484,6 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 	public boolean isMarkerVisible() {
 		return isMarkerVisible == 1;
 	}
-
-//	public void setCategory(final String category) {
-//		this.category = category;
-//	}
 
 	/**
 	 * restore marker data from a marker backup
@@ -552,6 +584,18 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 		this.tourSign = tourSign;
 	}
 
+	public void setSignPosition(final int signPosition) {
+		this.signPosition = signPosition;
+	}
+
+	public void setSignXOffset(final int signXOffset) {
+		this.signXOffset = signXOffset;
+	}
+
+	public void setSignYOffset(final int signYOffset) {
+		this.signYOffset = signYOffset;
+	}
+
 	/**
 	 * @param time
 	 *            Time in seconds relative to the tour start. When value is not available it is set
@@ -566,7 +610,7 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 	}
 
 	public void setVisibleType(final int visibleType) {
-		this._visibleType = visibleType;
+		_visibleType = visibleType;
 	}
 
 	public void setVisualPosition(final int visualPosition) {

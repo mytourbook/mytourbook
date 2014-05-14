@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -25,6 +25,7 @@ import net.tourbook.chart.IChartLayer;
 import net.tourbook.data.TourData;
 import net.tourbook.tour.TourManager;
 
+import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
@@ -47,7 +48,10 @@ public class ChartSegmentValueLayer implements IChartLayer {
 	 * @param drawingData
 	 * @param chartComponents
 	 */
-	public void draw(final GC gc, final GraphDrawingData drawingData, final Chart chart) {
+	public void draw(	final GC gc,
+						final GraphDrawingData drawingData,
+						final Chart chart,
+						final PixelConverter pixelConverter) {
 
 		final int[] segmentSerie = _tourData.segmentSerieIndex;
 

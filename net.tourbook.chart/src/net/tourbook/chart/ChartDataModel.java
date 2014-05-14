@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2012  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -20,8 +20,8 @@ import java.util.HashMap;
 import java.util.Map.Entry;
 
 /**
- * is the data model which is used by chart to draw it. All data which are required to draw the
- * chart must be contained in this data model.
+ * This is the data model for a chart to draw it. All data which are required to draw the chart must
+ * be contained in this data model.
  */
 public class ChartDataModel {
 

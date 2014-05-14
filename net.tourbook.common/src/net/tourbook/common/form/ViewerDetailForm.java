@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.common.form;
 
+import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
@@ -32,31 +33,42 @@ import org.eclipse.swt.widgets.Listener;
  */
 public class ViewerDetailForm {
 
-	private static final int	MINIMUM_WIDTH	= 100;
+	private static int	MINIMUM_WIDTH	= 100;
 
-	private Composite			_parent;
+	private Composite	_parent;
 
-	private Control				_maximizedControl;
+	private Control		_maximizedControl;
 
-	private Control				_viewer;
-	private Control				_sash;
-	private Control				_detail;
+	private Control		_viewer;
+	private Control		_sash;
+	private Control		_detail;
 
-	private Integer				_viewerWidth;
-	private Integer				_sashWidth;
-	private FormData			_sashLayoutData;
+	private Integer		_viewerWidth;
+	private Integer		_sashWidth;
+	private FormData	_sashLayoutData;
 
-	private boolean				_isInitialResize;
+	private boolean		_isInitialResize;
 
 	public ViewerDetailForm(final Composite parent, final Control viewer, final Control sash, final Control detail) {
 		this(parent, viewer, sash, detail, 50);
 	}
 
+	/**
+	 * @param parent
+	 * @param viewer
+	 * @param sash
+	 * @param detail
+	 * @param leftWidth
+	 *            Relative width of the left part in %.
+	 */
 	public ViewerDetailForm(final Composite parent,
 							final Control viewer,
 							final Control sash,
 							final Control detail,
 							final int leftWidth) {
+
+		final PixelConverter pc = new PixelConverter(parent);
+		MINIMUM_WIDTH = pc.convertWidthInCharsToPixels(15);
 
 		_parent = parent;
 		_viewer = viewer;
@@ -183,7 +195,7 @@ public class ViewerDetailForm {
 
 					if (_viewerWidth + MINIMUM_WIDTH >= parentRect.width) {
 
-						viewerWidth = Math.max(parentRect.width - MINIMUM_WIDTH, 50);
+						viewerWidth = Math.max(parentRect.width - MINIMUM_WIDTH, MINIMUM_WIDTH / 2);
 
 					} else {
 						viewerWidth = _viewerWidth;

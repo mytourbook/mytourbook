@@ -13,14 +13,14 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.map2.action;
+package net.tourbook.ui.tourChart.action;
 
+import net.tourbook.Messages;
+import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
-import net.tourbook.common.util.Util;
-import net.tourbook.map2.Messages;
-import net.tourbook.map2.view.Map2View;
-import net.tourbook.map2.view.MapFilterData;
-import net.tourbook.photo.DialogPhotoProperties;
+import net.tourbook.common.tooltip.IOpeningDialog;
+import net.tourbook.ui.tourChart.SlideoutMarkerOptions;
+import net.tourbook.ui.tourChart.TourChart;
 
 import org.eclipse.jface.action.ContributionItem;
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -38,20 +38,22 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 
-public class ActionPhotoProperties extends ContributionItem {
+public class ActionMarkerOptions extends ContributionItem implements IOpeningDialog {
 
-	private static final String		ID								= "ACTION_PHOTO_FILTER_ID";		//$NON-NLS-1$
+	private static final String		IMAGE_EDIT_TOUR_MARKER			= Messages.Image__edit_tour_marker;
+	private static final String		IMAGE_EDIT_TOUR_MARKER_DISABLED	= Messages.Image__edit_tour_marker_disabled;
 
-	private static final String		STATE_IS_PHOTO_FILTER_ACTIVE	= "STATE_IS_PHOTO_FILTER_ACTIVE";	//$NON-NLS-1$
+	private IDialogSettings			_state							= TourbookPlugin.getState(//
+																			getClass().getSimpleName());
 
-	private Map2View				_mapView;
+	private final String			_dialogId						= getClass().getCanonicalName();
 
-	private DialogPhotoProperties	_photoProperties;
+	private TourChart				_tourChart;
 
 	private ToolBar					_toolBar;
-
 	private ToolItem				_actionToolItem;
-	private IDialogSettings			_state;
+
+	private SlideoutMarkerOptions	_slideoutMarkerOptions;
 
 	/*
 	 * UI controls
@@ -59,34 +61,15 @@ public class ActionPhotoProperties extends ContributionItem {
 	private Control					_parent;
 
 	private Image					_imageEnabled;
-	private Image					_imageEnabledNoPhotos;
-	private Image					_imageEnabledWithPhotos;
 	private Image					_imageDisabled;
 
-	public class PhotoPropertiesUI extends DialogPhotoProperties {
+	public ActionMarkerOptions(final TourChart tourChart, final Control parent) {
 
-		public PhotoPropertiesUI(final Control parent, final ToolBar toolBar, final IDialogSettings state) {
-			super(parent, toolBar, state);
-		}
-
-		@Override
-		protected void updateFilterActionUI(final MapFilterData data) {
-			onUpdateFilter(data);
-		}
-	}
-
-	public ActionPhotoProperties(final Map2View mapView, final Control parent, final IDialogSettings state) {
-
-		super(ID);
-
-		_mapView = mapView;
+		_tourChart = tourChart;
 		_parent = parent;
-		_state = state;
 
-		_imageEnabled = UI.IMAGE_REGISTRY.get(UI.IMAGE_ACTION_PHOTO_FILTER);
-		_imageEnabledNoPhotos = UI.IMAGE_REGISTRY.get(UI.IMAGE_ACTION_PHOTO_FILTER_NO_PHOTOS);
-		_imageEnabledWithPhotos = UI.IMAGE_REGISTRY.get(UI.IMAGE_ACTION_PHOTO_FILTER_WITH_PHOTOS);
-		_imageDisabled = UI.IMAGE_REGISTRY.get(UI.IMAGE_ACTION_PHOTO_FILTER_DISABLED);
+		_imageEnabled = TourbookPlugin.getImageDescriptor(IMAGE_EDIT_TOUR_MARKER).createImage();
+		_imageDisabled = TourbookPlugin.getImageDescriptor(IMAGE_EDIT_TOUR_MARKER_DISABLED).createImage();
 	}
 
 	@Override
@@ -96,7 +79,6 @@ public class ActionPhotoProperties extends ContributionItem {
 
 			toolbar.addDisposeListener(new DisposeListener() {
 				public void widgetDisposed(final DisposeEvent e) {
-					//toolItem.getImage().dispose();
 					_actionToolItem.dispose();
 					_actionToolItem = null;
 				}
@@ -105,12 +87,9 @@ public class ActionPhotoProperties extends ContributionItem {
 			_toolBar = toolbar;
 
 			_actionToolItem = new ToolItem(toolbar, SWT.CHECK);
-
 			_actionToolItem.setImage(_imageEnabled);
 			_actionToolItem.setDisabledImage(_imageDisabled);
-
 			_actionToolItem.addSelectionListener(new SelectionAdapter() {
-
 				@Override
 				public void widgetSelected(final SelectionEvent e) {
 					onAction();
@@ -121,31 +100,36 @@ public class ActionPhotoProperties extends ContributionItem {
 				public void mouseMove(final MouseEvent e) {
 
 					final Point mousePosition = new Point(e.x, e.y);
-
 					final ToolItem hoveredItem = toolbar.getItem(mousePosition);
 
 					onMouseMove(hoveredItem, e);
 				}
 			});
 
-			_photoProperties = new PhotoPropertiesUI(_parent, _toolBar, _state);
+			_slideoutMarkerOptions = new SlideoutMarkerOptions(_parent, _toolBar, _state, _tourChart);
 
-			// send notifications to the map to update displayed photos
-			_photoProperties.addPropertiesListener(_mapView);
-
-			// this is also listening to update filter numbers in the photo properties shell
-			// this MUST be called after the map
-//			_photoProperties.addPropertiesListener(this);
+			updateUI();
 		}
+	}
+
+	@Override
+	public String getDialogId() {
+		return _dialogId;
+	}
+
+	@Override
+	public void hideDialog() {
+
+		_slideoutMarkerOptions.hideNow();
 	}
 
 	private void onAction() {
 
 		updateUI();
 
-		final boolean isFilterActive = _actionToolItem.getSelection();
+		final boolean isMarkerVisible = _actionToolItem.getSelection();
 
-		if (isFilterActive) {
+		if (isMarkerVisible) {
 
 			final Rectangle itemBounds = _actionToolItem.getBounds();
 
@@ -154,21 +138,21 @@ public class ActionPhotoProperties extends ContributionItem {
 			itemBounds.x = itemDisplayPosition.x;
 			itemBounds.y = itemDisplayPosition.y;
 
-			_photoProperties.open(itemBounds, false);
+			_slideoutMarkerOptions.open(itemBounds, false);
 
 		} else {
 
-			_photoProperties.close();
+			_slideoutMarkerOptions.close();
 		}
 
-		_mapView.actionPhotoProperties(isFilterActive);
+		_tourChart.actionShowTourMarker(isMarkerVisible);
 	}
 
 	private void onMouseMove(final ToolItem item, final MouseEvent mouseEvent) {
 
 		if (_actionToolItem.getSelection() == false || _actionToolItem.isEnabled() == false) {
 
-			// filter is not active
+			// marker is not displayed
 
 			return;
 		}
@@ -187,39 +171,16 @@ public class ActionPhotoProperties extends ContributionItem {
 			itemBounds.y = itemDisplayPosition.y;
 		}
 
-		_photoProperties.open(itemBounds, true);
-	}
-
-	private void onUpdateFilter(final MapFilterData data) {
-
-		_actionToolItem.setImage(data.allPhotos == 0 ? //
-				_imageEnabled
-				: data.filteredPhotos == 0 ? //
-						_imageEnabledNoPhotos
-						: _imageEnabledWithPhotos);
+		_slideoutMarkerOptions.open(itemBounds, true);
 	}
 
 	public void restoreState() {
 
-		final boolean isFilterActive = Util.getStateBoolean(_state, STATE_IS_PHOTO_FILTER_ACTIVE, false);
-
-		_actionToolItem.setSelection(isFilterActive);
-
-		_photoProperties.restoreState();
-
-		updateUI();
-
-		_mapView.actionPhotoProperties(isFilterActive);
-
-		// update AFTER photo filter is activated
-//		updateUI_FotoFilterStats();
+//		updateUI();
 	}
 
 	public void saveState() {
 
-		_state.put(STATE_IS_PHOTO_FILTER_ACTIVE, _actionToolItem.getSelection());
-
-		_photoProperties.saveState();
 	}
 
 	public void setEnabled(final boolean isEnabled) {
@@ -233,18 +194,24 @@ public class ActionPhotoProperties extends ContributionItem {
 		}
 	}
 
+	public void setSelected(final boolean isSelected) {
+
+		_actionToolItem.setSelection(isSelected);
+
+		updateUI();
+	}
+
 	private void updateUI() {
 
 		if (_actionToolItem.getSelection()) {
 
-			// hide tooltip because the photo filter is displayed
+			// hide tooltip because the marker options slideout is displayed
 
 			_actionToolItem.setToolTipText(UI.EMPTY_STRING);
 
 		} else {
 
-			_actionToolItem.setToolTipText(Messages.Map_Action_PhotoFilter_Tooltip);
+			_actionToolItem.setToolTipText(Messages.Tour_Action_MarkerOptions_Tooltip);
 		}
 	}
-
 }

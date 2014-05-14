@@ -76,29 +76,29 @@ import org.joda.time.DateTime;
 
 public class TourManager {
 
-	public static final String				CUSTOM_DATA_TOUR_ID						= "tourId";					//$NON-NLS-1$
-	public static final String				CUSTOM_DATA_TOUR_DATA					= "tourData";					//$NON-NLS-1$
-	public static final String				CUSTOM_DATA_TOUR_CHART_CONFIGURATION	= "tourChartConfig";			//$NON-NLS-1$
+	public static final String				CUSTOM_DATA_TOUR_ID						= "tourId";						//$NON-NLS-1$
+	public static final String				CUSTOM_DATA_TOUR_DATA					= "tourData";						//$NON-NLS-1$
+	public static final String				CUSTOM_DATA_TOUR_CHART_CONFIGURATION	= "tourChartConfig";				//$NON-NLS-1$
 
-	public static final String				CUSTOM_DATA_ALTIMETER					= "altimeter";					//$NON-NLS-1$
-	public static final String				CUSTOM_DATA_ALTITUDE					= "altitude";					//$NON-NLS-1$
-	public static final String				CUSTOM_DATA_CADENCE						= "cadence";					//$NON-NLS-1$
-	public static final String				CUSTOM_DATA_DISTANCE					= "distance";					//$NON-NLS-1$
-	public static final String				CUSTOM_DATA_GRADIENT					= "gradient";					//$NON-NLS-1$
-	public static final String				CUSTOM_DATA_HISTORY						= "history";					//$NON-NLS-1$
-	public static final String				CUSTOM_DATA_PACE						= "pace";						//$NON-NLS-1$
-	public static final String				CUSTOM_DATA_POWER						= "power";						//$NON-NLS-1$
-	public static final String				CUSTOM_DATA_PULSE						= "pulse";						//$NON-NLS-1$
-	public static final String				CUSTOM_DATA_SPEED						= "speed";						//$NON-NLS-1$
-	public static final String				CUSTOM_DATA_TEMPERATURE					= "temperature";				//$NON-NLS-1$
-	public static final String				CUSTOM_DATA_TIME						= "time";						//$NON-NLS-1$
+	public static final String				CUSTOM_DATA_ALTIMETER					= "altimeter";						//$NON-NLS-1$
+	public static final String				CUSTOM_DATA_ALTITUDE					= "altitude";						//$NON-NLS-1$
+	public static final String				CUSTOM_DATA_CADENCE						= "cadence";						//$NON-NLS-1$
+	public static final String				CUSTOM_DATA_DISTANCE					= "distance";						//$NON-NLS-1$
+	public static final String				CUSTOM_DATA_GRADIENT					= "gradient";						//$NON-NLS-1$
+	public static final String				CUSTOM_DATA_HISTORY						= "history";						//$NON-NLS-1$
+	public static final String				CUSTOM_DATA_PACE						= "pace";							//$NON-NLS-1$
+	public static final String				CUSTOM_DATA_POWER						= "power";							//$NON-NLS-1$
+	public static final String				CUSTOM_DATA_PULSE						= "pulse";							//$NON-NLS-1$
+	public static final String				CUSTOM_DATA_SPEED						= "speed";							//$NON-NLS-1$
+	public static final String				CUSTOM_DATA_TEMPERATURE					= "temperature";					//$NON-NLS-1$
+	public static final String				CUSTOM_DATA_TIME						= "time";							//$NON-NLS-1$
 
-	public static final String				CUSTOM_DATA_SEGMENT_VALUES				= "segmentValues";				//$NON-NLS-1$
-	public static final String				CUSTOM_DATA_ANALYZER_INFO				= "analyzerInfo";				//$NON-NLS-1$
-	public static final String				CUSTOM_DATA_CONCONI_TEST				= "CUSTOM_DATA_CONCONI_TEST";	//$NON-NLS-1$
+	public static final String				CUSTOM_DATA_SEGMENT_VALUES				= "segmentValues";					//$NON-NLS-1$
+	public static final String				CUSTOM_DATA_ANALYZER_INFO				= "analyzerInfo";					//$NON-NLS-1$
+	public static final String				CUSTOM_DATA_CONCONI_TEST				= "CUSTOM_DATA_CONCONI_TEST";		//$NON-NLS-1$
 
-	public static final String				X_AXIS_TIME								= "time";						//$NON-NLS-1$
-	public static final String				X_AXIS_DISTANCE							= "distance";					//$NON-NLS-1$
+	public static final String				X_AXIS_TIME								= "time";							//$NON-NLS-1$
+	public static final String				X_AXIS_DISTANCE							= "distance";						//$NON-NLS-1$
 
 	public static final int					GRAPH_ALTITUDE							= 1000;
 	public static final int					GRAPH_SPEED								= 1001;
@@ -125,9 +125,7 @@ public class TourManager {
 
 	private static TourManager				_instance;
 
-	private final static IPreferenceStore	_prefStore								= TourbookPlugin
-																							.getDefault()
-																							.getPreferenceStore();
+	private final static IPreferenceStore	_prefStore								= TourbookPlugin.getPrefStore();
 
 	/**
 	 * contains the instance of the {@link TourDataEditorView} or <code>null</code> when this part
@@ -350,7 +348,7 @@ public class TourManager {
 	 */
 	public static TourChartConfiguration createDefaultTourChartConfig() {
 
-		final TourChartConfiguration tourChartConfig = new TourChartConfiguration(true);
+		final TourChartConfiguration tcc = new TourChartConfiguration(true);
 
 		/*
 		 * convert graph ids from the preferences into visible graphs in the chart panel
@@ -360,36 +358,35 @@ public class TourManager {
 				_prefStore.getString(ITourbookPreferences.GRAPH_VISIBLE));
 
 		for (final String prefGraphId : prefGraphIds) {
-			tourChartConfig.addVisibleGraph(Integer.parseInt(prefGraphId));
+			tcc.addVisibleGraph(Integer.parseInt(prefGraphId));
 		}
 
-		tourChartConfig.isHrZoneDisplayed = _prefStore.getBoolean(//
+		tcc.isHrZoneDisplayed = _prefStore.getBoolean(//
 				ITourbookPreferences.GRAPH_IS_HR_ZONE_BACKGROUND_VISIBLE);
 
-		tourChartConfig.hrZoneStyle = _prefStore.getString(ITourbookPreferences.GRAPH_HR_ZONE_STYLE);
+		tcc.hrZoneStyle = _prefStore.getString(ITourbookPreferences.GRAPH_HR_ZONE_STYLE);
 
 		// set the unit which is shown on the x-axis
 		final boolean isShowTime = _prefStore.getString(ITourbookPreferences.GRAPH_X_AXIS).equals(X_AXIS_TIME);
-		tourChartConfig.isShowTimeOnXAxis = isShowTime;
-		tourChartConfig.isShowTimeOnXAxisBackup = isShowTime;
+		tcc.isShowTimeOnXAxis = isShowTime;
+		tcc.isShowTimeOnXAxisBackup = isShowTime;
 
 		final boolean isTourStartTime = _prefStore.getBoolean(ITourbookPreferences.GRAPH_X_AXIS_STARTTIME);
-		tourChartConfig.xAxisTime = isTourStartTime
-				? X_AXIS_START_TIME.TOUR_START_TIME
-				: X_AXIS_START_TIME.START_WITH_0;
-		tourChartConfig.isSRTMDataVisible = _prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_SRTM_VISIBLE);
+		tcc.xAxisTime = isTourStartTime ? X_AXIS_START_TIME.TOUR_START_TIME : X_AXIS_START_TIME.START_WITH_0;
+		tcc.isSRTMDataVisible = _prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_SRTM_VISIBLE);
 
-		tourChartConfig.isShowTourMarker = _prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_MARKER_VISIBLE);
-		tourChartConfig.isShowTourPhotos = _prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_TOUR_PHOTO_VISIBLE);
-		tourChartConfig.isShowTourPhotoTooltip = _prefStore.getBoolean(//
-				ITourbookPreferences.GRAPH_IS_TOUR_PHOTO_TOOLTIP_VISIBLE);
+		tcc.isShowTourMarker = _prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_MARKER_VISIBLE);
+		tcc.markerPointSize = _prefStore.getInt(ITourbookPreferences.GRAPH_MARKER_POINT_SIZE);
 
-		tourChartConfig.isShowBreaktimeValues = _prefStore.getBoolean(//
+		tcc.isShowTourPhotos = _prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_TOUR_PHOTO_VISIBLE);
+		tcc.isShowTourPhotoTooltip = _prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_TOUR_PHOTO_TOOLTIP_VISIBLE);
+
+		tcc.isShowBreaktimeValues = _prefStore.getBoolean(//
 				ITourbookPreferences.GRAPH_IS_BREAKTIME_VALUES_VISIBLE);
 
-		updateZoomOptionsInChartConfig(tourChartConfig, _prefStore);
+		updateZoomOptionsInChartConfig(tcc, _prefStore);
 
-		return tourChartConfig;
+		return tcc;
 	}
 
 	public static void fireEvent(final TourEventId tourEventId) {

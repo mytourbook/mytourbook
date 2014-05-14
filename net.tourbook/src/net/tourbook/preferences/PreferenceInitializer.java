@@ -121,8 +121,9 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 		// show breaktime values
 		store.setDefault(ITourbookPreferences.GRAPH_IS_BREAKTIME_VALUES_VISIBLE, true);
 
-		// is marker visible
+		// marker
 		store.setDefault(ITourbookPreferences.GRAPH_IS_MARKER_VISIBLE, true);
+		store.setDefault(ITourbookPreferences.GRAPH_MARKER_POINT_SIZE, 2);
 
 		// is photo visible
 		store.setDefault(ITourbookPreferences.GRAPH_IS_TOUR_PHOTO_VISIBLE, true);

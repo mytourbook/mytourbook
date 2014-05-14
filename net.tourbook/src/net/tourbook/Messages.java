@@ -526,8 +526,15 @@ public class Messages extends NLS {
 	public static String		Dlg_TourMarker_Button_ShowAllMarker_Tooltip;
 	public static String		Dlg_TourMarker_Button_undo;
 	public static String		Dlg_TourMarker_Button_undo_tooltip;
+
+	public static String	Dlg_TourMarker_Checkbox_MarkerVisibility;
+
 	public static String		Dlg_TourMarker_Dlg_Message;
 	public static String		Dlg_TourMarker_Dlg_title;
+
+	public static String	Dlg_TourMarker_Group_Label;
+
+	public static String	Dlg_TourMarker_Group_Sign;
 	public static String	Dlg_TourMarker_Label_Comment;
 
 	public static String	Dlg_TourMarker_Label_Description;
@@ -535,9 +542,23 @@ public class Messages extends NLS {
 	public static String		Dlg_TourMarker_Label_horizontal_offset;
 	public static String		Dlg_TourMarker_Label_marker_name;
 	public static String		Dlg_TourMarker_Label_markers;
+
+	public static String	Dlg_TourMarker_Label_Name;
+
+	public static String	Dlg_TourMarker_Label_Offset;
+
+	public static String	Dlg_TourMarker_Label_OffsetHorizontal;
+
+	public static String	Dlg_TourMarker_Label_OffsetHorizontal_Tooltip;
+
+	public static String	Dlg_TourMarker_Label_OffsetVertical;
+
+	public static String	Dlg_TourMarker_Label_OffsetVertical_Tooltip;
 	public static String		Dlg_TourMarker_Label_position;
 
 	public static String	Dlg_TourMarker_Label_Sign;
+
+	public static String	Dlg_TourMarker_Label_SignPosition;
 	public static String		Dlg_TourMarker_Label_vertical_offset;
 
 	public static String	Dlg_TourMarker_Link_Sign;
@@ -1098,6 +1119,10 @@ public class Messages extends NLS {
 	public static String		PrefPageTourTypeFilterList_Pref_TourTypeFilter_button_down;
 	public static String		PrefPageTourTypeFilterList_Pref_TourTypeFilter_button_up;
 
+	public static String	Slideout_ChartMarkerOptions_Label_MarkerSize;
+
+	public static String	Slideout_ChartMarkerOptions_Label_MarkerSize_Tooltip;
+
 	public static String		Tooltip_ValuePoint_Action_CloseContextMenu;
 	public static String		Tooltip_ValuePoint_Action_OpenToolTipMenu_ToolTip;
 	public static String		Tooltip_ValuePoint_Action_Orientation_Horizontal;
@@ -1152,6 +1177,8 @@ public class Messages extends NLS {
 	public static String		Tour_Action_HrZoneGraphType_NoGradient;
 	public static String		Tour_Action_HrZoneGraphType_WhiteBottom;
 	public static String		Tour_Action_HrZoneGraphType_WhiteTop;
+
+	public static String	Tour_Action_MarkerOptions_Tooltip;
 	public static String		Tour_Action_scroll_zoomed_chart;
 	public static String		Tour_Action_show_distance_on_x_axis;
 	public static String		Tour_Action_show_distance_on_x_axis_tooltip;

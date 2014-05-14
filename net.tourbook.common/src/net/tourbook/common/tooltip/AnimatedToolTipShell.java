@@ -524,7 +524,8 @@ public abstract class AnimatedToolTipShell {
 
 	/**
 	 * @return When <code>false</code> is returned, the tooltip will <b>not</b> be closed. This can
-	 *         be used when the tooltip opens another dialog which prevents to close this tooltip.
+	 *         be used when the tooltip opens another dialog which prevents to close this tooltip,
+	 *         default is <code>true</code>.
 	 */
 	protected boolean canCloseToolTip() {
 		return true;
@@ -554,7 +555,7 @@ public abstract class AnimatedToolTipShell {
 	 * @return Returns <code>true</code> to close the shell after it is completely hidden.
 	 */
 	protected boolean closeShellAfterHidden() {
-		
+
 		return false;
 	}
 
@@ -1199,7 +1200,7 @@ public abstract class AnimatedToolTipShell {
 			_shell.setVisible(false);
 
 			removeDisplayFilterListener();
-			
+
 			if (closeShellAfterHidden()) {
 				close();
 			}

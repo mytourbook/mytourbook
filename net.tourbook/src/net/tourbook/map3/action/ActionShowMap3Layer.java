@@ -17,9 +17,9 @@ package net.tourbook.map3.action;
 
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
+import net.tourbook.common.tooltip.IOpeningDialog;
 import net.tourbook.map3.Messages;
 import net.tourbook.map3.ui.DialogMap3Layer;
-import net.tourbook.map3.view.IOpeningDialog;
 import net.tourbook.map3.view.Map3View;
 
 import org.eclipse.jface.action.ContributionItem;

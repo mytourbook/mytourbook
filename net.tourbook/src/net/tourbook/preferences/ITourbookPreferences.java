@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -70,24 +70,23 @@ public interface ITourbookPreferences {
 	 * Graphs
 	 */
 	public static final String	GRAPH_ALL									= "graphs.all";											//$NON-NLS-1$
-	public static final String	GRAPH_VISIBLE								= "graphs.visible";										//$NON-NLS-1$
+	public static final String	GRAPH_ANTIALIASING							= "Graph_Antialiasing";									//$NON-NLS-1$
+	public static final String	GRAPH_HR_ZONE_STYLE							= "Graph_HrZone_GraphType";								//$NON-NLS-1$
+	public static final String	GRAPH_IS_BREAKTIME_VALUES_VISIBLE			= "Graph_IsBreaktimeVisible";								//$NON-NLS-1$
+	public static final String	GRAPH_IS_HR_ZONE_BACKGROUND_VISIBLE			= "Graph_HrZone_IsVisible";								//$NON-NLS-1$
+	public static final String	GRAPH_IS_MARKER_VISIBLE						= "Graph_IsMarkerVisible";									//$NON-NLS-1$
+	public static final String	GRAPH_IS_SRTM_VISIBLE						= "Graph_IsSRTMVisible";									//$NON-NLS-1$
+	public static final String	GRAPH_IS_TOUR_PHOTO_TOOLTIP_VISIBLE			= "GRAPH_IS_TOUR_PHOTO_TOOLTIP_VISIBLE";					//$NON-NLS-1$
+	public static final String	GRAPH_IS_TOUR_PHOTO_VISIBLE					= "GRAPH_IS_TOUR_PHOTO_VISIBLE";							//$NON-NLS-1$
+	public static final String	GRAPH_MARKER_POINT_SIZE						= "GRAPH_MARKER_POINT_SIZE";								//$NON-NLS-1$
+	public static final String	GRAPH_MOUSE_MODE							= "graph.toggle-mouse";									//$NON-NLS-1$
+	public static final String	GRAPH_MOVE_SLIDERS_WHEN_ZOOMED				= "graphs.move-sliders-when-zoomed";						//$NON-NLS-1$
+	public static final String	GRAPH_TRANSPARENCY_FILLING					= "Graph_Transparency_Filling";							//$NON-NLS-1$
+	public static final String	GRAPH_TRANSPARENCY_LINE						= "Graph_Transparency_Line";								//$NON-NLS-1$
 	public static final String	GRAPH_X_AXIS								= "graphs.x-axis";											//$NON-NLS-1$
 	public static final String	GRAPH_X_AXIS_STARTTIME						= "graphs.x-axis.starttime";								//$NON-NLS-1$
-	public static final String	GRAPH_IS_HR_ZONE_BACKGROUND_VISIBLE			= "Graph_HrZone_IsVisible";								//$NON-NLS-1$
-	public static final String	GRAPH_HR_ZONE_STYLE							= "Graph_HrZone_GraphType";								//$NON-NLS-1$
-	public static final String	GRAPH_TRANSPARENCY_LINE						= "Graph_Transparency_Line";								//$NON-NLS-1$
-	public static final String	GRAPH_TRANSPARENCY_FILLING					= "Graph_Transparency_Filling";							//$NON-NLS-1$
-	public static final String	GRAPH_ANTIALIASING							= "Graph_Antialiasing";									//$NON-NLS-1$
-
+	public static final String	GRAPH_VISIBLE								= "graphs.visible";										//$NON-NLS-1$
 	public static final String	GRAPH_ZOOM_AUTO_ZOOM_TO_SLIDER				= "graphs.zoom.autozoom-to-slider";						//$NON-NLS-1$
-	public static final String	GRAPH_MOVE_SLIDERS_WHEN_ZOOMED				= "graphs.move-sliders-when-zoomed";						//$NON-NLS-1$
-	public static final String	GRAPH_IS_SRTM_VISIBLE						= "Graph_IsSRTMVisible";									//$NON-NLS-1$
-	public static final String	GRAPH_IS_MARKER_VISIBLE						= "Graph_IsMarkerVisible";									//$NON-NLS-1$
-	public static final String	GRAPH_IS_BREAKTIME_VALUES_VISIBLE			= "Graph_IsBreaktimeVisible";								//$NON-NLS-1$
-	public static final String	GRAPH_IS_TOUR_PHOTO_VISIBLE					= "GRAPH_IS_TOUR_PHOTO_VISIBLE";							//$NON-NLS-1$
-	public static final String	GRAPH_IS_TOUR_PHOTO_TOOLTIP_VISIBLE			= "GRAPH_IS_TOUR_PHOTO_TOOLTIP_VISIBLE";					//$NON-NLS-1$
-
-	public static final String	GRAPH_MOUSE_MODE							= "graph.toggle-mouse";									//$NON-NLS-1$
 
 	public static final String	GRAPH_PACE_MINMAX_IS_ENABLED				= "graph.pace.is-min-enabled";								//$NON-NLS-1$
 	public static final String	GRAPH_PACE_MIN_VALUE						= "graph.pace.min-value";									//$NON-NLS-1$

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -25,7 +25,7 @@ import java.util.ArrayList;
 import net.tourbook.chart.ChartYDataMinMaxKeeper;
 
 /**
- * Contains the configuration how the tour chart is displayed
+ * Contains the configuration how the tour chart is displayed.
  */
 public class TourChartConfiguration {
 
@@ -49,7 +49,7 @@ public class TourChartConfiguration {
 	 * <p>
 	 * false: show the tour time which starts at 0
 	 */
-	public X_AXIS_START_TIME				xAxisTime				= X_AXIS_START_TIME.START_WITH_0;
+	public X_AXIS_START_TIME		xAxisTime				= X_AXIS_START_TIME.START_WITH_0;
 
 	/**
 	 * contains a list for all graphs which are displayed, the sequence of the list is the sequence
@@ -110,6 +110,11 @@ public class TourChartConfiguration {
 	public Boolean					isShowTourMarker		= true;
 
 	/**
+	 * Size of the marker point in DLU (Dialog Units).
+	 */
+	public int						markerPointSize			= 2;
+
+	/**
 	 * Is <code>true</code> when graph values are displayed when they are recorded when a break time
 	 * is detected.
 	 */
@@ -121,7 +126,7 @@ public class TourChartConfiguration {
 	public String					hrZoneStyle				= TourChart.ACTION_ID_HR_ZONE_STYLE_GRAPH_TOP;
 
 	public boolean					isShowTourPhotos		= true;											;
-	public boolean					isShowTourPhotoTooltip	= true;											;
+	public boolean					isShowTourPhotoTooltip	= true;
 
 	/**
 	 * @param keepMinMaxValues

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2012  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -25,6 +25,7 @@ import net.tourbook.chart.ChartMarker;
 import net.tourbook.chart.GraphDrawingData;
 import net.tourbook.chart.IChartLayer;
 
+import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
@@ -57,7 +58,10 @@ public class ChartSegmentLayer implements IChartLayer {
 	 * @param drawingData
 	 * @param fChartComponents
 	 */
-	public void draw(final GC gc, final GraphDrawingData drawingData, final Chart chart) {
+	public void draw(	final GC gc,
+						final GraphDrawingData drawingData,
+						final Chart chart,
+						final PixelConverter pixelConverter) {
 
 		final Display display = Display.getCurrent();
 
