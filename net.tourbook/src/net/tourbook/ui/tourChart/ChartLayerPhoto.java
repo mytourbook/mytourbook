@@ -40,7 +40,6 @@ public class ChartLayerPhoto implements IChartLayer {
 	private static final int			PHOTO_ICON_SPACING		= 2;
 
 	static final int					GROUP_HORIZONTAL_WIDTH	= 40;
-	static final int					GROUP_Y_HIT_BORDER		= 5;
 
 	private ArrayList<PhotoCategory>	_photoCategories;
 
@@ -197,7 +196,7 @@ public class ChartLayerPhoto implements IChartLayer {
 	}
 
 	/**
-	 * create list with hovered hovered photos
+	 * Creates a list with hovered photos.
 	 */
 	private void createHoveredPhotoList(final long eventTime, final int devXMouseMove, final int devYMouseMove) {
 
@@ -213,6 +212,9 @@ public class ChartLayerPhoto implements IChartLayer {
 			return;
 		}
 
+		final int hoveredXPos = devXMouseMove;
+		final int hoveredYPos = devYMouseMove;
+
 		final int numberOfCategories = _photoCategories.size();
 		final boolean isSingleCategory = numberOfCategories == 1;
 
@@ -227,8 +229,6 @@ public class ChartLayerPhoto implements IChartLayer {
 			final boolean isLastCategory = categoryIndex == numberOfCategories - 1;
 
 			final ArrayList<ChartPhoto> chartPhotos = photoCategory.chartPhotos;
-
-			final int hoveredXPos = devXMouseMove;
 
 			for (final PhotoPaintGroup paintGroup : photoCategory.paintGroups) {
 
@@ -254,7 +254,7 @@ public class ChartLayerPhoto implements IChartLayer {
 
 						if (hoveredXPos >= paintGroup.hGridStart
 								&& hoveredXPos <= paintGroup.hGridEnd
-								&& devYMouseMove >= devYHoverTop) {
+								&& hoveredYPos >= devYHoverTop) {
 
 							// photo is within current hovered area
 
@@ -265,8 +265,8 @@ public class ChartLayerPhoto implements IChartLayer {
 
 						if (hoveredXPos >= paintGroup.hGridStart
 								&& hoveredXPos <= paintGroup.hGridEnd
-								&& devYMouseMove >= devYHoverTop
-								&& devYMouseMove <= devYHoverBottom) {
+								&& hoveredYPos >= devYHoverTop
+								&& hoveredYPos <= devYHoverBottom) {
 
 							// photo is within current hovered area
 
@@ -550,7 +550,7 @@ public class ChartLayerPhoto implements IChartLayer {
 		int prevDevYPhoto = Integer.MIN_VALUE;
 		int prevDevXPhoto = Integer.MIN_VALUE;
 
-		// draw photo icon
+		// draw photo marker at the graph vertical position
 		for (final int photoIndex : paintGroup.photoIndex) {
 
 			final Point photoPosition = photoPositions[photoIndex];

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -375,7 +375,14 @@ public class TourManager {
 		tcc.xAxisTime = isTourStartTime ? X_AXIS_START_TIME.TOUR_START_TIME : X_AXIS_START_TIME.START_WITH_0;
 		tcc.isSRTMDataVisible = _prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_SRTM_VISIBLE);
 
+		tcc.isShowHiddenMarker = _prefStore.getBoolean(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_HIDDEN_MARKER);
+		tcc.isShowMarkerLabel = _prefStore.getBoolean(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_MARKER_LABEL);
 		tcc.isShowTourMarker = _prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_MARKER_VISIBLE);
+
+		tcc.markerDefaultColor = PreferenceConverter.getColor(_prefStore,//
+				ITourbookPreferences.GRAPH_MARKER_DEFAULT_COLOR);
+		tcc.markerDeviceColor = PreferenceConverter.getColor(_prefStore,//
+				ITourbookPreferences.GRAPH_MARKER_DEVICE_COLOR);
 		tcc.markerPointSize = _prefStore.getInt(ITourbookPreferences.GRAPH_MARKER_POINT_SIZE);
 
 		tcc.isShowTourPhotos = _prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_TOUR_PHOTO_VISIBLE);

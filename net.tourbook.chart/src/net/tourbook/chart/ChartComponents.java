@@ -153,8 +153,6 @@ public class ChartComponents extends Composite {
 
 	private ChartDrawingData		_chartDrawingData;
 
-	public boolean					_useAdvancedGraphics		= true;
-
 	private static final String		_monthLabels[]				= {
 			Messages.Month_jan,
 			Messages.Month_feb,

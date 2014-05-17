@@ -1189,7 +1189,6 @@ public class DialogMarker extends TitleAreaDialog {
 			_chkVisibility.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(final SelectionEvent e) {
-
 					toggleMarkerVisibility();
 				}
 			});

@@ -1119,6 +1119,16 @@ public class Messages extends NLS {
 	public static String		PrefPageTourTypeFilterList_Pref_TourTypeFilter_button_down;
 	public static String		PrefPageTourTypeFilterList_Pref_TourTypeFilter_button_up;
 
+	public static String	Slideout_ChartMarkerOptions_Checkbox_IsShowHiddenMarker;
+
+	public static String	Slideout_ChartMarkerOptions_Checkbox_IsShowMarker;
+
+	public static String	Slideout_ChartMarkerOptions_Label_DeviceMarkerColor;
+
+	public static String	Slideout_ChartMarkerOptions_Label_DeviceMarkerColor_Tooltip;
+
+	public static String	Slideout_ChartMarkerOptions_Label_MarkerColor;
+
 	public static String	Slideout_ChartMarkerOptions_Label_MarkerSize;
 
 	public static String	Slideout_ChartMarkerOptions_Label_MarkerSize_Tooltip;

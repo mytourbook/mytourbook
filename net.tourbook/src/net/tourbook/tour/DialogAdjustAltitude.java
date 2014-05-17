@@ -1123,7 +1123,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 			}
 		});
 
-		_tourChart.addMouseListener(new IMouseListener() {
+		_tourChart.addMouseChartListener(new IMouseListener() {
 
 			@Override
 			public void mouseDoubleClick(final ChartMouseEvent event) {}
@@ -1132,6 +1132,9 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 			public void mouseDown(final ChartMouseEvent event) {
 				onMouseDown(event);
 			}
+
+			@Override
+			public void mouseExit() {}
 
 			@Override
 			public void mouseMove(final ChartMouseEvent event) {

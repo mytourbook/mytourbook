@@ -53,6 +53,8 @@ public class ChartLabel extends ChartMarker {
 	public static final int	VISIBLE_TYPE_TYPE_NEW					= 10;
 	public static final int	VISIBLE_TYPE_TYPE_EDIT					= 20;
 
+	public boolean			isVisible;
+
 	public String			markerLabel								= UI.EMPTY_STRING;
 
 	/**
@@ -71,7 +73,54 @@ public class ChartLabel extends ChartMarker {
 
 	public int				visualType;
 
-	public Photo			markerImagePhoto;
+	public Photo			markerSignImage;
+
+	/*
+	 * Painted marker positions
+	 */
+	public int				devXMarker;
+	public int				devYMarker;
+
+	/*
+	 * Painted label positions
+	 */
+	public int				devXLabel;
+	public int				devYLabel;
+	public int				devLabelWidth;
+	public int				devLabelHeight;
+
+	/**
+	 * Is <code>true</code> when the label is drawn vertically.
+	 */
+	public boolean			isVertical;
+
+	/**
+	 * Contains custom data, can be used to keep references to the model.
+	 */
+	public Object			data;
 
 	public ChartLabel() {}
+
+	/**
+	 * @return Returns <code>true</code> when the marker is created with the device.
+	 */
+	public boolean isDeviceMarker() {
+
+		return type == ChartLabel.MARKER_TYPE_DEVICE;
+	}
+
+	@Override
+	public String toString() {
+		return String
+				.format(
+						"\nChartLabel\n   markerLabel=%s\n   isVertical=%s\n   devXMarker=%s\n   devYMarker=%s\n   devXLabel=%s\n   devYLabel=%s\n   devLabelWidth=%s\n   devLabelHeight=%s\n",
+						markerLabel,
+						isVertical,
+						devXMarker,
+						devYMarker,
+						devXLabel,
+						devYLabel,
+						devLabelWidth,
+						devLabelHeight);
+	}
 }

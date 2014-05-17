@@ -20,10 +20,12 @@ import java.util.Set;
 
 import net.tourbook.Messages;
 import net.tourbook.chart.Chart;
+import net.tourbook.chart.ChartLabel;
 import net.tourbook.chart.ChartXSlider;
 import net.tourbook.chart.IChartContextProvider;
 import net.tourbook.common.action.ActionOpenPrefDialog;
 import net.tourbook.data.TourData;
+import net.tourbook.data.TourMarker;
 import net.tourbook.data.TourTag;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
@@ -129,6 +131,31 @@ public class TourChartContextProvider implements IChartContextProvider, ITourPro
 								final int mouseDownDevPositionY) {
 
 		final TourChart tourChart = _tourChartViewer.getTourChart();
+
+		/*
+		 * Check if a marker is hovered
+		 */
+		TourMarker tourMarker = null;
+		final ChartLabel hoveredChartMarker = tourChart.getHoveredMarker();
+
+		if (hoveredChartMarker != null) {
+			if (hoveredChartMarker.data instanceof TourMarker) {
+				tourMarker = (TourMarker) hoveredChartMarker.data;
+			}
+		}
+
+//		if (tourMarker != null) {
+//
+//			tourChart.editTourMarker(tourMarker);
+//
+//		} else {
+//
+			fillContextMenu_Default(menuMgr, tourChart);
+//		}
+
+	}
+
+	private void fillContextMenu_Default(final IMenuManager menuMgr, final TourChart tourChart) {
 
 		menuMgr.add(new Separator());
 		menuMgr.add(_actionQuickEdit);

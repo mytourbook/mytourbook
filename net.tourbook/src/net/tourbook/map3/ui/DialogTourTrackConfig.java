@@ -906,12 +906,13 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 				.align(SWT.BEGINNING, SWT.BEGINNING)
 				.applyTo(colorSelector.getButton());
 
+		colorSelector.addOpenListener(this);
+
 		colorSelector.addListener(new IPropertyChangeListener() {
 			public void propertyChange(final PropertyChangeEvent event) {
 				onModifyConfig();
 			}
 		});
-		colorSelector.addOpenListener(this);
 
 		return colorSelector;
 	}

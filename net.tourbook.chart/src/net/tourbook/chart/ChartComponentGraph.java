@@ -271,21 +271,23 @@ public class ChartComponentGraph extends Canvas {
 	 */
 	private Cursor						_cursorResizeLeftRight;
 
-	private Cursor						_cursorResizeTopDown;
 	private Cursor						_cursorDragged;
-	private Cursor						_cursorModeSlider;
+	private Cursor						_cursorDragXSlider_ModeZoom;
+	private Cursor						_cursorDragXSlider_ModeSlider;
+	private Cursor						_cursorHoverXSlider;
+	private Cursor						_cursorIBeam;
 	private Cursor						_cursorModeZoom;
 	private Cursor						_cursorModeZoomMove;
+	private Cursor						_cursorModeSlider;
 	private Cursor						_cursorMove1x;
 	private Cursor						_cursorMove2x;
 	private Cursor						_cursorMove3x;
 	private Cursor						_cursorMove4x;
 	private Cursor						_cursorMove5x;
+	private Cursor						_cursorResizeTopDown;
+	private Cursor						_cursorXSlider;
 	private Cursor						_cursorXSliderLeft;
 	private Cursor						_cursorXSliderRight;
-	private Cursor						_cursorDragXSlider_ModeZoom;
-	private Cursor						_cursorDragXSlider_ModeSlider;
-	private Cursor						_cursorHoverXSlider;
 
 	private Color						_gridColor;
 	private Color						_gridColorMajor;
@@ -392,9 +394,9 @@ public class ChartComponentGraph extends Canvas {
 	Rectangle							_clientArea;
 
 	/**
-	 * Is <code>true</code> when custom overlays needs to be painted
+	 * When this state is not <code>null</code> then custom overlays needs to be painted.
 	 */
-	private boolean						_isCustomOverlayDirty;
+	private ChartMouseEvent				_customOverlayState;
 
 	/**
 	 * After a resize the custom overlay must be recomputed
@@ -423,6 +425,7 @@ public class ChartComponentGraph extends Canvas {
 		_cursorResizeLeftRight = new Cursor(getDisplay(), SWT.CURSOR_SIZEWE);
 		_cursorResizeTopDown = new Cursor(getDisplay(), SWT.CURSOR_SIZENS);
 		_cursorDragged = new Cursor(getDisplay(), SWT.CURSOR_SIZEALL);
+		_cursorIBeam = new Cursor(getDisplay(), SWT.CURSOR_IBEAM);
 
 		_cursorModeSlider = createCursorFromImage(Messages.Image_cursor_mode_slider);
 		_cursorModeZoom = createCursorFromImage(Messages.Image_cursor_mode_zoom);
@@ -1017,7 +1020,7 @@ public class ChartComponentGraph extends Canvas {
 				hideTooltip();
 
 				// get cursor location relativ to this graph canvas
-				final Point devMouse = ChartComponentGraph.this.toControl(getDisplay().getCursorLocation());
+				final Point devMouse = toControl(getDisplay().getCursorLocation());
 
 				computeSliderForContextMenu(devMouse.x, devMouse.y);
 
@@ -1433,7 +1436,7 @@ public class ChartComponentGraph extends Canvas {
 
 			final int hoveredLineValueIndexBACKUP = _hoveredLineValueIndex;
 
-			isLineHovered();
+			setHoveredLineValue();
 
 			if (_hoveredLineValueIndex != -1) {
 
@@ -1449,10 +1452,10 @@ public class ChartComponentGraph extends Canvas {
 
 					hoveredListener.hoveredValue(
 							eventTime,
-							_hoveredLineValueIndex,
-							devHoveredValueDevPosition,
 							_devXMouseMove,
-							_devYMouseMove);
+							_devYMouseMove,
+							_hoveredLineValueIndex,
+							devHoveredValueDevPosition);
 				}
 			}
 
@@ -3870,7 +3873,7 @@ public class ChartComponentGraph extends Canvas {
 				&& _isSelectionDirty == false
 				&& _isHoveredBarDirty == false
 				&& _hoveredLineValueIndex == -1
-				&& _isCustomOverlayDirty == false
+				&& _customOverlayState == null
 				&& _chartImage40Overlay != null) {
 
 			final Rectangle oldBounds = _chartImage40Overlay.getBounds();
@@ -3936,7 +3939,7 @@ public class ChartComponentGraph extends Canvas {
 				drawSync_460_HoveredLine(gcOverlay);
 			}
 
-			if (_isCustomOverlayDirty) {
+			if (_customOverlayState != null) {
 				drawSync_470_CustomOverlay(gcOverlay, eventTime);
 			}
 
@@ -4586,6 +4589,10 @@ public class ChartComponentGraph extends Canvas {
 
 		int graphIndex = 0;
 
+		// draw value point marker
+		final int devOffsetFill = _pc.convertHorizontalDLUsToPixels(8); //10;
+		final int devOffsetPoint = _pc.convertHorizontalDLUsToPixels(2);//3;
+
 		gcOverlay.setAntialias(SWT.ON);
 
 		// loop: all graphs
@@ -4659,10 +4666,6 @@ public class ChartComponentGraph extends Canvas {
 				colorLine = getColor(rgbLineDef);
 			}
 
-			// draw value point marker
-			final int devOffsetFill = 10;
-			final int devOffsetPoint = 3;
-
 			gcOverlay.setBackground(colorLine);
 
 			gcOverlay.setAlpha(0x40);
@@ -4709,11 +4712,16 @@ public class ChartComponentGraph extends Canvas {
 			_isCustomOverlayInvalid = 0;
 
 			// check if a custom overlay needs to be painted
-			_isCustomOverlayDirty = _chart.isCustomOverlayDirty(eventTime, _devXMouseMove, _devYMouseMove);
+			_customOverlayState = _chart.getCustomOverlayState(eventTime, _devXMouseMove, _devYMouseMove);
 		}
 
-		if (_isCustomOverlayDirty) {
-			_chart.getCustomOverlay().draw(gcOverlay);
+		if (_customOverlayState != null) {
+
+			for (final Object item : _chart.getCustomOverlays()) {
+				if (item instanceof CustomOverlay) {
+					((CustomOverlay) item).draw(gcOverlay);
+				}
+			}
 		}
 	}
 
@@ -5041,7 +5049,9 @@ public class ChartComponentGraph extends Canvas {
 
 		if (cursor != null) {
 
-			setCursor(cursor);
+//			setCursor(cursor);
+
+			_cursorXSlider = cursor;
 
 			return true;
 
@@ -5052,51 +5062,6 @@ public class ChartComponentGraph extends Canvas {
 
 			return false;
 		}
-	}
-
-	/**
-	 * Check if mouse has moved over a line value and sets {@link #_hoveredLineValueIndex} to the
-	 * value index or <code>-1</code> when focus rectangle is not hit.
-	 * 
-	 * @return
-	 */
-	private boolean isLineHovered() {
-
-		if (_lineDevPositions.size() == 0) {
-			return false;
-		}
-
-		RectangleLong lineRect = null;
-
-		for (final RectangleLong[] lineFocusRectangles : _lineFocusRectangles) {
-
-			// find the line rectangle which is hovered by the mouse
-			for (int valueIndex = 0; valueIndex < lineFocusRectangles.length; valueIndex++) {
-
-				lineRect = lineFocusRectangles[valueIndex];
-
-				// test if the mouse is within a bar focus rectangle
-				if (lineRect != null) {
-
-					// inline for lineRect.contains
-					if ((_devXMouseMove >= lineRect.x)
-							&& (_devYMouseMove >= lineRect.y)
-							&& _devXMouseMove < (lineRect.x + lineRect.width)
-							&& _devYMouseMove < (lineRect.y + lineRect.height)) {
-
-						// keep the hovered line index
-						_hoveredLineValueIndex = valueIndex;
-
-						return true;
-					}
-				}
-			}
-		}
-
-		// reset index
-		_hoveredLineValueIndex = -1;
-
-		return false;
 	}
 
 	/**
@@ -5283,6 +5248,7 @@ public class ChartComponentGraph extends Canvas {
 		_cursorResizeLeftRight = Util.disposeResource(_cursorResizeLeftRight);
 		_cursorResizeTopDown = Util.disposeResource(_cursorResizeTopDown);
 		_cursorDragged = Util.disposeResource(_cursorDragged);
+		_cursorIBeam = Util.disposeResource(_cursorIBeam);
 		_cursorModeSlider = Util.disposeResource(_cursorModeSlider);
 		_cursorModeZoom = Util.disposeResource(_cursorModeZoom);
 		_cursorModeZoomMove = Util.disposeResource(_cursorModeZoomMove);
@@ -5745,6 +5711,8 @@ public class ChartComponentGraph extends Canvas {
 	 */
 	private void onMouseExit(final MouseEvent event) {
 
+		_chart.onMouseExit();
+
 		_hoveredBarToolTip.toolTip20Hide();
 
 		boolean isRedraw = false;
@@ -5974,7 +5942,7 @@ public class ChartComponentGraph extends Canvas {
 
 		if (_isHoveredLineVisible || hoveredListener != null) {
 
-			isLineHovered();
+			setHoveredLineValue();
 
 			if (_hoveredLineValueIndex != -1) {
 
@@ -6003,17 +5971,21 @@ public class ChartComponentGraph extends Canvas {
 
 					hoveredListener.hoveredValue(
 							eventTime,
-							_hoveredLineValueIndex,
-							devHoveredValueDevPosition,
 							_devXMouseMove,
-							_devYMouseMove);
+							_devYMouseMove,
+							_hoveredLineValueIndex,
+							devHoveredValueDevPosition);
 				}
 			}
 		}
 
-		// check if custom overlay is dirty (e.g mouse can have hovered a photo group)
-		if (_isCustomOverlayDirty = _chart.isCustomOverlayDirty(eventTime, _devXMouseMove, _devYMouseMove)) {
+		// check if custom overlay is dirty, e.g mouse has hovered a photo group or a marker
+		_customOverlayState = _chart.getCustomOverlayState(eventTime, _devXMouseMove, _devYMouseMove);
+		if (_customOverlayState != null) {
+
 			isRedraw = true;
+
+			setCursorStyle(devYMouse);
 		}
 
 		if (isRedraw) {
@@ -6708,9 +6680,15 @@ public class ChartComponentGraph extends Canvas {
 				// chart is dragged
 				setCursor(_cursorDragged);
 
+			} else if (_customOverlayState != null && _customOverlayState.isWorked) {
+
+				setCursor(_cursorIBeam);
+
 			} else if (_isXSliderVisible && isInXSliderSetArea(devYMouse)) {
 
 				// cursor is already set
+
+				setCursor(_cursorXSlider);
 
 			} else {
 
@@ -6725,6 +6703,13 @@ public class ChartComponentGraph extends Canvas {
 		} else {
 			setCursor(null);
 		}
+	}
+
+	public void setCustomOverlayDirty() {
+
+		_customOverlayState = new ChartMouseEvent();
+
+		redraw();
 	}
 
 	/**
@@ -6877,6 +6862,47 @@ public class ChartComponentGraph extends Canvas {
 
 		_xSliderA.moveToXXDevPosition(xxDevViewPortOffset, false, true);
 		_xSliderB.moveToXXDevPosition(xxDevGraphWidth, false, true);
+	}
+
+	/**
+	 * Check if mouse has moved over a line value and sets {@link #_hoveredLineValueIndex} to the
+	 * value index or <code>-1</code> when focus rectangle is not hit.
+	 */
+	private void setHoveredLineValue() {
+
+		if (_lineDevPositions.size() == 0) {
+			return;
+		}
+
+		RectangleLong lineRect = null;
+
+		for (final RectangleLong[] lineFocusRectangles : _lineFocusRectangles) {
+
+			// find the line rectangle which is hovered by the mouse
+			for (int valueIndex = 0; valueIndex < lineFocusRectangles.length; valueIndex++) {
+
+				lineRect = lineFocusRectangles[valueIndex];
+
+				// test if the mouse is within a bar focus rectangle
+				if (lineRect != null) {
+
+					// inline for lineRect.contains
+					if ((_devXMouseMove >= lineRect.x)
+							&& (_devYMouseMove >= lineRect.y)
+							&& _devXMouseMove < (lineRect.x + lineRect.width)
+							&& _devYMouseMove < (lineRect.y + lineRect.height)) {
+
+						// keep the hovered line index
+						_hoveredLineValueIndex = valueIndex;
+
+						return;
+					}
+				}
+			}
+		}
+
+		// reset index
+		_hoveredLineValueIndex = -1;
 	}
 
 	void setSelectedBars(final boolean[] selectedItems) {
@@ -7053,7 +7079,7 @@ public class ChartComponentGraph extends Canvas {
 		valuePointToolTip.setChartMargins(marginTop, marginBottom);
 
 		// update custom overlay
-		_isCustomOverlayDirty = true;
+		_customOverlayState = new ChartMouseEvent();
 		_isCustomOverlayInvalid = 99;
 	}
 

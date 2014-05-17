@@ -24,6 +24,8 @@ import java.util.ArrayList;
 
 import net.tourbook.chart.ChartYDataMinMaxKeeper;
 
+import org.eclipse.swt.graphics.RGB;
+
 /**
  * Contains the configuration how the tour chart is displayed.
  */
@@ -110,9 +112,30 @@ public class TourChartConfiguration {
 	public Boolean					isShowTourMarker		= true;
 
 	/**
+	 * When <code>true</code>, hidden markers are also visible.
+	 */
+	public boolean					isShowHiddenMarker;
+
+	/**
+	 * When <code>true</code> tour marker labels are displayed.
+	 */
+	public boolean					isShowMarkerLabel;
+
+	/**
 	 * Size of the marker point in DLU (Dialog Units).
 	 */
-	public int						markerPointSize			= 2;
+	public int						markerPointSize;
+
+	/**
+	 * Color for the tour marker point and label.
+	 */
+	public RGB						markerDefaultColor;
+
+	/**
+	 * Color for the tour marker point which is created by the device and not with the marker
+	 * editor.
+	 */
+	public RGB						markerDeviceColor;
 
 	/**
 	 * Is <code>true</code> when graph values are displayed when they are recorded when a break time

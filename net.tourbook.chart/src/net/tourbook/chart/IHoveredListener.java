@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2012  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -29,16 +29,17 @@ public interface IHoveredListener {
 
 	/**
 	 * Event is fired when mouse is moved over a line graph value point.
+	 * 
 	 * @param eventTime
-	 * @param hoveredValueIndex
-	 * @param devHoveredValue
 	 * @param devXMouseMove
 	 * @param devYMouseMove
+	 * @param hoveredValueIndex
+	 * @param devHoveredValue
 	 */
 	void hoveredValue(	long eventTime,
-						int hoveredValueIndex,
-						PointLong devHoveredValue,
 						int devXMouseMove,
-						int devYMouseMove);
+						int devYMouseMove,
+						int hoveredValueIndex,
+						PointLong devHoveredValue);
 
 }

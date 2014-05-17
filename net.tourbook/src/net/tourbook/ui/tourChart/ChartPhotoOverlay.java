@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.ui.tourChart;
 
+import net.tourbook.chart.ChartMouseEvent;
 import net.tourbook.chart.CustomOverlay;
 
 import org.eclipse.swt.SWT;
@@ -46,19 +47,24 @@ public class ChartPhotoOverlay implements CustomOverlay {
 	}
 
 	@Override
-	public boolean onMouseMove(final long eventTime, final int devXMouse, final int devYMouse) {
+	public void onMouseMove(final ChartMouseEvent mouseEvent) {
 
 		// reset ALLWAYS
 		_hoveredPhotoGroup = null;
 
 		if (_photoLayer == null) {
-			return false;
+			mouseEvent.isWorked = false;
+			return;
 		}
 
-		_hoveredPhotoCategory = _photoLayer.getHoveredCategory(eventTime, devXMouse, devYMouse);
+		_hoveredPhotoCategory = _photoLayer.getHoveredCategory(
+				mouseEvent.eventTime,
+				mouseEvent.devXMouse,
+				mouseEvent.devYMouse);
+
 		_hoveredPhotoGroup = _photoLayer.getHoveredGroup();
 
-		return _hoveredPhotoGroup != null;
+		mouseEvent.isWorked = _hoveredPhotoGroup != null;
 	}
 
 	public void setPhotoLayer(final ChartLayerPhoto photoLayer) {

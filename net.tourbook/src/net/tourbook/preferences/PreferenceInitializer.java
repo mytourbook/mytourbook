@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -124,6 +124,14 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 		// marker
 		store.setDefault(ITourbookPreferences.GRAPH_IS_MARKER_VISIBLE, true);
 		store.setDefault(ITourbookPreferences.GRAPH_MARKER_POINT_SIZE, 2);
+		store.setDefault(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_HIDDEN_MARKER, false);
+		store.setDefault(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_MARKER_LABEL, true);
+		PreferenceConverter.setDefault(store, //
+				ITourbookPreferences.GRAPH_MARKER_DEFAULT_COLOR,
+				new RGB(0x60, 0x60, 0x60));
+		PreferenceConverter.setDefault(store, //
+				ITourbookPreferences.GRAPH_MARKER_DEVICE_COLOR,
+				new RGB(0xff, 0x0, 0x80));
 
 		// is photo visible
 		store.setDefault(ITourbookPreferences.GRAPH_IS_TOUR_PHOTO_VISIBLE, true);

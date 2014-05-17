@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -34,7 +34,7 @@ public interface CustomOverlay {
 	 * @param devYMouse
 	 *            Mouse vertical position or {@link Integer#MIN_VALUE} when mouse position is not
 	 *            available.
-	 * @return Returns <code>true</code> when the custom overlay must be painted.
 	 */
-	public boolean onMouseMove(long eventTime, int devXMouse, int devYMouse);
+	public void onMouseMove(ChartMouseEvent mouseEvent);
+
 }
