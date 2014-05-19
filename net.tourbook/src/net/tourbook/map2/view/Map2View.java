@@ -36,6 +36,7 @@ import net.tourbook.common.util.ITourToolTipProvider;
 import net.tourbook.common.util.TourToolTip;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
+import net.tourbook.data.TourMarker;
 import net.tourbook.data.TourWayPoint;
 import net.tourbook.importdata.RawDataManager;
 import net.tourbook.map.MapColorProvider;
@@ -88,6 +89,7 @@ import net.tourbook.tour.ITourEventListener;
 import net.tourbook.tour.SelectionTourData;
 import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.SelectionTourIds;
+import net.tourbook.tour.SelectionTourMarker;
 import net.tourbook.tour.TourEvent;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourInfoToolTipProvider;
@@ -2065,6 +2067,33 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 					enableActions();
 				}
 			}
+
+		} else if (selection instanceof SelectionTourMarker) {
+
+			final SelectionTourMarker markerSelection = (SelectionTourMarker) selection;
+
+			final ArrayList<TourMarker> tourMarker = markerSelection.getTourMarker();
+			final int numberOfTourMarkers = tourMarker.size();
+
+			int leftSliderValueIndex = 0;
+			int rightSliderValueIndex = 0;
+
+			if (numberOfTourMarkers == 1) {
+
+				leftSliderValueIndex = tourMarker.get(0).getSerieIndex();
+				rightSliderValueIndex = leftSliderValueIndex;
+
+			} else if (numberOfTourMarkers > 1) {
+
+				leftSliderValueIndex = tourMarker.get(0).getSerieIndex();
+				rightSliderValueIndex = tourMarker.get(numberOfTourMarkers - 1).getSerieIndex();
+			}
+
+			paintTourSliders(//
+					markerSelection.getTourData(),
+					leftSliderValueIndex,
+					rightSliderValueIndex,
+					leftSliderValueIndex);
 
 		} else if (selection instanceof SelectionMapPosition) {
 

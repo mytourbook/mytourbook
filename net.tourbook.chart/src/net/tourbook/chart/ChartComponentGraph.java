@@ -271,11 +271,11 @@ public class ChartComponentGraph extends Canvas {
 	 */
 	private Cursor						_cursorResizeLeftRight;
 
+	private Cursor						_cursorDefault;
 	private Cursor						_cursorDragged;
 	private Cursor						_cursorDragXSlider_ModeZoom;
 	private Cursor						_cursorDragXSlider_ModeSlider;
 	private Cursor						_cursorHoverXSlider;
-	private Cursor						_cursorIBeam;
 	private Cursor						_cursorModeZoom;
 	private Cursor						_cursorModeZoomMove;
 	private Cursor						_cursorModeSlider;
@@ -425,7 +425,7 @@ public class ChartComponentGraph extends Canvas {
 		_cursorResizeLeftRight = new Cursor(getDisplay(), SWT.CURSOR_SIZEWE);
 		_cursorResizeTopDown = new Cursor(getDisplay(), SWT.CURSOR_SIZENS);
 		_cursorDragged = new Cursor(getDisplay(), SWT.CURSOR_SIZEALL);
-		_cursorIBeam = new Cursor(getDisplay(), SWT.CURSOR_IBEAM);
+		_cursorDefault = new Cursor(getDisplay(), SWT.CURSOR_ARROW);
 
 		_cursorModeSlider = createCursorFromImage(Messages.Image_cursor_mode_slider);
 		_cursorModeZoom = createCursorFromImage(Messages.Image_cursor_mode_zoom);
@@ -5248,7 +5248,7 @@ public class ChartComponentGraph extends Canvas {
 		_cursorResizeLeftRight = Util.disposeResource(_cursorResizeLeftRight);
 		_cursorResizeTopDown = Util.disposeResource(_cursorResizeTopDown);
 		_cursorDragged = Util.disposeResource(_cursorDragged);
-		_cursorIBeam = Util.disposeResource(_cursorIBeam);
+		_cursorDefault = Util.disposeResource(_cursorDefault);
 		_cursorModeSlider = Util.disposeResource(_cursorModeSlider);
 		_cursorModeZoom = Util.disposeResource(_cursorModeZoom);
 		_cursorModeZoomMove = Util.disposeResource(_cursorModeZoomMove);
@@ -6682,7 +6682,7 @@ public class ChartComponentGraph extends Canvas {
 
 			} else if (_customOverlayState != null && _customOverlayState.isWorked) {
 
-				setCursor(_cursorIBeam);
+				setCursor(_cursorDefault);
 
 			} else if (_isXSliderVisible && isInXSliderSetArea(devYMouse)) {
 

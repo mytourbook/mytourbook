@@ -69,8 +69,10 @@ public class ChartMarkerLayer implements IChartLayer {
 		final double scaleX = drawingData.getScaleX();
 		final double scaleY = drawingData.getScaleY();
 
-		final Color defaultColor = new Color(display, _chartMarkerConfig.markerDefaultColor);
-		final Color deviceColor = new Color(display, _chartMarkerConfig.markerDeviceColor);
+		final Color colorSelected = display.getSystemColor(SWT.COLOR_BLUE);
+		final Color colorDefault = new Color(display, _chartMarkerConfig.markerColorDefault);
+		final Color colorDevice = new Color(display, _chartMarkerConfig.markerColorDevice);
+		final Color colorHidden = new Color(display, _chartMarkerConfig.markerColorHidden);
 
 		gc.setClipping(0, devYTop, gc.getClipping().width, devGraphHeight);
 
@@ -98,10 +100,19 @@ public class ChartMarkerLayer implements IChartLayer {
 			 */
 			if (MARKER_POINT_SIZE > 0) {
 
-				if (chartMarker.isDeviceMarker()) {
-					gc.setBackground(deviceColor);
+				if (chartMarker.visualType != ChartLabel.VISIBLE_TYPE_DEFAULT) {
+
+					gc.setBackground(colorSelected);
+
 				} else {
-					gc.setBackground(defaultColor);
+
+					if (chartMarker.isDeviceMarker()) {
+						gc.setBackground(colorDevice);
+					} else if (chartMarker.isVisible) {
+						gc.setBackground(colorDefault);
+					} else {
+						gc.setBackground(colorHidden);
+					}
 				}
 
 				final int markerPointSize2 = MARKER_POINT_SIZE / 2;
@@ -126,9 +137,9 @@ public class ChartMarkerLayer implements IChartLayer {
 			if (_chartMarkerConfig.isShowMarkerLabel) {
 
 				if (chartMarker.visualType != ChartLabel.VISIBLE_TYPE_DEFAULT) {
-					gc.setForeground(display.getSystemColor(SWT.COLOR_BLUE));
+					gc.setForeground(colorSelected);
 				} else {
-					gc.setForeground(defaultColor);
+					gc.setForeground(colorDefault);
 				}
 
 				final int labelWidth = labelExtend.x;
@@ -224,8 +235,9 @@ public class ChartMarkerLayer implements IChartLayer {
 				chartMarker.devLabelHeight = labelHeight;
 			}
 		}
-		defaultColor.dispose();
-		deviceColor.dispose();
+		colorDefault.dispose();
+		colorDevice.dispose();
+		colorHidden.dispose();
 
 		gc.setClipping((Rectangle) null);
 
@@ -241,15 +253,18 @@ public class ChartMarkerLayer implements IChartLayer {
 
 		final Device device = gc.getDevice();
 
-		final Color defaultColor = new Color(device, _chartMarkerConfig.markerDefaultColor);
-		final Color deviceColor = new Color(device, _chartMarkerConfig.markerDeviceColor);
+		final Color colorDefault = new Color(device, _chartMarkerConfig.markerColorDefault);
+		final Color colorDevice = new Color(device, _chartMarkerConfig.markerColorDevice);
+		final Color colorHidden = new Color(device, _chartMarkerConfig.markerColorHidden);
 		{
-			gc.setForeground(defaultColor);
+			gc.setForeground(colorDefault);
 
 			if (_hoveredMarker.isDeviceMarker()) {
-				gc.setBackground(deviceColor);
+				gc.setBackground(colorDevice);
+			} else if (_hoveredMarker.isVisible) {
+				gc.setBackground(colorDefault);
 			} else {
-				gc.setBackground(defaultColor);
+				gc.setBackground(colorHidden);
 			}
 
 			final boolean isLabelVisible = _chartMarkerConfig.isShowMarkerLabel;
@@ -280,8 +295,9 @@ public class ChartMarkerLayer implements IChartLayer {
 				}
 			}
 		}
-		defaultColor.dispose();
-		deviceColor.dispose();
+		colorDefault.dispose();
+		colorDevice.dispose();
+		colorHidden.dispose();
 
 		gc.setAlpha(0xff);
 	}

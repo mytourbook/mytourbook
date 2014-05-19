@@ -1127,6 +1127,10 @@ public class Messages extends NLS {
 
 	public static String	Slideout_ChartMarkerOptions_Label_DeviceMarkerColor_Tooltip;
 
+	public static String	Slideout_ChartMarkerOptions_Label_HiddenMarkerColor;
+
+	public static String	Slideout_ChartMarkerOptions_Label_HiddenMarkerColor_Tooltip;
+
 	public static String	Slideout_ChartMarkerOptions_Label_MarkerColor;
 
 	public static String	Slideout_ChartMarkerOptions_Label_MarkerSize;

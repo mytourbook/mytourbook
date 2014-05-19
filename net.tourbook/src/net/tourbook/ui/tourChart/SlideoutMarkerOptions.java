@@ -104,6 +104,7 @@ public class SlideoutMarkerOptions extends AnimatedToolTipShell implements IColo
 	private Composite				_shellContainer;
 	private ColorSelectorExtended	_colorDefaultMarker;
 	private ColorSelectorExtended	_colorDeviceMarker;
+	private ColorSelectorExtended	_colorHiddenMarker;
 	private Spinner					_spinMarkerSize;
 
 	private final class WaitTimer implements Runnable {
@@ -363,6 +364,33 @@ public class SlideoutMarkerOptions extends AnimatedToolTipShell implements IColo
 					}
 				});
 			}
+
+			/*
+			 * Hidden marker color
+			 */
+			{
+				// Label
+				final Label label = new Label(container, SWT.NONE);
+				GridDataFactory.fillDefaults()//
+						.align(SWT.FILL, SWT.CENTER)
+						.applyTo(label);
+				label.setText(Messages.Slideout_ChartMarkerOptions_Label_HiddenMarkerColor);
+				label.setToolTipText(Messages.Slideout_ChartMarkerOptions_Label_HiddenMarkerColor_Tooltip);
+
+				// Color selector
+				_colorHiddenMarker = new ColorSelectorExtended(container);
+				GridDataFactory.swtDefaults()//
+						.grab(false, true)
+						.align(SWT.BEGINNING, SWT.BEGINNING)
+						.applyTo(_colorHiddenMarker.getButton());
+
+				_colorHiddenMarker.addOpenListener(this);
+				_colorHiddenMarker.addListener(new IPropertyChangeListener() {
+					public void propertyChange(final PropertyChangeEvent event) {
+						onChangeUI();
+					}
+				});
+			}
 		}
 	}
 
@@ -404,6 +432,7 @@ public class SlideoutMarkerOptions extends AnimatedToolTipShell implements IColo
 		final boolean isShowMarkerLabel = _chkShowMarkerLabel.getSelection();
 		final RGB defaultColor = _colorDefaultMarker.getColorValue();
 		final RGB deviceColor = _colorDeviceMarker.getColorValue();
+		final RGB hiddenColor = _colorHiddenMarker.getColorValue();
 		final int markerPointSize = _spinMarkerSize.getSelection();
 
 		/*
@@ -414,17 +443,21 @@ public class SlideoutMarkerOptions extends AnimatedToolTipShell implements IColo
 		_prefStore.setValue(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_MARKER_LABEL, isShowMarkerLabel);
 
 		PreferenceConverter.setValue(_prefStore, //
-				ITourbookPreferences.GRAPH_MARKER_DEFAULT_COLOR,
+				ITourbookPreferences.GRAPH_MARKER_COLOR_DEFAULT,
 				defaultColor);
 		PreferenceConverter.setValue(_prefStore, //
-				ITourbookPreferences.GRAPH_MARKER_DEVICE_COLOR,
+				ITourbookPreferences.GRAPH_MARKER_COLOR_DEVICE,
 				deviceColor);
+		PreferenceConverter.setValue(_prefStore, //
+				ITourbookPreferences.GRAPH_MARKER_COLOR_HIDDEN,
+				hiddenColor);
 
 		/*
 		 * Update chart config
 		 */
-		tcc.markerDefaultColor = defaultColor;
-		tcc.markerDeviceColor = deviceColor;
+		tcc.markerColorDefault = defaultColor;
+		tcc.markerColorDevice = deviceColor;
+		tcc.markerColorHidden = hiddenColor;
 		tcc.markerPointSize = markerPointSize;
 		tcc.isShowHiddenMarker = isShowHiddenMarker;
 		tcc.isShowMarkerLabel = isShowMarkerLabel;
@@ -500,8 +533,9 @@ public class SlideoutMarkerOptions extends AnimatedToolTipShell implements IColo
 
 		_chkShowHiddenMarker.setSelection(tcc.isShowHiddenMarker);
 		_chkShowMarkerLabel.setSelection(tcc.isShowMarkerLabel);
-		_colorDefaultMarker.setColorValue(tcc.markerDefaultColor);
-		_colorDeviceMarker.setColorValue(tcc.markerDeviceColor);
+		_colorDefaultMarker.setColorValue(tcc.markerColorDefault);
+		_colorDeviceMarker.setColorValue(tcc.markerColorDevice);
+		_colorHiddenMarker.setColorValue(tcc.markerColorHidden);
 		_spinMarkerSize.setSelection(tcc.markerPointSize);
 	}
 

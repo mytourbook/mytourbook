@@ -127,11 +127,14 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 		store.setDefault(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_HIDDEN_MARKER, false);
 		store.setDefault(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_MARKER_LABEL, true);
 		PreferenceConverter.setDefault(store, //
-				ITourbookPreferences.GRAPH_MARKER_DEFAULT_COLOR,
+				ITourbookPreferences.GRAPH_MARKER_COLOR_DEFAULT,
 				new RGB(0x60, 0x60, 0x60));
 		PreferenceConverter.setDefault(store, //
-				ITourbookPreferences.GRAPH_MARKER_DEVICE_COLOR,
+				ITourbookPreferences.GRAPH_MARKER_COLOR_DEVICE,
 				new RGB(0xff, 0x0, 0x80));
+		PreferenceConverter.setDefault(store, //
+				ITourbookPreferences.GRAPH_MARKER_COLOR_HIDDEN,
+				new RGB(0xFF, 0x6B, 0x24));
 
 		// is photo visible
 		store.setDefault(ITourbookPreferences.GRAPH_IS_TOUR_PHOTO_VISIBLE, true);

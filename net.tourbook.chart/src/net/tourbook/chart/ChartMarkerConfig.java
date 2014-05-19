@@ -24,8 +24,9 @@ public class ChartMarkerConfig {
 	public boolean						isShowHiddenMarker	= false;
 	public boolean						isShowMarkerLabel	= true;
 
-	public RGB							markerDefaultColor;
-	public RGB							markerDeviceColor;
+	public RGB							markerColorDefault;
+	public RGB							markerColorDevice;
+	public RGB							markerColorHidden;
 
 	public int							markerPointSize;
 

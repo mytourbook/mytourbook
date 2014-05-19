@@ -27,6 +27,13 @@ import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.preference.StringFieldEditor;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.jface.resource.JFaceResources;
+import org.eclipse.jface.viewers.ColumnViewerEditor;
+import org.eclipse.jface.viewers.ColumnViewerEditorActivationEvent;
+import org.eclipse.jface.viewers.ColumnViewerEditorActivationStrategy;
+import org.eclipse.jface.viewers.FocusCellOwnerDrawHighlighter;
+import org.eclipse.jface.viewers.TableViewer;
+import org.eclipse.jface.viewers.TableViewerEditor;
+import org.eclipse.jface.viewers.TableViewerFocusCellManager;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.custom.SashForm;
@@ -754,6 +761,38 @@ public class UI {
 		for (int weightIndex = 0; weightIndex < weights.length; weightIndex++) {
 			memento.putInteger(weightKey + Integer.toString(weightIndex), weights[weightIndex]);
 		}
+	}
+
+	/**
+	 * Initialize cell editing.
+	 * 
+	 * @param viewer
+	 */
+	public static void setCellEditSupport(final TableViewer viewer) {
+
+		final TableViewerFocusCellManager focusCellManager = new TableViewerFocusCellManager(
+				viewer,
+				new FocusCellOwnerDrawHighlighter(viewer));
+
+		final ColumnViewerEditorActivationStrategy actSupport = new ColumnViewerEditorActivationStrategy(viewer) {
+			@Override
+			protected boolean isEditorActivationEvent(final ColumnViewerEditorActivationEvent event) {
+
+				return (event.eventType == ColumnViewerEditorActivationEvent.TRAVERSAL)
+						|| (event.eventType == ColumnViewerEditorActivationEvent.MOUSE_CLICK_SELECTION)
+						|| ((event.eventType == ColumnViewerEditorActivationEvent.KEY_PRESSED) && (event.keyCode == SWT.CR))
+						|| (event.eventType == ColumnViewerEditorActivationEvent.PROGRAMMATIC);
+			}
+		};
+
+		TableViewerEditor.create(//
+				viewer,
+				focusCellManager,
+				actSupport,
+				ColumnViewerEditor.TABBING_HORIZONTAL //
+						| ColumnViewerEditor.TABBING_MOVE_TO_ROW_NEIGHBOR //
+						| ColumnViewerEditor.TABBING_VERTICAL
+						| ColumnViewerEditor.KEYBOARD_ACTIVATION);
 	}
 
 	public static void setColorForAllChildren(final Control child, final Color fgColor, final Color bgColor) {

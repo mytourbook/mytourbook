@@ -13,21 +13,11 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.tour;
+package net.tourbook.ui.tourChart;
 
-import org.eclipse.ui.IWorkbenchPart;
+import net.tourbook.tour.SelectionTourMarker;
 
-public interface ITourEventListener {
+public interface ITourMarkerSelectionListener {
 
-	/**
-	 * @param part
-	 *            Part where the property was fired, can be <code>null</code> when the part is not
-	 *            set.
-	 * @param eventId
-	 *            Id is required.
-	 * @param eventData
-	 *            Can be <code>null</code>.
-	 */
-	public void tourChanged(final IWorkbenchPart part, TourEventId eventId, Object eventData);
-
+	void selectionChanged(SelectionTourMarker tourMarkerSelection);
 }

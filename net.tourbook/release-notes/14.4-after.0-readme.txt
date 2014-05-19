@@ -1,0 +1,40 @@
+Version: 14.?.0                                           ?. ? 2014
+
+
+
+
+
+
+
+New 3D Map Features 	
+
+* Map is positioned with a selected tour marker in the tour chart.
+
+
+New 
+
+* Improved tour marker dialog
+
+- Restructured UI
+- Select a marker in the tour chart
+
+
+* Tour chart
+
+- Slideout to set tour marker display options
+- Display a tour marker icon
+- Context menu for a marker
+  + Edit marker
+
+
+Improvements 
+
+
+
+
+
+Fixed Bugs 
+
+
+System 
+

@@ -379,10 +379,12 @@ public class TourManager {
 		tcc.isShowMarkerLabel = _prefStore.getBoolean(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_MARKER_LABEL);
 		tcc.isShowTourMarker = _prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_MARKER_VISIBLE);
 
-		tcc.markerDefaultColor = PreferenceConverter.getColor(_prefStore,//
-				ITourbookPreferences.GRAPH_MARKER_DEFAULT_COLOR);
-		tcc.markerDeviceColor = PreferenceConverter.getColor(_prefStore,//
-				ITourbookPreferences.GRAPH_MARKER_DEVICE_COLOR);
+		tcc.markerColorDefault = PreferenceConverter.getColor(_prefStore,//
+				ITourbookPreferences.GRAPH_MARKER_COLOR_DEFAULT);
+		tcc.markerColorDevice = PreferenceConverter.getColor(_prefStore,//
+				ITourbookPreferences.GRAPH_MARKER_COLOR_DEVICE);
+		tcc.markerColorHidden = PreferenceConverter.getColor(_prefStore,//
+				ITourbookPreferences.GRAPH_MARKER_COLOR_HIDDEN);
 		tcc.markerPointSize = _prefStore.getInt(ITourbookPreferences.GRAPH_MARKER_POINT_SIZE);
 
 		tcc.isShowTourPhotos = _prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_TOUR_PHOTO_VISIBLE);
@@ -406,6 +408,14 @@ public class TourManager {
 
 	public static void fireEvent(final TourEventId tourEventId, final ArrayList<TourData> modifiedTours) {
 		fireEvent(tourEventId, new TourEvent(modifiedTours));
+	}
+
+	public static void fireEvent(final TourEventId tourEventId, final Object customData) {
+
+		final Object[] allListeners = _tourEventListeners.getListeners();
+		for (final Object listener : allListeners) {
+			((ITourEventListener) listener).tourChanged(null, tourEventId, customData);
+		}
 	}
 
 	public static void fireEvent(final TourEventId tourEventId, final TourEvent tourEvent) {

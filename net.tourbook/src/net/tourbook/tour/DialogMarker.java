@@ -43,6 +43,7 @@ import net.tourbook.photo.PhotoUI;
 import net.tourbook.preferences.PrefPageSigns;
 import net.tourbook.sign.SignManager;
 import net.tourbook.sign.SignMenuManager;
+import net.tourbook.ui.tourChart.ITourMarkerSelectionListener;
 import net.tourbook.ui.tourChart.TourChart;
 import net.tourbook.ui.tourChart.TourChartConfiguration;
 
@@ -113,7 +114,7 @@ import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 
-public class DialogMarker extends TitleAreaDialog {
+public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectionListener {
 
 	private static final String			DIALOG_SETTINGS_POSITION			= "marker_position";						//$NON-NLS-1$
 	private static final String			DIALOG_SETTINGS_VIEWER_WIDTH		= "viewer_width";							//$NON-NLS-1$
@@ -161,6 +162,7 @@ public class DialogMarker extends TitleAreaDialog {
 
 	private boolean						_isOkPressed						= false;
 	private boolean						_isUpdateUI;
+	private boolean						_isSetXSlider						= true;
 
 	private NumberFormat				_nf3								= NumberFormat.getNumberInstance();
 
@@ -1209,6 +1211,9 @@ public class DialogMarker extends TitleAreaDialog {
 		_tourChart.setShowSlider(true);
 		_tourChart.setContextProvider(new DialogMarkerTourChartContextProvicer(this));
 
+		_tourChart.setIsFireTourMarkerEvent(false);
+		_tourChart.addTourMarkerSelectionListener(this);
+
 		// set title
 		_tourChart.addDataModelListener(new IDataModelListener() {
 			public void dataModelChanged(final ChartDataModel changedChartDataModel) {
@@ -1683,11 +1688,12 @@ public class DialogMarker extends TitleAreaDialog {
 		updateUI_FromModel();
 		onChangeMarkerUI();
 
-		// set slider position
-		_tourChart.setXSliderPosition(new SelectionChartXSliderPosition(
-				_tourChart,
-				newSelectedMarker.getSerieIndex(),
-				SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION));
+		if (_isSetXSlider) {
+
+			// set slider position
+			_tourChart.setXSliderPosition(new SelectionChartXSliderPosition(_tourChart, newSelectedMarker
+					.getSerieIndex(), SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION));
+		}
 	}
 
 	private void onViewerPaint(final Event event) {
@@ -1794,6 +1800,21 @@ public class DialogMarker extends TitleAreaDialog {
 		_state.put(STATE_IMAGE_COLUMN_WIDTH, _imageColumnWidth);
 
 		UI.saveSashWeight(_markerContainerSashForm, _state, STATE_MARKER_CONTAINER_SASH_WEIGHTS);
+	}
+
+	@Override
+	public void selectionChanged(final SelectionTourMarker tourMarkerSelection) {
+
+		final ArrayList<TourMarker> selectedTourMarker = tourMarkerSelection.getTourMarker();
+
+		// prevent that the x-slider is positioned in the tour chart
+		_isSetXSlider = false;
+		{
+			_markerViewer.setSelection(new StructuredSelection(selectedTourMarker), true);
+		}
+		_isSetXSlider = true;
+
+		_comboMarkerName.setFocus();
 	}
 
 	private void toggleMarkerVisibility() {

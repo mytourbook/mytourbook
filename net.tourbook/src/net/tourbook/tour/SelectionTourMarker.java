@@ -15,19 +15,38 @@
  *******************************************************************************/
 package net.tourbook.tour;
 
-import org.eclipse.ui.IWorkbenchPart;
+import java.util.ArrayList;
 
-public interface ITourEventListener {
+import net.tourbook.data.TourData;
+import net.tourbook.data.TourMarker;
 
-	/**
-	 * @param part
-	 *            Part where the property was fired, can be <code>null</code> when the part is not
-	 *            set.
-	 * @param eventId
-	 *            Id is required.
-	 * @param eventData
-	 *            Can be <code>null</code>.
-	 */
-	public void tourChanged(final IWorkbenchPart part, TourEventId eventId, Object eventData);
+import org.eclipse.jface.viewers.ISelection;
+
+/**
+ * This selection is fired when tour markers are is selected.
+ */
+public class SelectionTourMarker implements ISelection {
+
+	private TourData				_tourData;
+	private ArrayList<TourMarker>	_allTourMarker;
+
+	public SelectionTourMarker(final TourData tourData, final ArrayList<TourMarker> allTourMarker) {
+
+		_tourData = tourData;
+
+		_allTourMarker = allTourMarker;
+	}
+
+	public TourData getTourData() {
+		return _tourData;
+	}
+
+	public ArrayList<TourMarker> getTourMarker() {
+		return _allTourMarker;
+	}
+
+	public boolean isEmpty() {
+		return false;
+	}
 
 }

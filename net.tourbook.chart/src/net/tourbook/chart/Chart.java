@@ -375,6 +375,20 @@ public class Chart extends ViewForm {
 			_chartContextProvider.fillContextMenu(menuMgr, mouseDownDevPositionX, mouseDownDevPositionY);
 		}
 
+		fillContextMenu_ChartDefault(menuMgr, leftSlider, rightSlider, hoveredBarSerieIndex, hoveredBarValueIndex);
+
+		if (_chartContextProvider != null && showOnlySliderContext == false && _isFirstContextMenu == false) {
+			menuMgr.add(new Separator());
+			_chartContextProvider.fillContextMenu(menuMgr, mouseDownDevPositionX, mouseDownDevPositionY);
+		}
+	}
+
+	private void fillContextMenu_ChartDefault(	final IMenuManager menuMgr,
+												final ChartXSlider leftSlider,
+												final ChartXSlider rightSlider,
+												final int hoveredBarSerieIndex,
+												final int hoveredBarValueIndex) {
+
 		if (_chartDataModel.getChartType() == ChartType.BAR) {
 
 			/*
@@ -420,11 +434,6 @@ public class Chart extends ViewForm {
 				menuMgr.add(_allChartActions.get(ACTION_ID_MOVE_SLIDERS_TO_BORDER));
 				menuMgr.add(_allChartActions.get(ACTION_ID_ZOOM_IN_TO_SLIDER));
 			}
-		}
-
-		if (_chartContextProvider != null && showOnlySliderContext == false && _isFirstContextMenu == false) {
-			menuMgr.add(new Separator());
-			_chartContextProvider.fillContextMenu(menuMgr, mouseDownDevPositionX, mouseDownDevPositionY);
 		}
 	}
 
@@ -957,14 +966,14 @@ public class Chart extends ViewForm {
 
 	/**
 	 * @param chartContextProvider
-	 * @param isFirstContextMenu
-	 *            when <code>true</code> the context menu will be positioned before the chart menu
-	 *            items
+	 * @param isTopMenuPosition
+	 *            When <code>true</code> the context menu will be positioned before the chart menu
+	 *            actions.
 	 */
-	public void setContextProvider(final IChartContextProvider chartContextProvider, final boolean isFirstContextMenu) {
+	public void setContextProvider(final IChartContextProvider chartContextProvider, final boolean isTopMenuPosition) {
 
 		_chartContextProvider = chartContextProvider;
-		_isFirstContextMenu = isFirstContextMenu;
+		_isFirstContextMenu = isTopMenuPosition;
 	}
 
 	public void setCustomOverlayDirty() {

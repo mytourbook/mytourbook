@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -144,14 +144,14 @@ public class TourChartContextProvider implements IChartContextProvider, ITourPro
 			}
 		}
 
-//		if (tourMarker != null) {
-//
-//			tourChart.editTourMarker(tourMarker);
-//
-//		} else {
-//
+		if (tourMarker != null) {
+
+			fillContextMenu_TourMarker(menuMgr, tourChart, tourMarker);
+
+		} else {
+
 			fillContextMenu_Default(menuMgr, tourChart);
-//		}
+		}
 
 	}
 
@@ -212,6 +212,13 @@ public class TourChartContextProvider implements IChartContextProvider, ITourPro
 
 		_actionSetTourType.setEnabled(isTourSaved);
 		TourTypeMenuManager.enableRecentTourTypeActions(isTourSaved, existingTourTypeId);
+	}
+
+	private void fillContextMenu_TourMarker(final IMenuManager menuMgr, final TourChart tourChart, final TourMarker tourMarker) {
+
+		_actionOpenMarkerDialog.setSelectedMarker(tourMarker);
+
+		menuMgr.add(_actionOpenMarkerDialog);
 	}
 
 	@Override

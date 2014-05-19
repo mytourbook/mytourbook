@@ -13,21 +13,35 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.tour;
+package net.tourbook.ui.tourChart.action;
 
-import org.eclipse.ui.IWorkbenchPart;
+import net.tourbook.chart.IChartContextProvider;
 
-public interface ITourEventListener {
+import org.eclipse.jface.action.Action;
+
+public class ActionMarkerHide extends Action {
 
 	/**
-	 * @param part
-	 *            Part where the property was fired, can be <code>null</code> when the part is not
-	 *            set.
-	 * @param eventId
-	 *            Id is required.
-	 * @param eventData
-	 *            Can be <code>null</code>.
+	 * 
 	 */
-	public void tourChanged(final IWorkbenchPart part, TourEventId eventId, Object eventData);
+	private final IChartContextProvider	_chartContextProvider;
+
+
+	public ActionMarkerHide(	final IChartContextProvider chartContextProvider,
+								final String text,
+								final boolean isLeftSlider) {
+
+		super(text);
+
+
+		_chartContextProvider = chartContextProvider;
+	}
+
+
+	@Override
+	public void run() {
+
+
+	}
 
 }

@@ -129,13 +129,18 @@ public class TourChartConfiguration {
 	/**
 	 * Color for the tour marker point and label.
 	 */
-	public RGB						markerDefaultColor;
+	public RGB						markerColorDefault;
 
 	/**
 	 * Color for the tour marker point which is created by the device and not with the marker
 	 * editor.
 	 */
-	public RGB						markerDeviceColor;
+	public RGB						markerColorDevice;
+
+	/**
+	 * Color for tour markers which are hidden, visibility is false.
+	 */
+	public RGB						markerColorHidden;
 
 	/**
 	 * Is <code>true</code> when graph values are displayed when they are recorded when a break time
@@ -150,6 +155,7 @@ public class TourChartConfiguration {
 
 	public boolean					isShowTourPhotos		= true;											;
 	public boolean					isShowTourPhotoTooltip	= true;
+
 
 	/**
 	 * @param keepMinMaxValues

@@ -114,12 +114,8 @@ import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.ColumnViewer;
-import org.eclipse.jface.viewers.ColumnViewerEditor;
-import org.eclipse.jface.viewers.ColumnViewerEditorActivationEvent;
-import org.eclipse.jface.viewers.ColumnViewerEditorActivationStrategy;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.EditingSupport;
-import org.eclipse.jface.viewers.FocusCellOwnerDrawHighlighter;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
@@ -128,8 +124,6 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
-import org.eclipse.jface.viewers.TableViewerEditor;
-import org.eclipse.jface.viewers.TableViewerFocusCellManager;
 import org.eclipse.jface.viewers.TextCellEditor;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
@@ -2481,7 +2475,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		_sliceViewer = new TableViewer(table);
 
 		if (_isRowEditMode == false) {
-			setCellEditSupport(_sliceViewer);
+			UI.setCellEditSupport(_sliceViewer);
 		}
 
 		/*
@@ -2599,7 +2593,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		 */
 		_markerViewer = new TableViewer(table);
 		if (_isRowEditMode == false) {
-			setCellEditSupport(_markerViewer);
+			UI.setCellEditSupport(_markerViewer);
 		}
 
 		// create editing support after the viewer is created but before the columns are created
@@ -6343,38 +6337,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		}
 
 		table.showSelection();
-	}
-
-	/**
-	 * initialize cell editing
-	 * 
-	 * @param viewer
-	 */
-	private void setCellEditSupport(final TableViewer viewer) {
-
-		final TableViewerFocusCellManager focusCellManager = new TableViewerFocusCellManager(
-				viewer,
-				new FocusCellOwnerDrawHighlighter(viewer));
-
-		final ColumnViewerEditorActivationStrategy actSupport = new ColumnViewerEditorActivationStrategy(viewer) {
-			@Override
-			protected boolean isEditorActivationEvent(final ColumnViewerEditorActivationEvent event) {
-
-				return (event.eventType == ColumnViewerEditorActivationEvent.TRAVERSAL)
-						|| (event.eventType == ColumnViewerEditorActivationEvent.MOUSE_CLICK_SELECTION)
-						|| ((event.eventType == ColumnViewerEditorActivationEvent.KEY_PRESSED) && (event.keyCode == SWT.CR))
-						|| (event.eventType == ColumnViewerEditorActivationEvent.PROGRAMMATIC);
-			}
-		};
-
-		TableViewerEditor.create(//
-				viewer,
-				focusCellManager,
-				actSupport,
-				ColumnViewerEditor.TABBING_HORIZONTAL //
-						| ColumnViewerEditor.TABBING_MOVE_TO_ROW_NEIGHBOR //
-						| ColumnViewerEditor.TABBING_VERTICAL
-						| ColumnViewerEditor.KEYBOARD_ACTIVATION);
 	}
 
 	@Override

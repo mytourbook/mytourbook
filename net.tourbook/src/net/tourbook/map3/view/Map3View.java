@@ -57,6 +57,7 @@ import net.tourbook.common.tooltip.IOpeningDialog;
 import net.tourbook.common.util.SWTPopupOverAWT;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
+import net.tourbook.data.TourMarker;
 import net.tourbook.extension.export.ActionExport;
 import net.tourbook.importdata.RawDataManager;
 import net.tourbook.map.MapColorProvider;
@@ -95,6 +96,7 @@ import net.tourbook.tour.ITourEventListener;
 import net.tourbook.tour.SelectionTourData;
 import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.SelectionTourIds;
+import net.tourbook.tour.SelectionTourMarker;
 import net.tourbook.tour.TourEvent;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
@@ -625,6 +627,18 @@ public class Map3View extends ViewPart implements ITourProvider {
 				} else if (eventId == TourEventId.UPDATE_UI || eventId == TourEventId.CLEAR_DISPLAYED_TOUR) {
 
 					clearView();
+
+				} else if (eventId == TourEventId.MARKER_SELECTION) {
+
+					if (eventData instanceof SelectionTourMarker) {
+
+						final SelectionTourMarker selection = (SelectionTourMarker) eventData;
+
+						final TourData tourData = selection.getTourData();
+						final ArrayList<TourMarker> tourMarker = selection.getTourMarker();
+
+						syncMapWith_TourMarker(tourData, tourMarker);
+					}
 
 				} else if (eventId == TourEventId.SLIDER_POSITION_CHANGED) {
 
@@ -1212,6 +1226,36 @@ public class Map3View extends ViewPart implements ITourProvider {
 		return legendValue;
 	}
 
+	/**
+	 * @return Returns {@link MarkerLayer} or <code>null</code> when layer is not displayed.
+	 */
+	private MarkerLayer getLayerMarker() {
+
+		final MarkerLayer layer = Map3Manager.getLayer_Marker();
+
+		if (layer.isEnabled() == false) {
+			// layer is not displayed
+			return null;
+		}
+
+		return layer;
+	}
+
+	/**
+	 * @return Returns {@link TrackSliderLayer} or <code>null</code> when layer is not displayed.
+	 */
+	private TrackSliderLayer getLayerTrackSlider() {
+
+		final TrackSliderLayer layer = Map3Manager.getLayer_TrackSlider();
+
+		if (layer.isEnabled() == false) {
+			// layer is not displayed
+			return null;
+		}
+
+		return layer;
+	}
+
 	public java.awt.Rectangle getMapSize() {
 		return _wwCanvas.getBounds();
 	}
@@ -1320,21 +1364,6 @@ public class Map3View extends ViewPart implements ITourProvider {
 
 	public MapGraphId getTrackColorId() {
 		return _graphId;
-	}
-
-	/**
-	 * @return Returns {@link TrackSliderLayer} or <code>null</code> when layer is not displayed.
-	 */
-	private TrackSliderLayer getTrackSliderLayer() {
-
-		final TrackSliderLayer chartTrackLayer = Map3Manager.getLayer_TrackSlider();
-
-		if (chartTrackLayer.isEnabled() == false) {
-			// layer is not displayed
-			return null;
-		}
-
-		return chartTrackLayer;
 	}
 
 	private void hideTourInfo() {
@@ -1446,6 +1475,12 @@ public class Map3View extends ViewPart implements ITourProvider {
 
 				showTours(tourIds);
 			}
+
+		} else if (selection instanceof SelectionTourMarker) {
+
+			final SelectionTourMarker markerSelection = (SelectionTourMarker) selection;
+
+			syncMapWith_TourMarker(markerSelection.getTourData(), markerSelection.getTourMarker());
 
 		} else if (selection instanceof SelectionChartInfo) {
 
@@ -1863,44 +1898,6 @@ public class Map3View extends ViewPart implements ITourProvider {
 		showAllTours_InternalTours();
 	}
 
-	//	public static final String	ALL						= "gov.nasa.worldwind.perfstat.All";
-//
-//	public static final String	FRAME_RATE				= "gov.nasa.worldwind.perfstat.FrameRate";
-//	public static final String	FRAME_TIME				= "gov.nasa.worldwind.perfstat.FrameTime";
-//	public static final String	PICK_TIME				= "gov.nasa.worldwind.perfstat.PickTime";
-//
-//	public static final String	TERRAIN_TILE_COUNT		= "gov.nasa.worldwind.perfstat.TerrainTileCount";
-//	public static final String	IMAGE_TILE_COUNT		= "gov.nasa.worldwind.perfstat.ImageTileCount";
-//
-//	public static final String	AIRSPACE_GEOMETRY_COUNT	= "gov.nasa.worldwind.perfstat.AirspaceGeometryCount";
-//	public static final String	AIRSPACE_VERTEX_COUNT	= "gov.nasa.worldwind.perfstat.AirspaceVertexCount";
-//
-//	public static final String	JVM_HEAP				= "gov.nasa.worldwind.perfstat.JvmHeap";
-//	public static final String	JVM_HEAP_USED			= "gov.nasa.worldwind.perfstat.JvmHeapUsed";
-//
-//	public static final String	MEMORY_CACHE			= "gov.nasa.worldwind.perfstat.MemoryCache";
-//	public static final String	TEXTURE_CACHE			= "gov.nasa.worldwind.perfstat.TextureCache";
-
-//2013-10-06 10:12:12.317'955 [Map3View] 	         0  Frame Rate (fps)
-//2013-10-06 10:12:12.317'982 [Map3View] 	       152  Frame Time (ms)
-//2013-10-06 10:12:12.318'366 [Map3View] 	         8  Pick Time (ms)
-
-//2013-10-06 10:12:12.318'392 [Map3View] 	        91  Terrain Tiles
-
-//2013-10-06 10:12:12.318'169 [Map3View] 	      6252  Cache Size (Kb): Terrain
-//2013-10-06 10:12:12.318'191 [Map3View] 	         0  Cache Size (Kb): Placename Tiles
-//2013-10-06 10:12:12.318'214 [Map3View] 	      1860  Cache Size (Kb): Texture Tiles
-//2013-10-06 10:12:12.318'289 [Map3View] 	      3870  Cache Size (Kb): Elevation Tiles
-//2013-10-06 10:12:12.318'414 [Map3View] 	    422617  Texture Cache size (Kb)
-
-//2013-10-06 10:12:12.318'007 [Map3View] 	         2  Blue Marble (WMS) 2004 Tiles
-//2013-10-06 10:12:12.318'044 [Map3View] 	        35  i-cubed Landsat Tiles
-//2013-10-06 10:12:12.318'069 [Map3View] 	        84  MS Virtual Earth Aerial Tiles
-//2013-10-06 10:12:12.318'093 [Map3View] 	        84  Bing Imagery Tiles
-
-//2013-10-06 10:12:12.318'118 [Map3View] 	    463659  JVM total memory (Kb)
-//2013-10-06 10:12:12.318'141 [Map3View] 	    431273  JVM used memory (Kb)
-
 	private void showTour(final TourData newTourData) {
 
 		if (newTourData == null) {
@@ -1940,6 +1937,44 @@ public class Map3View extends ViewPart implements ITourProvider {
 
 		showAllTours_NewTours(allTours);
 	}
+
+	//	public static final String	ALL						= "gov.nasa.worldwind.perfstat.All";
+//
+//	public static final String	FRAME_RATE				= "gov.nasa.worldwind.perfstat.FrameRate";
+//	public static final String	FRAME_TIME				= "gov.nasa.worldwind.perfstat.FrameTime";
+//	public static final String	PICK_TIME				= "gov.nasa.worldwind.perfstat.PickTime";
+//
+//	public static final String	TERRAIN_TILE_COUNT		= "gov.nasa.worldwind.perfstat.TerrainTileCount";
+//	public static final String	IMAGE_TILE_COUNT		= "gov.nasa.worldwind.perfstat.ImageTileCount";
+//
+//	public static final String	AIRSPACE_GEOMETRY_COUNT	= "gov.nasa.worldwind.perfstat.AirspaceGeometryCount";
+//	public static final String	AIRSPACE_VERTEX_COUNT	= "gov.nasa.worldwind.perfstat.AirspaceVertexCount";
+//
+//	public static final String	JVM_HEAP				= "gov.nasa.worldwind.perfstat.JvmHeap";
+//	public static final String	JVM_HEAP_USED			= "gov.nasa.worldwind.perfstat.JvmHeapUsed";
+//
+//	public static final String	MEMORY_CACHE			= "gov.nasa.worldwind.perfstat.MemoryCache";
+//	public static final String	TEXTURE_CACHE			= "gov.nasa.worldwind.perfstat.TextureCache";
+
+//2013-10-06 10:12:12.317'955 [Map3View] 	         0  Frame Rate (fps)
+//2013-10-06 10:12:12.317'982 [Map3View] 	       152  Frame Time (ms)
+//2013-10-06 10:12:12.318'366 [Map3View] 	         8  Pick Time (ms)
+
+//2013-10-06 10:12:12.318'392 [Map3View] 	        91  Terrain Tiles
+
+//2013-10-06 10:12:12.318'169 [Map3View] 	      6252  Cache Size (Kb): Terrain
+//2013-10-06 10:12:12.318'191 [Map3View] 	         0  Cache Size (Kb): Placename Tiles
+//2013-10-06 10:12:12.318'214 [Map3View] 	      1860  Cache Size (Kb): Texture Tiles
+//2013-10-06 10:12:12.318'289 [Map3View] 	      3870  Cache Size (Kb): Elevation Tiles
+//2013-10-06 10:12:12.318'414 [Map3View] 	    422617  Texture Cache size (Kb)
+
+//2013-10-06 10:12:12.318'007 [Map3View] 	         2  Blue Marble (WMS) 2004 Tiles
+//2013-10-06 10:12:12.318'044 [Map3View] 	        35  i-cubed Landsat Tiles
+//2013-10-06 10:12:12.318'069 [Map3View] 	        84  MS Virtual Earth Aerial Tiles
+//2013-10-06 10:12:12.318'093 [Map3View] 	        84  Bing Imagery Tiles
+
+//2013-10-06 10:12:12.318'118 [Map3View] 	    463659  JVM total memory (Kb)
+//2013-10-06 10:12:12.318'141 [Map3View] 	    431273  JVM used memory (Kb)
 
 	private void showTours(final ArrayList<Long> allTourIds) {
 
@@ -1988,6 +2023,11 @@ public class Map3View extends ViewPart implements ITourProvider {
 
 	private void syncMapWith_ChartSlider(final SelectionChartInfo chartInfo, final Long tourId) {
 
+		final TrackSliderLayer chartSliderLayer = getLayerTrackSlider();
+		if (chartSliderLayer == null) {
+			return;
+		}
+
 		TourData tourData = TourManager.getInstance().getTourData(tourId);
 		if (tourData == null) {
 
@@ -1996,8 +2036,6 @@ public class Map3View extends ViewPart implements ITourProvider {
 			final HashMap<Long, TourData> rawData = RawDataManager.getInstance().getImportedTours();
 			tourData = rawData.get(tourId);
 		}
-
-		final TrackSliderLayer chartSliderLayer = getTrackSliderLayer();
 
 		if (tourData == null || tourData.latitudeSerie == null) {
 
@@ -2009,85 +2047,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 
 			final int valuesIndex = chartInfo.selectedSliderValuesIndex;
 
-			final double latitude = tourData.latitudeSerie[valuesIndex];
-			final double longitude = tourData.longitudeSerie[valuesIndex];
-
-			final float[] altitudeSerie = tourData.altitudeSerie;
-
-			final View view = _wwCanvas.getView();
-			if (view instanceof BasicOrbitView) {
-
-				final BasicOrbitView orbitView = (BasicOrbitView) view;
-				final Position eyePos = orbitView.getCurrentEyePosition();
-
-				final float trackAltitude = altitudeSerie == null ? 0 : altitudeSerie[valuesIndex];
-				final double elevation = getSliderYPosition(trackAltitude, eyePos);
-				final LatLon sliderDegrees = LatLon.fromDegrees(latitude, longitude);
-
-				/*
-				 * Prevent setting the same location because this will jitter the map slider and is
-				 * unnecessary.
-				 */
-				if (_currentTrackInfoSliderPosition != null) {
-
-					/*
-					 * Set a new position and sync map only, when lat/lon are different and
-					 * elevation is larger than 1mm.
-					 */
-
-					final double eleDiff = _currentTrackInfoSliderPosition.elevation - elevation;
-
-					if (_currentTrackInfoSliderPosition.getLatitude().equals(sliderDegrees.latitude)
-							&& _currentTrackInfoSliderPosition.getLongitude().equals(sliderDegrees.longitude)
-							&& eleDiff < 0.001) {
-
-						return;
-					}
-				}
-
-				chartSliderLayer.setSliderVisible(false);
-
-				final Position mapSliderPosition = new Position(sliderDegrees, elevation);
-
-				/*
-				 * This fragment is copied from
-				 * gov.nasa.worldwindx.applications.sar.AnalysisPanel.updateView(boolean)
-				 */
-
-				// Send a message to stop all changes to the view's center position.
-//				orbitView.stopMovementOnCenter();
-
-				// Set the view to center on the track position, while keeping the eye altitude constant.
-				try {
-
-					// New eye lat/lon will follow the ground position.
-					final LatLon newEyeLatLon = eyePos.add(mapSliderPosition.subtract(orbitView.getCenterPosition()));
-
-					// Eye elevation will not change unless it is below the ground position elevation.
-					final double newEyeElev = eyePos.getElevation() < mapSliderPosition.getElevation() //
-							? mapSliderPosition.getElevation()
-							: eyePos.getElevation();
-
-					final Position newEyePos = new Position(newEyeLatLon, newEyeElev);
-
-					if (_isSyncMapWithChartSlider) {
-						orbitView.setOrientation(newEyePos, mapSliderPosition);
-					}
-
-					// keep current position
-					_currentTrackInfoSliderPosition = mapSliderPosition;
-				}
-
-				// Fallback to setting center position.
-				catch (final Exception e) {
-
-					if (_isSyncMapWithChartSlider) {
-
-						orbitView.setCenterPosition(mapSliderPosition);
-						// View/OrbitView will have logged the exception, no need to log it here.
-					}
-				}
-			}
+			syncMapWith_SliderPosition(tourData, chartSliderLayer, valuesIndex);
 
 			// update slider UI
 			updateTrackSlider_10_Position(//
@@ -2097,6 +2057,115 @@ public class Map3View extends ViewPart implements ITourProvider {
 
 			updateActionsState();
 		}
+	}
+
+	private void syncMapWith_SliderPosition(final TourData tourData,
+											final TrackSliderLayer chartSliderLayer,
+											int valuesIndex) {
+
+		final double[] latitudeSerie = tourData.latitudeSerie;
+
+		// check bounds
+		if (valuesIndex >= latitudeSerie.length) {
+			valuesIndex = latitudeSerie.length;
+		}
+
+		final double latitude = latitudeSerie[valuesIndex];
+		final double longitude = tourData.longitudeSerie[valuesIndex];
+
+		final float[] altitudeSerie = tourData.altitudeSerie;
+
+		final View view = _wwCanvas.getView();
+		if (view instanceof BasicOrbitView) {
+
+			final BasicOrbitView orbitView = (BasicOrbitView) view;
+			final Position eyePos = orbitView.getCurrentEyePosition();
+
+			final float trackAltitude = altitudeSerie == null ? 0 : altitudeSerie[valuesIndex];
+			final double elevation = getSliderYPosition(trackAltitude, eyePos);
+			final LatLon sliderDegrees = LatLon.fromDegrees(latitude, longitude);
+
+			/*
+			 * Prevent setting the same location because this will jitter the map slider and is
+			 * unnecessary.
+			 */
+			if (_currentTrackInfoSliderPosition != null) {
+
+				/*
+				 * Set a new position and sync map only, when lat/lon are different and elevation is
+				 * larger than 1mm.
+				 */
+
+				final double eleDiff = _currentTrackInfoSliderPosition.elevation - elevation;
+
+				if (_currentTrackInfoSliderPosition.getLatitude().equals(sliderDegrees.latitude)
+						&& _currentTrackInfoSliderPosition.getLongitude().equals(sliderDegrees.longitude)
+						&& eleDiff < 0.001) {
+
+					return;
+				}
+			}
+
+			chartSliderLayer.setSliderVisible(false);
+
+			final Position mapSliderPosition = new Position(sliderDegrees, elevation);
+
+			/*
+			 * This fragment is copied from
+			 * gov.nasa.worldwindx.applications.sar.AnalysisPanel.updateView(boolean)
+			 */
+
+			// Send a message to stop all changes to the view's center position.
+//				orbitView.stopMovementOnCenter();
+
+			// Set the view to center on the track position, while keeping the eye altitude constant.
+			try {
+
+				// New eye lat/lon will follow the ground position.
+				final LatLon newEyeLatLon = eyePos.add(mapSliderPosition.subtract(orbitView.getCenterPosition()));
+
+				// Eye elevation will not change unless it is below the ground position elevation.
+				final double newEyeElev = eyePos.getElevation() < mapSliderPosition.getElevation() //
+						? mapSliderPosition.getElevation()
+						: eyePos.getElevation();
+
+				final Position newEyePos = new Position(newEyeLatLon, newEyeElev);
+
+				if (_isSyncMapWithChartSlider) {
+					orbitView.setOrientation(newEyePos, mapSliderPosition);
+				}
+
+				// keep current position
+				_currentTrackInfoSliderPosition = mapSliderPosition;
+			}
+
+			// Fallback to setting center position.
+			catch (final Exception e) {
+
+				if (_isSyncMapWithChartSlider) {
+
+					orbitView.setCenterPosition(mapSliderPosition);
+					// View/OrbitView will have logged the exception, no need to log it here.
+				}
+			}
+		}
+	}
+
+	/**
+	 * A tourmarker is selected, sync it with the map.
+	 */
+	private void syncMapWith_TourMarker(final TourData tourData, final ArrayList<TourMarker> allTourMarker) {
+
+		final TrackSliderLayer chartSliderLayer = getLayerTrackSlider();
+		if (chartSliderLayer == null) {
+			return;
+		}
+
+		final int valuesIndex = allTourMarker.get(0).getSerieIndex();
+
+		syncMapWith_SliderPosition(tourData, chartSliderLayer, valuesIndex);
+
+		updateTrackSlider_10_Position(tourData, allTourMarker);
 	}
 
 	/**
@@ -2134,7 +2203,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 
 	private void updateTrackSlider() {
 
-		final TrackSliderLayer trackSliderLayer = getTrackSliderLayer();
+		final TrackSliderLayer trackSliderLayer = getLayerTrackSlider();
 		if (trackSliderLayer == null) {
 			return;
 		}
@@ -2148,9 +2217,36 @@ public class Map3View extends ViewPart implements ITourProvider {
 		updateTrackSlider_10_Position(tourData, _currentLeftSliderValueIndex, _currentRightSliderValueIndex);
 	}
 
+	private void updateTrackSlider_10_Position(final TourData tourData, final ArrayList<TourMarker> allTourMarker) {
+
+		final TrackSliderLayer trackSliderLayer = getLayerTrackSlider();
+		if (trackSliderLayer == null) {
+			return;
+		}
+
+
+		final int numberOfTourMarkers = allTourMarker.size();
+
+		int leftSliderValueIndex = 0;
+		int rightSliderValueIndex = 0;
+
+		if (numberOfTourMarkers == 1) {
+
+			leftSliderValueIndex = allTourMarker.get(0).getSerieIndex();
+			rightSliderValueIndex = _currentRightSliderValueIndex;
+
+		} else if (numberOfTourMarkers > 1) {
+
+			leftSliderValueIndex = allTourMarker.get(0).getSerieIndex();
+			rightSliderValueIndex = allTourMarker.get(numberOfTourMarkers - 1).getSerieIndex();
+		}
+
+		updateTrackSlider_10_Position(tourData, leftSliderValueIndex, rightSliderValueIndex);
+	}
+
 	private void updateTrackSlider_10_Position(final TourData tourData, int leftPosIndex, int rightPosIndex) {
 
-		final TrackSliderLayer trackSliderLayer = getTrackSliderLayer();
+		final TrackSliderLayer trackSliderLayer = getLayerTrackSlider();
 		if (trackSliderLayer == null) {
 			return;
 		}
