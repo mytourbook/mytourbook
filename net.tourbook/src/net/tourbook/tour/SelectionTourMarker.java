@@ -23,7 +23,7 @@ import net.tourbook.data.TourMarker;
 import org.eclipse.jface.viewers.ISelection;
 
 /**
- * This selection is fired when tour markers are is selected.
+ * This selection is fired when tour markers are selected.
  */
 public class SelectionTourMarker implements ISelection {
 
