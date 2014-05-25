@@ -18,13 +18,13 @@ package net.tourbook.ui.tourChart.action;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.Chart;
-import net.tourbook.chart.ChartLabel;
 import net.tourbook.chart.ChartXSlider;
 import net.tourbook.chart.IChartContextProvider;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.tour.DialogMarker;
 import net.tourbook.tour.TourManager;
+import net.tourbook.ui.tourChart.ChartLabel;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.window.Window;

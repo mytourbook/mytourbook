@@ -21,7 +21,6 @@ package net.tourbook.ui.tourChart;
 import java.util.ArrayList;
 
 import net.tourbook.chart.Chart;
-import net.tourbook.chart.ChartMarker;
 import net.tourbook.chart.GraphDrawingData;
 import net.tourbook.chart.IChartLayer;
 

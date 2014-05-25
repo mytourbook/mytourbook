@@ -23,7 +23,6 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.TimeZone;
 
-import net.tourbook.chart.ChartLabel;
 import net.tourbook.common.util.MtMath;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TimeData;
@@ -33,6 +32,7 @@ import net.tourbook.data.TourWayPoint;
 import net.tourbook.importdata.DeviceData;
 import net.tourbook.importdata.TourbookDevice;
 import net.tourbook.ui.UI;
+import net.tourbook.ui.tourChart.ChartLabel;
 
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.osgi.util.NLS;

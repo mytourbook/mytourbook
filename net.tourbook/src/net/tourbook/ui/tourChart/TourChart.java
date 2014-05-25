@@ -24,22 +24,19 @@ import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartComponentAxis;
 import net.tourbook.chart.ChartComponents;
+import net.tourbook.chart.ChartCursor;
 import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.ChartDataSerie;
 import net.tourbook.chart.ChartDataYSerie;
-import net.tourbook.chart.ChartLabel;
-import net.tourbook.chart.ChartMarker;
-import net.tourbook.chart.ChartMarkerConfig;
-import net.tourbook.chart.ChartMarkerLayer;
-import net.tourbook.chart.ChartMarkerOverlay;
 import net.tourbook.chart.ChartMouseEvent;
 import net.tourbook.chart.ChartType;
 import net.tourbook.chart.ChartYDataMinMaxKeeper;
 import net.tourbook.chart.IChartLayer;
 import net.tourbook.chart.IFillPainter;
-import net.tourbook.chart.IHoveredListener;
+import net.tourbook.chart.IHoveredValueListener;
 import net.tourbook.chart.IMouseListener;
 import net.tourbook.chart.ITooltipOwner;
+import net.tourbook.chart.MouseAdapter;
 import net.tourbook.common.PointLong;
 import net.tourbook.common.UI;
 import net.tourbook.common.action.ActionOpenPrefDialog;
@@ -160,10 +157,8 @@ public class TourChart extends Chart {
 	private ChartPhotoToolTip		_photoTooltip;
 
 	private ControlListener			_ttControlListener						= new ControlListener();
-	private MouseMarkerListener		_mouseMarkerListener					= new MouseMarkerListener();
-
-	private ChartMarkerOverlay		_markerOverlay							= new ChartMarkerOverlay();
-	private ChartPhotoOverlay		_photoOverlay							= new ChartPhotoOverlay();
+	private IMouseListener			_mouseMarkerListener					= new MouseMarkerListener();
+	private IMouseListener			_mousePhotoListener						= new MousePhotoListener();
 
 	/*
 	 * UI controls
@@ -172,7 +167,7 @@ public class TourChart extends Chart {
 
 	private I2ndAltiLayer			_layer2ndAlti;
 
-	private ChartMarkerLayer		_layerMarker;
+	private ChartLayerMarker		_layerMarker;
 	private ChartLayer2ndAltiSerie	_layer2ndAltiSerie;
 	private ChartLayerPhoto			_layerPhoto;
 	private ChartSegmentLayer		_layerSegment;
@@ -264,7 +259,7 @@ public class TourChart extends Chart {
 		}
 	}
 
-	public class HoveredListener implements IHoveredListener {
+	public class HoveredValueListener implements IHoveredValueListener {
 
 		@Override
 		public void hideTooltip() {
@@ -311,10 +306,7 @@ public class TourChart extends Chart {
 
 	}
 
-	public class MouseMarkerListener implements IMouseListener {
-
-		@Override
-		public void mouseDoubleClick(final ChartMouseEvent event) {}
+	public class MouseMarkerListener extends MouseAdapter {
 
 		@Override
 		public void mouseDown(final ChartMouseEvent event) {
@@ -327,11 +319,27 @@ public class TourChart extends Chart {
 		}
 
 		@Override
-		public void mouseMove(final ChartMouseEvent event) {}
+		public void mouseMove(final ChartMouseEvent event) {
+			onMarkerMouseMove(event);
+		}
 
 		@Override
-		public void mouseUp(final ChartMouseEvent event) {}
+		public void mouseUp(final ChartMouseEvent event) {
+			onMarkerMouseUp(event);
+		}
+	}
 
+	public class MousePhotoListener extends MouseAdapter {
+
+		@Override
+		public void mouseExit() {
+			onPhotoMouseExit();
+		}
+
+		@Override
+		public void mouseMove(final ChartMouseEvent event) {
+			onPhotoMouseMove(event);
+		}
 	}
 
 	public TourChart(final Composite parent, final int style, final boolean isShowActions) {
@@ -421,7 +429,7 @@ public class TourChart extends Chart {
 
 //		_photoOverlay.setPhotoToolTip(_photoTooltip);
 
-		setHoveredListener(new HoveredListener());
+		setHoveredListener(new HoveredValueListener());
 	}
 
 	public void actionCanAutoMoveSliders(final boolean isItemChecked) {
@@ -1192,11 +1200,17 @@ public class TourChart extends Chart {
 	 */
 	private void createLayer_Marker(final boolean isForcedMarker) {
 
-		while (true) {
+		if (isForcedMarker == false && _tcc.isShowTourMarker == false) {
 
-			if (isForcedMarker == false && _tcc.isShowTourMarker == false) {
-				break;
+			// marker layer is not displayed
+
+			if (_layerMarker != null) {
+				hideMarkerLayer();
 			}
+
+		} else {
+
+			// marker layer is displayed
 
 			// set data serie for the x-axis
 			final double[] xAxisSerie = _tcc.isShowTimeOnXAxis ? //
@@ -1211,11 +1225,11 @@ public class TourChart extends Chart {
 			cmc.markerColorHidden = _tcc.markerColorHidden;
 			cmc.markerPointSize = _tcc.markerPointSize;
 
-			_layerMarker = new ChartMarkerLayer(cmc);
+			_layerMarker = new ChartLayerMarker(cmc);
 
-			_markerOverlay.setMarkerLayer(_layerMarker);
+			// set overlay painter
+			addChartOverlay(_layerMarker);
 
-			addCustomOverlay(_markerOverlay);
 			addMouseChartListener(_mouseMarkerListener);
 
 			for (final TourMarker tourMarker : _tourData.getTourMarkers()) {
@@ -1246,14 +1260,8 @@ public class TourChart extends Chart {
 
 				cmc.chartLabels.add(chartLabel);
 			}
-
-			return;
 		}
 
-		if (_layerMarker != null) {
-
-			hideMarkerLayer();
-		}
 	}
 
 	private void createLayer_Photo() {
@@ -1320,9 +1328,10 @@ public class TourChart extends Chart {
 			_layerPhoto = new ChartLayerPhoto(chartPhotoGroups);
 			_layerPhoto.setBackgroundColor(_photoOverlayBGColorLink, _photoOverlayBGColorTour);
 
-			// setup overlay
-			addCustomOverlay(_photoOverlay);
-			_photoOverlay.setPhotoLayer(_layerPhoto);
+			// set overlay painter
+			addChartOverlay(_layerPhoto);
+
+			addMouseChartListener(_mousePhotoListener);
 
 			if (isTimeSerie == false && isHistorySerie) {
 				// hide x slider in history chart
@@ -1339,10 +1348,8 @@ public class TourChart extends Chart {
 
 			// disable photo layer
 
+			removeChartOverlay(_layerPhoto);
 			_layerPhoto = null;
-			_photoOverlay.setPhotoLayer(null);
-
-			removeCustomOverlay(_photoOverlay);
 		}
 	}
 
@@ -1654,11 +1661,11 @@ public class TourChart extends Chart {
 	 */
 	ChartLabel getHoveredMarker() {
 
-		if (_markerOverlay == null) {
+		if (_layerMarker == null) {
 			return null;
 		}
 
-		return _markerOverlay.getHoveredMarker();
+		return _layerMarker.getHoveredMarker();
 	}
 
 	public Map<String, Action> getTourChartActions() {
@@ -1678,10 +1685,9 @@ public class TourChart extends Chart {
 	 */
 	private void hideMarkerLayer() {
 
+		removeChartOverlay(_layerMarker);
 		_layerMarker = null;
-		_markerOverlay.setMarkerLayer(null);
 
-		removeCustomOverlay(_markerOverlay);
 		removeMouseChartListener(_mouseMarkerListener);
 	}
 
@@ -1734,12 +1740,86 @@ public class TourChart extends Chart {
 
 	private void onMarkerMouseExit() {
 
-		// mouse has exited the chart, disable hovered marker
+		// mouse has exited the chart, reset hovered marker
 
-		_markerOverlay.hideHoveredMarker();
+		if (_layerMarker == null) {
+			return;
+		}
+
+		_layerMarker.resetHoveredMarker();
 
 		// redraw chart
-		setCustomOverlayDirty();
+		setChartOverlayDirty();
+	}
+
+	private void onMarkerMouseMove(final ChartMouseEvent mouseEvent) {
+
+		if (_layerMarker == null) {
+			return;
+		}
+
+		final ChartLabel hoveredMarker = _layerMarker.getHoveredMarker(mouseEvent);
+
+		final boolean isMarkerHovered = hoveredMarker != null;
+		if (isMarkerHovered) {
+
+			// set worked that no other actions are done in this event
+			mouseEvent.isWorked = isMarkerHovered;
+			mouseEvent.cursor = ChartCursor.Arrow;
+		}
+	}
+
+	private void onMarkerMouseUp(final ChartMouseEvent mouseEvent) {
+
+		if (_layerMarker == null) {
+			return;
+		}
+
+		final ChartLabel hoveredMarker = _layerMarker.getHoveredMarker(mouseEvent);
+
+		final boolean isMarkerHovered = hoveredMarker != null;
+		if (isMarkerHovered) {
+
+			// set marker default cursor when the mouse is still hovering a marker
+			mouseEvent.isWorked = isMarkerHovered;
+			mouseEvent.cursor = ChartCursor.Arrow;
+		}
+	}
+
+	private void onPhotoMouseExit() {
+
+		// mouse has exited the chart, reset hovered marker
+
+		if (_layerPhoto == null) {
+			return;
+		}
+
+		_layerPhoto.setHoveredData(null, null);
+
+		// redraw chart overlay
+		setChartOverlayDirty();
+	}
+
+	private void onPhotoMouseMove(final ChartMouseEvent mouseEvent) {
+
+		if (_layerPhoto == null) {
+			return;
+		}
+
+		// check if photos are hovered
+		final PhotoCategory hoveredPhotoCategory = _layerPhoto.getHoveredPhotoCategory(
+				mouseEvent.eventTime,
+				mouseEvent.devXMouse,
+				mouseEvent.devYMouse);
+
+		final PhotoPaintGroup hoveredPhotoGroup = _layerPhoto.getHoveredPaintGroup();
+
+		_layerPhoto.setHoveredData(hoveredPhotoCategory, hoveredPhotoGroup);
+
+		final boolean isHovered = hoveredPhotoGroup != null;
+		if (isHovered) {
+			mouseEvent.isWorked = isHovered;
+		}
 	}
 
 	public void partIsDeactivated() {

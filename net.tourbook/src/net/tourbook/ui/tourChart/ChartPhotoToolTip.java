@@ -127,9 +127,9 @@ public class ChartPhotoToolTip extends PhotoToolTipUI {
 
 		} else {
 
-			final PhotoPaintGroup photoGroup = photoLayer.getHoveredGroup();
+			final PhotoPaintGroup photoGroup = photoLayer.getHoveredPaintGroup();
 			final PhotoCategory hoveredCategory = photoLayer
-					.getHoveredCategory(eventTime, devXMouseMove, devYMouseMove);
+					.getHoveredPhotoCategory(eventTime, devXMouseMove, devYMouseMove);
 
 			// set tooltip position
 			_devXGridCenterX = photoGroup.hGridStart + (ChartLayerPhoto.GROUP_HORIZONTAL_WIDTH / 2);

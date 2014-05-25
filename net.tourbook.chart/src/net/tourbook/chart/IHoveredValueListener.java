@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2012  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -13,22 +13,33 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
+/**
+ * @author Wolfgang Schramm Created: 31.7.2012
+ */
 package net.tourbook.chart;
 
-public class ChartMarker {
+import net.tourbook.common.PointLong;
+
+public interface IHoveredValueListener {
 
 	/**
-	 * x-position in graph units
+	 * Hide tooltip because chart has been modified (zoomed in/out)
 	 */
-	public double	graphX;
+	void hideTooltip();
 
 	/**
-	 * index in the data serie
+	 * Event is fired when mouse is moved over a line graph value point.
+	 * 
+	 * @param eventTime
+	 * @param devXMouseMove
+	 * @param devYMouseMove
+	 * @param hoveredValueIndex
+	 * @param devHoveredValue
 	 */
-	public int		serieIndex;
-
-	public ChartMarker() {
-		super();
-	}
+	void hoveredValue(	long eventTime,
+						int devXMouseMove,
+						int devYMouseMove,
+						int hoveredValueIndex,
+						PointLong devHoveredValue);
 
 }

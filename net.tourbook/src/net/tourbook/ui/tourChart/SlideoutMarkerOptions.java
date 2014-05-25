@@ -455,13 +455,15 @@ public class SlideoutMarkerOptions extends AnimatedToolTipShell implements IColo
 		/*
 		 * Update chart config
 		 */
-		tcc.markerColorDefault = defaultColor;
-		tcc.markerColorDevice = deviceColor;
-		tcc.markerColorHidden = hiddenColor;
 		tcc.markerPointSize = markerPointSize;
 		tcc.isShowHiddenMarker = isShowHiddenMarker;
 		tcc.isShowMarkerLabel = isShowMarkerLabel;
 
+		tcc.markerColorDefault = defaultColor;
+		tcc.markerColorDevice = deviceColor;
+		tcc.markerColorHidden = hiddenColor;
+
+		// update chart with new settings
 		_tourChart.updateUI_MarkerOptions();
 	}
 

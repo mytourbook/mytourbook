@@ -15,26 +15,21 @@
  *******************************************************************************/
 package net.tourbook.chart;
 
-import org.eclipse.swt.graphics.GC;
+public abstract class MouseAdapter implements IMouseListener {
 
-public interface CustomOverlay {
+	@Override
+	public void mouseDoubleClick(final ChartMouseEvent event) {}
 
-	/**
-	 * Draws into the chart overlay, this event can happen at each mouse move event.
-	 * 
-	 * @param gcOverlay
-	 */
-	public boolean draw(GC gcOverlay);
+	@Override
+	public void mouseDown(final ChartMouseEvent event) {}
 
-	/**
-	 * @param eventTime
-	 * @param devXMouse
-	 *            Mouse horizontal position or {@link Integer#MIN_VALUE} when mouse position is not
-	 *            available.
-	 * @param devYMouse
-	 *            Mouse vertical position or {@link Integer#MIN_VALUE} when mouse position is not
-	 *            available.
-	 */
-	public void onMouseMove(ChartMouseEvent mouseEvent);
+	@Override
+	public void mouseExit() {}
+
+	@Override
+	public void mouseMove(final ChartMouseEvent event) {}
+
+	@Override
+	public void mouseUp(final ChartMouseEvent event) {}
 
 }

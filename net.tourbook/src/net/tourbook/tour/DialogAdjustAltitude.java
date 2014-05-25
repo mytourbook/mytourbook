@@ -20,10 +20,11 @@ import java.util.ArrayList;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.chart.ChartCursor;
 import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.ChartMouseEvent;
-import net.tourbook.chart.IMouseListener;
 import net.tourbook.chart.ISliderMoveListener;
+import net.tourbook.chart.MouseAdapter;
 import net.tourbook.chart.SelectionChartInfo;
 import net.tourbook.chart.SelectionChartXSliderPosition;
 import net.tourbook.common.util.Util;
@@ -1123,18 +1124,12 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 			}
 		});
 
-		_tourChart.addMouseChartListener(new IMouseListener() {
-
-			@Override
-			public void mouseDoubleClick(final ChartMouseEvent event) {}
+		_tourChart.addMouseChartListener(new MouseAdapter() {
 
 			@Override
 			public void mouseDown(final ChartMouseEvent event) {
 				onMouseDown(event);
 			}
-
-			@Override
-			public void mouseExit() {}
 
 			@Override
 			public void mouseMove(final ChartMouseEvent event) {
@@ -1145,6 +1140,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 			public void mouseUp(final ChartMouseEvent event) {
 				onMouseUp(event);
 			}
+
 		});
 
 		_tourChart.addXAxisSelectionListener(new IXAxisSelectionListener() {
@@ -1867,6 +1863,13 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 					break;
 				}
 			}
+		}
+
+		if (mouseEvent.isWorked) {
+
+			// show dragged cursor
+
+			mouseEvent.cursor = ChartCursor.Dragged;
 		}
 	}
 

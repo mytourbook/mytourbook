@@ -22,14 +22,20 @@ package net.tourbook.ui.tourChart;
 
 import java.util.ArrayList;
 
+import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.ChartYDataMinMaxKeeper;
+import net.tourbook.preferences.ITourbookPreferences;
 
+import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.preference.PreferenceConverter;
 import org.eclipse.swt.graphics.RGB;
 
 /**
  * Contains the configuration how the tour chart is displayed.
  */
 public class TourChartConfiguration {
+
+	private final IPreferenceStore	_prefStore				= TourbookPlugin.getPrefStore();
 
 	/**
 	 * true: show time on the x-axis
@@ -156,15 +162,32 @@ public class TourChartConfiguration {
 	public boolean					isShowTourPhotos		= true;											;
 	public boolean					isShowTourPhotoTooltip	= true;
 
-
 	/**
 	 * @param keepMinMaxValues
 	 *            set <code>true</code> to keep min/max values when tour data will change
 	 */
 	public TourChartConfiguration(final boolean keepMinMaxValues) {
+
 		if (keepMinMaxValues) {
 			setMinMaxKeeper(true);
 		}
+
+		/*
+		 * Initialize tour marker settings from the pref store
+		 */
+//		isShowTourMarker = _prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_MARKER_VISIBLE);
+
+		markerPointSize = _prefStore.getInt(ITourbookPreferences.GRAPH_MARKER_POINT_SIZE);
+		isShowHiddenMarker = _prefStore.getBoolean(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_HIDDEN_MARKER);
+		isShowMarkerLabel = _prefStore.getBoolean(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_MARKER_LABEL);
+
+		markerColorDefault = PreferenceConverter.getColor(_prefStore,//
+				ITourbookPreferences.GRAPH_MARKER_COLOR_DEFAULT);
+		markerColorDevice = PreferenceConverter.getColor(_prefStore,//
+				ITourbookPreferences.GRAPH_MARKER_COLOR_DEVICE);
+		markerColorHidden = PreferenceConverter.getColor(_prefStore,//
+				ITourbookPreferences.GRAPH_MARKER_COLOR_HIDDEN);
+
 	}
 
 	public void addVisibleGraph(final int visibleGraph) {

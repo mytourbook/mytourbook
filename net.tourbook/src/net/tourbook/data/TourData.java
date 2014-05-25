@@ -59,7 +59,6 @@ import javax.xml.bind.annotation.XmlType;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
-import net.tourbook.chart.ChartLabel;
 import net.tourbook.common.map.GeoPosition;
 import net.tourbook.common.util.MtMath;
 import net.tourbook.common.util.StatusUtil;
@@ -83,6 +82,7 @@ import net.tourbook.srtm.NumberForm;
 import net.tourbook.tour.BreakTimeResult;
 import net.tourbook.tour.BreakTimeTool;
 import net.tourbook.ui.UI;
+import net.tourbook.ui.tourChart.ChartLabel;
 import net.tourbook.ui.tourChart.ChartLayer2ndAltiSerie;
 import net.tourbook.ui.views.ISmoothingAlgorithm;
 import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
@@ -1016,7 +1016,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	/**
 	 * Contains photo data from a {@link TourPhotoLink}.
 	 * <p>
-	 * When this field is set, photos from this photo link are displayed otherwise the photos from
+	 * When this field is set, photos from this photo link are displayed otherwise photos from
 	 * {@link #tourPhotos} are displayed.
 	 */
 	@Transient

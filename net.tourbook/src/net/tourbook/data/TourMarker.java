@@ -34,9 +34,9 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
 import net.tourbook.Messages;
-import net.tourbook.chart.ChartLabel;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.ui.UI;
+import net.tourbook.ui.tourChart.ChartLabel;
 
 import org.eclipse.swt.graphics.Rectangle;
 

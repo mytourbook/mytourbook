@@ -1,7 +1,7 @@
 package net.tourbook.device.garmin.fit.listeners;
 
-import net.tourbook.chart.ChartLabel;
 import net.tourbook.device.garmin.fit.FitActivityContext;
+import net.tourbook.ui.tourChart.ChartLabel;
 
 import com.garmin.fit.LapMesg;
 import com.garmin.fit.LapMesgListener;

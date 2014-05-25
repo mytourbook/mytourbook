@@ -76,7 +76,7 @@ public class Chart extends ViewForm {
 	private final ListenerList		_sliderMoveListeners				= new ListenerList();
 	private final ListenerList		_doubleClickListeners				= new ListenerList();
 	private final ListenerList		_mouseChartListener					= new ListenerList();
-	private final ListenerList		_customOverlayListener				= new ListenerList();
+	private final ListenerList		_chartOverlayListener				= new ListenerList();
 
 	private ChartComponents			_chartComponents;
 
@@ -96,7 +96,7 @@ public class Chart extends ViewForm {
 	 */
 	IChartListener					_draggingListenerXMarker;
 
-	IHoveredListener				_hoveredListener;
+	IHoveredValueListener				_hoveredListener;
 
 	private HashMap<String, Action>	_allChartActions;
 	private boolean					_isFillToolbar						= true;
@@ -201,8 +201,8 @@ public class Chart extends ViewForm {
 		_barSelectionListeners.add(listener);
 	}
 
-	public void addCustomOverlay(final CustomOverlay customOverlay) {
-		_customOverlayListener.add(customOverlay);
+	public void addChartOverlay(final IChartOverlay chartOverlay) {
+		_chartOverlayListener.add(chartOverlay);
 	}
 
 	public void addDoubleClickListener(final IBarSelectionListener listener) {
@@ -616,45 +616,11 @@ public class Chart extends ViewForm {
 		return createChartInfo();
 	}
 
-	Object[] getCustomOverlays() {
-		return _customOverlayListener.getListeners();
+	Object[] getChartOverlays() {
+		return _chartOverlayListener.getListeners();
 	}
 
-	/**
-	 * @param eventTime
-	 * @param devXMouse
-	 * @param devYMouse
-	 * @return Returns a state of overlay a hit.
-	 */
-	ChartMouseEvent getCustomOverlayState(final long eventTime, final int devXMouse, final int devYMouse) {
-
-		ChartMouseEvent stateWhichIsWorked = null;
-
-		/**
-		 * !!! All overlays must be called, otherwise a photo group is not disabled when a marker
-		 * label is hovered !!!
-		 */
-		for (final Object item : _customOverlayListener.getListeners()) {
-			if (item instanceof CustomOverlay) {
-
-				final ChartMouseEvent mouseEvent = new ChartMouseEvent(MouseMove);
-
-				mouseEvent.devXMouse = devXMouse;
-				mouseEvent.devYMouse = devYMouse;
-				mouseEvent.eventTime = eventTime;
-
-				((CustomOverlay) item).onMouseMove(mouseEvent);
-
-				if (mouseEvent.isWorked) {
-					stateWhichIsWorked = mouseEvent;
-				}
-			}
-		}
-
-		return stateWhichIsWorked;
-	}
-
-	public IHoveredListener getHoveredListener() {
+	public IHoveredValueListener getHoveredListener() {
 		return _hoveredListener;
 	}
 
@@ -775,42 +741,6 @@ public class Chart extends ViewForm {
 		_chartComponents.getChartComponentGraph().handleTooltipMouseEvent(event, mouseDisplayPosition);
 	}
 
-	boolean isMouseDownExternalPre(final int devXMouse, final int devYMouse) {
-
-		final ChartMouseEvent event = new ChartMouseEvent(Chart.MouseDownPre);
-
-		event.devXMouse = devXMouse;
-		event.devYMouse = devYMouse;
-
-		fireChartMouseEvent(event);
-
-		return event.isWorked;
-	}
-
-	boolean isMouseMoveExternal(final int devXMouse, final int devYMouse) {
-
-		final ChartMouseEvent event = new ChartMouseEvent(Chart.MouseMove);
-
-		event.devXMouse = devXMouse;
-		event.devYMouse = devYMouse;
-
-		fireChartMouseEvent(event);
-
-		return event.isWorked;
-	}
-
-	boolean isMouseUpExternal(final int devXMouse, final int devYMouse) {
-
-		final ChartMouseEvent event = new ChartMouseEvent(Chart.MouseUp);
-
-		event.devXMouse = devXMouse;
-		event.devYMouse = devYMouse;
-
-		fireChartMouseEvent(event);
-
-		return event.isWorked;
-	}
-
 	/**
 	 * @return Returns <code>true</code> when the x-sliders are visible
 	 */
@@ -869,18 +799,54 @@ public class Chart extends ViewForm {
 		_chartComponents.getChartComponentGraph().zoomOutWithMouse(updateChart, Integer.MIN_VALUE);
 	}
 
+	ChartMouseEvent onExternalMouseDownPre(final long eventTime, final int devXMouse, final int devYMouse) {
+
+		final ChartMouseEvent event = new ChartMouseEvent(Chart.MouseDownPre, eventTime);
+
+		event.devXMouse = devXMouse;
+		event.devYMouse = devYMouse;
+
+		fireChartMouseEvent(event);
+
+		return event;
+	}
+
+	void onExternalMouseExit(final long eventTime) {
+
+		final ChartMouseEvent event = new ChartMouseEvent(Chart.MouseExit, eventTime);
+
+		fireChartMouseEvent(event);
+	}
+
+	ChartMouseEvent onExternalMouseMove(final long eventTime, final int devXMouse, final int devYMouse) {
+
+		final ChartMouseEvent event = new ChartMouseEvent(Chart.MouseMove, eventTime);
+
+		event.devXMouse = devXMouse;
+		event.devYMouse = devYMouse;
+
+		fireChartMouseEvent(event);
+
+		return event;
+	}
+
+	ChartMouseEvent onExternalMouseUp(final long eventTime, final int devXMouse, final int devYMouse) {
+
+		final ChartMouseEvent event = new ChartMouseEvent(Chart.MouseUp, eventTime);
+
+		event.devXMouse = devXMouse;
+		event.devYMouse = devYMouse;
+
+		fireChartMouseEvent(event);
+
+		return event;
+	}
+
 	void onHideContextMenu(final MenuEvent e, final Control menuParentControl) {
 
 		if (_chartContextProvider != null) {
 			_chartContextProvider.onHideContextMenu(e, menuParentControl);
 		}
-	}
-
-	void onMouseExit() {
-
-		final ChartMouseEvent event = new ChartMouseEvent(Chart.MouseExit);
-
-		fireChartMouseEvent(event);
 	}
 
 	void onShowContextMenu(final MenuEvent menuEvent, final Control menuParentControl) {
@@ -897,8 +863,8 @@ public class Chart extends ViewForm {
 		_chartComponents.getChartComponentGraph().redrawChart();
 	}
 
-	public void removeCustomOverlay(final CustomOverlay customOverlay) {
-		_customOverlayListener.remove(customOverlay);
+	public void removeChartOverlay(final IChartOverlay chartOverlay) {
+		_chartOverlayListener.remove(chartOverlay);
 	}
 
 	public void removeDoubleClickListener(final IBarSelectionListener listener) {
@@ -960,6 +926,10 @@ public class Chart extends ViewForm {
 		_chartComponents.getChartComponentGraph().setCanAutoZoomToSlider(canZoomToSliderOnMouseUp);
 	}
 
+	public void setChartOverlayDirty() {
+		_chartComponents.getChartComponentGraph().setChartOverlayDirty();
+	}
+
 	public void setContextProvider(final IChartContextProvider chartContextProvider) {
 		_chartContextProvider = chartContextProvider;
 	}
@@ -974,11 +944,6 @@ public class Chart extends ViewForm {
 
 		_chartContextProvider = chartContextProvider;
 		_isFirstContextMenu = isTopMenuPosition;
-	}
-
-	public void setCustomOverlayDirty() {
-
-		_chartComponents.getChartComponentGraph().setCustomOverlayDirty();
 	}
 
 	protected void setDataModel(final ChartDataModel chartDataModel) {
@@ -1045,7 +1010,7 @@ public class Chart extends ViewForm {
 		_chartComponents.onResize();
 	}
 
-	protected void setHoveredListener(final IHoveredListener hoveredValuePointListener) {
+	protected void setHoveredListener(final IHoveredValueListener hoveredValuePointListener) {
 		_hoveredListener = hoveredValuePointListener;
 	}
 

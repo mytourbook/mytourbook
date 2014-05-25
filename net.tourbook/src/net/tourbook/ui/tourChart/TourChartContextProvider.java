@@ -20,7 +20,6 @@ import java.util.Set;
 
 import net.tourbook.Messages;
 import net.tourbook.chart.Chart;
-import net.tourbook.chart.ChartLabel;
 import net.tourbook.chart.ChartXSlider;
 import net.tourbook.chart.IChartContextProvider;
 import net.tourbook.common.action.ActionOpenPrefDialog;

@@ -15,36 +15,17 @@
  *******************************************************************************/
 package net.tourbook.chart;
 
-public class ChartMouseEvent {
+import org.eclipse.swt.SWT;
 
-	public long			eventTime;
-
-	int					type;
+public enum ChartCursor {
 
 	/**
-	 * When <code>true</code> the event is done by the receiver, when <code>false</code> the
-	 * receiver has done nothing, default is <code>false</code>.
-	 * <p>
-	 * <b> Because this flag is used by all {@link ChartMouseEvent} listener, setting this value to
-	 * <code>false</code> will also disable other listeners. </b>
+	 * {@link SWT#CURSOR_ARROW}
 	 */
-	public boolean		isWorked;
-
-	public int			devYMouse;
-	public int			devXMouse;
+	Arrow,
 
 	/**
-	 * This cursor is displayed when {@link #isWorked} is <code>true</code>, can be
-	 * <code>null</code> which shows the default cursor.
+	 * {@link SWT#CURSOR_SIZEALL}
 	 */
-	public ChartCursor	cursor;
-
-	@SuppressWarnings("unused")
-	private ChartMouseEvent() {}
-
-	public ChartMouseEvent(final int eventType, final long time) {
-
-		type = eventType;
-		eventTime = time;
-	}
+	Dragged
 }

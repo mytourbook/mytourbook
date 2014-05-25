@@ -16,7 +16,7 @@
 /*
  * Administrator 10.08.2005
  */
-package net.tourbook.chart;
+package net.tourbook.ui.tourChart;
 
 import net.tourbook.common.UI;
 import net.tourbook.photo.Photo;

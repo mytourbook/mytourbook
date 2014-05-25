@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2012  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,27 +15,20 @@
  *******************************************************************************/
 package net.tourbook.ui.tourChart;
 
-import java.util.ArrayList;
+public class ChartMarker {
 
-import org.eclipse.swt.graphics.Point;
+	/**
+	 * x-position in graph units
+	 */
+	public double	graphX;
 
-/**
- * A photo category contains {@link ChartPhoto}'s for one {@link ChartPhotoType}.
- */
-public class PhotoCategory {
+	/**
+	 * index in the data serie
+	 */
+	public int		serieIndex;
 
-	final ChartPhotoType				photoType;
-
-	ArrayList<ChartPhoto>				chartPhotos;
-
-	public ArrayList<PhotoPaintGroup>	paintGroups	= new ArrayList<PhotoPaintGroup>();
-
-	Point[]								photoPositions;
-
-	public PhotoCategory(final ArrayList<ChartPhoto> chartPhotos, final ChartPhotoType photoType) {
-
-		this.chartPhotos = chartPhotos;
-		this.photoType = photoType;
+	public ChartMarker() {
+		super();
 	}
 
 }

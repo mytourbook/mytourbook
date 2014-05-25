@@ -529,11 +529,7 @@ public abstract class PhotoToolTipShell {
 		} finally {
 
 //			final float timeDiff = (float) (System.nanoTime() - start) / 1000000;
-//			System.out.println(UI.timeStampNano()
-//					+ " animation20_Runnable:\t"
-//					+ timeDiff
-//					+ " ms\t"
-//					+ " ms");
+//			System.out.println(UI.timeStampNano() + " animation20_Runnable:\t" + timeDiff + " ms\t" + " ms");
 //			// TODO remove SYSTEM.OUT.PRINTLN
 		}
 	}
@@ -650,8 +646,7 @@ public abstract class PhotoToolTipShell {
 			}
 
 			if (rightBottomBounds.y > displayBounds.y + displayBounds.height) {
-// ignore when tt is below the bottom, force the user to resize the tt
-//				location.y -= rightBottomBounds.y - (displayBounds.y + displayBounds.height);
+				location.y -= rightBottomBounds.y - (displayBounds.y + displayBounds.height);
 			}
 
 			if (location.x < displayBounds.x) {
@@ -1286,6 +1281,12 @@ public abstract class PhotoToolTipShell {
 
 	private void setShellVisible(final boolean isVisible) {
 
+//		final Rectangle shellBounds = _visibleShell.getBounds();
+
+//		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
+//				+ ("\tsetShellVisible: " + isVisible)+("\t"+shellBounds));
+		// TODO remove SYSTEM.OUT.PRINTLN
+
 		_visibleShell.setVisible(isVisible);
 
 		if (isVisible) {
@@ -1486,6 +1487,9 @@ public abstract class PhotoToolTipShell {
 	}
 
 	private void ttHide(final Event event) {
+
+//		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") + ("\tttHide"));
+//		// TODO remove SYSTEM.OUT.PRINTLN
 
 		if (_visibleShell == null || _visibleShell.isDisposed() || _visibleShell.isVisible() == false) {
 			return;

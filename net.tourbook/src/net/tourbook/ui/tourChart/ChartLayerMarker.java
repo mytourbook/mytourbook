@@ -16,7 +16,13 @@
 /**
  * @author Wolfgang Schramm Created: 06.07.2005
  */
-package net.tourbook.chart;
+package net.tourbook.ui.tourChart;
+
+import net.tourbook.chart.Chart;
+import net.tourbook.chart.ChartMouseEvent;
+import net.tourbook.chart.GraphDrawingData;
+import net.tourbook.chart.IChartLayer;
+import net.tourbook.chart.IChartOverlay;
 
 import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.swt.SWT;
@@ -27,7 +33,7 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.graphics.Transform;
 
-public class ChartMarkerLayer implements IChartLayer {
+public class ChartLayerMarker implements IChartLayer, IChartOverlay {
 
 	private int					LABEL_OFFSET;
 	private int					MARKER_HOVER_OFFSET;
@@ -42,7 +48,7 @@ public class ChartMarkerLayer implements IChartLayer {
 	private long				_hoveredEventTime;
 	private ChartLabel			_hoveredMarker;
 
-	public ChartMarkerLayer(final ChartMarkerConfig chartMarkerConfig) {
+	public ChartLayerMarker(final ChartMarkerConfig chartMarkerConfig) {
 
 		_chartMarkerConfig = chartMarkerConfig;
 	}
@@ -243,7 +249,13 @@ public class ChartMarkerLayer implements IChartLayer {
 
 	}
 
-	void drawHoveredMarker(final GC gc) {
+	/**
+	 * Draw hovered marker.
+	 * <p>
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void drawOverlay(final GC gc) {
 
 		if (_hoveredMarker == null) {
 			return;
@@ -302,6 +314,10 @@ public class ChartMarkerLayer implements IChartLayer {
 		gc.setAlpha(0xff);
 	}
 
+	public ChartLabel getHoveredMarker() {
+		return _hoveredMarker;
+	}
+
 	ChartLabel getHoveredMarker(final ChartMouseEvent mouseEvent) {
 
 		if (mouseEvent.eventTime == _hoveredEventTime) {
@@ -353,7 +369,10 @@ public class ChartMarkerLayer implements IChartLayer {
 		return null;
 	}
 
-	void hideHoveredMarker() {
+	/**
+	 * Set marker layer that nothing is hovered.
+	 */
+	void resetHoveredMarker() {
 
 		_hoveredMarker = null;
 	}

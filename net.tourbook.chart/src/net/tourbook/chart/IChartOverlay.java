@@ -13,33 +13,17 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-/**
- * @author Wolfgang Schramm Created: 31.7.2012
- */
 package net.tourbook.chart;
 
-import net.tourbook.common.PointLong;
+import org.eclipse.swt.graphics.GC;
 
-public interface IHoveredListener {
-
-	/**
-	 * Hide tooltip because chart has been modified (zoomed in/out)
-	 */
-	void hideTooltip();
+public interface IChartOverlay {
 
 	/**
-	 * Event is fired when mouse is moved over a line graph value point.
+	 * Draws into the chart overlay, this event can happen at each mouse move event.
 	 * 
-	 * @param eventTime
-	 * @param devXMouseMove
-	 * @param devYMouseMove
-	 * @param hoveredValueIndex
-	 * @param devHoveredValue
+	 * @param gcOverlay
 	 */
-	void hoveredValue(	long eventTime,
-						int devXMouseMove,
-						int devYMouseMove,
-						int hoveredValueIndex,
-						PointLong devHoveredValue);
+	public void drawOverlay(GC gcOverlay);
 
 }
