@@ -32,7 +32,7 @@ import net.tourbook.ui.action.ActionEditQuick;
 import net.tourbook.ui.action.ActionEditTour;
 import net.tourbook.ui.action.ActionSetTourTypeMenu;
 import net.tourbook.ui.tourChart.TourChart;
-import net.tourbook.ui.tourChart.action.ActionCreateMarker;
+import net.tourbook.ui.tourChart.action.ActionCreateMarkerFromSlider;
 import net.tourbook.ui.tourChart.action.ActionCreateRefTour;
 
 import org.eclipse.jface.action.IMenuManager;
@@ -54,9 +54,9 @@ public class TourChartContextProvider implements IChartContextProvider, ITourPro
 	private ActionOpenAdjustAltitudeDialog	_actionAdjustAltitude;
 
 	private ActionCreateRefTour				_actionCreateRefTour;
-	private ActionCreateMarker				_actionCreateMarker;
-	private ActionCreateMarker				_actionCreateMarkerLeft;
-	private ActionCreateMarker				_actionCreateMarkerRight;
+	private ActionCreateMarkerFromSlider				_actionCreateMarker;
+	private ActionCreateMarkerFromSlider				_actionCreateMarkerLeft;
+	private ActionCreateMarkerFromSlider				_actionCreateMarkerRight;
 
 	private ActionSetTourTypeMenu			_actionSetTourType;
 	private TagMenuManager					_tagMenuMgr;
@@ -84,16 +84,16 @@ public class TourChartContextProvider implements IChartContextProvider, ITourPro
 
 		_actionCreateRefTour = new ActionCreateRefTour(tourChart);
 
-		_actionCreateMarker = new ActionCreateMarker(this, //
+		_actionCreateMarker = new ActionCreateMarkerFromSlider(this, //
 				Messages.tourCatalog_view_action_create_marker,
 				true);
 
-		_actionCreateMarkerLeft = new ActionCreateMarker(
+		_actionCreateMarkerLeft = new ActionCreateMarkerFromSlider(
 				this,
 				Messages.tourCatalog_view_action_create_left_marker,
 				true);
 
-		_actionCreateMarkerRight = new ActionCreateMarker(
+		_actionCreateMarkerRight = new ActionCreateMarkerFromSlider(
 				this,
 				Messages.tourCatalog_view_action_create_right_marker,
 				false);

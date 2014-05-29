@@ -550,7 +550,6 @@ public class HAC4LinuxDeviceReader extends TourbookDevice {
 						break;
 					}
 					final TourMarker tourMarker = new TourMarker(tourData, ChartLabel.MARKER_TYPE_DEVICE);
-					tourMarker.setVisualPosition(ChartLabel.VISUAL_HORIZONTAL_ABOVE_GRAPH_CENTERED);
 					final int markerIndex = Integer.parseInt(fields[1]);
 					tourMarker.setSerieIndex(markerIndex);
 					tourMarker.setLabel(fields[0].substring(1, fields[0].length()));

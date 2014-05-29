@@ -63,7 +63,6 @@ public class ActionCreateTourMarker extends Action {
 			tourMarker.setSerieIndex(serieIndex);
 			tourMarker.setTime(tourData.timeSerie[serieIndex]);
 			tourMarker.setLabel(Messages.TourData_Label_new_marker);
-			tourMarker.setVisualPosition(ChartLabel.VISUAL_HORIZONTAL_ABOVE_GRAPH_CENTERED);
 
 			if (distSerie != null) {
 				tourMarker.setDistance(distSerie[serieIndex]);

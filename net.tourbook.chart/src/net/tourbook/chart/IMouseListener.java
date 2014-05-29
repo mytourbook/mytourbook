@@ -17,6 +17,11 @@ package net.tourbook.chart;
 
 public interface IMouseListener {
 
+	/**
+	 * Chart is resized, this also can happen when the chart is zoomed in/out.
+	 */
+	void chartResized();
+
 	void mouseDoubleClick(ChartMouseEvent event);
 
 	void mouseDown(ChartMouseEvent event);

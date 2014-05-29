@@ -527,7 +527,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 				// edit selected marker
 				final IStructuredSelection selection = (IStructuredSelection) _markerViewer.getSelection();
 				if (selection.size() > 0) {
-					_actionEditTourMarkers.setSelectedMarker((TourMarker) selection.getFirstElement());
+					_actionEditTourMarkers.setTourMarker((TourMarker) selection.getFirstElement());
 					_actionEditTourMarkers.run();
 				}
 			}
@@ -776,7 +776,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 
 		// set the marker which should be selected in the marker dialog
 		final IStructuredSelection selection = (IStructuredSelection) _markerViewer.getSelection();
-		_actionEditTourMarkers.setSelectedMarker((TourMarker) selection.getFirstElement());
+		_actionEditTourMarkers.setTourMarker((TourMarker) selection.getFirstElement());
 
 		/*
 		 * enable actions

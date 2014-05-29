@@ -121,11 +121,12 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 		// show breaktime values
 		store.setDefault(ITourbookPreferences.GRAPH_IS_BREAKTIME_VALUES_VISIBLE, true);
 
-		// marker
+		// tour marker
 		store.setDefault(ITourbookPreferences.GRAPH_IS_MARKER_VISIBLE, true);
 		store.setDefault(ITourbookPreferences.GRAPH_MARKER_POINT_SIZE, 2);
 		store.setDefault(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_HIDDEN_MARKER, false);
 		store.setDefault(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_MARKER_LABEL, true);
+		store.setDefault(ITourbookPreferences.GRAPH_MARKER_IS_DRAW_WITH_DEFAULT_COLOR, true);
 		PreferenceConverter.setDefault(store, //
 				ITourbookPreferences.GRAPH_MARKER_COLOR_DEFAULT,
 				new RGB(0x60, 0x60, 0x60));
@@ -134,7 +135,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 				new RGB(0xff, 0x0, 0x80));
 		PreferenceConverter.setDefault(store, //
 				ITourbookPreferences.GRAPH_MARKER_COLOR_HIDDEN,
-				new RGB(0xFF, 0x6B, 0x24));
+				new RGB(0x24, 0x9C, 0xFF));
 
 		// is photo visible
 		store.setDefault(ITourbookPreferences.GRAPH_IS_TOUR_PHOTO_VISIBLE, true);

@@ -42,9 +42,11 @@ public class ChartMouseEvent {
 	@SuppressWarnings("unused")
 	private ChartMouseEvent() {}
 
-	public ChartMouseEvent(final int eventType, final long time) {
+	public ChartMouseEvent(final int eventType, final long time, final int eventMouseX, final int eventMouseY) {
 
 		type = eventType;
 		eventTime = time;
+		devXMouse = eventMouseX;
+		devYMouse = eventMouseY;
 	}
 }

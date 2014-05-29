@@ -545,7 +545,7 @@ public class ChartLayerPhoto implements IChartLayer, IChartOverlay {
 	}
 
 	@Override
-	public void drawOverlay(final GC gcOverlay) {
+	public void drawOverlay(final GC gcOverlay, final GraphDrawingData graphDrawingData) {
 
 		if (_hoveredPaintGroup == null) {
 			return;

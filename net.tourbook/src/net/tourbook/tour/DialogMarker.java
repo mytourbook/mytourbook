@@ -29,7 +29,8 @@ import net.tourbook.chart.SelectionChartXSliderPosition;
 import net.tourbook.common.Hack;
 import net.tourbook.common.UI;
 import net.tourbook.common.action.ActionOpenPrefDialog;
-import net.tourbook.common.form.ViewerDetailForm;
+import net.tourbook.common.form.SashBottomFixedForm;
+import net.tourbook.common.form.SashLeftFixedForm;
 import net.tourbook.common.util.Util;
 import net.tourbook.common.widgets.ImageCanvas;
 import net.tourbook.data.TourData;
@@ -80,7 +81,6 @@ import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.jface.viewers.ViewerSorter;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.DisposeEvent;
@@ -116,13 +116,13 @@ import org.eclipse.swt.widgets.Text;
 
 public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectionListener {
 
-	private static final String			DIALOG_SETTINGS_POSITION			= "marker_position";						//$NON-NLS-1$
-	private static final String			DIALOG_SETTINGS_VIEWER_WIDTH		= "viewer_width";							//$NON-NLS-1$
-	private static final String			STATE_IMAGE_COLUMN_WIDTH			= "STATE_IMAGE_COLUMN_WIDTH";				//$NON-NLS-1$
-	private static final String			STATE_MARKER_CONTAINER_SASH_WEIGHTS	= "MarkerContainerSashWeights";			//$NON-NLS-1$
+	private static final String			DIALOG_SETTINGS_POSITION	= "marker_position";						//$NON-NLS-1$
+	private static final String			STATE_IMAGE_COLUMN_WIDTH	= "STATE_IMAGE_COLUMN_WIDTH";				//$NON-NLS-1$
+	private static final String			STATE_INNER_SASH_HEIGHT		= "STATE_INNER_SASH_HEIGHT";				//$NON-NLS-1$
+	private static final String			STATE_OUTER_SASH_WIDTH		= "STATE_OUTER_SASH_WIDTH";				//$NON-NLS-1$
 
-	private static final int			OFFSET_PAGE_INCREMENT				= 20;
-	private static final int			OFFSET_MAX							= 200;
+	private static final int			OFFSET_PAGE_INCREMENT		= 20;
+	private static final int			OFFSET_MAX					= 200;
 
 	private int							IMAGE_DEFAULT_WIDTH;
 	private int							IMAGE_MIN_WIDTH;
@@ -130,7 +130,7 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
 	private int							ROW_MAX_HEIGHT;
 	private int							CONTENT_DEFAULT_WIDTH;
 
-	private final IDialogSettings		_state								= TourbookPlugin.getState("DialogMarker");	//$NON-NLS-1$
+	private final IDialogSettings		_state						= TourbookPlugin.getState("DialogMarker");	//$NON-NLS-1$
 
 	private TourChart					_tourChart;
 	private TourData					_tourData;
@@ -143,7 +143,7 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
 	/**
 	 * backup for the selected tour marker
 	 */
-	private TourMarker					_backupMarker						= new TourMarker();
+	private TourMarker					_backupMarker				= new TourMarker();
 
 	private Set<TourMarker>				_tourMarkers;
 	private HashSet<TourMarker>			_tourMarkersBackup;
@@ -157,14 +157,14 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
 	private MouseWheelListener			_defaultMouseWheelListener;
 	private SelectionAdapter			_defaultSelectionAdapter;
 
-	private SignMenuManager				_signMenuManager					= new SignMenuManager();
+	private SignMenuManager				_signMenuManager			= new SignMenuManager();
 	private ActionOpenPrefDialog		_actionOpenTourSignPrefs;
 
-	private boolean						_isOkPressed						= false;
+	private boolean						_isOkPressed				= false;
 	private boolean						_isUpdateUI;
-	private boolean						_isSetXSlider						= true;
+	private boolean						_isSetXSlider				= true;
 
-	private NumberFormat				_nf3								= NumberFormat.getNumberInstance();
+	private NumberFormat				_nf3						= NumberFormat.getNumberInstance();
 
 	private int							_signImageColumn;
 	private int							_imageColumnWidth;
@@ -173,7 +173,7 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
 	 * Contains the controls which are displayed in the first column, these controls are used to get
 	 * the maximum width and set the first column within the differenct section to the same width.
 	 */
-	private final ArrayList<Control>	_firstColumnControls				= new ArrayList<Control>();
+	private final ArrayList<Control>	_firstColumnControls		= new ArrayList<Control>();
 
 	/*
 	 * none UI
@@ -183,9 +183,10 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
 	/*
 	 * UI controls
 	 */
-	private ViewerDetailForm			_viewerDetailForm;
-	private Composite					_markerContainer;
-	private SashForm					_markerContainerSashForm;
+	private SashLeftFixedForm			_sashOuterForm;
+	private SashBottomFixedForm			_sashInnerForm;
+	private Composite					_outerFixedPart;
+	private Composite					_innerFixedPart;
 
 	private TableViewer					_markerViewer;
 
@@ -481,7 +482,7 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
 	public void actionRemoveTourSign() {
 
 		// update model
-		_selectedTourMarker.setSign(null);
+		_selectedTourMarker.setTourSign(null);
 
 		// update UI
 		_lblSignName.setText(UI.EMPTY_STRING);
@@ -492,7 +493,7 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
 
 	public void actionSetTourSign(final TourSign tourSign) {
 
-		_selectedTourMarker.setSign(tourSign);
+		_selectedTourMarker.setTourSign(tourSign);
 
 		updateUI_TourSign(_selectedTourMarker);
 
@@ -609,20 +610,13 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
 		menuMgr.setRemoveAllWhenShown(true);
 		menuMgr.addMenuListener(new IMenuListener() {
 			public void menuAboutToShow(final IMenuManager menuMgr) {
-
-				// set menu items
-
-				_signMenuManager.fillSignMenu(menuMgr, DialogMarker.this);
-
-				menuMgr.add(new Separator());
-				menuMgr.add(_actionOpenTourSignPrefs);
+				fillContextMenu(menuMgr);
 			}
 		});
 
 		// set context menu for the link
 		final Menu signContextMenu = menuMgr.createContextMenu(control);
 		control.setMenu(signContextMenu);
-
 	}
 
 	@Override
@@ -673,25 +667,25 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
 				.applyTo(shellContainer);
 		GridLayoutFactory.swtDefaults().applyTo(shellContainer);
 		{
-			final Composite dlgContainer = new Composite(shellContainer, SWT.NONE);
+			final Composite sashContainer = new Composite(shellContainer, SWT.NONE);
 			GridDataFactory.fillDefaults()//
 					.grab(true, true)
-					.applyTo(dlgContainer);
-			GridLayoutFactory.swtDefaults().applyTo(dlgContainer);
+					.applyTo(sashContainer);
+			GridLayoutFactory.swtDefaults().applyTo(sashContainer);
 			{
 				// left part
-				_markerContainer = createUI_10_LeftPart(dlgContainer);
+				_outerFixedPart = createUI_10_LeftPart(sashContainer);
 
 				// sash
-				final Sash sash = new Sash(dlgContainer, SWT.VERTICAL);
+				final Sash sash = new Sash(sashContainer, SWT.VERTICAL);
 				UI.addSashColorHandler(sash);
 
 				// right part
-				final Composite chartContainer = createUI_20_RightPart(dlgContainer);
+				final Composite chartContainer = createUI_20_RightPart(sashContainer);
 
-				_viewerDetailForm = new ViewerDetailForm(//
-						dlgContainer,
-						_markerContainer,
+				_sashOuterForm = new SashLeftFixedForm(//
+						sashContainer,
+						_outerFixedPart,
 						sash,
 						chartContainer,
 						50);
@@ -709,7 +703,7 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
 			onResizeImageColumn();
 
 			// compute width for all controls and equalize column width for the different sections
-			dlgContainer.layout(true, true);
+			sashContainer.layout(true, true);
 			UI.setEqualizeColumWidths(_firstColumnControls, _pc.convertWidthInCharsToPixels(2));
 		}
 	}
@@ -717,18 +711,34 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
 	private Composite createUI_10_LeftPart(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults()//
+				.grab(true, true)
+				.applyTo(container);
 		GridLayoutFactory.fillDefaults()//
 				.extendedMargins(5, 5, 0, 0)
 				.applyTo(container);
 		{
-			_markerContainerSashForm = new SashForm(container, SWT.SMOOTH | SWT.VERTICAL);
+			final Composite sashContainer = new Composite(container, SWT.NONE);
 			GridDataFactory.fillDefaults()//
 					.grab(true, true)
-					.applyTo(_markerContainerSashForm);
-			_markerContainerSashForm.setSashWidth(10);
+					.applyTo(sashContainer);
+
 			{
-				createUI_40_MarkerList(_markerContainerSashForm);
-				createUI_50_MarkerDetails(_markerContainerSashForm);
+				// top part
+				final Composite flexiblePart = createUI_40_MarkerList(sashContainer);
+
+				// sash
+				final Sash sash = new Sash(sashContainer, SWT.HORIZONTAL);
+				UI.addSashColorHandler(sash);
+
+				// bottom part
+				_innerFixedPart = createUI_50_MarkerDetails(sashContainer);
+
+				_sashInnerForm = new SashBottomFixedForm(//
+						sashContainer,
+						flexiblePart,
+						sash,
+						_innerFixedPart);
 			}
 		}
 
@@ -742,9 +752,8 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
 				.grab(true, false)
 				.applyTo(chartContainer);
 		GridLayoutFactory.fillDefaults()//
-				.margins(5, 0)
+				.extendedMargins(5, 5, 0, 0)
 				.applyTo(chartContainer);
-//		chartContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
 		{
 			createUI_80_TourChart(chartContainer);
 		}
@@ -754,15 +763,18 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
 
 	/**
 	 * container: marker list
+	 * 
+	 * @return
 	 */
-	private void createUI_40_MarkerList(final Composite parent) {
+	private Composite createUI_40_MarkerList(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults()//
-				.grab(true, true)
-//				.indent(0, 4)
+//				.grab(true, true)
 				.applyTo(container);
-		GridLayoutFactory.fillDefaults().applyTo(container);
+		GridLayoutFactory.fillDefaults()//
+				.extendedMargins(0, 0, 0, 5)
+				.applyTo(container);
 //		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
 		{
 			// label: markers
@@ -771,6 +783,8 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
 
 			createUI_42_MarkerViewer(container);
 		}
+
+		return container;
 	}
 
 	private Composite createUI_42_MarkerViewer(final Composite parent) {
@@ -865,7 +879,7 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
 		return layoutContainer;
 	}
 
-	private void createUI_50_MarkerDetails(final Composite parent) {
+	private Composite createUI_50_MarkerDetails(final Composite parent) {
 
 		/*
 		 * container: marker details
@@ -910,6 +924,8 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
 			createUI_58_Description(container);
 			createUI_60_Visibility(container);
 		}
+
+		return container;
 	}
 
 	private void createUI_52_Label_Name(final Composite parent) {
@@ -1169,7 +1185,7 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
 					| SWT.H_SCROLL);
 			GridDataFactory.fillDefaults()//
 					.grab(true, true)
-					.hint(SWT.DEFAULT, _pc.convertHeightInCharsToPixels(3))
+					.minSize(SWT.DEFAULT, _pc.convertHeightInCharsToPixels(2))
 					.applyTo(_txtDescription);
 			_txtDescription.addModifyListener(_defaultModifyListener);
 		}
@@ -1205,13 +1221,13 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
 		_tourChart = new TourChart(parent, SWT.FLAT /* | SWT.BORDER */, true);
 		GridDataFactory.fillDefaults()//
 				.grab(true, true)
-//				.hint(600, 350)
+				.hint(_pc.convertWidthInCharsToPixels(90), _pc.convertHeightInCharsToPixels(40))
 				.applyTo(_tourChart);
 		_tourChart.setShowZoomActions(true);
 		_tourChart.setShowSlider(true);
-		_tourChart.setContextProvider(new DialogMarkerTourChartContextProvicer(this));
+		_tourChart.setContextProvider(new DialogMarkerTourChartContextProvicer(this), true);
 
-		_tourChart.setIsFireTourMarkerEvent(false);
+		_tourChart.setIsDisplayedInDialog(true);
 		_tourChart.addTourMarkerSelectionListener(this);
 
 		// set title
@@ -1228,11 +1244,9 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
 	private void createUI_90_MarkerActions(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults()//
-//				.grab(true, false)
-				.applyTo(container);
+		GridDataFactory.fillDefaults().applyTo(container);
 		GridLayoutFactory.fillDefaults()//
-				.extendedMargins(0, 0, 10, 0)
+				.extendedMargins(5, 0, 10, 0)
 				.numColumns(4)
 				.applyTo(container);
 //		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
@@ -1556,6 +1570,26 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
 
 	}
 
+	private void fillContextMenu(final IMenuManager menuMgr) {
+
+		/*
+		 * Set menu items
+		 */
+
+		_signMenuManager.fillSignMenu(menuMgr, DialogMarker.this);
+
+		menuMgr.add(new Separator());
+		menuMgr.add(_actionOpenTourSignPrefs);
+
+		/*
+		 * Enable actions
+		 */
+		final boolean isSignAvailable = _selectedTourMarker.getTourSign() != null;
+
+		_signMenuManager.setEnabledRemoveTourSignAction(isSignAvailable);
+
+	}
+
 	private void fillUI() {
 
 		/*
@@ -1761,18 +1795,17 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
 	private void restoreState() {
 
 		// restore width for the marker list
-		final int leftPartWidth = Util.getStateInt(
-				_state,
-				DIALOG_SETTINGS_VIEWER_WIDTH,
+		final int leftPartWidth = Util.getStateInt(_state, //
+				STATE_OUTER_SASH_WIDTH,
 				_pc.convertWidthInCharsToPixels(80));
 
-		_viewerDetailForm.setViewerWidth(leftPartWidth);
+		_sashOuterForm.setViewerWidth(leftPartWidth);
 
-		UI.restoreSashWeight(
-				_markerContainerSashForm,
-				_state,
-				STATE_MARKER_CONTAINER_SASH_WEIGHTS,
-				new int[] { 50, 50 });
+		final int bottomPartHeight = Util.getStateInt(_state,//
+				STATE_INNER_SASH_HEIGHT,
+				_pc.convertWidthInCharsToPixels(10));
+
+		_sashInnerForm.setFixedHeight(bottomPartHeight);
 	}
 
 	private void restoreState_Viewer() {
@@ -1795,11 +1828,10 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
 	private void saveState() {
 
 		_state.put(DIALOG_SETTINGS_POSITION, _comboLabelPosition.getSelectionIndex());
-		_state.put(DIALOG_SETTINGS_VIEWER_WIDTH, _markerContainer.getSize().x);
+		_state.put(STATE_OUTER_SASH_WIDTH, _outerFixedPart.getSize().x);
+		_state.put(STATE_INNER_SASH_HEIGHT, _innerFixedPart.getSize().y);
 
 		_state.put(STATE_IMAGE_COLUMN_WIDTH, _imageColumnWidth);
-
-		UI.saveSashWeight(_markerContainerSashForm, _state, STATE_MARKER_CONTAINER_SASH_WEIGHTS);
 	}
 
 	@Override
@@ -1844,7 +1876,7 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
 
 		tourMarker.setLabel(_comboMarkerName.getText());
 		tourMarker.setSignPosition(_comboSignPosition.getSelectionIndex());
-		tourMarker.setVisualPosition(_comboLabelPosition.getSelectionIndex());
+		tourMarker.setLabelPosition(_comboLabelPosition.getSelectionIndex());
 
 		tourMarker.setLabelXOffset(_spinLabelOffsetX.getSelection());
 		tourMarker.setLabelYOffset(_spinLabelOffsetY.getSelection());

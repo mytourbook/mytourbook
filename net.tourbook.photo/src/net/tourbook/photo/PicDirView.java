@@ -17,7 +17,7 @@ package net.tourbook.photo;
 
 import java.io.File;
 
-import net.tourbook.common.form.ViewerDetailForm;
+import net.tourbook.common.form.SashLeftFixedForm;
 import net.tourbook.common.util.PostSelectionProvider;
 import net.tourbook.common.util.Util;
 import net.tourbook.photo.internal.Activator;
@@ -71,7 +71,7 @@ public class PicDirView extends ViewPart implements IPhotoEventListener {
 	/*
 	 * UI controls
 	 */
-	private ViewerDetailForm				_containerMasterDetail;
+	private SashLeftFixedForm				_containerMasterDetail;
 	private Composite						_containerFolder;
 	private Composite						_containerImages;
 
@@ -275,7 +275,7 @@ public class PicDirView extends ViewPart implements IPhotoEventListener {
 			}
 
 			// master/detail form
-			_containerMasterDetail = new ViewerDetailForm(
+			_containerMasterDetail = new SashLeftFixedForm(
 					masterDetailContainer,
 					_containerFolder,
 					sash,

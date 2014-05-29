@@ -23,6 +23,7 @@ import net.tourbook.chart.ChartMouseEvent;
 import net.tourbook.chart.GraphDrawingData;
 import net.tourbook.chart.IChartLayer;
 import net.tourbook.chart.IChartOverlay;
+import net.tourbook.data.TourMarker;
 
 import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.swt.SWT;
@@ -31,6 +32,7 @@ import org.eclipse.swt.graphics.Device;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.graphics.Region;
 import org.eclipse.swt.graphics.Transform;
 
 public class ChartLayerMarker implements IChartLayer, IChartOverlay {
@@ -48,9 +50,93 @@ public class ChartLayerMarker implements IChartLayer, IChartOverlay {
 	private long				_hoveredEventTime;
 	private ChartLabel			_hoveredMarker;
 
-	public ChartLayerMarker(final ChartMarkerConfig chartMarkerConfig) {
+	public ChartLayerMarker() {}
 
-		_chartMarkerConfig = chartMarkerConfig;
+	private void adjustLabelPosition(	final ChartLabel chartMarker,
+										final int devYTop,
+										final int devYBottom,
+										final int labelWidth,
+										final int labelHeight) {
+
+		final int labelHeight2 = labelHeight / 2;
+		final int markerPointSize2 = MARKER_POINT_SIZE / 2;
+
+		switch (chartMarker.visualPosition) {
+		case TourMarker.LABEL_POS_VERTICAL_ABOVE_GRAPH:
+			_isVertical = true;
+			_devXMarker += labelHeight2;
+			_devYMarker -= LABEL_OFFSET + markerPointSize2;
+			break;
+
+		case TourMarker.LABEL_POS_VERTICAL_BELOW_GRAPH:
+			_isVertical = true;
+			_devXMarker += labelHeight2;
+			_devYMarker += labelWidth + LABEL_OFFSET + markerPointSize2;
+			break;
+
+		case TourMarker.LABEL_POS_VERTICAL_TOP_CHART:
+			_isVertical = true;
+			_devXMarker += labelHeight2;
+			_devYMarker = devYTop + labelWidth;
+			break;
+
+		case TourMarker.LABEL_POS_VERTICAL_BOTTOM_CHART:
+			_isVertical = true;
+			_devXMarker += labelHeight2;
+			_devYMarker = devYBottom - LABEL_OFFSET;
+			break;
+
+		case TourMarker.LABEL_POS_HORIZONTAL_ABOVE_GRAPH_LEFT:
+			_isVertical = false;
+			_devXMarker -= labelWidth + LABEL_OFFSET + markerPointSize2;
+			_devYMarker -= labelHeight + LABEL_OFFSET + markerPointSize2;
+			break;
+
+		case TourMarker.LABEL_POS_HORIZONTAL_ABOVE_GRAPH_CENTERED:
+			_isVertical = false;
+			_devXMarker -= labelWidth / 2;
+			_devYMarker -= labelHeight + LABEL_OFFSET + markerPointSize2;
+			break;
+
+		case TourMarker.LABEL_POS_HORIZONTAL_ABOVE_GRAPH_RIGHT:
+			_isVertical = false;
+			_devXMarker += LABEL_OFFSET + markerPointSize2;
+			_devYMarker -= labelHeight + LABEL_OFFSET + markerPointSize2;
+			break;
+
+		case TourMarker.LABEL_POS_HORIZONTAL_BELOW_GRAPH_LEFT:
+			_isVertical = false;
+			_devXMarker -= labelWidth + LABEL_OFFSET + markerPointSize2;
+			_devYMarker += LABEL_OFFSET + markerPointSize2;
+			break;
+
+		case TourMarker.LABEL_POS_HORIZONTAL_BELOW_GRAPH_CENTERED:
+			_isVertical = false;
+			_devXMarker -= labelWidth / 2;
+			_devYMarker += LABEL_OFFSET + markerPointSize2;
+			break;
+
+		case TourMarker.LABEL_POS_HORIZONTAL_BELOW_GRAPH_RIGHT:
+			_isVertical = false;
+			_devXMarker += LABEL_OFFSET + markerPointSize2;
+			_devYMarker += LABEL_OFFSET + markerPointSize2;
+			break;
+
+		case TourMarker.LABEL_POS_HORIZONTAL_GRAPH_LEFT:
+			_isVertical = false;
+			_devXMarker -= labelWidth + LABEL_OFFSET + markerPointSize2;
+			_devYMarker -= labelHeight / 2;
+			break;
+
+		case TourMarker.LABEL_POS_HORIZONTAL_GRAPH_RIGHT:
+			_isVertical = false;
+			_devXMarker += LABEL_OFFSET + markerPointSize2;
+			_devYMarker -= labelHeight / 2;
+			break;
+
+		default:
+			break;
+		}
 	}
 
 	/**
@@ -60,8 +146,11 @@ public class ChartLayerMarker implements IChartLayer, IChartOverlay {
 
 		final Device display = gc.getDevice();
 
-		MARKER_POINT_SIZE = pc.convertVerticalDLUsToPixels(_chartMarkerConfig.markerPointSize);
+		final int markerPointSize = _chartMarkerConfig.markerPointSize;
+
+		MARKER_POINT_SIZE = pc.convertVerticalDLUsToPixels(markerPointSize);
 		MARKER_HOVER_OFFSET = pc.convertVerticalDLUsToPixels(4);
+//		MARKER_HOVER_OFFSET = pc.convertVerticalDLUsToPixels(20);
 		LABEL_OFFSET = pc.convertVerticalDLUsToPixels(2);
 
 		final int devYTop = drawingData.getDevYTop();
@@ -93,6 +182,35 @@ public class ChartLayerMarker implements IChartLayer, IChartOverlay {
 				}
 			}
 
+			Color markerColor;
+			if (chartMarker.visualType != ChartLabel.VISIBLE_TYPE_DEFAULT) {
+
+				// marker is edited
+				markerColor = colorSelected;
+
+			} else {
+
+				/*
+				 * Set priority with which color a marker is painted.
+				 */
+
+				if (chartMarker.isVisible == false) {
+
+					// marker is hidden
+					markerColor = colorHidden;
+
+				} else if (chartMarker.isDeviceMarker()) {
+
+					// marker is created with the device
+					markerColor = colorDevice;
+
+				} else {
+
+					// this is a default marker which is visible
+					markerColor = colorDefault;
+				}
+			}
+
 			final float yValue = yValues[chartMarker.serieIndex];
 			final int devYGraph = (int) ((yValue - graphYBottom) * scaleY) - 0;
 
@@ -104,32 +222,18 @@ public class ChartLayerMarker implements IChartLayer, IChartOverlay {
 			/*
 			 * Draw marker point
 			 */
+			final int markerPointSize2 = MARKER_POINT_SIZE / 2;
+
+			final int devXMarker = _devXMarker - markerPointSize2 + 1;
+			final int devYMarker = _devYMarker - markerPointSize2 - 0;
+
+			chartMarker.devXMarker = devXMarker;
+			chartMarker.devYMarker = devYMarker;
+
 			if (MARKER_POINT_SIZE > 0) {
 
-				if (chartMarker.visualType != ChartLabel.VISIBLE_TYPE_DEFAULT) {
-
-					gc.setBackground(colorSelected);
-
-				} else {
-
-					if (chartMarker.isDeviceMarker()) {
-						gc.setBackground(colorDevice);
-					} else if (chartMarker.isVisible) {
-						gc.setBackground(colorDefault);
-					} else {
-						gc.setBackground(colorHidden);
-					}
-				}
-
-				final int markerPointSize2 = MARKER_POINT_SIZE / 2;
-
-				final int devXMarker = _devXMarker - markerPointSize2 + 1;
-				final int devYMarker = _devYMarker - markerPointSize2 - 0;
-
-				chartMarker.devXMarker = devXMarker;
-				chartMarker.devYMarker = devYMarker;
-
 				// draw marker point
+				gc.setBackground(markerColor);
 				gc.fillRectangle(//
 						devXMarker,
 						devYMarker,
@@ -145,14 +249,18 @@ public class ChartLayerMarker implements IChartLayer, IChartOverlay {
 				if (chartMarker.visualType != ChartLabel.VISIBLE_TYPE_DEFAULT) {
 					gc.setForeground(colorSelected);
 				} else {
-					gc.setForeground(colorDefault);
+
+					if (_chartMarkerConfig.isDrawLabelWithDefaultColor) {
+						gc.setForeground(colorDefault);
+					} else {
+						gc.setForeground(markerColor);
+					}
 				}
 
 				final int labelWidth = labelExtend.x;
 				final int labelHeight = labelExtend.y;
-				_isVertical = true;
 
-				setLabelPosition(//
+				adjustLabelPosition(//
 						chartMarker,
 						devYTop,
 						devYBottom,
@@ -169,8 +277,11 @@ public class ChartLayerMarker implements IChartLayer, IChartOverlay {
 					 * label is vertical
 					 */
 
+					final int vLabelWidth = labelHeight;
+					final int vLabelHeight = labelWidth;
+
 					// draw label to the left side of the marker
-					_devXMarker -= labelHeight;
+					_devXMarker -= vLabelWidth;
 
 					// don't draw the marker to the right of the chart
 					final long devXImageOffset = chart.getXXDevViewPortLeftBorder();
@@ -180,14 +291,49 @@ public class ChartLayerMarker implements IChartLayer, IChartOverlay {
 
 					// force label to be not below the bottom
 					if (_devYMarker > devYBottom) {
-						_devYMarker = devYBottom;
+						_devYMarker = devYBottom - LABEL_OFFSET;
 					}
 
 					// force label to be not above the top
-					if (_devYMarker - labelWidth < devYTop) {
-						_devYMarker = devYTop + labelWidth;
+					if (_devYMarker - vLabelHeight - LABEL_OFFSET < devYTop) {
+						_devYMarker = devYTop + vLabelHeight + LABEL_OFFSET;
 					}
 
+					final int devXLabel = _devXMarker;
+					int devYLabel = _devYMarker;
+
+					switch (chartMarker.visualPosition) {
+					case TourMarker.LABEL_POS_VERTICAL_ABOVE_GRAPH:
+
+						devYLabel -= vLabelHeight;
+						break;
+
+					case TourMarker.LABEL_POS_VERTICAL_BELOW_GRAPH:
+
+						devYLabel -= vLabelHeight;
+						break;
+
+					case TourMarker.LABEL_POS_VERTICAL_TOP_CHART:
+
+						devYLabel = devYTop;
+						break;
+
+					case TourMarker.LABEL_POS_VERTICAL_BOTTOM_CHART:
+
+						devYLabel = devYBottom - vLabelHeight;
+						break;
+
+					default:
+						break;
+					}
+
+					// keep painted positions to identify and paint hovered positions
+					chartMarker.devXLabel = devXLabel;
+					chartMarker.devYLabel = devYLabel;
+					chartMarker.devLabelWidth = vLabelWidth + markerPointSize2;
+					chartMarker.devLabelHeight = vLabelHeight;
+
+					// draw label vertical
 					final Transform tr = new Transform(display);
 					{
 						tr.translate(_devXMarker, _devYMarker);
@@ -230,15 +376,22 @@ public class ChartLayerMarker implements IChartLayer, IChartOverlay {
 						_devYMarker = devYTop;
 					}
 
-					gc.drawText(chartMarker.markerLabel, _devXMarker, _devYMarker, true);
+					// keep painted positions to identify and paint hovered positions
+					chartMarker.devXLabel = _devXMarker;
+					chartMarker.devYLabel = _devYMarker;
+					chartMarker.devLabelWidth = labelWidth;
+					chartMarker.devLabelHeight = labelHeight;
+
+					// draw label
+					gc.drawText(//
+							chartMarker.markerLabel,
+							_devXMarker,
+							_devYMarker,
+							true);
 				}
 
 				// keep painted positions to identify and paint hovered positions
 				chartMarker.isVertical = _isVertical;
-				chartMarker.devXLabel = _devXMarker;
-				chartMarker.devYLabel = _devYMarker;
-				chartMarker.devLabelWidth = labelWidth;
-				chartMarker.devLabelHeight = labelHeight;
 			}
 		}
 		colorDefault.dispose();
@@ -255,15 +408,19 @@ public class ChartLayerMarker implements IChartLayer, IChartOverlay {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void drawOverlay(final GC gc) {
+	public void drawOverlay(final GC gc, final GraphDrawingData graphDrawingData) {
 
 		if (_hoveredMarker == null) {
 			return;
 		}
 
-		gc.setAlpha(0x30);
+		final int devYTop = graphDrawingData.getDevYTop();
+		final int devGraphHeight = graphDrawingData.devGraphHeight;
 
 		final Device device = gc.getDevice();
+
+		gc.setClipping(0, devYTop, gc.getClipping().width, devGraphHeight);
+		gc.setAlpha(0x30);
 
 		final Color colorDefault = new Color(device, _chartMarkerConfig.markerColorDefault);
 		final Color colorDevice = new Color(device, _chartMarkerConfig.markerColorDevice);
@@ -282,28 +439,64 @@ public class ChartLayerMarker implements IChartLayer, IChartOverlay {
 			final boolean isLabelVisible = _chartMarkerConfig.isShowMarkerLabel;
 			final boolean isPointVisible = MARKER_POINT_SIZE > 0;
 
-			if (isPointVisible && isLabelVisible == false) {
+			final int devLabelX = _hoveredMarker.devXLabel - MARKER_HOVER_OFFSET;
+			final int devLabelY = _hoveredMarker.devYLabel - MARKER_HOVER_OFFSET;
+			final int devLabelWidth = _hoveredMarker.devLabelWidth + 2 * MARKER_HOVER_OFFSET;
+			final int devLabelHeight = _hoveredMarker.devLabelHeight + 2 * MARKER_HOVER_OFFSET;
+
+			final int devMarkerX = _hoveredMarker.devXMarker - MARKER_HOVER_OFFSET;
+			final int devMarkerY = _hoveredMarker.devYMarker - MARKER_HOVER_OFFSET;
+			final int devMarkerSize = MARKER_POINT_SIZE + 2 * MARKER_HOVER_OFFSET;
+
+			final boolean isDrawOverlapped = true;
+
+			if (isDrawOverlapped) {
+
+				/*
+				 * Rectangles can be merged into a union with regions, took me some time to find
+				 * this solution :-)
+				 */
+
+				final Region region = new Region(device);
+				{
+					region.add(devLabelX, devLabelY, devLabelWidth, devLabelHeight);
+					region.add(devMarkerX, devMarkerY, devMarkerSize, devMarkerSize);
+
+					final Rectangle clientRect = gc.getClipping();
+
+					gc.setClipping(region);
+					{
+						gc.fillRectangle(clientRect);
+					}
+					gc.setClipping((Region) null);
+				}
+				region.dispose();
+
+			} else {
 
 				// draw marker point area
-				gc.fillRectangle(//
-						_hoveredMarker.devXMarker - MARKER_HOVER_OFFSET,
-						_hoveredMarker.devYMarker - MARKER_HOVER_OFFSET,
-						MARKER_POINT_SIZE + 2 * MARKER_HOVER_OFFSET,
-						MARKER_POINT_SIZE + 2 * MARKER_HOVER_OFFSET);
-			}
+				if (isPointVisible && isLabelVisible == false) {
 
-			if (isLabelVisible) {
-
-				if (_hoveredMarker.isVertical) {
-
-				} else {
-
-					// draw marker text area
 					gc.fillRectangle(//
-							_hoveredMarker.devXLabel - MARKER_HOVER_OFFSET,
-							_hoveredMarker.devYLabel - MARKER_HOVER_OFFSET,
-							_hoveredMarker.devLabelWidth + 2 * MARKER_HOVER_OFFSET,
-							_hoveredMarker.devLabelHeight + 2 * MARKER_HOVER_OFFSET);
+							devMarkerX,
+							devMarkerY,
+							devMarkerSize,
+							devMarkerSize);
+				}
+
+				// draw marker text area
+				if (isLabelVisible) {
+
+					if (_hoveredMarker.isVertical) {
+
+					} else {
+
+						gc.fillRectangle(//
+								devLabelX,
+								devLabelY,
+								devLabelWidth,
+								devLabelHeight);
+					}
 				}
 			}
 		}
@@ -312,6 +505,7 @@ public class ChartLayerMarker implements IChartLayer, IChartOverlay {
 		colorHidden.dispose();
 
 		gc.setAlpha(0xff);
+		gc.setClipping((Rectangle) null);
 	}
 
 	public ChartLabel getHoveredMarker() {
@@ -336,33 +530,29 @@ public class ChartLayerMarker implements IChartLayer, IChartOverlay {
 
 		for (final ChartLabel chartLabel : _chartMarkerConfig.chartLabels) {
 
-			if (chartLabel.isVertical) {
+			final int devXLabel = chartLabel.devXLabel;
+			final int devYLabel = chartLabel.devYLabel;
 
-			} else {
+			if (devXMouse > devXLabel - MARKER_HOVER_OFFSET
+					&& devXMouse < devXLabel + chartLabel.devLabelWidth + MARKER_HOVER_OFFSET
+					&& devYMouse > devYLabel - MARKER_HOVER_OFFSET
+					&& devYMouse < devYLabel + chartLabel.devLabelHeight + MARKER_HOVER_OFFSET) {
 
-				final int devXLabel = chartLabel.devXLabel;
-				final int devYLabel = chartLabel.devYLabel;
+				// horizontal label is hit
+				return chartLabel;
+			}
 
-				if (devXMouse > devXLabel - MARKER_HOVER_OFFSET
-						&& devXMouse < devXLabel + chartLabel.devLabelWidth + MARKER_HOVER_OFFSET
-						&& devYMouse > devYLabel - MARKER_HOVER_OFFSET
-						&& devYMouse < devYLabel + chartLabel.devLabelHeight + MARKER_HOVER_OFFSET) {
+			// check tour marker point
+			final int devXMarker = chartLabel.devXMarker;
+			final int devYMarker = chartLabel.devYMarker;
 
-					// horizontal label is hit
-					return chartLabel;
-				}
+			if (devXMouse > devXMarker - MARKER_HOVER_OFFSET
+					&& devXMouse < devXMarker + MARKER_POINT_SIZE + MARKER_HOVER_OFFSET
+					&& devYMouse > devYMarker - MARKER_HOVER_OFFSET
+					&& devYMouse < devYMarker + MARKER_POINT_SIZE + MARKER_HOVER_OFFSET) {
 
-				final int devXMarker = chartLabel.devXMarker;
-				final int devYMarker = chartLabel.devYMarker;
-
-				if (devXMouse > devXMarker - MARKER_HOVER_OFFSET
-						&& devXMouse < devXMarker + MARKER_POINT_SIZE + MARKER_HOVER_OFFSET
-						&& devYMouse > devYMarker - MARKER_HOVER_OFFSET
-						&& devYMouse < devYMarker + MARKER_POINT_SIZE + MARKER_HOVER_OFFSET) {
-
-					// marker point is hit
-					return chartLabel;
-				}
+				// marker point is hit
+				return chartLabel;
 			}
 		}
 
@@ -377,86 +567,7 @@ public class ChartLayerMarker implements IChartLayer, IChartOverlay {
 		_hoveredMarker = null;
 	}
 
-	private void setLabelPosition(	final ChartLabel chartMarker,
-									final int devYTop,
-									final int devYBottom,
-									final int labelWidth,
-									final int labelHeight) {
-
-		final int labelHeight2 = labelHeight / 2;
-		final int markerPointSize2 = MARKER_POINT_SIZE / 2;
-
-		switch (chartMarker.visualPosition) {
-		case ChartLabel.VISUAL_VERTICAL_ABOVE_GRAPH:
-			_devXMarker += labelHeight2;
-			_devYMarker -= LABEL_OFFSET + markerPointSize2;
-			break;
-
-		case ChartLabel.VISUAL_VERTICAL_BELOW_GRAPH:
-			_devXMarker += labelHeight2;
-			_devYMarker += labelWidth + LABEL_OFFSET + markerPointSize2;
-			break;
-
-		case ChartLabel.VISUAL_VERTICAL_TOP_CHART:
-			_devXMarker += labelHeight2;
-			_devYMarker = devYTop + labelWidth;
-			break;
-
-		case ChartLabel.VISUAL_VERTICAL_BOTTOM_CHART:
-			_devXMarker += labelHeight2;
-			_devYMarker = devYBottom - LABEL_OFFSET;
-			break;
-
-		case ChartLabel.VISUAL_HORIZONTAL_ABOVE_GRAPH_LEFT:
-			_devXMarker -= labelWidth + LABEL_OFFSET + markerPointSize2;
-			_devYMarker -= labelHeight + LABEL_OFFSET + markerPointSize2;
-			_isVertical = false;
-			break;
-
-		case ChartLabel.VISUAL_HORIZONTAL_ABOVE_GRAPH_CENTERED:
-			_devXMarker -= labelWidth / 2;
-			_devYMarker -= labelHeight + LABEL_OFFSET + markerPointSize2;
-			_isVertical = false;
-			break;
-
-		case ChartLabel.VISUAL_HORIZONTAL_ABOVE_GRAPH_RIGHT:
-			_devXMarker += LABEL_OFFSET + markerPointSize2;
-			_devYMarker -= labelHeight + LABEL_OFFSET + markerPointSize2;
-			_isVertical = false;
-			break;
-
-		case ChartLabel.VISUAL_HORIZONTAL_BELOW_GRAPH_LEFT:
-			_devXMarker -= labelWidth + LABEL_OFFSET + markerPointSize2;
-			_devYMarker += LABEL_OFFSET + markerPointSize2;
-			_isVertical = false;
-			break;
-
-		case ChartLabel.VISUAL_HORIZONTAL_BELOW_GRAPH_CENTERED:
-			_devXMarker -= labelWidth / 2;
-			_devYMarker += LABEL_OFFSET + markerPointSize2;
-			_isVertical = false;
-			break;
-
-		case ChartLabel.VISUAL_HORIZONTAL_BELOW_GRAPH_RIGHT:
-			_devXMarker += LABEL_OFFSET + markerPointSize2;
-			_devYMarker += LABEL_OFFSET + markerPointSize2;
-			_isVertical = false;
-			break;
-
-		case ChartLabel.VISUAL_HORIZONTAL_GRAPH_LEFT:
-			_devXMarker -= labelWidth + LABEL_OFFSET + markerPointSize2;
-			_devYMarker -= labelHeight / 2;
-			_isVertical = false;
-			break;
-
-		case ChartLabel.VISUAL_HORIZONTAL_GRAPH_RIGHT:
-			_devXMarker += LABEL_OFFSET + markerPointSize2;
-			_devYMarker -= labelHeight / 2;
-			_isVertical = false;
-			break;
-
-		default:
-			break;
-		}
+	public void setChartMarkerConfig(final ChartMarkerConfig chartMarkerConfig) {
+		_chartMarkerConfig = chartMarkerConfig;
 	}
 }

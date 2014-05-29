@@ -583,7 +583,6 @@ public class PolarTrainerSAXHandler extends DefaultHandler {
 			tourMarker.setLabel(Integer.toString(lapCounter));
 			tourMarker.setSerieIndex(serieIndex);
 			tourMarker.setTime(sumLapDuration + lapDuration);
-			tourMarker.setVisualPosition(ChartLabel.VISUAL_HORIZONTAL_ABOVE_GRAPH_CENTERED);
 
 			if (distanceSerie != null) {
 				tourMarker.setDistance(distanceSerie[serieIndex]);

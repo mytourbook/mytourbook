@@ -18,6 +18,9 @@ package net.tourbook.chart;
 public abstract class MouseAdapter implements IMouseListener {
 
 	@Override
+	public void chartResized() {}
+
+	@Override
 	public void mouseDoubleClick(final ChartMouseEvent event) {}
 
 	@Override

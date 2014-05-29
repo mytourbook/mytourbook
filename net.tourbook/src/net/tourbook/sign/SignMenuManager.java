@@ -36,6 +36,8 @@ public class SignMenuManager {
 
 	private DialogMarker	_dialogMarker;
 
+	ActionRemoveTourSign	_actionRemoveTourSign	= new ActionRemoveTourSign();
+
 	private class ActionRemoveTourSign extends Action {
 
 		public ActionRemoveTourSign() {
@@ -118,8 +120,8 @@ public class SignMenuManager {
 					final SignCollection signCollection = SignManager.getSignEntries(__signCategory.getCategoryId());
 
 					// add actions
-					createSignCategoryActions(signCollection, __categoryMenu);
-					createSignActions(signCollection, __categoryMenu);
+					fill_SignCategoryActions(signCollection, __categoryMenu);
+					fill_SignActions(signCollection, __categoryMenu);
 				}
 			});
 
@@ -133,13 +135,13 @@ public class SignMenuManager {
 		item.fill(menu, -1);
 	}
 
-	private void createOtherActions(final IMenuManager menuMgr) {
+	private void fill_OtherActions(final IMenuManager menuMgr) {
 
 		menuMgr.add(new Separator());
-		menuMgr.add(new ActionRemoveTourSign());
+		menuMgr.add(_actionRemoveTourSign);
 	}
 
-	private void createSignActions(final SignCollection signCollection, final IMenuManager menuMgr) {
+	private void fill_SignActions(final SignCollection signCollection, final IMenuManager menuMgr) {
 
 		// add sign items
 		for (final TourSign menuTourSign : signCollection.tourSigns) {
@@ -147,7 +149,7 @@ public class SignMenuManager {
 		}
 	}
 
-	private void createSignActions(final SignCollection signCollection, final Menu menu) {
+	private void fill_SignActions(final SignCollection signCollection, final Menu menu) {
 
 		// add sign items
 		for (final TourSign menuTourSign : signCollection.tourSigns) {
@@ -155,7 +157,7 @@ public class SignMenuManager {
 		}
 	}
 
-	private void createSignCategoryActions(final SignCollection signCollection, final IMenuManager menuMgr) {
+	private void fill_SignCategoryActions(final SignCollection signCollection, final IMenuManager menuMgr) {
 
 		// add category items
 		for (final TourSignCategory tourSignCategory : signCollection.tourSignCategories) {
@@ -163,7 +165,7 @@ public class SignMenuManager {
 		}
 	}
 
-	private void createSignCategoryActions(final SignCollection signCollection, final Menu menu) {
+	private void fill_SignCategoryActions(final SignCollection signCollection, final Menu menu) {
 
 		// add category items
 		for (final TourSignCategory tourSignCategory : signCollection.tourSignCategories) {
@@ -179,9 +181,14 @@ public class SignMenuManager {
 
 		_dialogMarker = dialogMarker;
 
-		createSignCategoryActions(SignManager.getRootSigns(), menuMgr);
-		createSignActions(SignManager.getRootSigns(), menuMgr);
-		
-		createOtherActions(menuMgr);
+		fill_SignCategoryActions(SignManager.getRootSigns(), menuMgr);
+		fill_SignActions(SignManager.getRootSigns(), menuMgr);
+
+		fill_OtherActions(menuMgr);
+	}
+
+	public void setEnabledRemoveTourSignAction(final boolean isEnabled) {
+
+		_actionRemoveTourSign.setEnabled(isEnabled);
 	}
 }

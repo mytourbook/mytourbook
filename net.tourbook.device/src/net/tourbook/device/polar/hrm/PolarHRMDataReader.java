@@ -658,8 +658,6 @@ public class PolarHRMDataReader extends TourbookDevice {
 
 			final TourMarker tourMarker = new TourMarker(tourData, ChartLabel.MARKER_TYPE_DEVICE);
 			tourMarker.setLabel(markerText);
-			tourMarker.setVisualPosition(ChartLabel.VISUAL_HORIZONTAL_ABOVE_GRAPH_CENTERED);
-
 			tourMarker.setSerieIndex(serieIndex);
 			tourMarker.setTime(lapRelativeTime);
 

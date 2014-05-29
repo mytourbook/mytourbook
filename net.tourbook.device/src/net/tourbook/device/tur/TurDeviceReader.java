@@ -389,7 +389,6 @@ public class TurDeviceReader extends TourbookDevice {
 				label = Messages.TourData_Tour_Marker_unnamed;
 			}
 			tourMarker.setLabel(label);
-			tourMarker.setVisualPosition(ChartLabel.VISUAL_HORIZONTAL_ABOVE_GRAPH_CENTERED);
 
 			final int[] timeSerie = tourData.timeSerie;
 			if (timeSerie != null && timeSerie.length > 0) {

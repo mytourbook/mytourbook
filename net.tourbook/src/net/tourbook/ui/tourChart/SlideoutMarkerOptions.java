@@ -27,6 +27,7 @@ import net.tourbook.preferences.ITourbookPreferences;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferenceConverter;
 import org.eclipse.jface.util.IPropertyChangeListener;
@@ -69,6 +70,8 @@ public class SlideoutMarkerOptions extends AnimatedToolTipShell implements IColo
 
 	private SelectionAdapter		_defaultSelectionAdapter;
 	private MouseWheelListener		_defaultMouseWheelListener;
+	private IPropertyChangeListener	_defaultPropertyChangeListener;
+
 	{
 		_defaultSelectionAdapter = new SelectionAdapter() {
 			@Override
@@ -84,6 +87,12 @@ public class SlideoutMarkerOptions extends AnimatedToolTipShell implements IColo
 			}
 		};
 
+		_defaultPropertyChangeListener = new IPropertyChangeListener() {
+			public void propertyChange(final PropertyChangeEvent event) {
+				onChangeUI();
+			}
+		};
+
 //		_defaultModifyListener = new ModifyListener() {
 //			@Override
 //			public void modifyText(final ModifyEvent e) {
@@ -94,17 +103,23 @@ public class SlideoutMarkerOptions extends AnimatedToolTipShell implements IColo
 //			}
 //		};
 	}
+
+	private PixelConverter			_pc;
+
 	/*
 	 * UI controls
 	 */
+	private Composite				_shellContainer;
 	private TourChart				_tourChart;
 
 	private Button					_chkShowHiddenMarker;
 	private Button					_chkShowMarkerLabel;
-	private Composite				_shellContainer;
+	private Button					_chkDrawWithDefaultColor;
+
 	private ColorSelectorExtended	_colorDefaultMarker;
 	private ColorSelectorExtended	_colorDeviceMarker;
 	private ColorSelectorExtended	_colorHiddenMarker;
+
 	private Spinner					_spinMarkerSize;
 
 	private final class WaitTimer implements Runnable {
@@ -190,11 +205,14 @@ public class SlideoutMarkerOptions extends AnimatedToolTipShell implements IColo
 		final Composite ui = createUI(parent);
 
 		restoreState();
+		enableActions();
 
 		return ui;
 	}
 
 	private Composite createUI(final Composite parent) {
+
+		_pc = new PixelConverter(parent);
 
 		_shellContainer = new Composite(parent, SWT.NONE);
 		GridLayoutFactory.swtDefaults().applyTo(_shellContainer);
@@ -255,12 +273,18 @@ public class SlideoutMarkerOptions extends AnimatedToolTipShell implements IColo
 						.span(2, 1)
 						.applyTo(_chkShowMarkerLabel);
 				_chkShowMarkerLabel.setText(Messages.Slideout_ChartMarkerOptions_Checkbox_IsShowMarker);
-				_chkShowMarkerLabel.addSelectionListener(new SelectionAdapter() {
-					@Override
-					public void widgetSelected(final SelectionEvent e) {
-						onChangeUI();
-					}
-				});
+				_chkShowMarkerLabel.addSelectionListener(_defaultSelectionAdapter);
+
+				_chkDrawWithDefaultColor = new Button(container, SWT.CHECK);
+				GridDataFactory.fillDefaults()//
+						.span(2, 1)
+						.indent(_pc.convertWidthInCharsToPixels(3), 0)
+						.applyTo(_chkDrawWithDefaultColor);
+				_chkDrawWithDefaultColor
+						.setText(Messages.Slideout_ChartMarkerOptions_Checkbox_IsShowMarkerWithDefaultColor);
+				_chkDrawWithDefaultColor
+						.setToolTipText(Messages.Slideout_ChartMarkerOptions_Checkbox_IsShowMarkerWithDefaultColor_Tooltip);
+				_chkDrawWithDefaultColor.addSelectionListener(_defaultSelectionAdapter);
 			}
 
 			/*
@@ -272,12 +296,7 @@ public class SlideoutMarkerOptions extends AnimatedToolTipShell implements IColo
 						.span(2, 1)
 						.applyTo(_chkShowHiddenMarker);
 				_chkShowHiddenMarker.setText(Messages.Slideout_ChartMarkerOptions_Checkbox_IsShowHiddenMarker);
-				_chkShowHiddenMarker.addSelectionListener(new SelectionAdapter() {
-					@Override
-					public void widgetSelected(final SelectionEvent e) {
-						onChangeUI();
-					}
-				});
+				_chkShowHiddenMarker.addSelectionListener(_defaultSelectionAdapter);
 			}
 			/*
 			 * Marker size
@@ -331,11 +350,7 @@ public class SlideoutMarkerOptions extends AnimatedToolTipShell implements IColo
 						.applyTo(_colorDefaultMarker.getButton());
 
 				_colorDefaultMarker.addOpenListener(this);
-				_colorDefaultMarker.addListener(new IPropertyChangeListener() {
-					public void propertyChange(final PropertyChangeEvent event) {
-						onChangeUI();
-					}
-				});
+				_colorDefaultMarker.addListener(_defaultPropertyChangeListener);
 			}
 
 			/*
@@ -358,11 +373,7 @@ public class SlideoutMarkerOptions extends AnimatedToolTipShell implements IColo
 						.applyTo(_colorDeviceMarker.getButton());
 
 				_colorDeviceMarker.addOpenListener(this);
-				_colorDeviceMarker.addListener(new IPropertyChangeListener() {
-					public void propertyChange(final PropertyChangeEvent event) {
-						onChangeUI();
-					}
-				});
+				_colorDeviceMarker.addListener(_defaultPropertyChangeListener);
 			}
 
 			/*
@@ -385,13 +396,16 @@ public class SlideoutMarkerOptions extends AnimatedToolTipShell implements IColo
 						.applyTo(_colorHiddenMarker.getButton());
 
 				_colorHiddenMarker.addOpenListener(this);
-				_colorHiddenMarker.addListener(new IPropertyChangeListener() {
-					public void propertyChange(final PropertyChangeEvent event) {
-						onChangeUI();
-					}
-				});
+				_colorHiddenMarker.addListener(_defaultPropertyChangeListener);
 			}
 		}
+	}
+
+	private void enableActions() {
+
+		final boolean isLabelVisible = _chkShowMarkerLabel.getSelection();
+
+		_chkDrawWithDefaultColor.setEnabled(isLabelVisible);
 	}
 
 	public Shell getShell() {
@@ -428,17 +442,20 @@ public class SlideoutMarkerOptions extends AnimatedToolTipShell implements IColo
 
 		final TourChartConfiguration tcc = _tourChart.getTourChartConfig();
 
+		final int markerPointSize = _spinMarkerSize.getSelection();
+		final boolean isDrawLabelWithDefaultColor = _chkDrawWithDefaultColor.getSelection();
 		final boolean isShowHiddenMarker = _chkShowHiddenMarker.getSelection();
 		final boolean isShowMarkerLabel = _chkShowMarkerLabel.getSelection();
+
 		final RGB defaultColor = _colorDefaultMarker.getColorValue();
 		final RGB deviceColor = _colorDeviceMarker.getColorValue();
 		final RGB hiddenColor = _colorHiddenMarker.getColorValue();
-		final int markerPointSize = _spinMarkerSize.getSelection();
 
 		/*
 		 * Update pref store
 		 */
 		_prefStore.setValue(ITourbookPreferences.GRAPH_MARKER_POINT_SIZE, markerPointSize);
+		_prefStore.setValue(ITourbookPreferences.GRAPH_MARKER_IS_DRAW_WITH_DEFAULT_COLOR, isDrawLabelWithDefaultColor);
 		_prefStore.setValue(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_HIDDEN_MARKER, isShowHiddenMarker);
 		_prefStore.setValue(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_MARKER_LABEL, isShowMarkerLabel);
 
@@ -456,6 +473,7 @@ public class SlideoutMarkerOptions extends AnimatedToolTipShell implements IColo
 		 * Update chart config
 		 */
 		tcc.markerPointSize = markerPointSize;
+		tcc.isDrawLabelWithDefaultColor = isDrawLabelWithDefaultColor;
 		tcc.isShowHiddenMarker = isShowHiddenMarker;
 		tcc.isShowMarkerLabel = isShowMarkerLabel;
 
@@ -465,6 +483,8 @@ public class SlideoutMarkerOptions extends AnimatedToolTipShell implements IColo
 
 		// update chart with new settings
 		_tourChart.updateUI_MarkerOptions();
+
+		enableActions();
 	}
 
 	private void onDispose() {
@@ -533,11 +553,14 @@ public class SlideoutMarkerOptions extends AnimatedToolTipShell implements IColo
 
 		final TourChartConfiguration tcc = _tourChart.getTourChartConfig();
 
+		_chkDrawWithDefaultColor.setSelection(tcc.isDrawLabelWithDefaultColor);
 		_chkShowHiddenMarker.setSelection(tcc.isShowHiddenMarker);
 		_chkShowMarkerLabel.setSelection(tcc.isShowMarkerLabel);
+
 		_colorDefaultMarker.setColorValue(tcc.markerColorDefault);
 		_colorDeviceMarker.setColorValue(tcc.markerColorDevice);
 		_colorHiddenMarker.setColorValue(tcc.markerColorHidden);
+
 		_spinMarkerSize.setSelection(tcc.markerPointSize);
 	}
 

@@ -3771,7 +3771,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		// create a new marker
 		final TourMarker tourMarker = new TourMarker(this, ChartLabel.MARKER_TYPE_DEVICE);
 
-		tourMarker.setVisualPosition(ChartLabel.VISUAL_HORIZONTAL_ABOVE_GRAPH_CENTERED);
 		tourMarker.setTime((int) (recordingTime + timeData.marker));
 		tourMarker.setDistance(distanceAbsolute);
 		tourMarker.setSerieIndex(serieIndex);

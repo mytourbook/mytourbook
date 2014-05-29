@@ -15,33 +15,39 @@
  *******************************************************************************/
 package net.tourbook.ui.tourChart.action;
 
-import net.tourbook.chart.IChartContextProvider;
+import net.tourbook.Messages;
+import net.tourbook.data.TourMarker;
+import net.tourbook.ui.tourChart.TourChart;
 
 import org.eclipse.jface.action.Action;
 
-public class ActionMarkerHide extends Action {
+public class ActionSetMarkerVisible extends Action {
 
-	/**
-	 * 
-	 */
-	private final IChartContextProvider	_chartContextProvider;
+	private TourChart	_tourChart;
+	private boolean		_isMarkerVisible;
+	private TourMarker	_tourMarker;
 
+	public ActionSetMarkerVisible(final TourChart tourChart) {
 
-	public ActionMarkerHide(	final IChartContextProvider chartContextProvider,
-								final String text,
-								final boolean isLeftSlider) {
-
-		super(text);
-
-
-		_chartContextProvider = chartContextProvider;
+		_tourChart = tourChart;
 	}
-
 
 	@Override
 	public void run() {
 
+		_tourChart.actionSetMarkerVisible(_tourMarker, _isMarkerVisible);
+	}
 
+	public void setTourMarker(final TourMarker tourMarker, final boolean isMarkerVisible) {
+
+		_tourMarker = tourMarker;
+		_isMarkerVisible = isMarkerVisible;
+
+		if (isMarkerVisible) {
+			setText(Messages.Tour_Action_Marker_SetVisible);
+		} else {
+			setText(Messages.Tour_Action_Marker_SetHidden);
+		}
 	}
 
 }

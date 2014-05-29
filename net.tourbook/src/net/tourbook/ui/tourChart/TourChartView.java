@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -34,6 +34,7 @@ import net.tourbook.photo.TourPhotoLinkSelection;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.IDataModelListener;
 import net.tourbook.tour.ITourEventListener;
+import net.tourbook.tour.ITourModifyListener;
 import net.tourbook.tour.SelectionDeletedTours;
 import net.tourbook.tour.SelectionTourData;
 import net.tourbook.tour.SelectionTourId;
@@ -43,7 +44,6 @@ import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.ITourChartViewer;
 import net.tourbook.ui.UI;
-import net.tourbook.ui.action.ActionEditQuick;
 import net.tourbook.ui.views.tourCatalog.SelectionTourCatalogView;
 import net.tourbook.ui.views.tourCatalog.TVICatalogComparedTour;
 import net.tourbook.ui.views.tourCatalog.TVICatalogRefTourItem;
@@ -57,9 +57,7 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Listener;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IViewPart;
@@ -67,7 +65,6 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.part.ViewPart;
-//import net.tourbook.ui.UI;
 
 // author: Wolfgang Schramm
 // create: 09.07.2007
@@ -75,12 +72,11 @@ import org.eclipse.ui.part.ViewPart;
 /**
  * Shows the selected tour in a chart
  */
-public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoEventListener {
+public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoEventListener, ITourModifyListener {
 
 	public static final String		ID			= "net.tourbook.views.TourChartView";	//$NON-NLS-1$
 
-	private final IPreferenceStore	_prefStore	= TourbookPlugin.getDefault()//
-														.getPreferenceStore();
+	private final IPreferenceStore	_prefStore	= TourbookPlugin.getPrefStore();
 
 	private TourChartConfiguration	_tourChartConfig;
 	private TourData				_tourData;
@@ -92,7 +88,7 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 	 */
 	private boolean					_isForceUpdate;
 
-	private boolean					_isPartActive;
+//	private boolean					_isPartActive;
 
 	private PostSelectionProvider	_postSelectionProvider;
 	private ISelectionListener		_postSelectionListener;
@@ -114,7 +110,7 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 			public void partActivated(final IWorkbenchPartReference partRef) {
 
 				if (partRef.getPart(false) == TourChartView.this) {
-					_isPartActive = true;
+//					_isPartActive = true;
 				}
 			}
 
@@ -125,7 +121,7 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 			public void partDeactivated(final IWorkbenchPartReference partRef) {
 
 				if (partRef.getPart(false) == TourChartView.this) {
-					_isPartActive = false;
+//					_isPartActive = false;
 				}
 
 				// ensure that at EACH part deactivation the photo tooltip gets hidden
@@ -220,7 +216,6 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 				if (part == TourChartView.this) {
 					return;
 				}
-
 
 				if (eventId == TourEventId.SEGMENT_LAYER_CHANGED) {
 
@@ -347,14 +342,6 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 		_tourChart.setToolBarManager(getViewSite().getActionBars().getToolBarManager(), true);
 		_tourChart.setContextProvider(new TourChartContextProvider(this), true);
 
-		_tourChart.addDoubleClickListener(new Listener() {
-			public void handleEvent(final Event event) {
-				if (_tourData.getTourPerson() != null) {
-					ActionEditQuick.doAction(TourChartView.this);
-				}
-			}
-		});
-
 		_tourChartConfig = TourManager.createDefaultTourChartConfig();
 
 		// set chart title
@@ -363,6 +350,8 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 				chartDataModel.setTitle(TourManager.getTourTitleDetailed(_tourData));
 			}
 		});
+
+		_tourChart.addTourModifyListener(this);
 
 		// fire a slider move selection when a slider was moved in the tour chart
 		_tourChart.addSliderMoveListener(new ISliderMoveListener() {
@@ -692,6 +681,12 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 				}
 			});
 		}
+	}
+
+	@Override
+	public void tourIsModified(final TourData tourData) {
+
+		_tourData = TourManager.saveModifiedTour(tourData);
 	}
 
 	private void updateChart() {

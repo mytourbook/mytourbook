@@ -23,7 +23,8 @@ public interface IChartOverlay {
 	 * Draws into the chart overlay, this event can happen at each mouse move event.
 	 * 
 	 * @param gcOverlay
+	 * @param graphDrawingData
 	 */
-	public void drawOverlay(GC gcOverlay);
+	public void drawOverlay(GC gcOverlay, GraphDrawingData graphDrawingData);
 
 }

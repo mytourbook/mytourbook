@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 20011  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -13,15 +13,17 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-
 package net.tourbook.tour;
 
 import net.tourbook.Messages;
 import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartXSlider;
 import net.tourbook.chart.IChartContextProvider;
+import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
-import net.tourbook.ui.tourChart.action.ActionCreateMarker;
+import net.tourbook.ui.tourChart.TourChart;
+import net.tourbook.ui.tourChart.action.ActionCreateMarkerFromSlider;
+import net.tourbook.ui.tourChart.action.ActionCreateMarkerFromValuePoint;
 import net.tourbook.ui.tourChart.action.IMarkerReceiver;
 
 import org.eclipse.jface.action.IMenuManager;
@@ -30,14 +32,15 @@ import org.eclipse.swt.widgets.Control;
 
 class DialogMarkerTourChartContextProvicer implements IChartContextProvider, IMarkerReceiver {
 
-	private final DialogMarker	_markerDialog;
+	private final DialogMarker					_markerDialog;
 
-	private ActionCreateMarker	_actionCreateMarker;
-	private ActionCreateMarker	_actionCreateMarkerLeft;
-	private ActionCreateMarker	_actionCreateMarkerRight;
+	private ActionCreateMarkerFromSlider		_actionCreateMarkerFromSlider;
+	private ActionCreateMarkerFromSlider		_actionCreateMarkerFromSliderLeft;
+	private ActionCreateMarkerFromSlider		_actionCreateMarkerFromSliderRight;
+	private ActionCreateMarkerFromValuePoint	_actionCreateMarkerFromValuePoint;
 
-	private ChartXSlider		_leftSlider;
-	private ChartXSlider		_rightSlider;
+	private ChartXSlider						_leftSlider;
+	private ChartXSlider						_rightSlider;
 
 	/**
 	 * @param markerDialog
@@ -46,21 +49,29 @@ class DialogMarkerTourChartContextProvicer implements IChartContextProvider, IMa
 
 		_markerDialog = markerDialog;
 
-		_actionCreateMarker = new ActionCreateMarker(this, Messages.tourCatalog_view_action_create_marker, true);
+		_actionCreateMarkerFromSlider = new ActionCreateMarkerFromSlider(
+				this,
+				Messages.tourCatalog_view_action_create_marker,
+				true);
 
-		_actionCreateMarkerLeft = new ActionCreateMarker(
+		_actionCreateMarkerFromSliderLeft = new ActionCreateMarkerFromSlider(
 				this,
 				Messages.tourCatalog_view_action_create_left_marker,
 				true);
 
-		_actionCreateMarkerRight = new ActionCreateMarker(
+		_actionCreateMarkerFromSliderRight = new ActionCreateMarkerFromSlider(
 				this,
 				Messages.tourCatalog_view_action_create_right_marker,
 				false);
 
-		_actionCreateMarker.setMarkerReceiver(this);
-		_actionCreateMarkerLeft.setMarkerReceiver(this);
-		_actionCreateMarkerRight.setMarkerReceiver(this);
+		_actionCreateMarkerFromValuePoint = new ActionCreateMarkerFromValuePoint(
+				this,
+				Messages.tourCatalog_view_action_create_marker);
+
+		_actionCreateMarkerFromSlider.setMarkerReceiver(this);
+		_actionCreateMarkerFromSliderLeft.setMarkerReceiver(this);
+		_actionCreateMarkerFromSliderRight.setMarkerReceiver(this);
+		_actionCreateMarkerFromValuePoint.setMarkerReceiver(this);
 	}
 
 	public void addTourMarker(final TourMarker tourMarker) {
@@ -73,7 +84,25 @@ class DialogMarkerTourChartContextProvicer implements IChartContextProvider, IMa
 
 	public void fillContextMenu(final IMenuManager menuMgr,
 								final int mouseDownDevPositionX,
-								final int mouseDownDevPositionY) {}
+								final int mouseDownDevPositionY) {
+
+		final TourChart tourChart = _markerDialog.getTourChart();
+		final TourData tourData = tourChart.getTourData();
+
+		final int vpIndex = tourChart.getHoveredValuePointIndex();
+
+		if (vpIndex != -1) {
+			_actionCreateMarkerFromValuePoint.setValuePointIndex(vpIndex);
+			menuMgr.add(_actionCreateMarkerFromValuePoint);
+		}
+
+		/*
+		 * Enable action
+		 */
+		final boolean isTourSaved = tourData != null && tourData.getTourPerson() != null;
+
+		_actionCreateMarkerFromValuePoint.setEnabled(isTourSaved);
+	}
 
 	public void fillXSliderContextMenu(	final IMenuManager menuMgr,
 										final ChartXSlider leftSlider,
@@ -86,10 +115,10 @@ class DialogMarkerTourChartContextProvicer implements IChartContextProvider, IMa
 
 			// marker actions
 			if (leftSlider != null && rightSlider == null) {
-				menuMgr.add(_actionCreateMarker);
+//				menuMgr.add(_actionCreateMarkerFromSlider);
 			} else {
-				menuMgr.add(_actionCreateMarkerLeft);
-				menuMgr.add(_actionCreateMarkerRight);
+				menuMgr.add(_actionCreateMarkerFromSliderLeft);
+				menuMgr.add(_actionCreateMarkerFromSliderRight);
 			}
 		}
 	}
@@ -107,16 +136,10 @@ class DialogMarkerTourChartContextProvicer implements IChartContextProvider, IMa
 	}
 
 	@Override
-	public void onHideContextMenu(final MenuEvent menuEvent, final Control menuParentControl) {
-		// TODO Auto-generated method stub
-
-	}
+	public void onHideContextMenu(final MenuEvent menuEvent, final Control menuParentControl) {}
 
 	@Override
-	public void onShowContextMenu(final MenuEvent menuEvent, final Control menuParentControl) {
-		// TODO Auto-generated method stub
-
-	}
+	public void onShowContextMenu(final MenuEvent menuEvent, final Control menuParentControl) {}
 
 	public boolean showOnlySliderContextMenu() {
 		return false;

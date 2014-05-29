@@ -22,7 +22,7 @@ import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.ChartDataXSerie;
-import net.tourbook.common.form.ViewerDetailForm;
+import net.tourbook.common.form.SashLeftFixedForm;
 import net.tourbook.common.util.TableLayoutComposite;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourReference;
@@ -70,7 +70,7 @@ public class WizardPageReferenceTour extends WizardPage {
 	private static final String				REF_TOUR_CHECKED		= "RefTour.checkedTours";	//$NON-NLS-1$
 	private static final String				REF_TOUR_VIEWER_WIDTH	= "RefTour.viewerWidth";	//$NON-NLS-1$
 
-	private ViewerDetailForm				_viewerDetailForm;
+	private SashLeftFixedForm				_viewerDetailForm;
 	private Composite						_refContainer;
 
 	private CheckboxTableViewer				_refTourViewer;
@@ -158,7 +158,7 @@ public class WizardPageReferenceTour extends WizardPage {
 		_refTourChart = new Chart(_chartGroup, SWT.NONE);
 		_refTourChart.setBackgroundColor(parent.getDisplay().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
 
-		_viewerDetailForm = new ViewerDetailForm(masterDetailContainer, _refContainer, sash, _chartGroup);
+		_viewerDetailForm = new SashLeftFixedForm(masterDetailContainer, _refContainer, sash, _chartGroup);
 
 		restoreDialogSettings();
 

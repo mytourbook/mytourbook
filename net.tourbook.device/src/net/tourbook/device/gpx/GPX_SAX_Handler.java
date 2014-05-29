@@ -32,7 +32,6 @@ import net.tourbook.data.TourWayPoint;
 import net.tourbook.importdata.DeviceData;
 import net.tourbook.importdata.TourbookDevice;
 import net.tourbook.ui.UI;
-import net.tourbook.ui.tourChart.ChartLabel;
 
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.osgi.util.NLS;
@@ -601,7 +600,7 @@ public class GPX_SAX_Handler extends DefaultHandler {
 
 			// adjust default marker which are created in tourData.createTimeSeries()
 			for (final TourMarker tourMarker : tourData.getTourMarkers()) {
-				tourMarker.setVisualPosition(ChartLabel.VISUAL_VERTICAL_BOTTOM_CHART);
+				tourMarker.setLabelPosition(TourMarker.LABEL_POS_VERTICAL_BOTTOM_CHART);
 			}
 		}
 

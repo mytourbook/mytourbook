@@ -4225,7 +4225,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		_actionOpenMarkerDialog.setEnabled(_isEditMode && isTourInDb);
 
 		// select marker
-		_actionOpenMarkerDialog.setSelectedMarker(selectedMarker);
+		_actionOpenMarkerDialog.setTourMarker(selectedMarker);
 
 		_actionDeleteTimeSlicesRemoveTime.setEnabled(_isEditMode && isTourInDb && isSliceSelected);
 		_actionDeleteTimeSlicesKeepTime.setEnabled(_isEditMode && isTourInDb && isSliceSelected);

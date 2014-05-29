@@ -50,11 +50,14 @@ import net.tourbook.photo.Photo;
 import net.tourbook.photo.TourPhotoLink;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.PrefPageAppearanceTourChart;
+import net.tourbook.tour.ActionOpenMarkerDialog;
 import net.tourbook.tour.IDataModelListener;
+import net.tourbook.tour.ITourModifyListener;
 import net.tourbook.tour.SelectionTourMarker;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourInfoToolTipProvider;
 import net.tourbook.tour.TourManager;
+import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.tourChart.action.ActionCanAutoZoomToSlider;
 import net.tourbook.ui.tourChart.action.ActionCanMoveSlidersWhenZoomed;
 import net.tourbook.ui.tourChart.action.ActionChartOptions;
@@ -95,7 +98,7 @@ import org.eclipse.swt.widgets.Shell;
 /**
  * The tour chart extends the chart with all the functionality for a tour chart
  */
-public class TourChart extends Chart {
+public class TourChart extends Chart implements ITourProvider {
 
 	private static final String		ID										= "net.tourbook.ui.tourChart";								//$NON-NLS-1$
 
@@ -124,10 +127,9 @@ public class TourChart extends Chart {
 
 	private final boolean			_isShowActions;
 
-	private boolean					_isFireTourMarkerEvent					= true;
-
 	private Map<String, Action>		_allTourChartActions;
 	private ActionMarkerOptions		_actionMarkerOptions;
+	private ActionOpenMarkerDialog	_actionOpenMarkerDialog;
 
 	/**
 	 * datamodel listener is called when the chart data is created
@@ -136,11 +138,13 @@ public class TourChart extends Chart {
 
 	private IPropertyChangeListener	_prefChangeListener;
 	private final ListenerList		_tourMarkerSelectionListener			= new ListenerList();
+	private final ListenerList		_tourModifyListener						= new ListenerList();
 	private final ListenerList		_xAxisSelectionListener					= new ListenerList();
 	//
-	private boolean					_isSegmentLayerVisible					= false;
-	private boolean					_is2ndAltiLayerVisible					= false;
+	private boolean					_isSegmentLayerVisible;
+	private boolean					_is2ndAltiLayerVisible;
 	private boolean					_isMouseModeSet;
+	private boolean					_isDisplayedInDialog;
 
 	private ImageDescriptor			_imagePhoto								= TourbookPlugin
 																					.getImageDescriptor(Messages.Image__PhotoPhotos);
@@ -309,6 +313,11 @@ public class TourChart extends Chart {
 	public class MouseMarkerListener extends MouseAdapter {
 
 		@Override
+		public void mouseDoubleClick(final ChartMouseEvent event) {
+			onMarkerMouseDoubleClick(event);
+		}
+
+		@Override
 		public void mouseDown(final ChartMouseEvent event) {
 			onMarkerMouseDown(event);
 		}
@@ -330,6 +339,11 @@ public class TourChart extends Chart {
 	}
 
 	public class MousePhotoListener extends MouseAdapter {
+
+		@Override
+		public void chartResized() {
+			onPhotoChartResized();
+		}
 
 		@Override
 		public void mouseExit() {
@@ -469,6 +483,22 @@ public class TourChart extends Chart {
 		}
 
 		updateZoomOptionActionHandlers();
+	}
+
+	public void actionSetMarkerLabelPosition(final TourMarker tourMarker, final int labelPosId) {
+
+		tourMarker.setLabelPosition(labelPosId);
+
+		// tour will be saved and the chart is also updated
+		fireTourModifySelection();
+	}
+
+	public void actionSetMarkerVisible(final TourMarker tourMarker, final boolean isMarkerVisible) {
+
+		tourMarker.setMarkerVisible(isMarkerVisible);
+
+		// tour will be saved and the chart is also updated
+		fireTourModifySelection();
 	}
 
 	public void actionShowBreaktimeValues(final boolean isItemChecked) {
@@ -853,6 +883,10 @@ public class TourChart extends Chart {
 		_tourMarkerSelectionListener.add(listener);
 	}
 
+	public void addTourModifyListener(final ITourModifyListener listener) {
+		_tourModifyListener.add(listener);
+	}
+
 	public void addXAxisSelectionListener(final IXAxisSelectionListener listener) {
 		_xAxisSelectionListener.add(listener);
 	}
@@ -878,6 +912,7 @@ public class TourChart extends Chart {
 		 * other actions
 		 */
 		_actionMarkerOptions = new ActionMarkerOptions(this, _parent);
+		_actionOpenMarkerDialog = new ActionOpenMarkerDialog(this, true);
 
 		_allTourChartActions.put(ACTION_ID_CAN_AUTO_ZOOM_TO_SLIDER, new ActionCanAutoZoomToSlider(this));
 		_allTourChartActions.put(ACTION_ID_CAN_MOVE_SLIDERS_WHEN_ZOOMED, new ActionCanMoveSlidersWhenZoomed(this));
@@ -1210,14 +1245,11 @@ public class TourChart extends Chart {
 
 		} else {
 
-			// marker layer is displayed
-
-			// set data serie for the x-axis
-			final double[] xAxisSerie = _tcc.isShowTimeOnXAxis ? //
-					_tourData.getTimeSerieDouble()
-					: _tourData.getDistanceSerieDouble();
+			// marker layer is visible
 
 			final ChartMarkerConfig cmc = new ChartMarkerConfig();
+
+			cmc.isDrawLabelWithDefaultColor = _tcc.isDrawLabelWithDefaultColor;
 			cmc.isShowHiddenMarker = _tcc.isShowHiddenMarker;
 			cmc.isShowMarkerLabel = _tcc.isShowMarkerLabel;
 			cmc.markerColorDefault = _tcc.markerColorDefault;
@@ -1225,12 +1257,24 @@ public class TourChart extends Chart {
 			cmc.markerColorHidden = _tcc.markerColorHidden;
 			cmc.markerPointSize = _tcc.markerPointSize;
 
-			_layerMarker = new ChartLayerMarker(cmc);
+			if (_layerMarker == null) {
 
-			// set overlay painter
-			addChartOverlay(_layerMarker);
+				// setup marker layer, a layer is created only once
 
-			addMouseChartListener(_mouseMarkerListener);
+				_layerMarker = new ChartLayerMarker();
+
+				// set overlay painter
+				addChartOverlay(_layerMarker);
+
+				addMouseChartListener(_mouseMarkerListener);
+			}
+
+			_layerMarker.setChartMarkerConfig(cmc);
+
+			// set data serie for the x-axis
+			final double[] xAxisSerie = _tcc.isShowTimeOnXAxis ? //
+					_tourData.getTimeSerieDouble()
+					: _tourData.getDistanceSerieDouble();
 
 			for (final TourMarker tourMarker : _tourData.getTourMarkers()) {
 
@@ -1261,7 +1305,6 @@ public class TourChart extends Chart {
 				cmc.chartLabels.add(chartLabel);
 			}
 		}
-
 	}
 
 	private void createLayer_Photo() {
@@ -1633,6 +1676,19 @@ public class TourChart extends Chart {
 	}
 
 	/**
+	 * Fires an event when the a tour is modified.
+	 */
+	private void fireTourModifySelection() {
+
+		final Object[] listeners = _tourModifyListener.getListeners();
+		for (final Object listener2 : listeners) {
+
+			final ITourModifyListener listener = (ITourModifyListener) listener2;
+			listener.tourIsModified(_tourData);
+		}
+	}
+
+	/**
 	 * Fires an event when the x-axis values were changed by the user
 	 * 
 	 * @param isShowTimeOnXAxis
@@ -1668,6 +1724,35 @@ public class TourChart extends Chart {
 		return _layerMarker.getHoveredMarker();
 	}
 
+	/**
+	 * @return Returns a {@link TourMarker} when a chart label (marker) is hovered or
+	 *         <code>null</code> when a marker is not hovered.
+	 */
+	private TourMarker getHoveredTourMarker() {
+
+		TourMarker tourMarker = null;
+		final ChartLabel hoveredChartMarker = getHoveredMarker();
+
+		if (hoveredChartMarker != null) {
+			if (hoveredChartMarker.data instanceof TourMarker) {
+				tourMarker = (TourMarker) hoveredChartMarker.data;
+			}
+		}
+		return tourMarker;
+	}
+
+	@Override
+	public ArrayList<TourData> getSelectedTours() {
+
+		final ArrayList<TourData> tourChartTours = new ArrayList<TourData>();
+
+		if (_tourData != null) {
+			tourChartTours.add(_tourData);
+		}
+
+		return tourChartTours;
+	}
+
 	public Map<String, Action> getTourChartActions() {
 		return _allTourChartActions;
 	}
@@ -1701,23 +1786,31 @@ public class TourChart extends Chart {
 		_valuePointToolTip.hide();
 	}
 
-	private void onMarkerMouseDown(final ChartMouseEvent event) {
+	private void onMarkerMouseDoubleClick(final ChartMouseEvent event) {
 
-		/*
-		 * Check if a marker is hovered
-		 */
-		TourMarker tourMarker = null;
-		final ChartLabel hoveredChartMarker = getHoveredMarker();
+		final TourMarker tourMarker = getHoveredTourMarker();
+		if (tourMarker != null) {
 
-		if (hoveredChartMarker != null) {
-			if (hoveredChartMarker.data instanceof TourMarker) {
-				tourMarker = (TourMarker) hoveredChartMarker.data;
+			// notify the chart mouse listener that no other actions should be done
+			event.isWorked = true;
+
+			// prevent that this action will open another marker dialog
+			if (_isDisplayedInDialog == false) {
+
+				// open marker dialog with the hovered/selected tour marker
+				_actionOpenMarkerDialog.setTourMarker(tourMarker);
+				_actionOpenMarkerDialog.run();
 			}
 		}
+	}
+
+	private void onMarkerMouseDown(final ChartMouseEvent event) {
+
+		final TourMarker tourMarker = getHoveredTourMarker();
 
 		if (tourMarker != null) {
 
-			// notify the chart mouse down listener that no other actions should be done
+			// notify the chart mouse listener that no other actions should be done
 			event.isWorked = true;
 
 			final ArrayList<TourMarker> allTourMarker = new ArrayList<TourMarker>();
@@ -1729,7 +1822,7 @@ public class TourChart extends Chart {
 			fireTourMarkerSelection(tourMarkerSelection);
 
 			// update selection globally
-			if (_isFireTourMarkerEvent) {
+			if (_isDisplayedInDialog == false) {
 
 				TourManager.fireEvent(//
 						TourEventId.MARKER_SELECTION,
@@ -1784,6 +1877,12 @@ public class TourChart extends Chart {
 			mouseEvent.isWorked = isMarkerHovered;
 			mouseEvent.cursor = ChartCursor.Arrow;
 		}
+	}
+
+	private void onPhotoChartResized() {
+
+		// reset hovered state otherwise hovered photo marker are still displayed when chart is zoomed in
+		onPhotoMouseExit();
 	}
 
 	private void onPhotoMouseExit() {
@@ -1847,6 +1946,10 @@ public class TourChart extends Chart {
 		_tourMarkerSelectionListener.remove(listener);
 	}
 
+	public void removeTourModifySelectionListener(final ITourModifyListener listener) {
+		_tourModifyListener.remove(listener);
+	}
+
 	public void removeXAxisSelectionListener(final IXAxisSelectionListener listener) {
 		_xAxisSelectionListener.remove(listener);
 	}
@@ -1901,7 +2004,7 @@ public class TourChart extends Chart {
 	/**
 	 * set custom data for all graphs
 	 */
-	private void setGraphData() {
+	private void setGraphLayer() {
 
 		final ChartDataModel dataModel = getChartDataModel();
 		if (dataModel == null) {
@@ -1939,17 +2042,17 @@ public class TourChart extends Chart {
 			yDataWithLabels = (ChartDataYSerie) dataModel.getCustomData(TourManager.CUSTOM_DATA_CADENCE);
 		}
 
-		setGraphDataLayers(TourManager.CUSTOM_DATA_ALTITUDE, _tourData.segmentSerieAltitudeDiff, yDataWithLabels);
-		setGraphDataLayers(TourManager.CUSTOM_DATA_PULSE, _tourData.segmentSeriePulse, yDataWithLabels);
-		setGraphDataLayers(TourManager.CUSTOM_DATA_SPEED, _tourData.segmentSerieSpeed, yDataWithLabels);
-		setGraphDataLayers(TourManager.CUSTOM_DATA_PACE, _tourData.segmentSeriePace, yDataWithLabels);
-		setGraphDataLayers(TourManager.CUSTOM_DATA_POWER, _tourData.segmentSeriePower, yDataWithLabels);
-		setGraphDataLayers(TourManager.CUSTOM_DATA_GRADIENT, _tourData.segmentSerieGradient, yDataWithLabels);
-		setGraphDataLayers(TourManager.CUSTOM_DATA_ALTIMETER, _tourData.segmentSerieAltitudeUpH, yDataWithLabels);
-		setGraphDataLayers(TourManager.CUSTOM_DATA_TEMPERATURE, null, yDataWithLabels);
-		setGraphDataLayers(TourManager.CUSTOM_DATA_CADENCE, null, yDataWithLabels);
+		setGraphLayer_Layer(TourManager.CUSTOM_DATA_ALTITUDE, _tourData.segmentSerieAltitudeDiff, yDataWithLabels);
+		setGraphLayer_Layer(TourManager.CUSTOM_DATA_PULSE, _tourData.segmentSeriePulse, yDataWithLabels);
+		setGraphLayer_Layer(TourManager.CUSTOM_DATA_SPEED, _tourData.segmentSerieSpeed, yDataWithLabels);
+		setGraphLayer_Layer(TourManager.CUSTOM_DATA_PACE, _tourData.segmentSeriePace, yDataWithLabels);
+		setGraphLayer_Layer(TourManager.CUSTOM_DATA_POWER, _tourData.segmentSeriePower, yDataWithLabels);
+		setGraphLayer_Layer(TourManager.CUSTOM_DATA_GRADIENT, _tourData.segmentSerieGradient, yDataWithLabels);
+		setGraphLayer_Layer(TourManager.CUSTOM_DATA_ALTIMETER, _tourData.segmentSerieAltitudeUpH, yDataWithLabels);
+		setGraphLayer_Layer(TourManager.CUSTOM_DATA_TEMPERATURE, null, yDataWithLabels);
+		setGraphLayer_Layer(TourManager.CUSTOM_DATA_CADENCE, null, yDataWithLabels);
 
-		setGraphDataLayers(TourManager.CUSTOM_DATA_HISTORY, null, null);
+		setGraphLayer_Layer(TourManager.CUSTOM_DATA_HISTORY, null, null);
 	}
 
 	/**
@@ -1959,9 +2062,9 @@ public class TourChart extends Chart {
 	 * @param segmentDataSerie
 	 * @param yDataWithLabels
 	 */
-	private void setGraphDataLayers(final String customDataKey,
-									final Object segmentDataSerie,
-									final ChartDataYSerie yDataWithLabels) {
+	private void setGraphLayer_Layer(	final String customDataKey,
+										final Object segmentDataSerie,
+										final ChartDataYSerie yDataWithLabels) {
 
 		final ChartDataModel dataModel = getChartDataModel();
 		final ChartDataYSerie yData = (ChartDataYSerie) dataModel.getCustomData(customDataKey);
@@ -2034,13 +2137,13 @@ public class TourChart extends Chart {
 	}
 
 	/**
-	 * When a tour chart is opened in a dialog, a global tour event should sometimes not be fired
-	 * but the local marker selection listener is fired.
+	 * When a tour chart is opened in a dialog, some actions should not be done.
 	 * 
-	 * @param isFireTourMarkerEvent
+	 * @param isDisplayedInDialog
 	 */
-	public void setIsFireTourMarkerEvent(final boolean isFireTourMarkerEvent) {
-		_isFireTourMarkerEvent = isFireTourMarkerEvent;
+	public void setIsDisplayedInDialog(final boolean isDisplayedInDialog) {
+
+		_isDisplayedInDialog = isDisplayedInDialog;
 	}
 
 	private boolean setMaxDefaultValue(	final String property,
@@ -2259,7 +2362,7 @@ public class TourChart extends Chart {
 
 		createLayer_2ndAlti();
 
-		setGraphData();
+		setGraphLayer();
 		updateCustomLayers();
 	}
 
@@ -2282,7 +2385,7 @@ public class TourChart extends Chart {
 			resetGraphAlpha();
 		}
 
-		setGraphData();
+		setGraphLayer();
 		updateCustomLayers();
 
 		/*
@@ -2398,7 +2501,7 @@ public class TourChart extends Chart {
 
 		createPainter_HrZone();
 
-		setGraphData();
+		setGraphLayer();
 
 		updateChart(newChartDataModel, !isMinMaxKeeper);
 
@@ -2431,7 +2534,7 @@ public class TourChart extends Chart {
 			hideMarkerLayer();
 		}
 
-		setGraphData();
+		setGraphLayer();
 		updateCustomLayers();
 	}
 

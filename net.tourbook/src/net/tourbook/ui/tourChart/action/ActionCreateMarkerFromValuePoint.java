@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -18,7 +18,6 @@ package net.tourbook.ui.tourChart.action;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.Chart;
-import net.tourbook.chart.ChartXSlider;
 import net.tourbook.chart.IChartContextProvider;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
@@ -30,19 +29,17 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.widgets.Display;
 
-public class ActionCreateMarker extends Action {
+public class ActionCreateMarkerFromValuePoint extends Action {
 
 	/**
 	 * 
 	 */
 	private final IChartContextProvider	_chartContextProvider;
-	private boolean						_isLeftSlider;
 
 	private IMarkerReceiver				_markerReceiver;
+	private int							_vpIndex	= -1;
 
-	public ActionCreateMarker(	final IChartContextProvider chartContextProvider,
-								final String text,
-								final boolean isLeftSlider) {
+	public ActionCreateMarkerFromValuePoint(final IChartContextProvider chartContextProvider, final String text) {
 
 		super(text);
 
@@ -50,7 +47,6 @@ public class ActionCreateMarker extends Action {
 		setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__edit_tour_marker_new_disabled));
 
 		_chartContextProvider = chartContextProvider;
-		_isLeftSlider = isLeftSlider;
 	}
 
 	/**
@@ -61,18 +57,11 @@ public class ActionCreateMarker extends Action {
 	 */
 	private TourMarker createTourMarker(final TourData tourData) {
 
-		final ChartXSlider leftSlider = _chartContextProvider.getLeftSlider();
-		final ChartXSlider rightSlider = _chartContextProvider.getRightSlider();
-
-		final ChartXSlider slider = rightSlider == null ? //
-				leftSlider
-				: _isLeftSlider ? leftSlider : rightSlider;
-
-		if (slider == null || tourData.timeSerie == null) {
+		if (tourData.timeSerie == null) {
 			return null;
 		}
 
-		final int serieIndex = slider.getValuesIndex();
+		final int serieIndex = _vpIndex;
 		final float[] distSerie = tourData.getMetricDistanceSerie();
 
 		// create a new marker
@@ -80,7 +69,6 @@ public class ActionCreateMarker extends Action {
 		tourMarker.setSerieIndex(serieIndex);
 		tourMarker.setTime(tourData.timeSerie[serieIndex]);
 		tourMarker.setLabel(Messages.TourData_Label_new_marker);
-		tourMarker.setVisualPosition(ChartLabel.VISUAL_HORIZONTAL_ABOVE_GRAPH_CENTERED);
 
 		if (distSerie != null) {
 			tourMarker.setDistance(distSerie[serieIndex]);
@@ -110,6 +98,7 @@ public class ActionCreateMarker extends Action {
 		}
 
 		if (_markerReceiver != null) {
+
 			_markerReceiver.addTourMarker(newTourMarker);
 
 			// the marker dialog will not be opened
@@ -128,5 +117,9 @@ public class ActionCreateMarker extends Action {
 
 	public void setMarkerReceiver(final IMarkerReceiver markerReceiver) {
 		_markerReceiver = markerReceiver;
+	}
+
+	public void setValuePointIndex(final int vpIndex) {
+		_vpIndex = vpIndex;
 	}
 }

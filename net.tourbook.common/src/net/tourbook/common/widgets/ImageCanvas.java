@@ -43,6 +43,7 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 
 /**
@@ -56,6 +57,8 @@ public class ImageCanvas extends Canvas implements PaintListener {
 	private boolean				_isLead;
 
 	private final ListenerList	_selectionListener	= new ListenerList();
+
+	private boolean				_isFocusGained;
 
 	/**
 	 * @param parent
@@ -118,11 +121,17 @@ public class ImageCanvas extends Canvas implements PaintListener {
 		addFocusListener(new FocusAdapter() {
 			@Override
 			public void focusGained(final FocusEvent e) {
+
+				_isFocusGained = true;
+
 				redraw();
 			}
 
 			@Override
 			public void focusLost(final FocusEvent e) {
+
+				_isFocusGained = false;
+
 				redraw();
 			}
 		});
@@ -173,13 +182,27 @@ public class ImageCanvas extends Canvas implements PaintListener {
 
 		final GC gc = e.gc;
 
-		final boolean isFocus = isFocusControl();
+		/*
+		 * In focus control and focus gained can be different, for win7 it depends if a dialog was
+		 * opened with the mouse or keyboard !!!
+		 */
+		final boolean isFocus = isFocusControl() || _isFocusGained;
 
 		if (_image == null || _image.isDisposed()) {
 
+			final Rectangle rect = getClientArea();
+			final int devX = rect.x;
+			final int devY = rect.y;
+			final int width = rect.width;
+			final int height = rect.height;
+
+			// draw image indicator
+			gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WIDGET_LIGHT_SHADOW));
+			gc.fillRoundRectangle(devX, devY, width, height, 0, 0);
+
+			// draw focus
 			if (isFocus) {
-				final Rectangle rect = getClientArea();
-				gc.drawFocus(rect.x, rect.y, rect.width, rect.height);
+				gc.drawFocus(devX, devY, width, height);
 			}
 
 			return;
@@ -212,6 +235,7 @@ public class ImageCanvas extends Canvas implements PaintListener {
 		final int offsetX = _isLead ? 0 : (canvasWidth - bestSizeWidth) / 2;
 		final int offsetY = _isCentered ? (canvasHeight - bestSizeHeight) / 2 : 0;
 
+		// draw image
 		gc.drawImage(_image, //
 				0,
 				0,
@@ -223,6 +247,7 @@ public class ImageCanvas extends Canvas implements PaintListener {
 				bestSizeWidth,
 				bestSizeHeight);
 
+		// draw focus
 		if (isFocus) {
 
 			gc.drawFocus(//

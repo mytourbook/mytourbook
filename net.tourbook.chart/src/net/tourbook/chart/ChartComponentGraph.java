@@ -303,7 +303,7 @@ public class ChartComponentGraph extends Canvas {
 	private ToolTipV1					_hoveredBarToolTip;
 
 	private boolean						_isHoveredLineVisible			= false;
-	private int							_hoveredLineValueIndex			= -1;
+	private int							_hoveredValuePointIndex			= -1;
 
 	private ArrayList<RectangleLong[]>	_lineFocusRectangles			= new ArrayList<RectangleLong[]>();
 	private ArrayList<PointLong[]>		_lineDevPositions				= new ArrayList<PointLong[]>();
@@ -879,14 +879,14 @@ public class ChartComponentGraph extends Canvas {
 
 		final double[] xDataValues = xValueSerie[0];
 
-		if (_hoveredLineValueIndex == -1 || _hoveredLineValueIndex >= xDataValues.length) {
+		if (_hoveredValuePointIndex == -1 || _hoveredValuePointIndex >= xDataValues.length) {
 
 			// this should not happen but it dit
 			return;
 		}
 
-		slider.setValuesIndex(_hoveredLineValueIndex);
-		slider.setValueX(xDataValues[_hoveredLineValueIndex]);
+		slider.setValuesIndex(_hoveredValuePointIndex);
+		slider.setValueX(xDataValues[_hoveredValuePointIndex]);
 	}
 
 	/**
@@ -1429,11 +1429,11 @@ public class ChartComponentGraph extends Canvas {
 
 		if (_isHoveredLineVisible || hoveredListener != null) {
 
-			final int hoveredLineValueIndexBACKUP = _hoveredLineValueIndex;
+			final int hoveredLineValueIndexBACKUP = _hoveredValuePointIndex;
 
 			setHoveredLineValue();
 
-			if (_hoveredLineValueIndex != -1) {
+			if (_hoveredValuePointIndex != -1) {
 
 				final PointLong devHoveredValueDevPosition = getHoveredValueDevPosition();
 
@@ -1449,12 +1449,12 @@ public class ChartComponentGraph extends Canvas {
 							eventTime,
 							_devXMouseMove,
 							_devYMouseMove,
-							_hoveredLineValueIndex,
+							_hoveredValuePointIndex,
 							devHoveredValueDevPosition);
 				}
 			}
 
-			_hoveredLineValueIndex = hoveredLineValueIndexBACKUP;
+			_hoveredValuePointIndex = hoveredLineValueIndexBACKUP;
 		}
 	}
 
@@ -1716,12 +1716,12 @@ public class ChartComponentGraph extends Canvas {
 			graphIndex++;
 		}
 
-		if (valuePointToolTip != null && _hoveredLineValueIndex != -1) {
+		if (valuePointToolTip != null && _hoveredValuePointIndex != -1) {
 
 			final PointLong hoveredLinePosition = getHoveredValueDevPosition();
 
 			valuePointToolTip.setValueIndex(
-					_hoveredLineValueIndex,
+					_hoveredValuePointIndex,
 					_devXMouseMove,
 					_devYMouseMove,
 					hoveredLinePosition,
@@ -2681,7 +2681,7 @@ public class ChartComponentGraph extends Canvas {
 
 				// check if hovered line is hit, this check is an inline for .contains(...)
 				if (isSetHoveredIndex == false && prevLineRect.contains(_devXMouseMove, _devYMouseMove)) {
-					_hoveredLineValueIndex = prevValueIndex;
+					_hoveredValuePointIndex = prevValueIndex;
 					isSetHoveredIndex = true;
 				}
 
@@ -2752,7 +2752,7 @@ public class ChartComponentGraph extends Canvas {
 
 				// check if hovered line is hit, this check is an inline for .contains(...)
 				if (isSetHoveredIndex == false && prevLineRect.contains(_devXMouseMove, _devYMouseMove)) {
-					_hoveredLineValueIndex = valueIndex;
+					_hoveredValuePointIndex = valueIndex;
 					isSetHoveredIndex = true;
 				}
 
@@ -2763,7 +2763,7 @@ public class ChartComponentGraph extends Canvas {
 				lineFocusRectangles[valueIndex] = lastRect;
 
 				if (isSetHoveredIndex == false && lastRect.contains(_devXMouseMove, _devYMouseMove)) {
-					_hoveredLineValueIndex = valueIndex;
+					_hoveredValuePointIndex = valueIndex;
 				}
 
 				break;
@@ -3551,7 +3551,7 @@ public class ChartComponentGraph extends Canvas {
 
 				// check if hovered line is hit, this check is an inline for .contains(...)
 				if (isSetHoveredIndex == false && prevLineRect.contains(_devXMouseMove, _devYMouseMove)) {
-					_hoveredLineValueIndex = prevValueIndex;
+					_hoveredValuePointIndex = prevValueIndex;
 					isSetHoveredIndex = true;
 				}
 
@@ -3584,7 +3584,7 @@ public class ChartComponentGraph extends Canvas {
 
 				// check if hovered line is hit, this check is an inline for .contains(...)
 				if (isSetHoveredIndex == false && prevLineRect.contains(_devXMouseMove, _devYMouseMove)) {
-					_hoveredLineValueIndex = valueIndex;
+					_hoveredValuePointIndex = valueIndex;
 					isSetHoveredIndex = true;
 				}
 
@@ -3595,7 +3595,7 @@ public class ChartComponentGraph extends Canvas {
 				lineFocusRectangles[valueIndex] = lastRect;
 
 				if (isSetHoveredIndex == false && lastRect.contains(_devXMouseMove, _devYMouseMove)) {
-					_hoveredLineValueIndex = valueIndex;
+					_hoveredValuePointIndex = valueIndex;
 				}
 
 				break;
@@ -3870,7 +3870,7 @@ public class ChartComponentGraph extends Canvas {
 				&& _isSliderDirty == false
 				&& _isSelectionDirty == false
 				&& _isHoveredBarDirty == false
-				&& _hoveredLineValueIndex == -1
+				&& _hoveredValuePointIndex == -1
 				&& _chartImage40Overlay != null) {
 
 			final Rectangle oldBounds = _chartImage40Overlay.getBounds();
@@ -3930,7 +3930,7 @@ public class ChartComponentGraph extends Canvas {
 				_isHoveredBarDirty = false;
 			}
 
-			if (_hoveredLineValueIndex != -1 && _lineDevPositions.size() > 0) {
+			if (_hoveredValuePointIndex != -1 && _lineDevPositions.size() > 0) {
 
 				// hovered lines are set -> draw it
 				drawSync_460_HoveredLine(gcOverlay);
@@ -4619,14 +4619,14 @@ public class ChartComponentGraph extends Canvas {
 			}
 
 			// check color index
-			if (_hoveredLineValueIndex > lineColorIndex.length - 1) {
+			if (_hoveredValuePointIndex > lineColorIndex.length - 1) {
 				return;
 			}
 
 			final RectangleLong[] lineFocusRectangles = _lineFocusRectangles.get(graphIndex);
 
-			final PointLong devPosition = lineDevPositions[_hoveredLineValueIndex];
-			final RectangleLong hoveredRectangle = lineFocusRectangles[_hoveredLineValueIndex];
+			final PointLong devPosition = lineDevPositions[_hoveredValuePointIndex];
+			final RectangleLong hoveredRectangle = lineFocusRectangles[_hoveredValuePointIndex];
 
 			// check if hovered line positions are set
 			if (hoveredRectangle == null || devPosition == null) {
@@ -4656,7 +4656,7 @@ public class ChartComponentGraph extends Canvas {
 
 				// get the colors
 				final RGB[] rgbLine = yData.getRgbLine();
-				final int colorIndex = lineColorIndex[_hoveredLineValueIndex];
+				final int colorIndex = lineColorIndex[_hoveredValuePointIndex];
 
 				final RGB rgbLineDef = rgbLine[colorIndex];
 				colorLine = getColor(rgbLineDef);
@@ -4713,9 +4713,25 @@ public class ChartComponentGraph extends Canvas {
 
 		if (_isOverlayDirty) {
 
-			for (final Object item : _chart.getChartOverlays()) {
-				if (item instanceof IChartOverlay) {
-					((IChartOverlay) item).drawOverlay(gcOverlay);
+			for (final GraphDrawingData graphDrawingData : _graphDrawingData) {
+
+				final ArrayList<IChartLayer> customFgLayers = graphDrawingData.getYData().getCustomForegroundLayers();
+
+				/**
+				 * Draw overlay only when a graph contains overlay layers to ensure that a overlay
+				 * is painted not for the "wrong" graphs.
+				 * <p>
+				 * This feature is used to optimize painting is currently used for tour markers and
+				 * photos.
+				 */
+				if (customFgLayers.size() == 0) {
+					continue;
+				}
+
+				for (final Object item : _chart.getChartOverlays()) {
+					if (item instanceof IChartOverlay) {
+						((IChartOverlay) item).drawOverlay(gcOverlay, graphDrawingData);
+					}
 				}
 			}
 		}
@@ -4763,14 +4779,10 @@ public class ChartComponentGraph extends Canvas {
 		return _chartComponents.getDevVisibleChartHeight();
 	}
 
-	int getHoveredLineValueIndex() {
-		return _hoveredLineValueIndex;
-	}
-
 	private PointLong getHoveredValueDevPosition() {
 
 		final PointLong[] lineDevPositions = _lineDevPositions.get(0);
-		PointLong lineDevPos = lineDevPositions[_hoveredLineValueIndex];
+		PointLong lineDevPos = lineDevPositions[_hoveredValuePointIndex];
 
 		boolean isAdjusted = false;
 
@@ -4779,7 +4791,7 @@ public class ChartComponentGraph extends Canvas {
 		 */
 		if (lineDevPos == null) {
 
-			int lineDevIndex = _hoveredLineValueIndex;
+			int lineDevIndex = _hoveredValuePointIndex;
 
 			// check forward
 			while (lineDevIndex < lineDevPositions.length - 1) {
@@ -4787,7 +4799,7 @@ public class ChartComponentGraph extends Canvas {
 				lineDevPos = lineDevPositions[++lineDevIndex];
 
 				if (lineDevPos != null) {
-					_hoveredLineValueIndex = lineDevIndex;
+					_hoveredValuePointIndex = lineDevIndex;
 					isAdjusted = true;
 					break;
 				}
@@ -4795,7 +4807,7 @@ public class ChartComponentGraph extends Canvas {
 
 			if (lineDevPos == null) {
 
-				lineDevIndex = _hoveredLineValueIndex;
+				lineDevIndex = _hoveredValuePointIndex;
 
 				// check backward
 				while (lineDevIndex > 0) {
@@ -4803,7 +4815,7 @@ public class ChartComponentGraph extends Canvas {
 					lineDevPos = lineDevPositions[--lineDevIndex];
 
 					if (lineDevPos != null) {
-						_hoveredLineValueIndex = lineDevIndex;
+						_hoveredValuePointIndex = lineDevIndex;
 						isAdjusted = true;
 						break;
 					}
@@ -4817,6 +4829,14 @@ public class ChartComponentGraph extends Canvas {
 		}
 
 		return lineDevPos;
+	}
+
+	/**
+	 * @return Returns the index in the data series which is hovered with the mouse or
+	 *         <code>-1</code> when a value is not hovered.
+	 */
+	int getHoveredValuePointIndex() {
+		return _hoveredValuePointIndex;
 	}
 
 	/**
@@ -5419,10 +5439,25 @@ public class ChartComponentGraph extends Canvas {
 
 	void onMouseDoubleClick(final MouseEvent e) {
 
+		final long eventTime = e.time & 0xFFFFFFFFL;
+		final int devXMouse = e.x;
+		final int devYMouse = e.y;
+
 		// stop dragging the x-slider
 		_xSliderDragged = null;
 
-		if (_hoveredBarSerieIndex != -1) {
+		ChartMouseEvent mouseEvent;
+
+		if ((mouseEvent = _chart.onExternalMouseDoubleClick(eventTime, devXMouse, devYMouse)).isWorked) {
+
+//			setChartCursor(mouseEvent.cursor);
+
+//			_isOverlayDirty = true;
+//			isRedraw = true;
+//
+//			canShowHoveredTooltip = true;
+
+		} else if (_hoveredBarSerieIndex != -1) {
 
 			/*
 			 * execute the action which is defined when a bar is selected with the left mouse button
@@ -5536,7 +5571,7 @@ public class ChartComponentGraph extends Canvas {
 			 * make sure that the slider is exactly positioned where the value is displayed in the
 			 * graph
 			 */
-			setXSliderValueIndex(xSlider, _hoveredLineValueIndex, false);
+			setXSliderValueIndex(xSlider, _hoveredValuePointIndex, false);
 
 			_isSliderDirty = true;
 			redraw();
@@ -5949,7 +5984,7 @@ public class ChartComponentGraph extends Canvas {
 
 			setHoveredLineValue();
 
-			if (_hoveredLineValueIndex != -1) {
+			if (_hoveredValuePointIndex != -1) {
 
 				final PointLong devHoveredValueDevPosition = getHoveredValueDevPosition();
 
@@ -5958,7 +5993,7 @@ public class ChartComponentGraph extends Canvas {
 					if (valuePointToolTip != null) {
 
 						valuePointToolTip.setValueIndex(
-								_hoveredLineValueIndex,
+								_hoveredValuePointIndex,
 								_devXMouseMove,
 								_devYMouseMove,
 								devHoveredValueDevPosition,
@@ -5978,7 +6013,7 @@ public class ChartComponentGraph extends Canvas {
 							eventTime,
 							_devXMouseMove,
 							_devYMouseMove,
-							_hoveredLineValueIndex,
+							_hoveredValuePointIndex,
 							devHoveredValueDevPosition);
 				}
 			}
@@ -6755,7 +6790,7 @@ public class ChartComponentGraph extends Canvas {
 		} else {
 
 			// prevent using old value index which can cause bound exceptions
-			_hoveredLineValueIndex = -1;
+			_hoveredValuePointIndex = -1;
 			_lineDevPositions.clear();
 			_lineFocusRectangles.clear();
 		}
@@ -6873,7 +6908,7 @@ public class ChartComponentGraph extends Canvas {
 	}
 
 	/**
-	 * Check if mouse has moved over a line value and sets {@link #_hoveredLineValueIndex} to the
+	 * Check if mouse has moved over a line value and sets {@link #_hoveredValuePointIndex} to the
 	 * value index or <code>-1</code> when focus rectangle is not hit.
 	 */
 	private void setHoveredLineValue() {
@@ -6901,7 +6936,7 @@ public class ChartComponentGraph extends Canvas {
 							&& _devYMouseMove < (lineRect.y + lineRect.height)) {
 
 						// keep the hovered line index
-						_hoveredLineValueIndex = valueIndex;
+						_hoveredValuePointIndex = valueIndex;
 
 						return;
 					}
@@ -6910,7 +6945,7 @@ public class ChartComponentGraph extends Canvas {
 		}
 
 		// reset index
-		_hoveredLineValueIndex = -1;
+		_hoveredValuePointIndex = -1;
 	}
 
 	void setSelectedBars(final boolean[] selectedItems) {

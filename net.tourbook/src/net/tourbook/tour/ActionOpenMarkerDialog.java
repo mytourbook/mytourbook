@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -31,9 +31,8 @@ import org.eclipse.swt.widgets.Display;
 public class ActionOpenMarkerDialog extends Action {
 
 	private ITourProvider	_tourProvider;
+	private TourMarker		_tourMarker;
 	private boolean			_isSaveTour;
-
-	private TourMarker		_selectedTourMarker;
 
 	/**
 	 * @param tourProvider
@@ -97,11 +96,11 @@ public class ActionOpenMarkerDialog extends Action {
 
 	@Override
 	public void run() {
-		doAction(_tourProvider, _isSaveTour, _selectedTourMarker);
+		doAction(_tourProvider, _isSaveTour, _tourMarker);
 	}
 
-	public void setSelectedMarker(final TourMarker tourMarker) {
-		_selectedTourMarker = tourMarker;
+	public void setTourMarker(final TourMarker tourMarker) {
+		_tourMarker = tourMarker;
 	}
 
 }

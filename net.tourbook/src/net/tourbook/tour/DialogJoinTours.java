@@ -1217,7 +1217,7 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
 
 					tourMarker.setSerieIndex(joinMarkerIndex);
 					tourMarker.setLabel(markerLabel);
-					tourMarker.setVisualPosition(ChartLabel.VISUAL_VERTICAL_ABOVE_GRAPH);
+					tourMarker.setLabelPosition(TourMarker.LABEL_POS_VERTICAL_ABOVE_GRAPH);
 
 					if (isJoinTime) {
 						tourMarker.setTime(joinedTimeSerie[joinMarkerIndex]);

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -38,7 +38,7 @@ import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
 /**
- * Chart widget which represents the chart ui The chart consists of these components
+ * Chart widget which represents the chart UI.
  * <p>
  * The chart widget consists has the following heights:
  * 
@@ -221,8 +221,9 @@ public class ChartComponents extends Composite {
 
 		super(parent, style);
 
-		GridData gd;
 		_chart = parent;
+
+		GridData gd;
 
 		// set layout for the components
 		gd = new GridData(SWT.FILL, SWT.FILL, true, true);
@@ -2199,6 +2200,8 @@ public class ChartComponents extends Composite {
 		componentAxisRight.setDrawingData(_chartDrawingData, false);
 
 		componentGraph.updateChartSize();
+		
+		_chart.onExternalChartResize();
 
 		// synchronize chart
 		final SynchConfiguration synchConfig = createSynchConfig();

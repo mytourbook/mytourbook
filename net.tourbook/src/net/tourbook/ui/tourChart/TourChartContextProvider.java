@@ -40,8 +40,11 @@ import net.tourbook.ui.action.ActionEditQuick;
 import net.tourbook.ui.action.ActionEditTour;
 import net.tourbook.ui.action.ActionOpenTour;
 import net.tourbook.ui.action.ActionSetTourTypeMenu;
-import net.tourbook.ui.tourChart.action.ActionCreateMarker;
+import net.tourbook.ui.tourChart.action.ActionCreateMarkerFromSlider;
+import net.tourbook.ui.tourChart.action.ActionCreateMarkerFromValuePoint;
 import net.tourbook.ui.tourChart.action.ActionCreateRefTour;
+import net.tourbook.ui.tourChart.action.ActionSetMarkerLabelPositionMenu;
+import net.tourbook.ui.tourChart.action.ActionSetMarkerVisible;
 
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.Separator;
@@ -51,25 +54,28 @@ import org.eclipse.swt.widgets.Display;
 
 public class TourChartContextProvider implements IChartContextProvider, ITourProvider {
 
-	private final ITourChartViewer			_tourChartViewer;
+	private final ITourChartViewer				_tourChartViewer;
 
-	private ActionCreateRefTour				_actionCreateRefTour;
-	private ActionCreateMarker				_actionCreateMarker;
-	private ActionCreateMarker				_actionCreateMarkerLeft;
-	private ActionCreateMarker				_actionCreateMarkerRight;
-	private ActionEditTour					_actionEditTour;
-	private ActionExport					_actionExportTour;
-	private ActionOpenAdjustAltitudeDialog	_actionOpenAdjustAltitudeDialog;
-	private ActionOpenMarkerDialog			_actionOpenMarkerDialog;
-	private ActionOpenTour					_actionOpenTour;
-	private ActionOpenPrefDialog			_actionPrefDialog;
-	private ActionEditQuick					_actionQuickEdit;
-	private ActionSetTourTypeMenu			_actionSetTourType;
+	private ActionCreateRefTour					_actionCreateRefTour;
+	private ActionCreateMarkerFromSlider		_actionCreateMarkerFromSlider;
+	private ActionCreateMarkerFromSlider		_actionCreateMarkerFromSliderLeft;
+	private ActionCreateMarkerFromSlider		_actionCreateMarkerFromSliderRight;
+	private ActionCreateMarkerFromValuePoint	_actionCreateMarkerFromValuePoint;
+	private ActionEditQuick						_actionQuickEdit;
+	private ActionEditTour						_actionEditTour;
+	private ActionExport						_actionExportTour;
+	private ActionOpenAdjustAltitudeDialog		_actionOpenAdjustAltitudeDialog;
+	private ActionOpenMarkerDialog				_actionOpenMarkerDialog;
+	private ActionOpenPrefDialog				_actionPrefDialog;
+	private ActionOpenTour						_actionOpenTour;
+	private ActionSetTourTypeMenu				_actionSetTourType;
+	private ActionSetMarkerVisible				_actionSetMarkerVisible;
+	private ActionSetMarkerLabelPositionMenu	_actionSetMarkerPosition;
 
-	private TagMenuManager					_tagMenuMgr;
+	private TagMenuManager						_tagMenuMgr;
 
-	private ChartXSlider					_leftSlider;
-	private ChartXSlider					_rightSlider;
+	private ChartXSlider						_leftSlider;
+	private ChartXSlider						_rightSlider;
 
 	/**
 	 * Provides a context menu for a tour chart
@@ -88,19 +94,27 @@ public class TourChartContextProvider implements IChartContextProvider, ITourPro
 
 		_actionCreateRefTour = new ActionCreateRefTour(tourChart);
 
-		_actionCreateMarker = new ActionCreateMarker(this, //
+		_actionCreateMarkerFromSlider = new ActionCreateMarkerFromSlider(
+				this,
 				Messages.tourCatalog_view_action_create_marker,
 				true);
 
-		_actionCreateMarkerLeft = new ActionCreateMarker(
+		_actionCreateMarkerFromSliderLeft = new ActionCreateMarkerFromSlider(
 				this,
 				Messages.tourCatalog_view_action_create_left_marker,
 				true);
 
-		_actionCreateMarkerRight = new ActionCreateMarker(
+		_actionCreateMarkerFromSliderRight = new ActionCreateMarkerFromSlider(
 				this,
 				Messages.tourCatalog_view_action_create_right_marker,
 				false);
+
+		_actionCreateMarkerFromValuePoint = new ActionCreateMarkerFromValuePoint(
+				this,
+				Messages.tourCatalog_view_action_create_marker);
+
+		_actionSetMarkerVisible = new ActionSetMarkerVisible(tourChart);
+		_actionSetMarkerPosition = new ActionSetMarkerLabelPositionMenu(tourChart);
 
 		_actionExportTour = new ActionExport(this);
 
@@ -145,16 +159,23 @@ public class TourChartContextProvider implements IChartContextProvider, ITourPro
 
 		if (tourMarker != null) {
 
+			// a marker is hovered
+
 			fillContextMenu_TourMarker(menuMgr, tourChart, tourMarker);
 
 		} else {
 
 			fillContextMenu_Default(menuMgr, tourChart);
 		}
-
 	}
 
 	private void fillContextMenu_Default(final IMenuManager menuMgr, final TourChart tourChart) {
+
+		final int vpIndex = tourChart.getHoveredValuePointIndex();
+		if (vpIndex != -1) {
+			_actionCreateMarkerFromValuePoint.setValuePointIndex(vpIndex);
+			menuMgr.add(_actionCreateMarkerFromValuePoint);
+		}
 
 		menuMgr.add(new Separator());
 		menuMgr.add(_actionQuickEdit);
@@ -186,8 +207,7 @@ public class TourChartContextProvider implements IChartContextProvider, ITourPro
 		 * enable actions
 		 */
 
-		final TourChart tourChart1 = _tourChartViewer.getTourChart();
-		final TourData tourData = tourChart1.getTourData();
+		final TourData tourData = tourChart.getTourData();
 
 		final boolean isTourSaved = tourData != null && tourData.getTourPerson() != null;
 		final Set<TourTag> tourTags = tourData == null ? null : tourData.getTourTags();
@@ -197,6 +217,8 @@ public class TourChartContextProvider implements IChartContextProvider, ITourPro
 			final TourType tourType = tourData.getTourType();
 			existingTourTypeId = tourType == null ? TourDatabase.ENTITY_IS_NOT_SAVED : tourType.getTypeId();
 		}
+
+		_actionCreateMarkerFromValuePoint.setEnabled(isTourSaved);
 		_actionQuickEdit.setEnabled(isTourSaved);
 		_actionEditTour.setEnabled(isTourSaved);
 		_actionOpenMarkerDialog.setEnabled(isTourSaved);
@@ -213,11 +235,19 @@ public class TourChartContextProvider implements IChartContextProvider, ITourPro
 		TourTypeMenuManager.enableRecentTourTypeActions(isTourSaved, existingTourTypeId);
 	}
 
-	private void fillContextMenu_TourMarker(final IMenuManager menuMgr, final TourChart tourChart, final TourMarker tourMarker) {
+	private void fillContextMenu_TourMarker(final IMenuManager menuMgr,
+											final TourChart tourChart,
+											final TourMarker tourMarker) {
 
-		_actionOpenMarkerDialog.setSelectedMarker(tourMarker);
+		// setup actions
+		_actionOpenMarkerDialog.setTourMarker(tourMarker);
+		_actionSetMarkerVisible.setTourMarker(tourMarker, !tourMarker.isMarkerVisible());
+		_actionSetMarkerPosition.setTourMarker(tourMarker);
 
+		// fill actions
 		menuMgr.add(_actionOpenMarkerDialog);
+		menuMgr.add(_actionSetMarkerVisible);
+		menuMgr.add(_actionSetMarkerPosition);
 	}
 
 	@Override
@@ -230,12 +260,12 @@ public class TourChartContextProvider implements IChartContextProvider, ITourPro
 
 		if (leftSlider != null || rightSlider != null) {
 
-			// marker actions
+			// slider marker actions
 			if (leftSlider != null && rightSlider == null) {
-				menuMgr.add(_actionCreateMarker);
+				menuMgr.add(_actionCreateMarkerFromSlider);
 			} else {
-				menuMgr.add(_actionCreateMarkerLeft);
-				menuMgr.add(_actionCreateMarkerRight);
+				menuMgr.add(_actionCreateMarkerFromSliderLeft);
+				menuMgr.add(_actionCreateMarkerFromSliderRight);
 			}
 
 			menuMgr.add(_actionCreateRefTour);
@@ -257,9 +287,9 @@ public class TourChartContextProvider implements IChartContextProvider, ITourPro
 					&& tourData.distanceSerie != null
 					&& isTourSaved;
 
-			_actionCreateMarker.setEnabled(isTourSaved);
-			_actionCreateMarkerLeft.setEnabled(isTourSaved);
-			_actionCreateMarkerRight.setEnabled(isTourSaved);
+			_actionCreateMarkerFromSlider.setEnabled(isTourSaved);
+			_actionCreateMarkerFromSliderLeft.setEnabled(isTourSaved);
+			_actionCreateMarkerFromSliderRight.setEnabled(isTourSaved);
 
 			_actionCreateRefTour.setEnabled(canCreateRefTours);
 

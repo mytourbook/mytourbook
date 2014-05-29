@@ -310,7 +310,6 @@ public class CRPDataReader extends TourbookDevice {
 					// create a new marker
 					final TourMarker tourMarker = new TourMarker(tourData, ChartLabel.MARKER_TYPE_DEVICE);
 					tourMarker.setLabel(comment);
-					tourMarker.setVisualPosition(ChartLabel.VISUAL_HORIZONTAL_ABOVE_GRAPH_CENTERED);
 					tourMarker.setTime(timeData.time);
 					tourMarker.setDistance(timeData.distance);
 					tourMarker.setSerieIndex(tpIndex);
