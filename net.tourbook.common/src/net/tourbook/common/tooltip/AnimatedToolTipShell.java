@@ -91,6 +91,12 @@ public abstract class AnimatedToolTipShell {
 	 */
 	private boolean						_isShellFadingIn;
 
+	/**
+	 * When <code>true</code> (default) the shell trim style is used to create the tooltip shell
+	 * which creates a border. Set <code>false</code> to hide the border.
+	 */
+	private boolean						_isShowShellTrimStyle					= true;
+
 	private Point						_shellStartLocation;
 	private Point						_shellEndLocation						= new Point(0, 0);
 
@@ -562,11 +568,11 @@ public abstract class AnimatedToolTipShell {
 	/**
 	 * Creates the content area of the the tooltip.
 	 * 
-	 * @param parent
+	 * @param shell
 	 *            the parent of the content area
 	 * @return the content area created
 	 */
-	protected abstract Composite createToolTipContentArea(Composite parent);
+	protected abstract Composite createToolTipContentArea(Composite shell);
 
 	/**
 	 * Create a shell but do not display it
@@ -579,19 +585,23 @@ public abstract class AnimatedToolTipShell {
 		boolean isShellCreated = false;
 		boolean isCreateContent = false;
 
+		final int trimStyle = _isShowShellTrimStyle ? 0 : SWT.NO_TRIM;
+
 		if (_shell == null || _shell.isDisposed()) {
 
 			/*
 			 * create shell
 			 */
-			_shell = new Shell(_ownerControl.getShell(), //
-					SWT.ON_TOP //
-							/*
-							 * SWT.TOOL must be disabled that NO_FOCUS is working !!!
-							 */
+			final int shellStyle = SWT.ON_TOP //
+					/*
+					 * SWT.TOOL must be disabled that NO_FOCUS is working !!!
+					 */
 //							| SWT.TOOL
 //							| SWT.RESIZE
-							| SWT.NO_FOCUS);
+					| SWT.NO_FOCUS
+					| trimStyle;
+
+			_shell = new Shell(_ownerControl.getShell(), shellStyle);
 
 			_shell.setLayout(new FillLayout());
 
@@ -1175,6 +1185,14 @@ public abstract class AnimatedToolTipShell {
 
 	public void setIsKeepShellOpenWhenMoved(final boolean isKeepShellOpenWhenMoved) {
 		_isKeepToolTipOpenWhenResizedOrMoved = isKeepShellOpenWhenMoved;
+	}
+
+	/**
+	 * When <code>true</code> (default) the shell trim style is used to create the tooltip shell
+	 * which creates a border. Set <code>false</code> to hide the border.
+	 */
+	public void setIsShowShellTrimStyle(final boolean isShowShellTrimStyle) {
+		_isShowShellTrimStyle = isShowShellTrimStyle;
 	}
 
 	public void setReceiveMouseMoveEvent(final boolean isReceive) {

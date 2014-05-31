@@ -84,7 +84,11 @@ public interface ITourbookPreferences {
 	public static final String	GRAPH_MARKER_IS_SHOW_HIDDEN_MARKER			= "GRAPH_MARKER_IS_SHOW_HIDDEN_MARKER";					//$NON-NLS-1$
 	public static final String	GRAPH_MARKER_IS_SHOW_MARKER_LABEL			= "GRAPH_MARKER_IS_SHOW_MARKER_LABEL";						//$NON-NLS-1$
 	public static final String	GRAPH_MARKER_IS_DRAW_WITH_DEFAULT_COLOR		= "GRAPH_MARKER_IS_DRAW_WITH_DEFAULT_COLOR";				//$NON-NLS-1$
+	public static final String	GRAPH_MARKER_IS_SHOW_LABEL_TEMP_POSITION	= "GRAPH_MARKER_IS_SHOW_LABEL_TEMP_POSITION";				//$NON-NLS-1$
+	public static final String	GRAPH_MARKER_HOVER_SIZE						= "GRAPH_MARKER_HOVER_OFFSET";								//$NON-NLS-1$
+	public static final String	GRAPH_MARKER_LABEL_OFFSET					= "GRAPH_MARKER_LABEL_OFFSET";								//$NON-NLS-1$
 	public static final String	GRAPH_MARKER_POINT_SIZE						= "GRAPH_MARKER_POINT_SIZE";								//$NON-NLS-1$
+	public static final String	GRAPH_MARKER_LABEL_TEMP_POSITION			= "GRAPH_MARKER_LABEL_TEMP_POSITION";						//$NON-NLS-1$
 	public static final String	GRAPH_MOUSE_MODE							= "graph.toggle-mouse";									//$NON-NLS-1$
 	public static final String	GRAPH_MOVE_SLIDERS_WHEN_ZOOMED				= "graphs.move-sliders-when-zoomed";						//$NON-NLS-1$
 	public static final String	GRAPH_TRANSPARENCY_FILLING					= "Graph_Transparency_Filling";							//$NON-NLS-1$

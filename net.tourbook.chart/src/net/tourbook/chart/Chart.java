@@ -579,7 +579,7 @@ public class Chart extends ViewForm {
 		return _chartComponents.getChartComponentGraph()._canAutoZoomToSlider;
 	}
 
-	protected ChartComponents getChartComponents() {
+	public ChartComponents getChartComponents() {
 		return _chartComponents;
 	}
 

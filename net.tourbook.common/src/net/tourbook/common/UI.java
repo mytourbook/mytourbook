@@ -101,6 +101,7 @@ public class UI {
 	public static final String			SYMBOL_DOUBLE_VERTICAL					= "\u2551";																//$NON-NLS-1$
 	public static final String			SYMBOL_ELLIPSIS							= "\u2026";																//$NON-NLS-1$
 	public static final String			SYMBOL_FIGURE_DASH						= "\u2012";																//$NON-NLS-1$
+	public static final String			SYMBOL_FOOT_NOTE						= "\u20F0";																//$NON-NLS-1$
 	public static final String			SYMBOL_FULL_BLOCK						= "\u2588";																//$NON-NLS-1$
 	public static final String			SYMBOL_INFINITY_MAX						= "\u221E";																//$NON-NLS-1$
 	public static final String			SYMBOL_INFINITY_MIN						= "-\u221E";																//$NON-NLS-1$

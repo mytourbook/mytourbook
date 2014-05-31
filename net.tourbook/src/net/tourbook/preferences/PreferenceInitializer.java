@@ -20,6 +20,7 @@ import java.util.Calendar;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.Chart;
 import net.tourbook.common.util.StringToArrayConverter;
+import net.tourbook.data.TourMarker;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.tour.BreakTimeTool;
 import net.tourbook.tour.TourManager;
@@ -123,10 +124,16 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 
 		// tour marker
 		store.setDefault(ITourbookPreferences.GRAPH_IS_MARKER_VISIBLE, true);
+		store.setDefault(ITourbookPreferences.GRAPH_MARKER_HOVER_SIZE, 4);
+		store.setDefault(ITourbookPreferences.GRAPH_MARKER_LABEL_OFFSET, 2);
 		store.setDefault(ITourbookPreferences.GRAPH_MARKER_POINT_SIZE, 2);
+		store.setDefault(ITourbookPreferences.GRAPH_MARKER_LABEL_TEMP_POSITION,//
+				TourMarker.LABEL_POS_HORIZONTAL_ABOVE_GRAPH_CENTERED);
 		store.setDefault(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_HIDDEN_MARKER, false);
 		store.setDefault(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_MARKER_LABEL, true);
 		store.setDefault(ITourbookPreferences.GRAPH_MARKER_IS_DRAW_WITH_DEFAULT_COLOR, true);
+		store.setDefault(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_LABEL_TEMP_POSITION, false);
+
 		PreferenceConverter.setDefault(store, //
 				ITourbookPreferences.GRAPH_MARKER_COLOR_DEFAULT,
 				new RGB(0x60, 0x60, 0x60));

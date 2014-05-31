@@ -2082,7 +2082,7 @@ public class ChartComponents extends Composite {
 		return componentAxisRight;
 	}
 
-	ChartComponentGraph getChartComponentGraph() {
+	public ChartComponentGraph getChartComponentGraph() {
 		return componentGraph;
 	}
 
@@ -2200,7 +2200,7 @@ public class ChartComponents extends Composite {
 		componentAxisRight.setDrawingData(_chartDrawingData, false);
 
 		componentGraph.updateChartSize();
-		
+
 		_chart.onExternalChartResize();
 
 		// synchronize chart

@@ -1185,6 +1185,7 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
 					| SWT.H_SCROLL);
 			GridDataFactory.fillDefaults()//
 					.grab(true, true)
+					.hint(_pc.convertWidthInCharsToPixels(20), SWT.DEFAULT)
 					.minSize(SWT.DEFAULT, _pc.convertHeightInCharsToPixels(2))
 					.applyTo(_txtDescription);
 			_txtDescription.addModifyListener(_defaultModifyListener);
@@ -1664,6 +1665,10 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
 
 	@Override
 	protected void okPressed() {
+
+		if (_selectedTourMarker.isValidForSave() == false) {
+			return;
+		}
 
 		_isOkPressed = true;
 

@@ -73,10 +73,13 @@ public class ChartLabel extends ChartMarker {
 	public int				devLabelWidth;
 	public int				devLabelHeight;
 
+	public int				devHoverSize;
+	public int				devMarkerPointSize;
+
 	/**
 	 * Is <code>true</code> when the label is drawn vertically.
 	 */
-	public boolean			isVertical;
+	public boolean			devIsVertical;
 
 	/**
 	 * Contains custom data, can be used to keep references to the model.
@@ -99,7 +102,7 @@ public class ChartLabel extends ChartMarker {
 				.format(
 						"\nChartLabel\n   markerLabel=%s\n   isVertical=%s\n   devXMarker=%s\n   devYMarker=%s\n   devXLabel=%s\n   devYLabel=%s\n   devLabelWidth=%s\n   devLabelHeight=%s\n",
 						markerLabel,
-						isVertical,
+						devIsVertical,
 						devXMarker,
 						devYMarker,
 						devXLabel,

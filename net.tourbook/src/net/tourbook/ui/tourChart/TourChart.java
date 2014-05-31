@@ -157,8 +157,9 @@ public class TourChart extends Chart implements ITourProvider {
 
 	private TourInfoToolTipProvider	_tourInfoToolTipProvider;
 
-	private ValuePointToolTipUI		_valuePointToolTip;
 	private ChartPhotoToolTip		_photoTooltip;
+	private ChartMarkerToolTip		_markerTooltip;
+	private ValuePointToolTipUI		_valuePointToolTip;
 
 	private ControlListener			_ttControlListener						= new ControlListener();
 	private IMouseListener			_mouseMarkerListener					= new MouseMarkerListener();
@@ -441,7 +442,9 @@ public class TourChart extends Chart implements ITourProvider {
 
 		_photoTooltip = new ChartPhotoToolTip(this, _state);
 
-//		_photoOverlay.setPhotoToolTip(_photoTooltip);
+		_markerTooltip = new ChartMarkerToolTip(this);
+		_markerTooltip.setReceiveMouseMoveEvent(true);
+		_markerTooltip.setIsShowShellTrimStyle(false);
 
 		setHoveredListener(new HoveredValueListener());
 	}
@@ -1252,10 +1255,17 @@ public class TourChart extends Chart implements ITourProvider {
 			cmc.isDrawLabelWithDefaultColor = _tcc.isDrawLabelWithDefaultColor;
 			cmc.isShowHiddenMarker = _tcc.isShowHiddenMarker;
 			cmc.isShowMarkerLabel = _tcc.isShowMarkerLabel;
+			cmc.isShowMarkerLabelTempPos = _tcc.isShowMarkerLabelTempPos;
+
+			cmc.markerLabelTempPos = _tcc.markerLabelTempPos;
+
+			cmc.markerHoverSize = _tcc.markerHoverSize;
+			cmc.markerLabelOffset = _tcc.markerLabelOffset;
+			cmc.markerPointSize = _tcc.markerPointSize;
+
 			cmc.markerColorDefault = _tcc.markerColorDefault;
 			cmc.markerColorDevice = _tcc.markerColorDevice;
 			cmc.markerColorHidden = _tcc.markerColorHidden;
-			cmc.markerPointSize = _tcc.markerPointSize;
 
 			if (_layerMarker == null) {
 
@@ -1284,10 +1294,16 @@ public class TourChart extends Chart implements ITourProvider {
 
 				final int markerIndex = Math.min(tourMarker.getSerieIndex(), xAxisSerie.length - 1);
 
+				String markerLabel = tourMarker.getLabel();
+				final boolean isDescription = tourMarker.getDescription().length() > 0;
+				if (isDescription) {
+					markerLabel += UI.SPACE2 + UI.SYMBOL_FOOT_NOTE;
+				}
+
 				chartLabel.graphX = xAxisSerie[markerIndex];
 				chartLabel.serieIndex = markerIndex;
 
-				chartLabel.markerLabel = tourMarker.getLabel();
+				chartLabel.markerLabel = markerLabel;
 				chartLabel.visualPosition = tourMarker.getLabelPosition();
 				chartLabel.type = tourMarker.getType();
 				chartLabel.visualType = tourMarker.getVisibleType();
@@ -1721,7 +1737,7 @@ public class TourChart extends Chart implements ITourProvider {
 			return null;
 		}
 
-		return _layerMarker.getHoveredMarker();
+		return _layerMarker.getHoveredLabel();
 	}
 
 	/**
@@ -1839,7 +1855,7 @@ public class TourChart extends Chart implements ITourProvider {
 			return;
 		}
 
-		_layerMarker.resetHoveredMarker();
+		_layerMarker.resetHoveredLabel();
 
 		// redraw chart
 		setChartOverlayDirty();
@@ -1851,7 +1867,7 @@ public class TourChart extends Chart implements ITourProvider {
 			return;
 		}
 
-		final ChartLabel hoveredMarker = _layerMarker.getHoveredMarker(mouseEvent);
+		final ChartLabel hoveredMarker = _layerMarker.getHoveredLabel(mouseEvent);
 
 		final boolean isMarkerHovered = hoveredMarker != null;
 		if (isMarkerHovered) {
@@ -1860,6 +1876,8 @@ public class TourChart extends Chart implements ITourProvider {
 			mouseEvent.isWorked = isMarkerHovered;
 			mouseEvent.cursor = ChartCursor.Arrow;
 		}
+
+		_markerTooltip.showHoveredMarker(hoveredMarker);
 	}
 
 	private void onMarkerMouseUp(final ChartMouseEvent mouseEvent) {
@@ -1868,7 +1886,7 @@ public class TourChart extends Chart implements ITourProvider {
 			return;
 		}
 
-		final ChartLabel hoveredMarker = _layerMarker.getHoveredMarker(mouseEvent);
+		final ChartLabel hoveredMarker = _layerMarker.getHoveredLabel(mouseEvent);
 
 		final boolean isMarkerHovered = hoveredMarker != null;
 		if (isMarkerHovered) {

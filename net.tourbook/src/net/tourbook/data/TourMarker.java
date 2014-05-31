@@ -34,6 +34,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
 import net.tourbook.Messages;
+import net.tourbook.database.FIELD_VALIDATION;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.ui.UI;
 import net.tourbook.ui.tourChart.ChartLabel;
@@ -45,7 +46,7 @@ import org.eclipse.swt.graphics.Rectangle;
  * 
  * <pre>
  * 
- *  Planned features:
+ *  Planned features in 14.8:
  * 
  * 	- different icons, size, with/without text
  * 	- new marker description field
@@ -62,16 +63,6 @@ import org.eclipse.swt.graphics.Rectangle;
 @XmlRootElement(name = "TourMarker")
 @XmlAccessorType(XmlAccessType.NONE)
 public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializable {
-
-	/**
-	 * Replace in db version 24 with {@link TourWayPoint#DB_LENGTH_CATEGORY}
-	 */
-	public static final int			DB_LENGTH_CATEGORY							= 100;
-
-	/**
-	 * Replace in db version 24 with {@link TourWayPoint#DB_LENGTH_NAME}
-	 */
-	public static final int			DB_LENGTH_LABEL								= 255;
 
 	/**
 	 * Visual position for markers, they must correspond to the position id LABEL_POS_*.
@@ -202,13 +193,16 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 	private String					label										= UI.EMPTY_STRING;
 
 	/**
-	 * This field is disable since db version 24 because the TourSign can be categorized.
+	 * This field is disabled since db version 24 because a {@link TourSign} can be categorized.
 	 */
 	@SuppressWarnings("unused")
 	private String					category									= UI.EMPTY_STRING;
 
 	/**
-	 * Can be <code>null</code>
+	 * Can be <code>null</code>.
+	 * <p>
+	 * <b>This field is not yet used, it is available because a {@link TourWayPoint} also contains a
+	 * comment field.</b>
 	 * 
 	 * @since db version 24
 	 */
@@ -350,18 +344,6 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 	}
 
 	/**
-	 * @return
-	 */
-	public String getComment() {
-
-		return comment == null ? UI.EMPTY_STRING : comment;
-	}
-
-//	public String getCategory() {
-//		return category;
-//	}
-
-	/**
 	 * @return Returns description of the marker when available, otherwise an empty string.
 	 */
 	public String getDescription() {
@@ -482,8 +464,6 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 
 		if (label.compareTo(comparedMarker.label) != 0) {
 			return false;
-		} else if (getComment().compareTo(comparedMarker.getComment()) != 0) {
-			return false;
 		} else if (getDescription().compareTo(comparedMarker.getDescription()) != 0) {
 			return false;
 		} else if (distance20 != comparedMarker.distance20) {
@@ -526,6 +506,61 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 	}
 
 	/**
+	 * Checks if VARCHAR fields have the correct length
+	 * 
+	 * @return Returns <code>true</code> when the data are valid and can be saved
+	 */
+	public boolean isValidForSave() {
+
+		/*
+		 * Check: label
+		 */
+		FIELD_VALIDATION fieldValidation = TourDatabase.isFieldValidForSave(
+				label,
+				TourWayPoint.DB_LENGTH_NAME,
+				Messages.Db_Field_TourData_Title,
+				false);
+
+		if (fieldValidation == FIELD_VALIDATION.IS_INVALID) {
+			return false;
+		} else if (fieldValidation == FIELD_VALIDATION.TRUNCATE) {
+			label = label.substring(0, TourWayPoint.DB_LENGTH_NAME);
+		}
+
+		/*
+		 * Check: comment
+		 */
+		fieldValidation = TourDatabase.isFieldValidForSave(
+				comment,
+				TourWayPoint.DB_LENGTH_COMMENT,
+				Messages.Db_Field_TourData_Title,
+				false);
+
+		if (fieldValidation == FIELD_VALIDATION.IS_INVALID) {
+			return false;
+		} else if (fieldValidation == FIELD_VALIDATION.TRUNCATE) {
+			comment = comment.substring(0, TourWayPoint.DB_LENGTH_COMMENT);
+		}
+
+		/*
+		 * Check: description
+		 */
+		fieldValidation = TourDatabase.isFieldValidForSave(
+				description,
+				TourWayPoint.DB_LENGTH_DESCRIPTION,
+				Messages.Db_Field_TourData_Title,
+				false);
+
+		if (fieldValidation == FIELD_VALIDATION.IS_INVALID) {
+			return false;
+		} else if (fieldValidation == FIELD_VALIDATION.TRUNCATE) {
+			description = description.substring(0, TourWayPoint.DB_LENGTH_DESCRIPTION);
+		}
+
+		return true;
+	}
+
+	/**
 	 * restore marker data from a marker backup
 	 * 
 	 * @param backupMarker
@@ -548,10 +583,6 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 
 		tourData = backupMarker.tourData;
 		tourSign = backupMarker.tourSign;
-	}
-
-	public void setComment(final String comment) {
-		this.comment = comment;
 	}
 
 	public void setDescription(final String description) {
