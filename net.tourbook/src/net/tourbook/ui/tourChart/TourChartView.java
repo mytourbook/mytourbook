@@ -686,7 +686,9 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 	@Override
 	public void tourIsModified(final TourData tourData) {
 
-		_tourData = TourManager.saveModifiedTour(tourData);
+		final TourData savedTourData = TourManager.saveModifiedTour(tourData);
+
+		updateChart(savedTourData);
 	}
 
 	private void updateChart() {

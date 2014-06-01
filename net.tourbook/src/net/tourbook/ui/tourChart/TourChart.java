@@ -52,6 +52,7 @@ import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.PrefPageAppearanceTourChart;
 import net.tourbook.tour.ActionOpenMarkerDialog;
 import net.tourbook.tour.IDataModelListener;
+import net.tourbook.tour.ITourMarkerModifyListener;
 import net.tourbook.tour.ITourModifyListener;
 import net.tourbook.tour.SelectionTourMarker;
 import net.tourbook.tour.TourEventId;
@@ -137,6 +138,7 @@ public class TourChart extends Chart implements ITourProvider {
 	private IDataModelListener		_chartDataModelListener;
 
 	private IPropertyChangeListener	_prefChangeListener;
+	private final ListenerList		_tourMarkerModifyListener				= new ListenerList();
 	private final ListenerList		_tourMarkerSelectionListener			= new ListenerList();
 	private final ListenerList		_tourModifyListener						= new ListenerList();
 	private final ListenerList		_xAxisSelectionListener					= new ListenerList();
@@ -145,6 +147,7 @@ public class TourChart extends Chart implements ITourProvider {
 	private boolean					_is2ndAltiLayerVisible;
 	private boolean					_isMouseModeSet;
 	private boolean					_isDisplayedInDialog;
+	private TourMarker				_firedTourMarker;
 
 	private ImageDescriptor			_imagePhoto								= TourbookPlugin
 																					.getImageDescriptor(Messages.Image__PhotoPhotos);
@@ -492,16 +495,15 @@ public class TourChart extends Chart implements ITourProvider {
 
 		tourMarker.setLabelPosition(labelPosId);
 
-		// tour will be saved and the chart is also updated
-		fireTourModifySelection();
+		updateModifiedTourMarker(tourMarker);
 	}
 
 	public void actionSetMarkerVisible(final TourMarker tourMarker, final boolean isMarkerVisible) {
 
+		// modify tour marker
 		tourMarker.setMarkerVisible(isMarkerVisible);
 
-		// tour will be saved and the chart is also updated
-		fireTourModifySelection();
+		updateModifiedTourMarker(tourMarker);
 	}
 
 	public void actionShowBreaktimeValues(final boolean isItemChecked) {
@@ -585,7 +587,7 @@ public class TourChart extends Chart implements ITourProvider {
 
 		_tcc.isShowTourMarker = isMarkerVisible;
 
-		updateUI_LayerMarker(isMarkerVisible);
+		updateUI_MarkerLayer(isMarkerVisible);
 
 		// update actions
 		setActionChecked(ACTION_ID_IS_SHOW_TOUR_MARKER, isMarkerVisible);
@@ -880,6 +882,10 @@ public class TourChart extends Chart implements ITourProvider {
 		};
 
 		_prefStore.addPropertyChangeListener(_prefChangeListener);
+	}
+
+	public void addTourMarkerModifyListener(final ITourMarkerModifyListener listener) {
+		_tourMarkerModifyListener.add(listener);
 	}
 
 	public void addTourMarkerSelectionListener(final ITourMarkerSelectionListener listener) {
@@ -1252,7 +1258,7 @@ public class TourChart extends Chart implements ITourProvider {
 
 			final ChartMarkerConfig cmc = new ChartMarkerConfig();
 
-			cmc.isDrawLabelWithDefaultColor = _tcc.isDrawLabelWithDefaultColor;
+			cmc.isDrawMarkerWithDefaultColor = _tcc.isDrawMarkerWithDefaultColor;
 			cmc.isShowHiddenMarker = _tcc.isShowHiddenMarker;
 			cmc.isShowMarkerLabel = _tcc.isShowMarkerLabel;
 			cmc.isShowMarkerLabelTempPos = _tcc.isShowMarkerLabelTempPos;
@@ -1680,9 +1686,43 @@ public class TourChart extends Chart implements ITourProvider {
 	/**
 	 * Fires an event when the a tour marker is selected.
 	 * 
+	 * @param tourMarker
+	 */
+	private void fireTourMarkerModifyEvent(final TourMarker tourMarker) {
+
+		final Object[] listeners = _tourMarkerModifyListener.getListeners();
+		for (final Object listener2 : listeners) {
+
+			final ITourMarkerModifyListener listener = (ITourMarkerModifyListener) listener2;
+			listener.tourMarkerIsModified(tourMarker);
+		}
+	}
+
+	private void fireTourMarkerSelection(final TourMarker tourMarker) {
+
+		final ArrayList<TourMarker> allTourMarker = new ArrayList<TourMarker>();
+		allTourMarker.add(tourMarker);
+
+		final SelectionTourMarker tourMarkerSelection = new SelectionTourMarker(_tourData, allTourMarker);
+
+		// update selection locally (e.g. in a dialog)
+		fireTourMarkerSelection_Locally(tourMarkerSelection);
+
+		// update selection globally
+		if (_isDisplayedInDialog == false) {
+
+			TourManager.fireEvent(//
+					TourEventId.MARKER_SELECTION,
+					tourMarkerSelection);
+		}
+	}
+
+	/**
+	 * Fires an event when the a tour marker is selected.
+	 * 
 	 * @param isShowTimeOnXAxis
 	 */
-	private void fireTourMarkerSelection(final SelectionTourMarker tourMarkerSelection) {
+	private void fireTourMarkerSelection_Locally(final SelectionTourMarker tourMarkerSelection) {
 
 		final Object[] listeners = _tourMarkerSelectionListener.getListeners();
 		for (final Object listener2 : listeners) {
@@ -1692,9 +1732,9 @@ public class TourChart extends Chart implements ITourProvider {
 	}
 
 	/**
-	 * Fires an event when the a tour is modified.
+	 * Fires an event when a tour is modified.
 	 */
-	private void fireTourModifySelection() {
+	private void fireTourModifyEvent_Globally() {
 
 		final Object[] listeners = _tourModifyListener.getListeners();
 		for (final Object listener2 : listeners) {
@@ -1731,7 +1771,7 @@ public class TourChart extends Chart implements ITourProvider {
 	/**
 	 * @return Returns the hovered marker or <code>null</code> when a marker is not hovered.
 	 */
-	ChartLabel getHoveredMarker() {
+	private ChartLabel getHoveredLabel() {
 
 		if (_layerMarker == null) {
 			return null;
@@ -1741,17 +1781,18 @@ public class TourChart extends Chart implements ITourProvider {
 	}
 
 	/**
-	 * @return Returns a {@link TourMarker} when a chart label (marker) is hovered or
-	 *         <code>null</code> when a marker is not hovered.
+	 * @return Returns a {@link TourMarker} when a {@link ChartLabel} (marker) is hovered or
+	 *         <code>null</code> when a {@link ChartLabel} is not hovered.
 	 */
-	private TourMarker getHoveredTourMarker() {
+	public TourMarker getHoveredTourMarker() {
 
 		TourMarker tourMarker = null;
-		final ChartLabel hoveredChartMarker = getHoveredMarker();
 
-		if (hoveredChartMarker != null) {
-			if (hoveredChartMarker.data instanceof TourMarker) {
-				tourMarker = (TourMarker) hoveredChartMarker.data;
+		final ChartLabel hoveredChartLabel = getHoveredLabel();
+
+		if (hoveredChartLabel != null) {
+			if (hoveredChartLabel.data instanceof TourMarker) {
+				tourMarker = (TourMarker) hoveredChartLabel.data;
 			}
 		}
 		return tourMarker;
@@ -1820,30 +1861,18 @@ public class TourChart extends Chart implements ITourProvider {
 		}
 	}
 
-	private void onMarkerMouseDown(final ChartMouseEvent event) {
+	private void onMarkerMouseDown(final ChartMouseEvent mouseEvent) {
 
 		final TourMarker tourMarker = getHoveredTourMarker();
 
 		if (tourMarker != null) {
 
 			// notify the chart mouse listener that no other actions should be done
-			event.isWorked = true;
+			mouseEvent.isWorked = true;
 
-			final ArrayList<TourMarker> allTourMarker = new ArrayList<TourMarker>();
-			allTourMarker.add(tourMarker);
+			fireTourMarkerSelection(tourMarker);
 
-			final SelectionTourMarker tourMarkerSelection = new SelectionTourMarker(_tourData, allTourMarker);
-
-			// update selection locally (e.g. in a dialog)
-			fireTourMarkerSelection(tourMarkerSelection);
-
-			// update selection globally
-			if (_isDisplayedInDialog == false) {
-
-				TourManager.fireEvent(//
-						TourEventId.MARKER_SELECTION,
-						tourMarkerSelection);
-			}
+			_firedTourMarker = tourMarker;
 		}
 	}
 
@@ -1877,7 +1906,18 @@ public class TourChart extends Chart implements ITourProvider {
 			mouseEvent.cursor = ChartCursor.Arrow;
 		}
 
-		_markerTooltip.showHoveredMarker(hoveredMarker);
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+//
+//		if (getTourChartConfig().isShowTooltip) {
+//			_markerTooltip.showHoveredMarker(hoveredMarker);
+//		}
 	}
 
 	private void onMarkerMouseUp(final ChartMouseEvent mouseEvent) {
@@ -1886,14 +1926,24 @@ public class TourChart extends Chart implements ITourProvider {
 			return;
 		}
 
-		final ChartLabel hoveredMarker = _layerMarker.getHoveredLabel(mouseEvent);
+		final ChartLabel hoveredLabel = _layerMarker.getHoveredLabel(mouseEvent);
 
-		final boolean isMarkerHovered = hoveredMarker != null;
-		if (isMarkerHovered) {
+		final boolean isLabelHovered = hoveredLabel != null;
+		if (isLabelHovered) {
 
 			// set marker default cursor when the mouse is still hovering a marker
-			mouseEvent.isWorked = isMarkerHovered;
+			mouseEvent.isWorked = isLabelHovered;
 			mouseEvent.cursor = ChartCursor.Arrow;
+
+			final TourMarker hoveredTourMarker = getHoveredTourMarker();
+
+			// ensure that the tour marker selection is fired only once
+			if (_firedTourMarker == null || _firedTourMarker != hoveredTourMarker) {
+
+				// select the tour marker when the context menu is opened
+				fireTourMarkerSelection(hoveredTourMarker);
+			}
+			_firedTourMarker = null;
 		}
 	}
 
@@ -2412,6 +2462,23 @@ public class TourChart extends Chart implements ITourProvider {
 		redrawChart();
 	}
 
+	private void updateModifiedTourMarker(final TourMarker tourMarker) {
+
+		if (_isDisplayedInDialog) {
+
+//			// update only the marker layer
+//			updateUI_MarkerLayer();
+
+			// this will also update the chart
+			fireTourMarkerModifyEvent(tourMarker);
+
+		} else {
+
+			// tour will be saved and the chart is also updated
+			fireTourModifyEvent_Globally();
+		}
+	}
+
 	/**
 	 * Update the tour chart with the previous data and configuration
 	 * 
@@ -2539,13 +2606,19 @@ public class TourChart extends Chart implements ITourProvider {
 		_valuePointToolTip.setTourData(_tourData);
 	}
 
+	public void updateUI_MarkerLayer() {
+
+		updateUI_MarkerLayer(true);
+	}
+
 	/**
 	 * Updates the marker layer in the chart
 	 * 
 	 * @param isMarkerVisible
 	 */
-	public void updateUI_LayerMarker(final boolean isMarkerVisible) {
+	public void updateUI_MarkerLayer(final boolean isMarkerVisible) {
 
+		// create/hide marker layer
 		if (isMarkerVisible) {
 			createLayer_Marker(true);
 		} else {
@@ -2553,12 +2626,9 @@ public class TourChart extends Chart implements ITourProvider {
 		}
 
 		setGraphLayer();
+
+		// update marker layer
 		updateCustomLayers();
-	}
-
-	public void updateUI_MarkerOptions() {
-
-		updateUI_LayerMarker(true);
 	}
 
 	private void updateUI_PhotoAction() {

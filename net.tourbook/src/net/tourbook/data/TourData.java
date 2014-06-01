@@ -6416,13 +6416,13 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		return new StringBuilder()//
 				.append("[TourData]") //$NON-NLS-1$
 				//
-				.append(" tourId:") //$NON-NLS-1$
-				.append(tourId)
+//				.append(" tourId:") //$NON-NLS-1$
+//				.append(tourId)
 				//
-//				.append(" object:") //$NON-NLS-1$
-//				.append(super.toString())
-//				.append(" identityHashCode:") //$NON-NLS-1$
-//				.append(System.identityHashCode(this))
+				.append(" object:") //$NON-NLS-1$
+				.append(super.toString())
+				.append(" identityHashCode:") //$NON-NLS-1$
+				.append(System.identityHashCode(this))
 				.toString();
 	}
 

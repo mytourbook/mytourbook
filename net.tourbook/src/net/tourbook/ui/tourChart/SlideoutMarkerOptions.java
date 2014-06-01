@@ -104,7 +104,7 @@ public class SlideoutMarkerOptions extends AnimatedToolTipShell implements IColo
 	private Composite				_shellContainer;
 	private TourChart				_tourChart;
 
-	private Button					_chkDrawWithDefaultColor;
+	private Button					_chkDrawMarkerWithDefaultColor;
 	private Button					_chkShowHiddenMarker;
 	private Button					_chkShowMarkerLabel;
 	private Button					_chkShowLabelTempPosition;
@@ -114,6 +114,8 @@ public class SlideoutMarkerOptions extends AnimatedToolTipShell implements IColo
 	private ColorSelectorExtended	_colorDefaultMarker;
 	private ColorSelectorExtended	_colorDeviceMarker;
 	private ColorSelectorExtended	_colorHiddenMarker;
+
+	private Label					_lblLabelOffset;
 
 	private Spinner					_spinHoverSize;
 	private Spinner					_spinLabelOffset;
@@ -203,7 +205,7 @@ public class SlideoutMarkerOptions extends AnimatedToolTipShell implements IColo
 
 		fillUI();
 		restoreState();
-		enableActions();
+		enableControls();
 
 		return ui;
 	}
@@ -219,9 +221,9 @@ public class SlideoutMarkerOptions extends AnimatedToolTipShell implements IColo
 			GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
 			GridLayoutFactory.fillDefaults().applyTo(container);
 			{
-				createUI_50_Bottom(container);
 				createUI_10_Top(container);
-				createUI_20_TempPosition(container);
+				createUI_50_Checkboxes(container);
+				createUI_99_TempPosition(container);
 			}
 		}
 
@@ -239,78 +241,6 @@ public class SlideoutMarkerOptions extends AnimatedToolTipShell implements IColo
 	private void createUI_10_Top(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
-		{
-			/*
-			 * Show labels
-			 */
-			{
-				// show label
-				_chkShowMarkerLabel = new Button(container, SWT.CHECK);
-				GridDataFactory.fillDefaults()//
-						.span(2, 1)
-						.applyTo(_chkShowMarkerLabel);
-				_chkShowMarkerLabel.setText(Messages.Slideout_ChartMarkerOptions_Checkbox_IsShowMarker);
-				_chkShowMarkerLabel.addSelectionListener(_defaultSelectionAdapter);
-
-				// draw label with default color
-				_chkDrawWithDefaultColor = new Button(container, SWT.CHECK);
-				GridDataFactory.fillDefaults()//
-						.span(2, 1)
-						.indent(_pc.convertWidthInCharsToPixels(3), 0)
-						.applyTo(_chkDrawWithDefaultColor);
-				_chkDrawWithDefaultColor
-						.setText(Messages.Slideout_ChartMarkerOptions_Checkbox_IsShowMarkerWithDefaultColor);
-				_chkDrawWithDefaultColor
-						.setToolTipText(Messages.Slideout_ChartMarkerOptions_Checkbox_IsShowMarkerWithDefaultColor_Tooltip);
-				_chkDrawWithDefaultColor.addSelectionListener(_defaultSelectionAdapter);
-			}
-
-			/*
-			 * Show hidden labels
-			 */
-			{
-				_chkShowHiddenMarker = new Button(container, SWT.CHECK);
-				GridDataFactory.fillDefaults()//
-						.span(2, 1)
-						.applyTo(_chkShowHiddenMarker);
-				_chkShowHiddenMarker.setText(Messages.Slideout_ChartMarkerOptions_Checkbox_IsShowHiddenMarker);
-				_chkShowHiddenMarker.addSelectionListener(_defaultSelectionAdapter);
-			}
-
-		}
-	}
-
-	private void createUI_20_TempPosition(final Composite parent) {
-
-		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
-		{
-			// show temp position
-			_chkShowLabelTempPosition = new Button(container, SWT.CHECK);
-			GridDataFactory.fillDefaults()//
-					.applyTo(_chkShowLabelTempPosition);
-			_chkShowLabelTempPosition.setText(Messages.Slideout_ChartMarkerOptions_Checkbox_IsShowTempPosition);
-			_chkShowLabelTempPosition.setToolTipText(//
-					Messages.Slideout_ChartMarkerOptions_Checkbox_IsShowTempPosition_Tooltip);
-			_chkShowLabelTempPosition.addSelectionListener(_defaultSelectionAdapter);
-
-			/*
-			 * Combo
-			 */
-			{
-				_comboLabelPosition = new Combo(container, SWT.DROP_DOWN | SWT.READ_ONLY);
-				_comboLabelPosition.setVisibleItemCount(20);
-				_comboLabelPosition.addSelectionListener(_defaultSelectionAdapter);
-			}
-		}
-	}
-
-	private void createUI_50_Bottom(final Composite parent) {
-
-		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults()//
 				.grab(true, false)
 //				.indent(0, _pc.convertVerticalDLUsToPixels(6))
@@ -321,12 +251,12 @@ public class SlideoutMarkerOptions extends AnimatedToolTipShell implements IColo
 				.applyTo(container);
 //		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
 		{
-			createUI_70_BottomLeft(container);
-			createUI_80_BottomRight(container);
+			createUI_20_Sizes(container);
+			createUI_30_Colors(container);
 		}
 	}
 
-	private void createUI_70_BottomLeft(final Composite parent) {
+	private void createUI_20_Sizes(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
@@ -358,12 +288,12 @@ public class SlideoutMarkerOptions extends AnimatedToolTipShell implements IColo
 			 */
 			{
 				// Label
-				final Label label = new Label(container, SWT.NONE);
+				_lblLabelOffset = new Label(container, SWT.NONE);
 				GridDataFactory.fillDefaults()//
 						.align(SWT.FILL, SWT.CENTER)
-						.applyTo(label);
-				label.setText(Messages.Slideout_ChartMarkerOptions_Label_Offset);
-				label.setToolTipText(Messages.Slideout_ChartMarkerOptions_Label_Offset_Tooltip);
+						.applyTo(_lblLabelOffset);
+				_lblLabelOffset.setText(Messages.Slideout_ChartMarkerOptions_Label_Offset);
+				_lblLabelOffset.setToolTipText(Messages.Slideout_ChartMarkerOptions_Label_Offset_Tooltip);
 
 				// Spinner
 				_spinLabelOffset = new Spinner(container, SWT.BORDER);
@@ -397,7 +327,7 @@ public class SlideoutMarkerOptions extends AnimatedToolTipShell implements IColo
 		}
 	}
 
-	private void createUI_80_BottomRight(final Composite parent) {
+	private void createUI_30_Colors(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults()//
@@ -477,13 +407,90 @@ public class SlideoutMarkerOptions extends AnimatedToolTipShell implements IColo
 		}
 	}
 
-	private void enableActions() {
+	private void createUI_50_Checkboxes(final Composite parent) {
+
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+		{
+			{
+				/*
+				 * Show labels
+				 */
+				// show label
+				_chkShowMarkerLabel = new Button(container, SWT.CHECK);
+				GridDataFactory.fillDefaults()//
+						.span(2, 1)
+						.applyTo(_chkShowMarkerLabel);
+				_chkShowMarkerLabel.setText(Messages.Slideout_ChartMarkerOptions_Checkbox_IsShowMarker);
+				_chkShowMarkerLabel.addSelectionListener(_defaultSelectionAdapter);
+			}
+
+			{
+				/*
+				 * Show hidden marker
+				 */
+				_chkShowHiddenMarker = new Button(container, SWT.CHECK);
+				GridDataFactory.fillDefaults()//
+						.span(2, 1)
+						.applyTo(_chkShowHiddenMarker);
+				_chkShowHiddenMarker.setText(Messages.Slideout_ChartMarkerOptions_Checkbox_IsShowHiddenMarker);
+				_chkShowHiddenMarker.addSelectionListener(_defaultSelectionAdapter);
+			}
+
+			{
+				/*
+				 * Draw marker with default color
+				 */
+				_chkDrawMarkerWithDefaultColor = new Button(container, SWT.CHECK);
+				GridDataFactory.fillDefaults()//
+						.span(2, 1)
+						.applyTo(_chkDrawMarkerWithDefaultColor);
+				_chkDrawMarkerWithDefaultColor
+						.setText(Messages.Slideout_ChartMarkerOptions_Checkbox_IsShowMarkerWithDefaultColor);
+				_chkDrawMarkerWithDefaultColor
+						.setToolTipText(Messages.Slideout_ChartMarkerOptions_Checkbox_IsShowMarkerWithDefaultColor_Tooltip);
+				_chkDrawMarkerWithDefaultColor.addSelectionListener(_defaultSelectionAdapter);
+			}
+		}
+	}
+
+	private void createUI_99_TempPosition(final Composite parent) {
+
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+		{
+			// show temp position
+			_chkShowLabelTempPosition = new Button(container, SWT.CHECK);
+			GridDataFactory.fillDefaults()//
+					.applyTo(_chkShowLabelTempPosition);
+			_chkShowLabelTempPosition.setText(Messages.Slideout_ChartMarkerOptions_Checkbox_IsShowTempPosition);
+			_chkShowLabelTempPosition.setToolTipText(//
+					Messages.Slideout_ChartMarkerOptions_Checkbox_IsShowTempPosition_Tooltip);
+			_chkShowLabelTempPosition.addSelectionListener(_defaultSelectionAdapter);
+
+			/*
+			 * Combo
+			 */
+			{
+				_comboLabelPosition = new Combo(container, SWT.DROP_DOWN | SWT.READ_ONLY);
+				_comboLabelPosition.setVisibleItemCount(20);
+				_comboLabelPosition.addSelectionListener(_defaultSelectionAdapter);
+			}
+		}
+	}
+
+	private void enableControls() {
 
 		final boolean isLabelVisible = _chkShowMarkerLabel.getSelection();
 		final boolean isShowTempPosition = _chkShowLabelTempPosition.getSelection();
 
-		_chkDrawWithDefaultColor.setEnabled(isLabelVisible);
 		_comboLabelPosition.setEnabled(isShowTempPosition);
+
+		_lblLabelOffset.setEnabled(isLabelVisible);
+
+		_spinLabelOffset.setEnabled(isLabelVisible);
 	}
 
 	private void fillUI() {
@@ -531,7 +538,7 @@ public class SlideoutMarkerOptions extends AnimatedToolTipShell implements IColo
 
 		final TourChartConfiguration tcc = _tourChart.getTourChartConfig();
 
-		final boolean isDrawLabelWithDefaultColor = _chkDrawWithDefaultColor.getSelection();
+		final boolean isDrawMarkerWithDefaultColor = _chkDrawMarkerWithDefaultColor.getSelection();
 		final boolean isShowHiddenMarker = _chkShowHiddenMarker.getSelection();
 		final boolean isShowMarkerLabel = _chkShowMarkerLabel.getSelection();
 		final boolean isShowTempPosition = _chkShowLabelTempPosition.getSelection();
@@ -552,7 +559,7 @@ public class SlideoutMarkerOptions extends AnimatedToolTipShell implements IColo
 		_prefStore.setValue(ITourbookPreferences.GRAPH_MARKER_LABEL_OFFSET, labelOffset);
 		_prefStore.setValue(ITourbookPreferences.GRAPH_MARKER_POINT_SIZE, markerPointSize);
 		_prefStore.setValue(ITourbookPreferences.GRAPH_MARKER_LABEL_TEMP_POSITION, tempPosition);
-		_prefStore.setValue(ITourbookPreferences.GRAPH_MARKER_IS_DRAW_WITH_DEFAULT_COLOR, isDrawLabelWithDefaultColor);
+		_prefStore.setValue(ITourbookPreferences.GRAPH_MARKER_IS_DRAW_WITH_DEFAULT_COLOR, isDrawMarkerWithDefaultColor);
 		_prefStore.setValue(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_HIDDEN_MARKER, isShowHiddenMarker);
 		_prefStore.setValue(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_MARKER_LABEL, isShowMarkerLabel);
 		_prefStore.setValue(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_LABEL_TEMP_POSITION, isShowTempPosition);
@@ -570,7 +577,7 @@ public class SlideoutMarkerOptions extends AnimatedToolTipShell implements IColo
 		/*
 		 * Update chart config
 		 */
-		tcc.isDrawLabelWithDefaultColor = isDrawLabelWithDefaultColor;
+		tcc.isDrawMarkerWithDefaultColor = isDrawMarkerWithDefaultColor;
 		tcc.isShowHiddenMarker = isShowHiddenMarker;
 		tcc.isShowMarkerLabel = isShowMarkerLabel;
 		tcc.isShowMarkerLabelTempPos = isShowTempPosition;
@@ -585,9 +592,9 @@ public class SlideoutMarkerOptions extends AnimatedToolTipShell implements IColo
 		tcc.markerColorHidden = hiddenColor;
 
 		// update chart with new settings
-		_tourChart.updateUI_MarkerOptions();
+		_tourChart.updateUI_MarkerLayer();
 
-		enableActions();
+		enableControls();
 	}
 
 	private void onDispose() {
@@ -656,7 +663,7 @@ public class SlideoutMarkerOptions extends AnimatedToolTipShell implements IColo
 
 		final TourChartConfiguration tcc = _tourChart.getTourChartConfig();
 
-		_chkDrawWithDefaultColor.setSelection(tcc.isDrawLabelWithDefaultColor);
+		_chkDrawMarkerWithDefaultColor.setSelection(tcc.isDrawMarkerWithDefaultColor);
 		_chkShowHiddenMarker.setSelection(tcc.isShowHiddenMarker);
 		_chkShowMarkerLabel.setSelection(tcc.isShowMarkerLabel);
 		_chkShowLabelTempPosition.setSelection(tcc.isShowMarkerLabelTempPos);

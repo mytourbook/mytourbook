@@ -245,8 +245,13 @@ public class ChartLayerMarker implements IChartLayer, IChartOverlay {
 
 			if (MARKER_POINT_SIZE > 0) {
 
+				if (_cmc.isDrawMarkerWithDefaultColor) {
+					gc.setBackground(colorDefault);
+				} else {
+					gc.setBackground(markerColor);
+				}
+
 				// draw marker point
-				gc.setBackground(markerColor);
 				gc.fillRectangle(//
 						devXMarker,
 						devYMarker,
@@ -263,7 +268,7 @@ public class ChartLayerMarker implements IChartLayer, IChartOverlay {
 					gc.setForeground(colorSelected);
 				} else {
 
-					if (_cmc.isDrawLabelWithDefaultColor) {
+					if (_cmc.isDrawMarkerWithDefaultColor) {
 						gc.setForeground(colorDefault);
 					} else {
 						gc.setForeground(markerColor);

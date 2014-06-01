@@ -114,7 +114,7 @@ import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 
-public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectionListener {
+public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectionListener, ITourMarkerModifyListener {
 
 	private static final String			DIALOG_SETTINGS_POSITION	= "marker_position";						//$NON-NLS-1$
 	private static final String			STATE_IMAGE_COLUMN_WIDTH	= "STATE_IMAGE_COLUMN_WIDTH";				//$NON-NLS-1$
@@ -145,8 +145,8 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
 	 */
 	private TourMarker					_backupMarker				= new TourMarker();
 
-	private Set<TourMarker>				_tourMarkers;
-	private HashSet<TourMarker>			_tourMarkersBackup;
+	private Set<TourMarker>				_originalTourMarkers;
+	private HashSet<TourMarker>			_dialogTourMarkers;
 
 	/**
 	 * initial tour marker
@@ -382,7 +382,7 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
 			if (_tourData == null) {
 				return new Object[0];
 			} else {
-				return _tourMarkers.toArray();
+				return _dialogTourMarkers.toArray();
 			}
 		}
 
@@ -418,17 +418,22 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
 		setDefaultImage(TourbookPlugin.getImageDescriptor(Messages.Image__edit_tour_marker).createImage());
 
 		_tourData = tourData;
-		_tourMarkers = _tourData.getTourMarkers();
+
+		// create a shallow copy
+		_originalTourMarkers = new HashSet<TourMarker>();
+		_originalTourMarkers.addAll(_tourData.getTourMarkers());
 
 		/*
 		 * make a backup copy of the tour markers, modify the original data so that the tour chart
 		 * displays the modifications
 		 */
-		_tourMarkersBackup = new HashSet<TourMarker>();
+		_dialogTourMarkers = new HashSet<TourMarker>();
 
-		for (final TourMarker tourMarker : _tourMarkers) {
-			_tourMarkersBackup.add(tourMarker.clone());
+		for (final TourMarker tourMarker : _originalTourMarkers) {
+			_dialogTourMarkers.add(tourMarker.clone());
 		}
+
+		_tourData.setTourMarkers(_dialogTourMarkers);
 
 		_initialTourMarker = initialTourMarker;
 	}
@@ -452,13 +457,13 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
 			final int lastMarkerIndex = _markerViewer.getTable().getSelectionIndex();
 
 			// update data model
-			_tourMarkers.remove(selectedMarker);
+			_dialogTourMarkers.remove(selectedMarker);
 
 			// update the viewer
 			_markerViewer.remove(selectedMarker);
 
 			// update chart
-			_tourChart.updateUI_LayerMarker(true);
+			_tourChart.updateUI_MarkerLayer(true);
 
 			// select next marker
 			TourMarker nextMarker = (TourMarker) _markerViewer.getElementAt(lastMarkerIndex);
@@ -506,7 +511,7 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
 
 	private void actionShowHideAll(final boolean isVisible) {
 
-		for (final TourMarker tourMarker : _tourMarkers) {
+		for (final TourMarker tourMarker : _dialogTourMarkers) {
 			tourMarker.setMarkerVisible(isVisible);
 		}
 
@@ -517,9 +522,9 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
 		updateUI_FromModel();
 
 		// viewer+chart
-		final TourMarker[] allTourMarker = _tourMarkers.toArray(new TourMarker[_tourMarkers.size()]);
+		final TourMarker[] allTourMarker = _dialogTourMarkers.toArray(new TourMarker[_dialogTourMarkers.size()]);
 		_markerViewer.update(allTourMarker, null);
-		_tourChart.updateUI_LayerMarker(true);
+		_tourChart.updateUI_MarkerLayer(true);
 
 		enableControls();
 	}
@@ -531,7 +536,7 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
 		}
 
 		// update data model, add new marker to the marker list
-		_tourMarkers.add(newTourMarker);
+		_dialogTourMarkers.add(newTourMarker);
 
 		// update the viewer and select the new marker
 		_markerViewer.refresh();
@@ -540,7 +545,7 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
 		_comboMarkerName.setFocus();
 
 		// update chart
-		_tourChart.updateUI_LayerMarker(true);
+		_tourChart.updateUI_MarkerLayer(true);
 	}
 
 	@Override
@@ -561,7 +566,7 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
 			 * when OK is not pressed, revert tour markers, this happens when the Cancel button is
 			 * pressed or when the window is closed
 			 */
-			_tourData.setTourMarkers(_tourMarkersBackup);
+			_tourData.setTourMarkers(_originalTourMarkers);
 		}
 
 		saveState();
@@ -1230,6 +1235,7 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
 
 		_tourChart.setIsDisplayedInDialog(true);
 		_tourChart.addTourMarkerSelectionListener(this);
+		_tourChart.addTourMarkerModifyListener(this);
 
 		// set title
 		_tourChart.addDataModelListener(new IDataModelListener() {
@@ -1682,7 +1688,7 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
 
 		updateModel_FromUI(_selectedTourMarker);
 
-		_tourChart.updateUI_LayerMarker(true);
+		_tourChart.updateUI_MarkerLayer(true);
 
 		_markerViewer.update(_selectedTourMarker, null);
 
@@ -1871,6 +1877,24 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
 		}
 	}
 
+	@Override
+	public void tourMarkerIsModified(final TourMarker tourMarker) {
+
+		// a tour marker is modified in the tour chart which is located in this dialog
+
+		/*
+		 * Update UI
+		 */
+		// controls
+		updateUI_FromModel();
+
+		// viewer + chart
+		_markerViewer.update(tourMarker, null);
+		_tourChart.updateUI_MarkerLayer(true);
+
+		enableControls();
+	}
+
 	private void updateModel_FromUI(final TourMarker tourMarker) {
 
 		if (tourMarker == null) {
@@ -1925,7 +1949,7 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
 
 		// update UI
 		_markerViewer.update(tourMarker, null);
-		_tourChart.updateUI_LayerMarker(true);
+		_tourChart.updateUI_MarkerLayer(true);
 	}
 
 	private void updateUI_TourSign(final TourMarker tourMarker) {

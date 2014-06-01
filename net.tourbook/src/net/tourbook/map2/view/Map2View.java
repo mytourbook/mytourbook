@@ -854,7 +854,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 			final TourData firstTourData = _allTourData.get(0);
 
 			paintTours_20_One(firstTourData, false, true);
-			setMapToSliderBounds(firstTourData);
+			positionMapTo_ValueIndex(firstTourData, _currentSelectedSliderValueIndex);
 		}
 	}
 
@@ -1125,6 +1125,19 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 				} else if (eventId == TourEventId.UPDATE_UI || eventId == TourEventId.CLEAR_DISPLAYED_TOUR) {
 
 					clearView();
+
+				} else if (eventId == TourEventId.MARKER_SELECTION) {
+
+					if (eventData instanceof SelectionTourMarker) {
+
+						final SelectionTourMarker tourMarkerSelection = (SelectionTourMarker) eventData;
+
+//						System.out.println((UI.timeStampNano() + " [" + Map2View.class.getSimpleName() + "] ")
+//								+ ("\ttourMarkerSelection"));
+//						// TODO remove SYSTEM.OUT.PRINTLN
+
+						onSelectionChanged_TourMarker(tourMarkerSelection, false);
+					}
 
 				} else if (eventId == TourEventId.SLIDER_POSITION_CHANGED) {
 					onSelectionChanged((ISelection) eventData);
@@ -1928,7 +1941,8 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 
 	private void onSelectionChanged(final ISelection selection) {
 
-//		System.out.println(net.tourbook.common.UI.timeStampNano() + " Map::onSelectionChanged\t" + selection);
+//		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
+//				+ ("\tonSelectionChanged: " + selection));
 //		// TODO remove SYSTEM.OUT.PRINTLN
 
 		if (_isPartVisible == false) {
@@ -2024,7 +2038,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 
 						final SelectionChartInfo chartInfo = (SelectionChartInfo) selection;
 
-						paintTourSliders(
+						positionMapTo_TourSliders(
 								tourData,
 								chartInfo.leftSliderValuesIndex,
 								chartInfo.rightSliderValuesIndex,
@@ -2058,7 +2072,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 							? leftSliderValueIndex
 							: rightSliderValueIndex;
 
-					paintTourSliders(//
+					positionMapTo_TourSliders(//
 							tourData,
 							leftSliderValueIndex,
 							rightSliderValueIndex,
@@ -2072,28 +2086,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 
 			final SelectionTourMarker markerSelection = (SelectionTourMarker) selection;
 
-			final ArrayList<TourMarker> tourMarker = markerSelection.getTourMarker();
-			final int numberOfTourMarkers = tourMarker.size();
-
-			int leftSliderValueIndex = 0;
-			int rightSliderValueIndex = 0;
-
-			if (numberOfTourMarkers == 1) {
-
-				leftSliderValueIndex = tourMarker.get(0).getSerieIndex();
-				rightSliderValueIndex = leftSliderValueIndex;
-
-			} else if (numberOfTourMarkers > 1) {
-
-				leftSliderValueIndex = tourMarker.get(0).getSerieIndex();
-				rightSliderValueIndex = tourMarker.get(numberOfTourMarkers - 1).getSerieIndex();
-			}
-
-			paintTourSliders(//
-					markerSelection.getTourData(),
-					leftSliderValueIndex,
-					rightSliderValueIndex,
-					leftSliderValueIndex);
+			onSelectionChanged_TourMarker(markerSelection, true);
 
 		} else if (selection instanceof SelectionMapPosition) {
 
@@ -2106,7 +2099,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 					? valueIndex1
 					: valueIndex2;
 
-			paintTourSliders(//
+			positionMapTo_TourSliders(//
 					mapPositionSelection.getTourData(),
 					valueIndex1,
 					valueIndex2,
@@ -2193,6 +2186,41 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 				enableActions();
 			}
 		}
+	}
+
+	private void onSelectionChanged_TourMarker(final SelectionTourMarker markerSelection, final boolean isDrawSlider) {
+
+		final TourData tourData = markerSelection.getTourData();
+		final ArrayList<TourMarker> tourMarker = markerSelection.getTourMarker();
+		final int numberOfTourMarkers = tourMarker.size();
+
+		int leftSliderValueIndex = 0;
+		int rightSliderValueIndex = 0;
+
+		if (numberOfTourMarkers == 1) {
+
+			leftSliderValueIndex = tourMarker.get(0).getSerieIndex();
+			rightSliderValueIndex = leftSliderValueIndex;
+
+		} else if (numberOfTourMarkers > 1) {
+
+			leftSliderValueIndex = tourMarker.get(0).getSerieIndex();
+			rightSliderValueIndex = tourMarker.get(numberOfTourMarkers - 1).getSerieIndex();
+		}
+
+		if (isDrawSlider) {
+
+			positionMapTo_TourSliders(//
+					tourData,
+					leftSliderValueIndex,
+					rightSliderValueIndex,
+					leftSliderValueIndex);
+
+		} else {
+
+			positionMapTo_ValueIndex(tourData, leftSliderValueIndex);
+		}
+
 	}
 
 	private void paintEntireTour() {
@@ -2545,43 +2573,6 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 		_map.paint();
 	}
 
-	private void paintTourSliders(	final TourData tourData,
-									final int leftSliderValuesIndex,
-									final int rightSliderValuesIndex,
-									final int selectedSliderIndex) {
-
-		_isTourOrWayPoint = true;
-
-		if (TourManager.isPaintDataValid(tourData) == false) {
-			showDefaultMap(_isShowPhoto);
-			return;
-		}
-
-		_currentLeftSliderValueIndex = leftSliderValuesIndex;
-		_currentRightSliderValueIndex = rightSliderValuesIndex;
-		_currentSelectedSliderValueIndex = selectedSliderIndex;
-
-		_directMappingPainter.setPaintContext(
-				_map,
-				_isShowTour,
-				tourData,
-				leftSliderValuesIndex,
-				rightSliderValuesIndex,
-				_actionShowSliderInMap.isChecked(),
-				_actionShowSliderInLegend.isChecked());
-
-		if (_isMapSynchedWithSlider) {
-
-			setMapToSliderBounds(tourData);
-
-			_map.paint();
-
-		} else {
-
-			_map.redraw();
-		}
-	}
-
 	@Override
 	public void photoEvent(final IViewPart viewPart, final PhotoEventId photoEventId, final Object data) {
 
@@ -2617,6 +2608,65 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 		_photoFilterRatingStarOperator = event.fiterRatingStarOperator;
 
 		updateFilteredPhotos();
+	}
+
+	private void positionMapTo_TourSliders(	final TourData tourData,
+											final int leftSliderValuesIndex,
+											final int rightSliderValuesIndex,
+											final int selectedSliderIndex) {
+
+		_isTourOrWayPoint = true;
+
+		if (TourManager.isPaintDataValid(tourData) == false) {
+			showDefaultMap(_isShowPhoto);
+			return;
+		}
+
+		_currentLeftSliderValueIndex = leftSliderValuesIndex;
+		_currentRightSliderValueIndex = rightSliderValuesIndex;
+		_currentSelectedSliderValueIndex = selectedSliderIndex;
+
+		_directMappingPainter.setPaintContext(
+				_map,
+				_isShowTour,
+				tourData,
+				leftSliderValuesIndex,
+				rightSliderValuesIndex,
+				_actionShowSliderInMap.isChecked(),
+				_actionShowSliderInLegend.isChecked());
+
+		if (_isMapSynchedWithSlider) {
+
+			positionMapTo_ValueIndex(tourData, _currentSelectedSliderValueIndex);
+
+			_map.paint();
+
+		} else {
+
+			_map.redraw();
+		}
+	}
+
+	/**
+	 * Calculate the bounds for the tour in latitude and longitude values
+	 * 
+	 * @param tourData
+	 * @param valueIndex
+	 * @return
+	 */
+	private void positionMapTo_ValueIndex(final TourData tourData, final int valueIndex) {
+
+		if (tourData == null || tourData.latitudeSerie == null) {
+			return;
+		}
+
+		final double[] latitudeSerie = tourData.latitudeSerie;
+		final double[] longitudeSerie = tourData.longitudeSerie;
+
+		final int sliderIndex = Math.max(0, Math.min(valueIndex, latitudeSerie.length - 1));
+
+		_map.setMapCenter(new GeoPosition(latitudeSerie[sliderIndex], longitudeSerie[sliderIndex]));
+
 	}
 
 	private void resetMap() {
@@ -2981,49 +3031,6 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 	@Override
 	public void setFocus() {
 		_map.setFocus();
-	}
-
-	/**
-	 * Calculate the bounds for the tour in latitude and longitude values
-	 * 
-	 * @param tourData
-	 * @return
-	 */
-	private void setMapToSliderBounds(final TourData tourData) {
-
-		if (tourData == null) {
-			return;
-		}
-
-		final double[] latitudeSerie = tourData.latitudeSerie;
-		final double[] longitudeSerie = tourData.longitudeSerie;
-
-//		final double leftSliderLat = latitudeSerie[fCurrentLeftSliderValueIndex];
-//		final double leftSliderLong = longitudeSerie[fCurrentLeftSliderValueIndex];
-//
-//		final double rightSliderLat = latitudeSerie[fCurrentRightSliderValueIndex];
-//		final double rightSliderLong = longitudeSerie[fCurrentRightSliderValueIndex];
-//
-//		final double minLatitude = Math.min(leftSliderLat + 0, rightSliderLat + 0);
-//		final double minLongitude = Math.min(leftSliderLong + 0, rightSliderLong + 0);
-//
-//		final double maxLatitude = Math.max(leftSliderLat + 0, rightSliderLat + 0);
-//		final double maxLongitude = Math.max(leftSliderLong + 0, rightSliderLong + 0);
-//
-//		final double latDiff2 = (maxLatitude - minLatitude) / 2;
-//		final double longDiff2 = (maxLongitude - minLongitude) / 2;
-//
-//		final double sliderLat = minLatitude + latDiff2 - 0;
-//		final double sliderLong = minLongitude + longDiff2 - 0;
-
-//		_map.setCenterPosition(new GeoPosition(sliderLat, sliderLong));
-//		_map.setCenterPosition(new GeoPosition(sliderLat, leftSliderLong));
-//		_map.setCenterPosition(new GeoPosition(leftSliderLat, leftSliderLong));
-
-		final int sliderIndex = Math.max(0, Math.min(_currentSelectedSliderValueIndex, latitudeSerie.length - 1));
-
-		_map.setMapCenter(new GeoPosition(latitudeSerie[sliderIndex], longitudeSerie[sliderIndex]));
-
 	}
 
 	private void setTourPainterColorProvider(final MapGraphId colorId) {

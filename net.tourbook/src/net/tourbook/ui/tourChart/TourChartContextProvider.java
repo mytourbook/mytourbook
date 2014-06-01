@@ -86,6 +86,11 @@ public class TourChartContextProvider implements IChartContextProvider, ITourPro
 
 		_tourChartViewer = tourChartViewer;
 
+		createActions();
+	}
+
+	private void createActions() {
+
 		_actionQuickEdit = new ActionEditQuick(_tourChartViewer);
 		_actionEditTour = new ActionEditTour(_tourChartViewer);
 		_actionOpenTour = new ActionOpenTour(_tourChartViewer);
@@ -148,15 +153,7 @@ public class TourChartContextProvider implements IChartContextProvider, ITourPro
 		/*
 		 * Check if a marker is hovered
 		 */
-		TourMarker tourMarker = null;
-		final ChartLabel hoveredChartMarker = tourChart.getHoveredMarker();
-
-		if (hoveredChartMarker != null) {
-			if (hoveredChartMarker.data instanceof TourMarker) {
-				tourMarker = (TourMarker) hoveredChartMarker.data;
-			}
-		}
-
+		final TourMarker tourMarker = tourChart.getHoveredTourMarker();
 		if (tourMarker != null) {
 
 			// a marker is hovered
@@ -171,6 +168,9 @@ public class TourChartContextProvider implements IChartContextProvider, ITourPro
 
 	private void fillContextMenu_Default(final IMenuManager menuMgr, final TourChart tourChart) {
 
+		/*
+		 * Show "Create Marker..." when a value point is hovered.
+		 */
 		final int vpIndex = tourChart.getHoveredValuePointIndex();
 		if (vpIndex != -1) {
 			_actionCreateMarkerFromValuePoint.setValuePointIndex(vpIndex);

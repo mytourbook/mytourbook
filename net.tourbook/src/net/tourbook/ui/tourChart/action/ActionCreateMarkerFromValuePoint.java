@@ -93,6 +93,8 @@ public class ActionCreateMarkerFromValuePoint extends Action {
 		}
 
 		final TourMarker newTourMarker = createTourMarker(tourData);
+
+		// check if a tour marker could be created
 		if (newTourMarker == null) {
 			return;
 		}

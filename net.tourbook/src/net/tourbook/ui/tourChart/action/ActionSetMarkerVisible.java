@@ -38,6 +38,12 @@ public class ActionSetMarkerVisible extends Action {
 		_tourChart.actionSetMarkerVisible(_tourMarker, _isMarkerVisible);
 	}
 
+	/**
+	 * Set {@link TourMarker} which is modified.
+	 * 
+	 * @param tourMarker
+	 * @param isMarkerVisible
+	 */
 	public void setTourMarker(final TourMarker tourMarker, final boolean isMarkerVisible) {
 
 		_tourMarker = tourMarker;

@@ -693,19 +693,16 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 
 	@Override
 	public String toString() {
-		return new StringBuilder()//
-				.append(TourMarker.class.getSimpleName())
-				.append(" id:") //$NON-NLS-1$
-				.append(markerId)
-				.append(" createId:") //$NON-NLS-1$
-				.append(_createId)
-				.append(" distance:") //$NON-NLS-1$
-				.append(distance20)
-				.append(" time:") //$NON-NLS-1$
-				.append(time)
-				.append(" serieIndex:") //$NON-NLS-1$
-				.append(serieIndex)
-				.toString();
+		return ""//
+				+ (TourMarker.class.getSimpleName())
+				+ (" serieIndex:" + serieIndex)
+				+ (" isVisible:" + isMarkerVisible())
+				+ (" id:" + markerId)
+				+ (" createId:" + _createId)
+				+ (" distance:" + distance20)
+				+ (" time:" + time)
+		//
+		;
 	}
 
 	@Override

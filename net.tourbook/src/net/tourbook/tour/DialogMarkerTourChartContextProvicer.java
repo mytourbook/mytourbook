@@ -24,6 +24,8 @@ import net.tourbook.data.TourMarker;
 import net.tourbook.ui.tourChart.TourChart;
 import net.tourbook.ui.tourChart.action.ActionCreateMarkerFromSlider;
 import net.tourbook.ui.tourChart.action.ActionCreateMarkerFromValuePoint;
+import net.tourbook.ui.tourChart.action.ActionSetMarkerLabelPositionMenu;
+import net.tourbook.ui.tourChart.action.ActionSetMarkerVisible;
 import net.tourbook.ui.tourChart.action.IMarkerReceiver;
 
 import org.eclipse.jface.action.IMenuManager;
@@ -38,6 +40,8 @@ class DialogMarkerTourChartContextProvicer implements IChartContextProvider, IMa
 	private ActionCreateMarkerFromSlider		_actionCreateMarkerFromSliderLeft;
 	private ActionCreateMarkerFromSlider		_actionCreateMarkerFromSliderRight;
 	private ActionCreateMarkerFromValuePoint	_actionCreateMarkerFromValuePoint;
+	private ActionSetMarkerVisible				_actionSetMarkerVisible;
+	private ActionSetMarkerLabelPositionMenu	_actionSetMarkerPosition;
 
 	private ChartXSlider						_leftSlider;
 	private ChartXSlider						_rightSlider;
@@ -48,6 +52,17 @@ class DialogMarkerTourChartContextProvicer implements IChartContextProvider, IMa
 	DialogMarkerTourChartContextProvicer(final DialogMarker markerDialog) {
 
 		_markerDialog = markerDialog;
+
+		createActions();
+	}
+
+	public void addTourMarker(final TourMarker tourMarker) {
+		_markerDialog.addTourMarker(tourMarker);
+	}
+
+	private void createActions() {
+
+		final TourChart tourChart = _markerDialog.getTourChart();
 
 		_actionCreateMarkerFromSlider = new ActionCreateMarkerFromSlider(
 				this,
@@ -72,10 +87,9 @@ class DialogMarkerTourChartContextProvicer implements IChartContextProvider, IMa
 		_actionCreateMarkerFromSliderLeft.setMarkerReceiver(this);
 		_actionCreateMarkerFromSliderRight.setMarkerReceiver(this);
 		_actionCreateMarkerFromValuePoint.setMarkerReceiver(this);
-	}
 
-	public void addTourMarker(final TourMarker tourMarker) {
-		_markerDialog.addTourMarker(tourMarker);
+		_actionSetMarkerVisible = new ActionSetMarkerVisible(tourChart);
+		_actionSetMarkerPosition = new ActionSetMarkerLabelPositionMenu(tourChart);
 	}
 
 	public void fillBarChartContextMenu(final IMenuManager menuMgr,
@@ -90,10 +104,24 @@ class DialogMarkerTourChartContextProvicer implements IChartContextProvider, IMa
 		final TourData tourData = tourChart.getTourData();
 
 		final int vpIndex = tourChart.getHoveredValuePointIndex();
-
 		if (vpIndex != -1) {
+
+			// a value point is hovered
+
 			_actionCreateMarkerFromValuePoint.setValuePointIndex(vpIndex);
+
 			menuMgr.add(_actionCreateMarkerFromValuePoint);
+		}
+		
+		final TourMarker tourMarker = tourChart.getHoveredTourMarker();
+
+		if (tourMarker != null) {
+
+			_actionSetMarkerVisible.setTourMarker(tourMarker, !tourMarker.isMarkerVisible());
+			_actionSetMarkerPosition.setTourMarker(tourMarker);
+
+			menuMgr.add(_actionSetMarkerVisible);
+			menuMgr.add(_actionSetMarkerPosition);
 		}
 
 		/*

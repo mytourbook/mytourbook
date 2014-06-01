@@ -77,7 +77,9 @@ public class ActionOpenMarkerDialog extends Action {
 		if (markerDialog.open() == Window.OK) {
 
 			if (isSaveTour) {
+
 				TourManager.saveModifiedTours(selectedTours);
+
 			} else {
 
 				/*
@@ -85,13 +87,31 @@ public class ActionOpenMarkerDialog extends Action {
 				 */
 				final TourDataEditorView tourDataEditor = TourManager.getTourDataEditor();
 				if (tourDataEditor != null) {
-
 					tourDataEditor.updateUI(tourData, true);
-
-					TourManager.fireEvent(TourEventId.TOUR_CHANGED, new TourEvent(tourData));
+					fireTourChangeEvent(tourData);
 				}
+
+//				fireTourChangeEvent(tourData);
 			}
+
+		} else {
+
+//			fireTourChangeEvent(tourData);
 		}
+	}
+
+	/**
+	 * This event must be event when the dialog is canceled because the original tour marker are
+	 * replaced with the backedup markers.
+	 * <p>
+	 * Views which contain the original {@link TourMarker}'s need to know that the list has changed
+	 * otherwise marker actions do fail, e.g. Set Marker Hidden in tour chart view.
+	 * 
+	 * @param tourData
+	 */
+	private static void fireTourChangeEvent(final TourData tourData) {
+
+		TourManager.fireEvent(TourEventId.TOUR_CHANGED, new TourEvent(tourData));
 	}
 
 	@Override

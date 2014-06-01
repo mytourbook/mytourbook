@@ -126,7 +126,7 @@ public class TourChartConfiguration {
 	 * When <code>true</code>, all marker label with be drawn with default colors, otherwise they
 	 * are drawn with device or hidden color.
 	 */
-	public boolean					isDrawLabelWithDefaultColor;
+	public boolean					isDrawMarkerWithDefaultColor;
 
 	/**
 	 * When <code>true</code> tour marker labels are displayed.
@@ -192,7 +192,7 @@ public class TourChartConfiguration {
 		markerPointSize = _prefStore.getInt(ITourbookPreferences.GRAPH_MARKER_POINT_SIZE);
 		markerLabelTempPos = _prefStore.getInt(ITourbookPreferences.GRAPH_MARKER_LABEL_TEMP_POSITION);
 
-		isDrawLabelWithDefaultColor = _prefStore
+		isDrawMarkerWithDefaultColor = _prefStore
 				.getBoolean(ITourbookPreferences.GRAPH_MARKER_IS_DRAW_WITH_DEFAULT_COLOR);
 		isShowHiddenMarker = _prefStore.getBoolean(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_HIDDEN_MARKER);
 		isShowMarkerLabel = _prefStore.getBoolean(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_MARKER_LABEL);
