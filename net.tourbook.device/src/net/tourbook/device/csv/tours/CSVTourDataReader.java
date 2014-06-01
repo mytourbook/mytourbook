@@ -60,6 +60,7 @@ public class CSVTourDataReader extends TourbookDevice {
 	 * <i>Paused Time (sec);</i>
 	 */
 	private static final String	TOUR_CSV_ID_2		= "Date (yyyy-mm-dd); Time (hh-mm); Duration (sec); Paused Time (sec); Distance (m); Title; Comment; Tour Type; Tags;"; //$NON-NLS-1$
+//	private static final String	TOUR_CSV_ID			= "Date (yyyy-mm-dd); Time (hh-mm); Duration (sec); Paused Time (sec), Distance (m); Title; Comment; Tour Type; Tags;"; //$NON-NLS-1$
 
 	private static final String	CSV_TOKEN_SEPARATOR	= ";";																													//$NON-NLS-1$
 	private static final String	CSV_TAG_SEPARATOR	= ",";																													//$NON-NLS-1$
@@ -115,9 +116,18 @@ public class CSVTourDataReader extends TourbookDevice {
 	private void parseDate(final DateTimeData dateTime, final String nextToken) {
 
 		// Date (yyyy-mm-dd)
-		dateTime.year = Integer.parseInt(nextToken.substring(0, 4));
-		dateTime.month = Integer.parseInt(nextToken.substring(5, 7));
-		dateTime.day = Integer.parseInt(nextToken.substring(8, 10));
+		dateTime.year = parseInteger(nextToken.substring(0, 4));
+		dateTime.month = parseInteger(nextToken.substring(5, 7));
+		dateTime.day = parseInteger(nextToken.substring(8, 10));
+	}
+
+	private int parseInteger(final String string) {
+
+		try {
+			return Integer.parseInt(string);
+		} catch (final Exception e) {
+			return 0;
+		}
 	}
 
 	/**
@@ -199,8 +209,8 @@ public class CSVTourDataReader extends TourbookDevice {
 	private void parseTime(final DateTimeData dateTime, final String nextToken) {
 
 		// Time (hh-mm)
-		dateTime.hour = Integer.parseInt(nextToken.substring(0, 2));
-		dateTime.minute = Integer.parseInt(nextToken.substring(3, 5));
+		dateTime.hour = parseInteger(nextToken.substring(0, 2));
+		dateTime.minute = parseInteger(nextToken.substring(3, 5));
 	}
 
 	/**
@@ -310,13 +320,13 @@ public class CSVTourDataReader extends TourbookDevice {
 							dateTime.minute,
 							0);
 
-					duration = Integer.parseInt(allToken[2]); //				3 Duration (sec);
+					duration = parseInteger(allToken[2]); //					3 Duration (sec);
 					tourData.setTourRecordingTime(duration);
 
-					pausedTime = Integer.parseInt(allToken[3]); //				4 Paused Time (sec),
+					pausedTime = parseInteger(allToken[3]); //					4 Paused Time (sec),
 					tourData.setTourDrivingTime(Math.max(0, duration - pausedTime));
 
-					distance = Integer.parseInt(allToken[4]);//					5 Distance (m);
+					distance = parseInteger(allToken[4]);//						5 Distance (m);
 					tourData.setTourDistance(distance);
 
 					tourData.setTourTitle(allToken[5]);//						6 Title;
