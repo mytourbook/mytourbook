@@ -581,12 +581,15 @@ public class ChartComponentGraph extends Canvas {
 
 				_isFocusActive = true;
 				_isSelectionDirty = true;
+
 				redraw();
 			}
 
 			public void focusLost(final FocusEvent e) {
+
 				_isFocusActive = false;
 				_isSelectionDirty = true;
+
 				redraw();
 			}
 		});
@@ -5820,13 +5823,13 @@ public class ChartComponentGraph extends Canvas {
 		_devYMouseMove = devYMouse;
 
 		boolean isRedraw = false;
-		boolean canShowHoveredTooltip = false;
+		boolean canShowHoveredValueTooltip = false;
 
 		if (_isXSliderVisible && _xSliderDragged != null) {
 
 			// x-slider is dragged
 
-			canShowHoveredTooltip = true;
+			canShowHoveredValueTooltip = true;
 
 			// keep position of the slider line
 			_devXDraggedXSliderLine = devXMouse;
@@ -5905,7 +5908,7 @@ public class ChartComponentGraph extends Canvas {
 				_isOverlayDirty = true;
 				isRedraw = true;
 
-				canShowHoveredTooltip = true;
+				canShowHoveredValueTooltip = true;
 
 			} else if (_isXSliderVisible && (xSlider = isXSliderHit(devXMouse, devYMouse)) != null) {
 
@@ -5927,7 +5930,7 @@ public class ChartComponentGraph extends Canvas {
 				// set cursor
 				setCursor(_cursorResizeLeftRight);
 
-				canShowHoveredTooltip = true;
+				canShowHoveredValueTooltip = true;
 
 			} else if (_mouseOverXSlider != null) {
 
@@ -5937,7 +5940,7 @@ public class ChartComponentGraph extends Canvas {
 				_isSliderDirty = true;
 				isRedraw = true;
 
-				canShowHoveredTooltip = true;
+				canShowHoveredValueTooltip = true;
 
 			} else if (_isYSliderVisible && isYSliderHit(devXMouse, devYMouse) != null) {
 
@@ -5951,7 +5954,7 @@ public class ChartComponentGraph extends Canvas {
 				_isSliderDirty = true;
 				isRedraw = true;
 
-				canShowHoveredTooltip = true;
+				canShowHoveredValueTooltip = true;
 
 			} else if (_chart._draggingListenerXMarker != null && isSynchMarkerHit(devXMouse)) {
 
@@ -5961,7 +5964,7 @@ public class ChartComponentGraph extends Canvas {
 
 				// cursor is already set
 
-				canShowHoveredTooltip = true;
+				canShowHoveredValueTooltip = true;
 
 			} else if (isBarHit(devXMouse, devYMouse)) {
 
@@ -5972,7 +5975,7 @@ public class ChartComponentGraph extends Canvas {
 
 			} else {
 
-				canShowHoveredTooltip = true;
+				canShowHoveredValueTooltip = true;
 
 				setCursorStyle(devYMouse);
 			}
@@ -6007,7 +6010,7 @@ public class ChartComponentGraph extends Canvas {
 					isRedraw = true;
 				}
 
-				if (hoveredListener != null && canShowHoveredTooltip) {
+				if (hoveredListener != null && canShowHoveredValueTooltip) {
 
 					hoveredListener.hoveredValue(
 							eventTime,
@@ -6260,11 +6263,6 @@ public class ChartComponentGraph extends Canvas {
 			_isSliderDirty = true;
 			redraw();
 
-		} else if ((mouseEvent = _chart.onExternalMouseUp(event.time & 0xFFFFFFFFL, devXMouse, devYMouse)).isWorked) {
-
-			setChartCursor(mouseEvent.cursor);
-			return;
-
 		} else if (_ySliderDragged != null) {
 
 			// y-slider is dragged, stop dragging
@@ -6291,6 +6289,11 @@ public class ChartComponentGraph extends Canvas {
 			_isChartDraggedStarted = false;
 
 			updateDraggedChart(_draggedChartDraggedPos.x - _draggedChartStartPos.x);
+
+		} else if ((mouseEvent = _chart.onExternalMouseUp(event.time & 0xFFFFFFFFL, devXMouse, devYMouse)).isWorked) {
+
+			setChartCursor(mouseEvent.cursor);
+			return;
 		}
 
 		setCursorStyle(devYMouse);
@@ -6600,10 +6603,11 @@ public class ChartComponentGraph extends Canvas {
 
 		final int devXViewPortWidth = getDevVisibleChartWidth();
 		double xxDevOffset = xxDevSliderLinePos;
+		final long xxDevCenter = xxDevSliderLinePos - devXViewPortWidth / 2;
 
 		if (isCenterSliderPosition) {
 
-			xxDevOffset = xxDevSliderLinePos - devXViewPortWidth / 2;
+			xxDevOffset = xxDevCenter;
 
 		} else {
 
@@ -6840,12 +6844,16 @@ public class ChartComponentGraph extends Canvas {
 		if (chartType == ChartType.LINE) {
 
 			if (_selectedXSlider == null) {
+
 				// set focus to the left slider when x-sliders are visible
 				if (_isXSliderVisible) {
+
 					_selectedXSlider = getLeftSlider();
 					isFocus = true;
 				}
+
 			} else if (_selectedXSlider != null) {
+
 				isFocus = true;
 			}
 
@@ -6890,9 +6898,9 @@ public class ChartComponentGraph extends Canvas {
 			isFocus = true;
 		}
 
-		if (isFocus) {
-			_chart.fireFocusEvent();
-		}
+//		if (isFocus) {
+//			_chart.fireFocusEvent();
+//		}
 
 		return isFocus;
 	}

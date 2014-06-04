@@ -543,10 +543,12 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 						final SelectionChartInfo chartInfo = (SelectionChartInfo) selection;
 
 						// set slider position
-						_tourChart.setXSliderPosition(new SelectionChartXSliderPosition(
+						final SelectionChartXSliderPosition xSliderPosition = new SelectionChartXSliderPosition(
 								_tourChart,
 								chartInfo.leftSliderValuesIndex,
-								chartInfo.rightSliderValuesIndex));
+								chartInfo.rightSliderValuesIndex);
+
+						_tourChart.selectMarker(xSliderPosition);
 					}
 				}
 			}
@@ -576,7 +578,7 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 				}
 			}
 
-			_tourChart.setXSliderPosition(xSliderPosition);
+			_tourChart.selectMarker(xSliderPosition);
 
 		} else if (selection instanceof StructuredSelection) {
 

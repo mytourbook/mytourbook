@@ -30,8 +30,8 @@ public class ChartMouseEvent {
 	 */
 	public boolean		isWorked;
 
-	public int			devYMouse;
 	public int			devXMouse;
+	public int			devYMouse;
 
 	/**
 	 * This cursor is displayed when {@link #isWorked} is <code>true</code>, can be
@@ -46,6 +46,7 @@ public class ChartMouseEvent {
 
 		type = eventType;
 		eventTime = time;
+
 		devXMouse = eventMouseX;
 		devYMouse = eventMouseY;
 	}

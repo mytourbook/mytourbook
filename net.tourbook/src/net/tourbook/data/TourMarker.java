@@ -34,9 +34,9 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
 import net.tourbook.Messages;
+import net.tourbook.common.UI;
 import net.tourbook.database.FIELD_VALIDATION;
 import net.tourbook.database.TourDatabase;
-import net.tourbook.ui.UI;
 import net.tourbook.ui.tourChart.ChartLabel;
 
 import org.eclipse.swt.graphics.Rectangle;
@@ -63,6 +63,9 @@ import org.eclipse.swt.graphics.Rectangle;
 @XmlRootElement(name = "TourMarker")
 @XmlAccessorType(XmlAccessType.NONE)
 public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializable {
+
+	public static final int			DB_LENGTH_URL_TEXT							= 1024;
+	public static final int			DB_LENGTH_URL_ADDRESS						= 4096;
 
 	/**
 	 * Visual position for markers, they must correspond to the position id LABEL_POS_*.
@@ -199,21 +202,25 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 	private String					category									= UI.EMPTY_STRING;
 
 	/**
-	 * Can be <code>null</code>.
-	 * <p>
-	 * <b>This field is not yet used, it is available because a {@link TourWayPoint} also contains a
-	 * comment field.</b>
+	 * Can be <code>null</code>
 	 * 
 	 * @since db version 24
 	 */
-	private String					comment;
+	private String					description;
 
 	/**
 	 * Can be <code>null</code>
 	 * 
 	 * @since db version 24
 	 */
-	private String					description;
+	private String					urlText;
+
+	/**
+	 * Can be <code>null</code>
+	 * 
+	 * @since db version 24
+	 */
+	private String					urlAddress;
 
 	private int						isMarkerVisible								= 1;
 
@@ -427,13 +434,17 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 		return type;
 	}
 
+	public String getUrlAddress() {
+		return urlAddress == null ? UI.EMPTY_STRING : urlAddress;
+	}
+
+	public String getUrlText() {
+		return urlText == null ? UI.EMPTY_STRING : urlText;
+	}
+
 	public int getVisibleType() {
 		return _visibleType;
 	}
-
-//	public void setCategory(final String category) {
-//		this.category = category;
-//	}
 
 	/**
 	 * !!!!!!!!!!!!!!!!!<br>
@@ -518,8 +529,7 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 		FIELD_VALIDATION fieldValidation = TourDatabase.isFieldValidForSave(
 				label,
 				TourWayPoint.DB_LENGTH_NAME,
-				Messages.Db_Field_TourData_Title,
-				false);
+				Messages.Db_Field_TourData_Title);
 
 		if (fieldValidation == FIELD_VALIDATION.IS_INVALID) {
 			return false;
@@ -528,33 +538,45 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 		}
 
 		/*
-		 * Check: comment
-		 */
-		fieldValidation = TourDatabase.isFieldValidForSave(
-				comment,
-				TourWayPoint.DB_LENGTH_COMMENT,
-				Messages.Db_Field_TourData_Title,
-				false);
-
-		if (fieldValidation == FIELD_VALIDATION.IS_INVALID) {
-			return false;
-		} else if (fieldValidation == FIELD_VALIDATION.TRUNCATE) {
-			comment = comment.substring(0, TourWayPoint.DB_LENGTH_COMMENT);
-		}
-
-		/*
 		 * Check: description
 		 */
 		fieldValidation = TourDatabase.isFieldValidForSave(
 				description,
 				TourWayPoint.DB_LENGTH_DESCRIPTION,
-				Messages.Db_Field_TourData_Title,
-				false);
+				Messages.Db_Field_TourData_Description);
 
 		if (fieldValidation == FIELD_VALIDATION.IS_INVALID) {
 			return false;
 		} else if (fieldValidation == FIELD_VALIDATION.TRUNCATE) {
 			description = description.substring(0, TourWayPoint.DB_LENGTH_DESCRIPTION);
+		}
+
+		/*
+		 * Check: url text
+		 */
+		fieldValidation = TourDatabase.isFieldValidForSave(
+				urlText,
+				DB_LENGTH_URL_TEXT,
+				Messages.Db_Field_TourMarker_UrlText);
+
+		if (fieldValidation == FIELD_VALIDATION.IS_INVALID) {
+			return false;
+		} else if (fieldValidation == FIELD_VALIDATION.TRUNCATE) {
+			urlText = urlText.substring(0, DB_LENGTH_URL_TEXT);
+		}
+
+		/*
+		 * Check: url address
+		 */
+		fieldValidation = TourDatabase.isFieldValidForSave(
+				urlAddress,
+				DB_LENGTH_URL_ADDRESS,
+				Messages.Db_Field_TourMarker_UrlAddress);
+
+		if (fieldValidation == FIELD_VALIDATION.IS_INVALID) {
+			return false;
+		} else if (fieldValidation == FIELD_VALIDATION.TRUNCATE) {
+			urlAddress = urlAddress.substring(0, DB_LENGTH_URL_ADDRESS);
 		}
 
 		return true;
@@ -568,8 +590,9 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 	public void restoreMarkerFromBackup(final TourMarker backupMarker) {
 
 		label = backupMarker.label;
-		comment = backupMarker.comment;
 		description = backupMarker.description;
+		urlText = backupMarker.urlText;
+		urlAddress = backupMarker.urlAddress;
 
 		distance20 = backupMarker.distance20;
 		labelXOffset = backupMarker.labelXOffset;
@@ -630,8 +653,9 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 	public void setMarkerBackup(final TourMarker backupMarker) {
 
 		backupMarker.label = label;
-		backupMarker.comment = comment;
 		backupMarker.description = description;
+		backupMarker.urlAddress = urlAddress;
+		backupMarker.urlText = urlText;
 
 		backupMarker.distance20 = distance20;
 		backupMarker.labelXOffset = labelXOffset;
@@ -687,20 +711,28 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 		this.tourSign = tourSign;
 	}
 
+	public void setUrlAddress(final String urlAddress) {
+		this.urlAddress = urlAddress;
+	}
+
+	public void setUrlText(final String urlText) {
+		this.urlText = urlText;
+	}
+
 	public void setVisibleType(final int visibleType) {
 		_visibleType = visibleType;
 	}
 
 	@Override
 	public String toString() {
-		return ""//
+		return ""// //$NON-NLS-1$
 				+ (TourMarker.class.getSimpleName())
-				+ (" serieIndex:" + serieIndex)
-				+ (" isVisible:" + isMarkerVisible())
-				+ (" id:" + markerId)
-				+ (" createId:" + _createId)
-				+ (" distance:" + distance20)
-				+ (" time:" + time)
+				+ (" serieIndex:" + serieIndex) //$NON-NLS-1$
+				+ (" isVisible:" + isMarkerVisible()) //$NON-NLS-1$
+				+ (" id:" + markerId) //$NON-NLS-1$
+				+ (" createId:" + _createId) //$NON-NLS-1$
+				+ (" distance:" + distance20) //$NON-NLS-1$
+				+ (" time:" + time) //$NON-NLS-1$
 		//
 		;
 	}

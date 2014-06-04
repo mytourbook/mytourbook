@@ -206,6 +206,7 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
 	private Combo						_comboSignPosition;
 
 	private Group						_groupLabel;
+	private Group						_groupUrl;
 	private Group						_groupSign;
 
 	private ImageCanvas					_imgTourSign;
@@ -215,6 +216,8 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
 	private Label						_lblLabelOffsetX;
 	private Label						_lblLabelOffsetY;
 	private Label						_lblLabelPosition;
+	private Label						_lblLinkText;
+	private Label						_lblLinkUrl;
 	private Label						_lblSign;
 	private Label						_lblSignName;
 	private Label						_lblSignOffsetX;
@@ -227,6 +230,8 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
 	private Spinner						_spinSignOffsetY;
 
 	private Text						_txtDescription;
+	private Text						_txtUrlAddress;
+	private Text						_txtUrlText;
 
 	{
 		_nf3.setMinimumFractionDigits(3);
@@ -901,7 +906,6 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
 			 */
 			_groupLabel = new Group(container, SWT.NONE);
 			GridDataFactory.fillDefaults()//
-//					.grab(true, false)
 					.span(2, 1)
 					.applyTo(_groupLabel);
 			_groupLabel.setText(Messages.Dlg_TourMarker_Group_Label);
@@ -916,7 +920,6 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
 			 */
 			_groupSign = new Group(container, SWT.NONE);
 			GridDataFactory.fillDefaults()//
-//					.grab(true, false)
 					.span(2, 1)
 					.applyTo(_groupSign);
 			_groupSign.setText(Messages.Dlg_TourMarker_Group_Sign);
@@ -924,6 +927,19 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
 			{
 				createUI_56_Sign(_groupSign);
 				createUI_57_Sign_Position(_groupSign);
+			}
+
+			/*
+			 * Sign
+			 */
+			_groupUrl = new Group(container, SWT.NONE);
+			GridDataFactory.fillDefaults()//
+					.span(2, 1)
+					.applyTo(_groupUrl);
+			_groupUrl.setText(Messages.Dlg_TourMarker_Group_Url);
+			GridLayoutFactory.swtDefaults().numColumns(2).applyTo(_groupUrl);
+			{
+				createUI_70_Links(_groupUrl);
 			}
 
 			createUI_58_Description(container);
@@ -1216,6 +1232,49 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
 					toggleMarkerVisibility();
 				}
 			});
+		}
+	}
+
+	private void createUI_70_Links(final Composite parent) {
+
+		/*
+		 * Link Text
+		 */
+		{
+			// label
+			_lblLinkText = new Label(parent, SWT.NONE);
+			GridDataFactory.fillDefaults()//
+					.align(SWT.BEGINNING, SWT.BEGINNING)
+					.applyTo(_lblLinkText);
+			_lblLinkText.setText(Messages.Dlg_TourMarker_Label_LinkText);
+			_lblLinkText.setToolTipText(Messages.Dlg_TourMarker_Label_LinkText_Tooltip);
+
+			// text
+			_txtUrlText = new Text(parent, SWT.BORDER);
+			GridDataFactory.fillDefaults()//
+					.grab(true, true)
+					.applyTo(_txtUrlText);
+			_txtUrlText.addModifyListener(_defaultModifyListener);
+		}
+
+		/*
+		 * Link Url
+		 */
+		{
+			// label
+			_lblLinkUrl = new Label(parent, SWT.NONE);
+			GridDataFactory.fillDefaults()//
+					.align(SWT.BEGINNING, SWT.BEGINNING)
+					.applyTo(_lblLinkUrl);
+			_lblLinkUrl.setText(Messages.Dlg_TourMarker_Label_LinkUrl);
+			_lblLinkUrl.setToolTipText(Messages.Dlg_TourMarker_Label_LinkUrl_Tooltip);
+
+			// text
+			_txtUrlAddress = new Text(parent, SWT.BORDER);
+			GridDataFactory.fillDefaults()//
+					.grab(true, true)
+					.applyTo(_txtUrlAddress);
+			_txtUrlAddress.addModifyListener(_defaultModifyListener);
 		}
 	}
 
@@ -1526,14 +1585,8 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
 
 	private void enableControls() {
 
-		final boolean areMarkersAvailable = _markerViewer.getTable().getItemCount() != 0;
 		final boolean isMarkerSelected = _selectedTourMarker != null;
-
-		boolean isMarkerVisible = false;
-		if (_selectedTourMarker != null) {
-			isMarkerVisible = _selectedTourMarker.isMarkerVisible();
-		}
-		final boolean isMarkerEnabled = isMarkerVisible && areMarkersAvailable;
+		final boolean isMarkerEnabled = _markerViewer.getTable().getItemCount() != 0;
 
 		if (isMarkerSelected) {
 			_btnUndo.setEnabled(_selectedTourMarker.isEqual(_backupMarker, true) == false);
@@ -1544,8 +1597,8 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
 		_chkVisibility.setEnabled(isMarkerSelected);
 
 		_btnDelete.setEnabled(isMarkerSelected);
-		_btnShowAll.setEnabled(areMarkersAvailable);
-		_btnHideAll.setEnabled(areMarkersAvailable);
+		_btnShowAll.setEnabled(isMarkerEnabled);
+		_btnHideAll.setEnabled(isMarkerEnabled);
 
 		_comboLabelPosition.setEnabled(isMarkerEnabled);
 		_comboMarkerName.setEnabled(isMarkerEnabled);
@@ -1574,6 +1627,8 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
 		_spinSignOffsetY.setEnabled(isMarkerEnabled);
 
 		_txtDescription.setEnabled(isMarkerEnabled);
+		_txtUrlAddress.setEnabled(isMarkerEnabled);
+		_txtUrlText.setEnabled(isMarkerEnabled);
 
 	}
 
@@ -1913,6 +1968,8 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
 		tourMarker.setSignYOffset(_spinSignOffsetY.getSelection());
 
 		tourMarker.setDescription(_txtDescription.getText());
+		tourMarker.setUrlAddress(_txtUrlAddress.getText());
+		tourMarker.setUrlText(_txtUrlText.getText());
 	}
 
 	/**
@@ -1937,6 +1994,8 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
 			_spinSignOffsetY.setSelection(_selectedTourMarker.getSignYOffset());
 
 			_txtDescription.setText(_selectedTourMarker.getDescription());
+			_txtUrlAddress.setText(_selectedTourMarker.getUrlAddress());
+			_txtUrlText.setText(_selectedTourMarker.getUrlText());
 
 			updateUI_TourSign(_selectedTourMarker);
 		}

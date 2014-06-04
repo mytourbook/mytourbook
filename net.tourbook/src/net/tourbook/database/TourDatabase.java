@@ -1081,6 +1081,19 @@ public class TourDatabase {
 	 * @param field
 	 * @param maxLength
 	 * @param uiFieldName
+	 * @return Returns {@link FIELD_VALIDATION} status
+	 */
+	public static FIELD_VALIDATION isFieldValidForSave(final String field, final int maxLength, final String uiFieldName) {
+
+		return isFieldValidForSave(field, maxLength, uiFieldName, false);
+	}
+
+	/**
+	 * Checks if a field exceeds the max length
+	 * 
+	 * @param field
+	 * @param maxLength
+	 * @param uiFieldName
 	 * @param isForceTruncation
 	 * @return Returns {@link FIELD_VALIDATION} status
 	 */
@@ -2508,7 +2521,8 @@ public class TourDatabase {
 				+ "	signXOffset					INTEGER DEFAULT 0,				\n" //$NON-NLS-1$
 				+ "	signYOffset					INTEGER DEFAULT 0,				\n" //$NON-NLS-1$
 				+ ("	description				" + varCharKomma(TourWayPoint.DB_LENGTH_DESCRIPTION)) //	//$NON-NLS-1$
-				+ ("	comment					" + varCharKomma(TourWayPoint.DB_LENGTH_COMMENT)) //		//$NON-NLS-1$
+				+ ("	urlText					" + varCharKomma(TourMarker.DB_LENGTH_URL_TEXT)) //			//$NON-NLS-1$
+				+ ("	urlAddress				" + varCharKomma(TourMarker.DB_LENGTH_URL_ADDRESS)) //		//$NON-NLS-1$
 				//
 				// Version 24 - end
 
@@ -4973,11 +4987,12 @@ public class TourDatabase {
 //				//
 //				+ "	" + (TABLE_TOUR_SIGN + "_signId	BIGINT,						\n") //$NON-NLS-1$ //$NON-NLS-2$
 //				//
-//				+ "	signPosition				INTEGER,						\n" //$NON-NLS-1$
-//				+ "	signXOffset					INTEGER,						\n" //$NON-NLS-1$
-//				+ "	signYOffset					INTEGER,						\n" //$NON-NLS-1$
+//				+ "	signPosition				INTEGER DEFAULT 0,				\n" //$NON-NLS-1$
+//				+ "	signXOffset					INTEGER DEFAULT 0,				\n" //$NON-NLS-1$
+//				+ "	signYOffset					INTEGER DEFAULT 0,				\n" //$NON-NLS-1$
 //				+ ("	description				" + varCharKomma(TourWayPoint.DB_LENGTH_DESCRIPTION)) //	//$NON-NLS-1$
-//				+ ("	comment					" + varCharKomma(TourWayPoint.DB_LENGTH_COMMENT)) //		//$NON-NLS-1$
+//				+ ("	urlText					" + varCharKomma(TourMarker.DB_LENGTH_URL_TEXT)) //			//$NON-NLS-1$
+//				+ ("	urlAddress				" + varCharKomma(TourMarker.DB_LENGTH_URL_ADDRESS)) //		//$NON-NLS-1$
 //				//
 //				// Version 24 - end
 
@@ -4987,8 +5002,11 @@ public class TourDatabase {
 				final String manyToOne_TourSign = "TourSign_SignId"; //$NON-NLS-1$
 
 				sql_AddCol_BigInt(stmt, TABLE_TOUR_MARKER, manyToOne_TourSign);
+
 				sql_AddCol_VarCar(stmt, TABLE_TOUR_MARKER, "description", TourWayPoint.DB_LENGTH_DESCRIPTION); //$NON-NLS-1$
-				sql_AddCol_VarCar(stmt, TABLE_TOUR_MARKER, "comment", TourWayPoint.DB_LENGTH_COMMENT); //$NON-NLS-1$
+				sql_AddCol_VarCar(stmt, TABLE_TOUR_MARKER, "urlText", TourMarker.DB_LENGTH_URL_TEXT); //$NON-NLS-1$
+				sql_AddCol_VarCar(stmt, TABLE_TOUR_MARKER, "urlAddress", TourMarker.DB_LENGTH_URL_ADDRESS); //$NON-NLS-1$
+
 				sql_AddCol_Int(stmt, TABLE_TOUR_MARKER, "signPosition"); //$NON-NLS-1$
 				sql_AddCol_Int(stmt, TABLE_TOUR_MARKER, "signXOffset"); //$NON-NLS-1$
 				sql_AddCol_Int(stmt, TABLE_TOUR_MARKER, "signYOffset"); //$NON-NLS-1$

@@ -37,6 +37,7 @@ import net.tourbook.chart.IHoveredValueListener;
 import net.tourbook.chart.IMouseListener;
 import net.tourbook.chart.ITooltipOwner;
 import net.tourbook.chart.MouseAdapter;
+import net.tourbook.chart.SelectionChartXSliderPosition;
 import net.tourbook.common.PointLong;
 import net.tourbook.common.UI;
 import net.tourbook.common.action.ActionOpenPrefDialog;
@@ -147,7 +148,14 @@ public class TourChart extends Chart implements ITourProvider {
 	private boolean					_is2ndAltiLayerVisible;
 	private boolean					_isMouseModeSet;
 	private boolean					_isDisplayedInDialog;
+
 	private TourMarker				_firedTourMarker;
+
+	/**
+	 * The {@link TourMarker} selection state is <b>only</b> be displayed when the mouse is hovering
+	 * it.
+	 */
+	private TourMarker				_selectedTourMarker;
 
 	private ImageDescriptor			_imagePhoto								= TourbookPlugin
 																					.getImageDescriptor(Messages.Image__PhotoPhotos);
@@ -367,15 +375,15 @@ public class TourChart extends Chart implements ITourProvider {
 		_parent = parent;
 		_isShowActions = isShowActions;
 
-		/*
-		 * when the focus is changed, fire a tour chart selection, this is neccesarry to update the
-		 * tour markers when a tour chart got the focus
-		 */
-		addFocusListener(new Listener() {
-			public void handleEvent(final Event event) {
-//				fireTourChartSelection();
-			}
-		});
+//		/*
+//		 * when the focus is changed, fire a tour chart selection, this is neccesarry to update the
+//		 * tour markers when a tour chart got the focus
+//		 */
+//		addFocusListener(new Listener() {
+//			public void handleEvent(final Event event) {
+////				fireTourChartSelection();
+//			}
+//		});
 
 		addDisposeListener(new DisposeListener() {
 			public void widgetDisposed(final DisposeEvent e) {
@@ -446,8 +454,6 @@ public class TourChart extends Chart implements ITourProvider {
 		_photoTooltip = new ChartPhotoToolTip(this, _state);
 
 		_markerTooltip = new ChartMarkerToolTip(this);
-		_markerTooltip.setReceiveMouseMoveEvent(true);
-		_markerTooltip.setIsShowShellTrimStyle(false);
 
 		setHoveredListener(new HoveredValueListener());
 	}
@@ -1261,7 +1267,8 @@ public class TourChart extends Chart implements ITourProvider {
 			cmc.isDrawMarkerWithDefaultColor = _tcc.isDrawMarkerWithDefaultColor;
 			cmc.isShowHiddenMarker = _tcc.isShowHiddenMarker;
 			cmc.isShowMarkerLabel = _tcc.isShowMarkerLabel;
-			cmc.isShowMarkerLabelTempPos = _tcc.isShowMarkerLabelTempPos;
+			cmc.isShowMarkerTooltip = _tcc.isShowMarkerTooltip;
+			cmc.isShowLabelTempPos = _tcc.isShowLabelTempPos;
 
 			cmc.markerLabelTempPos = _tcc.markerLabelTempPos;
 
@@ -1277,7 +1284,7 @@ public class TourChart extends Chart implements ITourProvider {
 
 				// setup marker layer, a layer is created only once
 
-				_layerMarker = new ChartLayerMarker();
+				_layerMarker = new ChartLayerMarker(this);
 
 				// set overlay painter
 				addChartOverlay(_layerMarker);
@@ -1798,6 +1805,19 @@ public class TourChart extends Chart implements ITourProvider {
 		return tourMarker;
 	}
 
+//	ChartLabel getMarkerTooltipLabel() {
+//		return _tooltipLabel;
+//	}
+
+	ChartLayerMarker getLayerTourMarker() {
+
+		return _layerMarker;
+	}
+
+	public TourMarker getSelectedTourMarker() {
+		return _selectedTourMarker;
+	}
+
 	@Override
 	public ArrayList<TourData> getSelectedTours() {
 
@@ -1870,19 +1890,27 @@ public class TourChart extends Chart implements ITourProvider {
 			// notify the chart mouse listener that no other actions should be done
 			mouseEvent.isWorked = true;
 
+			_selectedTourMarker = tourMarker;
+
 			fireTourMarkerSelection(tourMarker);
 
 			_firedTourMarker = tourMarker;
+
+			// redraw chart
+			setChartOverlayDirty();
 		}
 	}
 
 	private void onMarkerMouseExit() {
 
-		// mouse has exited the chart, reset hovered marker
+		// mouse has exited the chart, reset hovered label
 
 		if (_layerMarker == null) {
 			return;
 		}
+
+		// disable selection
+		_selectedTourMarker = null;
 
 		_layerMarker.resetHoveredLabel();
 
@@ -1896,28 +1924,40 @@ public class TourChart extends Chart implements ITourProvider {
 			return;
 		}
 
-		final ChartLabel hoveredMarker = _layerMarker.getHoveredLabel(mouseEvent);
+		final ChartLabel hoveredLabel = _layerMarker.retrieveHoveredLabel(mouseEvent);
 
-		final boolean isMarkerHovered = hoveredMarker != null;
-		if (isMarkerHovered) {
+		final boolean isLabelHovered = hoveredLabel != null;
+
+		if (isLabelHovered) {
 
 			// set worked that no other actions are done in this event
-			mouseEvent.isWorked = isMarkerHovered;
+			mouseEvent.isWorked = isLabelHovered;
 			mouseEvent.cursor = ChartCursor.Arrow;
 		}
 
-// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-//
-//		if (getTourChartConfig().isShowTooltip) {
-//			_markerTooltip.showHoveredMarker(hoveredMarker);
-//		}
+		// check if the selected marker is hovered
+		final TourMarker hoveredMarker = getHoveredTourMarker();
+		if (_selectedTourMarker != null && (hoveredLabel == null) || (hoveredMarker != _selectedTourMarker)) {
+
+			_selectedTourMarker = null;
+
+			// redraw chart
+			setChartOverlayDirty();
+		}
+
+		// ensure that a selected tour marker is drawn in the overlay
+		if (_selectedTourMarker != null) {
+
+			// redraw chart
+			setChartOverlayDirty();
+		}
+
+		if (getTourChartConfig().isShowMarkerTooltip) {
+
+			// marker tooltip is displayed
+
+			_markerTooltip.open(hoveredLabel);
+		}
 	}
 
 	private void onMarkerMouseUp(final ChartMouseEvent mouseEvent) {
@@ -1926,7 +1966,7 @@ public class TourChart extends Chart implements ITourProvider {
 			return;
 		}
 
-		final ChartLabel hoveredLabel = _layerMarker.getHoveredLabel(mouseEvent);
+		final ChartLabel hoveredLabel = _layerMarker.retrieveHoveredLabel(mouseEvent);
 
 		final boolean isLabelHovered = hoveredLabel != null;
 		if (isLabelHovered) {
@@ -1935,6 +1975,9 @@ public class TourChart extends Chart implements ITourProvider {
 			mouseEvent.isWorked = isLabelHovered;
 			mouseEvent.cursor = ChartCursor.Arrow;
 
+			/*
+			 * Fire tourmarker selection
+			 */
 			final TourMarker hoveredTourMarker = getHoveredTourMarker();
 
 			// ensure that the tour marker selection is fired only once
@@ -2031,6 +2074,38 @@ public class TourChart extends Chart implements ITourProvider {
 
 		_photoTooltip.saveState();
 		_valuePointToolTip.saveState();
+	}
+
+	void selectMarker(final SelectionChartXSliderPosition xSliderPosition) {
+
+		// set position for the x-sliders
+		setXSliderPosition(xSliderPosition);
+
+		/*
+		 * Select tour marker
+		 */
+		if (_layerMarker != null) {
+
+			final int leftSliderValueIndex = xSliderPosition.getLeftSliderValueIndex();
+			if (leftSliderValueIndex != SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION) {
+
+				// check if a marker is selected
+				for (final TourMarker tourMarker : _tourData.getTourMarkers()) {
+
+					if (tourMarker.getSerieIndex() == leftSliderValueIndex) {
+
+						// marker is selected, get marker from chart label
+
+						_selectedTourMarker = tourMarker;
+
+						// redraw chart
+						setChartOverlayDirty();
+
+						break;
+					}
+				}
+			}
+		}
 	}
 
 	/**
@@ -2553,6 +2628,7 @@ public class TourChart extends Chart implements ITourProvider {
 		// set current tour data and chart config to new values
 		_tourData = newTourData;
 		_tcc = newChartConfig;
+		_selectedTourMarker = null;
 
 		final ChartDataModel newChartDataModel = TourManager.getInstance().createChartDataModel(
 				_tourData,
@@ -2602,7 +2678,6 @@ public class TourChart extends Chart implements ITourProvider {
 		}
 
 		_tourInfoToolTipProvider.setTourData(_tourData);
-
 		_valuePointToolTip.setTourData(_tourData);
 	}
 

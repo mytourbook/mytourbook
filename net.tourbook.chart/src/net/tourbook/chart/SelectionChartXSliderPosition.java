@@ -79,6 +79,10 @@ public class SelectionChartXSliderPosition implements ISelection {
 		return _chart;
 	}
 
+	/**
+	 * @return Returns the value index for the left slider or {@link #IGNORE_SLIDER_POSITION} when
+	 *         this value index should not be used.
+	 */
 	public int getLeftSliderValueIndex() {
 		return _leftSliderValueIndex;
 	}

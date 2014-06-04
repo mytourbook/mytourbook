@@ -34,9 +34,15 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Link;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
+
+import de.byteholder.geoclipse.util.Util;
 
 /**
  * created: 30.5.2014
@@ -52,8 +58,8 @@ public class ChartMarkerToolTip extends AnimatedToolTipShell {
 	private int					_defaultTextHeight;
 
 	private TourChart			_tourChart;
-	private ChartLabel			_hoveredLabel;
 
+	private ChartLabel			_hoveredLabel;
 	private TourMarker			_hoveredTourMarker;
 
 	/*
@@ -74,21 +80,29 @@ public class ChartMarkerToolTip extends AnimatedToolTipShell {
 		super(tourChart);
 
 		_tourChart = tourChart;
+
+		setReceiveMouseMoveEvent(true);
+		setIsShowShellTrimStyle(false);
+		setIsAnimateLocation(false);
 	}
 
 	@Override
 	protected void beforeHideToolTip() {
-//		reset(false);
+
+		_hoveredLabel = null;
+		_hoveredTourMarker = null;
 	}
 
 	@Override
 	protected boolean canShowToolTip() {
+
 		return _hoveredLabel != null;
 	}
 
 	private void checkTextControlSize(final Composite parent, final Text txtControl, final String text) {
 
 		Point defaultSize = txtControl.computeSize(SWT.DEFAULT, SWT.DEFAULT);
+
 		// check default width
 		if (defaultSize.x > _defaultTextWidth) {
 
@@ -136,6 +150,10 @@ public class ChartMarkerToolTip extends AnimatedToolTipShell {
 
 	@Override
 	protected Composite createToolTipContentArea(final Composite shell) {
+
+		setFadeInSteps(1);
+		setFadeOutSteps(10);
+		setFadeOutDelaySteps(20);
 
 		if (_hoveredLabel == null) {
 			return null;
@@ -221,6 +239,47 @@ public class ChartMarkerToolTip extends AnimatedToolTipShell {
 				txtDescription.setText(markerDescription);
 
 				checkTextControlSize(container, txtDescription, markerDescription);
+			}
+
+			/*
+			 * Url
+			 */
+			final String urlText = _hoveredTourMarker.getUrlText();
+			final String urlAddress = _hoveredTourMarker.getUrlAddress();
+			final boolean isText = urlText.length() > 0;
+			final boolean isAddress = urlAddress.length() > 0;
+
+			if (isText || isAddress) {
+
+				final Link linkUrl = new Link(container, SWT.NONE);
+				GridDataFactory.fillDefaults().applyTo(linkUrl);
+
+				linkUrl.addListener(SWT.Selection, new Listener() {
+					public void handleEvent(final Event event) {
+						onSelectUrl(event.text);
+					}
+				});
+
+				String linkText;
+
+				if (isAddress == false) {
+
+					// only text is in the link -> this is not a internet address but create a link of it
+
+					linkText = "<a href=\"" + urlText + "\">" + urlText + "</a>";
+
+				} else if (isText == false) {
+
+					linkText = "<a href=\"" + urlAddress + "\">" + urlAddress + "</a>";
+
+				} else {
+
+					linkText = "<a href=\"" + urlAddress + "\">" + urlText + "</a>";
+				}
+
+				linkUrl.setText(linkText);
+
+				setTextWidth(linkUrl, linkText);
 			}
 		}
 	}
@@ -323,14 +382,14 @@ public class ChartMarkerToolTip extends AnimatedToolTipShell {
 
 			// label is vertical
 
-			ttPosX = devHoveredX - tipWidth;
+			ttPosX = devHoveredX - tipWidth + 1;
 			ttPosY = devHoveredY;
 
 		} else {
 
 			// label is horizontal
 
-			ttPosX = devHoveredX - tipWidth;
+			ttPosX = devHoveredX - tipWidth + 1;
 			ttPosY = devHoveredY;
 		}
 
@@ -355,7 +414,14 @@ public class ChartMarkerToolTip extends AnimatedToolTipShell {
 //			ttPosY = aboveChart;
 //		}
 
-		return _tourChart.getChartComponents().getChartComponentGraph().toDisplay(ttPosX, ttPosY);
+		final Point ttLocation = _tourChart.getChartComponents().getChartComponentGraph().toDisplay(ttPosX, ttPosY);
+
+		return ttLocation;
+	}
+
+	public void hideMarkerTooltip() {
+
+		hide();
 	}
 
 	private void initUI(final Composite parent) {
@@ -376,17 +442,11 @@ public class ChartMarkerToolTip extends AnimatedToolTipShell {
 	@Override
 	protected void onMouseMoveInToolTip(final MouseEvent mouseEvent) {
 
-		if (_hoveredTourMarker != null && _hoveredTourMarker.getDescription().length() > 0) {
-
-			// allow the user to scroll the description text
-
-			return;
-		}
-
 		/*
-		 * Hide tooltip when mouse is hovering within the tooltip.
+		 * When in tooltip, the hovered label state is not displayed, keep it displayed
 		 */
-		reset(true);
+		final ChartLayerMarker markerLayer = _tourChart.getLayerTourMarker();
+		markerLayer.setTooltipLabel(_hoveredLabel);
 	}
 
 	private void onPaintShellContainer(final PaintEvent event) {
@@ -397,22 +457,39 @@ public class ChartMarkerToolTip extends AnimatedToolTipShell {
 		// draw border
 		gc.setForeground(_fgBorder);
 		gc.drawRectangle(0, 0, shellSize.x - 1, shellSize.y - 1);
-
 	}
 
-	public void reset(final boolean isHide) {
+	private void onSelectUrl(final String address) {
 
-		_hoveredLabel = null;
-		_hoveredTourMarker = null;
+		Util.openLink(Display.getCurrent().getActiveShell(), address);
+	}
 
-		if (isHide) {
-			hide();
+	void open(final ChartLabel hoveredLabel) {
+
+//		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
+//				+ ("\topen ")
+//				+ ("\thoveredLabel " + (hoveredLabel == null ? "null" : hoveredLabel.serieIndex))
+//				+ ("\t_hoveredLabel " + (_hoveredLabel == null ? "null" : _hoveredLabel.serieIndex))
+//				+ ("\tisTooltipClosing() " + isTooltipClosing())
+//		//
+//				);
+//		// TODO remove SYSTEM.OUT.PRINTLN
+
+		boolean isKeepOpened = false;
+
+		if (hoveredLabel != null && isTooltipClosing()) {
+
+			/**
+			 * This case occures when the tooltip is opened but is currently closing and the mouse
+			 * is moved from the tooltip back to the hovered label.
+			 * <p>
+			 * This prevents that when the mouse is over the hovered label but not moved, that the
+			 * tooltip keeps opened.
+			 */
+			isKeepOpened = true;
 		}
-	}
 
-	public void showHoveredMarker(final ChartLabel hoveredLabel) {
-
-		if (hoveredLabel == _hoveredLabel) {
+		if (hoveredLabel == _hoveredLabel && isKeepOpened == false) {
 			// nothing has changed
 			return;
 		}
@@ -421,20 +498,29 @@ public class ChartMarkerToolTip extends AnimatedToolTipShell {
 
 			// a marker is not hovered, hide tooltip
 
-			reset(true);
+			hideMarkerTooltip();
 
 		} else {
 
 			// another marker is hovered, show tooltip
 
-			if (_hoveredLabel != null) {
-				reset(true);
-			}
-
 			_hoveredLabel = hoveredLabel;
 			_hoveredTourMarker = getHoveredTourMarker();
 
 			showToolTip();
+		}
+	}
+
+	private void setTextWidth(final Control control, final String text) {
+
+		final Point defaultSize = control.computeSize(SWT.DEFAULT, SWT.DEFAULT);
+
+		// check default width
+		if (defaultSize.x > _defaultTextWidth) {
+
+			// limit width
+			final GridData gd = (GridData) control.getLayoutData();
+			gd.widthHint = _defaultTextWidth;
 		}
 	}
 

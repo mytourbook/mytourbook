@@ -23,8 +23,9 @@ public class ChartMarkerConfig {
 
 	public boolean						isDrawMarkerWithDefaultColor;
 	public boolean						isShowHiddenMarker;
+	public boolean						isShowLabelTempPos;
 	public boolean						isShowMarkerLabel	= true;
-	public boolean						isShowMarkerLabelTempPos;
+	public boolean						isShowMarkerTooltip;
 
 	public int							markerHoverSize;
 	public int							markerLabelOffset;

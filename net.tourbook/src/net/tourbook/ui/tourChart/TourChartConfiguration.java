@@ -133,10 +133,12 @@ public class TourChartConfiguration {
 	 */
 	public boolean					isShowMarkerLabel;
 
+	public boolean					isShowMarkerTooltip;
+
 	public int						markerHoverSize;
 	public int						markerLabelOffset;
 
-	public boolean					isShowMarkerLabelTempPos;
+	public boolean					isShowLabelTempPos;
 	public int						markerLabelTempPos;
 
 	/**
@@ -192,11 +194,12 @@ public class TourChartConfiguration {
 		markerPointSize = _prefStore.getInt(ITourbookPreferences.GRAPH_MARKER_POINT_SIZE);
 		markerLabelTempPos = _prefStore.getInt(ITourbookPreferences.GRAPH_MARKER_LABEL_TEMP_POSITION);
 
-		isDrawMarkerWithDefaultColor = _prefStore
-				.getBoolean(ITourbookPreferences.GRAPH_MARKER_IS_DRAW_WITH_DEFAULT_COLOR);
+		isDrawMarkerWithDefaultColor = _prefStore.getBoolean(//
+				ITourbookPreferences.GRAPH_MARKER_IS_DRAW_WITH_DEFAULT_COLOR);
 		isShowHiddenMarker = _prefStore.getBoolean(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_HIDDEN_MARKER);
 		isShowMarkerLabel = _prefStore.getBoolean(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_MARKER_LABEL);
-		isShowMarkerLabelTempPos = _prefStore.getBoolean(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_LABEL_TEMP_POSITION);
+		isShowMarkerTooltip = _prefStore.getBoolean(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_MARKER_TOOLTIP);
+		isShowLabelTempPos = _prefStore.getBoolean(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_LABEL_TEMP_POSITION);
 
 		markerColorDefault = PreferenceConverter.getColor(_prefStore,//
 				ITourbookPreferences.GRAPH_MARKER_COLOR_DEFAULT);

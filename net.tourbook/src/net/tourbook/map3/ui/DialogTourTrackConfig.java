@@ -1131,11 +1131,6 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 		saveState();
 	}
 
-	@Override
-	protected void onMouseMoveInToolTip(final MouseEvent mouseEvent) {
-
-	}
-
 	private void onSelectConfig() {
 
 		final int selectedIndex = _comboName.getSelectionIndex();
@@ -1520,7 +1515,7 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 	}
 
 	private void updateUI_Map3() {
-		
+
 		final Map3View map3View = Map3Manager.getMap3View();
 
 		if (map3View != null) {

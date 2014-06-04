@@ -442,6 +442,10 @@ public class Messages extends NLS {
 	public static String		Db_Field_TourData_TourImportFilePath;
 	public static String		Db_Field_TourData_Weather;
 
+	public static String	Db_Field_TourMarker_UrlAddress;
+
+	public static String	Db_Field_TourMarker_UrlText;
+
 	public static String		DeviceManager_Selection_device_is_not_selected;
 
 	public static String		Dialog_JoinTours_Checkbox_CreateTourMarker;
@@ -526,10 +530,21 @@ public class Messages extends NLS {
 	public static String		Dlg_TourMarker_Dlg_Message;
 	public static String		Dlg_TourMarker_Dlg_title;
 	public static String		Dlg_TourMarker_Group_Label;
+
 	public static String		Dlg_TourMarker_Group_Sign;
+
+	public static String	Dlg_TourMarker_Group_Url;
 	public static String		Dlg_TourMarker_Label_Comment;
 	public static String		Dlg_TourMarker_Label_Description;
 	public static String		Dlg_TourMarker_Label_horizontal_offset;
+
+	public static String	Dlg_TourMarker_Label_LinkText;
+
+	public static String	Dlg_TourMarker_Label_LinkText_Tooltip;
+
+	public static String	Dlg_TourMarker_Label_LinkUrl;
+
+	public static String	Dlg_TourMarker_Label_LinkUrl_Tooltip;
 	public static String		Dlg_TourMarker_Label_marker_name;
 	public static String		Dlg_TourMarker_Label_markers;
 	public static String		Dlg_TourMarker_Label_Name;
@@ -1102,12 +1117,11 @@ public class Messages extends NLS {
 
 	public static String		Slideout_ChartMarkerOptions_Checkbox_IsShowHiddenMarker;
 	public static String		Slideout_ChartMarkerOptions_Checkbox_IsShowMarker;
+	public static String		Slideout_ChartMarkerOptions_Checkbox_IsShowMarkerTooltip;
 	public static String		Slideout_ChartMarkerOptions_Checkbox_IsShowMarkerWithDefaultColor;
 	public static String		Slideout_ChartMarkerOptions_Checkbox_IsShowMarkerWithDefaultColor_Tooltip;
-
-	public static String	Slideout_ChartMarkerOptions_Checkbox_IsShowTempPosition;
-
-	public static String	Slideout_ChartMarkerOptions_Checkbox_IsShowTempPosition_Tooltip;
+	public static String		Slideout_ChartMarkerOptions_Checkbox_IsShowTempPosition;
+	public static String		Slideout_ChartMarkerOptions_Checkbox_IsShowTempPosition_Tooltip;
 	public static String		Slideout_ChartMarkerOptions_Label_DeviceMarkerColor;
 	public static String		Slideout_ChartMarkerOptions_Label_DeviceMarkerColor_Tooltip;
 	public static String		Slideout_ChartMarkerOptions_Label_HiddenMarkerColor;

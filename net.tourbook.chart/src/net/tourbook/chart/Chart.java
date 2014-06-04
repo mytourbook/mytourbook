@@ -37,7 +37,6 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.ToolBar;
 
 /**
@@ -71,7 +70,7 @@ public class Chart extends ViewForm {
 	private static final int		MouseExit							= 50;
 	private static final int		ChartResized						= 999;
 
-	private final ListenerList		_focusListeners						= new ListenerList();
+//	private final ListenerList		_focusListeners						= new ListenerList();
 	private final ListenerList		_barSelectionListeners				= new ListenerList();
 	private final ListenerList		_barDoubleClickListeners			= new ListenerList();
 	private final ListenerList		_sliderMoveListeners				= new ListenerList();
@@ -209,9 +208,9 @@ public class Chart extends ViewForm {
 		_barDoubleClickListeners.add(listener);
 	}
 
-	public void addFocusListener(final Listener listener) {
-		_focusListeners.add(listener);
-	}
+//	public void addFocusListener(final Listener listener) {
+//		_focusListeners.add(listener);
+//	}
 
 	public void addMouseChartListener(final IMouseListener mouseListener) {
 		_mouseChartListener.add(mouseListener);
@@ -539,18 +538,18 @@ public class Chart extends ViewForm {
 		}
 	}
 
-	void fireFocusEvent() {
-
-		final Object[] listeners = _focusListeners.getListeners();
-		for (final Object listener2 : listeners) {
-			final Listener listener = (Listener) listener2;
-			SafeRunnable.run(new SafeRunnable() {
-				public void run() {
-					listener.handleEvent(new Event());
-				}
-			});
-		}
-	}
+//	void fireFocusEvent() {
+//
+//		final Object[] listeners = _focusListeners.getListeners();
+//		for (final Object listener2 : listeners) {
+//			final Listener listener = (Listener) listener2;
+//			SafeRunnable.run(new SafeRunnable() {
+//				public void run() {
+//					listener.handleEvent(new Event());
+//				}
+//			});
+//		}
+//	}
 
 	public void fireSliderMoveEvent() {
 
@@ -869,9 +868,9 @@ public class Chart extends ViewForm {
 		_barDoubleClickListeners.remove(listener);
 	}
 
-	public void removeFocusListener(final Listener listener) {
-		_focusListeners.remove(listener);
-	}
+//	public void removeFocusListener(final Listener listener) {
+//		_focusListeners.remove(listener);
+//	}
 
 	public void removeMouseChartListener(final IMouseListener mouseListener) {
 		_mouseChartListener.remove(mouseListener);

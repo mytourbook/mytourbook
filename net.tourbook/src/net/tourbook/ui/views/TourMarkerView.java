@@ -823,7 +823,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 	}
 
 	/**
-	 * select the chart slider(s) according to the selected marker(s)
+	 * Fire a selection for the selected marker(s).
 	 */
 	private void fireSliderPosition(final StructuredSelection selection) {
 

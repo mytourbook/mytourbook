@@ -131,6 +131,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 				TourMarker.LABEL_POS_HORIZONTAL_ABOVE_GRAPH_CENTERED);
 		store.setDefault(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_HIDDEN_MARKER, false);
 		store.setDefault(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_MARKER_LABEL, true);
+		store.setDefault(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_MARKER_TOOLTIP, true);
 		store.setDefault(ITourbookPreferences.GRAPH_MARKER_IS_DRAW_WITH_DEFAULT_COLOR, true);
 		store.setDefault(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_LABEL_TEMP_POSITION, false);
 
