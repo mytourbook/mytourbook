@@ -28,6 +28,8 @@ public class Messages extends NLS {
 
 	public static String		Action_Sign_RemoveTourSign;
 
+	public static String	Action_Sign_SignPreferences;
+
 	public static String		Action_ToolTip_Hide;
 	public static String		Action_ToolTip_SetDefaults;
 
@@ -515,7 +517,6 @@ public class Messages extends NLS {
 	public static String		Dlg_AdjustAltitude_Radio_keep_start_altitude;
 	public static String		Dlg_AdjustAltitude_Radio_keep_start_altitude_tooltip;
 
-	public static String		Dlg_TourMarker_Action_SignPreferences;
 	public static String		Dlg_TourMarker_Button_delete;
 	public static String		Dlg_TourMarker_Button_delete_tooltip;
 	public static String		Dlg_TourMarker_Button_HideAllMarker;
@@ -538,6 +539,8 @@ public class Messages extends NLS {
 	public static String		Dlg_TourMarker_Label_Description;
 	public static String		Dlg_TourMarker_Label_horizontal_offset;
 
+	public static String	Dlg_TourMarker_Label_ImagePosition;
+
 	public static String	Dlg_TourMarker_Label_LinkText;
 
 	public static String	Dlg_TourMarker_Label_LinkText_Tooltip;
@@ -554,9 +557,9 @@ public class Messages extends NLS {
 	public static String		Dlg_TourMarker_Label_OffsetVertical;
 	public static String		Dlg_TourMarker_Label_OffsetVertical_Tooltip;
 	public static String		Dlg_TourMarker_Label_position;
-	public static String		Dlg_TourMarker_Label_Sign;
-	public static String		Dlg_TourMarker_Label_SignPosition;
 	public static String		Dlg_TourMarker_Label_vertical_offset;
+	public static String	Dlg_TourMarker_Link_Image;
+
 	public static String		Dlg_TourMarker_Link_Sign;
 	public static String		Dlg_TourMarker_MsgBox_delete_marker_message;
 	public static String		Dlg_TourMarker_MsgBox_delete_marker_title;
@@ -1196,6 +1199,8 @@ public class Messages extends NLS {
 
 	public static String		Tour_Action_Marker_SetLabelPosition;
 
+	public static String	Tour_Action_Marker_SetSignImage;
+
 	public static String		Tour_Action_Marker_SetVisible;
 
 	public static String		Tour_Action_MarkerOptions_Tooltip;
@@ -1280,6 +1285,10 @@ public class Messages extends NLS {
 	public static String		Tour_Marker_Column_km_tooltip;
 	public static String		Tour_Marker_Column_remark;
 	public static String		Tour_Marker_Column_time;
+
+	public static String	Tour_Marker_Column_Url_ShortCut;
+
+	public static String	Tour_Marker_Column_Url_Tooltip;
 	public static String		Tour_Marker_Column_vertical_offset;
 	public static String		Tour_Marker_Column_vertical_offset_tooltip;
 

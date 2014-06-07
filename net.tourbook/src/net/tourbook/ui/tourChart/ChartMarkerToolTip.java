@@ -15,10 +15,17 @@
  *******************************************************************************/
 package net.tourbook.ui.tourChart;
 
-import net.tourbook.chart.ColorCache;
-import net.tourbook.common.tooltip.AnimatedToolTipShell;
-import net.tourbook.data.TourMarker;
+import java.util.ArrayList;
 
+import net.tourbook.chart.ColorCache;
+import net.tourbook.common.UI;
+import net.tourbook.common.tooltip.AnimatedToolTipShell;
+import net.tourbook.data.TourData;
+import net.tourbook.data.TourMarker;
+import net.tourbook.tour.ActionOpenMarkerDialog;
+import net.tourbook.ui.ITourProvider;
+
+import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
@@ -41,39 +48,42 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.widgets.ToolBar;
 
 import de.byteholder.geoclipse.util.Util;
 
 /**
  * created: 30.5.2014
  */
-public class ChartMarkerToolTip extends AnimatedToolTipShell {
+public class ChartMarkerToolTip extends AnimatedToolTipShell implements ITourProvider {
 
-	private static final int	DEFAULT_TEXT_WIDTH	= 50;
-	private static final int	DEFAULT_TEXT_HEIGHT	= 20;
+	private static final int		DEFAULT_TEXT_WIDTH	= 50;
+	private static final int		DEFAULT_TEXT_HEIGHT	= 20;
 
-	private PixelConverter		_pc;
+	private int						_textStyle			= SWT.WRAP | SWT.MULTI | SWT.READ_ONLY | SWT.BORDER;
 
-	private int					_defaultTextWidth;
-	private int					_defaultTextHeight;
+	private PixelConverter			_pc;
 
-	private TourChart			_tourChart;
+	private int						_defaultTextWidth;
+	private int						_defaultTextHeight;
 
-	private ChartLabel			_hoveredLabel;
-	private TourMarker			_hoveredTourMarker;
+	private TourChart				_tourChart;
+
+	private ChartLabel				_hoveredLabel;
+	private TourMarker				_hoveredTourMarker;
+
+	private ActionOpenMarkerDialog	_actionOpenMarkerDialog;
 
 	/*
 	 * UI resources
 	 */
-	private final ColorCache	_colorCache			= new ColorCache();
-	private Color				_fgBorder;
-	private Color				_fgColor;
-	private Color				_bgColor;
+	private final ColorCache		_colorCache			= new ColorCache();
+	private Color					_fgBorder;
 
 	/*
 	 * UI controls
 	 */
-	private Composite			_shellContainer;
+	private Composite				_shellContainer;
 
 	public ChartMarkerToolTip(final TourChart tourChart) {
 
@@ -89,6 +99,11 @@ public class ChartMarkerToolTip extends AnimatedToolTipShell {
 	@Override
 	protected void beforeHideToolTip() {
 
+		/*
+		 * This is the tricky part that the hovered marker is reset before the tooltip is closed and
+		 * not when nothing is hovered. This ensures that the tooltip has a valid state.
+		 */
+
 		_hoveredLabel = null;
 		_hoveredTourMarker = null;
 	}
@@ -99,53 +114,13 @@ public class ChartMarkerToolTip extends AnimatedToolTipShell {
 		return _hoveredLabel != null;
 	}
 
-	private void checkTextControlSize(final Composite parent, final Text txtControl, final String text) {
+	private void createActions() {
 
-		Point defaultSize = txtControl.computeSize(SWT.DEFAULT, SWT.DEFAULT);
+		_actionOpenMarkerDialog = new ActionOpenMarkerDialog(this, true);
 
-		// check default width
-		if (defaultSize.x > _defaultTextWidth) {
-
-			// check default height
-			defaultSize = txtControl.computeSize(_defaultTextWidth, SWT.DEFAULT);
-			if (defaultSize.y > _defaultTextHeight) {
-
-				checkTextControlSize_RecreateWithVScroll(parent, txtControl, text, _defaultTextWidth);
-
-			} else {
-
-				// limit width
-				final GridData gd = (GridData) txtControl.getLayoutData();
-				gd.widthHint = _defaultTextWidth;
-			}
-
-		} else if (defaultSize.y > _defaultTextHeight) {
-
-			checkTextControlSize_RecreateWithVScroll(parent, txtControl, text, SWT.DEFAULT);
-		}
-	}
-
-	/**
-	 * Recreate text control with vertical scrollbar and limited height.
-	 * 
-	 * @param parent
-	 * @param txtControl
-	 * @param text
-	 * @param widthHint
-	 */
-	private void checkTextControlSize_RecreateWithVScroll(	final Composite parent,
-															Text txtControl,
-															final String text,
-															final int widthHint) {
-
-		txtControl.dispose();
-
-		txtControl = new Text(parent, SWT.WRAP | SWT.V_SCROLL);
-		GridDataFactory.fillDefaults()//
-				.hint(widthHint, _defaultTextHeight)
-				.applyTo(txtControl);
-
-		txtControl.setText(text);
+		// setup action for the current tour marker
+		_actionOpenMarkerDialog.setEnabled(true);
+		_actionOpenMarkerDialog.setTourMarker(_hoveredTourMarker);
 	}
 
 	@Override
@@ -170,7 +145,11 @@ public class ChartMarkerToolTip extends AnimatedToolTipShell {
 			}
 		});
 
+		createActions();
+
 		final Composite container = createUI(shell);
+
+		setColors(container);
 
 		return container;
 	}
@@ -190,8 +169,8 @@ public class ChartMarkerToolTip extends AnimatedToolTipShell {
 				// set margin to draw the border
 				.extendedMargins(1, 1, 1, 1)
 				.applyTo(_shellContainer);
-		_shellContainer.setForeground(_fgColor);
-		_shellContainer.setBackground(_bgColor);
+//		_shellContainer.setForeground(_fgColor);
+//		_shellContainer.setBackground(_bgColor);
 		_shellContainer.addPaintListener(new PaintListener() {
 			@Override
 			public void paintControl(final PaintEvent e) {
@@ -210,21 +189,28 @@ public class ChartMarkerToolTip extends AnimatedToolTipShell {
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridLayoutFactory.fillDefaults()//
 				.extendedMargins(5, 5, 5, 5)
-				.spacing(3, 1)
+//				.spacing(3, 1)
 				.numColumns(1)
 				.applyTo(container);
-//			container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
+		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_INFO_BACKGROUND));
 		{
-			/*
-			 * Name
-			 */
-			final String markerName = _hoveredTourMarker.getLabel();
-			if (markerName.length() > 0) {
+			final Composite topContainer = new Composite(container, SWT.NONE);
+			GridDataFactory.fillDefaults().grab(true, false).applyTo(topContainer);
+			GridLayoutFactory.fillDefaults().numColumns(2).applyTo(topContainer);
+			{
+				/*
+				 * Name
+				 */
+				final String markerName = _hoveredTourMarker.getLabel();
+				if (markerName.length() > 0) {
 
-				final Label lblName = new Label(container, SWT.NONE);
-				GridDataFactory.fillDefaults().applyTo(lblName);
+					final Label lblName = new Label(topContainer, SWT.NONE);
+					GridDataFactory.fillDefaults().applyTo(lblName);
 
-				lblName.setText(markerName);
+					lblName.setText(markerName);
+				}
+
+				createUI_20_Toolbar(topContainer);
 			}
 
 			/*
@@ -233,12 +219,13 @@ public class ChartMarkerToolTip extends AnimatedToolTipShell {
 			final String markerDescription = _hoveredTourMarker.getDescription();
 			if (markerDescription.length() > 0) {
 
-				final Text txtDescription = new Text(container, SWT.WRAP);
+				final Text txtDescription = new Text(container, _textStyle);
 				GridDataFactory.fillDefaults().applyTo(txtDescription);
 
+				txtDescription.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
 				txtDescription.setText(markerDescription);
 
-				checkTextControlSize(container, txtDescription, markerDescription);
+				setTextControlSize(container, txtDescription, markerDescription);
 			}
 
 			/*
@@ -279,9 +266,24 @@ public class ChartMarkerToolTip extends AnimatedToolTipShell {
 
 				linkUrl.setText(linkText);
 
-				setTextWidth(linkUrl, linkText);
+				setUrlWidth(linkUrl, linkText);
 			}
 		}
+	}
+
+	private void createUI_20_Toolbar(final Composite parent) {
+
+		/*
+		 * create toolbar
+		 */
+		final ToolBar toolbar = new ToolBar(parent, SWT.FLAT);
+		GridDataFactory.fillDefaults().applyTo(toolbar);
+
+		final ToolBarManager tbm = new ToolBarManager(toolbar);
+
+		tbm.add(_actionOpenMarkerDialog);
+
+		tbm.update(true);
 	}
 
 	/**
@@ -354,6 +356,15 @@ public class ChartMarkerToolTip extends AnimatedToolTipShell {
 	}
 
 	@Override
+	public ArrayList<TourData> getSelectedTours() {
+
+		final ArrayList<TourData> tours = new ArrayList<TourData>();
+		tours.add(_tourChart.getTourData());
+
+		return tours;
+	}
+
+	@Override
 	public Point getToolTipLocation(final Point tipSize) {
 
 		final Rectangle hoveredRect = getHoveredRect();
@@ -419,18 +430,13 @@ public class ChartMarkerToolTip extends AnimatedToolTipShell {
 		return ttLocation;
 	}
 
-	public void hideMarkerTooltip() {
-
-		hide();
-	}
-
 	private void initUI(final Composite parent) {
 
 		final Display display = parent.getDisplay();
 
 		_fgBorder = display.getSystemColor(SWT.COLOR_WIDGET_NORMAL_SHADOW);
-		_bgColor = display.getSystemColor(SWT.COLOR_WHITE);
-		_fgColor = display.getSystemColor(SWT.COLOR_DARK_GRAY);
+//		_bgColor = display.getSystemColor(SWT.COLOR_WHITE);
+//		_fgColor = display.getSystemColor(SWT.COLOR_DARK_GRAY);
 
 	}
 
@@ -462,6 +468,9 @@ public class ChartMarkerToolTip extends AnimatedToolTipShell {
 	private void onSelectUrl(final String address) {
 
 		Util.openLink(Display.getCurrent().getActiveShell(), address);
+
+		// close tooltip when a link is selected
+		hideNow();
 	}
 
 	void open(final ChartLabel hoveredLabel) {
@@ -498,7 +507,7 @@ public class ChartMarkerToolTip extends AnimatedToolTipShell {
 
 			// a marker is not hovered, hide tooltip
 
-			hideMarkerTooltip();
+			hide();
 
 		} else {
 
@@ -511,7 +520,65 @@ public class ChartMarkerToolTip extends AnimatedToolTipShell {
 		}
 	}
 
-	private void setTextWidth(final Control control, final String text) {
+	private void setColors(final Composite container) {
+		final Display display = container.getDisplay();
+
+		UI.setColorForAllChildren(
+				container,
+				display.getSystemColor(SWT.COLOR_INFO_FOREGROUND),
+				display.getSystemColor(SWT.COLOR_INFO_BACKGROUND));
+	}
+
+	private void setTextControlSize(final Composite parent, final Text txtControl, final String text) {
+
+		Point defaultSize = txtControl.computeSize(SWT.DEFAULT, SWT.DEFAULT);
+
+		// check default width
+		if (defaultSize.x > _defaultTextWidth) {
+
+			// check default height
+			defaultSize = txtControl.computeSize(_defaultTextWidth, SWT.DEFAULT);
+			if (defaultSize.y > _defaultTextHeight) {
+
+				setTextControlSize_RecreateWithVScroll(parent, txtControl, text, _defaultTextWidth);
+
+			} else {
+
+				// limit width
+				final GridData gd = (GridData) txtControl.getLayoutData();
+				gd.widthHint = _defaultTextWidth;
+			}
+
+		} else if (defaultSize.y > _defaultTextHeight) {
+
+			setTextControlSize_RecreateWithVScroll(parent, txtControl, text, SWT.DEFAULT);
+		}
+	}
+
+	/**
+	 * Recreate text control with vertical scrollbar and limited height.
+	 * 
+	 * @param parent
+	 * @param txtControl
+	 * @param text
+	 * @param widthHint
+	 */
+	private void setTextControlSize_RecreateWithVScroll(final Composite parent,
+														Text txtControl,
+														final String text,
+														final int widthHint) {
+
+		txtControl.dispose();
+
+		txtControl = new Text(parent, _textStyle | SWT.V_SCROLL);
+		GridDataFactory.fillDefaults()//
+				.hint(widthHint, _defaultTextHeight)
+				.applyTo(txtControl);
+
+		txtControl.setText(text);
+	}
+
+	private void setUrlWidth(final Control control, final String text) {
 
 		final Point defaultSize = control.computeSize(SWT.DEFAULT, SWT.DEFAULT);
 

@@ -796,26 +796,26 @@ public class UI {
 						| ColumnViewerEditor.KEYBOARD_ACTIVATION);
 	}
 
-	public static void setColorForAllChildren(final Control child, final Color fgColor, final Color bgColor) {
+	public static void setColorForAllChildren(final Control parent, final Color fgColor, final Color bgColor) {
 
-		child.setForeground(fgColor);
-		child.setBackground(bgColor);
+		parent.setForeground(fgColor);
+		parent.setBackground(bgColor);
 
-		if (child instanceof Composite) {
+		if (parent instanceof Composite) {
 
-			final Control[] children = ((Composite) child).getChildren();
+			final Control[] children = ((Composite) parent).getChildren();
 
-			for (final Control control : children) {
+			for (final Control child : children) {
 
-				if (control != null && control.isDisposed() == false //
+				if (child != null && child.isDisposed() == false //
 
-						// exclude controls
-						&& !control.getClass().equals(Combo.class)
-						&& !control.getClass().equals(Spinner.class)
+						// exclude controls which look ugly
+						&& !child.getClass().equals(Combo.class)
+						&& !child.getClass().equals(Spinner.class)
 				//
 				) {
 
-					setColorForAllChildren(control, fgColor, bgColor);
+					setColorForAllChildren(child, fgColor, bgColor);
 				}
 			}
 		}

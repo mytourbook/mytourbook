@@ -17,25 +17,27 @@ package net.tourbook.ui.tourChart.action;
 
 import net.tourbook.Messages;
 import net.tourbook.data.TourMarker;
-import net.tourbook.ui.tourChart.TourChart;
+import net.tourbook.ui.tourChart.ITourMarkerUpdater;
 
 import org.eclipse.jface.action.Action;
 
 public class ActionSetMarkerVisible extends Action {
 
-	private TourChart	_tourChart;
-	private boolean		_isMarkerVisible;
-	private TourMarker	_tourMarker;
+	private ITourMarkerUpdater	_tourMarkerUpdater;
+	private TourMarker			_tourMarker;
 
-	public ActionSetMarkerVisible(final TourChart tourChart) {
+	private boolean				_isMarkerVisible;
 
-		_tourChart = tourChart;
+	public ActionSetMarkerVisible(final ITourMarkerUpdater tourMarkerUpdater) {
+
+		_tourMarkerUpdater = tourMarkerUpdater;
 	}
 
 	@Override
 	public void run() {
 
-		_tourChart.actionSetMarkerVisible(_tourMarker, _isMarkerVisible);
+		_tourMarker.setMarkerVisible(_isMarkerVisible);
+		_tourMarkerUpdater.updateModifiedTourMarker(_tourMarker);
 	}
 
 	/**

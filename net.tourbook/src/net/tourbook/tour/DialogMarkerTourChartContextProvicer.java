@@ -21,6 +21,7 @@ import net.tourbook.chart.ChartXSlider;
 import net.tourbook.chart.IChartContextProvider;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
+import net.tourbook.ui.tourChart.ITourMarkerUpdater;
 import net.tourbook.ui.tourChart.TourChart;
 import net.tourbook.ui.tourChart.action.ActionCreateMarkerFromSlider;
 import net.tourbook.ui.tourChart.action.ActionCreateMarkerFromValuePoint;
@@ -62,7 +63,7 @@ class DialogMarkerTourChartContextProvicer implements IChartContextProvider, IMa
 
 	private void createActions() {
 
-		final TourChart tourChart = _markerDialog.getTourChart();
+		final ITourMarkerUpdater tourMarkerUpdater = _markerDialog.getTourChart();
 
 		_actionCreateMarkerFromSlider = new ActionCreateMarkerFromSlider(
 				this,
@@ -88,8 +89,8 @@ class DialogMarkerTourChartContextProvicer implements IChartContextProvider, IMa
 		_actionCreateMarkerFromSliderRight.setMarkerReceiver(this);
 		_actionCreateMarkerFromValuePoint.setMarkerReceiver(this);
 
-		_actionSetMarkerVisible = new ActionSetMarkerVisible(tourChart);
-		_actionSetMarkerPosition = new ActionSetMarkerLabelPositionMenu(tourChart);
+		_actionSetMarkerVisible = new ActionSetMarkerVisible(tourMarkerUpdater);
+		_actionSetMarkerPosition = new ActionSetMarkerLabelPositionMenu(tourMarkerUpdater);
 	}
 
 	public void fillBarChartContextMenu(final IMenuManager menuMgr,

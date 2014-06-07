@@ -100,7 +100,7 @@ import org.eclipse.swt.widgets.Shell;
 /**
  * The tour chart extends the chart with all the functionality for a tour chart
  */
-public class TourChart extends Chart implements ITourProvider {
+public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdater {
 
 	private static final String		ID										= "net.tourbook.ui.tourChart";								//$NON-NLS-1$
 
@@ -495,21 +495,6 @@ public class TourChart extends Chart implements ITourProvider {
 		}
 
 		updateZoomOptionActionHandlers();
-	}
-
-	public void actionSetMarkerLabelPosition(final TourMarker tourMarker, final int labelPosId) {
-
-		tourMarker.setLabelPosition(labelPosId);
-
-		updateModifiedTourMarker(tourMarker);
-	}
-
-	public void actionSetMarkerVisible(final TourMarker tourMarker, final boolean isMarkerVisible) {
-
-		// modify tour marker
-		tourMarker.setMarkerVisible(isMarkerVisible);
-
-		updateModifiedTourMarker(tourMarker);
 	}
 
 	public void actionShowBreaktimeValues(final boolean isItemChecked) {
@@ -1309,7 +1294,9 @@ public class TourChart extends Chart implements ITourProvider {
 
 				String markerLabel = tourMarker.getLabel();
 				final boolean isDescription = tourMarker.getDescription().length() > 0;
-				if (isDescription) {
+				final boolean isUrlAddress = tourMarker.getUrlAddress().length() > 0;
+				final boolean isUrlText = tourMarker.getUrlText().length() > 0;
+				if (isDescription | isUrlAddress | isUrlText) {
 					markerLabel += UI.SPACE2 + UI.SYMBOL_FOOT_NOTE;
 				}
 
@@ -1328,7 +1315,7 @@ public class TourChart extends Chart implements ITourProvider {
 
 				final TourSign tourSign = tourMarker.getTourSign();
 				if (tourSign != null) {
-					chartLabel.markerSignImage = tourSign.getSignImagePhoto();
+					chartLabel.markerSignPhoto = tourSign.getSignImagePhoto();
 				}
 
 				cmc.chartLabels.add(chartLabel);
@@ -2537,14 +2524,12 @@ public class TourChart extends Chart implements ITourProvider {
 		redrawChart();
 	}
 
-	private void updateModifiedTourMarker(final TourMarker tourMarker) {
+	@Override
+	public void updateModifiedTourMarker(final TourMarker tourMarker) {
 
 		if (_isDisplayedInDialog) {
 
-//			// update only the marker layer
-//			updateUI_MarkerLayer();
-
-			// this will also update the chart
+			// this will update the chart
 			fireTourMarkerModifyEvent(tourMarker);
 
 		} else {

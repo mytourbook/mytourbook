@@ -1409,7 +1409,8 @@ public class PrefPageSigns extends PreferencePage implements IWorkbenchPreferenc
 							photoPosX,
 							photoPosY,
 							imageCanvasWidth,
-							imageCanvasHeight);
+							imageCanvasHeight,
+							SWT.CENTER);
 
 					break;
 				}

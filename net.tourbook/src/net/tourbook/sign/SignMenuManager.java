@@ -16,9 +16,11 @@
 package net.tourbook.sign;
 
 import net.tourbook.Messages;
+import net.tourbook.common.action.ActionOpenPrefDialog;
 import net.tourbook.data.TourSign;
 import net.tourbook.data.TourSignCategory;
-import net.tourbook.tour.DialogMarker;
+import net.tourbook.preferences.PrefPageSigns;
+import net.tourbook.tour.ITourSignSetter;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ActionContributionItem;
@@ -34,20 +36,20 @@ import org.eclipse.swt.widgets.MenuItem;
 
 public class SignMenuManager {
 
-	private DialogMarker	_dialogMarker;
+	private ITourSignSetter			_tourSignSetter;
 
-	ActionRemoveTourSign	_actionRemoveTourSign	= new ActionRemoveTourSign();
+	private ActionOpenPrefDialog	_actionOpenTourSignPrefs;
+	private ActionRemoveTourSign	_actionRemoveTourSign;
 
 	private class ActionRemoveTourSign extends Action {
 
 		public ActionRemoveTourSign() {
-
 			super(Messages.Action_Sign_RemoveTourSign, AS_PUSH_BUTTON);
 		}
 
 		@Override
 		public void run() {
-			_dialogMarker.actionRemoveTourSign();
+			_tourSignSetter.removeTourSign();
 		}
 	}
 
@@ -67,7 +69,7 @@ public class SignMenuManager {
 
 		@Override
 		public void run() {
-			_dialogMarker.actionSetTourSign(__tourSign);
+			_tourSignSetter.setTourSign(__tourSign);
 		}
 	}
 
@@ -129,16 +131,25 @@ public class SignMenuManager {
 		}
 	}
 
-	private void addActionToMenu(final Menu menu, final Action action) {
+	public SignMenuManager(final ITourSignSetter tourSignSetter) {
 
-		final ActionContributionItem item = new ActionContributionItem(action);
-		item.fill(menu, -1);
+		_tourSignSetter = tourSignSetter;
+
+		createActions();
 	}
 
-	private void fill_OtherActions(final IMenuManager menuMgr) {
+	private void addActionToMenu(final Menu menu, final Action action) {
+		new ActionContributionItem(action).fill(menu, -1);
+	}
 
-		menuMgr.add(new Separator());
-		menuMgr.add(_actionRemoveTourSign);
+	private ActionContributionItem contribItem(final Action action) {
+		return new ActionContributionItem(action);
+	}
+
+	private void createActions() {
+
+		_actionOpenTourSignPrefs = new ActionOpenPrefDialog(Messages.Action_Sign_SignPreferences, PrefPageSigns.ID);
+		_actionRemoveTourSign = new ActionRemoveTourSign();
 	}
 
 	private void fill_SignActions(final SignCollection signCollection, final IMenuManager menuMgr) {
@@ -174,17 +185,37 @@ public class SignMenuManager {
 	}
 
 	/**
+	 * Fill sign menu into a {@link IMenuManager}.
+	 * 
 	 * @param menuMgr
-	 * @param dialogMarker
 	 */
-	public void fillSignMenu(final IMenuManager menuMgr, final DialogMarker dialogMarker) {
-
-		_dialogMarker = dialogMarker;
+	public void fillSignMenu(final IMenuManager menuMgr) {
 
 		fill_SignCategoryActions(SignManager.getRootSigns(), menuMgr);
 		fill_SignActions(SignManager.getRootSigns(), menuMgr);
 
-		fill_OtherActions(menuMgr);
+		menuMgr.add(new Separator());
+		menuMgr.add(_actionRemoveTourSign);
+
+		menuMgr.add(new Separator());
+		menuMgr.add(_actionOpenTourSignPrefs);
+	}
+
+	/**
+	 * Fill sign menu into a {@link Menu} widget.
+	 * 
+	 * @param menu
+	 */
+	public void fillSignMenu(final Menu menu) {
+
+		fill_SignCategoryActions(SignManager.getRootSigns(), menu);
+		fill_SignActions(SignManager.getRootSigns(), menu);
+
+		(new Separator()).fill(menu, -1);
+		contribItem(_actionRemoveTourSign).fill(menu, -1);
+
+		(new Separator()).fill(menu, -1);
+		contribItem(_actionOpenTourSignPrefs).fill(menu, -1);
 	}
 
 	public void setEnabledRemoveTourSignAction(final boolean isEnabled) {

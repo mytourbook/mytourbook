@@ -860,6 +860,13 @@ public class Chart extends ViewForm {
 		_chartComponents.getChartComponentGraph().redrawChart();
 	}
 
+	/**
+	 * Make the custom layers dirty and redraw it.
+	 */
+	public void redrawLayer() {
+		_chartComponents.getChartComponentGraph().redrawLayer();
+	}
+
 	public void removeChartOverlay(final IChartOverlay chartOverlay) {
 		_chartOverlayListener.remove(chartOverlay);
 	}

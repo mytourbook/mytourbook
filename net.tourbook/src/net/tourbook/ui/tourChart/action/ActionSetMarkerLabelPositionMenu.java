@@ -19,7 +19,7 @@ import java.util.ArrayList;
 
 import net.tourbook.Messages;
 import net.tourbook.data.TourMarker;
-import net.tourbook.ui.tourChart.TourChart;
+import net.tourbook.ui.tourChart.ITourMarkerUpdater;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ActionContributionItem;
@@ -37,7 +37,7 @@ public class ActionSetMarkerLabelPositionMenu extends Action implements IMenuCre
 
 	private Menu						_menu;
 
-	private TourChart					_tourChart;
+	private ITourMarkerUpdater			_tourMarkerUpdater;
 	private TourMarker					_tourMarker;
 
 	private ArrayList<ContributionItem>	_allActions	= new ArrayList<ContributionItem>();
@@ -67,7 +67,10 @@ public class ActionSetMarkerLabelPositionMenu extends Action implements IMenuCre
 
 		@Override
 		public void run() {
-			_tourChart.actionSetMarkerLabelPosition(_tourMarker, labelPosId);
+
+			_tourMarker.setLabelPosition(labelPosId);
+
+			_tourMarkerUpdater.updateModifiedTourMarker(_tourMarker);
 		}
 	}
 
@@ -83,13 +86,13 @@ public class ActionSetMarkerLabelPositionMenu extends Action implements IMenuCre
 		public void run() {}
 	}
 
-	public ActionSetMarkerLabelPositionMenu(final TourChart tourChart) {
+	public ActionSetMarkerLabelPositionMenu(final ITourMarkerUpdater tourMarkerUpdater) {
 
 		super(Messages.Tour_Action_Marker_SetLabelPosition, AS_DROP_DOWN_MENU);
 
 		setMenuCreator(this);
 
-		_tourChart = tourChart;
+		_tourMarkerUpdater = tourMarkerUpdater;
 
 		createActions();
 	}

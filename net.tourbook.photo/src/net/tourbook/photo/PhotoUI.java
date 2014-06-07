@@ -26,6 +26,7 @@ import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.StyledString.Styler;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
@@ -103,7 +104,7 @@ public class PhotoUI {
 	public static void init() {}
 
 	/**
-	 * Paint photo image centered.
+	 * Paint photo image .
 	 * 
 	 * @param gc
 	 * @param photo
@@ -112,14 +113,20 @@ public class PhotoUI {
 	 * @param photoPosY
 	 * @param imageCanvasWidth
 	 * @param imageCanvasHeight
+	 * @param style
+	 *            Style how the image is painted in the image canvas:
+	 *            <p>
+	 *            {@link SWT#CENTER}, {@link SWT#TOP}<br>
+	 * @return Returns the rectangle where the image is painted.
 	 */
-	public static void paintPhotoImage(	final GC gc,
-										final Photo photo,
-										final Image signImage,
-										final int photoPosX,
-										final int photoPosY,
-										final int imageCanvasWidth,
-										final int imageCanvasHeight) {
+	public static Rectangle paintPhotoImage(final GC gc,
+											final Photo photo,
+											final Image signImage,
+											final int photoPosX,
+											final int photoPosY,
+											final int imageCanvasWidth,
+											final int imageCanvasHeight,
+											final int style) {
 
 		final Rectangle imageRect = signImage.getBounds();
 		final int _paintedImageWidth = imageRect.width;
@@ -139,12 +146,27 @@ public class PhotoUI {
 		final int centerOffsetX = (imageCanvasWidth - paintedDest_Width) / 2;
 		final int centerOffsetY = (imageCanvasHeight - paintedDest_Height) / 2;
 
-		final int paintedDest_DevX = photoPosX + centerOffsetX;
-		final int paintedDest_DevY = photoPosY + centerOffsetY;
+		int paintedDest_DevX = photoPosX;
+		int paintedDest_DevY = photoPosY;
+
+		if (style == SWT.TOP) {
+
+			paintedDest_DevX += centerOffsetX;
+
+		} else {
+
+			// default is centerd
+
+			paintedDest_DevX += centerOffsetX;
+			paintedDest_DevY += centerOffsetY;
+		}
 
 		try {
 
 			try {
+
+//				gc.setBackground(gc.getDevice().getSystemColor(SWT.COLOR_WIDGET_LIGHT_SHADOW));
+//				gc.fillRectangle(photoPosX, photoPosY, imageCanvasWidth, imageCanvasHeight);
 
 				gc.drawImage(signImage, //
 						0,
@@ -171,6 +193,14 @@ public class PhotoUI {
 
 			gc.drawString(e.getMessage(), photoPosX, photoPosY);
 		}
+
+		final Rectangle rectPainted = new Rectangle(
+				paintedDest_DevX,
+				paintedDest_DevY,
+				paintedDest_Width,
+				paintedDest_Height);
+
+		return rectPainted;
 	}
 
 	/**

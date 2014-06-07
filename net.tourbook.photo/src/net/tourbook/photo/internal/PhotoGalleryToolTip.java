@@ -640,18 +640,7 @@ public class PhotoGalleryToolTip extends AnimatedToolTipShell {
 		final Color bgColor = _gallery.getBackground();
 		final Color fgColor = _gallery.getForeground();
 
-		child.setBackground(bgColor);
-		child.setForeground(fgColor);
-
-		if (child instanceof Composite) {
-			final Control[] children = ((Composite) child).getChildren();
-			for (final Control element : children) {
-
-				if (element != null && element.isDisposed() == false) {
-					updateUI_colors(element);
-				}
-			}
-		}
+		UI.setColorForAllChildren(child, fgColor, bgColor);
 
 		if (_labelError != null && _labelError.isDisposed() == false) {
 //			_labelError.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
@@ -663,5 +652,7 @@ public class PhotoGalleryToolTip extends AnimatedToolTipShell {
 //		_canvasContainer.setBackground(_gallery.getBackground());
 
 	}
+
+
 
 }

@@ -6435,6 +6435,17 @@ public class ChartComponentGraph extends Canvas {
 		redraw();
 	}
 
+	void redrawLayer() {
+
+		if (isDisposed()) {
+			return;
+		}
+
+		_isCustomLayerImageDirty=true;
+		
+		redraw();
+	}
+
 	/**
 	 * set the slider position when the data model has changed
 	 */

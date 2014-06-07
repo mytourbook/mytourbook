@@ -73,6 +73,7 @@ public class TourWayPoint implements Cloneable, Comparable<Object>, IHoveredArea
 	private String			name;
 
 	private String			description;
+	private String			comment;
 	private String			symbol;
 	private String			category;
 
@@ -202,6 +203,10 @@ public class TourWayPoint implements Cloneable, Comparable<Object>, IHoveredArea
 		return category;
 	}
 
+	public String getComment() {
+		return comment;
+	}
+
 	/**
 	 * @return Returns a unique id for manually created way points because the {@link #wayPointId}
 	 *         is {@link TourDatabase#ENTITY_IS_NOT_SAVED} when it's not yet persisted
@@ -290,6 +295,10 @@ public class TourWayPoint implements Cloneable, Comparable<Object>, IHoveredArea
 		this.category = category;
 	}
 
+	public void setComment(final String comment) {
+		this.comment = comment;
+	}
+
 	public void setDescription(final String description) {
 		this.description = description;
 	}
@@ -340,6 +349,8 @@ public class TourWayPoint implements Cloneable, Comparable<Object>, IHoveredArea
 		sb.append(longitude);
 		sb.append("\tdesc:"); //$NON-NLS-1$
 		sb.append(description);
+		sb.append("\tcom:"); //$NON-NLS-1$
+		sb.append(comment);
 
 		return sb.toString();
 	}

@@ -24,34 +24,67 @@ import net.tourbook.chart.GraphDrawingData;
 import net.tourbook.chart.IChartLayer;
 import net.tourbook.chart.IChartOverlay;
 import net.tourbook.data.TourMarker;
+import net.tourbook.photo.ILoadCallBack;
+import net.tourbook.photo.Photo;
+import net.tourbook.photo.PhotoUI;
+import net.tourbook.sign.SignManager;
 
 import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Device;
 import org.eclipse.swt.graphics.GC;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.graphics.Region;
 import org.eclipse.swt.graphics.Transform;
+import org.eclipse.swt.widgets.Display;
 
 public class ChartLayerMarker implements IChartLayer, IChartOverlay {
 
 	private int					LABEL_OFFSET;
+
 	private int					MARKER_HOVER_SIZE;
 	private int					MARKER_POINT_SIZE;
-
 	private TourChart			_tourChart;
-	private ChartMarkerConfig	_cmc;
 
+	private ChartMarkerConfig	_cmc;
 	private boolean				_isVertical;
+
 	private int					_devXMarker;
 	private int					_devYMarker;
-
 	private long				_hoveredEventTime;
-	private ChartLabel			_hoveredLabel;
 
+	private ChartLabel			_hoveredLabel;
 	private ChartLabel			_tooltipLabel;
+
+	public class LoadImageCallback implements ILoadCallBack {
+
+		@Override
+		public void callBackImageIsLoaded(final boolean isImageLoaded) {
+
+			if (isImageLoaded == false) {
+				return;
+			}
+
+			// run in UI thread
+			Display.getDefault().syncExec(new Runnable() {
+
+				@Override
+				public void run() {
+
+					// ensure chart is still displayed
+					if (_tourChart.getShell().isDisposed()) {
+						return;
+					}
+
+					// paint image
+					_tourChart.redrawLayer();
+				}
+			});
+		}
+	}
 
 	public ChartLayerMarker(final TourChart tourChart) {
 
@@ -247,8 +280,8 @@ public class ChartLayerMarker implements IChartLayer, IChartOverlay {
 			 * Draw marker point
 			 */
 
-			final int devXMarker = _devXMarker - markerPointSize2 + 0;
-			final int devYMarker = _devYMarker - markerPointSize2 - 0;
+			final int devXMarker = _devXMarker - markerPointSize2;
+			final int devYMarker = _devYMarker - markerPointSize2;
 
 			chartLabel.devXMarker = devXMarker;
 			chartLabel.devYMarker = devYMarker;
@@ -423,6 +456,37 @@ public class ChartLayerMarker implements IChartLayer, IChartOverlay {
 							_devXMarker,
 							_devYMarker,
 							isTextBgTransparent);
+				}
+
+				final Photo signPhoto = chartLabel.markerSignPhoto;
+				if (signPhoto != null) {
+
+					// draw the sign image
+
+					final ILoadCallBack imageLoadCallback = new LoadImageCallback();
+					final Image signImage = SignManager.getPhotoImage(signPhoto, imageLoadCallback);
+
+					if (signImage != null && signImage.isDisposed() == false) {
+
+						final int imageCanvasWidth = 50;
+						final int imageCanvasHeight = 50;
+
+						// position photo on top, above the tour marker point and centered
+						final int photoPosX = chartLabel.devXMarker - imageCanvasWidth / 2 + MARKER_POINT_SIZE / 2;
+						final int photoPosY = devYTop;
+
+						final Rectangle rectPainted = PhotoUI.paintPhotoImage(
+								gc,
+								signPhoto,
+								signImage,
+								photoPosX,
+								photoPosY,
+								imageCanvasWidth,
+								imageCanvasHeight,
+								SWT.TOP);
+
+						chartLabel.devMarkerSignImageBounds = rectPainted;
+					}
 				}
 			}
 
@@ -648,6 +712,24 @@ public class ChartLayerMarker implements IChartLayer, IChartOverlay {
 
 				// marker point is hit
 				return chartLabel;
+			}
+
+			final Rectangle imageBounds = chartLabel.devMarkerSignImageBounds;
+			if (imageBounds != null) {
+
+				final int devXImage = imageBounds.x;
+				final int devYImage = imageBounds.y;
+				final int imageWidth = imageBounds.width;
+				final int imageHeight = imageBounds.height;
+
+				if (devXMouse > devXImage - MARKER_HOVER_SIZE
+						&& devXMouse < devXImage + imageWidth + MARKER_HOVER_SIZE
+						&& devYMouse > devYImage - MARKER_HOVER_SIZE
+						&& devYMouse < devYImage + imageHeight + MARKER_HOVER_SIZE) {
+
+					// marker sign image is hit
+					return chartLabel;
+				}
 			}
 		}
 

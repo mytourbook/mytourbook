@@ -175,9 +175,9 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 	private int						labelXOffset;
 	private int						labelYOffset;
 
-	private int						signPosition;
-	private int						signXOffset;
-	private int						signYOffset;
+//	private int						signPosition;
+//	private int						signXOffset;
+//	private int						signYOffset;
 
 	/**
 	 * Contains the type of the marker, this can be: crossing, hotel, view point.
@@ -406,17 +406,17 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 		return serieIndex;
 	}
 
-	public int getSignPosition() {
-		return signPosition;
-	}
-
-	public int getSignXOffset() {
-		return signXOffset;
-	}
-
-	public int getSignYOffset() {
-		return signYOffset;
-	}
+//	public int getSignPosition() {
+//		return signPosition;
+//	}
+//
+//	public int getSignXOffset() {
+//		return signXOffset;
+//	}
+//
+//	public int getSignYOffset() {
+//		return signYOffset;
+//	}
 
 	public int getTime() {
 		return time;
@@ -489,12 +489,12 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 			return false;
 		} else if (serieIndex != comparedMarker.serieIndex) {
 			return false;
-		} else if (signPosition != comparedMarker.signPosition) {
-			return false;
-		} else if (signXOffset != comparedMarker.signXOffset) {
-			return false;
-		} else if (signYOffset != comparedMarker.signYOffset) {
-			return false;
+//		} else if (signPosition != comparedMarker.signPosition) {
+//			return false;
+//		} else if (signXOffset != comparedMarker.signXOffset) {
+//			return false;
+//		} else if (signYOffset != comparedMarker.signYOffset) {
+//			return false;
 		} else if (time != comparedMarker.time) {
 			return false;
 		} else if ((isIgnoreType == false) && (type != comparedMarker.type)) {
@@ -686,17 +686,17 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 		this.serieIndex = serieIndex;
 	}
 
-	public void setSignPosition(final int signPosition) {
-		this.signPosition = signPosition;
-	}
-
-	public void setSignXOffset(final int signXOffset) {
-		this.signXOffset = signXOffset;
-	}
-
-	public void setSignYOffset(final int signYOffset) {
-		this.signYOffset = signYOffset;
-	}
+//	public void setSignPosition(final int signPosition) {
+//		this.signPosition = signPosition;
+//	}
+//
+//	public void setSignXOffset(final int signXOffset) {
+//		this.signXOffset = signXOffset;
+//	}
+//
+//	public void setSignYOffset(final int signYOffset) {
+//		this.signYOffset = signYOffset;
+//	}
 
 	/**
 	 * @param time

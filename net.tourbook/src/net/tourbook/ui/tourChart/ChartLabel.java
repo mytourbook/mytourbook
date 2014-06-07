@@ -21,6 +21,8 @@ package net.tourbook.ui.tourChart;
 import net.tourbook.common.UI;
 import net.tourbook.photo.Photo;
 
+import org.eclipse.swt.graphics.Rectangle;
+
 public class ChartLabel extends ChartMarker {
 
 	/**
@@ -57,7 +59,7 @@ public class ChartLabel extends ChartMarker {
 
 	public int				visualType;
 
-	public Photo			markerSignImage;
+	public Photo			markerSignPhoto;
 
 	/*
 	 * Painted marker positions
@@ -75,6 +77,11 @@ public class ChartLabel extends ChartMarker {
 
 	public int				devHoverSize;
 	public int				devMarkerPointSize;
+
+	/**
+	 * Bounds where the marker sign image is painted.
+	 */
+	public Rectangle		devMarkerSignImageBounds;
 
 	/**
 	 * Is <code>true</code> when the label is drawn vertically.

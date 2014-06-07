@@ -44,6 +44,7 @@ import net.tourbook.ui.tourChart.action.ActionCreateMarkerFromSlider;
 import net.tourbook.ui.tourChart.action.ActionCreateMarkerFromValuePoint;
 import net.tourbook.ui.tourChart.action.ActionCreateRefTour;
 import net.tourbook.ui.tourChart.action.ActionSetMarkerLabelPositionMenu;
+import net.tourbook.ui.tourChart.action.ActionSetMarkerSignMenu;
 import net.tourbook.ui.tourChart.action.ActionSetMarkerVisible;
 
 import org.eclipse.jface.action.IMenuManager;
@@ -71,6 +72,7 @@ public class TourChartContextProvider implements IChartContextProvider, ITourPro
 	private ActionSetTourTypeMenu				_actionSetTourType;
 	private ActionSetMarkerVisible				_actionSetMarkerVisible;
 	private ActionSetMarkerLabelPositionMenu	_actionSetMarkerPosition;
+	private ActionSetMarkerSignMenu				_actionSetMarkerSignMenu;
 
 	private TagMenuManager						_tagMenuMgr;
 
@@ -120,6 +122,7 @@ public class TourChartContextProvider implements IChartContextProvider, ITourPro
 
 		_actionSetMarkerVisible = new ActionSetMarkerVisible(tourChart);
 		_actionSetMarkerPosition = new ActionSetMarkerLabelPositionMenu(tourChart);
+		_actionSetMarkerSignMenu = new ActionSetMarkerSignMenu(tourChart);
 
 		_actionExportTour = new ActionExport(this);
 
@@ -158,7 +161,7 @@ public class TourChartContextProvider implements IChartContextProvider, ITourPro
 
 			// a marker is hovered
 
-			fillContextMenu_TourMarker(menuMgr, tourChart, tourMarker);
+			fillContextMenu_TourMarker(menuMgr, tourMarker);
 
 		} else {
 
@@ -235,9 +238,7 @@ public class TourChartContextProvider implements IChartContextProvider, ITourPro
 		TourTypeMenuManager.enableRecentTourTypeActions(isTourSaved, existingTourTypeId);
 	}
 
-	private void fillContextMenu_TourMarker(final IMenuManager menuMgr,
-											final TourChart tourChart,
-											final TourMarker tourMarker) {
+	private void fillContextMenu_TourMarker(final IMenuManager menuMgr, final TourMarker tourMarker) {
 
 		// setup actions
 		_actionOpenMarkerDialog.setTourMarker(tourMarker);
@@ -248,6 +249,7 @@ public class TourChartContextProvider implements IChartContextProvider, ITourPro
 		menuMgr.add(_actionOpenMarkerDialog);
 		menuMgr.add(_actionSetMarkerVisible);
 		menuMgr.add(_actionSetMarkerPosition);
+		menuMgr.add(_actionSetMarkerSignMenu);
 	}
 
 	@Override
