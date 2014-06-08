@@ -91,18 +91,23 @@ public class ActionSetMarkerSignMenu extends Action implements IMenuCreator, ITo
 
 	@Override
 	public void removeTourSign() {
-		// TODO Auto-generated method stub
 
+		_tourMarker.setTourSign(null);
+		_tourMarkerUpdater.updateModifiedTourMarker(_tourMarker);
 	}
 
 	public void setTourMarker(final TourMarker tourMarker) {
+
 		_tourMarker = tourMarker;
+
+		_signMenuManager.setTourSign(tourMarker.getTourSign());
 	}
 
 	@Override
 	public void setTourSign(final TourSign tourSign) {
-		// TODO Auto-generated method stub
 
+		_tourMarker.setTourSign(tourSign);
+		_tourMarkerUpdater.updateModifiedTourMarker(_tourMarker);
 	}
 
 }

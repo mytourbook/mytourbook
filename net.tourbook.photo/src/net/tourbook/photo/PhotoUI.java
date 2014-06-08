@@ -165,6 +165,9 @@ public class PhotoUI {
 
 			try {
 
+				gc.setAntialias(SWT.ON);
+				gc.setInterpolation(SWT.HIGH);
+
 //				gc.setBackground(gc.getDevice().getSystemColor(SWT.COLOR_WIDGET_LIGHT_SHADOW));
 //				gc.fillRectangle(photoPosX, photoPosY, imageCanvasWidth, imageCanvasHeight);
 

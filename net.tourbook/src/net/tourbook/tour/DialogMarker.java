@@ -203,7 +203,7 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
 	private Combo						_comboMarkerName;
 //	private Combo						_comboSignPosition;
 
-	private Group						_groupLabel;
+	private Group						_groupText;
 	private Group						_groupUrl;
 	private Group						_groupSign;
 
@@ -862,7 +862,7 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
 		 */
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults()//
-//				.grab(true, true)
+				.grab(true, true)
 				.applyTo(container);
 		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
 //		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
@@ -870,15 +870,30 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
 			/*
 			 * Label
 			 */
-			_groupLabel = new Group(container, SWT.NONE);
+			_groupText = new Group(container, SWT.NONE);
 			GridDataFactory.fillDefaults()//
 					.span(2, 1)
-					.applyTo(_groupLabel);
-			_groupLabel.setText(Messages.Dlg_TourMarker_Group_Label);
-			GridLayoutFactory.swtDefaults().numColumns(2).applyTo(_groupLabel);
+					.grab(true, true)
+					.applyTo(_groupText);
+			_groupText.setText(Messages.Dlg_TourMarker_Group_Label);
+			GridLayoutFactory.swtDefaults().numColumns(2).applyTo(_groupText);
 			{
-				createUI_52_Label_Name(_groupLabel);
-				createUI_53_Label_Position(_groupLabel);
+				createUI_52_Label_Title(_groupText);
+				createUI_54_Description(_groupText);
+				createUI_58_Label_Position(_groupText);
+			}
+
+			/*
+			 * Url
+			 */
+			_groupUrl = new Group(container, SWT.NONE);
+			GridDataFactory.fillDefaults()//
+					.span(2, 1)
+					.applyTo(_groupUrl);
+			_groupUrl.setText(Messages.Dlg_TourMarker_Group_Url);
+			GridLayoutFactory.swtDefaults().numColumns(2).applyTo(_groupUrl);
+			{
+				createUI_60_Links(_groupUrl);
 			}
 
 			/*
@@ -890,32 +905,18 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
 					.applyTo(_groupSign);
 			_groupSign.setText(Messages.Dlg_TourMarker_Group_Sign);
 			GridLayoutFactory.swtDefaults().numColumns(2).applyTo(_groupSign);
+
 			{
-				createUI_56_Sign(_groupSign);
-				createUI_57_Sign_Position(_groupSign);
+				createUI_62_Sign(_groupSign);
 			}
 
-			/*
-			 * Sign
-			 */
-			_groupUrl = new Group(container, SWT.NONE);
-			GridDataFactory.fillDefaults()//
-					.span(2, 1)
-					.applyTo(_groupUrl);
-			_groupUrl.setText(Messages.Dlg_TourMarker_Group_Url);
-			GridLayoutFactory.swtDefaults().numColumns(2).applyTo(_groupUrl);
-			{
-				createUI_70_Links(_groupUrl);
-			}
-
-			createUI_58_Description(container);
-			createUI_60_Visibility(container);
+			createUI_70_Visibility(container);
 		}
 
 		return container;
 	}
 
-	private void createUI_52_Label_Name(final Composite parent) {
+	private void createUI_52_Label_Title(final Composite parent) {
 
 		/*
 		 * Marker name
@@ -924,14 +925,14 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
 			// Label
 			_lblLabel = new Label(parent, SWT.NONE);
 			_firstColumnControls.add(_lblLabel);
-			_lblLabel.setText(Messages.Dlg_TourMarker_Label_Name);
+			_lblLabel.setText(Messages.Dlg_TourMarker_Label_Label);
 
 			// Combo
 			_comboMarkerName = new Combo(parent, SWT.BORDER | SWT.FLAT);
 			GridDataFactory.fillDefaults()//
 					// !!! hint must be set because the width is adjusted to the content
 					.hint(CONTENT_DEFAULT_WIDTH, SWT.DEFAULT)
-					.grab(true, true)
+					.grab(true, false)
 					.applyTo(_comboMarkerName);
 			_comboMarkerName.addKeyListener(new KeyAdapter() {
 				@Override
@@ -942,7 +943,35 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
 		}
 	}
 
-	private void createUI_53_Label_Position(final Composite parent) {
+	private void createUI_54_Description(final Composite parent) {
+
+		{
+			/*
+			 * Description
+			 */
+
+			// label
+			_lblDescription = new Label(parent, SWT.NONE);
+			GridDataFactory.fillDefaults()//
+					.align(SWT.BEGINNING, SWT.BEGINNING)
+					.applyTo(_lblDescription);
+			_lblDescription.setText(Messages.Dlg_TourMarker_Label_Description);
+
+			// text
+			_txtDescription = new Text(parent, SWT.BORDER //
+					| SWT.WRAP
+					| SWT.V_SCROLL
+					| SWT.H_SCROLL);
+			GridDataFactory.fillDefaults()//
+					.grab(true, true)
+					.hint(_pc.convertWidthInCharsToPixels(20), SWT.DEFAULT)
+					.minSize(SWT.DEFAULT, _pc.convertVerticalDLUsToPixels(20))
+					.applyTo(_txtDescription);
+			_txtDescription.addModifyListener(_defaultModifyListener);
+		}
+	}
+
+	private void createUI_58_Label_Position(final Composite parent) {
 
 		/*
 		 * Position
@@ -952,6 +981,7 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
 			_lblLabelPosition = new Label(parent, SWT.NONE);
 			_firstColumnControls.add(_lblLabelPosition);
 			_lblLabelPosition.setText(Messages.Dlg_TourMarker_Label_position);
+			_lblLabelPosition.setToolTipText(Messages.Dlg_TourMarker_Label_Position_Tooltip);
 
 			final Composite container = new Composite(parent, SWT.NONE);
 			GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
@@ -1024,187 +1054,7 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
 		}
 	}
 
-	private void createUI_56_Sign(final Composite parent) {
-
-		final SelectionAdapter imageSelectionListener = new SelectionAdapter() {
-			@Override
-			public void widgetSelected(final SelectionEvent e) {
-				UI.openControlMenu(_imgTourSign);
-			}
-		};
-
-		/*
-		 * Sign image
-		 */
-		{
-			// label
-			_linkImage = new Link(parent, SWT.NONE);
-			_firstColumnControls.add(_linkImage);
-			_linkImage.setText(Messages.Dlg_TourMarker_Link_Image);
-			_linkImage.addSelectionListener(imageSelectionListener);
-
-			final Composite signContainer = new Composite(parent, SWT.NONE);
-			GridDataFactory.fillDefaults()//
-					.grab(true, false)
-					.applyTo(signContainer);
-			GridLayoutFactory.fillDefaults().numColumns(2).applyTo(signContainer);
-//			signContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
-			{
-				/*
-				 * Image: sign image
-				 */
-				_imgTourSign = new ImageCanvas(signContainer, SWT.NONE);
-				GridDataFactory.fillDefaults()//
-						.hint(_pc.convertWidthInCharsToPixels(15), _pc.convertHeightInCharsToPixels(4))
-						.applyTo(_imgTourSign);
-				_imgTourSign.setStyle(SWT.CENTER | SWT.LEAD);
-				_imgTourSign.addSelectionListener(imageSelectionListener);
-				createContextMenu(_imgTourSign);
-
-				/*
-				 * Label: sign name
-				 */
-				_lblSignName = new Label(signContainer, SWT.NONE);
-				GridDataFactory.fillDefaults()//
-						.grab(true, false)
-						.align(SWT.FILL, SWT.CENTER)
-						.applyTo(_lblSignName);
-			}
-		}
-	}
-
-	private void createUI_57_Sign_Position(final Composite parent) {
-
-		/*
-		 * Position
-		 */
-//		{
-//			// label
-//			_lblSignPosition = new Label(parent, SWT.NONE);
-//			_firstColumnControls.add(_lblSignPosition);
-//			_lblSignPosition.setText(Messages.Dlg_TourMarker_Label_ImagePosition);
-//
-//			final Composite container = new Composite(parent, SWT.NONE);
-//			GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-//			GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
-//			{
-//				/*
-//				 * Combo
-//				 */
-//				{
-//					_comboSignPosition = new Combo(container, SWT.DROP_DOWN | SWT.READ_ONLY);
-//					_comboSignPosition.setVisibleItemCount(20);
-//					_comboSignPosition.addSelectionListener(_defaultSelectionAdapter);
-//				}
-//
-//				/*
-//				 * Offset
-//				 */
-//				final Composite valueContainer = new Composite(container, SWT.NONE);
-//				GridDataFactory.fillDefaults()//
-//						.grab(true, false)
-//						.align(SWT.END, SWT.FILL)
-//						.applyTo(valueContainer);
-//				GridLayoutFactory.fillDefaults().numColumns(4).applyTo(valueContainer);
-////				valueContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
-//				{
-//					/*
-//					 * Horizontal offset
-//					 */
-//					{
-//						// Label
-//						_lblSignOffsetX = new Label(valueContainer, SWT.NONE);
-//						GridDataFactory.fillDefaults()//
-//								.align(SWT.FILL, SWT.CENTER)
-////								.indent(_pc.convertWidthInCharsToPixels(2), 0)
-//								.applyTo(_lblSignOffsetX);
-//						_lblSignOffsetX.setText(Messages.Dlg_TourMarker_Label_OffsetHorizontal);
-//						_lblSignOffsetX.setToolTipText(Messages.Tour_Marker_Column_horizontal_offset_tooltip);
-//
-//						// Spinner
-//						_spinSignOffsetX = new Spinner(valueContainer, SWT.BORDER);
-//						_spinSignOffsetX.setMinimum(-OFFSET_MAX);
-//						_spinSignOffsetX.setMaximum(OFFSET_MAX);
-//						_spinSignOffsetX.setPageIncrement(OFFSET_PAGE_INCREMENT);
-//						_spinSignOffsetX.addSelectionListener(_defaultSelectionAdapter);
-//						_spinSignOffsetX.addMouseWheelListener(_defaultMouseWheelListener);
-//					}
-//
-//					/*
-//					 * Vertical offset
-//					 */
-//					{
-//						// Label
-//						_lblSignOffsetY = new Label(valueContainer, SWT.NONE);
-//						GridDataFactory.fillDefaults()//
-//								.align(SWT.FILL, SWT.CENTER)
-//								.applyTo(_lblSignOffsetY);
-//						_lblSignOffsetY.setText(Messages.Dlg_TourMarker_Label_OffsetVertical);
-//						_lblSignOffsetY.setToolTipText(Messages.Tour_Marker_Column_vertical_offset_tooltip);
-//
-//						// Spinner
-//						_spinSignOffsetY = new Spinner(valueContainer, SWT.BORDER);
-//						_spinSignOffsetY.setMinimum(-OFFSET_MAX);
-//						_spinSignOffsetY.setMaximum(OFFSET_MAX);
-//						_spinSignOffsetY.setPageIncrement(OFFSET_PAGE_INCREMENT);
-//						_spinSignOffsetY.addSelectionListener(_defaultSelectionAdapter);
-//						_spinSignOffsetY.addMouseWheelListener(_defaultMouseWheelListener);
-//					}
-//				}
-//			}
-//		}
-	}
-
-	private void createUI_58_Description(final Composite parent) {
-
-		/*
-		 * Description
-		 */
-		{
-			// label
-			_lblDescription = new Label(parent, SWT.NONE);
-			GridDataFactory.fillDefaults()//
-					.align(SWT.BEGINNING, SWT.BEGINNING)
-					.applyTo(_lblDescription);
-			_lblDescription.setText(Messages.Dlg_TourMarker_Label_Description);
-
-			// text
-			_txtDescription = new Text(parent, SWT.BORDER //
-					| SWT.WRAP
-					| SWT.V_SCROLL
-					| SWT.H_SCROLL);
-			GridDataFactory.fillDefaults()//
-					.grab(true, true)
-					.hint(_pc.convertWidthInCharsToPixels(20), SWT.DEFAULT)
-					.minSize(SWT.DEFAULT, _pc.convertHeightInCharsToPixels(2))
-					.applyTo(_txtDescription);
-			_txtDescription.addModifyListener(_defaultModifyListener);
-		}
-	}
-
-	private void createUI_60_Visibility(final Composite parent) {
-
-		/*
-		 * Visibility
-		 */
-		{
-			_chkVisibility = new Button(parent, SWT.CHECK);
-			GridDataFactory.fillDefaults()//
-					.span(2, 1)
-//					.align(SWT.END, SWT.FILL)
-					.applyTo(_chkVisibility);
-			_chkVisibility.setText(Messages.Dlg_TourMarker_Checkbox_MarkerVisibility);
-			_chkVisibility.setToolTipText(Messages.Tour_Marker_Column_IsVisible_Tooltip);
-			_chkVisibility.addSelectionListener(new SelectionAdapter() {
-				@Override
-				public void widgetSelected(final SelectionEvent e) {
-					toggleMarkerVisibility();
-				}
-			});
-		}
-	}
-
-	private void createUI_70_Links(final Composite parent) {
+	private void createUI_60_Links(final Composite parent) {
 
 		/*
 		 * Link Text
@@ -1247,12 +1097,85 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
 		}
 	}
 
+	private void createUI_62_Sign(final Composite parent) {
+
+		final SelectionAdapter imageSelectionListener = new SelectionAdapter() {
+			@Override
+			public void widgetSelected(final SelectionEvent e) {
+				UI.openControlMenu(_imgTourSign);
+			}
+		};
+
+		final int SIGN_IMAGE_MAX_SIZE = TourMarker.getSignImageMaxSize(_pc);
+
+		/*
+		 * Sign image
+		 */
+		{
+			// label
+			_linkImage = new Link(parent, SWT.NONE);
+			_firstColumnControls.add(_linkImage);
+			_linkImage.setText(Messages.Dlg_TourMarker_Link_Image);
+			_linkImage.addSelectionListener(imageSelectionListener);
+
+			final Composite signContainer = new Composite(parent, SWT.NONE);
+			GridDataFactory.fillDefaults()//
+					.grab(true, false)
+					.applyTo(signContainer);
+			GridLayoutFactory.fillDefaults().numColumns(2).applyTo(signContainer);
+//			signContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
+			{
+				/*
+				 * Image: sign image
+				 */
+				_imgTourSign = new ImageCanvas(signContainer, SWT.NONE);
+				GridDataFactory.fillDefaults()//
+						.hint(SIGN_IMAGE_MAX_SIZE, SIGN_IMAGE_MAX_SIZE)
+						.applyTo(_imgTourSign);
+				_imgTourSign.setStyle(SWT.CENTER | SWT.LEAD);
+				_imgTourSign.addSelectionListener(imageSelectionListener);
+				createContextMenu(_imgTourSign);
+
+				/*
+				 * Label: sign name
+				 */
+				_lblSignName = new Label(signContainer, SWT.NONE);
+				GridDataFactory.fillDefaults()//
+						.grab(true, false)
+						.align(SWT.FILL, SWT.CENTER)
+						.applyTo(_lblSignName);
+			}
+		}
+	}
+
+	private void createUI_70_Visibility(final Composite parent) {
+
+		{
+			/*
+			 * Visibility
+			 */
+			_chkVisibility = new Button(parent, SWT.CHECK);
+			GridDataFactory.fillDefaults()//
+//					.span(2, 1)
+//					.align(SWT.END, SWT.FILL)
+					.applyTo(_chkVisibility);
+			_chkVisibility.setText(Messages.Dlg_TourMarker_Checkbox_MarkerVisibility);
+			_chkVisibility.setToolTipText(Messages.Tour_Marker_Column_IsVisible_Tooltip);
+			_chkVisibility.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(final SelectionEvent e) {
+					toggleMarkerVisibility();
+				}
+			});
+		}
+	}
+
 	/**
 	 * create tour chart with new marker
 	 */
 	private void createUI_80_TourChart(final Composite parent) {
 
-		_tourChart = new TourChart(parent, SWT.FLAT /* | SWT.BORDER */, true);
+		_tourChart = new TourChart(parent, SWT.FLAT /* | SWT.BORDER */);
 		GridDataFactory.fillDefaults()//
 				.grab(true, true)
 				.hint(_pc.convertWidthInCharsToPixels(90), _pc.convertHeightInCharsToPixels(40))
@@ -1262,6 +1185,7 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
 		_tourChart.setContextProvider(new DialogMarkerTourChartContextProvicer(this), true);
 
 		_tourChart.setIsDisplayedInDialog(true);
+
 		_tourChart.addTourMarkerSelectionListener(this);
 		_tourChart.addTourMarkerModifyListener(this);
 
@@ -1601,7 +1525,7 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
 //		_comboSignPosition.setEnabled(isMarkerEnabled);
 
 		// this do not work on win
-		_groupLabel.setEnabled(isMarkerEnabled);
+		_groupText.setEnabled(isMarkerEnabled);
 		_groupSign.setEnabled(isMarkerEnabled);
 
 		_imgTourSign.setEnabled(isMarkerEnabled);
@@ -1708,10 +1632,13 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
 
 		_pc = new PixelConverter(parent);
 
-		IMAGE_DEFAULT_WIDTH = _pc.convertWidthInCharsToPixels(6);
-		IMAGE_MIN_WIDTH = _pc.convertWidthInCharsToPixels(2);
-		ROW_MAX_HEIGHT = _pc.convertVerticalDLUsToPixels(50);
+		final int signImageMaxSize = TourMarker.getSignImageMaxSize(_pc);
+
 		CONTENT_DEFAULT_WIDTH = _pc.convertWidthInCharsToPixels(30);
+
+		IMAGE_MIN_WIDTH = signImageMaxSize / 3;
+		IMAGE_DEFAULT_WIDTH = signImageMaxSize / 2;
+		ROW_MAX_HEIGHT = signImageMaxSize;
 
 		restoreState_Viewer();
 	}

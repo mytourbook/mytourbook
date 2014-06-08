@@ -25,6 +25,7 @@ import net.tourbook.common.util.ColumnManager;
 import net.tourbook.common.util.ITourViewer;
 import net.tourbook.common.util.TreeColumnDefinition;
 import net.tourbook.common.util.TreeViewerItem;
+import net.tourbook.data.TourMarker;
 import net.tourbook.data.TourSign;
 import net.tourbook.data.TourSignCategory;
 import net.tourbook.database.TourDatabase;
@@ -896,8 +897,10 @@ public class PrefPageSigns extends PreferencePage implements IWorkbenchPreferenc
 
 		_pc = new PixelConverter(parent);
 
-		DEFAULT_IMAGE_WIDTH = _pc.convertWidthInCharsToPixels(6);
-		MAX_ROW_HEIGHT = _pc.convertVerticalDLUsToPixels(50);
+//		DEFAULT_IMAGE_WIDTH = _pc.convertWidthInCharsToPixels(6);
+//		MAX_ROW_HEIGHT = _pc.convertVerticalDLUsToPixels(50);
+		DEFAULT_IMAGE_WIDTH = TourMarker.getSignImageMaxSize(_pc);
+		MAX_ROW_HEIGHT = TourMarker.getSignImageMaxSize(_pc);
 	}
 
 	@Override

@@ -127,8 +127,6 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 	private TourData				_tourData;
 	private TourChartConfiguration	_tcc;
 
-	private final boolean			_isShowActions;
-
 	private Map<String, Action>		_allTourChartActions;
 	private ActionMarkerOptions		_actionMarkerOptions;
 	private ActionOpenMarkerDialog	_actionOpenMarkerDialog;
@@ -368,12 +366,11 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		}
 	}
 
-	public TourChart(final Composite parent, final int style, final boolean isShowActions) {
+	public TourChart(final Composite parent, final int style) {
 
 		super(parent, style);
 
 		_parent = parent;
-		_isShowActions = isShowActions;
 
 //		/*
 //		 * when the focus is changed, fire a tour chart selection, this is neccesarry to update the
@@ -1253,6 +1250,8 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 			cmc.isShowHiddenMarker = _tcc.isShowHiddenMarker;
 			cmc.isShowMarkerLabel = _tcc.isShowMarkerLabel;
 			cmc.isShowMarkerTooltip = _tcc.isShowMarkerTooltip;
+			cmc.isShowMarkerPoint = _tcc.isShowMarkerPoint;
+			cmc.isShowSignImage = _tcc.isShowSignImage;
 			cmc.isShowLabelTempPos = _tcc.isShowLabelTempPos;
 
 			cmc.markerLabelTempPos = _tcc.markerLabelTempPos;
@@ -1260,6 +1259,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 			cmc.markerHoverSize = _tcc.markerHoverSize;
 			cmc.markerLabelOffset = _tcc.markerLabelOffset;
 			cmc.markerPointSize = _tcc.markerPointSize;
+			cmc.markerSignImageSize = _tcc.markerSignImageSize;
 
 			cmc.markerColorDefault = _tcc.markerColorDefault;
 			cmc.markerColorDevice = _tcc.markerColorDevice;
@@ -1278,6 +1278,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 			}
 
 			_layerMarker.setChartMarkerConfig(cmc);
+			_markerTooltip.setChartMarkerConfig(cmc);
 
 			// set data serie for the x-axis
 			final double[] xAxisSerie = _tcc.isShowTimeOnXAxis ? //
@@ -1792,14 +1793,14 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		return tourMarker;
 	}
 
-//	ChartLabel getMarkerTooltipLabel() {
-//		return _tooltipLabel;
-//	}
-
 	ChartLayerMarker getLayerTourMarker() {
 
 		return _layerMarker;
 	}
+
+//	ChartLabel getMarkerTooltipLabel() {
+//		return _tooltipLabel;
+//	}
 
 	public TourMarker getSelectedTourMarker() {
 		return _selectedTourMarker;
@@ -1838,6 +1839,11 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		_layerMarker = null;
 
 		removeMouseChartListener(_mouseMarkerListener);
+	}
+
+	void hideTooltip() {
+		
+		_markerTooltip.hideNow();
 	}
 
 	private void onDispose() {
@@ -2276,6 +2282,11 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		_isDisplayedInDialog = isDisplayedInDialog;
 	}
 
+	public void setIsShowMarkerActions(final boolean isShowMarkerActions) {
+		
+		_markerTooltip.setIsShowMarkerActions(isShowMarkerActions);
+	}
+
 	private boolean setMaxDefaultValue(	final String property,
 										boolean isChartModified,
 										final String tagIsMaxEnabled,
@@ -2623,11 +2634,10 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		// set the model BEFORE actions are created/enabled/checked
 		setDataModel(newChartDataModel);
 
-		if (_isShowActions) {
-			createActions();
-			fillToolbar();
-			enableTourActions();
-		}
+		// create actions
+		createActions();
+		fillToolbar();
+		enableTourActions();
 
 		// restore min/max values from the chart config
 		final ChartYDataMinMaxKeeper newMinMaxKeeper = _tcc.getMinMaxKeeper();

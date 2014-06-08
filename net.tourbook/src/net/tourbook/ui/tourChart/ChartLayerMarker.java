@@ -44,12 +44,13 @@ import org.eclipse.swt.widgets.Display;
 public class ChartLayerMarker implements IChartLayer, IChartOverlay {
 
 	private int					LABEL_OFFSET;
-
 	private int					MARKER_HOVER_SIZE;
 	private int					MARKER_POINT_SIZE;
-	private TourChart			_tourChart;
+	private int					SIGN_IMAGE_MAX_SIZE;
 
+	private TourChart			_tourChart;
 	private ChartMarkerConfig	_cmc;
+
 	private boolean				_isVertical;
 
 	private int					_devXMarker;
@@ -190,12 +191,14 @@ public class ChartLayerMarker implements IChartLayer, IChartOverlay {
 		final Device display = gc.getDevice();
 
 		final int markerPointSize = _cmc.markerPointSize;
+		final int markerSignImageSize = _cmc.markerSignImageSize;
 		final int labelOffset = _cmc.markerLabelOffset;
 		final int hoverSize = _cmc.markerHoverSize;
 
 		MARKER_POINT_SIZE = pc.convertVerticalDLUsToPixels(markerPointSize);
-		MARKER_HOVER_SIZE = pc.convertVerticalDLUsToPixels(hoverSize);//4
-		LABEL_OFFSET = pc.convertVerticalDLUsToPixels(labelOffset); //2
+		MARKER_HOVER_SIZE = pc.convertVerticalDLUsToPixels(hoverSize);
+		LABEL_OFFSET = pc.convertVerticalDLUsToPixels(labelOffset);
+		SIGN_IMAGE_MAX_SIZE = pc.convertVerticalDLUsToPixels(markerSignImageSize);
 
 		/*
 		 * Set marker point size even that the label positioning has the correct distance otherwise
@@ -286,7 +289,7 @@ public class ChartLayerMarker implements IChartLayer, IChartOverlay {
 			chartLabel.devXMarker = devXMarker;
 			chartLabel.devYMarker = devYMarker;
 
-			if (MARKER_POINT_SIZE > 0) {
+			if (MARKER_POINT_SIZE > 0 && _cmc.isShowMarkerPoint) {
 
 				if (_cmc.isDrawMarkerWithDefaultColor) {
 					gc.setBackground(colorDefault);
@@ -458,6 +461,10 @@ public class ChartLayerMarker implements IChartLayer, IChartOverlay {
 							isTextBgTransparent);
 				}
 
+			}
+
+			if (_cmc.isShowSignImage) {
+
 				final Photo signPhoto = chartLabel.markerSignPhoto;
 				if (signPhoto != null) {
 
@@ -468,11 +475,21 @@ public class ChartLayerMarker implements IChartLayer, IChartOverlay {
 
 					if (signImage != null && signImage.isDisposed() == false) {
 
-						final int imageCanvasWidth = 50;
-						final int imageCanvasHeight = 50;
+//						// check image size
+//						final Rectangle imageSize = signImage.getBounds();
+//
+//						final int photoWidth = signPhoto.getPhotoImageWidth();
+//
+//						System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
+//								+ ("\timageSize.width: " + imageSize.width)
+//								+ ("\tphotoWidth: " + photoWidth)
+//								+ ("\tSIGN_IMAGE_MAX_SIZE: " + SIGN_IMAGE_MAX_SIZE)
+//						//
+//								);
+//						// TODO remove SYSTEM.OUT.PRINTLN
 
 						// position photo on top, above the tour marker point and centered
-						final int photoPosX = chartLabel.devXMarker - imageCanvasWidth / 2 + MARKER_POINT_SIZE / 2;
+						final int photoPosX = chartLabel.devXMarker - SIGN_IMAGE_MAX_SIZE / 2 + MARKER_POINT_SIZE / 2;
 						final int photoPosY = devYTop;
 
 						final Rectangle rectPainted = PhotoUI.paintPhotoImage(
@@ -481,8 +498,8 @@ public class ChartLayerMarker implements IChartLayer, IChartOverlay {
 								signImage,
 								photoPosX,
 								photoPosY,
-								imageCanvasWidth,
-								imageCanvasHeight,
+								SIGN_IMAGE_MAX_SIZE,
+								SIGN_IMAGE_MAX_SIZE,
 								SWT.TOP);
 
 						chartLabel.devMarkerSignImageBounds = rectPainted;
@@ -687,8 +704,35 @@ public class ChartLayerMarker implements IChartLayer, IChartOverlay {
 
 	private ChartLabel retrieveHoveredLabel_10(final int devXMouse, final int devYMouse) {
 
+		/*
+		 * Check sign images first, they have a higher priority
+		 */
 		for (final ChartLabel chartLabel : _cmc.chartLabels) {
 
+			final Rectangle imageBounds = chartLabel.devMarkerSignImageBounds;
+			if (imageBounds != null) {
+
+				final int devXImage = imageBounds.x;
+				final int devYImage = imageBounds.y;
+				final int imageWidth = imageBounds.width;
+				final int imageHeight = imageBounds.height;
+
+				if (devXMouse > devXImage
+						&& devXMouse < devXImage + imageWidth
+						&& devYMouse > devYImage
+						&& devYMouse < devYImage + imageHeight) {
+
+					// marker sign image is hit
+					return chartLabel;
+				}
+			}
+		}
+
+		for (final ChartLabel chartLabel : _cmc.chartLabels) {
+
+			/*
+			 * Check sign label
+			 */
 			final int devXLabel = chartLabel.devXLabel;
 			final int devYLabel = chartLabel.devYLabel;
 
@@ -701,7 +745,9 @@ public class ChartLayerMarker implements IChartLayer, IChartOverlay {
 				return chartLabel;
 			}
 
-			// check tour marker point
+			/*
+			 * Check marker point
+			 */
 			final int devXMarker = chartLabel.devXMarker;
 			final int devYMarker = chartLabel.devYMarker;
 
@@ -712,24 +758,6 @@ public class ChartLayerMarker implements IChartLayer, IChartOverlay {
 
 				// marker point is hit
 				return chartLabel;
-			}
-
-			final Rectangle imageBounds = chartLabel.devMarkerSignImageBounds;
-			if (imageBounds != null) {
-
-				final int devXImage = imageBounds.x;
-				final int devYImage = imageBounds.y;
-				final int imageWidth = imageBounds.width;
-				final int imageHeight = imageBounds.height;
-
-				if (devXMouse > devXImage - MARKER_HOVER_SIZE
-						&& devXMouse < devXImage + imageWidth + MARKER_HOVER_SIZE
-						&& devYMouse > devYImage - MARKER_HOVER_SIZE
-						&& devYMouse < devYImage + imageHeight + MARKER_HOVER_SIZE) {
-
-					// marker sign image is hit
-					return chartLabel;
-				}
 			}
 		}
 

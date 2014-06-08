@@ -24,18 +24,21 @@ public class ChartMarkerConfig {
 	public boolean						isDrawMarkerWithDefaultColor;
 	public boolean						isShowHiddenMarker;
 	public boolean						isShowLabelTempPos;
-	public boolean						isShowMarkerLabel	= true;
+	public boolean						isShowMarkerLabel;
+	public boolean						isShowMarkerPoint;
 	public boolean						isShowMarkerTooltip;
+	public boolean						isShowSignImage;
 
 	public int							markerHoverSize;
 	public int							markerLabelOffset;
 	public int							markerLabelTempPos;
 	public int							markerPointSize;
+	public int							markerSignImageSize;
 
 	public RGB							markerColorDefault;
 	public RGB							markerColorDevice;
 	public RGB							markerColorHidden;
 
-	public final ArrayList<ChartLabel>	chartLabels			= new ArrayList<ChartLabel>();
+	public final ArrayList<ChartLabel>	chartLabels	= new ArrayList<ChartLabel>();
 
 }

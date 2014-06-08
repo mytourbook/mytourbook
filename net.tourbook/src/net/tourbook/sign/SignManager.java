@@ -45,7 +45,7 @@ import org.eclipse.swt.graphics.Image;
  */
 public class SignManager {
 
-	private static final ImageQuality					SIGN_IMAGE_QUALITY		= ImageQuality.THUMB;
+	private static final ImageQuality					SIGN_IMAGE_QUALITY		= ImageQuality.HQ;
 
 	static final String									KEY_PART_SEPARATOR		= "__";									//$NON-NLS-1$
 

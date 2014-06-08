@@ -1316,7 +1316,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
 
 	private void createUITourChart(final Composite dlgContainer) {
 
-		_tourChart = new TourChart(dlgContainer, SWT.BORDER, true);
+		_tourChart = new TourChart(dlgContainer, SWT.BORDER);
 		GridDataFactory.fillDefaults().grab(true, true).minSize(300, 200).applyTo(_tourChart);
 
 		_tourChart.setShowZoomActions(true);

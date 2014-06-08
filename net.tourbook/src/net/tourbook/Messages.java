@@ -541,6 +541,8 @@ public class Messages extends NLS {
 
 	public static String	Dlg_TourMarker_Label_ImagePosition;
 
+	public static String	Dlg_TourMarker_Label_Label;
+
 	public static String	Dlg_TourMarker_Label_LinkText;
 
 	public static String	Dlg_TourMarker_Label_LinkText_Tooltip;
@@ -550,13 +552,14 @@ public class Messages extends NLS {
 	public static String	Dlg_TourMarker_Label_LinkUrl_Tooltip;
 	public static String		Dlg_TourMarker_Label_marker_name;
 	public static String		Dlg_TourMarker_Label_markers;
-	public static String		Dlg_TourMarker_Label_Name;
 	public static String		Dlg_TourMarker_Label_Offset;
 	public static String		Dlg_TourMarker_Label_OffsetHorizontal;
 	public static String		Dlg_TourMarker_Label_OffsetHorizontal_Tooltip;
 	public static String		Dlg_TourMarker_Label_OffsetVertical;
 	public static String		Dlg_TourMarker_Label_OffsetVertical_Tooltip;
 	public static String		Dlg_TourMarker_Label_position;
+
+	public static String	Dlg_TourMarker_Label_Position_Tooltip;
 	public static String		Dlg_TourMarker_Label_vertical_offset;
 	public static String	Dlg_TourMarker_Link_Image;
 
@@ -1120,9 +1123,13 @@ public class Messages extends NLS {
 
 	public static String		Slideout_ChartMarkerOptions_Checkbox_IsShowHiddenMarker;
 	public static String		Slideout_ChartMarkerOptions_Checkbox_IsShowMarker;
+
+	public static String	Slideout_ChartMarkerOptions_Checkbox_IsShowMarkerPoint;
 	public static String		Slideout_ChartMarkerOptions_Checkbox_IsShowMarkerTooltip;
 	public static String		Slideout_ChartMarkerOptions_Checkbox_IsShowMarkerWithDefaultColor;
 	public static String		Slideout_ChartMarkerOptions_Checkbox_IsShowMarkerWithDefaultColor_Tooltip;
+
+	public static String	Slideout_ChartMarkerOptions_Checkbox_IsShowSignImage;
 	public static String		Slideout_ChartMarkerOptions_Checkbox_IsShowTempPosition;
 	public static String		Slideout_ChartMarkerOptions_Checkbox_IsShowTempPosition_Tooltip;
 	public static String		Slideout_ChartMarkerOptions_Label_DeviceMarkerColor;
@@ -1136,6 +1143,10 @@ public class Messages extends NLS {
 	public static String		Slideout_ChartMarkerOptions_Label_MarkerSize_Tooltip;
 	public static String		Slideout_ChartMarkerOptions_Label_Offset;
 	public static String		Slideout_ChartMarkerOptions_Label_Offset_Tooltip;
+
+	public static String	Slideout_ChartMarkerOptions_Label_SignImageSize;
+
+	public static String	Slideout_ChartMarkerOptions_Label_SignImageSize_Tooltip;
 
 	public static String		Tooltip_ValuePoint_Action_CloseContextMenu;
 	public static String		Tooltip_ValuePoint_Action_OpenToolTipMenu_ToolTip;

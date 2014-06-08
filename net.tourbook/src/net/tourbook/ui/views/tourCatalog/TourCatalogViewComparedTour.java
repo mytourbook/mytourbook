@@ -242,7 +242,7 @@ public class TourCatalogViewComparedTour extends TourChartViewPart implements IS
 
 	private void createTourChart() {
 
-		_tourChart = new TourChart(_pageBook, SWT.FLAT, true);
+		_tourChart = new TourChart(_pageBook, SWT.FLAT);
 		_tourChart.setShowZoomActions(true);
 		_tourChart.setShowSlider(true);
 		_tourChart.setToolBarManager(getViewSite().getActionBars().getToolBarManager(), true);

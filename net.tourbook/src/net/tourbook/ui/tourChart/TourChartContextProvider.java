@@ -153,6 +153,8 @@ public class TourChartContextProvider implements IChartContextProvider, ITourPro
 
 		final TourChart tourChart = _tourChartViewer.getTourChart();
 
+		tourChart.hideTooltip();
+
 		/*
 		 * Check if a marker is hovered
 		 */
@@ -244,6 +246,7 @@ public class TourChartContextProvider implements IChartContextProvider, ITourPro
 		_actionOpenMarkerDialog.setTourMarker(tourMarker);
 		_actionSetMarkerVisible.setTourMarker(tourMarker, !tourMarker.isMarkerVisible());
 		_actionSetMarkerPosition.setTourMarker(tourMarker);
+		_actionSetMarkerSignMenu.setTourMarker(tourMarker);
 
 		// fill actions
 		menuMgr.add(_actionOpenMarkerDialog);

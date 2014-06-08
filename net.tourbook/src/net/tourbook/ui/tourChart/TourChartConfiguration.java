@@ -134,6 +134,8 @@ public class TourChartConfiguration {
 	public boolean					isShowMarkerLabel;
 
 	public boolean					isShowMarkerTooltip;
+	public boolean					isShowMarkerPoint;
+	public boolean					isShowSignImage;
 
 	public int						markerHoverSize;
 	public int						markerLabelOffset;
@@ -145,6 +147,11 @@ public class TourChartConfiguration {
 	 * Size of the marker point in DLU (Dialog Units).
 	 */
 	public int						markerPointSize;
+
+	/**
+	 * Size of the sign image in DLU (Dialog Units).
+	 */
+	public int						markerSignImageSize;
 
 	/**
 	 * Color for the tour marker point and label.
@@ -191,15 +198,18 @@ public class TourChartConfiguration {
 		 */
 		markerHoverSize = _prefStore.getInt(ITourbookPreferences.GRAPH_MARKER_HOVER_SIZE);
 		markerLabelOffset = _prefStore.getInt(ITourbookPreferences.GRAPH_MARKER_LABEL_OFFSET);
-		markerPointSize = _prefStore.getInt(ITourbookPreferences.GRAPH_MARKER_POINT_SIZE);
 		markerLabelTempPos = _prefStore.getInt(ITourbookPreferences.GRAPH_MARKER_LABEL_TEMP_POSITION);
+		markerPointSize = _prefStore.getInt(ITourbookPreferences.GRAPH_MARKER_POINT_SIZE);
+		markerSignImageSize = _prefStore.getInt(ITourbookPreferences.GRAPH_MARKER_SIGN_IMAGE_SIZE);
 
 		isDrawMarkerWithDefaultColor = _prefStore.getBoolean(//
 				ITourbookPreferences.GRAPH_MARKER_IS_DRAW_WITH_DEFAULT_COLOR);
 		isShowHiddenMarker = _prefStore.getBoolean(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_HIDDEN_MARKER);
-		isShowMarkerLabel = _prefStore.getBoolean(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_MARKER_LABEL);
-		isShowMarkerTooltip = _prefStore.getBoolean(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_MARKER_TOOLTIP);
 		isShowLabelTempPos = _prefStore.getBoolean(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_LABEL_TEMP_POSITION);
+		isShowMarkerLabel = _prefStore.getBoolean(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_MARKER_LABEL);
+		isShowMarkerPoint = _prefStore.getBoolean(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_MARKER_POINT);
+		isShowMarkerTooltip = _prefStore.getBoolean(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_MARKER_TOOLTIP);
+		isShowSignImage = _prefStore.getBoolean(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_SIGN_IMAGE);
 
 		markerColorDefault = PreferenceConverter.getColor(_prefStore,//
 				ITourbookPreferences.GRAPH_MARKER_COLOR_DEFAULT);

@@ -41,6 +41,8 @@ public class SignMenuManager {
 	private ActionOpenPrefDialog	_actionOpenTourSignPrefs;
 	private ActionRemoveTourSign	_actionRemoveTourSign;
 
+	private TourSign				_currentTourSign;
+
 	private class ActionRemoveTourSign extends Action {
 
 		public ActionRemoveTourSign() {
@@ -62,6 +64,13 @@ public class SignMenuManager {
 			super(tourSign.getSignName(), AS_PUSH_BUTTON);
 
 			__tourSign = tourSign;
+
+			/*
+			 * Disable this action when it contains the current tour sign
+			 */
+			if (_currentTourSign != null && _currentTourSign.getSignId() == tourSign.getSignId()) {
+				setEnabled(false);
+			}
 
 			// set sign image
 			setImageDescriptor(ImageDescriptor.createFromFile(null, tourSign.getImageFilePathName()));
@@ -221,5 +230,10 @@ public class SignMenuManager {
 	public void setEnabledRemoveTourSignAction(final boolean isEnabled) {
 
 		_actionRemoveTourSign.setEnabled(isEnabled);
+	}
+
+	public void setTourSign(final TourSign tourSign) {
+
+		_currentTourSign = tourSign;
 	}
 }

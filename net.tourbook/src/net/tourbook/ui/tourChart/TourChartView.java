@@ -335,12 +335,15 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 		_pageNoChart = new Label(_pageBook, SWT.NONE);
 		_pageNoChart.setText(Messages.UI_Label_no_chart_is_selected);
 
-		_tourChart = new TourChart(_pageBook, SWT.FLAT, true);
+		_tourChart = new TourChart(_pageBook, SWT.FLAT);
 		_tourChart.setShowZoomActions(true);
 		_tourChart.setShowSlider(true);
 		_tourChart.setTourInfoActionsEnabled(true);
 		_tourChart.setToolBarManager(getViewSite().getActionBars().getToolBarManager(), true);
 		_tourChart.setContextProvider(new TourChartContextProvider(this), true);
+
+		// allow the marker tooltip in the tour chart to open the marker dialog
+		_tourChart.setIsShowMarkerActions(true);
 
 		_tourChartConfig = TourManager.createDefaultTourChartConfig();
 

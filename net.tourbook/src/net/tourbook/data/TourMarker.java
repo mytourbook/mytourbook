@@ -37,8 +37,10 @@ import net.tourbook.Messages;
 import net.tourbook.common.UI;
 import net.tourbook.database.FIELD_VALIDATION;
 import net.tourbook.database.TourDatabase;
+import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.ui.tourChart.ChartLabel;
 
+import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.swt.graphics.Rectangle;
 
 /**
@@ -134,6 +136,8 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 	private TourData				tourData;
 
 	/**
+	 * Marker sign image, can be <code>null</code>.
+	 * 
 	 * @since Db version 24
 	 */
 	@ManyToOne(optional = true)
@@ -247,6 +251,11 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 	private long					_createId									= 0;
 
 	/**
+	 * 
+	 */
+	private static int				_defaultSignImageMaxSize					= -1;
+
+	/**
 	 * manually created marker or imported marker create a unique id to identify them, saved marker
 	 * are compared with the marker id
 	 */
@@ -260,6 +269,23 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 		this.type = markerType;
 
 		_createId = ++_createCounter;
+	}
+
+	/**
+	 * @param pc
+	 * @return Returns the default max size in pixel for a {@link TourSign} image. This is used when
+	 *         drawing a table column.<br>
+	 *         When a sign image is drawn in a chart or map, the sign image size from the pref store
+	 *         {@link ITourbookPreferences#GRAPH_MARKER_SIGN_IMAGE_SIZE} is used. This size is
+	 *         converted into pixel with the vertical DLU's.
+	 */
+	public static int getSignImageMaxSize(final PixelConverter pc) {
+
+		if (_defaultSignImageMaxSize == -1) {
+			_defaultSignImageMaxSize = pc.convertHeightInCharsToPixels(3);
+		}
+
+		return _defaultSignImageMaxSize;
 	}
 
 	@Override
@@ -399,13 +425,6 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 		return _markerBounds;
 	}
 
-	/**
-	 * @return Returns position of this marker in the data serie
-	 */
-	public int getSerieIndex() {
-		return serieIndex;
-	}
-
 //	public int getSignPosition() {
 //		return signPosition;
 //	}
@@ -417,6 +436,13 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 //	public int getSignYOffset() {
 //		return signYOffset;
 //	}
+
+	/**
+	 * @return Returns position of this marker in the data serie
+	 */
+	public int getSerieIndex() {
+		return serieIndex;
+	}
 
 	public int getTime() {
 		return time;

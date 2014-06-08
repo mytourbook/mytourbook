@@ -840,7 +840,9 @@ public class UI {
 				return;
 			}
 
-			final int width = control.getSize().x + additionalSpace;
+			final int controlWidth = control.getSize().x;
+
+			final int width = controlWidth + additionalSpace;
 
 			maxWidth = width > maxWidth ? width : maxWidth;
 		}
