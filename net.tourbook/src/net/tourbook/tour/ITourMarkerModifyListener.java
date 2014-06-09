@@ -20,10 +20,13 @@ import net.tourbook.data.TourMarker;
 public interface ITourMarkerModifyListener {
 
 	/**
-	 * This is called when a {@link TourMarker} is modified.
+	 * This is called when a {@link TourMarker} is modified. When {@link TourMarker} is
+	 * <code>null</code> a {@link TourMarker} is deleted.
 	 * 
 	 * @param tourMarker
+	 * @param isDeleted
+	 *            Is <code>true</code> when the tour marker is deleted.
 	 */
-	abstract void tourMarkerIsModified(TourMarker tourMarker);
+	abstract void tourMarkerIsModified(TourMarker tourMarker, boolean isDeleted);
 
 }

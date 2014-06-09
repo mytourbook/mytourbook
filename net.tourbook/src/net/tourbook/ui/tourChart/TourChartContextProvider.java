@@ -43,8 +43,9 @@ import net.tourbook.ui.action.ActionSetTourTypeMenu;
 import net.tourbook.ui.tourChart.action.ActionCreateMarkerFromSlider;
 import net.tourbook.ui.tourChart.action.ActionCreateMarkerFromValuePoint;
 import net.tourbook.ui.tourChart.action.ActionCreateRefTour;
+import net.tourbook.ui.tourChart.action.ActionDeleteMarker;
 import net.tourbook.ui.tourChart.action.ActionSetMarkerLabelPositionMenu;
-import net.tourbook.ui.tourChart.action.ActionSetMarkerSignMenu;
+import net.tourbook.ui.tourChart.action.ActionSetMarkerImageMenu;
 import net.tourbook.ui.tourChart.action.ActionSetMarkerVisible;
 
 import org.eclipse.jface.action.IMenuManager;
@@ -63,6 +64,7 @@ public class TourChartContextProvider implements IChartContextProvider, ITourPro
 	private ActionCreateMarkerFromSlider		_actionCreateMarkerFromSliderRight;
 	private ActionCreateMarkerFromValuePoint	_actionCreateMarkerFromValuePoint;
 	private ActionEditQuick						_actionQuickEdit;
+	private ActionDeleteMarker					_actionDeleteMarker;
 	private ActionEditTour						_actionEditTour;
 	private ActionExport						_actionExportTour;
 	private ActionOpenAdjustAltitudeDialog		_actionOpenAdjustAltitudeDialog;
@@ -72,7 +74,7 @@ public class TourChartContextProvider implements IChartContextProvider, ITourPro
 	private ActionSetTourTypeMenu				_actionSetTourType;
 	private ActionSetMarkerVisible				_actionSetMarkerVisible;
 	private ActionSetMarkerLabelPositionMenu	_actionSetMarkerPosition;
-	private ActionSetMarkerSignMenu				_actionSetMarkerSignMenu;
+	private ActionSetMarkerImageMenu				_actionSetMarkerSignMenu;
 
 	private TagMenuManager						_tagMenuMgr;
 
@@ -120,9 +122,10 @@ public class TourChartContextProvider implements IChartContextProvider, ITourPro
 				this,
 				Messages.tourCatalog_view_action_create_marker);
 
+		_actionDeleteMarker = new ActionDeleteMarker(tourChart);
 		_actionSetMarkerVisible = new ActionSetMarkerVisible(tourChart);
 		_actionSetMarkerPosition = new ActionSetMarkerLabelPositionMenu(tourChart);
-		_actionSetMarkerSignMenu = new ActionSetMarkerSignMenu(tourChart);
+		_actionSetMarkerSignMenu = new ActionSetMarkerImageMenu(tourChart);
 
 		_actionExportTour = new ActionExport(this);
 
@@ -153,7 +156,7 @@ public class TourChartContextProvider implements IChartContextProvider, ITourPro
 
 		final TourChart tourChart = _tourChartViewer.getTourChart();
 
-		tourChart.hideTooltip();
+		tourChart.hideMarkerTooltip();
 
 		/*
 		 * Check if a marker is hovered
@@ -243,6 +246,7 @@ public class TourChartContextProvider implements IChartContextProvider, ITourPro
 	private void fillContextMenu_TourMarker(final IMenuManager menuMgr, final TourMarker tourMarker) {
 
 		// setup actions
+		_actionDeleteMarker.setTourMarker(tourMarker);
 		_actionOpenMarkerDialog.setTourMarker(tourMarker);
 		_actionSetMarkerVisible.setTourMarker(tourMarker, !tourMarker.isMarkerVisible());
 		_actionSetMarkerPosition.setTourMarker(tourMarker);
@@ -250,9 +254,11 @@ public class TourChartContextProvider implements IChartContextProvider, ITourPro
 
 		// fill actions
 		menuMgr.add(_actionOpenMarkerDialog);
+
 		menuMgr.add(_actionSetMarkerVisible);
 		menuMgr.add(_actionSetMarkerPosition);
 		menuMgr.add(_actionSetMarkerSignMenu);
+		menuMgr.add(_actionDeleteMarker);
 	}
 
 	@Override

@@ -172,8 +172,8 @@ public class ChartMarkerToolTip extends AnimatedToolTipShell implements ITourPro
 	protected Composite createToolTipContentArea(final Composite shell) {
 
 		setFadeInSteps(1);
-		setFadeOutSteps(10);
-		setFadeOutDelaySteps(20);
+		setFadeOutSteps(20);
+		setFadeOutDelaySteps(5);
 
 		if (_hoveredLabel == null) {
 			return null;
@@ -509,6 +509,10 @@ public class ChartMarkerToolTip extends AnimatedToolTipShell implements ITourPro
 		return tours;
 	}
 
+	/**
+	 * By default the tooltip is located to the left side of the tour marker point, when not visible
+	 * it is displayed to the right side of the tour marker point.
+	 */
 	@Override
 	public Point getToolTipLocation(final Point tipSize) {
 
@@ -543,56 +547,21 @@ public class ChartMarkerToolTip extends AnimatedToolTipShell implements ITourPro
 			ttPosY = devHoveredY + devHoveredHeight / 2 - tipHeight / 2;
 		}
 
+		// ckeck if tooltip is left to the chart border
 		if (ttPosX + tipWidth < 0) {
 
-			// tooltip is left to the left border
-
+			// set tooltip to the graph left border
 			ttPosX = -tipWidth - 1;
 		}
 
-//		// check chart bottom
-//		final int chartHeight = _tourChart.getBounds().height;
-//		if (ttPosY > chartHeight) {
-//			// tooltip is below the chart bottom
-//			ttPosY = chartHeight + margin;
-//		}
-//
 		// check display bounds
 		final ChartComponentGraph chartComponentGraph = _tourChart.getChartComponents().getChartComponentGraph();
-//		final Rectangle displayBounds = chartComponentGraph.getDisplay().getBounds();
-		final Point chartDisplay = chartComponentGraph.toDisplay(0, 0);
+		final Point dispPos = chartComponentGraph.toDisplay(ttPosX, ttPosY);
+		if (dispPos.x < 0) {
 
-		final int chartDispLeft = chartDisplay.x;
-
-		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
-				+ ("\tttPosX: " + ttPosX)
-				+ ("\tchartDispLeft: " + chartDispLeft)
-		//
-				);
-		// TODO remove SYSTEM.OUT.PRINTLN
-
-		if (ttPosX < 0) {
-
-			if (chartDispLeft + ttPosX < 0) {
-				ttPosX = devHoveredRight + 1;
-			}
-		} else {
-
-			if (chartDispLeft - ttPosX < 0) {
-				ttPosX = devHoveredRight + 1;
-			}
+			// tooltip is outside of the display, set tooltip to the right of the tour marker
+			ttPosX = devHoveredRight + 1;
 		}
-
-//
-//		if (chartDisplay.y + ttPosY + tipHeight > displayBounds.height) {
-//			ttPosY = markerPosY - tipHeight - margin;
-//		}
-//
-//		// check display top
-//		final int aboveChart = -tipHeight - margin;
-//		if (ttPosY < aboveChart) {
-//			ttPosY = aboveChart;
-//		}
 
 		final Point ttLocation = chartComponentGraph.toDisplay(ttPosX, ttPosY);
 

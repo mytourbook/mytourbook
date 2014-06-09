@@ -30,7 +30,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 
-public class ActionSetMarkerSignMenu extends Action implements IMenuCreator, ITourSignSetter {
+public class ActionSetMarkerImageMenu extends Action implements IMenuCreator, ITourSignSetter {
 
 	private Menu				_menu;
 
@@ -39,9 +39,9 @@ public class ActionSetMarkerSignMenu extends Action implements IMenuCreator, ITo
 	private ITourMarkerUpdater	_tourMarkerUpdater;
 	private TourMarker			_tourMarker;
 
-	public ActionSetMarkerSignMenu(final ITourMarkerUpdater tourMarkerUpdater) {
+	public ActionSetMarkerImageMenu(final ITourMarkerUpdater tourMarkerUpdater) {
 
-		super(Messages.Tour_Action_Marker_SetSignImage, AS_DROP_DOWN_MENU);
+		super(Messages.Tour_Action_Marker_SetMarkerImage, AS_DROP_DOWN_MENU);
 
 		setMenuCreator(this);
 

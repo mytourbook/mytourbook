@@ -369,7 +369,7 @@
 		-->
 		
 		<page
-			name="%Pref_Page_Signs"
+			name="%Pref_Page_SignImages"
 			id="net.tourbook.preferences.PrefPageSigns"
 			class="net.tourbook.preferences.PrefPageSigns"
 		/>

@@ -674,8 +674,7 @@ public abstract class AnimatedToolTipShell {
 			}
 
 			if (rightBottomBounds.y > displayBounds.y + displayBounds.height) {
-// ignore when tt is below the bottom, force the user to resize the tt
-//				location.y -= rightBottomBounds.y - (displayBounds.y + displayBounds.height);
+				location.y -= rightBottomBounds.y - (displayBounds.y + displayBounds.height);
 			}
 
 			if (location.x < displayBounds.x) {

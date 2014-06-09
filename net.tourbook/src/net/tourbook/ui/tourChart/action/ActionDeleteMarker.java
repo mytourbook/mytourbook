@@ -13,24 +13,44 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.ui.tourChart;
+package net.tourbook.ui.tourChart.action;
 
+import net.tourbook.Messages;
+import net.tourbook.application.TourbookPlugin;
 import net.tourbook.data.TourMarker;
+import net.tourbook.ui.tourChart.ITourMarkerUpdater;
 
-public interface ITourMarkerUpdater {
+import org.eclipse.jface.action.Action;
+import org.eclipse.osgi.util.NLS;
+
+public class ActionDeleteMarker extends Action {
+
+	private ITourMarkerUpdater	_tourMarkerUpdater;
+	private TourMarker			_tourMarker;
+
+	public ActionDeleteMarker(final ITourMarkerUpdater tourMarkerUpdater) {
+
+		_tourMarkerUpdater = tourMarkerUpdater;
+
+		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__delete));
+	}
+
+	@Override
+	public void run() {
+
+		_tourMarkerUpdater.deleteTourMarker(_tourMarker);
+	}
 
 	/**
-	 * This is called when a {@link TourMarker} is deleted.
+	 * Set {@link TourMarker} which is modified.
 	 * 
 	 * @param tourMarker
 	 */
-	public void deleteTourMarker(TourMarker tourMarker);
+	public void setTourMarker(final TourMarker tourMarker) {
 
-	/**
-	 * This is called when a {@link TourMarker} is modified and the UI needs to be updated.
-	 * 
-	 * @param tourMarker
-	 */
-	public void updateModifiedTourMarker(TourMarker tourMarker);
+		_tourMarker = tourMarker;
+
+		setText(NLS.bind(Messages.Tour_Action_Marker_Delete, tourMarker.getLabel()));
+	}
 
 }

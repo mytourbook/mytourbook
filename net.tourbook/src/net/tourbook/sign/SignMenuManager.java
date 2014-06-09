@@ -46,7 +46,8 @@ public class SignMenuManager {
 	private class ActionRemoveTourSign extends Action {
 
 		public ActionRemoveTourSign() {
-			super(Messages.Action_Sign_RemoveTourSign, AS_PUSH_BUTTON);
+
+			super(Messages.Action_Sign_RemoveMarkerImage, AS_PUSH_BUTTON);
 		}
 
 		@Override
@@ -157,7 +158,7 @@ public class SignMenuManager {
 
 	private void createActions() {
 
-		_actionOpenTourSignPrefs = new ActionOpenPrefDialog(Messages.Action_Sign_SignPreferences, PrefPageSigns.ID);
+		_actionOpenTourSignPrefs = new ActionOpenPrefDialog(Messages.Action_Sign_MarkerImagePreferences, PrefPageSigns.ID);
 		_actionRemoveTourSign = new ActionRemoveTourSign();
 	}
 

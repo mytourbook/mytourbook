@@ -19,8 +19,6 @@ public class Util {
 	private static final String	URL_SPACE				= " ";		//$NON-NLS-1$
 	private static final String	URL_SPACE_REPLACEMENT	= "%20";	//$NON-NLS-1$
 
-
-
 	public static String encodeSpace(final String urlString) {
 		return urlString.replaceAll(URL_SPACE, URL_SPACE_REPLACEMENT);
 	}
@@ -69,7 +67,7 @@ public class Util {
 	 * Open a link
 	 */
 	public static void openLink(final Shell shell, String href) {
-		
+
 		// format the href for an html file (file:///<filename.html>
 		// required for Mac only.
 		if (href.startsWith("file:")) { //$NON-NLS-1$
@@ -79,9 +77,16 @@ public class Util {
 			}
 			href = "file:///" + href; //$NON-NLS-1$
 		}
-		
+
+		/*
+		 * Ensure that a protocol is set otherwise a MalformedURLException exception occures
+		 */
+		if (href.startsWith("http") == false) {
+			href = "http://" + href;
+		}
+
 		final IWorkbenchBrowserSupport support = PlatformUI.getWorkbench().getBrowserSupport();
-		
+
 		try {
 
 			final IWebBrowser browser = support.getExternalBrowser();
@@ -112,9 +117,8 @@ public class Util {
 	}
 
 	/**
-	 * This method encodes the url, removes the spaces from the url and replaces
-	 * the same with <code>"%20"</code>. This method is required to fix Bug
-	 * 77840.
+	 * This method encodes the url, removes the spaces from the url and replaces the same with
+	 * <code>"%20"</code>. This method is required to fix Bug 77840.
 	 * 
 	 * @since 3.0.2
 	 */

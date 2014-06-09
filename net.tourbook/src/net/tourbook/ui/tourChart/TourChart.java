@@ -76,15 +76,18 @@ import net.tourbook.ui.tourChart.action.ActionTourPhotos;
 import net.tourbook.ui.tourChart.action.ActionXAxisDistance;
 import net.tourbook.ui.tourChart.action.ActionXAxisTime;
 
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.IDialogSettings;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
@@ -323,6 +326,11 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 	public class MouseMarkerListener extends MouseAdapter {
 
 		@Override
+		public void chartResized() {
+			onMarkerChartResized();
+		}
+
+		@Override
 		public void mouseDoubleClick(final ChartMouseEvent event) {
 			onMarkerMouseDoubleClick(event);
 		}
@@ -449,7 +457,6 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		setValuePointToolTipProvider(_valuePointToolTip = new ValuePointToolTipUI(vpToolTipOwner, _state));
 
 		_photoTooltip = new ChartPhotoToolTip(this, _state);
-
 		_markerTooltip = new ChartMarkerToolTip(this);
 
 		setHoveredListener(new HoveredValueListener());
@@ -1470,6 +1477,37 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		}
 	}
 
+	@Override
+	public void deleteTourMarker(final TourMarker tourMarker) {
+
+		if (_isDisplayedInDialog) {
+
+			/*
+			 * Do not confirm deletion when tour chart is displayed in a dialog, because the dialog
+			 * and the removal can be canceled.
+			 */
+
+			// this will update the chart
+			fireTourMarkerModifyEvent(tourMarker, true);
+
+		} else {
+
+			// confirm to delete the marker
+			if (MessageDialog.openQuestion(
+					getShell(),
+					Messages.Dlg_TourMarker_MsgBox_delete_marker_title,
+					NLS.bind(Messages.Dlg_TourMarker_MsgBox_delete_marker_message, (tourMarker).getLabel()))) {
+
+				// remove tourmarker from the model
+				final boolean isRemoved = _tourData.getTourMarkers().remove(tourMarker);
+				Assert.isTrue(isRemoved);
+
+				// tour will be saved and the chart will also be updated
+				fireTourModifyEvent_Globally();
+			}
+		}
+	}
+
 	public void enableGraphAction(final int graphId, final boolean isEnabled) {
 
 		if (_allTourChartActions == null) {
@@ -1679,17 +1717,18 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 	}
 
 	/**
-	 * Fires an event when the a tour marker is selected.
+	 * Fires an event when the a tour marker is modified.
 	 * 
 	 * @param tourMarker
+	 * @param isTourMarkerDeleted
 	 */
-	private void fireTourMarkerModifyEvent(final TourMarker tourMarker) {
+	private void fireTourMarkerModifyEvent(final TourMarker tourMarker, final boolean isTourMarkerDeleted) {
 
 		final Object[] listeners = _tourMarkerModifyListener.getListeners();
 		for (final Object listener2 : listeners) {
 
 			final ITourMarkerModifyListener listener = (ITourMarkerModifyListener) listener2;
-			listener.tourMarkerIsModified(tourMarker);
+			listener.tourMarkerIsModified(tourMarker, isTourMarkerDeleted);
 		}
 	}
 
@@ -1841,8 +1880,8 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		removeMouseChartListener(_mouseMarkerListener);
 	}
 
-	void hideTooltip() {
-		
+	void hideMarkerTooltip() {
+
 		_markerTooltip.hideNow();
 	}
 
@@ -1854,6 +1893,12 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		_photoOverlayBGColorTour.dispose();
 
 		_valuePointToolTip.hide();
+	}
+
+	private void onMarkerChartResized() {
+
+		// hide tooltip otherwise it has the wrong location
+		hideMarkerTooltip();
 	}
 
 	private void onMarkerMouseDoubleClick(final ChartMouseEvent event) {
@@ -2283,7 +2328,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 	}
 
 	public void setIsShowMarkerActions(final boolean isShowMarkerActions) {
-		
+
 		_markerTooltip.setIsShowMarkerActions(isShowMarkerActions);
 	}
 
@@ -2541,7 +2586,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		if (_isDisplayedInDialog) {
 
 			// this will update the chart
-			fireTourMarkerModifyEvent(tourMarker);
+			fireTourMarkerModifyEvent(tourMarker, false);
 
 		} else {
 

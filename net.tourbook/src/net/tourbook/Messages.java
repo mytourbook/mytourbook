@@ -26,9 +26,9 @@ public class Messages extends NLS {
 	public static String		Action_PhotosAndTours_FilterPhotos_Tooltip;
 	public static String		Action_PhotosAndTours_SavePhotoInTour;
 
-	public static String		Action_Sign_RemoveTourSign;
+	public static String	Action_Sign_MarkerImagePreferences;
 
-	public static String	Action_Sign_SignPreferences;
+	public static String	Action_Sign_RemoveMarkerImage;
 
 	public static String		Action_ToolTip_Hide;
 	public static String		Action_ToolTip_SetDefaults;
@@ -530,9 +530,9 @@ public class Messages extends NLS {
 	public static String		Dlg_TourMarker_Checkbox_MarkerVisibility;
 	public static String		Dlg_TourMarker_Dlg_Message;
 	public static String		Dlg_TourMarker_Dlg_title;
-	public static String		Dlg_TourMarker_Group_Label;
+	public static String	Dlg_TourMarker_Group_Image;
 
-	public static String		Dlg_TourMarker_Group_Sign;
+	public static String		Dlg_TourMarker_Group_Label;
 
 	public static String	Dlg_TourMarker_Group_Url;
 	public static String		Dlg_TourMarker_Label_Comment;
@@ -1202,6 +1202,8 @@ public class Messages extends NLS {
 	public static String		Tour_Action_HrZoneGraphType_NoGradient;
 	public static String		Tour_Action_HrZoneGraphType_WhiteBottom;
 	public static String		Tour_Action_HrZoneGraphType_WhiteTop;
+	public static String	Tour_Action_Marker_Delete;
+
 	public static String		Tour_Action_Marker_PositionHorizontal;
 
 	public static String		Tour_Action_Marker_PositionVertical;
@@ -1210,7 +1212,7 @@ public class Messages extends NLS {
 
 	public static String		Tour_Action_Marker_SetLabelPosition;
 
-	public static String	Tour_Action_Marker_SetSignImage;
+	public static String	Tour_Action_Marker_SetMarkerImage;
 
 	public static String		Tour_Action_Marker_SetVisible;
 
