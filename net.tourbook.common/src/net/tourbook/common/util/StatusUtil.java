@@ -174,15 +174,15 @@ public class StatusUtil {
 	}
 
 	public static void showStatus(final String message) {
-		handleStatus(message, null, StatusManager.SHOW, IStatus.ERROR);
+		handleStatus(message, null, StatusManager.SHOW | StatusManager.BLOCK, IStatus.ERROR);
 	}
 
 	public static void showStatus(final String message, final Throwable exception) {
-		handleStatus(message, exception, StatusManager.SHOW, IStatus.ERROR);
+		handleStatus(message, exception, StatusManager.SHOW | StatusManager.BLOCK, IStatus.ERROR);
 	}
 
 	public static void showStatus(final Throwable exception) {
-		handleStatus(exception.getMessage(), exception, StatusManager.SHOW, IStatus.ERROR);
+		handleStatus(exception.getMessage(), exception, StatusManager.SHOW | StatusManager.BLOCK, IStatus.ERROR);
 	}
 
 }
