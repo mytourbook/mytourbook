@@ -109,6 +109,7 @@
          </action>
       </actionSet>
    </extension>
+   
    <extension
          point="org.eclipse.ui.actionSets">
       <actionSet
@@ -127,6 +128,7 @@
          </action>
       </actionSet>
    </extension>
+   
    <extension
          point="org.eclipse.ui.editors">
       <editor
@@ -699,19 +701,7 @@
 		            mnemonic="%command_view_tourEditor_mnemonic"
 		            tooltip="%command_view_tourEditor_tooltip"/>
 		            
-		      <command
-		            commandId="command.net.tourbook.views.tagViewID"
-		            icon="icons/tour-tag.gif"
-		            label="%command_tagging_name"
-		            tooltip="%command_tagging_name_tooltip"/>
 		            
-		      <command
-		            commandId="net.tourbook.command.tourChart.tool.graphAnalyzer"
-		            icon="icons/chart-analyzer.gif"
-		            label="%command_tourChart_tool_graphAnalyzer"
-		            mnemonic="%command_tourChart_tool_graphAnalyzer_mnemonic"
-		            style="push"
-		            tooltip="%command_tourChart_tool_graphAnalyzer_tooltip"/>
 		            
 				<separator
 					name="Map"
@@ -736,14 +726,6 @@
 		   <toolbar id="net.tourbook.toolbars.tourTools">
 		
 		      <command
-		            commandId="net.tourbook.command.tourChart.tool.tourSegmenter"
-		            icon="icons/tour-segmenter.gif"
-		            label="%command_tourChart_tool_tourSegmenter"
-		            mnemonic="%command_tourChart_tool_tourSegmenter_mnemonic"
-		            style="push"
-		            tooltip="%command_tourChart_tool_tourSegmenter_tooltip"/>
-		      
-		      <command
 		            commandId="net.tourbook.command.tourCompareWizard"
 		            icon="icons/tour-map-compare-wizard.png"
 		            label="%command_tourCompare_wizard"
@@ -759,14 +741,6 @@
 		            style="push"
 		            />
 		
-		   </toolbar>
-		</menuContribution>
-		
-		
-		<menuContribution locationURI="toolbar:org.eclipse.ui.main.toolbar?after=additions">
-		
-		   <toolbar id="net.tourbook.toolbars.rawdata">
-		   
 		      <command
 		            commandId="net.tourbook.command.device.synchronize.direct"
 		            icon="icons/device-synchronize-direct.gif"
@@ -774,6 +748,7 @@
 		            mnemonic="%command_device_synchronize_direct_mnemonic"
 		            style="push"
 		            tooltip="%command_device_synchronize_direct_tooltip"/>
+
 		   </toolbar>
 		</menuContribution>
 		

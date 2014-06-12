@@ -39,6 +39,11 @@ Changes
 - Removed tour marker tab because it was a redundance of the Tour Marker view which is now improved.
 
 
+* Workspace
+
+- Removed these actions "Tagged Tour", "Tour Analyzer" and "Tour Segmenter" from the workspace toolbars, these actions are available from the main menu.
+
+
 Fixed Bugs 
 
 
