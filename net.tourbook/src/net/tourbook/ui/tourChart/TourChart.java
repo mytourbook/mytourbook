@@ -1882,6 +1882,9 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
 	void hideMarkerTooltip() {
 
+		// disable selection
+		_selectedTourMarker = null;
+
 		_markerTooltip.hideNow();
 	}
 
@@ -1898,7 +1901,13 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 	private void onMarkerChartResized() {
 
 		// hide tooltip otherwise it has the wrong location
-		hideMarkerTooltip();
+		// disable selection
+		_selectedTourMarker = null;
+
+		// ensure that a marker do not keeps hovered state when chart is zoomed
+		_layerMarker.resetHoveredState();
+
+		_markerTooltip.hideNow();
 	}
 
 	private void onMarkerMouseDoubleClick(final ChartMouseEvent event) {
@@ -1950,7 +1959,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		// disable selection
 		_selectedTourMarker = null;
 
-		_layerMarker.resetHoveredLabel();
+		_layerMarker.resetHoveredState();
 
 		// redraw chart
 		setChartOverlayDirty();
@@ -1965,7 +1974,6 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		final ChartLabel hoveredLabel = _layerMarker.retrieveHoveredLabel(mouseEvent);
 
 		final boolean isLabelHovered = hoveredLabel != null;
-
 		if (isLabelHovered) {
 
 			// set worked that no other actions are done in this event

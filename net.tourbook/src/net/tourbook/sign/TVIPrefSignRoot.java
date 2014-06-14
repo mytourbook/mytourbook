@@ -46,7 +46,7 @@ public class TVIPrefSignRoot extends TVIPrefSignItem {
 		 */
 		for (final TourSign tourSign : rootSigns.tourSigns) {
 
-			final TVIPrefSign signItem = new TVIPrefSign(getSignViewer(), tourSign);
+			final TVIPrefSign signItem = new TVIPrefSign(null, getSignViewer(), tourSign);
 
 			addChild(signItem);
 		}

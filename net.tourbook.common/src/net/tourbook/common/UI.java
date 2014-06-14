@@ -99,7 +99,7 @@ public class UI {
 	public static final String			SYMBOL_DIFFERENCE_WITH_SPACE			= "\u0394 ";																//$NON-NLS-1$
 	public static final String			SYMBOL_DOUBLE_HORIZONTAL				= "\u2550";																//$NON-NLS-1$
 	public static final String			SYMBOL_DOUBLE_VERTICAL					= "\u2551";																//$NON-NLS-1$
-	public static final String			SYMBOL_ELLIPSIS							= "\u2026";																//$NON-NLS-1$
+//	public static final String			SYMBOL_ELLIPSIS							= "\u2026";																//$NON-NLS-1$
 	public static final String			SYMBOL_FIGURE_DASH						= "\u2012";																//$NON-NLS-1$
 	public static final String			SYMBOL_FOOT_NOTE						= "\u20F0";																//$NON-NLS-1$
 	public static final String			SYMBOL_FULL_BLOCK						= "\u2588";																//$NON-NLS-1$
@@ -961,13 +961,39 @@ public class UI {
 		return shortText;
 	}
 
-	public static String shortenText(final String text, final int textWidth) {
+	public static String shortenText(final String text, final int textWidth, final boolean isShowBegin) {
 
-		final int endIndex = text.length();
-		int beginIndex = endIndex - textWidth;
-		beginIndex = beginIndex < 0 ? 0 : beginIndex;
+		int beginIndex;
+		int endIndex;
 
-		return text.substring(beginIndex, endIndex);
+		final int textLength = text.length();
+
+		if (isShowBegin) {
+
+			beginIndex = 0;
+			endIndex = textLength > textWidth ? textWidth : textLength;
+
+		} else {
+
+			beginIndex = textLength - textWidth;
+			beginIndex = beginIndex < 0 ? 0 : beginIndex;
+
+			endIndex = textLength;
+		}
+
+		String shortedText = text.substring(beginIndex, endIndex);
+
+		// add ellipsis when text is too long
+		if (textLength > textWidth) {
+
+			if (isShowBegin) {
+				shortedText = shortedText + UI.ELLIPSIS;
+			} else {
+				shortedText = UI.ELLIPSIS + shortedText;
+			}
+		}
+
+		return shortedText;
 	}
 
 	public static String timeStamp() {

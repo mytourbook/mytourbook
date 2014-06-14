@@ -41,7 +41,7 @@ public class TVIPrefSignCategory extends TVIPrefSignItem {
 
 		// create sign items
 		for (final TourSign sign : signChildren.tourSigns) {
-			addChild(new TVIPrefSign(signViewer, sign));
+			addChild(new TVIPrefSign(this, signViewer, sign));
 		}
 
 		// create category items

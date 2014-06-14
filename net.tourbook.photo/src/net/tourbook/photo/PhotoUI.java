@@ -126,7 +126,8 @@ public class PhotoUI {
 											final int photoPosY,
 											final int imageCanvasWidth,
 											final int imageCanvasHeight,
-											final int style) {
+											final int style,
+											final Rectangle noHideArea) {
 
 		final Rectangle imageRect = signImage.getBounds();
 		final int _paintedImageWidth = imageRect.width;
@@ -155,10 +156,26 @@ public class PhotoUI {
 
 		} else {
 
-			// default is centerd
+			// default is vertical/horizontal centerd
 
 			paintedDest_DevX += centerOffsetX;
 			paintedDest_DevY += centerOffsetY;
+		}
+
+		final Rectangle rectPainted = new Rectangle(
+				paintedDest_DevX,
+				paintedDest_DevY,
+				paintedDest_Width,
+				paintedDest_Height);
+
+		if (noHideArea != null) {
+
+			if (rectPainted.intersects(noHideArea)) {
+
+				// prevent that the image is painted over the no hide area (this can be a marker label)
+
+				rectPainted.y = noHideArea.y + noHideArea.height;
+			}
 		}
 
 		try {
@@ -177,10 +194,10 @@ public class PhotoUI {
 						_paintedImageWidth,
 						_paintedImageHeight,
 						//
-						paintedDest_DevX,
-						paintedDest_DevY,
-						paintedDest_Width,
-						paintedDest_Height);
+						rectPainted.x,
+						rectPainted.y,
+						rectPainted.width,
+						rectPainted.height);
 
 			} catch (final Exception e) {
 
@@ -196,12 +213,6 @@ public class PhotoUI {
 
 			gc.drawString(e.getMessage(), photoPosX, photoPosY);
 		}
-
-		final Rectangle rectPainted = new Rectangle(
-				paintedDest_DevX,
-				paintedDest_DevY,
-				paintedDest_Width,
-				paintedDest_Height);
 
 		return rectPainted;
 	}

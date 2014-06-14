@@ -277,7 +277,7 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
 						return;
 					}
 
-					final Image signImage = SignManager.getPhotoImage(__tourSign.getSignImagePhoto());
+					final Image signImage = SignManager.getSignImage(__tourSign.getSignImagePhoto());
 
 					if (signImage != null) {
 
@@ -1705,7 +1705,7 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
 
 				final Photo signPhoto = tourSign.getSignImagePhoto();
 				final ILoadCallBack imageLoadCallback = new LoadImageCallbackViewer(tourSign);
-				final Image signImage = SignManager.getPhotoImage(signPhoto, imageLoadCallback);
+				final Image signImage = SignManager.getSignImage(signPhoto, imageLoadCallback);
 
 				if (signImage != null && signImage.isDisposed() == false) {
 
@@ -1741,7 +1741,8 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
 								photoPosY,
 								imageCanvasWidth,
 								imageCanvasHeight,
-								SWT.CENTER);
+								SWT.CENTER,
+								null);
 
 						break;
 					}
@@ -1954,7 +1955,7 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
 
 			final Photo signPhoto = tourSign.getSignImagePhoto();
 			final ILoadCallBack imageLoadCallback = new LoadImageCallbackSelectedMarker(tourSign);
-			final Image tourSignImage = SignManager.getPhotoImage(signPhoto, imageLoadCallback);
+			final Image tourSignImage = SignManager.getSignImage(signPhoto, imageLoadCallback);
 
 			_imgTourImage.setImage(tourSignImage, false);
 		}

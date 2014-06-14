@@ -228,6 +228,9 @@ public class ChartLayerMarker implements IChartLayer, IChartOverlay {
 
 		gc.setClipping(0, devYTop, gc.getClipping().width, devGraphHeight);
 
+		/*
+		 * Draw marker point and label
+		 */
 		for (final ChartLabel chartLabel : _cmc.chartLabels) {
 
 			// check if a marker should be displayed
@@ -280,16 +283,18 @@ public class ChartLayerMarker implements IChartLayer, IChartOverlay {
 			final Point labelExtend = gc.textExtent(chartLabel.markerLabel);
 
 			/*
+			 * Get marker point top/left position
+			 */
+			final int devXMarkerTopLeft = _devXMarker - markerPointSize2;
+			final int devYMarkerTopLeft = _devYMarker - markerPointSize2;
+
+			chartLabel.devXMarker = devXMarkerTopLeft;
+			chartLabel.devYMarker = devYMarkerTopLeft;
+
+			/*
 			 * Draw marker point
 			 */
-
-			final int devXMarker = _devXMarker - markerPointSize2;
-			final int devYMarker = _devYMarker - markerPointSize2;
-
-			chartLabel.devXMarker = devXMarker;
-			chartLabel.devYMarker = devYMarker;
-
-			if (MARKER_POINT_SIZE > 0 && _cmc.isShowMarkerPoint) {
+			if (_cmc.isShowMarkerPoint && MARKER_POINT_SIZE > 0) {
 
 				if (_cmc.isDrawMarkerWithDefaultColor) {
 					gc.setBackground(colorDefault);
@@ -299,8 +304,8 @@ public class ChartLayerMarker implements IChartLayer, IChartOverlay {
 
 				// draw marker point
 				gc.fillRectangle(//
-						devXMarker,
-						devYMarker,
+						devXMarkerTopLeft,
+						devYMarkerTopLeft,
 						MARKER_POINT_SIZE,
 						MARKER_POINT_SIZE);
 			}
@@ -397,10 +402,7 @@ public class ChartLayerMarker implements IChartLayer, IChartOverlay {
 					}
 
 					// keep painted positions to identify and paint the hovered positions
-					chartLabel.devXLabel = devXLabel;
-					chartLabel.devYLabel = devYLabel;
-					chartLabel.devLabelWidth = vLabelWidth;
-					chartLabel.devLabelHeight = vLabelHeight;
+					chartLabel.paintedLabel = new Rectangle(devXLabel, devYLabel, vLabelWidth, vLabelHeight);
 
 					// draw label vertical
 					final Transform tr = new Transform(display);
@@ -446,12 +448,7 @@ public class ChartLayerMarker implements IChartLayer, IChartOverlay {
 					}
 
 					// keep painted positions to identify and paint hovered positions
-					chartLabel.devXLabel = _devXMarker;
-					chartLabel.devYLabel = _devYMarker;
-					chartLabel.devLabelWidth = labelWidth;
-					chartLabel.devLabelHeight = labelHeight;
-
-//					gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLACK));
+					chartLabel.paintedLabel = new Rectangle(_devXMarker, _devYMarker, labelWidth, labelHeight);
 
 					// draw label
 					gc.drawText(//
@@ -463,6 +460,26 @@ public class ChartLayerMarker implements IChartLayer, IChartOverlay {
 
 			}
 
+			// keep painted positions to identify and paint hovered positions
+			chartLabel.devIsVertical = _isVertical;
+			chartLabel.devMarkerPointSize = MARKER_POINT_SIZE;
+			chartLabel.devHoverSize = MARKER_HOVER_SIZE;
+		}
+
+		/*
+		 * Draw marker image
+		 */
+		for (final ChartLabel chartLabel : _cmc.chartLabels) {
+
+			// check if a marker should be displayed
+			if (chartLabel.isVisible == false) {
+
+				// check if hidden markers should be displayed
+				if (_cmc.isShowHiddenMarker == false) {
+					continue;
+				}
+			}
+
 			if (_cmc.isShowSignImage) {
 
 				final Photo signPhoto = chartLabel.markerSignPhoto;
@@ -471,26 +488,15 @@ public class ChartLayerMarker implements IChartLayer, IChartOverlay {
 					// draw the sign image
 
 					final ILoadCallBack imageLoadCallback = new LoadImageCallback();
-					final Image signImage = SignManager.getPhotoImage(signPhoto, imageLoadCallback);
+					final Image signImage = SignManager.getSignImage(signPhoto, imageLoadCallback);
 
 					if (signImage != null && signImage.isDisposed() == false) {
-
-//						// check image size
-//						final Rectangle imageSize = signImage.getBounds();
-//
-//						final int photoWidth = signPhoto.getPhotoImageWidth();
-//
-//						System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
-//								+ ("\timageSize.width: " + imageSize.width)
-//								+ ("\tphotoWidth: " + photoWidth)
-//								+ ("\tSIGN_IMAGE_MAX_SIZE: " + SIGN_IMAGE_MAX_SIZE)
-//						//
-//								);
-//						// TODO remove SYSTEM.OUT.PRINTLN
 
 						// position photo on top, above the tour marker point and centered
 						final int photoPosX = chartLabel.devXMarker - SIGN_IMAGE_MAX_SIZE / 2 + MARKER_POINT_SIZE / 2;
 						final int photoPosY = devYTop;
+
+						final Rectangle noHideArea = chartLabel.paintedLabel;
 
 						final Rectangle rectPainted = PhotoUI.paintPhotoImage(
 								gc,
@@ -500,7 +506,8 @@ public class ChartLayerMarker implements IChartLayer, IChartOverlay {
 								photoPosY,
 								SIGN_IMAGE_MAX_SIZE,
 								SIGN_IMAGE_MAX_SIZE,
-								SWT.TOP);
+								SWT.TOP,
+								noHideArea);
 
 						chartLabel.devMarkerSignImageBounds = rectPainted;
 					}
@@ -620,22 +627,27 @@ public class ChartLayerMarker implements IChartLayer, IChartOverlay {
 			gc.setBackground(colorHidden);
 		}
 
-		final int devLabelX = chartLabel.devXLabel - MARKER_HOVER_SIZE;
-		final int devLabelY = chartLabel.devYLabel - MARKER_HOVER_SIZE;
-		final int devLabelWidth = chartLabel.devLabelWidth + 2 * MARKER_HOVER_SIZE;
-		final int devLabelHeight = chartLabel.devLabelHeight + 2 * MARKER_HOVER_SIZE;
+		/*
+		 * Rectangles can be merged into a union with regions, took me some time to find this
+		 * solution :-)
+		 */
+		final Region region = new Region(gc.getDevice());
+
+		final Rectangle paintedLabel = chartLabel.paintedLabel;
+		if (paintedLabel != null) {
+
+			final int devLabelX = paintedLabel.x - MARKER_HOVER_SIZE;
+			final int devLabelY = paintedLabel.y - MARKER_HOVER_SIZE;
+			final int devLabelWidth = paintedLabel.width + 2 * MARKER_HOVER_SIZE;
+			final int devLabelHeight = paintedLabel.height + 2 * MARKER_HOVER_SIZE;
+
+			region.add(devLabelX, devLabelY, devLabelWidth, devLabelHeight);
+		}
 
 		final int devMarkerX = chartLabel.devXMarker - MARKER_HOVER_SIZE;
 		final int devMarkerY = chartLabel.devYMarker - MARKER_HOVER_SIZE;
 		final int devMarkerSize = MARKER_POINT_SIZE + 2 * MARKER_HOVER_SIZE;
 
-		final Region region = new Region(gc.getDevice());
-
-		/*
-		 * Rectangles can be merged into a union with regions, took me some time to find this
-		 * solution :-)
-		 */
-		region.add(devLabelX, devLabelY, devLabelWidth, devLabelHeight);
 		region.add(devMarkerX, devMarkerY, devMarkerSize, devMarkerSize);
 
 		// get whole chart rect
@@ -677,7 +689,7 @@ public class ChartLayerMarker implements IChartLayer, IChartOverlay {
 	/**
 	 * Set state in marker layer that nothing is hovered.
 	 */
-	void resetHoveredLabel() {
+	void resetHoveredState() {
 
 		_hoveredLabel = null;
 		_tooltipLabel = null;
@@ -733,16 +745,20 @@ public class ChartLayerMarker implements IChartLayer, IChartOverlay {
 			/*
 			 * Check sign label
 			 */
-			final int devXLabel = chartLabel.devXLabel;
-			final int devYLabel = chartLabel.devYLabel;
+			final Rectangle paintedLabel = chartLabel.paintedLabel;
+			if (paintedLabel != null) {
 
-			if (devXMouse > devXLabel - MARKER_HOVER_SIZE
-					&& devXMouse < devXLabel + chartLabel.devLabelWidth + MARKER_HOVER_SIZE
-					&& devYMouse > devYLabel - MARKER_HOVER_SIZE
-					&& devYMouse < devYLabel + chartLabel.devLabelHeight + MARKER_HOVER_SIZE) {
+				final int devXLabel = paintedLabel.x;
+				final int devYLabel = paintedLabel.y;
 
-				// horizontal label is hit
-				return chartLabel;
+				if (devXMouse > devXLabel - MARKER_HOVER_SIZE
+						&& devXMouse < devXLabel + paintedLabel.width + MARKER_HOVER_SIZE
+						&& devYMouse > devYLabel - MARKER_HOVER_SIZE
+						&& devYMouse < devYLabel + paintedLabel.height + MARKER_HOVER_SIZE) {
+
+					// horizontal label is hit
+					return chartLabel;
+				}
 			}
 
 			/*

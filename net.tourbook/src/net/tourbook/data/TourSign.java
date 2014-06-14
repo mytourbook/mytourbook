@@ -33,7 +33,7 @@ import net.tourbook.database.TourDatabase;
 import net.tourbook.photo.Photo;
 
 /**
- * Contains an image which is displayed with tour markers or waypoints.
+ * Contains an image which can be displayed together with tour markers or waypoints.
  */
 @Entity
 public class TourSign implements Comparable<Object> {

@@ -26,6 +26,7 @@ import net.tourbook.photo.internal.manager.ImageCacheWrapper;
 
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.Rectangle;
 
 import com.googlecode.concurrentlinkedhashmap.ConcurrentLinkedHashMap;
 import com.googlecode.concurrentlinkedhashmap.EvictionListener;
@@ -197,17 +198,14 @@ public class PhotoImageCache {
 			photo.getImageMetaData();
 
 			// check if height is set
-//			if (photo.getImageWidth() == Integer.MIN_VALUE) {
-//
-//				// image dimension is not yet set
-//
-//				if (cacheWrapper.imageWidth != Integer.MIN_VALUE) {
-//
-//					// image dimension is available
-//
-//					photo.setDimension(cacheWrapper.imageWidth, cacheWrapper.imageHeight);
-//				}
-//			}
+			if (photo.getPhotoImageWidth() == Integer.MIN_VALUE) {
+
+				// image dimension is not yet set
+
+				final Rectangle imageSize = photoImage.getBounds();
+
+				photo.setPhotoDimension(imageSize.width, imageSize.height);
+			}
 		}
 		return photoImage;
 	}

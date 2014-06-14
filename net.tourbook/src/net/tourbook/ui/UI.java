@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -146,13 +146,9 @@ public class UI {
 	public static final String								SYMBOL_AVERAGE					= "\u00f8";									//$NON-NLS-1$
 	public static final String								SYMBOL_AVERAGE_WITH_SPACE		= "\u00f8 ";									//$NON-NLS-1$
 	public static final String								SYMBOL_DASH						= "-";											//$NON-NLS-1$
-//	public static final String								SYMBOL_DASH						= "\u2212";									//$NON-NLS-1$
-//	public static final String								SYMBOL_DIFFERENCE				= "\u0394";									//$NON-NLS-1$
-//	public static final String								SYMBOL_DIFFERENCE_WITH_SPACE	= "\u0394 ";									//$NON-NLS-1$
 	public static final String								SYMBOL_DOUBLE_HORIZONTAL		= "\u2550";									//$NON-NLS-1$
 	public static final String								SYMBOL_DOUBLE_VERTICAL			= "\u2551";									//$NON-NLS-1$
 	public static final String								SYMBOL_DEGREE					= "\u00B0";									//$NON-NLS-1$
-	public static final String								SYMBOL_ELLIPSIS					= "\u2026";									//$NON-NLS-1$
 	public static final String								SYMBOL_INFINITY					= "\u221E";									//$NON-NLS-1$
 	public static final String								SYMBOL_SUM_WITH_SPACE			= "\u2211 ";									//$NON-NLS-1$
 	public static final String								SYMBOL_TAU						= "\u03c4";									//$NON-NLS-1$

@@ -323,6 +323,8 @@ public class Photo {
 		 */
 		if (imageMetadata instanceof TiffImageMetadata) {
 
+			photoMetadata.isExifFromImage = true;
+
 			final TiffImageMetadata tiffMetadata = (TiffImageMetadata) imageMetadata;
 
 			photoMetadata.exifDateTime = getTiffValueDate(tiffMetadata);
@@ -342,6 +344,8 @@ public class Photo {
 			photoMetadata.model = getTiffValueString(tiffMetadata, TiffTagConstants.TIFF_TAG_MODEL);
 
 		} else if (imageMetadata instanceof JpegImageMetadata) {
+
+			photoMetadata.isExifFromImage = true;
 
 			final JpegImageMetadata jpegMetadata = (JpegImageMetadata) imageMetadata;
 
@@ -1288,21 +1292,30 @@ public class Photo {
 
 		_photoImageMetadata = photoImageMetadata;
 
-		_exifDateTime = photoImageMetadata.exifDateTime;
 		_imageFileDateTime = photoImageMetadata.fileDateTime;
 
-		_photoImageWidth = photoImageMetadata.imageWidth;
-		_photoImageHeight = photoImageMetadata.imageHeight;
+		if (photoImageMetadata.isExifFromImage) {
 
-		_orientation = photoImageMetadata.orientation;
+			/*
+			 * Set these data only when they are contained in the image file, this ensures that e.g.
+			 * width/height is not overwritten with default values.
+			 */
 
-		_imageDirection = photoImageMetadata.imageDirection;
-		_altitude = photoImageMetadata.altitude;
+			_exifDateTime = photoImageMetadata.exifDateTime;
 
-		_exifLatitude = photoImageMetadata.latitude;
-		_exifLongitude = photoImageMetadata.longitude;
+			_photoImageWidth = photoImageMetadata.imageWidth;
+			_photoImageHeight = photoImageMetadata.imageHeight;
 
-		_gpsAreaInfo = photoImageMetadata.gpsAreaInfo;
+			_orientation = photoImageMetadata.orientation;
+
+			_imageDirection = photoImageMetadata.imageDirection;
+			_altitude = photoImageMetadata.altitude;
+
+			_exifLatitude = photoImageMetadata.latitude;
+			_exifLongitude = photoImageMetadata.longitude;
+
+			_gpsAreaInfo = photoImageMetadata.gpsAreaInfo;
+		}
 
 		// rotate image, swap with and height
 		if (_photoImageWidth != Integer.MIN_VALUE && _photoImageHeight != Integer.MIN_VALUE) {

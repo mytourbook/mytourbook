@@ -68,12 +68,9 @@ public class ChartLabel extends ChartMarker {
 	public int				devYMarker;
 
 	/*
-	 * Painted label positions
+	 * Painted positions
 	 */
-	public int				devXLabel;
-	public int				devYLabel;
-	public int				devLabelWidth;
-	public int				devLabelHeight;
+	public Rectangle		paintedLabel;
 
 	public int				devHoverSize;
 	public int				devMarkerPointSize;
@@ -105,16 +102,12 @@ public class ChartLabel extends ChartMarker {
 
 	@Override
 	public String toString() {
-		return String
-				.format(
-						"\nChartLabel\n   markerLabel=%s\n   isVertical=%s\n   devXMarker=%s\n   devYMarker=%s\n   devXLabel=%s\n   devYLabel=%s\n   devLabelWidth=%s\n   devLabelHeight=%s\n",
-						markerLabel,
-						devIsVertical,
-						devXMarker,
-						devYMarker,
-						devXLabel,
-						devYLabel,
-						devLabelWidth,
-						devLabelHeight);
+		return "ChartLabel [devXMarker="
+				+ devXMarker
+				+ ", devYMarker="
+				+ devYMarker
+				+ ", markerLabel="
+				+ markerLabel
+				+ "]";
 	}
 }

@@ -269,6 +269,8 @@ public class Messages extends NLS {
 	public static String		App_Action_Cancel;
 	public static String		App_Action_Close_ToolTip;
 	public static String		App_Action_Columns;
+	public static String	App_Action_Delete;
+
 	public static String		App_Action_Duplicate;
 	public static String		App_Action_edit_tour;
 	public static String		App_Action_Edit;
@@ -1120,6 +1122,14 @@ public class Messages extends NLS {
 
 	public static String		PrefPageTourTypeFilterList_Pref_TourTypeFilter_button_down;
 	public static String		PrefPageTourTypeFilterList_Pref_TourTypeFilter_button_up;
+
+	public static String	SignImage_Viewer_Column_Dimension_Label;
+
+	public static String	SignImage_Viewer_Column_Dimension_Tooltip;
+
+	public static String	SignImage_Viewer_Column_FilePathName_Label;
+
+	public static String	SignImage_Viewer_Column_FilePathName_Tooltip;
 
 	public static String		Slideout_ChartMarkerOptions_Checkbox_IsShowHiddenMarker;
 	public static String		Slideout_ChartMarkerOptions_Checkbox_IsShowMarker;

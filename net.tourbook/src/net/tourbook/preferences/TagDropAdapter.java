@@ -222,7 +222,8 @@ final class TagDropAdapter extends ViewerDropAdapter {
 		 */
 		draggedCategory.setRoot(true);
 
-		final TourTagCategory savedDraggedCategory = TourDatabase.saveEntity(draggedCategory,
+		final TourTagCategory savedDraggedCategory = TourDatabase.saveEntity(
+				draggedCategory,
 				draggedCategory.getCategoryId(),
 				TourTagCategory.class);
 
@@ -306,13 +307,13 @@ final class TagDropAdapter extends ViewerDropAdapter {
 		return true;
 	}
 
-	private void dropTag_IntoCategory(final TVIPrefTag itemDraggedTag, final TVIPrefTagCategory itemTargetCategory) {
+	private void dropTag_IntoCategory(final TVIPrefTag tviDraggedTag, final TVIPrefTagCategory tviTargetCategory) {
 
-		final TourTag draggedTag = itemDraggedTag.getTourTag();
-		final TreeViewerItem itemDraggedParent = itemDraggedTag.getParentItem();
+		final TourTag draggedTag = tviDraggedTag.getTourTag();
+		final TreeViewerItem itemDraggedParent = tviDraggedTag.getParentItem();
 
-		final TourTagCategory targetCategory = itemTargetCategory.getTourTagCategory();
-		TVIPrefTagCategory itemDraggedParentCategory = null;
+		final TourTagCategory targetCategory = tviTargetCategory.getTourTagCategory();
+		TVIPrefTagCategory tviDraggedParentCategory = null;
 
 		boolean isUpdateViewer = false;
 
@@ -325,23 +326,21 @@ final class TagDropAdapter extends ViewerDropAdapter {
 			final EntityManager em = TourDatabase.getInstance().getEntityManager();
 			if (em != null) {
 
-				itemDraggedParentCategory = (TVIPrefTagCategory) itemDraggedParent;
-				final TourTagCategory draggedParentCategory = itemDraggedParentCategory.getTourTagCategory();
+				tviDraggedParentCategory = (TVIPrefTagCategory) itemDraggedParent;
+				final TourTagCategory draggedParentCategory = tviDraggedParentCategory.getTourTagCategory();
 
 				/*
 				 * remove tag from old category
 				 */
-				itemDraggedParentCategory.removeChild(itemDraggedTag);
-				itemDraggedParentCategory.setTourTagCategory(updateModel_RemoveTag(
-						draggedTag,
-						draggedParentCategory,
-						em));
+				tviDraggedParentCategory.removeChild(tviDraggedTag);
+				tviDraggedParentCategory.setTourTagCategory(//
+						updateModel_RemoveTag(draggedTag, draggedParentCategory, em));
 
 				/*
 				 * add tag to the new category (target)
 				 */
-				itemTargetCategory.addChild(itemDraggedTag);
-				itemTargetCategory.setTourTagCategory(updateModel_AddTag(draggedTag, targetCategory, em));
+				tviTargetCategory.addChild(tviDraggedTag);
+				tviTargetCategory.setTourTagCategory(updateModel_AddTag(draggedTag, targetCategory, em));
 
 				em.close();
 
@@ -362,7 +361,7 @@ final class TagDropAdapter extends ViewerDropAdapter {
 				/*
 				 * remove tag from root item
 				 */
-				draggedRootItem.removeChild(itemDraggedTag);
+				draggedRootItem.removeChild(tviDraggedTag);
 
 				/*
 				 * update tag in db
@@ -373,8 +372,8 @@ final class TagDropAdapter extends ViewerDropAdapter {
 				/*
 				 * add tag to the new category (target)
 				 */
-				itemTargetCategory.addChild(itemDraggedTag);
-				itemTargetCategory.setTourTagCategory(updateModel_AddTag(draggedTag, targetCategory, em));
+				tviTargetCategory.addChild(tviDraggedTag);
+				tviTargetCategory.setTourTagCategory(updateModel_AddTag(draggedTag, targetCategory, em));
 
 				em.close();
 
@@ -386,13 +385,13 @@ final class TagDropAdapter extends ViewerDropAdapter {
 
 			// update tag viewer
 
-			_tagViewer.remove(itemDraggedTag);
-			_tagViewer.add(itemTargetCategory, itemDraggedTag);
+			_tagViewer.remove(tviDraggedTag);
+			_tagViewer.add(tviTargetCategory, tviDraggedTag);
 
-			if (itemDraggedParentCategory != null) {
-				_tagViewer.update(itemDraggedParentCategory, null);
+			if (tviDraggedParentCategory != null) {
+				_tagViewer.update(tviDraggedParentCategory, null);
 			}
-			_tagViewer.update(itemTargetCategory, null);
+			_tagViewer.update(tviTargetCategory, null);
 		}
 	}
 
@@ -549,9 +548,7 @@ final class TagDropAdapter extends ViewerDropAdapter {
 		lazyTargetCategory.setTagCounter(lazyTargetCategory.getTourTags().size());
 		lazyTargetCategory.setCategoryCounter(targetCategories.size());
 
-		return TourDatabase.saveEntity(lazyTargetCategory,
-				lazyTargetCategory.getCategoryId(),
- TourTagCategory.class);
+		return TourDatabase.saveEntity(lazyTargetCategory, lazyTargetCategory.getCategoryId(), TourTagCategory.class);
 	}
 
 	/**
@@ -576,9 +573,7 @@ final class TagDropAdapter extends ViewerDropAdapter {
 		lazyTargetCategory.setTagCounter(targetTags.size());
 		lazyTargetCategory.setCategoryCounter(lazyTargetCategory.getTagCategories().size());
 
-		return TourDatabase.saveEntity(lazyTargetCategory,
-				lazyTargetCategory.getCategoryId(),
- TourTagCategory.class);
+		return TourDatabase.saveEntity(lazyTargetCategory, lazyTargetCategory.getCategoryId(), TourTagCategory.class);
 	}
 
 	private TourTagCategory updateModel_RemoveCategory(	final TourTagCategory draggedCategory,
@@ -613,7 +608,8 @@ final class TagDropAdapter extends ViewerDropAdapter {
 			lazyParentCategory.setCategoryCounter(parentChildrenCategories.size());
 			lazyParentCategory.setTagCounter(lazyParentCategory.getTourTags().size());
 
-			return TourDatabase.saveEntity(lazyParentCategory,
+			return TourDatabase.saveEntity(
+					lazyParentCategory,
 					lazyParentCategory.getCategoryId(),
 					TourTagCategory.class);
 		} else {

@@ -21,7 +21,6 @@ import net.tourbook.photo.PicDirView;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.handlers.HandlerUtil;
 
@@ -38,12 +37,7 @@ public class ActionHandlerImportSigns extends AbstractHandler {
 			final PhotosWithExifSelection selectedPhotosWithExif = picDirView.getSelectedPhotosWithExif(false);
 
 			if (selectedPhotosWithExif != null) {
-
-				final DialogImportSignIcons dialog = new DialogImportSignIcons(//
-						Display.getCurrent().getActiveShell(),
-						selectedPhotosWithExif);
-
-				dialog.open();
+				SignManager.importSignImages(selectedPhotosWithExif);
 			}
 		}
 

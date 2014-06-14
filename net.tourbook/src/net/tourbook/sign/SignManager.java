@@ -15,6 +15,11 @@
  *******************************************************************************/
 package net.tourbook.sign;
 
+import java.io.File;
+import java.lang.reflect.InvocationTargetException;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -25,8 +30,10 @@ import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
 import net.tourbook.Messages;
+import net.tourbook.common.UI;
 import net.tourbook.common.util.SQLUtils;
 import net.tourbook.common.util.StatusUtil;
+import net.tourbook.common.util.StringUtils;
 import net.tourbook.data.TourSign;
 import net.tourbook.data.TourSignCategory;
 import net.tourbook.data.TourTag;
@@ -37,13 +44,27 @@ import net.tourbook.photo.Photo;
 import net.tourbook.photo.PhotoImageCache;
 import net.tourbook.photo.PhotoLoadManager;
 import net.tourbook.photo.PhotoLoadingState;
+import net.tourbook.photo.PhotosWithExifSelection;
+import net.tourbook.preferences.PrefPageSigns;
 
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.Path;
+import org.eclipse.jface.dialogs.ProgressMonitorDialog;
+import org.eclipse.jface.operation.IRunnableWithProgress;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.ui.dialogs.PreferencesUtil;
 
 /**
  */
 public class SignManager {
+
+	/**
+	 * Update interval in ms.
+	 */
+	private static final int							MONITOR_UPDATE_INTERVAL	= 100;
 
 	private static final ImageQuality					SIGN_IMAGE_QUALITY		= ImageQuality.HQ;
 
@@ -79,6 +100,16 @@ public class SignManager {
 	 * {@link TourSignCategory#getCategoryKey()}.
 	 */
 	private static HashMap<String, TourSignCategory>	_importedSignCategories	= new HashMap<String, TourSignCategory>();
+
+	private static long									_parseUIUpdateTime;
+	private static int									_fsItemCounter;
+
+	private static int									_folderDepth;
+
+	/**
+	 * Number of segments in the {@link #_baseFolder}.
+	 */
+	private static int									_baseFolderSegments;
 
 	/**
 	 * Removes all tour signs which are loaded from the database so the next time they will be
@@ -252,51 +283,6 @@ public class SignManager {
 		return signCategory;
 	}
 
-	/**
-	 * @param signPhoto
-	 * @return Returns the photo image or <code>null</code> when image is not loaded.
-	 */
-	public static Image getPhotoImage(final Photo signPhoto) {
-
-		return PhotoImageCache.getImage(signPhoto, SIGN_IMAGE_QUALITY);
-	}
-
-	/**
-	 * @param signPhoto
-	 * @param imageLoadCallback
-	 *            This callback is used to load the photo image.
-	 * @return Returns the photo image or <code>null</code> when image is not loaded.
-	 */
-	public static Image getPhotoImage(final Photo signPhoto, final ILoadCallBack imageLoadCallback) {
-
-		Image photoImage = null;
-
-		// check if image has an loading error
-		final PhotoLoadingState photoLoadingState = signPhoto.getLoadingState(SIGN_IMAGE_QUALITY);
-
-		if (photoLoadingState != PhotoLoadingState.IMAGE_IS_INVALID) {
-
-			// image is not yet loaded
-
-			// check if image is in the cache
-			photoImage = PhotoImageCache.getImage(signPhoto, SIGN_IMAGE_QUALITY);
-
-			if ((photoImage == null || photoImage.isDisposed())
-					&& photoLoadingState == PhotoLoadingState.IMAGE_IS_IN_LOADING_QUEUE == false) {
-
-				// the requested image is not available in the image cache -> image must be loaded
-
-				PhotoLoadManager.putImageInLoadingQueueThumbGallery(
-						null,
-						signPhoto,
-						SIGN_IMAGE_QUALITY,
-						imageLoadCallback);
-			}
-		}
-
-		return photoImage;
-	}
-
 	@SuppressWarnings("unchecked")
 	public static SignCollection getRootSigns() {
 
@@ -407,12 +393,299 @@ public class SignManager {
 		return categoryEntries;
 	}
 
+	/**
+	 * @param signPhoto
+	 * @return Returns the photo image or <code>null</code> when image is not loaded.
+	 */
+	public static Image getSignImage(final Photo signPhoto) {
+
+		return PhotoImageCache.getImage(signPhoto, SIGN_IMAGE_QUALITY);
+	}
+
+	/**
+	 * @param signPhoto
+	 * @param imageLoadCallback
+	 *            This callback is used to load the photo image.
+	 * @return Returns the photo image or <code>null</code> when image is not loaded.
+	 */
+	public static Image getSignImage(final Photo signPhoto, final ILoadCallBack imageLoadCallback) {
+
+		Image photoImage = null;
+
+		// check if image has an loading error
+		final PhotoLoadingState photoLoadingState = signPhoto.getLoadingState(SIGN_IMAGE_QUALITY);
+
+		if (photoLoadingState != PhotoLoadingState.IMAGE_IS_INVALID) {
+
+			// image is not yet loaded
+
+			// check if image is in the cache
+			photoImage = PhotoImageCache.getImage(signPhoto, SIGN_IMAGE_QUALITY);
+
+			if ((photoImage == null || photoImage.isDisposed())
+					&& photoLoadingState == PhotoLoadingState.IMAGE_IS_IN_LOADING_QUEUE == false) {
+
+				// the requested image is not available in the image cache -> image must be loaded
+
+				PhotoLoadManager.putImageInLoadingQueueThumbGallery(
+						null,
+						signPhoto,
+						SIGN_IMAGE_QUALITY,
+						imageLoadCallback);
+			}
+		}
+
+		return photoImage;
+	}
+
+	/**
+	 * Imports all images from the selected folder and all subfolders, the foldername will be used
+	 * as the category name.
+	 * 
+	 * @param selectedFolder
+	 */
+	public static void importSignImages(final File selectedFolder) {
+
+		TEMP_DB_cleanup();
+
+		final Path baseFolder = new Path(selectedFolder.getAbsolutePath());
+		_baseFolderSegments = baseFolder.segmentCount();
+
+		try {
+
+			final IRunnableWithProgress runnable = new IRunnableWithProgress() {
+
+				@Override
+				public void run(final IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+
+					final String taskName = Messages.Dialog_ImportSigns_MonitorTask;
+					monitor.beginTask(taskName, IProgressMonitor.UNKNOWN);
+
+					// folder depth position is the parent of the root
+					_folderDepth = -1;
+
+					parseFolder_10_FilesFolder(//
+							selectedFolder,
+							UI.EMPTY_STRING,
+							null,
+							monitor);
+				}
+			};
+
+			final ProgressMonitorDialog progressMonitorDialog = new ProgressMonitorDialog(Display
+					.getCurrent()
+					.getActiveShell());
+			progressMonitorDialog.run(true, true, runnable);
+
+		} catch (final Exception e) {
+			StatusUtil.showStatus(e);
+		}
+
+		importSignImages_Final();
+	}
+
+	/**
+	 * Import sign images from a {@link PhotosWithExifSelection}.
+	 * 
+	 * @param selectedPhotosWithExif
+	 */
+	public static void importSignImages(final PhotosWithExifSelection selectedPhotosWithExif) {
+
+		TEMP_DB_cleanup();
+
+		for (final Photo signPhoto : selectedPhotosWithExif.photos) {
+
+			// get file/folder name without extension
+			final File fileOrFolder = signPhoto.imageFile;
+			final Path fileOrFolderPath = new Path(fileOrFolder.getAbsolutePath());
+			final String fileOrFolderName = fileOrFolderPath.removeFileExtension().lastSegment();
+
+			parseFolder_20_CreateTourSign(//
+					fileOrFolder,
+					fileOrFolderName,
+					TourSignCategory.ROOT_KEY,
+					null,
+					true);
+		}
+
+		importSignImages_Final();
+	}
+
+	private static void importSignImages_Final() {
+
+		saveAllImportedSigns();
+
+		Display.getCurrent().asyncExec(new Runnable() {
+			public void run() {
+
+				// ensure newly saved sign are loaded
+				clearTourSigns();
+
+				PreferencesUtil.createPreferenceDialogOn(
+						Display.getCurrent().getActiveShell(),
+						PrefPageSigns.ID,
+						null,
+						null).open();
+			}
+		});
+	}
+
 	public static void keepImportedSign(final TourSign importedSign) {
 
 		_importedSigns.put(importedSign.getSignKey(), importedSign);
 	}
 
-	public static void saveAllImportedSigns() {
+	/**
+	 * !!!!!!!!!!!!!! RECURSIVE !!!!!!!!!!!!!!!!!<br>
+	 * <br>
+	 * <br>
+	 * !!!!!!!!!!!!!! RECURSIVE !!!!!!!!!!!!!!!!!
+	 * 
+	 * @param fileOrFolder
+	 * @param categoryName
+	 * @param categoryKey
+	 *            Is an empty string when parent folder is the base folder.
+	 * @param parentSignCategory
+	 * @param monitor
+	 * @return Returns <code>true</code> if all deletions were successful
+	 */
+	private static void parseFolder_10_FilesFolder(	final File fileOrFolder,
+													String categoryKey,
+													final TourSignCategory parentSignCategory,
+													final IProgressMonitor monitor) {
+
+		if (monitor.isCanceled()) {
+			return;
+		}
+
+		// update monitor every n seconds
+		updateUI_Monitor(fileOrFolder, monitor);
+
+		// get file/folder name without extension
+		final Path fileOrFolderPath = new Path(fileOrFolder.getAbsolutePath());
+		final String fileOrFolderName = fileOrFolderPath.removeFileExtension().lastSegment();
+
+		final boolean isRootParent = _folderDepth == -1;
+		final boolean isRoot = _folderDepth == 0;
+		if (isRoot) {
+			categoryKey = TourSignCategory.ROOT_KEY;
+		}
+
+		if (fileOrFolder.isDirectory()) {
+
+			// fs item is a folder
+
+			// create folder key from folder path.
+			final String[] relativeSegments = fileOrFolderPath.removeFirstSegments(_baseFolderSegments).segments();
+			final String folderKey = StringUtils.join(relativeSegments, KEY_PART_SEPARATOR);
+
+			TourSignCategory signCategory = null;
+
+			// don't create a sign category for the parent of the root
+			if (isRootParent == false) {
+
+				// get/create sign category
+				signCategory = getImportedSignCategoryByKey(//
+						fileOrFolderName,
+						folderKey,
+						isRoot);
+
+				if (parentSignCategory != null) {
+					parentSignCategory.addTourSignCategory(signCategory);
+				}
+			}
+
+			// get all FS items
+			final String[] allFSItems = fileOrFolder.list();
+			for (final String fsPathName : allFSItems) {
+
+				_folderDepth++;
+
+				parseFolder_10_FilesFolder(//
+						new File(fileOrFolder, fsPathName),
+						folderKey,
+						signCategory,
+						monitor);
+
+				_folderDepth--;
+			}
+
+		} else {
+
+			// fs item is a file
+
+			parseFolder_20_CreateTourSign(//
+					fileOrFolder,
+					fileOrFolderName,
+					categoryKey,
+					parentSignCategory,
+					isRoot);
+		}
+
+		/*
+		 * !!! canceled must be checked before isFileFolderDeleted is checked because this returns
+		 * false when the monitor is canceled !!!
+		 */
+		if (monitor.isCanceled()) {
+			return;
+		}
+
+		if (true) {
+//			monitor.setCanceled(true);
+		}
+	}
+
+	/**
+	 * @param fileOrFolder
+	 * @param fileOrFolderName
+	 * @param categoryKey
+	 * @param parentSignCategory
+	 *            Parent category for this sign, can be <code>null</code> when sign is in the root.
+	 * @param isRoot
+	 */
+	private static void parseFolder_20_CreateTourSign(	final File fileOrFolder,
+														final String fileOrFolderName,
+														final String categoryKey,
+														final TourSignCategory parentSignCategory,
+														final boolean isRoot) {
+
+		// get/create sign
+		final TourSign importedSign = getImportedSignByKey(//
+				fileOrFolderName,
+				categoryKey,
+				isRoot);
+
+		if (importedSign.getSignId() == TourDatabase.ENTITY_IS_NOT_SAVED) {
+
+			// sign entity is not yet saved
+
+			importedSign.setRoot(isRoot);
+			importedSign.setImageFilePathName(fileOrFolder.getAbsolutePath());
+
+			final TourSign savedSign = TourDatabase.saveEntity(//
+					importedSign,
+					importedSign.getSignId(),
+					TourSign.class);
+
+			keepImportedSign(savedSign);
+
+			if (parentSignCategory != null) {
+
+				// set category for this sign
+				importedSign.getTourSignCategories().add(parentSignCategory);
+
+				// this parent category has a new child
+				parentSignCategory.addTourSign(savedSign);
+			}
+		}
+	}
+
+	public static void resetSignEntries(final long categoryId) {
+
+		_signCollections.remove(categoryId);
+	}
+
+	private static void saveAllImportedSigns() {
 
 //		// save imported signs
 //		for (final Entry<String, TourSign> tourSignEntry : _importedSigns.entrySet()) {
@@ -437,7 +710,7 @@ public class SignManager {
 
 			final TourSignCategory tourSignCategory = tourSignCategoryEntry.getValue();
 
-			final TourSignCategory savedSignCategory = TourDatabase.saveEntity(//
+			TourDatabase.saveEntity(//
 					tourSignCategory,
 					tourSignCategory.getCategoryId(),
 					TourSignCategory.class);
@@ -446,6 +719,61 @@ public class SignManager {
 		// remove imported signs/categories, saved sign/categories do have other instances
 		_importedSigns.clear();
 		_importedSignCategories.clear();
+	}
+
+	private static void TEMP_DB_cleanup() {
+
+		clearTourSigns();
+
+		Connection conn = null;
+		PreparedStatement prepStmt = null;
+
+		String sql = UI.EMPTY_STRING;
+
+		try {
+
+			conn = TourDatabase.getInstance().getConnection();
+
+			final String allSql[] = {
+					//
+					"DELETE FROM " + TourDatabase.JOINTABLE_TOURSIGNCATEGORY_TOURSIGN, //$NON-NLS-1$
+					"DELETE FROM " + TourDatabase.JOINTABLE_TOURSIGNCATEGORY_TOURSIGNCATEGORY, //$NON-NLS-1$
+					//
+					"DELETE FROM " + TourDatabase.TABLE_TOUR_SIGN, //$NON-NLS-1$
+					"DELETE FROM " + TourDatabase.TABLE_TOUR_SIGN_CATEGORY, //$NON-NLS-1$
+			//
+			};
+
+			for (final String sqlExec : allSql) {
+
+				sql = sqlExec;
+
+				prepStmt = conn.prepareStatement(sql);
+				prepStmt.execute();
+				prepStmt.close();
+			}
+
+		} catch (final SQLException e) {
+			SQLUtils.showSQLException(e);
+		} finally {
+			TourDatabase.closeConnection(conn);
+		}
+	}
+
+	private static void updateUI_Monitor(final File fileFolder, final IProgressMonitor monitor) {
+
+		final long time = System.currentTimeMillis();
+
+		_fsItemCounter++;
+
+		if (time > _parseUIUpdateTime + MONITOR_UPDATE_INTERVAL) {
+
+			_parseUIUpdateTime = time;
+
+			monitor.subTask(NLS.bind(
+					Messages.Dialog_ImportSigns_MonitorTask_SubTask,
+					new Object[] { _fsItemCounter, UI.shortenText(fileFolder.toString(), 100, false) }));
+		}
 	}
 
 }

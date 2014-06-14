@@ -5537,6 +5537,10 @@ public class ChartComponentGraph extends Canvas {
 			// stop dragging the x-slider
 			_xSliderDragged = null;
 
+			// prevent that after the context menu is closed with a mouse click, the x-slider starts dragging
+			_isSetXSliderPositionLeft = false;
+			_isSetXSliderPositionRight = false;
+
 			if (event.button == 3) {
 
 				// right button is pressed
@@ -6441,8 +6445,8 @@ public class ChartComponentGraph extends Canvas {
 			return;
 		}
 
-		_isCustomLayerImageDirty=true;
-		
+		_isCustomLayerImageDirty = true;
+
 		redraw();
 	}
 

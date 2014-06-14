@@ -39,13 +39,13 @@ public class SignMenuManager {
 	private ITourSignSetter			_tourSignSetter;
 
 	private ActionOpenPrefDialog	_actionOpenTourSignPrefs;
-	private ActionRemoveTourSign	_actionRemoveTourSign;
+	private ActionRemoveMarkerImage	_actionRemoveMarkerImage;
 
 	private TourSign				_currentTourSign;
 
-	private class ActionRemoveTourSign extends Action {
+	private class ActionRemoveMarkerImage extends Action {
 
-		public ActionRemoveTourSign() {
+		public ActionRemoveMarkerImage() {
 
 			super(Messages.Action_Sign_RemoveMarkerImage, AS_PUSH_BUTTON);
 		}
@@ -158,8 +158,10 @@ public class SignMenuManager {
 
 	private void createActions() {
 
-		_actionOpenTourSignPrefs = new ActionOpenPrefDialog(Messages.Action_Sign_MarkerImagePreferences, PrefPageSigns.ID);
-		_actionRemoveTourSign = new ActionRemoveTourSign();
+		_actionOpenTourSignPrefs = new ActionOpenPrefDialog(
+				Messages.Action_Sign_MarkerImagePreferences,
+				PrefPageSigns.ID);
+		_actionRemoveMarkerImage = new ActionRemoveMarkerImage();
 	}
 
 	private void fill_SignActions(final SignCollection signCollection, final IMenuManager menuMgr) {
@@ -205,7 +207,7 @@ public class SignMenuManager {
 		fill_SignActions(SignManager.getRootSigns(), menuMgr);
 
 		menuMgr.add(new Separator());
-		menuMgr.add(_actionRemoveTourSign);
+		menuMgr.add(_actionRemoveMarkerImage);
 
 		menuMgr.add(new Separator());
 		menuMgr.add(_actionOpenTourSignPrefs);
@@ -222,7 +224,7 @@ public class SignMenuManager {
 		fill_SignActions(SignManager.getRootSigns(), menu);
 
 		(new Separator()).fill(menu, -1);
-		contribItem(_actionRemoveTourSign).fill(menu, -1);
+		contribItem(_actionRemoveMarkerImage).fill(menu, -1);
 
 		(new Separator()).fill(menu, -1);
 		contribItem(_actionOpenTourSignPrefs).fill(menu, -1);
@@ -230,7 +232,7 @@ public class SignMenuManager {
 
 	public void setEnabledRemoveTourSignAction(final boolean isEnabled) {
 
-		_actionRemoveTourSign.setEnabled(isEnabled);
+		_actionRemoveMarkerImage.setEnabled(isEnabled);
 	}
 
 	public void setTourSign(final TourSign tourSign) {

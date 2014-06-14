@@ -148,7 +148,6 @@ public class ChartMarkerToolTip extends AnimatedToolTipShell implements ITourPro
 		 * This is the tricky part that the hovered marker is reset before the tooltip is closed and
 		 * not when nothing is hovered. This ensures that the tooltip has a valid state.
 		 */
-
 		_hoveredLabel = null;
 		_hoveredTourMarker = null;
 	}
@@ -172,7 +171,7 @@ public class ChartMarkerToolTip extends AnimatedToolTipShell implements ITourPro
 	protected Composite createToolTipContentArea(final Composite shell) {
 
 		setFadeInSteps(1);
-		setFadeOutSteps(20);
+		setFadeOutSteps(10);
 		setFadeOutDelaySteps(5);
 
 		if (_hoveredLabel == null) {
@@ -249,27 +248,7 @@ public class ChartMarkerToolTip extends AnimatedToolTipShell implements ITourPro
 				.applyTo(_ttContainer);
 		_ttContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_INFO_BACKGROUND));
 		{
-			final Composite topContainer = new Composite(_ttContainer, SWT.NONE);
-			GridDataFactory.fillDefaults().grab(true, false).applyTo(topContainer);
-			GridLayoutFactory.fillDefaults().numColumns(2).applyTo(topContainer);
-//			topContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
-			{
-				/*
-				 * Name
-				 */
-				final Label lblName = new Label(topContainer, SWT.NONE);
-				GridDataFactory.fillDefaults()//
-						.grab(true, false)
-						.align(SWT.FILL, SWT.CENTER)
-						.applyTo(lblName);
-
-				lblName.setText(_hoveredTourMarker.getLabel());
-
-				/*
-				 * Actions
-				 */
-				createUI_20_Actions(topContainer);
-			}
+			createUI_12_TopContainer();
 
 			/*
 			 * Description
@@ -329,6 +308,39 @@ public class ChartMarkerToolTip extends AnimatedToolTipShell implements ITourPro
 
 				setUrlWidth(linkUrl, linkText);
 			}
+		}
+	}
+
+	private void createUI_12_TopContainer() {
+
+		final String ttTitle = _hoveredTourMarker.getLabel();
+
+		if (ttTitle.length() == 0 && _isShowActions == false) {
+
+			// nothing is displayed
+			return;
+		}
+
+		final Composite topContainer = new Composite(_ttContainer, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(topContainer);
+		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(topContainer);
+//			topContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
+		{
+			/*
+			 * Name
+			 */
+			final Label lblName = new Label(topContainer, SWT.NONE);
+			GridDataFactory.fillDefaults()//
+					.grab(true, false)
+					.align(SWT.FILL, SWT.CENTER)
+					.applyTo(lblName);
+
+			lblName.setText(ttTitle);
+
+			/*
+			 * Actions
+			 */
+			createUI_20_Actions(topContainer);
 		}
 	}
 
@@ -440,47 +452,44 @@ public class ChartMarkerToolTip extends AnimatedToolTipShell implements ITourPro
 	 */
 	private Rectangle getHoveredRect() {
 
-		final int devMarkerPointSizeRaw = _hoveredLabel.devMarkerPointSize;
-		final int devLabelWidthRaw = _hoveredLabel.devLabelWidth;
 		final int hoverSize = _hoveredLabel.devHoverSize;
+		final int devMarkerPointSizeRaw = _hoveredLabel.devMarkerPointSize;
 
-		int devMarkerPointSize = devMarkerPointSizeRaw;
-		if (devMarkerPointSize < 1) {
-			devMarkerPointSize = 1;
-		}
-
-		final int devLabelX = _hoveredLabel.devXLabel - hoverSize;
-		final int devLabelY = _hoveredLabel.devYLabel - hoverSize;
-		final int devLabelWidth = devLabelWidthRaw + 2 * hoverSize;
-		final int devLabelHeight = _hoveredLabel.devLabelHeight + 2 * hoverSize;
-
-		final int devMarkerX = _hoveredLabel.devXMarker - hoverSize;
-		final int devMarkerY = _hoveredLabel.devYMarker - hoverSize;
-		final int devMarkerSize = devMarkerPointSize + 2 * hoverSize;
-
-		Rectangle rectMarker = null;
-		Rectangle rectLabel = null;
 		Rectangle rectHovered = new Rectangle(_hoveredLabel.devXMarker, _hoveredLabel.devYMarker, 1, 1);
 
 		// add marker rect
 		if (_cmc.isShowMarkerPoint && devMarkerPointSizeRaw > 0) {
-			rectMarker = new Rectangle(devMarkerX, devMarkerY, devMarkerSize, devMarkerSize);
+
+			int devMarkerPointSize = devMarkerPointSizeRaw;
+			if (devMarkerPointSize < 1) {
+				devMarkerPointSize = 1;
+			}
+
+			final int devMarkerX = _hoveredLabel.devXMarker - hoverSize;
+			final int devMarkerY = _hoveredLabel.devYMarker - hoverSize;
+			final int devMarkerSize = devMarkerPointSize + 2 * hoverSize;
+
+			final Rectangle rectMarker = new Rectangle(devMarkerX, devMarkerY, devMarkerSize, devMarkerSize);
 			rectHovered = rectHovered.union(rectMarker);
 		}
 
 		// add label rect
-		if (_cmc.isShowMarkerLabel && devLabelWidthRaw > 0) {
+		if (_cmc.isShowMarkerLabel) {
 
-			rectLabel = new Rectangle(devLabelX, devLabelY, devLabelWidth, devLabelHeight);
-			rectHovered = rectHovered.union(rectLabel);
+			final Rectangle paintedLabel = _hoveredLabel.paintedLabel;
+			final int devLabelWidthRaw = paintedLabel.width;
+
+			if (devLabelWidthRaw > 0) {
+
+				final int devLabelX = paintedLabel.x - hoverSize;
+				final int devLabelY = paintedLabel.y - hoverSize;
+				final int devLabelWidth = devLabelWidthRaw + 2 * hoverSize;
+				final int devLabelHeight = paintedLabel.height + 2 * hoverSize;
+
+				final Rectangle rectLabel = new Rectangle(devLabelX, devLabelY, devLabelWidth, devLabelHeight);
+				rectHovered = rectHovered.union(rectLabel);
+			}
 		}
-
-//		// add sign image rect
-//		final Rectangle rectImage = _hoveredLabel.devMarkerSignImageBounds;
-//		if (rectImage != null) {
-//
-//			rectHovered = rectHovered.union(rectImage);
-//		}
 
 		return rectHovered;
 	}

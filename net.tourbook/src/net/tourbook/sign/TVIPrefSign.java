@@ -24,10 +24,11 @@ public class TVIPrefSign extends TVIPrefSignItem {
 
 	private TourSign	_tourSign;
 
-	public TVIPrefSign(final TreeViewer signViewer, final TourSign tourSign) {
+	public TVIPrefSign(final TVIPrefSignCategory parentItem, final TreeViewer signViewer, final TourSign tourSign) {
 
 		super(signViewer);
 
+		setParentItem(parentItem);
 		_tourSign = tourSign;
 	}
 

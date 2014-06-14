@@ -17,6 +17,7 @@ package net.tourbook.ui.tourChart.action;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.UI;
 import net.tourbook.data.TourMarker;
 import net.tourbook.ui.tourChart.ITourMarkerUpdater;
 
@@ -45,12 +46,17 @@ public class ActionDeleteMarker extends Action {
 	 * Set {@link TourMarker} which is modified.
 	 * 
 	 * @param tourMarker
+	 * @param menuMgr
 	 */
 	public void setTourMarker(final TourMarker tourMarker) {
 
 		_tourMarker = tourMarker;
 
-		setText(NLS.bind(Messages.Tour_Action_Marker_Delete, tourMarker.getLabel()));
+		String label = tourMarker.getLabel();
+
+		label = UI.shortenText(label, 30, true);
+
+		setText(NLS.bind(Messages.Tour_Action_Marker_Delete, label));
 	}
 
 }
