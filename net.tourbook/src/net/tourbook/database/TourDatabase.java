@@ -433,6 +433,115 @@ public class TourDatabase {
 	}
 
 	/**
+	 * Remove a tour from the database
+	 * 
+	 * @param tourId
+	 */
+	public static boolean deleteTour(final long tourId) {
+
+		boolean isRemoved = false;
+
+		final EntityManager em = TourDatabase.getInstance().getEntityManager();
+		final EntityTransaction ts = em.getTransaction();
+
+		try {
+			final TourData tourData = em.find(TourData.class, tourId);
+
+			if (tourData != null) {
+				ts.begin();
+				em.remove(tourData);
+				ts.commit();
+			}
+
+		} catch (final Exception e) {
+
+			e.printStackTrace();
+
+			/*
+			 * an error could have been occured when loading the tour with em.find, remove the tour
+			 * with sql commands
+			 */
+			deleteTour_WithSQL(tourId);
+
+		} finally {
+			if (ts.isActive()) {
+				ts.rollback();
+			} else {
+				isRemoved = true;
+			}
+			em.close();
+		}
+
+		if (isRemoved) {
+
+			deleteTour_WithSQL(tourId);
+			TourManager.getInstance().removeTourFromCache(tourId);
+		}
+
+		return true;
+	}
+
+	/**
+	 * Remove tour from all tables which contain data for the removed tour
+	 * 
+	 * @param tourId
+	 *            Tour Id for the tour which is removed
+	 */
+	private static void deleteTour_WithSQL(final long tourId) {
+
+		Connection conn = null;
+		PreparedStatement prepStmt = null;
+
+		String sql = UI.EMPTY_STRING;
+
+		try {
+
+			conn = TourDatabase.getInstance().getConnection();
+
+			final String sqlWhere_TourId = " WHERE tourId=?";//$NON-NLS-1$
+			final String sqlWhere_TourData_TourId = " WHERE " + TABLE_TOUR_DATA + "_tourId=?"; //$NON-NLS-1$ //$NON-NLS-2$
+
+			final String allSql[] = {
+					//
+					"DELETE FROM " + TABLE_TOUR_DATA + sqlWhere_TourId, //$NON-NLS-1$
+					//
+					"DELETE FROM " + TABLE_TOUR_MARKER + sqlWhere_TourData_TourId, //$NON-NLS-1$
+					"DELETE FROM " + JOINTABLE_TOURDATA__TOURMARKER + sqlWhere_TourData_TourId, //$NON-NLS-1$
+					//
+					"DELETE FROM " + TABLE_TOUR_PHOTO + sqlWhere_TourData_TourId, //$NON-NLS-1$
+					"DELETE FROM " + JOINTABLE_TOURDATA__TOURPHOTO + sqlWhere_TourData_TourId, //$NON-NLS-1$
+					//
+					"DELETE FROM " + TABLE_TOUR_WAYPOINT + sqlWhere_TourData_TourId, //$NON-NLS-1$
+					"DELETE FROM " + JOINTABLE_TOURDATA__TOURWAYPOINT + sqlWhere_TourData_TourId, //$NON-NLS-1$
+					//
+					"DELETE FROM " + TABLE_TOUR_REFERENCE + sqlWhere_TourData_TourId, //$NON-NLS-1$
+					"DELETE FROM " + JOINTABLE_TOURDATA__TOURREFERENCE + sqlWhere_TourData_TourId, //$NON-NLS-1$
+					//
+					"DELETE FROM " + JOINTABLE_TOURDATA__TOURTAG + sqlWhere_TourData_TourId, //$NON-NLS-1$
+					//
+					"DELETE FROM " + TABLE_TOUR_COMPARED + sqlWhere_TourId, //$NON-NLS-1$
+			//
+			};
+
+			for (final String sqlExec : allSql) {
+
+				sql = sqlExec;
+
+				prepStmt = conn.prepareStatement(sql);
+				prepStmt.setLong(1, tourId);
+				prepStmt.execute();
+				prepStmt.close();
+			}
+
+		} catch (final SQLException e) {
+			System.out.println(sql);
+			UI.showSQLException(e);
+		} finally {
+			closeConnection(conn);
+		}
+	}
+
+	/**
 	 * Disable runtime statistics by putting this stagement after the result set was read
 	 * 
 	 * @param conn
@@ -1135,114 +1244,6 @@ public class TourDatabase {
 	}
 
 	/**
-	 * Remove a tour from the database
-	 * 
-	 * @param tourId
-	 */
-	public static boolean removeTour(final long tourId) {
-
-		boolean isRemoved = false;
-
-		final EntityManager em = TourDatabase.getInstance().getEntityManager();
-		final EntityTransaction ts = em.getTransaction();
-
-		try {
-			final TourData tourData = em.find(TourData.class, tourId);
-
-			if (tourData != null) {
-				ts.begin();
-				em.remove(tourData);
-				ts.commit();
-			}
-
-		} catch (final Exception e) {
-
-			e.printStackTrace();
-
-			/*
-			 * an error could have been occured when loading the tour with em.find, remove the tour
-			 * with sql commands
-			 */
-			removeTourWithSQL(tourId);
-
-		} finally {
-			if (ts.isActive()) {
-				ts.rollback();
-			} else {
-				isRemoved = true;
-			}
-			em.close();
-		}
-
-		if (isRemoved) {
-
-			removeTourWithSQL(tourId);
-			TourManager.getInstance().removeTourFromCache(tourId);
-		}
-
-		return true;
-	}
-
-	/**
-	 * Remove tour from all tables which contain data for the removed tour
-	 * 
-	 * @param tourId
-	 *            Tour Id for the tour which is removed
-	 */
-	private static void removeTourWithSQL(final long tourId) {
-
-		Connection conn = null;
-		PreparedStatement prepStmt = null;
-
-		String sql = UI.EMPTY_STRING;
-
-		try {
-
-			conn = TourDatabase.getInstance().getConnection();
-
-			final String sqlWhereTourDataTourId = " WHERE " + TABLE_TOUR_DATA + "_tourId=?"; //$NON-NLS-1$ //$NON-NLS-2$
-
-			final String allSql[] = {
-					//
-					"DELETE FROM " + TABLE_TOUR_DATA + " WHERE tourId=?", //$NON-NLS-1$ //$NON-NLS-2$
-					//
-					"DELETE FROM " + TABLE_TOUR_MARKER + sqlWhereTourDataTourId, //$NON-NLS-1$
-					"DELETE FROM " + JOINTABLE_TOURDATA__TOURMARKER + sqlWhereTourDataTourId, //$NON-NLS-1$
-					//
-					"DELETE FROM " + TABLE_TOUR_PHOTO + sqlWhereTourDataTourId, //$NON-NLS-1$
-					"DELETE FROM " + JOINTABLE_TOURDATA__TOURPHOTO + sqlWhereTourDataTourId, //$NON-NLS-1$
-					//
-					"DELETE FROM " + TABLE_TOUR_WAYPOINT + sqlWhereTourDataTourId, //$NON-NLS-1$
-					"DELETE FROM " + JOINTABLE_TOURDATA__TOURWAYPOINT + sqlWhereTourDataTourId, //$NON-NLS-1$
-					//
-					"DELETE FROM " + TABLE_TOUR_REFERENCE + sqlWhereTourDataTourId, //$NON-NLS-1$
-					"DELETE FROM " + JOINTABLE_TOURDATA__TOURREFERENCE + sqlWhereTourDataTourId, //$NON-NLS-1$
-					//
-					"DELETE FROM " + JOINTABLE_TOURDATA__TOURTAG + sqlWhereTourDataTourId, //$NON-NLS-1$
-					//
-					"DELETE FROM " + TABLE_TOUR_COMPARED + " WHERE tourId=?", //$NON-NLS-1$ //$NON-NLS-2$
-			//
-			};
-
-			for (final String sqlExec : allSql) {
-
-				sql = sqlExec;
-
-				prepStmt = conn.prepareStatement(sql);
-				prepStmt.setLong(1, tourId);
-				prepStmt.execute();
-				prepStmt.close();
-			}
-
-		} catch (final SQLException e) {
-			System.out.println(sql);
-			UI.showSQLException(e);
-		} finally {
-			closeConnection(conn);
-		}
-	}
-
-	/**
 	 * Persists an entity.
 	 * <p>
 	 * This method is <b>much faster</b> than using this
@@ -1305,7 +1306,7 @@ public class TourDatabase {
 	 * Persists an entity, an error is logged when saving fails.
 	 * <p>
 	 * This method is <b>much slower</b> than using this {@link #saveEntity(Object, long, Class)}
-	 * method without using the same EntityManater.
+	 * method without using the same EntityManager.
 	 * 
 	 * @param entity
 	 * @param id

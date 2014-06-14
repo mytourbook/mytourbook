@@ -28,6 +28,7 @@ import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.osgi.framework.internal.core.AbstractBundle;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
@@ -103,6 +104,10 @@ public class TourbookPlugin extends AbstractUIPlugin {
 	 */
 	public static TourbookPlugin getDefault() {
 		return _instance;
+	}
+
+	public static Image getImage(final String imagePath) {
+		return getImageDescriptor(imagePath).createImage();
 	}
 
 	/**

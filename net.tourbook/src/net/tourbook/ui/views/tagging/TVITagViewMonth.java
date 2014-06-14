@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -208,5 +208,12 @@ public class TVITagViewMonth extends TVITagViewItem {
 		result = prime * result + _year;
 		result = prime * result + ((_yearItem == null) ? 0 : _yearItem.hashCode());
 		return result;
+	}
+
+	@Override
+	public String toString() {
+		return "TVITagViewMonth " + System.identityHashCode(this)
+
+		+ " [_year=" + _year + ", _month=" + _month + ", _yearItem=" + _yearItem + "]";
 	}
 }

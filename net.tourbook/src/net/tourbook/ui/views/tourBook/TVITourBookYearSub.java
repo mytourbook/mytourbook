@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -67,7 +67,7 @@ public class TVITourBookYearSub extends TVITourBookItem {
 				"SELECT " //								//$NON-NLS-1$
 				//
 				+ "startYear, " //									1	//$NON-NLS-1$
-				+ "startMonth, " //								2	//$NON-NLS-1$
+				+ "startMonth, " //									2	//$NON-NLS-1$
 				+ "startDay, " //						            3	//$NON-NLS-1$
 				+ "tourDistance, " //					            4	//$NON-NLS-1$
 				+ "tourRecordingTime, " //				            5	//$NON-NLS-1$
@@ -231,15 +231,19 @@ public class TVITourBookYearSub extends TVITourBookItem {
 
 					// get first tag id
 					if (resultTagId instanceof Long) {
+
 						tagIds = new HashSet<Long>();
 						tagIds.add((Long) resultTagId);
+
 						tourItem.setTagIds(tagIds);
 					}
 
 					// get first marker id
 					if (resultMarkerId instanceof Long) {
+
 						markerIds = new HashSet<Long>();
 						markerIds.add((Long) resultMarkerId);
+
 						tourItem.setMarkerIds(markerIds);
 					}
 				}

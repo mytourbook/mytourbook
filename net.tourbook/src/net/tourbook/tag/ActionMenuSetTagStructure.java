@@ -1,17 +1,17 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
- *   
+ * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
+ * 
  * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software 
+ * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- *  
- * This program is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public License along with 
+ * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.tag;
 
@@ -42,18 +42,19 @@ import org.eclipse.swt.widgets.Tree;
 
 public class ActionMenuSetTagStructure extends Action implements IMenuCreator {
 
-	private Menu		fMenu;
+	private Menu		_menu;
 
-	private ITourViewer	fTourViewer;
+	private ITourViewer	_tourViewer;
 
 	private class ActionSetTagStructure extends Action {
 
-		private int	fExpandType;
+		private int	__expandType;
 
 		public ActionSetTagStructure(final int expandType, final String name) {
 
 			super(name, AS_CHECK_BOX);
-			fExpandType = expandType;
+
+			__expandType = expandType;
 		}
 
 		@Override
@@ -63,7 +64,7 @@ public class ActionMenuSetTagStructure extends Action implements IMenuCreator {
 
 				public void run() {
 
-					final StructuredSelection selection = (StructuredSelection) fTourViewer.getViewer().getSelection();
+					final StructuredSelection selection = (StructuredSelection) _tourViewer.getViewer().getSelection();
 
 					for (final Object element : selection.toArray()) {
 
@@ -79,27 +80,27 @@ public class ActionMenuSetTagStructure extends Action implements IMenuCreator {
 
 					if (element instanceof TVITagViewTag) {
 
-						setTagStructure2((TVITagViewTag) element);
+						setTagStructure_Item((TVITagViewTag) element);
 
 					} else if (element instanceof TVITagViewYear) {
 
-						setTagStructure2(((TVITagViewYear) element).getTagItem());
+						setTagStructure_Item(((TVITagViewYear) element).getTagItem());
 
 					} else if (element instanceof TVITagViewMonth) {
 
-						setTagStructure2(((TVITagViewMonth) element).getYearItem().getTagItem());
+						setTagStructure_Item(((TVITagViewMonth) element).getYearItem().getTagItem());
 					}
 				}
 
-				private void setTagStructure2(final TVITagViewTag tagItem) {
+				private void setTagStructure_Item(final TVITagViewTag tagItem) {
 
 					// check if expand type has changed
-					if (tagItem.getExpandType() == fExpandType) {
+					if (tagItem.getExpandType() == __expandType) {
 						return;
 					}
 
 					// remove the children of the tag because another type of children will be displayed
-					final ColumnViewer viewer = fTourViewer.getViewer();
+					final ColumnViewer viewer = _tourViewer.getViewer();
 					if (viewer instanceof TreeViewer) {
 
 						final TreeViewer treeViewer = (TreeViewer) viewer;
@@ -114,20 +115,20 @@ public class ActionMenuSetTagStructure extends Action implements IMenuCreator {
 							if (tagUnfetchedChildren != null) {
 								treeViewer.remove(tagUnfetchedChildren.toArray());
 							}
+
+							// set new expand type in the database
+							tagItem.setNewExpandType(__expandType);
+
+							tagItem.clearChildren();
+
+							if (isTagExpanded) {
+								treeViewer.setExpandedState(tagItem, true);
+							}
+
+							// update viewer
+							treeViewer.refresh(tagItem);
 						}
 						tree.setRedraw(true);
-
-						// set new expand type in the database
-						tagItem.setNewExpandType(fExpandType);
-
-						tagItem.clearChildren();
-
-						if (isTagExpanded) {
-							treeViewer.setExpandedState(tagItem, true);
-						}
-
-						// update viewer
-						treeViewer.refresh(tagItem);
 					}
 				}
 			};
@@ -141,19 +142,19 @@ public class ActionMenuSetTagStructure extends Action implements IMenuCreator {
 		super(Messages.action_tag_set_tag_expand_type, AS_DROP_DOWN_MENU);
 		setMenuCreator(this);
 
-		fTourViewer = tourViewer;
+		_tourViewer = tourViewer;
 	}
 
 	private void addActionToMenu(final Action action) {
 
 		final ActionContributionItem item = new ActionContributionItem(action);
-		item.fill(fMenu, -1);
+		item.fill(_menu, -1);
 	}
 
 	public void dispose() {
-		if (fMenu != null) {
-			fMenu.dispose();
-			fMenu = null;
+		if (_menu != null) {
+			_menu.dispose();
+			_menu = null;
 		}
 	}
 
@@ -164,10 +165,10 @@ public class ActionMenuSetTagStructure extends Action implements IMenuCreator {
 	public Menu getMenu(final Menu parent) {
 
 		dispose();
-		fMenu = new Menu(parent);
+		_menu = new Menu(parent);
 
 		// Add listener to repopulate the menu each time
-		fMenu.addMenuListener(new MenuAdapter() {
+		_menu.addMenuListener(new MenuAdapter() {
 			@Override
 			public void menuShown(final MenuEvent e) {
 
@@ -185,7 +186,8 @@ public class ActionMenuSetTagStructure extends Action implements IMenuCreator {
 				int typeIndex = 0;
 				for (final int expandType : TagManager.EXPAND_TYPES) {
 
-					final ActionSetTagStructure actionTagStructure = new ActionSetTagStructure(expandType,
+					final ActionSetTagStructure actionTagStructure = new ActionSetTagStructure(
+							expandType,
 							TagManager.EXPAND_TYPE_NAMES[typeIndex++]);
 
 					// check active expand type
@@ -196,7 +198,7 @@ public class ActionMenuSetTagStructure extends Action implements IMenuCreator {
 			}
 		});
 
-		return fMenu;
+		return _menu;
 	}
 
 	/**
@@ -207,7 +209,7 @@ public class ActionMenuSetTagStructure extends Action implements IMenuCreator {
 	private int getSelectedExpandType() {
 
 		int selectedExpandType = -1;
-		final StructuredSelection selection = (StructuredSelection) fTourViewer.getViewer().getSelection();
+		final StructuredSelection selection = (StructuredSelection) _tourViewer.getViewer().getSelection();
 
 		if (selection.size() == 1) {
 

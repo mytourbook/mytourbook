@@ -701,8 +701,6 @@
 		            mnemonic="%command_view_tourEditor_mnemonic"
 		            tooltip="%command_view_tourEditor_tooltip"/>
 		            
-		            
-		            
 				<separator
 					name="Map"
 					visible="false"/>

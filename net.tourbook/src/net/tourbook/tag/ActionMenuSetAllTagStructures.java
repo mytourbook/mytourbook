@@ -1,17 +1,17 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
- *   
+ * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
+ * 
  * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software 
+ * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- *  
- * This program is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public License along with 
+ * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.tag;
 
@@ -38,24 +38,25 @@ import org.eclipse.swt.widgets.MenuItem;
 
 public class ActionMenuSetAllTagStructures extends Action implements IMenuCreator {
 
-	private Menu		fMenu;
+	private Menu		_menu;
 
-	private TaggingView	fTagView;
+	private TaggingView	_tagView;
 
 	private class ActionSetTagStructure extends Action {
 
-		private int	fExpandType;
+		private int	__expandType;
 
 		private ActionSetTagStructure(final int expandType, final String name) {
 
 			super(name, AS_CHECK_BOX);
-			fExpandType = expandType;
+			__expandType = expandType;
 		}
 
 		@Override
 		public void run() {
 
-			if (MessageDialog.openConfirm(Display.getCurrent().getActiveShell(),
+			if (MessageDialog.openConfirm(
+					Display.getCurrent().getActiveShell(),
 					Messages.action_tag_set_all_confirm_title,
 					Messages.action_tag_set_all_confirm_message) == false) {
 				return;
@@ -75,7 +76,7 @@ public class ActionMenuSetAllTagStructures extends Action implements IMenuCreato
 						final HashMap<Long, TourTag> allTourTags = TourDatabase.getAllTourTags();
 						for (final TourTag tourTag : allTourTags.values()) {
 
-							if (tourTag.getExpandType() != fExpandType) {
+							if (tourTag.getExpandType() != __expandType) {
 
 								// set new expand type
 
@@ -83,12 +84,9 @@ public class ActionMenuSetAllTagStructures extends Action implements IMenuCreato
 								final TourTag tagInDb = em.find(TourTag.class, tagId);
 								if (tagInDb != null) {
 
-									tagInDb.setExpandType(fExpandType);
+									tagInDb.setExpandType(__expandType);
 
-									final TourTag savedEntity = TourDatabase.saveEntity(tagInDb,
-											tagId,
-											TourTag.class,
-											em);
+									final TourTag savedEntity = TourDatabase.saveEntity(tagInDb, tagId, TourTag.class);
 
 									if (savedEntity != null) {
 
@@ -107,7 +105,7 @@ public class ActionMenuSetAllTagStructures extends Action implements IMenuCreato
 						em.close();
 					}
 
-					fTagView.reloadViewer();
+					_tagView.reloadViewer();
 				}
 
 			};
@@ -120,19 +118,19 @@ public class ActionMenuSetAllTagStructures extends Action implements IMenuCreato
 		super(Messages.action_tag_set_all_tag_structures, AS_DROP_DOWN_MENU);
 		setMenuCreator(this);
 
-		fTagView = tagView;
+		_tagView = tagView;
 	}
 
 	private void addActionToMenu(final Action action) {
 
 		final ActionContributionItem item = new ActionContributionItem(action);
-		item.fill(fMenu, -1);
+		item.fill(_menu, -1);
 	}
 
 	public void dispose() {
-		if (fMenu != null) {
-			fMenu.dispose();
-			fMenu = null;
+		if (_menu != null) {
+			_menu.dispose();
+			_menu = null;
 		}
 	}
 
@@ -143,10 +141,10 @@ public class ActionMenuSetAllTagStructures extends Action implements IMenuCreato
 	public Menu getMenu(final Menu parent) {
 
 		dispose();
-		fMenu = new Menu(parent);
+		_menu = new Menu(parent);
 
 		// Add listener to repopulate the menu each time
-		fMenu.addMenuListener(new MenuAdapter() {
+		_menu.addMenuListener(new MenuAdapter() {
 			@Override
 			public void menuShown(final MenuEvent e) {
 
@@ -163,7 +161,8 @@ public class ActionMenuSetAllTagStructures extends Action implements IMenuCreato
 				int typeIndex = 0;
 				for (final int expandType : TagManager.EXPAND_TYPES) {
 
-					final ActionSetTagStructure actionTagStructure = new ActionSetTagStructure(expandType,
+					final ActionSetTagStructure actionTagStructure = new ActionSetTagStructure(
+							expandType,
 							TagManager.EXPAND_TYPE_NAMES[typeIndex++]);
 
 					addActionToMenu(actionTagStructure);
@@ -171,7 +170,7 @@ public class ActionMenuSetAllTagStructures extends Action implements IMenuCreato
 			}
 		});
 
-		return fMenu;
+		return _menu;
 	}
 
 }

@@ -30,7 +30,7 @@ import net.tourbook.data.TourData;
 import net.tourbook.data.TourTag;
 import net.tourbook.data.TourTagCategory;
 import net.tourbook.database.TourDatabase;
-import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.preferences.PrefPageTags;
 import net.tourbook.tour.TourManager;
 
 import org.eclipse.jface.action.Action;
@@ -287,9 +287,7 @@ public class ActionAddTourTag extends Action implements IMenuCreator, IAdvancedM
 
 		_actionOK = new ActionOK();
 
-		_actionOpenTagPrefs = new ActionOpenPrefDialog(
-				Messages.action_tag_open_tagging_structure,
-				ITourbookPreferences.PREF_PAGE_TAGS);
+		_actionOpenTagPrefs = new ActionOpenPrefDialog(Messages.action_tag_open_tagging_structure, PrefPageTags.ID);
 	}
 
 	private void createTagActions(final TagCollection tagCollection, final Menu menu) {

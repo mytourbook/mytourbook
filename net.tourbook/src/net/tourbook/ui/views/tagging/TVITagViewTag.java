@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -74,15 +74,15 @@ public class TVITagViewTag extends TVITagViewItem {
 
 		switch (_expandType) {
 		case TourTag.EXPAND_TYPE_FLAT:
-			setChildren(readTagChildrenTours(UI.EMPTY_STRING));
+			setChildren(readTagChildren_Tours(UI.EMPTY_STRING));
 			break;
 
 		case TourTag.EXPAND_TYPE_YEAR_MONTH_DAY:
-			setChildren(readTagChildrenYears(true, UI.EMPTY_STRING));
+			setChildren(readTagChildren_Years(true, UI.EMPTY_STRING));
 			break;
 
 		case TourTag.EXPAND_TYPE_YEAR_DAY:
-			setChildren(readTagChildrenYears(false, UI.EMPTY_STRING));
+			setChildren(readTagChildren_Years(false, UI.EMPTY_STRING));
 			break;
 
 		default:
@@ -145,7 +145,7 @@ public class TVITagViewTag extends TVITagViewItem {
 	/**
 	 * get all tours for the tag Id of this tree item
 	 */
-	private ArrayList<TreeViewerItem> readTagChildrenTours(final String whereClause) {
+	private ArrayList<TreeViewerItem> readTagChildren_Tours(final String whereClause) {
 
 		final ArrayList<TreeViewerItem> children = new ArrayList<TreeViewerItem>();
 
@@ -221,7 +221,7 @@ public class TVITagViewTag extends TVITagViewItem {
 		return children;
 	}
 
-	private ArrayList<TreeViewerItem> readTagChildrenYears(final boolean isMonth, final String whereClause) {
+	private ArrayList<TreeViewerItem> readTagChildren_Years(final boolean isMonth, final String whereClause) {
 
 		/*
 		 * get the children for the tag item
@@ -323,7 +323,7 @@ public class TVITagViewTag extends TVITagViewItem {
 
 			// this tag was added to tours
 
-			final ArrayList<TreeViewerItem> tagChildren = readTagChildrenTours(getTourIdWhereClause(modifiedTours));
+			final ArrayList<TreeViewerItem> tagChildren = readTagChildren_Tours(getTourIdWhereClause(modifiedTours));
 
 			// update model
 			unfetchedChildren.addAll(tagChildren);
@@ -379,7 +379,7 @@ public class TVITagViewTag extends TVITagViewItem {
 	 */
 	private void refreshYearItems(final TreeViewer tagViewer, final boolean isMonth) {
 
-		final ArrayList<TreeViewerItem> allYearItems = readTagChildrenYears(isMonth, UI.EMPTY_STRING);
+		final ArrayList<TreeViewerItem> allYearItems = readTagChildren_Years(isMonth, UI.EMPTY_STRING);
 
 		// update model
 		setChildren(allYearItems);
@@ -414,7 +414,7 @@ public class TVITagViewTag extends TVITagViewItem {
 
 				tagInDb.setExpandType(expandType);
 
-				TourDatabase.saveEntity(tagInDb, tagId, TourTag.class, em);
+				TourDatabase.saveEntity(tagInDb, tagId, TourTag.class);
 			}
 
 		} catch (final Exception e) {
@@ -426,6 +426,11 @@ public class TVITagViewTag extends TVITagViewItem {
 			_expandType = expandType;
 		}
 
+	}
+
+	@Override
+	public String toString() {
+		return "TVITagViewTag " + System.identityHashCode(this) + " [tagId=" + tagId + ", name=" + name + "]";
 	}
 
 }

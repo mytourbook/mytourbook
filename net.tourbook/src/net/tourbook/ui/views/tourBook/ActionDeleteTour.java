@@ -86,7 +86,7 @@ public class ActionDeleteTour extends Action {
 
 				final TVITourBookTour tourItem = (TVITourBookTour) treeItem;
 
-				if (TourDatabase.removeTour(tourItem.getTourId())) {
+				if (TourDatabase.deleteTour(tourItem.getTourId())) {
 
 					removedTours.add(tourItem);
 

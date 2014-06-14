@@ -27,6 +27,11 @@ New
   + Edit marker
 
 
+* Tagging view
+
+- Keep expanded/collapsed tags/categories when this view is closed and reopened.
+
+
 Improvements 
 
 
