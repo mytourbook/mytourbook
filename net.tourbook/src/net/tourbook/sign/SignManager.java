@@ -50,6 +50,7 @@ import net.tourbook.preferences.PrefPageSigns;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.osgi.util.NLS;
@@ -66,9 +67,9 @@ public class SignManager {
 	 */
 	private static final int							MONITOR_UPDATE_INTERVAL	= 100;
 
+	private static final String							KEY_PART_SEPARATOR		= "__";									//$NON-NLS-1$
 	private static final ImageQuality					SIGN_IMAGE_QUALITY		= ImageQuality.HQ;
-
-	static final String									KEY_PART_SEPARATOR		= "__";									//$NON-NLS-1$
+	public static final long							ROOT_SIGN_ID			= -1L;
 
 	public static final String[]						EXPAND_TYPE_NAMES		= {
 			Messages.app_action_expand_type_flat,
@@ -127,6 +128,98 @@ public class SignManager {
 
 		_importedSigns.clear();
 		_importedSignCategories.clear();
+	}
+
+	/**
+	 * Imports all images from the selected folder and all subfolders, the foldername will be used
+	 * as the category name.
+	 * 
+	 * @param selectedFolder
+	 */
+	public static void createSignImages(final File selectedFolder) {
+
+		final Path baseFolder = new Path(selectedFolder.getAbsolutePath());
+
+		// confirm import
+		if (MessageDialog.openConfirm(
+				Display.getCurrent().getActiveShell(),
+				Messages.Dialog_ImportSigns_ConfirmImportFolder_Title,
+				NLS.bind(//
+						Messages.Dialog_ImportSigns_ConfirmImportFolder_Message,
+						baseFolder.toOSString())) == false) {
+			return;
+		}
+
+		TEMP_DB_cleanup();
+
+		_baseFolderSegments = baseFolder.segmentCount();
+
+		try {
+
+			final IRunnableWithProgress runnable = new IRunnableWithProgress() {
+
+				@Override
+				public void run(final IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+
+					final String taskName = Messages.Dialog_ImportSigns_MonitorTask;
+					monitor.beginTask(taskName, IProgressMonitor.UNKNOWN);
+
+					// folder depth position is the parent of the root
+					_folderDepth = -1;
+
+					parseFolder_10_FilesFolder(//
+							selectedFolder,
+							UI.EMPTY_STRING,
+							null,
+							monitor);
+				}
+			};
+
+			final ProgressMonitorDialog progressMonitorDialog = new ProgressMonitorDialog(Display
+					.getCurrent()
+					.getActiveShell());
+			progressMonitorDialog.run(true, true, runnable);
+
+		} catch (final Exception e) {
+			StatusUtil.showStatus(e);
+		}
+
+		importSignImages_Final();
+	}
+
+	/**
+	 * Import sign images from a {@link PhotosWithExifSelection}.
+	 * 
+	 * @param selectedPhotosWithExif
+	 */
+	public static void createSignImages(final PhotosWithExifSelection selectedPhotosWithExif) {
+
+		// confirm import
+		if (MessageDialog.openConfirm(
+				Display.getCurrent().getActiveShell(),
+				Messages.Dialog_ImportSigns_ConfirmImportSelection_Title,
+				Messages.Dialog_ImportSigns_ConfirmImportSelection_Message) == false) {
+			return;
+		}
+
+		TEMP_DB_cleanup();
+
+		for (final Photo signPhoto : selectedPhotosWithExif.photos) {
+
+			// get file/folder name without extension
+			final File fileOrFolder = signPhoto.imageFile;
+			final Path fileOrFolderPath = new Path(fileOrFolder.getAbsolutePath());
+			final String fileOrFolderName = fileOrFolderPath.removeFileExtension().lastSegment();
+
+			parseFolder_20_CreateTourSign(//
+					fileOrFolder,
+					fileOrFolderName,
+					TourSignCategory.ROOT_KEY,
+					null,
+					true);
+		}
+
+		importSignImages_Final();
 	}
 
 	/**
@@ -286,10 +379,8 @@ public class SignManager {
 	@SuppressWarnings("unchecked")
 	public static SignCollection getRootSigns() {
 
-		final long rootSignId = -1L;
-
 		// check if root signs are loaded
-		SignCollection rootEntry = _signCollections.get(Long.valueOf(rootSignId));
+		SignCollection rootEntry = _signCollections.get(Long.valueOf(ROOT_SIGN_ID));
 		if (rootEntry != null) {
 			return rootEntry;
 		}
@@ -336,7 +427,7 @@ public class SignManager {
 			em.close();
 		}
 
-		_signCollections.put(rootSignId, rootEntry);
+		_signCollections.put(ROOT_SIGN_ID, rootEntry);
 
 		return rootEntry;
 	}
@@ -436,79 +527,6 @@ public class SignManager {
 		}
 
 		return photoImage;
-	}
-
-	/**
-	 * Imports all images from the selected folder and all subfolders, the foldername will be used
-	 * as the category name.
-	 * 
-	 * @param selectedFolder
-	 */
-	public static void importSignImages(final File selectedFolder) {
-
-		TEMP_DB_cleanup();
-
-		final Path baseFolder = new Path(selectedFolder.getAbsolutePath());
-		_baseFolderSegments = baseFolder.segmentCount();
-
-		try {
-
-			final IRunnableWithProgress runnable = new IRunnableWithProgress() {
-
-				@Override
-				public void run(final IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
-
-					final String taskName = Messages.Dialog_ImportSigns_MonitorTask;
-					monitor.beginTask(taskName, IProgressMonitor.UNKNOWN);
-
-					// folder depth position is the parent of the root
-					_folderDepth = -1;
-
-					parseFolder_10_FilesFolder(//
-							selectedFolder,
-							UI.EMPTY_STRING,
-							null,
-							monitor);
-				}
-			};
-
-			final ProgressMonitorDialog progressMonitorDialog = new ProgressMonitorDialog(Display
-					.getCurrent()
-					.getActiveShell());
-			progressMonitorDialog.run(true, true, runnable);
-
-		} catch (final Exception e) {
-			StatusUtil.showStatus(e);
-		}
-
-		importSignImages_Final();
-	}
-
-	/**
-	 * Import sign images from a {@link PhotosWithExifSelection}.
-	 * 
-	 * @param selectedPhotosWithExif
-	 */
-	public static void importSignImages(final PhotosWithExifSelection selectedPhotosWithExif) {
-
-		TEMP_DB_cleanup();
-
-		for (final Photo signPhoto : selectedPhotosWithExif.photos) {
-
-			// get file/folder name without extension
-			final File fileOrFolder = signPhoto.imageFile;
-			final Path fileOrFolderPath = new Path(fileOrFolder.getAbsolutePath());
-			final String fileOrFolderName = fileOrFolderPath.removeFileExtension().lastSegment();
-
-			parseFolder_20_CreateTourSign(//
-					fileOrFolder,
-					fileOrFolderName,
-					TourSignCategory.ROOT_KEY,
-					null,
-					true);
-		}
-
-		importSignImages_Final();
 	}
 
 	private static void importSignImages_Final() {
@@ -680,7 +698,7 @@ public class SignManager {
 		}
 	}
 
-	public static void resetSignEntries(final long categoryId) {
+	public static void removeCachedCategory(final long categoryId) {
 
 		_signCollections.remove(categoryId);
 	}

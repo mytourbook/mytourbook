@@ -38,7 +38,7 @@ public class ActionHandlerImportSignsFromFolder extends AbstractHandler {
 			final File selectedFolder = picDirView.getSelectedFolder();
 
 			if (selectedFolder != null) {
-				SignManager.importSignImages(selectedFolder);
+				SignManager.createSignImages(selectedFolder);
 			}
 		}
 

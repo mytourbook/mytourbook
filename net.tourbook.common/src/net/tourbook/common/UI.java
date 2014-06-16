@@ -34,6 +34,7 @@ import org.eclipse.jface.viewers.FocusCellOwnerDrawHighlighter;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerEditor;
 import org.eclipse.jface.viewers.TableViewerFocusCellManager;
+import org.eclipse.jface.viewers.TreePath;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.custom.SashForm;
@@ -118,6 +119,7 @@ public class UI {
 	public static final String			SYMBOL_GREATER_THAN						= ">";																		//$NON-NLS-1$
 	public static final String			SYMBOL_LESS_THAN						= "<";																		//$NON-NLS-1$
 	public static final String			SYMBOL_PERCENTAGE						= "%";																		//$NON-NLS-1$
+	public static final String			SYMBOL_QUESTION_MARK					= "?";																		//$NON-NLS-1$
 	public static final String			SYMBOL_STAR								= "*";																		//$NON-NLS-1$
 	public static final String			SYMBOL_UNDERSCORE						= "_";																		//$NON-NLS-1$
 	public static final String			SYMBOL_WIND_WITH_SPACE					= "W ";																	//$NON-NLS-1$
@@ -539,6 +541,35 @@ public class UI {
 		final int directionIndex = ((int) degree) % 8;
 
 		return directionIndex;
+	}
+
+	/**
+	 * @param allVisibleItems
+	 * @param allExpandedItems
+	 * @return Returns {@link TreePath}'s which are expanded and open (not hidden).
+	 */
+	public static TreePath[] getExpandedOpenedItems(final Object[] allVisibleItems, final TreePath[] allExpandedItems) {
+
+		final ArrayList<TreePath> expandedOpened = new ArrayList<TreePath>();
+
+		for (final TreePath expandedPath : allExpandedItems) {
+
+			/*
+			 * The last expanded segment must be in the visible list otherwise it is hidden.
+			 */
+			final Object lastExpandedItem = expandedPath.getLastSegment();
+
+			for (final Object visibleItem : allVisibleItems) {
+
+				if (lastExpandedItem == visibleItem) {
+
+					expandedOpened.add(expandedPath);
+					break;
+				}
+			}
+		}
+
+		return expandedOpened.toArray(new TreePath[expandedOpened.size()]);
 	}
 
 	/**

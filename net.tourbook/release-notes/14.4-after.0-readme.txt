@@ -39,6 +39,9 @@ Improvements
 
 Changes
 
+* Application menu is restructured.
+
+
 * Tour Editor
 
 - Removed tour marker tab because it was a redundance of the Tour Marker view which is now improved.

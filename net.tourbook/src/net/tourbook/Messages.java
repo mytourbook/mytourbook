@@ -26,9 +26,9 @@ public class Messages extends NLS {
 	public static String		Action_PhotosAndTours_FilterPhotos_Tooltip;
 	public static String		Action_PhotosAndTours_SavePhotoInTour;
 
-	public static String	Action_Sign_MarkerImagePreferences;
+	public static String		Action_Sign_MarkerImagePreferences;
 
-	public static String	Action_Sign_RemoveMarkerImage;
+	public static String		Action_Sign_RemoveMarkerImage;
 
 	public static String		Action_ToolTip_Hide;
 	public static String		Action_ToolTip_SetDefaults;
@@ -150,6 +150,14 @@ public class Messages extends NLS {
 	public static String		Dialog_ExtractTour_Label_DeviceName;
 	public static String		Dialog_ExtractTour_Label_SplitMethod;
 
+	public static String		Dialog_ImportSigns_ConfirmImportFolder_Message;
+
+	public static String		Dialog_ImportSigns_ConfirmImportFolder_Title;
+
+	public static String		Dialog_ImportSigns_ConfirmImportSelection_Message;
+
+	public static String		Dialog_ImportSigns_ConfirmImportSelection_Title;
+
 	public static String		Dialog_ImportSigns_Dialog_Title;
 	public static String		Dialog_ImportSigns_Dialog_Title_Message;
 	public static String		Dialog_ImportSigns_MonitorTask;
@@ -269,7 +277,7 @@ public class Messages extends NLS {
 	public static String		App_Action_Cancel;
 	public static String		App_Action_Close_ToolTip;
 	public static String		App_Action_Columns;
-	public static String	App_Action_Delete;
+	public static String		App_Action_Delete;
 
 	public static String		App_Action_Duplicate;
 	public static String		App_Action_edit_tour;
@@ -277,9 +285,13 @@ public class Messages extends NLS {
 	public static String		App_Action_Expand_All_Tooltip;
 	public static String		App_Action_ExtractTour;
 	public static String		App_Action_JoinTours;
+	public static String	App_Action_Menu_Directory;
+
 	public static String		App_Action_Menu_file;
 	public static String		App_Action_Menu_help;
 	public static String		App_Action_Menu_tools;
+
+	public static String	App_Action_Menu_Tour;
 	public static String		App_Action_Menu_view;
 	public static String		App_Action_New;
 	public static String		App_Action_open_perspective;
@@ -446,9 +458,9 @@ public class Messages extends NLS {
 	public static String		Db_Field_TourData_TourImportFilePath;
 	public static String		Db_Field_TourData_Weather;
 
-	public static String	Db_Field_TourMarker_UrlAddress;
+	public static String		Db_Field_TourMarker_UrlAddress;
 
-	public static String	Db_Field_TourMarker_UrlText;
+	public static String		Db_Field_TourMarker_UrlText;
 
 	public static String		DeviceManager_Selection_device_is_not_selected;
 
@@ -532,26 +544,26 @@ public class Messages extends NLS {
 	public static String		Dlg_TourMarker_Checkbox_MarkerVisibility;
 	public static String		Dlg_TourMarker_Dlg_Message;
 	public static String		Dlg_TourMarker_Dlg_title;
-	public static String	Dlg_TourMarker_Group_Image;
+	public static String		Dlg_TourMarker_Group_Image;
 
 	public static String		Dlg_TourMarker_Group_Label;
 
-	public static String	Dlg_TourMarker_Group_Url;
+	public static String		Dlg_TourMarker_Group_Url;
 	public static String		Dlg_TourMarker_Label_Comment;
 	public static String		Dlg_TourMarker_Label_Description;
 	public static String		Dlg_TourMarker_Label_horizontal_offset;
 
-	public static String	Dlg_TourMarker_Label_ImagePosition;
+	public static String		Dlg_TourMarker_Label_ImagePosition;
 
-	public static String	Dlg_TourMarker_Label_Label;
+	public static String		Dlg_TourMarker_Label_Label;
 
-	public static String	Dlg_TourMarker_Label_LinkText;
+	public static String		Dlg_TourMarker_Label_LinkText;
 
-	public static String	Dlg_TourMarker_Label_LinkText_Tooltip;
+	public static String		Dlg_TourMarker_Label_LinkText_Tooltip;
 
-	public static String	Dlg_TourMarker_Label_LinkUrl;
+	public static String		Dlg_TourMarker_Label_LinkUrl;
 
-	public static String	Dlg_TourMarker_Label_LinkUrl_Tooltip;
+	public static String		Dlg_TourMarker_Label_LinkUrl_Tooltip;
 	public static String		Dlg_TourMarker_Label_marker_name;
 	public static String		Dlg_TourMarker_Label_markers;
 	public static String		Dlg_TourMarker_Label_Offset;
@@ -561,9 +573,9 @@ public class Messages extends NLS {
 	public static String		Dlg_TourMarker_Label_OffsetVertical_Tooltip;
 	public static String		Dlg_TourMarker_Label_position;
 
-	public static String	Dlg_TourMarker_Label_Position_Tooltip;
+	public static String		Dlg_TourMarker_Label_Position_Tooltip;
 	public static String		Dlg_TourMarker_Label_vertical_offset;
-	public static String	Dlg_TourMarker_Link_Image;
+	public static String		Dlg_TourMarker_Link_Image;
 
 	public static String		Dlg_TourMarker_Link_Sign;
 	public static String		Dlg_TourMarker_MsgBox_delete_marker_message;
@@ -1041,6 +1053,11 @@ public class Messages extends NLS {
 	public static String		pref_view_layout_label_sub_sub;
 	public static String		pref_view_layout_label_title;
 
+	public static String	Pref_SignImages_Dialog_ConfirmDelete_Message;
+
+	public static String		Pref_SignImages_Dialog_Delete_Title;
+	public static String		Pref_SignImages_Dialog_NoSelectedSignImage_Message;
+
 	public static String		Pref_Statistic_Label_altitude;
 	public static String		Pref_Statistic_Label_altitude_low_value;
 	public static String		Pref_Statistic_Label_altitude_quantity;
@@ -1123,23 +1140,31 @@ public class Messages extends NLS {
 	public static String		PrefPageTourTypeFilterList_Pref_TourTypeFilter_button_down;
 	public static String		PrefPageTourTypeFilterList_Pref_TourTypeFilter_button_up;
 
-	public static String	SignImage_Viewer_Column_Dimension_Label;
+	public static String		SignImage_Viewer_Column_Dimension_Label;
 
-	public static String	SignImage_Viewer_Column_Dimension_Tooltip;
+	public static String		SignImage_Viewer_Column_Dimension_Tooltip;
 
-	public static String	SignImage_Viewer_Column_FilePathName_Label;
+	public static String		SignImage_Viewer_Column_FilePathName_Label;
 
-	public static String	SignImage_Viewer_Column_FilePathName_Tooltip;
+	public static String		SignImage_Viewer_Column_FilePathName_Tooltip;
+
+	public static String	SignImage_Viewer_Column_Image_Header;
+
+	public static String	SignImage_Viewer_Column_Image_Label;
+
+	public static String	SignImage_Viewer_Column_Image_Tooltip;
+
+	public static String	SignImage_Viewer_Column_Name_Label;
 
 	public static String		Slideout_ChartMarkerOptions_Checkbox_IsShowHiddenMarker;
 	public static String		Slideout_ChartMarkerOptions_Checkbox_IsShowMarker;
 
-	public static String	Slideout_ChartMarkerOptions_Checkbox_IsShowMarkerPoint;
+	public static String		Slideout_ChartMarkerOptions_Checkbox_IsShowMarkerPoint;
 	public static String		Slideout_ChartMarkerOptions_Checkbox_IsShowMarkerTooltip;
 	public static String		Slideout_ChartMarkerOptions_Checkbox_IsShowMarkerWithDefaultColor;
 	public static String		Slideout_ChartMarkerOptions_Checkbox_IsShowMarkerWithDefaultColor_Tooltip;
 
-	public static String	Slideout_ChartMarkerOptions_Checkbox_IsShowSignImage;
+	public static String		Slideout_ChartMarkerOptions_Checkbox_IsShowSignImage;
 	public static String		Slideout_ChartMarkerOptions_Checkbox_IsShowTempPosition;
 	public static String		Slideout_ChartMarkerOptions_Checkbox_IsShowTempPosition_Tooltip;
 	public static String		Slideout_ChartMarkerOptions_Label_DeviceMarkerColor;
@@ -1154,9 +1179,9 @@ public class Messages extends NLS {
 	public static String		Slideout_ChartMarkerOptions_Label_Offset;
 	public static String		Slideout_ChartMarkerOptions_Label_Offset_Tooltip;
 
-	public static String	Slideout_ChartMarkerOptions_Label_SignImageSize;
+	public static String		Slideout_ChartMarkerOptions_Label_SignImageSize;
 
-	public static String	Slideout_ChartMarkerOptions_Label_SignImageSize_Tooltip;
+	public static String		Slideout_ChartMarkerOptions_Label_SignImageSize_Tooltip;
 
 	public static String		Tooltip_ValuePoint_Action_CloseContextMenu;
 	public static String		Tooltip_ValuePoint_Action_OpenToolTipMenu_ToolTip;
@@ -1212,7 +1237,7 @@ public class Messages extends NLS {
 	public static String		Tour_Action_HrZoneGraphType_NoGradient;
 	public static String		Tour_Action_HrZoneGraphType_WhiteBottom;
 	public static String		Tour_Action_HrZoneGraphType_WhiteTop;
-	public static String	Tour_Action_Marker_Delete;
+	public static String		Tour_Action_Marker_Delete;
 
 	public static String		Tour_Action_Marker_PositionHorizontal;
 
@@ -1222,7 +1247,7 @@ public class Messages extends NLS {
 
 	public static String		Tour_Action_Marker_SetLabelPosition;
 
-	public static String	Tour_Action_Marker_SetMarkerImage;
+	public static String		Tour_Action_Marker_SetMarkerImage;
 
 	public static String		Tour_Action_Marker_SetVisible;
 
@@ -1309,9 +1334,9 @@ public class Messages extends NLS {
 	public static String		Tour_Marker_Column_remark;
 	public static String		Tour_Marker_Column_time;
 
-	public static String	Tour_Marker_Column_Url_ShortCut;
+	public static String		Tour_Marker_Column_Url_ShortCut;
 
-	public static String	Tour_Marker_Column_Url_Tooltip;
+	public static String		Tour_Marker_Column_Url_Tooltip;
 	public static String		Tour_Marker_Column_vertical_offset;
 	public static String		Tour_Marker_Column_vertical_offset_tooltip;
 

@@ -37,7 +37,7 @@ public class ActionHandlerImportSigns extends AbstractHandler {
 			final PhotosWithExifSelection selectedPhotosWithExif = picDirView.getSelectedPhotosWithExif(false);
 
 			if (selectedPhotosWithExif != null) {
-				SignManager.importSignImages(selectedPhotosWithExif);
+				SignManager.createSignImages(selectedPhotosWithExif);
 			}
 		}
 

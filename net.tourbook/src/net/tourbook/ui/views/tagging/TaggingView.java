@@ -138,8 +138,8 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 	private static final int				STATE_ITEM_TYPE_TAG				= 2;
 	private static final int				STATE_ITEM_TYPE_YEAR			= 3;
 	private static final int				STATE_ITEM_TYPE_MONTH			= 4;
-	static final int						TAG_VIEW_LAYOUT_FLAT			= 0;
 
+	static final int						TAG_VIEW_LAYOUT_FLAT			= 0;
 	static final int						TAG_VIEW_LAYOUT_HIERARCHICAL	= 10;
 	private static final NumberFormat		_nf1							= NumberFormat.getNumberInstance();
 
@@ -219,7 +219,6 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 			__itemType = itemType;
 			__itemData = itemData;
 		}
-
 	}
 
 	/**
@@ -1773,7 +1772,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 
 		final TLongArrayList expandedItems = new TLongArrayList();
 
-		final TreePath[] expandedOpenedTreePaths = saveState_ExpandedOpenedItems(
+		final TreePath[] expandedOpenedTreePaths = net.tourbook.common.UI.getExpandedOpenedItems(
 				visibleExpanded,
 				_tagViewer.getExpandedTreePaths());
 
@@ -1811,35 +1810,6 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 		}
 
 		Util.setState(_state, STATE_EXPANDED_ITEMS, expandedItems.toArray());
-	}
-
-	/**
-	 * @param allVisibleItems
-	 * @param allExpandedItems
-	 * @return Returns {@link TreePath}'s which are expanded and open (not hidden).
-	 */
-	private TreePath[] saveState_ExpandedOpenedItems(final Object[] allVisibleItems, final TreePath[] allExpandedItems) {
-
-		final ArrayList<TreePath> expandedOpened = new ArrayList<TreePath>();
-
-		for (final TreePath expandedPath : allExpandedItems) {
-
-			/*
-			 * The last expanded segment must be in the visible list otherwise it is hidden.
-			 */
-			final Object lastExpandedItem = expandedPath.getLastSegment();
-
-			for (final Object visibleItem : allVisibleItems) {
-
-				if (lastExpandedItem == visibleItem) {
-
-					expandedOpened.add(expandedPath);
-					break;
-				}
-			}
-		}
-
-		return expandedOpened.toArray(new TreePath[expandedOpened.size()]);
 	}
 
 	private void setCellColor(final ViewerCell cell, final Object element) {

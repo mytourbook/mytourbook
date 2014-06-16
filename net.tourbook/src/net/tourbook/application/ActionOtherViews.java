@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -16,8 +16,6 @@
 package net.tourbook.application;
 
 import net.tourbook.Messages;
-import net.tourbook.data.TourData;
-import net.tourbook.tour.TourManager;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IContributionItem;
@@ -38,12 +36,6 @@ public class ActionOtherViews extends Action implements IMenuCreator {
 
 	/**
 	 * @param window
-	 * @param tourProvider
-	 * @param isAddMode
-	 * @param isSaveTour
-	 *            when <code>true</code> the tour will be saved and a
-	 *            {@link TourManager#TOUR_CHANGED} event is fired, otherwise the {@link TourData}
-	 *            from the tour provider is only updated
 	 */
 	public ActionOtherViews(final IWorkbenchWindow window) {
 

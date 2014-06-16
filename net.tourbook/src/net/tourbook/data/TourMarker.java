@@ -107,25 +107,6 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 	public final static int			LABEL_POS_HORIZONTAL_GRAPH_RIGHT			= 11;
 
 	/**
-	 * Visual position for signs
-	 */
-	public static final String[]	SIGN_POSITIONS;
-
-	static {
-
-		SIGN_POSITIONS = new String[] { //
-		//
-			Messages.Tour_Marker_Position_horizontal_above_left, // 		0
-			Messages.Tour_Marker_Position_horizontal_above_centered, // 	1
-			Messages.Tour_Marker_Position_horizontal_above_right, // 		2
-			Messages.Tour_Marker_Position_horizontal_below_left, // 		3
-			Messages.Tour_Marker_Position_horizontal_below_centered, // 	4
-			Messages.Tour_Marker_Position_horizontal_below_right, // 		5
-			Messages.Tour_Marker_Position_horizontal_left, // 				6
-			Messages.Tour_Marker_Position_horizontal_right, // 				7
-		};
-	}
-	/**
 	 * Unique id for the {@link TourMarker} entity
 	 */
 	@Id
@@ -178,10 +159,6 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 	private int						visualPosition								= TourMarker.LABEL_POS_HORIZONTAL_ABOVE_GRAPH_CENTERED;
 	private int						labelXOffset;
 	private int						labelYOffset;
-
-//	private int						signPosition;
-//	private int						signXOffset;
-//	private int						signYOffset;
 
 	/**
 	 * Contains the type of the marker, this can be: crossing, hotel, view point.
@@ -425,18 +402,6 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 		return _markerBounds;
 	}
 
-//	public int getSignPosition() {
-//		return signPosition;
-//	}
-//
-//	public int getSignXOffset() {
-//		return signXOffset;
-//	}
-//
-//	public int getSignYOffset() {
-//		return signYOffset;
-//	}
-
 	/**
 	 * @return Returns position of this marker in the data serie
 	 */
@@ -515,12 +480,6 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 			return false;
 		} else if (serieIndex != comparedMarker.serieIndex) {
 			return false;
-//		} else if (signPosition != comparedMarker.signPosition) {
-//			return false;
-//		} else if (signXOffset != comparedMarker.signXOffset) {
-//			return false;
-//		} else if (signYOffset != comparedMarker.signYOffset) {
-//			return false;
 		} else if (time != comparedMarker.time) {
 			return false;
 		} else if ((isIgnoreType == false) && (type != comparedMarker.type)) {
@@ -711,18 +670,6 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 	public void setSerieIndex(final int serieIndex) {
 		this.serieIndex = serieIndex;
 	}
-
-//	public void setSignPosition(final int signPosition) {
-//		this.signPosition = signPosition;
-//	}
-//
-//	public void setSignXOffset(final int signXOffset) {
-//		this.signXOffset = signXOffset;
-//	}
-//
-//	public void setSignYOffset(final int signYOffset) {
-//		this.signYOffset = signYOffset;
-//	}
 
 	/**
 	 * @param time

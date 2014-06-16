@@ -155,8 +155,8 @@ public class TourDatabase {
 	public static final String						JOINTABLE_TOURDATA__TOURWAYPOINT			= (TABLE_TOUR_DATA
 																										+ "_" + TABLE_TOUR_WAYPOINT);		//$NON-NLS-1$
 
-	public static final String						JOINTABLE_TOURMARKER__TOURSIGN				= (TABLE_TOUR_MARKER
-																										+ "_" + TABLE_TOUR_SIGN);			//$NON-NLS-1$
+//	public static final String						JOINTABLE_TOURMARKER__TOURSIGN				= (TABLE_TOUR_MARKER
+//																										+ "_" + TABLE_TOUR_SIGN);			//$NON-NLS-1$
 	public static final String						JOINTABLE_TOURPERSON__TOURPERSON_HRZONE		= (TABLE_TOUR_PERSON
 																										+ "_" + TABLE_TOUR_PERSON_HRZONE);	//$NON-NLS-1$
 
@@ -1253,7 +1253,7 @@ public class TourDatabase {
 	 * @param entity
 	 * @param id
 	 * @param entityClass
-	 * @return saved entity
+	 * @return Returns the saved entity.
 	 */
 	public static <T> T saveEntity(final T entity, final long id, final Class<?> entityClass) {
 
@@ -2518,9 +2518,6 @@ public class TourDatabase {
 				//
 				+ "	" + (TABLE_TOUR_SIGN + "_signId	BIGINT,						\n") //$NON-NLS-1$ //$NON-NLS-2$
 				//
-//				+ "	signPosition				INTEGER DEFAULT 0,				\n" //$NON-NLS-1$
-//				+ "	signXOffset					INTEGER DEFAULT 0,				\n" //$NON-NLS-1$
-//				+ "	signYOffset					INTEGER DEFAULT 0,				\n" //$NON-NLS-1$
 				+ ("	description				" + varCharKomma(TourWayPoint.DB_LENGTH_DESCRIPTION)) //	//$NON-NLS-1$
 				+ ("	urlText					" + varCharKomma(TourMarker.DB_LENGTH_URL_TEXT)) //			//$NON-NLS-1$
 				+ ("	urlAddress				" + varCharKomma(TourMarker.DB_LENGTH_URL_ADDRESS)) //		//$NON-NLS-1$
@@ -4988,9 +4985,6 @@ public class TourDatabase {
 //				//
 //				+ "	" + (TABLE_TOUR_SIGN + "_signId	BIGINT,						\n") //$NON-NLS-1$ //$NON-NLS-2$
 //				//
-//				+ "	signPosition				INTEGER DEFAULT 0,				\n" //$NON-NLS-1$
-//				+ "	signXOffset					INTEGER DEFAULT 0,				\n" //$NON-NLS-1$
-//				+ "	signYOffset					INTEGER DEFAULT 0,				\n" //$NON-NLS-1$
 //				+ ("	description				" + varCharKomma(TourWayPoint.DB_LENGTH_DESCRIPTION)) //	//$NON-NLS-1$
 //				+ ("	urlText					" + varCharKomma(TourMarker.DB_LENGTH_URL_TEXT)) //			//$NON-NLS-1$
 //				+ ("	urlAddress				" + varCharKomma(TourMarker.DB_LENGTH_URL_ADDRESS)) //		//$NON-NLS-1$
@@ -5007,10 +5001,6 @@ public class TourDatabase {
 				sql_AddCol_VarCar(stmt, TABLE_TOUR_MARKER, "description", TourWayPoint.DB_LENGTH_DESCRIPTION); //$NON-NLS-1$
 				sql_AddCol_VarCar(stmt, TABLE_TOUR_MARKER, "urlText", TourMarker.DB_LENGTH_URL_TEXT); //$NON-NLS-1$
 				sql_AddCol_VarCar(stmt, TABLE_TOUR_MARKER, "urlAddress", TourMarker.DB_LENGTH_URL_ADDRESS); //$NON-NLS-1$
-
-//				sql_AddCol_Int(stmt, TABLE_TOUR_MARKER, "signPosition"); //$NON-NLS-1$
-//				sql_AddCol_Int(stmt, TABLE_TOUR_MARKER, "signXOffset"); //$NON-NLS-1$
-//				sql_AddCol_Int(stmt, TABLE_TOUR_MARKER, "signYOffset"); //$NON-NLS-1$
 
 				sql_CreateIndex(stmt, TABLE_TOUR_MARKER, manyToOne_TourSign, manyToOne_TourSign);
 

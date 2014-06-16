@@ -526,107 +526,150 @@
       </menuContribution>
 
 
-      <menuContribution locationURI="menu:views?before=defaultViews">
 
-         <separator
-            name="net.tourbook.separator.TourDirectories"
-            visible="true"/>
+		<!-- 
+			Directories
+		-->
+		<menuContribution locationURI="menu:m_directory?before=defaultViews">
 
-		         <command commandId="command.net.tourbook.views.rawData.RawDataView"
-		            icon="icons/rawdata.gif"
-		            label="%view_name_Data_Import"
-		            mnemonic="%view_name_Data_Import_Mnemonic"/>
+			<!-- Directories -->
+			
+				<separator
+					name="net.tourbook.separator.TourDirectories"
+					visible="true"/>
+
+				<!-- Tour Import -->
+				<command commandId="command.net.tourbook.views.rawData.RawDataView"
+					icon="icons/rawdata.gif"
+					label="%view_name_Data_Import"
+					mnemonic="%view_name_Data_Import_Mnemonic"/>
 		            
-		         <command commandId="command.net.tourbook.views.tourListView"
-		            icon="icons/tour-list.gif"
-		            label="%view_name_Book"
-		            mnemonic="%view_name_Book_Mnemonic"/>
+				<!-- Tour Book -->
+				<command commandId="command.net.tourbook.views.tourListView"
+					icon="icons/tour-list.gif"
+					label="%view_name_Book"
+					mnemonic="%view_name_Book_Mnemonic"/>
 		            
-		         <command commandId="command.net.tourbook.views.calendar.CalendarView"
-		               icon="icons/calendar.png"
-		               label="%view_name_Calendar"
-		               mnemonic="%view_name_Calendar_Mnemonic"/>
+				<!-- Calendar -->
+				<command commandId="command.net.tourbook.views.calendar.CalendarView"
+					icon="icons/calendar.png"
+					label="%view_name_Calendar"
+					mnemonic="%view_name_Calendar_Mnemonic"/>
 		               
-		         <command commandId="command.net.tourbook.views.tourCatalog.TourCatalogView"
-		            icon="icons/tour-map.gif"
-		            label="%view_name_tourCatalog"
-		            mnemonic="%view_name_tourCatalog_Mnemonic"/>
+				<!-- Tour Catalog -->
+				<command commandId="command.net.tourbook.views.tourCatalog.TourCatalogView"
+					icon="icons/tour-map.gif"
+					label="%view_name_tourCatalog"
+					mnemonic="%view_name_tourCatalog_Mnemonic"/>
+
+				<!-- Tagged Tours -->
+				<command commandId="command.net.tourbook.views.tagViewID"
+					icon="icons/tour-tag.gif"
+					label="%command_tagging_name"
+					mnemonic="%command_tagging_name_Mnemonic"
+					tooltip="%command_tagging_name_tooltip"/>
 		            
-			     <command commandId="command.net.tourbook.views.tagViewID"
-		            icon="icons/tour-tag.gif"
-		            label="%command_tagging_name"
-		            mnemonic="%command_tagging_name_Mnemonic"
-		            tooltip="%command_tagging_name_tooltip"/>
-		            
-		         <command commandId="command.net.tourbook.views.StatisticView"
-		            icon="icons/statistics.gif"
-		            label="%view_name_Statistics"
-		            mnemonic="%view_name_Statistics_Mnemonic"/>
-            
-         <separator
-            name="net.tourbook.separator.TourProperties"
-            visible="true"/>
-
-	         <command
-	               commandId="net.tourbook.command.selectedTour"
-	               icon="icons/tour-chart.gif"
-	               label="%command_view_selectedTour"
-	               mnemonic="%command_view_selectedTour_mnemonic"
-	               tooltip="%command_view_selectedTour_tooltip"/>
-	       
-	         <command
-	               commandId="net.tourbook.command.tourDataEditor"
-	               icon="icons/tour-editor.gif"
-	               label="%command_view_tourEditor"
-	               mnemonic="%command_view_tourEditor_mnemonic"
-	               tooltip="%command_view_tourEditor_tooltip"/>
+				<!-- Statistics -->
+				<command commandId="command.net.tourbook.views.StatisticView"
+					icon="icons/statistics.gif"
+					label="%view_name_Statistics"
+					mnemonic="%view_name_Statistics_Mnemonic"/>
 	               
-	         <command
-		           commandId="command.net.tourbook.views.TourMarkerView"
-	               icon="icons/tour-marker.png"
-	               label="%view_name_Marker"
-	               mnemonic="%view_name_Marker_Mnemonic"/>
+		</menuContribution>
+		
 
-	         <command
-		           commandId="command.net.tourbook.photo.TourPhotosView"
-				   icon="icons/photo-tour-photos.png"
-	               label="%View_Name_PhotoTourPhotos"
-	               mnemonic="%View_Name_PhotoTourPhotos_Mnemonic"/>
-	               
-	         <command
-	               commandId="command.net.tourbook.views.TourWaypointView"
-	               icon="icons/tour-waypoint.png"
-	               label="%View_Name_Waypoint"
-	               mnemonic="%View_Name_Waypoint_Mnemonic"/>
+		<!-- 
+			Tour
+		-->
+		<menuContribution locationURI="menu:m_tour?before=defaultViews">
 
-	         <command
-	               commandId="net.tourbook.mapping.command.tourMap"
-	               icon="icons/earth-globe-abstract.png"
-	               label="%command_tour_map_name"
-	               mnemonic="%command_tour_map_name_Mnemonic"
-	               tooltip="%command_tour_map_name_tooltip"/>
-	               
-         <separator
-               name="Map"
-               visible="false"/>
+			<!-- Map -->
+			
+				<separator
+					name="menu.net.tourbook.Map"
+					visible="true"/>
+
+				<!-- 2D map -->
+				<command
+					commandId="net.tourbook.mapping.command.tourMap"
+					icon="icons/earth-globe-abstract.png"
+					label="%command_tour_map_name"
+					mnemonic="%command_tour_map_name_Mnemonic"
+					tooltip="%command_tour_map_name_tooltip"/>
+
+			<!-- Tour -->
+			
+				<separator
+					name="net.tourbook.separator.TourProperties"
+					visible="true"/>
+
+				<!-- Tour Chart -->
+				<command
+					commandId="net.tourbook.command.selectedTour"
+					icon="icons/tour-chart.gif"
+					label="%command_view_selectedTour"
+					mnemonic="%command_view_selectedTour_mnemonic"
+					tooltip="%command_view_selectedTour_tooltip"/>
+		
+				<!-- Tour Editor -->
+				<command
+					commandId="net.tourbook.command.tourDataEditor"
+					icon="icons/tour-editor.gif"
+					label="%command_view_tourEditor"
+					mnemonic="%command_view_tourEditor_mnemonic"
+					tooltip="%command_view_tourEditor_tooltip"/>
+				
+				<!-- Tour Photos -->
+				<command
+					commandId="command.net.tourbook.photo.TourPhotosView"
+					icon="icons/photo-tour-photos.png"
+					label="%View_Name_PhotoTourPhotos"
+					mnemonic="%View_Name_PhotoTourPhotos_Mnemonic"/>
 
 
-         <separator
-               name="net.tourbook.separator.Tools"
-               visible="true"/>
+			<!-- Signs -->
+			
+				<separator
+					name="Signs"
+					visible="true"/>
+			 
+				<!-- Tour Marker -->
+				<command
+					commandId="command.net.tourbook.views.TourMarkerView"
+					icon="icons/tour-marker.png"
+					label="%view_name_Marker"
+					mnemonic="%view_name_Marker_Mnemonic"/>
+				 
+				<!-- Waypoints -->
+				<command
+					commandId="command.net.tourbook.views.TourWaypointView"
+					icon="icons/tour-waypoint.png"
+					label="%View_Name_Waypoint"
+					mnemonic="%View_Name_Waypoint_Mnemonic"/>
 
-	         <command
-	               commandId="command.net.tourbook.training.Training"
-	               icon="icons/pulse-zones.png"
-	               label="%View_Name_Training"
-	               mnemonic="%View_Name_Training_Mnemonic"/>
-	         <command
-	               commandId="command.net.tourbook.views.ConconiChart"
-	               icon="icons/conconi-chart.png"
-	               label="%View_Name_ConconiChart"
-	               mnemonic="%View_Name_ConconiChart_Mnemonic"/>
-	               
-      </menuContribution>
+
+			<!-- Sport -->
+
+				<separator
+					name="net.tourbook.separator.Tools"
+					visible="true"/>
+			
+				<!-- Training -->
+				<command
+					commandId="command.net.tourbook.training.Training"
+					icon="icons/pulse-zones.png"
+					label="%View_Name_Training"
+					mnemonic="%View_Name_Training_Mnemonic"/>
+				
+				<!-- Conconi Test -->
+				<command
+					commandId="command.net.tourbook.views.ConconiChart"
+					icon="icons/conconi-chart.png"
+					label="%View_Name_ConconiChart"
+					mnemonic="%View_Name_ConconiChart_Mnemonic"/>
+	         
+		</menuContribution>
+		
 
 		<menuContribution locationURI="menu:net.tourbook.menu.main.tools?after=tools">
 		      
@@ -1492,7 +1535,7 @@
 
    <extension point="org.eclipse.ui.menus">
 
-		<menuContribution locationURI="menu:views?after=Map" >
+		<menuContribution locationURI="menu:m_tour?endof=menu.net.tourbook.Map" >
 		            
 			<command commandId="net.tourbook.map3.command.TourMap3"
 				icon="icons/map3-view.png"

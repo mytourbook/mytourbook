@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -57,7 +57,15 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 	private IWorkbenchAction					_actionResetPerspective;
 	private IWorkbenchAction					_actionClosePerspective;
 	private IWorkbenchAction					_actionCloseAllPerspective;
-	private IWorkbenchAction					_actionEditActionSets;
+
+	/**
+	 * Customize perspective is disabled, because when the dialog is closed, the tour type UI
+	 * controls will be disposed, after some investigation an easy solution was not found.
+	 * <p>
+	 * This action cannot be removed from the perspective context menu (it's created internally),
+	 * only from the app menu.
+	 */
+//	private IWorkbenchAction					_actionEditActionSets;
 
 	PersonContributionItem						_personContribItem;
 	private TourTypeContributionItem			_tourTypeContribItem;
@@ -75,14 +83,16 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 	private void addPerspectiveActions(final MenuManager menu) {
 
 		{
-			final String openText = Messages.App_Action_open_perspective;
-			final MenuManager changePerspMenuMgr = new MenuManager(openText, "openPerspective"); //$NON-NLS-1$
+			final MenuManager perspectiveMenuMgr = new MenuManager(
+					Messages.App_Action_open_perspective,
+					"openPerspective"); //$NON-NLS-1$
+
 			final IContributionItem changePerspMenuItem = ContributionItemFactory.PERSPECTIVES_SHORTLIST
 					.create(_window);
 
-			changePerspMenuMgr.add(changePerspMenuItem);
+			perspectiveMenuMgr.add(changePerspMenuItem);
 
-			menu.add(changePerspMenuMgr);
+			menu.add(perspectiveMenuMgr);
 		}
 
 		menu.add(_actionSavePerspective);
@@ -91,7 +101,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		menu.add(_actionCloseAllPerspective);
 	}
 
-	private MenuManager createFileMenu() {
+	private MenuManager createMenu_10_File() {
 
 		final MenuManager fileMenu = new MenuManager(Messages.App_Action_Menu_file, IWorkbenchActionConstants.M_FILE);
 
@@ -114,20 +124,29 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		return fileMenu;
 	}
 
-	private MenuManager createHelpMenu() {
+	private MenuManager createMenu_20_Directories() {
 
-		/*
-		 * help - menu
-		 */
-		final MenuManager helpMenu = new MenuManager(Messages.App_Action_Menu_help, IWorkbenchActionConstants.M_HELP);
+		final MenuManager dirMenu = new MenuManager(Messages.App_Action_Menu_Directory, "m_directory"); //$NON-NLS-1$
 
-		helpMenu.add(new Separator("about")); //$NON-NLS-1$
-		helpMenu.add(getAction(ActionFactory.ABOUT.getId()));
+		dirMenu.add(new Separator("defaultViews")); //$NON-NLS-1$
 
-		return helpMenu;
+		dirMenu.add(new Separator());
+		dirMenu.add(_actionOtherViews);
+		addPerspectiveActions(dirMenu);
+
+		return dirMenu;
 	}
 
-	private MenuManager createToolMenu() {
+	private MenuManager createMenu_30_Tour() {
+
+		final MenuManager tourMenu = new MenuManager(Messages.App_Action_Menu_Tour, "m_tour"); //$NON-NLS-1$
+
+		tourMenu.add(new Separator("defaultViews")); //$NON-NLS-1$
+
+		return tourMenu;
+	}
+
+	private MenuManager createMenu_40_Tool() {
 
 		final MenuManager toolMenu = new MenuManager(Messages.App_Action_Menu_tools, "net.tourbook.menu.main.tools"); //$NON-NLS-1$
 
@@ -149,40 +168,43 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		return toolMenu;
 	}
 
-	private MenuManager createViewMenu() {
+	private MenuManager createMenu_50_Help() {
 
-		final MenuManager viewMenu = new MenuManager(Messages.App_Action_Menu_view, "views"); //$NON-NLS-1$
+		/*
+		 * help - menu
+		 */
+		final MenuManager helpMenu = new MenuManager(Messages.App_Action_Menu_help, IWorkbenchActionConstants.M_HELP);
 
-		viewMenu.add(new Separator("defaultViews")); //$NON-NLS-1$
+		helpMenu.add(new Separator("about")); //$NON-NLS-1$
+		helpMenu.add(getAction(ActionFactory.ABOUT.getId()));
 
-		viewMenu.add(new Separator());
-		viewMenu.add(_actionOtherViews);
-		addPerspectiveActions(viewMenu);
-
-		viewMenu.add(new Separator("adminViews")); //$NON-NLS-1$
-
-		return viewMenu;
+		return helpMenu;
 	}
 
 	@Override
 	protected void fillCoolBar(final ICoolBarManager coolBar) {
 
-		final IToolBarManager tbMgrPeople = new ToolBarManager(SWT.FLAT | SWT.RIGHT);
-		tbMgrPeople.add(_personContribItem);
+		/*
+		 * Toolbar: People
+		 */
+		final IToolBarManager tbMgr_People = new ToolBarManager(SWT.FLAT | SWT.RIGHT);
+		tbMgr_People.add(_personContribItem);
 
-		final ToolBarContributionItem tbItemPeople = new ToolBarContributionItem(tbMgrPeople, "people"); //$NON-NLS-1$
+		final ToolBarContributionItem tbItemPeople = new ToolBarContributionItem(tbMgr_People, "people"); //$NON-NLS-1$
 		coolBar.add(tbItemPeople);
 
-		// ---------------------------------------------------------
-
-		final IToolBarManager tbMgrTourType = new ToolBarManager(SWT.FLAT | SWT.RIGHT);
-		final ToolBarContributionItem tbItemTourType = new ToolBarContributionItem(tbMgrTourType, "tourtype"); //$NON-NLS-1$
+		/*
+		 * Toolbar: Tour type
+		 */
+		final IToolBarManager tbMgr_TourType = new ToolBarManager(SWT.FLAT | SWT.RIGHT);
+		final ToolBarContributionItem tbItemTourType = new ToolBarContributionItem(tbMgr_TourType, "tourtype"); //$NON-NLS-1$
 
 		coolBar.add(tbItemTourType);
-		tbMgrTourType.add(_tourTypeContribItem);
+		tbMgr_TourType.add(_tourTypeContribItem);
 
-		// ---------------------------------------------------------
-
+		/*
+		 * Toolbar: Measurement
+		 */
 		final boolean isShowMeasurement = TourbookPlugin
 				.getDefault()
 				.getPreferenceStore()
@@ -190,30 +212,31 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
 		if (isShowMeasurement) {
 
-			final IToolBarManager tbMgrSystem = new ToolBarManager(SWT.FLAT | SWT.RIGHT);
-			tbMgrSystem.add(_measurementContribItem);
+			final IToolBarManager tbMgr_System = new ToolBarManager(SWT.FLAT | SWT.RIGHT);
+			tbMgr_System.add(_measurementContribItem);
 
 			final ToolBarContributionItem tbItemMeasurement = new ToolBarContributionItem(
-					tbMgrSystem,
+					tbMgr_System,
 					"measurementSystem"); //$NON-NLS-1$
 			coolBar.add(tbItemMeasurement);
 		}
 
 		// this must be set after the coolbar is created, otherwise it stops populating the coolbar
-		TourTypeFilterManager.setToolBarContribItem(coolBar, tbMgrTourType, tbItemTourType, _tourTypeContribItem);
+		TourTypeFilterManager.setToolBarContribItem(coolBar, tbMgr_TourType, tbItemTourType, _tourTypeContribItem);
 	}
 
 	@Override
 	protected void fillMenuBar(final IMenuManager menuBar) {
 
 		/*
-		 * create menu bar
+		 * Create app menu bar
 		 */
-		menuBar.add(createFileMenu());
+		menuBar.add(createMenu_10_File());
+		menuBar.add(createMenu_20_Directories());
+		menuBar.add(createMenu_30_Tour());
+		menuBar.add(createMenu_40_Tool());
 		menuBar.add(new GroupMarker(IWorkbenchActionConstants.MB_ADDITIONS));
-		menuBar.add(createToolMenu());
-		menuBar.add(createViewMenu());
-		menuBar.add(createHelpMenu());
+		menuBar.add(createMenu_50_Help());
 	}
 
 	@Override
@@ -239,19 +262,16 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
 		_actionOtherViews = new ActionOtherViews(window);
 
-		_actionEditActionSets = ActionFactory.EDIT_ACTION_SETS.create(window);
-		register(_actionEditActionSets);
-
+//		_actionEditActionSets = ActionFactory.EDIT_ACTION_SETS.create(window);
 		_actionSavePerspective = ActionFactory.SAVE_PERSPECTIVE.create(window);
-		register(_actionSavePerspective);
-
 		_actionResetPerspective = ActionFactory.RESET_PERSPECTIVE.create(window);
-		register(_actionResetPerspective);
-
 		_actionClosePerspective = ActionFactory.CLOSE_PERSPECTIVE.create(window);
-		register(_actionClosePerspective);
-
 		_actionCloseAllPerspective = ActionFactory.CLOSE_ALL_PERSPECTIVES.create(window);
+
+//		register(_actionEditActionSets);
+		register(_actionSavePerspective);
+		register(_actionResetPerspective);
+		register(_actionClosePerspective);
 		register(_actionCloseAllPerspective);
 
 		/*
