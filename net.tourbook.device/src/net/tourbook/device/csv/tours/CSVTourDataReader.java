@@ -62,8 +62,19 @@ public class CSVTourDataReader extends TourbookDevice {
 	private static final String	TOUR_CSV_ID_2		= "Date (yyyy-mm-dd); Time (hh-mm); Duration (sec); Paused Time (sec); Distance (m); Title; Comment; Tour Type; Tags;"; //$NON-NLS-1$
 //	private static final String	TOUR_CSV_ID			= "Date (yyyy-mm-dd); Time (hh-mm); Duration (sec); Paused Time (sec), Distance (m); Title; Comment; Tour Type; Tags;"; //$NON-NLS-1$
 
+	/**
+	 * 
+	 */
+	private static final String	TOUR_CSV_ID_3		= "Date (yyyy-mm-dd); Time (hh-mm); Duration (sec); Paused Time (sec);"//$NON-NLS-1$
+															+ " Distance (m); Title; Comment; Tour Type; Tags;"//$NON-NLS-1$
+															+ " Altitude Up (m); Altitude Down (m);";																		//$NON-NLS-1$
+
 	private static final String	CSV_TOKEN_SEPARATOR	= ";";																													//$NON-NLS-1$
 	private static final String	CSV_TAG_SEPARATOR	= ",";																													//$NON-NLS-1$
+
+	private boolean				_isId1;
+	private boolean				_isId2;
+	private boolean				_isId3;
 
 	private class DateTimeData {
 		public int	year;
@@ -106,7 +117,11 @@ public class CSVTourDataReader extends TourbookDevice {
 
 	private boolean isFileValid(final String fileHeader) {
 
-		if (fileHeader.startsWith(TOUR_CSV_ID) || fileHeader.startsWith(TOUR_CSV_ID_2)) {
+		_isId1 = fileHeader.startsWith(TOUR_CSV_ID);
+		_isId2 = fileHeader.startsWith(TOUR_CSV_ID_2);
+		_isId3 = fileHeader.startsWith(TOUR_CSV_ID_3);
+
+		if (_isId1 || _isId2 || _isId3) {
 			return true;
 		}
 
@@ -121,6 +136,11 @@ public class CSVTourDataReader extends TourbookDevice {
 		dateTime.day = parseInteger(nextToken.substring(8, 10));
 	}
 
+	/**
+	 * @param string
+	 * @return Returns parsed integer value or 0 when the string argument do not contain a valid
+	 *         value.
+	 */
 	private int parseInteger(final String string) {
 
 		try {
@@ -310,8 +330,8 @@ public class CSVTourDataReader extends TourbookDevice {
 
 					final String[] allToken = tokenLine.split(CSV_TOKEN_SEPARATOR);
 
-					parseDate(dateTime, allToken[0]);//							1 Date (yyyy-mm-dd);
-					parseTime(dateTime, allToken[1]);//							2 Time (hh-mm);
+					parseDate(dateTime, allToken[0]);//								1 Date (yyyy-mm-dd);
+					parseTime(dateTime, allToken[1]);//								2 Time (hh-mm);
 					tourData.setTourStartTime(
 							dateTime.year,
 							dateTime.month,
@@ -320,20 +340,26 @@ public class CSVTourDataReader extends TourbookDevice {
 							dateTime.minute,
 							0);
 
-					duration = parseInteger(allToken[2]); //					3 Duration (sec);
+					duration = parseInteger(allToken[2]); //						3 Duration (sec);
 					tourData.setTourRecordingTime(duration);
 
-					pausedTime = parseInteger(allToken[3]); //					4 Paused Time (sec),
+					pausedTime = parseInteger(allToken[3]); //						4 Paused Time (sec),
 					tourData.setTourDrivingTime(Math.max(0, duration - pausedTime));
 
-					distance = parseInteger(allToken[4]);//						5 Distance (m);
+					distance = parseInteger(allToken[4]);//							5 Distance (m);
 					tourData.setTourDistance(distance);
 
-					tourData.setTourTitle(allToken[5]);//						6 Title;
-					tourData.setTourDescription(allToken[6]);//					7 Comment;
+					tourData.setTourTitle(allToken[5]);//							6 Title;
+					tourData.setTourDescription(allToken[6]);//						7 Comment;
 
-					isNewTourType |= parseTourType(tourData, allToken[7]);//	8 Tour Type;
-					isNewTag |= parseTags(tourData, allToken[8]);//				9 Tags;
+					isNewTourType |= parseTourType(tourData, allToken[7]);//		8 Tour Type;
+					isNewTag |= parseTags(tourData, allToken[8]);//					9 Tags;
+
+					if (_isId3) {
+
+						tourData.setTourAltUp(parseInteger(allToken[9]));//			10 Altitude Up (m);
+						tourData.setTourAltDown(parseInteger(allToken[10]));//		11 Altitude Down (m);
+					}
 
 				} catch (final NoSuchElementException e) {
 					// not all tokens are defined

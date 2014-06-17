@@ -34,6 +34,12 @@ New
 
 Improvements 
 
+* CSV import
+
+- altutide up/down can also be imported
+  required header/format: "Date (yyyy-mm-dd); Time (hh-mm); Duration (sec); Paused Time (sec); Distance (m); Title; Comment; Tour Type; Tags; Altitude Up (m); Altitude Down (m);"
+
+
 
 
 
