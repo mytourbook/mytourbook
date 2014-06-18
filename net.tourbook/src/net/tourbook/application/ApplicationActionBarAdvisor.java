@@ -151,9 +151,6 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
 	private MenuManager createMenu_50_Help() {
 
-		/*
-		 * help - menu
-		 */
 		final MenuManager helpMenu = new MenuManager(Messages.App_Action_Menu_help, "m_help");//$NON-NLS-1$
 
 		helpMenu.add(new Separator("about")); //$NON-NLS-1$
@@ -210,7 +207,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 	protected void fillMenuBar(final IMenuManager menuBar) {
 
 		/*
-		 * Create app menu bar
+		 * Create app menu
 		 */
 		menuBar.add(createMenu_10_Load());
 		menuBar.add(createMenu_20_Directories());
@@ -222,6 +219,8 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
 	@Override
 	protected void makeActions(final IWorkbenchWindow window) {
+
+		final boolean isOSX = "carbon".equals(SWT.getPlatform());//$NON-NLS-1$
 
 		_window = window;
 
@@ -262,26 +261,11 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		 * the application menu.
 		 */
 		_quitItem = new ActionContributionItem(_actionQuit);
-		_quitItem.setVisible(!"carbon".equals(SWT.getPlatform())); //$NON-NLS-1$
+		_quitItem.setVisible(!isOSX);
 
-		/*
-		 * If we're on OS X we shouldn't show this command in the File menu. It should be invisible
-		 * to the user. However, we should not remove it - the carbon UI code will do a search
-		 * through our menu structure looking for it when Cmd-Q is invoked (or Quit is chosen from
-		 * the application menu.
-		 */
 		_prefItem = new ActionContributionItem(_actionPreferences);
-		_prefItem.setVisible(!"carbon".equals(SWT.getPlatform())); //$NON-NLS-1$
-
-		/*
-		 * keep action bar advisor to register other actions
-		 */
-//		TourbookPlugin.getDefault().setActionBarAdvisor(this);
+		_prefItem.setVisible(!isOSX);
 	}
-
-//	public void registerAction(final IAction action) {
-//		register(action);
-//	}
 
 	@Override
 	public IStatus saveState(final IMemento memento) {

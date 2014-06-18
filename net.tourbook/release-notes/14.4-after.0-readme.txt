@@ -47,7 +47,9 @@ Improvements
 - altutide up/down can also be imported
   required header/format: "Date (yyyy-mm-dd); Time (hh-mm); Duration (sec); Paused Time (sec); Distance (m); Title; Comment; Tour Type; Tags; Altitude Up (m); Altitude Down (m);"
 
+* Customize Columns
 
+- columns can be set visible/hidden in the header context menu for all tables/trees which are using the column manager
 
 
 

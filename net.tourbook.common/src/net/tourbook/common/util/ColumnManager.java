@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -80,7 +80,7 @@ public class ColumnManager {
 	private String[]							_visibleColumnIds;
 
 	/**
-	 * contains a pair of column id and width for each column
+	 * Contains a pair with column id/column width for visible columns.
 	 */
 	private String[]							_columnIdsAndWidth;
 
@@ -89,14 +89,24 @@ public class ColumnManager {
 	private final ITourViewer					_tourViewer;
 
 	/**
-	 * viewer which is managed by this {@link ColumnManager}
+	 * Viewer which is managed by this {@link ColumnManager}.
 	 */
 	private ColumnViewer						_columnViewer;
 
 	/**
 	 * Context menu listener
 	 */
-	private Listener							_menuDetectListener;
+	private Listener							_tableMenuDetectListener;
+	private Listener							_treeMenuDetectListener;
+
+	private final Listener						_colItemListener;
+	{
+		_colItemListener = new Listener() {
+			public void handleEvent(final Event event) {
+				onSelectColumnItem(event);
+			}
+		};
+	}
 
 	public ColumnManager(final ITourViewer tourViewer, final IDialogSettings viewState) {
 
@@ -149,20 +159,20 @@ public class ColumnManager {
 	 * set context menu depending on the position of the mouse
 	 * 
 	 * @param table
-	 * @param tableContextMenu
+	 * @param defaultContextMenu
 	 *            can be <code>null</code>
 	 */
-	public void createHeaderContextMenu(final Table table, final Menu tableContextMenu) {
+	public void createHeaderContextMenu(final Table table, final Menu defaultContextMenu) {
 
 		// remove old listener
-		if (_menuDetectListener != null) {
-			table.removeListener(SWT.MenuDetect, _menuDetectListener);
+		if (_tableMenuDetectListener != null) {
+			table.removeListener(SWT.MenuDetect, _tableMenuDetectListener);
 		}
 
-		final Menu headerContextMenu = createHeaderContextMenuInternal(table, tableContextMenu);
+		final Menu headerContextMenu = createHeaderContextMenu_Menu(table, defaultContextMenu);
 
 		// add the context menu to the table
-		_menuDetectListener = new Listener() {
+		_tableMenuDetectListener = new Listener() {
 			public void handleEvent(final Event event) {
 
 				final Decorations shell = table.getShell();
@@ -173,28 +183,31 @@ public class ColumnManager {
 				final boolean isTableHeaderHit = clientArea.y <= pt.y
 						&& pt.y < (clientArea.y + table.getHeaderHeight());
 
-				final Menu contextMenu = isTableHeaderHit ? headerContextMenu : tableContextMenu;
-
-				table.setMenu(contextMenu);
+				table.setMenu(getContextMenu(isTableHeaderHit, headerContextMenu, defaultContextMenu));
 			}
 		};
 
-		table.addListener(SWT.MenuDetect, _menuDetectListener);
+		table.addListener(SWT.MenuDetect, _tableMenuDetectListener);
 	}
 
 	/**
 	 * set context menu depending on the position of the mouse
 	 * 
 	 * @param tree
-	 * @param treeContextMenu
+	 * @param defaultContextMenu
 	 *            can be <code>null</code>
 	 */
-	public void createHeaderContextMenu(final Tree tree, final Menu treeContextMenu) {
+	public void createHeaderContextMenu(final Tree tree, final Menu defaultContextMenu) {
 
-		final Menu headerContextMenu = createHeaderContextMenuInternal(tree, treeContextMenu);
+		// remove old listener
+		if (_treeMenuDetectListener != null) {
+			tree.removeListener(SWT.MenuDetect, _treeMenuDetectListener);
+		}
 
-		// add the context menu to the table viewer
-		tree.addListener(SWT.MenuDetect, new Listener() {
+		final Menu headerContextMenu = createHeaderContextMenu_Menu(tree, defaultContextMenu);
+
+		// add the context menu to the tree viewer
+		_treeMenuDetectListener = new Listener() {
 			public void handleEvent(final Event event) {
 
 				final Decorations shell = tree.getShell();
@@ -202,31 +215,52 @@ public class ColumnManager {
 				final Point pt = display.map(null, tree, new Point(event.x, event.y));
 				final Rectangle clientArea = tree.getClientArea();
 
-				final boolean header = clientArea.y <= pt.y && pt.y < (clientArea.y + tree.getHeaderHeight());
+				final boolean isTreeHeaderHit = clientArea.y <= pt.y && pt.y < (clientArea.y + tree.getHeaderHeight());
 
-				tree.setMenu(header ? headerContextMenu : treeContextMenu);
+				tree.setMenu(getContextMenu(isTreeHeaderHit, headerContextMenu, defaultContextMenu));
 			}
-		});
+		};
+		tree.addListener(SWT.MenuDetect, _treeMenuDetectListener);
 	}
 
 	/**
 	 * Create header context menu which has the action to modify columns
 	 * 
 	 * @param composite
-	 * @param compositeContextMenu
+	 * @param defaultContextMenu
 	 * @return
 	 */
-	private Menu createHeaderContextMenuInternal(final Composite composite, final Menu compositeContextMenu) {
+	private Menu createHeaderContextMenu_Menu(final Composite composite, final Menu defaultContextMenu) {
 
 		final Decorations shell = composite.getShell();
 		final Menu headerContextMenu = new Menu(shell, SWT.POP_UP);
 
 		/*
+		 * IMPORTANT: Dispose the menus (only the current menu, when menu is set with setMenu() it
+		 * will be disposed automatically)
+		 */
+		composite.addListener(SWT.Dispose, new Listener() {
+			public void handleEvent(final Event event) {
+
+				headerContextMenu.dispose();
+
+				if (defaultContextMenu != null) {
+					defaultContextMenu.dispose();
+				}
+			}
+		});
+
+		return headerContextMenu;
+	}
+
+	private void createHeaderContextMenu_MenuItems(final Menu contextMenu) {
+
+		/*
 		 * Size All Columns to Fit
 		 */
-		MenuItem itemName = new MenuItem(headerContextMenu, SWT.PUSH);
-		itemName.setText(Messages.Action_App_SizeAllColumnsToFit);
-		itemName.addListener(SWT.Selection, new Listener() {
+		final MenuItem fitMenuItem = new MenuItem(contextMenu, SWT.PUSH);
+		fitMenuItem.setText(Messages.Action_App_SizeAllColumnsToFit);
+		fitMenuItem.addListener(SWT.Selection, new Listener() {
 			public void handleEvent(final Event event) {
 				onFitAllColumnSize();
 			}
@@ -235,29 +269,33 @@ public class ColumnManager {
 		/*
 		 * Customize &Columns...
 		 */
-		itemName = new MenuItem(headerContextMenu, SWT.PUSH);
-		itemName.setText(Messages.Action_App_ConfigureColumns);
-		itemName.setImage(UI.IMAGE_REGISTRY.get(UI.IMAGE_CONFIGURE_COLUMNS));
-		itemName.addListener(SWT.Selection, new Listener() {
+		final MenuItem configMenuItem = new MenuItem(contextMenu, SWT.PUSH);
+		configMenuItem.setText(Messages.Action_App_ConfigureColumns);
+		configMenuItem.setImage(UI.IMAGE_REGISTRY.get(UI.IMAGE_CONFIGURE_COLUMNS));
+		configMenuItem.addListener(SWT.Selection, new Listener() {
 			public void handleEvent(final Event event) {
 				openColumnDialog();
 			}
 		});
 
-		/*
-		 * IMPORTANT: Dispose the menus (only the current menu, when menu is set with setMenu() it
-		 * will be disposed automatically)
-		 */
-		composite.addListener(SWT.Dispose, new Listener() {
-			public void handleEvent(final Event event) {
-				headerContextMenu.dispose();
-				if (compositeContextMenu != null) {
-					compositeContextMenu.dispose();
-				}
-			}
-		});
+		// separator
+		new MenuItem(contextMenu, SWT.SEPARATOR);
 
-		return headerContextMenu;
+		/*
+		 * Add all columns
+		 */
+		for (final ColumnDefinition colDef : getDialogColumns()) {
+
+			final MenuItem colMenuItem = new MenuItem(contextMenu, SWT.CHECK);
+
+			colMenuItem.setText(colDef.getColumnLabel());
+			colMenuItem.setEnabled(colDef.canModifyVisibility());
+			colMenuItem.setSelection(colDef.isCheckedInDialog());
+
+			colMenuItem.setData(colDef);
+			colMenuItem.addListener(SWT.Selection, _colItemListener);
+		}
+
 	}
 
 	/**
@@ -486,7 +524,7 @@ public class ColumnManager {
 	}
 
 	/**
-	 * Read the column order from a table and set {@link ColumnManager#fColumns}
+	 * Read the column order from a table/tree.
 	 */
 	private String[] getColumnIdsFromViewer() {
 
@@ -559,6 +597,28 @@ public class ColumnManager {
 		}
 
 		return columnWidth;
+	}
+
+	private Menu getContextMenu(final boolean isHeaderHit, final Menu headerContextMenu, final Menu defaultContextMenu) {
+
+		Menu contextMenu;
+		if (isHeaderHit) {
+
+			contextMenu = headerContextMenu;
+
+			// recreate all menu items because the column order can be changed
+			for (final MenuItem menuItem : contextMenu.getItems()) {
+				menuItem.dispose();
+			}
+
+			createHeaderContextMenu_MenuItems(headerContextMenu);
+
+		} else {
+
+			contextMenu = defaultContextMenu;
+		}
+
+		return contextMenu;
 	}
 
 	/**
@@ -701,6 +761,20 @@ public class ColumnManager {
 		});
 	}
 
+	private void onSelectColumnItem(final Event event) {
+
+		if (event.widget instanceof MenuItem) {
+
+			final MenuItem menuItem = (MenuItem) event.widget;
+
+			final Object data = menuItem.getData();
+			if (data instanceof ColumnDefinition) {
+
+				updateColumns(menuItem.getParent().getItems());
+			}
+		}
+	}
+
 	public void openColumnDialog() {
 
 		// get the sorting order and column width from the viewer
@@ -786,6 +860,34 @@ public class ColumnManager {
 
 		columnIdsAndWidth.add(columnId);
 		columnIdsAndWidth.add(Integer.toString(columnWidth));
+	}
+
+	private void setColumnIdsFromModifyDialog(final MenuItem[] menuItems) {
+
+		final ArrayList<String> visibleColumnIds = new ArrayList<String>();
+		final ArrayList<String> columnIdsAndWidth = new ArrayList<String>();
+
+		// recreate columns in the correct sort order
+		for (final MenuItem menuItem : menuItems) {
+
+			final boolean isChecked = menuItem.getSelection();
+
+			if (isChecked) {
+
+				// data in the table item contains the input items for the viewer
+				final ColumnDefinition colDef = (ColumnDefinition) menuItem.getData();
+
+				// set the visible columns
+				visibleColumnIds.add(colDef.getColumnId());
+
+				// set column id and width
+				columnIdsAndWidth.add(colDef.getColumnId());
+				columnIdsAndWidth.add(Integer.toString(colDef.getColumnWidth()));
+			}
+		}
+
+		_visibleColumnIds = visibleColumnIds.toArray(new String[visibleColumnIds.size()]);
+		_columnIdsAndWidth = columnIdsAndWidth.toArray(new String[columnIdsAndWidth.size()]);
 	}
 
 	/**
@@ -908,6 +1010,13 @@ public class ColumnManager {
 			_visibleColumnIds = new String[1];
 			_visibleColumnIds[0] = firstColumn.getColumnId();
 		}
+	}
+
+	private void updateColumns(final MenuItem[] menuItems) {
+
+		setColumnIdsFromModifyDialog(menuItems);
+
+		_columnViewer = _tourViewer.recreateViewer(_columnViewer);
 	}
 
 	/**
