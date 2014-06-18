@@ -289,6 +289,9 @@ public class Messages extends NLS {
 
 	public static String		App_Action_Menu_file;
 	public static String		App_Action_Menu_help;
+
+	public static String	App_Action_Menu_Import;
+
 	public static String		App_Action_Menu_tools;
 
 	public static String	App_Action_Menu_Tour;

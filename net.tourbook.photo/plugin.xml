@@ -32,7 +32,7 @@
 	
 	<extension point="org.eclipse.ui.menus">
 	
-		<menuContribution locationURI="menu:m_directory?endof=net.tourbook.separator.TourDirectories" >
+		<menuContribution locationURI="menu:m_directory?after=net.tourbook.separator.OtherDirectories" >
 		            
 			<command commandId="command.net.tourbook.photo.PicDirView"
 				icon="icons/photo-directory.png"

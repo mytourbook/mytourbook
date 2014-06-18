@@ -2,6 +2,14 @@ Version: 14.?.0                                           ?. ? 2014
 
 
 
+////////////////////////////////////////////////////////////////
+
+TRANSLATOR INFO TRANSLATOR INFO TRANSLATOR INFO TRANSLATOR INFO 
+
+App menu is reorganized, it is possible that the short cuts needs to be adjusted !!!!
+
+
+////////////////////////////////////////////////////////////////
 
 
 

@@ -58,6 +58,9 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 	private IWorkbenchAction					_actionClosePerspective;
 	private IWorkbenchAction					_actionCloseAllPerspective;
 
+	private ActionContributionItem				_quitItem;
+	private ActionContributionItem				_prefItem;
+
 	/**
 	 * Customize perspective is disabled, because when the dialog is closed, the tour type UI
 	 * controls will be disposed, after some investigation an easy solution was not found.
@@ -101,27 +104,14 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		menu.add(_actionCloseAllPerspective);
 	}
 
-	private MenuManager createMenu_10_File() {
+	private MenuManager createMenu_10_Load() {
 
-		final MenuManager fileMenu = new MenuManager(Messages.App_Action_Menu_file, IWorkbenchActionConstants.M_FILE);
+		final MenuManager loadMenu = new MenuManager(Messages.App_Action_Menu_Import, "m_import"); //$NON-NLS-1$
 
-		fileMenu.add(new GroupMarker("fileNew")); //$NON-NLS-1$
+		loadMenu.add(new GroupMarker("fileNew")); //$NON-NLS-1$
+		loadMenu.add(_quitItem);
 
-		fileMenu.add(new Separator("update")); //$NON-NLS-1$
-		fileMenu.add(new Separator("databaseTools")); //$NON-NLS-1$
-		fileMenu.add(new Separator());
-
-		/*
-		 * If we're on OS X we shouldn't show this command in the File menu. It should be invisible
-		 * to the user. However, we should not remove it - the carbon UI code will do a search
-		 * through our menu structure looking for it when Cmd-Q is invoked (or Quit is chosen from
-		 * the application menu.
-		 */
-		final ActionContributionItem quitItem = new ActionContributionItem(_actionQuit);
-		quitItem.setVisible(!"carbon".equals(SWT.getPlatform())); //$NON-NLS-1$
-		fileMenu.add(quitItem);
-
-		return fileMenu;
+		return loadMenu;
 	}
 
 	private MenuManager createMenu_20_Directories() {
@@ -129,10 +119,6 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		final MenuManager dirMenu = new MenuManager(Messages.App_Action_Menu_Directory, "m_directory"); //$NON-NLS-1$
 
 		dirMenu.add(new Separator("defaultViews")); //$NON-NLS-1$
-
-		dirMenu.add(new Separator());
-		dirMenu.add(_actionOtherViews);
-		addPerspectiveActions(dirMenu);
 
 		return dirMenu;
 	}
@@ -148,22 +134,17 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
 	private MenuManager createMenu_40_Tool() {
 
-		final MenuManager toolMenu = new MenuManager(Messages.App_Action_Menu_tools, "net.tourbook.menu.main.tools"); //$NON-NLS-1$
+		final MenuManager toolMenu = new MenuManager(Messages.App_Action_Menu_tools, "m_tools"); //$NON-NLS-1$
 
 		toolMenu.add(new GroupMarker("tools")); //$NON-NLS-1$
 		toolMenu.add(new GroupMarker(IWorkbenchActionConstants.MB_ADDITIONS));
 
 		toolMenu.add(new Separator());
+		toolMenu.add(_actionOtherViews);
+		addPerspectiveActions(toolMenu);
 
-		/*
-		 * If we're on OS X we shouldn't show this command in the File menu. It should be invisible
-		 * to the user. However, we should not remove it - the carbon UI code will do a search
-		 * through our menu structure looking for it when Cmd-Q is invoked (or Quit is chosen from
-		 * the application menu.
-		 */
-		final ActionContributionItem prefItem = new ActionContributionItem(_actionPreferences);
-		prefItem.setVisible(!"carbon".equals(SWT.getPlatform())); //$NON-NLS-1$
-		toolMenu.add(prefItem);
+		toolMenu.add(new Separator());
+		toolMenu.add(_prefItem);
 
 		return toolMenu;
 	}
@@ -173,7 +154,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		/*
 		 * help - menu
 		 */
-		final MenuManager helpMenu = new MenuManager(Messages.App_Action_Menu_help, IWorkbenchActionConstants.M_HELP);
+		final MenuManager helpMenu = new MenuManager(Messages.App_Action_Menu_help, "m_help");//$NON-NLS-1$
 
 		helpMenu.add(new Separator("about")); //$NON-NLS-1$
 		helpMenu.add(getAction(ActionFactory.ABOUT.getId()));
@@ -231,7 +212,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		/*
 		 * Create app menu bar
 		 */
-		menuBar.add(createMenu_10_File());
+		menuBar.add(createMenu_10_Load());
 		menuBar.add(createMenu_20_Directories());
 		menuBar.add(createMenu_30_Tour());
 		menuBar.add(createMenu_40_Tool());
@@ -273,6 +254,24 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		register(_actionResetPerspective);
 		register(_actionClosePerspective);
 		register(_actionCloseAllPerspective);
+
+		/*
+		 * If we're on OS X we shouldn't show this command in the File menu. It should be invisible
+		 * to the user. However, we should not remove it - the carbon UI code will do a search
+		 * through our menu structure looking for it when Cmd-Q is invoked (or Quit is chosen from
+		 * the application menu.
+		 */
+		_quitItem = new ActionContributionItem(_actionQuit);
+		_quitItem.setVisible(!"carbon".equals(SWT.getPlatform())); //$NON-NLS-1$
+
+		/*
+		 * If we're on OS X we shouldn't show this command in the File menu. It should be invisible
+		 * to the user. However, we should not remove it - the carbon UI code will do a search
+		 * through our menu structure looking for it when Cmd-Q is invoked (or Quit is chosen from
+		 * the application menu.
+		 */
+		_prefItem = new ActionContributionItem(_actionPreferences);
+		_prefItem.setVisible(!"carbon".equals(SWT.getPlatform())); //$NON-NLS-1$
 
 		/*
 		 * keep action bar advisor to register other actions
