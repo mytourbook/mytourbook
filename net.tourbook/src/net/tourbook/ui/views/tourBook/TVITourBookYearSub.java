@@ -109,7 +109,7 @@ public class TVITourBookYearSub extends TVITourBookItem {
 				+ (" FROM " + TourDatabase.TABLE_TOUR_DATA + " TourData" + UI.NEW_LINE) //			//$NON-NLS-1$ //$NON-NLS-2$
 
 				// get tag id's
-				+ (" LEFT OUTER JOIN " + TourDatabase.JOINTABLE_TOURDATA__TOURTAG + " jTdataTtag") //$NON-NLS-1$ //$NON-NLS-2$
+				+ (" LEFT OUTER JOIN " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + " jTdataTtag") //$NON-NLS-1$ //$NON-NLS-2$
 				+ (" ON TourData.tourId = jTdataTtag.TourData_tourId") //$NON-NLS-1$
 
 				// get marker id's

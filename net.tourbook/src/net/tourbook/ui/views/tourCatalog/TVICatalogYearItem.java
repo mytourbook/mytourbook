@@ -96,7 +96,7 @@ public class TVICatalogYearItem extends TVICatalogItem {
 		sb.append(" TourCompared.tourId = TourData.tourId"); //$NON-NLS-1$
 
 		// get tag id's
-		sb.append(" LEFT OUTER JOIN " + TourDatabase.JOINTABLE_TOURDATA__TOURTAG + " jTdataTtag"); //$NON-NLS-1$ //$NON-NLS-2$
+		sb.append(" LEFT OUTER JOIN " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + " jTdataTtag"); //$NON-NLS-1$ //$NON-NLS-2$
 		sb.append(" ON TourData.tourId = jTdataTtag.TourData_tourId"); //$NON-NLS-1$
 
 		sb.append(" WHERE TourCompared.refTourId=? AND TourCompared.startYear=?"); //$NON-NLS-1$

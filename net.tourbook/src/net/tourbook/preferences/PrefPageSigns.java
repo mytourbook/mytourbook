@@ -1018,8 +1018,6 @@ public class PrefPageSigns extends PreferencePage implements IWorkbenchPreferenc
 
 		_pc = new PixelConverter(parent);
 
-//		DEFAULT_IMAGE_WIDTH = _pc.convertWidthInCharsToPixels(6);
-//		MAX_ROW_HEIGHT = _pc.convertVerticalDLUsToPixels(50);
 		DEFAULT_IMAGE_WIDTH = TourMarker.getSignImageMaxSize(_pc);
 		MAX_ROW_HEIGHT = TourMarker.getSignImageMaxSize(_pc);
 	}
@@ -1138,7 +1136,7 @@ public class PrefPageSigns extends PreferencePage implements IWorkbenchPreferenc
 					SignManager.removeCachedCategory(SignManager.ROOT_SIGN_ID);
 
 					// update db model
-					final TourSignCategory savedCategory = updateModel_DeleteSign(tourSign, signCategory, em);
+//					final TourSignCategory savedCategory = updateModel_DeleteSign(tourSign, signCategory, em);
 
 					// update viewer model
 					tviRoot.removeChild(tviSign);

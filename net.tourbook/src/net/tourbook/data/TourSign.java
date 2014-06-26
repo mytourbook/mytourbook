@@ -15,18 +15,11 @@
  *******************************************************************************/
 package net.tourbook.data;
 
-import static javax.persistence.CascadeType.ALL;
-import static javax.persistence.FetchType.LAZY;
-
-import java.util.HashSet;
-import java.util.Set;
-
 import javax.persistence.Basic;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.ManyToMany;
 import javax.persistence.Transient;
 
 import net.tourbook.database.TourDatabase;
@@ -38,30 +31,24 @@ import net.tourbook.photo.Photo;
 @Entity
 public class TourSign implements Comparable<Object> {
 
-	public static final int				DB_LENGTH_NAME				= 1024;
-	public static final int				DB_LENGTH_IMAGE_FILE_PATH	= 1024;
+	public static final int		DB_LENGTH_NAME				= 1024;
+	public static final int		DB_LENGTH_IMAGE_FILE_PATH	= 1024;
 
-	public static final int				EXPAND_TYPE_YEAR_MONTH_DAY	= 0;
-	public static final int				EXPAND_TYPE_FLAT			= 1;
-	public static final int				EXPAND_TYPE_YEAR_DAY		= 2;
+	public static final int		EXPAND_TYPE_YEAR_MONTH_DAY	= 0;
+	public static final int		EXPAND_TYPE_FLAT			= 1;
+	public static final int		EXPAND_TYPE_YEAR_DAY		= 2;
 
-	public static final int				EXPAND_TYPE_DEFAULT			= EXPAND_TYPE_YEAR_MONTH_DAY;
+	public static final int		EXPAND_TYPE_DEFAULT			= EXPAND_TYPE_YEAR_MONTH_DAY;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private long						signId						= TourDatabase.ENTITY_IS_NOT_SAVED;
+	private long				signId						= TourDatabase.ENTITY_IS_NOT_SAVED;
 
 	/**
 	 * Display name of the sign.
 	 */
 	@Basic(optional = false)
-	private String						name;
-
-	/**
-	 * This key is used to identify imported signs (filesystem filename).
-	 */
-	@Basic(optional = false)
-	private String						signKey;
+	private String				name;
 
 	/**
 	 * Derby does not support BOOLEAN
@@ -69,47 +56,46 @@ public class TourSign implements Comparable<Object> {
 	 * 1 = <code>true</code><br>
 	 * 0 = <code>false</code>
 	 */
-	private int							isRoot						= 0;
+	private int					isRoot						= 0;
 
 	/**
 	 * Sign image filename with path.
 	 */
-	private String						imageFilePathName;
+	private String				imageFilePathName;
 
 	/**
 	 * when a sign is expanded in the sign tree viewer, the tours can be displayed in different
 	 * structures
 	 */
-	private int							expandType					= EXPAND_TYPE_FLAT;
+	private int					expandType					= EXPAND_TYPE_FLAT;
 
-	/**
-	 *
-	 */
-	@ManyToMany(mappedBy = "tourSigns", cascade = ALL, fetch = LAZY)
-	private final Set<TourSignCategory>	tourSignCategories			= new HashSet<TourSignCategory>();
+//	/**
+//	 *
+//	 */
+//	@ManyToOne
+//	private TourSignCategory	tourSignCategory;
 
 	/**
 	 * unique id for manually created tour types because the {@link #signId} is -1 when it's not
 	 * persisted
 	 */
 	@Transient
-	private long						_createId					= 0;
+	private long				_createId;
 
 	@Transient
-	private Photo						_signImagePhoto;
+	private Photo				_signImagePhoto;
 
 	/**
 	 * manually created marker or imported marker create a unique id to identify them, saved marker
 	 * are compared with the marker id
 	 */
-	private static int					_createCounter				= 0;
+	private static int			_createCounter;
 
 	public TourSign() {}
 
-	public TourSign(final String signName, final String signKeyName) {
+	public TourSign(final String signName) {
 
 		name = signName.trim();
-		signKey = signKeyName;
 
 		_createId = ++_createCounter;
 	}
@@ -178,17 +164,13 @@ public class TourSign implements Comparable<Object> {
 		return _signImagePhoto;
 	}
 
-	public String getSignKey() {
-		return signKey;
-	}
-
 	public String getSignName() {
 		return name;
 	}
 
-	public Set<TourSignCategory> getTourSignCategories() {
-		return tourSignCategories;
-	}
+//	public TourSignCategory getTourSignCategory() {
+//		return tourSignCategory;
+//	}
 
 	@Override
 	public int hashCode() {
@@ -233,6 +215,10 @@ public class TourSign implements Comparable<Object> {
 	public void setSignName(final String signName) {
 		this.name = signName;
 	}
+
+//	public void setTourSignCategory(final TourSignCategory tourSignCategory) {
+//		this.tourSignCategory = tourSignCategory;
+//	}
 
 	@Override
 	public String toString() {

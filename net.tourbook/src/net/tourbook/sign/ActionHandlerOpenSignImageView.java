@@ -15,27 +15,21 @@
  *******************************************************************************/
 package net.tourbook.sign;
 
-import java.util.ArrayList;
-import java.util.Set;
+import net.tourbook.common.util.Util;
+import net.tourbook.ui.views.signImages.TourSignView;
 
-import net.tourbook.data.TourSign;
+import org.eclipse.core.commands.AbstractHandler;
+import org.eclipse.core.commands.ExecutionEvent;
+import org.eclipse.core.commands.ExecutionException;
 
-/**
- * Contains all signs and sign categories for a sign category.
- */
-public class SignCollection {
 
-//	public ArrayList<TourSignCategory>	tourSignCategories;
-	public ArrayList<TourSign>			tourSigns;
+public class ActionHandlerOpenSignImageView extends AbstractHandler {
 
-	public SignCollection() {}
+	public Object execute(final ExecutionEvent event) throws ExecutionException {
 
-	public SignCollection(final ArrayList<TourSign> sortedSigns) {
-		tourSigns = sortedSigns;
-	}
+		Util.showView(TourSignView.ID, true);
 
-	public SignCollection(final Set<TourSign> tourSignsInOneTour) {
-		tourSigns = new ArrayList<TourSign>(tourSignsInOneTour);
+		return null;
 	}
 
 }

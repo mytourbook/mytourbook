@@ -1020,24 +1020,24 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 			 * remove join table tag->category
 			 */
 			sb.append("DELETE FROM "); //$NON-NLS-1$
-			sb.append(TourDatabase.JOINTABLE_TOURTAGCATEGORY_TOURTAG);
+			sb.append(TourDatabase.JOINTABLE__TOURTAGCATEGORY_TOURTAG);
 			int result = conn.createStatement().executeUpdate(sb.toString());
 			System.out.println("Deleted " //$NON-NLS-1$
 					+ result
 					+ " entries from " //$NON-NLS-1$
-					+ TourDatabase.JOINTABLE_TOURTAGCATEGORY_TOURTAG);
+					+ TourDatabase.JOINTABLE__TOURTAGCATEGORY_TOURTAG);
 
 			/*
 			 * remove jointable category<->category
 			 */
 			sb.setLength(0);
 			sb.append("DELETE FROM "); //$NON-NLS-1$
-			sb.append(TourDatabase.JOINTABLE_TOURTAGCATEGORY_TOURTAGCATEGORY);
+			sb.append(TourDatabase.JOINTABLE__TOURTAGCATEGORY_TOURTAGCATEGORY);
 			result = conn.createStatement().executeUpdate(sb.toString());
 			System.out.println("Deleted " //$NON-NLS-1$
 					+ result
 					+ " entries from " //$NON-NLS-1$
-					+ TourDatabase.JOINTABLE_TOURTAGCATEGORY_TOURTAGCATEGORY);
+					+ TourDatabase.JOINTABLE__TOURTAGCATEGORY_TOURTAGCATEGORY);
 
 			/*
 			 * set tags to root

@@ -16,7 +16,6 @@
 package net.tourbook.sign;
 
 import net.tourbook.data.TourSign;
-import net.tourbook.data.TourSignCategory;
 
 import org.eclipse.jface.viewers.TreeViewer;
 
@@ -31,15 +30,15 @@ public class TVIPrefSignRoot extends TVIPrefSignItem {
 
 		final SignCollection rootSigns = SignManager.getRootSigns();
 
-		/*
-		 * Set sign root categories
-		 */
-		for (final TourSignCategory tourSignCategory : rootSigns.tourSignCategories) {
-
-			final TVIPrefSignCategory categoryItem = new TVIPrefSignCategory(getSignViewer(), tourSignCategory);
-
-			addChild(categoryItem);
-		}
+//		/*
+//		 * Set sign root categories
+//		 */
+//		for (final TourSignCategory tourSignCategory : rootSigns.tourSignCategories) {
+//
+//			final TVIPrefSignCategory categoryItem = new TVIPrefSignCategory(getSignViewer(), tourSignCategory);
+//
+//			addChild(categoryItem);
+//		}
 
 		/*
 		 * Set root signs.

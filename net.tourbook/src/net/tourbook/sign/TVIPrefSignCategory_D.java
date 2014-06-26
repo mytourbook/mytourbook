@@ -16,16 +16,16 @@
 package net.tourbook.sign;
 
 import net.tourbook.data.TourSign;
-import net.tourbook.data.TourSignCategory;
+import net.tourbook.data.TourSignCategory_D;
 
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.widgets.Display;
 
-public class TVIPrefSignCategory extends TVIPrefSignItem {
+public class TVIPrefSignCategory_D extends TVIPrefSignItem {
 
-	private TourSignCategory	_tourSignCategory;
+	private TourSignCategory_D	_tourSignCategory;
 
-	public TVIPrefSignCategory(final TreeViewer signViewer, final TourSignCategory tourSignCategory) {
+	public TVIPrefSignCategory_D(final TreeViewer signViewer, final TourSignCategory tourSignCategory) {
 
 		super(signViewer);
 

@@ -16,15 +16,11 @@
 package net.tourbook.sign;
 
 import java.io.File;
-import java.lang.reflect.InvocationTargetException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.Map.Entry;
-import java.util.Set;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
@@ -32,8 +28,6 @@ import javax.persistence.Query;
 import net.tourbook.Messages;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.SQLUtils;
-import net.tourbook.common.util.StatusUtil;
-import net.tourbook.common.util.StringUtils;
 import net.tourbook.data.TourSign;
 import net.tourbook.data.TourSignCategory;
 import net.tourbook.data.TourTag;
@@ -44,19 +38,12 @@ import net.tourbook.photo.Photo;
 import net.tourbook.photo.PhotoImageCache;
 import net.tourbook.photo.PhotoLoadManager;
 import net.tourbook.photo.PhotoLoadingState;
-import net.tourbook.photo.PhotosWithExifSelection;
-import net.tourbook.preferences.PrefPageSigns;
 
-import org.eclipse.core.runtime.Assert;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.jface.dialogs.ProgressMonitorDialog;
-import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.ui.dialogs.PreferencesUtil;
 
 /**
  */
@@ -65,52 +52,41 @@ public class SignManager {
 	/**
 	 * Update interval in ms.
 	 */
-	private static final int							MONITOR_UPDATE_INTERVAL	= 100;
+	private static final int						MONITOR_UPDATE_INTERVAL	= 100;
 
-	private static final String							KEY_PART_SEPARATOR		= "__";									//$NON-NLS-1$
-	private static final ImageQuality					SIGN_IMAGE_QUALITY		= ImageQuality.HQ;
-	public static final long							ROOT_SIGN_ID			= -1L;
+	private static final String						KEY_PART_SEPARATOR		= "__";								//$NON-NLS-1$
+	private static final ImageQuality				SIGN_IMAGE_QUALITY		= ImageQuality.HQ;
+	public static final long						ROOT_SIGN_ID			= -1L;
 
-	public static final String[]						EXPAND_TYPE_NAMES		= {
+	public static final String[]					EXPAND_TYPE_NAMES		= {
 			Messages.app_action_expand_type_flat,
 			Messages.app_action_expand_type_year_day,
-			Messages.app_action_expand_type_year_month_day						};
+			Messages.app_action_expand_type_year_month_day					};
 
-	public static final int[]							EXPAND_TYPES			= {
+	public static final int[]						EXPAND_TYPES			= {
 			TourTag.EXPAND_TYPE_FLAT,
 			TourTag.EXPAND_TYPE_YEAR_DAY,
-			TourTag.EXPAND_TYPE_YEAR_MONTH_DAY									};
+			TourTag.EXPAND_TYPE_YEAR_MONTH_DAY								};
 
 	/**
 	 * Key is sign ID.
 	 */
-	private static volatile HashMap<Long, TourSign>		_tourSigns;
+	private static volatile HashMap<Long, TourSign>	_tourSigns;
 
 	/**
 	 * Key is the sign category ID or <code>-1</code> for the root.
 	 */
-	private static HashMap<Long, SignCollection>		_signCollections		= new HashMap<Long, SignCollection>();
+	private static HashMap<Long, SignCollection>	_signCollections		= new HashMap<Long, SignCollection>();
 
-	/**
-	 * Contains {@link TourSign}'s during sign importing, key is the {@link TourSign#getSignId()}.
-	 */
-	private static HashMap<String, TourSign>			_importedSigns			= new HashMap<String, TourSign>();
+	private static long								_parseUIUpdateTime;
+	private static int								_fsItemCounter;
 
-	/**
-	 * Contains {@link TourSignCategory}'s during sign category importing, key is the
-	 * {@link TourSignCategory#getCategoryKey()}.
-	 */
-	private static HashMap<String, TourSignCategory>	_importedSignCategories	= new HashMap<String, TourSignCategory>();
-
-	private static long									_parseUIUpdateTime;
-	private static int									_fsItemCounter;
-
-	private static int									_folderDepth;
+	private static int								_folderDepth;
 
 	/**
 	 * Number of segments in the {@link #_baseFolder}.
 	 */
-	private static int									_baseFolderSegments;
+	private static int								_baseFolderSegments;
 
 	/**
 	 * Removes all tour signs which are loaded from the database so the next time they will be
@@ -126,100 +102,28 @@ public class SignManager {
 
 		_signCollections.clear();
 
-		_importedSigns.clear();
-		_importedSignCategories.clear();
+//		_importedSigns.clear();
+//		_importedSignCategories.clear();
 	}
 
-	/**
-	 * Imports all images from the selected folder and all subfolders, the foldername will be used
-	 * as the category name.
-	 * 
-	 * @param selectedFolder
-	 */
-	public static void createSignImages(final File selectedFolder) {
-
-		final Path baseFolder = new Path(selectedFolder.getAbsolutePath());
-
-		// confirm import
-		if (MessageDialog.openConfirm(
-				Display.getCurrent().getActiveShell(),
-				Messages.Dialog_ImportSigns_ConfirmImportFolder_Title,
-				NLS.bind(//
-						Messages.Dialog_ImportSigns_ConfirmImportFolder_Message,
-						baseFolder.toOSString())) == false) {
-			return;
-		}
+	public static void createSignImages(final ArrayList<IPath> selectedFilePaths, final TourSignCategory signCategory) {
 
 		TEMP_DB_cleanup();
 
-		_baseFolderSegments = baseFolder.segmentCount();
+		signCollection = getSignCollection(signCategory);
 
-		try {
-
-			final IRunnableWithProgress runnable = new IRunnableWithProgress() {
-
-				@Override
-				public void run(final IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
-
-					final String taskName = Messages.Dialog_ImportSigns_MonitorTask;
-					monitor.beginTask(taskName, IProgressMonitor.UNKNOWN);
-
-					// folder depth position is the parent of the root
-					_folderDepth = -1;
-
-					parseFolder_10_FilesFolder(//
-							selectedFolder,
-							UI.EMPTY_STRING,
-							null,
-							monitor);
-				}
-			};
-
-			final ProgressMonitorDialog progressMonitorDialog = new ProgressMonitorDialog(Display
-					.getCurrent()
-					.getActiveShell());
-			progressMonitorDialog.run(true, true, runnable);
-
-		} catch (final Exception e) {
-			StatusUtil.showStatus(e);
-		}
-
-		importSignImages_Final();
-	}
-
-	/**
-	 * Import sign images from a {@link PhotosWithExifSelection}.
-	 * 
-	 * @param selectedPhotosWithExif
-	 */
-	public static void createSignImages(final PhotosWithExifSelection selectedPhotosWithExif) {
-
-		// confirm import
-		if (MessageDialog.openConfirm(
-				Display.getCurrent().getActiveShell(),
-				Messages.Dialog_ImportSigns_ConfirmImportSelection_Title,
-				Messages.Dialog_ImportSigns_ConfirmImportSelection_Message) == false) {
-			return;
-		}
-
-		TEMP_DB_cleanup();
-
-		for (final Photo signPhoto : selectedPhotosWithExif.photos) {
+		for (final IPath imageFilePath : selectedFilePaths) {
 
 			// get file/folder name without extension
-			final File fileOrFolder = signPhoto.imageFile;
-			final Path fileOrFolderPath = new Path(fileOrFolder.getAbsolutePath());
-			final String fileOrFolderName = fileOrFolderPath.removeFileExtension().lastSegment();
+			final File fileOrFolder = imageFilePath.toFile();
+			final String signImageName = imageFilePath.removeFileExtension().lastSegment();
 
 			parseFolder_20_CreateTourSign(//
 					fileOrFolder,
-					fileOrFolderName,
-					TourSignCategory.ROOT_KEY,
-					null,
-					true);
+					signImageName,
+					null);
 		}
 
-		importSignImages_Final();
 	}
 
 	/**
@@ -248,133 +152,94 @@ public class SignManager {
 		return cleanSignKey;
 	}
 
-	/**
-	 * @param categoryName
-	 * @param categoryKey
-	 * @param isRoot
-	 * @param imageFilePathName
-	 * @return Returns a cached {@link TourSign} or creates a new.
-	 */
-	public static TourSign getImportedSignByKey(final String signName, final String categoryKey, final boolean isRoot) {
-
-		final String signKey = createSignKey(signName, categoryKey, isRoot);
-
-		// check if signs are loaded
-		TourSign sign = _importedSigns.get(signKey);
-		if (sign != null) {
-			return sign;
-		}
-
-		/*
-		 * read signs from the database
-		 */
-		final EntityManager em = TourDatabase.getInstance().getEntityManager();
-		Assert.isTrue(em != null);
-
-		final String sql = "SELECT sign" //$NON-NLS-1$
-				+ (" FROM " + TourSign.class.getSimpleName() + " AS sign") //$NON-NLS-1$ //$NON-NLS-2$
-				+ (" WHERE sign.signKey=" + SQLUtils.getSqlString(signKey)); //$NON-NLS-1$
-
-		try {
-
-			final Query emQuery = em.createQuery(sql);
-
-			@SuppressWarnings("unchecked")
-			final ArrayList<TourSign> resultList = (ArrayList<TourSign>) emQuery.getResultList();
-
-			if (resultList.size() > 0) {
-
-				sign = resultList.get(0);
-
-			} else {
-
-				sign = new TourSign(signName, signKey);
-			}
-
-			_importedSigns.put(signKey, sign);
-
-		} catch (final Exception e) {
-
-			StatusUtil.log(sql, e);
-
-		} finally {
-
-			em.close();
-		}
-
-		return sign;
-	}
-
-	/**
-	 * Creates {@link TourSignCategory} by the categoryKey when it is not available.
-	 * 
-	 * @param categoryName
-	 * @param categoryKey
-	 * @param isRoot
-	 * @return Returns {@link TourSignCategory} for the categoryKey.
-	 */
-	public static TourSignCategory getImportedSignCategoryByKey(final String categoryName,
-																final String categoryKey,
-																final boolean isRoot) {
-
-		final String cleanCategoryName = SQLUtils.getCleanString(categoryName);
-		final String cleanCategoryKey = SQLUtils.getCleanString(categoryKey);
-
-		// check if sign categories are loaded
-		TourSignCategory signCategory = _importedSignCategories.get(cleanCategoryKey);
-		if (signCategory != null) {
-			return signCategory;
-		}
-
-		/*
-		 * read sign categories from the database
-		 */
-		final EntityManager em = TourDatabase.getInstance().getEntityManager();
-		Assert.isTrue(em != null);
-
-		final String sql = "SELECT signCategory" //$NON-NLS-1$
-				+ (" FROM " + TourSignCategory.class.getSimpleName() + " AS signCategory") //$NON-NLS-1$ //$NON-NLS-2$
-				+ (" WHERE" //$NON-NLS-1$
-						+ (" signCategory.categoryKey=" + SQLUtils.getSqlString(cleanCategoryKey)) //$NON-NLS-1$
-						+ " AND" //$NON-NLS-1$
-						+ " signCategory.name=" + SQLUtils.getSqlString(cleanCategoryName)); //$NON-NLS-1$
-
-		try {
-
-			final Query emQuery = em.createQuery(sql);
-
-			@SuppressWarnings("unchecked")
-			final ArrayList<TourSignCategory> resultList = (ArrayList<TourSignCategory>) emQuery.getResultList();
-
-			if (resultList.size() > 0) {
-
-				signCategory = resultList.get(0);
-
-			} else {
-
-				final TourSignCategory newSignCategory = new TourSignCategory(cleanCategoryName, cleanCategoryKey);
-
-				newSignCategory.setRoot(isRoot);
-
-				signCategory = TourDatabase.saveEntity(
-						newSignCategory,
-						newSignCategory.getCategoryId(),
-						TourSignCategory.class);
-			}
-
-			_importedSignCategories.put(cleanCategoryKey, signCategory);
-
-		} catch (final Exception e) {
-
-			StatusUtil.log(sql, e);
-
-		} finally {
-
-			em.close();
-		}
-
-		return signCategory;
-	}
+//	/**
+//	 * Imports all images from the selected folder and all subfolders, the foldername will be used
+//	 * as the category name.
+//	 *
+//	 * @param selectedFolder
+//	 */
+//	public static void createSignImages(final File selectedFolder) {
+//
+//		final Path baseFolder = new Path(selectedFolder.getAbsolutePath());
+//
+//		// confirm import
+//		if (MessageDialog.openConfirm(
+//				Display.getCurrent().getActiveShell(),
+//				Messages.Dialog_ImportSigns_ConfirmImportFolder_Title,
+//				NLS.bind(//
+//						Messages.Dialog_ImportSigns_ConfirmImportFolder_Message,
+//						baseFolder.toOSString())) == false) {
+//			return;
+//		}
+//
+//		TEMP_DB_cleanup();
+//
+//		_baseFolderSegments = baseFolder.segmentCount();
+//
+//		try {
+//
+//			final IRunnableWithProgress runnable = new IRunnableWithProgress() {
+//
+//				@Override
+//				public void run(final IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+//
+//					final String taskName = Messages.Dialog_ImportSigns_MonitorTask;
+//					monitor.beginTask(taskName, IProgressMonitor.UNKNOWN);
+//
+//					// folder depth position is the parent of the selected folder
+//					_folderDepth = -1;
+//
+//					parseFolder_10_FilesFolder(//
+//							selectedFolder,
+//							null,
+//							monitor);
+//				}
+//			};
+//
+//			final ProgressMonitorDialog progressMonitorDialog = new ProgressMonitorDialog(Display
+//					.getCurrent()
+//					.getActiveShell());
+//			progressMonitorDialog.run(true, true, runnable);
+//
+//		} catch (final Exception e) {
+//			StatusUtil.showStatus(e);
+//		}
+//
+//		importSignImages_Final();
+//	}
+//
+//	/**
+//	 * Import sign images from a {@link PhotosWithExifSelection}.
+//	 *
+//	 * @param selectedPhotosWithExif
+//	 */
+//	public static void createSignImages(final PhotosWithExifSelection selectedPhotosWithExif) {
+//
+//		// confirm import
+//		if (MessageDialog.openConfirm(
+//				Display.getCurrent().getActiveShell(),
+//				Messages.Dialog_ImportSigns_ConfirmImportSelection_Title,
+//				Messages.Dialog_ImportSigns_ConfirmImportSelection_Message) == false) {
+//			return;
+//		}
+//
+//		TEMP_DB_cleanup();
+//
+//		for (final Photo signPhoto : selectedPhotosWithExif.photos) {
+//
+//			// get file/folder name without extension
+//			final File fileOrFolder = signPhoto.imageFile;
+//			final Path fileOrFolderPath = new Path(fileOrFolder.getAbsolutePath());
+//			final String fileOrFolderName = fileOrFolderPath.removeFileExtension().lastSegment();
+//
+//			parseFolder_20_CreateTourSign(//
+//					fileOrFolder,
+//					fileOrFolderName,
+//					null);
+//		}
+//
+//		importSignImages_Final();
+//	}
 
 	@SuppressWarnings("unchecked")
 	public static SignCollection getRootSigns() {
@@ -398,22 +263,22 @@ public class SignManager {
 
 			rootEntry = new SignCollection();
 
-			/*
-			 * read sign categories from db
-			 */
-			Query emQuery = em.createQuery(//
-					//
-					"SELECT signCategory" //$NON-NLS-1$
-							+ (" FROM " + TourSignCategory.class.getSimpleName() + " AS signCategory") //$NON-NLS-1$ //$NON-NLS-2$
-							+ (" WHERE signCategory.isRoot=1") //$NON-NLS-1$
-							+ (" ORDER BY signCategory.name")); //$NON-NLS-1$
-
-			rootEntry.tourSignCategories = (ArrayList<TourSignCategory>) emQuery.getResultList();
+//			/*
+//			 * read sign categories from db
+//			 */
+//			Query emQuery = em.createQuery(//
+//					//
+//					"SELECT signCategory" //$NON-NLS-1$
+//							+ (" FROM " + TourSignCategory.class.getSimpleName() + " AS signCategory") //$NON-NLS-1$ //$NON-NLS-2$
+//							+ (" WHERE signCategory.isRoot=1") //$NON-NLS-1$
+//							+ (" ORDER BY signCategory.name")); //$NON-NLS-1$
+//
+//			rootEntry.tourSignCategories = (ArrayList<TourSignCategory>) emQuery.getResultList();
 
 			/*
 			 * read tour signs from db
 			 */
-			emQuery = em.createQuery(//
+			final Query emQuery = em.createQuery(//
 					//
 					"SELECT sign" //$NON-NLS-1$
 							+ (" FROM " + TourSign.class.getSimpleName() + " AS sign ") //$NON-NLS-1$ //$NON-NLS-2$
@@ -432,57 +297,77 @@ public class SignManager {
 		return rootEntry;
 	}
 
-	/**
-	 * @param categoryId
-	 * @return Returns a {@link SignCollection} which contains all signs and categories for the
-	 *         category Id.
-	 */
-	public static SignCollection getSignEntries(final long categoryId) {
+	private static SignCollection getSignCollection(final TourSignCategory signCategory) {
 
-		final Long categoryIdValue = Long.valueOf(categoryId);
+		long categoryId;
 
-		SignCollection categoryEntries = _signCollections.get(categoryIdValue);
-		if (categoryEntries != null) {
-			return categoryEntries;
+		if (signCategory == null) {
+			categoryId = ROOT_SIGN_ID;
+		} else {
+			categoryId = signCategory.getCategoryId();
 		}
 
-		/*
-		 * read sign category children from the database
-		 */
+		SignCollection signCollection = _signCollections.get(categoryId);
 
-		final EntityManager em = TourDatabase.getInstance().getEntityManager();
+		if (signCollection == null) {
 
-		if (em == null) {
-			return null;
+			signCollection = new SignCollection();
 		}
 
-		try {
-
-			categoryEntries = new SignCollection();
-
-			final TourSignCategory tourSignCategory = em.find(TourSignCategory.class, categoryIdValue);
-
-			// get signs
-			final Set<TourSign> lazyTourSigns = tourSignCategory.getTourSigns();
-			categoryEntries.tourSigns = new ArrayList<TourSign>(lazyTourSigns);
-			Collections.sort(categoryEntries.tourSigns);
-
-			// get categories
-			final Set<TourSignCategory> lazyTourSignCategories = tourSignCategory.getTourSignCategories();
-			categoryEntries.tourSignCategories = new ArrayList<TourSignCategory>(lazyTourSignCategories);
-			Collections.sort(categoryEntries.tourSignCategories);
-
-		} catch (final Exception e) {
-			StatusUtil.log(e);
-		} finally {
-
-			em.close();
-		}
-
-		_signCollections.put(categoryIdValue, categoryEntries);
-
-		return categoryEntries;
+		return signCollection;
 	}
+
+//	/**
+//	 * @param categoryId
+//	 * @return Returns a {@link SignCollection} which contains all signs and categories for the
+//	 *         category Id.
+//	 */
+//	public static SignCollection getSignEntries(final long categoryId) {
+//
+//		final Long categoryIdValue = Long.valueOf(categoryId);
+//
+//		SignCollection categoryEntries = _signCollections.get(categoryIdValue);
+//		if (categoryEntries != null) {
+//			return categoryEntries;
+//		}
+//
+//		/*
+//		 * read sign category children from the database
+//		 */
+//
+//		final EntityManager em = TourDatabase.getInstance().getEntityManager();
+//
+//		if (em == null) {
+//			return null;
+//		}
+//
+//		try {
+//
+//			categoryEntries = new SignCollection();
+//
+//			final TourSignCategory tourSignCategory = em.find(TourSignCategory.class, categoryIdValue);
+//
+//			// get signs
+//			final Set<TourSign> lazyTourSigns = tourSignCategory.getTourSigns();
+//			categoryEntries.tourSigns = new ArrayList<TourSign>(lazyTourSigns);
+//			Collections.sort(categoryEntries.tourSigns);
+//
+//			// get categories
+//			final Set<TourSignCategory> lazyTourSignCategories = tourSignCategory.getTourSignCategories();
+//			categoryEntries.tourSignCategories = new ArrayList<TourSignCategory>(lazyTourSignCategories);
+//			Collections.sort(categoryEntries.tourSignCategories);
+//
+//		} catch (final Exception e) {
+//			StatusUtil.log(e);
+//		} finally {
+//
+//			em.close();
+//		}
+//
+//		_signCollections.put(categoryIdValue, categoryEntries);
+//
+//		return categoryEntries;
+//	}
 
 	/**
 	 * @param signPhoto
@@ -529,29 +414,24 @@ public class SignManager {
 		return photoImage;
 	}
 
-	private static void importSignImages_Final() {
-
-		saveAllImportedSigns();
-
-		Display.getCurrent().asyncExec(new Runnable() {
-			public void run() {
-
-				// ensure newly saved sign are loaded
-				clearTourSigns();
-
-				PreferencesUtil.createPreferenceDialogOn(
-						Display.getCurrent().getActiveShell(),
-						PrefPageSigns.ID,
-						null,
-						null).open();
-			}
-		});
-	}
-
-	public static void keepImportedSign(final TourSign importedSign) {
-
-		_importedSigns.put(importedSign.getSignKey(), importedSign);
-	}
+//	private static void importSignImages_Final() {
+//
+//		saveAllImportedSigns();
+//
+//		Display.getCurrent().asyncExec(new Runnable() {
+//			public void run() {
+//
+//				// ensure newly saved sign are loaded
+//				clearTourSigns();
+//
+//				PreferencesUtil.createPreferenceDialogOn(
+//						Display.getCurrent().getActiveShell(),
+//						PrefPageSigns.ID,
+//						null,
+//						null).open();
+//			}
+//		});
+//	}
 
 	/**
 	 * !!!!!!!!!!!!!! RECURSIVE !!!!!!!!!!!!!!!!!<br>
@@ -560,15 +440,11 @@ public class SignManager {
 	 * !!!!!!!!!!!!!! RECURSIVE !!!!!!!!!!!!!!!!!
 	 * 
 	 * @param fileOrFolder
-	 * @param categoryName
-	 * @param categoryKey
-	 *            Is an empty string when parent folder is the base folder.
 	 * @param parentSignCategory
 	 * @param monitor
 	 * @return Returns <code>true</code> if all deletions were successful
 	 */
 	private static void parseFolder_10_FilesFolder(	final File fileOrFolder,
-													String categoryKey,
 													final TourSignCategory parentSignCategory,
 													final IProgressMonitor monitor) {
 
@@ -585,35 +461,36 @@ public class SignManager {
 
 		final boolean isRootParent = _folderDepth == -1;
 		final boolean isRoot = _folderDepth == 0;
-		if (isRoot) {
-			categoryKey = TourSignCategory.ROOT_KEY;
-		}
 
 		if (fileOrFolder.isDirectory()) {
 
-			// fs item is a folder
+			/*
+			 * FileSystem item is a folder
+			 */
 
-			// create folder key from folder path.
-			final String[] relativeSegments = fileOrFolderPath.removeFirstSegments(_baseFolderSegments).segments();
-			final String folderKey = StringUtils.join(relativeSegments, KEY_PART_SEPARATOR);
-
-			TourSignCategory signCategory = null;
+			final TourSignCategory signCategory = null;
 
 			// don't create a sign category for the parent of the root
 			if (isRootParent == false) {
 
-				// get/create sign category
-				signCategory = getImportedSignCategoryByKey(//
-						fileOrFolderName,
-						folderKey,
-						isRoot);
-
-				if (parentSignCategory != null) {
-					parentSignCategory.addTourSignCategory(signCategory);
-				}
+//				// get/create sign category
+//				final TourSignCategory newSignCategory = new TourSignCategory(fileOrFolderName);
+//
+//				newSignCategory.setRoot(isRoot);
+//
+//				final TourSignCategory savedCategory = TourDatabase.saveEntity(
+//						newSignCategory,
+//						newSignCategory.getCategoryId(),
+//						TourSignCategory.class);
+//
+//				signCategory = savedCategory;
+//
+//				if (parentSignCategory != null) {
+//					parentSignCategory.addTourSignCategory(signCategory);
+//				}
 			}
 
-			// get all FS items
+			// get all FileSystem items
 			final String[] allFSItems = fileOrFolder.list();
 			for (final String fsPathName : allFSItems) {
 
@@ -621,7 +498,6 @@ public class SignManager {
 
 				parseFolder_10_FilesFolder(//
 						new File(fileOrFolder, fsPathName),
-						folderKey,
 						signCategory,
 						monitor);
 
@@ -630,14 +506,14 @@ public class SignManager {
 
 		} else {
 
-			// fs item is a file
+			/*
+			 * FileSystem item is a file
+			 */
 
 			parseFolder_20_CreateTourSign(//
 					fileOrFolder,
 					fileOrFolderName,
-					categoryKey,
-					parentSignCategory,
-					isRoot);
+					parentSignCategory);
 		}
 
 		/*
@@ -654,48 +530,40 @@ public class SignManager {
 	}
 
 	/**
-	 * @param fileOrFolder
-	 * @param fileOrFolderName
-	 * @param categoryKey
+	 * Create tour sign and save it's entiy.
+	 * 
+	 * @param signImageFile
+	 * @param tourSignName
 	 * @param parentSignCategory
 	 *            Parent category for this sign, can be <code>null</code> when sign is in the root.
-	 * @param isRoot
+	 * @return
 	 */
-	private static void parseFolder_20_CreateTourSign(	final File fileOrFolder,
-														final String fileOrFolderName,
-														final String categoryKey,
-														final TourSignCategory parentSignCategory,
-														final boolean isRoot) {
+	private static TourSign parseFolder_20_CreateTourSign(	final File signImageFile,
+															final String tourSignName,
+															final TourSignCategory parentSignCategory) {
 
-		// get/create sign
-		final TourSign importedSign = getImportedSignByKey(//
-				fileOrFolderName,
-				categoryKey,
-				isRoot);
+		final boolean isRoot = parentSignCategory == null;
 
-		if (importedSign.getSignId() == TourDatabase.ENTITY_IS_NOT_SAVED) {
+		final TourSign newSign = new TourSign(tourSignName);
 
-			// sign entity is not yet saved
+		newSign.setRoot(isRoot);
+		newSign.setImageFilePathName(signImageFile.getAbsolutePath());
 
-			importedSign.setRoot(isRoot);
-			importedSign.setImageFilePathName(fileOrFolder.getAbsolutePath());
+		final TourSign savedSign = TourDatabase.saveEntity(//
+				newSign,
+				newSign.getSignId(),
+				TourSign.class);
 
-			final TourSign savedSign = TourDatabase.saveEntity(//
-					importedSign,
-					importedSign.getSignId(),
-					TourSign.class);
+		if (parentSignCategory != null) {
 
-			keepImportedSign(savedSign);
-
-			if (parentSignCategory != null) {
-
-				// set category for this sign
-				importedSign.getTourSignCategories().add(parentSignCategory);
-
-				// this parent category has a new child
-				parentSignCategory.addTourSign(savedSign);
-			}
+//			// set category for this sign
+//			savedSign.setTourSignCategory(parentSignCategory);
+//
+//			// this parent category has a new child
+//			parentSignCategory.addTourSign(savedSign);
 		}
+
+		return savedSign;
 	}
 
 	public static void removeCachedCategory(final long categoryId) {
@@ -703,41 +571,22 @@ public class SignManager {
 		_signCollections.remove(categoryId);
 	}
 
-	private static void saveAllImportedSigns() {
-
-//		// save imported signs
-//		for (final Entry<String, TourSign> tourSignEntry : _importedSigns.entrySet()) {
+//	private static void saveAllImportedSigns() {
 //
-//			final TourSign tourSign = tourSignEntry.getValue();
+//		// save imported categories
+//		for (final Entry<Long, TourSignCategory> tourSignCategoryEntry : _importedSignCategories.entrySet()) {
 //
-//			final TourSign savedSign = TourDatabase.saveEntity(//
-//					tourSign,
-//					tourSign.getSignId(),
-//					TourSign.class);
+//			final TourSignCategory tourSignCategory = tourSignCategoryEntry.getValue();
 //
-//			/*
-//			 * Replace sign with saved sign, otherwise this error occures: deleted entity passed to
-//			 * persist
-//			 */
-//			final TourSignCategory signCategory = savedSign.getSignCategory();
-//			signCategory.addTourSign(savedSign);
+//			TourDatabase.saveEntity(//
+//					tourSignCategory,
+//					tourSignCategory.getCategoryId(),
+//					TourSignCategory.class);
 //		}
-
-		// save imported categories
-		for (final Entry<String, TourSignCategory> tourSignCategoryEntry : _importedSignCategories.entrySet()) {
-
-			final TourSignCategory tourSignCategory = tourSignCategoryEntry.getValue();
-
-			TourDatabase.saveEntity(//
-					tourSignCategory,
-					tourSignCategory.getCategoryId(),
-					TourSignCategory.class);
-		}
-
-		// remove imported signs/categories, saved sign/categories do have other instances
-		_importedSigns.clear();
-		_importedSignCategories.clear();
-	}
+//
+//		// remove imported signs/categories, saved sign/categories do have other instances
+//		_importedSignCategories.clear();
+//	}
 
 	private static void TEMP_DB_cleanup() {
 
@@ -754,8 +603,8 @@ public class SignManager {
 
 			final String allSql[] = {
 					//
-					"DELETE FROM " + TourDatabase.JOINTABLE_TOURSIGNCATEGORY_TOURSIGN, //$NON-NLS-1$
-					"DELETE FROM " + TourDatabase.JOINTABLE_TOURSIGNCATEGORY_TOURSIGNCATEGORY, //$NON-NLS-1$
+					"DELETE FROM " + TourDatabase.JOINTABLE__TOURSIGNCATEGORY_TOURSIGN, //$NON-NLS-1$
+					"DELETE FROM " + TourDatabase.JOINTABLE__TOURSIGNCATEGORY_TOURSIGNCATEGORY, //$NON-NLS-1$
 					//
 					"DELETE FROM " + TourDatabase.TABLE_TOUR_SIGN, //$NON-NLS-1$
 					"DELETE FROM " + TourDatabase.TABLE_TOUR_SIGN_CATEGORY, //$NON-NLS-1$

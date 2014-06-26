@@ -1143,6 +1143,10 @@ public class Messages extends NLS {
 	public static String		PrefPageTourTypeFilterList_Pref_TourTypeFilter_button_down;
 	public static String		PrefPageTourTypeFilterList_Pref_TourTypeFilter_button_up;
 
+	public static String	SignImage_View_Action_CreateSignCategory;
+
+	public static String	SignImage_View_Action_ImportSignImage;
+
 	public static String		SignImage_Viewer_Column_Dimension_Label;
 
 	public static String		SignImage_Viewer_Column_Dimension_Tooltip;

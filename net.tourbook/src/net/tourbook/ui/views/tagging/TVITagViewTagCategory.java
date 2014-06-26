@@ -49,8 +49,8 @@ public class TVITagViewTagCategory extends TVITagViewItem {
 
 			final String tblTag = TourDatabase.TABLE_TOUR_TAG;
 			final String tblCat = TourDatabase.TABLE_TOUR_TAG_CATEGORY;
-			final String jTblCatTag = TourDatabase.JOINTABLE_TOURTAGCATEGORY_TOURTAG;
-			final String jTblCatCat = TourDatabase.JOINTABLE_TOURTAGCATEGORY_TOURTAGCATEGORY;
+			final String jTblCatTag = TourDatabase.JOINTABLE__TOURTAGCATEGORY_TOURTAG;
+			final String jTblCatCat = TourDatabase.JOINTABLE__TOURTAGCATEGORY_TOURTAGCATEGORY;
 
 			final StringBuilder sb = new StringBuilder();
 
