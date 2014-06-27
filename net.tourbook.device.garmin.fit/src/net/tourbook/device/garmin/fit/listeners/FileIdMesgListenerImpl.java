@@ -1,7 +1,7 @@
 package net.tourbook.device.garmin.fit.listeners;
 
-import net.tourbook.device.garmin.fit.FitActivityContext;
-import net.tourbook.device.garmin.fit.FitActivityReaderException;
+import net.tourbook.device.garmin.fit.FitContext;
+import net.tourbook.device.garmin.fit.FitDataReaderException;
 import net.tourbook.device.garmin.fit.types.GarminProduct;
 import net.tourbook.device.garmin.fit.types.Manufacturer;
 
@@ -11,30 +11,31 @@ import com.garmin.fit.FileIdMesgListener;
 
 public class FileIdMesgListenerImpl extends AbstractMesgListener implements FileIdMesgListener {
 
-	public FileIdMesgListenerImpl(FitActivityContext context) {
+	public FileIdMesgListenerImpl(final FitContext context) {
 		super(context);
 	}
 
 	@Override
-	public void onMesg(FileIdMesg mesg) {
-		File type = mesg.getType();
+	public void onMesg(final FileIdMesg mesg) {
+
+		final File type = mesg.getType();
 		if (type != File.ACTIVITY) {
-			throw new FitActivityReaderException("Invalid file type: " //$NON-NLS-1$
+			throw new FitDataReaderException("Invalid file type: " //$NON-NLS-1$
 					+ type.name()
 					+ ", expected: " //$NON-NLS-1$
 					+ File.ACTIVITY.name());
 		}
 
-		Long serialNumber = mesg.getSerialNumber();
+		final Long serialNumber = mesg.getSerialNumber();
 		if (serialNumber == null) {
-			throw new FitActivityReaderException("File serial number is missing"); //$NON-NLS-1$
+			throw new FitDataReaderException("File serial number is missing"); //$NON-NLS-1$
 		}
 
 		context.setDeviceId(serialNumber.toString());
 
-		Integer manufacturer = mesg.getManufacturer();
+		final Integer manufacturer = mesg.getManufacturer();
 		if (manufacturer != null) {
-			Manufacturer manufacturerEnum = Manufacturer.valueOf(manufacturer);
+			final Manufacturer manufacturerEnum = Manufacturer.valueOf(manufacturer);
 			if (manufacturerEnum != null) {
 				context.setManufacturer(manufacturerEnum.name());
 			} else {
@@ -42,9 +43,9 @@ public class FileIdMesgListenerImpl extends AbstractMesgListener implements File
 			}
 		}
 
-		Integer garminProduct = mesg.getGarminProduct();
+		final Integer garminProduct = mesg.getGarminProduct();
 		if (garminProduct != null) {
-			GarminProduct garminProductEnum = GarminProduct.valueOf(garminProduct);
+			final GarminProduct garminProductEnum = GarminProduct.valueOf(garminProduct);
 			if (garminProductEnum != null) {
 				context.setGarminProduct(garminProductEnum.name());
 			} else {

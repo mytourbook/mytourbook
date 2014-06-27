@@ -2,6 +2,7 @@ package net.tourbook.device.garmin.fit;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -9,6 +10,7 @@ import net.tourbook.common.util.Util;
 import net.tourbook.data.TimeData;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
+import net.tourbook.device.garmin.fit.FitContextData.ContextTimeData;
 import net.tourbook.importdata.TourbookDevice;
 
 import org.apache.commons.io.FilenameUtils;
@@ -19,12 +21,12 @@ import org.apache.commons.io.FilenameUtils;
  * 
  * @author Marcin Kuthan <marcin.kuthan@gmail.com>
  */
-public class FitActivityContext {
+public class FitContext {
 
 	private TourbookDevice			_device;
 	private final String			_filimportFilePathename;
 
-	private FitActivityContextData	_contextData;
+	private FitContextData			_contextData;
 
 	private boolean					_isSpeedSensorPresent;
 	private boolean					_isHeartRateSensorPresent;
@@ -44,46 +46,20 @@ public class FitActivityContext {
 	private Map<Long, TourData>		_alreadyImportedTours;
 	private HashMap<Long, TourData>	_newlyImportedTours;
 
-	public FitActivityContext(	final TourbookDevice device,
-								final String importFilePath,
-								final Map<Long, TourData> alreadyImportedTours,
-								final HashMap<Long, TourData> newlyImportedTours) {
+	public FitContext(	final TourbookDevice device,
+						final String importFilePath,
+						final Map<Long, TourData> alreadyImportedTours,
+						final HashMap<Long, TourData> newlyImportedTours) {
 
 		_device = device;
 		_filimportFilePathename = importFilePath;
 		_alreadyImportedTours = alreadyImportedTours;
 		_newlyImportedTours = newlyImportedTours;
 
-		_contextData = new FitActivityContextData();
+		_contextData = new FitContextData();
 	}
 
-	public void afterLap() {
-		_contextData.finalizeTourMarker();
-	}
-
-	public void afterRecord() {
-		_contextData.finalizeTimeData();
-		_serieIndex++;
-	}
-
-	public void afterSession() {
-		_contextData.finalizeTourData();
-	}
-
-	public void beforeLap() {
-		_contextData.initializeTourMarker();
-	}
-
-	public void beforeRecord() {
-		_contextData.initializeTimeData();
-	}
-
-	public void beforeSession() {
-		_serieIndex = 0;
-		_contextData.initializeTourData();
-	}
-
-	public FitActivityContextData getContextData() {
+	public FitContextData getContextData() {
 		return _contextData;
 	}
 
@@ -124,7 +100,54 @@ public class FitActivityContext {
 		return _manufacturer;
 	}
 
-	public int getSerieIndex() {
+	/**
+	 * When tour markers are created, they are created in the sequence of the time slices or at the
+	 * end of the session.
+	 * 
+	 * @param lapAbsoluteTime
+	 * @param lapDistance
+	 * @return
+	 */
+	public int getSerieIndex(final long lapAbsoluteTime, final float lapDistance) {
+
+		final List<ContextTimeData> allTimeData = _contextData.getAllTimeData();
+
+		final int timeDataSize = allTimeData.size();
+
+		if (_serieIndex >= timeDataSize) {
+
+			/*
+			 * The serie index is out of tour scope, try to get the index from time or distance.
+			 */
+
+			for (int serieIndex = 0; serieIndex < timeDataSize; serieIndex++) {
+
+				final ContextTimeData contextTimeData = allTimeData.get(serieIndex);
+				final TimeData timeData = contextTimeData.getTimeData();
+
+				final long absoluteTime = timeData.absoluteTime;
+				if (absoluteTime != Long.MIN_VALUE) {
+
+					final long tourAbsoluteTime = absoluteTime / 1000;
+
+					if (tourAbsoluteTime >= lapAbsoluteTime) {
+						return serieIndex;
+					}
+				}
+
+				if (lapDistance != -1) {
+
+					final float tourAbsoluteDistance = timeData.absoluteDistance;
+					if (tourAbsoluteDistance != Float.MIN_VALUE) {
+
+						if (tourAbsoluteDistance >= lapDistance) {
+							return serieIndex;
+						}
+					}
+				}
+			}
+		}
+
 		return _serieIndex;
 	}
 
@@ -156,9 +179,41 @@ public class FitActivityContext {
 		return _isSpeedSensorPresent;
 	}
 
+	public void mesgLap_10_Before() {
+
+		_contextData.ctxTourMarker_10_Initialize();
+	}
+
+	public void mesgLap_20_After() {
+
+		_contextData.ctxTourMarker_20_Finalize();
+	}
+
+	public void mesgRecord_10_Before() {
+
+		_contextData.ctxTimeData_10_Initialize();
+	}
+
+	public void mesgRecord_20_After() {
+
+		_contextData.ctxTimeData_20_Finalize();
+		_serieIndex++;
+	}
+
+	public void mesgSession_10_Before() {
+
+		_serieIndex = 0;
+		_contextData.ctxTourData_10_Initialize();
+	}
+
+	public void mesgSession_20_After() {
+
+		_contextData.ctxTourData_20_Finalize();
+	}
+
 	public void processData() {
 
-		_contextData.processData(new FitActivityContextDataHandler() {
+		_contextData.processData(new FitContextDataHandler() {
 
 			@Override
 			public void handleTour(	final TourData tourData,

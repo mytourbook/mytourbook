@@ -4,7 +4,7 @@
    <extension
          point="net.tourbook.deviceDataReader">
       <device
-            class="net.tourbook.device.garmin.fit.FitActivityReader"
+            class="net.tourbook.device.garmin.fit.FitDataReader"
             fileextension="fit"
             id="net.tourbook.device.FitDataReader"
             name="Fit Import"/>

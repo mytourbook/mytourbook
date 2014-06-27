@@ -1,8 +1,10 @@
 package net.tourbook.device.garmin.fit.listeners;
 
 import net.tourbook.chart.ChartLabel;
-import net.tourbook.device.garmin.fit.FitActivityContext;
+import net.tourbook.data.TourMarker;
+import net.tourbook.device.garmin.fit.FitContext;
 
+import com.garmin.fit.DateTime;
 import com.garmin.fit.LapMesg;
 import com.garmin.fit.LapMesgListener;
 
@@ -10,37 +12,51 @@ public class LapMesgListenerImpl extends AbstractMesgListener implements LapMesg
 
 	private int	_lapCounter;
 
-	public LapMesgListenerImpl(final FitActivityContext context) {
+	public LapMesgListenerImpl(final FitContext context) {
 		super(context);
 	}
 
 	@Override
-	public void onMesg(final LapMesg mesg) {
-		context.beforeLap();
+	public void onMesg(final LapMesg lapMesg) {
 
-		final Integer messageIndex = getLapMessageIndex(mesg);
+		context.mesgLap_10_Before();
 
-		getTourMarker().setLabel(messageIndex == null ? Integer.toString(++_lapCounter) : messageIndex.toString());
-		getTourMarker().setVisualPosition(ChartLabel.VISUAL_HORIZONTAL_ABOVE_GRAPH_CENTERED);
+		final Integer messageIndex = getLapMessageIndex(lapMesg);
 
-		getTourMarker().setSerieIndex(context.getSerieIndex() - 1);
+		final TourMarker tourMarker = getTourMarker();
 
-		final Float totalDistance = mesg.getTotalDistance();
+		tourMarker.setLabel(messageIndex == null ? Integer.toString(++_lapCounter) : messageIndex.toString());
+		tourMarker.setVisualPosition(ChartLabel.VISUAL_HORIZONTAL_ABOVE_GRAPH_CENTERED);
+
+		final Float totalDistance = lapMesg.getTotalDistance();
+		float lapDistance = -1;
 		if (totalDistance != null) {
-			float lapDistance = context.getLapDistance();
+
+			lapDistance = context.getLapDistance();
 			lapDistance += totalDistance;
+
 			context.setLapDistance(lapDistance);
-			getTourMarker().setDistance(lapDistance);
+			tourMarker.setDistance(lapDistance);
 		}
 
-		final Float totalElapsedTime = mesg.getTotalElapsedTime();
+		final Float totalElapsedTime = lapMesg.getTotalElapsedTime();
+		int lapTime = -1;
 		if (totalElapsedTime != null) {
-			int lapTime = context.getLapTime();
+
+			lapTime = context.getLapTime();
 			lapTime += Math.round(totalElapsedTime);
+
 			context.setLapTime(lapTime);
-			getTourMarker().setTime(lapTime);
+			tourMarker.setTime(lapTime);
 		}
 
-		context.afterLap();
+		// set time slices position
+		final DateTime timestamp = lapMesg.getTimestamp();
+		final long absoluteTime = timestamp.getTimestamp();
+
+		final int serieIndex = context.getSerieIndex(absoluteTime, lapDistance) - 1;
+		tourMarker.setSerieIndex(serieIndex);
+
+		context.mesgLap_20_After();
 	}
 }

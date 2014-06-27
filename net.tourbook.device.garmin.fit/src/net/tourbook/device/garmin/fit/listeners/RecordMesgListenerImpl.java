@@ -2,7 +2,7 @@ package net.tourbook.device.garmin.fit.listeners;
 
 import net.tourbook.data.TimeData;
 import net.tourbook.device.garmin.fit.DataConverters;
-import net.tourbook.device.garmin.fit.FitActivityContext;
+import net.tourbook.device.garmin.fit.FitContext;
 
 import com.garmin.fit.DateTime;
 import com.garmin.fit.RecordMesg;
@@ -10,14 +10,14 @@ import com.garmin.fit.RecordMesgListener;
 
 public class RecordMesgListenerImpl extends AbstractMesgListener implements RecordMesgListener {
 
-	public RecordMesgListenerImpl(final FitActivityContext context) {
+	public RecordMesgListenerImpl(final FitContext context) {
 		super(context);
 	}
 
 	@Override
 	public void onMesg(final RecordMesg mesg) {
 
-		context.beforeRecord();
+		context.mesgRecord_10_Before();
 
 		final TimeData timeData = getTimeData();
 
@@ -71,7 +71,7 @@ public class RecordMesgListenerImpl extends AbstractMesgListener implements Reco
 			timeData.temperature = temperature;
 		}
 
-		context.afterRecord();
+		context.mesgRecord_20_After();
 	}
 
 }
