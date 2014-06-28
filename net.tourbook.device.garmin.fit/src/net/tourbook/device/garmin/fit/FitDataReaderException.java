@@ -6,9 +6,9 @@ package net.tourbook.device.garmin.fit;
  * @author Marcin Kuthan <marcin.kuthan@gmail.com>
  */
 @SuppressWarnings("serial")
-public class FitActivityReaderException extends RuntimeException {
+public class FitDataReaderException extends RuntimeException {
 
-	public FitActivityReaderException(String message) {
+	public FitDataReaderException(String message) {
 		super(message);
 	}
 

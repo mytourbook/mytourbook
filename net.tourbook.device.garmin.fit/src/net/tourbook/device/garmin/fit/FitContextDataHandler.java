@@ -12,7 +12,7 @@ import net.tourbook.data.TourMarker;
  * 
  * @author Marcin Kuthan <marcin.kuthan@gmail.com>
  */
-interface FitActivityContextDataHandler {
+interface FitContextDataHandler {
 
 	void handleTour(TourData tourData, ArrayList<TimeData> timeDataList, Set<TourMarker> tourMarkerSet);
 

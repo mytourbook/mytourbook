@@ -2,8 +2,8 @@ package net.tourbook.device.garmin.fit.listeners;
 
 import net.tourbook.data.TourData;
 import net.tourbook.device.garmin.fit.DataConverters;
-import net.tourbook.device.garmin.fit.FitActivityContext;
-import net.tourbook.device.garmin.fit.FitActivityReaderException;
+import net.tourbook.device.garmin.fit.FitContext;
+import net.tourbook.device.garmin.fit.FitDataReaderException;
 
 import com.garmin.fit.DateTime;
 import com.garmin.fit.SessionMesg;
@@ -12,21 +12,21 @@ import com.garmin.fit.Sport;
 
 public class SessionMesgListenerImpl extends AbstractMesgListener implements SessionMesgListener {
 	
-	public SessionMesgListenerImpl(final FitActivityContext context) {
+	public SessionMesgListenerImpl(final FitContext context) {
 		super(context);
 	}
 
 	@Override
 	public void onMesg(final SessionMesg mesg) {
 
-		context.beforeSession();
+		context.mesgSession_10_Before();
 
 		final Integer messageIndex = getMessageIndex(mesg);
 		context.setSessionIndex(messageIndex.toString());
 
 		final DateTime startTime = mesg.getStartTime();
 		if (startTime == null) {
-			throw new FitActivityReaderException("Missing session start date"); //$NON-NLS-1$
+			throw new FitDataReaderException("Missing session start date"); //$NON-NLS-1$
 		}
 
 		final TourData tourData = getTourData();
@@ -83,6 +83,6 @@ public class SessionMesgListenerImpl extends AbstractMesgListener implements Ses
 			tourData.setTourDrivingTime(Math.round(totalTimerTime));
 		}
 
-		context.afterSession();
+		context.mesgSession_20_After();
 	}
 }
