@@ -723,8 +723,8 @@ public class PrefPageSigns extends PreferencePage implements IWorkbenchPreferenc
 		final TreeColumnDefinition colDef = new TreeColumnDefinition(_columnManager, "Dimension", SWT.TRAIL); //$NON-NLS-1$
 
 		colDef.setColumnLabel(Messages.SignImage_Viewer_Column_Dimension_Label);
-		colDef.setColumnHeader(Messages.SignImage_Viewer_Column_Dimension_Label);
-		colDef.setColumnToolTipText(Messages.SignImage_Viewer_Column_Dimension_Tooltip);
+		colDef.setColumnHeaderText(Messages.SignImage_Viewer_Column_Dimension_Label);
+		colDef.setColumnHeaderToolTipText(Messages.SignImage_Viewer_Column_Dimension_Tooltip);
 		colDef.setIsDefaultColumn();
 		colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(12));
 
@@ -771,8 +771,8 @@ public class PrefPageSigns extends PreferencePage implements IWorkbenchPreferenc
 		final TreeColumnDefinition colDef = new TreeColumnDefinition(_columnManager, "FilePathName", SWT.LEAD); //$NON-NLS-1$
 
 		colDef.setColumnLabel(Messages.SignImage_Viewer_Column_FilePathName_Label);
-		colDef.setColumnHeader(Messages.SignImage_Viewer_Column_FilePathName_Label);
-		colDef.setColumnToolTipText(Messages.SignImage_Viewer_Column_FilePathName_Tooltip);
+		colDef.setColumnHeaderText(Messages.SignImage_Viewer_Column_FilePathName_Label);
+		colDef.setColumnHeaderToolTipText(Messages.SignImage_Viewer_Column_FilePathName_Tooltip);
 		colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(100));
 
 		colDef.setLabelProvider(new CellLabelProvider() {
@@ -805,8 +805,8 @@ public class PrefPageSigns extends PreferencePage implements IWorkbenchPreferenc
 		_colDefImage = colDef;
 
 		colDef.setColumnLabel(Messages.SignImage_Viewer_Column_Image_Label);
-		colDef.setColumnHeader(Messages.SignImage_Viewer_Column_Image_Header);
-		colDef.setColumnToolTipText(Messages.SignImage_Viewer_Column_Image_Tooltip);
+		colDef.setColumnHeaderText(Messages.SignImage_Viewer_Column_Image_Header);
+		colDef.setColumnHeaderToolTipText(Messages.SignImage_Viewer_Column_Image_Tooltip);
 
 		colDef.setDefaultColumnWidth(DEFAULT_IMAGE_WIDTH);
 		colDef.setIsDefaultColumn();
@@ -836,7 +836,7 @@ public class PrefPageSigns extends PreferencePage implements IWorkbenchPreferenc
 
 		final TreeColumnDefinition colDef = new TreeColumnDefinition(_columnManager, "Name", SWT.LEAD); //$NON-NLS-1$
 		colDef.setColumnLabel(Messages.SignImage_Viewer_Column_Name_Label);
-		colDef.setColumnHeader(Messages.SignImage_Viewer_Column_Name_Label);
+		colDef.setColumnHeaderText(Messages.SignImage_Viewer_Column_Name_Label);
 
 		colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(30));
 		colDef.setIsDefaultColumn();

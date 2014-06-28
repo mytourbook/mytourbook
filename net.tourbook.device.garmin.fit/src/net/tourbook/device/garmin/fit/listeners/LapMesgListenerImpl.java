@@ -1,6 +1,5 @@
 package net.tourbook.device.garmin.fit.listeners;
 
-import net.tourbook.chart.ChartLabel;
 import net.tourbook.data.TourMarker;
 import net.tourbook.device.garmin.fit.FitContext;
 
@@ -25,7 +24,6 @@ public class LapMesgListenerImpl extends AbstractMesgListener implements LapMesg
 		final TourMarker tourMarker = getTourMarker();
 
 		tourMarker.setLabel(messageIndex == null ? Integer.toString(++_lapCounter) : messageIndex.toString());
-		tourMarker.setVisualPosition(ChartLabel.VISUAL_HORIZONTAL_ABOVE_GRAPH_CENTERED);
 
 		final Float totalDistance = lapMesg.getTotalDistance();
 		float lapDistance = -1;

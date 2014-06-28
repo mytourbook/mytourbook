@@ -867,8 +867,8 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 		_colDefImage = colDef;
 
 		colDef.setColumnLabel(Messages.profileViewer_column_label_color);
-		colDef.setColumnHeader(Messages.profileViewer_column_label_color_header);
-		colDef.setColumnToolTipText(Messages.profileViewer_column_label_color_tooltip);
+		colDef.setColumnHeaderText(Messages.profileViewer_column_label_color_header);
+		colDef.setColumnHeaderToolTipText(Messages.profileViewer_column_label_color_tooltip);
 		colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(50));
 		colDef.setIsDefaultColumn();
 		colDef.setCanModifyVisibility(false);
@@ -896,8 +896,8 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 		final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager, "profileId", SWT.TRAIL); //$NON-NLS-1$
 
 		colDef.setColumnLabel(Messages.profileViewer_column_label_id);
-		colDef.setColumnHeader(Messages.profileViewer_column_label_id_header);
-		colDef.setColumnToolTipText(Messages.profileViewer_column_label_id_tooltip);
+		colDef.setColumnHeaderText(Messages.profileViewer_column_label_id_header);
+		colDef.setColumnHeaderToolTipText(Messages.profileViewer_column_label_id_tooltip);
 		colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(10));
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
@@ -917,8 +917,8 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 		final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager, "profileName", SWT.LEAD); //$NON-NLS-1$
 
 		colDef.setColumnLabel(Messages.profileViewer_column_label_name);
-		colDef.setColumnHeader(Messages.profileViewer_column_label_name_header);
-		colDef.setColumnToolTipText(Messages.profileViewer_column_label_name_tooltip);
+		colDef.setColumnHeaderText(Messages.profileViewer_column_label_name_header);
+		colDef.setColumnHeaderToolTipText(Messages.profileViewer_column_label_name_tooltip);
 		colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(20));
 		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
@@ -939,8 +939,8 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 		final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager, "resolution", SWT.LEAD); //$NON-NLS-1$
 
 		colDef.setColumnLabel(Messages.profileViewer_column_label_resolution);
-		colDef.setColumnHeader(Messages.profileViewer_column_label_resolution_header);
-		colDef.setColumnToolTipText(Messages.profileViewer_column_label_resolution_tooltip);
+		colDef.setColumnHeaderText(Messages.profileViewer_column_label_resolution_header);
+		colDef.setColumnHeaderToolTipText(Messages.profileViewer_column_label_resolution_tooltip);
 		colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(20));
 		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
@@ -961,8 +961,8 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 		final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager, "shadowState", SWT.LEAD); //$NON-NLS-1$
 
 		colDef.setColumnLabel(Messages.profileViewer_column_label_isShadow);
-		colDef.setColumnHeader(Messages.profileViewer_column_label_isShadow_header);
-		colDef.setColumnToolTipText(Messages.profileViewer_column_label_isShadow_tooltip);
+		colDef.setColumnHeaderText(Messages.profileViewer_column_label_isShadow_header);
+		colDef.setColumnHeaderToolTipText(Messages.profileViewer_column_label_isShadow_tooltip);
 		colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(5));
 		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
@@ -983,8 +983,8 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 		final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager, "shadowValue", SWT.LEAD); //$NON-NLS-1$
 
 		colDef.setColumnLabel(Messages.profileViewer_column_label_shadowValue);
-		colDef.setColumnHeader(Messages.profileViewer_column_label_shadowValue_header);
-		colDef.setColumnToolTipText(Messages.profileViewer_column_label_shadowValue_tooltip);
+		colDef.setColumnHeaderText(Messages.profileViewer_column_label_shadowValue_header);
+		colDef.setColumnHeaderToolTipText(Messages.profileViewer_column_label_shadowValue_tooltip);
 		colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(10));
 		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
@@ -1004,8 +1004,8 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 
 		final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager, "tileImagePath", SWT.LEAD); //$NON-NLS-1$
 		colDef.setColumnLabel(Messages.profileViewer_column_label_imagePath);
-		colDef.setColumnHeader(Messages.profileViewer_column_label_imagePath_header);
-		colDef.setColumnToolTipText(Messages.profileViewer_column_label_imagePath_tooltip);
+		colDef.setColumnHeaderText(Messages.profileViewer_column_label_imagePath_header);
+		colDef.setColumnHeaderToolTipText(Messages.profileViewer_column_label_imagePath_tooltip);
 		colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(20));
 		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {

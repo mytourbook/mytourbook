@@ -36,7 +36,7 @@ public abstract class TableColumnFactory {
 			
 			colDef.setColumnLabel(Messages.ColumnFactory_Photo_Altitude);
 //			colDef.setColumnHeader(UI.UNIT_LABEL_ALTITUDE);
-			colDef.setColumnToolTipText(Messages.ColumnFactory_Photo_Altitude_Tooltip);
+			colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_Photo_Altitude_Tooltip);
 //			colDef.setColumnUnit(UI.UNIT_LABEL_ALTITUDE);
 			colDef.setDefaultColumnWidth(pixelWidth);
 			colDef.setColumnWeightData(new ColumnPixelData(pixelWidth, true));
@@ -54,7 +54,7 @@ public abstract class TableColumnFactory {
 			final ColumnDefinition colDef = new TableColumnDefinition(columnManager, "photoDate", SWT.TRAIL); //$NON-NLS-1$
 			
 			colDef.setColumnLabel(Messages.ColumnFactory_Photo_Date);
-			colDef.setColumnHeader(Messages.ColumnFactory_Photo_Date);
+			colDef.setColumnHeaderText(Messages.ColumnFactory_Photo_Date);
 			colDef.setDefaultColumnWidth(pixelWidth);
 			colDef.setColumnWeightData(new ColumnPixelData(pixelWidth, true));
 			
@@ -71,8 +71,8 @@ public abstract class TableColumnFactory {
 			final ColumnDefinition colDef = new TableColumnDefinition(columnManager, "photoImageDirectionDegree", SWT.TRAIL); //$NON-NLS-1$
 			
 			colDef.setColumnLabel(Messages.ColumnFactory_Photo_ImageDirectionDegree_Label);
-			colDef.setColumnHeader(Messages.ColumnFactory_Photo_ImageDirectionDegree_Header);
-			colDef.setColumnToolTipText(Messages.ColumnFactory_Photo_ImageDirectionDegree_Tooltip);
+			colDef.setColumnHeaderText(Messages.ColumnFactory_Photo_ImageDirectionDegree_Header);
+			colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_Photo_ImageDirectionDegree_Tooltip);
 			colDef.setColumnUnit(UI.SYMBOL_DEGREE);
 			colDef.setDefaultColumnWidth(pixelWidth);
 			colDef.setColumnWeightData(new ColumnPixelData(pixelWidth, true));
@@ -90,8 +90,8 @@ public abstract class TableColumnFactory {
 			final ColumnDefinition colDef = new TableColumnDefinition(columnManager, "photoImageDirectionText", SWT.TRAIL); //$NON-NLS-1$
 			
 			colDef.setColumnLabel(Messages.ColumnFactory_Photo_ImageDirectionText_Label);
-			colDef.setColumnHeader(Messages.ColumnFactory_Photo_ImageDirectionDegree_Header);
-			colDef.setColumnToolTipText(Messages.ColumnFactory_Photo_ImageDirectionText_Tooltip);
+			colDef.setColumnHeaderText(Messages.ColumnFactory_Photo_ImageDirectionDegree_Header);
+			colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_Photo_ImageDirectionText_Tooltip);
 			colDef.setColumnUnit(UI.SYMBOL_DEGREE);
 			colDef.setDefaultColumnWidth(pixelWidth);
 			colDef.setColumnWeightData(new ColumnPixelData(pixelWidth, true));
@@ -125,7 +125,7 @@ public abstract class TableColumnFactory {
 			final ColumnDefinition colDef = new TableColumnDefinition(columnManager, "photoFileLocation", SWT.LEAD); //$NON-NLS-1$
 			
 			colDef.setColumnLabel(Messages.ColumnFactory_Photo_Location);
-			colDef.setColumnHeader(Messages.ColumnFactory_Photo_Location);
+			colDef.setColumnHeaderText(Messages.ColumnFactory_Photo_Location);
 			colDef.setDefaultColumnWidth(pixelWidth);
 			colDef.setColumnWeightData(new ColumnPixelData(pixelWidth, true));
 			
@@ -158,7 +158,7 @@ public abstract class TableColumnFactory {
 			final ColumnDefinition colDef = new TableColumnDefinition(columnManager, "photoFileName", SWT.LEAD); //$NON-NLS-1$
 			
 			colDef.setColumnLabel(Messages.ColumnFactory_Photo_Name);
-			colDef.setColumnHeader(Messages.ColumnFactory_Photo_Name);
+			colDef.setColumnHeaderText(Messages.ColumnFactory_Photo_Name);
 			colDef.setDefaultColumnWidth(pixelWidth);
 			colDef.setColumnWeightData(new ColumnPixelData(pixelWidth, true));
 			
@@ -176,8 +176,8 @@ public abstract class TableColumnFactory {
 			final ColumnDefinition colDef = new TableColumnDefinition(columnManager, "photoOrientation", SWT.TRAIL); //$NON-NLS-1$
 			
 			colDef.setColumnLabel(Messages.ColumnFactory_Photo_Orientation);
-			colDef.setColumnHeader(Messages.ColumnFactory_Photo_Orientation_Header);
-			colDef.setColumnToolTipText(Messages.ColumnFactory_Photo_Orientation_Tooltip);
+			colDef.setColumnHeaderText(Messages.ColumnFactory_Photo_Orientation_Header);
+			colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_Photo_Orientation_Tooltip);
 			colDef.setDefaultColumnWidth(pixelWidth);
 			colDef.setColumnWeightData(new ColumnPixelData(pixelWidth, true));
 			
@@ -194,7 +194,7 @@ public abstract class TableColumnFactory {
 			final ColumnDefinition colDef = new TableColumnDefinition(columnManager, "photoOtherTags", SWT.LEAD); //$NON-NLS-1$
 			
 			colDef.setColumnLabel(Messages.ColumnFactory_Photo_OtherTags);
-			colDef.setColumnHeader(Messages.ColumnFactory_Photo_OtherTags);
+			colDef.setColumnHeaderText(Messages.ColumnFactory_Photo_OtherTags);
 			colDef.setDefaultColumnWidth(pixelWidth);
 			colDef.setColumnWeightData(new ColumnPixelData(pixelWidth, true));
 			
@@ -211,7 +211,7 @@ public abstract class TableColumnFactory {
 			final ColumnDefinition colDef = new TableColumnDefinition(columnManager, "photoDimension", SWT.TRAIL); //$NON-NLS-1$
 			
 			colDef.setColumnLabel(Messages.ColumnFactory_Photo_Dimension);
-			colDef.setColumnHeader(Messages.ColumnFactory_Photo_Dimension);
+			colDef.setColumnHeaderText(Messages.ColumnFactory_Photo_Dimension);
 			colDef.setDefaultColumnWidth(pixelWidth);
 			colDef.setColumnWeightData(new ColumnPixelData(pixelWidth, true));
 			
@@ -228,7 +228,7 @@ public abstract class TableColumnFactory {
 			final ColumnDefinition colDef = new TableColumnDefinition(columnManager, "photoTime", SWT.TRAIL); //$NON-NLS-1$
 			
 			colDef.setColumnLabel(Messages.ColumnFactory_Photo_Time);
-			colDef.setColumnHeader(Messages.ColumnFactory_Photo_Time);
+			colDef.setColumnHeaderText(Messages.ColumnFactory_Photo_Time);
 			colDef.setDefaultColumnWidth(pixelWidth);
 			colDef.setColumnWeightData(new ColumnPixelData(pixelWidth, true));
 			

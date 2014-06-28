@@ -697,7 +697,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 		colDef.setIsDefaultColumn();
 
 		// hide wrong tooltip
-		colDef.setColumnToolTipText(UI.EMPTY_STRING);
+		colDef.setColumnHeaderToolTipText(UI.EMPTY_STRING);
 
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
@@ -720,7 +720,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 //		colDef.setIsDefaultColumn();
 
 		// hide wrong tooltip
-		colDef.setColumnToolTipText(UI.EMPTY_STRING);
+		colDef.setColumnHeaderToolTipText(UI.EMPTY_STRING);
 
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override

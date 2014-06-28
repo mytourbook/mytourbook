@@ -796,7 +796,7 @@ public class PrefPageMap3Color extends PreferencePage implements IWorkbenchPrefe
 		final TreeColumnDefinition colDef = new TreeColumnDefinition(_columnManager, "profileName", SWT.LEAD); //$NON-NLS-1$
 
 		colDef.setColumnLabel(Messages.Pref_Map3Color_Column_ProfileName);
-		colDef.setColumnHeader(Messages.Pref_Map3Color_Column_ProfileName);
+		colDef.setColumnHeaderText(Messages.Pref_Map3Color_Column_ProfileName);
 		colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(20));
 		colDef.setIsDefaultColumn();
 		colDef.setIsColumnMoveable(false);
@@ -853,7 +853,7 @@ public class PrefPageMap3Color extends PreferencePage implements IWorkbenchPrefe
 		_colDefProfileImage = colDef;
 
 		colDef.setColumnLabel(Messages.Pref_Map3Color_Column_Colors);
-		colDef.setColumnHeader(Messages.Pref_Map3Color_Column_Colors);
+		colDef.setColumnHeaderText(Messages.Pref_Map3Color_Column_Colors);
 		colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(20));
 		colDef.setIsDefaultColumn();
 		colDef.setIsColumnMoveable(false);
@@ -881,8 +881,8 @@ public class PrefPageMap3Color extends PreferencePage implements IWorkbenchPrefe
 		final TreeColumnDefinition colDef = new TreeColumnDefinition(_columnManager, "minValue", SWT.TRAIL); //$NON-NLS-1$
 
 		colDef.setColumnLabel(Messages.Pref_Map3Color_Column_MinValue_Label);
-		colDef.setColumnHeader(Messages.Pref_Map3Color_Column_MinValue_Header);
-		colDef.setColumnToolTipText(Messages.Pref_Map3Color_Column_MinValue_Label);
+		colDef.setColumnHeaderText(Messages.Pref_Map3Color_Column_MinValue_Header);
+		colDef.setColumnHeaderToolTipText(Messages.Pref_Map3Color_Column_MinValue_Label);
 		colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(8));
 		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
@@ -917,8 +917,8 @@ public class PrefPageMap3Color extends PreferencePage implements IWorkbenchPrefe
 		final TreeColumnDefinition colDef = new TreeColumnDefinition(_columnManager, "maxValue", SWT.LEAD); //$NON-NLS-1$
 
 		colDef.setColumnLabel(Messages.Pref_Map3Color_Column_MaxValue_Label);
-		colDef.setColumnHeader(Messages.Pref_Map3Color_Column_MaxValue_Header);
-		colDef.setColumnToolTipText(Messages.Pref_Map3Color_Column_MaxValue_Label);
+		colDef.setColumnHeaderText(Messages.Pref_Map3Color_Column_MaxValue_Header);
+		colDef.setColumnHeaderToolTipText(Messages.Pref_Map3Color_Column_MaxValue_Label);
 		colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(8));
 		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
@@ -953,7 +953,7 @@ public class PrefPageMap3Color extends PreferencePage implements IWorkbenchPrefe
 		final TreeColumnDefinition colDef = new TreeColumnDefinition(_columnManager, "relativeMarker", SWT.CENTER); //$NON-NLS-1$
 
 		colDef.setColumnLabel(Messages.Pref_Map3Color_Column_AbsoluteRelativValue_Label);
-		colDef.setColumnToolTipText(Messages.Pref_Map3Color_Column_AbsoluteRelativValue_Tooltip);
+		colDef.setColumnHeaderToolTipText(Messages.Pref_Map3Color_Column_AbsoluteRelativValue_Tooltip);
 		colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(3));
 		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
@@ -990,7 +990,7 @@ public class PrefPageMap3Color extends PreferencePage implements IWorkbenchPrefe
 				"legendMinMaxOverwrite", SWT.CENTER); //$NON-NLS-1$
 
 		colDef.setColumnLabel(Messages.Pref_Map3Color_Column_OverwriteLegendMinMax_Label);
-		colDef.setColumnToolTipText(Messages.Pref_Map3Color_Column_OverwriteLegendMinMax_Label_Tooltip);
+		colDef.setColumnHeaderToolTipText(Messages.Pref_Map3Color_Column_OverwriteLegendMinMax_Label_Tooltip);
 		colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(3));
 		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
@@ -1025,8 +1025,8 @@ public class PrefPageMap3Color extends PreferencePage implements IWorkbenchPrefe
 		final TreeColumnDefinition colDef = new TreeColumnDefinition(_columnManager, "profileId", SWT.LEAD); //$NON-NLS-1$
 
 		colDef.setColumnLabel(Messages.Pref_Map3Color_Column_Id_Label);
-		colDef.setColumnHeader(Messages.Pref_Map3Color_Column_Id_Header);
-		colDef.setColumnToolTipText(Messages.Pref_Map3Color_Column_Id_Tooltip);
+		colDef.setColumnHeaderText(Messages.Pref_Map3Color_Column_Id_Header);
+		colDef.setColumnHeaderToolTipText(Messages.Pref_Map3Color_Column_Id_Tooltip);
 		colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(10));
 
 		colDef.setLabelProvider(new CellLabelProvider() {

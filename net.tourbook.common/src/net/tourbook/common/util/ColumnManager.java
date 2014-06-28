@@ -16,6 +16,8 @@
 package net.tourbook.common.util;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 import net.tourbook.common.UI;
 
@@ -284,18 +286,24 @@ public class ColumnManager {
 		/*
 		 * Add all columns
 		 */
-		for (final ColumnDefinition colDef : getDialogColumns()) {
+		for (final ColumnDefinition colDef : getDialogColumns(false)) {
 
 			final MenuItem colMenuItem = new MenuItem(contextMenu, SWT.CHECK);
 
-			colMenuItem.setText(colDef.getColumnLabel());
+			final String label = colDef.getColumnLabel();
+			final String unit = colDef.getColumnUnit();
+
+			final String menuText = unit == null //
+					? label
+					: label + "   ·   " + unit;
+
+			colMenuItem.setText(menuText);
 			colMenuItem.setEnabled(colDef.canModifyVisibility());
 			colMenuItem.setSelection(colDef.isCheckedInDialog());
 
 			colMenuItem.setData(colDef);
 			colMenuItem.addListener(SWT.Selection, _colItemListener);
 		}
-
 	}
 
 	/**
@@ -321,12 +329,12 @@ public class ColumnManager {
 		// get column widget
 		tc = tvc.getColumn();
 
-		final String columnText = colDef.getColumnText();
+		final String columnText = colDef.getColumnHeaderText();
 		if (columnText != null) {
 			tc.setText(columnText);
 		}
 
-		final String columnToolTipText = colDef.getColumnToolTipText();
+		final String columnToolTipText = colDef.getColumnHeaderToolTipText();
 		if (columnToolTipText != null) {
 			tc.setToolTipText(columnToolTipText);
 		}
@@ -411,12 +419,12 @@ public class ColumnManager {
 
 		tc = tvc.getColumn();
 
-		final String columnText = colDef.getColumnText();
+		final String columnText = colDef.getColumnHeaderText();
 		if (columnText != null) {
 			tc.setText(columnText);
 		}
 
-		final String columnToolTipText = colDef.getColumnToolTipText();
+		final String columnToolTipText = colDef.getColumnHeaderToolTipText();
 		if (columnToolTipText != null) {
 			tc.setToolTipText(columnToolTipText);
 		}
@@ -627,7 +635,7 @@ public class ColumnManager {
 	 * 
 	 * @return Returns all columns which are displayed in the {@link DialogModifyColumns}
 	 */
-	private ArrayList<ColumnDefinition> getDialogColumns() {
+	private ArrayList<ColumnDefinition> getDialogColumns(final boolean isSortInvisibleColumns) {
 
 		final ArrayList<ColumnDefinition> allColumnsClone = new ArrayList<ColumnDefinition>();
 
@@ -682,6 +690,19 @@ public class ColumnManager {
 
 				allColumnsClone.remove(colDef);
 			}
+		}
+
+		/*
+		 * Sort remaining columns by name
+		 */
+		if (isSortInvisibleColumns) {
+
+			Collections.sort(allColumnsClone, new Comparator<ColumnDefinition>() {
+				@Override
+				public int compare(final ColumnDefinition colDef1, final ColumnDefinition colDef2) {
+					return colDef1.getColumnLabel().compareTo(colDef2.getColumnLabel());
+				}
+			});
 		}
 
 		/*
@@ -784,7 +805,7 @@ public class ColumnManager {
 		(new DialogModifyColumns(
 				Display.getCurrent().getActiveShell(),
 				this,
-				getDialogColumns(),
+				getDialogColumns(false),
 				_allDefinedColumnDefinitions)).open();
 	}
 
