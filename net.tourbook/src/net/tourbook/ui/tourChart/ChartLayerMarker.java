@@ -608,6 +608,10 @@ public class ChartLayerMarker implements IChartLayer, IChartOverlay {
 									final Color colorHidden,
 									final boolean isSelected) {
 
+		if (chartLabel == null) {
+			return;
+		}
+
 		if (isSelected) {
 			gc.setAlpha(0x60);
 		} else {

@@ -23,13 +23,17 @@ New
 
 * Improved tour marker dialog
 
-- Restructured UI
-- Select a marker in the tour chart
+- Restructured UI.
+- Select a marker in the tour chart graphic.
+- A moving slider in the tour chart is also moved in an opened 2D/3D map view. 
+This is not the best solution but much better than before. It's a compromise because implementing a map within the marker dialog is very very time consuming. The 2D/3D maps are tight very closely to the 2D/3D map views. This implementation needed only 1h. 
+This missing feature was annoying the author since a very long time :-)
 
 
 * Tour chart
 
-- Slideout to set tour marker display options
+- Slideout to set tour marker display options.
+- Doubleclick a tour marker will open the marker dialog.
 - Display a tour marker icon
 - Context menu for a marker
   + Edit marker
@@ -68,12 +72,14 @@ Changes
 - Removed these actions "Tagged Tour", "Tour Analyzer" and "Tour Segmenter" from the workspace toolbars, these actions are available from the main menu.
 
 
-Fixed Bugs 
+Fixed Bugs
+
+* Some
 
 
 System 
 
-* Removed entity TourCategory, it is never be used.
-* Removed some tour database tables which are never be used.
+* Removed TourCategory entity, it have never been used.
+* Removed some tour database tables which have never been used.
 
 

@@ -25,11 +25,14 @@ import net.sf.swtaddons.autocomplete.combo.AutocompleteComboInput;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.ChartDataModel;
+import net.tourbook.chart.ISliderMoveListener;
+import net.tourbook.chart.SelectionChartInfo;
 import net.tourbook.chart.SelectionChartXSliderPosition;
 import net.tourbook.common.Hack;
 import net.tourbook.common.UI;
 import net.tourbook.common.form.SashBottomFixedForm;
 import net.tourbook.common.form.SashLeftFixedForm;
+import net.tourbook.common.util.PostSelectionProvider;
 import net.tourbook.common.util.Util;
 import net.tourbook.common.widgets.ImageCanvas;
 import net.tourbook.data.TourData;
@@ -830,6 +833,12 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
 			_groupText = new Group(container, SWT.NONE);
 			GridDataFactory.fillDefaults()//
 					.grab(true, true)
+					/*
+					 * !!! This min size ensures that the upper part (description) is NOT hidden
+					 * before the other parts (url, image). It took a while to find this solution
+					 * :-(
+					 */
+					.minSize(SWT.DEFAULT, _pc.convertVerticalDLUsToPixels(65))
 					.applyTo(_groupText);
 			_groupText.setText(Messages.Dlg_TourMarker_Group_Label);
 			GridLayoutFactory.swtDefaults().numColumns(2).applyTo(_groupText);
@@ -840,28 +849,30 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
 			}
 
 			/*
-			 * Url
-			 */
-			_groupUrl = new Group(container, SWT.NONE);
-			GridDataFactory.fillDefaults()//
-					.applyTo(_groupUrl);
-			_groupUrl.setText(Messages.Dlg_TourMarker_Group_Url);
-			GridLayoutFactory.swtDefaults().numColumns(2).applyTo(_groupUrl);
-			{
-				createUI_60_Links(_groupUrl);
-			}
-
-			/*
 			 * Image
 			 */
 			_groupImage = new Group(container, SWT.NONE);
 			GridDataFactory.fillDefaults()//
+					.grab(true, false)
 					.applyTo(_groupImage);
 			_groupImage.setText(Messages.Dlg_TourMarker_Group_Image);
 			GridLayoutFactory.swtDefaults().numColumns(2).applyTo(_groupImage);
 
 			{
 				createUI_62_Image(_groupImage);
+			}
+
+			/*
+			 * Url
+			 */
+			_groupUrl = new Group(container, SWT.NONE);
+			GridDataFactory.fillDefaults()//
+					.grab(true, false)
+					.applyTo(_groupUrl);
+			_groupUrl.setText(Messages.Dlg_TourMarker_Group_Url);
+			GridLayoutFactory.swtDefaults().numColumns(2).applyTo(_groupUrl);
+			{
+				createUI_60_Links(_groupUrl);
 			}
 
 			createUI_70_Visibility(container);
@@ -919,7 +930,6 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
 			GridDataFactory.fillDefaults()//
 					.grab(true, true)
 					.hint(_pc.convertWidthInCharsToPixels(20), SWT.DEFAULT)
-					.minSize(SWT.DEFAULT, _pc.convertVerticalDLUsToPixels(20))
 					.applyTo(_txtDescription);
 			_txtDescription.addModifyListener(_defaultModifyListener);
 		}
@@ -1142,6 +1152,11 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
 
 		_tourChart.addTourMarkerSelectionListener(this);
 		_tourChart.addTourMarkerModifyListener(this);
+		_tourChart.addSliderMoveListener(new ISliderMoveListener() {
+			public void sliderMoved(final SelectionChartInfo chartInfoSelection) {
+				fireGlobalSelection(chartInfoSelection);
+			}
+		});
 
 		// set title
 		_tourChart.addDataModelListener(new IDataModelListener() {
@@ -1570,6 +1585,16 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
 		new AutocompleteComboInput(_comboMarkerName);
 	}
 
+	/**
+	 * Fires a selection to all opened views.
+	 * 
+	 * @param selection
+	 */
+	private void fireGlobalSelection(final ISelection selection) {
+
+		PostSelectionProvider.fireSelection(selection);
+	}
+
 	@Override
 	protected IDialogSettings getDialogBoundsSettings() {
 
@@ -1825,6 +1850,8 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
 		_isSetXSlider = true;
 
 		_comboMarkerName.setFocus();
+
+		fireGlobalSelection(tourMarkerSelection);
 	}
 
 	@Override
