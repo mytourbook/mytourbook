@@ -20,6 +20,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 import javax.persistence.Transient;
 
 import net.tourbook.database.TourDatabase;
@@ -69,11 +70,11 @@ public class TourSign implements Comparable<Object> {
 	 */
 	private int					expandType					= EXPAND_TYPE_FLAT;
 
-//	/**
-//	 *
-//	 */
-//	@ManyToOne
-//	private TourSignCategory	tourSignCategory;
+	/**
+	 *
+	 */
+	@ManyToOne
+	private TourSignCategory	tourSignCategory;
 
 	/**
 	 * unique id for manually created tour types because the {@link #signId} is -1 when it's not
@@ -82,6 +83,9 @@ public class TourSign implements Comparable<Object> {
 	@Transient
 	private long				_createId;
 
+	/**
+	 * Photo for the sign image.
+	 */
 	@Transient
 	private Photo				_signImagePhoto;
 

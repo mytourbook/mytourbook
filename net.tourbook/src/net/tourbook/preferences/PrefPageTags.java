@@ -45,7 +45,6 @@ import org.eclipse.jface.dialogs.InputDialog;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
-import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.layout.TreeColumnLayout;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferencePage;
@@ -136,7 +135,6 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 	/*
 	 * None UI controls
 	 */
-	private PixelConverter			_pc;
 
 	/**
 	 * Sort the tags and categories
@@ -264,8 +262,6 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 	}
 
 	private Composite createUI(final Composite parent) {
-
-		_pc = new PixelConverter(parent);
 
 		// container
 		final Composite container = new Composite(parent, SWT.NONE);
@@ -887,8 +883,9 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 					// update item
 					parentCategoryItem.setTourTagCategory(savedParent);
 
-					// set category in tag
-					tourTag.getTagCategories().add(parentTagCategory);
+					// set category in tag,
+// this seems to be not necessary
+//					tourTag.setTagCategory(parentTagCategory);
 
 					// persist tag with category
 					savedTag = TourDatabase.saveEntity(tourTag, tourTag.getTagId(), TourTag.class);

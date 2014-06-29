@@ -121,7 +121,7 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 	 * 
 	 * @since Db version 24
 	 */
-	@ManyToOne(optional = true)
+	@ManyToOne
 	private TourSign				tourSign;
 
 	/**

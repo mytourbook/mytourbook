@@ -627,7 +627,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	 * Tags
 	 */
 	@ManyToMany(fetch = EAGER)
-	@JoinTable(inverseJoinColumns = @JoinColumn(name = "tourTag_tagId", referencedColumnName = "tagId"))
+	@JoinTable(inverseJoinColumns = @JoinColumn(name = "TOURTAG_TagID", referencedColumnName = "TagID"))
 	private Set<TourTag>										tourTags							= new HashSet<TourTag>();
 
 	/**
@@ -661,13 +661,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	 */
 	@Transient
 	public int[]												timeSerie;
-
-	/*
-	 * tourCategory is currently (version 1.6) not used but is defined in older databases, it is
-	 * disabled because the field is not available in the database table
-	 */
-	//	@ManyToMany(fetch = FetchType.LAZY, mappedBy = "tourData")
-	//	private Set<TourCategory>	tourCategory					= new HashSet<TourCategory>();
 
 	// ############################################# TRANSIENT DATA #############################################
 

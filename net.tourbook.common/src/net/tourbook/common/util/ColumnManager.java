@@ -58,6 +58,8 @@ import org.eclipse.swt.widgets.TreeColumn;
  */
 public class ColumnManager {
 
+	private static final String					LABEL_UNIT_SEPARATOR			= "   ·   ";							//$NON-NLS-1$
+
 	/**
 	 * minimum column width, when the column width is 0, there was a bug that this happened
 	 */
@@ -257,6 +259,8 @@ public class ColumnManager {
 
 	private void createHeaderContextMenu_MenuItems(final Menu contextMenu) {
 
+		getColumns_FromViewer();
+
 		/*
 		 * Size All Columns to Fit
 		 */
@@ -295,7 +299,7 @@ public class ColumnManager {
 
 			final String menuText = unit == null //
 					? label
-					: label + "   Â·   " + unit;
+					: label + LABEL_UNIT_SEPARATOR + unit;
 
 			colMenuItem.setText(menuText);
 			colMenuItem.setEnabled(colDef.canModifyVisibility());
@@ -490,10 +494,17 @@ public class ColumnManager {
 		return null;
 	}
 
+	private void getColumns_FromViewer() {
+		
+		// get the sorting order and column width from the viewer
+		_visibleColumnIds = getColumns_FromViewer_Ids();
+		_columnIdsAndWidth = getColumns_FromViewer_IdAndWidth();
+	}
+
 	/**
 	 * @return Returns the columns in the format: id/width ...
 	 */
-	private String[] getColumnIdAndWidthFromViewer() {
+	private String[] getColumns_FromViewer_IdAndWidth() {
 
 		final ArrayList<String> columnIdsAndWidth = new ArrayList<String>();
 
@@ -534,7 +545,7 @@ public class ColumnManager {
 	/**
 	 * Read the column order from a table/tree.
 	 */
-	private String[] getColumnIdsFromViewer() {
+	private String[] getColumns_FromViewer_Ids() {
 
 		final ArrayList<String> orderedColumnIds = new ArrayList<String>();
 
@@ -798,9 +809,7 @@ public class ColumnManager {
 
 	public void openColumnDialog() {
 
-		// get the sorting order and column width from the viewer
-		_visibleColumnIds = getColumnIdsFromViewer();
-		_columnIdsAndWidth = getColumnIdAndWidthFromViewer();
+		getColumns_FromViewer();
 
 		(new DialogModifyColumns(
 				Display.getCurrent().getActiveShell(),
@@ -845,13 +854,13 @@ public class ColumnManager {
 		}
 
 		// save column sort order
-		_visibleColumnIds = getColumnIdsFromViewer();
+		_visibleColumnIds = getColumns_FromViewer_Ids();
 		if (_visibleColumnIds != null) {
 			settings.put(MEMENTO_COLUMN_SORT_ORDER, StringToArrayConverter.convertArrayToString(_visibleColumnIds));
 		}
 
 		// save columns width and keep it for internal use
-		_columnIdsAndWidth = getColumnIdAndWidthFromViewer();
+		_columnIdsAndWidth = getColumns_FromViewer_IdAndWidth();
 		if (_columnIdsAndWidth != null) {
 			settings.put(MEMENTO_COLUMN_WIDTH, StringToArrayConverter.convertArrayToString(_columnIdsAndWidth));
 		}

@@ -1,6 +1,6 @@
 Version: 14.?.0                                           ?. ? 2014
 
-
+!!! VERY IMPORTANT: DB BACKUP BECAUSE OF STRUCTURAL CHANGES, e.g. dropped unused tables, foreign key
 
 ////////////////////////////////////////////////////////////////
 
@@ -72,4 +72,8 @@ Fixed Bugs
 
 
 System 
+
+* Removed entity TourCategory, it is never be used.
+* Removed some tour database tables which are never be used.
+
 

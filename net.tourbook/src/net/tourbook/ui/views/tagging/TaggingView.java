@@ -1409,6 +1409,9 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 		tbm.add(_actionExpandSelection);
 		tbm.add(_actionCollapseAll);
 
+		tbm.add(_actionSetLayoutFlat);
+		tbm.add(_actionSetLayoutHierarchical);
+
 		tbm.add(_actionRefreshView);
 
 		tbm.update(true);
@@ -1420,9 +1423,6 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 		 * fill view menu
 		 */
 		final IMenuManager menuMgr = getViewSite().getActionBars().getMenuManager();
-
-		menuMgr.add(_actionSetLayoutFlat);
-		menuMgr.add(_actionSetLayoutHierarchical);
 
 		menuMgr.add(new Separator());
 		menuMgr.add(_actionModifyColumns);
