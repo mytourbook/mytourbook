@@ -15,39 +15,23 @@
  *******************************************************************************/
 package net.tourbook.sign;
 
-import net.tourbook.data.TourSign;
 
-import org.eclipse.jface.viewers.TreeViewer;
+/**
+ * Contains all signs and sign categories for a sign category.
+ */
+public class SignCollection_DISABLED {
 
-public class TVIPrefSignRoot extends TVIPrefSignItem {
-
-	public TVIPrefSignRoot(final TreeViewer signViewer) {
-		super(signViewer);
-	}
-
-	@Override
-	protected void fetchChildren() {
-
-		final SignCollection rootSigns = SignManager.getRootSigns();
-
-//		/*
-//		 * Set sign root categories
-//		 */
-//		for (final TourSignCategory tourSignCategory : rootSigns.tourSignCategories) {
+////	public ArrayList<TourSignCategory>	tourSignCategories;
+//	public ArrayList<TourSign>			tourSigns;
 //
-//			final TVIPrefSignCategory categoryItem = new TVIPrefSignCategory(getSignViewer(), tourSignCategory);
+//	public SignCollection() {}
 //
-//			addChild(categoryItem);
-//		}
+//	public SignCollection(final ArrayList<TourSign> sortedSigns) {
+//		tourSigns = sortedSigns;
+//	}
+//
+//	public SignCollection(final Set<TourSign> tourSignsInOneTour) {
+//		tourSigns = new ArrayList<TourSign>(tourSignsInOneTour);
+//	}
 
-		/*
-		 * Set root signs.
-		 */
-		for (final TourSign tourSign : rootSigns.tourSigns) {
-
-			final TVIPrefSign signItem = new TVIPrefSign(null, getSignViewer(), tourSign);
-
-			addChild(signItem);
-		}
-	}
 }

@@ -46,9 +46,9 @@ public class ActionDeleteMarker extends Action {
 	 * Set {@link TourMarker} which is modified.
 	 * 
 	 * @param tourMarker
-	 * @param menuMgr
+	 * @param isConfirmDeletion
 	 */
-	public void setTourMarker(final TourMarker tourMarker) {
+	public void setTourMarker(final TourMarker tourMarker, final boolean isConfirmDeletion) {
 
 		_tourMarker = tourMarker;
 
@@ -56,7 +56,11 @@ public class ActionDeleteMarker extends Action {
 
 		label = UI.shortenText(label, 30, true);
 
-		setText(NLS.bind(Messages.Tour_Action_Marker_Delete, label));
+		final String actionText = isConfirmDeletion
+				? Messages.Tour_Action_Marker_Delete_WithConfirm
+				: Messages.Tour_Action_Marker_Delete;
+
+		setText(NLS.bind(actionText, label));
 	}
 
 }

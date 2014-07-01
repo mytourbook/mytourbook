@@ -46,7 +46,6 @@ import net.tourbook.common.util.IToolTipHideListener;
 import net.tourbook.common.util.TourToolTip;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
-import net.tourbook.data.TourSign;
 import net.tourbook.photo.Photo;
 import net.tourbook.photo.TourPhotoLink;
 import net.tourbook.preferences.ITourbookPreferences;
@@ -1321,10 +1320,10 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
 				chartLabel.isVisible = tourMarker.isMarkerVisible();
 
-				final TourSign tourSign = tourMarker.getTourSign();
-				if (tourSign != null) {
-					chartLabel.markerSignPhoto = tourSign.getSignImagePhoto();
-				}
+//				final TourSign tourSign = tourMarker.getTourSign();
+//				if (tourSign != null) {
+//					chartLabel.markerSignPhoto = tourSign.getSignImagePhoto();
+//				}
 
 				cmc.chartLabels.add(chartLabel);
 			}

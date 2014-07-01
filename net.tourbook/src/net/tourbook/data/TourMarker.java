@@ -116,13 +116,13 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 	@ManyToOne(optional = false)
 	private TourData				tourData;
 
-	/**
-	 * Marker sign image, can be <code>null</code>.
-	 * 
-	 * @since Db version 24
-	 */
-	@ManyToOne
-	private TourSign				tourSign;
+//	/**
+//	 * Marker sign image, can be <code>null</code>.
+//	 *
+//	 * @since Db version 24
+//	 */
+//	@ManyToOne
+//	private TourSign				tourSign;
 
 	/**
 	 * Contains the marker type which is defined in {@link ChartLabel} like
@@ -413,13 +413,13 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 		return time;
 	}
 
-	/**
-	 * @return Returns the {@link TourSign} for this {@link TourMarker} or <code>null</code> when
-	 *         it's not set.
-	 */
-	public TourSign getTourSign() {
-		return tourSign;
-	}
+//	/**
+//	 * @return Returns the {@link TourSign} for this {@link TourMarker} or <code>null</code> when
+//	 *         it's not set.
+//	 */
+//	public TourSign getTourSign() {
+//		return tourSign;
+//	}
 
 	public int getType() {
 		return type;
@@ -488,10 +488,10 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 			return false;
 		} else if (tourData != comparedMarker.tourData) {
 			return false;
-		} else if ((tourSign != null && comparedMarker.tourSign == null)
-				|| (tourSign == null && comparedMarker.tourSign != null)
-				|| (tourSign != null && comparedMarker.tourSign != null && tourSign.equals(comparedMarker.tourSign) == false)) {
-			return false;
+//		} else if ((tourSign != null && comparedMarker.tourSign == null)
+//				|| (tourSign == null && comparedMarker.tourSign != null)
+//				|| (tourSign != null && comparedMarker.tourSign != null && tourSign.equals(comparedMarker.tourSign) == false)) {
+//			return false;
 		}
 
 		return true;
@@ -590,7 +590,7 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 		visualPosition = backupMarker.visualPosition;
 
 		tourData = backupMarker.tourData;
-		tourSign = backupMarker.tourSign;
+//		tourSign = backupMarker.tourSign;
 	}
 
 	public void setDescription(final String description) {
@@ -653,7 +653,7 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 		backupMarker.visualPosition = visualPosition;
 
 		backupMarker.tourData = tourData;
-		backupMarker.tourSign = tourSign;
+//		backupMarker.tourSign = tourSign;
 	}
 
 	/**
@@ -680,9 +680,9 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 		this.time = time;
 	}
 
-	public void setTourSign(final TourSign tourSign) {
-		this.tourSign = tourSign;
-	}
+//	public void setTourSign(final TourSign tourSign) {
+//		this.tourSign = tourSign;
+//	}
 
 	public void setUrlAddress(final String urlAddress) {
 		this.urlAddress = urlAddress;
@@ -698,25 +698,25 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 
 	@Override
 	public String toString() {
-		return "TourMarker ["
+		return "TourMarker [" //$NON-NLS-1$
 //				+ ("markerId=" + markerId + ", ")
 //				+ ("tourData=" + tourData + ", ")
 //				+ ("type=" + type + ", ")
-				+ ("time=" + time + ", ")
+				+ ("time=" + time + ", ") //$NON-NLS-1$ //$NON-NLS-2$
 //				+ ("distance=" + distance + ", ")
 //				+ ("distance20=" + distance20 + ", ")
 //				+ ("visualPosition=" + visualPosition + ", ")
 //				+ ("labelXOffset=" + labelXOffset + ", ")
 //				+ ("labelYOffset=" + labelYOffset + ", ")
 //				+ ("markerType=" + markerType + ", ")
-				+ ("serieIndex=" + serieIndex + ", ")
-				+ ("label=" + label + ", ")
+				+ ("serieIndex=" + serieIndex + ", ") //$NON-NLS-1$ //$NON-NLS-2$
+				+ ("label=" + label + ", ") //$NON-NLS-1$ //$NON-NLS-2$
 //				+ ("category=" + category + ", ")
 //				+ ("isMarkerVisible=" + isMarkerVisible + ", ")
 //				+ ("_visibleType=" + _visibleType + ", ")
 //				+ ("_markerBounds=" + _markerBounds + ", ")
 //				+ ("_createId=" + _createId)
-				+ "]";
+				+ "]"; //$NON-NLS-1$
 	}
 
 	@Override

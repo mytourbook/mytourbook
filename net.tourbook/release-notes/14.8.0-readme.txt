@@ -8,6 +8,7 @@ TRANSLATOR INFO TRANSLATOR INFO TRANSLATOR INFO TRANSLATOR INFO
 
 App menu is reorganized, it is possible that the short cuts needs to be adjusted !!!!
 
+A few names has been changed, the old names are deleted so you find them as not translated text, e.g. Tour Catalog -> Reference Tours
 
 ////////////////////////////////////////////////////////////////
 

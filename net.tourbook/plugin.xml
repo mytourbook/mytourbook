@@ -161,7 +161,7 @@
             class="net.tourbook.application.PerspectiveFactoryTourCatalog"
             icon="icons/tour-map-perspective.gif"
             id="net.tourbook.perspective.TourCatalog"
-            name="%perspective_name_tourCatalog"/>
+            name="%perspective_name_ReferenceTours"/>
       <perspective
             class="net.tourbook.application.PerspectiveFactoryStatistic"
             icon="icons/statistics-perspective.gif"
@@ -366,13 +366,13 @@
 
 		<!--
 			Signs
-		-->
 		
 		<page
 			name="%Pref_Page_SignImages"
 			id="net.tourbook.preferences.PrefPageSigns"
 			class="net.tourbook.preferences.PrefPageSigns"
 		/>
+		-->
 
 
 		<!--
@@ -524,8 +524,8 @@
 				<command 
 					commandId="command.net.tourbook.views.tourCatalog.TourCatalogView"
 					icon="icons/tour-map.gif"
-					label="%view_name_tourCatalog"
-					mnemonic="%view_name_tourCatalog_Mnemonic"/>
+					label="%view_name_ReferenceTours"
+					mnemonic="%view_name_ReferenceTours_Mnemonic"/>
 
 				<!-- Tagged Tours -->
 				<command 
@@ -546,12 +546,13 @@
 					name="net.tourbook.separator.OtherDirectories"
 					visible="true"/>
 				 
-				<!-- Sign Images -->
+				<!-- Sign Images 
 				<command
 					commandId="command.net.tourbook.ui.views.signImages.TourSignView"
 					icon="icons/sign-image.png"
 					label="%View_Name_SignImage"
 					mnemonic="%View_Name_SignImage_Mnemonic"/>
+				-->
 	               
 		</menuContribution>
 		
@@ -564,7 +565,7 @@
 			<!-- Map -->
 			
 				<separator
-					name="menu.net.tourbook.Map"
+					name="sep_Map"
 					visible="true"/>
 
 				<!-- 2D map -->
@@ -575,10 +576,10 @@
 					mnemonic="%command_tour_map_name_Mnemonic"
 					tooltip="%command_tour_map_name_tooltip"/>
 
-			<!-- Tour -->
+			<!-- Tour (whole) -->
 			
 				<separator
-					name="net.tourbook.separator.TourProperties"
+					name="sep_Tour"
 					visible="true"/>
 
 				<!-- Tour Chart -->
@@ -588,15 +589,22 @@
 					label="%command_view_selectedTour"
 					mnemonic="%command_view_selectedTour_mnemonic"
 					tooltip="%command_view_selectedTour_tooltip"/>
-		
-				<!-- Tour Editor -->
+
+				<!-- Tour Editor - is displayed in the "Tour" and the "Tools" menu -->
 				<command
 					commandId="net.tourbook.command.tourDataEditor"
 					icon="icons/tour-editor.gif"
 					label="%command_view_tourEditor"
 					mnemonic="%command_view_tourEditor_mnemonic"
 					tooltip="%command_view_tourEditor_tooltip"/>
+
+
+			<!-- Tour items -->
 				
+				<separator
+					name="sep_Items"
+					visible="true"/>
+					
 				<!-- Tour Photos -->
 				<command
 					commandId="command.net.tourbook.photo.TourPhotosView"
@@ -604,13 +612,6 @@
 					label="%View_Name_PhotoTourPhotos"
 					mnemonic="%View_Name_PhotoTourPhotos_Mnemonic"/>
 
-
-			<!-- Signs -->
-			
-				<separator
-					name="Signs"
-					visible="true"/>
-			 
 				<!-- Tour Marker -->
 				<command
 					commandId="command.net.tourbook.views.TourMarkerView"
@@ -632,6 +633,14 @@
 			Tools
 		-->
 		<menuContribution locationURI="menu:m_tools?after=tools">
+
+			<!-- Tour Editor - is displayed in the "Tour" and the "Tools" menu -->
+			<command
+				commandId="net.tourbook.command.tourDataEditor"
+				icon="icons/tour-editor.gif"
+				label="%command_view_tourEditor"
+				mnemonic="%command_view_tourEditor_mnemonic"
+				tooltip="%command_view_tourEditor_tooltip"/>
 		      
 			<command
 				commandId="net.tourbook.command.tourChart.tool.tourSegmenter"
@@ -756,7 +765,7 @@
 
 
 		<!--
-			Important views
+			Important views are displayed in the app toolbar
 		-->
 		<menuContribution locationURI="toolbar:org.eclipse.ui.main.toolbar?after=additions">
 		
@@ -810,7 +819,7 @@
 
 
 		<!--
-			Important tools
+			Important tools are displayed in the app toolbar
 		-->
 		
 		<menuContribution locationURI="toolbar:org.eclipse.ui.main.toolbar?after=additions">
@@ -937,11 +946,13 @@
 				label="%Action_PhotoDirectory_LinkPhotoWithTourInFolder"
 				mnemonic="%Action_PhotoDirectory_LinkPhotoWithTourInFolder_Mnemonic"/>
 
+			<!-- 
 			<command
 				commandId="command.net.tourbook.sign.ImportTourSignsFromFolder"
 				icon="icons/tour-sign-import.png"
 				label="%Action_TourSign_ImportTourSignsFromFolder"
 				mnemonic="%Action_TourSign_ImportTourSignsFromFolder_Mnemonic"/>
+			-->
 
 		</menuContribution>
 
@@ -963,11 +974,13 @@
 				label="%Action_PhotoDirectory_LinkPhotoWithTourInGallerySelected"
 				mnemonic="%Action_PhotoDirectory_LinkPhotoWithTourInGallerySelected_Mnemonic"/>
 
+			<!--
 			<command
 				commandId="command.net.tourbook.sign.ImportTourSigns"
 				icon="icons/tour-sign-import.png"
 				label="%Action_TourSign_ImportTourSigns"
 				mnemonic="%Action_TourSign_ImportTourSigns_Mnemonic"/>
+			-->
 			
 		</menuContribution>
 
@@ -998,7 +1011,7 @@
             />
       <command
             id="command.net.tourbook.views.tourCatalog.TourCatalogView"
-            name="%view_name_tourCatalog"
+            name="%view_name_ReferenceTours"
             defaultHandler="net.tourbook.ui.views.ActionHandlerOpenViewTourCatalog"
             />
       <command
@@ -1196,7 +1209,6 @@
 
 		<!--
 			Tour signs
-		-->            
 		
 		<command id="command.net.tourbook.sign.ImportTourSigns"
 			name="%Action_TourSign_ImportTourSigns"
@@ -1212,6 +1224,7 @@
 			name="%View_Name_SignImage"
 			defaultHandler="net.tourbook.sign.ActionHandlerOpenSignImageView"
 			/>
+		-->            
 			
 	</extension>
 			
@@ -1294,7 +1307,7 @@
 				class="net.tourbook.ui.views.tourCatalog.TourCatalogView"
 				icon="icons/tour-map.gif"
 				id="net.tourbook.views.tourCatalog.TourCatalogView"
-				name="%view_name_tourCatalog"/>
+				name="%view_name_ReferenceTours"/>
 			<view
 				category="net.tourbook.category.tourList"
 				class="net.tourbook.statistic.TourStatisticsView"
@@ -1334,6 +1347,8 @@
 	            id="net.tourbook.views.TourWaypointView"
 	            name="%View_Name_Waypoint">
 	      </view>
+	      
+	      <!--
 	      <view
 	            category="net.tourbook.category.tour"
 	            class="net.tourbook.ui.views.signImages.TourSignView"
@@ -1341,6 +1356,7 @@
 	            id="net.tourbook.ui.views.signImages.TourSignView"
 	            name="%View_Name_SignImage">
 	      </view>
+	      -->
 
 
 		<!--  -->
@@ -1591,7 +1607,7 @@
 
    <extension point="org.eclipse.ui.menus">
 
-		<menuContribution locationURI="menu:m_tour?endof=menu.net.tourbook.Map" >
+		<menuContribution locationURI="menu:m_tour?endof=sep_Map" >
 		            
 			<command commandId="net.tourbook.map3.command.TourMap3"
 				icon="icons/map3-view.png"

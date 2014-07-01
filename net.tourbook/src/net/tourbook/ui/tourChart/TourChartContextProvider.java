@@ -44,7 +44,6 @@ import net.tourbook.ui.tourChart.action.ActionCreateMarkerFromSlider;
 import net.tourbook.ui.tourChart.action.ActionCreateMarkerFromValuePoint;
 import net.tourbook.ui.tourChart.action.ActionCreateRefTour;
 import net.tourbook.ui.tourChart.action.ActionDeleteMarker;
-import net.tourbook.ui.tourChart.action.ActionSetMarkerImageMenu;
 import net.tourbook.ui.tourChart.action.ActionSetMarkerLabelPositionMenu;
 import net.tourbook.ui.tourChart.action.ActionSetMarkerVisible;
 
@@ -74,7 +73,7 @@ public class TourChartContextProvider implements IChartContextProvider, ITourPro
 	private ActionSetTourTypeMenu				_actionSetTourType;
 	private ActionSetMarkerVisible				_actionSetMarkerVisible;
 	private ActionSetMarkerLabelPositionMenu	_actionSetMarkerPosition;
-	private ActionSetMarkerImageMenu				_actionSetMarkerSignMenu;
+//	private ActionSetMarkerImageMenu				_actionSetMarkerSignMenu;
 
 	private TagMenuManager						_tagMenuMgr;
 
@@ -125,7 +124,7 @@ public class TourChartContextProvider implements IChartContextProvider, ITourPro
 		_actionDeleteMarker = new ActionDeleteMarker(tourChart);
 		_actionSetMarkerVisible = new ActionSetMarkerVisible(tourChart);
 		_actionSetMarkerPosition = new ActionSetMarkerLabelPositionMenu(tourChart);
-		_actionSetMarkerSignMenu = new ActionSetMarkerImageMenu(tourChart);
+//		_actionSetMarkerSignMenu = new ActionSetMarkerImageMenu(tourChart);
 
 		_actionExportTour = new ActionExport(this);
 
@@ -246,18 +245,18 @@ public class TourChartContextProvider implements IChartContextProvider, ITourPro
 	private void fillContextMenu_TourMarker(final IMenuManager menuMgr, final TourMarker tourMarker) {
 
 		// setup actions
-		_actionDeleteMarker.setTourMarker(tourMarker);
+		_actionDeleteMarker.setTourMarker(tourMarker, true);
 		_actionOpenMarkerDialog.setTourMarker(tourMarker);
 		_actionSetMarkerVisible.setTourMarker(tourMarker, !tourMarker.isMarkerVisible());
 		_actionSetMarkerPosition.setTourMarker(tourMarker);
-		_actionSetMarkerSignMenu.setTourMarker(tourMarker);
+//		_actionSetMarkerSignMenu.setTourMarker(tourMarker);
 
 		// fill actions
 		menuMgr.add(_actionOpenMarkerDialog);
 
 		menuMgr.add(_actionSetMarkerVisible);
 		menuMgr.add(_actionSetMarkerPosition);
-		menuMgr.add(_actionSetMarkerSignMenu);
+//		menuMgr.add(_actionSetMarkerSignMenu);
 		menuMgr.add(_actionDeleteMarker);
 	}
 

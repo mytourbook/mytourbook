@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -22,8 +22,6 @@ public class Messages extends NLS {
 	private static final String	BUNDLE_NAME	= "net.tourbook.common.util.messages";	//$NON-NLS-1$
 
 	public static String		Action_App_ConfigureColumns;
-	public static String	Action_App_SizeAllColumnsToDefaults;
-
 	public static String		Action_App_SizeAllColumnsToFit;
 
 	public static String		Advanced_Menu_AnimationSymbol;

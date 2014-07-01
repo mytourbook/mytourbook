@@ -25,16 +25,12 @@ import net.tourbook.chart.IChartLayer;
 import net.tourbook.chart.IChartOverlay;
 import net.tourbook.data.TourMarker;
 import net.tourbook.photo.ILoadCallBack;
-import net.tourbook.photo.Photo;
-import net.tourbook.photo.PhotoUI;
-import net.tourbook.sign.SignManager;
 
 import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Device;
 import org.eclipse.swt.graphics.GC;
-import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.graphics.Region;
@@ -480,39 +476,39 @@ public class ChartLayerMarker implements IChartLayer, IChartOverlay {
 				}
 			}
 
-			if (_cmc.isShowSignImage) {
-
-				final Photo signPhoto = chartLabel.markerSignPhoto;
-				if (signPhoto != null) {
-
-					// draw the sign image
-
-					final ILoadCallBack imageLoadCallback = new LoadImageCallback();
-					final Image signImage = SignManager.getSignImage(signPhoto, imageLoadCallback);
-
-					if (signImage != null && signImage.isDisposed() == false) {
-
-						// position photo on top, above the tour marker point and centered
-						final int photoPosX = chartLabel.devXMarker - SIGN_IMAGE_MAX_SIZE / 2 + MARKER_POINT_SIZE / 2;
-						final int photoPosY = devYTop;
-
-						final Rectangle noHideArea = chartLabel.paintedLabel;
-
-						final Rectangle rectPainted = PhotoUI.paintPhotoImage(
-								gc,
-								signPhoto,
-								signImage,
-								photoPosX,
-								photoPosY,
-								SIGN_IMAGE_MAX_SIZE,
-								SIGN_IMAGE_MAX_SIZE,
-								SWT.TOP,
-								noHideArea);
-
-						chartLabel.devMarkerSignImageBounds = rectPainted;
-					}
-				}
-			}
+//			if (_cmc.isShowSignImage) {
+//
+//				final Photo signPhoto = chartLabel.markerSignPhoto;
+//				if (signPhoto != null) {
+//
+//					// draw the sign image
+//
+//					final ILoadCallBack imageLoadCallback = new LoadImageCallback();
+//					final Image signImage = SignManager.getSignImage(signPhoto, imageLoadCallback);
+//
+//					if (signImage != null && signImage.isDisposed() == false) {
+//
+//						// position photo on top, above the tour marker point and centered
+//						final int photoPosX = chartLabel.devXMarker - SIGN_IMAGE_MAX_SIZE / 2 + MARKER_POINT_SIZE / 2;
+//						final int photoPosY = devYTop;
+//
+//						final Rectangle noHideArea = chartLabel.paintedLabel;
+//
+//						final Rectangle rectPainted = PhotoUI.paintPhotoImage(
+//								gc,
+//								signPhoto,
+//								signImage,
+//								photoPosX,
+//								photoPosY,
+//								SIGN_IMAGE_MAX_SIZE,
+//								SIGN_IMAGE_MAX_SIZE,
+//								SWT.TOP,
+//								noHideArea);
+//
+//						chartLabel.devMarkerSignImageBounds = rectPainted;
+//					}
+//				}
+//			}
 
 			// keep painted positions to identify and paint hovered positions
 			chartLabel.devIsVertical = _isVertical;

@@ -70,7 +70,7 @@ import cop.swt.widgets.viewers.table.celleditors.SpinnerCellEditor;
  */
 public class Map3LayerUI {
 
-	private static final String			OPACITY_CAN_NOT_BE_SET	= "....";
+	private static final String			OPACITY_CAN_NOT_BE_SET	= "...."; //$NON-NLS-1$
 
 	public static final Double			DEFAULT_OPACITY			= new Double(1.0);
 

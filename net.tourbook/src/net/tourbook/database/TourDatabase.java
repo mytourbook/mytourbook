@@ -57,7 +57,6 @@ import net.tourbook.data.TourPerson;
 import net.tourbook.data.TourPersonHRZone;
 import net.tourbook.data.TourPhoto;
 import net.tourbook.data.TourReference;
-import net.tourbook.data.TourSign;
 import net.tourbook.data.TourTag;
 import net.tourbook.data.TourTagCategory;
 import net.tourbook.data.TourType;
@@ -138,8 +137,8 @@ public class TourDatabase {
 	public static final String						TABLE_TOUR_PERSON_HRZONE					= "TOURPERSONHRZONE";						//$NON-NLS-1$
 	public static final String						TABLE_TOUR_PHOTO							= "TOURPHOTO";								//$NON-NLS-1$
 	public static final String						TABLE_TOUR_REFERENCE						= "TOURREFERENCE";							//$NON-NLS-1$
-	public static final String						TABLE_TOUR_SIGN								= "TOURSIGN";								//$NON-NLS-1$
-	public static final String						TABLE_TOUR_SIGN_CATEGORY					= "TOURSIGNCATEGORY";						//$NON-NLS-1$
+//	public static final String						TABLE_TOUR_SIGN								= "TOURSIGN";								//$NON-NLS-1$
+//	public static final String						TABLE_TOUR_SIGN_CATEGORY					= "TOURSIGNCATEGORY";						//$NON-NLS-1$
 	public static final String						TABLE_TOUR_TAG								= "TOURTAG";								//$NON-NLS-1$
 	public static final String						TABLE_TOUR_TAG_CATEGORY						= "TOURTAGCATEGORY";						//$NON-NLS-1$
 	public static final String						TABLE_TOUR_TYPE								= "TOURTYPE";								//$NON-NLS-1$
@@ -180,7 +179,7 @@ public class TourDatabase {
 	private static final String						ENTITY_ID_PERSON							= "PersonID";								//$NON-NLS-1$
 	private static final String						ENTITY_ID_PHOTO								= "PhotoID";								//$NON-NLS-1$
 	private static final String						ENTITY_ID_REF								= "RefID";									//$NON-NLS-1$
-	private static final String						ENTITY_ID_SIGN								= "SignID";								//$NON-NLS-1$
+//	private static final String						ENTITY_ID_SIGN								= "SignID";								//$NON-NLS-1$
 	private static final String						ENTITY_ID_TAG								= "TagID";									//$NON-NLS-1$
 	private static final String						ENTITY_ID_TAG_CATEGORY						= "TagCategoryID";							//$NON-NLS-1$
 	private static final String						ENTITY_ID_TOUR								= "TourID";								//$NON-NLS-1$
@@ -191,8 +190,8 @@ public class TourDatabase {
 																										+ "_" + ENTITY_ID_BIKE;			//$NON-NLS-1$
 	private static final String						KEY_PERSON									= TABLE_TOUR_PERSON
 																										+ "_" + ENTITY_ID_PERSON;			//$NON-NLS-1$
-	private static final String						KEY_SIGN									= TABLE_TOUR_SIGN
-																										+ "_" + ENTITY_ID_SIGN;			//$NON-NLS-1$
+//	private static final String						KEY_SIGN									= TABLE_TOUR_SIGN
+//																										+ "_" + ENTITY_ID_SIGN;			//$NON-NLS-1$
 	private static final String						KEY_TAG										= TABLE_TOUR_TAG
 																										+ "_" + ENTITY_ID_TAG;				//$NON-NLS-1$
 	private static final String						KEY_TAG_CATEGORY							= TABLE_TOUR_TAG_CATEGORY
@@ -2046,7 +2045,7 @@ public class TourDatabase {
 
 				createTable_TourWayPoint(stmt);
 
-				createTable_TourSign(stmt);
+//				createTable_TourSign(stmt);
 //				createTable_TourSignCategory(stmt);
 
 			} catch (final SQLException e) {
@@ -2514,8 +2513,6 @@ public class TourDatabase {
 				//
 				// Version 24 - begin
 				//
-				+ "	" + KEY_SIGN + "		BIGINT,															\n" //$NON-NLS-1$ //$NON-NLS-2$
-				//
 				+ "	description				VARCHAR(" + TourWayPoint.DB_LENGTH_DESCRIPTION + "),			\n" //$NON-NLS-1$ //$NON-NLS-2$
 				+ "	urlText					VARCHAR(" + TourMarker.DB_LENGTH_URL_TEXT + "),					\n" //$NON-NLS-1$ //$NON-NLS-2$
 				+ "	urlAddress				VARCHAR(" + TourMarker.DB_LENGTH_URL_ADDRESS + "),				\n" //$NON-NLS-1$ //$NON-NLS-2$
@@ -2535,8 +2532,6 @@ public class TourDatabase {
 				+ "	markerType				BIGINT															\n" //$NON-NLS-1$
 				//
 				+ ")"); //$NON-NLS-1$
-
-		SQL.CreateIndex(stmt, TABLE_TOUR_MARKER, KEY_SIGN);
 	}
 
 	/**
@@ -2690,22 +2685,22 @@ public class TourDatabase {
 	 * @throws SQLException
 	 * @since DB version 24
 	 */
-	private void createTable_TourSign(final Statement stmt) throws SQLException {
+	private void createTable_TourSign_DISABLED(final Statement stmt) throws SQLException {
 
-		/*
-		 * Create table: TourSign
-		 */
-		exec(stmt, "CREATE TABLE " + TABLE_TOUR_SIGN + "	(												\n" //$NON-NLS-1$ //$NON-NLS-2$
-				//
-				+ SQL.CreateField_EntityId(ENTITY_ID_SIGN, true)
-				//
-				+ "	name				VARCHAR(" + TourSign.DB_LENGTH_NAME + "),							\n" //$NON-NLS-1$ //$NON-NLS-2$
-				+ "	imageFilePathName	VARCHAR(" + TourSign.DB_LENGTH_IMAGE_FILE_PATH + "),				\n" //$NON-NLS-1$ //$NON-NLS-2$
-				+ "	expandType			INT DEFAULT " + TourSign.EXPAND_TYPE_DEFAULT + ",					\n" //$NON-NLS-1$ //$NON-NLS-2$
-				//
-				+ "	isRoot 				INT DEFAULT 0														\n" //$NON-NLS-1$
-				//
-				+ ")"); //$NON-NLS-1$
+//		/*
+//		 * Create table: TourSign
+//		 */
+//		exec(stmt, "CREATE TABLE " + TABLE_TOUR_SIGN + "	(												\n" //$NON-NLS-1$ //$NON-NLS-2$
+//				//
+//				+ SQL.CreateField_EntityId(ENTITY_ID_SIGN, true)
+//				//
+//				+ "	name				VARCHAR(" + TourSign.DB_LENGTH_NAME + "),							\n" //$NON-NLS-1$ //$NON-NLS-2$
+//				+ "	imageFilePathName	VARCHAR(" + TourSign.DB_LENGTH_IMAGE_FILE_PATH + "),				\n" //$NON-NLS-1$ //$NON-NLS-2$
+//				+ "	expandType			INT DEFAULT " + TourSign.EXPAND_TYPE_DEFAULT + ",					\n" //$NON-NLS-1$ //$NON-NLS-2$
+//				//
+//				+ "	isRoot 				INT DEFAULT 0														\n" //$NON-NLS-1$
+//				//
+//				+ ")"); //$NON-NLS-1$
 	}
 
 	/**
@@ -4672,19 +4667,9 @@ public class TourDatabase {
 					/*
 					 * Add new columns
 					 */
-					SQL.AddCol_BigInt(stmt, TABLE_TOUR_MARKER, KEY_SIGN);
-
 					SQL.AddCol_VarCar(stmt, TABLE_TOUR_MARKER, "description", TourWayPoint.DB_LENGTH_DESCRIPTION); //$NON-NLS-1$
 					SQL.AddCol_VarCar(stmt, TABLE_TOUR_MARKER, "urlText", TourMarker.DB_LENGTH_URL_TEXT); //$NON-NLS-1$
 					SQL.AddCol_VarCar(stmt, TABLE_TOUR_MARKER, "urlAddress", TourMarker.DB_LENGTH_URL_ADDRESS); //$NON-NLS-1$
-
-					SQL.CreateIndex(stmt, TABLE_TOUR_MARKER, KEY_SIGN);
-
-					/*
-					 * Create new tables
-					 */
-					createTable_TourSign(stmt);
-//					createTable_TourSignCategory(stmt);
 				}
 
 				/*

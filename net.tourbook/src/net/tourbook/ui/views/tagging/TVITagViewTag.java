@@ -430,7 +430,7 @@ public class TVITagViewTag extends TVITagViewItem {
 
 	@Override
 	public String toString() {
-		return "TVITagViewTag " + System.identityHashCode(this) + " [tagId=" + tagId + ", name=" + name + "]";
+		return "TVITagViewTag " + System.identityHashCode(this) + " [tagId=" + tagId + ", name=" + name + "]"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 	}
 
 }

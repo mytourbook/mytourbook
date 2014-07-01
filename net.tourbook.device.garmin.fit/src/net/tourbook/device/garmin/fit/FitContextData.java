@@ -39,7 +39,7 @@ public class FitContextData {
 
 		@Override
 		public String toString() {
-			return "ContextTimeData [__data=" + __data + "]";
+			return "ContextTimeData [__data=" + __data + "]"; //$NON-NLS-1$ //$NON-NLS-2$
 		}
 	}
 
@@ -49,7 +49,7 @@ public class FitContextData {
 
 		@Override
 		public String toString() {
-			return "ContextTourData [__data=" + __data + "]";
+			return "ContextTourData [__data=" + __data + "]"; //$NON-NLS-1$ //$NON-NLS-2$
 		}
 	}
 
@@ -59,7 +59,7 @@ public class FitContextData {
 
 		@Override
 		public String toString() {
-			return "ContextTourMarker [__data=" + __data + "]";
+			return "ContextTourMarker [__data=" + __data + "]"; //$NON-NLS-1$ //$NON-NLS-2$
 		}
 	}
 

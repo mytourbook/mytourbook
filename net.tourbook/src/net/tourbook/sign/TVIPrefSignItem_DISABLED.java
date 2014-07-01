@@ -15,21 +15,18 @@
  *******************************************************************************/
 package net.tourbook.sign;
 
-import net.tourbook.common.util.Util;
-import net.tourbook.ui.views.signImages.TourSignView;
+import net.tourbook.common.util.TreeViewerItem;
 
-import org.eclipse.core.commands.AbstractHandler;
-import org.eclipse.core.commands.ExecutionEvent;
-import org.eclipse.core.commands.ExecutionException;
+public abstract class TVIPrefSignItem_DISABLED extends TreeViewerItem {
 
-
-public class ActionHandlerOpenSignImageView extends AbstractHandler {
-
-	public Object execute(final ExecutionEvent event) throws ExecutionException {
-
-		Util.showView(TourSignView.ID, true);
-
-		return null;
-	}
+//	private TreeViewer	_signViewer;
+//
+//	public TVIPrefSignItem(final TreeViewer signViewer) {
+//		_signViewer = signViewer;
+//	}
+//
+//	public TreeViewer getSignViewer() {
+//		return _signViewer;
+//	}
 
 }

@@ -24,22 +24,22 @@ import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.handlers.HandlerUtil;
 
-public class ActionHandlerImportSigns extends AbstractHandler {
+public class ActionHandlerImportSigns_DISABLED extends AbstractHandler {
 
 	@Override
 	public Object execute(final ExecutionEvent event) throws ExecutionException {
 
 		final IWorkbenchPart activePart = HandlerUtil.getActiveWorkbenchWindow(event).getActivePage().getActivePart();
 
-		if (activePart instanceof PicDirView) {
-
-			final PicDirView picDirView = (PicDirView) activePart;
-			final PhotosWithExifSelection selectedPhotosWithExif = picDirView.getSelectedPhotosWithExif(false);
-
-			if (selectedPhotosWithExif != null) {
-				SignManager.createSignImages(selectedPhotosWithExif);
-			}
-		}
+//		if (activePart instanceof PicDirView) {
+//
+//			final PicDirView picDirView = (PicDirView) activePart;
+//			final PhotosWithExifSelection selectedPhotosWithExif = picDirView.getSelectedPhotosWithExif(false);
+//
+//			if (selectedPhotosWithExif != null) {
+//				SignManager.createSignImages(selectedPhotosWithExif);
+//			}
+//		}
 
 		return null;
 	}

@@ -76,13 +76,11 @@ public class Util {
 				href = href.substring(1);
 			}
 			href = "file:///" + href; //$NON-NLS-1$
-		}
 
-		/*
-		 * Ensure that a protocol is set otherwise a MalformedURLException exception occures
-		 */
-		if (href.startsWith("http") == false) {
-			href = "http://" + href;
+		} else if (href.startsWith("http") == false) { //$NON-NLS-1$
+
+			// Ensure that a protocol is set otherwise a MalformedURLException exception occures
+			href = "http://" + href; //$NON-NLS-1$
 		}
 
 		final IWorkbenchBrowserSupport support = PlatformUI.getWorkbench().getBrowserSupport();

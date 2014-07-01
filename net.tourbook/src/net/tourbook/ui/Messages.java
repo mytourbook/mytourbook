@@ -208,11 +208,10 @@ public class Messages extends NLS {
 	public static String		ColumnFactory_tour_week_header;
 	public static String		ColumnFactory_tour_week_label;
 	public static String		ColumnFactory_tour_week_tooltip;
-	public static String	ColumnFactory_TimeDelta_Header;
 
-	public static String	ColumnFactory_TimeDelta_Label;
-
-	public static String	ColumnFactory_TimeDelta_Tooltip;
+	public static String		ColumnFactory_TimeDelta_Header;
+	public static String		ColumnFactory_TimeDelta_Label;
+	public static String		ColumnFactory_TimeDelta_Tooltip;
 
 	public static String		ColumnFactory_Tour_DayTime;
 	public static String		ColumnFactory_Tour_DayTime_Tooltip;
@@ -248,6 +247,7 @@ public class Messages extends NLS {
 	public static String		ColumnFactory_TourWeekYear_Header;
 	public static String		ColumnFactory_TourWeekYear_Label;
 	public static String		ColumnFactory_TourWeekYear_Tooltip;
+
 	public static String		ColumnFactory_Waypoint_Altitude_Label;
 	public static String		ColumnFactory_Waypoint_Category;
 	public static String		ColumnFactory_Waypoint_Comment;
@@ -279,6 +279,7 @@ public class Messages extends NLS {
 	public static String		Tooltip_WayPoint_Label_Symbol;
 
 	public static String		Tour_Marker_Column_IsVisible;
+	public static String		Tour_Marker_Column_IsVisible_Tooltip;
 	public static String		Tour_Marker_Column_IsVisibleNoEdit_Tooltip;
 
 	public static String		Tour_Tooltip_Format_Date;

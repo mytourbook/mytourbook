@@ -341,7 +341,7 @@ public class PrefPageViews extends FieldEditorPreferencePage implements IWorkben
 
 		Label label = new Label(container, SWT.NONE);
 		GridDataFactory.fillDefaults().applyTo(label);
-		label.setText(Messages.PrefPage_ViewTooltip_Label_TourCatalog);
+		label.setText(Messages.PrefPage_ViewTooltip_Label_ReferenceTours);
 
 		/*
 		 * checkbox: first column (reference tour)

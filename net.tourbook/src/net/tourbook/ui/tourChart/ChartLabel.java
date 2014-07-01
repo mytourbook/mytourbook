@@ -102,12 +102,12 @@ public class ChartLabel extends ChartMarker {
 
 	@Override
 	public String toString() {
-		return "ChartLabel [devXMarker="
+		return "ChartLabel [devXMarker=" //$NON-NLS-1$
 				+ devXMarker
-				+ ", devYMarker="
+				+ ", devYMarker=" //$NON-NLS-1$
 				+ devYMarker
-				+ ", markerLabel="
+				+ ", markerLabel=" //$NON-NLS-1$
 				+ markerLabel
-				+ "]";
+				+ "]"; //$NON-NLS-1$
 	}
 }

@@ -286,14 +286,14 @@ public class TVITagViewYear extends TVITagViewItem {
 
 	@Override
 	public String toString() {
-		return "TVITagViewYear "
+		return "TVITagViewYear " //$NON-NLS-1$
 				+ System.identityHashCode(this)
-				+ " [_year="
+				+ " [_year=" //$NON-NLS-1$
 				+ _year
-				+ ", _isMonth="
+				+ ", _isMonth=" //$NON-NLS-1$
 				+ _isMonth
-				+ ", _tagItem="
+				+ ", _tagItem=" //$NON-NLS-1$
 				+ _tagItem
-				+ "]";
+				+ "]"; //$NON-NLS-1$
 	}
 }

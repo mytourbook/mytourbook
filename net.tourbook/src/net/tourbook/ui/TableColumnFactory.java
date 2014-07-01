@@ -416,8 +416,8 @@ public abstract class TableColumnFactory {
 		
 			colDef.setColumnLabel(Messages.ColumnFactory_distance_label);
 			colDef.setColumnHeaderText(UI.UNIT_LABEL_DISTANCE);
-			colDef.setColumnUnit(UI.UNIT_LABEL_DISTANCE);
 			colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_distance_tooltip);
+			colDef.setColumnUnit(UI.UNIT_LABEL_DISTANCE);
 			colDef.setDefaultColumnWidth(pixelWidth);
 			colDef.setColumnWeightData(new ColumnPixelData(pixelWidth, true));
 
@@ -436,8 +436,8 @@ public abstract class TableColumnFactory {
 			
 			colDef.setColumnLabel(Messages.ColumnFactory_DistanceDelta_Label);
 			colDef.setColumnHeaderText(deltaDistance);
-			colDef.setColumnUnit(UI.UNIT_LABEL_DISTANCE);
 			colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_DistanceDelta_Tooltip);
+			colDef.setColumnUnit(UI.UNIT_LABEL_DISTANCE);
 			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(11));
 
  			return colDef;
@@ -457,8 +457,8 @@ public abstract class TableColumnFactory {
 			
 			colDef.setColumnLabel(Messages.ColumnFactory_TourDistanceDiff_Label);
 			colDef.setColumnHeaderText(header);
-			colDef.setColumnUnit(UI.UNIT_LABEL_DISTANCE);
 			colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_TourDistanceDiff_Tooltip);
+			colDef.setColumnUnit(UI.UNIT_LABEL_DISTANCE);
 			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
 			
 			return colDef;
@@ -640,14 +640,6 @@ public abstract class TableColumnFactory {
 			final int pixelWidth = pixelConverter.convertWidthInCharsToPixels(8);
 			final ColumnDefinition colDef = new TableColumnDefinition(columnManager, "markerVisible", SWT.CENTER); //$NON-NLS-1$
 			
-//			colDef.setColumnLabel(net.tourbook.Messages.Tour_Marker_Column_IsVisible);
-////			Visible
-//			colDef.setColumnHeader(net.tourbook.Messages.Tour_Marker_Column_IsVisible);
-//			colDef.setColumnToolTipText(net.tourbook.Messages.Tour_Marker_Column_IsVisibleNoEdit_Tooltip);
-////			Visibility of the marker:
-////
-////				Yes: Visible
-////				No:  Hidden
 			colDef.setColumnLabel(Messages.Tour_Marker_Column_IsVisible);
 			colDef.setColumnHeaderText(Messages.Tour_Marker_Column_IsVisible);
 			colDef.setColumnHeaderToolTipText(Messages.Tour_Marker_Column_IsVisibleNoEdit_Tooltip);
@@ -906,8 +898,8 @@ public abstract class TableColumnFactory {
 			
 			colDef.setColumnLabel(Messages.ColumnFactory_TimeDelta_Label);
 			colDef.setColumnHeaderText(Messages.ColumnFactory_TimeDelta_Header);
-			colDef.setColumnUnit(UI.UNIT_LABEL_TIME);
 			colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_TimeDelta_Tooltip);
+			colDef.setColumnUnit(UI.UNIT_LABEL_TIME);
 			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(12));
 			
 			return colDef;
@@ -923,8 +915,8 @@ public abstract class TableColumnFactory {
 		
 			colDef.setColumnLabel(Messages.ColumnFactory_time_interval_label);
 			colDef.setColumnHeaderText(Messages.ColumnFactory_time_interval);
-			colDef.setColumnUnit(Messages.ColumnFactory_time_interval);
 			colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_time_interval_tooltip);
+			colDef.setColumnUnit(Messages.ColumnFactory_time_interval);
 			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(8));
 			
 			colDef.setLabelProvider(new CellLabelProvider() {

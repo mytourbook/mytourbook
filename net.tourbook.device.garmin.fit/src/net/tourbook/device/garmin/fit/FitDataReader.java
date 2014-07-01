@@ -64,60 +64,60 @@ public class FitDataReader extends TourbookDevice {
 //						a++;
 //					}
 
-					if (fieldName.equals("") //
+					if (fieldName.equals("") // //$NON-NLS-1$
 							//
 							// record data
 							//
-							|| fieldName.equals("timestamp")
-							|| fieldName.equals("event")
-							|| fieldName.equals("event_type")
+							|| fieldName.equals("timestamp") //$NON-NLS-1$
+							|| fieldName.equals("event") //$NON-NLS-1$
+							|| fieldName.equals("event_type") //$NON-NLS-1$
 //							|| fieldName.equals("message_index")
-							|| fieldName.equals("altitude")
-							|| fieldName.equals("cadence")
-							|| fieldName.equals("distance")
-							|| fieldName.equals("grade")
-							|| fieldName.equals("heart_rate")
-							|| fieldName.equals("position_lat")
-							|| fieldName.equals("position_long")
-							|| fieldName.equals("speed")
-							|| fieldName.equals("temperature")
+							|| fieldName.equals("altitude") //$NON-NLS-1$
+							|| fieldName.equals("cadence") //$NON-NLS-1$
+							|| fieldName.equals("distance") //$NON-NLS-1$
+							|| fieldName.equals("grade") //$NON-NLS-1$
+							|| fieldName.equals("heart_rate") //$NON-NLS-1$
+							|| fieldName.equals("position_lat") //$NON-NLS-1$
+							|| fieldName.equals("position_long") //$NON-NLS-1$
+							|| fieldName.equals("speed") //$NON-NLS-1$
+							|| fieldName.equals("temperature") //$NON-NLS-1$
 							//
 							// lap data
 							//
-							|| fieldName.equals("avg_speed")
-							|| fieldName.equals("avg_heart_rate")
-							|| fieldName.equals("avg_cadence")
-							|| fieldName.equals("data")
-							|| fieldName.equals("device_index")
-							|| fieldName.equals("device_type")
-							|| fieldName.equals("event_group")
-							|| fieldName.equals("end_position_lat")
-							|| fieldName.equals("end_position_long")
-							|| fieldName.equals("intensity")
-							|| fieldName.equals("lap_trigger")
-							|| fieldName.equals("max_cadence")
-							|| fieldName.equals("max_heart_rate")
-							|| fieldName.equals("max_speed")
-							|| fieldName.equals("total_calories")
-							|| fieldName.equals("total_fat_calories")
-							|| fieldName.equals("sport")
-							|| fieldName.equals("start_position_lat")
-							|| fieldName.equals("start_position_long")
-							|| fieldName.equals("start_time")
-							|| fieldName.equals("total_ascent")
-							|| fieldName.equals("total_descent")
-							|| fieldName.equals("total_cycles")
-							|| fieldName.equals("total_distance")
-							|| fieldName.equals("total_elapsed_time")
-							|| fieldName.equals("total_timer_time")
+							|| fieldName.equals("avg_speed") //$NON-NLS-1$
+							|| fieldName.equals("avg_heart_rate") //$NON-NLS-1$
+							|| fieldName.equals("avg_cadence") //$NON-NLS-1$
+							|| fieldName.equals("data") //$NON-NLS-1$
+							|| fieldName.equals("device_index") //$NON-NLS-1$
+							|| fieldName.equals("device_type") //$NON-NLS-1$
+							|| fieldName.equals("event_group") //$NON-NLS-1$
+							|| fieldName.equals("end_position_lat") //$NON-NLS-1$
+							|| fieldName.equals("end_position_long") //$NON-NLS-1$
+							|| fieldName.equals("intensity") //$NON-NLS-1$
+							|| fieldName.equals("lap_trigger") //$NON-NLS-1$
+							|| fieldName.equals("max_cadence") //$NON-NLS-1$
+							|| fieldName.equals("max_heart_rate") //$NON-NLS-1$
+							|| fieldName.equals("max_speed") //$NON-NLS-1$
+							|| fieldName.equals("total_calories") //$NON-NLS-1$
+							|| fieldName.equals("total_fat_calories") //$NON-NLS-1$
+							|| fieldName.equals("sport") //$NON-NLS-1$
+							|| fieldName.equals("start_position_lat") //$NON-NLS-1$
+							|| fieldName.equals("start_position_long") //$NON-NLS-1$
+							|| fieldName.equals("start_time") //$NON-NLS-1$
+							|| fieldName.equals("total_ascent") //$NON-NLS-1$
+							|| fieldName.equals("total_descent") //$NON-NLS-1$
+							|| fieldName.equals("total_cycles") //$NON-NLS-1$
+							|| fieldName.equals("total_distance") //$NON-NLS-1$
+							|| fieldName.equals("total_elapsed_time") //$NON-NLS-1$
+							|| fieldName.equals("total_timer_time") //$NON-NLS-1$
 							//
-							|| fieldName.equals("unknown")
+							|| fieldName.equals("unknown") //$NON-NLS-1$
 					//
 					) {
 						continue;
 					}
 					System.out.println(String.format(
-							"%-5d%-30s%20s %s",
+							"%-5d%-30s%20s %s", //$NON-NLS-1$
 							field.getNum(),
 							fieldName,
 							field.getValue(),

@@ -13,14 +13,20 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.tour;
+package net.tourbook.sign;
 
-import net.tourbook.data.TourSign;
+import org.eclipse.core.commands.AbstractHandler;
+import org.eclipse.core.commands.ExecutionEvent;
+import org.eclipse.core.commands.ExecutionException;
 
-public interface ITourSignSetter {
 
-	public void removeTourSign();
+public class ActionHandlerOpenSignImageView_DISABLED extends AbstractHandler {
 
-	public void setTourSign(TourSign tourSign);
+	public Object execute(final ExecutionEvent event) throws ExecutionException {
+
+//		Util.showView(TourSignView.ID, true);
+
+		return null;
+	}
 
 }

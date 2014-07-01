@@ -15,43 +15,39 @@
  *******************************************************************************/
 package net.tourbook.sign;
 
-import net.tourbook.data.TourSign;
-import net.tourbook.photo.Photo;
 
-import org.eclipse.jface.viewers.TreeViewer;
+public class TVIPrefSign_DISABLED /* extends TVIPrefSignItem */{
 
-public class TVIPrefSign extends TVIPrefSignItem {
-
-	private TourSign	_tourSign;
-
-	public TVIPrefSign(final TVIPrefSignCategory_D parentItem, final TreeViewer signViewer, final TourSign tourSign) {
-
-		super(signViewer);
-
-		setParentItem(parentItem);
-		_tourSign = tourSign;
-	}
-
-	@Override
-	protected void fetchChildren() {
-		// a sign has no children
-	}
-
-	public Photo getSignImagePhoto() {
-		return _tourSign.getSignImagePhoto();
-	}
-
-	public TourSign getTourSign() {
-		return _tourSign;
-	}
-
-	@Override
-	public boolean hasChildren() {
-		return false;
-	}
-
-	public void setTourSign(final TourSign savedSign) {
-		_tourSign = savedSign;
-	}
+//	private TourSign	_tourSign;
+//
+//	public TVIPrefSign(final TVIPrefSignCategory_D parentItem, final TreeViewer signViewer, final TourSign tourSign) {
+//
+//		super(signViewer);
+//
+//		setParentItem(parentItem);
+//		_tourSign = tourSign;
+//	}
+//
+//	@Override
+//	protected void fetchChildren() {
+//		// a sign has no children
+//	}
+//
+//	public Photo getSignImagePhoto() {
+//		return _tourSign.getSignImagePhoto();
+//	}
+//
+//	public TourSign getTourSign() {
+//		return _tourSign;
+//	}
+//
+//	@Override
+//	public boolean hasChildren() {
+//		return false;
+//	}
+//
+//	public void setTourSign(final TourSign savedSign) {
+//		_tourSign = savedSign;
+//	}
 
 }

@@ -717,10 +717,6 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 	private void defineColumn_TimeDelta() {
 
 		final ColumnDefinition colDef = TableColumnFactory.TIME_DELTA.createColumn(_columnManager, _pc);
-//		colDef.setIsDefaultColumn();
-
-		// hide wrong tooltip
-		colDef.setColumnHeaderToolTipText(UI.EMPTY_STRING);
 
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override

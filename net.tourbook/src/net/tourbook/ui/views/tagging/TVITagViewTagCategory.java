@@ -140,12 +140,12 @@ public class TVITagViewTagCategory extends TVITagViewItem {
 
 	@Override
 	public String toString() {
-		return "TVITagViewTagCategory "
+		return "TVITagViewTagCategory " //$NON-NLS-1$
 				+ System.identityHashCode(this)
-				+ " [tagCategoryId="
+				+ " [tagCategoryId=" //$NON-NLS-1$
 				+ tagCategoryId
-				+ ", name="
+				+ ", name=" //$NON-NLS-1$
 				+ name
-				+ "]";
+				+ "]"; //$NON-NLS-1$
 	}
 }
