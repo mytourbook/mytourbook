@@ -33,6 +33,11 @@ Create Translation Archive
 	- delete all folders but NOT ".metadata"
 	- extract "mt-translations.zip" into this folder
 
+	- switch to workspace "C:\DAT\ws_mt-Translation-TEST"
+		- refresh all projects with F5
+		- run Project/clean... for all projects
+	
+
 ############
 
 Create Build
@@ -40,7 +45,9 @@ Create Build
 ############
 
 requirements:
+
 - buckminster is installed to see better error messages
+  (buckminster developemnet is not continued, TYCHO is used to build eclipse projects)
 
 - switch to workspace "C:\DAT\ws_mt-with-GIT"
 

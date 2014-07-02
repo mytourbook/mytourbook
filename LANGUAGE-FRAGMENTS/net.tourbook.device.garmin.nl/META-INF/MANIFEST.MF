@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Language support
 Bundle-SymbolicName: net.tourbook.device.garmin.nl;singleton:=true
-Bundle-Version: 14.4.0.qualifier
+Bundle-Version: 14.7.0.qualifier
 Bundle-Vendor: MyTourbook
 Fragment-Host: net.tourbook.device.garmin
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6

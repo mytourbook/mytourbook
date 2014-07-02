@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Photo Gallery
 Bundle-SymbolicName: net.tourbook.photo;singleton:=true
-Bundle-Version: 14.4.0.qualifier
+Bundle-Version: 14.7.0.qualifier
 Bundle-Activator: net.tourbook.photo.internal.Activator
 Bundle-Localization: plugin
 Bundle-Vendor: MyTourbook
