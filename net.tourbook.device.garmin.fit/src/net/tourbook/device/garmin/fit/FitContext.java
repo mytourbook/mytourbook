@@ -135,7 +135,8 @@ public class FitContext {
 					}
 				}
 
-				if (lapDistance != -1) {
+				// check if distance is recorded
+				if (lapDistance > 0) {
 
 					final float tourAbsoluteDistance = timeData.absoluteDistance;
 					if (tourAbsoluteDistance != Float.MIN_VALUE) {
@@ -222,8 +223,9 @@ public class FitContext {
 
 				resetSpeedAtFirstPosition(timeDataList);
 
-				tourData.setTourTitle(getTourTitle());
-				tourData.setTourDescription(getTourDescription());
+// disabled, this is annoing
+//				tourData.setTourTitle(getTourTitle());
+//				tourData.setTourDescription(getTourDescription());
 
 				tourData.importRawDataFile = _filimportFilePathename;
 				tourData.setTourImportFilePath(_filimportFilePathename);

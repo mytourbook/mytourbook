@@ -20,13 +20,22 @@ public class LapMesgListenerImpl extends AbstractMesgListener implements LapMesg
 
 		context.mesgLap_10_Before();
 
+		onMesg_SetupMarker(lapMesg);
+
+		context.mesgLap_20_After();
+	}
+
+	private void onMesg_SetupMarker(final LapMesg lapMesg) {
+
 		final Integer messageIndex = getLapMessageIndex(lapMesg);
 		final TourMarker tourMarker = getTourMarker();
 
-		tourMarker.setLabel(messageIndex == null ? Integer.toString(++_lapCounter) : messageIndex.toString());
+		tourMarker.setLabel(messageIndex == null //
+				? Integer.toString(++_lapCounter)
+				: messageIndex.toString());
 
-		final Float totalDistance = lapMesg.getTotalDistance();
 		float lapDistance = -1;
+		final Float totalDistance = lapMesg.getTotalDistance();
 		if (totalDistance != null) {
 
 			lapDistance = context.getLapDistance();
@@ -36,8 +45,8 @@ public class LapMesgListenerImpl extends AbstractMesgListener implements LapMesg
 			tourMarker.setDistance(lapDistance);
 		}
 
-		final Float totalElapsedTime = lapMesg.getTotalElapsedTime();
 		int lapTime = -1;
+		final Float totalElapsedTime = lapMesg.getTotalElapsedTime();
 		if (totalElapsedTime != null) {
 
 			lapTime = context.getLapTime();
@@ -47,13 +56,18 @@ public class LapMesgListenerImpl extends AbstractMesgListener implements LapMesg
 			tourMarker.setTime(lapTime);
 		}
 
-		// set time slices position
+		/*
+		 * Set time slice position
+		 */
 		final DateTime timestamp = lapMesg.getTimestamp();
 		final long absoluteTime = timestamp.getTimestamp();
 
-		final int serieIndex = context.getSerieIndex(absoluteTime, lapDistance) - 1;
-		tourMarker.setSerieIndex(serieIndex);
+		int serieIndex = context.getSerieIndex(absoluteTime, lapDistance) - 1;
 
-		context.mesgLap_20_After();
+		// check bounds
+		if (serieIndex < 0) {
+			serieIndex = 0;
+		}
+		tourMarker.setSerieIndex(serieIndex);
 	}
 }

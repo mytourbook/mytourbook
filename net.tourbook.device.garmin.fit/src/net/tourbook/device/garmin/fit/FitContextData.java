@@ -169,6 +169,7 @@ public class FitContextData {
 			}
 
 			final List<ContextTourMarker> contextTourMarkerList = _allTourMarker.get(contextTourData);
+
 			final Set<TourMarker> tourMarkerSet = new HashSet<TourMarker>(contextTourMarkerList.size());
 			for (final ContextTourMarker contextTourMarker : contextTourMarkerList) {
 				tourMarkerSet.add(contextTourMarker.__data);
