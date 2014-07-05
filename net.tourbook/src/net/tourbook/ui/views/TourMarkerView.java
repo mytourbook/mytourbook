@@ -567,6 +567,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 
 		defineColumn_Name();
 		defineColumn_Description();
+		defineColumn_Url();
 	}
 
 	/**
@@ -746,6 +747,56 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 
 					cell.setFont(_boldFont);
 				}
+			}
+		});
+	}
+
+	/**
+	 * Column: Url
+	 */
+	private void defineColumn_Url() {
+
+		final ColumnDefinition colDef = TableColumnFactory.URL.createColumn(_columnManager, _pc);
+		colDef.setIsDefaultColumn();
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final TourMarker marker = (TourMarker) cell.getElement();
+
+				String columnText = UI.EMPTY_STRING;
+
+				/*
+				 * Url
+				 */
+				final String urlText = marker.getUrlText();
+				final String urlAddress = marker.getUrlAddress();
+				final boolean isText = urlText.length() > 0;
+				final boolean isAddress = urlAddress.length() > 0;
+
+				if (isText || isAddress) {
+
+					String linkText;
+
+					if (isAddress == false) {
+
+						// only text is in the link -> this is not a internet address but create a link of it
+
+						linkText = urlText;
+
+					} else if (isText == false) {
+
+						linkText = urlAddress;
+
+					} else {
+
+						linkText = urlAddress;
+					}
+
+					columnText = linkText;
+				}
+
+				cell.setText(columnText);
 			}
 		});
 	}

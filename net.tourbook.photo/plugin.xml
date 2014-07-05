@@ -32,7 +32,7 @@
 	
 	<extension point="org.eclipse.ui.menus">
 	
-		<menuContribution locationURI="menu:m_directory?after=net.tourbook.separator.OtherDirectories" >
+		<menuContribution locationURI="menu:m_Directory?after=net.tourbook.separator.OtherDirectories" >
 		            
 			<command commandId="command.net.tourbook.photo.PicDirView"
 				icon="icons/photo-directory.png"
@@ -55,9 +55,9 @@
 			
 		</menuContribution>
 		
-		<menuContribution locationURI="toolbar:org.eclipse.ui.main.toolbar?after=additions">
+		<menuContribution locationURI="toolbar:org.eclipse.ui.main.toolbar">
 
-			<toolbar id="net.tourbook.toolbars.tourViews">
+			<toolbar id="mc_tb_Directory">
 			
 				<command commandId="command.net.tourbook.photo.PicDirView"
 					icon="icons/photo-directory.png"

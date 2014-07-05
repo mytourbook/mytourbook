@@ -7,7 +7,7 @@ Bundle-Activator: net.tourbook.common.CommonActivator
 Bundle-Vendor: MyTourbook
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
- net.tourbook.ext.worldwind_2.0_src
+ net.tourbook.ext.worldwind_2.0
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Export-Package: cop.swt.widgets.viewers.table.celleditors,

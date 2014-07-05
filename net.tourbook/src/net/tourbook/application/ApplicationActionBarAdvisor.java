@@ -106,7 +106,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
 	private MenuManager createMenu_10_Load() {
 
-		final MenuManager loadMenu = new MenuManager(Messages.App_Action_Menu_Import, "m_import"); //$NON-NLS-1$
+		final MenuManager loadMenu = new MenuManager(Messages.App_Action_Menu_Import, "m_Import"); //$NON-NLS-1$
 
 		loadMenu.add(new GroupMarker("fileNew")); //$NON-NLS-1$
 		loadMenu.add(_quitItem);
@@ -116,7 +116,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
 	private MenuManager createMenu_20_Directories() {
 
-		final MenuManager dirMenu = new MenuManager(Messages.App_Action_Menu_Directory, "m_directory"); //$NON-NLS-1$
+		final MenuManager dirMenu = new MenuManager(Messages.App_Action_Menu_Directory, "m_Directory"); //$NON-NLS-1$
 
 		dirMenu.add(new Separator("defaultViews")); //$NON-NLS-1$
 
@@ -125,7 +125,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
 	private MenuManager createMenu_30_Tour() {
 
-		final MenuManager tourMenu = new MenuManager(Messages.App_Action_Menu_Tour, "m_tour"); //$NON-NLS-1$
+		final MenuManager tourMenu = new MenuManager(Messages.App_Action_Menu_Tour, "m_Tour"); //$NON-NLS-1$
 
 		tourMenu.add(new Separator("defaultViews")); //$NON-NLS-1$
 
@@ -134,7 +134,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
 	private MenuManager createMenu_40_Tool() {
 
-		final MenuManager toolMenu = new MenuManager(Messages.App_Action_Menu_tools, "m_tools"); //$NON-NLS-1$
+		final MenuManager toolMenu = new MenuManager(Messages.App_Action_Menu_tools, "m_Tools"); //$NON-NLS-1$
 
 		toolMenu.add(new GroupMarker("tools")); //$NON-NLS-1$
 		toolMenu.add(new GroupMarker(IWorkbenchActionConstants.MB_ADDITIONS));
@@ -151,7 +151,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
 	private MenuManager createMenu_50_Help() {
 
-		final MenuManager helpMenu = new MenuManager(Messages.App_Action_Menu_help, "m_help");//$NON-NLS-1$
+		final MenuManager helpMenu = new MenuManager(Messages.App_Action_Menu_help, "m_Help");//$NON-NLS-1$
 
 		helpMenu.add(new Separator("about")); //$NON-NLS-1$
 		helpMenu.add(getAction(ActionFactory.ABOUT.getId()));

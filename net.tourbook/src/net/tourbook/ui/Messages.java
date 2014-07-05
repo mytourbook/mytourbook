@@ -248,6 +248,12 @@ public class Messages extends NLS {
 	public static String		ColumnFactory_TourWeekYear_Label;
 	public static String		ColumnFactory_TourWeekYear_Tooltip;
 
+	public static String	ColumnFactory_Url_Header;
+
+	public static String	ColumnFactory_Url_Label;
+
+	public static String	ColumnFactory_Url_Tooltip;
+
 	public static String		ColumnFactory_Waypoint_Altitude_Label;
 	public static String		ColumnFactory_Waypoint_Category;
 	public static String		ColumnFactory_Waypoint_Comment;

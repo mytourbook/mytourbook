@@ -73,7 +73,7 @@ public class TourChartContextProvider implements IChartContextProvider, ITourPro
 	private ActionSetTourTypeMenu				_actionSetTourType;
 	private ActionSetMarkerVisible				_actionSetMarkerVisible;
 	private ActionSetMarkerLabelPositionMenu	_actionSetMarkerPosition;
-//	private ActionSetMarkerImageMenu				_actionSetMarkerSignMenu;
+//	private ActionSetMarkerImageMenu			_actionSetMarkerSignMenu;
 
 	private TagMenuManager						_tagMenuMgr;
 
@@ -252,11 +252,12 @@ public class TourChartContextProvider implements IChartContextProvider, ITourPro
 //		_actionSetMarkerSignMenu.setTourMarker(tourMarker);
 
 		// fill actions
-		menuMgr.add(_actionOpenMarkerDialog);
-
-		menuMgr.add(_actionSetMarkerVisible);
 		menuMgr.add(_actionSetMarkerPosition);
 //		menuMgr.add(_actionSetMarkerSignMenu);
+		menuMgr.add(_actionOpenMarkerDialog);
+
+//		menuMgr.add(new Separator());
+		menuMgr.add(_actionSetMarkerVisible);
 		menuMgr.add(_actionDeleteMarker);
 	}
 

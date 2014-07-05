@@ -525,6 +525,8 @@ public class Messages extends NLS {
 	public static String		Dlg_TourMarker_Button_delete_tooltip;
 	public static String		Dlg_TourMarker_Button_HideAllMarker;
 	public static String		Dlg_TourMarker_Button_HideAllMarker_Tooltip;
+	public static String		Dlg_TourMarker_Button_PasteFromClipboard;
+	public static String		Dlg_TourMarker_Button_PasteFromClipboard_Tooltip;
 //	public static String		Dlg_TourMarker_Button_reset_offset;
 //	public static String		Dlg_TourMarker_Button_reset_offset_tooltip;
 	public static String		Dlg_TourMarker_Button_ShowAllMarker;
@@ -560,6 +562,8 @@ public class Messages extends NLS {
 //	public static String		Dlg_TourMarker_Link_Sign;
 	public static String		Dlg_TourMarker_MsgBox_delete_marker_message;
 	public static String		Dlg_TourMarker_MsgBox_delete_marker_title;
+	public static String		Dlg_TourMarker_MsgBox_WrongFormat_Message;
+	public static String		Dlg_TourMarker_MsgBox_WrongFormat_Title;
 
 	public static String		External_Link_MyTourbook;
 	public static String		External_Link_MyTourbook_TourChartSmoothing;
@@ -1208,7 +1212,6 @@ public class Messages extends NLS {
 	public static String		Tour_Action_HrZoneGraphType_WhiteBottom;
 	public static String		Tour_Action_HrZoneGraphType_WhiteTop;
 	public static String		Tour_Action_Marker_Delete;
-
 	public static String		Tour_Action_Marker_Delete_WithConfirm;
 	public static String		Tour_Action_Marker_PositionHorizontal;
 	public static String		Tour_Action_Marker_PositionVertical;

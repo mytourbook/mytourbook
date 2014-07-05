@@ -297,9 +297,12 @@ public class ColumnManager {
 			final String label = colDef.getColumnLabel();
 			final String unit = colDef.getColumnUnit();
 
-			final String menuText = unit == null //
-					? label
-					: label + LABEL_UNIT_SEPARATOR + unit;
+			String menuText = UI.EMPTY_STRING;
+			if (label != null) {
+				menuText = unit == null //
+						? label
+						: label + LABEL_UNIT_SEPARATOR + unit;
+			}
 
 			colMenuItem.setText(menuText);
 			colMenuItem.setEnabled(colDef.canModifyVisibility());
@@ -495,7 +498,7 @@ public class ColumnManager {
 	}
 
 	private void getColumns_FromViewer() {
-		
+
 		// get the sorting order and column width from the viewer
 		_visibleColumnIds = getColumns_FromViewer_Ids();
 		_columnIdsAndWidth = getColumns_FromViewer_IdAndWidth();

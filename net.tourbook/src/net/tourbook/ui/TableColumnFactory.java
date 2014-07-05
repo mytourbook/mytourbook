@@ -32,6 +32,8 @@ import org.eclipse.swt.SWT;
 
 public abstract class TableColumnFactory {
 
+	private static final String				COLUMN_ID_URL						= "Url";	//$NON-NLS-1$
+
 	public static final TableColumnFactory ALTITUDE = new TableColumnFactory() {
 		
 		@Override
@@ -1218,6 +1220,22 @@ public abstract class TableColumnFactory {
 		};
 	};
 
+
+	public static final TableColumnFactory URL = new TableColumnFactory() {
+		
+		@Override
+		public ColumnDefinition createColumn(final ColumnManager columnManager, final PixelConverter pixelConverter) {
+			
+			final ColumnDefinition colDef = new TableColumnDefinition(columnManager, COLUMN_ID_URL, SWT.LEAD);
+		
+			colDef.setColumnLabel(Messages.ColumnFactory_Url_Label);
+			colDef.setColumnHeaderText(Messages.ColumnFactory_Url_Header);
+			colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_Url_Tooltip);
+			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(25));
+
+			return colDef;
+		};
+	};
 	/*
 	 * Waypoint columns
 	 */

@@ -109,6 +109,7 @@ class DialogMarkerTourChartContextProvicer implements IChartContextProvider, IMa
 		final TourChart tourChart = _markerDialog.getTourChart();
 		final TourData tourData = tourChart.getTourData();
 
+		// action: create marker at the value position
 		final int vpIndex = tourChart.getHoveredValuePointIndex();
 		if (vpIndex != -1) {
 
@@ -120,17 +121,18 @@ class DialogMarkerTourChartContextProvicer implements IChartContextProvider, IMa
 		}
 
 		final TourMarker tourMarker = tourChart.getHoveredTourMarker();
-
 		if (tourMarker != null) {
 
 			_actionDeleteMarker.setTourMarker(tourMarker, false);
-			_actionSetMarkerVisible.setTourMarker(tourMarker, !tourMarker.isMarkerVisible());
-			_actionSetMarkerPosition.setTourMarker(tourMarker);
 //			_actionSetMarkerImageMenu.setTourMarker(tourMarker);
+			_actionSetMarkerPosition.setTourMarker(tourMarker);
+			_actionSetMarkerVisible.setTourMarker(tourMarker, !tourMarker.isMarkerVisible());
 
-			menuMgr.add(_actionSetMarkerVisible);
 			menuMgr.add(_actionSetMarkerPosition);
 //			menuMgr.add(_actionSetMarkerImageMenu);
+
+//			menuMgr.add(new Separator());
+			menuMgr.add(_actionSetMarkerVisible);
 			menuMgr.add(_actionDeleteMarker);
 		}
 
