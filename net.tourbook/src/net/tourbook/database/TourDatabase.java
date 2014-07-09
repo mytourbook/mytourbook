@@ -94,7 +94,7 @@ public class TourDatabase {
 	 */
 	private static final int						TOURBOOK_DB_VERSION							= 24;
 
-//	private static final int						TOURBOOK_DB_VERSION							= 24;	// 14.? after 14.4
+//	private static final int						TOURBOOK_DB_VERSION							= 24;	// 14.7
 //	private static final int						TOURBOOK_DB_VERSION							= 23;	// 13.2.0
 //	private static final int						TOURBOOK_DB_VERSION							= 22;	// 12.12.0
 //	private static final int						TOURBOOK_DB_VERSION							= 21;	// 12.1.1
@@ -275,17 +275,17 @@ public class TourDatabase {
 	 */
 	private static class SQL {
 
-		private static void AddCol_BigInt(final Statement stmt, final String table, final String columnName)
-				throws SQLException {
-
-			final String sql = ""// 												//$NON-NLS-1$
-					+ "ALTER TABLE " + table //										//$NON-NLS-1$
-					+ "	ADD COLUMN	" + columnName + " BIGINT"; //					//$NON-NLS-1$ //$NON-NLS-2$
-
-			exec(stmt, sql);
-
-			return;
-		}
+//		private static void AddCol_BigInt(final Statement stmt, final String table, final String columnName)
+//				throws SQLException {
+//
+//			final String sql = ""// 												//$NON-NLS-1$
+//					+ "ALTER TABLE " + table //										//$NON-NLS-1$
+//					+ "	ADD COLUMN	" + columnName + " BIGINT"; //					//$NON-NLS-1$ //$NON-NLS-2$
+//
+//			exec(stmt, sql);
+//
+//			return;
+//		}
 
 		@SuppressWarnings("unused")
 		private static void AddCol_Int(final Statement stmt, final String table, final String columnName)
@@ -4240,8 +4240,6 @@ public class TourDatabase {
 	}
 
 	/**
-	 * Set create date/time from the tour date
-	 * 
 	 * @param conn
 	 * @param monitor
 	 * @throws SQLException
@@ -4578,8 +4576,6 @@ public class TourDatabase {
 	}
 
 	/**
-	 * Set create date/time from the tour date
-	 * 
 	 * @param conn
 	 * @param monitor
 	 * @throws SQLException

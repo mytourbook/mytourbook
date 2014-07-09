@@ -69,7 +69,6 @@ import net.tourbook.ui.tourChart.action.ActionMarkerOptions;
 import net.tourbook.ui.tourChart.action.ActionShowBreaktimeValues;
 import net.tourbook.ui.tourChart.action.ActionShowSRTMData;
 import net.tourbook.ui.tourChart.action.ActionShowStartTime;
-import net.tourbook.ui.tourChart.action.ActionShowTourMarker;
 import net.tourbook.ui.tourChart.action.ActionShowValuePointToolTip;
 import net.tourbook.ui.tourChart.action.ActionTourPhotos;
 import net.tourbook.ui.tourChart.action.ActionXAxisDistance;
@@ -104,93 +103,92 @@ import org.eclipse.swt.widgets.Shell;
  */
 public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdater {
 
-	private static final String		ID										= "net.tourbook.ui.tourChart";								//$NON-NLS-1$
+	private static final String			ID										= "net.tourbook.ui.tourChart";								//$NON-NLS-1$
 
-	public static final String		ACTION_ID_CAN_AUTO_ZOOM_TO_SLIDER		= "ACTION_ID_CAN_AUTO_ZOOM_TO_SLIDER";						//$NON-NLS-1$
-	public static final String		ACTION_ID_CAN_MOVE_SLIDERS_WHEN_ZOOMED	= "ACTION_ID_CAN_MOVE_SLIDERS_WHEN_ZOOMED";				//$NON-NLS-1$
-	public static final String		ACTION_ID_EDIT_CHART_PREFERENCES		= "ACTION_ID_EDIT_CHART_PREFERENCES";						//$NON-NLS-1$
-	public static final String		ACTION_ID_IS_SHOW_BREAKTIME_VALUES		= "ACTION_ID_IS_SHOW_BREAKTIME_VALUES";					//$NON-NLS-1$
-	public static final String		ACTION_ID_IS_SHOW_SRTM_DATA				= "ACTION_ID_IS_SHOW_SRTM_DATA";							//$NON-NLS-1$
-	public static final String		ACTION_ID_IS_SHOW_START_TIME			= "ACTION_ID_IS_SHOW_START_TIME";							//$NON-NLS-1$
-	public static final String		ACTION_ID_IS_SHOW_TOUR_MARKER			= "ACTION_ID_IS_SHOW_TOUR_MARKER";							//$NON-NLS-1$
-	public static final String		ACTION_ID_IS_SHOW_TOUR_PHOTOS			= "ACTION_ID_IS_SHOW_TOUR_PHOTOS";							//$NON-NLS-1$
-	public static final String		ACTION_ID_IS_SHOW_VALUEPOINT_TOOLTIP	= "ACTION_ID_IS_SHOW_VALUEPOINT_TOOLTIP";					//$NON-NLS-1$
-	public static final String		ACTION_ID_HR_ZONE_DROPDOWN_MENU			= "ACTION_ID_HR_ZONE_DROPDOWN_MENU";						//$NON-NLS-1$
-	public static final String		ACTION_ID_HR_ZONE_STYLE_GRAPH_TOP		= "ACTION_ID_HR_ZONE_STYLE_GRAPH_TOP";						//$NON-NLS-1$
-	public static final String		ACTION_ID_HR_ZONE_STYLE_NO_GRADIENT		= "ACTION_ID_HR_ZONE_STYLE_NO_GRADIENT";					//$NON-NLS-1$
-	public static final String		ACTION_ID_HR_ZONE_STYLE_WHITE_BOTTOM	= "ACTION_ID_HR_ZONE_STYLE_WHITE_BOTTOM";					//$NON-NLS-1$
-	public static final String		ACTION_ID_HR_ZONE_STYLE_WHITE_TOP		= "ACTION_ID_HR_ZONE_STYLE_WHITE_TOP";						//$NON-NLS-1$
-	public static final String		ACTION_ID_X_AXIS_DISTANCE				= "ACTION_ID_X_AXIS_DISTANCE";								//$NON-NLS-1$
-	public static final String		ACTION_ID_X_AXIS_TIME					= "ACTION_ID_X_AXIS_TIME";									//$NON-NLS-1$
+	public static final String			ACTION_ID_CAN_AUTO_ZOOM_TO_SLIDER		= "ACTION_ID_CAN_AUTO_ZOOM_TO_SLIDER";						//$NON-NLS-1$
+	public static final String			ACTION_ID_CAN_MOVE_SLIDERS_WHEN_ZOOMED	= "ACTION_ID_CAN_MOVE_SLIDERS_WHEN_ZOOMED";				//$NON-NLS-1$
+	public static final String			ACTION_ID_EDIT_CHART_PREFERENCES		= "ACTION_ID_EDIT_CHART_PREFERENCES";						//$NON-NLS-1$
+	public static final String			ACTION_ID_IS_SHOW_BREAKTIME_VALUES		= "ACTION_ID_IS_SHOW_BREAKTIME_VALUES";					//$NON-NLS-1$
+	public static final String			ACTION_ID_IS_SHOW_SRTM_DATA				= "ACTION_ID_IS_SHOW_SRTM_DATA";							//$NON-NLS-1$
+	public static final String			ACTION_ID_IS_SHOW_START_TIME			= "ACTION_ID_IS_SHOW_START_TIME";							//$NON-NLS-1$
+	public static final String			ACTION_ID_IS_SHOW_TOUR_PHOTOS			= "ACTION_ID_IS_SHOW_TOUR_PHOTOS";							//$NON-NLS-1$
+	public static final String			ACTION_ID_IS_SHOW_VALUEPOINT_TOOLTIP	= "ACTION_ID_IS_SHOW_VALUEPOINT_TOOLTIP";					//$NON-NLS-1$
+	public static final String			ACTION_ID_HR_ZONE_DROPDOWN_MENU			= "ACTION_ID_HR_ZONE_DROPDOWN_MENU";						//$NON-NLS-1$
+	public static final String			ACTION_ID_HR_ZONE_STYLE_GRAPH_TOP		= "ACTION_ID_HR_ZONE_STYLE_GRAPH_TOP";						//$NON-NLS-1$
+	public static final String			ACTION_ID_HR_ZONE_STYLE_NO_GRADIENT		= "ACTION_ID_HR_ZONE_STYLE_NO_GRADIENT";					//$NON-NLS-1$
+	public static final String			ACTION_ID_HR_ZONE_STYLE_WHITE_BOTTOM	= "ACTION_ID_HR_ZONE_STYLE_WHITE_BOTTOM";					//$NON-NLS-1$
+	public static final String			ACTION_ID_HR_ZONE_STYLE_WHITE_TOP		= "ACTION_ID_HR_ZONE_STYLE_WHITE_TOP";						//$NON-NLS-1$
+	public static final String			ACTION_ID_X_AXIS_DISTANCE				= "ACTION_ID_X_AXIS_DISTANCE";								//$NON-NLS-1$
+	public static final String			ACTION_ID_X_AXIS_TIME					= "ACTION_ID_X_AXIS_TIME";									//$NON-NLS-1$
 
-	private final IPreferenceStore	_prefStore								= TourbookPlugin.getPrefStore();
-	private final IDialogSettings	_state									= TourbookPlugin.getState(ID);
+	private final IPreferenceStore		_prefStore								= TourbookPlugin.getPrefStore();
+	private final IDialogSettings		_state									= TourbookPlugin.getState(ID);
 
-	private TourData				_tourData;
-	private TourChartConfiguration	_tcc;
+	private TourData					_tourData;
+	private TourChartConfiguration		_tcc;
 
-	private Map<String, Action>		_allTourChartActions;
-	private ActionMarkerOptions		_actionMarkerOptions;
-	private ActionOpenMarkerDialog	_actionOpenMarkerDialog;
+	private Map<String, Action>			_allTourChartActions;
+	private ActionMarkerOptions			_actionMarkerOptions;
+	private ActionOpenMarkerDialog		_actionOpenMarkerDialog;
 
 	/**
 	 * datamodel listener is called when the chart data is created
 	 */
-	private IDataModelListener		_chartDataModelListener;
+	private IDataModelListener			_chartDataModelListener;
 
-	private IPropertyChangeListener	_prefChangeListener;
-	private final ListenerList		_tourMarkerModifyListener				= new ListenerList();
-	private final ListenerList		_tourMarkerSelectionListener			= new ListenerList();
-	private final ListenerList		_tourModifyListener						= new ListenerList();
-	private final ListenerList		_xAxisSelectionListener					= new ListenerList();
+	private IPropertyChangeListener		_prefChangeListener;
+	private final ListenerList			_tourMarkerModifyListener				= new ListenerList();
+	private final ListenerList			_tourMarkerSelectionListener			= new ListenerList();
+	private final ListenerList			_tourModifyListener						= new ListenerList();
+	private final ListenerList			_xAxisSelectionListener					= new ListenerList();
 	//
-	private boolean					_isSegmentLayerVisible;
-	private boolean					_is2ndAltiLayerVisible;
-	private boolean					_isMouseModeSet;
-	private boolean					_isDisplayedInDialog;
+	private boolean						_isSegmentLayerVisible;
+	private boolean						_is2ndAltiLayerVisible;
+	private boolean						_isMouseModeSet;
+	private boolean						_isDisplayedInDialog;
 
-	private TourMarker				_firedTourMarker;
+	private TourMarker					_firedTourMarker;
 
 	/**
 	 * The {@link TourMarker} selection state is <b>only</b> be displayed when the mouse is hovering
 	 * it.
 	 */
-	private TourMarker				_selectedTourMarker;
+	private TourMarker					_selectedTourMarker;
 
-	private ImageDescriptor			_imagePhoto								= TourbookPlugin
-																					.getImageDescriptor(Messages.Image__PhotoPhotos);
-	private ImageDescriptor			_imagePhotoTooltip						= TourbookPlugin
-																					.getImageDescriptor(Messages.Image__PhotoImage);
-	private IFillPainter			_hrZonePainter;
+	private ImageDescriptor				_imagePhoto								= TourbookPlugin
+																						.getImageDescriptor(Messages.Image__PhotoPhotos);
+	private ImageDescriptor				_imagePhotoTooltip						= TourbookPlugin
+																						.getImageDescriptor(Messages.Image__PhotoImage);
+	private IFillPainter				_hrZonePainter;
 
-	private ActionChartOptions		_actionOptions;
-	private TourToolTip				_tourToolTip;
+	private ActionChartOptions			_actionOptions;
+	private TourToolTip					_tourToolTip;
 
-	private TourInfoToolTipProvider	_tourInfoToolTipProvider;
+	private TourInfoToolTipProvider		_tourInfoToolTipProvider;
 
-	private ChartPhotoToolTip		_photoTooltip;
-	private ChartMarkerToolTip		_markerTooltip;
-	private ValuePointToolTipUI		_valuePointToolTip;
+	private ChartPhotoToolTip			_photoTooltip;
+	private ChartMarkerToolTip			_markerTooltip;
+	private ValuePointToolTipUI			_valuePointToolTip;
 
-	private ControlListener			_ttControlListener						= new ControlListener();
-	private IMouseListener			_mouseMarkerListener					= new MouseMarkerListener();
-	private IMouseListener			_mousePhotoListener						= new MousePhotoListener();
+	private ControlListener				_ttControlListener						= new ControlListener();
+	private IMouseListener				_mouseMarkerListener					= new MouseMarkerListener();
+	private IMouseListener				_mousePhotoListener						= new MousePhotoListener();
 
 	/*
 	 * UI controls
 	 */
-	private Composite				_parent;
+	private Composite					_parent;
 
-	private I2ndAltiLayer			_layer2ndAlti;
+	private I2ndAltiLayer				_layer2ndAlti;
 
-	private ChartLayerMarker		_layerMarker;
-	private ChartLayer2ndAltiSerie	_layer2ndAltiSerie;
-	private ChartLayerPhoto			_layerPhoto;
-	private ChartSegmentLayer		_layerSegment;
-	private ChartSegmentValueLayer	_layerSegmentValue;
+	private ChartLayerMarker			_layerMarker;
+	private ChartLayer2ndAltiSerie		_layer2ndAltiSerie;
+	private ChartLayerPhoto				_layerPhoto;
+	private ChartSegmentAltitudeLayer	_layerSegment;
+	private ChartSegmentValueLayer		_layerSegmentValue;
 
-	private Color					_photoOverlayBGColorLink;
-	private Color					_photoOverlayBGColorTour;
+	private Color						_photoOverlayBGColorLink;
+	private Color						_photoOverlayBGColorTour;
 
 	/**
 	 * This listener is added to ALL widgets within the tooltip shell.
@@ -577,15 +575,8 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 	public void actionShowTourMarker(final Boolean isMarkerVisible) {
 
 		_prefStore.setValue(ITourbookPreferences.GRAPH_IS_MARKER_VISIBLE, isMarkerVisible);
-		_tcc.isShowTourMarker = isMarkerVisible;
 
-		_tcc.isShowTourMarker = isMarkerVisible;
-
-		updateUI_MarkerLayer(isMarkerVisible);
-
-		// update actions
-		setActionChecked(ACTION_ID_IS_SHOW_TOUR_MARKER, isMarkerVisible);
-		_actionMarkerOptions.setSelected(isMarkerVisible);
+		updateUI_Marker(isMarkerVisible);
 	}
 
 	public void actionShowTourPhotos() {
@@ -922,7 +913,6 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		_allTourChartActions.put(ACTION_ID_IS_SHOW_BREAKTIME_VALUES, new ActionShowBreaktimeValues(this));
 		_allTourChartActions.put(ACTION_ID_IS_SHOW_SRTM_DATA, new ActionShowSRTMData(this));
 		_allTourChartActions.put(ACTION_ID_IS_SHOW_START_TIME, new ActionShowStartTime(this));
-		_allTourChartActions.put(ACTION_ID_IS_SHOW_TOUR_MARKER, new ActionShowTourMarker(this));
 		_allTourChartActions.put(ACTION_ID_IS_SHOW_TOUR_PHOTOS, new ActionTourPhotos(this));
 		_allTourChartActions.put(ACTION_ID_IS_SHOW_VALUEPOINT_TOOLTIP, new ActionShowValuePointToolTip(this));
 		_allTourChartActions.put(ACTION_ID_X_AXIS_DISTANCE, new ActionXAxisDistance(this));
@@ -1442,8 +1432,8 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		/*
 		 * create segment layer
 		 */
-		_layerSegment = new ChartSegmentLayer();
-		_layerSegment.setLineColor(new RGB(0, 177, 219));
+		_layerSegment = new ChartSegmentAltitudeLayer();
+		_layerSegment.setupLayerData(_tourData, new RGB(0, 177, 219));
 
 		for (final int serieIndex : segmentSerie) {
 
@@ -1580,12 +1570,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		/*
 		 * Tour marker
 		 */
-		final Boolean isMarkerVisible = _tcc.isShowTourMarker;
-
-		tourAction = _allTourChartActions.get(ACTION_ID_IS_SHOW_TOUR_MARKER);
-		tourAction.setEnabled(true);
-		tourAction.setChecked(isMarkerVisible);
-		_actionMarkerOptions.setSelected(isMarkerVisible);
+		_actionMarkerOptions.setSelected(_tcc.isShowTourMarker);
 
 		/*
 		 * Tour photos
@@ -1836,13 +1821,13 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		return _layerMarker;
 	}
 
-//	ChartLabel getMarkerTooltipLabel() {
-//		return _tooltipLabel;
-//	}
-
 	public TourMarker getSelectedTourMarker() {
 		return _selectedTourMarker;
 	}
+
+//	ChartLabel getMarkerTooltipLabel() {
+//		return _tooltipLabel;
+//	}
 
 	@Override
 	public ArrayList<TourData> getSelectedTours() {
@@ -2726,6 +2711,16 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
 		_tourInfoToolTipProvider.setTourData(_tourData);
 		_valuePointToolTip.setTourData(_tourData);
+	}
+
+	private void updateUI_Marker(final Boolean isMarkerVisible) {
+
+		_tcc.isShowTourMarker = isMarkerVisible;
+
+		updateUI_MarkerLayer(isMarkerVisible);
+
+		// update actions
+		_actionMarkerOptions.setSelected(isMarkerVisible);
 	}
 
 	public void updateUI_MarkerLayer() {

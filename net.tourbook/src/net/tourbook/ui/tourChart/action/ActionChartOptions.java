@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -75,8 +75,6 @@ public class ActionChartOptions extends Action implements IMenuCreator {
 
 		final Map<String, Action> tourChartActions = _tourChart.getTourChartActions();
 
-		addItem(tourChartActions.get(TourChart.ACTION_ID_IS_SHOW_TOUR_MARKER));
-		addItem(tourChartActions.get(TourChart.ACTION_ID_IS_SHOW_TOUR_PHOTOS));
 		addItem(tourChartActions.get(TourChart.ACTION_ID_IS_SHOW_BREAKTIME_VALUES));
 		addItem(tourChartActions.get(TourChart.ACTION_ID_IS_SHOW_START_TIME));
 		addItem(tourChartActions.get(TourChart.ACTION_ID_IS_SHOW_SRTM_DATA));

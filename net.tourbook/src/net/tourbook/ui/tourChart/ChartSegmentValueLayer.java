@@ -33,6 +33,9 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Display;
 
+/**
+ * This layer displays the average values for a segment.
+ */
 public class ChartSegmentValueLayer implements IChartLayer {
 
 	private RGB			lineColorRGB	= new RGB(255, 0, 0);

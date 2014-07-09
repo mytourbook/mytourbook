@@ -52,6 +52,17 @@ When a single marker is modified with this context menu, the marker and tour wil
 - Keep expanded/collapsed tags/categories when the view is closed and reopened.
 
 
+
+* Elevation Gain
+Sometimes totally wrong value :-( depending on the terrain
+
+- Tour segmenter
+  - Altitude up/down
+  - Segmenter with Douglas Peuker
+  - Show altitude difference in tour chart.
+
+
+
 Improvements
 
 

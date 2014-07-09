@@ -58,6 +58,8 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
 import net.tourbook.Messages;
+import net.tourbook.algorithm.DPPoint;
+import net.tourbook.algorithm.DouglasPeuckerSimplifier;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.map.GeoPosition;
 import net.tourbook.common.util.MtMath;
@@ -465,9 +467,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	private String												tourImportFilePath;																		// db-version 6
 
 	/**
-	 * tolerance for the Douglas Peucker algorithm
+	 * Tolerance for the Douglas Peucker algorithm.
 	 */
-	private short												dpTolerance							= 50;
+	private short												dpTolerance							= 50;													// 5.0 since version 14.7
 
 	/**
 	 * Time difference in seconds between 2 time slices or <code>-1</code> for GPS devices when the
@@ -1598,9 +1600,22 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	 */
 	public boolean computeAltitudeUpDown() {
 
-		final int prefMinAltitude = _prefStore.getInt(PrefPageComputedValues.STATE_COMPUTED_VALUE_MIN_ALTITUDE);
+		final float prefMinAltitude = _prefStore.getInt(PrefPageComputedValues.STATE_COMPUTED_VALUE_MIN_ALTITUDE);
 
-		final AltitudeUpDown altiUpDown = computeAltitudeUpDown_Internal(null, prefMinAltitude);
+		AltitudeUpDown altiUpDown;
+		if (distanceSerie != null) {
+
+			// DP needs distance
+
+			altiUpDown = computeAltitudeUpDown_20_Algorithm_DP(prefMinAltitude / 10.0f);
+
+			// keep this value to see in the UI (toursegmenter) the correct value
+			dpTolerance = (short) prefMinAltitude;
+
+		} else {
+
+			altiUpDown = computeAltitudeUpDown_30_Algorithm_9_08(null, prefMinAltitude);
+		}
 
 		if (altiUpDown == null) {
 			return false;
@@ -1613,23 +1628,74 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	}
 
 	public AltitudeUpDown computeAltitudeUpDown(final ArrayList<AltitudeUpDownSegment> segmentSerieIndexParameter,
-												final int minAltiDiff) {
-		return computeAltitudeUpDown_Internal(segmentSerieIndexParameter, minAltiDiff);
+												final float selectedMinAltiDiff) {
+
+		return computeAltitudeUpDown_30_Algorithm_9_08(segmentSerieIndexParameter, selectedMinAltiDiff);
 	}
 
 	/**
-	 * compute altitude up/down since version 9.08
+	 * Compute altitude up/down with Douglas Peuker algorithm.
+	 * 
+	 * @param dpTolerance
+	 * @return Returns <code>null</code> when altitude up/down cannot be computed
+	 */
+	private AltitudeUpDown computeAltitudeUpDown_20_Algorithm_DP(final float dpTolerance) {
+
+		// check if all necessary data are available
+		if (altitudeSerie == null || altitudeSerie.length < 2) {
+			return null;
+		}
+
+		// convert data series into DP points
+		final DPPoint dpPoints[] = new DPPoint[distanceSerie.length];
+		for (int serieIndex = 0; serieIndex < dpPoints.length; serieIndex++) {
+			dpPoints[serieIndex] = new DPPoint(distanceSerie[serieIndex], altitudeSerie[serieIndex], serieIndex);
+		}
+
+		final DPPoint[] simplifiedPoints = new DouglasPeuckerSimplifier(dpTolerance, dpPoints).simplify();
+
+		float altitudeUpTotal = 0;
+		float altitudeDownTotal = 0;
+
+		float prevAltitude = altitudeSerie[0];
+
+		/*
+		 * Get altitude up/down from the tour altitude values which are found by DP
+		 */
+		for (int dbIndex = 1; dbIndex < simplifiedPoints.length; dbIndex++) {
+
+			final DPPoint point = simplifiedPoints[dbIndex];
+			final float currentAltitude = altitudeSerie[point.serieIndex];
+			final float altiDiff = currentAltitude - prevAltitude;
+
+			if (altiDiff > 0) {
+				altitudeUpTotal += altiDiff;
+			} else {
+				altitudeDownTotal += altiDiff;
+			}
+
+			prevAltitude = currentAltitude;
+		}
+
+		return new AltitudeUpDown(altitudeUpTotal, -altitudeDownTotal);
+	}
+
+	/**
+	 * Compute altitude up/down since version 9.08
+	 * <p>
+	 * This algorithm is abandond because it can cause very wrong values dependend on the terrain.
+	 * DP is the preferred algorithm since 14.7.
 	 * 
 	 * @param segmentSerie
 	 *            segments are created for each gradient alternation when segmentSerie is not
 	 *            <code>null</code>
-	 * @param altitudeMinDiff
+	 * @param minAltiDiff
 	 * @return Returns <code>null</code> when altitude up/down cannot be computed
 	 */
-	private AltitudeUpDown computeAltitudeUpDown_Internal(	final ArrayList<AltitudeUpDownSegment> segmentSerie,
-															final int altitudeMinDiff) {
+	private AltitudeUpDown computeAltitudeUpDown_30_Algorithm_9_08(	final ArrayList<AltitudeUpDownSegment> segmentSerie,
+																	final float minAltiDiff) {
 
-		// check if data are available
+		// check if all necessary data are available
 		if ((altitudeSerie == null) || (timeSerie == null) || (timeSerie.length < 2)) {
 			return null;
 		}
@@ -1720,7 +1786,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 						// angel changed, tour was descending and is now ascending
 
-						if (angleAltiDown <= -altitudeMinDiff) {
+						if (angleAltiDown <= -minAltiDiff) {
 
 							final float segmentAltiDiff = segmentAltitudeMin - segmentAltitudeMax;
 							altitudeDownTotal += segmentAltiDiff;
@@ -1765,7 +1831,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 						// angel changed, tour was ascending and is now descending
 
-						if (angleAltiUp >= altitudeMinDiff) {
+						if (angleAltiUp >= minAltiDiff) {
 
 							final float segmentAltiDiff = segmentAltitudeMax - segmentAltitudeMin;
 							altitudeUpTotal += segmentAltiDiff;

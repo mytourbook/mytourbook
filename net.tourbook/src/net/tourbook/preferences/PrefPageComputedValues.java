@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -66,55 +66,13 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 
 	public static final String			ID									= "net.tourbook.preferences.PrefPageComputedValues";	//$NON-NLS-1$
 
+	/**
+	 * This value is used either for the min altitude or the DP tolerance.
+	 * <p>
+	 * It depends on the used algorithm which is decided in {@link TourData#computeAltitudeUpDown()}.
+	 */
 	public static final String			STATE_COMPUTED_VALUE_MIN_ALTITUDE	= "computedValue.minAltitude";							//$NON-NLS-1$
 	private static final String			STATE_COMPUTED_VALUE_SELECTED_TAB	= "computedValue.selectedTab";							//$NON-NLS-1$
-
-	public static final int[]			ALTITUDE_MINIMUM					= new int[] {
-			1,
-			2,
-			3,
-			4,
-			5,
-			6,
-			7,
-			8,
-			9,
-			10,
-			12,
-			14,
-			16,
-			18,
-			20,
-			25,
-			30,
-			35,
-			40,
-			45,
-			50,
-			60,
-			70,
-			80,
-			90,
-			100,
-			120,
-			140,
-			160,
-			180,
-			200,
-			250,
-			300,
-			350,
-			400,
-			450,
-			500,
-			600,
-			700,
-			800,
-			900,
-			1000															};
-
-	public static final int				DEFAULT_MIN_ALTITUDE_INDEX			= 4;
-	public static final int				DEFAULT_MIN_ALTITUDE				= ALTITUDE_MINIMUM[DEFAULT_MIN_ALTITUDE_INDEX];
 
 	/*
 	 * contains the tab folder index
@@ -132,9 +90,8 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 
 	private static final int			DEFAULT_DESCRIPTION_WIDTH			= 450;
 
-	private IPreferenceStore			_prefStore							= TourbookPlugin
-																					.getDefault()
-																					.getPreferenceStore();
+	private IPreferenceStore			_prefStore							= TourbookPlugin.getPrefStore();
+
 	private NumberFormat				_nf0								= NumberFormat.getNumberInstance();
 	private NumberFormat				_nf1								= NumberFormat.getNumberInstance();
 	{
@@ -159,9 +116,8 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 	 */
 	private TabFolder					_tabFolder;
 
-	private Combo						_comboMinAltitude;
-
 	private Combo						_comboBreakMethod;
+
 	private PageBook					_pagebookBreakTime;
 
 	private Composite					_pageBreakByAvgSliceSpeed;
@@ -179,6 +135,7 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 	private Spinner						_spinnerBreakMinAvgSpeedAS;
 	private Spinner						_spinnerBreakMinSliceSpeedAS;
 	private Spinner						_spinnerBreakMinSliceTimeAS;
+	private Spinner						_spinnerMinAltitude;
 
 	private ScrolledComposite			_smoothingScrolledContainer;
 	private Composite					_smoothingScrolledContent;
@@ -233,19 +190,19 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 			{
 
 				final TabItem tabSmoothing = new TabItem(_tabFolder, SWT.NONE);
-				tabSmoothing.setControl(createUI10Smoothing(_tabFolder));
+				tabSmoothing.setControl(createUI_10_Smoothing(_tabFolder));
 				tabSmoothing.setText(Messages.Compute_Values_Group_Smoothing);
 
 				final TabItem tabBreakTime = new TabItem(_tabFolder, SWT.NONE);
-				tabBreakTime.setControl(createUI50BreakTime(_tabFolder));
+				tabBreakTime.setControl(createUI_50_BreakTime(_tabFolder));
 				tabBreakTime.setText(Messages.Compute_BreakTime_Group_BreakTime);
 
 				final TabItem tabElevation = new TabItem(_tabFolder, SWT.NONE);
-				tabElevation.setControl(createUI20ElevationGain(_tabFolder));
+				tabElevation.setControl(createUI_20_ElevationGain(_tabFolder));
 				tabElevation.setText(Messages.compute_tourValueElevation_group_computeTourAltitude);
 
 				final TabItem tabHrZone = new TabItem(_tabFolder, SWT.NONE);
-				tabHrZone.setControl(createUI60HrZone(_tabFolder));
+				tabHrZone.setControl(createUI_60_HrZone(_tabFolder));
 				tabHrZone.setText(Messages.Compute_HrZone_Group);
 
 				/**
@@ -261,7 +218,7 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 		return _tabFolder;
 	}
 
-	private Control createUI10Smoothing(final Composite parent) {
+	private Control createUI_10_Smoothing(final Composite parent) {
 
 		_tk = new FormToolkit(parent.getDisplay());
 		_smoothingUI = new SmoothingUI();
@@ -300,7 +257,7 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 		return _smoothingScrolledContainer;
 	}
 
-	private Control createUI20ElevationGain(final Composite parent) {
+	private Control createUI_20_ElevationGain(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
@@ -311,12 +268,14 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 			Label label = new Label(container, SWT.NONE);
 			label.setText(Messages.compute_tourValueElevation_label_minAltiDifference);
 
-			// combo: min altitude
-			_comboMinAltitude = new Combo(container, SWT.READ_ONLY);
-			_comboMinAltitude.setVisibleItemCount(20);
-			for (final int minAlti : PrefPageComputedValues.ALTITUDE_MINIMUM) {
-				_comboMinAltitude.add(Integer.toString((int) (minAlti / UI.UNIT_VALUE_ALTITUDE)));
-			}
+			// spinner: minimum altitude
+			_spinnerMinAltitude = new Spinner(container, SWT.BORDER);
+			GridDataFactory.fillDefaults().applyTo(_spinnerMinAltitude);
+			_spinnerMinAltitude.setMinimum(1); // 0.1
+			_spinnerMinAltitude.setMaximum(10000); // 1000
+			_spinnerMinAltitude.setDigits(1);
+			_spinnerMinAltitude.addSelectionListener(_selectionListener);
+			_spinnerMinAltitude.addMouseWheelListener(_spinnerMouseWheelListener);
 
 			// label: unit
 			label = new Label(container, SWT.NONE);
@@ -359,7 +318,7 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 		return container;
 	}
 
-	private Composite createUI50BreakTime(final Composite parent) {
+	private Composite createUI_50_BreakTime(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
@@ -407,10 +366,10 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 			_pagebookBreakTime = new PageBook(container, SWT.NONE);
 			GridDataFactory.fillDefaults().span(2, 1).grab(true, false).applyTo(_pagebookBreakTime);
 			{
-				_pageBreakByAvgSliceSpeed = createUI51BreakByAvgSliceSpeed(_pagebookBreakTime);
-				_pageBreakByAvgSpeed = createUI52BreakByAvgSpeed(_pagebookBreakTime);
-				_pageBreakBySliceSpeed = createUI53BreakBySliceSpeed(_pagebookBreakTime);
-				_pageBreakByTimeDistance = createUI54BreakByTimeDistance(_pagebookBreakTime);
+				_pageBreakByAvgSliceSpeed = createUI_51_BreakByAvgSliceSpeed(_pagebookBreakTime);
+				_pageBreakByAvgSpeed = createUI_52_BreakByAvgSpeed(_pagebookBreakTime);
+				_pageBreakBySliceSpeed = createUI_53_BreakBySliceSpeed(_pagebookBreakTime);
+				_pageBreakByTimeDistance = createUI_54_BreakByTimeDistance(_pagebookBreakTime);
 			}
 
 			/*
@@ -468,7 +427,7 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 		return container;
 	}
 
-	private Composite createUI51BreakByAvgSliceSpeed(final Composite parent) {
+	private Composite createUI_51_BreakByAvgSliceSpeed(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
@@ -562,7 +521,7 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 		return container;
 	}
 
-	private Composite createUI52BreakByAvgSpeed(final Composite parent) {
+	private Composite createUI_52_BreakByAvgSpeed(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
@@ -608,7 +567,7 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 		return container;
 	}
 
-	private Composite createUI53BreakBySliceSpeed(final Composite parent) {
+	private Composite createUI_53_BreakBySliceSpeed(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
@@ -654,7 +613,7 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 		return container;
 	}
 
-	private Composite createUI54BreakByTimeDistance(final Composite parent) {
+	private Composite createUI_54_BreakByTimeDistance(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
@@ -750,7 +709,7 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 		return container;
 	}
 
-	private Control createUI60HrZone(final Composite parent) {
+	private Control createUI_60_HrZone(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
@@ -898,7 +857,7 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 
 	private void onComputeElevationGainValues() {
 
-		final int altiMin = ALTITUDE_MINIMUM[_comboMinAltitude.getSelectionIndex()];
+		final float altiMin = (float) (_spinnerMinAltitude.getSelection() / 10.0);
 
 		if (MessageDialog.openConfirm(
 				Display.getCurrent().getActiveShell(),
@@ -986,7 +945,7 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 			/*
 			 * compute altitude
 			 */
-			_comboMinAltitude.select(DEFAULT_MIN_ALTITUDE_INDEX);
+			_spinnerMinAltitude.setSelection(50); // 5.0
 
 		} else if (_tabFolder.getSelectionIndex() == TAB_FOLDER_SMOOTHING) {
 
@@ -1073,22 +1032,7 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 			 */
 			final int prefMinAltitude = _prefStore.getInt(STATE_COMPUTED_VALUE_MIN_ALTITUDE);
 
-			int minAltiIndex = -1;
-			int listIndex = 0;
-			for (final int minAltiInList : ALTITUDE_MINIMUM) {
-				if (minAltiInList == prefMinAltitude) {
-					minAltiIndex = listIndex;
-					break;
-				}
-
-				listIndex++;
-			}
-
-			if (minAltiIndex == -1) {
-				minAltiIndex = DEFAULT_MIN_ALTITUDE_INDEX;
-			}
-
-			_comboMinAltitude.select(minAltiIndex);
+			_spinnerMinAltitude.setSelection(prefMinAltitude);
 
 			/*
 			 * break method
@@ -1144,7 +1088,7 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 	 */
 	private void saveState() {
 
-		_prefStore.setValue(STATE_COMPUTED_VALUE_MIN_ALTITUDE, ALTITUDE_MINIMUM[_comboMinAltitude.getSelectionIndex()]);
+		_prefStore.setValue(STATE_COMPUTED_VALUE_MIN_ALTITUDE, _spinnerMinAltitude.getSelection());
 
 		/*
 		 * break time method

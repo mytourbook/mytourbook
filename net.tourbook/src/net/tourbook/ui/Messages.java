@@ -177,6 +177,12 @@ public class Messages extends NLS {
 	public static String		ColumnFactory_Diff_Header;
 	public static String		ColumnFactory_DistanceDelta_Label;
 	public static String		ColumnFactory_DistanceDelta_Tooltip;
+	public static String	ColumnFactory_DPTolerance_Header;
+
+	public static String	ColumnFactory_DPTolerance_Label;
+
+	public static String	ColumnFactory_DPTolerance_Tooltip;
+
 	public static String		ColumnFactory_Id_Label;
 	public static String		ColumnFactory_Id_Tooltip;
 	public static String		ColumnFactory_NumberOfGPSPhotos_Header;

@@ -196,6 +196,8 @@ public class TourChartConfiguration {
 		/*
 		 * Initialize tour marker settings from the pref store
 		 */
+		isShowTourMarker = _prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_MARKER_VISIBLE);
+
 		markerHoverSize = _prefStore.getInt(ITourbookPreferences.GRAPH_MARKER_HOVER_SIZE);
 		markerLabelOffset = _prefStore.getInt(ITourbookPreferences.GRAPH_MARKER_LABEL_OFFSET);
 		markerLabelTempPos = _prefStore.getInt(ITourbookPreferences.GRAPH_MARKER_LABEL_TEMP_POSITION);

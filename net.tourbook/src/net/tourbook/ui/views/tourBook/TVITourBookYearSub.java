@@ -102,7 +102,8 @@ public class TVITourBookYearSub extends TVITourBookItem {
 				+ "tourPerson_personId, " //			            31	//$NON-NLS-1$
 				//
 				+ "numberOfTimeSlices, " //							32	//$NON-NLS-1$
-				+ "numberOfPhotos" //								33	//$NON-NLS-1$
+				+ "numberOfPhotos, " //								33	//$NON-NLS-1$
+				+ "dpTolerance" //									34	//$NON-NLS-1$
 				//
 				+ UI.NEW_LINE
 
@@ -214,6 +215,9 @@ public class TVITourBookYearSub extends TVITourBookItem {
 
 					tourItem.colNumberOfTimeSlices = result.getInt(32);
 					tourItem.colNumberOfPhotos = result.getInt(33);
+					tourItem.colDPTolerance = result.getInt(34);
+
+					// -----------------------------------------------
 
 					calendar.set(dbYear, dbMonth - 1, dbDay, dbHour, dbMinute);
 					tourItem.colTourDate = calendar.getTimeInMillis();

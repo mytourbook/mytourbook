@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -127,7 +127,6 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	private static final int								MAX_DISTANCE_SCALE_METRIC			= 100;
 
 	private static final String								STATE_SELECTED_SEGMENTER_INDEX		= "selectedSegmenterIndex";			//$NON-NLS-1$
-	private static final String								STATE_SELECTED_MIN_ALTITUDE_INDEX	= "selectedMinAltitude";				//$NON-NLS-1$
 	private static final String								STATE_SELECTED_DISTANCE				= "selectedDistance";					//$NON-NLS-1$
 
 	/**
@@ -168,8 +167,8 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 	private TourData										_tourData;
 
-	private int												_dpTolerance;
-	private int												_savedDpTolerance					= -1;
+	private float											_dpTolerance;
+	private float											_savedDpTolerance					= -1;
 
 	private PostSelectionProvider							_postSelectionProvider;
 
@@ -270,14 +269,12 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	private Composite										_containerViewer;
 	private Composite										_containerSaveAltitude;
 
-	private Scale											_scaleTolerance;
-	private Label											_lblToleranceValue;
+//	private Label											_lblToleranceValue;
 	private ImageComboLabel									_lblTitle;
 	private Combo											_cboSegmenterType;
 	private Label											_lblAltitudeUp;
 
 	private Button											_btnSaveTour;
-	private Combo											_cboMinAltitude;
 	private Label											_lblMinAltitude;
 
 	private ActionShowSegments								_actionShowSegments;
@@ -299,6 +296,10 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	private Composite										_pageBreakByTimeDistance;
 
 	private Combo											_comboBreakMethod;
+
+	private Label											_lblBreakDistanceUnit;
+	private Label											_lblTourBreakTime;
+
 	private Spinner											_spinnerBreakMinAvgSpeedAS;
 	private Spinner											_spinnerBreakMinSliceSpeedAS;
 	private Spinner											_spinnerBreakMinSliceTimeAS;
@@ -307,8 +308,8 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	private Spinner											_spinnerBreakShortestTime;
 	private Spinner											_spinnerBreakMaxDistance;
 	private Spinner											_spinnerBreakSliceDiff;
-	private Label											_lblTourBreakTime;
-	private Label											_lblBreakDistanceUnit;
+	private Spinner											_spinnerDPTolerance;
+	private Spinner											_spinnerMinAltitude;
 
 	private class ActionShowSegments extends Action {
 
@@ -455,7 +456,6 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 			public void partClosed(final IWorkbenchPartReference partRef) {
 				if (partRef.getPart(false) == TourSegmenterView.this) {
-					saveTour();
 					saveState();
 					hideTourSegmentsInChart();
 				}
@@ -510,9 +510,8 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 					 */
 					_lblMinAltitude.setText(net.tourbook.common.UI.UNIT_LABEL_DISTANCE);
 					_lblMinAltitude.pack(true);
-					updateUIMinAltitude();
 
-					createSegments();
+					createSegments(true);
 
 				} else if (property.equals(ITourbookPreferences.VIEW_LAYOUT_CHANGED)) {
 
@@ -586,8 +585,9 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 							} else {
 
-								createSegments();
-								reloadViewer();
+								// it's the same tour but tour is modified
+
+								onSelectionChanged(new SelectionTourData(null, modifiedTourData));
 							}
 						}
 
@@ -690,6 +690,9 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		_tourChart = null;
 
 		_isClearView = true;
+
+		// removed old tour data from the selection provider
+		_postSelectionProvider.clearSelection();
 	}
 
 	private void createActions() {
@@ -844,8 +847,14 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 	/**
 	 * create points for the simplifier from distance and altitude
+	 * 
+	 * @param isFireEvent
 	 */
-	private void createSegments() {
+	private void createSegments(final boolean isFireEvent) {
+
+		if (_isSaving) {
+			return;
+		}
 
 		if (_tourData == null) {
 			_pageBookUI.showPage(_pageNoData);
@@ -865,39 +874,41 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 		if (selectedSegmenterType == SegmenterType.ByAltitudeWithDP) {
 
-			createSegmentsByAltitudeWithDP();
+			createSegmentsBy_AltitudeWithDP();
 
 		} else if (selectedSegmenterType == SegmenterType.ByPulseWithDP) {
 
-			createSegmentsByPulseWithDP();
+			createSegmentsBy_PulseWithDP();
 
 		} else if (selectedSegmenterType == SegmenterType.ByDistance) {
 
-			createSegmentsByDistance();
+			createSegmentsBy_Distance();
 
 		} else if (selectedSegmenterType == SegmenterType.ByMarker) {
 
-			createSegmentsByMarker();
+			createSegmentsBy_Marker();
 
 		} else if (selectedSegmenterType == SegmenterType.ByComputedAltiUpDown) {
 
-			createSegmentsByAltiUpDown();
+			createSegmentsBy_AltiUpDown();
 
 		} else if (selectedSegmenterType == SegmenterType.ByBreakTime) {
 
-			createSegmentsByBreakTime();
+			createSegmentsBy_BreakTime();
 		}
 
 		// update table and create the tour segments in tour data
 		reloadViewer();
 
-		fireSegmentLayerChanged();
+		if (isFireEvent) {
+			fireSegmentLayerChanged();
+		}
 	}
 
 	/**
 	 * create Douglas-Peucker segments from distance and altitude
 	 */
-	private void createSegmentsByAltitudeWithDP() {
+	private void createSegmentsBy_AltitudeWithDP() {
 
 		final float[] distanceSerie = _tourData.getMetricDistanceSerie();
 		final float[] altitudeSerie = _tourData.altitudeSerie;
@@ -922,9 +933,10 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		}
 	}
 
-	private void createSegmentsByAltiUpDown() {
+	private void createSegmentsBy_AltiUpDown() {
 
-		final int selectedMinAltiDiff = PrefPageComputedValues.ALTITUDE_MINIMUM[_cboMinAltitude.getSelectionIndex()];
+		final float selectedMinAltiDiff = (float) (_spinnerMinAltitude.getSelection() / 10.0);
+
 		final ArrayList<AltitudeUpDownSegment> tourSegements = new ArrayList<AltitudeUpDownSegment>();
 
 		// create segment when the altitude up/down is changing
@@ -945,7 +957,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		}
 	}
 
-	private void createSegmentsByBreakTime() {
+	private void createSegmentsBy_BreakTime() {
 
 		boolean[] breakTimeSerie = null;
 		BreakTimeResult breakTimeResult = null;
@@ -1044,7 +1056,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 	}
 
-	private void createSegmentsByDistance() {
+	private void createSegmentsBy_Distance() {
 
 		final float[] distanceSerie = _tourData.getMetricDistanceSerie();
 		final int lastDistanceSerieIndex = distanceSerie.length - 1;
@@ -1082,7 +1094,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		_tourData.segmentSerieIndex = ArrayListToArray.toInt(segmentSerieIndex);
 	}
 
-	private void createSegmentsByMarker() {
+	private void createSegmentsBy_Marker() {
 
 		final int[] timeSerie = _tourData.timeSerie;
 		final Set<TourMarker> tourMarkers = _tourData.getTourMarkers();
@@ -1114,7 +1126,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	/**
 	 * create Douglas-Peucker segments from time and pulse
 	 */
-	private void createSegmentsByPulseWithDP() {
+	private void createSegmentsBy_PulseWithDP() {
 
 		final int[] timeSerie = _tourData.timeSerie;
 		final float[] pulseSerie = _tourData.pulseSerie;
@@ -1154,12 +1166,12 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		_pageSegmenter = new Composite(_pageBookUI, SWT.NONE);
 		GridLayoutFactory.fillDefaults().spacing(0, 0).applyTo(_pageSegmenter);
 		{
-			createUI10Header(_pageSegmenter);
-			createUI70Viewer(_pageSegmenter);
+			createUI_10_Header(_pageSegmenter);
+			createUI_70_Viewer(_pageSegmenter);
 		}
 	}
 
-	private void createUI10Header(final Composite parent) {
+	private void createUI_10_Header(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
@@ -1226,17 +1238,17 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 			_pageBookSegmenter = new PageBook(container, SWT.NONE);
 			GridDataFactory.fillDefaults().grab(true, false).span(3, 1).applyTo(_pageBookSegmenter);
 			{
-				_pageSegTypeDP = createUI11SegmenterDP(_pageBookSegmenter);
-				_pageSegTypeByMarker = createUI12SegmenterByMarker(_pageBookSegmenter);
-				_pageSegTypeByDistance = createUI13SegmenterByDistance(_pageBookSegmenter);
-				_pageSegTypeByAltiUpDown = createUI14SegmenterByAltiUpDown(_pageBookSegmenter);
-				_pageSegTypeByBreakTime = createUI50SegmenterByBreakTime(_pageBookSegmenter);
+				_pageSegTypeDP = createUI_11_SegmenterBy_DP(_pageBookSegmenter);
+				_pageSegTypeByMarker = createUI_12_SegmenterBy_Marker(_pageBookSegmenter);
+				_pageSegTypeByDistance = createUI_13_SegmenterBy_Distance(_pageBookSegmenter);
+				_pageSegTypeByAltiUpDown = createUI_14_SegmenterBy_AltiUpDown(_pageBookSegmenter);
+				_pageSegTypeByBreakTime = createUI_50_SegmenterBy_BreakTime(_pageBookSegmenter);
 			}
 		}
 
 	}
 
-	private Composite createUI11SegmenterDP(final Composite parent) {
+	private Composite createUI_11_SegmenterBy_DP(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
@@ -1247,32 +1259,30 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 			final Label label = new Label(container, SWT.NONE);
 			label.setText(Messages.Tour_Segmenter_Label_tolerance);
 
-			// scale: tolerance
-			_scaleTolerance = new Scale(container, SWT.HORIZONTAL);
-			GridDataFactory.fillDefaults().grab(true, false).applyTo(_scaleTolerance);
-			_scaleTolerance.setMaximum(100);
-			_scaleTolerance.addSelectionListener(new SelectionAdapter() {
+			// spinner: minimum altitude
+			_spinnerDPTolerance = new Spinner(container, SWT.BORDER);
+			GridDataFactory.fillDefaults().applyTo(_spinnerDPTolerance);
+			_spinnerDPTolerance.setMinimum(1); // 0.1
+			_spinnerDPTolerance.setMaximum(10000); // 1000
+			_spinnerDPTolerance.setDigits(1);
+			_spinnerDPTolerance.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(final SelectionEvent e) {
-					onChangedTolerance(getDPTolerance());
-					setTourDirty();
+					onChangedTolerance();
 				}
 			});
-
-			// text: tolerance value
-			_lblToleranceValue = new Label(container, SWT.TRAIL);
-			_lblToleranceValue.setText(Messages.Tour_Segmenter_Label_default_tolerance);
-			GridDataFactory
-					.fillDefaults()
-					.align(SWT.FILL, SWT.CENTER)
-					.hint(_pc.convertWidthInCharsToPixels(4), SWT.DEFAULT)
-					.applyTo(_lblToleranceValue);
+			_spinnerDPTolerance.addMouseWheelListener(new MouseWheelListener() {
+				public void mouseScrolled(final MouseEvent event) {
+					UI.adjustSpinnerValueOnMouseScroll(event);
+					onChangedTolerance();
+				}
+			});
 		}
 
 		return container;
 	}
 
-	private Composite createUI12SegmenterByMarker(final Composite parent) {
+	private Composite createUI_12_SegmenterBy_Marker(final Composite parent) {
 
 		/*
 		 * display NONE, this is not easy to do - or I didn't find an easier way
@@ -1288,7 +1298,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		return container;
 	}
 
-	private Composite createUI13SegmenterByDistance(final Composite parent) {
+	private Composite createUI_13_SegmenterBy_Distance(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
@@ -1323,7 +1333,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		return container;
 	}
 
-	private Composite createUI14SegmenterByAltiUpDown(final Composite parent) {
+	private Composite createUI_14_SegmenterBy_AltiUpDown(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
@@ -1333,13 +1343,22 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 			final Label label = new Label(container, SWT.NONE);
 			label.setText(Messages.tour_segmenter_segType_byUpDownAlti_label);
 
-			// combo: min altitude
-			_cboMinAltitude = new Combo(container, SWT.READ_ONLY);
-			_cboMinAltitude.setVisibleItemCount(20);
-			_cboMinAltitude.addSelectionListener(new SelectionAdapter() {
+			// spinner: minimum altitude
+			_spinnerMinAltitude = new Spinner(container, SWT.BORDER);
+			GridDataFactory.fillDefaults().applyTo(_spinnerMinAltitude);
+			_spinnerMinAltitude.setMinimum(1); // 0.1
+			_spinnerMinAltitude.setMaximum(10000); // 1000
+			_spinnerMinAltitude.setDigits(1);
+			_spinnerMinAltitude.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(final SelectionEvent e) {
-					createSegments();
+					createSegments(true);
+				}
+			});
+			_spinnerMinAltitude.addMouseWheelListener(new MouseWheelListener() {
+				public void mouseScrolled(final MouseEvent event) {
+					UI.adjustSpinnerValueOnMouseScroll(event);
+					onChangeBreakTime();
 				}
 			});
 
@@ -1351,7 +1370,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		return container;
 	}
 
-	private Composite createUI50SegmenterByBreakTime(final Composite parent) {
+	private Composite createUI_50_SegmenterBy_BreakTime(final Composite parent) {
 
 		_containerBreakTime = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(_containerBreakTime);
@@ -1362,11 +1381,11 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 			GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
 			GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
 			{
-				createUI51TourBreakTime(container);
-				createUI52BreakTimePageBook(container);
+				createUI_51_TourBreakTime(container);
+				createUI_52_BreakTimePageBook(container);
 			}
 
-			createUI56BreakActions(_containerBreakTime);
+			createUI_59_BreakActions(_containerBreakTime);
 		}
 
 		_containerBreakTime.layout(true, true);
@@ -1375,7 +1394,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		return _containerBreakTime;
 	}
 
-	private void createUI51TourBreakTime(final Composite parent) {
+	private void createUI_51_TourBreakTime(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults()//
@@ -1406,7 +1425,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		}
 	}
 
-	private void createUI52BreakTimePageBook(final Composite parent) {
+	private void createUI_52_BreakTimePageBook(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
@@ -1442,10 +1461,10 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 			_pagebookBreakTime = new PageBook(container, SWT.NONE);
 			GridDataFactory.fillDefaults().span(2, 1).grab(true, false).applyTo(_pagebookBreakTime);
 			{
-				_pageBreakByAvgSliceSpeed = createUI53BreakByAvgSliceSpeed(_pagebookBreakTime);
-				_pageBreakByAvgSpeed = createUI54BreakByAvgSpeed(_pagebookBreakTime);
-				_pageBreakBySliceSpeed = createUI55BreakBySliceSpeed(_pagebookBreakTime);
-				_pageBreakByTimeDistance = createUI56BreakByTimeDistance(_pagebookBreakTime);
+				_pageBreakByAvgSliceSpeed = createUI_53_BreakBy_AvgSliceSpeed(_pagebookBreakTime);
+				_pageBreakByAvgSpeed = createUI_54_BreakBy_AvgSpeed(_pagebookBreakTime);
+				_pageBreakBySliceSpeed = createUI_55_BreakBy_SliceSpeed(_pagebookBreakTime);
+				_pageBreakByTimeDistance = createUI_56_BreakBy_TimeDistance(_pagebookBreakTime);
 			}
 
 			/*
@@ -1460,7 +1479,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		}
 	}
 
-	private Composite createUI53BreakByAvgSliceSpeed(final Composite parent) {
+	private Composite createUI_53_BreakBy_AvgSliceSpeed(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
@@ -1554,7 +1573,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		return container;
 	}
 
-	private Composite createUI54BreakByAvgSpeed(final Composite parent) {
+	private Composite createUI_54_BreakBy_AvgSpeed(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
@@ -1597,7 +1616,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		return container;
 	}
 
-	private Composite createUI55BreakBySliceSpeed(final Composite parent) {
+	private Composite createUI_55_BreakBy_SliceSpeed(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
@@ -1640,48 +1659,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		return container;
 	}
 
-	private void createUI56BreakActions(final Composite parent) {
-
-		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(false, true).applyTo(container);
-		GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
-//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
-		{
-			/*
-			 * button: restore from defaults
-			 */
-			final Button btnRestore = new Button(container, SWT.NONE);
-			GridDataFactory.fillDefaults()//
-					.align(SWT.FILL, SWT.END)
-					.grab(false, true)
-					.applyTo(btnRestore);
-			btnRestore.setText(Messages.Compute_BreakTime_Button_RestoreDefaultValues);
-			btnRestore.setToolTipText(Messages.Compute_BreakTime_Button_RestoreDefaultValues_Tooltip);
-			btnRestore.addSelectionListener(new SelectionAdapter() {
-				@Override
-				public void widgetSelected(final SelectionEvent e) {
-					restorePrefValues();
-				}
-			});
-
-			/*
-			 * button: set as default values
-			 */
-			final Button btnSetDefault = new Button(container, SWT.NONE);
-			GridDataFactory.fillDefaults()//
-					.applyTo(btnSetDefault);
-			btnSetDefault.setText(Messages.Compute_BreakTime_Button_SetDefaultValues);
-			btnSetDefault.setToolTipText(Messages.Compute_BreakTime_Button_SetDefaultValues_Tooltip);
-			btnSetDefault.addSelectionListener(new SelectionAdapter() {
-				@Override
-				public void widgetSelected(final SelectionEvent e) {
-					onSetDefaults(parent);
-				}
-			});
-		}
-	}
-
-	private Composite createUI56BreakByTimeDistance(final Composite parent) {
+	private Composite createUI_56_BreakBy_TimeDistance(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
@@ -1792,17 +1770,58 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		return container;
 	}
 
-	private void createUI70Viewer(final Composite parent) {
+	private void createUI_59_BreakActions(final Composite parent) {
+
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(false, true).applyTo(container);
+		GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
+//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
+		{
+			/*
+			 * button: restore from defaults
+			 */
+			final Button btnRestore = new Button(container, SWT.NONE);
+			GridDataFactory.fillDefaults()//
+					.align(SWT.FILL, SWT.END)
+					.grab(false, true)
+					.applyTo(btnRestore);
+			btnRestore.setText(Messages.Compute_BreakTime_Button_RestoreDefaultValues);
+			btnRestore.setToolTipText(Messages.Compute_BreakTime_Button_RestoreDefaultValues_Tooltip);
+			btnRestore.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(final SelectionEvent e) {
+					restorePrefValues();
+				}
+			});
+
+			/*
+			 * button: set as default values
+			 */
+			final Button btnSetDefault = new Button(container, SWT.NONE);
+			GridDataFactory.fillDefaults()//
+					.applyTo(btnSetDefault);
+			btnSetDefault.setText(Messages.Compute_BreakTime_Button_SetDefaultValues);
+			btnSetDefault.setToolTipText(Messages.Compute_BreakTime_Button_SetDefaultValues_Tooltip);
+			btnSetDefault.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(final SelectionEvent e) {
+					onSetDefaults(parent);
+				}
+			});
+		}
+	}
+
+	private void createUI_70_Viewer(final Composite parent) {
 
 		_containerViewer = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, true).applyTo(_containerViewer);
 		GridLayoutFactory.fillDefaults().applyTo(_containerViewer);
 		{
-			createUI80SegmentViewer(_containerViewer);
+			createUI_80_SegmentViewer(_containerViewer);
 		}
 	}
 
-	private void createUI80SegmentViewer(final Composite parent) {
+	private void createUI_80_SegmentViewer(final Composite parent) {
 
 		final Table table = new Table(parent, //
 				SWT.H_SCROLL | SWT.V_SCROLL | SWT.FULL_SELECTION | SWT.MULTI /* | SWT.BORDER */);
@@ -1850,13 +1869,13 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 			}
 		});
 
-		createUI90ContextMenu();
+		createUI_90_ContextMenu();
 	}
 
 	/**
 	 * create the views context menu
 	 */
-	private void createUI90ContextMenu() {
+	private void createUI_90_ContextMenu() {
 
 		final Table table = (Table) _segmentViewer.getControl();
 
@@ -1873,41 +1892,41 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 			}
 		};
 
-		defineColumnRecordingTimeTotal(defaultListener);
+		defineColumn_RecordingTimeTotal(defaultListener);
 
-		defineColumnDistanceTotal(defaultListener);
-		defineColumnDistance(defaultListener);
+		defineColumn_DistanceTotal(defaultListener);
+		defineColumn_Distance(defaultListener);
 
-		defineColumnRecordingTime(defaultListener);
-		defineColumnDrivingTime(defaultListener);
-		defineColumnPausedTime(defaultListener);
+		defineColumn_RecordingTime(defaultListener);
+		defineColumn_DrivingTime(defaultListener);
+		defineColumn_PausedTime(defaultListener);
 
-		defineColumnAltitudeDiffSegmentBorder(defaultListener);
-		defineColumnAltitudeDiffSegmentComputed(defaultListener);
-		defineColumnAltitudeUpSummarizedComputed(defaultListener);
-		defineColumnAltitudeDownSummarizedComputed(defaultListener);
+		defineColumn_AltitudeDiffSegmentBorder(defaultListener);
+		defineColumn_AltitudeDiffSegmentComputed(defaultListener);
+		defineColumn_AltitudeUpSummarizedComputed(defaultListener);
+		defineColumn_AltitudeDownSummarizedComputed(defaultListener);
 
-		defineColumnGradient();
+		defineColumn_Gradient();
 
-		defineColumnAltitudeUpHour(defaultListener);
-		defineColumnAltitudeDownHour(defaultListener);
+		defineColumn_AltitudeUpHour(defaultListener);
+		defineColumn_AltitudeDownHour(defaultListener);
 
-		defineColumnAvgSpeed();
-		defineColumnAvgPace();
-		defineColumnAvgPaceDifference();
-		defineColumnAvgPulse();
-		defineColumnAvgPulseDifference();
+		defineColumn_AvgSpeed();
+		defineColumn_AvgPace();
+		defineColumn_AvgPaceDifference();
+		defineColumn_AvgPulse();
+		defineColumn_AvgPulseDifference();
 
-		defineColumnAltitudeUpSummarizedBorder(defaultListener);
-		defineColumnAltitudeDownSummarizedBorder(defaultListener);
+		defineColumn_AltitudeUpSummarizedBorder(defaultListener);
+		defineColumn_AltitudeDownSummarizedBorder(defaultListener);
 
-		defineColumnSerieStartEndIndex();
+		defineColumn_SerieStartEndIndex();
 	}
 
 	/**
 	 * column: altitude diff segment border (m/ft)
 	 */
-	private void defineColumnAltitudeDiffSegmentBorder(final SelectionAdapter defaultColumnSelectionListener) {
+	private void defineColumn_AltitudeDiffSegmentBorder(final SelectionAdapter defaultColumnSelectionListener) {
 
 		final ColumnDefinition colDef;
 
@@ -1924,8 +1943,8 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 				if (altitudeDiff == 0) {
 					cell.setText(UI.EMPTY_STRING);
 				} else {
-					cell.setText(_nf_0_0.format(altitudeDiff / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE));
-					setCellColor(cell, (int) altitudeDiff);
+					cell.setText(_nf_1_1.format(altitudeDiff / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE));
+					setCellColor(cell, altitudeDiff);
 				}
 			}
 		});
@@ -1934,7 +1953,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	/**
 	 * column: computed altitude diff (m/ft)
 	 */
-	private void defineColumnAltitudeDiffSegmentComputed(final SelectionAdapter defaultColumnSelectionListener) {
+	private void defineColumn_AltitudeDiffSegmentComputed(final SelectionAdapter defaultColumnSelectionListener) {
 
 		final ColumnDefinition colDef;
 
@@ -1951,8 +1970,8 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 				if (altitudeDiff == 0) {
 					cell.setText(UI.EMPTY_STRING);
 				} else {
-					cell.setText(_nf_0_0.format(altitudeDiff / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE));
-					setCellColor(cell, (int) altitudeDiff);
+					cell.setText(_nf_1_1.format(altitudeDiff / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE));
+					setCellColor(cell, altitudeDiff);
 				}
 			}
 		});
@@ -1961,7 +1980,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	/**
 	 * column: altitude down m/h
 	 */
-	private void defineColumnAltitudeDownHour(final SelectionAdapter defaultColumnSelectionListener) {
+	private void defineColumn_AltitudeDownHour(final SelectionAdapter defaultColumnSelectionListener) {
 
 		final ColumnDefinition colDef;
 
@@ -1992,7 +2011,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	/**
 	 * column: total altitude down (m/ft)
 	 */
-	private void defineColumnAltitudeDownSummarizedBorder(final SelectionAdapter defaultColumnSelectionListener) {
+	private void defineColumn_AltitudeDownSummarizedBorder(final SelectionAdapter defaultColumnSelectionListener) {
 
 		final ColumnDefinition colDef;
 
@@ -2018,7 +2037,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	/**
 	 * column: total altitude down (m/ft)
 	 */
-	private void defineColumnAltitudeDownSummarizedComputed(final SelectionAdapter defaultColumnSelectionListener) {
+	private void defineColumn_AltitudeDownSummarizedComputed(final SelectionAdapter defaultColumnSelectionListener) {
 
 		final ColumnDefinition colDef;
 
@@ -2043,7 +2062,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	/**
 	 * column: altitude up m/h
 	 */
-	private void defineColumnAltitudeUpHour(final SelectionAdapter defaultColumnSelectionListener) {
+	private void defineColumn_AltitudeUpHour(final SelectionAdapter defaultColumnSelectionListener) {
 
 		final ColumnDefinition colDef;
 
@@ -2074,7 +2093,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	/**
 	 * column: total altitude up (m/ft)
 	 */
-	private void defineColumnAltitudeUpSummarizedBorder(final SelectionAdapter defaultColumnSelectionListener) {
+	private void defineColumn_AltitudeUpSummarizedBorder(final SelectionAdapter defaultColumnSelectionListener) {
 
 		final ColumnDefinition colDef;
 
@@ -2099,7 +2118,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	/**
 	 * column: total altitude up (m/ft)
 	 */
-	private void defineColumnAltitudeUpSummarizedComputed(final SelectionAdapter defaultColumnSelectionListener) {
+	private void defineColumn_AltitudeUpSummarizedComputed(final SelectionAdapter defaultColumnSelectionListener) {
 
 		final ColumnDefinition colDef;
 
@@ -2124,7 +2143,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	/**
 	 * column: average pace
 	 */
-	private void defineColumnAvgPace() {
+	private void defineColumn_AvgPace() {
 
 		final ColumnDefinition colDef;
 
@@ -2156,7 +2175,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	/**
 	 * column: pace difference
 	 */
-	private void defineColumnAvgPaceDifference() {
+	private void defineColumn_AvgPaceDifference() {
 
 		final ColumnDefinition colDef;
 
@@ -2180,7 +2199,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	/**
 	 * column: average pulse
 	 */
-	private void defineColumnAvgPulse() {
+	private void defineColumn_AvgPulse() {
 
 		final ColumnDefinition colDef;
 
@@ -2211,7 +2230,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	/**
 	 * column: pulse difference
 	 */
-	private void defineColumnAvgPulseDifference() {
+	private void defineColumn_AvgPulseDifference() {
 
 		final ColumnDefinition colDef;
 
@@ -2237,7 +2256,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	/**
 	 * column: average speed
 	 */
-	private void defineColumnAvgSpeed() {
+	private void defineColumn_AvgSpeed() {
 
 		final ColumnDefinition colDef;
 
@@ -2268,7 +2287,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	/**
 	 * column: distance (km/mile)
 	 */
-	private void defineColumnDistance(final SelectionAdapter defaultColumnSelectionListener) {
+	private void defineColumn_Distance(final SelectionAdapter defaultColumnSelectionListener) {
 
 		final ColumnDefinition colDef;
 
@@ -2293,7 +2312,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	/**
 	 * column: TOTAL distance (km/mile)
 	 */
-	private void defineColumnDistanceTotal(final SelectionAdapter defaultColumnSelectionListener) {
+	private void defineColumn_DistanceTotal(final SelectionAdapter defaultColumnSelectionListener) {
 
 		final ColumnDefinition colDef;
 
@@ -2318,7 +2337,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	/**
 	 * column: driving time
 	 */
-	private void defineColumnDrivingTime(final SelectionAdapter defaultColumnSelectionListener) {
+	private void defineColumn_DrivingTime(final SelectionAdapter defaultColumnSelectionListener) {
 
 		final ColumnDefinition colDef;
 
@@ -2342,7 +2361,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	/**
 	 * column: gradient
 	 */
-	private void defineColumnGradient() {
+	private void defineColumn_Gradient() {
 
 		final ColumnDefinition colDef;
 
@@ -2374,7 +2393,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	/**
 	 * column: break time
 	 */
-	private void defineColumnPausedTime(final SelectionAdapter defaultColumnSelectionListener) {
+	private void defineColumn_PausedTime(final SelectionAdapter defaultColumnSelectionListener) {
 
 		final ColumnDefinition colDef;
 
@@ -2398,7 +2417,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	/**
 	 * column: recording time
 	 */
-	private void defineColumnRecordingTime(final SelectionAdapter defaultColumnSelectionListener) {
+	private void defineColumn_RecordingTime(final SelectionAdapter defaultColumnSelectionListener) {
 
 		final ColumnDefinition colDef;
 
@@ -2417,7 +2436,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	/**
 	 * column: TOTAL recording time
 	 */
-	private void defineColumnRecordingTimeTotal(final SelectionAdapter defaultColumnSelectionListener) {
+	private void defineColumn_RecordingTimeTotal(final SelectionAdapter defaultColumnSelectionListener) {
 
 		final ColumnDefinition colDef;
 
@@ -2436,7 +2455,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	/**
 	 * column: data serie start/end index
 	 */
-	private void defineColumnSerieStartEndIndex() {
+	private void defineColumn_SerieStartEndIndex() {
 
 		final ColumnDefinition colDef;
 
@@ -2478,6 +2497,11 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	 * notify listeners to show/hide the segments
 	 */
 	private void fireSegmentLayerChanged() {
+
+		// ensure segments are created because they can be null when tour is saved an a new instance is displayed
+		if (_isShowSegmentsInChart && _tourData.segmentSerieIndex == null) {
+			createSegments(false);
+		}
 
 		// show/hide the segments in the chart
 		TourManager.fireEventWithCustomData(
@@ -2592,19 +2616,14 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		return scaleDistance;
 	}
 
-//	@SuppressWarnings("unchecked")
-//	@Override
-//	public Object getAdapter(final Class adapter) {
-//
-//		if (adapter == ColumnViewer.class) {
-//			return fSegmentViewer;
-//		}
-//
-//		return Platform.getAdapterManager().getAdapter(this, adapter);
-//	}
+	/**
+	 * DB tolerance is saved with factor 10.
+	 * 
+	 * @return Return tour tolerance divided by 10.
+	 */
+	private float getDPTolerance_FromTour() {
 
-	private int getDPTolerance() {
-		return (int) ((Math.pow(_scaleTolerance.getSelection(), 2.05)) / 50.0);
+		return (float) (_tourData.getDpTolerance() / 10.0);
 	}
 
 	private BreakTimeMethod getSelectedBreakMethod() {
@@ -2651,31 +2670,29 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 	private void onChangeBreakTime() {
 
-		createSegments();
+		createSegments(true);
 	}
 
 	private void onChangedDistance() {
 
 		updateUIDistance();
 
-		createSegments();
+		createSegments(true);
 	}
 
-	private void onChangedTolerance(final int dpTolerance/* , final boolean forceRecalc */) {
+	private void onChangedTolerance() {
 
-		// update label in the ui
-		_lblToleranceValue.setText(Integer.toString(dpTolerance));
+		final float dpTolerance = (float) (_spinnerDPTolerance.getSelection() / 10.0);
 
-		if (_tourData == null || (_dpTolerance == dpTolerance /* && forceRecalc == false */)) {
+		if (_tourData == null || (_dpTolerance == dpTolerance)) {
 			return;
 		}
 
 		_dpTolerance = dpTolerance;
 
-		// update tolerance into the tour data
-		_tourData.setDpTolerance((short) dpTolerance);
+		setTourDirty();
 
-		createSegments();
+		createSegments(true);
 	}
 
 	private void onSaveTourAltitude() {
@@ -2683,9 +2700,16 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		_tourData.setTourAltUp(_altitudeUp);
 		_tourData.setTourAltDown(_altitudeDown);
 
+		// update tolerance into the tour data
+		_tourData.setDpTolerance((short) (_dpTolerance * 10));
+
 		_isTourDirty = true;
 
 		_tourData = saveTour();
+
+		// create segments with newly saved tour that it can be displayed in the tour chart
+		createSegments(false);
+		updateUIAltitude();
 	}
 
 	private void onSelectBreakTimeMethod() {
@@ -2745,15 +2769,15 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 					return;
 				}
 
-				TourData nextTourData = null;
-				TourChart nextTourChart = null;
+				TourData eventTourData = null;
+				TourChart eventTourChart = null;
 
 				if (selection instanceof SelectionTourData) {
 
 					final SelectionTourData selectionTourData = (SelectionTourData) selection;
 
-					nextTourData = selectionTourData.getTourData();
-					nextTourChart = selectionTourData.getTourChart();
+					eventTourData = selectionTourData.getTourData();
+					eventTourChart = selectionTourData.getTourChart();
 
 				} else if (selection instanceof SelectionTourId) {
 
@@ -2766,7 +2790,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 						}
 					}
 
-					nextTourData = TourManager.getInstance().getTourData(tourIdSelection.getTourId());
+					eventTourData = TourManager.getInstance().getTourData(tourIdSelection.getTourId());
 
 				} else if (selection instanceof SelectionTourIds) {
 
@@ -2782,7 +2806,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 							}
 						}
 
-						nextTourData = TourManager.getInstance().getTourData(tourId);
+						eventTourData = TourManager.getInstance().getTourData(tourId);
 					}
 
 				} else if (selection instanceof SelectionDeletedTours) {
@@ -2793,7 +2817,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 					return;
 				}
 
-				if (checkDataValidation(nextTourData) == false) {
+				if (checkDataValidation(eventTourData) == false) {
 					return;
 				}
 
@@ -2805,36 +2829,37 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 				/*
 				 * save previous tour when a new tour is selected
 				 */
-				if (_tourData != null && _tourData.getTourId() == nextTourData.getTourId()) {
+				if (_tourData != null && _tourData == eventTourData) {
 
 					// nothing to do, it's the same tour
 
 				} else {
 
-					final TourData savedTour = saveTour();
-					if (savedTour != null) {
-
-						/*
-						 * when a tour is saved, the change notification is not fired because
-						 * another tour is already selected, but to update the tour in a TourViewer,
-						 * a change nofification must be fired afterwords
-						 */
-//				Display.getCurrent().asyncExec(new Runnable() {
-//					public void run() {
-//						TourManager.fireEvent(TourEventId.TOUR_CHANGED,
-//								new TourEvent(savedTour),
-//								TourSegmenterView.this);
+// disabled, tour is only saved with the save button since v14.7
+//					final TourData savedTour = saveTour();
+//					if (savedTour != null) {
+//
+//						/*
+//						 * when a tour is saved, the change notification is not fired because
+//						 * another tour is already selected, but to update the tour in a TourViewer,
+//						 * a change nofification must be fired afterwords
+//						 */
+////				Display.getCurrent().asyncExec(new Runnable() {
+////					public void run() {
+////						TourManager.fireEvent(TourEventId.TOUR_CHANGED,
+////								new TourEvent(savedTour),
+////								TourSegmenterView.this);
+////					}
+////				});
 //					}
-//				});
+
+					if (eventTourChart == null) {
+						eventTourChart = getActiveTourChart(eventTourData);
 					}
 
-					if (nextTourChart == null) {
-						nextTourChart = getActiveTourChart(nextTourData);
-					}
+					_tourChart = eventTourChart;
 
-					_tourChart = nextTourChart;
-
-					setTour(nextTourData, false);
+					setTour(eventTourData, false);
 				}
 			}
 		});
@@ -2894,7 +2919,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 		_pageSegmenter.layout();
 
-		createSegments();
+		createSegments(true);
 	}
 
 	private void onSetDefaults(final Composite parent) {
@@ -2914,7 +2939,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		{
 			_segmentViewer.getTable().dispose();
 
-			createUI80SegmentViewer(_containerViewer);
+			createUI_80_SegmentViewer(_containerViewer);
 			_containerViewer.layout();
 
 			// update the viewer
@@ -2996,21 +3021,6 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		} catch (final NumberFormatException e) {}
 		_scaleDistance.setSelection(stateDistance);
 		updateUIDistance();
-
-		// selected min altitude
-		int minAltitudeIndex = PrefPageComputedValues.DEFAULT_MIN_ALTITUDE_INDEX;
-		try {
-			minAltitudeIndex = _state.getInt(STATE_SELECTED_MIN_ALTITUDE_INDEX);
-		} catch (final NumberFormatException e) {}
-		if (minAltitudeIndex < 0) {
-			minAltitudeIndex = PrefPageComputedValues.DEFAULT_MIN_ALTITUDE_INDEX;
-		}
-		if (_cboMinAltitude.getItemCount() == 0) {
-			updateUIMinAltitude();
-		}
-
-		_cboMinAltitude.select(minAltitudeIndex);
-		updateUIMinAltitude();
 
 		/*
 		 * break time
@@ -3172,7 +3182,6 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		_columnManager.saveState(_state);
 
 		_state.put(STATE_SELECTED_SEGMENTER_INDEX, _cboSegmenterType.getSelectionIndex());
-		_state.put(STATE_SELECTED_MIN_ALTITUDE_INDEX, _cboMinAltitude.getSelectionIndex());
 		_state.put(STATE_SELECTED_DISTANCE, _scaleDistance.getSelection());
 
 		saveBreakTimeValuesInState();
@@ -3222,7 +3231,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		_comboBreakMethod.select(selectionIndex);
 	}
 
-	private void setCellColor(final ViewerCell cell, final int altiDiff) {
+	private void setCellColor(final ViewerCell cell, final float altiDiff) {
 
 		if (altiDiff == 0) {
 			cell.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_LIST_BACKGROUND));
@@ -3235,7 +3244,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 	@Override
 	public void setFocus() {
-		_scaleTolerance.setFocus();
+
 	}
 
 	private void setMaxDistanceScale() {
@@ -3278,14 +3287,10 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 			_lblTitle.setText(TourManager.getTourTitleDetailed(_tourData));
 
 			// keep original dp tolerance
-			_savedDpTolerance = _dpTolerance = _tourData.getDpTolerance();
+			_savedDpTolerance = _dpTolerance = getDPTolerance_FromTour();
 
-			// update segmenter values, the factor is defined by experimentals
-			final double factor = 1 / 2.05;
-			final double tolerance = Math.pow(_dpTolerance * 50, factor);
-
-			_scaleTolerance.setSelection((int) tolerance);
-			_lblToleranceValue.setText(Integer.toString(_tourData.getDpTolerance()));
+			// segmenter value
+			_spinnerDPTolerance.setSelection((int) (getDPTolerance_FromTour() * 10));
 
 			_btnSaveTour.setEnabled(_tourData.getTourPerson() != null);
 		}
@@ -3304,7 +3309,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 			return;
 		}
 
-		if (_tourData != null && _savedDpTolerance != _tourData.getDpTolerance()) {
+		if (_tourData != null && _savedDpTolerance != getDPTolerance_FromTour()) {
 			_isTourDirty = true;
 		}
 	}
@@ -3430,23 +3435,6 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 			// update UI
 			_lblDistanceValue.setText(distanceText + UI.SPACE + net.tourbook.common.UI.UNIT_LABEL_DISTANCE);
 		}
-	}
-
-	private void updateUIMinAltitude() {
-
-		// preserve selection
-		int prevSelection = _cboMinAltitude.getSelectionIndex();
-		if (prevSelection < 0) {
-			prevSelection = PrefPageComputedValues.DEFAULT_MIN_ALTITUDE_INDEX;
-		}
-
-		_cboMinAltitude.removeAll();
-
-		for (final int minAlti : PrefPageComputedValues.ALTITUDE_MINIMUM) {
-			_cboMinAltitude.add(Integer.toString(Math.round(minAlti / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE)));
-		}
-
-		_cboMinAltitude.select(prevSelection);
 	}
 
 	private void updateUISegmenterSelector() {
