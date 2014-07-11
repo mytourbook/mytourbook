@@ -84,48 +84,53 @@ public class ChartSegmentValueLayer implements IChartLayer {
 		final double scaleY = drawingData.getScaleY();
 
 		final Color lineColor = new Color(display, lineColorRGB);
+		{
+			Point previousPoint = null;
 
-		Point lastPoint = null;
+			for (int segmentIndex = 0; segmentIndex < segmentSerie.length; segmentIndex++) {
 
-		for (int segmentIndex = 0; segmentIndex < segmentSerie.length; segmentIndex++) {
+				final int serieIndex = segmentSerie[segmentIndex];
+				final int devXOffset = (int) (_xDataSerie[serieIndex] * scaleX - devGraphImageXOffset);
 
-			final int serieIndex = segmentSerie[segmentIndex];
-			final int devXOffset = (int) (_xDataSerie[serieIndex] * scaleX - devGraphImageXOffset);
+				final float graphYValue = segmentValues[segmentIndex] * valueDivisor;
+				final int devYGraph = (int) (scaleY * (graphYValue - graphYBottom));
+				int devYMarker = devYBottom - devYGraph;
 
-			final float graphYValue = segmentValues[segmentIndex] * valueDivisor;
-			final int devYGraph = (int) (scaleY * (graphYValue - graphYBottom));
-			int devYMarker = devYBottom - devYGraph;
+				// don't draw over the graph borders
+				if (devYMarker > devYBottom) {
+					devYMarker = devYBottom;
+				}
+				if (devYMarker < devYTop) {
+					devYMarker = devYTop;
+				}
 
-			// don't draw over the graph borders
-			if (devYMarker > devYBottom) {
-				devYMarker = devYBottom;
-			}
-			if (devYMarker < devYTop) {
-				devYMarker = devYTop;
-			}
+				/*
+				 * Connect two segments with a line
+				 */
+				if (previousPoint == null) {
 
-			if (lastPoint == null) {
-				lastPoint = new Point(devXOffset, devYMarker);
-			} else {
+					previousPoint = new Point(devXOffset, devYMarker);
 
-				gc.setForeground(lineColor);
+				} else {
 
+					gc.setForeground(lineColor);
+
+					gc.setLineStyle(SWT.LINE_DOT);
+					gc.drawLine(previousPoint.x, previousPoint.y, previousPoint.x, devYMarker);
+
+					gc.setLineStyle(SWT.LINE_SOLID);
+					gc.drawLine(previousPoint.x, devYMarker, devXOffset, devYMarker);
+
+					previousPoint.x = devXOffset;
+					previousPoint.y = devYMarker;
+				}
+
+				// draw a line from the marker to the top of the graph
+				gc.setForeground(display.getSystemColor(SWT.COLOR_GRAY));
 				gc.setLineStyle(SWT.LINE_DOT);
-				gc.drawLine(lastPoint.x, lastPoint.y, lastPoint.x, devYMarker);
-
-				gc.setLineStyle(SWT.LINE_SOLID);
-				gc.drawLine(lastPoint.x, devYMarker, devXOffset, devYMarker);
-
-				lastPoint.x = devXOffset;
-				lastPoint.y = devYMarker;
+				gc.drawLine(devXOffset, devYMarker, devXOffset, devYTop);
 			}
-
-			// draw a line from the marker to the top of the graph
-			gc.setForeground(display.getSystemColor(SWT.COLOR_GRAY));
-			gc.setLineStyle(SWT.LINE_DOT);
-			gc.drawLine(devXOffset, devYMarker, devXOffset, devYTop);
 		}
-
 		lineColor.dispose();
 	}
 

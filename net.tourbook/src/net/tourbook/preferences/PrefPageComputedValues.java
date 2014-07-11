@@ -35,6 +35,7 @@ import net.tourbook.ui.views.SmoothingUI;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.osgi.util.NLS;
@@ -88,7 +89,8 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 	 */
 	public static final int				BREAK_MAX_SPEED_KM_H				= 1000;												// 100.0 km/h
 
-	private static final int			DEFAULT_DESCRIPTION_WIDTH			= 450;
+	private int							DEFAULT_DESCRIPTION_WIDTH;
+	private int							DEFAULT_V_DISTANCE_PARAGRAPH;
 
 	private IPreferenceStore			_prefStore							= TourbookPlugin.getPrefStore();
 
@@ -110,6 +112,8 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 	 * the maximum width and set the first column within the differenct section to the same width
 	 */
 	private final ArrayList<Control>	_firstColBreakTime					= new ArrayList<Control>();
+
+	private PixelConverter				_pc;
 
 	/*
 	 * UI controls
@@ -135,7 +139,7 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 	private Spinner						_spinnerBreakMinAvgSpeedAS;
 	private Spinner						_spinnerBreakMinSliceSpeedAS;
 	private Spinner						_spinnerBreakMinSliceTimeAS;
-	private Spinner						_spinnerMinAltitude;
+	private Spinner						_spinnerDPTolerance;
 
 	private ScrolledComposite			_smoothingScrolledContainer;
 	private Composite					_smoothingScrolledContent;
@@ -157,6 +161,7 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 	protected Control createContents(final Composite parent) {
 
 		initUI(parent);
+
 		final Composite container = createUI(parent);
 
 		restoreState();
@@ -185,7 +190,6 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 			_tabFolder = new TabFolder(container, SWT.TOP);
 			GridDataFactory.fillDefaults()//
 					.grab(true, true)
-//					.indent(40, 20)
 					.applyTo(_tabFolder);
 			{
 
@@ -261,52 +265,71 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-		GridLayoutFactory.swtDefaults().extendedMargins(5, 5, 10, 5).numColumns(3).applyTo(container);
+		GridLayoutFactory.swtDefaults().extendedMargins(5, 5, 10, 5).applyTo(container);
 //		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
 		{
-			// label: min alti diff
-			Label label = new Label(container, SWT.NONE);
-			label.setText(Messages.compute_tourValueElevation_label_minAltiDifference);
+			final Composite dpContainer = new Composite(container, SWT.NONE);
+			GridDataFactory.fillDefaults().grab(true, false).applyTo(dpContainer);
+			GridLayoutFactory.fillDefaults().numColumns(3).applyTo(dpContainer);
+			{
+				// label: min alti diff
+				Label label = new Label(dpContainer, SWT.NONE);
+				label.setText(Messages.Compute_TourValueElevation_Label_DPTolerance);
 
-			// spinner: minimum altitude
-			_spinnerMinAltitude = new Spinner(container, SWT.BORDER);
-			GridDataFactory.fillDefaults().applyTo(_spinnerMinAltitude);
-			_spinnerMinAltitude.setMinimum(1); // 0.1
-			_spinnerMinAltitude.setMaximum(10000); // 1000
-			_spinnerMinAltitude.setDigits(1);
-			_spinnerMinAltitude.addSelectionListener(_selectionListener);
-			_spinnerMinAltitude.addMouseWheelListener(_spinnerMouseWheelListener);
+				// spinner: minimum altitude
+				_spinnerDPTolerance = new Spinner(dpContainer, SWT.BORDER);
+				GridDataFactory.fillDefaults().applyTo(_spinnerDPTolerance);
+				_spinnerDPTolerance.setMinimum(1); // 0.1
+				_spinnerDPTolerance.setMaximum(10000); // 1000
+				_spinnerDPTolerance.setDigits(1);
+				_spinnerDPTolerance.addSelectionListener(_selectionListener);
+				_spinnerDPTolerance.addMouseWheelListener(_spinnerMouseWheelListener);
 
-			// label: unit
-			label = new Label(container, SWT.NONE);
-			label.setText(net.tourbook.common.UI.UNIT_LABEL_ALTITUDE);
+				// label: unit
+				label = new Label(dpContainer, SWT.NONE);
+				label.setText(net.tourbook.common.UI.UNIT_LABEL_ALTITUDE);
+			}
 
-			// label: description
-			label = new Label(container, SWT.WRAP);
-			GridDataFactory.fillDefaults()//
-					.span(3, 1)
-					.indent(0, 10)
-					.hint(DEFAULT_DESCRIPTION_WIDTH, SWT.DEFAULT)
-					.grab(true, false)
-					.applyTo(label);
-			label.setText(Messages.compute_tourValueElevation_label_description);
+			{
+				// label: description
+				Label label = new Label(container, SWT.WRAP);
+				GridDataFactory.fillDefaults()//
+						.indent(0, DEFAULT_V_DISTANCE_PARAGRAPH)
+						.hint(DEFAULT_DESCRIPTION_WIDTH, SWT.DEFAULT)
+						.grab(true, false)
+						.applyTo(label);
+				label.setText(Messages.Compute_TourValueElevation_Label_Description_v14_7);
 
-			FormTools.createBullets(container, //
-					Messages.compute_tourValueElevation_label_description_Hints,
-					1,
-					3,
-					DEFAULT_DESCRIPTION_WIDTH,
-					null);
+				// label: tip
+				final Composite tipContainer = new Composite(container, SWT.NONE);
+				GridDataFactory.fillDefaults()//
+						.indent(0, DEFAULT_V_DISTANCE_PARAGRAPH)
+						.grab(true, false)
+						.applyTo(tipContainer);
+				GridLayoutFactory.fillDefaults().margins(5, 5).applyTo(tipContainer);
+				tipContainer.setBackground(tipContainer.getDisplay().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
+				{
+					// label: description
+					label = new Label(tipContainer, SWT.WRAP);
+					GridDataFactory.fillDefaults()//
+							.hint(DEFAULT_DESCRIPTION_WIDTH, SWT.DEFAULT)
+							.grab(true, false)
+							.applyTo(label);
+					label.setText(Messages.compute_tourValueElevation_label_description_Hints);
+				}
+			}
 
 			final Composite btnContainer = new Composite(container, SWT.NONE);
-			GridDataFactory.fillDefaults().span(3, 1).applyTo(btnContainer);
+			GridDataFactory.fillDefaults().applyTo(btnContainer);
 			GridLayoutFactory.fillDefaults().applyTo(btnContainer);
 			{
 				// button: compute computed values
 				final Button btnComputValues = new Button(btnContainer, SWT.NONE);
-				GridDataFactory.fillDefaults().indent(0, 10).applyTo(btnComputValues);
+				GridDataFactory.fillDefaults()//
+						.indent(0, DEFAULT_V_DISTANCE_PARAGRAPH)
+						.applyTo(btnComputValues);
 				btnComputValues.setText(Messages.compute_tourValueElevation_button_computeValues);
-				btnComputValues.setToolTipText(Messages.compute_tourValueElevation_button_computeValues_tooltip);
+				btnComputValues.setToolTipText(Messages.Compute_TourValueElevation_Button_ComputeValues_Tooltip_v14_7);
 				btnComputValues.addSelectionListener(new SelectionAdapter() {
 					@Override
 					public void widgetSelected(final SelectionEvent e) {
@@ -378,7 +401,7 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 			label = new Label(container, SWT.WRAP);
 			GridDataFactory.fillDefaults()//
 					.span(2, 1)
-					.indent(0, 10)
+					.indent(0, DEFAULT_V_DISTANCE_PARAGRAPH)
 					.hint(DEFAULT_DESCRIPTION_WIDTH, SWT.DEFAULT)
 					.grab(true, false)
 					.applyTo(label);
@@ -403,7 +426,7 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 			{
 				// button: compute computed values
 				final Button btnComputValues = new Button(btnContainer, SWT.NONE);
-				GridDataFactory.fillDefaults().indent(0, 10).applyTo(btnComputValues);
+				GridDataFactory.fillDefaults().indent(0, DEFAULT_V_DISTANCE_PARAGRAPH).applyTo(btnComputValues);
 				btnComputValues.setText(Messages.Compute_BreakTime_Button_ComputeAllTours);
 				btnComputValues.setToolTipText(Messages.Compute_BreakTime_Button_ComputeAllTours_Tooltip);
 				btnComputValues.addSelectionListener(new SelectionAdapter() {
@@ -511,7 +534,7 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 			final Label label = new Label(container, SWT.WRAP);
 			GridDataFactory.fillDefaults()//
 					.span(3, 1)
-					.indent(0, 10)
+					.indent(0, DEFAULT_V_DISTANCE_PARAGRAPH)
 					.hint(DEFAULT_DESCRIPTION_WIDTH, SWT.DEFAULT)
 					.grab(true, false)
 					.applyTo(label);
@@ -557,7 +580,7 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 			label = new Label(container, SWT.WRAP);
 			GridDataFactory.fillDefaults()//
 					.span(3, 1)
-					.indent(0, 10)
+					.indent(0, DEFAULT_V_DISTANCE_PARAGRAPH)
 					.hint(DEFAULT_DESCRIPTION_WIDTH, SWT.DEFAULT)
 					.grab(true, false)
 					.applyTo(label);
@@ -603,7 +626,7 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 			label = new Label(container, SWT.WRAP);
 			GridDataFactory.fillDefaults()//
 					.span(3, 1)
-					.indent(0, 10)
+					.indent(0, DEFAULT_V_DISTANCE_PARAGRAPH)
 					.hint(DEFAULT_DESCRIPTION_WIDTH, SWT.DEFAULT)
 					.grab(true, false)
 					.applyTo(label);
@@ -699,7 +722,7 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 			final Label label = new Label(container, SWT.WRAP);
 			GridDataFactory.fillDefaults()//
 					.span(3, 1)
-					.indent(0, 10)
+					.indent(0, DEFAULT_V_DISTANCE_PARAGRAPH)
 					.hint(DEFAULT_DESCRIPTION_WIDTH, SWT.DEFAULT)
 					.grab(true, false)
 					.applyTo(label);
@@ -763,6 +786,11 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 	public void init(final IWorkbench workbench) {}
 
 	private void initUI(final Composite parent) {
+
+		_pc = new PixelConverter(parent);
+
+		DEFAULT_DESCRIPTION_WIDTH = _pc.convertWidthInCharsToPixels(80);
+		DEFAULT_V_DISTANCE_PARAGRAPH = _pc.convertVerticalDLUsToPixels(4);
 
 		_selectionListener = new SelectionAdapter() {
 			@Override
@@ -857,15 +885,13 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 
 	private void onComputeElevationGainValues() {
 
-		final float altiMin = (float) (_spinnerMinAltitude.getSelection() / 10.0);
+		final float dpToleranceValue = _spinnerDPTolerance.getSelection() / 10.0f;
+		final String dpTolerance = _nf1.format(dpToleranceValue / UI.UNIT_VALUE_ALTITUDE);
 
 		if (MessageDialog.openConfirm(
 				Display.getCurrent().getActiveShell(),
 				Messages.compute_tourValueElevation_dlg_computeValues_title,
-				NLS.bind(
-						Messages.compute_tourValueElevation_dlg_computeValues_message,
-						Integer.toString((int) (altiMin / UI.UNIT_VALUE_ALTITUDE)),
-						net.tourbook.common.UI.UNIT_LABEL_ALTITUDE)) == false) {
+				NLS.bind(Messages.Compute_TourValueElevation_Dlg_ComputeValues_Message_v14_7, dpTolerance)) == false) {
 			return;
 		}
 
@@ -885,14 +911,9 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 
 			public String getResultText() {
 
-				final int prefMinAltitude = TourbookPlugin.getDefault()//
-						.getPreferenceStore()
-						.getInt(PrefPageComputedValues.STATE_COMPUTED_VALUE_MIN_ALTITUDE);
-
-				return NLS.bind(Messages.compute_tourValueElevation_resultText, //
+				return NLS.bind(Messages.Compute_TourValueElevation_ResultText_v14_7, //
 						new Object[] {
-								prefMinAltitude,
-								net.tourbook.common.UI.UNIT_LABEL_ALTITUDE,
+								dpTolerance,
 								_nf0.format((elevation[1] - elevation[0]) / UI.UNIT_VALUE_ALTITUDE),
 								net.tourbook.common.UI.UNIT_LABEL_ALTITUDE //
 						});
@@ -904,7 +925,7 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 
 				if (savedTourData != null) {
 
-					// get new value
+					// summarize new values
 					elevation[1] += savedTourData.getTourAltUp();
 
 					subTaskText = NLS.bind(Messages.compute_tourValueElevation_subTaskText,//
@@ -945,7 +966,7 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 			/*
 			 * compute altitude
 			 */
-			_spinnerMinAltitude.setSelection(50); // 5.0
+			_spinnerDPTolerance.setSelection(50); // 5.0
 
 		} else if (_tabFolder.getSelectionIndex() == TAB_FOLDER_SMOOTHING) {
 
@@ -1032,7 +1053,7 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 			 */
 			final int prefMinAltitude = _prefStore.getInt(STATE_COMPUTED_VALUE_MIN_ALTITUDE);
 
-			_spinnerMinAltitude.setSelection(prefMinAltitude);
+			_spinnerDPTolerance.setSelection(prefMinAltitude);
 
 			/*
 			 * break method
@@ -1088,7 +1109,7 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 	 */
 	private void saveState() {
 
-		_prefStore.setValue(STATE_COMPUTED_VALUE_MIN_ALTITUDE, _spinnerMinAltitude.getSelection());
+		_prefStore.setValue(STATE_COMPUTED_VALUE_MIN_ALTITUDE, _spinnerDPTolerance.getSelection());
 
 		/*
 		 * break time method

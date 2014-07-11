@@ -30,6 +30,7 @@ import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
+import org.eclipse.swt.graphics.LineAttributes;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
@@ -80,7 +81,7 @@ public class ChartSegmentAltitudeLayer implements IChartLayer {
 		final int devYTop = drawingData.getDevYTop();
 		final int devYBottom = drawingData.getDevYBottom();
 		final long devGraphImageOffset = chart.getXXDevViewPortLeftBorder();
-		final int devGraphHeight = drawingData.devGraphHeight;
+//		final int devGraphHeight = drawingData.devGraphHeight;
 
 		final float graphYBottom = drawingData.getGraphYBottom();
 		final float[] yValues = drawingData.getYData().getHighValuesFloat()[0];
@@ -89,6 +90,13 @@ public class ChartSegmentAltitudeLayer implements IChartLayer {
 
 		Rectangle prevUpTextRect = null;
 		Rectangle prevDownTextRect = null;
+
+		final LineAttributes defaultLineAttributes = gc.getLineAttributes();
+		final LineAttributes vertLineLA = new LineAttributes(5);
+		vertLineLA.dashOffset = 3;
+		vertLineLA.style = SWT.LINE_CUSTOM;
+		vertLineLA.dash = new float[] { 1f, 4f };
+		vertLineLA.width = 1f;
 
 		final Color colorLine = new Color(display, _lineColor);
 		{
@@ -118,7 +126,6 @@ public class ChartSegmentAltitudeLayer implements IChartLayer {
 
 				float altiDiff = 0;
 				if (segmentIndex > 0) {
-
 					if (segmentSerieComputedAltitudeDiff != null) {
 						altiDiff = segmentSerieComputedAltitudeDiff[segmentIndex];
 					} else {
@@ -144,8 +151,8 @@ public class ChartSegmentAltitudeLayer implements IChartLayer {
 
 				} else {
 
+					gc.setLineAttributes(defaultLineAttributes);
 					gc.setForeground(altiDiffColor);
-					gc.setLineStyle(SWT.LINE_SOLID);
 					gc.drawLine(//
 							previousPoint.x,
 							previousPoint.y,
@@ -158,21 +165,20 @@ public class ChartSegmentAltitudeLayer implements IChartLayer {
 				 */
 				int devYLine;
 				if (isAltitudeUp) {
-					devYLine = (int) (devYSegment - 1.5 * textHeight);
+					devYLine = devYSegment - 2 * textHeight;
 					if (devYLine < devYTop) {
 						devYLine = devYTop;
 					}
 				} else {
-					devYLine = (int) (devYSegment + 1.5 * textHeight);
+					devYLine = devYSegment + 2 * textHeight;
 					if (devYLine > devYBottom) {
 						devYLine = devYBottom - textHeight;
 					}
 				}
 				// don't draw over the graph borders
 
-//				gc.setForeground(display.getSystemColor(SWT.COLOR_GRAY));
 				gc.setForeground(altiDiffColor);
-				gc.setLineStyle(SWT.LINE_DOT);
+				gc.setLineAttributes(vertLineLA);
 				gc.drawLine(//
 						devXOffset,
 						devYSegment,

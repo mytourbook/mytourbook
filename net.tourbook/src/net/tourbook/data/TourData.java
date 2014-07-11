@@ -1600,21 +1600,21 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	 */
 	public boolean computeAltitudeUpDown() {
 
-		final float prefMinAltitude = _prefStore.getInt(PrefPageComputedValues.STATE_COMPUTED_VALUE_MIN_ALTITUDE);
+		final float prefDPTolerance = _prefStore.getInt(PrefPageComputedValues.STATE_COMPUTED_VALUE_MIN_ALTITUDE);
 
 		AltitudeUpDown altiUpDown;
 		if (distanceSerie != null) {
 
 			// DP needs distance
 
-			altiUpDown = computeAltitudeUpDown_20_Algorithm_DP(prefMinAltitude / 10.0f);
+			altiUpDown = computeAltitudeUpDown_20_Algorithm_DP(prefDPTolerance / 10.0f);
 
 			// keep this value to see in the UI (toursegmenter) the correct value
-			dpTolerance = (short) prefMinAltitude;
+			dpTolerance = (short) prefDPTolerance;
 
 		} else {
 
-			altiUpDown = computeAltitudeUpDown_30_Algorithm_9_08(null, prefMinAltitude);
+			altiUpDown = computeAltitudeUpDown_30_Algorithm_9_08(null, prefDPTolerance);
 		}
 
 		if (altiUpDown == null) {
@@ -2278,6 +2278,17 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		hrZone7 = zoneSize > 7 ? hrZones[7] : -1;
 		hrZone8 = zoneSize > 8 ? hrZones[8] : -1;
 		hrZone9 = zoneSize > 9 ? hrZones[9] : -1;
+
+		_hrZones = new int[] { hrZone0, //
+				hrZone1,
+				hrZone2,
+				hrZone3,
+				hrZone4,
+				hrZone5,
+				hrZone6,
+				hrZone7,
+				hrZone8,
+				hrZone9 };
 	}
 
 	private void computeMaxAltitude() {
@@ -4574,20 +4585,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	public int[] getHrZones() {
 
 		if (_hrZones == null) {
-
 			computeHrZones();
-
-			_hrZones = new int[] {
-					hrZone0,
-					hrZone1,
-					hrZone2,
-					hrZone3,
-					hrZone4,
-					hrZone5,
-					hrZone6,
-					hrZone7,
-					hrZone8,
-					hrZone9 };
 		}
 
 		return _hrZones;

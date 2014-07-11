@@ -398,6 +398,12 @@ public class Messages extends NLS {
 	public static String		Compute_Smoothing_Button_ForAllTours;
 	public static String		Compute_Smoothing_Button_ForAllTours_Tooltip;
 
+	public static String		Compute_TourValueElevation_Button_ComputeValues_Tooltip_v14_7;
+	public static String		Compute_TourValueElevation_Dlg_ComputeValues_Message_v14_7;
+	public static String		Compute_TourValueElevation_Label_Description_v14_7;
+	public static String		Compute_TourValueElevation_Label_DPTolerance;
+	public static String		Compute_TourValueElevation_ResultText_v14_7;
+
 	public static String		Compute_TourValueSpeed_Title;
 
 	public static String		Compute_Values_Group_Smoothing;
@@ -1326,6 +1332,7 @@ public class Messages extends NLS {
 	public static String		Tour_Marker_Position_Vertical_MarkerPoint_Above;
 	public static String		Tour_Marker_Position_Vertical_MarkerPoint_Below;
 
+	public static String		Tour_Segmenter_Label_AltitudeUpDown_Tooltip;
 	public static String		Tour_Segmenter_Label_default_tolerance;
 	public static String		Tour_Segmenter_Label_no_chart;
 	public static String		Tour_Segmenter_Label_tolerance;

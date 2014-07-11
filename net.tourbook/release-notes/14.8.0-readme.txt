@@ -1,6 +1,15 @@
 Version: 14.?.0                                           ?. ? 2014
 
-!!! VERY IMPORTANT: DB BACKUP BECAUSE OF STRUCTURAL CHANGES, e.g. dropped unused tables, foreign key
+TODO:
+
+* !!! VERY IMPORTANT: DB BACKUP BECAUSE OF STRUCTURAL CHANGES, e.g. dropped unused tables, foreign key
+
+* Workflow how altitude up/down is computed
+  - Pref page: computed values
+  - Tour segmenter: adjust DP tolerance
+  - Dialog: adjust altitude
+
+
 
 ////////////////////////////////////////////////////////////////
 
@@ -14,6 +23,7 @@ App menu is reorganized, it is possible that the short cuts needs to be adjusted
 A few names has been changed, the old names are deleted so you find them as not translated text, e.g. Tour Catalog -> Reference Tours
 
 ////////////////////////////////////////////////////////////////
+
 
 
 

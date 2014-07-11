@@ -502,6 +502,8 @@ public class TourDatabase {
 				final ArrayList<Long> tourList = getAllTourIds();
 				tourListSize[0] = tourList.size();
 
+				long lastUIUpdateTime = 0;
+
 				monitor.beginTask(Messages.tour_database_computeComputeValues_mainTask, tourList.size());
 
 				// loop over all tours and compute values
@@ -520,22 +522,34 @@ public class TourDatabase {
 						}
 					}
 
-					// create sub task text
-					final StringBuilder sb = new StringBuilder();
-					sb.append(NLS.bind(Messages.tour_database_computeComputeValues_subTask,//
-							new Object[] { tourCounter[0]++, tourListSize[0], }));
+					tourCounter[0]++;
 
-					sb.append(UI.DASH_WITH_DOUBLE_SPACE);
-					sb.append(tourCounter[0] * 100 / tourListSize[0]);
-					sb.append(UI.SYMBOL_PERCENTAGE);
-
+					/*
+					 * This must be called in every iteration because it can compute values !!!
+					 */
 					final String runnerSubTaskText = runner.getSubTaskText(savedTourData);
-					if (runnerSubTaskText != null) {
-						sb.append(UI.DASH_WITH_DOUBLE_SPACE);
-						sb.append(runnerSubTaskText);
-					}
 
-					monitor.subTask(sb.toString());
+					final long currentTime = System.currentTimeMillis();
+					if (currentTime > lastUIUpdateTime + 200) {
+
+						lastUIUpdateTime = currentTime;
+
+						// create sub task text
+						final StringBuilder sb = new StringBuilder();
+						sb.append(NLS.bind(Messages.tour_database_computeComputeValues_subTask,//
+								new Object[] { tourCounter[0], tourListSize[0], }));
+
+						sb.append(UI.DASH_WITH_DOUBLE_SPACE);
+						sb.append(tourCounter[0] * 100 / tourListSize[0]);
+						sb.append(UI.SYMBOL_PERCENTAGE);
+
+						if (runnerSubTaskText != null) {
+							sb.append(UI.DASH_WITH_DOUBLE_SPACE);
+							sb.append(runnerSubTaskText);
+						}
+
+						monitor.subTask(sb.toString());
+					}
 					monitor.worked(1);
 
 					// check if canceled
