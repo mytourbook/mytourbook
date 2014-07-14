@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -202,8 +202,8 @@ public class Util {
 
 		String format = Messages.Format_number_float;
 
-		format += (removeDecimalZero && (divValue % 1 == 0)) ? //
-				FORMAT_0F
+		format += (removeDecimalZero && (divValue % 1 == 0)) //
+				? FORMAT_0F
 				: Integer.toString(precision) + 'f';
 
 		return String.format(format, divValue).toString();
@@ -280,8 +280,6 @@ public class Util {
 	public static String formatValue(final int value, final int unitType) {
 		return formatValue(value, unitType, 1, false);
 	}
-
-
 
 	/**
 	 * Round floating value by removing the trailing part, which causes problem when creating units.

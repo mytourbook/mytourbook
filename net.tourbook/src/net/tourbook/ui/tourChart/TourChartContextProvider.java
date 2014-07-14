@@ -204,7 +204,8 @@ public class TourChartContextProvider implements IChartContextProvider, ITourPro
 		menuMgr.add(_actionPrefDialog);
 
 		// set slider position in export action
-		_actionExportTour.setTourRange(tourChart.getLeftSlider().getValuesIndex(), //
+		_actionExportTour.setTourRange(//
+				tourChart.getLeftSlider().getValuesIndex(),
 				tourChart.getRightSlider().getValuesIndex());
 
 		/////////////////////////////////////////////////////////////////////////////

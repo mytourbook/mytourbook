@@ -95,7 +95,7 @@ public abstract class TableColumnFactory {
 		public ColumnDefinition createColumn(final ColumnManager columnManager, final PixelConverter pixelConverter) {
 			
 			final ColumnDefinition colDef = new TableColumnDefinition(columnManager, "altitudeDown", SWT.TRAIL); //$NON-NLS-1$
-			final String unitLabel = UI.SYMBOL_SUM_WITH_SPACE + "\\ " + UI.UNIT_LABEL_ALTITUDE; //$NON-NLS-1$
+			final String unitLabel = UI.SYMBOL_SUM_WITH_SPACE + UI.UNIT_LABEL_ALTITUDE + UI.SPACE + UI.SYMBOL_ARROW_DOWN;
 		
 			colDef.setColumnLabel(Messages.ColumnFactory_altitude_down_label);
 			colDef.setColumnHeaderText(unitLabel);
@@ -112,7 +112,7 @@ public abstract class TableColumnFactory {
 		@Override
 		public ColumnDefinition createColumn(final ColumnManager columnManager, final PixelConverter pixelConverter) {
 
-			final String unitLabel = UI.SYMBOL_SUM_WITH_SPACE + "\\ " + UI.UNIT_LABEL_ALTITUDE + UI.SYMBOL_DOUBLE_HORIZONTAL; //$NON-NLS-1$
+			final String unitLabel = UI.SYMBOL_SUM_WITH_SPACE +  UI.UNIT_LABEL_ALTITUDE + UI.SYMBOL_DOUBLE_HORIZONTAL + UI.SPACE + UI.SYMBOL_ARROW_DOWN;
 			
 			final ColumnDefinition colDef = new TableColumnDefinition(columnManager, "altitudeDownSummarizedComputed", SWT.TRAIL); //$NON-NLS-1$
 			
@@ -132,7 +132,7 @@ public abstract class TableColumnFactory {
 		public ColumnDefinition createColumn(final ColumnManager columnManager, final PixelConverter pixelConverter) {
 
 			final ColumnDefinition colDef = new TableColumnDefinition(columnManager, "altitudeDownH", SWT.TRAIL); //$NON-NLS-1$
-			final String unitLabel = "\\ " + UI.UNIT_LABEL_ALTITUDE + Messages.ColumnFactory_hour; //$NON-NLS-1$
+			final String unitLabel = UI.UNIT_LABEL_ALTITUDE + Messages.ColumnFactory_hour + UI.SPACE + UI.SYMBOL_ARROW_DOWN;
 		
 			colDef.setColumnLabel(Messages.ColumnFactory_altitude_down_h_label);
 			colDef.setColumnHeaderText(unitLabel);
@@ -150,7 +150,7 @@ public abstract class TableColumnFactory {
 		public ColumnDefinition createColumn(final ColumnManager columnManager, final PixelConverter pixelConverter) {
 			
 			final ColumnDefinition colDef = new TableColumnDefinition(columnManager, "altitudeUp", SWT.TRAIL); //$NON-NLS-1$
-			final String unitLabel = UI.SYMBOL_SUM_WITH_SPACE + "/ " + UI.UNIT_LABEL_ALTITUDE;//$NON-NLS-1$
+			final String unitLabel = UI.SYMBOL_SUM_WITH_SPACE + UI.UNIT_LABEL_ALTITUDE + UI.SPACE + UI.SYMBOL_ARROW_UP;
 		
 			colDef.setColumnLabel(Messages.ColumnFactory_altitude_up_label);
 			colDef.setColumnHeaderText(unitLabel);
@@ -167,7 +167,7 @@ public abstract class TableColumnFactory {
 		@Override
 		public ColumnDefinition createColumn(final ColumnManager columnManager, final PixelConverter pixelConverter) {
 			
-			final String unitLabel = UI.SYMBOL_SUM_WITH_SPACE + "/ " + UI.UNIT_LABEL_ALTITUDE + UI.SYMBOL_DOUBLE_HORIZONTAL;//$NON-NLS-1$
+			final String unitLabel = UI.SYMBOL_SUM_WITH_SPACE + UI.UNIT_LABEL_ALTITUDE + UI.SYMBOL_DOUBLE_HORIZONTAL + UI.SPACE + UI.SYMBOL_ARROW_UP;
 
 			final ColumnDefinition colDef = new TableColumnDefinition(columnManager, "altitudeUpSummarizedComputed", SWT.TRAIL); //$NON-NLS-1$
 			
@@ -187,7 +187,7 @@ public abstract class TableColumnFactory {
 		public ColumnDefinition createColumn(final ColumnManager columnManager, final PixelConverter pixelConverter) {
 			
 			final ColumnDefinition colDef = new TableColumnDefinition(columnManager, "altitudeUpH", SWT.TRAIL); //$NON-NLS-1$
-			final String unitLabel = "/ " + UI.UNIT_LABEL_ALTITUDE + Messages.ColumnFactory_hour; //$NON-NLS-1$
+			final String unitLabel = UI.UNIT_LABEL_ALTITUDE + Messages.ColumnFactory_hour + UI.SPACE + UI.SYMBOL_ARROW_UP;
 		
 			colDef.setColumnLabel(Messages.ColumnFactory_altitude_up_h_label);
 			colDef.setColumnHeaderText(unitLabel);

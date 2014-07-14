@@ -860,147 +860,6 @@ public class ChartComponentGraph extends Canvas {
 	}
 
 	/**
-	 * Get the x-axis value according to the slider position in the UI
-	 * 
-	 * @param slider
-	 * @param devXSliderLinePosition
-	 */
-	void computeXSliderValue(final ChartXSlider slider, final long devXSliderLinePosition) {
-
-		final ChartDataXSerie xData = getXData();
-
-		if (xData == null) {
-			return;
-		}
-
-		final double[][] xValueSerie = xData.getHighValuesDouble();
-
-		if (xValueSerie.length == 0) {
-			// data are not available
-			return;
-		}
-
-		final double[] xDataValues = xValueSerie[0];
-
-		if (_hoveredValuePointIndex == -1 || _hoveredValuePointIndex >= xDataValues.length) {
-
-			// this should not happen but it dit
-			return;
-		}
-
-		slider.setValuesIndex(_hoveredValuePointIndex);
-		slider.setValueX(xDataValues[_hoveredValuePointIndex]);
-	}
-
-	/**
-	 * Get the x-axis value according to the slider position in the UI
-	 * 
-	 * @param slider
-	 * @param devXSliderLinePosition
-	 */
-	void computeXSliderValueOLD(final ChartXSlider slider, final int devXSliderLinePosition) {
-
-		final ChartDataXSerie xData = getXData();
-
-		if (xData == null) {
-			return;
-		}
-
-		final double[][] xValueSerie = xData.getHighValuesDouble();
-
-		if (xValueSerie.length == 0) {
-			// data are not available
-			return;
-		}
-
-		final double[] xDataValues = xValueSerie[0];
-		final int serieLength = xDataValues.length;
-		final int maxIndex = Math.max(0, serieLength - 1);
-
-		/*
-		 * The non time value (distance) is not linear, the value is increasing steadily but with
-		 * different distance on the x axis. So first we have to find the nearest position in the
-		 * values array and then interpolite from the found position to the slider position
-		 */
-
-		final double minValue = xData.getOriginalMinValue();
-		final double maxValue = xData.getOriginalMaxValue();
-		final double valueRange = maxValue > 0 ? (maxValue - minValue) : -(minValue - maxValue);
-
-		final double positionRatio = (double) devXSliderLinePosition / _xxDevGraphWidth;
-		int valueIndex = (int) (positionRatio * serieLength);
-
-		// check array bounds
-		valueIndex = Math.min(valueIndex, maxIndex);
-		valueIndex = Math.max(valueIndex, 0);
-
-		// sliderIndex points into the value array for the current slider position
-		double xDataValue = xDataValues[valueIndex];
-
-		// compute the value for the slider on the x-axis
-		final double sliderValue = positionRatio * valueRange;
-
-		if (xDataValue == sliderValue) {
-
-			// nothing to do
-
-		} else if (sliderValue > xDataValue) {
-
-			/*
-			 * in the value array move towards the end to find the position where the value of the
-			 * slider corresponds with the value in the value array
-			 */
-
-			while (sliderValue > xDataValue) {
-
-				xDataValue = xDataValues[valueIndex++];
-
-				// check if end of the x-data are reached
-				if (valueIndex == serieLength) {
-					break;
-				}
-			}
-			valueIndex--;
-			xDataValue = xDataValues[valueIndex];
-
-		} else {
-
-			/*
-			 * xDataValue > sliderValue
-			 */
-
-			while (sliderValue < xDataValue) {
-
-				// check if beginning of the x-data are reached
-				if (valueIndex == 0) {
-					break;
-				}
-
-				xDataValue = xDataValues[--valueIndex];
-			}
-		}
-
-		/*
-		 * This is a bit of a hack because at some positions the value is too small. Solving the
-		 * problem in the algorithm would take more time than using this hack.
-		 */
-		if (xDataValue < sliderValue) {
-			valueIndex++;
-		}
-
-		// check array bounds
-		valueIndex = Math.min(valueIndex, maxIndex);
-		xDataValue = xDataValues[valueIndex];
-
-		// !!! debug values !!!
-//		xValue = valueIndex * 1000;
-//		xValue = (int) (slider.getPositionRatio() * 1000000000);
-
-		slider.setValuesIndex(valueIndex);
-		slider.setValueX(xDataValue);
-	}
-
-	/**
 	 * create the context menu
 	 */
 	private void createContextMenu() {
@@ -1207,6 +1066,8 @@ public class ChartComponentGraph extends Canvas {
 				}
 			}
 
+// show also value index for debugging
+//			label.text = labelText.toString() + " " + xSlider.getValuesIndex();
 			label.text = labelText.toString();
 
 			label.height = labelExtend.y - 5;
@@ -5169,8 +5030,7 @@ public class ChartComponentGraph extends Canvas {
 		final ChartXSlider leftSlider = getLeftSlider();
 		final long xxDevLeftPosition = _xxDevViewPortLeftBorder + _devXMouseDown;
 
-		computeXSliderValue(leftSlider, xxDevLeftPosition);
-
+		setXSliderValue(leftSlider);
 		leftSlider.moveToXXDevPosition(xxDevLeftPosition, true, true);
 
 		setZoomInPosition();
@@ -5187,8 +5047,7 @@ public class ChartComponentGraph extends Canvas {
 		final ChartXSlider rightSlider = getRightSlider();
 		final long xxDevRightPosition = _xxDevViewPortLeftBorder + _devXMouseDown;
 
-		computeXSliderValue(rightSlider, xxDevRightPosition);
-
+		setXSliderValue(rightSlider);
 		rightSlider.moveToXXDevPosition(xxDevRightPosition, true, true);
 
 		setZoomInPosition();
@@ -5219,7 +5078,7 @@ public class ChartComponentGraph extends Canvas {
 		 */
 		final long xxDevLeftPosition = _xxDevViewPortLeftBorder + 2;
 
-		computeXSliderValue(leftSlider, xxDevLeftPosition);
+		setXSliderValue(leftSlider);
 		leftSlider.moveToXXDevPosition(xxDevLeftPosition, true, true);
 
 		/*
@@ -5227,7 +5086,7 @@ public class ChartComponentGraph extends Canvas {
 		 */
 		final long xxDevRightPosition = _xxDevViewPortLeftBorder + getDevVisibleChartWidth() - 2;
 
-		computeXSliderValue(rightSlider, xxDevRightPosition);
+		setXSliderValue(rightSlider);
 		rightSlider.moveToXXDevPosition(xxDevRightPosition, true, true);
 
 		_isSliderDirty = true;
@@ -5252,7 +5111,7 @@ public class ChartComponentGraph extends Canvas {
 		 */
 		xxDevSliderLinePos = Math.min(_xxDevGraphWidth, Math.max(0, xxDevSliderLinePos));
 
-		computeXSliderValue(xSlider, xxDevSliderLinePos);
+		setXSliderValue(xSlider);
 
 		// set new slider line position
 		xSlider.moveToXXDevPosition(xxDevSliderLinePos, true, true);
@@ -6464,6 +6323,9 @@ public class ChartComponentGraph extends Canvas {
 		 */
 		leftSlider.reset();
 		rightSlider.reset();
+
+//		_isSliderDirty = true;
+//		redraw();
 	}
 
 	/**
@@ -6998,6 +6860,146 @@ public class ChartComponentGraph extends Canvas {
 	}
 
 	/**
+	 * Set the value index in the X-slider for the hovered position.
+	 * 
+	 * @param xSlider
+	 */
+	void setXSliderValue(final ChartXSlider xSlider) {
+
+		final ChartDataXSerie xData = getXData();
+
+		if (xData == null) {
+			return;
+		}
+
+		final double[][] xValueSerie = xData.getHighValuesDouble();
+
+		if (xValueSerie.length == 0) {
+			// data are not available
+			return;
+		}
+
+		final double[] xDataValues = xValueSerie[0];
+
+		if (_hoveredValuePointIndex == -1 || _hoveredValuePointIndex >= xDataValues.length) {
+
+			// this happens when a new tour is displayed
+
+			return;
+		}
+
+		xSlider.setValueIndex(_hoveredValuePointIndex);
+	}
+
+	/**
+	 * Set the value index in the X-slider for the current slider position ratio.
+	 * <p>
+	 * The distance values (and time values with breaks) are not linear, the value is increasing
+	 * steadily but with different distance on the x axis. So first we have to find the nearest
+	 * position in the values array and then interpolite from the found position to the slider
+	 * position.
+	 * 
+	 * @param xSlider
+	 */
+	void setXSliderValue_FromRatio(final ChartXSlider xSlider) {
+
+		final ChartDataXSerie xData = getXData();
+
+		if (xData == null) {
+			return;
+		}
+
+		final double[][] xValueSerie = xData.getHighValuesDouble();
+
+		if (xValueSerie.length == 0) {
+			// data are not available
+			return;
+		}
+
+		final double[] xDataValues = xValueSerie[0];
+		final int serieLength = xDataValues.length;
+		final int maxIndex = Math.max(0, serieLength - 1);
+
+		/*
+		 */
+
+		final double minValue = xData.getOriginalMinValue();
+		final double maxValue = xData.getOriginalMaxValue();
+		final double valueRange = maxValue > 0 ? (maxValue - minValue) : -(minValue - maxValue);
+
+		final double posRatio = xSlider.getPositionRatio();
+		int valueIndex = (int) (posRatio * serieLength);
+
+		// check array bounds
+		valueIndex = Math.min(valueIndex, maxIndex);
+		valueIndex = Math.max(valueIndex, 0);
+
+		// sliderIndex points into the value array for the current slider position
+		double xDataValue = xDataValues[valueIndex];
+
+		// compute the value for the slider on the x-axis
+		final double sliderValue = posRatio * valueRange;
+
+		if (xDataValue == sliderValue) {
+
+			// nothing to do
+
+		} else if (sliderValue > xDataValue) {
+
+			/*
+			 * in the value array move towards the end to find the position where the value of the
+			 * slider corresponds with the value in the value array
+			 */
+
+			while (sliderValue > xDataValue) {
+
+				xDataValue = xDataValues[valueIndex++];
+
+				// check if end of the x-data are reached
+				if (valueIndex == serieLength) {
+					break;
+				}
+			}
+			valueIndex--;
+			xDataValue = xDataValues[valueIndex];
+
+		} else {
+
+			/*
+			 * xDataValue > sliderValue
+			 */
+
+			while (sliderValue < xDataValue) {
+
+				// check if beginning of the x-data are reached
+				if (valueIndex == 0) {
+					break;
+				}
+
+				xDataValue = xDataValues[--valueIndex];
+			}
+		}
+
+		/*
+		 * This is a bit of a hack because at some positions the value is too small. Solving the
+		 * problem in the algorithm would take more time than using this hack.
+		 */
+		if (xDataValue < sliderValue) {
+			valueIndex++;
+		}
+
+		// check array bounds
+		valueIndex = Math.min(valueIndex, maxIndex);
+		xDataValue = xDataValues[valueIndex];
+
+		// !!! debug values !!!
+//		xValue = valueIndex * 1000;
+//		xValue = (int) (slider.getPositionRatio() * 1000000000);
+
+		xSlider.setValueIndex(valueIndex);
+	}
+
+	/**
 	 * Set value index for a slider and move the slider to this position, the slider will be made
 	 * visible.
 	 * 
@@ -7015,21 +7017,21 @@ public class ChartComponentGraph extends Canvas {
 		}
 
 		final double[] xValues = xData.getHighValuesDouble()[0];
+		final int xValueLastIndex = xValues.length - 1;
 
 		// adjust the slider index to the array bounds
 		valueIndex = valueIndex < 0 ? //
 				0
-				: valueIndex > (xValues.length - 1) ? //
-						xValues.length - 1
+				: valueIndex > xValueLastIndex ? //
+						xValueLastIndex
 						: valueIndex;
 
 		final double xValue = xValues[valueIndex];
-		final double xxDevLinePos = _xxDevGraphWidth * xValue / xValues[xValues.length - 1];
+		final double lastXValue = xValues[xValueLastIndex];
+		final double xxDevLinePos = _xxDevGraphWidth * xValue / lastXValue;
 
-		slider.setValuesIndex(valueIndex);
-		slider.setValueX(xValue);
-
-		slider.moveToXXDevPosition((int) xxDevLinePos, true, true);
+		slider.setValueIndex(valueIndex);
+		slider.moveToXXDevPosition(xxDevLinePos, true, true);
 
 		setChartPosition(slider, isCenterSliderPosition);
 
@@ -7046,6 +7048,10 @@ public class ChartComponentGraph extends Canvas {
 		_isXSliderVisible = isSliderVisible;
 	}
 
+	/**
+	 * Set ratio when the mouse is double clicked, this position is used to zoom the chart with the
+	 * mouse.
+	 */
 	private void setZoomInPosition() {
 
 		// get left+right slider
@@ -7118,13 +7124,12 @@ public class ChartComponentGraph extends Canvas {
 
 		if (valueIndex >= xValues.length) {
 			valueIndex = xValues.length - 1;
-			slider.setValuesIndex(valueIndex);
+			slider.setValueIndex(valueIndex);
 		}
 
 		try {
-			slider.setValueX(xValues[valueIndex]);
 
-			final int linePos = (int) (_xxDevGraphWidth * (xValues[valueIndex] / xValues[xValues.length - 1]));
+			final double linePos = _xxDevGraphWidth * (xValues[valueIndex] / xValues[xValues.length - 1]);
 
 			slider.moveToXXDevPosition(linePos, true, true);
 

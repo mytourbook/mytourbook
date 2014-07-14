@@ -285,9 +285,13 @@ public class Chart extends ViewForm {
 
 		final ChartComponentGraph componentGraph = _chartComponents.getChartComponentGraph();
 		final int hoveredLineValueIndex = componentGraph.getHoveredValuePointIndex();
+		boolean isUseLeftSlider = false;
 		if (hoveredLineValueIndex == -1) {
+
 			// hovered line is not yet recognized
-			return null;
+//			return null;
+
+			isUseLeftSlider = true;
 		}
 
 		final SelectionChartInfo chartInfo = new SelectionChartInfo(this);
@@ -298,7 +302,11 @@ public class Chart extends ViewForm {
 		chartInfo.leftSliderValuesIndex = componentGraph.getLeftSlider().getValuesIndex();
 		chartInfo.rightSliderValuesIndex = componentGraph.getRightSlider().getValuesIndex();
 
-		chartInfo.selectedSliderValuesIndex = hoveredLineValueIndex;
+		if (isUseLeftSlider) {
+			chartInfo.selectedSliderValuesIndex = chartInfo.leftSliderValuesIndex;
+		} else {
+			chartInfo.selectedSliderValuesIndex = hoveredLineValueIndex;
+		}
 
 		return chartInfo;
 	}

@@ -2284,11 +2284,11 @@ public class ChartComponents extends Composite {
 			componentGraph.updateVisibleMinMaxValues();
 		}
 
+		/*
+		 * resetting the sliders require that the drawing data are created, this is done in the
+		 * onResize method
+		 */
 		if (onResize()) {
-			/*
-			 * resetting the sliders require that the drawing data are created, this is done in the
-			 * onResize method
-			 */
 			if (_devSliderBarHeight > 0) {
 				componentGraph.resetSliders();
 			}

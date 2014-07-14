@@ -21,6 +21,8 @@ public class Messages extends NLS {
 
 	private static final String	BUNDLE_NAME	= "net.tourbook.messages";										//$NON-NLS-1$
 
+	public static String		Action_Compute_ElevationGain;
+
 	public static String		Action_PhotosAndTours_FilterNoTours_Tooltip;
 	public static String		Action_PhotosAndTours_FilterNotSavedPhotos_Tooltip;
 	public static String		Action_PhotosAndTours_FilterPhotos_Tooltip;
@@ -398,11 +400,13 @@ public class Messages extends NLS {
 	public static String		Compute_Smoothing_Button_ForAllTours;
 	public static String		Compute_Smoothing_Button_ForAllTours_Tooltip;
 
-	public static String		Compute_TourValueElevation_Button_ComputeValues_Tooltip_v14_7;
-	public static String		Compute_TourValueElevation_Dlg_ComputeValues_Message_v14_7;
-	public static String		Compute_TourValueElevation_Label_Description_v14_7;
-	public static String		Compute_TourValueElevation_Label_DPTolerance;
-	public static String		Compute_TourValueElevation_ResultText_v14_7;
+	public static String		Compute_TourValue_ElevationGain_Button_ComputeValues_Tooltip;
+	public static String		Compute_TourValue_ElevationGain_Dlg_ComputeValues_Message;
+	public static String		Compute_TourValue_ElevationGain_Label_Description;
+	public static String		Compute_TourValue_ElevationGain_Link_DBTolerance;
+	public static String		Compute_TourValue_ElevationGain_Message;
+	public static String		Compute_TourValue_ElevationGain_ResultText;
+	public static String		Compute_TourValue_ElevationGain_Title;
 
 	public static String		Compute_TourValueSpeed_Title;
 
@@ -418,14 +422,9 @@ public class Messages extends NLS {
 	public static String		Conconi_Chart_Label_Tour_Tooltip;
 
 	public static String		compute_tourValueElevation_button_computeValues;
-	public static String		compute_tourValueElevation_button_computeValues_tooltip;
-	public static String		compute_tourValueElevation_dlg_computeValues_message;
 	public static String		compute_tourValueElevation_dlg_computeValues_title;
 	public static String		compute_tourValueElevation_group_computeTourAltitude;
-	public static String		compute_tourValueElevation_label_description;
 	public static String		compute_tourValueElevation_label_description_Hints;
-	public static String		compute_tourValueElevation_label_minAltiDifference;
-	public static String		compute_tourValueElevation_resultText;
 	public static String		compute_tourValueElevation_subTaskText;
 
 	public static String		compute_tourValueSpeed_label_description;
@@ -1332,10 +1331,11 @@ public class Messages extends NLS {
 	public static String		Tour_Marker_Position_Vertical_MarkerPoint_Above;
 	public static String		Tour_Marker_Position_Vertical_MarkerPoint_Below;
 
+	public static String		Tour_Segmenter_Button_SaveTour_Tooltip;
 	public static String		Tour_Segmenter_Label_AltitudeUpDown_Tooltip;
-	public static String		Tour_Segmenter_Label_default_tolerance;
+	public static String		Tour_Segmenter_Label_DPTolerance;
+	public static String		Tour_Segmenter_Label_DPTolerance_Tooltip;
 	public static String		Tour_Segmenter_Label_no_chart;
-	public static String		Tour_Segmenter_Label_tolerance;
 	public static String		Tour_Segmenter_Type_ByBreakTime;
 
 	public static String		Tour_Statistic_Combo_BarVOrder_InfoItem;
@@ -1465,9 +1465,7 @@ public class Messages extends NLS {
 	public static String		tour_merger_save_target_tour;
 
 	public static String		tour_segmenter_button_updateAltitude;
-	public static String		tour_segmenter_button_updateAltitude_tooltip;
 	public static String		tour_segmenter_label_createSegmentsWith;
-	public static String		tour_segmenter_label_tourAltitude_tooltip;
 	public static String		tour_segmenter_segType_byDistance_defaultDistance;
 	public static String		tour_segmenter_segType_byDistance_label;
 	public static String		tour_segmenter_segType_byUpDownAlti_label;

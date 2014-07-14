@@ -21,7 +21,7 @@ import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
@@ -52,11 +52,13 @@ import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
 import net.tourbook.tour.TourTypeMenuManager;
 import net.tourbook.ui.ITourProvider;
+import net.tourbook.ui.ITourProviderByID;
 import net.tourbook.ui.TreeColumnFactory;
 import net.tourbook.ui.UI;
 import net.tourbook.ui.action.ActionCollapseAll;
 import net.tourbook.ui.action.ActionCollapseOthers;
 import net.tourbook.ui.action.ActionComputeDistanceValuesFromGeoposition;
+import net.tourbook.ui.action.ActionComputeElevationGain;
 import net.tourbook.ui.action.ActionEditQuick;
 import net.tourbook.ui.action.ActionEditTour;
 import net.tourbook.ui.action.ActionExpandSelection;
@@ -118,7 +120,7 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.part.ViewPart;
 
-public class TourBookView extends ViewPart implements ITourProvider, ITourViewer3 {
+public class TourBookView extends ViewPart implements ITourProvider, ITourViewer3, ITourProviderByID {
 
 	static public final String							ID									= "net.tourbook.views.tourListView";		//$NON-NLS-1$
 
@@ -201,6 +203,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 	private ActionMergeTour								_actionMergeTour;
 	private ActionJoinTours								_actionJoinTours;
 	private ActionComputeDistanceValuesFromGeoposition	_actionComputeDistanceValuesFromGeoposition;
+	private ActionComputeElevationGain					_actionComputeElevationGain;
 	private ActionSetAltitudeValuesFromSRTM				_actionSetAltitudeFromSRTM;
 	private ActionSetTourTypeMenu						_actionSetTourType;
 
@@ -441,6 +444,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		_actionMergeTour = new ActionMergeTour(this);
 		_actionJoinTours = new ActionJoinTours(this);
 		_actionComputeDistanceValuesFromGeoposition = new ActionComputeDistanceValuesFromGeoposition(this);
+		_actionComputeElevationGain = new ActionComputeElevationGain(this);
 		_actionSetAltitudeFromSRTM = new ActionSetAltitudeValuesFromSRTM(this);
 		_actionSetOtherPerson = new ActionSetPerson(this);
 
@@ -1723,6 +1727,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 
 		_actionMergeTour.setEnabled(isOneTour && isDeviceTour && firstSavedTour.getMergeSourceTourId() != null);
 		_actionComputeDistanceValuesFromGeoposition.setEnabled(isTourSelected);
+		_actionComputeElevationGain.setEnabled(true);
 		_actionSetAltitudeFromSRTM.setEnabled(isTourSelected);
 
 		// enable delete ation when at least one tour is selected
@@ -1789,6 +1794,9 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		menuMgr.add(_actionOpenTour);
 		menuMgr.add(_actionMergeTour);
 		menuMgr.add(_actionJoinTours);
+
+		menuMgr.add(new Separator());
+		menuMgr.add(_actionComputeElevationGain);
 		menuMgr.add(_actionComputeDistanceValuesFromGeoposition);
 		menuMgr.add(_actionSetAltitudeFromSRTM);
 
@@ -1831,15 +1839,11 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		}
 	}
 
-	@Override
-	public ArrayList<TourData> getSelectedTours() {
+	public Set<Long> getSelectedTourIDs() {
 
-		// get selected tours
+		final Set<Long> tourIds = new HashSet<Long>();
 
 		final IStructuredSelection selectedTours = ((IStructuredSelection) _tourViewer.getSelection());
-		final ArrayList<TourData> selectedTourData = new ArrayList<TourData>();
-		final HashMap<Long, Long> tourIds = new HashMap<Long, Long>();
-
 		if (selectedTours.size() < 2) {
 
 			// one item is selected
@@ -1871,7 +1875,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 
 				// one tour is selected
 
-				tourIds.put(((TVITourBookTour) selectedItem).getTourId(), null);
+				tourIds.add(((TVITourBookTour) selectedItem).getTourId());
 			}
 
 		} else {
@@ -1883,23 +1887,35 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 				final Object viewItem = tourIterator.next();
 
 				if (viewItem instanceof TVITourBookTour) {
-					tourIds.put(((TVITourBookTour) viewItem).getTourId(), null);
+					tourIds.add(((TVITourBookTour) viewItem).getTourId());
 				}
 			}
 		}
 
+		return tourIds;
+	}
+
+	@Override
+	public ArrayList<TourData> getSelectedTours() {
+
+		// get selected tour id's
+
+		final Set<Long> tourIds = getSelectedTourIDs();
+
 		/*
 		 * show busyindicator when multiple tours needs to be retrieved from the database
 		 */
+		final ArrayList<TourData> selectedTourData = new ArrayList<TourData>();
+
 		if (tourIds.size() > 1) {
 			BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
 				@Override
 				public void run() {
-					getSelectedTourData(selectedTourData, tourIds.keySet());
+					getSelectedTourData(selectedTourData, tourIds);
 				}
 			});
 		} else {
-			getSelectedTourData(selectedTourData, tourIds.keySet());
+			getSelectedTourData(selectedTourData, tourIds);
 		}
 
 		return selectedTourData;
@@ -1919,14 +1935,14 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 	 * @param tourIds
 	 * @return Return all tours for one yearSubItem
 	 */
-	private void getYearSubTourIDs(final TVITourBookYearSub yearSubItem, final HashMap<Long, Long> tourIds) {
+	private void getYearSubTourIDs(final TVITourBookYearSub yearSubItem, final Set<Long> tourIds) {
 
 		// get all tours for the month item
 		for (final TreeViewerItem viewerItem : yearSubItem.getFetchedChildren()) {
 			if (viewerItem instanceof TVITourBookTour) {
 
 				final TVITourBookTour tourItem = (TVITourBookTour) viewerItem;
-				tourIds.put(tourItem.getTourId(), null);
+				tourIds.add(tourItem.getTourId());
 			}
 		}
 	}
@@ -1939,7 +1955,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 
 		final boolean isSelectAllChildren = _actionSelectAllTours.isChecked();
 
-		final HashMap<Long, Long> tourIds = new HashMap<Long, Long>();
+		final HashSet<Long> tourIds = new HashSet<Long>();
 
 		boolean isFirstYear = true;
 		boolean isFirstYearSub = true;
@@ -2000,7 +2016,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 						_selectedYearSub = tourItem.tourYearSub;
 					}
 
-					tourIds.put(tourItem.getTourId(), null);
+					tourIds.add(tourItem.getTourId());
 				}
 
 			} else {
@@ -2018,7 +2034,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 						_selectedYearSub = tourItem.tourYearSub;
 					}
 
-					tourIds.put(tourItem.getTourId(), null);
+					tourIds.add(tourItem.getTourId());
 				}
 			}
 		}
@@ -2034,10 +2050,11 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 
 			// keep selected tour id's
 			_selectedTourIds.clear();
-			_selectedTourIds.addAll(tourIds.keySet());
+			_selectedTourIds.addAll(tourIds);
 
-			selection = tourIds.size() == 1 ? new SelectionTourId(_selectedTourIds.get(0)) : new SelectionTourIds(
-					_selectedTourIds);
+			selection = tourIds.size() == 1 //
+					? new SelectionTourId(_selectedTourIds.get(0))
+					: new SelectionTourIds(_selectedTourIds);
 
 		}
 		_postSelectionProvider.setSelection(selection);

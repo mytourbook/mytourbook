@@ -1621,6 +1621,15 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 					updateUIFromModel(_tourData, false, true);
 
+				} else if (eventId == TourEventId.MARKER_SELECTION) {
+
+					if (eventData instanceof SelectionTourMarker) {
+
+						final SelectionTourMarker tourMarkerSelection = (SelectionTourMarker) eventData;
+
+						onSelectionChanged_TourMarker(tourMarkerSelection);
+					}
+
 				} else if (eventId == TourEventId.CLEAR_DISPLAYED_TOUR) {
 
 					clearEditorContent();
@@ -1672,7 +1681,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		TourManager.getInstance().addTourSaveListener(_tourSaveListener);
 	}
-
 	/**
 	 * Checks if a marker is within the selected time slices
 	 * 
@@ -4334,16 +4342,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		TourManager.fireEvent(TourEventId.TOUR_CHANGED, propertyData, TourDataEditorView.this);
 	}
 
-//	@Override
-//	public Object getAdapter(final Class adapter) {
-//
-//		if (adapter == ColumnViewer.class) {
-//			return _sliceViewer;
-//		}
-//
-//		return Platform.getAdapterManager().getAdapter(this, adapter);
-//	}
-
 	/**
 	 * fire notification for the reverted tour data
 	 */
@@ -4354,6 +4352,16 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		TourManager.fireEvent(TourEventId.TOUR_CHANGED, tourEvent, TourDataEditorView.this);
 	}
+
+//	@Override
+//	public Object getAdapter(final Class adapter) {
+//
+//		if (adapter == ColumnViewer.class) {
+//			return _sliceViewer;
+//		}
+//
+//		return Platform.getAdapterManager().getAdapter(this, adapter);
+//	}
 
 	/**
 	 * select the chart slider(s) according to the selected marker(s)
@@ -4528,31 +4536,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		}
 	}
 
-//	/**
-//	 * Converts a string into a int value
-//	 *
-//	 * @param valueText
-//	 * @return Returns the float value for the parameter valueText, return <code>0</code>
-//	 * @throws IllegalArgumentException
-//	 */
-//	private int getIntValue(String valueText) throws IllegalArgumentException {
-//
-//		valueText = valueText.trim();
-//		if (valueText.length() == 0) {
-//
-//			return 0;
-//
-//		} else {
-//
-//			final Object convertedValue = StringToNumberConverter.toInteger(true).convert(valueText);
-//			if (convertedValue instanceof Integer) {
-//				return ((Integer) convertedValue).intValue();
-//			}
-//		}
-//
-//		return 0;
-//	}
-
 	/**
 	 * Converts a string into a float value
 	 * 
@@ -4577,6 +4560,31 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		return 0;
 	}
+
+//	/**
+//	 * Converts a string into a int value
+//	 *
+//	 * @param valueText
+//	 * @return Returns the float value for the parameter valueText, return <code>0</code>
+//	 * @throws IllegalArgumentException
+//	 */
+//	private int getIntValue(String valueText) throws IllegalArgumentException {
+//
+//		valueText = valueText.trim();
+//		if (valueText.length() == 0) {
+//
+//			return 0;
+//
+//		} else {
+//
+//			final Object convertedValue = StringToNumberConverter.toInteger(true).convert(valueText);
+//			if (convertedValue instanceof Integer) {
+//				return ((Integer) convertedValue).intValue();
+//			}
+//		}
+//
+//		return 0;
+//	}
 
 	private TimeSlice[] getRemainingSliceItems(final Object[] dataViewerItems, final int firstIndex, final int lastIndex) {
 
@@ -5223,6 +5231,28 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		}
 
 		return isCurrentTourSelected;
+	}
+
+	private void onSelectionChanged_TourMarker(final SelectionTourMarker markerSelection) {
+
+		final ArrayList<TourMarker> tourMarker = markerSelection.getTourMarker();
+		final int numberOfTourMarkers = tourMarker.size();
+
+		int leftSliderValueIndex = 0;
+		int rightSliderValueIndex = 0;
+
+		if (numberOfTourMarkers == 1) {
+
+			leftSliderValueIndex = tourMarker.get(0).getSerieIndex();
+			rightSliderValueIndex = leftSliderValueIndex;
+
+		} else if (numberOfTourMarkers > 1) {
+
+			leftSliderValueIndex = tourMarker.get(0).getSerieIndex();
+			rightSliderValueIndex = tourMarker.get(numberOfTourMarkers - 1).getSerieIndex();
+		}
+
+		selectTimeSlice_InViewer(leftSliderValueIndex, rightSliderValueIndex);
 	}
 
 	private void onSelectTab() {

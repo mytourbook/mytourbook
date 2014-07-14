@@ -53,6 +53,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.TabItem;
@@ -65,15 +66,11 @@ import org.eclipse.ui.preferences.IWorkbenchPreferenceContainer;
 
 public class PrefPageComputedValues extends PreferencePage implements IWorkbenchPreferencePage {
 
-	public static final String			ID									= "net.tourbook.preferences.PrefPageComputedValues";	//$NON-NLS-1$
+	public static final String			ID									= "net.tourbook.preferences.PrefPageComputedValues";				//$NON-NLS-1$
 
-	/**
-	 * This value is used either for the min altitude or the DP tolerance.
-	 * <p>
-	 * It depends on the used algorithm which is decided in {@link TourData#computeAltitudeUpDown()}.
-	 */
-	public static final String			STATE_COMPUTED_VALUE_MIN_ALTITUDE	= "computedValue.minAltitude";							//$NON-NLS-1$
-	private static final String			STATE_COMPUTED_VALUE_SELECTED_TAB	= "computedValue.selectedTab";							//$NON-NLS-1$
+	public static final String			URL_DOUGLAS_PEUCKER_ALGORITHM		= "http://en.wikipedia.org/wiki/Ramer–Douglas–Peucker_algorithm";	//$NON-NLS-1$
+
+	private static final String			STATE_COMPUTED_VALUE_SELECTED_TAB	= "computedValue.selectedTab";										//$NON-NLS-1$
 
 	/*
 	 * contains the tab folder index
@@ -87,7 +84,7 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 	/**
 	 * 100 km/h is very high but it supports air planes which are slow on the ground
 	 */
-	public static final int				BREAK_MAX_SPEED_KM_H				= 1000;												// 100.0 km/h
+	public static final int				BREAK_MAX_SPEED_KM_H				= 1000;															// 100.0 km/h
 
 	private int							DEFAULT_DESCRIPTION_WIDTH;
 	private int							DEFAULT_V_DISTANCE_PARAGRAPH;
@@ -272,9 +269,18 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 			GridDataFactory.fillDefaults().grab(true, false).applyTo(dpContainer);
 			GridLayoutFactory.fillDefaults().numColumns(3).applyTo(dpContainer);
 			{
-				// label: min alti diff
-				Label label = new Label(dpContainer, SWT.NONE);
-				label.setText(Messages.Compute_TourValueElevation_Label_DPTolerance);
+				// label: DP Tolerance
+				final Link linkDP = new Link(dpContainer, SWT.NONE);
+				linkDP.setText(Messages.Compute_TourValue_ElevationGain_Link_DBTolerance);
+				linkDP.setToolTipText(Messages.Tour_Segmenter_Label_DPTolerance_Tooltip);
+				linkDP.addSelectionListener(new SelectionAdapter() {
+					@Override
+					public void widgetSelected(final SelectionEvent e) {
+						Util.openLink(
+								Display.getCurrent().getActiveShell(),
+								PrefPageComputedValues.URL_DOUGLAS_PEUCKER_ALGORITHM);
+					}
+				});
 
 				// spinner: minimum altitude
 				_spinnerDPTolerance = new Spinner(dpContainer, SWT.BORDER);
@@ -286,7 +292,7 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 				_spinnerDPTolerance.addMouseWheelListener(_spinnerMouseWheelListener);
 
 				// label: unit
-				label = new Label(dpContainer, SWT.NONE);
+				final Label label = new Label(dpContainer, SWT.NONE);
 				label.setText(net.tourbook.common.UI.UNIT_LABEL_ALTITUDE);
 			}
 
@@ -298,7 +304,7 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 						.hint(DEFAULT_DESCRIPTION_WIDTH, SWT.DEFAULT)
 						.grab(true, false)
 						.applyTo(label);
-				label.setText(Messages.Compute_TourValueElevation_Label_Description_v14_7);
+				label.setText(Messages.Compute_TourValue_ElevationGain_Label_Description);
 
 				// label: tip
 				final Composite tipContainer = new Composite(container, SWT.NONE);
@@ -329,7 +335,7 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 						.indent(0, DEFAULT_V_DISTANCE_PARAGRAPH)
 						.applyTo(btnComputValues);
 				btnComputValues.setText(Messages.compute_tourValueElevation_button_computeValues);
-				btnComputValues.setToolTipText(Messages.Compute_TourValueElevation_Button_ComputeValues_Tooltip_v14_7);
+				btnComputValues.setToolTipText(Messages.Compute_TourValue_ElevationGain_Button_ComputeValues_Tooltip);
 				btnComputValues.addSelectionListener(new SelectionAdapter() {
 					@Override
 					public void widgetSelected(final SelectionEvent e) {
@@ -834,7 +840,7 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 		final int[] oldBreakTime = { 0 };
 		final int[] newBreakTime = { 0 };
 
-		TourDatabase.computeValuesForAllTours(new IComputeTourValues() {
+		final IComputeTourValues computeTourValueConfig = new IComputeTourValues() {
 
 			public boolean computeTourValues(final TourData oldTourData) {
 
@@ -878,7 +884,9 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 
 				return subTaskText;
 			}
-		});
+		};
+
+		TourDatabase.computeValuesForAllTours(computeTourValueConfig, null);
 
 		fireTourModifyEvent();
 	}
@@ -891,7 +899,7 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 		if (MessageDialog.openConfirm(
 				Display.getCurrent().getActiveShell(),
 				Messages.compute_tourValueElevation_dlg_computeValues_title,
-				NLS.bind(Messages.Compute_TourValueElevation_Dlg_ComputeValues_Message_v14_7, dpTolerance)) == false) {
+				NLS.bind(Messages.Compute_TourValue_ElevationGain_Dlg_ComputeValues_Message, dpTolerance)) == false) {
 			return;
 		}
 
@@ -899,7 +907,7 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 
 		final int[] elevation = new int[] { 0, 0 };
 
-		TourDatabase.computeValuesForAllTours(new IComputeTourValues() {
+		final IComputeTourValues computeTourValueConfig = new IComputeTourValues() {
 
 			public boolean computeTourValues(final TourData oldTourData) {
 
@@ -911,7 +919,7 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 
 			public String getResultText() {
 
-				return NLS.bind(Messages.Compute_TourValueElevation_ResultText_v14_7, //
+				return NLS.bind(Messages.Compute_TourValue_ElevationGain_ResultText, //
 						new Object[] {
 								dpTolerance,
 								_nf0.format((elevation[1] - elevation[0]) / UI.UNIT_VALUE_ALTITUDE),
@@ -937,7 +945,9 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 
 				return subTaskText;
 			}
-		});
+		};
+
+		TourDatabase.computeValuesForAllTours(computeTourValueConfig, null);
 
 		fireTourModifyEvent();
 	}
@@ -1051,9 +1061,8 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 			/*
 			 * find pref minAlti value in list
 			 */
-			final int prefMinAltitude = _prefStore.getInt(STATE_COMPUTED_VALUE_MIN_ALTITUDE);
-
-			_spinnerDPTolerance.setSelection(prefMinAltitude);
+			final float prefDPTolerance = _prefStore.getFloat(ITourbookPreferences.COMPUTED_ALTITUDE_DP_TOLERANCE) * 10;
+			_spinnerDPTolerance.setSelection((int) prefDPTolerance);
 
 			/*
 			 * break method
@@ -1109,7 +1118,10 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 	 */
 	private void saveState() {
 
-		_prefStore.setValue(STATE_COMPUTED_VALUE_MIN_ALTITUDE, _spinnerDPTolerance.getSelection());
+		// DP tolerance when computing altitude up/down
+		_prefStore.setValue(
+				ITourbookPreferences.COMPUTED_ALTITUDE_DP_TOLERANCE,
+				_spinnerDPTolerance.getSelection() / 10.0f);
 
 		/*
 		 * break time method

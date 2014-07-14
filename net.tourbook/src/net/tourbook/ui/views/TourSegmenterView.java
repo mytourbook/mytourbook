@@ -94,7 +94,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Scale;
+import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.ui.IEditorPart;
@@ -118,6 +118,14 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 	public static final String						ID									= "net.tourbook.views.TourSegmenter";	//$NON-NLS-1$
 
+	private static final String						DISTANCE_MILES_1_8					= "1/8";
+	private static final String						DISTANCE_MILES_1_4					= "1/4";
+	private static final String						DISTANCE_MILES_3_8					= "3/8";
+	private static final String						DISTANCE_MILES_1_2					= "1/2";
+	private static final String						DISTANCE_MILES_5_8					= "5/8";
+	private static final String						DISTANCE_MILES_3_4					= "3/4";
+	private static final String						DISTANCE_MILES_7_8					= "7/8";
+
 	private static final String						FORMAT_ALTITUDE_DIFF				= "%d / %d %s";						//$NON-NLS-1$
 
 	private static final int						SEGMENTER_REQUIRES_ALTITUDE			= 0x01;
@@ -125,8 +133,8 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	private static final int						SEGMENTER_REQUIRES_PULSE			= 0x04;
 	private static final int						SEGMENTER_REQUIRES_MARKER			= 0x08;
 
-	private static final int						MAX_DISTANCE_SCALE_MILE				= 80;
-	private static final int						MAX_DISTANCE_SCALE_METRIC			= 100;
+	private static final int						MAX_DISTANCE_SPINNER_MILE			= 80;
+	private static final int						MAX_DISTANCE_SPINNER_METRIC			= 100;
 
 	private static final String						STATE_DP_TOLERANCE_PULSE			= "STATE_DP_TOLERANCE_PULSE";			//$NON-NLS-1$
 	private static final String						STATE_MINIMUM_ALTITUDE				= "STATE_MINIMUM_ALTITUDE";			//$NON-NLS-1$
@@ -199,8 +207,8 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		_nf_3_3.setMaximumFractionDigits(3);
 	}
 
-	private int										_maxDistanceScale;
-	private int										_scaleDistancePage;
+	private int										_maxDistanceSpinner;
+	private int										_spinnerDistancePage;
 
 	private boolean									_isShowSegmentsInChart;
 	private boolean									_isTourDirty						= false;
@@ -290,10 +298,10 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	private PageBook								_pageBookSegmenter;
 	private PageBook								_pagebookBreakTime;
 
-	private Button									_btnSaveTour;
+	private Button									_btnSaveTourDP;
+	private Button									_btnSaveTourMin;
 
 	private Composite								_containerBreakTime;
-	private Composite								_containerSaveAltitude;
 	private Composite								_containerViewer;
 	private Composite								_pageSegmenter;
 	private Composite								_pageBreakByAvgSliceSpeed;
@@ -312,14 +320,13 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 	private ImageComboLabel							_lblTitle;
 
-	private Label									_lblAltitudeUp;
+	private Label									_lblAltitudeUpDP;
+	private Label									_lblAltitudeUpMin;
 	private Label									_lblBreakDistanceUnit;
 	private Label									_lblDistanceValue;
 	private Label									_lblMinAltitude;
 	private Label									_lblNoData;
 	private Label									_lblTourBreakTime;
-
-	private Scale									_scaleDistance;
 
 	private Spinner									_spinnerBreakMinAvgSpeedAS;
 	private Spinner									_spinnerBreakMinSliceSpeedAS;
@@ -329,6 +336,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	private Spinner									_spinnerBreakShortestTime;
 	private Spinner									_spinnerBreakMaxDistance;
 	private Spinner									_spinnerBreakSliceDiff;
+	private Spinner									_spinnerDistance;
 	private Spinner									_spinnerDPToleranceAltitude;
 	private Spinner									_spinnerDPTolerancePulse;
 	private Spinner									_spinnerMinAltitude;
@@ -528,11 +536,11 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 					recreateViewer(null);
 
 					/*
-					 * update distance scale
+					 * update distance
 					 */
-					setMaxDistanceScale();
-					_scaleDistance.setMaximum(_maxDistanceScale);
-					_scaleDistance.setPageIncrement(_scaleDistancePage);
+					setMaxDistanceSpinner();
+					_spinnerDistance.setMaximum(_maxDistanceSpinner);
+					_spinnerDistance.setPageIncrement(_spinnerDistancePage);
 					updateUIDistance();
 
 					/*
@@ -749,7 +757,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		_pc = new PixelConverter(parent);
 		_spinnerWidth = _pc.convertWidthInCharsToPixels(_isOSX ? 10 : 5);
 
-		setMaxDistanceScale();
+		setMaxDistanceSpinner();
 
 		// define all columns
 		_columnManager = new ColumnManager(this, _state);
@@ -1171,8 +1179,8 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 			GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(label);
 			label.setText(Messages.tour_segmenter_label_createSegmentsWith);
 
+			// combo: segmenter type
 			{
-				// combo: segmenter type
 				_comboSegmenterType = new Combo(container, SWT.READ_ONLY);
 				_comboSegmenterType.addSelectionListener(new SelectionAdapter() {
 					@Override
@@ -1191,34 +1199,6 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 				GridDataFactory.fillDefaults().hint(size).applyTo(_comboSegmenterType);
 			}
 
-			/*
-			 * tour/computed altitude
-			 */
-			_containerSaveAltitude = new Composite(container, SWT.NONE);
-			GridDataFactory.fillDefaults().grab(true, false).applyTo(_containerSaveAltitude);
-			GridLayoutFactory.fillDefaults().numColumns(2).applyTo(_containerSaveAltitude);
-			{
-				// label: computed altitude up
-				_lblAltitudeUp = new Label(_containerSaveAltitude, SWT.TRAIL);
-				GridDataFactory.fillDefaults()//
-						.align(SWT.END, SWT.CENTER)
-						.grab(true, false)
-						.hint(_pc.convertWidthInCharsToPixels(18), SWT.DEFAULT)
-						.applyTo(_lblAltitudeUp);
-
-				// button: save tour altitude
-				_btnSaveTour = new Button(_containerSaveAltitude, SWT.NONE);
-				GridDataFactory.fillDefaults().indent(5, 0).applyTo(_btnSaveTour);
-				_btnSaveTour.setText(Messages.tour_segmenter_button_updateAltitude);
-				_btnSaveTour.setToolTipText(Messages.tour_segmenter_button_updateAltitude_tooltip);
-				_btnSaveTour.addSelectionListener(new SelectionAdapter() {
-					@Override
-					public void widgetSelected(final SelectionEvent e) {
-						onSaveTourAltitude();
-					}
-				});
-			}
-
 			// pagebook: segmenter type
 			_pageBookSegmenter = new PageBook(container, SWT.NONE);
 			GridDataFactory.fillDefaults().grab(true, false).span(3, 1).applyTo(_pageBookSegmenter);
@@ -1227,42 +1207,21 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 				_pageSegTypeDPPulse = createUI_42_SegmenterBy_DPPulse(_pageBookSegmenter);
 				_pageSegTypeByMarker = createUI_43_SegmenterBy_Marker(_pageBookSegmenter);
 				_pageSegTypeByDistance = createUI_44_SegmenterBy_Distance(_pageBookSegmenter);
-				_pageSegTypeByAltiUpDown = createUI_45_SegmenterBy_AltiUpDown(_pageBookSegmenter);
+				_pageSegTypeByAltiUpDown = createUI_45_SegmenterBy_MinAltitude(_pageBookSegmenter);
 				_pageSegTypeByBreakTime = createUI_50_SegmenterBy_BreakTime(_pageBookSegmenter);
 			}
 		}
-
 	}
 
 	private Composite createUI_42_SegmenterBy_DPAltitude(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-		GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
+		GridLayoutFactory.fillDefaults().numColumns(4).applyTo(container);
 		{
-
-			// label: tolerance
-			final Label label = new Label(container, SWT.NONE);
-			label.setText(Messages.Tour_Segmenter_Label_tolerance);
-
-			// spinner: minimum altitude
-			_spinnerDPToleranceAltitude = new Spinner(container, SWT.BORDER);
-			GridDataFactory.fillDefaults().applyTo(_spinnerDPToleranceAltitude);
-			_spinnerDPToleranceAltitude.setMinimum(1); // 0.1
-			_spinnerDPToleranceAltitude.setMaximum(10000); // 1000
-			_spinnerDPToleranceAltitude.setDigits(1);
-			_spinnerDPToleranceAltitude.addSelectionListener(new SelectionAdapter() {
-				@Override
-				public void widgetSelected(final SelectionEvent e) {
-					onChangedTolerance();
-				}
-			});
-			_spinnerDPToleranceAltitude.addMouseWheelListener(new MouseWheelListener() {
-				public void mouseScrolled(final MouseEvent event) {
-					UI.adjustSpinnerValueOnMouseScroll(event);
-					onChangedTolerance();
-				}
-			});
+			_spinnerDPToleranceAltitude = createUI_DP_Tolerance(container);
+			_lblAltitudeUpDP = createUI_DP_Info(container);
+			_btnSaveTourDP = createUI_DB_SaveTour(container);
 		}
 
 		return container;
@@ -1272,31 +1231,9 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-		GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
+		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
 		{
-
-			// label: tolerance
-			final Label label = new Label(container, SWT.NONE);
-			label.setText(Messages.Tour_Segmenter_Label_tolerance);
-
-			// spinner: minimum altitude
-			_spinnerDPTolerancePulse = new Spinner(container, SWT.BORDER);
-			GridDataFactory.fillDefaults().applyTo(_spinnerDPTolerancePulse);
-			_spinnerDPTolerancePulse.setMinimum(1); // 0.1
-			_spinnerDPTolerancePulse.setMaximum(10000); // 1000
-			_spinnerDPTolerancePulse.setDigits(1);
-			_spinnerDPTolerancePulse.addSelectionListener(new SelectionAdapter() {
-				@Override
-				public void widgetSelected(final SelectionEvent e) {
-					onChangedTolerance();
-				}
-			});
-			_spinnerDPTolerancePulse.addMouseWheelListener(new MouseWheelListener() {
-				public void mouseScrolled(final MouseEvent event) {
-					UI.adjustSpinnerValueOnMouseScroll(event);
-					onChangedTolerance();
-				}
-			});
+			_spinnerDPTolerancePulse = createUI_DP_Tolerance(container);
 		}
 
 		return container;
@@ -1329,35 +1266,43 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 			final Label label = new Label(container, SWT.NONE);
 			label.setText(Messages.tour_segmenter_segType_byDistance_label);
 
-			// scale: distance
-			_scaleDistance = new Scale(container, SWT.HORIZONTAL);
-			GridDataFactory.fillDefaults().grab(true, false).applyTo(_scaleDistance);
-			_scaleDistance.setMaximum(_maxDistanceScale);
-			_scaleDistance.setPageIncrement(_scaleDistancePage);
-			_scaleDistance.addSelectionListener(new SelectionAdapter() {
+			// spinner: distance
+			_spinnerDistance = new Spinner(container, SWT.BORDER);
+			GridDataFactory.fillDefaults().applyTo(_spinnerDistance);
+			_spinnerDistance.setMinimum(1); // 0.1
+			_spinnerDistance.setMaximum(_maxDistanceSpinner);
+			_spinnerDistance.setPageIncrement(_spinnerDistancePage);
+			_spinnerDistance.setDigits(1);
+			_spinnerDistance.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(final SelectionEvent e) {
 					onChangedDistance();
 				}
 			});
+			_spinnerDistance.addMouseWheelListener(new MouseWheelListener() {
+				public void mouseScrolled(final MouseEvent event) {
+					UI.adjustSpinnerValueOnMouseScroll(event);
+					onChangedDistance();
+				}
+			});
 
 			// text: distance value
-			_lblDistanceValue = new Label(container, SWT.TRAIL);
+			_lblDistanceValue = new Label(container, SWT.NONE);
 			_lblDistanceValue.setText(Messages.tour_segmenter_segType_byDistance_defaultDistance);
 			GridDataFactory.fillDefaults()//
 					.align(SWT.FILL, SWT.CENTER)
-					.hint(_pc.convertWidthInCharsToPixels(8), SWT.DEFAULT)
+					.grab(true, false)
 					.applyTo(_lblDistanceValue);
 		}
 
 		return container;
 	}
 
-	private Composite createUI_45_SegmenterBy_AltiUpDown(final Composite parent) {
+	private Composite createUI_45_SegmenterBy_MinAltitude(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-		GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
+		GridLayoutFactory.fillDefaults().numColumns(5).applyTo(container);
 		{
 			// label: min alti diff
 			final Label label = new Label(container, SWT.NONE);
@@ -1385,6 +1330,9 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 			// label: unit
 			_lblMinAltitude = new Label(container, SWT.NONE);
 			_lblMinAltitude.setText(net.tourbook.common.UI.UNIT_LABEL_ALTITUDE);
+
+			_lblAltitudeUpMin = createUI_DP_Info(container);
+			_btnSaveTourMin = createUI_DB_SaveTour(container);
 		}
 
 		return container;
@@ -1900,6 +1848,74 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		final Table table = (Table) _segmentViewer.getControl();
 
 		_columnManager.createHeaderContextMenu(table, null);
+	}
+
+	private Button createUI_DB_SaveTour(final Composite parent) {
+
+		final Button btn = new Button(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().indent(5, 0).applyTo(btn);
+		btn.setText(Messages.tour_segmenter_button_updateAltitude);
+		btn.setToolTipText(Messages.Tour_Segmenter_Button_SaveTour_Tooltip);
+		btn.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(final SelectionEvent e) {
+				onSaveTourAltitude();
+			}
+		});
+
+		return btn;
+	}
+
+	private Label createUI_DP_Info(final Composite parent) {
+
+		final Label label = new Label(parent, SWT.TRAIL);
+
+		GridDataFactory.fillDefaults()//
+				.align(SWT.END, SWT.CENTER)
+				.grab(true, false)
+				.hint(_pc.convertWidthInCharsToPixels(18), SWT.DEFAULT)
+				.applyTo(label);
+
+		return label;
+	}
+
+	private Spinner createUI_DP_Tolerance(final Composite parent) {
+
+		// label: DP Tolerance
+		final Link linkDP = new Link(parent, SWT.NONE);
+		linkDP.setText(Messages.Tour_Segmenter_Label_DPTolerance);
+		linkDP.setToolTipText(Messages.Tour_Segmenter_Label_DPTolerance_Tooltip);
+		linkDP.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(final SelectionEvent e) {
+				Util.openLink(
+						Display.getCurrent().getActiveShell(),
+						PrefPageComputedValues.URL_DOUGLAS_PEUCKER_ALGORITHM);
+			}
+		});
+
+		// spinner: DP tolerance
+		final Spinner spinner = new Spinner(parent, SWT.BORDER);
+		GridDataFactory.fillDefaults().applyTo(spinner);
+		spinner.setMinimum(1); // 0.1
+		spinner.setMaximum(10000); // 1000
+		spinner.setDigits(1);
+
+		spinner.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(final SelectionEvent e) {
+				onChangedTolerance();
+			}
+		});
+
+		spinner.addMouseWheelListener(new MouseWheelListener() {
+			public void mouseScrolled(final MouseEvent event) {
+				UI.adjustSpinnerValueOnMouseScroll(event);
+				onChangedTolerance();
+			}
+		});
+
+		return spinner;
 	}
 
 	private void defineAllColumns(final Composite parent) {
@@ -2601,39 +2617,39 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	}
 
 	/**
-	 * @return Returns distance in meters from the scale control
+	 * @return Returns distance in meters from the spinner control
 	 */
 	private float getDistance() {
 
-		final float selectedDistance = _scaleDistance.getSelection();
-		float scaleDistance;
+		final float selectedDistance = _spinnerDistance.getSelection();
+		float spinnerDistance;
 
 		if (net.tourbook.ui.UI.UNIT_VALUE_DISTANCE == net.tourbook.ui.UI.UNIT_MILE) {
 
 			// miles are displayed
 
-			scaleDistance = (selectedDistance) * 1000 / 8;
+			spinnerDistance = (selectedDistance) * 1000 / 8;
 
-			if (scaleDistance == 0) {
-				scaleDistance = 1000 / 8;
+			if (spinnerDistance == 0) {
+				spinnerDistance = 1000 / 8;
 			}
 
 			// convert mile -> meters
-			scaleDistance *= net.tourbook.ui.UI.UNIT_MILE;
+			spinnerDistance *= net.tourbook.ui.UI.UNIT_MILE;
 
 		} else {
 
 			// meters are displayed
 
-			scaleDistance = selectedDistance * MAX_DISTANCE_SCALE_METRIC;
+			spinnerDistance = selectedDistance * MAX_DISTANCE_SPINNER_METRIC;
 
 			// ensure the distance in not below 100m
-			if (scaleDistance < 100) {
-				scaleDistance = 100;
+			if (spinnerDistance < 100) {
+				spinnerDistance = 100;
 			}
 		}
 
-		return scaleDistance;
+		return spinnerDistance;
 	}
 
 	/**
@@ -2906,12 +2922,9 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 			_userSelectedSegmenterType = selectedSegmenterType;
 		}
 
-		boolean isShowSaveAltitude = false;
-
 		if (selectedSegmenterType == SegmenterType.ByAltitudeWithDP) {
 
 			_pageBookSegmenter.showPage(_pageSegTypeDPAltitude);
-			isShowSaveAltitude = true;
 
 		} else if (selectedSegmenterType == SegmenterType.ByPulseWithDP) {
 
@@ -2928,7 +2941,6 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		} else if (selectedSegmenterType == SegmenterType.ByComputedAltiUpDown) {
 
 			_pageBookSegmenter.showPage(_pageSegTypeByAltiUpDown);
-			isShowSaveAltitude = true;
 
 		} else if (selectedSegmenterType == SegmenterType.ByBreakTime) {
 
@@ -2937,8 +2949,6 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 			// update ui + layout
 			onSelectBreakTimeMethod();
 		}
-
-		_containerSaveAltitude.setVisible(isShowSaveAltitude);
 
 		_pageSegmenter.layout();
 
@@ -3038,15 +3048,17 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 //		_cboSegmenterType.select(segmenterIndex);
 
 		// selected distance
-		int stateDistance = 10;
-		try {
-			stateDistance = _state.getInt(STATE_SELECTED_DISTANCE);
-		} catch (final NumberFormatException e) {}
-		_scaleDistance.setSelection(stateDistance);
+		final int stateDistance = Util.getStateInt(_state, STATE_SELECTED_DISTANCE, 10);
+		_spinnerDistance.setSelection(stateDistance);
+
 		updateUIDistance();
 
 		_spinnerMinAltitude.setSelection(Util.getStateInt(_state, STATE_MINIMUM_ALTITUDE, 50));
-		_spinnerDPTolerancePulse.setSelection(Util.getStateInt(_state, STATE_DP_TOLERANCE_PULSE, 50));
+
+		// DP tolerance pulse
+		final int stateDPTolerancePulse = Util.getStateInt(_state, STATE_DP_TOLERANCE_PULSE, 50);
+		_dpTolerancePulse = stateDPTolerancePulse / 10.0f;
+		_spinnerDPTolerancePulse.setSelection(stateDPTolerancePulse);
 
 		/*
 		 * break time
@@ -3208,7 +3220,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		_columnManager.saveState(_state);
 
 		_state.put(STATE_SELECTED_SEGMENTER_INDEX, _comboSegmenterType.getSelectionIndex());
-		_state.put(STATE_SELECTED_DISTANCE, _scaleDistance.getSelection());
+		_state.put(STATE_SELECTED_DISTANCE, _spinnerDistance.getSelection());
 		_state.put(STATE_MINIMUM_ALTITUDE, _spinnerMinAltitude.getSelection());
 		_state.put(STATE_DP_TOLERANCE_PULSE, _spinnerDPTolerancePulse.getSelection());
 
@@ -3275,21 +3287,21 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 	}
 
-	private void setMaxDistanceScale() {
+	private void setMaxDistanceSpinner() {
 
 		if (net.tourbook.ui.UI.UNIT_VALUE_DISTANCE == net.tourbook.ui.UI.UNIT_MILE) {
 
 			// imperial
 
-			_maxDistanceScale = MAX_DISTANCE_SCALE_MILE;
-			_scaleDistancePage = 8;
+			_maxDistanceSpinner = MAX_DISTANCE_SPINNER_MILE;
+			_spinnerDistancePage = 8;
 
 		} else {
 
 			// metric
 
-			_maxDistanceScale = MAX_DISTANCE_SCALE_METRIC;
-			_scaleDistancePage = 10;
+			_maxDistanceSpinner = MAX_DISTANCE_SPINNER_METRIC;
+			_spinnerDistancePage = 10;
 		}
 	}
 
@@ -3320,7 +3332,9 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 			// segmenter value
 			_spinnerDPToleranceAltitude.setSelection((int) (getDPTolerance_FromTour() * 10));
 
-			_btnSaveTour.setEnabled(_tourData.getTourPerson() != null);
+			final boolean canSaveTour = _tourData.getTourPerson() != null;
+			_btnSaveTourDP.setEnabled(canSaveTour);
+			_btnSaveTourMin.setEnabled(canSaveTour);
 		}
 		_isDirtyDisabled = false;
 
@@ -3353,17 +3367,27 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 			return;
 		}
 
-		final SegmenterType selectedSegmenterType = selectedSegmenter.segmenterType;
+		Label lblInfo;
 		float[] altitudeSegments;
-		if (selectedSegmenterType == SegmenterType.ByComputedAltiUpDown) {
+
+		if (selectedSegmenter.segmenterType == SegmenterType.ByComputedAltiUpDown) {
+
+			// Minimum altitude
+
 			altitudeSegments = _tourData.segmentSerieComputedAltitudeDiff;
+			lblInfo = _lblAltitudeUpMin;
+
 		} else {
+
+			// DP tolerance
+
 			altitudeSegments = _tourData.segmentSerieAltitudeDiff;
+			lblInfo = _lblAltitudeUpDP;
 		}
 
 		if (altitudeSegments == null) {
-			_lblAltitudeUp.setText(UI.EMPTY_STRING);
-			_lblAltitudeUp.setToolTipText(UI.EMPTY_STRING);
+			lblInfo.setText(UI.EMPTY_STRING);
+			lblInfo.setToolTipText(UI.EMPTY_STRING);
 			return;
 		}
 
@@ -3381,20 +3405,20 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 		/*
 		 * Show altitude values not as negative values because the values are displayed left aligned
-		 * and it's easier to compare them when a minus sign is not displayed.
+		 * and it's easier to compare them visually when a minus sign is not displayed.
 		 */
 		final float compAltiUp = _altitudeUp / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE;
 		final float compAltiDown = _altitudeDown / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE;
 		final int tourAltiUp = Math.round(_tourData.getTourAltUp() / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE);
 		final int tourAltiDown = Math.round(_tourData.getTourAltDown() / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE);
 
-		_lblAltitudeUp.setText(String.format(
+		lblInfo.setText(String.format(
 				FORMAT_ALTITUDE_DIFF,
 				Math.round(compAltiUp),
 				tourAltiUp,
 				net.tourbook.common.UI.UNIT_LABEL_ALTITUDE));
 
-		_lblAltitudeUp.setToolTipText(NLS.bind(Messages.Tour_Segmenter_Label_AltitudeUpDown_Tooltip, new Object[] {
+		lblInfo.setToolTipText(NLS.bind(Messages.Tour_Segmenter_Label_AltitudeUpDown_Tooltip, new Object[] {
 
 				// Up
 				_nf_1_1.format(compAltiUp),
@@ -3409,7 +3433,11 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 				// Diff
 				_nf_1_1.format(compAltiUp - compAltiDown),
 				tourAltiUp - tourAltiDown,
-				net.tourbook.common.UI.UNIT_LABEL_ALTITUDE
+				net.tourbook.common.UI.UNIT_LABEL_ALTITUDE,
+
+				// DP
+				_nf_1_1.format(_tourData.getDpTolerance() / 10.0f),
+				_nf_1_1.format(_dpToleranceAltitude),
 		//
 				}));
 	}
@@ -3427,44 +3455,45 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 	private void updateUIDistance() {
 
-		float scaleDistance = getDistance() / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
+		float spinnerDistance = getDistance() / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
 
 		if (net.tourbook.ui.UI.UNIT_VALUE_DISTANCE == net.tourbook.ui.UI.UNIT_MILE) {
 
 			// imperial
 
-			scaleDistance /= 1000;
+			spinnerDistance /= 1000;
 
-			final int distanceInt = (int) scaleDistance;
-			final float distanceFract = scaleDistance - distanceInt;
+			final int distanceInt = (int) spinnerDistance;
+			final float distanceFract = spinnerDistance - distanceInt;
 
 			// create distance for imperials which shows the fraction with 1/8, 1/4, 3/8 ...
 			final StringBuilder sb = new StringBuilder();
+
 			if (distanceInt > 0) {
 				sb.append(Integer.toString(distanceInt));
 				sb.append(UI.SPACE);
 			}
 
 			if (Math.abs(distanceFract - 0.125f) <= 0.01) {
-				sb.append("1/8"); //$NON-NLS-1$
+				sb.append(DISTANCE_MILES_1_8);
 				sb.append(UI.SPACE);
 			} else if (Math.abs(distanceFract - 0.25f) <= 0.01) {
-				sb.append("1/4"); //$NON-NLS-1$
+				sb.append(DISTANCE_MILES_1_4);
 				sb.append(UI.SPACE);
 			} else if (Math.abs(distanceFract - 0.375) <= 0.01) {
-				sb.append("3/8"); //$NON-NLS-1$
+				sb.append(DISTANCE_MILES_3_8);
 				sb.append(UI.SPACE);
 			} else if (Math.abs(distanceFract - 0.5f) <= 0.01) {
-				sb.append("1/2"); //$NON-NLS-1$
+				sb.append(DISTANCE_MILES_1_2);
 				sb.append(UI.SPACE);
 			} else if (Math.abs(distanceFract - 0.625) <= 0.01) {
-				sb.append("5/8"); //$NON-NLS-1$
+				sb.append(DISTANCE_MILES_5_8);
 				sb.append(UI.SPACE);
 			} else if (Math.abs(distanceFract - 0.75f) <= 0.01) {
-				sb.append("3/4"); //$NON-NLS-1$
+				sb.append(DISTANCE_MILES_3_4);
 				sb.append(UI.SPACE);
 			} else if (Math.abs(distanceFract - 0.875) <= 0.01) {
-				sb.append("7/8"); //$NON-NLS-1$
+				sb.append(DISTANCE_MILES_7_8);
 				sb.append(UI.SPACE);
 			}
 
@@ -3477,17 +3506,8 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 			// metric
 
-			// format distance
-			String distanceText;
-			final float selectedDistance = scaleDistance / 1000;
-			if (selectedDistance >= 10) {
-				distanceText = _nf_0_0.format(selectedDistance);
-			} else {
-				distanceText = _nf_1_1.format(selectedDistance);
-			}
-
-			// update UI
-			_lblDistanceValue.setText(distanceText + UI.SPACE + net.tourbook.common.UI.UNIT_LABEL_DISTANCE);
+			// update UI, the spinner already displays the correct value
+			_lblDistanceValue.setText(net.tourbook.common.UI.UNIT_LABEL_DISTANCE);
 		}
 	}
 

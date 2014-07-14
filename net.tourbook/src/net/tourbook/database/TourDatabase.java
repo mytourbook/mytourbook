@@ -480,10 +480,17 @@ public class TourDatabase {
 	}
 
 	/**
-	 * @param {@link IComputeTourValues} interface to compute values for one tour
 	 * @return
 	 */
-	public static boolean computeValuesForAllTours(final IComputeTourValues runner) {
+	/**
+	 * @param runner
+	 *            {@link IComputeTourValues} interface to compute values for one tour
+	 * @param tourIds
+	 *            Tour ID's which should be computed, when <code>null</code>, ALL tours will be
+	 *            computed.
+	 * @return
+	 */
+	public static boolean computeValuesForAllTours(final IComputeTourValues runner, final ArrayList<Long> tourIds) {
 
 		final Shell shell = Display.getDefault().getActiveShell();
 
@@ -499,7 +506,12 @@ public class TourDatabase {
 			@Override
 			public void run(final IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 
-				final ArrayList<Long> tourList = getAllTourIds();
+				ArrayList<Long> tourList;
+				if (tourIds == null) {
+					tourList = getAllTourIds();
+				} else {
+					tourList = tourIds;
+				}
 				tourListSize[0] = tourList.size();
 
 				long lastUIUpdateTime = 0;

@@ -305,10 +305,6 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 		/*
 		 * computed values
 		 */
-//		// minimum altitude difference
-//		store.setDefault(
-//				PrefPageComputedValues.STATE_COMPUTED_VALUE_MIN_ALTITUDE,
-//				PrefPageComputedValues.DEFAULT_MIN_ALTITUDE);
 
 		// speed minimum time slice value in seconds
 		store.setDefault(ITourbookPreferences.APP_DATA_SPEED_MIN_TIMESLICE_VALUE, 10);
@@ -331,6 +327,9 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 		store.setDefault(ITourbookPreferences.BREAK_TIME_SHORTEST_TIME, 20);
 		store.setDefault(ITourbookPreferences.BREAK_TIME_MAX_DISTANCE, 20.0f);
 		store.setDefault(ITourbookPreferences.BREAK_TIME_SLICE_DIFF, 5); // 5 minutes
+
+		// DP tolerance when computing altitude up/down
+		store.setDefault(ITourbookPreferences.COMPUTED_ALTITUDE_DP_TOLERANCE, 5.0f);
 
 		/*
 		 * calendar week

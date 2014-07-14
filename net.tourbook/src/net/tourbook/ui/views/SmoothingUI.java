@@ -128,7 +128,7 @@ public class SmoothingUI {
 			return;
 		}
 
-		TourDatabase.computeValuesForAllTours(new IComputeTourValues() {
+		final IComputeTourValues computeTourValueConfig = new IComputeTourValues() {
 
 			public boolean computeTourValues(final TourData oldTourData) {
 
@@ -144,7 +144,9 @@ public class SmoothingUI {
 			public String getSubTaskText(final TourData savedTourData) {
 				return null;
 			}
-		});
+		};
+
+		TourDatabase.computeValuesForAllTours(computeTourValueConfig, null);
 
 		fireTourModifyEvent();
 	}

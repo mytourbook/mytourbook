@@ -177,6 +177,11 @@ public interface ITourbookPreferences {
 	public static final String	BREAK_TIME_MAX_DISTANCE						= "BreakTime_MaxDistance";									//$NON-NLS-1$
 	public static final String	BREAK_TIME_SLICE_DIFF						= "BreakTime_SliceDiff";									//$NON-NLS-1$
 
+	/**
+	 * DP tolerance when computing altitude up/down
+	 */
+	public static final String	COMPUTED_ALTITUDE_DP_TOLERANCE				= "COMPUTED_ALTITUDE_DP_TOLERANCE";						//$NON-NLS-1$
+
 	/*
 	 * measurement system
 	 */

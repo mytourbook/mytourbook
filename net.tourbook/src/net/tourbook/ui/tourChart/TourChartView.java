@@ -620,7 +620,6 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 
 			final TourPhotoLinkSelection linkSelection = (TourPhotoLinkSelection) data;
 
-//			onSelectionChanged_TourWithPhoto(linkSelection, linkSelection.getTourIds());
 			onSelectionChanged(linkSelection);
 		}
 	}
@@ -696,26 +695,6 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 		updateChart(savedTourData);
 	}
 
-	private void updateChart() {
-
-		if (_tourData == null) {
-			// nothing to do
-			return;
-		}
-
-		TourManager.getInstance().setActiveTourChart(_tourChart);
-
-		_pageBook.showPage(_tourChart);
-
-		// set or reset photo link
-		_tourData.tourPhotoLink = _tourPhotoLink;
-
-		_tourChart.updateTourChart(_tourData, _tourChartConfig, false);
-
-		// set application window title tool tip
-		setTitleToolTip(TourManager.getTourDateShort(_tourData));
-	}
-
 	private void updateChart(final long tourId) {
 
 		if (_tourData != null && _tourData.getTourId() == tourId && _isForceUpdate == false) {
@@ -739,7 +718,18 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 
 		_tourData = tourData;
 
-		updateChart();
+		TourManager.getInstance().setActiveTourChart(_tourChart);
+
+		_pageBook.showPage(_tourChart);
+
+		// set or reset photo link
+		_tourData.tourPhotoLink = _tourPhotoLink;
+
+		_tourChart.updateTourChart(_tourData, _tourChartConfig, false);
+
+		// set application window title tool tip
+		setTitleToolTip(TourManager.getTourDateShort(_tourData));
+
 	}
 
 }

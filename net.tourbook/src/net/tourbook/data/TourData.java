@@ -76,7 +76,6 @@ import net.tourbook.photo.TourPhotoLink;
 import net.tourbook.photo.TourPhotoManager;
 import net.tourbook.photo.TourPhotoReference;
 import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.preferences.PrefPageComputedValues;
 import net.tourbook.srtm.ElevationSRTM3;
 import net.tourbook.srtm.GeoLat;
 import net.tourbook.srtm.GeoLon;
@@ -1600,17 +1599,17 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	 */
 	public boolean computeAltitudeUpDown() {
 
-		final float prefDPTolerance = _prefStore.getInt(PrefPageComputedValues.STATE_COMPUTED_VALUE_MIN_ALTITUDE);
+		final float prefDPTolerance = _prefStore.getFloat(ITourbookPreferences.COMPUTED_ALTITUDE_DP_TOLERANCE);
 
 		AltitudeUpDown altiUpDown;
 		if (distanceSerie != null) {
 
 			// DP needs distance
 
-			altiUpDown = computeAltitudeUpDown_20_Algorithm_DP(prefDPTolerance / 10.0f);
+			altiUpDown = computeAltitudeUpDown_20_Algorithm_DP(prefDPTolerance);
 
-			// keep this value to see in the UI (toursegmenter) the correct value
-			dpTolerance = (short) prefDPTolerance;
+			// keep this value to see in the UI (toursegmenter) the value and how it is computed
+			dpTolerance = (short) (prefDPTolerance * 10);
 
 		} else {
 

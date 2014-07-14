@@ -641,7 +641,10 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 					final ViewerRow lastRow = cell.getViewerRow().getNeighbor(ViewerRow.ABOVE, false);
 
 					if (null != lastRow) {
-						prevDistance = ((TourMarker) lastRow.getElement()).getDistance();
+						final TourMarker element = (TourMarker) lastRow.getElement();
+						if (element instanceof TourMarker) {
+							prevDistance = element.getDistance();
+						}
 						prevDistance = prevDistance < 0 ? 0 : prevDistance;
 					}
 
@@ -726,7 +729,10 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 				final ViewerRow lastRow = cell.getViewerRow().getNeighbor(ViewerRow.ABOVE, false);
 				int lastTime = 0;
 				if (null != lastRow) {
-					lastTime = ((TourMarker) lastRow.getElement()).getTime();
+					final Object element = lastRow.getElement();
+					if (element instanceof TourMarker) {
+						lastTime = ((TourMarker) element).getTime();
+					}
 				}
 
 				cell.setText(UI.format_hh_mm_ss(((TourMarker) cell.getElement()).getTime() - lastTime));

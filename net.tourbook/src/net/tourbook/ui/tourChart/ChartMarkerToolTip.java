@@ -652,9 +652,9 @@ public class ChartMarkerToolTip extends AnimatedToolTipShell implements ITourPro
 			return;
 		}
 
-		if (hoveredLabel == null) {
+		if (hoveredLabel == null || hoveredLabel.paintedLabel == null) {
 
-			// a marker is not hovered, hide tooltip
+			// a marker is not hovered or is hidden, hide tooltip
 
 			hide();
 
