@@ -95,7 +95,7 @@ altutide up/down can also be imported, required header/format:
 
 Changes
 
-* Application menu is restructured.
+* Application menu and toolbar is restructured.
 
 
 * Tour Editor
@@ -108,9 +108,15 @@ Changes
 - Removed these actions "Tagged Tour", "Tour Analyzer" and "Tour Segmenter" from the workspace toolbars, these actions are available from the main menu.
 
 
+* Tour Analyzer
+
+- Removed unnecessary digit values
+- Is updated when another tour is selected
+
+
 Fixed Bugs
 
-* Some
+* Always
 
 
 System 

@@ -37,9 +37,21 @@ public class Util {
 
 	private final static NumberFormat	_nf0			= NumberFormat.getNumberInstance();
 	private final static NumberFormat	_nf1			= NumberFormat.getNumberInstance();
-	{
+	private final static NumberFormat	_nf2			= NumberFormat.getNumberInstance();
+	private final static NumberFormat	_nf3			= NumberFormat.getNumberInstance();
+
+	static {
 		_nf0.setMinimumFractionDigits(0);
+		_nf0.setMaximumFractionDigits(0);
+
 		_nf1.setMinimumFractionDigits(1);
+		_nf1.setMaximumFractionDigits(1);
+
+		_nf2.setMinimumFractionDigits(2);
+		_nf2.setMaximumFractionDigits(2);
+
+		_nf3.setMinimumFractionDigits(3);
+		_nf3.setMaximumFractionDigits(3);
 	}
 
 	private static StringBuilder		_sbFormatter	= new StringBuilder();
@@ -207,6 +219,44 @@ public class Util {
 				: Integer.toString(precision) + 'f';
 
 		return String.format(format, divValue).toString();
+	}
+
+	public static String formatNumber(	final double value,
+										final int unitType,
+										final int valueDivisor,
+										final int valueDecimals) {
+
+		String valueText;
+
+		if (unitType == ChartDataSerie.AXIS_UNIT_NUMBER) {
+
+			final double divValue = value / valueDivisor;
+
+			if (valueDecimals == 0 || divValue % 1 == 0) {
+
+				valueText = _nf0.format(divValue);
+
+			} else {
+
+				switch (valueDecimals) {
+				case 2:
+					valueText = _nf2.format(divValue);
+					break;
+				case 3:
+					valueText = _nf3.format(divValue);
+					break;
+
+				default:
+					valueText = _nf1.format(divValue);
+					break;
+				}
+			}
+		} else {
+
+			valueText = Util.formatValue(value, unitType, valueDivisor, true);
+		}
+
+		return valueText;
 	}
 
 	public static String formatValue(final double value, final int unitType, final float divisor, boolean isShowSeconds) {

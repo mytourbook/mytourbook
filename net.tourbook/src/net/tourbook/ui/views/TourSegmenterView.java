@@ -118,13 +118,13 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 	public static final String						ID									= "net.tourbook.views.TourSegmenter";	//$NON-NLS-1$
 
-	private static final String						DISTANCE_MILES_1_8					= "1/8";
-	private static final String						DISTANCE_MILES_1_4					= "1/4";
-	private static final String						DISTANCE_MILES_3_8					= "3/8";
-	private static final String						DISTANCE_MILES_1_2					= "1/2";
-	private static final String						DISTANCE_MILES_5_8					= "5/8";
-	private static final String						DISTANCE_MILES_3_4					= "3/4";
-	private static final String						DISTANCE_MILES_7_8					= "7/8";
+	private static final String						DISTANCE_MILES_1_8					= "1/8"; //$NON-NLS-1$
+	private static final String						DISTANCE_MILES_1_4					= "1/4"; //$NON-NLS-1$
+	private static final String						DISTANCE_MILES_3_8					= "3/8"; //$NON-NLS-1$
+	private static final String						DISTANCE_MILES_1_2					= "1/2"; //$NON-NLS-1$
+	private static final String						DISTANCE_MILES_5_8					= "5/8"; //$NON-NLS-1$
+	private static final String						DISTANCE_MILES_3_4					= "3/4"; //$NON-NLS-1$
+	private static final String						DISTANCE_MILES_7_8					= "7/8"; //$NON-NLS-1$
 
 	private static final String						FORMAT_ALTITUDE_DIFF				= "%d / %d %s";						//$NON-NLS-1$
 
@@ -252,14 +252,14 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 				SEGMENTER_REQUIRES_DISTANCE));
 
 		_allTourSegmenter.add(new TourSegmenter(
-				SegmenterType.ByPulseWithDP,
-				Messages.tour_segmenter_type_byPulse,
-				SEGMENTER_REQUIRES_PULSE));
-
-		_allTourSegmenter.add(new TourSegmenter(
 				SegmenterType.ByBreakTime,
 				Messages.Tour_Segmenter_Type_ByBreakTime,
 				SEGMENTER_REQUIRES_DISTANCE));
+
+		_allTourSegmenter.add(new TourSegmenter(
+				SegmenterType.ByPulseWithDP,
+				Messages.tour_segmenter_type_byPulse,
+				SEGMENTER_REQUIRES_PULSE));
 	}
 
 	private ArrayList<TourSegmenter>				_availableSegmenter					= new ArrayList<TourSegmenter>();

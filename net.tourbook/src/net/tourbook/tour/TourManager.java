@@ -1753,19 +1753,19 @@ public class TourManager {
 	 */
 	public ChartDataModel createChartDataModel(final TourData tourData, final TourChartConfiguration chartConfig) {
 
-		return createChartDataModelInternal(tourData, chartConfig, false);
+		return createChartDataModel_10(tourData, chartConfig, false);
 	}
 
 	public ChartDataModel createChartDataModel(	final TourData tourData,
 												final TourChartConfiguration chartConfig,
 												final boolean hasPropertyChanged) {
 
-		return createChartDataModelInternal(tourData, chartConfig, hasPropertyChanged);
+		return createChartDataModel_10(tourData, chartConfig, hasPropertyChanged);
 	}
 
-	private ChartDataModel createChartDataModelInternal(final TourData tourData,
-														final TourChartConfiguration tourChartConfig,
-														final boolean hasPropertyChanged) {
+	private ChartDataModel createChartDataModel_10(	final TourData tourData,
+													final TourChartConfiguration tourChartConfig,
+													final boolean hasPropertyChanged) {
 
 		final ChartDataModel chartDataModel = new ChartDataModel(ChartType.LINE);
 
@@ -1791,15 +1791,17 @@ public class TourManager {
 		/*
 		 * distance
 		 */
-
 		final double[] distanceSerie = tourData.getDistanceSerieDouble();
-		ChartDataXSerie xDataDistance = null;
+		ChartDataXSerie xDataDist = null;
 		if (distanceSerie != null) {
-			xDataDistance = new ChartDataXSerie(distanceSerie);
-			xDataDistance.setLabel(Messages.tour_editor_label_distance);
-			xDataDistance.setUnitLabel(UI.UNIT_LABEL_DISTANCE);
-			xDataDistance.setValueDivisor(1000);
-			xDataDistance.setDefaultRGB(new RGB(0, 0, 0));
+			xDataDist = new ChartDataXSerie(distanceSerie);
+			xDataDist.setLabel(Messages.tour_editor_label_distance);
+			xDataDist.setUnitLabel(UI.UNIT_LABEL_DISTANCE);
+			xDataDist.setValueDivisor(1000);
+			xDataDist.setDefaultRGB(new RGB(0, 0, 0));
+
+			// do not show average values but show the other values with 3 digits
+			xDataDist.setCustomData(CUSTOM_DATA_ANALYZER_INFO, new TourChartAnalyzerInfo(false, false, null, 3));
 		}
 
 		/*
@@ -1816,7 +1818,7 @@ public class TourManager {
 		 * displayed
 		 */
 		boolean isShowTimeOnXAxis;
-		if (xDataDistance == null) {
+		if (xDataDist == null) {
 			isShowTimeOnXAxis = true;
 			tourChartConfig.isForceTimeOnXAxis = true;
 		} else {
@@ -1832,9 +1834,9 @@ public class TourManager {
 			chartDataModel.setXData(xDataTime);
 			chartDataModel.addXyData(xDataTime);
 
-			if (xDataDistance != null) {
-				chartDataModel.setXData2nd(xDataDistance);
-				chartDataModel.addXyData(xDataDistance);
+			if (xDataDist != null) {
+				chartDataModel.setXData2nd(xDataDist);
+				chartDataModel.addXyData(xDataDist);
 			}
 
 			final DateTime tourStartTime = tourData.getTourStartTime();
@@ -1866,10 +1868,10 @@ public class TourManager {
 
 			// distance is available and is displayed on the x axis
 
-			chartDataModel.setXData(xDataDistance);
+			chartDataModel.setXData(xDataDist);
 			chartDataModel.setXData2nd(xDataTime);
 
-			chartDataModel.addXyData(xDataDistance);
+			chartDataModel.addXyData(xDataDist);
 			chartDataModel.addXyData(xDataTime);
 		}
 
@@ -1983,7 +1985,7 @@ public class TourManager {
 			yDataSpeed.setShowYSlider(true);
 			yDataSpeed.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_SPEED);
 			yDataSpeed.setCustomData(CUSTOM_DATA_ANALYZER_INFO, //
-					new TourChartAnalyzerInfo(true, true, _computeSpeedAvg, 2));
+					new TourChartAnalyzerInfo(true, true, _computeSpeedAvg, 1));
 
 			if (isHrZoneDisplayed) {
 				yDataSpeed.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_CUSTOM);
@@ -2072,7 +2074,8 @@ public class TourManager {
 			yDataAltimeter.setShowYSlider(true);
 			yDataAltimeter.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_ALTIMETER);
 			yDataAltimeter.setCustomData(CUSTOM_DATA_ANALYZER_INFO, //
-					new TourChartAnalyzerInfo(true, _computeAltimeterAvg));
+//					new TourChartAnalyzerInfo(true, _computeAltimeterAvg)
+					new TourChartAnalyzerInfo(true, false, _computeAltimeterAvg, 0));
 
 			if (isHrZoneDisplayed) {
 				yDataAltimeter.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_CUSTOM);
@@ -2300,7 +2303,7 @@ public class TourManager {
 		chartDataModel.setShowNoLineValues(tourChartConfig.isShowBreaktimeValues);
 
 		chartDataModel.setCustomData(CUSTOM_DATA_TIME, xDataTime);
-		chartDataModel.setCustomData(CUSTOM_DATA_DISTANCE, xDataDistance);
+		chartDataModel.setCustomData(CUSTOM_DATA_DISTANCE, xDataDist);
 
 		chartDataModel.setCustomData(CUSTOM_DATA_TOUR_DATA, tourData);
 		chartDataModel.setCustomData(CUSTOM_DATA_TOUR_ID, tourData.getTourId());
