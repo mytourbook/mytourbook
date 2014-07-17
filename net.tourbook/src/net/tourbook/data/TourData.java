@@ -650,6 +650,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	@ManyToOne
 	private TourBike											tourBike;
 
+	/*
+	 * ################################### TRANSIENT DATA ########################################
+	 */
+
 	/**
 	 * Contains time in <b>seconds</b> relativ to the tour start which is defined in:
 	 * {@link #startYear}, {@link #startMonth}, {@link #startDay}, {@link #startHour},
@@ -662,8 +666,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	 */
 	@Transient
 	public int[]												timeSerie;
-
-	// ############################################# TRANSIENT DATA #############################################
 
 	/**
 	 * contains the absolute distance in m (metric system)

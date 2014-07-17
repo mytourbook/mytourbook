@@ -343,6 +343,57 @@ public class TourDatabase {
 			return;
 		}
 
+		private static void Cleanup_DropConstraint(	final Statement stmt,
+													final String tableName,
+													final String constraintName) throws SQLException {
+
+			try {
+
+				exec(stmt, "ALTER TABLE " + tableName + " DROP CONSTRAINT " + constraintName);
+
+			} catch (final SQLException e) {
+
+				final String sqlState = e.getSQLState();
+				if (sqlState.equals("42X86")) { //$NON-NLS-1$
+
+					// Caused by: ERROR 42X86: ALTER TABLE failed. There is no constraint 'USER.FK_TOURDATA_TOURTAG_TOURTAG_TAGID' on table '"USER"."TOURDATA_TOURTAG"'.
+
+					/*
+					 * Ignore not existing constraints
+					 */
+					StatusUtil.log(e);
+
+				} else {
+					throw e;
+				}
+			}
+		}
+
+		private static void Cleanup_DropTable(final Statement stmt, final String tableName) throws SQLException {
+
+			try {
+
+				exec(stmt, "DROP TABLE " + tableName); //$NON-NLS-1$
+
+			} catch (final SQLException e) {
+
+				final String sqlState = e.getSQLState();
+				if (sqlState.equals("42Y55")) { //$NON-NLS-1$
+
+					// Caused by: ERROR 42Y55: 'DROP TABLE' cannot be performed on 'TOURCATEGORY' because it does not exist.
+
+					/*
+					 * This case occured because table TOURCATEGORY was created until version 1.6
+					 * but do not exist in later versions.
+					 */
+					StatusUtil.log(e);
+
+				} else {
+					throw e;
+				}
+			}
+		}
+
 		/**
 		 * Creates an ID field and set's the primary key.
 		 * 
@@ -380,17 +431,6 @@ public class TourDatabase {
 			final String sql = "CREATE INDEX " + indexAndColumnName + " ON " + tableName + " (" + indexAndColumnName + ")"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 
 			exec(stmt, sql);
-		}
-
-		private static void DropConstraint(final Statement stmt, final String tableName, final String constraintName)
-				throws SQLException {
-
-			exec(stmt, "ALTER TABLE " + tableName + " DROP CONSTRAINT " + constraintName); //$NON-NLS-1$ //$NON-NLS-2$
-		}
-
-		private static void DropTable(final Statement stmt, final String tableName) throws SQLException {
-
-			exec(stmt, "DROP TABLE " + tableName); //$NON-NLS-1$
 		}
 	}
 
@@ -4662,18 +4702,38 @@ public class TourDatabase {
 
 				// description column is not yet created -> do db update 24
 
+				/**
+				 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+				 * <p>
+				 * Drop tables first, when something goes wrong the existing tables are not yet
+				 * modified.
+				 * <p>
+				 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+				 */
+
 				/*
 				 * Drop tables which will never be used, they exist since many years but it is
 				 * unknows why they has been created.
 				 */
-				SQL.DropTable(stmt, TABLE_TOUR_CATEGORY);
-				SQL.DropTable(stmt, TABLE_TOURCATEGORY__TOURDATA);
+				SQL.Cleanup_DropTable(stmt, TABLE_TOUR_CATEGORY);
+				SQL.Cleanup_DropTable(stmt, TABLE_TOURCATEGORY__TOURDATA);
 
-				SQL.DropTable(stmt, JOINTABLE__TOURDATA__TOURMARKER);
-				SQL.DropTable(stmt, JOINTABLE__TOURDATA__TOURPHOTO);
-				SQL.DropTable(stmt, JOINTABLE__TOURDATA__TOURREFERENCE);
-				SQL.DropTable(stmt, JOINTABLE__TOURDATA__TOURWAYPOINT);
-				SQL.DropTable(stmt, JOINTABLE__TOURPERSON__TOURPERSON_HRZONE);
+				SQL.Cleanup_DropTable(stmt, JOINTABLE__TOURDATA__TOURMARKER);
+				SQL.Cleanup_DropTable(stmt, JOINTABLE__TOURDATA__TOURPHOTO);
+				SQL.Cleanup_DropTable(stmt, JOINTABLE__TOURDATA__TOURREFERENCE);
+				SQL.Cleanup_DropTable(stmt, JOINTABLE__TOURDATA__TOURWAYPOINT);
+				SQL.Cleanup_DropTable(stmt, JOINTABLE__TOURPERSON__TOURPERSON_HRZONE);
+
+				/*
+				 * Table: TOURTAG
+				 */
+				{
+					/**
+					 * Changed TagCategory from @ManyToMany to @ManyToOne because a tag can be
+					 * associated only with ONE category and not with multiple.
+					 */
+					SQL.Cleanup_DropConstraint(stmt, JOINTABLE__TOURDATA__TOURTAG, "FK_TOURDATA_TOURTAG_TOURTAG_TagID"); //$NON-NLS-1$
+				}
 
 				/*
 				 * Table: TOURMARKER
@@ -4692,17 +4752,6 @@ public class TourDatabase {
 					SQL.AddCol_VarCar(stmt, TABLE_TOUR_MARKER, "description", TourWayPoint.DB_LENGTH_DESCRIPTION); //$NON-NLS-1$
 					SQL.AddCol_VarCar(stmt, TABLE_TOUR_MARKER, "urlText", TourMarker.DB_LENGTH_URL_TEXT); //$NON-NLS-1$
 					SQL.AddCol_VarCar(stmt, TABLE_TOUR_MARKER, "urlAddress", TourMarker.DB_LENGTH_URL_ADDRESS); //$NON-NLS-1$
-				}
-
-				/*
-				 * Table: TOURTAG
-				 */
-				{
-					/**
-					 * Changed TagCategory from @ManyToMany to @ManyToOne because a tag can be
-					 * associated only with ONE category and not with multiple.
-					 */
-					SQL.DropConstraint(stmt, JOINTABLE__TOURDATA__TOURTAG, "FK_TOURDATA_TOURTAG_TOURTAG_TagID"); //$NON-NLS-1$
 				}
 			}
 		}

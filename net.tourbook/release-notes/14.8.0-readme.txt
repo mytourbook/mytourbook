@@ -28,10 +28,6 @@ A few names has been changed, the old names are deleted so you find them as not 
 
 
 
-New 3D Map Features 	
-
-* Map is positioned with a selected tour marker in the tour chart.
-
 
 New 
 
@@ -55,6 +51,11 @@ This missing feature was annoying the author since a very long time :-)
   - Delete marker
 Performance for these actions:
 When a single marker is modified with this context menu, the marker and tour will be saved and all opened views will be updated. This action needs some time, when multiple Markers should be changed it is faster to do it in the tour marker dialog.
+
+
+New 3D Map Features 	
+
+* Map is positioned with a selected tour marker in the tour chart.
 
 
 * Tagging view

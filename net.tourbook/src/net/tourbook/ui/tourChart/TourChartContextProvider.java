@@ -254,12 +254,12 @@ public class TourChartContextProvider implements IChartContextProvider, ITourPro
 
 		// fill actions
 		menuMgr.add(_actionSetMarkerPosition);
+		menuMgr.add(_actionSetMarkerVisible);
+		menuMgr.add(_actionDeleteMarker);
 //		menuMgr.add(_actionSetMarkerSignMenu);
 		menuMgr.add(_actionOpenMarkerDialog);
 
 //		menuMgr.add(new Separator());
-		menuMgr.add(_actionSetMarkerVisible);
-		menuMgr.add(_actionDeleteMarker);
 	}
 
 	@Override
