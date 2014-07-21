@@ -118,13 +118,13 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 	public static final String						ID									= "net.tourbook.views.TourSegmenter";	//$NON-NLS-1$
 
-	private static final String						DISTANCE_MILES_1_8					= "1/8"; //$NON-NLS-1$
-	private static final String						DISTANCE_MILES_1_4					= "1/4"; //$NON-NLS-1$
-	private static final String						DISTANCE_MILES_3_8					= "3/8"; //$NON-NLS-1$
-	private static final String						DISTANCE_MILES_1_2					= "1/2"; //$NON-NLS-1$
-	private static final String						DISTANCE_MILES_5_8					= "5/8"; //$NON-NLS-1$
-	private static final String						DISTANCE_MILES_3_4					= "3/4"; //$NON-NLS-1$
-	private static final String						DISTANCE_MILES_7_8					= "7/8"; //$NON-NLS-1$
+	private static final String						DISTANCE_MILES_1_8					= "1/8";								//$NON-NLS-1$
+	private static final String						DISTANCE_MILES_1_4					= "1/4";								//$NON-NLS-1$
+	private static final String						DISTANCE_MILES_3_8					= "3/8";								//$NON-NLS-1$
+	private static final String						DISTANCE_MILES_1_2					= "1/2";								//$NON-NLS-1$
+	private static final String						DISTANCE_MILES_5_8					= "5/8";								//$NON-NLS-1$
+	private static final String						DISTANCE_MILES_3_4					= "3/4";								//$NON-NLS-1$
+	private static final String						DISTANCE_MILES_7_8					= "7/8";								//$NON-NLS-1$
 
 	private static final String						FORMAT_ALTITUDE_DIFF				= "%d / %d %s";						//$NON-NLS-1$
 
@@ -210,7 +210,8 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	private int										_maxDistanceSpinner;
 	private int										_spinnerDistancePage;
 
-	private boolean									_isShowSegmentsInChart;
+	private boolean									_isSegmentLayerInTourChartVisible;
+	private boolean									_isSegmentLayerInTourChartVisibleBackup;
 	private boolean									_isTourDirty						= false;
 	private boolean									_isSaving;
 
@@ -361,7 +362,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 		@Override
 		public void run() {
-			_isShowSegmentsInChart = !_isShowSegmentsInChart;
+			_isSegmentLayerInTourChartVisible = !_isSegmentLayerInTourChartVisible;
 			fireSegmentLayerChanged();
 		}
 	}
@@ -501,13 +502,17 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 			public void partDeactivated(final IWorkbenchPartReference partRef) {}
 
-			public void partHidden(final IWorkbenchPartReference partRef) {}
+			public void partHidden(final IWorkbenchPartReference partRef) {
+				onPartHidden();
+			}
 
 			public void partInputChanged(final IWorkbenchPartReference partRef) {}
 
 			public void partOpened(final IWorkbenchPartReference partRef) {}
 
-			public void partVisible(final IWorkbenchPartReference partRef) {}
+			public void partVisible(final IWorkbenchPartReference partRef) {
+				onPartVisible();
+			}
 		};
 
 		getSite().getPage().addPartListener(_partListener);
@@ -775,8 +780,9 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		getSite().setSelectionProvider(_postSelectionProvider = new PostSelectionProvider(ID));
 
 		// set default value, show segments in opened charts
-		_isShowSegmentsInChart = true;
-		_actionShowSegments.setChecked(_isShowSegmentsInChart);
+		_isSegmentLayerInTourChartVisible = true;
+		_isSegmentLayerInTourChartVisibleBackup = true;
+		_actionShowSegments.setChecked(_isSegmentLayerInTourChartVisible);
 
 		_pageBookUI.showPage(_lblNoData);
 
@@ -1795,7 +1801,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 				SWT.H_SCROLL | SWT.V_SCROLL | SWT.FULL_SELECTION | SWT.MULTI /* | SWT.BORDER */);
 
 		table.setHeaderVisible(true);
-		table.setLinesVisible(true);
+//		table.setLinesVisible(true);
 		GridDataFactory.fillDefaults().grab(true, true).applyTo(table);
 
 		_segmentViewer = new TableViewer(table);
@@ -2535,14 +2541,14 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	private void fireSegmentLayerChanged() {
 
 		// ensure segments are created because they can be null when tour is saved an a new instance is displayed
-		if (_isShowSegmentsInChart && _tourData.segmentSerieIndex == null) {
+		if (_isSegmentLayerInTourChartVisible && _tourData.segmentSerieIndex == null) {
 			createSegments(false);
 		}
 
 		// show/hide the segments in the chart
 		TourManager.fireEventWithCustomData(
 				TourEventId.SEGMENT_LAYER_CHANGED,
-				_isShowSegmentsInChart,
+				_isSegmentLayerInTourChartVisible,
 				TourSegmenterView.this);
 	}
 
@@ -2698,8 +2704,8 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	 */
 	private void hideTourSegmentsInChart() {
 
-		_isShowSegmentsInChart = false;
-		_actionShowSegments.setChecked(_isShowSegmentsInChart);
+		_isSegmentLayerInTourChartVisible = false;
+		_actionShowSegments.setChecked(_isSegmentLayerInTourChartVisible);
 
 		fireSegmentLayerChanged();
 	}
@@ -2732,6 +2738,30 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		setTourDirty();
 
 		createSegments(true);
+	}
+
+	private void onPartHidden() {
+
+		_isSegmentLayerInTourChartVisibleBackup = _isSegmentLayerInTourChartVisible;
+
+		if (_isSegmentLayerInTourChartVisible) {
+
+			// fire event only when segment layer is visible
+			_isSegmentLayerInTourChartVisible = false;
+			fireSegmentLayerChanged();
+		}
+	}
+
+	private void onPartVisible() {
+
+		final boolean isShowSegmentsInChart = _isSegmentLayerInTourChartVisible;
+
+		_isSegmentLayerInTourChartVisible = _isSegmentLayerInTourChartVisibleBackup;
+
+		// fire event only when state changed
+		if (isShowSegmentsInChart != _isSegmentLayerInTourChartVisible) {
+			fireSegmentLayerChanged();
+		}
 	}
 
 	private void onSaveTourAltitude() {
@@ -3436,8 +3466,8 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 				net.tourbook.common.UI.UNIT_LABEL_ALTITUDE,
 
 				// DP
-				_nf_1_1.format(_tourData.getDpTolerance() / 10.0f),
 				_nf_1_1.format(_dpToleranceAltitude),
+				_nf_1_1.format(_tourData.getDpTolerance() / 10.0f),
 		//
 				}));
 	}
