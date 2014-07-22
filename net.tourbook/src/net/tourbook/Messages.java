@@ -614,6 +614,8 @@ public class Messages extends NLS {
 	public static String		Image__App_Add_2x;
 	public static String		Image__App_Cancel;
 	public static String		Image__App_Close;
+
+	public static String	Image__App_Edit_Paste;
 	public static String		Image__App_OK;
 	public static String		Image__App_Trash;
 	public static String		Image__App_Trash_Disabled;

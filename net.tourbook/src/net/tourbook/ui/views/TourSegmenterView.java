@@ -2748,7 +2748,10 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 			// fire event only when segment layer is visible
 			_isSegmentLayerInTourChartVisible = false;
-			fireSegmentLayerChanged();
+
+			if (_tourData != null) {
+				fireSegmentLayerChanged();
+			}
 		}
 	}
 
@@ -2760,7 +2763,9 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 		// fire event only when state changed
 		if (isShowSegmentsInChart != _isSegmentLayerInTourChartVisible) {
-			fireSegmentLayerChanged();
+			if (_tourData != null) {
+				fireSegmentLayerChanged();
+			}
 		}
 	}
 

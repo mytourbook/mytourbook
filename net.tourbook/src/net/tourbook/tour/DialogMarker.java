@@ -89,6 +89,7 @@ import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
@@ -207,6 +208,7 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
 //	private Group						_groupImage;
 
 //	private ImageCanvas					_imgTourImage;
+	private Image						_imagePaste;
 
 	private Label						_lblDescription;
 //	private Label						_lblImageName;
@@ -1092,7 +1094,7 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
 
 			// paste
 			_btnPasteText = new Button(parent, SWT.NONE);
-			_btnPasteText.setText(Messages.Dlg_TourMarker_Button_PasteFromClipboard);
+			_btnPasteText.setImage(_imagePaste);
 			_btnPasteText.setToolTipText(Messages.Dlg_TourMarker_Button_PasteFromClipboard_Tooltip);
 			_btnPasteText.addSelectionListener(new SelectionAdapter() {
 				@Override
@@ -1127,7 +1129,7 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
 			GridDataFactory.fillDefaults()//
 					.align(SWT.BEGINNING, SWT.CENTER)
 					.applyTo(_btnPasteUrl);
-			_btnPasteUrl.setText(Messages.Dlg_TourMarker_Button_PasteFromClipboard);
+			_btnPasteUrl.setImage(_imagePaste);
 			_btnPasteUrl.setToolTipText(Messages.Dlg_TourMarker_Button_PasteFromClipboard_Tooltip);
 			_btnPasteUrl.addSelectionListener(new SelectionAdapter() {
 				@Override
@@ -1588,6 +1590,8 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
 	private void dispose() {
 
 		_firstColumnControls.clear();
+
+		Util.disposeResource(_imagePaste);
 	}
 
 	private void enableControls() {
@@ -1723,6 +1727,8 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
 	private void initUI(final Composite parent) {
 
 		_pc = new PixelConverter(parent);
+
+		_imagePaste = TourbookPlugin.getImageDescriptor(Messages.Image__App_Edit_Paste).createImage();
 
 //		final int signImageMaxSize = TourMarker.getSignImageMaxSize(_pc);
 
