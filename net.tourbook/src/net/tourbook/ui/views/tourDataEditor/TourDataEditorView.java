@@ -1681,6 +1681,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		TourManager.getInstance().addTourSaveListener(_tourSaveListener);
 	}
+
 	/**
 	 * Checks if a marker is within the selected time slices
 	 * 
@@ -3521,7 +3522,13 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 						final float distancePrevious = _serieDistance[serieIndex - 1] / 1000 / _unitValueDistance;
 						final float distance = _serieDistance[serieIndex] / 1000 / _unitValueDistance;
 
-						cell.setText(_nf3.format(distance - distancePrevious));
+						final float distanceDiff = distance - distancePrevious;
+
+						if (distanceDiff < 0.001) {
+							cell.setText(UI.EMPTY_STRING);
+						} else {
+							cell.setText(_nf3.format(distanceDiff));
+						}
 					}
 				} else {
 					cell.setText(UI.EMPTY_STRING);

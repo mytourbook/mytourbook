@@ -976,7 +976,9 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 			/*
 			 * compute altitude
 			 */
-			_spinnerDPTolerance.setSelection(50); // 5.0
+			final float prefDPTolerance = _prefStore.getDefaultFloat(//
+					ITourbookPreferences.COMPUTED_ALTITUDE_DP_TOLERANCE) * 10;
+			_spinnerDPTolerance.setSelection((int) prefDPTolerance);
 
 		} else if (_tabFolder.getSelectionIndex() == TAB_FOLDER_SMOOTHING) {
 
@@ -1059,7 +1061,7 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 		_isUpdateUI = true;
 		{
 			/*
-			 * find pref minAlti value in list
+			 * DP tolerance
 			 */
 			final float prefDPTolerance = _prefStore.getFloat(ITourbookPreferences.COMPUTED_ALTITUDE_DP_TOLERANCE) * 10;
 			_spinnerDPTolerance.setSelection((int) prefDPTolerance);

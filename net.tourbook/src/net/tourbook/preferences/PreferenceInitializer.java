@@ -329,7 +329,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 		store.setDefault(ITourbookPreferences.BREAK_TIME_SLICE_DIFF, 5); // 5 minutes
 
 		// DP tolerance when computing altitude up/down
-		store.setDefault(ITourbookPreferences.COMPUTED_ALTITUDE_DP_TOLERANCE, 5.0f);
+		store.setDefault(ITourbookPreferences.COMPUTED_ALTITUDE_DP_TOLERANCE, 7.0f);
 
 		/*
 		 * calendar week

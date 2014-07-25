@@ -210,8 +210,8 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	private int										_maxDistanceSpinner;
 	private int										_spinnerDistancePage;
 
-	private boolean									_isSegmentLayerInTourChartVisible;
-	private boolean									_isSegmentLayerInTourChartVisibleBackup;
+//	private boolean									_isSegmentLayerInTourChartVisible;
+//	private boolean									_isSegmentLayerInTourChartVisibleBackup;
 	private boolean									_isTourDirty						= false;
 	private boolean									_isSaving;
 
@@ -355,15 +355,14 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		public ActionShowSegments() {
 
 			super(Messages.App_Action_open_tour_segmenter, SWT.TOGGLE);
-			setToolTipText(Messages.App_Action_open_tour_segmenter_tooltip);
 
+			setToolTipText(Messages.App_Action_open_tour_segmenter_tooltip);
 			setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__tour_segmenter));
 		}
 
 		@Override
 		public void run() {
-			_isSegmentLayerInTourChartVisible = !_isSegmentLayerInTourChartVisible;
-			fireSegmentLayerChanged();
+			fireSegmentLayerChanged(false);
 		}
 	}
 
@@ -780,9 +779,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		getSite().setSelectionProvider(_postSelectionProvider = new PostSelectionProvider(ID));
 
 		// set default value, show segments in opened charts
-		_isSegmentLayerInTourChartVisible = true;
-		_isSegmentLayerInTourChartVisibleBackup = true;
-		_actionShowSegments.setChecked(_isSegmentLayerInTourChartVisible);
+		_actionShowSegments.setChecked(true);
 
 		_pageBookUI.showPage(_lblNoData);
 
@@ -899,7 +896,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		reloadViewer();
 
 		if (isFireEvent) {
-			fireSegmentLayerChanged();
+			fireSegmentLayerChanged(false);
 		}
 	}
 
@@ -2536,19 +2533,25 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	}
 
 	/**
-	 * notify listeners to show/hide the segments
+	 * Notify listeners to show/hide the segments.
+	 * 
+	 * @param isForceHidden
+	 *            When <code>true</code> the segment layer will be hidden, otherwise the layer is
+	 *            set visible depending on the action state.
 	 */
-	private void fireSegmentLayerChanged() {
+	private void fireSegmentLayerChanged(final boolean isForceHidden) {
 
-		// ensure segments are created because they can be null when tour is saved an a new instance is displayed
-		if (_isSegmentLayerInTourChartVisible && _tourData.segmentSerieIndex == null) {
+		final boolean isSegmentLayerVisible = isForceHidden == true ? false : _actionShowSegments.isChecked();
+
+		// ensure segments are created because they can be null when tour is saved and a new instance is displayed
+		if (isSegmentLayerVisible && _tourData.segmentSerieIndex == null) {
 			createSegments(false);
 		}
 
 		// show/hide the segments in the chart
-		TourManager.fireEventWithCustomData(
+		TourManager.fireEventWithCustomData(//
 				TourEventId.SEGMENT_LAYER_CHANGED,
-				_isSegmentLayerInTourChartVisible,
+				isSegmentLayerVisible,
 				TourSegmenterView.this);
 	}
 
@@ -2704,10 +2707,9 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	 */
 	private void hideTourSegmentsInChart() {
 
-		_isSegmentLayerInTourChartVisible = false;
-		_actionShowSegments.setChecked(_isSegmentLayerInTourChartVisible);
+		_actionShowSegments.setChecked(false);
 
-		fireSegmentLayerChanged();
+		fireSegmentLayerChanged(false);
 	}
 
 	private void onChangeBreakTime() {
@@ -2742,30 +2744,20 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 	private void onPartHidden() {
 
-		_isSegmentLayerInTourChartVisibleBackup = _isSegmentLayerInTourChartVisible;
-
-		if (_isSegmentLayerInTourChartVisible) {
+		if (_actionShowSegments.isChecked()) {
 
 			// fire event only when segment layer is visible
-			_isSegmentLayerInTourChartVisible = false;
 
 			if (_tourData != null) {
-				fireSegmentLayerChanged();
+				fireSegmentLayerChanged(true);
 			}
 		}
 	}
 
 	private void onPartVisible() {
 
-		final boolean isShowSegmentsInChart = _isSegmentLayerInTourChartVisible;
-
-		_isSegmentLayerInTourChartVisible = _isSegmentLayerInTourChartVisibleBackup;
-
-		// fire event only when state changed
-		if (isShowSegmentsInChart != _isSegmentLayerInTourChartVisible) {
-			if (_tourData != null) {
-				fireSegmentLayerChanged();
-			}
+		if (_tourData != null) {
+			fireSegmentLayerChanged(false);
 		}
 	}
 
