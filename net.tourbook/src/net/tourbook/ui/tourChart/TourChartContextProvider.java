@@ -165,7 +165,7 @@ public class TourChartContextProvider implements IChartContextProvider, ITourPro
 
 			// a marker is hovered
 
-			fillContextMenu_TourMarker(menuMgr, tourMarker);
+			fillContextMenu_TourMarker(menuMgr, tourMarker, tourChart);
 
 		} else {
 
@@ -208,17 +208,15 @@ public class TourChartContextProvider implements IChartContextProvider, ITourPro
 				tourChart.getLeftSlider().getValuesIndex(),
 				tourChart.getRightSlider().getValuesIndex());
 
-		/////////////////////////////////////////////////////////////////////////////
-		/////////////////////////////////////////////////////////////////////////////
 
 		/*
 		 * enable actions
 		 */
 
 		final TourData tourData = tourChart.getTourData();
+		final Set<TourTag> tourTags = tourData == null ? null : tourData.getTourTags();
 
 		final boolean isTourSaved = tourData != null && tourData.getTourPerson() != null;
-		final Set<TourTag> tourTags = tourData == null ? null : tourData.getTourTags();
 
 		long existingTourTypeId = TourDatabase.ENTITY_IS_NOT_SAVED;
 		if (tourData != null) {
@@ -243,7 +241,9 @@ public class TourChartContextProvider implements IChartContextProvider, ITourPro
 		TourTypeMenuManager.enableRecentTourTypeActions(isTourSaved, existingTourTypeId);
 	}
 
-	private void fillContextMenu_TourMarker(final IMenuManager menuMgr, final TourMarker tourMarker) {
+	private void fillContextMenu_TourMarker(final IMenuManager menuMgr,
+											final TourMarker tourMarker,
+											final TourChart tourChart) {
 
 		// setup actions
 		_actionDeleteMarker.setTourMarker(tourMarker, true);
@@ -260,6 +260,20 @@ public class TourChartContextProvider implements IChartContextProvider, ITourPro
 		menuMgr.add(_actionOpenMarkerDialog);
 
 //		menuMgr.add(new Separator());
+
+		/*
+		 * enable actions
+		 */
+
+		final TourData tourData = tourChart.getTourData();
+
+		final boolean isTourSaved = tourData != null && tourData.getTourPerson() != null;
+
+		_actionDeleteMarker.setEnabled(isTourSaved);
+		_actionOpenMarkerDialog.setEnabled(isTourSaved);
+		_actionSetMarkerVisible.setEnabled(isTourSaved);
+		_actionSetMarkerPosition.setEnabled(isTourSaved);
+//		_actionSetMarkerSignMenu.setEnabled(isTourSaved);
 	}
 
 	@Override

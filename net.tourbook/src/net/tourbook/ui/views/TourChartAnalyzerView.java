@@ -662,6 +662,10 @@ public class TourChartAnalyzerView extends ViewPart {
 					return;
 				}
 
+				if (_innerScContainer == null | _innerScContainer.isDisposed()) {
+					return;
+				}
+
 				updateInfo(tourChart.getChartInfo());
 			}
 		});
