@@ -632,6 +632,13 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	private Set<TourTag>										tourTags							= new HashSet<TourTag>();
 
 	/**
+	 * SharedMarker
+	 */
+	@ManyToMany(fetch = EAGER)
+	@JoinTable(inverseJoinColumns = @JoinColumn(name = "SHAREDMARKER_SharedMarkerID", referencedColumnName = "SharedMarkerID"))
+	private Set<SharedMarker>									sharedMarker						= new HashSet<SharedMarker>();
+
+	/**
 	 * Category of the tour, e.g. bike, mountainbike, jogging, inlinescating
 	 */
 	@ManyToOne

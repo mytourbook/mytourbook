@@ -512,11 +512,11 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		_viewerContainer = new Composite(parent, SWT.NONE);
 		GridLayoutFactory.fillDefaults().applyTo(_viewerContainer);
 		{
-			createUI10TourViewer(_viewerContainer);
+			createUI_10_TourViewer(_viewerContainer);
 		}
 	}
 
-	private void createUI10TourViewer(final Composite parent) {
+	private void createUI_10_TourViewer(final Composite parent) {
 
 		// tour tree
 		final Tree tree = new Tree(parent, SWT.H_SCROLL | SWT.V_SCROLL | SWT.FLAT | SWT.FULL_SELECTION | SWT.MULTI);
@@ -570,7 +570,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		 * the context menu must be created after the viewer is created which is also done after the
 		 * measurement system has changed
 		 */
-		createUI20ContextMenu();
+		createUI_20_ContextMenu();
 
 		// set tour info tooltip provider
 		_tourInfoToolTip = new TreeViewerTourInfoToolTip(_tourViewer);
@@ -579,7 +579,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 	/**
 	 * create the views context menu
 	 */
-	private void createUI20ContextMenu() {
+	private void createUI_20_ContextMenu() {
 
 		final MenuManager menuMgr = new MenuManager("#PopupMenu"); //$NON-NLS-1$
 		menuMgr.setRemoveAllWhenShown(true);
@@ -2081,7 +2081,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 
 			_tourViewer.getTree().dispose();
 
-			createUI10TourViewer(_viewerContainer);
+			createUI_10_TourViewer(_viewerContainer);
 			_viewerContainer.layout();
 
 			_tourViewer.setInput(_rootItem = new TVITourBookRoot(this));

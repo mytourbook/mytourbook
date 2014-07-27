@@ -28,6 +28,7 @@ import java.net.URL;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
@@ -123,6 +124,17 @@ public class Util {
 		if (conn != null) {
 			try {
 				conn.close();
+			} catch (final SQLException e) {
+				SQLUtils.showSQLException(e);
+			}
+		}
+	}
+
+	public static void closeSql(final ResultSet result) {
+		
+		if (result != null) {
+			try {
+				result.close();
 			} catch (final SQLException e) {
 				SQLUtils.showSQLException(e);
 			}

@@ -66,7 +66,7 @@ public class TourWayPoint implements Cloneable, Comparable<Object>, IHoveredArea
 	private long			time					= 0;
 
 	/**
-	 * altitude in meters
+	 * Altitude in meters.
 	 */
 	private float			altitude				= Float.MIN_VALUE;
 

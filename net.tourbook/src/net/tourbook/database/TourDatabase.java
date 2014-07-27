@@ -50,6 +50,7 @@ import net.tourbook.application.MyTourbookSplashHandler;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
+import net.tourbook.data.SharedMarker;
 import net.tourbook.data.TourBike;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
@@ -92,8 +93,9 @@ public class TourDatabase {
 	/**
 	 * version for the database which is required that the tourbook application works successfully
 	 */
-	private static final int						TOURBOOK_DB_VERSION							= 24;
+	private static final int						TOURBOOK_DB_VERSION							= 25;										// 14.?
 
+//	private static final int						TOURBOOK_DB_VERSION							= 25;	// 14.?
 //	private static final int						TOURBOOK_DB_VERSION							= 24;	// 14.7
 //	private static final int						TOURBOOK_DB_VERSION							= 23;	// 13.2.0
 //	private static final int						TOURBOOK_DB_VERSION							= 22;	// 12.12.0
@@ -129,6 +131,7 @@ public class TourDatabase {
 
 	private static final String						TABLE_DB_VERSION							= "DBVERSION";								//$NON-NLS-1$
 	//
+	public static final String						TABLE_SHARED_MARKER							= "SHAREDMARKER";							//$NON-NLS-1$
 	public static final String						TABLE_TOUR_BIKE								= "TOURBIKE";								//$NON-NLS-1$
 	public static final String						TABLE_TOUR_COMPARED							= "TOURCOMPARED";							//$NON-NLS-1$
 	public static final String						TABLE_TOUR_DATA								= "TOURDATA";								//$NON-NLS-1$
@@ -144,6 +147,8 @@ public class TourDatabase {
 	public static final String						TABLE_TOUR_TYPE								= "TOURTYPE";								//$NON-NLS-1$
 	public static final String						TABLE_TOUR_WAYPOINT							= "TOURWAYPOINT";							//$NON-NLS-1$
 	//
+	public static final String						JOINTABLE__TOURDATA__SHAREDMARKER			= TABLE_TOUR_DATA
+																										+ "_" + TABLE_SHARED_MARKER;		//$NON-NLS-1$
 	public static final String						JOINTABLE__TOURDATA__TOURTAG				= TABLE_TOUR_DATA
 																										+ "_" + TABLE_TOUR_TAG;			//$NON-NLS-1$
 	public static final String						JOINTABLE__TOURTAGCATEGORY_TOURTAG			= TABLE_TOUR_TAG_CATEGORY
@@ -180,6 +185,7 @@ public class TourDatabase {
 	private static final String						ENTITY_ID_PHOTO								= "PhotoID";								//$NON-NLS-1$
 	private static final String						ENTITY_ID_REF								= "RefID";									//$NON-NLS-1$
 //	private static final String						ENTITY_ID_SIGN								= "SignID";								//$NON-NLS-1$
+	private static final String						ENTITY_ID_SHARED_MARKER						= "SharedMarkerID";						//$NON-NLS-1$
 	private static final String						ENTITY_ID_TAG								= "TagID";									//$NON-NLS-1$
 	private static final String						ENTITY_ID_TAG_CATEGORY						= "TagCategoryID";							//$NON-NLS-1$
 	private static final String						ENTITY_ID_TOUR								= "TourID";								//$NON-NLS-1$
@@ -192,11 +198,13 @@ public class TourDatabase {
 																										+ "_" + ENTITY_ID_PERSON;			//$NON-NLS-1$
 //	private static final String						KEY_SIGN									= TABLE_TOUR_SIGN
 //																										+ "_" + ENTITY_ID_SIGN;			//$NON-NLS-1$
+	private static final String						KEY_SHARED_MARKER							= TABLE_SHARED_MARKER
+																										+ "_" + ENTITY_ID_SHARED_MARKER;	//$NON-NLS-1$
 	private static final String						KEY_TAG										= TABLE_TOUR_TAG
 																										+ "_" + ENTITY_ID_TAG;				//$NON-NLS-1$
 	private static final String						KEY_TAG_CATEGORY							= TABLE_TOUR_TAG_CATEGORY
 																										+ "_" + ENTITY_ID_TAG_CATEGORY;	//$NON-NLS-1$
-	private static final String						KEY_TOUR									= TABLE_TOUR_DATA
+	public static final String						KEY_TOUR									= TABLE_TOUR_DATA
 																										+ "_" + ENTITY_ID_TOUR;			//$NON-NLS-1$
 	private static final String						KEY_TYPE									= TABLE_TOUR_TYPE
 																										+ "_" + ENTITY_ID_TYPE;			//$NON-NLS-1$
@@ -2110,6 +2118,7 @@ public class TourDatabase {
 				createTable_TourTagCategory(stmt);
 
 				createTable_TourWayPoint(stmt);
+				createTable_SharedMarker(stmt);
 
 //				createTable_TourSign(stmt);
 //				createTable_TourSignCategory(stmt);
@@ -2272,6 +2281,51 @@ public class TourDatabase {
 		 */
 		sql = "CREATE INDEX TourEndTime" + " ON " + TABLE_TOUR_DATA + " (TourEndTime)"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		exec(stmt, sql);
+	}
+
+	/**
+	 * Create table {@link #TABLE_SHARED_MARKER} for {@link SharedMarker} entities.
+	 * 
+	 * @param stmt
+	 * @throws SQLException
+	 * @since DB version 25
+	 */
+	private void createTable_SharedMarker(final Statement stmt) throws SQLException {
+
+		/*
+		 * Create table: SharedMarker
+		 */
+		exec(stmt, "CREATE TABLE " + TABLE_SHARED_MARKER + "	(											\n" //$NON-NLS-1$ //$NON-NLS-2$
+				//
+				+ SQL.CreateField_EntityId(ENTITY_ID_SHARED_MARKER, true)
+				//
+				+ "	name				VARCHAR(" + TourWayPoint.DB_LENGTH_NAME + "),						\n" //$NON-NLS-1$ //$NON-NLS-2$
+				+ "	description			VARCHAR(" + TourWayPoint.DB_LENGTH_DESCRIPTION + "),				\n" //$NON-NLS-1$ //$NON-NLS-2$
+				+ "	comment				VARCHAR(" + TourWayPoint.DB_LENGTH_COMMENT + "),					\n" //$NON-NLS-1$ //$NON-NLS-2$
+				+ "	urlText				VARCHAR(" + TourMarker.DB_LENGTH_URL_TEXT + "),						\n" //$NON-NLS-1$ //$NON-NLS-2$
+				+ "	urlAddress			VARCHAR(" + TourMarker.DB_LENGTH_URL_ADDRESS + "),					\n" //$NON-NLS-1$ //$NON-NLS-2$
+				+ "	latitude 			DOUBLE NOT NULL,													\n" //$NON-NLS-1$
+				+ "	longitude 			DOUBLE NOT NULL,													\n" //$NON-NLS-1$
+				+ "	altitude			FLOAT																\n" //$NON-NLS-1$
+				//
+				+ ")"); //$NON-NLS-1$
+
+		/**
+		 * Create table: SHAREDMARKER_TOURDATA
+		 */
+		exec(stmt, "CREATE TABLE " + JOINTABLE__TOURDATA__SHAREDMARKER + "	(								\n" //$NON-NLS-1$ //$NON-NLS-2$
+				//
+				+ "	" + KEY_SHARED_MARKER + "	BIGINT NOT NULL,											\n"//$NON-NLS-1$ //$NON-NLS-2$
+				+ "	" + KEY_TOUR + "			BIGINT NOT NULL												\n"//$NON-NLS-1$ //$NON-NLS-2$
+				//
+				+ ")"); //$NON-NLS-1$
+
+		// Add Constraint
+		final String fkName = "fk_" + JOINTABLE__TOURDATA__SHAREDMARKER + "_" + KEY_TOUR; //							//$NON-NLS-1$ //$NON-NLS-2$
+		exec(stmt, "ALTER TABLE " + JOINTABLE__TOURDATA__SHAREDMARKER + "									\n" //$NON-NLS-1$ //$NON-NLS-2$
+				+ "	ADD CONSTRAINT " + fkName + "															\n" //$NON-NLS-1$ //$NON-NLS-2$
+				+ "	FOREIGN KEY (" + KEY_TOUR + ")															\n" //$NON-NLS-1$ //$NON-NLS-2$
+				+ "	REFERENCES " + TABLE_TOUR_DATA + " (" + ENTITY_ID_TOUR + ")								"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 
 	/**
@@ -2793,9 +2847,6 @@ public class TourDatabase {
 
 		/**
 		 * Create table: TOURDATA_TOURTAG
-		 * <p>
-		 * This table should correctly be named TOURTAG_TOURDATA but this is a mistake in the
-		 * beginning of my SQL/EJB experience.
 		 */
 		exec(stmt, "CREATE TABLE " + JOINTABLE__TOURDATA__TOURTAG + "	(									\n" //$NON-NLS-1$ //$NON-NLS-2$
 				//
@@ -3126,6 +3177,49 @@ public class TourDatabase {
 		return false;
 	}
 
+	private boolean isTableAvailable(final Connection conn, final String table) {
+
+		try {
+
+			final DatabaseMetaData meta = conn.getMetaData();
+			final ResultSet result = meta.getTables(null, TABLE_SCHEMA, table.toUpperCase(), null);
+
+			while (result.next()) {
+				return true;
+			}
+
+//			/*
+//			 * dump all columns
+//			 */
+//			final DatabaseMetaData meta = conn.getMetaData();
+////			final ResultSet result = meta.getTables(null, null, null, new String[] {"TABLE"});
+//			final ResultSet result = meta.getTables(null, null, null, null);
+//
+//			while (result.next()) {
+//				System.out.println(("   " + result.getString("TABLE_CAT"))
+//						+ (", " + result.getString("TABLE_SCHEM"))
+//						+ (", " + result.getString("TABLE_NAME"))
+//						+ (", " + result.getString("TABLE_TYPE"))
+//						+ (", " + result.getString("REMARKS")));
+//			}
+////				TABLE_CAT String => table catalog (may be null)
+////				TABLE_SCHEM String => table schema (may be null)
+////				TABLE_NAME String => table name
+////				TABLE_TYPE String => table type. Typical types are "TABLE", "VIEW", "SYSTEM TABLE", "GLOBAL TEMPORARY", "LOCAL TEMPORARY", "ALIAS", "SYNONYM".
+////				REMARKS String => explanatory comment on the table
+////				TYPE_CAT String => the types catalog (may be null)
+////				TYPE_SCHEM String => the types schema (may be null)
+////				TYPE_NAME String => type name (may be null)
+////				SELF_REFERENCING_COL_NAME String => name of the designated "identifier" column of a typed table (may be null)
+////				REF_GENERATION String => specifies how values in SELF_REFERENCING_COL_NAME are created. Values are "SYSTEM", "USER", "DERIVED". (may be null)
+
+		} catch (final SQLException e) {
+			UI.showSQLException(e);
+		}
+
+		return false;
+	}
+
 	private void logDbUpdateEnd(final int dbVersion) {
 		System.out.println(NLS.bind(Messages.Tour_Database_UpdateDone, dbVersion));
 		System.out.println();
@@ -3358,6 +3452,13 @@ public class TourDatabase {
 			 */
 			if (currentDbVersion == 23) {
 				currentDbVersion = newVersion = updateDbDesign_023_to_024(conn, monitor);
+			}
+
+			/*
+			 * 24 -> 25
+			 */
+			if (currentDbVersion == 24) {
+				currentDbVersion = newVersion = updateDbDesign_024_to_025(conn, monitor);
 			}
 
 			/*
@@ -4753,6 +4854,32 @@ public class TourDatabase {
 					SQL.AddCol_VarCar(stmt, TABLE_TOUR_MARKER, "urlText", TourMarker.DB_LENGTH_URL_TEXT); //$NON-NLS-1$
 					SQL.AddCol_VarCar(stmt, TABLE_TOUR_MARKER, "urlAddress", TourMarker.DB_LENGTH_URL_ADDRESS); //$NON-NLS-1$
 				}
+			}
+		}
+		stmt.close();
+
+		logDbUpdateEnd(newDbVersion);
+
+		return newDbVersion;
+	}
+
+	private int updateDbDesign_024_to_025(final Connection conn, final IProgressMonitor monitor) throws SQLException {
+
+		final int newDbVersion = 25;
+
+		logDbUpdateStart(newDbVersion);
+
+		if (monitor != null) {
+			monitor.subTask(NLS.bind(Messages.Tour_Database_Update, newDbVersion));
+		}
+
+		final Statement stmt = conn.createStatement();
+		{
+			// check if db is updated to version 25
+			if (isTableAvailable(conn, TABLE_SHARED_MARKER) == false) {
+
+				// table SharedMarker is not available -> do db update 25
+				createTable_SharedMarker(stmt);
 			}
 		}
 		stmt.close();

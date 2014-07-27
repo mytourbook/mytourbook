@@ -28,6 +28,8 @@ public class Messages extends NLS {
 	public static String		Action_PhotosAndTours_FilterPhotos_Tooltip;
 	public static String		Action_PhotosAndTours_SavePhotoInTour;
 
+	public static String	Action_SharedMarker_ConvertFromTourMarker;
+
 //	public static String		Action_Sign_MarkerImagePreferences;
 //	public static String		Action_Sign_RemoveMarkerImage;
 

@@ -102,39 +102,6 @@ public class ActionSetMarkerLabelPositionMenu extends Action implements IMenuCre
 		return new ActionContributionItem(action);
 	}
 
-//	static {
-//
-//		final String[] LABEL_POSITIONS = new String[] { //
-//		//
-//			Messages.Tour_Marker_Position_vertical_above, // 				0
-//			Messages.Tour_Marker_Position_vertical_below, //				1
-//			Messages.Tour_Marker_Position_vertical_chart_top, // 			2
-//			Messages.Tour_Marker_Position_vertical_chart_bottom, // 		3
-//			Messages.Tour_Marker_Position_horizontal_above_left, // 		4
-//			Messages.Tour_Marker_Position_horizontal_above_centered, // 	5
-//			Messages.Tour_Marker_Position_horizontal_above_right, // 		6
-//			Messages.Tour_Marker_Position_horizontal_below_left, // 		7
-//			Messages.Tour_Marker_Position_horizontal_below_centered, // 	8
-//			Messages.Tour_Marker_Position_horizontal_below_right, // 		9
-//			Messages.Tour_Marker_Position_horizontal_left, // 				10
-//			Messages.Tour_Marker_Position_horizontal_right, // 				11
-//		};
-//	}
-//
-//	public final static int	LABEL_POS_VERTICAL_ABOVE_GRAPH				= 0;
-//	public final static int	LABEL_POS_VERTICAL_BELOW_GRAPH				= 1;
-//	public final static int	LABEL_POS_VERTICAL_TOP_CHART				= 2;
-//	public final static int	LABEL_POS_VERTICAL_BOTTOM_CHART				= 3;
-//
-//	public final static int	LABEL_POS_HORIZONTAL_ABOVE_GRAPH_LEFT		= 4;
-//	public final static int	LABEL_POS_HORIZONTAL_ABOVE_GRAPH_CENTERED	= 5;
-//	public final static int	LABEL_POS_HORIZONTAL_ABOVE_GRAPH_RIGHT		= 6;
-//	public final static int	LABEL_POS_HORIZONTAL_BELOW_GRAPH_LEFT		= 7;
-//	public final static int	LABEL_POS_HORIZONTAL_BELOW_GRAPH_CENTERED	= 8;
-//	public final static int	LABEL_POS_HORIZONTAL_BELOW_GRAPH_RIGHT		= 9;
-//	public final static int	LABEL_POS_HORIZONTAL_GRAPH_LEFT				= 10;
-//	public final static int	LABEL_POS_HORIZONTAL_GRAPH_RIGHT			= 11;
-
 	private void createActions() {
 
 		/*

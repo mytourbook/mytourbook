@@ -40,6 +40,7 @@ import net.tourbook.ui.action.ActionEditQuick;
 import net.tourbook.ui.action.ActionEditTour;
 import net.tourbook.ui.action.ActionOpenTour;
 import net.tourbook.ui.action.ActionSetTourTypeMenu;
+import net.tourbook.ui.tourChart.action.ActionConvertIntoSharedMarker;
 import net.tourbook.ui.tourChart.action.ActionCreateMarkerFromSlider;
 import net.tourbook.ui.tourChart.action.ActionCreateMarkerFromValuePoint;
 import net.tourbook.ui.tourChart.action.ActionCreateRefTour;
@@ -57,6 +58,7 @@ public class TourChartContextProvider implements IChartContextProvider, ITourPro
 
 	private final ITourChartViewer				_tourChartViewer;
 
+	private ActionConvertIntoSharedMarker		_actionConvertIntoSharedMarker;
 	private ActionCreateRefTour					_actionCreateRefTour;
 	private ActionCreateMarkerFromSlider		_actionCreateMarkerFromSlider;
 	private ActionCreateMarkerFromSlider		_actionCreateMarkerFromSliderLeft;
@@ -125,6 +127,7 @@ public class TourChartContextProvider implements IChartContextProvider, ITourPro
 		_actionSetMarkerVisible = new ActionSetMarkerVisible(tourChart);
 		_actionSetMarkerPosition = new ActionSetMarkerLabelPositionMenu(tourChart);
 //		_actionSetMarkerSignMenu = new ActionSetMarkerImageMenu(tourChart);
+		_actionConvertIntoSharedMarker = new ActionConvertIntoSharedMarker(tourChart);
 
 		_actionExportTour = new ActionExport(this);
 
@@ -208,11 +211,9 @@ public class TourChartContextProvider implements IChartContextProvider, ITourPro
 				tourChart.getLeftSlider().getValuesIndex(),
 				tourChart.getRightSlider().getValuesIndex());
 
-
 		/*
 		 * enable actions
 		 */
-
 		final TourData tourData = tourChart.getTourData();
 		final Set<TourTag> tourTags = tourData == null ? null : tourData.getTourTags();
 
@@ -251,6 +252,7 @@ public class TourChartContextProvider implements IChartContextProvider, ITourPro
 		_actionSetMarkerVisible.setTourMarker(tourMarker, !tourMarker.isMarkerVisible());
 		_actionSetMarkerPosition.setTourMarker(tourMarker);
 //		_actionSetMarkerSignMenu.setTourMarker(tourMarker);
+		_actionConvertIntoSharedMarker.setTourMarker(tourMarker);
 
 		// fill actions
 		menuMgr.add(_actionSetMarkerPosition);
@@ -259,16 +261,23 @@ public class TourChartContextProvider implements IChartContextProvider, ITourPro
 //		menuMgr.add(_actionSetMarkerSignMenu);
 		menuMgr.add(_actionOpenMarkerDialog);
 
-//		menuMgr.add(new Separator());
+		menuMgr.add(new Separator());
+		menuMgr.add(_actionConvertIntoSharedMarker);
 
 		/*
 		 * enable actions
 		 */
-
 		final TourData tourData = tourChart.getTourData();
 
 		final boolean isTourSaved = tourData != null && tourData.getTourPerson() != null;
 
+		boolean isGeoTour = false;
+		if (isTourSaved && tourData.latitudeSerie != null) {
+			// a shared marker needs a geo position
+			isGeoTour = true;
+		}
+
+		_actionConvertIntoSharedMarker.setEnabled(isTourSaved && isGeoTour);
 		_actionDeleteMarker.setEnabled(isTourSaved);
 		_actionOpenMarkerDialog.setEnabled(isTourSaved);
 		_actionSetMarkerVisible.setEnabled(isTourSaved);

@@ -1315,6 +1315,12 @@
 				icon="icons/statistics.gif"
 				id="net.tourbook.views.StatisticView"
 				name="%view_name_Statistics"/>
+			<view
+				category="net.tourbook.category.tourList"
+				class="net.tourbook.ui.views.TourMarkerAllView"
+				icon="icons/tour-marker.png"
+				id="net.tourbook.ui.views.TourMarkerAllView"
+				name="%View_Name_AllTourMarker"/>
 
 
 		<!-- 2. Tour Properties -->
