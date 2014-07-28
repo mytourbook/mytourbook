@@ -532,7 +532,6 @@ public class Messages extends NLS {
 	public static String		Dlg_TourMarker_Button_delete_tooltip;
 	public static String		Dlg_TourMarker_Button_HideAllMarker;
 	public static String		Dlg_TourMarker_Button_HideAllMarker_Tooltip;
-	public static String		Dlg_TourMarker_Button_PasteFromClipboard;
 	public static String		Dlg_TourMarker_Button_PasteFromClipboard_Tooltip;
 //	public static String		Dlg_TourMarker_Button_reset_offset;
 //	public static String		Dlg_TourMarker_Button_reset_offset_tooltip;
