@@ -1,0 +1,100 @@
+Version: 14.7.0                                                28.7.2014
+
+
+
+Tour Marker
+===========
+
+* There are many improvements for the tour marker.
+
+* New tour marker properties
+- Description
+- Internet address
+
+* Tour marker editor is restructured.
+- Edit new properties.
+- Select a marker in the tour chart graphic.
+- A moving slider in the tour chart (or selecting a marker) is also
+  moved in an opened 2D/3D map view in the workspace.
+- This is not the best solution but much better than before. It's a
+  compromise because implementing a map within the marker dialog would
+  be very very time consuming. The 2D/3D maps are tight very closely
+  to the 2D/3D map views.
+
+* Tour chart
+- Slideout to set tour marker display options.
+- Tooltip for a tour marker and open a url in the browser.
+- Doubleclick a tour marker will open the marker dialog.
+- Context menu actions for a marker.
+
+* 3D Map
+Map is positioned when a tour marker is selected in the tour chart and
+the track sliders are displayed in the 3D map.
+
+
+ 
+App 	
+===
+
+* App menu and toolbar is restructured.
+
+* Tourmap Ansicht Tour Catalog is renamed into Tourmap Ansicht 
+  Referenz Tours.
+
+* Tour marker tab in the  tour editor is removed because it was a
+  redundance of the tour marker view.
+
+* Removed some actions from the workspace toolbars to streamline the
+  UI, these actions are available in the application menu: Tagged
+  Tour, Tour Analyzer, Tour Segmenter.
+
+  
+ 
+Elevation Gain 	
+==============
+
+The algorithm to compute the elevation gain/loss is replaced with the
+Douglas Peucker algorithm.
+
+The new algorithm can be fine tuned with the Douglas Peucker tolerance
+which can be assessed in the tour segmenter.
+
+These parts have been modified to implement the new algorithm.
+
+* Preferences for computed values.
+* The tour segmenter and the layer in the tour chart.
+ 
+
+Why is the old algorithm replaced?
+
+Because the author is now the owner of a .fit device and discovered on
+the first tour, that the elevation gain with the old algorithm can be
+significantly wrong, it depends on the terrain.
+
+
+ 
+Improvements 	
+============
+
+* Table/Tree Columns
+  Columns can be set visible/hidden in the header context menu in all
+  tables/trees which are using the column manager.
+* Tagging view
+  Keep expanded/collapsed tags/categories when the view is closed and
+  reopened.
+* Tour Analyzer
+  - Removed unnecessary digits.
+  - Is updated when another tour is selected.
+* Fit import
+  Fixed problem when lap markers are saved in different formats in the
+  .fit file.
+* CSV import
+  Altutide up/down can also be imported.
+
+ 
+System 	
+======
+
+* Removed TourCategory entity, it have never been used.
+* Removed some tour database tables which have never been used.
+
