@@ -57,7 +57,6 @@ public class TourWayPoint implements Cloneable, Comparable<Object>, IHoveredArea
 
 	// initialize with invalid values
 	private double			longitude				= Double.MIN_VALUE;
-
 	private double			latitude				= Double.MIN_VALUE;
 
 	/**

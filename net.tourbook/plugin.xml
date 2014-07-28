@@ -545,6 +545,20 @@
 					label="%view_name_Statistics"
 					mnemonic="%view_name_Statistics_Mnemonic"/>
    
+				<separator	
+					name="net.tourbook.separator.TourMarker"
+					visible="true"/>
+				 
+				<!-- Shared Marker -->
+				
+				
+				<!-- All Tour Marker -->
+				<command
+					commandId="command.net.tourbook.ui.views.TourMarkerAllView"
+					icon="icons/tour-marker-all.png"
+					label="%View_Name_TourMarkerAll"
+					mnemonic="%View_Name_TourMarkerAll_Mnemonic"/>
+   
 				<separator
 					name="net.tourbook.separator.OtherDirectories"
 					visible="true"/>
@@ -1020,11 +1034,18 @@
             name="%view_name_Statistics"
             defaultHandler="net.tourbook.statistic.ActionHandlerOpenViewStatistic"
             />
-      <command
-            id="command.net.tourbook.views.TourMarkerView"
-            name="%view_name_Marker"
-            defaultHandler="net.tourbook.ui.views.ActionHandlerOpenViewTourMarker"
-            />
+            
+		<command
+			id="command.net.tourbook.ui.views.TourMarkerAllView"
+			name="%View_Name_TourMarkerAll"
+			defaultHandler="net.tourbook.ui.views.ActionHandlerOpenViewTourMarkerAll"
+		/>
+		<command
+			id="command.net.tourbook.views.TourMarkerView"
+			name="%view_name_Marker"
+			defaultHandler="net.tourbook.ui.views.ActionHandlerOpenViewTourMarker"
+		/>
+   
       <command
             id="command.net.tourbook.views.TourWaypointView"
             name="%View_Name_Waypoint"
@@ -1318,9 +1339,9 @@
 			<view
 				category="net.tourbook.category.tourList"
 				class="net.tourbook.ui.views.TourMarkerAllView"
-				icon="icons/tour-marker.png"
+				icon="icons/tour-marker-all.png"
 				id="net.tourbook.ui.views.TourMarkerAllView"
-				name="%View_Name_AllTourMarker"/>
+				name="%View_Name_TourMarkerAll"/>
 
 
 		<!-- 2. Tour Properties -->

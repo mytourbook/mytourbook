@@ -192,16 +192,20 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 	/**
 	 * Can be <code>null</code>
 	 * 
-	 * @since db version 24
+	 * @since DB version 24
 	 */
 	private String					urlText;
 
 	/**
 	 * Can be <code>null</code>
 	 * 
-	 * @since db version 24
+	 * @since DB version 24
 	 */
 	private String					urlAddress;
+
+	// initialize with invalid values
+//	private double					longitude									= Double.MIN_VALUE;
+//	private double					latitude									= Double.MIN_VALUE;
 
 	private int						isMarkerVisible								= 1;
 
@@ -392,6 +396,14 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 		return labelYOffset;
 	}
 
+	public double getLatitude() {
+		return latitude;
+	}
+
+	public double getLongitude() {
+		return longitude;
+	}
+
 	/**
 	 * @return Contains <b>width</b> and <b>height</b> of the marker image.
 	 *         <p>
@@ -401,6 +413,14 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 	public Rectangle getMarkerBounds() {
 		return _markerBounds;
 	}
+
+//	/**
+//	 * @return Returns the {@link TourSign} for this {@link TourMarker} or <code>null</code> when
+//	 *         it's not set.
+//	 */
+//	public TourSign getTourSign() {
+//		return tourSign;
+//	}
 
 	/**
 	 * @return Returns position of this marker in the data serie
@@ -412,14 +432,6 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 	public int getTime() {
 		return time;
 	}
-
-//	/**
-//	 * @return Returns the {@link TourSign} for this {@link TourMarker} or <code>null</code> when
-//	 *         it's not set.
-//	 */
-//	public TourSign getTourSign() {
-//		return tourSign;
-//	}
 
 	public int getType() {
 		return type;
@@ -630,6 +642,14 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 		this.labelYOffset = labelYOffset;
 	}
 
+	public void setLatitude(final double latitude) {
+		this.latitude = latitude;
+	}
+
+	public void setLongitude(final double longitude) {
+		this.longitude = longitude;
+	}
+
 	/**
 	 * copies the current marker into a backup marker
 	 * 
@@ -656,6 +676,10 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 //		backupMarker.tourSign = tourSign;
 	}
 
+//	public void setTourSign(final TourSign tourSign) {
+//		this.tourSign = tourSign;
+//	}
+
 	/**
 	 * @param markerBounds
 	 */
@@ -679,10 +703,6 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 	public void setTime(final int time) {
 		this.time = time;
 	}
-
-//	public void setTourSign(final TourSign tourSign) {
-//		this.tourSign = tourSign;
-//	}
 
 	public void setUrlAddress(final String urlAddress) {
 		this.urlAddress = urlAddress;

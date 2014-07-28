@@ -380,11 +380,12 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 //		defineColumn_Time();
 //		defineColumn_Distance();
 
-		defineColumn_MarkerId();
-		defineColumn_TourId();
 		defineColumn_Name();
 		defineColumn_Description();
 		defineColumn_Url();
+
+		defineColumn_MarkerId();
+		defineColumn_TourId();
 	}
 
 	/**
@@ -466,7 +467,6 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 		colDef.setDefaultColumnWidth(pixelWidth);
 		colDef.setColumnWeightData(new ColumnPixelData(pixelWidth, true));
 
-		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -529,7 +529,6 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 		colDef.setDefaultColumnWidth(pixelWidth);
 		colDef.setColumnWeightData(new ColumnPixelData(pixelWidth, true));
 
-		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
