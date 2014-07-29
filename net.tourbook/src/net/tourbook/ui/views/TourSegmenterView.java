@@ -406,8 +406,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 	private static class ViewSorter extends ViewerSorter {
 
-		// private static final int ASCENDING = 0;
-
+//		private static final int	ASCENDING	= 0;
 		private static final int	DESCENDING	= 1;
 
 		private int					_column;
@@ -471,7 +470,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 				_direction = 1 - _direction;
 			} else {
 				// New column; do an descending sort
-				this._column = column;
+				_column = column;
 				_direction = DESCENDING;
 			}
 		}
@@ -1971,7 +1970,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 		colDef = TableColumnFactory.ALTITUDE_DIFF_SEGMENT_BORDER.createColumn(_columnManager, _pc);
 		colDef.setIsDefaultColumn();
-		colDef.addSelectionListener(defaultColumnSelectionListener);
+		colDef.setColumnSelectionListener(defaultColumnSelectionListener);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -1998,7 +1997,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 		colDef = TableColumnFactory.ALTITUDE_DIFF_SEGMENT_COMPUTED.createColumn(_columnManager, _pc);
 		colDef.setIsDefaultColumn();
-		colDef.addSelectionListener(defaultColumnSelectionListener);
+		colDef.setColumnSelectionListener(defaultColumnSelectionListener);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -2025,7 +2024,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 		colDef = TableColumnFactory.ALTITUDE_DOWN_H.createColumn(_columnManager, _pc);
 		colDef.setIsDefaultColumn();
-		colDef.addSelectionListener(defaultColumnSelectionListener);
+		colDef.setColumnSelectionListener(defaultColumnSelectionListener);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -2056,7 +2055,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 		colDef = TableColumnFactory.ALTITUDE_DOWN_SUMMARIZED_BORDER.createColumn(_columnManager, _pc);
 		colDef.setIsDefaultColumn();
-		colDef.addSelectionListener(defaultColumnSelectionListener);
+		colDef.setColumnSelectionListener(defaultColumnSelectionListener);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -2082,7 +2081,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 		colDef = TableColumnFactory.ALTITUDE_DOWN_SUMMARIZED_COMPUTED.createColumn(_columnManager, _pc);
 		colDef.setIsDefaultColumn();
-		colDef.addSelectionListener(defaultColumnSelectionListener);
+		colDef.setColumnSelectionListener(defaultColumnSelectionListener);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -2107,7 +2106,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 		colDef = TableColumnFactory.ALTITUDE_UP_H.createColumn(_columnManager, _pc);
 		colDef.setIsDefaultColumn();
-		colDef.addSelectionListener(defaultColumnSelectionListener);
+		colDef.setColumnSelectionListener(defaultColumnSelectionListener);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -2138,7 +2137,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 		colDef = TableColumnFactory.ALTITUDE_UP_SUMMARIZED_BORDER.createColumn(_columnManager, _pc);
 		colDef.setIsDefaultColumn();
-		colDef.addSelectionListener(defaultColumnSelectionListener);
+		colDef.setColumnSelectionListener(defaultColumnSelectionListener);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -2163,7 +2162,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 		colDef = TableColumnFactory.ALTITUDE_UP_SUMMARIZED_COMPUTED.createColumn(_columnManager, _pc);
 		colDef.setIsDefaultColumn();
-		colDef.addSelectionListener(defaultColumnSelectionListener);
+		colDef.setColumnSelectionListener(defaultColumnSelectionListener);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -2188,7 +2187,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 		colDef = TableColumnFactory.AVG_PACE.createColumn(_columnManager, _pc);
 		colDef.setIsDefaultColumn();
-		colDef.addSelectionListener(new SelectionAdapter() {
+		colDef.setColumnSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(final SelectionEvent event) {
 				((ViewSorter) _segmentViewer.getSorter()).setSortColumn(COLUMN_SPEED);
@@ -2244,7 +2243,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 		colDef = TableColumnFactory.AVG_PULSE.createColumn(_columnManager, _pc);
 		colDef.setIsDefaultColumn();
-		colDef.addSelectionListener(new SelectionAdapter() {
+		colDef.setColumnSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(final SelectionEvent event) {
 				((ViewSorter) _segmentViewer.getSorter()).setSortColumn(COLUMN_PULSE);
@@ -2301,7 +2300,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 		colDef = TableColumnFactory.AVG_SPEED.createColumn(_columnManager, _pc);
 		colDef.setIsDefaultColumn();
-		colDef.addSelectionListener(new SelectionAdapter() {
+		colDef.setColumnSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(final SelectionEvent event) {
 				((ViewSorter) _segmentViewer.getSorter()).setSortColumn(COLUMN_SPEED);
@@ -2332,7 +2331,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 		colDef = TableColumnFactory.DISTANCE.createColumn(_columnManager, _pc);
 		colDef.setIsDefaultColumn();
-		colDef.addSelectionListener(defaultColumnSelectionListener);
+		colDef.setColumnSelectionListener(defaultColumnSelectionListener);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -2357,7 +2356,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 		colDef = TableColumnFactory.DISTANCE_TOTAL.createColumn(_columnManager, _pc);
 		colDef.setIsDefaultColumn();
-		colDef.addSelectionListener(defaultColumnSelectionListener);
+		colDef.setColumnSelectionListener(defaultColumnSelectionListener);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -2382,7 +2381,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 		colDef = TableColumnFactory.DRIVING_TIME.createColumn(_columnManager, _pc);
 		colDef.setIsDefaultColumn();
-		colDef.addSelectionListener(defaultColumnSelectionListener);
+		colDef.setColumnSelectionListener(defaultColumnSelectionListener);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -2406,7 +2405,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 		colDef = TableColumnFactory.GRADIENT.createColumn(_columnManager, _pc);
 		colDef.setIsDefaultColumn();
-		colDef.addSelectionListener(new SelectionAdapter() {
+		colDef.setColumnSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(final SelectionEvent event) {
 				((ViewSorter) _segmentViewer.getSorter()).setSortColumn(COLUMN_GRADIENT);
@@ -2438,7 +2437,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 		colDef = TableColumnFactory.PAUSED_TIME.createColumn(_columnManager, _pc);
 		colDef.setIsDefaultColumn();
-		colDef.addSelectionListener(defaultColumnSelectionListener);
+		colDef.setColumnSelectionListener(defaultColumnSelectionListener);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -2462,7 +2461,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 		colDef = TableColumnFactory.RECORDING_TIME.createColumn(_columnManager, _pc);
 		colDef.setIsDefaultColumn();
-		colDef.addSelectionListener(defaultColumnSelectionListener);
+		colDef.setColumnSelectionListener(defaultColumnSelectionListener);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -2481,7 +2480,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 		colDef = TableColumnFactory.RECORDING_TIME_TOTAL.createColumn(_columnManager, _pc);
 		colDef.setIsDefaultColumn();
-		colDef.addSelectionListener(defaultColumnSelectionListener);
+		colDef.setColumnSelectionListener(defaultColumnSelectionListener);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {

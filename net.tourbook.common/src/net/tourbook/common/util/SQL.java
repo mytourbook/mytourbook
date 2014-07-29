@@ -25,7 +25,7 @@ import org.eclipse.swt.widgets.Display;
 /**
  * SQL utilities.
  */
-public final class SQLUtils {
+public final class SQL {
 
 	public static final String	SQL_STRING_SEPARATOR	= "'";	//$NON-NLS-1$
 
@@ -35,7 +35,7 @@ public final class SQLUtils {
 	 */
 	public static String getCleanString(final String text) {
 
-		return text.replace(SQLUtils.SQL_STRING_SEPARATOR, UI.EMPTY_STRING);
+		return text.replace(SQL.SQL_STRING_SEPARATOR, UI.EMPTY_STRING);
 	}
 
 	/**
@@ -47,7 +47,7 @@ public final class SQLUtils {
 	 */
 	public static String getSqlString(final String string) {
 
-		return SQLUtils.SQL_STRING_SEPARATOR + string + SQLUtils.SQL_STRING_SEPARATOR;
+		return SQL.SQL_STRING_SEPARATOR + string + SQL.SQL_STRING_SEPARATOR;
 	}
 
 	public static void showSQLException(SQLException exception) {

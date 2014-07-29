@@ -36,7 +36,7 @@ import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.PostSelectionProvider;
-import net.tourbook.common.util.SQLUtils;
+import net.tourbook.common.util.SQL;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
@@ -752,7 +752,7 @@ public class TourPhotoManager implements IPhotoServiceProvider {
 			}
 
 		} catch (final SQLException e) {
-			SQLUtils.showSQLException(e);
+			SQL.showSQLException(e);
 		} finally {
 			Util.closeSql(conn);
 		}
@@ -798,7 +798,7 @@ public class TourPhotoManager implements IPhotoServiceProvider {
 			numberOfTours = result.getInt(1);
 
 		} catch (final SQLException e) {
-			SQLUtils.showSQLException(e);
+			SQL.showSQLException(e);
 		} finally {
 			Util.closeSql(conn);
 		}

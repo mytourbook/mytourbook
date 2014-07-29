@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -51,10 +51,10 @@ public class ColumnDefinition implements Cloneable {
 	private ControlListener		_columnControlListener;
 
 	private String				_columnText;
-
 	private String				_columnToolTipText;
 	private int					_columnWidth;
 	private String				_columnUnit;
+
 	private boolean				_isColumnResizable		= true;
 	private boolean				_isColumnMoveable		= true;
 
@@ -78,14 +78,6 @@ public class ColumnDefinition implements Cloneable {
 	private EditingSupport		_editingSupport;
 
 	private ColumnLayoutData	_columnLayoutData;
-
-	public void addControlListener(final ControlListener controlListener) {
-		_columnControlListener = controlListener;
-	}
-
-	public void addSelectionListener(final SelectionAdapter selectionAdapter) {
-		_columnSelectionListener = selectionAdapter;
-	}
 
 	/**
 	 * @return Returns <code>true</code> when the visibility of this column can be modified
@@ -266,6 +258,10 @@ public class ColumnDefinition implements Cloneable {
 		_columnToolTipText = toolTipText;
 	}
 
+	public void setColumnId(final String columnId) {
+		_columnId = columnId;
+	}
+
 	/**
 	 * @param label
 	 *            This text is displayed in the column modification dialog.
@@ -281,6 +277,16 @@ public class ColumnDefinition implements Cloneable {
 	 */
 	public void setColumnResizable(final boolean isResizable) {
 		_isColumnResizable = isResizable;
+	}
+
+	/**
+	 * Add listener which is called when the column header is selected, this is mainly used to sort
+	 * columns.
+	 * 
+	 * @param selectionAdapter
+	 */
+	public void setColumnSelectionListener(final SelectionAdapter selectionAdapter) {
+		_columnSelectionListener = selectionAdapter;
 	}
 
 	/**
@@ -303,6 +309,10 @@ public class ColumnDefinition implements Cloneable {
 
 	public void setColumnWidth(final int columnWidth) {
 		_columnWidth = columnWidth;
+	}
+
+	public void setControlListener(final ControlListener controlListener) {
+		_columnControlListener = controlListener;
 	}
 
 	/**

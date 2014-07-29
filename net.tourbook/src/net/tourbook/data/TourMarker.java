@@ -204,8 +204,10 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 	private String					urlAddress;
 
 	// initialize with invalid values
-//	private double					longitude									= Double.MIN_VALUE;
-//	private double					latitude									= Double.MIN_VALUE;
+	@Transient
+	private double					longitude									= Double.MIN_VALUE;
+	@Transient
+	private double					latitude									= Double.MIN_VALUE;
 
 	private int						isMarkerVisible								= 1;
 
@@ -421,6 +423,10 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 //	public TourSign getTourSign() {
 //		return tourSign;
 //	}
+
+	public long getMarkerId() {
+		return markerId;
+	}
 
 	/**
 	 * @return Returns position of this marker in the data serie
@@ -650,6 +656,10 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 		this.longitude = longitude;
 	}
 
+//	public void setTourSign(final TourSign tourSign) {
+//		this.tourSign = tourSign;
+//	}
+
 	/**
 	 * copies the current marker into a backup marker
 	 * 
@@ -675,10 +685,6 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 		backupMarker.tourData = tourData;
 //		backupMarker.tourSign = tourSign;
 	}
-
-//	public void setTourSign(final TourSign tourSign) {
-//		this.tourSign = tourSign;
-//	}
 
 	/**
 	 * @param markerBounds

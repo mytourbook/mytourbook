@@ -125,7 +125,7 @@ public class Util {
 			try {
 				conn.close();
 			} catch (final SQLException e) {
-				SQLUtils.showSQLException(e);
+				SQL.showSQLException(e);
 			}
 		}
 	}
@@ -136,7 +136,7 @@ public class Util {
 			try {
 				result.close();
 			} catch (final SQLException e) {
-				SQLUtils.showSQLException(e);
+				SQL.showSQLException(e);
 			}
 		}
 	}
@@ -147,7 +147,7 @@ public class Util {
 			try {
 				stmt.close();
 			} catch (final SQLException e) {
-				SQLUtils.showSQLException(e);
+				SQL.showSQLException(e);
 			}
 		}
 	}

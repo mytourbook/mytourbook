@@ -865,7 +865,7 @@ public class PrefPageMap3Color extends PreferencePage implements IWorkbenchPrefe
 			public void update(final ViewerCell cell) {}
 		});
 
-		colDef.addControlListener(new ControlAdapter() {
+		colDef.setControlListener(new ControlAdapter() {
 			@Override
 			public void controlResized(final ControlEvent e) {
 				onResizeImageColumn();

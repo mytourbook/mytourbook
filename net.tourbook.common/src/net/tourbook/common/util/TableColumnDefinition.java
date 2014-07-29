@@ -1,37 +1,38 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
- *   
+ * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
+ * 
  * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software 
+ * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- *  
- * This program is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public License along with 
+ * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.common.util;
 
+import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.swt.widgets.TableColumn;
 
 /**
- * A ColumnDefinition contains the data for creating a column in a TableViewer
+ * This contains data for creating a column in a {@link TableViewer}.
  */
 public class TableColumnDefinition extends ColumnDefinition {
 
-	private TableColumn	fTableColumn;
-	private int			fColumnIndex;
+	private TableColumn	_tableColumn;
+	private int			_columnIndex;
 
 	/**
 	 * @param columnManager
-	 *            manager which managed the columns
+	 *            Manager which managed the columns.
 	 * @param columnId
-	 *            column id which must be unique within the table
+	 *            Column id which must be unique within the table.
 	 * @param style
-	 *            ui style
+	 *            UI style.
 	 */
 	public TableColumnDefinition(final ColumnManager columnManager, final String columnId, final int style) {
 
@@ -42,19 +43,19 @@ public class TableColumnDefinition extends ColumnDefinition {
 	}
 
 	public TableColumn getTableColumn() {
-		return fTableColumn;
+		return _tableColumn;
 	}
 
 	public int getTableColumnIndex() {
-		return fColumnIndex;
+		return _columnIndex;
 	}
 
 	public void setTableColumn(final TableColumn tableColumn) {
-		fTableColumn = tableColumn;
+		_tableColumn = tableColumn;
 	}
 
 	public void setTableColumnIndex(final int tcIndex) {
-		fColumnIndex = tcIndex;
+		_columnIndex = tcIndex;
 	}
 
 	@Override

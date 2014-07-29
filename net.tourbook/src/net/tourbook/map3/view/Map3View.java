@@ -2161,6 +2161,11 @@ public class Map3View extends ViewPart implements ITourProvider {
 			return;
 		}
 
+		if (tourData == null || tourData.latitudeSerie == null) {
+			chartSliderLayer.setSliderVisible(false);
+			return;
+		}
+
 		final int valuesIndex = allTourMarker.get(0).getSerieIndex();
 
 		syncMapWith_SliderPosition(tourData, chartSliderLayer, valuesIndex);
@@ -2210,7 +2215,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 
 		final TourData tourData = getSelectedTour(trackSliderLayer);
 		if (tourData == null) {
-			trackSliderLayer.setSliderVisible(false);
+// ???		trackSliderLayer.setSliderVisible(false);
 			return;
 		}
 

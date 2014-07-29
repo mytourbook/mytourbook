@@ -1031,7 +1031,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		});
 
 		// sort column
-		colDef.addSelectionListener(new SelectionAdapter() {
+		colDef.setColumnSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(final SelectionEvent event) {
 				((DeviceImportSorter) _tourViewer.getSorter()).doSort(COLUMN_DATE);
@@ -1047,7 +1047,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 		final ColumnDefinition colDef = TableColumnFactory.DEVICE_NAME.createColumn(_columnManager, _pc);
 
-		colDef.addSelectionListener(new SelectionAdapter() {
+		colDef.setColumnSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(final SelectionEvent event) {
 				((DeviceImportSorter) _tourViewer.getSorter()).doSort(COLUMN_DATA_FORMAT);
@@ -1115,7 +1115,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 		final ColumnDefinition colDef = TableColumnFactory.IMPORT_FILE_NAME.createColumn(_columnManager, _pc);
 
-		colDef.addSelectionListener(new SelectionAdapter() {
+		colDef.setColumnSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(final SelectionEvent event) {
 				((DeviceImportSorter) _tourViewer.getSorter()).doSort(COLUMN_FILE_NAME);
@@ -1271,7 +1271,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		});
 
 		// sort column
-		colDef.addSelectionListener(new SelectionAdapter() {
+		colDef.setColumnSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(final SelectionEvent event) {
 				((DeviceImportSorter) _tourViewer.getSorter()).doSort(COLUMN_DATE);
@@ -1314,7 +1314,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 				cell.setText(tourData.getTourTitle());
 			}
 		});
-		colDef.addSelectionListener(new SelectionAdapter() {
+		colDef.setColumnSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(final SelectionEvent event) {
 				((DeviceImportSorter) _tourViewer.getSorter()).doSort(COLUMN_TITLE);

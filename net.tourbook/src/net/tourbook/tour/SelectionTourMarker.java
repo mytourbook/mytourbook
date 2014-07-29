@@ -33,7 +33,6 @@ public class SelectionTourMarker implements ISelection {
 	public SelectionTourMarker(final TourData tourData, final ArrayList<TourMarker> allTourMarker) {
 
 		_tourData = tourData;
-
 		_allTourMarker = allTourMarker;
 	}
 
