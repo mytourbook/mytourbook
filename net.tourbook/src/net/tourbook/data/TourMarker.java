@@ -204,10 +204,10 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 	private String					urlAddress;
 
 	// initialize with invalid values
-	@Transient
-	private double					longitude									= Double.MIN_VALUE;
-	@Transient
-	private double					latitude									= Double.MIN_VALUE;
+	private double					latitude;																							//		= Double.MIN_VALUE;
+	private double					longitude;																							//		= Double.MIN_VALUE;
+
+	private float					altitude;
 
 	private int						isMarkerVisible								= 1;
 
@@ -359,6 +359,10 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 		return true;
 	}
 
+	public float getAltitude() {
+		return altitude;
+	}
+
 	/**
 	 * @return Returns description of the marker when available, otherwise an empty string.
 	 */
@@ -406,6 +410,14 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 		return longitude;
 	}
 
+//	/**
+//	 * @return Returns the {@link TourSign} for this {@link TourMarker} or <code>null</code> when
+//	 *         it's not set.
+//	 */
+//	public TourSign getTourSign() {
+//		return tourSign;
+//	}
+
 	/**
 	 * @return Contains <b>width</b> and <b>height</b> of the marker image.
 	 *         <p>
@@ -415,14 +427,6 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 	public Rectangle getMarkerBounds() {
 		return _markerBounds;
 	}
-
-//	/**
-//	 * @return Returns the {@link TourSign} for this {@link TourMarker} or <code>null</code> when
-//	 *         it's not set.
-//	 */
-//	public TourSign getTourSign() {
-//		return tourSign;
-//	}
 
 	public long getMarkerId() {
 		return markerId;
@@ -611,6 +615,10 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 //		tourSign = backupMarker.tourSign;
 	}
 
+	public void setAltitude(final float altitude) {
+		this.altitude = altitude;
+	}
+
 	public void setDescription(final String description) {
 		this.description = description;
 	}
@@ -623,6 +631,12 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 	 */
 	public void setDistance(final float distance) {
 		this.distance20 = distance;
+	}
+
+	public void setGeoPosition(final double latitude, final double longitude) {
+
+		this.latitude = latitude;
+		this.longitude = longitude;
 	}
 
 	public void setLabel(final String label) {
@@ -644,6 +658,10 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 		this.labelXOffset = labelXOffset;
 	}
 
+//	public void setTourSign(final TourSign tourSign) {
+//		this.tourSign = tourSign;
+//	}
+
 	public void setLabelYOffset(final int labelYOffset) {
 		this.labelYOffset = labelYOffset;
 	}
@@ -655,10 +673,6 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 	public void setLongitude(final double longitude) {
 		this.longitude = longitude;
 	}
-
-//	public void setTourSign(final TourSign tourSign) {
-//		this.tourSign = tourSign;
-//	}
 
 	/**
 	 * copies the current marker into a backup marker

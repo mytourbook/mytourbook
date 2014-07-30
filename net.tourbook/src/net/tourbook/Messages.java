@@ -1269,6 +1269,8 @@ public class Messages extends NLS {
 	public static String		Tour_Database_PostUpdate021_SetTourStartEndTime;
 
 	public static String		Tour_Database_PostUpdate023_SetTimeSliceNumbers;
+
+	public static String	Tour_Database_PostUpdate025_SetMarkerFields;
 	public static String		Tour_Database_TourSaveError;
 	public static String		Tour_Database_update_tour;
 	public static String		Tour_Database_Update;

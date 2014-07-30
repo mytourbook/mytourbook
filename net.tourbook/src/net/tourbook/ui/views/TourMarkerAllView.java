@@ -27,7 +27,6 @@ import net.tourbook.common.UI;
 import net.tourbook.common.util.ColumnDefinition;
 import net.tourbook.common.util.ColumnManager;
 import net.tourbook.common.util.ITourViewer;
-import net.tourbook.common.util.PostSelectionProvider;
 import net.tourbook.common.util.SQL;
 import net.tourbook.common.util.TableColumnDefinition;
 import net.tourbook.common.util.Util;
@@ -56,7 +55,6 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.CellLabelProvider;
-import org.eclipse.jface.viewers.ColumnPixelData;
 import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
@@ -90,9 +88,15 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 
 	public static final String			ID							= "net.tourbook.ui.views.TourMarkerAllView";	//$NON-NLS-1$
 
+	private static final String			COLUMN_ALTITUDE				= "Altitude";									//$NON-NLS-1$
+	private static final String			COLUMN_DESCRIPTION			= "Description";								//$NON-NLS-1$
+	private static final String			COLUMN_LATITUDE				= "Latitude";									//$NON-NLS-1$
+	private static final String			COLUMN_LONGITUDE			= "Longitude";									//$NON-NLS-1$
 	private static final String			COLUMN_MARKER_ID			= "MarkerId";									//$NON-NLS-1$
-	private static final String			COLUMN_MARKER_NAME			= "MarkerName";								//$NON-NLS-1$
+	private static final String			COLUMN_NAME					= "Name";										//$NON-NLS-1$
 	private static final String			COLUMN_TOUR_ID				= "TourId";									//$NON-NLS-1$
+	private static final String			COLUMN_URL_ADDRESS			= "UrlAddress";								//$NON-NLS-1$
+	private static final String			COLUMN_URL_LABEL			= "UrlLabel";									//$NON-NLS-1$
 
 	private static final String			STATE_SELECTED_MARKER_ITEM	= "STATE_SELECTED_MARKER_ITEM";				//$NON-NLS-1$
 	private static final String			STATE_SORT_COLUMN_DIRECTION	= "STATE_SORT_COLUMN_DIRECTION";				//$NON-NLS-1$
@@ -100,8 +104,6 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 
 	private final IPreferenceStore		_prefStore					= TourbookPlugin.getPrefStore();
 	private final IDialogSettings		_state						= TourbookPlugin.getState("TourMarkerAllView"); //$NON-NLS-1$
-
-	private PostSelectionProvider		_postSelectionProvider;
 
 	private ISelectionListener			_postSelectionListener;
 	private IPropertyChangeListener		_prefChangeListener;
@@ -112,19 +114,25 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 
 	private PixelConverter				_pc;
 
-	private ArrayList<TourMarkerItem>	_allTourMarker				= new ArrayList<TourMarkerItem>();
+	private ArrayList<TourMarkerItem>	_allMarkerItems				= new ArrayList<TourMarkerItem>();
 	//
 	private TableViewer					_markerViewer;
 	private MarkerComparator			_markerComparator			= new MarkerComparator();
 	private ColumnManager				_columnManager;
-	private ColumnDefinition			_colDefName;
-	private ColumnDefinition			_colDefVisibility;
 	private SelectionAdapter			_columnSortListener;
+
+	private boolean						_isUpdateUI;
 	//
+	private final NumberFormat			_nf1						= NumberFormat.getNumberInstance();
 	private final NumberFormat			_nf_3_3						= NumberFormat.getNumberInstance();
+	private final NumberFormat			_nf6						= NumberFormat.getNumberInstance();
 	{
+		_nf1.setMinimumFractionDigits(1);
+		_nf1.setMaximumFractionDigits(1);
 		_nf_3_3.setMinimumFractionDigits(3);
 		_nf_3_3.setMaximumFractionDigits(3);
+		_nf6.setMinimumFractionDigits(6);
+		_nf6.setMaximumFractionDigits(6);
 	}
 
 	/*
@@ -146,10 +154,26 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 			final TourMarkerItem m1 = (TourMarkerItem) e1;
 			final TourMarkerItem m2 = (TourMarkerItem) e2;
 
-			long rc = 0;
+			double rc = 0;
 
 			// Determine which column and do the appropriate sort
 			switch (__sortColumnId) {
+			case COLUMN_ALTITUDE:
+				rc = m1.altitude - m2.altitude;
+				break;
+
+			case COLUMN_DESCRIPTION:
+				rc = m1.description.compareTo(m2.description);
+				break;
+
+			case COLUMN_LATITUDE:
+				rc = m1.latitude - m2.latitude;
+				break;
+
+			case COLUMN_LONGITUDE:
+				rc = m1.longitude - m2.longitude;
+				break;
+
 			case COLUMN_MARKER_ID:
 				rc = m1.markerId - m2.markerId;
 				break;
@@ -158,7 +182,15 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 				rc = m1.tourId - m2.tourId;
 				break;
 
-			case COLUMN_MARKER_NAME:
+			case COLUMN_URL_ADDRESS:
+				rc = m1.urlAddress.compareTo(m2.urlAddress);
+				break;
+
+			case COLUMN_URL_LABEL:
+				rc = m1.urlLabel.compareTo(m2.urlLabel);
+				break;
+
+			case COLUMN_NAME:
 			default:
 				rc = m1.label.compareTo(m2.label);
 			}
@@ -203,7 +235,7 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 		public void dispose() {}
 
 		public Object[] getElements(final Object inputElement) {
-			return _allTourMarker.toArray();
+			return _allMarkerItems.toArray();
 		}
 
 		public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
@@ -215,9 +247,11 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 		public long		tourId;
 		public String	label;
 		public String	description;
-		public String	urlText;
+		public String	urlLabel;
 		public String	urlAddress;
-
+		public double	latitude;
+		public double	longitude;
+		public float	altitude;
 	}
 
 	public TourMarkerAllView() {
@@ -356,11 +390,9 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 
 	private void clearView() {
 
-		_allTourMarker.clear();
+		_allMarkerItems.clear();
 
 		_markerViewer.setInput(new Object[0]);
-
-		_postSelectionProvider.clearSelection();
 	}
 
 	private void createActions() {
@@ -388,9 +420,6 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 
 		createActions();
 		fillToolbar();
-
-		// this part is a selection provider
-		getSite().setSelectionProvider(_postSelectionProvider = new PostSelectionProvider(ID));
 
 		// load marker and display them
 //		parent.getDisplay().asyncExec(new Runnable() {
@@ -477,16 +506,47 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 
 	private void defineAllColumns() {
 
-//		defineColumn_IsVisible();
-//		defineColumn_Time();
-//		defineColumn_Distance();
-
 		defineColumn_Name();
+		defineColumn_Altitude();
+		defineColumn_Latitude();
+		defineColumn_Longitude();
 		defineColumn_Description();
-		defineColumn_Url();
+		defineColumn_UrlLabel();
+		defineColumn_UrlAddress();
 
 		defineColumn_MarkerId();
 		defineColumn_TourId();
+	}
+
+	/**
+	 * Column: Altitude
+	 */
+	private void defineColumn_Altitude() {
+
+		final ColumnDefinition colDef = TableColumnFactory.ALTITUDE.createColumn(_columnManager, _pc);
+
+		colDef.setIsDefaultColumn();
+
+		// overwrite column id to identify the column when table is sorted
+		colDef.setColumnId(COLUMN_ALTITUDE);
+		colDef.setColumnSelectionListener(_columnSortListener);
+
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				String valueText;
+				final float altitude = ((TourMarkerItem) cell.getElement()).altitude;
+
+				if (altitude == TourDatabase.DEFAULT_FLOAT) {
+					valueText = UI.EMPTY_STRING;
+				} else {
+					valueText = _nf1.format(altitude / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE);
+				}
+
+				cell.setText(valueText);
+			}
+		});
 	}
 
 	/**
@@ -495,6 +555,12 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 	private void defineColumn_Description() {
 
 		final ColumnDefinition colDef = TableColumnFactory.WAYPOINT_DESCRIPTION.createColumn(_columnManager, _pc);
+
+		colDef.setIsDefaultColumn();
+
+		// overwrite column id to identify the column when table is sorted
+		colDef.setColumnId(COLUMN_DESCRIPTION);
+		colDef.setColumnSelectionListener(_columnSortListener);
 
 		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
@@ -508,49 +574,63 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 	}
 
 	/**
-	 * Column: Distance km/mi
+	 * Column: Latitude
 	 */
-	private void defineColumn_Distance() {
+	private void defineColumn_Latitude() {
 
-		final ColumnDefinition colDef = TableColumnFactory.DISTANCE.createColumn(_columnManager, _pc);
+		final ColumnDefinition colDef = new TableColumnDefinition(_columnManager, COLUMN_LATITUDE, SWT.LEAD);
+
+		colDef.setColumnName("Latitude");
+
 		colDef.setIsDefaultColumn();
+		colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(14));
+		colDef.setColumnSelectionListener(_columnSortListener);
 
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
 
-				final TourMarkerItem tourMarker = (TourMarkerItem) cell.getElement();
+				String valueText;
+				final double latitude = ((TourMarkerItem) cell.getElement()).latitude;
 
-//				final float markerDistance = tourMarker.distance;
-//				if (markerDistance == -1) {
-//					cell.setText(UI.EMPTY_STRING);
-//				} else {
-//					cell.setText(_nf_3_3.format(markerDistance / 1000 / UI.UNIT_VALUE_DISTANCE));
-//				}
-//
-//				if (tourMarker.type() == ChartLabel.MARKER_TYPE_DEVICE) {
-//					cell.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
-//				}
+				if (latitude == TourDatabase.DEFAULT_DOUBLE) {
+					valueText = UI.EMPTY_STRING;
+				} else {
+					valueText = _nf6.format(latitude);
+				}
+
+				cell.setText(valueText);
 			}
 		});
 	}
 
 	/**
-	 * Column: Is visible
+	 * Column: Longitude
 	 */
-	private void defineColumn_IsVisible() {
+	private void defineColumn_Longitude() {
 
-		_colDefVisibility = TableColumnFactory.MAP_MARKER_VISIBLE.createColumn(_columnManager, _pc);
-		_colDefVisibility.setIsDefaultColumn();
+		final ColumnDefinition colDef = new TableColumnDefinition(_columnManager, COLUMN_LONGITUDE, SWT.LEAD);
 
-		_colDefVisibility.setLabelProvider(new CellLabelProvider() {
+		colDef.setColumnName("Longitude");
+
+		colDef.setIsDefaultColumn();
+		colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(14));
+		colDef.setColumnSelectionListener(_columnSortListener);
+
+		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
 
-				final TourMarkerItem tourMarker = (TourMarkerItem) cell.getElement();
-//				cell.setText(tourMarker.isMarkerVisible()
-//						? Messages.App_Label_BooleanYes
-//						: Messages.App_Label_BooleanNo);
+				String valueText;
+				final double longitude = ((TourMarkerItem) cell.getElement()).longitude;
+
+				if (longitude == TourDatabase.DEFAULT_DOUBLE) {
+					valueText = UI.EMPTY_STRING;
+				} else {
+					valueText = _nf6.format(longitude);
+				}
+
+				cell.setText(valueText);
 			}
 		});
 	}
@@ -560,13 +640,11 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 	 */
 	private void defineColumn_MarkerId() {
 
-		final int pixelWidth = _pc.convertWidthInCharsToPixels(30);
 		final ColumnDefinition colDef = new TableColumnDefinition(_columnManager, COLUMN_MARKER_ID, SWT.LEAD);
 
-		colDef.setColumnLabel("Marker ID");
-		colDef.setColumnHeaderText("Marker ID");
-		colDef.setDefaultColumnWidth(pixelWidth);
-		colDef.setColumnWeightData(new ColumnPixelData(pixelWidth, true));
+		colDef.setColumnName("Marker ID");
+
+		colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(12));
 		colDef.setColumnSelectionListener(_columnSortListener);
 
 		colDef.setLabelProvider(new CellLabelProvider() {
@@ -582,15 +660,15 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 	 */
 	private void defineColumn_Name() {
 
-		_colDefName = TableColumnFactory.WAYPOINT_NAME.createColumn(_columnManager, _pc);
+		final ColumnDefinition colDef = TableColumnFactory.WAYPOINT_NAME.createColumn(_columnManager, _pc);
+
+		colDef.setIsDefaultColumn();
 
 		// overwrite column id to identify the column when table is sorted
-		_colDefName.setColumnId(COLUMN_MARKER_NAME);
+		colDef.setColumnId(COLUMN_NAME);
+		colDef.setColumnSelectionListener(_columnSortListener);
 
-		_colDefName.setIsDefaultColumn();
-		_colDefName.setColumnSelectionListener(_columnSortListener);
-
-		_colDefName.setLabelProvider(new CellLabelProvider() {
+		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
 
@@ -601,40 +679,15 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 	}
 
 	/**
-	 * Column: Time
-	 */
-	private void defineColumn_Time() {
-
-		final ColumnDefinition colDef = TableColumnFactory.TOUR_TIME_HH_MM_SS.createColumn(_columnManager, _pc);
-		colDef.setIsDefaultColumn();
-
-		// hide wrong tooltip
-		colDef.setColumnHeaderToolTipText(UI.EMPTY_STRING);
-
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-
-				final TourMarkerItem marker = (TourMarkerItem) cell.getElement();
-//				final long time = marker.getTime();
-//
-//				cell.setText(UI.format_hh_mm_ss(time));
-			}
-		});
-	}
-
-	/**
 	 * Column: TourID
 	 */
 	private void defineColumn_TourId() {
 
-		final int pixelWidth = _pc.convertWidthInCharsToPixels(30);
 		final ColumnDefinition colDef = new TableColumnDefinition(_columnManager, COLUMN_TOUR_ID, SWT.LEAD);
 
-		colDef.setColumnLabel("Tour ID");
-		colDef.setColumnHeaderText("Tour ID");
-		colDef.setDefaultColumnWidth(pixelWidth);
-		colDef.setColumnWeightData(new ColumnPixelData(pixelWidth, true));
+		colDef.setColumnName("Tour ID");
+
+		colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(22));
 		colDef.setColumnSelectionListener(_columnSortListener);
 
 		colDef.setLabelProvider(new CellLabelProvider() {
@@ -647,51 +700,45 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 	}
 
 	/**
-	 * Column: Url
+	 * Column: Url address
 	 */
-	private void defineColumn_Url() {
+	private void defineColumn_UrlAddress() {
 
-		final ColumnDefinition colDef = TableColumnFactory.URL.createColumn(_columnManager, _pc);
+		final ColumnDefinition colDef = new TableColumnDefinition(_columnManager, COLUMN_URL_ADDRESS, SWT.LEAD);
+
+		colDef.setColumnName("Url Address");
+
 		colDef.setIsDefaultColumn();
+		colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(20));
+		colDef.setColumnSelectionListener(_columnSortListener);
+
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
+				final TourMarkerItem markerItem = (TourMarkerItem) cell.getElement();
+				cell.setText(markerItem.urlAddress);
+			}
+		});
+	}
 
-				final TourMarkerItem marker = (TourMarkerItem) cell.getElement();
+	/**
+	 * Column: Url label
+	 */
+	private void defineColumn_UrlLabel() {
 
-				String columnText = UI.EMPTY_STRING;
+		final ColumnDefinition colDef = new TableColumnDefinition(_columnManager, COLUMN_URL_LABEL, SWT.LEAD);
 
-				/*
-				 * Url
-				 */
-				final String urlText = marker.urlText;
-				final String urlAddress = marker.urlAddress;
-				final boolean isText = urlText != null && urlText.length() > 0;
-				final boolean isAddress = urlAddress != null && urlAddress.length() > 0;
+		colDef.setColumnName("Url Label");
 
-				if (isText || isAddress) {
+		colDef.setIsDefaultColumn();
+		colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(20));
+		colDef.setColumnSelectionListener(_columnSortListener);
 
-					String linkText;
-
-					if (isAddress == false) {
-
-						// only text is in the link -> this is not a internet address but create a link of it
-
-						linkText = urlText;
-
-					} else if (isText == false) {
-
-						linkText = urlAddress;
-
-					} else {
-
-						linkText = urlAddress;
-					}
-
-					columnText = linkText;
-				}
-
-				cell.setText(columnText);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+				final TourMarkerItem markerItem = (TourMarkerItem) cell.getElement();
+				cell.setText(markerItem.urlLabel);
 			}
 		});
 	}
@@ -768,7 +815,9 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 				}
 			}
 
-			_postSelectionProvider.setSelection(new SelectionTourMarker(tourData, allTourMarker));
+			TourManager.fireEvent(//
+					TourEventId.MARKER_SELECTION,
+					new SelectionTourMarker(tourData, allTourMarker));
 		}
 	}
 
@@ -841,7 +890,7 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 
 			conn = TourDatabase.getInstance().getConnection();
 
-			_allTourMarker.clear();
+			_allMarkerItems.clear();
 
 			final String sql = "SELECT " //
 					+ "MarkerID, " //						// 1
@@ -849,7 +898,10 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 					+ "Label, " //							// 3
 					+ "description, " //					// 4
 					+ "urlText, " //						// 5
-					+ "urlAddress " //						// 6
+					+ "urlAddress, " //						// 6
+					+ "latitude, " //						// 7
+					+ "longitude, " //						// 8
+					+ "altitude " //						// 9
 					//
 					+ (" FROM " + TourDatabase.TABLE_TOUR_MARKER);
 
@@ -859,14 +911,22 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 			while (result.next()) {
 
 				final TourMarkerItem markerItem = new TourMarkerItem();
-				_allTourMarker.add(markerItem);
+				_allMarkerItems.add(markerItem);
+
+				final String dbLabel = result.getString(3);
+				final String dbDescription = result.getString(4);
+				final String dbUrlLabel = result.getString(5);
+				final String dbUrlAddress = result.getString(6);
 
 				markerItem.markerId = result.getLong(1);
 				markerItem.tourId = result.getLong(2);
-				markerItem.label = result.getString(3);
-				markerItem.description = result.getString(4);
-				markerItem.urlText = result.getString(5);
-				markerItem.urlAddress = result.getString(6);
+				markerItem.label = dbLabel == null ? UI.EMPTY_STRING : dbLabel;
+				markerItem.description = dbDescription == null ? UI.EMPTY_STRING : dbDescription;
+				markerItem.urlLabel = dbUrlLabel == null ? UI.EMPTY_STRING : dbUrlLabel;
+				markerItem.urlAddress = dbUrlAddress == null ? UI.EMPTY_STRING : dbUrlAddress;
+				markerItem.latitude = result.getDouble(7);
+				markerItem.longitude = result.getDouble(8);
+				markerItem.altitude = result.getFloat(9);
 			}
 
 		} catch (final SQLException e) {
@@ -902,6 +962,10 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 
 	private void onSelect_TourMarker(final StructuredSelection selection) {
 
+		if (_isUpdateUI) {
+			return;
+		}
+
 		fireSelection(selection);
 	}
 
@@ -911,20 +975,37 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 
 	private void onSelectionTourMarker(final Object eventData) {
 
-//		if (eventData instanceof SelectionTourMarker) {
-//
-//			/*
-//			 * Select the tourmarker in the view
-//			 */
-//			final SelectionTourMarker selection = (SelectionTourMarker) eventData;
-//
-//			final TourData tourData = selection.getTourData();
-//			final ArrayList<TourMarker> tourMarker = selection.getTourMarker();
-//
-//			if (tourData == _tourData) {
-//				_markerViewer.setSelection(new StructuredSelection(tourMarker), true);
-//			}
-//		}
+		if (eventData instanceof SelectionTourMarker) {
+
+			// select the tour marker item in the view
+
+			final SelectionTourMarker selection = (SelectionTourMarker) eventData;
+			final ArrayList<TourMarker> allTourMarker = selection.getTourMarker();
+
+			final long selectedTourMarkerId = allTourMarker.get(0).getMarkerId();
+
+			// find tour marker in marker items
+			TourMarkerItem selectedMarkerItem = null;
+			for (final TourMarkerItem tourMarker : _allMarkerItems) {
+				if (tourMarker.markerId == selectedTourMarkerId) {
+					selectedMarkerItem = tourMarker;
+					break;
+				}
+			}
+
+			if (selectedMarkerItem != null) {
+
+				// select and reveal tour marker item
+
+				_isUpdateUI = true;
+				{
+					_markerViewer.setSelection(new StructuredSelection(selectedMarkerItem));
+					final Table table = _markerViewer.getTable();
+					table.showSelection();
+				}
+				_isUpdateUI = false;
+			}
+		}
 	}
 
 	@Override
@@ -951,6 +1032,8 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 		}
 		_viewerContainer.setRedraw(true);
 
+		_markerViewer.getTable().setFocus();
+
 		return _markerViewer;
 	}
 
@@ -962,7 +1045,7 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 
 	private void restoreState_BeforeUI() {
 
-		final String sortColumnId = Util.getStateString(_state, STATE_SORT_COLUMN_ID, COLUMN_MARKER_NAME);
+		final String sortColumnId = Util.getStateString(_state, STATE_SORT_COLUMN_ID, COLUMN_NAME);
 		final int sortDirection = Util.getStateInt(_state, STATE_SORT_COLUMN_DIRECTION, MarkerComparator.ASCENDING);
 
 		// update comparator
@@ -981,7 +1064,7 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 		}
 
 		// select marker item by it's ID
-		for (final TourMarkerItem markerItem : _allTourMarker) {
+		for (final TourMarkerItem markerItem : _allMarkerItems) {
 			if (markerItem.markerId == stateMarkerId) {
 
 				_markerViewer.setSelection(new StructuredSelection(markerItem), true);

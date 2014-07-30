@@ -1884,16 +1884,16 @@ public class Map3View extends ViewPart implements ITourProvider {
 		showAllTours(_isSyncMapViewWithTour);
 	}
 
-	private void showAllTours_NewTours(final ArrayList<TourData> allTours) {
+	private void showAllTours_NewTours(final ArrayList<TourData> newTours) {
 
 		// check if new tours are already displayed
-		if (allTours.hashCode() == _allTours.hashCode()) {
+		if (newTours.hashCode() == _allTours.hashCode()) {
 			return;
 		}
 
 		cleanupOldTours();
 
-		_allTours.addAll(getMapTours(allTours));
+		_allTours.addAll(getMapTours(newTours));
 
 		showAllTours_InternalTours();
 	}
@@ -2166,6 +2166,9 @@ public class Map3View extends ViewPart implements ITourProvider {
 			return;
 		}
 
+		// ensure tour is displayed
+		updateUI_ShowTour(tourData);
+
 		final int valuesIndex = allTourMarker.get(0).getSerieIndex();
 
 		syncMapWith_SliderPosition(tourData, chartSliderLayer, valuesIndex);
@@ -2228,7 +2231,6 @@ public class Map3View extends ViewPart implements ITourProvider {
 		if (trackSliderLayer == null) {
 			return;
 		}
-
 
 		final int numberOfTourMarkers = allTourMarker.size();
 
@@ -2309,6 +2311,36 @@ public class Map3View extends ViewPart implements ITourProvider {
 			// poi layer is visible
 
 			markerLayer.createMarker(_allTours);
+		}
+	}
+
+	/**
+	 * Show tour when it is not yet displayed.
+	 * 
+	 * @param tourData
+	 */
+	private void updateUI_ShowTour(final TourData tourData) {
+
+		// check if the marker tour is displayed
+		final long markerTourId = tourData.getTourId().longValue();
+		boolean isTourVisible = false;
+
+		for (final TourData mapTourData : _allTours) {
+			if (mapTourData.getTourId().longValue() == markerTourId) {
+				isTourVisible = true;
+				break;
+			}
+		}
+
+		if (isTourVisible == false) {
+
+			// show tour
+
+			cleanupOldTours();
+
+			_allTours.add(tourData);
+
+			showAllTours_InternalTours();
 		}
 	}
 

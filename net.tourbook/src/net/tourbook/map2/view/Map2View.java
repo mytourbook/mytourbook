@@ -1130,13 +1130,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 
 					if (eventData instanceof SelectionTourMarker) {
 
-						final SelectionTourMarker tourMarkerSelection = (SelectionTourMarker) eventData;
-
-//						System.out.println((UI.timeStampNano() + " [" + Map2View.class.getSimpleName() + "] ")
-//								+ ("\ttourMarkerSelection"));
-//						// TODO remove SYSTEM.OUT.PRINTLN
-
-						onSelectionChanged_TourMarker(tourMarkerSelection, false);
+						onSelectionChanged_TourMarker((SelectionTourMarker) eventData, false);
 					}
 
 				} else if (eventId == TourEventId.SLIDER_POSITION_CHANGED) {
@@ -2191,6 +2185,9 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 	private void onSelectionChanged_TourMarker(final SelectionTourMarker markerSelection, final boolean isDrawSlider) {
 
 		final TourData tourData = markerSelection.getTourData();
+
+		updateUI_ShowTour(tourData);
+
 		final ArrayList<TourMarker> tourMarker = markerSelection.getTourMarker();
 		final int numberOfTourMarkers = tourMarker.size();
 
@@ -2208,19 +2205,21 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 			rightSliderValueIndex = tourMarker.get(numberOfTourMarkers - 1).getSerieIndex();
 		}
 
-		if (isDrawSlider) {
+		if (_isMapSynchedWithTour || _isMapSynchedWithSlider) {
 
-			positionMapTo_TourSliders(//
-					tourData,
-					leftSliderValueIndex,
-					rightSliderValueIndex,
-					leftSliderValueIndex);
+			if (isDrawSlider) {
 
-		} else {
+				positionMapTo_TourSliders(//
+						tourData,
+						leftSliderValueIndex,
+						rightSliderValueIndex,
+						leftSliderValueIndex);
 
-			positionMapTo_ValueIndex(tourData, leftSliderValueIndex);
+			} else {
+
+				positionMapTo_ValueIndex(tourData, leftSliderValueIndex);
+			}
 		}
-
 	}
 
 	private void paintEntireTour() {
@@ -3126,5 +3125,34 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 
 		_map.disposeOverlayImageCache();
 		_map.paint();
+	}
+
+	/**
+	 * Show tour when it is not yet displayed.
+	 * 
+	 * @param tourData
+	 */
+	private void updateUI_ShowTour(final TourData tourData) {
+
+		// check if the marker tour is displayed
+		final long markerTourId = tourData.getTourId().longValue();
+		boolean isTourVisible = false;
+
+		for (final TourData mapTourData : _allTourData) {
+			if (mapTourData.getTourId().longValue() == markerTourId) {
+				isTourVisible = true;
+				break;
+			}
+		}
+
+		if (isTourVisible == false) {
+
+			// show tour
+
+			_allTourData.clear();
+			_allTourData.add(tourData);
+
+			paintTours_10_All();
+		}
 	}
 }

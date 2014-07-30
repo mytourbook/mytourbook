@@ -1,0 +1,7 @@
+Version: 14.99.0                                                ?.?.2014
+
+
+* New actions in column header context menu
+  - Show all columns.
+  - Show default columns.
+

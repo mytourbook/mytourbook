@@ -386,6 +386,11 @@ public class Tile extends Observable {
 			// it is synchronized because this object can be set to null in another thread
 			synchronized (_overlayImageDataResources) {
 
+				// check _overlayImageDataResources again, it could be null at this time
+				if (_overlayImageDataResources == null) {
+					return null;
+				}
+
 				final ImageData tileImageData = _overlayImageDataResources.getTileImageData();
 				final ImageData neighborImageData = _overlayImageDataResources.getNeighborImageData();
 

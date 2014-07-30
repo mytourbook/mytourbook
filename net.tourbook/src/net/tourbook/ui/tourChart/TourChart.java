@@ -886,7 +886,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 	}
 
 	/**
-	 * Create all tour chart actions
+	 * Create all tour chart actions.
 	 */
 	private void createActions() {
 

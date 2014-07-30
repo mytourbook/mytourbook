@@ -26,6 +26,7 @@ import net.tourbook.chart.SelectionChartInfo;
 import net.tourbook.chart.SelectionChartXSliderPosition;
 import net.tourbook.common.util.PostSelectionProvider;
 import net.tourbook.data.TourData;
+import net.tourbook.data.TourMarker;
 import net.tourbook.photo.IPhotoEventListener;
 import net.tourbook.photo.PhotoEventId;
 import net.tourbook.photo.PhotoManager;
@@ -39,6 +40,7 @@ import net.tourbook.tour.SelectionDeletedTours;
 import net.tourbook.tour.SelectionTourData;
 import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.SelectionTourIds;
+import net.tourbook.tour.SelectionTourMarker;
 import net.tourbook.tour.TourEvent;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
@@ -270,6 +272,11 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 						&& eventData instanceof ISelection) {
 
 					onSelectionChanged((ISelection) eventData);
+
+				} else if (eventId == TourEventId.MARKER_SELECTION //
+						&& eventData instanceof SelectionTourMarker) {
+
+					onSelectionChanged_TourMarker((SelectionTourMarker) eventData);
 
 				} else if (eventId == TourEventId.CLEAR_DISPLAYED_TOUR) {
 
@@ -613,6 +620,48 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 		}
 	}
 
+	private void onSelectionChanged_TourMarker(final SelectionTourMarker markerSelection) {
+
+		final TourData tourData = markerSelection.getTourData();
+		final long markerTourId = tourData.getTourId().longValue();
+
+		/*
+		 * check if the marker tour is displayed
+		 */
+		if (_tourData == null || _tourData.getTourId().longValue() != markerTourId) {
+
+			// show tour
+
+			updateChart(tourData);
+		}
+
+		/*
+		 * set slider position
+		 */
+		final ArrayList<TourMarker> tourMarker = markerSelection.getTourMarker();
+		final int numberOfTourMarkers = tourMarker.size();
+
+		int leftSliderValueIndex = tourMarker.get(0).getSerieIndex();
+		int rightSliderValueIndex = 0;
+
+		if (numberOfTourMarkers == 1) {
+
+			rightSliderValueIndex = leftSliderValueIndex;
+
+		} else if (numberOfTourMarkers > 1) {
+
+			leftSliderValueIndex = tourMarker.get(0).getSerieIndex();
+			rightSliderValueIndex = tourMarker.get(numberOfTourMarkers - 1).getSerieIndex();
+		}
+
+		final SelectionChartXSliderPosition xSliderPosition = new SelectionChartXSliderPosition(
+				_tourChart,
+				leftSliderValueIndex,
+				rightSliderValueIndex);
+
+		_tourChart.selectMarker(xSliderPosition);
+	}
+
 	@Override
 	public void photoEvent(final IViewPart viewPart, final PhotoEventId photoEventId, final Object data) {
 
@@ -729,7 +778,6 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 
 		// set application window title tool tip
 		setTitleToolTip(TourManager.getTourDateShort(_tourData));
-
 	}
 
 }

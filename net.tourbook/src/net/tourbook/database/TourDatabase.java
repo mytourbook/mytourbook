@@ -271,37 +271,103 @@ public class TourDatabase {
 		// set storage location for the database
 		System.setProperty("derby.system.home", _databasePath); //$NON-NLS-1$
 
-// derby debug properties
+// set derby debug properties
 //		System.setProperty("derby.language.logQueryPlan", "true"); //$NON-NLS-1$
 //		System.setProperty("derby.language.logStatementText", "true"); //$NON-NLS-1$
 	}
 
 	private static final Object						DB_LOCK										= new Object();
 
+	public static final double						DEFAULT_DOUBLE								= 1E-300;									//Float.MIN_VALUE;
+	public static final double						DEFAULT_FLOAT								= 1E-40;
+
+	private static final String						DOUBLE_MIN_VALUE;
+	private static final String						FLOAT_MIN_VALUE;
+	static {
+
+//		!ENTRY net.tourbook.common 4 0 2014-07-30 11:05:18.419
+//		!MESSAGE ALTER TABLE TOURMARKER	ADD COLUMN	latitude DOUBLE DEFAULT 4.9E-324
+//
+//		!ENTRY net.tourbook.common 4 0 2014-07-30 11:05:18.440
+//		!MESSAGE SQLException
+//
+//		SQLState: 22003
+//		Severity: 30000
+//		Message: The resulting value is outside the range for the data type DOUBLE.
+//
+////////////////////////////////////////////////////////////////////////////////////////
+//
+//		Derby Limitations
+//
+//		DOUBLE value ranges:
+//		• Smallest DOUBLE value: -1.79769E+308
+//		• Largest DOUBLE value: 1.79769E+308
+//		• Smallest positive DOUBLE value: 2.225E-307
+//		• Largest negative DOUBLE value: -2.225E-307
+//
+//		DOUBLE_MIN_VALUE = (new Double(Double.MIN_VALUE)).toString();
+//
+		DOUBLE_MIN_VALUE = (new Double(DEFAULT_DOUBLE)).toString();
+		FLOAT_MIN_VALUE = (new Float(DEFAULT_FLOAT)).toString();
+	}
+
 	/**
 	 * SQL utilities.
 	 */
 	private static class SQL {
 
-//		private static void AddCol_BigInt(final Statement stmt, final String table, final String columnName)
-//				throws SQLException {
-//
-//			final String sql = ""// 												//$NON-NLS-1$
-//					+ "ALTER TABLE " + table //										//$NON-NLS-1$
-//					+ "	ADD COLUMN	" + columnName + " BIGINT"; //					//$NON-NLS-1$ //$NON-NLS-2$
-//
-//			exec(stmt, sql);
-//
-//			return;
-//		}
+		@SuppressWarnings("unused")
+		private static void AddCol_BigInt(	final Statement stmt,
+											final String table,
+											final String columnName,
+											final String defaultValue) throws SQLException {
+
+			final String sql = ""// 															//$NON-NLS-1$
+					+ "ALTER TABLE " + table //													//$NON-NLS-1$
+					+ "	ADD COLUMN	" + columnName + " BIGINT DEFAULT " + defaultValue; //		//$NON-NLS-1$ //$NON-NLS-2$
+
+			exec(stmt, sql);
+
+			return;
+		}
+
+		private static void AddCol_Double(	final Statement stmt,
+											final String table,
+											final String columnName,
+											final String defaultValue) throws SQLException {
+
+			final String sql = ""// 															//$NON-NLS-1$
+					+ "ALTER TABLE " + table //													//$NON-NLS-1$
+					+ "	ADD COLUMN	" + columnName + " DOUBLE DEFAULT " + defaultValue; //		//$NON-NLS-1$ //$NON-NLS-2$
+
+			exec(stmt, sql);
+
+			return;
+		}
+
+		private static void AddCol_Float(	final Statement stmt,
+											final String table,
+											final String columnName,
+											final String defaultValue) throws SQLException {
+
+			final String sql = ""// 															//$NON-NLS-1$
+					+ "ALTER TABLE " + table //													//$NON-NLS-1$
+					+ "	ADD COLUMN	" + columnName + " FLOAT DEFAULT  " + defaultValue; //		//$NON-NLS-1$ //$NON-NLS-2$
+
+			exec(stmt, sql);
+
+			return;
+		}
 
 		@SuppressWarnings("unused")
-		private static void AddCol_Int(final Statement stmt, final String table, final String columnName)
-				throws SQLException {
+		private static void AddCol_Int(	final Statement stmt,
+										final String table,
+										final String columnName,
+										final String defaultValue) throws SQLException {
 
-			final String sql = ""// 												//$NON-NLS-1$
-					+ "ALTER TABLE " + table //										//$NON-NLS-1$
-					+ "	ADD COLUMN	" + columnName + " INTEGER DEFAULT 0"; //		//$NON-NLS-1$ //$NON-NLS-2$
+			final String sql = ""// 															//$NON-NLS-1$
+					+ "ALTER TABLE " + table //													//$NON-NLS-1$
+					+ "	ADD COLUMN	" + columnName + " INTEGER DEFAULT " + defaultValue; //		//$NON-NLS-1$ //$NON-NLS-2$
 
 			exec(stmt, sql);
 
@@ -357,7 +423,7 @@ public class TourDatabase {
 
 			try {
 
-				exec(stmt, "ALTER TABLE " + tableName + " DROP CONSTRAINT " + constraintName);
+				exec(stmt, "ALTER TABLE " + tableName + " DROP CONSTRAINT " + constraintName); //$NON-NLS-1$ //$NON-NLS-2$
 
 			} catch (final SQLException e) {
 
@@ -2616,7 +2682,7 @@ public class TourDatabase {
 				+ "	time 					INTEGER NOT NULL,												\n" //$NON-NLS-1$
 
 				// before version 20
-				// + "	distance 				INTEGER NOT NULL,				\n" //$NON-NLS-1$
+				// + "	distance 			INTEGER NOT NULL,												\n" //$NON-NLS-1$
 				+ "	distance 				INTEGER,														\n" //$NON-NLS-1$
 
 				// Version 20 - begin
@@ -2638,6 +2704,23 @@ public class TourDatabase {
 				+ "	urlAddress				VARCHAR(" + TourMarker.DB_LENGTH_URL_ADDRESS + "),				\n" //$NON-NLS-1$ //$NON-NLS-2$
 				//
 				// Version 24 - end
+				//
+				// Version 25 - begin
+				//
+				// When DEFAULT value is NOT set, this exception occures:
+				//
+				//java.lang.IllegalArgumentException: Can not set float field net.tourbook.data.TourMarker.altitude to null value
+				//	at sun.reflect.UnsafeFieldAccessorImpl.throwSetIllegalArgumentException(UnsafeFieldAccessorImpl.java:176)
+				//	at sun.reflect.UnsafeFieldAccessorImpl.throwSetIllegalArgumentException(UnsafeFieldAccessorImpl.java:180)
+				//	at sun.reflect.UnsafeFloatFieldAccessorImpl.set(UnsafeFloatFieldAccessorImpl.java:92)
+				//	at java.lang.reflect.Field.set(Field.java:753)
+				//	at org.hibernate.property.DirectPropertyAccessor$DirectSetter.set(DirectPropertyAccessor.java:102)
+				//
+				+ "	altitude				FLOAT DEFAULT " + FLOAT_MIN_VALUE + ",							\n" //$NON-NLS-1$
+				+ "	latitude 				DOUBLE DEFAULT " + DOUBLE_MIN_VALUE + ",						\n" //$NON-NLS-1$
+				+ "	longitude 				DOUBLE DEFAULT " + DOUBLE_MIN_VALUE + ",						\n" //$NON-NLS-1$
+				//
+				// Version 25 - end
 				//
 				+ "	serieIndex 				INTEGER NOT NULL,												\n" //$NON-NLS-1$
 				+ "	type 					INTEGER NOT NULL,												\n" //$NON-NLS-1$
@@ -3318,14 +3401,6 @@ public class TourDatabase {
 			}
 		}
 
-		boolean isPostUpdate5 = false;
-		boolean isPostUpdate9 = false;
-		boolean isPostUpdate11 = false;
-		boolean isPostUpdate13 = false;
-		boolean isPostUpdate20 = false;
-		boolean isPostUpdate22 = false;
-		boolean isPostUpdate23 = false;
-
 		int newVersion = currentDbVersion;
 		final int oldVersion = currentDbVersion;
 
@@ -3349,6 +3424,7 @@ public class TourDatabase {
 				currentDbVersion = newVersion = 4;
 			}
 
+			boolean isPostUpdate5 = false;
 			if (currentDbVersion == 4) {
 				updateDbDesign_004_005(conn, monitor);
 				currentDbVersion = newVersion = 5;
@@ -3370,6 +3446,7 @@ public class TourDatabase {
 				currentDbVersion = newVersion = 8;
 			}
 
+			boolean isPostUpdate9 = false;
 			if (currentDbVersion == 8) {
 				updateDbDesign_008_009(conn, monitor);
 				currentDbVersion = newVersion = 9;
@@ -3381,6 +3458,7 @@ public class TourDatabase {
 				currentDbVersion = newVersion = 10;
 			}
 
+			boolean isPostUpdate11 = false;
 			if (currentDbVersion == 10) {
 				currentDbVersion = newVersion = updateDbDesign_010_011(conn, monitor);
 				isPostUpdate11 = true;
@@ -3390,6 +3468,7 @@ public class TourDatabase {
 				currentDbVersion = newVersion = updateDbDesign_011_012(conn, monitor);
 			}
 
+			boolean isPostUpdate13 = false;
 			if (currentDbVersion == 12) {
 				currentDbVersion = newVersion = updateDbDesign_012_013(conn, monitor);
 				isPostUpdate13 = true;
@@ -3419,6 +3498,7 @@ public class TourDatabase {
 				currentDbVersion = newVersion = updateDbDesign_018_to_019(conn, monitor);
 			}
 
+			boolean isPostUpdate20 = false;
 			if (currentDbVersion == 19) {
 				currentDbVersion = newVersion = updateDbDesign_019_to_020(conn, monitor);
 				isPostUpdate20 = true;
@@ -3434,6 +3514,8 @@ public class TourDatabase {
 			/*
 			 * 22
 			 */
+			boolean isPostUpdate22 = false;
+
 			if (currentDbVersion == 21) {
 				currentDbVersion = newVersion = updateDbDesign_021_to_022(conn, monitor);
 				isPostUpdate22 = true;
@@ -3442,6 +3524,8 @@ public class TourDatabase {
 			/*
 			 * 23
 			 */
+			boolean isPostUpdate23 = false;
+
 			if (currentDbVersion == 22) {
 				currentDbVersion = newVersion = updateDbDesign_022_to_023(conn, monitor);
 				isPostUpdate23 = true;
@@ -3457,7 +3541,10 @@ public class TourDatabase {
 			/*
 			 * 24 -> 25
 			 */
+			boolean isPostUpdate25 = false;
+
 			if (currentDbVersion == 24) {
+				isPostUpdate25 = true;
 				currentDbVersion = newVersion = updateDbDesign_024_to_025(conn, monitor);
 			}
 
@@ -3494,6 +3581,9 @@ public class TourDatabase {
 			}
 			if (isPostUpdate23) {
 				updateDbDesign_022_to_023_PostUpdate(conn, monitor);
+			}
+			if (isPostUpdate25) {
+				updateDbDesign_024_to_025_PostUpdate(conn, monitor);
 			}
 
 		} catch (final SQLException e) {
@@ -4846,7 +4936,6 @@ public class TourDatabase {
 					SQL.AlterCol_VarChar_Width(stmt, TABLE_TOUR_MARKER, "label", TourWayPoint.DB_LENGTH_NAME); //$NON-NLS-1$
 					SQL.AlterCol_VarChar_Width(stmt, TABLE_TOUR_MARKER, "category", TourWayPoint.DB_LENGTH_CATEGORY); //$NON-NLS-1$
 
-					//$NON-NLS-1$
 					/*
 					 * Add new columns
 					 */
@@ -4880,6 +4969,14 @@ public class TourDatabase {
 
 				// table SharedMarker is not available -> do db update 25
 				createTable_SharedMarker(stmt);
+
+				// Table: TOURMARKER
+				{
+					// Add new columns
+					SQL.AddCol_Float(stmt, TABLE_TOUR_MARKER, "altitude", FLOAT_MIN_VALUE); //$NON-NLS-1$
+					SQL.AddCol_Double(stmt, TABLE_TOUR_MARKER, "latitude", DOUBLE_MIN_VALUE); //$NON-NLS-1$
+					SQL.AddCol_Double(stmt, TABLE_TOUR_MARKER, "longitude", DOUBLE_MIN_VALUE); //$NON-NLS-1$
+				}
 			}
 		}
 		stmt.close();
@@ -4887,6 +4984,68 @@ public class TourDatabase {
 		logDbUpdateEnd(newDbVersion);
 
 		return newDbVersion;
+	}
+
+	/**
+	 * @param conn
+	 * @param monitor
+	 * @throws SQLException
+	 */
+	private void updateDbDesign_024_to_025_PostUpdate(final Connection conn, final IProgressMonitor monitor)
+			throws SQLException {
+
+		int tourIdx = 1;
+		final ArrayList<Long> tourList = getAllTourIds();
+
+		final EntityManager em = TourDatabase.getInstance().getEntityManager();
+		try {
+
+			// loop: all tours
+			for (final Long tourId : tourList) {
+
+				if (monitor != null) {
+
+					monitor.subTask(NLS.bind(//
+							Messages.Tour_Database_PostUpdate025_SetMarkerFields,
+							new Object[] { tourIdx, tourList.size() }));
+
+					tourIdx++;
+				}
+
+				final TourData tourData = em.find(TourData.class, tourId);
+				if (tourData != null) {
+
+					/*
+					 * set lat/lon/altitude in the tour marker from tour data
+					 */
+
+					final float[] altitudeSerie = tourData.altitudeSerie;
+					final double[] latitudeSerie = tourData.latitudeSerie;
+					final double[] longitudeSerie = tourData.longitudeSerie;
+
+					for (final TourMarker tourMarker : tourData.getTourMarkers()) {
+
+						final int serieIndex = tourMarker.getSerieIndex();
+
+						if (altitudeSerie != null) {
+							tourMarker.setAltitude(altitudeSerie[serieIndex]);
+						}
+
+						if (latitudeSerie != null) {
+							tourMarker.setGeoPosition(latitudeSerie[serieIndex], longitudeSerie[serieIndex]);
+						}
+					}
+
+					TourDatabase.saveEntity(tourData, tourId, TourData.class);
+				}
+			}
+
+		} catch (final Exception e) {
+			e.printStackTrace();
+		} finally {
+
+			em.close();
+		}
 	}
 
 	private void updateDbVersionNumber(final Connection conn, final int newVersion) throws SQLException {

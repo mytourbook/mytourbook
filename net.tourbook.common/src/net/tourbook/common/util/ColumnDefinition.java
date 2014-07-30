@@ -25,7 +25,7 @@ import org.eclipse.swt.events.SelectionAdapter;
 public class ColumnDefinition implements Cloneable {
 
 	/**
-	 * visible name in the modify dialog
+	 * Visible name in the modify dialog.
 	 */
 	private String				_label;
 
@@ -258,6 +258,11 @@ public class ColumnDefinition implements Cloneable {
 		_columnToolTipText = toolTipText;
 	}
 
+	/**
+	 * Overwrite default column ID which is set in the constructor.
+	 * 
+	 * @param columnId
+	 */
 	public void setColumnId(final String columnId) {
 		_columnId = columnId;
 	}
@@ -268,6 +273,20 @@ public class ColumnDefinition implements Cloneable {
 	 */
 	public void setColumnLabel(final String label) {
 		_label = label;
+	}
+
+	/**
+	 * Set text which is displayed in the column header and in the column modification dialog.
+	 * <p>
+	 * This will replace calling {@link #setColumnLabel(String)} and
+	 * {@link #setColumnHeaderText(String)} when the same text is displayed.
+	 * 
+	 * @param text
+	 */
+	public void setColumnName(final String text) {
+
+		_label = text;
+		_columnText = text;
 	}
 
 	/**

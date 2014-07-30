@@ -782,24 +782,16 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 
 				if (isText || isAddress) {
 
-					String linkText;
-
 					if (isAddress == false) {
 
 						// only text is in the link -> this is not a internet address but create a link of it
 
-						linkText = urlText;
-
-					} else if (isText == false) {
-
-						linkText = urlAddress;
+						columnText = urlText;
 
 					} else {
 
-						linkText = urlAddress;
+						columnText = urlAddress;
 					}
-
-					columnText = linkText;
 				}
 
 				cell.setText(columnText);

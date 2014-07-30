@@ -286,7 +286,7 @@ public class TourWayPoint implements Cloneable, Comparable<Object>, IHoveredArea
 		return result;
 	}
 
-	public void setAltitude(final float altitude) {
+	public void setAltitude(final Float altitude) {
 		this.altitude = altitude;
 	}
 

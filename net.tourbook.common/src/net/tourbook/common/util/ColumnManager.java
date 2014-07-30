@@ -61,7 +61,7 @@ public class ColumnManager {
 	private static final String					LABEL_UNIT_SEPARATOR			= "   ·   ";							//$NON-NLS-1$
 
 	/**
-	 * minimum column width, when the column width is 0, there was a bug that this happened
+	 * Minimum column width, when the column width is 0, there was a bug that this happened.
 	 */
 	private static final int					MINIMUM_COLUMN_WIDTH			= 7;
 
@@ -69,24 +69,27 @@ public class ColumnManager {
 	private static final String					MEMENTO_COLUMN_WIDTH			= "column_width";						//$NON-NLS-1$
 
 	/**
-	 * column definitions for all columns which are defined for the viewer
+	 * Contains all column definitions which are defined for the table/tree viewer.
+	 * <p>
+	 * The sequence how they are added is the default.
 	 */
 	private final ArrayList<ColumnDefinition>	_allDefinedColumnDefinitions	= new ArrayList<ColumnDefinition>();
 
 	/**
-	 * contains the column definitions for the visible columns in the sort order of the table/tree
+	 * Contains column definitions which are visible in the table/tree in the sort order of the
+	 * table/tree.
 	 */
-	private ArrayList<ColumnDefinition>			_visibleColumnDefinitions;
+	private ArrayList<ColumnDefinition>			_visibleColumnDefinitions		= new ArrayList<ColumnDefinition>();
 
 	/**
-	 * contains the column ids which are visible in the viewer
+	 * Contains the column ids which are visible in the viewer.
 	 */
 	private String[]							_visibleColumnIds;
 
 	/**
 	 * Contains a pair with column id/column width for visible columns.
 	 */
-	private String[]							_columnIdsAndWidth;
+	private String[]							_visibleColumnIdsAndWidth;
 
 	private AbstractColumnLayout				_columnLayout;
 
@@ -98,7 +101,7 @@ public class ColumnManager {
 	private ColumnViewer						_columnViewer;
 
 	/**
-	 * Context menu listener
+	 * Context menu listener.
 	 */
 	private Listener							_tableMenuDetectListener;
 	private Listener							_treeMenuDetectListener;
@@ -117,6 +120,80 @@ public class ColumnManager {
 		_tourViewer = tourViewer;
 
 		restoreState(viewState);
+	}
+
+	private void actionFitAllColumnSize() {
+
+		// larger tables/trees needs more time to resize
+
+		BusyIndicator.showWhile(_columnViewer.getControl().getDisplay(), new Runnable() {
+			public void run() {
+
+				boolean isColumn0Visible = true;
+
+				if (_tourViewer instanceof ITourViewer2) {
+					isColumn0Visible = ((ITourViewer2) _tourViewer).isColumn0Visible(_columnViewer);
+				}
+
+				if (_columnViewer instanceof TableViewer) {
+
+					final Table table = ((TableViewer) _columnViewer).getTable();
+					if (table.isDisposed()) {
+						return;
+					}
+
+					table.setRedraw(false);
+					{
+						final TableColumn[] allColumns = table.getColumns();
+
+						for (int columnIndex = 0; columnIndex < allColumns.length; columnIndex++) {
+							final TableColumn tableColumn = allColumns[columnIndex];
+							if (columnIndex == 0) {
+
+								if (isColumn0Visible) {
+									tableColumn.pack();
+								} else {
+									tableColumn.setWidth(0);
+								}
+							} else {
+								tableColumn.pack();
+							}
+						}
+					}
+					table.setRedraw(true);
+
+				} else if (_columnViewer instanceof TreeViewer) {
+
+					final Tree tree = ((TreeViewer) _columnViewer).getTree();
+					if (tree.isDisposed()) {
+						return;
+					}
+
+					tree.setRedraw(false);
+					{
+						final TreeColumn[] allColumns = tree.getColumns();
+						for (final TreeColumn tableColumn : allColumns) {
+							tableColumn.pack();
+						}
+					}
+					tree.setRedraw(true);
+				}
+			}
+		});
+	}
+
+	private void actionShowAllColumns() {
+
+		setVisibleColumnIds_All();
+
+		_columnViewer = _tourViewer.recreateViewer(_columnViewer);
+	}
+
+	private void actionShowDefaultColumns() {
+
+		setVisibleColumnIds_Default();
+
+		_columnViewer = _tourViewer.recreateViewer(_columnViewer);
 	}
 
 	public void addColumn(final ColumnDefinition colDef) {
@@ -268,7 +345,29 @@ public class ColumnManager {
 		fitMenuItem.setText(Messages.Action_App_SizeAllColumnsToFit);
 		fitMenuItem.addListener(SWT.Selection, new Listener() {
 			public void handleEvent(final Event event) {
-				onFitAllColumnSize();
+				actionFitAllColumnSize();
+			}
+		});
+
+		/*
+		 * Show all columns
+		 */
+		final MenuItem allColumnsMenuItem = new MenuItem(contextMenu, SWT.PUSH);
+		allColumnsMenuItem.setText(Messages.Action_ColumnManager_ShowAllColumns);
+		allColumnsMenuItem.addListener(SWT.Selection, new Listener() {
+			public void handleEvent(final Event event) {
+				actionShowAllColumns();
+			}
+		});
+
+		/*
+		 * Show default columns
+		 */
+		final MenuItem defaultColumnsMenuItem = new MenuItem(contextMenu, SWT.PUSH);
+		defaultColumnsMenuItem.setText(Messages.Action_ColumnManager_ShowDefaultColumns);
+		defaultColumnsMenuItem.addListener(SWT.Selection, new Listener() {
+			public void handleEvent(final Event event) {
+				actionShowDefaultColumns();
 			}
 		});
 
@@ -501,7 +600,7 @@ public class ColumnManager {
 
 		// get the sorting order and column width from the viewer
 		_visibleColumnIds = getColumns_FromViewer_Ids();
-		_columnIdsAndWidth = getColumns_FromViewer_IdAndWidth();
+		_visibleColumnIdsAndWidth = getColumns_FromViewer_IdAndWidth();
 	}
 
 	/**
@@ -590,12 +689,12 @@ public class ColumnManager {
 
 	private int getColumnWidth(final String columnWidthId) {
 
-		for (int columnIndex = 0; columnIndex < _columnIdsAndWidth.length; columnIndex++) {
-			final String columnId = _columnIdsAndWidth[columnIndex];
+		for (int columnIndex = 0; columnIndex < _visibleColumnIdsAndWidth.length; columnIndex++) {
+			final String columnId = _visibleColumnIdsAndWidth[columnIndex];
 
 			if (columnWidthId.equals(columnId)) {
 				try {
-					return Integer.parseInt(_columnIdsAndWidth[++columnIndex]);
+					return Integer.parseInt(_visibleColumnIdsAndWidth[++columnIndex]);
 				} catch (final Exception e) {
 					// ignore format exception
 				}
@@ -736,66 +835,6 @@ public class ColumnManager {
 		return allDialogColumns;
 	}
 
-	private void onFitAllColumnSize() {
-
-		// larger tables/trees needs more time to resize
-
-		BusyIndicator.showWhile(_columnViewer.getControl().getDisplay(), new Runnable() {
-			public void run() {
-
-				boolean isColumn0Visible = true;
-
-				if (_tourViewer instanceof ITourViewer2) {
-					isColumn0Visible = ((ITourViewer2) _tourViewer).isColumn0Visible(_columnViewer);
-				}
-
-				if (_columnViewer instanceof TableViewer) {
-
-					final Table table = ((TableViewer) _columnViewer).getTable();
-					if (table.isDisposed()) {
-						return;
-					}
-
-					table.setRedraw(false);
-					{
-						final TableColumn[] allColumns = table.getColumns();
-
-						for (int columnIndex = 0; columnIndex < allColumns.length; columnIndex++) {
-							final TableColumn tableColumn = allColumns[columnIndex];
-							if (columnIndex == 0) {
-
-								if (isColumn0Visible) {
-									tableColumn.pack();
-								} else {
-									tableColumn.setWidth(0);
-								}
-							} else {
-								tableColumn.pack();
-							}
-						}
-					}
-					table.setRedraw(true);
-
-				} else if (_columnViewer instanceof TreeViewer) {
-
-					final Tree tree = ((TreeViewer) _columnViewer).getTree();
-					if (tree.isDisposed()) {
-						return;
-					}
-
-					tree.setRedraw(false);
-					{
-						final TreeColumn[] allColumns = tree.getColumns();
-						for (final TreeColumn tableColumn : allColumns) {
-							tableColumn.pack();
-						}
-					}
-					tree.setRedraw(true);
-				}
-			}
-		});
-	}
-
 	private void onSelectColumnItem(final Event event) {
 
 		if (event.widget instanceof MenuItem) {
@@ -841,7 +880,7 @@ public class ColumnManager {
 		// restore column width
 		final String mementoColumnWidth = settings.get(MEMENTO_COLUMN_WIDTH);
 		if (mementoColumnWidth != null) {
-			_columnIdsAndWidth = StringToArrayConverter.convertStringToArray(mementoColumnWidth);
+			_visibleColumnIdsAndWidth = StringToArrayConverter.convertStringToArray(mementoColumnWidth);
 		}
 	}
 
@@ -863,9 +902,9 @@ public class ColumnManager {
 		}
 
 		// save columns width and keep it for internal use
-		_columnIdsAndWidth = getColumns_FromViewer_IdAndWidth();
-		if (_columnIdsAndWidth != null) {
-			settings.put(MEMENTO_COLUMN_WIDTH, StringToArrayConverter.convertArrayToString(_columnIdsAndWidth));
+		_visibleColumnIdsAndWidth = getColumns_FromViewer_IdAndWidth();
+		if (_visibleColumnIdsAndWidth != null) {
+			settings.put(MEMENTO_COLUMN_WIDTH, StringToArrayConverter.convertArrayToString(_visibleColumnIdsAndWidth));
 		}
 	}
 
@@ -895,66 +934,6 @@ public class ColumnManager {
 		columnIdsAndWidth.add(Integer.toString(columnWidth));
 	}
 
-	private void setColumnIdsFromModifyDialog(final MenuItem[] menuItems) {
-
-		final ArrayList<String> visibleColumnIds = new ArrayList<String>();
-		final ArrayList<String> columnIdsAndWidth = new ArrayList<String>();
-
-		// recreate columns in the correct sort order
-		for (final MenuItem menuItem : menuItems) {
-
-			final boolean isChecked = menuItem.getSelection();
-
-			if (isChecked) {
-
-				// data in the table item contains the input items for the viewer
-				final ColumnDefinition colDef = (ColumnDefinition) menuItem.getData();
-
-				// set the visible columns
-				visibleColumnIds.add(colDef.getColumnId());
-
-				// set column id and width
-				columnIdsAndWidth.add(colDef.getColumnId());
-				columnIdsAndWidth.add(Integer.toString(colDef.getColumnWidth()));
-			}
-		}
-
-		_visibleColumnIds = visibleColumnIds.toArray(new String[visibleColumnIds.size()]);
-		_columnIdsAndWidth = columnIdsAndWidth.toArray(new String[columnIdsAndWidth.size()]);
-	}
-
-	/**
-	 * Set the columns in {@link #_visibleColumnDefinitions} to the order of the
-	 * <code>tableItems</code> in the {@link DialogModifyColumns}
-	 * 
-	 * @param tableItems
-	 */
-	private void setColumnIdsFromModifyDialog(final TableItem[] tableItems) {
-
-		final ArrayList<String> visibleColumnIds = new ArrayList<String>();
-		final ArrayList<String> columnIdsAndWidth = new ArrayList<String>();
-
-		// recreate columns in the correct sort order
-		for (final TableItem tableItem : tableItems) {
-
-			if (tableItem.getChecked()) {
-
-				// data in the table item contains the input items for the viewer
-				final ColumnDefinition colDef = (ColumnDefinition) tableItem.getData();
-
-				// set the visible columns
-				visibleColumnIds.add(colDef.getColumnId());
-
-				// set column id and width
-				columnIdsAndWidth.add(colDef.getColumnId());
-				columnIdsAndWidth.add(Integer.toString(colDef.getColumnWidth()));
-			}
-		}
-
-		_visibleColumnIds = visibleColumnIds.toArray(new String[visibleColumnIds.size()]);
-		_columnIdsAndWidth = columnIdsAndWidth.toArray(new String[columnIdsAndWidth.size()]);
-	}
-
 	/**
 	 * Sets the column layout for the viewer which is managed by the {@link ColumnManager}.
 	 * <p>
@@ -968,11 +947,11 @@ public class ColumnManager {
 	}
 
 	/**
-	 * Set the visible column definitions from the visible ids
+	 * Set the visible column definitions from the visible ids.
 	 */
 	private void setVisibleColumnDefinitions() {
 
-		_visibleColumnDefinitions = new ArrayList<ColumnDefinition>();
+		_visibleColumnDefinitions.clear();
 
 		if (_visibleColumnIds != null) {
 
@@ -992,14 +971,14 @@ public class ColumnManager {
 			}
 		}
 
-		if (_columnIdsAndWidth != null) {
+		if (_visibleColumnIdsAndWidth != null) {
 
 			// set the width for all columns
 
-			for (int dataIdx = 0; dataIdx < _columnIdsAndWidth.length; dataIdx++) {
+			for (int dataIdx = 0; dataIdx < _visibleColumnIdsAndWidth.length; dataIdx++) {
 
-				final String columnId = _columnIdsAndWidth[dataIdx++];
-				final int columnWidth = Integer.valueOf(_columnIdsAndWidth[dataIdx]);
+				final String columnId = _visibleColumnIdsAndWidth[dataIdx++];
+				final int columnWidth = Integer.valueOf(_visibleColumnIdsAndWidth[dataIdx]);
 
 				final ColumnDefinition colDef = getColumnDefinitionByColumnId(columnId);
 				if (colDef != null) {
@@ -1045,9 +1024,110 @@ public class ColumnManager {
 		}
 	}
 
+	private void setVisibleColumnIds(final MenuItem[] menuItems) {
+
+		final ArrayList<String> visibleColumnIds = new ArrayList<String>();
+		final ArrayList<String> columnIdsAndWidth = new ArrayList<String>();
+
+		// recreate columns in the correct sort order
+		for (final MenuItem menuItem : menuItems) {
+
+			final boolean isChecked = menuItem.getSelection();
+
+			if (isChecked) {
+
+				// data in the table item contains the input items for the viewer
+				final ColumnDefinition colDef = (ColumnDefinition) menuItem.getData();
+
+				// set the visible columns
+				visibleColumnIds.add(colDef.getColumnId());
+
+				// set column id and width
+				columnIdsAndWidth.add(colDef.getColumnId());
+				columnIdsAndWidth.add(Integer.toString(colDef.getColumnWidth()));
+			}
+		}
+
+		_visibleColumnIds = visibleColumnIds.toArray(new String[visibleColumnIds.size()]);
+		_visibleColumnIdsAndWidth = columnIdsAndWidth.toArray(new String[columnIdsAndWidth.size()]);
+	}
+
+	/**
+	 * Set the columns in {@link #_visibleColumnDefinitions} to the order of the
+	 * <code>tableItems</code> in the {@link DialogModifyColumns}
+	 * 
+	 * @param tableItems
+	 */
+	private void setVisibleColumnIds(final TableItem[] tableItems) {
+
+		final ArrayList<String> visibleColumnIds = new ArrayList<String>();
+		final ArrayList<String> columnIdsAndWidth = new ArrayList<String>();
+
+		// recreate columns in the correct sort order
+		for (final TableItem tableItem : tableItems) {
+
+			if (tableItem.getChecked()) {
+
+				// data in the table item contains the input items for the viewer
+				final ColumnDefinition colDef = (ColumnDefinition) tableItem.getData();
+
+				// set the visible columns
+				visibleColumnIds.add(colDef.getColumnId());
+
+				// set column id and width
+				columnIdsAndWidth.add(colDef.getColumnId());
+				columnIdsAndWidth.add(Integer.toString(colDef.getColumnWidth()));
+			}
+		}
+
+		_visibleColumnIds = visibleColumnIds.toArray(new String[visibleColumnIds.size()]);
+		_visibleColumnIdsAndWidth = columnIdsAndWidth.toArray(new String[columnIdsAndWidth.size()]);
+	}
+
+	private void setVisibleColumnIds_All() {
+
+		final ArrayList<String> visibleColumnIds = new ArrayList<String>();
+		final ArrayList<String> visibleIdsAndWidth = new ArrayList<String>();
+
+		for (final ColumnDefinition colDef : _allDefinedColumnDefinitions) {
+
+			// set visible columns
+			visibleColumnIds.add(colDef.getColumnId());
+
+			// set column id and width
+			visibleIdsAndWidth.add(colDef.getColumnId());
+			visibleIdsAndWidth.add(Integer.toString(colDef.getColumnWidth()));
+		}
+
+		_visibleColumnIds = visibleColumnIds.toArray(new String[visibleColumnIds.size()]);
+		_visibleColumnIdsAndWidth = visibleIdsAndWidth.toArray(new String[visibleIdsAndWidth.size()]);
+	}
+
+	private void setVisibleColumnIds_Default() {
+
+		final ArrayList<String> visibleColumnIds = new ArrayList<String>();
+		final ArrayList<String> visibleIdsAndWidth = new ArrayList<String>();
+
+		for (final ColumnDefinition colDef : _allDefinedColumnDefinitions) {
+
+			if (colDef.isDefaultColumn()) {
+
+				// set visible columns
+				visibleColumnIds.add(colDef.getColumnId());
+
+				// set column id and width
+				visibleIdsAndWidth.add(colDef.getColumnId());
+				visibleIdsAndWidth.add(Integer.toString(colDef.getColumnWidth()));
+			}
+		}
+
+		_visibleColumnIds = visibleColumnIds.toArray(new String[visibleColumnIds.size()]);
+		_visibleColumnIdsAndWidth = visibleIdsAndWidth.toArray(new String[visibleIdsAndWidth.size()]);
+	}
+
 	private void updateColumns(final MenuItem[] menuItems) {
 
-		setColumnIdsFromModifyDialog(menuItems);
+		setVisibleColumnIds(menuItems);
 
 		_columnViewer = _tourViewer.recreateViewer(_columnViewer);
 	}
@@ -1060,7 +1140,7 @@ public class ColumnManager {
 	 */
 	void updateColumns(final TableItem[] tableItems) {
 
-		setColumnIdsFromModifyDialog(tableItems);
+		setVisibleColumnIds(tableItems);
 
 		_columnViewer = _tourViewer.recreateViewer(_columnViewer);
 	}

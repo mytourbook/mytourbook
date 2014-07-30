@@ -24,6 +24,10 @@ public class Messages extends NLS {
 	public static String		Action_App_ConfigureColumns;
 	public static String		Action_App_SizeAllColumnsToFit;
 
+	public static String	Action_ColumnManager_ShowAllColumns;
+
+	public static String	Action_ColumnManager_ShowDefaultColumns;
+
 	public static String		Advanced_Menu_AnimationSymbol;
 
 	public static String		ColumnModifyDialog_Button_default;
