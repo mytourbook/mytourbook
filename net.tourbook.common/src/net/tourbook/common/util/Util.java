@@ -18,6 +18,8 @@ package net.tourbook.common.util;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -251,32 +253,6 @@ public class Util {
 		}
 
 		return floatValues;
-	}
-
-	/**
-	 * To convert the InputStream to String we use the BufferedReader.readLine() method. We iterate
-	 * until the BufferedReader return null which means there's no more data to read. Each line will
-	 * appended to a StringBuilder and returned as String.
-	 */
-	public static String convertStreamToString(final InputStream is) throws IOException {
-
-		if (is != null) {
-
-			final StringBuilder sb = new StringBuilder();
-			String line;
-
-			try {
-				final BufferedReader reader = new BufferedReader(new InputStreamReader(is, UI.UTF_8));
-				while ((line = reader.readLine()) != null) {
-					sb.append(line).append(UI.NEW_LINE);
-				}
-			} finally {
-				is.close();
-			}
-			return sb.toString();
-		} else {
-			return UI.EMPTY_STRING;
-		}
 	}
 
 	/**
@@ -1328,6 +1304,58 @@ public class Util {
 			// do nothing
 		}
 		return Long.MIN_VALUE;
+	}
+
+	/**
+	 * Load a text file.
+	 * @param fileName
+	 * @return Returns the content from a text file
+	 */
+	public static String readContentFromFile(final String fileName) {
+
+		String content = UI.EMPTY_STRING;
+
+		try {
+
+			final FileInputStream stream = new FileInputStream(fileName);
+
+			content = readContentFromStream(stream);
+
+		} catch (final FileNotFoundException e) {
+			StatusUtil.showStatus(e);
+		} catch (final IOException e) {
+			StatusUtil.showStatus(e);
+		}
+
+		return content;
+	}
+
+	/**
+	 * To convert the InputStream to String we use the BufferedReader.readLine() method. We iterate
+	 * until the BufferedReader return null which means there's no more data to read. Each line will
+	 * appended to a StringBuilder and returned as String.
+	 */
+	public static String readContentFromStream(final InputStream inputStream) throws IOException {
+ 
+		if (inputStream != null) {
+
+			final StringBuilder sb = new StringBuilder();
+			String line;
+
+			try {
+
+				final BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, UI.UTF_8));
+
+				while ((line = reader.readLine()) != null) {
+					sb.append(line).append(UI.NEW_LINE);
+				}
+			} finally {
+				inputStream.close();
+			}
+			return sb.toString();
+		} else {
+			return UI.EMPTY_STRING;
+		}
 	}
 
 	/**

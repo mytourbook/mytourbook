@@ -700,6 +700,10 @@ public class SlideoutMarkerOptions extends AnimatedToolTipShell implements IColo
 		_tourChart.updateUI_MarkerLayer();
 
 		enableControls();
+
+		// notify pref listener
+		TourbookPlugin.getDefault().getPreferenceStore()//
+				.setValue(ITourbookPreferences.GRAPH_MARKER_IS_MODIFIED, Math.random());
 	}
 
 	private void onDispose() {

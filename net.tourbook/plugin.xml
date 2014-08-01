@@ -623,6 +623,13 @@
 					label="%view_name_Marker"
 					mnemonic="%view_name_Marker_Mnemonic"/>
 				 
+				<!-- Tour Marker Report -->
+				<command
+					commandId="command.net.tourbook.views.TourMarkerLogbookView"
+					icon="icons/tour-marker-logbook.png"
+					label="%View_Name_MarkerLogbook"
+					mnemonic="%View_Name_MarkerLogbook_Mnemonic"/>
+				 
 				<!-- Waypoints -->
 				<command
 					commandId="command.net.tourbook.views.TourWaypointView"
@@ -1020,11 +1027,18 @@
             name="%view_name_Statistics"
             defaultHandler="net.tourbook.statistic.ActionHandlerOpenViewStatistic"
             />
+
       <command
             id="command.net.tourbook.views.TourMarkerView"
             name="%view_name_Marker"
             defaultHandler="net.tourbook.ui.views.ActionHandlerOpenViewTourMarker"
             />
+      <command
+            id="command.net.tourbook.views.TourMarkerLogbookView"
+            name="%View_Name_MarkerLogbook"
+            defaultHandler="net.tourbook.ui.views.ActionHandlerOpenViewTourMarkerLogbook"
+            />
+
       <command
             id="command.net.tourbook.views.TourWaypointView"
             name="%View_Name_Waypoint"
@@ -1341,6 +1355,13 @@
 	            id="net.tourbook.views.TourMarkerView"
 	            name="%view_name_Marker">
 	      </view>
+	 
+	      <view
+	            category="net.tourbook.category.tour"
+	            class="net.tourbook.ui.views.TourMarkerLogbookView"
+	            icon="icons/tour-marker-logbook.png"
+	            id="net.tourbook.ui.views.TourMarkerLogbookView"
+	            name="%View_Name_MarkerLogbook"/>
 	      <view
 	            category="net.tourbook.category.tour"
 	            class="net.tourbook.ui.views.TourWaypointView"
