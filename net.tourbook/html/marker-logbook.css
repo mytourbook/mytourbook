@@ -1,6 +1,4 @@
-/*
- Default is from page http://www.w3schools.com/html/html_css.asp
-*/
+
 html {
 	overflow-y: scroll;
 }
@@ -15,6 +13,10 @@ body {
 
 p,td,ul {
 	line-height:		130%;
+}
+
+p {
+	margin:				0px;
 }
 
 body,p,h1,h2,h3,h4,table,td,th,ul,ol,textarea,input {
@@ -69,7 +71,7 @@ h1,h2,h3,h4,h5,h6 {
 	color:				#000000;
 }
 
-.title {
+.log-title {
 	clear:				both;	
 }
 
@@ -86,8 +88,41 @@ h1,h2,h3,h4,h5,h6 {
 	margin-top:			15px;
 }
 
-.label {
+.marker-title {
+	margin-top:			13px;
 	font-weight: 		bold;
+}
+
+a.label-text:LINK,
+a.label-text:VISITED {
+	display:			block;
+	width:				auto;					/* enforce width to the right border */
+	color:				#333;	
+    text-decoration:	none;
+}
+
+
+.marker-actions {
+	float:				right;
+	opacity:			0;
+	filter: 			alpha(opacity=0);
+}
+
+.marker-container:HOVER
+.marker-actions {								/* show hidden actions */
+	opacity:			1.0;
+	filter: 			alpha(opacity=100); 	/* IE needs this even in html standard mode*/
+}
+
+a.action:LINK,
+a.action:VISITED {
+	display:			block;
+	
+    text-decoration:	none;
+
+	width: 				16px; 
+	height: 			16px; 
+	cursor: 			pointer; 
 }
 
 .description {

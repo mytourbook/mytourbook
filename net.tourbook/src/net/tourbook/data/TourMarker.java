@@ -314,10 +314,10 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 	}
 
 	/**
-	 * !!!!!!!!!!!!!!!!!<br>
-	 * serieIndex is not used for equals or hashcode because this is modified when markers are
-	 * deleted<br>
-	 * !!!!!!!!!!!!!!!!!<br>
+	 * Tourmarker is compared with the {@link TourMarker#markerId} or {@link TourMarker#_createId}
+	 * <p>
+	 * <b> {@link #serieIndex} is not used for equals or hashcode because this is modified when
+	 * markers are deleted</b>
 	 * 
 	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
@@ -403,14 +403,17 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 	}
 
 	/**
+	 * @return Returns {@link TourMarker} entity id.
+	 */
+	public long getMarkerId() {
+		return markerId;
+	}
+
+	/**
 	 * @return Returns position of this marker in the data serie
 	 */
 	public int getSerieIndex() {
 		return serieIndex;
-	}
-
-	public int getTime() {
-		return time;
 	}
 
 //	/**
@@ -420,6 +423,10 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 //	public TourSign getTourSign() {
 //		return tourSign;
 //	}
+
+	public int getTime() {
+		return time;
+	}
 
 	public int getType() {
 		return type;
@@ -671,6 +678,10 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 		this.serieIndex = serieIndex;
 	}
 
+//	public void setTourSign(final TourSign tourSign) {
+//		this.tourSign = tourSign;
+//	}
+
 	/**
 	 * @param time
 	 *            Time in seconds relative to the tour start. When value is not available it is set
@@ -679,10 +690,6 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 	public void setTime(final int time) {
 		this.time = time;
 	}
-
-//	public void setTourSign(final TourSign tourSign) {
-//		this.tourSign = tourSign;
-//	}
 
 	public void setUrlAddress(final String urlAddress) {
 		this.urlAddress = urlAddress;

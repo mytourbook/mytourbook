@@ -625,10 +625,10 @@
 				 
 				<!-- Tour Marker Report -->
 				<command
-					commandId="command.net.tourbook.views.TourMarkerLogbookView"
+					commandId="command.net.tourbook.views.TourMarkerLogView"
 					icon="icons/tour-marker-logbook.png"
-					label="%View_Name_MarkerLogbook"
-					mnemonic="%View_Name_MarkerLogbook_Mnemonic"/>
+					label="%View_Name_MarkerLog"
+					mnemonic="%View_Name_MarkerLog_Mnemonic"/>
 				 
 				<!-- Waypoints -->
 				<command
@@ -1034,9 +1034,9 @@
             defaultHandler="net.tourbook.ui.views.ActionHandlerOpenViewTourMarker"
             />
       <command
-            id="command.net.tourbook.views.TourMarkerLogbookView"
-            name="%View_Name_MarkerLogbook"
-            defaultHandler="net.tourbook.ui.views.ActionHandlerOpenViewTourMarkerLogbook"
+            id="command.net.tourbook.views.TourMarkerLogView"
+            name="%View_Name_MarkerLog"
+            defaultHandler="net.tourbook.ui.views.ActionHandlerOpenViewTourMarkerLog"
             />
 
       <command
@@ -1358,10 +1358,10 @@
 	 
 	      <view
 	            category="net.tourbook.category.tour"
-	            class="net.tourbook.ui.views.TourMarkerLogbookView"
+	            class="net.tourbook.ui.views.TourMarkerLogView"
 	            icon="icons/tour-marker-logbook.png"
-	            id="net.tourbook.ui.views.TourMarkerLogbookView"
-	            name="%View_Name_MarkerLogbook"/>
+	            id="net.tourbook.ui.views.TourMarkerLogView"
+	            name="%View_Name_MarkerLog"/>
 	      <view
 	            category="net.tourbook.category.tour"
 	            class="net.tourbook.ui.views.TourWaypointView"

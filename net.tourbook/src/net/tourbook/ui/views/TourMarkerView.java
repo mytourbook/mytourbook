@@ -63,12 +63,9 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
-import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.CellLabelProvider;
-import org.eclipse.jface.viewers.CheckboxCellEditor;
 import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.DoubleClickEvent;
-import org.eclipse.jface.viewers.EditingSupport;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
@@ -77,7 +74,6 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
-import org.eclipse.jface.viewers.TextCellEditor;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.jface.viewers.ViewerRow;
@@ -139,114 +135,6 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 
 	private Font					_boldFont;
 	private Chart					_tourChart;
-
-	private final class MarkerEditingSupportLabel extends EditingSupport {
-
-		private final TextCellEditor	__cellEditor;
-
-		private MarkerEditingSupportLabel(final TableViewer tableViewer) {
-
-			super(tableViewer);
-
-			__cellEditor = new TextCellEditor(tableViewer.getTable());
-		}
-
-		@Override
-		protected boolean canEdit(final Object element) {
-
-			if (isTourInDb() == false) {
-				return false;
-			}
-
-			return true;
-		}
-
-		@Override
-		protected CellEditor getCellEditor(final Object element) {
-			return __cellEditor;
-		}
-
-		@Override
-		protected Object getValue(final Object element) {
-			return ((TourMarker) element).getLabel();
-		}
-
-		@Override
-		protected void setValue(final Object element, final Object value) {
-
-			if (value instanceof String) {
-
-				final TourMarker tourMarker = (TourMarker) element;
-				final String newValue = (String) value;
-
-				if (newValue.equals(tourMarker.getLabel()) == false) {
-
-					// value has changed
-
-					tourMarker.setLabel(newValue);
-
-//					setTourDirty();
-
-					// update viewer
-					super.getViewer().update(element, null);
-
-					// display modified time slices in this editor and in other views/editors
-//					fireModifyNotification();
-				}
-			}
-		}
-	}
-
-	private final class MarkerEditingSupportVisibility extends EditingSupport {
-
-		private final CheckboxCellEditor	_cellEditor;
-
-		private MarkerEditingSupportVisibility(final TableViewer tableViewer) {
-
-			super(tableViewer);
-
-			_cellEditor = new CheckboxCellEditor(tableViewer.getTable());
-		}
-
-		@Override
-		protected boolean canEdit(final Object element) {
-			return true;
-		}
-
-		@Override
-		protected CellEditor getCellEditor(final Object element) {
-			return _cellEditor;
-		}
-
-		@Override
-		protected Object getValue(final Object element) {
-
-			if (element instanceof TourMarker) {
-
-				final TourMarker tourMarker = (TourMarker) element;
-
-				return tourMarker.isMarkerVisible() ? Boolean.TRUE : Boolean.FALSE;
-			}
-
-			return Boolean.FALSE;
-		}
-
-		@Override
-		protected void setValue(final Object element, final Object value) {
-
-			if (element instanceof TourMarker) {
-
-				final TourMarker tourMarker = (TourMarker) element;
-				final Boolean isVisible = (Boolean) value;
-
-				// update model
-				tourMarker.setMarkerVisible(isVisible);
-
-				// update UI
-				super.getViewer().update(element, null);
-			}
-		}
-	}
 
 	class MarkerViewerContentProvicer implements IStructuredContentProvider {
 
@@ -1019,14 +907,14 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 			}
 		}
 
-		final boolean isTour = (tourId >= 0) && (_tourData != null);
+		final boolean isTourAvailable = (tourId >= 0) && (_tourData != null);
 
-		if (isTour) {
+		if (isTourAvailable) {
 			_pageBook.showPage(_viewerContainer);
 			_markerViewer.setInput(new Object[0]);
 		}
 
-		_actionEditTourMarkers.setEnabled(isTour);
+		_actionEditTourMarkers.setEnabled(isTourAvailable);
 	}
 
 	private void onSelectionTourMarker(final Object eventData) {

@@ -21,11 +21,11 @@ import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 
-public class ActionHandlerOpenViewTourMarkerLogbook extends AbstractHandler {
+public class ActionHandlerOpenViewTourMarkerLog extends AbstractHandler {
 
 	public Object execute(final ExecutionEvent event) throws ExecutionException {
 
-		Util.showView(TourMarkerLogbookView.ID, true);
+		Util.showView(TourMarkerLogView.ID, true);
 
 		return null;
 	}
