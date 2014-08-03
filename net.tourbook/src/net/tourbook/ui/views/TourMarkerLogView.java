@@ -471,8 +471,6 @@ public class TourMarkerLogView extends ViewPart {
 		} catch (final SWTError e) {
 
 			_txtNoBrowser.setText(NLS.bind(Messages.UI_Label_BrowserCannotBeCreated_Error, e.getMessage()));
-
-			StatusUtil.showStatus("Could not instantiate Browser: " + e.getMessage());
 		}
 	}
 
