@@ -60,6 +60,7 @@ import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.window.Window;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.SWTError;
 import org.eclipse.swt.browser.Browser;
@@ -68,6 +69,7 @@ import org.eclipse.swt.browser.LocationEvent;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchPart;
@@ -117,7 +119,7 @@ public class TourMarkerLogView extends ViewPart {
 	private Composite				_pageContent;
 
 	private Browser					_browser;
-	private Label					_lblNoBrowser;
+	private Text					_txtNoBrowser;
 	private TourChart				_tourChart;
 
 	private void addPartListener() {
@@ -433,11 +435,15 @@ public class TourMarkerLogView extends ViewPart {
 
 		_pageNoBrowser = new Composite(_pageBook, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, true).applyTo(_pageNoBrowser);
-		GridLayoutFactory.fillDefaults().numColumns(1).applyTo(_pageNoBrowser);
+		GridLayoutFactory.swtDefaults().numColumns(1).applyTo(_pageNoBrowser);
+		_pageNoBrowser.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_LIST_BACKGROUND));
 		{
-			_lblNoBrowser = new Label(_pageNoBrowser, SWT.NONE);
-			GridDataFactory.fillDefaults().grab(true, true).applyTo(_lblNoBrowser);
-			_lblNoBrowser.setText(Messages.UI_Label_BrowserCannotBeCreated);
+			_txtNoBrowser = new Text(_pageNoBrowser, SWT.WRAP | SWT.READ_ONLY);
+			GridDataFactory.fillDefaults()//
+					.grab(true, true)
+					.align(SWT.FILL, SWT.BEGINNING)
+					.applyTo(_txtNoBrowser);
+			_txtNoBrowser.setText(Messages.UI_Label_BrowserCannotBeCreated);
 		}
 
 		_pageContent = new Composite(_pageBook, SWT.NONE);
@@ -464,7 +470,7 @@ public class TourMarkerLogView extends ViewPart {
 
 		} catch (final SWTError e) {
 
-			_lblNoBrowser.setText(e.getMessage());
+			_txtNoBrowser.setText(NLS.bind(Messages.UI_Label_BrowserCannotBeCreated_Error, e.getMessage()));
 
 			StatusUtil.showStatus("Could not instantiate Browser: " + e.getMessage());
 		}
