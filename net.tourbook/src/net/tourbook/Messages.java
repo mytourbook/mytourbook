@@ -614,7 +614,7 @@ public class Messages extends NLS {
 	public static String		Image__App_Cancel;
 	public static String		Image__App_Close;
 
-	public static String	Image__App_Edit_Paste;
+	public static String		Image__App_Edit_Paste;
 	public static String		Image__App_OK;
 	public static String		Image__App_Trash;
 	public static String		Image__App_Trash_Disabled;
@@ -1599,6 +1599,7 @@ public class Messages extends NLS {
 	public static String		Training_View_Label_RightChartBorder_Tooltip;
 	public static String		Training_View_Link_NoHrZones;
 
+	public static String		UI_Label_BrowserCannotBeCreated;
 	public static String		UI_Label_no_chart_is_selected;
 	public static String		UI_Label_PersonIsRequired;
 	public static String		UI_Label_TourIsNotSelected;

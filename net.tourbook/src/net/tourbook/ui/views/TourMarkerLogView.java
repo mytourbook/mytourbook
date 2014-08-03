@@ -113,10 +113,11 @@ public class TourMarkerLogView extends ViewPart {
 	 */
 	private PageBook				_pageBook;
 	private Label					_pageNoTour;
+	private Composite				_pageNoBrowser;
+	private Composite				_pageContent;
 
-	private Composite				_viewerContainer;
 	private Browser					_browser;
-
+	private Label					_lblNoBrowser;
 	private TourChart				_tourChart;
 
 	private void addPartListener() {
@@ -234,7 +235,7 @@ public class TourMarkerLogView extends ViewPart {
 		// removed old tour data from the selection provider
 		_postSelectionProvider.clearSelection();
 
-		_pageBook.showPage(_pageNoTour);
+		showInvalidPage();
 	}
 
 	private String createBody() {
@@ -409,8 +410,7 @@ public class TourMarkerLogView extends ViewPart {
 		addPrefListener();
 		addPartListener();
 
-		// show default page
-		_pageBook.showPage(_pageNoTour);
+		showInvalidPage();
 
 		// this part is a selection provider
 		getSite().setSelectionProvider(_postSelectionProvider = new PostSelectionProvider(ID));
@@ -431,10 +431,19 @@ public class TourMarkerLogView extends ViewPart {
 		_pageNoTour = new Label(_pageBook, SWT.NONE);
 		_pageNoTour.setText(Messages.UI_Label_no_chart_is_selected);
 
-		_viewerContainer = new Composite(_pageBook, SWT.NONE);
-		GridLayoutFactory.fillDefaults().applyTo(_viewerContainer);
+		_pageNoBrowser = new Composite(_pageBook, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, true).applyTo(_pageNoBrowser);
+		GridLayoutFactory.fillDefaults().numColumns(1).applyTo(_pageNoBrowser);
 		{
-			createUI_10_Browser(_viewerContainer);
+			_lblNoBrowser = new Label(_pageNoBrowser, SWT.NONE);
+			GridDataFactory.fillDefaults().grab(true, true).applyTo(_lblNoBrowser);
+			_lblNoBrowser.setText(Messages.UI_Label_BrowserCannotBeCreated);
+		}
+
+		_pageContent = new Composite(_pageBook, SWT.NONE);
+		GridLayoutFactory.fillDefaults().applyTo(_pageContent);
+		{
+			createUI_10_Browser(_pageContent);
 		}
 	}
 
@@ -454,6 +463,8 @@ public class TourMarkerLogView extends ViewPart {
 			});
 
 		} catch (final SWTError e) {
+
+			_lblNoBrowser.setText(e.getMessage());
 
 			StatusUtil.showStatus("Could not instantiate Browser: " + e.getMessage());
 		}
@@ -699,8 +710,8 @@ public class TourMarkerLogView extends ViewPart {
 		}
 
 		final boolean isTourAvailable = (tourId >= 0) && (_tourData != null);
-		if (isTourAvailable) {
-			_pageBook.showPage(_viewerContainer);
+		if (isTourAvailable && _browser != null) {
+			_pageBook.showPage(_pageContent);
 			updateUI();
 		}
 	}
@@ -714,9 +725,14 @@ public class TourMarkerLogView extends ViewPart {
 
 	}
 
+	private void showInvalidPage() {
+
+		_pageBook.showPage(_browser == null ? _pageNoBrowser : _pageNoTour);
+	}
+
 	private void showTourFromTourProvider() {
 
-		_pageBook.showPage(_pageNoTour);
+		showInvalidPage();
 
 		// a tour is not displayed, find a tour provider which provides a tour
 		Display.getCurrent().asyncExec(new Runnable() {
@@ -748,7 +764,7 @@ public class TourMarkerLogView extends ViewPart {
 	 */
 	private void updateUI() {
 
-		if (_tourData == null) {
+		if (_tourData == null || _browser == null) {
 			return;
 		}
 
