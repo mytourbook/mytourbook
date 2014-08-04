@@ -579,13 +579,20 @@
 					mnemonic="%command_view_selectedTour_mnemonic"
 					tooltip="%command_view_selectedTour_tooltip"/>
 
-				<!-- Tour Editor - is displayed in the "Tour" and the "Tools" menu -->
+				<!-- Tour Editor - this command is displayed in the "Tour" and the "Tools" menu -->
 				<command
 					commandId="net.tourbook.command.tourDataEditor"
 					icon="icons/tour-editor.gif"
 					label="%command_view_tourEditor"
 					mnemonic="%command_view_tourEditor_mnemonic"
 					tooltip="%command_view_tourEditor_tooltip"/>
+				 
+				<!-- Tour Log -->
+				<command
+					commandId="command.net.tourbook.views.TourBlogView"
+					icon="icons/tour-blog.png"
+					label="%View_Name_TourBlog"
+					mnemonic="%View_Name_TourBlog_Mnemonic"/>
 
 
 			<!-- Map -->
@@ -622,13 +629,6 @@
 					icon="icons/tour-marker.png"
 					label="%view_name_Marker"
 					mnemonic="%view_name_Marker_Mnemonic"/>
-				 
-				<!-- Tour Marker Report -->
-				<command
-					commandId="command.net.tourbook.views.TourMarkerLogView"
-					icon="icons/tour-marker-logbook.png"
-					label="%View_Name_MarkerLog"
-					mnemonic="%View_Name_MarkerLog_Mnemonic"/>
 				 
 				<!-- Waypoints -->
 				<command
@@ -1034,9 +1034,9 @@
             defaultHandler="net.tourbook.ui.views.ActionHandlerOpenViewTourMarker"
             />
       <command
-            id="command.net.tourbook.views.TourMarkerLogView"
-            name="%View_Name_MarkerLog"
-            defaultHandler="net.tourbook.ui.views.ActionHandlerOpenViewTourMarkerLog"
+            id="command.net.tourbook.views.TourBlogView"
+            name="%View_Name_TourBlog"
+            defaultHandler="net.tourbook.ui.views.ActionHandlerOpenViewTourBlog"
             />
 
       <command
@@ -1358,10 +1358,10 @@
 	 
 	      <view
 	            category="net.tourbook.category.tour"
-	            class="net.tourbook.ui.views.TourMarkerLogView"
-	            icon="icons/tour-marker-logbook.png"
-	            id="net.tourbook.ui.views.TourMarkerLogView"
-	            name="%View_Name_MarkerLog"/>
+	            class="net.tourbook.ui.views.TourBlogView"
+	            icon="icons/tour-blog.png"
+	            id="net.tourbook.ui.views.TourBlogView"
+	            name="%View_Name_TourBlog"/>
 	      <view
 	            category="net.tourbook.category.tour"
 	            class="net.tourbook.ui.views.TourWaypointView"

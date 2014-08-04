@@ -27,7 +27,6 @@ import java.util.Set;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.SelectionChartXSliderPosition;
-import net.tourbook.common.UI;
 import net.tourbook.common.util.PostSelectionProvider;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
@@ -36,6 +35,7 @@ import net.tourbook.data.TourMarker;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.DialogMarker;
+import net.tourbook.tour.DialogQuickEdit;
 import net.tourbook.tour.ITourEventListener;
 import net.tourbook.tour.SelectionDeletedTours;
 import net.tourbook.tour.SelectionTourData;
@@ -80,19 +80,21 @@ import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
-public class TourMarkerLogView extends ViewPart {
+public class TourBlogView extends ViewPart {
 
-	public static final String		ID				= "net.tourbook.ui.views.TourMarkerLogView";	//$NON-NLS-1$
+	public static final String		ID					= "net.tourbook.ui.views.TourBlogView";		//$NON-NLS-1$
 
-	private static final String		HREF_TOKEN		= "#";
+	private static final String		HREF_TOKEN			= "#";											//$NON-NLS-1$
 
-	private static final String		ACTION_OPEN		= "Open";
-	private static final String		ACTION_EDIT		= "Edit";
+	private static final String		ACTION_EDIT_MARKER	= "EditMarker";								//$NON-NLS-1$
+	private static final String		ACTION_EDIT_TOUR	= "EditTour";									//$NON-NLS-1$
+	private static final String		ACTION_OPEN_MARKER	= "OpenMarker";								//$NON-NLS-1$
 
-	private static final String		HREF_EDIT		= HREF_TOKEN + ACTION_EDIT + HREF_TOKEN;
-	private static final String		HREF_OPEN		= HREF_TOKEN + ACTION_OPEN + HREF_TOKEN;
+	private static final String		HREF_EDIT_MARKER	= HREF_TOKEN + ACTION_EDIT_MARKER + HREF_TOKEN;
+	private static final String		HREF_EDIT_TOUR		= HREF_TOKEN + ACTION_EDIT_TOUR;
+	private static final String		HREF_OPEN_MARKER	= HREF_TOKEN + ACTION_OPEN_MARKER + HREF_TOKEN;
 
-	private final IPreferenceStore	_prefStore		= TourbookPlugin.getPrefStore();
+	private final IPreferenceStore	_prefStore			= TourbookPlugin.getPrefStore();
 
 	private PostSelectionProvider	_postSelectionProvider;
 
@@ -103,12 +105,12 @@ public class TourMarkerLogView extends ViewPart {
 
 	private TourData				_tourData;
 	private String					_htmlCss;
+	private String					_actionEditImageUrl;
 
 	private boolean					_isShowHiddenMarker;
 
-	private final DateTimeFormatter	_dateFormatter	= DateTimeFormat.fullDate();
-//	private final DateTimeFormatter	_dateFormatter	= DateTimeFormat.longDate();
-	private final DateTimeFormatter	_timeFormatter	= DateTimeFormat.mediumTime();
+	private final DateTimeFormatter	_dateFormatter		= DateTimeFormat.fullDate();
+	private final DateTimeFormatter	_timeFormatter		= DateTimeFormat.mediumTime();
 
 	/*
 	 * UI controls
@@ -119,8 +121,8 @@ public class TourMarkerLogView extends ViewPart {
 	private Composite				_pageContent;
 
 	private Browser					_browser;
-	private Text					_txtNoBrowser;
 	private TourChart				_tourChart;
+	private Text					_txtNoBrowser;
 
 	private void addPartListener() {
 
@@ -131,7 +133,7 @@ public class TourMarkerLogView extends ViewPart {
 			public void partBroughtToTop(final IWorkbenchPartReference partRef) {}
 
 			public void partClosed(final IWorkbenchPartReference partRef) {
-				if (partRef.getPart(false) == TourMarkerLogView.this) {
+				if (partRef.getPart(false) == TourBlogView.this) {
 					saveState();
 				}
 			}
@@ -176,7 +178,7 @@ public class TourMarkerLogView extends ViewPart {
 
 		_postSelectionListener = new ISelectionListener() {
 			public void selectionChanged(final IWorkbenchPart part, final ISelection selection) {
-				if (part == TourMarkerLogView.this) {
+				if (part == TourBlogView.this) {
 					return;
 				}
 				onSelectionChanged(selection);
@@ -190,7 +192,7 @@ public class TourMarkerLogView extends ViewPart {
 		_tourEventListener = new ITourEventListener() {
 			public void tourChanged(final IWorkbenchPart part, final TourEventId eventId, final Object eventData) {
 
-				if ((_tourData == null) || (part == TourMarkerLogView.this)) {
+				if ((_tourData == null) || (part == TourBlogView.this)) {
 					return;
 				}
 
@@ -240,7 +242,23 @@ public class TourMarkerLogView extends ViewPart {
 		showInvalidPage();
 	}
 
-	private String createBody() {
+	private String convertLineBreaks(final String text) {
+
+		return text.replaceAll("\\r\\n|\\r|\\n", "<br>");
+	}
+
+	private String createHead() {
+
+		final String html = ""//
+				+ "	<meta http-equiv='Content-Type' content='text/html; charset=UTF-8' />\n"
+				+ "	<meta http-equiv='X-UA-Compatible' content='IE=edge' />\n"
+				+ _htmlCss
+				+ "\n";
+
+		return html;
+	}
+
+	private String createHtml() {
 
 		final StringBuilder sb = new StringBuilder();
 
@@ -248,7 +266,12 @@ public class TourMarkerLogView extends ViewPart {
 		final ArrayList<TourMarker> allMarker = new ArrayList<TourMarker>(tourMarkers);
 		Collections.sort(allMarker);
 
-		createBody_Title(sb);
+		sb.append("<div class='action-hover-container'>\n");
+		{
+			createHtml_TourTitle(sb);
+			createHtml_TourDescription(sb);
+		}
+		sb.append("</div>\n");
 
 		for (final TourMarker tourMarker : allMarker) {
 
@@ -257,10 +280,12 @@ public class TourMarkerLogView extends ViewPart {
 				continue;
 			}
 
-			sb.append("<div class='marker-container'>\n");
-			createBody_Label(sb, tourMarker);
-			createBody_Description(sb, tourMarker);
-			createBody_Url(sb, tourMarker);
+			sb.append("<div class='action-hover-container'>\n");
+			{
+				createHtml_MarkerLabel(sb, tourMarker);
+				createHtml_MarkerDescription(sb, tourMarker);
+				createHtml_MarkerUrl(sb, tourMarker);
+			}
 			sb.append("</div>\n");
 		}
 
@@ -270,24 +295,21 @@ public class TourMarkerLogView extends ViewPart {
 	/**
 	 * Description
 	 */
-	private void createBody_Description(final StringBuilder sb, final TourMarker tourMarker) {
+	private void createHtml_MarkerDescription(final StringBuilder sb, final TourMarker tourMarker) {
 
 		final String description = tourMarker.getDescription();
 		if (description.length() > 0) {
-
-			final String htmlDescription = description.replaceAll("\\r\\n|\\r|\\n", "<br>");
-
-			sb.append("<p class='description'>" + htmlDescription + "</p>\n");
+			sb.append("<p class='description'>" + convertLineBreaks(description) + "</p>\n");
 		}
 	}
 
 	/**
 	 * Label
 	 */
-	private void createBody_Label(final StringBuilder sb, final TourMarker tourMarker) {
+	private void createHtml_MarkerLabel(final StringBuilder sb, final TourMarker tourMarker) {
 
-		final String hrefOpen = HREF_OPEN + tourMarker.getMarkerId();
-		final String hrefEdit = HREF_EDIT + tourMarker.getMarkerId();
+		final String hrefOpen = HREF_OPEN_MARKER + tourMarker.getMarkerId();
+		final String hrefEdit = HREF_EDIT_MARKER + tourMarker.getMarkerId();
 
 		final String hoverEdit = "Edit marker: \"" + tourMarker.getLabel() + "\"";
 		final String hoverOpen = "Navigate to the marker \""
@@ -302,21 +324,11 @@ public class TourMarkerLogView extends ViewPart {
 			textOpen = label;
 		}
 
-		String imageUrl = UI.EMPTY_STRING;
-		try {
-			final URL bundleUrl = TourbookPlugin.getDefault().getBundle().getEntry("/icons/quick-edit.gif"); //$NON-NLS-1$
-			final URL fileUrl = FileLocator.toFileURL(bundleUrl);
-			imageUrl = fileUrl.toExternalForm();
-
-		} catch (final IOException e) {
-			StatusUtil.showStatus(e);
-		}
-
 		sb.append("<div class='marker-title'>\n"
 
-				+ ("<div class='marker-actions'>"
+				+ ("<div class='action-container'>"
 						+ ("<a class='action' style='background: url("
-								+ imageUrl
+								+ _actionEditImageUrl
 								+ ") no-repeat;'"
 								+ (" href='" + hrefEdit + "'")
 								+ (" title='" + hoverEdit + "'")
@@ -328,40 +340,10 @@ public class TourMarkerLogView extends ViewPart {
 				+ "</div>\n");
 	}
 
-	private void createBody_Title(final StringBuilder sb) {
-
-		/*
-		 * Date/Time
-		 */
-		final long recordingTime = _tourData.getTourRecordingTime();
-		final DateTime dtTourStart = _tourData.getTourStartTime();
-		final DateTime dtTourEnd = dtTourStart.plus(recordingTime * 1000);
-
-		final String date = String.format(_dateFormatter.print(dtTourStart.getMillis()));
-
-		final String time = String.format(//
-				"%s - %s",
-				_timeFormatter.print(dtTourStart.getMillis()),
-				_timeFormatter.print(dtTourEnd.getMillis()));
-
-		sb.append("<div class='date'>" + date + "</div>\n");
-		sb.append("<div class='time'>" + time + "</div>\n");
-
-		sb.append("<div class='top-margin'>&nbsp;</div>\n");
-
-		/*
-		 * Title
-		 */
-		final String tourTitle = _tourData.getTourTitle();
-		if (tourTitle.length() > 0) {
-			sb.append("<h1 class='log-title'>" + tourTitle + "</h1>\n");
-		}
-	}
-
 	/**
 	 * Url
 	 */
-	private void createBody_Url(final StringBuilder sb, final TourMarker tourMarker) {
+	private void createHtml_MarkerUrl(final StringBuilder sb, final TourMarker tourMarker) {
 
 		final String urlText = tourMarker.getUrlText();
 		final String urlAddress = tourMarker.getUrlAddress();
@@ -394,11 +376,62 @@ public class TourMarkerLogView extends ViewPart {
 		}
 	}
 
-	private String createHead() {
+	private void createHtml_TourDescription(final StringBuilder sb) {
 
-		final String html = _htmlCss;
+		final String tourDescription = _tourData.getTourDescription();
 
-		return html;
+		if (tourDescription.length() == 0) {
+			return;
+		}
+
+		sb.append("<div class='tour-description'>" + convertLineBreaks(tourDescription) + "</div>\n");
+	}
+
+	private void createHtml_TourTitle(final StringBuilder sb) {
+
+		/*
+		 * Date/Time header
+		 */
+		final long recordingTime = _tourData.getTourRecordingTime();
+		final DateTime dtTourStart = _tourData.getTourStartTime();
+		final DateTime dtTourEnd = dtTourStart.plus(recordingTime * 1000);
+
+		final String date = String.format(_dateFormatter.print(dtTourStart.getMillis()));
+
+		final String time = String.format(//
+				"%s - %s",
+				_timeFormatter.print(dtTourStart.getMillis()),
+				_timeFormatter.print(dtTourEnd.getMillis()));
+
+		sb.append("<div class='date'>" + date + "</div>\n");
+		sb.append("<div class='time'>" + time + "</div>\n");
+
+		sb.append("<div class='top-margin'>&nbsp;</div>\n");
+
+		/*
+		 * Tour title
+		 */
+		String tourTitle = _tourData.getTourTitle();
+		if (tourTitle.length() == 0) {
+			tourTitle = "&nbsp;";
+		}
+
+		final String hoverEdit = "Quick edit: \"" + tourTitle + "\"";
+
+		sb.append("<div class='action-hover-container'>\n"
+
+				+ ("<div class='action-container'>"
+						+ ("<a class='action' style='background: url("
+								+ _actionEditImageUrl
+								+ ") no-repeat;'"
+								+ (" href='" + HREF_EDIT_TOUR + "'")
+								+ (" title='" + hoverEdit + "'")
+								+ ">" //
+						+ "</a>") //
+				+ "	</div>\n")
+
+				+ ("<span class='log-title'>" + tourTitle + "</span>\n")
+				+ "</div>\n");
 	}
 
 	@Override
@@ -503,7 +536,7 @@ public class TourMarkerLogView extends ViewPart {
 		}
 	}
 
-	private void hrefActionEdit(final TourMarker selectedTourMarker) {
+	private void hrefActionEditMarker(final TourMarker selectedTourMarker) {
 
 		if (_tourData.isManualTour()) {
 			// a manually created tour do not have time slices -> no markers
@@ -520,10 +553,20 @@ public class TourMarkerLogView extends ViewPart {
 		}
 	}
 
+	private void hrefActionEditTour() {
+
+		if (new DialogQuickEdit(//
+				Display.getCurrent().getActiveShell(),
+				_tourData).open() == Window.OK) {
+
+			TourManager.saveModifiedTour(_tourData);
+		}
+	}
+
 	/**
 	 * Fire a selection for the selected marker(s).
 	 */
-	private void hrefActionOpen(final StructuredSelection selection) {
+	private void hrefActionOpenMarker(final StructuredSelection selection) {
 
 		// a chart must be available
 		if (_tourChart == null) {
@@ -567,14 +610,24 @@ public class TourMarkerLogView extends ViewPart {
 
 		try {
 
-			final URL bundleUrl = TourbookPlugin.getDefault().getBundle().getEntry("/html/marker-logbook.css"); //$NON-NLS-1$
-			final URL fileUrl = FileLocator.toFileURL(bundleUrl);
+			/*
+			 * load css from file
+			 */
+			URL bundleUrl = TourbookPlugin.getDefault().getBundle().getEntry("/html/tour-blog.css"); //$NON-NLS-1$
+			URL fileUrl = FileLocator.toFileURL(bundleUrl);
 			final URI fileUri = fileUrl.toURI();
 			final File file = new File(fileUri);
 
 			final String cssContent = Util.readContentFromFile(file.getAbsolutePath());
 
 			_htmlCss = "<style>" + cssContent + "</style>";
+
+			/*
+			 * set edit image url
+			 */
+			bundleUrl = TourbookPlugin.getDefault().getBundle().getEntry("/icons/quick-edit.gif"); //$NON-NLS-1$
+			fileUrl = FileLocator.toFileURL(bundleUrl);
+			_actionEditImageUrl = fileUrl.toExternalForm();
 
 		} catch (final IOException | URISyntaxException e) {
 			StatusUtil.showStatus(e);
@@ -611,26 +664,33 @@ public class TourMarkerLogView extends ViewPart {
 					}
 				}
 
+				final String action = locationParts[1];
+
 				if (hrefTourMarker != null) {
 
-					final String action = locationParts[1];
-
 					switch (action) {
-					case ACTION_EDIT:
-						hrefActionEdit(hrefTourMarker);
+					case ACTION_EDIT_MARKER:
+						hrefActionEditMarker(hrefTourMarker);
 						break;
 
-					case ACTION_OPEN:
-						hrefActionOpen(new StructuredSelection(hrefTourMarker));
-						break;
-
-					default:
+					case ACTION_OPEN_MARKER:
+						hrefActionOpenMarker(new StructuredSelection(hrefTourMarker));
 						break;
 					}
 				}
 
 			} catch (final Exception e) {
 				// ignore
+			}
+
+		} else if (locationParts.length == 2) {
+
+			final String action = locationParts[1];
+
+			switch (action) {
+			case ACTION_EDIT_TOUR:
+				hrefActionEditTour();
+				break;
 			}
 
 		} else if (location.startsWith("http")) {
@@ -774,11 +834,20 @@ public class TourMarkerLogView extends ViewPart {
 
 		_isShowHiddenMarker = _prefStore.getBoolean(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_HIDDEN_MARKER);
 
+//		Force Internet Explorer to not use compatibility mode. Internet Explorer believes that websites under
+//		several domains (including "ibm.com") require compatibility mode. You may see your web application run
+//		normally under "localhost", but then fail when hosted under another domain (e.g.: "ibm.com").
+//		Setting "IE=Edge" will force the latest standards mode for the version of Internet Explorer being used.
+//		This is supported for Internet Explorer 8 and later. You can also ease your testing efforts by forcing
+//		specific versions of Internet Explorer to render using the standards mode of previous versions. This
+//		prevents you from exploiting the latest features, but may offer you compatibility and stability. Lookup
+//		the online documentation for the "X-UA-Compatible" META tag to find which value is right for you.
+
 		final String html = "" //
 				+ "<!DOCTYPE html>\n" // ensure that IE is using the newest version and not the quirk mode
-				+ "<html>\n"
+				+ "<html style='height: 100%; width: 100%; margin: 0px; padding: 0px;'>\n"
 				+ ("<head>\n" + createHead() + "\n</head>\n")
-				+ ("<body>\n" + createBody() + "\n</body>\n")
+				+ ("<body>\n" + createHtml() + "\n</body>\n")
 				+ "</html>";
 
 		_browser.setText(html);

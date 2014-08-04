@@ -6,7 +6,6 @@ html {
 body {
 	font-size:			13px;
 	color:				#404040;
-	xbackground-color:	#f1f1f1;
 	background-color:	#fff;
 	margin:				5px;
 }
@@ -38,7 +37,6 @@ table,th,td,input,textarea {
 h1 {
 	font-size:			28px;
 	margin-top:			0px;
-	xfont-weight:		normal;
 	font-weight:		bold;
 }
 
@@ -72,15 +70,25 @@ h1,h2,h3,h4,h5,h6 {
 }
 
 .log-title {
-	clear:				both;	
+	display:			block;
+	width:				auto;					/* enforce width to the right border */
+	font-size:			28px;
+	font-weight:		bold;
+	color:				#333;	
+}
+.log-title:HOVER {
+	background-color: 	#eee;
 }
 
 .date {
 	float:				left;
+	width:				50%;
 }
 
 .time {
 	float:				right;
+	width:				50%;
+	text-align: 		right;
 }
 
 .top-margin {
@@ -93,6 +101,10 @@ h1,h2,h3,h4,h5,h6 {
 	font-weight: 		bold;
 }
 
+.marker-title:HOVER {
+	background-color: 	#eee;
+}
+
 a.label-text:LINK,
 a.label-text:VISITED {
 	display:			block;
@@ -101,17 +113,15 @@ a.label-text:VISITED {
     text-decoration:	none;
 }
 
-
-.marker-actions {
+.action-hover-container:HOVER 
+.action-container {								/* show hidden actions */
+	opacity:			1.0;
+	filter: 			alpha(opacity=100); 	/* IE needs this even in html standard mode*/
+}
+.action-container {
 	float:				right;
 	opacity:			0;
 	filter: 			alpha(opacity=0);
-}
-
-.marker-container:HOVER
-.marker-actions {								/* show hidden actions */
-	opacity:			1.0;
-	filter: 			alpha(opacity=100); 	/* IE needs this even in html standard mode*/
 }
 
 a.action:LINK,
