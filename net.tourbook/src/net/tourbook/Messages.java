@@ -1240,6 +1240,12 @@ public class Messages extends NLS {
 	public static String		Tour_Action_TourPhotosWithTooltip_Tooltip;
 	public static String		Tour_Action_ValuePointToolTip_IsVisible;
 
+	public static String	Tour_Blog_Action_EditMarker_Tooltip;
+
+	public static String	Tour_Blog_Action_EditTour_Tooltip;
+
+	public static String	Tour_Blog_Action_OpenMarker_Tooltip;
+
 	public static String		Tour_Book_Action_delete_selected_tours;
 	public static String		Tour_Book_Action_delete_selected_tours_dlg_message;
 	public static String		Tour_Book_Action_delete_selected_tours_dlg_message_confirm;
