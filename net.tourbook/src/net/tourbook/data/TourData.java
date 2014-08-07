@@ -5135,7 +5135,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	}
 
 	/**
-	 * @return the tourDescription
+	 * @return Returns {@link #tourDescription} or an empty string when value is not set.
 	 */
 	public String getTourDescription() {
 		return tourDescription == null ? UI.EMPTY_STRING : tourDescription;
@@ -5153,7 +5153,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	}
 
 	/**
-	 * @return Returns {@link #tourEndPlace} or an empty string when value is not set
+	 * @return Returns {@link #tourEndPlace} or an empty string when value is not set.
 	 */
 	public String getTourEndPlace() {
 		return tourEndPlace == null ? UI.EMPTY_STRING : tourEndPlace;

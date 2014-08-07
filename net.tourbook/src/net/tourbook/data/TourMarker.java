@@ -320,10 +320,10 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 	}
 
 	/**
-	 * !!!!!!!!!!!!!!!!!<br>
-	 * serieIndex is not used for equals or hashcode because this is modified when markers are
-	 * deleted<br>
-	 * !!!!!!!!!!!!!!!!!<br>
+	 * Tourmarker is compared with the {@link TourMarker#markerId} or {@link TourMarker#_createId}
+	 * <p>
+	 * <b> {@link #serieIndex} is not used for equals or hashcode because this is modified when
+	 * markers are deleted</b>
 	 * 
 	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
@@ -428,6 +428,13 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 		return _markerBounds;
 	}
 
+	public long getMarkerId() {
+		return markerId;
+	}
+
+	/**
+	 * @return Returns {@link TourMarker} entity id.
+	 */
 	public long getMarkerId() {
 		return markerId;
 	}
@@ -714,6 +721,10 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 	public void setSerieIndex(final int serieIndex) {
 		this.serieIndex = serieIndex;
 	}
+
+//	public void setTourSign(final TourSign tourSign) {
+//		this.tourSign = tourSign;
+//	}
 
 	/**
 	 * @param time

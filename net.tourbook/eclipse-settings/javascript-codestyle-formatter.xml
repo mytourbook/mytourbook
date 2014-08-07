@@ -87,7 +87,7 @@
 <setting id="org.eclipse.wst.jsdt.core.formatter.insert_space_between_brackets_in_array_type_reference" value="do not insert"/>
 <setting id="org.eclipse.wst.jsdt.core.formatter.insert_space_after_and_in_type_parameter" value="insert"/>
 <setting id="org.eclipse.wst.jsdt.core.formatter.insert_space_after_opening_paren_in_constructor_declaration" value="do not insert"/>
-<setting id="org.eclipse.wst.jsdt.core.formatter.alignment_for_expressions_in_array_initializer" value="80"/>
+<setting id="org.eclipse.wst.jsdt.core.formatter.alignment_for_expressions_in_array_initializer" value="84"/>
 <setting id="org.eclipse.wst.jsdt.core.formatter.insert_space_before_comma_in_multiple_field_declarations" value="do not insert"/>
 <setting id="org.eclipse.wst.jsdt.core.formatter.blank_lines_after_package" value="1"/>
 <setting id="org.eclipse.wst.jsdt.core.formatter.insert_new_line_after_comma_in_objlit_initializer" value="insert"/>

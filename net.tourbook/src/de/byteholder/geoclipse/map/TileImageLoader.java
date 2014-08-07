@@ -208,7 +208,7 @@ public class TileImageLoader implements Runnable {
 							if (inputStream != null) {
 
 								// the stream can contain an error message from the wms server
-								StatusUtil.showStatus(Util.convertStreamToString(inputStream), e);
+								StatusUtil.showStatus(Util.readContentFromStream(inputStream), e);
 
 								inputStream.close();
 
