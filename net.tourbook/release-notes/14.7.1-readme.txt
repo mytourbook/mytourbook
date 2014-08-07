@@ -1,0 +1,35 @@
+Version: 14.7.1                                                 7.8.2014
+
+
+  
+New
+===	
+
+* Tour blog
+
+  - This view shows all texts which are entered for a tour (tour 
+    description, weather and tour markers).
+
+  - A Tour marker can be selected to navigate in other views, e.g. Tour 
+    Chart, 2D/3D map.
+
+  - Tour and tour markers can be edited.
+ 
+
+	Linux Info
+	----------
+
+	It is very likely that the Tour Blog is not working with Linux, this
+	error can occure: No more handles [Unknown Mozilla path 
+	(MOZILLA_FIVE_HOME not set)]
+
+	This feature is based on the browser widget, there are some hints 
+	http://www.eclipse.org/swt/faq.php#browserlinux which may help you 
+	to get it to work (MyTourbook 14.7 is based on Eclipse 3.8).
+ 
+
+ 
+Language
+========
+
+* French translation for 14.7.0
