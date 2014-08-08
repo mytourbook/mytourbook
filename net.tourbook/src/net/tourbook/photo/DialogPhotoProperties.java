@@ -414,9 +414,6 @@ public class DialogPhotoProperties extends AnimatedToolTipShell implements IPhot
 		PhotoManager.removePhotoEventListener(this);
 	}
 
-	@Override
-	protected void onMouseMoveInToolTip(final MouseEvent mouseEvent) {}
-
 	private void onSelectImageSize() {
 
 		final int oldImageSize = _imageSize;

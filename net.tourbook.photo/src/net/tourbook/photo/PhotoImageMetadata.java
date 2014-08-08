@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2012  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -21,6 +21,12 @@ import org.joda.time.DateTime;
  * Metadata for the original photo image file.
  */
 public class PhotoImageMetadata {
+
+	/**
+	 * Is <code>true</code> when the image data are loaded from the image file, otherwise it is
+	 * <code>false</code>.
+	 */
+	public boolean	isExifFromImage;
 
 	/**
 	 * Last modified in GMT

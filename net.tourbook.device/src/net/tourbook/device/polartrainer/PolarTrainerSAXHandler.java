@@ -22,7 +22,6 @@ import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import net.tourbook.chart.ChartLabel;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TimeData;
@@ -34,6 +33,7 @@ import net.tourbook.device.InvalidDeviceSAXException;
 import net.tourbook.importdata.DeviceData;
 import net.tourbook.importdata.TourbookDevice;
 import net.tourbook.preferences.TourTypeColorDefinition;
+import net.tourbook.ui.tourChart.ChartLabel;
 
 import org.eclipse.osgi.util.NLS;
 import org.joda.time.DateTime;
@@ -583,7 +583,6 @@ public class PolarTrainerSAXHandler extends DefaultHandler {
 			tourMarker.setLabel(Integer.toString(lapCounter));
 			tourMarker.setSerieIndex(serieIndex);
 			tourMarker.setTime(sumLapDuration + lapDuration);
-			tourMarker.setVisualPosition(ChartLabel.VISUAL_HORIZONTAL_ABOVE_GRAPH_CENTERED);
 
 			if (distanceSerie != null) {
 				tourMarker.setDistance(distanceSerie[serieIndex]);

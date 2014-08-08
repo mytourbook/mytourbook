@@ -3,13 +3,13 @@ package net.tourbook.device.garmin.fit.listeners;
 import net.tourbook.data.TimeData;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
-import net.tourbook.device.garmin.fit.FitActivityContext;
-import net.tourbook.device.garmin.fit.FitActivityContextData;
+import net.tourbook.device.garmin.fit.FitContext;
+import net.tourbook.device.garmin.fit.FitContextData;
 
 import com.garmin.fit.Mesg;
 
 /**
- * The super class for all message listeners, provides access to the {@link FitActivityContext}.
+ * The super class for all message listeners, provides access to the {@link FitContext}.
  * 
  * @author Marcin Kuthan <marcin.kuthan@gmail.com>
  */
@@ -17,13 +17,13 @@ public abstract class AbstractMesgListener {
 
 	private static final Integer		DEFAULT_MESSAGE_INDEX	= Integer.valueOf(0);
 
-	protected final FitActivityContext	context;
+	protected final FitContext	context;
 
-	public AbstractMesgListener(final FitActivityContext context) {
+	public AbstractMesgListener(final FitContext context) {
 		this.context = context;
 	}
 
-	protected FitActivityContextData getContextData() {
+	protected FitContextData getContextData() {
 		return context.getContextData();
 	}
 

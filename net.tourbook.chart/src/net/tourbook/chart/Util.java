@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -37,9 +37,21 @@ public class Util {
 
 	private final static NumberFormat	_nf0			= NumberFormat.getNumberInstance();
 	private final static NumberFormat	_nf1			= NumberFormat.getNumberInstance();
-	{
+	private final static NumberFormat	_nf2			= NumberFormat.getNumberInstance();
+	private final static NumberFormat	_nf3			= NumberFormat.getNumberInstance();
+
+	static {
 		_nf0.setMinimumFractionDigits(0);
+		_nf0.setMaximumFractionDigits(0);
+
 		_nf1.setMinimumFractionDigits(1);
+		_nf1.setMaximumFractionDigits(1);
+
+		_nf2.setMinimumFractionDigits(2);
+		_nf2.setMaximumFractionDigits(2);
+
+		_nf3.setMinimumFractionDigits(3);
+		_nf3.setMaximumFractionDigits(3);
 	}
 
 	private static StringBuilder		_sbFormatter	= new StringBuilder();
@@ -202,11 +214,49 @@ public class Util {
 
 		String format = Messages.Format_number_float;
 
-		format += (removeDecimalZero && (divValue % 1 == 0)) ? //
-				FORMAT_0F
+		format += (removeDecimalZero && (divValue % 1 == 0)) //
+				? FORMAT_0F
 				: Integer.toString(precision) + 'f';
 
 		return String.format(format, divValue).toString();
+	}
+
+	public static String formatNumber(	final double value,
+										final int unitType,
+										final int valueDivisor,
+										final int valueDecimals) {
+
+		String valueText;
+
+		if (unitType == ChartDataSerie.AXIS_UNIT_NUMBER) {
+
+			final double divValue = value / valueDivisor;
+
+			if (valueDecimals == 0 || divValue % 1 == 0) {
+
+				valueText = _nf0.format(divValue);
+
+			} else {
+
+				switch (valueDecimals) {
+				case 2:
+					valueText = _nf2.format(divValue);
+					break;
+				case 3:
+					valueText = _nf3.format(divValue);
+					break;
+
+				default:
+					valueText = _nf1.format(divValue);
+					break;
+				}
+			}
+		} else {
+
+			valueText = Util.formatValue(value, unitType, valueDivisor, true);
+		}
+
+		return valueText;
 	}
 
 	public static String formatValue(final double value, final int unitType, final float divisor, boolean isShowSeconds) {
@@ -280,8 +330,6 @@ public class Util {
 	public static String formatValue(final int value, final int unitType) {
 		return formatValue(value, unitType, 1, false);
 	}
-
-
 
 	/**
 	 * Round floating value by removing the trailing part, which causes problem when creating units.

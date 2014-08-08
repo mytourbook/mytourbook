@@ -26,7 +26,7 @@ import net.tourbook.Messages;
 import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartDataModel;
 import net.tourbook.common.UI;
-import net.tourbook.common.form.ViewerDetailForm;
+import net.tourbook.common.form.SashLeftFixedForm;
 import net.tourbook.common.util.TreeViewerItem;
 import net.tourbook.data.TourData;
 import net.tourbook.database.TourDatabase;
@@ -91,7 +91,7 @@ public class WizardPageCompareTour extends WizardPage {
 	private TVIWizardCompareRoot	fRootItem;
 
 	private Chart					fCompTourChart;
-	private ViewerDetailForm		fViewerDetailForm;
+	private SashLeftFixedForm		fViewerDetailForm;
 
 	private boolean					fIsTourViewerInitialized	= false;
 
@@ -302,7 +302,7 @@ public class WizardPageCompareTour extends WizardPage {
 		fChartGroup.setText(Messages.tourCatalog_wizard_Group_selected_tour);
 		fChartGroup.setEnabled(false);
 
-		fViewerDetailForm = new ViewerDetailForm(masterDetailContainer, viewer, sash, fChartGroup);
+		fViewerDetailForm = new SashLeftFixedForm(masterDetailContainer, viewer, sash, fChartGroup);
 
 		/*
 		 * create pagebook with the chart and the no-chart page

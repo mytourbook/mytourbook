@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -30,7 +30,6 @@ import net.tourbook.tour.SelectionTourChart;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.ITourChartViewer;
-import net.tourbook.ui.action.ActionEditQuick;
 import net.tourbook.ui.tourChart.TourChart;
 import net.tourbook.ui.tourChart.TourChartContextProvider;
 import net.tourbook.ui.tourChart.TourChartViewPart;
@@ -40,9 +39,7 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Listener;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.part.PageBook;
 
@@ -68,18 +65,12 @@ public class TourCatalogViewReferenceTour extends TourChartViewPart implements I
 		_pageNoChart = new Label(_pageBook, SWT.NONE);
 		_pageNoChart.setText(Messages.UI_Label_no_chart_is_selected);
 
-		_tourChart = new TourChart(_pageBook, SWT.FLAT, true);
+		_tourChart = new TourChart(_pageBook, SWT.FLAT);
 		_tourChart.setShowZoomActions(true);
 		_tourChart.setShowSlider(true);
 		_tourChart.setToolBarManager(getViewSite().getActionBars().getToolBarManager(), true);
 		_tourChart.setContextProvider(new TourChartContextProvider(this));
 		_tourChart.setTourInfoActionsEnabled(true);
-
-		_tourChart.addDoubleClickListener(new Listener() {
-			public void handleEvent(final Event event) {
-				ActionEditQuick.doAction(TourCatalogViewReferenceTour.this);
-			}
-		});
 
 		// set chart title
 		_tourChart.addDataModelListener(new IDataModelListener() {

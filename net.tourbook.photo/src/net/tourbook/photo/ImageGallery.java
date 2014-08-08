@@ -55,7 +55,6 @@ import net.tourbook.photo.internal.gallery.MT20.IGalleryContextMenuProvider;
 import net.tourbook.photo.internal.gallery.MT20.IItemListener;
 import net.tourbook.photo.internal.manager.ExifCache;
 import net.tourbook.photo.internal.manager.GallerySorting;
-import net.tourbook.photo.internal.manager.ImageUtils;
 import net.tourbook.photo.internal.manager.ThumbnailStore;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -631,8 +630,8 @@ public abstract class ImageGallery implements IItemListener, IGalleryContextMenu
 
 			MessageDialog.openInformation(
 					_display.getActiveShell(),
-					Messages.Pic_Dir_Dialog_LinkPhotos_Title,
-					Messages.Pic_Dir_Dialog_LinkPhotos_DialogInterrupted_Message);
+					Messages.Pic_Dir_Dialog_Photos_Title,
+					Messages.Pic_Dir_Dialog_Photos_DialogInterrupted_Message);
 
 			return null;
 		}
@@ -646,16 +645,16 @@ public abstract class ImageGallery implements IItemListener, IGalleryContextMenu
 
 				MessageDialog.openInformation(
 						_display.getActiveShell(),
-						Messages.Pic_Dir_Dialog_LinkPhotos_Title,
-						NLS.bind(Messages.Pic_Dir_Dialog_LinkPhotos_NoSelectedImagesInFolder_Message,//
+						Messages.Pic_Dir_Dialog_Photos_Title,
+						NLS.bind(Messages.Pic_Dir_Dialog_Photos_NoSelectedImagesInFolder_Message,//
 								_photoFolderWhichShouldBeDisplayed.getAbsolutePath()));
 
 			} else {
 
 				MessageDialog.openInformation(
 						_display.getActiveShell(),
-						Messages.Pic_Dir_Dialog_LinkPhotos_Title,
-						Messages.Pic_Dir_Dialog_LinkPhotos_NoSelectedImage_Message);
+						Messages.Pic_Dir_Dialog_Photos_Title,
+						Messages.Pic_Dir_Dialog_Photos_NoSelectedImage_Message);
 			}
 
 			return null;

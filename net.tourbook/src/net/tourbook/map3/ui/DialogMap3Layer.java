@@ -115,7 +115,7 @@ public class DialogMap3Layer extends AnimatedToolTipShell {
 
 	@Override
 	protected boolean closeShellAfterHidden() {
-		
+
 		/*
 		 * Close the tooltip that the state is saved.
 		 */
@@ -186,11 +186,6 @@ public class DialogMap3Layer extends AnimatedToolTipShell {
 	private void onDispose() {
 
 		Map3Manager.setMap3LayerDialog(null);
-	}
-
-	@Override
-	protected void onMouseMoveInToolTip(final MouseEvent mouseEvent) {
-
 	}
 
 	/**

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -38,7 +38,9 @@ import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.SelectionTourIds;
 import net.tourbook.tour.TourEvent;
+import net.tourbook.tour.TourManager;
 import net.tourbook.ui.views.rawData.RawDataView;
+import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
 
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -57,7 +59,6 @@ import org.eclipse.jface.viewers.StyledString.Styler;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
-import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
@@ -71,7 +72,6 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
-import org.eclipse.ui.IMemento;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.widgets.FormToolkit;
@@ -146,13 +146,9 @@ public class UI {
 	public static final String								SYMBOL_AVERAGE					= "\u00f8";									//$NON-NLS-1$
 	public static final String								SYMBOL_AVERAGE_WITH_SPACE		= "\u00f8 ";									//$NON-NLS-1$
 	public static final String								SYMBOL_DASH						= "-";											//$NON-NLS-1$
-//	public static final String								SYMBOL_DASH						= "\u2212";									//$NON-NLS-1$
-	public static final String								SYMBOL_DIFFERENCE				= "\u0394";									//$NON-NLS-1$
-	public static final String								SYMBOL_DIFFERENCE_WITH_SPACE	= "\u0394 ";									//$NON-NLS-1$
 	public static final String								SYMBOL_DOUBLE_HORIZONTAL		= "\u2550";									//$NON-NLS-1$
 	public static final String								SYMBOL_DOUBLE_VERTICAL			= "\u2551";									//$NON-NLS-1$
 	public static final String								SYMBOL_DEGREE					= "\u00B0";									//$NON-NLS-1$
-	public static final String								SYMBOL_ELLIPSIS					= "\u2026";									//$NON-NLS-1$
 	public static final String								SYMBOL_INFINITY					= "\u221E";									//$NON-NLS-1$
 	public static final String								SYMBOL_SUM_WITH_SPACE			= "\u2211 ";									//$NON-NLS-1$
 	public static final String								SYMBOL_TAU						= "\u03c4";									//$NON-NLS-1$
@@ -523,6 +519,26 @@ public class UI {
 		}
 
 		return containedTourId;
+	}
+
+	/**
+	 * Get text for the OK button.
+	 * 
+	 * @param tourData
+	 * @return
+	 */
+	public static String convertOKtoSaveUpdateButton(final TourData tourData) {
+
+		String okText = null;
+
+		final TourDataEditorView tourDataEditor = TourManager.getTourDataEditor();
+		if ((tourDataEditor != null) && tourDataEditor.isDirty() && (tourDataEditor.getTourData() == tourData)) {
+			okText = Messages.app_action_update;
+		} else {
+			okText = Messages.app_action_save;
+		}
+
+		return okText;
 	}
 
 	private static String createGraphImage_Name(final MapGraphId graphId) {
@@ -1010,41 +1026,6 @@ public class UI {
 		combo.setText(comboItems[0]);
 	}
 
-	/**
-	 * Restore the sash weight from a memento
-	 * 
-	 * @param sash
-	 * @param fMemento
-	 * @param weightKey
-	 * @param sashDefaultWeight
-	 */
-	public static void restoreSashWeight(	final SashForm sash,
-											final IMemento fMemento,
-											final String weightKey,
-											final int[] sashDefaultWeight) {
-
-		final int[] sashWeights = sash.getWeights();
-		final int[] newWeights = new int[sashWeights.length];
-
-		for (int weightIndex = 0; weightIndex < sashWeights.length; weightIndex++) {
-
-			final Integer mementoWeight = fMemento.getInteger(weightKey + Integer.toString(weightIndex));
-
-			if (mementoWeight == null) {
-				try {
-					newWeights[weightIndex] = sashDefaultWeight[weightIndex];
-
-				} catch (final ArrayIndexOutOfBoundsException e) {
-					newWeights[weightIndex] = 100;
-				}
-			} else {
-				newWeights[weightIndex] = mementoWeight;
-			}
-		}
-
-		sash.setWeights(newWeights);
-	}
-
 	public static ImageData rotate(final ImageData srcData, final int direction) {
 
 		final int bytesPerPixel = srcData.bytesPerLine / srcData.width;
@@ -1090,22 +1071,6 @@ public class UI {
 
 		// destBytesPerLine is used as scanlinePad to ensure that no padding is required
 		return new ImageData(width, height, srcData.depth, srcData.palette, destBytesPerLine, newData);
-	}
-
-	/**
-	 * Store the weights for the sash in a memento
-	 * 
-	 * @param sash
-	 * @param memento
-	 * @param weightKey
-	 */
-	public static void saveSashWeight(final SashForm sash, final IMemento memento, final String weightKey) {
-
-		final int[] weights = sash.getWeights();
-
-		for (int weightIndex = 0; weightIndex < weights.length; weightIndex++) {
-			memento.putInteger(weightKey + Integer.toString(weightIndex), weights[weightIndex]);
-		}
 	}
 
 	/**

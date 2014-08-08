@@ -58,8 +58,9 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
 import net.tourbook.Messages;
+import net.tourbook.algorithm.DPPoint;
+import net.tourbook.algorithm.DouglasPeuckerSimplifier;
 import net.tourbook.application.TourbookPlugin;
-import net.tourbook.chart.ChartLabel;
 import net.tourbook.common.map.GeoPosition;
 import net.tourbook.common.util.MtMath;
 import net.tourbook.common.util.StatusUtil;
@@ -75,7 +76,6 @@ import net.tourbook.photo.TourPhotoLink;
 import net.tourbook.photo.TourPhotoManager;
 import net.tourbook.photo.TourPhotoReference;
 import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.preferences.PrefPageComputedValues;
 import net.tourbook.srtm.ElevationSRTM3;
 import net.tourbook.srtm.GeoLat;
 import net.tourbook.srtm.GeoLon;
@@ -83,6 +83,7 @@ import net.tourbook.srtm.NumberForm;
 import net.tourbook.tour.BreakTimeResult;
 import net.tourbook.tour.BreakTimeTool;
 import net.tourbook.ui.UI;
+import net.tourbook.ui.tourChart.ChartLabel;
 import net.tourbook.ui.tourChart.ChartLayer2ndAltiSerie;
 import net.tourbook.ui.views.ISmoothingAlgorithm;
 import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
@@ -465,9 +466,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	private String												tourImportFilePath;																		// db-version 6
 
 	/**
-	 * tolerance for the Douglas Peucker algorithm
+	 * Tolerance for the Douglas Peucker algorithm.
 	 */
-	private short												dpTolerance							= 50;
+	private short												dpTolerance							= 50;													// 5.0 since version 14.7
 
 	/**
 	 * Time difference in seconds between 2 time slices or <code>-1</code> for GPS devices when the
@@ -627,7 +628,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	 * Tags
 	 */
 	@ManyToMany(fetch = EAGER)
-	@JoinTable(inverseJoinColumns = @JoinColumn(name = "tourTag_tagId", referencedColumnName = "tagId"))
+	@JoinTable(inverseJoinColumns = @JoinColumn(name = "TOURTAG_TagID", referencedColumnName = "TagID"))
 	private Set<TourTag>										tourTags							= new HashSet<TourTag>();
 
 	/**
@@ -649,6 +650,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	@ManyToOne
 	private TourBike											tourBike;
 
+	/*
+	 * ################################### TRANSIENT DATA ########################################
+	 */
+
 	/**
 	 * Contains time in <b>seconds</b> relativ to the tour start which is defined in:
 	 * {@link #startYear}, {@link #startMonth}, {@link #startDay}, {@link #startHour},
@@ -661,15 +666,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	 */
 	@Transient
 	public int[]												timeSerie;
-
-	/*
-	 * tourCategory is currently (version 1.6) not used but is defined in older databases, it is
-	 * disabled because the field is not available in the database table
-	 */
-	//	@ManyToMany(fetch = FetchType.LAZY, mappedBy = "tourData")
-	//	private Set<TourCategory>	tourCategory					= new HashSet<TourCategory>();
-
-	// ############################################# TRANSIENT DATA #############################################
 
 	/**
 	 * contains the absolute distance in m (metric system)
@@ -1016,7 +1012,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	/**
 	 * Contains photo data from a {@link TourPhotoLink}.
 	 * <p>
-	 * When this field is set, photos from this photo link are displayed otherwise the photos from
+	 * When this field is set, photos from this photo link are displayed otherwise photos from
 	 * {@link #tourPhotos} are displayed.
 	 */
 	@Transient
@@ -1605,9 +1601,22 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	 */
 	public boolean computeAltitudeUpDown() {
 
-		final int prefMinAltitude = _prefStore.getInt(PrefPageComputedValues.STATE_COMPUTED_VALUE_MIN_ALTITUDE);
+		final float prefDPTolerance = _prefStore.getFloat(ITourbookPreferences.COMPUTED_ALTITUDE_DP_TOLERANCE);
 
-		final AltitudeUpDown altiUpDown = computeAltitudeUpDown_Internal(null, prefMinAltitude);
+		AltitudeUpDown altiUpDown;
+		if (distanceSerie != null) {
+
+			// DP needs distance
+
+			altiUpDown = computeAltitudeUpDown_20_Algorithm_DP(prefDPTolerance);
+
+			// keep this value to see in the UI (toursegmenter) the value and how it is computed
+			dpTolerance = (short) (prefDPTolerance * 10);
+
+		} else {
+
+			altiUpDown = computeAltitudeUpDown_30_Algorithm_9_08(null, prefDPTolerance);
+		}
 
 		if (altiUpDown == null) {
 			return false;
@@ -1620,23 +1629,74 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	}
 
 	public AltitudeUpDown computeAltitudeUpDown(final ArrayList<AltitudeUpDownSegment> segmentSerieIndexParameter,
-												final int minAltiDiff) {
-		return computeAltitudeUpDown_Internal(segmentSerieIndexParameter, minAltiDiff);
+												final float selectedMinAltiDiff) {
+
+		return computeAltitudeUpDown_30_Algorithm_9_08(segmentSerieIndexParameter, selectedMinAltiDiff);
 	}
 
 	/**
-	 * compute altitude up/down since version 9.08
+	 * Compute altitude up/down with Douglas Peuker algorithm.
+	 * 
+	 * @param dpTolerance
+	 * @return Returns <code>null</code> when altitude up/down cannot be computed
+	 */
+	private AltitudeUpDown computeAltitudeUpDown_20_Algorithm_DP(final float dpTolerance) {
+
+		// check if all necessary data are available
+		if (altitudeSerie == null || altitudeSerie.length < 2) {
+			return null;
+		}
+
+		// convert data series into DP points
+		final DPPoint dpPoints[] = new DPPoint[distanceSerie.length];
+		for (int serieIndex = 0; serieIndex < dpPoints.length; serieIndex++) {
+			dpPoints[serieIndex] = new DPPoint(distanceSerie[serieIndex], altitudeSerie[serieIndex], serieIndex);
+		}
+
+		final DPPoint[] simplifiedPoints = new DouglasPeuckerSimplifier(dpTolerance, dpPoints).simplify();
+
+		float altitudeUpTotal = 0;
+		float altitudeDownTotal = 0;
+
+		float prevAltitude = altitudeSerie[0];
+
+		/*
+		 * Get altitude up/down from the tour altitude values which are found by DP
+		 */
+		for (int dbIndex = 1; dbIndex < simplifiedPoints.length; dbIndex++) {
+
+			final DPPoint point = simplifiedPoints[dbIndex];
+			final float currentAltitude = altitudeSerie[point.serieIndex];
+			final float altiDiff = currentAltitude - prevAltitude;
+
+			if (altiDiff > 0) {
+				altitudeUpTotal += altiDiff;
+			} else {
+				altitudeDownTotal += altiDiff;
+			}
+
+			prevAltitude = currentAltitude;
+		}
+
+		return new AltitudeUpDown(altitudeUpTotal, -altitudeDownTotal);
+	}
+
+	/**
+	 * Compute altitude up/down since version 9.08
+	 * <p>
+	 * This algorithm is abandond because it can cause very wrong values dependend on the terrain.
+	 * DP is the preferred algorithm since 14.7.
 	 * 
 	 * @param segmentSerie
 	 *            segments are created for each gradient alternation when segmentSerie is not
 	 *            <code>null</code>
-	 * @param altitudeMinDiff
+	 * @param minAltiDiff
 	 * @return Returns <code>null</code> when altitude up/down cannot be computed
 	 */
-	private AltitudeUpDown computeAltitudeUpDown_Internal(	final ArrayList<AltitudeUpDownSegment> segmentSerie,
-															final int altitudeMinDiff) {
+	private AltitudeUpDown computeAltitudeUpDown_30_Algorithm_9_08(	final ArrayList<AltitudeUpDownSegment> segmentSerie,
+																	final float minAltiDiff) {
 
-		// check if data are available
+		// check if all necessary data are available
 		if ((altitudeSerie == null) || (timeSerie == null) || (timeSerie.length < 2)) {
 			return null;
 		}
@@ -1727,7 +1787,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 						// angel changed, tour was descending and is now ascending
 
-						if (angleAltiDown <= -altitudeMinDiff) {
+						if (angleAltiDown <= -minAltiDiff) {
 
 							final float segmentAltiDiff = segmentAltitudeMin - segmentAltitudeMax;
 							altitudeDownTotal += segmentAltiDiff;
@@ -1772,7 +1832,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 						// angel changed, tour was ascending and is now descending
 
-						if (angleAltiUp >= altitudeMinDiff) {
+						if (angleAltiUp >= minAltiDiff) {
 
 							final float segmentAltiDiff = segmentAltitudeMax - segmentAltitudeMin;
 							altitudeUpTotal += segmentAltiDiff;
@@ -2219,6 +2279,17 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		hrZone7 = zoneSize > 7 ? hrZones[7] : -1;
 		hrZone8 = zoneSize > 8 ? hrZones[8] : -1;
 		hrZone9 = zoneSize > 9 ? hrZones[9] : -1;
+
+		_hrZones = new int[] { hrZone0, //
+				hrZone1,
+				hrZone2,
+				hrZone3,
+				hrZone4,
+				hrZone5,
+				hrZone6,
+				hrZone7,
+				hrZone8,
+				hrZone9 };
 	}
 
 	private void computeMaxAltitude() {
@@ -3771,7 +3842,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		// create a new marker
 		final TourMarker tourMarker = new TourMarker(this, ChartLabel.MARKER_TYPE_DEVICE);
 
-		tourMarker.setVisualPosition(ChartLabel.VISUAL_HORIZONTAL_ABOVE_GRAPH_CENTERED);
 		tourMarker.setTime((int) (recordingTime + timeData.marker));
 		tourMarker.setDistance(distanceAbsolute);
 		tourMarker.setSerieIndex(serieIndex);
@@ -4516,20 +4586,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	public int[] getHrZones() {
 
 		if (_hrZones == null) {
-
 			computeHrZones();
-
-			_hrZones = new int[] {
-					hrZone0,
-					hrZone1,
-					hrZone2,
-					hrZone3,
-					hrZone4,
-					hrZone5,
-					hrZone6,
-					hrZone7,
-					hrZone8,
-					hrZone9 };
 		}
 
 		return _hrZones;
@@ -5071,7 +5128,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	}
 
 	/**
-	 * @return the tourDescription
+	 * @return Returns {@link #tourDescription} or an empty string when value is not set.
 	 */
 	public String getTourDescription() {
 		return tourDescription == null ? UI.EMPTY_STRING : tourDescription;
@@ -5089,7 +5146,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	}
 
 	/**
-	 * @return Returns {@link #tourEndPlace} or an empty string when value is not set
+	 * @return Returns {@link #tourEndPlace} or an empty string when value is not set.
 	 */
 	public String getTourEndPlace() {
 		return tourEndPlace == null ? UI.EMPTY_STRING : tourEndPlace;
@@ -6417,13 +6474,13 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		return new StringBuilder()//
 				.append("[TourData]") //$NON-NLS-1$
 				//
-				.append(" tourId:") //$NON-NLS-1$
-				.append(tourId)
+//				.append(" tourId:") //$NON-NLS-1$
+//				.append(tourId)
 				//
-//				.append(" object:") //$NON-NLS-1$
-//				.append(super.toString())
-//				.append(" identityHashCode:") //$NON-NLS-1$
-//				.append(System.identityHashCode(this))
+				.append(" object:") //$NON-NLS-1$
+				.append(super.toString())
+				.append(" identityHashCode:") //$NON-NLS-1$
+				.append(System.identityHashCode(this))
 				.toString();
 	}
 

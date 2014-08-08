@@ -58,12 +58,7 @@ public class ChartXSlider {
 	/**
 	 * Contains the position of the slider within values array
 	 */
-	private int								_valuesIndex;
-
-	/**
-	 * Value of the slider at the x axis
-	 */
-	private double							_xAxisValue;
+	private int								_valueIndex;
 
 	/**
 	 * labelList contains a slider label for each graph
@@ -128,11 +123,7 @@ public class ChartXSlider {
 	 * @return Returns the position of the slider in the values array
 	 */
 	public int getValuesIndex() {
-		return _valuesIndex;
-	}
-
-	public double getValueX() {
-		return _xAxisValue;
+		return _valueIndex;
 	}
 
 	/**
@@ -163,8 +154,7 @@ public class ChartXSlider {
 				public void run() {
 
 					moveToXXDevPosition(xxDevGraphWidth, true, true);
-
-					_chartGraph.computeXSliderValue(ChartXSlider.this, xxDevGraphWidth);
+					_chartGraph.setXSliderValue(ChartXSlider.this);
 				}
 			});
 
@@ -173,7 +163,7 @@ public class ChartXSlider {
 			// reposition the slider line but keep the position ratio
 			final double devSliderPos = xxDevGraphWidth * _positionRatio;
 
-			moveToXXDevPosition((int) (devSliderPos < 0 ? 0 : devSliderPos), true, false);
+			moveToXXDevPosition(devSliderPos < 0 ? 0 : devSliderPos, true, false);
 		}
 	}
 
@@ -181,15 +171,15 @@ public class ChartXSlider {
 	 * Sets a new position for the sliderLine and also updates the slider/line rectangles and value.
 	 * A Slider move event is fired
 	 * 
-	 * @param newXXDevSliderLinePos
+	 * @param xxDevLinePos
 	 */
-	void moveToXXDevPosition(	long newXXDevSliderLinePos,
+	void moveToXXDevPosition(	double xxDevLinePos,
 								final boolean isAdjustToImageWidth,
 								final boolean isAdjustPositionRatio) {
 
-		final long _xxDevFullyGraphWidth = _chartGraph.getXXDevGraphWidth();
+		final long _xxDevGraphWidth = _chartGraph.getXXDevGraphWidth();
 
-		if (_xxDevFullyGraphWidth == 0) {
+		if (_xxDevGraphWidth == 0) {
 			return;
 		}
 
@@ -198,41 +188,40 @@ public class ChartXSlider {
 		 * is auto-zoomed to the slider position in the mouse up event
 		 */
 		if (isAdjustToImageWidth) {
-			newXXDevSliderLinePos = Math.min(_xxDevFullyGraphWidth, Math.max(0, newXXDevSliderLinePos));
+			xxDevLinePos = Math.min(_xxDevGraphWidth, Math.max(0, xxDevLinePos));
 		}
 
 		// reposition the hit rectangle
-		_hitRectangle.x = newXXDevSliderLinePos - ChartXSlider.SLIDER_LINE_WIDTH;
+		_hitRectangle.x = (long) (xxDevLinePos - ChartXSlider.SLIDER_LINE_WIDTH);
 
 		// the devVirtualSliderLinePos must be set before the change event is
 		// called, otherwise the event listener would get the old value
 		final long xxDevOldPos = _xxDevSliderLinePos;
-		_xxDevSliderLinePos = newXXDevSliderLinePos;
+		_xxDevSliderLinePos = (long) xxDevLinePos;
 
 		if (isAdjustPositionRatio) {
 
-			_positionRatio = (double) newXXDevSliderLinePos / (_xxDevFullyGraphWidth - 0);
+			_positionRatio = xxDevLinePos / (_xxDevGraphWidth - 0);
 
 			// enforce max value
 			_positionRatio = Math.min(_positionRatio, 1);
 		}
 
 		// fire change event when the position has changed
-		if (newXXDevSliderLinePos != xxDevOldPos) {
+		if ((long) xxDevLinePos != xxDevOldPos) {
 			_chartGraph._chart.fireSliderMoveEvent();
 		}
 	}
 
 	public void reset() {
 
-		final long xxDevGraphRightBorder = _chartGraph.getXXDevGraphWidth();
+		final long xxDevGraphWidth = _chartGraph.getXXDevGraphWidth();
 
-		double xxDevSliderPos = xxDevGraphRightBorder * _positionRatio;
+		double xxDevSliderPos = xxDevGraphWidth * _positionRatio;
 		xxDevSliderPos = xxDevSliderPos < 0 ? 0 : xxDevSliderPos;
 
-		moveToXXDevPosition((int) xxDevSliderPos, true, true);
-
-		_chartGraph.computeXSliderValue(ChartXSlider.this, (int) xxDevSliderPos);
+		_chartGraph.setXSliderValue_FromRatio(this);
+		moveToXXDevPosition(xxDevSliderPos, true, true);
 	}
 
 	/**
@@ -247,23 +236,14 @@ public class ChartXSlider {
 		_labelList = labelList;
 	}
 
-	void setSliderLineValueIndex(final int valueIndex, final double xValue) {
-
-		_valuesIndex = valueIndex;
-		_xAxisValue = xValue;
-	}
-
 	/**
-	 * valuesIndex is the position of the slider in the values array
+	 * Set position of the slider within value array.
 	 * 
-	 * @param valuesIndex
+	 * @param valueIndex
 	 */
-	public void setValuesIndex(final int valueIndex) {
-		_valuesIndex = valueIndex;
-	}
+	void setValueIndex(final int valueIndex) {
 
-	void setValueX(final double xDataValues) {
-		_xAxisValue = xDataValues;
+		_valueIndex = valueIndex;
 	}
 
 }

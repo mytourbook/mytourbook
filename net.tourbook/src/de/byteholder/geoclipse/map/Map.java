@@ -233,6 +233,12 @@ public class Map extends Canvas {
 		;
 	}
 
+	private Color								SYS_COLOR_BLACK;
+	private Color								SYS_COLOR_DARK_GRAY;
+	private Color								SYS_COLOR_GRAY;
+	private Color								SYS_COLOR_WHITE;
+	private Color								SYS_COLOR_YELLOW;
+
 	/**
 	 * Map zoom level which is currently be used to display tiles. Normally a value between around 0
 	 * and 20.
@@ -531,6 +537,12 @@ public class Map extends Canvas {
 
 		_transparentColor = new Color(_display, MAP_TRANSPARENT_RGB);
 		_defaultBackgroundColor = new Color(_display, MAP_DEFAULT_BACKGROUND_RGB);
+
+		SYS_COLOR_BLACK = _display.getSystemColor(SWT.COLOR_BLACK);
+		SYS_COLOR_DARK_GRAY = _display.getSystemColor(SWT.COLOR_DARK_GRAY);
+		SYS_COLOR_GRAY = _display.getSystemColor(SWT.COLOR_GRAY);
+		SYS_COLOR_WHITE = _display.getSystemColor(SWT.COLOR_WHITE);
+		SYS_COLOR_YELLOW = _display.getSystemColor(SWT.COLOR_YELLOW);
 
 		_poiImage = TourbookPlugin
 				.getImageDescriptor(de.byteholder.geoclipse.poi.Messages.Image_POI_InMap)
@@ -2179,9 +2191,9 @@ public class Map extends Canvas {
 
 		final int devYScaleLines = devY;
 
-		final Color white = _display.getSystemColor(SWT.COLOR_WHITE);
-		final Color black = _display.getSystemColor(SWT.COLOR_BLACK);
-		final Color gray = _display.getSystemColor(SWT.COLOR_DARK_GRAY);
+		final Color white = SYS_COLOR_WHITE;
+		final Color black = SYS_COLOR_BLACK;
+		final Color gray = SYS_COLOR_DARK_GRAY;
 
 		paint_52_ScaleLine(gc, devX1, devX2, devY++, segmentWidth, gray, gray);
 		paint_52_ScaleLine(gc, devX1, devX2, devY++, segmentWidth, white, black);
@@ -2204,7 +2216,7 @@ public class Map extends Canvas {
 		borderColor.dispose();
 
 		// paint text
-		gc.setForeground(_display.getSystemColor(SWT.COLOR_BLACK));
+		gc.setForeground(SYS_COLOR_BLACK);
 		gc.drawText(scaleText, devXText, devYText, true);
 	}
 
@@ -2216,7 +2228,7 @@ public class Map extends Canvas {
 									final Color firstColor,
 									final Color secondColor) {
 
-		gc.setForeground(_display.getSystemColor(SWT.COLOR_DARK_GRAY));
+		gc.setForeground(SYS_COLOR_DARK_GRAY);
 		gc.drawPoint(devX1, devY);
 
 		gc.setForeground(firstColor);
@@ -2231,7 +2243,7 @@ public class Map extends Canvas {
 		gc.setForeground(secondColor);
 		gc.drawLine(devX1 + 3 * segmentWidth, devY, devX2, devY);
 
-		gc.setForeground(_display.getSystemColor(SWT.COLOR_DARK_GRAY));
+		gc.setForeground(SYS_COLOR_DARK_GRAY);
 		gc.drawPoint(devX2, devY);
 	}
 
@@ -2245,10 +2257,10 @@ public class Map extends Canvas {
 		if (_previousOfflineArea != null) {
 
 			gc.setLineStyle(SWT.LINE_SOLID);
-			gc.setForeground(_display.getSystemColor(SWT.COLOR_WHITE));
+			gc.setForeground(SYS_COLOR_WHITE);
 			gc.drawRectangle(_previousOfflineArea);
 
-			gc.setForeground(_display.getSystemColor(SWT.COLOR_GRAY));
+			gc.setForeground(SYS_COLOR_GRAY);
 			final int devX = _previousOfflineArea.x;
 			final int devY = _previousOfflineArea.y;
 			gc.drawRectangle(//
@@ -2260,8 +2272,8 @@ public class Map extends Canvas {
 			/*
 			 * draw text marker
 			 */
-			gc.setForeground(_display.getSystemColor(SWT.COLOR_BLACK));
-			gc.setBackground(_display.getSystemColor(SWT.COLOR_WHITE));
+			gc.setForeground(SYS_COLOR_BLACK);
+			gc.setBackground(SYS_COLOR_WHITE);
 			final Point textExtend = gc.textExtent(Messages.Offline_Area_Label_OldAreaMarker);
 			int devYMarker = devY - textExtend.y;
 			devYMarker = devYMarker < 0 ? 0 : devYMarker;
@@ -2273,8 +2285,8 @@ public class Map extends Canvas {
 		 */
 		if (_isSelectOfflineArea) {
 
-			gc.setForeground(_display.getSystemColor(SWT.COLOR_BLACK));
-			gc.setBackground(_display.getSystemColor(SWT.COLOR_YELLOW));
+			gc.setForeground(SYS_COLOR_BLACK);
+			gc.setBackground(SYS_COLOR_YELLOW);
 
 			final StringBuilder sb = new StringBuilder();
 			sb.append(Messages.Offline_Area_Label_SelectInfo);
@@ -2348,7 +2360,7 @@ public class Map extends Canvas {
 //				gc.drawRectangle(devX, devY, tileSize, tileSize);
 //
 //				gc.setLineStyle(SWT.LINE_DASH);
-//				gc.setForeground(_display.getSystemColor(SWT.COLOR_DARK_GRAY));
+//				gc.setForeground(SYS_COLOR_DARK_GRAY);
 //				gc.drawRectangle(devX, devY, tileSize, tileSize);
 			}
 		}
@@ -2383,11 +2395,11 @@ public class Map extends Canvas {
 		_currentOfflineArea = new Rectangle(devX, devY, devWidth, devHeight);
 
 		gc.setLineStyle(SWT.LINE_SOLID);
-		gc.setForeground(_display.getSystemColor(SWT.COLOR_BLACK));
+		gc.setForeground(SYS_COLOR_BLACK);
 		gc.drawRectangle(devX, devY, devWidth, devHeight);
 
 		gc.setLineStyle(SWT.LINE_SOLID);
-		gc.setForeground(_display.getSystemColor(SWT.COLOR_WHITE));
+		gc.setForeground(SYS_COLOR_WHITE);
 //		gc.drawRectangle(devX + 1, devY + 1, devWidth - 2, devHeight - 2);
 
 		gc.setBackground(_display.getSystemColor(SWT.COLOR_DARK_YELLOW));
@@ -2398,8 +2410,8 @@ public class Map extends Canvas {
 		/*
 		 * draw text marker
 		 */
-		gc.setForeground(_display.getSystemColor(SWT.COLOR_BLACK));
-		gc.setBackground(_display.getSystemColor(SWT.COLOR_WHITE));
+		gc.setForeground(SYS_COLOR_BLACK);
+		gc.setBackground(SYS_COLOR_WHITE);
 		final Point textExtend = gc.textExtent(Messages.Offline_Area_Label_AreaMarker);
 		int devYMarker = devY - textExtend.y;
 		devYMarker = devYMarker < 0 ? 0 : devYMarker;
@@ -2899,7 +2911,7 @@ public class Map extends Canvas {
 			final Image errorImage = _mp.getErrorImage();
 			final Rectangle imageBounds = errorImage.getBounds();
 
-			gcMapImage.setBackground(_display.getSystemColor(SWT.COLOR_GRAY));
+			gcMapImage.setBackground(SYS_COLOR_GRAY);
 			gcMapImage.fillRectangle(devTileViewport.x, devTileViewport.y, imageBounds.width, imageBounds.height);
 
 			paintTileInfoError(gcMapImage, devTileViewport, tile);
@@ -3117,14 +3129,14 @@ public class Map extends Canvas {
 		if (_isShowTileBorder) {
 
 			// draw tile border
-			gc.setForeground(_display.getSystemColor(SWT.COLOR_DARK_GRAY));
+			gc.setForeground(SYS_COLOR_DARK_GRAY);
 			gc.drawRectangle(devTileViewport.x, devTileViewport.y, _tilePixelSize, _tilePixelSize);
 		}
 
 		if (_isShowTileInfo) {
 
 			// draw tile info
-			gc.setForeground(_display.getSystemColor(SWT.COLOR_WHITE));
+			gc.setForeground(SYS_COLOR_WHITE);
 			gc.setBackground(_display.getSystemColor(SWT.COLOR_DARK_BLUE));
 
 			final int leftMargin = 10;
@@ -3149,10 +3161,10 @@ public class Map extends Canvas {
 	private void paintTileInfoError(final GC gc, final Rectangle devTileViewport, final Tile tile) {
 
 		// draw tile border
-		gc.setForeground(_display.getSystemColor(SWT.COLOR_DARK_GRAY));
+		gc.setForeground(SYS_COLOR_DARK_GRAY);
 		gc.drawRectangle(devTileViewport.x, devTileViewport.y, _tilePixelSize, _tilePixelSize);
 
-		gc.setForeground(_display.getSystemColor(SWT.COLOR_WHITE));
+		gc.setForeground(SYS_COLOR_WHITE);
 		gc.setBackground(_display.getSystemColor(SWT.COLOR_DARK_MAGENTA));
 
 		final int leftMargin = 10;
@@ -3692,56 +3704,6 @@ public class Map extends Canvas {
 		_isLiveView = isLiveView;
 	}
 
-	/*
-	 * keep old method because it is not easy to understand
-	 */
-//	/**
-//	 * Sets the center of the map in pixel coordinates.
-//	 *
-//	 * @param worldPixelCenter
-//	 */
-//	private void setMapCenterInWorldPixelOLD(Point2D worldPixelCenter) {
-//
-//		/*
-//		 * check if the center is within the map
-//		 */
-//
-//		final int viewportPixelHeight = getWorldPixelViewport().height;
-//
-//		final Rectangle newTopLeftPixelVP = getWorldPixelTopLeftViewport(worldPixelCenter);
-//
-//		// don't let the user pan over the top edge
-//		if (newTopLeftPixelVP.y < 0) {
-//			final double centerY = viewportPixelHeight / 2d;
-//			worldPixelCenter = new Point2D.Double(worldPixelCenter.getX(), centerY);
-//		}
-//
-//		// don't let the user pan over the bottom edge
-//		final Dimension mapTileSize = _mp.getMapTileSize(_mapZoomLevel);
-//		final int mapHeight = (int) mapTileSize.getHeight() * _mp.getTileSize();
-//
-//		if (newTopLeftPixelVP.y + newTopLeftPixelVP.height > mapHeight) {
-//			final double centerY = mapHeight - viewportPixelHeight / 2;
-//			worldPixelCenter = new Point2D.Double(worldPixelCenter.getX(), centerY);
-//		}
-//
-//		// if map is too small then just center it
-//		if (mapHeight < newTopLeftPixelVP.height) {
-//			final double centerY = mapHeight / 2d;
-//			worldPixelCenter = new Point2D.Double(worldPixelCenter.getX(), centerY);
-//		}
-//
-//		_worldPixelMapCenter = worldPixelCenter;
-//
-//		fireMousePosition();
-//
-//		/*
-//		 * hide previous offline area when map position has changed because the area has no absolute
-//		 * position
-//		 */
-////		_currentOfflineArea = null;
-//	}
-
 	/**
 	 * Set the center of the map to a geo position (with lat/long) and redraw the map.
 	 * 
@@ -3860,6 +3822,56 @@ public class Map extends Canvas {
 		paint();
 	}
 
+	/*
+	 * keep old method because it is not easy to understand
+	 */
+//	/**
+//	 * Sets the center of the map in pixel coordinates.
+//	 *
+//	 * @param worldPixelCenter
+//	 */
+//	private void setMapCenterInWorldPixelOLD(Point2D worldPixelCenter) {
+//
+//		/*
+//		 * check if the center is within the map
+//		 */
+//
+//		final int viewportPixelHeight = getWorldPixelViewport().height;
+//
+//		final Rectangle newTopLeftPixelVP = getWorldPixelTopLeftViewport(worldPixelCenter);
+//
+//		// don't let the user pan over the top edge
+//		if (newTopLeftPixelVP.y < 0) {
+//			final double centerY = viewportPixelHeight / 2d;
+//			worldPixelCenter = new Point2D.Double(worldPixelCenter.getX(), centerY);
+//		}
+//
+//		// don't let the user pan over the bottom edge
+//		final Dimension mapTileSize = _mp.getMapTileSize(_mapZoomLevel);
+//		final int mapHeight = (int) mapTileSize.getHeight() * _mp.getTileSize();
+//
+//		if (newTopLeftPixelVP.y + newTopLeftPixelVP.height > mapHeight) {
+//			final double centerY = mapHeight - viewportPixelHeight / 2;
+//			worldPixelCenter = new Point2D.Double(worldPixelCenter.getX(), centerY);
+//		}
+//
+//		// if map is too small then just center it
+//		if (mapHeight < newTopLeftPixelVP.height) {
+//			final double centerY = mapHeight / 2d;
+//			worldPixelCenter = new Point2D.Double(worldPixelCenter.getX(), centerY);
+//		}
+//
+//		_worldPixelMapCenter = worldPixelCenter;
+//
+//		fireMousePosition();
+//
+//		/*
+//		 * hide previous offline area when map position has changed because the area has no absolute
+//		 * position
+//		 */
+////		_currentOfflineArea = null;
+//	}
+
 	/**
 	 * Resets current tile factory and sets a new one. The new tile factory is displayed at the same
 	 * position as the previous tile factory
@@ -3891,16 +3903,6 @@ public class Map extends Canvas {
 	public void setOverlayKey(final String key) {
 		_overlayKey = key;
 	}
-
-//	public void setPhoto(final Photo photo) {
-//
-//		final GeoPosition geoPosition = photo.getGeoPosition();
-//		if (geoPosition == null) {
-//			return;
-//		}
-//
-//		setMapCenter(geoPosition);
-//	}
 
 	/**
 	 * @param isRedrawEnabled
@@ -4027,6 +4029,16 @@ public class Map extends Canvas {
 		}
 	}
 
+//	public void setPhoto(final Photo photo) {
+//
+//		final GeoPosition geoPosition = photo.getGeoPosition();
+//		if (geoPosition == null) {
+//			return;
+//		}
+//
+//		setMapCenter(geoPosition);
+//	}
+
 	/**
 	 * Set if the tile borders should be drawn. Mainly used for debugging.
 	 * 
@@ -4092,13 +4104,6 @@ public class Map extends Canvas {
 			}
 		});
 	}
-
-//	/** Determine the space between the first two fingers */
-//	private float touchDistance(final Touch touch1, final Touch touch2) {
-//		final float x = touch1.positionX - touch2.positionX;
-//		final float y = touch1.positionY - touch2.positionY;
-//		return (float) Math.sqrt(x * x + y * y);
-//	}
 
 	/**
 	 * Set the zoom level for the map and centers the map to the previous center. The zoom level is

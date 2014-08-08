@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -128,14 +128,14 @@ public class TVITagViewMonth extends TVITagViewItem {
 			//
 			sb.append(TVITagViewTour.SQL_TOUR_COLUMNS); //	3
 
-			sb.append(" FROM " + TourDatabase.JOINTABLE_TOURDATA__TOURTAG + " jTdataTtag"); //$NON-NLS-1$ //$NON-NLS-2$
+			sb.append(" FROM " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + " jTdataTtag"); //$NON-NLS-1$ //$NON-NLS-2$
 
 			// get all tours for current tag and year/month
 			sb.append(" LEFT OUTER JOIN " + TourDatabase.TABLE_TOUR_DATA + " TourData"); //$NON-NLS-1$ //$NON-NLS-2$
 			sb.append(" ON jTdataTtag.TourData_tourId=TourData.tourId "); //$NON-NLS-1$
 
 			// get all tag id's for one tour
-			sb.append(" LEFT OUTER JOIN " + TourDatabase.JOINTABLE_TOURDATA__TOURTAG + " jTdataTtag2"); //$NON-NLS-1$ //$NON-NLS-2$
+			sb.append(" LEFT OUTER JOIN " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + " jTdataTtag2"); //$NON-NLS-1$ //$NON-NLS-2$
 			sb.append(" ON TourData.tourID = jTdataTtag2.TourData_tourId"); //$NON-NLS-1$
 
 			sb.append(" WHERE jTdataTtag.TourTag_TagId=?"); //$NON-NLS-1$
@@ -208,5 +208,12 @@ public class TVITagViewMonth extends TVITagViewItem {
 		result = prime * result + _year;
 		result = prime * result + ((_yearItem == null) ? 0 : _yearItem.hashCode());
 		return result;
+	}
+
+	@Override
+	public String toString() {
+		return "TVITagViewMonth " + System.identityHashCode(this) //$NON-NLS-1$
+
+		+ " [_year=" + _year + ", _month=" + _month + ", _yearItem=" + _yearItem + "]"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 	}
 }

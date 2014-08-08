@@ -9,7 +9,6 @@
 		<provider>org.hibernate.ejb.HibernatePersistence</provider>
      
 		<class>net.tourbook.data.TourBike</class>
-		<class>net.tourbook.data.TourCategory</class>
 		<class>net.tourbook.data.TourCompared</class>
 		<class>net.tourbook.data.TourData</class>
 		<class>net.tourbook.data.TourMarker</class>
@@ -17,8 +16,15 @@
 		<class>net.tourbook.data.TourPersonHRZone</class>
 		<class>net.tourbook.data.TourPhoto</class>
 		<class>net.tourbook.data.TourReference</class>
+		
+<!--
+		<class>net.tourbook.data.TourSign</class>
+		<class>net.tourbook.data.TourSignCategory</class>
+-->
+
 		<class>net.tourbook.data.TourTag</class>
 		<class>net.tourbook.data.TourTagCategory</class>
+
 		<class>net.tourbook.data.TourType</class>
 		<class>net.tourbook.data.TourWayPoint</class>
  

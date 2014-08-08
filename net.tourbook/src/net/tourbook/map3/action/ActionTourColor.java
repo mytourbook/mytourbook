@@ -18,9 +18,9 @@ package net.tourbook.map3.action;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.color.MapGraphId;
+import net.tourbook.common.tooltip.IOpeningDialog;
 import net.tourbook.map2.Messages;
 import net.tourbook.map3.ui.DialogSelectMap3Color;
-import net.tourbook.map3.view.IOpeningDialog;
 import net.tourbook.map3.view.Map3View;
 import net.tourbook.preferences.ITourbookPreferences;
 

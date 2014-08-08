@@ -33,7 +33,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import net.tourbook.chart.ChartLabel;
 import net.tourbook.data.TimeData;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
@@ -42,6 +41,7 @@ import net.tourbook.importdata.DeviceData;
 import net.tourbook.importdata.SerialParameters;
 import net.tourbook.importdata.TourbookDevice;
 import net.tourbook.ui.UI;
+import net.tourbook.ui.tourChart.ChartLabel;
 
 public class HAC4LinuxDeviceReader extends TourbookDevice {
 	private Section	m_section	= Section.SECTION_NONE;	;
@@ -550,7 +550,6 @@ public class HAC4LinuxDeviceReader extends TourbookDevice {
 						break;
 					}
 					final TourMarker tourMarker = new TourMarker(tourData, ChartLabel.MARKER_TYPE_DEVICE);
-					tourMarker.setVisualPosition(ChartLabel.VISUAL_HORIZONTAL_ABOVE_GRAPH_CENTERED);
 					final int markerIndex = Integer.parseInt(fields[1]);
 					tourMarker.setSerieIndex(markerIndex);
 					tourMarker.setLabel(fields[0].substring(1, fields[0].length()));

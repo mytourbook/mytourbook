@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2012  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -26,6 +26,7 @@ import net.tourbook.common.RectangleLong;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
+import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlEvent;
@@ -270,21 +271,23 @@ public class ChartComponentGraph extends Canvas {
 	 */
 	private Cursor						_cursorResizeLeftRight;
 
-	private Cursor						_cursorResizeTopDown;
+	private Cursor						_cursorArrow;
 	private Cursor						_cursorDragged;
-	private Cursor						_cursorModeSlider;
+	private Cursor						_cursorDragXSlider_ModeZoom;
+	private Cursor						_cursorDragXSlider_ModeSlider;
+	private Cursor						_cursorHoverXSlider;
 	private Cursor						_cursorModeZoom;
 	private Cursor						_cursorModeZoomMove;
+	private Cursor						_cursorModeSlider;
 	private Cursor						_cursorMove1x;
 	private Cursor						_cursorMove2x;
 	private Cursor						_cursorMove3x;
 	private Cursor						_cursorMove4x;
 	private Cursor						_cursorMove5x;
+	private Cursor						_cursorResizeTopDown;
+	private Cursor						_cursorXSlider;
 	private Cursor						_cursorXSliderLeft;
 	private Cursor						_cursorXSliderRight;
-	private Cursor						_cursorDragXSlider_ModeZoom;
-	private Cursor						_cursorDragXSlider_ModeSlider;
-	private Cursor						_cursorHoverXSlider;
 
 	private Color						_gridColor;
 	private Color						_gridColorMajor;
@@ -300,7 +303,7 @@ public class ChartComponentGraph extends Canvas {
 	private ToolTipV1					_hoveredBarToolTip;
 
 	private boolean						_isHoveredLineVisible			= false;
-	private int							_hoveredLineValueIndex			= -1;
+	private int							_hoveredValuePointIndex			= -1;
 
 	private ArrayList<RectangleLong[]>	_lineFocusRectangles			= new ArrayList<RectangleLong[]>();
 	private ArrayList<PointLong[]>		_lineDevPositions				= new ArrayList<PointLong[]>();
@@ -391,14 +394,11 @@ public class ChartComponentGraph extends Canvas {
 	Rectangle							_clientArea;
 
 	/**
-	 * Is <code>true</code> when custom overlays needs to be painted
-	 */
-	private boolean						_isCustomOverlayDirty;
-
-	/**
 	 * After a resize the custom overlay must be recomputed
 	 */
 	private int							_isCustomOverlayInvalid;
+
+	private PixelConverter				_pc;
 
 	/**
 	 * Constructor
@@ -415,9 +415,12 @@ public class ChartComponentGraph extends Canvas {
 
 		_chart = chartWidget;
 
+		_pc = new PixelConverter(_chart);
+
 		_cursorResizeLeftRight = new Cursor(getDisplay(), SWT.CURSOR_SIZEWE);
 		_cursorResizeTopDown = new Cursor(getDisplay(), SWT.CURSOR_SIZENS);
 		_cursorDragged = new Cursor(getDisplay(), SWT.CURSOR_SIZEALL);
+		_cursorArrow = new Cursor(getDisplay(), SWT.CURSOR_ARROW);
 
 		_cursorModeSlider = createCursorFromImage(Messages.Image_cursor_mode_slider);
 		_cursorModeZoom = createCursorFromImage(Messages.Image_cursor_mode_zoom);
@@ -578,12 +581,15 @@ public class ChartComponentGraph extends Canvas {
 
 				_isFocusActive = true;
 				_isSelectionDirty = true;
+
 				redraw();
 			}
 
 			public void focusLost(final FocusEvent e) {
+
 				_isFocusActive = false;
 				_isSelectionDirty = true;
+
 				redraw();
 			}
 		});
@@ -854,147 +860,6 @@ public class ChartComponentGraph extends Canvas {
 	}
 
 	/**
-	 * Get the x-axis value according to the slider position in the UI
-	 * 
-	 * @param slider
-	 * @param devXSliderLinePosition
-	 */
-	void computeXSliderValue(final ChartXSlider slider, final long devXSliderLinePosition) {
-
-		final ChartDataXSerie xData = getXData();
-
-		if (xData == null) {
-			return;
-		}
-
-		final double[][] xValueSerie = xData.getHighValuesDouble();
-
-		if (xValueSerie.length == 0) {
-			// data are not available
-			return;
-		}
-
-		final double[] xDataValues = xValueSerie[0];
-
-		if (_hoveredLineValueIndex == -1 || _hoveredLineValueIndex >= xDataValues.length) {
-
-			// this should not happen but it dit
-			return;
-		}
-
-		slider.setValuesIndex(_hoveredLineValueIndex);
-		slider.setValueX(xDataValues[_hoveredLineValueIndex]);
-	}
-
-	/**
-	 * Get the x-axis value according to the slider position in the UI
-	 * 
-	 * @param slider
-	 * @param devXSliderLinePosition
-	 */
-	void computeXSliderValueOLD(final ChartXSlider slider, final int devXSliderLinePosition) {
-
-		final ChartDataXSerie xData = getXData();
-
-		if (xData == null) {
-			return;
-		}
-
-		final double[][] xValueSerie = xData.getHighValuesDouble();
-
-		if (xValueSerie.length == 0) {
-			// data are not available
-			return;
-		}
-
-		final double[] xDataValues = xValueSerie[0];
-		final int serieLength = xDataValues.length;
-		final int maxIndex = Math.max(0, serieLength - 1);
-
-		/*
-		 * The non time value (distance) is not linear, the value is increasing steadily but with
-		 * different distance on the x axis. So first we have to find the nearest position in the
-		 * values array and then interpolite from the found position to the slider position
-		 */
-
-		final double minValue = xData.getOriginalMinValue();
-		final double maxValue = xData.getOriginalMaxValue();
-		final double valueRange = maxValue > 0 ? (maxValue - minValue) : -(minValue - maxValue);
-
-		final double positionRatio = (double) devXSliderLinePosition / _xxDevGraphWidth;
-		int valueIndex = (int) (positionRatio * serieLength);
-
-		// check array bounds
-		valueIndex = Math.min(valueIndex, maxIndex);
-		valueIndex = Math.max(valueIndex, 0);
-
-		// sliderIndex points into the value array for the current slider position
-		double xDataValue = xDataValues[valueIndex];
-
-		// compute the value for the slider on the x-axis
-		final double sliderValue = positionRatio * valueRange;
-
-		if (xDataValue == sliderValue) {
-
-			// nothing to do
-
-		} else if (sliderValue > xDataValue) {
-
-			/*
-			 * in the value array move towards the end to find the position where the value of the
-			 * slider corresponds with the value in the value array
-			 */
-
-			while (sliderValue > xDataValue) {
-
-				xDataValue = xDataValues[valueIndex++];
-
-				// check if end of the x-data are reached
-				if (valueIndex == serieLength) {
-					break;
-				}
-			}
-			valueIndex--;
-			xDataValue = xDataValues[valueIndex];
-
-		} else {
-
-			/*
-			 * xDataValue > sliderValue
-			 */
-
-			while (sliderValue < xDataValue) {
-
-				// check if beginning of the x-data are reached
-				if (valueIndex == 0) {
-					break;
-				}
-
-				xDataValue = xDataValues[--valueIndex];
-			}
-		}
-
-		/*
-		 * This is a bit of a hack because at some positions the value is too small. Solving the
-		 * problem in the algorithm would take more time than using this hack.
-		 */
-		if (xDataValue < sliderValue) {
-			valueIndex++;
-		}
-
-		// check array bounds
-		valueIndex = Math.min(valueIndex, maxIndex);
-		xDataValue = xDataValues[valueIndex];
-
-		// !!! debug values !!!
-//		xValue = valueIndex * 1000;
-//		xValue = (int) (slider.getPositionRatio() * 1000000000);
-
-		slider.setValuesIndex(valueIndex);
-		slider.setValueX(xDataValue);
-	}
-
-	/**
 	 * create the context menu
 	 */
 	private void createContextMenu() {
@@ -1012,7 +877,7 @@ public class ChartComponentGraph extends Canvas {
 				hideTooltip();
 
 				// get cursor location relativ to this graph canvas
-				final Point devMouse = ChartComponentGraph.this.toControl(getDisplay().getCursorLocation());
+				final Point devMouse = toControl(getDisplay().getCursorLocation());
 
 				computeSliderForContextMenu(devMouse.x, devMouse.y);
 
@@ -1201,6 +1066,8 @@ public class ChartComponentGraph extends Canvas {
 				}
 			}
 
+// show also value index for debugging
+//			label.text = labelText.toString() + " " + xSlider.getValuesIndex();
 			label.text = labelText.toString();
 
 			label.height = labelExtend.y - 5;
@@ -1422,15 +1289,15 @@ public class ChartComponentGraph extends Canvas {
 
 	private void doAutoScroll_30_UpdateHoveredListener(final long eventTime) {
 
-		final IHoveredListener hoveredListener = _chart._hoveredListener;
+		final IHoveredValueListener hoveredListener = _chart._hoveredListener;
 
 		if (_isHoveredLineVisible || hoveredListener != null) {
 
-			final int hoveredLineValueIndexBACKUP = _hoveredLineValueIndex;
+			final int hoveredLineValueIndexBACKUP = _hoveredValuePointIndex;
 
-			isLineHovered();
+			setHoveredLineValue();
 
-			if (_hoveredLineValueIndex != -1) {
+			if (_hoveredValuePointIndex != -1) {
 
 				final PointLong devHoveredValueDevPosition = getHoveredValueDevPosition();
 
@@ -1444,14 +1311,14 @@ public class ChartComponentGraph extends Canvas {
 
 					hoveredListener.hoveredValue(
 							eventTime,
-							_hoveredLineValueIndex,
-							devHoveredValueDevPosition,
 							_devXMouseMove,
-							_devYMouseMove);
+							_devYMouseMove,
+							_hoveredValuePointIndex,
+							devHoveredValueDevPosition);
 				}
 			}
 
-			_hoveredLineValueIndex = hoveredLineValueIndexBACKUP;
+			_hoveredValuePointIndex = hoveredLineValueIndexBACKUP;
 		}
 	}
 
@@ -1713,12 +1580,12 @@ public class ChartComponentGraph extends Canvas {
 			graphIndex++;
 		}
 
-		if (valuePointToolTip != null && _hoveredLineValueIndex != -1) {
+		if (valuePointToolTip != null && _hoveredValuePointIndex != -1) {
 
 			final PointLong hoveredLinePosition = getHoveredValueDevPosition();
 
 			valuePointToolTip.setValueIndex(
-					_hoveredLineValueIndex,
+					_hoveredValuePointIndex,
 					_devXMouseMove,
 					_devYMouseMove,
 					hoveredLinePosition,
@@ -2678,7 +2545,7 @@ public class ChartComponentGraph extends Canvas {
 
 				// check if hovered line is hit, this check is an inline for .contains(...)
 				if (isSetHoveredIndex == false && prevLineRect.contains(_devXMouseMove, _devYMouseMove)) {
-					_hoveredLineValueIndex = prevValueIndex;
+					_hoveredValuePointIndex = prevValueIndex;
 					isSetHoveredIndex = true;
 				}
 
@@ -2749,7 +2616,7 @@ public class ChartComponentGraph extends Canvas {
 
 				// check if hovered line is hit, this check is an inline for .contains(...)
 				if (isSetHoveredIndex == false && prevLineRect.contains(_devXMouseMove, _devYMouseMove)) {
-					_hoveredLineValueIndex = valueIndex;
+					_hoveredValuePointIndex = valueIndex;
 					isSetHoveredIndex = true;
 				}
 
@@ -2760,7 +2627,7 @@ public class ChartComponentGraph extends Canvas {
 				lineFocusRectangles[valueIndex] = lastRect;
 
 				if (isSetHoveredIndex == false && lastRect.contains(_devXMouseMove, _devYMouseMove)) {
-					_hoveredLineValueIndex = valueIndex;
+					_hoveredValuePointIndex = valueIndex;
 				}
 
 				break;
@@ -3548,7 +3415,7 @@ public class ChartComponentGraph extends Canvas {
 
 				// check if hovered line is hit, this check is an inline for .contains(...)
 				if (isSetHoveredIndex == false && prevLineRect.contains(_devXMouseMove, _devYMouseMove)) {
-					_hoveredLineValueIndex = prevValueIndex;
+					_hoveredValuePointIndex = prevValueIndex;
 					isSetHoveredIndex = true;
 				}
 
@@ -3581,7 +3448,7 @@ public class ChartComponentGraph extends Canvas {
 
 				// check if hovered line is hit, this check is an inline for .contains(...)
 				if (isSetHoveredIndex == false && prevLineRect.contains(_devXMouseMove, _devYMouseMove)) {
-					_hoveredLineValueIndex = valueIndex;
+					_hoveredValuePointIndex = valueIndex;
 					isSetHoveredIndex = true;
 				}
 
@@ -3592,7 +3459,7 @@ public class ChartComponentGraph extends Canvas {
 				lineFocusRectangles[valueIndex] = lastRect;
 
 				if (isSetHoveredIndex == false && lastRect.contains(_devXMouseMove, _devYMouseMove)) {
-					_hoveredLineValueIndex = valueIndex;
+					_hoveredValuePointIndex = valueIndex;
 				}
 
 				break;
@@ -3816,7 +3683,8 @@ public class ChartComponentGraph extends Canvas {
 		}
 
 		final GC gcCustom = new GC(_chartImage30Custom);
-		{
+		try {
+
 			gcCustom.fillRectangle(chartRect);
 
 			/*
@@ -3833,11 +3701,13 @@ public class ChartComponentGraph extends Canvas {
 				final ArrayList<IChartLayer> customFgLayers = graphDrawingData.getYData().getCustomForegroundLayers();
 
 				for (final IChartLayer layer : customFgLayers) {
-					layer.draw(gcCustom, graphDrawingData, _chart);
+					layer.draw(gcCustom, graphDrawingData, _chart, _pc);
 				}
 			}
+
+		} finally {
+			gcCustom.dispose();
 		}
-		gcCustom.dispose();
 
 		_isCustomLayerImageDirty = false;
 	}
@@ -3864,8 +3734,7 @@ public class ChartComponentGraph extends Canvas {
 				&& _isSliderDirty == false
 				&& _isSelectionDirty == false
 				&& _isHoveredBarDirty == false
-				&& _hoveredLineValueIndex == -1
-				&& _isCustomOverlayDirty == false
+				&& _hoveredValuePointIndex == -1
 				&& _chartImage40Overlay != null) {
 
 			final Rectangle oldBounds = _chartImage40Overlay.getBounds();
@@ -3925,20 +3794,19 @@ public class ChartComponentGraph extends Canvas {
 				_isHoveredBarDirty = false;
 			}
 
-			if (_hoveredLineValueIndex != -1 && _lineDevPositions.size() > 0) {
+			if (_hoveredValuePointIndex != -1 && _lineDevPositions.size() > 0) {
 
 				// hovered lines are set -> draw it
 				drawSync_460_HoveredLine(gcOverlay);
 			}
 
-			if (_isCustomOverlayDirty) {
+			if (_isOverlayDirty) {
 				drawSync_470_CustomOverlay(gcOverlay, eventTime);
+				_isOverlayDirty = false;
 			}
 
 		}
 		gcOverlay.dispose();
-
-		_isOverlayDirty = false;
 
 //		System.out.println("time\t" + ((float) (System.nanoTime() - start) / 1000000) + " ms");
 //		// TODO remove SYSTEM.OUT.PRINTLN
@@ -4581,6 +4449,10 @@ public class ChartComponentGraph extends Canvas {
 
 		int graphIndex = 0;
 
+		// draw value point marker
+		final int devOffsetFill = _pc.convertHorizontalDLUsToPixels(8); //10;
+		final int devOffsetPoint = _pc.convertHorizontalDLUsToPixels(2);//3;
+
 		gcOverlay.setAntialias(SWT.ON);
 
 		// loop: all graphs
@@ -4611,14 +4483,14 @@ public class ChartComponentGraph extends Canvas {
 			}
 
 			// check color index
-			if (_hoveredLineValueIndex > lineColorIndex.length - 1) {
+			if (_hoveredValuePointIndex > lineColorIndex.length - 1) {
 				return;
 			}
 
 			final RectangleLong[] lineFocusRectangles = _lineFocusRectangles.get(graphIndex);
 
-			final PointLong devPosition = lineDevPositions[_hoveredLineValueIndex];
-			final RectangleLong hoveredRectangle = lineFocusRectangles[_hoveredLineValueIndex];
+			final PointLong devPosition = lineDevPositions[_hoveredValuePointIndex];
+			final RectangleLong hoveredRectangle = lineFocusRectangles[_hoveredValuePointIndex];
 
 			// check if hovered line positions are set
 			if (hoveredRectangle == null || devPosition == null) {
@@ -4648,29 +4520,25 @@ public class ChartComponentGraph extends Canvas {
 
 				// get the colors
 				final RGB[] rgbLine = yData.getRgbLine();
-				final int colorIndex = lineColorIndex[_hoveredLineValueIndex];
+				final int colorIndex = lineColorIndex[_hoveredValuePointIndex];
 
 				final RGB rgbLineDef = rgbLine[colorIndex];
 				colorLine = getColor(rgbLineDef);
 			}
 
-			// draw value point marker
-			final int devOffsetFill = 10;
-			final int devOffsetPoint = 3;
-
 			gcOverlay.setBackground(colorLine);
 
 			gcOverlay.setAlpha(0x40);
 			gcOverlay.fillOval(//
-					devX - devOffsetFill,
-					(int) (devPosition.y - devOffsetFill),
+					devX - devOffsetFill + 1,
+					(int) (devPosition.y - devOffsetFill + 1),
 					devOffsetFill * 2,
 					devOffsetFill * 2);
 
 			gcOverlay.setAlpha(0xff);
 			gcOverlay.fillOval(//
-					devX - devOffsetPoint,
-					(int) (devPosition.y - devOffsetPoint),
+					devX - devOffsetPoint + 1,
+					(int) (devPosition.y - devOffsetPoint + 1),
 					devOffsetPoint * 2,
 					devOffsetPoint * 2);
 
@@ -4704,11 +4572,32 @@ public class ChartComponentGraph extends Canvas {
 			_isCustomOverlayInvalid = 0;
 
 			// check if a custom overlay needs to be painted
-			_isCustomOverlayDirty = _chart.isCustomOverlayDirty(eventTime, _devXMouseMove, _devYMouseMove);
+//			_isOverlayDirty = _chart.getCustomOverlayState(eventTime, _devXMouseMove, _devYMouseMove);
 		}
 
-		if (_isCustomOverlayDirty) {
-			_chart.getCustomOverlay().draw(gcOverlay);
+		if (_isOverlayDirty) {
+
+			for (final GraphDrawingData graphDrawingData : _graphDrawingData) {
+
+				final ArrayList<IChartLayer> customFgLayers = graphDrawingData.getYData().getCustomForegroundLayers();
+
+				/**
+				 * Draw overlay only when a graph contains overlay layers to ensure that a overlay
+				 * is painted not for the "wrong" graphs.
+				 * <p>
+				 * This feature is used to optimize painting is currently used for tour markers and
+				 * photos.
+				 */
+				if (customFgLayers.size() == 0) {
+					continue;
+				}
+
+				for (final Object item : _chart.getChartOverlays()) {
+					if (item instanceof IChartOverlay) {
+						((IChartOverlay) item).drawOverlay(gcOverlay, graphDrawingData);
+					}
+				}
+			}
 		}
 	}
 
@@ -4754,14 +4643,10 @@ public class ChartComponentGraph extends Canvas {
 		return _chartComponents.getDevVisibleChartHeight();
 	}
 
-	int getHoveredLineValueIndex() {
-		return _hoveredLineValueIndex;
-	}
-
 	private PointLong getHoveredValueDevPosition() {
 
 		final PointLong[] lineDevPositions = _lineDevPositions.get(0);
-		PointLong lineDevPos = lineDevPositions[_hoveredLineValueIndex];
+		PointLong lineDevPos = lineDevPositions[_hoveredValuePointIndex];
 
 		boolean isAdjusted = false;
 
@@ -4770,7 +4655,7 @@ public class ChartComponentGraph extends Canvas {
 		 */
 		if (lineDevPos == null) {
 
-			int lineDevIndex = _hoveredLineValueIndex;
+			int lineDevIndex = _hoveredValuePointIndex;
 
 			// check forward
 			while (lineDevIndex < lineDevPositions.length - 1) {
@@ -4778,7 +4663,7 @@ public class ChartComponentGraph extends Canvas {
 				lineDevPos = lineDevPositions[++lineDevIndex];
 
 				if (lineDevPos != null) {
-					_hoveredLineValueIndex = lineDevIndex;
+					_hoveredValuePointIndex = lineDevIndex;
 					isAdjusted = true;
 					break;
 				}
@@ -4786,7 +4671,7 @@ public class ChartComponentGraph extends Canvas {
 
 			if (lineDevPos == null) {
 
-				lineDevIndex = _hoveredLineValueIndex;
+				lineDevIndex = _hoveredValuePointIndex;
 
 				// check backward
 				while (lineDevIndex > 0) {
@@ -4794,7 +4679,7 @@ public class ChartComponentGraph extends Canvas {
 					lineDevPos = lineDevPositions[--lineDevIndex];
 
 					if (lineDevPos != null) {
-						_hoveredLineValueIndex = lineDevIndex;
+						_hoveredValuePointIndex = lineDevIndex;
 						isAdjusted = true;
 						break;
 					}
@@ -4804,10 +4689,18 @@ public class ChartComponentGraph extends Canvas {
 
 		if (isAdjusted) {
 			// force repaining
-			_isOverlayDirty = false;
+			_isOverlayDirty = true;
 		}
 
 		return lineDevPos;
+	}
+
+	/**
+	 * @return Returns the index in the data series which is hovered with the mouse or
+	 *         <code>-1</code> when a value is not hovered.
+	 */
+	int getHoveredValuePointIndex() {
+		return _hoveredValuePointIndex;
 	}
 
 	/**
@@ -4931,7 +4824,7 @@ public class ChartComponentGraph extends Canvas {
 
 	private void hideTooltip() {
 
-		final IHoveredListener hoveredListener = _chart.getHoveredListener();
+		final IHoveredValueListener hoveredListener = _chart.getHoveredListener();
 		if (hoveredListener != null) {
 
 			// hide value point tooltip
@@ -5038,6 +4931,8 @@ public class ChartComponentGraph extends Canvas {
 
 			setCursor(cursor);
 
+			_cursorXSlider = cursor;
+
 			return true;
 
 		} else {
@@ -5047,51 +4942,6 @@ public class ChartComponentGraph extends Canvas {
 
 			return false;
 		}
-	}
-
-	/**
-	 * Check if mouse has moved over a line value and sets {@link #_hoveredLineValueIndex} to the
-	 * value index or <code>-1</code> when focus rectangle is not hit.
-	 * 
-	 * @return
-	 */
-	private boolean isLineHovered() {
-
-		if (_lineDevPositions.size() == 0) {
-			return false;
-		}
-
-		RectangleLong lineRect = null;
-
-		for (final RectangleLong[] lineFocusRectangles : _lineFocusRectangles) {
-
-			// find the line rectangle which is hovered by the mouse
-			for (int valueIndex = 0; valueIndex < lineFocusRectangles.length; valueIndex++) {
-
-				lineRect = lineFocusRectangles[valueIndex];
-
-				// test if the mouse is within a bar focus rectangle
-				if (lineRect != null) {
-
-					// inline for lineRect.contains
-					if ((_devXMouseMove >= lineRect.x)
-							&& (_devYMouseMove >= lineRect.y)
-							&& _devXMouseMove < (lineRect.x + lineRect.width)
-							&& _devYMouseMove < (lineRect.y + lineRect.height)) {
-
-						// keep the hovered line index
-						_hoveredLineValueIndex = valueIndex;
-
-						return true;
-					}
-				}
-			}
-		}
-
-		// reset index
-		_hoveredLineValueIndex = -1;
-
-		return false;
 	}
 
 	/**
@@ -5180,8 +5030,7 @@ public class ChartComponentGraph extends Canvas {
 		final ChartXSlider leftSlider = getLeftSlider();
 		final long xxDevLeftPosition = _xxDevViewPortLeftBorder + _devXMouseDown;
 
-		computeXSliderValue(leftSlider, xxDevLeftPosition);
-
+		setXSliderValue(leftSlider);
 		leftSlider.moveToXXDevPosition(xxDevLeftPosition, true, true);
 
 		setZoomInPosition();
@@ -5198,8 +5047,7 @@ public class ChartComponentGraph extends Canvas {
 		final ChartXSlider rightSlider = getRightSlider();
 		final long xxDevRightPosition = _xxDevViewPortLeftBorder + _devXMouseDown;
 
-		computeXSliderValue(rightSlider, xxDevRightPosition);
-
+		setXSliderValue(rightSlider);
 		rightSlider.moveToXXDevPosition(xxDevRightPosition, true, true);
 
 		setZoomInPosition();
@@ -5230,7 +5078,7 @@ public class ChartComponentGraph extends Canvas {
 		 */
 		final long xxDevLeftPosition = _xxDevViewPortLeftBorder + 2;
 
-		computeXSliderValue(leftSlider, xxDevLeftPosition);
+		setXSliderValue(leftSlider);
 		leftSlider.moveToXXDevPosition(xxDevLeftPosition, true, true);
 
 		/*
@@ -5238,7 +5086,7 @@ public class ChartComponentGraph extends Canvas {
 		 */
 		final long xxDevRightPosition = _xxDevViewPortLeftBorder + getDevVisibleChartWidth() - 2;
 
-		computeXSliderValue(rightSlider, xxDevRightPosition);
+		setXSliderValue(rightSlider);
 		rightSlider.moveToXXDevPosition(xxDevRightPosition, true, true);
 
 		_isSliderDirty = true;
@@ -5263,7 +5111,7 @@ public class ChartComponentGraph extends Canvas {
 		 */
 		xxDevSliderLinePos = Math.min(_xxDevGraphWidth, Math.max(0, xxDevSliderLinePos));
 
-		computeXSliderValue(xSlider, xxDevSliderLinePos);
+		setXSliderValue(xSlider);
 
 		// set new slider line position
 		xSlider.moveToXXDevPosition(xxDevSliderLinePos, true, true);
@@ -5278,6 +5126,7 @@ public class ChartComponentGraph extends Canvas {
 		_cursorResizeLeftRight = Util.disposeResource(_cursorResizeLeftRight);
 		_cursorResizeTopDown = Util.disposeResource(_cursorResizeTopDown);
 		_cursorDragged = Util.disposeResource(_cursorDragged);
+		_cursorArrow = Util.disposeResource(_cursorArrow);
 		_cursorModeSlider = Util.disposeResource(_cursorModeSlider);
 		_cursorModeZoom = Util.disposeResource(_cursorModeZoom);
 		_cursorModeZoomMove = Util.disposeResource(_cursorModeZoomMove);
@@ -5452,10 +5301,25 @@ public class ChartComponentGraph extends Canvas {
 
 	void onMouseDoubleClick(final MouseEvent e) {
 
+		final long eventTime = e.time & 0xFFFFFFFFL;
+		final int devXMouse = e.x;
+		final int devYMouse = e.y;
+
 		// stop dragging the x-slider
 		_xSliderDragged = null;
 
-		if (_hoveredBarSerieIndex != -1) {
+		ChartMouseEvent mouseEvent;
+
+		if ((mouseEvent = _chart.onExternalMouseDoubleClick(eventTime, devXMouse, devYMouse)).isWorked) {
+
+//			setChartCursor(mouseEvent.cursor);
+
+//			_isOverlayDirty = true;
+//			isRedraw = true;
+//
+//			canShowHoveredTooltip = true;
+
+		} else if (_hoveredBarSerieIndex != -1) {
 
 			/*
 			 * execute the action which is defined when a bar is selected with the left mouse button
@@ -5532,6 +5396,10 @@ public class ChartComponentGraph extends Canvas {
 			// stop dragging the x-slider
 			_xSliderDragged = null;
 
+			// prevent that after the context menu is closed with a mouse click, the x-slider starts dragging
+			_isSetXSliderPositionLeft = false;
+			_isSetXSliderPositionRight = false;
+
 			if (event.button == 3) {
 
 				// right button is pressed
@@ -5544,7 +5412,10 @@ public class ChartComponentGraph extends Canvas {
 		}
 
 		// use external mouse event listener
-		if (_chart.isMouseDownExternalPre(devXMouse, devYMouse)) {
+		ChartMouseEvent mouseEvent;
+		if ((mouseEvent = _chart.onExternalMouseDownPre(event.time & 0xFFFFFFFFL, devXMouse, devYMouse)).isWorked) {
+
+			setChartCursor(mouseEvent.cursor);
 			return;
 		}
 
@@ -5566,7 +5437,7 @@ public class ChartComponentGraph extends Canvas {
 			 * make sure that the slider is exactly positioned where the value is displayed in the
 			 * graph
 			 */
-			setXSliderValueIndex(xSlider, _hoveredLineValueIndex, false);
+			setXSliderValueIndex(xSlider, _hoveredValuePointIndex, false);
 
 			_isSliderDirty = true;
 			redraw();
@@ -5740,11 +5611,14 @@ public class ChartComponentGraph extends Canvas {
 	 */
 	private void onMouseExit(final MouseEvent event) {
 
+		_chart.onExternalMouseExit(event.time);
+
 		_hoveredBarToolTip.toolTip20Hide();
 
 		boolean isRedraw = false;
 
 		if (_isAutoScroll) {
+
 			// stop autoscrolling
 			_isAutoScroll = false;
 
@@ -5812,13 +5686,13 @@ public class ChartComponentGraph extends Canvas {
 		_devYMouseMove = devYMouse;
 
 		boolean isRedraw = false;
-		boolean canShowHoveredTooltip = false;
+		boolean canShowHoveredValueTooltip = false;
 
 		if (_isXSliderVisible && _xSliderDragged != null) {
 
 			// x-slider is dragged
 
-			canShowHoveredTooltip = true;
+			canShowHoveredValueTooltip = true;
 
 			// keep position of the slider line
 			_devXDraggedXSliderLine = devXMouse;
@@ -5888,11 +5762,16 @@ public class ChartComponentGraph extends Canvas {
 		} else {
 
 			ChartXSlider xSlider;
+			ChartMouseEvent mouseEvent;
 
-			if (_chart.isMouseMoveExternal(devXMouse, devYMouse)) {
+			if ((mouseEvent = _chart.onExternalMouseMove(eventTime, devXMouse, devYMouse)).isWorked) {
 
-				// set the cursor shape depending on the mouse location
-				setCursor(_cursorDragged);
+				setChartCursor(mouseEvent.cursor);
+
+				_isOverlayDirty = true;
+				isRedraw = true;
+
+				canShowHoveredValueTooltip = true;
 
 			} else if (_isXSliderVisible && (xSlider = isXSliderHit(devXMouse, devYMouse)) != null) {
 
@@ -5914,7 +5793,7 @@ public class ChartComponentGraph extends Canvas {
 				// set cursor
 				setCursor(_cursorResizeLeftRight);
 
-				canShowHoveredTooltip = true;
+				canShowHoveredValueTooltip = true;
 
 			} else if (_mouseOverXSlider != null) {
 
@@ -5924,7 +5803,7 @@ public class ChartComponentGraph extends Canvas {
 				_isSliderDirty = true;
 				isRedraw = true;
 
-				canShowHoveredTooltip = true;
+				canShowHoveredValueTooltip = true;
 
 			} else if (_isYSliderVisible && isYSliderHit(devXMouse, devYMouse) != null) {
 
@@ -5938,7 +5817,7 @@ public class ChartComponentGraph extends Canvas {
 				_isSliderDirty = true;
 				isRedraw = true;
 
-				canShowHoveredTooltip = true;
+				canShowHoveredValueTooltip = true;
 
 			} else if (_chart._draggingListenerXMarker != null && isSynchMarkerHit(devXMouse)) {
 
@@ -5948,7 +5827,7 @@ public class ChartComponentGraph extends Canvas {
 
 				// cursor is already set
 
-				canShowHoveredTooltip = true;
+				canShowHoveredValueTooltip = true;
 
 			} else if (isBarHit(devXMouse, devYMouse)) {
 
@@ -5959,19 +5838,19 @@ public class ChartComponentGraph extends Canvas {
 
 			} else {
 
-				canShowHoveredTooltip = true;
+				canShowHoveredValueTooltip = true;
 
 				setCursorStyle(devYMouse);
 			}
 		}
 
-		final IHoveredListener hoveredListener = _chart._hoveredListener;
+		final IHoveredValueListener hoveredListener = _chart._hoveredListener;
 
 		if (_isHoveredLineVisible || hoveredListener != null) {
 
-			isLineHovered();
+			setHoveredLineValue();
 
-			if (_hoveredLineValueIndex != -1) {
+			if (_hoveredValuePointIndex != -1) {
 
 				final PointLong devHoveredValueDevPosition = getHoveredValueDevPosition();
 
@@ -5980,7 +5859,7 @@ public class ChartComponentGraph extends Canvas {
 					if (valuePointToolTip != null) {
 
 						valuePointToolTip.setValueIndex(
-								_hoveredLineValueIndex,
+								_hoveredValuePointIndex,
 								_devXMouseMove,
 								_devYMouseMove,
 								devHoveredValueDevPosition,
@@ -5994,21 +5873,16 @@ public class ChartComponentGraph extends Canvas {
 					isRedraw = true;
 				}
 
-				if (hoveredListener != null && canShowHoveredTooltip) {
+				if (hoveredListener != null && canShowHoveredValueTooltip) {
 
 					hoveredListener.hoveredValue(
 							eventTime,
-							_hoveredLineValueIndex,
-							devHoveredValueDevPosition,
 							_devXMouseMove,
-							_devYMouseMove);
+							_devYMouseMove,
+							_hoveredValuePointIndex,
+							devHoveredValueDevPosition);
 				}
 			}
-		}
-
-		// check if custom overlay is dirty (e.g mouse can have hovered a photo group)
-		if (_isCustomOverlayDirty = _chart.isCustomOverlayDirty(eventTime, _devXMouseMove, _devYMouseMove)) {
-			isRedraw = true;
 		}
 
 		if (isRedraw) {
@@ -6226,6 +6100,8 @@ public class ChartComponentGraph extends Canvas {
 		final int devXMouse = event.x;
 		final int devYMouse = event.y;
 
+		ChartMouseEvent mouseEvent;
+
 		if (_isAutoScroll) {
 
 			// stop auto scolling
@@ -6249,10 +6125,6 @@ public class ChartComponentGraph extends Canvas {
 			// redraw slider
 			_isSliderDirty = true;
 			redraw();
-
-		} else if (_chart.isMouseUpExternal(devXMouse, devYMouse)) {
-
-			return;
 
 		} else if (_ySliderDragged != null) {
 
@@ -6280,6 +6152,11 @@ public class ChartComponentGraph extends Canvas {
 			_isChartDraggedStarted = false;
 
 			updateDraggedChart(_draggedChartDraggedPos.x - _draggedChartStartPos.x);
+
+		} else if ((mouseEvent = _chart.onExternalMouseUp(event.time & 0xFFFFFFFFL, devXMouse, devYMouse)).isWorked) {
+
+			setChartCursor(mouseEvent.cursor);
+			return;
 		}
 
 		setCursorStyle(devYMouse);
@@ -6421,6 +6298,17 @@ public class ChartComponentGraph extends Canvas {
 		redraw();
 	}
 
+	void redrawLayer() {
+
+		if (isDisposed()) {
+			return;
+		}
+
+		_isCustomLayerImageDirty = true;
+
+		redraw();
+	}
+
 	/**
 	 * set the slider position when the data model has changed
 	 */
@@ -6435,6 +6323,9 @@ public class ChartComponentGraph extends Canvas {
 		 */
 		leftSlider.reset();
 		rightSlider.reset();
+
+//		_isSliderDirty = true;
+//		redraw();
 	}
 
 	/**
@@ -6544,6 +6435,34 @@ public class ChartComponentGraph extends Canvas {
 		_canAutoZoomToSlider = canAutoZoomToSlider;
 	}
 
+	private void setChartCursor(final ChartCursor cursor) {
+
+		if (cursor == null) {
+			return;
+		}
+
+		switch (cursor) {
+		case Arrow:
+			setCursor(_cursorArrow);
+			break;
+
+		case Dragged:
+			setCursor(_cursorDragged);
+			break;
+
+		default:
+			setCursor(null);
+			break;
+		}
+	}
+
+	void setChartOverlayDirty() {
+
+		_isOverlayDirty = true;
+
+		redraw();
+	}
+
 	/**
 	 * Move a zoomed chart so that the slider is visible.
 	 * 
@@ -6561,10 +6480,11 @@ public class ChartComponentGraph extends Canvas {
 
 		final int devXViewPortWidth = getDevVisibleChartWidth();
 		double xxDevOffset = xxDevSliderLinePos;
+		final long xxDevCenter = xxDevSliderLinePos - devXViewPortWidth / 2;
 
 		if (isCenterSliderPosition) {
 
-			xxDevOffset = xxDevSliderLinePos - devXViewPortWidth / 2;
+			xxDevOffset = xxDevCenter;
 
 		} else {
 
@@ -6703,10 +6623,6 @@ public class ChartComponentGraph extends Canvas {
 				// chart is dragged
 				setCursor(_cursorDragged);
 
-			} else if (_isXSliderVisible && isInXSliderSetArea(devYMouse)) {
-
-				// cursor is already set
-
 			} else {
 
 				// nothing is dragged
@@ -6755,7 +6671,7 @@ public class ChartComponentGraph extends Canvas {
 		} else {
 
 			// prevent using old value index which can cause bound exceptions
-			_hoveredLineValueIndex = -1;
+			_hoveredValuePointIndex = -1;
 			_lineDevPositions.clear();
 			_lineFocusRectangles.clear();
 		}
@@ -6805,12 +6721,16 @@ public class ChartComponentGraph extends Canvas {
 		if (chartType == ChartType.LINE) {
 
 			if (_selectedXSlider == null) {
+
 				// set focus to the left slider when x-sliders are visible
 				if (_isXSliderVisible) {
+
 					_selectedXSlider = getLeftSlider();
 					isFocus = true;
 				}
+
 			} else if (_selectedXSlider != null) {
+
 				isFocus = true;
 			}
 
@@ -6855,11 +6775,9 @@ public class ChartComponentGraph extends Canvas {
 			isFocus = true;
 		}
 
-		if (isFocus) {
-			_chart.fireFocusEvent();
-		}
-
-		ChartManager.getInstance().setActiveChart(isFocus ? _chart : null);
+//		if (isFocus) {
+//			_chart.fireFocusEvent();
+//		}
 
 		return isFocus;
 	}
@@ -6872,6 +6790,47 @@ public class ChartComponentGraph extends Canvas {
 
 		_xSliderA.moveToXXDevPosition(xxDevViewPortOffset, false, true);
 		_xSliderB.moveToXXDevPosition(xxDevGraphWidth, false, true);
+	}
+
+	/**
+	 * Check if mouse has moved over a line value and sets {@link #_hoveredValuePointIndex} to the
+	 * value index or <code>-1</code> when focus rectangle is not hit.
+	 */
+	private void setHoveredLineValue() {
+
+		if (_lineDevPositions.size() == 0) {
+			return;
+		}
+
+		RectangleLong lineRect = null;
+
+		for (final RectangleLong[] lineFocusRectangles : _lineFocusRectangles) {
+
+			// find the line rectangle which is hovered by the mouse
+			for (int valueIndex = 0; valueIndex < lineFocusRectangles.length; valueIndex++) {
+
+				lineRect = lineFocusRectangles[valueIndex];
+
+				// test if the mouse is within a bar focus rectangle
+				if (lineRect != null) {
+
+					// inline for lineRect.contains
+					if ((_devXMouseMove >= lineRect.x)
+							&& (_devYMouseMove >= lineRect.y)
+							&& _devXMouseMove < (lineRect.x + lineRect.width)
+							&& _devYMouseMove < (lineRect.y + lineRect.height)) {
+
+						// keep the hovered line index
+						_hoveredValuePointIndex = valueIndex;
+
+						return;
+					}
+				}
+			}
+		}
+
+		// reset index
+		_hoveredValuePointIndex = -1;
 	}
 
 	void setSelectedBars(final boolean[] selectedItems) {
@@ -6901,6 +6860,146 @@ public class ChartComponentGraph extends Canvas {
 	}
 
 	/**
+	 * Set the value index in the X-slider for the hovered position.
+	 * 
+	 * @param xSlider
+	 */
+	void setXSliderValue(final ChartXSlider xSlider) {
+
+		final ChartDataXSerie xData = getXData();
+
+		if (xData == null) {
+			return;
+		}
+
+		final double[][] xValueSerie = xData.getHighValuesDouble();
+
+		if (xValueSerie.length == 0) {
+			// data are not available
+			return;
+		}
+
+		final double[] xDataValues = xValueSerie[0];
+
+		if (_hoveredValuePointIndex == -1 || _hoveredValuePointIndex >= xDataValues.length) {
+
+			// this happens when a new tour is displayed
+
+			return;
+		}
+
+		xSlider.setValueIndex(_hoveredValuePointIndex);
+	}
+
+	/**
+	 * Set the value index in the X-slider for the current slider position ratio.
+	 * <p>
+	 * The distance values (and time values with breaks) are not linear, the value is increasing
+	 * steadily but with different distance on the x axis. So first we have to find the nearest
+	 * position in the values array and then interpolite from the found position to the slider
+	 * position.
+	 * 
+	 * @param xSlider
+	 */
+	void setXSliderValue_FromRatio(final ChartXSlider xSlider) {
+
+		final ChartDataXSerie xData = getXData();
+
+		if (xData == null) {
+			return;
+		}
+
+		final double[][] xValueSerie = xData.getHighValuesDouble();
+
+		if (xValueSerie.length == 0) {
+			// data are not available
+			return;
+		}
+
+		final double[] xDataValues = xValueSerie[0];
+		final int serieLength = xDataValues.length;
+		final int maxIndex = Math.max(0, serieLength - 1);
+
+		/*
+		 */
+
+		final double minValue = xData.getOriginalMinValue();
+		final double maxValue = xData.getOriginalMaxValue();
+		final double valueRange = maxValue > 0 ? (maxValue - minValue) : -(minValue - maxValue);
+
+		final double posRatio = xSlider.getPositionRatio();
+		int valueIndex = (int) (posRatio * serieLength);
+
+		// check array bounds
+		valueIndex = Math.min(valueIndex, maxIndex);
+		valueIndex = Math.max(valueIndex, 0);
+
+		// sliderIndex points into the value array for the current slider position
+		double xDataValue = xDataValues[valueIndex];
+
+		// compute the value for the slider on the x-axis
+		final double sliderValue = posRatio * valueRange;
+
+		if (xDataValue == sliderValue) {
+
+			// nothing to do
+
+		} else if (sliderValue > xDataValue) {
+
+			/*
+			 * in the value array move towards the end to find the position where the value of the
+			 * slider corresponds with the value in the value array
+			 */
+
+			while (sliderValue > xDataValue) {
+
+				xDataValue = xDataValues[valueIndex++];
+
+				// check if end of the x-data are reached
+				if (valueIndex == serieLength) {
+					break;
+				}
+			}
+			valueIndex--;
+			xDataValue = xDataValues[valueIndex];
+
+		} else {
+
+			/*
+			 * xDataValue > sliderValue
+			 */
+
+			while (sliderValue < xDataValue) {
+
+				// check if beginning of the x-data are reached
+				if (valueIndex == 0) {
+					break;
+				}
+
+				xDataValue = xDataValues[--valueIndex];
+			}
+		}
+
+		/*
+		 * This is a bit of a hack because at some positions the value is too small. Solving the
+		 * problem in the algorithm would take more time than using this hack.
+		 */
+		if (xDataValue < sliderValue) {
+			valueIndex++;
+		}
+
+		// check array bounds
+		valueIndex = Math.min(valueIndex, maxIndex);
+		xDataValue = xDataValues[valueIndex];
+
+		// !!! debug values !!!
+//		xValue = valueIndex * 1000;
+//		xValue = (int) (slider.getPositionRatio() * 1000000000);
+
+		xSlider.setValueIndex(valueIndex);
+	}
+
+	/**
 	 * Set value index for a slider and move the slider to this position, the slider will be made
 	 * visible.
 	 * 
@@ -6918,21 +7017,21 @@ public class ChartComponentGraph extends Canvas {
 		}
 
 		final double[] xValues = xData.getHighValuesDouble()[0];
+		final int xValueLastIndex = xValues.length - 1;
 
 		// adjust the slider index to the array bounds
 		valueIndex = valueIndex < 0 ? //
 				0
-				: valueIndex > (xValues.length - 1) ? //
-						xValues.length - 1
+				: valueIndex > xValueLastIndex ? //
+						xValueLastIndex
 						: valueIndex;
 
 		final double xValue = xValues[valueIndex];
-		final double xxDevLinePos = _xxDevGraphWidth * xValue / xValues[xValues.length - 1];
+		final double lastXValue = xValues[xValueLastIndex];
+		final double xxDevLinePos = _xxDevGraphWidth * xValue / lastXValue;
 
-		slider.setValuesIndex(valueIndex);
-		slider.setValueX(xValue);
-
-		slider.moveToXXDevPosition((int) xxDevLinePos, true, true);
+		slider.setValueIndex(valueIndex);
+		slider.moveToXXDevPosition(xxDevLinePos, true, true);
 
 		setChartPosition(slider, isCenterSliderPosition);
 
@@ -6949,6 +7048,10 @@ public class ChartComponentGraph extends Canvas {
 		_isXSliderVisible = isSliderVisible;
 	}
 
+	/**
+	 * Set ratio when the mouse is double clicked, this position is used to zoom the chart with the
+	 * mouse.
+	 */
 	private void setZoomInPosition() {
 
 		// get left+right slider
@@ -7021,13 +7124,12 @@ public class ChartComponentGraph extends Canvas {
 
 		if (valueIndex >= xValues.length) {
 			valueIndex = xValues.length - 1;
-			slider.setValuesIndex(valueIndex);
+			slider.setValueIndex(valueIndex);
 		}
 
 		try {
-			slider.setValueX(xValues[valueIndex]);
 
-			final int linePos = (int) (_xxDevGraphWidth * (xValues[valueIndex] / xValues[xValues.length - 1]));
+			final double linePos = _xxDevGraphWidth * (xValues[valueIndex] / xValues[xValues.length - 1]);
 
 			slider.moveToXXDevPosition(linePos, true, true);
 
@@ -7048,7 +7150,7 @@ public class ChartComponentGraph extends Canvas {
 		valuePointToolTip.setChartMargins(marginTop, marginBottom);
 
 		// update custom overlay
-		_isCustomOverlayDirty = true;
+		_isOverlayDirty = true;
 		_isCustomOverlayInvalid = 99;
 	}
 

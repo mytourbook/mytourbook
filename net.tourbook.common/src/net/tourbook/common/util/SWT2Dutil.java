@@ -123,19 +123,58 @@ public class SWT2Dutil {
 
 		try {
 			final ColorModel cm = bufferedImage.getColorModel();
+
+// with Alpha from http://git.eclipse.org/c/platform/eclipse.platform.swt.git/tree/examples/org.eclipse.swt.snippets/src/org/eclipse/swt/snippets/Snippet156.java
+//
+//			if (cm instanceof DirectColorModel) {
+//
+//				final DirectColorModel colorModel = (DirectColorModel) cm;
+//
+//				final PaletteData palette = new PaletteData(
+//						colorModel.getRedMask(),
+//						colorModel.getGreenMask(),
+//						colorModel.getBlueMask());
+//				final ImageData data = new ImageData(
+//						bufferedImage.getWidth(),
+//						bufferedImage.getHeight(),
+//						colorModel.getPixelSize(),
+//						palette);
+//				for (int y = 0; y < data.height; y++) {
+//					for (int x = 0; x < data.width; x++) {
+//
+//						final int rgb = bufferedImage.getRGB(x, y);
+//
+//						final int pixel = palette.getPixel(new RGB((rgb >> 16) & 0xFF, (rgb >> 8) & 0xFF, rgb & 0xFF));
+//						data.setPixel(x, y, pixel);
+//
+//						if (colorModel.hasAlpha()) {
+//							data.setAlpha(x, y, (rgb >> 24) & 0xFF);
+//						}
+//					}
+//				}
+//
+//				return data;
+//
+//			} else
+
 			if (cm instanceof DirectColorModel) {
+
 				final DirectColorModel colorModel = (DirectColorModel) cm;
+
 				final PaletteData palette = new PaletteData(
 						colorModel.getRedMask(),
 						colorModel.getGreenMask(),
 						colorModel.getBlueMask());
+
 				final ImageData data = new ImageData(
 						bufferedImage.getWidth(),
 						bufferedImage.getHeight(),
 						colorModel.getPixelSize(),
 						palette);
+
 				final WritableRaster raster = bufferedImage.getRaster();
 				final int[] pixelArray = new int[3];
+
 				for (int y = 0; y < data.height; y++) {
 					for (int x = 0; x < data.width; x++) {
 						raster.getPixel(x, y, pixelArray);
@@ -143,14 +182,20 @@ public class SWT2Dutil {
 						data.setPixel(x, y, pixel);
 					}
 				}
+
 				return data;
+
 			} else if (cm instanceof ComponentColorModel) {
+
 				final ComponentColorModel colorModel = (ComponentColorModel) cm;
+
 				final PaletteData palette = new PaletteData(0xff0000, 0x00ff00, 0x0000ff);
 				final ImageData data = new ImageData(bufferedImage.getWidth(), bufferedImage.getHeight(), 24, palette);
+
 				final WritableRaster raster = bufferedImage.getRaster();
 				final int size = colorModel.getNumComponents();
 				final int[] pixelArray = new int[size];
+
 				if ((size == 1) && (colorModel.getPixelSize() == 48)) {
 					for (int y = 0; y < data.height; y++) {
 						for (int x = 0; x < data.width; x++) {
@@ -181,16 +226,28 @@ public class SWT2Dutil {
 									pixelArray[2] / 256)));
 						}
 					}
+
 				} else if ((size == 3) || (size == 4)) {
+
+					final boolean hasAlpha = colorModel.hasAlpha();
+
 					for (int y = 0; y < data.height; y++) {
 						for (int x = 0; x < data.width; x++) {
+
 							raster.getPixel(x, y, pixelArray);
+
 							// 8 bit color components
 							data.setPixel(x, y, palette.getPixel(new RGB(pixelArray[0], pixelArray[1], pixelArray[2])));
+
+							if (hasAlpha) {
+								data.setAlpha(x, y, pixelArray[3]);
+							}
 						}
 					}
 				}
+
 				return data;
+
 			} else if (cm instanceof IndexColorModel) {
 				final IndexColorModel colorModel = (IndexColorModel) cm;
 				final int size = colorModel.getMapSize();

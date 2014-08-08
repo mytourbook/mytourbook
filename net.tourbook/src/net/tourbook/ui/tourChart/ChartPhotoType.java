@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,10 +15,24 @@
  *******************************************************************************/
 package net.tourbook.ui.tourChart;
 
+import net.tourbook.data.TourData;
+import net.tourbook.photo.TourPhotoLink;
+import net.tourbook.photo.TourPhotoLinkView;
+
+/**
+ * Distingishes if photos are saved in a tour or they are from a {@link TourPhotoLink} which are
+ * created in the {@link TourPhotoLinkView}.
+ */
 public enum ChartPhotoType {
 
+	/**
+	 * Photos are saved in a tour.
+	 */
 	TOUR,
 
+	/**
+	 * Photos are linked with a tour, see also here {@link TourData#tourPhotoLink}.
+	 */
 	LINK
 
 }

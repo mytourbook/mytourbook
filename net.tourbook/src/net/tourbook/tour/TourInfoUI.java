@@ -649,13 +649,11 @@ public class TourInfoUI {
 						.applyTo(label);
 
 				// text field
-				int style;
+				int style = SWT.WRAP | SWT.MULTI | SWT.READ_ONLY | SWT.BORDER;
 				final int lineCount = Util.countCharacter(_tourData.getTourDescription(), '\n');
 
 				if (lineCount > 10) {
-					style = SWT.WRAP | SWT.MULTI | SWT.READ_ONLY | SWT.BORDER | SWT.V_SCROLL;
-				} else {
-					style = SWT.WRAP | SWT.MULTI | SWT.READ_ONLY | SWT.BORDER;
+					style |= SWT.V_SCROLL;
 				}
 
 				_txtDescription = new Text(container, style);

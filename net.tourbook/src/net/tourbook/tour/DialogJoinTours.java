@@ -22,7 +22,6 @@ import java.util.Set;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
-import net.tourbook.chart.ChartLabel;
 import net.tourbook.common.action.ActionOpenPrefDialog;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
@@ -38,6 +37,7 @@ import net.tourbook.tag.TagMenuManager;
 import net.tourbook.ui.ITourProvider2;
 import net.tourbook.ui.UI;
 import net.tourbook.ui.action.ActionSetTourTypeMenu;
+import net.tourbook.ui.tourChart.ChartLabel;
 
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
@@ -1217,7 +1217,7 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
 
 					tourMarker.setSerieIndex(joinMarkerIndex);
 					tourMarker.setLabel(markerLabel);
-					tourMarker.setVisualPosition(ChartLabel.VISUAL_VERTICAL_ABOVE_GRAPH);
+					tourMarker.setLabelPosition(TourMarker.LABEL_POS_VERTICAL_ABOVE_GRAPH);
 
 					if (isJoinTime) {
 						tourMarker.setTime(joinedTimeSerie[joinMarkerIndex]);

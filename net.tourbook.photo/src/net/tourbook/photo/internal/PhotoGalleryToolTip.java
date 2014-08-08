@@ -25,9 +25,9 @@ import net.tourbook.photo.Photo;
 import net.tourbook.photo.PhotoImageCache;
 import net.tourbook.photo.PhotoImageMetadata;
 import net.tourbook.photo.PhotoLoadManager;
+import net.tourbook.photo.RendererHelper;
 import net.tourbook.photo.internal.gallery.MT20.GalleryMT20;
 import net.tourbook.photo.internal.gallery.MT20.GalleryMT20Item;
-import net.tourbook.photo.internal.gallery.MT20.RendererHelper;
 
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
@@ -640,18 +640,7 @@ public class PhotoGalleryToolTip extends AnimatedToolTipShell {
 		final Color bgColor = _gallery.getBackground();
 		final Color fgColor = _gallery.getForeground();
 
-		child.setBackground(bgColor);
-		child.setForeground(fgColor);
-
-		if (child instanceof Composite) {
-			final Control[] children = ((Composite) child).getChildren();
-			for (final Control element : children) {
-
-				if (element != null && element.isDisposed() == false) {
-					updateUI_colors(element);
-				}
-			}
-		}
+		UI.setColorForAllChildren(child, fgColor, bgColor);
 
 		if (_labelError != null && _labelError.isDisposed() == false) {
 //			_labelError.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
@@ -663,5 +652,7 @@ public class PhotoGalleryToolTip extends AnimatedToolTipShell {
 //		_canvasContainer.setBackground(_gallery.getBackground());
 
 	}
+
+
 
 }

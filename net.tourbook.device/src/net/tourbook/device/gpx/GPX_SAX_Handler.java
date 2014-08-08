@@ -23,7 +23,6 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.TimeZone;
 
-import net.tourbook.chart.ChartLabel;
 import net.tourbook.common.util.MtMath;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TimeData;
@@ -601,7 +600,7 @@ public class GPX_SAX_Handler extends DefaultHandler {
 
 			// adjust default marker which are created in tourData.createTimeSeries()
 			for (final TourMarker tourMarker : tourData.getTourMarkers()) {
-				tourMarker.setVisualPosition(ChartLabel.VISUAL_VERTICAL_BOTTOM_CHART);
+				tourMarker.setLabelPosition(TourMarker.LABEL_POS_VERTICAL_BOTTOM_CHART);
 			}
 		}
 

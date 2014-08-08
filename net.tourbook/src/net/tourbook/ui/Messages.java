@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -175,6 +175,14 @@ public class Messages extends NLS {
 	public static String		ColumnFactory_clouds;
 	public static String		ColumnFactory_clouds_tooltip;
 	public static String		ColumnFactory_Diff_Header;
+	public static String		ColumnFactory_DistanceDelta_Label;
+	public static String		ColumnFactory_DistanceDelta_Tooltip;
+	public static String	ColumnFactory_DPTolerance_Header;
+
+	public static String	ColumnFactory_DPTolerance_Label;
+
+	public static String	ColumnFactory_DPTolerance_Tooltip;
+
 	public static String		ColumnFactory_Id_Label;
 	public static String		ColumnFactory_Id_Tooltip;
 	public static String		ColumnFactory_NumberOfGPSPhotos_Header;
@@ -206,6 +214,11 @@ public class Messages extends NLS {
 	public static String		ColumnFactory_tour_week_header;
 	public static String		ColumnFactory_tour_week_label;
 	public static String		ColumnFactory_tour_week_tooltip;
+
+	public static String		ColumnFactory_TimeDelta_Header;
+	public static String		ColumnFactory_TimeDelta_Label;
+	public static String		ColumnFactory_TimeDelta_Tooltip;
+
 	public static String		ColumnFactory_Tour_DayTime;
 	public static String		ColumnFactory_Tour_DayTime_Tooltip;
 	public static String		ColumnFactory_Tour_WeekDay_Header;
@@ -240,6 +253,13 @@ public class Messages extends NLS {
 	public static String		ColumnFactory_TourWeekYear_Header;
 	public static String		ColumnFactory_TourWeekYear_Label;
 	public static String		ColumnFactory_TourWeekYear_Tooltip;
+
+	public static String	ColumnFactory_Url_Header;
+
+	public static String	ColumnFactory_Url_Label;
+
+	public static String	ColumnFactory_Url_Tooltip;
+
 	public static String		ColumnFactory_Waypoint_Altitude_Label;
 	public static String		ColumnFactory_Waypoint_Category;
 	public static String		ColumnFactory_Waypoint_Comment;
@@ -269,6 +289,10 @@ public class Messages extends NLS {
 	public static String		Tooltip_WayPoint_Label_Comment;
 	public static String		Tooltip_WayPoint_Label_Description;
 	public static String		Tooltip_WayPoint_Label_Symbol;
+
+	public static String		Tour_Marker_Column_IsVisible;
+	public static String		Tour_Marker_Column_IsVisible_Tooltip;
+	public static String		Tour_Marker_Column_IsVisibleNoEdit_Tooltip;
 
 	public static String		Tour_Tooltip_Format_Date;
 	public static String		Tour_Tooltip_Format_DateWeekTime;

@@ -18,6 +18,7 @@ package net.tourbook.common.color;
 import java.awt.Color;
 
 import org.eclipse.swt.graphics.Device;
+import org.eclipse.swt.graphics.RGB;
 
 public class ColorUtil {
 
@@ -50,6 +51,11 @@ public class ColorUtil {
 		} else {
 			return new org.eclipse.swt.graphics.Color(display, 0xff, 0xff, 0xff);
 		}
+	}
+
+	public static org.eclipse.swt.graphics.Color getContrastColor(final Device device, final RGB rgb) {
+
+		return getContrastColor(device, rgb.red, rgb.green, rgb.blue);
 	}
 
 	/**

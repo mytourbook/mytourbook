@@ -1,6 +1,6 @@
 package net.tourbook.device.garmin.fit.listeners;
 
-import net.tourbook.device.garmin.fit.FitActivityContext;
+import net.tourbook.device.garmin.fit.FitContext;
 
 import com.garmin.fit.AntplusDeviceType;
 import com.garmin.fit.DeviceInfoMesg;
@@ -8,7 +8,7 @@ import com.garmin.fit.DeviceInfoMesgListener;
 
 public class DeviceInfoMesgListenerImpl extends AbstractMesgListener implements DeviceInfoMesgListener {
 
-	public DeviceInfoMesgListenerImpl(final FitActivityContext context) {
+	public DeviceInfoMesgListenerImpl(final FitContext context) {
 		super(context);
 	}
 

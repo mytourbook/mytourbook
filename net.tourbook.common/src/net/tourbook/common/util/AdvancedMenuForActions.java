@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -225,7 +225,7 @@ public class AdvancedMenuForActions {
 	/**
 	 * This is called when the parent menu is displayed. An arm listener is added to each menu item
 	 * in the parent menu.
-	 *
+	 * 
 	 * @param menuEvent
 	 * @param menuParentControl
 	 * @param isAutoOpen
@@ -276,7 +276,7 @@ public class AdvancedMenuForActions {
 			 * it happened that the text of the menu item was not reset when the menu was opened
 			 * with a mouse click and not automatically
 			 */
-			if (_armMenuItem != null && _armMenuItem == menuItem) {
+			if (_armMenuItem != null && _armMenuItem.isDisposed() == false && _armMenuItem == menuItem) {
 				_armMenuItem.setText(_armActionText);
 			}
 		}
@@ -338,7 +338,7 @@ public class AdvancedMenuForActions {
 
 	private void restoreMenuItemText() {
 
-		if (_armMenuItem != null) {
+		if (_armMenuItem != null && _armMenuItem.isDisposed() == false) {
 			_armMenuItem.setText(_armActionText);
 		}
 	}

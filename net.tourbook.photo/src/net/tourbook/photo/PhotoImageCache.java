@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2012  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -26,6 +26,7 @@ import net.tourbook.photo.internal.manager.ImageCacheWrapper;
 
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.Rectangle;
 
 import com.googlecode.concurrentlinkedhashmap.ConcurrentLinkedHashMap;
 import com.googlecode.concurrentlinkedhashmap.EvictionListener;
@@ -51,7 +52,7 @@ public class PhotoImageCache {
 	private static int														_maxOriginalImageCacheSize	= _prefStore
 																												.getInt(IPhotoPreferences.PHOTO_ORIGINAL_IMAGE_CACHE_SIZE);
 
-	private static final ConcurrentLinkedHashMap<String, ImageCacheWrapper>	_imageCache;
+	private static final ConcurrentLinkedHashMap<String, ImageCacheWrapper>	_imageCacheThumb;
 	private static final ConcurrentLinkedHashMap<String, ImageCacheWrapper>	_imageCacheOriginal;
 
 	static {
@@ -79,7 +80,7 @@ public class PhotoImageCache {
 			}
 		};
 
-		_imageCache = new ConcurrentLinkedHashMap.Builder<String, ImageCacheWrapper>()
+		_imageCacheThumb = new ConcurrentLinkedHashMap.Builder<String, ImageCacheWrapper>()
 				.maximumWeightedCapacity(_maxThumbImageCacheSize)
 				.listener(evictionListener)
 				.build();
@@ -169,14 +170,14 @@ public class PhotoImageCache {
 	 * @param folderPath
 	 */
 	public static void disposeThumbs(final String folderPath) {
-		dispose(_imageCache, folderPath);
+		dispose(_imageCacheThumb, folderPath);
 	}
 
 	public static Image getImage(final Photo photo, final ImageQuality imageQuality) {
 
 		final String imageKey = photo.getImageKey(imageQuality);
 
-		return getImageFromCache(_imageCache, photo, imageKey);
+		return getImageFromCache(_imageCacheThumb, photo, imageKey);
 	}
 
 	private static Image getImageFromCache(	final ConcurrentLinkedHashMap<String, ImageCacheWrapper> imageCache,
@@ -197,17 +198,14 @@ public class PhotoImageCache {
 			photo.getImageMetaData();
 
 			// check if height is set
-//			if (photo.getImageWidth() == Integer.MIN_VALUE) {
-//
-//				// image dimension is not yet set
-//
-//				if (cacheWrapper.imageWidth != Integer.MIN_VALUE) {
-//
-//					// image dimension is available
-//
-//					photo.setDimension(cacheWrapper.imageWidth, cacheWrapper.imageHeight);
-//				}
-//			}
+			if (photo.getPhotoImageWidth() == Integer.MIN_VALUE) {
+
+				// image dimension is not yet set
+
+				final Rectangle imageSize = photoImage.getBounds();
+
+				photo.setPhotoDimension(imageSize.width, imageSize.height);
+			}
 		}
 		return photoImage;
 	}
@@ -238,7 +236,7 @@ public class PhotoImageCache {
 	 */
 	public static void putImage(final String imageKey, final Image image, final String originalImagePathName) {
 
-		putImageInCache(_imageCache, imageKey, image, originalImagePathName);
+		putImageInCache(_imageCacheThumb, imageKey, image, originalImagePathName);
 	}
 
 	private static void putImageInCache(final ConcurrentLinkedHashMap<String, ImageCacheWrapper> imageCache,
@@ -290,13 +288,13 @@ public class PhotoImageCache {
 		if (!isSet) {
 			isSet = setImageSize_IntoCacheWrapper(photo, imageWidth, imageHeight, //
 					ImageQuality.THUMB,
-					_imageCache);
+					_imageCacheThumb);
 		}
 
 		if (!isSet) {
 			isSet = setImageSize_IntoCacheWrapper(photo, imageWidth, imageHeight, //
 					ImageQuality.HQ,
-					_imageCache);
+					_imageCacheThumb);
 		}
 
 		if (!isSet) {
@@ -331,6 +329,6 @@ public class PhotoImageCache {
 	}
 
 	public static void setThumbCacheSize(final int newCacheSize) {
-		_imageCache.setCapacity(newCacheSize);
+		_imageCacheThumb.setCapacity(newCacheSize);
 	}
 }

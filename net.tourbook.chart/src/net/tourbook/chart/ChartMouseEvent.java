@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -17,18 +17,37 @@ package net.tourbook.chart;
 
 public class ChartMouseEvent {
 
-	int				type;
+	public long			eventTime;
+
+	int					type;
 
 	/**
 	 * When <code>true</code> the event is done by the receiver, when <code>false</code> the
-	 * receiver has done nothing.
+	 * receiver has done nothing, default is <code>false</code>.
+	 * <p>
+	 * <b> Because this flag is used by all {@link ChartMouseEvent} listener, setting this value to
+	 * <code>false</code> will also disable other listeners. </b>
 	 */
-	public boolean	isWorked	= false;
+	public boolean		isWorked;
 
-	public int		devYMouse;
-	public int		devXMouse;
+	public int			devXMouse;
+	public int			devYMouse;
 
-	public ChartMouseEvent(final int eventType) {
+	/**
+	 * This cursor is displayed when {@link #isWorked} is <code>true</code>, can be
+	 * <code>null</code> which shows the default cursor.
+	 */
+	public ChartCursor	cursor;
+
+	@SuppressWarnings("unused")
+	private ChartMouseEvent() {}
+
+	public ChartMouseEvent(final int eventType, final long time, final int eventMouseX, final int eventMouseY) {
+
 		type = eventType;
+		eventTime = time;
+
+		devXMouse = eventMouseX;
+		devYMouse = eventMouseY;
 	}
 }

@@ -342,7 +342,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 		final int[] tourCounter = { 0 };
 		final int[] tourCounterWithHrZones = { 0 };
 
-		final boolean isCanceled = TourDatabase.computeValuesForAllTours(new IComputeTourValues() {
+		final IComputeTourValues computeTourValueConfig = new IComputeTourValues() {
 
 			@Override
 			public boolean computeTourValues(final TourData originalTourData) {
@@ -364,6 +364,9 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 				originalTourData.computeAvgPulse();
 
 				final int[] allHrZones = originalTourData.getHrZones();
+				if (allHrZones == null) {
+					return false;
+				}
 
 				// check if hr zones are computed
 				for (final int hrZone : allHrZones) {
@@ -388,7 +391,9 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 				return NLS.bind(Messages.Compute_HrZones_Job_ComputeAllTours_SubTask, //
 						new Object[] { tourCounterWithHrZones[0], tourCounter[0] });
 			}
-		});
+		};
+
+		final boolean isCanceled = TourDatabase.computeValuesForAllTours(computeTourValueConfig, null);
 
 		boolean returnValue = true;
 

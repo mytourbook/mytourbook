@@ -1766,6 +1766,12 @@ public class TourMapPainter extends MapPainter {
 		return valuePosition;
 	}
 
+	/**
+	 * @param photo
+	 * @param map
+	 * @param tile
+	 * @return Returns the photo image or <code>null</code> when image is not loaded.
+	 */
 	private Image getPhotoImage(final Photo photo, final Map map, final Tile tile) {
 
 		Image photoImage = null;

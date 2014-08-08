@@ -906,12 +906,13 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 				.align(SWT.BEGINNING, SWT.BEGINNING)
 				.applyTo(colorSelector.getButton());
 
+		colorSelector.addOpenListener(this);
+
 		colorSelector.addListener(new IPropertyChangeListener() {
 			public void propertyChange(final PropertyChangeEvent event) {
 				onModifyConfig();
 			}
 		});
-		colorSelector.addOpenListener(this);
 
 		return colorSelector;
 	}
@@ -1128,11 +1129,6 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 		_comboName.setItem(selectedIndex, _textConfigName.getText());
 
 		saveState();
-	}
-
-	@Override
-	protected void onMouseMoveInToolTip(final MouseEvent mouseEvent) {
-
 	}
 
 	private void onSelectConfig() {
@@ -1519,7 +1515,7 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 	}
 
 	private void updateUI_Map3() {
-		
+
 		final Map3View map3View = Map3Manager.getMap3View();
 
 		if (map3View != null) {

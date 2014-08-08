@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -63,50 +63,43 @@ import org.w3c.dom.Element;
 
 public class TourTypeFilterManager {
 
-	private static final String										TAG_NAME					= "name";									//$NON-NLS-1$
+	private static final String					TAG_NAME					= "name";									//$NON-NLS-1$
 
-	private static final String										TAG_FILTER_TYPE				= "filterType";							//$NON-NLS-1$
-	private static final String										TAG_SYSTEM_ID				= "systemId";								//$NON-NLS-1$
-	private static final String										TAG_TOUR_TYPE_ID			= "tourTypeId";							//$NON-NLS-1$
+	private static final String					TAG_FILTER_TYPE				= "filterType";							//$NON-NLS-1$
+	private static final String					TAG_SYSTEM_ID				= "systemId";								//$NON-NLS-1$
+	private static final String					TAG_TOUR_TYPE_ID			= "tourTypeId";							//$NON-NLS-1$
 
-	private static final String										MEMENTO_ROOT_FILTER_LIST	= "filterlist";							//$NON-NLS-1$
-	private static final String										MEMENTO_CHILD_FILTER		= "filter";								//$NON-NLS-1$
-	private static final String										MEMENTO_CHILD_TOURTYPE		= "tourtype";								//$NON-NLS-1$
+	private static final String					MEMENTO_ROOT_FILTER_LIST	= "filterlist";							//$NON-NLS-1$
+	private static final String					MEMENTO_CHILD_FILTER		= "filter";								//$NON-NLS-1$
+	private static final String					MEMENTO_CHILD_TOURTYPE		= "tourtype";								//$NON-NLS-1$
 
-	private static final String										MEMENTO_FILTER_LIST_FILE	= "filterlist.xml";						//$NON-NLS-1$
+	private static final String					MEMENTO_FILTER_LIST_FILE	= "filterlist.xml";						//$NON-NLS-1$
 
-//	private static TourTypeFilterManager							_instance;
-
-	private static IPreferenceStore									_prefStore					= TourbookPlugin
-																										.getDefault()
-																										.getPreferenceStore();
-
-	private static IDialogSettings									_state						= TourbookPlugin
-																										.getDefault()
-																										.getDialogSettingsSection(
-																												"TourTypeFilterManager");	//$NON-NLS-1$
-	private static org.eclipse.jface.util.IPropertyChangeListener	_prefChangeListener;
+	private static IPreferenceStore				_prefStore					= TourbookPlugin.getPrefStore();
+	private static IDialogSettings				_state						= TourbookPlugin
+																					.getState("TourTypeFilterManager"); //$NON-NLS-1$
+	private static IPropertyChangeListener		_prefChangeListener;
 
 	/**
 	 * contains the tour type filters which are displayed in the combobox
 	 */
-	private static ArrayList<TourTypeFilter>						_tourTypeFilters;
+	private static ArrayList<TourTypeFilter>	_tourTypeFilters;
 
-	private static ArrayList<ActionTTFilter>						_ttFilterActions			= new ArrayList<ActionTTFilter>();
+	private static ArrayList<ActionTTFilter>	_ttFilterActions			= new ArrayList<ActionTTFilter>();
 
-	private static double											_propertyValue;
+	private static double						_propertyValue;
 
-	private static ActionOpenPrefDialog								_actionOpenTourTypePrefs;
+	private static ActionOpenPrefDialog			_actionOpenTourTypePrefs;
 
 	/**
 	 * contains the action for the filter which is currently selected
 	 */
-	private static ActionTTFilter									_selectedFilterAction;
+	private static ActionTTFilter				_selectedFilterAction;
 
-	private static ICoolBarManager									_coolBar;
-	private static IToolBarManager									_tbMgrTourType;
-	private static ToolBarContributionItem							_tbItemTourType;
-	private static TourTypeContributionItem							_tourTypeContribItem;
+//	private static ICoolBarManager									_coolBar;
+//	private static IToolBarManager									_tbMgrTourType;
+//	private static ToolBarContributionItem							_tbItemTourType;
+	private static TourTypeContributionItem		_tourTypeContribItem;
 
 	static {
 
@@ -607,9 +600,9 @@ public class TourTypeFilterManager {
 												final ToolBarContributionItem tbItemTourType,
 												final TourTypeContributionItem tourTypeContribItem) {
 
-		_coolBar = coolBar;
-		_tbMgrTourType = tbMgrTourType;
-		_tbItemTourType = tbItemTourType;
+//		_coolBar = coolBar;
+//		_tbMgrTourType = tbMgrTourType;
+//		_tbItemTourType = tbItemTourType;
 		_tourTypeContribItem = tourTypeContribItem;
 	}
 

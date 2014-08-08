@@ -109,7 +109,7 @@ public abstract class TVITagViewItem extends TreeViewerItem {
 			sb.append("SELECT "); //$NON-NLS-1$
 			sb.append(SQL_SUM_COLUMNS);
 
-			sb.append(" FROM " + TourDatabase.JOINTABLE_TOURDATA__TOURTAG + " jtblTagData"); //$NON-NLS-1$ //$NON-NLS-2$
+			sb.append(" FROM " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + " jtblTagData"); //$NON-NLS-1$ //$NON-NLS-2$
 
 			// get data for a tour
 			sb.append(" LEFT OUTER JOIN " + TourDatabase.TABLE_TOUR_DATA + " TourData ON "); //$NON-NLS-1$ //$NON-NLS-2$

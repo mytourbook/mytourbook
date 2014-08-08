@@ -38,7 +38,6 @@ import net.tourbook.tour.SelectionTourData;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.ITourChartViewer;
-import net.tourbook.ui.action.ActionEditQuick;
 import net.tourbook.ui.tourChart.TourChart;
 import net.tourbook.ui.tourChart.TourChartContextProvider;
 import net.tourbook.ui.tourChart.TourChartViewPart;
@@ -52,9 +51,7 @@ import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.part.PageBook;
@@ -245,18 +242,12 @@ public class TourCatalogViewComparedTour extends TourChartViewPart implements IS
 
 	private void createTourChart() {
 
-		_tourChart = new TourChart(_pageBook, SWT.FLAT, true);
+		_tourChart = new TourChart(_pageBook, SWT.FLAT);
 		_tourChart.setShowZoomActions(true);
 		_tourChart.setShowSlider(true);
 		_tourChart.setToolBarManager(getViewSite().getActionBars().getToolBarManager(), true);
 		_tourChart.setContextProvider(new TourChartContextProvider(this));
 		_tourChart.setTourInfoActionsEnabled(true);
-
-		_tourChart.addDoubleClickListener(new Listener() {
-			public void handleEvent(final Event event) {
-				ActionEditQuick.doAction(TourCatalogViewComparedTour.this);
-			}
-		});
 
 		// fire a slider move selection when a slider was moved in the tour chart
 		_tourChart.addSliderMoveListener(new ISliderMoveListener() {

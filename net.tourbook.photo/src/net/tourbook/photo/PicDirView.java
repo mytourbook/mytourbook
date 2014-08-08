@@ -17,7 +17,7 @@ package net.tourbook.photo;
 
 import java.io.File;
 
-import net.tourbook.common.form.ViewerDetailForm;
+import net.tourbook.common.form.SashLeftFixedForm;
 import net.tourbook.common.util.PostSelectionProvider;
 import net.tourbook.common.util.Util;
 import net.tourbook.photo.internal.Activator;
@@ -71,7 +71,7 @@ public class PicDirView extends ViewPart implements IPhotoEventListener {
 	/*
 	 * UI controls
 	 */
-	private ViewerDetailForm				_containerMasterDetail;
+	private SashLeftFixedForm				_containerMasterDetail;
 	private Composite						_containerFolder;
 	private Composite						_containerImages;
 
@@ -275,7 +275,7 @@ public class PicDirView extends ViewPart implements IPhotoEventListener {
 			}
 
 			// master/detail form
-			_containerMasterDetail = new ViewerDetailForm(
+			_containerMasterDetail = new SashLeftFixedForm(
 					masterDetailContainer,
 					_containerFolder,
 					sash,
@@ -346,13 +346,21 @@ public class PicDirView extends ViewPart implements IPhotoEventListener {
 	}
 
 	/**
+	 * @return Returns selected folder or <code>null</code> when a folder is not selected.
+	 */
+	public File getSelectedFolder() {
+
+		return _picDirFolder.getSelectedFolder();
+	}
+
+	/**
 	 * Creates a {@link PhotosWithExifSelection}
 	 * 
 	 * @param isAllImages
 	 *            When <code>true</code>, all images which are displayed in the gallery are
 	 *            returned, otherwise the selected images.
-	 * @return Returns a {@link ISelection} for selected or all images or <code>null</code> null
-	 *         when loading EXIF data was canceled by the user.
+	 * @return Returns a {@link ISelection} for selected or all images or <code>null</code> when
+	 *         loading EXIF data was canceled by the user.
 	 */
 	public PhotosWithExifSelection getSelectedPhotosWithExif(final boolean isAllImages) {
 		return _picDirImages.getSelectedPhotosWithExif(isAllImages);

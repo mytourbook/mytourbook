@@ -15,7 +15,7 @@
 	<extension point="org.eclipse.ui.commands">
 
 		<command id="command.net.tourbook.photo.PicDirView"
-			name="%View_Name_PhotoDirectory"
+			name="%View_Name_Photos"
 			defaultHandler="net.tourbook.photo.internal.ActionHandlerOpenViewPhotoDirectory"
 			/>
 
@@ -32,12 +32,12 @@
 	
 	<extension point="org.eclipse.ui.menus">
 	
-		<menuContribution locationURI="menu:views?before=net.tourbook.separator.TourProperties" >
+		<menuContribution locationURI="menu:m_Directory?after=net.tourbook.separator.OtherDirectories" >
 		            
 			<command commandId="command.net.tourbook.photo.PicDirView"
 				icon="icons/photo-directory.png"
-				label="%View_Name_PhotoDirectory"
-				mnemonic="%View_Name_PhotoDirectory_Mnemonic"/>
+				label="%View_Name_Photos"
+				mnemonic="%View_Name_Photos_Mnemonic"/>
 		
 		</menuContribution>
 
@@ -55,14 +55,14 @@
 			
 		</menuContribution>
 		
-		<menuContribution locationURI="toolbar:org.eclipse.ui.main.toolbar?after=additions">
+		<menuContribution locationURI="toolbar:org.eclipse.ui.main.toolbar">
 
-			<toolbar id="net.tourbook.toolbars.tourViews">
+			<toolbar id="mc_tb_Directory">
 			
 				<command commandId="command.net.tourbook.photo.PicDirView"
 					icon="icons/photo-directory.png"
-					label="%View_Name_PhotoDirectory"
-					mnemonic="%View_Name_PhotoDirectory_Mnemonic"/>
+					label="%View_Name_Photos"
+					mnemonic="%View_Name_Photos_Mnemonic"/>
 			
 			</toolbar>
 
@@ -130,8 +130,7 @@
 			class="net.tourbook.photo.PicDirView"
 			icon="icons/photo-directory.png"
 			id="net.tourbook.photo.PicDirView"
-			name="%View_Name_PhotoDirectory"/>
-	
+			name="%View_Name_Photos"/>
 	
 	</extension>
 

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -40,28 +40,28 @@ import org.eclipse.swt.widgets.ToolItem;
 
 public class ActionPhotoProperties extends ContributionItem {
 
-	private static final String	ID								= "ACTION_PHOTO_FILTER_ID";		//$NON-NLS-1$
+	private static final String		ID								= "ACTION_PHOTO_FILTER_ID";		//$NON-NLS-1$
 
-	private static final String	STATE_IS_PHOTO_FILTER_ACTIVE	= "STATE_IS_PHOTO_FILTER_ACTIVE";	//$NON-NLS-1$
+	private static final String		STATE_IS_PHOTO_FILTER_ACTIVE	= "STATE_IS_PHOTO_FILTER_ACTIVE";	//$NON-NLS-1$
 
-	private Map2View			_mapView;
+	private Map2View				_mapView;
 
-	private DialogPhotoProperties		_photoProperties;
+	private DialogPhotoProperties	_photoProperties;
 
-	private ToolBar				_toolBar;
+	private ToolBar					_toolBar;
 
-	private ToolItem			_actionToolItem;
-	private IDialogSettings		_state;
+	private ToolItem				_actionToolItem;
+	private IDialogSettings			_state;
 
 	/*
 	 * UI controls
 	 */
-	private Control				_parent;
+	private Control					_parent;
 
-	private Image				_imageEnabled;
-	private Image				_imageEnabledNoPhotos;
-	private Image				_imageEnabledWithPhotos;
-	private Image				_imageDisabled;
+	private Image					_imageEnabled;
+	private Image					_imageEnabledNoPhotos;
+	private Image					_imageEnabledWithPhotos;
+	private Image					_imageDisabled;
 
 	public class PhotoPropertiesUI extends DialogPhotoProperties {
 

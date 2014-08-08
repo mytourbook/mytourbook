@@ -32,6 +32,10 @@ import net.tourbook.map2.Messages;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.swt.graphics.Image;
 
+/**
+ * A waypoint is associated with a tour but the way point position is independently from a tour, it
+ * has it's own lat/lon position.
+ */
 @Entity
 public class TourWayPoint implements Cloneable, Comparable<Object>, IHoveredArea {
 
@@ -93,7 +97,6 @@ public class TourWayPoint implements Cloneable, Comparable<Object>, IHoveredArea
 	private static int		_createCounter			= 0;
 
 	public TourWayPoint() {}
-
 
 	public TourWayPoint clone(final TourData wpTourData) {
 

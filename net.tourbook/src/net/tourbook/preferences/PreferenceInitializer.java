@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -20,6 +20,7 @@ import java.util.Calendar;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.Chart;
 import net.tourbook.common.util.StringToArrayConverter;
+import net.tourbook.data.TourMarker;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.tour.BreakTimeTool;
 import net.tourbook.tour.TourManager;
@@ -121,8 +122,31 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 		// show breaktime values
 		store.setDefault(ITourbookPreferences.GRAPH_IS_BREAKTIME_VALUES_VISIBLE, true);
 
-		// is marker visible
+		// tour marker
 		store.setDefault(ITourbookPreferences.GRAPH_IS_MARKER_VISIBLE, true);
+		store.setDefault(ITourbookPreferences.GRAPH_MARKER_HOVER_SIZE, 4);
+		store.setDefault(ITourbookPreferences.GRAPH_MARKER_LABEL_OFFSET, 2);
+		store.setDefault(ITourbookPreferences.GRAPH_MARKER_LABEL_TEMP_POSITION,//
+				TourMarker.LABEL_POS_HORIZONTAL_ABOVE_GRAPH_CENTERED);
+		store.setDefault(ITourbookPreferences.GRAPH_MARKER_POINT_SIZE, 2);
+		store.setDefault(ITourbookPreferences.GRAPH_MARKER_SIGN_IMAGE_SIZE, 50); // in DLU
+		store.setDefault(ITourbookPreferences.GRAPH_MARKER_IS_DRAW_WITH_DEFAULT_COLOR, true);
+		store.setDefault(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_HIDDEN_MARKER, false);
+		store.setDefault(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_LABEL_TEMP_POSITION, false);
+		store.setDefault(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_MARKER_LABEL, true);
+		store.setDefault(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_MARKER_POINT, true);
+		store.setDefault(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_MARKER_TOOLTIP, true);
+		store.setDefault(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_SIGN_IMAGE, true);
+
+		PreferenceConverter.setDefault(store, //
+				ITourbookPreferences.GRAPH_MARKER_COLOR_DEFAULT,
+				new RGB(0x60, 0x60, 0x60));
+		PreferenceConverter.setDefault(store, //
+				ITourbookPreferences.GRAPH_MARKER_COLOR_DEVICE,
+				new RGB(0xff, 0x0, 0x80));
+		PreferenceConverter.setDefault(store, //
+				ITourbookPreferences.GRAPH_MARKER_COLOR_HIDDEN,
+				new RGB(0x24, 0x9C, 0xFF));
 
 		// is photo visible
 		store.setDefault(ITourbookPreferences.GRAPH_IS_TOUR_PHOTO_VISIBLE, true);
@@ -281,10 +305,6 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 		/*
 		 * computed values
 		 */
-		// minimum altitude difference
-		store.setDefault(
-				PrefPageComputedValues.STATE_COMPUTED_VALUE_MIN_ALTITUDE,
-				PrefPageComputedValues.DEFAULT_MIN_ALTITUDE);
 
 		// speed minimum time slice value in seconds
 		store.setDefault(ITourbookPreferences.APP_DATA_SPEED_MIN_TIMESLICE_VALUE, 10);
@@ -307,6 +327,9 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 		store.setDefault(ITourbookPreferences.BREAK_TIME_SHORTEST_TIME, 20);
 		store.setDefault(ITourbookPreferences.BREAK_TIME_MAX_DISTANCE, 20.0f);
 		store.setDefault(ITourbookPreferences.BREAK_TIME_SLICE_DIFF, 5); // 5 minutes
+
+		// DP tolerance when computing altitude up/down
+		store.setDefault(ITourbookPreferences.COMPUTED_ALTITUDE_DP_TOLERANCE, 7.0f);
 
 		/*
 		 * calendar week

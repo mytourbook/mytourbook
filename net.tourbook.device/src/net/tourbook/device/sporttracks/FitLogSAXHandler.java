@@ -21,7 +21,6 @@ import java.util.HashSet;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
-import net.tourbook.chart.ChartLabel;
 import net.tourbook.common.util.MtMath;
 import net.tourbook.common.util.Util;
 import net.tourbook.common.weather.IWeather;
@@ -34,6 +33,7 @@ import net.tourbook.database.TourDatabase;
 import net.tourbook.device.InvalidDeviceSAXException;
 import net.tourbook.device.Messages;
 import net.tourbook.preferences.TourTypeColorDefinition;
+import net.tourbook.ui.tourChart.ChartLabel;
 
 import org.eclipse.osgi.util.NLS;
 import org.joda.time.DateTime;
@@ -512,7 +512,6 @@ public class FitLogSAXHandler extends DefaultHandler {
 			tourMarker.setLabel(Integer.toString(lapCounter));
 			tourMarker.setSerieIndex(serieIndex);
 			tourMarker.setTime((int) lapRelativeTime);
-			tourMarker.setVisualPosition(ChartLabel.VISUAL_HORIZONTAL_ABOVE_GRAPH_CENTERED);
 
 			if (distanceSerie != null) {
 				tourMarker.setDistance(distanceSerie[serieIndex]);

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -70,24 +70,40 @@ public interface ITourbookPreferences {
 	 * Graphs
 	 */
 	public static final String	GRAPH_ALL									= "graphs.all";											//$NON-NLS-1$
-	public static final String	GRAPH_VISIBLE								= "graphs.visible";										//$NON-NLS-1$
-	public static final String	GRAPH_X_AXIS								= "graphs.x-axis";											//$NON-NLS-1$
-	public static final String	GRAPH_X_AXIS_STARTTIME						= "graphs.x-axis.starttime";								//$NON-NLS-1$
-	public static final String	GRAPH_IS_HR_ZONE_BACKGROUND_VISIBLE			= "Graph_HrZone_IsVisible";								//$NON-NLS-1$
-	public static final String	GRAPH_HR_ZONE_STYLE							= "Graph_HrZone_GraphType";								//$NON-NLS-1$
-	public static final String	GRAPH_TRANSPARENCY_LINE						= "Graph_Transparency_Line";								//$NON-NLS-1$
-	public static final String	GRAPH_TRANSPARENCY_FILLING					= "Graph_Transparency_Filling";							//$NON-NLS-1$
 	public static final String	GRAPH_ANTIALIASING							= "Graph_Antialiasing";									//$NON-NLS-1$
-
-	public static final String	GRAPH_ZOOM_AUTO_ZOOM_TO_SLIDER				= "graphs.zoom.autozoom-to-slider";						//$NON-NLS-1$
-	public static final String	GRAPH_MOVE_SLIDERS_WHEN_ZOOMED				= "graphs.move-sliders-when-zoomed";						//$NON-NLS-1$
-	public static final String	GRAPH_IS_SRTM_VISIBLE						= "Graph_IsSRTMVisible";									//$NON-NLS-1$
-	public static final String	GRAPH_IS_MARKER_VISIBLE						= "Graph_IsMarkerVisible";									//$NON-NLS-1$
+	public static final String	GRAPH_HR_ZONE_STYLE							= "Graph_HrZone_GraphType";								//$NON-NLS-1$
 	public static final String	GRAPH_IS_BREAKTIME_VALUES_VISIBLE			= "Graph_IsBreaktimeVisible";								//$NON-NLS-1$
-	public static final String	GRAPH_IS_TOUR_PHOTO_VISIBLE					= "GRAPH_IS_TOUR_PHOTO_VISIBLE";							//$NON-NLS-1$
+	public static final String	GRAPH_IS_HR_ZONE_BACKGROUND_VISIBLE			= "Graph_HrZone_IsVisible";								//$NON-NLS-1$
+	public static final String	GRAPH_IS_MARKER_VISIBLE						= "Graph_IsMarkerVisible";									//$NON-NLS-1$
+	public static final String	GRAPH_IS_SRTM_VISIBLE						= "Graph_IsSRTMVisible";									//$NON-NLS-1$
 	public static final String	GRAPH_IS_TOUR_PHOTO_TOOLTIP_VISIBLE			= "GRAPH_IS_TOUR_PHOTO_TOOLTIP_VISIBLE";					//$NON-NLS-1$
+	public static final String	GRAPH_IS_TOUR_PHOTO_VISIBLE					= "GRAPH_IS_TOUR_PHOTO_VISIBLE";							//$NON-NLS-1$
+
+	public static final String	GRAPH_MARKER_COLOR_DEFAULT					= "GRAPH_MARKER_COLOR_DEFAULT";							//$NON-NLS-1$
+	public static final String	GRAPH_MARKER_COLOR_DEVICE					= "GRAPH_MARKER_COLOR_DEVICE";								//$NON-NLS-1$
+	public static final String	GRAPH_MARKER_COLOR_HIDDEN					= "GRAPH_MARKER_COLOR_HIDDEN";								//$NON-NLS-1$
+	public static final String	GRAPH_MARKER_IS_DRAW_WITH_DEFAULT_COLOR		= "GRAPH_MARKER_IS_DRAW_WITH_DEFAULT_COLOR";				//$NON-NLS-1$
+	public static final String	GRAPH_MARKER_IS_MODIFIED					= "GRAPH_MARKER_IS_MODIFIED";								//$NON-NLS-1$
+	public static final String	GRAPH_MARKER_IS_SHOW_HIDDEN_MARKER			= "GRAPH_MARKER_IS_SHOW_HIDDEN_MARKER";					//$NON-NLS-1$
+	public static final String	GRAPH_MARKER_IS_SHOW_LABEL_TEMP_POSITION	= "GRAPH_MARKER_IS_SHOW_LABEL_TEMP_POSITION";				//$NON-NLS-1$
+	public static final String	GRAPH_MARKER_IS_SHOW_MARKER_LABEL			= "GRAPH_MARKER_IS_SHOW_MARKER_LABEL";						//$NON-NLS-1$
+	public static final String	GRAPH_MARKER_IS_SHOW_MARKER_POINT			= "GRAPH_MARKER_IS_SHOW_MARKER_POINT";						//$NON-NLS-1$
+	public static final String	GRAPH_MARKER_IS_SHOW_MARKER_TOOLTIP			= "GRAPH_MARKER_IS_SHOW_MARKER_TOOLTIP";					//$NON-NLS-1$
+	public static final String	GRAPH_MARKER_IS_SHOW_SIGN_IMAGE				= "GRAPH_MARKER_IS_SHOW_SIGN_IMAGE";						//$NON-NLS-1$
+	public static final String	GRAPH_MARKER_HOVER_SIZE						= "GRAPH_MARKER_HOVER_OFFSET";								//$NON-NLS-1$
+	public static final String	GRAPH_MARKER_LABEL_OFFSET					= "GRAPH_MARKER_LABEL_OFFSET";								//$NON-NLS-1$
+	public static final String	GRAPH_MARKER_LABEL_TEMP_POSITION			= "GRAPH_MARKER_LABEL_TEMP_POSITION";						//$NON-NLS-1$
+	public static final String	GRAPH_MARKER_POINT_SIZE						= "GRAPH_MARKER_POINT_SIZE";								//$NON-NLS-1$
+	public static final String	GRAPH_MARKER_SIGN_IMAGE_SIZE				= "GRAPH_MARKER_SIGN_IMAGE_SIZE";							//$NON-NLS-1$
 
 	public static final String	GRAPH_MOUSE_MODE							= "graph.toggle-mouse";									//$NON-NLS-1$
+	public static final String	GRAPH_MOVE_SLIDERS_WHEN_ZOOMED				= "graphs.move-sliders-when-zoomed";						//$NON-NLS-1$
+	public static final String	GRAPH_TRANSPARENCY_FILLING					= "Graph_Transparency_Filling";							//$NON-NLS-1$
+	public static final String	GRAPH_TRANSPARENCY_LINE						= "Graph_Transparency_Line";								//$NON-NLS-1$
+	public static final String	GRAPH_X_AXIS								= "graphs.x-axis";											//$NON-NLS-1$
+	public static final String	GRAPH_X_AXIS_STARTTIME						= "graphs.x-axis.starttime";								//$NON-NLS-1$
+	public static final String	GRAPH_VISIBLE								= "graphs.visible";										//$NON-NLS-1$
+	public static final String	GRAPH_ZOOM_AUTO_ZOOM_TO_SLIDER				= "graphs.zoom.autozoom-to-slider";						//$NON-NLS-1$
 
 	public static final String	GRAPH_PACE_MINMAX_IS_ENABLED				= "graph.pace.is-min-enabled";								//$NON-NLS-1$
 	public static final String	GRAPH_PACE_MIN_VALUE						= "graph.pace.min-value";									//$NON-NLS-1$
@@ -164,6 +180,11 @@ public interface ITourbookPreferences {
 	public static final String	BREAK_TIME_MAX_DISTANCE						= "BreakTime_MaxDistance";									//$NON-NLS-1$
 	public static final String	BREAK_TIME_SLICE_DIFF						= "BreakTime_SliceDiff";									//$NON-NLS-1$
 
+	/**
+	 * DP tolerance when computing altitude up/down
+	 */
+	public static final String	COMPUTED_ALTITUDE_DP_TOLERANCE				= "COMPUTED_ALTITUDE_DP_TOLERANCE";						//$NON-NLS-1$
+
 	/*
 	 * measurement system
 	 */
@@ -229,7 +250,6 @@ public interface ITourbookPreferences {
 	/*
 	 * id's for preference pages
 	 */
-	public static final String	PREF_PAGE_TAGS								= "net.tourbook.preferences.PrefPageTags";					//$NON-NLS-1$
 	public static final String	PREF_PAGE_TOUR_TYPE							= "net.tourbook.preferences.PrefPageTourTypeDefinition";	//$NON-NLS-1$
 	public static final String	PREF_PAGE_TOUR_TYPE_FILTER					= "net.tourbook.preferences.PrefPageTourTypeFilter";		//$NON-NLS-1$
 

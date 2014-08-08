@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -38,7 +38,7 @@ import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
 /**
- * Chart widget which represents the chart ui The chart consists of these components
+ * Chart widget which represents the chart UI.
  * <p>
  * The chart widget consists has the following heights:
  * 
@@ -153,8 +153,6 @@ public class ChartComponents extends Composite {
 
 	private ChartDrawingData		_chartDrawingData;
 
-	public boolean					_useAdvancedGraphics		= true;
-
 	private static final String		_monthLabels[]				= {
 			Messages.Month_jan,
 			Messages.Month_feb,
@@ -223,8 +221,9 @@ public class ChartComponents extends Composite {
 
 		super(parent, style);
 
-		GridData gd;
 		_chart = parent;
+
+		GridData gd;
 
 		// set layout for the components
 		gd = new GridData(SWT.FILL, SWT.FILL, true, true);
@@ -2083,7 +2082,7 @@ public class ChartComponents extends Composite {
 		return componentAxisRight;
 	}
 
-	ChartComponentGraph getChartComponentGraph() {
+	public ChartComponentGraph getChartComponentGraph() {
 		return componentGraph;
 	}
 
@@ -2202,6 +2201,8 @@ public class ChartComponents extends Composite {
 
 		componentGraph.updateChartSize();
 
+		_chart.onExternalChartResize();
+
 		// synchronize chart
 		final SynchConfiguration synchConfig = createSynchConfig();
 		if (synchConfig != null) {
@@ -2283,11 +2284,11 @@ public class ChartComponents extends Composite {
 			componentGraph.updateVisibleMinMaxValues();
 		}
 
+		/*
+		 * resetting the sliders require that the drawing data are created, this is done in the
+		 * onResize method
+		 */
 		if (onResize()) {
-			/*
-			 * resetting the sliders require that the drawing data are created, this is done in the
-			 * onResize method
-			 */
 			if (_devSliderBarHeight > 0) {
 				componentGraph.resetSliders();
 			}

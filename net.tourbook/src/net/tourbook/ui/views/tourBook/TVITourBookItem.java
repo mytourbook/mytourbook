@@ -120,9 +120,12 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
 
 	int								colNumberOfTimeSlices;
 	int								colNumberOfPhotos;
+	int								colDPTolerance;
 
 	TVITourBookItem(final TourBookView view) {
+
 		tourBookView = view;
+
 		calendar.setFirstDayOfWeek(prefStore.getInt(ITourbookPreferences.CALENDAR_WEEK_FIRST_DAY_OF_WEEK));
 		calendar.setMinimalDaysInFirstWeek(prefStore.getInt(ITourbookPreferences.CALENDAR_WEEK_MIN_DAYS_IN_FIRST_WEEK));
 	}

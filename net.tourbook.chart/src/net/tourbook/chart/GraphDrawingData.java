@@ -108,6 +108,7 @@ public class GraphDrawingData {
 	private ChartDrawingData		chartDrawingData;
 
 	public GraphDrawingData(final ChartDrawingData chartDrawingData, final ChartType chartType) {
+
 		this.chartDrawingData = chartDrawingData;
 		_chartType = chartType;
 	}

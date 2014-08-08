@@ -33,6 +33,11 @@ Create Translation Archive
 	- delete all folders but NOT ".metadata"
 	- extract "mt-translations.zip" into this folder
 
+	- switch to workspace "C:\DAT\ws_mt-Translation-TEST"
+		- refresh all projects with F5
+		- run Project/clean... for all projects
+	
+
 ############
 
 Create Build
@@ -40,7 +45,9 @@ Create Build
 ############
 
 requirements:
+
 - buckminster is installed to see better error messages
+  (buckminster developemnet is not continued, TYCHO is used to build eclipse projects)
 
 - switch to workspace "C:\DAT\ws_mt-with-GIT"
 
@@ -70,6 +77,9 @@ Create Update Site
 
 ##################
 
+- check which plugins needs to be contained in the update site
+- update plugin version number
+
 - create translation archive when necessary, see above instructions
 
 - switch to workspace "C:\DAT\ws_mt-with-GIT"
@@ -84,3 +94,4 @@ Create Update Site
 
 - run script "clear-update-site.xml" in the project "update-site.mytourbook"
 - build the update site within site.xml
+

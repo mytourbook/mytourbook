@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -18,7 +18,7 @@ package net.tourbook.chart;
 import org.eclipse.jface.viewers.ISelection;
 
 /**
- * contains the value index for the sliders
+ * Contains the value index for the sliders.
  */
 public class SelectionChartXSliderPosition implements ISelection {
 
@@ -79,6 +79,10 @@ public class SelectionChartXSliderPosition implements ISelection {
 		return _chart;
 	}
 
+	/**
+	 * @return Returns the value index for the left slider or {@link #IGNORE_SLIDER_POSITION} when
+	 *         this value index should not be used.
+	 */
 	public int getLeftSliderValueIndex() {
 		return _leftSliderValueIndex;
 	}

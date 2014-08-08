@@ -151,10 +151,24 @@ public class ColumnDefinition implements Cloneable {
 		return _columnControlListener;
 	}
 
+	/**
+	 * @return Returns the text which is displayed in the column header.
+	 */
+	public String getColumnHeaderText() {
+		return _columnText;
+	}
+
+	public String getColumnHeaderToolTipText() {
+		return _columnToolTipText;
+	}
+
 	public String getColumnId() {
 		return _columnId;
 	}
 
+	/**
+	 * @return Returns the text which is displayed in the column modification dialog.
+	 */
 	public String getColumnLabel() {
 		return _label;
 	}
@@ -165,14 +179,6 @@ public class ColumnDefinition implements Cloneable {
 
 	public int getColumnStyle() {
 		return _style;
-	}
-
-	public String getColumnText() {
-		return _columnText;
-	}
-
-	public String getColumnToolTipText() {
-		return _columnToolTipText;
 	}
 
 	public String getColumnUnit() {
@@ -248,13 +254,21 @@ public class ColumnDefinition implements Cloneable {
 	 * 
 	 * @param text
 	 */
-	public void setColumnHeader(final String text) {
+	public void setColumnHeaderText(final String text) {
 		_columnText = text;
 	}
 
 	/**
+	 * @param toolTipText
+	 *            Text is displayed as tooltip in the column header
+	 */
+	public void setColumnHeaderToolTipText(final String toolTipText) {
+		_columnToolTipText = toolTipText;
+	}
+
+	/**
 	 * @param label
-	 *            Text is displayed in the column modification dialog
+	 *            This text is displayed in the column modification dialog.
 	 */
 	public void setColumnLabel(final String label) {
 		_label = label;
@@ -267,14 +281,6 @@ public class ColumnDefinition implements Cloneable {
 	 */
 	public void setColumnResizable(final boolean isResizable) {
 		_isColumnResizable = isResizable;
-	}
-
-	/**
-	 * @param toolTipText
-	 *            Text is displayed as tooltip in the column header
-	 */
-	public void setColumnToolTipText(final String toolTipText) {
-		_columnToolTipText = toolTipText;
 	}
 
 	/**

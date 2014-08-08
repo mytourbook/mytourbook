@@ -18,6 +18,8 @@ package net.tourbook.common.util;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -27,6 +29,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
@@ -35,14 +38,12 @@ import java.util.Calendar;
 import net.tourbook.common.UI;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Resource;
 import org.eclipse.swt.widgets.Combo;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Scale;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Spinner;
@@ -119,13 +120,24 @@ public class Util {
 		}
 	}
 
+	public static void closeSql(final Connection conn) {
+
+		if (conn != null) {
+			try {
+				conn.close();
+			} catch (final SQLException e) {
+				SQLUtils.showSQLException(e);
+			}
+		}
+	}
+
 	public static void closeSql(final Statement stmt) {
 
 		if (stmt != null) {
 			try {
 				stmt.close();
 			} catch (final SQLException e) {
-				showSQLException(e);
+				SQLUtils.showSQLException(e);
 			}
 		}
 	}
@@ -241,32 +253,6 @@ public class Util {
 		}
 
 		return floatValues;
-	}
-
-	/**
-	 * To convert the InputStream to String we use the BufferedReader.readLine() method. We iterate
-	 * until the BufferedReader return null which means there's no more data to read. Each line will
-	 * appended to a StringBuilder and returned as String.
-	 */
-	public static String convertStreamToString(final InputStream is) throws IOException {
-
-		if (is != null) {
-
-			final StringBuilder sb = new StringBuilder();
-			String line;
-
-			try {
-				final BufferedReader reader = new BufferedReader(new InputStreamReader(is, UI.UTF_8));
-				while ((line = reader.readLine()) != null) {
-					sb.append(line).append(UI.NEW_LINE);
-				}
-			} finally {
-				is.close();
-			}
-			return sb.toString();
-		} else {
-			return UI.EMPTY_STRING;
-		}
 	}
 
 	/**
@@ -1321,6 +1307,58 @@ public class Util {
 	}
 
 	/**
+	 * Load a text file.
+	 * @param fileName
+	 * @return Returns the content from a text file
+	 */
+	public static String readContentFromFile(final String fileName) {
+
+		String content = UI.EMPTY_STRING;
+
+		try {
+
+			final FileInputStream stream = new FileInputStream(fileName);
+
+			content = readContentFromStream(stream);
+
+		} catch (final FileNotFoundException e) {
+			StatusUtil.showStatus(e);
+		} catch (final IOException e) {
+			StatusUtil.showStatus(e);
+		}
+
+		return content;
+	}
+
+	/**
+	 * To convert the InputStream to String we use the BufferedReader.readLine() method. We iterate
+	 * until the BufferedReader return null which means there's no more data to read. Each line will
+	 * appended to a StringBuilder and returned as String.
+	 */
+	public static String readContentFromStream(final InputStream inputStream) throws IOException {
+ 
+		if (inputStream != null) {
+
+			final StringBuilder sb = new StringBuilder();
+			String line;
+
+			try {
+
+				final BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, UI.UTF_8));
+
+				while ((line = reader.readLine()) != null) {
+					sb.append(line).append(UI.NEW_LINE);
+				}
+			} finally {
+				inputStream.close();
+			}
+			return sb.toString();
+		} else {
+			return UI.EMPTY_STRING;
+		}
+	}
+
+	/**
 	 * @param unitValue
 	 * @return Returns unit value rounded to the number of 50/20/10/5/2/1
 	 */
@@ -1773,24 +1811,6 @@ public class Util {
 			colorValue.putInteger(ATTR_COLOR_GREEN, rgb.green);
 			colorValue.putInteger(ATTR_COLOR_BLUE, rgb.blue);
 		}
-	}
-
-	public static void showSQLException(SQLException e) {
-
-		while (e != null) {
-
-			final String sqlExceptionText = getSQLExceptionText(e);
-
-			System.out.println(sqlExceptionText);
-			e.printStackTrace();
-
-			MessageDialog.openError(Display.getCurrent().getActiveShell(), //
-					"SQL Error",//$NON-NLS-1$
-					sqlExceptionText);
-
-			e = e.getNextException();
-		}
-
 	}
 
 	/**

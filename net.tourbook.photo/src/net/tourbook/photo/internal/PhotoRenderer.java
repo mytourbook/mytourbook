@@ -39,12 +39,12 @@ import net.tourbook.photo.PhotoManager;
 import net.tourbook.photo.PhotoSqlLoadingState;
 import net.tourbook.photo.PhotoUI;
 import net.tourbook.photo.RatingStars;
+import net.tourbook.photo.RendererHelper;
 import net.tourbook.photo.internal.gallery.MT20.AbstractGalleryMT20ItemRenderer;
 import net.tourbook.photo.internal.gallery.MT20.DefaultGalleryMT20ItemRenderer;
 import net.tourbook.photo.internal.gallery.MT20.GalleryMT20;
 import net.tourbook.photo.internal.gallery.MT20.GalleryMT20Item;
 import net.tourbook.photo.internal.gallery.MT20.PaintingResult;
-import net.tourbook.photo.internal.gallery.MT20.RendererHelper;
 import net.tourbook.photo.internal.gallery.MT20.ZoomState;
 import net.tourbook.photo.internal.manager.ExifCache;
 

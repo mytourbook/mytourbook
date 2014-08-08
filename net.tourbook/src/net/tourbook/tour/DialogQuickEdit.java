@@ -179,15 +179,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
 
 		super.createButtonsForButtonBar(parent);
 
-		// set text for the OK button
-		String okText = null;
-
-		final TourDataEditorView tourDataEditor = TourManager.getTourDataEditor();
-		if ((tourDataEditor != null) && tourDataEditor.isDirty() && (tourDataEditor.getTourData() == _tourData)) {
-			okText = Messages.app_action_update;
-		} else {
-			okText = Messages.app_action_save;
-		}
+		final String okText = net.tourbook.ui.UI.convertOKtoSaveUpdateButton(_tourData);
 
 		getButton(IDialogConstants.OK_ID).setText(okText);
 	}

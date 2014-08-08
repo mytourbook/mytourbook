@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -24,8 +24,9 @@ import org.eclipse.swt.graphics.Point;
  */
 public class PhotoCategory {
 
-	ArrayList<ChartPhoto>				chartPhotos;
 	final ChartPhotoType				photoType;
+
+	ArrayList<ChartPhoto>				chartPhotos;
 
 	public ArrayList<PhotoPaintGroup>	paintGroups	= new ArrayList<PhotoPaintGroup>();
 

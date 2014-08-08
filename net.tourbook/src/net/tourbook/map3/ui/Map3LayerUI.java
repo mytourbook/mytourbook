@@ -70,7 +70,7 @@ import cop.swt.widgets.viewers.table.celleditors.SpinnerCellEditor;
  */
 public class Map3LayerUI {
 
-	private static final String			OPACITY_CAN_NOT_BE_SET	= "....";
+	private static final String			OPACITY_CAN_NOT_BE_SET	= "...."; //$NON-NLS-1$
 
 	public static final Double			DEFAULT_OPACITY			= new Double(1.0);
 
@@ -269,10 +269,13 @@ public class Map3LayerUI {
 
 		Tree tree;
 		{
-			tree = new Tree(layoutContainer, SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER
-//					| SWT.MULTI
-					| SWT.FULL_SELECTION
-					| SWT.CHECK);
+			tree = new Tree(layoutContainer, //
+					SWT.H_SCROLL //
+							| SWT.V_SCROLL
+//							| SWT.BORDER
+//							| SWT.MULTI
+							| SWT.FULL_SELECTION
+							| SWT.CHECK);
 
 			tree.setHeaderVisible(true);
 			tree.setLinesVisible(false);

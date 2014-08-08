@@ -36,6 +36,7 @@ import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.PostSelectionProvider;
+import net.tourbook.common.util.SQLUtils;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
@@ -59,7 +60,6 @@ import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.MessageDialogWithToggle;
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.window.Window;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
@@ -69,9 +69,6 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.ui.IWorkbenchPart;
-import org.eclipse.ui.IWorkbenchPartReference;
-import org.eclipse.ui.IWorkbenchPartSite;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
@@ -755,16 +752,9 @@ public class TourPhotoManager implements IPhotoServiceProvider {
 			}
 
 		} catch (final SQLException e) {
-			net.tourbook.ui.UI.showSQLException(e);
+			SQLUtils.showSQLException(e);
 		} finally {
-
-			if (conn != null) {
-				try {
-					conn.close();
-				} catch (final SQLException e) {
-					net.tourbook.ui.UI.showSQLException(e);
-				}
-			}
+			Util.closeSql(conn);
 		}
 
 		return tourPhotoImages;
@@ -808,16 +798,9 @@ public class TourPhotoManager implements IPhotoServiceProvider {
 			numberOfTours = result.getInt(1);
 
 		} catch (final SQLException e) {
-			net.tourbook.ui.UI.showSQLException(e);
+			SQLUtils.showSQLException(e);
 		} finally {
-
-			if (conn != null) {
-				try {
-					conn.close();
-				} catch (final SQLException e) {
-					net.tourbook.ui.UI.showSQLException(e);
-				}
-			}
+			Util.closeSql(conn);
 		}
 
 		return numberOfTours;
@@ -1030,39 +1013,9 @@ public class TourPhotoManager implements IPhotoServiceProvider {
 			// fire a selection for the first tour
 
 			final long tourId = ref.tourId;
+			final SelectionTourId selection = new SelectionTourId(tourId);
 
-			final IWorkbenchWindow wbWin = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-			if (wbWin != null) {
-
-				final IWorkbenchPage wbWinPage = wbWin.getActivePage();
-				if (wbWinPage != null) {
-
-					final IWorkbenchPart wbWinPagePart = wbWinPage.getActivePart();
-					if (wbWinPagePart != null) {
-
-						final IWorkbenchPartSite site = wbWinPagePart.getSite();
-						if (site != null) {
-
-							final ISelectionProvider selectionProvider = site.getSelectionProvider();
-							if (selectionProvider instanceof PostSelectionProvider) {
-
-								/*
-								 * restore view state when this view is maximized
-								 */
-								final IWorkbenchPartReference activePartReference = wbWinPage.getActivePartReference();
-								final int partState = wbWinPage.getPartState(activePartReference);
-
-								if (partState != IWorkbenchPage.STATE_RESTORED) {
-									wbWinPage.setPartState(activePartReference, IWorkbenchPage.STATE_RESTORED);
-								}
-
-								// fire selection
-								((PostSelectionProvider) selectionProvider).setSelection(new SelectionTourId(tourId));
-							}
-						}
-					}
-				}
-			}
+			PostSelectionProvider.fireSelection(selection);
 
 			break;
 		}

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -18,7 +18,7 @@ package net.tourbook.database;
 import net.tourbook.data.TourData;
 
 /**
- * Interface to compute tour values for one {@link TourData}
+ * Interface to compute tour values for {@link TourData}
  */
 public interface IComputeTourValues {
 

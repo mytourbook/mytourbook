@@ -338,6 +338,14 @@ public class PhotoLoadManager {
 		_executorExif.submit(executorTask);
 	}
 
+	/**
+	 * @param galleryItem
+	 *            Gallery item is used to check if it is still visible. Can be <code>null</code>,
+	 *            then the visibility is not checked.
+	 * @param photo
+	 * @param imageQuality
+	 * @param loadCallBack
+	 */
 	private static void putImageInLoadingQueueHQ(	final GalleryMT20Item galleryItem,
 													final Photo photo,
 													final ImageQuality imageQuality,
@@ -364,7 +372,7 @@ public class PhotoLoadManager {
 					return;
 				}
 
-				if (isImageVisible(galleryItem) == false) {
+				if (galleryItem != null && isImageVisible(galleryItem) == false) {
 
 					resetLoadingState(photo, imageQuality);
 
@@ -460,6 +468,14 @@ public class PhotoLoadManager {
 		_executorOriginal.submit(executorTask);
 	}
 
+	/**
+	 * @param galleryItem
+	 *            Gallery item is used to check if it is still visible. Can be <code>null</code>,
+	 *            then the visibility is not checked.
+	 * @param photo
+	 * @param imageQuality
+	 * @param imageLoadCallback
+	 */
 	public static void putImageInLoadingQueueThumbGallery(	final GalleryMT20Item galleryItem,
 															final Photo photo,
 															final ImageQuality imageQuality,
@@ -506,7 +522,7 @@ public class PhotoLoadManager {
 
 				} else {
 
-					if (isImageVisible(galleryItem) == false) {
+					if (galleryItem != null && isImageVisible(galleryItem) == false) {
 
 						resetLoadingState(photo, imageQuality);
 
@@ -517,7 +533,7 @@ public class PhotoLoadManager {
 
 						// HQ image is requested
 
-						PhotoLoadManager.putImageInLoadingQueueHQ(//
+						putImageInLoadingQueueHQ(//
 								galleryItem,
 								photo,
 								imageQuality,

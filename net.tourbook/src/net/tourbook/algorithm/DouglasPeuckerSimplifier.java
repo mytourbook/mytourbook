@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -22,7 +22,7 @@ public class DouglasPeuckerSimplifier {
 	/**
 	 * Approximation tolerance
 	 */
-	private long		_tolerance;
+	private float		_tolerance;
 
 	private DPPoint[]	_graphPoints;
 
@@ -31,12 +31,13 @@ public class DouglasPeuckerSimplifier {
 	 */
 	private boolean[]	_usedPoints;
 
-	public DouglasPeuckerSimplifier(final int tolerance, final DPPoint[] graphPoints) {
+	public DouglasPeuckerSimplifier(final float tolerance, final DPPoint[] graphPoints) {
+
 		_tolerance = tolerance;
 		_graphPoints = graphPoints;
 	}
 
-	public Object[] simplify() {
+	public DPPoint[] simplify() {
 
 		// set all used points to false
 		_usedPoints = new boolean[_graphPoints.length];
@@ -60,7 +61,7 @@ public class DouglasPeuckerSimplifier {
 			}
 		}
 
-		return simplifiedPoints.toArray();
+		return simplifiedPoints.toArray(new DPPoint[simplifiedPoints.size()]);
 	}
 
 	private void simplifySection(final int startIndex, final int endIndex) {

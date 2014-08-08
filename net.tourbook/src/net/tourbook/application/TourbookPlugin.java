@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -28,6 +28,7 @@ import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.osgi.framework.internal.core.AbstractBundle;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
@@ -105,6 +106,10 @@ public class TourbookPlugin extends AbstractUIPlugin {
 		return _instance;
 	}
 
+	public static Image getImage(final String imagePath) {
+		return getImageDescriptor(imagePath).createImage();
+	}
+
 	/**
 	 * Returns an image descriptor for images in the plug-in path.
 	 * 
@@ -158,7 +163,7 @@ public class TourbookPlugin extends AbstractUIPlugin {
 	}
 
 	/**
-	 * This is a shortcut for {@link #getDialogSettingsSection(String)}
+	 * This is a shortcut for {@link getDefault().getDialogSettingsSection(String)}
 	 * 
 	 * @param stateSectionName
 	 * @return

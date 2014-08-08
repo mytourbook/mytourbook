@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -13,7 +13,6 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-
 package net.tourbook.data;
 
 import static javax.persistence.CascadeType.ALL;
@@ -36,55 +35,73 @@ import net.tourbook.database.TourDatabase;
 @Entity
 public class TourTag implements Comparable<Object> {
 
-	public static final int				DB_LENGTH_NAME				= 255;
+	public static final int		DB_LENGTH_NAME				= 255;
 
-	public static final int				EXPAND_TYPE_YEAR_MONTH_DAY	= 0;
-	public static final int				EXPAND_TYPE_FLAT			= 1;
-	public static final int				EXPAND_TYPE_YEAR_DAY		= 2;
+	public static final int		EXPAND_TYPE_YEAR_MONTH_DAY	= 0;
+	public static final int		EXPAND_TYPE_FLAT			= 1;
+	public static final int		EXPAND_TYPE_YEAR_DAY		= 2;
 
 	/*
-	 * DON'T USE THE FINAL KEYWORD FOR THE ID because the Id cannot be set
+	 * DON'T USE THE FINAL KEYWORD FOR THE ID otherwise the Id cannot be set.
 	 */
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private long						tagId						= TourDatabase.ENTITY_IS_NOT_SAVED;
+	private long				tagId						= TourDatabase.ENTITY_IS_NOT_SAVED;
 
 	/**
 	 * This is a root tag when set to <code>1</code>, derby does not support BOOLEAN, 1 =
 	 * <code>true</code>, 0 = <code>false</code>
 	 */
-	private int							isRoot						= 0;
+	private int					isRoot						= 0;
 
 	/**
 	 * Display name of the tag
 	 */
 	@Basic(optional = false)
-	private String						name;
+	private String				name;
 
 	/**
 	 * when a tag is expanded in the tag tree viewer, the tours can be displayed in different
 	 * structures
 	 */
-	private int							expandType					= EXPAND_TYPE_FLAT;
+	private int					expandType					= EXPAND_TYPE_FLAT;
 
+	/**
+	 * Contains all tours are associated with this tag.
+	 */
 	@ManyToMany(mappedBy = "tourTags", cascade = ALL, fetch = LAZY)
-	private final Set<TourData>			tourData					= new HashSet<TourData>();
+	private final Set<TourData>	tourData					= new HashSet<TourData>();
 
-	@ManyToMany(mappedBy = "tourTags", cascade = ALL, fetch = LAZY)
-	private final Set<TourTagCategory>	tourTagCategory				= new HashSet<TourTagCategory>();
+//	/**
+//	 * A tag belongs to <b>ONE</b> category and not to many as it was implemented in version 14.4
+//	 * and before.
+//	 * <p>
+//	 * This new field needs a column in the db table but the column in the db is empty for entities
+//	 * which are created before 14.4 but it's still working ???
+//	 * <p>
+//	 * <p>
+//	 * <b>Old Implementation</b>
+//	 *
+//	 * <pre>
+//	 * &#064;ManyToMany(mappedBy = &quot;tourTags&quot;, cascade = ALL, fetch = LAZY)
+//	 * private final Set&lt;TourTagCategory&gt;	tourTagCategory	= new HashSet&lt;TourTagCategory&gt;();
+//	 * </pre>
+//	 */
+//	@ManyToOne()
+//	private TourTagCategory		tourTagCategory;
 
 	/**
 	 * unique id for manually created tour types because the {@link #tagId} is -1 when it's not
 	 * persisted
 	 */
 	@Transient
-	private long						_createId					= 0;
+	private long				_createId					= 0;
 
 	/**
 	 * manually created marker or imported marker create a unique id to identify them, saved marker
 	 * are compared with the marker id
 	 */
-	private static int					_createCounter				= 0;
+	private static int			_createCounter				= 0;
 
 	public TourTag() {}
 
@@ -138,10 +155,6 @@ public class TourTag implements Comparable<Object> {
 		return expandType;
 	}
 
-	public Set<TourTagCategory> getTagCategories() {
-		return tourTagCategory;
-	}
-
 	public long getTagId() {
 		return tagId;
 	}
@@ -162,14 +175,6 @@ public class TourTag implements Comparable<Object> {
 		result = prime * result + (int) (tagId ^ (tagId >>> 32));
 		return result;
 	}
-
-//	@Override
-//	public int hashCode() {
-//		int result = 17;
-//		result = prime * result + (int) (_createId ^ (_createId >>> 32));
-//		result = (int) (37 * result + tagId);
-//		return result;
-//	}
 
 	public boolean isRoot() {
 		return isRoot == 1;

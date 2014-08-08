@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -41,15 +41,15 @@ public class TVITagViewYear extends TVITagViewItem {
 	 * <code>true</code> when the children of this year item contains month items<br>
 	 * <code>false</code> when the children of this year item contains tour items
 	 */
-	private boolean					fIsMonth;
+	private boolean					_isMonth;
 
 	public TVITagViewYear(final TVITagViewTag parentItem, final int year, final boolean isMonth) {
-		
+
 		setParentItem(parentItem);
-		
+
 		_tagItem = parentItem;
 		_year = year;
-		fIsMonth = isMonth;
+		_isMonth = isMonth;
 	}
 
 	/**
@@ -87,7 +87,7 @@ public class TVITagViewYear extends TVITagViewItem {
 		}
 
 		final TVITagViewYear other = (TVITagViewYear) obj;
-		if (fIsMonth != other.fIsMonth) {
+		if (_isMonth != other._isMonth) {
 			return false;
 		}
 		if (_year != other._year) {
@@ -108,7 +108,7 @@ public class TVITagViewYear extends TVITagViewItem {
 	@Override
 	protected void fetchChildren() {
 
-		if (fIsMonth) {
+		if (_isMonth) {
 			setChildren(readYearChildrenMonths());
 		} else {
 			setChildren(readYearChildrenTours());
@@ -131,7 +131,7 @@ public class TVITagViewYear extends TVITagViewItem {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + (fIsMonth ? 1231 : 1237);
+		result = prime * result + (_isMonth ? 1231 : 1237);
 		result = prime * result + ((_tagItem == null) ? 0 : _tagItem.hashCode());
 		result = prime * result + _year;
 		return result;
@@ -146,7 +146,7 @@ public class TVITagViewYear extends TVITagViewItem {
 			/*
 			 * get all tours for the tag Id of this tree item
 			 */
-			
+
 			final SQLFilter sqlFilter = new SQLFilter();
 			final StringBuilder sb = new StringBuilder();
 
@@ -156,7 +156,7 @@ public class TVITagViewYear extends TVITagViewItem {
 
 			sb.append(SQL_SUM_COLUMNS);
 
-			sb.append(" FROM " + TourDatabase.JOINTABLE_TOURDATA__TOURTAG + " jTdataTtag"); //$NON-NLS-1$ //$NON-NLS-2$
+			sb.append(" FROM " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + " jTdataTtag"); //$NON-NLS-1$ //$NON-NLS-2$
 
 			// get all tours for current tag and year
 			sb.append(" LEFT OUTER JOIN " + TourDatabase.TABLE_TOUR_DATA + " TourData"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -209,7 +209,7 @@ public class TVITagViewYear extends TVITagViewItem {
 			/*
 			 * get all tours for the tag Id of this tree item
 			 */
-			
+
 			final SQLFilter sqlFilter = new SQLFilter();
 			final StringBuilder sb = new StringBuilder();
 
@@ -219,14 +219,14 @@ public class TVITagViewYear extends TVITagViewItem {
 			sb.append(" jTdataTtag2.TourTag_tagId,");//			2 //$NON-NLS-1$
 			sb.append(TVITagViewTour.SQL_TOUR_COLUMNS); //		3
 
-			sb.append(" FROM " + TourDatabase.JOINTABLE_TOURDATA__TOURTAG + " jTdataTtag"); //$NON-NLS-1$ //$NON-NLS-2$
+			sb.append(" FROM " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + " jTdataTtag"); //$NON-NLS-1$ //$NON-NLS-2$
 
 			// get all tours for current tag and year/month
 			sb.append(" LEFT OUTER JOIN " + TourDatabase.TABLE_TOUR_DATA + " TourData"); //$NON-NLS-1$ //$NON-NLS-2$
 			sb.append(" ON jTdataTtag.TourData_tourId=TourData.tourId "); //$NON-NLS-1$
 
 			// get all tag id's for one tour
-			sb.append(" LEFT OUTER JOIN " + TourDatabase.JOINTABLE_TOURDATA__TOURTAG + " jTdataTtag2"); //$NON-NLS-1$ //$NON-NLS-2$
+			sb.append(" LEFT OUTER JOIN " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + " jTdataTtag2"); //$NON-NLS-1$ //$NON-NLS-2$
 			sb.append(" ON TourData.tourID = jTdataTtag2.TourData_tourId"); //$NON-NLS-1$
 
 			sb.append(" WHERE jTdataTtag.TourTag_TagId=?"); //$NON-NLS-1$
@@ -262,7 +262,7 @@ public class TVITagViewYear extends TVITagViewItem {
 				} else {
 
 					// resultset contains a new tour
-					
+
 					tourItem = new TVITagViewTour(this);
 
 					children.add(tourItem);
@@ -282,5 +282,18 @@ public class TVITagViewYear extends TVITagViewItem {
 		}
 
 		return children;
+	}
+
+	@Override
+	public String toString() {
+		return "TVITagViewYear " //$NON-NLS-1$
+				+ System.identityHashCode(this)
+				+ " [_year=" //$NON-NLS-1$
+				+ _year
+				+ ", _isMonth=" //$NON-NLS-1$
+				+ _isMonth
+				+ ", _tagItem=" //$NON-NLS-1$
+				+ _tagItem
+				+ "]"; //$NON-NLS-1$
 	}
 }

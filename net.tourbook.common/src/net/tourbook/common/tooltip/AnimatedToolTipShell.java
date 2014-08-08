@@ -77,6 +77,12 @@ public abstract class AnimatedToolTipShell {
 	private ToolTipDisplayListener		_ttDisplayListener;
 
 	/**
+	 * When <code>true</code> (default) the tooltip will be moved from the previous location to the
+	 * current location.
+	 */
+	private boolean						_isAnimateLocation						= true;
+
+	/**
 	 * Keep track of added display listener that no more than <b>1</b> is set.
 	 */
 	private boolean						_isDisplayListenerSet;
@@ -90,6 +96,12 @@ public abstract class AnimatedToolTipShell {
 	 * Is <code>true</code> when shell is fading in, otherwise <code>false</code>.
 	 */
 	private boolean						_isShellFadingIn;
+
+	/**
+	 * When <code>true</code> (default) the shell trim style is used to create the tooltip shell
+	 * which creates a border. Set <code>false</code> to hide the border.
+	 */
+	private boolean						_isShowShellTrimStyle					= true;
 
 	private Point						_shellStartLocation;
 	private Point						_shellEndLocation						= new Point(0, 0);
@@ -335,7 +347,7 @@ public abstract class AnimatedToolTipShell {
 			// set new end location
 			_shellEndLocation = shellEndLocation;
 
-			if (isShellVisible) {
+			if (isShellVisible && _isAnimateLocation) {
 
 				// shell is already visible, move from the current position to the target position
 
@@ -407,12 +419,17 @@ public abstract class AnimatedToolTipShell {
 					final boolean isInTarget = shellCurrentLocation.x == shellEndX
 							&& shellCurrentLocation.y == shellEndY;
 
-					final int diffAlpha = ALPHA_OPAQUE / _fadeInSteps;
-
-					newAlpha = currentAlpha + diffAlpha;
-					if (newAlpha > ALPHA_OPAQUE) {
+					if (_fadeInSteps <= 0) {
 						newAlpha = ALPHA_OPAQUE;
+					} else {
+						final int diffAlpha = ALPHA_OPAQUE / _fadeInSteps;
+
+						newAlpha = currentAlpha + diffAlpha;
+						if (newAlpha > ALPHA_OPAQUE) {
+							newAlpha = ALPHA_OPAQUE;
+						}
 					}
+
 					finalFadeAlpha = ALPHA_OPAQUE;
 
 					if (isInTarget && currentAlpha == ALPHA_OPAQUE) {
@@ -453,10 +470,17 @@ public abstract class AnimatedToolTipShell {
 						return;
 					}
 
-					final int alphaDiff = ALPHA_OPAQUE / _fadeOutSteps;
+					if (_fadeInSteps <= 0) {
 
-					newAlpha = currentAlpha - alphaDiff;
-					finalFadeAlpha = 0;
+						newAlpha = 0;
+
+					} else {
+
+						final int alphaDiff = ALPHA_OPAQUE / _fadeOutSteps;
+
+						newAlpha = currentAlpha - alphaDiff;
+						finalFadeAlpha = 0;
+					}
 
 					if (newAlpha <= 0) {
 
@@ -524,7 +548,8 @@ public abstract class AnimatedToolTipShell {
 
 	/**
 	 * @return When <code>false</code> is returned, the tooltip will <b>not</b> be closed. This can
-	 *         be used when the tooltip opens another dialog which prevents to close this tooltip.
+	 *         be used when the tooltip opens another dialog which prevents to close this tooltip,
+	 *         default is <code>true</code>.
 	 */
 	protected boolean canCloseToolTip() {
 		return true;
@@ -554,18 +579,18 @@ public abstract class AnimatedToolTipShell {
 	 * @return Returns <code>true</code> to close the shell after it is completely hidden.
 	 */
 	protected boolean closeShellAfterHidden() {
-		
+
 		return false;
 	}
 
 	/**
 	 * Creates the content area of the the tooltip.
 	 * 
-	 * @param parent
+	 * @param shell
 	 *            the parent of the content area
 	 * @return the content area created
 	 */
-	protected abstract Composite createToolTipContentArea(Composite parent);
+	protected abstract Composite createToolTipContentArea(Composite shell);
 
 	/**
 	 * Create a shell but do not display it
@@ -578,19 +603,23 @@ public abstract class AnimatedToolTipShell {
 		boolean isShellCreated = false;
 		boolean isCreateContent = false;
 
+		final int trimStyle = _isShowShellTrimStyle ? 0 : SWT.NO_TRIM;
+
 		if (_shell == null || _shell.isDisposed()) {
 
 			/*
 			 * create shell
 			 */
-			_shell = new Shell(_ownerControl.getShell(), //
-					SWT.ON_TOP //
-							/*
-							 * SWT.TOOL must be disabled that NO_FOCUS is working !!!
-							 */
+			final int shellStyle = SWT.ON_TOP //
+					/*
+					 * SWT.TOOL must be disabled that NO_FOCUS is working !!!
+					 */
 //							| SWT.TOOL
 //							| SWT.RESIZE
-							| SWT.NO_FOCUS);
+					| SWT.NO_FOCUS
+					| trimStyle;
+
+			_shell = new Shell(_ownerControl.getShell(), shellStyle);
 
 			_shell.setLayout(new FillLayout());
 
@@ -645,8 +674,7 @@ public abstract class AnimatedToolTipShell {
 			}
 
 			if (rightBottomBounds.y > displayBounds.y + displayBounds.height) {
-// ignore when tt is below the bottom, force the user to resize the tt
-//				location.y -= rightBottomBounds.y - (displayBounds.y + displayBounds.height);
+				location.y -= rightBottomBounds.y - (displayBounds.y + displayBounds.height);
 			}
 
 			if (location.x < displayBounds.x) {
@@ -726,6 +754,14 @@ public abstract class AnimatedToolTipShell {
 	private boolean isShellHidden() {
 
 		return _shell == null || _shell.isDisposed() || _shell.isVisible() == false;
+	}
+
+	/**
+	 * @return Returns <code>true</code> when the tooltip is opened but is started to close it.
+	 */
+	public boolean isTooltipClosing() {
+
+		return _isShellFadingOut && isToolTipVisible();
 	}
 
 	public boolean isToolTipVisible() {
@@ -817,8 +853,8 @@ public abstract class AnimatedToolTipShell {
 					if (_mouseOverBehaviour == MOUSE_OVER_BEHAVIOUR_NO_IGNORE) {
 
 						/*
-						 * owner is not ignored, which means the when the mouse is hovered the
-						 * owner, the tooltip keeps opened, this is the default
+						 * owner is not ignored, which means when the mouse is hovered the owner,
+						 * the tooltip keeps opened, this is the default
 						 */
 
 						isKeepVisible = true;
@@ -871,29 +907,15 @@ public abstract class AnimatedToolTipShell {
 			isHide = true;
 		}
 
-		if (isInTooltip && _isShellFadingOut) {
-
-			// don't hide when mouse is hovering hiding tooltip
-
-			ttShow();
-
-		} else if (isHide) {
-
-			final Rectangle noHideArea = noHideOnMouseMove();
-
-			if (noHideArea == null || noHideArea.contains(displayCursorLocation) == false) {
-
-				// hide definitively
-
-				ttHide();
-			}
-		}
-
 		boolean isKeepOpened = true;
 
 		if (isInTooltip && _isShellFadingOut) {
 
 			// don't hide when mouse is hovering hiding tooltip
+
+//			System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
+//					+ (" onDisplayMouseMove\tisInTooltip && _isShellFadingOut"));
+//			// TODO remove SYSTEM.OUT.PRINTLN
 
 			ttShow();
 
@@ -911,10 +933,12 @@ public abstract class AnimatedToolTipShell {
 			}
 		}
 
-//		System.out.println(UI.timeStampNano()
-//				+ " onDisplayMouseMove\t"
-//				+ ((float) (System.nanoTime() - start) / 1000000)
-//				+ " ms");
+//		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
+//				+ (" onDisplayMouseMove\t" + ((float) (System.nanoTime() - start) / 1000000) + " ms")//
+//				+ ("\tisInTooltip: " + isInTooltip)
+//				+ ("\tisHide: " + isHide)
+//		//
+//				);
 //		// TODO remove SYSTEM.OUT.PRINTLN
 
 		return isKeepOpened;
@@ -938,7 +962,7 @@ public abstract class AnimatedToolTipShell {
 		_shell.dispose();
 	}
 
-	protected abstract void onMouseMoveInToolTip(MouseEvent mouseEvent);
+	protected void onMouseMoveInToolTip(final MouseEvent mouseEvent) {}
 
 	private void onOwnerControlEvent(final Event event) {
 
@@ -1172,8 +1196,24 @@ public abstract class AnimatedToolTipShell {
 		_fadeOutSteps = fadeOutSteps;
 	}
 
+	/**
+	 * When <code>true</code> (default) the tooltip will be moved from the previous location to the
+	 * current location.
+	 */
+	public void setIsAnimateLocation(final boolean isAnimateLocation) {
+		_isAnimateLocation = isAnimateLocation;
+	}
+
 	public void setIsKeepShellOpenWhenMoved(final boolean isKeepShellOpenWhenMoved) {
 		_isKeepToolTipOpenWhenResizedOrMoved = isKeepShellOpenWhenMoved;
+	}
+
+	/**
+	 * When <code>true</code> (default) the shell trim style is used to create the tooltip shell
+	 * which creates a border. Set <code>false</code> to hide the border.
+	 */
+	public void setIsShowShellTrimStyle(final boolean isShowShellTrimStyle) {
+		_isShowShellTrimStyle = isShowShellTrimStyle;
 	}
 
 	public void setReceiveMouseMoveEvent(final boolean isReceive) {
@@ -1199,7 +1239,7 @@ public abstract class AnimatedToolTipShell {
 			_shell.setVisible(false);
 
 			removeDisplayFilterListener();
-			
+
 			if (closeShellAfterHidden()) {
 				close();
 			}
@@ -1275,6 +1315,7 @@ public abstract class AnimatedToolTipShell {
 		// shell is not yet fading in
 
 		if (canShowToolTip() == false) {
+
 			return;
 		}
 

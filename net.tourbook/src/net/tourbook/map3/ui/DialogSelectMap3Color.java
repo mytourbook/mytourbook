@@ -842,11 +842,6 @@ public class DialogSelectMap3Color extends AnimatedToolTipShell implements IMap3
 		disposeProfileImages();
 	}
 
-	@Override
-	protected void onMouseMoveInToolTip(final MouseEvent mouseEvent) {
-
-	}
-
 	private void onResizeImageColumn() {
 
 		// recreate images

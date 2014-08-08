@@ -126,7 +126,7 @@ public class CalendarTourDataProvider {
 				+ (" FROM " + TourDatabase.TABLE_TOUR_DATA + UI.NEW_LINE) //$NON-NLS-1$
 
 				// get tag id's
-				+ (" LEFT OUTER JOIN " + TourDatabase.JOINTABLE_TOURDATA__TOURTAG + " jTdataTtag") //$NON-NLS-1$ //$NON-NLS-2$
+				+ (" LEFT OUTER JOIN " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + " jTdataTtag") //$NON-NLS-1$ //$NON-NLS-2$
 				+ (" ON tourID = jTdataTtag.TourData_tourId") //$NON-NLS-1$
 
 				+ (" WHERE StartYear=?" + UI.NEW_LINE) //$NON-NLS-1$
@@ -376,7 +376,7 @@ public class CalendarTourDataProvider {
 				+ (" FROM " + TourDatabase.TABLE_TOUR_DATA + UI.NEW_LINE) //$NON-NLS-1$
 
 				// get tag id's
-				+ (" LEFT OUTER JOIN " + TourDatabase.JOINTABLE_TOURDATA__TOURTAG + " jTdataTtag") //$NON-NLS-1$ //$NON-NLS-2$
+				+ (" LEFT OUTER JOIN " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + " jTdataTtag") //$NON-NLS-1$ //$NON-NLS-2$
 				+ (" ON tourID = jTdataTtag.TourData_tourId") //$NON-NLS-1$
 
 				+ (" WHERE StartYear=?" + UI.NEW_LINE) //$NON-NLS-1$

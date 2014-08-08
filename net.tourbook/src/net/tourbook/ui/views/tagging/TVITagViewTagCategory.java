@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -49,8 +49,8 @@ public class TVITagViewTagCategory extends TVITagViewItem {
 
 			final String tblTag = TourDatabase.TABLE_TOUR_TAG;
 			final String tblCat = TourDatabase.TABLE_TOUR_TAG_CATEGORY;
-			final String jTblCatTag = TourDatabase.JOINTABLE_TOURTAGCATEGORY_TOURTAG;
-			final String jTblCatCat = TourDatabase.JOINTABLE_TOURTAGCATEGORY_TOURTAGCATEGORY;
+			final String jTblCatTag = TourDatabase.JOINTABLE__TOURTAGCATEGORY_TOURTAG;
+			final String jTblCatCat = TourDatabase.JOINTABLE__TOURTAGCATEGORY_TOURTAGCATEGORY;
 
 			final StringBuilder sb = new StringBuilder();
 
@@ -136,5 +136,16 @@ public class TVITagViewTagCategory extends TVITagViewItem {
 
 	public String getName() {
 		return name;
+	}
+
+	@Override
+	public String toString() {
+		return "TVITagViewTagCategory " //$NON-NLS-1$
+				+ System.identityHashCode(this)
+				+ " [tagCategoryId=" //$NON-NLS-1$
+				+ tagCategoryId
+				+ ", name=" //$NON-NLS-1$
+				+ name
+				+ "]"; //$NON-NLS-1$
 	}
 }

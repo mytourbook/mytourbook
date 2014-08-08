@@ -629,7 +629,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 
 		colDef.setIsDefaultColumn();
 		colDef.setColumnLabel(Messages.Compare_Result_Column_tour);
-		colDef.setColumnHeader(Messages.Compare_Result_Column_tour);
+		colDef.setColumnHeaderText(Messages.Compare_Result_Column_tour);
 		colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(25) + 16);
 		colDef.setCanModifyVisibility(false);
 		colDef.setLabelProvider(new TourInfoToolTipCellLabelProvider() {
@@ -685,8 +685,8 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 		final TreeColumnDefinition colDef = new TreeColumnDefinition(_columnManager, "diff", SWT.TRAIL); //$NON-NLS-1$
 
 		colDef.setIsDefaultColumn();
-		colDef.setColumnHeader(Messages.Compare_Result_Column_diff);
-		colDef.setColumnToolTipText(Messages.Compare_Result_Column_diff_tooltip);
+		colDef.setColumnHeaderText(Messages.Compare_Result_Column_diff);
+		colDef.setColumnHeaderToolTipText(Messages.Compare_Result_Column_diff_tooltip);
 		colDef.setColumnLabel(Messages.Compare_Result_Column_diff_label);
 		colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(8));
 		colDef.setLabelProvider(new CellLabelProvider() {
@@ -738,9 +738,9 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 		final TreeColumnDefinition colDef = new TreeColumnDefinition(_columnManager, "speedComputed", SWT.TRAIL); //$NON-NLS-1$
 
 		colDef.setIsDefaultColumn();
-		colDef.setColumnHeader(UI.UNIT_LABEL_SPEED);
+		colDef.setColumnHeaderText(UI.UNIT_LABEL_SPEED);
 		colDef.setColumnUnit(UI.UNIT_LABEL_SPEED);
-		colDef.setColumnToolTipText(Messages.Compare_Result_Column_kmh_tooltip);
+		colDef.setColumnHeaderToolTipText(Messages.Compare_Result_Column_kmh_tooltip);
 		colDef.setColumnLabel(Messages.Compare_Result_Column_kmh_label);
 		colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(8));
 		colDef.setLabelProvider(new CellLabelProvider() {
@@ -765,9 +765,9 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 
 		final TreeColumnDefinition colDef = new TreeColumnDefinition(_columnManager, "speedMoved", SWT.TRAIL); //$NON-NLS-1$
 
-		colDef.setColumnHeader(UI.UNIT_LABEL_SPEED);
+		colDef.setColumnHeaderText(UI.UNIT_LABEL_SPEED);
 		colDef.setColumnUnit(UI.UNIT_LABEL_SPEED);
-		colDef.setColumnToolTipText(Messages.Compare_Result_Column_kmh_moved_tooltip);
+		colDef.setColumnHeaderToolTipText(Messages.Compare_Result_Column_kmh_moved_tooltip);
 		colDef.setColumnLabel(Messages.Compare_Result_Column_kmh_moved_label);
 		colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(8));
 		colDef.setLabelProvider(new CellLabelProvider() {
@@ -792,9 +792,9 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 
 		final TreeColumnDefinition colDef = new TreeColumnDefinition(_columnManager, "speedSaved", SWT.TRAIL); //$NON-NLS-1$
 
-		colDef.setColumnHeader(UI.UNIT_LABEL_SPEED);
+		colDef.setColumnHeaderText(UI.UNIT_LABEL_SPEED);
 		colDef.setColumnUnit(UI.UNIT_LABEL_SPEED);
-		colDef.setColumnToolTipText(Messages.Compare_Result_Column_kmh_db_tooltip);
+		colDef.setColumnHeaderToolTipText(Messages.Compare_Result_Column_kmh_db_tooltip);
 		colDef.setColumnLabel(Messages.Compare_Result_Column_kmh_db_label);
 		colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(8));
 		colDef.setLabelProvider(new CellLabelProvider() {

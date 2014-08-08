@@ -183,11 +183,6 @@ public class _TEMPLATE_DialogAnimatedToolTipShell extends AnimatedToolTipShell {
 
 	}
 
-	@Override
-	protected void onMouseMoveInToolTip(final MouseEvent mouseEvent) {
-
-	}
-
 	/**
 	 * @param toolTipItemBounds
 	 * @param isOpenDelayed

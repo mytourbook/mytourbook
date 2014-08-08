@@ -59,7 +59,7 @@ public class ActionDeleteTour extends Action {
 								final SelectionDeletedTours selectionRemovedTours,
 								final IProgressMonitor monitor) {
 
-		int selectionSize = selection.size();
+		final int selectionSize = selection.size();
 		int tourCounter = 0;
 
 		int firstSelectedTourIndex = -1;
@@ -86,7 +86,7 @@ public class ActionDeleteTour extends Action {
 
 				final TVITourBookTour tourItem = (TVITourBookTour) treeItem;
 
-				if (TourDatabase.removeTour(tourItem.getTourId())) {
+				if (TourDatabase.deleteTour(tourItem.getTourId())) {
 
 					removedTours.add(tourItem);
 
@@ -144,7 +144,6 @@ public class ActionDeleteTour extends Action {
 				// }
 			}
 		}
-
 	}
 
 	@Override

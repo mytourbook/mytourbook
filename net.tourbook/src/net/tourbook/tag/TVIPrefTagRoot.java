@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -45,9 +45,9 @@ public class TVIPrefTagRoot extends TVIPrefTagItem {
 			 */
 			Query query = em.createQuery(//
 					//
-					"SELECT tourTag" //$NON-NLS-1$
-							+ (" FROM TourTag AS tourTag ") //$NON-NLS-1$
-							+ (" WHERE tourTag.isRoot = 1")); //$NON-NLS-1$
+					"SELECT tag" //$NON-NLS-1$
+							+ (" FROM " + TourTag.class.getSimpleName() + " AS tag ") //$NON-NLS-1$ //$NON-NLS-2$
+							+ (" WHERE tag.isRoot = 1")); //$NON-NLS-1$
 
 			final ArrayList<TourTag> tourTags = (ArrayList<TourTag>) query.getResultList();
 
@@ -61,9 +61,9 @@ public class TVIPrefTagRoot extends TVIPrefTagItem {
 			 */
 			query = em.createQuery(//
 					//
-					"SELECT tourTagCategory" //$NON-NLS-1$
-							+ (" FROM TourTagCategory AS tourTagCategory") //$NON-NLS-1$
-							+ (" WHERE tourTagCategory.isRoot = 1")); //$NON-NLS-1$
+					"SELECT tagCategory" //$NON-NLS-1$
+							+ (" FROM " + TourTagCategory.class.getSimpleName() + " AS tagCategory") //$NON-NLS-1$ //$NON-NLS-2$
+							+ (" WHERE tagCategory.isRoot = 1")); //$NON-NLS-1$
 
 			final ArrayList<TourTagCategory> tourTagCategories = (ArrayList<TourTagCategory>) query.getResultList();
 

@@ -26,6 +26,7 @@ import net.tourbook.chart.IChartLayer;
 import net.tourbook.data.SplineData;
 import net.tourbook.data.TourData;
 
+import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
@@ -72,7 +73,10 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
 		_xDataSerie = xDataSerie;
 	}
 
-	public void draw(final GC gc, final GraphDrawingData drawingData, final Chart chart) {
+	public void draw(	final GC gc,
+						final GraphDrawingData drawingData,
+						final Chart chart,
+						final PixelConverter pixelConverter) {
 
 		final double[] xValues = _xDataSerie;
 

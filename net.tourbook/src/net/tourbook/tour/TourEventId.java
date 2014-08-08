@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2012  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -97,5 +97,10 @@ public enum TourEventId {
 	 * view is closed which provided the tour
 	 */
 	CLEAR_DISPLAYED_TOUR,
+
+	/**
+	 * A tour marker is selected, event data contain a {@link SelectionTourMarker}.
+	 */
+	MARKER_SELECTION,
 
 }

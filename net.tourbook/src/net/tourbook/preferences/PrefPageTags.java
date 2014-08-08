@@ -94,6 +94,8 @@ import org.eclipse.ui.dialogs.PreferencesUtil;
 
 public class PrefPageTags extends PreferencePage implements IWorkbenchPreferencePage, ITourViewer {
 
+	public static final String		ID				= "net.tourbook.preferences.PrefPageTags";			//$NON-NLS-1$
+
 	private static final String		SORT_PROPERTY	= "sort";											//$NON-NLS-1$
 
 	private final IPreferenceStore	_prefStore		= TourbookPlugin.getDefault().getPreferenceStore();
@@ -129,6 +131,10 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 	private Button					_btnNewTagCategory;
 	private Button					_btnRename;
 	private Button					_btnReset;
+
+	/*
+	 * None UI controls
+	 */
 
 	/**
 	 * Sort the tags and categories
@@ -262,9 +268,10 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 		GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
 		GridLayoutFactory.fillDefaults()//
 				.margins(0, 0)
-				.spacing(SWT.DEFAULT, 0)
+//				.spacing(SWT.DEFAULT, 0)
 				.numColumns(2)
 				.applyTo(container);
+//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
 		{
 			createUI_10_Title(container);
 
@@ -317,9 +324,8 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 		/*
 		 * create viewer
 		 */
-		final Tree tree = new Tree(layoutContainer, SWT.H_SCROLL
-				| SWT.V_SCROLL
-				| SWT.BORDER
+		final Tree tree = new Tree(layoutContainer, SWT.H_SCROLL | SWT.V_SCROLL
+//				| SWT.BORDER
 				| SWT.MULTI
 				| SWT.FULL_SELECTION);
 
@@ -522,8 +528,16 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 	private void createUI_40_Bottom(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(container);
-		GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
+		GridDataFactory.fillDefaults()//
+				.grab(true, false)
+				.span(2, 1)
+//				.indent(0, _pc.convertVerticalDLUsToPixels(4))
+				.applyTo(container);
+		GridLayoutFactory.fillDefaults()//
+				.numColumns(1)
+//				.extendedMargins(0, 0, top, bottom)
+				.applyTo(container);
+//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
 		{
 			final Label label = new Label(container, SWT.WRAP);
 			label.setText(Messages.pref_tourtag_hint);
@@ -869,8 +883,9 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 					// update item
 					parentCategoryItem.setTourTagCategory(savedParent);
 
-					// set category in tag
-					tourTag.getTagCategories().add(parentTagCategory);
+					// set category in tag,
+// this seems to be not necessary
+//					tourTag.setTagCategory(parentTagCategory);
 
 					// persist tag with category
 					savedTag = TourDatabase.saveEntity(tourTag, tourTag.getTagId(), TourTag.class);
@@ -1002,24 +1017,24 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 			 * remove join table tag->category
 			 */
 			sb.append("DELETE FROM "); //$NON-NLS-1$
-			sb.append(TourDatabase.JOINTABLE_TOURTAGCATEGORY_TOURTAG);
+			sb.append(TourDatabase.JOINTABLE__TOURTAGCATEGORY_TOURTAG);
 			int result = conn.createStatement().executeUpdate(sb.toString());
 			System.out.println("Deleted " //$NON-NLS-1$
 					+ result
 					+ " entries from " //$NON-NLS-1$
-					+ TourDatabase.JOINTABLE_TOURTAGCATEGORY_TOURTAG);
+					+ TourDatabase.JOINTABLE__TOURTAGCATEGORY_TOURTAG);
 
 			/*
 			 * remove jointable category<->category
 			 */
 			sb.setLength(0);
 			sb.append("DELETE FROM "); //$NON-NLS-1$
-			sb.append(TourDatabase.JOINTABLE_TOURTAGCATEGORY_TOURTAGCATEGORY);
+			sb.append(TourDatabase.JOINTABLE__TOURTAGCATEGORY_TOURTAGCATEGORY);
 			result = conn.createStatement().executeUpdate(sb.toString());
 			System.out.println("Deleted " //$NON-NLS-1$
 					+ result
 					+ " entries from " //$NON-NLS-1$
-					+ TourDatabase.JOINTABLE_TOURTAGCATEGORY_TOURTAGCATEGORY);
+					+ TourDatabase.JOINTABLE__TOURTAGCATEGORY_TOURTAGCATEGORY);
 
 			/*
 			 * set tags to root

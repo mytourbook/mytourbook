@@ -17,13 +17,13 @@ package net.tourbook.ui.views.tourDataEditor;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
-import net.tourbook.chart.ChartLabel;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.tour.DialogMarker;
 import net.tourbook.tour.TourEvent;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
+import net.tourbook.ui.tourChart.ChartLabel;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.viewers.StructuredSelection;
@@ -63,7 +63,6 @@ public class ActionCreateTourMarker extends Action {
 			tourMarker.setSerieIndex(serieIndex);
 			tourMarker.setTime(tourData.timeSerie[serieIndex]);
 			tourMarker.setLabel(Messages.TourData_Label_new_marker);
-			tourMarker.setVisualPosition(ChartLabel.VISUAL_HORIZONTAL_ABOVE_GRAPH_CENTERED);
 
 			if (distSerie != null) {
 				tourMarker.setDistance(distSerie[serieIndex]);

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -22,12 +22,20 @@ package net.tourbook.ui.tourChart;
 
 import java.util.ArrayList;
 
+import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.ChartYDataMinMaxKeeper;
+import net.tourbook.preferences.ITourbookPreferences;
+
+import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.preference.PreferenceConverter;
+import org.eclipse.swt.graphics.RGB;
 
 /**
- * Contains the configuration how the tour chart is displayed
+ * Contains the configuration how the tour chart is displayed.
  */
 public class TourChartConfiguration {
+
+	private final IPreferenceStore	_prefStore				= TourbookPlugin.getPrefStore();
 
 	/**
 	 * true: show time on the x-axis
@@ -49,7 +57,7 @@ public class TourChartConfiguration {
 	 * <p>
 	 * false: show the tour time which starts at 0
 	 */
-	public X_AXIS_START_TIME				xAxisTime				= X_AXIS_START_TIME.START_WITH_0;
+	public X_AXIS_START_TIME		xAxisTime				= X_AXIS_START_TIME.START_WITH_0;
 
 	/**
 	 * contains a list for all graphs which are displayed, the sequence of the list is the sequence
@@ -110,6 +118,58 @@ public class TourChartConfiguration {
 	public Boolean					isShowTourMarker		= true;
 
 	/**
+	 * When <code>true</code>, hidden markers are also visible.
+	 */
+	public boolean					isShowHiddenMarker;
+
+	/**
+	 * When <code>true</code>, all marker label with be drawn with default colors, otherwise they
+	 * are drawn with device or hidden color.
+	 */
+	public boolean					isDrawMarkerWithDefaultColor;
+
+	/**
+	 * When <code>true</code> tour marker labels are displayed.
+	 */
+	public boolean					isShowMarkerLabel;
+
+	public boolean					isShowMarkerTooltip;
+	public boolean					isShowMarkerPoint;
+	public boolean					isShowSignImage;
+
+	public int						markerHoverSize;
+	public int						markerLabelOffset;
+
+	public boolean					isShowLabelTempPos;
+	public int						markerLabelTempPos;
+
+	/**
+	 * Size of the marker point in DLU (Dialog Units).
+	 */
+	public int						markerPointSize;
+
+	/**
+	 * Size of the sign image in DLU (Dialog Units).
+	 */
+	public int						markerSignImageSize;
+
+	/**
+	 * Color for the tour marker point and label.
+	 */
+	public RGB						markerColorDefault;
+
+	/**
+	 * Color for the tour marker point which is created by the device and not with the marker
+	 * editor.
+	 */
+	public RGB						markerColorDevice;
+
+	/**
+	 * Color for tour markers which are hidden, visibility is false.
+	 */
+	public RGB						markerColorHidden;
+
+	/**
 	 * Is <code>true</code> when graph values are displayed when they are recorded when a break time
 	 * is detected.
 	 */
@@ -121,16 +181,45 @@ public class TourChartConfiguration {
 	public String					hrZoneStyle				= TourChart.ACTION_ID_HR_ZONE_STYLE_GRAPH_TOP;
 
 	public boolean					isShowTourPhotos		= true;											;
-	public boolean					isShowTourPhotoTooltip	= true;											;
+	public boolean					isShowTourPhotoTooltip	= true;
 
 	/**
 	 * @param keepMinMaxValues
 	 *            set <code>true</code> to keep min/max values when tour data will change
 	 */
 	public TourChartConfiguration(final boolean keepMinMaxValues) {
+
 		if (keepMinMaxValues) {
 			setMinMaxKeeper(true);
 		}
+
+		/*
+		 * Initialize tour marker settings from the pref store
+		 */
+		isShowTourMarker = _prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_MARKER_VISIBLE);
+
+		markerHoverSize = _prefStore.getInt(ITourbookPreferences.GRAPH_MARKER_HOVER_SIZE);
+		markerLabelOffset = _prefStore.getInt(ITourbookPreferences.GRAPH_MARKER_LABEL_OFFSET);
+		markerLabelTempPos = _prefStore.getInt(ITourbookPreferences.GRAPH_MARKER_LABEL_TEMP_POSITION);
+		markerPointSize = _prefStore.getInt(ITourbookPreferences.GRAPH_MARKER_POINT_SIZE);
+		markerSignImageSize = _prefStore.getInt(ITourbookPreferences.GRAPH_MARKER_SIGN_IMAGE_SIZE);
+
+		isDrawMarkerWithDefaultColor = _prefStore.getBoolean(//
+				ITourbookPreferences.GRAPH_MARKER_IS_DRAW_WITH_DEFAULT_COLOR);
+		isShowHiddenMarker = _prefStore.getBoolean(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_HIDDEN_MARKER);
+		isShowLabelTempPos = _prefStore.getBoolean(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_LABEL_TEMP_POSITION);
+		isShowMarkerLabel = _prefStore.getBoolean(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_MARKER_LABEL);
+		isShowMarkerPoint = _prefStore.getBoolean(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_MARKER_POINT);
+		isShowMarkerTooltip = _prefStore.getBoolean(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_MARKER_TOOLTIP);
+		isShowSignImage = _prefStore.getBoolean(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_SIGN_IMAGE);
+
+		markerColorDefault = PreferenceConverter.getColor(_prefStore,//
+				ITourbookPreferences.GRAPH_MARKER_COLOR_DEFAULT);
+		markerColorDevice = PreferenceConverter.getColor(_prefStore,//
+				ITourbookPreferences.GRAPH_MARKER_COLOR_DEVICE);
+		markerColorHidden = PreferenceConverter.getColor(_prefStore,//
+				ITourbookPreferences.GRAPH_MARKER_COLOR_HIDDEN);
+
 	}
 
 	public void addVisibleGraph(final int visibleGraph) {

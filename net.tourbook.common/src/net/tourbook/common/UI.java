@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -21,12 +21,23 @@ import java.util.ArrayList;
 
 import net.tourbook.common.weather.IWeather;
 
+import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.preference.StringFieldEditor;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.jface.resource.JFaceResources;
+import org.eclipse.jface.viewers.ColumnViewerEditor;
+import org.eclipse.jface.viewers.ColumnViewerEditorActivationEvent;
+import org.eclipse.jface.viewers.ColumnViewerEditorActivationStrategy;
+import org.eclipse.jface.viewers.FocusCellOwnerDrawHighlighter;
+import org.eclipse.jface.viewers.TableViewer;
+import org.eclipse.jface.viewers.TableViewerEditor;
+import org.eclipse.jface.viewers.TableViewerFocusCellManager;
+import org.eclipse.jface.viewers.TreePath;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabItem;
+import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseTrackListener;
@@ -57,6 +68,7 @@ import org.eclipse.swt.widgets.Scale;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.ToolBar;
+import org.eclipse.ui.IMemento;
 import org.epics.css.dal.Timestamp;
 import org.epics.css.dal.Timestamp.Format;
 import org.joda.time.DateTime;
@@ -80,6 +92,8 @@ public class UI {
 	public static final String			SPACE4									= "    ";																	//$NON-NLS-1$
 	public static final String			STRING_0								= "0";																		//$NON-NLS-1$
 
+	public static final String			SYMBOL_ARROW_UP							= "\u2191";																//$NON-NLS-1$
+	public static final String			SYMBOL_ARROW_DOWN						= "\u2193";																//$NON-NLS-1$
 	public static final String			SYMBOL_AVERAGE							= "\u00f8";																//$NON-NLS-1$
 	public static final String			SYMBOL_AVERAGE_WITH_SPACE				= "\u00f8 ";																//$NON-NLS-1$
 	public static final String			SYMBOL_DASH								= "\u2212";																//$NON-NLS-1$
@@ -90,7 +104,9 @@ public class UI {
 	public static final String			SYMBOL_DOUBLE_VERTICAL					= "\u2551";																//$NON-NLS-1$
 	public static final String			SYMBOL_ELLIPSIS							= "\u2026";																//$NON-NLS-1$
 	public static final String			SYMBOL_FIGURE_DASH						= "\u2012";																//$NON-NLS-1$
+	public static final String			SYMBOL_FOOT_NOTE						= "\u20F0";																//$NON-NLS-1$
 	public static final String			SYMBOL_FULL_BLOCK						= "\u2588";																//$NON-NLS-1$
+	public static final String			SYMBOL_IDENTICAL_TO						= "\u2261";																//$NON-NLS-1$
 	public static final String			SYMBOL_INFINITY_MAX						= "\u221E";																//$NON-NLS-1$
 	public static final String			SYMBOL_INFINITY_MIN						= "-\u221E";																//$NON-NLS-1$
 	public static final String			SYMBOL_SUM_WITH_SPACE					= "\u2211 ";																//$NON-NLS-1$
@@ -106,6 +122,8 @@ public class UI {
 	public static final String			SYMBOL_GREATER_THAN						= ">";																		//$NON-NLS-1$
 	public static final String			SYMBOL_LESS_THAN						= "<";																		//$NON-NLS-1$
 	public static final String			SYMBOL_PERCENTAGE						= "%";																		//$NON-NLS-1$
+	public static final String			SYMBOL_QUESTION_MARK					= "?";																		//$NON-NLS-1$
+	public static final String			SYMBOL_STAR								= "*";																		//$NON-NLS-1$
 	public static final String			SYMBOL_UNDERSCORE						= "_";																		//$NON-NLS-1$
 	public static final String			SYMBOL_WIND_WITH_SPACE					= "W ";																	//$NON-NLS-1$
 
@@ -401,6 +419,21 @@ public class UI {
 		return new Cursor(display, sourceData, 0, 0);
 	}
 
+	/**
+	 * Creates one action in a toolbar.
+	 * 
+	 * @param parent
+	 * @param action
+	 */
+	public static void createToolbarAction(final Composite parent, final Action action) {
+
+		final ToolBar toolbar = new ToolBar(parent, SWT.FLAT);
+
+		final ToolBarManager tbm = new ToolBarManager(toolbar);
+		tbm.add(action);
+		tbm.update(true);
+	}
+
 	public static Color disposeResource(final Color resource) {
 		if ((resource != null) && !resource.isDisposed()) {
 			resource.dispose();
@@ -467,6 +500,31 @@ public class UI {
 	}
 
 	/**
+	 * Get best-fit size for an image drawn in an area of maxX, maxY
+	 * 
+	 * @param imageWidth
+	 * @param imageHeight
+	 * @param canvasWidth
+	 * @param canvasHeight
+	 * @return
+	 */
+	public static Point getBestFitCanvasSize(	final int imageWidth,
+												final int imageHeight,
+												final int canvasWidth,
+												final int canvasHeight) {
+
+		final double widthRatio = (double) imageWidth / (double) canvasWidth;
+		final double heightRatio = (double) imageHeight / (double) canvasHeight;
+
+		final double bestRatio = widthRatio > heightRatio ? widthRatio : heightRatio;
+
+		final int newWidth = (int) (imageWidth / bestRatio);
+		final int newHeight = (int) (imageHeight / bestRatio);
+
+		return new Point(newWidth, newHeight);
+	}
+
+	/**
 	 * @param degreeDirection
 	 * @return Returns cardinal direction
 	 */
@@ -486,6 +544,35 @@ public class UI {
 		final int directionIndex = ((int) degree) % 8;
 
 		return directionIndex;
+	}
+
+	/**
+	 * @param allVisibleItems
+	 * @param allExpandedItems
+	 * @return Returns {@link TreePath}'s which are expanded and open (not hidden).
+	 */
+	public static TreePath[] getExpandedOpenedItems(final Object[] allVisibleItems, final TreePath[] allExpandedItems) {
+
+		final ArrayList<TreePath> expandedOpened = new ArrayList<TreePath>();
+
+		for (final TreePath expandedPath : allExpandedItems) {
+
+			/*
+			 * The last expanded segment must be in the visible list otherwise it is hidden.
+			 */
+			final Object lastExpandedItem = expandedPath.getLastSegment();
+
+			for (final Object visibleItem : allVisibleItems) {
+
+				if (lastExpandedItem == visibleItem) {
+
+					expandedOpened.add(expandedPath);
+					break;
+				}
+			}
+		}
+
+		return expandedOpened.toArray(new TreePath[expandedOpened.size()]);
 	}
 
 	/**
@@ -572,6 +659,80 @@ public class UI {
 	}
 
 	/**
+	 * Restore the sash weight from a memento
+	 * 
+	 * @param sashForm
+	 * @param state
+	 * @param weightKey
+	 * @param sashDefaultWeight
+	 */
+	public static void restoreSashWeight(	final SashForm sashForm,
+											final IDialogSettings state,
+											final String weightKey,
+											final int[] sashDefaultWeight) {
+
+		final int[] sashWeights = sashForm.getWeights();
+		final int[] newWeights = new int[sashWeights.length];
+
+		for (int weightIndex = 0; weightIndex < sashWeights.length; weightIndex++) {
+
+			try {
+
+				final int mementoWeight = state.getInt(weightKey + Integer.toString(weightIndex));
+
+				newWeights[weightIndex] = mementoWeight;
+
+			} catch (final Exception e) {
+
+				try {
+					newWeights[weightIndex] = sashDefaultWeight[weightIndex];
+
+				} catch (final ArrayIndexOutOfBoundsException e2) {
+					newWeights[weightIndex] = 100;
+				}
+			}
+
+		}
+
+		sashForm.setWeights(newWeights);
+	}
+
+	/**
+	 * Restore the sash weight from a memento
+	 * 
+	 * @param sash
+	 * @param fMemento
+	 * @param weightKey
+	 * @param sashDefaultWeight
+	 */
+	public static void restoreSashWeight(	final SashForm sash,
+											final IMemento fMemento,
+											final String weightKey,
+											final int[] sashDefaultWeight) {
+
+		final int[] sashWeights = sash.getWeights();
+		final int[] newWeights = new int[sashWeights.length];
+
+		for (int weightIndex = 0; weightIndex < sashWeights.length; weightIndex++) {
+
+			final Integer mementoWeight = fMemento.getInteger(weightKey + Integer.toString(weightIndex));
+
+			if (mementoWeight == null) {
+				try {
+					newWeights[weightIndex] = sashDefaultWeight[weightIndex];
+
+				} catch (final ArrayIndexOutOfBoundsException e) {
+					newWeights[weightIndex] = 100;
+				}
+			} else {
+				newWeights[weightIndex] = mementoWeight;
+			}
+		}
+
+		sash.setWeights(newWeights);
+	}
+
+	/**
 	 * This is a copy with modifications from {@link org.eclipse.jface.dialogs.Dialog}
 	 * 
 	 * @param statePrefix
@@ -605,26 +766,90 @@ public class UI {
 		}
 	}
 
-	public static void setColorForAllChildren(final Control child, final Color fgColor, final Color bgColor) {
+	/**
+	 * Store the weights for the sash in a memento
+	 * 
+	 * @param sashForm
+	 * @param state
+	 * @param weightKey
+	 */
+	public static void saveSashWeight(final SashForm sashForm, final IDialogSettings state, final String weightKey) {
 
-		child.setForeground(fgColor);
-		child.setBackground(bgColor);
+		final int[] weights = sashForm.getWeights();
 
-		if (child instanceof Composite) {
+		for (int weightIndex = 0; weightIndex < weights.length; weightIndex++) {
+			state.put(weightKey + Integer.toString(weightIndex), weights[weightIndex]);
+		}
+	}
 
-			final Control[] children = ((Composite) child).getChildren();
+	/**
+	 * Store the weights for the sash in a memento
+	 * 
+	 * @param sash
+	 * @param memento
+	 * @param weightKey
+	 */
+	public static void saveSashWeight(final SashForm sash, final IMemento memento, final String weightKey) {
 
-			for (final Control control : children) {
+		final int[] weights = sash.getWeights();
 
-				if (control != null && control.isDisposed() == false //
+		for (int weightIndex = 0; weightIndex < weights.length; weightIndex++) {
+			memento.putInteger(weightKey + Integer.toString(weightIndex), weights[weightIndex]);
+		}
+	}
 
-						// exclude controls
-						&& !control.getClass().equals(Combo.class)
-						&& !control.getClass().equals(Spinner.class)
+	/**
+	 * Initialize cell editing.
+	 * 
+	 * @param viewer
+	 */
+	public static void setCellEditSupport(final TableViewer viewer) {
+
+		final TableViewerFocusCellManager focusCellManager = new TableViewerFocusCellManager(
+				viewer,
+				new FocusCellOwnerDrawHighlighter(viewer));
+
+		final ColumnViewerEditorActivationStrategy actSupport = new ColumnViewerEditorActivationStrategy(viewer) {
+			@Override
+			protected boolean isEditorActivationEvent(final ColumnViewerEditorActivationEvent event) {
+
+				return (event.eventType == ColumnViewerEditorActivationEvent.TRAVERSAL)
+						|| (event.eventType == ColumnViewerEditorActivationEvent.MOUSE_CLICK_SELECTION)
+						|| ((event.eventType == ColumnViewerEditorActivationEvent.KEY_PRESSED) && (event.keyCode == SWT.CR))
+						|| (event.eventType == ColumnViewerEditorActivationEvent.PROGRAMMATIC);
+			}
+		};
+
+		TableViewerEditor.create(//
+				viewer,
+				focusCellManager,
+				actSupport,
+				ColumnViewerEditor.TABBING_HORIZONTAL //
+						| ColumnViewerEditor.TABBING_MOVE_TO_ROW_NEIGHBOR //
+						| ColumnViewerEditor.TABBING_VERTICAL
+						| ColumnViewerEditor.KEYBOARD_ACTIVATION);
+	}
+
+	public static void setColorForAllChildren(final Control parent, final Color fgColor, final Color bgColor) {
+
+		parent.setForeground(fgColor);
+		parent.setBackground(bgColor);
+
+		if (parent instanceof Composite) {
+
+			final Control[] children = ((Composite) parent).getChildren();
+
+			for (final Control child : children) {
+
+				if (child != null && child.isDisposed() == false //
+
+						// exclude controls which look ugly
+						&& !child.getClass().equals(Combo.class)
+						&& !child.getClass().equals(Spinner.class)
 				//
 				) {
 
-					setColorForAllChildren(control, fgColor, bgColor);
+					setColorForAllChildren(child, fgColor, bgColor);
 				}
 			}
 		}
@@ -649,7 +874,9 @@ public class UI {
 				return;
 			}
 
-			final int width = control.getSize().x + additionalSpace;
+			final int controlWidth = control.getSize().x;
+
+			final int width = controlWidth + additionalSpace;
 
 			maxWidth = width > maxWidth ? width : maxWidth;
 		}
@@ -766,6 +993,41 @@ public class UI {
 		gc.dispose();
 
 		return shortText;
+	}
+
+	public static String shortenText(final String text, final int textWidth, final boolean isShowBegin) {
+
+		int beginIndex;
+		int endIndex;
+
+		final int textLength = text.length();
+
+		if (isShowBegin) {
+
+			beginIndex = 0;
+			endIndex = textLength > textWidth ? textWidth : textLength;
+
+		} else {
+
+			beginIndex = textLength - textWidth;
+			beginIndex = beginIndex < 0 ? 0 : beginIndex;
+
+			endIndex = textLength;
+		}
+
+		String shortedText = text.substring(beginIndex, endIndex);
+
+		// add ellipsis when text is too long
+		if (textLength > textWidth) {
+
+			if (isShowBegin) {
+				shortedText = shortedText + UI.ELLIPSIS;
+			} else {
+				shortedText = UI.ELLIPSIS + shortedText;
+			}
+		}
+
+		return shortedText;
 	}
 
 	public static String timeStamp() {

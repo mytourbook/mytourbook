@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -25,21 +25,23 @@ import net.tourbook.chart.ChartDrawingData;
 import net.tourbook.chart.ChartType;
 import net.tourbook.chart.GraphDrawingData;
 import net.tourbook.chart.IChartLayer;
+import net.tourbook.chart.IChartOverlay;
 
+import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Device;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Display;
 
-public class ChartLayerPhoto implements IChartLayer {
+public class ChartLayerPhoto implements IChartLayer, IChartOverlay {
 
 	private static final int			PHOTO_ICON_SIZE			= 3;
 	private static final int			PHOTO_ICON_SPACING		= 2;
 
 	static final int					GROUP_HORIZONTAL_WIDTH	= 40;
-	static final int					GROUP_Y_HIT_BORDER		= 5;
 
 	private ArrayList<PhotoCategory>	_photoCategories;
 
@@ -49,8 +51,8 @@ public class ChartLayerPhoto implements IChartLayer {
 	private long						_hoveredPhotoEventTime;
 
 	private ArrayList<ChartPhoto>		_hoveredPhotos			= new ArrayList<ChartPhoto>();
-	private PhotoCategory				_hoveredCategory;
-	private PhotoPaintGroup				_hoveredGroup;
+	private PhotoCategory				_hoveredPhotoCategory;
+	private PhotoPaintGroup				_hoveredPaintGroup;
 
 	private Color						_bgColorLink;
 	private Color						_bgColorTour;
@@ -196,7 +198,7 @@ public class ChartLayerPhoto implements IChartLayer {
 	}
 
 	/**
-	 * create list with hovered hovered photos
+	 * Creates a list with hovered photos.
 	 */
 	private void createHoveredPhotoList(final long eventTime, final int devXMouseMove, final int devYMouseMove) {
 
@@ -204,13 +206,16 @@ public class ChartLayerPhoto implements IChartLayer {
 		_hoveredPhotos.clear();
 		_hoveredPhotoEventTime = eventTime;
 
-		_hoveredCategory = null;
-		_hoveredGroup = null;
+		_hoveredPhotoCategory = null;
+		_hoveredPaintGroup = null;
 
 		if (_photoCategories == null || _photoCategories.size() == 0) {
 			// photo positions are not initialized
 			return;
 		}
+
+		final int hoveredXPos = devXMouseMove;
+		final int hoveredYPos = devYMouseMove;
 
 		final int numberOfCategories = _photoCategories.size();
 		final boolean isSingleCategory = numberOfCategories == 1;
@@ -226,8 +231,6 @@ public class ChartLayerPhoto implements IChartLayer {
 			final boolean isLastCategory = categoryIndex == numberOfCategories - 1;
 
 			final ArrayList<ChartPhoto> chartPhotos = photoCategory.chartPhotos;
-
-			final int hoveredXPos = devXMouseMove;
 
 			for (final PhotoPaintGroup paintGroup : photoCategory.paintGroups) {
 
@@ -253,7 +256,7 @@ public class ChartLayerPhoto implements IChartLayer {
 
 						if (hoveredXPos >= paintGroup.hGridStart
 								&& hoveredXPos <= paintGroup.hGridEnd
-								&& devYMouseMove >= devYHoverTop) {
+								&& hoveredYPos >= devYHoverTop) {
 
 							// photo is within current hovered area
 
@@ -264,8 +267,8 @@ public class ChartLayerPhoto implements IChartLayer {
 
 						if (hoveredXPos >= paintGroup.hGridStart
 								&& hoveredXPos <= paintGroup.hGridEnd
-								&& devYMouseMove >= devYHoverTop
-								&& devYMouseMove <= devYHoverBottom) {
+								&& hoveredYPos >= devYHoverTop
+								&& hoveredYPos <= devYHoverBottom) {
 
 							// photo is within current hovered area
 
@@ -283,8 +286,8 @@ public class ChartLayerPhoto implements IChartLayer {
 						_hoveredPhotos.add(chartPhoto);
 					}
 
-					_hoveredCategory = photoCategory;
-					_hoveredGroup = paintGroup;
+					_hoveredPhotoCategory = photoCategory;
+					_hoveredPaintGroup = paintGroup;
 
 					break category;
 				}
@@ -384,7 +387,10 @@ public class ChartLayerPhoto implements IChartLayer {
 	/**
 	 * Draw photos into the current graph.
 	 */
-	public void draw(final GC gc, final GraphDrawingData graphDrawingData, final Chart chart) {
+	public void draw(	final GC gc,
+						final GraphDrawingData graphDrawingData,
+						final Chart chart,
+						final PixelConverter pixelConverter) {
 
 		_display = Display.getCurrent();
 
@@ -529,24 +535,38 @@ public class ChartLayerPhoto implements IChartLayer {
 //				 */
 //				final int yHitHeight = groupY + groupHeight;// + 2 * GROUP_Y_HIT_BORDER;
 //				gc.setLineWidth(1);
-//				gc.setForeground(display.getSystemColor(SWT.COLOR_RED));
+//				gc.setForeground(_display.getSystemColor(SWT.COLOR_RED));
 //				gc.drawLine(paintGroup.hGridStart, groupY, paintGroup.hGridStart, yHitHeight);
 //
-//				gc.setForeground(display.getSystemColor(SWT.COLOR_DARK_BLUE));
+//				gc.setForeground(_display.getSystemColor(SWT.COLOR_DARK_BLUE));
 //				gc.drawLine(paintGroup.hGridEnd, groupY, paintGroup.hGridEnd, yHitHeight);
 			}
 		}
-
 	}
 
-	void drawPhotoAndGroup(final GC gc, final PhotoPaintGroup paintGroup, final PhotoCategory photoCategory) {
+	@Override
+	public void drawOverlay(final GC gcOverlay, final GraphDrawingData graphDrawingData) {
+
+		if (_hoveredPaintGroup == null) {
+			return;
+		}
+
+		final Device display = gcOverlay.getDevice();
+
+		gcOverlay.setForeground(display.getSystemColor(SWT.COLOR_WHITE));
+		gcOverlay.setBackground(getPhotoGroupBackgroundColor(_hoveredPhotoCategory.photoType, true));
+
+		drawPhotoAndGroup(gcOverlay, _hoveredPaintGroup, _hoveredPhotoCategory);
+	}
+
+	private void drawPhotoAndGroup(final GC gc, final PhotoPaintGroup paintGroup, final PhotoCategory photoCategory) {
 
 		final Point[] photoPositions = photoCategory.photoPositions;
 
 		int prevDevYPhoto = Integer.MIN_VALUE;
 		int prevDevXPhoto = Integer.MIN_VALUE;
 
-		// draw photo icon
+		// draw photo marker at the graph vertical position
 		for (final int photoIndex : paintGroup.photoIndex) {
 
 			final Point photoPosition = photoPositions[photoIndex];
@@ -587,20 +607,20 @@ public class ChartLayerPhoto implements IChartLayer {
 		gc.drawText(paintGroup.paintedGroupText, paintGroup.paintedTextDevX, paintGroup.paintedTextDevY, true);
 	}
 
-	PhotoCategory getHoveredCategory(final long eventTime, final int devXMouse, final int devYMouse) {
+	PhotoPaintGroup getHoveredPaintGroup() {
+		return _hoveredPaintGroup;
+	}
+
+	PhotoCategory getHoveredPhotoCategory(final long eventTime, final int devXMouse, final int devYMouse) {
 
 		if (eventTime == _hoveredPhotoEventTime) {
-			return _hoveredCategory;
+			return _hoveredPhotoCategory;
 		}
 
 		// list is dirty -> recreate hovered photos list
 		createHoveredPhotoList(eventTime, devXMouse, devYMouse);
 
-		return _hoveredCategory;
-	}
-
-	PhotoPaintGroup getHoveredGroup() {
-		return _hoveredGroup;
+		return _hoveredPhotoCategory;
 	}
 
 	/**
@@ -620,7 +640,7 @@ public class ChartLayerPhoto implements IChartLayer {
 		return _hoveredPhotos;
 	}
 
-	Color getPhotoGroupBackgroundColor(final ChartPhotoType photoType, final boolean isHovered) {
+	private Color getPhotoGroupBackgroundColor(final ChartPhotoType photoType, final boolean isHovered) {
 
 		if (_photoCategories.size() == 1) {
 
@@ -657,6 +677,12 @@ public class ChartLayerPhoto implements IChartLayer {
 	public void setBackgroundColor(final Color bgColorLink, final Color bgColorTour) {
 		_bgColorLink = bgColorLink;
 		_bgColorTour = bgColorTour;
+	}
+
+	void setHoveredData(final PhotoCategory hoveredPhotoCategory, final PhotoPaintGroup hoveredPhotoGroup) {
+
+		_hoveredPhotoCategory = hoveredPhotoCategory;
+		_hoveredPaintGroup = hoveredPhotoGroup;
 	}
 
 }
