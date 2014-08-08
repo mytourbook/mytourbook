@@ -428,10 +428,6 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 		return _markerBounds;
 	}
 
-	public long getMarkerId() {
-		return markerId;
-	}
-
 	/**
 	 * @return Returns {@link TourMarker} entity id.
 	 */

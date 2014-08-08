@@ -178,6 +178,10 @@ public class Messages extends NLS {
 	public static String		Action_Tag_AutoOpenCancel;
 	public static String		Action_Tag_AutoOpenOK;
 
+	public static String	Action_TourFilter_WithGPS_Tooltip;
+
+	public static String	Action_TourFilter_WithoutGPS_Tooltip;
+
 	public static String		Action_TourType_ModifyTourTypeFilter;
 
 	public static String		Adjust_Altitude_Checkbox_SRTM_SelectWholeTour;
@@ -715,6 +719,14 @@ public class Messages extends NLS {
 	public static String		Image__tour_options;
 	public static String		Image__tour_segmenter;
 	public static String		Image__tour_viewer;
+
+	public static String	Image__TourFilter_WithGPS;
+
+	public static String	Image__TourFilter_WithGPS_Disabled;
+
+	public static String	Image__TourFilter_WithoutGPS;
+
+	public static String	Image__TourFilter_WithoutGPS_Disabled;
 
 //	public static String		Image__TourSignImport;
 	public static String		Image__undo_edit;

@@ -80,8 +80,8 @@ public class TourWayPoint implements Cloneable, Comparable<Object>, IHoveredArea
 	private GeoPosition		_geoPosition;
 
 	/**
-	 * unique id for manually created markers because the {@link #markerId} is 0 when the marker is
-	 * not persisted
+	 * Unique id for manually created waypoints because the {@link #wayPointId} is 0 when the
+	 * waypoint is not persisted.
 	 */
 	@Transient
 	private long			_createId				= 0;
