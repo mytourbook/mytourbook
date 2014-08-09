@@ -247,7 +247,7 @@ public class StatisticTourTime extends YearStatistic implements IBarSelectionPro
 		final String tourTags = TourDatabase.getTagNames(_tourTimeData.tagIds.get(tooltipTourId));
 		final String tourDescription = _tourTimeData.tourDescription.get(valueIndex).replace(
 				net.tourbook.ui.UI.SYSTEM_NEW_LINE,
-				UI.NEW_LINE);
+				UI.NEW_LINE1);
 
 		final int[] startValue = _tourTimeData.tourTimeStartValues;
 		final int[] endValue = _tourTimeData.tourTimeEndValues;

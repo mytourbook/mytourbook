@@ -76,6 +76,8 @@ import org.joda.time.DateTimeZone;
 
 public class UI {
 
+	public static final char			SPACE									= ' ';
+	public static final char			NEW_LINE								= '\n';
 	public static final char			TAB										= '\t';
 
 	public static final String			COMMA_SPACE								= ", ";																	//$NON-NLS-1$
@@ -84,10 +86,10 @@ public class UI {
 	public static final String			DASH_WITH_DOUBLE_SPACE					= "   -   ";																//$NON-NLS-1$
 	public static final String			DIMENSION								= " x ";																	//$NON-NLS-1$
 	public static final String			EMPTY_STRING							= "";																		//$NON-NLS-1$
-	public static final String			NEW_LINE								= "\n";																	//$NON-NLS-1$
+	public static final String			NEW_LINE1								= "\n";																	//$NON-NLS-1$
 	public static final String			NEW_LINE2								= "\n\n";																	//$NON-NLS-1$
 	public static final String			NEW_LINE3								= "\n\n\n";																//$NON-NLS-1$
-	public static final String			SPACE									= " ";																		//$NON-NLS-1$
+	public static final String			SPACE1									= " ";																		//$NON-NLS-1$
 	public static final String			SPACE2									= "  ";																	//$NON-NLS-1$
 	public static final String			SPACE4									= "    ";																	//$NON-NLS-1$
 	public static final String			STRING_0								= "0";																		//$NON-NLS-1$

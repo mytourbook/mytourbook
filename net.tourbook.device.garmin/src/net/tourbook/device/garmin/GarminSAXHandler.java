@@ -709,7 +709,7 @@ public class GarminSAXHandler extends DefaultHandler {
 			_isInHeartRateValue = false;
 
 			if (_dataVersion == 2) {
-				_timeData.pulse = getFloatValue(_characters.toString());
+				_timeData.pulse = Util.parseFloat(_characters.toString());
 			}
 
 		} else if (name.equals(TAG_HEART_RATE_BPM)) {
@@ -717,24 +717,24 @@ public class GarminSAXHandler extends DefaultHandler {
 			_isInHeartRate = false;
 
 			if (_dataVersion == 1) {
-				_timeData.pulse = getFloatValue(_characters.toString());
+				_timeData.pulse = Util.parseFloat(_characters.toString());
 			}
 
 		} else if (name.equals(TAG_ALTITUDE_METERS)) {
 
 			_isInAltitude = false;
 
-			_timeData.absoluteAltitude = getFloatValue(_characters.toString());
+			_timeData.absoluteAltitude = Util.parseFloat(_characters.toString());
 
 		} else if (name.equals(TAG_DISTANCE_METERS)) {
 
 			_isInDistance = false;
-			_timeData.absoluteDistance = getFloatValue(_characters.toString());
+			_timeData.absoluteDistance = Util.parseFloat(_characters.toString());
 
 		} else if (name.equals(TAG_CADENCE)) {
 
 			_isInCadence = false;
-			float cadence = getFloatValue(_characters.toString());
+			float cadence = Util.parseFloat(_characters.toString());
 			_timeData.cadence = cadence = cadence == Float.MIN_VALUE ? 0 : cadence;
 
 		} else if (name.equals(TAG_SENSOR_STATE)) {
@@ -746,25 +746,25 @@ public class GarminSAXHandler extends DefaultHandler {
 
 			_isInLatitude = false;
 
-			_timeData.latitude = getDoubleValue(_characters.toString());
+			_timeData.latitude = Util.parseDouble(_characters.toString());
 
 		} else if (name.equals(TAG_LONGITUDE_DEGREES)) {
 
 			_isInLongitude = false;
 
-			_timeData.longitude = getDoubleValue(_characters.toString());
+			_timeData.longitude = Util.parseDouble(_characters.toString());
 
 		} else if (name.equals(TAG_NS3_SPEED)) {
 
 			_isInNs3Speed = false;
 
-			_timeData.speed = getFloatValue(_characters.toString());
+			_timeData.speed = Util.parseFloat(_characters.toString());
 
 		} else if (name.equals(TAG_NS3_WATTS)) {
 
 			_isInNs3Watts = false;
 
-			_timeData.power = getFloatValue(_characters.toString());
+			_timeData.power = Util.parseFloat(_characters.toString());
 
 		} else if (name.equals(TAG_TIME)) {
 
@@ -801,47 +801,6 @@ public class GarminSAXHandler extends DefaultHandler {
 
 		}
 	}
-
-	private double getDoubleValue(final String textValue) {
-
-		try {
-			if (textValue != null) {
-				return Double.parseDouble(textValue);
-			} else {
-				return Double.MIN_VALUE;
-			}
-
-		} catch (final NumberFormatException e) {
-			return Double.MIN_VALUE;
-		}
-	}
-
-	private float getFloatValue(final String textValue) {
-
-		try {
-			if (textValue != null) {
-				return Float.parseFloat(textValue);
-			} else {
-				return Float.MIN_VALUE;
-			}
-
-		} catch (final NumberFormatException e) {
-			return Float.MIN_VALUE;
-		}
-	}
-
-//	private short getShortValue(final String textValue) {
-//
-//		try {
-//			if (textValue != null) {
-//				return Short.parseShort(textValue);
-//			} else {
-//				return Short.MIN_VALUE;
-//			}
-//		} catch (final NumberFormatException e) {
-//			return Short.MIN_VALUE;
-//		}
-//	}
 
 	private void initializeNewLap() {
 

@@ -2619,7 +2619,11 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		if (isAltitudeAvailable) {
 			for (int serieIndex = 0; serieIndex < size; serieIndex++) {
 
-				gradientSerie[serieIndex] = (float) (Vv_sc[serieIndex] / Vh_sc[serieIndex] * 100.0);
+				final double vh_sc_Value = Vh_sc[serieIndex];
+
+				gradientSerie[serieIndex] = vh_sc_Value == 0.0 ? //
+						0
+						: (float) (Vv_sc[serieIndex] / vh_sc_Value * 100.0);
 
 				final double vSpeedSmoothed = Vv_sc[serieIndex] * 3600.0;
 				altimeterSerie[serieIndex] = (float) (vSpeedSmoothed);

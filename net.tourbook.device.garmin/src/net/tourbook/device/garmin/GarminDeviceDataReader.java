@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,10 +15,6 @@
  *******************************************************************************/
 package net.tourbook.device.garmin;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
 import java.util.HashMap;
 
 import javax.xml.parsers.SAXParser;
@@ -33,7 +29,6 @@ import net.tourbook.ui.UI;
 
 public class GarminDeviceDataReader extends TourbookDevice {
 
-	private static final String	XML_START_ID	= "<?xml";						//$NON-NLS-1$
 	private static final String	XML_GARMIN_TAG	= "<TrainingCenterDatabase";	//$NON-NLS-1$
 
 	// plugin constructor
@@ -68,46 +63,13 @@ public class GarminDeviceDataReader extends TourbookDevice {
 		return -1;
 	}
 
-	/**
-	 * check if the file is a xml file
-	 */
-	private boolean isXMLFile(final String importFilePath) {
-
-		BufferedReader fileReader = null;
-		try {
-			fileReader = new BufferedReader(new FileReader(importFilePath));
-			final String fileHeader = fileReader.readLine();
-			if (fileHeader == null
-					|| (fileHeader.startsWith(XML_START_ID) || fileHeader.startsWith(XML_GARMIN_TAG)) == false) {
-
-				fileReader.close();
-				return false;
-			}
-
-		} catch (final FileNotFoundException e1) {
-			e1.printStackTrace();
-		} catch (final IOException e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				if (fileReader != null) {
-					fileReader.close();
-				}
-			} catch (final IOException e) {
-				StatusUtil.showStatus(e);
-			}
-		}
-
-		return true;
-	}
-
 	@Override
 	public boolean processDeviceData(	final String importFilePath,
 										final DeviceData deviceData,
 										final HashMap<Long, TourData> alreadyImportedTours,
 										final HashMap<Long, TourData> newlyImportedTours) {
 
-		if (isXMLFile(importFilePath) == false) {
+		if (isValidXMLFile(importFilePath, XML_GARMIN_TAG) == false) {
 			return false;
 		}
 
@@ -125,8 +87,10 @@ public class GarminDeviceDataReader extends TourbookDevice {
 			parser.parse("file:" + importFilePath, saxHandler);//$NON-NLS-1$
 
 		} catch (final Exception e) {
+
 			StatusUtil.log("Error parsing file: " + importFilePath, e); //$NON-NLS-1$
 			return false;
+
 		} finally {
 			saxHandler.dispose();
 		}
@@ -135,6 +99,6 @@ public class GarminDeviceDataReader extends TourbookDevice {
 	}
 
 	public boolean validateRawData(final String fileName) {
-		return isXMLFile(fileName);
+		return isValidXMLFile(fileName, XML_GARMIN_TAG);
 	}
 }
