@@ -215,7 +215,6 @@
    
    <!-- Suunto -->
    <extension	point="net.tourbook.deviceDataReader">
-
       <device
             class="net.tourbook.device.suunto.SuuntoDeviceDataReader"
             fileextension="xml"

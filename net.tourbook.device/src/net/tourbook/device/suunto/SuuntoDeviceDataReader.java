@@ -37,10 +37,12 @@ import net.tourbook.importdata.TourbookDevice;
 
 public class SuuntoDeviceDataReader extends TourbookDevice {
 
-	private static final String	SUUNTO_TAG_HEADER				= "<header>";	//$NON-NLS-1$
-	private static final String	SUUNTO_TAG_SAMPLES				= "<samples>";	//$NON-NLS-1$
-	private static final String	SUUNTO_TAG_WELL_FORMED_BEGIN	= "<suunto>";	//$NON-NLS-1$
-	private static final String	SUUNTO_TAG_WELL_FORMED_END		= "</suunto>";	//$NON-NLS-1$
+	public static final String	TAG_SUUNTO						= "suunto";
+
+	private static final String	SUUNTO_TAG_WELL_FORMED_BEGIN	= "<" + TAG_SUUNTO + ">";	//$NON-NLS-1$
+	private static final String	SUUNTO_TAG_WELL_FORMED_END		= "</suunto>";				//$NON-NLS-1$
+	private static final String	SUUNTO_TAG_HEADER				= "<header>";				//$NON-NLS-1$
+	private static final String	SUUNTO_TAG_SAMPLES				= "<samples>";				//$NON-NLS-1$
 
 	// plugin constructor
 	public SuuntoDeviceDataReader() {}

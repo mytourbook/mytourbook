@@ -168,11 +168,24 @@ public class FitContextData {
 				timeDataList.add(contextTimeData.__data);
 			}
 
+			final int lastSerieIndex = timeDataList.size() - 1;
+
 			final List<ContextTourMarker> contextTourMarkerList = _allTourMarker.get(contextTourData);
 
 			final Set<TourMarker> tourMarkerSet = new HashSet<TourMarker>(contextTourMarkerList.size());
 			for (final ContextTourMarker contextTourMarker : contextTourMarkerList) {
-				tourMarkerSet.add(contextTourMarker.__data);
+
+				final TourMarker tourMarker = contextTourMarker.__data;
+
+				/*
+				 * Fit devices adds a marker at the end, this is annoing therefore it is removed. It
+				 * is not only the last time slice it can also be about the last 5 time slices.
+				 */
+				if (tourMarker.getSerieIndex() > lastSerieIndex - 5) {
+					continue;
+				}
+
+				tourMarkerSet.add(tourMarker);
 			}
 
 			handler.handleTour(contextTourData.__data, timeDataList, tourMarkerSet);

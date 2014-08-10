@@ -2621,6 +2621,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 				final double vh_sc_Value = Vh_sc[serieIndex];
 
+				// check divide by 0
 				gradientSerie[serieIndex] = vh_sc_Value == 0.0 ? //
 						0
 						: (float) (Vv_sc[serieIndex] / vh_sc_Value * 100.0);

@@ -17,16 +17,19 @@ package net.tourbook.importdata;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 
 import net.tourbook.common.UI;
+import net.tourbook.common.util.FileUtils;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 
 public abstract class TourbookDevice implements IRawDataReader {
 
+	private static final String		XML_COMMENT				= "<!--";				//$NON-NLS-1$
 	protected static final String	XML_START_ID			= "<?xml";				//$NON-NLS-1$
 
 	/**
@@ -43,22 +46,22 @@ public abstract class TourbookDevice implements IRawDataReader {
 	/**
 	 * Unique id for each device reader
 	 */
-	public String				deviceId;
+	public String					deviceId;
 
 	/**
 	 * Visible device name, e.g. HAC4, HAC5
 	 */
-	public String				visibleName;
+	public String					visibleName;
 
 	/**
 	 * File extension used when tour data are imported from a file
 	 */
-	public String				fileExtension;
+	public String					fileExtension;
 
 	/**
 	 * Sort priority (since version 10.11), default will sort devices to the end.
 	 */
-	public int					extensionSortPriority	= Integer.MAX_VALUE;
+	public int						extensionSortPriority	= Integer.MAX_VALUE;
 
 // disabled in version 10.10, it seems to be not used anymore
 //	/**
@@ -76,23 +79,23 @@ public abstract class TourbookDevice implements IRawDataReader {
 	/**
 	 * when set to <code>-1</code> this is ignored otherwise this year is used as the import year
 	 */
-	public int					importYear				= -1;
+	public int						importYear				= -1;
 
 	/**
 	 * When <code>true</code> the tracks in one file will be merged into one track, a marker is
 	 * created for each track
 	 */
-	public boolean				isMergeTracks			= false;
+	public boolean					isMergeTracks			= false;
 
 	/**
 	 * when <code>true</code> validate the checksum when importing data
 	 */
-	public boolean				isChecksumValidation	= true;
+	public boolean					isChecksumValidation	= true;
 
 	/**
 	 * A tour id will be created with recording time when <code>true</code>.
 	 */
-	public boolean				isCreateTourIdWithRecordingTime;
+	public boolean					isCreateTourIdWithRecordingTime;
 
 	public TourbookDevice() {}
 
@@ -227,11 +230,35 @@ public abstract class TourbookDevice implements IRawDataReader {
 	 */
 	protected boolean isValidXMLFile(final String importFilePath, final String deviceTag) {
 
+		return isValidXMLFile(importFilePath, deviceTag, false);
+	}
+
+	/**
+	 * Check if the file is a valid device xml file.
+	 * 
+	 * @param importFilePath
+	 * @param deviceTag
+	 *            The deviceTag starts on the second line of a xml file.
+	 * @param isRemoveBOM
+	 *            When <code>true</code> the BOM (Byte Order Mark) is removed from the file.
+	 * @return Returns <code>true</code> when the file contains content with the requested tag.
+	 */
+	protected boolean isValidXMLFile(final String importFilePath, final String deviceTag, final boolean isRemoveBOM) {
+
 		BufferedReader fileReader = null;
 
 		try {
 
 			final FileInputStream inputStream = new FileInputStream(importFilePath);
+
+			if (isRemoveBOM) {
+
+				try {
+					FileUtils.consumeBOM(inputStream, UI.UTF_8);
+				} catch (final IOException e) {
+					// just ignore it
+				}
+			}
 
 			fileReader = new BufferedReader(new InputStreamReader(inputStream, UI.UTF_8));
 
@@ -240,15 +267,22 @@ public abstract class TourbookDevice implements IRawDataReader {
 				return false;
 			}
 
-			line = fileReader.readLine();
+			/*
+			 * skip empty lines and lines with comments
+			 */
+			line = fileReader.readLine().trim();
+
+			while (line != null && (line.length() == 0) || line.startsWith(XML_COMMENT)) {
+
+				line = fileReader.readLine().trim();
+			}
+
 			if (line == null || line.toLowerCase().startsWith(deviceTag.toLowerCase()) == false) {
 				return false;
 			}
 
 		} catch (final Exception e1) {
-
 			StatusUtil.log(e1);
-
 		} finally {
 			Util.closeReader(fileReader);
 		}
