@@ -559,12 +559,12 @@ public class TourChartAnalyzerView extends ViewPart {
 
 		for (int columnIndex = 0; columnIndex < columns; columnIndex++) {
 			label = new Label(_innerScContainer, SWT.NONE);
-			label.setText(UI.SPACE);
+			label.setText(UI.SPACE1);
 			label.setLayoutData(gd);
 		}
 
 		label = new Label(_innerScContainer, SWT.NONE);
-		label.setText(UI.SPACE);
+		label.setText(UI.SPACE1);
 		label.setLayoutData(gd);
 	}
 

@@ -285,7 +285,7 @@ public abstract class StatisticDay extends YearStatistic implements IBarSelectio
 		final String tourTags = TourDatabase.getTagNames(_tourDayData.tagIds.get(tooltipTourId));
 		final String tourDescription = _tourDayData.tourDescription.get(valueIndex).replace(
 				net.tourbook.ui.UI.SYSTEM_NEW_LINE,
-				UI.NEW_LINE);
+				UI.NEW_LINE1);
 
 		final int[] startValue = _tourDayData.tourStartValues;
 		final int[] endValue = _tourDayData.tourEndValues;

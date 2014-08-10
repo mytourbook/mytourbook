@@ -1,0 +1,7 @@
+# these settings are merged into the file plugin.properties 
+<<<<<<< HEAD
+0=14.?.0
+=======
+0=14.7.2
+>>>>>>> master
+1=2014

@@ -136,8 +136,8 @@ class FlexTool {
 	private void createUI_20_ToolTipHeader(final Composite parent) {
 
 		final int WINDOW_TITLE_HEIGHT = UI.IS_OSX ? SWT.DEFAULT : 16;
-		final String btnCloseText = UI.IS_OSX ? "x" : UI.SPACE; //$NON-NLS-1$
-		final String btnDefaultText = UI.IS_OSX ? "M" : UI.SPACE; //$NON-NLS-1$
+		final String btnCloseText = UI.IS_OSX ? "x" : UI.SPACE1; //$NON-NLS-1$
+		final String btnDefaultText = UI.IS_OSX ? "M" : UI.SPACE1; //$NON-NLS-1$
 
 		_headerContainer = new Composite(parent, SWT.NONE);
 		GridDataFactory

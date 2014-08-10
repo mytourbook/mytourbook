@@ -240,7 +240,7 @@ public class TourManager {
 	}
 
 	/**
-	 * Computes distance values from geo position
+	 * Computes distance values from geo position.
 	 * 
 	 * @param tourDataList
 	 * @return Returns <code>true</code> when distance values are computed and {@link TourData} are
@@ -267,58 +267,68 @@ public class TourManager {
 
 				for (final TourData tourData : tourDataList) {
 
-					final double[] latSerie = tourData.latitudeSerie;
-					final double[] lonSerie = tourData.longitudeSerie;
+					final boolean isComputed = computeDistanceValuesFromGeoPosition(tourData);
 
-					if (latSerie == null) {
-						continue;
+					if (isComputed) {
+						retValue[0] = true;
 					}
-
-					final float[] distanceSerie = new float[latSerie.length];
-					tourData.distanceSerie = distanceSerie;
-
-					double distance = 0;
-					double latStart = latSerie[0];
-					double lonStart = lonSerie[0];
-
-					// compute distance for every time slice
-					for (int serieIndex = 1; serieIndex < latSerie.length; serieIndex++) {
-
-						final double latEnd = latSerie[serieIndex];
-						final double lonEnd = lonSerie[serieIndex];
-
-						/*
-						 * vincenty algorithm is much more accurate compared with haversine
-						 */
-//						final double distDiff = Util.distanceHaversine(latStart, lonStart, latEnd, lonEnd);
-						final double distDiff = MtMath.distanceVincenty(latStart, lonStart, latEnd, lonEnd);
-
-						distance += distDiff;
-						distanceSerie[serieIndex] = (float) distance;
-
-						latStart = latEnd;
-						lonStart = lonEnd;
-					}
-
-					// update tour distance which is displayed in views/tour editor
-					tourData.setTourDistance((int) distance);
-
-					// set distance in markers
-					final Set<TourMarker> allTourMarker = tourData.getTourMarkers();
-					if (allTourMarker != null) {
-
-						for (final TourMarker tourMarker : allTourMarker) {
-							final float markerDistance = distanceSerie[tourMarker.getSerieIndex()];
-							tourMarker.setDistance(markerDistance);
-						}
-					}
-
-					retValue[0] = true;
 				}
 			}
 		});
 
 		return retValue[0];
+	}
+
+	public static boolean computeDistanceValuesFromGeoPosition(final TourData tourData) {
+
+		final double[] latSerie = tourData.latitudeSerie;
+		final double[] lonSerie = tourData.longitudeSerie;
+
+		if (latSerie == null) {
+			return false;
+		}
+
+		final float[] distanceSerie = new float[latSerie.length];
+
+		double distance = 0;
+		double latStart = latSerie[0];
+		double lonStart = lonSerie[0];
+
+		// compute distance for every time slice
+		for (int serieIndex = 1; serieIndex < latSerie.length; serieIndex++) {
+
+			final double latEnd = latSerie[serieIndex];
+			final double lonEnd = lonSerie[serieIndex];
+
+			/*
+			 * vincenty algorithm is much more accurate compared with haversine
+			 */
+//			final double distDiff = Util.distanceHaversine(latStart, lonStart, latEnd, lonEnd);
+			final double distDiff = MtMath.distanceVincenty(latStart, lonStart, latEnd, lonEnd);
+
+			distance += distDiff;
+			distanceSerie[serieIndex] = (float) distance;
+
+			latStart = latEnd;
+			lonStart = lonEnd;
+		}
+
+		// update tour distance which is displayed in views/tour editor
+		tourData.setTourDistance((int) distance);
+
+		// set distance in markers
+		final Set<TourMarker> allTourMarker = tourData.getTourMarkers();
+		if (allTourMarker != null) {
+
+			for (final TourMarker tourMarker : allTourMarker) {
+				final float markerDistance = distanceSerie[tourMarker.getSerieIndex()];
+				tourMarker.setDistance(markerDistance);
+			}
+		}
+
+		tourData.distanceSerie = distanceSerie;
+
+		return true;
 	}
 
 	public static float computeTourSpeed(final TourData tourData, final int startIndex, final int endIndex) {

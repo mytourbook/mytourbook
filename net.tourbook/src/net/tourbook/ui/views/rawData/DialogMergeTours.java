@@ -809,7 +809,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
 				.applyTo(_lblAdjustSecondsValue);
 
 		label = new Label(timeContainer, SWT.NONE);
-		label.setText(UI.SPACE);
+		label.setText(UI.SPACE1);
 
 		_lblAdjustSecondsUnit = new Label(timeContainer, SWT.NONE);
 		_lblAdjustSecondsUnit.setText(Messages.tour_merger_label_adjust_seconds);
@@ -842,7 +842,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
 				.applyTo(_lblAdjustMinuteValue);
 
 		label = new Label(timeContainer, SWT.NONE);
-		label.setText(UI.SPACE);
+		label.setText(UI.SPACE1);
 
 		_lblAdjustMinuteUnit = new Label(timeContainer, SWT.NONE);
 		_lblAdjustMinuteUnit.setText(Messages.tour_merger_label_adjust_minutes);

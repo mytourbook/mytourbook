@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,18 +15,12 @@
  *******************************************************************************/
 package net.tourbook.device.sporttracks;
 
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.HashMap;
 
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
 import net.tourbook.application.TourbookPlugin;
-import net.tourbook.common.UI;
-import net.tourbook.common.util.FileUtils;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.data.TourData;
 import net.tourbook.database.TourDatabase;
@@ -43,7 +37,6 @@ import org.eclipse.swt.widgets.Display;
 
 public class FitLogDeviceDataReader extends TourbookDevice {
 
-	private static final String				XML_START_ID	= "<?xml";											//$NON-NLS-1$
 	private static final String				XML_FIT_LOG_TAG	= "<FitnessWorkbook ";								//$NON-NLS-1$
 
 	private static final IPreferenceStore	_prefStore		= TourbookPlugin.getDefault().getPreferenceStore();
@@ -79,59 +72,13 @@ public class FitLogDeviceDataReader extends TourbookDevice {
 		return -1;
 	}
 
-	/**
-	 * check if the file is a valid fit log file
-	 */
-	private boolean isValidXMLFile(final String importFilePath) {
-
-		BufferedReader fileReader = null;
-		try {
-
-			final FileInputStream inputStream = new FileInputStream(importFilePath);
-
-			/*
-			 * .fitlog files contain BOM's (Byte Order Mark)
-			 */
-			try {
-				FileUtils.consumeBOM(inputStream, UI.UTF_8);
-			} catch (final IOException e) {
-				// just ignore it
-			}
-
-			fileReader = new BufferedReader(new InputStreamReader(inputStream, UI.UTF_8));
-
-			String line = fileReader.readLine();
-			if (line == null || line.startsWith(XML_START_ID) == false) {
-				return false;
-			}
-
-			line = fileReader.readLine();
-			if (line == null || line.startsWith(XML_FIT_LOG_TAG) == false) {
-				return false;
-			}
-
-		} catch (final Exception e1) {
-			StatusUtil.log(e1);
-		} finally {
-			try {
-				if (fileReader != null) {
-					fileReader.close();
-				}
-			} catch (final IOException e) {
-				StatusUtil.showStatus(e);
-			}
-		}
-
-		return true;
-	}
-
 	@Override
 	public boolean processDeviceData(	final String importFilePath,
 										final DeviceData deviceData,
 										final HashMap<Long, TourData> alreadyImportedTours,
 										final HashMap<Long, TourData> newlyImportedTours) {
 
-		if (isValidXMLFile(importFilePath) == false) {
+		if (isValidXMLFile(importFilePath, XML_FIT_LOG_TAG, true) == false) {
 			return false;
 		}
 
@@ -184,6 +131,10 @@ public class FitLogDeviceDataReader extends TourbookDevice {
 	}
 
 	public boolean validateRawData(final String fileName) {
-		return isValidXMLFile(fileName);
+
+		/*
+		 * .fitlog files contain BOM's (Byte Order Mark)
+		 */
+		return isValidXMLFile(fileName, XML_FIT_LOG_TAG, true);
 	}
 }

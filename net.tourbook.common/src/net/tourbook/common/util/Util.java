@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.MessageDigest;
@@ -150,6 +151,17 @@ public class Util {
 				stmt.close();
 			} catch (final SQLException e) {
 				SQL.showSQLException(e);
+			}
+		}
+	}
+
+	public static void closeWriter(final Writer writer) {
+
+		if (writer != null) {
+			try {
+				writer.close();
+			} catch (final Exception e) {
+				StatusUtil.showStatus(e);
 			}
 		}
 	}
@@ -1235,6 +1247,20 @@ public class Util {
 		return Double.MIN_VALUE;
 	}
 
+	public static double parseDouble(final String textValue) {
+
+		try {
+			if (textValue != null) {
+				return Double.parseDouble(textValue);
+			} else {
+				return Double.MIN_VALUE;
+			}
+
+		} catch (final NumberFormatException e) {
+			return Double.MIN_VALUE;
+		}
+	}
+
 	/**
 	 * Parses SAX attribute
 	 * 
@@ -1254,6 +1280,20 @@ public class Util {
 			// do nothing
 		}
 		return Float.MIN_VALUE;
+	}
+
+	public static float parseFloat(final String textValue) {
+
+		try {
+			if (textValue != null) {
+				return Float.parseFloat(textValue);
+			} else {
+				return Float.MIN_VALUE;
+			}
+
+		} catch (final NumberFormatException e) {
+			return Float.MIN_VALUE;
+		}
 	}
 
 	/**
@@ -1320,6 +1360,7 @@ public class Util {
 
 	/**
 	 * Load a text file.
+	 * 
 	 * @param fileName
 	 * @return Returns the content from a text file
 	 */
@@ -1348,7 +1389,7 @@ public class Util {
 	 * appended to a StringBuilder and returned as String.
 	 */
 	public static String readContentFromStream(final InputStream inputStream) throws IOException {
- 
+
 		if (inputStream != null) {
 
 			final StringBuilder sb = new StringBuilder();

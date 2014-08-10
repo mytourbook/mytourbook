@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,14 +15,11 @@
  *******************************************************************************/
 package net.tourbook.device.gpx;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
 import java.util.HashMap;
 
 import javax.xml.parsers.SAXParserFactory;
 
+import net.tourbook.common.util.StatusUtil;
 import net.tourbook.data.TourData;
 import net.tourbook.importdata.DeviceData;
 import net.tourbook.importdata.SerialParameters;
@@ -35,7 +32,7 @@ import org.xml.sax.SAXParseException;
 
 public class GPXDeviceDataReader extends TourbookDevice {
 
-	private static final String	XML_START_ID	= "<?xml";	//$NON-NLS-1$
+	private static final String	XML_GPX_TAG	= "<gpx";	//$NON-NLS-1$
 
 	// plugin constructor
 	public GPXDeviceDataReader() {}
@@ -75,29 +72,8 @@ public class GPXDeviceDataReader extends TourbookDevice {
 										final HashMap<Long, TourData> alreadyImportedTours,
 										final HashMap<Long, TourData> newlyImportedTours) {
 
-		/*
-		 * check if the file is a xml file
-		 */
-		BufferedReader fileReader = null;
-		try {
-			fileReader = new BufferedReader(new FileReader(importFilePath));
-			final String fileHeader = fileReader.readLine();
-			if (fileHeader == null || fileHeader.contains(XML_START_ID) == false) {
-				fileReader.close();
-				return false;
-			}
-		} catch (final FileNotFoundException e1) {
-			e1.printStackTrace();
-		} catch (final IOException e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				if (fileReader != null) {
-					fileReader.close();
-				}
-			} catch (final IOException e) {
-				e.printStackTrace();
-			}
+		if (isValidXMLFile(importFilePath, XML_GPX_TAG) == false) {
+			return false;
 		}
 
 		final GPX_SAX_Handler handler = new GPX_SAX_Handler(
@@ -139,8 +115,8 @@ public class GPXDeviceDataReader extends TourbookDevice {
 			return false;
 
 		} catch (final Exception e) {
-			System.err.println("Error parsing file: " + importFilePath); //$NON-NLS-1$
-			e.printStackTrace();
+
+			StatusUtil.log("Error parsing file: " + importFilePath, e); //$NON-NLS-1$
 			return false;
 		}
 
@@ -148,7 +124,7 @@ public class GPXDeviceDataReader extends TourbookDevice {
 	}
 
 	public boolean validateRawData(final String fileName) {
-		return true;
+		return isValidXMLFile(fileName, XML_GPX_TAG);
 	}
 
 }

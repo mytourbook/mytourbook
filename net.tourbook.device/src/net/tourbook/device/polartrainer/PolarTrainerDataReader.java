@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,9 +15,6 @@
  *******************************************************************************/
 package net.tourbook.device.polartrainer;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
 import java.util.HashMap;
 
 import javax.xml.parsers.SAXParser;
@@ -42,10 +39,9 @@ import org.eclipse.swt.widgets.Display;
  */
 public class PolarTrainerDataReader extends TourbookDevice {
 
-	private static final String				XML_START_ID	= "<?xml";											//$NON-NLS-1$
-	private static final String				XML_POLAR_TAG	= "<<polar-exercise-data";							//$NON-NLS-1$
+	private static final String				XML_POLAR_TAG	= "<polar-exercise-data";			//$NON-NLS-1$
 
-	private static final IPreferenceStore	_prefStore		= TourbookPlugin.getDefault().getPreferenceStore();
+	private static final IPreferenceStore	_prefStore		= TourbookPlugin.getPrefStore();
 
 	// plugin constructor
 	public PolarTrainerDataReader() {}
@@ -78,45 +74,13 @@ public class PolarTrainerDataReader extends TourbookDevice {
 		return -1;
 	}
 
-	/**
-	 * check if the file is a xml file
-	 */
-	private boolean isValidXMLFile(final String importFilePath) {
-
-		BufferedReader fileReader = null;
-		try {
-			fileReader = new BufferedReader(new FileReader(importFilePath));
-			final String fileHeader = fileReader.readLine();
-
-			if (fileHeader == null
-					|| (fileHeader.startsWith(XML_START_ID) || fileHeader.startsWith(XML_POLAR_TAG)) == false) {
-
-				fileReader.close();
-				return false;
-			}
-
-		} catch (final Exception e1) {
-			StatusUtil.log(e1);
-		} finally {
-			try {
-				if (fileReader != null) {
-					fileReader.close();
-				}
-			} catch (final IOException e) {
-				StatusUtil.showStatus(e);
-			}
-		}
-
-		return true;
-	}
-
 	@Override
 	public boolean processDeviceData(	final String importFilePath,
 										final DeviceData deviceData,
 										final HashMap<Long, TourData> alreadyImportedTours,
 										final HashMap<Long, TourData> newlyImportedTours) {
 
-		if (isValidXMLFile(importFilePath) == false) {
+		if (isValidXMLFile(importFilePath, XML_POLAR_TAG) == false) {
 			return false;
 		}
 
@@ -161,7 +125,7 @@ public class PolarTrainerDataReader extends TourbookDevice {
 	}
 
 	public boolean validateRawData(final String fileName) {
-		return isValidXMLFile(fileName);
+		return isValidXMLFile(fileName, XML_POLAR_TAG);
 	}
 
 }

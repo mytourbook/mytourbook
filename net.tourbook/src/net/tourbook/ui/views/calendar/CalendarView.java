@@ -270,7 +270,7 @@ public class CalendarView extends ViewPart implements ITourProvider {
 						return data.tourTitle;
 					} else if (data.tourDescription != null && data.tourDescription.length() > 1) {
 						// for now we are only supporting one line descriptions
-						return data.tourDescription.replace("\r\n", UI.SPACE).replace("\n", UI.SPACE); //$NON-NLS-1$ //$NON-NLS-2$
+						return data.tourDescription.replace("\r\n", UI.SPACE1).replace("\n", UI.SPACE1); //$NON-NLS-1$ //$NON-NLS-2$
 					} else {
 						return UI.EMPTY_STRING;
 					}
@@ -290,7 +290,7 @@ public class CalendarView extends ViewPart implements ITourProvider {
 				public String format(final CalendarTourData data) {
 					if (data.tourDescription != null && data.tourDescription.length() > 1) {
 						// for now we are only supporting one line descriptions
-						return data.tourDescription.replace("\r\n", UI.SPACE).replace("\n", UI.SPACE); //$NON-NLS-1$ //$NON-NLS-2$
+						return data.tourDescription.replace("\r\n", UI.SPACE1).replace("\n", UI.SPACE1); //$NON-NLS-1$ //$NON-NLS-2$
 					} else if (data.tourTitle != null && data.tourTitle.length() > 1) {
 						return data.tourTitle;
 					} else {
