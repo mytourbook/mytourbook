@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import net.tourbook.common.UI;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TimeData;
 import net.tourbook.data.TourData;
@@ -68,24 +69,18 @@ public class FitContext {
 	}
 
 	public String getDeviceName() {
+
 		final StringBuilder deviceName = new StringBuilder();
-		if (getManufacturer() != null) {
-			deviceName.append(getManufacturer()).append(" "); //$NON-NLS-1$
+
+		if (_manufacturer != null) {
+			deviceName.append(_manufacturer).append(UI.SPACE);
 		}
 
-		if (getGarminProduct() != null) {
-			deviceName.append(getGarminProduct()).append(" "); //$NON-NLS-1$
-		}
-
-		if (getSoftwareVersion() != null) {
-			deviceName.append("(").append(getSoftwareVersion()).append(")"); //$NON-NLS-1$ //$NON-NLS-2$
+		if (_garminProduct != null) {
+			deviceName.append(_garminProduct);
 		}
 
 		return deviceName.toString();
-	}
-
-	public String getGarminProduct() {
-		return _garminProduct;
 	}
 
 	public float getLapDistance() {
@@ -94,10 +89,6 @@ public class FitContext {
 
 	public int getLapTime() {
 		return _lapTime;
-	}
-
-	public String getManufacturer() {
-		return _manufacturer;
 	}
 
 	/**
@@ -154,10 +145,6 @@ public class FitContext {
 
 	public String getSessionIndex() {
 		return _sessionIndex;
-	}
-
-	public String getSoftwareVersion() {
-		return _softwareVersion;
 	}
 
 	public String getTourDescription() {
@@ -232,6 +219,7 @@ public class FitContext {
 
 				tourData.setDeviceId(getDeviceId());
 				tourData.setDeviceName(getDeviceName());
+				tourData.setDeviceFirmwareVersion(_softwareVersion);
 				tourData.setDeviceTimeInterval((short) -1);
 
 				tourData.setIsDistanceFromSensor(isSpeedSensorPresent());

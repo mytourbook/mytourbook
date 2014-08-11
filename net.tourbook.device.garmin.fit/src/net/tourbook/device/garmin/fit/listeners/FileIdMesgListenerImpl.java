@@ -18,6 +18,9 @@ public class FileIdMesgListenerImpl extends AbstractMesgListener implements File
 	@Override
 	public void onMesg(final FileIdMesg mesg) {
 
+		/*
+		 * File Type
+		 */
 		final File type = mesg.getType();
 		if (type != File.ACTIVITY) {
 			throw new FitDataReaderException("Invalid file type: " //$NON-NLS-1$
@@ -26,13 +29,18 @@ public class FileIdMesgListenerImpl extends AbstractMesgListener implements File
 					+ File.ACTIVITY.name());
 		}
 
+		/*
+		 * Serial Number
+		 */
 		final Long serialNumber = mesg.getSerialNumber();
 		if (serialNumber == null) {
 			throw new FitDataReaderException("File serial number is missing"); //$NON-NLS-1$
 		}
-
 		context.setDeviceId(serialNumber.toString());
 
+		/*
+		 * Manufacturer
+		 */
 		final Integer manufacturer = mesg.getManufacturer();
 		if (manufacturer != null) {
 			final Manufacturer manufacturerEnum = Manufacturer.valueOf(manufacturer);
@@ -43,6 +51,9 @@ public class FileIdMesgListenerImpl extends AbstractMesgListener implements File
 			}
 		}
 
+		/*
+		 * Product
+		 */
 		final Integer garminProduct = mesg.getGarminProduct();
 		if (garminProduct != null) {
 			final GarminProduct garminProductEnum = GarminProduct.valueOf(garminProduct);

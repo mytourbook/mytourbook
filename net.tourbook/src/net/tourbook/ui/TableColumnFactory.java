@@ -400,7 +400,22 @@ public abstract class TableColumnFactory {
 			colDef.setLabelProvider(new CellLabelProvider() {
 				@Override
 				public void update(final ViewerCell cell) {
-					cell.setText(((TourData) cell.getElement()).getDeviceName());
+					
+					TourData tourData = (TourData) cell.getElement();
+					
+					String deviceName = tourData.getDeviceName();
+					String firmwareVersion = tourData.getDeviceFirmwareVersion();
+					
+					String name = firmwareVersion.length() == 0//
+							? deviceName
+							: deviceName
+									+ UI.SPACE
+									+ UI.SYMBOL_BRACKET_LEFT
+									+ firmwareVersion
+									+ UI.SYMBOL_BRACKET_RIGHT
+									;
+					
+					cell.setText(name);
 				}
 			});
 			

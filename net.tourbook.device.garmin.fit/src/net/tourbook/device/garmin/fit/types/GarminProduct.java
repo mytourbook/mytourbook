@@ -2,32 +2,33 @@ package net.tourbook.device.garmin.fit.types;
 
 import com.garmin.fit.Fit;
 
+/**
+ * This is from {@link com.garmin.fit.GarminProduct} and converted into an enum.
+ */
 public enum GarminProduct {
 
-	// source: com.garmin.fit.GarminProduct
-
 	HRM1(1), //
-	AXH01(2), // 							// AXH01 HRM chipset
+	AXH01(2), //							// AXH01 HRM chipset
 	AXB01(3), //
 	AXB02(4), //
 	HRM2SS(5), //
 	DSI_ALF02(6), //
 	HRM3SS(7), //
 	HRM_RUN_SINGLE_BYTE_PRODUCT_ID(8), //	// hrm_run model for HRM ANT+ messaging
-	BSM(9), // 								// BSM model for ANT+ messaging
-	BCM(10), // 							// BCM model for ANT+ messaging
+	BSM(9), //								// BSM model for ANT+ messaging
+	BCM(10), //								// BCM model for ANT+ messaging
 	FR301_CHINA(473), //
 	FR301_JAPAN(474), //
 	FR301_KOREA(475), //
 	FR301_TAIWAN(494), //
-	FR405(717), // 							// Forerunner 405
-	FR50(782), // 							// Forerunner 50
+	FR405(717), //							// Forerunner 405
+	FR50(782), //							// Forerunner 50
 	FR405_JAPAN(987), //
-	FR60(988), // 							// Forerunner 60
+	FR60(988), //							// Forerunner 60
 	DSI_ALF01(1011), //
-	FR310XT(1018), // 						// Forerunner 310
+	FR310XT(1018), //						// Forerunner 310
 	EDGE500(1036), //
-	FR110(1124), // 						// Forerunner 110
+	FR110(1124), //							// Forerunner 110
 	EDGE800(1169), //
 	EDGE500_TAIWAN(1199), //
 	EDGE500_JAPAN(1213), //
@@ -65,7 +66,7 @@ public enum GarminProduct {
 	FR10_JAPAN(1688), //
 	EDGE810_JAPAN(1721), //
 	VIRB_ELITE(1735), //
-	EDGE_TOURING(1736), // 					// Also Edge Touring Plus
+	EDGE_TOURING(1736), //					// Also Edge Touring Plus
 	EDGE510_JAPAN(1742), //
 	HRM_RUN(1752), //
 	EDGE510_ASIA(1821), //
@@ -75,16 +76,18 @@ public enum GarminProduct {
 	VIVO_FIT(1837), //
 	VIRB_REMOTE(1853), //
 	VIVO_KI(1885), //
+	FR15(1903), //
 	EDGE510_KOREA(1918), //
 	FR620_JAPAN(1928), //
 	FR620_CHINA(1929), //
 	FR220_JAPAN(1930), //
 	FR220_CHINA(1931), //
-	SDM4(10007), // 						// SDM4 footpod
+	FENIX2(1967), //
+	SDM4(10007), //							// SDM4 footpod
 	EDGE_REMOTE(10014), //
 	TRAINING_CENTER(20119), //
 	ANDROID_ANTPLUS_PLUGIN(65532), //
-	CONNECT(65534), // 						// Garmin Connect website
+	CONNECT(65534), //						// Garmin Connect website
 	INVALID(Fit.UINT16_INVALID), //
 
 	;
