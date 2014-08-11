@@ -120,6 +120,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	public static final int										DB_LENGTH_WEATHER					= 1000;
 	public static final int										DB_LENGTH_WEATHER_CLOUDS			= 255;
 
+	public static final int										GPS_STATE_WITHOUT_GPS				= 0;
+	public static final int										GPS_STATE_WITH_GPS					= 1;
+	public static final int										GPS_STATE_WITH_MERGED_GPS			= 2;
+
 	private static final String									TIME_ZONE_ID_EUROPE_BERLIN			= "Europe/Berlin";										//$NON-NLS-1$
 
 	public static final int										MIN_TIMEINTERVAL_FOR_MAX_SPEED		= 20;
@@ -592,7 +596,11 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	@Basic(optional = false)
 	private SerieData											serieData;
 
-	// ############################################# ASSOCIATED ENTITIES #############################################
+	/**
+	 * This state contains {@link #GPS_STATE_WITH_GPS} when the tour was created with GPS data
+	 * otherwise the state is 0.
+	 */
+	private int													gpsState;
 
 	/**
 	 * Photos for this tour
@@ -600,6 +608,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	@OneToMany(fetch = FetchType.EAGER, cascade = ALL, mappedBy = "tourData")
 	@Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
 	private Set<TourPhoto>										tourPhotos							= new HashSet<TourPhoto>();
+
+	// ############################################# ASSOCIATED ENTITIES #############################################
 
 	/**
 	 * Tour marker
@@ -657,10 +667,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	@ManyToOne
 	private TourBike											tourBike;
 
-	/*
-	 * ################################### TRANSIENT DATA ########################################
-	 */
-
 	/**
 	 * Contains time in <b>seconds</b> relativ to the tour start which is defined in:
 	 * {@link #startYear}, {@link #startMonth}, {@link #startDay}, {@link #startHour},
@@ -673,6 +679,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	 */
 	@Transient
 	public int[]												timeSerie;
+
+	/*
+	 * ################################### TRANSIENT DATA ########################################
+	 */
 
 	/**
 	 * contains the absolute distance in m (metric system)
@@ -821,10 +831,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	public float[]												tourCompareSerie;
 
 	/*
-	 * computed data series
-	 */
-
-	/*
 	 * GPS data
 	 */
 	/**
@@ -832,6 +838,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	 */
 	@Transient
 	public double[]												latitudeSerie;
+
+	/*
+	 * computed data series
+	 */
 
 	@Transient
 	public double[]												longitudeSerie;
@@ -865,13 +875,14 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 	@Transient
 	public int[]												segmentSerieRecordingTime;
+
 	@Transient
 	public int[]												segmentSerieDrivingTime;
 	@Transient
 	public int[]												segmentSerieBreakTime;
-
 	@Transient
 	public float[]												segmentSerieDistanceDiff;
+
 	@Transient
 	public float[]												segmentSerieDistanceTotal;
 	@Transient
@@ -882,9 +893,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	public float[]												segmentSerieAltitudeUpH;
 	@Transient
 	public float[]												segmentSerieAltitudeDownH;
-
 	@Transient
 	public float[]												segmentSerieSpeed;
+
 	@Transient
 	public float[]												segmentSeriePace;
 	@Transient
@@ -895,7 +906,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	public float[]												segmentSerieGradient;
 	@Transient
 	public float[]												segmentSeriePulse;
-
 	/**
 	 * Contains the filename from which the data is imported. When <code>null</code> the data is not
 	 * imported it is from the database.
@@ -1061,7 +1071,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	public TourData() {}
 
 	/**
-	 * Removed data series when the sum of all values is 0
+	 * Removed data series when the sum of all values is 0.
 	 */
 	public void cleanupDataSeries() {
 
@@ -1211,6 +1221,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 			latitudeSerie = null;
 			longitudeSerie = null;
 		}
+
+		setGpsState(latitudeSerie == null ? GPS_STATE_WITHOUT_GPS : GPS_STATE_WITH_GPS);
 	}
 
 	/**
@@ -4567,6 +4579,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		return _gpsBounds;
 	}
 
+	public int getGpsState() {
+		return gpsState;
+	}
+
 	/**
 	 * @return Returns the metric or imperial altimeter serie depending on the active measurement
 	 */
@@ -5819,6 +5835,18 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 	public void setDpTolerance(final short dpTolerance) {
 		this.dpTolerance = dpTolerance;
+	}
+
+	/**
+	 * Set state if the tour contains GPS data when the tour was created.
+	 * <p>
+	 * The state {@link #GPS_STATE_WITH_GPS} is set when the tour was created with GPS data
+	 * otherwise the state is {@link #GPS_STATE_WITHOUT_GPS} or {@link #GPS_STATE_WITH_MERGED_GPS}.
+	 * 
+	 * @param gpsState
+	 */
+	public void setGpsState(final int gpsState) {
+		this.gpsState = gpsState;
 	}
 
 	/**

@@ -359,7 +359,14 @@ public class TourDatabase {
 			return;
 		}
 
-		@SuppressWarnings("unused")
+		/**
+		 * @param stmt
+		 * @param table
+		 * @param columnName
+		 * @param defaultValue
+		 *            Default value.
+		 * @throws SQLException
+		 */
 		private static void AddCol_Int(	final Statement stmt,
 										final String table,
 										final String columnName,
@@ -2653,6 +2660,12 @@ public class TourDatabase {
 				+ "	photoTimeAdjustment		INTEGER DEFAULT 0,												\n" //$NON-NLS-1$
 				//
 				// version 23 end ---------
+
+				// version 25 start  -  >14.7.0
+				//
+				+ "	gpsState				INTEGER DEFAULT 0,												\n" //$NON-NLS-1$
+				//
+				// version 25 end ---------
 
 				+ "	serieData				BLOB 															\n" //$NON-NLS-1$
 
@@ -4977,6 +4990,12 @@ public class TourDatabase {
 					SQL.AddCol_Double(stmt, TABLE_TOUR_MARKER, "latitude", DOUBLE_MIN_VALUE); //$NON-NLS-1$
 					SQL.AddCol_Double(stmt, TABLE_TOUR_MARKER, "longitude", DOUBLE_MIN_VALUE); //$NON-NLS-1$
 				}
+
+				// Table: TOURDATA
+				{
+					// Add new columns
+					SQL.AddCol_Int(stmt, TABLE_TOUR_DATA, "gpsState", "0"); //$NON-NLS-1$
+				}
 			}
 		}
 		stmt.close();
@@ -5035,6 +5054,11 @@ public class TourDatabase {
 							tourMarker.setGeoPosition(latitudeSerie[serieIndex], longitudeSerie[serieIndex]);
 						}
 					}
+
+					// set GPS state
+					tourData.setGpsState(latitudeSerie == null
+							? TourData.GPS_STATE_WITHOUT_GPS
+							: TourData.GPS_STATE_WITH_GPS);
 
 					TourDatabase.saveEntity(tourData, tourId, TourData.class);
 				}
