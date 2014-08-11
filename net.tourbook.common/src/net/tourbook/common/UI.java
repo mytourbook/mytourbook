@@ -80,6 +80,9 @@ public class UI {
 	public static final char			NEW_LINE								= '\n';
 	public static final char			TAB										= '\t';
 
+	public static final char			SYMBOL_BRACKET_LEFT						= '(';
+	public static final char			SYMBOL_BRACKET_RIGHT					= ')';
+
 	public static final String			COMMA_SPACE								= ", ";																	//$NON-NLS-1$
 	public static final String			DASH									= "-";																		//$NON-NLS-1$
 	public static final String			DASH_WITH_SPACE							= " - ";																	//$NON-NLS-1$
@@ -115,8 +118,6 @@ public class UI {
 	public static final String			SYMBOL_SUN								= "\u263C";																//$NON-NLS-1$
 	public static final String			SYMBOL_TAU								= "\u03c4";																//$NON-NLS-1$
 
-	public static final String			SYMBOL_BRACKET_LEFT						= "(";																		//$NON-NLS-1$
-	public static final String			SYMBOL_BRACKET_RIGHT					= ")";																		//$NON-NLS-1$
 	public static final String			SYMBOL_COLON							= ":";																		//$NON-NLS-1$
 	public static final String			SYMBOL_DOT								= ".";																		//$NON-NLS-1$
 	public static final String			SYMBOL_EQUAL							= "=";																		//$NON-NLS-1$
