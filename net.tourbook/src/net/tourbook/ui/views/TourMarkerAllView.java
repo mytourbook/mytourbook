@@ -89,50 +89,50 @@ import org.eclipse.ui.part.ViewPart;
  */
 public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourViewer {
 
-	public static final String			ID							= "net.tourbook.ui.views.TourMarkerAllView";	//$NON-NLS-1$
-
-	private static final String			COLUMN_ALTITUDE				= "Altitude";									//$NON-NLS-1$
-
-	private static final String			COLUMN_DESCRIPTION			= "Description";								//$NON-NLS-1$
-	private static final String			COLUMN_LATITUDE				= "Latitude";									//$NON-NLS-1$
-	private static final String			COLUMN_LONGITUDE			= "Longitude";									//$NON-NLS-1$
-	private static final String			COLUMN_MARKER_ID			= "MarkerId";									//$NON-NLS-1$
-	private static final String			COLUMN_NAME					= "Name";										//$NON-NLS-1$
-	private static final String			COLUMN_TOUR_ID				= "TourId";									//$NON-NLS-1$
-	private static final String			COLUMN_URL_ADDRESS			= "UrlAddress";								//$NON-NLS-1$
-	private static final String			COLUMN_URL_LABEL			= "UrlLabel";									//$NON-NLS-1$
-	private static final String			STATE_SELECTED_MARKER_ITEM	= "STATE_SELECTED_MARKER_ITEM";				//$NON-NLS-1$
-
-	private static final String			STATE_SORT_COLUMN_DIRECTION	= "STATE_SORT_COLUMN_DIRECTION";				//$NON-NLS-1$
-	private static final String			STATE_SORT_COLUMN_ID		= "STATE_SORT_COLUMN_ID";						//$NON-NLS-1$
-	private static final String			STATE_TOUR_FILTER_GPS		= "STATE_TOUR_FILTER_GPS";						//$NON-NLS-1$
-	private static int					TOUR_FILTER_GPS_IS_DISABLED	= 0;
-
-	private static int					TOUR_FILTER_WITH_GPS		= 1;
-	private static int					TOUR_FILTER_WITHOUT_GPS		= 2;
-	private final IPreferenceStore		_prefStore					= TourbookPlugin.getPrefStore();
-
-	private final IDialogSettings		_state						= TourbookPlugin.getState("TourMarkerAllView"); //$NON-NLS-1$
-	private ISelectionListener			_postSelectionListener;
-
-	private IPropertyChangeListener		_prefChangeListener;
-	private ITourEventListener			_tourEventListener;
-	private IPartListener2				_partListener;
-	private ActionModifyColumns			_actionModifyColumns;
-
-	private ActionTourFilterWithGPS		_actionTourFilterWithGPS;
-	private ActionTourFilterWithoutGPS	_actionTourFilterWithoutGPS;
-	private PixelConverter				_pc;
-
-	private ArrayList<TourMarkerItem>	_allMarkerItems				= new ArrayList<TourMarkerItem>();
-
-	private int							_tourFilterGPS				= TOUR_FILTER_GPS_IS_DISABLED;
-
-	private boolean						_isUpdateUI;
+	public static final String				ID								= "net.tourbook.ui.views.TourMarkerAllView";	//$NON-NLS-1$
 	//
-	private final NumberFormat			_nf1						= NumberFormat.getNumberInstance();
-	private final NumberFormat			_nf_3_3						= NumberFormat.getNumberInstance();
-	private final NumberFormat			_nf6						= NumberFormat.getNumberInstance();
+	private static final String				COLUMN_ALTITUDE					= "Altitude";									//$NON-NLS-1$
+	private static final String				COLUMN_DESCRIPTION				= "Description";								//$NON-NLS-1$
+	private static final String				COLUMN_LATITUDE					= "Latitude";									//$NON-NLS-1$
+	private static final String				COLUMN_LONGITUDE				= "Longitude";									//$NON-NLS-1$
+	private static final String				COLUMN_MARKER_ID				= "MarkerId";									//$NON-NLS-1$
+	private static final String				COLUMN_NAME						= "Name";										//$NON-NLS-1$
+	private static final String				COLUMN_TOUR_ID					= "TourId";									//$NON-NLS-1$
+	private static final String				COLUMN_URL_ADDRESS				= "UrlAddress";								//$NON-NLS-1$
+	private static final String				COLUMN_URL_LABEL				= "UrlLabel";									//$NON-NLS-1$
+	//
+	private static final String				STATE_SELECTED_MARKER_ITEM		= "STATE_SELECTED_MARKER_ITEM";				//$NON-NLS-1$
+	private static final String				STATE_SORT_COLUMN_DIRECTION		= "STATE_SORT_COLUMN_DIRECTION";				//$NON-NLS-1$
+	private static final String				STATE_SORT_COLUMN_ID			= "STATE_SORT_COLUMN_ID";						//$NON-NLS-1$
+	private static final String				STATE_TOUR_FILTER_GPS			= "STATE_TOUR_FILTER_GPS";						//$NON-NLS-1$
+	//
+	private static int						MARKER_GPS_FILTER_IS_DISABLED	= 0;
+	private static int						MARKER_GPS_FILTER_WITH_GPS		= 1;
+	private static int						MARKER_GPS_FILTER_WITH_NO_GPS	= 2;
+	//
+	private final IPreferenceStore			_prefStore						= TourbookPlugin.getPrefStore();
+	private final IDialogSettings			_state							= TourbookPlugin
+																					.getState("TourMarkerAllView");		//$NON-NLS-1$
+	//
+	private IPartListener2					_partListener;
+	private ISelectionListener				_postSelectionListener;
+	private IPropertyChangeListener			_prefChangeListener;
+	private ITourEventListener				_tourEventListener;
+	//
+	private ActionModifyColumns				_actionModifyColumns;
+	private ActionMarkerFilterWithGPS		_actionTourFilterWithGPS;
+	private ActionMarkerFilterWithNoGPS	_actionTourFilterWithoutGPS;
+	private PixelConverter					_pc;
+
+	private ArrayList<TourMarkerItem>		_allMarkerItems					= new ArrayList<TourMarkerItem>();
+
+	private int								_markerFilterGPS				= MARKER_GPS_FILTER_IS_DISABLED;
+
+	private boolean							_isUpdateUI;
+	//
+	private final NumberFormat				_nf1							= NumberFormat.getNumberInstance();
+	private final NumberFormat				_nf_3_3							= NumberFormat.getNumberInstance();
+	private final NumberFormat				_nf6							= NumberFormat.getNumberInstance();
 	{
 		_nf1.setMinimumFractionDigits(1);
 		_nf1.setMaximumFractionDigits(1);
@@ -142,14 +142,15 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 		_nf6.setMaximumFractionDigits(6);
 	}
 	//
-	private TableViewer					_markerViewer;
-	private MarkerComparator			_markerComparator			= new MarkerComparator();
-	private ColumnManager				_columnManager;
-	private SelectionAdapter			_columnSortListener;
+	private TableViewer						_markerViewer;
+	private MarkerComparator				_markerComparator				= new MarkerComparator();
+	private ColumnManager					_columnManager;
+	private SelectionAdapter				_columnSortListener;
+
 	/*
 	 * UI controls
 	 */
-	private Composite					_viewerContainer;
+	private Composite						_viewerContainer;
 
 	private class MarkerComparator extends ViewerComparator {
 
@@ -257,7 +258,7 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 		@Override
 		public boolean select(final Viewer viewer, final Object parentElement, final Object element) {
 
-			if (_tourFilterGPS == TOUR_FILTER_GPS_IS_DISABLED) {
+			if (_markerFilterGPS == MARKER_GPS_FILTER_IS_DISABLED) {
 
 				return true;
 
@@ -265,7 +266,7 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 
 				final TourMarkerItem markerItem = (TourMarkerItem) element;
 
-				return _tourFilterGPS == TOUR_FILTER_WITH_GPS
+				return _markerFilterGPS == MARKER_GPS_FILTER_WITH_GPS
 						? markerItem._latitude != TourDatabase.DEFAULT_DOUBLE
 						: markerItem._latitude == TourDatabase.DEFAULT_DOUBLE;
 			}
@@ -289,7 +290,7 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 		super();
 	}
 
-	void actionTourFilterGPS(final Action actionTourFilter) {
+	void actionMarkerFilterGPS(final Action actionTourFilter) {
 
 		// toggle with/without GPS actions
 
@@ -297,13 +298,13 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 
 			// action with GPS is hit
 
-			if (_tourFilterGPS != TOUR_FILTER_WITH_GPS) {
+			if (_markerFilterGPS != MARKER_GPS_FILTER_WITH_GPS) {
 
-				_tourFilterGPS = TOUR_FILTER_WITH_GPS;
+				_markerFilterGPS = MARKER_GPS_FILTER_WITH_GPS;
 
 			} else {
 
-				_tourFilterGPS = TOUR_FILTER_GPS_IS_DISABLED;
+				_markerFilterGPS = MARKER_GPS_FILTER_IS_DISABLED;
 			}
 
 			_actionTourFilterWithoutGPS.setChecked(false);
@@ -312,13 +313,13 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 
 			// action without GPS is hit
 
-			if (_tourFilterGPS != TOUR_FILTER_WITHOUT_GPS) {
+			if (_markerFilterGPS != MARKER_GPS_FILTER_WITH_NO_GPS) {
 
-				_tourFilterGPS = TOUR_FILTER_WITHOUT_GPS;
+				_markerFilterGPS = MARKER_GPS_FILTER_WITH_NO_GPS;
 
 			} else {
 
-				_tourFilterGPS = TOUR_FILTER_GPS_IS_DISABLED;
+				_markerFilterGPS = MARKER_GPS_FILTER_IS_DISABLED;
 			}
 
 			_actionTourFilterWithGPS.setChecked(false);
@@ -486,8 +487,8 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 	private void createActions() {
 
 		_actionModifyColumns = new ActionModifyColumns(this);
-		_actionTourFilterWithGPS = new ActionTourFilterWithGPS(this);
-		_actionTourFilterWithoutGPS = new ActionTourFilterWithoutGPS(this);
+		_actionTourFilterWithGPS = new ActionMarkerFilterWithGPS(this);
+		_actionTourFilterWithoutGPS = new ActionMarkerFilterWithNoGPS(this);
 	}
 
 	@Override
@@ -1139,7 +1140,7 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 	private void restoreState_BeforeUI() {
 
 		// GPS tour filter
-		_tourFilterGPS = Util.getStateInt(_state, STATE_TOUR_FILTER_GPS, TOUR_FILTER_GPS_IS_DISABLED);
+		_markerFilterGPS = Util.getStateInt(_state, STATE_TOUR_FILTER_GPS, MARKER_GPS_FILTER_IS_DISABLED);
 
 		final String sortColumnId = Util.getStateString(_state, STATE_SORT_COLUMN_ID, COLUMN_NAME);
 		final int sortDirection = Util.getStateInt(_state, STATE_SORT_COLUMN_DIRECTION, MarkerComparator.ASCENDING);
@@ -1152,8 +1153,8 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 	private void restoreState_WithUI() {
 
 		// GPS tour filter
-		_actionTourFilterWithGPS.setChecked(_tourFilterGPS == TOUR_FILTER_WITH_GPS);
-		_actionTourFilterWithoutGPS.setChecked(_tourFilterGPS == TOUR_FILTER_WITHOUT_GPS);
+		_actionTourFilterWithGPS.setChecked(_markerFilterGPS == MARKER_GPS_FILTER_WITH_GPS);
+		_actionTourFilterWithoutGPS.setChecked(_markerFilterGPS == MARKER_GPS_FILTER_WITH_NO_GPS);
 
 		/*
 		 * select marker item
@@ -1182,7 +1183,7 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 		_state.put(STATE_SORT_COLUMN_ID, _markerComparator.__sortColumnId);
 		_state.put(STATE_SORT_COLUMN_DIRECTION, _markerComparator.__sortDirection);
 
-		_state.put(STATE_TOUR_FILTER_GPS, _tourFilterGPS);
+		_state.put(STATE_TOUR_FILTER_GPS, _markerFilterGPS);
 
 		/*
 		 * selected marker item

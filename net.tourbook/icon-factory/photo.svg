@@ -4219,17 +4219,6 @@
     </linearGradient>
     <radialGradient
        r="5"
-       fy="122.32294"
-       fx="262.96185"
-       cy="122.32294"
-       cx="262.96185"
-       gradientTransform="matrix(1,0,0,0.7999991,42.03815,21.97269)"
-       gradientUnits="userSpaceOnUse"
-       id="radialGradient4932"
-       xlink:href="#linearGradient6549-4-2-2-7-4-7"
-       inkscape:collect="always" />
-    <radialGradient
-       r="5"
        fy="122.3723"
        fx="242.98395"
        cy="122.3723"
@@ -4328,17 +4317,6 @@
          offset="1"
          id="stop6553-2-8-9-9-2-8-8" />
     </linearGradient>
-    <radialGradient
-       r="5"
-       fy="122.32294"
-       fx="262.96185"
-       cy="122.32294"
-       cx="262.96185"
-       gradientTransform="matrix(1,0,0,0.7999991,42.03815,21.972687)"
-       gradientUnits="userSpaceOnUse"
-       id="radialGradient4022"
-       xlink:href="#linearGradient6549-4-2-2-7-4-7-7"
-       inkscape:collect="always" />
   </defs>
   <sodipodi:namedview
      id="base"
@@ -4347,9 +4325,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="16.000001"
-     inkscape:cx="305.36759"
-     inkscape:cy="934.85619"
+     inkscape:zoom="22.627418"
+     inkscape:cx="320.20006"
+     inkscape:cy="925.9025"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="true"
@@ -4358,7 +4336,7 @@
      inkscape:window-x="69"
      inkscape:window-y="-7"
      inkscape:window-maximized="1"
-     inkscape:snap-grids="false"
+     inkscape:snap-grids="true"
      inkscape:snap-page="true"
      inkscape:snap-to-guides="true"
      inkscape:snap-nodes="false">
@@ -6324,11 +6302,11 @@
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90" />
     <path
-       style="fill:url(#radialGradient4932);fill-opacity:1;stroke:#3a9ff7;stroke-width:0.50000000000000000;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       style="fill:#ff3803;fill-opacity:1;stroke:#ff3803;stroke-width:0.50000000000000000;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
        d="m 303.5,115.86236 4,4 10e-6,2.24982 2,0 -10e-6,-2.24982 4,-4 z"
        id="path5771-6-9-5-51-3-2"
        inkscape:connector-curvature="0"
-       inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook\icons\tour-filter-tour-with-gps.png"
+       inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook\icons\marker-filter-with-gps.png"
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90"
        sodipodi:nodetypes="ccccccc" />
@@ -6339,7 +6317,7 @@
        xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA0AAAAHCAYAAADTcMcaAAAABHNCSVQICAgIfAhkiAAAAEhJREFU GJWdUMENACEMQuN6MGwX1FcTvNNE5QUtkKaFZMctSHbHiW4ZljSVSUJEYLWvbnST89Q5a9jAm5P/ Qt/m3QUAUF6+NwAiHUSTqou4XAAAAABJRU5ErkJggg== "
        height="7"
        width="13"
-       inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook\icons\tour-filter-tour-with-gps.png"
+       inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook\icons\marker-filter-with-gps.png"
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90" />
     <rect
@@ -6349,15 +6327,15 @@
        height="16"
        x="300"
        y="106.36218"
-       inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook\icons\tour-filter-tour-with-gps.png"
+       inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook\icons\marker-filter-with-gps.png"
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90" />
     <path
-       style="fill:url(#radialGradient4022);fill-opacity:1;stroke:#3a9ff7;stroke-width:0.5;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       style="fill:#ff3803;fill-opacity:1;stroke:#ff3803;stroke-width:0.50000000000000000;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
        d="m 323.50001,115.86236 4,4 1e-5,2.24982 2,0 -1e-5,-2.24982 4,-4 z"
        id="path5771-6-9-5-51-3-2-3"
        inkscape:connector-curvature="0"
-       inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook\icons\tour-filter-tour-without-gps.png"
+       inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook\icons\marker-filter-without-gps.png"
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90"
        sodipodi:nodetypes="ccccccc" />
@@ -6368,15 +6346,15 @@
        xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA0AAAAHCAYAAADTcMcaAAAABHNCSVQICAgIfAhkiAAAAEhJREFU GJWdUMENACEMQuN6MGwX1FcTvNNE5QUtkKaFZMctSHbHiW4ZljSVSUJEYLWvbnST89Q5a9jAm5P/ Qt/m3QUAUF6+NwAiHUSTqou4XAAAAABJRU5ErkJggg== "
        height="7"
        width="13"
-       inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook\icons\tour-filter-tour-without-gps.png"
+       inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook\icons\marker-filter-without-gps.png"
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90" />
     <path
-       style="fill:none;stroke:#ff0b0b;stroke-width:1.52706909;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       style="fill:none;stroke:#ff3803;stroke-width:1.52706908999999990;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
        d="m 325.76353,113.59865 5.41664,-5.41657 0,0 0,0 0,0"
        id="path4385-3-0-7-1-5"
        inkscape:connector-curvature="0"
-       inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook\icons\tour-filter-tour-without-gps.png"
+       inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook\icons\marker-filter-without-gps.png"
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90" />
     <rect
@@ -6386,7 +6364,7 @@
        height="16"
        x="320"
        y="106.36218"
-       inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook\icons\tour-filter-tour-without-gps.png"
+       inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook\icons\marker-filter-without-gps.png"
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90" />
   </g>

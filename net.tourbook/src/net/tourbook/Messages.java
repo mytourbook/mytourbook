@@ -23,12 +23,16 @@ public class Messages extends NLS {
 
 	public static String		Action_Compute_ElevationGain;
 
+	public static String		Action_MarkerFilter_WithGPS_Tooltip;
+
+	public static String		Action_MarkerFilter_WithoutGPS_Tooltip;
+
 	public static String		Action_PhotosAndTours_FilterNoTours_Tooltip;
 	public static String		Action_PhotosAndTours_FilterNotSavedPhotos_Tooltip;
 	public static String		Action_PhotosAndTours_FilterPhotos_Tooltip;
 	public static String		Action_PhotosAndTours_SavePhotoInTour;
 
-	public static String	Action_SharedMarker_ConvertFromTourMarker;
+	public static String		Action_SharedMarker_ConvertFromTourMarker;
 
 //	public static String		Action_Sign_MarkerImagePreferences;
 //	public static String		Action_Sign_RemoveMarkerImage;
@@ -177,10 +181,6 @@ public class Messages extends NLS {
 	public static String		Action_Tag_Add_RecentTags;
 	public static String		Action_Tag_AutoOpenCancel;
 	public static String		Action_Tag_AutoOpenOK;
-
-	public static String	Action_TourFilter_WithGPS_Tooltip;
-
-	public static String	Action_TourFilter_WithoutGPS_Tooltip;
 
 	public static String		Action_TourType_ModifyTourTypeFilter;
 
@@ -619,12 +619,10 @@ public class Messages extends NLS {
 	public static String		Image__App_Add_2x;
 	public static String		Image__App_Cancel;
 	public static String		Image__App_Close;
-
 	public static String		Image__App_Edit_Paste;
 	public static String		Image__App_OK;
 	public static String		Image__App_Trash;
 	public static String		Image__App_Trash_Disabled;
-
 	public static String		Image__ArrowDown;
 	public static String		Image__ArrowUp;
 	public static String		Image__assignMergedTour;
@@ -669,6 +667,8 @@ public class Messages extends NLS {
 	public static String		Image__layout_flat;
 	public static String		Image__layout_hierarchical;
 	public static String		Image__link;
+	public static String		Image__MarkerFilter_WithGPS;
+	public static String		Image__MarkerFilter_WithoutGPS;
 	public static String		Image__MyTourbook16;
 	public static String		Image__options;
 	public static String		Image__Options_Bright;
@@ -708,7 +708,6 @@ public class Messages extends NLS {
 	public static String		Image__synch_statistics;
 	public static String		Image__synch_statistics_Disabled;
 //	public static String		Image__Symbol_Difference;
-
 	public static String		Image__Synced;
 	public static String		Image__tag;
 	public static String		Image__tag_category;
@@ -719,15 +718,6 @@ public class Messages extends NLS {
 	public static String		Image__tour_options;
 	public static String		Image__tour_segmenter;
 	public static String		Image__tour_viewer;
-
-	public static String	Image__TourFilter_WithGPS;
-
-	public static String	Image__TourFilter_WithGPS_Disabled;
-
-	public static String	Image__TourFilter_WithoutGPS;
-
-	public static String	Image__TourFilter_WithoutGPS_Disabled;
-
 //	public static String		Image__TourSignImport;
 	public static String		Image__undo_edit;
 	public static String		Image__undo_edit_disabled;
@@ -1254,11 +1244,11 @@ public class Messages extends NLS {
 	public static String		Tour_Action_TourPhotosWithTooltip_Tooltip;
 	public static String		Tour_Action_ValuePointToolTip_IsVisible;
 
-	public static String	Tour_Blog_Action_EditMarker_Tooltip;
+	public static String		Tour_Blog_Action_EditMarker_Tooltip;
 
-	public static String	Tour_Blog_Action_EditTour_Tooltip;
+	public static String		Tour_Blog_Action_EditTour_Tooltip;
 
-	public static String	Tour_Blog_Action_OpenMarker_Tooltip;
+	public static String		Tour_Blog_Action_OpenMarker_Tooltip;
 
 	public static String		Tour_Book_Action_delete_selected_tours;
 	public static String		Tour_Book_Action_delete_selected_tours_dlg_message;
@@ -1288,7 +1278,7 @@ public class Messages extends NLS {
 
 	public static String		Tour_Database_PostUpdate023_SetTimeSliceNumbers;
 
-	public static String	Tour_Database_PostUpdate025_SetMarkerFields;
+	public static String		Tour_Database_PostUpdate025_SetMarkerFields;
 	public static String		Tour_Database_TourSaveError;
 	public static String		Tour_Database_update_tour;
 	public static String		Tour_Database_Update;
