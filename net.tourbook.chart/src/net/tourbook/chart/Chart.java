@@ -913,7 +913,8 @@ public class Chart extends ViewForm {
 	 *            The backgroundColor to set.
 	 */
 	public void setBackgroundColor(final Color backgroundColor) {
-		this._backgroundColor = backgroundColor;
+
+		_backgroundColor = backgroundColor;
 	}
 
 	/**

@@ -2177,7 +2177,8 @@ public class ChartComponentGraph extends Canvas {
 					rgbBgBright,
 					graphLineAlpha,
 					graphFillingAlpha,
-					graphValueOffset);
+					graphValueOffset,
+					false);
 
 		} else {
 
@@ -2197,7 +2198,8 @@ public class ChartComponentGraph extends Canvas {
 					rgbBgBright,
 					_chart.graphTransparencyLine,
 					_chart.graphTransparencyFilling,
-					graphValueOffset);
+					graphValueOffset,
+					true);
 
 			// draw segment before the marker
 			drawAsync_510_LineGraphSegment(
@@ -2210,7 +2212,8 @@ public class ChartComponentGraph extends Canvas {
 					rgbBgBright,
 					noneMarkerLineAlpha,
 					noneMarkerFillingAlpha,
-					graphValueOffset);
+					graphValueOffset,
+					true);
 
 			// draw segment after the marker
 			drawAsync_510_LineGraphSegment(
@@ -2223,13 +2226,13 @@ public class ChartComponentGraph extends Canvas {
 					rgbBgBright,
 					noneMarkerLineAlpha,
 					noneMarkerFillingAlpha,
-					graphValueOffset);
+					graphValueOffset,
+					true);
 		}
 	}
 
 	/**
-	 * first we draw the graph into a path, the path is then drawn on the device with a
-	 * transformation
+	 * First draw the graph into a path, the path is then drawn on the device with a transformation.
 	 * 
 	 * @param gcSegment
 	 * @param graphDrawingData
@@ -2238,7 +2241,12 @@ public class ChartComponentGraph extends Canvas {
 	 * @param rgbFg
 	 * @param rgbBgDark
 	 * @param rgbBgBright
+	 * @param graphLineAlpha
+	 * @param graphFillingAlpha
 	 * @param graphValueOffset
+	 * @param isSegmented
+	 *            When <code>true</code> the whole graph is painted with several segments, otherwise
+	 *            the whole graph is painted once.
 	 */
 	private void drawAsync_510_LineGraphSegment(final GC gcSegment,
 												final GraphDrawingData graphDrawingData,
@@ -2249,7 +2257,8 @@ public class ChartComponentGraph extends Canvas {
 												final RGB rgbBgBright,
 												final int graphLineAlpha,
 												final int graphFillingAlpha,
-												final double graphValueOffset) {
+												final double graphValueOffset,
+												final boolean isSegmented) {
 
 		final ChartDataXSerie xData = graphDrawingData.getXData();
 		final ChartDataYSerie yData = graphDrawingData.getYData();
@@ -2418,7 +2427,15 @@ public class ChartComponentGraph extends Canvas {
 
 				// set first point before devX==0 that the first line is not visible but correctly painted
 				final double devXFirstPoint = devXPrev;
-				final float devXFirstPointF = (float) devXPrev;
+				float devXFirstPointF = (float) devXPrev;
+
+				if (isSegmented == false) {
+					/*
+					 * All is painted without segments. Hide the first line from the bottom to the
+					 * first value point by setting the position into the hidden area.
+					 */
+					devXFirstPointF -= 1.0f;
+				}
 
 				float devYStart = 0;
 
@@ -2820,7 +2837,8 @@ public class ChartComponentGraph extends Canvas {
 					rgbBg2,
 					graphLineAlpha,
 					graphFillingAlpha,
-					graphValueOffset);
+					graphValueOffset,
+					true);
 
 			runningIndex++;
 		}
