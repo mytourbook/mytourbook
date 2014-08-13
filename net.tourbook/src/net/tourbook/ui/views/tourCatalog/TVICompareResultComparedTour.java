@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -17,7 +17,6 @@ package net.tourbook.ui.views.tourCatalog;
 
 import net.tourbook.data.TourCompared;
 import net.tourbook.data.TourData;
-import net.tourbook.data.TourReference;
 
 /**
  * Tree view item with the compare result between the reference and the compared tour
@@ -28,47 +27,47 @@ public class TVICompareResultComparedTour extends TVICompareResultItem {
 	 * Unique key for the {@link TourCompared} entity, when <code>-1</code> the compared tour is not
 	 * saved in the database
 	 */
-	long			compId					= -1;
+	long		compId					= -1;
 
-	TourReference	refTour;
+	RefTourItem	refTour;
 
 	/**
 	 * contains the {@link TourData} for the compared tour
 	 */
-	TourData		comparedTourData;
+	TourData	comparedTourData;
 
 	/**
 	 * contains the minimum value for the altitude differenz
 	 */
-	float			minAltitudeDiff			= 0;
+	float		minAltitudeDiff			= 0;
 
 	/**
 	 * contains the minimum data serie for each compared value
 	 */
-	float[]			altitudeDiffSerie;
+	float[]		altitudeDiffSerie;
 
-	int				computedStartIndex		= -1;
-	int				computedEndIndex		= -1;
+	int			computedStartIndex		= -1;
+	int			computedEndIndex		= -1;
 
-	int				normalizedStartIndex	= -1;
-	int				normalizedEndIndex		= -1;
+	int			normalizedStartIndex	= -1;
+	int			normalizedEndIndex		= -1;
 
-	int				compareDrivingTime;
-	int				compareRecordingTime;
+	int			compareDrivingTime;
+	int			compareRecordingTime;
 
-	float			compareDistance;
-	float			compareSpeed;
-	int				timeIntervall;
+	float		compareDistance;
+	float		compareSpeed;
+	int			timeIntervall;
 
 	/*
 	 * when a compared tour is stored in the database, the compId is set and the data from the
 	 * database are stored in the field's db...
 	 */
-	int				dbStartIndex;
+	int			dbStartIndex;
 
-	int				dbEndIndex;
+	int			dbEndIndex;
 
-	float			dbSpeed;
+	float		dbSpeed;
 
 	/*
 	 * the moved... fields contain the position of the compared tour when the user moved the
@@ -77,7 +76,7 @@ public class TVICompareResultComparedTour extends TVICompareResultItem {
 //	int				movedStartIndex;
 //	int				movedEndIndex;
 
-	float			movedSpeed;
+	float		movedSpeed;
 
 	@Override
 	public boolean equals(final Object obj) {

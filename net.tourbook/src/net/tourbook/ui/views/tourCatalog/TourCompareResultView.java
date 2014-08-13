@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -110,7 +110,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 	private final IDialogSettings				_state				= TourbookPlugin.getDefault() //
 																			.getDialogSettingsSection(ID);
 
-	private TVICompareResultRootItem			_tootItem;
+	private TVICompareResultRootItem			_rootItem;
 
 	private PostSelectionProvider				_postSelectionProvider;
 
@@ -175,7 +175,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 
 		@Override
 		public Object[] getElements(final Object inputElement) {
-			return _tootItem.getFetchedChildrenAsArray();
+			return _rootItem.getFetchedChildrenAsArray();
 		}
 
 		@Override
@@ -233,7 +233,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 
 						// find compared tour in the viewer
 						final ArrayList<TVICompareResultComparedTour> comparedTours = new ArrayList<TVICompareResultComparedTour>();
-						getComparedTours(comparedTours, _tootItem, compareIds);
+						getComparedTours(comparedTours, _rootItem, compareIds);
 
 						if (comparedTours.size() > 0) {
 
@@ -407,7 +407,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 
 					final ArrayList<TourData> modifiedTours = ((TourEvent) eventData).getModifiedTours();
 					if (modifiedTours != null) {
-						updateTourViewer(_tootItem, modifiedTours);
+						updateTourViewer(_rootItem, modifiedTours);
 					}
 
 				} else if (eventId == TourEventId.TAG_STRUCTURE_CHANGED) {
@@ -466,7 +466,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 
 		getSite().setSelectionProvider(_postSelectionProvider = new PostSelectionProvider(ID));
 
-		_tourViewer.setInput(_tootItem = new TVICompareResultRootItem());
+		_tourViewer.setInput(_rootItem = new TVICompareResultRootItem());
 	}
 
 	private void createUI(final Composite parent) {
@@ -1167,7 +1167,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 
 			final TVICompareResultReferenceTour refItem = (TVICompareResultReferenceTour) treeItem;
 
-			_postSelectionProvider.setSelection(new SelectionTourCatalogView(refItem.refTour.getRefId()));
+			_postSelectionProvider.setSelection(new SelectionTourCatalogView(refItem.refTourItem.refId));
 
 		} else if (treeItem instanceof TVICompareResultComparedTour) {
 
@@ -1190,7 +1190,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 			createUI10TourViewer(_viewerContainer);
 			_viewerContainer.layout();
 
-			_tourViewer.setInput(_tootItem = new TVICompareResultRootItem());
+			_tourViewer.setInput(_rootItem = new TVICompareResultRootItem());
 
 			_tourViewer.setExpandedElements(expandedElements);
 			_tourViewer.setSelection(selection);
@@ -1209,7 +1209,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 			final Object[] expandedElements = _tourViewer.getExpandedElements();
 			final ISelection selection = _tourViewer.getSelection();
 
-			_tourViewer.setInput(_tootItem = new TVICompareResultRootItem());
+			_tourViewer.setInput(_rootItem = new TVICompareResultRootItem());
 
 			_tourViewer.setExpandedElements(expandedElements);
 			_tourViewer.setSelection(selection);
@@ -1265,7 +1265,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 		 */
 
 		final ArrayList<TVICompareResultComparedTour> comparedTourItems = new ArrayList<TVICompareResultComparedTour>();
-		getComparedTours(comparedTourItems, _tootItem, removedTourCompareIds);
+		getComparedTours(comparedTourItems, _rootItem, removedTourCompareIds);
 
 		// reset entity for the removed compared tours
 		for (final TVICompareResultComparedTour removedTourItem : comparedTourItems) {

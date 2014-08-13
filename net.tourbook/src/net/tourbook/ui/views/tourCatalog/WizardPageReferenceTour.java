@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,6 +15,10 @@
  *******************************************************************************/
 package net.tourbook.ui.views.tourCatalog;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 
 import net.tourbook.Messages;
@@ -23,9 +27,9 @@ import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.ChartDataXSerie;
 import net.tourbook.common.form.SashLeftFixedForm;
-import net.tourbook.common.util.TableLayoutComposite;
+import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
-import net.tourbook.data.TourReference;
+import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.IReferenceTourProvider;
@@ -33,7 +37,11 @@ import net.tourbook.ui.UI;
 import net.tourbook.ui.tourChart.TourChartConfiguration;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
+import org.eclipse.jface.layout.GridDataFactory;
+import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.jface.layout.TableColumnLayout;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.CheckboxTableViewer;
 import org.eclipse.jface.viewers.ColumnWeightData;
@@ -41,17 +49,17 @@ import org.eclipse.jface.viewers.ICheckStateListener;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.ITableLabelProvider;
-import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -59,27 +67,44 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Sash;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
-import org.eclipse.swt.widgets.TableColumn;
+import org.eclipse.ui.part.PageBook;
 
 public class WizardPageReferenceTour extends WizardPage {
 
 	public static final int					COLUMN_REF_TOUR			= 0;
 
 	// dialog settings
-	private static final String				REF_TOUR_CHECKED		= "RefTour.checkedTours";	//$NON-NLS-1$
-	private static final String				REF_TOUR_VIEWER_WIDTH	= "RefTour.viewerWidth";	//$NON-NLS-1$
+	private static final String				REF_TOUR_CHECKED		= "RefTour.checkedTours";			//$NON-NLS-1$
+	private static final String				REF_TOUR_VIEWER_WIDTH	= "RefTour.viewerWidth";			//$NON-NLS-1$
 
+	final IPreferenceStore					_prefStore				= TourbookPlugin.getPrefStore();
+
+	private ArrayList<RefTourItem>			_refTours				= new ArrayList<RefTourItem>();
+	private final IReferenceTourProvider	_refTourProvider;
+
+	/*
+	 * UI controls
+	 */
+	private PageBook						_pageBook;
 	private SashLeftFixedForm				_viewerDetailForm;
 	private Composite						_refContainer;
-
-	private CheckboxTableViewer				_refTourViewer;
-	private Group							_chartGroup;
 	private Chart							_refTourChart;
+	private CheckboxTableViewer				_refTourViewer;
+	private Group							_groupChart;
+	private Label							_pageTourIsNotSelected;
 
-	private Object[]						_refTours;
+	private final class RefTourComparator extends ViewerComparator {
+		@Override
+		public int compare(final Viewer viewer, final Object e1, final Object e2) {
 
-	private final IReferenceTourProvider	_refTourProvider;
+			final RefTourItem refTourItem1 = (RefTourItem) e1;
+			final RefTourItem refTourItem2 = (RefTourItem) e2;
+
+			return refTourItem1.label.compareTo(refTourItem2.label);
+		}
+	}
 
 	private class RefTourContentProvider implements IStructuredContentProvider {
 
@@ -88,28 +113,10 @@ public class WizardPageReferenceTour extends WizardPage {
 		public void dispose() {}
 
 		public Object[] getElements(final Object parent) {
-			return _refTours = ReferenceTourManager.getInstance().getAllReferenceTours();
+			return _refTours.toArray();
 		}
 
 		public void inputChanged(final Viewer v, final Object oldInput, final Object newInput) {}
-	}
-
-	private class RefTourLabelProvider extends LabelProvider implements ITableLabelProvider {
-
-		public Image getColumnImage(final Object element, final int columnIndex) {
-			return null;
-		}
-
-		public String getColumnText(final Object obj, final int index) {
-
-			final TourReference tourRef = ((TourReference) obj);
-
-			switch (index) {
-			case COLUMN_REF_TOUR:
-				return tourRef.getLabel();
-			}
-			return UI.EMPTY_STRING;
-		}
 	}
 
 	protected WizardPageReferenceTour(final IReferenceTourProvider refTourProvider) {
@@ -123,115 +130,142 @@ public class WizardPageReferenceTour extends WizardPage {
 
 	public void createControl(final Composite parent) {
 
-		GridLayout gridLayout;
+		initializeDialogUnits(parent);
 
-		final Composite pageContainer = new Composite(parent, SWT.NONE);
-		pageContainer.setLayout(new GridLayout());
-
-		final Label label = new Label(pageContainer, SWT.NONE);
-		label.setText(Messages.tourCatalog_wizard_Label_reference_tour);
-
-		// fSashContainer = new SashForm(pageContainer, SWT.HORIZONTAL);
-		// fSashContainer.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true,
-		// true));
-
-		final Composite masterDetailContainer = new Composite(pageContainer, SWT.NONE);
-		masterDetailContainer.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-
-		// reference tours / select buttons
-		_refContainer = new Composite(masterDetailContainer, SWT.NONE);
-		gridLayout = new GridLayout(2, false);
-		gridLayout.marginHeight = 0;
-		gridLayout.marginWidth = 0;
-		_refContainer.setLayout(gridLayout);
-
-		createRefTourTableViewer(_refContainer);
-		createRefTourButtons(_refContainer);
-
-		final Sash sash = new Sash(masterDetailContainer, SWT.VERTICAL);
-
-		// chart group
-		_chartGroup = new Group(masterDetailContainer, SWT.NONE);
-		_chartGroup.setLayout(new GridLayout());
-		_chartGroup.setEnabled(false);
-
-		_refTourChart = new Chart(_chartGroup, SWT.NONE);
-		_refTourChart.setBackgroundColor(parent.getDisplay().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
-
-		_viewerDetailForm = new SashLeftFixedForm(masterDetailContainer, _refContainer, sash, _chartGroup);
-
-		restoreDialogSettings();
+		final Composite pageContainer = createUI(parent);
 
 		// control must be set, otherwise nothing is displayed
 		setControl(pageContainer);
 
+		loadRefTours();
+		_refTourViewer.setInput(this);
+
+		restoreState();
+
 		validatePage();
+
+		/*
+		 * After 1 hour to try different solutions, I found a solution to remove the vertical
+		 * scrollbar from the ref tour table, only an async layout removes it.
+		 */
+		parent.getDisplay().asyncExec(new Runnable() {
+			public void run() {
+
+				final Shell shell = parent.getShell();
+
+				if (shell.isDisposed() == false) {
+					shell.layout(true, true);
+				}
+			}
+		});
 	}
 
-	private void createRefTourButtons(final Composite parent) {
+	private Composite createUI(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
-		container.setLayoutData(new GridData(SWT.BEGINNING, SWT.BEGINNING, false, false));
-		final GridLayout gridLayout = new GridLayout();
-		gridLayout.marginHeight = 0;
-		gridLayout.marginWidth = 0;
-		gridLayout.marginRight = 15;
-		container.setLayout(gridLayout);
+		GridLayoutFactory.fillDefaults().applyTo(container);
+		{
+			final Label label = new Label(container, SWT.NONE);
+			label.setText(Messages.tourCatalog_wizard_Label_reference_tour);
 
-		final Button buttonSelectAll = new Button(container, SWT.NONE);
-		buttonSelectAll.setText(Messages.tourCatalog_wizard_Action_select_all);
-		setButtonLayoutData(buttonSelectAll);
-		buttonSelectAll.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(final SelectionEvent e) {
-				_refTourViewer.setAllChecked(true);
-				validatePage();
-			}
-		});
+			final Composite masterDetailContainer = new Composite(container, SWT.NONE);
+			GridDataFactory.fillDefaults().grab(true, true).applyTo(masterDetailContainer);
 
-		final Button buttonDeselectAll = new Button(container, SWT.NONE);
-		buttonDeselectAll.setText(Messages.tourCatalog_wizard_Action_deselect_all);
-		setButtonLayoutData(buttonDeselectAll);
-		buttonDeselectAll.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(final SelectionEvent e) {
-				_refTourViewer.setAllChecked(false);
-				validatePage();
+			/*
+			 * Reference tours
+			 */
+			{
+				_refContainer = new Composite(masterDetailContainer, SWT.NONE);
+				GridLayoutFactory.fillDefaults().numColumns(1).applyTo(_refContainer);
+				{
+					createUI_10_RefTourTableViewer(_refContainer);
+					createUI_20_Actions(_refContainer);
+				}
 			}
-		});
+
+			/*
+			 * Sash
+			 */
+			final Sash sash = new Sash(masterDetailContainer, SWT.VERTICAL);
+
+			/*
+			 * Chart
+			 */
+			{
+				_groupChart = new Group(masterDetailContainer, SWT.NONE);
+				_groupChart.setLayout(new GridLayout());
+				_groupChart.setEnabled(false);
+				{
+					/*
+					 * create pagebook with the chart and the no-chart page
+					 */
+					_pageBook = new PageBook(_groupChart, SWT.NONE);
+					_pageBook.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+					{
+						_refTourChart = new Chart(_pageBook, SWT.NONE);
+						_refTourChart.setBackgroundColor(parent
+								.getDisplay()
+								.getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
+
+						_pageTourIsNotSelected = new Label(_pageBook, SWT.NONE);
+						_pageTourIsNotSelected.setText(Messages.tourCatalog_wizard_Label_a_tour_is_not_selected);
+						_pageTourIsNotSelected.setEnabled(false);
+					}
+				}
+			}
+
+			_viewerDetailForm = new SashLeftFixedForm(masterDetailContainer, _refContainer, sash, _groupChart);
+		}
+
+		return container;
 	}
 
-	private void createRefTourTableViewer(final Composite parent) {
+	private void createUI_10_RefTourTableViewer(final Composite parent) {
 
-		final TableLayoutComposite layouter = new TableLayoutComposite(parent, SWT.NONE);
-		final GridData gridData = new GridData(GridData.FILL_BOTH);
-		gridData.widthHint = convertWidthInCharsToPixels(30);
-		layouter.setLayoutData(gridData);
+		final TableColumnLayout tableLayout = new TableColumnLayout();
 
-		final Table table = new Table(layouter, SWT.H_SCROLL
-				| SWT.V_SCROLL
+		final Composite layoutContainer = new Composite(parent, SWT.NONE);
+		layoutContainer.setLayout(tableLayout);
+		GridDataFactory.fillDefaults()//
+				.grab(true, true)
+				.applyTo(layoutContainer);
+
+		final Table table = new Table(layoutContainer, 0
+//				SWT.H_SCROLL //
+//				| SWT.V_SCROLL //
 				| SWT.MULTI
 				| SWT.BORDER
 				| SWT.FULL_SELECTION
 				| SWT.CHECK);
+
 		table.setLinesVisible(false);
 
-		TableColumn column;
-		column = new TableColumn(table, SWT.NONE);
-		column.setText(Messages.tourCatalog_wizard_Column_tour);
-		layouter.addColumnData(new ColumnWeightData(1, false));
-
 		_refTourViewer = new CheckboxTableViewer(table);
-		_refTourViewer.setContentProvider(new RefTourContentProvider());
-		_refTourViewer.setLabelProvider(new RefTourLabelProvider());
 
-		_refTourViewer.setComparator(new ViewerComparator() {
-			@SuppressWarnings("unchecked")
+		/*
+		 * create columns
+		 */
+		TableViewerColumn tvc;
+
+		// column: reference tour
+		tvc = new TableViewerColumn(_refTourViewer, SWT.LEAD);
+		tvc.setLabelProvider(new CellLabelProvider() {
 			@Override
-			public int compare(final Viewer viewer, final Object e1, final Object e2) {
-				return getComparator().compare(((TourReference) e1).getLabel(), ((TourReference) e2).getLabel());
+			public void update(final ViewerCell cell) {
+
+				final RefTourItem refTour = (RefTourItem) cell.getElement();
+
+				cell.setText(refTour.label);
 			}
 		});
+
+		tableLayout.setColumnData(tvc.getColumn(), new ColumnWeightData(100));
+
+		/*
+		 * Setup viewer
+		 */
+		_refTourViewer.setContentProvider(new RefTourContentProvider());
+		_refTourViewer.setComparator(new RefTourComparator());
 
 		_refTourViewer.addSelectionChangedListener(new ISelectionChangedListener() {
 			public void selectionChanged(final SelectionChangedEvent event) {
@@ -241,70 +275,159 @@ public class WizardPageReferenceTour extends WizardPage {
 
 		_refTourViewer.addCheckStateListener(new ICheckStateListener() {
 			public void checkStateChanged(final CheckStateChangedEvent event) {
-				validatePage();
+				onCheckRefTour(event);
 			}
 		});
-
-		_refTourViewer.setInput(this);
 	}
 
-	public TourReference[] getReferenceTours() {
+	private void createUI_20_Actions(final Composite parent) {
+
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().applyTo(container);
+		GridLayoutFactory.fillDefaults()//
+//				.extendedMargins(0, 5, 0, 0)
+				.numColumns(2)
+				.applyTo(container);
+		{
+			/*
+			 * Action: Select all
+			 */
+			{
+				final Button btn = new Button(container, SWT.NONE);
+				btn.setText(Messages.tourCatalog_wizard_Action_select_all);
+				btn.addSelectionListener(new SelectionAdapter() {
+					@Override
+					public void widgetSelected(final SelectionEvent e) {
+						_refTourViewer.setAllChecked(true);
+						validatePage();
+					}
+				});
+				setButtonLayoutData(btn);
+			}
+
+			/*
+			 * Action: Deselect all
+			 */
+			{
+				final Button btn = new Button(container, SWT.NONE);
+				btn.setText(Messages.tourCatalog_wizard_Action_deselect_all);
+				btn.addSelectionListener(new SelectionAdapter() {
+					@Override
+					public void widgetSelected(final SelectionEvent e) {
+						_refTourViewer.setAllChecked(false);
+						validatePage();
+					}
+				});
+				setButtonLayoutData(btn);
+			}
+		}
+	}
+
+	public RefTourItem[] getReferenceTours() {
 
 		// convert the Object[] into a TourReference[]
 		final Object[] checked = _refTourViewer.getCheckedElements();
-		final TourReference[] refTours = new TourReference[checked.length];
+		final RefTourItem[] refTours = new RefTourItem[checked.length];
 		System.arraycopy(checked, 0, refTours, 0, checked.length);
 
 		return refTours;
 	}
 
-	void persistDialogSettings() {
+	private void loadRefTours() {
 
-		final IDialogSettings wizardSettings = getDialogSettings();
+		_refTours.clear();
 
-		// save the viewer width
-		wizardSettings.put(REF_TOUR_VIEWER_WIDTH, _refContainer.getSize().x);
+		final String sql = "" //$NON-NLS-1$
+				//
+				+ "SELECT" //$NON-NLS-1$
+				//
+				+ " refId," //$NON-NLS-1$
+				+ " TourData_tourId," //$NON-NLS-1$
+				//
+				+ " label," //$NON-NLS-1$
+				+ " startIndex," //$NON-NLS-1$
+				+ " endIndex" //$NON-NLS-1$
+				//
+				+ " FROM " + TourDatabase.TABLE_TOUR_REFERENCE //$NON-NLS-1$
+				+ " ORDER BY label"; //$NON-NLS-1$
 
-		// save the checked tours
-		final Object[] checkedElements = _refTourViewer.getCheckedElements();
-		final String[] refTourIds = new String[checkedElements.length];
+		try {
 
-		for (int tourIndex = 0; tourIndex < checkedElements.length; tourIndex++) {
-			refTourIds[tourIndex] = Long.toString(((TourReference) (checkedElements[tourIndex])).getRefId());
+			final Connection conn = TourDatabase.getInstance().getConnection();
+			final PreparedStatement statement = conn.prepareStatement(sql);
+			final ResultSet result = statement.executeQuery();
+
+			while (result.next()) {
+
+				final RefTourItem refItem = new RefTourItem();
+
+				refItem.refId = result.getLong(1);
+				refItem.tourId = result.getLong(2);
+
+				refItem.label = result.getString(3);
+				refItem.startIndex = result.getInt(4);
+				refItem.endIndex = result.getInt(5);
+
+				_refTours.add(refItem);
+			}
+
+			conn.close();
+
+		} catch (final SQLException e) {
+			UI.showSQLException(e);
 		}
-		wizardSettings.put(REF_TOUR_CHECKED, refTourIds);
 	}
 
-	private void restoreDialogSettings() {
+	private void onCheckRefTour(final CheckStateChangedEvent event) {
 
-		final IDialogSettings wizardSettings = getDialogSettings();
+		/*
+		 * Select checked ref tour
+		 */
+		if (event.getChecked()) {
+
+			final Object checkedElement = event.getElement();
+			_refTourViewer.setSelection(new StructuredSelection(checkedElement));
+		}
+
+		validatePage();
+	}
+
+	private void restoreState() {
+
+		final IDialogSettings state = getDialogSettings();
 
 		// restore viewer width
 		Integer viewerWidth = null;
 		try {
-			viewerWidth = wizardSettings.getInt(REF_TOUR_VIEWER_WIDTH);
+			viewerWidth = state.getInt(REF_TOUR_VIEWER_WIDTH);
 		} catch (final NumberFormatException e) {
 			viewerWidth = 200;
 		}
 		_viewerDetailForm.setViewerWidth(viewerWidth);
 
+		RefTourItem firstCheckedRefTour = null;
+
 		if (_refTourProvider == null) {
 
 			// restore checked reference tours
-			final String[] persistedTourIds = wizardSettings.getArray(REF_TOUR_CHECKED);
+			final long[] persistedTourIds = Util.getStateLongArray(state, REF_TOUR_CHECKED, null);
 
 			if (persistedTourIds != null) {
-				for (final Object refTour : _refTours) {
-					final TourReference tourReference = (TourReference) refTour;
-					// final String refTourId = Long.toString(tourReference
-					// .getTourData()
-					// .getTourId());
 
-					final String refId = Long.toString(tourReference.getRefId());
+				for (final RefTourItem refTourItem : _refTours) {
 
-					for (final String persistedRefId : persistedTourIds) {
-						if (persistedRefId.compareTo(refId) == 0) {
-							_refTourViewer.setChecked(tourReference, true);
+					final long refId = refTourItem.refId;
+
+					for (final long stateRefId : persistedTourIds) {
+
+						if (stateRefId == refId) {
+
+							_refTourViewer.setChecked(refTourItem, true);
+
+							if (firstCheckedRefTour == null) {
+								firstCheckedRefTour = refTourItem;
+							}
+
 							break;
 						}
 					}
@@ -323,28 +446,66 @@ public class WizardPageReferenceTour extends WizardPage {
 					// loop: all available reference tours
 					for (final Object refTour : _refTours) {
 
-						final TourReference tourReference = (TourReference) refTour;
+						final RefTourItem tourReference = (RefTourItem) refTour;
 
-						if (selectedRefTourId.equals(tourReference.getRefId())) {
+						if (selectedRefTourId.equals(tourReference.refId)) {
+
 							_refTourViewer.setChecked(tourReference, true);
+
+							if (firstCheckedRefTour == null) {
+								firstCheckedRefTour = tourReference;
+							}
+
 							break;
 						}
 					}
 				}
+
 			}
 		}
+
+		if (firstCheckedRefTour != null) {
+
+			// select first checked ref tour
+			_refTourViewer.setSelection(new StructuredSelection(firstCheckedRefTour), true);
+
+		} else {
+
+			// select first ref tour
+			if (_refTours.size() > 0) {
+				_refTourViewer.setSelection(new StructuredSelection(_refTours.get(0)), true);
+			}
+		}
+	}
+
+	void saveState() {
+
+		final IDialogSettings state = getDialogSettings();
+
+		// save the viewer width
+		state.put(REF_TOUR_VIEWER_WIDTH, _refContainer.getSize().x);
+
+		// save the checked tours
+		final Object[] checkedElements = _refTourViewer.getCheckedElements();
+		final long[] refTourIds = new long[checkedElements.length];
+
+		for (int tourIndex = 0; tourIndex < checkedElements.length; tourIndex++) {
+			refTourIds[tourIndex] = ((RefTourItem) (checkedElements[tourIndex])).refId;
+		}
+
+		Util.setState(state, REF_TOUR_CHECKED, refTourIds);
 	}
 
 	private void showReferenceTour(final SelectionChangedEvent event) {
 
 		final IStructuredSelection selection = (IStructuredSelection) event.getSelection();
 
-		final TourReference refTour = (TourReference) selection.getFirstElement();
+		final RefTourItem refTour = (RefTourItem) selection.getFirstElement();
 
 		if (refTour != null) {
 
 			// get tour data from the database
-			final TourData tourData = refTour.getTourData();
+			final TourData tourData = TourManager.getTour(refTour.tourId);
 
 			// set the altitude visible
 			final TourChartConfiguration chartConfig = new TourChartConfiguration(false);
@@ -354,26 +515,27 @@ public class WizardPageReferenceTour extends WizardPage {
 
 			final ChartDataXSerie xData = chartDataModel.getXData();
 
-			xData.setSynchMarkerValueIndex(refTour.getStartValueIndex(), refTour.getEndValueIndex());
+			xData.setSynchMarkerValueIndex(refTour.startIndex, refTour.endIndex);
 
-			_chartGroup.setText(NLS.bind(refTour.getLabel() + ": " //$NON-NLS-1$
+			_groupChart.setText(NLS.bind(refTour.label + ": " //$NON-NLS-1$
 					+ Messages.tourCatalog_wizard_Group_chart_title, TourManager.getTourDateShort(tourData)));
 
 			// set grid size
-			final IPreferenceStore prefStore = TourbookPlugin.getDefault().getPreferenceStore();
 			_refTourChart.setGrid(
-					prefStore.getInt(ITourbookPreferences.GRAPH_GRID_HORIZONTAL_DISTANCE),
-					prefStore.getInt(ITourbookPreferences.GRAPH_GRID_VERTICAL_DISTANCE),
-					prefStore.getBoolean(ITourbookPreferences.GRAPH_GRID_IS_SHOW_HORIZONTAL_GRIDLINES),
-					prefStore.getBoolean(ITourbookPreferences.GRAPH_GRID_IS_SHOW_VERTICAL_GRIDLINES));
+					_prefStore.getInt(ITourbookPreferences.GRAPH_GRID_HORIZONTAL_DISTANCE),
+					_prefStore.getInt(ITourbookPreferences.GRAPH_GRID_VERTICAL_DISTANCE),
+					_prefStore.getBoolean(ITourbookPreferences.GRAPH_GRID_IS_SHOW_HORIZONTAL_GRIDLINES),
+					_prefStore.getBoolean(ITourbookPreferences.GRAPH_GRID_IS_SHOW_VERTICAL_GRIDLINES));
 
 			_refTourChart.updateChart(chartDataModel, false);
+
+			_pageBook.showPage(_refTourChart);
 
 		} else {
 
 			// hide the chart
-			_refTourChart.updateChart(null, false);
-			_chartGroup.setText(UI.EMPTY_STRING);
+			_pageBook.showPage(_pageTourIsNotSelected);
+			_groupChart.setText(UI.EMPTY_STRING);
 		}
 	}
 
@@ -382,10 +544,13 @@ public class WizardPageReferenceTour extends WizardPage {
 		final Object[] checkedElements = _refTourViewer.getCheckedElements();
 
 		if (checkedElements.length == 0) {
+
 			setPageComplete(false);
 			setErrorMessage(Messages.tourCatalog_wizard_Error_select_reference_tours);
 			return false;
+
 		} else {
+
 			setPageComplete(true);
 			setErrorMessage(null);
 			setMessage(Messages.tourCatalog_wizard_Msg_select_reference_tour);

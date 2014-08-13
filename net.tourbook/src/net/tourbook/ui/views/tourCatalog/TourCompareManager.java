@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2012  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -30,7 +30,6 @@ import net.tourbook.application.PerspectiveFactoryCompareTours;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourCompared;
 import net.tourbook.data.TourData;
-import net.tourbook.data.TourReference;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.UI;
@@ -49,13 +48,13 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.WorkbenchException;
 
 /**
- * The TourCompareManager manages the comparison between reference and all selected tours
+ * The manages the comparison between reference and all selected tours.
  */
 public class TourCompareManager {
 
 	private static TourCompareManager						_instance;
 
-	private TourReference[]									_refTourContext;
+	private RefTourItem[]									_refTourItems;
 	private TourData[]										_refToursData;
 
 	private final ArrayList<TVICompareResultComparedTour>	_comparedTourItems	= new ArrayList<TVICompareResultComparedTour>();
@@ -177,7 +176,7 @@ public class TourCompareManager {
 		comparedTour.setStartIndex(comparedTourItem.computedStartIndex);
 		comparedTour.setEndIndex(comparedTourItem.computedEndIndex);
 		comparedTour.setTourId(tourData.getTourId());
-		comparedTour.setRefTourId(comparedTourItem.refTour.getRefId());
+		comparedTour.setRefTourId(comparedTourItem.refTour.refId);
 
 		comparedTour.setTourDate(tourData.getTourStartTimeMS());
 		comparedTour.setStartYear(tourData.getTourStartTime().getYear());
@@ -242,9 +241,9 @@ public class TourCompareManager {
 		/*
 		 * reference tour
 		 */
-		final TourReference refTour = _refTourContext[refTourIndex];
-		final int refMeasureStartIndex = refTour.getStartValueIndex();
-		final int refMeasureEndIndex = refTour.getEndValueIndex();
+		final RefTourItem refTour = _refTourItems[refTourIndex];
+		final int refMeasureStartIndex = refTour.startIndex;
+		final int refMeasureEndIndex = refTour.endIndex;
 
 		// get the reference tour
 		final TourData refTourData = _refToursData[refTourIndex];
@@ -396,19 +395,19 @@ public class TourCompareManager {
 	/**
 	 * Compares all reference tours with all compare tours
 	 * 
-	 * @param refTourContext
+	 * @param refTours
 	 * @param comparedTours
 	 */
-	public void compareTours(final TourReference[] refTourContext, final Object[] comparedTours) {
+	public void compareTours(final RefTourItem[] refTours, final Object[] comparedTours) {
 
-		_refTourContext = refTourContext;
-		_refToursData = new TourData[refTourContext.length];
+		_refTourItems = refTours;
+		_refToursData = new TourData[refTours.length];
 
-		final int tours2Compare = comparedTours.length * refTourContext.length;
+		final int tours2Compare = comparedTours.length * refTours.length;
 
 		final Job compareJob = new Job(Messages.tourCatalog_view_compare_job_title) {
 
-			private void compareTourJob(final TourReference[] refTourContext,
+			private void compareTourJob(final RefTourItem[] refTourItems,
 										final Object[] comparedTours,
 										final IProgressMonitor monitor) {
 
@@ -416,7 +415,7 @@ public class TourCompareManager {
 				_comparedTourItems.clear();
 
 				// get all reference tours
-				getRefToursData();
+				loadRefTours();
 
 				// loop: all compare tours
 				for (final Object tour : comparedTours) {
@@ -440,7 +439,7 @@ public class TourCompareManager {
 							&& compareTourData.timeSerie.length > 0) {
 
 						// loop: all reference tours
-						for (int refTourIndex = 0; refTourIndex < refTourContext.length; refTourIndex++) {
+						for (int refTourIndex = 0; refTourIndex < refTourItems.length; refTourIndex++) {
 
 							if (monitor.isCanceled()) {
 								showCompareResults();
@@ -455,7 +454,7 @@ public class TourCompareManager {
 							// ignore tours which could not be compared
 							if (compareResult.computedStartIndex != -1) {
 
-								compareResult.refTour = refTourContext[refTourIndex];
+								compareResult.refTour = refTourItems[refTourIndex];
 								compareResult.comparedTourData = compareTourData;
 
 								_comparedTourItems.add(compareResult);
@@ -479,7 +478,7 @@ public class TourCompareManager {
 
 				monitor.beginTask(Messages.tourCatalog_view_compare_job_task, tours2Compare);
 
-				compareTourJob(refTourContext, comparedTours, monitor);
+				compareTourJob(refTours, comparedTours, monitor);
 
 				monitor.done();
 
@@ -496,8 +495,8 @@ public class TourCompareManager {
 	/**
 	 * @return Returns the reference tours which has been compared
 	 */
-	public TourReference[] getComparedReferenceTours() {
-		return _refTourContext;
+	public RefTourItem[] getComparedReferenceTours() {
+		return _refTourItems;
 	}
 
 	/**
@@ -512,16 +511,14 @@ public class TourCompareManager {
 	 * 
 	 * @param refTourContext
 	 */
-	private void getRefToursData() {
+	private void loadRefTours() {
 
-		for (int tourIndex = 0; tourIndex < _refTourContext.length; tourIndex++) {
+		for (int tourIndex = 0; tourIndex < _refTourItems.length; tourIndex++) {
 
-			final TourReference refTour = _refTourContext[tourIndex];
+			final RefTourItem refTour = _refTourItems[tourIndex];
 
-			_refTourContext[tourIndex] = refTour;
-
-			// load tour from database
-			_refToursData[tourIndex] = refTour.getTourData();
+			_refTourItems[tourIndex] = refTour;
+			_refToursData[tourIndex] = TourManager.getInstance().getTourData(refTour.tourId);
 		}
 	}
 
@@ -540,8 +537,7 @@ public class TourCompareManager {
 						// show compare result perspective
 						workbench.showPerspective(PerspectiveFactoryCompareTours.PERSPECTIVE_ID, window);
 
-						final TourCompareResultView view = (TourCompareResultView) Util
-.showView(
+						final TourCompareResultView view = (TourCompareResultView) Util.showView(
 								TourCompareResultView.ID,
 								true);
 

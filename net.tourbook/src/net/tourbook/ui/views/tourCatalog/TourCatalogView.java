@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -1226,10 +1226,11 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 		// get all ref tours which needs to be updated
 		for (final TVICompareResultComparedTour compareResult : persistedCompareResults) {
 
-			if (compareResult.getParentItem() instanceof TVICompareResultReferenceTour) {
+			final TreeViewerItem parentItem = compareResult.getParentItem();
 
-				final long compResultRefId = ((TVICompareResultReferenceTour) compareResult.getParentItem()).refTour
-						.getRefId();
+			if (parentItem instanceof TVICompareResultReferenceTour) {
+
+				final long compResultRefId = ((TVICompareResultReferenceTour) parentItem).refTourItem.refId;
 
 				viewRefIds.put(compResultRefId, compResultRefId);
 			}

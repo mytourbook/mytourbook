@@ -126,7 +126,7 @@ public class TourCatalogViewReferenceTour extends TourChartViewPart implements I
 
 			} else if (firstElement instanceof TVICompareResultComparedTour) {
 
-				showRefTour(((TVICompareResultComparedTour) firstElement).refTour.getRefId());
+				showRefTour(((TVICompareResultComparedTour) firstElement).refTour.refId);
 			}
 		}
 	}

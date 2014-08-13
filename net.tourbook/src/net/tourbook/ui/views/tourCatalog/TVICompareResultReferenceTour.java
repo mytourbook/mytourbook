@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -19,7 +19,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import net.tourbook.common.util.TreeViewerItem;
-import net.tourbook.data.TourReference;
 
 /**
  * contains tree viewer items (TVI) for reference tours
@@ -30,22 +29,22 @@ public class TVICompareResultReferenceTour extends TVICompareResultItem {
 
 	long										tourId;
 
-	TourReference								refTour;
+	RefTourItem									refTourItem;
 
 	/**
 	 * keeps the tourId's for all compared tours which have already been stored in the db
 	 */
-	private HashMap<Long, StoredComparedTour>	fStoredComparedTours;
+	private HashMap<Long, StoredComparedTour>	_storedComparedTours;
 
 	public TVICompareResultReferenceTour(	final TVICompareResultRootItem parentItem,
 											final String label,
-											final TourReference refTour,
+											final RefTourItem refTourItem,
 											final long tourId) {
 
 		this.setParentItem(parentItem);
 
 		this.label = label;
-		this.refTour = refTour;
+		this.refTourItem = refTourItem;
 		this.tourId = tourId;
 	}
 
@@ -61,11 +60,11 @@ public class TVICompareResultReferenceTour extends TVICompareResultItem {
 			return false;
 		}
 		final TVICompareResultReferenceTour other = (TVICompareResultReferenceTour) obj;
-		if (refTour == null) {
-			if (other.refTour != null) {
+		if (refTourItem == null) {
+			if (other.refTourItem != null) {
 				return false;
 			}
-		} else if (!refTour.equals(other.refTour)) {
+		} else if (!refTourItem.equals(other.refTourItem)) {
 			return false;
 		}
 		return true;
@@ -77,20 +76,20 @@ public class TVICompareResultReferenceTour extends TVICompareResultItem {
 		final ArrayList<TreeViewerItem> children = new ArrayList<TreeViewerItem>();
 		setChildren(children);
 
-		final long refId = refTour.getRefId();
+		final long refId = refTourItem.refId;
 
-		if (fStoredComparedTours != null) {
-			fStoredComparedTours.clear();
+		if (_storedComparedTours != null) {
+			_storedComparedTours.clear();
 		}
-		
-		fStoredComparedTours = TourCompareManager.getComparedToursFromDb(refId);
+
+		_storedComparedTours = TourCompareManager.getComparedToursFromDb(refId);
 
 		final TVICompareResultComparedTour[] comparedTours = TourCompareManager.getInstance().getComparedTours();
 
 		// create children for one reference tour
 		for (final TVICompareResultComparedTour compTour : comparedTours) {
 
-			if (compTour.refTour.getRefId() == refId) {
+			if (compTour.refTour.refId == refId) {
 
 				// compared tour belongs to the reference tour
 
@@ -102,10 +101,10 @@ public class TVICompareResultReferenceTour extends TVICompareResultItem {
 				 * id for the compared tour
 				 */
 				final Long comparedTourId = compTour.comparedTourData.getTourId();
-				final boolean isStoredForRefTour = fStoredComparedTours.containsKey(comparedTourId);
+				final boolean isStoredForRefTour = _storedComparedTours.containsKey(comparedTourId);
 
 				if (isStoredForRefTour) {
-					final StoredComparedTour storedComparedTour = fStoredComparedTours.get(comparedTourId);
+					final StoredComparedTour storedComparedTour = _storedComparedTours.get(comparedTourId);
 					compTour.compId = storedComparedTour.comparedId;
 					compTour.dbStartIndex = storedComparedTour.startIndex;
 					compTour.dbEndIndex = storedComparedTour.endIndex;
@@ -120,13 +119,11 @@ public class TVICompareResultReferenceTour extends TVICompareResultItem {
 
 	}
 
-	
-
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((refTour == null) ? 0 : refTour.hashCode());
+		result = prime * result + ((refTourItem == null) ? 0 : refTourItem.hashCode());
 		return result;
 	}
 

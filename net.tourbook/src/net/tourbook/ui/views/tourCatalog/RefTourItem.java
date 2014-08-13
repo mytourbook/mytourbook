@@ -15,35 +15,52 @@
  *******************************************************************************/
 package net.tourbook.ui.views.tourCatalog;
 
-import java.util.ArrayList;
+public class RefTourItem {
 
-import net.tourbook.common.util.TreeViewerItem;
+	public long		refId;
+	public long		tourId;
 
-/**
- * Rootitem for compare results, the children are reference tours
- */
-public class TVICompareResultRootItem extends TVICompareResultItem {
+	public String	label;
+	public int		startIndex;
+	public int		endIndex;
 
 	@Override
-	protected void fetchChildren() {
-
-		final ArrayList<TreeViewerItem> children = new ArrayList<TreeViewerItem>();
-		setChildren(children);
-
-		final RefTourItem[] refTourItems = TourCompareManager.getInstance().getComparedReferenceTours();
-
-		if (refTourItems == null) {
-			return;
+	public boolean equals(final Object obj) {
+		if (this == obj) {
+			return true;
 		}
-
-		for (final RefTourItem refTour : refTourItems) {
-
-			children.add(new TVICompareResultReferenceTour(//
-					this,
-					refTour.label,
-					refTour,
-					refTour.tourId));
+		if (obj == null) {
+			return false;
 		}
+		if (!(obj instanceof RefTourItem)) {
+			return false;
+		}
+		final RefTourItem other = (RefTourItem) obj;
+		if (refId != other.refId) {
+			return false;
+		}
+		return true;
 	}
 
+	@Override
+	public int hashCode() {
+
+		final int prime = 31;
+		int result = 1;
+
+		result = prime * result + (int) (refId ^ (refId >>> 32));
+
+		return result;
+	}
+
+	@Override
+	public String toString() {
+		return "RefTourItem ["
+				+ ("refId=" + refId + ", ")
+				+ ("tourId=" + tourId + ", ")
+				+ ("label=" + label + ", ")
+				+ ("startIndex=" + startIndex + ", ")
+				+ ("endIndex=" + endIndex)
+				+ "]";
+	}
 }

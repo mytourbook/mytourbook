@@ -609,7 +609,9 @@ public class YearStatisticView extends ViewPart {
 					yearIndex++;
 				}
 
-				if (_allTours.size() > 0 && _allTours.size() >= yearIndex) {
+				final int allTourSize = _allTours.size();
+
+				if (allTourSize > 0 && yearIndex < allTourSize) {
 					selectTourInYearChart(_allTours.get(yearIndex).getTourId());
 				}
 			}

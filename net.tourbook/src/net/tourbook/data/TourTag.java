@@ -18,7 +18,6 @@ package net.tourbook.data;
 import static javax.persistence.CascadeType.ALL;
 import static javax.persistence.FetchType.LAZY;
 
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -161,10 +160,6 @@ public class TourTag implements Comparable<Object> {
 
 	public String getTagName() {
 		return name;
-	}
-
-	public Collection<TourData> getTourData() {
-		return tourData;
 	}
 
 	@Override

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -17,7 +17,6 @@ package net.tourbook.ui.views.tourCatalog;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
-import net.tourbook.data.TourReference;
 import net.tourbook.ui.IReferenceTourProvider;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -25,7 +24,9 @@ import org.eclipse.jface.wizard.Wizard;
 
 public class WizardTourComparer extends Wizard {
 
-	public static final String		DIALOG_SETTINGS_SECTION	= "WizardTourComparer"; //$NON-NLS-1$
+	public static final String		DIALOG_SETTINGS_SECTION	= "WizardTourComparer";							//$NON-NLS-1$
+
+	private final IDialogSettings	_state					= TourbookPlugin.getState(DIALOG_SETTINGS_SECTION);
 
 	private WizardPageCompareTour	_pageCompareTour;
 	private WizardPageReferenceTour	_pageReferenceTour;
@@ -33,12 +34,16 @@ public class WizardTourComparer extends Wizard {
 	private IReferenceTourProvider	_refTourProvider;
 
 	public WizardTourComparer() {
-		setDialogSettings();
+
 		setWindowTitle(Messages.tourCatalog_wizard_Wizard_title);
+
+		restoreState();
 	}
 
 	public WizardTourComparer(final IReferenceTourProvider refTourProvider) {
+
 		this();
+
 		_refTourProvider = refTourProvider;
 	}
 
@@ -51,16 +56,18 @@ public class WizardTourComparer extends Wizard {
 
 	@Override
 	public boolean performCancel() {
-		persistDialogSettings();
+
+		saveState();
+
 		return true;
 	}
 
 	@Override
 	public boolean performFinish() {
 
-		persistDialogSettings();
+		saveState();
 
-		final TourReference[] refTours = _pageReferenceTour.getReferenceTours();
+		final RefTourItem[] refTours = _pageReferenceTour.getReferenceTours();
 		final Object[] comparedTours = _pageCompareTour.getComparedTours();
 
 		TourCompareManager.getInstance().compareTours(refTours, comparedTours);
@@ -68,21 +75,15 @@ public class WizardTourComparer extends Wizard {
 		return true;
 	}
 
-	private void persistDialogSettings() {
-		_pageReferenceTour.persistDialogSettings();
-		_pageCompareTour.persistDialogSettings();
+	private void restoreState() {
+
+		super.setDialogSettings(_state);
 	}
 
-	private void setDialogSettings() {
+	private void saveState() {
 
-		final IDialogSettings pluginSettings = TourbookPlugin.getDefault().getDialogSettings();
-		IDialogSettings wizardSettings = pluginSettings.getSection(DIALOG_SETTINGS_SECTION);
-
-		if (wizardSettings == null) {
-			wizardSettings = pluginSettings.addNewSection(DIALOG_SETTINGS_SECTION);
-		}
-
-		super.setDialogSettings(wizardSettings);
+		_pageReferenceTour.saveState();
+		_pageCompareTour.saveState();
 	}
 
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -23,6 +23,7 @@ import java.text.NumberFormat;
 import java.util.ArrayList;
 
 import net.tourbook.Messages;
+import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartDataModel;
 import net.tourbook.common.UI;
@@ -30,6 +31,7 @@ import net.tourbook.common.form.SashLeftFixedForm;
 import net.tourbook.common.util.TreeViewerItem;
 import net.tourbook.data.TourData;
 import net.tourbook.database.TourDatabase;
+import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.tourChart.TourChartConfiguration;
 
@@ -37,6 +39,8 @@ import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.TreeColumnLayout;
+import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.CheckboxTreeViewer;
 import org.eclipse.jface.viewers.ColumnPixelData;
@@ -46,18 +50,17 @@ import org.eclipse.jface.viewers.ICheckStateListener;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.ITreeContentProvider;
-import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.jface.viewers.TreeViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -73,31 +76,32 @@ import org.eclipse.ui.part.PageBook;
 
 public class WizardPageCompareTour extends WizardPage {
 
-	// dialog settings
 	private static final String		COMP_TOUR_VIEWER_WIDTH		= "CompTour.viewerWidth";			//$NON-NLS-1$
 	private static final String		COMP_TOUR_SELECT_ALL		= "CompTour.selectAll";			//$NON-NLS-1$
 
-	// tree columns
-	static final int				COLUMN_DATE					= 0;
-	static final int				COLUMN_DISTANCE				= 1;
-	static final int				COLUMN_UP					= 2;
-	static final int				COLUMN_RECORDING			= 3;
+	final IPreferenceStore			_prefStore					= TourbookPlugin.getPrefStore();
 
-	private Button					fCheckSelectAll;
-	private PageBook				fPageBook;
-	private Label					fPageTourIsNotSelected;
+	private TVIWizardCompareRoot	_rootItem;
+	private SashLeftFixedForm		_viewerDetailForm;
 
-	private CheckboxTreeViewer		fTourViewer;
-	private TVIWizardCompareRoot	fRootItem;
+	private boolean					_isTourViewerInitialized	= false;
 
-	private Chart					fCompTourChart;
-	private SashLeftFixedForm		fViewerDetailForm;
+	private NumberFormat			_nf1						= NumberFormat.getNumberInstance();
+	{
+		_nf1.setMinimumFractionDigits(1);
+		_nf1.setMaximumFractionDigits(1);
+	}
 
-	private boolean					fIsTourViewerInitialized	= false;
+	/*
+	 * UI controls
+	 */
+	private PageBook				_pageBook;
+	private Label					_pageTourIsNotSelected;
 
-	private NumberFormat			fNf							= NumberFormat.getNumberInstance();
-
-	private Group					fChartGroup;
+	private Button					_chkSelectAll;
+	private Chart					_compareTourChart;
+	private Group					_groupChart;
+	private CheckboxTreeViewer		_tourViewer;
 
 	private class TourContentProvider implements ITreeContentProvider {
 
@@ -108,7 +112,7 @@ public class WizardPageCompareTour extends WizardPage {
 		}
 
 		public Object[] getElements(final Object inputElement) {
-			return fRootItem.getFetchedChildrenAsArray();
+			return _rootItem.getFetchedChildrenAsArray();
 		}
 
 		public Object getParent(final Object element) {
@@ -122,52 +126,6 @@ public class WizardPageCompareTour extends WizardPage {
 		public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
 	}
 
-	class TourLabelProvider extends LabelProvider implements ITableLabelProvider {
-
-		public Image getColumnImage(final Object element, final int columnIndex) {
-			return null;
-		}
-
-		public String getColumnText(final Object obj, final int index) {
-
-			if (obj instanceof TVIWizardCompareTour) {
-
-				final TVIWizardCompareTour tourItem = (TVIWizardCompareTour) obj;
-
-				switch (index) {
-				case COLUMN_DATE:
-					return ((TVIWizardCompareItem) obj).treeColumn;
-
-				case COLUMN_DISTANCE:
-					fNf.setMinimumFractionDigits(1);
-					fNf.setMaximumFractionDigits(1);
-					return fNf.format((tourItem.colDistance) / (1000 * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE));
-
-				case COLUMN_RECORDING:
-					final long recordingTime = tourItem.colRecordingTime;
-					return String.format(//
-							Messages.Format_hhmm,
-							(recordingTime / 3600),
-							((recordingTime % 3600) / 60));
-
-				case COLUMN_UP:
-					return Long.toString((long) (tourItem.colAltitudeUp / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE));
-
-				default:
-				}
-
-			} else {
-				if (index == COLUMN_DATE) {
-					return ((TVIWizardCompareItem) obj).treeColumn;
-				} else {
-					return UI.EMPTY_STRING;
-				}
-			}
-
-			return UI.EMPTY_STRING;
-		}
-	}
-
 	WizardPageCompareTour() {
 
 		super("compare-tour");//$NON-NLS-1$
@@ -179,7 +137,7 @@ public class WizardPageCompareTour extends WizardPage {
 
 		final Composite pageContainer = createUI(parent);
 
-		restoreDialogSettings();
+		restoreState();
 
 		// set the control, otherwise nothing is displayed
 		setControl(pageContainer);
@@ -187,7 +145,41 @@ public class WizardPageCompareTour extends WizardPage {
 		validatePage();
 	}
 
-	private Control createTourViewer(final Composite parent) {
+	private Composite createUI(final Composite parent) {
+
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridLayoutFactory.fillDefaults().applyTo(container);
+		{
+			{
+				_chkSelectAll = new Button(container, SWT.CHECK);
+				_chkSelectAll.setText(Messages.tourCatalog_wizard_Action_select_all_tours);
+				_chkSelectAll.addSelectionListener(new SelectionAdapter() {
+					@Override
+					public void widgetSelected(final SelectionEvent e) {
+						enableTours(_chkSelectAll.getSelection());
+						validatePage();
+					}
+				});
+			}
+
+			/*
+			 * create master detail layout
+			 */
+			final Composite detailContainer = new Composite(container, SWT.NONE);
+			GridDataFactory.fillDefaults().grab(true, true).applyTo(detailContainer);
+			{
+				final Control viewer = createUI_10_TourViewer(detailContainer);
+				final Sash sash = new Sash(detailContainer, SWT.VERTICAL);
+				final Composite tourChart = createUI_50_TourChart(parent, detailContainer);
+
+				_viewerDetailForm = new SashLeftFixedForm(detailContainer, viewer, sash, tourChart);
+			}
+		}
+
+		return container;
+	}
+
+	private Control createUI_10_TourViewer(final Composite parent) {
 
 		initializeDialogUnits(parent);
 
@@ -205,64 +197,41 @@ public class WizardPageCompareTour extends WizardPage {
 				| SWT.CHECK);
 
 		tree.setHeaderVisible(true);
-		tree.setLinesVisible(true);
+
+		_tourViewer = new ContainerCheckedTreeViewer(tree);
+
+		defineAllColumns(treeLayout);
 
 		/*
-		 * tree columns
+		 * Setup viewer
 		 */
-		TreeColumn tc;
+		_tourViewer.setContentProvider(new TourContentProvider());
+		_tourViewer.setUseHashlookup(true);
 
-		tc = new TreeColumn(tree, SWT.NONE);
-		tc.setText(Messages.tourCatalog_wizard_Column_tour);
-		treeLayout.setColumnData(tc, new ColumnPixelData(convertWidthInCharsToPixels(20)));
-
-		tc = new TreeColumn(tree, SWT.TRAIL);
-		tc.setText(UI.UNIT_LABEL_DISTANCE);
-		tc.setToolTipText(Messages.tourCatalog_wizard_Column_distance_tooltip);
-		treeLayout.setColumnData(tc, new ColumnWeightData(10));
-
-		tc = new TreeColumn(tree, SWT.TRAIL);
-		tc.setText(UI.UNIT_LABEL_ALTITUDE);
-		tc.setToolTipText(Messages.tourCatalog_wizard_Column_altitude_up_tooltip);
-		treeLayout.setColumnData(tc, new ColumnWeightData(10));
-
-		tc = new TreeColumn(tree, SWT.TRAIL);
-		tc.setText(Messages.tourCatalog_wizard_Column_h);
-		tc.setToolTipText(Messages.tourCatalog_wizard_Column_h_tooltip);
-		treeLayout.setColumnData(tc, new ColumnWeightData(10));
-
-		/*
-		 * tree viewer
-		 */
-		fTourViewer = new ContainerCheckedTreeViewer(tree);
-		fTourViewer.setContentProvider(new TourContentProvider());
-		fTourViewer.setLabelProvider(new TourLabelProvider());
-		fTourViewer.setUseHashlookup(true);
-
-		fTourViewer.addSelectionChangedListener(new ISelectionChangedListener() {
+		_tourViewer.addSelectionChangedListener(new ISelectionChangedListener() {
 			public void selectionChanged(final SelectionChangedEvent event) {
 				showCompareTour(event);
 			}
 		});
 
-		fTourViewer.addCheckStateListener(new ICheckStateListener() {
+		_tourViewer.addCheckStateListener(new ICheckStateListener() {
 			public void checkStateChanged(final CheckStateChangedEvent event) {
 				validatePage();
 			}
 		});
 
-		fTourViewer.addDoubleClickListener(new IDoubleClickListener() {
+		_tourViewer.addDoubleClickListener(new IDoubleClickListener() {
 			public void doubleClick(final DoubleClickEvent event) {
 
-				final Object selection = ((IStructuredSelection) fTourViewer.getSelection()).getFirstElement();
+				final Object selection = ((IStructuredSelection) _tourViewer.getSelection()).getFirstElement();
 				if (selection != null) {
 
 					// expand/collapse current item
 
-					if (fTourViewer.getExpandedState(selection)) {
-						fTourViewer.collapseToLevel(selection, 1);
+					if (_tourViewer.getExpandedState(selection)) {
+						_tourViewer.collapseToLevel(selection, 1);
 					} else {
-						fTourViewer.expandToLevel(selection, 1);
+						_tourViewer.expandToLevel(selection, 1);
 					}
 				}
 			}
@@ -271,53 +240,167 @@ public class WizardPageCompareTour extends WizardPage {
 		return layoutContainer;
 	}
 
-	private Composite createUI(final Composite parent) {
+	private Composite createUI_50_TourChart(final Composite parent, final Composite detailContainer) {
 
-		final Composite pageContainer = new Composite(parent, SWT.NONE);
-		GridLayoutFactory.fillDefaults().applyTo(pageContainer);
+		// chart group
+		_groupChart = new Group(detailContainer, SWT.NONE);
+		_groupChart.setLayout(new GridLayout());
+		_groupChart.setText(Messages.tourCatalog_wizard_Group_selected_tour);
+		_groupChart.setEnabled(false);
+		{
+			/*
+			 * create pagebook with the chart and the no-chart page
+			 */
+			_pageBook = new PageBook(_groupChart, SWT.NONE);
+			_pageBook.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+			{
+				_compareTourChart = new Chart(_pageBook, SWT.NONE);
+				_compareTourChart.setBackgroundColor(parent.getDisplay().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
 
-		fCheckSelectAll = new Button(pageContainer, SWT.CHECK);
-		fCheckSelectAll.setText(Messages.tourCatalog_wizard_Action_select_all_tours);
-		fCheckSelectAll.addSelectionListener(new SelectionAdapter() {
+				// set grid size
+				_compareTourChart.setGrid(
+						_prefStore.getInt(ITourbookPreferences.GRAPH_GRID_HORIZONTAL_DISTANCE),
+						_prefStore.getInt(ITourbookPreferences.GRAPH_GRID_VERTICAL_DISTANCE),
+						_prefStore.getBoolean(ITourbookPreferences.GRAPH_GRID_IS_SHOW_HORIZONTAL_GRIDLINES),
+						_prefStore.getBoolean(ITourbookPreferences.GRAPH_GRID_IS_SHOW_VERTICAL_GRIDLINES));
+
+				_pageTourIsNotSelected = new Label(_pageBook, SWT.NONE);
+				_pageTourIsNotSelected.setText(Messages.tourCatalog_wizard_Label_a_tour_is_not_selected);
+				_pageTourIsNotSelected.setEnabled(false);
+			}
+		}
+
+		return _groupChart;
+	}
+
+	/**
+	 * Create all columns.
+	 */
+	private void defineAllColumns(final TreeColumnLayout treeLayout) {
+
+		defineColumn_Date(treeLayout);
+		defineColumn_Distance(treeLayout);
+		defineColumn_AltitudeUp(treeLayout);
+		defineColumn_RecordingTime(treeLayout);
+	}
+
+	private void defineColumn_AltitudeUp(final TreeColumnLayout treeLayout) {
+
+		final TreeViewerColumn tvc = new TreeViewerColumn(_tourViewer, SWT.TRAIL);
+		tvc.setLabelProvider(new CellLabelProvider() {
 			@Override
-			public void widgetSelected(final SelectionEvent e) {
-				enableTours(fCheckSelectAll.getSelection());
-				validatePage();
+			public void update(final ViewerCell cell) {
+
+				final Object element = cell.getElement();
+
+				if (element instanceof TVIWizardCompareTour) {
+
+					final TVIWizardCompareTour tourItem = (TVIWizardCompareTour) element;
+
+					final long value = (long) (tourItem.colAltitudeUp / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE);
+					cell.setText(Long.toString(value));
+
+				} else {
+
+					cell.setText(UI.EMPTY_STRING);
+				}
 			}
 		});
 
-		/*
-		 * create master detail layout
-		 */
-		final Composite masterDetailContainer = new Composite(pageContainer, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, true).applyTo(masterDetailContainer);
+		final TreeColumn tc = tvc.getColumn();
+		tc.setText(UI.UNIT_LABEL_ALTITUDE);
+		tc.setToolTipText(Messages.tourCatalog_wizard_Column_altitude_up_tooltip);
+		treeLayout.setColumnData(tc, new ColumnWeightData(10));
+	}
 
-		final Control viewer = createTourViewer(masterDetailContainer);
+	private void defineColumn_Date(final TreeColumnLayout treeLayout) {
 
-		final Sash sash = new Sash(masterDetailContainer, SWT.VERTICAL);
+		final TreeViewerColumn tvc = new TreeViewerColumn(_tourViewer, SWT.LEAD);
+		tvc.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
 
-		// chart group
-		fChartGroup = new Group(masterDetailContainer, SWT.NONE);
-		fChartGroup.setLayout(new GridLayout());
-		fChartGroup.setText(Messages.tourCatalog_wizard_Group_selected_tour);
-		fChartGroup.setEnabled(false);
+				final Object element = cell.getElement();
 
-		fViewerDetailForm = new SashLeftFixedForm(masterDetailContainer, viewer, sash, fChartGroup);
+				if (element instanceof TVIWizardCompareYear) {
+					cell.setText(((TVIWizardCompareYear) element).treeColumn);
+				} else if (element instanceof TVIWizardCompareMonth) {
+					cell.setText(((TVIWizardCompareMonth) element).treeColumn);
+				} else if (element instanceof TVIWizardCompareTour) {
+					cell.setText(((TVIWizardCompareTour) element).treeColumn);
+				} else {
+					cell.setText(UI.EMPTY_STRING);
+				}
+			}
+		});
 
-		/*
-		 * create pagebook with the chart and the no-chart page
-		 */
-		fPageBook = new PageBook(fChartGroup, SWT.NONE);
-		fPageBook.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+		final TreeColumn tc = tvc.getColumn();
+		tc.setText(Messages.tourCatalog_wizard_Column_tour);
+		treeLayout.setColumnData(tc, new ColumnPixelData(convertWidthInCharsToPixels(20)));
+	}
 
-		fCompTourChart = new Chart(fPageBook, SWT.NONE);
-		fCompTourChart.setBackgroundColor(parent.getDisplay().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
+	private void defineColumn_Distance(final TreeColumnLayout treeLayout) {
 
-		fPageTourIsNotSelected = new Label(fPageBook, SWT.NONE);
-		fPageTourIsNotSelected.setText(Messages.tourCatalog_wizard_Label_a_tour_is_not_selected);
-		fPageTourIsNotSelected.setEnabled(false);
+		final TreeViewerColumn tvc = new TreeViewerColumn(_tourViewer, SWT.TRAIL);
+		tvc.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
 
-		return pageContainer;
+				final Object element = cell.getElement();
+
+				if (element instanceof TVIWizardCompareTour) {
+
+					final TVIWizardCompareTour tourItem = (TVIWizardCompareTour) element;
+
+					final float distance = (tourItem.colDistance) / (1000 * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE);
+
+					cell.setText(_nf1.format(distance));
+
+				} else {
+
+					cell.setText(UI.EMPTY_STRING);
+				}
+			}
+		});
+
+		final TreeColumn tc = tvc.getColumn();
+		tc.setText(UI.UNIT_LABEL_DISTANCE);
+		tc.setToolTipText(Messages.tourCatalog_wizard_Column_distance_tooltip);
+		treeLayout.setColumnData(tc, new ColumnWeightData(10));
+	}
+
+	private void defineColumn_RecordingTime(final TreeColumnLayout treeLayout) {
+
+		final TreeViewerColumn tvc = new TreeViewerColumn(_tourViewer, SWT.TRAIL);
+		tvc.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final Object element = cell.getElement();
+
+				if (element instanceof TVIWizardCompareTour) {
+
+					final TVIWizardCompareTour tourItem = (TVIWizardCompareTour) element;
+
+					final long recordingTime = tourItem.colRecordingTime;
+
+					cell.setText(String.format(//
+							Messages.Format_hhmm,
+							(recordingTime / 3600),
+							((recordingTime % 3600) / 60)));
+
+				} else {
+
+					cell.setText(UI.EMPTY_STRING);
+				}
+			}
+		});
+
+		final TreeColumn tc = tvc.getColumn();
+
+		tc.setText(Messages.tourCatalog_wizard_Column_h);
+		tc.setToolTipText(Messages.tourCatalog_wizard_Column_h_tooltip);
+		treeLayout.setColumnData(tc, new ColumnWeightData(10));
 	}
 
 	/**
@@ -330,22 +413,22 @@ public class WizardPageCompareTour extends WizardPage {
 		final boolean isEnabled = !isChecked;
 
 		// load tour data into the viewer if not yet done
-		if (isEnabled && fIsTourViewerInitialized == false) {
+		if (isEnabled && _isTourViewerInitialized == false) {
 
 			BusyIndicator.showWhile(null, new Runnable() {
 				public void run() {
 
 					// initialize the data before the view input is set
-					fRootItem = new TVIWizardCompareRoot();
-					fTourViewer.setInput(this);
+					_rootItem = new TVIWizardCompareRoot();
+					_tourViewer.setInput(this);
 
-					fIsTourViewerInitialized = true;
+					_isTourViewerInitialized = true;
 				}
 			});
 
 		}
 
-		fTourViewer.getControl().setEnabled(isEnabled);
+		_tourViewer.getControl().setEnabled(isEnabled);
 	}
 
 	private Long[] getAllTourIds() {
@@ -378,7 +461,7 @@ public class WizardPageCompareTour extends WizardPage {
 	 */
 	public Object[] getComparedTours() {
 
-		if (fCheckSelectAll.getSelection()) {
+		if (_chkSelectAll.getSelection()) {
 
 			// return all tours
 
@@ -386,21 +469,11 @@ public class WizardPageCompareTour extends WizardPage {
 
 		} else {
 
-			return fTourViewer.getCheckedElements();
+			return _tourViewer.getCheckedElements();
 		}
 	}
 
-	void persistDialogSettings() {
-
-		final IDialogSettings wizardSettings = getDialogSettings();
-
-		// save the viewer width
-		wizardSettings.put(COMP_TOUR_VIEWER_WIDTH, fTourViewer.getTree().getSize().x);
-
-		wizardSettings.put(COMP_TOUR_SELECT_ALL, fCheckSelectAll.getSelection());
-	}
-
-	private void restoreDialogSettings() {
+	private void restoreState() {
 
 		final IDialogSettings wizardSettings = getDialogSettings();
 
@@ -409,13 +482,23 @@ public class WizardPageCompareTour extends WizardPage {
 		try {
 			viewerWidth = wizardSettings.getInt(COMP_TOUR_VIEWER_WIDTH);
 		} catch (final NumberFormatException e) {}
-		fViewerDetailForm.setViewerWidth(viewerWidth);
+		_viewerDetailForm.setViewerWidth(viewerWidth);
 
 		// restore checkbox: select all tours
 		final boolean isSelectAllTours = wizardSettings.getBoolean(COMP_TOUR_SELECT_ALL);
-		fCheckSelectAll.setSelection(isSelectAllTours);
+		_chkSelectAll.setSelection(isSelectAllTours);
 
 		enableTours(isSelectAllTours);
+	}
+
+	void saveState() {
+
+		final IDialogSettings wizardSettings = getDialogSettings();
+
+		// save the viewer width
+		wizardSettings.put(COMP_TOUR_VIEWER_WIDTH, _tourViewer.getTree().getSize().x);
+
+		wizardSettings.put(COMP_TOUR_SELECT_ALL, _chkSelectAll.getSelection());
 	}
 
 	private void showCompareTour(final SelectionChangedEvent event) {
@@ -447,17 +530,18 @@ public class WizardPageCompareTour extends WizardPage {
 //				fTourChart.setGridDistance(prefStore.getInt(ITourbookPreferences.GRAPH_GRID_HORIZONTAL_DISTANCE),
 //						prefStore.getInt(ITourbookPreferences.GRAPH_GRID_VERTICAL_DISTANCE));
 
-			fCompTourChart.updateChart(chartDataModel, false);
+			_compareTourChart.updateChart(chartDataModel, false);
 
-			fChartGroup.setText(NLS.bind(
+			_groupChart.setText(NLS.bind(
 					Messages.tourCatalog_wizard_Group_selected_tour_2,
 					TourManager.getTourDateShort(tourData)));
 
-			fPageBook.showPage(fCompTourChart);
+			_pageBook.showPage(_compareTourChart);
 
 		} else {
-			fPageBook.showPage(fPageTourIsNotSelected);
-			fChartGroup.setText(UI.EMPTY_STRING);
+
+			_pageBook.showPage(_pageTourIsNotSelected);
+			_groupChart.setText(UI.EMPTY_STRING);
 		}
 	}
 
@@ -465,7 +549,7 @@ public class WizardPageCompareTour extends WizardPage {
 
 		setMessage(Messages.tourCatalog_wizard_Label_page_message);
 
-		if (fCheckSelectAll.getSelection()) {
+		if (_chkSelectAll.getSelection()) {
 
 			setPageComplete(true);
 			setErrorMessage(null);
@@ -473,7 +557,7 @@ public class WizardPageCompareTour extends WizardPage {
 
 		} else {
 
-			final Object[] checkedElements = fTourViewer.getCheckedElements();
+			final Object[] checkedElements = _tourViewer.getCheckedElements();
 
 			if (checkedElements.length == 0) {
 				setPageComplete(false);

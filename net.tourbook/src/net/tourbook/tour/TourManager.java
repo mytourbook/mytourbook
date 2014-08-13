@@ -495,6 +495,21 @@ public class TourManager {
 	}
 
 	/**
+	 * Get a tour from the cache, the cache is necessary because getting a tour from the database
+	 * creates always a new instance.
+	 * <p>
+	 * This is a shortcut for {@link TourManager.getInstance().getTourData(tourId)}.
+	 * 
+	 * @param requestedTourId
+	 * @return Returns the tour data for the tour id or <code>null</code> when tour is not in the
+	 *         database.
+	 */
+	public static TourData getTour(final Long requestedTourId) {
+
+		return getInstance().getTourData(requestedTourId);
+	}
+
+	/**
 	 * @return Returns the instance of the {@link TourDataEditorView} or <code>null</code> when this
 	 *         part is not opened
 	 */
@@ -528,15 +543,6 @@ public class TourManager {
 	public static DateTime getTourDateTime(final TourData tourData) {
 
 		return tourData.getTourStartTime();
-//
-//		return new DateTime(//
-//				tourData.getStartYear(),
-//				tourData.getStartMonth(),
-//				tourData.getStartDay(),
-//				tourData.getStartHour(),
-//				tourData.getStartMinute(),
-//				tourData.getStartSecond(),
-//				0);
 	}
 
 	/**
@@ -1387,20 +1393,6 @@ public class TourManager {
 	public void addTourSaveListener(final ITourSaveListener listener) {
 		_tourSaveListeners.add(listener);
 	}
-
-//	/**
-//	 * adjust the min/max values to make them more visible and not at the same vertical position as
-//	 * the x-axis or the top of the chart
-//	 */
-//	private void adjustMinMax(final ChartDataYSerie yData) {
-//
-//		yData.setVisibleMaxValue(yData.getVisibleMaxValue() + 1);
-//
-//		final float visibleMinValue = yData.getVisibleMinValue();
-//		if (visibleMinValue > 0) {
-//			yData.setVisibleMinValue(visibleMinValue - 1);
-//		}
-//	}
 
 	/**
 	 * Remove all {@link TourData} from the cache so they need to be reloaded the next time with
@@ -2356,11 +2348,11 @@ public class TourManager {
 
 	/**
 	 * Get a tour from the cache, the cache is necessary because getting a tour from the database
-	 * creates always a new instance
+	 * creates always a new instance.
 	 * 
 	 * @param requestedTourId
-	 * @return Returns the tour data for the tour id or <code>null</code> when the tour is not in
-	 *         the database
+	 * @return Returns the tour data for the tour id or <code>null</code> when tour is not in the
+	 *         database.
 	 */
 	public TourData getTourData(final Long requestedTourId) {
 
