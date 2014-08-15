@@ -2,9 +2,9 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: World Wind Resources
 Bundle-SymbolicName: net.tourbook.ext.worldwind_2.0;singleton:=true
-Bundle-Version: 2.0.0.rev1721
+Bundle-Version: 2.0.2230
 Bundle-Vendor: NASA World Wind
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: .,
  gdal.jar,

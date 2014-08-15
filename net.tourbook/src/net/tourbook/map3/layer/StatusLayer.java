@@ -20,6 +20,7 @@ import gov.nasa.worldwind.geom.coords.UTMCoord;
 import gov.nasa.worldwind.layers.AbstractLayer;
 import gov.nasa.worldwind.render.DrawContext;
 import gov.nasa.worldwind.render.OrderedRenderable;
+import gov.nasa.worldwind.render.TextRenderer;
 import gov.nasa.worldwind.util.Logging;
 import gov.nasa.worldwind.util.OGLTextRenderer;
 import gov.nasa.worldwind.util.OGLUtil;
@@ -42,7 +43,6 @@ import javax.media.opengl.GL;
 import javax.media.opengl.GL2;
 import javax.swing.Timer;
 
-import com.jogamp.opengl.util.awt.TextRenderer;
 import com.jogamp.opengl.util.texture.Texture;
 import com.jogamp.opengl.util.texture.TextureCoords;
 import com.jogamp.opengl.util.texture.TextureData;

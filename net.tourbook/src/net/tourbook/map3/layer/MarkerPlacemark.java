@@ -24,6 +24,7 @@ import gov.nasa.worldwind.render.DrawContext;
 import gov.nasa.worldwind.render.Offset;
 import gov.nasa.worldwind.render.PointPlacemark;
 import gov.nasa.worldwind.render.PointPlacemarkAttributes;
+import gov.nasa.worldwind.render.TextRenderer;
 import gov.nasa.worldwind.util.OGLStackHandler;
 import gov.nasa.worldwind.util.OGLTextRenderer;
 import gov.nasa.worldwind.util.OGLUtil;
@@ -38,12 +39,11 @@ import javax.media.opengl.GL2;
 
 import net.tourbook.map3.view.Map3View;
 
-import com.jogamp.opengl.util.awt.TextRenderer;
-
 public class MarkerPlacemark extends PointPlacemark {
 
 	String						markerText;
 	double						absoluteAltitude;
+
 	private static AtomicLong	_counterDraw	= new AtomicLong();
 	private static AtomicLong	_counterMake	= new AtomicLong();
 
@@ -62,7 +62,7 @@ public class MarkerPlacemark extends PointPlacemark {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected void computePlacemarkPoints(final DrawContext dc) {
+	protected void computePlacemarkPoints(final DrawContext dc, final OrderedPlacemark opm) {
 
 		this.placePoint = null;
 		this.terrainPoint = null;
@@ -124,15 +124,17 @@ public class MarkerPlacemark extends PointPlacemark {
 	 *            a pick support holding the picked object list to add this shape to.
 	 */
 	@Override
-	protected void doDrawOrderedRenderable(final DrawContext dc, final PickSupport pickCandidates) {
+	protected void doDrawOrderedRenderable(	final DrawContext dc,
+											final PickSupport pickCandidates,
+											final OrderedPlacemark opm) {
 
-		if (this.isDrawLine(dc)) {
-			this.drawLine(dc, pickCandidates);
+		if (this.isDrawLine(dc, opm)) {
+			this.drawLine(dc, pickCandidates, opm);
 		}
 
 		if (this.activeTexture == null) {
 			if (this.isDrawPoint(dc)) {
-				this.drawPoint(dc, pickCandidates);
+				this.drawPoint(dc, pickCandidates, opm);
 			}
 			return;
 		}
@@ -243,7 +245,7 @@ public class MarkerPlacemark extends PointPlacemark {
 //            dc.drawUnitQuadOutline(); // for debugging label placement
 
 			if (this.mustDrawLabel() && !dc.isPickingMode()) {
-				this.drawLabel(dc);
+				this.drawLabel(dc, opm);
 			}
 
 		} finally {
@@ -266,7 +268,7 @@ public class MarkerPlacemark extends PointPlacemark {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected void drawLabel(final DrawContext dc) {
+	protected void drawLabel(final DrawContext dc, final OrderedPlacemark opm) {
 //
 //		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
 //				+ ("\tdrawLabel()")
@@ -364,7 +366,7 @@ public class MarkerPlacemark extends PointPlacemark {
 	 *            the pick support object to use when adding this as a pick candidate.
 	 */
 	@Override
-	protected void drawLine(final DrawContext dc, final PickSupport pickCandidates) {
+	protected void drawLine(final DrawContext dc, final PickSupport pickCandidates, final OrderedPlacemark opm) {
 
 		final GL2 gl = dc.getGL().getGL2(); // GL initialization checks for GL2 compatibility.
 

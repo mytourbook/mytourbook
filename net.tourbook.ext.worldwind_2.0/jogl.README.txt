@@ -5,9 +5,9 @@ This software is licensed as specified in the LICENSE.txt file.
 You must use this software in accordance with the terms 
 under which the code is licensed.
 
-This is build version 2.1.0, based on:
-              branch  master
-              commit  8363df5da5794faf10478789954992cef0c0d50f
+This is build version 2.1.5, based on:
+              branch  origin/master
+              commit  ba0dc6462a88ee7512a087deaaca760239915548
 
 Instructions for unzipping Java Binding for the OpenGL API, version 2.1
 ----------------------------------------------------------------------------------
