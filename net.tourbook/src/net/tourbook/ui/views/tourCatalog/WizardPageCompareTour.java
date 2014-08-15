@@ -149,19 +149,8 @@ public class WizardPageCompareTour extends WizardPage {
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridLayoutFactory.fillDefaults().applyTo(container);
+//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
 		{
-			{
-				_chkSelectAll = new Button(container, SWT.CHECK);
-				_chkSelectAll.setText(Messages.tourCatalog_wizard_Action_select_all_tours);
-				_chkSelectAll.addSelectionListener(new SelectionAdapter() {
-					@Override
-					public void widgetSelected(final SelectionEvent e) {
-						enableTours(_chkSelectAll.getSelection());
-						validatePage();
-					}
-				});
-			}
-
 			/*
 			 * create master detail layout
 			 */
@@ -173,6 +162,17 @@ public class WizardPageCompareTour extends WizardPage {
 				final Composite tourChart = createUI_50_TourChart(parent, detailContainer);
 
 				_viewerDetailForm = new SashLeftFixedForm(detailContainer, viewer, sash, tourChart);
+			}
+			{
+				_chkSelectAll = new Button(container, SWT.CHECK);
+				_chkSelectAll.setText(Messages.tourCatalog_wizard_Action_select_all_tours);
+				_chkSelectAll.addSelectionListener(new SelectionAdapter() {
+					@Override
+					public void widgetSelected(final SelectionEvent e) {
+						enableTours(_chkSelectAll.getSelection());
+						validatePage();
+					}
+				});
 			}
 		}
 

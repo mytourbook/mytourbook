@@ -165,8 +165,8 @@ public class WizardPageReferenceTour extends WizardPage {
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridLayoutFactory.fillDefaults().applyTo(container);
 		{
-			final Label label = new Label(container, SWT.NONE);
-			label.setText(Messages.tourCatalog_wizard_Label_reference_tour);
+//			final Label label = new Label(container, SWT.NONE);
+//			label.setText(Messages.tourCatalog_wizard_Label_reference_tour);
 
 			final Composite masterDetailContainer = new Composite(container, SWT.NONE);
 			GridDataFactory.fillDefaults().grab(true, true).applyTo(masterDetailContainer);

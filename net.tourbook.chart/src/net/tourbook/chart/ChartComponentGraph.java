@@ -2157,7 +2157,10 @@ public class ChartComponentGraph extends Canvas {
 			graphValueOffset = (float) (_xxDevViewPortLeftBorder / scaleX);
 		}
 
-		if (xData.getSynchMarkerStartIndex() == -1) {
+		final int synchMarkerStartIndex = xData.getSynchMarkerStartIndex();
+		final int synchMarkerEndIndex = xData.getSynchMarkerEndIndex();
+
+		if (synchMarkerStartIndex == -1) {
 
 			// synch marker is not displayed
 
@@ -2177,57 +2180,42 @@ public class ChartComponentGraph extends Canvas {
 					rgbBgBright,
 					graphLineAlpha,
 					graphFillingAlpha,
-					graphValueOffset,
-					false);
+					graphValueOffset);
 
 		} else {
 
 			// draw synched tour
 
-			final int noneMarkerLineAlpha = (int) (_chart.graphTransparencyLine * 0.5);
-			final int noneMarkerFillingAlpha = (int) (_chart.graphTransparencyFilling * 0.5);
+			final double noneMarkerAlpha = 0.4;
+
+			final int noneMarkerLineAlpha = (int) (_chart.graphTransparencyLine * noneMarkerAlpha);
+			final int noneMarkerFillingAlpha = (int) (_chart.graphTransparencyFilling * noneMarkerAlpha);
+
+			// draw graph without marker
+//			drawAsync_510_LineGraphSegment(
+//					gcGraph,
+//					graphDrawingData,
+//					0,
+//					serieSize,
+//					rgbFg,
+//					rgbBgDark,
+//					rgbBgBright,
+//					noneMarkerLineAlpha,
+//					noneMarkerFillingAlpha,
+//					graphValueOffset);
 
 			// draw the x-marker
 			drawAsync_510_LineGraphSegment(
 					gcGraph,
 					graphDrawingData,
-					xData.getSynchMarkerStartIndex(),
-					xData.getSynchMarkerEndIndex() + 1,
+					synchMarkerStartIndex,
+					synchMarkerEndIndex + 0,
 					rgbFg,
 					rgbBgDark,
 					rgbBgBright,
 					_chart.graphTransparencyLine,
 					_chart.graphTransparencyFilling,
-					graphValueOffset,
-					true);
-
-			// draw segment before the marker
-			drawAsync_510_LineGraphSegment(
-					gcGraph,
-					graphDrawingData,
-					0,
-					xData.getSynchMarkerStartIndex() + 1,
-					rgbFg,
-					rgbBgDark,
-					rgbBgBright,
-					noneMarkerLineAlpha,
-					noneMarkerFillingAlpha,
-					graphValueOffset,
-					true);
-
-			// draw segment after the marker
-			drawAsync_510_LineGraphSegment(
-					gcGraph,
-					graphDrawingData,
-					xData.getSynchMarkerEndIndex() - 0,
-					serieSize,
-					rgbFg,
-					rgbBgDark,
-					rgbBgBright,
-					noneMarkerLineAlpha,
-					noneMarkerFillingAlpha,
-					graphValueOffset,
-					true);
+					graphValueOffset);
 		}
 	}
 
@@ -2257,8 +2245,7 @@ public class ChartComponentGraph extends Canvas {
 												final RGB rgbBgBright,
 												final int graphLineAlpha,
 												final int graphFillingAlpha,
-												final double graphValueOffset,
-												final boolean isSegmented) {
+												final double graphValueOffset) {
 
 		final ChartDataXSerie xData = graphDrawingData.getXData();
 		final ChartDataYSerie yData = graphDrawingData.getYData();
@@ -2429,12 +2416,12 @@ public class ChartComponentGraph extends Canvas {
 				final double devXFirstPoint = devXPrev;
 				float devXFirstPointF = (float) devXPrev;
 
-				if (isSegmented == false) {
+				if (devXFirstPointF == 0.0f) {
 					/*
 					 * All is painted without segments. Hide the first line from the bottom to the
 					 * first value point by setting the position into the hidden area.
 					 */
-					devXFirstPointF -= 1.0f;
+					devXFirstPointF -= 0.5f;
 				}
 
 				float devYStart = 0;
@@ -2837,8 +2824,7 @@ public class ChartComponentGraph extends Canvas {
 					rgbBg2,
 					graphLineAlpha,
 					graphFillingAlpha,
-					graphValueOffset,
-					true);
+					graphValueOffset);
 
 			runningIndex++;
 		}
