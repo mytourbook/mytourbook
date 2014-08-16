@@ -1,0 +1,27 @@
+Version: 14.8.0                                                16.8.2014
+
+ 
+New 	
+===
+
+* Import Suunto files.
+
+ 
+Improvements 	
+============
+
+* Recognize new Garmin devices, e.g. Fenix2.
+* Show firmware version in import view (when available).
+
+ 
+Fixed Bug 	
+=========
+
+* Show 3D map with 64 bit Java, Bug #86
+
+ 
+System 	
+======
+
+* Update to FIT SDK 12
+* Update to WorldWind SDK revision 2230
