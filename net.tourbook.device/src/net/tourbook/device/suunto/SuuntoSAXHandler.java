@@ -83,6 +83,7 @@ public class SuuntoSAXHandler extends DefaultHandler {
 	private static final String				TAG_DISTANCE			= "Distance";										//$NON-NLS-1$
 	private static final String				TAG_EVENTS				= "Events";										//$NON-NLS-1$
 	private static final String				TAG_HR					= "HR";											//$NON-NLS-1$
+	private static final String				TAG_LAP					= "Lap";											//$NON-NLS-1$
 	private static final String				TAG_LATITUDE			= "Latitude";										//$NON-NLS-1$
 	private static final String				TAG_LONGITUDE			= "Longitude";										//$NON-NLS-1$
 	private static final String				TAG_SAMPLE				= "Sample";										//$NON-NLS-1$
@@ -102,11 +103,15 @@ public class SuuntoSAXHandler extends DefaultHandler {
 	private TimeData						_gpsData;
 	private ArrayList<TimeData>				_gpsList				= new ArrayList<TimeData>();
 
+	private TimeData						_markerData;
+	private ArrayList<TimeData>				_markerList				= new ArrayList<TimeData>();
+
 	private boolean							_isImported;
 
 	private StringBuilder					_characters				= new StringBuilder();
 	private String							_currentSampleType;
 	private long							_currentTime;
+	private long							_prevSampleTime;
 
 	private boolean							_isInRootDevice;
 	private boolean							_isInRootSamples;
@@ -173,6 +178,7 @@ public class SuuntoSAXHandler extends DefaultHandler {
 
 		_sampleList.clear();
 		_gpsList.clear();
+		_markerList.clear();
 	}
 
 	@Override
@@ -280,6 +286,11 @@ public class SuuntoSAXHandler extends DefaultHandler {
 			final float hr = Util.parseFloat(_characters.toString());
 			_sampleData.pulse = hr * 60.0f;
 
+		} else if (name.equals(TAG_LAP)) {
+
+			// set a marker
+			_markerData.marker = 1;
+
 		} else if (name.equals(TAG_LATITUDE)) {
 
 			_isInLatitude = false;
@@ -334,30 +345,77 @@ public class SuuntoSAXHandler extends DefaultHandler {
 
 	private void finalizeSample() {
 
-		if (_currentSampleType != null) {
+		final long sampleTime;
+		if (_currentTime == Long.MIN_VALUE) {
 
-			if (_currentSampleType.equals(SAMPLE_TYPE_PERIODIC)) {
+			sampleTime = DEFAULT_TIME;
 
-				// set virtual time if time is not available
-				_sampleData.absoluteTime = _currentTime == Long.MIN_VALUE ? DEFAULT_TIME : _currentTime;
+		} else {
 
-				_sampleList.add(_sampleData);
+			/*
+			 * Remove milliseconds because this can cause wrong data. Position of a marker can be at
+			 * the wrong second and multiple samples can have the same second but other
+			 * milliseconds.
+			 */
+			sampleTime = _currentTime / 1000 * 1000;
+		}
 
-			} else if (_currentSampleType.equals(SAMPLE_TYPE_GPS_BASE)
-					|| _currentSampleType.equals(SAMPLE_TYPE_GPS_SMALL)
-					|| _currentSampleType.equals(SAMPLE_TYPE_GPS_TINY)) {
+		/*
+		 * A lap do not contain a sample type
+		 */
+		if (_markerData.marker == 1) {
 
-				// set virtual time if time is not available
-				_gpsData.absoluteTime = _currentTime == Long.MIN_VALUE ? DEFAULT_TIME : _currentTime;
+			// set virtual time if time is not available
+			_markerData.absoluteTime = sampleTime;
 
-				_gpsList.add(_gpsData);
+			_markerList.add(_markerData);
+
+		} else {
+
+			if (_currentSampleType != null) {
+
+				if (_currentSampleType.equals(SAMPLE_TYPE_PERIODIC)) {
+
+					/*
+					 * Skip samples with the same time in seconds
+					 */
+					boolean isSkipSample = false;
+
+					if (_currentTime != Long.MIN_VALUE //
+							&& _prevSampleTime != Long.MIN_VALUE
+							&& sampleTime == _prevSampleTime) {
+
+						isSkipSample = true;
+					}
+
+					if (isSkipSample == false) {
+
+						// set virtual time if time is not available
+						_sampleData.absoluteTime = sampleTime;
+
+						_sampleList.add(_sampleData);
+
+						_prevSampleTime = sampleTime;
+					}
+
+				} else if (_currentSampleType.equals(SAMPLE_TYPE_GPS_BASE)
+						|| _currentSampleType.equals(SAMPLE_TYPE_GPS_SMALL)
+						|| _currentSampleType.equals(SAMPLE_TYPE_GPS_TINY)) {
+
+					// set virtual time if time is not available
+					_gpsData.absoluteTime = sampleTime;
+
+					_gpsList.add(_gpsData);
+				}
 			}
 		}
 
 		_sampleData = null;
 		_gpsData = null;
-		_currentSampleType = null;
+		_markerData = null;
+
 		_currentTime = Long.MIN_VALUE;
+		_currentSampleType = null;
 	}
 
 	private void finalizeTour() {
@@ -367,7 +425,8 @@ public class SuuntoSAXHandler extends DefaultHandler {
 			return;
 		}
 
-		setGPSSerie();
+		setData_GPS();
+		setData_Marker();
 
 		// create data object for each tour
 		final TourData tourData = new TourData();
@@ -418,27 +477,12 @@ public class SuuntoSAXHandler extends DefaultHandler {
 	}
 
 	/**
-	 * Check if distance values are not changed when geo position changed, when <code>true</code>
-	 * compute distance values from geo position.
-	 * 
-	 * @param tourData
-	 */
-	private void setDistanceSerie(final TourData tourData) {
-
-		/*
-		 * There are currently no data available to check if distance is changing, current data keep
-		 * distance for some slices and then jumps to the next value.
-		 */
-		TourManager.computeDistanceValuesFromGeoPosition(tourData);
-	}
-
-	/**
 	 * Merge GPS data into tour data by time.
 	 * <p>
 	 * Merge is necessary because there are separate time slices for GPS data and not every 'normal'
 	 * time slice has it's own GPS time slice.
 	 */
-	private void setGPSSerie() {
+	private void setData_GPS() {
 
 		if (_gpsList.size() == 0) {
 			return;
@@ -507,6 +551,67 @@ public class SuuntoSAXHandler extends DefaultHandler {
 		}
 	}
 
+	/**
+	 * Merge Marker data into tour data by time.
+	 * <p>
+	 * Merge is necessary because there are separate time slices for markers.
+	 */
+	private void setData_Marker() {
+
+		final int markerSize = _markerList.size();
+
+		if (markerSize == 0) {
+			return;
+		}
+
+		int markerIndex = 0;
+
+		long markerTime = _markerList.get(markerIndex).absoluteTime;
+
+		for (final TimeData sampleData : _sampleList) {
+
+			final long sampleTime = sampleData.absoluteTime;
+
+			if (sampleTime < markerTime) {
+
+				continue;
+
+			} else {
+
+				// markerTime >= sampleTime
+
+				sampleData.marker = 1;
+				sampleData.markerLabel = Integer.toString(markerIndex + 1);
+
+				/*
+				 * check if another marker is available
+				 */
+				markerIndex++;
+
+				if (markerIndex >= markerSize) {
+					break;
+				}
+
+				markerTime = _markerList.get(markerIndex).absoluteTime;
+			}
+		}
+	}
+
+	/**
+	 * Check if distance values are not changed when geo position changed, when <code>true</code>
+	 * compute distance values from geo position.
+	 * 
+	 * @param tourData
+	 */
+	private void setDistanceSerie(final TourData tourData) {
+
+		/*
+		 * There are currently no data available to check if distance is changing, current data keep
+		 * distance for some slices and then jumps to the next value.
+		 */
+		TourManager.computeDistanceValuesFromGeoPosition(tourData);
+	}
+
 	@Override
 	public void startElement(final String uri, final String localName, final String name, final Attributes attributes)
 			throws SAXException {
@@ -523,6 +628,7 @@ public class SuuntoSAXHandler extends DefaultHandler {
 
 				// create new time items, "sampleType" defines which time data are used
 				_gpsData = new TimeData();
+				_markerData = new TimeData();
 				_sampleData = new TimeData();
 			}
 

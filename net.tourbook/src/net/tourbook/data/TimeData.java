@@ -23,6 +23,8 @@ package net.tourbook.data;
 import java.io.Serializable;
 import java.sql.Date;
 
+import org.joda.time.DateTime;
+
 /**
  * Contains data for one time slice.
  * <p>
@@ -127,16 +129,16 @@ public class TimeData implements Serializable {
 	@Override
 	public String toString() {
 		return "TimeData [" //$NON-NLS-1$
-				+ ("id=" + id) //$NON-NLS-1$
-				+ (", time=" + time) //$NON-NLS-1$
-				+ (", absoluteTime=" + absoluteTime) //$NON-NLS-1$
+//				+ ("id=" + id) //$NON-NLS-1$
+//				+ (", time=" + time) //$NON-NLS-1$
+				+ (", absoluteTime=" + new DateTime(absoluteTime)) //$NON-NLS-1$
 //				+ (", relativeTime=" + relativeTime) //$NON-NLS-1$
 //				+ (", pulse=" + pulse) //$NON-NLS-1$
 //				+ (", temperature=" + temperature)
 //				+ (", cadence=" + cadence)
-				+ (", altitude=" + altitude) //$NON-NLS-1$
-				+ (", absoluteAltitude=" + absoluteAltitude) //$NON-NLS-1$
-				+ (", distance=" + distance) //$NON-NLS-1$
+//				+ (", altitude=" + altitude) //$NON-NLS-1$
+//				+ (", absoluteAltitude=" + absoluteAltitude) //$NON-NLS-1$
+//				+ (", distance=" + distance) //$NON-NLS-1$
 //				+ (", gpxDistance=" + gpxDistance)
 //				+ (", absoluteDistance=" + absoluteDistance)
 //				+ (", power=" + power)
