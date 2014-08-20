@@ -90,6 +90,13 @@ public class ChartLabel extends ChartMarker {
 	 */
 	public Object			data;
 
+	/*
+	 * Graph margins
+	 */
+	public int				devYBottom;
+	public int				devYTop;
+	public int				devGraphWidth;
+
 	public ChartLabel() {}
 
 	/**

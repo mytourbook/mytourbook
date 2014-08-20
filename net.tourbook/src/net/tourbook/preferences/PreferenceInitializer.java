@@ -24,6 +24,7 @@ import net.tourbook.data.TourMarker;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.tour.BreakTimeTool;
 import net.tourbook.tour.TourManager;
+import net.tourbook.ui.tourChart.ChartMarkerToolTip;
 import net.tourbook.ui.tourChart.TourChart;
 import net.tourbook.ui.views.ISmoothingAlgorithm;
 
@@ -137,6 +138,8 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 		store.setDefault(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_MARKER_POINT, true);
 		store.setDefault(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_MARKER_TOOLTIP, true);
 		store.setDefault(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_SIGN_IMAGE, true);
+		store.setDefault(ITourbookPreferences.GRAPH_MARKER_TOOLTIP_POSITION,//
+				ChartMarkerToolTip.DEFAULT_TOOLTIP_POSITION);
 
 		PreferenceConverter.setDefault(store, //
 				ITourbookPreferences.GRAPH_MARKER_COLOR_DEFAULT,

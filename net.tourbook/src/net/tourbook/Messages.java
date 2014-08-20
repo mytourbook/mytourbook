@@ -1149,6 +1149,8 @@ public class Messages extends NLS {
 //	public static String		Slideout_ChartMarkerOptions_Checkbox_IsShowSignImage;
 	public static String		Slideout_ChartMarkerOptions_Checkbox_IsShowTempPosition;
 	public static String		Slideout_ChartMarkerOptions_Checkbox_IsShowTempPosition_Tooltip;
+
+	public static String		Slideout_ChartMarkerOptions_Combo_TooltipPosition_Tooltip;
 	public static String		Slideout_ChartMarkerOptions_Label_DeviceMarkerColor;
 	public static String		Slideout_ChartMarkerOptions_Label_DeviceMarkerColor_Tooltip;
 	public static String		Slideout_ChartMarkerOptions_Label_HiddenMarkerColor;
@@ -1240,11 +1242,11 @@ public class Messages extends NLS {
 	public static String		Tour_Action_TourPhotosWithTooltip_Tooltip;
 	public static String		Tour_Action_ValuePointToolTip_IsVisible;
 
-	public static String	Tour_Blog_Action_EditMarker_Tooltip;
+	public static String		Tour_Blog_Action_EditMarker_Tooltip;
 
-	public static String	Tour_Blog_Action_EditTour_Tooltip;
+	public static String		Tour_Blog_Action_EditTour_Tooltip;
 
-	public static String	Tour_Blog_Action_OpenMarker_Tooltip;
+	public static String		Tour_Blog_Action_OpenMarker_Tooltip;
 
 	public static String		Tour_Book_Action_delete_selected_tours;
 	public static String		Tour_Book_Action_delete_selected_tours_dlg_message;
@@ -1337,6 +1339,12 @@ public class Messages extends NLS {
 	public static String		Tour_Marker_Position_Vertical_Chart_Top;
 	public static String		Tour_Marker_Position_Vertical_MarkerPoint_Above;
 	public static String		Tour_Marker_Position_Vertical_MarkerPoint_Below;
+	public static String		Tour_Marker_TooltipPosition_Bottom;
+	public static String		Tour_Marker_TooltipPosition_ChartBottom;
+	public static String		Tour_Marker_TooltipPosition_ChartTop;
+	public static String		Tour_Marker_TooltipPosition_Left;
+	public static String		Tour_Marker_TooltipPosition_Right;
+	public static String		Tour_Marker_TooltipPosition_Top;
 
 	public static String		Tour_Segmenter_Button_SaveTour_Tooltip;
 	public static String		Tour_Segmenter_Label_AltitudeUpDown_Tooltip;

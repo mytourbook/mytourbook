@@ -28,7 +28,7 @@ public class ChartDrawingData {
 	int									devSliderBarHeight;
 	int									devXAxisHeight;
 
-	public int							devDevVisibleChartWidth;
+	public int							devVisibleChartWidth;
 
 	ChartDrawingData(final ArrayList<GraphDrawingData> graphDrawingData) {
 

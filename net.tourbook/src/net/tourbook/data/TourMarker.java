@@ -377,8 +377,8 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 	}
 
 	/**
-	 * @return Returns marker label visual position which is defined in {@link ChartLabel} like
-	 *         {@link ChartLabel#LABEL_POS_HORIZONTAL_ABOVE_GRAPH_CENTERED}.
+	 * @return Returns marker label visual position like
+	 *         {@link TourMarker#LABEL_POS_HORIZONTAL_ABOVE_GRAPH_CENTERED}.
 	 */
 	public int getLabelPosition() {
 		return visualPosition;

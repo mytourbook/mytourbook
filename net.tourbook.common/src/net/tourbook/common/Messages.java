@@ -21,6 +21,18 @@ public class Messages extends NLS {
 
 	private static final String	BUNDLE_NAME	= "net.tourbook.common.messages";				//$NON-NLS-1$
 
+	public static String	App_Position_Bottom;
+
+	public static String	App_Position_ChartBottom;
+
+	public static String	App_Position_ChartTop;
+
+	public static String	App_Position_Left;
+
+	public static String	App_Position_Right;
+
+	public static String	App_Position_Top;
+
 	public static String		color_chooser_hexagon;
 	public static String		color_chooser_rgb;
 	public static String		color_chooser_red;
@@ -149,6 +161,18 @@ public class Messages extends NLS {
 	public static String		legend_color_lighten_color;
 
 	public static String		rgv_vertex_class_cast_exception;
+
+	public static String	Tour_Marker_TooltipPosition_Bottom;
+
+	public static String	Tour_Marker_TooltipPosition_ChartBottom;
+
+	public static String	Tour_Marker_TooltipPosition_ChartTop;
+
+	public static String	Tour_Marker_TooltipPosition_Left;
+
+	public static String	Tour_Marker_TooltipPosition_Right;
+
+	public static String	Tour_Marker_TooltipPosition_Top;
 
 	static {
 		// initialize resource bundle

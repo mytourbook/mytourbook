@@ -95,6 +95,7 @@ public interface ITourbookPreferences {
 	public static final String	GRAPH_MARKER_LABEL_TEMP_POSITION			= "GRAPH_MARKER_LABEL_TEMP_POSITION";						//$NON-NLS-1$
 	public static final String	GRAPH_MARKER_POINT_SIZE						= "GRAPH_MARKER_POINT_SIZE";								//$NON-NLS-1$
 	public static final String	GRAPH_MARKER_SIGN_IMAGE_SIZE				= "GRAPH_MARKER_SIGN_IMAGE_SIZE";							//$NON-NLS-1$
+	public static final String	GRAPH_MARKER_TOOLTIP_POSITION				= "GRAPH_MARKER_TOOLTIP_POSITION";							//$NON-NLS-1$
 
 	public static final String	GRAPH_MOUSE_MODE							= "graph.toggle-mouse";									//$NON-NLS-1$
 	public static final String	GRAPH_MOVE_SLIDERS_WHEN_ZOOMED				= "graphs.move-sliders-when-zoomed";						//$NON-NLS-1$

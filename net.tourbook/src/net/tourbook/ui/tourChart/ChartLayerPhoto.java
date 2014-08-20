@@ -66,7 +66,7 @@ public class ChartLayerPhoto implements IChartLayer, IChartOverlay {
 	private void createGroupPositions(final GraphDrawingData graphDrawingData, final long devGraphImageOffset) {
 
 		final ChartDrawingData chartDrawingData = graphDrawingData.getChartDrawingData();
-		final int devVisibleChartWidth = chartDrawingData.devDevVisibleChartWidth;
+		final int devVisibleChartWidth = chartDrawingData.devVisibleChartWidth;
 		final long devVirtualGraphWidth = graphDrawingData.devVirtualGraphWidth;
 		final double zoomRatio = (double) devVirtualGraphWidth / devVisibleChartWidth;
 
@@ -399,7 +399,7 @@ public class ChartLayerPhoto implements IChartLayer, IChartOverlay {
 		final int devGraphHeight = graphDrawingData.devGraphHeight;
 
 		final ChartDrawingData chartDrawingData = graphDrawingData.getChartDrawingData();
-		final int devVisibleChartWidth = chartDrawingData.devDevVisibleChartWidth;
+		final int devVisibleChartWidth = chartDrawingData.devVisibleChartWidth;
 		final long devVirtualGraphWidth = graphDrawingData.devVirtualGraphWidth;
 		final double zoomRatio = (double) devVirtualGraphWidth / devVisibleChartWidth;
 

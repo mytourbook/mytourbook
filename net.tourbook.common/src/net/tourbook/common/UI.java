@@ -63,6 +63,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.Monitor;
 import org.eclipse.swt.widgets.Sash;
 import org.eclipse.swt.widgets.Scale;
 import org.eclipse.swt.widgets.Shell;
@@ -547,6 +548,33 @@ public class UI {
 		final int directionIndex = ((int) degree) % 8;
 
 		return directionIndex;
+	}
+
+	public static Rectangle getDisplayBounds(final Composite composite, final Point location) {
+
+		Rectangle displayBounds;
+		final Monitor[] allMonitors = composite.getDisplay().getMonitors();
+
+		if (allMonitors.length > 1) {
+			// By default present in the monitor of the control
+			displayBounds = composite.getMonitor().getBounds();
+			final Point p = new Point(location.x, location.y);
+
+			// Search on which monitor the event occurred
+			Rectangle tmp;
+			for (final Monitor element : allMonitors) {
+				tmp = element.getBounds();
+				if (tmp.contains(p)) {
+					displayBounds = tmp;
+					break;
+				}
+			}
+
+		} else {
+			displayBounds = composite.getDisplay().getBounds();
+		}
+
+		return displayBounds;
 	}
 
 	/**
