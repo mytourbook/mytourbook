@@ -43,6 +43,7 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
@@ -139,8 +140,9 @@ public class ChartMarkerToolTip extends AnimatedToolTipShell implements ITourPro
 	 * UI resources
 	 */
 	private Font							_boldFont;
-	private final ColorCache				_colorCache						= new ColorCache();
 	private Color							_fgBorder;
+	private Color							_titleColor;
+	private ColorCache						_colorCache;
 
 	/*
 	 * UI controls
@@ -311,6 +313,7 @@ public class ChartMarkerToolTip extends AnimatedToolTipShell implements ITourPro
 					.applyTo(lblName);
 
 			lblName.setFont(_boldFont);
+			lblName.setForeground(_titleColor);
 			lblName.setText(ttTitle);
 
 			/*
@@ -777,8 +780,10 @@ public class ChartMarkerToolTip extends AnimatedToolTipShell implements ITourPro
 		_defaultTextWidth = _pc.convertWidthInCharsToPixels(DEFAULT_TEXT_WIDTH);
 		_defaultTextHeight = _pc.convertHeightInCharsToPixels(DEFAULT_TEXT_HEIGHT);
 
+		_colorCache = new ColorCache();
 		_boldFont = JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT);
 		_fgBorder = display.getSystemColor(SWT.COLOR_WIDGET_NORMAL_SHADOW);
+		_titleColor = _colorCache.getColor(new RGB(0x50, 0x50, 0x50));
 	}
 
 	private void onDispose() {
@@ -862,10 +867,7 @@ public class ChartMarkerToolTip extends AnimatedToolTipShell implements ITourPro
 
 		final Display display = container.getDisplay();
 
-		UI.setColorForAllChildren(
-				container,
-				display.getSystemColor(SWT.COLOR_INFO_FOREGROUND),
-				display.getSystemColor(SWT.COLOR_INFO_BACKGROUND));
+		UI.setBackgroundColorForAllChildren(container, display.getSystemColor(SWT.COLOR_INFO_BACKGROUND));
 	}
 
 	void setIsShowMarkerActions(final boolean isShowMarkerActions) {
