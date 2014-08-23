@@ -938,9 +938,17 @@ public class Messages extends NLS {
 	public static String		Pref_Graphs_Text_max_value;
 	public static String		Pref_Graphs_Text_min_value;
 
+	public static String	Pref_MapLayout_Checkbox_BorderColor_Color;
+
+	public static String	Pref_MapLayout_Checkbox_BorderColor_Darker;
+
 	public static String		Pref_MapLayout_Dialog_OSX_Warning_Message;
 	public static String		Pref_MapLayout_Dialog_OSX_Warning_Title;
 	public static String		Pref_MapLayout_Group_TourInMapProperties;
+	public static String	Pref_MapLayout_Label_BorderColor;
+
+	public static String	Pref_MapLayout_Label_BorderColorType;
+
 	public static String		Pref_MapLayout_Label_TourPaintMethod;
 	public static String		Pref_MapLayout_Label_TourPaintMethod_Complex;
 	public static String		Pref_MapLayout_Label_TourPaintMethod_Complex_Tooltip;

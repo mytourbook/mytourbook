@@ -92,6 +92,7 @@ public class Messages extends NLS {
 	public static String		map_action_save_default_position;
 	public static String		map_action_set_default_position;
 
+	public static String		Map_Action_Edit2DMapPreferences;
 	public static String		Map_Action_ManageMapProviders;
 	public static String		Map_Action_PhotoFilter_Tooltip;
 	public static String		Map_Action_POI;

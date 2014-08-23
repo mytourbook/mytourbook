@@ -90,7 +90,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 //	private Color								_magenta				= _display.getSystemColor(SWT.COLOR_MAGENTA);
 //	private Color								_cyan					= _display.getSystemColor(SWT.COLOR_CYAN);
 //	private Color								_darkGray				= _display.getSystemColor(SWT.COLOR_DARK_GRAY);
-	private Color								_darkGray					= _colorCache.getRGB(0x404040);
+	private Color								_darkGray					= _colorCache.getColor(0x404040);
 
 //	private NavigationStyle						_navigationStyle	= NavigationStyle.PHYSICAL;
 
@@ -602,7 +602,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		final int numCols = 9; // one col left and right of the week + 7 week days
 		final int numRows = getNumOfWeeks(); // number of weeks per month displayed (make sure _tinyLayout is already defined!)
 
-		final Color alternate = _colorCache.getRGB(0xf0f0f0);
+		final Color alternate = _colorCache.getColor(0xf0f0f0);
 
 		_tourFocus = new ArrayList<ObjectLocation>();
 		_dayFocus = new ArrayList<ObjectLocation>();
@@ -873,10 +873,10 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 	private void drawHighlightedTour(final GC gc, final CalendarTourData data, final Rectangle rec) {
 
 		gc.setAlpha(0xd0);
-		gc.setBackground(_colorCache.getRGB(_rgbBright.get(data.typeColorIndex).hashCode()));
-		gc.setForeground(_colorCache.getRGB(_rgbDark.get(data.typeColorIndex).hashCode()));
+		gc.setBackground(_colorCache.getColor(_rgbBright.get(data.typeColorIndex).hashCode()));
+		gc.setForeground(_colorCache.getColor(_rgbDark.get(data.typeColorIndex).hashCode()));
 		gc.fillGradientRectangle(rec.x - 4, rec.y - 4, rec.width + 9, rec.height + 9, false);
-		gc.setForeground(_colorCache.getRGB(_rgbLine.get(data.typeColorIndex).hashCode()));
+		gc.setForeground(_colorCache.getColor(_rgbLine.get(data.typeColorIndex).hashCode()));
 		gc.drawRoundRectangle(rec.x - 5, rec.y - 5, rec.width + 10, rec.height + 10, 6, 6);
 		gc.setAlpha(0xFF);
 
@@ -888,7 +888,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 			if (_useBlackForHighlightTourInfoText) {
 				color = _black;
 			} else {
-				color = _colorCache.getRGB(_rgbText.get(data.typeColorIndex).hashCode());
+				color = _colorCache.getColor(_rgbText.get(data.typeColorIndex).hashCode());
 			}
 			drawTourInfoText(gc, r, data, color);
 		}
@@ -912,7 +912,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 	private void drawSelectedTour(final GC gc, final CalendarTourData data, final Rectangle rec) {
 
-		final Color lineColor = _colorCache.getRGB(_rgbLine.get(data.typeColorIndex).hashCode());
+		final Color lineColor = _colorCache.getColor(_rgbLine.get(data.typeColorIndex).hashCode());
 
 		// - red box -
 		gc.setBackground(_red);
@@ -959,13 +959,13 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 	private void drawTourInfo(final GC gc, final Rectangle r, final CalendarTourData data, final boolean highlight) {
 
-		final Color line = _colorCache.getRGB(_rgbLine.get(data.typeColorIndex).hashCode());
+		final Color line = _colorCache.getColor(_rgbLine.get(data.typeColorIndex).hashCode());
 
 		gc.setForeground(line);
 		gc.drawRectangle(r);
 
-		gc.setBackground(_colorCache.getRGB(_rgbBright.get(data.typeColorIndex).hashCode()));
-		gc.setForeground(_colorCache.getRGB(_rgbDark.get(data.typeColorIndex).hashCode()));
+		gc.setBackground(_colorCache.getColor(_rgbBright.get(data.typeColorIndex).hashCode()));
+		gc.setForeground(_colorCache.getColor(_rgbDark.get(data.typeColorIndex).hashCode()));
 		gc.fillGradientRectangle(r.x + 1, r.y + 1, r.width - 1, r.height - 1, false);
 
 		// only fill in text if the tour rectangle has a reasonable size
@@ -974,7 +974,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 			if (highlight && _useBlackForHighlightTourInfoText) {
 				fg = _black;
 			} else if (_useTextColorForTourInfoText) {
-				fg = _colorCache.getRGB(_rgbText.get(data.typeColorIndex).hashCode());
+				fg = _colorCache.getColor(_rgbText.get(data.typeColorIndex).hashCode());
 			} else {
 				fg = _darkGray;
 			}
@@ -1057,7 +1057,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		gc.setFont(boldFont);
 
 		for (final WeekSummaryFormatter formatter : _weekSummaryFormatter) {
-			gc.setForeground(_colorCache.getRGB(formatter.getColor().hashCode()));
+			gc.setForeground(_colorCache.getColor(formatter.getColor().hashCode()));
 			text = formatter.format(data);
 			// if (text.length() > 0 && y < rec.y + rec.height - minToShow) {
 			if (text.length() > 0 && y < (rec.y + rec.height)) {

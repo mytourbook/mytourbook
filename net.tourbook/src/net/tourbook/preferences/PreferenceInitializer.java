@@ -255,16 +255,22 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 		/*
 		 * map
 		 */
-		// appearance of the painted tour in map
-		store.setDefault(ITourbookPreferences.MAP_LAYOUT_SYMBOL, PrefPageMap2Appearance.MAP_TOUR_SYMBOL_LINE);
+		store.setDefault(ITourbookPreferences.MAP_LAYOUT_PLOT_TYPE, PrefPageMap2Appearance.DEFAULT_PLOT_TYPE);
 		store.setDefault(ITourbookPreferences.MAP_LAYOUT_SYMBOL_WIDTH, 6);
 		store.setDefault(ITourbookPreferences.MAP_LAYOUT_PAINT_WITH_BORDER, true);
 		store.setDefault(ITourbookPreferences.MAP_LAYOUT_BORDER_WIDTH, 1);
-		store.setDefault(
-				ITourbookPreferences.MAP_LAYOUT_TOUR_PAINT_METHOD,
+		store.setDefault(ITourbookPreferences.MAP_LAYOUT_BORDER_DIMM_VALUE, 80); // 0...100
+
+		PreferenceConverter.setDefault(store, ITourbookPreferences.MAP_LAYOUT_BORDER_COLOR, //
+				new RGB(0x50, 0x50, 0x50));
+
+		store.setDefault(ITourbookPreferences.MAP_LAYOUT_TOUR_PAINT_METHOD, //
 				PrefPageMap2Appearance.TOUR_PAINT_METHOD_SIMPLE);
 
-		PreferenceConverter.setDefault(store, ITourbookPreferences.MAP_LAYOUT_DIM_COLOR, new RGB(0x00, 0x00, 0x00));
+		PreferenceConverter.setDefault(store, ITourbookPreferences.MAP_LAYOUT_MAP_DIMM_COLOR, //
+				new RGB(0x00, 0x00, 0x00));
+
+		store.setDefault(ITourbookPreferences.MAP_LAYOUT_LIVE_UPDATE, true);
 
 		/*
 		 * tour data editor

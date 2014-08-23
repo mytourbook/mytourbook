@@ -18,6 +18,7 @@ package net.tourbook.common.color;
 import gnu.trove.map.hash.TIntObjectHashMap;
 
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Display;
 
 /**
@@ -52,9 +53,9 @@ public class ColorCacheSWT {
 	/**
 	 * @param colorValue
 	 * @return Returns the color for the <code>colorValue</code> from the color cache, color is
-	 *         created when it is not available
+	 *         created when it is not available.
 	 */
-	public Color getRGB(final int colorValue) {
+	public Color getColor(final int colorValue) {
 
 		Color color = _colors.get(colorValue);
 		if (color != null) {
@@ -66,6 +67,28 @@ public class ColorCacheSWT {
 		final int blue = (colorValue & 0xFF0000) >>> 16;
 
 		color = new Color(_display, red, green, blue);
+
+		_colors.put(colorValue, color);
+
+		return color;
+	}
+
+	/**
+	 * @param colorValue
+	 * @return Returns the color for the <code>colorValue</code> from the color cache, color is
+	 *         created when it is not available.
+	 */
+	public Color getColor(final RGB rgb) {
+
+		final int colorValue = ((rgb.red & 0xFF) << 0) | ((rgb.green & 0xFF) << 8) | ((rgb.blue & 0xFF) << 16);
+
+		Color color = _colors.get(colorValue);
+
+		if (color != null) {
+			return color;
+		}
+
+		color = new Color(_display, rgb);
 
 		_colors.put(colorValue, color);
 

@@ -22,7 +22,6 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.font.FontRenderContext;
 import java.awt.font.LineMetrics;
-import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -60,6 +59,7 @@ import net.tourbook.ui.UI;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.preference.PreferenceConverter;
 import org.eclipse.jface.resource.ColorRegistry;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.util.IPropertyChangeListener;
@@ -85,30 +85,33 @@ import de.byteholder.geoclipse.mapprovider.MP;
  */
 public class TourMapPainter extends MapPainter {
 
-	private static final String				VALUE_FORMAT		= "%.0f";									//$NON-NLS-1$
-
 	private static final int				MARKER_MARGIN		= 2;
 	private static final int				MARKER_POLE			= 16;
 
 	private static final Font				DEFAULT_FONT		= net.tourbook.common.UI.AWT_FONT_ARIAL_12;
+
+	final static IPreferenceStore			_prefStore			= TourbookPlugin.getPrefStore();
 
 	private static IPropertyChangeListener	_prefChangeListener;
 
 	private float[]							_dataSerie;
 
 	private IMapColorProvider				_legendProvider;
+
 	// painting parameter
 	private int								_lineWidth;
-
 	private int								_lineWidth2;
-	private static boolean					_prefIsDrawLine;
+	private static float					_borderBrightness;
 
-	private static boolean					_prefIsDrawSquare;
-	private static int						_prefLineWidth;
-	private static boolean					_prefWithBorder;
+	private static RGB						_prefBorderRGB;
+	private static int						_prefBorderType;
 	private static int						_prefBorderWidth;
-	private static boolean					_isImageAvailable	= false;
+	private static boolean					_prefIsDrawLine;
+	private static boolean					_prefIsDrawSquare;
+	private static boolean					_prefIsWithBorder;
+	private static int						_prefLineWidth;
 
+	private static boolean					_isImageAvailable	= false;
 	private static boolean					_isErrorLogged;
 
 	/**
@@ -340,12 +343,12 @@ public class TourMapPainter extends MapPainter {
 
 		// Measure the font and the message
 		final FontRenderContext frc = g2.getFontRenderContext();
-		final Rectangle2D bounds = font.getStringBounds(unitText, frc);
+//		final Rectangle2D bounds = font.getStringBounds(unitText, frc);
 		final LineMetrics metrics = font.getLineMetrics(unitText, frc);
 
-		final float width = (float) bounds.getWidth(); // The width of our text
+//		final float width = (float) bounds.getWidth(); // The width of our text
 		final float lineheight = metrics.getHeight(); // Total line height
-		final float ascent = metrics.getAscent(); // Top of text to baseline
+//		final float ascent = metrics.getAscent(); // Top of text to baseline
 
 		// Now display the message centered horizontally and vertically in box
 //		final float x0 = (float) (box.getX() + (box.getWidth() - width) / 2);
@@ -608,7 +611,7 @@ public class TourMapPainter extends MapPainter {
 		gc.setForeground(borderColor);
 		gc.drawRectangle(contentBorder);
 
-		final Color textBorderColor = _colorCache.getRGB(0xF1EEE8);
+		final Color textBorderColor = _colorCache.getColor(0xF1EEE8);
 		final Color unitTextColor = display.getSystemColor(SWT.COLOR_BLACK);
 
 		int unitLabelIndex = 0;
@@ -693,7 +696,7 @@ public class TourMapPainter extends MapPainter {
 			 */
 
 			final long valueRGB = colorProvider.getRGBValue(ColorProviderConfig.MAP2, legendValue);
-			final Color valueColor = _colorCache.getRGB((int) valueRGB);
+			final Color valueColor = _colorCache.getColor((int) valueRGB);
 
 			gc.setForeground(valueColor);
 
@@ -804,16 +807,20 @@ public class TourMapPainter extends MapPainter {
 
 	private static void getTourPainterSettings() {
 
-		final IPreferenceStore prefStore = TourbookPlugin.getDefault().getPreferenceStore();
+		final String drawSymbol = _prefStore.getString(ITourbookPreferences.MAP_LAYOUT_PLOT_TYPE);
 
-		final String drawSymbol = prefStore.getString(ITourbookPreferences.MAP_LAYOUT_SYMBOL);
+		_prefIsDrawLine = drawSymbol.equals(PrefPageMap2Appearance.PLOT_TYPE_LINE);
+		_prefIsDrawSquare = drawSymbol.equals(PrefPageMap2Appearance.PLOT_TYPE_SQUARE);
 
-		_prefIsDrawLine = drawSymbol.equals(PrefPageMap2Appearance.MAP_TOUR_SYMBOL_LINE);
-		_prefIsDrawSquare = drawSymbol.equals(PrefPageMap2Appearance.MAP_TOUR_SYMBOL_SQUARE);
+		_prefLineWidth = _prefStore.getInt(ITourbookPreferences.MAP_LAYOUT_SYMBOL_WIDTH);
+		_prefIsWithBorder = _prefStore.getBoolean(ITourbookPreferences.MAP_LAYOUT_PAINT_WITH_BORDER);
 
-		_prefLineWidth = prefStore.getInt(ITourbookPreferences.MAP_LAYOUT_SYMBOL_WIDTH);
-		_prefWithBorder = prefStore.getBoolean(ITourbookPreferences.MAP_LAYOUT_PAINT_WITH_BORDER);
-		_prefBorderWidth = prefStore.getInt(ITourbookPreferences.MAP_LAYOUT_BORDER_WIDTH);
+		_prefBorderRGB = PreferenceConverter.getColor(_prefStore, ITourbookPreferences.MAP_LAYOUT_BORDER_COLOR);
+		_prefBorderType = _prefStore.getInt(ITourbookPreferences.MAP_LAYOUT_BORDER_TYPE);
+		_prefBorderWidth = _prefStore.getInt(ITourbookPreferences.MAP_LAYOUT_BORDER_WIDTH);
+
+		final int prefBorderDimmValue = _prefStore.getInt(ITourbookPreferences.MAP_LAYOUT_BORDER_DIMM_VALUE);
+		_borderBrightness = (float) (1.0 - prefBorderDimmValue / 100.0);
 	}
 
 	private static void init() {
@@ -868,16 +875,10 @@ public class TourMapPainter extends MapPainter {
 	@Override
 	protected void dispose() {
 
-		disposeImage(_tourStartMarker);
-		disposeImage(_tourEndMarker);
+		Util.disposeResource(_tourEndMarker);
+		Util.disposeResource(_tourStartMarker);
 
 		_isImageAvailable = false;
-	}
-
-	private void disposeImage(final Image image) {
-		if (image != null && !image.isDisposed()) {
-			image.dispose();
-		}
 	}
 
 	@Override
@@ -923,22 +924,22 @@ public class TourMapPainter extends MapPainter {
 
 				setDataSerie(tourData);
 
-				final boolean isDrawTourInTile = drawTour10InTile(gcTile, map, tile, tourData, parts, systemColorBlue);
+				final boolean isDrawTourInTile = drawTour_10_InTile(gcTile, map, tile, tourData, parts, systemColorBlue);
 
 				isContentInTile = isContentInTile || isDrawTourInTile;
 
 //				/**
 //				 * DEBUG Start
 //				 */
-//				gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WHITE));
-//				gc.fillRectangle(0, 0, 2, 50);
-//				gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
-//				gc.fillRectangle(2, 0, 2, 50);
-//				gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
-//				gc.fillRectangle(4, 0, 2, 50);
-//				gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
-//				gc.fillRectangle(6, 0, 2, 50);
-//				isTourInTile = true;
+//				gcTile.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WHITE));
+//				gcTile.fillRectangle(0, 0, 2, 50);
+//				gcTile.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
+//				gcTile.fillRectangle(2, 0, 2, 50);
+//				gcTile.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
+//				gcTile.fillRectangle(4, 0, 2, 50);
+//				gcTile.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
+//				gcTile.fillRectangle(6, 0, 2, 50);
+//				isContentInTile = true;
 //				/**
 //				 * DEBUG End
 //				 */
@@ -1242,7 +1243,7 @@ public class TourMapPainter extends MapPainter {
 		return isMarkerInTile;
 	}
 
-	private boolean drawTour10InTile(	final GC gcTile,
+	private boolean drawTour_10_InTile(	final GC gcTile,
 										final Map map,
 										final Tile tile,
 										final TourData tourData,
@@ -1297,7 +1298,7 @@ public class TourMapPainter extends MapPainter {
 
 			if (lineIndex == 0) {
 
-				if (_prefWithBorder == false) {
+				if (_prefIsWithBorder == false) {
 					// skip border
 					continue;
 				}
@@ -1367,7 +1368,7 @@ public class TourMapPainter extends MapPainter {
 
 							color = getTourColor(tourData, serieIndex, isBorder, true);
 
-							drawTour20Line(gcTile, //
+							drawTour_20_Line(gcTile, //
 									devFromWithOffsetX,
 									devFromWithOffsetY,
 									devToWithOffsetX,
@@ -1387,7 +1388,7 @@ public class TourMapPainter extends MapPainter {
 						 * the last inside to the first outside position
 						 */
 
-						drawTour20Line(gcTile, //
+						drawTour_20_Line(gcTile, //
 								devFromWithOffsetX,
 								devFromWithOffsetY,
 								devToWithOffsetX,
@@ -1424,9 +1425,9 @@ public class TourMapPainter extends MapPainter {
 							final Color color = getTourColor(tourData, serieIndex, isBorder, false);
 
 							if (_prefIsDrawSquare) {
-								drawTour30Square(gcTile, devX, devY, color);
+								drawTour_30_Square(gcTile, devX, devY, color);
 							} else {
-								drawTour40Dot(gcTile, devX, devY, color);
+								drawTour_40_Dot(gcTile, devX, devY, color);
 							}
 
 							// set previous pixel
@@ -1441,25 +1442,25 @@ public class TourMapPainter extends MapPainter {
 		return isTourInTile;
 	}
 
-	private void drawTour20Line(final GC gc,
-								final int devXFrom,
-								final int devYFrom,
-								final int devXTo,
-								final int devYTo,
-								final Color color) {
+	private void drawTour_20_Line(	final GC gc,
+									final int devXFrom,
+									final int devYFrom,
+									final int devXTo,
+									final int devYTo,
+									final Color color) {
 
 		if (color != null) {
 			gc.setForeground(color);
 		}
 
-		drawTour40Dot(gc, devXTo, devYTo, color);
+		drawTour_40_Dot(gc, devXTo, devYTo, color);
 
 		// draw line with the color from the legend provider
 		gc.drawLine(devXFrom, devYFrom, devXTo, devYTo);
 
 	}
 
-	private void drawTour30Square(final GC gc, final int devX, final int devY, final Color color) {
+	private void drawTour_30_Square(final GC gc, final int devX, final int devY, final Color color) {
 
 		if (color != null) {
 			gc.setBackground(color);
@@ -1468,7 +1469,7 @@ public class TourMapPainter extends MapPainter {
 		gc.fillRectangle(devX - _lineWidth2, devY - _lineWidth2, _lineWidth, _lineWidth);
 	}
 
-	private void drawTour40Dot(final GC gc, final int devX, final int devY, final Color color) {
+	private void drawTour_40_Dot(final GC gc, final int devX, final int devY, final Color color) {
 
 		if (color != null) {
 			gc.setBackground(color);
@@ -1811,6 +1812,16 @@ public class TourMapPainter extends MapPainter {
 			return null;
 		}
 
+		/*
+		 * Get border color.
+		 */
+		if (isBorder && _prefBorderType == PrefPageMap2Appearance.BORDER_TYPE_COLOR) {
+			return _colorCache.getColor(_prefBorderRGB);
+		}
+
+		/*
+		 * Get color from the color provider
+		 */
 		long colorValue = 0;
 		if (_legendProvider instanceof IGradientColorProvider) {
 
@@ -1827,16 +1838,14 @@ public class TourMapPainter extends MapPainter {
 
 			// paint the border in a darker color
 
-			final float brightness = 0.8f;
-
-			final int red = (int) (((colorValue & 0xFF) >>> 0) * brightness);
-			final int green = (int) (((colorValue & 0xFF00) >>> 8) * brightness);
-			final int blue = (int) (((colorValue & 0xFF0000) >>> 16) * brightness);
+			final int red = (int) (((colorValue & 0xFF) >>> 0) * _borderBrightness);
+			final int green = (int) (((colorValue & 0xFF00) >>> 8) * _borderBrightness);
+			final int blue = (int) (((colorValue & 0xFF0000) >>> 16) * _borderBrightness);
 
 			colorValue = ((red & 0xFF) << 0) | ((green & 0xFF) << 8) | ((blue & 0xFF) << 16);
 		}
 
-		return _colorCache.getRGB((int) colorValue);
+		return _colorCache.getColor((int) colorValue);
 	}
 
 	/**

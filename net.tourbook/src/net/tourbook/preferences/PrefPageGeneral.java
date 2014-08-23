@@ -169,20 +169,6 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 				_rdoAltitudeFoot.setText(Messages.Pref_general_imperial_unit_feet);
 			}
 
-//			final RadioGroupFieldEditor rdoSystemAltitude = new RadioGroupFieldEditor(
-//					ITourbookPreferences.MEASUREMENT_SYSTEM_ALTITUDE,
-//					Messages.Pref_general_system_altitude,
-//					2,
-//					new String[][] {
-//							new String[] {
-//									Messages.Pref_general_metric_unit_m,
-//									ITourbookPreferences.MEASUREMENT_SYSTEM_ALTITUDE_M },
-//							new String[] {
-//									Messages.Pref_general_imperial_unit_feet,
-//									ITourbookPreferences.MEASUREMENT_SYSTEM_ALTITUDE_FOOT }, },
-//					group,
-//					false);
-
 			/*
 			 * radio: distance
 			 */
@@ -204,20 +190,6 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 				_rdoDistanceMi.setText(Messages.Pref_general_imperial_unit_mi);
 			}
 
-//			final RadioGroupFieldEditor rdoSystemDistance = new RadioGroupFieldEditor(
-//					ITourbookPreferences.MEASUREMENT_SYSTEM_DISTANCE,
-//					Messages.Pref_general_system_distance,
-//					2,
-//					new String[][] {
-//							new String[] {
-//									Messages.Pref_general_metric_unit_km,
-//									ITourbookPreferences.MEASUREMENT_SYSTEM_DISTANCE_KM },
-//							new String[] {
-//									Messages.Pref_general_imperial_unit_mi,
-//									ITourbookPreferences.MEASUREMENT_SYSTEM_DISTANCE_MI }, },
-//					group,
-//					false);
-
 			/*
 			 * radio: temperature
 			 */
@@ -238,20 +210,6 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 				_rdoTemperatureFahrenheit = new Button(containerTemperature, SWT.RADIO);
 				_rdoTemperatureFahrenheit.setText(Messages.Pref_general_imperial_unit_fahrenheit);
 			}
-
-//			final RadioGroupFieldEditor rdoSystemTemperature = new RadioGroupFieldEditor(
-//					ITourbookPreferences.MEASUREMENT_SYSTEM_TEMPERATURE,
-//					Messages.Pref_general_system_temperature,
-//					2,
-//					new String[][] {
-//							new String[] {
-//									Messages.Pref_general_metric_unit_celcius,
-//									ITourbookPreferences.MEASUREMENT_SYSTEM_TEMPERATURE_C },
-//							new String[] {
-//									Messages.Pref_general_imperial_unit_fahrenheit,
-//									ITourbookPreferences.MEASUREMENT_SYSTEM_TEMPTERATURE_F }, },
-//					group,
-//					false);
 
 			/*
 			 * this is currently disabled because computing the power according to

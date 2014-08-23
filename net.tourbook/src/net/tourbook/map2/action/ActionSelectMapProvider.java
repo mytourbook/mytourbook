@@ -367,7 +367,7 @@ public class ActionSelectMapProvider extends Action implements IMenuCreator, IMa
 
 		// set map dim level
 		final IPreferenceStore store = TourbookPlugin.getDefault().getPreferenceStore();
-		final RGB dimColor = PreferenceConverter.getColor(store, ITourbookPreferences.MAP_LAYOUT_DIM_COLOR);
+		final RGB dimColor = PreferenceConverter.getColor(store, ITourbookPreferences.MAP_LAYOUT_MAP_DIMM_COLOR);
 		map.setDimLevel(_mapView.getMapDimLevel(), dimColor);
 
 		// update tooltip, show selected map provider
