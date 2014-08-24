@@ -75,6 +75,8 @@ public class Util {
 	public static final String	UNIQUE_ID_SUFFIX_POLAR_PDD				= "76913";				//$NON-NLS-1$
 	public static final String	UNIQUE_ID_SUFFIX_POLAR_TRAINER			= "13457";				//$NON-NLS-1$
 	public static final String	UNIQUE_ID_SUFFIX_SPORT_TRACKS_FITLOG	= "24168";				//$NON-NLS-1$
+	public static final String	UNIQUE_ID_SUFFIX_SUUNTO2				= "92145";				//$NON-NLS-1$
+	public static final String	UNIQUE_ID_SUFFIX_SUUNTO3				= "73198";				//$NON-NLS-1$
 
 	/*
 	 * default xml attributes

@@ -35,7 +35,7 @@ import net.tourbook.importdata.DeviceData;
 import net.tourbook.importdata.SerialParameters;
 import net.tourbook.importdata.TourbookDevice;
 
-public class SuuntoDeviceDataReader extends TourbookDevice {
+public class Suunto2DeviceDataReader extends TourbookDevice {
 
 	public static final String	TAG_SUUNTO						= "suunto";
 
@@ -45,7 +45,7 @@ public class SuuntoDeviceDataReader extends TourbookDevice {
 	private static final String	SUUNTO_TAG_SAMPLES				= "<samples>";				//$NON-NLS-1$
 
 	// plugin constructor
-	public SuuntoDeviceDataReader() {}
+	public Suunto2DeviceDataReader() {}
 
 	@Override
 	public String buildFileNameFromRawData(final String rawDataFileName) {
@@ -175,7 +175,7 @@ public class SuuntoDeviceDataReader extends TourbookDevice {
 			return false;
 		}
 
-		final SuuntoSAXHandler saxHandler = new SuuntoSAXHandler(
+		final Suunto2SAXHandler saxHandler = new Suunto2SAXHandler(
 				this,
 				importFilePath,
 				alreadyImportedTours,

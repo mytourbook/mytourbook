@@ -64,6 +64,9 @@ public class FitDataReader extends TourbookDevice {
 						a++;
 					}
 
+					/*
+					 * Set fields which should be scriped in the log
+					 */
 					if (fieldName.equals("") // //$NON-NLS-1$
 
 							//
@@ -81,7 +84,7 @@ public class FitDataReader extends TourbookDevice {
 							|| fieldName.equals("position_lat") //$NON-NLS-1$
 							|| fieldName.equals("position_long") //$NON-NLS-1$
 							|| fieldName.equals("speed") //$NON-NLS-1$
-//							|| fieldName.equals("temperature") //$NON-NLS-1$
+							|| fieldName.equals("temperature") //$NON-NLS-1$
 
 							//
 							// lap data
@@ -102,7 +105,7 @@ public class FitDataReader extends TourbookDevice {
 							|| fieldName.equals("max_speed") //$NON-NLS-1$
 							|| fieldName.equals("total_calories") //$NON-NLS-1$
 							|| fieldName.equals("total_fat_calories") //$NON-NLS-1$
-							|| fieldName.equals("sport") //$NON-NLS-1$
+//							|| fieldName.equals("sport") //$NON-NLS-1$
 							|| fieldName.equals("start_position_lat") //$NON-NLS-1$
 							|| fieldName.equals("start_position_long") //$NON-NLS-1$
 							|| fieldName.equals("start_time") //$NON-NLS-1$
@@ -118,6 +121,7 @@ public class FitDataReader extends TourbookDevice {
 					) {
 						continue;
 					}
+
 					System.out.println(String.format(
 							"%-5d%-30s%20s %s", //$NON-NLS-1$
 							field.getNum(),

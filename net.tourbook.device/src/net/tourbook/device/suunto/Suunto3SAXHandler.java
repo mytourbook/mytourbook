@@ -43,7 +43,7 @@ import org.xml.sax.helpers.DefaultHandler;
  * <a href="http://wiki.oldhu.com/doku.php?id=suunto_moveslink2_xml_file_format"
  * >http://wiki.oldhu.com/doku.php?id=suunto_moveslink2_xml_file_format</a>
  */
-public class SuuntoSAXHandler extends DefaultHandler {
+public class Suunto3SAXHandler extends DefaultHandler {
 
 	private static final double				RADIANT_TO_DEGREE		= 57.2957795131;
 
@@ -67,15 +67,17 @@ public class SuuntoSAXHandler extends DefaultHandler {
 	private static final String				SAMPLE_TYPE_PERIODIC	= "periodic";										//$NON-NLS-1$
 
 	// root tags
-	private static final String				TAG_ROOT_DEVICE			= "Device";										//$NON-NLS-1$
-	private static final String				TAG_ROOT_HEADER			= "header";										//$NON-NLS-1$
-	private static final String				TAG_ROOT_SAMPLES		= "Samples";										//$NON-NLS-1$
+	private static final String				TAG_DEVLOG				= "DeviceLog";										//$NON-NLS-1$
+	private static final String				TAG_DEVLOG_DEVICE		= "Device";										//$NON-NLS-1$
+	private static final String				TAG_DEVLOG_HEADER		= "Header";										//$NON-NLS-1$
+	private static final String				TAG_DEVLOG_SAMPLES		= "Samples";										//$NON-NLS-1$
 
 	// header tags
 	private static final String				TAG_ENERGY				= "Energy";										//$NON-NLS-1$
 
 	// device tags
-	private static final String				TAG_SW					= "SW";											//$NON-NLS-1$
+	private static final String				TAG_DEVICE_SW			= "SW";											//$NON-NLS-1$
+	private static final String				TAG_DEVICE_NAME			= "Name";											//$NON-NLS-1$
 
 	// sample tags
 	private static final String				TAG_ALTITUDE			= "Altitude";										//$NON-NLS-1$
@@ -113,9 +115,12 @@ public class SuuntoSAXHandler extends DefaultHandler {
 	private long							_currentTime;
 	private long							_prevSampleTime;
 
-	private boolean							_isInRootDevice;
-	private boolean							_isInRootSamples;
-	private boolean							_isInRootHeader;
+	private boolean							_isInDevice;
+	private boolean							_isInDeviceSW;
+	private boolean							_isInDeviceName;
+
+	private boolean							_isInSamples;
+	private boolean							_isInHeader;
 
 	private boolean							_isInAltitude;
 	private boolean							_isInCadence;
@@ -127,12 +132,12 @@ public class SuuntoSAXHandler extends DefaultHandler {
 	private boolean							_isInLongitude;
 	private boolean							_isInSample;
 	private boolean							_isInSampleType;
-	private boolean							_isInSW;
 	private boolean							_isInUTC;
 	private boolean							_isInTemperature;
 
 	private int								_tourCalories;
-	private String							_tourSW;
+	private String							_tourDeviceSW;
+	private String							_tourDeviceName;
 
 	static {
 
@@ -143,10 +148,10 @@ public class SuuntoSAXHandler extends DefaultHandler {
 		TIME_FORMAT_RFC822.setTimeZone(utc);
 	}
 
-	public SuuntoSAXHandler(final TourbookDevice deviceDataReader,
-							final String importFileName,
-							final HashMap<Long, TourData> alreadyImportedTours,
-							final HashMap<Long, TourData> newlyImportedTours) {
+	public Suunto3SAXHandler(	final TourbookDevice deviceDataReader,
+								final String importFileName,
+								final HashMap<Long, TourData> alreadyImportedTours,
+								final HashMap<Long, TourData> newlyImportedTours) {
 
 		_device = deviceDataReader;
 		_importFilePath = importFileName;
@@ -165,7 +170,8 @@ public class SuuntoSAXHandler extends DefaultHandler {
 				|| _isInHR
 				|| _isInLatitude
 				|| _isInLongitude
-				|| _isInSW
+				|| _isInDeviceSW
+				|| _isInDeviceName
 				|| _isInTemperature
 				|| _isInUTC
 		//
@@ -184,15 +190,15 @@ public class SuuntoSAXHandler extends DefaultHandler {
 	@Override
 	public void endElement(final String uri, final String localName, final String name) throws SAXException {
 
-		if (_isInRootSamples) {
+		if (_isInSamples) {
 
 			endElement_InSamples(name);
 
-		} else if (_isInRootHeader) {
+		} else if (_isInHeader) {
 
 			endElement_InHeader(name);
 
-		} else if (_isInRootDevice) {
+		} else if (_isInDevice) {
 
 			endElement_InDevice(name);
 		}
@@ -203,19 +209,19 @@ public class SuuntoSAXHandler extends DefaultHandler {
 
 			finalizeSample();
 
-		} else if (name.equals(TAG_ROOT_SAMPLES)) {
+		} else if (name.equals(TAG_DEVLOG_SAMPLES)) {
 
-			_isInRootSamples = false;
+			_isInSamples = false;
 
-		} else if (name.equals(TAG_ROOT_HEADER)) {
+		} else if (name.equals(TAG_DEVLOG_HEADER)) {
 
-			_isInRootHeader = false;
+			_isInHeader = false;
 
-		} else if (name.equals(TAG_ROOT_DEVICE)) {
+		} else if (name.equals(TAG_DEVLOG_DEVICE)) {
 
-			_isInRootDevice = false;
+			_isInDevice = false;
 
-		} else if (name.equals(SuuntoDeviceDataReader.TAG_SUUNTO)) {
+		} else if (name.equals(TAG_DEVLOG)) {
 
 			finalizeTour();
 		}
@@ -223,11 +229,17 @@ public class SuuntoSAXHandler extends DefaultHandler {
 
 	private void endElement_InDevice(final String name) {
 
-		if (name.equals(TAG_SW)) {
+		if (name.equals(TAG_DEVICE_SW)) {
 
-			_isInSW = false;
+			_isInDeviceSW = false;
 
-			_tourSW = _characters.toString();
+			_tourDeviceSW = _characters.toString();
+
+		} else if (name.equals(TAG_DEVICE_NAME)) {
+
+			_isInDeviceName = false;
+
+			_tourDeviceName = _characters.toString();
 		}
 	}
 
@@ -443,15 +455,15 @@ public class SuuntoSAXHandler extends DefaultHandler {
 		tourData.setCalories(_tourCalories);
 
 		tourData.setDeviceId(_device.deviceId);
-		tourData.setDeviceName(_device.visibleName);
-		tourData.setDeviceFirmwareVersion(_tourSW == null ? UI.EMPTY_STRING : _tourSW);
+		tourData.setDeviceName(_tourDeviceName == null ? _device.visibleName : _tourDeviceName);
+		tourData.setDeviceFirmwareVersion(_tourDeviceSW == null ? UI.EMPTY_STRING : _tourDeviceSW);
 
 		tourData.createTimeSeries(_sampleList, true);
 
 		setDistanceSerie(tourData);
 
 		// after all data are added, the tour id can be created
-		final String uniqueId = _device.createUniqueId(tourData, Util.UNIQUE_ID_SUFFIX_GARMIN_TCX);
+		final String uniqueId = _device.createUniqueId(tourData, Util.UNIQUE_ID_SUFFIX_SUUNTO3);
 		final Long tourId = tourData.createTourId(uniqueId);
 
 		// check if the tour is already imported
@@ -616,7 +628,7 @@ public class SuuntoSAXHandler extends DefaultHandler {
 	public void startElement(final String uri, final String localName, final String name, final Attributes attributes)
 			throws SAXException {
 
-		if (_isInRootSamples) {
+		if (_isInSamples) {
 
 			if (_isInSample) {
 
@@ -632,25 +644,25 @@ public class SuuntoSAXHandler extends DefaultHandler {
 				_sampleData = new TimeData();
 			}
 
-		} else if (_isInRootHeader) {
+		} else if (_isInHeader) {
 
 			startElement_InHeader(name);
 
-		} else if (_isInRootDevice) {
+		} else if (_isInDevice) {
 
 			startElement_InDevice(name);
 
-		} else if (name.equals(TAG_ROOT_SAMPLES)) {
+		} else if (name.equals(TAG_DEVLOG_SAMPLES)) {
 
-			_isInRootSamples = true;
+			_isInSamples = true;
 
-		} else if (name.equals(TAG_ROOT_HEADER)) {
+		} else if (name.equals(TAG_DEVLOG_HEADER)) {
 
-			_isInRootHeader = true;
+			_isInHeader = true;
 
-		} else if (name.equals(TAG_ROOT_DEVICE)) {
+		} else if (name.equals(TAG_DEVLOG_DEVICE)) {
 
-			_isInRootDevice = true;
+			_isInDevice = true;
 		}
 
 	}
@@ -659,10 +671,15 @@ public class SuuntoSAXHandler extends DefaultHandler {
 
 		boolean isData = false;
 
-		if (name.equals(TAG_SW)) {
+		if (name.equals(TAG_DEVICE_SW)) {
 
 			isData = true;
-			_isInSW = true;
+			_isInDeviceSW = true;
+
+		} else if (name.equals(TAG_DEVICE_NAME)) {
+
+			isData = true;
+			_isInDeviceName = true;
 		}
 
 		if (isData) {
