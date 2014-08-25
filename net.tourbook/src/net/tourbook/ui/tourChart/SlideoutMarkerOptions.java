@@ -111,7 +111,11 @@ public class SlideoutMarkerOptions extends AnimatedToolTipShell implements IColo
 //	private Button					_chkShowSignImage;
 	private Button					_chkDrawMarkerWithDefaultColor;
 
+	/**
+	 * Label temporary position, this position is not saved in the marker.
+	 */
 	private Combo					_comboLabelTempPosition;
+	private Combo					_comboTooltipPosition;
 
 	private ColorSelectorExtended	_colorDefaultMarker;
 	private ColorSelectorExtended	_colorDeviceMarker;
@@ -253,15 +257,40 @@ public class SlideoutMarkerOptions extends AnimatedToolTipShell implements IColo
 //		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
 		{
 			{
-				/*
-				 * Show marker tooltip
-				 */
-				_chkShowMarkerTooltip = new Button(container, SWT.CHECK);
+				final Composite ttContainer = new Composite(container, SWT.NONE);
 				GridDataFactory.fillDefaults()//
+						.grab(true, false)
 						.span(2, 1)
-						.applyTo(_chkShowMarkerTooltip);
-				_chkShowMarkerTooltip.setText(Messages.Slideout_ChartMarkerOptions_Checkbox_IsShowMarkerTooltip);
-				_chkShowMarkerTooltip.addSelectionListener(_defaultSelectionAdapter);
+						.applyTo(ttContainer);
+				GridLayoutFactory.fillDefaults().numColumns(2).applyTo(ttContainer);
+				{
+					{
+						/*
+						 * Show marker tooltip
+						 */
+						_chkShowMarkerTooltip = new Button(ttContainer, SWT.CHECK);
+						GridDataFactory.fillDefaults()//
+								.applyTo(_chkShowMarkerTooltip);
+						_chkShowMarkerTooltip.setText(//
+								Messages.Slideout_ChartMarkerOptions_Checkbox_IsShowMarkerTooltip);
+						_chkShowMarkerTooltip.addSelectionListener(_defaultSelectionAdapter);
+					}
+					{
+						/*
+						 * Combo: tooltip position
+						 */
+						_comboTooltipPosition = new Combo(ttContainer, SWT.DROP_DOWN | SWT.READ_ONLY);
+						GridDataFactory.fillDefaults()//
+//								.indent(_pc.convertWidthInCharsToPixels(3), 0)
+								.grab(true, false)
+								.align(SWT.END, SWT.FILL)
+								.applyTo(_comboTooltipPosition);
+						_comboTooltipPosition.setVisibleItemCount(20);
+						_comboTooltipPosition.setToolTipText(//
+								Messages.Slideout_ChartMarkerOptions_Combo_TooltipPosition_Tooltip);
+						_comboTooltipPosition.addSelectionListener(_defaultSelectionAdapter);
+					}
+				}
 			}
 
 			{
@@ -321,10 +350,10 @@ public class SlideoutMarkerOptions extends AnimatedToolTipShell implements IColo
 				GridDataFactory.fillDefaults()//
 						.span(2, 1)
 						.applyTo(_chkDrawMarkerWithDefaultColor);
-				_chkDrawMarkerWithDefaultColor
-						.setText(Messages.Slideout_ChartMarkerOptions_Checkbox_IsShowMarkerWithDefaultColor);
-				_chkDrawMarkerWithDefaultColor
-						.setToolTipText(Messages.Slideout_ChartMarkerOptions_Checkbox_IsShowMarkerWithDefaultColor_Tooltip);
+				_chkDrawMarkerWithDefaultColor.setText(//
+						Messages.Slideout_ChartMarkerOptions_Checkbox_IsShowMarkerWithDefaultColor);
+				_chkDrawMarkerWithDefaultColor.setToolTipText(//
+						Messages.Slideout_ChartMarkerOptions_Checkbox_IsShowMarkerWithDefaultColor_Tooltip);
 				_chkDrawMarkerWithDefaultColor.addSelectionListener(_defaultSelectionAdapter);
 			}
 		}
@@ -353,10 +382,10 @@ public class SlideoutMarkerOptions extends AnimatedToolTipShell implements IColo
 						Messages.Slideout_ChartMarkerOptions_Checkbox_IsShowTempPosition_Tooltip);
 				_chkShowLabelTempPosition.addSelectionListener(_defaultSelectionAdapter);
 
-				/*
-				 * Combo
-				 */
 				{
+					/*
+					 * Combo: temp position
+					 */
 					_comboLabelTempPosition = new Combo(tempContainer, SWT.DROP_DOWN | SWT.READ_ONLY);
 					GridDataFactory.fillDefaults()//
 							.indent(_pc.convertWidthInCharsToPixels(3), 0)
@@ -566,8 +595,11 @@ public class SlideoutMarkerOptions extends AnimatedToolTipShell implements IColo
 		final boolean isLabelVisible = _chkShowMarkerLabel.getSelection();
 //		final boolean isImageVisible = _chkShowSignImage.getSelection();
 		final boolean isMarkerPointVisible = _chkShowMarkerPoint.getSelection();
+		final boolean isTooltipVisible = _chkShowMarkerTooltip.getSelection();
 
 		final boolean isMarkerVisible = isLabelVisible || isMarkerPointVisible;// || isImageVisible;
+
+		_comboTooltipPosition.setEnabled(isTooltipVisible);
 
 		_chkShowLabelTempPosition.setEnabled(isLabelVisible);
 		_comboLabelTempPosition.setEnabled(isLabelVisible && isShowTempPosition);
@@ -592,6 +624,10 @@ public class SlideoutMarkerOptions extends AnimatedToolTipShell implements IColo
 		 */
 		for (final String position : TourMarker.LABEL_POSITIONS) {
 			_comboLabelTempPosition.add(position);
+		}
+
+		for (final String position : ChartMarkerToolTip.TOOLTIP_POSITIONS) {
+			_comboTooltipPosition.add(position);
 		}
 
 	}
@@ -643,6 +679,7 @@ public class SlideoutMarkerOptions extends AnimatedToolTipShell implements IColo
 		final int markerPointSize = _spinMarkerPointSize.getSelection();
 //		final int signImageSize = _spinSignImageSize.getSelection();
 		final int tempPosition = _comboLabelTempPosition.getSelectionIndex();
+		final int ttPosition = _comboTooltipPosition.getSelectionIndex();
 
 		final RGB defaultColor = _colorDefaultMarker.getColorValue();
 		final RGB deviceColor = _colorDeviceMarker.getColorValue();
@@ -655,6 +692,7 @@ public class SlideoutMarkerOptions extends AnimatedToolTipShell implements IColo
 		_prefStore.setValue(ITourbookPreferences.GRAPH_MARKER_LABEL_OFFSET, labelOffset);
 		_prefStore.setValue(ITourbookPreferences.GRAPH_MARKER_LABEL_TEMP_POSITION, tempPosition);
 		_prefStore.setValue(ITourbookPreferences.GRAPH_MARKER_POINT_SIZE, markerPointSize);
+		_prefStore.setValue(ITourbookPreferences.GRAPH_MARKER_TOOLTIP_POSITION, ttPosition);
 //		_prefStore.setValue(ITourbookPreferences.GRAPH_MARKER_SIGN_IMAGE_SIZE, signImageSize);
 
 		_prefStore.setValue(ITourbookPreferences.GRAPH_MARKER_IS_DRAW_WITH_DEFAULT_COLOR, isDrawMarkerWithDefaultColor);
@@ -690,6 +728,7 @@ public class SlideoutMarkerOptions extends AnimatedToolTipShell implements IColo
 		tcc.markerLabelOffset = labelOffset;
 		tcc.markerLabelTempPos = tempPosition;
 		tcc.markerPointSize = markerPointSize;
+		tcc.markerTooltipPosition = ttPosition;
 //		tcc.markerSignImageSize = signImageSize;
 
 		tcc.markerColorDefault = defaultColor;
@@ -766,6 +805,10 @@ public class SlideoutMarkerOptions extends AnimatedToolTipShell implements IColo
 
 		final TourChartConfiguration tcc = _tourChart.getTourChartConfig();
 
+		final int markerTooltipPosition = tcc.markerTooltipPosition < 0
+				? ChartMarkerToolTip.DEFAULT_TOOLTIP_POSITION
+				: tcc.markerTooltipPosition;
+
 		_chkDrawMarkerWithDefaultColor.setSelection(tcc.isDrawMarkerWithDefaultColor);
 		_chkShowHiddenMarker.setSelection(tcc.isShowHiddenMarker);
 		_chkShowMarkerLabel.setSelection(tcc.isShowMarkerLabel);
@@ -775,6 +818,7 @@ public class SlideoutMarkerOptions extends AnimatedToolTipShell implements IColo
 		_chkShowLabelTempPosition.setSelection(tcc.isShowLabelTempPos);
 
 		_comboLabelTempPosition.select(tcc.markerLabelTempPos);
+		_comboTooltipPosition.select(markerTooltipPosition);
 
 		_colorDefaultMarker.setColorValue(tcc.markerColorDefault);
 		_colorDeviceMarker.setColorValue(tcc.markerColorDevice);

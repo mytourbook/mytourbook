@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Tour Printing
 Bundle-SymbolicName: net.tourbook.printing;singleton:=true
-Bundle-Version: 14.7.2.qualifier
+Bundle-Version: 14.8.2.qualifier
 Bundle-Activator: net.tourbook.printing.Activator
 Bundle-Vendor: MyTourbook
 Require-Bundle: org.eclipse.ui,

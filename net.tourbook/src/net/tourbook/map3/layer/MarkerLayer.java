@@ -23,6 +23,7 @@ import gov.nasa.worldwind.event.SelectListener;
 import gov.nasa.worldwind.geom.Position;
 import gov.nasa.worldwind.layers.RenderableLayer;
 import gov.nasa.worldwind.render.Offset;
+import gov.nasa.worldwind.render.PointPlacemark;
 import gov.nasa.worldwind.render.PointPlacemarkAttributes;
 
 import java.net.URL;
@@ -52,7 +53,7 @@ public class MarkerLayer extends RenderableLayer implements SelectListener, IChe
 	 */
 	private int					_lastAddRemoveAction	= -1;
 
-	private MarkerPlacemark		_previousHoveredMarker;
+	private PointPlacemark		_previousHoveredMarker;
 
 	public MarkerLayer() {}
 
@@ -132,20 +133,19 @@ public class MarkerLayer extends RenderableLayer implements SelectListener, IChe
 					absoluteAltitude = altitudeSerie[serieIndex];// + 300;
 				}
 
-				final MarkerPlacemark markerPl = new MarkerPlacemark(Position.fromDegrees(
+				final Position markerPosition = Position.fromDegrees(
 						latitudeSerie[serieIndex],
 						longitudeSerie[serieIndex],
-						absoluteAltitude));
+						absoluteAltitude);
+
+				final PointPlacemark markerPl = new PointPlacemark(markerPosition);
 
 				markerPl.setAltitudeMode(altitudeMode);
 				markerPl.setEnableDecluttering(true);
-
-//				markerPl.setLabelText(UI.SPACE);
-				markerPl.setLabelText(tourMarker.getLabel());
-
 				markerPl.setLineEnabled(true);
-
 				markerPl.setAttributes(ppAttributes);
+
+				markerPl.setLabelText(tourMarker.getLabel());
 
 				addRenderable(markerPl);
 			}

@@ -21,6 +21,7 @@ import gov.nasa.worldwind.render.DrawContext;
 import gov.nasa.worldwind.render.OrderedRenderable;
 import gov.nasa.worldwind.render.Renderable;
 import gov.nasa.worldwind.render.ScreenImage;
+import gov.nasa.worldwind.render.TextRenderer;
 import gov.nasa.worldwind.util.Logging;
 import gov.nasa.worldwind.util.OGLTextRenderer;
 import gov.nasa.worldwind.util.WWMath;
@@ -47,7 +48,6 @@ import net.tourbook.map3.view.Map3Manager;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
 
-import com.jogamp.opengl.util.awt.TextRenderer;
 
 /**
  * Part of this code is copied from: gov.nasa.worldwindx.examples.analytics.AnalyticSurfaceLegend

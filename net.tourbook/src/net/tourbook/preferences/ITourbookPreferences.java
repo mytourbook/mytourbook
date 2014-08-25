@@ -95,6 +95,7 @@ public interface ITourbookPreferences {
 	public static final String	GRAPH_MARKER_LABEL_TEMP_POSITION			= "GRAPH_MARKER_LABEL_TEMP_POSITION";						//$NON-NLS-1$
 	public static final String	GRAPH_MARKER_POINT_SIZE						= "GRAPH_MARKER_POINT_SIZE";								//$NON-NLS-1$
 	public static final String	GRAPH_MARKER_SIGN_IMAGE_SIZE				= "GRAPH_MARKER_SIGN_IMAGE_SIZE";							//$NON-NLS-1$
+	public static final String	GRAPH_MARKER_TOOLTIP_POSITION				= "GRAPH_MARKER_TOOLTIP_POSITION";							//$NON-NLS-1$
 
 	public static final String	GRAPH_MOUSE_MODE							= "graph.toggle-mouse";									//$NON-NLS-1$
 	public static final String	GRAPH_MOVE_SLIDERS_WHEN_ZOOMED				= "graphs.move-sliders-when-zoomed";						//$NON-NLS-1$
@@ -240,11 +241,15 @@ public interface ITourbookPreferences {
 	/*
 	 * layout for maps
 	 */
-	public static final String	MAP_LAYOUT_SYMBOL							= "map.layout.symbol";										//$NON-NLS-1$
-	public static final String	MAP_LAYOUT_SYMBOL_WIDTH						= "map.layout.symbol-width";								//$NON-NLS-1$
-	public static final String	MAP_LAYOUT_DIM_COLOR						= "map.layout.dim-color";									//$NON-NLS-1$
-	public static final String	MAP_LAYOUT_PAINT_WITH_BORDER				= "map.layout.paintWithBorder";							//$NON-NLS-1$
+	public static final String	MAP_LAYOUT_BORDER_TYPE						= "MAP_LAYOUT_BORDER_TYPE";								//$NON-NLS-1$
+	public static final String	MAP_LAYOUT_BORDER_COLOR						= "MAP_LAYOUT_BORDER_COLOR";								//$NON-NLS-1$
+	public static final String	MAP_LAYOUT_BORDER_DIMM_VALUE				= "MAP_LAYOUT_BORDER_DIMM_VALUE";							//$NON-NLS-1$
 	public static final String	MAP_LAYOUT_BORDER_WIDTH						= "map.layout.borderWidth";								//$NON-NLS-1$
+	public static final String	MAP_LAYOUT_MAP_DIMM_COLOR					= "map.layout.dim-color";									//$NON-NLS-1$
+	public static final String	MAP_LAYOUT_LIVE_UPDATE						= "MAP_LAYOUT_LIVE_UPDATE";								//$NON-NLS-1$
+	public static final String	MAP_LAYOUT_PAINT_WITH_BORDER				= "map.layout.paintWithBorder";							//$NON-NLS-1$
+	public static final String	MAP_LAYOUT_PLOT_TYPE						= "map.layout.symbol";										//$NON-NLS-1$
+	public static final String	MAP_LAYOUT_SYMBOL_WIDTH						= "map.layout.symbol-width";								//$NON-NLS-1$
 	public static final String	MAP_LAYOUT_TOUR_PAINT_METHOD				= "map.layout.tour-paint-algorithm";						//$NON-NLS-1$
 
 	/*
@@ -358,5 +363,4 @@ public interface ITourbookPreferences {
 
 	public static final String	MAP3_IS_COLOR_SELECTOR_DISPLAYED			= "MAP3_IS_COLOR_SELECTOR_DISPLAYED";						//$NON-NLS-1$
 	public static final String	MAP3_NUMBER_OF_COLOR_SELECTORS				= "MAP3_NUMBER_OF_COLOR_SELECTORS";						//$NON-NLS-1$
-
 }

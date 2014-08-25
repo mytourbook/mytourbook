@@ -134,6 +134,9 @@ public class TourChartConfiguration {
 	public boolean					isShowMarkerLabel;
 
 	public boolean					isShowMarkerTooltip;
+
+	public int						markerTooltipPosition	= ChartMarkerToolTip.DEFAULT_TOOLTIP_POSITION;
+
 	public boolean					isShowMarkerPoint;
 	public boolean					isShowSignImage;
 
@@ -203,6 +206,7 @@ public class TourChartConfiguration {
 		markerLabelTempPos = _prefStore.getInt(ITourbookPreferences.GRAPH_MARKER_LABEL_TEMP_POSITION);
 		markerPointSize = _prefStore.getInt(ITourbookPreferences.GRAPH_MARKER_POINT_SIZE);
 		markerSignImageSize = _prefStore.getInt(ITourbookPreferences.GRAPH_MARKER_SIGN_IMAGE_SIZE);
+		markerTooltipPosition = _prefStore.getInt(ITourbookPreferences.GRAPH_MARKER_TOOLTIP_POSITION);
 
 		isDrawMarkerWithDefaultColor = _prefStore.getBoolean(//
 				ITourbookPreferences.GRAPH_MARKER_IS_DRAW_WITH_DEFAULT_COLOR);

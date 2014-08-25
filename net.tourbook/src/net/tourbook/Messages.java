@@ -942,9 +942,12 @@ public class Messages extends NLS {
 	public static String		Pref_Graphs_Text_max_value;
 	public static String		Pref_Graphs_Text_min_value;
 
+	public static String		Pref_MapLayout_Checkbox_BorderColor_Color;
+	public static String		Pref_MapLayout_Checkbox_BorderColor_Darker;
 	public static String		Pref_MapLayout_Dialog_OSX_Warning_Message;
 	public static String		Pref_MapLayout_Dialog_OSX_Warning_Title;
 	public static String		Pref_MapLayout_Group_TourInMapProperties;
+	public static String		Pref_MapLayout_Label_BorderColor;
 	public static String		Pref_MapLayout_Label_TourPaintMethod;
 	public static String		Pref_MapLayout_Label_TourPaintMethod_Complex;
 	public static String		Pref_MapLayout_Label_TourPaintMethod_Complex_Tooltip;
@@ -1153,6 +1156,8 @@ public class Messages extends NLS {
 //	public static String		Slideout_ChartMarkerOptions_Checkbox_IsShowSignImage;
 	public static String		Slideout_ChartMarkerOptions_Checkbox_IsShowTempPosition;
 	public static String		Slideout_ChartMarkerOptions_Checkbox_IsShowTempPosition_Tooltip;
+
+	public static String		Slideout_ChartMarkerOptions_Combo_TooltipPosition_Tooltip;
 	public static String		Slideout_ChartMarkerOptions_Label_DeviceMarkerColor;
 	public static String		Slideout_ChartMarkerOptions_Label_DeviceMarkerColor_Tooltip;
 	public static String		Slideout_ChartMarkerOptions_Label_HiddenMarkerColor;
@@ -1343,6 +1348,12 @@ public class Messages extends NLS {
 	public static String		Tour_Marker_Position_Vertical_Chart_Top;
 	public static String		Tour_Marker_Position_Vertical_MarkerPoint_Above;
 	public static String		Tour_Marker_Position_Vertical_MarkerPoint_Below;
+	public static String		Tour_Marker_TooltipPosition_Bottom;
+	public static String		Tour_Marker_TooltipPosition_ChartBottom;
+	public static String		Tour_Marker_TooltipPosition_ChartTop;
+	public static String		Tour_Marker_TooltipPosition_Left;
+	public static String		Tour_Marker_TooltipPosition_Right;
+	public static String		Tour_Marker_TooltipPosition_Top;
 
 	public static String		Tour_Segmenter_Button_SaveTour_Tooltip;
 	public static String		Tour_Segmenter_Label_AltitudeUpDown_Tooltip;

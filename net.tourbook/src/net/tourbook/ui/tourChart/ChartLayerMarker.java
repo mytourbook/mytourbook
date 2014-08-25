@@ -460,22 +460,25 @@ public class ChartLayerMarker implements IChartLayer, IChartOverlay {
 			chartLabel.devIsVertical = _isVertical;
 			chartLabel.devMarkerPointSize = MARKER_POINT_SIZE;
 			chartLabel.devHoverSize = MARKER_HOVER_SIZE;
+			chartLabel.devYBottom = devYBottom;
+			chartLabel.devYTop = devYTop;
+			chartLabel.devGraphWidth = drawingData.getChartDrawingData().devVisibleChartWidth;
 		}
 
 		/*
 		 * Draw marker image
 		 */
-		for (final ChartLabel chartLabel : _cmc.chartLabels) {
-
-			// check if a marker should be displayed
-			if (chartLabel.isVisible == false) {
-
-				// check if hidden markers should be displayed
-				if (_cmc.isShowHiddenMarker == false) {
-					continue;
-				}
-			}
-
+//		for (final ChartLabel chartLabel : _cmc.chartLabels) {
+//
+//			// check if a marker should be displayed
+//			if (chartLabel.isVisible == false) {
+//
+//				// check if hidden markers should be displayed
+//				if (_cmc.isShowHiddenMarker == false) {
+//					continue;
+//				}
+//			}
+//
 //			if (_cmc.isShowSignImage) {
 //
 //				final Photo signPhoto = chartLabel.markerSignPhoto;
@@ -509,12 +512,12 @@ public class ChartLayerMarker implements IChartLayer, IChartOverlay {
 //					}
 //				}
 //			}
-
-			// keep painted positions to identify and paint hovered positions
-			chartLabel.devIsVertical = _isVertical;
-			chartLabel.devMarkerPointSize = MARKER_POINT_SIZE;
-			chartLabel.devHoverSize = MARKER_HOVER_SIZE;
-		}
+//
+//			// keep painted positions to identify and paint hovered positions
+//			chartLabel.devIsVertical = _isVertical;
+//			chartLabel.devMarkerPointSize = MARKER_POINT_SIZE;
+//			chartLabel.devHoverSize = MARKER_HOVER_SIZE;
+//		}
 		colorDefault.dispose();
 		colorDevice.dispose();
 		colorHidden.dispose();

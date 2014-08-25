@@ -34,6 +34,7 @@ public class ChartMarkerConfig {
 	public int							markerLabelTempPos;
 	public int							markerPointSize;
 	public int							markerSignImageSize;
+	public int							markerTooltipPosition;
 
 	public RGB							markerColorDefault;
 	public RGB							markerColorDevice;

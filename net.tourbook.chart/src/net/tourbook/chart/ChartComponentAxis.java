@@ -259,7 +259,7 @@ public class ChartComponentAxis extends Canvas {
 		}
 
 		final long devVirtualWidth = _componentGraph.getXXDevGraphWidth();
-		final int devVisibleWidth = _chartDrawingData.devDevVisibleChartWidth;
+		final int devVisibleWidth = _chartDrawingData.devVisibleChartWidth;
 
 		final long devWidthWithoutVisible = devVirtualWidth - devVisibleWidth;
 		final long devLeftBorder = _componentGraph.getXXDevViewPortLeftBorder();

@@ -1251,6 +1251,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 			cmc.isShowLabelTempPos = _tcc.isShowLabelTempPos;
 
 			cmc.markerLabelTempPos = _tcc.markerLabelTempPos;
+			cmc.markerTooltipPosition = _tcc.markerTooltipPosition;
 
 			cmc.markerHoverSize = _tcc.markerHoverSize;
 			cmc.markerLabelOffset = _tcc.markerLabelOffset;

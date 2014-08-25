@@ -204,36 +204,37 @@
    </extension>
    
 
-   <!-- PolarTrainer -->
    <extension	point="net.tourbook.deviceDataReader">
-      <device
-            class="net.tourbook.device.polartrainer.PolarTrainerDataReader"
-            fileextension="xml"
-            id="net.tourbook.device.PolarTrainerDataReader"
-            name="Polar Personaltrainer"/>
-   </extension>
-   
-   <!-- Suunto -->
-   <extension	point="net.tourbook.deviceDataReader">
-      <device
-            class="net.tourbook.device.suunto.SuuntoDeviceDataReader"
-            fileextension="xml"
-            id="net.tourbook.device.Suunto"
-            name="Suunto">
-      </device>
-   </extension>
-   
-   <!-- TUR -->
-   <extension	point="net.tourbook.deviceDataReader">
-         <device
-            class="net.tourbook.device.tur.TurDeviceReader"
-            fileextension="tur"
-            id="net.tourbook.device.TurDeviceReader"
-            name="TUR"/>
-   </extension>
-   
-   
-   <!--  -->
 
+		<!-- PolarTrainer -->
+		<device
+			class="net.tourbook.device.polartrainer.PolarTrainerDataReader"
+			fileextension="xml"
+			id="net.tourbook.device.PolarTrainerDataReader"
+			name="Polar Personaltrainer"/>
 
+		<!-- Suunto 2 -->
+		<device
+			class="net.tourbook.device.suunto.Suunto2DeviceDataReader"
+			fileextension="xml"
+			id="net.tourbook.device.Suunto"
+			name="Suunto 2">
+		</device>
+
+		<!-- Suunto 3 -->
+		<device
+			class="net.tourbook.device.suunto.Suunto3DeviceDataReader"
+			fileextension="sml"
+			id="net.tourbook.device.Suunto3"
+			name="Suunto 3">
+		</device>
+
+		<!-- TUR -->
+		<device
+			class="net.tourbook.device.tur.TurDeviceReader"
+			fileextension="tur"
+			id="net.tourbook.device.TurDeviceReader"
+			name="TUR"/>
+		</extension>
+   
 </plugin>
