@@ -382,6 +382,17 @@ public class ChartMarkerToolTip extends AnimatedToolTipShell implements ITourPro
 		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
 		{
 			/*
+			 * Altitude
+			 */
+			final boolean isAvailableAltitude = _tourData.getAltitudeSerie() != null;
+			if (isAvailableAltitude) {
+
+				final String valueText = _nf1NoGroup.format(_tourData.getAltitudeSmoothedSerie(false)[valueIndex]);
+
+				createUI_72_ValueField(container, GRAPH_LABEL_ALTITUDE, UI.UNIT_LABEL_ALTITUDE, valueText);
+			}
+
+			/*
 			 * Distance
 			 */
 			final boolean isAvailableDistance = _tourData.distanceSerie != null;
@@ -406,17 +417,6 @@ public class ChartMarkerToolTip extends AnimatedToolTipShell implements ITourPro
 				final String valueText = net.tourbook.ui.UI.format_hhh_mm_ss(timeSerie[valueIndex]);
 
 				createUI_72_ValueField(container, GRAPH_LABEL_TIME_DURATION, UI.UNIT_LABEL_TIME, valueText);
-			}
-
-			/*
-			 * Altitude
-			 */
-			final boolean isAvailableAltitude = _tourData.getAltitudeSerie() != null;
-			if (isAvailableAltitude) {
-
-				final String valueText = _nf1NoGroup.format(_tourData.getAltitudeSmoothedSerie(false)[valueIndex]);
-
-				createUI_72_ValueField(container, GRAPH_LABEL_ALTITUDE, UI.UNIT_LABEL_ALTITUDE, valueText);
 			}
 		}
 

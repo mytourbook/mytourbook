@@ -37,9 +37,9 @@ import net.tourbook.importdata.TourbookDevice;
 
 public class Suunto2DeviceDataReader extends TourbookDevice {
 
-	public static final String	TAG_SUUNTO						= "suunto";
+	public static final String	TAG_SUUNTO						= "suunto"; //$NON-NLS-1$
 
-	private static final String	SUUNTO_TAG_WELL_FORMED_BEGIN	= "<" + TAG_SUUNTO + ">";	//$NON-NLS-1$
+	private static final String	SUUNTO_TAG_WELL_FORMED_BEGIN	= "<" + TAG_SUUNTO + ">";	//$NON-NLS-1$ //$NON-NLS-2$
 	private static final String	SUUNTO_TAG_WELL_FORMED_END		= "</suunto>";				//$NON-NLS-1$
 	private static final String	SUUNTO_TAG_HEADER				= "<header>";				//$NON-NLS-1$
 	private static final String	SUUNTO_TAG_SAMPLES				= "<samples>";				//$NON-NLS-1$
