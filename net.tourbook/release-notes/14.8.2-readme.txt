@@ -1,4 +1,4 @@
-Version: 14.8.2                                                16.8.2014
+Version: 14.8.2                                                25.8.2014
 
  
 New 	
@@ -18,15 +18,3 @@ Improvements
   - Improved tour marker tooltip UI
 
 * Import Suunto 2 laps.
-
- 
-Fixed Bug 	
-=========
-
-* 
-
- 
-System 	
-======
-
-* 
