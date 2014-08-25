@@ -270,14 +270,26 @@ public abstract class TourbookDevice implements IRawDataReader {
 			/*
 			 * skip empty lines and lines with comments
 			 */
-			line = fileReader.readLine().trim();
+			while (true) {
 
-			while (line != null && (line.length() == 0) || line.startsWith(XML_COMMENT)) {
+				line = fileReader.readLine();
 
-				line = fileReader.readLine().trim();
+				if (line == null) {
+					return false;
+				}
+
+				line = line.trim();
+
+				if (line.length() != 0 && !line.startsWith(XML_COMMENT)) {
+					// this must be a line with a tag
+					break;
+				}
 			}
 
-			if (line == null || line.toLowerCase().startsWith(deviceTag.toLowerCase()) == false) {
+			/*
+			 * Check if a none empty line contains the required tag
+			 */
+			if (line.toLowerCase().startsWith(deviceTag.toLowerCase()) == false) {
 				return false;
 			}
 
