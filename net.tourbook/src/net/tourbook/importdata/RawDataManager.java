@@ -273,16 +273,16 @@ public class RawDataManager {
 			@Override
 			public int compare(final IPath path1, final IPath path2) {
 
-				final String file1Extension = path1.getFileExtension().toLowerCase();
-				final String file2Extension = path2.getFileExtension().toLowerCase();
+				final String file1Extension = path1.getFileExtension();
+				final String file2Extension = path2.getFileExtension();
 
 				if (file1Extension != null
 						&& file1Extension.length() > 0
 						&& file2Extension != null
 						&& file2Extension.length() > 0) {
 
-					final TourbookDevice file1Device = _devicesByExtension.get(file1Extension);
-					final TourbookDevice file2Device = _devicesByExtension.get(file2Extension);
+					final TourbookDevice file1Device = _devicesByExtension.get(file1Extension.toLowerCase());
+					final TourbookDevice file2Device = _devicesByExtension.get(file2Extension.toLowerCase());
 
 					if (file1Device != null && file2Device != null) {
 						return file1Device.extensionSortPriority - file2Device.extensionSortPriority;
