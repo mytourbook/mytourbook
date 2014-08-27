@@ -196,6 +196,11 @@ public class ActionMarkerOptions extends ContributionItem implements IOpeningDia
 
 	public void setSelected(final boolean isSelected) {
 
+		if (_actionToolItem == null) {
+			// this happened
+			return;
+		}
+
 		_actionToolItem.setSelection(isSelected);
 
 		updateUI();

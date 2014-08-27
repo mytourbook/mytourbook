@@ -6491,14 +6491,11 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 	public String toStringWithHash() {
 
-		final StringBuilder sb = new StringBuilder();
+		final String string = "" //$NON-NLS-1$
+				+ ("	tourId: " + tourId) //$NON-NLS-1$
+				+ ("	identityHashCode: " + System.identityHashCode(this)); //$NON-NLS-1$
 
-		sb.append("   tourId:");//$NON-NLS-1$
-		sb.append(tourId);
-		sb.append("   identityHashCode:");//$NON-NLS-1$
-		sb.append(System.identityHashCode(this));
-
-		return sb.toString();
+		return string;
 	}
 
 	@Override
