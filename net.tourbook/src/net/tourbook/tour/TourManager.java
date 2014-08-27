@@ -155,9 +155,19 @@ public class TourManager {
 
 		final int cacheSize = _prefStore.getInt(ITourbookPreferences.TOUR_CACHE_SIZE);
 		if (cacheSize > 0) {
+
 			_tourDataCache = new TourDataCache(cacheSize);
+
 		} else {
-			_tourDataCache = null;
+
+			/**
+			 * VERY IMPORTANT
+			 * <p>
+			 * When cache size is 0, each time when the same tour is requested from the tour
+			 * manager, a new TourData entity is created. So each opened view gets a new tourdata
+			 * for the same tour which causes a LOT of troubles.
+			 */
+			_tourDataCache = new TourDataCache(10);
 		}
 
 		createAvgCallbacks();
@@ -1403,10 +1413,6 @@ public class TourManager {
 	 */
 	public void clearTourDataCache() {
 
-		if (_tourDataCache == null) {
-			return;
-		}
-
 		_tourDataCache.clear();
 
 		if (_tourDataEditorInstance != null && _tourDataEditorInstance.isDirty()) {
@@ -2368,10 +2374,8 @@ public class TourManager {
 			final TourData tourDataInEditor = _tourDataEditorInstance.getTourData();
 			if (tourDataInEditor != null && tourDataInEditor.getTourId().equals(requestedTourId)) {
 
-				if (_tourDataCache != null) {
-					// cache tour data
-					_tourDataCache.put(tourDataInEditor.getTourId(), tourDataInEditor);
-				}
+				// cache tour data
+				_tourDataCache.put(tourDataInEditor.getTourId(), tourDataInEditor);
 
 				return tourDataInEditor;
 			}
@@ -2383,9 +2387,7 @@ public class TourManager {
 		TourData existingTourData = null;
 		TourData tourDataInCache = null;
 
-		if (_tourDataCache != null) {
-			tourDataInCache = _tourDataCache.get(requestedTourId);
-		}
+		tourDataInCache = _tourDataCache.get(requestedTourId);
 
 		if (tourDataInCache != null) {
 			existingTourData = tourDataInCache;
@@ -2396,13 +2398,16 @@ public class TourManager {
 			if (tourDataFromDb == null) {
 
 				// try to get tour from raw data manager
-				return RawDataManager.getInstance().getImportedTours().get(requestedTourId);
+				final TourData tourDataFromRawManager = RawDataManager
+						.getInstance()
+						.getImportedTours()
+						.get(requestedTourId);
+
+				return tourDataFromRawManager;
 			}
 
 			// cache tour data
-			if (_tourDataCache != null) {
-				_tourDataCache.put(tourDataFromDb.getTourId(), tourDataFromDb);
-			}
+			_tourDataCache.put(tourDataFromDb.getTourId(), tourDataFromDb);
 
 			existingTourData = tourDataFromDb;
 		}
@@ -2465,9 +2470,7 @@ public class TourManager {
 
 //		final ArrayList<TourData> modifiedTour = new ArrayList<TourData>(fTourDataCache.values());
 
-		if (_tourDataCache != null) {
-			_tourDataCache.clear();
-		}
+		_tourDataCache.clear();
 
 		// notify listener to reload the tours
 		/*
@@ -2494,9 +2497,7 @@ public class TourManager {
 	 */
 	public void removeTourFromCache(final Long tourId) {
 
-		if (_tourDataCache != null) {
-			_tourDataCache.remove(tourId);
-		}
+		_tourDataCache.remove(tourId);
 	}
 
 	public void removeTourSaveListener(final ITourSaveListener listener) {
@@ -2576,10 +2577,6 @@ public class TourManager {
 	}
 
 	public void resetMapPositions() {
-
-		if (_tourDataCache == null) {
-			return;
-		}
 
 		for (final TourData tourData : _tourDataCache.getCache().values()) {
 			tourData.mapCenterPositionLatitude = Double.MIN_VALUE;
@@ -2707,9 +2704,7 @@ public class TourManager {
 			return;
 		}
 
-		if (_tourDataCache != null) {
-			_tourDataCache.put(tourData.getTourId(), tourData);
-		}
+		_tourDataCache.put(tourData.getTourId(), tourData);
 
 		replaceTourInTourEditor(tourData);
 	}

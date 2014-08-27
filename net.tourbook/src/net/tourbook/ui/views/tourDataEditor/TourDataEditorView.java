@@ -76,7 +76,6 @@ import net.tourbook.tour.TourEvent;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.ITourProvider2;
-import net.tourbook.ui.ImageComboLabel;
 import net.tourbook.ui.MessageManager;
 import net.tourbook.ui.TableColumnFactory;
 import net.tourbook.ui.action.ActionExtractTour;
@@ -520,21 +519,20 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	/*
 	 * tab: info
 	 */
-	private Text								_txtRefTour;
-
-	private Text								_txtTimeSlicesCount;
-	private Text								_txtDeviceName;
-	private Text								_txtDeviceFirmwareVersion;
-	private Label								_lblDistanceSensor;
-	private Label								_lblPulseSensor;
-	private Label								_lblPowerSensor;
-	private ImageComboLabel						_txtImportFilePath;
-	private Text								_txtPerson;
-	private Text								_txtTourId;
-	private Text								_txtMergeFromTourId;
-	private Text								_txtMergeIntoTourId;
 	private Text								_txtDateTimeCreated;
 	private Text								_txtDateTimeModified;
+	private Text								_txtDeviceName;
+	private Text								_txtDeviceFirmwareVersion;
+	private Text								_txtDistanceSensor;
+	private Text								_txtImportFilePath;
+	private Text								_txtMergeFromTourId;
+	private Text								_txtMergeIntoTourId;
+	private Text								_txtPulseSensor;
+	private Text								_txtPowerSensor;
+	private Text								_txtPerson;
+	private Text								_txtRefTour;
+	private Text								_txtTimeSlicesCount;
+	private Text								_txtTourId;
 
 	//
 	// ################################################## End of UI controls ##################################################
@@ -630,7 +628,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 						 */
 						_tourData.clearWorldPositions();
 
-						updateUIAfterSliceEdit();
+						updateUI_AfterSliceEdit();
 					}
 
 				} catch (final Exception e) {
@@ -748,7 +746,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 						// update dataserie
 						__dataSerie[serieIndex] = metricValue;
 
-						updateUIAfterSliceEdit();
+						updateUI_AfterSliceEdit();
 					}
 
 				} catch (final Exception e) {
@@ -985,7 +983,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			return;
 		}
 
-		updateUIAfterDistanceModifications();
+		updateUI_AfterDistanceModifications();
 	}
 
 	/**
@@ -1020,7 +1018,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		// update UI
 		_tourData = tourData;
 		_tourChart = null;
-		updateUIFromModel(tourData, false, true);
+		updateUI_FromModel(tourData, false, true);
 
 		// set editor into edit mode
 		_isEditMode = true;
@@ -1233,7 +1231,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			}
 		}
 
-		updateUIAfterDistanceModifications();
+		updateUI_AfterDistanceModifications();
 	}
 
 	/**
@@ -1319,8 +1317,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		getDataSeriesFromTourData();
 
 		// update UI
-		updateUITab1Tour();
-		updateUITab4Info();
+		updateUI_Tab_1_Tour();
+		updateUI_Tab_3_Info();
 
 		// update slice viewer
 		_sliceViewerItems = getRemainingSliceItems(_sliceViewerItems, firstIndex, lastIndex);
@@ -1389,7 +1387,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			}
 		}
 
-		updateUIAfterDistanceModifications();
+		updateUI_AfterDistanceModifications();
 	}
 
 	void actionToggleReadEditMode() {
@@ -1469,7 +1467,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 					Display.getCurrent().asyncExec(new Runnable() {
 						@Override
 						public void run() {
-							updateUIFromModelRunnable();
+							updateUI_FromModelRunnable();
 						}
 					});
 				}
@@ -1525,13 +1523,13 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 						recreateViewer();
 
-						updateUIFromModel(_tourData, false, true);
+						updateUI_FromModel(_tourData, false, true);
 
 					} else if (property.equals(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED)) {
 
 						// reload tour data
 
-						updateUIFromModel(_tourData, false, true);
+						updateUI_FromModel(_tourData, false, true);
 					}
 
 				} else if (property.equals(ITourbookPreferences.TOUR_PERSON_LIST_IS_MODIFIED)) {
@@ -1607,7 +1605,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 								setTourDirty();
 							}
 
-							updateUIFromModel(tourData, true, tourEvent.isReverted);
+							updateUI_FromModel(tourData, true, tourEvent.isReverted);
 
 							// nothing more to do, the editor contains only one tour
 							return;
@@ -1619,7 +1617,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 				} else if (eventId == TourEventId.TAG_STRUCTURE_CHANGED) {
 
-					updateUIFromModel(_tourData, false, true);
+					updateUI_FromModel(_tourData, false, true);
 
 				} else if (eventId == TourEventId.MARKER_SELECTION) {
 
@@ -1636,11 +1634,11 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 				} else if (eventId == TourEventId.SEGMENT_LAYER_CHANGED) {
 
-					updateUIFromModel(_tourData, true, true);
+					updateUI_FromModel(_tourData, true, true);
 
 				} else if (eventId == TourEventId.TOUR_CHART_PROPERTY_IS_MODIFIED) {
 
-					updateUIFromModel(_tourData, true, true);
+					updateUI_FromModel(_tourData, true, true);
 
 				} else if (eventId == TourEventId.UPDATE_UI) {
 
@@ -1652,7 +1650,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 						// reload tour data
 						_tourData = TourManager.getInstance().getTourData(_tourData.getTourId());
 
-						updateUIFromModel(_tourData, false, true);
+						updateUI_FromModel(_tourData, false, true);
 					}
 				}
 			}
@@ -1818,7 +1816,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 				}
 				setTourDirty();
 
-				updateUITime(event.widget);
+				updateUI_Time(event.widget);
 			}
 		};
 
@@ -1851,7 +1849,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 				setTourDirty();
 
-				updateUITitle();
+				updateUI_Title();
 
 				onModifyContent();
 			}
@@ -1870,7 +1868,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 				setTourDirty();
 
-				updateUITime(event.widget);
+				updateUI_Time(event.widget);
 			}
 		};
 
@@ -2155,22 +2153,22 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		{
 			_tabTour = new CTabItem(_tabFolder, SWT.FLAT);
 			_tabTour.setText(Messages.tour_editor_tabLabel_tour);
-			_tabTour.setControl(createUITab10Tour(_tabFolder));
+			_tabTour.setControl(createUITab_10_Tour(_tabFolder));
 
 			_tabSlices = new CTabItem(_tabFolder, SWT.FLAT);
 			_tabSlices.setText(Messages.tour_editor_tabLabel_tour_data);
-			_tabSlices.setControl(createUITab30Slices(_tabFolder));
+			_tabSlices.setControl(createUITab_20_Slices(_tabFolder));
 
 			_tabInfo = new CTabItem(_tabFolder, SWT.FLAT);
 			_tabInfo.setText(Messages.tour_editor_tabLabel_info);
-			_tabInfo.setControl(createUITab40Info(_tabFolder));
+			_tabInfo.setControl(createUITab_30_Info(_tabFolder));
 		}
 	}
 
 	/**
 	 * @param parent
 	 */
-	private void createUI10SliceViewer(final Composite parent) {
+	private void createUI_10_SliceViewer(final Composite parent) {
 
 		// table
 		final Table table = new Table(parent, SWT.H_SCROLL | SWT.V_SCROLL | SWT.FULL_SELECTION | SWT.MULTI);
@@ -2180,7 +2178,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		table.setLinesVisible(true);
 		GridDataFactory.fillDefaults().grab(true, true).applyTo(table);
 
-		createUI12SliceViewerContextMenu(table);
+		createUI_12_SliceViewerContextMenu(table);
 
 //		table.addTraverseListener(new TraverseListener() {
 //			public void keyTraversed(final TraverseEvent e) {
@@ -2246,7 +2244,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		table.getColumn(0).setWidth(0);
 	}
 
-	private void createUI12SliceViewerContextMenu(final Table table) {
+	private void createUI_12_SliceViewerContextMenu(final Table table) {
 
 		final MenuManager menuMgr = new MenuManager();
 
@@ -2263,7 +2261,15 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		_sliceColumnManager.createHeaderContextMenu(table, tableContextMenu);
 	}
 
-	private void createUISection110Title(final Composite parent) {
+	private Text createUI_FieldText(final Composite parent) {
+
+		final Text txtField = _tk.createText(parent, UI.EMPTY_STRING, SWT.READ_ONLY);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(txtField);
+
+		return txtField;
+	}
+
+	private void createUISection_110_Title(final Composite parent) {
 
 		Label label;
 
@@ -2409,7 +2415,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		}
 	}
 
-	private void createUISection120DateTime(final Composite parent) {
+	private void createUISection_120_DateTime(final Composite parent) {
 
 		_sectionDateTime = createSection(parent, _tk, Messages.tour_editor_section_date_time, false, true);
 		final Composite container = (Composite) _sectionDateTime.getClient();
@@ -2420,15 +2426,15 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 				.applyTo(container);
 //		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
 		{
-			createUISection122DateTimeCol1(container);
-			createUISection124DateTimeCol2(container);
+			createUISection_122_DateTimeCol1(container);
+			createUISection_124_DateTimeCol2(container);
 		}
 	}
 
 	/**
 	 * 1. column
 	 */
-	private void createUISection122DateTimeCol1(final Composite section) {
+	private void createUISection_122_DateTimeCol1(final Composite section) {
 
 		final Composite container = _tk.createComposite(section);
 		GridDataFactory.fillDefaults().applyTo(container);
@@ -2520,7 +2526,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	/**
 	 * 2. column
 	 */
-	private void createUISection124DateTimeCol2(final Composite section) {
+	private void createUISection_124_DateTimeCol2(final Composite section) {
 
 		Label label;
 
@@ -2565,7 +2571,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		}
 	}
 
-	private void createUISection130Personal(final Composite parent) {
+	private void createUISection_130_Personal(final Composite parent) {
 
 		_sectionPersonal = createSection(parent, _tk, Messages.tour_editor_section_personal, false, true);
 		final Composite container = (Composite) _sectionPersonal.getClient();
@@ -2574,15 +2580,15 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 				.spacing(COLUMN_SPACING, 5)
 				.applyTo(container);
 		{
-			createUISection132PersonalCol1(container);
-			createUISection134PersonalCol2(container);
+			createUISection_132_PersonalCol1(container);
+			createUISection_134_PersonalCol2(container);
 		}
 	}
 
 	/**
 	 * 1. column
 	 */
-	private void createUISection132PersonalCol1(final Composite section) {
+	private void createUISection_132_PersonalCol1(final Composite section) {
 
 		final Composite container = _tk.createComposite(section);
 		GridDataFactory.fillDefaults().applyTo(container);
@@ -2620,7 +2626,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	/**
 	 * 2. column
 	 */
-	private void createUISection134PersonalCol2(final Composite section) {
+	private void createUISection_134_PersonalCol2(final Composite section) {
 
 		final Composite container = _tk.createComposite(section);
 		GridDataFactory.fillDefaults().applyTo(container);
@@ -2649,7 +2655,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		}
 	}
 
-	private void createUISection140Weather(final Composite parent) {
+	private void createUISection_140_Weather(final Composite parent) {
 
 		_sectionWeather = createSection(parent, _tk, Messages.tour_editor_section_weather, false, true);
 		final Composite container = (Composite) _sectionWeather.getClient();
@@ -2658,13 +2664,13 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 				.spacing(COLUMN_SPACING, 5)
 				.applyTo(container);
 		{
-			createUISection141Weather(container);
-			createUISection142Weather(container);
-			createUISection144WeatherCol1(container);
+			createUISection_141_Weather(container);
+			createUISection_142_Weather(container);
+			createUISection_144_WeatherCol1(container);
 		}
 	}
 
-	private void createUISection141Weather(final Composite parent) {
+	private void createUISection_141_Weather(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(container);
@@ -2693,7 +2699,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		}
 	}
 
-	private void createUISection142Weather(final Composite section) {
+	private void createUISection_142_Weather(final Composite section) {
 
 		final Composite container = _tk.createComposite(section);
 		GridDataFactory.fillDefaults().span(2, 1).applyTo(container);
@@ -2915,7 +2921,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	/**
 	 * weather: 1. column
 	 */
-	private void createUISection144WeatherCol1(final Composite section) {
+	private void createUISection_144_WeatherCol1(final Composite section) {
 
 		final Composite container = _tk.createComposite(section);
 		GridDataFactory.fillDefaults().applyTo(container);
@@ -3036,7 +3042,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		}
 	}
 
-	private void createUISection150Characteristics(final Composite parent) {
+	private void createUISection_150_Characteristics(final Composite parent) {
 
 		_sectionCharacteristics = createSection(parent, _tk, Messages.tour_editor_section_characteristics, false, true);
 		final Composite container = (Composite) _sectionCharacteristics.getClient();
@@ -3095,7 +3101,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		}
 	}
 
-	private void createUISection410Info(final Composite parent) {
+	private void createUISection_300_Info(final Composite parent) {
 
 		Label label;
 
@@ -3114,101 +3120,86 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			/*
 			 * date/time created
 			 */
-			label = _tk.createLabel(container, Messages.Tour_Editor_Label_DateTimeCreated);
-
-			_txtDateTimeCreated = _tk.createText(container, UI.EMPTY_STRING, SWT.READ_ONLY);
-			GridDataFactory.fillDefaults().grab(true, false).applyTo(_txtDateTimeCreated);
+			_tk.createLabel(container, Messages.Tour_Editor_Label_DateTimeCreated);
+			_txtDateTimeCreated = createUI_FieldText(container);
 
 			/*
 			 * date/time modified
 			 */
-			label = _tk.createLabel(container, Messages.Tour_Editor_Label_DateTimeModified);
-
-			_txtDateTimeModified = _tk.createText(container, UI.EMPTY_STRING, SWT.READ_ONLY);
-			GridDataFactory.fillDefaults().grab(true, false).applyTo(_txtDateTimeModified);
+			_tk.createLabel(container, Messages.Tour_Editor_Label_DateTimeModified);
+			_txtDateTimeModified = createUI_FieldText(container);
 
 			/*
 			 * reference tours
 			 */
 			label = _tk.createLabel(container, Messages.tour_editor_label_ref_tour);
-			GridDataFactory.swtDefaults().align(SWT.BEGINNING, SWT.BEGINNING).applyTo(label);
-
+			GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).applyTo(label);
 			_txtRefTour = _tk.createText(container, UI.EMPTY_STRING, SWT.READ_ONLY | SWT.MULTI);
 
 			/*
 			 * number of time slices
 			 */
 			_tk.createLabel(container, Messages.tour_editor_label_datapoints);
-
-			_txtTimeSlicesCount = _tk.createText(container, UI.EMPTY_STRING, SWT.READ_ONLY);
-			GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.FILL).applyTo(_txtTimeSlicesCount);
+			_txtTimeSlicesCount = createUI_FieldText(container);
 
 			/*
 			 * device name
 			 */
 			_tk.createLabel(container, Messages.tour_editor_label_device_name);
-
-			_txtDeviceName = _tk.createText(container, UI.EMPTY_STRING, SWT.READ_ONLY);
-			GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.FILL).applyTo(_txtDeviceName);
+			_txtDeviceName = createUI_FieldText(container);
 
 			/*
 			 * device firmware version
 			 */
 			_tk.createLabel(container, Messages.Tour_Editor_Label_DeviceFirmwareVersion);
-
-			_txtDeviceFirmwareVersion = _tk.createText(container, UI.EMPTY_STRING, SWT.READ_ONLY);
-			GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.FILL).applyTo(_txtDeviceFirmwareVersion);
+			_txtDeviceFirmwareVersion = createUI_FieldText(container);
 
 			/*
 			 * distance sensor
 			 */
 			_tk.createLabel(container, Messages.tour_editor_label_DistanceSensor);
 
-			_lblDistanceSensor = _tk.createLabel(container, UI.EMPTY_STRING, SWT.READ_ONLY);
-			_lblDistanceSensor.setToolTipText(Messages.Tour_Editor_Label_DistanceSensor_Tooltip);
-			GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.FILL).grab(true, false).applyTo(_lblDistanceSensor);
+			_txtDistanceSensor = createUI_FieldText(container);
+			_txtDistanceSensor.setToolTipText(Messages.Tour_Editor_Label_DistanceSensor_Tooltip);
 
 			/*
 			 * pulse sensor
 			 */
 			_tk.createLabel(container, Messages.Tour_Editor_Label_PulseSensor);
 
-			_lblPulseSensor = _tk.createLabel(container, UI.EMPTY_STRING, SWT.READ_ONLY);
-			_lblPulseSensor.setToolTipText(Messages.Tour_Editor_Label_DeviceSensor_Tooltip);
-			GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.FILL).grab(true, false).applyTo(_lblPulseSensor);
+			_txtPulseSensor = createUI_FieldText(container);
+			_txtPulseSensor.setToolTipText(Messages.Tour_Editor_Label_DeviceSensor_Tooltip);
 
 			/*
 			 * power sensor
 			 */
 			_tk.createLabel(container, Messages.Tour_Editor_Label_PowerSensor);
 
-			_lblPowerSensor = _tk.createLabel(container, UI.EMPTY_STRING, SWT.READ_ONLY);
-			_lblPowerSensor.setToolTipText(Messages.Tour_Editor_Label_DeviceSensor_Tooltip);
-			GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.FILL).grab(true, false).applyTo(_lblPulseSensor);
+			_txtPowerSensor = createUI_FieldText(container);
+			_txtPowerSensor.setToolTipText(Messages.Tour_Editor_Label_DeviceSensor_Tooltip);
 
 			/*
 			 * import file path
 			 */
 			_tk.createLabel(container, Messages.tour_editor_label_import_file_path);
 
-			_txtImportFilePath = new ImageComboLabel(container, SWT.NONE);
-			_tk.adapt(_txtImportFilePath);
-			GridDataFactory.fillDefaults()//
-					.grab(true, false)
-					//
-					// adjust to the label controls
-					.indent(2, 0)
-					//
-					.align(SWT.FILL, SWT.FILL)
-					.applyTo(_txtImportFilePath);
+			_txtImportFilePath = createUI_FieldText(container);
+//			_txtImportFilePath = new ImageComboLabel(container, SWT.NONE);
+//			_tk.adapt(_txtImportFilePath);
+//			GridDataFactory.fillDefaults()//
+//					.grab(true, false)
+//					//
+//					// adjust to the label controls
+//					.indent(2, 0)
+//					//
+//					.align(SWT.FILL, SWT.FILL)
+//					.applyTo(_txtImportFilePath);
 
 			/*
 			 * person
 			 */
 			_tk.createLabel(container, Messages.tour_editor_label_person);
-
-			_txtPerson = _tk.createText(container, UI.EMPTY_STRING, SWT.READ_ONLY);
-			GridDataFactory.fillDefaults().grab(true, false).applyTo(_txtPerson);
+			_txtPerson = createUI_FieldText(container);
 
 			/*
 			 * tour id
@@ -3216,8 +3207,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			label = _tk.createLabel(container, Messages.tour_editor_label_tour_id);
 			label.setToolTipText(Messages.tour_editor_label_tour_id_tooltip);
 
-			_txtTourId = _tk.createText(container, UI.EMPTY_STRING, SWT.READ_ONLY);
-			GridDataFactory.fillDefaults().grab(true, false).applyTo(_txtTourId);
+			_txtTourId = createUI_FieldText(container);
 
 			/*
 			 * merged from tour id
@@ -3225,8 +3215,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			label = _tk.createLabel(container, Messages.tour_editor_label_merge_from_tour_id);
 			label.setToolTipText(Messages.tour_editor_label_merge_from_tour_id_tooltip);
 
-			_txtMergeFromTourId = _tk.createText(container, UI.EMPTY_STRING, SWT.READ_ONLY);
-			GridDataFactory.fillDefaults().grab(true, false).applyTo(_txtMergeFromTourId);
+			_txtMergeFromTourId = createUI_FieldText(container);
 
 			/*
 			 * merged into tour id
@@ -3234,8 +3223,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			label = _tk.createLabel(container, Messages.tour_editor_label_merge_into_tour_id);
 			label.setToolTipText(Messages.tour_editor_label_merge_into_tour_id_tooltip);
 
-			_txtMergeIntoTourId = _tk.createText(container, UI.EMPTY_STRING, SWT.READ_ONLY);
-			GridDataFactory.fillDefaults().grab(true, false).applyTo(_txtMergeIntoTourId);
+			_txtMergeIntoTourId = createUI_FieldText(container);
 		}
 
 		/*
@@ -3253,7 +3241,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		_tk.createLabel(parent, UI.EMPTY_STRING);
 	}
 
-	private Composite createUITab10Tour(final Composite parent) {
+	private Composite createUITab_10_Tour(final Composite parent) {
 
 		// scrolled container
 		_tab1Container = new ScrolledComposite(parent, SWT.V_SCROLL | SWT.H_SCROLL);
@@ -3277,19 +3265,19 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 			_tk.setBorderStyle(SWT.BORDER);
 			{
-				createUISection110Title(_tourContainer);
+				createUISection_110_Title(_tourContainer);
 				createUISectionSeparator(_tourContainer);
 
-				createUISection120DateTime(_tourContainer);
+				createUISection_120_DateTime(_tourContainer);
 				createUISectionSeparator(_tourContainer);
 
-				createUISection130Personal(_tourContainer);
+				createUISection_130_Personal(_tourContainer);
 				createUISectionSeparator(_tourContainer);
 
-				createUISection140Weather(_tourContainer);
+				createUISection_140_Weather(_tourContainer);
 				createUISectionSeparator(_tourContainer);
 
-				createUISection150Characteristics(_tourContainer);
+				createUISection_150_Characteristics(_tourContainer);
 			}
 		}
 
@@ -3308,7 +3296,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	 * @param parent
 	 * @return returns the controls for the tab
 	 */
-	private Control createUITab30Slices(final Composite parent) {
+	private Control createUITab_20_Slices(final Composite parent) {
 
 		_tab3Container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, true).applyTo(_tab3Container);
@@ -3318,7 +3306,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			GridDataFactory.fillDefaults().grab(true, true).applyTo(_sliceViewerContainer);
 			GridLayoutFactory.fillDefaults().spacing(0, 0).applyTo(_sliceViewerContainer);
 
-			createUI10SliceViewer(_sliceViewerContainer);
+			createUI_10_SliceViewer(_sliceViewerContainer);
 
 			_timeSliceLabel = new Label(_tab3Container, SWT.WRAP);
 			_timeSliceLabel.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_INFO_FOREGROUND));
@@ -3330,7 +3318,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		return _tab3Container;
 	}
 
-	private Composite createUITab40Info(final Composite parent) {
+	private Composite createUITab_30_Info(final Composite parent) {
 
 		/*
 		 * scrolled container
@@ -3354,7 +3342,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		// set content for scrolled composite
 		_tab4Container.setContent(_infoContainer);
 
-		createUISection410Info(_infoContainer);
+		createUISection_300_Info(_infoContainer);
 
 		return _tab4Container;
 	}
@@ -3947,7 +3935,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		_tourData = reloadTourData();
 
-		updateUIFromModel(_tourData, true, true);
+		updateUI_FromModel(_tourData, true, true);
 
 		fireRevertNotification();
 
@@ -4017,7 +4005,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		final TourData tourData = TourManager.getInstance().getTourData(tourId);
 		if (tourData != null) {
 			_tourChart = null;
-			updateUIFromModel(tourData, false, true);
+			updateUI_FromModel(tourData, false, true);
 		}
 	}
 
@@ -4033,7 +4021,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		}
 
 		_tourChart = null;
-		updateUIFromModel(tourData, true, true);
+		updateUI_FromModel(tourData, true, true);
 	}
 
 	@Override
@@ -5008,7 +4996,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 				final TourChart tourChart = selectionTourData.getTourChart();
 
 				_tourChart = tourChart;
-				updateUIFromModel(tourData, false, true);
+				updateUI_FromModel(tourData, false, true);
 			}
 
 		} else if (selection instanceof SelectionTourId) {
@@ -5046,7 +5034,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 							_tourData = tourData;
 							_tourChart = null;
-							updateUIFromModel(tourData, false, true);
+							updateUI_FromModel(tourData, false, true);
 
 						} else {
 
@@ -5055,7 +5043,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 								// a new tour id is in the selection
 								_tourData = tourData;
 								_tourChart = null;
-								updateUIFromModel(tourData, false, true);
+								updateUI_FromModel(tourData, false, true);
 							}
 						}
 					}
@@ -5404,7 +5392,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 				{
 					table.dispose();
 
-					createUI10SliceViewer(_sliceViewerContainer);
+					createUI_10_SliceViewer(_sliceViewerContainer);
 
 					_sliceViewerContainer.layout();
 
@@ -5849,7 +5837,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		_postSelectionProvider.clearSelection();
 
-		updateUIFromModel(tourDataForEditor, false, true);
+		updateUI_FromModel(tourDataForEditor, false, true);
 	}
 
 	/**
@@ -5878,7 +5866,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	private void showDefaultTitle() {
 
 		_messageManager.removeMessage(MESSAGE_KEY_ANOTHER_SELECTION);
-		updateUITitle();
+		updateUI_Title();
 
 		_isInfoInTitle = false;
 	}
@@ -5892,7 +5880,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			if (_tourData == modifiedTours.get(0)) {
 
 				// tour type or tags can have been changed within this dialog
-				updateUITourTypeTags();
+				updateUI_TourTypeTags();
 
 				setTourDirty();
 			}
@@ -6030,48 +6018,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		}
 	}
 
-	private void updateRefTourInfo(final Collection<TourReference> refTours) {
-
-		final ArrayList<TourReference> refTourList = new ArrayList<TourReference>(refTours);
-
-		// sort reference tours by start index
-		Collections.sort(refTourList, new Comparator<TourReference>() {
-			@Override
-			public int compare(final TourReference refTour1, final TourReference refTour2) {
-				return refTour1.getStartValueIndex() - refTour2.getStartValueIndex();
-			}
-		});
-
-		final StringBuilder sb = new StringBuilder();
-		int refCounter = 0;
-
-		_refTourRange = new int[refTourList.size()][2];
-
-		for (final TourReference refTour : refTourList) {
-
-			if (refCounter > 0) {
-				sb.append(UI.NEW_LINE);
-			}
-
-			sb.append(refTour.getLabel());
-
-			sb.append(" ("); //$NON-NLS-1$
-			sb.append(refTour.getStartValueIndex());
-			sb.append(UI.DASH_WITH_SPACE);
-			sb.append(refTour.getEndValueIndex());
-			sb.append(")"); //$NON-NLS-1$
-
-			final int[] oneRange = _refTourRange[refCounter];
-			oneRange[0] = refTour.getStartValueIndex();
-			oneRange[1] = refTour.getEndValueIndex();
-
-			refCounter++;
-		}
-
-		_txtRefTour.setText(sb.toString());
-		_txtRefTour.pack(true);
-	}
-
 	private void updateStatusLine() {
 
 		final boolean isVisible = _timeSliceLabel.isVisible();
@@ -6106,7 +6052,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	 */
 	public void updateUI(final TourData tourData) {
 
-		updateUIFromModel(tourData, true, true);
+		updateUI_FromModel(tourData, true, true);
 	}
 
 	/**
@@ -6123,12 +6069,12 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		}
 	}
 
-	private void updateUIAfterDistanceModifications() {
+	private void updateUI_AfterDistanceModifications() {
 
-		updateUIAfterSliceEdit();
+		updateUI_AfterSliceEdit();
 
 		// update distance in the UI, this must be done after updateUIAfterSliceEdit()
-		updateUITab1Tour();
+		updateUI_Tab_1_Tour();
 
 		/*
 		 * set slice viewer dirty when the time slice tab is not selected -> slice viewer was not
@@ -6139,7 +6085,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		}
 	}
 
-	private void updateUIAfterSliceEdit() {
+	private void updateUI_AfterSliceEdit() {
 
 		setTourDirty();
 
@@ -6164,7 +6110,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	 *            <code>true</code> will reload time slices
 	 * @param isDirtyDisabled
 	 */
-	private void updateUIFromModel(	final TourData tourData,
+	private void updateUI_FromModel(final TourData tourData,
 									final boolean forceTimeSliceReload,
 									final boolean isDirtyDisabled) {
 
@@ -6211,13 +6157,13 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 				_uiRunnableCounter = _uiUpdateCounter - 1;
 
 				if (_isPartVisible) {
-					updateUIFromModelRunnable();
+					updateUI_FromModelRunnable();
 				}
 			}
 		});
 	}
 
-	private void updateUIFromModelRunnable() {
+	private void updateUI_FromModelRunnable() {
 
 		if (_uiRunnableCounter == _uiUpdateCounter) {
 			// UI is updated
@@ -6249,11 +6195,11 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			_pageEditorForm.setImage(net.tourbook.ui.UI.getInstance().getTourTypeImage(tourType.getTypeId()));
 		}
 
-		updateUITitleAsynch(getTourTitle());
+		updateUI_TitleAsynch(getTourTitle());
 
-		updateUITab1Tour();
-		updateUITab3Slices();
-		updateUITab4Info();
+		updateUI_Tab_1_Tour();
+		updateUI_Tab_2_Slices();
+		updateUI_Tab_3_Info();
 
 		enableActions();
 		enableControls();
@@ -6269,7 +6215,50 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		_isSetField = false;
 	}
 
-	private void updateUITab1Tour() {
+	private void updateUI_RefTourInfo(final Collection<TourReference> refTours) {
+
+		final ArrayList<TourReference> refTourList = new ArrayList<TourReference>(refTours);
+
+		// sort reference tours by start index
+		Collections.sort(refTourList, new Comparator<TourReference>() {
+			@Override
+			public int compare(final TourReference refTour1, final TourReference refTour2) {
+				return refTour1.getStartValueIndex() - refTour2.getStartValueIndex();
+			}
+		});
+
+		final StringBuilder sb = new StringBuilder();
+		int refCounter = 0;
+
+		_refTourRange = new int[refTourList.size()][2];
+
+		for (final TourReference refTour : refTourList) {
+
+			if (refCounter > 0) {
+				sb.append(UI.NEW_LINE);
+			}
+
+			sb.append(refTour.getLabel());
+
+			sb.append(" ("); //$NON-NLS-1$
+			sb.append(refTour.getStartValueIndex());
+			sb.append(UI.DASH_WITH_SPACE);
+			sb.append(refTour.getEndValueIndex());
+			sb.append(")"); //$NON-NLS-1$
+
+			final int[] oneRange = _refTourRange[refCounter];
+			oneRange[0] = refTour.getStartValueIndex();
+			oneRange[1] = refTour.getEndValueIndex();
+
+			refCounter++;
+		}
+
+		_txtRefTour.setText(sb.toString());
+//		_txtRefTour.pack(true);
+		_txtRefTour.getParent().layout(true, true);
+	}
+
+	private void updateUI_Tab_1_Tour() {
 
 		/*
 		 * tour/event
@@ -6378,7 +6367,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 	}
 
-	private void updateUITab3Slices() {
+	private void updateUI_Tab_2_Slices() {
 
 		if (_uiRunnableForceTimeSliceReload) {
 			_sliceViewerTourId = -1L;
@@ -6404,7 +6393,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		}
 	}
 
-	private void updateUITab4Info() {
+	private void updateUI_Tab_3_Info() {
 
 		// data points
 		final int[] timeSerie = _tourData.timeSerie;
@@ -6423,34 +6412,33 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		_txtDeviceFirmwareVersion.pack(true);
 
 		// distance sensor
-		_lblDistanceSensor.setText(_tourData.isDistanceSensorPresent()
+		_txtDistanceSensor.setText(_tourData.isDistanceSensorPresent()
 				? Messages.Tour_Editor_Label_Sensor_Yes
 				: Messages.Tour_Editor_Label_Sensor_No);
-//		_lblDistanceSensor.pack(true);
 
 		// pulse sensor
-		_lblPulseSensor.setText(_tourData.isPulseSensorPresent()
+		_txtPulseSensor.setText(_tourData.isPulseSensorPresent()
 				? Messages.Tour_Editor_Label_Sensor_Yes
 				: Messages.Tour_Editor_Label_Sensor_No);
-//		_lblPulseSensor.pack(true);
 
 		// power sensor
-		_lblPowerSensor.setText(_tourData.isPowerSensorPresent()
+		_txtPowerSensor.setText(_tourData.isPowerSensorPresent()
 				? Messages.Tour_Editor_Label_Sensor_Yes
 				: Messages.Tour_Editor_Label_Sensor_No);
-//		_lblPowerSensor.pack(true);
 
 		// import file path
-		_txtImportFilePath.setText(_tourData.isTourImportFilePathAvailable()
+		final String importFilePath = _tourData.isTourImportFilePathAvailable()
 				? _tourData.getTourImportFilePath()
-				: UI.EMPTY_STRING);
+				: UI.EMPTY_STRING;
+		_txtImportFilePath.setText(importFilePath);
+		_txtImportFilePath.setToolTipText(importFilePath);
 
 		/*
 		 * reference tours
 		 */
 		final Collection<TourReference> refTours = _tourData.getTourReferences();
 		if (refTours.size() > 0) {
-			updateRefTourInfo(refTours);
+			updateUI_RefTourInfo(refTours);
 		} else {
 			_txtRefTour.setText(Messages.tour_editor_label_ref_tour_none);
 			_refTourRange = null;
@@ -6521,7 +6509,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	/**
 	 * Validate tour recording/driving/paused time
 	 */
-	private void updateUITime(final Widget widget) {
+	private void updateUI_Time(final Widget widget) {
 
 		/*
 		 * check if a time control is currently used
@@ -6594,7 +6582,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	/**
 	 * Update title of the view with the modified date/time
 	 */
-	private void updateUITitle() {
+	private void updateUI_Title() {
 
 		_calendar.set(
 				_dtTourDate.getYear(),
@@ -6604,14 +6592,14 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 				_dtStartTime.getMinutes(),
 				_dtStartTime.getSeconds());
 
-		updateUITitleAsynch(TourManager.getTourTitle(_calendar.getTime()));
+		updateUI_TitleAsynch(TourManager.getTourTitle(_calendar.getTime()));
 	}
 
 	/**
 	 * update the title is a really performance hog because of the date/time controls when they are
 	 * layouted
 	 */
-	private void updateUITitleAsynch(final String title) {
+	private void updateUI_TitleAsynch(final String title) {
 
 		_uiUpdateTitleCounter++;
 
@@ -6637,7 +6625,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		});
 	}
 
-	private void updateUITourTypeTags() {
+	private void updateUI_TourTypeTags() {
 
 		// tour type/tags
 		net.tourbook.ui.UI.updateUITourType(_tourData, _lblTourType, true);
