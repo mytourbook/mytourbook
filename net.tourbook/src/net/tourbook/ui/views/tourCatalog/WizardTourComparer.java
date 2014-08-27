@@ -28,8 +28,8 @@ public class WizardTourComparer extends Wizard {
 
 	private final IDialogSettings	_state					= TourbookPlugin.getState(DIALOG_SETTINGS_SECTION);
 
-	private WizardPageCompareTour	_pageCompareTour;
-	private WizardPageReferenceTour	_pageReferenceTour;
+	private WizardPage_10_CompareTour	_pageCompareTour;
+	private WizardPage_20_ReferenceTour	_pageReferenceTour;
 
 	private IReferenceTourProvider	_refTourProvider;
 
@@ -50,8 +50,8 @@ public class WizardTourComparer extends Wizard {
 	@Override
 	public void addPages() {
 
-		addPage(_pageCompareTour = new WizardPageCompareTour());
-		addPage(_pageReferenceTour = new WizardPageReferenceTour(_refTourProvider));
+		addPage(_pageCompareTour = new WizardPage_10_CompareTour());
+		addPage(_pageReferenceTour = new WizardPage_20_ReferenceTour(_refTourProvider));
 	}
 
 	@Override

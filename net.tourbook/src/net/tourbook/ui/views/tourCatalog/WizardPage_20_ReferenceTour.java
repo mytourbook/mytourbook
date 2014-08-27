@@ -71,7 +71,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.ui.part.PageBook;
 
-public class WizardPageReferenceTour extends WizardPage {
+public class WizardPage_20_ReferenceTour extends WizardPage {
 
 	public static final int					COLUMN_REF_TOUR			= 0;
 
@@ -119,7 +119,7 @@ public class WizardPageReferenceTour extends WizardPage {
 		public void inputChanged(final Viewer v, final Object oldInput, final Object newInput) {}
 	}
 
-	protected WizardPageReferenceTour(final IReferenceTourProvider refTourProvider) {
+	protected WizardPage_20_ReferenceTour(final IReferenceTourProvider refTourProvider) {
 
 		super("reference-tour");//$NON-NLS-1$
 

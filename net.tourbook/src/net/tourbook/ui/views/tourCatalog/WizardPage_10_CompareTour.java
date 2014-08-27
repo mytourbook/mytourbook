@@ -74,7 +74,7 @@ import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.ui.dialogs.ContainerCheckedTreeViewer;
 import org.eclipse.ui.part.PageBook;
 
-public class WizardPageCompareTour extends WizardPage {
+public class WizardPage_10_CompareTour extends WizardPage {
 
 	private static final String		COMP_TOUR_VIEWER_WIDTH		= "CompTour.viewerWidth";			//$NON-NLS-1$
 	private static final String		COMP_TOUR_SELECT_ALL		= "CompTour.selectAll";			//$NON-NLS-1$
@@ -126,7 +126,7 @@ public class WizardPageCompareTour extends WizardPage {
 		public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
 	}
 
-	WizardPageCompareTour() {
+	WizardPage_10_CompareTour() {
 
 		super("compare-tour");//$NON-NLS-1$
 
@@ -156,6 +156,7 @@ public class WizardPageCompareTour extends WizardPage {
 			 */
 			final Composite detailContainer = new Composite(container, SWT.NONE);
 			GridDataFactory.fillDefaults().grab(true, true).applyTo(detailContainer);
+//			detailContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
 			{
 				final Control viewer = createUI_10_TourViewer(detailContainer);
 				final Sash sash = new Sash(detailContainer, SWT.VERTICAL);

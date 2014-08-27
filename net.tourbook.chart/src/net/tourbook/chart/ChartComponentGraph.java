@@ -285,7 +285,6 @@ public class ChartComponentGraph extends Canvas {
 	private Cursor						_cursorMove4x;
 	private Cursor						_cursorMove5x;
 	private Cursor						_cursorResizeTopDown;
-	private Cursor						_cursorXSlider;
 	private Cursor						_cursorXSliderLeft;
 	private Cursor						_cursorXSliderRight;
 
@@ -2192,17 +2191,17 @@ public class ChartComponentGraph extends Canvas {
 			final int noneMarkerFillingAlpha = (int) (_chart.graphTransparencyFilling * noneMarkerAlpha);
 
 			// draw graph without marker
-//			drawAsync_510_LineGraphSegment(
-//					gcGraph,
-//					graphDrawingData,
-//					0,
-//					serieSize,
-//					rgbFg,
-//					rgbBgDark,
-//					rgbBgBright,
-//					noneMarkerLineAlpha,
-//					noneMarkerFillingAlpha,
-//					graphValueOffset);
+			drawAsync_510_LineGraphSegment(
+					gcGraph,
+					graphDrawingData,
+					0,
+					serieSize,
+					rgbFg,
+					rgbBgDark,
+					rgbBgBright,
+					noneMarkerLineAlpha,
+					noneMarkerFillingAlpha,
+					graphValueOffset);
 
 			// draw the x-marker
 			drawAsync_510_LineGraphSegment(
@@ -2222,7 +2221,7 @@ public class ChartComponentGraph extends Canvas {
 	/**
 	 * First draw the graph into a path, the path is then drawn on the device with a transformation.
 	 * 
-	 * @param gcSegment
+	 * @param gc
 	 * @param graphDrawingData
 	 * @param startIndex
 	 * @param endIndex
@@ -2236,7 +2235,7 @@ public class ChartComponentGraph extends Canvas {
 	 *            When <code>true</code> the whole graph is painted with several segments, otherwise
 	 *            the whole graph is painted once.
 	 */
-	private void drawAsync_510_LineGraphSegment(final GC gcSegment,
+	private void drawAsync_510_LineGraphSegment(final GC gc,
 												final GraphDrawingData graphDrawingData,
 												final int startIndex,
 												final int endIndex,
@@ -2339,7 +2338,7 @@ public class ChartComponentGraph extends Canvas {
 		double devXPrevNoLine = 0;
 		boolean isNoLine = false;
 
-		final Rectangle chartRectangle = gcSegment.getClipping();
+		final Rectangle chartRectangle = gc.getClipping();
 		final int devXVisibleWidth = chartRectangle.width;
 
 		boolean isDrawFirstPoint = true;
@@ -2416,12 +2415,12 @@ public class ChartComponentGraph extends Canvas {
 				final double devXFirstPoint = devXPrev;
 				float devXFirstPointF = (float) devXPrev;
 
-				if (devXFirstPointF == 0.0f) {
+				if (devXFirstPointF <= 0.0f) {
 					/*
-					 * All is painted without segments. Hide the first line from the bottom to the
-					 * first value point by setting the position into the hidden area.
+					 * Hide the first line from the bottom to the first value point by setting the
+					 * position into the hidden area.
 					 */
-					devXFirstPointF -= 0.5f;
+					devXFirstPointF -= 1f;
 				}
 
 				float devYStart = 0;
@@ -2442,13 +2441,14 @@ public class ChartComponentGraph extends Canvas {
 
 				final float devY = devY0Inverse - devY1Prev;
 
-				path.moveTo(devXFirstPointF, devYStart);
-				path.lineTo(devXFirstPointF, devY);
+				path.moveTo((int) devXFirstPointF, (int) devYStart);
+				path.lineTo((int) devXFirstPointF, (int) devY);
 
 				if (isPath2) {
 					path2.moveTo(devXFirstPointF, devY0Inverse - devY2);
 					path2.lineTo(devXFirstPointF, devY0Inverse - devY2);
 				}
+
 
 				/*
 				 * set line hover positions for the first point
@@ -2493,8 +2493,8 @@ public class ChartComponentGraph extends Canvas {
 
 						devY = devY0;
 					}
-					path.lineTo((float) devXPrev, devY);
-					path.lineTo(devXf, devY);
+					path.lineTo((int) devXPrev, (int) devY);
+					path.lineTo((int) devXf, (int) devY);
 
 					/*
 					 * keep positions, because skipped values will be painted as a dot outside of
@@ -2525,7 +2525,7 @@ public class ChartComponentGraph extends Canvas {
 
 						isNoLine = false;
 
-						path.lineTo((float) devXPrevNoLine, devY0Inverse - devY1Prev);
+						path.lineTo((int) devXPrevNoLine, (int) (devY0Inverse - devY1Prev));
 					}
 
 					devY = devY0Inverse - devY1;
@@ -2580,7 +2580,7 @@ public class ChartComponentGraph extends Canvas {
 
 				final float devY = devY0Inverse - devY1;
 
-				path.lineTo(devXf, devY);
+				path.lineTo((int) devXf, (int) devY);
 
 				// move path to the final point
 				if (graphFillMethod == ChartDataYSerie.FILL_METHOD_FILL_BOTTOM
@@ -2588,18 +2588,18 @@ public class ChartComponentGraph extends Canvas {
 
 					// draw line to the bottom of the graph
 
-					path.lineTo(devXf, devGraphHeight);
+					path.lineTo((int) devXf, devGraphHeight);
 
 				} else if (graphFillMethod == ChartDataYSerie.FILL_METHOD_FILL_ZERO) {
 
 					// draw line to the x-axis, y=0
 
-					path.lineTo(devXf, devY0);
+					path.lineTo((int) devXf, (int) devY0);
 				}
 
 				// moveTo() is necessary that the graph is filled correctly (to prevent a triangle filled shape)
 				// finalize previous subpath
-				path.moveTo(devXf, 0);
+				path.moveTo((int) devXf, 0);
 
 				if (isPath2) {
 					path2.lineTo(devXf, devY0Inverse - devY2);
@@ -2646,9 +2646,6 @@ public class ChartComponentGraph extends Canvas {
 		final Color colorBgDark = new Color(display, rgbBgDark);
 		final Color colorBgBright = new Color(display, rgbBgBright);
 
-		gcSegment.setAntialias(_chart.graphAntialiasing);
-		gcSegment.setAlpha(graphFillingAlpha);
-
 		final double graphWidth = xValues[Math.min(xValueLength - 1, endIndex)] - graphValueOffset;
 
 		/**
@@ -2656,7 +2653,9 @@ public class ChartComponentGraph extends Canvas {
 		 */
 		final int devGraphWidth = Math.min(0x7fff, (int) (graphWidth * scaleX));
 
-		gcSegment.setClipping(path);
+		gc.setAntialias(_chart.graphAntialiasing);
+		gc.setAlpha(graphFillingAlpha);
+		gc.setClipping(path);
 
 		/*
 		 * fill the graph
@@ -2668,10 +2667,10 @@ public class ChartComponentGraph extends Canvas {
 			 * rectangle
 			 */
 
-			gcSegment.setForeground(colorBgDark);
-			gcSegment.setBackground(colorBgBright);
+			gc.setForeground(colorBgDark);
+			gc.setBackground(colorBgBright);
 
-			gcSegment.fillGradientRectangle(//
+			gc.fillGradientRectangle(//
 					0,
 					devGraphHeight,
 					devGraphWidth,
@@ -2684,10 +2683,10 @@ public class ChartComponentGraph extends Canvas {
 			 * fill above 0 line
 			 */
 
-			gcSegment.setForeground(colorBgDark);
-			gcSegment.setBackground(colorBgBright);
+			gc.setForeground(colorBgDark);
+			gc.setBackground(colorBgBright);
 
-			gcSegment.fillGradientRectangle(//
+			gc.fillGradientRectangle(//
 					0,
 					(int) devY0,
 					devGraphWidth,
@@ -2697,10 +2696,10 @@ public class ChartComponentGraph extends Canvas {
 			/*
 			 * fill below 0 line
 			 */
-			gcSegment.setForeground(colorBgBright);
-			gcSegment.setBackground(colorBgDark);
+			gc.setForeground(colorBgBright);
+			gc.setBackground(colorBgDark);
 
-			gcSegment.fillGradientRectangle(//
+			gc.fillGradientRectangle(//
 					0,
 					devGraphHeight, // start from the graph bottom
 					devGraphWidth,
@@ -2713,11 +2712,11 @@ public class ChartComponentGraph extends Canvas {
 
 			if (customFillPainter != null) {
 
-				gcSegment.setForeground(colorBgDark);
-				gcSegment.setBackground(colorBgBright);
+				gc.setForeground(colorBgDark);
+				gc.setBackground(colorBgBright);
 
 				customFillPainter.draw(
-						gcSegment,
+						gc,
 						graphDrawingData,
 						_chart,
 						devXPositions,
@@ -2727,33 +2726,33 @@ public class ChartComponentGraph extends Canvas {
 		}
 
 		// reset clipping that the line is drawn everywere
-		gcSegment.setClipping((Rectangle) null);
+		gc.setClipping((Rectangle) null);
 
-		gcSegment.setBackground(colorLine);
+		gc.setBackground(colorLine);
 
 		/*
 		 * paint skipped values
 		 */
 		if (isShowSkippedValues && skippedValues.size() > 0) {
 			for (final Point skippedPoint : skippedValues) {
-				gcSegment.fillRectangle(skippedPoint.x, skippedPoint.y, 2, 2);
+				gc.fillRectangle(skippedPoint.x, skippedPoint.y, 2, 2);
 			}
 		}
 
 		/*
 		 * draw line along the path
 		 */
-		gcSegment.setAlpha(graphLineAlpha);
+		gc.setAlpha(graphLineAlpha);
 
 		// set line style
-		gcSegment.setLineStyle(SWT.LINE_SOLID);
+		gc.setLineStyle(SWT.LINE_SOLID);
 //		gcSegment.setLineWidth(1);
 
 		// draw the line of the graph
-		gcSegment.setForeground(colorLine);
+		gc.setForeground(colorLine);
 
 //		gcGraph.setAlpha(0x80);
-		gcSegment.drawPath(path);
+		gc.drawPath(path);
 
 		// dispose resources
 		colorLine.dispose();
@@ -2767,14 +2766,14 @@ public class ChartComponentGraph extends Canvas {
 		 */
 		if (path2 != null) {
 
-			gcSegment.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
-			gcSegment.drawPath(path2);
+			gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
+			gc.drawPath(path2);
 
 			path2.dispose();
 		}
 
-		gcSegment.setAlpha(0xFF);
-		gcSegment.setAntialias(SWT.OFF);
+		gc.setAlpha(0xFF);
+		gc.setAntialias(SWT.OFF);
 	}
 
 	private void drawAsync_520_RangeMarker(final GC gc, final GraphDrawingData drawingData) {
@@ -4934,8 +4933,6 @@ public class ChartComponentGraph extends Canvas {
 		if (cursor != null) {
 
 			setCursor(cursor);
-
-			_cursorXSlider = cursor;
 
 			return true;
 
