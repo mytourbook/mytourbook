@@ -502,6 +502,23 @@ public class WizardPage_10_CompareTour extends WizardPage {
 		wizardSettings.put(COMP_TOUR_SELECT_ALL, _chkSelectAll.getSelection());
 	}
 
+	@Override
+	public void setVisible(final boolean visible) {
+
+		super.setVisible(visible);
+
+		final boolean isSelectAll = _chkSelectAll.getSelection();
+
+		if (isSelectAll) {
+
+			_chkSelectAll.setFocus();
+
+		} else {
+
+			_tourViewer.getTree().setFocus();
+		}
+	}
+
 	private void showCompareTour(final SelectionChangedEvent event) {
 
 		final IStructuredSelection selection = (IStructuredSelection) event.getSelection();

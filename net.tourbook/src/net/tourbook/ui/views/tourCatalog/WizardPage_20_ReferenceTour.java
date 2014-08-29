@@ -496,6 +496,14 @@ public class WizardPage_20_ReferenceTour extends WizardPage {
 		Util.setState(state, REF_TOUR_CHECKED, refTourIds);
 	}
 
+	@Override
+	public void setVisible(final boolean visible) {
+
+		super.setVisible(visible);
+
+		_refTourViewer.getTable().setFocus();
+	}
+
 	private void showReferenceTour(final SelectionChangedEvent event) {
 
 		final IStructuredSelection selection = (IStructuredSelection) event.getSelection();

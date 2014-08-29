@@ -104,14 +104,14 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		menu.add(_actionCloseAllPerspective);
 	}
 
-	private MenuManager createMenu_10_Load() {
+	private MenuManager createMenu_10_New() {
 
-		final MenuManager loadMenu = new MenuManager(Messages.App_Action_Menu_Import, "m_Import"); //$NON-NLS-1$
+		final MenuManager newMenu = new MenuManager(Messages.App_Action_Menu_New, "m_New"); //$NON-NLS-1$
 
-		loadMenu.add(new GroupMarker("fileNew")); //$NON-NLS-1$
-		loadMenu.add(_quitItem);
+		newMenu.add(new GroupMarker("ci_New")); //$NON-NLS-1$
+		newMenu.add(_quitItem);
 
-		return loadMenu;
+		return newMenu;
 	}
 
 	private MenuManager createMenu_20_Directories() {
@@ -209,7 +209,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		/*
 		 * Create app menu
 		 */
-		menuBar.add(createMenu_10_Load());
+		menuBar.add(createMenu_10_New());
 		menuBar.add(createMenu_20_Directories());
 		menuBar.add(createMenu_30_Tour());
 		menuBar.add(createMenu_40_Tool());

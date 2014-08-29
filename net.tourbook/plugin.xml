@@ -462,15 +462,16 @@
 
 
 		<!-- 
-			Load
+			New
 		-->
-		<menuContribution locationURI="menu:m_Import?after=fileNew">
-		
+		<menuContribution locationURI="menu:m_New?after=ci_New">
+
 			<command
 				commandId="net.tourbook.command.device.importFromFile"
 				icon="icons/folder_open_add.gif"
 				label="%command_device_importFromFile"
 				mnemonic="%command_device_importFromFile_mnemonic"/>
+				
 			<command
 				commandId="net.tourbook.command.device.synchronize"
 				icon="icons/device-synchronize.gif"
@@ -489,6 +490,16 @@
 				name="net.tourbook.separator"
 				visible="true"/>
 		
+			<command
+				commandId="net.tourbook.command.createNewTour"
+				icon="icons/tour-new.png"
+				label="%command_createNewTour"
+				mnemonic="%command_createNewTour_mnemonic"/>
+				
+			<separator
+				name="net.tourbook.separator2"
+				visible="true"/>
+
 		</menuContribution>
 
 
@@ -1573,61 +1584,80 @@
       </keyword>
 
    </extension>
-   
-   <extension
-         point="org.eclipse.ui.bindings">
-      <scheme
-            id="net.tourbook.scheme"
-            name="MyTourbook Scheme"
-            parentId="org.eclipse.ui.defaultAcceleratorConfiguration">
-      </scheme>
-      
-	  <!-- Picture directory -->            
-      
-      <key
-            commandId="net.tourbook.command.PicDir.ShowNaviationHistory"
-            sequence="%Shortcut_Key_PicDir_ShowNavigationHistory"
-            contextId="org.eclipse.ui.contexts.window"
-            schemeId="net.tourbook.scheme">
-      </key>
-      
-      <key
-            commandId="net.tourbook.command.PicDir.NavigateHistoryBackward"
-            sequence="%Shortcut_Key_PicDir_History_Backward"
-            contextId="org.eclipse.ui.contexts.window"
-            schemeId="net.tourbook.scheme">
-      </key>
-      <key
-            commandId="net.tourbook.command.PicDir.NavigateHistoryBackward"
-            sequence="%Shortcut_Key_PicDir_History_Backward_OSX"
-            platform="carbon"
-            contextId="org.eclipse.ui.contexts.window"
-            schemeId="net.tourbook.scheme">
-      </key>
-      <key
-            commandId="net.tourbook.command.PicDir.NavigateHistoryForward"
-            sequence="%Shortcut_Key_PicDir_History_Forward"
-            contextId="org.eclipse.ui.contexts.window"
-            schemeId="net.tourbook.scheme">
-      </key>
-      <key
-            commandId="net.tourbook.command.PicDir.NavigateHistoryForward"
-            sequence="%Shortcut_Key_PicDir_History_Forward_OSX"
-            platform="carbon"
-            contextId="org.eclipse.ui.contexts.window"
-            schemeId="net.tourbook.scheme">
-      </key>
+
+	<extension
+		point="org.eclipse.ui.bindings">
+
+		<scheme
+			id="net.tourbook.scheme"
+			name="MyTourbook Scheme"
+			parentId="org.eclipse.ui.defaultAcceleratorConfiguration"/>
+
+		<!-- New -->
+	
+		<key
+			commandId="net.tourbook.command.device.importFromFile"
+			sequence="%Shortcut_Key_App_ImportFromFile"
+			contextId="org.eclipse.ui.contexts.window"
+			schemeId="net.tourbook.scheme"/>
+
+		<key
+			commandId="net.tourbook.command.tourCompareWizard"
+			sequence="%Shortcut_Key_App_CompareTours"
+			contextId="org.eclipse.ui.contexts.window"
+			schemeId="net.tourbook.scheme"/>
+
+		<key
+			commandId="net.tourbook.command.createNewTour"
+			sequence="%Shortcut_Key_App_NewTour"
+			contextId="org.eclipse.ui.contexts.window"
+			schemeId="net.tourbook.scheme"/>
 
 
-	  <!-- Preferences -->            
+		<!-- Picture directory -->            
 
-      <key
-            commandId="org.eclipse.ui.window.preferences"
-            sequence="%Shortcut_Key_App_Preferences"
-            contextId="org.eclipse.ui.contexts.window"
-            schemeId="net.tourbook.scheme">
-      </key>
-   </extension>
+		<key
+			commandId="net.tourbook.command.PicDir.ShowNaviationHistory"
+			sequence="%Shortcut_Key_PicDir_ShowNavigationHistory"
+			contextId="org.eclipse.ui.contexts.window"
+			schemeId="net.tourbook.scheme"/>
+		
+		<key
+			commandId="net.tourbook.command.PicDir.NavigateHistoryBackward"
+			sequence="%Shortcut_Key_PicDir_History_Backward"
+			contextId="org.eclipse.ui.contexts.window"
+			schemeId="net.tourbook.scheme"/>
+		
+		<key
+			commandId="net.tourbook.command.PicDir.NavigateHistoryBackward"
+			sequence="%Shortcut_Key_PicDir_History_Backward_OSX"
+			platform="carbon"
+			contextId="org.eclipse.ui.contexts.window"
+			schemeId="net.tourbook.scheme"/>
+		
+		<key
+			commandId="net.tourbook.command.PicDir.NavigateHistoryForward"
+			sequence="%Shortcut_Key_PicDir_History_Forward"
+			contextId="org.eclipse.ui.contexts.window"
+			schemeId="net.tourbook.scheme"/>
+		
+		<key
+			commandId="net.tourbook.command.PicDir.NavigateHistoryForward"
+			sequence="%Shortcut_Key_PicDir_History_Forward_OSX"
+			platform="carbon"
+			contextId="org.eclipse.ui.contexts.window"
+			schemeId="net.tourbook.scheme"/>
+
+
+		<!-- Preferences -->            
+
+		<key
+			commandId="org.eclipse.ui.window.preferences"
+			sequence="%Shortcut_Key_App_Preferences"
+			contextId="org.eclipse.ui.contexts.window"
+			schemeId="net.tourbook.scheme"/>
+  
+	</extension>
 
 
 	<!-- 

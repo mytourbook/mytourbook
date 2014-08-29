@@ -1387,7 +1387,8 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 
 	@Override
 	public void setFocus() {
-		_tourViewer.getControl().setFocus();
+
+		_tourViewer.getTree().setFocus();
 	}
 
 	/**
