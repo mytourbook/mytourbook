@@ -15,27 +15,19 @@
  *******************************************************************************/
 package net.tourbook.device;
 
-import org.eclipse.osgi.util.NLS;
+import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
+import org.eclipse.jface.preference.IPreferenceStore;
 
-public class Messages extends NLS {
+public class PreferenceInitializer extends AbstractPreferenceInitializer {
 
-	private static final String	BUNDLE_NAME	= "net.tourbook.device.messages";	//$NON-NLS-1$
+	public PreferenceInitializer() {}
 
-	public static String		FitLog_Error_InvalidStartTime;
+	@Override
+	public void initializeDefaultPreferences() {
 
-	public static String		Port_Listener_Error_ntd001;
-	public static String		Port_Listener_Error_ntd002;
+		final IPreferenceStore store = Activator.getDefault().getPreferenceStore();
 
-	public static String		PrefPage_GPX_Label_DistanceValues;
-	public static String		PrefPage_GPX_Radio_DistanceAbsolute;
-	public static String		PrefPage_GPX_Radio_DistanceAbsolute_Tooltip;
-	public static String		PrefPage_GPX_Radio_DistanceRelative;
-	public static String		PrefPage_GPX_Radio_DistanceRelative_Tooltip;
-
-	static {
-		// initialize resource bundle
-		NLS.initializeMessages(BUNDLE_NAME, Messages.class);
+		store.setDefault(IPreferences.GPX_IS_RELATIVE_DISTANCE_VALUE, true);
 	}
 
-	private Messages() {}
 }

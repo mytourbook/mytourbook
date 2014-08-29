@@ -29,11 +29,14 @@ import net.tourbook.data.TimeData;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.data.TourWayPoint;
+import net.tourbook.device.Activator;
+import net.tourbook.device.IPreferences;
 import net.tourbook.importdata.DeviceData;
 import net.tourbook.importdata.TourbookDevice;
 import net.tourbook.ui.UI;
 
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.widgets.Display;
 import org.joda.time.DateTime;
@@ -113,6 +116,8 @@ public class GPX_SAX_Handler extends DefaultHandler {
 																				"yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");			//$NON-NLS-1$
 	private static final SimpleDateFormat	GPX_TIME_FORMAT_RFC822		= new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");	//$NON-NLS-1$
 
+	private IPreferenceStore				_prefStore					= Activator.getDefault().getPreferenceStore();
+
 	private int								_gpxVersion					= -1;
 	private boolean							_gpxHasLocalTime			= false;											// To work around a Polar Websync export bug...
 
@@ -177,6 +182,9 @@ public class GPX_SAX_Handler extends DefaultHandler {
 
 	private final StringBuilder				_characters					= new StringBuilder();
 
+	private boolean							_isAbsoluteDistance;
+	private float							_gpxAbsoluteDistance;
+
 	{
 		GPX_TIME_FORMAT.setTimeZone(TimeZone.getTimeZone("UTC")); //$NON-NLS-1$
 		GPX_TIME_FORMAT_SSSZ.setTimeZone(TimeZone.getTimeZone("UTC")); //$NON-NLS-1$
@@ -205,6 +213,13 @@ public class GPX_SAX_Handler extends DefaultHandler {
 		_newlyImportedTours = newlyImportedTours;
 
 		_gpxHasLocalTime = false; // Polar exports local time :-(
+
+		/*
+		 * Relative distances are the first implementation for distance values but the
+		 * <gpxdata:distance> tags can also contain absolute values.
+		 */
+		final boolean isRelativeDistance = _prefStore.getBoolean(IPreferences.GPX_IS_RELATIVE_DISTANCE_VALUE);
+		_isAbsoluteDistance = isRelativeDistance == false;
 	}
 
 	@Override
@@ -341,8 +356,28 @@ public class GPX_SAX_Handler extends DefaultHandler {
 						// </gpxdata:distance>
 
 						_isInDistance = false;
-						_timeSlice.gpxDistance = getFloatValue(charData);
+
+						final float gpxExtDistanceValue = getFloatValue(charData);
+
+						float relativeDistanceValue;
+
+						if (_isAbsoluteDistance && gpxExtDistanceValue != Float.MIN_VALUE) {
+
+							final float oldAbsoluteDistance = _gpxAbsoluteDistance;
+							_gpxAbsoluteDistance = gpxExtDistanceValue;
+
+							relativeDistanceValue = gpxExtDistanceValue - oldAbsoluteDistance;
+
+						} else {
+
+							// this is the default, distance value is relative and correct
+
+							relativeDistanceValue = gpxExtDistanceValue;
+						}
+
+						_timeSlice.gpxDistance = relativeDistanceValue;
 					}
+
 				} else if (name.equals(TAG_TRK_NAME)) {
 
 					// </name> track name
@@ -725,8 +760,12 @@ public class GPX_SAX_Handler extends DefaultHandler {
 	}
 
 	private void initNewTrack() {
+
 		_timeDataList.clear();
+
 		_absoluteDistance = 0;
+		_gpxAbsoluteDistance = 0;
+
 		_prevTimeSlice = null;
 		_trkName = null;
 	}

@@ -15,27 +15,8 @@
  *******************************************************************************/
 package net.tourbook.device;
 
-import org.eclipse.osgi.util.NLS;
+public interface IPreferences {
 
-public class Messages extends NLS {
+	String	GPX_IS_RELATIVE_DISTANCE_VALUE	= "GPX_IS_RELATIVE_DISTANCE_VALUE"; //$NON-NLS-1$
 
-	private static final String	BUNDLE_NAME	= "net.tourbook.device.messages";	//$NON-NLS-1$
-
-	public static String		FitLog_Error_InvalidStartTime;
-
-	public static String		Port_Listener_Error_ntd001;
-	public static String		Port_Listener_Error_ntd002;
-
-	public static String		PrefPage_GPX_Label_DistanceValues;
-	public static String		PrefPage_GPX_Radio_DistanceAbsolute;
-	public static String		PrefPage_GPX_Radio_DistanceAbsolute_Tooltip;
-	public static String		PrefPage_GPX_Radio_DistanceRelative;
-	public static String		PrefPage_GPX_Radio_DistanceRelative_Tooltip;
-
-	static {
-		// initialize resource bundle
-		NLS.initializeMessages(BUNDLE_NAME, Messages.class);
-	}
-
-	private Messages() {}
 }

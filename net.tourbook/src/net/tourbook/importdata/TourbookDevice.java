@@ -238,13 +238,13 @@ public abstract class TourbookDevice implements IRawDataReader {
 	 * 
 	 * @param importFilePath
 	 * @param deviceTag
-	 *            The deviceTag starts on the second line of a xml file.
 	 * @param isRemoveBOM
 	 *            When <code>true</code> the BOM (Byte Order Mark) is removed from the file.
 	 * @return Returns <code>true</code> when the file contains content with the requested tag.
 	 */
 	protected boolean isValidXMLFile(final String importFilePath, final String deviceTag, final boolean isRemoveBOM) {
 
+		final String deviceTagLower = deviceTag.toLowerCase();
 		BufferedReader fileReader = null;
 
 		try {
@@ -263,34 +263,24 @@ public abstract class TourbookDevice implements IRawDataReader {
 			fileReader = new BufferedReader(new InputStreamReader(inputStream, UI.UTF_8));
 
 			String line = fileReader.readLine();
-			if (line == null || line.toLowerCase().startsWith(XML_START_ID) == false) {
+			if (line == null || line.toLowerCase().contains(XML_START_ID) == false) {
 				return false;
 			}
 
-			/*
-			 * skip empty lines and lines with comments
-			 */
+			final int maxLines = 100;
+			int lineCounter = 0;
+
 			while (true) {
+
+				if (line.toLowerCase().contains(deviceTagLower)) {
+					return true;
+				}
 
 				line = fileReader.readLine();
 
-				if (line == null) {
+				if (line == null || lineCounter++ > maxLines) {
 					return false;
 				}
-
-				line = line.trim();
-
-				if (line.length() != 0 && !line.startsWith(XML_COMMENT)) {
-					// this must be a line with a tag
-					break;
-				}
-			}
-
-			/*
-			 * Check if a none empty line contains the required tag
-			 */
-			if (line.toLowerCase().startsWith(deviceTag.toLowerCase()) == false) {
-				return false;
 			}
 
 		} catch (final Exception e1) {

@@ -2,6 +2,13 @@
 <?eclipse version="3.4"?>
 <plugin>
 
+	<extension	point="org.eclipse.core.runtime.preferences">
+	
+		<initializer
+			class="net.tourbook.device.PreferenceInitializer"/>
+			
+	</extension>
+
 
    <!-- Ciclo Tour -->
    <extension	point="net.tourbook.deviceDataReader">
@@ -91,6 +98,15 @@
             fileextension="gpx"
             id="net.tourbook.device.GPXDataReader"
             name="GPX"/>
+   </extension>
+
+   <extension	point="org.eclipse.ui.preferencePages">
+      <page
+            category="net.tourbook.preferences.PrefPageDataImport"
+            class="net.tourbook.device.gpx.PrefPageGPX"
+            id="net.tourbook.device.PrefPageGPX"
+            name="GPX">
+      </page>
    </extension>
 
 

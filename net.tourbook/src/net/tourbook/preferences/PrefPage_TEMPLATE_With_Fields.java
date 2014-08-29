@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2012  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -24,11 +24,11 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
-public class PrefPage_TEMPLATE extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
+public class PrefPage_TEMPLATE_With_Fields extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
 
-	public static final String	ID	= "net.tourbook.preferences.PrefPageGeneralExternalProgramsID"; //$NON-NLS-1$
+	public static final String	ID			= "net.tourbook.preferences.PrefPageGeneralExternalProgramsID"; //$NON-NLS-1$
 
-	private IPreferenceStore	_prefStore;
+	private IPreferenceStore	_prefStore	= TourbookPlugin.getPrefStore();
 
 	/*
 	 * UI controls
@@ -55,8 +55,6 @@ public class PrefPage_TEMPLATE extends FieldEditorPreferencePage implements IWor
 	}
 
 	public void init(final IWorkbench workbench) {
-
-		_prefStore = TourbookPlugin.getDefault().getPreferenceStore();
 
 		setPreferenceStore(_prefStore);
 	}
