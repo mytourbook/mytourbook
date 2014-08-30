@@ -65,7 +65,7 @@ public class FitDataReader extends TourbookDevice {
 					}
 
 					/*
-					 * Set fields which should be scriped in the log
+					 * Set fields which should NOT be displayed in the log
 					 */
 					if (fieldName.equals("") // //$NON-NLS-1$
 
@@ -75,7 +75,7 @@ public class FitDataReader extends TourbookDevice {
 							|| fieldName.equals("timestamp") //$NON-NLS-1$
 							|| fieldName.equals("event") //$NON-NLS-1$
 							|| fieldName.equals("event_type") //$NON-NLS-1$
-//							|| fieldName.equals("message_index")
+							|| fieldName.equals("message_index")
 							|| fieldName.equals("altitude") //$NON-NLS-1$
 							|| fieldName.equals("cadence") //$NON-NLS-1$
 							|| fieldName.equals("distance") //$NON-NLS-1$
@@ -105,7 +105,7 @@ public class FitDataReader extends TourbookDevice {
 							|| fieldName.equals("max_speed") //$NON-NLS-1$
 							|| fieldName.equals("total_calories") //$NON-NLS-1$
 							|| fieldName.equals("total_fat_calories") //$NON-NLS-1$
-//							|| fieldName.equals("sport") //$NON-NLS-1$
+							|| fieldName.equals("sport") //$NON-NLS-1$
 							|| fieldName.equals("start_position_lat") //$NON-NLS-1$
 							|| fieldName.equals("start_position_long") //$NON-NLS-1$
 							|| fieldName.equals("start_time") //$NON-NLS-1$
@@ -194,13 +194,14 @@ public class FitDataReader extends TourbookDevice {
 			broadcaster.addListener(new LapMesgListenerImpl(context));
 			broadcaster.addListener(new RecordMesgListenerImpl(context));
 
-//			// show debug info
+//			// START - show debug info
 //			System.out.println();
 //			System.out.println();
 //			System.out.println((System.currentTimeMillis() + " [" + getClass().getSimpleName() + "]")
 //					+ (" \t" + importFilePath));
 //			System.out.println();
 //			addDebugListener(broadcaster);
+//			// END - show debug info
 
 			broadcaster.run(fis);
 

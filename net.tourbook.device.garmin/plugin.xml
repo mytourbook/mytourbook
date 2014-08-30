@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.2"?>
 <plugin>
-   <extension
-         point="net.tourbook.deviceDataReader">
+
+   <extension	point="net.tourbook.deviceDataReader">
       <device
             class="net.tourbook.device.garmin.GarminDeviceDataReader"
             fileextension="*"
             id="net.tourbook.device.GarminDeviceReader"
             name="%device.name.0"/>
    </extension>
-   <extension
-         point="net.tourbook.externalDeviceDataReader">
+   
+   <extension	point="net.tourbook.externalDeviceDataReader">
       <device
             class="net.tourbook.device.garmin.GarminExternalDevice"
             id="net.tourbook.device.GarminExternalDeviceReader"
@@ -19,8 +19,7 @@
       </device>
    </extension>
    
-   <extension
-         point="org.eclipse.ui.preferencePages">
+   <extension	point="org.eclipse.ui.preferencePages">
       <page
             category="net.tourbook.preferences.PrefPageDataImport"
             class="net.tourbook.device.garmin.PrefPageTCX"
@@ -28,8 +27,8 @@
             name="TCX">
       </page>
    </extension>
-   <extension
-         point="org.eclipse.core.runtime.preferences">
+   
+   <extension	point="org.eclipse.core.runtime.preferences">
       <initializer
             class="net.tourbook.device.garmin.PreferenceInitializer">
       </initializer>

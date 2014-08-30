@@ -51,10 +51,6 @@ public class PrefPageGPX extends PreferencePage implements IWorkbenchPreferenceP
 	private Button				_rdoDistanceRelative;
 	private Button				_rdoDistanceAbsolute;
 
-	/*
-	 * UI controls
-	 */
-
 	@Override
 	protected Control createContents(final Composite parent) {
 

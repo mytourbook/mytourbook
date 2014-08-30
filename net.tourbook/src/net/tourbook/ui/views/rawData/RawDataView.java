@@ -31,6 +31,7 @@ import java.util.Set;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.action.ActionOpenPrefDialog;
 import net.tourbook.common.util.ColumnDefinition;
 import net.tourbook.common.util.ColumnManager;
 import net.tourbook.common.util.ITourViewer3;
@@ -47,6 +48,7 @@ import net.tourbook.database.TourDatabase;
 import net.tourbook.extension.export.ActionExport;
 import net.tourbook.importdata.RawDataManager;
 import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.preferences.PrefPageDataImport;
 import net.tourbook.tag.TagMenuManager;
 import net.tourbook.tour.ActionOpenAdjustAltitudeDialog;
 import net.tourbook.tour.ActionOpenMarkerDialog;
@@ -151,12 +153,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	public static final String				IMAGE_DATA_TRANSFER_DIRECT				= "IMAGE_DATA_TRANSFER_DIRECT";			//$NON-NLS-1$
 	public static final String				IMAGE_IMPORT							= "IMAGE_IMPORT";							//$NON-NLS-1$
 
-	private final IPreferenceStore			_prefStore								= TourbookPlugin.getDefault()//
-																							.getPreferenceStore();
-
-	private final IDialogSettings			_state									= TourbookPlugin.getDefault()//
-																							.getDialogSettingsSection(
-																									ID);
+	private final IPreferenceStore			_prefStore								= TourbookPlugin.getPrefStore();
+	private final IDialogSettings			_state									= TourbookPlugin.getState(ID);
 
 	private RawDataManager					_rawDataMgr								= RawDataManager.getInstance();
 
@@ -242,6 +240,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	private ActionSaveTourInDatabase		_actionSaveTour;
 	private ActionSaveTourInDatabase		_actionSaveTourWithPerson;
 	private ActionSetTourTypeMenu			_actionSetTourType;
+	private ActionOpenPrefDialog			_actionEditImportPreferences;
 
 	// view actions
 	private ActionRemoveToursWhenClosed		_actionRemoveToursWhenClosed;
@@ -561,37 +560,32 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 	private void createActions() {
 
-		// context menu
-		_actionSaveTour = new ActionSaveTourInDatabase(this, false);
-		_actionSaveTourWithPerson = new ActionSaveTourInDatabase(this, true);
-		_actionMergeIntoTour = new ActionMergeIntoMenu(this);
-		_actionReimportSubMenu = new ActionReimportSubMenu(this);
-		_actionRemoveTour = new ActionRemoveTour(this);
-		_actionExportTour = new ActionExport(this);
-		_actionJoinTours = new ActionJoinTours(this);
-
-		_actionEditTour = new ActionEditTour(this);
-		_actionEditQuick = new ActionEditQuick(this);
-		_actionMergeTour = new ActionMergeTour(this);
-		_actionOpenTour = new ActionOpenTour(this);
-		_actionSetTourType = new ActionSetTourTypeMenu(this);
-
-		_actionOpenMarkerDialog = new ActionOpenMarkerDialog(this, true);
-		_actionOpenAdjustAltitudeDialog = new ActionOpenAdjustAltitudeDialog(this);
-
-		_tagMenuMgr = new TagMenuManager(this, true);
-
-		// view toolbar
-		_actionClearView = new ActionClearView(this);
-
-		// view menu
-		_actionRemoveToursWhenClosed = new ActionRemoveToursWhenClosed();
 		_actionAdjustImportedYear = new ActionAdjustYear(this);
+		_actionClearView = new ActionClearView(this);
 		_actionCreateTourIdWithTime = new ActionCreateTourIdWithTime(this);
 		_actionDisableChecksumValidation = new ActionDisableChecksumValidation(this);
+		_actionEditImportPreferences = new ActionOpenPrefDialog(
+				Messages.Import_Data_Action_EditImportPreferences,
+				PrefPageDataImport.ID);
+		_actionEditTour = new ActionEditTour(this);
+		_actionEditQuick = new ActionEditQuick(this);
+		_actionExportTour = new ActionExport(this);
+		_actionJoinTours = new ActionJoinTours(this);
 		_actionMergeGPXTours = new ActionMergeGPXTours(this);
-
+		_actionMergeIntoTour = new ActionMergeIntoMenu(this);
+		_actionMergeTour = new ActionMergeTour(this);
 		_actionModifyColumns = new ActionModifyColumns(this);
+		_actionOpenTour = new ActionOpenTour(this);
+		_actionOpenMarkerDialog = new ActionOpenMarkerDialog(this, true);
+		_actionOpenAdjustAltitudeDialog = new ActionOpenAdjustAltitudeDialog(this);
+		_actionReimportSubMenu = new ActionReimportSubMenu(this);
+		_actionRemoveTour = new ActionRemoveTour(this);
+		_actionRemoveToursWhenClosed = new ActionRemoveToursWhenClosed();
+		_actionSaveTour = new ActionSaveTourInDatabase(this, false);
+		_actionSaveTourWithPerson = new ActionSaveTourInDatabase(this, true);
+		_actionSetTourType = new ActionSetTourTypeMenu(this);
+
+		_tagMenuMgr = new TagMenuManager(this, true);
 	}
 
 	@Override
@@ -1640,6 +1634,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		menuMgr.add(new Separator());
 		menuMgr.add(_actionExportTour);
 		menuMgr.add(_actionReimportSubMenu);
+		menuMgr.add(_actionEditImportPreferences);
 		menuMgr.add(_actionRemoveTour);
 
 		menuMgr.add(new Separator());
@@ -1687,11 +1682,13 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 		menuMgr.add(_actionRemoveToursWhenClosed);
 
+		// import settings
 		menuMgr.add(new Separator());
 		menuMgr.add(_actionCreateTourIdWithTime);
 		menuMgr.add(_actionMergeGPXTours);
 		menuMgr.add(_actionDisableChecksumValidation);
 		menuMgr.add(_actionAdjustImportedYear);
+		menuMgr.add(_actionEditImportPreferences);
 
 		menuMgr.add(new Separator());
 		menuMgr.add(_actionModifyColumns);

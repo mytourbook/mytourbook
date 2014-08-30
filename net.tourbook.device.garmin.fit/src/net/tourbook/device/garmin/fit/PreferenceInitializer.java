@@ -13,35 +13,21 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.preferences;
+package net.tourbook.device.garmin.fit;
 
-import net.tourbook.Messages;
+import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
+import org.eclipse.jface.preference.IPreferenceStore;
 
-import org.eclipse.jface.layout.GridDataFactory;
-import org.eclipse.jface.preference.PreferencePage;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Label;
-import org.eclipse.ui.IWorkbench;
-import org.eclipse.ui.IWorkbenchPreferencePage;
+public class PreferenceInitializer extends AbstractPreferenceInitializer {
 
-public class PrefPageDataImport extends PreferencePage implements IWorkbenchPreferencePage {
-
-	public static final String	ID	= "net.tourbook.preferences.PrefPageDataImport";	//$NON-NLS-1$
+	public PreferenceInitializer() {}
 
 	@Override
-	protected Control createContents(final Composite parent) {
+	public void initializeDefaultPreferences() {
 
-		final Label label = new Label(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().applyTo(label);
-		label.setText(Messages.Pref_DataImport_Label);
+		final IPreferenceStore store = Activator.getDefault().getPreferenceStore();
 
-		return label;
-	}
-
-	public void init(final IWorkbench workbench) {
-		noDefaultAndApplyButton();
+		store.setDefault(IPreferences.FIT_TEMPERATURE_ADJUSTMENT, 0.0f);
 	}
 
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -13,21 +13,10 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.device;
+package net.tourbook.device.garmin.fit;
 
-import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
-import org.eclipse.jface.preference.IPreferenceStore;
+public interface IPreferences {
 
-public class PreferenceInitializer extends AbstractPreferenceInitializer {
-
-	public PreferenceInitializer() {}
-
-	@Override
-	public void initializeDefaultPreferences() {
-
-		final IPreferenceStore store = Activator.getDefault().getPreferenceStore();
-
-		store.setDefault(IPreferences.GPX_IS_RELATIVE_DISTANCE_VALUE, true);
-	}
+	String	FIT_TEMPERATURE_ADJUSTMENT	= "FIT_TEMPERATURE_ADJUSTMENT"; //$NON-NLS-1$
 
 }
