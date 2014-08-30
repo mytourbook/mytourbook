@@ -82,6 +82,7 @@ import net.tourbook.srtm.GeoLon;
 import net.tourbook.srtm.NumberForm;
 import net.tourbook.tour.BreakTimeResult;
 import net.tourbook.tour.BreakTimeTool;
+import net.tourbook.tour.TourManager;
 import net.tourbook.ui.UI;
 import net.tourbook.ui.tourChart.ChartLabel;
 import net.tourbook.ui.tourChart.ChartLayer2ndAltiSerie;
@@ -3521,10 +3522,21 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		tourRecordingTime = recordingTime;
 		setTourEndTimeMS();
 
+		cleanupDataSeries();
+
+		/*
+		 * Try to get distance values from lat/long values, this must be done after the cleanup
+		 * which can set distanceSerie = null.
+		 */
+		if (distanceSerie == null) {
+			TourManager.computeDistanceValuesFromGeoPosition(this);
+		}
+
 		/*
 		 * create marker after all other data are setup
 		 */
 		if (isCreateMarker) {
+
 			for (int serieIndex = 0; serieIndex < serieSize; serieIndex++) {
 
 				final TimeData timeData = timeDataSerie[serieIndex];
@@ -3544,8 +3556,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 				}
 			}
 		}
-
-		cleanupDataSeries();
 		resetSortedMarkers();
 	}
 
