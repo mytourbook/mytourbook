@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -29,7 +29,6 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 
 /**
- * The action to delete a tour is displayed in a sub menu that it is not accidentally be run
  */
 public class ActionReimportSubMenu extends Action implements IMenuCreator {
 
@@ -38,6 +37,7 @@ public class ActionReimportSubMenu extends Action implements IMenuCreator {
 	private ActionReimportEntireTour			_actionReimportEntireTour;
 	private ActionReimportOnlyTimeSlices		_actionReimportOnlyTimeSlices;
 	private ActionReimportOnlyAltitudeValues	_actionReimportOnlyAltitudeValues;
+	private ActionReimportOnlyTemperatureValues	_actionReimportOnlyTemperatureValues;
 
 	private ITourViewer3						_tourViewer;
 
@@ -67,6 +67,19 @@ public class ActionReimportSubMenu extends Action implements IMenuCreator {
 
 	}
 
+	private class ActionReimportOnlyTemperatureValues extends Action {
+
+		public ActionReimportOnlyTemperatureValues() {
+			setText(Messages.Import_Data_Action_Reimport_OnlyTemperatureValues);
+		}
+
+		@Override
+		public void run() {
+			RawDataManager.getInstance().actionReimportTour(RawDataManager.ReImport.OnlyTemperatureValues, _tourViewer);
+		}
+
+	}
+
 	private class ActionReimportOnlyTimeSlices extends Action {
 
 		public ActionReimportOnlyTimeSlices() {
@@ -91,9 +104,11 @@ public class ActionReimportSubMenu extends Action implements IMenuCreator {
 		_actionReimportEntireTour = new ActionReimportEntireTour();
 		_actionReimportOnlyTimeSlices = new ActionReimportOnlyTimeSlices();
 		_actionReimportOnlyAltitudeValues = new ActionReimportOnlyAltitudeValues();
+		_actionReimportOnlyTemperatureValues = new ActionReimportOnlyTemperatureValues();
 	}
 
 	public void dispose() {
+
 		if (_menu != null) {
 			_menu.dispose();
 			_menu = null;
@@ -103,6 +118,7 @@ public class ActionReimportSubMenu extends Action implements IMenuCreator {
 	private void fillMenu(final Menu menu) {
 
 		new ActionContributionItem(_actionReimportOnlyAltitudeValues).fill(menu, -1);
+		new ActionContributionItem(_actionReimportOnlyTemperatureValues).fill(menu, -1);
 		new ActionContributionItem(_actionReimportOnlyTimeSlices).fill(menu, -1);
 		new ActionContributionItem(_actionReimportEntireTour).fill(menu, -1);
 	}

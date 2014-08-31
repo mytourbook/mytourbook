@@ -16,7 +16,7 @@
 	
 		<page
 			category="net.tourbook.preferences.PrefPageDataImport"
-			class="net.tourbook.device.garmin.fit.PrefPageFit"
+			class="net.tourbook.device.garmin.fit.PrefPageImportFit"
 			id="net.tourbook.device.PrefPageFit"
 			name="Fit"/>
 

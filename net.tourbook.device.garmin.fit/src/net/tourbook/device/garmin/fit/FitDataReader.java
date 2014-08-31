@@ -205,7 +205,7 @@ public class FitDataReader extends TourbookDevice {
 
 			broadcaster.run(fis);
 
-			context.processData();
+			context.finalizeTour();
 
 			returnValue = true;
 

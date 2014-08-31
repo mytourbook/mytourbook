@@ -34,11 +34,11 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
-public class PrefPageFit extends PreferencePage implements IWorkbenchPreferencePage {
+public class PrefPageImportFit extends PreferencePage implements IWorkbenchPreferencePage {
 
 	public static final String	ID					= "net.tourbook.device.PrefPageFit";			//$NON-NLS-1$
 
-	private static final String	DEGREE				= "°C";										//$NON-NLS-1$
+	private static final String	DEGREE_CELCIUS		= "°C";										//$NON-NLS-1$
 
 	private static final float	TEMPERATURE_DIGITS	= 10.0f;
 
@@ -68,7 +68,7 @@ public class PrefPageFit extends PreferencePage implements IWorkbenchPreferenceP
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+		GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
 //		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
 		{
 			createUI_10_Distance(container);
@@ -103,8 +103,8 @@ public class PrefPageFit extends PreferencePage implements IWorkbenchPreferenceP
 						.applyTo(_spinnerTemperatureAdjustment);
 				_spinnerTemperatureAdjustment.setDigits(1);
 				_spinnerTemperatureAdjustment.setPageIncrement(10);
-				_spinnerTemperatureAdjustment.setMinimum(-100);
-				_spinnerTemperatureAdjustment.setMaximum(100);
+				_spinnerTemperatureAdjustment.setMinimum(-100); // - 10.0 °C
+				_spinnerTemperatureAdjustment.setMaximum(100); // +10.0 °C
 				_spinnerTemperatureAdjustment.addMouseWheelListener(new MouseWheelListener() {
 					public void mouseScrolled(final MouseEvent event) {
 						Util.adjustSpinnerValueOnMouseScroll(event);
@@ -112,11 +112,11 @@ public class PrefPageFit extends PreferencePage implements IWorkbenchPreferenceP
 				});
 			}
 
-			// label: °
+			// label: °C
 			{
 				final Label label = new Label(group, SWT.NONE);
 				GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(label);
-				label.setText(DEGREE);
+				label.setText(DEGREE_CELCIUS);
 			}
 
 			// label: info
@@ -131,7 +131,6 @@ public class PrefPageFit extends PreferencePage implements IWorkbenchPreferenceP
 				txtInfo.setText(Messages.PrefPage_Fit_Label_AdjustTemperature_Info);
 			}
 		}
-
 	}
 
 	private void enableControls() {
@@ -152,7 +151,7 @@ public class PrefPageFit extends PreferencePage implements IWorkbenchPreferenceP
 
 		final float temperatureAdjustment = _prefStore.getDefaultFloat(IPreferences.FIT_TEMPERATURE_ADJUSTMENT);
 
-		_spinnerTemperatureAdjustment.setSelection((int) (temperatureAdjustment * temperatureAdjustment));
+		_spinnerTemperatureAdjustment.setSelection((int) (temperatureAdjustment * TEMPERATURE_DIGITS));
 
 		super.performDefaults();
 	}
@@ -173,7 +172,7 @@ public class PrefPageFit extends PreferencePage implements IWorkbenchPreferenceP
 
 		final float temperatureAdjustment = _prefStore.getFloat(IPreferences.FIT_TEMPERATURE_ADJUSTMENT);
 
-		_spinnerTemperatureAdjustment.setSelection((int) (temperatureAdjustment * temperatureAdjustment));
+		_spinnerTemperatureAdjustment.setSelection((int) (temperatureAdjustment * TEMPERATURE_DIGITS));
 	}
 
 	private void saveState() {

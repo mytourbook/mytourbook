@@ -1,0 +1,34 @@
+Version: 14.9.0                                                25.9.2014
+
+ 
+Tour Import
+===========
+
+* All import data formats
+  Compute distance values from geo positions when distance values are 
+  not available but geo positions are available.
+
+* Import Suunto 3 (.sml) files.
+ 
+* Import Suunto 2 
+  - Import laps.
+
+* Import Fit 
+  - Adjust temperature values when importing files.
+  - Reimport temperature values for existing tours.
+  
+* Import GPX
+  <gpxdata:distance> tags can contain relative or absolute distance 
+  values.
+
+  
+Other Improvements 	
+==================
+
+* 2D Map
+  - Set tour border color.
+  
+* Tour chart
+  - Set tour marker tooltip position
+  - Improved tour marker tooltip UI
+

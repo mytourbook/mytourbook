@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -26,6 +26,7 @@ public class Messages extends NLS {
 	public static String		Port_Listener_Error_ntd001;
 	public static String		Port_Listener_Error_ntd002;
 
+	public static String		PrefPage_GPX_Group_DistanceValues;
 	public static String		PrefPage_GPX_Label_DistanceValues;
 	public static String		PrefPage_GPX_Radio_DistanceAbsolute;
 	public static String		PrefPage_GPX_Radio_DistanceAbsolute_Tooltip;

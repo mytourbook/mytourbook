@@ -103,7 +103,7 @@
    <extension	point="org.eclipse.ui.preferencePages">
       <page
             category="net.tourbook.preferences.PrefPageDataImport"
-            class="net.tourbook.device.gpx.PrefPageGPX"
+            class="net.tourbook.device.gpx.PrefPageImportGPX"
             id="net.tourbook.device.PrefPageGPX"
             name="GPX">
       </page>

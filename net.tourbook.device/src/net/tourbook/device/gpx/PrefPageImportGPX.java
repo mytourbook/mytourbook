@@ -31,11 +31,12 @@ import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
-public class PrefPageGPX extends PreferencePage implements IWorkbenchPreferencePage {
+public class PrefPageImportGPX extends PreferencePage implements IWorkbenchPreferencePage {
 
 	public static final String	ID			= "net.tourbook.device.PrefPageGPX";			//$NON-NLS-1$
 
@@ -68,7 +69,7 @@ public class PrefPageGPX extends PreferencePage implements IWorkbenchPreferenceP
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+		GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
 //		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
 		{
 			createUI_10_Distance(container);
@@ -79,27 +80,37 @@ public class PrefPageGPX extends PreferencePage implements IWorkbenchPreferenceP
 
 	private void createUI_10_Distance(final Composite parent) {
 
-		// label
-		final Label label = new Label(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.BEGINNING).applyTo(label);
-		label.setText(Messages.PrefPage_GPX_Label_DistanceValues);
-
-		// radio
-		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults()//
-				.indent(_pc.convertWidthInCharsToPixels(3), 0)
-				.applyTo(container);
-		GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
+		final Group group = new Group(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(group);
+		GridLayoutFactory.swtDefaults().numColumns(2).applyTo(group);
+		group.setText(Messages.PrefPage_GPX_Group_DistanceValues);
 		{
-			_rdoDistanceRelative = new Button(container, SWT.RADIO);
-			_rdoDistanceRelative.setText(Messages.PrefPage_GPX_Radio_DistanceRelative);
-			_rdoDistanceRelative.setToolTipText(Messages.PrefPage_GPX_Radio_DistanceRelative_Tooltip);
-			_rdoDistanceRelative.addSelectionListener(_defaultSelectionListener);
+			// label
+			{
+				final Label label = new Label(group, SWT.NONE);
+				GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.BEGINNING).applyTo(label);
+				label.setText(Messages.PrefPage_GPX_Label_DistanceValues);
+			}
 
-			_rdoDistanceAbsolute = new Button(container, SWT.RADIO);
-			_rdoDistanceAbsolute.setText(Messages.PrefPage_GPX_Radio_DistanceAbsolute);
-			_rdoDistanceAbsolute.setToolTipText(Messages.PrefPage_GPX_Radio_DistanceAbsolute_Tooltip);
-			_rdoDistanceAbsolute.addSelectionListener(_defaultSelectionListener);
+			// radio
+			{
+				final Composite container = new Composite(group, SWT.NONE);
+				GridDataFactory.fillDefaults()//
+						.indent(_pc.convertWidthInCharsToPixels(3), 0)
+						.applyTo(container);
+				GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
+				{
+					_rdoDistanceRelative = new Button(container, SWT.RADIO);
+					_rdoDistanceRelative.setText(Messages.PrefPage_GPX_Radio_DistanceRelative);
+					_rdoDistanceRelative.setToolTipText(Messages.PrefPage_GPX_Radio_DistanceRelative_Tooltip);
+					_rdoDistanceRelative.addSelectionListener(_defaultSelectionListener);
+
+					_rdoDistanceAbsolute = new Button(container, SWT.RADIO);
+					_rdoDistanceAbsolute.setText(Messages.PrefPage_GPX_Radio_DistanceAbsolute);
+					_rdoDistanceAbsolute.setToolTipText(Messages.PrefPage_GPX_Radio_DistanceAbsolute_Tooltip);
+					_rdoDistanceAbsolute.addSelectionListener(_defaultSelectionListener);
+				}
+			}
 		}
 	}
 

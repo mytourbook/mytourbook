@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -332,6 +332,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		}
 
 		_rawDataMgr.removeTours(selectedTours);
+
+		_postSelectionProvider.clearSelection();
 
 		TourManager.fireEvent(TourEventId.CLEAR_DISPLAYED_TOUR, null, RawDataView.this);
 
@@ -1822,6 +1824,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	private void onSelectionChanged(final ISelection selection) {
 
 		if (!selection.isEmpty() && (selection instanceof SelectionDeletedTours)) {
+
+			_postSelectionProvider.clearSelection();
 
 			final SelectionDeletedTours tourSelection = (SelectionDeletedTours) selection;
 			final ArrayList<ITourItem> removedTours = tourSelection.removedTours;

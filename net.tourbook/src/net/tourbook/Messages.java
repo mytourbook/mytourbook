@@ -751,12 +751,16 @@ public class Messages extends NLS {
 
 	public static String		Import_Data_Action_Reimport_EntireTour;
 	public static String		Import_Data_Action_Reimport_OnlyAltitudeValues;
+	public static String	Import_Data_Action_Reimport_OnlyTemperatureValues;
+
 	public static String		Import_Data_Action_Reimport_OnlyTimeSlices;
 	public static String		Import_Data_Action_Reimport_Tour;
 	public static String		Import_Data_Action_RemoveTour;
 	public static String		Import_Data_Action_RemoveToursWhenClosed;
 	public static String		Import_Data_Dialog_ConfirmReimport_Message;
 	public static String		Import_Data_Dialog_ConfirmReimportAltitudeValues_Message;
+	public static String	Import_Data_Dialog_ConfirmReimportTemperatureValues_Message;
+
 	public static String		Import_Data_Dialog_ConfirmReimportTimeSlices_Message;
 	public static String		Import_Data_Dialog_GetAlternativePath_Message;
 	public static String		Import_Data_Dialog_GetReimportedFilePath_Message;

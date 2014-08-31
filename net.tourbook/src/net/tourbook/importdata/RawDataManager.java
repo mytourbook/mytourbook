@@ -116,20 +116,19 @@ public class RawDataManager {
 	private List<TourbookDevice>			_devicesBySortPriority;
 
 	private HashMap<String, TourbookDevice>	_devicesByExtension;
+
 	/**
 	 * Filepath from the previous reimported tour
 	 */
 	private IPath							_previousSelectedReimportFolder;
 
 	public static enum ReImport {
+
 		Tour, //
 		AllTimeSlices, //
-		OnlyAltitudeValues
+		OnlyAltitudeValues, //
+		OnlyTemperatureValues,
 	}
-
-//	public static final int					REIMPORT_TOUR						= 10;
-//	public static final int					REIMPORT_ALL_TIME_SLICES			= 20;
-//	public static final int					REIMPORT_ALTITUDE_VALUES			= 30;
 
 	private RawDataManager() {}
 
@@ -377,7 +376,7 @@ public class RawDataManager {
 			return;
 		}
 
-		if (actionReimportTour10Confirm(reimportId) == false) {
+		if (actionReimportTour_10_Confirm(reimportId) == false) {
 			return;
 		}
 
@@ -412,7 +411,7 @@ public class RawDataManager {
 
 					// this case occures when a file contains multiple tours
 
-					if (actionReimportTour30(reimportId, reimportedFile, oldTourData)) {
+					if (actionReimportTour_30(reimportId, reimportedFile, oldTourData)) {
 						isReImported = true;
 						isTourReImportedFromSameFile = true;
 					}
@@ -420,7 +419,7 @@ public class RawDataManager {
 
 				if (isTourReImportedFromSameFile == false) {
 
-					reimportedFile = actionReimportTour20GetImportFile(oldTourData);
+					reimportedFile = actionReimportTour_20_GetImportFile(oldTourData);
 
 					if (reimportedFile == null) {
 						// user canceled file dialog
@@ -429,7 +428,7 @@ public class RawDataManager {
 
 					// import file is available
 
-					if (actionReimportTour30(reimportId, reimportedFile, oldTourData)) {
+					if (actionReimportTour_30(reimportId, reimportedFile, oldTourData)) {
 						isReImported = true;
 					}
 				}
@@ -452,7 +451,7 @@ public class RawDataManager {
 		}
 	}
 
-	private boolean actionReimportTour10Confirm(final ReImport reimportTour) {
+	private boolean actionReimportTour_10_Confirm(final ReImport reimportTour) {
 
 		if (reimportTour == ReImport.Tour) {
 
@@ -526,6 +525,31 @@ public class RawDataManager {
 					return true;
 				}
 			}
+
+		} else if (reimportTour == ReImport.OnlyTemperatureValues) {
+
+			if (_prefStore.getBoolean(ITourbookPreferences.TOGGLE_STATE_REIMPORT_TEMPERATURE_VALUES)) {
+
+				return true;
+
+			} else {
+
+				final MessageDialogWithToggle dialog = MessageDialogWithToggle.openOkCancelConfirm(//
+						Display.getCurrent().getActiveShell(),//
+						Messages.import_data_dlg_reimport_title, //
+						Messages.Import_Data_Dialog_ConfirmReimportTemperatureValues_Message, //
+						Messages.App_ToggleState_DoNotShowAgain, //
+						false, // toggle default state
+						null,
+						null);
+
+				if (dialog.getReturnCode() == Window.OK) {
+					_prefStore.setValue(
+							ITourbookPreferences.TOGGLE_STATE_REIMPORT_TEMPERATURE_VALUES,
+							dialog.getToggleState());
+					return true;
+				}
+			}
 		}
 
 		return false;
@@ -535,7 +559,7 @@ public class RawDataManager {
 	 * @param tourData
 	 * @return Returns <code>null</code> when the user has canceled the file dialog.
 	 */
-	private File actionReimportTour20GetImportFile(final TourData tourData) {
+	private File actionReimportTour_20_GetImportFile(final TourData tourData) {
 
 		String reimportFilePathName = null;
 
@@ -643,7 +667,7 @@ public class RawDataManager {
 		return new File(reimportFilePathName);
 	}
 
-	private boolean actionReimportTour30(	final ReImport reimportId,
+	private boolean actionReimportTour_30(	final ReImport reimportId,
 											final File reimportedFile,
 											final TourData oldTourData) {
 
@@ -661,7 +685,7 @@ public class RawDataManager {
 			/*
 			 * tour(s) could be reimported from the file, check if it contains a valid tour
 			 */
-			TourData newTourData = actionReimportTour40(reimportId, reimportedFile, oldTourData);
+			TourData newTourData = actionReimportTour_40(reimportId, reimportedFile, oldTourData);
 
 			if (newTourData != null) {
 
@@ -715,7 +739,7 @@ public class RawDataManager {
 	 * @param oldTourData
 	 * @return Returns {@link TourData} with the reimported time slices.
 	 */
-	private TourData actionReimportTour40(	final ReImport reimportId,
+	private TourData actionReimportTour_40(	final ReImport reimportId,
 											final File reimportedFile,
 											final TourData oldTourData) {
 
@@ -744,39 +768,46 @@ public class RawDataManager {
 				continue;
 			}
 
+			TourData tourData = null;
+
 			if (reimportId == ReImport.Tour) {
 
 				// replace complete tour
 
-				/*
-				 * maintain list, that another call of this method do not find this tour again
-				 */
-				_newlyImportedTours.remove(oldTourData.getTourId());
+				tourData = reimportedTourData;
 
-				return reimportedTourData;
-
-			} else if (reimportId == ReImport.AllTimeSlices || reimportId == ReImport.OnlyAltitudeValues) {
+			} else if (reimportId == ReImport.AllTimeSlices
+					|| reimportId == ReImport.OnlyAltitudeValues
+					|| reimportId == ReImport.OnlyTemperatureValues) {
 
 				// replace part of the tour
 
-				// update device data
-				oldTourData.setDeviceFirmwareVersion(reimportedTourData.getDeviceFirmwareVersion());
-				oldTourData.setDeviceId(reimportedTourData.getDeviceId());
-				oldTourData.setDeviceName(reimportedTourData.getDeviceName());
+				if (reimportId == ReImport.AllTimeSlices || reimportId == ReImport.OnlyAltitudeValues) {
 
-				// reimport altitude
-				oldTourData.altitudeSerie = reimportedTourData.altitudeSerie;
+					// reimport altitude only
+					oldTourData.altitudeSerie = reimportedTourData.altitudeSerie;
+				}
+
+				if (reimportId == ReImport.AllTimeSlices || reimportId == ReImport.OnlyTemperatureValues) {
+
+					// reimport temperature only
+					oldTourData.temperatureSerie = reimportedTourData.temperatureSerie;
+				}
 
 				if (reimportId == ReImport.AllTimeSlices) {
 
-					// reimport all data series
+					// reimport all other data series
+
+					// update device data
+					oldTourData.setDeviceFirmwareVersion(reimportedTourData.getDeviceFirmwareVersion());
+					oldTourData.setDeviceId(reimportedTourData.getDeviceId());
+					oldTourData.setDeviceName(reimportedTourData.getDeviceName());
 
 					oldTourData.cadenceSerie = reimportedTourData.cadenceSerie;
 					oldTourData.distanceSerie = reimportedTourData.distanceSerie;
 					oldTourData.latitudeSerie = reimportedTourData.latitudeSerie;
 					oldTourData.longitudeSerie = reimportedTourData.longitudeSerie;
 					oldTourData.pulseSerie = reimportedTourData.pulseSerie;
-					oldTourData.temperatureSerie = reimportedTourData.temperatureSerie;
 					oldTourData.timeSerie = reimportedTourData.timeSerie;
 
 					/*
@@ -800,16 +831,24 @@ public class RawDataManager {
 					oldTourData.setCalories(reimportedTourData.getCalories());
 				}
 
-				oldTourData.clearComputedSeries();
+				tourData = oldTourData;
+			}
 
-				oldTourData.computeAltitudeUpDown();
-				oldTourData.computeTourDrivingTime();
-				oldTourData.computeComputedValues();
+			if (tourData != null) {
 
-				// maintain list
+				/*
+				 * compute computed values
+				 */
+				tourData.clearComputedSeries();
+
+				tourData.computeAltitudeUpDown();
+				tourData.computeTourDrivingTime();
+				tourData.computeComputedValues();
+
+				// maintain list, that another call of this method do not find this tour again
 				_newlyImportedTours.remove(oldTourData.getTourId());
 
-				return oldTourData;
+				return tourData;
 			}
 		}
 

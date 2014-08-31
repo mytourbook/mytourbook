@@ -1,8 +1,12 @@
 package net.tourbook.device.garmin.fit.listeners;
 
 import net.tourbook.data.TimeData;
+import net.tourbook.device.garmin.fit.Activator;
 import net.tourbook.device.garmin.fit.DataConverters;
 import net.tourbook.device.garmin.fit.FitContext;
+import net.tourbook.device.garmin.fit.IPreferences;
+
+import org.eclipse.jface.preference.IPreferenceStore;
 
 import com.garmin.fit.DateTime;
 import com.garmin.fit.RecordMesg;
@@ -10,8 +14,14 @@ import com.garmin.fit.RecordMesgListener;
 
 public class RecordMesgListenerImpl extends AbstractMesgListener implements RecordMesgListener {
 
+	private IPreferenceStore	_prefStore	= Activator.getDefault().getPreferenceStore();
+	private float				_temperatureAdjustment;
+
 	public RecordMesgListenerImpl(final FitContext context) {
+
 		super(context);
+
+		_temperatureAdjustment = _prefStore.getFloat(IPreferences.FIT_TEMPERATURE_ADJUSTMENT);
 	}
 
 	@Override
@@ -66,9 +76,18 @@ public class RecordMesgListenerImpl extends AbstractMesgListener implements Reco
 			timeData.power = power;
 		}
 
-		final Byte temperature = mesg.getTemperature();
-		if (temperature != null) {
-			timeData.temperature = temperature;
+		final Byte mesgTemperature = mesg.getTemperature();
+		if (mesgTemperature != null) {
+
+			if (_temperatureAdjustment != 0.0f) {
+
+				// adjust temperature when this is set in the fit pref page
+				timeData.temperature = mesgTemperature + _temperatureAdjustment;
+
+			} else {
+
+				timeData.temperature = mesgTemperature;
+			}
 		}
 
 		context.mesgRecord_20_After();
