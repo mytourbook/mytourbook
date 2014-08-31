@@ -59,7 +59,6 @@ public class PrefPageImportFit extends PreferencePage implements IWorkbenchPrefe
 		final Composite ui = createUI(parent);
 
 		restoreState();
-		enableControls();
 
 		return ui;
 	}
@@ -133,13 +132,7 @@ public class PrefPageImportFit extends PreferencePage implements IWorkbenchPrefe
 		}
 	}
 
-	private void enableControls() {
-
-	}
-
-	public void init(final IWorkbench workbench) {
-
-	}
+	public void init(final IWorkbench workbench) {}
 
 	private void initUI(final Composite parent) {
 

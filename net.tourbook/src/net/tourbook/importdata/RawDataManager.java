@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -70,11 +70,12 @@ import org.eclipse.ui.WorkbenchException;
 
 public class RawDataManager {
 
-	private static final String				RAW_DATA_LAST_SELECTED_PATH			= "raw-data-view.last-selected-import-path";	//$NON-NLS-1$
-	private static final String				TEMP_IMPORTED_FILE					= "received-device-data.txt";					//$NON-NLS-1$
+	private static final String				RAW_DATA_LAST_SELECTED_PATH			= "raw-data-view.last-selected-import-path";				//$NON-NLS-1$
+	private static final String				TEMP_IMPORTED_FILE					= "received-device-data.txt";								//$NON-NLS-1$
 
-	private final IPreferenceStore			_prefStore							= TourbookPlugin.getDefault() //
-																						.getPreferenceStore();
+	public static final int					ADJUST_IMPORT_YEAR_IS_DISABLED		= -1;
+
+	private final IPreferenceStore			_prefStore							= TourbookPlugin.getPrefStore();
 
 	private static RawDataManager			_instance							= null;
 
@@ -108,11 +109,12 @@ public class RawDataManager {
 	private boolean							_isImported;
 
 	private boolean							_isImportCanceled;
-	private int								_importSettingsImportYear			= -1;
+	//
+	private boolean							_importSettingsCreateTourIdWithTime	= RawDataView.STATE_IS_CREATE_TOUR_ID_WITH_TIME_DEFAULT;
+	private int								_importSettingsImportYear			= ADJUST_IMPORT_YEAR_IS_DISABLED;
+	private boolean							_importSettingsIsMergeTracks		= RawDataView.STATE_IS_MERGE_TRACKS_DEFAULT;
+	private boolean							_importSettingsIsChecksumValidation	= RawDataView.STATE_IS_CHECKSUM_VALIDATION_DEFAULT;
 
-	private boolean							_importSettingsIsMergeTracks;
-	private boolean							_importSettingsIsChecksumValidation	= true;
-	private boolean							_importSettingsCreateTourIdWithTime	= false;
 	private List<TourbookDevice>			_devicesBySortPriority;
 
 	private HashMap<String, TourbookDevice>	_devicesByExtension;

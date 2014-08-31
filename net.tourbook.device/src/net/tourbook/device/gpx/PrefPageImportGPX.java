@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,19 +15,21 @@
  *******************************************************************************/
 package net.tourbook.device.gpx;
 
+import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.util.Util;
 import net.tourbook.device.Activator;
 import net.tourbook.device.IPreferences;
 import net.tourbook.device.Messages;
+import net.tourbook.importdata.RawDataManager;
+import net.tourbook.ui.views.rawData.RawDataView;
 
+import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -38,19 +40,21 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 
 public class PrefPageImportGPX extends PreferencePage implements IWorkbenchPreferencePage {
 
-	public static final String	ID			= "net.tourbook.device.PrefPageGPX";			//$NON-NLS-1$
+	public static final String		ID				= "net.tourbook.device.PrefPageGPX";			//$NON-NLS-1$
 
-	private IPreferenceStore	_prefStore	= Activator.getDefault().getPreferenceStore();
+	private IPreferenceStore		_prefStore		= Activator.getDefault().getPreferenceStore();
+	private final IDialogSettings	_importState	= TourbookPlugin.getState(RawDataView.ID);
 
-	private SelectionListener	_defaultSelectionListener;
+	private RawDataManager			_rawDataMgr		= RawDataManager.getInstance();
 
-	private PixelConverter		_pc;
+	private PixelConverter			_pc;
 
 	/*
 	 * UI controls
 	 */
-	private Button				_rdoDistanceRelative;
-	private Button				_rdoDistanceAbsolute;
+	private Button					_chkOneTour;
+	private Button					_rdoDistanceRelative;
+	private Button					_rdoDistanceAbsolute;
 
 	@Override
 	protected Control createContents(final Composite parent) {
@@ -60,7 +64,6 @@ public class PrefPageImportGPX extends PreferencePage implements IWorkbenchPrefe
 		final Composite ui = createUI(parent);
 
 		restoreState();
-		enableControls();
 
 		return ui;
 	}
@@ -70,18 +73,36 @@ public class PrefPageImportGPX extends PreferencePage implements IWorkbenchPrefe
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
 		GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
-//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
 		{
-			createUI_10_Distance(container);
+			createUI_10_OneTour(container);
+			createUI_20_Distance(container);
 		}
 
 		return container;
 	}
 
-	private void createUI_10_Distance(final Composite parent) {
+	private void createUI_10_OneTour(final Composite parent) {
+
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+		{
+			// checkbox: merge all tracks into one tour
+			{
+				_chkOneTour = new Button(container, SWT.CHECK);
+				GridDataFactory.fillDefaults().span(2, 1).applyTo(_chkOneTour);
+				_chkOneTour.setText(Messages.PrefPage_GPX_Checkbox_OneTour);
+			}
+		}
+	}
+
+	private void createUI_20_Distance(final Composite parent) {
 
 		final Group group = new Group(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(group);
+		GridDataFactory.fillDefaults()//
+				.grab(true, false)
+				.indent(0, _pc.convertVerticalDLUsToPixels(4))
+				.applyTo(group);
 		GridLayoutFactory.swtDefaults().numColumns(2).applyTo(group);
 		group.setText(Messages.PrefPage_GPX_Group_DistanceValues);
 		{
@@ -103,58 +124,29 @@ public class PrefPageImportGPX extends PreferencePage implements IWorkbenchPrefe
 					_rdoDistanceRelative = new Button(container, SWT.RADIO);
 					_rdoDistanceRelative.setText(Messages.PrefPage_GPX_Radio_DistanceRelative);
 					_rdoDistanceRelative.setToolTipText(Messages.PrefPage_GPX_Radio_DistanceRelative_Tooltip);
-					_rdoDistanceRelative.addSelectionListener(_defaultSelectionListener);
 
 					_rdoDistanceAbsolute = new Button(container, SWT.RADIO);
 					_rdoDistanceAbsolute.setText(Messages.PrefPage_GPX_Radio_DistanceAbsolute);
 					_rdoDistanceAbsolute.setToolTipText(Messages.PrefPage_GPX_Radio_DistanceAbsolute_Tooltip);
-					_rdoDistanceAbsolute.addSelectionListener(_defaultSelectionListener);
 				}
 			}
 		}
 	}
 
-	private void enableControls() {
-
-	}
-
-	public void init(final IWorkbench workbench) {
-
-	}
+	public void init(final IWorkbench workbench) {}
 
 	private void initUI(final Composite parent) {
 
 		_pc = new PixelConverter(parent);
-
-		_defaultSelectionListener = new SelectionAdapter() {
-
-			@Override
-			public void widgetSelected(final SelectionEvent e) {
-				onModify();
-			}
-		};
-	}
-
-	@Override
-	public boolean okToLeave() {
-
-		return super.okToLeave();
-	}
-
-	private void onModify() {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	protected void performApply() {
-
-		super.performApply();
 	}
 
 	@Override
 	protected void performDefaults() {
 
+		// merge all tracks into one tour
+		_chkOneTour.setSelection(RawDataView.STATE_IS_MERGE_TRACKS_DEFAULT);
+
+		// relative/absolute distance
 		final boolean isRelativeDistance = _prefStore.getDefaultBoolean(IPreferences.GPX_IS_RELATIVE_DISTANCE_VALUE);
 
 		_rdoDistanceAbsolute.setSelection(isRelativeDistance == false);
@@ -167,10 +159,9 @@ public class PrefPageImportGPX extends PreferencePage implements IWorkbenchPrefe
 	public boolean performOk() {
 
 		final boolean isOK = super.performOk();
+
 		if (isOK) {
-
 			saveState();
-
 		}
 
 		return isOK;
@@ -178,6 +169,14 @@ public class PrefPageImportGPX extends PreferencePage implements IWorkbenchPrefe
 
 	private void restoreState() {
 
+		// merge all tracks into one tour
+		final boolean isMergeIntoOneTour = Util.getStateBoolean(
+				_importState,
+				RawDataView.STATE_IS_MERGE_TRACKS,
+				RawDataView.STATE_IS_MERGE_TRACKS_DEFAULT);
+		_chkOneTour.setSelection(isMergeIntoOneTour);
+
+		// relative/absolute distance
 		final boolean isRelativeDistance = _prefStore.getBoolean(IPreferences.GPX_IS_RELATIVE_DISTANCE_VALUE);
 
 		_rdoDistanceAbsolute.setSelection(isRelativeDistance == false);
@@ -186,6 +185,12 @@ public class PrefPageImportGPX extends PreferencePage implements IWorkbenchPrefe
 
 	private void saveState() {
 
+		// merge all tracks into one tour
+		final boolean isMergeIntoOneTour = _chkOneTour.getSelection();
+		_importState.put(RawDataView.STATE_IS_MERGE_TRACKS, isMergeIntoOneTour);
+		_rawDataMgr.setMergeTracks(isMergeIntoOneTour);
+
+		// relative/absolute distance
 		_prefStore.setValue(IPreferences.GPX_IS_RELATIVE_DISTANCE_VALUE, _rdoDistanceRelative.getSelection());
 	}
 }

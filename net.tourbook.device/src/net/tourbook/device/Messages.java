@@ -19,19 +19,30 @@ import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS {
 
-	private static final String	BUNDLE_NAME	= "net.tourbook.device.messages";	//$NON-NLS-1$
+	private static final String	BUNDLE_NAME	= "net.tourbook.device.messages";		//$NON-NLS-1$
 
 	public static String		FitLog_Error_InvalidStartTime;
 
 	public static String		Port_Listener_Error_ntd001;
 	public static String		Port_Listener_Error_ntd002;
 
+	public static String		PrefPage_GPX_Checkbox_OneTour;
 	public static String		PrefPage_GPX_Group_DistanceValues;
+	public static String		PrefPage_GPX_Group_GPXImport;
 	public static String		PrefPage_GPX_Label_DistanceValues;
 	public static String		PrefPage_GPX_Radio_DistanceAbsolute;
 	public static String		PrefPage_GPX_Radio_DistanceAbsolute_Tooltip;
 	public static String		PrefPage_GPX_Radio_DistanceRelative;
 	public static String		PrefPage_GPX_Radio_DistanceRelative_Tooltip;
+
+	public static String		PrefPage_HAC4_Checkbox_DisableChecksumValidation;
+	public static String		PrefPage_HAC4_Group;
+
+	public static String	PrefPage_HAC45_Checkbox_AdjustImportYear;
+
+	public static String	PrefPage_HAC45_Group;
+
+	public static String	PrefPage_HAC45_Label_ImportYear;
 
 	static {
 		// initialize resource bundle

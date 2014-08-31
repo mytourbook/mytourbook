@@ -1107,6 +1107,14 @@ public class Messages extends NLS {
 	public static String		Pref_TourTypes_root_title;
 	public static String		Pref_TourTypes_Title;
 
+	public static String	PrefPage_Import_Checkbox_CreateTourIdWithTime;
+
+	public static String	PrefPage_Import_Checkbox_CreateTourIdWithTime_Tooltip;
+
+	public static String	PrefPage_Import_Group_CommonSettings;
+
+	public static String	PrefPage_Import_Label_Info;
+
 	public static String		PrefPage_ViewActions_Group;
 	public static String		PrefPage_ViewActions_Label_DoubleClick;
 	public static String		PrefPage_ViewActions_Label_DoubleClick_AdjustAltitude;

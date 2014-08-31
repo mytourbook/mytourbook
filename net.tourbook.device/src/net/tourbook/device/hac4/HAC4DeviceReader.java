@@ -33,6 +33,7 @@ import net.tourbook.data.TimeData;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourType;
 import net.tourbook.importdata.DeviceData;
+import net.tourbook.importdata.RawDataManager;
 import net.tourbook.importdata.SerialParameters;
 import net.tourbook.importdata.TourbookDevice;
 import net.tourbook.ui.UI;
@@ -211,7 +212,7 @@ public class HAC4DeviceReader extends TourbookDevice {
 			 * might be not correct but there is no other way to get the year
 			 */
 			short tourYear = hac4DeviceData.transferYear;
-			if (importYear != -1) {
+			if (importYear != RawDataManager.ADJUST_IMPORT_YEAR_IS_DISABLED) {
 				tourYear = (short) importYear;
 			}
 

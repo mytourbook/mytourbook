@@ -21,7 +21,7 @@
    
    <extension	point="org.eclipse.ui.preferencePages">
       <page
-            category="net.tourbook.preferences.PrefPageDataImport"
+            category="net.tourbook.preferences.PrefPageImport"
             class="net.tourbook.device.garmin.PrefPageTCX"
             id="net.tourbook.device.garmin.prefPage"
             name="TCX">
