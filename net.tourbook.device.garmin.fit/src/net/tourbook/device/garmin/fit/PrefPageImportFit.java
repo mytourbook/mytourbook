@@ -38,7 +38,7 @@ public class PrefPageImportFit extends PreferencePage implements IWorkbenchPrefe
 
 	public static final String	ID					= "net.tourbook.device.PrefPageFit";			//$NON-NLS-1$
 
-	private static final String	DEGREE_CELCIUS		= "°C";										//$NON-NLS-1$
+	private static final String	DEGREE_CELCIUS		= "\u0394 °C";									//$NON-NLS-1$
 
 	private static final float	TEMPERATURE_DIGITS	= 10.0f;
 
@@ -125,7 +125,7 @@ public class PrefPageImportFit extends PreferencePage implements IWorkbenchPrefe
 						.span(3, 1)
 						.grab(true, false)
 						.hint(_pc.convertWidthInCharsToPixels(50), SWT.DEFAULT)
-						.indent(-3, 0)
+						.indent(-3, _pc.convertVerticalDLUsToPixels(4))
 						.applyTo(txtInfo);
 				txtInfo.setText(Messages.PrefPage_Fit_Label_AdjustTemperature_Info);
 			}

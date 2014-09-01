@@ -75,7 +75,7 @@ public class FitDataReader extends TourbookDevice {
 							|| fieldName.equals("timestamp") //$NON-NLS-1$
 							|| fieldName.equals("event") //$NON-NLS-1$
 							|| fieldName.equals("event_type") //$NON-NLS-1$
-							|| fieldName.equals("message_index")
+							|| fieldName.equals("message_index") //$NON-NLS-1$
 							|| fieldName.equals("altitude") //$NON-NLS-1$
 							|| fieldName.equals("cadence") //$NON-NLS-1$
 							|| fieldName.equals("distance") //$NON-NLS-1$

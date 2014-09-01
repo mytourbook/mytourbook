@@ -28,7 +28,6 @@ public class Messages extends NLS {
 
 	public static String		PrefPage_GPX_Checkbox_OneTour;
 	public static String		PrefPage_GPX_Group_DistanceValues;
-	public static String		PrefPage_GPX_Group_GPXImport;
 	public static String		PrefPage_GPX_Label_DistanceValues;
 	public static String		PrefPage_GPX_Radio_DistanceAbsolute;
 	public static String		PrefPage_GPX_Radio_DistanceAbsolute_Tooltip;
@@ -38,11 +37,9 @@ public class Messages extends NLS {
 	public static String		PrefPage_HAC4_Checkbox_DisableChecksumValidation;
 	public static String		PrefPage_HAC4_Group;
 
-	public static String	PrefPage_HAC45_Checkbox_AdjustImportYear;
-
-	public static String	PrefPage_HAC45_Group;
-
-	public static String	PrefPage_HAC45_Label_ImportYear;
+	public static String		PrefPage_HAC45_Checkbox_AdjustImportYear;
+	public static String		PrefPage_HAC45_Group;
+	public static String		PrefPage_HAC45_Label_ImportYear;
 
 	static {
 		// initialize resource bundle

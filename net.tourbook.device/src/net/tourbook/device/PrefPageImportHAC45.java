@@ -137,9 +137,9 @@ public class PrefPageImportHAC45 extends PreferencePage implements IWorkbenchPre
 				GridDataFactory.fillDefaults() //
 						.align(SWT.BEGINNING, SWT.FILL)
 						.applyTo(_spinnerImportYear);
-				_spinnerImportYear.setPageIncrement(1);
-				_spinnerImportYear.setMinimum(1970);
+				_spinnerImportYear.setPageIncrement(10);
 				_spinnerImportYear.setMaximum(3000);
+				_spinnerImportYear.setMinimum(1800);
 				_spinnerImportYear.addMouseWheelListener(new MouseWheelListener() {
 					public void mouseScrolled(final MouseEvent event) {
 						Util.adjustSpinnerValueOnMouseScroll(event);
@@ -173,6 +173,8 @@ public class PrefPageImportHAC45 extends PreferencePage implements IWorkbenchPre
 		// HAC 4/5: adjust import year, this value is never saved in a state
 		_chkAdjustImportYear.setSelection(false);
 		_spinnerImportYear.setSelection(new DateTime().getYear());
+
+		enableControls();
 
 		super.performDefaults();
 	}
