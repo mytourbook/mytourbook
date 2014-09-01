@@ -1,4 +1,4 @@
-Version: 14.9.0                                                25.9.2014
+Version: 14.9.0                                                 6.9.2014
 
  
 Tour Import
@@ -20,6 +20,8 @@ Tour Import
 * Import GPX
   <gpxdata:distance> tags can contain relative or absolute distance 
   values.
+  
+* Moved all import setting into the import preferences dialog.
 
   
 Other Improvements 	
@@ -31,4 +33,11 @@ Other Improvements
 * Tour chart
   - Set tour marker tooltip position
   - Improved tour marker tooltip UI
+  
+
+Fixed Regression Bug
+====================
+
+* All .xml import formats failed when the <xml> tag and other tags are
+  on the same line.
 
