@@ -51,7 +51,7 @@ public class PrefPageImport extends PreferencePage implements IWorkbenchPreferen
 	 */
 	private Button					_chkCreateTourIdWithTime;
 
-	private Label					_lblIdInfo;
+	private Label					_txtIdInfo;
 
 	@Override
 	protected Control createContents(final Composite parent) {
@@ -94,14 +94,15 @@ public class PrefPageImport extends PreferencePage implements IWorkbenchPreferen
 				});
 			}
 
-			// label: id info
+			// text: id info
 			{
-				_lblIdInfo = new Label(container, SWT.WRAP);
+				_txtIdInfo = new Label(container, SWT.WRAP | SWT.READ_ONLY);
 				GridDataFactory.fillDefaults()//
+						.grab(true, false)
 						.indent(_pc.convertWidthInCharsToPixels(3), 0)
-						.hint(_pc.convertWidthInCharsToPixels(72), SWT.DEFAULT)
-						.applyTo(_lblIdInfo);
-				_lblIdInfo.setText(Messages.PrefPage_Import_Checkbox_CreateTourIdWithTime_Tooltip);
+						.hint(_pc.convertWidthInCharsToPixels(40), SWT.DEFAULT)
+						.applyTo(_txtIdInfo);
+				_txtIdInfo.setText(Messages.PrefPage_Import_Checkbox_CreateTourIdWithTime_Tooltip);
 			}
 		}
 
@@ -112,7 +113,7 @@ public class PrefPageImport extends PreferencePage implements IWorkbenchPreferen
 
 		final boolean isTourIdWithTime = _chkCreateTourIdWithTime.getSelection();
 
-		_lblIdInfo.setEnabled(isTourIdWithTime);
+		_txtIdInfo.setEnabled(isTourIdWithTime);
 	}
 
 	public void init(final IWorkbench workbench) {

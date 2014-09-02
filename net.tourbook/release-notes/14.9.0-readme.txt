@@ -4,9 +4,11 @@ Version: 14.9.0                                                 6.9.2014
 Tour Import
 ===========
 
-* All import data formats
-  Compute distance values from geo positions when distance values are 
-  not available but geo positions are available.
+* Common
+  - Compute distance values (for all supported import data formats)
+    from geo positions when distance values are not available but geo
+    positions are available.
+  - Moved all import setting into the import preferences dialog.
 
 * Import Suunto 3 (.sml) files.
  
@@ -14,14 +16,13 @@ Tour Import
   - Import laps.
 
 * Import Fit 
-  - Adjust temperature values when importing files.
+  - Rectify temperature values when importing files.
   - Reimport temperature values for existing tours.
   
 * Import GPX
   <gpxdata:distance> tags can contain relative or absolute distance 
   values.
   
-* Moved all import setting into the import preferences dialog.
 
   
 Other Improvements 	

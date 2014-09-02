@@ -30,7 +30,6 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Spinner;
-import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
@@ -120,14 +119,14 @@ public class PrefPageImportFit extends PreferencePage implements IWorkbenchPrefe
 
 			// label: info
 			{
-				final Text txtInfo = new Text(group, SWT.WRAP | SWT.READ_ONLY);
+				final Label lblInfo = new Label(group, SWT.WRAP);
 				GridDataFactory.fillDefaults()//
 						.span(3, 1)
 						.grab(true, false)
-						.hint(_pc.convertWidthInCharsToPixels(50), SWT.DEFAULT)
-						.indent(-3, _pc.convertVerticalDLUsToPixels(4))
-						.applyTo(txtInfo);
-				txtInfo.setText(Messages.PrefPage_Fit_Label_AdjustTemperature_Info);
+						.hint(_pc.convertWidthInCharsToPixels(40), SWT.DEFAULT)
+						.indent(0, _pc.convertVerticalDLUsToPixels(4))
+						.applyTo(lblInfo);
+				lblInfo.setText(Messages.PrefPage_Fit_Label_AdjustTemperature_Info);
 			}
 		}
 	}
