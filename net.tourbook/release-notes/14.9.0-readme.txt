@@ -1,44 +1,52 @@
 Version: 14.9.0                                                 6.9.2014
 
+New 	
+===
+
+* Import Suunto 3 .sml files.
+
  
-Tour Import
-===========
+Import Improvements 	
+===================
 
-* Common
-  - Compute distance values (for all supported import data formats)
-    from geo positions when distance values are not available but geo
-    positions are available.
-  - Moved all import setting into the import preferences dialog.
-
-* Import Suunto 3 (.sml) files.
- 
-* Import Suunto 2 
-  - Import laps.
-
-* Import Fit 
+* Fit import
   - Rectify temperature values when importing files.
   - Reimport temperature values for existing tours.
-  
-* Import GPX
-  <gpxdata:distance> tags can contain relative or absolute distance 
-  values.
-  
+    
+* GPX import
+  - <gpxdata:distance> tags can contain relative or absolute distance 
+    values.
 
-  
-Other Improvements 	
+* Suunto 2 import
+  - Import laps in Suunto 2 .xml files.
+    
+* Common
+  - Compute distance values from geo positions when distance values are 
+    not available.
+  - Moved all import setting from the import view menu into the import 
+    preference dialog.
+
+ 
+Other Improvements
 ==================
 
-* 2D Map
+* 2D map
   - Set tour border color.
   
 * Tour chart
-  - Set tour marker tooltip position
-  - Improved tour marker tooltip UI
-  
+  - Set position for the tour marker tooltip.
+  - Improved UI in the tour marker tooltip.
 
-Fixed Regression Bug
-====================
+ 
+Fixed Bug 	
+=========
 
-* All .xml import formats failed when the <xml> tag and other tags are
-  on the same line.
+* The import of any .xml formats failed when the <xml... tag and other 
+  tags are on the same line.
 
+
+This Website
+============	
+
+* Menu UI refresh.
+* Set style for tables which list actions, properties...
