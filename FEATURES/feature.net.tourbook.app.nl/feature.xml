@@ -2,7 +2,7 @@
 <feature
       id="feature.net.tourbook.app.nl"
       label="MyTourbook Language Support"
-      version="14.8.2.qualifier"
+      version="14.9.0.qualifier"
       provider-name="MyTourbook"
       plugin="net.tourbook.branding">
 
@@ -27,6 +27,7 @@
       <import plugin="net.tourbook.common"/>
       <import plugin="net.tourbook.device"/>
       <import plugin="net.tourbook.device.garmin"/>
+      <import plugin="net.tourbook.device.garmin.fit"/>
       <import plugin="net.tourbook.device.nmea"/>
       <import plugin="net.tourbook"/>
       <import plugin="net.tourbook.printing"/>
@@ -60,6 +61,14 @@
 
    <plugin
          id="net.tourbook.device.garmin.nl"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         fragment="true"
+         unpack="false"/>
+
+   <plugin
+         id="net.tourbook.device.garmin.fit.nl"
          download-size="0"
          install-size="0"
          version="0.0.0"

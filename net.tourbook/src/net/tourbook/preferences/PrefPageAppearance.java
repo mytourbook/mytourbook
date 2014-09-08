@@ -98,16 +98,16 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
 		GridLayoutFactory.fillDefaults().spacing(5, 15).applyTo(container);
 		{
 
-			createUI10Tagging(container);
-			createUI20RecentEntries(container);
-			createUI30MemoryMonitor(container);
-			createUI40ResetAllToggleDialogs(container);
+			createUI_10_Tagging(container);
+			createUI_20_RecentEntries(container);
+			createUI_30_MemoryMonitor(container);
+			createUI_40_ResetAllToggleDialogs(container);
 		}
 
 		return container;
 	}
 
-	private void createUI10Tagging(final Composite parent) {
+	private void createUI_10_Tagging(final Composite parent) {
 
 		final Group group = new Group(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(group);
@@ -183,7 +183,7 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
 		}
 	}
 
-	private void createUI20RecentEntries(final Composite parent) {
+	private void createUI_20_RecentEntries(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
@@ -214,14 +214,14 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
 	/**
 	 * memory monitor
 	 */
-	private void createUI30MemoryMonitor(final Composite parent) {
+	private void createUI_30_MemoryMonitor(final Composite parent) {
 
 		_chkMemMonitor = new Button(parent, SWT.CHECK);
 		GridDataFactory.fillDefaults().indent(0, 10).applyTo(_chkMemMonitor);
 		_chkMemMonitor.setText(Messages.pref_appearance_showMemoryMonitor);
 	}
 
-	private void createUI40ResetAllToggleDialogs(final Composite parent) {
+	private void createUI_40_ResetAllToggleDialogs(final Composite parent) {
 
 		_btnResetAllToggleDialogs = new Button(parent, SWT.PUSH);
 		GridDataFactory.fillDefaults()//
@@ -291,6 +291,7 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
 
 		_prefStore.setValue(ITourbookPreferences.TOGGLE_STATE_REIMPORT_ALL_TIME_SLICES, false);
 		_prefStore.setValue(ITourbookPreferences.TOGGLE_STATE_REIMPORT_ALTITUDE_VALUES, false);
+		_prefStore.setValue(ITourbookPreferences.TOGGLE_STATE_REIMPORT_TEMPERATURE_VALUES, false);
 		_prefStore.setValue(ITourbookPreferences.TOGGLE_STATE_REIMPORT_TOUR, false);
 		_prefStore.setValue(ITourbookPreferences.TOGGLE_STATE_SHOW_HISTORY_TOUR_SAVE_WARNING, false);
 		_prefStore.setValue(ITourbookPreferences.TOGGLE_STATE_SHOW_STAR_RATING_SAVE_WARNING, false);

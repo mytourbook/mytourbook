@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -31,6 +31,7 @@ import java.util.Set;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.action.ActionOpenPrefDialog;
 import net.tourbook.common.util.ColumnDefinition;
 import net.tourbook.common.util.ColumnManager;
 import net.tourbook.common.util.ITourViewer3;
@@ -47,6 +48,7 @@ import net.tourbook.database.TourDatabase;
 import net.tourbook.extension.export.ActionExport;
 import net.tourbook.importdata.RawDataManager;
 import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.preferences.PrefPageImport;
 import net.tourbook.tag.TagMenuManager;
 import net.tourbook.tour.ActionOpenAdjustAltitudeDialog;
 import net.tourbook.tour.ActionOpenMarkerDialog;
@@ -132,33 +134,33 @@ import org.eclipse.ui.part.ViewPart;
  */
 public class RawDataView extends ViewPart implements ITourProviderAll, ITourViewer3 {
 
-	public static final String				ID										= "net.tourbook.views.rawData.RawDataView"; //$NON-NLS-1$
+	public static final String				ID											= "net.tourbook.views.rawData.RawDataView"; //$NON-NLS-1$
 
-	public static final int					COLUMN_DATE								= 0;
-	public static final int					COLUMN_TITLE							= 1;
-	public static final int					COLUMN_DATA_FORMAT						= 2;
-	public static final int					COLUMN_FILE_NAME						= 3;
+	public static final int					COLUMN_DATE									= 0;
+	public static final int					COLUMN_TITLE								= 1;
+	public static final int					COLUMN_DATA_FORMAT							= 2;
+	public static final int					COLUMN_FILE_NAME							= 3;
 
-	private static final String				STATE_IMPORTED_FILENAMES				= "importedFilenames";						//$NON-NLS-1$
-	private static final String				STATE_SELECTED_TOUR_INDICES				= "SelectedTourIndices";					//$NON-NLS-1$
+	private static final String				STATE_IMPORTED_FILENAMES					= "importedFilenames";						//$NON-NLS-1$
+	private static final String				STATE_SELECTED_TOUR_INDICES					= "SelectedTourIndices";					//$NON-NLS-1$
 
-	private static final String				STATE_IS_REMOVE_TOURS_WHEN_VIEW_CLOSED	= "STATE_IS_REMOVE_TOURS_WHEN_VIEW_CLOSED"; //$NON-NLS-1$
-	private static final String				STATE_IS_MERGE_TRACKS					= "isMergeTracks";							//$NON-NLS-1$
-	private static final String				STATE_IS_CHECKSUM_VALIDATION			= "isChecksumValidation";					//$NON-NLS-1$
-	private static final String				STATE_IS_CREATE_TOUR_ID_WITH_TIME		= "isCreateTourIdWithTime";				//$NON-NLS-1$
+	private static final String				STATE_IS_REMOVE_TOURS_WHEN_VIEW_CLOSED		= "STATE_IS_REMOVE_TOURS_WHEN_VIEW_CLOSED"; //$NON-NLS-1$
 
-	public static final String				IMAGE_DATA_TRANSFER						= "IMAGE_DATA_TRANSFER";					//$NON-NLS-1$
-	public static final String				IMAGE_DATA_TRANSFER_DIRECT				= "IMAGE_DATA_TRANSFER_DIRECT";			//$NON-NLS-1$
-	public static final String				IMAGE_IMPORT							= "IMAGE_IMPORT";							//$NON-NLS-1$
+	public static final String				STATE_IS_MERGE_TRACKS						= "isMergeTracks";							//$NON-NLS-1$
+	public static final boolean				STATE_IS_MERGE_TRACKS_DEFAULT				= false;
+	public static final String				STATE_IS_CHECKSUM_VALIDATION				= "isChecksumValidation";					//$NON-NLS-1$
+	public static final boolean				STATE_IS_CHECKSUM_VALIDATION_DEFAULT		= true;
+	public static final String				STATE_IS_CREATE_TOUR_ID_WITH_TIME			= "isCreateTourIdWithTime";				//$NON-NLS-1$
+	public static final boolean				STATE_IS_CREATE_TOUR_ID_WITH_TIME_DEFAULT	= false;
 
-	private final IPreferenceStore			_prefStore								= TourbookPlugin.getDefault()//
-																							.getPreferenceStore();
+	public static final String				IMAGE_DATA_TRANSFER							= "IMAGE_DATA_TRANSFER";					//$NON-NLS-1$
+	public static final String				IMAGE_DATA_TRANSFER_DIRECT					= "IMAGE_DATA_TRANSFER_DIRECT";			//$NON-NLS-1$
+	public static final String				IMAGE_IMPORT								= "IMAGE_IMPORT";							//$NON-NLS-1$
 
-	private final IDialogSettings			_state									= TourbookPlugin.getDefault()//
-																							.getDialogSettingsSection(
-																									ID);
+	private final IPreferenceStore			_prefStore									= TourbookPlugin.getPrefStore();
+	private final IDialogSettings			_state										= TourbookPlugin.getState(ID);
 
-	private RawDataManager					_rawDataMgr								= RawDataManager.getInstance();
+	private RawDataManager					_rawDataMgr									= RawDataManager.getInstance();
 
 	private PostSelectionProvider			_postSelectionProvider;
 	private IPartListener2					_partListener;
@@ -169,23 +171,26 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	protected TourPerson					_activePerson;
 	protected TourPerson					_newActivePerson;
 
-	protected boolean						_isPartVisible							= false;
-	protected boolean						_isViewerPersonDataDirty				= false;
+	protected boolean						_isPartVisible								= false;
+	protected boolean						_isViewerPersonDataDirty					= false;
 
 	private ColumnManager					_columnManager;
 
-	private final Calendar					_calendar								= GregorianCalendar.getInstance();
+	private final Calendar					_calendar									= GregorianCalendar
+																								.getInstance();
 
-	private final DateFormat				_dateFormatter							= DateFormat
-																							.getDateInstance(DateFormat.SHORT);
-	private final DateFormat				_timeFormatter							= DateFormat
-																							.getTimeInstance(DateFormat.SHORT);
-	private final DateFormat				_durationFormatter						= DateFormat.getTimeInstance(
-																							DateFormat.SHORT,
-																							Locale.GERMAN);
+	private final DateFormat				_dateFormatter								= DateFormat
+																								.getDateInstance(DateFormat.SHORT);
+	private final DateFormat				_timeFormatter								= DateFormat
+																								.getTimeInstance(DateFormat.SHORT);
+	private final DateFormat				_durationFormatter							= DateFormat.getTimeInstance(
+																								DateFormat.SHORT,
+																								Locale.GERMAN);
 
-	private final NumberFormat				_nf1									= NumberFormat.getNumberInstance();
-	private final NumberFormat				_nf3									= NumberFormat.getNumberInstance();
+	private final NumberFormat				_nf1										= NumberFormat
+																								.getNumberInstance();
+	private final NumberFormat				_nf3										= NumberFormat
+																								.getNumberInstance();
 	{
 		_nf1.setMinimumFractionDigits(1);
 		_nf1.setMaximumFractionDigits(1);
@@ -199,7 +204,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	private boolean							_isToolTipInTags;
 
 	private TagMenuManager					_tagMenuMgr;
-	private TourDoubleClickState			_tourDoubleClickState					= new TourDoubleClickState();
+	private TourDoubleClickState			_tourDoubleClickState						= new TourDoubleClickState();
 
 	/*
 	 * resources
@@ -237,6 +242,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	private ActionOpenTour					_actionOpenTour;
 	private ActionOpenMarkerDialog			_actionOpenMarkerDialog;
 	private ActionOpenAdjustAltitudeDialog	_actionOpenAdjustAltitudeDialog;
+	private ActionOpenPrefDialog			_actionEditImportPreferences;
 	private ActionReimportSubMenu			_actionReimportSubMenu;
 	private ActionRemoveTour				_actionRemoveTour;
 	private ActionSaveTourInDatabase		_actionSaveTour;
@@ -245,10 +251,10 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 	// view actions
 	private ActionRemoveToursWhenClosed		_actionRemoveToursWhenClosed;
-	private ActionAdjustYear				_actionAdjustImportedYear;
-	private ActionCreateTourIdWithTime		_actionCreateTourIdWithTime;
-	private ActionDisableChecksumValidation	_actionDisableChecksumValidation;
-	private ActionMergeGPXTours				_actionMergeGPXTours;
+//	private ActionAdjustYear				_actionAdjustImportedYear;
+//	private ActionCreateTourIdWithTime		_actionCreateTourIdWithTime;
+//	private ActionDisableChecksumValidation	_actionDisableChecksumValidation;
+//	private ActionMergeGPXTours				_actionMergeGPXTours;
 
 	private TableViewerTourInfoToolTip		_tourInfoToolTip;
 
@@ -333,6 +339,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		}
 
 		_rawDataMgr.removeTours(selectedTours);
+
+		_postSelectionProvider.clearSelection();
 
 		TourManager.fireEvent(TourEventId.CLEAR_DISPLAYED_TOUR, null, RawDataView.this);
 
@@ -561,37 +569,28 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 	private void createActions() {
 
-		// context menu
-		_actionSaveTour = new ActionSaveTourInDatabase(this, false);
-		_actionSaveTourWithPerson = new ActionSaveTourInDatabase(this, true);
-		_actionMergeIntoTour = new ActionMergeIntoMenu(this);
-		_actionReimportSubMenu = new ActionReimportSubMenu(this);
-		_actionRemoveTour = new ActionRemoveTour(this);
-		_actionExportTour = new ActionExport(this);
-		_actionJoinTours = new ActionJoinTours(this);
-
+		_actionClearView = new ActionClearView(this);
+		_actionEditImportPreferences = new ActionOpenPrefDialog(
+				Messages.Import_Data_Action_EditImportPreferences,
+				PrefPageImport.ID);
 		_actionEditTour = new ActionEditTour(this);
 		_actionEditQuick = new ActionEditQuick(this);
+		_actionExportTour = new ActionExport(this);
+		_actionJoinTours = new ActionJoinTours(this);
+		_actionMergeIntoTour = new ActionMergeIntoMenu(this);
 		_actionMergeTour = new ActionMergeTour(this);
+		_actionModifyColumns = new ActionModifyColumns(this);
 		_actionOpenTour = new ActionOpenTour(this);
-		_actionSetTourType = new ActionSetTourTypeMenu(this);
-
 		_actionOpenMarkerDialog = new ActionOpenMarkerDialog(this, true);
 		_actionOpenAdjustAltitudeDialog = new ActionOpenAdjustAltitudeDialog(this);
+		_actionReimportSubMenu = new ActionReimportSubMenu(this);
+		_actionRemoveTour = new ActionRemoveTour(this);
+		_actionRemoveToursWhenClosed = new ActionRemoveToursWhenClosed();
+		_actionSaveTour = new ActionSaveTourInDatabase(this, false);
+		_actionSaveTourWithPerson = new ActionSaveTourInDatabase(this, true);
+		_actionSetTourType = new ActionSetTourTypeMenu(this);
 
 		_tagMenuMgr = new TagMenuManager(this, true);
-
-		// view toolbar
-		_actionClearView = new ActionClearView(this);
-
-		// view menu
-		_actionRemoveToursWhenClosed = new ActionRemoveToursWhenClosed();
-		_actionAdjustImportedYear = new ActionAdjustYear(this);
-		_actionCreateTourIdWithTime = new ActionCreateTourIdWithTime(this);
-		_actionDisableChecksumValidation = new ActionDisableChecksumValidation(this);
-		_actionMergeGPXTours = new ActionMergeGPXTours(this);
-
-		_actionModifyColumns = new ActionModifyColumns(this);
 	}
 
 	@Override
@@ -1640,6 +1639,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		menuMgr.add(new Separator());
 		menuMgr.add(_actionExportTour);
 		menuMgr.add(_actionReimportSubMenu);
+		menuMgr.add(_actionEditImportPreferences);
 		menuMgr.add(_actionRemoveTour);
 
 		menuMgr.add(new Separator());
@@ -1686,12 +1686,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		final IMenuManager menuMgr = getViewSite().getActionBars().getMenuManager();
 
 		menuMgr.add(_actionRemoveToursWhenClosed);
-
-		menuMgr.add(new Separator());
-		menuMgr.add(_actionCreateTourIdWithTime);
-		menuMgr.add(_actionMergeGPXTours);
-		menuMgr.add(_actionDisableChecksumValidation);
-		menuMgr.add(_actionAdjustImportedYear);
+		menuMgr.add(_actionEditImportPreferences);
 
 		menuMgr.add(new Separator());
 		menuMgr.add(_actionModifyColumns);
@@ -1825,6 +1820,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	private void onSelectionChanged(final ISelection selection) {
 
 		if (!selection.isEmpty() && (selection instanceof SelectionDeletedTours)) {
+
+			_postSelectionProvider.clearSelection();
 
 			final SelectionDeletedTours tourSelection = (SelectionDeletedTours) selection;
 			final ArrayList<ITourItem> removedTours = tourSelection.removedTours;
@@ -2036,17 +2033,15 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 		// restore: set merge tracks status before the tours are imported
 		final boolean isMergeTracks = _state.getBoolean(STATE_IS_MERGE_TRACKS);
-		_actionMergeGPXTours.setChecked(isMergeTracks);
 		_rawDataMgr.setMergeTracks(isMergeTracks);
 
 		// restore: set merge tracks status before the tours are imported
 		final boolean isCreateTourIdWithTime = _state.getBoolean(STATE_IS_CREATE_TOUR_ID_WITH_TIME);
-		_actionCreateTourIdWithTime.setChecked(isCreateTourIdWithTime);
 		_rawDataMgr.setCreateTourIdWithTime(isCreateTourIdWithTime);
 
 		// restore: is checksum validation
-		_actionDisableChecksumValidation.setChecked(_state.getBoolean(STATE_IS_CHECKSUM_VALIDATION));
-		_rawDataMgr.setIsChecksumValidation(_actionDisableChecksumValidation.isChecked() == false);
+		final boolean isValidation = _state.getBoolean(STATE_IS_CHECKSUM_VALIDATION);
+		_rawDataMgr.setIsChecksumValidation(isValidation);
 
 		updateToolTipState();
 
@@ -2082,10 +2077,6 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 		// keep selected tours
 		Util.setState(_state, STATE_SELECTED_TOUR_INDICES, table.getSelectionIndices());
-
-		_state.put(STATE_IS_MERGE_TRACKS, _actionMergeGPXTours.isChecked());
-		_state.put(STATE_IS_CHECKSUM_VALIDATION, _actionDisableChecksumValidation.isChecked());
-		_state.put(STATE_IS_CREATE_TOUR_ID_WITH_TIME, _actionCreateTourIdWithTime.isChecked());
 
 		_columnManager.saveState(_state);
 	}

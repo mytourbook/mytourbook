@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Reader for different devices
 Bundle-SymbolicName: net.tourbook.device;singleton:=true
-Bundle-Version: 14.8.2.qualifier
+Bundle-Version: 14.9.0.qualifier
 Bundle-Activator: net.tourbook.device.Activator
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.ui,

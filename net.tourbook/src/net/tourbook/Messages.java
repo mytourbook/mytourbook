@@ -732,15 +732,11 @@ public class Messages extends NLS {
 
 	public static String		image__merge_tours;
 
-	public static String		import_data_action_adjust_imported_year;
 	public static String		import_data_action_assignment_is_not_available;
 	public static String		import_data_action_assignMergedTour;
 	public static String		import_data_action_assignMergedTour_default;
 	public static String		import_data_action_clear_view;
 	public static String		import_data_action_clear_view_tooltip;
-	public static String		import_data_action_createTourIdWithTime;
-	public static String		import_data_action_disable_hac4_checksum_validation;
-	public static String		import_data_action_merge_tracks;
 	public static String		import_data_action_save_tour_for_person;
 	public static String		import_data_action_save_tour_with_person;
 	public static String		import_data_action_save_tours_for_person;
@@ -752,14 +748,17 @@ public class Messages extends NLS {
 	public static String		import_data_updateDataFromDatabase_subTask;
 	public static String		import_data_updateDataFromDatabase_task;
 
+	public static String		Import_Data_Action_EditImportPreferences;
 	public static String		Import_Data_Action_Reimport_EntireTour;
 	public static String		Import_Data_Action_Reimport_OnlyAltitudeValues;
+	public static String		Import_Data_Action_Reimport_OnlyTemperatureValues;
 	public static String		Import_Data_Action_Reimport_OnlyTimeSlices;
 	public static String		Import_Data_Action_Reimport_Tour;
 	public static String		Import_Data_Action_RemoveTour;
 	public static String		Import_Data_Action_RemoveToursWhenClosed;
 	public static String		Import_Data_Dialog_ConfirmReimport_Message;
 	public static String		Import_Data_Dialog_ConfirmReimportAltitudeValues_Message;
+	public static String		Import_Data_Dialog_ConfirmReimportTemperatureValues_Message;
 	public static String		Import_Data_Dialog_ConfirmReimportTimeSlices_Message;
 	public static String		Import_Data_Dialog_GetAlternativePath_Message;
 	public static String		Import_Data_Dialog_GetReimportedFilePath_Message;
@@ -876,8 +875,6 @@ public class Messages extends NLS {
 	public static String		Pref_ChartColors_unit_max;
 	public static String		Pref_ChartColors_unit_mid;
 	public static String		Pref_ChartColors_unit_min;
-
-	public static String		Pref_DataImport_Label;
 
 	public static String		Pref_general_imperial_unit_fahrenheit;
 	public static String		Pref_general_imperial_unit_feet;
@@ -1105,6 +1102,10 @@ public class Messages extends NLS {
 	public static String		Pref_TourTypes_dnd_hint;
 	public static String		Pref_TourTypes_root_title;
 	public static String		Pref_TourTypes_Title;
+
+	public static String		PrefPage_Import_Checkbox_CreateTourIdWithTime;
+	public static String		PrefPage_Import_Checkbox_CreateTourIdWithTime_Tooltip;
+	public static String		PrefPage_Import_Label_Info;
 
 	public static String		PrefPage_ViewActions_Group;
 	public static String		PrefPage_ViewActions_Label_DoubleClick;

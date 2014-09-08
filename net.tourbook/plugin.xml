@@ -328,8 +328,8 @@
 			Import
 		-->
 		<page
-			class="net.tourbook.preferences.PrefPageDataImport"
-			id="net.tourbook.preferences.PrefPageDataImport"
+			class="net.tourbook.preferences.PrefPageImport"
+			id="net.tourbook.preferences.PrefPageImport"
 			name="%preference_page_data_import"
 		/>
       

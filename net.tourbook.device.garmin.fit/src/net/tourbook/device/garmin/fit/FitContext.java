@@ -199,7 +199,7 @@ public class FitContext {
 		_contextData.ctxTourData_20_Finalize();
 	}
 
-	public void processData() {
+	public void finalizeTour() {
 
 		_contextData.processData(new FitContextDataHandler() {
 

@@ -2,6 +2,13 @@
 <?eclipse version="3.4"?>
 <plugin>
 
+	<extension	point="org.eclipse.core.runtime.preferences">
+	
+		<initializer
+			class="net.tourbook.device.PreferenceInitializer"/>
+			
+	</extension>
+
 
    <!-- Ciclo Tour -->
    <extension	point="net.tourbook.deviceDataReader">
@@ -64,7 +71,7 @@
 
    <extension	point="org.eclipse.ui.preferencePages">
       <page
-            category="net.tourbook.preferences.PrefPageDataImport"
+            category="net.tourbook.preferences.PrefPageImport"
             class="net.tourbook.device.daum.ergobike.PrefPageDaumErgoBike"
             id="net.tourbook.device.daum.ergobike.id"
             name="Daum Ergometer">
@@ -91,6 +98,15 @@
             fileextension="gpx"
             id="net.tourbook.device.GPXDataReader"
             name="GPX"/>
+   </extension>
+
+   <extension	point="org.eclipse.ui.preferencePages">
+      <page
+            category="net.tourbook.preferences.PrefPageImport"
+            class="net.tourbook.device.gpx.PrefPageImportGPX"
+            id="net.tourbook.device.PrefPageGPX"
+            name="GPX">
+      </page>
    </extension>
 
 
@@ -159,6 +175,17 @@
             type="serial">
       </device>
    </extension>
+
+
+   <!-- HAC 4/5 -->
+   <extension	point="org.eclipse.ui.preferencePages">
+      <page
+            category="net.tourbook.preferences.PrefPageImport"
+            class="net.tourbook.device.PrefPageImportHAC45"
+            id="net.tourbook.device.PrefPageImportHAC45"
+            name="HAC 4/5">
+      </page>
+   </extension>
    
    
    <!-- Polar HRM  -->
@@ -190,7 +217,7 @@
 
    <extension	point="org.eclipse.ui.preferencePages">
       <page
-            category="net.tourbook.preferences.PrefPageDataImport"
+            category="net.tourbook.preferences.PrefPageImport"
             class="net.tourbook.device.polar.hrm.PrefPagePolar"
             id="net.tourbook.device.polar.hrm.prefPagePolar"
             name="Polar">

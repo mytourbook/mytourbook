@@ -34,6 +34,7 @@ import net.tourbook.data.TimeData;
 import net.tourbook.data.TourData;
 import net.tourbook.device.DeviceReaderTools;
 import net.tourbook.importdata.DeviceData;
+import net.tourbook.importdata.RawDataManager;
 import net.tourbook.importdata.SerialParameters;
 import net.tourbook.importdata.TourbookDevice;
 
@@ -214,7 +215,7 @@ public class HAC5DeviceDataReader extends TourbookDevice {
 			_fileDate.setTime(new Date(lastModified));
 
 			int tourYear = _fileDate.get(Calendar.YEAR);
-			if (importYear != -1) {
+			if (importYear != RawDataManager.ADJUST_IMPORT_YEAR_IS_DISABLED) {
 				tourYear = importYear;
 			}
 

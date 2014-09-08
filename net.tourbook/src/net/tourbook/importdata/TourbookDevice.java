@@ -29,8 +29,8 @@ import net.tourbook.data.TourData;
 
 public abstract class TourbookDevice implements IRawDataReader {
 
-	private static final String		XML_COMMENT				= "<!--";				//$NON-NLS-1$
-	protected static final String	XML_START_ID			= "<?xml";				//$NON-NLS-1$
+	private static final String		XML_COMMENT				= "<!--";											//$NON-NLS-1$
+	protected static final String	XML_START_ID			= "<?xml";											//$NON-NLS-1$
 
 	/**
 	 * Temperature scale when a device supports scaled temperature values. A value greater than 10
@@ -77,9 +77,10 @@ public abstract class TourbookDevice implements IRawDataReader {
 //	public boolean	canSelectMultipleFilesInImportDialog	= false;
 
 	/**
-	 * when set to <code>-1</code> this is ignored otherwise this year is used as the import year
+	 * When set to {@link RawDataManager#ADJUST_IMPORT_YEAR_IS_DISABLED} this is ignored otherwise
+	 * this year is used as the import year.
 	 */
-	public int						importYear				= -1;
+	public int						importYear				= RawDataManager.ADJUST_IMPORT_YEAR_IS_DISABLED;
 
 	/**
 	 * When <code>true</code> the tracks in one file will be merged into one track, a marker is
@@ -238,13 +239,13 @@ public abstract class TourbookDevice implements IRawDataReader {
 	 * 
 	 * @param importFilePath
 	 * @param deviceTag
-	 *            The deviceTag starts on the second line of a xml file.
 	 * @param isRemoveBOM
 	 *            When <code>true</code> the BOM (Byte Order Mark) is removed from the file.
 	 * @return Returns <code>true</code> when the file contains content with the requested tag.
 	 */
 	protected boolean isValidXMLFile(final String importFilePath, final String deviceTag, final boolean isRemoveBOM) {
 
+		final String deviceTagLower = deviceTag.toLowerCase();
 		BufferedReader fileReader = null;
 
 		try {
@@ -263,34 +264,24 @@ public abstract class TourbookDevice implements IRawDataReader {
 			fileReader = new BufferedReader(new InputStreamReader(inputStream, UI.UTF_8));
 
 			String line = fileReader.readLine();
-			if (line == null || line.toLowerCase().startsWith(XML_START_ID) == false) {
+			if (line == null || line.toLowerCase().contains(XML_START_ID) == false) {
 				return false;
 			}
 
-			/*
-			 * skip empty lines and lines with comments
-			 */
+			final int maxLines = 100;
+			int lineCounter = 0;
+
 			while (true) {
+
+				if (line.toLowerCase().contains(deviceTagLower)) {
+					return true;
+				}
 
 				line = fileReader.readLine();
 
-				if (line == null) {
+				if (line == null || lineCounter++ > maxLines) {
 					return false;
 				}
-
-				line = line.trim();
-
-				if (line.length() != 0 && !line.startsWith(XML_COMMENT)) {
-					// this must be a line with a tag
-					break;
-				}
-			}
-
-			/*
-			 * Check if a none empty line contains the required tag
-			 */
-			if (line.toLowerCase().startsWith(deviceTag.toLowerCase()) == false) {
-				return false;
 			}
 
 		} catch (final Exception e1) {
