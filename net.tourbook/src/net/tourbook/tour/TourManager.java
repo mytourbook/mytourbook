@@ -2135,11 +2135,17 @@ public class TourManager {
 			setGraphColor(yDataGradient, GraphColorManager.PREF_GRAPH_GRADIENT);
 			chartDataModel.addXyData(yDataGradient);
 
-			// adjust min value when defined in the pref store
+			// adjust min/max values when defined in the pref store
 			if (_prefStore.getBoolean(ITourbookPreferences.GRAPH_GRADIENT_MIN_IS_ENABLED)) {
-				yDataGradient.setVisibleMinValue(//
-						_prefStore.getInt(ITourbookPreferences.GRAPH_GRADIENT_MIN_VALUE),
-						true);
+
+				final int minValue = _prefStore.getInt(ITourbookPreferences.GRAPH_GRADIENT_MIN_VALUE);
+				yDataGradient.setVisibleMinValue(minValue + TourChart.MIN_ADJUSTMENT, true);
+
+				// set max value after min value
+				final double maxValue = _prefStore.getInt(ITourbookPreferences.GRAPH_GRADIENT_MAX_VALUE);
+
+				// adjust max otherwise values above the max are painted
+				yDataGradient.setVisibleMaxValue(maxValue > 0 ? maxValue - 1e-5 : maxValue + 1e-5, true);
 			}
 		}
 

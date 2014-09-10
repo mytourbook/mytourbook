@@ -98,6 +98,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 		/*
 		 * graph preferences
 		 */
+		store.setDefault(ITourbookPreferences.GRAPH_PREF_PAGE_IS_TOUR_CHART_LIVE_UPDATE, true);
 		store.setDefault(ITourbookPreferences.GRAPH_VISIBLE, Integer.toString(TourManager.GRAPH_ALTITUDE));
 
 		final String separator = StringToArrayConverter.STRING_SEPARATOR;
@@ -169,6 +170,18 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 		store.setDefault(ITourbookPreferences.GRAPH_GRID_HORIZONTAL_DISTANCE, 80);
 		store.setDefault(ITourbookPreferences.GRAPH_GRID_IS_SHOW_HORIZONTAL_GRIDLINES, false);
 		store.setDefault(ITourbookPreferences.GRAPH_GRID_IS_SHOW_VERTICAL_GRIDLINES, false);
+
+		/*
+		 * Min/Max values
+		 */
+		store.setDefault(ITourbookPreferences.GRAPH_ALTIMETER_MIN_IS_ENABLED, false);
+		store.setDefault(ITourbookPreferences.GRAPH_ALTIMETER_MIN_VALUE, 0);
+		store.setDefault(ITourbookPreferences.GRAPH_GRADIENT_MIN_IS_ENABLED, false);
+		store.setDefault(ITourbookPreferences.GRAPH_GRADIENT_MIN_VALUE, -10);
+		store.setDefault(ITourbookPreferences.GRAPH_GRADIENT_MAX_VALUE, 10);
+		store.setDefault(ITourbookPreferences.GRAPH_PACE_MINMAX_IS_ENABLED, false);
+		store.setDefault(ITourbookPreferences.GRAPH_PACE_MIN_VALUE, 1);
+		store.setDefault(ITourbookPreferences.GRAPH_PACE_MAX_VALUE, 5);
 
 		// value point tool tip
 		store.setDefault(ITourbookPreferences.VALUE_POINT_TOOL_TIP_IS_VISIBLE, true);
