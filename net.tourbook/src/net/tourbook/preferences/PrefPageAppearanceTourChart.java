@@ -84,8 +84,7 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 	private ArrayList<Graph>		_graphList;
 	private ArrayList<Graph>		_viewerGraphs;
 
-	private MouseWheelListener		_mouseWheelListener;
-	private SelectionAdapter		_minMaxSelectionListener;
+	private MouseWheelListener		_defaultMouseWheelListener;
 	private SelectionAdapter		_defaultSelectionListener;
 
 	private boolean					_isGridLineWarningDisplayed					= false;
@@ -108,9 +107,12 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 
 	private Button					_chkGraphAntialiasing;
 	private Button					_chkLiveUpdate;
-	private Button					_chkMinMaxAltimeter;
-	private Button					_chkMinMaxGradient;
-	private Button					_chkMinMaxPace;
+	private Button					_chkMinAltimeter;
+	private Button					_chkMaxAltimeter;
+	private Button					_chkMinGradient;
+	private Button					_chkMaxGradient;
+	private Button					_chkMinPace;
+	private Button					_chkMaxPace;
 	private Button					_chkMoveSlidersWhenZoomed;
 	private Button					_chkShowHorizontalGridLines;
 	private Button					_chkShowHrZoneBackground;
@@ -118,20 +120,21 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 	private Button					_chkShowVerticalGridLines;
 	private Button					_chkZoomToSlider;
 
+	private Button					_rdoMouseModeSlider;
+	private Button					_rdoMouseModeZoom;
 	private Button					_rdoShowDistance;
 	private Button					_rdoShowTime;
-	private Button					_rdoZoomFeatures;
-	private Button					_rdoSliderFeatures;
 
 	private Spinner					_spinnerAltimeterMin;
-	private Spinner					_spinnerGradientMax;
+	private Spinner					_spinnerAltimeterMax;
 	private Spinner					_spinnerGradientMin;
+	private Spinner					_spinnerGradientMax;
 	private Spinner					_spinnerGraphTransparencyLine;
 	private Spinner					_spinnerGraphTransparencyFilling;
 	private Spinner					_spinnerGridHorizontalDistance;
 	private Spinner					_spinnerGridVerticalDistance;
-	private Spinner					_spinnerPaceMax;
 	private Spinner					_spinnerPaceMin;
+	private Spinner					_spinnerPaceMax;
 
 	private static class Graph {
 
@@ -168,7 +171,6 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
 		GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
 		{
-
 			_tabFolder = new TabFolder(container, SWT.NONE);
 			_tabFolder.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 			{
@@ -189,7 +191,7 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 				_tab4_Options.setControl(createUI_80_Tab_4_Options(_tabFolder));
 			}
 
-			createUI_90_LiveUpdate(container);
+			createUI_99_LiveUpdate(container);
 		}
 
 		return container;
@@ -280,6 +282,7 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 		_graphCheckboxList.addSelectionChangedListener(new ISelectionChangedListener() {
 			public void selectionChanged(final SelectionChangedEvent event) {
 				enableUpDownActions();
+				doLiveUpdate();
 			}
 		});
 
@@ -306,6 +309,7 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 				public void widgetSelected(final SelectionEvent e) {
 					moveSelectionUp();
 					enableUpDownActions();
+					doLiveUpdate();
 				}
 			});
 
@@ -322,6 +326,7 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 				public void widgetSelected(final SelectionEvent e) {
 					moveSelectionDown();
 					enableUpDownActions();
+					doLiveUpdate();
 				}
 			});
 		}
@@ -352,7 +357,8 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 					.applyTo(_spinnerGraphTransparencyLine);
 			_spinnerGraphTransparencyLine.setMinimum(0x10);
 			_spinnerGraphTransparencyLine.setMaximum(0xff);
-			_spinnerGraphTransparencyLine.addMouseWheelListener(_mouseWheelListener);
+			_spinnerGraphTransparencyLine.addMouseWheelListener(_defaultMouseWheelListener);
+			_spinnerGraphTransparencyLine.addSelectionListener(_defaultSelectionListener);
 
 			/*
 			 * label: graph filling transparency
@@ -373,7 +379,8 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 					.applyTo(_spinnerGraphTransparencyFilling);
 			_spinnerGraphTransparencyFilling.setMinimum(0x00);
 			_spinnerGraphTransparencyFilling.setMaximum(0xff);
-			_spinnerGraphTransparencyFilling.addMouseWheelListener(_mouseWheelListener);
+			_spinnerGraphTransparencyFilling.addMouseWheelListener(_defaultMouseWheelListener);
+			_spinnerGraphTransparencyFilling.addSelectionListener(_defaultSelectionListener);
 
 			/*
 			 * checkbox: graph antialiasing
@@ -382,6 +389,7 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 			GridDataFactory.fillDefaults().span(2, 1).applyTo(_chkGraphAntialiasing);
 			_chkGraphAntialiasing.setText(Messages.Pref_Graphs_Checkbox_GraphAntialiasing);
 			_chkGraphAntialiasing.setToolTipText(Messages.Pref_Graphs_Checkbox_GraphAntialiasing_Tooltip);
+			_chkGraphAntialiasing.addSelectionListener(_defaultSelectionListener);
 
 			/*
 			 * checkbox: HR zones
@@ -390,6 +398,7 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 			GridDataFactory.fillDefaults().span(2, 1).applyTo(_chkShowHrZoneBackground);
 			_chkShowHrZoneBackground.setText(GRAPH_LABEL_SHOW_HR_ZONE_BACKGROUND);
 			_chkShowHrZoneBackground.setToolTipText(GRAPH_LABEL_SHOW_HR_ZONE_BACKGROUND_TOOLTIP);
+			_chkShowHrZoneBackground.addSelectionListener(_defaultSelectionListener);
 		}
 	}
 
@@ -452,7 +461,8 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 						.applyTo(_spinnerGridHorizontalDistance);
 				_spinnerGridHorizontalDistance.setMinimum(10);
 				_spinnerGridHorizontalDistance.setMaximum(200);
-				_spinnerGridHorizontalDistance.addMouseWheelListener(_mouseWheelListener);
+				_spinnerGridHorizontalDistance.addMouseWheelListener(_defaultMouseWheelListener);
+				_spinnerGridHorizontalDistance.addSelectionListener(_defaultSelectionListener);
 
 				/*
 				 * label: vertical grid
@@ -473,7 +483,8 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 						.applyTo(_spinnerGridVerticalDistance);
 				_spinnerGridVerticalDistance.setMinimum(10);
 				_spinnerGridVerticalDistance.setMaximum(200);
-				_spinnerGridVerticalDistance.addMouseWheelListener(_mouseWheelListener);
+				_spinnerGridVerticalDistance.addMouseWheelListener(_defaultMouseWheelListener);
+				_spinnerGridVerticalDistance.addSelectionListener(_defaultSelectionListener);
 			}
 
 			/*
@@ -511,22 +522,20 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 			 */
 			_rdoShowDistance = new Button(group, SWT.RADIO);
 			_rdoShowDistance.setText(Messages.Pref_Graphs_Radio_show_distance);
-			_rdoShowDistance.addSelectionListener(new SelectionAdapter() {
-				@Override
-				public void widgetSelected(final SelectionEvent event) {
-
-				}
-			});
+			_rdoShowDistance.addSelectionListener(_defaultSelectionListener);
 
 			/*
 			 * radio: time
 			 */
 			_rdoShowTime = new Button(group, SWT.RADIO);
 			_rdoShowTime.setText(Messages.Pref_Graphs_Radio_show_time);
+			_rdoShowTime.addSelectionListener(_defaultSelectionListener);
 
+			// checkbox: start time
 			_chkShowStartTime = new Button(group, SWT.CHECK);
 			GridDataFactory.fillDefaults().indent(UI.FORM_FIRST_COLUMN_INDENT, 0).applyTo(_chkShowStartTime);
 			_chkShowStartTime.setText(Messages.Pref_Graphs_Check_show_start_time);
+			_chkShowStartTime.addSelectionListener(_defaultSelectionListener);
 		}
 	}
 
@@ -537,112 +546,28 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 		{
 			final Group group = new Group(container, SWT.NONE);
 			GridDataFactory.fillDefaults().grab(true, false).applyTo(group);
-			GridLayoutFactory.fillDefaults().numColumns(3).applyTo(group);
+			GridLayoutFactory.swtDefaults().numColumns(3).applyTo(group);
 			group.setText(Messages.Pref_Graphs_force_minimum_value);
 			{
-				createUI_54_MinMax_Pace(group);
-				createUI_56_MinMax_Altimeter(group);
-				createUI_58_MinMax_Gradient(group);
+				createUI_54_MinMax_Altimeter(group);
+				createUI_56_MinMax_Gradient(group);
+				createUI_58_MinMax_Pace(group);
 			}
-
-			// the editor container removes all margins
-			GridLayoutFactory.swtDefaults().margins(5, 5).numColumns(3).applyTo(group);
 		}
 
 		return container;
 	}
 
-	private void createUI_54_MinMax_Pace(final Group parent) {
-
-		Label label;
-
-		/*
-		 * checkbox: Pace min/max
-		 */
-		_chkMinMaxPace = new Button(parent, SWT.CHECK);
-		GridDataFactory.fillDefaults().span(3, 1).applyTo(_chkMinMaxPace);
-		_chkMinMaxPace.setText(Messages.Pref_Graphs_Check_force_minmax_for_pace);
-		_chkMinMaxPace.addSelectionListener(_minMaxSelectionListener);
-
-		/*
-		 * Pace min value
-		 */
-		{
-			// label
-			label = new Label(parent, SWT.NONE);
-			GridDataFactory.fillDefaults()//
-					.indent(_pc.convertWidthInCharsToPixels(3), 0)
-					.align(SWT.FILL, SWT.CENTER)
-					.applyTo(label);
-			label.setText(Messages.Pref_Graphs_Text_min_value);
-
-			// spinner
-			_spinnerPaceMin = new Spinner(parent, SWT.BORDER);
-			GridDataFactory.fillDefaults() //
-					.align(SWT.END, SWT.FILL)
-					.applyTo(_spinnerPaceMin);
-			_spinnerPaceMin.setMinimum(0);
-			_spinnerPaceMin.setMaximum(60);
-			_spinnerPaceMin.addMouseWheelListener(_mouseWheelListener);
-
-			// label: minutes
-			label = new Label(parent, SWT.NONE);
-			label.setText(Messages.app_unit_minutes);
-		}
-
-		/*
-		 * Pace max value
-		 */
-		{
-			// label
-			label = new Label(parent, SWT.NONE);
-			GridDataFactory.fillDefaults()//
-					.indent(_pc.convertWidthInCharsToPixels(3), 0)
-					.align(SWT.FILL, SWT.CENTER)
-					.applyTo(label);
-			label.setText(Messages.Pref_Graphs_Text_max_value);
-
-			// spinner
-			_spinnerPaceMax = new Spinner(parent, SWT.BORDER);
-			GridDataFactory.fillDefaults() //
-					.align(SWT.END, SWT.FILL)
-					.applyTo(_spinnerPaceMax);
-			_spinnerPaceMax.setMinimum(0);
-			_spinnerPaceMax.setMaximum(60);
-			_spinnerPaceMax.addMouseWheelListener(_mouseWheelListener);
-
-			// label: minutes
-			label = new Label(parent, SWT.NONE);
-			label.setText(Messages.app_unit_minutes);
-		}
-	}
-
-	private void createUI_56_MinMax_Altimeter(final Group parent) {
-
-		Label label;
-
-		/*
-		 * Altimeter min/max
-		 */
-		{
-			// ckeckbox
-			_chkMinMaxAltimeter = new Button(parent, SWT.CHECK);
-			GridDataFactory.fillDefaults().span(3, 1).applyTo(_chkMinMaxAltimeter);
-			_chkMinMaxAltimeter.setText(Messages.Pref_Graphs_Check_force_minimum_for_altimeter);
-			_chkMinMaxAltimeter.addSelectionListener(_minMaxSelectionListener);
-		}
+	private void createUI_54_MinMax_Altimeter(final Group parent) {
 
 		/*
 		 * Altimeter min value
 		 */
 		{
-			// label
-			label = new Label(parent, SWT.NONE);
-			GridDataFactory.fillDefaults()//
-					.indent(_pc.convertWidthInCharsToPixels(3), 0)
-					.align(SWT.FILL, SWT.CENTER)
-					.applyTo(label);
-			label.setText(Messages.Pref_Graphs_Text_min_value);
+			// ckeckbox
+			_chkMinAltimeter = new Button(parent, SWT.CHECK);
+			_chkMinAltimeter.setText(Messages.Pref_Graphs_Checkbox_IsForceAltimeterMinValue);
+			_chkMinAltimeter.addSelectionListener(_defaultSelectionListener);
 
 			// spinner
 			_spinnerAltimeterMin = new Spinner(parent, SWT.BORDER);
@@ -651,50 +576,61 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 					.applyTo(_spinnerAltimeterMin);
 			_spinnerAltimeterMin.setMinimum(-10000);
 			_spinnerAltimeterMin.setMaximum(10000);
-			_spinnerAltimeterMin.addMouseWheelListener(_mouseWheelListener);
+			_spinnerAltimeterMin.addMouseWheelListener(_defaultMouseWheelListener);
 			_spinnerAltimeterMin.addSelectionListener(_defaultSelectionListener);
+
+			// spacer
+			new Label(parent, SWT.NONE);
+		}
+
+		/*
+		 * Altimeter max value
+		 */
+		{
+			// ckeckbox
+			_chkMaxAltimeter = new Button(parent, SWT.CHECK);
+			_chkMaxAltimeter.setText(Messages.Pref_Graphs_Checkbox_IsForceAltimeterMaxValue);
+			_chkMaxAltimeter.addSelectionListener(_defaultSelectionListener);
+
+			// spinner
+			_spinnerAltimeterMax = new Spinner(parent, SWT.BORDER);
+			GridDataFactory.fillDefaults() //
+					.align(SWT.END, SWT.FILL)
+					.applyTo(_spinnerAltimeterMax);
+			_spinnerAltimeterMax.setMinimum(-10000);
+			_spinnerAltimeterMax.setMaximum(10000);
+			_spinnerAltimeterMax.addMouseWheelListener(_defaultMouseWheelListener);
+			_spinnerAltimeterMax.addSelectionListener(_defaultSelectionListener);
 
 			// spacer
 			new Label(parent, SWT.NONE);
 		}
 	}
 
-	private void createUI_58_MinMax_Gradient(final Group parent) {
-
-		Label label;
-
-		/*
-		 * checkbox: Gradient min/max
-		 */
-		_chkMinMaxGradient = new Button(parent, SWT.CHECK);
-		GridDataFactory.fillDefaults().span(3, 1).applyTo(_chkMinMaxGradient);
-		_chkMinMaxGradient.setText(Messages.Pref_Graphs_Check_force_minimum_for_gradient);
-		_chkMinMaxGradient.addSelectionListener(_minMaxSelectionListener);
+	private void createUI_56_MinMax_Gradient(final Group parent) {
 
 		/*
 		 * Gradient min value
 		 */
 		{
-			// label
-			label = new Label(parent, SWT.NONE);
-			GridDataFactory.fillDefaults()//
-					.indent(_pc.convertWidthInCharsToPixels(3), 0)
-					.align(SWT.FILL, SWT.CENTER)
-					.applyTo(label);
-			label.setText(Messages.Pref_Graphs_Text_min_value);
+			// ckeckbox
+			_chkMinGradient = new Button(parent, SWT.CHECK);
+			_chkMinGradient.setText(Messages.Pref_Graphs_Checkbox_IsForceGradientMinValue);
+			_chkMinGradient.addSelectionListener(_defaultSelectionListener);
 
 			// spinner
 			_spinnerGradientMin = new Spinner(parent, SWT.BORDER);
 			GridDataFactory.fillDefaults() //
-					.align(SWT.END, SWT.FILL)
+					.align(SWT.FILL, SWT.CENTER)
+					.indent(0, _pc.convertVerticalDLUsToPixels(4))
 					.applyTo(_spinnerGradientMin);
 			_spinnerGradientMin.setMinimum(-100);
 			_spinnerGradientMin.setMaximum(100);
-			_spinnerGradientMin.addMouseWheelListener(_mouseWheelListener);
+			_spinnerGradientMin.addMouseWheelListener(_defaultMouseWheelListener);
 			_spinnerGradientMin.addSelectionListener(_defaultSelectionListener);
 
 			// label: %
-			label = new Label(parent, SWT.NONE);
+			final Label label = new Label(parent, SWT.NONE);
 			label.setText(UI.SYMBOL_PERCENTAGE);
 		}
 
@@ -702,27 +638,71 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 		 * Gradient max value
 		 */
 		{
-			// label
-			label = new Label(parent, SWT.NONE);
-			GridDataFactory.fillDefaults()//
-					.indent(_pc.convertWidthInCharsToPixels(3), 0)
-					.align(SWT.FILL, SWT.CENTER)
-					.applyTo(label);
-			label.setText(Messages.Pref_Graphs_Text_max_value);
+			// ckeckbox
+			_chkMaxGradient = new Button(parent, SWT.CHECK);
+			_chkMaxGradient.setText(Messages.Pref_Graphs_Checkbox_IsForceGradientMaxValue);
+			_chkMaxGradient.addSelectionListener(_defaultSelectionListener);
 
 			// spinner
 			_spinnerGradientMax = new Spinner(parent, SWT.BORDER);
-			GridDataFactory.fillDefaults() //
-					.align(SWT.END, SWT.FILL)
-					.applyTo(_spinnerGradientMax);
+			GridDataFactory.fillDefaults().applyTo(_spinnerGradientMax);
 			_spinnerGradientMax.setMinimum(-100);
 			_spinnerGradientMax.setMaximum(100);
-			_spinnerGradientMax.addMouseWheelListener(_mouseWheelListener);
+			_spinnerGradientMax.addMouseWheelListener(_defaultMouseWheelListener);
 			_spinnerGradientMax.addSelectionListener(_defaultSelectionListener);
 
 			// label: %
-			label = new Label(parent, SWT.NONE);
+			final Label label = new Label(parent, SWT.NONE);
 			label.setText(UI.SYMBOL_PERCENTAGE);
+		}
+	}
+
+	private void createUI_58_MinMax_Pace(final Group parent) {
+
+		/*
+		 * Pace min value
+		 */
+		{
+			// ckeckbox
+			_chkMinPace = new Button(parent, SWT.CHECK);
+			_chkMinPace.setText(Messages.Pref_Graphs_Checkbox_IsForcePaceMinValue);
+			_chkMinPace.addSelectionListener(_defaultSelectionListener);
+
+			// spinner
+			_spinnerPaceMin = new Spinner(parent, SWT.BORDER);
+			GridDataFactory.fillDefaults() //
+					.indent(0, _pc.convertVerticalDLUsToPixels(4))
+					.applyTo(_spinnerPaceMin);
+			_spinnerPaceMin.setMinimum(0);
+			_spinnerPaceMin.setMaximum(60);
+			_spinnerPaceMin.addMouseWheelListener(_defaultMouseWheelListener);
+			_spinnerPaceMin.addSelectionListener(_defaultSelectionListener);
+
+			// label: minutes
+			final Label label = new Label(parent, SWT.NONE);
+			label.setText(Messages.app_unit_minutes);
+		}
+
+		/*
+		 * Pace max value
+		 */
+		{
+			// ckeckbox
+			_chkMaxPace = new Button(parent, SWT.CHECK);
+			_chkMaxPace.setText(Messages.Pref_Graphs_Checkbox_IsForcePaceMaxValue);
+			_chkMaxPace.addSelectionListener(_defaultSelectionListener);
+
+			// spinner
+			_spinnerPaceMax = new Spinner(parent, SWT.BORDER);
+			GridDataFactory.fillDefaults().applyTo(_spinnerPaceMax);
+			_spinnerPaceMax.setMinimum(0);
+			_spinnerPaceMax.setMaximum(60);
+			_spinnerPaceMax.addMouseWheelListener(_defaultMouseWheelListener);
+			_spinnerPaceMax.addSelectionListener(_defaultSelectionListener);
+
+			// label: minutes
+			final Label label = new Label(parent, SWT.NONE);
+			label.setText(Messages.app_unit_minutes);
 		}
 	}
 
@@ -746,18 +726,14 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 		GridLayoutFactory.swtDefaults().applyTo(group);
 		{
 			// radio: zoom features
-			_rdoZoomFeatures = new Button(group, SWT.RADIO);
-			_rdoZoomFeatures.setText(Messages.Pref_Graphs_Radio_mouse_mode_zoom);
-			_rdoZoomFeatures.addSelectionListener(new SelectionAdapter() {
-				@Override
-				public void widgetSelected(final SelectionEvent event) {
-					enableActions();
-				}
-			});
+			_rdoMouseModeZoom = new Button(group, SWT.RADIO);
+			_rdoMouseModeZoom.setText(Messages.Pref_Graphs_Radio_mouse_mode_zoom);
+			_rdoMouseModeZoom.addSelectionListener(_defaultSelectionListener);
 
 			// radio: slider features
-			_rdoSliderFeatures = new Button(group, SWT.RADIO);
-			_rdoSliderFeatures.setText(Messages.Pref_Graphs_Radio_mouse_mode_slider);
+			_rdoMouseModeSlider = new Button(group, SWT.RADIO);
+			_rdoMouseModeSlider.setText(Messages.Pref_Graphs_Radio_mouse_mode_slider);
+			_rdoMouseModeSlider.addSelectionListener(_defaultSelectionListener);
 		}
 	}
 
@@ -776,16 +752,18 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 			 */
 			_chkZoomToSlider = new Button(groupZoomOptions, SWT.CHECK);
 			_chkZoomToSlider.setText(Messages.Pref_Graphs_Check_autozoom);
+			_chkZoomToSlider.addSelectionListener(_defaultSelectionListener);
 
 			/*
 			 * checkbox: move sliders to border when zoomed
 			 */
 			_chkMoveSlidersWhenZoomed = new Button(groupZoomOptions, SWT.CHECK);
 			_chkMoveSlidersWhenZoomed.setText(Messages.Pref_Graphs_move_sliders_when_zoomed);
+			_chkMoveSlidersWhenZoomed.addSelectionListener(_defaultSelectionListener);
 		}
 	}
 
-	private void createUI_90_LiveUpdate(final Composite parent) {
+	private void createUI_99_LiveUpdate(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
@@ -816,7 +794,29 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 
 	private void enableControls() {
 
-		onSelectMinMax();
+		/*
+		 * perform defaults for the currently selected tab
+		 */
+		final TabItem selectedTab = _tabFolder.getItem(_tabFolder.getSelectionIndex());
+
+		if (selectedTab == _tab1_Graphs) {
+
+		} else if (selectedTab == _tab2_Grid) {
+
+		} else if (selectedTab == _tab3_MinMax) {
+
+			_spinnerAltimeterMin.setEnabled(_chkMinAltimeter.getSelection());
+			_spinnerAltimeterMax.setEnabled(_chkMaxAltimeter.getSelection());
+
+			_spinnerGradientMin.setEnabled(_chkMinGradient.getSelection());
+			_spinnerGradientMax.setEnabled(_chkMaxGradient.getSelection());
+
+			_spinnerPaceMin.setEnabled(_chkMinPace.getSelection());
+			_spinnerPaceMax.setEnabled(_chkMaxPace.getSelection());
+
+		} else if (selectedTab == _tab4_Options) {
+
+		}
 	}
 
 	/**
@@ -852,25 +852,17 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 
 		_pc = new PixelConverter(parent);
 
-		_mouseWheelListener = new MouseWheelListener() {
+		_defaultMouseWheelListener = new MouseWheelListener() {
 			public void mouseScrolled(final MouseEvent event) {
 				UI.adjustSpinnerValueOnMouseScroll(event);
-				doLiveUpdate();
-			}
-		};
-
-		_minMaxSelectionListener = new SelectionAdapter() {
-			@Override
-			public void widgetSelected(final SelectionEvent e) {
-				onSelectMinMax();
-				doLiveUpdate();
+				onSelection();
 			}
 		};
 
 		_defaultSelectionListener = new SelectionAdapter() {
 			@Override
 			public void widgetSelected(final SelectionEvent e) {
-				onSelection(true);
+				onSelection();
 			}
 		};
 
@@ -976,66 +968,46 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 
 		// show performance warning
 
-		if (_isGridLineWarningDisplayed) {
-			return;
+		if (_isGridLineWarningDisplayed == false) {
+
+			// don't show warning when both are hidden
+			if (_chkShowHorizontalGridLines.getSelection() || _chkShowVerticalGridLines.getSelection()) {
+
+				_isGridLineWarningDisplayed = true;
+
+				MessageDialog.openWarning(
+						getShell(),
+						Messages.Pref_Graphs_Dialog_GridLine_Warning_Title,
+						Messages.Pref_Graphs_Dialog_GridLine_Warning_Message);
+			}
 		}
-
-		// don't show warning when both are hidden
-		if (!_chkShowHorizontalGridLines.getSelection() && !_chkShowVerticalGridLines.getSelection()) {
-			return;
-		}
-
-		_isGridLineWarningDisplayed = true;
-
-		MessageDialog.openWarning(
-				getShell(),
-				Messages.Pref_Graphs_Dialog_GridLine_Warning_Title,
-				Messages.Pref_Graphs_Dialog_GridLine_Warning_Message);
 
 		doLiveUpdate();
 	}
 
-	private void onSelection(final boolean isLiveUpdate) {
+	private void onSelection() {
 
 		/*
 		 * perform defaults for the currently selected tab
 		 */
+		final TabItem selectedTab = _tabFolder.getItem(_tabFolder.getSelectionIndex());
 
-		final int selectedTabIndex = _tabFolder.getSelectionIndex();
-		if (selectedTabIndex == -1) {
-			return;
-		}
+		if (selectedTab == _tab1_Graphs) {
 
-		final TabItem selectedTabItem = _tabFolder.getItem(selectedTabIndex);
+		} else if (selectedTab == _tab2_Grid) {
 
-		if (selectedTabItem.equals(_tab1_Graphs)) {
+		} else if (selectedTab == _tab3_MinMax) {
 
-		} else if (selectedTabItem.equals(_tab2_Grid)) {
+			validateMinMax();
 
-		} else if (selectedTabItem.equals(_tab3_MinMax)) {
-
-		} else if (selectedTabItem.equals(_tab4_Options)) {
+		} else if (selectedTab == _tab4_Options) {
 
 		}
 
 		enableActions();
+		enableControls();
 
-		if (isLiveUpdate) {
-			doLiveUpdate();
-		}
-	}
-
-	private void onSelectMinMax() {
-
-		final boolean isAltimeter = _chkMinMaxAltimeter.getSelection();
-		final boolean isGradient = _chkMinMaxGradient.getSelection();
-		final boolean isPace = _chkMinMaxPace.getSelection();
-
-		_spinnerAltimeterMin.setEnabled(isAltimeter);
-		_spinnerGradientMin.setEnabled(isGradient);
-		_spinnerGradientMax.setEnabled(isGradient);
-		_spinnerPaceMin.setEnabled(isPace);
-		_spinnerPaceMax.setEnabled(isPace);
+		doLiveUpdate();
 	}
 
 	@Override
@@ -1052,15 +1024,9 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 		/*
 		 * perform defaults for the currently selected tab
 		 */
+		final TabItem selectedTab = _tabFolder.getItem(_tabFolder.getSelectionIndex());
 
-		final int selectedTabIndex = _tabFolder.getSelectionIndex();
-		if (selectedTabIndex == -1) {
-			return;
-		}
-
-		final TabItem selectedTabItem = _tabFolder.getItem(selectedTabIndex);
-
-		if (selectedTabItem.equals(_tab1_Graphs)) {
+		if (selectedTab == _tab1_Graphs) {
 
 			_chkGraphAntialiasing.setSelection(//
 					_prefStore.getDefaultBoolean(ITourbookPreferences.GRAPH_ANTIALIASING));
@@ -1074,7 +1040,7 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 			_spinnerGraphTransparencyLine.setSelection(//
 					_prefStore.getDefaultInt(ITourbookPreferences.GRAPH_TRANSPARENCY_LINE));
 
-		} else if (selectedTabItem.equals(_tab2_Grid)) {
+		} else if (selectedTab == _tab2_Grid) {
 
 			_spinnerGridHorizontalDistance.setSelection(//
 					_prefStore.getDefaultInt(ITourbookPreferences.GRAPH_GRID_HORIZONTAL_DISTANCE));
@@ -1086,25 +1052,33 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 			_chkShowVerticalGridLines.setSelection(//
 					_prefStore.getDefaultBoolean(ITourbookPreferences.GRAPH_GRID_IS_SHOW_VERTICAL_GRIDLINES));
 
-		} else if (selectedTabItem.equals(_tab3_MinMax)) {
+		} else if (selectedTab == _tab3_MinMax) {
 
 			// min/max altimeter
-			_chkMinMaxAltimeter.setSelection(//
-					_prefStore.getDefaultBoolean(ITourbookPreferences.GRAPH_ALTIMETER_MIN_IS_ENABLED));
+			_chkMinAltimeter.setSelection(//
+					_prefStore.getDefaultBoolean(ITourbookPreferences.GRAPH_ALTIMETER_IS_MIN_ENABLED));
+			_chkMaxAltimeter.setSelection(//
+					_prefStore.getDefaultBoolean(ITourbookPreferences.GRAPH_ALTIMETER_IS_MAX_ENABLED));
 			_spinnerAltimeterMin.setSelection(//
 					_prefStore.getDefaultInt(ITourbookPreferences.GRAPH_ALTIMETER_MIN_VALUE));
+			_spinnerAltimeterMax.setSelection(//
+					_prefStore.getDefaultInt(ITourbookPreferences.GRAPH_ALTIMETER_MAX_VALUE));
 
 			// min/max gradient
-			_chkMinMaxGradient.setSelection(//
-					_prefStore.getDefaultBoolean(ITourbookPreferences.GRAPH_GRADIENT_MIN_IS_ENABLED));
+			_chkMinGradient.setSelection(//
+					_prefStore.getDefaultBoolean(ITourbookPreferences.GRAPH_GRADIENT_IS_MIN_ENABLED));
+			_chkMaxGradient.setSelection(//
+					_prefStore.getDefaultBoolean(ITourbookPreferences.GRAPH_GRADIENT_IS_MAX_ENABLED));
 			_spinnerGradientMin.setSelection(//
 					_prefStore.getDefaultInt(ITourbookPreferences.GRAPH_GRADIENT_MIN_VALUE));
 			_spinnerGradientMax.setSelection(//
 					_prefStore.getDefaultInt(ITourbookPreferences.GRAPH_GRADIENT_MAX_VALUE));
 
 			// min/max pace
-			_chkMinMaxPace.setSelection(//
-					_prefStore.getDefaultBoolean(ITourbookPreferences.GRAPH_PACE_MINMAX_IS_ENABLED));
+			_chkMinPace.setSelection(//
+					_prefStore.getDefaultBoolean(ITourbookPreferences.GRAPH_PACE_IS_MIN_ENABLED));
+			_chkMaxPace.setSelection(//
+					_prefStore.getDefaultBoolean(ITourbookPreferences.GRAPH_PACE_IS_MAX_ENABLED));
 			_spinnerPaceMin.setSelection(//
 					_prefStore.getDefaultInt(ITourbookPreferences.GRAPH_PACE_MIN_VALUE));
 			_spinnerPaceMax.setSelection(//
@@ -1118,7 +1092,7 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 
 		super.performDefaults();
 
-		onSelection(true);
+		onSelection();
 	}
 
 	@Override
@@ -1133,41 +1107,15 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 
 		restoreState_Tab_1_Graphs();
 		restoreState_Tab_2_Grid();
-
-		if (_prefStore.getString(ITourbookPreferences.GRAPH_MOUSE_MODE).equals(Chart.MOUSE_MODE_SLIDER)) {
-			_rdoSliderFeatures.setSelection(true);
-		} else {
-			_rdoZoomFeatures.setSelection(true);
-		}
-
-		_chkZoomToSlider.setSelection(//
-				_prefStore.getBoolean(ITourbookPreferences.GRAPH_ZOOM_AUTO_ZOOM_TO_SLIDER));
-		_chkMoveSlidersWhenZoomed.setSelection(//
-				_prefStore.getBoolean(ITourbookPreferences.GRAPH_MOVE_SLIDERS_WHEN_ZOOMED));
-
-		// min/max altimeter
-		_chkMinMaxAltimeter.setSelection(_prefStore.getBoolean(ITourbookPreferences.GRAPH_ALTIMETER_MIN_IS_ENABLED));
-		_spinnerAltimeterMin.setSelection(_prefStore.getInt(ITourbookPreferences.GRAPH_ALTIMETER_MIN_VALUE));
-
-		// min/max gradient
-		_chkMinMaxGradient.setSelection(//
-				_prefStore.getBoolean(ITourbookPreferences.GRAPH_GRADIENT_MIN_IS_ENABLED));
-		_spinnerGradientMin.setSelection(//
-				_prefStore.getInt(ITourbookPreferences.GRAPH_GRADIENT_MIN_VALUE));
-		_spinnerGradientMax.setSelection(//
-				_prefStore.getInt(ITourbookPreferences.GRAPH_GRADIENT_MAX_VALUE));
-
-		// min/max pace
-		_chkMinMaxPace.setSelection(_prefStore.getBoolean(ITourbookPreferences.GRAPH_PACE_MINMAX_IS_ENABLED));
-		_spinnerPaceMax.setSelection(_prefStore.getInt(ITourbookPreferences.GRAPH_PACE_MAX_VALUE));
-		_spinnerPaceMin.setSelection(_prefStore.getInt(ITourbookPreferences.GRAPH_PACE_MIN_VALUE));
+		restoreState_Tab_3_MinMax();
+		restoreState_Tab_4_Options();
 
 		// selected tab
 		_tabFolder.setSelection(_prefStore.getInt(STATE_PREF_PAGE_CHART_GRAPHS_SELECTED_TAB));
 
 		// live update
-		_chkLiveUpdate.setSelection(_prefStore
-				.getBoolean(ITourbookPreferences.GRAPH_PREF_PAGE_IS_TOUR_CHART_LIVE_UPDATE));
+		_chkLiveUpdate.setSelection(//
+				_prefStore.getBoolean(ITourbookPreferences.GRAPH_PREF_PAGE_IS_TOUR_CHART_LIVE_UPDATE));
 
 		enableControls();
 	}
@@ -1263,36 +1211,61 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 		_chkShowStartTime.setSelection(_prefStore.getBoolean(ITourbookPreferences.GRAPH_X_AXIS_STARTTIME));
 	}
 
+	private void restoreState_Tab_3_MinMax() {
+
+		// min/max altimeter
+		_chkMinAltimeter.setSelection(//
+				_prefStore.getBoolean(ITourbookPreferences.GRAPH_ALTIMETER_IS_MIN_ENABLED));
+		_chkMaxAltimeter.setSelection(//
+				_prefStore.getBoolean(ITourbookPreferences.GRAPH_ALTIMETER_IS_MAX_ENABLED));
+		_spinnerAltimeterMin.setSelection(//
+				_prefStore.getInt(ITourbookPreferences.GRAPH_ALTIMETER_MIN_VALUE));
+		_spinnerAltimeterMax.setSelection(//
+				_prefStore.getInt(ITourbookPreferences.GRAPH_ALTIMETER_MAX_VALUE));
+
+		// min/max gradient
+		_chkMinGradient.setSelection(//
+				_prefStore.getBoolean(ITourbookPreferences.GRAPH_GRADIENT_IS_MIN_ENABLED));
+		_chkMaxGradient.setSelection(//
+				_prefStore.getBoolean(ITourbookPreferences.GRAPH_GRADIENT_IS_MAX_ENABLED));
+		_spinnerGradientMin.setSelection(//
+				_prefStore.getInt(ITourbookPreferences.GRAPH_GRADIENT_MIN_VALUE));
+		_spinnerGradientMax.setSelection(//
+				_prefStore.getInt(ITourbookPreferences.GRAPH_GRADIENT_MAX_VALUE));
+
+		// min/max pace
+		_chkMinPace.setSelection(//
+				_prefStore.getBoolean(ITourbookPreferences.GRAPH_PACE_IS_MIN_ENABLED));
+		_chkMaxPace.setSelection(//
+				_prefStore.getBoolean(ITourbookPreferences.GRAPH_PACE_IS_MAX_ENABLED));
+		_spinnerPaceMin.setSelection(//
+				_prefStore.getInt(ITourbookPreferences.GRAPH_PACE_MIN_VALUE));
+		_spinnerPaceMax.setSelection(//
+				_prefStore.getInt(ITourbookPreferences.GRAPH_PACE_MAX_VALUE));
+	}
+
+	private void restoreState_Tab_4_Options() {
+
+		// mouse wheel mode
+		_chkZoomToSlider.setSelection(//
+				_prefStore.getBoolean(ITourbookPreferences.GRAPH_ZOOM_AUTO_ZOOM_TO_SLIDER));
+		_chkMoveSlidersWhenZoomed.setSelection(//
+				_prefStore.getBoolean(ITourbookPreferences.GRAPH_MOVE_SLIDERS_WHEN_ZOOMED));
+
+		// zoom options
+		if (_prefStore.getString(ITourbookPreferences.GRAPH_MOUSE_MODE).equals(Chart.MOUSE_MODE_SLIDER)) {
+			_rdoMouseModeSlider.setSelection(true);
+		} else {
+			_rdoMouseModeZoom.setSelection(true);
+		}
+	}
+
 	private void saveState() {
 
 		saveState_Tab_1_Graphs();
 		saveState_Tab_2_Grid();
-
-		if (_rdoSliderFeatures.getSelection()) {
-			_prefStore.setValue(ITourbookPreferences.GRAPH_MOUSE_MODE, Chart.MOUSE_MODE_SLIDER);
-		} else {
-			_prefStore.setValue(ITourbookPreferences.GRAPH_MOUSE_MODE, Chart.MOUSE_MODE_ZOOM);
-		}
-
-		_prefStore.setValue(ITourbookPreferences.GRAPH_ZOOM_AUTO_ZOOM_TO_SLIDER, //
-				_chkZoomToSlider.getSelection());
-
-		_prefStore.setValue(ITourbookPreferences.GRAPH_MOVE_SLIDERS_WHEN_ZOOMED, //
-				_chkMoveSlidersWhenZoomed.getSelection());
-
-		// min/max pace
-		_prefStore.setValue(ITourbookPreferences.GRAPH_PACE_MINMAX_IS_ENABLED, _chkMinMaxPace.getSelection());
-		_prefStore.setValue(ITourbookPreferences.GRAPH_PACE_MAX_VALUE, _spinnerPaceMax.getSelection());
-		_prefStore.setValue(ITourbookPreferences.GRAPH_PACE_MIN_VALUE, _spinnerPaceMin.getSelection());
-
-		// min/max altimeter
-		_prefStore.setValue(ITourbookPreferences.GRAPH_ALTIMETER_MIN_IS_ENABLED, _chkMinMaxAltimeter.getSelection());
-		_prefStore.setValue(ITourbookPreferences.GRAPH_ALTIMETER_MIN_VALUE, _spinnerAltimeterMin.getSelection());
-
-		// min/max gradient
-		_prefStore.setValue(ITourbookPreferences.GRAPH_GRADIENT_MIN_IS_ENABLED, _chkMinMaxGradient.getSelection());
-		_prefStore.setValue(ITourbookPreferences.GRAPH_GRADIENT_MAX_VALUE, _spinnerGradientMax.getSelection());
-		_prefStore.setValue(ITourbookPreferences.GRAPH_GRADIENT_MIN_VALUE, _spinnerGradientMin.getSelection());
+		saveState_Tab_3_MinMax();
+		saveState_Tab_4_Options();
 
 		// live update
 		_prefStore.setValue(
@@ -1346,7 +1319,7 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 	}
 
 	private void saveState_Tab_2_Grid() {
-		
+
 		_prefStore.setValue(ITourbookPreferences.GRAPH_GRID_HORIZONTAL_DISTANCE, //
 				_spinnerGridHorizontalDistance.getSelection());
 		_prefStore.setValue(ITourbookPreferences.GRAPH_GRID_VERTICAL_DISTANCE, //
@@ -1367,12 +1340,47 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 				_chkShowStartTime.getSelection());
 	}
 
-	private void saveState_UI() {
+	private void saveState_Tab_3_MinMax() {
 
-		if (_tabFolder == null || _tabFolder.isDisposed()) {
-			return;
+		// min/max altimeter
+		_prefStore.setValue(ITourbookPreferences.GRAPH_ALTIMETER_IS_MIN_ENABLED, _chkMinAltimeter.getSelection());
+		_prefStore.setValue(ITourbookPreferences.GRAPH_ALTIMETER_IS_MAX_ENABLED, _chkMaxAltimeter.getSelection());
+		_prefStore.setValue(ITourbookPreferences.GRAPH_ALTIMETER_MIN_VALUE, _spinnerAltimeterMin.getSelection());
+		_prefStore.setValue(ITourbookPreferences.GRAPH_ALTIMETER_MAX_VALUE, _spinnerAltimeterMax.getSelection());
+
+		// min/max gradient
+		_prefStore.setValue(ITourbookPreferences.GRAPH_GRADIENT_IS_MIN_ENABLED, _chkMinGradient.getSelection());
+		_prefStore.setValue(ITourbookPreferences.GRAPH_GRADIENT_IS_MAX_ENABLED, _chkMaxGradient.getSelection());
+		_prefStore.setValue(ITourbookPreferences.GRAPH_GRADIENT_MIN_VALUE, _spinnerGradientMin.getSelection());
+		_prefStore.setValue(ITourbookPreferences.GRAPH_GRADIENT_MAX_VALUE, _spinnerGradientMax.getSelection());
+
+		// min/max pace
+		_prefStore.setValue(ITourbookPreferences.GRAPH_PACE_IS_MIN_ENABLED, _chkMinPace.getSelection());
+		_prefStore.setValue(ITourbookPreferences.GRAPH_PACE_IS_MAX_ENABLED, _chkMaxPace.getSelection());
+		_prefStore.setValue(ITourbookPreferences.GRAPH_PACE_MIN_VALUE, _spinnerPaceMin.getSelection());
+		_prefStore.setValue(ITourbookPreferences.GRAPH_PACE_MAX_VALUE, _spinnerPaceMax.getSelection());
+	}
+
+	private void saveState_Tab_4_Options() {
+
+		// mouse wheel mode
+		if (_rdoMouseModeSlider.getSelection()) {
+			_prefStore.setValue(ITourbookPreferences.GRAPH_MOUSE_MODE, Chart.MOUSE_MODE_SLIDER);
+		} else {
+			_prefStore.setValue(ITourbookPreferences.GRAPH_MOUSE_MODE, Chart.MOUSE_MODE_ZOOM);
 		}
 
+		// zoom options
+		_prefStore.setValue(ITourbookPreferences.GRAPH_ZOOM_AUTO_ZOOM_TO_SLIDER, //
+				_chkZoomToSlider.getSelection());
+
+		_prefStore.setValue(ITourbookPreferences.GRAPH_MOVE_SLIDERS_WHEN_ZOOMED, //
+				_chkMoveSlidersWhenZoomed.getSelection());
+	}
+
+	private void saveState_UI() {
+
+		// keep selected tab
 		_prefStore.setValue(STATE_PREF_PAGE_CHART_GRAPHS_SELECTED_TAB, _tabFolder.getSelectionIndex());
 	}
 
@@ -1390,6 +1398,39 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 
 			setErrorMessage(null);
 			setValid(true);
+		}
+	}
+
+	private void validateMinMax() {
+
+		if (_chkMinAltimeter.getSelection()) {
+
+			final int min = _spinnerAltimeterMin.getSelection();
+			final int max = _spinnerAltimeterMax.getSelection();
+
+			if (min >= max) {
+				_spinnerAltimeterMax.setSelection(min + 1);
+			}
+		}
+
+		if (_chkMinGradient.getSelection()) {
+
+			final int min = _spinnerGradientMin.getSelection();
+			final int max = _spinnerGradientMax.getSelection();
+
+			if (min >= max) {
+				_spinnerGradientMax.setSelection(min + 1);
+			}
+		}
+
+		if (_chkMinPace.getSelection()) {
+
+			final int min = _spinnerPaceMin.getSelection();
+			final int max = _spinnerPaceMax.getSelection();
+
+			if (min >= max) {
+				_spinnerPaceMax.setSelection(min + 1);
+			}
 		}
 	}
 

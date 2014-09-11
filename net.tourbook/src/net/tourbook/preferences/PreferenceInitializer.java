@@ -174,12 +174,18 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 		/*
 		 * Min/Max values
 		 */
-		store.setDefault(ITourbookPreferences.GRAPH_ALTIMETER_MIN_IS_ENABLED, false);
+		store.setDefault(ITourbookPreferences.GRAPH_ALTIMETER_IS_MIN_ENABLED, false);
+		store.setDefault(ITourbookPreferences.GRAPH_ALTIMETER_IS_MAX_ENABLED, false);
 		store.setDefault(ITourbookPreferences.GRAPH_ALTIMETER_MIN_VALUE, 0);
-		store.setDefault(ITourbookPreferences.GRAPH_GRADIENT_MIN_IS_ENABLED, false);
+		store.setDefault(ITourbookPreferences.GRAPH_ALTIMETER_MAX_VALUE, 1500);
+
+		store.setDefault(ITourbookPreferences.GRAPH_GRADIENT_IS_MIN_ENABLED, false);
+		store.setDefault(ITourbookPreferences.GRAPH_GRADIENT_IS_MAX_ENABLED, false);
 		store.setDefault(ITourbookPreferences.GRAPH_GRADIENT_MIN_VALUE, -10);
 		store.setDefault(ITourbookPreferences.GRAPH_GRADIENT_MAX_VALUE, 10);
-		store.setDefault(ITourbookPreferences.GRAPH_PACE_MINMAX_IS_ENABLED, false);
+
+		store.setDefault(ITourbookPreferences.GRAPH_PACE_IS_MIN_ENABLED, false);
+		store.setDefault(ITourbookPreferences.GRAPH_PACE_IS_MAX_ENABLED, false);
 		store.setDefault(ITourbookPreferences.GRAPH_PACE_MIN_VALUE, 1);
 		store.setDefault(ITourbookPreferences.GRAPH_PACE_MAX_VALUE, 5);
 

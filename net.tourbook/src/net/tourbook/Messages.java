@@ -900,6 +900,18 @@ public class Messages extends NLS {
 	public static String		Pref_Graphs_Check_show_start_time;
 	public static String		Pref_Graphs_Checkbox_GraphAntialiasing;
 	public static String		Pref_Graphs_Checkbox_GraphAntialiasing_Tooltip;
+	public static String	Pref_Graphs_Checkbox_IsForceAltimeterMaxValue;
+
+	public static String	Pref_Graphs_Checkbox_IsForceAltimeterMinValue;
+
+	public static String	Pref_Graphs_Checkbox_IsForceGradientMaxValue;
+
+	public static String	Pref_Graphs_Checkbox_IsForceGradientMinValue;
+
+	public static String	Pref_Graphs_Checkbox_IsForcePaceMaxValue;
+
+	public static String	Pref_Graphs_Checkbox_IsForcePaceMinValue;
+
 	public static String		Pref_Graphs_Checkbox_ShowHorizontalGrid;
 	public static String		Pref_Graphs_Checkbox_ShowVerticalGrid;
 	public static String		Pref_Graphs_Dialog_GridLine_Warning_Message;

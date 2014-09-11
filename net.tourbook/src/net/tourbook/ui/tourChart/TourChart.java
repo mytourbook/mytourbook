@@ -125,6 +125,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 	 * 1e-5 is too small for the min value, it do not correct the graph.
 	 */
 	public static final double			MIN_ADJUSTMENT							= 1e-3;
+	public static final double			MAX_ADJUSTMENT							= 1e-5;
 
 	private final IPreferenceStore		_prefStore								= TourbookPlugin.getPrefStore();
 	private final IDialogSettings		_state									= TourbookPlugin.getState(ID);
@@ -833,37 +834,34 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 					isChartModified = true;
 				}
 
+				/*
+				 * Altimeter
+				 */
 				isChartModified |= setMinDefaultValue(
 						property,
 						isChartModified,
-						ITourbookPreferences.GRAPH_PACE_MINMAX_IS_ENABLED,
-						ITourbookPreferences.GRAPH_PACE_MIN_VALUE,
-						TourManager.GRAPH_PACE,
-						60,
-						Double.MIN_VALUE);
+						ITourbookPreferences.GRAPH_ALTIMETER_IS_MIN_ENABLED,
+						ITourbookPreferences.GRAPH_ALTIMETER_MIN_VALUE,
+						TourManager.GRAPH_ALTIMETER,
+						0,
+						MIN_ADJUSTMENT);
 
 				isChartModified |= setMaxDefaultValue(
 						property,
 						isChartModified,
-						ITourbookPreferences.GRAPH_PACE_MINMAX_IS_ENABLED,
-						ITourbookPreferences.GRAPH_PACE_MAX_VALUE,
-						TourManager.GRAPH_PACE,
-						60,
-						Double.MIN_VALUE);
-
-				isChartModified |= setMinDefaultValue(
-						property,
-						isChartModified,
-						ITourbookPreferences.GRAPH_ALTIMETER_MIN_IS_ENABLED,
-						ITourbookPreferences.GRAPH_ALTIMETER_MIN_VALUE,
+						ITourbookPreferences.GRAPH_ALTIMETER_IS_MAX_ENABLED,
+						ITourbookPreferences.GRAPH_ALTIMETER_MAX_VALUE,
 						TourManager.GRAPH_ALTIMETER,
 						0,
-						Double.MIN_VALUE);
+						1e-2);
 
+				/*
+				 * Gradient
+				 */
 				isChartModified |= setMinDefaultValue(
 						property,
 						isChartModified,
-						ITourbookPreferences.GRAPH_GRADIENT_MIN_IS_ENABLED,
+						ITourbookPreferences.GRAPH_GRADIENT_IS_MIN_ENABLED,
 						ITourbookPreferences.GRAPH_GRADIENT_MIN_VALUE,
 						TourManager.GRAPH_GRADIENT,
 						0,
@@ -872,11 +870,32 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 				isChartModified |= setMaxDefaultValue(
 						property,
 						isChartModified,
-						ITourbookPreferences.GRAPH_GRADIENT_MIN_IS_ENABLED,
+						ITourbookPreferences.GRAPH_GRADIENT_IS_MAX_ENABLED,
 						ITourbookPreferences.GRAPH_GRADIENT_MAX_VALUE,
 						TourManager.GRAPH_GRADIENT,
 						0,
-						1e-5);
+						MAX_ADJUSTMENT);
+
+				/*
+				 * Pace
+				 */
+				isChartModified |= setMinDefaultValue(
+						property,
+						isChartModified,
+						ITourbookPreferences.GRAPH_PACE_IS_MIN_ENABLED,
+						ITourbookPreferences.GRAPH_PACE_MIN_VALUE,
+						TourManager.GRAPH_PACE,
+						60,
+						Double.MIN_VALUE);
+
+				isChartModified |= setMaxDefaultValue(
+						property,
+						isChartModified,
+						ITourbookPreferences.GRAPH_PACE_IS_MAX_ENABLED,
+						ITourbookPreferences.GRAPH_PACE_MAX_VALUE,
+						TourManager.GRAPH_PACE,
+						60,
+						Double.MIN_VALUE);
 
 				if (isChartModified) {
 					updateTourChart(keepMinMax);
@@ -2350,7 +2369,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 	 * @param prefMaxValue
 	 * @param yDataInfoId
 	 * @param valueDivisor
-	 * @param minMaxAdjustment
+	 * @param maxAdjustment
 	 *            Is disabled when set to {@link Double#MIN_VALUE}.
 	 * @return
 	 */
@@ -2360,7 +2379,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 										final String prefMaxValue,
 										final int yDataInfoId,
 										final int valueDivisor,
-										final double minMaxAdjustment) {
+										final double maxAdjustment) {
 
 		if (property.equals(prefIsMaxEnabled) || property.equals(prefMaxValue)) {
 
@@ -2386,8 +2405,10 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
 					double maxValue = _prefStore.getInt(prefMaxValue);
 
-					if (minMaxAdjustment != Double.MIN_VALUE) {
-						maxValue = maxValue > 0 ? maxValue - 1e-5 : maxValue + 1e-5;
+					if (maxAdjustment != Double.MIN_VALUE) {
+						maxValue = maxValue > 0 //
+								? maxValue - maxAdjustment
+								: maxValue + maxAdjustment;
 					}
 
 					yData.setVisibleMaxValue(valueDivisor == 0 ? maxValue : maxValue * valueDivisor);
@@ -2395,7 +2416,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 				} else {
 
 					// reset visible max value to the original max value
-					yData.setVisibleMaxValue(yData.getOriginalMinValue());
+					yData.setVisibleMaxValue(yData.getOriginalMaxValue());
 				}
 
 				isChartModified = true;
@@ -2412,7 +2433,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 	 * @param tabMinValue
 	 * @param yDataInfoId
 	 * @param valueDivisor
-	 * @param minMaxAdjustment
+	 * @param minAdjustment
 	 *            Is disabled when set to {@link Double#MIN_VALUE}.
 	 * @return
 	 */
@@ -2422,7 +2443,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 										final String tabMinValue,
 										final int yDataInfoId,
 										final int valueDivisor,
-										final double minMaxAdjustment) {
+										final double minAdjustment) {
 
 		if (property.equals(tagIsMinEnabled) || property.equals(tabMinValue)) {
 
@@ -2446,8 +2467,9 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
 					// set visible min value from the preferences
 					double minValue = _prefStore.getInt(tabMinValue);
-					if (minMaxAdjustment != Double.MIN_VALUE) {
-						minValue += MIN_ADJUSTMENT;
+
+					if (minAdjustment != Double.MIN_VALUE) {
+						minValue += minAdjustment;
 					}
 
 					yData.setVisibleMinValue(valueDivisor == 0 ? minValue : minValue * valueDivisor);

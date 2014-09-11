@@ -3,14 +3,15 @@ Version: 14.9.0                                                 6.9.2014
 New 	
 ===
 
-* Tour Chart
-  - Gradient max value.
-
  
 Improvements
 ============
 
-* live update for tour chart pref page
+* Tour Chart
+  - Force min/max values separately, min/max values have been reset to default values.
+  - Force altitude/gradient max value.
+  - Live update for tour chart preferences.
+
 
 
  

@@ -108,14 +108,21 @@ public interface ITourbookPreferences {
 	public static final String	GRAPH_VISIBLE								= "graphs.visible";										//$NON-NLS-1$
 	public static final String	GRAPH_ZOOM_AUTO_ZOOM_TO_SLIDER				= "graphs.zoom.autozoom-to-slider";						//$NON-NLS-1$
 
-	public static final String	GRAPH_ALTIMETER_MIN_IS_ENABLED				= "graphs.altimeter.is-min-enabled";						//$NON-NLS-1$
-	public static final String	GRAPH_ALTIMETER_MIN_VALUE					= "graphs.altimeter.min-value";							//$NON-NLS-1$
-	public static final String	GRAPH_GRADIENT_MIN_IS_ENABLED				= "graphs.gradient.is-min-enabled";						//$NON-NLS-1$
-	public static final String	GRAPH_GRADIENT_MIN_VALUE					= "graphs.gradient.min-value";								//$NON-NLS-1$
+	/*
+	 * Min/Max values
+	 */
+	public static final String	GRAPH_ALTIMETER_IS_MIN_ENABLED				= "GRAPH_ALTIMETER_IS_MIN_ENABLED";						//$NON-NLS-1$
+	public static final String	GRAPH_ALTIMETER_IS_MAX_ENABLED				= "GRAPH_ALTIMETER_IS_MAX_ENABLED";						//$NON-NLS-1$
+	public static final String	GRAPH_ALTIMETER_MIN_VALUE					= "GRAPH_ALTIMETER_MIN_VALUE";								//$NON-NLS-1$
+	public static final String	GRAPH_ALTIMETER_MAX_VALUE					= "GRAPH_ALTIMETER_MAX_VALUE";								//$NON-NLS-1$
+	public static final String	GRAPH_GRADIENT_IS_MIN_ENABLED				= "GRAPH_GRADIENT_IS_MIN_ENABLED";							//$NON-NLS-1$
+	public static final String	GRAPH_GRADIENT_IS_MAX_ENABLED				= "GRAPH_GRADIENT_IS_MAX_ENABLED";							//$NON-NLS-1$
+	public static final String	GRAPH_GRADIENT_MIN_VALUE					= "GRAPH_GRADIENT_MIN_VALUE";								//$NON-NLS-1$
 	public static final String	GRAPH_GRADIENT_MAX_VALUE					= "GRAPH_GRADIENT_MAX_VALUE";								//$NON-NLS-1$
-	public static final String	GRAPH_PACE_MINMAX_IS_ENABLED				= "graph.pace.is-min-enabled";								//$NON-NLS-1$
-	public static final String	GRAPH_PACE_MIN_VALUE						= "graph.pace.min-value";									//$NON-NLS-1$
-	public static final String	GRAPH_PACE_MAX_VALUE						= "graph.pace.max-value";									//$NON-NLS-1$
+	public static final String	GRAPH_PACE_IS_MIN_ENABLED					= "GRAPH_PACE_IS_MIN_ENABLED";								//$NON-NLS-1$
+	public static final String	GRAPH_PACE_IS_MAX_ENABLED					= "GRAPH_PACE_IS_MAX_ENABLED";								//$NON-NLS-1$
+	public static final String	GRAPH_PACE_MIN_VALUE						= "GRAPH_PACE_MIN_VALUE";									//$NON-NLS-1$
+	public static final String	GRAPH_PACE_MAX_VALUE						= "GRAPH_PACE_MAX_VALUE";									//$NON-NLS-1$
 
 	public static final String	GRAPH_GRID_VERTICAL_DISTANCE				= "graphs.grid.vertical-distance";							//$NON-NLS-1$
 	public static final String	GRAPH_GRID_HORIZONTAL_DISTANCE				= "graphs.grid.horizontal-distance";						//$NON-NLS-1$
@@ -131,7 +138,6 @@ public interface ITourbookPreferences {
 	public static final String	GRAPH_JAMET_SMOOTHING_SPEED_TAU				= "GraphJametSmoothing_SpeedSmoothingTau";					//$NON-NLS-1$
 	public static final String	GRAPH_JAMET_SMOOTHING_REPEATED_SMOOTHING	= "GraphJametSmoothing_RepeatedSmoothing";					//$NON-NLS-1$
 	public static final String	GRAPH_JAMET_SMOOTHING_REPEATED_TAU			= "GraphJametSmoothing_RepeatedTau";						//$NON-NLS-1$
-
 
 	/**
 	 * Graph color change flag.

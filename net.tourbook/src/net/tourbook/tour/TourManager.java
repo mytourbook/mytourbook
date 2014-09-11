@@ -2040,12 +2040,17 @@ public class TourManager {
 			setGraphColor(yDataPace, GraphColorManager.PREF_GRAPH_PACE);
 			chartDataModel.addXyData(yDataPace);
 
-			// adjust pace min/max values when it's defined in the pref store
-			if (_prefStore.getBoolean(ITourbookPreferences.GRAPH_PACE_MINMAX_IS_ENABLED)) {
+			/*
+			 * adjust pace min/max values when it's defined in the pref store
+			 */
+			if (_prefStore.getBoolean(ITourbookPreferences.GRAPH_PACE_IS_MIN_ENABLED)) {
 
 				yDataPace.setVisibleMinValue(_prefStore.getInt(ITourbookPreferences.GRAPH_PACE_MIN_VALUE) * 60, true);
+			}
 
-				// set max value after min value
+			// set max value after min value
+			if (_prefStore.getBoolean(ITourbookPreferences.GRAPH_PACE_IS_MAX_ENABLED)) {
+
 				yDataPace.setVisibleMaxValue(_prefStore.getInt(ITourbookPreferences.GRAPH_PACE_MAX_VALUE) * 60, true);
 			}
 		}
@@ -2090,7 +2095,6 @@ public class TourManager {
 			yDataAltimeter.setShowYSlider(true);
 			yDataAltimeter.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_ALTIMETER);
 			yDataAltimeter.setCustomData(CUSTOM_DATA_ANALYZER_INFO, //
-//					new TourChartAnalyzerInfo(true, _computeAltimeterAvg)
 					new TourChartAnalyzerInfo(true, false, _computeAltimeterAvg, 0));
 
 			if (isHrZoneDisplayed) {
@@ -2102,11 +2106,25 @@ public class TourManager {
 			setGraphColor(yDataAltimeter, GraphColorManager.PREF_GRAPH_ALTIMETER);
 			chartDataModel.addXyData(yDataAltimeter);
 
-			// adjust min altitude when it's defined in the pref store
-			if (_prefStore.getBoolean(ITourbookPreferences.GRAPH_ALTIMETER_MIN_IS_ENABLED)) {
-				yDataAltimeter.setVisibleMinValue(
-						_prefStore.getInt(ITourbookPreferences.GRAPH_ALTIMETER_MIN_VALUE),
-						true);
+			/*
+			 * adjust min/max altitude when it's defined in the pref store
+			 */
+			if (_prefStore.getBoolean(ITourbookPreferences.GRAPH_ALTIMETER_IS_MIN_ENABLED)) {
+
+				final int minValue = _prefStore.getInt(ITourbookPreferences.GRAPH_ALTIMETER_MIN_VALUE);
+
+				yDataAltimeter.setVisibleMinValue(minValue + TourChart.MIN_ADJUSTMENT, true);
+			}
+
+			if (_prefStore.getBoolean(ITourbookPreferences.GRAPH_ALTIMETER_IS_MAX_ENABLED)) {
+
+				final double maxValue = _prefStore.getInt(ITourbookPreferences.GRAPH_ALTIMETER_MAX_VALUE);
+
+				final double maxAdjust = 1e-2;
+				// set max value after min value, adjust max otherwise values above the max are painted
+				yDataAltimeter.setVisibleMaxValue(maxValue > 0 //
+						? maxValue - maxAdjust
+						: maxValue + maxAdjust, true);
 			}
 		}
 
@@ -2135,17 +2153,24 @@ public class TourManager {
 			setGraphColor(yDataGradient, GraphColorManager.PREF_GRAPH_GRADIENT);
 			chartDataModel.addXyData(yDataGradient);
 
-			// adjust min/max values when defined in the pref store
-			if (_prefStore.getBoolean(ITourbookPreferences.GRAPH_GRADIENT_MIN_IS_ENABLED)) {
+			/*
+			 * adjust min/max values when defined in the pref store
+			 */
+			if (_prefStore.getBoolean(ITourbookPreferences.GRAPH_GRADIENT_IS_MIN_ENABLED)) {
 
 				final int minValue = _prefStore.getInt(ITourbookPreferences.GRAPH_GRADIENT_MIN_VALUE);
-				yDataGradient.setVisibleMinValue(minValue + TourChart.MIN_ADJUSTMENT, true);
 
-				// set max value after min value
+				yDataGradient.setVisibleMinValue(minValue + TourChart.MIN_ADJUSTMENT, true);
+			}
+
+			if (_prefStore.getBoolean(ITourbookPreferences.GRAPH_GRADIENT_IS_MAX_ENABLED)) {
+
 				final double maxValue = _prefStore.getInt(ITourbookPreferences.GRAPH_GRADIENT_MAX_VALUE);
 
-				// adjust max otherwise values above the max are painted
-				yDataGradient.setVisibleMaxValue(maxValue > 0 ? maxValue - 1e-5 : maxValue + 1e-5, true);
+				// set max value after min value, adjust max otherwise values above the max are painted
+				yDataGradient.setVisibleMaxValue(maxValue > 0 //
+						? maxValue - TourChart.MAX_ADJUSTMENT
+						: maxValue + TourChart.MAX_ADJUSTMENT, true);
 			}
 		}
 
