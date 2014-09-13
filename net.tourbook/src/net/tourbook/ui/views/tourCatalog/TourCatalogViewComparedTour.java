@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -252,7 +252,11 @@ public class TourCatalogViewComparedTour extends TourChartViewPart implements IS
 		// fire a slider move selection when a slider was moved in the tour chart
 		_tourChart.addSliderMoveListener(new ISliderMoveListener() {
 			public void sliderMoved(final SelectionChartInfo chartInfoSelection) {
-				_postSelectionProvider.setSelection(chartInfoSelection);
+
+				TourManager.fireEventWithCustomData(//
+						TourEventId.SLIDER_POSITION_CHANGED,
+						chartInfoSelection,
+						TourCatalogViewComparedTour.this);
 			}
 		});
 

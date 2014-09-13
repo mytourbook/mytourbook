@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -126,7 +126,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 	/*
 	 * data
 	 */
-	private boolean							_isDisableSliderEvent;
+	private boolean							_isSliderEventDisabled;
 	private boolean							_isTourSaved						= false;
 	private final boolean					_isSaveTour;
 	private final boolean					_isCreateDummyAltitude;
@@ -1116,7 +1116,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 			@Override
 			public void sliderMoved(final SelectionChartInfo chartInfo) {
 
-				if (_isDisableSliderEvent) {
+				if (_isSliderEventDisabled) {
 					return;
 				}
 
@@ -2320,11 +2320,11 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 
 	private void updateTourChart() {
 
-		_isDisableSliderEvent = true;
+		_isSliderEventDisabled = true;
 
 		_tourChart.updateTourChart(_tourData, _tourChartConfig, true);
 
-		_isDisableSliderEvent = false;
+		_isSliderEventDisabled = false;
 	}
 
 	private void updateUI2ndLayer() {

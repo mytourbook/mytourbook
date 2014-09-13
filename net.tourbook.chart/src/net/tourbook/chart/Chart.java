@@ -546,19 +546,6 @@ public class Chart extends ViewForm {
 		}
 	}
 
-//	void fireFocusEvent() {
-//
-//		final Object[] listeners = _focusListeners.getListeners();
-//		for (final Object listener2 : listeners) {
-//			final Listener listener = (Listener) listener2;
-//			SafeRunnable.run(new SafeRunnable() {
-//				public void run() {
-//					listener.handleEvent(new Event());
-//				}
-//			});
-//		}
-//	}
-
 	public void fireSliderMoveEvent() {
 
 		final SelectionChartInfo chartInfo = createChartInfo();

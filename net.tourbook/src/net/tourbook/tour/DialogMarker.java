@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -1233,7 +1233,11 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
 		_tourChart.addTourMarkerModifyListener(this);
 		_tourChart.addSliderMoveListener(new ISliderMoveListener() {
 			public void sliderMoved(final SelectionChartInfo chartInfoSelection) {
-				fireGlobalSelection(chartInfoSelection);
+
+				TourManager.fireEventWithCustomData(//
+						TourEventId.SLIDER_POSITION_CHANGED,
+						chartInfoSelection,
+						null);
 			}
 		});
 

@@ -42,6 +42,7 @@ import java.util.HashMap;
 import javax.swing.SwingUtilities;
 
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.SelectionChartInfo;
 import net.tourbook.chart.SelectionChartXSliderPosition;
@@ -640,7 +641,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 						syncMapWith_TourMarker(tourData, tourMarker);
 					}
 
-				} else if (eventId == TourEventId.SLIDER_POSITION_CHANGED) {
+				} else if (eventId == TourEventId.SLIDER_POSITION_CHANGED && eventData instanceof ISelection) {
 
 					onSelection((ISelection) eventData);
 				}
@@ -1500,6 +1501,38 @@ public class Map3View extends ViewPart implements ITourProvider {
 				}
 			}
 
+		} else if (selection instanceof SelectionChartXSliderPosition) {
+
+			final SelectionChartXSliderPosition xSliderPos = (SelectionChartXSliderPosition) selection;
+			final Chart chart = xSliderPos.getChart();
+			if (chart == null) {
+				return;
+			}
+
+			final ChartDataModel chartDataModel = chart.getChartDataModel();
+
+			final Object tourId = chartDataModel.getCustomData(TourManager.CUSTOM_DATA_TOUR_ID);
+			if (tourId instanceof Long) {
+
+				final TourData tourData = TourManager.getInstance().getTourData((Long) tourId);
+				if (tourData != null) {
+
+					final int leftSliderValueIndex = xSliderPos.getLeftSliderValueIndex();
+					int rightSliderValueIndex = xSliderPos.getRightSliderValueIndex();
+
+					rightSliderValueIndex = rightSliderValueIndex == SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION
+							? leftSliderValueIndex
+							: rightSliderValueIndex;
+
+					syncMapWith_ChartSlider(//
+							tourData,
+							leftSliderValueIndex,
+							rightSliderValueIndex,
+							leftSliderValueIndex);
+
+					enableActions();
+				}
+			}
 		}
 	}
 
@@ -2059,6 +2092,36 @@ public class Map3View extends ViewPart implements ITourProvider {
 		}
 	}
 
+	private void syncMapWith_ChartSlider(	final TourData tourData,
+											final int leftSliderValuesIndex,
+											final int rightSliderValuesIndex,
+											final int selectedSliderIndex) {
+
+		final TrackSliderLayer chartSliderLayer = getLayerTrackSlider();
+		if (chartSliderLayer == null) {
+			return;
+		}
+
+		if (tourData == null || tourData.latitudeSerie == null) {
+
+			chartSliderLayer.setSliderVisible(false);
+
+		} else {
+
+			// sync map with chart slider
+
+			syncMapWith_SliderPosition(tourData, chartSliderLayer, selectedSliderIndex);
+
+			// update slider UI
+			updateTrackSlider_10_Position(//
+					tourData,
+					leftSliderValuesIndex,
+					rightSliderValuesIndex);
+
+			updateActionsState();
+		}
+	}
+
 	private void syncMapWith_SliderPosition(final TourData tourData,
 											final TrackSliderLayer chartSliderLayer,
 											int valuesIndex) {
@@ -2223,7 +2286,6 @@ public class Map3View extends ViewPart implements ITourProvider {
 		if (trackSliderLayer == null) {
 			return;
 		}
-
 
 		final int numberOfTourMarkers = allTourMarker.size();
 

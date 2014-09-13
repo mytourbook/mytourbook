@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -33,9 +33,11 @@ import net.tourbook.chart.SelectionChartXSliderPosition;
 import net.tourbook.chart.Util;
 import net.tourbook.common.UI;
 import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.tour.ITourEventListener;
 import net.tourbook.tour.SelectionTourChart;
 import net.tourbook.tour.SelectionTourData;
 import net.tourbook.tour.SelectionTourId;
+import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.tourChart.TourChart;
 
@@ -75,9 +77,10 @@ public class TourChartAnalyzerView extends ViewPart {
 
 	private final IPreferenceStore		_prefStore			= TourbookPlugin.getPrefStore();
 
-	private IPropertyChangeListener		_prefChangeListener;
 	private IPartListener2				_partListener;
 	private ISelectionListener			_postSelectionListener;
+	private IPropertyChangeListener		_prefChangeListener;
+	private ITourEventListener			_tourEventListener;
 
 	private ScrolledComposite			_scrolledContainer;
 	private Composite					_partContainer;
@@ -108,6 +111,7 @@ public class TourChartAnalyzerView extends ViewPart {
 	int									_columnSpacing		= 1;
 
 	private boolean						_isPartVisible		= false;
+
 
 	public TourChartAnalyzerView() {
 		super();
@@ -185,6 +189,26 @@ public class TourChartAnalyzerView extends ViewPart {
 		_prefStore.addPropertyChangeListener(_prefChangeListener);
 	}
 
+	private void addTourEventListener() {
+
+		_tourEventListener = new ITourEventListener() {
+			@Override
+			public void tourChanged(final IWorkbenchPart part, final TourEventId eventId, final Object eventData) {
+
+				if (part == TourChartAnalyzerView.this) {
+					return;
+				}
+
+				if (eventId == TourEventId.SLIDER_POSITION_CHANGED && eventData instanceof ISelection) {
+
+					onSelectionChanged((ISelection) eventData);
+				}
+			}
+		};
+
+		TourManager.getInstance().addTourEventListener(_tourEventListener);
+	}
+
 	@Override
 	public void createPartControl(final Composite parent) {
 
@@ -196,6 +220,7 @@ public class TourChartAnalyzerView extends ViewPart {
 
 		addListeners();
 		addPrefListeners();
+		addTourEventListener();
 	}
 
 	/**
@@ -600,7 +625,6 @@ public class TourChartAnalyzerView extends ViewPart {
 			return color;
 		}
 	}
-
 	private void onSelectionChanged(final ISelection selection) {
 
 		if (_isPartVisible == false) {
