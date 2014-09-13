@@ -1,4 +1,4 @@
-Version: 14.9.0                                                 6.9.2014
+Version: 14.z.0                                                 6.9.2014
 
 New 	
 ===
@@ -8,9 +8,12 @@ Improvements
 ============
 
 * Tour Chart
-  - Force min/max values separately, min/max values have been reset to default values.
-  - Force altitude/gradient max value.
+  - Force min/max values separately, existing min/max values have been reset to default values.
+  - Force max value for altitude/gradient.
   - Live update for tour chart preferences.
+  - Fixed some min/max bugs when min/max value is enforced.
+    When min is enforced but the data min value is larger than forced min, the data min value is used.
+    When max is enforced but the data max value is smaller than forced max, the data max value is used.
 
 
 

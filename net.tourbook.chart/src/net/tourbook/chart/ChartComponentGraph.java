@@ -7341,8 +7341,8 @@ public class ChartComponentGraph extends Canvas {
 			xValueIndexRight = Math.min(xValueIndexRight, yValuesLastIndex);
 			xValueIndexRight = Math.max(xValueIndexRight, 0);
 
-			float minValue = yValues[xValueIndexLeft];
-			float maxValue = yValues[xValueIndexLeft];
+			float dataMinValue = yValues[xValueIndexLeft];
+			float dataMaxValue = yValues[xValueIndexLeft];
 
 			for (final float[] yValueSerie : yValueSeries) {
 
@@ -7354,21 +7354,73 @@ public class ChartComponentGraph extends Canvas {
 
 					final float yValue = yValueSerie[valueIndex];
 
-					if (yValue < minValue) {
-						minValue = yValue;
+					if (yValue < dataMinValue) {
+						dataMinValue = yValue;
 					}
-					if (yValue > maxValue) {
-						maxValue = yValue;
+					if (yValue > dataMaxValue) {
+						dataMaxValue = yValue;
 					}
 				}
 			}
 
-			if (yData.isForceMinValue() == false && minValue != 0) {
-				yData.setVisibleMinValue(minValue);
+			if (yData.isForceMinValue()) {
+
+				/*
+				 * Prevent that data values which are small than forced min are not painted but
+				 * increase the visible min values when the data values are larger than the forced
+				 * min value.
+				 */
+
+				final double forcedMinValue = yData.getVisibleMinValueForced();
+
+				if (dataMinValue > forcedMinValue) {
+
+					// data min is larger than forced min -> use data min value
+
+					yData.setVisibleMinValue(dataMinValue);
+
+				} else {
+
+					// set forced min value
+
+					yData.setVisibleMinValue(forcedMinValue);
+				}
+
+			} else if (dataMinValue != 0) {
+
+				// min is not forced
+
+				yData.setVisibleMinValue(dataMinValue);
 			}
 
-			if (yData.isForceMaxValue() == false && maxValue != 0) {
-				yData.setVisibleMaxValue(maxValue);
+			if (yData.isForceMaxValue()) {
+
+				/*
+				 * Prevent that data values which are larger than forced max are not painted but
+				 * reduce the visible max values when the data values are below the forced max
+				 * value.
+				 */
+
+				final double forcedMaxValue = yData.getVisibleMaxValueForced();
+
+				if (dataMaxValue < forcedMaxValue) {
+
+					// data max value is below forced max value -> use data max value
+
+					yData.setVisibleMaxValue(dataMaxValue);
+
+				} else {
+
+					// set forced max value
+
+					yData.setVisibleMaxValue(forcedMaxValue);
+				}
+
+			} else if (dataMaxValue != 0) {
+
+				// max is not forced
+
+				yData.setVisibleMaxValue(dataMaxValue);
 			}
 		}
 	}

@@ -69,6 +69,15 @@ public abstract class ChartDataSerie {
 	double							_originalMaxValue;
 
 	/**
+	 * when <code>true</code> the minimum value is forced when the dataserie is displayed
+	 */
+	private boolean					_isForceMinValue						= false;
+	private boolean					_isForceMaxValue						= false;
+
+	private double					_visibleMaxValueForced;
+	private double					_visibleMinValueForced;
+
+	/**
 	 * Unit which is drawn on the x or y axis
 	 */
 	private int						_axisUnit								= AXIS_UNIT_NUMBER;
@@ -91,12 +100,6 @@ public abstract class ChartDataSerie {
 	private RGB						_rgbText[]								= new RGB[] { new RGB(0, 0, 0) };
 
 	private RGB						_defaultRGB;
-
-	/**
-	 * when <code>true</code> the minimum value is forced when the dataserie is displayed
-	 */
-	private boolean					_isForceMinValue						= false;
-	private boolean					_isForceMaxValue						= false;
 
 	public int getAxisUnit() {
 		return _axisUnit;
@@ -176,11 +179,19 @@ public abstract class ChartDataSerie {
 		return _visibleMaxValue;
 	}
 
+	public double getVisibleMaxValueForced() {
+		return _visibleMaxValueForced;
+	}
+
 	/**
 	 * @return returns the minimum value in the data serie
 	 */
 	public double getVisibleMinValue() {
 		return _visibleMinValue;
+	}
+
+	public double getVisibleMinValueForced() {
+		return _visibleMinValueForced;
 	}
 
 	public boolean isForceMaxValue() {
@@ -248,18 +259,28 @@ public abstract class ChartDataSerie {
 		_visibleMaxValue = maxValue;
 	}
 
-	public void setVisibleMaxValue(final double maxValue, final boolean forceValue) {
-		_visibleMaxValue = maxValue > _visibleMinValue ? maxValue : _visibleMinValue * _valueDivisor;
-		_isForceMaxValue = forceValue;
+	public void setVisibleMaxValueForced(final double maxValue) {
+
+		_isForceMaxValue = true;
+
+		// ensure max is larger than min
+		_visibleMaxValue = maxValue > _visibleMinValue //
+				? maxValue
+				: _visibleMinValue * _valueDivisor;
+
+		_visibleMaxValueForced = _visibleMaxValue;
 	}
 
 	public void setVisibleMinValue(final double minValue) {
 		_visibleMinValue = minValue;
 	}
 
-	public void setVisibleMinValue(final double minValue, final boolean forceValue) {
+	public void setVisibleMinValueForced(final double minValue) {
+
+		_isForceMinValue = true;
+
 		_visibleMinValue = minValue;
-		_isForceMinValue = forceValue;
+		_visibleMinValueForced = minValue;
 	}
 
 }

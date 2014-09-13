@@ -2045,13 +2045,13 @@ public class TourManager {
 			 */
 			if (_prefStore.getBoolean(ITourbookPreferences.GRAPH_PACE_IS_MIN_ENABLED)) {
 
-				yDataPace.setVisibleMinValue(_prefStore.getInt(ITourbookPreferences.GRAPH_PACE_MIN_VALUE) * 60, true);
+				yDataPace.setVisibleMinValueForced(_prefStore.getInt(ITourbookPreferences.GRAPH_PACE_MIN_VALUE) * 60);
 			}
 
 			// set max value after min value
 			if (_prefStore.getBoolean(ITourbookPreferences.GRAPH_PACE_IS_MAX_ENABLED)) {
 
-				yDataPace.setVisibleMaxValue(_prefStore.getInt(ITourbookPreferences.GRAPH_PACE_MAX_VALUE) * 60, true);
+				yDataPace.setVisibleMaxValueForced(_prefStore.getInt(ITourbookPreferences.GRAPH_PACE_MAX_VALUE) * 60);
 			}
 		}
 
@@ -2113,7 +2113,7 @@ public class TourManager {
 
 				final int minValue = _prefStore.getInt(ITourbookPreferences.GRAPH_ALTIMETER_MIN_VALUE);
 
-				yDataAltimeter.setVisibleMinValue(minValue + TourChart.MIN_ADJUSTMENT, true);
+				yDataAltimeter.setVisibleMinValueForced(minValue + TourChart.MIN_ADJUSTMENT);
 			}
 
 			if (_prefStore.getBoolean(ITourbookPreferences.GRAPH_ALTIMETER_IS_MAX_ENABLED)) {
@@ -2122,9 +2122,9 @@ public class TourManager {
 
 				final double maxAdjust = 1e-2;
 				// set max value after min value, adjust max otherwise values above the max are painted
-				yDataAltimeter.setVisibleMaxValue(maxValue > 0 //
+				yDataAltimeter.setVisibleMaxValueForced(maxValue > 0 //
 						? maxValue - maxAdjust
-						: maxValue + maxAdjust, true);
+						: maxValue + maxAdjust);
 			}
 		}
 
@@ -2160,7 +2160,7 @@ public class TourManager {
 
 				final int minValue = _prefStore.getInt(ITourbookPreferences.GRAPH_GRADIENT_MIN_VALUE);
 
-				yDataGradient.setVisibleMinValue(minValue + TourChart.MIN_ADJUSTMENT, true);
+				yDataGradient.setVisibleMinValueForced(minValue + TourChart.MIN_ADJUSTMENT);
 			}
 
 			if (_prefStore.getBoolean(ITourbookPreferences.GRAPH_GRADIENT_IS_MAX_ENABLED)) {
@@ -2168,9 +2168,9 @@ public class TourManager {
 				final double maxValue = _prefStore.getInt(ITourbookPreferences.GRAPH_GRADIENT_MAX_VALUE);
 
 				// set max value after min value, adjust max otherwise values above the max are painted
-				yDataGradient.setVisibleMaxValue(maxValue > 0 //
+				yDataGradient.setVisibleMaxValueForced(maxValue > 0 //
 						? maxValue - TourChart.MAX_ADJUSTMENT
-						: maxValue + TourChart.MAX_ADJUSTMENT, true);
+						: maxValue + TourChart.MAX_ADJUSTMENT);
 			}
 		}
 

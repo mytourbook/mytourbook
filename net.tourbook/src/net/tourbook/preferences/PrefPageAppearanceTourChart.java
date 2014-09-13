@@ -95,9 +95,9 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 	 * UI controls
 	 */
 	private TabFolder				_tabFolder;
-	private TabItem					_tab2_Grid;
 	private TabItem					_tab1_Graphs;
-	private TabItem					_tab3_MinMax;
+	private TabItem					_tab2_MinMax;
+	private TabItem					_tab3_Grid;
 	private TabItem					_tab4_Options;
 
 	private CheckboxTableViewer		_graphCheckboxList;
@@ -178,13 +178,13 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 				_tab1_Graphs.setText(Messages.Pref_Graphs_Tab_graph_defaults);
 				_tab1_Graphs.setControl(createUI_10_Tab_1_Graphs(_tabFolder));
 
-				_tab2_Grid = new TabItem(_tabFolder, SWT.NONE);
-				_tab2_Grid.setText(Messages.Pref_Graphs_Tab_Grid);
-				_tab2_Grid.setControl(createUI_30_Tab_2_Grid(_tabFolder));
+				_tab2_MinMax = new TabItem(_tabFolder, SWT.NONE);
+				_tab2_MinMax.setText(Messages.Pref_Graphs_Tab_default_values);
+				_tab2_MinMax.setControl(createUI_50_Tab_2_MinMax(_tabFolder));
 
-				_tab3_MinMax = new TabItem(_tabFolder, SWT.NONE);
-				_tab3_MinMax.setText(Messages.Pref_Graphs_Tab_default_values);
-				_tab3_MinMax.setControl(createUI_50_Tab_3_MinMax(_tabFolder));
+				_tab3_Grid = new TabItem(_tabFolder, SWT.NONE);
+				_tab3_Grid.setText(Messages.Pref_Graphs_Tab_Grid);
+				_tab3_Grid.setControl(createUI_60_Tab_3_Grid(_tabFolder));
 
 				_tab4_Options = new TabItem(_tabFolder, SWT.NONE);
 				_tab4_Options.setText(Messages.Pref_Graphs_Tab_zoom_options);
@@ -402,144 +402,7 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 		}
 	}
 
-	/**
-	 * tab: grid/units
-	 * 
-	 * @return
-	 */
-	private Control createUI_30_Tab_2_Grid(final Composite parent) {
-
-		final Composite container = new Composite(parent, SWT.NONE);
-		GridLayoutFactory.swtDefaults().applyTo(container);
-		{
-			createUI_32_Grid(container);
-			createUI_34_XAxisUnits(container);
-		}
-
-		return container;
-	}
-
-	private void createUI_32_Grid(final Composite parent) {
-
-		final SelectionAdapter gridLineListener = new SelectionAdapter() {
-			@Override
-			public void widgetSelected(final SelectionEvent e) {
-				onSelectGridLine();
-			}
-		};
-
-		final Group group = new Group(parent, SWT.NONE);
-		group.setText(Messages.Pref_Graphs_Group_Grid);
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(group);
-		GridLayoutFactory.swtDefaults().numColumns(2).applyTo(group);
-		{
-			/*
-			 * label: grid distance
-			 */
-			Label label = new Label(group, SWT.NONE);
-			GridDataFactory.fillDefaults()//
-					.span(2, 1)
-					.applyTo(label);
-			label.setText(Messages.Pref_Graphs_grid_distance);
-			{
-				/*
-				 * label: horizontal grid
-				 */
-				label = new Label(group, SWT.NONE);
-				GridDataFactory.fillDefaults()//
-						.indent(16, 0)
-						.align(SWT.FILL, SWT.CENTER)
-						.applyTo(label);
-				label.setText(Messages.Pref_Graphs_grid_horizontal_distance);
-
-				/*
-				 * spinner: horizontal grid
-				 */
-				_spinnerGridHorizontalDistance = new Spinner(group, SWT.BORDER);
-				GridDataFactory.fillDefaults() //
-						.align(SWT.BEGINNING, SWT.FILL)
-						.applyTo(_spinnerGridHorizontalDistance);
-				_spinnerGridHorizontalDistance.setMinimum(10);
-				_spinnerGridHorizontalDistance.setMaximum(200);
-				_spinnerGridHorizontalDistance.addMouseWheelListener(_defaultMouseWheelListener);
-				_spinnerGridHorizontalDistance.addSelectionListener(_defaultSelectionListener);
-
-				/*
-				 * label: vertical grid
-				 */
-				label = new Label(group, SWT.NONE);
-				GridDataFactory.fillDefaults()//
-						.indent(16, 0)
-						.align(SWT.FILL, SWT.CENTER)
-						.applyTo(label);
-				label.setText(Messages.Pref_Graphs_grid_vertical_distance);
-
-				/*
-				 * spinner: vertical grid
-				 */
-				_spinnerGridVerticalDistance = new Spinner(group, SWT.BORDER);
-				GridDataFactory.fillDefaults() //
-						.align(SWT.BEGINNING, SWT.FILL)
-						.applyTo(_spinnerGridVerticalDistance);
-				_spinnerGridVerticalDistance.setMinimum(10);
-				_spinnerGridVerticalDistance.setMaximum(200);
-				_spinnerGridVerticalDistance.addMouseWheelListener(_defaultMouseWheelListener);
-				_spinnerGridVerticalDistance.addSelectionListener(_defaultSelectionListener);
-			}
-
-			/*
-			 * checkbox: show horizontal grid
-			 */
-			_chkShowHorizontalGridLines = new Button(group, SWT.CHECK);
-			GridDataFactory.fillDefaults()//
-					.indent(0, 15)
-					.span(2, 1)
-					.applyTo(_chkShowHorizontalGridLines);
-			_chkShowHorizontalGridLines.setText(Messages.Pref_Graphs_Checkbox_ShowHorizontalGrid);
-			_chkShowHorizontalGridLines.addSelectionListener(gridLineListener);
-
-			/*
-			 * checkbox: show vertical grid
-			 */
-			_chkShowVerticalGridLines = new Button(group, SWT.CHECK);
-			GridDataFactory.fillDefaults().span(2, 1).applyTo(_chkShowVerticalGridLines);
-			_chkShowVerticalGridLines.setText(Messages.Pref_Graphs_Checkbox_ShowVerticalGrid);
-			_chkShowVerticalGridLines.addSelectionListener(gridLineListener);
-
-		}
-	}
-
-	private void createUI_34_XAxisUnits(final Composite container) {
-
-		// group: units for the x-axis
-		final Group group = new Group(container, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(group);
-		group.setText(Messages.Pref_Graphs_Group_units_for_xaxis);
-		GridLayoutFactory.swtDefaults().applyTo(group);
-		{
-			/*
-			 * radio: distance
-			 */
-			_rdoShowDistance = new Button(group, SWT.RADIO);
-			_rdoShowDistance.setText(Messages.Pref_Graphs_Radio_show_distance);
-			_rdoShowDistance.addSelectionListener(_defaultSelectionListener);
-
-			/*
-			 * radio: time
-			 */
-			_rdoShowTime = new Button(group, SWT.RADIO);
-			_rdoShowTime.setText(Messages.Pref_Graphs_Radio_show_time);
-			_rdoShowTime.addSelectionListener(_defaultSelectionListener);
-
-			// checkbox: start time
-			_chkShowStartTime = new Button(group, SWT.CHECK);
-			GridDataFactory.fillDefaults().indent(UI.FORM_FIRST_COLUMN_INDENT, 0).applyTo(_chkShowStartTime);
-			_chkShowStartTime.setText(Messages.Pref_Graphs_Check_show_start_time);
-			_chkShowStartTime.addSelectionListener(_defaultSelectionListener);
-		}
-	}
-
-	private Control createUI_50_Tab_3_MinMax(final Composite parent) {
+	private Control createUI_50_Tab_2_MinMax(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridLayoutFactory.swtDefaults().applyTo(container);
@@ -706,6 +569,143 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 		}
 	}
 
+	/**
+	 * tab: grid/units
+	 * 
+	 * @return
+	 */
+	private Control createUI_60_Tab_3_Grid(final Composite parent) {
+
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridLayoutFactory.swtDefaults().applyTo(container);
+		{
+			createUI_62_Grid(container);
+			createUI_64_XAxisUnits(container);
+		}
+
+		return container;
+	}
+
+	private void createUI_62_Grid(final Composite parent) {
+
+		final SelectionAdapter gridLineListener = new SelectionAdapter() {
+			@Override
+			public void widgetSelected(final SelectionEvent e) {
+				onSelectGridLine();
+			}
+		};
+
+		final Group group = new Group(parent, SWT.NONE);
+		group.setText(Messages.Pref_Graphs_Group_Grid);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(group);
+		GridLayoutFactory.swtDefaults().numColumns(2).applyTo(group);
+		{
+			/*
+			 * label: grid distance
+			 */
+			Label label = new Label(group, SWT.NONE);
+			GridDataFactory.fillDefaults()//
+					.span(2, 1)
+					.applyTo(label);
+			label.setText(Messages.Pref_Graphs_grid_distance);
+			{
+				/*
+				 * label: horizontal grid
+				 */
+				label = new Label(group, SWT.NONE);
+				GridDataFactory.fillDefaults()//
+						.indent(16, 0)
+						.align(SWT.FILL, SWT.CENTER)
+						.applyTo(label);
+				label.setText(Messages.Pref_Graphs_grid_horizontal_distance);
+
+				/*
+				 * spinner: horizontal grid
+				 */
+				_spinnerGridHorizontalDistance = new Spinner(group, SWT.BORDER);
+				GridDataFactory.fillDefaults() //
+						.align(SWT.BEGINNING, SWT.FILL)
+						.applyTo(_spinnerGridHorizontalDistance);
+				_spinnerGridHorizontalDistance.setMinimum(10);
+				_spinnerGridHorizontalDistance.setMaximum(200);
+				_spinnerGridHorizontalDistance.addMouseWheelListener(_defaultMouseWheelListener);
+				_spinnerGridHorizontalDistance.addSelectionListener(_defaultSelectionListener);
+
+				/*
+				 * label: vertical grid
+				 */
+				label = new Label(group, SWT.NONE);
+				GridDataFactory.fillDefaults()//
+						.indent(16, 0)
+						.align(SWT.FILL, SWT.CENTER)
+						.applyTo(label);
+				label.setText(Messages.Pref_Graphs_grid_vertical_distance);
+
+				/*
+				 * spinner: vertical grid
+				 */
+				_spinnerGridVerticalDistance = new Spinner(group, SWT.BORDER);
+				GridDataFactory.fillDefaults() //
+						.align(SWT.BEGINNING, SWT.FILL)
+						.applyTo(_spinnerGridVerticalDistance);
+				_spinnerGridVerticalDistance.setMinimum(10);
+				_spinnerGridVerticalDistance.setMaximum(200);
+				_spinnerGridVerticalDistance.addMouseWheelListener(_defaultMouseWheelListener);
+				_spinnerGridVerticalDistance.addSelectionListener(_defaultSelectionListener);
+			}
+
+			/*
+			 * checkbox: show horizontal grid
+			 */
+			_chkShowHorizontalGridLines = new Button(group, SWT.CHECK);
+			GridDataFactory.fillDefaults()//
+					.indent(0, 15)
+					.span(2, 1)
+					.applyTo(_chkShowHorizontalGridLines);
+			_chkShowHorizontalGridLines.setText(Messages.Pref_Graphs_Checkbox_ShowHorizontalGrid);
+			_chkShowHorizontalGridLines.addSelectionListener(gridLineListener);
+
+			/*
+			 * checkbox: show vertical grid
+			 */
+			_chkShowVerticalGridLines = new Button(group, SWT.CHECK);
+			GridDataFactory.fillDefaults().span(2, 1).applyTo(_chkShowVerticalGridLines);
+			_chkShowVerticalGridLines.setText(Messages.Pref_Graphs_Checkbox_ShowVerticalGrid);
+			_chkShowVerticalGridLines.addSelectionListener(gridLineListener);
+
+		}
+	}
+
+	private void createUI_64_XAxisUnits(final Composite container) {
+
+		// group: units for the x-axis
+		final Group group = new Group(container, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(group);
+		group.setText(Messages.Pref_Graphs_Group_units_for_xaxis);
+		GridLayoutFactory.swtDefaults().applyTo(group);
+		{
+			/*
+			 * radio: distance
+			 */
+			_rdoShowDistance = new Button(group, SWT.RADIO);
+			_rdoShowDistance.setText(Messages.Pref_Graphs_Radio_show_distance);
+			_rdoShowDistance.addSelectionListener(_defaultSelectionListener);
+
+			/*
+			 * radio: time
+			 */
+			_rdoShowTime = new Button(group, SWT.RADIO);
+			_rdoShowTime.setText(Messages.Pref_Graphs_Radio_show_time);
+			_rdoShowTime.addSelectionListener(_defaultSelectionListener);
+
+			// checkbox: start time
+			_chkShowStartTime = new Button(group, SWT.CHECK);
+			GridDataFactory.fillDefaults().indent(UI.FORM_FIRST_COLUMN_INDENT, 0).applyTo(_chkShowStartTime);
+			_chkShowStartTime.setText(Messages.Pref_Graphs_Check_show_start_time);
+			_chkShowStartTime.addSelectionListener(_defaultSelectionListener);
+		}
+	}
+
 	private Control createUI_80_Tab_4_Options(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
@@ -801,9 +801,9 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 
 		if (selectedTab == _tab1_Graphs) {
 
-		} else if (selectedTab == _tab2_Grid) {
+		} else if (selectedTab == _tab3_Grid) {
 
-		} else if (selectedTab == _tab3_MinMax) {
+		} else if (selectedTab == _tab2_MinMax) {
 
 			_spinnerAltimeterMin.setEnabled(_chkMinAltimeter.getSelection());
 			_spinnerAltimeterMax.setEnabled(_chkMaxAltimeter.getSelection());
@@ -994,9 +994,9 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 
 		if (selectedTab == _tab1_Graphs) {
 
-		} else if (selectedTab == _tab2_Grid) {
+		} else if (selectedTab == _tab3_Grid) {
 
-		} else if (selectedTab == _tab3_MinMax) {
+		} else if (selectedTab == _tab2_MinMax) {
 
 			validateMinMax();
 
@@ -1040,7 +1040,7 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 			_spinnerGraphTransparencyLine.setSelection(//
 					_prefStore.getDefaultInt(ITourbookPreferences.GRAPH_TRANSPARENCY_LINE));
 
-		} else if (selectedTab == _tab2_Grid) {
+		} else if (selectedTab == _tab3_Grid) {
 
 			_spinnerGridHorizontalDistance.setSelection(//
 					_prefStore.getDefaultInt(ITourbookPreferences.GRAPH_GRID_HORIZONTAL_DISTANCE));
@@ -1052,7 +1052,7 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 			_chkShowVerticalGridLines.setSelection(//
 					_prefStore.getDefaultBoolean(ITourbookPreferences.GRAPH_GRID_IS_SHOW_VERTICAL_GRIDLINES));
 
-		} else if (selectedTab == _tab3_MinMax) {
+		} else if (selectedTab == _tab2_MinMax) {
 
 			// min/max altimeter
 			_chkMinAltimeter.setSelection(//
