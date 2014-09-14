@@ -252,7 +252,11 @@ public class TourCatalogViewComparedTour extends TourChartViewPart implements IS
 		// fire a slider move selection when a slider was moved in the tour chart
 		_tourChart.addSliderMoveListener(new ISliderMoveListener() {
 			public void sliderMoved(final SelectionChartInfo chartInfoSelection) {
-				_postSelectionProvider.setSelection(chartInfoSelection);
+
+				TourManager.fireEventWithCustomData(//
+						TourEventId.SLIDER_POSITION_CHANGED,
+						chartInfoSelection,
+						TourCatalogViewComparedTour.this);
 			}
 		});
 

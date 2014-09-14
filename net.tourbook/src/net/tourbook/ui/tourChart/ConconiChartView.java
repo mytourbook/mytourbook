@@ -404,10 +404,11 @@ public class ConconiChartView extends ViewPart {
 
 // check x-data visible min value
 		//adjust min/max values that the chart do not stick to a border
-		xDataPower.setVisibleMinValue(0, true);
-		xDataPower.setVisibleMaxValue(xDataPower.getVisibleMaxValue() + ADJUST_MAX_POWER_VALUE, true);
-		_yDataPulse.setVisibleMinValue(_yDataPulse.getVisibleMinValue() - ADJUST_MAX_PULSE_VALUE, true);
-		_yDataPulse.setVisibleMaxValue(_yDataPulse.getVisibleMaxValue() + ADJUST_MAX_PULSE_VALUE, true);
+		xDataPower.setVisibleMinValueForced(0);
+		xDataPower.setVisibleMaxValueForced(xDataPower.getVisibleMaxValue() + ADJUST_MAX_POWER_VALUE);
+
+		_yDataPulse.setVisibleMinValueForced(_yDataPulse.getVisibleMinValue() - ADJUST_MAX_PULSE_VALUE);
+		_yDataPulse.setVisibleMaxValueForced(_yDataPulse.getVisibleMaxValue() + ADJUST_MAX_PULSE_VALUE);
 
 		// setup chart data model
 		chartDataModel.setXData(xDataPower);

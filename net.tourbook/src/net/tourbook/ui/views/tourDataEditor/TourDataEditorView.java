@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -1652,6 +1652,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 						updateUI_FromModel(_tourData, false, true);
 					}
+
+				} else if (eventId == TourEventId.SLIDER_POSITION_CHANGED && eventData instanceof ISelection) {
+
+					onSelectionChanged((ISelection) eventData);
 				}
 			}
 		};

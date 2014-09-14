@@ -2168,7 +2168,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 		final Period age = new Period(getBirthdayFromUI().getMillis(), _today.getMillis());
 
 		final int ageYears = age.getYears();
-		final String ageText = UI.SPACE + ageYears + UI.SPACE2 + Messages.Pref_People_Label_Years;
+		final String ageText = UI.SPACE + Integer.toString(ageYears) + UI.SPACE2 + Messages.Pref_People_Label_Years;
 
 		_lblAgePerson.setText(ageText);
 		_lblAgeHr.setText(ageText);

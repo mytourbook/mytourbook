@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -79,6 +79,8 @@ public interface ITourbookPreferences {
 	public static final String	GRAPH_IS_TOUR_PHOTO_TOOLTIP_VISIBLE			= "GRAPH_IS_TOUR_PHOTO_TOOLTIP_VISIBLE";					//$NON-NLS-1$
 	public static final String	GRAPH_IS_TOUR_PHOTO_VISIBLE					= "GRAPH_IS_TOUR_PHOTO_VISIBLE";							//$NON-NLS-1$
 
+	public static final String	GRAPH_PREF_PAGE_IS_TOUR_CHART_LIVE_UPDATE	= "GRAPH_PREF_PAGE_IS_TOUR_CHART_LIVE_UPDATE";				//$NON-NLS-1$
+
 	public static final String	GRAPH_MARKER_COLOR_DEFAULT					= "GRAPH_MARKER_COLOR_DEFAULT";							//$NON-NLS-1$
 	public static final String	GRAPH_MARKER_COLOR_DEVICE					= "GRAPH_MARKER_COLOR_DEVICE";								//$NON-NLS-1$
 	public static final String	GRAPH_MARKER_COLOR_HIDDEN					= "GRAPH_MARKER_COLOR_HIDDEN";								//$NON-NLS-1$
@@ -106,13 +108,21 @@ public interface ITourbookPreferences {
 	public static final String	GRAPH_VISIBLE								= "graphs.visible";										//$NON-NLS-1$
 	public static final String	GRAPH_ZOOM_AUTO_ZOOM_TO_SLIDER				= "graphs.zoom.autozoom-to-slider";						//$NON-NLS-1$
 
-	public static final String	GRAPH_PACE_MINMAX_IS_ENABLED				= "graph.pace.is-min-enabled";								//$NON-NLS-1$
-	public static final String	GRAPH_PACE_MIN_VALUE						= "graph.pace.min-value";									//$NON-NLS-1$
-	public static final String	GRAPH_PACE_MAX_VALUE						= "graph.pace.max-value";									//$NON-NLS-1$
-	public static final String	GRAPH_ALTIMETER_MIN_IS_ENABLED				= "graphs.altimeter.is-min-enabled";						//$NON-NLS-1$
-	public static final String	GRAPH_ALTIMETER_MIN_VALUE					= "graphs.altimeter.min-value";							//$NON-NLS-1$
-	public static final String	GRAPH_GRADIENT_MIN_IS_ENABLED				= "graphs.gradient.is-min-enabled";						//$NON-NLS-1$
-	public static final String	GRAPH_GRADIENT_MIN_VALUE					= "graphs.gradient.min-value";								//$NON-NLS-1$
+	/*
+	 * Min/Max values
+	 */
+	public static final String	GRAPH_ALTIMETER_IS_MIN_ENABLED				= "GRAPH_ALTIMETER_IS_MIN_ENABLED";						//$NON-NLS-1$
+	public static final String	GRAPH_ALTIMETER_IS_MAX_ENABLED				= "GRAPH_ALTIMETER_IS_MAX_ENABLED";						//$NON-NLS-1$
+	public static final String	GRAPH_ALTIMETER_MIN_VALUE					= "GRAPH_ALTIMETER_MIN_VALUE";								//$NON-NLS-1$
+	public static final String	GRAPH_ALTIMETER_MAX_VALUE					= "GRAPH_ALTIMETER_MAX_VALUE";								//$NON-NLS-1$
+	public static final String	GRAPH_GRADIENT_IS_MIN_ENABLED				= "GRAPH_GRADIENT_IS_MIN_ENABLED";							//$NON-NLS-1$
+	public static final String	GRAPH_GRADIENT_IS_MAX_ENABLED				= "GRAPH_GRADIENT_IS_MAX_ENABLED";							//$NON-NLS-1$
+	public static final String	GRAPH_GRADIENT_MIN_VALUE					= "GRAPH_GRADIENT_MIN_VALUE";								//$NON-NLS-1$
+	public static final String	GRAPH_GRADIENT_MAX_VALUE					= "GRAPH_GRADIENT_MAX_VALUE";								//$NON-NLS-1$
+	public static final String	GRAPH_PACE_IS_MIN_ENABLED					= "GRAPH_PACE_IS_MIN_ENABLED";								//$NON-NLS-1$
+	public static final String	GRAPH_PACE_IS_MAX_ENABLED					= "GRAPH_PACE_IS_MAX_ENABLED";								//$NON-NLS-1$
+	public static final String	GRAPH_PACE_MIN_VALUE						= "GRAPH_PACE_MIN_VALUE";									//$NON-NLS-1$
+	public static final String	GRAPH_PACE_MAX_VALUE						= "GRAPH_PACE_MAX_VALUE";									//$NON-NLS-1$
 
 	public static final String	GRAPH_GRID_VERTICAL_DISTANCE				= "graphs.grid.vertical-distance";							//$NON-NLS-1$
 	public static final String	GRAPH_GRID_HORIZONTAL_DISTANCE				= "graphs.grid.horizontal-distance";						//$NON-NLS-1$
@@ -364,4 +374,5 @@ public interface ITourbookPreferences {
 
 	public static final String	MAP3_IS_COLOR_SELECTOR_DISPLAYED			= "MAP3_IS_COLOR_SELECTOR_DISPLAYED";						//$NON-NLS-1$
 	public static final String	MAP3_NUMBER_OF_COLOR_SELECTORS				= "MAP3_NUMBER_OF_COLOR_SELECTORS";						//$NON-NLS-1$
+
 }

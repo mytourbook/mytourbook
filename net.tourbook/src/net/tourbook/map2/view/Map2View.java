@@ -349,7 +349,9 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 			/*
 			 * dim color is stored in the pref store and not in the memento
 			 */
-			final RGB dimColor = PreferenceConverter.getColor(_prefStore, ITourbookPreferences.MAP_LAYOUT_MAP_DIMM_COLOR);
+			final RGB dimColor = PreferenceConverter.getColor(
+					_prefStore,
+					ITourbookPreferences.MAP_LAYOUT_MAP_DIMM_COLOR);
 
 			_map.dimMap(dimLevel, dimColor);
 		}
@@ -757,7 +759,9 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 
 				} else if (property.equals(ITourbookPreferences.MAP_LAYOUT_MAP_DIMM_COLOR)) {
 
-					actionDimMap(PreferenceConverter.getColor(_prefStore, ITourbookPreferences.MAP_LAYOUT_MAP_DIMM_COLOR));
+					actionDimMap(PreferenceConverter.getColor(
+							_prefStore,
+							ITourbookPreferences.MAP_LAYOUT_MAP_DIMM_COLOR));
 
 				} else if (property.equals(ITourbookPreferences.MEASUREMENT_SYSTEM)) {
 
@@ -853,7 +857,8 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 						onSelectionChanged_TourMarker((SelectionTourMarker) eventData, false);
 					}
 
-				} else if (eventId == TourEventId.SLIDER_POSITION_CHANGED) {
+				} else if (eventId == TourEventId.SLIDER_POSITION_CHANGED && eventData instanceof ISelection) {
+
 					onSelectionChanged((ISelection) eventData);
 				}
 			}
@@ -1737,7 +1742,9 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 
 		} else if (selection instanceof SelectionChartInfo) {
 
-			final ChartDataModel chartDataModel = ((SelectionChartInfo) selection).chartDataModel;
+			final SelectionChartInfo chartInfo = (SelectionChartInfo) selection;
+			final ChartDataModel chartDataModel = chartInfo.chartDataModel;
+
 			if (chartDataModel != null) {
 
 				final Object tourId = chartDataModel.getCustomData(TourManager.CUSTOM_DATA_TOUR_ID);
@@ -1753,8 +1760,6 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 					}
 
 					if (tourData != null) {
-
-						final SelectionChartInfo chartInfo = (SelectionChartInfo) selection;
 
 						positionMapTo_TourSliders(
 								tourData,
