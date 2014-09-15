@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -27,6 +27,7 @@ import java.util.Set;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.SelectionChartXSliderPosition;
+import net.tourbook.common.util.CSS;
 import net.tourbook.common.util.PostSelectionProvider;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
@@ -55,6 +56,7 @@ import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.preference.PreferenceConverter;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ISelection;
@@ -66,6 +68,8 @@ import org.eclipse.swt.SWTError;
 import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.browser.LocationAdapter;
 import org.eclipse.swt.browser.LocationEvent;
+import org.eclipse.swt.browser.ProgressAdapter;
+import org.eclipse.swt.browser.ProgressEvent;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
@@ -82,19 +86,25 @@ import org.joda.time.format.DateTimeFormatter;
 
 public class TourBlogView extends ViewPart {
 
-	public static final String		ID					= "net.tourbook.ui.views.TourBlogView";		//$NON-NLS-1$
+	public static final String		ID						= "net.tourbook.ui.views.TourBlogView";			//$NON-NLS-1$
 
-	private static final String		HREF_TOKEN			= "#";											//$NON-NLS-1$
+	private static final String		HREF_TOKEN				= "#";												//$NON-NLS-1$
 
-	private static final String		ACTION_EDIT_MARKER	= "EditMarker";								//$NON-NLS-1$
-	private static final String		ACTION_EDIT_TOUR	= "EditTour";									//$NON-NLS-1$
-	private static final String		ACTION_OPEN_MARKER	= "OpenMarker";								//$NON-NLS-1$
+	private static final String		ACTION_EDIT_MARKER		= "EditMarker";									//$NON-NLS-1$
+	private static final String		ACTION_EDIT_TOUR		= "EditTour";										//$NON-NLS-1$
+	private static final String		ACTION_OPEN_MARKER		= "OpenMarker";									//$NON-NLS-1$
+	private static final String		ACTION_HIDE_MARKER		= "HideMarker";									//$NON-NLS-1$
+	private static final String		ACTION_UNHIDE_MARKER	= "UnHideMarker";									//$NON-NLS-1$
 
-	private static final String		HREF_EDIT_MARKER	= HREF_TOKEN + ACTION_EDIT_MARKER + HREF_TOKEN;
-	private static final String		HREF_EDIT_TOUR		= HREF_TOKEN + ACTION_EDIT_TOUR;
-	private static final String		HREF_OPEN_MARKER	= HREF_TOKEN + ACTION_OPEN_MARKER + HREF_TOKEN;
+	private static final String		HREF_EDIT_MARKER		= HREF_TOKEN + ACTION_EDIT_MARKER + HREF_TOKEN;
+	private static final String		HREF_EDIT_TOUR			= HREF_TOKEN + ACTION_EDIT_TOUR;
+	private static final String		HREF_HIDE_MARKER		= HREF_TOKEN + ACTION_HIDE_MARKER + HREF_TOKEN;
+	private static final String		HREF_OPEN_MARKER		= HREF_TOKEN + ACTION_OPEN_MARKER + HREF_TOKEN;
+	private static final String		HREF_UNHIDE_MARKER		= HREF_TOKEN + ACTION_UNHIDE_MARKER + HREF_TOKEN;
 
-	private final IPreferenceStore	_prefStore			= TourbookPlugin.getPrefStore();
+	private static final String		HREF_MARKER_ITEM		= "#MarkerItem";
+
+	private final IPreferenceStore	_prefStore				= TourbookPlugin.getPrefStore();
 
 	private PostSelectionProvider	_postSelectionProvider;
 
@@ -104,13 +114,24 @@ public class TourBlogView extends ViewPart {
 	private IPartListener2			_partListener;
 
 	private TourData				_tourData;
+
 	private String					_htmlCss;
+
 	private String					_actionEditImageUrl;
+	private String					_actionHideMarkerUrl;
+	private String					_actionShowMarkerUrl;
 
 	private boolean					_isShowHiddenMarker;
+	private String					_cssMarkerHiddenColor;
 
-	private final DateTimeFormatter	_dateFormatter		= DateTimeFormat.fullDate();
-	private final DateTimeFormatter	_timeFormatter		= DateTimeFormat.mediumTime();
+//	/**
+//	 * Is {@link Integer#MIN_VALUE} when browser vertical scrollbar is not displayed.
+//	 */
+//	private int						_browserVerticalPosition	= Integer.MIN_VALUE;
+	private Long					_reloadedTourMarkerId;
+
+	private final DateTimeFormatter	_dateFormatter			= DateTimeFormat.fullDate();
+	private final DateTimeFormatter	_timeFormatter			= DateTimeFormat.mediumTime();
 
 	/*
 	 * UI controls
@@ -268,7 +289,7 @@ public class TourBlogView extends ViewPart {
 
 		create_22_BlogHeader(sb);
 
-		sb.append("<div class='action-hover-container' style='margin-top:30px;'>\n"); //$NON-NLS-1$
+		sb.append("<div class='action-hover-container' style='margin-top:30px; margin-bottom: 5px;'>\n"); //$NON-NLS-1$
 		{
 			create_24_Tour(sb);
 		}
@@ -371,40 +392,58 @@ public class TourBlogView extends ViewPart {
 		final long markerId = tourMarker.getMarkerId();
 		final String markerLabel = tourMarker.getLabel();
 
-		final String hrefOpen = HREF_OPEN_MARKER + markerId;
-		final String hrefEdit = HREF_EDIT_MARKER + markerId;
+		final String hrefOpenMarker = HREF_OPEN_MARKER + markerId;
+		final String hrefEditMarker = HREF_EDIT_MARKER + markerId;
+		final String hrefHideMarker = HREF_HIDE_MARKER + markerId;
+		final String hrefShowMarker = HREF_UNHIDE_MARKER + markerId;
 
-		final String hoverEdit = NLS.bind(Messages.Tour_Blog_Action_EditMarker_Tooltip, markerLabel);
-		final String hoverOpen = NLS.bind(Messages.Tour_Blog_Action_OpenMarker_Tooltip, markerLabel);
+		final String hoverEditMarker = NLS.bind(Messages.Tour_Blog_Action_EditMarker_Tooltip, markerLabel);
+		final String hoverHideMarker = NLS.bind(Messages.Tour_Blog_Action_HideMarker_Tooltip, markerLabel);
+		final String hoverOpenMarker = NLS.bind(Messages.Tour_Blog_Action_OpenMarker_Tooltip, markerLabel);
+		final String hoverShowMarker = NLS.bind(Messages.Tour_Blog_Action_ShowMarker_Tooltip, markerLabel);
 
 		final String label = markerLabel;
 		String textOpen;
 		if (label.length() == 0) {
-			textOpen = hrefOpen;
+			textOpen = hrefOpenMarker;
 		} else {
 			textOpen = label;
 		}
 
+		final String cssMarkerColor = tourMarker.isMarkerVisible() ? "#000;" : _cssMarkerHiddenColor;//$NON-NLS-1$
+		final String htmlMarkerStyle = " style='color:" + cssMarkerColor + "'"; //$NON-NLS-1$ //$NON-NLS-2$
+
+		final String htmlActionShowHideMarker = tourMarker.isMarkerVisible() //
+				? createHtml_Action(hrefHideMarker, hoverHideMarker, _actionHideMarkerUrl)
+				: createHtml_Action(hrefShowMarker, hoverShowMarker, _actionShowMarkerUrl);
+
+		final String htmlActionContainer = "" // //$NON-NLS-1$
+				+ "<div class='action-container'>" //$NON-NLS-1$
+				+ ("<table><tbody><tr>") //$NON-NLS-1$
+				+ ("<td>") //$NON-NLS-1$
+				+ htmlActionShowHideMarker
+				+ ("</td>") //$NON-NLS-1$
+				+ ("<td>") //$NON-NLS-1$
+				+ createHtml_Action(hrefEditMarker, hoverEditMarker, _actionEditImageUrl)
+				+ ("</td>") //$NON-NLS-1$
+				+ "</tr></tbody></table>" // //$NON-NLS-1$
+				+ "	</div>\n"; //$NON-NLS-1$
+
 		sb.append("<div class='title'>\n" //$NON-NLS-1$
-
-				+ ("<div class='action-container'>" //$NON-NLS-1$
-						+ ("<a class='action' style='background: url(" //$NON-NLS-1$
-								+ _actionEditImageUrl
-								+ ") no-repeat;'" //$NON-NLS-1$
-								+ (" href='" + hrefEdit + "'") //$NON-NLS-1$ //$NON-NLS-2$
-								+ (" title='" + hoverEdit + "'") //$NON-NLS-1$ //$NON-NLS-2$
-								+ ">" // //$NON-NLS-1$
-						+ "</a>") // //$NON-NLS-1$
-				+ "	</div>\n") //$NON-NLS-1$
-
-				+ ("<a class='label-text' href='" + hrefOpen + "' title='" + hoverOpen + "'>" + textOpen + "</a>\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+				+ htmlActionContainer
+				+ ("<a class='label-text'" //$NON-NLS-1$
+						+ htmlMarkerStyle
+						+ (" href='" + hrefOpenMarker + "'") //$NON-NLS-1$ //$NON-NLS-2$
+						+ (" name='" + createHtml_MarkerName(markerId) + "'") //$NON-NLS-1$ //$NON-NLS-2$
+						+ (" title='" + hoverOpenMarker + "'") //$NON-NLS-1$ //$NON-NLS-2$
+						+ ">" + textOpen + "</a>\n") //$NON-NLS-1$ //$NON-NLS-2$
 				+ "</div>\n"); //$NON-NLS-1$
 		/*
 		 * Description
 		 */
 		final String description = tourMarker.getDescription();
-		sb.append("<a class='label-text' href='" + hrefOpen + "' title='" + hoverOpen + "'>\n"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-		sb.append("	<p class='description'>" + convertLineBreaks(description) + "</p>\n"); //$NON-NLS-1$ //$NON-NLS-2$
+		sb.append("<a class='label-text' href='" + hrefOpenMarker + "' title='" + hoverOpenMarker + "'>\n"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		sb.append("	<p class='description'" + htmlMarkerStyle + ">" + convertLineBreaks(description) + "</p>\n"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		sb.append("</a>\n"); //$NON-NLS-1$
 	}
 
@@ -444,10 +483,25 @@ public class TourBlogView extends ViewPart {
 		}
 	}
 
+	private String createHtml_Action(final String hrefMarker, final String hoverMarker, final String backgroundImage) {
+
+		return "<a class='action'" // //$NON-NLS-1$
+				+ (" style='background-image: url(" + backgroundImage + ");'") //$NON-NLS-1$ //$NON-NLS-2$
+				+ (" href='" + hrefMarker + "'") //$NON-NLS-1$ //$NON-NLS-2$
+				+ (" title='" + hoverMarker + "'") //$NON-NLS-1$ //$NON-NLS-2$
+				+ ">" // //$NON-NLS-1$
+				+ "</a>"; //$NON-NLS-1$
+	}
+
+	private String createHtml_MarkerName(final long markerId) {
+
+		return HREF_MARKER_ITEM + markerId;
+	}
+
 	@Override
 	public void createPartControl(final Composite parent) {
 
-		loadResources();
+		initUI();
 		createUI(parent);
 
 		addSelectionListener();
@@ -506,9 +560,15 @@ public class TourBlogView extends ViewPart {
 			_browser.addLocationListener(new LocationAdapter() {
 				@Override
 				public void changing(final LocationEvent event) {
-					onLocationChanging(event);
+					onBrowserLocationChanging(event);
 				}
+			});
 
+			_browser.addProgressListener(new ProgressAdapter() {
+				@Override
+				public void completed(final ProgressEvent event) {
+					onBrowserCompleted(event);
+				}
 			});
 
 		} catch (final SWTError e) {
@@ -573,6 +633,15 @@ public class TourBlogView extends ViewPart {
 		}
 	}
 
+	private void hrefActionHideMarker(final TourMarker selectedTourMarker) {
+
+		selectedTourMarker.setMarkerVisible(false);
+
+		prepareBrowserReload(selectedTourMarker);
+
+		TourManager.saveModifiedTour(_tourData);
+	}
+
 	/**
 	 * Fire a selection for the selected marker(s).
 	 */
@@ -616,7 +685,16 @@ public class TourBlogView extends ViewPart {
 		}
 	}
 
-	private void loadResources() {
+	private void hrefActionShowMarker(final TourMarker selectedTourMarker) {
+
+		selectedTourMarker.setMarkerVisible(true);
+
+		prepareBrowserReload(selectedTourMarker);
+
+		TourManager.saveModifiedTour(_tourData);
+	}
+
+	private void initUI() {
 
 		try {
 
@@ -633,11 +711,19 @@ public class TourBlogView extends ViewPart {
 			_htmlCss = "<style>" + cssContent + "</style>"; //$NON-NLS-1$ //$NON-NLS-2$
 
 			/*
-			 * set edit image url
+			 * set image urls
 			 */
 			bundleUrl = TourbookPlugin.getDefault().getBundle().getEntry("/icons/quick-edit.gif"); //$NON-NLS-1$
 			fileUrl = FileLocator.toFileURL(bundleUrl);
 			_actionEditImageUrl = fileUrl.toExternalForm();
+
+			bundleUrl = TourbookPlugin.getDefault().getBundle().getEntry("/icons/remove.png"); //$NON-NLS-1$
+			fileUrl = FileLocator.toFileURL(bundleUrl);
+			_actionHideMarkerUrl = fileUrl.toExternalForm();
+
+			bundleUrl = TourbookPlugin.getDefault().getBundle().getEntry("/icons/eye.png"); //$NON-NLS-1$
+			fileUrl = FileLocator.toFileURL(bundleUrl);
+			_actionShowMarkerUrl = fileUrl.toExternalForm();
 
 		} catch (final IOException | URISyntaxException e) {
 			StatusUtil.showStatus(e);
@@ -645,9 +731,46 @@ public class TourBlogView extends ViewPart {
 
 	}
 
-	private void onLocationChanging(final LocationEvent event) {
+	private void onBrowserCompleted(final ProgressEvent event) {
+
+		if (_reloadedTourMarkerId == null) {
+			return;
+		}
+
+		// get local copy
+		final long reloadedTourMarkerId = _reloadedTourMarkerId;
+
+		/*
+		 * This must be run async otherwise an endless loop will happen
+		 */
+		_browser.getDisplay().asyncExec(new Runnable() {
+			public void run() {
+
+				final String href = "location.href='" + createHtml_MarkerName(reloadedTourMarkerId) + "'";
+
+				_browser.execute(href);
+			}
+		});
+
+		_reloadedTourMarkerId = null;
+	}
+
+	private void onBrowserLocationChanging(final LocationEvent event) {
 
 		final String location = event.location;
+
+		if (location.contains(HREF_MARKER_ITEM)) {
+
+			/*
+			 * Page is reloaded and is scrolled to the tour marker where the last tour marker action
+			 * is done.
+			 */
+
+			_browser.setRedraw(true);
+
+			return;
+		}
+
 		final String[] locationParts = location.split(HREF_TOKEN);
 
 		if (locationParts.length == 3) {
@@ -683,9 +806,18 @@ public class TourBlogView extends ViewPart {
 						hrefActionEditMarker(hrefTourMarker);
 						break;
 
+					case ACTION_HIDE_MARKER:
+						hrefActionHideMarker(hrefTourMarker);
+						break;
+
 					case ACTION_OPEN_MARKER:
 						hrefActionOpenMarker(new StructuredSelection(hrefTourMarker));
 						break;
+
+					case ACTION_UNHIDE_MARKER:
+						hrefActionShowMarker(hrefTourMarker);
+						break;
+
 					}
 				}
 
@@ -790,6 +922,18 @@ public class TourBlogView extends ViewPart {
 		}
 	}
 
+	/**
+	 * Keeps the current browser scroll position.
+	 * 
+	 * @param tourMarker
+	 */
+	private void prepareBrowserReload(final TourMarker tourMarker) {
+
+		_reloadedTourMarkerId = tourMarker.getMarkerId();
+
+		_browser.setRedraw(false);
+	}
+
 	private void saveState() {
 
 	}
@@ -844,6 +988,10 @@ public class TourBlogView extends ViewPart {
 
 		_isShowHiddenMarker = _prefStore.getBoolean(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_HIDDEN_MARKER);
 
+		_cssMarkerHiddenColor = CSS.color(PreferenceConverter.getColor(
+				_prefStore,
+				ITourbookPreferences.GRAPH_MARKER_COLOR_HIDDEN));
+
 //		Force Internet Explorer to not use compatibility mode. Internet Explorer believes that websites under
 //		several domains (including "ibm.com") require compatibility mode. You may see your web application run
 //		normally under "localhost", but then fail when hosted under another domain (e.g.: "ibm.com").
@@ -862,5 +1010,4 @@ public class TourBlogView extends ViewPart {
 
 		_browser.setText(html);
 	}
-
 }

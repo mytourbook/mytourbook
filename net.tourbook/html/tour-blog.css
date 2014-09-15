@@ -54,12 +54,12 @@ img {
 
 .blog-item
 {
-	margin-bottom:		20px;
+	margin-bottom:		5px;
 }
 
 .title 
 {
-	margin-bottom:		5px;
+	margin-bottom:		0px;
 	font-weight: 		bold;
 }
 
@@ -77,30 +77,48 @@ a.label-text:VISITED
     text-decoration:	none;
 }
 
+.action-hover-container
+{
+	overflow: 				auto;
+}
+/* show hidden actions */
 .action-hover-container:HOVER .action-container
-{												/* show hidden actions */
-	opacity:			1.0;
-	filter: 			alpha(opacity=100); 	/* IE needs this even in html standard mode*/
+{												
+	opacity:				1.0;
+	filter: 				alpha(opacity=100); 	/* IE needs this even in html standard mode*/
 }
 .action-hover-container:HOVER 
 {
-	background-color: 	#eee;
+	background-color: 		#eee;
+}
+.action-hover-container .action-container a:HOVER 
+{ 
+	border: 				1px solid #aaa;
+	border-radius:			3px;
 }
 
 .action-container 
 {
-	float:				right;
-	opacity:			0;
-	filter: 			alpha(opacity=0);
+	float:					right;
+	opacity:				0;
+	filter: 				alpha(opacity=0);
 }
 
 a.action:LINK,
 a.action:VISITED 
 {
-	display:			block;
-	width: 				16px; 
-	height: 			16px; 
-	cursor: 			pointer; 
+	display:				block;
+	width: 					20px; 
+	height: 				20px; 
+
+	text-decoration:		none;
 	
-    text-decoration:	none;
+	background-repeat:		no-repeat;
+	background-position:	center;
+
+	border:					1px solid #eee;
+	border-radius:			3px;
+
+	cursor: 				pointer; 
 }
+

@@ -16,6 +16,9 @@ Improvements
     When max is enforced but the data max value is smaller than forced max, the data max value is used.
   - When a vertical slider is moved in the tour chart with a hovered mouse, this view must not be activated that the moved slider is also updated in other views, e.g. 2/3D Map, Tour Analyzer.
 
+* Tour Blog
+  - Show/hide tour marker.
+  - Improved UI: Hovered style.
 
  
 Fixed Bug 	
