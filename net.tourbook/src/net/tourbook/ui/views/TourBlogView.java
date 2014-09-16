@@ -102,7 +102,7 @@ public class TourBlogView extends ViewPart {
 	private static final String		HREF_OPEN_MARKER		= HREF_TOKEN + ACTION_OPEN_MARKER + HREF_TOKEN;
 	private static final String		HREF_UNHIDE_MARKER		= HREF_TOKEN + ACTION_UNHIDE_MARKER + HREF_TOKEN;
 
-	private static final String		HREF_MARKER_ITEM		= "#MarkerItem";
+	private static final String		HREF_MARKER_ITEM		= "#MarkerItem";									//$NON-NLS-1$
 
 	private final IPreferenceStore	_prefStore				= TourbookPlugin.getPrefStore();
 
@@ -124,10 +124,6 @@ public class TourBlogView extends ViewPart {
 	private boolean					_isShowHiddenMarker;
 	private String					_cssMarkerHiddenColor;
 
-//	/**
-//	 * Is {@link Integer#MIN_VALUE} when browser vertical scrollbar is not displayed.
-//	 */
-//	private int						_browserVerticalPosition	= Integer.MIN_VALUE;
 	private Long					_reloadedTourMarkerId;
 
 	private final DateTimeFormatter	_dateFormatter			= DateTimeFormat.fullDate();
@@ -402,14 +398,6 @@ public class TourBlogView extends ViewPart {
 		final String hoverOpenMarker = NLS.bind(Messages.Tour_Blog_Action_OpenMarker_Tooltip, markerLabel);
 		final String hoverShowMarker = NLS.bind(Messages.Tour_Blog_Action_ShowMarker_Tooltip, markerLabel);
 
-		final String label = markerLabel;
-		String textOpen;
-		if (label.length() == 0) {
-			textOpen = hrefOpenMarker;
-		} else {
-			textOpen = label;
-		}
-
 		final String cssMarkerColor = tourMarker.isMarkerVisible() ? "#000;" : _cssMarkerHiddenColor;//$NON-NLS-1$
 		final String htmlMarkerStyle = " style='color:" + cssMarkerColor + "'"; //$NON-NLS-1$ //$NON-NLS-2$
 
@@ -420,23 +408,22 @@ public class TourBlogView extends ViewPart {
 		final String htmlActionContainer = "" // //$NON-NLS-1$
 				+ "<div class='action-container'>" //$NON-NLS-1$
 				+ ("<table><tbody><tr>") //$NON-NLS-1$
-				+ ("<td>") //$NON-NLS-1$
-				+ htmlActionShowHideMarker
-				+ ("</td>") //$NON-NLS-1$
-				+ ("<td>") //$NON-NLS-1$
-				+ createHtml_Action(hrefEditMarker, hoverEditMarker, _actionEditImageUrl)
-				+ ("</td>") //$NON-NLS-1$
+				+ ("<td>" + htmlActionShowHideMarker + "</td>") //$NON-NLS-1$ //$NON-NLS-2$
+				+ ("<td>" + createHtml_Action(hrefEditMarker, hoverEditMarker, _actionEditImageUrl) + "</td>") //$NON-NLS-1$ //$NON-NLS-2$
 				+ "</tr></tbody></table>" // //$NON-NLS-1$
 				+ "	</div>\n"; //$NON-NLS-1$
 
 		sb.append("<div class='title'>\n" //$NON-NLS-1$
+
 				+ htmlActionContainer
+
 				+ ("<a class='label-text'" //$NON-NLS-1$
 						+ htmlMarkerStyle
 						+ (" href='" + hrefOpenMarker + "'") //$NON-NLS-1$ //$NON-NLS-2$
 						+ (" name='" + createHtml_MarkerName(markerId) + "'") //$NON-NLS-1$ //$NON-NLS-2$
 						+ (" title='" + hoverOpenMarker + "'") //$NON-NLS-1$ //$NON-NLS-2$
-						+ ">" + textOpen + "</a>\n") //$NON-NLS-1$ //$NON-NLS-2$
+						+ ">" + markerLabel + "</a>\n") //$NON-NLS-1$ //$NON-NLS-2$
+
 				+ "</div>\n"); //$NON-NLS-1$
 		/*
 		 * Description
@@ -465,18 +452,15 @@ public class TourBlogView extends ViewPart {
 
 				// only text is in the link -> this is not a internet address but create a link of it
 
-				final String title = urlText;
-				linkText = "<a href='" + urlText + "' title='" + title + "'>" + urlText + "</a>\n"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+				linkText = "<a href='" + urlText + "' title='" + urlText + "'>" + urlText + "</a>\n"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 
 			} else if (isText == false) {
 
-				final String title = urlAddress;
-				linkText = "<a href='" + urlAddress + "' title='" + title + "'>" + urlAddress + "</a>\n"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+				linkText = "<a href='" + urlAddress + "' title='" + urlAddress + "'>" + urlAddress + "</a>\n"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 
 			} else {
 
-				final String title = urlAddress;
-				linkText = "<a href='" + urlAddress + "' title='" + title + "'>" + urlText + "</a>\n"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+				linkText = "<a href='" + urlAddress + "' title='" + urlAddress + "'>" + urlText + "</a>\n"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 			}
 
 			sb.append(linkText);
@@ -746,7 +730,7 @@ public class TourBlogView extends ViewPart {
 		_browser.getDisplay().asyncExec(new Runnable() {
 			public void run() {
 
-				final String href = "location.href='" + createHtml_MarkerName(reloadedTourMarkerId) + "'";
+				final String href = "location.href='" + createHtml_MarkerName(reloadedTourMarkerId) + "'"; //$NON-NLS-1$ //$NON-NLS-2$
 
 				_browser.execute(href);
 			}

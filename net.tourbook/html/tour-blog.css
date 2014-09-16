@@ -1,87 +1,102 @@
 
-html {
-	overflow-y: scroll;
+html 
+{
+	overflow-y: 			scroll;
 }
 
-body {
-	font-size:			13px;
-	color:				#404040;
-	background-color:	#fff;
-	margin:				5px;
+body 
+{
+	font-size:				13px;
+	color:					#404040;
+	background-color:		#fff;
+	margin:					5px;
 }
 
-p,td,ul {
-	line-height:		130%;
+p,td,ul 
+{
+	line-height:			130%;
 }
 
-p {
-	margin:				0px;
+p 
+{
+	margin:					0px;
 }
 
-body,p,h1,h2,h3,h4,table,td,th,ul,ol,textarea,input {
-	font-family: 		verdana, helvetica, arial, sans-serif;
+img 
+{
+	border: 				0;
 }
 
-
-img {
-	border: 			0;
+table
+{
+	border-collapse:		collapse;
 }
+
+body,p,h1,h2,h3,h4,table,td,th,ul,ol,textarea,input 
+{
+	font-family: 			verdana, helvetica, arial, sans-serif;
+}
+
 
 .date 
 {
-	float:				left;
-	width:				50%;
+	float:					left;
+	width:					50%;
 }
 
 .time 
 {
-	float:				right;
-	width:				50%;
-	text-align: 		right;
+	float:					right;
+	width:					50%;
+	text-align: 			right;
 }
 
 .blog-title 
 {
-	display:			block;
-	width:				auto;					/* enforce width to the right border */
+	display:				block;
+	width:					auto;					/* enforce width to the right border */
 
-	margin-bottom:		20px;
+	margin-bottom:			12px;
 
-	font-size:			24px;
-	font-weight:		bold;
-	color:				#333;	
+	font-size:				24px;
+	font-weight:			bold;
+	color:					#333;	
 }
 
 .blog-item
 {
-	margin-bottom:		5px;
+	margin-bottom:			8px;
 }
 
 .title 
 {
-	margin-bottom:		0px;
-	font-weight: 		bold;
+	margin-bottom:			0px;
+	font-weight: 			bold;
 }
 
 .description
 {
-	margin-bottom:		5px;
+	margin-top:				2px;
+	margin-bottom:			2px;
 }
 
 a.label-text:LINK,
 a.label-text:VISITED 
 {
-	display:			block;
-	width:				auto;					/* enforce width to the right border */
-	color:				#333;	
-    text-decoration:	none;
+	display:				block;
+	width:					auto;					/* enforce width to the right border */
+	color:					#333;	
+    text-decoration:		none;
 }
 
 .action-hover-container
 {
-	overflow: 				auto;
+	min-height: 			24px;					/* ensure action buttons are covered with 1 liner */
+	overflow: 				hidden;					/* prevent to create a horizontal scrollbar */
+	padding-left: 			2px;
 }
-/* show hidden actions */
+
+/* show hidden actions when blog item is hovered */
 .action-hover-container:HOVER .action-container
 {												
 	opacity:				1.0;
@@ -89,7 +104,7 @@ a.label-text:VISITED
 }
 .action-hover-container:HOVER 
 {
-	background-color: 		#eee;
+	background-color: 		#f8f8f8;
 }
 .action-hover-container .action-container a:HOVER 
 { 
@@ -99,10 +114,17 @@ a.label-text:VISITED
 
 .action-container 
 {
-	float:					right;
 	opacity:				0;
 	filter: 				alpha(opacity=0);
+
+	background-color: 		#f8f8f8;
+	position:				absolute;
+	right:					5px;					/* blog margin*/
+	z-index:				10;
 }
+
+
+
 
 a.action:LINK,
 a.action:VISITED 
@@ -116,7 +138,7 @@ a.action:VISITED
 	background-repeat:		no-repeat;
 	background-position:	center;
 
-	border:					1px solid #eee;
+	border:					1px solid #f8f8f8;
 	border-radius:			3px;
 
 	cursor: 				pointer; 
