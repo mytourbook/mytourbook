@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -19,7 +19,7 @@ import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.tooltip.IOpeningDialog;
-import net.tourbook.ui.tourChart.SlideoutMarkerOptions;
+import net.tourbook.ui.tourChart.SlideoutTourChartMarker;
 import net.tourbook.ui.tourChart.TourChart;
 
 import org.eclipse.jface.action.ContributionItem;
@@ -38,7 +38,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 
-public class ActionMarkerOptions extends ContributionItem implements IOpeningDialog {
+public class ActionTourChartMarker extends ContributionItem implements IOpeningDialog {
 
 	private static final String		IMAGE_EDIT_TOUR_MARKER			= Messages.Image__edit_tour_marker;
 	private static final String		IMAGE_EDIT_TOUR_MARKER_DISABLED	= Messages.Image__edit_tour_marker_disabled;
@@ -53,7 +53,7 @@ public class ActionMarkerOptions extends ContributionItem implements IOpeningDia
 	private ToolBar					_toolBar;
 	private ToolItem				_actionToolItem;
 
-	private SlideoutMarkerOptions	_slideoutMarkerOptions;
+	private SlideoutTourChartMarker	_slideoutMarkerOptions;
 
 	/*
 	 * UI controls
@@ -63,7 +63,7 @@ public class ActionMarkerOptions extends ContributionItem implements IOpeningDia
 	private Image					_imageEnabled;
 	private Image					_imageDisabled;
 
-	public ActionMarkerOptions(final TourChart tourChart, final Control parent) {
+	public ActionTourChartMarker(final TourChart tourChart, final Control parent) {
 
 		_tourChart = tourChart;
 		_parent = parent;
@@ -106,7 +106,7 @@ public class ActionMarkerOptions extends ContributionItem implements IOpeningDia
 				}
 			});
 
-			_slideoutMarkerOptions = new SlideoutMarkerOptions(_parent, _toolBar, _state, _tourChart);
+			_slideoutMarkerOptions = new SlideoutTourChartMarker(_parent, _toolBar, _state, _tourChart);
 
 			updateUI();
 		}

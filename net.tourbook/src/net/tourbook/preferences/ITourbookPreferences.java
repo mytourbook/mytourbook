@@ -123,6 +123,10 @@ public interface ITourbookPreferences {
 	public static final String	GRAPH_PACE_IS_MAX_ENABLED					= "GRAPH_PACE_IS_MAX_ENABLED";								//$NON-NLS-1$
 	public static final String	GRAPH_PACE_MIN_VALUE						= "GRAPH_PACE_MIN_VALUE";									//$NON-NLS-1$
 	public static final String	GRAPH_PACE_MAX_VALUE						= "GRAPH_PACE_MAX_VALUE";									//$NON-NLS-1$
+	public static final String	GRAPH_PULSE_IS_MIN_ENABLED					= "GRAPH_PULSE_IS_MIN_ENABLED";							//$NON-NLS-1$
+	public static final String	GRAPH_PULSE_IS_MAX_ENABLED					= "GRAPH_PULSE_IS_MAX_ENABLED";							//$NON-NLS-1$
+	public static final String	GRAPH_PULSE_MIN_VALUE						= "GRAPH_PULSE_MIN_VALUE";									//$NON-NLS-1$
+	public static final String	GRAPH_PULSE_MAX_VALUE						= "GRAPH_PULSE_MAX_VALUE";									//$NON-NLS-1$
 
 	public static final String	GRAPH_GRID_VERTICAL_DISTANCE				= "graphs.grid.vertical-distance";							//$NON-NLS-1$
 	public static final String	GRAPH_GRID_HORIZONTAL_DISTANCE				= "graphs.grid.horizontal-distance";						//$NON-NLS-1$

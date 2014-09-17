@@ -189,6 +189,11 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 		store.setDefault(ITourbookPreferences.GRAPH_PACE_MIN_VALUE, 1);
 		store.setDefault(ITourbookPreferences.GRAPH_PACE_MAX_VALUE, 5);
 
+		store.setDefault(ITourbookPreferences.GRAPH_PULSE_IS_MIN_ENABLED, false);
+		store.setDefault(ITourbookPreferences.GRAPH_PULSE_IS_MAX_ENABLED, false);
+		store.setDefault(ITourbookPreferences.GRAPH_PULSE_MIN_VALUE, 50);
+		store.setDefault(ITourbookPreferences.GRAPH_PULSE_MAX_VALUE, 200);
+
 		// value point tool tip
 		store.setDefault(ITourbookPreferences.VALUE_POINT_TOOL_TIP_IS_VISIBLE, true);
 

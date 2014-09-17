@@ -289,7 +289,7 @@ public class Messages extends NLS {
 	public static String		App_Action_Menu_Directory;
 	public static String		App_Action_Menu_help;
 
-	public static String	App_Action_Menu_New;
+	public static String		App_Action_Menu_New;
 	public static String		App_Action_Menu_tools;
 	public static String		App_Action_Menu_Tour;
 	public static String		App_Action_New;
@@ -908,17 +908,21 @@ public class Messages extends NLS {
 	public static String		Pref_Graphs_Check_show_start_time;
 	public static String		Pref_Graphs_Checkbox_GraphAntialiasing;
 	public static String		Pref_Graphs_Checkbox_GraphAntialiasing_Tooltip;
-	public static String	Pref_Graphs_Checkbox_IsForceAltimeterMaxValue;
+	public static String		Pref_Graphs_Checkbox_IsForceAltimeterMaxValue;
 
-	public static String	Pref_Graphs_Checkbox_IsForceAltimeterMinValue;
+	public static String		Pref_Graphs_Checkbox_IsForceAltimeterMinValue;
 
-	public static String	Pref_Graphs_Checkbox_IsForceGradientMaxValue;
+	public static String		Pref_Graphs_Checkbox_IsForceGradientMaxValue;
 
-	public static String	Pref_Graphs_Checkbox_IsForceGradientMinValue;
+	public static String		Pref_Graphs_Checkbox_IsForceGradientMinValue;
 
-	public static String	Pref_Graphs_Checkbox_IsForcePaceMaxValue;
+	public static String		Pref_Graphs_Checkbox_IsForcePaceMaxValue;
 
-	public static String	Pref_Graphs_Checkbox_IsForcePaceMinValue;
+	public static String		Pref_Graphs_Checkbox_IsForcePaceMinValue;
+
+	public static String	Pref_Graphs_Checkbox_IsForcePulseMaxValue;
+
+	public static String	Pref_Graphs_Checkbox_IsForcePulseMinValue;
 
 	public static String		Pref_Graphs_Checkbox_ShowHorizontalGrid;
 	public static String		Pref_Graphs_Checkbox_ShowVerticalGrid;
@@ -952,9 +956,9 @@ public class Messages extends NLS {
 	public static String		Pref_Graphs_Text_max_value;
 	public static String		Pref_Graphs_Text_min_value;
 
-	public static String	Pref_LiveUpdate_Checkbox;
+	public static String		Pref_LiveUpdate_Checkbox;
 
-	public static String	Pref_LiveUpdate_Checkbox_Tooltip;
+	public static String		Pref_LiveUpdate_Checkbox_Tooltip;
 
 	public static String		Pref_MapLayout_Checkbox_BorderColor_Color;
 	public static String		Pref_MapLayout_Checkbox_BorderColor_Darker;
@@ -1268,14 +1272,10 @@ public class Messages extends NLS {
 	public static String		Tour_Action_ValuePointToolTip_IsVisible;
 
 	public static String		Tour_Blog_Action_EditMarker_Tooltip;
-
 	public static String		Tour_Blog_Action_EditTour_Tooltip;
-
-	public static String	Tour_Blog_Action_HideMarker_Tooltip;
-
+	public static String		Tour_Blog_Action_HideMarker_Tooltip;
 	public static String		Tour_Blog_Action_OpenMarker_Tooltip;
-
-	public static String	Tour_Blog_Action_ShowMarker_Tooltip;
+	public static String		Tour_Blog_Action_ShowMarker_Tooltip;
 
 	public static String		Tour_Book_Action_delete_selected_tours;
 	public static String		Tour_Book_Action_delete_selected_tours_dlg_message;
@@ -1302,9 +1302,7 @@ public class Messages extends NLS {
 	public static String		Tour_Database_PostUpdate011_SetTourCreateTime;
 	public static String		Tour_Database_PostUpdate020_ConvertIntToFloat;
 	public static String		Tour_Database_PostUpdate021_SetTourStartEndTime;
-
 	public static String		Tour_Database_PostUpdate023_SetTimeSliceNumbers;
-
 	public static String		Tour_Database_PostUpdate025_SetMarkerFields;
 	public static String		Tour_Database_TourSaveError;
 	public static String		Tour_Database_update_tour;

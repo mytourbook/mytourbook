@@ -136,7 +136,6 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 	 */
 	@XmlElement
 	private int						time										= -1;
-
 	/**
 	 * Distance field before db version 20, this field is required for data conversion AND <b>to
 	 * load entities</b> !!!
@@ -157,9 +156,9 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 	 * {@link ChartLabel#LABEL_POS_HORIZONTAL_ABOVE_GRAPH_CENTERED}.
 	 */
 	private int						visualPosition								= TourMarker.LABEL_POS_HORIZONTAL_ABOVE_GRAPH_CENTERED;
+
 	private int						labelXOffset;
 	private int						labelYOffset;
-
 	/**
 	 * Contains the type of the marker, this can be: crossing, hotel, view point.
 	 * <p>
@@ -205,8 +204,8 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 
 	// initialize with invalid values
 	private double					latitude;																							//		= Double.MIN_VALUE;
-	private double					longitude;																							//		= Double.MIN_VALUE;
 
+	private double					longitude;																							//		= Double.MIN_VALUE;
 	private float					altitude;
 
 	private int						isMarkerVisible								= 1;
@@ -410,14 +409,6 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 		return longitude;
 	}
 
-//	/**
-//	 * @return Returns the {@link TourSign} for this {@link TourMarker} or <code>null</code> when
-//	 *         it's not set.
-//	 */
-//	public TourSign getTourSign() {
-//		return tourSign;
-//	}
-
 	/**
 	 * @return Contains <b>width</b> and <b>height</b> of the marker image.
 	 *         <p>
@@ -427,6 +418,14 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 	public Rectangle getMarkerBounds() {
 		return _markerBounds;
 	}
+
+//	/**
+//	 * @return Returns the {@link TourSign} for this {@link TourMarker} or <code>null</code> when
+//	 *         it's not set.
+//	 */
+//	public TourSign getTourSign() {
+//		return tourSign;
+//	}
 
 	/**
 	 * @return Returns {@link TourMarker} entity id.
@@ -477,6 +476,14 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 		result = prime * result + (int) (_createId ^ (_createId >>> 32));
 		result = prime * result + (int) (markerId ^ (markerId >>> 32));
 		return result;
+	}
+
+	/**
+	 * @return Returns <code>true</code> when the marker is created with the device.
+	 */
+	public boolean isDeviceMarker() {
+
+		return type == ChartLabel.MARKER_TYPE_DEVICE;
 	}
 
 	/**

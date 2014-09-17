@@ -46,6 +46,7 @@ import net.tourbook.tour.SelectionTourMarker;
 import net.tourbook.tour.TourEvent;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
+import net.tourbook.ui.action.ActionTourBlogMarker;
 import net.tourbook.ui.tourChart.TourChart;
 import net.tourbook.ui.views.tourCatalog.SelectionTourCatalogView;
 import net.tourbook.ui.views.tourCatalog.TVICatalogComparedTour;
@@ -53,6 +54,8 @@ import net.tourbook.ui.views.tourCatalog.TVICatalogRefTourItem;
 import net.tourbook.ui.views.tourCatalog.TVICompareResultComparedTour;
 
 import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.jface.action.IToolBarManager;
+import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -86,25 +89,41 @@ import org.joda.time.format.DateTimeFormatter;
 
 public class TourBlogView extends ViewPart {
 
-	public static final String		ID						= "net.tourbook.ui.views.TourBlogView";			//$NON-NLS-1$
+	public static final String		ID										= "net.tourbook.ui.views.TourBlogView";		//$NON-NLS-1$
 
-	private static final String		HREF_TOKEN				= "#";												//$NON-NLS-1$
+	static final String				STATE_IS_DRAW_MARKER_WITH_DEFAULT_COLOR	= "STATE_IS_DRAW_MARKER_WITH_DEFAULT_COLOR";	//$NON-NLS-1$
+	static final String				STATE_IS_SHOW_HIDDEN_MARKER				= "STATE_IS_SHOW_HIDDEN_MARKER";				//$NON-NLS-1$
 
-	private static final String		ACTION_EDIT_MARKER		= "EditMarker";									//$NON-NLS-1$
-	private static final String		ACTION_EDIT_TOUR		= "EditTour";										//$NON-NLS-1$
-	private static final String		ACTION_OPEN_MARKER		= "OpenMarker";									//$NON-NLS-1$
-	private static final String		ACTION_HIDE_MARKER		= "HideMarker";									//$NON-NLS-1$
-	private static final String		ACTION_UNHIDE_MARKER	= "UnHideMarker";									//$NON-NLS-1$
+	private static final String		HREF_TOKEN								= "#";											//$NON-NLS-1$
 
-	private static final String		HREF_EDIT_MARKER		= HREF_TOKEN + ACTION_EDIT_MARKER + HREF_TOKEN;
-	private static final String		HREF_EDIT_TOUR			= HREF_TOKEN + ACTION_EDIT_TOUR;
-	private static final String		HREF_HIDE_MARKER		= HREF_TOKEN + ACTION_HIDE_MARKER + HREF_TOKEN;
-	private static final String		HREF_OPEN_MARKER		= HREF_TOKEN + ACTION_OPEN_MARKER + HREF_TOKEN;
-	private static final String		HREF_UNHIDE_MARKER		= HREF_TOKEN + ACTION_UNHIDE_MARKER + HREF_TOKEN;
+	private static final String		ACTION_EDIT_TOUR						= "EditTour";									//$NON-NLS-1$
 
-	private static final String		HREF_MARKER_ITEM		= "#MarkerItem";									//$NON-NLS-1$
+	private static final String		ACTION_EDIT_MARKER						= "EditMarker";								//$NON-NLS-1$
+	private static final String		ACTION_HIDE_MARKER						= "HideMarker";								//$NON-NLS-1$
+	private static final String		ACTION_OPEN_MARKER						= "OpenMarker";								//$NON-NLS-1$
+	private static final String		ACTION_SHOW_MARKER						= "ShowMarker";								//$NON-NLS-1$
 
-	private final IPreferenceStore	_prefStore				= TourbookPlugin.getPrefStore();
+	private static String			HREF_EDIT_TOUR;
+
+	private static String			HREF_EDIT_MARKER;
+	private static String			HREF_HIDE_MARKER;
+	private static String			HREF_OPEN_MARKER;
+	private static String			HREF_SHOW_MARKER;
+
+	static {
+
+		HREF_EDIT_TOUR = HREF_TOKEN + ACTION_EDIT_TOUR;
+
+		HREF_EDIT_MARKER = HREF_TOKEN + ACTION_EDIT_MARKER + HREF_TOKEN;
+		HREF_HIDE_MARKER = HREF_TOKEN + ACTION_HIDE_MARKER + HREF_TOKEN;
+		HREF_OPEN_MARKER = HREF_TOKEN + ACTION_OPEN_MARKER + HREF_TOKEN;
+		HREF_SHOW_MARKER = HREF_TOKEN + ACTION_SHOW_MARKER + HREF_TOKEN;
+	}
+
+	private static final String		HREF_MARKER_ITEM						= "#MarkerItem";								//$NON-NLS-1$
+
+	private final IPreferenceStore	_prefStore								= TourbookPlugin.getPrefStore();
+	private final IDialogSettings	_state									= TourbookPlugin.getState(ID);
 
 	private PostSelectionProvider	_postSelectionProvider;
 
@@ -121,13 +140,19 @@ public class TourBlogView extends ViewPart {
 	private String					_actionHideMarkerUrl;
 	private String					_actionShowMarkerUrl;
 
-	private boolean					_isShowHiddenMarker;
+	private String					_cssMarkerDefaultColor;
+	private String					_cssMarkerDeviceColor;
 	private String					_cssMarkerHiddenColor;
+
+	private boolean					_isDrawWithDefaultColor;
+	private boolean					_isShowHiddenMarker;
 
 	private Long					_reloadedTourMarkerId;
 
-	private final DateTimeFormatter	_dateFormatter			= DateTimeFormat.fullDate();
-	private final DateTimeFormatter	_timeFormatter			= DateTimeFormat.mediumTime();
+	private ActionTourBlogMarker	_actionTourBlogMarker;
+
+	private final DateTimeFormatter	_dateFormatter							= DateTimeFormat.fullDate();
+	private final DateTimeFormatter	_timeFormatter							= DateTimeFormat.mediumTime();
 
 	/*
 	 * UI controls
@@ -140,6 +165,8 @@ public class TourBlogView extends ViewPart {
 	private Browser					_browser;
 	private TourChart				_tourChart;
 	private Text					_txtNoBrowser;
+
+	private Composite				_uiParent;
 
 	private void addPartListener() {
 
@@ -391,14 +418,38 @@ public class TourBlogView extends ViewPart {
 		final String hrefOpenMarker = HREF_OPEN_MARKER + markerId;
 		final String hrefEditMarker = HREF_EDIT_MARKER + markerId;
 		final String hrefHideMarker = HREF_HIDE_MARKER + markerId;
-		final String hrefShowMarker = HREF_UNHIDE_MARKER + markerId;
+		final String hrefShowMarker = HREF_SHOW_MARKER + markerId;
 
 		final String hoverEditMarker = NLS.bind(Messages.Tour_Blog_Action_EditMarker_Tooltip, markerLabel);
 		final String hoverHideMarker = NLS.bind(Messages.Tour_Blog_Action_HideMarker_Tooltip, markerLabel);
 		final String hoverOpenMarker = NLS.bind(Messages.Tour_Blog_Action_OpenMarker_Tooltip, markerLabel);
 		final String hoverShowMarker = NLS.bind(Messages.Tour_Blog_Action_ShowMarker_Tooltip, markerLabel);
 
-		final String cssMarkerColor = tourMarker.isMarkerVisible() ? "#000;" : _cssMarkerHiddenColor;//$NON-NLS-1$
+		/*
+		 * get color by priority
+		 */
+		String cssMarkerColor;
+
+		if (_isDrawWithDefaultColor) {
+
+			// force default color
+			cssMarkerColor = _cssMarkerDefaultColor;
+
+		} else if (tourMarker.isMarkerVisible() == false) {
+
+			// show hidden color
+			cssMarkerColor = _cssMarkerHiddenColor;
+
+		} else if (tourMarker.isDeviceMarker()) {
+
+			// show with device color
+			cssMarkerColor = _cssMarkerDeviceColor;
+
+		} else {
+
+			cssMarkerColor = _cssMarkerDefaultColor;
+		}
+
 		final String htmlMarkerStyle = " style='color:" + cssMarkerColor + "'"; //$NON-NLS-1$ //$NON-NLS-2$
 
 		final String htmlActionShowHideMarker = tourMarker.isMarkerVisible() //
@@ -467,6 +518,13 @@ public class TourBlogView extends ViewPart {
 		}
 	}
 
+	private void createActions() {
+
+		_actionTourBlogMarker = new ActionTourBlogMarker(this, _uiParent);
+
+		fillActionBars();
+	}
+
 	private String createHtml_Action(final String hrefMarker, final String hoverMarker, final String backgroundImage) {
 
 		return "<a class='action'" // //$NON-NLS-1$
@@ -485,8 +543,12 @@ public class TourBlogView extends ViewPart {
 	@Override
 	public void createPartControl(final Composite parent) {
 
+		_uiParent = parent;
+
 		initUI();
+
 		createUI(parent);
+		createActions();
 
 		addSelectionListener();
 		addTourEventListener();
@@ -572,6 +634,16 @@ public class TourBlogView extends ViewPart {
 		_prefStore.removePropertyChangeListener(_prefChangeListener);
 
 		super.dispose();
+	}
+
+	private void fillActionBars() {
+
+		/*
+		 * fill view toolbar
+		 */
+		final IToolBarManager tbm = getViewSite().getActionBars().getToolBarManager();
+
+		tbm.add(_actionTourBlogMarker);
 	}
 
 	private void fireMarkerPosition(final StructuredSelection selection) {
@@ -798,7 +870,7 @@ public class TourBlogView extends ViewPart {
 						hrefActionOpenMarker(new StructuredSelection(hrefTourMarker));
 						break;
 
-					case ACTION_UNHIDE_MARKER:
+					case ACTION_SHOW_MARKER:
 						hrefActionShowMarker(hrefTourMarker);
 						break;
 
@@ -964,17 +1036,26 @@ public class TourBlogView extends ViewPart {
 	/**
 	 * Update the UI from {@link #_tourData}.
 	 */
-	private void updateUI() {
+	void updateUI() {
 
 		if (_tourData == null || _browser == null) {
 			return;
 		}
 
-		_isShowHiddenMarker = _prefStore.getBoolean(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_HIDDEN_MARKER);
+		_isDrawWithDefaultColor = _state.getBoolean(STATE_IS_DRAW_MARKER_WITH_DEFAULT_COLOR);
+		_isShowHiddenMarker = _state.getBoolean(STATE_IS_SHOW_HIDDEN_MARKER);
+
+		_cssMarkerDefaultColor = CSS.color(PreferenceConverter.getColor(
+				_prefStore,
+				ITourbookPreferences.GRAPH_MARKER_COLOR_DEFAULT));
 
 		_cssMarkerHiddenColor = CSS.color(PreferenceConverter.getColor(
 				_prefStore,
 				ITourbookPreferences.GRAPH_MARKER_COLOR_HIDDEN));
+
+		_cssMarkerDeviceColor = CSS.color(PreferenceConverter.getColor(
+				_prefStore,
+				ITourbookPreferences.GRAPH_MARKER_COLOR_DEVICE));
 
 //		Force Internet Explorer to not use compatibility mode. Internet Explorer believes that websites under
 //		several domains (including "ibm.com") require compatibility mode. You may see your web application run

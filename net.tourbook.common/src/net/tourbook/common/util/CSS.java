@@ -15,8 +15,6 @@
  *******************************************************************************/
 package net.tourbook.common.util;
 
-import net.tourbook.common.UI;
-
 import org.eclipse.swt.graphics.RGB;
 
 public class CSS {
@@ -29,11 +27,7 @@ public class CSS {
 	 */
 	public static String color(final RGB color) {
 
-		return UI.SYMBOL_NUMBER_SIGN
-				+ Integer.toHexString(color.red)
-				+ Integer.toHexString(color.green)
-				+ Integer.toHexString(color.blue)
-				+ UI.SYMBOL_SEMICOLON;
+		return String.format("#%02X%02X%02X;", color.red, color.green, color.blue);
 	}
 
 }

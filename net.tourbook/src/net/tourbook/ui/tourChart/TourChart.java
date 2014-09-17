@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -65,11 +65,11 @@ import net.tourbook.ui.tourChart.action.ActionChartOptions;
 import net.tourbook.ui.tourChart.action.ActionGraph;
 import net.tourbook.ui.tourChart.action.ActionHrZoneDropDownMenu;
 import net.tourbook.ui.tourChart.action.ActionHrZoneGraphType;
-import net.tourbook.ui.tourChart.action.ActionMarkerOptions;
 import net.tourbook.ui.tourChart.action.ActionShowBreaktimeValues;
 import net.tourbook.ui.tourChart.action.ActionShowSRTMData;
 import net.tourbook.ui.tourChart.action.ActionShowStartTime;
 import net.tourbook.ui.tourChart.action.ActionShowValuePointToolTip;
+import net.tourbook.ui.tourChart.action.ActionTourChartMarker;
 import net.tourbook.ui.tourChart.action.ActionTourPhotos;
 import net.tourbook.ui.tourChart.action.ActionXAxisDistance;
 import net.tourbook.ui.tourChart.action.ActionXAxisTime;
@@ -134,7 +134,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 	private TourChartConfiguration		_tcc;
 
 	private Map<String, Action>			_allTourChartActions;
-	private ActionMarkerOptions			_actionMarkerOptions;
+	private ActionTourChartMarker		_actionTourChartMarker;
 	private ActionOpenMarkerDialog		_actionOpenMarkerDialog;
 
 	/**
@@ -897,6 +897,27 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 						60,
 						Double.MIN_VALUE);
 
+				/*
+				 * Pulse
+				 */
+				isChartModified |= setMinDefaultValue(
+						property,
+						isChartModified,
+						ITourbookPreferences.GRAPH_PULSE_IS_MIN_ENABLED,
+						ITourbookPreferences.GRAPH_PULSE_MIN_VALUE,
+						TourManager.GRAPH_PULSE,
+						0,
+						MIN_ADJUSTMENT);
+
+				isChartModified |= setMaxDefaultValue(
+						property,
+						isChartModified,
+						ITourbookPreferences.GRAPH_PULSE_IS_MAX_ENABLED,
+						ITourbookPreferences.GRAPH_PULSE_MAX_VALUE,
+						TourManager.GRAPH_PULSE,
+						0,
+						MAX_ADJUSTMENT);
+
 				if (isChartModified) {
 					updateTourChart(keepMinMax);
 				}
@@ -942,7 +963,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		/*
 		 * other actions
 		 */
-		_actionMarkerOptions = new ActionMarkerOptions(this, _parent);
+		_actionTourChartMarker = new ActionTourChartMarker(this, _parent);
 		_actionOpenMarkerDialog = new ActionOpenMarkerDialog(this, true);
 
 		_allTourChartActions.put(ACTION_ID_CAN_AUTO_ZOOM_TO_SLIDER, new ActionCanAutoZoomToSlider(this));
@@ -1608,7 +1629,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		/*
 		 * Tour marker
 		 */
-		_actionMarkerOptions.setSelected(_tcc.isShowTourMarker);
+		_actionTourChartMarker.setSelected(_tcc.isShowTourMarker);
 
 		/*
 		 * Tour photos
@@ -1727,7 +1748,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
 		tbm.add(_allTourChartActions.get(ACTION_ID_HR_ZONE_DROPDOWN_MENU));
 		tbm.add(_allTourChartActions.get(ACTION_ID_IS_SHOW_TOUR_PHOTOS));
-		tbm.add(_actionMarkerOptions);
+		tbm.add(_actionTourChartMarker);
 
 		tbm.add(new Separator());
 		tbm.add(_allTourChartActions.get(ACTION_ID_X_AXIS_TIME));
@@ -2800,7 +2821,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		updateUI_MarkerLayer(isMarkerVisible);
 
 		// update actions
-		_actionMarkerOptions.setSelected(isMarkerVisible);
+		_actionTourChartMarker.setSelected(isMarkerVisible);
 	}
 
 	public void updateUI_MarkerLayer() {

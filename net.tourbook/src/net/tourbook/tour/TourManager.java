@@ -1977,6 +1977,20 @@ public class TourManager {
 
 			setGraphColor(yDataPulse, GraphColorManager.PREF_GRAPH_HEARTBEAT);
 			chartDataModel.addXyData(yDataPulse);
+
+			/*
+			 * adjust pulse min/max values when it's defined in the pref store
+			 */
+			if (_prefStore.getBoolean(ITourbookPreferences.GRAPH_PULSE_IS_MIN_ENABLED)) {
+
+				yDataPulse.setVisibleMinValueForced(_prefStore.getInt(ITourbookPreferences.GRAPH_PULSE_MIN_VALUE));
+			}
+
+			// set max value after min value
+			if (_prefStore.getBoolean(ITourbookPreferences.GRAPH_PULSE_IS_MAX_ENABLED)) {
+
+				yDataPulse.setVisibleMaxValueForced(_prefStore.getInt(ITourbookPreferences.GRAPH_PULSE_MAX_VALUE));
+			}
 		}
 
 		/*

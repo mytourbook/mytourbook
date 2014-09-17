@@ -9,16 +9,18 @@ Improvements
 
 * Tour Chart
   - Force min/max values separately, existing min/max values have been reset to default values.
-  - Force max value for altitude/gradient.
+  - Force max value for altitude/gradient, force min/max value for heartbeat.
   - Live update for tour chart preferences.
   - Fixed some min/max bugs when min/max value is enforced.
     When min is enforced but the data min value is larger than forced min, the data min value is used.
     When max is enforced but the data max value is smaller than forced max, the data max value is used.
-  - When a vertical slider is moved in the tour chart with a hovered mouse, this view must not be activated that the moved slider is also updated in other views, e.g. 2/3D Map, Tour Analyzer.
+  - When a vertical slider is moved in the tour chart with a hovered mouse, this view must not be activated (another view can be the active view) that the moved slider is also updated in other views, e.g. 2/3D Map, Tour Analyzer.
 
 * Tour Blog
-  - Show/hide tour marker.
-  - Improved UI: Hovered style.
+  - Set marker visible/hidden.
+  - Show/hide hidden marker.
+  - Draw marker with hidden/device/default color.
+  - Improved hovered style.
 
  
 Fixed Bug 	

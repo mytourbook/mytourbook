@@ -56,7 +56,7 @@ import org.eclipse.swt.widgets.ToolBar;
 /**
  * Tour chart marker properties slideout.
  */
-public class SlideoutMarkerOptions extends AnimatedToolTipShell implements IColorSelectorListener {
+public class SlideoutTourChartMarker extends AnimatedToolTipShell implements IColorSelectorListener {
 
 	private final IPreferenceStore	_prefStore			= TourbookPlugin.getPrefStore();
 
@@ -138,7 +138,7 @@ public class SlideoutMarkerOptions extends AnimatedToolTipShell implements IColo
 		}
 	}
 
-	public SlideoutMarkerOptions(	final Control ownerControl,
+	public SlideoutTourChartMarker(	final Control ownerControl,
 									final ToolBar toolBar,
 									final IDialogSettings state,
 									final TourChart tourChart) {

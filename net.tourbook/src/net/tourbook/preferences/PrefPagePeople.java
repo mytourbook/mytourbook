@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -114,6 +114,9 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 
 	private static final String			STATE_SELECTED_PERSON		= "selectedPersonId";							//$NON-NLS-1$
 	private static final String			STATE_SELECTED_TAB_FOLDER	= "selectedTabFolder";							//$NON-NLS-1$
+
+	public static final int				HEART_BEAT_MIN				= 10;
+	public static final int				HEART_BEAT_MAX				= 300;
 
 	/**
 	 * Id to indicate that the hr zones should be displayed for the active person when the pref
@@ -995,8 +998,8 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 					.align(SWT.BEGINNING, SWT.FILL)
 //					.hint(_spinnerWidth, SWT.DEFAULT)
 					.applyTo(_spinnerMaxHR);
-			_spinnerMaxHR.setMinimum(10);
-			_spinnerMaxHR.setMaximum(300);
+			_spinnerMaxHR.setMinimum(HEART_BEAT_MIN);
+			_spinnerMaxHR.setMaximum(HEART_BEAT_MAX);
 			_spinnerMaxHR.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(final SelectionEvent e) {
