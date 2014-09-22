@@ -20,9 +20,9 @@
 <!--
 		<class>net.tourbook.data.TourSign</class>
 		<class>net.tourbook.data.TourSignCategory</class>
--->
 
 		<class>net.tourbook.data.SharedMarker</class>
+-->
 		
 		<class>net.tourbook.data.TourTag</class>
 		<class>net.tourbook.data.TourTagCategory</class>

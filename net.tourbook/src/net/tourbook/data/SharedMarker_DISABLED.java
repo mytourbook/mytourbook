@@ -29,14 +29,13 @@ import javax.persistence.ManyToMany;
 import javax.persistence.Transient;
 
 import net.tourbook.common.UI;
-import net.tourbook.common.util.StatusUtil;
 import net.tourbook.database.TourDatabase;
 
 /**
  * Shared marker entity.
  */
 @Entity
-public class SharedMarker implements Cloneable, Comparable<Object> {
+public class SharedMarker_DISABLED implements Cloneable, Comparable<Object> {
 
 	/**
 	 * Unique id for a {@link SharedMarker} entity.
@@ -92,27 +91,27 @@ public class SharedMarker implements Cloneable, Comparable<Object> {
 	@Transient
 	private static int			_createCounter	= 0;
 
-	public SharedMarker() {}
+	public SharedMarker_DISABLED() {}
 
-	public SharedMarker clone(final TourData wpTourData) {
+	public SharedMarker_DISABLED clone(final TourData wpTourData) {
 
-		try {
-
-			// create a shallow copy
-			final SharedMarker newSharedMarker = (SharedMarker) super.clone();
-
-			// set create id to uniquely identify the shared marker
-			newSharedMarker._createId = ++_createCounter;
-
-			newSharedMarker.sharedMarkerId = TourDatabase.ENTITY_IS_NOT_SAVED;
-
-//			newWayPoint.tourData = wpTourData;
-
-			return newSharedMarker;
-
-		} catch (final CloneNotSupportedException e) {
-			StatusUtil.log(e);
-		}
+//		try {
+//
+//			// create a shallow copy
+//			final SharedMarker newSharedMarker = (SharedMarker) super.clone();
+//
+//			// set create id to uniquely identify the shared marker
+//			newSharedMarker._createId = ++_createCounter;
+//
+//			newSharedMarker.sharedMarkerId = TourDatabase.ENTITY_IS_NOT_SAVED;
+//
+////			newWayPoint.tourData = wpTourData;
+//
+//			return newSharedMarker;
+//
+//		} catch (final CloneNotSupportedException e) {
+//			StatusUtil.log(e);
+//		}
 
 		return null;
 	}
@@ -124,33 +123,33 @@ public class SharedMarker implements Cloneable, Comparable<Object> {
 		 * set default sorting by time or by id (creation time)
 		 */
 
-		if (other instanceof SharedMarker) {
-
-			final SharedMarker otherSharedMarker = (SharedMarker) other;
-
-			if (_createId == 0) {
-
-				if (otherSharedMarker._createId == 0) {
-
-					// both shared markers are persisted
-					return sharedMarkerId > otherSharedMarker.sharedMarkerId ? 1 : -1;
-				}
-
-				return 1;
-
-			} else {
-
-				// _createId != 0
-
-				if (otherSharedMarker._createId != 0) {
-
-					// both shared markers are created and not persisted
-					return _createId > otherSharedMarker._createId ? 1 : -1;
-				}
-
-				return -1;
-			}
-		}
+//		if (other instanceof SharedMarker) {
+//
+//			final SharedMarker otherSharedMarker = (SharedMarker) other;
+//
+//			if (_createId == 0) {
+//
+//				if (otherSharedMarker._createId == 0) {
+//
+//					// both shared markers are persisted
+//					return sharedMarkerId > otherSharedMarker.sharedMarkerId ? 1 : -1;
+//				}
+//
+//				return 1;
+//
+//			} else {
+//
+//				// _createId != 0
+//
+//				if (otherSharedMarker._createId != 0) {
+//
+//					// both shared markers are created and not persisted
+//					return _createId > otherSharedMarker._createId ? 1 : -1;
+//				}
+//
+//				return -1;
+//			}
+//		}
 
 		return 0;
 	}
@@ -167,20 +166,20 @@ public class SharedMarker implements Cloneable, Comparable<Object> {
 			return false;
 		}
 
-		final SharedMarker other = (SharedMarker) obj;
-		if (_createId == 0) {
-
-			// tour is from the database
-			if (sharedMarkerId != other.sharedMarkerId) {
-				return false;
-			}
-		} else {
-
-			// tour was create or imported
-			if (_createId != other._createId) {
-				return false;
-			}
-		}
+//		final SharedMarker other = (SharedMarker) obj;
+//		if (_createId == 0) {
+//
+//			// tour is from the database
+//			if (sharedMarkerId != other.sharedMarkerId) {
+//				return false;
+//			}
+//		} else {
+//
+//			// tour was create or imported
+//			if (_createId != other._createId) {
+//				return false;
+//			}
+//		}
 		return true;
 	}
 

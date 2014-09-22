@@ -97,6 +97,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.ui.IWorkbenchPart;
 
 /**
  * The tour chart extends the chart with all the functionality for a tour chart
@@ -129,6 +130,11 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
 	private final IPreferenceStore		_prefStore								= TourbookPlugin.getPrefStore();
 	private final IDialogSettings		_state									= TourbookPlugin.getState(ID);
+
+	/**
+	 * Part in which the tour chart is created, can be <code>null</code> when created in a dialog.
+	 */
+	private IWorkbenchPart				_part;
 
 	private TourData					_tourData;
 	private TourChartConfiguration		_tcc;
@@ -377,11 +383,19 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		}
 	}
 
-	public TourChart(final Composite parent, final int style) {
+	/**
+	 * @param parent
+	 * @param style
+	 * @param part
+	 *            Part in which the tour chart is created, can be <code>null</code> when created in
+	 *            a dialog.
+	 */
+	public TourChart(final Composite parent, final int style, final IWorkbenchPart part) {
 
 		super(parent, style);
 
 		_parent = parent;
+		_part = part;
 
 //		/*
 //		 * when the focus is changed, fire a tour chart selection, this is neccesarry to update the
@@ -1630,6 +1644,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		 * Tour marker
 		 */
 		_actionTourChartMarker.setSelected(_tcc.isShowTourMarker);
+		_actionTourChartMarker.setEnabled(true);
 
 		/*
 		 * Tour photos
@@ -1790,7 +1805,8 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
 			TourManager.fireEvent(//
 					TourEventId.MARKER_SELECTION,
-					tourMarkerSelection);
+					tourMarkerSelection,
+					_part);
 		}
 	}
 
@@ -2630,6 +2646,8 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 				for (final Action action : _allTourChartActions.values()) {
 					action.setEnabled(false);
 				}
+
+				_actionTourChartMarker.setEnabled(false);
 			}
 		}
 	}

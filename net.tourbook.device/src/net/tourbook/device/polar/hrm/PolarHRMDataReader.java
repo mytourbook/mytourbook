@@ -618,7 +618,11 @@ public class PolarHRMDataReader extends TourbookDevice {
 		}
 
 		final Set<TourMarker> tourMarkers = tourData.getTourMarkers();
+
+		final float[] altitudeSerie = tourData.altitudeSerie;
 		final float[] distanceSerie = tourData.distanceSerie;
+		final double[] latitudeSerie = tourData.latitudeSerie;
+		final double[] longitudeSerie = tourData.longitudeSerie;
 
 		int lapCounter = 1;
 
@@ -659,10 +663,18 @@ public class PolarHRMDataReader extends TourbookDevice {
 			final TourMarker tourMarker = new TourMarker(tourData, ChartLabel.MARKER_TYPE_DEVICE);
 			tourMarker.setLabel(markerText);
 			tourMarker.setSerieIndex(serieIndex);
-			tourMarker.setTime(lapRelativeTime);
+			tourMarker.setTime(lapRelativeTime, tourData.getTourStartTimeMS() + (lapRelativeTime * 1000));
+
+			if (altitudeSerie != null) {
+				tourMarker.setAltitude(altitudeSerie[serieIndex]);
+			}
 
 			if (distanceSerie != null) {
 				tourMarker.setDistance(distanceSerie[serieIndex]);
+			}
+
+			if (latitudeSerie != null) {
+				tourMarker.setGeoPosition(latitudeSerie[serieIndex], longitudeSerie[serieIndex]);
 			}
 
 			tourMarkers.add(tourMarker);

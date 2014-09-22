@@ -32,6 +32,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Set;
 
 import net.tourbook.data.TimeData;
 import net.tourbook.data.TourData;
@@ -180,6 +181,8 @@ public class HAC4LinuxDeviceReader extends TourbookDevice {
 		}
 	}
 
+
+
 	/*
 	 * (non-Javadoc)
 	 * @see net.tourbook.importdata.IRawDataReader#getDeviceModeName(int)
@@ -293,6 +296,7 @@ public class HAC4LinuxDeviceReader extends TourbookDevice {
 			fileHac4LinuxData = new BufferedReader(new FileReader(importFilePath));
 			final TourData tourData = new TourData();
 //			final TourPerson tourPerson = new TourPerson();
+			final Set<TourMarker> allTourMarker = tourData.getTourMarkers();
 
 			String line = null;
 			final StringBuffer tourDescription = new StringBuffer();
@@ -557,9 +561,14 @@ public class HAC4LinuxDeviceReader extends TourbookDevice {
 					int timeRelative = Integer.parseInt(fields[2].substring(6, 8));
 					timeRelative += Integer.parseInt(fields[2].substring(3, 5)) * 60;
 					timeRelative += Integer.parseInt(fields[2].substring(0, 2)) * 3600;
-					tourMarker.setTime(timeRelative);
-					tourData.getTourMarkers().add(tourMarker);
+
+					// set time temporaritly the correct absolute time will be set later
+					tourMarker.setTime(timeRelative, Long.MIN_VALUE);
+
+					allTourMarker.add(tourMarker);
+
 					break;
+
 				default:
 					break;
 				}
@@ -578,7 +587,7 @@ public class HAC4LinuxDeviceReader extends TourbookDevice {
 //			tourData.setTourPerson(tourPerson);
 
 			tourData.setTourType(defaultTourType);
-			
+
 			tourData.setDeviceId(deviceId);
 			tourData.setDeviceName(visibleName);
 
@@ -610,6 +619,8 @@ public class HAC4LinuxDeviceReader extends TourbookDevice {
 				// create additional data
 				tourData.computeComputedValues();
 				tourData.computeTourDrivingTime();
+
+				tourData.finalizeTourMarkerWithRelativeTime();
 			}
 
 		} catch (final FileNotFoundException e) {

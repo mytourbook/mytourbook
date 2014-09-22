@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -234,7 +234,6 @@ public class CRPDataReader extends TourbookDevice {
 			 * set time serie from the imported trackpoints
 			 */
 			final ArrayList<TimeData> timeDataList = new ArrayList<TimeData>();
-			TimeData timeData;
 
 			int tpIndex = 0;
 			int tourTime = 0;
@@ -284,7 +283,9 @@ public class CRPDataReader extends TourbookDevice {
 					comment = tokenLine.nextToken("\t"); //$NON-NLS-1$
 				}
 
-				timeDataList.add(timeData = new TimeData());
+				final TimeData timeData = new TimeData();
+
+				timeDataList.add(timeData);
 
 				final short altitudeDiff = (short) (altitude - oldAltitude);
 				timeData.altitude = altitudeDiff;
@@ -310,9 +311,10 @@ public class CRPDataReader extends TourbookDevice {
 					// create a new marker
 					final TourMarker tourMarker = new TourMarker(tourData, ChartLabel.MARKER_TYPE_DEVICE);
 					tourMarker.setLabel(comment);
-					tourMarker.setTime(timeData.time);
+					tourMarker.setTime(tourTime, Long.MIN_VALUE);
 					tourMarker.setDistance(timeData.distance);
 					tourMarker.setSerieIndex(tpIndex);
+					tourMarker.setAltitude(altitude);
 
 					tourData.getTourMarkers().add(tourMarker);
 				}
@@ -364,7 +366,6 @@ public class CRPDataReader extends TourbookDevice {
 				}
 			}
 
-
 			tourData.setDeviceId(deviceId);
 			tourData.setDeviceName(visibleName);
 
@@ -387,6 +388,8 @@ public class CRPDataReader extends TourbookDevice {
 
 				tourData.setTourAltUp(tourAltUp);
 				tourData.setTourAltDown(tourAltDown);
+
+				tourData.finalizeTourMarkerWithRelativeTime();
 			}
 
 			returnValue = true;

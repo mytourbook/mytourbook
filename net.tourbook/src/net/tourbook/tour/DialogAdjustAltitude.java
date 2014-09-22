@@ -1096,7 +1096,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 
 	private void createUI20TourChart(final Composite parent) {
 
-		_tourChart = new TourChart(parent, SWT.BORDER);
+		_tourChart = new TourChart(parent, SWT.BORDER, null);
 		GridDataFactory.fillDefaults().grab(true, true).indent(0, 0).minSize(300, 200).applyTo(_tourChart);
 
 		_tourChart.setShowZoomActions(true);

@@ -340,6 +340,7 @@ public class TurDeviceReader extends TourbookDevice {
 				tourData.computeTourDrivingTime();
 
 				processDeviceData_10_CreateMarker(tourData, fileTurData);
+				tourData.finalizeTourMarkerWithRelativeTime();
 			}
 
 		} catch (final FileNotFoundException e) {
@@ -378,7 +379,9 @@ public class TurDeviceReader extends TourbookDevice {
 		for (int i = 0; i < markerCount; i++) {
 
 			final TourMarker tourMarker = new TourMarker(tourData, ChartLabel.MARKER_TYPE_DEVICE);
-			tourMarker.setTime(Integer.parseInt(TurFileUtil.readText(fileTurData)));
+
+			// the correct absolute time will be set later
+			tourMarker.setTime(Integer.parseInt(TurFileUtil.readText(fileTurData)), Long.MIN_VALUE);
 
 			String label = TurFileUtil.readText(fileTurData);
 			label = label.substring(0, label.indexOf(';'));

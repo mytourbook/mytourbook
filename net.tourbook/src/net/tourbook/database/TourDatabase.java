@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -50,7 +50,6 @@ import net.tourbook.application.MyTourbookSplashHandler;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
-import net.tourbook.data.SharedMarker;
 import net.tourbook.data.TourBike;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
@@ -131,7 +130,7 @@ public class TourDatabase {
 
 	private static final String						TABLE_DB_VERSION							= "DBVERSION";								//$NON-NLS-1$
 	//
-	public static final String						TABLE_SHARED_MARKER							= "SHAREDMARKER";							//$NON-NLS-1$
+//	public static final String						TABLE_SHARED_MARKER							= "SHAREDMARKER";							//$NON-NLS-1$
 	public static final String						TABLE_TOUR_BIKE								= "TOURBIKE";								//$NON-NLS-1$
 	public static final String						TABLE_TOUR_COMPARED							= "TOURCOMPARED";							//$NON-NLS-1$
 	public static final String						TABLE_TOUR_DATA								= "TOURDATA";								//$NON-NLS-1$
@@ -147,8 +146,8 @@ public class TourDatabase {
 	public static final String						TABLE_TOUR_TYPE								= "TOURTYPE";								//$NON-NLS-1$
 	public static final String						TABLE_TOUR_WAYPOINT							= "TOURWAYPOINT";							//$NON-NLS-1$
 	//
-	public static final String						JOINTABLE__TOURDATA__SHAREDMARKER			= TABLE_TOUR_DATA
-																										+ "_" + TABLE_SHARED_MARKER;		//$NON-NLS-1$
+//	public static final String						JOINTABLE__TOURDATA__SHAREDMARKER			= TABLE_TOUR_DATA
+//																										+ "_" + TABLE_SHARED_MARKER;		//$NON-NLS-1$
 	public static final String						JOINTABLE__TOURDATA__TOURTAG				= TABLE_TOUR_DATA
 																										+ "_" + TABLE_TOUR_TAG;			//$NON-NLS-1$
 	public static final String						JOINTABLE__TOURTAGCATEGORY_TOURTAG			= TABLE_TOUR_TAG_CATEGORY
@@ -185,10 +184,10 @@ public class TourDatabase {
 	private static final String						ENTITY_ID_PHOTO								= "PhotoID";								//$NON-NLS-1$
 	private static final String						ENTITY_ID_REF								= "RefID";									//$NON-NLS-1$
 //	private static final String						ENTITY_ID_SIGN								= "SignID";								//$NON-NLS-1$
-	private static final String						ENTITY_ID_SHARED_MARKER						= "SharedMarkerID";						//$NON-NLS-1$
+//	private static final String						ENTITY_ID_SHARED_MARKER						= "SharedMarkerID";						//$NON-NLS-1$
 	private static final String						ENTITY_ID_TAG								= "TagID";									//$NON-NLS-1$
 	private static final String						ENTITY_ID_TAG_CATEGORY						= "TagCategoryID";							//$NON-NLS-1$
-	private static final String						ENTITY_ID_TOUR								= "TourID";								//$NON-NLS-1$
+	public static final String						ENTITY_ID_TOUR								= "TourID";								//$NON-NLS-1$
 	private static final String						ENTITY_ID_TYPE								= "TypeID";								//$NON-NLS-1$
 	private static final String						ENTITY_ID_WAY_POINT							= "WayPointID";							//$NON-NLS-1$
 	//
@@ -198,8 +197,8 @@ public class TourDatabase {
 																										+ "_" + ENTITY_ID_PERSON;			//$NON-NLS-1$
 //	private static final String						KEY_SIGN									= TABLE_TOUR_SIGN
 //																										+ "_" + ENTITY_ID_SIGN;			//$NON-NLS-1$
-	private static final String						KEY_SHARED_MARKER							= TABLE_SHARED_MARKER
-																										+ "_" + ENTITY_ID_SHARED_MARKER;	//$NON-NLS-1$
+//	private static final String						KEY_SHARED_MARKER							= TABLE_SHARED_MARKER
+//																										+ "_" + ENTITY_ID_SHARED_MARKER;	//$NON-NLS-1$
 	private static final String						KEY_TAG										= TABLE_TOUR_TAG
 																										+ "_" + ENTITY_ID_TAG;				//$NON-NLS-1$
 	private static final String						KEY_TAG_CATEGORY							= TABLE_TOUR_TAG_CATEGORY
@@ -279,10 +278,12 @@ public class TourDatabase {
 	private static final Object						DB_LOCK										= new Object();
 
 	public static final double						DEFAULT_DOUBLE								= 1E-300;									//Float.MIN_VALUE;
-	public static final double						DEFAULT_FLOAT								= 1E-40;
+	public static final float						DEFAULT_FLOAT								= 1E-40f;
 
-	private static final String						DOUBLE_MIN_VALUE;
-	private static final String						FLOAT_MIN_VALUE;
+	private static final String						DB_DOUBLE_MIN_VALUE;
+	private static final String						DB_FLOAT_MIN_VALUE;
+	private static final String						DB_LONG_MIN_VALUE;
+
 	static {
 
 //		!ENTRY net.tourbook.common 4 0 2014-07-30 11:05:18.419
@@ -306,9 +307,10 @@ public class TourDatabase {
 //		• Largest negative DOUBLE value: -2.225E-307
 //
 //		DOUBLE_MIN_VALUE = (new Double(Double.MIN_VALUE)).toString();
-//
-		DOUBLE_MIN_VALUE = (new Double(DEFAULT_DOUBLE)).toString();
-		FLOAT_MIN_VALUE = (new Float(DEFAULT_FLOAT)).toString();
+
+		DB_DOUBLE_MIN_VALUE = (new Double(DEFAULT_DOUBLE)).toString();
+		DB_FLOAT_MIN_VALUE = (new Float(DEFAULT_FLOAT)).toString();
+		DB_LONG_MIN_VALUE = Long.toString(Long.MIN_VALUE);
 	}
 
 	/**
@@ -316,7 +318,6 @@ public class TourDatabase {
 	 */
 	private static class SQL {
 
-		@SuppressWarnings("unused")
 		private static void AddCol_BigInt(	final Statement stmt,
 											final String table,
 											final String columnName,
@@ -2191,7 +2192,7 @@ public class TourDatabase {
 				createTable_TourTagCategory(stmt);
 
 				createTable_TourWayPoint(stmt);
-				createTable_SharedMarker(stmt);
+//				createTable_SharedMarker(stmt);
 
 //				createTable_TourSign(stmt);
 //				createTable_TourSignCategory(stmt);
@@ -2286,18 +2287,23 @@ public class TourDatabase {
 			_isVersionChecked = true;
 
 		} catch (final SQLException e) {
+
 			UI.showSQLException(e);
+			PlatformUI.getWorkbench().close();
+
+		} catch (final Exception e) {
+
+			StatusUtil.showStatus(e);
+			PlatformUI.getWorkbench().close();
+
 		} finally {
-			try {
-				conn.close();
-			} catch (final SQLException e) {
-				UI.showSQLException(e);
-			}
+
+			Util.closeSql(conn);
 			Util.closeSql(stmt1);
 			Util.closeSql(stmt2);
 		}
 
-		return true;
+		return _isVersionChecked;
 	}
 
 	/**
@@ -2363,42 +2369,42 @@ public class TourDatabase {
 	 * @throws SQLException
 	 * @since DB version 25
 	 */
-	private void createTable_SharedMarker(final Statement stmt) throws SQLException {
+	private void createTable_SharedMarker_DISABLED(final Statement stmt) throws SQLException {
 
-		/*
-		 * Create table: SharedMarker
-		 */
-		exec(stmt, "CREATE TABLE " + TABLE_SHARED_MARKER + "	(											\n" //$NON-NLS-1$ //$NON-NLS-2$
-				//
-				+ SQL.CreateField_EntityId(ENTITY_ID_SHARED_MARKER, true)
-				//
-				+ "	name				VARCHAR(" + TourWayPoint.DB_LENGTH_NAME + "),						\n" //$NON-NLS-1$ //$NON-NLS-2$
-				+ "	description			VARCHAR(" + TourWayPoint.DB_LENGTH_DESCRIPTION + "),				\n" //$NON-NLS-1$ //$NON-NLS-2$
-				+ "	comment				VARCHAR(" + TourWayPoint.DB_LENGTH_COMMENT + "),					\n" //$NON-NLS-1$ //$NON-NLS-2$
-				+ "	urlText				VARCHAR(" + TourMarker.DB_LENGTH_URL_TEXT + "),						\n" //$NON-NLS-1$ //$NON-NLS-2$
-				+ "	urlAddress			VARCHAR(" + TourMarker.DB_LENGTH_URL_ADDRESS + "),					\n" //$NON-NLS-1$ //$NON-NLS-2$
-				+ "	latitude 			DOUBLE NOT NULL,													\n" //$NON-NLS-1$
-				+ "	longitude 			DOUBLE NOT NULL,													\n" //$NON-NLS-1$
-				+ "	altitude			FLOAT																\n" //$NON-NLS-1$
-				//
-				+ ")"); //$NON-NLS-1$
-
-		/**
-		 * Create table: SHAREDMARKER_TOURDATA
-		 */
-		exec(stmt, "CREATE TABLE " + JOINTABLE__TOURDATA__SHAREDMARKER + "	(								\n" //$NON-NLS-1$ //$NON-NLS-2$
-				//
-				+ "	" + KEY_SHARED_MARKER + "	BIGINT NOT NULL,											\n"//$NON-NLS-1$ //$NON-NLS-2$
-				+ "	" + KEY_TOUR + "			BIGINT NOT NULL												\n"//$NON-NLS-1$ //$NON-NLS-2$
-				//
-				+ ")"); //$NON-NLS-1$
-
-		// Add Constraint
-		final String fkName = "fk_" + JOINTABLE__TOURDATA__SHAREDMARKER + "_" + KEY_TOUR; //							//$NON-NLS-1$ //$NON-NLS-2$
-		exec(stmt, "ALTER TABLE " + JOINTABLE__TOURDATA__SHAREDMARKER + "									\n" //$NON-NLS-1$ //$NON-NLS-2$
-				+ "	ADD CONSTRAINT " + fkName + "															\n" //$NON-NLS-1$ //$NON-NLS-2$
-				+ "	FOREIGN KEY (" + KEY_TOUR + ")															\n" //$NON-NLS-1$ //$NON-NLS-2$
-				+ "	REFERENCES " + TABLE_TOUR_DATA + " (" + ENTITY_ID_TOUR + ")								"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+//		/*
+//		 * Create table: SharedMarker
+//		 */
+//		exec(stmt, "CREATE TABLE " + TABLE_SHARED_MARKER + "	(											\n" //$NON-NLS-1$ //$NON-NLS-2$
+//				//
+//				+ SQL.CreateField_EntityId(ENTITY_ID_SHARED_MARKER, true)
+//				//
+//				+ "	name				VARCHAR(" + TourWayPoint.DB_LENGTH_NAME + "),						\n" //$NON-NLS-1$ //$NON-NLS-2$
+//				+ "	description			VARCHAR(" + TourWayPoint.DB_LENGTH_DESCRIPTION + "),				\n" //$NON-NLS-1$ //$NON-NLS-2$
+//				+ "	comment				VARCHAR(" + TourWayPoint.DB_LENGTH_COMMENT + "),					\n" //$NON-NLS-1$ //$NON-NLS-2$
+//				+ "	urlText				VARCHAR(" + TourMarker.DB_LENGTH_URL_TEXT + "),						\n" //$NON-NLS-1$ //$NON-NLS-2$
+//				+ "	urlAddress			VARCHAR(" + TourMarker.DB_LENGTH_URL_ADDRESS + "),					\n" //$NON-NLS-1$ //$NON-NLS-2$
+//				+ "	latitude 			DOUBLE NOT NULL,													\n" //$NON-NLS-1$
+//				+ "	longitude 			DOUBLE NOT NULL,													\n" //$NON-NLS-1$
+//				+ "	altitude			FLOAT																\n" //$NON-NLS-1$
+//				//
+//				+ ")"); //$NON-NLS-1$
+//
+//		/**
+//		 * Create table: SHAREDMARKER_TOURDATA
+//		 */
+//		exec(stmt, "CREATE TABLE " + JOINTABLE__TOURDATA__SHAREDMARKER + "	(								\n" //$NON-NLS-1$ //$NON-NLS-2$
+//				//
+//				+ "	" + KEY_SHARED_MARKER + "	BIGINT NOT NULL,											\n"//$NON-NLS-1$ //$NON-NLS-2$
+//				+ "	" + KEY_TOUR + "			BIGINT NOT NULL												\n"//$NON-NLS-1$ //$NON-NLS-2$
+//				//
+//				+ ")"); //$NON-NLS-1$
+//
+//		// Add Constraint
+//		final String fkName = "fk_" + JOINTABLE__TOURDATA__SHAREDMARKER + "_" + KEY_TOUR; //							//$NON-NLS-1$ //$NON-NLS-2$
+//		exec(stmt, "ALTER TABLE " + JOINTABLE__TOURDATA__SHAREDMARKER + "									\n" //$NON-NLS-1$ //$NON-NLS-2$
+//				+ "	ADD CONSTRAINT " + fkName + "															\n" //$NON-NLS-1$ //$NON-NLS-2$
+//				+ "	FOREIGN KEY (" + KEY_TOUR + ")															\n" //$NON-NLS-1$ //$NON-NLS-2$
+//				+ "	REFERENCES " + TABLE_TOUR_DATA + " (" + ENTITY_ID_TOUR + ")								"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 
 	/**
@@ -2720,6 +2726,8 @@ public class TourDatabase {
 				//
 				// Version 25 - begin
 				//
+				+ "	tourTime				BIGINT DEFAULT " + Long.MIN_VALUE + ",							\n" //$NON-NLS-1$ //$NON-NLS-2$
+				//
 				// When DEFAULT value is NOT set, this exception occures:
 				//
 				//java.lang.IllegalArgumentException: Can not set float field net.tourbook.data.TourMarker.altitude to null value
@@ -2729,9 +2737,9 @@ public class TourDatabase {
 				//	at java.lang.reflect.Field.set(Field.java:753)
 				//	at org.hibernate.property.DirectPropertyAccessor$DirectSetter.set(DirectPropertyAccessor.java:102)
 				//
-				+ "	altitude				FLOAT DEFAULT " + FLOAT_MIN_VALUE + ",							\n" //$NON-NLS-1$
-				+ "	latitude 				DOUBLE DEFAULT " + DOUBLE_MIN_VALUE + ",						\n" //$NON-NLS-1$
-				+ "	longitude 				DOUBLE DEFAULT " + DOUBLE_MIN_VALUE + ",						\n" //$NON-NLS-1$
+				+ "	altitude				FLOAT DEFAULT " + DB_FLOAT_MIN_VALUE + ",						\n" //$NON-NLS-1$ //$NON-NLS-2$
+				+ "	latitude 				DOUBLE DEFAULT " + DB_DOUBLE_MIN_VALUE + ",						\n" //$NON-NLS-1$ //$NON-NLS-2$
+				+ "	longitude 				DOUBLE DEFAULT " + DB_DOUBLE_MIN_VALUE + ",						\n" //$NON-NLS-1$ //$NON-NLS-2$
 				//
 				// Version 25 - end
 				//
@@ -2996,7 +3004,7 @@ public class TourDatabase {
 
 		// add constraints
 		final String fkTag = "fk_" + jtabTag + "_" + KEY_TAG; //											//$NON-NLS-1$ //$NON-NLS-2$
-		final String fkCat = "fk_" + jtabTag + "_" + TABLE_TOUR_TAG_CATEGORY + "_" + KEY_TAG_CATEGORY; //			//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		final String fkCat = "fk_" + jtabTag + "_" + TABLE_TOUR_TAG_CATEGORY + "_" + KEY_TAG_CATEGORY; //	//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
 		exec(stmt, "ALTER TABLE " + jtabTag + "																\n"//$NON-NLS-1$ //$NON-NLS-2$
 				+ "	ADD CONSTRAINT " + fkTag + "															\n"//$NON-NLS-1$ //$NON-NLS-2$
@@ -4978,23 +4986,22 @@ public class TourDatabase {
 		final Statement stmt = conn.createStatement();
 		{
 			// check if db is updated to version 25
-			if (isTableAvailable(conn, TABLE_SHARED_MARKER) == false) {
-
-				// table SharedMarker is not available -> do db update 25
-				createTable_SharedMarker(stmt);
+			if (isColumnAvailable(conn, TABLE_TOUR_MARKER, "altitude") == false) { //$NON-NLS-1$
 
 				// Table: TOURMARKER
 				{
 					// Add new columns
-					SQL.AddCol_Float(stmt, TABLE_TOUR_MARKER, "altitude", FLOAT_MIN_VALUE); //$NON-NLS-1$
-					SQL.AddCol_Double(stmt, TABLE_TOUR_MARKER, "latitude", DOUBLE_MIN_VALUE); //$NON-NLS-1$
-					SQL.AddCol_Double(stmt, TABLE_TOUR_MARKER, "longitude", DOUBLE_MIN_VALUE); //$NON-NLS-1$
+					SQL.AddCol_Float(stmt, TABLE_TOUR_MARKER, "altitude", DB_FLOAT_MIN_VALUE); //$NON-NLS-1$
+					SQL.AddCol_Double(stmt, TABLE_TOUR_MARKER, "latitude", DB_DOUBLE_MIN_VALUE); //$NON-NLS-1$
+					SQL.AddCol_Double(stmt, TABLE_TOUR_MARKER, "longitude", DB_DOUBLE_MIN_VALUE); //$NON-NLS-1$
+					SQL.AddCol_BigInt(stmt, TABLE_TOUR_MARKER, "tourTime", DB_LONG_MIN_VALUE);//$NON-NLS-1$
+
 				}
 
 				// Table: TOURDATA
 				{
 					// Add new columns
-					SQL.AddCol_Int(stmt, TABLE_TOUR_DATA, "gpsState", "0"); //$NON-NLS-1$
+					SQL.AddCol_Int(stmt, TABLE_TOUR_DATA, "gpsState", "0"); //$NON-NLS-1$ //$NON-NLS-2$
 				}
 			}
 		}
@@ -5035,12 +5042,14 @@ public class TourDatabase {
 				if (tourData != null) {
 
 					/*
-					 * set lat/lon/altitude in the tour marker from tour data
+					 * set absolute time/lat/lon/altitude in the tour marker from tour data
 					 */
 
 					final float[] altitudeSerie = tourData.altitudeSerie;
 					final double[] latitudeSerie = tourData.latitudeSerie;
 					final double[] longitudeSerie = tourData.longitudeSerie;
+
+					final long tourStartTime = tourData.getTourStartTimeMS();
 
 					for (final TourMarker tourMarker : tourData.getTourMarkers()) {
 
@@ -5053,6 +5062,9 @@ public class TourDatabase {
 						if (latitudeSerie != null) {
 							tourMarker.setGeoPosition(latitudeSerie[serieIndex], longitudeSerie[serieIndex]);
 						}
+
+						final int relativeTime = tourMarker.getTime();
+						tourMarker.setTime(relativeTime, tourStartTime + (relativeTime * 1000));
 					}
 
 					// set GPS state
@@ -5065,7 +5077,9 @@ public class TourDatabase {
 			}
 
 		} catch (final Exception e) {
-			e.printStackTrace();
+
+			throw e;
+
 		} finally {
 
 			em.close();

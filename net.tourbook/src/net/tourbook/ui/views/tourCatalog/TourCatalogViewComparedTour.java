@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -242,7 +242,7 @@ public class TourCatalogViewComparedTour extends TourChartViewPart implements IS
 
 	private void createTourChart() {
 
-		_tourChart = new TourChart(_pageBook, SWT.FLAT);
+		_tourChart = new TourChart(_pageBook, SWT.FLAT, getSite().getPart());
 		_tourChart.setShowZoomActions(true);
 		_tourChart.setShowSlider(true);
 		_tourChart.setToolBarManager(getViewSite().getActionBars().getToolBarManager(), true);

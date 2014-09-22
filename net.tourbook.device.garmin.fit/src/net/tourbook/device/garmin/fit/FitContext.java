@@ -225,6 +225,7 @@ public class FitContext {
 				tourData.setIsDistanceFromSensor(isSpeedSensorPresent());
 
 				tourData.createTimeSeries(timeDataList, false);
+				
 
 				// after all data are added, the tour id can be created
 				final String uniqueId = _device.createUniqueId(tourData, Util.UNIQUE_ID_SUFFIX_GARMIN_FIT);
@@ -240,6 +241,7 @@ public class FitContext {
 					tourData.computeAltimeterGradientSerie();
 
 					tourData.setTourMarkers(tourMarkerSet);
+					tourData.finalizeTourMarkerWithRelativeTime();
 				}
 			}
 		});

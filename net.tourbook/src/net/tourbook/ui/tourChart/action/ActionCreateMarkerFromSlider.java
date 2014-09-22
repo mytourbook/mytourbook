@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -73,16 +73,28 @@ public class ActionCreateMarkerFromSlider extends Action {
 		}
 
 		final int serieIndex = slider.getValuesIndex();
+		final int relativeTourTime = tourData.timeSerie[serieIndex];
+		final float[] altitudeSerie = tourData.altitudeSerie;
 		final float[] distSerie = tourData.getMetricDistanceSerie();
+		final double[] latitudeSerie = tourData.latitudeSerie;
+		final double[] longitudeSerie = tourData.longitudeSerie;
 
 		// create a new marker
 		final TourMarker tourMarker = new TourMarker(tourData, ChartLabel.MARKER_TYPE_CUSTOM);
 		tourMarker.setSerieIndex(serieIndex);
-		tourMarker.setTime(tourData.timeSerie[serieIndex]);
 		tourMarker.setLabel(Messages.TourData_Label_new_marker);
+		tourMarker.setTime(relativeTourTime, tourData.getTourStartTimeMS() + (relativeTourTime * 1000));
+
+		if (altitudeSerie != null) {
+			tourMarker.setAltitude(altitudeSerie[serieIndex]);
+		}
 
 		if (distSerie != null) {
 			tourMarker.setDistance(distSerie[serieIndex]);
+		}
+
+		if (latitudeSerie != null) {
+			tourMarker.setGeoPosition(latitudeSerie[serieIndex], longitudeSerie[serieIndex]);
 		}
 
 		return tourMarker;

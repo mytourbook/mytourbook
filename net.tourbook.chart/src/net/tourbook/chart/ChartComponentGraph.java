@@ -6480,8 +6480,9 @@ public class ChartComponentGraph extends Canvas {
 		final long xxDevSliderLinePos = slider.getXXDevSliderLinePos();
 
 		final int devXViewPortWidth = getDevVisibleChartWidth();
-		double xxDevOffset = xxDevSliderLinePos;
 		final long xxDevCenter = xxDevSliderLinePos - devXViewPortWidth / 2;
+
+		double xxDevOffset = xxDevSliderLinePos;
 
 		if (isCenterSliderPosition) {
 

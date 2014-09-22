@@ -555,7 +555,11 @@ public class PolarTrainerSAXHandler extends DefaultHandler {
 		}
 
 		final Set<TourMarker> tourMarkers = tourData.getTourMarkers();
+
+		final float[] altitudeSerie = tourData.altitudeSerie;
 		final float[] distanceSerie = tourData.distanceSerie;
+		final double[] latitudeSerie = tourData.latitudeSerie;
+		final double[] longitudeSerie = tourData.longitudeSerie;
 
 		int sumLapDuration = 0;
 		int lapCounter = 1;
@@ -563,11 +567,12 @@ public class PolarTrainerSAXHandler extends DefaultHandler {
 		for (final Lap lap : _laps) {
 
 			final int lapDuration = lap.duration;
+			final int relativeTourTime = sumLapDuration + lapDuration;
 			int serieIndex = 0;
 
 			// get serie index
 			for (final int tourRelativeTime : timeSerie) {
-				if (tourRelativeTime >= sumLapDuration + lapDuration) {
+				if (tourRelativeTime >= relativeTourTime) {
 					break;
 				}
 				serieIndex++;
@@ -582,10 +587,18 @@ public class PolarTrainerSAXHandler extends DefaultHandler {
 
 			tourMarker.setLabel(Integer.toString(lapCounter));
 			tourMarker.setSerieIndex(serieIndex);
-			tourMarker.setTime(sumLapDuration + lapDuration);
+			tourMarker.setTime(relativeTourTime, tourData.getTourStartTimeMS() + (relativeTourTime * 1000));
+
+			if (altitudeSerie != null) {
+				tourMarker.setAltitude(altitudeSerie[serieIndex]);
+			}
 
 			if (distanceSerie != null) {
 				tourMarker.setDistance(distanceSerie[serieIndex]);
+			}
+
+			if (latitudeSerie != null) {
+				tourMarker.setGeoPosition(latitudeSerie[serieIndex], longitudeSerie[serieIndex]);
 			}
 
 			tourMarkers.add(tourMarker);

@@ -65,7 +65,7 @@ public class TourCatalogViewReferenceTour extends TourChartViewPart implements I
 		_pageNoChart = new Label(_pageBook, SWT.NONE);
 		_pageNoChart.setText(Messages.UI_Label_no_chart_is_selected);
 
-		_tourChart = new TourChart(_pageBook, SWT.FLAT);
+		_tourChart = new TourChart(_pageBook, SWT.FLAT, getSite().getPart());
 		_tourChart.setShowZoomActions(true);
 		_tourChart.setShowSlider(true);
 		_tourChart.setToolBarManager(getViewSite().getActionBars().getToolBarManager(), true);

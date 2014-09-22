@@ -136,6 +136,12 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 	 */
 	@XmlElement
 	private int						time										= -1;
+
+	/**
+	 * Absolute time of the tour marker in milliseconds since 1970-01-01T00:00:00Z.
+	 */
+	private long					tourTime									= Long.MIN_VALUE;
+
 	/**
 	 * Distance field before db version 20, this field is required for data conversion AND <b>to
 	 * load entities</b> !!!
@@ -203,10 +209,9 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 	private String					urlAddress;
 
 	// initialize with invalid values
-	private double					latitude;																							//		= Double.MIN_VALUE;
-
-	private double					longitude;																							//		= Double.MIN_VALUE;
-	private float					altitude;
+	private float					altitude									= TourDatabase.DEFAULT_FLOAT;
+	private double					latitude									= TourDatabase.DEFAULT_DOUBLE;
+	private double					longitude									= TourDatabase.DEFAULT_DOUBLE;
 
 	private int						isMarkerVisible								= 1;
 
@@ -441,8 +446,19 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 		return serieIndex;
 	}
 
+	/**
+	 * @return Returns time in seconds relative to the tour start. When value is not available it is
+	 *         set to -1.
+	 */
 	public int getTime() {
 		return time;
+	}
+
+	/**
+	 * @return Return the absolute time in ms since 1970-01-01T00:00:00Z.
+	 */
+	public long getTourTime() {
+		return tourTime;
 	}
 
 	public int getType() {
@@ -498,8 +514,6 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 
 		if (label.compareTo(comparedMarker.label) != 0) {
 			return false;
-		} else if (getDescription().compareTo(comparedMarker.getDescription()) != 0) {
-			return false;
 		} else if (distance20 != comparedMarker.distance20) {
 			return false;
 		} else if (labelXOffset != comparedMarker.labelXOffset) {
@@ -514,11 +528,15 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 			return false;
 		} else if (time != comparedMarker.time) {
 			return false;
+		} else if (tourTime != comparedMarker.tourTime) {
+			return false;
 		} else if ((isIgnoreType == false) && (type != comparedMarker.type)) {
 			return false;
 		} else if (visualPosition != comparedMarker.visualPosition) {
 			return false;
 		} else if (tourData != comparedMarker.tourData) {
+			return false;
+		} else if (getDescription().compareTo(comparedMarker.getDescription()) != 0) {
 			return false;
 //		} else if ((tourSign != null && comparedMarker.tourSign == null)
 //				|| (tourSign == null && comparedMarker.tourSign != null)
@@ -606,19 +624,22 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 	 */
 	public void restoreMarkerFromBackup(final TourMarker backupMarker) {
 
-		label = backupMarker.label;
+		altitude = backupMarker.altitude;
 		description = backupMarker.description;
-		urlText = backupMarker.urlText;
-		urlAddress = backupMarker.urlAddress;
-
 		distance20 = backupMarker.distance20;
+		label = backupMarker.label;
+		latitude = backupMarker.latitude;
+		longitude = backupMarker.longitude;
 		labelXOffset = backupMarker.labelXOffset;
 		labelYOffset = backupMarker.labelYOffset;
 		markerId = backupMarker.markerId;
 		markerType = backupMarker.markerType;
 		serieIndex = backupMarker.serieIndex;
 		time = backupMarker.time;
+		tourTime = backupMarker.tourTime;
 		type = backupMarker.type;
+		urlAddress = backupMarker.urlAddress;
+		urlText = backupMarker.urlText;
 		visualPosition = backupMarker.visualPosition;
 
 		tourData = backupMarker.tourData;
@@ -664,13 +685,13 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 		this.visualPosition = visualPosition;
 	}
 
-	public void setLabelXOffset(final int labelXOffset) {
-		this.labelXOffset = labelXOffset;
-	}
-
 //	public void setTourSign(final TourSign tourSign) {
 //		this.tourSign = tourSign;
 //	}
+
+	public void setLabelXOffset(final int labelXOffset) {
+		this.labelXOffset = labelXOffset;
+	}
 
 	public void setLabelYOffset(final int labelYOffset) {
 		this.labelYOffset = labelYOffset;
@@ -691,19 +712,22 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 	 */
 	public void setMarkerBackup(final TourMarker backupMarker) {
 
-		backupMarker.label = label;
+		backupMarker.altitude = altitude;
 		backupMarker.description = description;
-		backupMarker.urlAddress = urlAddress;
-		backupMarker.urlText = urlText;
-
 		backupMarker.distance20 = distance20;
+		backupMarker.label = label;
 		backupMarker.labelXOffset = labelXOffset;
 		backupMarker.labelYOffset = labelYOffset;
+		backupMarker.latitude = latitude;
+		backupMarker.longitude = longitude;
 		backupMarker.markerId = markerId;
 		backupMarker.markerType = markerType;
 		backupMarker.serieIndex = serieIndex;
 		backupMarker.time = time;
+		backupMarker.tourTime = tourTime;
 		backupMarker.type = type;
+		backupMarker.urlAddress = urlAddress;
+		backupMarker.urlText = urlText;
 		backupMarker.visualPosition = visualPosition;
 
 		backupMarker.tourData = tourData;
@@ -721,21 +745,26 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 		this.isMarkerVisible = isMarkerVisible ? 1 : 0;
 	}
 
-	public void setSerieIndex(final int serieIndex) {
-		this.serieIndex = serieIndex;
-	}
-
 //	public void setTourSign(final TourSign tourSign) {
 //		this.tourSign = tourSign;
 //	}
 
+	public void setSerieIndex(final int serieIndex) {
+		this.serieIndex = serieIndex;
+	}
+
 	/**
-	 * @param time
+	 * @param relativeTourTime
 	 *            Time in seconds relative to the tour start. When value is not available it is set
 	 *            to -1.
+	 * @param absoluteTourTime
+	 *            Absolute time of the tour marker in milliseconds since 1970-01-01T00:00:00Z. When
+	 *            value is not available, it is set to {@link Long#MIN_VALUE}.
 	 */
-	public void setTime(final int time) {
-		this.time = time;
+	public void setTime(final int relativeTourTime, final long absoluteTourTime) {
+
+		this.time = relativeTourTime;
+		this.tourTime = absoluteTourTime;
 	}
 
 	public void setUrlAddress(final String urlAddress) {

@@ -915,10 +915,25 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
 				extractedMarker.setSerieIndex(extractedMarkerIndex);
 
 				if (isTourTime) {
-					tourMarker.setTime(extractTimeSerie[extractedMarkerIndex]);
+
+					final int extractedRelativeTime = extractTimeSerie[extractedMarkerIndex];
+
+					tourMarker.setTime(//
+							extractedRelativeTime,
+							_tourDataSource.getTourStartTimeMS() + (extractedRelativeTime * 1000));
 				}
 				if (isTourDistance) {
 					tourMarker.setDistance(extractDistanceSerie[extractedMarkerIndex]);
+				}
+
+				if (extractAltitudeSerie != null) {
+					tourMarker.setAltitude(extractAltitudeSerie[extractedMarkerIndex]);
+				}
+
+				if (extractLatitudeSerie != null) {
+					tourMarker.setGeoPosition(
+							extractLatitudeSerie[extractedMarkerIndex],
+							extractLongitudeSerie[extractedMarkerIndex]);
 				}
 
 				extractedTourMarker.add(extractedMarker);

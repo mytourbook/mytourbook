@@ -1151,10 +1151,21 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
 					clonedMarker.setSerieIndex(joinMarkerIndex);
 
 					if (isJoinTime) {
-						clonedMarker.setTime(joinedTimeSerie[joinMarkerIndex]);
+						final int relativeTourTime = joinedTimeSerie[joinMarkerIndex];
+						tourMarker.setTime(relativeTourTime, joinedTourStart.getMillis() + (relativeTourTime * 1000));
 					}
 					if (isJoinDistance) {
 						clonedMarker.setDistance(joinedDistanceSerie[joinMarkerIndex]);
+					}
+
+					if (isJoinAltitude) {
+						tourMarker.setAltitude(joinedAltitudeSerie[joinMarkerIndex]);
+					}
+
+					if (isJoinLat && isJoinLon) {
+						tourMarker.setGeoPosition(
+								joinedLatitudeSerie[joinMarkerIndex],
+								joinedLongitudeSerie[joinMarkerIndex]);
 					}
 
 					joinedTourMarker.add(clonedMarker);
@@ -1220,10 +1231,21 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
 					tourMarker.setLabelPosition(TourMarker.LABEL_POS_VERTICAL_ABOVE_GRAPH);
 
 					if (isJoinTime) {
-						tourMarker.setTime(joinedTimeSerie[joinMarkerIndex]);
+						final int relativeTourTime = joinedTimeSerie[joinMarkerIndex];
+						tourMarker.setTime(relativeTourTime, joinedTourStart.getMillis() + (relativeTourTime * 1000));
 					}
 					if (isJoinDistance) {
 						tourMarker.setDistance(joinedDistanceSerie[joinMarkerIndex]);
+					}
+
+					if (isJoinAltitude) {
+						tourMarker.setAltitude(joinedAltitudeSerie[joinMarkerIndex]);
+					}
+
+					if (isJoinLat && isJoinLon) {
+						tourMarker.setGeoPosition(
+								joinedLatitudeSerie[joinMarkerIndex],
+								joinedLongitudeSerie[joinMarkerIndex]);
 					}
 
 					joinedTourMarker.add(tourMarker);

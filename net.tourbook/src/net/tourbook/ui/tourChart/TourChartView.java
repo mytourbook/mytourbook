@@ -345,7 +345,7 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 		_pageNoChart = new Label(_pageBook, SWT.NONE);
 		_pageNoChart.setText(Messages.UI_Label_no_chart_is_selected);
 
-		_tourChart = new TourChart(_pageBook, SWT.FLAT);
+		_tourChart = new TourChart(_pageBook, SWT.FLAT, this);
 		_tourChart.setShowZoomActions(true);
 		_tourChart.setShowSlider(true);
 		_tourChart.setTourInfoActionsEnabled(true);
@@ -644,8 +644,10 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 
 		final SelectionChartXSliderPosition xSliderPosition = new SelectionChartXSliderPosition(
 				_tourChart,
+				SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION,
 				leftSliderValueIndex,
-				rightSliderValueIndex);
+				rightSliderValueIndex,
+				true);
 
 		_tourChart.selectMarker(xSliderPosition);
 	}

@@ -418,11 +418,11 @@ public class TourManager {
 		fireEvent(tourEventId, new TourEvent(modifiedTours));
 	}
 
-	public static void fireEvent(final TourEventId tourEventId, final Object customData) {
+	public static void fireEvent(final TourEventId tourEventId, final Object customData, final IWorkbenchPart part) {
 
 		final Object[] allListeners = _tourEventListeners.getListeners();
 		for (final Object listener : allListeners) {
-			((ITourEventListener) listener).tourChanged(null, tourEventId, customData);
+			((ITourEventListener) listener).tourChanged(part, tourEventId, customData);
 		}
 	}
 
@@ -1056,6 +1056,8 @@ public class TourManager {
 		 * update marker index in the remaining markers
 		 */
 		final int diffSerieIndex = lastSerieIndex - firstSerieIndex + 1;
+		final long tourStartTimeMS = tourData.getTourStartTimeMS();
+
 		final int[] timeSerie = tourData.timeSerie;
 		final float[] distSerie = tourData.distanceSerie;
 
@@ -1072,7 +1074,8 @@ public class TourManager {
 				if (isRemoveTime) {
 
 					if (timeSerie != null) {
-						tourMarker.setTime(timeSerie[serieIndex]);
+						final int relativeTime = timeSerie[serieIndex];
+						tourMarker.setTime(relativeTime, tourStartTimeMS + (relativeTime * 1000));
 					}
 
 					if (distSerie != null) {

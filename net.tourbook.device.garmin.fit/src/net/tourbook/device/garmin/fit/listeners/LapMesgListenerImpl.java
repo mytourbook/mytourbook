@@ -53,7 +53,9 @@ public class LapMesgListenerImpl extends AbstractMesgListener implements LapMesg
 			lapTime += Math.round(totalElapsedTime);
 
 			context.setLapTime(lapTime);
-			tourMarker.setTime(lapTime);
+
+			// the correct absolute time will be set later
+			tourMarker.setTime(lapTime, Long.MIN_VALUE);
 		}
 
 		/*

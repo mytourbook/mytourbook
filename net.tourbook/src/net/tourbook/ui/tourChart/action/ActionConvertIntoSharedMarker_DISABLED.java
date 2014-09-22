@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -16,22 +16,19 @@
 package net.tourbook.ui.tourChart.action;
 
 import net.tourbook.Messages;
-import net.tourbook.data.SharedMarker;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
-import net.tourbook.database.TourDatabase;
-import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.tourChart.TourChart;
 
 import org.eclipse.jface.action.Action;
 
-public class ActionConvertIntoSharedMarker extends Action {
+public class ActionConvertIntoSharedMarker_DISABLED extends Action {
 
 	private TourChart	_tourChart;
 	private TourMarker	_tourMarker;
 
-	public ActionConvertIntoSharedMarker(final TourChart tourChart) {
+	public ActionConvertIntoSharedMarker_DISABLED(final TourChart tourChart) {
 
 		super(Messages.Action_SharedMarker_ConvertFromTourMarker);
 
@@ -54,28 +51,28 @@ public class ActionConvertIntoSharedMarker extends Action {
 
 		final int tourMarkerSerieIndex = _tourMarker.getSerieIndex();
 
-		final SharedMarker sharedMarker = new SharedMarker();
-
-		sharedMarker.setName(_tourMarker.getLabel());
-		sharedMarker.setDescription(_tourMarker.getDescription());
-
-		sharedMarker.setUrlAddress(_tourMarker.getUrlAddress());
-		sharedMarker.setUrlText(_tourMarker.getUrlText());
-
-		sharedMarker.setLatitude(tourData.latitudeSerie[tourMarkerSerieIndex]);
-		sharedMarker.setLongitude(tourData.longitudeSerie[tourMarkerSerieIndex]);
-
-
-		if (tourData.altitudeSerie != null) {
-			sharedMarker.setAltitude(tourData.altitudeSerie[tourMarkerSerieIndex]);
-		}
-
-		final SharedMarker savedSharedMarker = TourDatabase.saveEntity(//
-				sharedMarker,
-				sharedMarker.getId(),
-				SharedMarker.class);
-
-		TourManager.fireEvent(TourEventId.TOUR_CHANGED);
+//		final SharedMarker sharedMarker = new SharedMarker();
+//
+//		sharedMarker.setName(_tourMarker.getLabel());
+//		sharedMarker.setDescription(_tourMarker.getDescription());
+//
+//		sharedMarker.setUrlAddress(_tourMarker.getUrlAddress());
+//		sharedMarker.setUrlText(_tourMarker.getUrlText());
+//
+//		sharedMarker.setLatitude(tourData.latitudeSerie[tourMarkerSerieIndex]);
+//		sharedMarker.setLongitude(tourData.longitudeSerie[tourMarkerSerieIndex]);
+//
+//
+//		if (tourData.altitudeSerie != null) {
+//			sharedMarker.setAltitude(tourData.altitudeSerie[tourMarkerSerieIndex]);
+//		}
+//
+//		final SharedMarker savedSharedMarker = TourDatabase.saveEntity(//
+//				sharedMarker,
+//				sharedMarker.getId(),
+//				SharedMarker.class);
+//
+//		TourManager.fireEvent(TourEventId.TOUR_CHANGED);
 	}
 
 	public void setTourMarker(final TourMarker tourMarker) {

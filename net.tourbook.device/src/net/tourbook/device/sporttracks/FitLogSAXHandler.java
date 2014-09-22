@@ -473,7 +473,10 @@ public class FitLogSAXHandler extends DefaultHandler {
 		}
 
 		final Set<TourMarker> tourMarkers = tourData.getTourMarkers();
+		final float[] altitudeSerie = tourData.altitudeSerie;
 		final float[] distanceSerie = tourData.distanceSerie;
+		final double[] latitudeSerie = tourData.latitudeSerie;
+		final double[] longitudeSerie = tourData.longitudeSerie;
 
 		/*
 		 * tour and track can have different start times
@@ -486,7 +489,7 @@ public class FitLogSAXHandler extends DefaultHandler {
 		for (final Lap lap : _laps) {
 
 			final long startTimeDiff = lap.lapStartTime - tourStartTime;// - tour2sliceTimeDiff;
-			long lapRelativeTime = startTimeDiff / 1000;
+			int lapRelativeTime = (int) (startTimeDiff / 1000);
 			int serieIndex = 0;
 
 			// get serie index
@@ -511,10 +514,18 @@ public class FitLogSAXHandler extends DefaultHandler {
 
 			tourMarker.setLabel(Integer.toString(lapCounter));
 			tourMarker.setSerieIndex(serieIndex);
-			tourMarker.setTime((int) lapRelativeTime);
+			tourMarker.setTime(lapRelativeTime, tourData.getTourStartTimeMS() + (lapRelativeTime * 1000));
 
 			if (distanceSerie != null) {
 				tourMarker.setDistance(distanceSerie[serieIndex]);
+			}
+
+			if (altitudeSerie != null) {
+				tourMarker.setAltitude(altitudeSerie[serieIndex]);
+			}
+
+			if (latitudeSerie != null) {
+				tourMarker.setGeoPosition(latitudeSerie[serieIndex], longitudeSerie[serieIndex]);
 			}
 
 			tourMarkers.add(tourMarker);

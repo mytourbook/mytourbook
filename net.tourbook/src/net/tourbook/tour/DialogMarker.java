@@ -1218,7 +1218,7 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
 	 */
 	private void createUI_80_TourChart(final Composite parent) {
 
-		_tourChart = new TourChart(parent, SWT.FLAT /* | SWT.BORDER */);
+		_tourChart = new TourChart(parent, SWT.FLAT /* | SWT.BORDER */, null);
 		GridDataFactory.fillDefaults()//
 				.grab(true, true)
 				.hint(_pc.convertWidthInCharsToPixels(90), _pc.convertHeightInCharsToPixels(40))

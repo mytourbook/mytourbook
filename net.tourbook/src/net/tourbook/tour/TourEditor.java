@@ -216,7 +216,7 @@ public class TourEditor extends EditorPart implements IPersistableEditor {
 		addTourEventListener();
 		createActions();
 
-		_tourChart = new TourChart(parent, SWT.FLAT);
+		_tourChart = new TourChart(parent, SWT.FLAT, getSite().getPart());
 
 		_tourChart.setShowZoomActions(true);
 		_tourChart.setShowSlider(true);

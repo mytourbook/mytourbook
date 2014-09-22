@@ -642,12 +642,12 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	@JoinTable(inverseJoinColumns = @JoinColumn(name = "TOURTAG_TagID", referencedColumnName = "TagID"))
 	private Set<TourTag>										tourTags							= new HashSet<TourTag>();
 
-	/**
-	 * SharedMarker
-	 */
-	@ManyToMany(fetch = EAGER)
-	@JoinTable(inverseJoinColumns = @JoinColumn(name = "SHAREDMARKER_SharedMarkerID", referencedColumnName = "SharedMarkerID"))
-	private Set<SharedMarker>									sharedMarker						= new HashSet<SharedMarker>();
+//	/**
+//	 * SharedMarker
+//	 */
+//	@ManyToMany(fetch = EAGER)
+//	@JoinTable(inverseJoinColumns = @JoinColumn(name = "SHAREDMARKER_SharedMarkerID", referencedColumnName = "SharedMarkerID"))
+//	private Set<SharedMarker>									sharedMarker						= new HashSet<SharedMarker>();
 
 	/**
 	 * Category of the tour, e.g. bike, mountainbike, jogging, inlinescating
@@ -669,9 +669,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	private TourBike											tourBike;
 
 	/**
-	 * Contains time in <b>seconds</b> relativ to the tour start which is defined in:
-	 * {@link #startYear}, {@link #startMonth}, {@link #startDay}, {@link #startHour},
-	 * {@link #startMinute} and {@link #startSecond}.
+	 * Contains time in <b>seconds</b> relativ to the tour start which is defined in
+	 * {@link #tourStartTime}.
 	 * <p>
 	 * The array {@link #timeSerie} is <code>null</code> for a manually created tour, it is
 	 * <b>always</b> set when tour is from a device or an imported file.
@@ -3561,17 +3560,18 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 				final TimeData timeData = timeDataSerie[serieIndex];
 
 				if (timeData.marker != 0) {
-					int time = 0;
+
+					int relativeTime = 0;
 					float distanceValue = 0;
 
 					if (timeSerie != null) {
-						time = timeSerie[serieIndex];
+						relativeTime = timeSerie[serieIndex];
 					}
 					if (distanceSerie != null) {
 						distanceValue = distanceSerie[serieIndex];
 					}
 
-					createTourMarker(timeData, serieIndex, time, distanceValue);
+					createTourMarker(timeData, serieIndex, relativeTime, distanceValue);
 				}
 			}
 		}
@@ -3865,18 +3865,23 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	 * 
 	 * @param timeData
 	 * @param serieIndex
-	 * @param recordingTime
+	 * @param relativeTime
 	 * @param distanceAbsolute
 	 */
 	private void createTourMarker(	final TimeData timeData,
 									final int serieIndex,
-									final long recordingTime,
+									final int relativeTime,
 									final float distanceAbsolute) {
 
 		// create a new marker
 		final TourMarker tourMarker = new TourMarker(this, ChartLabel.MARKER_TYPE_DEVICE);
 
-		tourMarker.setTime((int) (recordingTime + timeData.marker));
+		/*
+		 * ??? timeData.marker was added until version 14.9 but I have no idea why this was added
+		 * ???
+		 */
+//		tourMarker.setTime((int) (relativeTime + timeData.marker));
+		tourMarker.setTime(relativeTime, tourStartTime);
 		tourMarker.setDistance(distanceAbsolute);
 		tourMarker.setSerieIndex(serieIndex);
 
@@ -4189,6 +4194,30 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		}
 
 		return false;
+	}
+
+	/**
+	 * Finalize all marker data after all data are imported.
+	 * <p>
+	 * Relative tour time must be available that the absolute time can be set.
+	 */
+	public void finalizeTourMarkerWithRelativeTime() {
+
+		for (final TourMarker tourMarker : this.getTourMarkers()) {
+
+			final int serieIndex = tourMarker.getSerieIndex();
+			final int relativeTourTime = tourMarker.getTime();
+
+			tourMarker.setTime(relativeTourTime, tourStartTime + (relativeTourTime * 1000));
+
+			if (altitudeSerie != null) {
+				tourMarker.setAltitude(altitudeSerie[serieIndex]);
+			}
+
+			if (latitudeSerie != null) {
+				tourMarker.setGeoPosition(latitudeSerie[serieIndex], longitudeSerie[serieIndex]);
+			}
+		}
 	}
 
 	/**
