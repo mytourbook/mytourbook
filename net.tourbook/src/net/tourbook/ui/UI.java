@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -140,8 +140,6 @@ public class UI {
 	public static final String								VIEW_COLOR_BG_SEGMENTER_UP		= "view.colorBG.segmenterUp";					//$NON-NLS-1$
 	public static final String								VIEW_COLOR_BG_SEGMENTER_DOWN	= "view.colorBG.segmenterDown";				//$NON-NLS-1$
 	public static final String								VIEW_COLOR_BG_HISTORY_TOUR		= "VIEW_COLOR_BG_HISTORY_TOUR";				//$NON-NLS-1$
-
-	public static final String								UTF_8							= "UTF-8";										//$NON-NLS-1$
 
 	public static final String								SYMBOL_AVERAGE					= "\u00f8";									//$NON-NLS-1$
 	public static final String								SYMBOL_AVERAGE_WITH_SPACE		= "\u00f8 ";									//$NON-NLS-1$
@@ -393,6 +391,7 @@ public class UI {
 	public static boolean confirmOverwrite(final File file) {
 
 		final Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
+
 		final MessageDialog dialog = new MessageDialog(
 				shell,
 				Messages.app_dlg_confirmFileOverwrite_title,
@@ -401,6 +400,7 @@ public class UI {
 				MessageDialog.QUESTION,
 				new String[] { IDialogConstants.YES_LABEL, IDialogConstants.CANCEL_LABEL },
 				0);
+
 		dialog.open();
 
 		return dialog.getReturnCode() == 0;

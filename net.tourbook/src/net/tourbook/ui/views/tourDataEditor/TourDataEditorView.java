@@ -192,8 +192,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 	private static final int					COLUMN_SPACING					= 20;
 
-	private static final String					CSV_FILE_EXTENSION				= "csv";									//$NON-NLS-1$
-
 	private final IPreferenceStore				_prefStore						= TourbookPlugin.getDefault() //
 																						.getPreferenceStore();
 
@@ -1047,8 +1045,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		dialog.setText(Messages.dialog_export_file_dialog_text);
 
 		dialog.setFilterPath(_viewState.get(STATE_CSV_EXPORT_PATH));
-		dialog.setFilterExtensions(new String[] { CSV_FILE_EXTENSION });
-		dialog.setFileName(net.tourbook.ui.UI.format_yyyymmdd_hhmmss(_tourData) + UI.SYMBOL_DOT + CSV_FILE_EXTENSION);
+		dialog.setFilterExtensions(new String[] { Util.CSV_FILE_EXTENSION });
+		dialog.setFileName(net.tourbook.ui.UI.format_yyyymmdd_hhmmss(_tourData)
+				+ UI.SYMBOL_DOT
+				+ Util.CSV_FILE_EXTENSION);
 
 		final String selectedFilePath = dialog.open();
 		if (selectedFilePath == null) {

@@ -13,22 +13,30 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.tour;
+package net.tourbook.ui.views.tourBook;
 
-import java.util.ArrayList;
+import net.tourbook.Messages;
 
-import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.action.Action;
 
-/**
- * contains tours which has been deleted in the database or removed from a view (tours in the import
- * view which are not saved but removed)
- */
-public class SelectionDeletedTours implements ISelection {
+class ActionExportViewCSV extends Action {
 
-	public ArrayList<ITourItem>	removedTours	= new ArrayList<ITourItem>();
+	private TourBookView	_tourBookView;
 
-	public boolean isEmpty() {
-		return false;
+	/**
+	 * @param tourBookView
+	 */
+	public ActionExportViewCSV(final TourBookView tourBookView) {
+
+		super();
+
+		_tourBookView = tourBookView;
+
+		setText(Messages.Tour_Book_Action_ExportViewCSV);
 	}
 
+	@Override
+	public void run() {
+		_tourBookView.actionExportViewCSV();
+	}
 }

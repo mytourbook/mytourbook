@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -49,6 +49,7 @@ public class TVITourBookYearSub extends TVITourBookItem {
 		 */
 		String sumYear = UI.EMPTY_STRING;
 		String sumYearSub = UI.EMPTY_STRING;
+
 		if (_category == ITEM_TYPE_WEEK) {
 			sumYear = "startWeekYear"; //$NON-NLS-1$
 			sumYearSub = "startWeek"; //$NON-NLS-1$
@@ -263,4 +264,9 @@ public class TVITourBookYearSub extends TVITourBookItem {
 			UI.showSQLException(e);
 		}
 	}
+
+	public int getCategory() {
+		return _category;
+	}
+
 }

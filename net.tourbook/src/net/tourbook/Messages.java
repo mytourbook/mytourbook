@@ -920,9 +920,9 @@ public class Messages extends NLS {
 
 	public static String		Pref_Graphs_Checkbox_IsForcePaceMinValue;
 
-	public static String	Pref_Graphs_Checkbox_IsForcePulseMaxValue;
+	public static String		Pref_Graphs_Checkbox_IsForcePulseMaxValue;
 
-	public static String	Pref_Graphs_Checkbox_IsForcePulseMinValue;
+	public static String		Pref_Graphs_Checkbox_IsForcePulseMinValue;
 
 	public static String		Pref_Graphs_Checkbox_ShowHorizontalGrid;
 	public static String		Pref_Graphs_Checkbox_ShowVerticalGrid;
@@ -1285,6 +1285,7 @@ public class Messages extends NLS {
 	public static String		Tour_Book_Action_delete_selected_tours_menu;
 	public static String		Tour_Book_Action_DeleteSelectedTours_Monitor;
 	public static String		Tour_Book_Action_DeleteSelectedTours_MonitorSubtask;
+	public static String		Tour_Book_Action_ExportViewCSV;
 	public static String		Tour_Book_Combo_statistic_tooltip;
 	public static String		Tour_Book_Combo_year_tooltip;
 	public static String		Tour_Book_Label_chart_title;

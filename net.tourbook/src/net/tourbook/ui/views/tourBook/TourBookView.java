@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,6 +15,12 @@
  *******************************************************************************/
 package net.tourbook.ui.views.tourBook;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.text.DateFormat;
 import java.text.DateFormatSymbols;
 import java.text.NumberFormat;
@@ -25,10 +31,13 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
+import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.UI;
 import net.tourbook.common.util.ColumnManager;
 import net.tourbook.common.util.ITourViewer3;
 import net.tourbook.common.util.PostSelectionProvider;
+import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.TreeColumnDefinition;
 import net.tourbook.common.util.TreeViewerItem;
 import net.tourbook.common.util.Util;
@@ -54,7 +63,6 @@ import net.tourbook.tour.TourTypeMenuManager;
 import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.ITourProviderByID;
 import net.tourbook.ui.TreeColumnFactory;
-import net.tourbook.ui.UI;
 import net.tourbook.ui.action.ActionCollapseAll;
 import net.tourbook.ui.action.ActionCollapseOthers;
 import net.tourbook.ui.action.ActionComputeDistanceValuesFromGeoposition;
@@ -75,6 +83,7 @@ import net.tourbook.ui.views.TreeViewerTourInfoToolTip;
 import net.tourbook.ui.views.rawData.ActionMergeTour;
 import net.tourbook.ui.views.rawData.ActionReimportSubMenu;
 
+import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
@@ -100,6 +109,7 @@ import org.eclipse.jface.viewers.ITreeSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.StyledString;
+import org.eclipse.jface.viewers.TreePath;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
@@ -111,6 +121,7 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.ScrollBar;
 import org.eclipse.swt.widgets.Tree;
@@ -119,16 +130,61 @@ import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.part.ViewPart;
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
+import org.joda.time.format.ISODateTimeFormat;
 
 public class TourBookView extends ViewPart implements ITourProvider, ITourViewer3, ITourProviderByID {
 
 	static public final String							ID									= "net.tourbook.views.tourListView";		//$NON-NLS-1$
 
+	private static final String							STATE_CSV_EXPORT_PATH				= "STATE_CSV_EXPORT_PATH";					//$NON-NLS-1$
 	private static final String							STATE_SELECTED_YEAR					= "SelectedYear";							//$NON-NLS-1$
 	private static final String							STATE_SELECTED_MONTH				= "SelectedMonth";							//$NON-NLS-1$
 	private static final String							STATE_SELECTED_TOURS				= "SelectedTours";							//$NON-NLS-1$
 	private static final String							STATE_IS_SELECT_YEAR_MONTH_TOURS	= "IsSelectYearMonthTours";				//$NON-NLS-1$
 	private static final String							STATE_YEAR_SUB_CATEGORY				= "YearSubCategory";						//$NON-NLS-1$
+
+	private static final String							CSV_HEADER_AVERAGE_CADENCE			= "AvgCadence";
+	private static final String							CSV_HEADER_AVERAGE_PACE				= "AvgPace (%s)";
+	private static final String							CSV_HEADER_AVERAGE_SPEED			= "AvgSpeed (%s)";
+	private static final String							CSV_HEADER_AVERAGE_TEMPERATURE		= "AvgTemperature (%s)";
+	private static final String							CSV_HEADER_ALTITUDE_DOWN			= "AltitudeDown (%s)";
+	private static final String							CSV_HEADER_ALTITUDE_UP				= "AltitudeUp (%s)";
+	private static final String							CSV_HEADER_CALORIES					= "Calories";
+	private static final String							CSV_HEADER_DAY						= "Day";
+	private static final String							CSV_HEADER_DEVICE_START_DISTANCE	= "DeviceStartDistance";
+	private static final String							CSV_HEADER_DISTANCE					= "Distance (%s)";
+	private static final String							CSV_HEADER_DP_TOLERANCE				= "DPTolerance";
+	private static final String							CSV_HEADER_ISO_DATE_TIME			= "ISO8601";
+	private static final String							CSV_HEADER_MOVING_TIME				= "MovingTime";
+	private static final String							CSV_HEADER_NUMBER_OF_MARKER			= "NumberOfMarkers";
+	private static final String							CSV_HEADER_NUMBER_OF_PHOTOS			= "NumberOfPhotos";
+	private static final String							CSV_HEADER_NUMBER_OF_TOURS			= "NumberOfTours";
+	private static final String							CSV_HEADER_WEATHER					= "Weather";
+	private static final String							CSV_HEADER_WIND_DIRECTION			= "WindDirection";
+	private static final String							CSV_HEADER_WIND_SPEED				= "WindSpeed";
+	private static final String							CSV_HEADER_MAX_ALTITUDE				= "MaxAltitude (%s)";
+	private static final String							CSV_HEADER_MAX_PULSE				= "MaxPulse";
+	private static final String							CSV_HEADER_MAX_SPEED				= "MaxSpeed (%s)";
+	private static final String							CSV_HEADER_MONTH					= "Month";
+	private static final String							CSV_HEADER_PAUSED_TIME				= "PausedTime";
+	private static final String							CSV_HEADER_PAUSED_TIME_RELATIVE		= "RelativePausedTime";
+	private static final String							CSV_HEADER_PERSON					= "Person";
+	private static final String							CSV_HEADER_RECORDING_TIME			= "RecordingTime";
+	private static final String							CSV_HEADER_RESTPULSE				= "RestPulse";
+	private static final String							CSV_HEADER_TAGS						= "Tags";
+	private static final String							CSV_HEADER_TIME						= "Time";
+	private static final String							CSV_HEADER_TIME_INTERVAL			= "TimeInterval";
+	private static final String							CSV_HEADER_TIME_SLICES				= "TimeSlices";
+	private static final String							CSV_HEADER_TITLE					= "Title";
+	private static final String							CSV_HEADER_TOUR_TYPE_ID				= "TourTypeId";
+	private static final String							CSV_HEADER_TOUR_TYPE_NAME			= "TourTypeName";
+	private static final String							CSV_HEADER_WEEK						= "Week";
+	private static final String							CSV_HEADER_WEEKDAY					= "Weekday";
+	private static final String							CSV_HEADER_WEEK_YEAR				= "WeekYear";
+	private static final String							CSV_HEADER_YEAR						= "Year";
 
 	private static int									_yearSubCategory					= TourItem.ITEM_TYPE_MONTH;
 
@@ -147,11 +203,23 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 	private IPropertyChangeListener						_prefChangeListener;
 	private TVITourBookRoot								_rootItem;
 
-	private final NumberFormat							_nf1								= NumberFormat
-																									.getNumberInstance();
+	private final DateTimeFormatter						_dtFormatter;
+	private final DateTimeFormatter						_isoFormatter;
+	private final NumberFormat							_nf1;
+	private final NumberFormat							_nf1NoGroup;
+
 	{
+		_nf1 = NumberFormat.getNumberInstance();
 		_nf1.setMinimumFractionDigits(1);
 		_nf1.setMaximumFractionDigits(1);
+
+		_nf1NoGroup = NumberFormat.getNumberInstance();
+		_nf1NoGroup.setMinimumFractionDigits(1);
+		_nf1NoGroup.setMaximumFractionDigits(1);
+		_nf1NoGroup.setGroupingUsed(false);
+
+		_dtFormatter = DateTimeFormat.forPattern("yyyy-MM-dd_HH-mm-ss");
+		_isoFormatter = ISODateTimeFormat.basicDateTimeNoMillis();
 	}
 
 	private final Calendar								_calendar							= GregorianCalendar
@@ -188,35 +256,31 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 	private Composite									_viewerContainer;
 
 	private TreeViewer									_tourViewer;
-	private ActionEditQuick								_actionEditQuick;
 
 	private ActionCollapseAll							_actionCollapseAll;
-
 	private ActionCollapseOthers						_actionCollapseOthers;
+	private ActionComputeDistanceValuesFromGeoposition	_actionComputeDistanceValuesFromGeoposition;
+	private ActionComputeElevationGain					_actionComputeElevationGain;
+	private ActionEditQuick								_actionEditQuick;
 	private ActionExpandSelection						_actionExpandSelection;
+	private ActionExport								_actionExportTour;
+	private ActionExportViewCSV							_actionExportViewCSV;
 	private ActionDeleteTourMenu						_actionDeleteTour;
-
 	private ActionEditTour								_actionEditTour;
 	private ActionOpenTour								_actionOpenTour;
 	private ActionOpenMarkerDialog						_actionOpenMarkerDialog;
 	private ActionOpenAdjustAltitudeDialog				_actionOpenAdjustAltitudeDialog;
-	private ActionMergeTour								_actionMergeTour;
 	private ActionJoinTours								_actionJoinTours;
-	private ActionComputeDistanceValuesFromGeoposition	_actionComputeDistanceValuesFromGeoposition;
-	private ActionComputeElevationGain					_actionComputeElevationGain;
+	private ActionMergeTour								_actionMergeTour;
+	private ActionModifyColumns							_actionModifyColumns;
+	private ActionPrint									_actionPrintTour;
+	private ActionRefreshView							_actionRefreshView;
+	private ActionReimportSubMenu						_actionReimportSubMenu;
+	private ActionSelectAllTours						_actionSelectAllTours;
 	private ActionSetAltitudeValuesFromSRTM				_actionSetAltitudeFromSRTM;
 	private ActionSetTourTypeMenu						_actionSetTourType;
-
-	private ActionSelectAllTours						_actionSelectAllTours;
-	private ActionYearSubCategorySelect					_actionYearSubCategorySelect;
-
-	private ActionModifyColumns							_actionModifyColumns;
-	private ActionRefreshView							_actionRefreshView;
 	private ActionSetPerson								_actionSetOtherPerson;
-
-	private ActionExport								_actionExportTour;
-	private ActionReimportSubMenu						_actionReimportSubMenu;
-	private ActionPrint									_actionPrintTour;
+	private ActionYearSubCategorySelect					_actionYearSubCategorySelect;
 
 	private PixelConverter								_pc;
 
@@ -286,6 +350,56 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 
 		@Override
 		public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
+	}
+
+	void actionExportViewCSV() {
+
+		// get selected items
+		final ITreeSelection selection = (ITreeSelection) _tourViewer.getSelection();
+
+		if (selection.size() == 0) {
+			return;
+		}
+
+		final String defaultExportFilePath = _state.get(STATE_CSV_EXPORT_PATH);
+		final String defaultExportFileName = "TourBook_"
+				+ _dtFormatter.print(new DateTime())
+				+ UI.SYMBOL_DOT
+				+ Util.CSV_FILE_EXTENSION;
+
+		/*
+		 * get export filename
+		 */
+		final FileDialog dialog = new FileDialog(Display.getCurrent().getActiveShell(), SWT.SAVE);
+		dialog.setText(Messages.dialog_export_file_dialog_text);
+
+		dialog.setFilterPath(defaultExportFilePath);
+		dialog.setFilterExtensions(new String[] { Util.CSV_FILE_EXTENSION });
+		dialog.setFileName(defaultExportFileName);
+
+		final String selectedFilePath = dialog.open();
+		if (selectedFilePath == null) {
+			return;
+		}
+
+		final File exportFilePath = new Path(selectedFilePath).toFile();
+
+		// keep export path
+		_state.put(STATE_CSV_EXPORT_PATH, exportFilePath.getPath());
+
+		if (exportFilePath.exists()) {
+			if (net.tourbook.ui.UI.confirmOverwrite(exportFilePath) == false) {
+				// don't overwrite file, nothing more to do
+				return;
+			}
+		}
+
+		exportCSV(selection, selectedFilePath);
+
+//		// DEBUGGING: USING DEFAULT PATH
+//		final IPath path = new Path(defaultExportFilePath).removeLastSegments(1).append(defaultExportFileName);
+//
+//		exportCSV(selection, path.toOSString());
 	}
 
 	void actionSelectYearMonthTours() {
@@ -434,34 +548,30 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 
 	private void createActions() {
 
+		_actionCollapseAll = new ActionCollapseAll(this);
+		_actionCollapseOthers = new ActionCollapseOthers(this);
+		_actionComputeDistanceValuesFromGeoposition = new ActionComputeDistanceValuesFromGeoposition(this);
+		_actionComputeElevationGain = new ActionComputeElevationGain(this);
+		_actionDeleteTour = new ActionDeleteTourMenu(this);
 		_actionEditQuick = new ActionEditQuick(this);
 		_actionEditTour = new ActionEditTour(this);
-		_actionOpenTour = new ActionOpenTour(this);
-		_actionDeleteTour = new ActionDeleteTourMenu(this);
-
+		_actionExpandSelection = new ActionExpandSelection(this);
+		_actionExportTour = new ActionExport(this);
+		_actionExportViewCSV = new ActionExportViewCSV(this);
+		_actionJoinTours = new ActionJoinTours(this);
 		_actionOpenMarkerDialog = new ActionOpenMarkerDialog(this, true);
 		_actionOpenAdjustAltitudeDialog = new ActionOpenAdjustAltitudeDialog(this);
 		_actionMergeTour = new ActionMergeTour(this);
-		_actionJoinTours = new ActionJoinTours(this);
-		_actionComputeDistanceValuesFromGeoposition = new ActionComputeDistanceValuesFromGeoposition(this);
-		_actionComputeElevationGain = new ActionComputeElevationGain(this);
+		_actionModifyColumns = new ActionModifyColumns(this);
+		_actionOpenTour = new ActionOpenTour(this);
+		_actionPrintTour = new ActionPrint(this);
+		_actionRefreshView = new ActionRefreshView(this);
+		_actionReimportSubMenu = new ActionReimportSubMenu(this);
 		_actionSetAltitudeFromSRTM = new ActionSetAltitudeValuesFromSRTM(this);
 		_actionSetOtherPerson = new ActionSetPerson(this);
-
 		_actionSetTourType = new ActionSetTourTypeMenu(this);
-
-		_actionModifyColumns = new ActionModifyColumns(this);
 		_actionSelectAllTours = new ActionSelectAllTours(this);
 		_actionYearSubCategorySelect = new ActionYearSubCategorySelect(this);
-		_actionRefreshView = new ActionRefreshView(this);
-
-		_actionExpandSelection = new ActionExpandSelection(this);
-		_actionCollapseAll = new ActionCollapseAll(this);
-		_actionCollapseOthers = new ActionCollapseOthers(this);
-
-		_actionExportTour = new ActionExport(this);
-		_actionReimportSubMenu = new ActionReimportSubMenu(this);
-		_actionPrintTour = new ActionPrint(this);
 
 		_tagMenuMgr = new TagMenuManager(this, true);
 
@@ -607,6 +717,18 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		_columnManager.createHeaderContextMenu(tree, treeContextMenu);
 	}
 
+	private void csvField(final StringBuilder sb, final int fieldValue) {
+
+		sb.append(fieldValue);
+		sb.append(UI.TAB);
+	}
+
+	private void csvField(final StringBuilder sb, final String fieldValue) {
+
+		sb.append(fieldValue);
+		sb.append(UI.TAB);
+	}
+
 	/**
 	 * Defines all columns for the table viewer in the column manager, the sequence defines the
 	 * default columns
@@ -615,7 +737,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 	 */
 	private void defineAllColumns(final Composite parent) {
 
-		defineColumn_Date();
+		defineColumn_1stColumn_Date();
 		defineColumn_WeekDay();
 		defineColumn_Time();
 		defineColumn_TourTypeImage();
@@ -665,6 +787,70 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 	}
 
 	/**
+	 * tree column: date
+	 */
+	private void defineColumn_1stColumn_Date() {
+
+		final TreeColumnDefinition colDef = TreeColumnFactory.DATE.createColumn(_columnManager, _pc);
+		colDef.setIsDefaultColumn();
+		colDef.setCanModifyVisibility(false);
+		colDef.setLabelProvider(new TourInfoToolTipStyledCellLabelProvider() {
+
+			@Override
+			public Long getTourId(final ViewerCell cell) {
+
+				if (_isToolTipInDate == false) {
+					return null;
+				}
+
+				final Object element = cell.getElement();
+				if ((element instanceof TVITourBookTour)) {
+					return ((TVITourBookItem) element).getTourId();
+				}
+
+				return null;
+			}
+
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final Object element = cell.getElement();
+				final TVITourBookItem tourItem = (TVITourBookItem) element;
+
+				if ((element instanceof TVITourBookTour)) {
+
+					// tour item
+					cell.setText(tourItem.treeColumn);
+
+				} else {
+
+					// year/month item
+					final StyledString styledString = new StyledString();
+					styledString.append(tourItem.treeColumn);
+					styledString.append(UI.SPACE3);
+					styledString.append(Long.toString(tourItem.colCounter), StyledString.QUALIFIER_STYLER);
+
+					if (tourItem instanceof TVITourBookYearSub) {
+
+						cell.setForeground(//
+								JFaceResources.getColorRegistry().get(net.tourbook.ui.UI.VIEW_COLOR_SUB_SUB));
+
+					} else {
+
+						cell.setForeground(//
+								JFaceResources.getColorRegistry().get(net.tourbook.ui.UI.VIEW_COLOR_SUB));
+					}
+
+					cell.setText(styledString.getString());
+					cell.setStyleRanges(styledString.getStyleRanges());
+				}
+
+				setCellColor(cell, element);
+			}
+		});
+	}
+
+	/**
 	 * column: altitude down (m)
 	 */
 	private void defineColumn_AltitudeDown() {
@@ -680,7 +866,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 				if (dbAltitudeDown == 0) {
 					cell.setText(UI.EMPTY_STRING);
 				} else {
-					cell.setText(Long.toString((long) (-dbAltitudeDown / UI.UNIT_VALUE_ALTITUDE)));
+					cell.setText(Long.toString((long) (-dbAltitudeDown / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE)));
 				}
 
 				setCellColor(cell, element);
@@ -705,7 +891,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 				if (dbAltitudeUp == 0) {
 					cell.setText(UI.EMPTY_STRING);
 				} else {
-					cell.setText(Long.toString((long) (dbAltitudeUp / UI.UNIT_VALUE_ALTITUDE)));
+					cell.setText(Long.toString((long) (dbAltitudeUp / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE)));
 				}
 
 				setCellColor(cell, element);
@@ -748,12 +934,12 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 			public void update(final ViewerCell cell) {
 
 				final Object element = cell.getElement();
-				final float pace = ((TVITourBookItem) element).colAvgPace * UI.UNIT_VALUE_DISTANCE;
+				final float pace = ((TVITourBookItem) element).colAvgPace * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
 
 				if (pace == 0) {
 					cell.setText(UI.EMPTY_STRING);
 				} else {
-					cell.setText(UI.format_mm_ss((long) pace));
+					cell.setText(net.tourbook.ui.UI.format_mm_ss((long) pace));
 				}
 
 				setCellColor(cell, element);
@@ -797,7 +983,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 
 				final Object element = cell.getElement();
 
-				final float speed = ((TVITourBookItem) element).colAvgSpeed / UI.UNIT_VALUE_DISTANCE;
+				final float speed = ((TVITourBookItem) element).colAvgSpeed / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
 				if (speed == 0) {
 					cell.setText(UI.EMPTY_STRING);
 				} else {
@@ -827,8 +1013,10 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 					cell.setText(UI.EMPTY_STRING);
 				} else {
 
-					if (UI.UNIT_VALUE_TEMPERATURE != 1) {
-						temperature = temperature * UI.UNIT_FAHRENHEIT_MULTI + UI.UNIT_FAHRENHEIT_ADD;
+					if (net.tourbook.ui.UI.UNIT_VALUE_TEMPERATURE != 1) {
+						temperature = temperature
+								* net.tourbook.ui.UI.UNIT_FAHRENHEIT_MULTI
+								+ net.tourbook.ui.UI.UNIT_FAHRENHEIT_ADD;
 					}
 
 					cell.setText(_nf1.format(temperature));
@@ -853,63 +1041,10 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 				final Object element = cell.getElement();
 				final long caloriesSum = ((TVITourBookItem) element).colCalories;
 
-				cell.setText(Long.toString(caloriesSum));
-
-				setCellColor(cell, element);
-			}
-		});
-	}
-
-	/**
-	 * tree column: date
-	 */
-	private void defineColumn_Date() {
-
-		final TreeColumnDefinition colDef = TreeColumnFactory.DATE.createColumn(_columnManager, _pc);
-		colDef.setIsDefaultColumn();
-		colDef.setCanModifyVisibility(false);
-		colDef.setLabelProvider(new TourInfoToolTipStyledCellLabelProvider() {
-
-			@Override
-			public Long getTourId(final ViewerCell cell) {
-
-				if (_isToolTipInDate == false) {
-					return null;
-				}
-
-				final Object element = cell.getElement();
-				if ((element instanceof TVITourBookTour)) {
-					return ((TVITourBookItem) element).getTourId();
-				}
-
-				return null;
-			}
-
-			@Override
-			public void update(final ViewerCell cell) {
-
-				final Object element = cell.getElement();
-				final TVITourBookItem tourItem = (TVITourBookItem) element;
-
-				if ((element instanceof TVITourBookTour)) {
-
-					// tour item
-					cell.setText(tourItem.treeColumn);
-
+				if (caloriesSum == 0) {
+					cell.setText(UI.EMPTY_STRING);
 				} else {
-
-					// year/month item
-					final StyledString styledString = new StyledString();
-					styledString.append(tourItem.treeColumn);
-					styledString.append("   " + tourItem.colCounter, StyledString.QUALIFIER_STYLER); //$NON-NLS-1$
-
-					if (tourItem instanceof TVITourBookYearSub) {
-						cell.setForeground(JFaceResources.getColorRegistry().get(UI.VIEW_COLOR_SUB_SUB));
-					} else {
-						cell.setForeground(JFaceResources.getColorRegistry().get(UI.VIEW_COLOR_SUB));
-					}
-					cell.setText(styledString.getString());
-					cell.setStyleRanges(styledString.getStyleRanges());
+					cell.setText(Long.toString(caloriesSum));
 				}
 
 				setCellColor(cell, element);
@@ -934,7 +1069,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 					if (dbStartDistance == 0) {
 						cell.setText(UI.EMPTY_STRING);
 					} else {
-						cell.setText(Long.toString((long) (dbStartDistance / UI.UNIT_VALUE_DISTANCE)));
+						cell.setText(Long.toString((long) (dbStartDistance / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE)));
 					}
 
 					setCellColor(cell, element);
@@ -960,7 +1095,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 				if (dbDistance == 0) {
 					cell.setText(UI.EMPTY_STRING);
 				} else {
-					cell.setText(_nf1.format(dbDistance / 1000 / UI.UNIT_VALUE_DISTANCE));
+					cell.setText(_nf1.format(dbDistance / 1000 / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE));
 				}
 
 				setCellColor(cell, element);
@@ -1034,7 +1169,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 				if (dbMaxAltitude == 0) {
 					cell.setText(UI.EMPTY_STRING);
 				} else {
-					cell.setText(Long.toString((long) (dbMaxAltitude / UI.UNIT_VALUE_ALTITUDE)));
+					cell.setText(Long.toString((long) (dbMaxAltitude / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE)));
 				}
 
 				setCellColor(cell, element);
@@ -1081,7 +1216,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 				if (dbMaxSpeed == 0) {
 					cell.setText(UI.EMPTY_STRING);
 				} else {
-					cell.setText(_nf1.format(dbMaxSpeed / UI.UNIT_VALUE_DISTANCE));
+					cell.setText(_nf1.format(dbMaxSpeed / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE));
 				}
 
 				setCellColor(cell, element);
@@ -1262,9 +1397,9 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 					cell.setText(UI.EMPTY_STRING);
 				} else {
 					if (_isDriveTimeFormat_hhmmss) {
-						cell.setText(UI.format_hh_mm_ss(dbPausedTime).toString());
+						cell.setText(net.tourbook.ui.UI.format_hh_mm_ss(dbPausedTime).toString());
 					} else {
-						cell.setText(UI.format_hh_mm(dbPausedTime + 30).toString());
+						cell.setText(net.tourbook.ui.UI.format_hh_mm(dbPausedTime + 30).toString());
 					}
 				}
 
@@ -1320,12 +1455,12 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 
 				if (element instanceof TVITourBookTour) {
 					if (_isDriveTimeFormat_hhmmss) {
-						cell.setText(UI.format_hh_mm_ss(drivingTime).toString());
+						cell.setText(net.tourbook.ui.UI.format_hh_mm_ss(drivingTime).toString());
 					} else {
-						cell.setText(UI.format_hh_mm(drivingTime + 30).toString());
+						cell.setText(net.tourbook.ui.UI.format_hh_mm(drivingTime + 30).toString());
 					}
 				} else {
-					cell.setText(UI.format_hh_mm(drivingTime + 30).toString());
+					cell.setText(net.tourbook.ui.UI.format_hh_mm(drivingTime + 30).toString());
 				}
 
 				setCellColor(cell, element);
@@ -1374,12 +1509,12 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 
 				if (element instanceof TVITourBookTour) {
 					if (_isRecTimeFormat_hhmmss) {
-						cell.setText(UI.format_hh_mm_ss(recordingTime).toString());
+						cell.setText(net.tourbook.ui.UI.format_hh_mm_ss(recordingTime).toString());
 					} else {
-						cell.setText(UI.format_hh_mm(recordingTime + 30).toString());
+						cell.setText(net.tourbook.ui.UI.format_hh_mm(recordingTime + 30).toString());
 					}
 				} else {
-					cell.setText(UI.format_hh_mm(recordingTime + 30).toString());
+					cell.setText(net.tourbook.ui.UI.format_hh_mm(recordingTime + 30).toString());
 				}
 
 				setCellColor(cell, element);
@@ -1461,7 +1596,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 				if (element instanceof TVITourBookTour) {
 
 					final long tourTypeId = ((TVITourBookTour) element).getTourTypeId();
-					final Image tourTypeImage = UI.getInstance().getTourTypeImage(tourTypeId);
+					final Image tourTypeImage = net.tourbook.ui.UI.getInstance().getTourTypeImage(tourTypeId);
 
 					/*
 					 * when a tour type image is modified, it will keep the same image resource only
@@ -1487,7 +1622,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 				if (element instanceof TVITourBookTour) {
 
 					final long tourTypeId = ((TVITourBookTour) element).getTourTypeId();
-					cell.setText(UI.getInstance().getTourTypeLabel(tourTypeId));
+					cell.setText(net.tourbook.ui.UI.getInstance().getTourTypeLabel(tourTypeId));
 				}
 			}
 		});
@@ -1562,7 +1697,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 			public void update(final ViewerCell cell) {
 
 				final Object element = cell.getElement();
-				final int windSpeed = (int) (((TVITourBookItem) element).colWindSpd / UI.UNIT_VALUE_DISTANCE);
+				final int windSpeed = (int) (((TVITourBookItem) element).colWindSpd / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE);
 
 				if (windSpeed == 0) {
 					cell.setText(UI.EMPTY_STRING);
@@ -1762,6 +1897,451 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 				: TourDatabase.ENTITY_IS_NOT_SAVED);
 	}
 
+	private void exportCSV(final ITreeSelection selection, final String selectedFilePath) {
+
+		/*
+		 * Write selected items into a csv file.
+		 */
+		Writer exportWriter = null;
+		try {
+
+			exportWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(selectedFilePath), UI.UTF_8));
+			final StringBuilder sb = new StringBuilder();
+
+			exportCSV_10_Header(exportWriter, sb);
+
+			for (final TreePath treePath : selection.getPaths()) {
+
+				// truncate buffer
+				sb.setLength(0);
+
+				final int segmentCount = treePath.getSegmentCount();
+
+				for (int segmentIndex = 0; segmentIndex < segmentCount; segmentIndex++) {
+
+					final Object segment = treePath.getSegment(segmentIndex);
+					final boolean isTour = segment instanceof TVITourBookTour;
+
+					exportCSV_20_1stColumn(sb, segmentCount, segment, isTour);
+
+					if (segment instanceof TVITourBookItem) {
+
+						final TVITourBookItem tviItem = (TVITourBookItem) segment;
+
+						// output data only for the last segment
+						if (segmentCount == 1
+								|| (segmentCount == 2 && segmentIndex == 1)
+								|| (segmentCount == 3 && segmentIndex == 2)) {
+
+							exportCSV_30_OtherColumns(sb, isTour, tviItem);
+						}
+					}
+				}
+
+				// end of line
+				sb.append(net.tourbook.ui.UI.SYSTEM_NEW_LINE);
+				exportWriter.write(sb.toString());
+			}
+
+		} catch (final IOException e) {
+			StatusUtil.showStatus(e);
+		} finally {
+			Util.closeWriter(exportWriter);
+		}
+	}
+
+	private void exportCSV_10_Header(final Writer exportWriter, final StringBuilder sb) throws IOException {
+
+		// Year
+		csvField(sb, CSV_HEADER_YEAR);
+
+		// Month or Week
+		if (isYearSubWeek()) {
+			csvField(sb, CSV_HEADER_WEEK);
+			csvField(sb, CSV_HEADER_MONTH);
+		} else {
+			// defaults to month
+			csvField(sb, CSV_HEADER_MONTH);
+			csvField(sb, CSV_HEADER_WEEK);
+		}
+
+		csvField(sb, CSV_HEADER_DAY);
+		csvField(sb, CSV_HEADER_WEEKDAY);
+		csvField(sb, CSV_HEADER_TIME);
+		csvField(sb, CSV_HEADER_ISO_DATE_TIME);
+		csvField(sb, CSV_HEADER_NUMBER_OF_TOURS);
+		csvField(sb, CSV_HEADER_TOUR_TYPE_ID);
+		csvField(sb, CSV_HEADER_TOUR_TYPE_NAME);
+		csvField(sb, String.format(CSV_HEADER_DISTANCE, UI.UNIT_LABEL_DISTANCE));
+		csvField(sb, String.format(CSV_HEADER_ALTITUDE_UP, UI.UNIT_LABEL_ALTITUDE));
+		csvField(sb, String.format(CSV_HEADER_ALTITUDE_DOWN, UI.UNIT_LABEL_ALTITUDE));
+		csvField(sb, CSV_HEADER_RECORDING_TIME);
+		csvField(sb, CSV_HEADER_MOVING_TIME);
+		csvField(sb, CSV_HEADER_PAUSED_TIME);
+		csvField(sb, CSV_HEADER_PAUSED_TIME_RELATIVE);
+		csvField(sb, CSV_HEADER_NUMBER_OF_MARKER);
+		csvField(sb, CSV_HEADER_NUMBER_OF_PHOTOS);
+		csvField(sb, CSV_HEADER_WEATHER);
+		csvField(sb, CSV_HEADER_WIND_SPEED);
+		csvField(sb, CSV_HEADER_WIND_DIRECTION);
+		csvField(sb, CSV_HEADER_TITLE);
+		csvField(sb, CSV_HEADER_TAGS);
+		csvField(sb, CSV_HEADER_CALORIES);
+		csvField(sb, CSV_HEADER_RESTPULSE);
+		csvField(sb, String.format(CSV_HEADER_MAX_ALTITUDE, UI.UNIT_LABEL_ALTITUDE));
+		csvField(sb, String.format(CSV_HEADER_MAX_SPEED, UI.UNIT_LABEL_SPEED));
+		csvField(sb, CSV_HEADER_MAX_PULSE);
+		csvField(sb, String.format(CSV_HEADER_AVERAGE_SPEED, UI.UNIT_LABEL_SPEED));
+		csvField(sb, String.format(CSV_HEADER_AVERAGE_PACE, UI.UNIT_LABEL_PACE));
+		csvField(sb, CSV_HEADER_AVERAGE_CADENCE);
+		csvField(sb, String.format(CSV_HEADER_AVERAGE_TEMPERATURE, UI.UNIT_LABEL_TEMPERATURE));
+		csvField(sb, CSV_HEADER_WEEK_YEAR);
+		csvField(sb, CSV_HEADER_TIME_SLICES);
+		csvField(sb, CSV_HEADER_TIME_INTERVAL);
+		csvField(sb, CSV_HEADER_DEVICE_START_DISTANCE);
+		csvField(sb, CSV_HEADER_DP_TOLERANCE);
+		csvField(sb, CSV_HEADER_PERSON);
+
+		// end of line
+		sb.append(net.tourbook.ui.UI.SYSTEM_NEW_LINE);
+
+		exportWriter.write(sb.toString());
+	}
+
+	private void exportCSV_20_1stColumn(final StringBuilder sb,
+										final int segmentCount,
+										final Object segment,
+										final boolean isTour) {
+
+		if (segment instanceof TVITourBookYear) {
+
+			final TVITourBookYear tviYear = (TVITourBookYear) segment;
+
+			// year
+			csvField(sb, tviYear.tourYear);
+
+			if (segmentCount == 1) {
+
+				for (int spacerIndex = segmentCount; spacerIndex < 4; spacerIndex++) {
+					sb.append(UI.TAB);
+				}
+			}
+
+		} else if (segment instanceof TVITourBookYearSub) {
+
+			final TVITourBookYearSub tviYearSub = (TVITourBookYearSub) segment;
+
+			// month or week
+			csvField(sb, tviYearSub.tourYearSub);
+
+			if (segmentCount == 2) {
+
+				for (int spacerIndex = segmentCount; spacerIndex < 4; spacerIndex++) {
+					sb.append(UI.TAB);
+				}
+			}
+
+		} else if (isTour) {
+
+			final TVITourBookTour tviTour = (TVITourBookTour) segment;
+
+			if (isYearSubWeek()) {
+
+				// month
+				csvField(sb, tviTour.tourMonth);
+
+			} else {
+
+				// week
+				csvField(sb, tviTour.tourWeek);
+			}
+
+			// day
+			csvField(sb, tviTour.tourDay);
+		}
+	}
+
+	private void exportCSV_30_OtherColumns(final StringBuilder sb, final boolean isTour, final TVITourBookItem tviItem) {
+
+		TVITourBookTour tviTour = null;
+		if (isTour) {
+			tviTour = (TVITourBookTour) tviItem;
+		}
+
+		// CSV_HEADER_WEEKDAY
+		if (isTour) {
+			sb.append(_weekDays[tviItem.colWeekDay]);
+		}
+		sb.append(UI.TAB);
+
+		// CSV_HEADER_TIME
+		if (isTour) {
+			_calendar.setTimeInMillis(tviItem.colTourDate);
+			sb.append(_timeFormatter.format(_calendar.getTime()));
+		}
+		sb.append(UI.TAB);
+
+		// CSV_HEADER_ISO_DATE_TIME
+		if (isTour) {
+			sb.append(_isoFormatter.print(tviItem.colTourDate));
+		}
+		sb.append(UI.TAB);
+
+		// CSV_HEADER_NUMBER_OF_TOURS
+		if (isTour) {
+			sb.append(Long.toString(1));
+		} else {
+			sb.append(Long.toString(tviItem.colCounter));
+		}
+		sb.append(UI.TAB);
+
+		// CSV_HEADER_TOUR_TYPE_ID
+		if (isTour) {
+			sb.append(tviTour.getTourTypeId());
+		}
+		sb.append(UI.TAB);
+
+		// CSV_HEADER_TOUR_TYPE_NAME
+		if (isTour) {
+			final long tourTypeId = tviTour.getTourTypeId();
+			sb.append(net.tourbook.ui.UI.getInstance().getTourTypeLabel(tourTypeId));
+		}
+		sb.append(UI.TAB);
+
+		// CSV_HEADER_DISTANCE
+		final float dbDistance = tviItem.colDistance;
+		if (dbDistance != 0) {
+			sb.append(_nf1NoGroup.format(dbDistance / 1000 / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE));
+		}
+		sb.append(UI.TAB);
+
+		// CSV_HEADER_ALTITUDE_UP
+		final long dbAltitudeUp = tviItem.colAltitudeUp;
+		if (dbAltitudeUp != 0) {
+			sb.append(Long.toString((long) (dbAltitudeUp / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE)));
+		}
+		sb.append(UI.TAB);
+
+		// CSV_HEADER_ALTITUDE_DOWN
+		final long dbAltitudeDown = tviItem.colAltitudeDown;
+		if (dbAltitudeDown != 0) {
+			sb.append(Long.toString((long) (-dbAltitudeDown / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE)));
+		}
+		sb.append(UI.TAB);
+
+		// CSV_HEADER_RECORDING_TIME
+		final long colRecordingTime = (tviItem).colRecordingTime;
+		if (colRecordingTime != 0) {
+			sb.append(net.tourbook.ui.UI.format_hh_mm_ss(colRecordingTime));
+		}
+		sb.append(UI.TAB);
+
+		// CSV_HEADER_MOVING_TIME
+		final long colDrivingTime = tviItem.colDrivingTime;
+		if (colDrivingTime != 0) {
+			sb.append(net.tourbook.ui.UI.format_hh_mm_ss(colDrivingTime));
+		}
+		sb.append(UI.TAB);
+
+		// CSV_HEADER_PAUSED_TIME
+		final long colPausedTime = tviItem.colPausedTime;
+		if (colPausedTime != 0) {
+			sb.append(net.tourbook.ui.UI.format_hh_mm_ss(colPausedTime));
+		}
+		sb.append(UI.TAB);
+
+		// CSV_HEADER_RELATIVE_PAUSED_TIME
+		final long dbPausedTime = colPausedTime;
+		final long dbRecordingTime = tviItem.colRecordingTime;
+		final float relativePausedTime = dbRecordingTime == 0 //
+				? 0
+				: (float) dbPausedTime / dbRecordingTime * 100;
+		if (relativePausedTime != 0) {
+			sb.append(_nf1NoGroup.format(relativePausedTime));
+		}
+		sb.append(UI.TAB);
+
+		// CSV_HEADER_NUMBER_OF_MARKER
+		if (isTour) {
+			final ArrayList<Long> markerIds = tviTour.getMarkerIds();
+			if (markerIds != null) {
+				sb.append(Integer.toString(markerIds.size()));
+			}
+		}
+		sb.append(UI.TAB);
+
+		// CSV_HEADER_NUMBER_OF_PHOTOS
+		if (isTour) {
+			final int numberOfPhotos = tviTour.colNumberOfPhotos;
+			if (numberOfPhotos != 0) {
+				sb.append(Integer.toString(numberOfPhotos));
+			}
+		}
+		sb.append(UI.TAB);
+
+		// CSV_HEADER_WEATHER
+		if (isTour) {
+			final String windClouds = tviTour.colClouds;
+			if (windClouds != null) {
+				sb.append(windClouds);
+			}
+
+		}
+		sb.append(UI.TAB);
+
+		// CSV_HEADER_WIND_SPEED
+		final int windSpeed = (int) (tviItem.colWindSpd / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE);
+		if (windSpeed != 0) {
+			sb.append(Integer.toString(windSpeed));
+		}
+		sb.append(UI.TAB);
+
+		// CSV_HEADER_WIND_DIRECTION
+		if (isTour) {
+			final int windDir = tviItem.colWindDir;
+			if (windDir != 0) {
+				sb.append(Integer.toString(windDir));
+			}
+		}
+		sb.append(UI.TAB);
+
+		// CSV_HEADER_TITLE
+		final String dbTourTitle = tviItem.colTourTitle;
+		if (dbTourTitle != null) {
+			sb.append(dbTourTitle);
+		}
+		sb.append(UI.TAB);
+
+		// CSV_HEADER_TAGS
+		if (isTour) {
+			sb.append(TourDatabase.getTagNames(tviTour.getTagIds()));
+		}
+		sb.append(UI.TAB);
+
+		// CSV_HEADER_CALORIES
+		final long caloriesSum = tviItem.colCalories;
+		if (caloriesSum != 0) {
+			sb.append(Long.toString(caloriesSum));
+		}
+		sb.append(UI.TAB);
+
+		// CSV_HEADER_RESTPULSE
+		if (isTour) {
+			final int restPulse = tviItem.colRestPulse;
+			if (restPulse != 0) {
+				sb.append(Integer.toString(restPulse));
+			}
+		}
+		sb.append(UI.TAB);
+
+		// CSV_HEADER_MAX_ALTITUDE
+		final long dbMaxAltitude = tviItem.colMaxAltitude;
+		if (dbMaxAltitude != 0) {
+			sb.append(Long.toString((long) (dbMaxAltitude / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE)));
+		}
+		sb.append(UI.TAB);
+
+		// CSV_HEADER_MAX_SPEED
+		final float dbMaxSpeed = tviItem.colMaxSpeed;
+		if (dbMaxSpeed != 0) {
+			sb.append(_nf1NoGroup.format(dbMaxSpeed / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE));
+		}
+		sb.append(UI.TAB);
+
+		// CSV_HEADER_MAX_PULSE
+		if (isTour) {
+			final long dbMaxPulse = tviItem.colMaxPulse;
+			if (dbMaxPulse != 0) {
+				sb.append(Long.toString(dbMaxPulse));
+			}
+		}
+		sb.append(UI.TAB);
+
+		// CSV_HEADER_AVERAGE_SPEED
+		final float speed = tviItem.colAvgSpeed / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
+		if (speed != 0) {
+			sb.append(_nf1NoGroup.format(speed));
+		}
+		sb.append(UI.TAB);
+
+		// CSV_HEADER_AVERAGE_PACE
+		final float pace = tviItem.colAvgPace * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
+		if (pace != 0) {
+			sb.append(net.tourbook.ui.UI.format_mm_ss((long) pace));
+		}
+		sb.append(UI.TAB);
+
+		// CSV_HEADER_AVERAGE_CADENCE
+		final long dbAvgCadence = tviItem.colAvgCadence;
+		if (dbAvgCadence != 0) {
+			sb.append(Long.toString(dbAvgCadence));
+		}
+		sb.append(UI.TAB);
+
+		// CSV_HEADER_AVERAGE_TEMPERATURE
+		float temperature = tviItem.colAvgTemperature;
+
+		if (temperature != 0) {
+			if (net.tourbook.ui.UI.UNIT_VALUE_TEMPERATURE != 1) {
+				temperature = temperature
+						* net.tourbook.ui.UI.UNIT_FAHRENHEIT_MULTI
+						+ net.tourbook.ui.UI.UNIT_FAHRENHEIT_ADD;
+			}
+			sb.append(_nf1NoGroup.format(temperature));
+		}
+		sb.append(UI.TAB);
+
+		// CSV_HEADER_WEEK_YEAR
+		if (isTour) {
+			final int week = tviItem.colWeekYear;
+			if (week != 0) {
+				sb.append(Integer.toString(week));
+			}
+		}
+		sb.append(UI.TAB);
+
+		// CSV_HEADER_TIME_SLICES
+		final int numberOfTimeSlices = tviItem.colNumberOfTimeSlices;
+		if (numberOfTimeSlices != 0) {
+			sb.append(Integer.toString(numberOfTimeSlices));
+		}
+		sb.append(UI.TAB);
+
+		// CSV_HEADER_TIME_INTERVAL
+		if (isTour) {
+			final short dbTimeInterval = tviTour.getColumnTimeInterval();
+			if (dbTimeInterval != 0) {
+				sb.append(Long.toString(dbTimeInterval));
+			}
+		}
+		sb.append(UI.TAB);
+
+		// CSV_HEADER_DEVICE_START_DISTANCE
+		if (isTour) {
+			final long dbStartDistance = tviTour.getColumnStartDistance();
+			if (dbStartDistance != 0) {
+				sb.append(Long.toString((long) (dbStartDistance / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE)));
+			}
+		}
+		sb.append(UI.TAB);
+
+		// CSV_HEADER_DP_TOLERANCE
+		if (isTour) {
+			final int dpTolerance = tviItem.colDPTolerance;
+			if (dpTolerance != 0) {
+				sb.append(_nf1NoGroup.format(dpTolerance / 10.0));
+			}
+		}
+		sb.append(UI.TAB);
+
+		// CSV_HEADER_PERSON
+		if (isTour) {
+			final long dbPersonId = tviTour.colPersonId;
+			sb.append(PersonManager.getPersonName(dbPersonId));
+		}
+		sb.append(UI.TAB);
+	}
+
 	private void fillActionBars() {
 
 		/*
@@ -1814,6 +2394,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 
 		menuMgr.add(new Separator());
 		menuMgr.add(_actionExportTour);
+		menuMgr.add(_actionExportViewCSV);
 		menuMgr.add(_actionReimportSubMenu);
 		menuMgr.add(_actionPrintTour);
 
@@ -1945,6 +2526,14 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 				tourIds.add(tourItem.getTourId());
 			}
 		}
+	}
+
+	/**
+	 * @return Returns <code>true</code> when the year subcategory is week, otherwise it is month.
+	 */
+	private boolean isYearSubWeek() {
+
+		return _yearSubCategory == TVITourBookItem.ITEM_TYPE_WEEK;
 	}
 
 	private void onSelectTreeItem(final SelectionChangedEvent event) {
@@ -2280,9 +2869,9 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 	private void setCellColor(final ViewerCell cell, final Object element) {
 
 		if (element instanceof TVITourBookYear) {
-			cell.setForeground(JFaceResources.getColorRegistry().get(UI.VIEW_COLOR_SUB));
+			cell.setForeground(JFaceResources.getColorRegistry().get(net.tourbook.ui.UI.VIEW_COLOR_SUB));
 		} else if (element instanceof TVITourBookYearSub) {
-			cell.setForeground(JFaceResources.getColorRegistry().get(UI.VIEW_COLOR_SUB_SUB));
+			cell.setForeground(JFaceResources.getColorRegistry().get(net.tourbook.ui.UI.VIEW_COLOR_SUB_SUB));
 //		} else if (element instanceof TVITourBookTour) {
 //			cell.setForeground(JFaceResources.getColorRegistry().get(UI.VIEW_COLOR_TOUR));
 		}

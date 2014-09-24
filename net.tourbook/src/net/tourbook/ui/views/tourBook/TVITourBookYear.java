@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -112,16 +112,19 @@ public class TVITourBookYear extends TVITourBookItem {
 	}
 
 	private String formatItemString(final int year, final int yearSub) {
+
 		if (_subCategory == ITEM_TYPE_WEEK) {
+
 			calendar.set(Calendar.YEAR, year);
 			calendar.set(Calendar.WEEK_OF_YEAR, yearSub);
 			calendar.set(Calendar.DAY_OF_WEEK, calendar.getFirstDayOfWeek());
+
 			// the number_of_week is broken in Java.text.SimpleDateFormat :-(
-			return "[" //$NON-NLS-1$
-					+ String.format("%02d", yearSub) //$NON-NLS-1$
-					+ "] " //$NON-NLS-1$
+			return String.format("[%02d]", yearSub) //$NON-NLS-1$
 					+ (new SimpleDateFormat(" dd MMM")).format(calendar.getTime()); //$NON-NLS-1$
+
 		} else { // default to month
+
 			calendar.set(year, yearSub - 1, 1);
 			return UI.MonthFormatter.format(calendar.getTime());
 		}

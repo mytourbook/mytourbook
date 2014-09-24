@@ -92,6 +92,8 @@ public class Util {
 	public static final String	ATTR_COLOR_GREEN						= "green";				//$NON-NLS-1$
 	public static final String	ATTR_COLOR_BLUE							= "blue";				//$NON-NLS-1$
 
+	public static final String	CSV_FILE_EXTENSION						= "csv";				//$NON-NLS-1$
+
 	public static int adjustScaleValueOnMouseScroll(final MouseEvent event) {
 
 		// accelerate with Ctrl + Shift key
@@ -136,7 +138,7 @@ public class Util {
 	}
 
 	public static void closeSql(final ResultSet result) {
-		
+
 		if (result != null) {
 			try {
 				result.close();

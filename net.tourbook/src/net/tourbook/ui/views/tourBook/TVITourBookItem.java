@@ -84,6 +84,9 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
 	int								tourYearSub;
 	int								tourDay;
 
+	/**
+	 * Returns this Calendar's time value in milliseconds.
+	 */
 	long							colTourDate;
 	String							colTourTitle;
 	long							colPersonId;														// tourPerson_personId

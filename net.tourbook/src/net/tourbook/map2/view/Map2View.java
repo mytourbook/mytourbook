@@ -87,6 +87,7 @@ import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.PrefPageMap2Appearance;
 import net.tourbook.srtm.IPreferences;
 import net.tourbook.tour.ITourEventListener;
+import net.tourbook.tour.SelectionDeletedTours;
 import net.tourbook.tour.SelectionTourData;
 import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.SelectionTourIds;
@@ -944,6 +945,8 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 		_tourInfoToolTipProvider.setTourData(null);
 
 		showDefaultMap(false);
+
+		enableActions();
 	}
 
 	private void createActions(final Composite parent) {
@@ -1908,6 +1911,10 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 
 				enableActions();
 			}
+
+		} else if (selection instanceof SelectionDeletedTours) {
+
+			clearView();
 		}
 	}
 

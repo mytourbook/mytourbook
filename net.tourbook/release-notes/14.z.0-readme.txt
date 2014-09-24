@@ -3,6 +3,9 @@ Version: 14.z.0                                                 6.9.2014
 New 	
 ===
 
+* Tour Book
+  - Export view in CSV format.
+  
  
 Improvements
 ============

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -94,6 +94,7 @@ import net.tourbook.printing.ActionPrint;
 import net.tourbook.tour.ActionOpenAdjustAltitudeDialog;
 import net.tourbook.tour.ActionOpenMarkerDialog;
 import net.tourbook.tour.ITourEventListener;
+import net.tourbook.tour.SelectionDeletedTours;
 import net.tourbook.tour.SelectionTourData;
 import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.SelectionTourIds;
@@ -551,7 +552,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 
 					if (_lastHiddenSelection != null) {
 
-						onSelection(_lastHiddenSelection);
+						onSelectionChanged(_lastHiddenSelection);
 
 						_lastHiddenSelection = null;
 					}
@@ -598,7 +599,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 					return;
 				}
 
-				onSelection(selection);
+				onSelectionChanged(selection);
 			}
 		};
 		getSite().getPage().addPostSelectionListener(_postSelectionListener);
@@ -643,7 +644,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 
 				} else if (eventId == TourEventId.SLIDER_POSITION_CHANGED && eventData instanceof ISelection) {
 
-					onSelection((ISelection) eventData);
+					onSelectionChanged((ISelection) eventData);
 				}
 			}
 		};
@@ -698,6 +699,11 @@ public class Map3View extends ViewPart implements ITourProvider {
 	private void clearView() {
 
 		cleanupOldTours();
+
+		final TrackSliderLayer trackSliderLayer = getLayerTrackSlider();
+		if (trackSliderLayer != null) {
+			trackSliderLayer.setSliderVisible(false);
+		}
 
 		showAllTours_InternalTours();
 	}
@@ -917,7 +923,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 
 				if (_lastHiddenSelection != null) {
 
-					onSelection(_lastHiddenSelection);
+					onSelectionChanged(_lastHiddenSelection);
 
 					_lastHiddenSelection = null;
 
@@ -1082,6 +1088,9 @@ public class Map3View extends ViewPart implements ITourProvider {
 		_actionTourColorPulse.setEnabled(canTourBeDisplayed);
 		_actionTourColorSpeed.setEnabled(canTourBeDisplayed);
 		_actionTourColorHrZone.setEnabled(canTourBeDisplayed);
+
+		_actionShowEntireTour.setEnabled(canTourBeDisplayed);
+		_actionShowMarker.setEnabled(canTourBeDisplayed);
 	}
 
 	private void enableContextMenuActions() {
@@ -1415,7 +1424,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 		Map3Manager.getLayer_Marker().onModifyConfig(_allTours);
 	}
 
-	private void onSelection(final ISelection selection) {
+	private void onSelectionChanged(final ISelection selection) {
 
 		if (_isPartVisible == false || _isRestored == false) {
 
@@ -1533,6 +1542,10 @@ public class Map3View extends ViewPart implements ITourProvider {
 					enableActions();
 				}
 			}
+
+		} else if (selection instanceof SelectionDeletedTours) {
+
+			clearView();
 		}
 	}
 
