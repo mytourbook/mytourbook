@@ -771,6 +771,8 @@ public class Messages extends NLS {
 	public static String		Import_Data_Label_Hint;
 	public static String		Import_Data_Label_Info;
 	public static String		Import_Data_Link_Import;
+	public static String		Import_Data_Link_ReceiveFromSerialPort_Configured;
+	public static String		Import_Data_Link_ReceiveFromSerialPort_Directly;
 	public static String		Import_Data_Link_Transfer;
 	public static String		Import_Data_Link_TransferDirectly;
 

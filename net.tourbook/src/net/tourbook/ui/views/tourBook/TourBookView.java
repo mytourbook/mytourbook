@@ -158,7 +158,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 	private static final String							CSV_HEADER_DISTANCE					= "Distance (%s)";
 	private static final String							CSV_HEADER_DP_TOLERANCE				= "DPTolerance";
 	private static final String							CSV_HEADER_ISO_DATE_TIME			= "ISO8601";
-	private static final String							CSV_HEADER_MOVING_TIME				= "MovingTime";
+	private static final String							CSV_HEADER_MOVING_TIME				= "MovingTime (%s)";
 	private static final String							CSV_HEADER_NUMBER_OF_MARKER			= "NumberOfMarkers";
 	private static final String							CSV_HEADER_NUMBER_OF_PHOTOS			= "NumberOfPhotos";
 	private static final String							CSV_HEADER_NUMBER_OF_TOURS			= "NumberOfTours";
@@ -169,10 +169,10 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 	private static final String							CSV_HEADER_MAX_PULSE				= "MaxPulse";
 	private static final String							CSV_HEADER_MAX_SPEED				= "MaxSpeed (%s)";
 	private static final String							CSV_HEADER_MONTH					= "Month";
-	private static final String							CSV_HEADER_PAUSED_TIME				= "PausedTime";
-	private static final String							CSV_HEADER_PAUSED_TIME_RELATIVE		= "RelativePausedTime";
+	private static final String							CSV_HEADER_PAUSED_TIME				= "PausedTime (%s)";
+	private static final String							CSV_HEADER_PAUSED_TIME_RELATIVE		= "RelativePausedTime (%)";
 	private static final String							CSV_HEADER_PERSON					= "Person";
-	private static final String							CSV_HEADER_RECORDING_TIME			= "RecordingTime";
+	private static final String							CSV_HEADER_RECORDING_TIME			= "RecordingTime (%s)";
 	private static final String							CSV_HEADER_RESTPULSE				= "RestPulse";
 	private static final String							CSV_HEADER_TAGS						= "Tags";
 	private static final String							CSV_HEADER_TIME						= "Time";
@@ -185,6 +185,8 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 	private static final String							CSV_HEADER_WEEKDAY					= "Weekday";
 	private static final String							CSV_HEADER_WEEK_YEAR				= "WeekYear";
 	private static final String							CSV_HEADER_YEAR						= "Year";
+
+	private static final String							HHH_MM_SS							= "hhh:mm:ss";								//$NON-NLS-1$
 
 	private static int									_yearSubCategory					= TourItem.ITEM_TYPE_MONTH;
 
@@ -1975,10 +1977,13 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		csvField(sb, String.format(CSV_HEADER_DISTANCE, UI.UNIT_LABEL_DISTANCE));
 		csvField(sb, String.format(CSV_HEADER_ALTITUDE_UP, UI.UNIT_LABEL_ALTITUDE));
 		csvField(sb, String.format(CSV_HEADER_ALTITUDE_DOWN, UI.UNIT_LABEL_ALTITUDE));
-		csvField(sb, CSV_HEADER_RECORDING_TIME);
-		csvField(sb, CSV_HEADER_MOVING_TIME);
-		csvField(sb, CSV_HEADER_PAUSED_TIME);
+		csvField(sb, String.format(CSV_HEADER_RECORDING_TIME, Messages.App_Unit_Seconds_Small));
+		csvField(sb, String.format(CSV_HEADER_MOVING_TIME, Messages.App_Unit_Seconds_Small));
+		csvField(sb, String.format(CSV_HEADER_PAUSED_TIME, Messages.App_Unit_Seconds_Small));
 		csvField(sb, CSV_HEADER_PAUSED_TIME_RELATIVE);
+		csvField(sb, String.format(CSV_HEADER_RECORDING_TIME, HHH_MM_SS));
+		csvField(sb, String.format(CSV_HEADER_MOVING_TIME, HHH_MM_SS));
+		csvField(sb, String.format(CSV_HEADER_PAUSED_TIME, HHH_MM_SS));
 		csvField(sb, CSV_HEADER_NUMBER_OF_MARKER);
 		csvField(sb, CSV_HEADER_NUMBER_OF_PHOTOS);
 		csvField(sb, CSV_HEADER_WEATHER);
@@ -2069,277 +2074,375 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		}
 
 		// CSV_HEADER_WEEKDAY
-		if (isTour) {
-			sb.append(_weekDays[tviItem.colWeekDay]);
+		{
+			if (isTour) {
+				sb.append(_weekDays[tviItem.colWeekDay]);
+			}
+			sb.append(UI.TAB);
 		}
-		sb.append(UI.TAB);
 
 		// CSV_HEADER_TIME
-		if (isTour) {
-			_calendar.setTimeInMillis(tviItem.colTourDate);
-			sb.append(_timeFormatter.format(_calendar.getTime()));
+		{
+			if (isTour) {
+				_calendar.setTimeInMillis(tviItem.colTourDate);
+				sb.append(_timeFormatter.format(_calendar.getTime()));
+			}
+			sb.append(UI.TAB);
 		}
-		sb.append(UI.TAB);
 
 		// CSV_HEADER_ISO_DATE_TIME
-		if (isTour) {
-			sb.append(_isoFormatter.print(tviItem.colTourDate));
+		{
+			if (isTour) {
+				sb.append(_isoFormatter.print(tviItem.colTourDate));
+			}
+			sb.append(UI.TAB);
 		}
-		sb.append(UI.TAB);
 
 		// CSV_HEADER_NUMBER_OF_TOURS
-		if (isTour) {
-			sb.append(Long.toString(1));
-		} else {
-			sb.append(Long.toString(tviItem.colCounter));
+		{
+			if (isTour) {
+				sb.append(Long.toString(1));
+			} else {
+				sb.append(Long.toString(tviItem.colCounter));
+			}
+			sb.append(UI.TAB);
 		}
-		sb.append(UI.TAB);
 
 		// CSV_HEADER_TOUR_TYPE_ID
-		if (isTour) {
-			sb.append(tviTour.getTourTypeId());
+		{
+			if (isTour) {
+				sb.append(tviTour.getTourTypeId());
+			}
+			sb.append(UI.TAB);
 		}
-		sb.append(UI.TAB);
 
 		// CSV_HEADER_TOUR_TYPE_NAME
-		if (isTour) {
-			final long tourTypeId = tviTour.getTourTypeId();
-			sb.append(net.tourbook.ui.UI.getInstance().getTourTypeLabel(tourTypeId));
+		{
+			if (isTour) {
+				final long tourTypeId = tviTour.getTourTypeId();
+				sb.append(net.tourbook.ui.UI.getInstance().getTourTypeLabel(tourTypeId));
+			}
+			sb.append(UI.TAB);
 		}
-		sb.append(UI.TAB);
 
 		// CSV_HEADER_DISTANCE
-		final float dbDistance = tviItem.colDistance;
-		if (dbDistance != 0) {
-			sb.append(_nf1NoGroup.format(dbDistance / 1000 / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE));
+		{
+			final float dbDistance = tviItem.colDistance;
+			if (dbDistance != 0) {
+				sb.append(_nf1NoGroup.format(dbDistance / 1000 / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE));
+			}
+			sb.append(UI.TAB);
 		}
-		sb.append(UI.TAB);
 
 		// CSV_HEADER_ALTITUDE_UP
-		final long dbAltitudeUp = tviItem.colAltitudeUp;
-		if (dbAltitudeUp != 0) {
-			sb.append(Long.toString((long) (dbAltitudeUp / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE)));
+		{
+			final long dbAltitudeUp = tviItem.colAltitudeUp;
+			if (dbAltitudeUp != 0) {
+				sb.append(Long.toString((long) (dbAltitudeUp / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE)));
+			}
+			sb.append(UI.TAB);
 		}
-		sb.append(UI.TAB);
 
 		// CSV_HEADER_ALTITUDE_DOWN
-		final long dbAltitudeDown = tviItem.colAltitudeDown;
-		if (dbAltitudeDown != 0) {
-			sb.append(Long.toString((long) (-dbAltitudeDown / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE)));
+		{
+			final long dbAltitudeDown = tviItem.colAltitudeDown;
+			if (dbAltitudeDown != 0) {
+				sb.append(Long.toString((long) (-dbAltitudeDown / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE)));
+			}
+			sb.append(UI.TAB);
 		}
-		sb.append(UI.TAB);
 
 		// CSV_HEADER_RECORDING_TIME
-		final long colRecordingTime = (tviItem).colRecordingTime;
-		if (colRecordingTime != 0) {
-			sb.append(net.tourbook.ui.UI.format_hh_mm_ss(colRecordingTime));
+		{
+			final long colRecordingTime = (tviItem).colRecordingTime;
+			if (colRecordingTime != 0) {
+				sb.append(Long.toString(colRecordingTime));
+			}
+			sb.append(UI.TAB);
 		}
-		sb.append(UI.TAB);
 
 		// CSV_HEADER_MOVING_TIME
-		final long colDrivingTime = tviItem.colDrivingTime;
-		if (colDrivingTime != 0) {
-			sb.append(net.tourbook.ui.UI.format_hh_mm_ss(colDrivingTime));
+		{
+			final long colDrivingTime = tviItem.colDrivingTime;
+			if (colDrivingTime != 0) {
+				sb.append(Long.toString(colDrivingTime));
+			}
+			sb.append(UI.TAB);
 		}
-		sb.append(UI.TAB);
 
 		// CSV_HEADER_PAUSED_TIME
-		final long colPausedTime = tviItem.colPausedTime;
-		if (colPausedTime != 0) {
-			sb.append(net.tourbook.ui.UI.format_hh_mm_ss(colPausedTime));
+		{
+			final long colPausedTime = tviItem.colPausedTime;
+			if (colPausedTime != 0) {
+				sb.append(Long.toString(colPausedTime));
+			}
+			sb.append(UI.TAB);
 		}
-		sb.append(UI.TAB);
 
 		// CSV_HEADER_RELATIVE_PAUSED_TIME
-		final long dbPausedTime = colPausedTime;
-		final long dbRecordingTime = tviItem.colRecordingTime;
-		final float relativePausedTime = dbRecordingTime == 0 //
-				? 0
-				: (float) dbPausedTime / dbRecordingTime * 100;
-		if (relativePausedTime != 0) {
-			sb.append(_nf1NoGroup.format(relativePausedTime));
+		{
+			final long colPausedTime = tviItem.colPausedTime;
+			final long dbPausedTime = colPausedTime;
+			final long dbRecordingTime = tviItem.colRecordingTime;
+			final float relativePausedTime = dbRecordingTime == 0 //
+					? 0
+					: (float) dbPausedTime / dbRecordingTime * 100;
+			if (relativePausedTime != 0) {
+				sb.append(_nf1NoGroup.format(relativePausedTime));
+			}
+			sb.append(UI.TAB);
 		}
-		sb.append(UI.TAB);
+
+		// CSV_HEADER_RECORDING_TIME hhh:mm:ss
+		{
+			final long colRecordingTime = (tviItem).colRecordingTime;
+			if (colRecordingTime != 0) {
+				sb.append(net.tourbook.ui.UI.format_hh_mm_ss(colRecordingTime));
+			}
+			sb.append(UI.TAB);
+		}
+
+		// CSV_HEADER_MOVING_TIME hhh:mm:ss
+		{
+			final long colDrivingTime = tviItem.colDrivingTime;
+			if (colDrivingTime != 0) {
+				sb.append(net.tourbook.ui.UI.format_hh_mm_ss(colDrivingTime));
+			}
+			sb.append(UI.TAB);
+		}
+
+		// CSV_HEADER_PAUSED_TIME hhh:mm:ss
+		{
+			final long colPausedTime = tviItem.colPausedTime;
+			if (colPausedTime != 0) {
+				sb.append(net.tourbook.ui.UI.format_hh_mm_ss(colPausedTime));
+			}
+			sb.append(UI.TAB);
+		}
 
 		// CSV_HEADER_NUMBER_OF_MARKER
-		if (isTour) {
-			final ArrayList<Long> markerIds = tviTour.getMarkerIds();
-			if (markerIds != null) {
-				sb.append(Integer.toString(markerIds.size()));
+		{
+			if (isTour) {
+				final ArrayList<Long> markerIds = tviTour.getMarkerIds();
+				if (markerIds != null) {
+					sb.append(Integer.toString(markerIds.size()));
+				}
 			}
+			sb.append(UI.TAB);
 		}
-		sb.append(UI.TAB);
 
 		// CSV_HEADER_NUMBER_OF_PHOTOS
-		if (isTour) {
-			final int numberOfPhotos = tviTour.colNumberOfPhotos;
-			if (numberOfPhotos != 0) {
-				sb.append(Integer.toString(numberOfPhotos));
+		{
+			if (isTour) {
+				final int numberOfPhotos = tviTour.colNumberOfPhotos;
+				if (numberOfPhotos != 0) {
+					sb.append(Integer.toString(numberOfPhotos));
+				}
 			}
+			sb.append(UI.TAB);
 		}
-		sb.append(UI.TAB);
 
 		// CSV_HEADER_WEATHER
-		if (isTour) {
-			final String windClouds = tviTour.colClouds;
-			if (windClouds != null) {
-				sb.append(windClouds);
-			}
+		{
+			if (isTour) {
+				final String windClouds = tviTour.colClouds;
+				if (windClouds != null) {
+					sb.append(windClouds);
+				}
 
+			}
+			sb.append(UI.TAB);
 		}
-		sb.append(UI.TAB);
 
 		// CSV_HEADER_WIND_SPEED
-		final int windSpeed = (int) (tviItem.colWindSpd / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE);
-		if (windSpeed != 0) {
-			sb.append(Integer.toString(windSpeed));
+		{
+			final int windSpeed = (int) (tviItem.colWindSpd / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE);
+			if (windSpeed != 0) {
+				sb.append(Integer.toString(windSpeed));
+			}
+			sb.append(UI.TAB);
 		}
-		sb.append(UI.TAB);
 
 		// CSV_HEADER_WIND_DIRECTION
-		if (isTour) {
-			final int windDir = tviItem.colWindDir;
-			if (windDir != 0) {
-				sb.append(Integer.toString(windDir));
+		{
+			if (isTour) {
+				final int windDir = tviItem.colWindDir;
+				if (windDir != 0) {
+					sb.append(Integer.toString(windDir));
+				}
 			}
+			sb.append(UI.TAB);
 		}
-		sb.append(UI.TAB);
 
 		// CSV_HEADER_TITLE
-		final String dbTourTitle = tviItem.colTourTitle;
-		if (dbTourTitle != null) {
-			sb.append(dbTourTitle);
+		{
+			final String dbTourTitle = tviItem.colTourTitle;
+			if (dbTourTitle != null) {
+				sb.append(dbTourTitle);
+			}
+			sb.append(UI.TAB);
 		}
-		sb.append(UI.TAB);
 
 		// CSV_HEADER_TAGS
-		if (isTour) {
-			sb.append(TourDatabase.getTagNames(tviTour.getTagIds()));
+		{
+			if (isTour) {
+				sb.append(TourDatabase.getTagNames(tviTour.getTagIds()));
+			}
+			sb.append(UI.TAB);
 		}
-		sb.append(UI.TAB);
 
 		// CSV_HEADER_CALORIES
-		final long caloriesSum = tviItem.colCalories;
-		if (caloriesSum != 0) {
-			sb.append(Long.toString(caloriesSum));
+		{
+			final long caloriesSum = tviItem.colCalories;
+			if (caloriesSum != 0) {
+				sb.append(Long.toString(caloriesSum));
+			}
+			sb.append(UI.TAB);
 		}
-		sb.append(UI.TAB);
 
 		// CSV_HEADER_RESTPULSE
-		if (isTour) {
-			final int restPulse = tviItem.colRestPulse;
-			if (restPulse != 0) {
-				sb.append(Integer.toString(restPulse));
+		{
+			if (isTour) {
+				final int restPulse = tviItem.colRestPulse;
+				if (restPulse != 0) {
+					sb.append(Integer.toString(restPulse));
+				}
 			}
+			sb.append(UI.TAB);
 		}
-		sb.append(UI.TAB);
 
 		// CSV_HEADER_MAX_ALTITUDE
-		final long dbMaxAltitude = tviItem.colMaxAltitude;
-		if (dbMaxAltitude != 0) {
-			sb.append(Long.toString((long) (dbMaxAltitude / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE)));
+		{
+			final long dbMaxAltitude = tviItem.colMaxAltitude;
+			if (dbMaxAltitude != 0) {
+				sb.append(Long.toString((long) (dbMaxAltitude / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE)));
+			}
+			sb.append(UI.TAB);
 		}
-		sb.append(UI.TAB);
 
 		// CSV_HEADER_MAX_SPEED
-		final float dbMaxSpeed = tviItem.colMaxSpeed;
-		if (dbMaxSpeed != 0) {
-			sb.append(_nf1NoGroup.format(dbMaxSpeed / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE));
+		{
+			final float dbMaxSpeed = tviItem.colMaxSpeed;
+			if (dbMaxSpeed != 0) {
+				sb.append(_nf1NoGroup.format(dbMaxSpeed / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE));
+			}
+			sb.append(UI.TAB);
 		}
-		sb.append(UI.TAB);
 
 		// CSV_HEADER_MAX_PULSE
-		if (isTour) {
-			final long dbMaxPulse = tviItem.colMaxPulse;
-			if (dbMaxPulse != 0) {
-				sb.append(Long.toString(dbMaxPulse));
+		{
+			if (isTour) {
+				final long dbMaxPulse = tviItem.colMaxPulse;
+				if (dbMaxPulse != 0) {
+					sb.append(Long.toString(dbMaxPulse));
+				}
 			}
+			sb.append(UI.TAB);
 		}
-		sb.append(UI.TAB);
 
 		// CSV_HEADER_AVERAGE_SPEED
-		final float speed = tviItem.colAvgSpeed / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
-		if (speed != 0) {
-			sb.append(_nf1NoGroup.format(speed));
+		{
+			final float speed = tviItem.colAvgSpeed / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
+			if (speed != 0) {
+				sb.append(_nf1NoGroup.format(speed));
+			}
+			sb.append(UI.TAB);
 		}
-		sb.append(UI.TAB);
 
 		// CSV_HEADER_AVERAGE_PACE
-		final float pace = tviItem.colAvgPace * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
-		if (pace != 0) {
-			sb.append(net.tourbook.ui.UI.format_mm_ss((long) pace));
+		{
+			final float pace = tviItem.colAvgPace * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
+			if (pace != 0) {
+				sb.append(net.tourbook.ui.UI.format_mm_ss((long) pace));
+			}
+			sb.append(UI.TAB);
 		}
-		sb.append(UI.TAB);
 
 		// CSV_HEADER_AVERAGE_CADENCE
-		final long dbAvgCadence = tviItem.colAvgCadence;
-		if (dbAvgCadence != 0) {
-			sb.append(Long.toString(dbAvgCadence));
+		{
+			final long dbAvgCadence = tviItem.colAvgCadence;
+			if (dbAvgCadence != 0) {
+				sb.append(Long.toString(dbAvgCadence));
+			}
+			sb.append(UI.TAB);
 		}
-		sb.append(UI.TAB);
 
 		// CSV_HEADER_AVERAGE_TEMPERATURE
-		float temperature = tviItem.colAvgTemperature;
+		{
+			float temperature = tviItem.colAvgTemperature;
 
-		if (temperature != 0) {
-			if (net.tourbook.ui.UI.UNIT_VALUE_TEMPERATURE != 1) {
-				temperature = temperature
-						* net.tourbook.ui.UI.UNIT_FAHRENHEIT_MULTI
-						+ net.tourbook.ui.UI.UNIT_FAHRENHEIT_ADD;
+			if (temperature != 0) {
+				if (net.tourbook.ui.UI.UNIT_VALUE_TEMPERATURE != 1) {
+					temperature = temperature
+							* net.tourbook.ui.UI.UNIT_FAHRENHEIT_MULTI
+							+ net.tourbook.ui.UI.UNIT_FAHRENHEIT_ADD;
+				}
+				sb.append(_nf1NoGroup.format(temperature));
 			}
-			sb.append(_nf1NoGroup.format(temperature));
+			sb.append(UI.TAB);
 		}
-		sb.append(UI.TAB);
 
 		// CSV_HEADER_WEEK_YEAR
-		if (isTour) {
-			final int week = tviItem.colWeekYear;
-			if (week != 0) {
-				sb.append(Integer.toString(week));
+		{
+			if (isTour) {
+				final int week = tviItem.colWeekYear;
+				if (week != 0) {
+					sb.append(Integer.toString(week));
+				}
 			}
+			sb.append(UI.TAB);
 		}
-		sb.append(UI.TAB);
 
 		// CSV_HEADER_TIME_SLICES
-		final int numberOfTimeSlices = tviItem.colNumberOfTimeSlices;
-		if (numberOfTimeSlices != 0) {
-			sb.append(Integer.toString(numberOfTimeSlices));
+		{
+			final int numberOfTimeSlices = tviItem.colNumberOfTimeSlices;
+			if (numberOfTimeSlices != 0) {
+				sb.append(Integer.toString(numberOfTimeSlices));
+			}
+			sb.append(UI.TAB);
 		}
-		sb.append(UI.TAB);
 
 		// CSV_HEADER_TIME_INTERVAL
-		if (isTour) {
-			final short dbTimeInterval = tviTour.getColumnTimeInterval();
-			if (dbTimeInterval != 0) {
-				sb.append(Long.toString(dbTimeInterval));
+		{
+			if (isTour) {
+				final short dbTimeInterval = tviTour.getColumnTimeInterval();
+				if (dbTimeInterval != 0) {
+					sb.append(Long.toString(dbTimeInterval));
+				}
 			}
+			sb.append(UI.TAB);
 		}
-		sb.append(UI.TAB);
 
 		// CSV_HEADER_DEVICE_START_DISTANCE
-		if (isTour) {
-			final long dbStartDistance = tviTour.getColumnStartDistance();
-			if (dbStartDistance != 0) {
-				sb.append(Long.toString((long) (dbStartDistance / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE)));
+		{
+			if (isTour) {
+				final long dbStartDistance = tviTour.getColumnStartDistance();
+				if (dbStartDistance != 0) {
+					sb.append(Long.toString((long) (dbStartDistance / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE)));
+				}
 			}
+			sb.append(UI.TAB);
 		}
-		sb.append(UI.TAB);
 
 		// CSV_HEADER_DP_TOLERANCE
-		if (isTour) {
-			final int dpTolerance = tviItem.colDPTolerance;
-			if (dpTolerance != 0) {
-				sb.append(_nf1NoGroup.format(dpTolerance / 10.0));
+		{
+			if (isTour) {
+				final int dpTolerance = tviItem.colDPTolerance;
+				if (dpTolerance != 0) {
+					sb.append(_nf1NoGroup.format(dpTolerance / 10.0));
+				}
 			}
+			sb.append(UI.TAB);
 		}
-		sb.append(UI.TAB);
 
 		// CSV_HEADER_PERSON
-		if (isTour) {
-			final long dbPersonId = tviTour.colPersonId;
-			sb.append(PersonManager.getPersonName(dbPersonId));
+		{
+			if (isTour) {
+				final long dbPersonId = tviTour.colPersonId;
+				sb.append(PersonManager.getPersonName(dbPersonId));
+			}
+			sb.append(UI.TAB);
 		}
-		sb.append(UI.TAB);
 	}
 
 	private void fillActionBars() {

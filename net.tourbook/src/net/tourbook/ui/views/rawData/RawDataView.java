@@ -715,7 +715,9 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 					.grab(true, false)
 					.indent(0, 10)
 					.applyTo(linkTransfer);
-			linkTransfer.setText(Messages.Import_Data_Link_Transfer);
+//			<a>Transfer tours from a sportcomputer</a>
+//			<a>Touren von einem Sportcomputer übertragen</a>
+			linkTransfer.setText(Messages.Import_Data_Link_ReceiveFromSerialPort_Configured);
 			linkTransfer.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(final SelectionEvent e) {
@@ -737,7 +739,9 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 					.grab(true, false)
 					.indent(0, 10)
 					.applyTo(linkTransferDirect);
-			linkTransferDirect.setText(Messages.Import_Data_Link_TransferDirectly);
+//			<a>Transfer tours from a sportcomputer with previous configuration</a>
+//			<a>Touren von einem Sportcomputer übertragen, mit vorheriger Konfiguration</a>
+			linkTransferDirect.setText(Messages.Import_Data_Link_ReceiveFromSerialPort_Directly);
 			linkTransferDirect.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(final SelectionEvent e) {

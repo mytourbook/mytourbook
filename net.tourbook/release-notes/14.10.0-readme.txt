@@ -1,7 +1,26 @@
-Version: 14.z.0                                                 6.9.2014
+
+
+TRANSLATION TRANSLATION TRANSLATION TRANSLATION TRANSLATION TRANSLATION 
+
+FYI: There are a few renamings, the old texts are deleted you just have to translate the new texts.
+
+* App menu: "Import" -> "New"
+* Tour import view/ New menu: "Transfer Tours" --> "Receive Tours ..."
+
+TRANSLATION TRANSLATION TRANSLATION TRANSLATION TRANSLATION TRANSLATION 
+
+
+
+Version: 14.10.0                                                 ?.10.2014
+
 
 New 	
 ===
+
+* All Tour Marker View - This view displays all created tour markers
+  - Sort by all columns.
+  - Selected tour marker is displayed in other views.
+  - Tours for multiple selected tour markers are displayed in other views.
 
 * Tour Book
   - Export view in CSV format.
@@ -25,9 +44,18 @@ Improvements
   - Draw marker with hidden/device/default color.
   - Improved hovered style.
 
- 
-Fixed Bug 	
-=========
+* Table/Tree Views - New actions in the column header context menu
+  - Show all columns.
+  - Show default columns.
+
+
+App
+===
+
+* New keyboard shortcuts.
+* App menu: renamed "Import" -> "New".
+
+
 
 
 

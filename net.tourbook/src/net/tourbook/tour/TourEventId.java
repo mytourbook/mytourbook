@@ -15,7 +15,6 @@
  *******************************************************************************/
 package net.tourbook.tour;
 
-import net.tourbook.chart.SelectionChartInfo;
 import net.tourbook.data.TourData;
 import net.tourbook.tag.ChangedTags;
 import net.tourbook.ui.UI;

@@ -700,6 +700,16 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 		super.dispose();
 	}
 
+	/**
+	 * enable actions
+	 */
+	private void enableActions() {
+
+		final boolean tourInDb = isTourInDb();
+
+		_actionEditTourMarkers.setEnabled(tourInDb);
+	}
+
 	private void fillContextMenu(final IMenuManager menuMgr) {
 
 		menuMgr.add(_actionEditTourMarkers);
@@ -711,12 +721,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 		final IStructuredSelection selection = (IStructuredSelection) _markerViewer.getSelection();
 		_actionEditTourMarkers.setTourMarker((TourMarker) selection.getFirstElement());
 
-		/*
-		 * enable actions
-		 */
-		final boolean tourInDb = isTourInDb();
-
-		_actionEditTourMarkers.setEnabled(tourInDb);
+		enableActions();
 	}
 
 	private void fillToolbar() {
@@ -902,11 +907,10 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 		final boolean isTourAvailable = (tourId >= 0) && (_tourData != null);
 
 		if (isTourAvailable) {
-			_pageBook.showPage(_viewerContainer);
-			_markerViewer.setInput(new Object[0]);
+			updateUI_MarkerViewer();
 		}
 
-		_actionEditTourMarkers.setEnabled(isTourAvailable);
+		enableActions();
 	}
 
 	private void onSelectionTourMarker(final Object eventData) {
@@ -922,7 +926,14 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 			final ArrayList<TourMarker> tourMarker = selection.getTourMarker();
 
 			if (tourData == _tourData) {
+
 				_markerViewer.setSelection(new StructuredSelection(tourMarker), true);
+
+			} else {
+
+				_tourData = tourData;
+
+				updateUI_MarkerViewer();
 			}
 		}
 	}
@@ -993,6 +1004,12 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 				}
 			}
 		});
+	}
+
+	private void updateUI_MarkerViewer() {
+
+		_pageBook.showPage(_viewerContainer);
+		_markerViewer.setInput(new Object[0]);
 	}
 
 }

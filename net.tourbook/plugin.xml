@@ -475,16 +475,16 @@
 			<command
 				commandId="net.tourbook.command.device.synchronize"
 				icon="icons/device-synchronize.gif"
-				label="%command_device_synchronize_configured"
-				mnemonic="%command_device_synchronize_configured_mnemonic"
-				tooltip="%command_device_synchronize_configured_tooltip"/>
+				label="%Command_Device_ReceiveFromSerialPort_Configured"
+				mnemonic="%Command_Device_ReceiveFromSerialPort_Configured_Mnemonic"
+				tooltip="%Command_Device_ReceiveFromSerialPort_Configured_Tooltip"/>
 				
 			<command
 				commandId="net.tourbook.command.device.synchronize.direct"
 				icon="icons/device-synchronize-direct.gif"
-				label="%command_device_synchronize_direct"
-				mnemonic="%command_device_synchronize_direct_mnemonic"
-				tooltip="%command_device_synchronize_direct_tooltip"/>
+				label="%Command_Device_ReceiveFromSerialPort_Directly"
+				mnemonic="%Command_Device_ReceiveFromSerialPort_Directly_Mnemonic"
+				tooltip="%Command_Device_ReceiveFromSerialPort_Directly_Tooltip"/>
 				
 			<separator
 				name="net.tourbook.separator"
@@ -941,18 +941,18 @@
 		   <command
 		         commandId="net.tourbook.command.device.synchronize"
 		         icon="icons/device-synchronize.gif"
-		         label="%command_device_synchronize_configured"
-		         mnemonic="%command_device_synchronize_configured_mnemonic"
+		         label="%Command_Device_ReceiveFromSerialPort_Configured"
+		         mnemonic="%Command_Device_ReceiveFromSerialPort_Configured_Mnemonic"
 		         style="push"
-		         tooltip="%command_device_synchronize_configured_tooltip">
+		         tooltip="%Command_Device_ReceiveFromSerialPort_Configured_Tooltip">
 		   </command>
 		   <command
 		         commandId="net.tourbook.command.device.synchronize.direct"
 		         icon="icons/device-synchronize-direct.gif"
-		         label="%command_device_synchronize_direct"
-		         mnemonic="%command_device_synchronize_direct_mnemonic"
+		         label="%Command_Device_ReceiveFromSerialPort_Directly"
+		         mnemonic="%Command_Device_ReceiveFromSerialPort_Directly_Mnemonic"
 		         style="push"
-		         tooltip="%command_device_synchronize_direct_tooltip">
+		         tooltip="%Command_Device_ReceiveFromSerialPort_Directly_Tooltip">
 		   </command>
 		</menuContribution>
 
@@ -1117,12 +1117,12 @@
       <command
             id="net.tourbook.command.device.synchronize.direct"
             defaultHandler="net.tourbook.importdata.ActionHandlerImportFromDeviceDirect"
-            name="%command_device_synchronize_direct">
+            name="%Command_Device_ReceiveFromSerialPort_Directly">
       </command>
       <command
             id="net.tourbook.command.device.synchronize"
             defaultHandler="net.tourbook.importdata.ActionHandlerImportFromDevice"
-            name="%command_device_synchronize_configured">
+            name="%Command_Device_ReceiveFromSerialPort_Configured">
       </command>
       <command
             id="net.tourbook.command.tourChart.options"
