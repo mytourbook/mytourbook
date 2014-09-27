@@ -15,7 +15,6 @@
  *******************************************************************************/
 package net.tourbook.ui.tourChart.action;
 
-import net.tourbook.Messages;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.tour.TourManager;
@@ -30,7 +29,7 @@ public class ActionConvertIntoSharedMarker_DISABLED extends Action {
 
 	public ActionConvertIntoSharedMarker_DISABLED(final TourChart tourChart) {
 
-		super(Messages.Action_SharedMarker_ConvertFromTourMarker);
+//		super(Messages.Action_SharedMarker_ConvertFromTourMarker);
 
 		_tourChart = tourChart;
 	}

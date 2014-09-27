@@ -1951,7 +1951,7 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
 	@Override
 	public void selectionChanged(final SelectionTourMarker tourMarkerSelection) {
 
-		final ArrayList<TourMarker> selectedTourMarker = tourMarkerSelection.getTourMarker();
+		final ArrayList<TourMarker> selectedTourMarker = tourMarkerSelection.getSelectedTourMarker();
 
 		// prevent that the x-slider is positioned in the tour chart
 		_isSetXSlider = false;

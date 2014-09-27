@@ -1924,7 +1924,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 
 		updateUI_ShowTour(tourData);
 
-		final ArrayList<TourMarker> tourMarker = markerSelection.getTourMarker();
+		final ArrayList<TourMarker> tourMarker = markerSelection.getSelectedTourMarker();
 		final int numberOfTourMarkers = tourMarker.size();
 
 		int leftSliderValueIndex = 0;
@@ -2883,7 +2883,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 
 		if (isTourVisible == false) {
 
-			// show tour
+			// tour is not yet visible, show it now
 
 			_allTourData.clear();
 			_allTourData.add(tourData);

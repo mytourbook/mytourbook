@@ -442,7 +442,7 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 		{
 			// ckeckbox
 			_chkMinAltimeter = new Button(parent, SWT.CHECK);
-			_chkMinAltimeter.setText(Messages.Pref_Graphs_Checkbox_IsForceAltimeterMinValue);
+			_chkMinAltimeter.setText(Messages.Pref_Graphs_Checkbox_ForceAltimeterMinValue);
 			_chkMinAltimeter.addSelectionListener(_defaultSelectionListener);
 
 			// spinner
@@ -465,7 +465,7 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 		{
 			// ckeckbox
 			_chkMaxAltimeter = new Button(parent, SWT.CHECK);
-			_chkMaxAltimeter.setText(Messages.Pref_Graphs_Checkbox_IsForceAltimeterMaxValue);
+			_chkMaxAltimeter.setText(Messages.Pref_Graphs_Checkbox_ForceAltimeterMaxValue);
 			_chkMaxAltimeter.addSelectionListener(_defaultSelectionListener);
 
 			// spinner
@@ -491,7 +491,7 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 		{
 			// ckeckbox
 			_chkMinGradient = new Button(parent, SWT.CHECK);
-			_chkMinGradient.setText(Messages.Pref_Graphs_Checkbox_IsForceGradientMinValue);
+			_chkMinGradient.setText(Messages.Pref_Graphs_Checkbox_ForceGradientMinValue);
 			_chkMinGradient.addSelectionListener(_defaultSelectionListener);
 
 			// spinner
@@ -516,7 +516,7 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 		{
 			// ckeckbox
 			_chkMaxGradient = new Button(parent, SWT.CHECK);
-			_chkMaxGradient.setText(Messages.Pref_Graphs_Checkbox_IsForceGradientMaxValue);
+			_chkMaxGradient.setText(Messages.Pref_Graphs_Checkbox_ForceGradientMaxValue);
 			_chkMaxGradient.addSelectionListener(_defaultSelectionListener);
 
 			// spinner
@@ -541,7 +541,7 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 		{
 			// ckeckbox
 			_chkMinPulse = new Button(parent, SWT.CHECK);
-			_chkMinPulse.setText(Messages.Pref_Graphs_Checkbox_IsForcePulseMinValue);
+			_chkMinPulse.setText(Messages.Pref_Graphs_Checkbox_ForcePulseMinValue);
 			_chkMinPulse.addSelectionListener(_defaultSelectionListener);
 
 			// spinner
@@ -566,7 +566,7 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 		{
 			// ckeckbox
 			_chkMaxPulse = new Button(parent, SWT.CHECK);
-			_chkMaxPulse.setText(Messages.Pref_Graphs_Checkbox_IsForcePulseMaxValue);
+			_chkMaxPulse.setText(Messages.Pref_Graphs_Checkbox_ForcePulseMaxValue);
 			_chkMaxPulse.addSelectionListener(_defaultSelectionListener);
 
 			// spinner
@@ -591,7 +591,7 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 		{
 			// ckeckbox
 			_chkMinPace = new Button(parent, SWT.CHECK);
-			_chkMinPace.setText(Messages.Pref_Graphs_Checkbox_IsForcePaceMinValue);
+			_chkMinPace.setText(Messages.Pref_Graphs_Checkbox_ForcePaceMinValue);
 			_chkMinPace.addSelectionListener(_defaultSelectionListener);
 
 			// spinner
@@ -615,7 +615,7 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 		{
 			// ckeckbox
 			_chkMaxPace = new Button(parent, SWT.CHECK);
-			_chkMaxPace.setText(Messages.Pref_Graphs_Checkbox_IsForcePaceMaxValue);
+			_chkMaxPace.setText(Messages.Pref_Graphs_Checkbox_ForcePaceMaxValue);
 			_chkMaxPace.addSelectionListener(_defaultSelectionListener);
 
 			// spinner

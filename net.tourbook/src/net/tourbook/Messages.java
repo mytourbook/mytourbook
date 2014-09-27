@@ -24,7 +24,6 @@ public class Messages extends NLS {
 	public static String		Action_Compute_ElevationGain;
 
 	public static String		Action_MarkerFilter_WithGPS_Tooltip;
-
 	public static String		Action_MarkerFilter_WithoutGPS_Tooltip;
 
 	public static String		Action_PhotosAndTours_FilterNoTours_Tooltip;
@@ -910,22 +909,14 @@ public class Messages extends NLS {
 	public static String		Pref_Graphs_Check_show_start_time;
 	public static String		Pref_Graphs_Checkbox_GraphAntialiasing;
 	public static String		Pref_Graphs_Checkbox_GraphAntialiasing_Tooltip;
-	public static String		Pref_Graphs_Checkbox_IsForceAltimeterMaxValue;
-
-	public static String		Pref_Graphs_Checkbox_IsForceAltimeterMinValue;
-
-	public static String		Pref_Graphs_Checkbox_IsForceGradientMaxValue;
-
-	public static String		Pref_Graphs_Checkbox_IsForceGradientMinValue;
-
-	public static String		Pref_Graphs_Checkbox_IsForcePaceMaxValue;
-
-	public static String		Pref_Graphs_Checkbox_IsForcePaceMinValue;
-
-	public static String		Pref_Graphs_Checkbox_IsForcePulseMaxValue;
-
-	public static String		Pref_Graphs_Checkbox_IsForcePulseMinValue;
-
+	public static String		Pref_Graphs_Checkbox_ForceAltimeterMaxValue;
+	public static String		Pref_Graphs_Checkbox_ForceAltimeterMinValue;
+	public static String		Pref_Graphs_Checkbox_ForceGradientMaxValue;
+	public static String		Pref_Graphs_Checkbox_ForceGradientMinValue;
+	public static String		Pref_Graphs_Checkbox_ForcePaceMaxValue;
+	public static String		Pref_Graphs_Checkbox_ForcePaceMinValue;
+	public static String		Pref_Graphs_Checkbox_ForcePulseMaxValue;
+	public static String		Pref_Graphs_Checkbox_ForcePulseMinValue;
 	public static String		Pref_Graphs_Checkbox_ShowHorizontalGrid;
 	public static String		Pref_Graphs_Checkbox_ShowVerticalGrid;
 	public static String		Pref_Graphs_Dialog_GridLine_Warning_Message;
@@ -959,7 +950,6 @@ public class Messages extends NLS {
 	public static String		Pref_Graphs_Text_min_value;
 
 	public static String		Pref_LiveUpdate_Checkbox;
-
 	public static String		Pref_LiveUpdate_Checkbox_Tooltip;
 
 	public static String		Pref_MapLayout_Checkbox_BorderColor_Color;
@@ -1180,7 +1170,6 @@ public class Messages extends NLS {
 //	public static String		Slideout_ChartMarkerOptions_Checkbox_IsShowSignImage;
 	public static String		Slideout_ChartMarkerOptions_Checkbox_IsShowTempPosition;
 	public static String		Slideout_ChartMarkerOptions_Checkbox_IsShowTempPosition_Tooltip;
-
 	public static String		Slideout_ChartMarkerOptions_Combo_TooltipPosition_Tooltip;
 	public static String		Slideout_ChartMarkerOptions_Label_DeviceMarkerColor;
 	public static String		Slideout_ChartMarkerOptions_Label_DeviceMarkerColor_Tooltip;
@@ -1346,7 +1335,6 @@ public class Messages extends NLS {
 	public static String		Tour_Marker_Column_Url_Tooltip;
 	public static String		Tour_Marker_Column_vertical_offset;
 	public static String		Tour_Marker_Column_vertical_offset_tooltip;
-
 	public static String		Tour_Marker_Position_horizontal_above_centered;
 	public static String		Tour_Marker_Position_horizontal_above_left;
 	public static String		Tour_Marker_Position_horizontal_above_right;

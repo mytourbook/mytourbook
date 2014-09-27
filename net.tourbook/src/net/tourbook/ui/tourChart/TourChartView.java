@@ -287,7 +287,7 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 
 				} else if (eventId == TourEventId.UPDATE_UI) {
 
-					// check if this tour data editor contains a tour which must be updated
+					// check if this tour chart contains a tour which must be updated
 
 					if (_tourData == null) {
 						return;
@@ -405,17 +405,12 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 		if (chartInfo != null) {
 
 			_isInSliderPositionFired = true;
-
-//		Display.getCurrent().asyncExec(new Runnable() {
-//			public void run() {
-//
-//			}
-//		});
-			TourManager.fireEventWithCustomData(//
-					TourEventId.SLIDER_POSITION_CHANGED,
-					chartInfo,
-					TourChartView.this);
-
+			{
+				TourManager.fireEventWithCustomData(//
+						TourEventId.SLIDER_POSITION_CHANGED,
+						chartInfo,
+						TourChartView.this);
+			}
 			_isInSliderPositionFired = false;
 		}
 	}
@@ -610,46 +605,50 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 
 	private void onSelectionChanged_TourMarker(final SelectionTourMarker markerSelection) {
 
-		final TourData tourData = markerSelection.getTourData();
-		final long markerTourId = tourData.getTourId().longValue();
+		_isInSelectionChanged = true;
+		{
+			final TourData tourData = markerSelection.getTourData();
+			final long markerTourId = tourData.getTourId().longValue();
 
-		/*
-		 * check if the marker tour is displayed
-		 */
-		if (_tourData == null || _tourData.getTourId().longValue() != markerTourId) {
+			/*
+			 * check if the marker tour is displayed
+			 */
+			if (_tourData == null || _tourData.getTourId().longValue() != markerTourId) {
 
-			// show tour
+				// show tour
 
-			updateChart(tourData);
+				updateChart(tourData);
+			}
+
+			/*
+			 * set slider position
+			 */
+			final ArrayList<TourMarker> tourMarker = markerSelection.getSelectedTourMarker();
+			final int numberOfTourMarkers = tourMarker.size();
+
+			int leftSliderValueIndex = tourMarker.get(0).getSerieIndex();
+			int rightSliderValueIndex = 0;
+
+			if (numberOfTourMarkers == 1) {
+
+				rightSliderValueIndex = leftSliderValueIndex;
+
+			} else if (numberOfTourMarkers > 1) {
+
+				leftSliderValueIndex = tourMarker.get(0).getSerieIndex();
+				rightSliderValueIndex = tourMarker.get(numberOfTourMarkers - 1).getSerieIndex();
+			}
+
+			final SelectionChartXSliderPosition xSliderPosition = new SelectionChartXSliderPosition(
+					_tourChart,
+					SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION,
+					leftSliderValueIndex,
+					rightSliderValueIndex,
+					true);
+
+			_tourChart.selectMarker(xSliderPosition);
 		}
-
-		/*
-		 * set slider position
-		 */
-		final ArrayList<TourMarker> tourMarker = markerSelection.getTourMarker();
-		final int numberOfTourMarkers = tourMarker.size();
-
-		int leftSliderValueIndex = tourMarker.get(0).getSerieIndex();
-		int rightSliderValueIndex = 0;
-
-		if (numberOfTourMarkers == 1) {
-
-			rightSliderValueIndex = leftSliderValueIndex;
-
-		} else if (numberOfTourMarkers > 1) {
-
-			leftSliderValueIndex = tourMarker.get(0).getSerieIndex();
-			rightSliderValueIndex = tourMarker.get(numberOfTourMarkers - 1).getSerieIndex();
-		}
-
-		final SelectionChartXSliderPosition xSliderPosition = new SelectionChartXSliderPosition(
-				_tourChart,
-				SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION,
-				leftSliderValueIndex,
-				rightSliderValueIndex,
-				true);
-
-		_tourChart.selectMarker(xSliderPosition);
+		_isInSelectionChanged = false;
 	}
 
 	@Override

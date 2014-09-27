@@ -1798,7 +1798,11 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		final SelectionTourMarker tourMarkerSelection = new SelectionTourMarker(_tourData, allTourMarker);
 
 		// update selection locally (e.g. in a dialog)
-		fireTourMarkerSelection_Locally(tourMarkerSelection);
+		final Object[] listeners = _tourMarkerSelectionListener.getListeners();
+		for (final Object listener2 : listeners) {
+			final ITourMarkerSelectionListener listener = (ITourMarkerSelectionListener) listener2;
+			listener.selectionChanged(tourMarkerSelection);
+		}
 
 		// update selection globally
 		if (_isDisplayedInDialog == false) {
@@ -1807,20 +1811,6 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 					TourEventId.MARKER_SELECTION,
 					tourMarkerSelection,
 					_part);
-		}
-	}
-
-	/**
-	 * Fires an event when the a tour marker is selected.
-	 * 
-	 * @param isShowTimeOnXAxis
-	 */
-	private void fireTourMarkerSelection_Locally(final SelectionTourMarker tourMarkerSelection) {
-
-		final Object[] listeners = _tourMarkerSelectionListener.getListeners();
-		for (final Object listener2 : listeners) {
-			final ITourMarkerSelectionListener listener = (ITourMarkerSelectionListener) listener2;
-			listener.selectionChanged(tourMarkerSelection);
 		}
 	}
 

@@ -269,6 +269,20 @@ public class TourBlogView extends ViewPart {
 				} else if (eventId == TourEventId.CLEAR_DISPLAYED_TOUR) {
 
 					clearView();
+
+				} else if (eventId == TourEventId.MARKER_SELECTION) {
+
+					if (eventData instanceof SelectionTourMarker) {
+
+						final TourData tourData = ((SelectionTourMarker) eventData).getTourData();
+
+						if (tourData != _tourData) {
+
+							_tourData = tourData;
+
+							updateUI();
+						}
+					}
 				}
 			}
 		};

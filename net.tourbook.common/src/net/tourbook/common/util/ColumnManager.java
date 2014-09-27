@@ -256,13 +256,36 @@ public class ColumnManager {
 		_tableMenuDetectListener = new Listener() {
 			public void handleEvent(final Event event) {
 
-				final Decorations shell = table.getShell();
-				final Display display = shell.getDisplay();
+				final Display display = table.getShell().getDisplay();
 				final Point pt = display.map(null, table, new Point(event.x, event.y));
-				final Rectangle clientArea = table.getClientArea();
 
-				final boolean isTableHeaderHit = clientArea.y <= pt.y
-						&& pt.y < (clientArea.y + table.getHeaderHeight());
+				final Rectangle tblClientArea = table.getClientArea();
+				final int headerHeight = table.getHeaderHeight();
+
+				final boolean isTableHeaderHit = tblClientArea.y <= pt.y && pt.y < (tblClientArea.y + headerHeight);
+
+//				System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
+//						+ ("\tisTableHeaderHit: " + isTableHeaderHit)
+//						+ ("\tclientArea: " + tblClientArea)
+//						+ ("\theaderHeight: " + headerHeight)
+//						+ ("\tpt: " + pt));
+//				// TODO remove SYSTEM.OUT.PRINTLN
+//
+//
+				/**
+				 * When the context menu is opened with the keyboard, the context menu from the
+				 * tree/table is displayed and not from the header when the mouse is hovering the
+				 * header. "detail" contains the info which input devices requested the context
+				 * menu.
+				 * <p>
+				 * Currently the context menu for the header with the keyboard is not supported.
+				 */
+//
+//				if (lParam != -1) {
+//					detail = SWT.MENU_MOUSE;
+//				} else {
+//					detail = SWT.MENU_KEYBOARD;
+//				}
 
 				table.setMenu(getContextMenu(isTableHeaderHit, headerContextMenu, defaultContextMenu));
 			}

@@ -637,7 +637,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 						final SelectionTourMarker selection = (SelectionTourMarker) eventData;
 
 						final TourData tourData = selection.getTourData();
-						final ArrayList<TourMarker> tourMarker = selection.getTourMarker();
+						final ArrayList<TourMarker> tourMarker = selection.getSelectedTourMarker();
 
 						syncMapWith_TourMarker(tourData, tourMarker);
 					}
@@ -1490,7 +1490,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 
 			final SelectionTourMarker markerSelection = (SelectionTourMarker) selection;
 
-			syncMapWith_TourMarker(markerSelection.getTourData(), markerSelection.getTourMarker());
+			syncMapWith_TourMarker(markerSelection.getTourData(), markerSelection.getSelectedTourMarker());
 
 		} else if (selection instanceof SelectionChartInfo) {
 

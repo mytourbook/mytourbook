@@ -3712,6 +3712,10 @@ public class Map extends Canvas {
 	 */
 	public void setMapCenter(final GeoPosition geoPosition) {
 
+//		System.out.println((net.tourbook.common.UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
+//				+ ("\tsetMapCenter: " + geoPosition));
+//		// TODO remove SYSTEM.OUT.PRINTLN
+
 		final java.awt.Point newMapCenter = _mp.geoToPixel(geoPosition, _mapZoomLevel);
 
 		if (Thread.currentThread() == _displayThread) {

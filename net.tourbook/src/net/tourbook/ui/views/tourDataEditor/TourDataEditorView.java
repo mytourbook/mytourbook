@@ -5179,7 +5179,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 			final SelectionTourMarker markerSelection = (SelectionTourMarker) selection;
 
-			final ArrayList<TourMarker> tourMarker = markerSelection.getTourMarker();
+			final ArrayList<TourMarker> tourMarker = markerSelection.getSelectedTourMarker();
 			final int numberOfTourMarkers = tourMarker.size();
 
 			int leftSliderValueIndex = 0;
@@ -5234,7 +5234,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 	private void onSelectionChanged_TourMarker(final SelectionTourMarker markerSelection) {
 
-		final ArrayList<TourMarker> tourMarker = markerSelection.getTourMarker();
+		final ArrayList<TourMarker> tourMarker = markerSelection.getSelectedTourMarker();
 		final int numberOfTourMarkers = tourMarker.size();
 
 		int leftSliderValueIndex = 0;

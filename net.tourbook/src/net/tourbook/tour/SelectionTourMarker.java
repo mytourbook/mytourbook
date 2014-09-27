@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -28,20 +28,24 @@ import org.eclipse.jface.viewers.ISelection;
 public class SelectionTourMarker implements ISelection {
 
 	private TourData				_tourData;
-	private ArrayList<TourMarker>	_allTourMarker;
+	private ArrayList<TourMarker>	_selectedTourMarker;
 
-	public SelectionTourMarker(final TourData tourData, final ArrayList<TourMarker> allTourMarker) {
+	/**
+	 * @param tourData
+	 * @param selectedTourMarker
+	 */
+	public SelectionTourMarker(final TourData tourData, final ArrayList<TourMarker> selectedTourMarker) {
 
 		_tourData = tourData;
-		_allTourMarker = allTourMarker;
+		_selectedTourMarker = selectedTourMarker;
 	}
 
 	public TourData getTourData() {
 		return _tourData;
 	}
 
-	public ArrayList<TourMarker> getTourMarker() {
-		return _allTourMarker;
+	public ArrayList<TourMarker> getSelectedTourMarker() {
+		return _selectedTourMarker;
 	}
 
 	public boolean isEmpty() {

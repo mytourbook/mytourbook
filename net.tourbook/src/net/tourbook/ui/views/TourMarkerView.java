@@ -17,11 +17,11 @@ package net.tourbook.ui.views;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.Chart;
-import net.tourbook.chart.SelectionChartXSliderPosition;
 import net.tourbook.common.util.ColumnDefinition;
 import net.tourbook.common.util.ColumnManager;
 import net.tourbook.common.util.ITourViewer;
@@ -45,7 +45,6 @@ import net.tourbook.ui.TableColumnFactory;
 import net.tourbook.ui.UI;
 import net.tourbook.ui.action.ActionModifyColumns;
 import net.tourbook.ui.tourChart.ChartLabel;
-import net.tourbook.ui.tourChart.TourChart;
 import net.tourbook.ui.views.tourCatalog.SelectionTourCatalogView;
 import net.tourbook.ui.views.tourCatalog.TVICatalogComparedTour;
 import net.tourbook.ui.views.tourCatalog.TVICatalogRefTourItem;
@@ -117,6 +116,8 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 	private TableViewer				_markerViewer;
 	private ColumnManager			_columnManager;
 
+	private boolean					_isInUpdate;
+
 	private ColumnDefinition		_colDefName;
 	private ColumnDefinition		_colDefVisibility;
 
@@ -130,7 +131,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 	 * UI controls
 	 */
 	private PageBook				_pageBook;
-	private Label					_pageNoChart;
+	private Label					_pageNoTour;
 	private Composite				_viewerContainer;
 
 	private Font					_boldFont;
@@ -242,10 +243,13 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 	private void addSelectionListener() {
 
 		_postSelectionListener = new ISelectionListener() {
+
 			public void selectionChanged(final IWorkbenchPart part, final ISelection selection) {
+
 				if (part == TourMarkerView.this) {
 					return;
 				}
+
 				onSelectionChanged(selection);
 			}
 		};
@@ -256,6 +260,10 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 
 		_tourEventListener = new ITourEventListener() {
 			public void tourChanged(final IWorkbenchPart part, final TourEventId eventId, final Object eventData) {
+
+				if (_isInUpdate) {
+					return;
+				}
 
 				if ((_tourData == null) || (part == TourMarkerView.this)) {
 					return;
@@ -276,7 +284,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 								// get modified tour
 								_tourData = tourData;
 
-								_markerViewer.setInput(new Object[0]);
+								updateUI_MarkerViewer();
 
 								// removed old tour data from the selection provider
 								_postSelectionProvider.clearSelection();
@@ -289,7 +297,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 
 				} else if (eventId == TourEventId.MARKER_SELECTION) {
 
-					onSelectionTourMarker(eventData);
+					onTourEvent_TourMarker(eventData);
 
 				} else if (eventId == TourEventId.CLEAR_DISPLAYED_TOUR) {
 
@@ -305,11 +313,9 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 
 		_tourData = null;
 
-		_markerViewer.setInput(new Object[0]);
+		updateUI_MarkerViewer();
 
 		_postSelectionProvider.clearSelection();
-
-		_pageBook.showPage(_pageNoChart);
 	}
 
 	private void createActions() {
@@ -342,7 +348,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 		getSite().setSelectionProvider(_postSelectionProvider = new PostSelectionProvider(ID));
 
 		// show default page
-		_pageBook.showPage(_pageNoChart);
+		_pageBook.showPage(_pageNoTour);
 
 		// show marker from last selection
 		onSelectionChanged(getSite().getWorkbenchWindow().getSelectionService().getSelection());
@@ -357,8 +363,8 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 		_pageBook = new PageBook(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, true).applyTo(_pageBook);
 
-		_pageNoChart = new Label(_pageBook, SWT.NONE);
-		_pageNoChart.setText(Messages.UI_Label_no_chart_is_selected);
+		_pageNoTour = new Label(_pageBook, SWT.NONE);
+		_pageNoTour.setText(Messages.UI_Label_no_chart_is_selected);
 
 		_viewerContainer = new Composite(_pageBook, SWT.NONE);
 		GridLayoutFactory.fillDefaults().applyTo(_viewerContainer);
@@ -398,17 +404,14 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 
 		_markerViewer.addSelectionChangedListener(new ISelectionChangedListener() {
 			public void selectionChanged(final SelectionChangedEvent event) {
-				final StructuredSelection selection = (StructuredSelection) event.getSelection();
-				if (selection != null) {
-					onSelectTourMarker(selection);
-				}
+				onSelect_TourMarker((StructuredSelection) event.getSelection());
 			}
 		});
 
 		_markerViewer.addDoubleClickListener(new IDoubleClickListener() {
 			public void doubleClick(final DoubleClickEvent event) {
 
-				if (isTourInDb() == false) {
+				if (isTourSavedInDb() == false) {
 					return;
 				}
 
@@ -705,9 +708,9 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 	 */
 	private void enableActions() {
 
-		final boolean tourInDb = isTourInDb();
+		final boolean isTourInDb = isTourSavedInDb();
 
-		_actionEditTourMarkers.setEnabled(tourInDb);
+		_actionEditTourMarkers.setEnabled(isTourInDb);
 	}
 
 	private void fillContextMenu(final IMenuManager menuMgr) {
@@ -744,65 +747,6 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 //		tbm.add();
 	}
 
-	private void fireMarkerPosition(final StructuredSelection selection) {
-
-		final Object[] selectedMarker = selection.toArray();
-
-		if (selectedMarker.length > 0) {
-
-			final ArrayList<TourMarker> allTourMarker = new ArrayList<TourMarker>();
-
-			for (final Object object : selectedMarker) {
-				allTourMarker.add((TourMarker) object);
-			}
-
-			_postSelectionProvider.setSelection(new SelectionTourMarker(_tourData, allTourMarker));
-		}
-	}
-
-	/**
-	 * Fire a selection for the selected marker(s).
-	 */
-	private void fireSliderPosition(final StructuredSelection selection) {
-
-		// a chart must be available
-		if (_tourChart == null) {
-
-			final TourChart tourChart = TourManager.getInstance().getActiveTourChart();
-
-			if ((tourChart == null) || tourChart.isDisposed()) {
-
-				fireMarkerPosition(selection);
-
-				return;
-
-			} else {
-				_tourChart = tourChart;
-			}
-		}
-
-		final Object[] selectedMarker = selection.toArray();
-
-		if (selectedMarker.length > 1) {
-
-			// two or more markers are selected
-
-			_postSelectionProvider.setSelection(new SelectionChartXSliderPosition(
-					_tourChart,
-					((TourMarker) selectedMarker[0]).getSerieIndex(),
-					((TourMarker) selectedMarker[selectedMarker.length - 1]).getSerieIndex()));
-
-		} else if (selectedMarker.length > 0) {
-
-			// one marker is selected
-
-			_postSelectionProvider.setSelection(new SelectionChartXSliderPosition(
-					_tourChart,
-					((TourMarker) selectedMarker[0]).getSerieIndex(),
-					SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION));
-		}
-	}
-
 	@Override
 	public ColumnManager getColumnManager() {
 		return _columnManager;
@@ -829,9 +773,9 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 	}
 
 	/**
-	 * @return Returns <code>true</code> when the tour is saved in the database
+	 * @return Returns <code>true</code> when the tour is saved in the database.
 	 */
-	private boolean isTourInDb() {
+	private boolean isTourSavedInDb() {
 
 		if ((_tourData != null) && (_tourData.getTourPerson() != null)) {
 			return true;
@@ -840,7 +784,29 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 		return false;
 	}
 
+	private void onSelect_TourMarker(final StructuredSelection selection) {
+
+		if (_isInUpdate) {
+			return;
+		}
+
+		final ArrayList<TourMarker> selectedTourMarker = new ArrayList<TourMarker>();
+
+		for (final Iterator<?> iterator = selection.iterator(); iterator.hasNext();) {
+			selectedTourMarker.add((TourMarker) iterator.next());
+		}
+
+		TourManager.fireEvent(//
+				TourEventId.MARKER_SELECTION,
+				new SelectionTourMarker(_tourData, selectedTourMarker),
+				getSite().getPart());
+	}
+
 	private void onSelectionChanged(final ISelection selection) {
+
+		if (_isInUpdate) {
+			return;
+		}
 
 		long tourId = TourDatabase.ENTITY_IS_NOT_SAVED;
 
@@ -904,16 +870,10 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 			}
 		}
 
-		final boolean isTourAvailable = (tourId >= 0) && (_tourData != null);
-
-		if (isTourAvailable) {
-			updateUI_MarkerViewer();
-		}
-
-		enableActions();
+		updateUI_MarkerViewer();
 	}
 
-	private void onSelectionTourMarker(final Object eventData) {
+	private void onTourEvent_TourMarker(final Object eventData) {
 
 		if (eventData instanceof SelectionTourMarker) {
 
@@ -923,24 +883,21 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 			final SelectionTourMarker selection = (SelectionTourMarker) eventData;
 
 			final TourData tourData = selection.getTourData();
-			final ArrayList<TourMarker> tourMarker = selection.getTourMarker();
+			final ArrayList<TourMarker> tourMarker = selection.getSelectedTourMarker();
 
-			if (tourData == _tourData) {
-
-				_markerViewer.setSelection(new StructuredSelection(tourMarker), true);
-
-			} else {
+			if (tourData != _tourData) {
 
 				_tourData = tourData;
 
 				updateUI_MarkerViewer();
 			}
+
+			_isInUpdate = true;
+			{
+				_markerViewer.setSelection(new StructuredSelection(tourMarker), true);
+			}
+			_isInUpdate = false;
 		}
-	}
-
-	private void onSelectTourMarker(final StructuredSelection selection) {
-
-		fireSliderPosition(selection);
 	}
 
 	@Override
@@ -964,7 +921,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 	@Override
 	public void reloadViewer() {
 
-		_markerViewer.setInput(new Object[0]);
+		updateUI_MarkerViewer();
 	}
 
 	private void saveState() {
@@ -974,12 +931,13 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 
 	@Override
 	public void setFocus() {
+
 		_markerViewer.getTable().setFocus();
 	}
 
 	private void showTourFromTourProvider() {
 
-		_pageBook.showPage(_pageNoChart);
+		_pageBook.showPage(_pageNoTour);
 
 		// a tour is not displayed, find a tour provider which provides a tour
 		Display.getCurrent().asyncExec(new Runnable() {
@@ -1008,8 +966,21 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 
 	private void updateUI_MarkerViewer() {
 
-		_pageBook.showPage(_viewerContainer);
-		_markerViewer.setInput(new Object[0]);
-	}
+		if (isTourSavedInDb()) {
 
+			_isInUpdate = true;
+			{
+				_markerViewer.setInput(new Object[0]);
+			}
+			_isInUpdate = false;
+
+			_pageBook.showPage(_viewerContainer);
+
+		} else {
+
+			_pageBook.showPage(_pageNoTour);
+		}
+
+		enableActions();
+	}
 }
