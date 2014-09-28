@@ -55,12 +55,12 @@ public class RefTourItem {
 
 	@Override
 	public String toString() {
-		return "RefTourItem ["
-				+ ("refId=" + refId + ", ")
-				+ ("tourId=" + tourId + ", ")
-				+ ("label=" + label + ", ")
-				+ ("startIndex=" + startIndex + ", ")
-				+ ("endIndex=" + endIndex)
-				+ "]";
+		return "RefTourItem [" //$NON-NLS-1$
+				+ ("refId=" + refId + ", ") //$NON-NLS-1$ //$NON-NLS-2$
+				+ ("tourId=" + tourId + ", ") //$NON-NLS-1$ //$NON-NLS-2$
+				+ ("label=" + label + ", ") //$NON-NLS-1$ //$NON-NLS-2$
+				+ ("startIndex=" + startIndex + ", ") //$NON-NLS-1$ //$NON-NLS-2$
+				+ ("endIndex=" + endIndex) //$NON-NLS-1$
+				+ "]"; //$NON-NLS-1$
 	}
 }

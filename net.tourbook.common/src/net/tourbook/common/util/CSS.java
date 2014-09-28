@@ -19,6 +19,8 @@ import org.eclipse.swt.graphics.RGB;
 
 public class CSS {
 
+	private static final String	CSS_COLOR_VALUE	= "#%02X%02X%02X;"; //$NON-NLS-1$
+
 	/**
 	 * Converts a rgb color into an CSS color value, e.g. #f0aa88;
 	 * 
@@ -27,7 +29,7 @@ public class CSS {
 	 */
 	public static String color(final RGB color) {
 
-		return String.format("#%02X%02X%02X;", color.red, color.green, color.blue);
+		return String.format(CSS_COLOR_VALUE, color.red, color.green, color.blue);
 	}
 
 }

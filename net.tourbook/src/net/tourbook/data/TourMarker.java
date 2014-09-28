@@ -139,6 +139,8 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 
 	/**
 	 * Absolute time of the tour marker in milliseconds since 1970-01-01T00:00:00Z.
+	 * 
+	 * @since Db version 25
 	 */
 	private long					tourTime									= Long.MIN_VALUE;
 
@@ -208,9 +210,19 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 	 */
 	private String					urlAddress;
 
-	// initialize with invalid values
+	/**
+	 * @since Db version 25
+	 */
 	private float					altitude									= TourDatabase.DEFAULT_FLOAT;
+
+	/**
+	 * @since Db version 25
+	 */
+
 	private double					latitude									= TourDatabase.DEFAULT_DOUBLE;
+	/**
+	 * @since Db version 25
+	 */
 	private double					longitude									= TourDatabase.DEFAULT_DOUBLE;
 
 	private int						isMarkerVisible								= 1;

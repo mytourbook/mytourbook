@@ -930,7 +930,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 						ITourbookPreferences.GRAPH_PULSE_MAX_VALUE,
 						TourManager.GRAPH_PULSE,
 						0,
-						MAX_ADJUSTMENT);
+						1e-3);
 
 				if (isChartModified) {
 					updateTourChart(keepMinMax);

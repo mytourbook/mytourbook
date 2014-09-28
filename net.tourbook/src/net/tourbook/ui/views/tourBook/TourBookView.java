@@ -146,47 +146,48 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 	private static final String							STATE_IS_SELECT_YEAR_MONTH_TOURS	= "IsSelectYearMonthTours";				//$NON-NLS-1$
 	private static final String							STATE_YEAR_SUB_CATEGORY				= "YearSubCategory";						//$NON-NLS-1$
 
-	private static final String							CSV_HEADER_AVERAGE_CADENCE			= "AvgCadence";
-	private static final String							CSV_HEADER_AVERAGE_PACE				= "AvgPace (%s)";
-	private static final String							CSV_HEADER_AVERAGE_SPEED			= "AvgSpeed (%s)";
-	private static final String							CSV_HEADER_AVERAGE_TEMPERATURE		= "AvgTemperature (%s)";
-	private static final String							CSV_HEADER_ALTITUDE_DOWN			= "AltitudeDown (%s)";
-	private static final String							CSV_HEADER_ALTITUDE_UP				= "AltitudeUp (%s)";
-	private static final String							CSV_HEADER_CALORIES					= "Calories";
-	private static final String							CSV_HEADER_DAY						= "Day";
-	private static final String							CSV_HEADER_DEVICE_START_DISTANCE	= "DeviceStartDistance";
-	private static final String							CSV_HEADER_DISTANCE					= "Distance (%s)";
-	private static final String							CSV_HEADER_DP_TOLERANCE				= "DPTolerance";
-	private static final String							CSV_HEADER_ISO_DATE_TIME			= "ISO8601";
-	private static final String							CSV_HEADER_MOVING_TIME				= "MovingTime (%s)";
-	private static final String							CSV_HEADER_NUMBER_OF_MARKER			= "NumberOfMarkers";
-	private static final String							CSV_HEADER_NUMBER_OF_PHOTOS			= "NumberOfPhotos";
-	private static final String							CSV_HEADER_NUMBER_OF_TOURS			= "NumberOfTours";
-	private static final String							CSV_HEADER_WEATHER					= "Weather";
-	private static final String							CSV_HEADER_WIND_DIRECTION			= "WindDirection";
-	private static final String							CSV_HEADER_WIND_SPEED				= "WindSpeed";
-	private static final String							CSV_HEADER_MAX_ALTITUDE				= "MaxAltitude (%s)";
-	private static final String							CSV_HEADER_MAX_PULSE				= "MaxPulse";
-	private static final String							CSV_HEADER_MAX_SPEED				= "MaxSpeed (%s)";
-	private static final String							CSV_HEADER_MONTH					= "Month";
-	private static final String							CSV_HEADER_PAUSED_TIME				= "PausedTime (%s)";
-	private static final String							CSV_HEADER_PAUSED_TIME_RELATIVE		= "RelativePausedTime (%)";
-	private static final String							CSV_HEADER_PERSON					= "Person";
-	private static final String							CSV_HEADER_RECORDING_TIME			= "RecordingTime (%s)";
-	private static final String							CSV_HEADER_RESTPULSE				= "RestPulse";
-	private static final String							CSV_HEADER_TAGS						= "Tags";
-	private static final String							CSV_HEADER_TIME						= "Time";
-	private static final String							CSV_HEADER_TIME_INTERVAL			= "TimeInterval";
-	private static final String							CSV_HEADER_TIME_SLICES				= "TimeSlices";
-	private static final String							CSV_HEADER_TITLE					= "Title";
-	private static final String							CSV_HEADER_TOUR_TYPE_ID				= "TourTypeId";
-	private static final String							CSV_HEADER_TOUR_TYPE_NAME			= "TourTypeName";
-	private static final String							CSV_HEADER_WEEK						= "Week";
-	private static final String							CSV_HEADER_WEEKDAY					= "Weekday";
-	private static final String							CSV_HEADER_WEEK_YEAR				= "WeekYear";
-	private static final String							CSV_HEADER_YEAR						= "Year";
+	private static final String							CSV_HEADER_AVERAGE_CADENCE			= "AvgCadence"; //$NON-NLS-1$
+	private static final String							CSV_HEADER_AVERAGE_PACE				= "AvgPace (%s)"; //$NON-NLS-1$
+	private static final String							CSV_HEADER_AVERAGE_SPEED			= "AvgSpeed (%s)"; //$NON-NLS-1$
+	private static final String							CSV_HEADER_AVERAGE_TEMPERATURE		= "AvgTemperature (%s)"; //$NON-NLS-1$
+	private static final String							CSV_HEADER_ALTITUDE_DOWN			= "AltitudeDown (%s)"; //$NON-NLS-1$
+	private static final String							CSV_HEADER_ALTITUDE_UP				= "AltitudeUp (%s)"; //$NON-NLS-1$
+	private static final String							CSV_HEADER_CALORIES					= "Calories"; //$NON-NLS-1$
+	private static final String							CSV_HEADER_DAY						= "Day"; //$NON-NLS-1$
+	private static final String							CSV_HEADER_DEVICE_START_DISTANCE	= "DeviceStartDistance"; //$NON-NLS-1$
+	private static final String							CSV_HEADER_DISTANCE					= "Distance (%s)"; //$NON-NLS-1$
+	private static final String							CSV_HEADER_DP_TOLERANCE				= "DPTolerance"; //$NON-NLS-1$
+	private static final String							CSV_HEADER_ISO_DATE_TIME			= "ISO8601"; //$NON-NLS-1$
+	private static final String							CSV_HEADER_MOVING_TIME				= "MovingTime (%s)"; //$NON-NLS-1$
+	private static final String							CSV_HEADER_NUMBER_OF_MARKER			= "NumberOfMarkers"; //$NON-NLS-1$
+	private static final String							CSV_HEADER_NUMBER_OF_PHOTOS			= "NumberOfPhotos"; //$NON-NLS-1$
+	private static final String							CSV_HEADER_NUMBER_OF_TOURS			= "NumberOfTours"; //$NON-NLS-1$
+	private static final String							CSV_HEADER_WEATHER					= "Weather"; //$NON-NLS-1$
+	private static final String							CSV_HEADER_WIND_DIRECTION			= "WindDirection"; //$NON-NLS-1$
+	private static final String							CSV_HEADER_WIND_SPEED				= "WindSpeed"; //$NON-NLS-1$
+	private static final String							CSV_HEADER_MAX_ALTITUDE				= "MaxAltitude (%s)"; //$NON-NLS-1$
+	private static final String							CSV_HEADER_MAX_PULSE				= "MaxPulse"; //$NON-NLS-1$
+	private static final String							CSV_HEADER_MAX_SPEED				= "MaxSpeed (%s)"; //$NON-NLS-1$
+	private static final String							CSV_HEADER_MONTH					= "Month"; //$NON-NLS-1$
+	private static final String							CSV_HEADER_PAUSED_TIME				= "PausedTime (%s)"; //$NON-NLS-1$
+	private static final String							CSV_HEADER_PAUSED_TIME_RELATIVE		= "RelativePausedTime (%)"; //$NON-NLS-1$
+	private static final String							CSV_HEADER_PERSON					= "Person"; //$NON-NLS-1$
+	private static final String							CSV_HEADER_RECORDING_TIME			= "RecordingTime (%s)"; //$NON-NLS-1$
+	private static final String							CSV_HEADER_RESTPULSE				= "RestPulse"; //$NON-NLS-1$
+	private static final String							CSV_HEADER_TAGS						= "Tags"; //$NON-NLS-1$
+	private static final String							CSV_HEADER_TIME						= "Time"; //$NON-NLS-1$
+	private static final String							CSV_HEADER_TIME_INTERVAL			= "TimeInterval"; //$NON-NLS-1$
+	private static final String							CSV_HEADER_TIME_SLICES				= "TimeSlices"; //$NON-NLS-1$
+	private static final String							CSV_HEADER_TITLE					= "Title"; //$NON-NLS-1$
+	private static final String							CSV_HEADER_TOUR_TYPE_ID				= "TourTypeId"; //$NON-NLS-1$
+	private static final String							CSV_HEADER_TOUR_TYPE_NAME			= "TourTypeName"; //$NON-NLS-1$
+	private static final String							CSV_HEADER_WEEK						= "Week"; //$NON-NLS-1$
+	private static final String							CSV_HEADER_WEEKDAY					= "Weekday"; //$NON-NLS-1$
+	private static final String							CSV_HEADER_WEEK_YEAR				= "WeekYear"; //$NON-NLS-1$
+	private static final String							CSV_HEADER_YEAR						= "Year"; //$NON-NLS-1$
 
-	private static final String							HHH_MM_SS							= "hhh:mm:ss";								//$NON-NLS-1$
+	private static final String							CSV_EXPORT_DEFAULT_FILE_NAME		= "TourBook_"; //$NON-NLS-1$
+	private static final String							CSV_EXPORT_DURATION_HHH_MM_SS		= "hhh:mm:ss";								//$NON-NLS-1$
 
 	private static int									_yearSubCategory					= TourItem.ITEM_TYPE_MONTH;
 
@@ -220,7 +221,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		_nf1NoGroup.setMaximumFractionDigits(1);
 		_nf1NoGroup.setGroupingUsed(false);
 
-		_dtFormatter = DateTimeFormat.forPattern("yyyy-MM-dd_HH-mm-ss");
+		_dtFormatter = DateTimeFormat.forPattern("yyyy-MM-dd_HH-mm-ss"); //$NON-NLS-1$
 		_isoFormatter = ISODateTimeFormat.basicDateTimeNoMillis();
 	}
 
@@ -364,7 +365,8 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		}
 
 		final String defaultExportFilePath = _state.get(STATE_CSV_EXPORT_PATH);
-		final String defaultExportFileName = "TourBook_"
+
+		final String defaultExportFileName = CSV_EXPORT_DEFAULT_FILE_NAME
 				+ _dtFormatter.print(new DateTime())
 				+ UI.SYMBOL_DOT
 				+ Util.CSV_FILE_EXTENSION;
@@ -1981,9 +1983,9 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		csvField(sb, String.format(CSV_HEADER_MOVING_TIME, Messages.App_Unit_Seconds_Small));
 		csvField(sb, String.format(CSV_HEADER_PAUSED_TIME, Messages.App_Unit_Seconds_Small));
 		csvField(sb, CSV_HEADER_PAUSED_TIME_RELATIVE);
-		csvField(sb, String.format(CSV_HEADER_RECORDING_TIME, HHH_MM_SS));
-		csvField(sb, String.format(CSV_HEADER_MOVING_TIME, HHH_MM_SS));
-		csvField(sb, String.format(CSV_HEADER_PAUSED_TIME, HHH_MM_SS));
+		csvField(sb, String.format(CSV_HEADER_RECORDING_TIME, CSV_EXPORT_DURATION_HHH_MM_SS));
+		csvField(sb, String.format(CSV_HEADER_MOVING_TIME, CSV_EXPORT_DURATION_HHH_MM_SS));
+		csvField(sb, String.format(CSV_HEADER_PAUSED_TIME, CSV_EXPORT_DURATION_HHH_MM_SS));
 		csvField(sb, CSV_HEADER_NUMBER_OF_MARKER);
 		csvField(sb, CSV_HEADER_NUMBER_OF_PHOTOS);
 		csvField(sb, CSV_HEADER_WEATHER);

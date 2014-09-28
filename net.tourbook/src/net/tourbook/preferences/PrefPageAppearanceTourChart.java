@@ -98,6 +98,7 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 	private boolean					_isGridLineWarningDisplayed					= false;
 
 	private PixelConverter			_pc;
+	private int						_columnSpacing;
 
 	/*
 	 * UI controls
@@ -416,14 +417,20 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 
 	private Control createUI_50_Tab_2_MinMax(final Composite parent) {
 
+		_columnSpacing = _pc.convertWidthInCharsToPixels(4);
+
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridLayoutFactory.swtDefaults().applyTo(container);
 		{
 			final Group group = new Group(container, SWT.NONE);
 			GridDataFactory.fillDefaults().grab(true, false).applyTo(group);
-			GridLayoutFactory.swtDefaults().numColumns(3).applyTo(group);
+			GridLayoutFactory.swtDefaults()//
+					.numColumns(6)
+					.spacing(_pc.convertHorizontalDLUsToPixels(4), _pc.convertVerticalDLUsToPixels(4))
+					.applyTo(group);
 			group.setText(Messages.Pref_Graphs_force_minimum_value);
 			{
+				createUI_52_Header(group);
 				createUI_54_MinMax_Altimeter(group);
 				createUI_55_MinMax_Gradient(group);
 				createUI_56_MinMax_Heartbeat(group);
@@ -434,89 +441,111 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 		return container;
 	}
 
+	private void createUI_52_Header(final Group parent) {
+
+		Label label;
+
+		// label: spacer
+		label = new Label(parent, SWT.NONE);
+
+		// label: min value
+		label = new Label(parent, SWT.NONE);
+		GridDataFactory.fillDefaults()//
+				.span(2, 1)
+				.indent(_columnSpacing, 0)
+				.applyTo(label);
+		label.setText(Messages.Pref_Graphs_Label_MinValue);
+
+		// label: max value
+		label = new Label(parent, SWT.NONE);
+		GridDataFactory.fillDefaults()//
+				.span(2, 1)
+				.indent(_columnSpacing, 0)
+				.applyTo(label);
+		label.setText(Messages.Pref_Graphs_Label_MaxValue);
+
+		// label: spacer
+		label = new Label(parent, SWT.NONE);
+	}
+
 	private void createUI_54_MinMax_Altimeter(final Group parent) {
 
-		/*
-		 * Altimeter min value
-		 */
+		// label
+		final Label label = new Label(parent, SWT.NONE);
+		label.setText(Messages.Pref_Graphs_Checkbox_ForceAltimeterValue);
+
+		// Altimeter min value
 		{
 			// ckeckbox
 			_chkMinAltimeter = new Button(parent, SWT.CHECK);
-			_chkMinAltimeter.setText(Messages.Pref_Graphs_Checkbox_ForceAltimeterMinValue);
+			GridDataFactory.fillDefaults()//
+					.indent(_columnSpacing, 0)
+					.applyTo(_chkMinAltimeter);
 			_chkMinAltimeter.addSelectionListener(_defaultSelectionListener);
 
-			// spinner
 			_spinnerAltimeterMin = new Spinner(parent, SWT.BORDER);
 			GridDataFactory.fillDefaults() //
-					.align(SWT.END, SWT.FILL)
+//					.align(SWT.FILL, SWT.CENTER)
 					.applyTo(_spinnerAltimeterMin);
 			_spinnerAltimeterMin.setMinimum(ALTIMETER_MIN);
 			_spinnerAltimeterMin.setMaximum(ALTIMETER_MAX);
 			_spinnerAltimeterMin.addMouseWheelListener(_defaultMouseWheelListener);
 			_spinnerAltimeterMin.addSelectionListener(_defaultSelectionListener);
-
-			// spacer
-			new Label(parent, SWT.NONE);
 		}
 
-		/*
-		 * Altimeter max value
-		 */
+		// Altimeter max value
 		{
 			// ckeckbox
 			_chkMaxAltimeter = new Button(parent, SWT.CHECK);
-			_chkMaxAltimeter.setText(Messages.Pref_Graphs_Checkbox_ForceAltimeterMaxValue);
+			GridDataFactory.fillDefaults()//
+					.indent(_columnSpacing, 0)
+					.applyTo(_chkMaxAltimeter);
 			_chkMaxAltimeter.addSelectionListener(_defaultSelectionListener);
 
 			// spinner
 			_spinnerAltimeterMax = new Spinner(parent, SWT.BORDER);
-			GridDataFactory.fillDefaults() //
-					.align(SWT.END, SWT.FILL)
-					.applyTo(_spinnerAltimeterMax);
 			_spinnerAltimeterMax.setMinimum(ALTIMETER_MIN);
 			_spinnerAltimeterMax.setMaximum(ALTIMETER_MAX);
 			_spinnerAltimeterMax.addMouseWheelListener(_defaultMouseWheelListener);
 			_spinnerAltimeterMax.addSelectionListener(_defaultSelectionListener);
-
-			// spacer
-			new Label(parent, SWT.NONE);
 		}
+
+		// spacer
+		new Label(parent, SWT.NONE);
 	}
 
 	private void createUI_55_MinMax_Gradient(final Group parent) {
 
-		/*
-		 * Gradient min value
-		 */
+		// label
+		Label label = new Label(parent, SWT.NONE);
+		label.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, false));
+		label.setText(Messages.Pref_Graphs_Checkbox_ForceGradientValue);
+
+		// Gradient min value
 		{
 			// ckeckbox
 			_chkMinGradient = new Button(parent, SWT.CHECK);
-			_chkMinGradient.setText(Messages.Pref_Graphs_Checkbox_ForceGradientMinValue);
+			GridDataFactory.fillDefaults()//
+					.indent(_columnSpacing, 0)
+					.applyTo(_chkMinGradient);
 			_chkMinGradient.addSelectionListener(_defaultSelectionListener);
 
 			// spinner
 			_spinnerGradientMin = new Spinner(parent, SWT.BORDER);
-			GridDataFactory.fillDefaults() //
-					.align(SWT.FILL, SWT.CENTER)
-					.indent(0, _pc.convertVerticalDLUsToPixels(4))
-					.applyTo(_spinnerGradientMin);
+			GridDataFactory.fillDefaults().applyTo(_spinnerGradientMin);
 			_spinnerGradientMin.setMinimum(GRADIENT_MIN);
 			_spinnerGradientMin.setMaximum(GRADIENT_MAX);
 			_spinnerGradientMin.addMouseWheelListener(_defaultMouseWheelListener);
 			_spinnerGradientMin.addSelectionListener(_defaultSelectionListener);
-
-			// label: %
-			final Label label = new Label(parent, SWT.NONE);
-			label.setText(UI.SYMBOL_PERCENTAGE);
 		}
 
-		/*
-		 * Gradient max value
-		 */
+		// Gradient max value
 		{
 			// ckeckbox
 			_chkMaxGradient = new Button(parent, SWT.CHECK);
-			_chkMaxGradient.setText(Messages.Pref_Graphs_Checkbox_ForceGradientMaxValue);
+			GridDataFactory.fillDefaults()//
+					.indent(_columnSpacing, 0)
+					.applyTo(_chkMaxGradient);
 			_chkMaxGradient.addSelectionListener(_defaultSelectionListener);
 
 			// spinner
@@ -526,47 +555,45 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 			_spinnerGradientMax.setMaximum(GRADIENT_MAX);
 			_spinnerGradientMax.addMouseWheelListener(_defaultMouseWheelListener);
 			_spinnerGradientMax.addSelectionListener(_defaultSelectionListener);
-
-			// label: %
-			final Label label = new Label(parent, SWT.NONE);
-			label.setText(UI.SYMBOL_PERCENTAGE);
 		}
+
+		// label: %
+		label = new Label(parent, SWT.NONE);
+		label.setText(UI.SYMBOL_PERCENTAGE);
 	}
 
 	private void createUI_56_MinMax_Heartbeat(final Group parent) {
 
-		/*
-		 * Pulse min value
-		 */
+		// label
+		Label label = new Label(parent, SWT.NONE);
+		label.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, false));
+		label.setText(Messages.Pref_Graphs_Checkbox_ForcePulseValue);
+
+		// Pulse min value
 		{
 			// ckeckbox
 			_chkMinPulse = new Button(parent, SWT.CHECK);
-			_chkMinPulse.setText(Messages.Pref_Graphs_Checkbox_ForcePulseMinValue);
+			GridDataFactory.fillDefaults()//
+					.indent(_columnSpacing, 0)
+					.applyTo(_chkMinPulse);
 			_chkMinPulse.addSelectionListener(_defaultSelectionListener);
 
 			// spinner
 			_spinnerPulseMin = new Spinner(parent, SWT.BORDER);
-			GridDataFactory.fillDefaults() //
-					.align(SWT.FILL, SWT.CENTER)
-					.indent(0, _pc.convertVerticalDLUsToPixels(4))
-					.applyTo(_spinnerPulseMin);
+			GridDataFactory.fillDefaults().applyTo(_spinnerPulseMin);
 			_spinnerPulseMin.setMinimum(PrefPagePeople.HEART_BEAT_MIN);
 			_spinnerPulseMin.setMaximum(PrefPagePeople.HEART_BEAT_MAX);
 			_spinnerPulseMin.addMouseWheelListener(_defaultMouseWheelListener);
 			_spinnerPulseMin.addSelectionListener(_defaultSelectionListener);
-
-			// label: bpm
-			final Label label = new Label(parent, SWT.NONE);
-			label.setText(GRAPH_LABEL_HEARTBEAT_UNIT);
 		}
 
-		/*
-		 * Pulse max value
-		 */
+		// Pulse max value
 		{
 			// ckeckbox
 			_chkMaxPulse = new Button(parent, SWT.CHECK);
-			_chkMaxPulse.setText(Messages.Pref_Graphs_Checkbox_ForcePulseMaxValue);
+			GridDataFactory.fillDefaults()//
+					.indent(_columnSpacing, 0)
+					.applyTo(_chkMaxPulse);
 			_chkMaxPulse.addSelectionListener(_defaultSelectionListener);
 
 			// spinner
@@ -576,46 +603,45 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 			_spinnerPulseMax.setMaximum(PrefPagePeople.HEART_BEAT_MAX);
 			_spinnerPulseMax.addMouseWheelListener(_defaultMouseWheelListener);
 			_spinnerPulseMax.addSelectionListener(_defaultSelectionListener);
-
-			// label: bpm
-			final Label label = new Label(parent, SWT.NONE);
-			label.setText(GRAPH_LABEL_HEARTBEAT_UNIT);
 		}
+
+		// label: bpm
+		label = new Label(parent, SWT.NONE);
+		label.setText(GRAPH_LABEL_HEARTBEAT_UNIT);
 	}
 
 	private void createUI_58_MinMax_Pace(final Group parent) {
 
-		/*
-		 * Pace min value
-		 */
+		// label
+		Label label = new Label(parent, SWT.NONE);
+		label.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, false));
+		label.setText(Messages.Pref_Graphs_Checkbox_ForcePaceValue);
+
+		// Pace min value
 		{
 			// ckeckbox
 			_chkMinPace = new Button(parent, SWT.CHECK);
-			_chkMinPace.setText(Messages.Pref_Graphs_Checkbox_ForcePaceMinValue);
+			GridDataFactory.fillDefaults()//
+					.indent(_columnSpacing, 0)
+					.applyTo(_chkMinPace);
 			_chkMinPace.addSelectionListener(_defaultSelectionListener);
 
 			// spinner
 			_spinnerPaceMin = new Spinner(parent, SWT.BORDER);
-			GridDataFactory.fillDefaults() //
-					.indent(0, _pc.convertVerticalDLUsToPixels(4))
-					.applyTo(_spinnerPaceMin);
+			GridDataFactory.fillDefaults().applyTo(_spinnerPaceMin);
 			_spinnerPaceMin.setMinimum(PACE_MIN);
 			_spinnerPaceMin.setMaximum(PACE_MAX);
 			_spinnerPaceMin.addMouseWheelListener(_defaultMouseWheelListener);
 			_spinnerPaceMin.addSelectionListener(_defaultSelectionListener);
-
-			// label: minutes
-			final Label label = new Label(parent, SWT.NONE);
-			label.setText(Messages.app_unit_minutes);
 		}
 
-		/*
-		 * Pace max value
-		 */
+		// Pace max value
 		{
 			// ckeckbox
 			_chkMaxPace = new Button(parent, SWT.CHECK);
-			_chkMaxPace.setText(Messages.Pref_Graphs_Checkbox_ForcePaceMaxValue);
+			GridDataFactory.fillDefaults()//
+					.indent(_columnSpacing, 0)
+					.applyTo(_chkMaxPace);
 			_chkMaxPace.addSelectionListener(_defaultSelectionListener);
 
 			// spinner
@@ -625,11 +651,11 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 			_spinnerPaceMax.setMaximum(PACE_MAX);
 			_spinnerPaceMax.addMouseWheelListener(_defaultMouseWheelListener);
 			_spinnerPaceMax.addSelectionListener(_defaultSelectionListener);
-
-			// label: minutes
-			final Label label = new Label(parent, SWT.NONE);
-			label.setText(Messages.app_unit_minutes);
 		}
+
+		// label: minutes
+		label = new Label(parent, SWT.NONE);
+		label.setText(Messages.app_unit_minutes);
 	}
 
 	/**
@@ -1181,8 +1207,8 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 	private void restoreState() {
 
 		restoreState_Tab_1_Graphs();
-		restoreState_Tab_2_Grid();
-		restoreState_Tab_3_MinMax();
+		restoreState_Tab_2_MinMax();
+		restoreState_Tab_3_Grid();
 		restoreState_Tab_4_Options();
 
 		// selected tab
@@ -1259,34 +1285,7 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 		_graphCheckboxList.setCheckedElements(checkedGraphs.toArray());
 	}
 
-	private void restoreState_Tab_2_Grid() {
-
-		/*
-		 * Graid
-		 */
-		_spinnerGridHorizontalDistance.setSelection(//
-				_prefStore.getInt(ITourbookPreferences.GRAPH_GRID_HORIZONTAL_DISTANCE));
-		_spinnerGridVerticalDistance.setSelection(//
-				_prefStore.getInt(ITourbookPreferences.GRAPH_GRID_VERTICAL_DISTANCE));
-
-		_chkShowHorizontalGridLines.setSelection(//
-				_prefStore.getBoolean(ITourbookPreferences.GRAPH_GRID_IS_SHOW_HORIZONTAL_GRIDLINES));
-		_chkShowVerticalGridLines.setSelection(//
-				_prefStore.getBoolean(ITourbookPreferences.GRAPH_GRID_IS_SHOW_VERTICAL_GRIDLINES));
-
-		/*
-		 * Units
-		 */
-		if (_prefStore.getString(ITourbookPreferences.GRAPH_X_AXIS).equals(TourManager.X_AXIS_TIME)) {
-			_rdoShowTime.setSelection(true);
-		} else {
-			_rdoShowDistance.setSelection(true);
-		}
-
-		_chkShowStartTime.setSelection(_prefStore.getBoolean(ITourbookPreferences.GRAPH_X_AXIS_STARTTIME));
-	}
-
-	private void restoreState_Tab_3_MinMax() {
+	private void restoreState_Tab_2_MinMax() {
 
 		// min/max altimeter
 		_chkMinAltimeter.setSelection(//
@@ -1329,6 +1328,33 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 				_prefStore.getInt(ITourbookPreferences.GRAPH_PULSE_MAX_VALUE));
 	}
 
+	private void restoreState_Tab_3_Grid() {
+
+		/*
+		 * Graid
+		 */
+		_spinnerGridHorizontalDistance.setSelection(//
+				_prefStore.getInt(ITourbookPreferences.GRAPH_GRID_HORIZONTAL_DISTANCE));
+		_spinnerGridVerticalDistance.setSelection(//
+				_prefStore.getInt(ITourbookPreferences.GRAPH_GRID_VERTICAL_DISTANCE));
+
+		_chkShowHorizontalGridLines.setSelection(//
+				_prefStore.getBoolean(ITourbookPreferences.GRAPH_GRID_IS_SHOW_HORIZONTAL_GRIDLINES));
+		_chkShowVerticalGridLines.setSelection(//
+				_prefStore.getBoolean(ITourbookPreferences.GRAPH_GRID_IS_SHOW_VERTICAL_GRIDLINES));
+
+		/*
+		 * Units
+		 */
+		if (_prefStore.getString(ITourbookPreferences.GRAPH_X_AXIS).equals(TourManager.X_AXIS_TIME)) {
+			_rdoShowTime.setSelection(true);
+		} else {
+			_rdoShowDistance.setSelection(true);
+		}
+
+		_chkShowStartTime.setSelection(_prefStore.getBoolean(ITourbookPreferences.GRAPH_X_AXIS_STARTTIME));
+	}
+
 	private void restoreState_Tab_4_Options() {
 
 		// mouse wheel mode
@@ -1348,8 +1374,8 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 	private void saveState() {
 
 		saveState_Tab_1_Graphs();
-		saveState_Tab_2_Grid();
-		saveState_Tab_3_MinMax();
+		saveState_Tab_2_MinMax();
+		saveState_Tab_3_Grid();
 		saveState_Tab_4_Options();
 
 		// live update
@@ -1403,29 +1429,7 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 		_prefStore.setValue(ITourbookPreferences.GRAPH_ALL, StringToArrayConverter.convertArrayToString(prefGraphs));
 	}
 
-	private void saveState_Tab_2_Grid() {
-
-		_prefStore.setValue(ITourbookPreferences.GRAPH_GRID_HORIZONTAL_DISTANCE, //
-				_spinnerGridHorizontalDistance.getSelection());
-		_prefStore.setValue(ITourbookPreferences.GRAPH_GRID_VERTICAL_DISTANCE, //
-				_spinnerGridVerticalDistance.getSelection());
-
-		_prefStore.setValue(ITourbookPreferences.GRAPH_GRID_IS_SHOW_HORIZONTAL_GRIDLINES, //
-				_chkShowHorizontalGridLines.getSelection());
-		_prefStore.setValue(ITourbookPreferences.GRAPH_GRID_IS_SHOW_VERTICAL_GRIDLINES, //
-				_chkShowVerticalGridLines.getSelection());
-
-		if (_rdoShowTime.getSelection()) {
-			_prefStore.setValue(ITourbookPreferences.GRAPH_X_AXIS, TourManager.X_AXIS_TIME);
-		} else {
-			_prefStore.setValue(ITourbookPreferences.GRAPH_X_AXIS, TourManager.X_AXIS_DISTANCE);
-		}
-
-		_prefStore.setValue(ITourbookPreferences.GRAPH_X_AXIS_STARTTIME, //
-				_chkShowStartTime.getSelection());
-	}
-
-	private void saveState_Tab_3_MinMax() {
+	private void saveState_Tab_2_MinMax() {
 
 		// min/max altimeter
 		_prefStore.setValue(ITourbookPreferences.GRAPH_ALTIMETER_IS_MIN_ENABLED, _chkMinAltimeter.getSelection());
@@ -1450,6 +1454,28 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 		_prefStore.setValue(ITourbookPreferences.GRAPH_PULSE_IS_MAX_ENABLED, _chkMaxPulse.getSelection());
 		_prefStore.setValue(ITourbookPreferences.GRAPH_PULSE_MIN_VALUE, _spinnerPulseMin.getSelection());
 		_prefStore.setValue(ITourbookPreferences.GRAPH_PULSE_MAX_VALUE, _spinnerPulseMax.getSelection());
+	}
+
+	private void saveState_Tab_3_Grid() {
+
+		_prefStore.setValue(ITourbookPreferences.GRAPH_GRID_HORIZONTAL_DISTANCE, //
+				_spinnerGridHorizontalDistance.getSelection());
+		_prefStore.setValue(ITourbookPreferences.GRAPH_GRID_VERTICAL_DISTANCE, //
+				_spinnerGridVerticalDistance.getSelection());
+
+		_prefStore.setValue(ITourbookPreferences.GRAPH_GRID_IS_SHOW_HORIZONTAL_GRIDLINES, //
+				_chkShowHorizontalGridLines.getSelection());
+		_prefStore.setValue(ITourbookPreferences.GRAPH_GRID_IS_SHOW_VERTICAL_GRIDLINES, //
+				_chkShowVerticalGridLines.getSelection());
+
+		if (_rdoShowTime.getSelection()) {
+			_prefStore.setValue(ITourbookPreferences.GRAPH_X_AXIS, TourManager.X_AXIS_TIME);
+		} else {
+			_prefStore.setValue(ITourbookPreferences.GRAPH_X_AXIS, TourManager.X_AXIS_DISTANCE);
+		}
+
+		_prefStore.setValue(ITourbookPreferences.GRAPH_X_AXIS_STARTTIME, //
+				_chkShowStartTime.getSelection());
 	}
 
 	private void saveState_Tab_4_Options() {

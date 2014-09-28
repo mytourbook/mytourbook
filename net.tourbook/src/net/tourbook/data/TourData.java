@@ -121,10 +121,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	public static final int										DB_LENGTH_WEATHER					= 1000;
 	public static final int										DB_LENGTH_WEATHER_CLOUDS			= 255;
 
-	public static final int										GPS_STATE_WITHOUT_GPS				= 0;
-	public static final int										GPS_STATE_WITH_GPS					= 1;
-	public static final int										GPS_STATE_WITH_MERGED_GPS			= 2;
-
 	private static final String									TIME_ZONE_ID_EUROPE_BERLIN			= "Europe/Berlin";										//$NON-NLS-1$
 
 	public static final int										MIN_TIMEINTERVAL_FOR_MAX_SPEED		= 20;
@@ -596,12 +592,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	 */
 	@Basic(optional = false)
 	private SerieData											serieData;
-
-	/**
-	 * This state contains {@link #GPS_STATE_WITH_GPS} when the tour was created with GPS data
-	 * otherwise the state is 0.
-	 */
-	private int													gpsState;
 
 	/**
 	 * Photos for this tour
@@ -1221,8 +1211,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 			latitudeSerie = null;
 			longitudeSerie = null;
 		}
-
-		setGpsState(latitudeSerie == null ? GPS_STATE_WITHOUT_GPS : GPS_STATE_WITH_GPS);
 	}
 
 	/**
@@ -4618,10 +4606,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		return _gpsBounds;
 	}
 
-	public int getGpsState() {
-		return gpsState;
-	}
-
 	/**
 	 * @return Returns the metric or imperial altimeter serie depending on the active measurement
 	 */
@@ -5874,18 +5858,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 	public void setDpTolerance(final short dpTolerance) {
 		this.dpTolerance = dpTolerance;
-	}
-
-	/**
-	 * Set state if the tour contains GPS data when the tour was created.
-	 * <p>
-	 * The state {@link #GPS_STATE_WITH_GPS} is set when the tour was created with GPS data
-	 * otherwise the state is {@link #GPS_STATE_WITHOUT_GPS} or {@link #GPS_STATE_WITH_MERGED_GPS}.
-	 * 
-	 * @param gpsState
-	 */
-	public void setGpsState(final int gpsState) {
-		this.gpsState = gpsState;
 	}
 
 	/**

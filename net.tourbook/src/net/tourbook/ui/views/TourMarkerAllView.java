@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -46,6 +46,7 @@ import net.tourbook.tour.TourEvent;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.ITourProvider;
+import net.tourbook.ui.Messages;
 import net.tourbook.ui.TableColumnFactory;
 import net.tourbook.ui.action.ActionEditQuick;
 import net.tourbook.ui.action.ActionEditTour;
@@ -99,79 +100,81 @@ import org.eclipse.ui.part.ViewPart;
  */
 public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourViewer {
 
-	public static final String			ID								= "net.tourbook.ui.views.TourMarkerAllView";	//$NON-NLS-1$
+	public static final String				ID								= "net.tourbook.ui.views.TourMarkerAllView";	//$NON-NLS-1$
 	//
-	private static final String			COLUMN_ALTITUDE					= "Altitude";									//$NON-NLS-1$
-	private static final String			COLUMN_DATE						= "Date";										//$NON-NLS-1$
-	private static final String			COLUMN_DESCRIPTION				= "Description";								//$NON-NLS-1$
-	private static final String			COLUMN_LATITUDE					= "Latitude";									//$NON-NLS-1$
-	private static final String			COLUMN_LONGITUDE				= "Longitude";									//$NON-NLS-1$
-	private static final String			COLUMN_MARKER_ID				= "MarkerId";									//$NON-NLS-1$
-	private static final String			COLUMN_NAME						= "Name";										//$NON-NLS-1$
-	private static final String			COLUMN_TOUR_ID					= "TourId";									//$NON-NLS-1$
-	private static final String			COLUMN_TIME						= "Time";										//$NON-NLS-1$
-	private static final String			COLUMN_URL_ADDRESS				= "UrlAddress";								//$NON-NLS-1$
-	private static final String			COLUMN_URL_LABEL				= "UrlLabel";									//$NON-NLS-1$
+	private static final String				COLUMN_ALTITUDE					= "Altitude";									//$NON-NLS-1$
+	private static final String				COLUMN_DATE						= "Date";										//$NON-NLS-1$
+	private static final String				COLUMN_DESCRIPTION				= "Description";								//$NON-NLS-1$
+	private static final String				COLUMN_LATITUDE					= "Latitude";									//$NON-NLS-1$
+	private static final String				COLUMN_LONGITUDE				= "Longitude";									//$NON-NLS-1$
+	private static final String				COLUMN_MARKER_ID				= "MarkerId";									//$NON-NLS-1$
+	private static final String				COLUMN_NAME						= "Name";										//$NON-NLS-1$
+	private static final String				COLUMN_TOUR_ID					= "TourId";									//$NON-NLS-1$
+	private static final String				COLUMN_TIME						= "Time";										//$NON-NLS-1$
+	private static final String				COLUMN_URL_ADDRESS				= "UrlAddress";								//$NON-NLS-1$
+	private static final String				COLUMN_URL_LABEL				= "UrlLabel";									//$NON-NLS-1$
 	//
-	private static final String			STATE_SELECTED_MARKER_ITEM		= "STATE_SELECTED_MARKER_ITEM";				//$NON-NLS-1$
-	private static final String			STATE_SORT_COLUMN_DIRECTION		= "STATE_SORT_COLUMN_DIRECTION";				//$NON-NLS-1$
-	private static final String			STATE_SORT_COLUMN_ID			= "STATE_SORT_COLUMN_ID";						//$NON-NLS-1$
-	private static final String			STATE_TOUR_FILTER_GPS			= "STATE_TOUR_FILTER_GPS";						//$NON-NLS-1$
+	private static final String				STATE_SELECTED_MARKER_ITEM		= "STATE_SELECTED_MARKER_ITEM";				//$NON-NLS-1$
+	private static final String				STATE_GEO_POSITION_ACCURACY		= "STATE_GEO_POSITION_ACCURACY";				//$NON-NLS-1$
+	private static final String				STATE_SORT_COLUMN_DIRECTION		= "STATE_SORT_COLUMN_DIRECTION";				//$NON-NLS-1$
+	private static final String				STATE_SORT_COLUMN_ID			= "STATE_SORT_COLUMN_ID";						//$NON-NLS-1$
+	private static final String				STATE_TOUR_FILTER_GPS			= "STATE_TOUR_FILTER_GPS";						//$NON-NLS-1$
 	//
-	private static int					MARKER_GPS_FILTER_IS_DISABLED	= 0;
-	private static int					MARKER_GPS_FILTER_WITH_GPS		= 1;
-	private static int					MARKER_GPS_FILTER_WITH_NO_GPS	= 2;
+	private static int						MARKER_GPS_FILTER_IS_DISABLED	= 0;
+	private static int						MARKER_GPS_FILTER_WITH_GPS		= 1;
+	private static int						MARKER_GPS_FILTER_WITH_NO_GPS	= 2;
 	//
-	private final IPreferenceStore		_prefStore						= TourbookPlugin.getPrefStore();
-	private final IDialogSettings		_state							= TourbookPlugin.getState("TourMarkerAllView"); //$NON-NLS-1$
+	private final IPreferenceStore			_prefStore						= TourbookPlugin.getPrefStore();
+	private final IDialogSettings			_state							= TourbookPlugin
+																					.getState("TourMarkerAllView");		//$NON-NLS-1$
 	//
-	private PostSelectionProvider		_postSelectionProvider;
+	private PostSelectionProvider			_postSelectionProvider;
 	//
-	private IPartListener2				_partListener;
-	private IPropertyChangeListener		_prefChangeListener;
-	private ITourEventListener			_tourEventListener;
+	private IPartListener2					_partListener;
+	private IPropertyChangeListener			_prefChangeListener;
+	private ITourEventListener				_tourEventListener;
 	//
-	private ActionEditTour				_actionEditTour;
-	private ActionModifyColumns			_actionModifyColumns;
-	private ActionOpenMarkerDialog		_actionOpenMarkerDialog;
-	private ActionOpenTour				_actionOpenTour;
-	private ActionEditQuick				_actionQuickEdit;
-	private ActionMarkerFilterWithGPS	_actionTourFilterWithGPS;
-	private ActionMarkerFilterWithNoGPS	_actionTourFilterWithoutGPS;
+	private ActionEditTour					_actionEditTour;
+	private ActionModifyColumns				_actionModifyColumns;
+	private ActionOpenMarkerDialog			_actionOpenMarkerDialog;
+	private ActionOpenTour					_actionOpenTour;
+	private ActionEditQuick					_actionQuickEdit;
+	private ActionSetGeoPositionAccuracy	_actionSetPositionAccuracy;
+	private ActionMarkerFilterWithGPS		_actionTourFilterWithGPS;
+	private ActionMarkerFilterWithNoGPS		_actionTourFilterWithoutGPS;
 
-	private PixelConverter				_pc;
+	private ArrayList<TourMarkerItem>		_allMarkerItems					= new ArrayList<TourMarkerItem>();
 
-	private ArrayList<TourMarkerItem>	_allMarkerItems					= new ArrayList<TourMarkerItem>();
+	private int								_markerFilterGPS				= MARKER_GPS_FILTER_IS_DISABLED;
 
-	private int							_markerFilterGPS				= MARKER_GPS_FILTER_IS_DISABLED;
+	private int								_geoPositionAccuracy;
+	private boolean							_isInUpdate;
 
-	private boolean						_isInUpdate;
-
-	private final DateFormat			_dateFormatter					= DateFormat.getDateInstance(DateFormat.SHORT);
-	private final DateFormat			_timeFormatter					= DateFormat.getTimeInstance(DateFormat.SHORT);
-
+	private final DateFormat				_dateFormatter					= DateFormat
+																					.getDateInstance(DateFormat.SHORT);
+	private final DateFormat				_timeFormatter					= DateFormat
+																					.getTimeInstance(DateFormat.SHORT);
 	//
-	private final NumberFormat			_nf1							= NumberFormat.getNumberInstance();
-	private final NumberFormat			_nf3							= NumberFormat.getNumberInstance();
-	private final NumberFormat			_nf4							= NumberFormat.getNumberInstance();
+	private final NumberFormat				_nf1							= NumberFormat.getNumberInstance();
+	private final NumberFormat				_nf3							= NumberFormat.getNumberInstance();
+	private final NumberFormat				_nfGeo							= NumberFormat.getNumberInstance();
 	{
 		_nf1.setMinimumFractionDigits(1);
 		_nf1.setMaximumFractionDigits(1);
 		_nf3.setMinimumFractionDigits(3);
 		_nf3.setMaximumFractionDigits(3);
-		_nf4.setMinimumFractionDigits(3);
-		_nf4.setMaximumFractionDigits(3);
 	}
 	//
-	private TableViewer					_markerViewer;
-	private MarkerComparator			_markerComparator				= new MarkerComparator();
-	private ColumnManager				_columnManager;
-	private SelectionAdapter			_columnSortListener;
+	private TableViewer						_markerViewer;
+	private MarkerComparator				_markerComparator				= new MarkerComparator();
+	private ColumnManager					_columnManager;
+	private SelectionAdapter				_columnSortListener;
 
 	/*
 	 * UI controls
 	 */
-	private Composite					_viewerContainer;
+	private PixelConverter					_pc;
+	private Composite						_viewerContainer;
 
 	private class MarkerComparator extends ViewerComparator {
 
@@ -187,6 +190,7 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 			final TourMarkerItem m1 = (TourMarkerItem) e1;
 			final TourMarkerItem m2 = (TourMarkerItem) e2;
 
+			boolean _isSortByTime = false;
 			double rc = 0;
 
 			// Determine which column and do the appropriate sort
@@ -204,6 +208,7 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 				if (rc == 0) {
 					rc = m1._longitude - m2._longitude;
 				}
+				_isSortByTime = true;
 				break;
 
 			case COLUMN_LONGITUDE:
@@ -211,6 +216,7 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 				if (rc == 0) {
 					rc = m1._latitude - m2._latitude;
 				}
+				_isSortByTime = true;
 				break;
 
 			case COLUMN_MARKER_ID:
@@ -237,11 +243,11 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 			case COLUMN_NAME:
 			default:
 				rc = m1._label.compareTo(m2._label);
+				_isSortByTime = true;
+			}
 
-				if (rc == 0) {
-					rc = m1._time - m2._time;
-//					rc = m1._longitude - m2._longitude;
-				}
+			if (rc == 0 && _isSortByTime) {
+				rc = m1._time - m2._time;
 			}
 
 			// If descending order, flip the direction
@@ -421,6 +427,19 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 		});
 	}
 
+	void actionSetGeoPositionAccuracy(final int selectedAccuracy) {
+
+		if (selectedAccuracy == _geoPositionAccuracy) {
+			// nothing has changed
+			return;
+		}
+
+		_geoPositionAccuracy = selectedAccuracy;
+		validateGeoPosition();
+
+		reloadViewer();
+	}
+
 	private void addPartListener() {
 
 		_partListener = new IPartListener2() {
@@ -525,14 +544,14 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 
 	private void createActions() {
 
+		_actionEditTour = new ActionEditTour(this);
 		_actionModifyColumns = new ActionModifyColumns(this);
 		_actionOpenMarkerDialog = new ActionOpenMarkerDialog(this, true);
+		_actionOpenTour = new ActionOpenTour(this);
+		_actionQuickEdit = new ActionEditQuick(this);
+		_actionSetPositionAccuracy = new ActionSetGeoPositionAccuracy(this);
 		_actionTourFilterWithGPS = new ActionMarkerFilterWithGPS(this);
 		_actionTourFilterWithoutGPS = new ActionMarkerFilterWithNoGPS(this);
-
-		_actionQuickEdit = new ActionEditQuick(this);
-		_actionEditTour = new ActionEditTour(this);
-		_actionOpenTour = new ActionOpenTour(this);
 	}
 
 	@Override
@@ -654,14 +673,17 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 	private void defineAllColumns() {
 
 		defineColumn_Name();
+
 		defineColumn_Date();
 		defineColumn_Time();
+
 		defineColumn_Altitude();
+		defineColumn_Latitude();
+		defineColumn_Longitude();
+
 		defineColumn_Description();
 		defineColumn_UrlLabel();
 		defineColumn_UrlAddress();
-		defineColumn_Latitude();
-		defineColumn_Longitude();
 
 		defineColumn_MarkerId();
 		defineColumn_TourId();
@@ -703,7 +725,7 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 
 		final ColumnDefinition colDef = new TableColumnDefinition(_columnManager, COLUMN_DATE, SWT.TRAIL);
 
-		colDef.setColumnName("Date");
+		colDef.setColumnName(Messages.ColumnFactory_Waypoint_Date);
 
 		colDef.setIsDefaultColumn();
 		colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(12));
@@ -734,7 +756,6 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 		colDef.setColumnId(COLUMN_DESCRIPTION);
 		colDef.setColumnSelectionListener(_columnSortListener);
 
-		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -752,7 +773,8 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 
 		final ColumnDefinition colDef = new TableColumnDefinition(_columnManager, COLUMN_LATITUDE, SWT.TRAIL);
 
-		colDef.setColumnName("Latitude");
+		colDef.setColumnName(Messages.ColumnFactory_latitude);
+		colDef.setIsDefaultColumn();
 
 		colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(11));
 		colDef.setColumnSelectionListener(_columnSortListener);
@@ -767,7 +789,11 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 				if (latitude == TourDatabase.DEFAULT_DOUBLE) {
 					valueText = UI.EMPTY_STRING;
 				} else {
-					valueText = _nf4.format(latitude);
+					if (_geoPositionAccuracy == ActionSetGeoPositionAccuracy.DISABLED_ACCURACY) {
+						valueText = Double.toString(latitude);
+					} else {
+						valueText = _nfGeo.format(latitude);
+					}
 				}
 
 				cell.setText(valueText);
@@ -782,7 +808,8 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 
 		final ColumnDefinition colDef = new TableColumnDefinition(_columnManager, COLUMN_LONGITUDE, SWT.TRAIL);
 
-		colDef.setColumnName("Longitude");
+		colDef.setColumnName(Messages.ColumnFactory_longitude);
+		colDef.setIsDefaultColumn();
 
 		colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(11));
 		colDef.setColumnSelectionListener(_columnSortListener);
@@ -797,7 +824,11 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 				if (longitude == TourDatabase.DEFAULT_DOUBLE) {
 					valueText = UI.EMPTY_STRING;
 				} else {
-					valueText = _nf4.format(longitude);
+					if (_geoPositionAccuracy == ActionSetGeoPositionAccuracy.DISABLED_ACCURACY) {
+						valueText = Double.toString(longitude);
+					} else {
+						valueText = _nfGeo.format(longitude);
+					}
 				}
 
 				cell.setText(valueText);
@@ -812,7 +843,7 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 
 		final ColumnDefinition colDef = new TableColumnDefinition(_columnManager, COLUMN_MARKER_ID, SWT.LEAD);
 
-		colDef.setColumnName("Marker ID");
+		colDef.setColumnName(Messages.ColumnFactory_TourMarkerId);
 
 		colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(12));
 		colDef.setColumnSelectionListener(_columnSortListener);
@@ -855,10 +886,14 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 
 		final ColumnDefinition colDef = new TableColumnDefinition(_columnManager, COLUMN_TIME, SWT.TRAIL);
 
-		colDef.setColumnName("Time");
+		colDef.setColumnName(Messages.ColumnFactory_tour_time_label_hhmmss);
 
 		colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(12));
-		colDef.setColumnSelectionListener(_columnSortListener);
+
+		/*
+		 * a marker cannot be sorted by time only by date
+		 */
+//		colDef.setColumnSelectionListener(_columnSortListener);
 
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
@@ -879,7 +914,7 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 
 		final ColumnDefinition colDef = new TableColumnDefinition(_columnManager, COLUMN_TOUR_ID, SWT.LEAD);
 
-		colDef.setColumnName("Tour ID");
+		colDef.setColumnName(Messages.ColumnFactory_TourId);
 
 		colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(22));
 		colDef.setColumnSelectionListener(_columnSortListener);
@@ -900,7 +935,7 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 
 		final ColumnDefinition colDef = new TableColumnDefinition(_columnManager, COLUMN_URL_ADDRESS, SWT.LEAD);
 
-		colDef.setColumnName("Url Address");
+		colDef.setColumnName(Messages.ColumnFactory_InetAddress_Url);
 
 		colDef.setIsDefaultColumn();
 		colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(20));
@@ -922,7 +957,7 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 
 		final ColumnDefinition colDef = new TableColumnDefinition(_columnManager, COLUMN_URL_LABEL, SWT.LEAD);
 
-		colDef.setColumnName("Url Label");
+		colDef.setColumnName(Messages.ColumnFactory_InetAddress_Label);
 
 		colDef.setIsDefaultColumn();
 		colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(20));
@@ -991,7 +1026,7 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 		 */
 		final IMenuManager menuMgr = actionBars.getMenuManager();
 
-		menuMgr.add(new Separator());
+		menuMgr.add(_actionSetPositionAccuracy);
 		menuMgr.add(_actionModifyColumns);
 
 		/*
@@ -1120,6 +1155,8 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 
 		_allMarkerItems.clear();
 
+		final double geoAccuracyFactor = Math.pow(10, _geoPositionAccuracy);
+
 		Connection conn = null;
 		PreparedStatement statement = null;
 		ResultSet result = null;
@@ -1131,21 +1168,21 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 			final String tblTourMarker = TourDatabase.TABLE_TOUR_MARKER;
 			final String tourKey = TourDatabase.KEY_TOUR;
 
-			final String sql = "SELECT " //
-					+ "MarkerID, " //						// 1
-					+ (tourKey + ", ") //					// 2
-					+ "Label, " //							// 3
-					+ "description, " //					// 4
-					+ "urlText, " //						// 5
-					+ "urlAddress, " //						// 6
-					+ "latitude, " //						// 7
-					+ "longitude, " //						// 8
-					+ "altitude, " //						// 9
-					+ "tourTime " //						// 10
+			final String sql = "SELECT " // //$NON-NLS-1$
+					+ "MarkerID, " //						// 1 //$NON-NLS-1$
+					+ (tourKey + ", ") //					// 2 //$NON-NLS-1$
+					+ "Label, " //							// 3 //$NON-NLS-1$
+					+ "description, " //					// 4 //$NON-NLS-1$
+					+ "urlText, " //						// 5 //$NON-NLS-1$
+					+ "urlAddress, " //						// 6 //$NON-NLS-1$
+					+ "latitude, " //						// 7 //$NON-NLS-1$
+					+ "longitude, " //						// 8 //$NON-NLS-1$
+					+ "altitude, " //						// 9 //$NON-NLS-1$
+					+ "tourTime " //						// 10 //$NON-NLS-1$
 					//
 					+ UI.NEW_LINE
 					//
-					+ (" FROM " + tblTourMarker + UI.NEW_LINE)
+					+ (" FROM " + tblTourMarker + UI.NEW_LINE) //$NON-NLS-1$
 			//
 			;
 
@@ -1174,14 +1211,21 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 
 				} else {
 
-					final long longLat = (long) (dbLatitude * 1000);
-					final long longLon = (long) (dbLongitude * 1000);
+					if (_geoPositionAccuracy == ActionSetGeoPositionAccuracy.DISABLED_ACCURACY) {
 
-					final double latitude = longLat / 1000.0;
-					final double longitude = longLon / 1000.0;
+						markerItem._latitude = dbLatitude;
+						markerItem._longitude = dbLongitude;
 
-					markerItem._latitude = latitude;
-					markerItem._longitude = longitude;
+					} else {
+
+						// set geo accuracy
+
+						final long longLat = (long) (dbLatitude * geoAccuracyFactor);
+						final long longLon = (long) (dbLongitude * geoAccuracyFactor);
+
+						markerItem._latitude = longLat / geoAccuracyFactor;
+						markerItem._longitude = longLon / geoAccuracyFactor;
+					}
 				}
 
 				markerItem._markerId = result.getLong(1);
@@ -1380,6 +1424,13 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 		// GPS tour filter
 		_markerFilterGPS = Util.getStateInt(_state, STATE_TOUR_FILTER_GPS, MARKER_GPS_FILTER_IS_DISABLED);
 
+		// geo position accuracy
+		_geoPositionAccuracy = Util.getStateInt(_state,//
+				STATE_GEO_POSITION_ACCURACY,
+				ActionSetGeoPositionAccuracy.DEFAULT_ACCURACY);
+		validateGeoPosition();
+
+		// sorting
 		final String sortColumnId = Util.getStateString(_state, STATE_SORT_COLUMN_ID, COLUMN_NAME);
 		final int sortDirection = Util.getStateInt(_state, STATE_SORT_COLUMN_DIRECTION, MarkerComparator.ASCENDING);
 
@@ -1393,6 +1444,9 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 		// GPS tour filter
 		_actionTourFilterWithGPS.setChecked(_markerFilterGPS == MARKER_GPS_FILTER_WITH_GPS);
 		_actionTourFilterWithoutGPS.setChecked(_markerFilterGPS == MARKER_GPS_FILTER_WITH_NO_GPS);
+
+		// geo position accuracy
+		_actionSetPositionAccuracy.setAccuracy(_geoPositionAccuracy);
 
 		/*
 		 * select marker item
@@ -1423,6 +1477,7 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 		_state.put(STATE_SORT_COLUMN_DIRECTION, _markerComparator.__sortDirection);
 
 		_state.put(STATE_TOUR_FILTER_GPS, _markerFilterGPS);
+		_state.put(STATE_GEO_POSITION_ACCURACY, _geoPositionAccuracy);
 
 		/*
 		 * selected marker item
@@ -1480,6 +1535,23 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 			_markerViewer.setInput(new Object[0]);
 		}
 		_isInUpdate = false;
+	}
+
+	/**
+	 * Validates geo position accuracy and setup's the position formatter.
+	 */
+	private void validateGeoPosition() {
+
+		if (_geoPositionAccuracy != ActionSetGeoPositionAccuracy.DISABLED_ACCURACY) {
+
+			// ensure value is valid
+			if (_geoPositionAccuracy < 0 || _geoPositionAccuracy > ActionSetGeoPositionAccuracy.MAX_ACCURACY) {
+				_geoPositionAccuracy = ActionSetGeoPositionAccuracy.DEFAULT_ACCURACY;
+			}
+
+			_nfGeo.setMinimumFractionDigits(_geoPositionAccuracy);
+			_nfGeo.setMaximumFractionDigits(_geoPositionAccuracy);
+		}
 	}
 
 }

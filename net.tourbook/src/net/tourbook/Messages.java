@@ -31,7 +31,7 @@ public class Messages extends NLS {
 	public static String		Action_PhotosAndTours_FilterPhotos_Tooltip;
 	public static String		Action_PhotosAndTours_SavePhotoInTour;
 
-	public static String		Action_SharedMarker_ConvertFromTourMarker;
+//	public static String		Action_SharedMarker_ConvertFromTourMarker;
 
 //	public static String		Action_Sign_MarkerImagePreferences;
 //	public static String		Action_Sign_RemoveMarkerImage;
@@ -180,6 +180,10 @@ public class Messages extends NLS {
 	public static String		Action_Tag_Add_RecentTags;
 	public static String		Action_Tag_AutoOpenCancel;
 	public static String		Action_Tag_AutoOpenOK;
+
+	public static String		Action_TourMarkerAllView_DisableGeoPositionAccuracy;
+	public static String		Action_TourMarkerAllView_GeoPositionAccuracy;
+	public static String		Action_TourMarkerAllView_SetGeoPositionAccuracy;
 
 	public static String		Action_TourType_ModifyTourTypeFilter;
 
@@ -772,8 +776,6 @@ public class Messages extends NLS {
 	public static String		Import_Data_Link_Import;
 	public static String		Import_Data_Link_ReceiveFromSerialPort_Configured;
 	public static String		Import_Data_Link_ReceiveFromSerialPort_Directly;
-	public static String		Import_Data_Link_Transfer;
-	public static String		Import_Data_Link_TransferDirectly;
 
 	public static String		Import_Wizard_Control_combo_person_default_settings;
 	public static String		Import_Wizard_Control_combo_ports_not_available;
@@ -907,16 +909,12 @@ public class Messages extends NLS {
 	public static String		Pref_Graphs_Check_force_minimum_for_gradient;
 	public static String		Pref_Graphs_Check_force_minmax_for_pace;
 	public static String		Pref_Graphs_Check_show_start_time;
+	public static String		Pref_Graphs_Checkbox_ForceAltimeterValue;
+	public static String		Pref_Graphs_Checkbox_ForceGradientValue;
+	public static String		Pref_Graphs_Checkbox_ForcePaceValue;
+	public static String		Pref_Graphs_Checkbox_ForcePulseValue;
 	public static String		Pref_Graphs_Checkbox_GraphAntialiasing;
 	public static String		Pref_Graphs_Checkbox_GraphAntialiasing_Tooltip;
-	public static String		Pref_Graphs_Checkbox_ForceAltimeterMaxValue;
-	public static String		Pref_Graphs_Checkbox_ForceAltimeterMinValue;
-	public static String		Pref_Graphs_Checkbox_ForceGradientMaxValue;
-	public static String		Pref_Graphs_Checkbox_ForceGradientMinValue;
-	public static String		Pref_Graphs_Checkbox_ForcePaceMaxValue;
-	public static String		Pref_Graphs_Checkbox_ForcePaceMinValue;
-	public static String		Pref_Graphs_Checkbox_ForcePulseMaxValue;
-	public static String		Pref_Graphs_Checkbox_ForcePulseMinValue;
 	public static String		Pref_Graphs_Checkbox_ShowHorizontalGrid;
 	public static String		Pref_Graphs_Checkbox_ShowVerticalGrid;
 	public static String		Pref_Graphs_Dialog_GridLine_Warning_Message;
@@ -935,6 +933,10 @@ public class Messages extends NLS {
 	public static String		Pref_Graphs_Label_GraphTransparency_Tooltip;
 	public static String		Pref_Graphs_Label_GraphTransparencyLine;
 	public static String		Pref_Graphs_Label_GraphTransparencyLine_Tooltip;
+	public static String		Pref_Graphs_Label_MaxValue;
+
+	public static String		Pref_Graphs_Label_MinValue;
+
 	public static String		Pref_Graphs_Label_select_graph;
 	public static String		Pref_Graphs_Label_select_graph_tooltip;
 	public static String		Pref_Graphs_move_sliders_when_zoomed;

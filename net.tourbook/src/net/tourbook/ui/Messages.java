@@ -177,14 +177,13 @@ public class Messages extends NLS {
 	public static String		ColumnFactory_Diff_Header;
 	public static String		ColumnFactory_DistanceDelta_Label;
 	public static String		ColumnFactory_DistanceDelta_Tooltip;
-	public static String	ColumnFactory_DPTolerance_Header;
-
-	public static String	ColumnFactory_DPTolerance_Label;
-
-	public static String	ColumnFactory_DPTolerance_Tooltip;
-
+	public static String		ColumnFactory_DPTolerance_Header;
+	public static String		ColumnFactory_DPTolerance_Label;
+	public static String		ColumnFactory_DPTolerance_Tooltip;
 	public static String		ColumnFactory_Id_Label;
 	public static String		ColumnFactory_Id_Tooltip;
+	public static String		ColumnFactory_InetAddress_Label;
+	public static String		ColumnFactory_InetAddress_Url;
 	public static String		ColumnFactory_NumberOfGPSPhotos_Header;
 	public static String		ColumnFactory_NumberOfGPSPhotos_Label;
 	public static String		ColumnFactory_NumberOfGPSPhotos_Tooltip;
@@ -214,11 +213,9 @@ public class Messages extends NLS {
 	public static String		ColumnFactory_tour_week_header;
 	public static String		ColumnFactory_tour_week_label;
 	public static String		ColumnFactory_tour_week_tooltip;
-
 	public static String		ColumnFactory_TimeDelta_Header;
 	public static String		ColumnFactory_TimeDelta_Label;
 	public static String		ColumnFactory_TimeDelta_Tooltip;
-
 	public static String		ColumnFactory_Tour_DayTime;
 	public static String		ColumnFactory_Tour_DayTime_Tooltip;
 	public static String		ColumnFactory_Tour_WeekDay_Header;
@@ -237,6 +234,8 @@ public class Messages extends NLS {
 	public static String		ColumnFactory_TourEndTime_Header;
 	public static String		ColumnFactory_TourEndTime_Label;
 	public static String		ColumnFactory_TourEndTime_Tooltip;
+	public static String		ColumnFactory_TourId;
+	public static String		ColumnFactory_TourMarkerId;
 	public static String		ColumnFactory_TourPerson;
 	public static String		ColumnFactory_TourPerson_Tooltip;
 	public static String		ColumnFactory_TourStartDate_Header;
@@ -253,13 +252,9 @@ public class Messages extends NLS {
 	public static String		ColumnFactory_TourWeekYear_Header;
 	public static String		ColumnFactory_TourWeekYear_Label;
 	public static String		ColumnFactory_TourWeekYear_Tooltip;
-
-	public static String	ColumnFactory_Url_Header;
-
-	public static String	ColumnFactory_Url_Label;
-
-	public static String	ColumnFactory_Url_Tooltip;
-
+	public static String		ColumnFactory_Url_Header;
+	public static String		ColumnFactory_Url_Label;
+	public static String		ColumnFactory_Url_Tooltip;
 	public static String		ColumnFactory_Waypoint_Altitude_Label;
 	public static String		ColumnFactory_Waypoint_Category;
 	public static String		ColumnFactory_Waypoint_Comment;

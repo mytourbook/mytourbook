@@ -277,12 +277,24 @@ public class TourDatabase {
 
 	private static final Object						DB_LOCK										= new Object();
 
-	public static final double						DEFAULT_DOUBLE								= 1E-300;									//Float.MIN_VALUE;
-	public static final float						DEFAULT_FLOAT								= 1E-40f;
+//	Derby Limitations
+//
+//	Smallest 			DOUBLE 	-1.79769E+308
+//	Largest 			DOUBLE 	 1.79769E+308
+//	Smallest positive 	DOUBLE 	   2.225E-307
+//	Largest negative 	DOUBLE    -2.225E-307
+//
+//	Smallest 			REAL 	   -3.402E+38
+//	Largest				REAL 	    3.402E+38
+//	Smallest positive	REAL 	    1.175E-37
+//	Largest negative	REAL 	   -1.175E-37
 
-	private static final String						DB_DOUBLE_MIN_VALUE;
-	private static final String						DB_FLOAT_MIN_VALUE;
-	private static final String						DB_LONG_MIN_VALUE;
+	public static final float						DEFAULT_FLOAT								= -1E+35f;
+	public static final double						DEFAULT_DOUBLE								= -1E+300;									//Float.MIN_VALUE;
+
+	private static final String						SQL_LONG_MIN_VALUE;
+	private static final String						SQL_FLOAT_MIN_VALUE;
+	private static final String						SQL_DOUBLE_MIN_VALUE;
 
 	static {
 
@@ -297,20 +309,11 @@ public class TourDatabase {
 //		Message: The resulting value is outside the range for the data type DOUBLE.
 //
 ////////////////////////////////////////////////////////////////////////////////////////
-//
-//		Derby Limitations
-//
-//		DOUBLE value ranges:
-//		• Smallest DOUBLE value: -1.79769E+308
-//		• Largest DOUBLE value: 1.79769E+308
-//		• Smallest positive DOUBLE value: 2.225E-307
-//		• Largest negative DOUBLE value: -2.225E-307
-//
-//		DOUBLE_MIN_VALUE = (new Double(Double.MIN_VALUE)).toString();
 
-		DB_DOUBLE_MIN_VALUE = (new Double(DEFAULT_DOUBLE)).toString();
-		DB_FLOAT_MIN_VALUE = (new Float(DEFAULT_FLOAT)).toString();
-		DB_LONG_MIN_VALUE = Long.toString(Long.MIN_VALUE);
+		SQL_LONG_MIN_VALUE = Long.toString(Long.MIN_VALUE);
+
+		SQL_FLOAT_MIN_VALUE = (new Float(DEFAULT_FLOAT)).toString();
+		SQL_DOUBLE_MIN_VALUE = (new Double(DEFAULT_DOUBLE)).toString();
 	}
 
 	/**
@@ -2667,12 +2670,6 @@ public class TourDatabase {
 				//
 				// version 23 end ---------
 
-				// version 25 start  -  >14.7.0
-				//
-				+ "	gpsState				INTEGER DEFAULT 0,												\n" //$NON-NLS-1$
-				//
-				// version 25 end ---------
-
 				+ "	serieData				BLOB 															\n" //$NON-NLS-1$
 
 				+ ")"); //$NON-NLS-1$
@@ -2737,9 +2734,9 @@ public class TourDatabase {
 				//	at java.lang.reflect.Field.set(Field.java:753)
 				//	at org.hibernate.property.DirectPropertyAccessor$DirectSetter.set(DirectPropertyAccessor.java:102)
 				//
-				+ "	altitude				FLOAT DEFAULT " + DB_FLOAT_MIN_VALUE + ",						\n" //$NON-NLS-1$ //$NON-NLS-2$
-				+ "	latitude 				DOUBLE DEFAULT " + DB_DOUBLE_MIN_VALUE + ",						\n" //$NON-NLS-1$ //$NON-NLS-2$
-				+ "	longitude 				DOUBLE DEFAULT " + DB_DOUBLE_MIN_VALUE + ",						\n" //$NON-NLS-1$ //$NON-NLS-2$
+				+ "	altitude				FLOAT DEFAULT " + SQL_FLOAT_MIN_VALUE + ",						\n" //$NON-NLS-1$ //$NON-NLS-2$
+				+ "	latitude 				DOUBLE DEFAULT " + SQL_DOUBLE_MIN_VALUE + ",						\n" //$NON-NLS-1$ //$NON-NLS-2$
+				+ "	longitude 				DOUBLE DEFAULT " + SQL_DOUBLE_MIN_VALUE + ",						\n" //$NON-NLS-1$ //$NON-NLS-2$
 				//
 				// Version 25 - end
 				//
@@ -4986,22 +4983,16 @@ public class TourDatabase {
 		final Statement stmt = conn.createStatement();
 		{
 			// check if db is updated to version 25
-			if (isColumnAvailable(conn, TABLE_TOUR_MARKER, "altitude") == false) { //$NON-NLS-1$
+			if (isColumnAvailable(conn, TABLE_TOUR_MARKER, "tourTime") == false) { //$NON-NLS-1$
 
 				// Table: TOURMARKER
 				{
 					// Add new columns
-					SQL.AddCol_Float(stmt, TABLE_TOUR_MARKER, "altitude", DB_FLOAT_MIN_VALUE); //$NON-NLS-1$
-					SQL.AddCol_Double(stmt, TABLE_TOUR_MARKER, "latitude", DB_DOUBLE_MIN_VALUE); //$NON-NLS-1$
-					SQL.AddCol_Double(stmt, TABLE_TOUR_MARKER, "longitude", DB_DOUBLE_MIN_VALUE); //$NON-NLS-1$
-					SQL.AddCol_BigInt(stmt, TABLE_TOUR_MARKER, "tourTime", DB_LONG_MIN_VALUE);//$NON-NLS-1$
+					SQL.AddCol_BigInt(stmt, TABLE_TOUR_MARKER, "tourTime", SQL_LONG_MIN_VALUE);//$NON-NLS-1$
+					SQL.AddCol_Float(stmt, TABLE_TOUR_MARKER, "altitude", SQL_FLOAT_MIN_VALUE); //$NON-NLS-1$
+					SQL.AddCol_Double(stmt, TABLE_TOUR_MARKER, "latitude", SQL_DOUBLE_MIN_VALUE); //$NON-NLS-1$
+					SQL.AddCol_Double(stmt, TABLE_TOUR_MARKER, "longitude", SQL_DOUBLE_MIN_VALUE); //$NON-NLS-1$
 
-				}
-
-				// Table: TOURDATA
-				{
-					// Add new columns
-					SQL.AddCol_Int(stmt, TABLE_TOUR_DATA, "gpsState", "0"); //$NON-NLS-1$ //$NON-NLS-2$
 				}
 			}
 		}
@@ -5066,11 +5057,6 @@ public class TourDatabase {
 						final int relativeTime = tourMarker.getTime();
 						tourMarker.setTime(relativeTime, tourStartTime + (relativeTime * 1000));
 					}
-
-					// set GPS state
-					tourData.setGpsState(latitudeSerie == null
-							? TourData.GPS_STATE_WITHOUT_GPS
-							: TourData.GPS_STATE_WITH_GPS);
 
 					TourDatabase.saveEntity(tourData, tourId, TourData.class);
 				}

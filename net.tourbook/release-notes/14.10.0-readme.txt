@@ -17,10 +17,11 @@ Version: 14.10.0                                                 ?.10.2014
 New 	
 ===
 
-* All Tour Marker View - This view displays all created tour markers
-  - Sort by all columns.
-  - Selected tour marker is displayed in other views.
-  - Tours for multiple selected tour markers are displayed in other views.
+* All Tour Marker View 
+  - This view displays all created tour markers.
+  - Sorting can be done by all columns, tour markers with a similar position can be identified.
+  - Tours for selected tour markers are displayed in other views.
+
 
 * Tour Book
   - Export view in CSV format.
