@@ -2,10 +2,10 @@
 
 TRANSLATION TRANSLATION TRANSLATION TRANSLATION TRANSLATION TRANSLATION 
 
-FYI: There are a few renamings, the old texts are deleted you just have to translate the new texts.
+FYI: There are a few renamings, the old texts are deleted so you just have to translate the new texts.
 
-* App menu: "Import" -> "New"
-* Tour import view/ New menu: "Transfer Tours" --> "Receive Tours ..."
+* App menu: "Import" -> "New" (renamed again 'import' is not sufficient)
+* Tour import view / "New" menu: "Transfer Tours ..." --> "Receive Tours ..."
 
 TRANSLATION TRANSLATION TRANSLATION TRANSLATION TRANSLATION TRANSLATION 
 
@@ -38,14 +38,16 @@ Improvements
     When min is enforced but the data min value is larger than forced min, the data min value is used.
     When max is enforced but the data max value is smaller than forced max, the data max value is used.
   - When a vertical slider is moved in the tour chart with a hovered mouse, this view must not be activated (another view can be the active view) that the moved slider is also updated in other views, e.g. 2/3D Map, Tour Analyzer.
-
+  - Removed border line on the left side of the tour chart graphic (this was a drawing bug since centuries).
+  
 * Tour Blog
   - Set marker visible/hidden.
   - Show/hide hidden marker.
   - Draw marker with hidden/device/default color.
   - Improved hovered style.
 
-* Table/Tree Views - New actions in the column header context menu
+* All Table/Tree Views 
+  New actions in the column header context menu
   - Show all columns.
   - Show default columns.
 

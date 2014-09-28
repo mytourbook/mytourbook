@@ -13,6 +13,8 @@ Create Translation Archive
 
 - switch to workspace "C:\DAT\ws_mt-NL-projects" 
 
+	- refresh all projects with F5
+
 	- set version number into "feature.xml" in "feature.net.tourbook.app.nl"
 	- force feature version number into the *.nl fragments
 	- set synch option back to "synch versions on build (recommended)"
@@ -29,7 +31,7 @@ Create Translation Archive
 
 - test translations
 
-	- switch to folder "C:\DAT\ws_mt-Translation-TEST"
+	- select folder "C:\DAT\ws_mt-Translation-TEST"
 	- delete all folders but NOT ".metadata"
 	- extract "mt-translations.zip" into this folder
 
