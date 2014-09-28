@@ -905,9 +905,6 @@ public class Messages extends NLS {
 	public static String		Pref_Graphs_Button_down;
 	public static String		Pref_Graphs_Button_up;
 	public static String		Pref_Graphs_Check_autozoom;
-	public static String		Pref_Graphs_Check_force_minimum_for_altimeter;
-	public static String		Pref_Graphs_Check_force_minimum_for_gradient;
-	public static String		Pref_Graphs_Check_force_minmax_for_pace;
 	public static String		Pref_Graphs_Check_show_start_time;
 	public static String		Pref_Graphs_Checkbox_ForceAltimeterValue;
 	public static String		Pref_Graphs_Checkbox_ForceGradientValue;
@@ -920,7 +917,6 @@ public class Messages extends NLS {
 	public static String		Pref_Graphs_Dialog_GridLine_Warning_Message;
 	public static String		Pref_Graphs_Dialog_GridLine_Warning_Title;
 	public static String		Pref_Graphs_Error_one_graph_must_be_selected;
-	public static String		Pref_Graphs_Error_value_must_be_integer;
 	public static String		Pref_Graphs_force_minimum_value;
 	public static String		Pref_Graphs_grid_distance;
 	public static String		Pref_Graphs_grid_horizontal_distance;
@@ -934,9 +930,7 @@ public class Messages extends NLS {
 	public static String		Pref_Graphs_Label_GraphTransparencyLine;
 	public static String		Pref_Graphs_Label_GraphTransparencyLine_Tooltip;
 	public static String		Pref_Graphs_Label_MaxValue;
-
 	public static String		Pref_Graphs_Label_MinValue;
-
 	public static String		Pref_Graphs_Label_select_graph;
 	public static String		Pref_Graphs_Label_select_graph_tooltip;
 	public static String		Pref_Graphs_move_sliders_when_zoomed;
@@ -948,8 +942,6 @@ public class Messages extends NLS {
 	public static String		Pref_Graphs_Tab_graph_defaults;
 	public static String		Pref_Graphs_Tab_Grid;
 	public static String		Pref_Graphs_Tab_zoom_options;
-	public static String		Pref_Graphs_Text_max_value;
-	public static String		Pref_Graphs_Text_min_value;
 
 	public static String		Pref_LiveUpdate_Checkbox;
 	public static String		Pref_LiveUpdate_Checkbox_Tooltip;
@@ -1568,7 +1560,6 @@ public class Messages extends NLS {
 	public static String		tourCatalog_wizard_Group_selected_tour_2;
 	public static String		tourCatalog_wizard_Label_a_tour_is_not_selected;
 	public static String		tourCatalog_wizard_Label_page_message;
-	public static String		tourCatalog_wizard_Label_reference_tour;
 	public static String		tourCatalog_wizard_Msg_select_reference_tour;
 	public static String		tourCatalog_wizard_Page_compared_tours_title;
 	public static String		tourCatalog_wizard_Page_reference_tour_title;
