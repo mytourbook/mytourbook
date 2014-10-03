@@ -258,7 +258,8 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 
 		_graphCheckboxList = CheckboxTableViewer.newCheckList(//
 				parent,
-				SWT.SINGLE | SWT.TOP | SWT.BORDER);
+				SWT.SINGLE | SWT.TOP /* | SWT.BORDER */);
+//		_graphCheckboxList.getTable().setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
 
 		_graphCheckboxList.setContentProvider(new IStructuredContentProvider() {
 			public void dispose() {}
@@ -883,41 +884,28 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 
 	private void enableControls() {
 
-		/*
-		 * perform defaults for the currently selected tab
-		 */
-		final TabItem selectedTab = _tabFolder.getItem(_tabFolder.getSelectionIndex());
+		_spinnerAltimeterMin.setEnabled(_chkMinAltimeter.getSelection());
+		_spinnerAltimeterMax.setEnabled(_chkMaxAltimeter.getSelection());
 
-		if (selectedTab == _tab1_Graphs) {
+		_spinnerGradientMin.setEnabled(_chkMinGradient.getSelection());
+		_spinnerGradientMax.setEnabled(_chkMaxGradient.getSelection());
 
-		} else if (selectedTab == _tab3_Grid) {
+		_spinnerPaceMin.setEnabled(_chkMinPace.getSelection());
+		_spinnerPaceMax.setEnabled(_chkMaxPace.getSelection());
 
-		} else if (selectedTab == _tab2_MinMax) {
-
-			_spinnerAltimeterMin.setEnabled(_chkMinAltimeter.getSelection());
-			_spinnerAltimeterMax.setEnabled(_chkMaxAltimeter.getSelection());
-
-			_spinnerGradientMin.setEnabled(_chkMinGradient.getSelection());
-			_spinnerGradientMax.setEnabled(_chkMaxGradient.getSelection());
-
-			_spinnerPaceMin.setEnabled(_chkMinPace.getSelection());
-			_spinnerPaceMax.setEnabled(_chkMaxPace.getSelection());
-
-			_spinnerPulseMin.setEnabled(_chkMinPulse.getSelection());
-			_spinnerPulseMax.setEnabled(_chkMaxPulse.getSelection());
-
-		} else if (selectedTab == _tab4_Options) {
-
-		}
+		_spinnerPulseMin.setEnabled(_chkMinPulse.getSelection());
+		_spinnerPulseMax.setEnabled(_chkMaxPulse.getSelection());
 	}
 
 	/**
 	 * check if the up/down button are enabled
 	 */
+
 	private void enableUpDownActions() {
 
 		final Table table = _graphCheckboxList.getTable();
 		final TableItem[] items = table.getSelection();
+
 		final boolean validSelection = items != null && items.length > 0;
 		boolean enableUp = validSelection;
 		boolean enableDown = validSelection;

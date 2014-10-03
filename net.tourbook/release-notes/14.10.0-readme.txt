@@ -1,17 +1,4 @@
-
-
-TRANSLATION TRANSLATION TRANSLATION TRANSLATION TRANSLATION TRANSLATION 
-
-FYI: There are a few renamings, the old texts are deleted so you just have to translate the new texts.
-
-* App menu: "Import" -> "New" (renamed again 'import' is not sufficient)
-* Tour import view / "New" menu: "Transfer Tours ..." --> "Receive Tours ..."
-
-TRANSLATION TRANSLATION TRANSLATION TRANSLATION TRANSLATION TRANSLATION 
-
-
-
-Version: 14.10.0                                                 ?.10.2014
+Version: 14.10.0                                              13.10.2014
 
 
 New 	

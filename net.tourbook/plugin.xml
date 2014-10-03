@@ -472,6 +472,10 @@
 				label="%command_device_importFromFile"
 				mnemonic="%command_device_importFromFile_mnemonic"/>
 				
+			<separator
+				name="net.tourbook.separator.device"
+				visible="true"/>
+				
 			<command
 				commandId="net.tourbook.command.device.synchronize"
 				icon="icons/device-synchronize.gif"
@@ -487,7 +491,7 @@
 				tooltip="%Command_Device_ReceiveFromSerialPort_Directly_Tooltip"/>
 				
 			<separator
-				name="net.tourbook.separator"
+				name="net.tourbook.separator.new"
 				visible="true"/>
 		
 			<command
@@ -497,7 +501,7 @@
 				mnemonic="%command_createNewTour_mnemonic"/>
 				
 			<separator
-				name="net.tourbook.separator2"
+				name="net.tourbook.separator.additional"
 				visible="true"/>
 
 		</menuContribution>

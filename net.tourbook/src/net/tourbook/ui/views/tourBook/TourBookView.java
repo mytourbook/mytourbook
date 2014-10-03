@@ -146,47 +146,47 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 	private static final String							STATE_IS_SELECT_YEAR_MONTH_TOURS	= "IsSelectYearMonthTours";				//$NON-NLS-1$
 	private static final String							STATE_YEAR_SUB_CATEGORY				= "YearSubCategory";						//$NON-NLS-1$
 
-	private static final String							CSV_HEADER_AVERAGE_CADENCE			= "AvgCadence"; //$NON-NLS-1$
-	private static final String							CSV_HEADER_AVERAGE_PACE				= "AvgPace (%s)"; //$NON-NLS-1$
-	private static final String							CSV_HEADER_AVERAGE_SPEED			= "AvgSpeed (%s)"; //$NON-NLS-1$
-	private static final String							CSV_HEADER_AVERAGE_TEMPERATURE		= "AvgTemperature (%s)"; //$NON-NLS-1$
-	private static final String							CSV_HEADER_ALTITUDE_DOWN			= "AltitudeDown (%s)"; //$NON-NLS-1$
-	private static final String							CSV_HEADER_ALTITUDE_UP				= "AltitudeUp (%s)"; //$NON-NLS-1$
-	private static final String							CSV_HEADER_CALORIES					= "Calories"; //$NON-NLS-1$
-	private static final String							CSV_HEADER_DAY						= "Day"; //$NON-NLS-1$
-	private static final String							CSV_HEADER_DEVICE_START_DISTANCE	= "DeviceStartDistance"; //$NON-NLS-1$
-	private static final String							CSV_HEADER_DISTANCE					= "Distance (%s)"; //$NON-NLS-1$
-	private static final String							CSV_HEADER_DP_TOLERANCE				= "DPTolerance"; //$NON-NLS-1$
-	private static final String							CSV_HEADER_ISO_DATE_TIME			= "ISO8601"; //$NON-NLS-1$
-	private static final String							CSV_HEADER_MOVING_TIME				= "MovingTime (%s)"; //$NON-NLS-1$
-	private static final String							CSV_HEADER_NUMBER_OF_MARKER			= "NumberOfMarkers"; //$NON-NLS-1$
-	private static final String							CSV_HEADER_NUMBER_OF_PHOTOS			= "NumberOfPhotos"; //$NON-NLS-1$
-	private static final String							CSV_HEADER_NUMBER_OF_TOURS			= "NumberOfTours"; //$NON-NLS-1$
-	private static final String							CSV_HEADER_WEATHER					= "Weather"; //$NON-NLS-1$
-	private static final String							CSV_HEADER_WIND_DIRECTION			= "WindDirection"; //$NON-NLS-1$
-	private static final String							CSV_HEADER_WIND_SPEED				= "WindSpeed"; //$NON-NLS-1$
-	private static final String							CSV_HEADER_MAX_ALTITUDE				= "MaxAltitude (%s)"; //$NON-NLS-1$
-	private static final String							CSV_HEADER_MAX_PULSE				= "MaxPulse"; //$NON-NLS-1$
-	private static final String							CSV_HEADER_MAX_SPEED				= "MaxSpeed (%s)"; //$NON-NLS-1$
-	private static final String							CSV_HEADER_MONTH					= "Month"; //$NON-NLS-1$
-	private static final String							CSV_HEADER_PAUSED_TIME				= "PausedTime (%s)"; //$NON-NLS-1$
-	private static final String							CSV_HEADER_PAUSED_TIME_RELATIVE		= "RelativePausedTime (%)"; //$NON-NLS-1$
-	private static final String							CSV_HEADER_PERSON					= "Person"; //$NON-NLS-1$
-	private static final String							CSV_HEADER_RECORDING_TIME			= "RecordingTime (%s)"; //$NON-NLS-1$
-	private static final String							CSV_HEADER_RESTPULSE				= "RestPulse"; //$NON-NLS-1$
-	private static final String							CSV_HEADER_TAGS						= "Tags"; //$NON-NLS-1$
-	private static final String							CSV_HEADER_TIME						= "Time"; //$NON-NLS-1$
-	private static final String							CSV_HEADER_TIME_INTERVAL			= "TimeInterval"; //$NON-NLS-1$
-	private static final String							CSV_HEADER_TIME_SLICES				= "TimeSlices"; //$NON-NLS-1$
-	private static final String							CSV_HEADER_TITLE					= "Title"; //$NON-NLS-1$
-	private static final String							CSV_HEADER_TOUR_TYPE_ID				= "TourTypeId"; //$NON-NLS-1$
-	private static final String							CSV_HEADER_TOUR_TYPE_NAME			= "TourTypeName"; //$NON-NLS-1$
-	private static final String							CSV_HEADER_WEEK						= "Week"; //$NON-NLS-1$
-	private static final String							CSV_HEADER_WEEKDAY					= "Weekday"; //$NON-NLS-1$
-	private static final String							CSV_HEADER_WEEK_YEAR				= "WeekYear"; //$NON-NLS-1$
-	private static final String							CSV_HEADER_YEAR						= "Year"; //$NON-NLS-1$
+	private static final String							CSV_HEADER_AVERAGE_CADENCE			= "AvgCadence";							//$NON-NLS-1$
+	private static final String							CSV_HEADER_AVERAGE_PACE				= "AvgPace (%s)";							//$NON-NLS-1$
+	private static final String							CSV_HEADER_AVERAGE_SPEED			= "AvgSpeed (%s)";							//$NON-NLS-1$
+	private static final String							CSV_HEADER_AVERAGE_TEMPERATURE		= "AvgTemperature (%s)";					//$NON-NLS-1$
+	private static final String							CSV_HEADER_ALTITUDE_DOWN			= "AltitudeDown (%s)";						//$NON-NLS-1$
+	private static final String							CSV_HEADER_ALTITUDE_UP				= "AltitudeUp (%s)";						//$NON-NLS-1$
+	private static final String							CSV_HEADER_CALORIES					= "Calories";								//$NON-NLS-1$
+	private static final String							CSV_HEADER_DAY						= "Day";									//$NON-NLS-1$
+	private static final String							CSV_HEADER_DEVICE_START_DISTANCE	= "DeviceStartDistance";					//$NON-NLS-1$
+	private static final String							CSV_HEADER_DISTANCE					= "Distance (%s)";							//$NON-NLS-1$
+	private static final String							CSV_HEADER_DP_TOLERANCE				= "DPTolerance";							//$NON-NLS-1$
+	private static final String							CSV_HEADER_ISO_DATE_TIME			= "ISO8601";								//$NON-NLS-1$
+	private static final String							CSV_HEADER_MOVING_TIME				= "MovingTime (%s)";						//$NON-NLS-1$
+	private static final String							CSV_HEADER_NUMBER_OF_MARKER			= "NumberOfMarkers";						//$NON-NLS-1$
+	private static final String							CSV_HEADER_NUMBER_OF_PHOTOS			= "NumberOfPhotos";						//$NON-NLS-1$
+	private static final String							CSV_HEADER_NUMBER_OF_TOURS			= "NumberOfTours";							//$NON-NLS-1$
+	private static final String							CSV_HEADER_WEATHER					= "Weather";								//$NON-NLS-1$
+	private static final String							CSV_HEADER_WIND_DIRECTION			= "WindDirection";							//$NON-NLS-1$
+	private static final String							CSV_HEADER_WIND_SPEED				= "WindSpeed";								//$NON-NLS-1$
+	private static final String							CSV_HEADER_MAX_ALTITUDE				= "MaxAltitude (%s)";						//$NON-NLS-1$
+	private static final String							CSV_HEADER_MAX_PULSE				= "MaxPulse";								//$NON-NLS-1$
+	private static final String							CSV_HEADER_MAX_SPEED				= "MaxSpeed (%s)";							//$NON-NLS-1$
+	private static final String							CSV_HEADER_MONTH					= "Month";									//$NON-NLS-1$
+	private static final String							CSV_HEADER_PAUSED_TIME				= "PausedTime (%s)";						//$NON-NLS-1$
+	private static final String							CSV_HEADER_PAUSED_TIME_RELATIVE		= "RelativePausedTime (%)";				//$NON-NLS-1$
+	private static final String							CSV_HEADER_PERSON					= "Person";								//$NON-NLS-1$
+	private static final String							CSV_HEADER_RECORDING_TIME			= "RecordingTime (%s)";					//$NON-NLS-1$
+	private static final String							CSV_HEADER_RESTPULSE				= "RestPulse";								//$NON-NLS-1$
+	private static final String							CSV_HEADER_TAGS						= "Tags";									//$NON-NLS-1$
+	private static final String							CSV_HEADER_TIME						= "Time";									//$NON-NLS-1$
+	private static final String							CSV_HEADER_TIME_INTERVAL			= "TimeInterval";							//$NON-NLS-1$
+	private static final String							CSV_HEADER_TIME_SLICES				= "TimeSlices";							//$NON-NLS-1$
+	private static final String							CSV_HEADER_TITLE					= "Title";									//$NON-NLS-1$
+	private static final String							CSV_HEADER_TOUR_TYPE_ID				= "TourTypeId";							//$NON-NLS-1$
+	private static final String							CSV_HEADER_TOUR_TYPE_NAME			= "TourTypeName";							//$NON-NLS-1$
+	private static final String							CSV_HEADER_WEEK						= "Week";									//$NON-NLS-1$
+	private static final String							CSV_HEADER_WEEKDAY					= "Weekday";								//$NON-NLS-1$
+	private static final String							CSV_HEADER_WEEK_YEAR				= "WeekYear";								//$NON-NLS-1$
+	private static final String							CSV_HEADER_YEAR						= "Year";									//$NON-NLS-1$
 
-	private static final String							CSV_EXPORT_DEFAULT_FILE_NAME		= "TourBook_"; //$NON-NLS-1$
+	private static final String							CSV_EXPORT_DEFAULT_FILE_NAME		= "TourBook_";								//$NON-NLS-1$
 	private static final String							CSV_EXPORT_DURATION_HHH_MM_SS		= "hhh:mm:ss";								//$NON-NLS-1$
 
 	private static int									_yearSubCategory					= TourItem.ITEM_TYPE_MONTH;
@@ -1826,6 +1826,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		TVITourBookTour firstTour = null;
 
 		for (final Iterator<?> iter = selection.iterator(); iter.hasNext();) {
+
 			final Object treeItem = iter.next();
 			if (treeItem instanceof TVITourBookTour) {
 				if (tourItems == 0) {
@@ -1839,6 +1840,8 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		final boolean isTourSelected = tourItems > 0;
 		final boolean isOneTour = tourItems == 1;
 		boolean isDeviceTour = false;
+
+		final ArrayList<TourType> tourTypes = TourDatabase.getAllTourTypes();
 
 		final TVITourBookItem firstElement = (TVITourBookItem) selection.getFirstElement();
 		final boolean firstElementHasChildren = firstElement == null ? false : firstElement.hasChildren();
@@ -1858,41 +1861,30 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		_tourDoubleClickState.canEditMarker = isOneTour;
 		_tourDoubleClickState.canAdjustAltitude = isOneTour;
 
-		_actionEditTour.setEnabled(isOneTour);
-		_actionOpenTour.setEnabled(isOneTour);
-		_actionEditQuick.setEnabled(isOneTour);
-		_actionOpenMarkerDialog.setEnabled(isOneTour && isDeviceTour);
-		_actionOpenAdjustAltitudeDialog.setEnabled(isOneTour && isDeviceTour);
-
-		_actionMergeTour.setEnabled(isOneTour && isDeviceTour && firstSavedTour.getMergeSourceTourId() != null);
 		_actionComputeDistanceValuesFromGeoposition.setEnabled(isTourSelected);
 		_actionComputeElevationGain.setEnabled(true);
-		_actionSetAltitudeFromSRTM.setEnabled(isTourSelected);
-
-		// enable delete ation when at least one tour is selected
-		if (isTourSelected) {
-			_actionDeleteTour.setEnabled(true);
-		} else {
-			_actionDeleteTour.setEnabled(false);
-		}
-
-		_actionJoinTours.setEnabled(tourItems > 1);
-		_actionSetOtherPerson.setEnabled(isTourSelected);
-
+		_actionDeleteTour.setEnabled(isTourSelected);
+		_actionEditQuick.setEnabled(isOneTour);
+		_actionEditTour.setEnabled(isOneTour);
 		_actionExportTour.setEnabled(isTourSelected);
-		_actionReimportSubMenu.setEnabled(isTourSelected);
+		_actionExportViewCSV.setEnabled(selectedItems > 0);
+		_actionJoinTours.setEnabled(tourItems > 1);
+		_actionMergeTour.setEnabled(isOneTour && isDeviceTour && firstSavedTour.getMergeSourceTourId() != null);
+		_actionOpenAdjustAltitudeDialog.setEnabled(isOneTour && isDeviceTour);
+		_actionOpenMarkerDialog.setEnabled(isOneTour && isDeviceTour);
+		_actionOpenTour.setEnabled(isOneTour);
 		_actionPrintTour.setEnabled(isTourSelected);
-
-		final ArrayList<TourType> tourTypes = TourDatabase.getAllTourTypes();
+		_actionReimportSubMenu.setEnabled(isTourSelected);
+		_actionSetAltitudeFromSRTM.setEnabled(isTourSelected);
+		_actionSetOtherPerson.setEnabled(isTourSelected);
 		_actionSetTourType.setEnabled(isTourSelected && tourTypes.size() > 0);
 
-		_actionExpandSelection.setEnabled(selection.size() == 0 ? false : true);
-
-		_actionExpandSelection.setEnabled(firstElement == null ? false : //
-				selectedItems == 1 ? firstElementHasChildren : //
-						true);
-
 		_actionCollapseOthers.setEnabled(selectedItems == 1 && firstElementHasChildren);
+		_actionExpandSelection.setEnabled(firstElement == null //
+				? false
+				: selectedItems == 1 //
+						? firstElementHasChildren
+						: true);
 
 		_tagMenuMgr.enableTagActions(isTourSelected, isOneTour, firstTour == null ? null : firstTour.getTagIds());
 
