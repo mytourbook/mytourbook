@@ -1179,6 +1179,8 @@ public class Messages extends NLS {
 //	public static String		Slideout_ChartMarkerOptions_Label_SignImageSize;
 //	public static String		Slideout_ChartMarkerOptions_Label_SignImageSize_Tooltip;
 
+	public static String	Slideout_TourMarkerFilter_Label_GeoFilterDiff;
+
 	public static String		Tooltip_ValuePoint_Action_CloseContextMenu;
 	public static String		Tooltip_ValuePoint_Action_OpenToolTipMenu_ToolTip;
 	public static String		Tooltip_ValuePoint_Action_Orientation_Horizontal;

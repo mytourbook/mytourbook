@@ -1060,12 +1060,12 @@
 		<command
 			id="command.net.tourbook.ui.views.TourMarkerAllView"
 			name="%View_Name_TourMarkerAll"
-			defaultHandler="net.tourbook.ui.views.ActionHandlerOpenViewTourMarkerAll"
+			defaultHandler="net.tourbook.ui.views.tourMarker.ActionHandlerOpenViewTourMarkerAll"
 		/>
 		<command
 			id="command.net.tourbook.views.TourMarkerView"
 			name="%view_name_Marker"
-			defaultHandler="net.tourbook.ui.views.ActionHandlerOpenViewTourMarker"
+			defaultHandler="net.tourbook.ui.views.tourMarker.ActionHandlerOpenViewTourMarker"
 		/>
    
       <command
@@ -1366,7 +1366,7 @@
 				name="%view_name_Statistics"/>
 			<view
 				category="net.tourbook.category.tourList"
-				class="net.tourbook.ui.views.TourMarkerAllView"
+				class="net.tourbook.ui.views.tourMarker.TourMarkerAllView"
 				icon="icons/tour-marker-all.png"
 				id="net.tourbook.ui.views.TourMarkerAllView"
 				name="%View_Name_TourMarkerAll"/>
@@ -1391,7 +1391,7 @@
 	      </view>
 	      <view
 	            category="net.tourbook.category.tour"
-	            class="net.tourbook.ui.views.TourMarkerView"
+	            class="net.tourbook.ui.views.tourMarker.TourMarkerView"
 	            icon="icons/tour-marker.png"
 	            id="net.tourbook.views.TourMarkerView"
 	            name="%view_name_Marker">

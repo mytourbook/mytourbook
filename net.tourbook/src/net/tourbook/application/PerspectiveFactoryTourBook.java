@@ -19,12 +19,12 @@ import net.tourbook.map2.view.Map2View;
 import net.tourbook.photo.PicDirView;
 import net.tourbook.statistic.TourStatisticsView;
 import net.tourbook.ui.tourChart.TourChartView;
-import net.tourbook.ui.views.TourMarkerView;
 import net.tourbook.ui.views.TourWaypointView;
 import net.tourbook.ui.views.calendar.CalendarView;
 import net.tourbook.ui.views.rawData.RawDataView;
 import net.tourbook.ui.views.tourBook.TourBookView;
 import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
+import net.tourbook.ui.views.tourMarker.TourMarkerView;
 
 import org.eclipse.ui.IFolderLayout;
 import org.eclipse.ui.IPageLayout;

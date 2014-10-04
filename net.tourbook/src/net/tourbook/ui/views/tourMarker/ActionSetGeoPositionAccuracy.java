@@ -13,7 +13,7 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.ui.views;
+package net.tourbook.ui.views.tourMarker;
 
 import java.util.ArrayList;
 
@@ -29,11 +29,11 @@ import org.eclipse.swt.widgets.Menu;
 
 public class ActionSetGeoPositionAccuracy extends Action implements IMenuCreator {
 
-	static final int					DISABLED_ACCURACY	= -1;
-	static final int					DEFAULT_ACCURACY	= 3;
-	static final int					MAX_ACCURACY		= 6;
+	static final int					DISABLED_LAT_LON_DIGITS	= -1;
+	static final int					DEFAULT_LAT_LON_DIGITS	= 3;
+	static final int					MAX_LAT_LON_DIGITS		= 6;
 
-	private int							_selectedAccuracy	= DEFAULT_ACCURACY;
+	private int							_selectedAccuracy		= DEFAULT_LAT_LON_DIGITS;
 
 	private TourMarkerAllView			_tourMarkerAllView;
 
@@ -74,11 +74,11 @@ public class ActionSetGeoPositionAccuracy extends Action implements IMenuCreator
 
 		_sccuracyActions = new ArrayList<ActionAccuracy>();
 
-		for (int actionIndex = DISABLED_ACCURACY; actionIndex < MAX_ACCURACY; actionIndex++) {
+		for (int actionIndex = DISABLED_LAT_LON_DIGITS; actionIndex < MAX_LAT_LON_DIGITS; actionIndex++) {
 
 			final ActionAccuracy action;
 
-			if (actionIndex == DISABLED_ACCURACY) {
+			if (actionIndex == DISABLED_LAT_LON_DIGITS) {
 
 				// action: disable accuracy
 
@@ -104,10 +104,6 @@ public class ActionSetGeoPositionAccuracy extends Action implements IMenuCreator
 			_menu.dispose();
 			_menu = null;
 		}
-	}
-
-	public int getDimLevel() {
-		return _selectedAccuracy;
 	}
 
 	public Menu getMenu(final Control parent) {

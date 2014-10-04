@@ -13,10 +13,11 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.ui.views;
+package net.tourbook.ui.views.tourMarker;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.UI;
 import net.tourbook.common.color.IColorSelectorListener;
 import net.tourbook.common.tooltip.AnimatedToolTipShell;
 import net.tourbook.common.util.Util;
@@ -24,9 +25,11 @@ import net.tourbook.common.util.Util;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseTrackAdapter;
+import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Point;
@@ -35,18 +38,24 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.ToolBar;
 
 /**
  * Tour chart marker properties slideout.
  */
-public class SlideoutTourBlogMarker extends AnimatedToolTipShell implements IColorSelectorListener {
+public class SlideoutTourMarkerFilter extends AnimatedToolTipShell implements IColorSelectorListener {
 
-	private final IDialogSettings	_state				= TourbookPlugin.getState(TourBlogView.ID);
+	private static final int		GEO_FILTER_DIGITS	= 4;
+
+	private final IDialogSettings	_state				= TourbookPlugin.getState(TourMarkerAllView.ID);
 
 	// initialize with default values which are (should) never be used
 	private Rectangle				_toolTipItemBounds	= new Rectangle(0, 0, 50, 50);
+
+	private TourMarkerAllView		_tourMarkerAllView;
 
 	private final WaitTimer			_waitTimer			= new WaitTimer();
 
@@ -54,25 +63,22 @@ public class SlideoutTourBlogMarker extends AnimatedToolTipShell implements ICol
 	private boolean					_canOpenToolTip;
 	private boolean					_isAnotherDialogOpened;
 
+	private MouseWheelListener		_accuracyMouseWheelListener;
+	private SelectionAdapter		_accuracySelectionListener;
 	private SelectionAdapter		_defaultSelectionAdapter;
 
-	{
-		_defaultSelectionAdapter = new SelectionAdapter() {
-			@Override
-			public void widgetSelected(final SelectionEvent e) {
-				onChangeUI();
-			}
-		};
-	}
+	private PixelConverter			_pc;
 
 	/*
 	 * UI controls
 	 */
 	private Composite				_shellContainer;
-	private TourBlogView			_tourBlogView;
 
-	private Button					_chkDrawMarkerWithDefaultColor;
-	private Button					_chkShowHiddenMarker;
+	private Button					_chkLatLonAccuracy;
+
+	private Label					_lblGeoFilter;
+
+	private Spinner					_spinnerGeoFilter;
 
 	private final class WaitTimer implements Runnable {
 		@Override
@@ -81,14 +87,14 @@ public class SlideoutTourBlogMarker extends AnimatedToolTipShell implements ICol
 		}
 	}
 
-	public SlideoutTourBlogMarker(	final Control ownerControl,
+	public SlideoutTourMarkerFilter(final Control ownerControl,
 									final ToolBar toolBar,
 									final IDialogSettings state,
-									final TourBlogView tourBlogView) {
+									final TourMarkerAllView tourMarkerAllView) {
 
 		super(ownerControl);
 
-		_tourBlogView = tourBlogView;
+		_tourMarkerAllView = tourMarkerAllView;
 
 		addListener(ownerControl, toolBar);
 
@@ -157,11 +163,14 @@ public class SlideoutTourBlogMarker extends AnimatedToolTipShell implements ICol
 		final Composite ui = createUI(parent);
 
 		restoreState();
+		enableControls();
 
 		return ui;
 	}
 
 	private Composite createUI(final Composite parent) {
+
+		initUI(parent);
 
 		_shellContainer = new Composite(parent, SWT.NONE);
 		GridLayoutFactory.swtDefaults().applyTo(_shellContainer);
@@ -184,36 +193,48 @@ public class SlideoutTourBlogMarker extends AnimatedToolTipShell implements ICol
 		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
 //		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
 		{
+			/*
+			 * Geo filter range
+			 */
 			{
-				/*
-				 * Show hidden marker
-				 */
-				_chkShowHiddenMarker = new Button(container, SWT.CHECK);
+				_lblGeoFilter = new Label(container, SWT.NONE);
 				GridDataFactory.fillDefaults()//
-						.span(2, 1)
-						.applyTo(_chkShowHiddenMarker);
-				_chkShowHiddenMarker.setText(Messages.Slideout_ChartMarkerOptions_Checkbox_IsShowHiddenMarker);
-				_chkShowHiddenMarker.addSelectionListener(_defaultSelectionAdapter);
+						.align(SWT.BEGINNING, SWT.CENTER)
+						.applyTo(_lblGeoFilter);
+				_lblGeoFilter.setText(Messages.Slideout_TourMarkerFilter_Label_GeoFilterDiff);
+
+				_spinnerGeoFilter = new Spinner(container, SWT.BORDER);
+				GridDataFactory.fillDefaults() //
+//						.align(SWT.FILL, SWT.CENTER)
+						.applyTo(_spinnerGeoFilter);
+				_spinnerGeoFilter.setMinimum(0);
+				_spinnerGeoFilter.setMaximum((int) (1 * Math.pow(10, GEO_FILTER_DIGITS)));
+				_spinnerGeoFilter.setDigits(GEO_FILTER_DIGITS);
+				_spinnerGeoFilter.setPageIncrement(50);
+				_spinnerGeoFilter.addMouseWheelListener(_accuracyMouseWheelListener);
+				_spinnerGeoFilter.addSelectionListener(_accuracySelectionListener);
 			}
+//			{
+//				/*
+//				 * Show hidden marker
+//				 */
+//				_chkLatLonAccuracy = new Button(container, SWT.CHECK);
+//				GridDataFactory.fillDefaults()//
+//						.span(2, 1)
+//						.applyTo(_chkLatLonAccuracy);
+//				_chkLatLonAccuracy.setText(Messages.Slideout_ChartMarkerOptions_Checkbox_IsShowHiddenMarker);
+//				_chkLatLonAccuracy.addSelectionListener(_defaultSelectionAdapter);
+//			}
 
-			{
-				/*
-				 * Draw marker with default color
-				 */
-				_chkDrawMarkerWithDefaultColor = new Button(container, SWT.CHECK);
-				GridDataFactory.fillDefaults()//
-						.span(2, 1)
-						.applyTo(_chkDrawMarkerWithDefaultColor);
-
-				_chkDrawMarkerWithDefaultColor.setText(//
-						Messages.Slideout_ChartMarkerOptions_Checkbox_IsShowMarkerWithDefaultColor);
-
-				_chkDrawMarkerWithDefaultColor.setToolTipText(//
-						Messages.Slideout_ChartMarkerOptions_Checkbox_IsShowMarkerWithDefaultColor_Tooltip);
-
-				_chkDrawMarkerWithDefaultColor.addSelectionListener(_defaultSelectionAdapter);
-			}
 		}
+	}
+
+	private void enableControls() {
+
+		final boolean isGeoFilterActive = _tourMarkerAllView.isGeoFilterActive();
+
+		_lblGeoFilter.setEnabled(isGeoFilterActive);
+		_spinnerGeoFilter.setEnabled(isGeoFilterActive);
 	}
 
 	public Shell getShell() {
@@ -230,10 +251,36 @@ public class SlideoutTourBlogMarker extends AnimatedToolTipShell implements ICol
 
 		final int itemHeight = _toolTipItemBounds.height;
 
-		final int devX = _toolTipItemBounds.x;
+		final int devX = _toolTipItemBounds.x - tipSize.x / 2;
 		final int devY = _toolTipItemBounds.y + itemHeight;
 
 		return new Point(devX, devY);
+	}
+
+	private void initUI(final Composite parent) {
+
+		_pc = new PixelConverter(parent);
+
+		_accuracyMouseWheelListener = new MouseWheelListener() {
+			public void mouseScrolled(final MouseEvent event) {
+				UI.adjustSpinnerValueOnMouseScroll(event);
+				onSelection_GeoFilter();
+			}
+		};
+
+		_accuracySelectionListener = new SelectionAdapter() {
+			@Override
+			public void widgetSelected(final SelectionEvent e) {
+				onSelection_GeoFilter();
+			}
+		};
+
+		_defaultSelectionAdapter = new SelectionAdapter() {
+			@Override
+			public void widgetSelected(final SelectionEvent e) {
+				onChangeUI();
+			}
+		};
 	}
 
 	@Override
@@ -246,7 +293,16 @@ public class SlideoutTourBlogMarker extends AnimatedToolTipShell implements ICol
 
 		saveState();
 
-		_tourBlogView.updateUI();
+//		_tourMarkerAllView.updateUI();
+	}
+
+	private void onSelection_GeoFilter() {
+
+		final double accuracy = _spinnerGeoFilter.getSelection() / Math.pow(10, GEO_FILTER_DIGITS);
+
+		_state.put(TourMarkerAllView.STATE_GEO_FILTER_ACCURACY, accuracy);
+
+		_tourMarkerAllView.updateUI_GeoFilter();
 	}
 
 	/**
@@ -303,20 +359,15 @@ public class SlideoutTourBlogMarker extends AnimatedToolTipShell implements ICol
 
 	private void restoreState() {
 
-		_chkDrawMarkerWithDefaultColor.setSelection(//
-				Util.getStateBoolean(_state, TourBlogView.STATE_IS_DRAW_MARKER_WITH_DEFAULT_COLOR, true));
+		final double stateGeoFilterRange = Util.getStateDouble(_state,//
+				TourMarkerAllView.STATE_GEO_FILTER_ACCURACY,
+				TourMarkerAllView.DEFAULT_GEO_FILTER_ACCURACY);
 
-		_chkShowHiddenMarker.setSelection(//
-				Util.getStateBoolean(_state, TourBlogView.STATE_IS_SHOW_HIDDEN_MARKER, true));
+		_spinnerGeoFilter.setSelection((int) (stateGeoFilterRange * Math.pow(10, GEO_FILTER_DIGITS)));
 	}
 
 	private void saveState() {
 
-		final boolean isDrawMarkerWithDefaultColor = _chkDrawMarkerWithDefaultColor.getSelection();
-		final boolean isShowHiddenMarker = _chkShowHiddenMarker.getSelection();
-
-		_state.put(TourBlogView.STATE_IS_DRAW_MARKER_WITH_DEFAULT_COLOR, isDrawMarkerWithDefaultColor);
-		_state.put(TourBlogView.STATE_IS_SHOW_HIDDEN_MARKER, isShowHiddenMarker);
 	}
 
 }

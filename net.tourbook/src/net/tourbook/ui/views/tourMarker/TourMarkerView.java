@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -13,7 +13,7 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.ui.views;
+package net.tourbook.ui.views.tourMarker;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -21,7 +21,6 @@ import java.util.Iterator;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
-import net.tourbook.chart.Chart;
 import net.tourbook.common.util.ColumnDefinition;
 import net.tourbook.common.util.ColumnManager;
 import net.tourbook.common.util.ITourViewer;
@@ -121,10 +120,10 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 	private ColumnDefinition		_colDefName;
 	private ColumnDefinition		_colDefVisibility;
 
-	private final NumberFormat		_nf_3_3		= NumberFormat.getNumberInstance();
+	private final NumberFormat		_nf3		= NumberFormat.getNumberInstance();
 	{
-		_nf_3_3.setMinimumFractionDigits(3);
-		_nf_3_3.setMaximumFractionDigits(3);
+		_nf3.setMinimumFractionDigits(3);
+		_nf3.setMaximumFractionDigits(3);
 	}
 
 	/*
@@ -135,7 +134,6 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 	private Composite				_viewerContainer;
 
 	private Font					_boldFont;
-	private Chart					_tourChart;
 
 	class MarkerViewerContentProvicer implements IStructuredContentProvider {
 
@@ -496,7 +494,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 				if (markerDistance == -1) {
 					cell.setText(UI.EMPTY_STRING);
 				} else {
-					cell.setText(_nf_3_3.format(markerDistance / 1000 / UI.UNIT_VALUE_DISTANCE));
+					cell.setText(_nf3.format(markerDistance / 1000 / UI.UNIT_VALUE_DISTANCE));
 				}
 
 				if (tourMarker.getType() == ChartLabel.MARKER_TYPE_DEVICE) {
@@ -539,7 +537,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 						prevDistance = prevDistance < 0 ? 0 : prevDistance;
 					}
 
-					cell.setText(_nf_3_3.format((markerDistance - prevDistance) / 1000 / UI.UNIT_VALUE_DISTANCE));
+					cell.setText(_nf3.format((markerDistance - prevDistance) / 1000 / UI.UNIT_VALUE_DISTANCE));
 				}
 			}
 		});
@@ -817,23 +815,18 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 			final SelectionTourData tourDataSelection = (SelectionTourData) selection;
 			_tourData = tourDataSelection.getTourData();
 
-			if (_tourData == null) {
-				_tourChart = null;
-			} else {
-				_tourChart = tourDataSelection.getTourChart();
+			if (_tourData != null) {
 				tourId = _tourData.getTourId();
 			}
 
 		} else if (selection instanceof SelectionTourId) {
 
-			_tourChart = null;
 			tourId = ((SelectionTourId) selection).getTourId();
 
 		} else if (selection instanceof SelectionTourIds) {
 
 			final ArrayList<Long> tourIds = ((SelectionTourIds) selection).getTourIds();
 			if ((tourIds != null) && (tourIds.size() > 0)) {
-				_tourChart = null;
 				tourId = tourIds.get(0);
 			}
 
@@ -843,13 +836,11 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 
 			final TVICatalogRefTourItem refItem = tourCatalogSelection.getRefItem();
 			if (refItem != null) {
-				_tourChart = null;
 				tourId = refItem.getTourId();
 			}
 
 		} else if (selection instanceof StructuredSelection) {
 
-			_tourChart = null;
 			final Object firstElement = ((StructuredSelection) selection).getFirstElement();
 			if (firstElement instanceof TVICatalogComparedTour) {
 				tourId = ((TVICatalogComparedTour) firstElement).getTourId();

@@ -13,23 +13,23 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.ui.views;
+package net.tourbook.ui.views.tourMarker;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 
 import org.eclipse.jface.action.Action;
 
-public class ActionMarkerFilterWithGPS extends Action {
+public class ActionMarkerFilterWithNoGPS extends Action {
 
 	private TourMarkerAllView	_tourMarkerAllView;
 
-	public ActionMarkerFilterWithGPS(final TourMarkerAllView tourMarkerAllView) {
+	public ActionMarkerFilterWithNoGPS(final TourMarkerAllView tourMarkerAllView) {
 
 		super(null, AS_CHECK_BOX);
 
-		setToolTipText(Messages.Action_MarkerFilter_WithGPS_Tooltip);
-		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__MarkerFilter_WithGPS));
+		setToolTipText(Messages.Action_MarkerFilter_WithoutGPS_Tooltip);
+		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__MarkerFilter_WithoutGPS));
 
 		_tourMarkerAllView = tourMarkerAllView;
 	}

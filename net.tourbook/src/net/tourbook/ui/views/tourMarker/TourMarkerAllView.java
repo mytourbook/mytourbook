@@ -13,7 +13,7 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.ui.views;
+package net.tourbook.ui.views.tourMarker;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -67,15 +67,15 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.CellLabelProvider;
+import org.eclipse.jface.viewers.CheckStateChangedEvent;
+import org.eclipse.jface.viewers.CheckboxTableViewer;
 import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.DoubleClickEvent;
+import org.eclipse.jface.viewers.ICheckStateListener;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
-import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.jface.viewers.ViewerComparator;
@@ -85,9 +85,12 @@ import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
+import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IPartListener2;
@@ -114,19 +117,21 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 	private static final String				COLUMN_URL_ADDRESS				= "UrlAddress";								//$NON-NLS-1$
 	private static final String				COLUMN_URL_LABEL				= "UrlLabel";									//$NON-NLS-1$
 	//
+	private static final String				STATE_LAT_LON_DIGITS			= "STATE_LAT_LON_DIGITS";						//$NON-NLS-1$
+	static final String						STATE_GEO_FILTER_ACCURACY		= "STATE_GEO_FILTER_ACCURACY";					//$NON-NLS-1$
+	private static final String				STATE_GPS_MARKER_FILTER			= "STATE_GPS_MARKER_FILTER";					//$NON-NLS-1$
 	private static final String				STATE_SELECTED_MARKER_ITEM		= "STATE_SELECTED_MARKER_ITEM";				//$NON-NLS-1$
-	private static final String				STATE_GEO_POSITION_ACCURACY		= "STATE_GEO_POSITION_ACCURACY";				//$NON-NLS-1$
 	private static final String				STATE_SORT_COLUMN_DIRECTION		= "STATE_SORT_COLUMN_DIRECTION";				//$NON-NLS-1$
 	private static final String				STATE_SORT_COLUMN_ID			= "STATE_SORT_COLUMN_ID";						//$NON-NLS-1$
-	private static final String				STATE_TOUR_FILTER_GPS			= "STATE_TOUR_FILTER_GPS";						//$NON-NLS-1$
+
+	static final double						DEFAULT_GEO_FILTER_ACCURACY		= 0.05;
 	//
-	private static int						MARKER_GPS_FILTER_IS_DISABLED	= 0;
-	private static int						MARKER_GPS_FILTER_WITH_GPS		= 1;
-	private static int						MARKER_GPS_FILTER_WITH_NO_GPS	= 2;
+	private static int						GPS_MARKER_FILTER_IS_DISABLED	= 0;
+	private static int						GPS_MARKER_FILTER_WITH_GPS		= 1;
+	private static int						GPS_MARKER_FILTER_WITHOUT_GPS	= 2;
 	//
 	private final IPreferenceStore			_prefStore						= TourbookPlugin.getPrefStore();
-	private final IDialogSettings			_state							= TourbookPlugin
-																					.getState("TourMarkerAllView");		//$NON-NLS-1$
+	private final IDialogSettings			_state							= TourbookPlugin.getState(ID);
 	//
 	private PostSelectionProvider			_postSelectionProvider;
 	//
@@ -140,14 +145,27 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 	private ActionOpenTour					_actionOpenTour;
 	private ActionEditQuick					_actionQuickEdit;
 	private ActionSetGeoPositionAccuracy	_actionSetPositionAccuracy;
+	private ActionTourMarkerFilter			_actionTourMarkerFilter;
 	private ActionMarkerFilterWithGPS		_actionTourFilterWithGPS;
 	private ActionMarkerFilterWithNoGPS		_actionTourFilterWithoutGPS;
 
 	private ArrayList<TourMarkerItem>		_allMarkerItems					= new ArrayList<TourMarkerItem>();
 
-	private int								_markerFilterGPS				= MARKER_GPS_FILTER_IS_DISABLED;
+	private int								_gpsMarkerFilter				= GPS_MARKER_FILTER_IS_DISABLED;
 
-	private int								_geoPositionAccuracy;
+	/**
+	 * State for the GPS filter.
+	 */
+	private int								_gpsDecimals;
+
+	/**
+	 * Is <code>true</code> when markers are filtered with the geo filter.
+	 */
+	private boolean							_isGeoFilterActive;
+	private double							_geoFilterLat;
+	private double							_geoFilterLon;
+	private double							_geoFilterMaxDiff;
+
 	private boolean							_isInUpdate;
 
 	private final DateFormat				_dateFormatter					= DateFormat
@@ -165,7 +183,7 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 		_nf3.setMaximumFractionDigits(3);
 	}
 	//
-	private TableViewer						_markerViewer;
+	private CheckboxTableViewer				_markerViewer;
 	private MarkerComparator				_markerComparator				= new MarkerComparator();
 	private ColumnManager					_columnManager;
 	private SelectionAdapter				_columnSortListener;
@@ -174,6 +192,7 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 	 * UI controls
 	 */
 	private PixelConverter					_pc;
+	private Composite						_uiParent;
 	private Composite						_viewerContainer;
 
 	private class MarkerComparator extends ViewerComparator {
@@ -196,58 +215,58 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 			// Determine which column and do the appropriate sort
 			switch (__sortColumnId) {
 			case COLUMN_ALTITUDE:
-				rc = m1._altitude - m2._altitude;
+				rc = m1.altitude - m2.altitude;
 				break;
 
 			case COLUMN_DESCRIPTION:
-				rc = m1._description.compareTo(m2._description);
+				rc = m1.description.compareTo(m2.description);
 				break;
 
 			case COLUMN_LATITUDE:
-				rc = m1._latitude - m2._latitude;
+				rc = m1.latitude - m2.latitude;
 				if (rc == 0) {
-					rc = m1._longitude - m2._longitude;
+					rc = m1.longitude - m2.longitude;
 				}
 				_isSortByTime = true;
 				break;
 
 			case COLUMN_LONGITUDE:
-				rc = m1._longitude - m2._longitude;
+				rc = m1.longitude - m2.longitude;
 				if (rc == 0) {
-					rc = m1._latitude - m2._latitude;
+					rc = m1.latitude - m2.latitude;
 				}
 				_isSortByTime = true;
 				break;
 
 			case COLUMN_MARKER_ID:
-				rc = m1._markerId - m2._markerId;
+				rc = m1.markerId - m2.markerId;
 				break;
 
 			case COLUMN_TOUR_ID:
-				rc = m1._tourId - m2._tourId;
+				rc = m1.tourId - m2.tourId;
 				break;
 
 			case COLUMN_DATE:
 			case COLUMN_TIME:
-				rc = m1._time - m2._time;
+				rc = m1.time - m2.time;
 				break;
 
 			case COLUMN_URL_ADDRESS:
-				rc = m1._urlAddress.compareTo(m2._urlAddress);
+				rc = m1.urlAddress.compareTo(m2.urlAddress);
 				break;
 
 			case COLUMN_URL_LABEL:
-				rc = m1._urlLabel.compareTo(m2._urlLabel);
+				rc = m1.urlLabel.compareTo(m2.urlLabel);
 				break;
 
 			case COLUMN_NAME:
 			default:
-				rc = m1._label.compareTo(m2._label);
+				rc = m1.label.compareTo(m2.label);
 				_isSortByTime = true;
 			}
 
 			if (rc == 0 && _isSortByTime) {
-				rc = m1._time - m2._time;
+				rc = m1.time - m2.time;
 			}
 
 			// If descending order, flip the direction
@@ -304,34 +323,88 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 		@Override
 		public boolean select(final Viewer viewer, final Object parentElement, final Object element) {
 
-			if (_markerFilterGPS == MARKER_GPS_FILTER_IS_DISABLED) {
+			final TourMarkerItem markerItem = (TourMarkerItem) element;
 
-				return true;
+			final boolean isTourWithGPS = markerItem.latitude != TourDatabase.DEFAULT_DOUBLE;
+			final boolean isTourWithoutGPS = markerItem.latitude == TourDatabase.DEFAULT_DOUBLE;
+
+			boolean isVisible;
+
+			/*
+			 * Check GPS filter
+			 */
+			if (_gpsMarkerFilter == GPS_MARKER_FILTER_IS_DISABLED) {
+
+				isVisible = true;
 
 			} else {
 
-				final TourMarkerItem markerItem = (TourMarkerItem) element;
-
-				return _markerFilterGPS == MARKER_GPS_FILTER_WITH_GPS
-						? markerItem._latitude != TourDatabase.DEFAULT_DOUBLE
-						: markerItem._latitude == TourDatabase.DEFAULT_DOUBLE;
+				isVisible = _gpsMarkerFilter == GPS_MARKER_FILTER_WITH_GPS ? isTourWithGPS : isTourWithoutGPS;
 			}
+
+			if (isVisible == false) {
+				return false;
+			}
+
+			/*
+			 * Check geo filter
+			 */
+			if (_isGeoFilterActive == false) {
+				return true;
+			}
+
+			if (isTourWithoutGPS) {
+				return false;
+			}
+
+			// Lat filter
+			final double lat = markerItem.latitude;
+			final double latDiff = _geoFilterLat - lat;
+			if (latDiff > 0) {
+
+				if (latDiff > _geoFilterMaxDiff) {
+					return false;
+				}
+
+			} else {
+
+				if (-latDiff > _geoFilterMaxDiff) {
+					return false;
+				}
+			}
+
+			// Lon filter
+			final double lon = markerItem.longitude;
+			final double lonDiff = _geoFilterLon - lon;
+			if (lonDiff > 0) {
+
+				if (lonDiff > _geoFilterMaxDiff) {
+					return false;
+				}
+			} else {
+
+				if (-lonDiff > _geoFilterMaxDiff) {
+					return false;
+				}
+			}
+
+			return true;
 		}
 	}
 
 	private class TourMarkerItem {
 
-		public long		_markerId;
-		public long		_tourId;
-		public String	_label;
-		public String	_description;
-		public String	_urlLabel;
-		public String	_urlAddress;
-		public double	_latitude;
-		public double	_longitude;
-		public float	_altitude;
+		public long		markerId;
 
-		public long		_time;
+		public long		tourId;
+		public String	label;
+		public String	description;
+		public String	urlLabel;
+		public String	urlAddress;
+		public double	latitude;
+		public double	longitude;
+		public float	altitude;
+		public long		time;
 
 		@Override
 		public boolean equals(final Object obj) {
@@ -348,7 +421,7 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 			if (!getOuterType().equals(other.getOuterType())) {
 				return false;
 			}
-			if (_markerId != other._markerId) {
+			if (markerId != other.markerId) {
 				return false;
 			}
 			return true;
@@ -363,8 +436,13 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 			final int prime = 31;
 			int result = 1;
 			result = prime * result + getOuterType().hashCode();
-			result = prime * result + (int) (_markerId ^ (_markerId >>> 32));
+			result = prime * result + (int) (markerId ^ (markerId >>> 32));
 			return result;
+		}
+
+		@Override
+		public String toString() {
+			return "TourMarkerItem [_label=" + label + "]";
 		}
 	}
 
@@ -380,13 +458,13 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 
 			// action with GPS is hit
 
-			if (_markerFilterGPS != MARKER_GPS_FILTER_WITH_GPS) {
+			if (_gpsMarkerFilter != GPS_MARKER_FILTER_WITH_GPS) {
 
-				_markerFilterGPS = MARKER_GPS_FILTER_WITH_GPS;
+				_gpsMarkerFilter = GPS_MARKER_FILTER_WITH_GPS;
 
 			} else {
 
-				_markerFilterGPS = MARKER_GPS_FILTER_IS_DISABLED;
+				_gpsMarkerFilter = GPS_MARKER_FILTER_IS_DISABLED;
 			}
 
 			_actionTourFilterWithoutGPS.setChecked(false);
@@ -395,47 +473,32 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 
 			// action without GPS is hit
 
-			if (_markerFilterGPS != MARKER_GPS_FILTER_WITH_NO_GPS) {
+			if (_gpsMarkerFilter != GPS_MARKER_FILTER_WITHOUT_GPS) {
 
-				_markerFilterGPS = MARKER_GPS_FILTER_WITH_NO_GPS;
+				_gpsMarkerFilter = GPS_MARKER_FILTER_WITHOUT_GPS;
 
 			} else {
 
-				_markerFilterGPS = MARKER_GPS_FILTER_IS_DISABLED;
+				_gpsMarkerFilter = GPS_MARKER_FILTER_IS_DISABLED;
 			}
 
 			_actionTourFilterWithGPS.setChecked(false);
 		}
 
-		// refilter viewer
-		BusyIndicator.showWhile(_viewerContainer.getDisplay(), new Runnable() {
-			public void run() {
+		refilterViewer();
 
-				_viewerContainer.setRedraw(false);
-				{
-					// keep selection
-					final ISelection selectionBackup = _markerViewer.getSelection();
-					{
-						_markerViewer.refresh();
-					}
-					updateUI_ReselectTourMarker(selectionBackup);
-				}
-				_viewerContainer.setRedraw(true);
-
-				_markerViewer.getTable().setFocus();
-			}
-		});
+		_markerViewer.getTable().setFocus();
 	}
 
 	void actionSetGeoPositionAccuracy(final int selectedAccuracy) {
 
-		if (selectedAccuracy == _geoPositionAccuracy) {
+		if (selectedAccuracy == _gpsDecimals) {
 			// nothing has changed
 			return;
 		}
 
-		_geoPositionAccuracy = selectedAccuracy;
-		validateGeoPosition();
+		_gpsDecimals = selectedAccuracy;
+		setup_GeoDigits();
 
 		reloadViewer();
 	}
@@ -484,7 +547,7 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 
 					defineAllColumns();
 
-					_markerViewer = (TableViewer) recreateViewer(_markerViewer);
+					_markerViewer = (CheckboxTableViewer) recreateViewer(_markerViewer);
 
 				} else if (property.equals(ITourbookPreferences.VIEW_LAYOUT_CHANGED)) {
 
@@ -552,10 +615,13 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 		_actionSetPositionAccuracy = new ActionSetGeoPositionAccuracy(this);
 		_actionTourFilterWithGPS = new ActionMarkerFilterWithGPS(this);
 		_actionTourFilterWithoutGPS = new ActionMarkerFilterWithNoGPS(this);
+		_actionTourMarkerFilter = new ActionTourMarkerFilter(this, _uiParent);
 	}
 
 	@Override
 	public void createPartControl(final Composite parent) {
+
+		_uiParent = parent;
 
 		initUI(parent);
 
@@ -609,16 +675,41 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 		/*
 		 * create table
 		 */
-		final Table table = new Table(parent, SWT.FULL_SELECTION | SWT.MULTI /* | SWT.BORDER */);
+		final Table table = new Table(parent, SWT.FULL_SELECTION | SWT.MULTI | SWT.CHECK);
 		GridDataFactory.fillDefaults().grab(true, true).applyTo(table);
 
 		table.setHeaderVisible(true);
 		table.setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
 
 		/*
+		 * It took a while that the correct listener is set and also the checked item is fired and
+		 * not the wrong selection..
+		 */
+		table.addListener(SWT.Selection, new Listener() {
+
+			@Override
+			public void handleEvent(final Event event) {
+
+				if (event.detail == SWT.CHECK) {
+
+					// checkbox is hit
+
+					final TableItem item = (TableItem) event.item;
+
+					onSelect_TourMarker(item);
+
+				} else {
+
+					onSelect_TourMarker(null);
+				}
+			}
+		});
+		;
+
+		/*
 		 * create table viewer
 		 */
-		_markerViewer = new TableViewer(table);
+		_markerViewer = new CheckboxTableViewer(table);
 
 		_columnManager.createColumns(_markerViewer);
 
@@ -627,20 +718,19 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 		_markerViewer.addFilter(new MarkerItemFilter());
 		_markerViewer.setComparator(_markerComparator);
 
-		_markerViewer.addSelectionChangedListener(new ISelectionChangedListener() {
-			@Override
-			public void selectionChanged(final SelectionChangedEvent event) {
-				final StructuredSelection selection = (StructuredSelection) event.getSelection();
-				if (selection != null) {
-					onSelect_TourMarker(selection);
-				}
-			}
-		});
-
 		_markerViewer.addDoubleClickListener(new IDoubleClickListener() {
 			@Override
 			public void doubleClick(final DoubleClickEvent event) {
-				onDoubleClick_TourMarker();
+				onTourMarker_DoubleClick();
+			}
+		});
+
+//		_markerViewer.setCheckStateProvider(checkStateProvider);
+
+		_markerViewer.addCheckStateListener(new ICheckStateListener() {
+			@Override
+			public void checkStateChanged(final CheckStateChangedEvent event) {
+				onTourMarker_StateChanged(event);
 			}
 		});
 
@@ -705,7 +795,7 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 			public void update(final ViewerCell cell) {
 
 				String valueText;
-				final float altitude = ((TourMarkerItem) cell.getElement())._altitude;
+				final float altitude = ((TourMarkerItem) cell.getElement()).altitude;
 
 				if (altitude == TourDatabase.DEFAULT_FLOAT) {
 					valueText = UI.EMPTY_STRING;
@@ -737,7 +827,7 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 
 				final TourMarkerItem tourMarkerItem = (TourMarkerItem) cell.getElement();
 
-				cell.setText(_dateFormatter.format(tourMarkerItem._time));
+				cell.setText(_dateFormatter.format(tourMarkerItem.time));
 			}
 		});
 
@@ -761,7 +851,7 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 			public void update(final ViewerCell cell) {
 
 				final TourMarkerItem marker = (TourMarkerItem) cell.getElement();
-				cell.setText(marker._description);
+				cell.setText(marker.description);
 			}
 		});
 	}
@@ -784,12 +874,12 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 			public void update(final ViewerCell cell) {
 
 				String valueText;
-				final double latitude = ((TourMarkerItem) cell.getElement())._latitude;
+				final double latitude = ((TourMarkerItem) cell.getElement()).latitude;
 
 				if (latitude == TourDatabase.DEFAULT_DOUBLE) {
 					valueText = UI.EMPTY_STRING;
 				} else {
-					if (_geoPositionAccuracy == ActionSetGeoPositionAccuracy.DISABLED_ACCURACY) {
+					if (_gpsDecimals == ActionSetGeoPositionAccuracy.DISABLED_LAT_LON_DIGITS) {
 						valueText = Double.toString(latitude);
 					} else {
 						valueText = _nfGeo.format(latitude);
@@ -819,12 +909,12 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 			public void update(final ViewerCell cell) {
 
 				String valueText;
-				final double longitude = ((TourMarkerItem) cell.getElement())._longitude;
+				final double longitude = ((TourMarkerItem) cell.getElement()).longitude;
 
 				if (longitude == TourDatabase.DEFAULT_DOUBLE) {
 					valueText = UI.EMPTY_STRING;
 				} else {
-					if (_geoPositionAccuracy == ActionSetGeoPositionAccuracy.DISABLED_ACCURACY) {
+					if (_gpsDecimals == ActionSetGeoPositionAccuracy.DISABLED_LAT_LON_DIGITS) {
 						valueText = Double.toString(longitude);
 					} else {
 						valueText = _nfGeo.format(longitude);
@@ -851,7 +941,7 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
-				cell.setText(Long.toString(((TourMarkerItem) cell.getElement())._markerId));
+				cell.setText(Long.toString(((TourMarkerItem) cell.getElement()).markerId));
 			}
 		});
 	}
@@ -874,7 +964,7 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 			public void update(final ViewerCell cell) {
 
 				final TourMarkerItem marker = (TourMarkerItem) cell.getElement();
-				cell.setText(marker._label);
+				cell.setText(marker.label);
 			}
 		});
 	}
@@ -901,7 +991,7 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 
 				final TourMarkerItem tourMarkerItem = (TourMarkerItem) cell.getElement();
 
-				cell.setText(_timeFormatter.format(tourMarkerItem._time));
+				cell.setText(_timeFormatter.format(tourMarkerItem.time));
 			}
 		});
 
@@ -922,7 +1012,7 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
-				cell.setText(Long.toString(((TourMarkerItem) cell.getElement())._tourId));
+				cell.setText(Long.toString(((TourMarkerItem) cell.getElement()).tourId));
 			}
 		});
 
@@ -945,7 +1035,7 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 			@Override
 			public void update(final ViewerCell cell) {
 				final TourMarkerItem markerItem = (TourMarkerItem) cell.getElement();
-				cell.setText(markerItem._urlAddress);
+				cell.setText(markerItem.urlAddress);
 			}
 		});
 	}
@@ -967,7 +1057,7 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 			@Override
 			public void update(final ViewerCell cell) {
 				final TourMarkerItem markerItem = (TourMarkerItem) cell.getElement();
-				cell.setText(markerItem._urlLabel);
+				cell.setText(markerItem.urlLabel);
 			}
 		});
 	}
@@ -1036,6 +1126,7 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 
 		tbm.add(_actionTourFilterWithGPS);
 		tbm.add(_actionTourFilterWithoutGPS);
+		tbm.add(_actionTourMarkerFilter);
 	}
 
 	@Override
@@ -1055,12 +1146,12 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 		}
 
 		// get tour by id
-		final TourData tourData = TourManager.getInstance().getTourData(tourMarkerItem._tourId);
+		final TourData tourData = TourManager.getInstance().getTourData(tourMarkerItem.tourId);
 		if (tourData == null) {
 			return null;
 		}
 
-		final long markerId = tourMarkerItem._markerId;
+		final long markerId = tourMarkerItem.markerId;
 
 		// get marker by id
 		for (final TourMarker tourMarker : tourData.getTourMarkers()) {
@@ -1074,7 +1165,7 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 
 	private TourMarkerItem getSelectedTourMarkerItem() {
 
-		final StructuredSelection selection = (StructuredSelection) _markerViewer.getSelection();
+		final StructuredSelection selection = getViewerSelection();
 
 		if (selection.getFirstElement() instanceof TourMarkerItem) {
 			return (TourMarkerItem) selection.getFirstElement();
@@ -1087,7 +1178,7 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 
 		final ArrayList<TourData> selectedTours = new ArrayList<TourData>();
 
-		final StructuredSelection selection = (StructuredSelection) _markerViewer.getSelection();
+		final StructuredSelection selection = getViewerSelection();
 
 		for (final Iterator<?> iterator = selection.iterator(); iterator.hasNext();) {
 
@@ -1100,7 +1191,7 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 				final TourMarkerItem tourMarkerItem = (TourMarkerItem) element;
 
 				// get tour by id
-				final TourData tourData = TourManager.getInstance().getTourData(tourMarkerItem._tourId);
+				final TourData tourData = TourManager.getInstance().getTourData(tourMarkerItem.tourId);
 
 				if (tourData != null) {
 					selectedTours.add(tourData);
@@ -1137,6 +1228,11 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 		return _markerViewer;
 	}
 
+	private StructuredSelection getViewerSelection() {
+
+		return (StructuredSelection) _markerViewer.getSelection();
+	}
+
 	private void initUI(final Composite parent) {
 
 		_pc = new PixelConverter(parent);
@@ -1149,13 +1245,17 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 		};
 	}
 
+	boolean isGeoFilterActive() {
+		return _isGeoFilterActive;
+	}
+
 	private void loadAllMarker() {
 
 //		final long start = System.nanoTime();
 
 		_allMarkerItems.clear();
 
-		final double geoAccuracyFactor = Math.pow(10, _geoPositionAccuracy);
+		final double geoAccuracyFactor = Math.pow(10, _gpsDecimals);
 
 		Connection conn = null;
 		PreparedStatement statement = null;
@@ -1206,15 +1306,15 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 				final double dbLongitude = result.getDouble(8);
 				if (dbLatitude == TourDatabase.DEFAULT_DOUBLE) {
 
-					markerItem._latitude = dbLatitude;
-					markerItem._longitude = dbLongitude;
+					markerItem.latitude = dbLatitude;
+					markerItem.longitude = dbLongitude;
 
 				} else {
 
-					if (_geoPositionAccuracy == ActionSetGeoPositionAccuracy.DISABLED_ACCURACY) {
+					if (_gpsDecimals == ActionSetGeoPositionAccuracy.DISABLED_LAT_LON_DIGITS) {
 
-						markerItem._latitude = dbLatitude;
-						markerItem._longitude = dbLongitude;
+						markerItem.latitude = dbLatitude;
+						markerItem.longitude = dbLongitude;
 
 					} else {
 
@@ -1223,19 +1323,19 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 						final long longLat = (long) (dbLatitude * geoAccuracyFactor);
 						final long longLon = (long) (dbLongitude * geoAccuracyFactor);
 
-						markerItem._latitude = longLat / geoAccuracyFactor;
-						markerItem._longitude = longLon / geoAccuracyFactor;
+						markerItem.latitude = longLat / geoAccuracyFactor;
+						markerItem.longitude = longLon / geoAccuracyFactor;
 					}
 				}
 
-				markerItem._markerId = result.getLong(1);
-				markerItem._tourId = result.getLong(2);
-				markerItem._label = dbLabel == null ? UI.EMPTY_STRING : dbLabel;
-				markerItem._description = dbDescription == null ? UI.EMPTY_STRING : dbDescription;
-				markerItem._urlLabel = dbUrlLabel == null ? UI.EMPTY_STRING : dbUrlLabel;
-				markerItem._urlAddress = dbUrlAddress == null ? UI.EMPTY_STRING : dbUrlAddress;
-				markerItem._altitude = result.getFloat(9);
-				markerItem._time = result.getLong(10);
+				markerItem.markerId = result.getLong(1);
+				markerItem.tourId = result.getLong(2);
+				markerItem.label = dbLabel == null ? UI.EMPTY_STRING : dbLabel;
+				markerItem.description = dbDescription == null ? UI.EMPTY_STRING : dbDescription;
+				markerItem.urlLabel = dbUrlLabel == null ? UI.EMPTY_STRING : dbUrlLabel;
+				markerItem.urlAddress = dbUrlAddress == null ? UI.EMPTY_STRING : dbUrlAddress;
+				markerItem.altitude = result.getFloat(9);
+				markerItem.time = result.getLong(10);
 			}
 
 		} catch (final SQLException e) {
@@ -1251,44 +1351,51 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 //		// TODO remove SYSTEM.OUT.PRINTLN
 	}
 
-	private void onDoubleClick_TourMarker() {
-
-		final TourMarker tourMarker = getSelectedTourMarker();
-
-		if (tourMarker == null) {
-			return;
-		}
-
-		_actionOpenMarkerDialog.setTourMarker(tourMarker);
-		_actionOpenMarkerDialog.run();
-	}
-
 	private void onSelect_SortColumn(final SelectionEvent e) {
 
 		_viewerContainer.setRedraw(false);
 		{
 			// keep selection
-			final ISelection selectionBackup = _markerViewer.getSelection();
+			final ISelection selectionBackup = getViewerSelection();
 			{
 				// update viewer with new sorting
 				_markerComparator.setSortColumn(e.widget);
 				_markerViewer.refresh();
 			}
-			updateUI_ReselectTourMarker(selectionBackup);
+			updateUI_SelectTourMarker(selectionBackup);
 		}
 		_viewerContainer.setRedraw(true);
 	}
 
-	private void onSelect_TourMarker(final StructuredSelection selection) {
+	private void onSelect_TourMarker(final TableItem item) {
 
 		if (_isInUpdate) {
 			return;
 		}
 
+		StructuredSelection selection;
+
+		if (item == null) {
+
+			selection = (StructuredSelection) _markerViewer.getSelection();
+
+		} else {
+
+			/**
+			 * This is VERY important
+			 * <p>
+			 * Table.getSelection() returns the wrong selection when the user clicked on a checkbox.
+			 */
+
+			final Object selectedMarker = item.getData();
+
+			selection = new StructuredSelection(selectedMarker);
+		}
+
 		// get unique tour id's
 		final HashSet<Long> tourIds = new HashSet<Long>();
 		for (final Iterator<?> selectedItem = selection.iterator(); selectedItem.hasNext();) {
-			tourIds.add(((TourMarkerItem) selectedItem.next())._tourId);
+			tourIds.add(((TourMarkerItem) selectedItem.next()).tourId);
 		}
 
 		final SelectionTourIds selectionTourIds = new SelectionTourIds(new ArrayList<>(tourIds));
@@ -1302,7 +1409,7 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 			final TourMarkerItem firstMarkerItem = (TourMarkerItem) selection.getFirstElement();
 
 			// get tour by id
-			final TourData tourData = TourManager.getInstance().getTourData(firstMarkerItem._tourId);
+			final TourData tourData = TourManager.getInstance().getTourData(firstMarkerItem.tourId);
 			if (tourData == null) {
 				return;
 			}
@@ -1311,7 +1418,7 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 
 			for (final Iterator<?> iterator = selection.iterator(); iterator.hasNext();) {
 
-				final long selectedMarkerId = ((TourMarkerItem) iterator.next())._markerId;
+				final long selectedMarkerId = ((TourMarkerItem) iterator.next()).markerId;
 
 				// get marker by id
 				for (final TourMarker tourMarker : tourData.getTourMarkers()) {
@@ -1340,9 +1447,13 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 
 		} else if (uniqueTourIds > 1) {
 
-			// multiple tours are selected
+			// multiple tours are selected, fire a part selection
 
-			_postSelectionProvider.setSelection(selectionTourIds);
+			_isInUpdate = true;
+			{
+				_postSelectionProvider.setSelection(selectionTourIds);
+			}
+			_isInUpdate = false;
 		}
 	}
 
@@ -1360,7 +1471,7 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 			// find tour marker in marker items
 			TourMarkerItem selectedMarkerItem = null;
 			for (final TourMarkerItem tourMarker : _allMarkerItems) {
-				if (tourMarker._markerId == selectedTourMarkerId) {
+				if (tourMarker.markerId == selectedTourMarkerId) {
 					selectedMarkerItem = tourMarker;
 					break;
 				}
@@ -1370,8 +1481,98 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 
 				final StructuredSelection markerViewerSelection = new StructuredSelection(selectedMarkerItem);
 
-				updateUI_ReselectTourMarker(markerViewerSelection);
+				updateUI_SelectTourMarker(markerViewerSelection);
 			}
+		}
+	}
+
+	private void onTourMarker_DoubleClick() {
+
+		final TourMarker tourMarker = getSelectedTourMarker();
+
+		if (tourMarker == null) {
+			return;
+		}
+
+		_actionOpenMarkerDialog.setTourMarker(tourMarker);
+		_actionOpenMarkerDialog.run();
+	}
+
+	private void onTourMarker_StateChanged(final CheckStateChangedEvent event) {
+
+		final boolean isChecked = event.getChecked();
+		final Object checkedElement = event.getElement();
+		final Object[] checkedElements = _markerViewer.getCheckedElements();
+
+		final TourMarkerItem markerItem = (TourMarkerItem) checkedElement;
+		final boolean isMarkerWithGPS = markerItem.latitude != TourDatabase.DEFAULT_DOUBLE;
+
+		Object checkedMarker = null;
+
+		_isGeoFilterActive = false;
+
+		if (isMarkerWithGPS) {
+
+			if (isChecked) {
+
+				_isGeoFilterActive = true;
+
+				/*
+				 * Ensure that the checked marker is also selected. It is possible that a selected
+				 * and checked marker gets unchecked and another marker is checked that it is not
+				 * selected.
+				 */
+
+				boolean isCheckAndSelected = false;
+
+				final TableItem[] seletedItems = _markerViewer.getTable().getSelection();
+				for (final TableItem tableItem : seletedItems) {
+					if (tableItem.getData() == checkedElement) {
+						isCheckAndSelected = true;
+						break;
+					}
+				}
+
+				if (isCheckAndSelected == false) {
+
+					updateUI_SelectTourMarker(new StructuredSelection(checkedElement));
+
+//					Table table = _markerViewer.getTable();
+//					table.setSelection(item);
+//					table.showSelection();
+
+				}
+			}
+
+		} else {
+
+			// prevent to check tour marker without GPS
+
+			_markerViewer.setGrayed(checkedElement, true);
+
+			checkedMarker = checkedElement;
+		}
+
+		if (isChecked && checkedElements.length > 1) {
+
+			// only 1 marker can be checked
+
+			checkedMarker = checkedElement;
+		}
+
+		if (checkedMarker != null) {
+
+			for (final Object element : checkedElements) {
+				if (element != checkedMarker) {
+					_markerViewer.setChecked(element, false);
+				}
+			}
+
+			updateUI_SelectTourMarker(new StructuredSelection(checkedMarker));
+		}
+
+		if (isMarkerWithGPS) {
+			updateUI_GeoFilter(markerItem);
 		}
 	}
 
@@ -1381,7 +1582,7 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 		_viewerContainer.setRedraw(false);
 		{
 			// keep selection
-			final ISelection selectionBackup = _markerViewer.getSelection();
+			final ISelection selectionBackup = getViewerSelection();
 			{
 				_markerViewer.getTable().dispose();
 
@@ -1393,13 +1594,32 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 				// update the viewer
 				updateUI_SetViewerInput();
 			}
-			updateUI_ReselectTourMarker(selectionBackup);
+			updateUI_SelectTourMarker(selectionBackup);
 		}
 		_viewerContainer.setRedraw(true);
 
 		_markerViewer.getTable().setFocus();
 
 		return _markerViewer;
+	}
+
+	private void refilterViewer() {
+
+		BusyIndicator.showWhile(_viewerContainer.getDisplay(), new Runnable() {
+			public void run() {
+
+				_viewerContainer.setRedraw(false);
+				{
+					// keep selection
+					final ISelection selectionBackup = getViewerSelection();
+					{
+						_markerViewer.refresh(false);
+					}
+					updateUI_SelectTourMarker(selectionBackup);
+				}
+				_viewerContainer.setRedraw(true);
+			}
+		});
 	}
 
 	@Override
@@ -1410,11 +1630,11 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 		_viewerContainer.setRedraw(false);
 		{
 			// keep selection
-			final ISelection selectionBackup = _markerViewer.getSelection();
+			final ISelection selectionBackup = getViewerSelection();
 			{
 				updateUI_SetViewerInput();
 			}
-			updateUI_ReselectTourMarker(selectionBackup);
+			updateUI_SelectTourMarker(selectionBackup);
 		}
 		_viewerContainer.setRedraw(true);
 	}
@@ -1422,13 +1642,16 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 	private void restoreState_BeforeUI() {
 
 		// GPS tour filter
-		_markerFilterGPS = Util.getStateInt(_state, STATE_TOUR_FILTER_GPS, MARKER_GPS_FILTER_IS_DISABLED);
+		_gpsMarkerFilter = Util.getStateInt(_state, STATE_GPS_MARKER_FILTER, GPS_MARKER_FILTER_IS_DISABLED);
 
-		// geo position accuracy
-		_geoPositionAccuracy = Util.getStateInt(_state,//
-				STATE_GEO_POSITION_ACCURACY,
-				ActionSetGeoPositionAccuracy.DEFAULT_ACCURACY);
-		validateGeoPosition();
+		// lat/lon digits
+		_gpsDecimals = Util.getStateInt(_state,//
+				STATE_LAT_LON_DIGITS,
+				ActionSetGeoPositionAccuracy.DEFAULT_LAT_LON_DIGITS);
+		setup_GeoDigits();
+
+		// geo filter accuracy
+		_geoFilterMaxDiff = Util.getStateDouble(_state, STATE_GEO_FILTER_ACCURACY, DEFAULT_GEO_FILTER_ACCURACY);
 
 		// sorting
 		final String sortColumnId = Util.getStateString(_state, STATE_SORT_COLUMN_ID, COLUMN_NAME);
@@ -1442,11 +1665,11 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 	private void restoreState_WithUI() {
 
 		// GPS tour filter
-		_actionTourFilterWithGPS.setChecked(_markerFilterGPS == MARKER_GPS_FILTER_WITH_GPS);
-		_actionTourFilterWithoutGPS.setChecked(_markerFilterGPS == MARKER_GPS_FILTER_WITH_NO_GPS);
+		_actionTourFilterWithGPS.setChecked(_gpsMarkerFilter == GPS_MARKER_FILTER_WITH_GPS);
+		_actionTourFilterWithoutGPS.setChecked(_gpsMarkerFilter == GPS_MARKER_FILTER_WITHOUT_GPS);
 
 		// geo position accuracy
-		_actionSetPositionAccuracy.setAccuracy(_geoPositionAccuracy);
+		_actionSetPositionAccuracy.setAccuracy(_gpsDecimals);
 
 		/*
 		 * select marker item
@@ -1459,9 +1682,9 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 
 			// select marker item by it's ID
 			for (final TourMarkerItem markerItem : _allMarkerItems) {
-				if (markerItem._markerId == stateMarkerId) {
+				if (markerItem.markerId == stateMarkerId) {
 
-					updateUI_ReselectTourMarker(new StructuredSelection(markerItem));
+					updateUI_SelectTourMarker(new StructuredSelection(markerItem));
 
 					return;
 				}
@@ -1476,19 +1699,19 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 		_state.put(STATE_SORT_COLUMN_ID, _markerComparator.__sortColumnId);
 		_state.put(STATE_SORT_COLUMN_DIRECTION, _markerComparator.__sortDirection);
 
-		_state.put(STATE_TOUR_FILTER_GPS, _markerFilterGPS);
-		_state.put(STATE_GEO_POSITION_ACCURACY, _geoPositionAccuracy);
+		_state.put(STATE_GPS_MARKER_FILTER, _gpsMarkerFilter);
+		_state.put(STATE_LAT_LON_DIGITS, _gpsDecimals);
 
 		/*
 		 * selected marker item
 		 */
 		long markerId = TourDatabase.ENTITY_IS_NOT_SAVED;
-		final StructuredSelection selection = (StructuredSelection) _markerViewer.getSelection();
+		final StructuredSelection selection = getViewerSelection();
 		final Object firstItem = selection.getFirstElement();
 
 		if (firstItem instanceof TourMarkerItem) {
 			final TourMarkerItem markerItem = (TourMarkerItem) firstItem;
-			markerId = markerItem._markerId;
+			markerId = markerItem.markerId;
 		}
 		_state.put(STATE_SELECTED_MARKER_ITEM, markerId);
 	}
@@ -1499,16 +1722,57 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 	}
 
 	/**
+	 * Validates geo position accuracy and setup's the position formatter.
+	 */
+	private void setup_GeoDigits() {
+
+		if (_gpsDecimals != ActionSetGeoPositionAccuracy.DISABLED_LAT_LON_DIGITS) {
+
+			// ensure value is valid
+			if (_gpsDecimals < 0 || _gpsDecimals > ActionSetGeoPositionAccuracy.MAX_LAT_LON_DIGITS) {
+				_gpsDecimals = ActionSetGeoPositionAccuracy.DEFAULT_LAT_LON_DIGITS;
+			}
+
+			_nfGeo.setMinimumFractionDigits(_gpsDecimals);
+			_nfGeo.setMaximumFractionDigits(_gpsDecimals);
+		}
+	}
+
+	void updateUI_GeoFilter() {
+
+		// geo filter accuracy
+		_geoFilterMaxDiff = Util.getStateDouble(_state, STATE_GEO_FILTER_ACCURACY, DEFAULT_GEO_FILTER_ACCURACY);
+
+		refilterViewer();
+	}
+
+	private void updateUI_GeoFilter(final TourMarkerItem markerItem) {
+
+		_geoFilterLat = markerItem.latitude;
+		_geoFilterLon = markerItem.longitude;
+
+		_viewerContainer.setRedraw(false);
+		{
+			_markerViewer.refresh(false);
+			_markerViewer.reveal(markerItem);
+		}
+		_viewerContainer.setRedraw(true);
+
+	}
+
+	/**
 	 * Select and reveal tour marker item.
 	 * 
 	 * @param selection
 	 */
-	private void updateUI_ReselectTourMarker(final ISelection selection) {
+	private void updateUI_SelectTourMarker(final ISelection selection) {
 
 		_isInUpdate = true;
 		{
 			_markerViewer.setSelection(selection, true);
-			_markerViewer.getTable().showSelection();
+
+			final Table table = _markerViewer.getTable();
+			table.showSelection();
 		}
 		_isInUpdate = false;
 	}
@@ -1535,23 +1799,6 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 			_markerViewer.setInput(new Object[0]);
 		}
 		_isInUpdate = false;
-	}
-
-	/**
-	 * Validates geo position accuracy and setup's the position formatter.
-	 */
-	private void validateGeoPosition() {
-
-		if (_geoPositionAccuracy != ActionSetGeoPositionAccuracy.DISABLED_ACCURACY) {
-
-			// ensure value is valid
-			if (_geoPositionAccuracy < 0 || _geoPositionAccuracy > ActionSetGeoPositionAccuracy.MAX_ACCURACY) {
-				_geoPositionAccuracy = ActionSetGeoPositionAccuracy.DEFAULT_ACCURACY;
-			}
-
-			_nfGeo.setMinimumFractionDigits(_geoPositionAccuracy);
-			_nfGeo.setMaximumFractionDigits(_geoPositionAccuracy);
-		}
 	}
 
 }
