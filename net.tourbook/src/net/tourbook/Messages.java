@@ -672,7 +672,9 @@ public class Messages extends NLS {
 	public static String		Image__layout_hierarchical;
 	public static String		Image__link;
 	public static String		Image__MarkerFilter_WithGPS;
+	public static String		Image__MarkerFilter_WithGPS_Disabled;
 	public static String		Image__MarkerFilter_WithoutGPS;
+	public static String		Image__MarkerFilter_WithoutGPS_Disabled;
 	public static String		Image__MyTourbook16;
 	public static String		Image__options;
 	public static String		Image__Options_Bright;
@@ -1179,7 +1181,19 @@ public class Messages extends NLS {
 //	public static String		Slideout_ChartMarkerOptions_Label_SignImageSize;
 //	public static String		Slideout_ChartMarkerOptions_Label_SignImageSize_Tooltip;
 
-	public static String	Slideout_TourMarkerFilter_Label_GeoFilterDiff;
+	public static String	Slideout_TourMarkerFilter_Checkbox_IsReduceLatLonDigits;
+
+	public static String	Slideout_TourMarkerFilter_Checkbox_IsReduceLatLonDigits_Tooltip;
+
+	public static String		Slideout_TourMarkerFilter_Label_GeoFilter;
+
+	public static String		Slideout_TourMarkerFilter_Label_GeoFilter_Tooltip;
+
+	public static String	Slideout_TourMarkerFilter_Label_GeoFilterArea;
+
+	public static String	Slideout_TourMarkerFilter_Label_GeoFilterNotAvailable;
+
+	public static String	Slideout_TourMarkerFilter_Label_LatLonDigits;
 
 	public static String		Tooltip_ValuePoint_Action_CloseContextMenu;
 	public static String		Tooltip_ValuePoint_Action_OpenToolTipMenu_ToolTip;
