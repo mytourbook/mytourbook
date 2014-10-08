@@ -26,7 +26,6 @@ import net.tourbook.ui.views.tourMarker.TourMarkerAllView.TourMarkerItem;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
-import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseEvent;
@@ -42,6 +41,7 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Spinner;
@@ -67,7 +67,7 @@ public class SlideoutTourMarkerFilter extends AnimatedToolTipShell implements IC
 	private boolean					_canOpenToolTip;
 	private boolean					_isAnotherDialogOpened;
 
-	private PixelConverter			_pc;
+//	private PixelConverter			_pc;
 	private Font					_boldFont;
 
 	/*
@@ -77,7 +77,7 @@ public class SlideoutTourMarkerFilter extends AnimatedToolTipShell implements IC
 
 	private Button					_chkLatLonDigits;
 
-	private Label					_lblGeoFilter;
+	private Group					_groupGeoFilter;
 	private Label					_lblGeoFilterArea;
 	private Label					_lblGeoFilterUnit;
 	private Label					_lblGeoFilterValuePrefix;
@@ -183,7 +183,7 @@ public class SlideoutTourMarkerFilter extends AnimatedToolTipShell implements IC
 		{
 			final Composite container = new Composite(_shellContainer, SWT.NONE);
 			GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-			GridLayoutFactory.fillDefaults().numColumns(4).applyTo(container);
+			GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
 //			container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
 			{
 				createUI_10_GeoFilter(container);
@@ -197,84 +197,81 @@ public class SlideoutTourMarkerFilter extends AnimatedToolTipShell implements IC
 	private void createUI_10_GeoFilter(final Composite parent) {
 
 		/*
-		 * Geo filter
+		 * Group: Geo filter
 		 */
+		_groupGeoFilter = new Group(parent, SWT.NONE);
+		GridDataFactory.fillDefaults()//
+				.align(SWT.FILL, SWT.CENTER)
+				.grab(true, false)
+				.span(3, 1)
+				.applyTo(_groupGeoFilter);
+		GridLayoutFactory.swtDefaults().numColumns(4).applyTo(_groupGeoFilter);
+		_groupGeoFilter.setText(Messages.Slideout_TourMarkerFilter_Label_GeoFilter);
+		_groupGeoFilter.setToolTipText(Messages.Slideout_TourMarkerFilter_Label_GeoFilter_Tooltip);
 		{
-			// label
-			_lblGeoFilter = new Label(parent, SWT.NONE);
-			GridDataFactory.fillDefaults()//
-					.align(SWT.FILL, SWT.CENTER)
-					.grab(true, false)
-					.span(4, 1)
-					.applyTo(_lblGeoFilter);
-			_lblGeoFilter.setText(Messages.Slideout_TourMarkerFilter_Label_GeoFilter);
-			_lblGeoFilter.setToolTipText(Messages.Slideout_TourMarkerFilter_Label_GeoFilter_Tooltip);
-		}
+			/*
+			 * Selected marker
+			 */
+			{
+				// label
+				_lblSelectedMarker = new Label(_groupGeoFilter, SWT.READ_ONLY);
+				GridDataFactory.fillDefaults()//
+						.span(4, 1)
+						.align(SWT.FILL, SWT.CENTER)
+//					.indent(_pc.convertWidthInCharsToPixels(3), 0)
+						.applyTo(_lblSelectedMarker);
+				_lblSelectedMarker.setFont(_boldFont);
+			}
 
-		/*
-		 * Selected marker
-		 */
-		{
-			// label
-			_lblSelectedMarker = new Label(parent, SWT.READ_ONLY);
-			GridDataFactory.fillDefaults()//
-					.span(4, 1)
-					.align(SWT.FILL, SWT.CENTER)
-					.indent(_pc.convertWidthInCharsToPixels(3), 0)
-					.applyTo(_lblSelectedMarker);
-			_lblSelectedMarker.setFont(_boldFont);
-			_lblSelectedMarker.setToolTipText(Messages.Slideout_TourMarkerFilter_Label_GeoFilter_Tooltip);
-		}
+			/*
+			 * Geo filter area
+			 */
+			{
+				// label
+				_lblGeoFilterArea = new Label(_groupGeoFilter, SWT.NONE);
+				GridDataFactory.fillDefaults()//
+						.align(SWT.FILL, SWT.CENTER)
+						.grab(true, false)
+//					.indent(_pc.convertWidthInCharsToPixels(3), 0)
+						.applyTo(_lblGeoFilterArea);
+				_lblGeoFilterArea.setText(Messages.Slideout_TourMarkerFilter_Label_GeoFilterArea);
 
-		/*
-		 * Geo filter area
-		 */
-		{
-			// label
-			_lblGeoFilterArea = new Label(parent, SWT.NONE);
-			GridDataFactory.fillDefaults()//
-					.align(SWT.FILL, SWT.CENTER)
-					.grab(true, false)
-					.indent(_pc.convertWidthInCharsToPixels(3), 0)
-					.applyTo(_lblGeoFilterArea);
-			_lblGeoFilterArea.setText(Messages.Slideout_TourMarkerFilter_Label_GeoFilterArea);
-			_lblGeoFilterArea.setToolTipText(Messages.Slideout_TourMarkerFilter_Label_GeoFilter_Tooltip);
+				// value prefix: plus/minus
+				_lblGeoFilterValuePrefix = new Label(_groupGeoFilter, SWT.NONE);
+				GridDataFactory.fillDefaults()//
+						.align(SWT.END, SWT.CENTER)
+						.applyTo(_lblGeoFilterValuePrefix);
+				_lblGeoFilterValuePrefix.setText(UI.SYMBOL_PLUS_MINUS);
 
-			// value prefix: plus/minus
-			_lblGeoFilterValuePrefix = new Label(parent, SWT.NONE);
-			GridDataFactory.fillDefaults()//
-					.align(SWT.END, SWT.CENTER)
-					.applyTo(_lblGeoFilterValuePrefix);
-			_lblGeoFilterValuePrefix.setText(UI.SYMBOL_PLUS_MINUS);
+				// spinner
+				_spinnerGeoFilter = new Spinner(_groupGeoFilter, SWT.BORDER);
+				GridDataFactory.fillDefaults()//
+						.align(SWT.END, SWT.CENTER)
+						.applyTo(_spinnerGeoFilter);
+				_spinnerGeoFilter.setMinimum(0);
+				_spinnerGeoFilter.setMaximum((int) (1 * Math.pow(10, GEO_FILTER_DIGITS)));
+				_spinnerGeoFilter.setDigits(GEO_FILTER_DIGITS);
+				_spinnerGeoFilter.setPageIncrement(50);
+				_spinnerGeoFilter.addMouseWheelListener(new MouseWheelListener() {
+					public void mouseScrolled(final MouseEvent event) {
+						UI.adjustSpinnerValueOnMouseScroll(event);
+						onSelect_GeoFilter();
+					}
+				});
+				_spinnerGeoFilter.addSelectionListener(new SelectionAdapter() {
+					@Override
+					public void widgetSelected(final SelectionEvent e) {
+						onSelect_GeoFilter();
+					}
+				});
 
-			// spinner
-			_spinnerGeoFilter = new Spinner(parent, SWT.BORDER);
-			GridDataFactory.fillDefaults()//
-					.align(SWT.END, SWT.CENTER)
-					.applyTo(_spinnerGeoFilter);
-			_spinnerGeoFilter.setMinimum(0);
-			_spinnerGeoFilter.setMaximum((int) (1 * Math.pow(10, GEO_FILTER_DIGITS)));
-			_spinnerGeoFilter.setDigits(GEO_FILTER_DIGITS);
-			_spinnerGeoFilter.setPageIncrement(50);
-			_spinnerGeoFilter.addMouseWheelListener(new MouseWheelListener() {
-				public void mouseScrolled(final MouseEvent event) {
-					UI.adjustSpinnerValueOnMouseScroll(event);
-					onSelect_GeoFilter();
-				}
-			});
-			_spinnerGeoFilter.addSelectionListener(new SelectionAdapter() {
-				@Override
-				public void widgetSelected(final SelectionEvent e) {
-					onSelect_GeoFilter();
-				}
-			});
-
-			// unit
-			_lblGeoFilterUnit = new Label(parent, SWT.NONE);
-			GridDataFactory.fillDefaults()//
-					.align(SWT.BEGINNING, SWT.CENTER)
-					.applyTo(_lblGeoFilterUnit);
-			_lblGeoFilterUnit.setText(UI.SYMBOL_DEGREE);
+				// unit
+				_lblGeoFilterUnit = new Label(_groupGeoFilter, SWT.NONE);
+				GridDataFactory.fillDefaults()//
+						.align(SWT.BEGINNING, SWT.CENTER)
+						.applyTo(_lblGeoFilterUnit);
+				_lblGeoFilterUnit.setText(UI.SYMBOL_DEGREE);
+			}
 		}
 	}
 
@@ -314,9 +311,6 @@ public class SlideoutTourMarkerFilter extends AnimatedToolTipShell implements IC
 				}
 			});
 			_spinnerLatLonDigits.addSelectionListener(_selectionAdapterLatLonDigits);
-
-			// spacer
-			new Label(parent, SWT.NONE);
 		}
 	}
 
@@ -357,7 +351,7 @@ public class SlideoutTourMarkerFilter extends AnimatedToolTipShell implements IC
 
 	private void initUI(final Composite parent) {
 
-		_pc = new PixelConverter(parent);
+//		_pc = new PixelConverter(parent);
 		_boldFont = JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT);
 	}
 

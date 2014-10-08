@@ -446,7 +446,7 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 
 		@Override
 		public String toString() {
-			return "TourMarkerItem [_label=" + label + "]";
+			return "TourMarkerItem [_label=" + label + "]"; //$NON-NLS-1$ //$NON-NLS-2$
 		}
 	}
 

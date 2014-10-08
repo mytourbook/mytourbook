@@ -181,10 +181,6 @@ public class Messages extends NLS {
 	public static String		Action_Tag_AutoOpenCancel;
 	public static String		Action_Tag_AutoOpenOK;
 
-	public static String		Action_TourMarkerAllView_DisableGeoPositionAccuracy;
-	public static String		Action_TourMarkerAllView_GeoPositionAccuracy;
-	public static String		Action_TourMarkerAllView_SetGeoPositionAccuracy;
-
 	public static String		Action_TourType_ModifyTourTypeFilter;
 
 	public static String		Adjust_Altitude_Checkbox_SRTM_SelectWholeTour;
@@ -1181,19 +1177,12 @@ public class Messages extends NLS {
 //	public static String		Slideout_ChartMarkerOptions_Label_SignImageSize;
 //	public static String		Slideout_ChartMarkerOptions_Label_SignImageSize_Tooltip;
 
-	public static String	Slideout_TourMarkerFilter_Checkbox_IsReduceLatLonDigits;
-
-	public static String	Slideout_TourMarkerFilter_Checkbox_IsReduceLatLonDigits_Tooltip;
-
+	public static String		Slideout_TourMarkerFilter_Checkbox_IsReduceLatLonDigits;
+	public static String		Slideout_TourMarkerFilter_Checkbox_IsReduceLatLonDigits_Tooltip;
 	public static String		Slideout_TourMarkerFilter_Label_GeoFilter;
-
 	public static String		Slideout_TourMarkerFilter_Label_GeoFilter_Tooltip;
-
-	public static String	Slideout_TourMarkerFilter_Label_GeoFilterArea;
-
-	public static String	Slideout_TourMarkerFilter_Label_GeoFilterNotAvailable;
-
-	public static String	Slideout_TourMarkerFilter_Label_LatLonDigits;
+	public static String		Slideout_TourMarkerFilter_Label_GeoFilterArea;
+	public static String		Slideout_TourMarkerFilter_Label_GeoFilterNotAvailable;
 
 	public static String		Tooltip_ValuePoint_Action_CloseContextMenu;
 	public static String		Tooltip_ValuePoint_Action_OpenToolTipMenu_ToolTip;
@@ -1221,7 +1210,6 @@ public class Messages extends NLS {
 	public static String		Tooltip_ValuePoint_Action_Value_TimeDuration;
 	public static String		Tooltip_ValuePoint_Action_Value_TimeOfDay;
 	public static String		Tooltip_ValuePoint_Action_Value_TimeSlices;
-
 	public static String		Tooltip_ValuePoint_Format_Pace;
 	public static String		Tooltip_ValuePoint_Label_ChartZoomFactor_Tooltip;
 	public static String		Tooltip_ValuePoint_Label_NoData;
