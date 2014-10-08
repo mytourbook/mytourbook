@@ -227,6 +227,10 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 
 	private int						isMarkerVisible								= 1;
 
+	/*
+	 * NO ENTITY FIELDS
+	 */
+
 	/**
 	 * visibleType is used to show the marker with different visible effects (color)
 	 */

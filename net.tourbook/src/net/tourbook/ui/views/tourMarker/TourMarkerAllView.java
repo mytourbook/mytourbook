@@ -150,6 +150,11 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 	private ActionTourMarkerFilter		_actionTourMarkerFilter;
 	private ActionMarkerFilterWithGPS	_actionTourFilterWithGPS;
 	private ActionMarkerFilterWithNoGPS	_actionTourFilterWithoutGPS;
+	//
+	private CheckboxTableViewer			_markerViewer;
+	private MarkerComparator			_markerComparator					= new MarkerComparator();
+	private ColumnManager				_columnManager;
+	private SelectionAdapter			_columnSortListener;
 
 	private ArrayList<TourMarkerItem>	_allMarkerItems						= new ArrayList<TourMarkerItem>();
 
@@ -185,11 +190,6 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 		_nf3.setMinimumFractionDigits(3);
 		_nf3.setMaximumFractionDigits(3);
 	}
-	//
-	private CheckboxTableViewer			_markerViewer;
-	private MarkerComparator			_markerComparator					= new MarkerComparator();
-	private ColumnManager				_columnManager;
-	private SelectionAdapter			_columnSortListener;
 
 	/*
 	 * UI controls
@@ -673,25 +673,13 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 
 		/*
 		 * It took a while that the correct listener is set and also the checked item is fired and
-		 * not the wrong selection..
+		 * not the wrong selection.
 		 */
 		table.addListener(SWT.Selection, new Listener() {
 
 			@Override
 			public void handleEvent(final Event event) {
-
-				if (event.detail == SWT.CHECK) {
-
-					// checkbox is hit
-
-					final TableItem item = (TableItem) event.item;
-
-					onSelect_TourMarker(item);
-
-				} else {
-
-					onSelect_TourMarker(null);
-				}
+				onSelect_TourMarker(event);
 			}
 		});
 		;
@@ -1120,6 +1108,73 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 		tbm.add(_actionTourMarkerFilter);
 	}
 
+	private void fireSelection(final StructuredSelection selection) {
+
+		// get unique tour id's
+		final HashSet<Long> tourIds = new HashSet<Long>();
+		for (final Iterator<?> selectedItem = selection.iterator(); selectedItem.hasNext();) {
+			tourIds.add(((TourMarkerItem) selectedItem.next()).tourId);
+		}
+
+		final SelectionTourIds selectionTourIds = new SelectionTourIds(new ArrayList<>(tourIds));
+
+		final int uniqueTourIds = tourIds.size();
+
+		if (uniqueTourIds == 1) {
+
+			// only one unique tour is selected, fire a marker selection
+
+			final TourMarkerItem firstMarkerItem = (TourMarkerItem) selection.getFirstElement();
+
+			// get tour by id
+			final TourData tourData = TourManager.getInstance().getTourData(firstMarkerItem.tourId);
+			if (tourData == null) {
+				return;
+			}
+
+			final ArrayList<TourMarker> selectedTourMarkers = new ArrayList<TourMarker>();
+
+			for (final Iterator<?> iterator = selection.iterator(); iterator.hasNext();) {
+
+				final long selectedMarkerId = ((TourMarkerItem) iterator.next()).markerId;
+
+				// get marker by id
+				for (final TourMarker tourMarker : tourData.getTourMarkers()) {
+					if (tourMarker.getMarkerId() == selectedMarkerId) {
+						selectedTourMarkers.add(tourMarker);
+						break;
+					}
+				}
+			}
+
+			_isInUpdate = true;
+			{
+				/*
+				 * Set selection in the selection provider that the part selection provider is in
+				 * sync with the marker selection, otherwise a selection listener, e.g. tour editor
+				 * can display the wrong tour. This happened !!!
+				 */
+				_postSelectionProvider.setSelectionNoFireEvent(selectionTourIds);
+
+				TourManager.fireEvent(//
+						TourEventId.MARKER_SELECTION,
+						new SelectionTourMarker(tourData, selectedTourMarkers),
+						getSite().getPart());
+			}
+			_isInUpdate = false;
+
+		} else if (uniqueTourIds > 1) {
+
+			// multiple tours are selected, fire a part selection
+
+			_isInUpdate = true;
+			{
+				_postSelectionProvider.setSelection(selectionTourIds);
+			}
+			_isInUpdate = false;
+		}
+	}
+
 	@Override
 	public ColumnManager getColumnManager() {
 		return _columnManager;
@@ -1326,8 +1381,8 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 //
 //					} else {
 //
-						markerItem.latitude = dbLatitude;
-						markerItem.longitude = dbLongitude;
+					markerItem.latitude = dbLatitude;
+					markerItem.longitude = dbLongitude;
 //
 //					}
 				}
@@ -1366,12 +1421,12 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 				_markerComparator.setSortColumn(e.widget);
 				_markerViewer.refresh();
 			}
-			updateUI_SelectTourMarker(selectionBackup);
+			updateUI_SelectTourMarker(selectionBackup, null);
 		}
 		_viewerContainer.setRedraw(true);
 	}
 
-	private void onSelect_TourMarker(final TableItem item) {
+	private void onSelect_TourMarker(final Event event) {
 
 		if (_isInUpdate) {
 			return;
@@ -1379,86 +1434,29 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 
 		StructuredSelection selection;
 
-		if (item == null) {
+		if (event.detail == SWT.CHECK) {
 
-			selection = (StructuredSelection) _markerViewer.getSelection();
-
-		} else {
+			// checkbox is hit
 
 			/**
-			 * This is VERY important
+			 * !!! VERY important !!!
 			 * <p>
-			 * Table.getSelection() returns the wrong selection when the user clicked on a checkbox.
+			 * Table.getSelection() returns the wrong selection when the user clicked in a checkbox.
 			 */
 
+			final TableItem item = (TableItem) event.item;
 			final Object selectedMarker = item.getData();
 
 			selection = new StructuredSelection(selectedMarker);
+
+		} else {
+
+			// checkbox is not hit
+
+			selection = (StructuredSelection) _markerViewer.getSelection();
 		}
 
-		// get unique tour id's
-		final HashSet<Long> tourIds = new HashSet<Long>();
-		for (final Iterator<?> selectedItem = selection.iterator(); selectedItem.hasNext();) {
-			tourIds.add(((TourMarkerItem) selectedItem.next()).tourId);
-		}
-
-		final SelectionTourIds selectionTourIds = new SelectionTourIds(new ArrayList<>(tourIds));
-
-		final int uniqueTourIds = tourIds.size();
-
-		if (uniqueTourIds == 1) {
-
-			// only one unique tour is selected, fire a marker selection
-
-			final TourMarkerItem firstMarkerItem = (TourMarkerItem) selection.getFirstElement();
-
-			// get tour by id
-			final TourData tourData = TourManager.getInstance().getTourData(firstMarkerItem.tourId);
-			if (tourData == null) {
-				return;
-			}
-
-			final ArrayList<TourMarker> selectedTourMarkers = new ArrayList<TourMarker>();
-
-			for (final Iterator<?> iterator = selection.iterator(); iterator.hasNext();) {
-
-				final long selectedMarkerId = ((TourMarkerItem) iterator.next()).markerId;
-
-				// get marker by id
-				for (final TourMarker tourMarker : tourData.getTourMarkers()) {
-					if (tourMarker.getMarkerId() == selectedMarkerId) {
-						selectedTourMarkers.add(tourMarker);
-						break;
-					}
-				}
-			}
-
-			_isInUpdate = true;
-			{
-				/*
-				 * Set selection in the selection provider that the part selection provider is in
-				 * sync with the marker selection, otherwise a selection listener, e.g. tour editor
-				 * can display the wrong tour. This happened !!!
-				 */
-				_postSelectionProvider.setSelectionNoFireEvent(selectionTourIds);
-
-				TourManager.fireEvent(//
-						TourEventId.MARKER_SELECTION,
-						new SelectionTourMarker(tourData, selectedTourMarkers),
-						getSite().getPart());
-			}
-			_isInUpdate = false;
-
-		} else if (uniqueTourIds > 1) {
-
-			// multiple tours are selected, fire a part selection
-
-			_isInUpdate = true;
-			{
-				_postSelectionProvider.setSelection(selectionTourIds);
-			}
-			_isInUpdate = false;
-		}
+		fireSelection(selection);
 	}
 
 	private void onTourEvent_TourMarker(final Object eventData) {
@@ -1485,7 +1483,7 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 
 				final StructuredSelection markerViewerSelection = new StructuredSelection(selectedMarkerItem);
 
-				updateUI_SelectTourMarker(markerViewerSelection);
+				updateUI_SelectTourMarker(markerViewerSelection, null);
 			}
 		}
 	}
@@ -1522,6 +1520,7 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 
 				_isGeoFilterActive = true;
 				_markerFilter = markerItem;
+
 				/*
 				 * Ensure that the checked marker is also selected. It is possible that a selected
 				 * and checked marker gets unchecked and another marker is checked that it is not
@@ -1540,12 +1539,7 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 
 				if (isCheckAndSelected == false) {
 
-					updateUI_SelectTourMarker(new StructuredSelection(checkedElement));
-
-//					Table table = _markerViewer.getTable();
-//					table.setSelection(item);
-//					table.showSelection();
-
+					updateUI_SelectTourMarker(new StructuredSelection(checkedElement), null);
 				}
 			}
 
@@ -1573,7 +1567,8 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 				}
 			}
 
-			updateUI_SelectTourMarker(new StructuredSelection(checkedMarker));
+			updateUI_SelectTourMarker(new StructuredSelection(checkedMarker), null);
+
 		}
 
 		if (isMarkerWithGPS) {
@@ -1590,6 +1585,7 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 		{
 			// keep selection
 			final ISelection selectionBackup = getViewerSelection();
+			final Object[] checkedElements = _markerViewer.getCheckedElements();
 			{
 				_markerViewer.getTable().dispose();
 
@@ -1601,7 +1597,7 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 				// update the viewer
 				updateUI_SetViewerInput();
 			}
-			updateUI_SelectTourMarker(selectionBackup);
+			updateUI_SelectTourMarker(selectionBackup, checkedElements);
 		}
 		_viewerContainer.setRedraw(true);
 
@@ -1619,10 +1615,11 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 				{
 					// keep selection
 					final ISelection selectionBackup = getViewerSelection();
+					final Object[] checkedElements = _markerViewer.getCheckedElements();
 					{
 						_markerViewer.refresh(false);
 					}
-					updateUI_SelectTourMarker(selectionBackup);
+					updateUI_SelectTourMarker(selectionBackup, checkedElements);
 				}
 				_viewerContainer.setRedraw(true);
 			}
@@ -1638,10 +1635,11 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 		{
 			// keep selection
 			final ISelection selectionBackup = getViewerSelection();
+			final Object[] checkedElements = _markerViewer.getCheckedElements();
 			{
 				updateUI_SetViewerInput();
 			}
-			updateUI_SelectTourMarker(selectionBackup);
+			updateUI_SelectTourMarker(selectionBackup, checkedElements);
 		}
 		_viewerContainer.setRedraw(true);
 	}
@@ -1694,7 +1692,7 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 			for (final TourMarkerItem markerItem : _allMarkerItems) {
 				if (markerItem.markerId == stateMarkerId) {
 
-					updateUI_SelectTourMarker(new StructuredSelection(markerItem));
+					updateUI_SelectTourMarker(new StructuredSelection(markerItem), null);
 
 					return;
 				}
@@ -1757,7 +1755,25 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 		_viewerContainer.setRedraw(false);
 		{
 			_markerViewer.refresh(false);
-			_markerViewer.reveal(markerItem);
+
+			/*
+			 * Select and reveal marker item
+			 */
+			final Table table = _markerViewer.getTable();
+			final TableItem[] tableItems = table.getItems();
+
+			int checkedIndex = 0;
+
+			for (; checkedIndex < tableItems.length; checkedIndex++) {
+				if (tableItems[checkedIndex].getData() == markerItem) {
+					break;
+				}
+			}
+
+			if (checkedIndex < tableItems.length) {
+				table.setSelection(checkedIndex);
+			}
+
 		}
 		_viewerContainer.setRedraw(true);
 
@@ -1779,10 +1795,11 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 		{
 			// keep selection
 			final ISelection selectionBackup = getViewerSelection();
+			final Object[] checkedElements = _markerViewer.getCheckedElements();
 			{
 				_markerViewer.refresh();
 			}
-			updateUI_SelectTourMarker(selectionBackup);
+			updateUI_SelectTourMarker(selectionBackup, checkedElements);
 		}
 		_viewerContainer.setRedraw(true);
 
@@ -1792,12 +1809,17 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 	 * Select and reveal tour marker item.
 	 * 
 	 * @param selection
+	 * @param checkedElements
 	 */
-	private void updateUI_SelectTourMarker(final ISelection selection) {
+	private void updateUI_SelectTourMarker(final ISelection selection, final Object[] checkedElements) {
 
 		_isInUpdate = true;
 		{
 			_markerViewer.setSelection(selection, true);
+
+			if (checkedElements != null && checkedElements.length > 0) {
+				_markerViewer.setCheckedElements(checkedElements);
+			}
 
 			final Table table = _markerViewer.getTable();
 			table.showSelection();
