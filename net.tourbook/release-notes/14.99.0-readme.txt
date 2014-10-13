@@ -1,0 +1,32 @@
+Version: 14.99.0                                              13.10.2014
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+ 
+ TRANSLATION FORMATTING
+
+ Formatting is not set correctly by FR translation
+ 
+ Enshure that configuration is set correctly FOR ALL settings, it makes my life easier.
+ 
+ http://mytourbook.sourceforge.net/mytourbook/index.php/development/translation/install-resource-editor#configure-editor
+ 
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+
+
+New 	
+===
+
+* 
+  
+ 
+Improvements
+============
+
+* 
+
+
+
+
+
