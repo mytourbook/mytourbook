@@ -554,7 +554,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 					final HashSet<String> importedFiles = _rawDataMgr.getImportedFiles();
 					_state.put(STATE_IMPORTED_FILENAMES, importedFiles.toArray(new String[importedFiles.size()]));
 
-					reimportAllImportFiles();
+					reimportAllImportFiles(false);
 
 				} else if (eventId == TourEventId.TAG_STRUCTURE_CHANGED) {
 
@@ -1866,9 +1866,11 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	}
 
 	/**
-	 * update {@link TourData} from the database for all imported tours, displays a progress dialog
+	 * Update {@link TourData} from the database for all imported tours, displays a progress dialog.
+	 * 
+	 * @param canCancelable
 	 */
-	public void reimportAllImportFiles() {
+	private void reimportAllImportFiles(final boolean canCancelable) {
 
 		final String[] prevImportedFiles = _state.getArray(STATE_IMPORTED_FILENAMES);
 		if ((prevImportedFiles == null) || (prevImportedFiles.length == 0)) {
@@ -1882,14 +1884,14 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		try {
 			new ProgressMonitorDialog(Display.getDefault().getActiveShell()).run(
 					true,
-					false,
+					canCancelable,
 					new IRunnableWithProgress() {
 
 						@Override
 						public void run(final IProgressMonitor monitor) throws InvocationTargetException,
 								InterruptedException {
 
-							reimportAllImportFilesRunnable(monitor, prevImportedFiles);
+							reimportAllImportFilesRunnable(monitor, prevImportedFiles, canCancelable);
 						}
 					});
 
@@ -1905,8 +1907,11 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	 * 
 	 * @param monitor
 	 * @param importedFiles
+	 * @param canCancelable
 	 */
-	private void reimportAllImportFilesRunnable(final IProgressMonitor monitor, final String[] importedFiles) {
+	private void reimportAllImportFilesRunnable(final IProgressMonitor monitor,
+												final String[] importedFiles,
+												final boolean canCancelable) {
 
 		int workedDone = 0;
 		final int workedAll = importedFiles.length;
@@ -1938,6 +1943,11 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 				} else {
 					notImportedFiles.add(fileName);
 				}
+			}
+
+			if (canCancelable && monitor.isCanceled()) {
+				// stop importing but process imported tours
+				break;
 			}
 		}
 
@@ -2052,7 +2062,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		Display.getCurrent().asyncExec(new Runnable() {
 			@Override
 			public void run() {
-				reimportAllImportFiles();
+				reimportAllImportFiles(true);
 			}
 		});
 	}

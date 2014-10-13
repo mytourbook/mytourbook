@@ -300,7 +300,7 @@ public class RawDataManager {
 		try {
 			new ProgressMonitorDialog(Display.getDefault().getActiveShell()).run(
 					true,
-					false,
+					true,
 					new IRunnableWithProgress() {
 
 						public void run(final IProgressMonitor monitor) throws InvocationTargetException,
@@ -334,6 +334,11 @@ public class RawDataManager {
 									importCounter++;
 								} else {
 									notImportedFiles.add(osFilePath);
+								}
+
+								if (monitor.isCanceled()) {
+									// stop importing but process imported tours
+									break;
 								}
 							}
 
