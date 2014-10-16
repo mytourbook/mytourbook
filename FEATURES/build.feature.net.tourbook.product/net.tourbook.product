@@ -23,6 +23,7 @@
 #-debug
 #-clean</programArgs>
       <vmArgs>-Xmx1024m</vmArgs>
+      <vmArgsLin>-Dorg.eclipse.swt.browser.XULRunnerPath=/opt/xulrunner</vmArgsLin>
    </launcherArgs>
 
    <windowImages i16="/net.tourbook/icons/application/tourbook16.png" i32="/net.tourbook/icons/application/tourbook32.png" i48="/net.tourbook/icons/application/tourbook48.png" i64="/net.tourbook/icons/application/tourbook64.png" i128="/net.tourbook/icons/application/tourbook128.png"/>

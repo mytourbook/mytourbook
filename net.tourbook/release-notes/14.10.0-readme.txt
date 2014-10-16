@@ -1,6 +1,17 @@
 Version: 14.10.0                                              13.10.2014
 
 
+XURL=https://ftp.mozilla.org/pub/mozilla.org/xulrunner/releases/10.0.2/runtimes/xulrunner-10.0.2.en-US.linux-x86_64.tar.bz2
+cd /opt
+sudo sh -c "wget -O- $XURL | tar -xj"
+sudo ln -s /opt/xulrunner/xulrunner /usr/bin/xulrunner
+sudo ln -s /opt/xulrunner/xpcshell /usr/bin/xpcshell
+
+put in vmargs
+-Dorg.eclipse.swt.browser.XULRunnerPath=/opt/xulrunner
+
+
+
 New 	
 ===
 
