@@ -94,17 +94,22 @@ public class TourBlogView extends ViewPart {
 	static final String				STATE_IS_DRAW_MARKER_WITH_DEFAULT_COLOR	= "STATE_IS_DRAW_MARKER_WITH_DEFAULT_COLOR";	//$NON-NLS-1$
 	static final String				STATE_IS_SHOW_HIDDEN_MARKER				= "STATE_IS_SHOW_HIDDEN_MARKER";				//$NON-NLS-1$
 
+	private static final String		EXTERNAL_LINK_URL						= "http";										//$NON-NLS-1$
 	private static final String		HREF_TOKEN								= "#";											//$NON-NLS-1$
+	private static final String		PAGE_ABOUT_BLANK						= "about:blank";								//$NON-NLS-1$
+
+	/**
+	 * This is necessary otherwise XULrunner in Linux do not fire a location change event.
+	 */
+	private static final String		HTTP_DUMMY								= "http://dummy";								//$NON-NLS-1$
 
 	private static final String		ACTION_EDIT_TOUR						= "EditTour";									//$NON-NLS-1$
-
 	private static final String		ACTION_EDIT_MARKER						= "EditMarker";								//$NON-NLS-1$
 	private static final String		ACTION_HIDE_MARKER						= "HideMarker";								//$NON-NLS-1$
 	private static final String		ACTION_OPEN_MARKER						= "OpenMarker";								//$NON-NLS-1$
 	private static final String		ACTION_SHOW_MARKER						= "ShowMarker";								//$NON-NLS-1$
 
 	private static String			HREF_EDIT_TOUR;
-
 	private static String			HREF_EDIT_MARKER;
 	private static String			HREF_HIDE_MARKER;
 	private static String			HREF_OPEN_MARKER;
@@ -389,12 +394,14 @@ public class TourBlogView extends ViewPart {
 
 			final String hoverEdit = NLS.bind(Messages.Tour_Blog_Action_EditTour_Tooltip, tourTitle);
 
+			String hrefEditTour = HTTP_DUMMY + HREF_EDIT_TOUR;
+
 			sb.append("" + // //$NON-NLS-1$
 					("<div class='action-container'>" //$NON-NLS-1$
 							+ ("<a class='action' style='background: url(" //$NON-NLS-1$
 									+ _actionEditImageUrl
 									+ ") no-repeat;'" //$NON-NLS-1$
-									+ (" href='" + HREF_EDIT_TOUR + "'") //$NON-NLS-1$ //$NON-NLS-2$
+									+ (" href='" + hrefEditTour + "'") //$NON-NLS-1$ //$NON-NLS-2$
 									+ (" title='" + hoverEdit + "'") //$NON-NLS-1$ //$NON-NLS-2$
 									+ ">" // //$NON-NLS-1$
 							+ "</a>") // //$NON-NLS-1$
@@ -429,10 +436,10 @@ public class TourBlogView extends ViewPart {
 		final long markerId = tourMarker.getMarkerId();
 		final String markerLabel = tourMarker.getLabel();
 
-		final String hrefOpenMarker = HREF_OPEN_MARKER + markerId;
-		final String hrefEditMarker = HREF_EDIT_MARKER + markerId;
-		final String hrefHideMarker = HREF_HIDE_MARKER + markerId;
-		final String hrefShowMarker = HREF_SHOW_MARKER + markerId;
+		final String hrefOpenMarker = HTTP_DUMMY + HREF_OPEN_MARKER + markerId;
+		final String hrefEditMarker = HTTP_DUMMY + HREF_EDIT_MARKER + markerId;
+		final String hrefHideMarker = HTTP_DUMMY + HREF_HIDE_MARKER + markerId;
+		final String hrefShowMarker = HTTP_DUMMY + HREF_SHOW_MARKER + markerId;
 
 		final String hoverEditMarker = NLS.bind(Messages.Tour_Blog_Action_EditMarker_Tooltip, markerLabel);
 		final String hoverHideMarker = NLS.bind(Messages.Tour_Blog_Action_HideMarker_Tooltip, markerLabel);
@@ -614,7 +621,20 @@ public class TourBlogView extends ViewPart {
 
 		try {
 
-			_browser = new Browser(parent, SWT.NONE);
+			try {
+
+				// use default browser
+				_browser = new Browser(parent, SWT.NONE);
+
+			} catch (final Exception e) {
+
+				/*
+				 * Use mozilla browser, this is necessary for Linux when default browser fails
+				 * however the XULrunner needs to be installed.
+				 */
+				_browser = new Browser(parent, SWT.MOZILLA);
+			}
+
 			GridDataFactory.fillDefaults().grab(true, true).applyTo(_browser);
 
 			_browser.addLocationListener(new LocationAdapter() {
@@ -689,7 +709,7 @@ public class TourBlogView extends ViewPart {
 				selectedTourMarker);
 
 		if (markerDialog.open() == Window.OK) {
-			TourManager.saveModifiedTour(_tourData);
+			saveModifiedTour();
 		}
 	}
 
@@ -699,7 +719,7 @@ public class TourBlogView extends ViewPart {
 				Display.getCurrent().getActiveShell(),
 				_tourData).open() == Window.OK) {
 
-			TourManager.saveModifiedTour(_tourData);
+			saveModifiedTour();
 		}
 	}
 
@@ -709,7 +729,7 @@ public class TourBlogView extends ViewPart {
 
 		prepareBrowserReload(selectedTourMarker);
 
-		TourManager.saveModifiedTour(_tourData);
+		saveModifiedTour();
 	}
 
 	/**
@@ -761,7 +781,7 @@ public class TourBlogView extends ViewPart {
 
 		prepareBrowserReload(selectedTourMarker);
 
-		TourManager.saveModifiedTour(_tourData);
+		saveModifiedTour();
 	}
 
 	private void initUI() {
@@ -887,7 +907,6 @@ public class TourBlogView extends ViewPart {
 					case ACTION_SHOW_MARKER:
 						hrefActionShowMarker(hrefTourMarker);
 						break;
-
 					}
 				}
 
@@ -905,7 +924,7 @@ public class TourBlogView extends ViewPart {
 				break;
 			}
 
-		} else if (location.startsWith("http")) { //$NON-NLS-1$
+		} else if (location.startsWith(HTTP_DUMMY) == false && location.startsWith(EXTERNAL_LINK_URL)) {
 
 			// open link in the external browser
 
@@ -913,7 +932,7 @@ public class TourBlogView extends ViewPart {
 			Util.openLink(_browser.getShell(), location);
 		}
 
-		if (location.equals("about:blank") == false) { //$NON-NLS-1$
+		if (location.equals(PAGE_ABOUT_BLANK) == false) {
 
 			// about:blank is the initial page
 
@@ -1004,6 +1023,18 @@ public class TourBlogView extends ViewPart {
 		_browser.setRedraw(false);
 	}
 
+	private void saveModifiedTour() {
+
+		/*
+		 * Run async because a tour save will fire a tour change event.
+		 */
+		_uiParent.getDisplay().asyncExec(new Runnable() {
+			public void run() {
+				TourManager.saveModifiedTour(_tourData);
+			}
+		});
+	}
+
 	private void saveState() {
 
 	}
@@ -1087,6 +1118,7 @@ public class TourBlogView extends ViewPart {
 				+ ("<body>\n" + create_20_Body() + "\n</body>\n") //$NON-NLS-1$ //$NON-NLS-2$
 				+ "</html>"; //$NON-NLS-1$
 
+		_browser.setRedraw(true);
 		_browser.setText(html);
 	}
 }
