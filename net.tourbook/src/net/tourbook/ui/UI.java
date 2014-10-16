@@ -1155,7 +1155,8 @@ public class UI {
 
 			final String sqlExceptionText = Util.getSQLExceptionText(e);
 
-			StatusUtil.log(sqlExceptionText);
+			// log also the stacktrace
+			StatusUtil.log(sqlExceptionText + Util.getStackTrace(e));
 
 			MessageDialog.openError(Display.getDefault().getActiveShell(), //
 					"SQL Error",//$NON-NLS-1$

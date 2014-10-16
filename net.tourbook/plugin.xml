@@ -109,24 +109,7 @@
 				label="%action_software_updates"
 				menubarPath="m_Help/g_SoftwareUpdate">
 			</action>
-		</actionSet>
-
-		<!-- Places search -->
-		<actionSet
-			id="de.byteholder.geoclipse.poi.actionSet"
-			label="Sample Action Set"
-			visible="true">
-			 
-			<action
-				class="de.byteholder.geoclipse.poi.ShowPoiViewAction"
-				icon="icons/find.png"
-				id="de.byteholder.geoclipse.poi.ShowPlacesViewAction"
-				label="&amp;Places search"
-				style="push"
-				toolbarPath="mc_tb_Tour"
-				tooltip="Search for places and show them on the map">
-			</action>
-			   
+			
 		</actionSet>
 	</extension>
    
@@ -616,7 +599,7 @@
 					mnemonic="%command_view_tourEditor_mnemonic"
 					tooltip="%command_view_tourEditor_tooltip"/>
 				 
-				<!-- Tour Log -->
+				<!-- Tour Blog -->
 				<command
 					commandId="command.net.tourbook.views.TourBlogView"
 					icon="icons/tour-blog.png"
@@ -674,47 +657,69 @@
 		-->
 		<menuContribution locationURI="menu:m_Tools?after=tools">
 
-			<!-- Tour Editor - is displayed in the "Tour" and the "Tools" menu -->
-			<command
-				commandId="net.tourbook.command.tourDataEditor"
-				icon="icons/tour-editor.gif"
-				label="%command_view_tourEditor"
-				mnemonic="%command_view_tourEditor_mnemonic"
-				tooltip="%command_view_tourEditor_tooltip"/>
-		      
-			<command
-				commandId="net.tourbook.command.tourChart.tool.tourSegmenter"
-				icon="icons/tour-segmenter.gif"
-				label="%command_tourChart_tool_tourSegmenter"
-				mnemonic="%command_tourChart_tool_tourSegmenter_mnemonic"
-				style="push"
-				tooltip="%command_tourChart_tool_tourSegmenter_tooltip"/>
+			<!-- Search -->
 			
-			<command
-				commandId="net.tourbook.command.tourChart.tool.graphAnalyzer"
-				icon="icons/chart-analyzer.gif"
-				label="%command_tourChart_tool_graphAnalyzer"
-				mnemonic="%command_tourChart_tool_graphAnalyzer_mnemonic"
-				style="push"
-				tooltip="%command_tourChart_tool_graphAnalyzer_tooltip"/>
+				<command
+					commandId="command.net.tourbook.search.SearchResultView"
+					icon="icons/find-all.png"
+					label="%View_Name_SearchAll"
+					mnemonic="%View_Name_SearchAll_Mnemonic"/>
+	
+				<command
+					commandId="command.de.byteholder.geoclipse.poi.ShowPOI"
+					icon="icons/find.png"
+					label="%View_Name_SearchPOI"
+					tooltip="%View_Name_SearchPOI_Mnemonic"
+				/>
+	
+				<separator
+					name="net.tourbook.separator.Search"
+					visible="true"/>
+   
+			<!-- Tour-->
 			
-			<command
-				commandId="net.tourbook.command.tourCompareWizard"
-				icon="icons/tour-map-compare-wizard.png"
-				label="%command_tourCompare_wizard"
-				mnemonic="%command_tourCompare_wizard_mnemonic"/>
-			
-			<command
-				commandId="command.net.tourbook.ui.views.TourChartSmoothingView"
-				icon="icons/smooth.png"
-				label="%View_Name_TourChartSmoothing"
-				mnemonic="%View_Name_TourChartSmoothing_Mnemonic"/>
+				<!-- Tour Editor - is displayed in the "Tour" and the "Tools" menu -->
+				<command
+					commandId="net.tourbook.command.tourDataEditor"
+					icon="icons/tour-editor.gif"
+					label="%command_view_tourEditor"
+					mnemonic="%command_view_tourEditor_mnemonic"
+					tooltip="%command_view_tourEditor_tooltip"/>
+			      
+				<command
+					commandId="net.tourbook.command.tourChart.tool.tourSegmenter"
+					icon="icons/tour-segmenter.gif"
+					label="%command_tourChart_tool_tourSegmenter"
+					mnemonic="%command_tourChart_tool_tourSegmenter_mnemonic"
+					style="push"
+					tooltip="%command_tourChart_tool_tourSegmenter_tooltip"/>
+				
+				<command
+					commandId="net.tourbook.command.tourChart.tool.graphAnalyzer"
+					icon="icons/chart-analyzer.gif"
+					label="%command_tourChart_tool_graphAnalyzer"
+					mnemonic="%command_tourChart_tool_graphAnalyzer_mnemonic"
+					style="push"
+					tooltip="%command_tourChart_tool_graphAnalyzer_tooltip"/>
+				
+				<command
+					commandId="net.tourbook.command.tourCompareWizard"
+					icon="icons/tour-map-compare-wizard.png"
+					label="%command_tourCompare_wizard"
+					mnemonic="%command_tourCompare_wizard_mnemonic"/>
+				
+				<command
+					commandId="command.net.tourbook.ui.views.TourChartSmoothingView"
+					icon="icons/smooth.png"
+					label="%View_Name_TourChartSmoothing"
+					mnemonic="%View_Name_TourChartSmoothing_Mnemonic"/>
+	
+	
+				<separator
+					name="net.tourbook.separator.Tour"
+					visible="true"/>
 
 			<!-- Sport -->
-
-				<separator
-					name="net.tourbook.separator.Tools"
-					visible="true"/>
 			
 				<!-- Training -->
 				<command
@@ -791,7 +796,7 @@
 		-->
 		<menuContribution locationURI="toolbar:org.eclipse.ui.main.toolbar">
 
-			<toolbar id="mc_tb_AppFilter">
+			<toolbar id="mc_tb_AppFilter" label="%Toolbar_Name_PhotoFilter">
 		
 				<command
 			         commandId="command.net.tourbook.PhotoFilter"
@@ -809,7 +814,7 @@
 		-->
 		<menuContribution locationURI="toolbar:org.eclipse.ui.main.toolbar">
 		
-			<toolbar id="mc_tb_Directory">
+			<toolbar id="mc_tb_Directory" label="%Toolbar_Name_Directory">
 				
 				<!-- Tour Import -->
 				<command 
@@ -830,7 +835,7 @@
 
 		<menuContribution locationURI="toolbar:org.eclipse.ui.main.toolbar">
 		
-			<toolbar id="mc_tb_Tour">
+			<toolbar id="mc_tb_Tour" label="%Toolbar_Name_Tour">
 				
 				<!-- Tour Chart -->
 				<command
@@ -865,7 +870,7 @@
 		
 		<menuContribution locationURI="toolbar:org.eclipse.ui.main.toolbar">
 		
-		   <toolbar id="net.tourbook.toolbars.tourTools">
+		   <toolbar id="net.tourbook.toolbars.tourTools" label="%Toolbar_Name_Tools">
 		
 		      <command
 		            commandId="net.tourbook.command.tourCompareWizard"
@@ -883,22 +888,38 @@
 		            style="push"
 		            />
 		
-
 		   </toolbar>
 		</menuContribution>
 		
 		
 		<menuContribution locationURI="toolbar:org.eclipse.ui.main.toolbar">
 		
-		   <toolbar id="net.tourbook.toolbars.general">
-		   
-		      <command
-		            commandId="org.eclipse.ui.window.preferences"
-		            icon="icons/options.png"
-		            label="%command_general_preferences"
-		            style="push"
-		            />
-		   </toolbar>
+			<toolbar id="net.tourbook.toolbars.general" label="%Toolbar_Name_General">
+
+				<!-- Search -->
+				<command
+					commandId="command.net.tourbook.search.SearchResultView"
+					icon="icons/find-all.png"
+					label="%View_Name_SearchAll"
+					tooltip="%View_Name_SearchAll_Tooltip"
+					/>
+
+				<command
+					commandId="command.de.byteholder.geoclipse.poi.ShowPOI"
+					icon="icons/find.png"
+					label="%View_Name_SearchPOI"
+					tooltip="%View_Name_SearchPOI_Tooltip"
+					/>
+
+				<!-- Preferences -->
+				<command
+					commandId="org.eclipse.ui.window.preferences"
+					icon="icons/options.png"
+					label="%command_general_preferences"
+					style="push"
+				/>
+
+			</toolbar>
 		</menuContribution>
 		
    </extension>
@@ -909,7 +930,7 @@
 
 		   <toolbar id="net.tourbook.mapping.statusline.mapinfo">
 
-		      <control
+		      <control 
 		            class="net.tourbook.map2.view.MapInfoContribution"
 		            id="net.tourbook.mapping.mapinfo">
 		      </control>
@@ -1056,45 +1077,60 @@
             name="%view_name_Statistics"
             defaultHandler="net.tourbook.statistic.ActionHandlerOpenViewStatistic"
             />
-            
+
+		<command
+			id="command.net.tourbook.search.SearchResultView"
+			name="%View_Name_SearchAll"
+			defaultHandler="net.tourbook.search.ActionHandlerOpenViewSearchResultView"
+			/>
+
+		<command
+			id="command.de.byteholder.geoclipse.poi.ShowPOI"
+			name="%View_Name_SearchPOI"
+			defaultHandler="de.byteholder.geoclipse.poi.ActionHandlerOpenViewPOI"
+			/>
+
 		<command
 			id="command.net.tourbook.ui.views.TourMarkerAllView"
 			name="%View_Name_TourMarkerAll"
 			defaultHandler="net.tourbook.ui.views.tourMarker.ActionHandlerOpenViewTourMarkerAll"
-		/>
+			/>
 		<command
 			id="command.net.tourbook.views.TourMarkerView"
 			name="%view_name_Marker"
 			defaultHandler="net.tourbook.ui.views.tourMarker.ActionHandlerOpenViewTourMarker"
-		/>
+			/>
    
-      <command
-            id="command.net.tourbook.views.TourBlogView"
-            name="%View_Name_TourBlog"
-            defaultHandler="net.tourbook.ui.views.ActionHandlerOpenViewTourBlog"
-            />
+		<command
+			id="command.net.tourbook.views.TourBlogView"
+			name="%View_Name_TourBlog"
+			defaultHandler="net.tourbook.ui.views.ActionHandlerOpenViewTourBlog"
+			/>
 
-      <command
-            id="command.net.tourbook.views.TourWaypointView"
-            name="%View_Name_Waypoint"
-            defaultHandler="net.tourbook.ui.views.ActionHandlerOpenViewTourWaypoint"
-	  		/>
-      <command
-            id="command.net.tourbook.views.ConconiChart"
-            name="%View_Name_ConconiChart"
-            defaultHandler="net.tourbook.ui.views.ActionHandlerOpenViewConconiChart"
-	  		/>
-      <command
-            id="command.net.tourbook.training.Training"
-            name="%View_Name_Training"
-            defaultHandler="net.tourbook.training.ActionHandlerOpenViewTraining"
-	  		/>
-      <command
-            id="command.net.tourbook.ui.views.TourChartSmoothingView"
-            name="%View_Name_TourChartSmoothing"
-            defaultHandler="net.tourbook.ui.views.ActionHandlerOpenViewChartSmoothing"
-	  		/>
-      
+		<command
+			id="command.net.tourbook.views.TourWaypointView"
+			name="%View_Name_Waypoint"
+			defaultHandler="net.tourbook.ui.views.ActionHandlerOpenViewTourWaypoint"
+		/>
+		
+		<command
+			id="command.net.tourbook.views.ConconiChart"
+			name="%View_Name_ConconiChart"
+			defaultHandler="net.tourbook.ui.views.ActionHandlerOpenViewConconiChart"
+		/>
+		
+		<command
+			id="command.net.tourbook.training.Training"
+			name="%View_Name_Training"
+			defaultHandler="net.tourbook.training.ActionHandlerOpenViewTraining"
+		/>
+		
+		<command
+			id="command.net.tourbook.ui.views.TourChartSmoothingView"
+			name="%View_Name_TourChartSmoothing"
+			defaultHandler="net.tourbook.ui.views.ActionHandlerOpenViewChartSmoothing"
+		/>
+  
       <command
             id="net.tourbook.command.tourChart.tool.adjustAltitude"
             name="%command_tourChart_tool_adjustAltitude">
@@ -1422,55 +1458,67 @@
 	      -->
 
 
-		<!--  -->
+		<!-- Tools -->
 		<category
 			id="net.tourbook.category.Tools"
 			name="%View_Category_Tools"
 		/>
-		
-	      <view
-	            category="net.tourbook.category.Tools"
-	            class="net.tourbook.ui.tourChart.ConconiChartView"
-	            icon="icons/conconi-chart.png"
-	            id="net.tourbook.views.ConconiChartView"
-	            name="%View_Name_ConconiChart">
-	      </view>
-	      <view
-	            category="net.tourbook.category.Tools"
-	            class="net.tourbook.ui.views.TourChartAnalyzerView"
-	            icon="icons/chart-analyzer.gif"
-	            id="net.tourbook.views.TourChartAnalyzer"
-	            name="%view_name_Analyzer">
-	      </view>
-	      <view
-	            category="net.tourbook.category.Tools"
-	            class="net.tourbook.ui.views.TourSegmenterView"
-	            icon="icons/tour-segmenter.gif"
-	            id="net.tourbook.views.TourSegmenter"
-	            name="%view_name_Segmenter">
-	      </view>
-	      <view
-	            category="net.tourbook.category.Tools"
-	            class="net.tourbook.training.TrainingView"
-	            icon="icons/pulse-zones.png"
-	            id="net.tourbook.training.TrainingView"
-	            name="%View_Name_Training">
-	      </view>
-	      <view
-	            category="net.tourbook.category.Tools"
-	            class="net.tourbook.ui.views.TourChartSmoothingView"
-	            icon="icons/smooth.png"
-	            id="net.tourbook.ui.views.TourChartSmoothingView"
-	            name="%View_Name_TourChartSmoothing">
-	      </view>
-	      <view
-	            allowMultiple="false"
-	            category="net.tourbook.category.Tools"
-	            class="de.byteholder.geoclipse.poi.PoiView"
-	            icon="icons/find.png"
-	            id="de.byteholder.geoclipse.poi.poiView"
-	            name="Places">
-	      </view>
+
+			<view
+				category="net.tourbook.category.Tools"
+				class="net.tourbook.search.SearchResultView"
+				icon="icons/find-all.png"
+				id="net.tourbook.search.SearchResultView"
+				name="%View_Name_SearchAll"
+			/>
+
+			<view
+				category="net.tourbook.category.Tools"
+				class="de.byteholder.geoclipse.poi.PoiView"
+				icon="icons/find.png"
+				id="de.byteholder.geoclipse.poi.poiView"
+				name="%View_Name_SearchPOI"
+			/>
+			
+			<view
+				category="net.tourbook.category.Tools"
+				class="net.tourbook.ui.tourChart.ConconiChartView"
+				icon="icons/conconi-chart.png"
+				id="net.tourbook.views.ConconiChartView"
+				name="%View_Name_ConconiChart">
+			</view>
+			
+			<view
+				category="net.tourbook.category.Tools"
+				class="net.tourbook.ui.views.TourChartAnalyzerView"
+				icon="icons/chart-analyzer.gif"
+				id="net.tourbook.views.TourChartAnalyzer"
+				name="%view_name_Analyzer">
+			</view>
+			
+			<view
+				category="net.tourbook.category.Tools"
+				class="net.tourbook.ui.views.TourSegmenterView"
+				icon="icons/tour-segmenter.gif"
+				id="net.tourbook.views.TourSegmenter"
+				name="%view_name_Segmenter">
+			</view>
+			
+			<view
+				category="net.tourbook.category.Tools"
+				class="net.tourbook.training.TrainingView"
+				icon="icons/pulse-zones.png"
+				id="net.tourbook.training.TrainingView"
+				name="%View_Name_Training">
+			</view>
+			
+			<view
+				category="net.tourbook.category.Tools"
+				class="net.tourbook.ui.views.TourChartSmoothingView"
+				icon="icons/smooth.png"
+				id="net.tourbook.ui.views.TourChartSmoothingView"
+				name="%View_Name_TourChartSmoothing">
+			</view>
 
 
       <category

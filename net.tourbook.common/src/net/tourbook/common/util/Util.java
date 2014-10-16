@@ -25,6 +25,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.io.Writer;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -56,6 +58,7 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.WorkbenchException;
 import org.eclipse.ui.XMLMemento;
 import org.eclipse.ui.browser.IWebBrowser;
 import org.eclipse.ui.browser.IWorkbenchBrowserSupport;
@@ -669,12 +672,25 @@ public class Util {
 				.append(UI.NEW_LINE2)
 				.append("SQLState: " + (e).getSQLState()) //$NON-NLS-1$
 				.append(UI.NEW_LINE)
-				.append("Severity: " + (e).getErrorCode()) //$NON-NLS-1$
+				.append("ErrorCode: " + (e).getErrorCode()) //$NON-NLS-1$
 				.append(UI.NEW_LINE)
 				.append("Message: " + (e).getMessage()) //$NON-NLS-1$
 				.append(UI.NEW_LINE);
 
 		return sb.toString();
+	}
+
+	public static String getStackTrace(final Throwable t) {
+
+		final StringWriter sw = new StringWriter();
+		final PrintWriter pw = new PrintWriter(sw, true);
+
+		t.printStackTrace(pw);
+
+		pw.flush();
+		sw.flush();
+
+		return sw.toString();
 	}
 
 	/**
@@ -1892,9 +1908,25 @@ public class Util {
 				return null;
 			}
 
-			final IWorkbenchPage page = wbWin.getActivePage();
+			IWorkbenchPage page = wbWin.getActivePage();
 			if (page == null) {
-				return null;
+
+				// this case can happen when all perspectives are closed, try to open default perspective
+
+				final String defaultPerspectiveID = wb.getPerspectiveRegistry().getDefaultPerspective();
+				if (defaultPerspectiveID == null) {
+					return null;
+				}
+
+				try {
+					page = wb.showPerspective(defaultPerspectiveID, wbWin);
+				} catch (final WorkbenchException e) {
+					// ignore
+				}
+
+				if (page == null) {
+					return null;
+				}
 			}
 
 			final int activationMode = isActivateView ? IWorkbenchPage.VIEW_ACTIVATE : IWorkbenchPage.VIEW_VISIBLE;
