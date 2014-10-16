@@ -394,12 +394,14 @@ public class TourBlogView extends ViewPart {
 
 			final String hoverEdit = NLS.bind(Messages.Tour_Blog_Action_EditTour_Tooltip, tourTitle);
 
+			String hrefEditTour = HTTP_DUMMY + HREF_EDIT_TOUR;
+
 			sb.append("" + // //$NON-NLS-1$
 					("<div class='action-container'>" //$NON-NLS-1$
 							+ ("<a class='action' style='background: url(" //$NON-NLS-1$
 									+ _actionEditImageUrl
 									+ ") no-repeat;'" //$NON-NLS-1$
-									+ (" href='" + HREF_EDIT_TOUR + "'") //$NON-NLS-1$ //$NON-NLS-2$
+									+ (" href='" + hrefEditTour + "'") //$NON-NLS-1$ //$NON-NLS-2$
 									+ (" title='" + hoverEdit + "'") //$NON-NLS-1$ //$NON-NLS-2$
 									+ ">" // //$NON-NLS-1$
 							+ "</a>") // //$NON-NLS-1$
@@ -1116,6 +1118,7 @@ public class TourBlogView extends ViewPart {
 				+ ("<body>\n" + create_20_Body() + "\n</body>\n") //$NON-NLS-1$ //$NON-NLS-2$
 				+ "</html>"; //$NON-NLS-1$
 
+		_browser.setRedraw(true);
 		_browser.setText(html);
 	}
 }
