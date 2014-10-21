@@ -330,12 +330,7 @@ public class TourBlogView extends ViewPart {
 		Collections.sort(allMarker);
 
 		create_22_BlogHeader(sb);
-
-		sb.append("<div class='action-hover-container' style='margin-top:30px; margin-bottom: 5px;'>\n"); //$NON-NLS-1$
-		{
-			create_24_Tour(sb);
-		}
-		sb.append("</div>\n"); //$NON-NLS-1$
+		create_24_Tour(sb);
 
 		for (final TourMarker tourMarker : allMarker) {
 
@@ -382,50 +377,69 @@ public class TourBlogView extends ViewPart {
 
 	private void create_24_Tour(final StringBuilder sb) {
 
-		sb.append("<div class='blog-item'>"); //$NON-NLS-1$
-		{
-			/*
-			 * Tour title
-			 */
-			String tourTitle = _tourData.getTourTitle();
-			if (tourTitle.length() == 0) {
-				tourTitle = "&nbsp;"; //$NON-NLS-1$
+		String tourTitle = _tourData.getTourTitle();
+		final String tourDescription = _tourData.getTourDescription();
+		final String tourWeather = _tourData.getWeather();
+
+		final boolean isDescription = tourDescription.length() > 0;
+		final boolean isTitle = tourTitle.length() > 0;
+		final boolean isWeather = tourWeather.length() > 0;
+
+		if (isDescription || isTitle || isWeather) {
+
+			sb.append("<div class='action-hover-container' style='margin-top:30px; margin-bottom: 5px;'>\n"); //$NON-NLS-1$
+			{
+
+				sb.append("<div class='blog-item'>"); //$NON-NLS-1$
+				{
+					/*
+					 * Tour title
+					 */
+					if (isTitle == false) {
+						tourTitle = "&nbsp;"; //$NON-NLS-1$
+					}
+
+					final String hoverEdit = NLS.bind(Messages.Tour_Blog_Action_EditTour_Tooltip, tourTitle);
+
+					final String hrefEditTour = HTTP_DUMMY + HREF_EDIT_TOUR;
+
+					sb.append("" + // //$NON-NLS-1$
+							("<div class='action-container'>" //$NON-NLS-1$
+									+ ("<a class='action' style='background: url(" //$NON-NLS-1$
+											+ _actionEditImageUrl
+											+ ") no-repeat;'" //$NON-NLS-1$
+											+ (" href='" + hrefEditTour + "'") //$NON-NLS-1$ //$NON-NLS-2$
+											+ (" title='" + hoverEdit + "'") //$NON-NLS-1$ //$NON-NLS-2$
+											+ ">" // //$NON-NLS-1$
+									+ "</a>") // //$NON-NLS-1$
+							+ "	</div>\n") //$NON-NLS-1$
+							+ ("<span class='blog-title'>" + tourTitle + "</span>\n")); //$NON-NLS-1$ //$NON-NLS-2$
+
+					/*
+					 * Description
+					 */
+					if (isDescription) {
+						sb.append("<p class='description'>" + convertLineBreaks(tourDescription) + "</p>\n"); //$NON-NLS-1$ //$NON-NLS-2$
+					}
+
+					/*
+					 * Weather
+					 */
+					if (isWeather) {
+						sb.append("<div class='title'>" + Messages.tour_editor_section_weather + "</div>\n"); //$NON-NLS-1$ //$NON-NLS-2$
+						sb.append("<p class='description'>" + convertLineBreaks(tourWeather) + "</p>\n"); //$NON-NLS-1$ //$NON-NLS-2$
+					}
+				}
+				sb.append("</div>\n"); //$NON-NLS-1$
 			}
+			sb.append("</div>\n"); //$NON-NLS-1$
 
-			final String hoverEdit = NLS.bind(Messages.Tour_Blog_Action_EditTour_Tooltip, tourTitle);
+		} else {
 
-			String hrefEditTour = HTTP_DUMMY + HREF_EDIT_TOUR;
+			// there is no tour header, set some spacing
 
-			sb.append("" + // //$NON-NLS-1$
-					("<div class='action-container'>" //$NON-NLS-1$
-							+ ("<a class='action' style='background: url(" //$NON-NLS-1$
-									+ _actionEditImageUrl
-									+ ") no-repeat;'" //$NON-NLS-1$
-									+ (" href='" + hrefEditTour + "'") //$NON-NLS-1$ //$NON-NLS-2$
-									+ (" title='" + hoverEdit + "'") //$NON-NLS-1$ //$NON-NLS-2$
-									+ ">" // //$NON-NLS-1$
-							+ "</a>") // //$NON-NLS-1$
-					+ "	</div>\n") //$NON-NLS-1$
-					+ ("<span class='blog-title'>" + tourTitle + "</span>\n")); //$NON-NLS-1$ //$NON-NLS-2$
-
-			/*
-			 * Description
-			 */
-			final String tourDescription = _tourData.getTourDescription();
-			if (tourDescription.length() > 0) {
-				sb.append("<p class='description'>" + convertLineBreaks(tourDescription) + "</p>\n"); //$NON-NLS-1$ //$NON-NLS-2$
-			}
-
-			/*
-			 * Weather
-			 */
-			final String tourWeather = _tourData.getWeather();
-			if (tourWeather.length() > 0) {
-				sb.append("<div class='title'>" + Messages.tour_editor_section_weather + "</div>\n"); //$NON-NLS-1$ //$NON-NLS-2$
-				sb.append("<p class='description'>" + convertLineBreaks(tourWeather) + "</p>\n"); //$NON-NLS-1$ //$NON-NLS-2$
-			}
+			sb.append("<div style='margin-top:20px;'></div>\n"); //$NON-NLS-1$
 		}
-		sb.append("</div>\n"); //$NON-NLS-1$
 	}
 
 	/**
