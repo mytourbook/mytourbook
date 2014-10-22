@@ -1654,12 +1654,6 @@
 			schemeId="net.tourbook.scheme"/>
 
 		<key
-			commandId="net.tourbook.command.tourCompareWizard"
-			sequence="%Shortcut_Key_App_CompareTours"
-			contextId="org.eclipse.ui.contexts.window"
-			schemeId="net.tourbook.scheme"/>
-
-		<key
 			commandId="net.tourbook.command.createNewTour"
 			sequence="%Shortcut_Key_App_NewTour"
 			contextId="org.eclipse.ui.contexts.window"

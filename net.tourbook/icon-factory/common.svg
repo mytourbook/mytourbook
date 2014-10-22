@@ -3668,17 +3668,17 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="14.998095"
-     inkscape:cx="83.994651"
-     inkscape:cy="1004.115"
+     inkscape:zoom="5.3026273"
+     inkscape:cx="70.790464"
+     inkscape:cy="991.25267"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="true"
-     inkscape:window-width="2484"
-     inkscape:window-height="1421"
-     inkscape:window-x="69"
-     inkscape:window-y="-7"
-     inkscape:window-maximized="1"
+     inkscape:window-width="1455"
+     inkscape:window-height="1195"
+     inkscape:window-x="524"
+     inkscape:window-y="65"
+     inkscape:window-maximized="0"
      inkscape:snap-grids="true"
      inkscape:snap-page="false"
      inkscape:snap-to-guides="false"
@@ -3701,7 +3701,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -4044,6 +4044,58 @@
        d="m 110,37.862183 a 5.5,5.5 0 1 1 -11,0 5.5,5.5 0 1 1 11,0 z"
        transform="matrix(0.99090909,0,0,1,-16.1,1)"
        inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook\icons\find-all.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <path
+       sodipodi:type="arc"
+       style="color:#000000;fill:#c7c7c7;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0.5;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+       id="path3737"
+       sodipodi:cx="84"
+       sodipodi:cy="39.362183"
+       sodipodi:rx="4"
+       sodipodi:ry="4"
+       d="m 88,39.362183 a 4,4 0 1 1 -8,0 4,4 0 1 1 8,0 z"
+       inkscape:export-filename="C:\DAT\mytourbook-RESOURCEN\xampp\htdocs\mytourbook\templates\mytourbook\images\bullet-8.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"
+       transform="matrix(0.75,0,0,0.75,-24,65.840546)" />
+    <path
+       transform="matrix(0.5,0,0,0.5,6,76.681091)"
+       sodipodi:type="arc"
+       style="color:#000000;fill:#c7c7c7;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0.5;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+       id="path3737-1"
+       sodipodi:cx="84"
+       sodipodi:cy="39.362183"
+       sodipodi:rx="4"
+       sodipodi:ry="4"
+       d="m 88,39.362183 a 4,4 0 1 1 -8,0 4,4 0 1 1 8,0 z"
+       inkscape:export-filename="C:\DAT\mytourbook-RESOURCEN\xampp\htdocs\mytourbook\templates\mytourbook\images\bullet-7.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <path
+       sodipodi:type="arc"
+       style="color:#000000;fill:#505050;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0.5;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+       id="path3737-9"
+       sodipodi:cx="84"
+       sodipodi:cy="39.362183"
+       sodipodi:rx="4"
+       sodipodi:ry="4"
+       d="m 88,39.362183 a 4,4 0 1 1 -8,0 4,4 0 1 1 8,0 z"
+       inkscape:export-filename="C:\DAT\mytourbook-RESOURCEN\xampp\htdocs\mytourbook\templates\mytourbook\images\bullet-8.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"
+       transform="matrix(0.75,0,0,0.75,-24,73.840546)" />
+    <path
+       transform="matrix(0.5,0,0,0.5,6,84.68109)"
+       sodipodi:type="arc"
+       style="color:#000000;fill:#808080;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0.5;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+       id="path3737-1-8"
+       sodipodi:cx="84"
+       sodipodi:cy="39.362183"
+       sodipodi:rx="4"
+       sodipodi:ry="4"
+       d="m 88,39.362183 a 4,4 0 1 1 -8,0 4,4 0 1 1 8,0 z"
+       inkscape:export-filename="C:\DAT\mytourbook-RESOURCEN\xampp\htdocs\mytourbook\templates\mytourbook\images\bullet-7.png"
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90" />
   </g>
