@@ -1,62 +1,68 @@
-Version: 14.10.0                                              13.10.2014
-
-
-XURL=https://ftp.mozilla.org/pub/mozilla.org/xulrunner/releases/10.0.2/runtimes/xulrunner-10.0.2.en-US.linux-x86_64.tar.bz2
-cd /opt
-sudo sh -c "wget -O- $XURL | tar -xj"
-sudo ln -s /opt/xulrunner/xulrunner /usr/bin/xulrunner
-sudo ln -s /opt/xulrunner/xpcshell /usr/bin/xpcshell
-
-put in vmargs
--Dorg.eclipse.swt.browser.XULRunnerPath=/opt/xulrunner
-
+Version: 14.10.0                                              22.10.2014
 
 
 New 	
 ===
 
-* All Tour Marker View 
-  - This view displays all created tour markers.
-  - Sorting can be done by all columns, tour markers with a similar position can be identified.
-  - Tours for selected tour markers are displayed in other views.
-
+* All Tour Marker View
+  This new view shows all tour markers from all tours.
 
 * Tour Book
-  - Export view in CSV format.
-  
+  Export view in CSV format. 
+
  
-Improvements
+Improvements 	
 ============
 
 * Tour Chart
-  - Force min/max values separately, existing min/max values have been reset to default values.
-  - Force max value for altitude/gradient, force min/max value for heartbeat.
+
+  - Force min/max values.
+    - Force min/max values separately, existing min/max values have been
+      reset to default values.
+    - Force values for altimeter/gradient/heartbeat/pace.
+    - Fixed some bugs when min/max value is enforced.
   - Live update for tour chart preferences.
-  - Fixed some min/max bugs when min/max value is enforced.
-    When min is enforced but the data min value is larger than forced min, the data min value is used.
-    When max is enforced but the data max value is smaller than forced max, the data max value is used.
-  - When a vertical slider is moved in the tour chart with a hovered mouse, this view must not be activated (another view can be the active view) that the moved slider is also updated in other views, e.g. 2/3D Map, Tour Analyzer.
-  - Removed border line on the left side of the tour chart graphic (this was a drawing bug since centuries).
-  
-* Tour Blog
+  - When a vertical slider is moved in the tour chart with a hovered 
+    mouse, the tour chart view must not be activated any more (another 
+    view can be the active view) that the moved slider is also updated 
+    in other views, e.g. 2/3D Map, Tour Analyzer.
+  - Removed border line on the left side of the tour chart graphic 
+    (this was a drawing bug since centuries).
+
+* Tour Blog ...
+
   - Set marker visible/hidden.
   - Show/hide hidden marker.
   - Draw marker with hidden/device/default color.
   - Improved hovered style.
+  - Support for Linux.
 
-* All Table/Tree Views 
-  New actions in the column header context menu
+* All Table/Tree Views
+
+  New actions in the column header context menu.
+
   - Show all columns.
   - Show default columns.
 
-
-App
+ 
+App 	
 ===
 
-* New keyboard shortcuts.
-* App menu: renamed "Import" -> "New".
+- Renamed "Import" --> "New" in the app menu.
+- Changed wording
+  "Transfer Tours ..." --> "Receive Tours ... serial port"
 
+ 
+Fixed Bugs 	
+==========
 
+- Tour blog is not displayed with Linux because the web browser causes
+  an error. This problem can be solved when XULrunner is installed, 
+  see here...
 
+ 
+This Website 	
+============
 
+- Modernized this website with some CSS modifications.
 
