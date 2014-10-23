@@ -70,6 +70,7 @@ import net.tourbook.ui.UI;
 import org.apache.derby.drda.NetworkServerControl;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.ListenerList;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -238,6 +239,7 @@ public class TourDatabase {
 	private static final IPreferenceStore			_prefStore									= TourbookPlugin
 																										.getPrefStore();
 
+	private boolean									_isDbInitialized;
 	private boolean									_isTableChecked;
 	private boolean									_isVersionChecked;
 
@@ -266,7 +268,9 @@ public class TourDatabase {
 	private static final String						DERBY_URL_COMMAND_UPGRADE_TRUE				= ";upgrade=true";							//$NON-NLS-1$
 
 	private boolean									_isDerbyEmbedded;
-	private boolean									_isDbUpgraded;
+	private boolean									_isChecked_DbUpgraded;
+	private boolean									_isChecked_DbCreated;
+
 
 	private static NetworkServerControl				_server;
 
@@ -894,35 +898,6 @@ public class TourDatabase {
 		cs.close();
 	}
 
-	private static void ensureDbIsCreated() {
-
-		Connection conn = null;
-
-		// ensure driver is loaded
-		try {
-			Class.forName(DERBY_DRIVER_CLASS);
-		} catch (final ClassNotFoundException e) {
-			StatusUtil.showStatus(e);
-		}
-
-		/*
-		 * Get a connection, this also creates the database when not yet available. The embedded
-		 * driver displays a warning when database already exist.
-		 */
-		try {
-
-			conn = DriverManager.getConnection(//
-					DERBY_URL + DERBY_URL_COMMAND_CREATE_TRUE,
-					TABLE_SCHEMA,
-					TABLE_SCHEMA);
-
-		} catch (final SQLException e) {
-			UI.showSQLException(e);
-		} finally {
-			closeConnection(conn);
-		}
-	}
-
 	private static void exec(final Statement stmt, final String sql) throws SQLException {
 
 		StatusUtil.log(sql);
@@ -1224,47 +1199,6 @@ public class TourDatabase {
 		}
 
 		return _instance;
-	}
-
-	private static Connection getPooledConnection() throws SQLException {
-
-		if (_pooledDataSource == null) {
-
-			synchronized (DB_LOCK) {
-
-				// check again
-				if (_pooledDataSource == null) {
-
-					ensureDbIsCreated();
-
-					try {
-						_pooledDataSource = new ComboPooledDataSource();
-
-						//loads the jdbc driver
-						_pooledDataSource.setDriverClass(DERBY_DRIVER_CLASS);
-						_pooledDataSource.setJdbcUrl(DERBY_URL);
-						_pooledDataSource.setUser(TABLE_SCHEMA);
-						_pooledDataSource.setPassword(TABLE_SCHEMA);
-
-						_pooledDataSource.setMaxPoolSize(100);
-						_pooledDataSource.setMaxStatements(100);
-						_pooledDataSource.setMaxStatementsPerConnection(20);
-
-					} catch (final PropertyVetoException e) {
-						StatusUtil.log(e);
-					}
-				}
-			}
-		}
-
-		Connection conn = null;
-		try {
-			conn = _pooledDataSource.getConnection();
-		} catch (final SQLException e) {
-			UI.showSQLException(e);
-		}
-
-		return conn;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -2811,11 +2745,66 @@ public class TourDatabase {
 
 	public Connection getConnection() throws SQLException {
 
-		if (sqlInit_10_IsDbValid()) {
-			return getPooledConnection();
+		if (sqlInit_10_IsDbInitialized()) {
+			return getConnection_Pooled();
 		} else {
 			return null;
 		}
+	}
+
+	private Connection getConnection_Pooled() throws SQLException {
+
+		if (_pooledDataSource == null) {
+
+			synchronized (DB_LOCK) {
+
+				// check again
+				if (_pooledDataSource == null) {
+
+					try {
+						_pooledDataSource = new ComboPooledDataSource();
+
+						//loads the jdbc driver
+						_pooledDataSource.setDriverClass(DERBY_DRIVER_CLASS);
+						_pooledDataSource.setJdbcUrl(DERBY_URL);
+						_pooledDataSource.setUser(TABLE_SCHEMA);
+						_pooledDataSource.setPassword(TABLE_SCHEMA);
+
+						_pooledDataSource.setMaxPoolSize(100);
+						_pooledDataSource.setMaxStatements(100);
+						_pooledDataSource.setMaxStatementsPerConnection(20);
+
+					} catch (final PropertyVetoException e) {
+						StatusUtil.log(e);
+					}
+				}
+			}
+		}
+
+		Connection conn = null;
+		try {
+			conn = _pooledDataSource.getConnection();
+		} catch (final SQLException e) {
+			UI.showSQLException(e);
+		}
+
+		return conn;
+	}
+
+	/**
+	 * @return Returns a connection to the derby database but do not create it.
+	 *         <p>
+	 *         <b> The pooled connection is not used because the database could be shutdown when it
+	 *         needs to be upgraded. </b>
+	 * @throws SQLException
+	 */
+	private Connection getConnection_Simple() throws SQLException {
+
+		final String dbUrl = DERBY_URL;
+
+		logDriverManagerGetConnection(dbUrl);
+
+		return DriverManager.getConnection(dbUrl, TABLE_SCHEMA, TABLE_SCHEMA);
 	}
 
 	/**
@@ -2826,7 +2815,11 @@ public class TourDatabase {
 	public EntityManager getEntityManager() {
 
 		if (_emFactory == null) {
-			getEntityManagerCreate();
+
+			// ensure db is valid BEFOR entity manager is inizialized which can shutdown the database
+			if (sqlInit_10_IsDbInitialized() == false) {
+				return null;
+			}
 		}
 
 		if (_emFactory == null) {
@@ -2838,59 +2831,6 @@ public class TourDatabase {
 			return null;
 		} else {
 			return _emFactory.createEntityManager();
-		}
-	}
-
-	private synchronized void getEntityManagerCreate() {
-
-		try {
-
-			final Map<String, Object> configOverrides = new HashMap<String, Object>();
-
-			configOverrides.put("hibernate.connection.url", DERBY_URL); //$NON-NLS-1$
-			configOverrides.put("hibernate.connection.driver_class", DERBY_DRIVER_CLASS); //$NON-NLS-1$
-
-			final MyTourbookSplashHandler splashHandler = TourbookPlugin.getSplashHandler();
-
-			if (splashHandler == null) {
-				try {
-					sqlInit_20_CheckServer();
-				} catch (final Throwable e) {
-					StatusUtil.showStatus(e);
-					return;
-				}
-				sqlInit_30_CheckTable(null);
-				sqlInit_40_IsVersionValid(null);
-
-				_emFactory = Persistence.createEntityManagerFactory(PERSISTENCE_UNIT_NAME, configOverrides);
-
-			} else {
-
-				new IRunnableWithProgress() {
-					@Override
-					public void run(final IProgressMonitor monitor) throws InvocationTargetException,
-							InterruptedException {
-
-						try {
-							sqlInit_20_CheckServer();
-						} catch (final Throwable e) {
-							return;
-						}
-
-						sqlInit_30_CheckTable(monitor);
-						sqlInit_40_IsVersionValid(monitor);
-
-						monitor.subTask(Messages.Database_Monitor_persistent_service_task);
-
-						_emFactory = Persistence.createEntityManagerFactory(PERSISTENCE_UNIT_NAME, configOverrides);
-					}
-				}.run(splashHandler.getBundleProgressMonitor());
-			}
-
-		} catch (final InvocationTargetException e) {
-			StatusUtil.log(e);
-		} catch (final InterruptedException e) {
-			StatusUtil.log(e);
 		}
 	}
 
@@ -2987,6 +2927,11 @@ public class TourDatabase {
 		System.out.println(NLS.bind(Messages.Tour_Database_Update, dbVersion));
 	}
 
+	private void logDriverManagerGetConnection(final String dbUrl) {
+
+		StatusUtil.logInfo("Derby command executed: " + dbUrl); //$NON-NLS-1$
+	}
+
 	private void modifyColumn_Type(	final String table,
 									final String fieldName,
 									final String newFieldType,
@@ -3024,27 +2969,78 @@ public class TourDatabase {
 		_propertyListeners.remove(listener);
 	}
 
-	private boolean sqlInit_10_IsDbValid() {
+	private boolean sqlInit_10_IsDbInitialized() {
+
+		if (_isDbInitialized) {
+			return true;
+		}
+
+		// check if the derby driver can be loaded
+		try {
+			Class.forName(DERBY_DRIVER_CLASS);
+		} catch (final ClassNotFoundException e) {
+			StatusUtil.showStatus(e.getMessage(), e);
+			return false;
+		}
+
+		final boolean[] returnState = { false };
 
 		try {
 
-			sqlInit_20_CheckServer();
+			/*
+			 * Get progress monitor
+			 */
+			final IProgressMonitor progressMonitor;
+			final MyTourbookSplashHandler splashHandler = TourbookPlugin.getSplashHandler();
+			if (splashHandler == null) {
+				progressMonitor = new NullProgressMonitor();
+			} else {
+				progressMonitor = splashHandler.getBundleProgressMonitor();
+			}
 
-		} catch (final Throwable e) {
+			/*
+			 * Check or setup sql
+			 */
+			final IRunnableWithProgress runnable = new IRunnableWithProgress() {
+				@Override
+				public void run(final IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 
+					try {
+
+						sqlInit_20_CheckServer();
+						sqlInit_30_Check_DbIsCreated();
+
+					} catch (final Throwable e) {
+
+						StatusUtil.log(e);
+						return;
+					}
+
+					sqlInit_40_CheckTable(monitor);
+
+					if (sqlInit_60_IsVersionValid(monitor) == false) {
+						return;
+					}
+
+					sqlInit_80_Check_DbIsUpgraded(monitor);
+
+					sqlInit_90_SetupEntityManager(monitor);
+
+					returnState[0] = true;
+				}
+			};
+
+			runnable.run(progressMonitor);
+
+		} catch (final InvocationTargetException e) {
 			StatusUtil.log(e);
-			return false;
+		} catch (final InterruptedException e) {
+			StatusUtil.log(e);
+		} finally {
+			_isDbInitialized = returnState[0];
 		}
 
-		sqlInit_30_CheckTable(null);
-
-		if (sqlInit_40_IsVersionValid(null) == false) {
-			return false;
-		}
-
-		sqlInit_50_EnsureDbIsUpgraded();
-
-		return true;
+		return returnState[0];
 	}
 
 	/**
@@ -3064,20 +3060,15 @@ public class TourDatabase {
 			return;
 		}
 
-		// check if the derby driver can be loaded
-		try {
-			Class.forName(DERBY_DRIVER_CLASS);
-		} catch (final ClassNotFoundException e) {
-			StatusUtil.showStatus(e.getMessage(), e);
-			return;
-		}
-
 		try {
 
 			final MyTourbookSplashHandler splashHandler = TourbookPlugin.getSplashHandler();
 
-			sqlInit_22_CheckServer_CreateRunnable().run(
-					splashHandler == null ? null : splashHandler.getBundleProgressMonitor());
+			final IProgressMonitor monitor = splashHandler == null //
+					? null
+					: splashHandler.getBundleProgressMonitor();
+
+			sqlInit_22_CheckServer_CreateRunnable().run(monitor);
 
 		} catch (final InvocationTargetException e) {
 
@@ -3190,7 +3181,7 @@ public class TourDatabase {
 							monitor.subTask(Messages.Database_Monitor_SetupPooledConnection);
 						}
 
-						final Connection connection = getPooledConnection();
+						final Connection connection = getConnection_Simple();
 						connection.close();
 
 						// log database path
@@ -3206,12 +3197,51 @@ public class TourDatabase {
 		return runnable;
 	}
 
+	private void sqlInit_30_Check_DbIsCreated() {
+
+		if (_isChecked_DbCreated) {
+			return;
+		}
+
+		Connection conn = null;
+
+		// ensure driver is loaded
+		try {
+			Class.forName(DERBY_DRIVER_CLASS);
+		} catch (final ClassNotFoundException e) {
+			StatusUtil.showStatus(e);
+		}
+
+		/*
+		 * Get a connection, this also creates the database when not yet available. The embedded
+		 * driver displays a warning when database already exist.
+		 */
+		try {
+
+			final String dbUrl = DERBY_URL + DERBY_URL_COMMAND_CREATE_TRUE;
+
+			logDriverManagerGetConnection(dbUrl);
+
+			conn = DriverManager.getConnection(dbUrl, TABLE_SCHEMA, TABLE_SCHEMA);
+
+		} catch (final SQLException e) {
+
+			UI.showSQLException(e);
+
+		} finally {
+
+			closeConnection(conn);
+
+			_isChecked_DbCreated = true;
+		}
+	}
+
 	/**
 	 * Check if the table in the database exist
 	 * 
 	 * @param monitor
 	 */
-	private void sqlInit_30_CheckTable(final IProgressMonitor monitor) {
+	private void sqlInit_40_CheckTable(final IProgressMonitor monitor) {
 
 		if (_isTableChecked) {
 			return;
@@ -3221,7 +3251,7 @@ public class TourDatabase {
 
 		try {
 
-			conn = getPooledConnection();
+			conn = getConnection_Simple();
 
 			/*
 			 * Check if the tourdata table exists
@@ -3295,7 +3325,7 @@ public class TourDatabase {
 	 *            Progress monitor or <code>null</code> when the monitor is not available
 	 * @return
 	 */
-	private boolean sqlInit_40_IsVersionValid(final IProgressMonitor monitor) {
+	private boolean sqlInit_60_IsVersionValid(final IProgressMonitor monitor) {
 
 		if (_isVersionChecked) {
 			return true;
@@ -3311,7 +3341,7 @@ public class TourDatabase {
 
 		try {
 
-			conn = getPooledConnection();
+			conn = getConnection_Simple();
 			{
 				String sql = "SELECT * FROM " + TABLE_DB_VERSION; //$NON-NLS-1$
 
@@ -3381,44 +3411,38 @@ public class TourDatabase {
 		return _isVersionChecked;
 	}
 
-	private void sqlInit_50_EnsureDbIsUpgraded() {
+	private void sqlInit_80_Check_DbIsUpgraded(final IProgressMonitor monitor) {
 
-		if (_isDbUpgraded) {
+		if (_isChecked_DbUpgraded) {
 			return;
 		}
 
-		boolean isUpdateNeeded = false;
+		boolean isUpgradeNeeded = false;
 
 		if (_dbVersionBeforeUpdate < 26 && _dbVersionAfterUpdate >= 26) {
 
 			// db version 26: update to derby 10.11.1.1 to implement text search with lucene
 
-			isUpdateNeeded = true;
+			isUpgradeNeeded = true;
 		}
 
-		if (!isUpdateNeeded) {
-			return;
-		}
+		if (!isUpgradeNeeded) {
 
-		try {
+			_isChecked_DbUpgraded = true;
 
-			_pooledDataSource.softResetAllUsers();
-
-		} catch (final SQLException e) {
-			UI.showSQLException(e);
 			return;
 		}
 
 		Connection conn = null;
-		boolean isShutDown = false;
 
 		try {
 
 			// shutdown database that all connections are closed, THIS WILL ALWAYS CREATE AN EXCEPTION
-			conn = DriverManager.getConnection(//
-					DERBY_URL + DERBY_URL_COMMAND_SHUTDOWN_TRUE,
-					TABLE_SCHEMA,
-					TABLE_SCHEMA);
+			final String dbUrl = DERBY_URL + DERBY_URL_COMMAND_SHUTDOWN_TRUE;
+
+			logDriverManagerGetConnection(dbUrl);
+
+			conn = DriverManager.getConnection(dbUrl, TABLE_SCHEMA, TABLE_SCHEMA);
 
 		} catch (final SQLException e) {
 
@@ -3427,42 +3451,41 @@ public class TourDatabase {
 			// log also the stacktrace
 			StatusUtil.log(sqlExceptionText + Util.getStackTrace(e));
 
-			isShutDown = true;
-
 		} finally {
 			closeConnection(conn);
 		}
 
 		try {
 
-			// upgrade the database
-			final String dbCommand = DERBY_URL + DERBY_URL_COMMAND_UPGRADE_TRUE;
+			// upgrade database
 
-			conn = DriverManager.getConnection(//
-					dbCommand,
-					TABLE_SCHEMA,
-					TABLE_SCHEMA);
+			final String dbUrl = DERBY_URL + DERBY_URL_COMMAND_UPGRADE_TRUE;
 
-			StatusUtil.logInfo("Derby command executed: " + dbCommand);
+			logDriverManagerGetConnection(dbUrl);
 
-			_isDbUpgraded = true;
+			monitor.subTask(Messages.Database_Monitor_UpgradeDatabase);
+
+			conn = DriverManager.getConnection(dbUrl, TABLE_SCHEMA, TABLE_SCHEMA);
+
+			_isChecked_DbUpgraded = true;
 
 		} catch (final SQLException e) {
 			UI.showSQLException(e);
 		} finally {
 			closeConnection(conn);
 		}
+	}
 
-		if (isShutDown) {
+	private synchronized void sqlInit_90_SetupEntityManager(final IProgressMonitor monitor) {
 
-			try {
-				conn = _pooledDataSource.getConnection();
-			} catch (final SQLException e) {
-				UI.showSQLException(e);
-			} finally {
-				closeConnection(conn);
-			}
-		}
+		final Map<String, Object> configOverrides = new HashMap<String, Object>();
+
+		configOverrides.put("hibernate.connection.url", DERBY_URL); //$NON-NLS-1$
+		configOverrides.put("hibernate.connection.driver_class", DERBY_DRIVER_CLASS); //$NON-NLS-1$
+
+		monitor.subTask(Messages.Database_Monitor_persistent_service_task);
+
+		_emFactory = Persistence.createEntityManagerFactory(PERSISTENCE_UNIT_NAME, configOverrides);
 	}
 
 	/**

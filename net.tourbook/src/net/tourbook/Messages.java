@@ -439,17 +439,18 @@ public class Messages extends NLS {
 
 	public static String		Database_Confirm_update;
 	public static String		Database_Confirm_update_title;
-
 	public static String		Database_Confirm_Update20;
-	public static String		Database_Monitor_CreateDatabase;
 
+	public static String		Database_Monitor_CreateDatabase;
 	public static String		Database_Monitor_db_service_task;
 	public static String		Database_Monitor_persistent_service_task;
 	public static String		Database_Monitor_SetupPooledConnection;
+	public static String		Database_Monitor_UpgradeDatabase;
 
 	public static String		DataImport_Error_file_does_not_exist_msg;
 	public static String		DataImport_Error_file_does_not_exist_title;
 	public static String		DataImport_Error_invalid_data_format;
+
 	public static String		DataImport_ConfirmImport_title;
 
 	public static String		Db_Field_TourData_Description;
@@ -460,7 +461,6 @@ public class Messages extends NLS {
 	public static String		Db_Field_TourData_Weather;
 
 	public static String		Db_Field_TourMarker_UrlAddress;
-
 	public static String		Db_Field_TourMarker_UrlText;
 
 	public static String		DeviceManager_Selection_device_is_not_selected;
