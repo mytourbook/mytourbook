@@ -660,7 +660,7 @@
 			<!-- Search -->
 			
 				<command
-					commandId="command.net.tourbook.search.SearchResultView"
+					commandId="command.net.tourbook.search.SearchView"
 					icon="icons/find-all.png"
 					label="%View_Name_SearchAll"
 					mnemonic="%View_Name_SearchAll_Mnemonic"/>
@@ -898,7 +898,7 @@
 
 				<!-- Search -->
 				<command
-					commandId="command.net.tourbook.search.SearchResultView"
+					commandId="command.net.tourbook.search.SearchView"
 					icon="icons/find-all.png"
 					label="%View_Name_SearchAll"
 					tooltip="%View_Name_SearchAll_Tooltip"
@@ -1079,7 +1079,7 @@
             />
 
 		<command
-			id="command.net.tourbook.search.SearchResultView"
+			id="command.net.tourbook.search.SearchView"
 			name="%View_Name_SearchAll"
 			defaultHandler="net.tourbook.search.ActionHandlerOpenViewSearchResultView"
 			/>
@@ -1466,9 +1466,9 @@
 
 			<view
 				category="net.tourbook.category.Tools"
-				class="net.tourbook.search.SearchResultView"
+				class="net.tourbook.search.SearchView"
 				icon="icons/find-all.png"
-				id="net.tourbook.search.SearchResultView"
+				id="net.tourbook.search.SearchView"
 				name="%View_Name_SearchAll"
 			/>
 
@@ -1700,6 +1700,14 @@
 		<key
 			commandId="org.eclipse.ui.window.preferences"
 			sequence="%Shortcut_Key_App_Preferences"
+			contextId="org.eclipse.ui.contexts.window"
+			schemeId="net.tourbook.scheme"/>
+
+		<!-- Tools -->
+	
+		<key
+			commandId="command.net.tourbook.search.SearchView"
+			sequence="%Shortcut_Key_App_Search"
 			contextId="org.eclipse.ui.contexts.window"
 			schemeId="net.tourbook.scheme"/>
   

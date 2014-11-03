@@ -1266,7 +1266,7 @@ public class TourPhotoManager implements IPhotoServiceProvider {
 		if (_sqlConnection != null) {
 
 			Util.closeSql(_sqlStatement);
-			TourDatabase.closeConnection(_sqlConnection);
+			Util.closeSql(_sqlConnection);
 
 			_sqlStatement = null;
 			_sqlConnection = null;

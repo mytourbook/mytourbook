@@ -1,0 +1,53 @@
+
+html 
+{
+	overflow-y: 			scroll;
+}
+
+body 
+{
+	font-size:				13px;
+	color:					#404040;
+	background-color:		#fff;
+	margin:					5px;
+}
+
+p,td,ul 
+{
+	line-height:			130%;
+}
+
+p 
+{
+	margin:					0px;
+}
+
+img 
+{
+	border: 				0;
+}
+
+table
+{
+	border-collapse:		collapse;
+}
+
+body,p,h1,h2,h3,h4,table,td,th,ul,ol,textarea,input 
+{
+	font-family: 			verdana, helvetica, arial, sans-serif;
+}
+
+.result-item
+{
+	xborder-bottom:			1px solid #ddd;
+	padding-bottom: 		20px;
+}
+
+.result-description
+{
+}
+
+.result-title
+{
+	font-style:				italic;
+}

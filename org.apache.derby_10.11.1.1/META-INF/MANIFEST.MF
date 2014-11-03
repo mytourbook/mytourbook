@@ -3,15 +3,17 @@ Bundle-ManifestVersion: 2
 Bundle-Name: Apache Derby + Lucene Plug-in for Eclipse
 Bundle-SymbolicName: org.apache.derby
 Bundle-Version: 10.11.1.1
+Bundle-Vendor: The Apache Software Foundation
 Bundle-ClassPath: derby.jar,
  derbyclient.jar,
  derbynet.jar,
- derbytools.jar,
  derbyoptionaltools.jar,
- lucene-analyzers-common-4.10.1.jar,
+ derbytools.jar,
  lucene-core-4.10.1.jar,
- lucene-queryparser-4.10.1.jar
-Bundle-Vendor: The Apache Software Foundation
+ lucene-analyzers-common-4.10.1.jar,
+ lucene-queryparser-4.10.1.jar,
+ lucene-highlighter-4.10.1.jar,
+ lucene-suggest-4.10.1.jar
 Export-Package: org.apache.derby.agg,
  org.apache.derby.authentication,
  org.apache.derby.catalog,
@@ -233,9 +235,18 @@ Export-Package: org.apache.derby.agg,
  org.apache.lucene.queryparser.xml,
  org.apache.lucene.queryparser.xml.builders,
  org.apache.lucene.search,
+ org.apache.lucene.search.highlight,
  org.apache.lucene.search.payloads,
+ org.apache.lucene.search.postingshighlight,
  org.apache.lucene.search.similarities,
  org.apache.lucene.search.spans,
+ org.apache.lucene.search.spell,
+ org.apache.lucene.search.suggest,
+ org.apache.lucene.search.suggest.analyzing,
+ org.apache.lucene.search.suggest.fst,
+ org.apache.lucene.search.suggest.jaspell,
+ org.apache.lucene.search.suggest.tst,
+ org.apache.lucene.search.vectorhighlight,
  org.apache.lucene.store,
  org.apache.lucene.util,
  org.apache.lucene.util.automaton,

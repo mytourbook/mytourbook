@@ -62,6 +62,7 @@ import net.tourbook.data.TourTagCategory;
 import net.tourbook.data.TourType;
 import net.tourbook.data.TourWayPoint;
 import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.search.MTSearchManager;
 import net.tourbook.tag.TagCollection;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.TourTypeFilter;
@@ -246,7 +247,7 @@ public class TourDatabase {
 	private final ListenerList						_propertyListeners							= new ListenerList(
 																										ListenerList.IDENTITY);
 
-	private final String							_databasePath								= Platform
+	private final static String						_databasePath								= Platform
 																										.getInstanceLocation()
 																										.getURL()
 																										.getPath()
@@ -270,7 +271,6 @@ public class TourDatabase {
 	private boolean									_isDerbyEmbedded;
 	private boolean									_isChecked_DbUpgraded;
 	private boolean									_isChecked_DbCreated;
-
 
 	private static NetworkServerControl				_server;
 
@@ -845,7 +845,7 @@ public class TourDatabase {
 			System.out.println(sql);
 			UI.showSQLException(e);
 		} finally {
-			closeConnection(conn);
+			Util.closeSql(conn);
 		}
 	}
 
@@ -954,7 +954,7 @@ public class TourDatabase {
 			UI.showSQLException(e);
 		} finally {
 			Util.closeSql(stmt);
-			closeConnection(conn);
+			Util.closeSql(conn);
 		}
 
 		return tourIds;
@@ -1097,6 +1097,10 @@ public class TourDatabase {
 		return _tourTypes;
 	}
 
+	public static String getDatabasePath() {
+		return _databasePath;
+	}
+
 	/**
 	 * Getting one row from the database sorted by alphabet and without any double entries.
 	 * 
@@ -1161,7 +1165,7 @@ public class TourDatabase {
 							UI.showSQLException(e);
 						} finally {
 							Util.closeSql(stmt);
-							closeConnection(conn);
+							Util.closeSql(conn);
 						}
 
 						/*
@@ -3026,8 +3030,11 @@ public class TourDatabase {
 
 					sqlInit_90_SetupEntityManager(monitor);
 
+					sqlInit_95_SetupSearch(monitor);
+
 					returnState[0] = true;
 				}
+
 			};
 
 			runnable.run(progressMonitor);
@@ -3230,7 +3237,7 @@ public class TourDatabase {
 
 		} finally {
 
-			closeConnection(conn);
+			Util.closeSql(conn);
 
 			_isChecked_DbCreated = true;
 		}
@@ -3452,7 +3459,7 @@ public class TourDatabase {
 			StatusUtil.log(sqlExceptionText + Util.getStackTrace(e));
 
 		} finally {
-			closeConnection(conn);
+			Util.closeSql(conn);
 		}
 
 		try {
@@ -3472,7 +3479,7 @@ public class TourDatabase {
 		} catch (final SQLException e) {
 			UI.showSQLException(e);
 		} finally {
-			closeConnection(conn);
+			Util.closeSql(conn);
 		}
 	}
 
@@ -3486,6 +3493,23 @@ public class TourDatabase {
 		monitor.subTask(Messages.Database_Monitor_persistent_service_task);
 
 		_emFactory = Persistence.createEntityManagerFactory(PERSISTENCE_UNIT_NAME, configOverrides);
+	}
+
+	private void sqlInit_95_SetupSearch(final IProgressMonitor monitor) {
+
+		Connection connection = null;
+
+		try {
+
+			connection = getConnection_Simple();
+
+			MTSearchManager.setupSearch(connection, monitor);
+
+		} catch (final SQLException e) {
+			UI.showSQLException(e);
+		} finally {
+			Util.closeSql(connection);
+		}
 	}
 
 	/**

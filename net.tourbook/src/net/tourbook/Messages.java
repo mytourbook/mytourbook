@@ -444,6 +444,8 @@ public class Messages extends NLS {
 	public static String		Database_Monitor_CreateDatabase;
 	public static String		Database_Monitor_db_service_task;
 	public static String		Database_Monitor_persistent_service_task;
+	public static String	Database_Monitor_SetupLucene;
+
 	public static String		Database_Monitor_SetupPooledConnection;
 	public static String		Database_Monitor_UpgradeDatabase;
 
@@ -1152,6 +1154,10 @@ public class Messages extends NLS {
 //	public static String		SignImage_Viewer_Column_Image_Label;
 //	public static String		SignImage_Viewer_Column_Image_Tooltip;
 //	public static String		SignImage_Viewer_Column_Name_Label;
+
+	public static String	Search_Manager_CreateFTIndex;
+
+	public static String	Search_Result_Link_NoResultAvailable;
 
 	public static String		Slideout_ChartMarkerOptions_Checkbox_IsShowHiddenMarker;
 	public static String		Slideout_ChartMarkerOptions_Checkbox_IsShowMarker;

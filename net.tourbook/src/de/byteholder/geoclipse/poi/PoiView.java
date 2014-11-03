@@ -296,7 +296,7 @@ public class PoiView extends ViewPart implements Observer {
 			/*
 			 * table viewer: poi items
 			 */
-			final Table poiTable = new Table(container, SWT.BORDER | SWT.SINGLE | SWT.FULL_SELECTION);
+			final Table poiTable = new Table(container, /* SWT.BORDER | */SWT.SINGLE | SWT.FULL_SELECTION);
 			GridDataFactory.fillDefaults().grab(true, true).applyTo(poiTable);
 			poiTable.setLinesVisible(true);
 			poiTable.setHeaderVisible(true);
