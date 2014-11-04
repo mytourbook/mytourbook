@@ -60,7 +60,7 @@ public class TESTMySuggester {
 
 		// Get terms from index for given field
 		final IndexReader ireader = DirectoryReader.open(FSDirectory.open(new File(indexPath)));
-		final TESTTermFreqIteratorListWrapper inputIterator = new TESTTermFreqIteratorListWrapper();
+		final TermFreqIteratorListWrapper inputIterator = new TermFreqIteratorListWrapper();
 
 		final List<AtomicReaderContext> leaves = ireader.leaves();
 

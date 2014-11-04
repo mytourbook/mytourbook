@@ -37,6 +37,7 @@ import net.tourbook.tour.TourEvent;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
 
+import org.apache.lucene.search.suggest.Lookup.LookupResult;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.bindings.keys.KeyStroke;
@@ -149,30 +150,15 @@ public class SearchView extends ViewPart {
 
 		public IContentProposal[] getProposals(final String contents, final int position) {
 
-
 			final List<Proposal> primaryProposals = new ArrayList<Proposal>();
 			final List<Proposal> secondaryProposals = new ArrayList<Proposal>();
 
-			final String[] proposalStrings = MTSearchManager.getProposals(contents, position);
-//			final String[] proposalStrings = {
-//					//
-//					"aa",
-//					"ab",
-//					"ab1",
-//					"ab2",
-//					"ab3",
-//					"ab4",
-//					"ab5",
-//					"aba",
-//					"abb",
-//					"abc",
-//					"abd",
-//					"abz",
-//			//
-//			};
+			final List<LookupResult> proposals = MTSearchManager.getProposals(contents, position);
 			final String contentToCursor = contents.substring(0, position);
 
-			for (final String proposalString : proposalStrings) {
+			for (final LookupResult lookupResult : proposals) {
+
+				final String proposalString = lookupResult.key.toString();
 
 				if (stringOverlap(contentToCursor, proposalString) > 0) {
 					primaryProposals.add(new Proposal(proposalString));
@@ -224,6 +210,13 @@ public class SearchView extends ViewPart {
 
 	public class MTContentProposalAdapter extends ContentProposalAdapter {
 
+		/**
+		 * @param control
+		 * @param controlContentAdapter
+		 * @param proposalProvider
+		 * @param keyStroke
+		 * @param autoActivationCharacters
+		 */
 		public MTContentProposalAdapter(final Control control,
 										final IControlContentAdapter controlContentAdapter,
 										final IContentProposalProvider proposalProvider,
@@ -426,14 +419,13 @@ public class SearchView extends ViewPart {
 				}
 			});
 
-			final ContentProposalAdapter contentAssistCommandAdapter = new MTContentProposalAdapter(
+			new MTContentProposalAdapter(
 					_txtSearch,
 					new TextContentAdapter(),
 					new LuceneSuggestProposalProvider(),
-					KeyStroke.getInstance(SWT.ARROW_DOWN),
-					new char[] { '$' });
-
-			contentAssistCommandAdapter.setPropagateKeys(false);
+//					KeyStroke.getInstance(SWT.ARROW_DOWN),
+					null,
+					null);
 
 			/*
 			 * Button: Search

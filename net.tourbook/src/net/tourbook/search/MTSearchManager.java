@@ -21,6 +21,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -35,6 +36,8 @@ import net.tourbook.database.TourDatabase;
 import net.tourbook.ui.UI;
 
 import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.analysis.standard.StandardAnalyzer;
+import org.apache.lucene.analysis.util.CharArraySet;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.Field.Store;
@@ -59,6 +62,7 @@ import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.search.TopScoreDocCollector;
 import org.apache.lucene.search.postingshighlight.PostingsHighlighter;
+import org.apache.lucene.search.suggest.Lookup.LookupResult;
 import org.apache.lucene.search.suggest.analyzing.AnalyzingSuggester;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.util.Version;
@@ -66,18 +70,20 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.osgi.util.NLS;
+import org.eclipse.swt.custom.BusyIndicator;
+import org.eclipse.swt.widgets.Display;
 
 public class MTSearchManager {
 
-	private static final String			LUCENE_INDEX_FOLDER_NAME	= "lucene-index";
+	private static final String				LUCENE_INDEX_FOLDER_NAME	= "lucene-index";
 
-	private static final String			SEARCH_FIELD_DESCRIPTION	= "description";	//$NON-NLS-1$
-	private static final String			SEARCH_FIELD_TITLE			= "title";			//$NON-NLS-1$
-	private static final String			SEARCH_FIELD_TOUR_ID		= "tourID";		//$NON-NLS-1$
+	private static final String				SEARCH_FIELD_DESCRIPTION	= "description";					//$NON-NLS-1$
+	private static final String				SEARCH_FIELD_TITLE			= "title";							//$NON-NLS-1$
+	private static final String				SEARCH_FIELD_TOUR_ID		= "tourID";						//$NON-NLS-1$
 
-	private static final String[]		_emptyProposal				= new String[] {};
+	private static final List<LookupResult>	_emptyProposal				= new ArrayList<LookupResult>();
 
-	private static AnalyzingSuggester	_suggester;
+	private static AnalyzingSuggester		_suggester;
 
 	public static class MyPostingsHighlighter extends PostingsHighlighter {
 
@@ -366,12 +372,20 @@ public class MTSearchManager {
 	private static Analyzer getAnalyzer() throws SQLException {
 
 		final Locale currentLocale = Locale.getDefault();
-		final Analyzer analyzer = SearchUtils.getAnalyzerForLocale(currentLocale);
+
+//		currentLocale = Locale.GERMAN;
+//		currentLocale = Locale.ENGLISH;
+//
+		Analyzer analyzer = SearchUtils.getAnalyzerForLocale(currentLocale);
+//		analyzer = new GermanAnalyzer();
+//		analyzer = new EnglishAnalyzer();
+
+		analyzer = new StandardAnalyzer(new CharArraySet(0, true));
 
 		return analyzer;
 	}
 
-	static String[] getProposals(final String contents, final int position) {
+	static List<LookupResult> getProposals(final String contents, final int position) {
 
 		try {
 
@@ -379,7 +393,7 @@ public class MTSearchManager {
 				_suggester = setupSuggester();
 			}
 
-			return _emptyProposal;
+			return _suggester.lookup(contents, false, 15);
 
 		} catch (final Exception e) {
 			return _emptyProposal;
@@ -477,48 +491,54 @@ public class MTSearchManager {
 
 	private static AnalyzingSuggester setupSuggester() {
 
-		DirectoryReader indexReader = null;
-		AnalyzingSuggester suggester = null;
+		final AnalyzingSuggester suggester[] = new AnalyzingSuggester[1];
 
-		try {
+		BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
+			public void run() {
 
-			final FSDirectory dir = openIndex(TourDatabase.TABLE_TOUR_DATA);
+				DirectoryReader indexReader = null;
 
-			indexReader = DirectoryReader.open(dir);
+				try {
 
-			final TESTTermFreqIteratorListWrapper inputIterator = new TESTTermFreqIteratorListWrapper();
+					final TermFreqIteratorListWrapper inputIterator = new TermFreqIteratorListWrapper();
 
-			final List<AtomicReaderContext> leaves = indexReader.leaves();
+					final FSDirectory dir = openIndex(TourDatabase.TABLE_TOUR_DATA);
+					indexReader = DirectoryReader.open(dir);
 
-			for (final AtomicReaderContext readerContext : leaves) {
+					final List<AtomicReaderContext> leaves = indexReader.leaves();
 
-				final AtomicReader reader = readerContext.reader();
-				final Fields fields = reader.fields();
+					for (final AtomicReaderContext readerContext : leaves) {
 
-				for (final String field : fields) {
+						final AtomicReader reader = readerContext.reader();
+						final Fields fields = reader.fields();
 
-					if (field.equals(SEARCH_FIELD_DESCRIPTION) //
-							|| field.equals(SEARCH_FIELD_TITLE)) {
+						for (final String field : fields) {
 
-						final Terms terms = fields.terms(field);
-						final TermsEnum termsEnum = terms.iterator(null);
+							if (field.equals(SEARCH_FIELD_DESCRIPTION) //
+									|| field.equals(SEARCH_FIELD_TITLE)) {
 
-						inputIterator.add(termsEnum);
+								final Terms terms = fields.terms(field);
+								final TermsEnum termsEnum = terms.iterator(null);
+
+								inputIterator.add(termsEnum);
+							}
+						}
 					}
+
+//					final Analyzer analyzer = getAnalyzer();
+					final Analyzer analyzer = new StandardAnalyzer(new CharArraySet(0, true));
+
+					suggester[0] = new AnalyzingSuggester(analyzer);
+					suggester[0].build(inputIterator);
+
+				} catch (final Exception e) {
+					StatusUtil.showStatus(e);
+				} finally {
+					closeReader(indexReader);
 				}
 			}
+		});
 
-			final Analyzer analyzer = getAnalyzer();
-
-			suggester = new AnalyzingSuggester(analyzer);
-			suggester.build(inputIterator);
-
-		} catch (final Exception e) {
-			StatusUtil.showStatus(e);
-		} finally {
-			closeReader(indexReader);
-		}
-
-		return suggester;
+		return suggester[0];
 	}
 }

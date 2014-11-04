@@ -33,7 +33,7 @@ import org.apache.lucene.util.BytesRefIterator;
  * concatenation of the individual iterators in the order in which they were
  * added.
  */
-public class TESTTermFreqIteratorListWrapper implements TermFreqIterator, InputIterator {
+public class TermFreqIteratorListWrapper implements TermFreqIterator, InputIterator {
 
 	/** List of iterators being wrapped. */
 	private List<BytesRefIterator> iters;
@@ -45,7 +45,7 @@ public class TESTTermFreqIteratorListWrapper implements TermFreqIterator, InputI
      * Creates a new empty wrapper, to which iterators can be added. For each
      * iterator, a weight value of <code>1</code> is assigned for all terms.
      */
-	public TESTTermFreqIteratorListWrapper() {
+	public TermFreqIteratorListWrapper() {
 
 		curr = -1;
 		iters = new ArrayList<BytesRefIterator>();
