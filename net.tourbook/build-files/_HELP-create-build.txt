@@ -79,8 +79,7 @@ Create Update Site
 
 ##################
 
-- check which plugins needs to be contained in the update site
-- update plugin version number
+- check which plugins needs to be contained in the update site and update plugin version number
 
 - create translation archive when necessary, see above instructions
 
