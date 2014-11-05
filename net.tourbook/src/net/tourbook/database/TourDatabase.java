@@ -5080,12 +5080,14 @@ public class TourDatabase {
 						 * markers are not affected.
 						 */
 
-						final String message = String.format(
-								"Tour marker: %s - serieIndex: %d - serie length: %d - relative time: %d sec",//$NON-NLS-1$
-								tourMarker.getLabel(),
-								tourMarker.getSerieIndex(),
-								serieLength,
-								tourMarker.getTime());
+						final String message = String
+								.format(
+										"Tour: %s - Tour marker: %s - serieIndex: %d - serie length: %d - relative time: %d sec",//$NON-NLS-1$
+										TourManager.getTourDateTimeShort(tourData),
+										tourMarker.getLabel(),
+										tourMarker.getSerieIndex(),
+										serieLength,
+										tourMarker.getTime());
 
 						StatusUtil.showStatus(message, e);
 					}
