@@ -44,11 +44,14 @@ import org.eclipse.jface.bindings.keys.KeyStroke;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.fieldassist.ContentProposalAdapter;
 import org.eclipse.jface.fieldassist.IContentProposal;
+import org.eclipse.jface.fieldassist.IContentProposalListener;
+import org.eclipse.jface.fieldassist.IContentProposalListener2;
 import org.eclipse.jface.fieldassist.IContentProposalProvider;
 import org.eclipse.jface.fieldassist.IControlContentAdapter;
 import org.eclipse.jface.fieldassist.TextContentAdapter;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
@@ -64,6 +67,7 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.TraverseEvent;
 import org.eclipse.swt.events.TraverseListener;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -76,41 +80,66 @@ import org.eclipse.ui.part.ViewPart;
 
 public class SearchView extends ViewPart {
 
-	public static final String		ID					= "net.tourbook.search.SearchView"; //$NON-NLS-1$
+	public static final String			ID						= "net.tourbook.search.SearchView"; //$NON-NLS-1$
 
-	private static final String		SEARCH_RESULT_CSS	= "/html/search-result.css";
+	private static final String			SEARCH_RESULT_CSS_FILE	= "/html/search-result.css";		//$NON-NLS-1$
 
-	private final IPreferenceStore	_prefStore			= TourbookPlugin.getPrefStore();
+	private static final String			STATE_POPUP_WIDTH		= "STATE_POPUP_WIDTH";				//$NON-NLS-1$
+	private static final String			STATE_POPUP_HEIGHT		= "STATE_POPUP_HEIGHT";			//$NON-NLS-1$
 
-	private final IDialogSettings	_state				= TourbookPlugin.getState(ID);
-	private PostSelectionProvider	_postSelectionProvider;
-
-	private IPropertyChangeListener	_prefChangeListener;
-
-	private ITourEventListener		_tourEventListener;
-	private IPartListener2			_partListener;
-	private String					_htmlCss;
+	private final IPreferenceStore		_prefStore				= TourbookPlugin.getPrefStore();
+	private final IDialogSettings		_state					= TourbookPlugin.getState(ID);
+	//
+	private PostSelectionProvider		_postSelectionProvider;
+	private IPropertyChangeListener		_prefChangeListener;
+	private ITourEventListener			_tourEventListener;
+	private IPartListener2				_partListener;
+	//
+	private String						_htmlCss;
 
 	/**
 	 * Set time that an error displays the correct time.
 	 */
-	private long					_searchStartTime	= System.currentTimeMillis();
+	private long						_searchStartTime		= System.currentTimeMillis();
+
+	private MTContentProposalAdapter	_contentProposalAdapter;
+	private TextContentAdapter			_controlContentAdapter	= new TextContentAdapter();
+	private MTProposalProvider			_proposalProvider		= new MTProposalProvider();
+
+	private PixelConverter				_pc;
 
 	/*
 	 * UI controls
 	 */
-	private Browser					_browser;
+	private Browser						_browser;
+	private Button						_btnSearch;
+	private Text						_txtSearch;
+	private Text						_txtStatus;
 
-	private Button					_btnSearch;
+	public class MTContentProposalAdapter extends ContentProposalAdapter {
 
-	private Text					_txtSearch;
+		/**
+		 * @param control
+		 * @param controlContentAdapter
+		 * @param proposalProvider
+		 * @param keyStroke
+		 * @param autoActivationCharacters
+		 */
+		public MTContentProposalAdapter(final Control control,
+										final IControlContentAdapter controlContentAdapter,
+										final IContentProposalProvider proposalProvider,
+										final KeyStroke keyStroke,
+										final char[] autoActivationCharacters) {
 
-	private Text					_txtStatus;
+			super(control, controlContentAdapter, proposalProvider, keyStroke, autoActivationCharacters);
+		}
+
+	}
 
 	/**
 	 * Copied from {@link org.eclipse.jdt.internal.ui.dialogs.GenerateToStringDialog} and adjusted.
 	 */
-	private class LuceneSuggestProposalProvider implements IContentProposalProvider {
+	private class MTProposalProvider implements IContentProposalProvider {
 
 		private String	latestContents;
 		private int		latestPosition;
@@ -154,6 +183,7 @@ public class SearchView extends ViewPart {
 			final List<Proposal> secondaryProposals = new ArrayList<Proposal>();
 
 			final List<LookupResult> proposals = MTSearchManager.getProposals(contents, position);
+
 			final String contentToCursor = contents.substring(0, position);
 
 			for (final LookupResult lookupResult : proposals) {
@@ -206,26 +236,6 @@ public class SearchView extends ViewPart {
 
 			return 0;
 		}
-	}
-
-	public class MTContentProposalAdapter extends ContentProposalAdapter {
-
-		/**
-		 * @param control
-		 * @param controlContentAdapter
-		 * @param proposalProvider
-		 * @param keyStroke
-		 * @param autoActivationCharacters
-		 */
-		public MTContentProposalAdapter(final Control control,
-										final IControlContentAdapter controlContentAdapter,
-										final IContentProposalProvider proposalProvider,
-										final KeyStroke keyStroke,
-										final char[] autoActivationCharacters) {
-
-			super(control, controlContentAdapter, proposalProvider, keyStroke, autoActivationCharacters);
-		}
-
 	}
 
 	private void addPartListener() {
@@ -363,7 +373,7 @@ public class SearchView extends ViewPart {
 	@Override
 	public void createPartControl(final Composite parent) {
 
-		initUI();
+		initUI(parent);
 
 		createUI(parent);
 		createActions();
@@ -374,6 +384,8 @@ public class SearchView extends ViewPart {
 
 		// this part is a selection provider
 		getSite().setSelectionProvider(_postSelectionProvider = new PostSelectionProvider(ID));
+
+		restoreState();
 	}
 
 	private void createUI(final Composite parent) {
@@ -419,13 +431,43 @@ public class SearchView extends ViewPart {
 				}
 			});
 
-			new MTContentProposalAdapter(
+			_contentProposalAdapter = new MTContentProposalAdapter(//
 					_txtSearch,
-					new TextContentAdapter(),
-					new LuceneSuggestProposalProvider(),
+					_controlContentAdapter,
+					_proposalProvider,
 //					KeyStroke.getInstance(SWT.ARROW_DOWN),
 					null,
 					null);
+
+			_contentProposalAdapter.addContentProposalListener(new IContentProposalListener() {
+
+				@Override
+				public void proposalAccepted(final IContentProposal proposal) {
+
+					System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
+							+ ("\tContent: " + proposal.getContent())
+							+ ("\tLabel: " + proposal.getLabel())
+							+ ("\tCursorPosition: " + proposal.getCursorPosition())
+					//
+							);
+					// TODO remove SYSTEM.OUT.PRINTLN
+					onSelectSearch();
+				}
+			});
+			_contentProposalAdapter.addContentProposalListener(new IContentProposalListener2() {
+
+				@Override
+				public void proposalPopupClosed(final ContentProposalAdapter adapter) {
+					// TODO Auto-generated method stub
+
+				}
+
+				@Override
+				public void proposalPopupOpened(final ContentProposalAdapter adapter) {
+					// TODO Auto-generated method stub
+
+				}
+			});
 
 			/*
 			 * Button: Search
@@ -523,14 +565,16 @@ public class SearchView extends ViewPart {
 //		tbm.add(_actionTourBlogMarker);
 	}
 
-	private void initUI() {
+	private void initUI(final Composite parent) {
+
+		_pc = new PixelConverter(parent);
 
 		try {
 
 			/*
 			 * load css from file
 			 */
-			final URL bundleUrl = TourbookPlugin.getDefault().getBundle().getEntry(SEARCH_RESULT_CSS);
+			final URL bundleUrl = TourbookPlugin.getDefault().getBundle().getEntry(SEARCH_RESULT_CSS_FILE);
 			final URL fileUrl = FileLocator.toFileURL(bundleUrl);
 			final URI fileUri = fileUrl.toURI();
 			final File file = new File(fileUri);
@@ -556,19 +600,33 @@ public class SearchView extends ViewPart {
 
 	private void onSelectSearch() {
 
+		if (_contentProposalAdapter.isProposalPopupOpen()) {
+			return;
+		}
+
 		_searchStartTime = System.currentTimeMillis();
 
-		final String searchText = _txtSearch.getText().trim();
+		String searchText = _txtSearch.getText().trim();
 
 		// check if search text is valid
 		if (searchText.length() == 0) {
 			updateUI_Status("No result", false);
 			return;
 		}
-		if (searchText.startsWith("*") || searchText.startsWith("?")) {
+		if (searchText.startsWith(UI.SYMBOL_STAR) || searchText.startsWith("?")) {
 			updateUI_Status("* or ? is not allowed as first character", false);
 			return;
 		}
+
+		if (searchText.endsWith(UI.SYMBOL_STAR) == false) {
+
+			// Append a * otherwise nothing is found
+			searchText += UI.SYMBOL_STAR;
+		}
+
+		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
+				+ ("\tsearch: " + searchText));
+		// TODO remove SYSTEM.OUT.PRINTLN
 
 		final SearchResult searchResult = MTSearchManager.search(searchText);
 
@@ -580,8 +638,20 @@ public class SearchView extends ViewPart {
 		updateUI_SearchResult(searchResult);
 	}
 
+	private void restoreState() {
+
+		final int popupWidth = Util.getStateInt(_state, STATE_POPUP_WIDTH, _pc.convertWidthInCharsToPixels(40));
+		final int popupHeight = Util.getStateInt(_state, STATE_POPUP_HEIGHT, _pc.convertHeightInCharsToPixels(20));
+		final Point popupSize = new Point(popupWidth, popupHeight);
+
+		_contentProposalAdapter.setPopupSize(popupSize);
+	}
+
 	private void saveState() {
 
+		final Point popupSize = _contentProposalAdapter.getPopupSize();
+		_state.put(STATE_POPUP_WIDTH, popupSize.x);
+		_state.put(STATE_POPUP_HEIGHT, popupSize.y);
 	}
 
 	@Override

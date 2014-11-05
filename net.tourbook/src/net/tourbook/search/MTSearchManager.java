@@ -393,7 +393,7 @@ public class MTSearchManager {
 				_suggester = setupSuggester();
 			}
 
-			return _suggester.lookup(contents, false, 15);
+			return _suggester.lookup(contents, false, 999);
 
 		} catch (final Exception e) {
 			return _emptyProposal;
