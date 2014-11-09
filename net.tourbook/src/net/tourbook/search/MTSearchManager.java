@@ -22,18 +22,17 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.TreeMap;
 
 import net.tourbook.Messages;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 import net.tourbook.database.TourDatabase;
-import net.tourbook.ui.UI;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
@@ -53,6 +52,8 @@ import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.index.IndexWriterConfig.OpenMode;
+import org.apache.lucene.index.IndexableField;
+import org.apache.lucene.index.MultiReader;
 import org.apache.lucene.index.Terms;
 import org.apache.lucene.index.TermsEnum;
 import org.apache.lucene.queryparser.classic.MultiFieldQueryParser;
@@ -60,8 +61,8 @@ import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TopDocs;
-import org.apache.lucene.search.TopScoreDocCollector;
 import org.apache.lucene.search.postingshighlight.PostingsHighlighter;
+import org.apache.lucene.search.suggest.Lookup;
 import org.apache.lucene.search.suggest.Lookup.LookupResult;
 import org.apache.lucene.search.suggest.analyzing.AnalyzingSuggester;
 import org.apache.lucene.store.FSDirectory;
@@ -75,15 +76,18 @@ import org.eclipse.swt.widgets.Display;
 
 public class MTSearchManager {
 
-	private static final String				LUCENE_INDEX_FOLDER_NAME	= "lucene-index";
+	private static final String				LUCENE_INDEX_FOLDER_NAME		= "lucene-index";
 
-	private static final String				SEARCH_FIELD_DESCRIPTION	= "description";					//$NON-NLS-1$
-	private static final String				SEARCH_FIELD_TITLE			= "title";							//$NON-NLS-1$
-	private static final String				SEARCH_FIELD_TOUR_ID		= "tourID";						//$NON-NLS-1$
+	private static final String				SEARCH_FIELD_DESCRIPTION		= "description";					//$NON-NLS-1$
+	private static final String				SEARCH_FIELD_MARKER_ID			= "markerID";						//$NON-NLS-1$
+	private static final String				SEARCH_FIELD_TOUR_MARKERLABEL	= "label";							//$NON-NLS-1$
+	private static final String				SEARCH_FIELD_TITLE				= "title";							//$NON-NLS-1$
+	private static final String				SEARCH_FIELD_TOUR_ID			= "tourID";						//$NON-NLS-1$
+	private static final String				SEARCH_FIELD_TOUR_START_TIME	= "time";							//$NON-NLS-1$
 
-	private static final List<LookupResult>	_emptyProposal				= new ArrayList<LookupResult>();
+	private static final List<LookupResult>	_emptyProposal					= new ArrayList<LookupResult>();
 
-	private static AnalyzingSuggester		_suggester;
+	private static Lookup					_suggester;
 
 	public static class MyPostingsHighlighter extends PostingsHighlighter {
 
@@ -100,7 +104,6 @@ public class MTSearchManager {
 		protected Analyzer getIndexAnalyzer(final String field) {
 			return _analyzer;
 		}
-
 	}
 
 	private static void closeReader(final DirectoryReader indexReader) {
@@ -123,25 +126,33 @@ public class MTSearchManager {
 	 */
 	private static void createIndex(final Connection conn, final IProgressMonitor monitor) throws SQLException {
 
-		FSDirectory indexStore = null;
-		IndexWriter indexWriter = null;
-		PreparedStatement stmt = null;
-
 		// configure field with offsets at index time
 		final FieldType offsetsType = new FieldType(TextField.TYPE_STORED);
 		offsetsType.setIndexOptions(IndexOptions.DOCS_AND_FREQS_AND_POSITIONS_AND_OFFSETS);
 
+		monitor.subTask(Messages.Database_Monitor_SetupLucene);
+
+		createIndex_TourData(conn, monitor, offsetsType);
+		createIndex_TourMarker(conn, monitor, offsetsType);
+	}
+
+	private static void createIndex_TourData(	final Connection conn,
+												final IProgressMonitor monitor,
+												final FieldType offsetsType) throws SQLException {
+
+		final Analyzer analyzer = getAnalyzer();
+		final IndexWriterConfig writerConfig = new IndexWriterConfig(Version.LUCENE_4_10_1, analyzer);
+
+		FSDirectory indexStore = null;
+		IndexWriter indexWriter = null;
+		PreparedStatement stmt = null;
 		try {
 
-			monitor.subTask(Messages.Database_Monitor_SetupLucene);
+			indexStore = openIndex(TourDatabase.TABLE_TOUR_DATA);
 
 			/*
 			 * Setup index writer
 			 */
-			indexStore = openIndex(TourDatabase.TABLE_TOUR_DATA);
-
-			final Analyzer analyzer = getAnalyzer();
-			final IndexWriterConfig writerConfig = new IndexWriterConfig(Version.LUCENE_4_10_1, analyzer);
 
 			// delete old index and create a new
 			writerConfig.setOpenMode(OpenMode.CREATE);
@@ -157,7 +168,8 @@ public class MTSearchManager {
 					//
 					+ " tourId," //				1 //$NON-NLS-1$
 					+ " tourTitle," //			2 //$NON-NLS-1$
-					+ " tourDescription" //		3 //$NON-NLS-1$
+					+ " tourDescription," //	3 //$NON-NLS-1$
+					+ " tourStartTime" //		4 //$NON-NLS-1$
 					//
 					+ (" FROM " + TourDatabase.TABLE_TOUR_DATA); //$NON-NLS-1$
 
@@ -174,6 +186,7 @@ public class MTSearchManager {
 				final String dbTourId = rs.getString(1);
 				final String dbTitle = rs.getString(2);
 				final String dbDescription = rs.getString(3);
+				final Long dbTourStartTime = rs.getLong(4);
 
 				doc.add(new StringField(SEARCH_FIELD_TOUR_ID, dbTourId, Store.YES));
 
@@ -184,6 +197,8 @@ public class MTSearchManager {
 				if (dbDescription != null) {
 					doc.add(new Field(SEARCH_FIELD_DESCRIPTION, dbDescription, offsetsType));
 				}
+
+				doc.add(new Field(SEARCH_FIELD_TOUR_START_TIME, dbTourStartTime.toString(), offsetsType));
 
 				indexWriter.addDocument(doc);
 
@@ -220,152 +235,103 @@ public class MTSearchManager {
 		}
 	}
 
-	/**
-	 * Creating the result is complicated because the highlights are listed by field and not by hit,
-	 * therefor the structure must be inverted.
-	 * 
-	 * @param highlights
-	 * @param topDocs
-	 * @param searchResult
-	 */
-	private static void createSearchResult(	final Map<String, String[]> highlights,
-											final TopDocs topDocs,
-											final SearchResult searchResult) {
+	private static void createIndex_TourMarker(	final Connection conn,
+												final IProgressMonitor monitor,
+												final FieldType offsetsType) throws SQLException {
 
-		if (highlights.size() == 0) {
-			return;
-		}
+		final Analyzer analyzer = getAnalyzer();
+		final IndexWriterConfig writerConfig = new IndexWriterConfig(Version.LUCENE_4_10_1, analyzer);
 
-		final Set<Entry<String, String[]>> fields = highlights.entrySet();
-		Entry<String, String[]> firstHit;
-		try {
-			firstHit = fields.iterator().next();
-		} catch (final Exception e) {
-			return;
-		}
-
-		final int numberOfHits = firstHit.getValue().length;
-
-		final TreeMap<String, SearchResultItem> searchResultItems = searchResult.items;
-
-		// create result items
-		final SearchResultItem[] resultItems = new SearchResultItem[numberOfHits];
-		for (int hitIndex = 0; hitIndex < numberOfHits; hitIndex++) {
-
-			final SearchResultItem resultItem = new SearchResultItem();
-
-			resultItems[hitIndex] = resultItem;
-			searchResultItems.put(Integer.toString(hitIndex + 1), resultItem);
-		}
-
-		for (final Entry<String, String[]> field : fields) {
-
-			final String fieldName = field.getKey();
-			final String[] snippets = field.getValue();
-
-			for (int hitIndex = 0; hitIndex < snippets.length; hitIndex++) {
-
-				final SearchResultItem resultItem = resultItems[hitIndex];
-				final String snippet = snippets[hitIndex];
-
-				switch (fieldName) {
-
-				case SEARCH_FIELD_DESCRIPTION:
-					resultItem.tourDescription = snippet;
-					break;
-
-				case SEARCH_FIELD_TITLE:
-					resultItem.tourTitle = snippet;
-					break;
-				}
-			}
-		}
-
-		searchResult.totalHits = topDocs.totalHits;
-	}
-
-	private static void createSearchResult(	final TopScoreDocCollector collector,
-											final IndexSearcher searcher,
-											final SearchResult searchResult) throws IOException {
-
-		final ScoreDoc[] hits = collector.topDocs().scoreDocs;
-
-		if (hits.length == 0) {
-			return;
-		}
-
-		final TreeMap<String, SearchResultItem> searchResultItems = searchResult.items;
-
-		final StringBuilder sqlTourIds = new StringBuilder();
-
-		for (int hitIndex = 0; hitIndex < hits.length; ++hitIndex) {
-
-			final ScoreDoc scoreDoc = hits[hitIndex];
-
-			final int docId = scoreDoc.doc;
-			final Document doc = searcher.doc(docId);
-
-			final String tourId = doc.get(SEARCH_FIELD_TOUR_ID);
-
-			final SearchResultItem resultItem = new SearchResultItem();
-
-			resultItem.tourId = tourId;
-			resultItem.score = scoreDoc.score;
-
-			searchResultItems.put(tourId, resultItem);
-
-			// Create tour id list for the sql statement
-			if (hitIndex > 0) {
-				sqlTourIds.append(',');
-			}
-			sqlTourIds.append(tourId);
-		}
-
-		/*
-		 * Get tour data for each hit
-		 */
+		FSDirectory indexStore = null;
+		IndexWriter indexWriter = null;
 		PreparedStatement stmt = null;
-		Connection conn = null;
 
 		try {
-			conn = TourDatabase.getInstance().getConnection();
 
+			indexStore = openIndex(TourDatabase.TABLE_TOUR_MARKER);
+
+			/*
+			 * Setup index writer
+			 */
+
+			// delete old index and create a new
+			writerConfig.setOpenMode(OpenMode.CREATE);
+
+			indexWriter = new IndexWriter(indexStore, writerConfig);
+
+			/*
+			 * Get sql data
+			 */
 			final String sql = "" // //$NON-NLS-1$
 					//
 					+ "SELECT" //$NON-NLS-1$
 					//
-					+ " tourId," //				1 //$NON-NLS-1$
-					+ " tourTitle," //			2 //$NON-NLS-1$
-					+ " tourDescription" //		3 //$NON-NLS-1$
+					+ " markerId," //				1 //$NON-NLS-1$
+					+ " label," //					2 //$NON-NLS-1$
+					+ " description," //			3 //$NON-NLS-1$
+					+ " tourTime" //				4 //$NON-NLS-1$
 					//
-					+ (" FROM " + TourDatabase.TABLE_TOUR_DATA)
-
-					+ (" WHERE tourId IN (" + sqlTourIds + ")")
-			//
-			;
+					+ (" FROM " + TourDatabase.TABLE_TOUR_MARKER); //$NON-NLS-1$
 
 			stmt = conn.prepareStatement(sql);
 			final ResultSet rs = stmt.executeQuery();
 
+			int createdDocuments = 0;
+			long lastUpdateTime = System.currentTimeMillis();
+
 			while (rs.next()) {
 
-				final String dbTourId = rs.getString(1);
-				final String dbTitle = rs.getString(2);
+				final Document doc = new Document();
+
+				final String dbMarkerId = rs.getString(1);
+				final String dbLabel = rs.getString(2);
 				final String dbDescription = rs.getString(3);
+				final Long dbTourTime = rs.getLong(4);
 
-				final SearchResultItem resultItem = searchResultItems.get(dbTourId);
-				if (resultItem != null) {
+				doc.add(new StringField(SEARCH_FIELD_MARKER_ID, dbMarkerId, Store.YES));
 
-					resultItem.tourTitle = dbTitle;
-					resultItem.tourDescription = dbDescription;
+				if (dbLabel != null) {
+					doc.add(new Field(SEARCH_FIELD_TOUR_MARKERLABEL, dbLabel, offsetsType));
+				}
+
+				if (dbDescription != null) {
+					doc.add(new Field(SEARCH_FIELD_DESCRIPTION, dbDescription, offsetsType));
+				}
+
+				doc.add(new Field(SEARCH_FIELD_TOUR_START_TIME, dbTourTime.toString(), offsetsType));
+
+				indexWriter.addDocument(doc);
+
+				createdDocuments++;
+
+				/*
+				 * Update monitor every 1/20 seconds
+				 */
+				final long now = System.currentTimeMillis();
+
+				if (now > lastUpdateTime + 50) {
+					lastUpdateTime = now;
+					monitor.subTask(NLS.bind(Messages.Search_Manager_CreateFTIndex, createdDocuments));
 				}
 			}
 
-		} catch (final SQLException e) {
-			UI.showSQLException(e);
+		} catch (final IOException e) {
+			StatusUtil.showStatus(e);
 		} finally {
+
+			if (indexWriter != null) {
+				try {
+					indexWriter.close();
+				} catch (final IOException e) {
+					StatusUtil.showStatus(e);
+				}
+			}
+
+			if (indexStore != null) {
+				indexStore.close();
+			}
+
 			Util.closeSql(stmt);
-			Util.closeSql(conn);
 		}
 	}
 
@@ -415,51 +381,49 @@ public class MTSearchManager {
 	public static SearchResult search(final String searchText) {
 
 		final SearchResult searchResult = new SearchResult();
+
 		IndexReader indexReader1 = null;
+		IndexReader indexReader2 = null;
+		MultiReader multiReader = null;
 
 		try {
 
-			final String[] fields = {
+			final String[] queryFields = {
 					//
 					SEARCH_FIELD_TITLE,
 					SEARCH_FIELD_DESCRIPTION,
+					SEARCH_FIELD_TOUR_MARKERLABEL,
 			//
 			};
 
-			final int[] maxPassages = { 2, 2 };
+			final int[] maxPassages = { 2, 2, 2 };
 			final int hitsPerPage = 10;
-
-////			final MultiReader multiReader = new MultiReader(reader1, reader2);
-////			final IndexSearcher multiSearcher = new IndexSearcher(multiReader);
-//
-//			final TopScoreDocCollector collector = TopScoreDocCollector.create(hitsPerPage, true);
-//			searcher.search(query, collector);
-//			createSearchResult(collector, searcher, searchResult);
-//			searchResult.totalHits = collector.getTotalHits();
 
 			final Analyzer analyzer = getAnalyzer();
 
-			final MultiFieldQueryParser queryParser = new MultiFieldQueryParser(fields, analyzer);
+			final MultiFieldQueryParser queryParser = new MultiFieldQueryParser(queryFields, analyzer);
 			final Query query = queryParser.parse(searchText);
 
 			final FSDirectory tourDataIndex = openIndex(TourDatabase.TABLE_TOUR_DATA);
-			indexReader1 = DirectoryReader.open(tourDataIndex);
-			final IndexSearcher searcher = new IndexSearcher(indexReader1);
+			final FSDirectory tourMarkerIndex = openIndex(TourDatabase.TABLE_TOUR_MARKER);
 
-			final TopDocs topDocs = searcher.search(query, hitsPerPage);
+			indexReader1 = DirectoryReader.open(tourDataIndex);
+			indexReader2 = DirectoryReader.open(tourMarkerIndex);
+
+			multiReader = new MultiReader(indexReader1, indexReader2);
+			final IndexSearcher multiSearcher = new IndexSearcher(multiReader);
+
+			final TopDocs topDocs = multiSearcher.search(query, hitsPerPage);
 
 			final MyPostingsHighlighter highlighter = new MyPostingsHighlighter(analyzer);
 			final Map<String, String[]> highlights = highlighter.highlightFields(
-					fields,
+					queryFields,
 					query,
-					searcher,
+					multiSearcher,
 					topDocs,
 					maxPassages);
 
-//			final PostingsHighlighter highlighter = new PostingsHighlighter();
-//			final String[] highlights = highlighter.highlight(SEARCH_FIELD_DESCRIPTION, query, searcher, topDocs);
-
-			createSearchResult(highlights, topDocs, searchResult);
+			search_CreateResult(highlights, topDocs, multiReader, searchResult);
 
 		} catch (final Exception e) {
 			StatusUtil.showStatus(e);
@@ -468,13 +432,123 @@ public class MTSearchManager {
 			// reader can only be closed when there
 			// is no need to access the documents any more.
 			try {
-				indexReader1.close();
+				multiReader.close();
 			} catch (final IOException e) {
 				StatusUtil.showStatus(e);
 			}
 		}
 
 		return searchResult;
+	}
+
+	/**
+	 * Creating the result is complicated because the highlights are listed by field and not by hit,
+	 * therefor the structure must be inverted.
+	 * 
+	 * @param highlights
+	 * @param topDocs
+	 * @param multiReader
+	 * @param searchResult
+	 * @throws IOException
+	 */
+	private static void search_CreateResult(final Map<String, String[]> highlights,
+											final TopDocs topDocs,
+											final IndexReader multiReader,
+											final SearchResult searchResult) throws IOException {
+
+		if (highlights.size() == 0) {
+			return;
+		}
+
+		final ScoreDoc scoreDocs[] = topDocs.scoreDocs;
+		final int docids[] = new int[scoreDocs.length];
+		for (int i = 0; i < docids.length; i++) {
+			docids[i] = scoreDocs[i].doc;
+		}
+
+		final Set<Entry<String, String[]>> fields = highlights.entrySet();
+		Entry<String, String[]> firstHit;
+		try {
+			firstHit = fields.iterator().next();
+		} catch (final Exception e) {
+			return;
+		}
+
+		final int numberOfHits = firstHit.getValue().length;
+
+		// create result items
+		final SearchResultItem[] resultItems = new SearchResultItem[numberOfHits];
+		for (int hitIndex = 0; hitIndex < numberOfHits; hitIndex++) {
+
+			final SearchResultItem resultItem = new SearchResultItem();
+
+			resultItems[hitIndex] = resultItem;
+
+			searchResult.items.put(Integer.toString(hitIndex + 1), resultItem);
+		}
+
+		boolean isDocRead = false;
+		final Set<String> fieldsToLoad = new HashSet<String>();
+		fieldsToLoad.add(SEARCH_FIELD_TOUR_ID);
+		fieldsToLoad.add(SEARCH_FIELD_MARKER_ID);
+		fieldsToLoad.add(SEARCH_FIELD_TOUR_START_TIME);
+
+		for (final Entry<String, String[]> field : fields) {
+
+			final String fieldName = field.getKey();
+			final String[] snippets = field.getValue();
+
+			for (int hitIndex = 0; hitIndex < snippets.length; hitIndex++) {
+
+				final SearchResultItem resultItem = resultItems[hitIndex];
+				final String snippet = snippets[hitIndex];
+
+				switch (fieldName) {
+
+				case SEARCH_FIELD_DESCRIPTION:
+					resultItem.description = snippet;
+					break;
+
+				case SEARCH_FIELD_TITLE:
+					resultItem.tourTitle = snippet;
+					break;
+
+				case SEARCH_FIELD_TOUR_MARKERLABEL:
+					resultItem.markerLabel = snippet;
+					break;
+				}
+
+				if (isDocRead == false) {
+
+					final int docID = docids[hitIndex];
+					final Document doc = multiReader.document(docID, fieldsToLoad);
+
+					for (final IndexableField indexableField : doc.getFields()) {
+
+						final String docFieldName = indexableField.name();
+
+						switch (docFieldName) {
+						case SEARCH_FIELD_TOUR_ID:
+							resultItem.tourId = indexableField.stringValue();
+							break;
+
+						case SEARCH_FIELD_MARKER_ID:
+							resultItem.markerId = indexableField.stringValue();
+							break;
+
+						case SEARCH_FIELD_TOUR_START_TIME:
+							resultItem.tourStartTime = Long.parseLong(indexableField.stringValue());
+							break;
+						}
+					}
+				}
+			}
+
+			// get doc fields only once
+			isDocRead = true;
+		}
+
+		searchResult.totalHits = topDocs.totalHits;
 	}
 
 	/**
@@ -489,9 +563,9 @@ public class MTSearchManager {
 		createIndex(conn, monitor);
 	}
 
-	private static AnalyzingSuggester setupSuggester() {
+	private static Lookup setupSuggester() {
 
-		final AnalyzingSuggester suggester[] = new AnalyzingSuggester[1];
+		final Lookup suggester[] = new AnalyzingSuggester[1];
 
 		BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
 			public void run() {
@@ -515,7 +589,10 @@ public class MTSearchManager {
 						for (final String field : fields) {
 
 							if (field.equals(SEARCH_FIELD_DESCRIPTION) //
-									|| field.equals(SEARCH_FIELD_TITLE)) {
+									|| field.equals(SEARCH_FIELD_TITLE)
+									|| field.equals(SEARCH_FIELD_TOUR_MARKERLABEL)
+							//
+							) {
 
 								final Terms terms = fields.terms(field);
 								final TermsEnum termsEnum = terms.iterator(null);
@@ -525,10 +602,18 @@ public class MTSearchManager {
 						}
 					}
 
-//					final Analyzer analyzer = getAnalyzer();
-					final Analyzer analyzer = new StandardAnalyzer(new CharArraySet(0, true));
+					final Analyzer queryAnalyzer = new StandardAnalyzer(new CharArraySet(0, true));
 
-					suggester[0] = new AnalyzingSuggester(analyzer);
+					suggester[0] = new AnalyzingSuggester(queryAnalyzer);
+
+// THIS IS NOT WORKING
+//					suggester[0] = new AnalyzingInfixSuggester(
+//							Version.LUCENE_4_10_1,
+//							dir,
+//							getAnalyzer(),
+//							queryAnalyzer,
+//							4);
+
 					suggester[0].build(inputIterator);
 
 				} catch (final Exception e) {

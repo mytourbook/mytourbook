@@ -555,6 +555,12 @@ public class TourManager {
 		return tourData.getTourStartTime();
 	}
 
+	public static String getTourDateTimeFull(final Date dt) {
+		return net.tourbook.ui.UI.DateFormatterFull.format(dt) + UI.DASH_WITH_SPACE
+
+		;
+	}
+
 	/**
 	 * @return Returns a tour title which contains: full date + full time
 	 */

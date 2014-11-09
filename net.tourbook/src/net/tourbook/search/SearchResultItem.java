@@ -17,11 +17,28 @@ package net.tourbook.search;
 
 public class SearchResultItem {
 
+	String	description;
+
+	String	markerId;
+	String	markerLabel;
+
 	String	tourId;
+	String	tourTitle;
+	long	tourStartTime;
 
 	float	score;
 
-	String	tourTitle;
-	String	tourDescription;
+	@Override
+	public String toString() {
+		return "SearchResultItem ["
+				+ ("tourId=" + tourId + ", ")
+				+ ("markerId=" + markerId + ", ")
+				+ ("tourStartTime=" + tourStartTime + ", ")
+				+ ("markerLabel=" + markerLabel + ", ")
+				+ ("tourTitle=" + tourTitle + ", ")
+				+ ("description=" + description + ", ")
+				+ ("score=" + score)
+				+ "]";
+	}
 
 }

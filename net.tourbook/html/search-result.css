@@ -43,11 +43,21 @@ body,p,h1,h2,h3,h4,table,td,th,ul,ol,textarea,input
 	padding-bottom: 		20px;
 }
 
+.result-title
+{
+	xpadding-left: 				20px;
+}
+
 .result-description
 {
 }
 
-.result-title
+a.item-title:LINK,
+a.item-title:VISITED 
 {
-	font-style:				italic;
+	display:				block;
+	width:					auto;					/* enforce width to the right border */
+	text-decoration:		none;
+	text-indent:			20px;
+	color:					#2B62D2;	
 }

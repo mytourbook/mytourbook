@@ -16,6 +16,8 @@
 package net.tourbook.ui;
 
 import java.io.File;
+import java.io.IOException;
+import java.net.URL;
 import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -42,6 +44,7 @@ import net.tourbook.tour.TourManager;
 import net.tourbook.ui.views.rawData.RawDataView;
 import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
 
+import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.GridDataFactory;
@@ -91,6 +94,8 @@ public class UI {
 																									|| "cocoa".equals(SWT.getPlatform());	//$NON-NLS-1$
 	public static final boolean								IS_WIN							= "win32".equals(SWT.getPlatform()) //$NON-NLS-1$
 																									|| "wpf".equals(SWT.getPlatform());	//$NON-NLS-1$
+
+	private static final String								ICONS_PATH						= "/icons/";
 
 	public static final String								EMPTY_STRING					= "";											//$NON-NLS-1$
 	public static final String								SPACE							= " ";											//$NON-NLS-1$
@@ -973,6 +978,19 @@ public class UI {
 	public static Image getGraphImageDisabled(final MapGraphId graphId) {
 
 		return IMAGE_REGISTRY.get(createGraphImage_NameDisabled(graphId));
+	}
+
+	/**
+	 * @param imageName
+	 * @return Returns the url for an icon image in the {@link TourbookPlugin} bundle.
+	 * @throws IOException
+	 */
+	public static String getIconUrl(final String imageName) throws IOException {
+
+		final URL bundleUrl = TourbookPlugin.getDefault().getBundle().getEntry(ICONS_PATH + imageName);
+		final URL fileUrl = FileLocator.toFileURL(bundleUrl);
+
+		return fileUrl.toExternalForm();
 	}
 
 	public static UI getInstance() {

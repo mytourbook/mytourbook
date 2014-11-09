@@ -63,12 +63,11 @@ import org.eclipse.swt.browser.LocationAdapter;
 import org.eclipse.swt.browser.LocationEvent;
 import org.eclipse.swt.browser.ProgressAdapter;
 import org.eclipse.swt.browser.ProgressEvent;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.KeyAdapter;
+import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.TraverseEvent;
 import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
@@ -77,6 +76,9 @@ import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.part.ViewPart;
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 
 public class SearchView extends ViewPart {
 
@@ -86,6 +88,10 @@ public class SearchView extends ViewPart {
 
 	private static final String			STATE_POPUP_WIDTH		= "STATE_POPUP_WIDTH";				//$NON-NLS-1$
 	private static final String			STATE_POPUP_HEIGHT		= "STATE_POPUP_HEIGHT";			//$NON-NLS-1$
+	private static final String			STATE_SEARCH_TEXT		= "STATE_SEARCH_TEXT";				//$NON-NLS-1$
+
+	private final DateTimeFormatter		_dateFormatter			= DateTimeFormat.fullDate();
+	private final DateTimeFormatter		_timeFormatter			= DateTimeFormat.mediumTime();
 
 	private final IPreferenceStore		_prefStore				= TourbookPlugin.getPrefStore();
 	private final IDialogSettings		_state					= TourbookPlugin.getState(ID);
@@ -96,6 +102,8 @@ public class SearchView extends ViewPart {
 	private IPartListener2				_partListener;
 	//
 	private String						_htmlCss;
+	private String						_tourChartIconUrl;
+	private String						_tourMarkerIconUrl;
 
 	/**
 	 * Set time that an error displays the correct time.
@@ -112,7 +120,6 @@ public class SearchView extends ViewPart {
 	 * UI controls
 	 */
 	private Browser						_browser;
-	private Button						_btnSearch;
 	private Text						_txtSearch;
 	private Text						_txtStatus;
 
@@ -134,6 +141,15 @@ public class SearchView extends ViewPart {
 			super(control, controlContentAdapter, proposalProvider, keyStroke, autoActivationCharacters);
 		}
 
+		/**
+		 * Open popup with {@link SWT#ARROW_DOWN} key.
+		 * <p>
+		 * {@inheritDoc}
+		 */
+		@Override
+		protected void openProposalPopup() {
+			super.openProposalPopup();
+		}
 	}
 
 	/**
@@ -346,20 +362,67 @@ public class SearchView extends ViewPart {
 			{
 				final SearchResultItem resultItem = entry.getValue();
 
-				final String tourTitle = resultItem.tourTitle;
-				if (tourTitle != null) {
-					sb.append("<div class='result-title'>"); //$NON-NLS-1$
+				final boolean isTour = resultItem.tourId != null;
+				final boolean isMarker = resultItem.markerId != null;
+				final String iconUrl = isTour ? _tourChartIconUrl : _tourMarkerIconUrl;
+
+				String itemTitle = UI.EMPTY_STRING;
+				final String hrefOpenItem = null;
+
+				if (isTour) {
+
+					final String tourTitle = resultItem.tourTitle;
+
+					if (tourTitle != null) {
+						itemTitle = tourTitle;
+					}
+
+				} else if (isMarker) {
+
+					final String tourMarkerLabel = resultItem.markerLabel;
+
+					if (tourMarkerLabel != null) {
+						itemTitle = tourMarkerLabel;
+					}
+				}
+
+				sb.append("<div class='result-title'>"); //$NON-NLS-1$
+				{
+					sb.append("<a class='item-title'" //
+							+ (" style='" //
+									+ "background: url("
+									+ iconUrl + ") no-repeat;'")
+							+ (" href='" + hrefOpenItem + "'") //$NON-NLS-1$ //$NON-NLS-2$
+							+ (" title='" + itemTitle + "'") //$NON-NLS-1$ //$NON-NLS-2$
+							+ ">" // //$NON-NLS-1$
+							+ itemTitle
+							+ "</a>");
+				}
+				sb.append("</div>\n"); //$NON-NLS-1$
+
+				final String description = resultItem.description;
+				if (description != null) {
+					sb.append("<div class='result-description'>"); //$NON-NLS-1$
 					{
-						sb.append(tourTitle);
+						sb.append(description);
 					}
 					sb.append("</div>\n"); //$NON-NLS-1$
 				}
 
-				final String tourDescription = resultItem.tourDescription;
-				if (tourDescription != null) {
-					sb.append("<div class='result-description'>"); //$NON-NLS-1$
+				final long tourStartTime = resultItem.tourStartTime;
+				if (tourStartTime != 0) {
+
+					sb.append("<div class='' style='text-align:right;'>"); //$NON-NLS-1$
 					{
-						sb.append(tourDescription);
+						final DateTime dt = new DateTime(tourStartTime);
+
+						sb.append(String.format(//
+//								"%s - %s - CW %d",
+								"%s - %s",
+								_dateFormatter.print(dt.getMillis()),
+								_timeFormatter.print(dt.getMillis())
+//								dt.getWeekOfWeekyear()
+								));
 					}
 					sb.append("</div>\n"); //$NON-NLS-1$
 				}
@@ -409,24 +472,33 @@ public class SearchView extends ViewPart {
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
 		GridLayoutFactory.fillDefaults()//
-				.extendedMargins(2, 2, 2, 2)
-				.spacing(5, 0)
-				.numColumns(2)
+				.extendedMargins(0, 2, 2, 2)
+//				.margins(0, 0)
 				.applyTo(container);
 		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WHITE));
+		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
 		{
 // ALTERNATIVE TEXT CONTROL
 //tasktop.TextSearchControl
 			/*
 			 * Text: Search field
 			 */
-			_txtSearch = new Text(container, SWT.BORDER);
+			_txtSearch = new Text(container, SWT.NONE /* SWT.BORDER */);
 			GridDataFactory.fillDefaults().grab(true, false).applyTo(_txtSearch);
+			_txtSearch.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
+			_txtSearch.addKeyListener(new KeyAdapter() {
+
+				@Override
+				public void keyPressed(final KeyEvent e) {
+//					onSearchKey(e);
+				}
+			});
+
 			_txtSearch.addTraverseListener(new TraverseListener() {
 				@Override
 				public void keyTraversed(final TraverseEvent e) {
 					if (e.detail == SWT.TRAVERSE_RETURN) {
-						onSelectSearch();
+						onSearchSelect();
 					}
 				}
 			});
@@ -435,7 +507,6 @@ public class SearchView extends ViewPart {
 					_txtSearch,
 					_controlContentAdapter,
 					_proposalProvider,
-//					KeyStroke.getInstance(SWT.ARROW_DOWN),
 					null,
 					null);
 
@@ -451,9 +522,10 @@ public class SearchView extends ViewPart {
 					//
 							);
 					// TODO remove SYSTEM.OUT.PRINTLN
-					onSelectSearch();
+					onSearchSelect();
 				}
 			});
+
 			_contentProposalAdapter.addContentProposalListener(new IContentProposalListener2() {
 
 				@Override
@@ -466,18 +538,6 @@ public class SearchView extends ViewPart {
 				public void proposalPopupOpened(final ContentProposalAdapter adapter) {
 					// TODO Auto-generated method stub
 
-				}
-			});
-
-			/*
-			 * Button: Search
-			 */
-			_btnSearch = new Button(container, SWT.NONE);
-			_btnSearch.setText("&Search");
-			_btnSearch.addSelectionListener(new SelectionAdapter() {
-				@Override
-				public void widgetSelected(final SelectionEvent e) {
-					onSelectSearch();
 				}
 			});
 		}
@@ -532,7 +592,6 @@ public class SearchView extends ViewPart {
 
 		} catch (final SWTError e) {
 
-			_btnSearch.setEnabled(false);
 			_txtSearch.setEnabled(false);
 
 			final String message = e.getMessage();
@@ -583,6 +642,12 @@ public class SearchView extends ViewPart {
 
 			_htmlCss = "<style>" + cssContent + "</style>"; //$NON-NLS-1$ //$NON-NLS-2$
 
+			/*
+			 * set image urls
+			 */
+			_tourChartIconUrl = net.tourbook.ui.UI.getIconUrl(Messages.Image__TourChart);
+			_tourMarkerIconUrl = net.tourbook.ui.UI.getIconUrl(Messages.Image__TourMarker);
+
 		} catch (final IOException | URISyntaxException e) {
 			StatusUtil.showStatus(e);
 		}
@@ -598,7 +663,27 @@ public class SearchView extends ViewPart {
 
 	}
 
-	private void onSelectSearch() {
+	/**
+	 * Open popup with {@link SWT#ARROW_DOWN} key.
+	 * 
+	 * @param e
+	 */
+	private void onSearchKey(final KeyEvent e) {
+
+		if (_contentProposalAdapter.isProposalPopupOpen()) {
+			return;
+		}
+
+		if (e.keyCode == SWT.ARROW_DOWN) {
+//		if (e.keyCode == SWT.ARROW_UP) {
+//			e.doit = false;
+
+			e.keyCode = SWT.ARROW_UP;
+			_contentProposalAdapter.openProposalPopup();
+		}
+	}
+
+	private void onSearchSelect() {
 
 		if (_contentProposalAdapter.isProposalPopupOpen()) {
 			return;
@@ -645,6 +730,10 @@ public class SearchView extends ViewPart {
 		final Point popupSize = new Point(popupWidth, popupHeight);
 
 		_contentProposalAdapter.setPopupSize(popupSize);
+
+		final String searchText = Util.getStateString(_state, STATE_SEARCH_TEXT, UI.EMPTY_STRING);
+		_txtSearch.setText(searchText);
+		_txtSearch.setSelection(searchText.length());
 	}
 
 	private void saveState() {
@@ -652,6 +741,8 @@ public class SearchView extends ViewPart {
 		final Point popupSize = _contentProposalAdapter.getPopupSize();
 		_state.put(STATE_POPUP_WIDTH, popupSize.x);
 		_state.put(STATE_POPUP_HEIGHT, popupSize.y);
+
+		_state.put(STATE_SEARCH_TEXT, _txtSearch.getText());
 	}
 
 	@Override
