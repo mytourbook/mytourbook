@@ -586,7 +586,7 @@
 				<!-- Tour Chart -->
 				<command
 					commandId="net.tourbook.command.selectedTour"
-					icon="icons/tour-chart.gif"
+					icon="icons/tour-chart.png"
 					label="%command_view_selectedTour"
 					mnemonic="%command_view_selectedTour_mnemonic"
 					tooltip="%command_view_selectedTour_tooltip"/>
@@ -840,7 +840,7 @@
 				<!-- Tour Chart -->
 				<command
 					commandId="net.tourbook.command.selectedTour"
-					icon="icons/tour-chart.gif"
+					icon="icons/tour-chart.png"
 					label="%command_view_selectedTour"
 					mnemonic="%command_view_selectedTour_mnemonic"
 					tooltip="%command_view_selectedTour_tooltip"/>
@@ -1414,7 +1414,7 @@
 	      <view
 	            category="net.tourbook.category.tour"
 	            class="net.tourbook.ui.tourChart.TourChartView"
-	            icon="icons/tour-chart.gif"
+	            icon="icons/tour-chart.png"
 	            id="net.tourbook.views.TourChartView"
 	            name="%view_name_Chart">
 	      </view>
