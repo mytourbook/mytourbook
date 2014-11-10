@@ -1074,9 +1074,21 @@ public class Messages extends NLS {
 	public static String		Pref_Statistic_Label_interval;
 	public static String		Pref_Statistic_Label_separator;
 
+	public static String	Pref_Tour_Button_FailedUpdate;
+
+	public static String	Pref_Tour_Dialog_ConfirmDatabaseUpdate_Message;
+
+	public static String	Pref_Tour_Dialog_ConfirmDatabaseUpdate_Title;
+
 	public static String		Pref_Tour_Dialog_TourCacheIsModified_Message;
 	public static String		Pref_Tour_Dialog_TourCacheIsModified_Title;
+	public static String	Pref_Tour_Group_FailedUpdates;
+
 	public static String		Pref_Tour_Group_TourCache;
+	public static String	Pref_Tour_Label_FailedUpdateInfo;
+
+	public static String	Pref_Tour_Label_FailedUpdateInfo_BOLD;
+
 	public static String		Pref_Tour_Label_TourCacheSize;
 	public static String		Pref_Tour_Label_TourCacheSize_Info;
 

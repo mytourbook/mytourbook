@@ -2,7 +2,7 @@
 <feature
       id="feature.z_Dummy_Host"
       label="Z_Dummy_Host"
-      version="14.10.0.qualifier"
+      version="14.10.1.qualifier"
       provider-name="dummy feature">
 
    <description url="http://www.example.com/description">

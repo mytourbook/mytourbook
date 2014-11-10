@@ -96,7 +96,7 @@ public class TourDatabase {
 	 */
 	private static final int						TOURBOOK_DB_VERSION							= 26;										// 14.?
 
-//	private static final int						TOURBOOK_DB_VERSION							= 25;	// 14.7
+//	private static final int						TOURBOOK_DB_VERSION							= 25;	// 14.10
 //	private static final int						TOURBOOK_DB_VERSION							= 24;	// 14.7
 //	private static final int						TOURBOOK_DB_VERSION							= 23;	// 13.2.0
 //	private static final int						TOURBOOK_DB_VERSION							= 22;	// 12.12.0
@@ -5159,7 +5159,7 @@ public class TourDatabase {
 	 * @param monitor
 	 * @throws SQLException
 	 */
-	private void updateDbDesign_024_to_025_PostUpdate(final Connection conn, final IProgressMonitor monitor)
+	public void updateDbDesign_024_to_025_PostUpdate(final Connection conn, final IProgressMonitor monitor)
 			throws SQLException {
 
 		int tourIdx = 1;
@@ -5181,21 +5181,35 @@ public class TourDatabase {
 				}
 
 				final TourData tourData = em.find(TourData.class, tourId);
-				if (tourData != null) {
+				if (tourData == null) {
+					continue;
+				}
 
-					/*
-					 * set absolute time/lat/lon/altitude in the tour marker from tour data
-					 */
+				/*
+				 * set absolute time/lat/lon/altitude in the tour marker from tour data
+				 */
 
-					final float[] altitudeSerie = tourData.altitudeSerie;
-					final double[] latitudeSerie = tourData.latitudeSerie;
-					final double[] longitudeSerie = tourData.longitudeSerie;
+				final float[] altitudeSerie = tourData.altitudeSerie;
+				final double[] latitudeSerie = tourData.latitudeSerie;
+				final double[] longitudeSerie = tourData.longitudeSerie;
 
-					final long tourStartTime = tourData.getTourStartTimeMS();
+				int serieLength = -1;
+				if (altitudeSerie != null) {
+					serieLength = altitudeSerie.length;
+				} else if (latitudeSerie != null) {
+					serieLength = latitudeSerie.length;
+				}
 
-					for (final TourMarker tourMarker : tourData.getTourMarkers()) {
+				final long tourStartTime = tourData.getTourStartTimeMS();
+
+				for (final TourMarker tourMarker : tourData.getTourMarkers()) {
+
+					try {
 
 						final int serieIndex = tourMarker.getSerieIndex();
+
+// this is used for debugging to force an error
+//						serieIndex += 100;
 
 						if (altitudeSerie != null) {
 							tourMarker.setAltitude(altitudeSerie[serieIndex]);
@@ -5206,14 +5220,42 @@ public class TourDatabase {
 						}
 
 						final int relativeTime = tourMarker.getTime();
+
 						tourMarker.setTime(relativeTime, tourStartTime + (relativeTime * 1000));
+
+					} catch (final Exception e) {
+
+						/*
+						 * This ArrayIndexOutOfBoundsException occured during the update after this
+						 * version was released. Therefore it's captured and detailed logged, other
+						 * markers are not affected.
+						 */
+
+						final String message = String
+								.format(
+										"Tour: %s - Tour marker: %s - serieIndex: %d - serie length: %d - relative time: %d sec",//$NON-NLS-1$
+										TourManager.getTourDateTimeShort(tourData),
+										tourMarker.getLabel(),
+										tourMarker.getSerieIndex(),
+										serieLength,
+										tourMarker.getTime());
+
+						StatusUtil.showStatus(message, e);
 					}
 
-					TourDatabase.saveEntity(tourData, tourId, TourData.class);
 				}
+
+				// check before tour is saved
+				if (monitor.isCanceled()) {
+					return;
+				}
+
+				TourDatabase.saveEntity(tourData, tourId, TourData.class);
 			}
 
 		} catch (final Exception e) {
+
+			StatusUtil.showStatus(e);
 
 			throw e;
 
