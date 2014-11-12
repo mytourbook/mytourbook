@@ -75,6 +75,7 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
+import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.part.ViewPart;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
@@ -82,19 +83,22 @@ import org.joda.time.format.DateTimeFormatter;
 
 public class SearchView extends ViewPart {
 
-	public static final String			ID						= "net.tourbook.search.SearchView"; //$NON-NLS-1$
+	public static final String			ID								= "net.tourbook.search.SearchView"; //$NON-NLS-1$
 
-	private static final String			SEARCH_RESULT_CSS_FILE	= "/html/search-result.css";		//$NON-NLS-1$
+	private static final String			SEARCH_RESULT_CSS_FILE			= "/html/search-result.css";		//$NON-NLS-1$
 
-	private static final String			STATE_POPUP_WIDTH		= "STATE_POPUP_WIDTH";				//$NON-NLS-1$
-	private static final String			STATE_POPUP_HEIGHT		= "STATE_POPUP_HEIGHT";			//$NON-NLS-1$
-	private static final String			STATE_SEARCH_TEXT		= "STATE_SEARCH_TEXT";				//$NON-NLS-1$
+	static final String					STATE_IS_SHOW_DATE_TIME			= "STATE_IS_SHOW_DATE_TIME";		//$NON-NLS-1$
+	static final boolean				STATE_IS_SHOW_DATE_TIME_DEFAULT	= false;
+	static final String					STATE_HITS_PER_PAGE				= "STATE_HITS_PER_PAGE";			//$NON-NLS-1$
+	static final int					STATE_HITS_PER_PAGE_DEFAULT		= 10;
+	private static final String			STATE_POPUP_WIDTH				= "STATE_POPUP_WIDTH";				//$NON-NLS-1$
+	private static final String			STATE_POPUP_HEIGHT				= "STATE_POPUP_HEIGHT";			//$NON-NLS-1$
+	private static final String			STATE_SEARCH_TEXT				= "STATE_SEARCH_TEXT";				//$NON-NLS-1$
 
-	private final DateTimeFormatter		_dateFormatter			= DateTimeFormat.fullDate();
-	private final DateTimeFormatter		_timeFormatter			= DateTimeFormat.mediumTime();
+	private final DateTimeFormatter		_dateFormatter					= DateTimeFormat.mediumDate();
 
-	private final IPreferenceStore		_prefStore				= TourbookPlugin.getPrefStore();
-	private final IDialogSettings		_state					= TourbookPlugin.getState(ID);
+	private final IPreferenceStore		_prefStore						= TourbookPlugin.getPrefStore();
+	private final IDialogSettings		_state							= TourbookPlugin.getState(ID);
 	//
 	private PostSelectionProvider		_postSelectionProvider;
 	private IPropertyChangeListener		_prefChangeListener;
@@ -105,14 +109,17 @@ public class SearchView extends ViewPart {
 	private String						_tourChartIconUrl;
 	private String						_tourMarkerIconUrl;
 
-	/**
-	 * Set time that an error displays the correct time.
-	 */
-	private long						_searchStartTime		= System.currentTimeMillis();
-
 	private MTContentProposalAdapter	_contentProposalAdapter;
-	private TextContentAdapter			_controlContentAdapter	= new TextContentAdapter();
-	private MTProposalProvider			_proposalProvider		= new MTProposalProvider();
+	private TextContentAdapter			_controlContentAdapter			= new TextContentAdapter();
+	private MTProposalProvider			_proposalProvider				= new MTProposalProvider();
+
+	private ActionSearchOptions			_actionTourBlogMarker;
+
+	private boolean						_isShowDateTime;
+	private int							_hitsPerPage;
+
+	private SearchResult				_searchResult;
+	private long						_searchTime						= -1;
 
 	private PixelConverter				_pc;
 
@@ -120,8 +127,15 @@ public class SearchView extends ViewPart {
 	 * UI controls
 	 */
 	private Browser						_browser;
+
+	private Composite					_pageNoBrowser;
+	private Composite					_pageSearch;
+	private Composite					_uiParent;
+
+	private PageBook					_pageBook;
+
+	private Text						_txtNoBrowser;
 	private Text						_txtSearch;
-	private Text						_txtStatus;
 
 	public class MTContentProposalAdapter extends ContentProposalAdapter {
 
@@ -330,6 +344,15 @@ public class SearchView extends ViewPart {
 		TourManager.getInstance().addTourEventListener(_tourEventListener);
 	}
 
+	private void appendState(final StringBuilder state, final String text) {
+
+		if (state.length() > 0) {
+			state.append(UI.DASH_WITH_SPACE);
+		}
+
+		state.append(text);
+	}
+
 	private void clearView() {
 
 		// removed old tour data from the selection provider
@@ -337,6 +360,8 @@ public class SearchView extends ViewPart {
 	}
 
 	private void createActions() {
+
+		_actionTourBlogMarker = new ActionSearchOptions(this, _uiParent);
 
 		fillActionBars();
 	}
@@ -352,46 +377,93 @@ public class SearchView extends ViewPart {
 		return html;
 	}
 
-	private String createHTML_20_Body(final SearchResult searchResult) {
+	/**
+	 * @param searchResult
+	 *            Can be <code>null</code> when search result is not available.
+	 * @param state
+	 * @return
+	 */
+	private String createHTML_20_Body(final SearchResult searchResult, final String state) {
 
 		final StringBuilder sb = new StringBuilder();
 
-		for (final Entry<String, SearchResultItem> entry : searchResult.items.entrySet()) {
+		{
+			// state
 
-			sb.append("<div class='result-item'>"); //$NON-NLS-1$
+			sb.append("<div class='result-state'>"); //$NON-NLS-1$
 			{
-				final SearchResultItem resultItem = entry.getValue();
+				sb.append(state);
+			}
+			sb.append("</div>\n"); //$NON-NLS-1$
+		}
 
-				final boolean isTour = resultItem.tourId != null;
-				final boolean isMarker = resultItem.markerId != null;
-				final String iconUrl = isTour ? _tourChartIconUrl : _tourMarkerIconUrl;
+		if (searchResult != null) {
 
-				String itemTitle = UI.EMPTY_STRING;
-				final String hrefOpenItem = null;
+			for (final Entry<String, SearchResultItem> entry : searchResult.items.entrySet()) {
+				createHTML_30_Item(sb, entry);
+			}
+		}
 
-				if (isTour) {
+		return sb.toString();
+	}
 
-					final String tourTitle = resultItem.tourTitle;
+	private void createHTML_30_Item(final StringBuilder sb, final Entry<String, SearchResultItem> entry) {
 
-					if (tourTitle != null) {
-						itemTitle = tourTitle;
-					}
+		sb.append("<div class='result-item'>"); //$NON-NLS-1$
+		{
+			final SearchResultItem resultItem = entry.getValue();
 
-				} else if (isMarker) {
+			final boolean isTour = resultItem.tourId != null;
+			final boolean isMarker = resultItem.markerId != null;
+			final String iconUrl = isTour ? _tourChartIconUrl : _tourMarkerIconUrl;
 
-					final String tourMarkerLabel = resultItem.markerLabel;
+			String itemTitle = UI.EMPTY_STRING;
+			final String hrefOpenItem = null;
 
-					if (tourMarkerLabel != null) {
-						itemTitle = tourMarkerLabel;
-					}
+			if (isTour) {
+
+				final String tourTitle = resultItem.tourTitle;
+
+				if (tourTitle != null) {
+					itemTitle = tourTitle;
 				}
 
+			} else if (isMarker) {
+
+				final String tourMarkerLabel = resultItem.markerLabel;
+
+				if (tourMarkerLabel != null) {
+					itemTitle = tourMarkerLabel;
+				}
+			}
+
+			if (_isShowDateTime) {
+
+				final long tourStartTime = resultItem.tourStartTime;
+				if (tourStartTime != 0) {
+
+					sb.append("<div class='item-date-time'>"); //$NON-NLS-1$
+					{
+						final DateTime dt = new DateTime(tourStartTime);
+
+						sb.append(String.format(//
+//								"%s - %s - CW %d",
+//								"%s - %s",
+								"%s",
+								_dateFormatter.print(dt.getMillis())
+//								_timeFormatter.print(dt.getMillis())
+//								dt.getWeekOfWeekyear()
+								));
+					}
+					sb.append("</div>\n"); //$NON-NLS-1$
+				}
+			}
+
+			{
 				sb.append("<div class='result-title'>"); //$NON-NLS-1$
 				{
 					sb.append("<a class='item-title'" //
-							+ (" style='" //
-									+ "background: url("
-									+ iconUrl + ") no-repeat;'")
+							+ (" style='background-image: url(" + iconUrl + ")'")
 							+ (" href='" + hrefOpenItem + "'") //$NON-NLS-1$ //$NON-NLS-2$
 							+ (" title='" + itemTitle + "'") //$NON-NLS-1$ //$NON-NLS-2$
 							+ ">" // //$NON-NLS-1$
@@ -399,7 +471,9 @@ public class SearchView extends ViewPart {
 							+ "</a>");
 				}
 				sb.append("</div>\n"); //$NON-NLS-1$
+			}
 
+			{
 				final String description = resultItem.description;
 				if (description != null) {
 					sb.append("<div class='result-description'>"); //$NON-NLS-1$
@@ -408,33 +482,16 @@ public class SearchView extends ViewPart {
 					}
 					sb.append("</div>\n"); //$NON-NLS-1$
 				}
-
-				final long tourStartTime = resultItem.tourStartTime;
-				if (tourStartTime != 0) {
-
-					sb.append("<div class='' style='text-align:right;'>"); //$NON-NLS-1$
-					{
-						final DateTime dt = new DateTime(tourStartTime);
-
-						sb.append(String.format(//
-//								"%s - %s - CW %d",
-								"%s - %s",
-								_dateFormatter.print(dt.getMillis()),
-								_timeFormatter.print(dt.getMillis())
-//								dt.getWeekOfWeekyear()
-								));
-					}
-					sb.append("</div>\n"); //$NON-NLS-1$
-				}
 			}
-			sb.append("</div>\n"); //$NON-NLS-1$
-		}
 
-		return sb.toString();
+		}
+		sb.append("</div>\n"); //$NON-NLS-1$
 	}
 
 	@Override
 	public void createPartControl(final Composite parent) {
+
+		_uiParent = parent;
 
 		initUI(parent);
 
@@ -449,25 +506,52 @@ public class SearchView extends ViewPart {
 		getSite().setSelectionProvider(_postSelectionProvider = new PostSelectionProvider(ID));
 
 		restoreState();
+
+		showInvalidPage();
 	}
 
 	private void createUI(final Composite parent) {
 
+		_pageBook = new PageBook(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, true).applyTo(_pageBook);
+
+		_pageNoBrowser = new Composite(_pageBook, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, true).applyTo(_pageNoBrowser);
+		GridLayoutFactory.swtDefaults().numColumns(1).applyTo(_pageNoBrowser);
+		{
+			_txtNoBrowser = new Text(_pageNoBrowser, SWT.WRAP | SWT.READ_ONLY);
+			GridDataFactory.fillDefaults()//
+					.grab(true, true)
+					.align(SWT.FILL, SWT.BEGINNING)
+					.applyTo(_txtNoBrowser);
+		}
+
+		_pageSearch = new Composite(_pageBook, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, true).applyTo(_pageSearch);
+		GridLayoutFactory.fillDefaults().applyTo(_pageSearch);
+		{
+			createUI_10_Search(_pageSearch);
+		}
+	}
+
+	private void createUI_10_Search(final Composite parent) {
+
 		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+		GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
 		GridLayoutFactory.fillDefaults()//
 				.numColumns(1)
 				.spacing(0, 2)
 				.applyTo(container);
 		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WHITE));
+		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
+		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
 		{
-			createUI_10_Query(container);
-			createUI_20_Status(container);
-			createUI_30_Result(container);
+			createUI_20_QueryField(container);
+			createUI_30_ResultBrowser(container);
 		}
 	}
 
-	private Composite createUI_10_Query(final Composite parent) {
+	private void createUI_20_QueryField(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
@@ -476,6 +560,7 @@ public class SearchView extends ViewPart {
 //				.margins(0, 0)
 				.applyTo(container);
 		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WHITE));
+		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
 		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
 		{
 // ALTERNATIVE TEXT CONTROL
@@ -529,34 +614,15 @@ public class SearchView extends ViewPart {
 			_contentProposalAdapter.addContentProposalListener(new IContentProposalListener2() {
 
 				@Override
-				public void proposalPopupClosed(final ContentProposalAdapter adapter) {
-					// TODO Auto-generated method stub
-
-				}
+				public void proposalPopupClosed(final ContentProposalAdapter adapter) {}
 
 				@Override
-				public void proposalPopupOpened(final ContentProposalAdapter adapter) {
-					// TODO Auto-generated method stub
-
-				}
+				public void proposalPopupOpened(final ContentProposalAdapter adapter) {}
 			});
 		}
-
-		return container;
 	}
 
-	private void createUI_20_Status(final Composite parent) {
-
-		_txtStatus = new Text(parent, SWT.WRAP | SWT.READ_ONLY);
-		GridDataFactory.fillDefaults()//
-				.grab(true, false)
-				.align(SWT.FILL, SWT.BEGINNING)
-				.applyTo(_txtStatus);
-
-		_txtStatus.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WHITE));
-	}
-
-	private void createUI_30_Result(final Composite parent) {
+	private void createUI_30_ResultBrowser(final Composite parent) {
 
 		try {
 
@@ -564,6 +630,9 @@ public class SearchView extends ViewPart {
 
 				// use default browser
 				_browser = new Browser(parent, SWT.NONE);
+
+				// DEBUG: force error in win7
+//				_browser = new Browser(parent, SWT.MOZILLA);
 
 			} catch (final Exception e) {
 
@@ -594,9 +663,9 @@ public class SearchView extends ViewPart {
 
 			_txtSearch.setEnabled(false);
 
-			final String message = e.getMessage();
+			_txtNoBrowser.setText(NLS.bind(Messages.UI_Label_BrowserCannotBeCreated_Error, e.getMessage()));
 
-			updateUI_Status(NLS.bind(Messages.UI_Label_BrowserCannotBeCreated_Error, message), false);
+			showInvalidPage();
 
 			StatusUtil.log(e);
 		}
@@ -621,7 +690,7 @@ public class SearchView extends ViewPart {
 		 */
 		final IToolBarManager tbm = getViewSite().getActionBars().getToolBarManager();
 
-//		tbm.add(_actionTourBlogMarker);
+		tbm.add(_actionTourBlogMarker);
 	}
 
 	private void initUI(final Composite parent) {
@@ -664,6 +733,24 @@ public class SearchView extends ViewPart {
 	}
 
 	/**
+	 * @param isStartSearch
+	 *            When <code>true</code> the search is started again.
+	 */
+	void onChangeUI(final boolean isStartSearch) {
+
+		restoreState_Options();
+
+		if (isStartSearch) {
+
+			onSearchSelect();
+
+		} else {
+
+			updateUI(_searchResult, null);
+		}
+	}
+
+	/**
 	 * Open popup with {@link SWT#ARROW_DOWN} key.
 	 * 
 	 * @param e
@@ -689,17 +776,17 @@ public class SearchView extends ViewPart {
 			return;
 		}
 
-		_searchStartTime = System.currentTimeMillis();
+		_searchResult = null;
 
 		String searchText = _txtSearch.getText().trim();
 
 		// check if search text is valid
 		if (searchText.length() == 0) {
-			updateUI_Status("No result", false);
+			updateUI(null, "No result");
 			return;
 		}
 		if (searchText.startsWith(UI.SYMBOL_STAR) || searchText.startsWith("?")) {
-			updateUI_Status("* or ? is not allowed as first character", false);
+			updateUI(null, "* or ? is not allowed as first character");
 			return;
 		}
 
@@ -709,18 +796,22 @@ public class SearchView extends ViewPart {
 			searchText += UI.SYMBOL_STAR;
 		}
 
-		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
-				+ ("\tsearch: " + searchText));
-		// TODO remove SYSTEM.OUT.PRINTLN
+		_searchTime = -1;
+		final long startTime = System.currentTimeMillis();
 
-		final SearchResult searchResult = MTSearchManager.search(searchText);
+		final int startDocNumber = 0;
+
+		final SearchResult searchResult = MTSearchManager.search(searchText, _hitsPerPage, startDocNumber);
 
 		if (searchResult.items.size() == 0) {
-			updateUI_Status("No result", false);
+			updateUI(null, "No result");
 			return;
 		}
 
-		updateUI_SearchResult(searchResult);
+		_searchResult = searchResult;
+		_searchTime = System.currentTimeMillis() - startTime;
+
+		updateUI(searchResult, null);
 	}
 
 	private void restoreState() {
@@ -733,7 +824,19 @@ public class SearchView extends ViewPart {
 
 		final String searchText = Util.getStateString(_state, STATE_SEARCH_TEXT, UI.EMPTY_STRING);
 		_txtSearch.setText(searchText);
+		// move cursor to the end of the text
 		_txtSearch.setSelection(searchText.length());
+
+		restoreState_Options();
+
+		onChangeUI(false);
+	}
+
+	private void restoreState_Options() {
+
+		_hitsPerPage = Util.getStateInt(_state, STATE_HITS_PER_PAGE, STATE_HITS_PER_PAGE_DEFAULT);
+
+		_isShowDateTime = Util.getStateBoolean(_state, STATE_IS_SHOW_DATE_TIME, STATE_IS_SHOW_DATE_TIME_DEFAULT);
 	}
 
 	private void saveState() {
@@ -751,48 +854,38 @@ public class SearchView extends ViewPart {
 		_txtSearch.setFocus();
 	}
 
-	private void updateUI_SearchResult(final SearchResult searchResult) {
+	private void showInvalidPage() {
+
+		_pageBook.showPage(_browser == null ? _pageNoBrowser : _pageSearch);
+	}
+
+	/**
+	 * @param searchResult
+	 *            Can be <code>null</code> when a search result is not available.
+	 * @param statusText
+	 *            Can be <code>null</code> when a status text is not available.
+	 */
+	private void updateUI(final SearchResult searchResult, final String statusText) {
+
+		final StringBuilder state = new StringBuilder();
+
+		if (statusText != null) {
+			appendState(state, statusText);
+		}
+
+		if (searchResult != null) {
+			appendState(state, String.format("%d results - %d ms", searchResult.totalHits, _searchTime));
+		}
 
 		final String html = "" // //$NON-NLS-1$
 				+ "<!DOCTYPE html>\n" // ensure that IE is using the newest version and not the quirk mode //$NON-NLS-1$
-				+ "<html style='height: 100%; width: 100%; margin: 0px; padding: 0px;'>\n" //$NON-NLS-1$
+				+ "<html>\n" //$NON-NLS-1$
 				+ ("<head>\n" + createHTML_10_Head() + "\n</head>\n") //$NON-NLS-1$ //$NON-NLS-2$
-				+ ("<body>\n" + createHTML_20_Body(searchResult) + "\n</body>\n") //$NON-NLS-1$ //$NON-NLS-2$
+				+ ("<body>\n" + createHTML_20_Body(searchResult, state.toString()) + "\n</body>\n") //$NON-NLS-1$ //$NON-NLS-2$
 				+ "</html>"; //$NON-NLS-1$
 
 		_browser.setRedraw(true);
 		_browser.setText(html);
-
-		updateUI_Status(String.format("Hits: %d", searchResult.totalHits), true);
 	}
 
-	/**
-	 * @param statusText
-	 * @param isResultAvailable
-	 */
-	private void updateUI_Status(final String statusText, final boolean isResultAvailable) {
-
-		/*
-		 * Update status
-		 */
-		final long time = System.currentTimeMillis() - _searchStartTime;
-
-		String text;
-		if (statusText == null) {
-			text = String.format("%d ms", time);
-		} else {
-			text = String.format("%s - %d ms", statusText, time);
-		}
-
-		_txtStatus.setText(text);
-
-		/*
-		 * Clear browser when an error occured.
-		 */
-		if (!isResultAvailable && _browser != null) {
-
-			_browser.setRedraw(true);
-			_browser.setText(UI.EMPTY_STRING);
-		}
-	}
 }

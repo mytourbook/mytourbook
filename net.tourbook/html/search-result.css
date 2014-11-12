@@ -2,6 +2,10 @@
 html 
 {
 	overflow-y: 			scroll;
+	height:					100%; 
+	width:					100%; 
+	margin:					0px; 
+	padding:				0px;
 }
 
 body 
@@ -39,8 +43,8 @@ body,p,h1,h2,h3,h4,table,td,th,ul,ol,textarea,input
 
 .result-item
 {
-	xborder-bottom:			1px solid #ddd;
-	padding-bottom: 		20px;
+	padding-bottom: 		5px;
+	clear: 					both;		/* start new item */
 }
 
 .result-title
@@ -55,9 +59,26 @@ body,p,h1,h2,h3,h4,table,td,th,ul,ol,textarea,input
 a.item-title:LINK,
 a.item-title:VISITED 
 {
+	/* enforce width to the right border */
 	display:				block;
-	width:					auto;					/* enforce width to the right border */
+	width:					auto;					
+
 	text-decoration:		none;
-	text-indent:			20px;
 	color:					#2B62D2;	
+
+	/* adjust text that icon is not overlapped */
+	text-indent:			20px;
+
+	/* adjust icon image that it's bottom is aligned with the text */
+	background-repeat:		no-repeat;
+	padding-top: 			3px; 
+	background-clip:		padding-box;
+}
+
+.item-date-time
+{
+	float: 					right;
+	xtext-align:				right;
+	margin-left:			10px;
+	margin-bottom:			10px;
 }

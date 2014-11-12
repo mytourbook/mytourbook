@@ -88,6 +88,8 @@ public class MTSearchManager {
 	private static final List<LookupResult>	_emptyProposal					= new ArrayList<LookupResult>();
 
 	private static Lookup					_suggester;
+	private static IndexReader				_indexReader;
+	private static ScoreDoc					_afterScoreDoc;
 
 	public static class MyPostingsHighlighter extends PostingsHighlighter {
 
@@ -103,17 +105,6 @@ public class MTSearchManager {
 		@Override
 		protected Analyzer getIndexAnalyzer(final String field) {
 			return _analyzer;
-		}
-	}
-
-	private static void closeReader(final DirectoryReader indexReader) {
-
-		if (indexReader != null) {
-			try {
-				indexReader.close();
-			} catch (final IOException e) {
-				StatusUtil.showStatus(e);
-			}
 		}
 	}
 
@@ -378,15 +369,24 @@ public class MTSearchManager {
 		return indexDirectory;
 	}
 
-	public static SearchResult search(final String searchText) {
+	public static void saveState() {
+
+		if (_indexReader != null) {
+			try {
+				_indexReader.close();
+			} catch (final IOException e) {
+				StatusUtil.showStatus(e);
+			}
+		}
+	}
+
+	public static SearchResult search(final String searchText, final int hitsPerPage, final int startDocNumber) {
 
 		final SearchResult searchResult = new SearchResult();
 
-		IndexReader indexReader1 = null;
-		IndexReader indexReader2 = null;
-		MultiReader multiReader = null;
-
 		try {
+
+			setupIndexReader();
 
 			final String[] queryFields = {
 					//
@@ -397,45 +397,52 @@ public class MTSearchManager {
 			};
 
 			final int[] maxPassages = { 2, 2, 2 };
-			final int hitsPerPage = 10;
 
 			final Analyzer analyzer = getAnalyzer();
 
 			final MultiFieldQueryParser queryParser = new MultiFieldQueryParser(queryFields, analyzer);
 			final Query query = queryParser.parse(searchText);
+			final IndexSearcher indexSearcher = new IndexSearcher(_indexReader);
 
-			final FSDirectory tourDataIndex = openIndex(TourDatabase.TABLE_TOUR_DATA);
-			final FSDirectory tourMarkerIndex = openIndex(TourDatabase.TABLE_TOUR_MARKER);
+			_topDocs = indexSearcher.search(query, 9999999);
+			
+			
+			
+			
+			
+			
+			
+			
+			final int page = 2; //starting from 0
 
-			indexReader1 = DirectoryReader.open(tourDataIndex);
-			indexReader2 = DirectoryReader.open(tourMarkerIndex);
+			final TopDocs td = indexSearcher.search(query, (page+1)*10);
+			for (int i = page * 10; i < (page + 1) * 10 && i < td.scoreDocs.length; i++)
+			{
+			    final int docId = td.scoreDocs[i].doc;
 
-			multiReader = new MultiReader(indexReader1, indexReader2);
-			final IndexSearcher multiSearcher = new IndexSearcher(multiReader);
-
-			final TopDocs topDocs = multiSearcher.search(query, hitsPerPage);
+				final Document doc = _indexReader.document(docId);
+			}
+			
+			
+			
+			
+			
+			
+			
+			
 
 			final MyPostingsHighlighter highlighter = new MyPostingsHighlighter(analyzer);
 			final Map<String, String[]> highlights = highlighter.highlightFields(
 					queryFields,
 					query,
-					multiSearcher,
-					topDocs,
+					indexSearcher,
+					_topDocs,
 					maxPassages);
 
-			search_CreateResult(highlights, topDocs, multiReader, searchResult);
+			search_CreateResult(highlights, _topDocs, _indexReader, searchResult);
 
 		} catch (final Exception e) {
 			StatusUtil.showStatus(e);
-		} finally {
-
-			// reader can only be closed when there
-			// is no need to access the documents any more.
-			try {
-				multiReader.close();
-			} catch (final IOException e) {
-				StatusUtil.showStatus(e);
-			}
 		}
 
 		return searchResult;
@@ -552,6 +559,34 @@ public class MTSearchManager {
 	}
 
 	/**
+	 * Once you have a new IndexReader, it's relatively cheap to create a new IndexSearcher from it.
+	 */
+	private static void setupIndexReader() {
+
+		if (_indexReader != null) {
+			// index reader is initialized
+			return;
+		}
+
+		IndexReader indexReader1 = null;
+		IndexReader indexReader2 = null;
+
+		try {
+
+			final FSDirectory tourDataIndex = openIndex(TourDatabase.TABLE_TOUR_DATA);
+			final FSDirectory tourMarkerIndex = openIndex(TourDatabase.TABLE_TOUR_MARKER);
+
+			indexReader1 = DirectoryReader.open(tourDataIndex);
+			indexReader2 = DirectoryReader.open(tourMarkerIndex);
+
+			_indexReader = new MultiReader(indexReader1, indexReader2);
+
+		} catch (final Exception e) {
+			StatusUtil.showStatus(e);
+		}
+	}
+
+	/**
 	 * Enable Lucene tool.
 	 * 
 	 * @param conn
@@ -565,21 +600,18 @@ public class MTSearchManager {
 
 	private static Lookup setupSuggester() {
 
+		setupIndexReader();
+
 		final Lookup suggester[] = new AnalyzingSuggester[1];
 
 		BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
 			public void run() {
 
-				DirectoryReader indexReader = null;
-
 				try {
 
 					final TermFreqIteratorListWrapper inputIterator = new TermFreqIteratorListWrapper();
 
-					final FSDirectory dir = openIndex(TourDatabase.TABLE_TOUR_DATA);
-					indexReader = DirectoryReader.open(dir);
-
-					final List<AtomicReaderContext> leaves = indexReader.leaves();
+					final List<AtomicReaderContext> leaves = _indexReader.leaves();
 
 					for (final AtomicReaderContext readerContext : leaves) {
 
@@ -618,8 +650,6 @@ public class MTSearchManager {
 
 				} catch (final Exception e) {
 					StatusUtil.showStatus(e);
-				} finally {
-					closeReader(indexReader);
 				}
 			}
 		});

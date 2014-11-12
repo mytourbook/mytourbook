@@ -1173,6 +1173,8 @@ public class Messages extends NLS {
 
 	public static String		Search_Result_Link_NoResultAvailable;
 
+	public static String	Search_View_Label_NoSearch;
+
 	public static String		Slideout_ChartMarkerOptions_Checkbox_IsShowHiddenMarker;
 	public static String		Slideout_ChartMarkerOptions_Checkbox_IsShowMarker;
 	public static String		Slideout_ChartMarkerOptions_Checkbox_IsShowMarkerPoint;
@@ -1196,6 +1198,10 @@ public class Messages extends NLS {
 	public static String		Slideout_ChartMarkerOptions_Label_Offset_Tooltip;
 //	public static String		Slideout_ChartMarkerOptions_Label_SignImageSize;
 //	public static String		Slideout_ChartMarkerOptions_Label_SignImageSize_Tooltip;
+
+	public static String	Slideout_SearchViewOptions_Checkbox_IsShowDateTime;
+
+	public static String	Slideout_SearchViewOptions_Label_NumberOfDisplayedResults;
 
 	public static String		Slideout_TourMarkerFilter_Checkbox_IsReduceLatLonDigits;
 	public static String		Slideout_TourMarkerFilter_Checkbox_IsReduceLatLonDigits_Tooltip;

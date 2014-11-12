@@ -200,7 +200,7 @@ public class AnalyzingSuggesterTest extends LuceneTestCase {
       }
     }
     
-    lineFile.close();
+    lineFile.saveState();
   }
   
   // TODO: more tests
