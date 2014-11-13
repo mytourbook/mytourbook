@@ -91,20 +91,18 @@ public class MTSearchManager {
 	private static IndexReader				_indexReader;
 	private static ScoreDoc					_afterScoreDoc;
 
+	private static TopDocs					_topDocs;
+	private static String					_topDocsSearchText;
+
 	public static class MyPostingsHighlighter extends PostingsHighlighter {
 
-		private Analyzer	_analyzer;
-
-		private MyPostingsHighlighter(final Analyzer analyzer) {
-
+		private MyPostingsHighlighter() {
 			super();
-
-			_analyzer = analyzer;
 		}
 
 		@Override
 		protected Analyzer getIndexAnalyzer(final String field) {
-			return _analyzer;
+			return getAnalyzer();
 		}
 	}
 
@@ -326,18 +324,26 @@ public class MTSearchManager {
 		}
 	}
 
-	private static Analyzer getAnalyzer() throws SQLException {
+	private static Analyzer getAnalyzer() {
 
-		final Locale currentLocale = Locale.getDefault();
+		Analyzer analyzer = null;
+
+		try {
+
+			final Locale currentLocale = Locale.getDefault();
 
 //		currentLocale = Locale.GERMAN;
 //		currentLocale = Locale.ENGLISH;
 //
-		Analyzer analyzer = SearchUtils.getAnalyzerForLocale(currentLocale);
+			analyzer = SearchUtils.getAnalyzerForLocale(currentLocale);
 //		analyzer = new GermanAnalyzer();
 //		analyzer = new EnglishAnalyzer();
 
-		analyzer = new StandardAnalyzer(new CharArraySet(0, true));
+			analyzer = new StandardAnalyzer(new CharArraySet(0, true));
+
+		} catch (final SQLException e) {
+			StatusUtil.showStatus(e);
+		}
 
 		return analyzer;
 	}
@@ -374,19 +380,28 @@ public class MTSearchManager {
 		if (_indexReader != null) {
 			try {
 				_indexReader.close();
+				_indexReader = null;
 			} catch (final IOException e) {
 				StatusUtil.showStatus(e);
 			}
 		}
 	}
 
-	public static SearchResult search(final String searchText, final int hitsPerPage, final int startDocNumber) {
+	/**
+	 * @param searchText
+	 * @param pageNumber
+	 *            Starting from 0.
+	 * @param hitsPerPage
+	 * @return
+	 */
+	public static SearchResult search(final String searchText, final int pageNumber, final int hitsPerPage) {
 
 		final SearchResult searchResult = new SearchResult();
 
-		try {
+		searchResult.pageNumber = pageNumber;
+		searchResult.hitsPerPage = hitsPerPage;
 
-			setupIndexReader();
+		try {
 
 			final String[] queryFields = {
 					//
@@ -398,45 +413,45 @@ public class MTSearchManager {
 
 			final int[] maxPassages = { 2, 2, 2 };
 
+			setupIndexReader();
 			final Analyzer analyzer = getAnalyzer();
 
 			final MultiFieldQueryParser queryParser = new MultiFieldQueryParser(queryFields, analyzer);
 			final Query query = queryParser.parse(searchText);
+
 			final IndexSearcher indexSearcher = new IndexSearcher(_indexReader);
 
-			_topDocs = indexSearcher.search(query, 9999999);
-			
-			
-			
-			
-			
-			
-			
-			
-			final int page = 2; //starting from 0
+			if (_topDocsSearchText == null || _topDocsSearchText.equals(searchText) == false) {
 
-			final TopDocs td = indexSearcher.search(query, (page+1)*10);
-			for (int i = page * 10; i < (page + 1) * 10 && i < td.scoreDocs.length; i++)
-			{
-			    final int docId = td.scoreDocs[i].doc;
+				// this is a new search
 
-				final Document doc = _indexReader.document(docId);
+				_topDocs = indexSearcher.search(query, _indexReader.maxDoc());
+				_topDocsSearchText = searchText;
 			}
-			
-			
-			
-			
-			
-			
-			
-			
 
-			final MyPostingsHighlighter highlighter = new MyPostingsHighlighter(analyzer);
+			final ScoreDoc[] scoreDocs = _topDocs.scoreDocs;
+
+			final int maxDocIndex = scoreDocs.length;
+			final int docStartIndex = pageNumber * hitsPerPage;
+			int docEndIndex = (pageNumber + 1) * hitsPerPage;
+
+			if (docEndIndex > maxDocIndex) {
+				docEndIndex = maxDocIndex;
+			}
+
+			final int maxPageIndex = docEndIndex - docStartIndex;
+			final int docids[] = new int[maxPageIndex];
+
+			for (int docIndex = 0; docIndex < maxPageIndex; docIndex++) {
+				docids[docIndex] = scoreDocs[docStartIndex + docIndex].doc;
+			}
+
+			final MyPostingsHighlighter highlighter = new MyPostingsHighlighter();
 			final Map<String, String[]> highlights = highlighter.highlightFields(
 					queryFields,
 					query,
 					indexSearcher,
-					_topDocs,
+					docids,
 					maxPassages);
 
 			search_CreateResult(highlights, _topDocs, _indexReader, searchResult);
@@ -466,6 +481,8 @@ public class MTSearchManager {
 		if (highlights.size() == 0) {
 			return;
 		}
+
+		searchResult.totalHits = topDocs.totalHits;
 
 		final ScoreDoc scoreDocs[] = topDocs.scoreDocs;
 		final int docids[] = new int[scoreDocs.length];
@@ -554,8 +571,6 @@ public class MTSearchManager {
 			// get doc fields only once
 			isDocRead = true;
 		}
-
-		searchResult.totalHits = topDocs.totalHits;
 	}
 
 	/**

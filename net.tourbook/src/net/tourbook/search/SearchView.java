@@ -399,6 +399,8 @@ public class SearchView extends ViewPart {
 
 		if (searchResult != null) {
 
+			createHTML_40_PageNavigator(sb, searchResult);
+
 			for (final Entry<String, SearchResultItem> entry : searchResult.items.entrySet()) {
 				createHTML_30_Item(sb, entry);
 			}
@@ -484,6 +486,43 @@ public class SearchView extends ViewPart {
 				}
 			}
 
+		}
+		sb.append("</div>\n"); //$NON-NLS-1$
+	}
+
+	private void createHTML_40_PageNavigator(final StringBuilder sb, final SearchResult searchResult) {
+
+		final int totalHits = searchResult.totalHits;
+		final int hitsPerPage = searchResult.hitsPerPage;
+		final int activePageNumber = searchResult.pageNumber;
+
+		final int visiblePages = 10;
+		int firstPage = activePageNumber - visiblePages / 2;
+		int lastPage = activePageNumber + visiblePages / 2;
+		final int maxPage = (totalHits / hitsPerPage) + 1;
+		if (firstPage < 0) {
+			firstPage = 0;
+		}
+		if (lastPage > maxPage) {
+			lastPage = maxPage;
+		}
+
+		sb.append("<div class='page-navigator'>"); //$NON-NLS-1$
+		{
+			sb.append("<table><tbody><tr>");
+			{
+				for (int currentPage = firstPage; currentPage < lastPage; currentPage++) {
+
+					sb.append("<td>");
+					if (currentPage == activePageNumber) {
+						sb.append((currentPage + 1));
+					} else {
+						sb.append("<a href=''>" + (currentPage + 1) + "</a>");
+					}
+					sb.append("</td>");
+				}
+			}
+			sb.append("</tr></tbody></table>");
 		}
 		sb.append("</div>\n"); //$NON-NLS-1$
 	}
@@ -583,7 +622,7 @@ public class SearchView extends ViewPart {
 				@Override
 				public void keyTraversed(final TraverseEvent e) {
 					if (e.detail == SWT.TRAVERSE_RETURN) {
-						onSearchSelect();
+						onSearchSelect(0);
 					}
 				}
 			});
@@ -607,7 +646,7 @@ public class SearchView extends ViewPart {
 					//
 							);
 					// TODO remove SYSTEM.OUT.PRINTLN
-					onSearchSelect();
+					onSearchSelect(0);
 				}
 			});
 
@@ -742,7 +781,7 @@ public class SearchView extends ViewPart {
 
 		if (isStartSearch) {
 
-			onSearchSelect();
+			onSearchSelect(0);
 
 		} else {
 
@@ -770,7 +809,12 @@ public class SearchView extends ViewPart {
 		}
 	}
 
-	private void onSearchSelect() {
+	/**
+	 * @param pageNumber
+	 *            When <code>0</code> a new or repeated search is started, otherwise the selected
+	 *            page should be displayed.
+	 */
+	private void onSearchSelect(final int pageNumber) {
 
 		if (_contentProposalAdapter.isProposalPopupOpen()) {
 			return;
@@ -799,9 +843,7 @@ public class SearchView extends ViewPart {
 		_searchTime = -1;
 		final long startTime = System.currentTimeMillis();
 
-		final int startDocNumber = 0;
-
-		final SearchResult searchResult = MTSearchManager.search(searchText, _hitsPerPage, startDocNumber);
+		final SearchResult searchResult = MTSearchManager.search(searchText, pageNumber, _hitsPerPage);
 
 		if (searchResult.items.size() == 0) {
 			updateUI(null, "No result");

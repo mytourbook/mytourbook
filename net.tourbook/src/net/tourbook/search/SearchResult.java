@@ -25,4 +25,8 @@ public class SearchResult {
 	final TreeMap<String, SearchResultItem>	items	= new TreeMap<String, SearchResultItem>();
 
 	int										totalHits;
+
+	int										pageNumber;
+
+	int										hitsPerPage;
 }
