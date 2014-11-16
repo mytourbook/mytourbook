@@ -41,7 +41,7 @@ import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.Field.Store;
 import org.apache.lucene.document.FieldType;
-import org.apache.lucene.document.StringField;
+import org.apache.lucene.document.LongField;
 import org.apache.lucene.document.TextField;
 import org.apache.lucene.index.AtomicReader;
 import org.apache.lucene.index.AtomicReaderContext;
@@ -78,12 +78,12 @@ public class MTSearchManager {
 
 	private static final String				LUCENE_INDEX_FOLDER_NAME		= "lucene-index";
 
-	private static final String				SEARCH_FIELD_DESCRIPTION		= "description";					//$NON-NLS-1$
-	private static final String				SEARCH_FIELD_MARKER_ID			= "markerID";						//$NON-NLS-1$
-	private static final String				SEARCH_FIELD_TOUR_MARKERLABEL	= "label";							//$NON-NLS-1$
-	private static final String				SEARCH_FIELD_TITLE				= "title";							//$NON-NLS-1$
-	private static final String				SEARCH_FIELD_TOUR_ID			= "tourID";						//$NON-NLS-1$
-	private static final String				SEARCH_FIELD_TOUR_START_TIME	= "time";							//$NON-NLS-1$
+	private static final String				SEARCH_FIELD_DESCRIPTION		= "description";						//$NON-NLS-1$
+	private static final String				SEARCH_FIELD_MARKER_ID			= "markerID";							//$NON-NLS-1$
+	private static final String				SEARCH_FIELD_TOUR_MARKERLABEL	= "label";								//$NON-NLS-1$
+	private static final String				SEARCH_FIELD_TITLE				= "title";								//$NON-NLS-1$
+	private static final String				SEARCH_FIELD_TOUR_ID			= "tourID";							//$NON-NLS-1$
+	private static final String				SEARCH_FIELD_TOUR_START_TIME	= "time";								//$NON-NLS-1$
 
 	private static final List<LookupResult>	_emptyProposal					= new ArrayList<LookupResult>();
 
@@ -93,6 +93,14 @@ public class MTSearchManager {
 
 	private static TopDocs					_topDocs;
 	private static String					_topDocsSearchText;
+
+	// configure field with offsets at index time
+	private static final FieldType			_longSearchField				= new FieldType(LongField.TYPE_STORED);
+	private static final FieldType			_textSearchField				= new FieldType(TextField.TYPE_STORED);
+	{
+		_longSearchField.setIndexOptions(IndexOptions.DOCS_AND_FREQS_AND_POSITIONS_AND_OFFSETS);
+		_textSearchField.setIndexOptions(IndexOptions.DOCS_AND_FREQS_AND_POSITIONS_AND_OFFSETS);
+	}
 
 	public static class MyPostingsHighlighter extends PostingsHighlighter {
 
@@ -115,19 +123,13 @@ public class MTSearchManager {
 	 */
 	private static void createIndex(final Connection conn, final IProgressMonitor monitor) throws SQLException {
 
-		// configure field with offsets at index time
-		final FieldType offsetsType = new FieldType(TextField.TYPE_STORED);
-		offsetsType.setIndexOptions(IndexOptions.DOCS_AND_FREQS_AND_POSITIONS_AND_OFFSETS);
-
 		monitor.subTask(Messages.Database_Monitor_SetupLucene);
 
-		createIndex_TourData(conn, monitor, offsetsType);
-		createIndex_TourMarker(conn, monitor, offsetsType);
+		createIndex_TourData(conn, monitor);
+		createIndex_TourMarker(conn, monitor);
 	}
 
-	private static void createIndex_TourData(	final Connection conn,
-												final IProgressMonitor monitor,
-												final FieldType offsetsType) throws SQLException {
+	private static void createIndex_TourData(final Connection conn, final IProgressMonitor monitor) throws SQLException {
 
 		final Analyzer analyzer = getAnalyzer();
 		final IndexWriterConfig writerConfig = new IndexWriterConfig(Version.LUCENE_4_10_1, analyzer);
@@ -172,22 +174,21 @@ public class MTSearchManager {
 
 				final Document doc = new Document();
 
-				final String dbTourId = rs.getString(1);
+				final long dbTourId = rs.getLong(1);
 				final String dbTitle = rs.getString(2);
 				final String dbDescription = rs.getString(3);
 				final Long dbTourStartTime = rs.getLong(4);
 
-				doc.add(new StringField(SEARCH_FIELD_TOUR_ID, dbTourId, Store.YES));
+				doc.add(new LongField(SEARCH_FIELD_TOUR_ID, dbTourId, Store.YES));
+				doc.add(new LongField(SEARCH_FIELD_TOUR_START_TIME, dbTourStartTime, _longSearchField));
 
 				if (dbTitle != null) {
-					doc.add(new Field(SEARCH_FIELD_TITLE, dbTitle, offsetsType));
+					doc.add(new Field(SEARCH_FIELD_TITLE, dbTitle, _textSearchField));
 				}
 
 				if (dbDescription != null) {
-					doc.add(new Field(SEARCH_FIELD_DESCRIPTION, dbDescription, offsetsType));
+					doc.add(new Field(SEARCH_FIELD_DESCRIPTION, dbDescription, _textSearchField));
 				}
-
-				doc.add(new Field(SEARCH_FIELD_TOUR_START_TIME, dbTourStartTime.toString(), offsetsType));
 
 				indexWriter.addDocument(doc);
 
@@ -224,9 +225,8 @@ public class MTSearchManager {
 		}
 	}
 
-	private static void createIndex_TourMarker(	final Connection conn,
-												final IProgressMonitor monitor,
-												final FieldType offsetsType) throws SQLException {
+	private static void createIndex_TourMarker(final Connection conn, final IProgressMonitor monitor)
+			throws SQLException {
 
 		final Analyzer analyzer = getAnalyzer();
 		final IndexWriterConfig writerConfig = new IndexWriterConfig(Version.LUCENE_4_10_1, analyzer);
@@ -255,10 +255,11 @@ public class MTSearchManager {
 					//
 					+ "SELECT" //$NON-NLS-1$
 					//
-					+ " markerId," //				1 //$NON-NLS-1$
-					+ " label," //					2 //$NON-NLS-1$
-					+ " description," //			3 //$NON-NLS-1$
-					+ " tourTime" //				4 //$NON-NLS-1$
+					+ " markerId," //						1 //$NON-NLS-1$
+					+ (TourDatabase.KEY_TOUR + ",") //		2
+					+ " label," //							3 //$NON-NLS-1$
+					+ " description," //					4 //$NON-NLS-1$
+					+ " tourTime" //						5 //$NON-NLS-1$
 					//
 					+ (" FROM " + TourDatabase.TABLE_TOUR_MARKER); //$NON-NLS-1$
 
@@ -272,22 +273,23 @@ public class MTSearchManager {
 
 				final Document doc = new Document();
 
-				final String dbMarkerId = rs.getString(1);
-				final String dbLabel = rs.getString(2);
-				final String dbDescription = rs.getString(3);
-				final Long dbTourTime = rs.getLong(4);
+				final long dbMarkerId = rs.getLong(1);
+				final long dbTourId = rs.getLong(2);
+				final String dbLabel = rs.getString(3);
+				final String dbDescription = rs.getString(4);
+				final long dbTourTime = rs.getLong(5);
 
-				doc.add(new StringField(SEARCH_FIELD_MARKER_ID, dbMarkerId, Store.YES));
+				doc.add(new LongField(SEARCH_FIELD_MARKER_ID, dbMarkerId, Store.YES));
+				doc.add(new LongField(SEARCH_FIELD_TOUR_ID, dbTourId, Store.YES));
+				doc.add(new LongField(SEARCH_FIELD_TOUR_START_TIME, dbTourTime, _longSearchField));
 
 				if (dbLabel != null) {
-					doc.add(new Field(SEARCH_FIELD_TOUR_MARKERLABEL, dbLabel, offsetsType));
+					doc.add(new Field(SEARCH_FIELD_TOUR_MARKERLABEL, dbLabel, _textSearchField));
 				}
 
 				if (dbDescription != null) {
-					doc.add(new Field(SEARCH_FIELD_DESCRIPTION, dbDescription, offsetsType));
+					doc.add(new Field(SEARCH_FIELD_DESCRIPTION, dbDescription, _textSearchField));
 				}
-
-				doc.add(new Field(SEARCH_FIELD_TOUR_START_TIME, dbTourTime.toString(), offsetsType));
 
 				indexWriter.addDocument(doc);
 
@@ -431,6 +433,11 @@ public class MTSearchManager {
 
 			final ScoreDoc[] scoreDocs = _topDocs.scoreDocs;
 
+			/**
+			 * Get doc id's only for the current page.
+			 * <p>
+			 * It is very cheap to query the doc id's but very expensive to retrieve the documents.
+			 */
 			final int maxDocIndex = scoreDocs.length;
 			final int docStartIndex = pageNumber * hitsPerPage;
 			int docEndIndex = (pageNumber + 1) * hitsPerPage;
@@ -454,7 +461,7 @@ public class MTSearchManager {
 					docids,
 					maxPassages);
 
-			search_CreateResult(highlights, _topDocs, _indexReader, searchResult);
+			search_CreateResult(highlights, _topDocs, _indexReader, searchResult, docids, docStartIndex);
 
 		} catch (final Exception e) {
 			StatusUtil.showStatus(e);
@@ -471,24 +478,23 @@ public class MTSearchManager {
 	 * @param topDocs
 	 * @param multiReader
 	 * @param searchResult
+	 * @param docStartIndex
+	 * @param docids2
 	 * @throws IOException
 	 */
 	private static void search_CreateResult(final Map<String, String[]> highlights,
 											final TopDocs topDocs,
 											final IndexReader multiReader,
-											final SearchResult searchResult) throws IOException {
+											final SearchResult searchResult,
+											final int[] docids,
+											final int docStartIndex) throws IOException {
 
 		if (highlights.size() == 0) {
 			return;
 		}
 
 		searchResult.totalHits = topDocs.totalHits;
-
-		final ScoreDoc scoreDocs[] = topDocs.scoreDocs;
-		final int docids[] = new int[scoreDocs.length];
-		for (int i = 0; i < docids.length; i++) {
-			docids[i] = scoreDocs[i].doc;
-		}
+		final ScoreDoc[] scoreDocs = topDocs.scoreDocs;
 
 		final Set<Entry<String, String[]>> fields = highlights.entrySet();
 		Entry<String, String[]> firstHit;
@@ -502,13 +508,15 @@ public class MTSearchManager {
 
 		// create result items
 		final SearchResultItem[] resultItems = new SearchResultItem[numberOfHits];
+		final ArrayList<SearchResultItem> searchResultItems = searchResult.items;
+
 		for (int hitIndex = 0; hitIndex < numberOfHits; hitIndex++) {
 
 			final SearchResultItem resultItem = new SearchResultItem();
 
 			resultItems[hitIndex] = resultItem;
 
-			searchResult.items.put(Integer.toString(hitIndex + 1), resultItem);
+			searchResultItems.add(resultItem);
 		}
 
 		boolean isDocRead = false;
@@ -544,24 +552,27 @@ public class MTSearchManager {
 
 				if (isDocRead == false) {
 
-					final int docID = docids[hitIndex];
-					final Document doc = multiReader.document(docID, fieldsToLoad);
+					final int docId = docids[hitIndex];
+					final Document doc = multiReader.document(docId, fieldsToLoad);
 
-					for (final IndexableField indexableField : doc.getFields()) {
+					resultItem.docId = docId;
+					resultItem.score = scoreDocs[docStartIndex + hitIndex].score;
 
-						final String docFieldName = indexableField.name();
+					for (final IndexableField indexField : doc.getFields()) {
+
+						final String docFieldName = indexField.name();
 
 						switch (docFieldName) {
 						case SEARCH_FIELD_TOUR_ID:
-							resultItem.tourId = indexableField.stringValue();
+							resultItem.tourId = indexField.stringValue();
 							break;
 
 						case SEARCH_FIELD_MARKER_ID:
-							resultItem.markerId = indexableField.stringValue();
+							resultItem.markerId = indexField.stringValue();
 							break;
 
 						case SEARCH_FIELD_TOUR_START_TIME:
-							resultItem.tourStartTime = Long.parseLong(indexableField.stringValue());
+							resultItem.tourStartTime = Long.parseLong(indexField.stringValue());
 							break;
 						}
 					}

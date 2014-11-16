@@ -298,6 +298,8 @@ public class Messages extends NLS {
 	public static String		App_Action_open_tour_segmenter_tooltip;
 	public static String		App_Action_OpenOtherViews;
 	public static String		App_Action_Remove;
+
+	public static String		App_Action_RestoreDefaults;
 	public static String		App_Action_set_tour_type;
 	public static String		App_Action_Save;
 	public static String		App_Action_SetPerson;
@@ -1074,20 +1076,20 @@ public class Messages extends NLS {
 	public static String		Pref_Statistic_Label_interval;
 	public static String		Pref_Statistic_Label_separator;
 
-	public static String	Pref_Tour_Button_FailedUpdate;
+	public static String		Pref_Tour_Button_FailedUpdate;
 
-	public static String	Pref_Tour_Dialog_ConfirmDatabaseUpdate_Message;
+	public static String		Pref_Tour_Dialog_ConfirmDatabaseUpdate_Message;
 
-	public static String	Pref_Tour_Dialog_ConfirmDatabaseUpdate_Title;
+	public static String		Pref_Tour_Dialog_ConfirmDatabaseUpdate_Title;
 
 	public static String		Pref_Tour_Dialog_TourCacheIsModified_Message;
 	public static String		Pref_Tour_Dialog_TourCacheIsModified_Title;
-	public static String	Pref_Tour_Group_FailedUpdates;
+	public static String		Pref_Tour_Group_FailedUpdates;
 
 	public static String		Pref_Tour_Group_TourCache;
-	public static String	Pref_Tour_Label_FailedUpdateInfo;
+	public static String		Pref_Tour_Label_FailedUpdateInfo;
 
-	public static String	Pref_Tour_Label_FailedUpdateInfo_BOLD;
+	public static String		Pref_Tour_Label_FailedUpdateInfo_BOLD;
 
 	public static String		Pref_Tour_Label_TourCacheSize;
 	public static String		Pref_Tour_Label_TourCacheSize_Info;
@@ -1173,7 +1175,7 @@ public class Messages extends NLS {
 
 	public static String		Search_Result_Link_NoResultAvailable;
 
-	public static String	Search_View_Label_NoSearch;
+	public static String		Search_View_Label_NoSearch;
 
 	public static String		Slideout_ChartMarkerOptions_Checkbox_IsShowHiddenMarker;
 	public static String		Slideout_ChartMarkerOptions_Checkbox_IsShowMarker;
@@ -1199,9 +1201,14 @@ public class Messages extends NLS {
 //	public static String		Slideout_ChartMarkerOptions_Label_SignImageSize;
 //	public static String		Slideout_ChartMarkerOptions_Label_SignImageSize_Tooltip;
 
-	public static String	Slideout_SearchViewOptions_Checkbox_IsShowDateTime;
-
-	public static String	Slideout_SearchViewOptions_Label_NumberOfDisplayedResults;
+	public static String		Slideout_SearchViewOptions_Checkbox_IsShowDateTime;
+	public static String		Slideout_SearchViewOptions_Checkbox_IsShowItemNumber;
+	public static String		Slideout_SearchViewOptions_Checkbox_IsShowScore;
+	public static String		Slideout_SearchViewOptions_Checkbox_IsShowTopNavigator;
+	public static String		Slideout_SearchViewOptions_Group_PageNavigation;
+	public static String		Slideout_SearchViewOptions_Group_Result;
+	public static String		Slideout_SearchViewOptions_Label_NumberOfDisplayedResults;
+	public static String		Slideout_SearchViewOptions_Label_NumberOfPages;
 
 	public static String		Slideout_TourMarkerFilter_Checkbox_IsReduceLatLonDigits;
 	public static String		Slideout_TourMarkerFilter_Checkbox_IsReduceLatLonDigits_Tooltip;

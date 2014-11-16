@@ -28,6 +28,11 @@ public class SearchResultItem {
 
 	float	score;
 
+	/**
+	 * Lucene doc id.
+	 */
+	int		docId;
+
 	@Override
 	public String toString() {
 		return "SearchResultItem ["

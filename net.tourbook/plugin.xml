@@ -495,7 +495,24 @@
 		-->
 		<menuContribution locationURI="menu:m_Directory?before=defaultViews">
 
+			<!-- Search -->
+			
+				<command
+					commandId="command.net.tourbook.search.SearchView"
+					icon="icons/find-all.png"
+					label="%View_Name_SearchAll"
+					mnemonic="%View_Name_SearchAll_Mnemonic"/>
+	
+				<command
+					commandId="command.de.byteholder.geoclipse.poi.ShowPOI"
+					icon="icons/find.png"
+					label="%View_Name_SearchPOI"
+					tooltip="%View_Name_SearchPOI_Mnemonic"
+				/>
+   
+
 			<!-- Directories -->
+
 				<separator
 					name="net.tourbook.separator.TourDirectories"
 					visible="true"/>
@@ -657,25 +674,6 @@
 		-->
 		<menuContribution locationURI="menu:m_Tools?after=tools">
 
-			<!-- Search -->
-			
-				<command
-					commandId="command.net.tourbook.search.SearchView"
-					icon="icons/find-all.png"
-					label="%View_Name_SearchAll"
-					mnemonic="%View_Name_SearchAll_Mnemonic"/>
-	
-				<command
-					commandId="command.de.byteholder.geoclipse.poi.ShowPOI"
-					icon="icons/find.png"
-					label="%View_Name_SearchPOI"
-					tooltip="%View_Name_SearchPOI_Mnemonic"
-				/>
-	
-				<separator
-					name="net.tourbook.separator.Search"
-					visible="true"/>
-   
 			<!-- Tour-->
 			
 				<!-- Tour Editor - is displayed in the "Tour" and the "Tools" menu -->

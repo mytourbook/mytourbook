@@ -11,7 +11,7 @@ html
 body 
 {
 	font-size:				13px;
-	color:					#404040;
+	color:					#444;
 	background-color:		#fff;
 	margin:					5px;
 }
@@ -34,6 +34,7 @@ img
 table
 {
 	border-collapse:		collapse;
+	xborder:					1px solid;
 }
 
 body,p,h1,h2,h3,h4,table,td,th,ul,ol,textarea,input 
@@ -41,44 +42,147 @@ body,p,h1,h2,h3,h4,table,td,th,ul,ol,textarea,input
 	font-family: 			verdana, helvetica, arial, sans-serif;
 }
 
+a /* an <a> covers the whole item */
+{
+	text-decoration:		none;
+	color:					#444;
+}
+
+/*
+	Navigator
+*/
+.page-navigator table
+{
+	width:					100%
+}
+
+.page-number
+{
+	display:				block;
+	padding:				1px 5px 3px 5px;
+	border:					1px solid #fff;
+	xfont-size:				130%;
+	xfont-weight: 			bold;	
+	text-decoration:		none;
+}
+
+.page-selected
+{
+	border:					1px solid #ccc;
+}
+
+a.page-number:HOVER
+{
+	border:					1px solid #ccc;
+}
+
+/*
+	Result state
+*/
+.result-state
+{
+	padding-top:			20px;
+}
+
+/*
+	Result item
+*/
 .result-item
 {
 	padding-bottom: 		5px;
 	clear: 					both;		/* start new item */
 }
 
-.result-title
+.item-image 
 {
-	xpadding-left: 				20px;
+	vertical-align:			top;
+	padding-right:			10px;
+	xpadding-top:			-3px;
 }
 
-.result-description
-{
-}
-
-a.item-title:LINK,
-a.item-title:VISITED 
+a.item:LINK,
+a.item:VISITED 
 {
 	/* enforce width to the right border */
 	display:				block;
 	width:					auto;					
 
 	text-decoration:		none;
-	color:					#2B62D2;	
-
-	/* adjust text that icon is not overlapped */
-	text-indent:			20px;
-
-	/* adjust icon image that it's bottom is aligned with the text */
-	background-repeat:		no-repeat;
-	padding-top: 			3px; 
-	background-clip:		padding-box;
 }
 
-.item-date-time
+.item-title
 {
-	float: 					right;
-	xtext-align:				right;
-	margin-left:			10px;
-	margin-bottom:			10px;
+	text-decoration: 		underline;
 }
+
+.item-info
+{
+	font-size:				80%;
+	color:					#888;
+}
+
+.item-info td
+{
+	padding-right:			20px;
+}
+
+/*
+	Hover container
+*/
+
+.hover-container 
+{
+	padding:				3px;
+}
+
+/* show hidden actions when search item is hovered */
+.hover-container:HOVER .action-container
+{												
+	opacity:				1.0;
+	filter: 				alpha(opacity=100); 	/* IE needs this even in html standard mode*/
+}
+
+.hover-container:HOVER 
+{
+	background-color: 		#f8f8f8;
+	xbackground-color: 		#ddd;
+}
+
+.hover-container .action-container a:HOVER 
+{ 
+	border: 				1px solid #aaa;
+	border-radius:			3px;
+}
+
+/*
+	Actions
+*/
+.action-container 
+{
+	opacity:				0;
+	filter: 				alpha(opacity=0);
+
+	background-color: 		#f8f8f8;
+	position:				absolute;
+	right:					5px;					/* search item margin */
+	z-index:				10;
+}
+
+a.action:LINK,
+a.action:VISITED 
+{
+	display:				block;
+	width: 					20px; 
+	height: 				20px; 
+
+	text-decoration:		none;
+	
+	background-repeat:		no-repeat;
+	background-position:	center;
+
+	border:					1px solid #f8f8f8;
+	border-radius:			3px;
+
+	cursor: 				pointer; 
+}
+

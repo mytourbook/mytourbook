@@ -241,7 +241,7 @@ public class TourBlogView extends ViewPart {
 		_tourEventListener = new ITourEventListener() {
 			public void tourChanged(final IWorkbenchPart part, final TourEventId eventId, final Object eventData) {
 
-				if ((_tourData == null) || (part == TourBlogView.this)) {
+				if (part == TourBlogView.this) {
 					return;
 				}
 
@@ -340,14 +340,12 @@ public class TourBlogView extends ViewPart {
 			}
 
 			sb.append("<div class='blog-item'>"); //$NON-NLS-1$
+			sb.append("<div class='action-hover-container'>\n"); //$NON-NLS-1$
 			{
-				sb.append("<div class='action-hover-container'>\n"); //$NON-NLS-1$
-				{
-					create_30_Marker(sb, tourMarker);
-					create_32_MarkerUrl(sb, tourMarker);
-				}
-				sb.append("</div>\n"); //$NON-NLS-1$
+				create_30_Marker(sb, tourMarker);
+				create_32_MarkerUrl(sb, tourMarker);
 			}
+			sb.append("</div>\n"); //$NON-NLS-1$
 			sb.append("</div>\n"); //$NON-NLS-1$
 		}
 
@@ -497,7 +495,7 @@ public class TourBlogView extends ViewPart {
 				+ ("<td>" + htmlActionShowHideMarker + "</td>") //$NON-NLS-1$ //$NON-NLS-2$
 				+ ("<td>" + createHtml_Action(hrefEditMarker, hoverEditMarker, _actionEditImageUrl) + "</td>") //$NON-NLS-1$ //$NON-NLS-2$
 				+ "</tr></tbody></table>" // //$NON-NLS-1$
-				+ "	</div>\n"; //$NON-NLS-1$
+				+ "</div>\n"; //$NON-NLS-1$
 
 		sb.append("<div class='title'>\n" //$NON-NLS-1$
 
@@ -1020,7 +1018,6 @@ public class TourBlogView extends ViewPart {
 
 		final boolean isTourAvailable = (tourId >= 0) && (_tourData != null);
 		if (isTourAvailable && _browser != null) {
-			_pageBook.showPage(_pageContent);
 			updateUI();
 		}
 	}
@@ -1100,6 +1097,8 @@ public class TourBlogView extends ViewPart {
 		if (_tourData == null || _browser == null) {
 			return;
 		}
+
+		_pageBook.showPage(_pageContent);
 
 		_isDrawWithDefaultColor = _state.getBoolean(STATE_IS_DRAW_MARKER_WITH_DEFAULT_COLOR);
 		_isShowHiddenMarker = _state.getBoolean(STATE_IS_SHOW_HIDDEN_MARKER);

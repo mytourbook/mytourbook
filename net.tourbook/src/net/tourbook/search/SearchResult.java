@@ -15,17 +15,21 @@
  *******************************************************************************/
 package net.tourbook.search;
 
-import java.util.TreeMap;
+import java.util.ArrayList;
 
 public class SearchResult {
 
 	/**
 	 * Key is tour ID.
 	 */
-	final TreeMap<String, SearchResultItem>	items	= new TreeMap<String, SearchResultItem>();
+//	final TreeMap<String, SearchResultItem>	items	= new TreeMap<String, SearchResultItem>();
+	final ArrayList<SearchResultItem>	items	= new ArrayList<SearchResultItem>();
 
 	int										totalHits;
 
+	/**
+	 * First page is <code>0</code>.
+	 */
 	int										pageNumber;
 
 	int										hitsPerPage;

@@ -78,6 +78,7 @@ body,p,h1,h2,h3,h4,table,td,th,ul,ol,textarea,input
 {
 	margin-top:				2px;
 	margin-bottom:			2px;
+	font-weight: 			normal;
 }
 
 a.label-text:LINK,
@@ -91,7 +92,7 @@ a.label-text:VISITED
 
 .action-hover-container
 {
-	min-height: 			24px;					/* ensure action buttons are covered with 1 liner */
+	min-height: 			24px;					/* ensure action buttons are covered with 1 line */
 	overflow: 				hidden;					/* prevent to create a horizontal scrollbar */
 	padding-left: 			2px;
 }
@@ -122,9 +123,6 @@ a.label-text:VISITED
 	right:					5px;					/* blog margin*/
 	z-index:				10;
 }
-
-
-
 
 a.action:LINK,
 a.action:VISITED 

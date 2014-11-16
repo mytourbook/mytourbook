@@ -37,6 +37,7 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Spinner;
@@ -61,7 +62,7 @@ public class SlideoutSearchOptions extends AnimatedToolTipShell implements IColo
 	private SearchView				_searchView;
 
 	private SelectionAdapter		_defaultSelectionAdapter;
-	private SelectionAdapter		_selectionAdapterWithSearch;
+	private SelectionAdapter		_selectionAdapterWithNewSearch;
 	{
 		_defaultSelectionAdapter = new SelectionAdapter() {
 			@Override
@@ -69,7 +70,8 @@ public class SlideoutSearchOptions extends AnimatedToolTipShell implements IColo
 				onChangeUI(false);
 			}
 		};
-		_selectionAdapterWithSearch = new SelectionAdapter() {
+
+		_selectionAdapterWithNewSearch = new SelectionAdapter() {
 			@Override
 			public void widgetSelected(final SelectionEvent e) {
 				onChangeUI(true);
@@ -83,8 +85,12 @@ public class SlideoutSearchOptions extends AnimatedToolTipShell implements IColo
 	private Composite				_shellContainer;
 
 	private Button					_chkShowDateTime;
+	private Button					_chkShowItemNumber;
+	private Button					_chkShowScore;
+	private Button					_chkTopNavigator;
 
 	private Spinner					_spinnerDisplayedResults;
+	private Spinner					_spinnerNumberOfPages;
 
 	private final class WaitTimer implements Runnable {
 		@Override
@@ -182,54 +188,141 @@ public class SlideoutSearchOptions extends AnimatedToolTipShell implements IColo
 			GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
 			GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
 			{
-				createUI_10_Checkboxes(container);
-				createUI_20_ResultItems(container);
+				createUI_10_ResultItems(container);
+				createUI_20_PageNavigator(container);
 			}
+
+			createUI_99_RestoreDefaults(_shellContainer);
 		}
 
 		return _shellContainer;
 	}
 
-	private void createUI_10_Checkboxes(final Composite parent) {
+	private void createUI_10_ResultItems(final Composite parent) {
 
-		/*
-		 * Show date/time
-		 */
+		final Group group = new Group(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().span(2, 1).applyTo(group);
+		GridLayoutFactory.swtDefaults().numColumns(2).applyTo(group);
+		group.setText(Messages.Slideout_SearchViewOptions_Group_Result);
 		{
-			_chkShowDateTime = new Button(parent, SWT.CHECK);
-			GridDataFactory.fillDefaults()//
-					.span(2, 1)
-					.applyTo(_chkShowDateTime);
-			_chkShowDateTime.setText(Messages.Slideout_SearchViewOptions_Checkbox_IsShowDateTime);
-			_chkShowDateTime.addSelectionListener(_defaultSelectionAdapter);
+			/*
+			 * Show date/time
+			 */
+			{
+				_chkShowDateTime = new Button(group, SWT.CHECK);
+				GridDataFactory.fillDefaults()//
+						.span(2, 1)
+						.applyTo(_chkShowDateTime);
+				_chkShowDateTime.setText(Messages.Slideout_SearchViewOptions_Checkbox_IsShowDateTime);
+				_chkShowDateTime.addSelectionListener(_defaultSelectionAdapter);
+			}
+
+			/*
+			 * Show score
+			 */
+			{
+				_chkShowScore = new Button(group, SWT.CHECK);
+				GridDataFactory.fillDefaults()//
+						.span(2, 1)
+						.applyTo(_chkShowScore);
+				_chkShowScore.setText(Messages.Slideout_SearchViewOptions_Checkbox_IsShowScore);
+				_chkShowScore.addSelectionListener(_defaultSelectionAdapter);
+			}
+
+			/*
+			 * Show item number
+			 */
+			{
+				_chkShowItemNumber = new Button(group, SWT.CHECK);
+				GridDataFactory.fillDefaults()//
+						.span(2, 1)
+						.applyTo(_chkShowItemNumber);
+				_chkShowItemNumber.setText(Messages.Slideout_SearchViewOptions_Checkbox_IsShowItemNumber);
+				_chkShowItemNumber.addSelectionListener(_defaultSelectionAdapter);
+			}
+
+			/*
+			 * Hits per page
+			 */
+			{
+				// checkbox
+				final Label label = new Label(group, SWT.CHECK);
+				label.setText(Messages.Slideout_SearchViewOptions_Label_NumberOfDisplayedResults);
+
+				// spinner
+				_spinnerDisplayedResults = new Spinner(group, SWT.BORDER);
+				GridDataFactory.fillDefaults() //
+						.align(SWT.END, SWT.CENTER)
+						.applyTo(_spinnerDisplayedResults);
+				_spinnerDisplayedResults.setMinimum(1);
+				_spinnerDisplayedResults.setMaximum(1000);
+				_spinnerDisplayedResults.addMouseWheelListener(new MouseWheelListener() {
+					public void mouseScrolled(final MouseEvent event) {
+						UI.adjustSpinnerValueOnMouseScroll(event);
+						onChangeUI(true);
+					}
+				});
+				_spinnerDisplayedResults.addSelectionListener(_selectionAdapterWithNewSearch);
+			}
 		}
 	}
 
-	private void createUI_20_ResultItems(final Composite parent) {
+	private void createUI_20_PageNavigator(final Composite parent) {
 
-		/*
-		 * Hits per page
-		 */
+		final Group group = new Group(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().span(2, 1).applyTo(group);
+		GridLayoutFactory.swtDefaults().numColumns(2).applyTo(group);
+		group.setText(Messages.Slideout_SearchViewOptions_Group_PageNavigation);
 		{
-			// checkbox
-			final Label label = new Label(parent, SWT.CHECK);
-			label.setText(Messages.Slideout_SearchViewOptions_Label_NumberOfDisplayedResults);
+			/*
+			 * Show top navigator
+			 */
+			{
+				_chkTopNavigator = new Button(group, SWT.CHECK);
+				GridDataFactory.fillDefaults()//
+						.span(2, 1)
+						.applyTo(_chkTopNavigator);
+				_chkTopNavigator.setText(Messages.Slideout_SearchViewOptions_Checkbox_IsShowTopNavigator);
+				_chkTopNavigator.addSelectionListener(_defaultSelectionAdapter);
+			}
 
-			// spinner
-			_spinnerDisplayedResults = new Spinner(parent, SWT.BORDER);
-			GridDataFactory.fillDefaults() //
-					.align(SWT.END, SWT.CENTER)
-					.applyTo(_spinnerDisplayedResults);
-			_spinnerDisplayedResults.setMinimum(1);
-			_spinnerDisplayedResults.setMaximum(1000);
-			_spinnerDisplayedResults.addMouseWheelListener(new MouseWheelListener() {
-				public void mouseScrolled(final MouseEvent event) {
-					UI.adjustSpinnerValueOnMouseScroll(event);
-					onChangeUI(true);
-				}
-			});
-			_spinnerDisplayedResults.addSelectionListener(_selectionAdapterWithSearch);
+			/*
+			 * Number of pages in the page navigator
+			 */
+			{
+				// checkbox
+				final Label label = new Label(group, SWT.CHECK);
+				label.setText(Messages.Slideout_SearchViewOptions_Label_NumberOfPages);
+
+				// spinner
+				_spinnerNumberOfPages = new Spinner(group, SWT.BORDER);
+				GridDataFactory.fillDefaults() //
+						.align(SWT.END, SWT.CENTER)
+						.applyTo(_spinnerNumberOfPages);
+				_spinnerNumberOfPages.setMinimum(3);
+				_spinnerNumberOfPages.setMaximum(50);
+				_spinnerNumberOfPages.addMouseWheelListener(new MouseWheelListener() {
+					public void mouseScrolled(final MouseEvent event) {
+						UI.adjustSpinnerValueOnMouseScroll(event);
+						onChangeUI(true);
+					}
+				});
+				_spinnerNumberOfPages.addSelectionListener(_selectionAdapterWithNewSearch);
+			}
 		}
+	}
+
+	private void createUI_99_RestoreDefaults(final Composite parent) {
+
+		final Button btnReset = new Button(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, false).align(SWT.END, SWT.FILL).applyTo(btnReset);
+		btnReset.setText(Messages.App_Action_RestoreDefaults);
+		btnReset.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(final SelectionEvent e) {
+				setDefaults();
+			}
+		});
 	}
 
 	public Shell getShell() {
@@ -324,16 +417,55 @@ public class SlideoutSearchOptions extends AnimatedToolTipShell implements IColo
 				SearchView.STATE_IS_SHOW_DATE_TIME,
 				SearchView.STATE_IS_SHOW_DATE_TIME_DEFAULT));
 
+		_chkShowItemNumber.setSelection(Util.getStateBoolean(
+				_state,
+				SearchView.STATE_IS_SHOW_ITEM_NUMBER,
+				SearchView.STATE_IS_SHOW_ITEM_NUMBER_DEFAULT));
+
+		_chkShowScore.setSelection(Util.getStateBoolean(
+				_state,
+				SearchView.STATE_IS_SHOW_SCORE,
+				SearchView.STATE_IS_SHOW_SCORE_DEFAULT));
+
+		_chkTopNavigator.setSelection(Util.getStateBoolean(
+				_state,
+				SearchView.STATE_IS_SHOW_TOP_NAVIGATOR,
+				SearchView.STATE_IS_SHOW_TOP_NAVIGATOR_DEFAULT));
+
 		_spinnerDisplayedResults.setSelection(Util.getStateInt(
 				_state,
 				SearchView.STATE_HITS_PER_PAGE,
 				SearchView.STATE_HITS_PER_PAGE_DEFAULT));
+
+		_spinnerNumberOfPages.setSelection(Util.getStateInt(
+				_state,
+				SearchView.STATE_NUMBER_OF_PAGES,
+				SearchView.STATE_NUMBER_OF_PAGES_DEFAULT));
 	}
 
 	private void saveState() {
 
 		_state.put(SearchView.STATE_IS_SHOW_DATE_TIME, _chkShowDateTime.getSelection());
+		_state.put(SearchView.STATE_IS_SHOW_ITEM_NUMBER, _chkShowItemNumber.getSelection());
+		_state.put(SearchView.STATE_IS_SHOW_SCORE, _chkShowScore.getSelection());
+		_state.put(SearchView.STATE_IS_SHOW_TOP_NAVIGATOR, _chkTopNavigator.getSelection());
 		_state.put(SearchView.STATE_HITS_PER_PAGE, _spinnerDisplayedResults.getSelection());
+		_state.put(SearchView.STATE_NUMBER_OF_PAGES, _spinnerNumberOfPages.getSelection());
+	}
+
+	private void setDefaults() {
+
+		_state.put(SearchView.STATE_IS_SHOW_DATE_TIME, SearchView.STATE_IS_SHOW_DATE_TIME_DEFAULT);
+		_state.put(SearchView.STATE_IS_SHOW_ITEM_NUMBER, SearchView.STATE_IS_SHOW_ITEM_NUMBER_DEFAULT);
+		_state.put(SearchView.STATE_IS_SHOW_SCORE, SearchView.STATE_IS_SHOW_SCORE_DEFAULT);
+		_state.put(SearchView.STATE_IS_SHOW_TOP_NAVIGATOR, SearchView.STATE_IS_SHOW_TOP_NAVIGATOR_DEFAULT);
+		_state.put(SearchView.STATE_HITS_PER_PAGE, SearchView.STATE_HITS_PER_PAGE_DEFAULT);
+		_state.put(SearchView.STATE_NUMBER_OF_PAGES, SearchView.STATE_NUMBER_OF_PAGES_DEFAULT);
+
+		restoreState();
+
+		// update UI
+		onChangeUI(true);
 	}
 
 }

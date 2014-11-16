@@ -22,7 +22,6 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map.Entry;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
@@ -31,8 +30,11 @@ import net.tourbook.common.util.PostSelectionProvider;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
+import net.tourbook.data.TourMarker;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.ITourEventListener;
+import net.tourbook.tour.SelectionTourId;
+import net.tourbook.tour.SelectionTourMarker;
 import net.tourbook.tour.TourEvent;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
@@ -83,22 +85,54 @@ import org.joda.time.format.DateTimeFormatter;
 
 public class SearchView extends ViewPart {
 
-	public static final String			ID								= "net.tourbook.search.SearchView"; //$NON-NLS-1$
+	public static final String			ID									= "net.tourbook.search.SearchView"; //$NON-NLS-1$
 
-	private static final String			SEARCH_RESULT_CSS_FILE			= "/html/search-result.css";		//$NON-NLS-1$
+	private static final String			SEARCH_RESULT_CSS_FILE				= "/html/search-result.css";		//$NON-NLS-1$
 
-	static final String					STATE_IS_SHOW_DATE_TIME			= "STATE_IS_SHOW_DATE_TIME";		//$NON-NLS-1$
-	static final boolean				STATE_IS_SHOW_DATE_TIME_DEFAULT	= false;
-	static final String					STATE_HITS_PER_PAGE				= "STATE_HITS_PER_PAGE";			//$NON-NLS-1$
-	static final int					STATE_HITS_PER_PAGE_DEFAULT		= 10;
-	private static final String			STATE_POPUP_WIDTH				= "STATE_POPUP_WIDTH";				//$NON-NLS-1$
-	private static final String			STATE_POPUP_HEIGHT				= "STATE_POPUP_HEIGHT";			//$NON-NLS-1$
-	private static final String			STATE_SEARCH_TEXT				= "STATE_SEARCH_TEXT";				//$NON-NLS-1$
+	static final String					STATE_IS_SHOW_DATE_TIME				= "STATE_IS_SHOW_DATE_TIME";		//$NON-NLS-1$
+	static final boolean				STATE_IS_SHOW_DATE_TIME_DEFAULT		= false;
+	static final String					STATE_IS_SHOW_ITEM_NUMBER			= "STATE_IS_SHOW_ITEM_NUMBER";		//$NON-NLS-1$
+	static final boolean				STATE_IS_SHOW_ITEM_NUMBER_DEFAULT	= false;
+	static final String					STATE_IS_SHOW_SCORE					= "STATE_IS_SHOW_SCORE";			//$NON-NLS-1$
+	static final boolean				STATE_IS_SHOW_SCORE_DEFAULT			= false;
+	static final String					STATE_IS_SHOW_TOP_NAVIGATOR			= "STATE_IS_SHOW_TOP_NAVIGATOR";	//$NON-NLS-1$
+	static final boolean				STATE_IS_SHOW_TOP_NAVIGATOR_DEFAULT	= false;
+	static final String					STATE_HITS_PER_PAGE					= "STATE_HITS_PER_PAGE";			//$NON-NLS-1$
+	static final int					STATE_HITS_PER_PAGE_DEFAULT			= 10;
+	static final String					STATE_NUMBER_OF_PAGES				= "STATE_NUMBER_OF_PAGES";			//$NON-NLS-1$
+	static final int					STATE_NUMBER_OF_PAGES_DEFAULT		= 5;
 
-	private final DateTimeFormatter		_dateFormatter					= DateTimeFormat.mediumDate();
+	private static final String			STATE_POPUP_WIDTH					= "STATE_POPUP_WIDTH";				//$NON-NLS-1$
+	private static final String			STATE_POPUP_HEIGHT					= "STATE_POPUP_HEIGHT";			//$NON-NLS-1$
+	private static final String			STATE_SEARCH_TEXT					= "STATE_SEARCH_TEXT";				//$NON-NLS-1$
 
-	private final IPreferenceStore		_prefStore						= TourbookPlugin.getPrefStore();
-	private final IDialogSettings		_state							= TourbookPlugin.getState(ID);
+	/**
+	 * This is necessary otherwise XULrunner in Linux do not fire a location change event.
+	 */
+	private static final String			HTTP_DUMMY							= "http://dummy";					//$NON-NLS-1$
+
+	private static final String			HREF_TOKEN							= "#";								//$NON-NLS-1$
+	private static final String			PAGE_ABOUT_BLANK					= "about:blank";					//$NON-NLS-1$
+
+	private static final String			ACTION_NAVIGATE_PAGE				= "NavigatePage";					//$NON-NLS-1$
+	private static final String			ACTION_SELECT_TOUR					= "SelectTour";					//$NON-NLS-1$
+	private static final String			ACTION_SELECT_MARKER				= "SelectMarker";					//$NON-NLS-1$
+
+	private static String				HREF_NAVIGATE_PAGE;
+	private static String				HREF_SELECT_TOUR;
+	private static String				HREF_SELECT_MARKER;
+
+	static {
+
+		HREF_NAVIGATE_PAGE = HREF_TOKEN + ACTION_NAVIGATE_PAGE + HREF_TOKEN;
+		HREF_SELECT_TOUR = HREF_TOKEN + ACTION_SELECT_TOUR + HREF_TOKEN;
+		HREF_SELECT_MARKER = HREF_TOKEN + ACTION_SELECT_MARKER + HREF_TOKEN;
+	}
+
+	private final DateTimeFormatter		_dateFormatter						= DateTimeFormat.mediumDate();
+
+	private final IPreferenceStore		_prefStore							= TourbookPlugin.getPrefStore();
+	private final IDialogSettings		_state								= TourbookPlugin.getState(ID);
 	//
 	private PostSelectionProvider		_postSelectionProvider;
 	private IPropertyChangeListener		_prefChangeListener;
@@ -110,16 +144,20 @@ public class SearchView extends ViewPart {
 	private String						_tourMarkerIconUrl;
 
 	private MTContentProposalAdapter	_contentProposalAdapter;
-	private TextContentAdapter			_controlContentAdapter			= new TextContentAdapter();
-	private MTProposalProvider			_proposalProvider				= new MTProposalProvider();
+	private TextContentAdapter			_controlContentAdapter				= new TextContentAdapter();
+	private MTProposalProvider			_proposalProvider					= new MTProposalProvider();
 
 	private ActionSearchOptions			_actionTourBlogMarker;
 
 	private boolean						_isShowDateTime;
+	private boolean						_isShowItemNumber;
+	private boolean						_isShowScore;
+	private boolean						_isShowTopNavigator;
 	private int							_hitsPerPage;
+	private int							_numberOfPages;
 
 	private SearchResult				_searchResult;
-	private long						_searchTime						= -1;
+	private long						_searchTime							= -1;
 
 	private PixelConverter				_pc;
 
@@ -366,6 +404,18 @@ public class SearchView extends ViewPart {
 		fillActionBars();
 	}
 
+	private String createHTML(final SearchResult searchResult, final StringBuilder stateText) {
+
+		final String html = "" // //$NON-NLS-1$
+				+ "<!DOCTYPE html>\n" // ensure that IE is using the newest version and not the quirk mode //$NON-NLS-1$
+				+ "<html>\n" //$NON-NLS-1$
+				+ ("<head>\n" + createHTML_10_Head() + "\n</head>\n") //$NON-NLS-1$ //$NON-NLS-2$
+				+ ("<body>\n" + createHTML_20_Body(searchResult, stateText.toString()) + "\n</body>\n") //$NON-NLS-1$ //$NON-NLS-2$
+				+ "</html>"; //$NON-NLS-1$
+
+		return html;
+	}
+
 	private String createHTML_10_Head() {
 
 		final String html = ""// //$NON-NLS-1$
@@ -380,114 +430,187 @@ public class SearchView extends ViewPart {
 	/**
 	 * @param searchResult
 	 *            Can be <code>null</code> when search result is not available.
-	 * @param state
+	 * @param stateText
 	 * @return
 	 */
-	private String createHTML_20_Body(final SearchResult searchResult, final String state) {
+	private String createHTML_20_Body(final SearchResult searchResult, final String stateText) {
 
 		final StringBuilder sb = new StringBuilder();
+		final StringBuilder sbNavigator = new StringBuilder();
 
-		{
-			// state
+		if (searchResult != null) {
 
-			sb.append("<div class='result-state'>"); //$NON-NLS-1$
-			{
-				sb.append(state);
+			createHTML_40_PageNavigator(sbNavigator, searchResult);
+
+			if (_isShowTopNavigator) {
+				sb.append("<div style='padding-top:0px;'></div>");
+				sb.append(sbNavigator);
+				sb.append("<div style='padding-top:20px;'></div>");
 			}
-			sb.append("</div>\n"); //$NON-NLS-1$
 		}
 
 		if (searchResult != null) {
 
-			createHTML_40_PageNavigator(sb, searchResult);
+			final int itemBaseNumber = searchResult.pageNumber * searchResult.hitsPerPage;
 
-			for (final Entry<String, SearchResultItem> entry : searchResult.items.entrySet()) {
-				createHTML_30_Item(sb, entry);
+			int itemIndex = 0;
+
+			for (final SearchResultItem entry : searchResult.items) {
+
+				final int itemNumber = ++itemIndex + itemBaseNumber;
+
+				sb.append("<div class='result-item'>"); //$NON-NLS-1$
+				sb.append("<div class='hover-container'>\n"); //$NON-NLS-1$
+				{
+					createHTML_30_Item(sb, entry, itemNumber);
+				}
+				sb.append("</div>\n"); //$NON-NLS-1$
+				sb.append("</div>\n"); //$NON-NLS-1$
+
 			}
+		}
+
+		if (searchResult != null) {
+			sb.append("<div style='padding-top:20px;'></div>");
+			sb.append(sbNavigator);
+			sb.append("<div style='padding-top:20px;'></div>");
+		}
+
+		// state
+		{
+			sb.append("<div class='result-state'>"); //$NON-NLS-1$
+			{
+				sb.append(stateText);
+			}
+			sb.append("</div>\n"); //$NON-NLS-1$
 		}
 
 		return sb.toString();
 	}
 
-	private void createHTML_30_Item(final StringBuilder sb, final Entry<String, SearchResultItem> entry) {
+	private void createHTML_30_Item(final StringBuilder sb, final SearchResultItem resultItem, final int itemNumber) {
 
-		sb.append("<div class='result-item'>"); //$NON-NLS-1$
-		{
-			final SearchResultItem resultItem = entry.getValue();
+		final String tourId = resultItem.tourId;
+		final String markerId = resultItem.markerId;
 
-			final boolean isTour = resultItem.tourId != null;
-			final boolean isMarker = resultItem.markerId != null;
-			final String iconUrl = isTour ? _tourChartIconUrl : _tourMarkerIconUrl;
+		final boolean isTour = tourId != null && markerId == null;
+		final boolean isMarker = markerId != null && tourId != null;
 
-			String itemTitle = UI.EMPTY_STRING;
-			final String hrefOpenItem = null;
+		final String iconUrl = isTour ? _tourChartIconUrl : _tourMarkerIconUrl;
 
-			if (isTour) {
+		String itemTitleText = null;
+		String hrefOpenItem = null;
 
-				final String tourTitle = resultItem.tourTitle;
+		if (isTour) {
 
-				if (tourTitle != null) {
-					itemTitle = tourTitle;
-				}
+			final String tourTitle = resultItem.tourTitle;
 
-			} else if (isMarker) {
-
-				final String tourMarkerLabel = resultItem.markerLabel;
-
-				if (tourMarkerLabel != null) {
-					itemTitle = tourMarkerLabel;
-				}
+			if (tourTitle != null) {
+				itemTitleText = tourTitle;
 			}
 
-			if (_isShowDateTime) {
+			hrefOpenItem = HTTP_DUMMY + HREF_SELECT_TOUR + tourId;
 
-				final long tourStartTime = resultItem.tourStartTime;
-				if (tourStartTime != 0) {
+		} else if (isMarker) {
 
-					sb.append("<div class='item-date-time'>"); //$NON-NLS-1$
-					{
-						final DateTime dt = new DateTime(tourStartTime);
+			final String tourMarkerLabel = resultItem.markerLabel;
 
-						sb.append(String.format(//
-//								"%s - %s - CW %d",
-//								"%s - %s",
-								"%s",
-								_dateFormatter.print(dt.getMillis())
-//								_timeFormatter.print(dt.getMillis())
-//								dt.getWeekOfWeekyear()
-								));
-					}
-					sb.append("</div>\n"); //$NON-NLS-1$
-				}
+			if (tourMarkerLabel != null) {
+				itemTitleText = tourMarkerLabel;
 			}
 
-			{
-				sb.append("<div class='result-title'>"); //$NON-NLS-1$
-				{
-					sb.append("<a class='item-title'" //
-							+ (" style='background-image: url(" + iconUrl + ")'")
-							+ (" href='" + hrefOpenItem + "'") //$NON-NLS-1$ //$NON-NLS-2$
-							+ (" title='" + itemTitle + "'") //$NON-NLS-1$ //$NON-NLS-2$
-							+ ">" // //$NON-NLS-1$
-							+ itemTitle
-							+ "</a>");
-				}
-				sb.append("</div>\n"); //$NON-NLS-1$
-			}
-
-			{
-				final String description = resultItem.description;
-				if (description != null) {
-					sb.append("<div class='result-description'>"); //$NON-NLS-1$
-					{
-						sb.append(description);
-					}
-					sb.append("</div>\n"); //$NON-NLS-1$
-				}
-			}
-
+			hrefOpenItem = HTTP_DUMMY + HREF_SELECT_MARKER + markerId + HREF_TOKEN + tourId;
 		}
-		sb.append("</div>\n"); //$NON-NLS-1$
+
+		if (itemTitleText == null) {
+			itemTitleText = UI.EMPTY_STRING;
+		}
+
+		String itemTitle = itemTitleText;
+		if (itemTitle.length() == 0) {
+			// publish new line that the icon is not overwritten
+			itemTitle = "</br>";
+		}
+
+		final boolean isShowInfo = _isShowDateTime || _isShowItemNumber || _isShowScore;
+
+		sb.append("<table><tbody><tr>");
+		{
+			/*
+			 * Item image
+			 */
+			sb.append("<td class='item-image'>");
+			{
+				sb.append("<img src='" + iconUrl + "'></img>");
+			}
+			sb.append("</td>");
+
+			/*
+			 * Item content
+			 */
+			sb.append("<td style='width:100%;'>");
+			{
+				sb.append("<a class='item'" //
+						+ (" xstyle='background-image: url(" + iconUrl + ")'")
+						+ (" href='" + hrefOpenItem + "'") //$NON-NLS-1$ //$NON-NLS-2$
+						+ (" title='" + itemTitle + "'") //$NON-NLS-1$ //$NON-NLS-2$
+						+ ">"); // //$NON-NLS-1$
+				{
+					// title
+					sb.append("<span class='item-title'>" + itemTitle + "</span>");
+
+					// description
+					{
+						final String description = resultItem.description;
+						if (description != null) {
+							sb.append("<div class='item-description'>"); //$NON-NLS-1$
+							{
+								sb.append(description);
+							}
+							sb.append("</div>\n"); //$NON-NLS-1$
+						}
+					}
+
+					// info
+					if (isShowInfo) {
+
+						sb.append("<div class='item-info'>"); //$NON-NLS-1$
+						sb.append("<table><tbody><tr>");
+						{
+							if (_isShowDateTime) {
+
+								final long tourStartTime = resultItem.tourStartTime;
+								if (tourStartTime != 0) {
+
+									final DateTime dt = new DateTime(tourStartTime);
+
+									sb.append("<td>"
+											+ String.format("%s", _dateFormatter.print(dt.getMillis()))
+											+ "</td>");
+
+								}
+							}
+
+							if (_isShowScore) {
+								sb.append("<td>" //
+//										+ String.format("%d . %10.5f", resultItem.docId, resultItem.score)
+										+ String.format("%3.3f", resultItem.score)
+										+ "<td>");
+							}
+
+							if (_isShowItemNumber) {
+								sb.append("<td>" + Integer.toString(itemNumber) + "<td>");
+							}
+						}
+						sb.append("</tr></tbody></table>");
+						sb.append("</div>\n"); //$NON-NLS-1$
+					}
+				}
+				sb.append("</a>");
+			}
+			sb.append("</td>");
+		}
+		sb.append("</tr></tbody></table>");
 	}
 
 	private void createHTML_40_PageNavigator(final StringBuilder sb, final SearchResult searchResult) {
@@ -496,10 +619,37 @@ public class SearchView extends ViewPart {
 		final int hitsPerPage = searchResult.hitsPerPage;
 		final int activePageNumber = searchResult.pageNumber;
 
-		final int visiblePages = 10;
-		int firstPage = activePageNumber - visiblePages / 2;
-		int lastPage = activePageNumber + visiblePages / 2;
-		final int maxPage = (totalHits / hitsPerPage) + 1;
+		if (totalHits <= hitsPerPage) {
+			// paging is not needed
+			return;
+		}
+
+		final int visiblePages = _numberOfPages;
+		int maxPage = (totalHits / hitsPerPage);
+
+		if (totalHits % hitsPerPage != 0) {
+			maxPage++;
+		}
+
+		int pagesBefore = visiblePages / 2;
+		int pagesAfter = visiblePages - pagesBefore;
+
+		if (activePageNumber - pagesBefore < 0) {
+
+			final int pagesDiff = activePageNumber - pagesBefore;
+
+			pagesBefore = activePageNumber;
+			pagesAfter += -pagesDiff;
+		}
+
+		if (activePageNumber + pagesAfter > maxPage) {
+
+			pagesAfter = maxPage - activePageNumber;
+			pagesBefore = visiblePages - pagesAfter;
+		}
+
+		int firstPage = activePageNumber - pagesBefore;
+		int lastPage = activePageNumber + pagesAfter;
 		if (firstPage < 0) {
 			firstPage = 0;
 		}
@@ -507,20 +657,94 @@ public class SearchView extends ViewPart {
 			lastPage = maxPage;
 		}
 
+		final StringBuilder sbPages = new StringBuilder();
+
+		final StringBuilder sbFirst = new StringBuilder();
+		final StringBuilder sbLast = new StringBuilder();
+		final StringBuilder sbNext = new StringBuilder();
+		final StringBuilder sbPrevious = new StringBuilder();
+
+		sbNext.append("<td style='width:49%; text-align:left;'>");
+		sbPrevious.append("<td style='width:49%; text-align:right;'>");
+
+		for (int currentPage = firstPage; currentPage < lastPage; currentPage++) {
+
+			final int visiblePageNo = currentPage + 1;
+			final String hrefPage = HTTP_DUMMY + HREF_NAVIGATE_PAGE + currentPage;
+
+			/*
+			 * Previous page
+			 */
+			if (currentPage == activePageNumber - 1) {
+				sbPrevious.append("<a class='page-number' href='" + hrefPage + "'><</a>");
+			}
+
+			/*
+			 * Every page
+			 */
+			sbPages.append("<td>");
+			{
+				if (currentPage == activePageNumber) {
+					sbPages.append("<div class='page-number page-selected'>" + visiblePageNo + "</div>");
+				} else {
+					sbPages.append("<a class='page-number' href='" + hrefPage + "'>" + visiblePageNo + "</a>");
+				}
+			}
+			sbPages.append("</td>");
+
+			/*
+			 * Next page
+			 */
+			if (currentPage == activePageNumber + 1) {
+				sbNext.append("<a class='page-number' href='" + hrefPage + "'>></a>");
+			}
+		}
+
+		sbNext.append("</td>");
+		sbPrevious.append("</td>");
+
+		/*
+		 * first page
+		 */
+		sbFirst.append("<td>");
+		{
+			if (firstPage > 0) {
+				final String hrefPage = HTTP_DUMMY + HREF_NAVIGATE_PAGE + 0;
+				sbFirst.append("<a class='page-number' href='" + hrefPage + "'>1</a>");
+			}
+		}
+		sbFirst.append("</td>");
+		if (firstPage > 0) {
+			sbFirst.append("<td>..</td>");
+		}
+
+		/*
+		 * last page
+		 */
+		if (lastPage < maxPage - 0) {
+			sbLast.append("<td>..</td>");
+		}
+		sbLast.append("<td>");
+		{
+			if (lastPage < maxPage) {
+				final String hrefPage = HTTP_DUMMY + HREF_NAVIGATE_PAGE + (maxPage - 1);
+				sbLast.append("<a class='page-number' href='" + hrefPage + "'>" + maxPage + "</a>");
+			}
+		}
+		sbLast.append("</td>");
+
+		/*
+		 * put all together
+		 */
 		sb.append("<div class='page-navigator'>"); //$NON-NLS-1$
 		{
 			sb.append("<table><tbody><tr>");
 			{
-				for (int currentPage = firstPage; currentPage < lastPage; currentPage++) {
-
-					sb.append("<td>");
-					if (currentPage == activePageNumber) {
-						sb.append((currentPage + 1));
-					} else {
-						sb.append("<a href=''>" + (currentPage + 1) + "</a>");
-					}
-					sb.append("</td>");
-				}
+				sb.append(sbPrevious);
+				sb.append(sbFirst);
+				sb.append(sbPages);
+				sb.append(sbLast);
+				sb.append(sbNext);
 			}
 			sb.append("</tr></tbody></table>");
 		}
@@ -639,13 +863,14 @@ public class SearchView extends ViewPart {
 				@Override
 				public void proposalAccepted(final IContentProposal proposal) {
 
-					System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
-							+ ("\tContent: " + proposal.getContent())
-							+ ("\tLabel: " + proposal.getLabel())
-							+ ("\tCursorPosition: " + proposal.getCursorPosition())
-					//
-							);
-					// TODO remove SYSTEM.OUT.PRINTLN
+//					System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
+//							+ ("\tContent: " + proposal.getContent())
+//							+ ("\tLabel: " + proposal.getLabel())
+//							+ ("\tCursorPosition: " + proposal.getCursorPosition())
+//					//
+//							);
+//					// TODO remove SYSTEM.OUT.PRINTLN
+
 					onSearchSelect(0);
 				}
 			});
@@ -762,13 +987,92 @@ public class SearchView extends ViewPart {
 	}
 
 	private void onBrowserCompleted(final ProgressEvent event) {
-		// TODO Auto-generated method stub
 
 	}
 
 	private void onBrowserLocationChanging(final LocationEvent event) {
-		// TODO Auto-generated method stub
 
+		final String location = event.location;
+		final String[] locationParts = location.split(HREF_TOKEN);
+
+//		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
+//				+ ("\tlocation:" + location)
+//				+ ("\t" + Arrays.toString(locationParts)));
+//		// TODO remove SYSTEM.OUT.PRINTLN
+
+		if (locationParts.length >= 3) {
+
+			final String partValue3 = locationParts[2];
+
+			switch (locationParts[1]) {
+			case ACTION_SELECT_MARKER:
+
+				// get tour by id
+				final Long markerTourId = Long.parseLong(locationParts[3]);
+				final TourData tourData = TourManager.getTour(markerTourId);
+				if (tourData == null) {
+					return;
+				}
+
+				final long selectedMarkerId = Long.parseLong(partValue3);
+				final ArrayList<TourMarker> selectedTourMarkers = new ArrayList<TourMarker>();
+
+				// get marker by id
+				for (final TourMarker tourMarker : tourData.getTourMarkers()) {
+					if (tourMarker.getMarkerId() == selectedMarkerId) {
+						selectedTourMarkers.add(tourMarker);
+						break;
+					}
+				}
+
+				final SelectionTourMarker markerSelection = new SelectionTourMarker(tourData, selectedTourMarkers);
+
+				// ensure that the selection provider do not contain the wrong data
+				_postSelectionProvider.setSelectionNoFireEvent(markerSelection);
+
+				TourManager.fireEvent(//
+						TourEventId.MARKER_SELECTION,
+						markerSelection,
+						getSite().getPart());
+
+				break;
+
+			case ACTION_SELECT_TOUR:
+
+				final Long tourId = Long.parseLong(partValue3);
+				final SelectionTourId tourSelection = new SelectionTourId(tourId);
+
+				_postSelectionProvider.setSelection(tourSelection);
+
+				break;
+
+			case ACTION_NAVIGATE_PAGE:
+
+				// navigate to another page
+
+				_browser.getDisplay().asyncExec(new Runnable() {
+					public void run() {
+
+						final int pageNumber = Integer.parseInt(partValue3);
+
+						onSearchSelect(pageNumber);
+					}
+				});
+
+				break;
+
+			default:
+				break;
+			}
+
+		}
+
+		if (location.equals(PAGE_ABOUT_BLANK) == false) {
+
+			// about:blank is the initial page
+
+			event.doit = false;
+		}
 	}
 
 	/**
@@ -811,8 +1115,7 @@ public class SearchView extends ViewPart {
 
 	/**
 	 * @param pageNumber
-	 *            When <code>0</code> a new or repeated search is started, otherwise the selected
-	 *            page should be displayed.
+	 *            <code>0</code> is the first page number.
 	 */
 	private void onSearchSelect(final int pageNumber) {
 
@@ -877,8 +1180,23 @@ public class SearchView extends ViewPart {
 	private void restoreState_Options() {
 
 		_hitsPerPage = Util.getStateInt(_state, STATE_HITS_PER_PAGE, STATE_HITS_PER_PAGE_DEFAULT);
+		_numberOfPages = Util.getStateInt(_state, STATE_NUMBER_OF_PAGES, STATE_NUMBER_OF_PAGES_DEFAULT);
 
-		_isShowDateTime = Util.getStateBoolean(_state, STATE_IS_SHOW_DATE_TIME, STATE_IS_SHOW_DATE_TIME_DEFAULT);
+		_isShowDateTime = Util.getStateBoolean(_state, //
+				STATE_IS_SHOW_DATE_TIME,
+				STATE_IS_SHOW_DATE_TIME_DEFAULT);
+
+		_isShowItemNumber = Util.getStateBoolean(_state, //
+				STATE_IS_SHOW_ITEM_NUMBER,
+				STATE_IS_SHOW_ITEM_NUMBER_DEFAULT);
+
+		_isShowScore = Util.getStateBoolean(_state, //
+				STATE_IS_SHOW_SCORE,
+				STATE_IS_SHOW_SCORE_DEFAULT);
+
+		_isShowTopNavigator = Util.getStateBoolean(_state,//
+				STATE_IS_SHOW_TOP_NAVIGATOR,
+				STATE_IS_SHOW_TOP_NAVIGATOR_DEFAULT);
 	}
 
 	private void saveState() {
@@ -909,22 +1227,17 @@ public class SearchView extends ViewPart {
 	 */
 	private void updateUI(final SearchResult searchResult, final String statusText) {
 
-		final StringBuilder state = new StringBuilder();
+		final StringBuilder stateText = new StringBuilder();
 
 		if (statusText != null) {
-			appendState(state, statusText);
+			appendState(stateText, statusText);
 		}
 
 		if (searchResult != null) {
-			appendState(state, String.format("%d results - %d ms", searchResult.totalHits, _searchTime));
+			appendState(stateText, String.format("%d results - %d ms", searchResult.totalHits, _searchTime));
 		}
 
-		final String html = "" // //$NON-NLS-1$
-				+ "<!DOCTYPE html>\n" // ensure that IE is using the newest version and not the quirk mode //$NON-NLS-1$
-				+ "<html>\n" //$NON-NLS-1$
-				+ ("<head>\n" + createHTML_10_Head() + "\n</head>\n") //$NON-NLS-1$ //$NON-NLS-2$
-				+ ("<body>\n" + createHTML_20_Body(searchResult, state.toString()) + "\n</body>\n") //$NON-NLS-1$ //$NON-NLS-2$
-				+ "</html>"; //$NON-NLS-1$
+		final String html = createHTML(searchResult, stateText);
 
 		_browser.setRedraw(true);
 		_browser.setText(html);
