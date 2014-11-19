@@ -647,6 +647,8 @@ public class Messages extends NLS {
 	public static String		Image__edit_tour_marker_new;
 	public static String		Image__edit_tour_marker_new_disabled;
 	public static String		Image__expand_all;
+
+	public static String		Image__Eye;
 	public static String		Image__graph_altimeter;
 	public static String		Image__graph_altitude;
 	public static String		Image__graph_cadence;
@@ -696,6 +698,8 @@ public class Messages extends NLS {
 	public static String		Image__RawData_Import;
 	public static String		Image__RawData_Transfer;
 	public static String		Image__RawData_TransferDirect;
+
+	public static String		Image__Remove;
 	public static String		Image__refresh;
 	public static String		Image__remove_all;
 	public static String		Image__remove_all_disabled;
@@ -1173,9 +1177,8 @@ public class Messages extends NLS {
 
 	public static String		Search_Manager_CreateFTIndex;
 
-	public static String		Search_Result_Link_NoResultAvailable;
-
-	public static String		Search_View_Label_NoSearch;
+	public static String		Search_View_Action_EditMarker_Tooltip;
+	public static String		Search_View_Action_EditTour_Tooltip;
 
 	public static String		Slideout_ChartMarkerOptions_Checkbox_IsShowHiddenMarker;
 	public static String		Slideout_ChartMarkerOptions_Checkbox_IsShowMarker;
@@ -1202,6 +1205,8 @@ public class Messages extends NLS {
 //	public static String		Slideout_ChartMarkerOptions_Label_SignImageSize_Tooltip;
 
 	public static String		Slideout_SearchViewOptions_Checkbox_IsShowDateTime;
+
+	public static String	Slideout_SearchViewOptions_Checkbox_IsShowDocId;
 	public static String		Slideout_SearchViewOptions_Checkbox_IsShowItemNumber;
 	public static String		Slideout_SearchViewOptions_Checkbox_IsShowScore;
 	public static String		Slideout_SearchViewOptions_Checkbox_IsShowTopNavigator;

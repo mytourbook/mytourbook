@@ -86,6 +86,7 @@ public class SlideoutSearchOptions extends AnimatedToolTipShell implements IColo
 
 	private Button					_chkShowDateTime;
 	private Button					_chkShowItemNumber;
+	private Button					_chkShowLuceneDocId;
 	private Button					_chkShowScore;
 	private Button					_chkTopNavigator;
 
@@ -239,6 +240,18 @@ public class SlideoutSearchOptions extends AnimatedToolTipShell implements IColo
 						.applyTo(_chkShowItemNumber);
 				_chkShowItemNumber.setText(Messages.Slideout_SearchViewOptions_Checkbox_IsShowItemNumber);
 				_chkShowItemNumber.addSelectionListener(_defaultSelectionAdapter);
+			}
+
+			/*
+			 * Show lucene doc id
+			 */
+			{
+				_chkShowLuceneDocId = new Button(group, SWT.CHECK);
+				GridDataFactory.fillDefaults()//
+						.span(2, 1)
+						.applyTo(_chkShowLuceneDocId);
+				_chkShowLuceneDocId.setText(Messages.Slideout_SearchViewOptions_Checkbox_IsShowDocId);
+				_chkShowLuceneDocId.addSelectionListener(_defaultSelectionAdapter);
 			}
 
 			/*
@@ -417,6 +430,11 @@ public class SlideoutSearchOptions extends AnimatedToolTipShell implements IColo
 				SearchView.STATE_IS_SHOW_DATE_TIME,
 				SearchView.STATE_IS_SHOW_DATE_TIME_DEFAULT));
 
+		_chkShowLuceneDocId.setSelection(Util.getStateBoolean(
+				_state,
+				SearchView.STATE_IS_SHOW_LUCENE_DOC_ID,
+				SearchView.STATE_IS_SHOW_LUCENE_DOC_ID_DEFAULT));
+
 		_chkShowItemNumber.setSelection(Util.getStateBoolean(
 				_state,
 				SearchView.STATE_IS_SHOW_ITEM_NUMBER,
@@ -447,6 +465,7 @@ public class SlideoutSearchOptions extends AnimatedToolTipShell implements IColo
 
 		_state.put(SearchView.STATE_IS_SHOW_DATE_TIME, _chkShowDateTime.getSelection());
 		_state.put(SearchView.STATE_IS_SHOW_ITEM_NUMBER, _chkShowItemNumber.getSelection());
+		_state.put(SearchView.STATE_IS_SHOW_LUCENE_DOC_ID, _chkShowLuceneDocId.getSelection());
 		_state.put(SearchView.STATE_IS_SHOW_SCORE, _chkShowScore.getSelection());
 		_state.put(SearchView.STATE_IS_SHOW_TOP_NAVIGATOR, _chkTopNavigator.getSelection());
 		_state.put(SearchView.STATE_HITS_PER_PAGE, _spinnerDisplayedResults.getSelection());
@@ -457,6 +476,7 @@ public class SlideoutSearchOptions extends AnimatedToolTipShell implements IColo
 
 		_state.put(SearchView.STATE_IS_SHOW_DATE_TIME, SearchView.STATE_IS_SHOW_DATE_TIME_DEFAULT);
 		_state.put(SearchView.STATE_IS_SHOW_ITEM_NUMBER, SearchView.STATE_IS_SHOW_ITEM_NUMBER_DEFAULT);
+		_state.put(SearchView.STATE_IS_SHOW_LUCENE_DOC_ID, SearchView.STATE_IS_SHOW_LUCENE_DOC_ID_DEFAULT);
 		_state.put(SearchView.STATE_IS_SHOW_SCORE, SearchView.STATE_IS_SHOW_SCORE_DEFAULT);
 		_state.put(SearchView.STATE_IS_SHOW_TOP_NAVIGATOR, SearchView.STATE_IS_SHOW_TOP_NAVIGATOR_DEFAULT);
 		_state.put(SearchView.STATE_HITS_PER_PAGE, SearchView.STATE_HITS_PER_PAGE_DEFAULT);

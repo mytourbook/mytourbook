@@ -803,8 +803,8 @@ public class TourBlogView extends ViewPart {
 			/*
 			 * load css from file
 			 */
-			URL bundleUrl = TourbookPlugin.getDefault().getBundle().getEntry("/html/tour-blog.css"); //$NON-NLS-1$
-			URL fileUrl = FileLocator.toFileURL(bundleUrl);
+			final URL bundleUrl = TourbookPlugin.getDefault().getBundle().getEntry("/html/tour-blog.css"); //$NON-NLS-1$
+			final URL fileUrl = FileLocator.toFileURL(bundleUrl);
 			final URI fileUri = fileUrl.toURI();
 			final File file = new File(fileUri);
 
@@ -815,17 +815,9 @@ public class TourBlogView extends ViewPart {
 			/*
 			 * set image urls
 			 */
-			bundleUrl = TourbookPlugin.getDefault().getBundle().getEntry("/icons/quick-edit.gif"); //$NON-NLS-1$
-			fileUrl = FileLocator.toFileURL(bundleUrl);
-			_actionEditImageUrl = fileUrl.toExternalForm();
-
-			bundleUrl = TourbookPlugin.getDefault().getBundle().getEntry("/icons/remove.png"); //$NON-NLS-1$
-			fileUrl = FileLocator.toFileURL(bundleUrl);
-			_actionHideMarkerUrl = fileUrl.toExternalForm();
-
-			bundleUrl = TourbookPlugin.getDefault().getBundle().getEntry("/icons/eye.png"); //$NON-NLS-1$
-			fileUrl = FileLocator.toFileURL(bundleUrl);
-			_actionShowMarkerUrl = fileUrl.toExternalForm();
+			_actionEditImageUrl = net.tourbook.ui.UI.getIconUrl(Messages.Image__quick_edit);
+			_actionHideMarkerUrl = net.tourbook.ui.UI.getIconUrl(Messages.Image__Remove);
+			_actionShowMarkerUrl = net.tourbook.ui.UI.getIconUrl(Messages.Image__Eye);
 
 		} catch (final IOException | URISyntaxException e) {
 			StatusUtil.showStatus(e);

@@ -13,7 +13,7 @@ body
 	font-size:				13px;
 	color:					#444;
 	background-color:		#fff;
-	margin:					5px;
+	margin:					0px;
 }
 
 p,td,ul 
@@ -34,7 +34,8 @@ img
 table
 {
 	border-collapse:		collapse;
-	xborder:					1px solid;
+	
+	xborder:				1px solid; /* debug table */
 }
 
 body,p,h1,h2,h3,h4,table,td,th,ul,ol,textarea,input 
@@ -46,6 +47,92 @@ a /* an <a> covers the whole item */
 {
 	text-decoration:		none;
 	color:					#444;
+}
+
+
+/*
+	Hover container
+*/
+
+.hover-container 
+{
+	clear: 					both;		/* start new item */
+	padding:				2px 0 2px 0;
+	margin-bottom:			1px;
+}
+
+.hover-container:HOVER
+{
+	background-color: 		#f8f8f8;
+}
+
+/* show hidden actions when search item is hovered */
+.hover-container:HOVER .action-container
+{												
+	opacity:				1.0;
+	filter: 				alpha(opacity=100); 	/* IE needs this even in html standard mode*/
+}
+
+.hover-container .action-container a:HOVER 
+{ 
+	border: 				1px solid #aaa;
+	border-radius:			3px;
+}
+
+.hover-container.selected,
+.hover-container.selected .action-container 
+{
+	background-color: 		#eee;
+}
+.hover-container.selected:HOVER,
+.hover-container.selected:HOVER .action-container 
+{
+	background-color: 		#ddd;
+}
+
+.hover-container.selected:HOVER .action
+{
+	/* hide border */
+	border:					1px solid #ddd;
+}
+
+.hover-container.selected .action:HOVER
+{
+	/* show border */
+	border:					1px solid #888;
+}
+
+/*
+	Actions
+*/
+.action-container 
+{
+	opacity:				0;
+	filter: 				alpha(opacity=0);
+
+	background-color: 		#f8f8f8;
+	position:				absolute;
+	right:					0px;					/* search item margin */
+	z-index:				10;
+	padding:				0 0 5px 5px;
+}
+
+a.action:LINK,
+a.action:VISITED 
+{
+	display:				block;
+	width: 					20px; 
+	height: 				20px; 
+
+	text-decoration:		none;
+	
+	background-repeat:		no-repeat;
+	background-position:	center;
+
+	border:					1px solid #f8f8f8;
+	border-radius:			3px;
+
+	cursor: 				pointer; 
 }
 
 /*
@@ -85,19 +172,13 @@ a.page-number:HOVER
 }
 
 /*
-	Result item
+	Item
 */
-.result-item
-{
-	padding-bottom: 		5px;
-	clear: 					both;		/* start new item */
-}
-
 .item-image 
 {
 	vertical-align:			top;
+	padding-left:			5px;
 	padding-right:			10px;
-	xpadding-top:			-3px;
 }
 
 a.item:LINK,
@@ -115,6 +196,12 @@ a.item:VISITED
 	text-decoration: 		underline;
 }
 
+.item-title-no-description
+{
+	/* hide underline when only the title is available but not a description */
+	text-decoration: 		none;
+}
+
 .item-info
 {
 	font-size:				80%;
@@ -124,65 +211,5 @@ a.item:VISITED
 .item-info td
 {
 	padding-right:			20px;
-}
-
-/*
-	Hover container
-*/
-
-.hover-container 
-{
-	padding:				3px;
-}
-
-/* show hidden actions when search item is hovered */
-.hover-container:HOVER .action-container
-{												
-	opacity:				1.0;
-	filter: 				alpha(opacity=100); 	/* IE needs this even in html standard mode*/
-}
-
-.hover-container:HOVER 
-{
-	background-color: 		#f8f8f8;
-	xbackground-color: 		#ddd;
-}
-
-.hover-container .action-container a:HOVER 
-{ 
-	border: 				1px solid #aaa;
-	border-radius:			3px;
-}
-
-/*
-	Actions
-*/
-.action-container 
-{
-	opacity:				0;
-	filter: 				alpha(opacity=0);
-
-	background-color: 		#f8f8f8;
-	position:				absolute;
-	right:					5px;					/* search item margin */
-	z-index:				10;
-}
-
-a.action:LINK,
-a.action:VISITED 
-{
-	display:				block;
-	width: 					20px; 
-	height: 				20px; 
-
-	text-decoration:		none;
-	
-	background-repeat:		no-repeat;
-	background-position:	center;
-
-	border:					1px solid #f8f8f8;
-	border-radius:			3px;
-
-	cursor: 				pointer; 
 }
 

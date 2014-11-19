@@ -22,6 +22,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -413,7 +414,8 @@ public class MTSearchManager {
 			//
 			};
 
-			final int[] maxPassages = { 2, 2, 2 };
+			final int maxPassages[] = new int[queryFields.length];
+			Arrays.fill(maxPassages, 1);
 
 			setupIndexReader();
 			final Analyzer analyzer = getAnalyzer();
