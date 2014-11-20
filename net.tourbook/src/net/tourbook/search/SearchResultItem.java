@@ -17,16 +17,16 @@ package net.tourbook.search;
 
 public class SearchResultItem {
 
-	String	description;
+	int		docSource;
 
 	String	markerId;
-	String	markerLabel;
-
 	String	tourId;
-	String	tourTitle;
+
+	String	title;
+	String	description;
 	long	tourStartTime;
 
-	float	score;
+//	float	score;
 
 	/**
 	 * Lucene doc id.
@@ -39,10 +39,10 @@ public class SearchResultItem {
 				+ ("tourId=" + tourId + ", ")
 				+ ("markerId=" + markerId + ", ")
 				+ ("tourStartTime=" + tourStartTime + ", ")
-				+ ("markerLabel=" + markerLabel + ", ")
-				+ ("tourTitle=" + tourTitle + ", ")
+//				+ ("markerLabel=" + markerLabel + ", ")
+				+ ("tourTitle=" + title + ", ")
 				+ ("description=" + description + ", ")
-				+ ("score=" + score)
+//				+ ("score=" + score)
 				+ "]";
 	}
 

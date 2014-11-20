@@ -20,12 +20,19 @@ import net.tourbook.common.util.Util;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.ui.IViewPart;
 
-public class ActionHandlerOpenViewSearchResultView extends AbstractHandler {
+public class ActionHandlerOpenSearchView extends AbstractHandler {
 
 	public Object execute(final ExecutionEvent event) throws ExecutionException {
 
-		Util.showView(SearchView.ID, true);
+		final IViewPart part = Util.showView(SearchView.ID, true);
+
+		if (part instanceof SearchView) {
+
+			final SearchView searchView = (SearchView) part;
+			searchView.actionOpenSearchView();
+		}
 
 		return null;
 	}

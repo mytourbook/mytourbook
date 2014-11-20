@@ -25,12 +25,14 @@ public class SearchResult {
 //	final TreeMap<String, SearchResultItem>	items	= new TreeMap<String, SearchResultItem>();
 	final ArrayList<SearchResultItem>	items	= new ArrayList<SearchResultItem>();
 
-	int										totalHits;
+	int									totalHits;
 
 	/**
 	 * First page is <code>0</code>.
 	 */
-	int										pageNumber;
+	int									pageNumber;
 
-	int										hitsPerPage;
+	int									hitsPerPage;
+
+	String								error;
 }

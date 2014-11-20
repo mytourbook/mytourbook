@@ -193,7 +193,7 @@ public class TourDatabase {
 	private static final String						ENTITY_ID_TAG_CATEGORY						= "TagCategoryID";							//$NON-NLS-1$
 	public static final String						ENTITY_ID_TOUR								= "TourID";								//$NON-NLS-1$
 	private static final String						ENTITY_ID_TYPE								= "TypeID";								//$NON-NLS-1$
-	private static final String						ENTITY_ID_WAY_POINT							= "WayPointID";							//$NON-NLS-1$
+	public static final String						ENTITY_ID_WAY_POINT							= "WayPointID";							//$NON-NLS-1$
 	//
 	private static final String						KEY_BIKE									= TABLE_TOUR_BIKE
 																										+ "_" + ENTITY_ID_BIKE;			//$NON-NLS-1$

@@ -61,17 +61,17 @@ public class SlideoutSearchOptions extends AnimatedToolTipShell implements IColo
 
 	private SearchView				_searchView;
 
-	private SelectionAdapter		_defaultSelectionAdapter;
-	private SelectionAdapter		_selectionAdapterWithNewSearch;
+	private SelectionAdapter		_selectionAdapter_Default;
+	private SelectionAdapter		_selectionAdapter_WithNewSearch;
 	{
-		_defaultSelectionAdapter = new SelectionAdapter() {
+		_selectionAdapter_Default = new SelectionAdapter() {
 			@Override
 			public void widgetSelected(final SelectionEvent e) {
 				onChangeUI(false);
 			}
 		};
 
-		_selectionAdapterWithNewSearch = new SelectionAdapter() {
+		_selectionAdapter_WithNewSearch = new SelectionAdapter() {
 			@Override
 			public void widgetSelected(final SelectionEvent e) {
 				onChangeUI(true);
@@ -87,8 +87,11 @@ public class SlideoutSearchOptions extends AnimatedToolTipShell implements IColo
 	private Button					_chkShowDateTime;
 	private Button					_chkShowItemNumber;
 	private Button					_chkShowLuceneDocId;
-	private Button					_chkShowScore;
+//	private Button					_chkShowScore;
 	private Button					_chkTopNavigator;
+
+	private Button					_rdoTimeAscending;
+	private Button					_rdoTimeDescending;
 
 	private Spinner					_spinnerDisplayedResults;
 	private Spinner					_spinnerNumberOfPages;
@@ -189,8 +192,9 @@ public class SlideoutSearchOptions extends AnimatedToolTipShell implements IColo
 			GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
 			GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
 			{
-				createUI_10_ResultItems(container);
-				createUI_20_PageNavigator(container);
+				createUI_10_Sorting(container);
+				createUI_50_ResultItems(container);
+				createUI_90_PageNavigator(container);
 			}
 
 			createUI_99_RestoreDefaults(_shellContainer);
@@ -199,7 +203,36 @@ public class SlideoutSearchOptions extends AnimatedToolTipShell implements IColo
 		return _shellContainer;
 	}
 
-	private void createUI_10_ResultItems(final Composite parent) {
+	private void createUI_10_Sorting(final Composite parent) {
+
+		final Group group = new Group(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().span(2, 1).applyTo(group);
+		GridLayoutFactory.swtDefaults().numColumns(4).applyTo(group);
+		group.setText(Messages.Slideout_SearchViewOptions_Group_Sorting);
+		{
+			/*
+			 * Sort by date/time
+			 */
+			{
+				Label label = new Label(group, SWT.NONE);
+				label.setText(Messages.Slideout_SearchViewOptions_Label_SortByDate);
+
+				// spacer - NEEDS A BETTER SOLUTION WHEN SORTING WITH MULTIPLE FIELDS
+				label = new Label(group, SWT.NONE);
+				GridDataFactory.fillDefaults().indent(20, 0).applyTo(label);
+
+				_rdoTimeAscending = new Button(group, SWT.RADIO);
+				_rdoTimeAscending.setText(Messages.Slideout_SearchViewOptions_Label_SortAscending);
+				_rdoTimeAscending.addSelectionListener(_selectionAdapter_WithNewSearch);
+
+				_rdoTimeDescending = new Button(group, SWT.RADIO);
+				_rdoTimeDescending.setText(Messages.Slideout_SearchViewOptions_Label_SortDescending);
+				_rdoTimeDescending.addSelectionListener(_selectionAdapter_WithNewSearch);
+			}
+		}
+	}
+
+	private void createUI_50_ResultItems(final Composite parent) {
 
 		final Group group = new Group(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().span(2, 1).applyTo(group);
@@ -215,20 +248,20 @@ public class SlideoutSearchOptions extends AnimatedToolTipShell implements IColo
 						.span(2, 1)
 						.applyTo(_chkShowDateTime);
 				_chkShowDateTime.setText(Messages.Slideout_SearchViewOptions_Checkbox_IsShowDateTime);
-				_chkShowDateTime.addSelectionListener(_defaultSelectionAdapter);
+				_chkShowDateTime.addSelectionListener(_selectionAdapter_Default);
 			}
 
 			/*
 			 * Show score
 			 */
-			{
-				_chkShowScore = new Button(group, SWT.CHECK);
-				GridDataFactory.fillDefaults()//
-						.span(2, 1)
-						.applyTo(_chkShowScore);
-				_chkShowScore.setText(Messages.Slideout_SearchViewOptions_Checkbox_IsShowScore);
-				_chkShowScore.addSelectionListener(_defaultSelectionAdapter);
-			}
+//			{
+//				_chkShowScore = new Button(group, SWT.CHECK);
+//				GridDataFactory.fillDefaults()//
+//						.span(2, 1)
+//						.applyTo(_chkShowScore);
+//				_chkShowScore.setText(Messages.Slideout_SearchViewOptions_Checkbox_IsShowScore);
+//				_chkShowScore.addSelectionListener(_selectionAdapter_Default);
+//			}
 
 			/*
 			 * Show item number
@@ -239,7 +272,7 @@ public class SlideoutSearchOptions extends AnimatedToolTipShell implements IColo
 						.span(2, 1)
 						.applyTo(_chkShowItemNumber);
 				_chkShowItemNumber.setText(Messages.Slideout_SearchViewOptions_Checkbox_IsShowItemNumber);
-				_chkShowItemNumber.addSelectionListener(_defaultSelectionAdapter);
+				_chkShowItemNumber.addSelectionListener(_selectionAdapter_Default);
 			}
 
 			/*
@@ -251,7 +284,7 @@ public class SlideoutSearchOptions extends AnimatedToolTipShell implements IColo
 						.span(2, 1)
 						.applyTo(_chkShowLuceneDocId);
 				_chkShowLuceneDocId.setText(Messages.Slideout_SearchViewOptions_Checkbox_IsShowDocId);
-				_chkShowLuceneDocId.addSelectionListener(_defaultSelectionAdapter);
+				_chkShowLuceneDocId.addSelectionListener(_selectionAdapter_Default);
 			}
 
 			/*
@@ -275,12 +308,12 @@ public class SlideoutSearchOptions extends AnimatedToolTipShell implements IColo
 						onChangeUI(true);
 					}
 				});
-				_spinnerDisplayedResults.addSelectionListener(_selectionAdapterWithNewSearch);
+				_spinnerDisplayedResults.addSelectionListener(_selectionAdapter_WithNewSearch);
 			}
 		}
 	}
 
-	private void createUI_20_PageNavigator(final Composite parent) {
+	private void createUI_90_PageNavigator(final Composite parent) {
 
 		final Group group = new Group(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().span(2, 1).applyTo(group);
@@ -296,7 +329,7 @@ public class SlideoutSearchOptions extends AnimatedToolTipShell implements IColo
 						.span(2, 1)
 						.applyTo(_chkTopNavigator);
 				_chkTopNavigator.setText(Messages.Slideout_SearchViewOptions_Checkbox_IsShowTopNavigator);
-				_chkTopNavigator.addSelectionListener(_defaultSelectionAdapter);
+				_chkTopNavigator.addSelectionListener(_selectionAdapter_Default);
 			}
 
 			/*
@@ -320,7 +353,7 @@ public class SlideoutSearchOptions extends AnimatedToolTipShell implements IColo
 						onChangeUI(true);
 					}
 				});
-				_spinnerNumberOfPages.addSelectionListener(_selectionAdapterWithNewSearch);
+				_spinnerNumberOfPages.addSelectionListener(_selectionAdapter_WithNewSearch);
 			}
 		}
 	}
@@ -440,15 +473,23 @@ public class SlideoutSearchOptions extends AnimatedToolTipShell implements IColo
 				SearchView.STATE_IS_SHOW_ITEM_NUMBER,
 				SearchView.STATE_IS_SHOW_ITEM_NUMBER_DEFAULT));
 
-		_chkShowScore.setSelection(Util.getStateBoolean(
-				_state,
-				SearchView.STATE_IS_SHOW_SCORE,
-				SearchView.STATE_IS_SHOW_SCORE_DEFAULT));
+//		_chkShowScore.setSelection(Util.getStateBoolean(
+//				_state,
+//				SearchView.STATE_IS_SHOW_SCORE,
+//				SearchView.STATE_IS_SHOW_SCORE_DEFAULT));
 
 		_chkTopNavigator.setSelection(Util.getStateBoolean(
 				_state,
 				SearchView.STATE_IS_SHOW_TOP_NAVIGATOR,
 				SearchView.STATE_IS_SHOW_TOP_NAVIGATOR_DEFAULT));
+
+		// sort by date
+		final boolean isSortDateAscending = Util.getStateBoolean(
+				_state,
+				SearchView.STATE_IS_SORT_DATE_ASCENDING,
+				SearchView.STATE_IS_SORT_DATE_ASCENDING_DEFAULT);
+		_rdoTimeAscending.setSelection(isSortDateAscending);
+		_rdoTimeDescending.setSelection(isSortDateAscending == false);
 
 		_spinnerDisplayedResults.setSelection(Util.getStateInt(
 				_state,
@@ -466,8 +507,9 @@ public class SlideoutSearchOptions extends AnimatedToolTipShell implements IColo
 		_state.put(SearchView.STATE_IS_SHOW_DATE_TIME, _chkShowDateTime.getSelection());
 		_state.put(SearchView.STATE_IS_SHOW_ITEM_NUMBER, _chkShowItemNumber.getSelection());
 		_state.put(SearchView.STATE_IS_SHOW_LUCENE_DOC_ID, _chkShowLuceneDocId.getSelection());
-		_state.put(SearchView.STATE_IS_SHOW_SCORE, _chkShowScore.getSelection());
+//		_state.put(SearchView.STATE_IS_SHOW_SCORE, _chkShowScore.getSelection());
 		_state.put(SearchView.STATE_IS_SHOW_TOP_NAVIGATOR, _chkTopNavigator.getSelection());
+		_state.put(SearchView.STATE_IS_SORT_DATE_ASCENDING, _rdoTimeAscending.getSelection());
 		_state.put(SearchView.STATE_HITS_PER_PAGE, _spinnerDisplayedResults.getSelection());
 		_state.put(SearchView.STATE_NUMBER_OF_PAGES, _spinnerNumberOfPages.getSelection());
 	}
@@ -477,8 +519,9 @@ public class SlideoutSearchOptions extends AnimatedToolTipShell implements IColo
 		_state.put(SearchView.STATE_IS_SHOW_DATE_TIME, SearchView.STATE_IS_SHOW_DATE_TIME_DEFAULT);
 		_state.put(SearchView.STATE_IS_SHOW_ITEM_NUMBER, SearchView.STATE_IS_SHOW_ITEM_NUMBER_DEFAULT);
 		_state.put(SearchView.STATE_IS_SHOW_LUCENE_DOC_ID, SearchView.STATE_IS_SHOW_LUCENE_DOC_ID_DEFAULT);
-		_state.put(SearchView.STATE_IS_SHOW_SCORE, SearchView.STATE_IS_SHOW_SCORE_DEFAULT);
+//		_state.put(SearchView.STATE_IS_SHOW_SCORE, SearchView.STATE_IS_SHOW_SCORE_DEFAULT);
 		_state.put(SearchView.STATE_IS_SHOW_TOP_NAVIGATOR, SearchView.STATE_IS_SHOW_TOP_NAVIGATOR_DEFAULT);
+		_state.put(SearchView.STATE_IS_SORT_DATE_ASCENDING, SearchView.STATE_IS_SORT_DATE_ASCENDING_DEFAULT);
 		_state.put(SearchView.STATE_HITS_PER_PAGE, SearchView.STATE_HITS_PER_PAGE_DEFAULT);
 		_state.put(SearchView.STATE_NUMBER_OF_PAGES, SearchView.STATE_NUMBER_OF_PAGES_DEFAULT);
 

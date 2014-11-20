@@ -1885,7 +1885,13 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 
 				final TourWayPoint wp = (TourWayPoint) firstElement;
 
+				final TourData tourData = wp.getTourData();
+
+				paintTours_20_One(tourData, false, true);
+
 				_map.setPOI(_wayPointToolTipProvider, wp);
+
+				enableActions();
 			}
 
 			enableActions();

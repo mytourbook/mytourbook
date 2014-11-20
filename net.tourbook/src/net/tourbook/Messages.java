@@ -1205,15 +1205,17 @@ public class Messages extends NLS {
 //	public static String		Slideout_ChartMarkerOptions_Label_SignImageSize_Tooltip;
 
 	public static String		Slideout_SearchViewOptions_Checkbox_IsShowDateTime;
-
-	public static String	Slideout_SearchViewOptions_Checkbox_IsShowDocId;
+	public static String		Slideout_SearchViewOptions_Checkbox_IsShowDocId;
 	public static String		Slideout_SearchViewOptions_Checkbox_IsShowItemNumber;
-	public static String		Slideout_SearchViewOptions_Checkbox_IsShowScore;
 	public static String		Slideout_SearchViewOptions_Checkbox_IsShowTopNavigator;
 	public static String		Slideout_SearchViewOptions_Group_PageNavigation;
 	public static String		Slideout_SearchViewOptions_Group_Result;
+	public static String		Slideout_SearchViewOptions_Group_Sorting;
 	public static String		Slideout_SearchViewOptions_Label_NumberOfDisplayedResults;
 	public static String		Slideout_SearchViewOptions_Label_NumberOfPages;
+	public static String		Slideout_SearchViewOptions_Label_SortAscending;
+	public static String		Slideout_SearchViewOptions_Label_SortByDate;
+	public static String		Slideout_SearchViewOptions_Label_SortDescending;
 
 	public static String		Slideout_TourMarkerFilter_Checkbox_IsReduceLatLonDigits;
 	public static String		Slideout_TourMarkerFilter_Checkbox_IsReduceLatLonDigits_Tooltip;

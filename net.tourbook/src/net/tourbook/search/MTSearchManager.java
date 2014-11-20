@@ -42,6 +42,7 @@ import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.Field.Store;
 import org.apache.lucene.document.FieldType;
+import org.apache.lucene.document.IntField;
 import org.apache.lucene.document.LongField;
 import org.apache.lucene.document.TextField;
 import org.apache.lucene.index.AtomicReader;
@@ -61,6 +62,9 @@ import org.apache.lucene.queryparser.classic.MultiFieldQueryParser;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
+import org.apache.lucene.search.Sort;
+import org.apache.lucene.search.SortField;
+import org.apache.lucene.search.SortField.Type;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.search.postingshighlight.PostingsHighlighter;
 import org.apache.lucene.search.suggest.Lookup;
@@ -77,27 +81,35 @@ import org.eclipse.swt.widgets.Display;
 
 public class MTSearchManager {
 
-	private static final String				LUCENE_INDEX_FOLDER_NAME		= "lucene-index";
+	private static final String				LUCENE_INDEX_FOLDER_NAME	= "lucene-index";
 
-	private static final String				SEARCH_FIELD_DESCRIPTION		= "description";						//$NON-NLS-1$
-	private static final String				SEARCH_FIELD_MARKER_ID			= "markerID";							//$NON-NLS-1$
-	private static final String				SEARCH_FIELD_TOUR_MARKERLABEL	= "label";								//$NON-NLS-1$
-	private static final String				SEARCH_FIELD_TITLE				= "title";								//$NON-NLS-1$
-	private static final String				SEARCH_FIELD_TOUR_ID			= "tourID";							//$NON-NLS-1$
-	private static final String				SEARCH_FIELD_TOUR_START_TIME	= "time";								//$NON-NLS-1$
+	private static final String				SEARCH_FIELD_DESCRIPTION	= "description";						//$NON-NLS-1$
+	private static final String				SEARCH_FIELD_DOC_SOURCE		= "docSource";							//$NON-NLS-1$
+	private static final String				SEARCH_FIELD_MARKER_ID		= "markerID";							//$NON-NLS-1$
+//	private static final String				SEARCH_FIELD_TOUR_MARKERLABEL	= "label";								//$NON-NLS-1$
+	private static final String				SEARCH_FIELD_TITLE			= "title";								//$NON-NLS-1$
+	private static final String				SEARCH_FIELD_TOUR_ID		= "tourID";							//$NON-NLS-1$
+	private static final String				SEARCH_FIELD_TOUR_TIME		= "time";								//$NON-NLS-1$
 
-	private static final List<LookupResult>	_emptyProposal					= new ArrayList<LookupResult>();
+	static final int						DOC_SOURCE_TOUR				= 1;
+	static final int						DOC_SOURCE_TOUR_MARKER		= 2;
+	static final int						DOC_SOURCE_WAY_POINT		= 3;
+
+	private static final List<LookupResult>	_emptyProposal				= new ArrayList<LookupResult>();
 
 	private static Lookup					_suggester;
 	private static IndexReader				_indexReader;
-	private static ScoreDoc					_afterScoreDoc;
+	private static IndexSearcher			_indexSearcher;
 
 	private static TopDocs					_topDocs;
 	private static String					_topDocsSearchText;
 
+	private static boolean					_isSortDateAscending		= false;
+
 	// configure field with offsets at index time
-	private static final FieldType			_longSearchField				= new FieldType(LongField.TYPE_STORED);
-	private static final FieldType			_textSearchField				= new FieldType(TextField.TYPE_STORED);
+	private static final FieldType			_longSearchField			= new FieldType(LongField.TYPE_STORED);
+	private static final FieldType			_textSearchField			= new FieldType(TextField.TYPE_STORED);
+
 	{
 		_longSearchField.setIndexOptions(IndexOptions.DOCS_AND_FREQS_AND_POSITIONS_AND_OFFSETS);
 		_textSearchField.setIndexOptions(IndexOptions.DOCS_AND_FREQS_AND_POSITIONS_AND_OFFSETS);
@@ -128,12 +140,12 @@ public class MTSearchManager {
 
 		createIndex_TourData(conn, monitor);
 		createIndex_TourMarker(conn, monitor);
+		createIndex_TourWayPoint(conn, monitor);
 	}
 
 	private static void createIndex_TourData(final Connection conn, final IProgressMonitor monitor) throws SQLException {
 
-		final Analyzer analyzer = getAnalyzer();
-		final IndexWriterConfig writerConfig = new IndexWriterConfig(Version.LUCENE_4_10_1, analyzer);
+		final IndexWriterConfig writerConfig = getWriterConfig();
 
 		FSDirectory indexStore = null;
 		IndexWriter indexWriter = null;
@@ -173,15 +185,17 @@ public class MTSearchManager {
 
 			while (rs.next()) {
 
-				final Document doc = new Document();
-
 				final long dbTourId = rs.getLong(1);
 				final String dbTitle = rs.getString(2);
 				final String dbDescription = rs.getString(3);
 				final Long dbTourStartTime = rs.getLong(4);
 
+				final Document doc = new Document();
+
+				doc.add(new IntField(SEARCH_FIELD_DOC_SOURCE, DOC_SOURCE_TOUR, Store.YES));
+
 				doc.add(new LongField(SEARCH_FIELD_TOUR_ID, dbTourId, Store.YES));
-				doc.add(new LongField(SEARCH_FIELD_TOUR_START_TIME, dbTourStartTime, _longSearchField));
+				doc.add(new LongField(SEARCH_FIELD_TOUR_TIME, dbTourStartTime, _longSearchField));
 
 				if (dbTitle != null) {
 					doc.add(new Field(SEARCH_FIELD_TITLE, dbTitle, _textSearchField));
@@ -229,8 +243,7 @@ public class MTSearchManager {
 	private static void createIndex_TourMarker(final Connection conn, final IProgressMonitor monitor)
 			throws SQLException {
 
-		final Analyzer analyzer = getAnalyzer();
-		final IndexWriterConfig writerConfig = new IndexWriterConfig(Version.LUCENE_4_10_1, analyzer);
+		final IndexWriterConfig writerConfig = getWriterConfig();
 
 		FSDirectory indexStore = null;
 		IndexWriter indexWriter = null;
@@ -272,7 +285,107 @@ public class MTSearchManager {
 
 			while (rs.next()) {
 
+				final long dbMarkerId = rs.getLong(1);
+				final long dbTourId = rs.getLong(2);
+				final String dbLabel = rs.getString(3);
+				final String dbDescription = rs.getString(4);
+				final long dbTourTime = rs.getLong(5);
+
 				final Document doc = new Document();
+
+				doc.add(new IntField(SEARCH_FIELD_DOC_SOURCE, DOC_SOURCE_TOUR_MARKER, Store.YES));
+
+				doc.add(new LongField(SEARCH_FIELD_MARKER_ID, dbMarkerId, Store.YES));
+				doc.add(new LongField(SEARCH_FIELD_TOUR_ID, dbTourId, Store.YES));
+				doc.add(new LongField(SEARCH_FIELD_TOUR_TIME, dbTourTime, _longSearchField));
+
+				if (dbLabel != null) {
+					doc.add(new Field(SEARCH_FIELD_TITLE, dbLabel, _textSearchField));
+				}
+
+				if (dbDescription != null) {
+					doc.add(new Field(SEARCH_FIELD_DESCRIPTION, dbDescription, _textSearchField));
+				}
+
+				indexWriter.addDocument(doc);
+
+				createdDocuments++;
+
+				/*
+				 * Update monitor every 1/20 seconds
+				 */
+				final long now = System.currentTimeMillis();
+
+				if (now > lastUpdateTime + 50) {
+					lastUpdateTime = now;
+					monitor.subTask(NLS.bind(Messages.Search_Manager_CreateFTIndex, createdDocuments));
+				}
+			}
+
+		} catch (final IOException e) {
+			StatusUtil.showStatus(e);
+		} finally {
+
+			if (indexWriter != null) {
+				try {
+					indexWriter.close();
+				} catch (final IOException e) {
+					StatusUtil.showStatus(e);
+				}
+			}
+
+			if (indexStore != null) {
+				indexStore.close();
+			}
+
+			Util.closeSql(stmt);
+		}
+	}
+
+	private static void createIndex_TourWayPoint(final Connection conn, final IProgressMonitor monitor)
+			throws SQLException {
+
+		final IndexWriterConfig writerConfig = getWriterConfig();
+
+		FSDirectory indexStore = null;
+		IndexWriter indexWriter = null;
+		PreparedStatement stmt = null;
+
+		try {
+
+			indexStore = openIndex(TourDatabase.TABLE_TOUR_WAYPOINT);
+
+			/*
+			 * Setup index writer
+			 */
+
+			// delete old index and create a new
+			writerConfig.setOpenMode(OpenMode.CREATE);
+
+			indexWriter = new IndexWriter(indexStore, writerConfig);
+
+			/*
+			 * Get sql data
+			 */
+			final String sql = "" // //$NON-NLS-1$
+					//
+					+ "SELECT" //$NON-NLS-1$
+					//
+					+ (" " + TourDatabase.ENTITY_ID_WAY_POINT + ",") //		1 //$NON-NLS-1$
+					+ (TourDatabase.KEY_TOUR + ",") //						2
+					+ " name," //											3 //$NON-NLS-1$
+					+ " description," //									4 //$NON-NLS-1$
+					+ " time" //											5 //$NON-NLS-1$
+					//
+					+ (" FROM " + TourDatabase.TABLE_TOUR_WAYPOINT); //$NON-NLS-1$
+
+			stmt = conn.prepareStatement(sql);
+			final ResultSet rs = stmt.executeQuery();
+
+			int createdDocuments = 0;
+			long lastUpdateTime = System.currentTimeMillis();
+
+			while (rs.next()) {
 
 				final long dbMarkerId = rs.getLong(1);
 				final long dbTourId = rs.getLong(2);
@@ -280,12 +393,19 @@ public class MTSearchManager {
 				final String dbDescription = rs.getString(4);
 				final long dbTourTime = rs.getLong(5);
 
+				final Document doc = new Document();
+
+				doc.add(new IntField(SEARCH_FIELD_DOC_SOURCE, DOC_SOURCE_WAY_POINT, Store.YES));
+
 				doc.add(new LongField(SEARCH_FIELD_MARKER_ID, dbMarkerId, Store.YES));
 				doc.add(new LongField(SEARCH_FIELD_TOUR_ID, dbTourId, Store.YES));
-				doc.add(new LongField(SEARCH_FIELD_TOUR_START_TIME, dbTourTime, _longSearchField));
+
+				if (dbTourTime != 0) {
+					doc.add(new LongField(SEARCH_FIELD_TOUR_TIME, dbTourTime, _longSearchField));
+				}
 
 				if (dbLabel != null) {
-					doc.add(new Field(SEARCH_FIELD_TOUR_MARKERLABEL, dbLabel, _textSearchField));
+					doc.add(new Field(SEARCH_FIELD_TITLE, dbLabel, _textSearchField));
 				}
 
 				if (dbDescription != null) {
@@ -366,6 +486,14 @@ public class MTSearchManager {
 		}
 	}
 
+	private static IndexWriterConfig getWriterConfig() {
+
+		final Analyzer analyzer = getAnalyzer();
+		final IndexWriterConfig writerConfig = new IndexWriterConfig(Version.LUCENE_4_10_1, analyzer);
+
+		return writerConfig;
+	}
+
 	private static FSDirectory openIndex(final String tableName) throws IOException {
 
 		final Path dbPath = new Path(TourDatabase.getDatabasePath());
@@ -410,7 +538,6 @@ public class MTSearchManager {
 					//
 					SEARCH_FIELD_TITLE,
 					SEARCH_FIELD_DESCRIPTION,
-					SEARCH_FIELD_TOUR_MARKERLABEL,
 			//
 			};
 
@@ -418,19 +545,37 @@ public class MTSearchManager {
 			Arrays.fill(maxPassages, 1);
 
 			setupIndexReader();
+
 			final Analyzer analyzer = getAnalyzer();
 
 			final MultiFieldQueryParser queryParser = new MultiFieldQueryParser(queryFields, analyzer);
 			final Query query = queryParser.parse(searchText);
 
-			final IndexSearcher indexSearcher = new IndexSearcher(_indexReader);
-
-			if (_topDocsSearchText == null || _topDocsSearchText.equals(searchText) == false) {
+			if (_topDocsSearchText == null || _topDocsSearchText.equals(searchText) == false || true) {
 
 				// this is a new search
 
-				_topDocs = indexSearcher.search(query, _indexReader.maxDoc());
+				final SortField sortByTime = new SortField(
+						SEARCH_FIELD_TOUR_TIME,
+						Type.LONG,
+						_isSortDateAscending == false);
+//				final SortField sortByScore = SortField.FIELD_SCORE;
+
+//				final Sort sort = new Sort(sortByScore, sortByTime);
+				final Sort sort = new Sort(sortByTime);
+
+				_topDocs = _indexSearcher.search(query, _indexReader.maxDoc(), sort);
+
 				_topDocsSearchText = searchText;
+
+//				SortField sortField[] = { new SortField("cat", SortField.STRING), SortField.FIELD_SCORE };
+//				Sort sort = new Sort(sortField);
+//
+//				Query q = whatever;
+//
+//				TopFieldCollector tfc = TopFieldCollector.create(sort, 1000, true, true, true, true);
+//				searcher.search(q, tfc);
+//				TopDocs td = tfc.topDocs();
 			}
 
 			final ScoreDoc[] scoreDocs = _topDocs.scoreDocs;
@@ -459,7 +604,7 @@ public class MTSearchManager {
 			final Map<String, String[]> highlights = highlighter.highlightFields(
 					queryFields,
 					query,
-					indexSearcher,
+					_indexSearcher,
 					docids,
 					maxPassages);
 
@@ -467,6 +612,7 @@ public class MTSearchManager {
 
 		} catch (final Exception e) {
 			StatusUtil.showStatus(e);
+			searchResult.error = e.getMessage();
 		}
 
 		return searchResult;
@@ -496,7 +642,7 @@ public class MTSearchManager {
 		}
 
 		searchResult.totalHits = topDocs.totalHits;
-		final ScoreDoc[] scoreDocs = topDocs.scoreDocs;
+//		final ScoreDoc[] scoreDocs = topDocs.scoreDocs;
 
 		final Set<Entry<String, String[]>> fields = highlights.entrySet();
 		Entry<String, String[]> firstHit;
@@ -523,9 +669,10 @@ public class MTSearchManager {
 
 		boolean isDocRead = false;
 		final Set<String> fieldsToLoad = new HashSet<String>();
+		fieldsToLoad.add(SEARCH_FIELD_DOC_SOURCE);
 		fieldsToLoad.add(SEARCH_FIELD_TOUR_ID);
 		fieldsToLoad.add(SEARCH_FIELD_MARKER_ID);
-		fieldsToLoad.add(SEARCH_FIELD_TOUR_START_TIME);
+		fieldsToLoad.add(SEARCH_FIELD_TOUR_TIME);
 
 		for (final Entry<String, String[]> field : fields) {
 
@@ -544,11 +691,7 @@ public class MTSearchManager {
 					break;
 
 				case SEARCH_FIELD_TITLE:
-					resultItem.tourTitle = snippet;
-					break;
-
-				case SEARCH_FIELD_TOUR_MARKERLABEL:
-					resultItem.markerLabel = snippet;
+					resultItem.title = snippet;
 					break;
 				}
 
@@ -558,13 +701,17 @@ public class MTSearchManager {
 					final Document doc = multiReader.document(docId, fieldsToLoad);
 
 					resultItem.docId = docId;
-					resultItem.score = scoreDocs[docStartIndex + hitIndex].score;
+//					resultItem.score = scoreDocs[docStartIndex + hitIndex].score;
 
 					for (final IndexableField indexField : doc.getFields()) {
 
 						final String docFieldName = indexField.name();
 
 						switch (docFieldName) {
+						case SEARCH_FIELD_DOC_SOURCE:
+							resultItem.docSource = indexField.numericValue().intValue();
+							break;
+
 						case SEARCH_FIELD_TOUR_ID:
 							resultItem.tourId = indexField.stringValue();
 							break;
@@ -573,8 +720,8 @@ public class MTSearchManager {
 							resultItem.markerId = indexField.stringValue();
 							break;
 
-						case SEARCH_FIELD_TOUR_START_TIME:
-							resultItem.tourStartTime = Long.parseLong(indexField.stringValue());
+						case SEARCH_FIELD_TOUR_TIME:
+							resultItem.tourStartTime = indexField.numericValue().longValue();
 							break;
 						}
 					}
@@ -584,6 +731,11 @@ public class MTSearchManager {
 			// get doc fields only once
 			isDocRead = true;
 		}
+	}
+
+	static void setResultSorting(final boolean isSortDateAscending) {
+
+		_isSortDateAscending = isSortDateAscending;
 	}
 
 	/**
@@ -598,16 +750,21 @@ public class MTSearchManager {
 
 		IndexReader indexReader1 = null;
 		IndexReader indexReader2 = null;
+		IndexReader indexReader3 = null;
 
 		try {
 
 			final FSDirectory tourDataIndex = openIndex(TourDatabase.TABLE_TOUR_DATA);
 			final FSDirectory tourMarkerIndex = openIndex(TourDatabase.TABLE_TOUR_MARKER);
+			final FSDirectory tourWayPoint = openIndex(TourDatabase.TABLE_TOUR_WAYPOINT);
 
 			indexReader1 = DirectoryReader.open(tourDataIndex);
 			indexReader2 = DirectoryReader.open(tourMarkerIndex);
+			indexReader3 = DirectoryReader.open(tourWayPoint);
 
-			_indexReader = new MultiReader(indexReader1, indexReader2);
+			_indexReader = new MultiReader(indexReader1, indexReader2, indexReader3);
+
+			_indexSearcher = new IndexSearcher(_indexReader);
 
 		} catch (final Exception e) {
 			StatusUtil.showStatus(e);
@@ -650,7 +807,6 @@ public class MTSearchManager {
 
 							if (field.equals(SEARCH_FIELD_DESCRIPTION) //
 									|| field.equals(SEARCH_FIELD_TITLE)
-									|| field.equals(SEARCH_FIELD_TOUR_MARKERLABEL)
 							//
 							) {
 

@@ -1079,7 +1079,7 @@
 		<command
 			id="command.net.tourbook.search.SearchView"
 			name="%View_Name_SearchAll"
-			defaultHandler="net.tourbook.search.ActionHandlerOpenViewSearchResultView"
+			defaultHandler="net.tourbook.search.ActionHandlerOpenSearchView"
 			/>
 
 		<command
