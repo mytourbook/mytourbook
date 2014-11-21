@@ -36,7 +36,7 @@ import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.PrefPagePeople;
 import net.tourbook.proxy.DefaultProxySelector;
 import net.tourbook.proxy.IPreferences;
-import net.tourbook.search.MTSearchManager;
+import net.tourbook.search.FTSearchManager;
 import net.tourbook.tag.TagMenuManager;
 import net.tourbook.tour.TourTypeMenuManager;
 import net.tourbook.ui.UI;
@@ -482,7 +482,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 		TagMenuManager.saveTagState();
 		TourTypeMenuManager.saveState();
 		TourPhotoManager.saveState();
-		MTSearchManager.saveState();
+		FTSearchManager.close();
 
 		/**
 		 * Save map3 state only when map is initialized (displayed). When this state is not checked

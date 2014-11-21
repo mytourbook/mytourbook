@@ -1167,33 +1167,45 @@ public class UI {
 		});
 	}
 
-	public static void showSQLException(SQLException e) {
+	public static void showSQLException(final SQLException ex) {
 
-		while (e != null) {
+		Display.getDefault().asyncExec(new Runnable() {
+			public void run() {
 
-			final String sqlExceptionText = Util.getSQLExceptionText(e);
+				SQLException e = ex;
 
-			// log also the stacktrace
-			StatusUtil.log(sqlExceptionText + Util.getStackTrace(e));
+				while (e != null) {
 
-			MessageDialog.openError(Display.getDefault().getActiveShell(), //
-					"SQL Error",//$NON-NLS-1$
-					sqlExceptionText);
+					final String sqlExceptionText = Util.getSQLExceptionText(e);
 
-			e = e.getNextException();
-		}
+					// log also the stacktrace
+					StatusUtil.log(sqlExceptionText + Util.getStackTrace(e));
+
+					MessageDialog.openError(Display.getDefault().getActiveShell(), //
+							"SQL Error",//$NON-NLS-1$
+							sqlExceptionText);
+
+					e = e.getNextException();
+				}
+			}
+		});
 	}
 
 	public static void showSQLException(final SQLException e, final String sqlStatement) {
 
-		final String message = "SQL statement: " + UI.NEW_LINE2 + sqlStatement + Util.getSQLExceptionText(e); //$NON-NLS-1$
+		Display.getDefault().asyncExec(new Runnable() {
+			public void run() {
 
-		MessageDialog.openError(Display.getDefault().getActiveShell(), //
-				"SQL Error", //$NON-NLS-1$
-				message);
+				final String message = "SQL statement: " + UI.NEW_LINE2 + sqlStatement + Util.getSQLExceptionText(e); //$NON-NLS-1$
 
-		StatusUtil.log(message);
-		StatusUtil.log(e);
+				MessageDialog.openError(Display.getDefault().getActiveShell(), //
+						"SQL Error", //$NON-NLS-1$
+						message);
+
+				StatusUtil.log(message);
+				StatusUtil.log(e);
+			}
+		});
 	}
 
 	public static void updateUITags(final TourData tourData, final Label tourTagLabel) {

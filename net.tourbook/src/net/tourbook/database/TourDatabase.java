@@ -62,7 +62,6 @@ import net.tourbook.data.TourTagCategory;
 import net.tourbook.data.TourType;
 import net.tourbook.data.TourWayPoint;
 import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.search.MTSearchManager;
 import net.tourbook.tag.TagCollection;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.TourTypeFilter;
@@ -3030,8 +3029,6 @@ public class TourDatabase {
 
 					sqlInit_90_SetupEntityManager(monitor);
 
-					sqlInit_95_SetupSearch(monitor);
-
 					returnState[0] = true;
 				}
 
@@ -3442,14 +3439,17 @@ public class TourDatabase {
 
 		Connection conn = null;
 
+		/*
+		 * Shutdown db
+		 */
 		try {
 
 			// shutdown database that all connections are closed, THIS WILL ALWAYS CREATE AN EXCEPTION
-			final String dbUrl = DERBY_URL + DERBY_URL_COMMAND_SHUTDOWN_TRUE;
+			final String dbUrl_ShutDown = DERBY_URL + DERBY_URL_COMMAND_SHUTDOWN_TRUE;
 
-			logDriverManagerGetConnection(dbUrl);
+			logDriverManagerGetConnection(dbUrl_ShutDown);
 
-			conn = DriverManager.getConnection(dbUrl, TABLE_SCHEMA, TABLE_SCHEMA);
+			conn = DriverManager.getConnection(dbUrl_ShutDown, TABLE_SCHEMA, TABLE_SCHEMA);
 
 		} catch (final SQLException e) {
 
@@ -3462,17 +3462,18 @@ public class TourDatabase {
 			Util.closeSql(conn);
 		}
 
+		/*
+		 * Upgrade database
+		 */
 		try {
 
-			// upgrade database
+			final String dbUrl_Upgrade = DERBY_URL + DERBY_URL_COMMAND_UPGRADE_TRUE;
 
-			final String dbUrl = DERBY_URL + DERBY_URL_COMMAND_UPGRADE_TRUE;
-
-			logDriverManagerGetConnection(dbUrl);
+			logDriverManagerGetConnection(dbUrl_Upgrade);
 
 			monitor.subTask(Messages.Database_Monitor_UpgradeDatabase);
 
-			conn = DriverManager.getConnection(dbUrl, TABLE_SCHEMA, TABLE_SCHEMA);
+			conn = DriverManager.getConnection(dbUrl_Upgrade, TABLE_SCHEMA, TABLE_SCHEMA);
 
 			_isChecked_DbUpgraded = true;
 
@@ -3493,23 +3494,6 @@ public class TourDatabase {
 		monitor.subTask(Messages.Database_Monitor_persistent_service_task);
 
 		_emFactory = Persistence.createEntityManagerFactory(PERSISTENCE_UNIT_NAME, configOverrides);
-	}
-
-	private void sqlInit_95_SetupSearch(final IProgressMonitor monitor) {
-
-		Connection connection = null;
-
-		try {
-
-			connection = getConnection_Simple();
-
-			MTSearchManager.setupSearch(connection, monitor);
-
-		} catch (final SQLException e) {
-			UI.showSQLException(e);
-		} finally {
-			Util.closeSql(connection);
-		}
 	}
 
 	/**

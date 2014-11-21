@@ -42,6 +42,7 @@ import net.tourbook.database.TourDatabase;
 import net.tourbook.importdata.RawDataManager;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.PrefPageViews;
+import net.tourbook.search.FTSearchManager;
 import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.ITourProviderAll;
 import net.tourbook.ui.action.ActionEditQuick;
@@ -1212,6 +1213,8 @@ public class TourManager {
 				StatusUtil.showStatus(e);
 			}
 		}
+
+		FTSearchManager.updateIndex(savedTours);
 
 		if (canFireNotification && doFireChangeEvent[0]) {
 			final TourEvent propertyData = new TourEvent(savedTours);

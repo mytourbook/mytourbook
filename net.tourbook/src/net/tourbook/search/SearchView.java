@@ -310,7 +310,7 @@ public class SearchView extends ViewPart {
 			final List<Proposal> primaryProposals = new ArrayList<Proposal>();
 			final List<Proposal> secondaryProposals = new ArrayList<Proposal>();
 
-			final List<LookupResult> proposals = MTSearchManager.getProposals(contents, position);
+			final List<LookupResult> proposals = FTSearchManager.getProposals(contents, position);
 
 			final String contentToCursor = contents.substring(0, position);
 
@@ -395,7 +395,13 @@ public class SearchView extends ViewPart {
 
 			public void partClosed(final IWorkbenchPartReference partRef) {
 				if (partRef.getPart(false) == SearchView.this) {
+
 					saveState();
+
+					/**
+					 * Close ft index that it will be created each time when the index is opened.
+					 */
+					FTSearchManager.close();
 				}
 			}
 
@@ -580,9 +586,9 @@ public class SearchView extends ViewPart {
 		final String markerId = resultItem.markerId;
 		final String tourId = resultItem.tourId;
 
-		final boolean isTour = docSource == MTSearchManager.DOC_SOURCE_TOUR;
-		final boolean isMarker = docSource == MTSearchManager.DOC_SOURCE_TOUR_MARKER;
-		final boolean isWayPoint = docSource == MTSearchManager.DOC_SOURCE_WAY_POINT;
+		final boolean isTour = docSource == FTSearchManager.DOC_SOURCE_TOUR;
+		final boolean isMarker = docSource == FTSearchManager.DOC_SOURCE_TOUR_MARKER;
+		final boolean isWayPoint = docSource == FTSearchManager.DOC_SOURCE_WAY_POINT;
 
 		String iconUrl = null;
 
@@ -1061,6 +1067,9 @@ public class SearchView extends ViewPart {
 				 * </pre>
 				 */
 				_browser = new Browser(parent, SWT.MOZILLA);
+
+//	-Dorg.eclipse.swt.browser.XULRunnerPath=c:\xxx\xulrunner
+
 			}
 
 			GridDataFactory.fillDefaults().grab(true, true).applyTo(_browser);
@@ -1534,7 +1543,7 @@ public class SearchView extends ViewPart {
 				STATE_IS_SORT_DATE_ASCENDING,
 				STATE_IS_SORT_DATE_ASCENDING_DEFAULT);
 
-		MTSearchManager.setResultSorting(isSortDateAscending);
+		FTSearchManager.setResultSorting(isSortDateAscending);
 	}
 
 	private void saveModifiedTour(final TourData tourData) {
@@ -1642,7 +1651,7 @@ public class SearchView extends ViewPart {
 		_searchTime = -1;
 		final long startTime = System.currentTimeMillis();
 
-		final SearchResult searchResult = MTSearchManager.search(searchText, pageNumber, _hitsPerPage);
+		final SearchResult searchResult = FTSearchManager.search(searchText, pageNumber, _hitsPerPage);
 
 		if (searchResult.items.size() == 0 && searchResult.error == null) {
 			updateUI(null, "No result");
