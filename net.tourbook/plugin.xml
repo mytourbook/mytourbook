@@ -499,7 +499,7 @@
 			
 				<command
 					commandId="command.net.tourbook.search.SearchView"
-					icon="icons/find-all.png"
+					icon="icons/search.png"
 					label="%View_Name_SearchAll"
 					mnemonic="%View_Name_SearchAll_Mnemonic"/>
 	
@@ -897,7 +897,7 @@
 				<!-- Search -->
 				<command
 					commandId="command.net.tourbook.search.SearchView"
-					icon="icons/find-all.png"
+					icon="icons/search.png"
 					label="%View_Name_SearchAll"
 					tooltip="%View_Name_SearchAll_Tooltip"
 					/>
@@ -1465,7 +1465,7 @@
 			<view
 				category="net.tourbook.category.Tools"
 				class="net.tourbook.search.SearchView"
-				icon="icons/find-all.png"
+				icon="icons/search.png"
 				id="net.tourbook.search.SearchView"
 				name="%View_Name_SearchAll"
 			/>

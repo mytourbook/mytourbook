@@ -2,7 +2,7 @@
 <feature
       id="feature.net.tourbook.app"
       label="MyTourbook Application"
-      version="14.10.1.qualifier"
+      version="14.14.0.qualifier"
       provider-name="MyTourbook"
       plugin="net.tourbook.branding">
 
@@ -31,7 +31,6 @@
       <import plugin="org.eclipse.ui.forms"/>
       <import plugin="org.eclipse.core.databinding"/>
       <import plugin="org.eclipse.update.ui"/>
-      <import plugin="org.apache.derby.core"/>
       <import plugin="net.tourbook.ext.ejb3"/>
       <import plugin="de.byteholder.geoclipse.ext.geotools"/>
       <import plugin="net.tourbook.common"/>
@@ -42,6 +41,7 @@
       <import plugin="net.tourbook.photo"/>
       <import plugin="net.tourbook.ext.rxtx_2.2"/>
       <import plugin="net.tourbook.ext.worldwind_2.0"/>
+      <import plugin="org.apache.derby"/>
    </requires>
 
    <plugin
