@@ -24,6 +24,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -116,6 +117,28 @@ public class Util {
 		final int newValue = ((event.count > 0 ? 1 : -1) * accelerator);
 
 		spinner.setSelection(spinner.getSelection() + newValue);
+	}
+
+	public static void close(final FileInputStream fs) {
+
+		if (fs != null) {
+			try {
+				fs.close();
+			} catch (final IOException e) {
+				StatusUtil.log(e);
+			}
+		}
+	}
+
+	public static void close(final OutputStream os) {
+
+		if (os != null) {
+			try {
+				os.close();
+			} catch (final IOException e) {
+				StatusUtil.log(e);
+			}
+		}
 	}
 
 	public static void closeReader(final BufferedReader reader) {

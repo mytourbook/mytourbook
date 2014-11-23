@@ -117,7 +117,7 @@ public class UI {
 	public static final String			SYMBOL_INFINITY_MAX						= "\u221E";																//$NON-NLS-1$
 	public static final String			SYMBOL_INFINITY_MIN						= "-\u221E";																//$NON-NLS-1$
 	public static final char			SYMBOL_NUMBER_SIGN						= '#';
-	public static final String			SYMBOL_PLUS_MINUS						= "\u00B1";																	//$NON-NLS-1$
+	public static final String			SYMBOL_PLUS_MINUS						= "\u00B1";																//$NON-NLS-1$
 	public static final char			SYMBOL_SEMICOLON						= ';';
 	public static final String			SYMBOL_SUM_WITH_SPACE					= "\u2211 ";																//$NON-NLS-1$
 	public static final String			SYMBOL_SUN								= "\u263C";																//$NON-NLS-1$
@@ -159,6 +159,8 @@ public class UI {
 	public static final boolean			IS_LINUX								= "gtk".equals(SWT.getPlatform());											//$NON-NLS-1$
 	public static final boolean			IS_OSX									= "carbon".equals(SWT.getPlatform()) || "cocoa".equals(SWT.getPlatform());	//$NON-NLS-1$ //$NON-NLS-2$
 	public static final boolean			IS_WIN									= "win32".equals(SWT.getPlatform()) || "wpf".equals(SWT.getPlatform());	//$NON-NLS-1$ //$NON-NLS-2$
+
+	public static final String			BROWSER_TYPE_MOZILLA					= "mozilla";																//$NON-NLS-1$
 
 	public static final String			UTF_8									= "UTF-8";																	//$NON-NLS-1$
 	public static final String			UTF_16									= "UTF-16";																//$NON-NLS-1$

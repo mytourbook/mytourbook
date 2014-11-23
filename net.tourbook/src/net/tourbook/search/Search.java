@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,26 +15,32 @@
  *******************************************************************************/
 package net.tourbook.search;
 
-import net.tourbook.common.util.Util;
+import net.tourbook.web.WebContentServer;
 
-import org.eclipse.core.commands.AbstractHandler;
-import org.eclipse.core.commands.ExecutionEvent;
-import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.ui.IViewPart;
+import org.eclipse.swt.browser.Browser;
 
-public class ActionHandlerOpenSearchView extends AbstractHandler {
+public class Search {
 
-	public Object execute(final ExecutionEvent event) throws ExecutionException {
+	static final String	SEARCH_FOLDER	= "search/";	//$NON-NLS-1$
 
-		final IViewPart part = Util.showView(SearchView.ID, true);
+	private Browser		_browser;
 
-		if (part instanceof SearchView) {
+	Search(final Browser browser) {
 
-			final SearchView searchView = (SearchView) part;
-			searchView.actionOpenSearchView();
-		}
+		// ensure web server is started
+		WebContentServer.init();
 
-		return null;
+		_browser = browser;
+
+
+		final String searchUrl = "http://localhost/search/search.html";
+
+//		_browser.setUrl("http://dojotoolkit.org/api/");
+		_browser.setUrl(searchUrl);
+	}
+
+	void setFocus() {
+		_browser.setFocus();
 	}
 
 }

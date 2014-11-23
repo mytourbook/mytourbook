@@ -41,6 +41,7 @@ import net.tourbook.tag.TagMenuManager;
 import net.tourbook.tour.TourTypeMenuManager;
 import net.tourbook.ui.UI;
 import net.tourbook.ui.views.rawData.RawDataView;
+import net.tourbook.web.WebContentServer;
 
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IStatus;
@@ -482,7 +483,9 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 		TagMenuManager.saveTagState();
 		TourTypeMenuManager.saveState();
 		TourPhotoManager.saveState();
+
 		FTSearchManager.close();
+		WebContentServer.stop();
 
 		/**
 		 * Save map3 state only when map is initialized (displayed). When this state is not checked

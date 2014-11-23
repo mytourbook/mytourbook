@@ -17,9 +17,7 @@ package net.tourbook.search;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -41,9 +39,9 @@ import net.tourbook.tour.SelectionTourMarker;
 import net.tourbook.tour.TourEvent;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
+import net.tourbook.web.WEB;
 
 import org.apache.lucene.search.suggest.Lookup.LookupResult;
-import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.bindings.keys.KeyStroke;
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -68,18 +66,29 @@ import org.eclipse.swt.SWTError;
 import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.browser.LocationAdapter;
 import org.eclipse.swt.browser.LocationEvent;
+import org.eclipse.swt.browser.LocationListener;
 import org.eclipse.swt.browser.ProgressAdapter;
 import org.eclipse.swt.browser.ProgressEvent;
+import org.eclipse.swt.browser.ProgressListener;
+import org.eclipse.swt.browser.StatusTextEvent;
+import org.eclipse.swt.browser.StatusTextListener;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.TraverseEvent;
 import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.ProgressBar;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.widgets.ToolBar;
+import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
@@ -95,7 +104,8 @@ public class SearchView extends ViewPart {
 
 	private static final String			IMAGE_ACTION_TOUR_WAY_POINT				= net.tourbook.map2.Messages.Image_Action_TourWayPoint;
 
-	private static final String			SEARCH_RESULT_CSS_FILE					= "/html/search-result.css";							//$NON-NLS-1$
+	private static final String			SEARCH_RESULT_CSS_FILE					= Search.SEARCH_FOLDER
+																						+ "search-result.css";							//$NON-NLS-1$
 
 	static final String					STATE_IS_SHOW_DATE_TIME					= "STATE_IS_SHOW_DATE_TIME";							//$NON-NLS-1$
 	static final boolean				STATE_IS_SHOW_DATE_TIME_DEFAULT			= false;
@@ -198,7 +208,7 @@ public class SearchView extends ViewPart {
 	private TextContentAdapter			_controlContentAdapter					= new TextContentAdapter();
 	private MTProposalProvider			_proposalProvider						= new MTProposalProvider();
 
-	private ActionSearchOptions			_actionTourBlogMarker;
+	private ActionSearchOptions			_actionSearchOptions;
 
 	private boolean						_isBrowserLoadingCompleted;
 	private boolean						_isUIShowDateTime;
@@ -220,19 +230,18 @@ public class SearchView extends ViewPart {
 	private int							_previousDocId							= -1;
 
 	private PixelConverter				_pc;
-
 	/*
 	 * UI controls
 	 */
 	private Browser						_browser;
-
 	private Composite					_pageNoBrowser;
+
 	private Composite					_pageSearch;
 	private Composite					_uiParent;
-
 	private PageBook					_pageBook;
 
 	private Text						_txtNoBrowser;
+
 	private Text						_txtSearch;
 
 	public class MTContentProposalAdapter extends ContentProposalAdapter {
@@ -366,6 +375,144 @@ public class SearchView extends ViewPart {
 		}
 	}
 
+	public static void main(final String[] args) {
+
+		final Display display = new Display();
+		final Shell shell = new Shell(display);
+		final GridLayout gridLayout = new GridLayout();
+		gridLayout.numColumns = 3;
+		shell.setLayout(gridLayout);
+		final ToolBar toolbar = new ToolBar(shell, SWT.NONE);
+		final ToolItem itemBack = new ToolItem(toolbar, SWT.PUSH);
+		itemBack.setText("Back");
+		final ToolItem itemForward = new ToolItem(toolbar, SWT.PUSH);
+		itemForward.setText("Forward");
+		final ToolItem itemStop = new ToolItem(toolbar, SWT.PUSH);
+		itemStop.setText("Stop");
+		final ToolItem itemRefresh = new ToolItem(toolbar, SWT.PUSH);
+		itemRefresh.setText("Refresh");
+		final ToolItem itemGo = new ToolItem(toolbar, SWT.PUSH);
+		itemGo.setText("Go");
+
+		GridData data = new GridData();
+		data.horizontalSpan = 3;
+		toolbar.setLayoutData(data);
+
+		final Label labelAddress = new Label(shell, SWT.NONE);
+		labelAddress.setText("Address");
+
+		final Text location = new Text(shell, SWT.BORDER);
+		data = new GridData();
+		data.horizontalAlignment = GridData.FILL;
+		data.horizontalSpan = 2;
+		data.grabExcessHorizontalSpace = true;
+		location.setLayoutData(data);
+
+		final Browser browser;
+		try {
+
+			browser = new Browser(shell, SWT.NONE);
+
+//			System.setProperty("org.eclipse.swt.browser.XULRunnerPath", "C:\\E\\XULRunner\\xulrunner-10-32");
+//			browser = new Browser(shell, SWT.MOZILLA);
+
+		} catch (final SWTError e) {
+			System.out.println("Could not instantiate Browser: " + e.getMessage());
+			display.dispose();
+			return;
+		}
+		data = new GridData();
+		data.horizontalAlignment = GridData.FILL;
+		data.verticalAlignment = GridData.FILL;
+		data.horizontalSpan = 3;
+		data.grabExcessHorizontalSpace = true;
+		data.grabExcessVerticalSpace = true;
+		browser.setLayoutData(data);
+
+		final Label status = new Label(shell, SWT.NONE);
+		data = new GridData(GridData.FILL_HORIZONTAL);
+		data.horizontalSpan = 2;
+		status.setLayoutData(data);
+
+		final ProgressBar progressBar = new ProgressBar(shell, SWT.NONE);
+		data = new GridData();
+		data.horizontalAlignment = GridData.END;
+		progressBar.setLayoutData(data);
+
+		/* event handling */
+		final Listener listener = new Listener() {
+			@Override
+			public void handleEvent(final Event event) {
+				final ToolItem item = (ToolItem) event.widget;
+				final String string = item.getText();
+				if (string.equals("Back")) {
+					browser.back();
+				} else if (string.equals("Forward")) {
+					browser.forward();
+				} else if (string.equals("Stop")) {
+					browser.stop();
+				} else if (string.equals("Refresh")) {
+					browser.refresh();
+				} else if (string.equals("Go")) {
+					browser.setUrl(location.getText());
+				}
+			}
+		};
+		browser.addProgressListener(new ProgressListener() {
+			@Override
+			public void changed(final ProgressEvent event) {
+				if (event.total == 0) {
+					return;
+				}
+				final int ratio = event.current * 100 / event.total;
+				progressBar.setSelection(ratio);
+			}
+
+			@Override
+			public void completed(final ProgressEvent event) {
+				progressBar.setSelection(0);
+			}
+		});
+		browser.addStatusTextListener(new StatusTextListener() {
+			@Override
+			public void changed(final StatusTextEvent event) {
+				status.setText(event.text);
+			}
+		});
+		browser.addLocationListener(new LocationListener() {
+			@Override
+			public void changed(final LocationEvent event) {
+				if (event.top) {
+					location.setText(event.location);
+				}
+			}
+
+			@Override
+			public void changing(final LocationEvent event) {}
+		});
+		itemBack.addListener(SWT.Selection, listener);
+		itemForward.addListener(SWT.Selection, listener);
+		itemStop.addListener(SWT.Selection, listener);
+		itemRefresh.addListener(SWT.Selection, listener);
+		itemGo.addListener(SWT.Selection, listener);
+		location.addListener(SWT.DefaultSelection, new Listener() {
+			@Override
+			public void handleEvent(final Event e) {
+				browser.setUrl(location.getText());
+			}
+		});
+
+		shell.open();
+		browser.setUrl("http://eclipse.org");
+
+		while (!shell.isDisposed()) {
+			if (!display.readAndDispatch()) {
+				display.sleep();
+			}
+		}
+		display.dispose();
+	}
+
 	void actionOpenSearchView() {
 
 		// force focus, but there are still possibilities, that the focus is not set into the search control.
@@ -484,7 +631,7 @@ public class SearchView extends ViewPart {
 
 	private void createActions() {
 
-		_actionTourBlogMarker = new ActionSearchOptions(this, _uiParent);
+		_actionSearchOptions = new ActionSearchOptions(this, _uiParent);
 
 		fillActionBars();
 	}
@@ -919,6 +1066,24 @@ public class SearchView extends ViewPart {
 		restoreState();
 
 		showInvalidPage();
+
+//		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
+//				+ ("\t" + _browser.setUrl("http://www.heise.de/")));
+//		// TODO remove SYSTEM.OUT.PRINTLN
+
+//		_browser.setUrl("google.com");
+
+		_browser.getDisplay().asyncExec(new Runnable() {
+			public void run() {
+
+				_browser.setUrl("http://eclipse.org");
+			}
+		});
+
+//		final boolean isValid = _browser.setUrl("file:///C:/DAT/ws/Editor-for-HTML-JS-CSS/tour-blog.html");
+//		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") + ("\tisValid: " + isValid));
+//		// TODO remove SYSTEM.OUT.PRINTLN
+
 	}
 
 	private void createUI(final Composite parent) {
@@ -1067,9 +1232,6 @@ public class SearchView extends ViewPart {
 				 * </pre>
 				 */
 				_browser = new Browser(parent, SWT.MOZILLA);
-
-//	-Dorg.eclipse.swt.browser.XULRunnerPath=c:\xxx\xulrunner
-
 			}
 
 			GridDataFactory.fillDefaults().grab(true, true).applyTo(_browser);
@@ -1119,7 +1281,7 @@ public class SearchView extends ViewPart {
 		 */
 		final IToolBarManager tbm = getViewSite().getActionBars().getToolBarManager();
 
-		tbm.add(_actionTourBlogMarker);
+		tbm.add(_actionSearchOptions);
 	}
 
 	private int getMaxPage(final int totalHits, final int hitsPerPage) {
@@ -1251,12 +1413,8 @@ public class SearchView extends ViewPart {
 			/*
 			 * load css from file
 			 */
-			final URL bundleUrl = TourbookPlugin.getDefault().getBundle().getEntry(SEARCH_RESULT_CSS_FILE);
-			final URL fileUrl = FileLocator.toFileURL(bundleUrl);
-			final URI fileUri = fileUrl.toURI();
-			final File file = new File(fileUri);
-
-			final String cssContent = Util.readContentFromFile(file.getAbsolutePath());
+			final File cssFile = WEB.getFile(SEARCH_RESULT_CSS_FILE);
+			final String cssContent = Util.readContentFromFile(cssFile.getAbsolutePath());
 
 			_htmlCss = "<style>" + cssContent + "</style>"; //$NON-NLS-1$ //$NON-NLS-2$
 
@@ -1278,9 +1436,9 @@ public class SearchView extends ViewPart {
 
 		_isBrowserLoadingCompleted = true;
 
-//		System.out
-//				.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") + ("\tonBrowserCompleted()"));
-//// TODO remove SYSTEM.OUT.PRINTLN
+		System.out
+				.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") + ("\tonBrowserCompleted()"));
+// TODO remove SYSTEM.OUT.PRINTLN
 
 	}
 
@@ -1290,10 +1448,12 @@ public class SearchView extends ViewPart {
 
 		final String[] locationParts = location.split(HREF_TOKEN);
 
-//		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
-//				+ ("\tlocation:" + location)
-//				+ ("\t" + Arrays.toString(locationParts)));
-//		// TODO remove SYSTEM.OUT.PRINTLN
+		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
+				+ ("\tlocation: " + location)
+//				+ ("\t" + Arrays.toString(locationParts))
+				//
+				);
+		// TODO remove SYSTEM.OUT.PRINTLN
 
 		String action = null;
 		long tourId = -1;
@@ -1689,7 +1849,6 @@ public class SearchView extends ViewPart {
 
 		final String html = createHTML(searchResult, stateText);
 
-		_browser.setRedraw(true);
 		_browser.setText(html);
 	}
 

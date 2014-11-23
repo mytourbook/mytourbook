@@ -17,9 +17,7 @@ package net.tourbook.ui.views;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Set;
@@ -52,8 +50,8 @@ import net.tourbook.ui.views.tourCatalog.SelectionTourCatalogView;
 import net.tourbook.ui.views.tourCatalog.TVICatalogComparedTour;
 import net.tourbook.ui.views.tourCatalog.TVICatalogRefTourItem;
 import net.tourbook.ui.views.tourCatalog.TVICompareResultComparedTour;
+import net.tourbook.web.WEB;
 
-import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
@@ -803,12 +801,8 @@ public class TourBlogView extends ViewPart {
 			/*
 			 * load css from file
 			 */
-			final URL bundleUrl = TourbookPlugin.getDefault().getBundle().getEntry("/html/tour-blog.css"); //$NON-NLS-1$
-			final URL fileUrl = FileLocator.toFileURL(bundleUrl);
-			final URI fileUri = fileUrl.toURI();
-			final File file = new File(fileUri);
-
-			final String cssContent = Util.readContentFromFile(file.getAbsolutePath());
+			final File cssFile = WEB.getFile("tour-blog.css");//$NON-NLS-1$
+			final String cssContent = Util.readContentFromFile(cssFile.getAbsolutePath());
 
 			_htmlCss = "<style>" + cssContent + "</style>"; //$NON-NLS-1$ //$NON-NLS-2$
 
