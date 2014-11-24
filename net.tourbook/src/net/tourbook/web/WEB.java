@@ -27,7 +27,17 @@ import org.eclipse.core.runtime.FileLocator;
 
 public class WEB {
 
-	private static final String	WEB_CONTENT_FOLDER	= "/WebContent/";	//$NON-NLS-1$
+	public static String		SERVER_URL;
+
+	static {
+
+		SERVER_URL = WebContentServer.SERVER_URL;
+	}
+
+	/**
+	 * Root folder for web content in the plugin.
+	 */
+	private static final String	PLUGIN_WEB_CONTENT_FOLDER	= "/WebContent";	//$NON-NLS-1$
 
 	/**
 	 * @param filePathName
@@ -37,11 +47,13 @@ public class WEB {
 	 */
 	public static File getFile(final String filePathName) throws IOException, URISyntaxException {
 
-		final URL bundleUrl = TourbookPlugin.getDefault().getBundle().getEntry(WEB_CONTENT_FOLDER + filePathName);
+		final URL bundleUrl = TourbookPlugin
+				.getDefault()
+				.getBundle()
+				.getEntry(PLUGIN_WEB_CONTENT_FOLDER + filePathName);
 
 		final URL fileUrl = FileLocator.toFileURL(bundleUrl);
-		final URI fileUri = fileUrl.toURI();
-		final File file = new File(fileUri);
+		final File file = new File(fileUrl.toURI());
 
 		return file;
 
@@ -55,7 +67,7 @@ public class WEB {
 	 */
 	public static URI getRoot() throws IOException, URISyntaxException {
 
-		final URL bundleUrl = TourbookPlugin.getDefault().getBundle().getEntry(WEB_CONTENT_FOLDER);
+		final URL bundleUrl = TourbookPlugin.getDefault().getBundle().getEntry(PLUGIN_WEB_CONTENT_FOLDER);
 
 		final URL fileUrl = FileLocator.toFileURL(bundleUrl);
 		final URI fileUri = fileUrl.toURI();

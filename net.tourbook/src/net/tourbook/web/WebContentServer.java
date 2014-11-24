@@ -15,7 +15,6 @@
  *******************************************************************************/
 package net.tourbook.web;
 
-import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -23,14 +22,13 @@ import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.URI;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import net.tourbook.common.UI;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 
-import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
@@ -41,76 +39,41 @@ import com.sun.net.httpserver.HttpServer;
  */
 public class WebContentServer {
 
-	private static final int	SERVER_PORT	= 80;
+	private static boolean				DEBUG						= true;
 
-	private static HttpServer	_server;
+	private static final String			PROTOCOL_HTTP				= "http://";	//$NON-NLS-1$
+	private static final String			PROTOCOL_COLUMN				= ":";			//$NON-NLS-1$
+	private static final String			ROOT_FILE_PATH_NAME			= "/";			//$NON-NLS-1$
 
-	private static class GetHandler implements HttpHandler {
-		public void handle(final HttpExchange httpExchange) throws IOException {
+	static String						SERVER_URL;
 
-			final StringBuilder response = new StringBuilder();
+	private static final int			NUMBER_OF_SERVER_THREADS	= 10;
 
-			final Map<String, String> parms = WebContentServer.queryToMap(httpExchange.getRequestURI().getQuery());
+	private static HttpServer			_server;
+	private static final int			_serverPort;
 
-			response.append("<html><body>");
-			response.append("hello : " + parms.get("hello") + "<br/>");
-			response.append("foo : " + parms.get("foo") + "<br/>");
-			response.append("</body></html>");
+	private static InetSocketAddress	inetAddress;
 
-			WebContentServer.writeResponse(httpExchange, response.toString());
+	static {
+
+		if (DEBUG) {
+			_serverPort = 24114;
+		} else {
+			_serverPort = PortFinder.findFreePort();
 		}
+
+		final InetAddress loopbackAddress = InetAddress.getLoopbackAddress();
+		inetAddress = new InetSocketAddress(loopbackAddress, _serverPort);
+
+		SERVER_URL = PROTOCOL_HTTP + loopbackAddress.getHostAddress() + PROTOCOL_COLUMN + _serverPort;
 	}
 
-	private static class GetHandler2 implements HttpHandler {
+	private static class DefaultHandler implements HttpHandler {
+
 		public void handle(final HttpExchange httpExchange) throws IOException {
 
-			// add the required response header for a PDF file
-			final Headers headers = httpExchange.getResponseHeaders();
-			headers.add("Content-Type", "application/pdf");
-
-			// a PDF (you provide your own!)
-			final File file = new File("c:/temp/doc.pdf");
-			final byte[] bytearray = new byte[(int) file.length()];
-			final FileInputStream fis = new FileInputStream(file);
-
-			final BufferedInputStream bis = new BufferedInputStream(fis);
-			bis.read(bytearray, 0, bytearray.length);
-
-			// ok, we are ready to send the response.
-			httpExchange.sendResponseHeaders(200, file.length());
-
-			final OutputStream responseBody = httpExchange.getResponseBody();
-			responseBody.write(bytearray, 0, bytearray.length);
-			responseBody.close();
-
-			bis.close();
-		}
-	}
-
-	// http://localhost:8000/info
-	private static class InfoHandler implements HttpHandler {
-		public void handle(final HttpExchange httpExchange) throws IOException {
-
-			final String response = "Use /get?hello=word&foo=bar to see how to handle url parameters";
-
-			WebContentServer.writeResponse(httpExchange, response.toString());
-		}
-	}
-
-	private static class InfoHandler2 implements HttpHandler {
-		public void handle(final HttpExchange t) throws IOException {
-
-			final String response = "Use /get to download a PDF";
-			t.sendResponseHeaders(200, response.length());
-
-			final OutputStream os = t.getResponseBody();
-			os.write(response.getBytes());
-			os.close();
-		}
-	}
-
-	private static class RootHandler implements HttpHandler {
-		public void handle(final HttpExchange httpExchange) throws IOException {
+			final long start = System.nanoTime();
+			String log = UI.EMPTY_STRING;
 
 			FileInputStream fs = null;
 			OutputStream os = null;
@@ -119,21 +82,21 @@ public class WebContentServer {
 
 				boolean isResource = false;
 
-				final String root = WEB.getFile(UI.EMPTY_STRING).getCanonicalFile().getPath();
+				final String root = WEB.getFile(ROOT_FILE_PATH_NAME).getCanonicalFile().getPath();
 				final URI requestURI = httpExchange.getRequestURI();
 				final String requestUriPath = requestURI.getPath();
 
 				String requestedOSPath;
 
-				if (requestUriPath.startsWith("/firebug-lite")) {
+				if (requestUriPath.startsWith("/WebContent-firebug-lite")) {
 
 					isResource = true;
 					requestedOSPath = "C:/E/XULRunner/" + requestUriPath;
 
-				} else if (requestUriPath.startsWith("/???")) {
+				} else if (requestUriPath.startsWith("/WebContent-dojo")) {
 
 					isResource = true;
-					requestedOSPath = "C:/E/js-resources/dojo/dojo-release/" + requestUriPath;
+					requestedOSPath = "C:/E/js-resources/dojo/" + requestUriPath;
 
 				} else {
 
@@ -142,11 +105,14 @@ public class WebContentServer {
 
 				final File file = new File(requestedOSPath).getCanonicalFile();
 
-				System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
-						+ ("\trequestURI\t" + requestUriPath)//
-						+ ("\tfile.getPath()\t" + file.getPath())//
-				);
-				// TODO remove SYSTEM.OUT.PRINTLN
+//				System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
+//						+ ("\trequestURI\t" + requestUriPath)//
+////						+ ("\tfile.getPath()\t" + file.getPath())//
+//				);
+//				// TODO remove SYSTEM.OUT.PRINTLN
+				if (DEBUG) {
+					log += requestUriPath;
+				}
 
 				if (!file.getPath().startsWith(root) && !isResource) {
 
@@ -164,7 +130,7 @@ public class WebContentServer {
 
 					// Object does not exist or is not a file: reject with 404 error.
 
-					final String response = "404 (Not Found)\n";
+					final String response = String.format("%s\n404 (Not Found)\n", requestUriPath);
 					httpExchange.sendResponseHeaders(404, response.length());
 
 					os = httpExchange.getResponseBody();
@@ -191,8 +157,20 @@ public class WebContentServer {
 			} catch (final Exception e) {
 				StatusUtil.log(e);
 			} finally {
+
 				Util.close(fs);
 				Util.close(os);
+
+				if (DEBUG) {
+
+					final String msg2 = String.format("%s    %03.2f ms  %-16s  %s", //
+							UI.timeStampNano(),
+							(float) (System.nanoTime() - start) / 1000000,
+							Thread.currentThread().getName(),
+							log);
+
+					System.out.println(msg2);
+				}
 			}
 		}
 	}
@@ -205,21 +183,17 @@ public class WebContentServer {
 
 		try {
 
-//			final InetSocketAddress inetSocketAddress = new InetSocketAddress(SERVER_PORT);
-//			_server = HttpServer.create(inetSocketAddress, 0);
-
-			final InetSocketAddress inetAddress = new InetSocketAddress(InetAddress.getLoopbackAddress(), SERVER_PORT);
-
 			_server = HttpServer.create(inetAddress, 0);
 
-			_server.createContext("/", new RootHandler());
+			_server.createContext("/", new DefaultHandler());
 
 			// ensure that the server is running in another thread
-			_server.setExecutor(java.util.concurrent.Executors.newFixedThreadPool(10));
+			final ExecutorService executor = Executors.newFixedThreadPool(NUMBER_OF_SERVER_THREADS);
+			_server.setExecutor(executor);
 
 			_server.start();
 
-			StatusUtil.logInfo("Started WebContentServer (HTTP) at port: " + SERVER_PORT);//$NON-NLS-1$
+			StatusUtil.logInfo("Started WebContentServer " + SERVER_URL);//$NON-NLS-1$
 
 		} catch (final IOException e) {
 			StatusUtil.showStatus(e);
@@ -231,30 +205,6 @@ public class WebContentServer {
 		checkServer();
 	}
 
-	/**
-	 * returns the url parameters in a map
-	 * 
-	 * @param query
-	 * @return map
-	 */
-	private static Map<String, String> queryToMap(final String query) {
-
-		final Map<String, String> result = new HashMap<String, String>();
-
-		for (final String param : query.split("&")) {
-
-			final String pair[] = param.split("=");
-
-			if (pair.length > 1) {
-				result.put(pair[0], pair[1]);
-			} else {
-				result.put(pair[0], "");
-			}
-		}
-
-		return result;
-	}
-
 	public static void stop() {
 
 		if (_server != null) {
@@ -262,18 +212,8 @@ public class WebContentServer {
 			_server.stop(0);
 			_server = null;
 
-			StatusUtil.logInfo("Stopped WebContentServer (HTTP) at port: " + SERVER_PORT);//$NON-NLS-1$
+			StatusUtil.logInfo("Stopped WebContentServer " + SERVER_URL);//$NON-NLS-1$
 		}
-
-	}
-
-	private static void writeResponse(final HttpExchange httpExchange, final String response) throws IOException {
-
-		httpExchange.sendResponseHeaders(200, response.length());
-
-		final OutputStream os = httpExchange.getResponseBody();
-		os.write(response.getBytes());
-		os.close();
 	}
 
 }

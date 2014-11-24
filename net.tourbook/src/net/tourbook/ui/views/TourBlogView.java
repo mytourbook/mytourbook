@@ -801,7 +801,7 @@ public class TourBlogView extends ViewPart {
 			/*
 			 * load css from file
 			 */
-			final File cssFile = WEB.getFile("tour-blog.css");//$NON-NLS-1$
+			final File cssFile = WEB.getFile("/tour-blog.css");//$NON-NLS-1$
 			final String cssContent = Util.readContentFromFile(cssFile.getAbsolutePath());
 
 			_htmlCss = "<style>" + cssContent + "</style>"; //$NON-NLS-1$ //$NON-NLS-2$

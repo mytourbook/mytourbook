@@ -15,13 +15,15 @@
  *******************************************************************************/
 package net.tourbook.search;
 
+import net.tourbook.common.UI;
+import net.tourbook.web.WEB;
 import net.tourbook.web.WebContentServer;
 
 import org.eclipse.swt.browser.Browser;
 
 public class Search {
 
-	static final String	SEARCH_FOLDER	= "search/";	//$NON-NLS-1$
+	static final String	SEARCH_FOLDER	= "/search/";	//$NON-NLS-1$
 
 	private Browser		_browser;
 
@@ -32,8 +34,10 @@ public class Search {
 
 		_browser = browser;
 
+		final String searchUrl = WEB.SERVER_URL + SEARCH_FOLDER + "search.html";
 
-		final String searchUrl = "http://localhost/search/search.html";
+		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") + ("\t" + searchUrl));
+		// TODO remove SYSTEM.OUT.PRINTLN
 
 //		_browser.setUrl("http://dojotoolkit.org/api/");
 		_browser.setUrl(searchUrl);

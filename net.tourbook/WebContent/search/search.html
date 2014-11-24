@@ -1,24 +1,32 @@
 <!DOCTYPE html>
-<html debug="true">
+<html xdebug="true">
 <head>
 
-<script type="text/javascript" src="/firebug-lite/content/firebug-lite-dev.js">
+<!-- 
+<script type="text/javascript" src="/WebContent-firebug-lite/content/firebug-lite-dev.js">
 {
     overrideConsole: false,
     startInNewWindow: false,
-    startOpened: true,
-    enableTrace: true
+    startOpened: false,
+    enableTrace: false
 }
 </script>
+ -->
 
 <meta http-equiv='Content-Type' content='text/html; charset=UTF-8' />
 <meta http-equiv='X-UA-Compatible' content='IE=edge' />
 
+<title>Tutorial: Hello Dojo!</title>
 
 </head>
 <body>
 
-	<div>Dojo will be placed here.</div>
+	<h1 id="greeting">Hello</h1>
 
+	<!-- load Dojo -->
+	<script src="/WebContent-dojo/dojo/dojo.js" data-dojo-config="async: true"></script>
+	
+    <script type="text/javascript" src="search.js"></script>
+    
 </body>
 </html>
