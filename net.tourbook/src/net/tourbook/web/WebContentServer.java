@@ -18,10 +18,17 @@ package net.tourbook.web;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.URI;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -29,6 +36,8 @@ import net.tourbook.common.UI;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 
+import com.sun.net.httpserver.Headers;
+import com.sun.net.httpserver.HttpContext;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
@@ -39,24 +48,43 @@ import com.sun.net.httpserver.HttpServer;
  */
 public class WebContentServer {
 
-	private static boolean				DEBUG						= true;
+	private static boolean					IS_DEBUG_PORT				= true;
+	private static final int				NUMBER_OF_SERVER_THREADS	= 1;
 
-	private static final String			PROTOCOL_HTTP				= "http://";	//$NON-NLS-1$
-	private static final String			PROTOCOL_COLUMN				= ":";			//$NON-NLS-1$
-	private static final String			ROOT_FILE_PATH_NAME			= "/";			//$NON-NLS-1$
+	// logs: time, url
+	private static boolean					LOG_URL						= true;
 
-	static String						SERVER_URL;
+	// logs: header
+	private static boolean					LOG_HEADER					= false;
 
-	private static final int			NUMBER_OF_SERVER_THREADS	= 10;
+	// logs: xhr
+	private static boolean					LOG_XHR						= false;
 
-	private static HttpServer			_server;
-	private static final int			_serverPort;
+	private static final String				ROOT_FILE_PATH_NAME			= "/";							//$NON-NLS-1$
 
-	private static InetSocketAddress	inetAddress;
+	private static final String				PROTOCOL_HTTP				= "http://";					//$NON-NLS-1$
+	private static final String				PROTOCOL_COLUMN				= ":";							//$NON-NLS-1$
+
+	private static final String				REQUEST_PATH_DOJO			= "/WebContent-dojo";			//$NON-NLS-1$
+	private static final String				REQUEST_PATH_FIREBUG_LITE	= "/WebContent-firebug-lite";	//$NON-NLS-1$
+
+	private static final String				XHR_HEADER_KEY				= "X-requested-with";			//$NON-NLS-1$
+	private static final String				XHR_HEADER_VALUE			= "XMLHttpRequest";			//$NON-NLS-1$
+
+	static String							SERVER_URL;
+
+	private static Map<String, XHRHandler>	_allXHRHandler				= new HashMap<>();
+
+	private static HttpServer				_server;
+	private static final int				_serverPort;
+
+	private static InetSocketAddress		inetAddress;
+
+	private String[]						set;
 
 	static {
 
-		if (DEBUG) {
+		if (IS_DEBUG_PORT) {
 			_serverPort = 24114;
 		} else {
 			_serverPort = PortFinder.findFreePort();
@@ -73,84 +101,87 @@ public class WebContentServer {
 		public void handle(final HttpExchange httpExchange) throws IOException {
 
 			final long start = System.nanoTime();
-			String log = UI.EMPTY_STRING;
 
-			FileInputStream fs = null;
-			OutputStream os = null;
+			final StringBuilder log = new StringBuilder();
 
 			try {
 
-				boolean isResource = false;
+				boolean isResourceUrl = false;
 
-				final String root = WEB.getFile(ROOT_FILE_PATH_NAME).getCanonicalFile().getPath();
+				final String rootPath = WEB.getFile(ROOT_FILE_PATH_NAME).getCanonicalFile().getPath();
+
 				final URI requestURI = httpExchange.getRequestURI();
 				final String requestUriPath = requestURI.getPath();
 
-				String requestedOSPath;
+				final Headers requestHeaders = httpExchange.getRequestHeaders();
+				final Set<Entry<String, List<String>>> headerEntries = requestHeaders.entrySet();
 
-				if (requestUriPath.startsWith("/WebContent-firebug-lite")) {
+				final String xhrValue = requestHeaders.getFirst(XHR_HEADER_KEY);
+				final boolean isXHR = XHR_HEADER_VALUE.equals(xhrValue);
 
-					isResource = true;
-					requestedOSPath = "C:/E/XULRunner/" + requestUriPath;
+				if (LOG_URL || LOG_XHR) {
+					log.append(requestUriPath);
+				}
+				if (LOG_URL && LOG_XHR) {
+					logParameter(httpExchange, log);
+				}
+				if (LOG_HEADER && isXHR) {
+					logHeader(log, headerEntries);
+				}
 
-				} else if (requestUriPath.startsWith("/WebContent-dojo")) {
+				if (isXHR) {
 
-					isResource = true;
-					requestedOSPath = "C:/E/js-resources/dojo/" + requestUriPath;
+					// XHR request
+
+					handle_XHR(httpExchange, requestUriPath, log);
 
 				} else {
 
-					requestedOSPath = root + requestUriPath;
-				}
+					String requestedOSPath = null;
 
-				final File file = new File(requestedOSPath).getCanonicalFile();
+					if (requestUriPath.startsWith(REQUEST_PATH_FIREBUG_LITE)) {
 
-//				System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
-//						+ ("\trequestURI\t" + requestUriPath)//
-////						+ ("\tfile.getPath()\t" + file.getPath())//
-//				);
-//				// TODO remove SYSTEM.OUT.PRINTLN
-				if (DEBUG) {
-					log += requestUriPath;
-				}
+						// Firebug lite request
 
-				if (!file.getPath().startsWith(root) && !isResource) {
+						isResourceUrl = true;
+						requestedOSPath = "C:/E/XULRunner/" + requestUriPath;
 
-					// Suspected path traversal attack: reject with 403 error.
+					} else if (requestUriPath.startsWith(REQUEST_PATH_DOJO)) {
 
-					final String response = "403 (Forbidden)\n";
-					httpExchange.sendResponseHeaders(403, response.length());
+						// Dojo request
 
-					os = httpExchange.getResponseBody();
-					os.write(response.getBytes());
+						isResourceUrl = true;
+						requestedOSPath = "C:/E/js-resources/dojo/" + requestUriPath;
 
-					StatusUtil.log(response + " " + file.getPath());
+					} else {
 
-				} else if (!file.isFile()) {
+						// default request
 
-					// Object does not exist or is not a file: reject with 404 error.
+						requestedOSPath = rootPath + requestUriPath;
+					}
 
-					final String response = String.format("%s\n404 (Not Found)\n", requestUriPath);
-					httpExchange.sendResponseHeaders(404, response.length());
+					if (requestedOSPath != null) {
 
-					os = httpExchange.getResponseBody();
-					os.write(response.getBytes());
+						final File file = new File(requestedOSPath).getCanonicalFile();
 
-					StatusUtil.log(response + " " + file.getPath());
+						if (!file.getPath().startsWith(rootPath) && !isResourceUrl) {
 
-				} else {
+							// Suspected path traversal attack: reject with 403 error.
 
-					// Object exists and is a file: accept with response code 200.
+							handle_403(httpExchange, file);
 
-					httpExchange.sendResponseHeaders(200, 0);
+						} else if (!file.isFile()) {
 
-					os = httpExchange.getResponseBody();
-					fs = new FileInputStream(file);
+							// Object does not exist or is not a file: reject with 404 error.
 
-					final byte[] buffer = new byte[0x10000];
-					int count = 0;
-					while ((count = fs.read(buffer)) >= 0) {
-						os.write(buffer, 0, count);
+							handle_404(httpExchange, file, requestUriPath);
+
+						} else {
+
+							// Object exists and is a file: accept with response code 200.
+
+							handle_File(httpExchange, file);
+						}
 					}
 				}
 
@@ -158,24 +189,171 @@ public class WebContentServer {
 				StatusUtil.log(e);
 			} finally {
 
-				Util.close(fs);
-				Util.close(os);
+				if (LOG_URL || LOG_XHR || LOG_HEADER) {
 
-				if (DEBUG) {
-
-					final String msg2 = String.format("%s    %03.2f ms  %-16s  %s", //
+					final String msg = String.format("%s %5.1f ms  %-16s  %s", //
 							UI.timeStampNano(),
 							(float) (System.nanoTime() - start) / 1000000,
 							Thread.currentThread().getName(),
 							log);
 
-					System.out.println(msg2);
+					System.out.println(msg);
 				}
 			}
 		}
+
+		private void logHeader(final StringBuilder log, final Set<Entry<String, List<String>>> headerEntries) {
+			
+			log.append("\n");
+			
+			for (final Entry<String, List<String>> entry : headerEntries) {
+				log.append(String.format("%-20s %s\n", entry.getKey(), entry.getValue()));
+			}
+		}
+
+		private void logParameter(final HttpExchange httpExchange, final StringBuilder log) {
+			
+			// get parameters from url query string
+			
+			@SuppressWarnings("unchecked")
+			final Map<String, Object> params = (Map<String, Object>) httpExchange
+					.getAttribute(ParameterFilter.ATTRIBUTE_PARAMETERS);
+
+			log.append("\tparams: " + params);
+		}
+
 	}
 
-	private static void checkServer() {
+	/**
+	 * @param xhrKey
+	 * @param xhrHandler
+	 * @return Returns the previous handler or <code>null</code> when a handler is not available.
+	 */
+	public static XHRHandler addXHRHandler(final String xhrKey, final XHRHandler xhrHandler) {
+
+		return _allXHRHandler.put(xhrKey, xhrHandler);
+	}
+
+	private static void handle_403(final HttpExchange httpExchange, final File file) {
+
+		OutputStream os = null;
+
+		try {
+
+			final String response = "403 (Forbidden)\n";
+			httpExchange.sendResponseHeaders(403, response.length());
+
+			os = httpExchange.getResponseBody();
+			os.write(response.getBytes());
+
+			StatusUtil.log(response + " " + file.getPath());
+
+		} catch (final Exception e) {
+			StatusUtil.log(e);
+		} finally {
+			Util.close(os);
+		}
+	}
+
+	private static void handle_404(final HttpExchange httpExchange, final File file, final String requestUriPath) {
+
+		OutputStream os = null;
+
+		try {
+
+			final String response = String.format("%s\n404 (Not Found)\n", requestUriPath);
+			httpExchange.sendResponseHeaders(404, response.length());
+
+			os = httpExchange.getResponseBody();
+			os.write(response.getBytes());
+
+			StatusUtil.log(response + " " + file.getPath());
+
+		} catch (final Exception e) {
+			StatusUtil.log(e);
+		} finally {
+			Util.close(os);
+		}
+	}
+
+	private static void handle_File(final HttpExchange httpExchange, final File file) {
+
+		FileInputStream fs = null;
+		OutputStream os = null;
+
+		try {
+
+			httpExchange.sendResponseHeaders(200, 0);
+
+			os = httpExchange.getResponseBody();
+			fs = new FileInputStream(file);
+
+			final byte[] buffer = new byte[0x10000];
+			int count = 0;
+			while ((count = fs.read(buffer)) >= 0) {
+				os.write(buffer, 0, count);
+			}
+
+		} catch (final Exception e) {
+			StatusUtil.log(e);
+		} finally {
+
+			Util.close(fs);
+			Util.close(os);
+		}
+	}
+
+	private static void handle_XHR(final HttpExchange httpExchange, final String requestUriPath, final StringBuilder log) {
+
+		final InputStream reqBody = null;
+
+		try {
+
+			if (LOG_XHR) {
+
+//				reqBody = httpExchange.getRequestBody();
+//
+//				final StringBuilder sb = new StringBuilder();
+//				final byte[] buffer = new byte[0x10000];
+//
+//				while (reqBody.read(buffer) != -1) {
+//					sb.append(buffer);
+//				}
+//
+//				// log content
+//				log.append("\nXHR-\n");
+//				log.append(sb.toString());
+//				log.append("\n-XHR\n");
+			}
+
+			final String xhrKey = requestUriPath;
+			final XHRHandler xhrHandler = _allXHRHandler.get(xhrKey);
+
+			if (xhrHandler == null) {
+				StatusUtil.logError("XHR handler is not set for " + xhrKey);
+			} else {
+				xhrHandler.handleXHREvent(httpExchange, log);
+			}
+
+		} catch (final Exception e) {
+			StatusUtil.log(e);
+		} finally {
+
+			Util.close(reqBody);
+		}
+
+	}
+
+	/**
+	 * @param xhrKey
+	 * @return Returns the previous handler or <code>null</code> when a handler is not available.
+	 */
+	public static XHRHandler removeXHRHandler(final String xhrKey) {
+
+		return _allXHRHandler.remove(xhrKey);
+	}
+
+	public static void start() {
 
 		if (_server != null) {
 			return;
@@ -185,7 +363,10 @@ public class WebContentServer {
 
 			_server = HttpServer.create(inetAddress, 0);
 
-			_server.createContext("/", new DefaultHandler());
+			final HttpContext context = _server.createContext("/", new DefaultHandler());
+
+			// convert uri query parameters into a "parameters" map
+			context.getFilters().add(new ParameterFilter());
 
 			// ensure that the server is running in another thread
 			final ExecutorService executor = Executors.newFixedThreadPool(NUMBER_OF_SERVER_THREADS);
@@ -200,11 +381,6 @@ public class WebContentServer {
 		}
 	}
 
-	public static void init() {
-
-		checkServer();
-	}
-
 	public static void stop() {
 
 		if (_server != null) {
@@ -214,6 +390,11 @@ public class WebContentServer {
 
 			StatusUtil.logInfo("Stopped WebContentServer " + SERVER_URL);//$NON-NLS-1$
 		}
+	}
+
+	@Override
+	public String toString() {
+		return "WebContentServer [set=" + Arrays.toString(set) + "]";
 	}
 
 }

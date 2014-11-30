@@ -119,11 +119,11 @@ public class Util {
 		spinner.setSelection(spinner.getSelection() + newValue);
 	}
 
-	public static void close(final FileInputStream fs) {
+	public static void close(final InputStream is) {
 
-		if (fs != null) {
+		if (is != null) {
 			try {
-				fs.close();
+				is.close();
 			} catch (final IOException e) {
 				StatusUtil.log(e);
 			}

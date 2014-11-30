@@ -435,6 +435,8 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 				setupAppSelectionListener();
 
 				setupProxy();
+
+				WebContentServer.start();
 			}
 		});
 	}

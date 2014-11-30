@@ -86,41 +86,6 @@ import org.eclipse.swt.widgets.Display;
 
 public class FTSearchManager {
 
-	private static final String				LUCENE_INDEX_FOLDER_NAME	= "lucene-index";						//$NON-NLS-1$
-
-	private static final String				SEARCH_FIELD_DESCRIPTION	= "description";						//$NON-NLS-1$
-	private static final String				SEARCH_FIELD_DOC_SOURCE		= "docSource";							//$NON-NLS-1$
-	private static final String				SEARCH_FIELD_MARKER_ID		= "markerID";							//$NON-NLS-1$
-	private static final String				SEARCH_FIELD_TITLE			= "title";								//$NON-NLS-1$
-	private static final String				SEARCH_FIELD_TOUR_ID		= "tourID";							//$NON-NLS-1$
-	private static final String				SEARCH_FIELD_TIME			= "time";								//$NON-NLS-1$
-
-	private static final String				LOG_CREATE_INDEX			= "Created ft index: %s\t %d ms";		//$NON-NLS-1$
-
-	static final int						DOC_SOURCE_TOUR				= 1;
-	static final int						DOC_SOURCE_TOUR_MARKER		= 2;
-	static final int						DOC_SOURCE_WAY_POINT		= 3;
-
-	private static final List<LookupResult>	_emptyProposal				= new ArrayList<LookupResult>();
-
-	private static Lookup					_suggester;
-	private static IndexReader				_indexReader;
-	private static IndexSearcher			_indexSearcher;
-
-	private static TopDocs					_topDocs;
-	private static String					_topDocsSearchText;
-
-	private static boolean					_isSortDateAscending		= false;
-
-	// configure field with offsets at index time
-	private static final FieldType			_longSearchField			= new FieldType(LongField.TYPE_STORED);
-	private static final FieldType			_textSearchField			= new FieldType(TextField.TYPE_STORED);
-
-	{
-		_longSearchField.setIndexOptions(IndexOptions.DOCS_AND_FREQS_AND_POSITIONS_AND_OFFSETS);
-		_textSearchField.setIndexOptions(IndexOptions.DOCS_AND_FREQS_AND_POSITIONS_AND_OFFSETS);
-	}
-
 	public static class MyPostingsHighlighter extends PostingsHighlighter {
 
 		private MyPostingsHighlighter() {
@@ -509,7 +474,7 @@ public class FTSearchManager {
 		return writerConfig;
 	}
 
-	static List<LookupResult> getProposals(final String contents, final int position) {
+	static List<LookupResult> getProposals(final String contents) {
 
 		try {
 
@@ -892,6 +857,7 @@ public class FTSearchManager {
 		final Lookup suggester[] = new AnalyzingSuggester[1];
 
 		BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
+			@Override
 			public void run() {
 
 				try {
@@ -975,5 +941,51 @@ public class FTSearchManager {
 //			Util.closeSql(stmt);
 //		}
 
+	}
+
+	private static final String				LUCENE_INDEX_FOLDER_NAME	= "lucene-index";						//$NON-NLS-1$
+
+	private static final String				SEARCH_FIELD_DESCRIPTION	= "description";						//$NON-NLS-1$
+
+	private static final String				SEARCH_FIELD_DOC_SOURCE		= "docSource";							//$NON-NLS-1$
+
+	private static final String				SEARCH_FIELD_MARKER_ID		= "markerID";							//$NON-NLS-1$
+
+	private static final String				SEARCH_FIELD_TITLE			= "title";								//$NON-NLS-1$
+
+	private static final String				SEARCH_FIELD_TOUR_ID		= "tourID";							//$NON-NLS-1$
+
+	private static final String				SEARCH_FIELD_TIME			= "time";								//$NON-NLS-1$
+
+	private static final String				LOG_CREATE_INDEX			= "Created ft index: %s\t %d ms";		//$NON-NLS-1$
+
+	static final int						DOC_SOURCE_TOUR				= 1;
+
+	static final int						DOC_SOURCE_TOUR_MARKER		= 2;
+
+	static final int						DOC_SOURCE_WAY_POINT		= 3;
+
+	private static final List<LookupResult>	_emptyProposal				= new ArrayList<LookupResult>();
+
+	private static Lookup					_suggester;
+
+	private static IndexReader				_indexReader;
+
+	private static IndexSearcher			_indexSearcher;
+
+	private static TopDocs					_topDocs;
+
+	private static String					_topDocsSearchText;
+
+	private static boolean					_isSortDateAscending		= false;
+
+	// configure field with offsets at index time
+	private static final FieldType			_longSearchField			= new FieldType(LongField.TYPE_STORED);
+
+	private static final FieldType			_textSearchField			= new FieldType(TextField.TYPE_STORED);
+
+	{
+		_longSearchField.setIndexOptions(IndexOptions.DOCS_AND_FREQS_AND_POSITIONS_AND_OFFSETS);
+		_textSearchField.setIndexOptions(IndexOptions.DOCS_AND_FREQS_AND_POSITIONS_AND_OFFSETS);
 	}
 }

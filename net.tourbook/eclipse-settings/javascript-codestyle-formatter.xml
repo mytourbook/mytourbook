@@ -1,4 +1,5 @@
-<?xml version="1.0" encoding="UTF-8"?><profiles version="11">
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<profiles version="11">
 <profile kind="CodeFormatterProfile" name="Wolfgangs JS Formatter" version="11">
 <setting id="org.eclipse.wst.jsdt.core.formatter.indent_body_declarations_compare_to_annotation_declaration_header" value="true"/>
 <setting id="org.eclipse.wst.jsdt.core.formatter.insert_space_after_comma_in_enum_constant_arguments" value="insert"/>
@@ -111,7 +112,7 @@
 <setting id="org.eclipse.wst.jsdt.core.formatter.insert_new_line_in_empty_type_declaration" value="insert"/>
 <setting id="org.eclipse.wst.jsdt.core.formatter.insert_new_line_in_empty_anonymous_type_declaration" value="insert"/>
 <setting id="org.eclipse.wst.jsdt.core.formatter.insert_space_after_comma_in_explicitconstructorcall_arguments" value="insert"/>
-<setting id="org.eclipse.wst.jsdt.core.formatter.brace_position_for_objlit_initializer" value="next_line"/>
+<setting id="org.eclipse.wst.jsdt.core.formatter.brace_position_for_objlit_initializer" value="end_of_line"/>
 <setting id="org.eclipse.wst.jsdt.core.formatter.insert_space_between_empty_parens_in_method_declaration" value="do not insert"/>
 <setting id="org.eclipse.wst.jsdt.core.formatter.insert_space_before_comma_in_allocation_expression" value="do not insert"/>
 <setting id="org.eclipse.wst.jsdt.core.compiler.source" value="1.5"/>

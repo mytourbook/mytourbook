@@ -100,150 +100,6 @@ import org.joda.time.format.DateTimeFormatter;
 
 public class SearchView extends ViewPart {
 
-	public static final String			ID										= "net.tourbook.search.SearchView";					//$NON-NLS-1$
-
-	private static final String			IMAGE_ACTION_TOUR_WAY_POINT				= net.tourbook.map2.Messages.Image_Action_TourWayPoint;
-
-	private static final String			SEARCH_RESULT_CSS_FILE					= Search.SEARCH_FOLDER
-																						+ "search-result.css";							//$NON-NLS-1$
-
-	static final String					STATE_IS_SHOW_DATE_TIME					= "STATE_IS_SHOW_DATE_TIME";							//$NON-NLS-1$
-	static final boolean				STATE_IS_SHOW_DATE_TIME_DEFAULT			= false;
-	static final String					STATE_IS_SHOW_ITEM_NUMBER				= "STATE_IS_SHOW_ITEM_NUMBER";							//$NON-NLS-1$
-	static final boolean				STATE_IS_SHOW_ITEM_NUMBER_DEFAULT		= false;
-	static final String					STATE_IS_SHOW_LUCENE_DOC_ID				= "STATE_IS_SHOW_LUCENE_DOC_ID";						//$NON-NLS-1$
-	static final boolean				STATE_IS_SHOW_LUCENE_DOC_ID_DEFAULT		= false;
-//	static final String					STATE_IS_SHOW_SCORE						= "STATE_IS_SHOW_SCORE";			//$NON-NLS-1$
-//	static final boolean				STATE_IS_SHOW_SCORE_DEFAULT				= false;
-	static final String					STATE_IS_SHOW_TOP_NAVIGATOR				= "STATE_IS_SHOW_TOP_NAVIGATOR";						//$NON-NLS-1$
-	static final boolean				STATE_IS_SHOW_TOP_NAVIGATOR_DEFAULT		= false;
-	static final String					STATE_IS_SORT_DATE_ASCENDING			= "STATE_IS_SORT_DATE_ASCENDING";						//$NON-NLS-1$
-	static final boolean				STATE_IS_SORT_DATE_ASCENDING_DEFAULT	= false;
-	static final String					STATE_HITS_PER_PAGE						= "STATE_HITS_PER_PAGE";								//$NON-NLS-1$
-	static final int					STATE_HITS_PER_PAGE_DEFAULT				= 10;
-	static final String					STATE_NUMBER_OF_PAGES					= "STATE_NUMBER_OF_PAGES";								//$NON-NLS-1$
-	static final int					STATE_NUMBER_OF_PAGES_DEFAULT			= 3;
-
-	private static final String			STATE_POPUP_WIDTH						= "STATE_POPUP_WIDTH";									//$NON-NLS-1$
-	private static final String			STATE_POPUP_HEIGHT						= "STATE_POPUP_HEIGHT";								//$NON-NLS-1$
-	private static final String			STATE_SEARCH_TEXT						= "STATE_SEARCH_TEXT";									//$NON-NLS-1$
-
-	private static final String			TAG_TD									= "<td>";
-	private static final String			TAG_TD_END								= "</td>";
-
-	private static final String			CSS_HOVER_CONTAINER						= "hover-container";									//$NON-NLS-1$
-	private static final String			CSS_SELECTED							= "selected";											//$NON-NLS-1$
-
-	private static final String			PAGE_ABOUT_BLANK						= "about:blank";										//$NON-NLS-1$
-
-	/**
-	 * This is necessary otherwise XULrunner in Linux do not fire a location change event.
-	 */
-	private static final String			HTTP_PROTOCOL							= "http://dummy/a?";									//$NON-NLS-1$
-
-	private static final String			HREF_TOKEN								= "&";													//$NON-NLS-1$
-	private static final String			HREF_VALUE_SEP							= "=";													//$NON-NLS-1$
-
-	private static final String			PARAM_ACTION							= "action";											//$NON-NLS-1$
-	private static final String			PARAM_DOC_ID							= "docId";												//$NON-NLS-1$
-	private static final String			PARAM_MARKER_ID							= "markerId";											//$NON-NLS-1$
-	private static final String			PARAM_PAGE								= "page";												//$NON-NLS-1$
-	private static final String			PARAM_TOUR_ID							= "tourId";											//$NON-NLS-1$
-
-	private static final String			ACTION_EDIT_MARKER						= "EditMarker";										//$NON-NLS-1$
-	private static final String			ACTION_EDIT_TOUR						= "EditTour";											//$NON-NLS-1$
-	private static final String			ACTION_NAVIGATE_PAGE					= "NavigatePage";										//$NON-NLS-1$
-	private static final String			ACTION_SELECT_TOUR						= "SelectTour";										//$NON-NLS-1$
-	private static final String			ACTION_SELECT_MARKER					= "SelectMarker";										//$NON-NLS-1$
-	private static final String			ACTION_SELECT_WAY_POINT					= "SelectWayPoint";									//$NON-NLS-1$
-
-	private static String				HREF_ACTION_EDIT_MARKER;
-	private static String				HREF_ACTION_EDIT_TOUR;
-	private static String				HREF_ACTION_NAVIGATE_PAGE;
-	private static String				HREF_ACTION_SELECT_TOUR;
-	private static String				HREF_ACTION_SELECT_MARKER;
-	private static final String			HREF_ACTION_SELECT_WAY_POINT;
-
-	private static String				HREF_PARAM_DOC_ID;
-	private static String				HREF_PARAM_MARKER_ID;
-	private static String				HREF_PARAM_PAGE;
-	private static String				HREF_PARAM_TOUR_ID;
-
-	static {
-
-		// e.g. ...&action=EditMarker...
-
-		final String HREF_ACTION = HREF_TOKEN + PARAM_ACTION + HREF_VALUE_SEP;
-
-		HREF_ACTION_EDIT_MARKER = HREF_ACTION + ACTION_EDIT_MARKER;
-		HREF_ACTION_EDIT_TOUR = HREF_ACTION + ACTION_EDIT_TOUR;
-		HREF_ACTION_NAVIGATE_PAGE = HREF_ACTION + ACTION_NAVIGATE_PAGE;
-		HREF_ACTION_SELECT_TOUR = HREF_ACTION + ACTION_SELECT_TOUR;
-		HREF_ACTION_SELECT_MARKER = HREF_ACTION + ACTION_SELECT_MARKER;
-		HREF_ACTION_SELECT_WAY_POINT = HREF_ACTION + ACTION_SELECT_WAY_POINT;
-
-		HREF_PARAM_DOC_ID = HREF_TOKEN + PARAM_DOC_ID + HREF_VALUE_SEP;
-		HREF_PARAM_MARKER_ID = HREF_TOKEN + PARAM_MARKER_ID + HREF_VALUE_SEP;
-		HREF_PARAM_TOUR_ID = HREF_TOKEN + PARAM_TOUR_ID + HREF_VALUE_SEP;
-		HREF_PARAM_PAGE = HREF_TOKEN + PARAM_PAGE + HREF_VALUE_SEP;
-	}
-
-	private final DateTimeFormatter		_dateFormatter							= DateTimeFormat.mediumDate();
-
-	private final IPreferenceStore		_prefStore								= TourbookPlugin.getPrefStore();
-	private final IDialogSettings		_state									= TourbookPlugin.getState(ID);
-	//
-	private PostSelectionProvider		_postSelectionProvider;
-	private IPropertyChangeListener		_prefChangeListener;
-	private ITourEventListener			_tourEventListener;
-	private IPartListener2				_partListener;
-	//
-	private String						_actionUrl_EditImage;
-	private String						_htmlCss;
-	private String						_iconUrl_Tour;
-	private String						_iconUrl_Marker;
-	private String						_iconUrl_WayPoint;
-
-	private MTContentProposalAdapter	_contentProposalAdapter;
-	private TextContentAdapter			_controlContentAdapter					= new TextContentAdapter();
-	private MTProposalProvider			_proposalProvider						= new MTProposalProvider();
-
-	private ActionSearchOptions			_actionSearchOptions;
-
-	private boolean						_isBrowserLoadingCompleted;
-	private boolean						_isUIShowDateTime;
-	private boolean						_isUIShowItemNumber;
-	private boolean						_isUIShowLuceneDocId;
-//	private boolean						_isUIShowScore;
-	private boolean						_isUIShowTopNavigator;
-
-	private int							_hitsPerPage;
-	private int							_numberOfPages;
-
-	private SearchResult				_searchResult;
-	private long						_searchTime								= -1;
-
-	/**
-	 * Lucene doc id for a selected document in the UI, otherwise it's <code>-1</code>.
-	 */
-	private int							_selectedDocId							= -1;
-	private int							_previousDocId							= -1;
-
-	private PixelConverter				_pc;
-	/*
-	 * UI controls
-	 */
-	private Browser						_browser;
-	private Composite					_pageNoBrowser;
-
-	private Composite					_pageSearch;
-	private Composite					_uiParent;
-	private PageBook					_pageBook;
-
-	private Text						_txtNoBrowser;
-
-	private Text						_txtSearch;
-
 	public class MTContentProposalAdapter extends ContentProposalAdapter {
 
 		/**
@@ -278,9 +134,6 @@ public class SearchView extends ViewPart {
 	 */
 	private class MTProposalProvider implements IContentProposalProvider {
 
-		private String	latestContents;
-		private int		latestPosition;
-
 		private class Proposal implements IContentProposal {
 
 			final private String	proposal;
@@ -291,6 +144,7 @@ public class SearchView extends ViewPart {
 				this.position = proposal.length();
 			}
 
+			@Override
 			public String getContent() {
 
 				final int overlap = stringOverlap(latestContents.substring(0, latestPosition), proposal);
@@ -300,26 +154,33 @@ public class SearchView extends ViewPart {
 				return proposal.substring(overlap);
 			}
 
+			@Override
 			public int getCursorPosition() {
 				return position;
 			}
 
+			@Override
 			public String getDescription() {
 //				return parser.getVariableDescriptions().get(proposal);
 				return null;
 			}
 
+			@Override
 			public String getLabel() {
 				return proposal;
 			}
 		}
+		private String	latestContents;
 
+		private int		latestPosition;
+
+		@Override
 		public IContentProposal[] getProposals(final String contents, final int position) {
 
 			final List<Proposal> primaryProposals = new ArrayList<Proposal>();
 			final List<Proposal> secondaryProposals = new ArrayList<Proposal>();
 
-			final List<LookupResult> proposals = FTSearchManager.getProposals(contents, position);
+			final List<LookupResult> proposals = FTSearchManager.getProposals(contents);
 
 			final String contentToCursor = contents.substring(0, position);
 
@@ -513,6 +374,150 @@ public class SearchView extends ViewPart {
 		display.dispose();
 	}
 
+	public static final String			ID										= "net.tourbook.search.SearchView";					//$NON-NLS-1$
+	private static final String			IMAGE_ACTION_TOUR_WAY_POINT				= net.tourbook.map2.Messages.Image_Action_TourWayPoint;
+	private static final String			SEARCH_RESULT_CSS_FILE					= Search.SEARCH_FOLDER
+																						+ "search-result.css";							//$NON-NLS-1$
+	static final String					STATE_IS_SHOW_DATE_TIME					= "STATE_IS_SHOW_DATE_TIME";							//$NON-NLS-1$
+	static final boolean				STATE_IS_SHOW_DATE_TIME_DEFAULT			= false;
+	static final String					STATE_IS_SHOW_ITEM_NUMBER				= "STATE_IS_SHOW_ITEM_NUMBER";							//$NON-NLS-1$
+static final boolean				STATE_IS_SHOW_ITEM_NUMBER_DEFAULT		= false;
+	static final String					STATE_IS_SHOW_LUCENE_DOC_ID				= "STATE_IS_SHOW_LUCENE_DOC_ID";						//$NON-NLS-1$
+	static final boolean				STATE_IS_SHOW_LUCENE_DOC_ID_DEFAULT		= false;
+	//	static final String					STATE_IS_SHOW_SCORE						= "STATE_IS_SHOW_SCORE";			//$NON-NLS-1$
+//	static final boolean				STATE_IS_SHOW_SCORE_DEFAULT				= false;
+	static final String					STATE_IS_SHOW_TOP_NAVIGATOR				= "STATE_IS_SHOW_TOP_NAVIGATOR";						//$NON-NLS-1$
+	static final boolean				STATE_IS_SHOW_TOP_NAVIGATOR_DEFAULT		= false;
+	static final String					STATE_IS_SORT_DATE_ASCENDING			= "STATE_IS_SORT_DATE_ASCENDING";						//$NON-NLS-1$
+	static final boolean				STATE_IS_SORT_DATE_ASCENDING_DEFAULT	= false;
+	static final String					STATE_HITS_PER_PAGE						= "STATE_HITS_PER_PAGE";								//$NON-NLS-1$
+
+	static final int					STATE_HITS_PER_PAGE_DEFAULT				= 10;
+	static final String					STATE_NUMBER_OF_PAGES					= "STATE_NUMBER_OF_PAGES";								//$NON-NLS-1$
+	static final int					STATE_NUMBER_OF_PAGES_DEFAULT			= 3;
+
+	private static final String			STATE_POPUP_WIDTH						= "STATE_POPUP_WIDTH";									//$NON-NLS-1$
+	private static final String			STATE_POPUP_HEIGHT						= "STATE_POPUP_HEIGHT";								//$NON-NLS-1$
+
+	private static final String			STATE_SEARCH_TEXT						= "STATE_SEARCH_TEXT";									//$NON-NLS-1$
+	private static final String			TAG_TD									= "<td>";
+
+	private static final String			TAG_TD_END								= "</td>";
+
+	private static final String			CSS_HOVER_CONTAINER						= "hover-container";									//$NON-NLS-1$
+
+	private static final String			CSS_SELECTED							= "selected";											//$NON-NLS-1$
+	private static final String			PAGE_ABOUT_BLANK						= "about:blank";										//$NON-NLS-1$
+
+	/**
+	 * This is necessary otherwise XULrunner in Linux do not fire a location change event.
+	 */
+	private static final String			HTTP_PROTOCOL							= "http://dummy/a?";									//$NON-NLS-1$
+	private static final String			HREF_TOKEN								= "&";													//$NON-NLS-1$
+	private static final String			HREF_VALUE_SEP							= "=";													//$NON-NLS-1$
+	private static final String			PARAM_ACTION							= "action";											//$NON-NLS-1$
+	private static final String			PARAM_DOC_ID							= "docId";												//$NON-NLS-1$
+
+	private static final String			PARAM_MARKER_ID							= "markerId";											//$NON-NLS-1$
+	private static final String			PARAM_PAGE								= "page";												//$NON-NLS-1$
+	private static final String			PARAM_TOUR_ID							= "tourId";											//$NON-NLS-1$
+	private static final String			ACTION_EDIT_MARKER						= "EditMarker";										//$NON-NLS-1$
+	private static final String			ACTION_EDIT_TOUR						= "EditTour";											//$NON-NLS-1$
+	private static final String			ACTION_NAVIGATE_PAGE					= "NavigatePage";										//$NON-NLS-1$
+
+	private static final String			ACTION_SELECT_TOUR						= "SelectTour";										//$NON-NLS-1$
+	private static final String			ACTION_SELECT_MARKER					= "SelectMarker";										//$NON-NLS-1$
+	private static final String			ACTION_SELECT_WAY_POINT					= "SelectWayPoint";									//$NON-NLS-1$
+	private static String				HREF_ACTION_EDIT_MARKER;
+	private static String				HREF_ACTION_EDIT_TOUR;
+	private static String				HREF_ACTION_NAVIGATE_PAGE;
+
+	private static String				HREF_ACTION_SELECT_TOUR;
+	private static String				HREF_ACTION_SELECT_MARKER;
+	private static final String			HREF_ACTION_SELECT_WAY_POINT;
+	private static String				HREF_PARAM_DOC_ID;
+
+	private static String				HREF_PARAM_MARKER_ID;
+
+	private static String				HREF_PARAM_PAGE;
+
+	private static String				HREF_PARAM_TOUR_ID;
+	static {
+
+		// e.g. ...&action=EditMarker...
+
+		final String HREF_ACTION = HREF_TOKEN + PARAM_ACTION + HREF_VALUE_SEP;
+
+		HREF_ACTION_EDIT_MARKER = HREF_ACTION + ACTION_EDIT_MARKER;
+		HREF_ACTION_EDIT_TOUR = HREF_ACTION + ACTION_EDIT_TOUR;
+		HREF_ACTION_NAVIGATE_PAGE = HREF_ACTION + ACTION_NAVIGATE_PAGE;
+		HREF_ACTION_SELECT_TOUR = HREF_ACTION + ACTION_SELECT_TOUR;
+		HREF_ACTION_SELECT_MARKER = HREF_ACTION + ACTION_SELECT_MARKER;
+		HREF_ACTION_SELECT_WAY_POINT = HREF_ACTION + ACTION_SELECT_WAY_POINT;
+
+		HREF_PARAM_DOC_ID = HREF_TOKEN + PARAM_DOC_ID + HREF_VALUE_SEP;
+		HREF_PARAM_MARKER_ID = HREF_TOKEN + PARAM_MARKER_ID + HREF_VALUE_SEP;
+		HREF_PARAM_TOUR_ID = HREF_TOKEN + PARAM_TOUR_ID + HREF_VALUE_SEP;
+		HREF_PARAM_PAGE = HREF_TOKEN + PARAM_PAGE + HREF_VALUE_SEP;
+	}
+	private final DateTimeFormatter		_dateFormatter							= DateTimeFormat.mediumDate();
+	private final IPreferenceStore		_prefStore								= TourbookPlugin.getPrefStore();
+	private final IDialogSettings		_state									= TourbookPlugin.getState(ID);
+	//
+	private PostSelectionProvider		_postSelectionProvider;
+	private IPropertyChangeListener		_prefChangeListener;
+	private ITourEventListener			_tourEventListener;
+	private IPartListener2				_partListener;
+	//
+	private String						_actionUrl_EditImage;
+	private String						_htmlCss;
+
+	private String						_iconUrl_Tour;
+	private String						_iconUrl_Marker;
+	private String						_iconUrl_WayPoint;
+
+	private MTContentProposalAdapter	_contentProposalAdapter;
+
+	private TextContentAdapter			_controlContentAdapter					= new TextContentAdapter();
+	private MTProposalProvider			_proposalProvider						= new MTProposalProvider();
+	private ActionSearchOptions			_actionSearchOptions;
+	private boolean						_isBrowserLoadingCompleted;
+private boolean						_isUIShowDateTime;
+
+	private boolean						_isUIShowItemNumber;
+	private boolean						_isUIShowLuceneDocId;
+
+	//	private boolean						_isUIShowScore;
+	private boolean						_isUIShowTopNavigator;
+	private int							_hitsPerPage;
+
+	private int							_numberOfPages;
+	private SearchResult				_searchResult;
+
+	private long						_searchTime								= -1;
+	/**
+	 * Lucene doc id for a selected document in the UI, otherwise it's <code>-1</code>.
+	 */
+	private int							_selectedDocId							= -1;
+	private int							_previousDocId							= -1;
+
+	private PixelConverter				_pc;
+	/*
+	 * UI controls
+	 */
+	private Browser						_browser;
+	private Composite					_pageNoBrowser;
+
+	private Composite					_pageSearch;
+
+	private Composite					_uiParent;
+
+	private PageBook					_pageBook;
+
+	private Text						_txtNoBrowser;
+
+	private Text						_txtSearch;
+
 	void actionOpenSearchView() {
 
 		// force focus, but there are still possibilities, that the focus is not set into the search control.
@@ -536,10 +541,13 @@ public class SearchView extends ViewPart {
 
 		_partListener = new IPartListener2() {
 
+			@Override
 			public void partActivated(final IWorkbenchPartReference partRef) {}
 
+			@Override
 			public void partBroughtToTop(final IWorkbenchPartReference partRef) {}
 
+			@Override
 			public void partClosed(final IWorkbenchPartReference partRef) {
 				if (partRef.getPart(false) == SearchView.this) {
 
@@ -552,14 +560,19 @@ public class SearchView extends ViewPart {
 				}
 			}
 
+			@Override
 			public void partDeactivated(final IWorkbenchPartReference partRef) {}
 
+			@Override
 			public void partHidden(final IWorkbenchPartReference partRef) {}
 
+			@Override
 			public void partInputChanged(final IWorkbenchPartReference partRef) {}
 
+			@Override
 			public void partOpened(final IWorkbenchPartReference partRef) {}
 
+			@Override
 			public void partVisible(final IWorkbenchPartReference partRef) {}
 		};
 		getViewSite().getPage().addPartListener(_partListener);
@@ -568,6 +581,7 @@ public class SearchView extends ViewPart {
 	private void addPrefListener() {
 
 		_prefChangeListener = new IPropertyChangeListener() {
+			@Override
 			public void propertyChange(final PropertyChangeEvent event) {
 
 				final String property = event.getProperty();
@@ -585,6 +599,7 @@ public class SearchView extends ViewPart {
 	private void addTourEventListener() {
 
 		_tourEventListener = new ITourEventListener() {
+			@Override
 			public void tourChanged(final IWorkbenchPart part, final TourEventId eventId, final Object eventData) {
 
 				if (part == SearchView.this) {
@@ -1074,6 +1089,7 @@ public class SearchView extends ViewPart {
 //		_browser.setUrl("google.com");
 
 		_browser.getDisplay().asyncExec(new Runnable() {
+			@Override
 			public void run() {
 
 				_browser.setUrl("http://eclipse.org");
@@ -1166,6 +1182,7 @@ public class SearchView extends ViewPart {
 			});
 
 			_txtSearch.addListener(SWT.KeyDown, new Listener() {
+				@Override
 				public void handleEvent(final Event event) {
 					onKeyDown(event);
 				}
@@ -1563,6 +1580,7 @@ public class SearchView extends ViewPart {
 			final int pageNumber = page;
 
 			_browser.getDisplay().asyncExec(new Runnable() {
+				@Override
 				public void run() {
 					startSearch(false, pageNumber);
 				}
@@ -1712,6 +1730,7 @@ public class SearchView extends ViewPart {
 		 * Run async because a tour save will fire a tour change event.
 		 */
 		_uiParent.getDisplay().asyncExec(new Runnable() {
+			@Override
 			public void run() {
 				TourManager.saveModifiedTour(tourData);
 			}

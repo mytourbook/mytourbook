@@ -1,32 +1,94 @@
 <!DOCTYPE html>
-<html xdebug="true">
-<head>
-
+<html>
 <!-- 
-<script type="text/javascript" src="/WebContent-firebug-lite/content/firebug-lite-dev.js">
-{
-    overrideConsole: false,
-    startInNewWindow: false,
-    startOpened: false,
-    enableTrace: false
-}
-</script>
+<html debug="true">
  -->
+<head>
+<!-- 
+	<script type="text/javascript" src="/WebContent-firebug-lite/content/firebug-lite-dev.js">
+	{
+	    overrideConsole: false,
+	    startInNewWindow: false,
+	    startOpened: false,
+	    enableTrace: false
+	}
+	</script>
+	 -->
 
 <meta http-equiv='Content-Type' content='text/html; charset=UTF-8' />
 <meta http-equiv='X-UA-Compatible' content='IE=edge' />
 
-<title>Tutorial: Hello Dojo!</title>
+<title>Search - MyTourbook 14.14</title>
+<link rel="stylesheet" href="/WebContent-dojo/dijit/themes/claro/claro.css">
+
+<script>
+	dojoConfig = {
+		async : true,
+		parseOnLoad : true,
+		isDebug : true,
+	}
+</script>
+
+<script src="/WebContent-dojo/dojo/dojo.js"></script>
+<script src="search.js"></script>
 
 </head>
-<body>
 
-	<h1 id="greeting">Hello</h1>
+<body class="claro">
 
-	<!-- load Dojo -->
-	<script src="/WebContent-dojo/dojo/dojo.js" data-dojo-config="async: true"></script>
-	
-    <script type="text/javascript" src="search.js"></script>
-    
+	<div id=domSearchInput style='float: left'></div>
+	<div id=domSelectedItem style='float: right;'></div>
+
+	<div id='domResult' style="float: right; padding-top: 20px; width: 50%;"></div>
+
+	<!-- 
+	<input id="apiSearchWidget" 
+		data-dojo-type="dijit.form.FilteringSelect" 
+		data-dojo-props="
+			placeholder:'Quick navigation', 
+			missingMessage : 'Module name not found', 
+			required: false, 
+			hasDownArrow : true"
+		style="width: 150px; display: 'inline';"
+			>
+
+	<input type="select" 
+		data-dojo-type="dijit.form.FilteringSelect"
+		data-dojo-attach-point="_apSearchField" 
+		data-dojo-props="
+			name:			'format',
+			autoComplete:	true,
+			required:		true,
+			searchAttr:		'name',
+			style:			'width:100%;'"
+	/>
+
+	<h1>Output</h1>
+	<div id="output"></div>
+	<button type="button" id="startButton">Start</button>
+
+	<div style="xwidth: 50%;">
+
+		<div style="width: 50%; float: left;">
+			<h3>Search</h3>
+			<div id="_nodeSearch"></div>
+		</div>
+
+		<div style="width: 50%; float: right;">
+			<h3>Selected Values</h3>
+			<div>
+				<strong>value: </strong> <span id="value"></span>
+			</div>
+			<div>
+				<strong>displayedValue: </strong> <span id="displayedValue"></span>
+			</div>
+		</div>
+
+	</div>
+ -->
+
 </body>
+
+
 </html>
+
