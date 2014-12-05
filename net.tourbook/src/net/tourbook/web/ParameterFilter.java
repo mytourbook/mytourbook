@@ -26,12 +26,9 @@ public class ParameterFilter extends Filter {
 
 	private static final String	REQUEST_METHOD_POST		= "post";
 	public static final String	ATTRIBUTE_PARAMETERS	= "parameters";
-	private static final String	UTF_8					= "utf-8";
 
 	private static final String	REGEX_VALUE_SEP			= "[=]";
 	private static final String	REGEX_PARAMETER_SEP		= "[&]";
-
-	private static final String	FILE_ENCODING			= System.getProperty("file.encoding");
 
 	@Override
 	public String description() {
@@ -66,7 +63,7 @@ public class ParameterFilter extends Filter {
 			@SuppressWarnings("unchecked")
 			final Map<String, Object> parameters = (Map<String, Object>) exchange.getAttribute(ATTRIBUTE_PARAMETERS);
 
-			final InputStreamReader isr = new InputStreamReader(exchange.getRequestBody(), UTF_8);
+			final InputStreamReader isr = new InputStreamReader(exchange.getRequestBody(), WEB.UTF_8);
 			final BufferedReader br = new BufferedReader(isr);
 			final String query = br.readLine();
 
@@ -88,12 +85,13 @@ public class ParameterFilter extends Filter {
 
 				String key = null;
 				String value = null;
+
 				if (param.length > 0) {
-					key = URLDecoder.decode(param[0], FILE_ENCODING);
+					key = URLDecoder.decode(param[0], WEB.UTF_8);
 				}
 
 				if (param.length > 1) {
-					value = URLDecoder.decode(param[1], FILE_ENCODING);
+					value = URLDecoder.decode(param[1], WEB.UTF_8);
 				}
 
 				if (parameters.containsKey(key)) {

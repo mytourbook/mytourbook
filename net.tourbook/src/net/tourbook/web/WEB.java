@@ -27,6 +27,8 @@ import org.eclipse.core.runtime.FileLocator;
 
 public class WEB {
 
+	public static final String	UTF_8						= "UTF-8";			//$NON-NLS-1$
+
 	public static String		SERVER_URL;
 
 	static {

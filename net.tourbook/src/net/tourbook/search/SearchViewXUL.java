@@ -29,7 +29,7 @@ public class SearchViewXUL extends ViewPart {
 
 	public static final String	ID	= "net.tourbook.search.SearchViewXUL";	//$NON-NLS-1$
 
-	private Search				_search;
+	private SearchUI				_search;
 
 	private IPartListener2		_partListener;
 
@@ -37,27 +37,40 @@ public class SearchViewXUL extends ViewPart {
 
 		_partListener = new IPartListener2() {
 
+			@Override
 			public void partActivated(final IWorkbenchPartReference partRef) {}
 
+			@Override
 			public void partBroughtToTop(final IWorkbenchPartReference partRef) {}
 
+			@Override
 			public void partClosed(final IWorkbenchPartReference partRef) {
 
 				if (partRef.getPart(false) == SearchViewXUL.this) {
+
+					/**
+					 * Close ft index that it will be created each time when the index is opened.
+					 */
+					FTSearchManager.close();
 
 					// stop webserver for debugging
 					WebContentServer.stop();
 				}
 			}
 
+			@Override
 			public void partDeactivated(final IWorkbenchPartReference partRef) {}
 
+			@Override
 			public void partHidden(final IWorkbenchPartReference partRef) {}
 
+			@Override
 			public void partInputChanged(final IWorkbenchPartReference partRef) {}
 
+			@Override
 			public void partOpened(final IWorkbenchPartReference partRef) {}
 
+			@Override
 			public void partVisible(final IWorkbenchPartReference partRef) {}
 		};
 
@@ -82,7 +95,7 @@ public class SearchViewXUL extends ViewPart {
 
 		addPartListener();
 
-		_search = new Search(browser);
+		_search = new SearchUI(browser);
 	}
 
 	@Override

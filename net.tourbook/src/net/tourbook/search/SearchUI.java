@@ -17,6 +17,8 @@ package net.tourbook.search;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.List;
 import java.util.Map;
 
@@ -35,7 +37,7 @@ import org.json.JSONObject;
 
 import com.sun.net.httpserver.HttpExchange;
 
-public class Search implements XHRHandler {
+public class SearchUI implements XHRHandler {
 
 	static final String			SEARCH_FOLDER			= "/search/";	//$NON-NLS-1$
 
@@ -55,7 +57,7 @@ public class Search implements XHRHandler {
 
 	private Browser				_browser;
 
-	Search(final Browser browser) {
+	SearchUI(final Browser browser) {
 
 		// ensure web server is started
 		WebContentServer.start();
@@ -69,7 +71,7 @@ public class Search implements XHRHandler {
 		_browser.setUrl(searchUrl);
 	}
 
-	private String doAction_Proposals(final Map<String, Object> params) {
+	private String doAction_Proposals(final Map<String, Object> params) throws UnsupportedEncodingException {
 
 		final JSONObject jsonResponse = new JSONObject();
 
@@ -77,7 +79,10 @@ public class Search implements XHRHandler {
 		final Object xhrSearchText = params.get(XHR_SEARCH_TEXT);
 
 		if (xhrSearchText instanceof String) {
-			proposals = FTSearchManager.getProposals((String) xhrSearchText);
+
+			final String searchText = URLDecoder.decode((String) xhrSearchText, WEB.UTF_8);
+
+			proposals = FTSearchManager.getProposals(searchText);
 		}
 
 		if (proposals.size() == 0) {
@@ -90,8 +95,8 @@ public class Search implements XHRHandler {
 			final String proposal = lookupResult.key.toString();
 
 			final JSONObject item = new JSONObject();
-			item.put(ITEM_KEY_ID, "" + proposal);
-			item.put(ITEM_KEY_NAME, "" + proposal);
+			item.put(ITEM_KEY_ID, proposal);
+			item.put(ITEM_KEY_NAME, proposal);
 
 			allItems.put(item);
 		}
@@ -99,6 +104,7 @@ public class Search implements XHRHandler {
 		jsonResponse.put("items", allItems);
 
 		final String response = jsonResponse.toString();
+
 		return response;
 	}
 
@@ -150,10 +156,13 @@ public class Search implements XHRHandler {
 
 		try {
 
-			httpExchange.sendResponseHeaders(200, response.length());
+//			response.setContentType("application/json;charset=UTF-8");
+			final byte[] convertedResponse = response.getBytes(WEB.UTF_8);
+
+			httpExchange.sendResponseHeaders(200, convertedResponse.length);
 
 			os = httpExchange.getResponseBody();
-			os.write(response.getBytes());
+			os.write(convertedResponse);
 
 		} catch (final Exception e) {
 			StatusUtil.log(e);

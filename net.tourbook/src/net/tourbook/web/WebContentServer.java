@@ -68,6 +68,11 @@ public class WebContentServer {
 	private static final String				REQUEST_PATH_DOJO			= "/WebContent-dojo";			//$NON-NLS-1$
 	private static final String				REQUEST_PATH_FIREBUG_LITE	= "/WebContent-firebug-lite";	//$NON-NLS-1$
 
+	/**
+	 * Path for custom dojo widgets
+	 */
+	private static final String				REQUEST_PATH_TOURBOOK		= "/tourbook";					//$NON-NLS-1$
+
 	private static final String				XHR_HEADER_KEY				= "X-requested-with";			//$NON-NLS-1$
 	private static final String				XHR_HEADER_VALUE			= "XMLHttpRequest";			//$NON-NLS-1$
 
@@ -98,130 +103,10 @@ public class WebContentServer {
 
 	private static class DefaultHandler implements HttpHandler {
 
+		@Override
 		public void handle(final HttpExchange httpExchange) throws IOException {
-
-			final long start = System.nanoTime();
-
-			final StringBuilder log = new StringBuilder();
-
-			try {
-
-				boolean isResourceUrl = false;
-
-				final String rootPath = WEB.getFile(ROOT_FILE_PATH_NAME).getCanonicalFile().getPath();
-
-				final URI requestURI = httpExchange.getRequestURI();
-				final String requestUriPath = requestURI.getPath();
-
-				final Headers requestHeaders = httpExchange.getRequestHeaders();
-				final Set<Entry<String, List<String>>> headerEntries = requestHeaders.entrySet();
-
-				final String xhrValue = requestHeaders.getFirst(XHR_HEADER_KEY);
-				final boolean isXHR = XHR_HEADER_VALUE.equals(xhrValue);
-
-				if (LOG_URL || LOG_XHR) {
-					log.append(requestUriPath);
-				}
-				if (LOG_URL && LOG_XHR) {
-					logParameter(httpExchange, log);
-				}
-				if (LOG_HEADER && isXHR) {
-					logHeader(log, headerEntries);
-				}
-
-				if (isXHR) {
-
-					// XHR request
-
-					handle_XHR(httpExchange, requestUriPath, log);
-
-				} else {
-
-					String requestedOSPath = null;
-
-					if (requestUriPath.startsWith(REQUEST_PATH_FIREBUG_LITE)) {
-
-						// Firebug lite request
-
-						isResourceUrl = true;
-						requestedOSPath = "C:/E/XULRunner/" + requestUriPath;
-
-					} else if (requestUriPath.startsWith(REQUEST_PATH_DOJO)) {
-
-						// Dojo request
-
-						isResourceUrl = true;
-						requestedOSPath = "C:/E/js-resources/dojo/" + requestUriPath;
-
-					} else {
-
-						// default request
-
-						requestedOSPath = rootPath + requestUriPath;
-					}
-
-					if (requestedOSPath != null) {
-
-						final File file = new File(requestedOSPath).getCanonicalFile();
-
-						if (!file.getPath().startsWith(rootPath) && !isResourceUrl) {
-
-							// Suspected path traversal attack: reject with 403 error.
-
-							handle_403(httpExchange, file);
-
-						} else if (!file.isFile()) {
-
-							// Object does not exist or is not a file: reject with 404 error.
-
-							handle_404(httpExchange, file, requestUriPath);
-
-						} else {
-
-							// Object exists and is a file: accept with response code 200.
-
-							handle_File(httpExchange, file);
-						}
-					}
-				}
-
-			} catch (final Exception e) {
-				StatusUtil.log(e);
-			} finally {
-
-				if (LOG_URL || LOG_XHR || LOG_HEADER) {
-
-					final String msg = String.format("%s %5.1f ms  %-16s  %s", //
-							UI.timeStampNano(),
-							(float) (System.nanoTime() - start) / 1000000,
-							Thread.currentThread().getName(),
-							log);
-
-					System.out.println(msg);
-				}
-			}
+			WebContentServer.handle(httpExchange);
 		}
-
-		private void logHeader(final StringBuilder log, final Set<Entry<String, List<String>>> headerEntries) {
-			
-			log.append("\n");
-			
-			for (final Entry<String, List<String>> entry : headerEntries) {
-				log.append(String.format("%-20s %s\n", entry.getKey(), entry.getValue()));
-			}
-		}
-
-		private void logParameter(final HttpExchange httpExchange, final StringBuilder log) {
-			
-			// get parameters from url query string
-			
-			@SuppressWarnings("unchecked")
-			final Map<String, Object> params = (Map<String, Object>) httpExchange
-					.getAttribute(ParameterFilter.ATTRIBUTE_PARAMETERS);
-
-			log.append("\tparams: " + params);
-		}
-
 	}
 
 	/**
@@ -232,6 +117,117 @@ public class WebContentServer {
 	public static XHRHandler addXHRHandler(final String xhrKey, final XHRHandler xhrHandler) {
 
 		return _allXHRHandler.put(xhrKey, xhrHandler);
+	}
+
+	private static void handle(final HttpExchange httpExchange) {
+
+		final long start = System.nanoTime();
+
+		final StringBuilder log = new StringBuilder();
+
+		try {
+
+			boolean isResourceUrl = false;
+
+			final String rootPath = WEB.getFile(ROOT_FILE_PATH_NAME).getCanonicalFile().getPath();
+
+			final URI requestURI = httpExchange.getRequestURI();
+			final String requestUriPath = requestURI.getPath();
+
+			final Headers requestHeaders = httpExchange.getRequestHeaders();
+			final Set<Entry<String, List<String>>> headerEntries = requestHeaders.entrySet();
+
+			final String xhrValue = requestHeaders.getFirst(XHR_HEADER_KEY);
+			final boolean isXHR = XHR_HEADER_VALUE.equals(xhrValue);
+
+			if (LOG_URL || LOG_XHR) {
+				log.append(requestUriPath);
+			}
+			if (LOG_URL && LOG_XHR) {
+				logParameter(httpExchange, log);
+			}
+			if (LOG_HEADER && isXHR) {
+				logHeader(log, headerEntries);
+			}
+
+			if (isXHR) {
+
+				// XHR request
+
+				handle_XHR(httpExchange, requestUriPath, log);
+
+			} else {
+
+				String requestedOSPath = null;
+
+				if (requestUriPath.startsWith(REQUEST_PATH_FIREBUG_LITE)) {
+
+					// Firebug lite requests
+
+					isResourceUrl = true;
+					requestedOSPath = "C:/E/XULRunner/" + requestUriPath;
+
+				} else if (requestUriPath.startsWith(REQUEST_PATH_DOJO)) {
+
+					// Dojo requests
+
+					isResourceUrl = true;
+					requestedOSPath = "C:/E/js-resources/dojo/" + requestUriPath;
+
+				} else if (requestUriPath.startsWith(REQUEST_PATH_TOURBOOK)) {
+
+					// Tourbook widget requests
+
+					isResourceUrl = true;
+					requestedOSPath = rootPath + requestUriPath;
+
+				} else {
+
+					// default request
+
+					requestedOSPath = rootPath + requestUriPath;
+				}
+
+				if (requestedOSPath != null) {
+
+					final File file = new File(requestedOSPath).getCanonicalFile();
+
+					if (!file.getPath().startsWith(rootPath) && !isResourceUrl) {
+
+						// Suspected path traversal attack: reject with 403 error.
+
+						handle_403(httpExchange, file);
+
+					} else if (!file.isFile()) {
+
+						// Object does not exist or is not a file: reject with 404 error.
+
+						handle_404(httpExchange, file, requestUriPath);
+
+					} else {
+
+						// Object exists and is a file: accept with response code 200.
+
+						handle_File(httpExchange, file);
+					}
+				}
+			}
+
+		} catch (final Exception e) {
+			StatusUtil.log(e);
+		} finally {
+
+			if (LOG_URL || LOG_XHR || LOG_HEADER) {
+
+				final String msg = String.format("%s %5.1f ms  %-16s  %s", //
+						UI.timeStampNano(),
+						(float) (System.nanoTime() - start) / 1000000,
+						Thread.currentThread().getName(),
+						log);
+
+				System.out.println(msg);
+			}
+		}
 	}
 
 	private static void handle_403(final HttpExchange httpExchange, final File file) {
@@ -342,6 +338,26 @@ public class WebContentServer {
 			Util.close(reqBody);
 		}
 
+	}
+
+	private static void logHeader(final StringBuilder log, final Set<Entry<String, List<String>>> headerEntries) {
+
+		log.append("\n");
+
+		for (final Entry<String, List<String>> entry : headerEntries) {
+			log.append(String.format("%-20s %s\n", entry.getKey(), entry.getValue()));
+		}
+	}
+
+	private static void logParameter(final HttpExchange httpExchange, final StringBuilder log) {
+
+		// get parameters from url query string
+
+		@SuppressWarnings("unchecked")
+		final Map<String, Object> params = (Map<String, Object>) httpExchange
+				.getAttribute(ParameterFilter.ATTRIBUTE_PARAMETERS);
+
+		log.append("\tparams: " + params);
 	}
 
 	/**
