@@ -104,7 +104,7 @@ public class SearchView extends ViewPart {
 
 	private static final String			IMAGE_ACTION_TOUR_WAY_POINT				= net.tourbook.map2.Messages.Image_Action_TourWayPoint;
 
-	private static final String			SEARCH_RESULT_CSS_FILE					= SearchUI.SEARCH_FOLDER
+	private static final String			SEARCH_RESULT_CSS_FILE					= SearchWebService.SEARCH_FOLDER
 																						+ "search-result.css";							//$NON-NLS-1$
 
 	static final String					STATE_IS_SHOW_DATE_TIME					= "STATE_IS_SHOW_DATE_TIME";							//$NON-NLS-1$
@@ -1842,7 +1842,7 @@ public class SearchView extends ViewPart {
 		_searchTime = -1;
 		final long startTime = System.currentTimeMillis();
 
-		final SearchResult searchResult = FTSearchManager.search(searchText, pageNumber, _hitsPerPage);
+		final SearchResult searchResult = FTSearchManager.searchByPage(searchText, pageNumber, _hitsPerPage);
 
 		if (searchResult.items.size() == 0 && searchResult.error == null) {
 			updateUI(null, "No result");

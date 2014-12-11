@@ -53,12 +53,13 @@ public class WebContentServer {
 
 	// logs: time, url
 	private static boolean					LOG_URL						= true;
+	private static boolean					LOG_DOJO					= false;
 
 	// logs: header
 	private static boolean					LOG_HEADER					= false;
 
 	// logs: xhr
-	private static boolean					LOG_XHR						= false;
+	private static boolean					LOG_XHR						= true;
 
 	private static final String				ROOT_FILE_PATH_NAME			= "/";							//$NON-NLS-1$
 
@@ -139,15 +140,23 @@ public class WebContentServer {
 
 			final String xhrValue = requestHeaders.getFirst(XHR_HEADER_KEY);
 			final boolean isXHR = XHR_HEADER_VALUE.equals(xhrValue);
+			final boolean isDojo = requestUriPath.startsWith(REQUEST_PATH_DOJO);
 
-			if (LOG_URL || LOG_XHR) {
-				log.append(requestUriPath);
-			}
-			if (LOG_URL && LOG_XHR) {
-				logParameter(httpExchange, log);
-			}
-			if (LOG_HEADER && isXHR) {
-				logHeader(log, headerEntries);
+			if (isDojo) {
+				if (LOG_DOJO) {
+					log.append(requestUriPath);
+				}
+			} else {
+
+				if (LOG_URL || LOG_XHR) {
+					log.append(requestUriPath);
+				}
+				if (LOG_URL && LOG_XHR) {
+					logParameter(httpExchange, log);
+				}
+				if (LOG_HEADER && isXHR) {
+					logHeader(log, headerEntries);
+				}
 			}
 
 			if (isXHR) {
@@ -160,14 +169,7 @@ public class WebContentServer {
 
 				String requestedOSPath = null;
 
-				if (requestUriPath.startsWith(REQUEST_PATH_FIREBUG_LITE)) {
-
-					// Firebug lite requests
-
-					isResourceUrl = true;
-					requestedOSPath = "C:/E/XULRunner/" + requestUriPath;
-
-				} else if (requestUriPath.startsWith(REQUEST_PATH_DOJO)) {
+				if (isDojo) {
 
 					// Dojo requests
 
@@ -180,6 +182,13 @@ public class WebContentServer {
 
 					isResourceUrl = true;
 					requestedOSPath = rootPath + requestUriPath;
+
+				} else if (requestUriPath.startsWith(REQUEST_PATH_FIREBUG_LITE)) {
+
+					// Firebug lite requests
+
+					isResourceUrl = true;
+					requestedOSPath = "C:/E/XULRunner/" + requestUriPath;
 
 				} else {
 
@@ -217,7 +226,7 @@ public class WebContentServer {
 			StatusUtil.log(e);
 		} finally {
 
-			if (LOG_URL || LOG_XHR || LOG_HEADER) {
+			if (log.length() > 0 && (LOG_URL || LOG_XHR || LOG_HEADER || LOG_DOJO)) {
 
 				final String msg = String.format("%s %5.1f ms  %-16s  %s", //
 						UI.timeStampNano(),
@@ -355,7 +364,7 @@ public class WebContentServer {
 
 		@SuppressWarnings("unchecked")
 		final Map<String, Object> params = (Map<String, Object>) httpExchange
-				.getAttribute(ParameterFilter.ATTRIBUTE_PARAMETERS);
+				.getAttribute(RequestParameterFilter.ATTRIBUTE_PARAMETERS);
 
 		log.append("\tparams: " + params);
 	}
@@ -382,7 +391,7 @@ public class WebContentServer {
 			final HttpContext context = _server.createContext("/", new DefaultHandler());
 
 			// convert uri query parameters into a "parameters" map
-			context.getFilters().add(new ParameterFilter());
+			context.getFilters().add(new RequestParameterFilter());
 
 			// ensure that the server is running in another thread
 			final ExecutorService executor = Executors.newFixedThreadPool(NUMBER_OF_SERVER_THREADS);

@@ -19,13 +19,14 @@
 <meta http-equiv='X-UA-Compatible' content='IE=edge' />
 
 <title>Search - MyTourbook 14.14</title>
-<link rel="stylesheet" href="/WebContent-dojo/dijit/themes/claro/claro.css">
+<link rel="stylesheet" type="text/css" href="/WebContent-dojo/dijit/themes/claro/claro.css">
+<link rel="stylesheet" type="text/css" href="/WebContent-dojo/dojox/grid/resources/Grid.css" >
 
 <script>
 	dojoConfig = {
 		async : true,
 		parseOnLoad : true,
-		isDebug : true,
+		//isDebug : true,
 	}
 </script>
 
@@ -36,9 +37,23 @@
 
 <body class="claro">
 
-	<div id="domSearchInput" style="float: left;"></div>
+	<div id="domLog" style="background-color: #FFFCD9; width: 50%; height: 50%; overflow: auto;"></div>
 
-	<div id="domLog" style="float: right; background-color: #FFFCD9; width: 50%; height: 50%; overflow: auto;"></div>
+
+	<div id="domSearchInput" style="height: 5em;"></div>
+	
+	<div
+		data-dojo-type="dijit.layout.BorderContainer"
+		data-dojo-attach-point="_apContainer"
+		xstyle="background-color: #efd"
+		style="width:90%; height: 300px; background-color: yellow;"
+		>
+	
+		<div id="domGrid" 
+			style="width:90%; height:90%; background-color:green;"
+		></div>
+	
+	</div>
 
 </body>
 

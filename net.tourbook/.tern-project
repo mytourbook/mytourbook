@@ -1,1 +1,1 @@
-{"ide":{},"libs":["ecma5","browser"],"plugins":{"requirejs":{}}}
+{"ide":{"scriptPaths":[{"type":"FOLDER","path":"dojo-EXTERNAL/dojo"}]},"libs":["browser","ecma5"],"plugins":{"requirejs":{"paths":{}}}}

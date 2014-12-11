@@ -755,93 +755,6 @@ public class FTSearchManager {
 	}
 
 	/**
-	 * @param searchText
-	 * @param pageNumber
-	 *            Starting from 0.
-	 * @param hitsPerPage
-	 * @return
-	 */
-	public static SearchResult search(final String searchText, final int pageNumber, final int hitsPerPage) {
-
-		final SearchResult searchResult = new SearchResult();
-
-		searchResult.pageNumber = pageNumber;
-		searchResult.hitsPerPage = hitsPerPage;
-
-		try {
-
-			setupIndexReader();
-
-			final String[] queryFields = {
-					//
-					SEARCH_FIELD_TITLE,
-					SEARCH_FIELD_DESCRIPTION,
-			//
-			};
-
-			final int maxPassages[] = new int[queryFields.length];
-			Arrays.fill(maxPassages, 1);
-
-			final Analyzer analyzer = getAnalyzer();
-
-			final MultiFieldQueryParser queryParser = new MultiFieldQueryParser(queryFields, analyzer);
-			queryParser.setAllowLeadingWildcard(true);
-
-			final Query query = queryParser.parse(searchText);
-
-			if (_topDocsSearchText == null || _topDocsSearchText.equals(searchText) == false || true) {
-
-				// this is a new search
-
-				final SortField sortByTime = new SortField(SEARCH_FIELD_TIME, Type.LONG, _isSortDateAscending == false);
-				final Sort sort = new Sort(sortByTime);
-
-				_topDocs = _indexSearcher.search(query, _indexReader.maxDoc(), sort);
-
-				_topDocsSearchText = searchText;
-			}
-
-			final ScoreDoc[] scoreDocs = _topDocs.scoreDocs;
-
-			/**
-			 * Get doc id's only for the current page.
-			 * <p>
-			 * It is very cheap to query the doc id's but very expensive to retrieve the documents.
-			 */
-			final int maxDocIndex = scoreDocs.length;
-			final int docStartIndex = pageNumber * hitsPerPage;
-			int docEndIndex = (pageNumber + 1) * hitsPerPage;
-
-			if (docEndIndex > maxDocIndex) {
-				docEndIndex = maxDocIndex;
-			}
-
-			final int maxPageIndex = docEndIndex - docStartIndex;
-			final int docids[] = new int[maxPageIndex];
-
-			for (int docIndex = 0; docIndex < maxPageIndex; docIndex++) {
-				docids[docIndex] = scoreDocs[docStartIndex + docIndex].doc;
-			}
-
-			final MyPostingsHighlighter highlighter = new MyPostingsHighlighter();
-			final Map<String, String[]> highlights = highlighter.highlightFields(
-					queryFields,
-					query,
-					_indexSearcher,
-					docids,
-					maxPassages);
-
-			search_CreateResult(highlights, _topDocs, _indexReader, searchResult, docids, docStartIndex);
-
-		} catch (final Exception e) {
-			StatusUtil.showStatus(e);
-			searchResult.error = e.getMessage();
-		}
-
-		return searchResult;
-	}
-
-	/**
 	 * Creating the result is complicated because the highlights are listed by field and not by hit,
 	 * therefor the structure must be inverted.
 	 * 
@@ -865,7 +778,6 @@ public class FTSearchManager {
 		}
 
 		searchResult.totalHits = topDocs.totalHits;
-//		final ScoreDoc[] scoreDocs = topDocs.scoreDocs;
 
 		final Set<Entry<String, String[]>> fields = highlights.entrySet();
 		Entry<String, String[]> firstHit;
@@ -954,6 +866,115 @@ public class FTSearchManager {
 			// get doc fields only once
 			isDocRead = true;
 		}
+	}
+
+	/**
+	 * @param searchText
+	 * @param pageNumber
+	 *            Starting from 0.
+	 * @param hitsPerPage
+	 * @return
+	 */
+	public static SearchResult searchByPage(final String searchText, final int pageNumber, final int hitsPerPage) {
+
+		final int docStartIndex = pageNumber * hitsPerPage;
+		final int docEndIndex = (pageNumber + 1) * hitsPerPage;
+
+		return searchByPosition(searchText, docStartIndex, docEndIndex, pageNumber, hitsPerPage);
+	}
+
+	/**
+	 * @param searchText
+	 * @param startIndex
+	 * @param endIndex
+	 * @param pageNumber
+	 *            or <code>-1</code> when not available.
+	 * @param hitsPerPage
+	 *            or <code>-1</code> when not available.
+	 * @return
+	 */
+	public static SearchResult searchByPosition(final String searchText,
+												final int startIndex,
+												final int endIndex,
+												final int pageNumber,
+												final int hitsPerPage) {
+
+		final SearchResult searchResult = new SearchResult();
+
+		searchResult.pageNumber = pageNumber;
+		searchResult.hitsPerPage = hitsPerPage;
+
+		try {
+
+			setupIndexReader();
+
+			final String[] queryFields = {
+					//
+					SEARCH_FIELD_TITLE,
+					SEARCH_FIELD_DESCRIPTION,
+			//
+			};
+
+			final int maxPassages[] = new int[queryFields.length];
+			Arrays.fill(maxPassages, 1);
+
+			final Analyzer analyzer = getAnalyzer();
+
+			final MultiFieldQueryParser queryParser = new MultiFieldQueryParser(queryFields, analyzer);
+			queryParser.setAllowLeadingWildcard(true);
+
+			final Query query = queryParser.parse(searchText);
+
+			if (_topDocsSearchText == null || _topDocsSearchText.equals(searchText) == false || true) {
+
+				// this is a new search
+
+				final SortField sortByTime = new SortField(SEARCH_FIELD_TIME, Type.LONG, _isSortDateAscending == false);
+				final Sort sort = new Sort(sortByTime);
+
+				_topDocs = _indexSearcher.search(query, _indexReader.maxDoc(), sort);
+
+				_topDocsSearchText = searchText;
+			}
+
+			final ScoreDoc[] scoreDocs = _topDocs.scoreDocs;
+
+			/**
+			 * Get doc id's only for the current page.
+			 * <p>
+			 * It is very cheap to query the doc id's but very expensive to retrieve the documents.
+			 */
+			final int maxDocIndex = scoreDocs.length;
+			final int docStartIndex = startIndex;
+			int docEndIndex = endIndex;
+
+			if (docEndIndex > maxDocIndex) {
+				docEndIndex = maxDocIndex;
+			}
+
+			final int maxPageIndex = docEndIndex - docStartIndex;
+			final int docids[] = new int[maxPageIndex];
+
+			for (int docIndex = 0; docIndex < maxPageIndex; docIndex++) {
+				docids[docIndex] = scoreDocs[docStartIndex + docIndex].doc;
+			}
+
+			final MyPostingsHighlighter highlighter = new MyPostingsHighlighter();
+			final Map<String, String[]> highlights = highlighter.highlightFields(
+					queryFields,
+					query,
+					_indexSearcher,
+					docids,
+					maxPassages);
+
+			search_CreateResult(highlights, _topDocs, _indexReader, searchResult, docids, docStartIndex);
+
+		} catch (final Exception e) {
+			StatusUtil.showStatus(e);
+			searchResult.error = e.getMessage();
+		}
+
+		return searchResult;
 	}
 
 	static void setResultSorting(final boolean isSortDateAscending) {

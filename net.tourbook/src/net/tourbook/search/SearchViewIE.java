@@ -25,7 +25,7 @@ public class SearchViewIE extends ViewPart {
 
 	public static final String	ID	= "net.tourbook.search.SearchViewIE";	//$NON-NLS-1$
 
-	private SearchUI				_search;
+	private SearchWebService				_search;
 
 	@Override
 	public void createPartControl(final Composite parent) {
@@ -40,7 +40,7 @@ public class SearchViewIE extends ViewPart {
 			return;
 		}
 
-		_search = new SearchUI(browser);
+		_search = new SearchWebService(browser);
 	}
 
 	@Override

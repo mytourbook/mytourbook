@@ -22,7 +22,7 @@ import com.sun.net.httpserver.HttpExchange;
  * Puts query parameters into a map which can be retrieved with
  * {@link HttpExchange#getAttribute(String)} and "parameters" as the parameter.
  */
-public class ParameterFilter extends Filter {
+public class RequestParameterFilter extends Filter {
 
 	private static final String	REQUEST_METHOD_POST		= "post";
 	public static final String	ATTRIBUTE_PARAMETERS	= "parameters";

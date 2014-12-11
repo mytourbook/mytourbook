@@ -29,7 +29,7 @@ public class SearchViewXUL extends ViewPart {
 
 	public static final String	ID	= "net.tourbook.search.SearchViewXUL";	//$NON-NLS-1$
 
-	private SearchUI				_search;
+	private SearchWebService				_search;
 
 	private IPartListener2		_partListener;
 
@@ -95,7 +95,7 @@ public class SearchViewXUL extends ViewPart {
 
 		addPartListener();
 
-		_search = new SearchUI(browser);
+		_search = new SearchWebService(browser);
 	}
 
 	@Override
