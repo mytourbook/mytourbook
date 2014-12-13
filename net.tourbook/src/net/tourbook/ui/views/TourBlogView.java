@@ -89,6 +89,8 @@ public class TourBlogView extends ViewPart {
 
 	public static final String		ID										= "net.tourbook.ui.views.TourBlogView";		//$NON-NLS-1$
 
+	private static final String		TOUR_BLOG_CSS							= "/tourbook/blog/tour-blog.css";				//$NON-NLS-1$
+
 	static final String				STATE_IS_DRAW_MARKER_WITH_DEFAULT_COLOR	= "STATE_IS_DRAW_MARKER_WITH_DEFAULT_COLOR";	//$NON-NLS-1$
 	static final String				STATE_IS_SHOW_HIDDEN_MARKER				= "STATE_IS_SHOW_HIDDEN_MARKER";				//$NON-NLS-1$
 
@@ -175,24 +177,32 @@ public class TourBlogView extends ViewPart {
 
 		_partListener = new IPartListener2() {
 
+			@Override
 			public void partActivated(final IWorkbenchPartReference partRef) {}
 
+			@Override
 			public void partBroughtToTop(final IWorkbenchPartReference partRef) {}
 
+			@Override
 			public void partClosed(final IWorkbenchPartReference partRef) {
 				if (partRef.getPart(false) == TourBlogView.this) {
 					saveState();
 				}
 			}
 
+			@Override
 			public void partDeactivated(final IWorkbenchPartReference partRef) {}
 
+			@Override
 			public void partHidden(final IWorkbenchPartReference partRef) {}
 
+			@Override
 			public void partInputChanged(final IWorkbenchPartReference partRef) {}
 
+			@Override
 			public void partOpened(final IWorkbenchPartReference partRef) {}
 
+			@Override
 			public void partVisible(final IWorkbenchPartReference partRef) {}
 		};
 		getViewSite().getPage().addPartListener(_partListener);
@@ -201,6 +211,7 @@ public class TourBlogView extends ViewPart {
 	private void addPrefListener() {
 
 		_prefChangeListener = new IPropertyChangeListener() {
+			@Override
 			public void propertyChange(final PropertyChangeEvent event) {
 
 				final String property = event.getProperty();
@@ -224,6 +235,7 @@ public class TourBlogView extends ViewPart {
 	private void addSelectionListener() {
 
 		_postSelectionListener = new ISelectionListener() {
+			@Override
 			public void selectionChanged(final IWorkbenchPart part, final ISelection selection) {
 				if (part == TourBlogView.this) {
 					return;
@@ -237,6 +249,7 @@ public class TourBlogView extends ViewPart {
 	private void addTourEventListener() {
 
 		_tourEventListener = new ITourEventListener() {
+			@Override
 			public void tourChanged(final IWorkbenchPart part, final TourEventId eventId, final Object eventData) {
 
 				if (part == TourBlogView.this) {
@@ -801,7 +814,7 @@ public class TourBlogView extends ViewPart {
 			/*
 			 * load css from file
 			 */
-			final File cssFile = WEB.getFile("/tour-blog.css");//$NON-NLS-1$
+			final File cssFile = WEB.getFile(TOUR_BLOG_CSS);
 			final String cssContent = Util.readContentFromFile(cssFile.getAbsolutePath());
 
 			_htmlCss = "<style>" + cssContent + "</style>"; //$NON-NLS-1$ //$NON-NLS-2$
@@ -832,6 +845,7 @@ public class TourBlogView extends ViewPart {
 		 * This must be run async otherwise an endless loop will happen
 		 */
 		_browser.getDisplay().asyncExec(new Runnable() {
+			@Override
 			public void run() {
 
 				final String href = "location.href='" + createHtml_MarkerName(reloadedTourMarkerId) + "'"; //$NON-NLS-1$ //$NON-NLS-2$
@@ -1026,6 +1040,7 @@ public class TourBlogView extends ViewPart {
 		 * Run async because a tour save will fire a tour change event.
 		 */
 		_uiParent.getDisplay().asyncExec(new Runnable() {
+			@Override
 			public void run() {
 				TourManager.saveModifiedTour(_tourData);
 			}
@@ -1052,6 +1067,7 @@ public class TourBlogView extends ViewPart {
 
 		// a tour is not displayed, find a tour provider which provides a tour
 		Display.getCurrent().asyncExec(new Runnable() {
+			@Override
 			public void run() {
 
 				// validate widget
