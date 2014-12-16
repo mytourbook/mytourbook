@@ -69,7 +69,10 @@ public class SearchWebService implements XHRHandler {
 
 		_browser = browser;
 
-		final String searchUrl = WEB.SERVER_URL + SEARCH_FOLDER + "search.html";
+//		http://127.0.0.1:24114/tourbook/search/test-dgrid.html
+
+//		final String searchUrl = WEB.SERVER_URL + SEARCH_FOLDER + "search.html";
+		final String searchUrl = WEB.SERVER_URL + SEARCH_FOLDER + "test-dgrid.html";
 
 		_browser.setUrl(searchUrl);
 	}
@@ -117,31 +120,30 @@ public class SearchWebService implements XHRHandler {
 
 		final Headers headers = httpExchange.getRequestHeaders();
 
-		final String range = headers.getFirst(REQUEST_HEADER_RANGE);
-
-		final String[] ranges = range.substring("items=".length()).split("-");
-		final int searchPosFrom = Integer.valueOf(ranges[0]);
-		final int searchPosTo = Integer.valueOf(ranges[1]);
-
-		log.append("range: " + searchPosFrom + "-" + searchPosTo + "\t" + headers.entrySet());
-
-//		final JSONObject jsonResponse = new JSONObject();
 		final JSONArray allItems = new JSONArray();
 
+		final String xhrSearchText = (String) params.get(XHR_PARAM_SEARCH_TEXT);
+		final String range = headers.getFirst(REQUEST_HEADER_RANGE);
+
 		SearchResult searchResult = null;
-		String searchText = null;
+		int searchPosFrom = 0;
 
-		final Object xhrSearchText = params.get(XHR_PARAM_SEARCH_TEXT);
-		if (xhrSearchText instanceof String) {
+		if (xhrSearchText != null && range != null) {
 
-			searchText = URLDecoder.decode((String) xhrSearchText, WEB.UTF_8);
+			final String[] ranges = range.substring("items=".length()).split("-");
+			searchPosFrom = Integer.valueOf(ranges[0]);
+			final int searchPosTo = Integer.valueOf(ranges[1]);
+
+			log.append("range: " + searchPosFrom + "-" + searchPosTo + "\t" + headers.entrySet());
+
+			String searchText = URLDecoder.decode(xhrSearchText, WEB.UTF_8);
 			if (searchText.endsWith(UI.SYMBOL_STAR) == false) {
 
 				// Append a * otherwise nothing is found
 				searchText += UI.SYMBOL_STAR;
 			}
 
-			searchResult = FTSearchManager.searchByPosition(searchText, searchPosFrom, searchPosTo, -1, -1);
+			searchResult = FTSearchManager.searchByPosition(searchText, searchPosFrom, searchPosTo);
 
 			for (final SearchResultItem searchItem : searchResult.items) {
 
@@ -177,24 +179,24 @@ public class SearchWebService implements XHRHandler {
 		/*
 		 * This is very important otherwise nothing is displayed
 		 */
-		final Headers responseHeaders = httpExchange.getResponseHeaders();
-		String contentRange;
-		if (searchResult == null) {
-			contentRange = "0-0/0";
-		} else {
-			contentRange = searchPosFrom + "-" + (searchPosFrom + allItems.length() - 0) + "/" + searchResult.totalHits;
+		if (searchResult != null) {
+
+			final Headers responseHeaders = httpExchange.getResponseHeaders();
+			String contentRange;
+			if (searchResult.items.size() == 0) {
+				contentRange = "0-0/0";
+			} else {
+				contentRange = searchPosFrom
+						+ "-"
+						+ (searchPosFrom + allItems.length() - 1)
+						+ "/"
+						+ searchResult.totalHits;
+			}
+			responseHeaders.set("Content-Range", "items " + contentRange);
 		}
 
-		responseHeaders.set("Content-Range", "items " + contentRange);
-
-//		jsonResponse.put("items", allItems);
-//		jsonResponse.put("numRows", allItems.length());
-//		jsonResponse.put("identifier", ITEM_KEY_ID);
-
-//		'numRows'=>$numRows, 'items'=>$ret, 'identity'=>'id'
-
-//		final String response = jsonResponse.toString();
 		final String response = allItems.toString();
+
 		return response;
 	}
 

@@ -6,7 +6,6 @@ define(
 ], function(declare) {
 //
 	var SearchMgr = declare("tourbook.search.SearchMgr", [], {
-
 	});
 
 	SearchMgr.XHR_SEARCH_HANDLER = "/xhrSearch";

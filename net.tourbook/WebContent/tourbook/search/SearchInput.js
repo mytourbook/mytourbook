@@ -37,7 +37,7 @@ define(
 					return;
 				}
 
-				console.info("_loadData: " + xhrSearchText);
+//				console.info("_loadData: " + xhrSearchText);
 
 				var t = this;
 
@@ -61,7 +61,7 @@ define(
 
 					t.store = newStore;
 
-					console.debug("proposal received");
+//					console.debug("proposal received");
 
 				}, function(err) {
 
@@ -74,11 +74,15 @@ define(
 
 				// show selected item
 
-				console.info("onChange");
+//				console.info("onChange");
 
 				var grid = this._grid;
 
-				grid.store.target = this.getSearchUrl();
+				// JsonRest
+//				grid.store.target = this.getSearchUrl();
+
+				// QueryReadStore
+				grid.store.url = this.getSearchUrl();
 
 				grid.model.clearCache();
 				grid.body.refresh()
@@ -93,7 +97,7 @@ define(
 
 				// load suggestions for the entered value
 
-				console.info("_onKeyUp");
+//				console.info("_onKeyUp");
 
 				if (this._canLoadData) {
 
@@ -122,14 +126,14 @@ define(
 
 				// load suggestions for the entered value
 
-				console.info("_onKeyDown");
+//				console.info("_onKeyDown");
 			},
 
 			getSearchText : function getSearchText() {
 				return this.get('displayedValue');
 			},
 
-			getSearchUrl : function() {
+			getSearchUrl : function getSearchUrl() {
 
 				var searchText = this.getSearchText();
 
@@ -138,7 +142,7 @@ define(
 
 				var url = SearchMgr.XHR_SEARCH_HANDLER + '?' + actionSearch + paramSearchText;
 
-				console.info("store: " + url);
+//				console.info("store: " + url);
 
 				return url;
 			},

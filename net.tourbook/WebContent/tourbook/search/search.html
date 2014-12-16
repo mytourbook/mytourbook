@@ -22,6 +22,16 @@
 <link rel="stylesheet" type="text/css" href="/WebContent-dojo/dijit/themes/claro/claro.css">
 <link rel="stylesheet" type="text/css" href="/WebContent-dojo/dojox/grid/resources/Grid.css" >
 
+<style type="text/css">
+	
+	.gridx {
+		width: 600px;
+		height: 300px;
+		height: 420px;
+	}
+
+</style>
+
 <script>
 	dojoConfig = {
 		async : true,
@@ -41,19 +51,25 @@
 
 
 	<div id="domSearchInput" style="height: 5em;"></div>
-	
+
+<!-- 
 	<div
 		data-dojo-type="dijit.layout.BorderContainer"
 		data-dojo-attach-point="_apContainer"
-		xstyle="background-color: #efd"
-		style="width:90%; height: 300px; background-color: yellow;"
+		style="
+			xwidth:90%; 
+			xheight: 500px; 
+			background-color: yellow;"
 		>
-	
-		<div id="domGrid" 
-			style="width:90%; height:90%; background-color:green;"
-		></div>
-	
+
 	</div>
+ -->	
+ 
+		<div id="domGrid" 
+			style="
+				xwidth: 90%; 
+				xheight: 450px; 
+				background-color: green;"></div>
 
 </body>
 

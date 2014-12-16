@@ -1,96 +1,110 @@
 'use strict';
 
 require(
-	[
-		'dojo/_base/declare',
-		'dojo/_base/lang',
-		'dojo/dom',
-		'dojo/store/JsonRest',
+[
+	'dojo/_base/declare',
+	'dojo/_base/lang',
+	'dojo/dom',
 
-		'gridx/Grid',
-		'gridx/core/model/cache/Async',
-		'gridx/modules/VirtualVScroller',
-		'gridx/modules/extendedSelect/Row',
-		'gridx/modules/Focus',
+//	'dojo/store/JsonRest',
+	'dojox/data/QueryReadStore',
 
-		'./SearchInput.js',
-		'dojo/domReady!'
-	], //
-	function(declare,
-		lang,
-		dom,
-		Store,
+	'gridx/Grid',
+	'gridx/core/model/cache/Async',
 
-		Grid,
-		Cache,
-		VirtualVScroller,
-		SelectRow,
-		Focus,
-		SearchInput,
-		zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz) {
+	'gridx/modules/VirtualVScroller',
+//	'gridx/modules/extendedSelect/Row',
+//	'gridx/modules/Focus',
+//	"gridx/modules/ColumnResizer",
 
-		var searchInput = new SearchInput({
+	'./SearchInput.js',
+	'dojo/domReady!'
+], //
+function(//
+declare, //
+lang, //
+dom, //
 
-			id : 'searchInput',
-			name : 'idSearch',
+//JsonRest, //
+QueryReadStore, //
 
-			placeHolder : 'Search Tours, Marker and Waypoints',
+GridX, //
+Cache, //
 
-			hasDownArrow : false,
+VirtualVScroller, //
+//SelectRow, //
+//Focus, //
+//ColumnResizer, //
 
-			searchAttr : 'id',
-			labelAttr : 'name',
-			labelType : 'html',
+SearchInput //
+) {
 
-		}, 'domSearchInput');
+	var searchInput = new SearchInput({
 
-		searchInput.startup();
+		id : 'searchInput',
+		name : 'idSearch',
 
-		var target = searchInput.getSearchUrl();
+		placeHolder : 'Search Tours, Marker and Waypoints',
 
-		var store = new Store({
-			target : target,
-		});
+		hasDownArrow : false,
 
-		var columns =
-		[
-			{
-				id : 'id',
-				field : 'id',
-				name : 'ID',
-				width : '100px',
-			},
-			{
-				id : 'name',
-				field : 'name',
-				name : 'Tour',
-				width : '100%',
-			}
-		];
+		searchAttr : 'id',
+		labelAttr : 'name',
+		labelType : 'html',
 
-		var grid = new Grid({
+	}, 'domSearchInput');
 
-			store : store,
-			structure : columns,
-			cacheClass : Cache,
+	searchInput.startup();
 
+	var searchUrl = searchInput.getSearchUrl();
 
-			pageSize: 10,
-			vScrollerLazy: true,
-			
-			modules :
-			[
-//				VirtualVScroller,
-//				SelectRow,
-//				Focus,
-			]
-		});
+//	var store = new JsonRest({
+//		target : searchUrl,
+//	});
 
-		grid.placeAt('domGrid');
-		grid.startup();
-
-		searchInput.setGrid(grid);
-
-		// set focus to the search field
-		searchInput.focus();
+	var store = new QueryReadStore({
+		idAttribute : 'id',
+//		url : 'QueryReadStore.php'
+		url : searchUrl
 	});
+
+	var columns =
+	[
+		{
+			id : 'id',
+			field : 'id',
+			name : 'ID',
+			width : '100px',
+		},
+		{
+			id : 'name',
+			field : 'name',
+			name : 'Tour',
+			width : '100%',
+		}
+	];
+
+	var grid = new GridX({
+
+		store : store,
+		structure : columns,
+		cacheClass : Cache,
+
+		pageSize : 10,
+		vScrollerLazy : true,
+
+		modules : [
+//			VirtualVScroller,
+//			SelectRow,
+//			Focus,
+		]
+	});
+
+	grid.placeAt('domGrid');
+	grid.startup();
+
+	searchInput.setGrid(grid);
+
+	// set focus to the search field
+	searchInput.focus();
+});
