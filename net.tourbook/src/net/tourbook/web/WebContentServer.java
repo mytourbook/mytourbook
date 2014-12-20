@@ -120,6 +120,8 @@ public class WebContentServer {
 		return _allXHRHandler.put(xhrKey, xhrHandler);
 	}
 
+
+
 	private static void handle(final HttpExchange httpExchange) {
 
 		final long start = System.nanoTime();
@@ -288,6 +290,7 @@ public class WebContentServer {
 
 		try {
 
+			WEB.setResponseHeaderContentType(httpExchange, file);
 			httpExchange.sendResponseHeaders(200, 0);
 
 			os = httpExchange.getResponseBody();

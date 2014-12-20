@@ -1,25 +1,55 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset="utf-8">
-<title>Test OnDemandGrids with promise-based stores</title>
-<link rel="stylesheet" href="/WebContent-dojo/dojo/resources/dojo.css">
-<link rel="stylesheet" href="/WebContent-dojo/dgrid/css/dgrid.css">
-<link rel="stylesheet" href="/WebContent-dojo/dgrid/css/skins/claro.css">
-<style>
-.dgrid {
-	height: 40em;
-	margin: 0em;
-}
-</style>
+	<meta charset="utf-8">
+
+	<title>Test OnDemandGrids with promise-based stores</title>
+
+	<link rel="stylesheet" href="/WebContent-dojo/dojo/resources/dojo.css">
+	
+	<!-- 
+	<link rel="stylesheet" href="/WebContent-dojo/dijit/themes/claro/claro.css">
+	 -->
+	<link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/dojo/1.8/dijit/themes/claro/claro.css">
+
+	<link rel="stylesheet" href="/WebContent-dojo/dgrid/css/dgrid.css">
+	<link rel="stylesheet" href="/WebContent-dojo/dgrid/css/skins/claro.css">
+    	
+	<link rel="stylesheet" href="search.css">
+
+	<script src="/WebContent-dojo/dojo/dojo.js" data-dojo-config="async:true"></script>
+	<!-- 
+	<script src='https://ajax.googleapis.com/ajax/libs/dojo/1.8.0/dojo/dojo.js' 
+		data-dojo-config="async:true"></script>
+	 -->
+  
+	<script src="test-dgrid.js"></script>
 </head>
 
 <body class="claro">
 
-	<div id="domGrid"></div>
+	<div id="domLoading">
+		<div>Loading...</div>
+	</div>
+	
+	<div id="domContainer"
+	    data-dojo-type="dijit/layout/LayoutContainer">
+    
+	    <div id="domSearchInputContainer"
+	        data-dojo-type="dijit/layout/ContentPane"
+	        data-dojo-props="region:'top'">
+	        
+	    	<div id="domSearchInput"></div>
+	    </div>
 
-	<script src="/WebContent-dojo/dojo/dojo.js" data-dojo-config="async: true"></script>
-	<script src="test-dgrid.js"></script>
+	    <div
+	        data-dojo-type="dijit/layout/ContentPane"
+	        data-dojo-props="region:'center'">
+	        
+			<div id="domGrid"></div>
+	    </div>
+
+	</div>
 
 </body>
 </html>

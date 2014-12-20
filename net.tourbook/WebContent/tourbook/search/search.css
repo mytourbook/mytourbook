@@ -1,0 +1,94 @@
+
+html, body 
+{
+    height:					100%;
+}
+
+body 
+{
+	font-family: 			verdana, helvetica, arial, sans-serif;
+	font-family:			sans-serif;
+    font-size:				13px;
+}
+
+
+
+#domLoading 
+{
+	position:				absolute;
+	z-index:				1001;
+	top:					0;
+	left:					0;
+	width:					100%;
+	height:					100%;
+	background-color:		#fff;
+	
+	display:				table;		/* this is needed to vertical align in the middle */
+}
+
+#domLoading div
+{
+	display:				table-cell;
+	vertical-align: 		middle;
+	text-align: 			center;
+}
+
+
+#domContainer 
+{
+    height:					100%;
+}
+
+
+/*
+	Search
+*/
+#domSearchInputContainer
+{
+	padding:				0px;	
+	background-color:		#f0f0f0;
+}
+
+#domSearchInputContainer div			/* search input field */
+{
+	border:					0px;	
+	width:					90%;
+	background-color:		#f0f0f0;
+}
+
+
+/*
+	Grid
+*/
+#domGrid 
+{
+    position: 				absolute;
+    top: 					0;
+    bottom: 				0;
+    left: 					0;
+    right: 					0;
+    height: 				auto;
+    	
+    border:					0px;
+}
+	
+#domGrid div:focus 
+{ 
+	xoutline: 				none; 
+	xoutline-color:			aqua;
+	xoutline-style:			double;
+	outline-width:			2px;
+	xbackground-color: 		#00f;
+}
+
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	

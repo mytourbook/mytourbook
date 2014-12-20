@@ -41,6 +41,8 @@ import com.sun.net.httpserver.HttpExchange;
 public class SearchWebService implements XHRHandler {
 
 	private static final String	REQUEST_HEADER_RANGE		= "Range";
+	private static final String	CONTENT_RANGE_ITEMS			= "items %d-%d/%d";
+	private static final String	CONTENT_RANGE_ZERO			= "0-0/0";
 
 	static final String			SEARCH_FOLDER				= "/tourbook/search/";	//$NON-NLS-1$
 
@@ -125,14 +127,20 @@ public class SearchWebService implements XHRHandler {
 		final String xhrSearchText = (String) params.get(XHR_PARAM_SEARCH_TEXT);
 		final String range = headers.getFirst(REQUEST_HEADER_RANGE);
 
-		SearchResult searchResult = null;
 		int searchPosFrom = 0;
+		int searchPosTo = 0;
 
-		if (xhrSearchText != null && range != null) {
+		if (range != null) {
 
 			final String[] ranges = range.substring("items=".length()).split("-");
 			searchPosFrom = Integer.valueOf(ranges[0]);
-			final int searchPosTo = Integer.valueOf(ranges[1]);
+			searchPosTo = Integer.valueOf(ranges[1]);
+		}
+
+		SearchResult searchResult = null;
+		int allItemSize = 0;
+
+		if (xhrSearchText != null) {
 
 			log.append("range: " + searchPosFrom + "-" + searchPosTo + "\t" + headers.entrySet());
 
@@ -174,30 +182,41 @@ public class SearchWebService implements XHRHandler {
 
 				allItems.put(item);
 			}
+
+			allItemSize = allItems.length();
 		}
 
-		/*
-		 * This is very important otherwise nothing is displayed
-		 */
-		if (searchResult != null) {
+		final Headers responseHeaders = httpExchange.getResponseHeaders();
+		responseHeaders.set(WEB.RESPONSE_HEADER_CONTENT_TYPE, WEB.CONTENT_TYPE_APPLICATION_JSON);
 
-			final Headers responseHeaders = httpExchange.getResponseHeaders();
-			String contentRange;
-			if (searchResult.items.size() == 0) {
-				contentRange = "0-0/0";
-			} else {
-				contentRange = searchPosFrom
-						+ "-"
-						+ (searchPosFrom + allItems.length() - 1)
-						+ "/"
-						+ searchResult.totalHits;
-			}
-			responseHeaders.set("Content-Range", "items " + contentRange);
-		}
+		// this is very important otherwise nothing is displayed
+		responseHeaders.set(
+				WEB.RESPONSE_HEADER_CONTENT_RANGE,
+				getContentRange(searchResult, searchPosFrom, allItemSize));
 
 		final String response = allItems.toString();
 
 		return response;
+	}
+
+	private String getContentRange(final SearchResult searchResult, final int searchPosFrom, final int allItemSize) {
+
+		String contentRange;
+
+		if (searchResult == null || allItemSize == 0) {
+
+			contentRange = CONTENT_RANGE_ZERO;
+
+		} else {
+
+			contentRange = String.format(
+					CONTENT_RANGE_ITEMS,
+					searchPosFrom,
+					(searchPosFrom + allItemSize - 1),
+					searchResult.totalHits);
+		}
+
+		return contentRange;
 	}
 
 	@Override
