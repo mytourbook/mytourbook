@@ -6,6 +6,7 @@ define(
 	"dojo/_base/lang",
 
 	"dojo/dom",
+	"dojo/keys", // keys.DOWN_ARROW keys.ENTER keys.ESCAPE
 	"dojo/on",
 	"dojo/request/xhr",
 	"dojo/store/Memory",
@@ -18,6 +19,7 @@ function(//
 declare, lang, //
 
 dom, //
+keys, //
 on, //
 xhr, //
 Memory, //
@@ -32,9 +34,7 @@ SearchMgr //
 		FilteringSelect,
 	], {
 
-		_currentSearchUrl : null,
-
-		_loadData : function loadData(xhrSearchText) {
+		_loadProposals : function _loadProposals(xhrSearchText) {
 
 			if (xhrSearchText) {
 				xhrSearchText = xhrSearchText.trim();
@@ -45,9 +45,7 @@ SearchMgr //
 				return;
 			}
 
-//				console.info("_loadData: " + xhrSearchText);
-
-			var t = this;
+			var self = this;
 
 			var query = {};
 			query[SearchMgr.XHR_PARAM_ACTION] = SearchMgr.XHR_ACTION_PROPOSALS;
@@ -67,9 +65,9 @@ SearchMgr //
 					data : xhrData
 				});
 
-				t.store = newStore;
+				self.store = newStore;
 
-//					console.debug("proposal received");
+//				console.debug("proposal received");
 
 			}, function(err) {
 
@@ -78,15 +76,16 @@ SearchMgr //
 			})
 		},
 
-		_onChange : function onChange(evt) {
+		_loadResults : function _loadResults() {
 
 			// show selected item
 
 			var newSearchUrl = this.getSearchUrl();
 
-			if (this._currentSearchUrl !== newSearchUrl) {
+			console.warn("_loadResults '" + newSearchUrl + "'");
 
-				console.info("onChange: " + newSearchUrl);
+			// check if loading is needed
+			if (this._currentSearchUrl !== newSearchUrl) {
 
 				this._currentSearchUrl = newSearchUrl;
 
@@ -97,70 +96,45 @@ SearchMgr //
 			}
 		},
 
-		_onKeyPress : function _onKeyPress(event) {
-
-			this._canLoadData = true;
-		},
-
-		_onKeyUp : function _onKeyUp(event) {
-
-			// load suggestions for the entered value
-
-			console.info("_onKeyUp");
-
-			var isLoading = false;
-
-			if (this._canLoadData) {
-
-				this._canLoadData = false;
-
-				var searchText = this.getSearchText();
-
-				if (searchText !== this._lastSearchText) {
-
-					// prevent that it is call TWICE
-					event.stopPropagation();
-					event.preventDefault();
-
-					this._lastSearchText = searchText;
-
-					this._loadData(searchText);
-
-					isLoading = true;
-				}
-			}
-
-			if (isLoading === false) {
-
-				if (event.defaultPrevented) {
-					return; // Should do nothing if the key event was already consumed.
-				}
-
-				switch (event.key) {
-				case "ArrowDown":
-				case "ArrowUp":
-
-					// open popup
-					
-					this.loadDropDown();
-					
-					// Consume the event for suppressing "double action".
-					event.preventDefault();
-
-					break;
-				}
-			}
-		},
-
 		_onKeyDown : function _onKeyDown(evt) {
 
 			// load suggestions for the entered value
 
-			console.info("_onKeyDown");
+			console.info("_onKeyDown '" + this.getSearchText() + "'");
+		},
+
+		_onKeyPress : function _onKeyPress(event) {
+
+			console.info("_onKeyPress '" + this.getSearchText() + "'");
+		},
+
+		_onKeyUp : function _onKeyUp(event) {
+
+			console.info("_onKeyUp '" + this.getSearchText() + "'");
+
+			var searchText = this.getSearchText();
+
+			// load suggestions for the entered value
+			if (searchText !== this._lastSearchText) {
+
+				// prevent that it is call TWICE
+				event.stopPropagation();
+				event.preventDefault();
+
+				this._lastSearchText = searchText;
+
+				this._loadProposals(searchText);
+			}
+
+			// load results only with the <Enter> key
+			if (event.keyCode == keys.ENTER) {
+				this._loadResults();
+			}
 		},
 
 		getSearchText : function getSearchText() {
-			return this.get('displayedValue');
+			
+			return this.get('displayedValue').trim();
 		},
 
 		getSearchUrl : function getSearchUrl() {
@@ -187,11 +161,18 @@ SearchMgr //
 			dom.byId("domLog").innerHTML = logText;
 		},
 
+		onChange : function(value) {
+			/*
+			 * THIS IS NOT WORKING PROPERLY :-(
+			 */
+//			this._onChange(value);
+			console.warn("onChange '" + this.getSearchText() + "'");
+		},
+
 		postCreate : function() {
 
 			this.inherited(arguments);
 
-			on(this.domNode, "change", lang.hitch(this, "_onChange"));
 			on(this.domNode, "keypress", lang.hitch(this, "_onKeyPress"));
 			on(this.domNode, "keydown", lang.hitch(this, "_onKeyDown"));
 			on(this.domNode, "keyup", lang.hitch(this, "_onKeyUp"));
@@ -203,7 +184,7 @@ SearchMgr //
 
 			// set max height smaller for the dropdown box that the a scollbar of the body is not displayed
 			var viewport = winUtils.getBox(this.ownerDocument);
-			this.maxHeight = viewport.h * 0.95;
+			this.maxHeight = viewport.h * 0.90;
 		},
 
 		setGrid : function(grid) {

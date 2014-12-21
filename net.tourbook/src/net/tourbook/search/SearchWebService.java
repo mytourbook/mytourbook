@@ -145,6 +145,10 @@ public class SearchWebService implements XHRHandler {
 			log.append("range: " + searchPosFrom + "-" + searchPosTo + "\t" + headers.entrySet());
 
 			String searchText = URLDecoder.decode(xhrSearchText, WEB.UTF_8);
+
+			// ensure white space is removed
+			searchText = searchText.trim();
+
 			if (searchText.endsWith(UI.SYMBOL_STAR) == false) {
 
 				// Append a * otherwise nothing is found

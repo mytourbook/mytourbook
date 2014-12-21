@@ -55,8 +55,6 @@ SearchMgr //
 
 	App.prototype = {
 
-		searchInput : null,
-
 		createUI : function() {
 
 			this.searchInput = new SearchInput({
@@ -147,25 +145,25 @@ SearchMgr //
 
 			}, 'domGrid');
 
-			grid.on("dgrid-select", function(event) {
-
-				// Get the rows that were just selected
-				var rows = event.rows;
-				// ...
-
-				// Iterate through all currently-selected items
-				for ( var id in grid.selection) {
-					if (grid.selection[id]) {
-						// ...
-					}
-				}
-			});
-
-			grid.on("dgrid-deselect", function(event) {
-				// Get the rows that were just deselected
-				var rows = event.rows;
-				// ...
-			});
+//			grid.on("dgrid-select", function(event) {
+//
+//				// Get the rows that were just selected
+//				var rows = event.rows;
+//				// ...
+//
+//				// Iterate through all currently-selected items
+//				for ( var id in grid.selection) {
+//					if (grid.selection[id]) {
+//						// ...
+//					}
+//				}
+//			});
+//
+//			grid.on("dgrid-deselect", function(event) {
+//				// Get the rows that were just deselected
+//				var rows = event.rows;
+//				// ...
+//			});
 
 			return grid;
 		},
@@ -179,8 +177,6 @@ SearchMgr //
 
 			var url = SearchMgr.XHR_SEARCH_HANDLER + '?' + actionSearch + paramSearchText;
 
-//			console.info("store: " + url);
-
 			return url;
 		},
 
@@ -190,8 +186,8 @@ SearchMgr //
 
 			// resize UI, otherwise not everthing is correctly rearranged
 			var domContainer = registry.byId('domContainer');
-		    domContainer.resize();
-		    
+			domContainer.resize();
+
 			// fade out loading message
 			fx.fadeOut({
 				node : "domLoading",
