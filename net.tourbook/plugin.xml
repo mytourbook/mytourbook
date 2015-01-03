@@ -1503,7 +1503,7 @@
 
 			<view
 				category="net.tourbook.category.Tools"
-				class="net.tourbook.search.SearchView"
+				class="net.tourbook.search.SearchViewSWT"
 				icon="icons/search.png"
 				id="net.tourbook.search.SearchView"
 				name="%View_Name_SearchAll"

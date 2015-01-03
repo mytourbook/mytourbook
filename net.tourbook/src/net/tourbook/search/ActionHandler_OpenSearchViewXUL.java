@@ -28,9 +28,9 @@ public class ActionHandler_OpenSearchViewXUL extends AbstractHandler {
 
 		final IViewPart part = Util.showView(SearchViewXUL.ID, true);
 
-		if (part instanceof SearchView) {
+		if (part instanceof SearchViewSWT) {
 
-			final SearchView searchView = (SearchView) part;
+			final SearchViewSWT searchView = (SearchViewSWT) part;
 			searchView.actionOpenSearchView();
 		}
 

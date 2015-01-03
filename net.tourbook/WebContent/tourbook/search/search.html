@@ -1,78 +1,49 @@
 <!DOCTYPE html>
 <html>
-<!-- 
-<html debug="true">
- -->
 <head>
-<!-- 
-	<script type="text/javascript" src="/WebContent-firebug-lite/content/firebug-lite-dev.js">
-	{
-	    overrideConsole: false,
-	    startInNewWindow: false,
-	    startOpened: false,
-	    enableTrace: false
-	}
-	</script>
-	 -->
+	<meta charset="utf-8">
 
-<meta http-equiv='Content-Type' content='text/html; charset=UTF-8' />
-<meta http-equiv='X-UA-Compatible' content='IE=edge' />
+	<title>Test OnDemandGrids with promise-based stores</title>
 
-<title>Search - MyTourbook 14.14</title>
-<link rel="stylesheet" type="text/css" href="/WebContent-dojo/dijit/themes/claro/claro.css">
-<link rel="stylesheet" type="text/css" href="/WebContent-dojo/dojox/grid/resources/Grid.css" >
+	<link rel="stylesheet" href="/WebContent-dojo/dojo/resources/dojo.css">
+	<link rel="stylesheet" href="/WebContent-dojo/dijit/themes/claro/claro.css">
+	<link rel="stylesheet" href="/WebContent-dojo/dgrid/css/dgrid.css">
+	<link rel="stylesheet" href="/WebContent-dojo/dgrid/css/skins/claro.css">
+    	
+	<link rel="stylesheet" href="search.css">
 
-<style type="text/css">
-	
-	.gridx {
-		width: 600px;
-		height: 300px;
-		height: 420px;
-	}
-
-</style>
-
-<script>
-	dojoConfig = {
-		async : true,
-		parseOnLoad : true,
-		//isDebug : true,
-	}
-</script>
-
-<script src="/WebContent-dojo/dojo/dojo.js"></script>
-<script src="search.js"></script>
-
+	<script src="/WebContent-dojo/dojo/dojo.js" data-dojo-config="async:true"></script>
+	<script src="search.js"></script>
 </head>
 
 <body class="claro">
 
-	<div id="domLog" style="background-color: #FFFCD9; width: 50%; height: 50%; overflow: auto;"></div>
+	<div id="domLoading">
+		<div>Loading...</div>
+	</div>
 
+	
+	<div id="domContainer"
+	    data-dojo-type="dijit/layout/LayoutContainer">
+    
+	    <div id="domSearchInputContainer"
+	        data-dojo-type="dijit/layout/ContentPane"
+	        data-dojo-props="region:'top'">
+	        
+	    	<div id="domSearchInput"></div>
+	    </div>
 
-	<div id="domSearchInput" style="height: 5em;"></div>
+	    <div
+	        data-dojo-type="dijit/layout/ContentPane"
+	        data-dojo-props="region:'center'">
 
-<!-- 
-	<div
-		data-dojo-type="dijit.layout.BorderContainer"
-		data-dojo-attach-point="_apContainer"
-		style="
-			xwidth:90%; 
-			xheight: 500px; 
-			background-color: yellow;"
-		>
+			<div id="domError"></div>
+	        
+			<div id="domGrid"></div>
+			<div id="domStatus"></div>
+	    </div>
 
 	</div>
- -->	
- 
-		<div id="domGrid" 
-			style="
-				xwidth: 90%; 
-				xheight: 450px; 
-				background-color: green;"></div>
 
 </body>
-
-
 </html>
-

@@ -16,7 +16,6 @@
 package net.tourbook.search;
 
 import net.tourbook.Messages;
-import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.color.IColorSelectorListener;
 import net.tourbook.common.tooltip.AnimatedToolTipShell;
@@ -48,21 +47,19 @@ import org.eclipse.swt.widgets.ToolBar;
  */
 public class SlideoutSearchOptions extends AnimatedToolTipShell implements IColorSelectorListener {
 
-	private final IDialogSettings	_state				= TourbookPlugin.getState(SearchView.ID);
-
 	// initialize with default values which are (should) never be used
-	private Rectangle				_toolTipItemBounds	= new Rectangle(0, 0, 50, 50);
+	private Rectangle			_toolTipItemBounds	= new Rectangle(0, 0, 50, 50);
 
-	private final WaitTimer			_waitTimer			= new WaitTimer();
+	private final WaitTimer		_waitTimer			= new WaitTimer();
 
-	private boolean					_isWaitTimerStarted;
-	private boolean					_canOpenToolTip;
-	private boolean					_isAnotherDialogOpened;
+	private boolean				_isWaitTimerStarted;
+	private boolean				_canOpenToolTip;
+	private boolean				_isAnotherDialogOpened;
 
-	private SearchView				_searchView;
+	private SearchViewSWT		_searchView;
 
-	private SelectionAdapter		_selectionAdapter_Default;
-	private SelectionAdapter		_selectionAdapter_WithNewSearch;
+	private SelectionAdapter	_selectionAdapter_Default;
+	private SelectionAdapter	_selectionAdapter_WithNewSearch;
 	{
 		_selectionAdapter_Default = new SelectionAdapter() {
 			@Override
@@ -82,19 +79,19 @@ public class SlideoutSearchOptions extends AnimatedToolTipShell implements IColo
 	/*
 	 * UI controls
 	 */
-	private Composite				_shellContainer;
+	private Composite			_shellContainer;
 
-	private Button					_chkShowDateTime;
-	private Button					_chkShowItemNumber;
-	private Button					_chkShowLuceneDocId;
+	private Button				_chkShowDateTime;
+	private Button				_chkShowItemNumber;
+	private Button				_chkShowLuceneDocId;
 //	private Button					_chkShowScore;
-	private Button					_chkTopNavigator;
+	private Button				_chkTopNavigator;
 
-	private Button					_rdoTimeAscending;
-	private Button					_rdoTimeDescending;
+	private Button				_rdoTimeAscending;
+	private Button				_rdoTimeDescending;
 
-	private Spinner					_spinnerDisplayedResults;
-	private Spinner					_spinnerNumberOfPages;
+	private Spinner				_spinnerDisplayedResults;
+	private Spinner				_spinnerNumberOfPages;
 
 	private final class WaitTimer implements Runnable {
 		@Override
@@ -106,7 +103,7 @@ public class SlideoutSearchOptions extends AnimatedToolTipShell implements IColo
 	public SlideoutSearchOptions(	final Control ownerControl,
 									final ToolBar toolBar,
 									final IDialogSettings state,
-									final SearchView searchView) {
+									final SearchViewSWT searchView) {
 
 		super(ownerControl);
 
@@ -303,6 +300,7 @@ public class SlideoutSearchOptions extends AnimatedToolTipShell implements IColo
 				_spinnerDisplayedResults.setMinimum(1);
 				_spinnerDisplayedResults.setMaximum(1000);
 				_spinnerDisplayedResults.addMouseWheelListener(new MouseWheelListener() {
+					@Override
 					public void mouseScrolled(final MouseEvent event) {
 						UI.adjustSpinnerValueOnMouseScroll(event);
 						onChangeUI(true);
@@ -348,6 +346,7 @@ public class SlideoutSearchOptions extends AnimatedToolTipShell implements IColo
 				_spinnerNumberOfPages.setMinimum(3);
 				_spinnerNumberOfPages.setMaximum(50);
 				_spinnerNumberOfPages.addMouseWheelListener(new MouseWheelListener() {
+					@Override
 					public void mouseScrolled(final MouseEvent event) {
 						UI.adjustSpinnerValueOnMouseScroll(event);
 						onChangeUI(true);
@@ -459,19 +458,19 @@ public class SlideoutSearchOptions extends AnimatedToolTipShell implements IColo
 	private void restoreState() {
 
 		_chkShowDateTime.setSelection(Util.getStateBoolean(
-				_state,
-				SearchView.STATE_IS_SHOW_DATE_TIME,
-				SearchView.STATE_IS_SHOW_DATE_TIME_DEFAULT));
+				SearchUI.state,
+				SearchUI.STATE_IS_SHOW_DATE_TIME,
+				SearchUI.STATE_IS_SHOW_DATE_TIME_DEFAULT));
 
 		_chkShowLuceneDocId.setSelection(Util.getStateBoolean(
-				_state,
-				SearchView.STATE_IS_SHOW_LUCENE_DOC_ID,
-				SearchView.STATE_IS_SHOW_LUCENE_DOC_ID_DEFAULT));
+				SearchUI.state,
+				SearchUI.STATE_IS_SHOW_LUCENE_DOC_ID,
+				SearchUI.STATE_IS_SHOW_LUCENE_DOC_ID_DEFAULT));
 
 		_chkShowItemNumber.setSelection(Util.getStateBoolean(
-				_state,
-				SearchView.STATE_IS_SHOW_ITEM_NUMBER,
-				SearchView.STATE_IS_SHOW_ITEM_NUMBER_DEFAULT));
+				SearchUI.state,
+				SearchUI.STATE_IS_SHOW_ITEM_NUMBER,
+				SearchUI.STATE_IS_SHOW_ITEM_NUMBER_DEFAULT));
 
 //		_chkShowScore.setSelection(Util.getStateBoolean(
 //				_state,
@@ -479,51 +478,52 @@ public class SlideoutSearchOptions extends AnimatedToolTipShell implements IColo
 //				SearchView.STATE_IS_SHOW_SCORE_DEFAULT));
 
 		_chkTopNavigator.setSelection(Util.getStateBoolean(
-				_state,
-				SearchView.STATE_IS_SHOW_TOP_NAVIGATOR,
-				SearchView.STATE_IS_SHOW_TOP_NAVIGATOR_DEFAULT));
+				SearchUI.state,
+				SearchViewSWT.STATE_IS_SHOW_TOP_NAVIGATOR,
+				SearchViewSWT.STATE_IS_SHOW_TOP_NAVIGATOR_DEFAULT));
 
 		// sort by date
 		final boolean isSortDateAscending = Util.getStateBoolean(
-				_state,
-				SearchView.STATE_IS_SORT_DATE_ASCENDING,
-				SearchView.STATE_IS_SORT_DATE_ASCENDING_DEFAULT);
+				SearchUI.state,
+				SearchUI.STATE_IS_SORT_DATE_ASCENDING,
+				SearchUI.STATE_IS_SORT_DATE_ASCENDING_DEFAULT);
 		_rdoTimeAscending.setSelection(isSortDateAscending);
 		_rdoTimeDescending.setSelection(isSortDateAscending == false);
 
 		_spinnerDisplayedResults.setSelection(Util.getStateInt(
-				_state,
-				SearchView.STATE_HITS_PER_PAGE,
-				SearchView.STATE_HITS_PER_PAGE_DEFAULT));
+				SearchUI.state,
+				SearchViewSWT.STATE_HITS_PER_PAGE,
+				SearchViewSWT.STATE_HITS_PER_PAGE_DEFAULT));
 
 		_spinnerNumberOfPages.setSelection(Util.getStateInt(
-				_state,
-				SearchView.STATE_NUMBER_OF_PAGES,
-				SearchView.STATE_NUMBER_OF_PAGES_DEFAULT));
+				SearchUI.state,
+				SearchViewSWT.STATE_NUMBER_OF_PAGES,
+				SearchViewSWT.STATE_NUMBER_OF_PAGES_DEFAULT));
 	}
 
 	private void saveState() {
 
-		_state.put(SearchView.STATE_IS_SHOW_DATE_TIME, _chkShowDateTime.getSelection());
-		_state.put(SearchView.STATE_IS_SHOW_ITEM_NUMBER, _chkShowItemNumber.getSelection());
-		_state.put(SearchView.STATE_IS_SHOW_LUCENE_DOC_ID, _chkShowLuceneDocId.getSelection());
-//		_state.put(SearchView.STATE_IS_SHOW_SCORE, _chkShowScore.getSelection());
-		_state.put(SearchView.STATE_IS_SHOW_TOP_NAVIGATOR, _chkTopNavigator.getSelection());
-		_state.put(SearchView.STATE_IS_SORT_DATE_ASCENDING, _rdoTimeAscending.getSelection());
-		_state.put(SearchView.STATE_HITS_PER_PAGE, _spinnerDisplayedResults.getSelection());
-		_state.put(SearchView.STATE_NUMBER_OF_PAGES, _spinnerNumberOfPages.getSelection());
+		SearchUI.state.put(SearchUI.STATE_IS_SHOW_DATE_TIME, _chkShowDateTime.getSelection());
+		SearchUI.state.put(SearchUI.STATE_IS_SHOW_ITEM_NUMBER, _chkShowItemNumber.getSelection());
+		SearchUI.state.put(SearchUI.STATE_IS_SHOW_LUCENE_DOC_ID, _chkShowLuceneDocId.getSelection());
+		SearchUI.state.put(SearchUI.STATE_IS_SORT_DATE_ASCENDING, _rdoTimeAscending.getSelection());
+
+		SearchUI.state.put(SearchViewSWT.STATE_IS_SHOW_TOP_NAVIGATOR, _chkTopNavigator.getSelection());
+		SearchUI.state.put(SearchViewSWT.STATE_HITS_PER_PAGE, _spinnerDisplayedResults.getSelection());
+		SearchUI.state.put(SearchViewSWT.STATE_NUMBER_OF_PAGES, _spinnerNumberOfPages.getSelection());
 	}
 
 	private void setDefaults() {
 
-		_state.put(SearchView.STATE_IS_SHOW_DATE_TIME, SearchView.STATE_IS_SHOW_DATE_TIME_DEFAULT);
-		_state.put(SearchView.STATE_IS_SHOW_ITEM_NUMBER, SearchView.STATE_IS_SHOW_ITEM_NUMBER_DEFAULT);
-		_state.put(SearchView.STATE_IS_SHOW_LUCENE_DOC_ID, SearchView.STATE_IS_SHOW_LUCENE_DOC_ID_DEFAULT);
-//		_state.put(SearchView.STATE_IS_SHOW_SCORE, SearchView.STATE_IS_SHOW_SCORE_DEFAULT);
-		_state.put(SearchView.STATE_IS_SHOW_TOP_NAVIGATOR, SearchView.STATE_IS_SHOW_TOP_NAVIGATOR_DEFAULT);
-		_state.put(SearchView.STATE_IS_SORT_DATE_ASCENDING, SearchView.STATE_IS_SORT_DATE_ASCENDING_DEFAULT);
-		_state.put(SearchView.STATE_HITS_PER_PAGE, SearchView.STATE_HITS_PER_PAGE_DEFAULT);
-		_state.put(SearchView.STATE_NUMBER_OF_PAGES, SearchView.STATE_NUMBER_OF_PAGES_DEFAULT);
+		SearchUI.state.put(SearchUI.STATE_IS_SHOW_DATE_TIME, SearchUI.STATE_IS_SHOW_DATE_TIME_DEFAULT);
+		SearchUI.state.put(SearchUI.STATE_IS_SHOW_ITEM_NUMBER, SearchUI.STATE_IS_SHOW_ITEM_NUMBER_DEFAULT);
+		SearchUI.state.put(SearchUI.STATE_IS_SHOW_LUCENE_DOC_ID, SearchUI.STATE_IS_SHOW_LUCENE_DOC_ID_DEFAULT);
+		SearchUI.state.put(SearchUI.STATE_IS_SORT_DATE_ASCENDING, SearchUI.STATE_IS_SORT_DATE_ASCENDING_DEFAULT);
+
+		SearchUI.state
+				.put(SearchViewSWT.STATE_IS_SHOW_TOP_NAVIGATOR, SearchViewSWT.STATE_IS_SHOW_TOP_NAVIGATOR_DEFAULT);
+		SearchUI.state.put(SearchViewSWT.STATE_HITS_PER_PAGE, SearchViewSWT.STATE_HITS_PER_PAGE_DEFAULT);
+		SearchUI.state.put(SearchViewSWT.STATE_NUMBER_OF_PAGES, SearchViewSWT.STATE_NUMBER_OF_PAGES_DEFAULT);
 
 		restoreState();
 

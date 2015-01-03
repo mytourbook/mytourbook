@@ -42,7 +42,7 @@ public class ActionSearchOptions extends ContributionItem {
 	private ToolBar					_toolBar;
 	private ToolItem				_actionToolItem;
 
-	private SearchView				_searchView;
+	private SearchViewSWT				_searchView;
 	private SlideoutSearchOptions	_slideoutSearchOptions;
 
 	/*
@@ -52,7 +52,7 @@ public class ActionSearchOptions extends ContributionItem {
 
 	private Image					_actionImage;
 
-	public ActionSearchOptions(final SearchView searchView, final Control parent) {
+	public ActionSearchOptions(final SearchViewSWT searchView, final Control parent) {
 
 		_searchView = searchView;
 		_parent = parent;

@@ -427,6 +427,7 @@ public class UI {
 				|| fileCollisionValue == FileCollisionBehavior.KEEP) {
 
 			Display.getDefault().syncExec(new Runnable() {
+				@Override
 				public void run() {
 
 					final Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
@@ -985,12 +986,22 @@ public class UI {
 	 * @return Returns the url for an icon image in the {@link TourbookPlugin} bundle.
 	 * @throws IOException
 	 */
-	public static String getIconUrl(final String imageName) throws IOException {
+	public static String getIconUrl(final String imageName) {
 
-		final URL bundleUrl = TourbookPlugin.getDefault().getBundle().getEntry(ICONS_PATH + imageName);
-		final URL fileUrl = FileLocator.toFileURL(bundleUrl);
+		URL fileUrl = null;
 
-		return fileUrl.toExternalForm();
+		try {
+
+			final URL bundleUrl = TourbookPlugin.getDefault().getBundle().getEntry(ICONS_PATH + imageName);
+			fileUrl = FileLocator.toFileURL(bundleUrl);
+
+			return fileUrl.toExternalForm();
+
+		} catch (final IOException e) {
+			StatusUtil.log(e);
+		}
+
+		return EMPTY_STRING;
 	}
 
 	public static UI getInstance() {
@@ -1161,6 +1172,7 @@ public class UI {
 	public static void showMessageInfo(final String title, final String message) {
 
 		Display.getDefault().asyncExec(new Runnable() {
+			@Override
 			public void run() {
 				MessageDialog.openInformation(Display.getDefault().getActiveShell(), title, message);
 			}
@@ -1170,6 +1182,7 @@ public class UI {
 	public static void showSQLException(final SQLException ex) {
 
 		Display.getDefault().asyncExec(new Runnable() {
+			@Override
 			public void run() {
 
 				SQLException e = ex;
@@ -1194,6 +1207,7 @@ public class UI {
 	public static void showSQLException(final SQLException e, final String sqlStatement) {
 
 		Display.getDefault().asyncExec(new Runnable() {
+			@Override
 			public void run() {
 
 				final String message = "SQL statement: " + UI.NEW_LINE2 + sqlStatement + Util.getSQLExceptionText(e); //$NON-NLS-1$

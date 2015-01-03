@@ -15,9 +15,6 @@
  *******************************************************************************/
 package net.tourbook.search;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,23 +25,17 @@ import net.tourbook.common.util.PostSelectionProvider;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
-import net.tourbook.data.TourMarker;
-import net.tourbook.data.TourWayPoint;
 import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.tour.DialogMarker;
-import net.tourbook.tour.DialogQuickEdit;
+import net.tourbook.search.SearchUI.ItemResponse;
 import net.tourbook.tour.ITourEventListener;
 import net.tourbook.tour.SelectionTourId;
-import net.tourbook.tour.SelectionTourMarker;
 import net.tourbook.tour.TourEvent;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
-import net.tourbook.web.WEB;
 
 import org.apache.lucene.search.suggest.Lookup.LookupResult;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.bindings.keys.KeyStroke;
-import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.fieldassist.ContentProposalAdapter;
 import org.eclipse.jface.fieldassist.IContentProposal;
 import org.eclipse.jface.fieldassist.IContentProposalListener;
@@ -57,9 +48,6 @@ import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
-import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.StructuredSelection;
-import org.eclipse.jface.window.Window;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.SWTError;
@@ -67,7 +55,6 @@ import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.browser.LocationAdapter;
 import org.eclipse.swt.browser.LocationEvent;
 import org.eclipse.swt.browser.LocationListener;
-import org.eclipse.swt.browser.ProgressAdapter;
 import org.eclipse.swt.browser.ProgressEvent;
 import org.eclipse.swt.browser.ProgressListener;
 import org.eclipse.swt.browser.StatusTextEvent;
@@ -94,147 +81,69 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.part.ViewPart;
-import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 
-public class SearchView extends ViewPart {
+public class SearchViewSWT extends ViewPart {
 
-	public static final String			ID										= "net.tourbook.search.SearchView";					//$NON-NLS-1$
+	public static final String			ID									= "net.tourbook.search.SearchView"; //$NON-NLS-1$
 
-	private static final String			IMAGE_ACTION_TOUR_WAY_POINT				= net.tourbook.map2.Messages.Image_Action_TourWayPoint;
+	static final String					STATE_IS_SHOW_TOP_NAVIGATOR			= "STATE_IS_SHOW_TOP_NAVIGATOR";	//$NON-NLS-1$
+	static final boolean				STATE_IS_SHOW_TOP_NAVIGATOR_DEFAULT	= false;
 
-	private static final String			SEARCH_RESULT_CSS_FILE					= SearchWebService.SEARCH_FOLDER
-																						+ "search-result.css";							//$NON-NLS-1$
+	static final String					STATE_HITS_PER_PAGE					= "STATE_HITS_PER_PAGE";			//$NON-NLS-1$
+	static final int					STATE_HITS_PER_PAGE_DEFAULT			= 10;
 
-	static final String					STATE_IS_SHOW_DATE_TIME					= "STATE_IS_SHOW_DATE_TIME";							//$NON-NLS-1$
-	static final boolean				STATE_IS_SHOW_DATE_TIME_DEFAULT			= false;
+	static final String					STATE_NUMBER_OF_PAGES				= "STATE_NUMBER_OF_PAGES";			//$NON-NLS-1$
+	static final int					STATE_NUMBER_OF_PAGES_DEFAULT		= 3;
 
-	static final String					STATE_IS_SHOW_ITEM_NUMBER				= "STATE_IS_SHOW_ITEM_NUMBER";							//$NON-NLS-1$
-	static final boolean				STATE_IS_SHOW_ITEM_NUMBER_DEFAULT		= false;
+	private static final String			STATE_POPUP_WIDTH					= "STATE_POPUP_WIDTH";				//$NON-NLS-1$
+	private static final String			STATE_POPUP_HEIGHT					= "STATE_POPUP_HEIGHT";			//$NON-NLS-1$
+	private static final String			STATE_SEARCH_TEXT					= "STATE_SEARCH_TEXT";				//$NON-NLS-1$
 
-	static final String					STATE_IS_SHOW_LUCENE_DOC_ID				= "STATE_IS_SHOW_LUCENE_DOC_ID";						//$NON-NLS-1$
-	static final boolean				STATE_IS_SHOW_LUCENE_DOC_ID_DEFAULT		= false;
+	private static final String			CSS_SELECTED						= "selected";						//$NON-NLS-1$
 
-//	static final String					STATE_IS_SHOW_SCORE						= "STATE_IS_SHOW_SCORE";			//$NON-NLS-1$
-//	static final boolean				STATE_IS_SHOW_SCORE_DEFAULT				= false;
+	private static final String			PARAM_PAGE							= "page";							//$NON-NLS-1$
+	private static final String			ACTION_NAVIGATE_PAGE				= "NavigatePage";					//$NON-NLS-1$
 
-	static final String					STATE_IS_SHOW_TOP_NAVIGATOR				= "STATE_IS_SHOW_TOP_NAVIGATOR";						//$NON-NLS-1$
-	static final boolean				STATE_IS_SHOW_TOP_NAVIGATOR_DEFAULT		= false;
-
-	static final String					STATE_IS_SORT_DATE_ASCENDING			= "STATE_IS_SORT_DATE_ASCENDING";						//$NON-NLS-1$
-	static final boolean				STATE_IS_SORT_DATE_ASCENDING_DEFAULT	= false;
-
-	static final String					STATE_HITS_PER_PAGE						= "STATE_HITS_PER_PAGE";								//$NON-NLS-1$
-	static final int					STATE_HITS_PER_PAGE_DEFAULT				= 10;
-
-	static final String					STATE_NUMBER_OF_PAGES					= "STATE_NUMBER_OF_PAGES";								//$NON-NLS-1$
-	static final int					STATE_NUMBER_OF_PAGES_DEFAULT			= 3;
-
-	private static final String			STATE_POPUP_WIDTH						= "STATE_POPUP_WIDTH";									//$NON-NLS-1$
-	private static final String			STATE_POPUP_HEIGHT						= "STATE_POPUP_HEIGHT";								//$NON-NLS-1$
-	private static final String			STATE_SEARCH_TEXT						= "STATE_SEARCH_TEXT";									//$NON-NLS-1$
-
-	private static final String			TAG_TD									= "<td>";
-	private static final String			TAG_TD_END								= "</td>";
-
-	private static final String			CSS_HOVER_CONTAINER						= "hover-container";									//$NON-NLS-1$
-	private static final String			CSS_SELECTED							= "selected";											//$NON-NLS-1$
-
-	private static final String			PAGE_ABOUT_BLANK						= "about:blank";										//$NON-NLS-1$
-
-	/**
-	 * This is necessary otherwise XULrunner in Linux do not fire a location change event.
-	 */
-	private static final String			HTTP_PROTOCOL							= "http://dummy/a?";									//$NON-NLS-1$
-
-	private static final String			HREF_TOKEN								= "&";													//$NON-NLS-1$
-	private static final String			HREF_VALUE_SEP							= "=";													//$NON-NLS-1$
-
-	private static final String			PARAM_ACTION							= "action";											//$NON-NLS-1$
-	private static final String			PARAM_DOC_ID							= "docId";												//$NON-NLS-1$
-	private static final String			PARAM_MARKER_ID							= "markerId";											//$NON-NLS-1$
-	private static final String			PARAM_PAGE								= "page";												//$NON-NLS-1$
-	private static final String			PARAM_TOUR_ID							= "tourId";											//$NON-NLS-1$
-
-	private static final String			ACTION_EDIT_MARKER						= "EditMarker";										//$NON-NLS-1$
-	private static final String			ACTION_EDIT_TOUR						= "EditTour";											//$NON-NLS-1$
-	private static final String			ACTION_NAVIGATE_PAGE					= "NavigatePage";										//$NON-NLS-1$
-	private static final String			ACTION_SELECT_TOUR						= "SelectTour";										//$NON-NLS-1$
-	private static final String			ACTION_SELECT_MARKER					= "SelectMarker";										//$NON-NLS-1$
-	private static final String			ACTION_SELECT_WAY_POINT					= "SelectWayPoint";									//$NON-NLS-1$
-
-	private static String				HREF_ACTION_EDIT_MARKER;
-	private static String				HREF_ACTION_EDIT_TOUR;
-	private static String				HREF_ACTION_NAVIGATE_PAGE;
-	private static String				HREF_ACTION_SELECT_TOUR;
-	private static String				HREF_ACTION_SELECT_MARKER;
-	private static final String			HREF_ACTION_SELECT_WAY_POINT;
-
-	private static String				HREF_PARAM_DOC_ID;
-	private static String				HREF_PARAM_MARKER_ID;
-	private static String				HREF_PARAM_PAGE;
-	private static String				HREF_PARAM_TOUR_ID;
+	private static final String			HREF_ACTION_NAVIGATE_PAGE;
+	private static final String			HREF_PARAM_PAGE;
 
 	static {
 
 		// e.g. ...&action=EditMarker...
 
-		final String HREF_ACTION = HREF_TOKEN + PARAM_ACTION + HREF_VALUE_SEP;
+		final String HREF_ACTION = SearchUI.HREF_TOKEN + SearchUI.PARAM_ACTION + SearchUI.HREF_VALUE_SEP;
 
-		HREF_ACTION_EDIT_MARKER = HREF_ACTION + ACTION_EDIT_MARKER;
-		HREF_ACTION_EDIT_TOUR = HREF_ACTION + ACTION_EDIT_TOUR;
 		HREF_ACTION_NAVIGATE_PAGE = HREF_ACTION + ACTION_NAVIGATE_PAGE;
-		HREF_ACTION_SELECT_TOUR = HREF_ACTION + ACTION_SELECT_TOUR;
-		HREF_ACTION_SELECT_MARKER = HREF_ACTION + ACTION_SELECT_MARKER;
-		HREF_ACTION_SELECT_WAY_POINT = HREF_ACTION + ACTION_SELECT_WAY_POINT;
-
-		HREF_PARAM_DOC_ID = HREF_TOKEN + PARAM_DOC_ID + HREF_VALUE_SEP;
-		HREF_PARAM_MARKER_ID = HREF_TOKEN + PARAM_MARKER_ID + HREF_VALUE_SEP;
-		HREF_PARAM_TOUR_ID = HREF_TOKEN + PARAM_TOUR_ID + HREF_VALUE_SEP;
-		HREF_PARAM_PAGE = HREF_TOKEN + PARAM_PAGE + HREF_VALUE_SEP;
+		HREF_PARAM_PAGE = SearchUI.HREF_TOKEN + PARAM_PAGE + SearchUI.HREF_VALUE_SEP;
 	}
 
-	private final DateTimeFormatter		_dateFormatter							= DateTimeFormat.mediumDate();
-
-	private final IPreferenceStore		_prefStore								= TourbookPlugin.getPrefStore();
-	private final IDialogSettings		_state									= TourbookPlugin.getState(ID);
+	private final IPreferenceStore		_prefStore							= TourbookPlugin.getPrefStore();
 	//
 	private PostSelectionProvider		_postSelectionProvider;
 	private IPropertyChangeListener		_prefChangeListener;
 	private ITourEventListener			_tourEventListener;
 	private IPartListener2				_partListener;
 	//
-	private String						_actionUrl_EditImage;
-	private String						_htmlCss;
-	private String						_iconUrl_Tour;
-	private String						_iconUrl_Marker;
-	private String						_iconUrl_WayPoint;
-
 	private MTContentProposalAdapter	_contentProposalAdapter;
-	private TextContentAdapter			_controlContentAdapter					= new TextContentAdapter();
-	private MTProposalProvider			_proposalProvider						= new MTProposalProvider();
+	private TextContentAdapter			_controlContentAdapter				= new TextContentAdapter();
+	private MTProposalProvider			_proposalProvider					= new MTProposalProvider();
 
 	private ActionSearchOptions			_actionSearchOptions;
 
-	private boolean						_isBrowserLoadingCompleted;
-	private boolean						_isUIShowDateTime;
-	private boolean						_isUIShowItemNumber;
-	private boolean						_isUIShowLuceneDocId;
-	//	private boolean						_isUIShowScore;
+//	private boolean						_isBrowserLoadingCompleted;
 	private boolean						_isUIShowTopNavigator;
 
 	private int							_hitsPerPage;
 	private int							_numberOfPages;
 
 	private SearchResult				_searchResult;
-	private long						_searchTime								= -1;
+	private long						_searchTime							= -1;
 
 	/**
 	 * Lucene doc id for a selected document in the UI, otherwise it's <code>-1</code>.
 	 */
-	private int							_selectedDocId							= -1;
-	private int							_previousDocId							= -1;
+	private int							_selectedDocId						= -1;
+	private int							_previousDocId						= -1;
 
 	private PixelConverter				_pc;
 	/*
@@ -250,6 +159,8 @@ public class SearchView extends ViewPart {
 	private Text						_txtNoBrowser;
 
 	private Text						_txtSearch;
+
+	private SearchUI					_searchUI;
 
 	public class MTContentProposalAdapter extends ContentProposalAdapter {
 
@@ -557,7 +468,7 @@ public class SearchView extends ViewPart {
 
 			@Override
 			public void partClosed(final IWorkbenchPartReference partRef) {
-				if (partRef.getPart(false) == SearchView.this) {
+				if (partRef.getPart(false) == SearchViewSWT.this) {
 
 					saveState();
 
@@ -610,7 +521,7 @@ public class SearchView extends ViewPart {
 			@Override
 			public void tourChanged(final IWorkbenchPart part, final TourEventId eventId, final Object eventData) {
 
-				if (part == SearchView.this) {
+				if (part == SearchViewSWT.this) {
 					return;
 				}
 
@@ -676,7 +587,7 @@ public class SearchView extends ViewPart {
 		final String html = ""// //$NON-NLS-1$
 				+ "	<meta http-equiv='Content-Type' content='text/html; charset=UTF-8' />\n" //$NON-NLS-1$
 				+ "	<meta http-equiv='X-UA-Compatible' content='IE=edge' />\n" //$NON-NLS-1$
-				+ _htmlCss
+				+ SearchUI.CSS_STYLE
 				+ "\n"; //$NON-NLS-1$
 
 		return html;
@@ -697,232 +608,58 @@ public class SearchView extends ViewPart {
 
 			createHTML_40_PageNavigator(sbNavigator, searchResult);
 
+			/*
+			 * top navigator
+			 */
 			if (_isUIShowTopNavigator) {
 				sb.append("<div style='padding-top:3px;'></div>");
 				sb.append(sbNavigator);
 				sb.append("<div style='padding-top:3px;'></div>");
 			}
-		}
 
-		if (searchResult != null) {
-
+			/*
+			 * items
+			 */
 			final int itemBaseNumber = searchResult.pageNumber * searchResult.hitsPerPage;
-
 			int itemIndex = 0;
 
-			for (final SearchResultItem entry : searchResult.items) {
+			for (final SearchResultItem resultItem : searchResult.items) {
 
-				final int itemNumber = ++itemIndex + itemBaseNumber;
+				final int itemNumber = itemBaseNumber + (++itemIndex);
 
 				String selectedItemClass = UI.EMPTY_STRING;
 
-				if (_selectedDocId != -1 && _selectedDocId == entry.docId) {
+				if (_selectedDocId != -1 && _selectedDocId == resultItem.docId) {
 					selectedItemClass = UI.SPACE1 + CSS_SELECTED;
 				}
 
 				sb.append("<div"
-						+ (" class='" + CSS_HOVER_CONTAINER + selectedItemClass + "'")
-						+ " id='" + entry.docId + "'>\n"); //$NON-NLS-1$
+						+ (" class='" + SearchUI.CSS_ITEM_CONTAINER + selectedItemClass + "'")
+						+ " id='" + resultItem.docId + "'>\n"); //$NON-NLS-1$
 				{
-					createHTML_30_Item(sb, entry, itemNumber);
+					final ItemResponse itemResponse = _searchUI.createHTML_10_Item(resultItem, itemNumber);
+					sb.append(itemResponse.createdHtml);
+
 				}
 				sb.append("</div>\n"); //$NON-NLS-1$
-
 			}
-		}
 
-		if (searchResult != null) {
+			/*
+			 * bottom navigator
+			 */
 			sb.append("<div style='padding-top:3px;'></div>");
 			sb.append(sbNavigator);
 			sb.append("<div style='padding-top:3px;'></div>");
 		}
 
 		// state
+		sb.append("<div class='result-state'>"); //$NON-NLS-1$
 		{
-			sb.append("<div class='result-state'>"); //$NON-NLS-1$
-			{
-				sb.append(stateText);
-			}
-			sb.append("</div>\n"); //$NON-NLS-1$
+			sb.append(stateText);
 		}
+		sb.append("</div>\n"); //$NON-NLS-1$
 
 		return sb.toString();
-	}
-
-	private void createHTML_30_Item(final StringBuilder sb, final SearchResultItem resultItem, final int itemNumber) {
-
-		final int docId = resultItem.docId;
-		final int docSource = resultItem.docSource;
-		final String markerId = resultItem.markerId;
-		final String tourId = resultItem.tourId;
-
-		final boolean isTour = docSource == FTSearchManager.DOC_SOURCE_TOUR;
-		final boolean isMarker = docSource == FTSearchManager.DOC_SOURCE_TOUR_MARKER;
-		final boolean isWayPoint = docSource == FTSearchManager.DOC_SOURCE_WAY_POINT;
-
-		String iconUrl = null;
-
-		String hoverMessage = null;
-		String hrefEditItem = null;
-		String hrefSelectItem = null;
-		String itemTitleText = null;
-
-		if (isTour) {
-
-			final String tourTitle = resultItem.title;
-			if (tourTitle != null) {
-				itemTitleText = tourTitle;
-			}
-
-			hrefSelectItem = HTTP_PROTOCOL
-					+ HREF_ACTION_SELECT_TOUR
-					+ (HREF_PARAM_TOUR_ID + tourId)
-					+ (HREF_PARAM_DOC_ID + docId);
-
-			hrefEditItem = HTTP_PROTOCOL
-					+ HREF_ACTION_EDIT_TOUR
-					+ (HREF_PARAM_TOUR_ID + tourId)
-					+ (HREF_PARAM_DOC_ID + docId);
-
-			iconUrl = _iconUrl_Tour;
-			hoverMessage = Messages.Search_View_Action_EditTour_Tooltip;
-
-		} else if (isMarker) {
-
-			final String tourMarkerLabel = resultItem.title;
-			if (tourMarkerLabel != null) {
-				itemTitleText = tourMarkerLabel;
-			}
-
-			hrefSelectItem = HTTP_PROTOCOL
-					+ HREF_ACTION_SELECT_MARKER
-					+ (HREF_PARAM_TOUR_ID + tourId)
-					+ (HREF_PARAM_MARKER_ID + markerId)
-					+ (HREF_PARAM_DOC_ID + docId);
-
-			hrefEditItem = HTTP_PROTOCOL
-					+ HREF_ACTION_EDIT_MARKER
-					+ (HREF_PARAM_TOUR_ID + tourId)
-					+ (HREF_PARAM_MARKER_ID + markerId)
-					+ (HREF_PARAM_DOC_ID + docId);
-
-			iconUrl = _iconUrl_Marker;
-			hoverMessage = Messages.Search_View_Action_EditMarker_Tooltip;
-
-		} else if (isWayPoint) {
-
-			final String tourMarkerLabel = resultItem.title;
-			if (tourMarkerLabel != null) {
-				itemTitleText = tourMarkerLabel;
-			}
-
-			hrefSelectItem = HTTP_PROTOCOL
-					+ HREF_ACTION_SELECT_WAY_POINT
-					+ (HREF_PARAM_TOUR_ID + tourId)
-					+ (HREF_PARAM_MARKER_ID + markerId)
-					+ (HREF_PARAM_DOC_ID + docId);
-
-			iconUrl = _iconUrl_WayPoint;
-			hoverMessage = Messages.Search_View_Action_EditMarker_Tooltip;
-		}
-
-		if (itemTitleText == null) {
-			itemTitleText = UI.EMPTY_STRING;
-		}
-
-		String itemTitle = itemTitleText;
-		if (itemTitle.length() == 0) {
-			// show new line that the icon is not overwritten
-			itemTitle = "</br>";
-		}
-
-		final String description = resultItem.description;
-		final boolean isDescription = description != null;
-
-		// hovered actions
-		if (hrefEditItem != null) {
-
-			sb.append("<div class='action-container'>" //$NON-NLS-1$
-					+ ("<table><tbody><tr>") //$NON-NLS-1$
-					+ (TAG_TD + createHtml_Action(hrefEditItem, hoverMessage, _actionUrl_EditImage) + TAG_TD_END)
-					+ "</tr></tbody></table>" // //$NON-NLS-1$
-					+ "</div>\n"); //$NON-NLS-1$
-		}
-
-		sb.append("<a class='item'" //
-				+ (" href='" + hrefSelectItem + "'") //$NON-NLS-1$ //$NON-NLS-2$
-				+ (" title='" + itemTitle + "'") //$NON-NLS-1$ //$NON-NLS-2$
-				+ ">"); // //$NON-NLS-1$
-		{
-			sb.append("<table><tbody><tr>");
-			{
-				/*
-				 * Item image
-				 */
-				sb.append("<td class='item-image'>");
-				sb.append("<img src='" + iconUrl + "'></img>");
-				sb.append(TAG_TD_END);
-
-				/*
-				 * Item content
-				 */
-				sb.append("<td style='width:100%;'>");
-				{
-					// title
-					if (isDescription) {
-						sb.append("<span class='item-title'>" + itemTitle + "</span>");
-					} else {
-						sb.append("<span class='item-title-no-description'>" + itemTitle + "</span>");
-					}
-
-					// description
-					if (isDescription) {
-						sb.append("<div class='item-description'>"); //$NON-NLS-1$
-						sb.append(description);
-						sb.append("</div>\n"); //$NON-NLS-1$
-					}
-
-					// info
-					if (_isUIShowDateTime || _isUIShowItemNumber || /* _isUIShowScore || */_isUIShowLuceneDocId) {
-
-						sb.append("<div class='item-info'>"); //$NON-NLS-1$
-						sb.append("<table><tbody><tr>");
-						{
-							if (_isUIShowDateTime) {
-
-								final long tourStartTime = resultItem.tourStartTime;
-								if (tourStartTime != 0) {
-
-									final DateTime dt = new DateTime(tourStartTime);
-
-									sb.append(TAG_TD
-											+ String.format("%s", _dateFormatter.print(dt.getMillis()))
-											+ TAG_TD_END);
-
-								}
-							}
-
-//							if (_isUIShowScore) {
-//								sb.append(TAG_TD + String.format("%1.3f", resultItem.score) + TAG_TD_END);
-//							}
-
-							if (_isUIShowItemNumber) {
-								sb.append(TAG_TD + Integer.toString(itemNumber) + TAG_TD_END);
-							}
-
-							if (_isUIShowLuceneDocId) {
-								sb.append(TAG_TD + String.format("%d", docId) + TAG_TD_END);
-							}
-						}
-						sb.append("</tr></tbody></table>");
-						sb.append("</div>\n"); //$NON-NLS-1$
-					}
-				}
-				sb.append(TAG_TD_END);
-			}
-			sb.append("</tr></tbody></table>");
-		}
-		sb.append("</a>");
 	}
 
 	private void createHTML_40_PageNavigator(final StringBuilder sb, final SearchResult searchResult) {
@@ -978,7 +715,7 @@ public class SearchView extends ViewPart {
 		for (int currentPage = firstPage; currentPage < lastPage; currentPage++) {
 
 			final int visiblePageNo = currentPage + 1;
-			final String hrefPage = HTTP_PROTOCOL + HREF_ACTION_NAVIGATE_PAGE + HREF_PARAM_PAGE + currentPage;
+			final String hrefPage = SearchUI.HTTP_PROTOCOL + HREF_ACTION_NAVIGATE_PAGE + HREF_PARAM_PAGE + currentPage;
 
 			/*
 			 * Previous page
@@ -990,7 +727,7 @@ public class SearchView extends ViewPart {
 			/*
 			 * Every page
 			 */
-			sbPages.append(TAG_TD);
+			sbPages.append(SearchUI.TAG_TD);
 			{
 				if (currentPage == activePageNumber) {
 					sbPages.append("<div class='page-number page-selected'>" + visiblePageNo + "</div>");
@@ -998,7 +735,7 @@ public class SearchView extends ViewPart {
 					sbPages.append("<a class='page-number' href='" + hrefPage + "'>" + visiblePageNo + "</a>");
 				}
 			}
-			sbPages.append(TAG_TD_END);
+			sbPages.append(SearchUI.TAG_TD_END);
 
 			/*
 			 * Next page
@@ -1008,20 +745,20 @@ public class SearchView extends ViewPart {
 			}
 		}
 
-		sbNext.append(TAG_TD_END);
-		sbPrevious.append(TAG_TD_END);
+		sbNext.append(SearchUI.TAG_TD_END);
+		sbPrevious.append(SearchUI.TAG_TD_END);
 
 		/*
 		 * first page
 		 */
-		sbFirst.append(TAG_TD);
+		sbFirst.append(SearchUI.TAG_TD);
 		{
 			if (firstPage > 0) {
-				final String hrefPage = HTTP_PROTOCOL + HREF_ACTION_NAVIGATE_PAGE + HREF_PARAM_PAGE + 0;
+				final String hrefPage = SearchUI.HTTP_PROTOCOL + HREF_ACTION_NAVIGATE_PAGE + HREF_PARAM_PAGE + 0;
 				sbFirst.append("<a" + " class='page-number' href='" + hrefPage + "'>1</a>");
 			}
 		}
-		sbFirst.append(TAG_TD_END);
+		sbFirst.append(SearchUI.TAG_TD_END);
 		if (firstPage > 0) {
 			sbFirst.append("<td>..</td>");
 		}
@@ -1032,14 +769,17 @@ public class SearchView extends ViewPart {
 		if (lastPage < maxPage - 0) {
 			sbLast.append("<td>..</td>");
 		}
-		sbLast.append(TAG_TD);
+		sbLast.append(SearchUI.TAG_TD);
 		{
 			if (lastPage < maxPage) {
-				final String hrefPage = HTTP_PROTOCOL + HREF_ACTION_NAVIGATE_PAGE + HREF_PARAM_PAGE + (maxPage - 1);
+				final String hrefPage = SearchUI.HTTP_PROTOCOL
+						+ HREF_ACTION_NAVIGATE_PAGE
+						+ HREF_PARAM_PAGE
+						+ (maxPage - 1);
 				sbLast.append("<a class='page-number' href='" + hrefPage + "'>" + maxPage + "</a>");
 			}
 		}
-		sbLast.append(TAG_TD_END);
+		sbLast.append(SearchUI.TAG_TD_END);
 
 		/*
 		 * put all together
@@ -1059,16 +799,6 @@ public class SearchView extends ViewPart {
 		sb.append("</div>\n"); //$NON-NLS-1$
 	}
 
-	private String createHtml_Action(final String hrefMarker, final String hoverMessage, final String backgroundImage) {
-
-		return "<a class='action'" // //$NON-NLS-1$
-				+ (" style='background-image: url(" + backgroundImage + ");'") //$NON-NLS-1$ //$NON-NLS-2$
-				+ (" href='" + hrefMarker + "'") //$NON-NLS-1$ //$NON-NLS-2$
-				+ (" title='" + hoverMessage + "'") //$NON-NLS-1$ //$NON-NLS-2$
-				+ ">" // //$NON-NLS-1$
-				+ "</a>"; //$NON-NLS-1$
-	}
-
 	@Override
 	public void createPartControl(final Composite parent) {
 
@@ -1086,6 +816,8 @@ public class SearchView extends ViewPart {
 		// this part is a selection provider
 		getSite().setSelectionProvider(_postSelectionProvider = new PostSelectionProvider(ID));
 
+		_searchUI = new SearchUI(this, _browser, _postSelectionProvider, false);
+
 		restoreState();
 
 		showInvalidPage();
@@ -1096,13 +828,13 @@ public class SearchView extends ViewPart {
 
 //		_browser.setUrl("google.com");
 
-		_browser.getDisplay().asyncExec(new Runnable() {
-			@Override
-			public void run() {
-
-				_browser.setUrl("http://eclipse.org");
-			}
-		});
+//		_browser.getDisplay().asyncExec(new Runnable() {
+//			@Override
+//			public void run() {
+//
+//				_browser.setUrl("http://eclipse.org");
+//			}
+//		});
 
 //		final boolean isValid = _browser.setUrl("file:///C:/DAT/ws/Editor-for-HTML-JS-CSS/tour-blog.html");
 //		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") + ("\tisValid: " + isValid));
@@ -1268,13 +1000,6 @@ public class SearchView extends ViewPart {
 				}
 			});
 
-			_browser.addProgressListener(new ProgressAdapter() {
-				@Override
-				public void completed(final ProgressEvent event) {
-					onBrowserCompleted(event);
-				}
-			});
-
 		} catch (final SWTError e) {
 
 			_txtSearch.setEnabled(false);
@@ -1320,158 +1045,16 @@ public class SearchView extends ViewPart {
 		return maxPage;
 	}
 
-	private void hrefActionEditTour(final Long tourId) {
-
-		// get tour by id
-		final TourData tourData = TourManager.getTour(tourId);
-		if (tourData == null) {
-			return;
-		}
-
-		if (new DialogQuickEdit(//
-				Display.getCurrent().getActiveShell(),
-				tourData).open() == Window.OK) {
-
-			saveModifiedTour(tourData);
-		}
-	}
-
-	private void hrefActionMarker(final String action, final long tourId, final long markerId) {
-
-		// get tour by id
-		final TourData tourData = TourManager.getTour(tourId);
-		if (tourData == null) {
-			return;
-		}
-
-		TourMarker selectedTourMarker = null;
-
-		// get marker by id
-		for (final TourMarker tourMarker : tourData.getTourMarkers()) {
-			if (tourMarker.getMarkerId() == markerId) {
-				selectedTourMarker = tourMarker;
-				break;
-			}
-		}
-
-		if (selectedTourMarker == null) {
-			return;
-		}
-
-		switch (action) {
-		case ACTION_EDIT_MARKER:
-			hrefActionMarker_Edit(tourData, selectedTourMarker);
-			break;
-
-		case ACTION_SELECT_MARKER:
-			hrefActionMarker_Select(tourData, selectedTourMarker);
-			break;
-		}
-	}
-
-	private void hrefActionMarker_Edit(final TourData tourData, final TourMarker tourMarker) {
-
-		if (tourData.isManualTour()) {
-			// a manually created tour do not have time slices -> no markers
-			return;
-		}
-
-		final DialogMarker markerDialog = new DialogMarker(//
-				_uiParent.getShell(),
-				tourData,
-				tourMarker);
-
-		if (markerDialog.open() == Window.OK) {
-			saveModifiedTour(tourData);
-		}
-	}
-
-	private void hrefActionMarker_Select(final TourData tourData, final TourMarker selectedTourMarker) {
-
-		final ArrayList<TourMarker> selectedTourMarkers = new ArrayList<TourMarker>();
-		selectedTourMarkers.add(selectedTourMarker);
-
-		final SelectionTourMarker markerSelection = new SelectionTourMarker(tourData, selectedTourMarkers);
-
-		// ensure that the selection provider contain the correct data
-		_postSelectionProvider.setSelectionNoFireEvent(markerSelection);
-
-		TourManager.fireEvent(//
-				TourEventId.MARKER_SELECTION,
-				markerSelection,
-				getSite().getPart());
-	}
-
-	private void hrefActionWayPoint(final String action, final long tourId, final long markerId) {
-
-		// get tour by id
-		final TourData tourData = TourManager.getTour(tourId);
-		if (tourData == null) {
-			return;
-		}
-
-		TourWayPoint selectedWayPoint = null;
-
-		// get marker by id
-		for (final TourWayPoint wayPoint : tourData.getTourWayPoints()) {
-			if (wayPoint.getWayPointId() == markerId) {
-				selectedWayPoint = wayPoint;
-				break;
-			}
-		}
-
-		if (selectedWayPoint == null) {
-			return;
-		}
-
-		// fire selection
-		final ISelection selection = new StructuredSelection(selectedWayPoint);
-		_postSelectionProvider.setSelection(selection);
-	}
-
 	private void initUI(final Composite parent) {
 
 		_pc = new PixelConverter(parent);
-
-		try {
-
-			/*
-			 * load css from file
-			 */
-			final File cssFile = WEB.getFile(SEARCH_RESULT_CSS_FILE);
-			final String cssContent = Util.readContentFromFile(cssFile.getAbsolutePath());
-
-			_htmlCss = "<style>" + cssContent + "</style>"; //$NON-NLS-1$ //$NON-NLS-2$
-
-			/*
-			 * set image urls
-			 */
-			_iconUrl_Tour = net.tourbook.ui.UI.getIconUrl(Messages.Image__TourChart);
-			_iconUrl_Marker = net.tourbook.ui.UI.getIconUrl(Messages.Image__TourMarker);
-			_iconUrl_WayPoint = net.tourbook.ui.UI.getIconUrl(IMAGE_ACTION_TOUR_WAY_POINT);
-
-			_actionUrl_EditImage = net.tourbook.ui.UI.getIconUrl(Messages.Image__quick_edit);
-
-		} catch (final IOException | URISyntaxException e) {
-			StatusUtil.showStatus(e);
-		}
-	}
-
-	private void onBrowserCompleted(final ProgressEvent event) {
-
-		_isBrowserLoadingCompleted = true;
-
-		System.out
-				.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") + ("\tonBrowserCompleted()"));
-// TODO remove SYSTEM.OUT.PRINTLN
-
 	}
 
 	private void onBrowserLocation(final LocationEvent event) {
 
 		final String location = event.location;
 
-		final String[] locationParts = location.split(HREF_TOKEN);
+		final String[] locationParts = location.split(SearchUI.HREF_TOKEN);
 
 		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
 				+ ("\tlocation: " + location)
@@ -1488,7 +1071,7 @@ public class SearchView extends ViewPart {
 
 		for (final String part : locationParts) {
 
-			final int valueSepPos = part.indexOf(HREF_VALUE_SEP);
+			final int valueSepPos = part.indexOf(SearchUI.HREF_VALUE_SEP);
 
 			String key;
 			String value = null;
@@ -1506,11 +1089,11 @@ public class SearchView extends ViewPart {
 			}
 
 			switch (key) {
-			case PARAM_ACTION:
+			case SearchUI.PARAM_ACTION:
 				action = value;
 				break;
 
-			case PARAM_DOC_ID:
+			case SearchUI.PARAM_DOC_ID:
 				docId = Integer.parseInt(value);
 				break;
 
@@ -1518,11 +1101,11 @@ public class SearchView extends ViewPart {
 				page = Integer.parseInt(value);
 				break;
 
-			case PARAM_MARKER_ID:
+			case SearchUI.PARAM_MARKER_ID:
 				markerId = Long.parseLong(value);
 				break;
 
-			case PARAM_TOUR_ID:
+			case SearchUI.PARAM_TOUR_ID:
 				tourId = Long.parseLong(value);
 				break;
 
@@ -1531,7 +1114,7 @@ public class SearchView extends ViewPart {
 			}
 		}
 
-		if (location.equals(PAGE_ABOUT_BLANK) && action == null) {
+		if (location.equals(SearchUI.PAGE_ABOUT_BLANK) && action == null) {
 
 			// about:blank is the initial page
 
@@ -1548,15 +1131,15 @@ public class SearchView extends ViewPart {
 
 		switch (action) {
 
-		case ACTION_EDIT_TOUR:
+		case SearchUI.ACTION_EDIT_TOUR:
 
 			setSelectedDocId(docId);
 
-			hrefActionEditTour(tourId);
+			_searchUI.hrefActionEditTour(tourId);
 
 			break;
 
-		case ACTION_SELECT_TOUR:
+		case SearchUI.ACTION_SELECT_TOUR:
 
 			setSelectedDocId(docId);
 
@@ -1564,20 +1147,20 @@ public class SearchView extends ViewPart {
 
 			break;
 
-		case ACTION_EDIT_MARKER:
-		case ACTION_SELECT_MARKER:
+		case SearchUI.ACTION_EDIT_MARKER:
+		case SearchUI.ACTION_SELECT_MARKER:
 
 			setSelectedDocId(docId);
 
-			hrefActionMarker(action, tourId, markerId);
+			_searchUI.hrefActionMarker(action, tourId, markerId);
 
 			break;
 
-		case ACTION_SELECT_WAY_POINT:
+		case SearchUI.ACTION_SELECT_WAY_POINT:
 
 			setSelectedDocId(docId);
 
-			hrefActionWayPoint(action, tourId, markerId);
+			_searchUI.hrefActionWayPoint(action, tourId, markerId);
 
 			break;
 
@@ -1684,13 +1267,16 @@ public class SearchView extends ViewPart {
 
 	private void restoreState() {
 
-		final int popupWidth = Util.getStateInt(_state, STATE_POPUP_WIDTH, _pc.convertWidthInCharsToPixels(40));
-		final int popupHeight = Util.getStateInt(_state, STATE_POPUP_HEIGHT, _pc.convertHeightInCharsToPixels(20));
+		final int popupWidth = Util.getStateInt(SearchUI.state, STATE_POPUP_WIDTH, _pc.convertWidthInCharsToPixels(40));
+		final int popupHeight = Util.getStateInt(
+				SearchUI.state,
+				STATE_POPUP_HEIGHT,
+				_pc.convertHeightInCharsToPixels(20));
 		final Point popupSize = new Point(popupWidth, popupHeight);
 
 		_contentProposalAdapter.setPopupSize(popupSize);
 
-		final String searchText = Util.getStateString(_state, STATE_SEARCH_TEXT, UI.EMPTY_STRING);
+		final String searchText = Util.getStateString(SearchUI.state, STATE_SEARCH_TEXT, UI.EMPTY_STRING);
 		_txtSearch.setText(searchText);
 		// move cursor to the end of the text
 		_txtSearch.setSelection(searchText.length());
@@ -1702,56 +1288,23 @@ public class SearchView extends ViewPart {
 
 	private void restoreState_Options() {
 
-		_hitsPerPage = Util.getStateInt(_state, STATE_HITS_PER_PAGE, STATE_HITS_PER_PAGE_DEFAULT);
-		_numberOfPages = Util.getStateInt(_state, STATE_NUMBER_OF_PAGES, STATE_NUMBER_OF_PAGES_DEFAULT);
+		_hitsPerPage = Util.getStateInt(SearchUI.state, STATE_HITS_PER_PAGE, STATE_HITS_PER_PAGE_DEFAULT);
+		_numberOfPages = Util.getStateInt(SearchUI.state, STATE_NUMBER_OF_PAGES, STATE_NUMBER_OF_PAGES_DEFAULT);
 
-		_isUIShowDateTime = Util.getStateBoolean(_state, //
-				STATE_IS_SHOW_DATE_TIME,
-				STATE_IS_SHOW_DATE_TIME_DEFAULT);
-
-		_isUIShowLuceneDocId = Util.getStateBoolean(_state, //
-				STATE_IS_SHOW_LUCENE_DOC_ID,
-				STATE_IS_SHOW_LUCENE_DOC_ID_DEFAULT);
-
-		_isUIShowItemNumber = Util.getStateBoolean(_state, //
-				STATE_IS_SHOW_ITEM_NUMBER,
-				STATE_IS_SHOW_ITEM_NUMBER_DEFAULT);
-
-//		_isUIShowScore = Util.getStateBoolean(_state, //
-//				STATE_IS_SHOW_SCORE,
-//				STATE_IS_SHOW_SCORE_DEFAULT);
-
-		_isUIShowTopNavigator = Util.getStateBoolean(_state,//
+		_isUIShowTopNavigator = Util.getStateBoolean(SearchUI.state,//
 				STATE_IS_SHOW_TOP_NAVIGATOR,
 				STATE_IS_SHOW_TOP_NAVIGATOR_DEFAULT);
 
-		final boolean isSortDateAscending = Util.getStateBoolean(_state,//
-				STATE_IS_SORT_DATE_ASCENDING,
-				STATE_IS_SORT_DATE_ASCENDING_DEFAULT);
-
-		FTSearchManager.setResultSorting(isSortDateAscending);
-	}
-
-	private void saveModifiedTour(final TourData tourData) {
-
-		/*
-		 * Run async because a tour save will fire a tour change event.
-		 */
-		_uiParent.getDisplay().asyncExec(new Runnable() {
-			@Override
-			public void run() {
-				TourManager.saveModifiedTour(tourData);
-			}
-		});
+		SearchUI.restoreState_Options();
 	}
 
 	private void saveState() {
 
 		final Point popupSize = _contentProposalAdapter.getPopupSize();
-		_state.put(STATE_POPUP_WIDTH, popupSize.x);
-		_state.put(STATE_POPUP_HEIGHT, popupSize.y);
+		SearchUI.state.put(STATE_POPUP_WIDTH, popupSize.x);
+		SearchUI.state.put(STATE_POPUP_HEIGHT, popupSize.y);
 
-		_state.put(STATE_SEARCH_TEXT, _txtSearch.getText());
+		SearchUI.state.put(STATE_SEARCH_TEXT, _txtSearch.getText());
 	}
 
 	@Override
@@ -1777,14 +1330,18 @@ public class SearchView extends ViewPart {
 		sb.append("if (oldId >= 0) {");
 		sb.append("	var divOldSelection = document.getElementById(oldId.toString());");
 		sb.append("	if (divOldSelection) {");
-		sb.append("		divOldSelection.setAttribute('class', '" + CSS_HOVER_CONTAINER + "');");
+		sb.append("		divOldSelection.setAttribute('class', '" + SearchUI.CSS_ITEM_CONTAINER + "');");
 		sb.append("	}");
 		sb.append("}");
 
 		sb.append("if (selectedId >= 0) {");
 		sb.append("	var divSelection = document.getElementById(selectedId.toString());");
 		sb.append("	if (divSelection) {");
-		sb.append("		divSelection.setAttribute('class', '" + CSS_HOVER_CONTAINER + UI.SPACE + CSS_SELECTED + "');");
+		sb.append("		divSelection.setAttribute('class', '"
+				+ SearchUI.CSS_ITEM_CONTAINER
+				+ UI.SPACE
+				+ CSS_SELECTED
+				+ "');");
 		sb.append("	}");
 		sb.append("}");
 

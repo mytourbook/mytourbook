@@ -26,11 +26,11 @@ public class ActionHandler_OpenSearchView extends AbstractHandler {
 
 	public Object execute(final ExecutionEvent event) throws ExecutionException {
 
-		final IViewPart part = Util.showView(SearchView.ID, true);
+		final IViewPart part = Util.showView(SearchViewSWT.ID, true);
 
-		if (part instanceof SearchView) {
+		if (part instanceof SearchViewSWT) {
 
-			final SearchView searchView = (SearchView) part;
+			final SearchViewSWT searchView = (SearchViewSWT) part;
 			searchView.actionOpenSearchView();
 		}
 

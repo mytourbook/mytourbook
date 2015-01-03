@@ -27,7 +27,6 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -639,22 +638,23 @@ public class FTSearchManager {
 
 		Analyzer analyzer = null;
 
-		try {
-
-			final Locale currentLocale = Locale.getDefault();
-
-//			currentLocale = Locale.GERMAN;
-//			currentLocale = Locale.ENGLISH;
+//		try {
 //
-			analyzer = SearchUtils.getAnalyzerForLocale(currentLocale);
-//			analyzer = new GermanAnalyzer();
-//			analyzer = new EnglishAnalyzer();
+//			final Locale currentLocale = Locale.getDefault();
+//
+////			currentLocale = Locale.GERMAN;
+////			currentLocale = Locale.ENGLISH;
+////
+////			analyzer = SearchUtils.getAnalyzerForLocale(currentLocale);
+////			analyzer = new GermanAnalyzer();
+////			analyzer = new EnglishAnalyzer();
+//
+//
+//		} catch (final SQLException e) {
+//			StatusUtil.showStatus(e);
+//		}
 
-			analyzer = new StandardAnalyzer(new CharArraySet(0, true));
-
-		} catch (final SQLException e) {
-			StatusUtil.showStatus(e);
-		}
+		analyzer = new StandardAnalyzer(new CharArraySet(0, true));
 
 		return analyzer;
 	}
@@ -822,6 +822,8 @@ public class FTSearchManager {
 			for (int docIndex = 0; docIndex < resultSize; docIndex++) {
 				docids[docIndex] = scoreDocs[docStartIndex + docIndex].doc;
 			}
+
+			// this can occure: field 'description' was indexed without offsets, cannot highlight
 
 			final MyPostingsHighlighter highlighter = new MyPostingsHighlighter();
 			final Map<String, String[]> highlights = highlighter.highlightFields(

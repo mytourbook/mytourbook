@@ -65,6 +65,7 @@ SearchMgr //
 					data : xhrData
 				});
 
+				// overwrite store in dijit/form/ComboBoxMixin
 				self.store = newStore;
 
 //				console.debug("proposal received");
@@ -73,44 +74,33 @@ SearchMgr //
 
 				// Handle the error condition
 				console.error("error: " + err);
-			})
+			});
 		},
 
-		_loadResults : function _loadResults() {
+		_loadSearchResults : function _loadSearchResults() {
 
 			// show selected item
 
 			var newSearchUrl = this.getSearchUrl();
 
-			console.warn("_loadResults '" + newSearchUrl + "'");
+			console.warn("_loadSearchResults '" + newSearchUrl + "'");
 
 			// check if loading is needed
 			if (this._currentSearchUrl !== newSearchUrl) {
 
+				// keep current search
 				this._currentSearchUrl = newSearchUrl;
 
-				var grid = this._grid;
+				// overwrite store url
+				this._grid.collection.target = newSearchUrl;
 
-				grid.collection.target = newSearchUrl;
-				grid.refresh();
+				this._grid.refresh();
 			}
-		},
-
-		_onKeyDown : function _onKeyDown(evt) {
-
-			// load suggestions for the entered value
-
-			console.info("_onKeyDown '" + this.getSearchText() + "'");
-		},
-
-		_onKeyPress : function _onKeyPress(event) {
-
-			console.info("_onKeyPress '" + this.getSearchText() + "'");
 		},
 
 		_onKeyUp : function _onKeyUp(event) {
 
-			console.info("_onKeyUp '" + this.getSearchText() + "'");
+//			console.info("_onKeyUp '" + this.getSearchText() + "'");
 
 			var searchText = this.getSearchText();
 
@@ -128,12 +118,11 @@ SearchMgr //
 
 			// load results only with the <Enter> key
 			if (event.keyCode == keys.ENTER) {
-				this._loadResults();
+				this._loadSearchResults();
 			}
 		},
 
 		getSearchText : function getSearchText() {
-			
 			return this.get('displayedValue').trim();
 		},
 
@@ -145,8 +134,6 @@ SearchMgr //
 			var paramSearchText = "&" + SearchMgr.XHR_PARAM_SEARCH_TEXT + "=" + encodeURIComponent(searchText);
 
 			var url = SearchMgr.XHR_SEARCH_HANDLER + '?' + actionSearch + paramSearchText;
-
-//				console.info("store: " + url);
 
 			return url;
 		},
@@ -173,8 +160,6 @@ SearchMgr //
 
 			this.inherited(arguments);
 
-			on(this.domNode, "keypress", lang.hitch(this, "_onKeyPress"));
-			on(this.domNode, "keydown", lang.hitch(this, "_onKeyDown"));
 			on(this.domNode, "keyup", lang.hitch(this, "_onKeyUp"));
 		},
 
@@ -182,9 +167,14 @@ SearchMgr //
 
 			this.inherited(arguments);
 
+			// overwrite dijit._HasDropDown
 			// set max height smaller for the dropdown box that the a scollbar of the body is not displayed
 			var viewport = winUtils.getBox(this.ownerDocument);
 			this.maxHeight = viewport.h * 0.90;
+
+			// overwrite dijit._HasDropDown
+			// force with to the max proposal with
+			this.autoWidth = false;
 		},
 
 		setGrid : function(grid) {

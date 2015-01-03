@@ -15,6 +15,14 @@
  *******************************************************************************/
 package net.tourbook.search;
 
+import java.util.ArrayList;
+
+import net.tourbook.common.util.PostSelectionProvider;
+import net.tourbook.data.TourData;
+import net.tourbook.tour.ITourEventListener;
+import net.tourbook.tour.TourEvent;
+import net.tourbook.tour.TourEventId;
+import net.tourbook.tour.TourManager;
 import net.tourbook.web.WebContentServer;
 
 import org.eclipse.swt.SWT;
@@ -22,16 +30,19 @@ import org.eclipse.swt.SWTError;
 import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IPartListener2;
+import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.part.ViewPart;
 
 public class SearchViewXUL extends ViewPart {
 
-	public static final String	ID	= "net.tourbook.search.SearchViewXUL";	//$NON-NLS-1$
+	public static final String		ID	= "net.tourbook.search.SearchViewXUL";	//$NON-NLS-1$
 
-	private SearchWebService				_search;
+	private SearchUI				_searchUI;
 
-	private IPartListener2		_partListener;
+	private IPartListener2			_partListener;
+	private PostSelectionProvider	_postSelectionProvider;
+	private ITourEventListener		_tourEventListener;
 
 	private void addPartListener() {
 
@@ -77,11 +88,49 @@ public class SearchViewXUL extends ViewPart {
 		getViewSite().getPage().addPartListener(_partListener);
 	}
 
+	private void addTourEventListener() {
+
+		_tourEventListener = new ITourEventListener() {
+			@Override
+			public void tourChanged(final IWorkbenchPart part, final TourEventId eventId, final Object eventData) {
+
+				if (part == SearchViewXUL.this) {
+					return;
+				}
+
+				if ((eventId == TourEventId.TOUR_CHANGED) && (eventData instanceof TourEvent)) {
+
+					final ArrayList<TourData> modifiedTours = ((TourEvent) eventData).getModifiedTours();
+					if (modifiedTours != null) {
+
+						// update modified tour
+
+						for (final TourData tourData : modifiedTours) {
+
+						}
+					}
+
+				} else if (eventId == TourEventId.CLEAR_DISPLAYED_TOUR) {
+
+					clearView();
+
+				}
+			}
+		};
+
+		TourManager.getInstance().addTourEventListener(_tourEventListener);
+	}
+
+	private void clearView() {
+
+		// removed old tour data from the selection provider
+		_postSelectionProvider.clearSelection();
+	}
+
 	@Override
 	public void createPartControl(final Composite parent) {
 
 		Browser browser;
-
 		try {
 
 			System.setProperty("org.eclipse.swt.browser.XULRunnerPath", "C:\\E\\XULRunner\\xulrunner-10-32");
@@ -93,22 +142,27 @@ public class SearchViewXUL extends ViewPart {
 			return;
 		}
 
-		addPartListener();
+		// this part is a selection provider
+		getSite().setSelectionProvider(_postSelectionProvider = new PostSelectionProvider(ID));
 
-		_search = new SearchWebService(browser);
+		addPartListener();
+		addTourEventListener();
+
+		_searchUI = new SearchUI(this, browser, _postSelectionProvider, true);
 	}
 
 	@Override
 	public void dispose() {
 
 		getViewSite().getPage().removePartListener(_partListener);
+		TourManager.getInstance().removeTourEventListener(_tourEventListener);
 
 		super.dispose();
 	}
 
 	@Override
 	public void setFocus() {
-		_search.setFocus();
+		_searchUI.setFocus();
 	}
 
 }
