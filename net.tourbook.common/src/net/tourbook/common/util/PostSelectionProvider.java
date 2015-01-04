@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -90,10 +90,12 @@ public class PostSelectionProvider implements IPostSelectionProvider {
 		return false;
 	}
 
+	@Override
 	public void addPostSelectionChangedListener(final ISelectionChangedListener listener) {
 		_postSelectionListeners.add(listener);
 	}
 
+	@Override
 	public void addSelectionChangedListener(final ISelectionChangedListener listener) {}
 
 	/**
@@ -103,16 +105,20 @@ public class PostSelectionProvider implements IPostSelectionProvider {
 		_currentSelection = null;
 	}
 
+	@Override
 	public ISelection getSelection() {
 		return _currentSelection;
 	}
 
+	@Override
 	public void removePostSelectionChangedListener(final ISelectionChangedListener listener) {
 		_postSelectionListeners.remove(listener);
 	}
 
+	@Override
 	public void removeSelectionChangedListener(final ISelectionChangedListener listener) {}
 
+	@Override
 	public void setSelection(final ISelection selection) {
 
 		if (selection == null) {
@@ -128,6 +134,7 @@ public class PostSelectionProvider implements IPostSelectionProvider {
 		for (final Object listener : listeners) {
 			final ISelectionChangedListener l = (ISelectionChangedListener) listener;
 			SafeRunnable.run(new SafeRunnable() {
+				@Override
 				public void run() {
 					l.selectionChanged(event);
 				}

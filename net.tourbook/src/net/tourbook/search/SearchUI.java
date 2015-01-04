@@ -453,9 +453,7 @@ public class SearchUI implements XHRHandler {
 		return itemResponse;
 	}
 
-	private  String createHTML_20_Action(	final String actionUrl,
-												final String hoverMessage,
-												final String backgroundImage) {
+	private String createHTML_20_Action(final String actionUrl, final String hoverMessage, final String backgroundImage) {
 
 		return "<a class='action'" // //$NON-NLS-1$
 				+ (" style='background-image: url(" + backgroundImage + ");'") //$NON-NLS-1$ //$NON-NLS-2$
@@ -640,21 +638,9 @@ public class SearchUI implements XHRHandler {
 	 */
 	private boolean performAction(final String location) {
 
-//		if (location.equals(_previousUrl)) {
-//
-//			/*
-//			 *
-//			 */
-//			return false;
-//		}
-//		_previousUrl = location;
-
-		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] performAction()")
-				+ ("\tlocation: " + location)
-//				+ ("\t" + Arrays.toString(locationParts))
-				//
-				);
-		// TODO remove SYSTEM.OUT.PRINTLN
+//		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] performAction()")
+//				+ ("\tlocation: " + location));
+//		// TODO remove SYSTEM.OUT.PRINTLN
 
 		String action = null;
 
@@ -714,10 +700,6 @@ public class SearchUI implements XHRHandler {
 			break;
 
 		case ACTION_SELECT_TOUR:
-
-			System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
-					+ ("\tACTION_SELECT_TOUR: " + tourId));
-			// TODO remove SYSTEM.OUT.PRINTLN
 
 			_postSelectionProvider.setSelection(new SelectionTourId(tourId));
 

@@ -112,6 +112,7 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 	private void addPartListener() {
 		_partListener = new IPartListener2() {
 
+			@Override
 			public void partActivated(final IWorkbenchPartReference partRef) {
 
 				if (partRef.getPart(false) == TourChartView.this) {
@@ -119,10 +120,13 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 				}
 			}
 
+			@Override
 			public void partBroughtToTop(final IWorkbenchPartReference partRef) {}
 
+			@Override
 			public void partClosed(final IWorkbenchPartReference partRef) {}
 
+			@Override
 			public void partDeactivated(final IWorkbenchPartReference partRef) {
 
 				if (partRef.getPart(false) == TourChartView.this) {
@@ -133,16 +137,20 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 				_tourChart.partIsDeactivated();
 			}
 
+			@Override
 			public void partHidden(final IWorkbenchPartReference partRef) {
 				if (partRef.getPart(false) == TourChartView.this) {
 					_tourChart.partIsHidden();
 				}
 			}
 
+			@Override
 			public void partInputChanged(final IWorkbenchPartReference partRef) {}
 
+			@Override
 			public void partOpened(final IWorkbenchPartReference partRef) {}
 
+			@Override
 			public void partVisible(final IWorkbenchPartReference partRef) {
 				if (partRef.getPart(false) == TourChartView.this) {
 					_tourChart.partIsVisible();
@@ -155,6 +163,7 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 	private void addPrefListener() {
 
 		_prefChangeListener = new IPropertyChangeListener() {
+			@Override
 			public void propertyChange(final PropertyChangeEvent event) {
 
 				final String property = event.getProperty();
@@ -200,6 +209,7 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 	private void addSelectionListener() {
 
 		_postSelectionListener = new ISelectionListener() {
+			@Override
 			public void selectionChanged(final IWorkbenchPart part, final ISelection selection) {
 
 				if (part == TourChartView.this) {
@@ -216,6 +226,7 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 
 		_tourEventListener = new ITourEventListener() {
 
+			@Override
 			public void tourChanged(final IWorkbenchPart part, final TourEventId eventId, final Object eventData) {
 
 				if (part == TourChartView.this) {
@@ -359,6 +370,7 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 
 		// set chart title
 		_tourChart.addDataModelListener(new IDataModelListener() {
+			@Override
 			public void dataModelChanged(final ChartDataModel chartDataModel) {
 				chartDataModel.setTitle(TourManager.getTourTitleDetailed(_tourData));
 			}
@@ -368,6 +380,7 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 
 		// fire a slider move selection when a slider was moved in the tour chart
 		_tourChart.addSliderMoveListener(new ISliderMoveListener() {
+			@Override
 			public void sliderMoved(final SelectionChartInfo chartInfoSelection) {
 				fireSliderPosition();
 			}
@@ -415,6 +428,7 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 		}
 	}
 
+	@Override
 	public ArrayList<TourData> getSelectedTours() {
 
 		if (_tourData == null) {
@@ -427,11 +441,16 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 		return tourList;
 	}
 
+	@Override
 	public TourChart getTourChart() {
 		return _tourChart;
 	}
 
 	private void onSelectionChanged(final ISelection selection) {
+
+//		System.out.println((net.tourbook.common.UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
+//				+ ("\tonSelectionChanged"));
+//		// TODO remove SYSTEM.OUT.PRINTLN
 
 		// prevent to listen to own events
 		if (_isInSliderPositionFired) {
@@ -702,6 +721,7 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 
 			// a tour is not displayed, find a tour provider which provides a tour
 			Display.getCurrent().asyncExec(new Runnable() {
+				@Override
 				public void run() {
 
 					// validate widget

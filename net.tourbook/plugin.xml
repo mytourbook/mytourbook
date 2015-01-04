@@ -913,28 +913,28 @@
 					icon="icons/searchXUL.png"
 					label="%View_Name_SearchAll"
 					tooltip="%View_Name_SearchAll_Tooltip"
-					/>
+				/>
 
 				<command
 					commandId="command.net.tourbook.search.SearchViewIE"
 					icon="icons/searchIE.png"
 					label="%View_Name_SearchAll"
 					tooltip="%View_Name_SearchAll_Tooltip"
-					/>
+				/>
 
 				<command
 					commandId="command.net.tourbook.search.SearchView"
 					icon="icons/search.png"
 					label="%View_Name_SearchAll"
 					tooltip="%View_Name_SearchAll_Tooltip"
-					/>
+				/>
 
 				<command
 					commandId="command.de.byteholder.geoclipse.poi.ShowPOI"
 					icon="icons/find.png"
 					label="%View_Name_SearchPOI"
 					tooltip="%View_Name_SearchPOI_Tooltip"
-					/>
+				/>
 
 				<!-- Preferences -->
 				<command
@@ -1762,7 +1762,8 @@
 			commandId="command.net.tourbook.search.SearchViewXUL"
 			sequence="%Shortcut_Key_App_Search"
 			contextId="org.eclipse.ui.contexts.window"
-			schemeId="net.tourbook.scheme"/>
+			schemeId="net.tourbook.scheme"
+		/>
   
 	</extension>
 

@@ -468,15 +468,16 @@ public class SearchViewSWT extends ViewPart {
 
 			@Override
 			public void partClosed(final IWorkbenchPartReference partRef) {
-				if (partRef.getPart(false) == SearchViewSWT.this) {
 
-					saveState();
-
-					/**
-					 * Close ft index that it will be created each time when the index is opened.
-					 */
-					FTSearchManager.close();
-				}
+//				if (partRef.getPart(false) == SearchViewSWT.this) {
+//
+//					saveState();
+//
+//					/**
+//					 * Close ft index that it will be created each time when the index is opened.
+//					 */
+//					FTSearchManager.close();
+//				}
 			}
 
 			@Override
@@ -801,6 +802,8 @@ public class SearchViewSWT extends ViewPart {
 
 	@Override
 	public void createPartControl(final Composite parent) {
+
+		FTSearchManager.setupSuggester();
 
 		_uiParent = parent;
 

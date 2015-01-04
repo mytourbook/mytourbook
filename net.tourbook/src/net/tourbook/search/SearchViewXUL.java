@@ -23,7 +23,6 @@ import net.tourbook.tour.ITourEventListener;
 import net.tourbook.tour.TourEvent;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
-import net.tourbook.web.WebContentServer;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.SWTError;
@@ -40,8 +39,9 @@ public class SearchViewXUL extends ViewPart {
 
 	private SearchUI				_searchUI;
 
-	private IPartListener2			_partListener;
 	private PostSelectionProvider	_postSelectionProvider;
+
+	private IPartListener2			_partListener;
 	private ITourEventListener		_tourEventListener;
 
 	private void addPartListener() {
@@ -57,16 +57,16 @@ public class SearchViewXUL extends ViewPart {
 			@Override
 			public void partClosed(final IWorkbenchPartReference partRef) {
 
-				if (partRef.getPart(false) == SearchViewXUL.this) {
-
-					/**
-					 * Close ft index that it will be created each time when the index is opened.
-					 */
-					FTSearchManager.close();
-
-					// stop webserver for debugging
-					WebContentServer.stop();
-				}
+//				if (partRef.getPart(false) == SearchViewXUL.this) {
+//
+//					/**
+//					 * Close ft index that it will be created each time when the index is opened.
+//					 */
+//					FTSearchManager.close();
+//
+//					// stop webserver for debugging
+//					WebContentServer.stop();
+//				}
 			}
 
 			@Override
@@ -130,6 +130,8 @@ public class SearchViewXUL extends ViewPart {
 	@Override
 	public void createPartControl(final Composite parent) {
 
+		FTSearchManager.setupSuggester();
+
 		Browser browser;
 		try {
 
@@ -154,8 +156,8 @@ public class SearchViewXUL extends ViewPart {
 	@Override
 	public void dispose() {
 
-		getViewSite().getPage().removePartListener(_partListener);
 		TourManager.getInstance().removeTourEventListener(_tourEventListener);
+		getViewSite().getPage().removePartListener(_partListener);
 
 		super.dispose();
 	}
@@ -164,5 +166,4 @@ public class SearchViewXUL extends ViewPart {
 	public void setFocus() {
 		_searchUI.setFocus();
 	}
-
 }

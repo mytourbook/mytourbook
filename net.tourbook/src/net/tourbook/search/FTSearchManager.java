@@ -682,10 +682,7 @@ public class FTSearchManager {
 		try {
 
 			if (_suggester == null) {
-//				_suggester = setupSuggester_Analyzing();
-//				_suggester = setupSuggester_AnalyzingInfix();
-//				_suggester = setupSuggester_NGramAnalyzing();
-				_suggester = setupSuggester_FreeText();
+				setupSuggester();
 			}
 
 			final List<LookupResult> suggestions = _suggester.lookup(contents, false, 10000);
@@ -1075,6 +1072,17 @@ public class FTSearchManager {
 
 		} catch (final Exception e) {
 			StatusUtil.showStatus(e);
+		}
+	}
+
+	public static void setupSuggester() {
+
+		if (_suggester == null) {
+			
+//			_suggester = setupSuggester_Analyzing();
+//			_suggester = setupSuggester_AnalyzingInfix();
+//			_suggester = setupSuggester_NGramAnalyzing();
+			_suggester = setupSuggester_FreeText();
 		}
 	}
 

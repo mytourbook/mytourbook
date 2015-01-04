@@ -230,10 +230,11 @@ public class WebContentServer {
 
 			if (log.length() > 0 && (LOG_URL || LOG_XHR || LOG_HEADER || LOG_DOJO)) {
 
-				final String msg = String.format("%s %5.1f ms  %-16s  %s", //
+				final String msg = String.format("%s %5.1f ms  %-16s [%s] %s", //
 						UI.timeStampNano(),
 						(float) (System.nanoTime() - start) / 1000000,
 						Thread.currentThread().getName(),
+						WebContentServer.class.getSimpleName(),
 						log);
 
 				System.out.println(msg);

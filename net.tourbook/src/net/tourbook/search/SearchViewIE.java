@@ -23,7 +23,6 @@ import net.tourbook.tour.ITourEventListener;
 import net.tourbook.tour.TourEvent;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
-import net.tourbook.web.WebContentServer;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.SWTError;
@@ -41,8 +40,9 @@ public class SearchViewIE extends ViewPart {
 	private SearchUI				_searchUI;
 
 	private PostSelectionProvider	_postSelectionProvider;
-	private ITourEventListener		_tourEventListener;
+
 	private IPartListener2			_partListener;
+	private ITourEventListener		_tourEventListener;
 
 	private void addPartListener() {
 
@@ -57,16 +57,16 @@ public class SearchViewIE extends ViewPart {
 			@Override
 			public void partClosed(final IWorkbenchPartReference partRef) {
 
-				if (partRef.getPart(false) == SearchViewIE.this) {
-
-					/**
-					 * Close ft index that it will be created each time when the index is opened.
-					 */
-					FTSearchManager.close();
-
-					// stop webserver for debugging
-					WebContentServer.stop();
-				}
+//				if (partRef.getPart(false) == SearchViewIE.this) {
+//
+//					/**
+//					 * Close ft index that it will be created each time when the index is opened.
+//					 */
+//					FTSearchManager.close();
+//
+//					// stop webserver for debugging
+//					WebContentServer.stop();
+//				}
 			}
 
 			@Override
@@ -130,6 +130,8 @@ public class SearchViewIE extends ViewPart {
 	@Override
 	public void createPartControl(final Composite parent) {
 
+		FTSearchManager.setupSuggester();
+
 		Browser browser;
 		try {
 
@@ -140,13 +142,15 @@ public class SearchViewIE extends ViewPart {
 			return;
 		}
 
-		// this part is a selection provider
-		getSite().setSelectionProvider(_postSelectionProvider = new PostSelectionProvider(ID));
+		_postSelectionProvider = new PostSelectionProvider(ID);
+
+		_searchUI = new SearchUI(this, browser, _postSelectionProvider, true);
 
 		addPartListener();
 		addTourEventListener();
 
-		_searchUI = new SearchUI(this, browser, _postSelectionProvider, true);
+		// this part is a selection provider
+		getSite().setSelectionProvider(_postSelectionProvider);
 	}
 
 	@Override
