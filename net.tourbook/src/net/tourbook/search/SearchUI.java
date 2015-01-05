@@ -15,11 +15,9 @@
  *******************************************************************************/
 package net.tourbook.search;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
-import java.net.URISyntaxException;
 import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.List;
@@ -113,7 +111,9 @@ public class SearchUI implements XHRHandler {
 	private static final String				JSON_SELECTED_ID						= "selectedId";										//$NON-NLS-1$
 	//
 	static final String						SEARCH_FOLDER							= "/tourbook/search/";									//$NON-NLS-1$
-	private static final String				SEARCH_PAGE								= "search.html";										//$NON-NLS-1$
+	private static final String				SEARCH_PAGE_INNER						= "search.html";										//$NON-NLS-1$
+	private static final String				SEARCH_PAGE_CONTAINER					= SEARCH_FOLDER
+																							+ "search-container.html";						//$NON-NLS-1$
 	private static final String				SEARCH_RESULT_CSS_FILE					= SEARCH_FOLDER + "search-swt.css";					//$NON-NLS-1$
 	//
 	private static String					_actionUrl_EditImage;
@@ -161,6 +161,7 @@ public class SearchUI implements XHRHandler {
 	static final String						HREF_PARAM_DOC_ID;
 	static final String						HREF_PARAM_MARKER_ID;
 	static final String						HREF_PARAM_TOUR_ID;
+
 	static {
 
 		// e.g. ...&action=EditMarker...
@@ -186,25 +187,12 @@ public class SearchUI implements XHRHandler {
 
 		_actionUrl_EditImage = net.tourbook.ui.UI.getIconUrl(Messages.Image__quick_edit);
 
-		try {
-
-			/*
-			 * load css from file
-			 */
-			final File cssFile = WEB.getFile(SEARCH_RESULT_CSS_FILE);
-			final String cssContent = Util.readContentFromFile(cssFile.getAbsolutePath());
-
-			CSS_STYLE = "<style>" + cssContent + "</style>"; //$NON-NLS-1$ //$NON-NLS-2$
-
-		} catch (final IOException | URISyntaxException e) {
-			StatusUtil.showStatus(e);
-		}
+		CSS_STYLE = "<style>" + WEB.getFileContent(SEARCH_RESULT_CSS_FILE) + "</style>"; //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
-	private Browser							_browser;
-//	private String							_previousUrl;
-
 	private ViewPart						_view;
+	private Browser							_browser;
+
 	private PostSelectionProvider			_postSelectionProvider;
 
 	private boolean							_isWebUI;
@@ -241,8 +229,14 @@ public class SearchUI implements XHRHandler {
 				}
 			});
 
-			final String searchUrl = WEB.SERVER_URL + SEARCH_FOLDER + SEARCH_PAGE;
-			_browser.setUrl(searchUrl);
+			final String searchUrl = WEB.SERVER_URL + SEARCH_FOLDER + SEARCH_PAGE_INNER;
+
+// !!! This will crash the whole app on Linux !!!
+//			_browser.setUrl(searchUrl);
+
+			final String html = WEB.getFileContent(SEARCH_PAGE_CONTAINER);
+
+			_browser.setText(html);
 		}
 	}
 

@@ -22,6 +22,8 @@ import java.net.URISyntaxException;
 import java.net.URL;
 
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.util.StatusUtil;
+import net.tourbook.common.util.Util;
 
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
@@ -80,6 +82,26 @@ public class WEB {
 
 		return file;
 
+	}
+
+	/**
+	 * @param webContentFile
+	 * @return
+	 */
+	public static String getFileContent(final String webContentFile) {
+
+		File cssFile;
+		String cssContent = null;
+
+		try {
+			cssFile = WEB.getFile(webContentFile);
+			cssContent = Util.readContentFromFile(cssFile.getAbsolutePath());
+
+		} catch (IOException | URISyntaxException e) {
+			StatusUtil.showStatus(e);
+		}
+
+		return cssContent;
 	}
 
 	/**
