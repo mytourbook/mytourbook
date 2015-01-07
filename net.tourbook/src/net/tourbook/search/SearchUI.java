@@ -110,11 +110,10 @@ public class SearchUI implements XHRHandler {
 	private static final String				JSON_HTML_CONTENT						= "htmlContent";										//$NON-NLS-1$
 	private static final String				JSON_SELECTED_ID						= "selectedId";										//$NON-NLS-1$
 	//
-	static final String						SEARCH_FOLDER							= "/tourbook/search/";									//$NON-NLS-1$
-	private static final String				SEARCH_PAGE_INNER						= "search.html";										//$NON-NLS-1$
-	private static final String				SEARCH_PAGE_CONTAINER					= SEARCH_FOLDER
-																							+ "search-container.html";						//$NON-NLS-1$
-	private static final String				SEARCH_RESULT_CSS_FILE					= SEARCH_FOLDER + "search-swt.css";					//$NON-NLS-1$
+	private static final String				SEARCH_FOLDER							= "/tourbook/search/";									//$NON-NLS-1$
+	private static final String				SEARCH_PAGE								= "search.html";										//$NON-NLS-1$
+	private static final String				SEARCH_SWT_CSS_FILE						= SEARCH_FOLDER + "search-swt.css";					//$NON-NLS-1$
+	static String							SEARCH_SWT_CSS_STYLE;
 	//
 	private static String					_actionUrl_EditImage;
 	private static String					_iconUrl_Tour;
@@ -124,7 +123,6 @@ public class SearchUI implements XHRHandler {
 
 	private static boolean					_isUIShowItemNumber;
 	private static boolean					_isUIShowLuceneDocId;
-	static String							CSS_STYLE;
 
 	private static final DateTimeFormatter	_dateFormatter							= DateTimeFormat.mediumDate();
 	//
@@ -187,7 +185,7 @@ public class SearchUI implements XHRHandler {
 
 		_actionUrl_EditImage = net.tourbook.ui.UI.getIconUrl(Messages.Image__quick_edit);
 
-		CSS_STYLE = "<style>" + WEB.getFileContent(SEARCH_RESULT_CSS_FILE) + "</style>"; //$NON-NLS-1$ //$NON-NLS-2$
+		SEARCH_SWT_CSS_STYLE = "<style>" + WEB.getFileContent(SEARCH_SWT_CSS_FILE, false) + "</style>"; //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	private ViewPart						_view;
@@ -229,14 +227,16 @@ public class SearchUI implements XHRHandler {
 				}
 			});
 
-			final String searchUrl = WEB.SERVER_URL + SEARCH_FOLDER + SEARCH_PAGE_INNER;
-
 // !!! This will crash the whole app on Linux !!!
+//			final String searchUrl = WEB.SERVER_URL + SEARCH_FOLDER + SEARCH_PAGE;
 //			_browser.setUrl(searchUrl);
+//
+// This worked partly, Dojo could not load all web resources
+//			final String html = WEB.getFileContent(SEARCH_FOLDER + SEARCH_PAGE, true);
+//			_browser.setText(html);
 
-			final String html = WEB.getFileContent(SEARCH_PAGE_CONTAINER);
-
-			_browser.setText(html);
+			final String searchUrl = WEB.SERVER_URL + SEARCH_FOLDER + SEARCH_PAGE;
+			_browser.setUrl(searchUrl);
 		}
 	}
 

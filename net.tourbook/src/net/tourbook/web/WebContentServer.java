@@ -68,10 +68,6 @@ public class WebContentServer {
 
 	private static final String				REQUEST_PATH_DOJO			= "/WebContent-dojo";			//$NON-NLS-1$
 	private static final String				REQUEST_PATH_FIREBUG_LITE	= "/WebContent-firebug-lite";	//$NON-NLS-1$
-
-	/**
-	 * Path for custom dojo widgets
-	 */
 	private static final String				REQUEST_PATH_TOURBOOK		= "/tourbook";					//$NON-NLS-1$
 
 	private static final String				XHR_HEADER_KEY				= "X-requested-with";			//$NON-NLS-1$

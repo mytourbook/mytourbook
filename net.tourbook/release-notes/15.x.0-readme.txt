@@ -20,14 +20,17 @@ Version: 15.?.0                                              ?.?.2015
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
- The search Web 2.0 do not run with an IBM JVM because it do not include the com.sun.net.httpserver components.
+ The search Web 2.0 do not run with an IBM JVM because it do not include the com.sun.net.httpserver.* components.
 
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 
-Ubuntu with XULRunner and browser.setUrl() will crash, browser.setText() is working ???
+Ubuntu with XULRunner and browser.setUrl() will crash, browser.setText() is working, why?
 
+Tested with browser.setText() and the file:/// protocol but this is also not working with the error "Access is denied." even when lot of Dojo files are loaded but not all. Dojo also do not support the file:/// protocol.
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 
 New 	

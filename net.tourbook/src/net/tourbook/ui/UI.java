@@ -988,14 +988,15 @@ public class UI {
 	 */
 	public static String getIconUrl(final String imageName) {
 
-		URL fileUrl = null;
 
 		try {
 
 			final URL bundleUrl = TourbookPlugin.getDefault().getBundle().getEntry(ICONS_PATH + imageName);
-			fileUrl = FileLocator.toFileURL(bundleUrl);
 
-			return fileUrl.toExternalForm();
+			final URL fileUrl = FileLocator.toFileURL(bundleUrl);
+			final String iconUrl = fileUrl.toExternalForm();
+
+			return iconUrl;
 
 		} catch (final IOException e) {
 			StatusUtil.log(e);

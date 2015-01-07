@@ -588,7 +588,7 @@ public class SearchViewSWT extends ViewPart {
 		final String html = ""// //$NON-NLS-1$
 				+ "	<meta http-equiv='Content-Type' content='text/html; charset=UTF-8' />\n" //$NON-NLS-1$
 				+ "	<meta http-equiv='X-UA-Compatible' content='IE=edge' />\n" //$NON-NLS-1$
-				+ SearchUI.CSS_STYLE
+				+ SearchUI.SEARCH_SWT_CSS_STYLE
 				+ "\n"; //$NON-NLS-1$
 
 		return html;

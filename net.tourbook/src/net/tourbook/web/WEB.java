@@ -17,11 +17,13 @@ package net.tourbook.web;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.UI;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 
@@ -86,22 +88,42 @@ public class WEB {
 
 	/**
 	 * @param webContentFile
-	 * @return
+	 *            Absolute file path name which parent is {@value #PLUGIN_WEB_CONTENT_FOLDER}.
+	 * @param isConvertPaths
+	 *            Converts absolute paths to file paths.
+	 * @return Returns the content of a file from the WebContent folder, this folder is the root for
+	 *         web resources located in {@value #PLUGIN_WEB_CONTENT_FOLDER}.
 	 */
-	public static String getFileContent(final String webContentFile) {
+	public static String getFileContent(final String webContentFile, final boolean isConvertPaths) {
 
-		File cssFile;
-		String cssContent = null;
+		File webFile;
+		String webContent = null;
 
 		try {
-			cssFile = WEB.getFile(webContentFile);
-			cssContent = Util.readContentFromFile(cssFile.getAbsolutePath());
+
+			webFile = WEB.getFile(webContentFile);
+			webContent = Util.readContentFromFile(webFile.getAbsolutePath());
+
+			if (isConvertPaths) {
+
+				final String fromHtmlDojoPath = "/WebContent-dojo";
+				final String fromHtmlFirebugPath = "/WebContent-firebug-lite";
+
+				final String toSystemDojoPath = "C:/E/js-resources/dojo/";
+				final String toSystemFirebugPath = "C:/E/XULRunner/";
+
+				// replace local paths, which do not start with a /
+				webContent = replaceLocalPath(webContent, webFile);
+
+				webContent = replacePath(webContent, fromHtmlDojoPath, toSystemDojoPath);
+				webContent = replacePath(webContent, fromHtmlFirebugPath, toSystemFirebugPath);
+			}
 
 		} catch (IOException | URISyntaxException e) {
 			StatusUtil.showStatus(e);
 		}
 
-		return cssContent;
+		return webContent;
 	}
 
 	/**
@@ -119,6 +141,50 @@ public class WEB {
 
 		return fileUri;
 
+	}
+
+	private static String replaceLocalPath(final String webContent, final File webFile) {
+
+		String replacedContent = UI.EMPTY_STRING;
+
+		try {
+
+			final Path filePath = new Path(webFile.getAbsolutePath());
+			final File folderPath = filePath.removeLastSegments(1).toFile();
+			final String urlPath = folderPath.toURI().toURL().toExternalForm();
+
+			replacedContent = webContent.replaceAll("href=\"(?!/)", "href=\"" + urlPath);
+			replacedContent = replacedContent.replaceAll("src=\"(?!/)", "src=\"" + urlPath);
+
+		} catch (final MalformedURLException e) {
+			StatusUtil.log(e);
+		}
+
+		return replacedContent;
+	}
+
+	private static String replacePath(	final String webContent,
+										final String htmlContentPath,
+										final String systemContentPath) {
+
+		String replacedContent = UI.EMPTY_STRING;
+
+		try {
+
+			String systemUriPath = new File(systemContentPath).toURI().toURL().toExternalForm();
+
+			// remove trailing slash
+			systemUriPath = systemUriPath.substring(0, systemUriPath.length() - 1);
+
+			final String systemPath = systemUriPath + htmlContentPath;
+
+			replacedContent = webContent.replaceAll(htmlContentPath, systemPath);
+
+		} catch (final MalformedURLException e) {
+			StatusUtil.log(e);
+		}
+
+		return replacedContent;
 	}
 
 	/**
