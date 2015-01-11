@@ -33,6 +33,12 @@ Tested with browser.setText() and the file:/// protocol but this is also not wor
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 
+DOKU DOKU DOKU DOKU DOKU DOKU DOKU DOKU DOKU DOKU DOKU DOKU DOKU DOKU DOKU DOKU 
+
+Explizit steht es noch nirgendwo in der Doku, dass man für die 32 bit App auch die 32 bit JRE und die 64 bit App die 64 bit JRE benötigt, werde die Doku entsprechend anpassen.
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 New 	
 ===
 

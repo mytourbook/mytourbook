@@ -250,7 +250,7 @@
 <setting id="org.eclipse.wst.jsdt.core.formatter.insert_space_before_comma_in_annotation" value="do not insert"/>
 <setting id="org.eclipse.wst.jsdt.core.formatter.blank_lines_before_field" value="0"/>
 <setting id="org.eclipse.wst.jsdt.core.formatter.comment.clear_blank_lines_in_javadoc_comment" value="false"/>
-<setting id="org.eclipse.wst.jsdt.core.formatter.insert_new_line_after_opening_brace_in_objlit_initializer" value="do not insert"/>
+<setting id="org.eclipse.wst.jsdt.core.formatter.insert_new_line_after_opening_brace_in_objlit_initializer" value="insert"/>
 <setting id="org.eclipse.wst.jsdt.core.formatter.insert_new_line_before_finally_in_try_statement" value="do not insert"/>
 <setting id="org.eclipse.wst.jsdt.core.formatter.compact_else_if" value="true"/>
 <setting id="org.eclipse.wst.jsdt.core.formatter.insert_space_after_comma_in_annotation" value="insert"/>

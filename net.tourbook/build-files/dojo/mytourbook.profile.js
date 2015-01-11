@@ -1,0 +1,6 @@
+var profile = {
+	
+	basePath : "../../../WebContent"
+	
+	
+};
