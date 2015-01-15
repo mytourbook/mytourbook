@@ -1,6 +1,0 @@
-var profile = {
-	
-	basePath : "../../../WebContent"
-	
-	
-};

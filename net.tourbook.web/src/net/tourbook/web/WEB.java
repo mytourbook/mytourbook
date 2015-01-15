@@ -22,7 +22,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 
-import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
@@ -74,10 +73,7 @@ public class WEB {
 	 */
 	public static File getFile(final String filePathName) throws IOException, URISyntaxException {
 
-		final URL bundleUrl = TourbookPlugin
-				.getDefault()
-				.getBundle()
-				.getEntry(PLUGIN_WEB_CONTENT_FOLDER + filePathName);
+		final URL bundleUrl = Activator.getDefault().getBundle().getEntry(PLUGIN_WEB_CONTENT_FOLDER + filePathName);
 
 		final URL fileUrl = FileLocator.toFileURL(bundleUrl);
 		final File file = new File(fileUrl.toURI());
@@ -134,7 +130,7 @@ public class WEB {
 	 */
 	public static URI getRoot() throws IOException, URISyntaxException {
 
-		final URL bundleUrl = TourbookPlugin.getDefault().getBundle().getEntry(PLUGIN_WEB_CONTENT_FOLDER);
+		final URL bundleUrl = Activator.getDefault().getBundle().getEntry(PLUGIN_WEB_CONTENT_FOLDER);
 
 		final URL fileUrl = FileLocator.toFileURL(bundleUrl);
 		final URI fileUri = fileUrl.toURI();

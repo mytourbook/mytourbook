@@ -1,0 +1,5 @@
+{
+	"name":			"mytourbook",
+	"version":		"14.14.1",
+	"dojoBuild":	"mytourbook-build-profile.js",
+}

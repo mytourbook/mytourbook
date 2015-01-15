@@ -13,10 +13,13 @@ define(
 	"dojo/window",
 
 	"dijit/form/FilteringSelect",
-	'./SearchMgr.js',
+
+	'./SearchMgr.js'
 ], //
-function(//
-declare, lang, //
+function(
+//
+declare, //
+lang, //
 
 dom, //
 keys, //
@@ -26,6 +29,7 @@ Memory, //
 winUtils, //
 
 FilteringSelect, //
+
 SearchMgr //
 ) {
 

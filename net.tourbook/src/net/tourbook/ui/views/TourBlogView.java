@@ -89,7 +89,7 @@ public class TourBlogView extends ViewPart {
 
 	public static final String		ID										= "net.tourbook.ui.views.TourBlogView";		//$NON-NLS-1$
 
-	private static final String		TOUR_BLOG_CSS							= "/tourbook/blog/tour-blog.css";				//$NON-NLS-1$
+	private static final String		TOUR_BLOG_CSS							= "/tourbook/resources/tour-blog.css";			//$NON-NLS-1$
 
 	static final String				STATE_IS_DRAW_MARKER_WITH_DEFAULT_COLOR	= "STATE_IS_DRAW_MARKER_WITH_DEFAULT_COLOR";	//$NON-NLS-1$
 	static final String				STATE_IS_SHOW_HIDDEN_MARKER				= "STATE_IS_SHOW_HIDDEN_MARKER";				//$NON-NLS-1$

@@ -1,0 +1,4 @@
+@import '../../dojo/resources/dojo.css';
+@import '../../dijit/themes/claro/claro.css';
+@import '../../dgrid/css/dgrid.css';
+html,body{height:100%;margin:0;padding:0}.loading{font-size:1.5em;text-align:center;}.loaded .loading{display:none}

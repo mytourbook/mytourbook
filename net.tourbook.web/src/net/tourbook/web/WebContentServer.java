@@ -66,7 +66,7 @@ public class WebContentServer {
 	private static final String				PROTOCOL_HTTP				= "http://";					//$NON-NLS-1$
 	private static final String				PROTOCOL_COLUMN				= ":";							//$NON-NLS-1$
 
-	private static final String				REQUEST_PATH_DOJO			= "/WebContent-dojo";			//$NON-NLS-1$
+	private static final String				REQUEST_PATH_DOJO			= "/WebContent-dojo/";			//$NON-NLS-1$
 	private static final String				REQUEST_PATH_FIREBUG_LITE	= "/WebContent-firebug-lite";	//$NON-NLS-1$
 	private static final String				REQUEST_PATH_TOURBOOK		= "/tourbook";					//$NON-NLS-1$
 
@@ -116,8 +116,6 @@ public class WebContentServer {
 		return _allXHRHandler.put(xhrKey, xhrHandler);
 	}
 
-
-
 	private static void handle(final HttpExchange httpExchange) {
 
 		final long start = System.nanoTime();
@@ -131,14 +129,36 @@ public class WebContentServer {
 			final String rootPath = WEB.getFile(ROOT_FILE_PATH_NAME).getCanonicalFile().getPath();
 
 			final URI requestURI = httpExchange.getRequestURI();
-			final String requestUriPath = requestURI.getPath();
+			String requestUriPath = requestURI.getPath();
 
 			final Headers requestHeaders = httpExchange.getRequestHeaders();
 			final Set<Entry<String, List<String>>> headerEntries = requestHeaders.entrySet();
 
 			final String xhrValue = requestHeaders.getFirst(XHR_HEADER_KEY);
 			final boolean isXHR = XHR_HEADER_VALUE.equals(xhrValue);
-			final boolean isDojo = requestUriPath.startsWith(REQUEST_PATH_DOJO);
+
+			final String DOJO_ROOT = "/dojo/";
+			final String DOJO_DIJIT = "/dijit/";
+			final String DOJO_DGRID = "/dgrid/";
+			final String DOJO_DSTORE = "/dstore/";
+			final String DOJO_PUT_SELECTOR = "/put-selector/";
+			final String DOJO_XSTYLE = "/xstyle/";
+
+			boolean isDojo = requestUriPath.startsWith(REQUEST_PATH_DOJO);
+			if (isDojo == false) {
+
+				if (requestUriPath.startsWith(DOJO_ROOT)
+						|| requestUriPath.startsWith(DOJO_DIJIT)
+						|| requestUriPath.startsWith(DOJO_DGRID)
+						|| requestUriPath.startsWith(DOJO_DSTORE)
+						|| requestUriPath.startsWith(DOJO_PUT_SELECTOR)
+						|| requestUriPath.startsWith(DOJO_XSTYLE)
+				//
+				) {
+					isDojo = true;
+					requestUriPath = REQUEST_PATH_DOJO + requestUriPath;
+				}
+			}
 
 			if (isDojo) {
 				if (LOG_DOJO) {
@@ -366,7 +386,9 @@ public class WebContentServer {
 		final Map<String, Object> params = (Map<String, Object>) httpExchange
 				.getAttribute(RequestParameterFilter.ATTRIBUTE_PARAMETERS);
 
-		log.append("\tparams: " + params);
+		if (params.size() > 0) {
+			log.append("\tparams: " + params);
+		}
 	}
 
 	/**
