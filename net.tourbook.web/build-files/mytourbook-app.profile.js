@@ -18,9 +18,9 @@ var profile = {
 	// `basePath` is relative to the directory containing this profile file; in this case, it is being set to the
 	// src/ directory, which is the same place as the `baseUrl` directory in the loader configuration. (If you change
 	// this, you will also need to update run.js.)
-	basePath : "../../..",
+	basePath : "../../../../mytourbook-BUILD-dojo",
 
-	releaseDir : "net.tourbook.ext.jars/dojo",
+	releaseDir : "release",
 
 	// Builds a new release.
 	action : 'release',
@@ -49,29 +49,6 @@ var profile = {
 	// smaller. We add it back here to avoid that extra HTTP request. There is also an "acme" selector available; if
 	// you use that, you will need to set the `selectorEngine` property in index.html, too.
 	selectorEngine : 'lite',
-
-	// Any module in an application can be converted into a "layer" module, which consists of the original module +
-	// additional dependencies built into the same file. Using layers allows applications to reduce the number of HTTP
-	// requests by combining all JavaScript into a single file.
-	layers : {
-		// This is the main loader module. It is a little special because it is treated like an AMD module even though
-		// it is actually just plain JavaScript. There is some extra magic in the build system specifically for this
-		// module ID.
-		'dojo/dojo' : {
-			// By default, the build system will try to include `dojo/main` in the built `dojo/dojo` layer, which adds
-			// a bunch of stuff we do not want or need. We want the initial script load to be as small and quick to
-			// load as possible, so we configure it as a custom, bootable base.
-			boot : true,
-			customBase : true
-		},
-
-	// In this demo application, we load `app/main` on the client-side, so here we build a separate layer containing
-	// that code. (Practically speaking, you would probably just want to roll everything into the `dojo/dojo` layer,
-	// but this helps provide a basic illustration of how multi-layer builds work.) Note that when you create a new
-	// layer, the module referenced by the layer is always included in the layer (in this case, `app/main`), so it
-	// does not need to be explicitly defined in the `include` array.
-		'app/main' : {}
-	},
 
 	// Providing hints to the build system allows code to be conditionally removed on a more granular level than simple
 	// module dependencies can allow. This is especially useful for creating tiny mobile builds. Keep in mind that dead
@@ -122,6 +99,10 @@ var profile = {
 			location : "C:/E/js-resources/dojo/WebContent-dojo/dstore"
 		},
 		{
+			name : "rql",
+			location : "C:/E/js-resources/dojo/WebContent-dojo/rql"
+		},
+		{
 			name : "put-selector",
 			location : "C:/E/js-resources/dojo/WebContent-dojo/put-selector"
 		},
@@ -131,7 +112,30 @@ var profile = {
 		},
 		{
 			name : "mytourbook",
-			location : "C:/DAT/ws_mt-with-GIT/mytourbook/net.tourbook/WebContent"
+			location : "C:/DAT/ws_mt-with-GIT/mytourbook/net.tourbook.web/WebContent"
 		},
 	],
+
+	// Any module in an application can be converted into a "layer" module, which consists of the original module +
+	// additional dependencies built into the same file. Using layers allows applications to reduce the number of HTTP
+	// requests by combining all JavaScript into a single file.
+	layers : {
+		// This is the main loader module. It is a little special because it is treated like an AMD module even though
+		// it is actually just plain JavaScript. There is some extra magic in the build system specifically for this
+		// module ID.
+		'dojo/dojo' : {
+			// By default, the build system will try to include `dojo/main` in the built `dojo/dojo` layer, which adds
+			// a bunch of stuff we do not want or need. We want the initial script load to be as small and quick to
+			// load as possible, so we configure it as a custom, bootable base.
+			boot : true,
+			customBase : true
+		},
+
+		// In this demo application, we load `app/main` on the client-side, so here we build a separate layer containing
+		// that code. (Practically speaking, you would probably just want to roll everything into the `dojo/dojo` layer,
+		// but this helps provide a basic illustration of how multi-layer builds work.) Note that when you create a new
+		// layer, the module referenced by the layer is always included in the layer (in this case, `app/main`), so it
+		// does not need to be explicitly defined in the `include` array.
+		'tourbook/search' : {}
+	},
 };

@@ -4,16 +4,13 @@ define(
 [
 	"dojo/_base/declare",
 	"dojo/_base/lang",
-
 	"dojo/dom",
 	"dojo/keys", // keys.DOWN_ARROW keys.ENTER keys.ESCAPE
 	"dojo/on",
 	"dojo/request/xhr",
 	"dojo/store/Memory",
 	"dojo/window",
-
 	"dijit/form/FilteringSelect",
-
 	'./SearchMgr.js'
 ], //
 function(
@@ -35,7 +32,7 @@ SearchMgr //
 
 	var SearchUI = declare("tourbook.search.SearchInput",
 	[
-		FilteringSelect,
+		FilteringSelect
 	], {
 
 		_loadProposals : function _loadProposals(xhrSearchText) {
@@ -183,7 +180,7 @@ SearchMgr //
 
 		setGrid : function(grid) {
 			this._grid = grid;
-		},
+		}
 	});
 
 	return SearchUI;

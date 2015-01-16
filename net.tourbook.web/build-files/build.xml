@@ -1,0 +1,173 @@
+<?xml version='1.0' encoding='UTF-8'?>
+
+<!--
+Licensed Materials - Property of IBM
+
+© Copyright IBM Corp. 2006, 2008 All Rights Reserved.
+
+US Government Users Restricted Rights - Use, duplication or
+disclosure restricted by GSA ADP Schedule Contract with 
+IBM Corp.
+
+DISCLAIMER OF WARRANTIES :                                             
+                                                                       
+Permission is granted to copy and modify this  Sample code, and to           
+distribute modified versions provided that both the copyright        
+notice, and this permission notice and warranty disclaimer appear
+in all copies and modified versions. 
+
+THIS SAMPLE CODE IS LICENSED TO YOU AS-IS. IBM AND ITS SUPPLIERS AND
+LICENSORS DISCLAIM ALL WARRANTIES, EITHER EXPRESS OR IMPLIED, IN SUCH SAMPLE
+CODE, INCLUDING THE WARRANTY OF NON-INFRINGEMENT AND THE IMPLIED WARRANTIES 
+OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.  IN NO EVENT WILL
+IBM OR ITS LICENSORS OR SUPPLIERS BE LIABLE FOR ANY DAMAGES ARISING OUT OF
+THE USE OF OR INABILITY TO USE THE SAMPLE CODE, DISTRIBUTION OF THE SAMPLE
+CODE, OR COMBINATION OF THE SAMPLE CODE WITH ANY OTHER CODE. IN NO EVENT
+SHALL IBM OR ITS LICENSORS AND SUPPLIERS BE LIABLE FOR ANY LOST REVENUE,
+LOST PROFITS OR DATA, OR FOR DIRECT, INDIRECT, SPECIAL, CONSEQUENTIAL,
+INCIDENTAL OR PUNITIVE DAMAGES, HOWEVER CAUSED AND REGARDLESS OF THE THEORY
+OF LIABILITY, EVEN IF IBM OR ITS LICENSORS OR SUPPLIERS HAVE BEEN ADVISED OF
+THE POSSIBILITY OF SUCH DAMAGES.                                     
+-->
+
+<project name="samplePlugin" default="all" basedir=".">
+
+	<property name="J2EE_HOME" value="../navigator/build/lib/j2ee" />
+	<property name="P8_HOME" value="../navigator/build/lib/p8" />
+	<property name="ODWEK_HOME" value="../navigator/build/lib/od" />
+	<property name="CM_HOME" value="../navigator/build/lib/cm" />
+	<property name="NAVIGATOR_HOME" value="../navigator/WebContent" />
+
+	<target name="all" depends="clean,compile,compress_js,jar" />
+	
+	<path id="classpath">
+		<fileset id="j2ee.jars" dir="${J2EE_HOME}">
+			<include name="**/*.jar" />
+		</fileset>
+		<fileset id="odwek.jars" dir="${ODWEK_HOME}">
+			<include name="**/*.jar" />
+		</fileset>
+		<fileset id="p8.jars" dir="${P8_HOME}">
+			<include name="**/*.jar" />
+		</fileset>
+		<fileset id="cm.jars" dir="${CM_HOME}">
+			<include name="**/*.jar" />
+		</fileset>
+		<fileset dir="${NAVIGATOR_HOME}" >
+			<include name="WEB-INF/lib/*.jar" />
+		</fileset>
+		<filelist dir="${NAVIGATOR_HOME}">
+			<file name="WEB-INF/classes"/>
+		</filelist>
+	</path>
+
+	<target name="clean">
+		<delete dir="temp" />
+	</target>
+	
+	<!--Unzips and extracts all the necessary files to perform a dojo build and compress the sample plugin files for production use -->
+		<target name="unzip_dojo_files">
+			<!--You must provide a value for the dojo source zip file here.  
+			Go download a dojo source zip file from http://download.dojotoolkit.org/ (ie..dojo-release-1.9.3-src.zip) and provide the path here. -->
+			<property name="dojo_src_zip" value="../navigator/build/resources/source_1.8.4-20130502-IBM_dojo_modified.zip" />
+			<!--Provide a path to the WebContent folder of where IBM Content Navigator is installed.  
+			By default, a windows install path can be: C:\Program Files (x86)\IBM\ECMClient\configure\explodedformat\navigator. -->
+			<property name="icn_path" value="../navigator/WebContent"/>
+			
+			<delete dir="temp/dojo" />
+			<unzip dest="temp/dojo" src="${dojo_src_zip}" />
+			<delete file="temp/dojo/gridx/mobile/util/build_demos.js" />
+
+			<copy todir="temp/dojo/ecm" preservelastmodified="yes" verbose="no">
+				<fileset dir="${icn_path}/ecm">
+					<include name="**/*" />
+					<exclude name="nls/ecm_*.jgz" />
+					<exclude name="**/FormSigningContainer.js"/>
+					<exclude name="**/DocumentFormContainer.js"/>
+					<exclude name="**/PropertiesControllerRuntime.js"/>
+				</fileset>
+			</copy>
+			<copy todir="temp/dojo/idx" preservelastmodified="yes" verbose="no">
+				<fileset dir="${icn_path}/idx">
+					<include name="**/*" />
+				</fileset>
+			</copy>
+		</target>
+
+		<!--Performs a dojo build and compresses the sample plugin files for production use. 
+		It will produce a single minified gzipped file that will perform and load in a much more efficient manner. -->
+		<target name="compress_js" depends="unzip_dojo_files" description="Use dojo's build system to concatenate the sample plugin into one javascript file. 
+			At the end it will also compress the concatenated file further using gzip. 
+			Provide this gzipped file in SamplePlugin.getScript() for best performance.">
+			<echo level="info" message="Copying plugin files over..." />
+			<copy todir="temp/dojo/samplePluginDojo" preservelastmodified="yes" verbose="no">
+				<fileset dir="src/com/ibm/ecm/extension/sample/WebContent/samplePluginDojo">
+					<include name="**/*" />
+					<exclude name="**/SampleImageViewer.js"/>
+				</fileset>
+
+				<fileset dir="src/com/ibm/ecm/extension/sample/WebContent">
+					<include name="SamplePlugin.js" />
+				</fileset>
+				
+				<fileset dir=".">
+					<include name="samplePlugin.profile.js" />
+				</fileset>
+			</copy>
+			
+			<echo level="info" message="Running dojo custom build..." />
+			<java dir="${basedir}/temp/dojo/util/buildscripts" fork="true" classname="org.mozilla.javascript.tools.shell.Main" failonerror="true">
+				<classpath path="${basedir}/temp/dojo/util/shrinksafe/js.jar;${basedir}/temp/dojo/util/shrinksafe/shrinksafe.jar" />
+				<arg line="${basedir}/temp/dojo/dojo/dojo.js --release" />
+				<arg value="baseUrl=${basedir}/temp/dojo/dojo" />
+				<arg value="profile=${basedir}/samplePlugin.profile.js" />
+				<arg value="load=build" />
+			</java>
+			
+			<!-- Copying in the finished optmized files -->
+			<echo>Copy in optmized javascript and css files</echo>
+			<mkdir dir="output"/>
+			<copy todir="output" preservelastmodified="yes" verbose="no">
+				<fileset dir="temp/dojo/release/samplePluginDojo">
+					<include name="SamplePlugin.js" />
+				</fileset>
+			</copy>
+			
+			<!--compressed javascript file -->
+			<gzip  src="output/SamplePlugin.js" destfile="output/SamplePlugin.js.jgz"/>
+			<copy todir="src/com/ibm/ecm/extension/sample/WebContent" file="output/SamplePlugin.js.jgz" preservelastmodified="yes" verbose="no" />
+
+			<!--compressed css file -->
+			<gzip  src="src/com/ibm/ecm/extension/sample/WebContent/SamplePlugin.css" destfile="src/com/ibm/ecm/extension/sample/WebContent/SamplePlugin.css.jgz"/>
+
+			<delete dir="temp/dojo" />
+		</target>
+	
+	<target name="compile">
+		<mkdir dir="temp"/>
+		<javac srcdir="src" destdir="temp" source="1.5" target="1.5" debug="true">
+			<classpath refid="classpath" />
+			<include name="**/*.java" />
+		</javac>
+	</target>
+	
+	<target name="jar">
+		<copy todir="temp" >
+			<fileset dir="src">
+				<include name="**/WebContent/**" />
+			</fileset>
+		</copy>
+		<jar jarfile="SamplePlugin.jar" >
+			<fileset dir="./temp" includes="**/*" />
+			<manifest>
+				<attribute name="Plugin-Class" value="com.ibm.ecm.extension.sample.SamplePlugin" />
+				<section name="build">
+					<attribute name="Built-By" value="${user.name}" />
+					<attribute name="Build" value="${TODAY}" />
+				</section>
+			</manifest>
+		</jar>
+		<delete dir="./temp" />
+	</target>
+	
+</project>

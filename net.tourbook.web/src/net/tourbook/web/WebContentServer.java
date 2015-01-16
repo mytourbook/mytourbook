@@ -61,17 +61,16 @@ public class WebContentServer {
 	// logs: xhr
 	private static boolean					LOG_XHR						= true;
 
-	private static final String				ROOT_FILE_PATH_NAME			= "/";							//$NON-NLS-1$
+	private static final String				ROOT_FILE_PATH_NAME			= "/";					//$NON-NLS-1$
 
-	private static final String				PROTOCOL_HTTP				= "http://";					//$NON-NLS-1$
-	private static final String				PROTOCOL_COLUMN				= ":";							//$NON-NLS-1$
+	private static final String				PROTOCOL_HTTP				= "http://";			//$NON-NLS-1$
+	private static final String				PROTOCOL_COLUMN				= ":";					//$NON-NLS-1$
 
-	private static final String				REQUEST_PATH_DOJO			= "/WebContent-dojo/";			//$NON-NLS-1$
-	private static final String				REQUEST_PATH_FIREBUG_LITE	= "/WebContent-firebug-lite";	//$NON-NLS-1$
-	private static final String				REQUEST_PATH_TOURBOOK		= "/tourbook";					//$NON-NLS-1$
+	private static final String				DOJO_PATH					= "/WebContent-dojo/";	//$NON-NLS-1$
+	private static final String				REQUEST_PATH_TOURBOOK		= "/tourbook";			//$NON-NLS-1$
 
-	private static final String				XHR_HEADER_KEY				= "X-requested-with";			//$NON-NLS-1$
-	private static final String				XHR_HEADER_VALUE			= "XMLHttpRequest";			//$NON-NLS-1$
+	private static final String				XHR_HEADER_KEY				= "X-requested-with";	//$NON-NLS-1$
+	private static final String				XHR_HEADER_VALUE			= "XMLHttpRequest";	//$NON-NLS-1$
 
 	static String							SERVER_URL;
 
@@ -144,23 +143,21 @@ public class WebContentServer {
 			final String DOJO_PUT_SELECTOR = "/put-selector/";
 			final String DOJO_XSTYLE = "/xstyle/";
 
-			boolean isDojo = requestUriPath.startsWith(REQUEST_PATH_DOJO);
-			if (isDojo == false) {
+			boolean isDojoRequest = false;
 
-				if (requestUriPath.startsWith(DOJO_ROOT)
-						|| requestUriPath.startsWith(DOJO_DIJIT)
-						|| requestUriPath.startsWith(DOJO_DGRID)
-						|| requestUriPath.startsWith(DOJO_DSTORE)
-						|| requestUriPath.startsWith(DOJO_PUT_SELECTOR)
-						|| requestUriPath.startsWith(DOJO_XSTYLE)
-				//
-				) {
-					isDojo = true;
-					requestUriPath = REQUEST_PATH_DOJO + requestUriPath;
-				}
+			if (requestUriPath.startsWith(DOJO_ROOT)
+					|| requestUriPath.startsWith(DOJO_DIJIT)
+					|| requestUriPath.startsWith(DOJO_DGRID)
+					|| requestUriPath.startsWith(DOJO_DSTORE)
+					|| requestUriPath.startsWith(DOJO_PUT_SELECTOR)
+					|| requestUriPath.startsWith(DOJO_XSTYLE)
+			//
+			) {
+				isDojoRequest = true;
+				requestUriPath = DOJO_PATH + requestUriPath;
 			}
 
-			if (isDojo) {
+			if (isDojoRequest) {
 				if (LOG_DOJO) {
 					log.append(requestUriPath);
 				}
@@ -187,7 +184,7 @@ public class WebContentServer {
 
 				String requestedOSPath = null;
 
-				if (isDojo) {
+				if (isDojoRequest) {
 
 					// Dojo requests
 
@@ -200,13 +197,6 @@ public class WebContentServer {
 
 					isResourceUrl = true;
 					requestedOSPath = rootPath + requestUriPath;
-
-				} else if (requestUriPath.startsWith(REQUEST_PATH_FIREBUG_LITE)) {
-
-					// Firebug lite requests
-
-					isResourceUrl = true;
-					requestedOSPath = "C:/E/XULRunner/" + requestUriPath;
 
 				} else {
 

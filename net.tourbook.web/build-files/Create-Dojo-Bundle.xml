@@ -1,0 +1,37 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<project name="CreateDojoFiles" default="all" basedir=".">
+
+	<property name="dojoToolkit"		value="C:/E/js-resources/dojo/WebContent-dojo" />
+	
+	<!-- this folder is populated in mytourbook.profile.js -->
+	<property name="dojo-minimized"			value="../../../../mytourbook-BUILD-dojo" />
+
+	<target name="all" depends="clean,compress_js" />
+	<target name="all-with-clean" depends="clean,compress_js" />
+
+	<target name="clean">
+		<delete includeEmptyDirs="true">
+			<fileset dir="${dojo-minimized}" includes="**/*" defaultexcludes="no"/>
+		</delete>
+	</target>
+
+	<target name="compress_js">
+
+		<echo level="info" message="Running dojo custom build..." />
+		
+		<java dir="${dojoToolkit}/util/buildscripts" 
+			fork="true" 
+			classname="org.mozilla.javascript.tools.shell.Main" 
+			failonerror="true">
+			
+			<classpath path="${dojoToolkit}/util/shrinksafe/js.jar;${dojoToolkit}/util/closureCompiler/compiler.jar;${dojoToolkit}/util/shrinksafe/shrinksafe.jar" />
+			<arg line="${dojoToolkit}/dojo/dojo.js --release" />
+			<arg value="baseUrl=${dojoToolkit}/dojo" />
+			
+			<arg value="profile=${basedir}/mytourbook-app.profile.js" />
+			<arg value="load=build" />
+		</java>
+		
+	</target>
+
+</project>

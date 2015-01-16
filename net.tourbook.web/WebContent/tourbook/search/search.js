@@ -3,28 +3,21 @@ require(
 	'dojo/_base/declare',
 	"dojo/_base/fx",
 	'dojo/_base/lang',
-
 	'dojo/aspect',
 	"dojo/dom",
 	"dojo/dom-style",
 	"dojo/parser",
 	"dojo/request/xhr",
-
 	"dijit/registry",
-
 	'dgrid/Keyboard',
 	'dgrid/OnDemandList',
 	"dgrid/Selection",
 	'dstore/QueryResults',
 	'dstore/RequestMemory',
-
 	'put-selector/put',
-
 	'./SearchInput.js',
 	'./SearchMgr.js',
-
 	'dojo/domReady!'
-
 ], function(
 //
 declare, //
@@ -70,7 +63,7 @@ SearchMgr //
 
 				searchAttr : 'id',
 				labelAttr : 'name',
-				labelType : 'html',
+				labelType : 'html'
 
 			}, 'domSearchInput');
 
@@ -111,7 +104,7 @@ SearchMgr //
 					});
 
 					return queryResult;
-				},
+				}
 			}))({
 
 				// a valid url is necessary
@@ -119,7 +112,7 @@ SearchMgr //
 //				target : "about:blank",
 				target : self._searchInput.getSearchUrl(),
 
-				useRangeHeaders : true,
+				useRangeHeaders : true
 			});
 
 			var grid = new (declare("tourbook.search.ResultUIList",
@@ -137,7 +130,7 @@ SearchMgr //
 					div.innerHTML = value.htmlContent;
 
 					return div;
-				},
+				}
 			}))({
 
 				columns : {
