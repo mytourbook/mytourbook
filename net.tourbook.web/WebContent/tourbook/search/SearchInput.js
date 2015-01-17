@@ -1,5 +1,3 @@
-// 'use strict';
-
 define(
 [
 	"dojo/_base/declare",
@@ -11,22 +9,19 @@ define(
 	"dojo/store/Memory",
 	"dojo/window",
 	"dijit/form/FilteringSelect",
-	'./SearchMgr.js'
+	"./SearchMgr"
 ], //
-function(
-//
+function(//
+//	
 declare, //
 lang, //
-
 dom, //
 keys, //
 on, //
 xhr, //
 Memory, //
 winUtils, //
-
 FilteringSelect, //
-
 SearchMgr //
 ) {
 

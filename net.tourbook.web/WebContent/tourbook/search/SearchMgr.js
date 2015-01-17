@@ -1,12 +1,7 @@
-//'use strict';
-
 define(
-[ //
-	"dojo/_base/declare"
-],
+[ "dojo/_base/declare"
+], function(declare) {
 
-function(declare) {
-//
 	var SearchMgr = declare("tourbook.search.SearchMgr", [], {});
 
 	/*

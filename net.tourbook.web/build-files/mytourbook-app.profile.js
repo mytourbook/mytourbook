@@ -20,7 +20,7 @@ var profile = {
 	// this, you will also need to update run.js.)
 	basePath : "../../../../mytourbook-BUILD-dojo",
 
-	releaseDir : "release",
+	releaseDir : "mt-dojo-release",
 
 	// Builds a new release.
 	action : 'release',
@@ -111,8 +111,8 @@ var profile = {
 			location : "C:/E/js-resources/dojo/WebContent-dojo/xstyle"
 		},
 		{
-			name : "mytourbook",
-			location : "C:/DAT/ws_mt-with-GIT/mytourbook/net.tourbook.web/WebContent"
+			name : "tourbook",
+			location : "C:/DAT/ws_mt-with-GIT/mytourbook/net.tourbook.web/WebContent/tourbook"
 		},
 	],
 

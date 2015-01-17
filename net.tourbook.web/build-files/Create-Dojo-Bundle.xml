@@ -7,7 +7,6 @@
 	<property name="dojo-minimized"			value="../../../../mytourbook-BUILD-dojo" />
 
 	<target name="all" depends="clean,compress_js" />
-	<target name="all-with-clean" depends="clean,compress_js" />
 
 	<target name="clean">
 		<delete includeEmptyDirs="true">

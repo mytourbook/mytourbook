@@ -45,10 +45,11 @@ SearchMgr //
 
 ) {
 
-	function App() {
+
+	function SearchAppProto() {
 	}
 
-	App.prototype = {
+	SearchAppProto.prototype = {
 
 		createUI : function() {
 
@@ -187,7 +188,9 @@ SearchMgr //
 	}
 
 	parser.parse().then(function() {
-		new App().startApp();
+		new SearchAppProto().startApp();
 	});
 
+	var SearchApp= declare("tourbook.search.SearchApp", [], {});
+	return SearchApp;
 });
