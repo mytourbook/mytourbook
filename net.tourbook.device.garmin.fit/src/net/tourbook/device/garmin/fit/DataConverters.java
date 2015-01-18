@@ -31,6 +31,10 @@ public class DataConverters {
 		return 3.6f * speed;
 	}
 
+	/**
+	 * @param timestamp
+	 * @return Returns timestamp in GARMIN time not in Java time !!!
+	 */
 	public static long convertTimestamp(final DateTime timestamp) {
 		return timestamp.getTimestamp() * 1000L;
 	}

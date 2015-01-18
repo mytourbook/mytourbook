@@ -8,6 +8,7 @@ import java.util.Set;
 
 import net.tourbook.common.UI;
 import net.tourbook.common.util.Util;
+import net.tourbook.data.GearData;
 import net.tourbook.data.TimeData;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
@@ -15,6 +16,8 @@ import net.tourbook.device.garmin.fit.FitContextData.ContextTimeData;
 import net.tourbook.importdata.TourbookDevice;
 
 import org.apache.commons.io.FilenameUtils;
+
+import com.garmin.fit.EventMesg;
 
 /**
  * Garmin FIT activity context used by message listeners to store activity data loaded from FIT
@@ -58,6 +61,112 @@ public class FitContext {
 		_newlyImportedTours = newlyImportedTours;
 
 		_contextData = new FitContextData();
+	}
+
+	public void finalizeTour() {
+
+		final FitContextDataHandler contextDataHandler = new FitContextDataHandler() {
+
+			@Override
+			public void setupTour(	final TourData tourData,
+									final ArrayList<TimeData> timeDataList,
+									final Set<TourMarker> tourMarkerSet,
+									final List<GearData> gearList) {
+
+				resetSpeedAtFirstPosition(timeDataList);
+
+// disabled, this is annoing
+//				tourData.setTourTitle(getTourTitle());
+//				tourData.setTourDescription(getTourDescription());
+
+				tourData.importRawDataFile = _filimportFilePathename;
+				tourData.setTourImportFilePath(_filimportFilePathename);
+
+				tourData.setDeviceId(getDeviceId());
+				tourData.setDeviceName(getDeviceName());
+				tourData.setDeviceFirmwareVersion(_softwareVersion);
+				tourData.setDeviceTimeInterval((short) -1);
+
+				tourData.setIsDistanceFromSensor(isSpeedSensorPresent());
+
+				tourData.createTimeSeries(timeDataList, false);
+
+				validateGearData(tourData, gearList);
+
+				// after all data are added, the tour id can be created
+				final String uniqueId = _device.createUniqueId(tourData, Util.UNIQUE_ID_SUFFIX_GARMIN_FIT);
+				final Long tourId = tourData.createTourId(uniqueId);
+
+				if (_alreadyImportedTours.containsKey(tourId) == false) {
+
+					// add new tour to the map
+					_newlyImportedTours.put(tourId, tourData);
+
+					// create additional data
+					tourData.computeComputedValues();
+					tourData.computeAltimeterGradientSerie();
+
+					tourData.setTourMarkers(tourMarkerSet);
+					tourData.finalizeTourMarkerWithRelativeTime();
+				}
+			}
+
+			private void validateGearData(final TourData tourData, final List<GearData> gearList) {
+
+				/*
+				 * validate gear list
+				 */
+				final int[] timeSerie = tourData.timeSerie;
+				final long tourStartTime = tourData.getTourStartTimeMS();
+				final long tourEndTime = tourStartTime + (timeSerie[timeSerie.length - 1] * 1000);
+
+				final List<GearData> validatedGearList = new ArrayList<GearData>();
+				GearData startGear = null;
+
+				for (final GearData gearData : gearList) {
+
+					final long gearTime = gearData.absoluteTime;
+
+					// ensure time is valid
+					if (gearTime < tourStartTime) {
+						startGear = gearData;
+					}
+
+					if (gearTime >= tourStartTime && gearTime <= tourEndTime) {
+
+						// set initial gears when available
+						if (startGear != null) {
+
+							// set time to tour start
+							startGear.absoluteTime = tourStartTime;
+
+							validatedGearList.add(startGear);
+							startGear = null;
+						}
+
+						validatedGearList.add(gearData);
+					}
+				}
+
+				if (validatedGearList.size() > 0) {
+
+					// set end gear
+					final GearData lastGearData = validatedGearList.get(validatedGearList.size() - 1);
+					if (lastGearData.absoluteTime < tourEndTime) {
+
+						final GearData lastGear = new GearData();
+						lastGear.absoluteTime = tourEndTime;
+						lastGear.gears = lastGearData.gears;
+
+						validatedGearList.add(lastGear);
+					}
+
+					tourData.setGears(validatedGearList);
+				}
+			}
+		};
+
+		_contextData.processData(contextDataHandler);
 	}
 
 	public FitContextData getContextData() {
@@ -167,6 +276,11 @@ public class FitContext {
 		return _isSpeedSensorPresent;
 	}
 
+	public void mesgEvent(final EventMesg mesg) {
+
+		_contextData.ctxGear(mesg);
+	}
+
 	public void mesgLap_10_Before() {
 
 		_contextData.ctxTourMarker_10_Initialize();
@@ -197,54 +311,6 @@ public class FitContext {
 	public void mesgSession_20_After() {
 
 		_contextData.ctxTourData_20_Finalize();
-	}
-
-	public void finalizeTour() {
-
-		_contextData.processData(new FitContextDataHandler() {
-
-			@Override
-			public void handleTour(	final TourData tourData,
-									final ArrayList<TimeData> timeDataList,
-									final Set<TourMarker> tourMarkerSet) {
-
-				resetSpeedAtFirstPosition(timeDataList);
-
-// disabled, this is annoing
-//				tourData.setTourTitle(getTourTitle());
-//				tourData.setTourDescription(getTourDescription());
-
-				tourData.importRawDataFile = _filimportFilePathename;
-				tourData.setTourImportFilePath(_filimportFilePathename);
-
-				tourData.setDeviceId(getDeviceId());
-				tourData.setDeviceName(getDeviceName());
-				tourData.setDeviceFirmwareVersion(_softwareVersion);
-				tourData.setDeviceTimeInterval((short) -1);
-
-				tourData.setIsDistanceFromSensor(isSpeedSensorPresent());
-
-				tourData.createTimeSeries(timeDataList, false);
-				
-
-				// after all data are added, the tour id can be created
-				final String uniqueId = _device.createUniqueId(tourData, Util.UNIQUE_ID_SUFFIX_GARMIN_FIT);
-				final Long tourId = tourData.createTourId(uniqueId);
-
-				if (_alreadyImportedTours.containsKey(tourId) == false) {
-
-					// add new tour to the map
-					_newlyImportedTours.put(tourId, tourData);
-
-					// create additional data
-					tourData.computeComputedValues();
-					tourData.computeAltimeterGradientSerie();
-
-					tourData.setTourMarkers(tourMarkerSet);
-					tourData.finalizeTourMarkerWithRelativeTime();
-				}
-			}
-		});
 	}
 
 	private void resetSpeedAtFirstPosition(final ArrayList<TimeData> timeDataList) {

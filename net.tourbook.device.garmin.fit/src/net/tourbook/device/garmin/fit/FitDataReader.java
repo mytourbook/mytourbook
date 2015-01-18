@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -22,7 +22,9 @@ import java.util.HashMap;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.data.TourData;
 import net.tourbook.device.garmin.fit.listeners.ActivityMesgListenerImpl;
+import net.tourbook.device.garmin.fit.listeners.BikeProfileMesgListenerImpl;
 import net.tourbook.device.garmin.fit.listeners.DeviceInfoMesgListenerImpl;
+import net.tourbook.device.garmin.fit.listeners.EventMesgListenerImpl;
 import net.tourbook.device.garmin.fit.listeners.FileCreatorMesgListenerImpl;
 import net.tourbook.device.garmin.fit.listeners.FileIdMesgListenerImpl;
 import net.tourbook.device.garmin.fit.listeners.LapMesgListenerImpl;
@@ -55,6 +57,9 @@ public class FitDataReader extends TourbookDevice {
 		broadcaster.addListener(new MesgListener() {
 			@Override
 			public void onMesg(final Mesg mesg) {
+
+				long timestamp = 0;
+
 				for (final Field field : mesg.getFields()) {
 
 					final String fieldName = field.getName();
@@ -64,34 +69,44 @@ public class FitDataReader extends TourbookDevice {
 						a++;
 					}
 
+					if (fieldName.equals("timestamp")) { //$NON-NLS-1$
+						timestamp = (Long) field.getValue();
+					}
 					/*
 					 * Set fields which should NOT be displayed in the log
 					 */
 					if (fieldName.equals("") // //$NON-NLS-1$
 
+							|| fieldName.equals("timestamp") //$NON-NLS-1$
+
 							//
 							// record data
 							//
-							|| fieldName.equals("timestamp") //$NON-NLS-1$
 							|| fieldName.equals("event") //$NON-NLS-1$
 							|| fieldName.equals("event_type") //$NON-NLS-1$
 							|| fieldName.equals("message_index") //$NON-NLS-1$
 							|| fieldName.equals("altitude") //$NON-NLS-1$
 							|| fieldName.equals("cadence") //$NON-NLS-1$
 							|| fieldName.equals("distance") //$NON-NLS-1$
+							|| fieldName.equals("fractional_cadence") //$NON-NLS-1$
 							|| fieldName.equals("grade") //$NON-NLS-1$
 							|| fieldName.equals("heart_rate") //$NON-NLS-1$
 							|| fieldName.equals("position_lat") //$NON-NLS-1$
 							|| fieldName.equals("position_long") //$NON-NLS-1$
 							|| fieldName.equals("speed") //$NON-NLS-1$
 							|| fieldName.equals("temperature") //$NON-NLS-1$
+//							|| fieldName.equals("front_gear") //$NON-NLS-1$
+//							|| fieldName.equals("front_gear_num") //$NON-NLS-1$
+//							|| fieldName.equals("rear_gear") //$NON-NLS-1$
+//							|| fieldName.equals("rear_gear_num") //$NON-NLS-1$
 
 							//
 							// lap data
 							//
-							|| fieldName.equals("avg_speed") //$NON-NLS-1$
-							|| fieldName.equals("avg_heart_rate") //$NON-NLS-1$
 							|| fieldName.equals("avg_cadence") //$NON-NLS-1$
+							|| fieldName.equals("avg_fractional_cadence") //$NON-NLS-1$
+							|| fieldName.equals("avg_heart_rate") //$NON-NLS-1$
+							|| fieldName.equals("avg_speed") //$NON-NLS-1$
 							|| fieldName.equals("data") //$NON-NLS-1$
 							|| fieldName.equals("device_index") //$NON-NLS-1$
 							|| fieldName.equals("device_type") //$NON-NLS-1$
@@ -101,6 +116,7 @@ public class FitDataReader extends TourbookDevice {
 							|| fieldName.equals("intensity") //$NON-NLS-1$
 							|| fieldName.equals("lap_trigger") //$NON-NLS-1$
 							|| fieldName.equals("max_cadence") //$NON-NLS-1$
+							|| fieldName.equals("max_fractional_cadence") //$NON-NLS-1$
 							|| fieldName.equals("max_heart_rate") //$NON-NLS-1$
 							|| fieldName.equals("max_speed") //$NON-NLS-1$
 							|| fieldName.equals("total_calories") //$NON-NLS-1$
@@ -122,8 +138,8 @@ public class FitDataReader extends TourbookDevice {
 						continue;
 					}
 
-					System.out.println(String.format(
-							"%-5d%-30s%20s %s", //$NON-NLS-1$
+					System.out.println(String.format("%s %-5d %-30s %20s %s", //$NON-NLS-1$
+							Long.toString(timestamp),
 							field.getNum(),
 							fieldName,
 							field.getValue(),
@@ -185,23 +201,37 @@ public class FitDataReader extends TourbookDevice {
 					alreadyImportedTours,
 					newlyImportedTours);
 
-			// original listener
-			broadcaster.addListener(new FileIdMesgListenerImpl(context));
-			broadcaster.addListener(new FileCreatorMesgListenerImpl(context));
-			broadcaster.addListener(new DeviceInfoMesgListenerImpl(context));
+			// fit listener
 			broadcaster.addListener(new ActivityMesgListenerImpl(context));
-			broadcaster.addListener(new SessionMesgListenerImpl(context));
+			broadcaster.addListener(new BikeProfileMesgListenerImpl(context));
+			broadcaster.addListener(new DeviceInfoMesgListenerImpl(context));
+			broadcaster.addListener(new EventMesgListenerImpl(context));
+			broadcaster.addListener(new FileCreatorMesgListenerImpl(context));
+			broadcaster.addListener(new FileIdMesgListenerImpl(context));
 			broadcaster.addListener(new LapMesgListenerImpl(context));
 			broadcaster.addListener(new RecordMesgListenerImpl(context));
+			broadcaster.addListener(new SessionMesgListenerImpl(context));
 
-//			// START - show debug info
-//			System.out.println();
-//			System.out.println();
-//			System.out.println((System.currentTimeMillis() + " [" + getClass().getSimpleName() + "]")
-//					+ (" \t" + importFilePath));
-//			System.out.println();
-//			addDebugListener(broadcaster);
-//			// END - show debug info
+			// START - show debug info
+			// START - show debug info
+			// START - show debug info
+			System.out.println();
+			System.out.println();
+			System.out.println((System.currentTimeMillis() + " [" + getClass().getSimpleName() + "]")
+					+ (" \t" + importFilePath));
+			System.out.println();
+			System.out.println(String.format(//
+					"%s %-5s %-30s %20s %s", //$NON-NLS-1$
+					"Timestamp",
+					"Num",
+					"Name",
+					"Value",
+					"Units"));
+			System.out.println();
+			addDebugListener(broadcaster);
+			// END - show debug info
+			// END - show debug info
+			// END - show debug info
 
 			broadcaster.run(fis);
 

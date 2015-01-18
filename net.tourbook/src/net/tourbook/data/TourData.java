@@ -32,6 +32,7 @@ import java.util.Comparator;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.persistence.Basic;
@@ -829,12 +830,14 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	@Transient
 	public double[]												latitudeSerie;
 
-	/*
-	 * computed data series
-	 */
-
 	@Transient
 	public double[]												longitudeSerie;
+
+	/*
+	 * Gears
+	 */
+	@Transient
+	public GearData[]											gears;
 
 	/**
 	 * Contains the bounds of the tour in latitude/longitude:
@@ -5683,6 +5686,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		latitudeSerie = serieData.latitude;
 		longitudeSerie = serieData.longitude;
 
+		gears = serieData.gears;
+
 		if (powerSerie != null) {
 			isPowerSerieFromDevice = true;
 		}
@@ -5724,6 +5729,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 		serieData.latitude = latitudeSerie;
 		serieData.longitude = longitudeSerie;
+
+		serieData.gears = gears;
 
 		/*
 		 * time serie size
@@ -5858,6 +5865,31 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 	public void setDpTolerance(final short dpTolerance) {
 		this.dpTolerance = dpTolerance;
+	}
+
+	public void setGears(final List<GearData> gearDataList) {
+
+		this.gears = gearDataList.toArray(new GearData[gearDataList.size()]);
+
+		// dump gears
+		System.out.println("Gears");
+		System.out.println(tourStartTime / 1000);
+
+		for (final GearData gearData : gears) {
+
+			final long currentTime = gearData.absoluteTime / 1000;
+
+			System.out.println(String.format(
+					"%d   %h   %-5d %-5d %-5d %-5d",
+					currentTime,
+					gearData.gears,
+					gearData.getFrontGearTeeth(),
+					gearData.getFrontGearNum(),
+					gearData.getRearGearTeeth(),
+					gearData.getRearGearNum()));
+			// TODO remove SYSTEM.OUT.PRINTLN
+		}
+		System.out.println(tourEndTime / 1000);
 	}
 
 	/**
