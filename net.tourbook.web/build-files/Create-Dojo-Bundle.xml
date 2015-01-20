@@ -1,17 +1,17 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <project name="CreateDojoFiles" default="all" basedir=".">
 
-	<property name="dojoToolkit"		value="C:/E/js-resources/dojo/WebContent-dojo" />
+	<property name="dojoToolkitFolder"		value="C:/E/js-resources/dojo/WebContent-dojo" />
 	
-	<!-- this folder is populated in mytourbook.profile.js -->
-	<property name="dojo-minimized"			value="../../../../mytourbook-BUILD-dojo" />
+	<!-- this folder is populated in mytourbook-app.profile.js -->
+	<property name="dojoBuildFolder"			value="../../../../mytourbook-BUILD-dojo" />
 
 	<target name="all" depends="clean,compress_js" />
 	<target name="all-with-clean" depends="clean,compress_js" />
 
 	<target name="clean">
 		<delete includeEmptyDirs="true">
-			<fileset dir="${dojo-minimized}" includes="**/*" defaultexcludes="no"/>
+			<fileset dir="${dojoBuildFolder}" includes="**/*" defaultexcludes="no"/>
 		</delete>
 	</target>
 
@@ -19,16 +19,29 @@
 
 		<echo level="info" message="Running dojo custom build..." />
 		
-		<java dir="${dojoToolkit}/util/buildscripts" 
+		<java dir="${dojoToolkitFolder}/util/buildscripts" 
 			fork="true" 
 			classname="org.mozilla.javascript.tools.shell.Main" 
 			failonerror="true">
 			
-			<classpath path="${dojoToolkit}/util/shrinksafe/js.jar;${dojoToolkit}/util/closureCompiler/compiler.jar;${dojoToolkit}/util/shrinksafe/shrinksafe.jar" />
-			<arg line="${dojoToolkit}/dojo/dojo.js --release" />
-			<arg value="baseUrl=${dojoToolkit}/dojo" />
+			<classpath path="${dojoToolkitFolder}/util/shrinksafe/js.jar;${dojoToolkitFolder}/util/closureCompiler/compiler.jar;${dojoToolkitFolder}/util/shrinksafe/shrinksafe.jar" />
+
+			<arg line="${dojoToolkitFolder}/dojo/dojo.js --release " />
+
+			<arg value="baseUrl=${dojoToolkitFolder}/dojo" />
 			
 			<arg value="profile=${basedir}/mytourbook-app.profile.js" />
+			
+<!--
+			<arg value="profile=C:/E/js-resources/dojo/modified-dojo-boilerplate-master/profiles/app2.profile.js" />
+			<arg line="${dojoToolkitFolder}/dojo/dojo.js - -release - -check" />
+
+	     - - check-args              print computed raw command line input, including raw profiles, then terminate
+	     - - check                   print computed profile, then terminate
+	     - - check-discovery         print all discovered resources, then terminate
+	     - - debug-check             print computed profile, including internal structures
+-->
+			
 			<arg value="load=build" />
 		</java>
 		

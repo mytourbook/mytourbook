@@ -11,7 +11,7 @@ define(
 	"dojo/store/Memory",
 	"dojo/window",
 	"dijit/form/FilteringSelect",
-	'./SearchMgr.js'
+	'./SearchMgr'
 ], //
 function(
 //

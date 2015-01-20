@@ -1,4 +1,4 @@
-require(
+define(
 [
 	'dojo/_base/declare',
 	"dojo/_base/fx",
@@ -15,8 +15,8 @@ require(
 	'dstore/QueryResults',
 	'dstore/RequestMemory',
 	'put-selector/put',
-	'./SearchInput.js',
-	'./SearchMgr.js',
+	'./SearchInput',
+	'./SearchMgr',
 	'dojo/domReady!'
 ], function(
 //
@@ -45,10 +45,10 @@ SearchMgr //
 
 ) {
 
-	function App() {
+	function SearchAppProto() {
 	}
 
-	App.prototype = {
+	SearchAppProto.prototype = {
 
 		createUI : function() {
 
@@ -187,7 +187,15 @@ SearchMgr //
 	}
 
 	parser.parse().then(function() {
-		new App().startApp();
+		new SearchAppProto().startApp();
 	});
 
+	var SearchApp = declare("tourbook.search.SearchApp", [], {
+
+		feature1 : function() {
+			alert('feature1');
+		}
+	});
+
+	return SearchApp;
 });
