@@ -45,10 +45,7 @@ SearchMgr //
 
 ) {
 
-	function SearchAppProto() {
-	}
-
-	SearchAppProto.prototype = {
+	var SearchApp = declare("tourbook.search.SearchApp", [], {
 
 		createUI : function() {
 
@@ -109,7 +106,7 @@ SearchMgr //
 
 				// a valid url is necessary
 				// target will be set for each search request
-//				target : "about:blank",
+				//			target : "about:blank",
 				target : self._searchInput.getSearchUrl(),
 
 				useRangeHeaders : true
@@ -145,10 +142,10 @@ SearchMgr //
 			grid.on("dgrid-select", function(event) {
 
 				// tour, marker or waypoint is selected -> select it in the UI
-				
+
 				var row = event.rows[0];
 				var selectedId = row.data[SearchMgr.XHR_PARAM_SELECTED_ID];
-				
+
 				var xhrQuery = {};
 				xhrQuery[SearchMgr.XHR_PARAM_ACTION] = SearchMgr.XHR_ACTION_SELECT;
 				xhrQuery[SearchMgr.XHR_PARAM_SELECTED_ID] = encodeURIComponent(selectedId);
@@ -184,17 +181,10 @@ SearchMgr //
 				}
 			}).play();
 		}
-	}
-
-	parser.parse().then(function() {
-		new SearchAppProto().startApp();
 	});
-
-	var SearchApp = declare("tourbook.search.SearchApp", [], {
-
-		feature1 : function() {
-			alert('feature1');
-		}
+	
+	parser.parse().then(function() {
+		new SearchApp().startApp();
 	});
 
 	return SearchApp;

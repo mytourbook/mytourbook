@@ -5,6 +5,5 @@
 	"description":	"MyTourbook web applications.",
 	"homepage":		"http://mytourbook.sourceforge.net",
 	
-	"main":			"tourbookMain",
 	"dojoBuild":	"build-profile.js",
 }

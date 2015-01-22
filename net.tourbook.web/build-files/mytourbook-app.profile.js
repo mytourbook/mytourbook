@@ -19,13 +19,21 @@ var profile = (function() {
 		// `basePath` is relative to the directory containing this profile file; in this case, it is being set to the
 		// src/ directory, which is the same place as the `baseUrl` directory in the loader configuration. (If you change
 		// this, you will also need to update run.js.)
-		basePath : "../WebContent",
+//		basePath : "../WebContent",
 
-		releaseDir : "../../../../mytourbook-BUILD-dojo/mt-dojo-release",
+// releaseDir is set in the command line in Create-Dojo-Bundle.xml		
+//		releaseDir : "../../../../mytourbook-BUILD-dojo/mt-dojo-release",
 //		releaseName : "releaseName",
 
 		// Builds a new release.
-		action : 'release',
+//		action : 'release',
+//		action : 'check',
+//	   check-args              print computed raw command line input, including raw profiles, then terminate
+//	   check                   print computed profile, then terminate
+//	   check-discovery         print all discovered resources, then terminate
+//	   debug-check             print computed profile, including internal structures
+
+		localeList : "cs_CZ,de,en,es,fr,it,nl",
 
 		// Strips all comments and whitespace from CSS files and inlines @imports where possible.
 		cssOptimize : 'comments',
@@ -45,7 +53,7 @@ var profile = (function() {
 		// Strips all calls to console functions within the code. You can also set this to "warn" to strip everything
 		// but console.error, and any other truthy value to strip everything but console.warn and console.error.
 		// This defaults to "normal" (strip all but warn and error) if not provided.
-		stripConsole : 'all',
+		stripConsole : 'warn',
 
 		// The default selector engine is not included by default in a dojo.js build in order to make mobile builds
 		// smaller. We add it back here to avoid that extra HTTP request. There is also an "acme" selector available; if
@@ -114,7 +122,12 @@ var profile = (function() {
 			},
 			{
 				name : "tourbook",
-				location : "C:/DAT/ws_mt-with-GIT/mytourbook/net.tourbook.web/WebContent/tourbook"
+
+				/**
+				 * !!! This location must be in the dojo root, otherwise the css '@import' urls do NOT work, they are
+				 * referenced to the SOURCE folder !!!
+				 */
+				location : "C:/E/js-resources/dojo/WebContent-dojo/tourbook"
 			},
 		],
 
@@ -130,7 +143,7 @@ var profile = (function() {
 				// a bunch of stuff we do not want or need. We want the initial script load to be as small and quick to
 				// load as possible, so we configure it as a custom, bootable base.
 				boot : true,
-				customBase : true
+//				customBase : true
 			},
 
 			// In this demo application, we load `app/main` on the client-side, so here we build a separate layer containing
@@ -138,7 +151,18 @@ var profile = (function() {
 			// but this helps provide a basic illustration of how multi-layer builds work.) Note that when you create a new
 			// layer, the module referenced by the layer is always included in the layer (in this case, `app/main`), so it
 			// does not need to be explicitly defined in the `include` array.
-			'tourbook/search/SearchApp' : {}
-		}
+			'tourbook/search/SearchApp' : {
+
+				include :
+				[
+					'dijit/layout/LayoutContainer',
+					'dijit/layout/ContentPane'
+				]
+			}
+		},
+
+//		prefixes : {
+//			"css" : "C:/E/js-resources/dojo/WebContent-dojo/"
+//		}
 	};
 })();

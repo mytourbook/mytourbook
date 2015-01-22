@@ -1,33 +1,28 @@
 <!DOCTYPE html>
-<html debug="true">
+<html>
 <head>
 
 <!-- 
-	<script type="text/javascript" src="/WebContent-firebug-lite/content/firebug-lite-dev.js">
-	{
-	    overrideConsole: false,
-	    startInNewWindow: true,
-	    startOpened: true,
-	    enableTrace: true
-	}
-	</script>
-
-
+ -->
 	<meta http-equiv='Content-Type' content='text/html; charset=UTF-8' />
 	<meta http-equiv='X-UA-Compatible' content='IE=edge' />
-	 -->
 
 	<title>Search</title>
-
-	<link rel="stylesheet" href="/dojo/resources/dojo.css">
-	<link rel="stylesheet" href="/dijit/themes/claro/claro.css">
-	<link rel="stylesheet" href="/dgrid/css/dgrid.css">
-	<link rel="stylesheet" href="/dgrid/css/skins/claro.css">
     	
-	<link rel="stylesheet" href="search.css">
 
+<!-- debug build
+	<link rel="stylesheet" href="search.css">
 	<script src="/dojo/dojo.js" data-dojo-config="async:true"></script>
-	<script src="SearchApp.js"></script>
+ -->
+ 
+<!-- release build
+ -->	
+	<link rel="stylesheet" href="search.css.jgz">
+	<script src="/dojo/dojo.js.jgz" data-dojo-config="async:true"></script>
+	<script src="/tourbook/search/SearchApp.js.jgz" data-dojo-config="async:true"></script>
+	
+	<script>require(['tourbook/search/SearchApp' ]);</script>
+	
 </head>
 
 <body class="claro">

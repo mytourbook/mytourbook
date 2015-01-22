@@ -128,7 +128,7 @@ public class WebContentServer {
 			final String rootPath = WEB.getFile(ROOT_FILE_PATH_NAME).getCanonicalFile().getPath();
 
 			final URI requestURI = httpExchange.getRequestURI();
-			String requestUriPath = requestURI.getPath();
+			final String requestUriPath = requestURI.getPath();
 
 			final Headers requestHeaders = httpExchange.getRequestHeaders();
 			final Set<Entry<String, List<String>>> headerEntries = requestHeaders.entrySet();
@@ -143,7 +143,7 @@ public class WebContentServer {
 			final String DOJO_PUT_SELECTOR = "/put-selector/";
 			final String DOJO_XSTYLE = "/xstyle/";
 
-			boolean isDojoRequest = false;
+			final boolean isDojoRequest = false;
 
 			if (requestUriPath.startsWith(DOJO_ROOT)
 					|| requestUriPath.startsWith(DOJO_DIJIT)
@@ -153,8 +153,8 @@ public class WebContentServer {
 					|| requestUriPath.startsWith(DOJO_XSTYLE)
 			//
 			) {
-				isDojoRequest = true;
-				requestUriPath = DOJO_PATH + requestUriPath;
+//				isDojoRequest = true;
+//				requestUriPath = DOJO_PATH + requestUriPath;
 			}
 
 			if (isDojoRequest) {

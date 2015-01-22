@@ -1,4 +1,11 @@
 
+/*
+*/
+@import url(../../dojo/resources/dojo.css);
+@import url(../../dijit/themes/claro/claro.css);
+@import url(../../dgrid/css/dgrid.css);
+@import url(../../dgrid/css/skins/claro.css);
+
 html, body 
 {
     height:					100%;

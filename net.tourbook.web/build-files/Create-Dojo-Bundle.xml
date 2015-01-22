@@ -1,24 +1,38 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <project name="CreateDojoFiles" default="all" basedir=".">
-
-	<property name="dojoToolkitFolder"		value="C:/E/js-resources/dojo/WebContent-dojo" />
 	
-	<!-- this folder is populated in mytourbook-app.profile.js -->
+	<property name="tourbookRootFolder"			value="../WebContent" />
+	<property name="tourbookSrcFolder"			value="${tourbookRootFolder}/tourbook" />
+	
+	<property name="dojoToolkitFolder"			value="C:/E/js-resources/dojo/WebContent-dojo" />
+	<property name="tourbookTempFolder"			value="${dojoToolkitFolder}" />
+	<property name="tourbookTempSrcFolder"		value="${tourbookTempFolder}/tourbook" />
+	
 	<property name="dojoBuildFolder"			value="../../../../mytourbook-BUILD-dojo" />
+	<property name="releaseFolder"				value="${dojoBuildFolder}/mt-dojo-release" />
+	<property name="compressFolder"				value="${dojoBuildFolder}/mt-dojo-compress" />
 
-	<target name="all" depends="clean,compress_js" />
-	<target name="all-with-clean" depends="clean,compress_js" />
+	<target name="all" depends="clean,shrink,compress" />
+	<target name="allx" depends="compress" />
 
 	<target name="clean">
+		<delete dir="${tourbookTempSrcFolder}" />
 		<delete includeEmptyDirs="true">
 			<fileset dir="${dojoBuildFolder}" includes="**/*" defaultexcludes="no"/>
 		</delete>
 	</target>
 
-	<target name="compress_js">
+	<target name="shrink">
+
+		<echo level="info" message="Copying src files ..." />
+		<copy todir="${tourbookTempSrcFolder}" preservelastmodified="yes" verbose="no">
+			<fileset dir="${tourbookSrcFolder}">
+				<include name="**/*" />
+			</fileset>
+		</copy>
+
 
 		<echo level="info" message="Running dojo custom build..." />
-		
 		<java dir="${dojoToolkitFolder}/util/buildscripts" 
 			fork="true" 
 			classname="org.mozilla.javascript.tools.shell.Main" 
@@ -26,25 +40,53 @@
 			
 			<classpath path="${dojoToolkitFolder}/util/shrinksafe/js.jar;${dojoToolkitFolder}/util/closureCompiler/compiler.jar;${dojoToolkitFolder}/util/shrinksafe/shrinksafe.jar" />
 
-			<arg line="${dojoToolkitFolder}/dojo/dojo.js --release " />
+			<arg line="${dojoToolkitFolder}/dojo/dojo.js " />
 
+			<!-- dojo root -->
 			<arg value="baseUrl=${dojoToolkitFolder}/dojo" />
 			
+			<!-- tourbook source -->
+			<arg value="basePath=${tourbookTempFolder}" />
+			
+			<!-- release folder -->
+			<arg value="releaseDir=${releaseFolder}" />
+			
+			<!-- major profile -->
 			<arg value="profile=${basedir}/mytourbook-app.profile.js" />
 			
-<!--
-			<arg value="profile=C:/E/js-resources/dojo/modified-dojo-boilerplate-master/profiles/app2.profile.js" />
-			<arg line="${dojoToolkitFolder}/dojo/dojo.js - -release - -check" />
+			<!-- "action" options
+				release
+			    check                   print computed profile, then terminate
+			    // vvvvv is valid ONLY in the arg line
+		    	check-args              print computed raw command line input, including raw profiles, then terminate
+			    check-discovery         print all discovered resources, then terminate
+			    debug-check             print computed profile, including internal structures -->
+			<arg value="action=release" />
 
-	     - - check-args              print computed raw command line input, including raw profiles, then terminate
-	     - - check                   print computed profile, then terminate
-	     - - check-discovery         print all discovered resources, then terminate
-	     - - debug-check             print computed profile, including internal structures
--->
-			
 			<arg value="load=build" />
 		</java>
+
+	</target>
+	
+	<target name="compress">
 		
+		<copy todir="${tourbookRootFolder}/tourbook/search/nls" preservelastmodified="no" verbose="yes">
+			<fileset dir="${releaseFolder}/tourbook/search/nls">
+				<include name="**/*.js"/>
+				<exclude name="**/*uncompressed*"/>
+			</fileset>
+		</copy>
+
+		<!--compress minimized files and create it in the src folder -->
+		<gzip  	src="${releaseFolder}/dojo/dojo.js" 
+				destfile="${tourbookRootFolder}/dojo/dojo.js.jgz"/>
+		
+		<gzip  	src="${releaseFolder}/tourbook/search/SearchApp.js" 
+				destfile="${tourbookSrcFolder}/search/SearchApp.js.jgz"/>
+		
+		<gzip  	src="${releaseFolder}/tourbook/search/search.css" 
+				destfile="${tourbookSrcFolder}/search/search.css.jgz"/>
+
 	</target>
 
 </project>
