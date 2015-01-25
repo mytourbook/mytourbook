@@ -1,0 +1,3 @@
+//>>built
+define("tourbook/search/nls/SearchApp_fr",{"dijit/form/nls/ComboBox":{previousMessage:"Choix pr\u00e9c\u00e9dents",_localized:{},nextMessage:"Plus de choix"},"dijit/nls/loading":{_localized:{},loadingState:"Chargement...",errorState:"Une erreur est survenue"},"dijit/form/nls/validate":{invalidMessage:"La valeur indiqu\u00e9e n'est pas correcte.",rangeMessage:"Cette valeur n'est pas comprise dans la plage autoris\u00e9e.",_localized:{},missingMessage:"Cette valeur est requise."}});
+//# sourceMappingURL=SearchApp_fr.js.map

@@ -1,32 +1,40 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <project name="CreateDojoFiles" default="all" basedir=".">
 	
-	<property name="tourbookRootFolder"			value="../WebContent" />
-	<property name="tourbookSrcFolder"			value="${tourbookRootFolder}/tourbook" />
+	<property name="dojoToolkitFolder"				value="C:/E/js-resources/dojo/MyTourbook-DojoToolkit" />
 	
-	<property name="dojoToolkitFolder"			value="C:/E/js-resources/dojo/WebContent-dojo" />
-	<property name="tourbookTempFolder"			value="${dojoToolkitFolder}" />
-	<property name="tourbookTempSrcFolder"		value="${tourbookTempFolder}/tourbook" />
+	<property name="rootFolderDev"					value="../WebContent-dev" />
+	<property name="rootFolderRel"					value="../WebContent-rel" />
+
+	<property name="srcFolderDev"					value="${rootFolderDev}/tourbook" />
+	<property name="srcFolderRel"					value="${rootFolderRel}/tourbook" />
 	
-	<property name="dojoBuildFolder"			value="../../../../mytourbook-BUILD-dojo" />
-	<property name="releaseFolder"				value="${dojoBuildFolder}/mt-dojo-release" />
-	<property name="compressFolder"				value="${dojoBuildFolder}/mt-dojo-compress" />
+	<property name="tourbookBasePath"				value="${dojoToolkitFolder}" />
+	<property name="tourbookInDojoToolkitFolder"	value="${tourbookBasePath}/tourbook" />
+	
+	<property name="dojoBuildFolder"				value="../../../../mytourbook-BUILD-dojo" />
+	<property name="releaseFolder"					value="${dojoBuildFolder}/mt-dojo-release" />
 
-	<target name="all" depends="clean,shrink,compress" />
-	<target name="allx" depends="compress" />
+	<target name="all" depends="cleanBuild,cleanMTRelease,shrink,compress,copyResources" />
 
-	<target name="clean">
-		<delete dir="${tourbookTempSrcFolder}" />
+	<target name="cleanBuild">
+		<echo level="info" message="Clean build folder" />
+		<delete dir="${tourbookInDojoToolkitFolder}" />
 		<delete includeEmptyDirs="true">
 			<fileset dir="${dojoBuildFolder}" includes="**/*" defaultexcludes="no"/>
 		</delete>
 	</target>
 
+	<target name="cleanMTRelease">
+		<echo level="info" message="Clean MT release folder" />
+		<delete dir="${srcFolderRel}" />
+	</target>
+
 	<target name="shrink">
 
-		<echo level="info" message="Copying src files ..." />
-		<copy todir="${tourbookTempSrcFolder}" preservelastmodified="yes" verbose="no">
-			<fileset dir="${tourbookSrcFolder}">
+		<echo level="info" message="Copying src files into dojo root ..." />
+		<copy todir="${tourbookInDojoToolkitFolder}" preservelastmodified="yes" verbose="no">
+			<fileset dir="${srcFolderDev}">
 				<include name="**/*" />
 			</fileset>
 		</copy>
@@ -46,7 +54,7 @@
 			<arg value="baseUrl=${dojoToolkitFolder}/dojo" />
 			
 			<!-- tourbook source -->
-			<arg value="basePath=${tourbookTempFolder}" />
+			<arg value="basePath=${tourbookBasePath}" />
 			
 			<!-- release folder -->
 			<arg value="releaseDir=${releaseFolder}" />
@@ -70,7 +78,15 @@
 	
 	<target name="compress">
 		
-		<copy todir="${tourbookRootFolder}/tourbook/search/nls" preservelastmodified="no" verbose="yes">
+		<copy todir="${srcFolderRel}" preservelastmodified="no" verbose="yes">
+			<fileset dir="${srcFolderDev}">
+				<include name="**/*"/>
+				<exclude name="**/*.js"/>
+				<exclude name="**/search.css"/> <!-- this file is in the build layer -->
+			</fileset>
+		</copy>
+		
+		<copy todir="${rootFolderRel}/tourbook/search/nls" preservelastmodified="no" verbose="yes">
 			<fileset dir="${releaseFolder}/tourbook/search/nls">
 				<include name="**/*.js"/>
 				<exclude name="**/*uncompressed*"/>
@@ -78,15 +94,48 @@
 		</copy>
 
 		<!--compress minimized files and create it in the src folder -->
+		<mkdir dir="${rootFolderRel}/dojo"/>	
 		<gzip  	src="${releaseFolder}/dojo/dojo.js" 
-				destfile="${tourbookRootFolder}/dojo/dojo.js.jgz"/>
+				destfile="${rootFolderRel}/dojo/dojo.js.jgz"/>
 		
 		<gzip  	src="${releaseFolder}/tourbook/search/SearchApp.js" 
-				destfile="${tourbookSrcFolder}/search/SearchApp.js.jgz"/>
+				destfile="${srcFolderRel}/search/SearchApp.js.jgz"/>
 		
 		<gzip  	src="${releaseFolder}/tourbook/search/search.css" 
-				destfile="${tourbookSrcFolder}/search/search.css.jgz"/>
+				destfile="${srcFolderRel}/search/search.css.jgz"/>
 
 	</target>
+
+	<!-- - - - - - - - - - - - - - - - - - 
+          target: copyResources                      
+         - - - - - - - - - - - - - - - - - -->
+    <target name="copyResources">
+            
+    	<!--
+			copy MT resources
+		-->
+		<copy todir="${rootFolderRel}" preservelastmodified="no" verbose="yes">
+			<fileset dir="${rootFolderDev}">
+				<include name="**/favicon.ico"/>
+			</fileset>
+		</copy>
+
+    	<!--
+			copy Dojo resources
+		-->
+		<copy todir="${rootFolderRel}" preservelastmodified="no" verbose="yes">
+			<fileset dir="${dojoToolkitFolder}" id="id">
+			    <include name="**/dgrid/css/skins/images/row_back.png"/>
+			    <include name="**/dojo/resources/blank.gif"/>
+			    <include name="**/dijit/themes/claro/form/images/commonFormArrows.png"/>
+			</fileset>
+		</copy>
+    	
+    	<!-- 
+    		delete build files
+    	-->
+		<antcall target="cleanBuild" />
+
+    </target>
 
 </project>

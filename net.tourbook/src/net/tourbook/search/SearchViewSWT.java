@@ -716,7 +716,7 @@ public class SearchViewSWT extends ViewPart {
 		for (int currentPage = firstPage; currentPage < lastPage; currentPage++) {
 
 			final int visiblePageNo = currentPage + 1;
-			final String hrefPage = SearchUI.HTTP_PROTOCOL + HREF_ACTION_NAVIGATE_PAGE + HREF_PARAM_PAGE + currentPage;
+			final String hrefPage = SearchUI.HTTP_PROTOCOL_DUMMY + HREF_ACTION_NAVIGATE_PAGE + HREF_PARAM_PAGE + currentPage;
 
 			/*
 			 * Previous page
@@ -755,7 +755,7 @@ public class SearchViewSWT extends ViewPart {
 		sbFirst.append(SearchUI.TAG_TD);
 		{
 			if (firstPage > 0) {
-				final String hrefPage = SearchUI.HTTP_PROTOCOL + HREF_ACTION_NAVIGATE_PAGE + HREF_PARAM_PAGE + 0;
+				final String hrefPage = SearchUI.HTTP_PROTOCOL_DUMMY + HREF_ACTION_NAVIGATE_PAGE + HREF_PARAM_PAGE + 0;
 				sbFirst.append("<a" + " class='page-number' href='" + hrefPage + "'>1</a>");
 			}
 		}
@@ -773,7 +773,7 @@ public class SearchViewSWT extends ViewPart {
 		sbLast.append(SearchUI.TAG_TD);
 		{
 			if (lastPage < maxPage) {
-				final String hrefPage = SearchUI.HTTP_PROTOCOL
+				final String hrefPage = SearchUI.HTTP_PROTOCOL_DUMMY
 						+ HREF_ACTION_NAVIGATE_PAGE
 						+ HREF_PARAM_PAGE
 						+ (maxPage - 1);

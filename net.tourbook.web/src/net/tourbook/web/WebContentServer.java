@@ -64,9 +64,8 @@ public class WebContentServer {
 	private static final String				ROOT_FILE_PATH_NAME			= "/";					//$NON-NLS-1$
 
 	private static final String				PROTOCOL_HTTP				= "http://";			//$NON-NLS-1$
-	private static final String				PROTOCOL_COLUMN				= ":";					//$NON-NLS-1$
+	private static final String				URI_INNER_PROTOCOL_FILE		= "/file:";			//$NON-NLS-1$
 
-	private static final String				DOJO_PATH					= "/WebContent-dojo/";	//$NON-NLS-1$
 	private static final String				REQUEST_PATH_TOURBOOK		= "/tourbook";			//$NON-NLS-1$
 
 	private static final String				XHR_HEADER_KEY				= "X-requested-with";	//$NON-NLS-1$
@@ -94,7 +93,7 @@ public class WebContentServer {
 		final InetAddress loopbackAddress = InetAddress.getLoopbackAddress();
 		inetAddress = new InetSocketAddress(loopbackAddress, _serverPort);
 
-		SERVER_URL = PROTOCOL_HTTP + loopbackAddress.getHostAddress() + PROTOCOL_COLUMN + _serverPort;
+		SERVER_URL = PROTOCOL_HTTP + loopbackAddress.getHostAddress() + ':' + _serverPort;
 	}
 
 	private static class DefaultHandler implements HttpHandler {
@@ -128,7 +127,7 @@ public class WebContentServer {
 			final String rootPath = WEB.getFile(ROOT_FILE_PATH_NAME).getCanonicalFile().getPath();
 
 			final URI requestURI = httpExchange.getRequestURI();
-			final String requestUriPath = requestURI.getPath();
+			String requestUriPath = requestURI.getPath();
 
 			final Headers requestHeaders = httpExchange.getRequestHeaders();
 			final Set<Entry<String, List<String>>> headerEntries = requestHeaders.entrySet();
@@ -143,18 +142,18 @@ public class WebContentServer {
 			final String DOJO_PUT_SELECTOR = "/put-selector/";
 			final String DOJO_XSTYLE = "/xstyle/";
 
-			final boolean isDojoRequest = false;
+			boolean isDojoRequest = false;
 
-			if (requestUriPath.startsWith(DOJO_ROOT)
-					|| requestUriPath.startsWith(DOJO_DIJIT)
-					|| requestUriPath.startsWith(DOJO_DGRID)
-					|| requestUriPath.startsWith(DOJO_DSTORE)
-					|| requestUriPath.startsWith(DOJO_PUT_SELECTOR)
-					|| requestUriPath.startsWith(DOJO_XSTYLE)
+			if (WEB.IS_DEBUG
+					&& (requestUriPath.startsWith(DOJO_ROOT)
+							|| requestUriPath.startsWith(DOJO_DIJIT)
+							|| requestUriPath.startsWith(DOJO_DGRID)
+							|| requestUriPath.startsWith(DOJO_DSTORE)
+							|| requestUriPath.startsWith(DOJO_PUT_SELECTOR) || requestUriPath.startsWith(DOJO_XSTYLE))
 			//
 			) {
-//				isDojoRequest = true;
-//				requestUriPath = DOJO_PATH + requestUriPath;
+				isDojoRequest = true;
+				requestUriPath = WEB.DOJO_TOOLKIT_FOLDER + requestUriPath;
 			}
 
 			if (isDojoRequest) {
@@ -189,7 +188,7 @@ public class WebContentServer {
 					// Dojo requests
 
 					isResourceUrl = true;
-					requestedOSPath = "C:/E/js-resources/dojo/" + requestUriPath;
+					requestedOSPath = WEB.DEBUG_PATH_DOJO + requestUriPath;
 
 				} else if (requestUriPath.startsWith(REQUEST_PATH_TOURBOOK)) {
 
@@ -197,6 +196,11 @@ public class WebContentServer {
 
 					isResourceUrl = true;
 					requestedOSPath = rootPath + requestUriPath;
+
+				} else if (requestUriPath.startsWith(URI_INNER_PROTOCOL_FILE)) {
+
+					isResourceUrl = true;
+					requestedOSPath = requestUriPath.substring(URI_INNER_PROTOCOL_FILE.length());
 
 				} else {
 
@@ -208,6 +212,10 @@ public class WebContentServer {
 				if (requestedOSPath != null) {
 
 					final File file = new File(requestedOSPath).getCanonicalFile();
+
+					if (LOG_URL) {
+//						log.append("\t-->\t" + file.toString());
+					}
 
 					if (!file.getPath().startsWith(rootPath) && !isResourceUrl) {
 
@@ -298,6 +306,7 @@ public class WebContentServer {
 		try {
 
 			WEB.setResponseHeaderContentType(httpExchange, file);
+
 			httpExchange.sendResponseHeaders(200, 0);
 
 			os = httpExchange.getResponseBody();

@@ -131,10 +131,11 @@ public class SearchUI implements XHRHandler {
 	static final String						CSS_ITEM_CONTAINER						= "item-container";									//$NON-NLS-1$
 
 	static final String						PAGE_ABOUT_BLANK						= "about:blank";										//$NON-NLS-1$
+
 	/**
 	 * This is necessary otherwise XULrunner in Linux do not fire a location change event.
 	 */
-	static final String						HTTP_PROTOCOL							= "http://dummy/a?";									//$NON-NLS-1$
+	static final String						HTTP_PROTOCOL_DUMMY						= WEB.WEB_PROTOCOL + "dummy/a?";						//$NON-NLS-1$
 
 	static final String						HREF_TOKEN								= "&";													//$NON-NLS-1$
 	static final String						HREF_VALUE_SEP							= "=";													//$NON-NLS-1$
@@ -176,15 +177,6 @@ public class SearchUI implements XHRHandler {
 		HREF_PARAM_MARKER_ID = HREF_TOKEN + PARAM_MARKER_ID + HREF_VALUE_SEP;
 		HREF_PARAM_TOUR_ID = HREF_TOKEN + PARAM_TOUR_ID + HREF_VALUE_SEP;
 
-		/*
-		 * set image urls
-		 */
-		_iconUrl_Tour = net.tourbook.ui.UI.getIconUrl(Messages.Image__TourChart);
-		_iconUrl_Marker = net.tourbook.ui.UI.getIconUrl(Messages.Image__TourMarker);
-		_iconUrl_WayPoint = net.tourbook.ui.UI.getIconUrl(IMAGE_ACTION_TOUR_WAY_POINT);
-
-		_actionUrl_EditImage = net.tourbook.ui.UI.getIconUrl(Messages.Image__quick_edit);
-
 		SEARCH_SWT_CSS_STYLE = "<style>" + WEB.getFileContent(SEARCH_SWT_CSS_FILE, false) + "</style>"; //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
@@ -218,7 +210,16 @@ public class SearchUI implements XHRHandler {
 
 		_browser = browser;
 
-		if (isWebUI) {
+		/*
+		 * set image urls
+		 */
+		_iconUrl_Tour = getIconUrl(Messages.Image__TourChart);
+		_iconUrl_Marker = getIconUrl(Messages.Image__TourMarker);
+		_iconUrl_WayPoint = getIconUrl(IMAGE_ACTION_TOUR_WAY_POINT);
+
+		_actionUrl_EditImage = getIconUrl(Messages.Image__quick_edit);
+
+		if (_isWebUI) {
 
 			_browser.addLocationListener(new LocationAdapter() {
 				@Override
@@ -288,12 +289,12 @@ public class SearchUI implements XHRHandler {
 				itemTitleText = tourTitle;
 			}
 
-			hrefSelectItem = HTTP_PROTOCOL
+			hrefSelectItem = HTTP_PROTOCOL_DUMMY
 					+ HREF_ACTION_SELECT_TOUR
 					+ (HREF_PARAM_TOUR_ID + tourId)
 					+ (HREF_PARAM_DOC_ID + docId);
 
-			hrefEditItem = HTTP_PROTOCOL
+			hrefEditItem = HTTP_PROTOCOL_DUMMY
 					+ HREF_ACTION_EDIT_TOUR
 					+ (HREF_PARAM_TOUR_ID + tourId)
 					+ (HREF_PARAM_DOC_ID + docId);
@@ -308,13 +309,13 @@ public class SearchUI implements XHRHandler {
 				itemTitleText = tourMarkerLabel;
 			}
 
-			hrefSelectItem = HTTP_PROTOCOL
+			hrefSelectItem = HTTP_PROTOCOL_DUMMY
 					+ HREF_ACTION_SELECT_MARKER
 					+ (HREF_PARAM_TOUR_ID + tourId)
 					+ (HREF_PARAM_MARKER_ID + markerId)
 					+ (HREF_PARAM_DOC_ID + docId);
 
-			hrefEditItem = HTTP_PROTOCOL
+			hrefEditItem = HTTP_PROTOCOL_DUMMY
 					+ HREF_ACTION_EDIT_MARKER
 					+ (HREF_PARAM_TOUR_ID + tourId)
 					+ (HREF_PARAM_MARKER_ID + markerId)
@@ -330,7 +331,7 @@ public class SearchUI implements XHRHandler {
 				itemTitleText = tourMarkerLabel;
 			}
 
-			hrefSelectItem = HTTP_PROTOCOL
+			hrefSelectItem = HTTP_PROTOCOL_DUMMY
 					+ HREF_ACTION_SELECT_WAY_POINT
 					+ (HREF_PARAM_TOUR_ID + tourId)
 					+ (HREF_PARAM_MARKER_ID + markerId)
@@ -356,11 +357,11 @@ public class SearchUI implements XHRHandler {
 		// hovered actions
 		if (hrefEditItem != null) {
 
-			sb.append("<div class='action-container'>" //$NON-NLS-1$
-					+ ("<table><tbody><tr>") //$NON-NLS-1$
-					+ (TAG_TD + createHTML_20_Action(hrefEditItem, hoverMessage, _actionUrl_EditImage) + TAG_TD_END)
-					+ "</tr></tbody></table>" // //$NON-NLS-1$
-					+ "</div>\n"); //$NON-NLS-1$
+//			sb.append("<div class='action-container'>" //$NON-NLS-1$
+//					+ ("<table><tbody><tr>") //$NON-NLS-1$
+//					+ (TAG_TD + createHTML_20_Action(hrefEditItem, hoverMessage, _actionUrl_EditImage) + TAG_TD_END)
+//					+ "</tr></tbody></table>" // //$NON-NLS-1$
+//					+ "</div>\n"); //$NON-NLS-1$
 		}
 
 		if (_isWebUI == false) {
@@ -475,6 +476,17 @@ public class SearchUI implements XHRHandler {
 		}
 
 		return contentRange;
+	}
+
+	private String getIconUrl(final String iconImage) {
+
+		final String iconUrl = net.tourbook.ui.UI.getIconUrl(iconImage);
+
+		if (_isWebUI) {
+			return WEB.SERVER_URL + '/' + iconUrl;
+		}
+
+		return iconUrl;
 	}
 
 	@Override

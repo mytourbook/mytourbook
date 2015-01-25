@@ -13,25 +13,12 @@
  * Look to `util/build/buildControlDefault.js` for more information on available options and their default values.
  */
 var profile = (function() {
+	
+	var dojoSource = "C:/E/js-resources/dojo/MyTourbook-DojoToolkit";
 
 	return {
 
-		// `basePath` is relative to the directory containing this profile file; in this case, it is being set to the
-		// src/ directory, which is the same place as the `baseUrl` directory in the loader configuration. (If you change
-		// this, you will also need to update run.js.)
-//		basePath : "../WebContent",
-
-// releaseDir is set in the command line in Create-Dojo-Bundle.xml		
-//		releaseDir : "../../../../mytourbook-BUILD-dojo/mt-dojo-release",
-//		releaseName : "releaseName",
-
-		// Builds a new release.
-//		action : 'release',
-//		action : 'check',
-//	   check-args              print computed raw command line input, including raw profiles, then terminate
-//	   check                   print computed profile, then terminate
-//	   check-discovery         print all discovered resources, then terminate
-//	   debug-check             print computed profile, including internal structures
+		// some properties are set in Create-Dojo-Bundle.xml
 
 		localeList : "cs_CZ,de,en,es,fr,it,nl",
 
@@ -90,35 +77,35 @@ var profile = (function() {
 		[
 			{
 				name : "dojo",
-				location : "C:/E/js-resources/dojo/WebContent-dojo/dojo"
+				location : dojoSource + "/dojo"
 			},
-//		{
-//			name : "dojox",
-//			location : "C:/E/js-resources/dojo/WebContent-dojo/dojox"
-//		},
+//			{
+//				name : "dojox",
+//				location : dojoSource + "/dojox"
+//			},
 			{
 				name : "dijit",
-				location : "C:/E/js-resources/dojo/WebContent-dojo/dijit"
+				location : dojoSource + "/dijit"
 			},
 			{
 				name : "dgrid",
-				location : "C:/E/js-resources/dojo/WebContent-dojo/dgrid"
+				location : dojoSource + "/dgrid"
 			},
 			{
 				name : "dstore",
-				location : "C:/E/js-resources/dojo/WebContent-dojo/dstore"
+				location : dojoSource + "/dstore"
 			},
 			{
 				name : "rql",
-				location : "C:/E/js-resources/dojo/WebContent-dojo/rql"
+				location : dojoSource + "/rql"
 			},
 			{
 				name : "put-selector",
-				location : "C:/E/js-resources/dojo/WebContent-dojo/put-selector"
+				location : dojoSource + "/put-selector"
 			},
 			{
 				name : "xstyle",
-				location : "C:/E/js-resources/dojo/WebContent-dojo/xstyle"
+				location : dojoSource + "/xstyle"
 			},
 			{
 				name : "tourbook",
@@ -127,7 +114,7 @@ var profile = (function() {
 				 * !!! This location must be in the dojo root, otherwise the css '@import' urls do NOT work, they are
 				 * referenced to the SOURCE folder !!!
 				 */
-				location : "C:/E/js-resources/dojo/WebContent-dojo/tourbook"
+				location : dojoSource + "/tourbook"
 			},
 		],
 
@@ -160,9 +147,5 @@ var profile = (function() {
 				]
 			}
 		},
-
-//		prefixes : {
-//			"css" : "C:/E/js-resources/dojo/WebContent-dojo/"
-//		}
 	};
 })();

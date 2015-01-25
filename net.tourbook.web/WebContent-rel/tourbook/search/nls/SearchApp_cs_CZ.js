@@ -1,0 +1,3 @@
+//>>built
+define("tourbook/search/nls/SearchApp_cs_CZ",{"dijit/form/nls/ComboBox":{previousMessage:"Previous choices",_localized:{},nextMessage:"More choices"},"dijit/nls/loading":{_localized:{},loadingState:"Loading...",errorState:"Sorry, an error occurred"},"dijit/form/nls/validate":{invalidMessage:"The value entered is not valid.",rangeMessage:"This value is out of range.",_localized:{},missingMessage:"This value is required."}});
+//# sourceMappingURL=SearchApp_cs_CZ.js.map

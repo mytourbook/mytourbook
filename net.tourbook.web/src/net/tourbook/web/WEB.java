@@ -32,10 +32,37 @@ import org.eclipse.core.runtime.Path;
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 
+/**
+ * Web tools.
+ */
 public class WEB {
 
-	public static final String	UTF_8									= "UTF-8";										//$NON-NLS-1$
+	/**
+	 * When <code>true</code> the web content is delivered from the
+	 * {@value #WEB_CONTENT_DEVELOPMENT_FOLDER} folder otherwise it is delivered from the
+	 * {@value #WEB_CONTENT_RELEASE_FOLDER} folder.
+	 * <p>
+	 * When switching between debug and none debug, the html sources must also be adjusted, like in
+	 * search.html.
+	 */
+	static boolean				IS_DEBUG								= true;
 
+	static final String			DEBUG_PATH_XUL_RUNNER					= "C:/E/XULRunner/";							//$NON-NLS-1$
+	static final String			DEBUG_PATH_DOJO							= "C:/E/js-resources/dojo/";					//$NON-NLS-1$
+
+	static final String			DOJO_TOOLKIT_FOLDER						= "/MyTourbook-DojoToolkit";					//$NON-NLS-1$
+
+	private static final String	WEB_CONTENT_DEVELOPMENT_FOLDER			= "/WebContent-dev";
+	private static final String	WEB_CONTENT_RELEASE_FOLDER				= "/WebContent-rel";
+
+	/**
+	 * Root folder for web content in the web plugin.
+	 */
+	private static final String	WEB_CONTENT_FOLDER						= IS_DEBUG
+																				? WEB_CONTENT_DEVELOPMENT_FOLDER
+																				: WEB_CONTENT_RELEASE_FOLDER;
+
+	public static final String	WEB_PROTOCOL							= "http://";									//$NON-NLS-1$
 	public static String		SERVER_URL;
 
 	static {
@@ -43,10 +70,7 @@ public class WEB {
 		SERVER_URL = WebContentServer.SERVER_URL;
 	}
 
-	/**
-	 * Root folder for web content in the plugin.
-	 */
-	private static final String	PLUGIN_WEB_CONTENT_FOLDER				= "/WebContent";								//$NON-NLS-1$
+	public static final String	UTF_8									= "UTF-8";										//$NON-NLS-1$
 
 	private static final String	RESPONSE_HEADER_CONTENT_ENCODING		= "Content-Encoding";							//$NON-NLS-1$
 	public static final String	RESPONSE_HEADER_CONTENT_RANGE			= "Content-Range";								//$NON-NLS-1$
@@ -57,19 +81,27 @@ public class WEB {
 	private static final String	CONTENT_TYPE_APPLICATION_JAVASCRIPT		= "application/javascript";					//$NON-NLS-1$
 	public static final String	CONTENT_TYPE_APPLICATION_JSON			= "application/json";							//$NON-NLS-1$
 	private static final String	CONTENT_TYPE_APPLICATION_X_JAVASCRIPT	= "application/x-javascript; charset=UTF-8";	//$NON-NLS-1$
+	private static final String	CONTENT_TYPE_IMAGE_GIF					= "image/gif";									//$NON-NLS-1$
 	private static final String	CONTENT_TYPE_IMAGE_JPG					= "image/jpeg";								//$NON-NLS-1$
 	private static final String	CONTENT_TYPE_IMAGE_PNG					= "image/png";									//$NON-NLS-1$
+	private static final String	CONTENT_TYPE_IMAGE_X_ICO				= "image/x-icon";								//$NON-NLS-1$
 	private static final String	CONTENT_TYPE_TEXT_CSS					= "text/css";									//$NON-NLS-1$
 	private static final String	CONTENT_TYPE_TEXT_HTML					= "text/html";									//$NON-NLS-1$
 	private static final String	CONTENT_TYPE_UNKNOWN					= "application/octet-stream";					//$NON-NLS-1$
 
 	private static final String	FILE_EXTENSION_CSS						= "css";										//$NON-NLS-1$
+	private static final String	FILE_EXTENSION_GIF						= "gif";										//$NON-NLS-1$
 	private static final String	FILE_EXTENSION_HTML						= "html";										//$NON-NLS-1$
+	private static final String	FILE_EXTENSION_ICO						= "ico";										//$NON-NLS-1$
 	private static final String	FILE_EXTENSION_JGZ						= "jgz";										//$NON-NLS-1$
 	private static final String	FILE_EXTENSION_JPG						= "jpg";										//$NON-NLS-1$
 	private static final String	FILE_EXTENSION_JS						= "js";										//$NON-NLS-1$
 	private static final String	FILE_EXTENSION_PNG						= "png";										//$NON-NLS-1$
 
+	/**
+	 * @param path
+	 * @return Returns the 2nd last extension or <code>null</code> when not available.
+	 */
 	private static String getCompressedExtension(final Path path) {
 
 		if (path.hasTrailingSeparator()) {
@@ -102,7 +134,14 @@ public class WEB {
 	 */
 	public static File getFile(final String filePathName) throws IOException, URISyntaxException {
 
-		final URL bundleUrl = Activator.getDefault().getBundle().getEntry(PLUGIN_WEB_CONTENT_FOLDER + filePathName);
+		final String bundleFileName = WEB_CONTENT_FOLDER + filePathName;
+
+		final URL bundleUrl = Activator.getDefault().getBundle().getEntry(bundleFileName);
+
+		if (bundleUrl == null) {
+			StatusUtil.log("File is not available: " + bundleFileName);//$NON-NLS-1$
+			return null;
+		}
 
 		final URL fileUrl = FileLocator.toFileURL(bundleUrl);
 		final File file = new File(fileUrl.toURI());
@@ -113,11 +152,11 @@ public class WEB {
 
 	/**
 	 * @param webContentFile
-	 *            Absolute file path name which parent is {@value #PLUGIN_WEB_CONTENT_FOLDER}.
+	 *            Absolute file path name which parent is {@value #WEB_CONTENT_FOLDER}.
 	 * @param isConvertPaths
 	 *            Converts absolute paths to file paths.
 	 * @return Returns the content of a file from the WebContent folder, this folder is the root for
-	 *         web resources located in {@value #PLUGIN_WEB_CONTENT_FOLDER}.
+	 *         web resources located in {@value #WEB_CONTENT_FOLDER}.
 	 */
 	public static String getFileContent(final String webContentFile, final boolean isConvertPaths) {
 
@@ -131,11 +170,11 @@ public class WEB {
 
 			if (isConvertPaths) {
 
-				final String fromHtmlDojoPath = "/WebContent-dojo";
+				final String fromHtmlDojoPath = DOJO_TOOLKIT_FOLDER;
 				final String fromHtmlFirebugPath = "/WebContent-firebug-lite";
 
-				final String toSystemDojoPath = "C:/E/js-resources/dojo/";
-				final String toSystemFirebugPath = "C:/E/XULRunner/";
+				final String toSystemDojoPath = DEBUG_PATH_DOJO;
+				final String toSystemFirebugPath = DEBUG_PATH_XUL_RUNNER;
 
 				// replace local paths, which do not start with a /
 				webContent = replaceLocalPath(webContent, webFile);
@@ -159,7 +198,7 @@ public class WEB {
 	 */
 	public static URI getRoot() throws IOException, URISyntaxException {
 
-		final URL bundleUrl = Activator.getDefault().getBundle().getEntry(PLUGIN_WEB_CONTENT_FOLDER);
+		final URL bundleUrl = Activator.getDefault().getBundle().getEntry(WEB_CONTENT_FOLDER);
 
 		final URL fileUrl = FileLocator.toFileURL(bundleUrl);
 		final URI fileUri = fileUrl.toURI();
@@ -235,6 +274,8 @@ public class WEB {
 
 			if (FILE_EXTENSION_JGZ.equals(extension)) {
 
+				// file is compressed
+
 				rawExtension = getCompressedExtension(path);
 
 				if (rawExtension != null) {
@@ -248,8 +289,16 @@ public class WEB {
 				contentType = CONTENT_TYPE_TEXT_CSS;
 				break;
 
+			case FILE_EXTENSION_GIF:
+				contentType = CONTENT_TYPE_IMAGE_GIF;
+				break;
+
 			case FILE_EXTENSION_HTML:
 				contentType = CONTENT_TYPE_TEXT_HTML;
+				break;
+
+			case FILE_EXTENSION_ICO:
+				contentType = CONTENT_TYPE_IMAGE_X_ICO;
 				break;
 
 			case FILE_EXTENSION_JGZ:
