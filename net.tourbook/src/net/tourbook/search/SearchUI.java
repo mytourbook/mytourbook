@@ -51,6 +51,8 @@ import org.eclipse.jface.window.Window;
 import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.browser.LocationAdapter;
 import org.eclipse.swt.browser.LocationEvent;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.part.ViewPart;
 import org.joda.time.DateTime;
@@ -65,7 +67,7 @@ import com.sun.net.httpserver.HttpExchange;
 /**
  *
  */
-public class SearchUI implements XHRHandler {
+public class SearchUI implements XHRHandler, DisposeListener {
 
 	private static final String				IMAGE_ACTION_TOUR_WAY_POINT				= net.tourbook.map2.Messages.Image_Action_TourWayPoint;
 
@@ -73,28 +75,28 @@ public class SearchUI implements XHRHandler {
 																							.getState("net.tourbook.search.SearchUI");		//$NON-NLS-1$
 
 	static final String						STATE_IS_SHOW_DATE_TIME					= "STATE_IS_SHOW_DATE_TIME";							//$NON-NLS-1$
-
 	static final boolean					STATE_IS_SHOW_DATE_TIME_DEFAULT			= false;
+	//
 	static final String						STATE_IS_SHOW_ITEM_NUMBER				= "STATE_IS_SHOW_ITEM_NUMBER";							//$NON-NLS-1$
-
 	static final boolean					STATE_IS_SHOW_ITEM_NUMBER_DEFAULT		= false;
+	//
 	static final String						STATE_IS_SHOW_LUCENE_DOC_ID				= "STATE_IS_SHOW_LUCENE_DOC_ID";						//$NON-NLS-1$
-
 	static final boolean					STATE_IS_SHOW_LUCENE_DOC_ID_DEFAULT		= false;
+	//
 	static final String						STATE_IS_SORT_DATE_ASCENDING			= "STATE_IS_SORT_DATE_ASCENDING";						//$NON-NLS-1$
-
 	static final boolean					STATE_IS_SORT_DATE_ASCENDING_DEFAULT	= false;
+
 	private static final String				REQUEST_HEADER_RANGE					= "Range";
 
 	private static final String				CONTENT_RANGE_ITEMS						= "items %d-%d/%d";
 	private static final String				CONTENT_RANGE_ZERO						= "0-0/0";
+
 	/*
 	 * This will handle all xhr actions, they are also defined in SearchMgr.js
 	 */
 	private static final String				XHR_SEARCH_INPUT_HANDLER				= "/xhrSearch";										//$NON-NLS-1$
-
+	//
 	private static final String				XHR_ACTION_PROPOSALS					= "proposals";											//$NON-NLS-1$
-
 	private static final String				XHR_ACTION_SEARCH						= "search";											//$NON-NLS-1$
 	private static final String				XHR_ACTION_SELECT						= "select";											//$NON-NLS-1$
 	//
@@ -209,6 +211,8 @@ public class SearchUI implements XHRHandler {
 		WebContentServer.addXHRHandler(XHR_SEARCH_INPUT_HANDLER, this);
 
 		_browser = browser;
+
+		_browser.addDisposeListener(this);
 
 		/*
 		 * set image urls
@@ -492,6 +496,13 @@ public class SearchUI implements XHRHandler {
 	@Override
 	public void handleXHREvent(final HttpExchange httpExchange, final StringBuilder log) throws IOException {
 
+		if (_browser.isDisposed()) {
+
+			// this happened when the request is from an external browser.
+
+			return;
+		}
+
 		// get parameters from url query string
 		@SuppressWarnings("unchecked")
 		final Map<String, Object> params = (Map<String, Object>) httpExchange
@@ -743,6 +754,12 @@ public class SearchUI implements XHRHandler {
 
 	void setFocus() {
 		_browser.setFocus();
+	}
+
+	@Override
+	public void widgetDisposed(final DisposeEvent e) {
+		
+		WebContentServer.removeXHRHandler(XHR_SEARCH_INPUT_HANDLER);
 	}
 
 	private void writeRespone(final HttpExchange httpExchange, final String response) {

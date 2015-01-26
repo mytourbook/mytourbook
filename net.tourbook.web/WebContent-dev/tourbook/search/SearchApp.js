@@ -5,7 +5,10 @@ define(
 	'dojo/_base/lang',
 	'dojo/aspect',
 	"dojo/dom",
+	"dojo/dom-class",
 	"dojo/dom-style",
+	"dojo/mouse",
+	"dojo/on",
 	"dojo/parser",
 	"dojo/request/xhr",
 	"dijit/registry",
@@ -26,7 +29,10 @@ lang, //
 
 aspect, //
 dom, //
+domClass, //
 domStyle, //
+mouse, //
+on, //
 parser, //
 xhr, //
 
@@ -47,12 +53,24 @@ SearchMgr //
 
 	var SearchApp = declare("tourbook.search.SearchApp", [], {
 
-		createUI : function() {
+		createUI : function createUI() {
+
+			require([], function(mouse, dom, domClass, on) {
+			});
+
+			on(dom.byId("hoverNode"), mouse.enter, function() {
+				domClass.add("hoverNode", "hoverClass");
+			});
+
+			on(dom.byId("hoverNode"), mouse.leave, function() {
+				domClass.remove("hoverNode", "hoverClass");
+			});
 
 			this._searchInput = new SearchInput({
 
 				id : 'searchInput',
 				name : 'idSearch',
+				class : 'cssSearchInput',
 
 				placeHolder : 'Search Tours, Marker and Waypoints',
 
@@ -72,7 +90,7 @@ SearchMgr //
 			this._searchInput.focus();
 		},
 
-		createUI_Grid : function() {
+		createUI_Grid : function createUI_Grid() {
 
 			var self = this;
 
@@ -182,7 +200,7 @@ SearchMgr //
 			}).play();
 		}
 	});
-	
+
 	parser.parse().then(function() {
 		new SearchApp().startApp();
 	});

@@ -55,16 +55,43 @@ body
 {
 	padding:				0px;	
 	background-color:		#f0f0f0;
+	overflow:				hidden;
 }
 
-#domSearchInputContainer div			/* search input field */
+.cssSearchInput
 {
 	border:					0px;	
-	width:					95%;
+	xwidth:					90%;
 	margin-left:			0.2em;
-	background-color:		#f0f0f0;
+	xbackground-color:		#f0f0f0;
+	xbackground-color:		#0f0;
+	
+	margin:					auto;
+	position:				absolute;
+	top:					0; 
+	left: 					0; 
+	bottom: 				0; 
+	right:	 				0;
+}
+	
+/*
+	Property button
+*/
+#hoverNode 
+{ 
+	float:					right;
+	width:					30px; 
+	height:					30px; 
+	
+	background-image: 		url("/tourbook/resources/options.png");
+	background-repeat:		no-repeat;
+	background-position: 	center;
 }
 
+.hoverClass 
+{ 
+	background-color:		#aaa; 
+}
 
 /*
 	Grid
@@ -241,8 +268,6 @@ a.item:VISITED
 	padding-right:			20px;
 }
 
-	
-	
 	
 	
 	
