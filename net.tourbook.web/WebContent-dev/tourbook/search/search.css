@@ -18,6 +18,11 @@ body
     font-size:				13px;
 }
 
+table
+{
+	border-collapse:		collapse;
+	xborder:					1px solid; /* debug table */
+}
 
 
 #domLoading 
@@ -54,24 +59,15 @@ body
 #domSearchInputContainer
 {
 	padding:				0px;	
-	background-color:		#f0f0f0;
+	background-color:		#f4f4f4;
 	overflow:				hidden;
 }
 
-.cssSearchInput
+.domSearchInput
 {
 	border:					0px;	
-	xwidth:					90%;
-	margin-left:			0.2em;
-	xbackground-color:		#f0f0f0;
-	xbackground-color:		#0f0;
-	
-	margin:					auto;
-	position:				absolute;
-	top:					0; 
-	left: 					0; 
-	bottom: 				0; 
-	right:	 				0;
+	width:					100%;
+	background-color:		#f4f4f4		!important; /* important is VERY important to overwrite dijit styles */
 }
 	
 /*
@@ -79,7 +75,6 @@ body
 */
 #hoverNode 
 { 
-	float:					right;
 	width:					30px; 
 	height:					30px; 
 	
@@ -140,12 +135,6 @@ body
 
 */
 
-table
-{
-	border-collapse:		collapse;
-	
-	xborder:				1px solid; /* debug table */
-}
 
 /*
 body,p,h1,h2,h3,h4,table,td,th,ul,ol,textarea,input 

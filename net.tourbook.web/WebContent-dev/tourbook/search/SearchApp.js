@@ -20,6 +20,7 @@ define(
 	'put-selector/put',
 	'./SearchInput',
 	'./SearchMgr',
+	'dojo/i18n!./nls/Messages',
 	'dojo/domReady!'
 ], function(
 //
@@ -47,8 +48,8 @@ RequestMemory, //
 put, //
 
 SearchInput, //
-SearchMgr //
-
+SearchMgr, //
+Messages //
 ) {
 
 	var SearchApp = declare("tourbook.search.SearchApp", [], {
@@ -70,9 +71,11 @@ SearchMgr //
 
 				id : 'searchInput',
 				name : 'idSearch',
-				class : 'cssSearchInput',
+				
+				// this will overwrite all dijit classes for this dom node
+//				baseClass : 'domSearchInput',
 
-				placeHolder : 'Search Tours, Marker and Waypoints',
+				placeHolder : Messages.searchInput_PlaceHolder,
 
 				hasDownArrow : false,
 
@@ -81,6 +84,8 @@ SearchMgr //
 				labelType : 'html'
 
 			}, 'domSearchInput');
+			
+			domClass.add(this._searchInput.domNode, 'domSearchInput');
 
 			var grid = this.createUI_Grid();
 

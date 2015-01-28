@@ -22,6 +22,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 
+import net.tourbook.common.ReplacingOutputStream;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
@@ -72,6 +73,7 @@ public class WEB {
 
 	public static final String	UTF_8									= "UTF-8";										//$NON-NLS-1$
 
+	public static final String	RESPONSE_HEADER_ACCEPT_LANGUAGE			= "Accept-Language";							//$NON-NLS-1$
 	private static final String	RESPONSE_HEADER_CONTENT_ENCODING		= "Content-Encoding";							//$NON-NLS-1$
 	public static final String	RESPONSE_HEADER_CONTENT_RANGE			= "Content-Range";								//$NON-NLS-1$
 	public static final String	RESPONSE_HEADER_CONTENT_TYPE			= "Content-Type";								//$NON-NLS-1$
@@ -96,7 +98,14 @@ public class WEB {
 	private static final String	FILE_EXTENSION_JGZ						= "jgz";										//$NON-NLS-1$
 	private static final String	FILE_EXTENSION_JPG						= "jpg";										//$NON-NLS-1$
 	private static final String	FILE_EXTENSION_JS						= "js";										//$NON-NLS-1$
+	private static final String	FILE_EXTENSION_MAP						= "map";										//$NON-NLS-1$
 	private static final String	FILE_EXTENSION_PNG						= "png";										//$NON-NLS-1$
+
+	/**
+	 * HTML page which contains variable replacements which are processed in
+	 * {@link ReplacingOutputStream}.
+	 */
+	public static final String	FILE_EXTENSION_MTHTML					= "mthtml";									//$NON-NLS-1$
 
 	/**
 	 * @param path
@@ -257,18 +266,21 @@ public class WEB {
 	 * 
 	 * @param httpExchange
 	 * @param file
+	 * @return Returns the file extension.
 	 */
-	public static void setResponseHeaderContentType(final HttpExchange httpExchange, final File file) {
+	public static String setResponseHeaderContentType(final HttpExchange httpExchange, final File file) {
 
 		String contentType = null;
 		boolean isCompressed = false;
 
 		final Path path = new Path(file.getAbsolutePath());
 
+		String extension = null;
 		String rawExtension = path.getFileExtension();
+
 		if (rawExtension != null) {
 
-			final String extension = rawExtension.toLowerCase();
+			extension = rawExtension.toLowerCase();
 
 			String compressedExtension = null;
 
@@ -294,6 +306,7 @@ public class WEB {
 				break;
 
 			case FILE_EXTENSION_HTML:
+			case FILE_EXTENSION_MTHTML:
 				contentType = CONTENT_TYPE_TEXT_HTML;
 				break;
 
@@ -328,6 +341,10 @@ public class WEB {
 				contentType = CONTENT_TYPE_APPLICATION_JAVASCRIPT;
 				break;
 
+			case FILE_EXTENSION_MAP: // .js.map
+				contentType = CONTENT_TYPE_APPLICATION_JSON;
+				break;
+
 			case FILE_EXTENSION_PNG:
 				contentType = CONTENT_TYPE_IMAGE_PNG;
 				break;
@@ -346,5 +363,7 @@ public class WEB {
 		if (isCompressed) {
 			responseHeaders.set(RESPONSE_HEADER_CONTENT_ENCODING, CONTENT_ENCODING_GZIP);
 		}
+
+		return extension;
 	}
 }

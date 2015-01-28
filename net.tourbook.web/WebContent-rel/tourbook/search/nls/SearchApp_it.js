@@ -1,3 +1,4 @@
 //>>built
-define("tourbook/search/nls/SearchApp_it",{"dijit/form/nls/ComboBox":{previousMessage:"Scelte precedenti",_localized:{},nextMessage:"Scelte successive"},"dijit/nls/loading":{_localized:{},loadingState:"Caricamento in corso...",errorState:"Si \u00e8 verificato un errore"},"dijit/form/nls/validate":{invalidMessage:"Il valore immesso non \u00e8 valido.",rangeMessage:"Questo valore \u00e8 fuori dall'intervallo consentito.",_localized:{},missingMessage:"Questo valore \u00e8 obbligatorio."}});
+define("tourbook/search/nls/SearchApp_it",{"tourbook/search/nls/Messages":{searchInput_PlaceHolder:"it",_localized:{}},"dijit/form/nls/ComboBox":{previousMessage:"Scelte precedenti",_localized:{},nextMessage:"Scelte successive"},"dijit/nls/loading":{_localized:{},loadingState:"Caricamento in corso...",errorState:"Si \u00e8 verificato un errore"},"dijit/form/nls/validate":{invalidMessage:"Il valore immesso non \u00e8 valido.",rangeMessage:"Questo valore \u00e8 fuori dall'intervallo consentito.",_localized:{},
+missingMessage:"Questo valore \u00e8 obbligatorio."}});
 //# sourceMappingURL=SearchApp_it.js.map

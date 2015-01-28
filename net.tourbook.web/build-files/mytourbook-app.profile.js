@@ -140,6 +140,7 @@ var profile = (function() {
 			// does not need to be explicitly defined in the `include` array.
 			'tourbook/search/SearchApp' : {
 
+				// these includes are necessary because they are used in a template
 				include :
 				[
 					'dijit/layout/LayoutContainer',

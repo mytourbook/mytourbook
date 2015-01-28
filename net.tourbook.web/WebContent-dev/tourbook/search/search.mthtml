@@ -16,10 +16,11 @@
 		var dojoConfig = 
 		{
 		 	async : 		true,
+			locale : 		'$LOCALE$',
+			//locale : 		'es',
+			//extraLocale : 	['cs_CZ', 'de', 'en', 'fr', 'it', 'nl']
 			//parseOnLoad : 	true,
 			//isDebug : 		true,
-			//locale : 		'en',
-			//extraLocale : 	[ 'de']
 		};
 		
 	</script>
@@ -34,16 +35,16 @@
  -->
  
 <!-- DEBUG build
+ -->
 	<link rel="stylesheet" href="search.css">
 	<script src="/dojo/dojo.js"></script>
- -->
 <!-- end DEBUG build -->
  
 <!-- RELEASE build
- -->	
 	<link rel="stylesheet" href="search.css.jgz">
 	<script src="/dojo/dojo.js.jgz" data-dojo-config="async:true"></script>
 	<script src="/tourbook/search/SearchApp.js.jgz" data-dojo-config="async:true"></script>
+ -->	
 <!-- end RELEASE build -->	
 	
 	<script>require(['tourbook/search/SearchApp' ]);</script>
@@ -51,9 +52,7 @@
 <body class="claro">
 
 	<div id="domLoading">
-		<!-- 
-		<div>Loading...</div>
-		 -->
+		<div>$MESSAGE_LOADING$</div>
 	</div>
 
 	
