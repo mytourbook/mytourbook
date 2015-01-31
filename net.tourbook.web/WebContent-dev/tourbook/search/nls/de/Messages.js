@@ -1,4 +1,5 @@
 define(//
 {
-	searchInput_PlaceHolder : 'de: Touren, Markierungen und Wegpunkte suchen'
+	searchInput_PlaceHolder : 'Touren, Markierungen und Wegpunkte suchen',
+	searchOptions_Tooltip : 'Einstellungen für die Suche.'
 });

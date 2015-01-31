@@ -42,9 +42,6 @@ public class WEB {
 	 * When <code>true</code> the web content is delivered from the
 	 * {@value #WEB_CONTENT_DEVELOPMENT_FOLDER} folder otherwise it is delivered from the
 	 * {@value #WEB_CONTENT_RELEASE_FOLDER} folder.
-	 * <p>
-	 * When switching between debug and none debug, the html sources must also be adjusted, like in
-	 * search.html.
 	 */
 	static boolean				IS_DEBUG								= true;
 

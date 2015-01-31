@@ -13,7 +13,7 @@
  * Look to `util/build/buildControlDefault.js` for more information on available options and their default values.
  */
 var profile = (function() {
-	
+
 	var dojoSource = "C:/E/js-resources/dojo/MyTourbook-DojoToolkit";
 
 	return {
@@ -140,7 +140,9 @@ var profile = (function() {
 			// does not need to be explicitly defined in the `include` array.
 			'tourbook/search/SearchApp' : {
 
-				// these includes are necessary because they are used in a template
+				/**
+				 * These includes are necessary, they are used in templates but not recognized by the dojo builder.
+				 */
 				include :
 				[
 					'dijit/layout/LayoutContainer',

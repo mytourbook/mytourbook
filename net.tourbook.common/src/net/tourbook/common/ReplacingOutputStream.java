@@ -51,9 +51,6 @@ public class ReplacingOutputStream extends OutputStream {
 
 			final int value = newValue.codePointAt(i);
 			delegate.write(value);
-
-			System.out.print(String.valueOf((char) value));
-			// TODO remove SYSTEM.OUT.PRINTLN
 		}
 	}
 
@@ -74,9 +71,6 @@ public class ReplacingOutputStream extends OutputStream {
 				replacement.add(b);
 			} else {
 				delegate.write(b);
-
-				System.out.print(String.valueOf((char) b));
-				// TODO remove SYSTEM.OUT.PRINTLN
 			}
 		}
 

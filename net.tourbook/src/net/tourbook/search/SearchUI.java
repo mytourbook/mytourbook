@@ -113,7 +113,7 @@ public class SearchUI implements XHRHandler, DisposeListener {
 	private static final String				JSON_SELECTED_ID						= "selectedId";										//$NON-NLS-1$
 	//
 	private static final String				SEARCH_FOLDER							= "/tourbook/search/";									//$NON-NLS-1$
-	private static final String				SEARCH_PAGE								= "search.html";										//$NON-NLS-1$
+	private static final String				SEARCH_PAGE								= "search.mthtml";										//$NON-NLS-1$
 	private static final String				SEARCH_SWT_CSS_FILE						= SEARCH_FOLDER + "search-swt.css";					//$NON-NLS-1$
 	static String							SEARCH_SWT_CSS_STYLE;
 	//
@@ -361,11 +361,11 @@ public class SearchUI implements XHRHandler, DisposeListener {
 		// hovered actions
 		if (hrefEditItem != null) {
 
-//			sb.append("<div class='action-container'>" //$NON-NLS-1$
-//					+ ("<table><tbody><tr>") //$NON-NLS-1$
-//					+ (TAG_TD + createHTML_20_Action(hrefEditItem, hoverMessage, _actionUrl_EditImage) + TAG_TD_END)
-//					+ "</tr></tbody></table>" // //$NON-NLS-1$
-//					+ "</div>\n"); //$NON-NLS-1$
+			sb.append("<div class='action-container'>" //$NON-NLS-1$
+					+ ("<table><tbody><tr>") //$NON-NLS-1$
+					+ (TAG_TD + createHTML_20_Action(hrefEditItem, hoverMessage, _actionUrl_EditImage) + TAG_TD_END)
+					+ "</tr></tbody></table>" // //$NON-NLS-1$
+					+ "</div>\n"); //$NON-NLS-1$
 		}
 
 		if (_isWebUI == false) {
@@ -758,7 +758,7 @@ public class SearchUI implements XHRHandler, DisposeListener {
 
 	@Override
 	public void widgetDisposed(final DisposeEvent e) {
-		
+
 		WebContentServer.removeXHRHandler(XHR_SEARCH_INPUT_HANDLER);
 	}
 
@@ -845,7 +845,9 @@ public class SearchUI implements XHRHandler, DisposeListener {
 
 		if (xhrSearchText != null) {
 
-			log.append("range: " + searchPosFrom + "-" + searchPosTo + "\t" + headers.entrySet());
+			if (WebContentServer.LOG_XHR) {
+				log.append("range: " + searchPosFrom + "-" + searchPosTo + "\t" + headers.entrySet());
+			}
 
 			String searchText = URLDecoder.decode(xhrSearchText, WEB.UTF_8);
 

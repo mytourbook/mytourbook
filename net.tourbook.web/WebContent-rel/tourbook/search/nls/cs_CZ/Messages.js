@@ -1,3 +1,3 @@
 //>>built
-define("tourbook/search/nls/cs_CZ/Messages",{searchInput_PlaceHolder:"cs_CZ"});
+define("tourbook/search/nls/cs_CZ/Messages",{});
 //# sourceMappingURL=Messages.js.map

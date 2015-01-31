@@ -15,7 +15,7 @@
 	<property name="dojoBuildFolder"				value="../../../../mytourbook-BUILD-dojo" />
 	<property name="dojoBuildReleaseFolder"			value="${dojoBuildFolder}/mt-dojo-release" />
 
-	<target name="all" depends="cleanBuild,cleanMTRelease,shrink,compress,copyResources" />
+	<target name="all" depends="cleanBuild,cleanMTRelease,shrink,copyResources,compress,cleanBuild" />
 
 	<target name="cleanBuild">
 		<echo level="info" message="Clean build folder" />
@@ -32,7 +32,7 @@
 
 	<target name="shrink">
 
-		<echo level="info" message="Copying src files into dojo root ..." />
+		<echo level="info" message="### Copying src files into dojo root ..." />
 		<copy todir="${tourbookInDojoToolkitFolder}" preservelastmodified="yes" verbose="no">
 			<fileset dir="${WebContentDevTourbook}">
 				<include name="**/*" />
@@ -77,23 +77,6 @@
 	</target>
 	
 	<target name="compress">
-		
-		<copy todir="${WebContentRelTourbook}" preservelastmodified="no" verbose="yes">
-			<fileset dir="${WebContentDevTourbook}">
-				<include name="**/*"/>
-				<exclude name="**/*.js"/>
-				<exclude name="**/search.css"/> <!-- this file is in the build layer -->
-			</fileset>
-		</copy>
-		
-		<copy todir="${WebContentRel}/tourbook/search/nls" preservelastmodified="no" verbose="yes">
-			<fileset dir="${dojoBuildReleaseFolder}/tourbook/search/nls">
-				<include name="**/*.js"/>
-				<!-- 
-				<exclude name="**/*uncompressed*"/>
-				-->
-			</fileset>
-		</copy>
 
 		<!--compress minimized files and create it in the src folder -->
 		<mkdir dir="${WebContentRel}/dojo"/>	
@@ -108,14 +91,37 @@
 
 	</target>
 
-	<!-- - - - - - - - - - - - - - - - - - 
-          target: copyResources                      
-         - - - - - - - - - - - - - - - - - -->
+	<!-- 
+		target: copyResources                      
+	-->
     <target name="copyResources">
+		
+    	<!--
+			copy MT resources without js
+		-->
+		<echo level="info" message="### Copying resources without js, dev->rel ..." />
+		<copy todir="${WebContentRelTourbook}" preservelastmodified="no" verbose="yes">
+			<fileset dir="${WebContentDevTourbook}">
+				<include name="**/*"/>
+				<exclude name="**/*.js"/>
+				<exclude name="**/search.css"/> <!-- this file is in the build layer -->
+			</fileset>
+		</copy>
+		
+    	<!--
+			copy MT nls resources
+		-->
+		<echo level="info" message="### Copying nls resources, build->rel ..." />
+		<copy todir="${WebContentRel}/tourbook/search/nls" preservelastmodified="no" verbose="yes">
+			<fileset dir="${dojoBuildReleaseFolder}/tourbook/search/nls">
+				<include name="**/*.js"/>
+			</fileset>
+		</copy>
             
     	<!--
-			copy MT resources
+			copy MT root resources
 		-->
+		<echo level="info" message="### Copying MT root resources, dev->rel ..." />
 		<copy todir="${WebContentRel}" preservelastmodified="no" verbose="yes">
 			<fileset dir="${WebContentDev}">
 				<include name="**/favicon.ico"/>
@@ -125,6 +131,7 @@
     	<!--
 			copy JS debug resources
 		-->
+		<echo level="info" message="### Copying JS debug resources, build->rel ..." />
 		<copy todir="${WebContentRel}" preservelastmodified="no" verbose="yes">
 			<fileset dir="${dojoBuildReleaseFolder}">
 				<include name="**/dojo.js.map"/>
@@ -141,6 +148,7 @@
     	<!--
 			copy Dojo resources
 		-->
+		<echo level="info" message="### Copying Dojo resources, toolkit->rel ..." />
 		<copy todir="${WebContentRel}" preservelastmodified="no" verbose="yes">
 			<fileset dir="${dojoToolkitFolder}" id="id">
 			    <include name="**/dgrid/css/skins/images/row_back.png"/>
@@ -149,11 +157,6 @@
 			    <include name="**/dijit/themes/claro/images/standardGradient.png"/>
 			</fileset>
 		</copy>
-    	
-    	<!-- 
-    		delete build files
-		<antcall target="cleanBuild" />
-    	-->
 
     </target>
 

@@ -50,43 +50,46 @@ import com.sun.net.httpserver.HttpServer;
  */
 public class WebContentServer {
 
-	private static final boolean			IS_DEBUG_PORT						= true;
-	private static final int				NUMBER_OF_SERVER_THREADS			= 1;
+	private static final boolean			IS_DEBUG_PORT				= true;
+	private static final int				NUMBER_OF_SERVER_THREADS	= 1;
 
 	// logs: time, url
-	private static final boolean			LOG_URL								= true;
-	private static final boolean			LOG_DOJO							= true;
+	private static boolean					LOG_URL						= true;
+	private static boolean					LOG_DOJO					= false;
 
 	// logs: header
-	private static final boolean			LOG_HEADER							= false;
+	private static boolean					LOG_HEADER					= false;
 
 	// logs: xhr
-	private static final boolean			LOG_XHR								= true;
+	public static boolean					LOG_XHR						= false;
 
-	private static final String				HTML_REPLACEMENT_MESSAGE_LOADING	= "MESSAGE_LOADING";	//$NON-NLS-1$
-	private static final String				HTML_REPLACEMENT_LOCALE				= "LOCALE";			//$NON-NLS-1$
+	// variables which are replaced in .mthtml files
+	private static final String				MTHTML_DOJO_SEARCH			= "DOJO_SEARCH";			//$NON-NLS-1$
+	private static final String				MTHTML_MESSAGE_LOADING		= "MESSAGE_LOADING";		//$NON-NLS-1$
+	private static final String				MTHTML_MESSAGE_SEARCH_TITLE	= "MESSAGE_SEARCH_TITLE";	//$NON-NLS-1$
+	private static final String				MTHTML_LOCALE				= "LOCALE";				//$NON-NLS-1$
 
-	private static final String				ROOT_FILE_PATH_NAME					= "/";					//$NON-NLS-1$
+	private static final String				ROOT_FILE_PATH_NAME			= "/";						//$NON-NLS-1$
 
-	private static final String				PROTOCOL_HTTP						= "http://";			//$NON-NLS-1$
-	private static final String				URI_INNER_PROTOCOL_FILE				= "/file:";			//$NON-NLS-1$
+	private static final String				PROTOCOL_HTTP				= "http://";				//$NON-NLS-1$
+	private static final String				URI_INNER_PROTOCOL_FILE		= "/file:";				//$NON-NLS-1$
 
-	private static final String				REQUEST_PATH_TOURBOOK				= "/tourbook";			//$NON-NLS-1$
+	private static final String				REQUEST_PATH_TOURBOOK		= "/tourbook";				//$NON-NLS-1$
 
-	private static final String				XHR_HEADER_KEY						= "X-requested-with";	//$NON-NLS-1$
-	private static final String				XHR_HEADER_VALUE					= "XMLHttpRequest";	//$NON-NLS-1$
+	private static final String				XHR_HEADER_KEY				= "X-requested-with";		//$NON-NLS-1$
+	private static final String				XHR_HEADER_VALUE			= "XMLHttpRequest";		//$NON-NLS-1$
 
-	private static final String				DOJO_ROOT							= "/dojo/";			//$NON-NLS-1$
-	private static final String				DOJO_DIJIT							= "/dijit/";			//$NON-NLS-1$
-	private static final String				DOJO_DGRID							= "/dgrid/";			//$NON-NLS-1$
-	private static final String				DOJO_DSTORE							= "/dstore/";			//$NON-NLS-1$
-	private static final String				DOJO_PUT_SELECTOR					= "/put-selector/";	//$NON-NLS-1$
-	private static final String				DOJO_XSTYLE							= "/xstyle/";			//$NON-NLS-1$
+	private static final String				DOJO_ROOT					= "/dojo/";				//$NON-NLS-1$
+	private static final String				DOJO_DIJIT					= "/dijit/";				//$NON-NLS-1$
+	private static final String				DOJO_DGRID					= "/dgrid/";				//$NON-NLS-1$
+	private static final String				DOJO_DSTORE					= "/dstore/";				//$NON-NLS-1$
+	private static final String				DOJO_PUT_SELECTOR			= "/put-selector/";		//$NON-NLS-1$
+	private static final String				DOJO_XSTYLE					= "/xstyle/";				//$NON-NLS-1$
 
 	static String							SERVER_URL;
 
-	private static Map<String, XHRHandler>	_allXHRHandler						= new HashMap<>();
-	private static Map<String, Object>		_replacementValues					= new HashMap<>();
+	private static Map<String, XHRHandler>	_allXHRHandler				= new HashMap<>();
+	private static Map<String, Object>		_mthtmlValues				= new HashMap<>();
 
 	private static HttpServer				_server;
 	private static final int				_serverPort;
@@ -108,8 +111,32 @@ public class WebContentServer {
 
 		SERVER_URL = PROTOCOL_HTTP + loopbackAddress.getHostAddress() + ':' + _serverPort;
 
-		_replacementValues.put(HTML_REPLACEMENT_LOCALE, Locale.getDefault().getLanguage());
-		_replacementValues.put(HTML_REPLACEMENT_MESSAGE_LOADING, Messages.Web_Content_Loading);
+		// Steps when switching between DEBUG and RELEASE build:
+		// =====================================================
+		// - Set DEBUG flag in WEB.java
+		// - Run ant file Create-Dojo-Bundle.xml when RELEASE build is enabled.
+		// - Restart app.
+
+		final String dojoSearch = WEB.IS_DEBUG //
+
+				? "" //$NON-NLS-1$
+
+						// DEBUG build
+						+ "	<link rel='stylesheet' href='search.css'>					\n" //$NON-NLS-1$
+						+ "	<script src='/dojo/dojo.js'></script>						\n" //$NON-NLS-1$
+
+				: "" //$NON-NLS-1$
+
+						// RELEASE build
+						+ "	<link rel='stylesheet' href='search.css.jgz'>				\n" //$NON-NLS-1$
+						+ "	<script src='/dojo/dojo.js.jgz'></script>					\n" //$NON-NLS-1$
+						+ "	<script src='/tourbook/search/SearchApp.js.jgz'></script>	\n" //$NON-NLS-1$
+		;
+
+		_mthtmlValues.put(MTHTML_DOJO_SEARCH, dojoSearch);
+		_mthtmlValues.put(MTHTML_LOCALE, Locale.getDefault().getLanguage());
+		_mthtmlValues.put(MTHTML_MESSAGE_LOADING, Messages.Web_Content_Loading);
+		_mthtmlValues.put(MTHTML_MESSAGE_SEARCH_TITLE, Messages.Search_Title);
 	}
 
 	private static class DefaultHandler implements HttpHandler {
@@ -165,27 +192,33 @@ public class WebContentServer {
 				requestUriPath = WEB.DOJO_TOOLKIT_FOLDER + requestUriPath;
 			}
 
+			/*
+			 * Log request
+			 */
 			if (isDojoRequest) {
 				if (LOG_DOJO) {
 					log.append(requestUriPath);
 				}
+			} else if (isXHR) {
+
+				if (LOG_XHR) {
+					log.append(requestUriPath);
+					logParameter(httpExchange, log);
+				}
+
 			} else {
 
-				if (LOG_URL || LOG_XHR) {
+				if (LOG_URL) {
 					log.append(requestUriPath);
-				}
-				if (LOG_URL && LOG_XHR) {
-					logParameter(httpExchange, log);
 				}
 				if (LOG_HEADER && isXHR) {
 					logHeader(log, headerEntries);
 				}
 			}
 
-//			if (LOG_HEADER) {
-//				logHeader(log, headerEntries);
-//			}
-
+			/*
+			 * Handle request
+			 */
 			if (isXHR) {
 
 				// XHR request
@@ -328,15 +361,15 @@ public class WebContentServer {
 
 			if (extension.equals(WEB.FILE_EXTENSION_MTHTML)) {
 
-				replacingOS = new ReplacingOutputStream(os, _replacementValues);
+				// replaces also values in .mthtml files
+
+				replacingOS = new ReplacingOutputStream(os, _mthtmlValues);
 
 				int c;
 
 				while ((c = fs.read()) != -1) {
 					replacingOS.write(c);
 				}
-
-//				os.flush();
 
 			} else {
 

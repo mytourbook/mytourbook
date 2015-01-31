@@ -1,26 +1,33 @@
 define(
 [
 	'dojo/_base/declare',
-	"dojo/_base/fx",
+	'dojo/_base/fx',
 	'dojo/_base/lang',
 	'dojo/aspect',
-	"dojo/dom",
-	"dojo/dom-class",
-	"dojo/dom-style",
-	"dojo/mouse",
-	"dojo/on",
-	"dojo/parser",
-	"dojo/request/xhr",
-	"dijit/registry",
+	'dojo/dom',
+	'dojo/dom-class',
+	'dojo/dom-style',
+	'dojo/mouse',
+	'dojo/on',
+	'dojo/parser',
+	'dojo/request/xhr',
+
+	'dijit/form/Button',
+	'dijit/registry',
+
 	'dgrid/Keyboard',
 	'dgrid/OnDemandList',
-	"dgrid/Selection",
+	'dgrid/Selection',
 	'dstore/QueryResults',
 	'dstore/RequestMemory',
+
 	'put-selector/put',
+
+//	'./DialogSearchOptions',
 	'./SearchInput',
 	'./SearchMgr',
 	'dojo/i18n!./nls/Messages',
+
 	'dojo/domReady!'
 ], function(
 //
@@ -37,6 +44,7 @@ on, //
 parser, //
 xhr, //
 
+Button, //
 registry, //
 
 Keyboard, //
@@ -47,31 +55,49 @@ RequestMemory, //
 
 put, //
 
+//DialogSearchOptions, //
 SearchInput, //
 SearchMgr, //
 Messages //
 ) {
 
-	var SearchApp = declare("tourbook.search.SearchApp", [], {
+	var SearchApp = declare('tourbook.search.SearchApp', [], {
 
 		createUI : function createUI() {
 
-			require([], function(mouse, dom, domClass, on) {
-			});
+			/**
+			 * domActionSearchOptions
+			 */
+			this._actionOptions = new Button({
 
-			on(dom.byId("hoverNode"), mouse.enter, function() {
-				domClass.add("hoverNode", "hoverClass");
-			});
+				// label is displayed as tooltip
+				label : Messages.searchOptions_Tooltip,
+				showLabel : false,
+				iconClass : 'actionOptionsIcon',
 
-			on(dom.byId("hoverNode"), mouse.leave, function() {
-				domClass.remove("hoverNode", "hoverClass");
-			});
+//				onClick : function() {
+//
+////					alert('test button clicked')
+//
+//					var dlgSearchOptions = new DialogSearchOptions({
+//						fitContentArea : false,
+//						resizable : true,
+//					});
+//
+//					dlgSearchOptions.show(item, item.repository);
+//				}
 
+			}, 'domActionSearchOptions');
+			this._actionOptions.startup();
+
+			/**
+			 * domSearchInput
+			 */
 			this._searchInput = new SearchInput({
 
 				id : 'searchInput',
 				name : 'idSearch',
-				
+
 				// this will overwrite all dijit classes for this dom node
 //				baseClass : 'domSearchInput',
 
@@ -84,7 +110,7 @@ Messages //
 				labelType : 'html'
 
 			}, 'domSearchInput');
-			
+
 			domClass.add(this._searchInput.domNode, 'domSearchInput');
 
 			var grid = this.createUI_Grid();
@@ -101,7 +127,7 @@ Messages //
 
 			// copied from http://dgrid.io/tutorials/0.4/grids_and_stores/demo/OnDemandGrid-comparison.html
 			// ??? WHEN fetchRange IS NOT DEFINED, DATA WILL NOT BE RETRIEVED ???
-			var collection = new (declare("tourbook.search.ResultStore", RequestMemory, {
+			var collection = new (declare('tourbook.search.ResultStore', RequestMemory, {
 
 				fetchRange : function(kwArgs) {
 
@@ -129,20 +155,20 @@ Messages //
 
 				// a valid url is necessary
 				// target will be set for each search request
-				//			target : "about:blank",
+				//			target : 'about:blank',
 				target : self._searchInput.getSearchUrl(),
 
 				useRangeHeaders : true
 			});
 
-			var grid = new (declare("tourbook.search.ResultUIList",
+			var grid = new (declare('tourbook.search.ResultUIList',
 			[
 				OnDemandList,
 				Keyboard,
 				Selection
 			], {
 
-				selectionMode : "single",
+				selectionMode : 'single',
 
 				renderRow : function(value) {
 
@@ -162,7 +188,7 @@ Messages //
 
 			}, 'domGrid');
 
-			grid.on("dgrid-select", function(event) {
+			grid.on('dgrid-select', function(event) {
 
 				// tour, marker or waypoint is selected -> select it in the UI
 
@@ -175,7 +201,7 @@ Messages //
 
 				xhr(SearchMgr.XHR_SEARCH_HANDLER, {
 
-					handleAs : "json",
+					handleAs : 'json',
 					preventCache : true,
 					timeout : 60000,
 
@@ -195,7 +221,7 @@ Messages //
 
 			// fade out loading message
 			fx.fadeOut({
-				node : "domLoading",
+				node : 'domLoading',
 				duration : 200,
 
 				// hide loading layer

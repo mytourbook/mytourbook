@@ -9,53 +9,30 @@
 	<meta http-equiv='X-UA-Compatible' content='IE=edge' />
  -->
 
-	<title>Search</title>
+	<title>$MESSAGE_SEARCH_TITLE$</title>
+	<link rel='stylesheet' href='default.css'>
+
+</head>
+
+<body class="claro">
+
+	<div id="domLoading">
+		<div>$MESSAGE_LOADING$</div>
+	</div>
     	
 	<script type="text/javascript">
 		
 		var dojoConfig = 
 		{
-		 	async : 		true,
-			//parseOnLoad : 	true,
-			//isDebug : 		true,
-			//locale : 		'en',
-			//extraLocale : 	[ 'de']
+		 	async : 	true,
+			locale : 	'$LOCALE$',
 		};
 		
 	</script>
-	
-<!--
-	Steps when switching between DEBUG and RELEASE build:
-	=====================================================
-	- Set DEBUG flag in WEB.java
-	- Enable DEBUG or RELEASE build.
-	- Run ant file Create-Dojo-Bundle.xml when RELEASE build is enabled.
-	- Restart app.
- -->
- 
-<!-- DEBUG build
-	<link rel="stylesheet" href="search.css">
-	<script src="/dojo/dojo.js"></script>
- -->
-<!-- end DEBUG build -->
- 
-<!-- RELEASE build
- -->	
-	<link rel="stylesheet" href="search.css.jgz">
-	<script src="/dojo/dojo.js.jgz" data-dojo-config="async:true"></script>
-	<script src="/tourbook/search/SearchApp.js.jgz" data-dojo-config="async:true"></script>
-<!-- end RELEASE build -->	
-	
-	<script>require(['tourbook/search/SearchApp' ]);</script>
-</head>
-<body class="claro">
 
-	<div id="domLoading">
-		<!-- 
-		<div>Loading...</div>
-		 -->
-	</div>
-
+$DOJO_SEARCH$
+	
+	<script>require(['tourbook/search/SearchApp']);</script>
 	
 	<div id="domContainer"
 	    data-dojo-type="dijit/layout/LayoutContainer">
@@ -72,6 +49,14 @@
 					<td style="padding-left:0.2em;">
 					    <div id="hoverNode"></div>
 					</td>
+					<td style="padding-left:0.2em;">
+					    <div id="hoverNode"></div>
+					    <div id="domButtonOptions" 
+					    	data-dojo-type="dijit/form/Button"
+					        data-dojo-props="onClick: function(){ console.log('First button was clicked!'); }">
+					        Click Me!
+					    </div>
+					</td>
 				</tr>
 			</table>
 	    </div>
@@ -87,6 +72,6 @@
 	    </div>
 
 	</div>
-
+	
 </body>
 </html>
