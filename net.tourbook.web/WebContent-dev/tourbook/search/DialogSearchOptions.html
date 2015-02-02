@@ -1,35 +1,156 @@
-<div
-	data-dojo-attach-point="_apContainer"
-	data-dojo-type="idx.layout.BorderContainer"
-	data-dojo-props="gutters:true">
+<div id="${id}">
 	
-	<div
-		data-dojo-attach-point="_apTopPane"
-		data-dojo-type="dijit.layout.ContentPane"
-		data-dojo-props="splitter:true,region:'top'"
-		style="position: relative;">
-
-		<div
-			data-dojo-attach-point="_apSloshBucket"
-			style=" position:	absolute;
-					top: 		0;
-					left: 		0;
-					right: 		0;
-
-					/* it is very complicated to set a bottom margin, it needs absolute and relative positioning */
-					bottom: 	10px;	
+	<div class="dijitDialogPaneContentArea">
+	
+		<div id="groupSorting" 
+			data-dojo-type="dijit/TitlePane" 
+			data-dojo-props="toggleable:false, title: '${messages.searchOptions_Group_Sorting}'">
+			
+			<table>
+				<tr>
+					<td style="padding-right:2em;">
+						${messages.searchOptions_Label_SortAscending}					
+					</td>
+					<td>
+						<input 
+							id="sortByDateAscending" 
+							data-dojo-type="dijit/form/RadioButton"
+							data-dojo-attach-event="click:onSelection">
+						<label for="sortByDateAscending">${messages.searchOptions_Radio_SortAscending}</label>
 					
-					min-height:	100px;
-					min-width:	300px;
-					">
+						<input 
+							id="sortByDateDescending" 
+							data-dojo-type="dijit/form/RadioButton"
+							data-dojo-attach-event="click:onSelection">
+						<label for="sortByDateDescending">${messages.searchOptions_Radio_SortDescending}</label>
+					</td>
+				</tr>
+			</table>
+		</div>
+		<br>
+		<div id="groupResult" 
+			data-dojo-type="dijit/TitlePane" 
+			data-dojo-props="toggleable:false, title: '${messages.searchOptions_Group_Result}'">
+			
+			<!-- Show date/time -->
+			<div class="formFieldVSpace">
+				<input id="chkShowDateTime" 
+					data-dojo-type="dijit/form/CheckBox" 
+					data-dojo-attach-event="click:onSelection"/> 
+				<label for="chkShowDateTime">${messages.searchOptions_Checkbox_ShowDateTime}</label>
+			</div>
+			
+			<!-- Show item number -->
+			<div class="formFieldVSpace">
+				<input id="chkShowItemNumber" 
+					data-dojo-type="dijit/form/CheckBox" 
+					data-dojo-attach-event="click:onSelection"/> 
+				<label for="chkShowItemNumber">${messages.searchOptions_Checkbox_ShowItemNumber}</label>
+			</div>
+			
+			<!-- Show Lucene doc ID -->
+			<div class="formFieldVSpace">
+				<input id="chkShowLuceneID" 
+					data-dojo-type="dijit/form/CheckBox" 
+					data-dojo-attach-event="click:onSelection"/> 
+				<label for="chkShowLuceneID">${messages.searchOptions_Checkbox_ShowLuceneDocId}</label>
+			</div>
+			
+			<!-- Number ob displayed results -->
+			<div class="formFieldVSpace">
+				<label for="spinnerDisplayedResults" 
+					style="padding-right: 1em;">${messages.searchOptions_Spinner_DisplayedResults}</label>
+					
+				<input id="spinnerDisplayedResults"
+					data-dojo-type="dijit/form/NumberSpinner"
+				    data-dojo-props="smallDelta:10, constraints:{min:1, max:1000, places:0}"
+					data-dojo-attach-event="change:onSelection,click:onSelection"
+					style="width:5em"/> 
+			</div>
 		</div>
 	</div>
-	
-	<div
-		data-dojo-attach-point="centerPane"
-		data-dojo-type="dijit.layout.ContentPane"
-		data-dojo-props="region:'center'">
 
-		<div>Snippet_002_Dialog</div>
+	<!-- 
+
+
+
+		<script>
+			require(["dijit/form/RadioButton", "dojo/on", "dijit/registry", "dojo/parser", "dojo/domReady!"], function(RadioButton, on, registry, parser){
+				parser.parse();
+
+				on(document.getElementById("summaryBtn"), "click", function(evt){
+					var toppings = [];
+
+					if(registry.byId("topping1").get("checked")){
+						toppings.push(registry.byId("topping1").get("value"));
+					}
+
+					if(registry.byId("topping2").get("checked")){
+						toppings.push(registry.byId("topping2").get("value"));
+					}
+
+					if(registry.byId("topping3").get("checked")) {
+						toppings.push(registry.byId("topping3").get("value"));
+					}
+
+					alert("Topping: " + toppings.join(", "));
+				});
+			});
+
+		</script>	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+			
+<div id="tp2" data-dojo-type="dijit/TitlePane" data-dojo-props="title: '<img src=\'images/bullet.png\'>I\'m a TitlePane Too'">
+    Click arrow to close me.
+</div>
+
+
+    <div class="dijitDialogPaneActionBar">
+        <button data-dojo-type="dijit/form/Button" type="button" data-dojo-attach-event="click:actionRegister">Register</button>
+        <button data-dojo-type="dijit/form/Button" type="button" data-dojo-attach-event="click:actionCancel">Cancel</button>
+    </div>
+	 
+	 
+	<div data-dojo-type="dijit/layout/ContentPane">
+		<label>Sorting by Date</label>
+	
+		<input 
+			id="mycheck" 
+			name="mycheck" 
+			data-dojo-type="dijit/form/CheckBox" 
+			value="agreed" 
+			checked 
+			onChange="alert('onChange called with parameter = ' + arguments[0] + ', and widget value = ' + this.get('value'))" /> 
+		<label for="mycheck">I agree</label>
+				data-dojo-attach-point="_apSloshBucket"
+	 -->	
+	
+		
+	<!-- 
+		<div 	
+			id="domChkSortByDateAscending" 
+			data-dojo-type="dijit/form/Checkbox"></div>
+		<label for="domChkSortByDateAscending">Ascending</label>
+	
+		<div data-dojo-attach-point="domChkSortByDateDescending"
+		
+			id="domChkSortByDateAscending" 
+			data-dojo-type="dijit/form/Checkbox"></div>
+		<label for="domChkSortByDateAscending">I agree</label>
+	
 	</div>
+	 -->
 </div>

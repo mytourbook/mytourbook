@@ -28,7 +28,6 @@
     box-shadow:				none;
 }
 
-.search .dijitButtonNode:hover,
 .search .dijitButtonHover .dijitButtonNode {
     background-color: 		#ddd;
 }
@@ -40,6 +39,7 @@
 .search .dijitTextBox
 {
 	border-color: 			#f4f4f4;
+	background-color:		#f4f4f4;
 }
 
 .search .dijitTextBoxFocused
@@ -73,7 +73,6 @@
 .domSearchInput
 {
 	width:					100%;
-	background-color:		#f4f4f4		!important; /* !important is VERY IMPORTANT to overwrite dijit styles */
 }
 
 /*

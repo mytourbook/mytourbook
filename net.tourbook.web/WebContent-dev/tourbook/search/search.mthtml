@@ -14,7 +14,7 @@
 
 </head>
 
-<body class="claro search">
+<body class="claro">
 
 	<div id="domLoading">
 		<div>$MESSAGE_LOADING$</div>
@@ -24,8 +24,9 @@
 		
 		var dojoConfig = 
 		{
-		 	async : 	true,
-			locale : 	'$LOCALE$',
+		 	//parseOnLoad:	true,
+		 	async : 		true,			// this is very important otherwise loading is very slow
+			locale : 		'$LOCALE$',
 		};
 		
 	</script>
@@ -39,6 +40,7 @@ $DOJO_SEARCH$
 	    data-dojo-type="dijit/layout/LayoutContainer">
     
 	    <div id="domSearchInputContainer"
+	    	class="search"
 	        data-dojo-type="dijit/layout/ContentPane"
 	        data-dojo-props="region:'top'">
 	        

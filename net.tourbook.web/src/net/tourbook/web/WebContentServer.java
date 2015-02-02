@@ -55,7 +55,7 @@ public class WebContentServer {
 
 	// logs: time, url
 	private static boolean					LOG_URL						= true;
-	private static boolean					LOG_DOJO					= false;
+	private static boolean					LOG_DOJO					= true;
 
 	// logs: header
 	private static boolean					LOG_HEADER					= false;

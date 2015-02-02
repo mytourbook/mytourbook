@@ -23,7 +23,7 @@ define(
 
 	'put-selector/put',
 
-//	'./DialogSearchOptions',
+	'./DialogSearchOptions',
 	'./SearchInput',
 	'./SearchMgr',
 	'dojo/i18n!./nls/Messages',
@@ -55,7 +55,7 @@ RequestMemory, //
 
 put, //
 
-//DialogSearchOptions, //
+DialogSearchOptions, //
 SearchInput, //
 SearchMgr, //
 Messages //
@@ -65,8 +65,14 @@ Messages //
 
 		createUI : function createUI() {
 
+			var self = this;
+
+			// set 'search' class to overwrite css theme properties
+//			var searchInputContainer=registry.byId('domSearchInputContainer');
+//			domClass.add(searchInputContainer, 'search');
+
 			/**
-			 * domActionSearchOptions
+			 * Action: Search Options
 			 */
 			this._actionOptions = new Button({
 
@@ -75,23 +81,28 @@ Messages //
 				showLabel : false,
 				iconClass : 'actionOptionsIcon',
 
-//				onClick : function() {
-//
-////					alert('test button clicked')
-//
-//					var dlgSearchOptions = new DialogSearchOptions({
-//						fitContentArea : false,
-//						resizable : true,
-//					});
-//
-//					dlgSearchOptions.show(item, item.repository);
-//				}
+				onClick : function() {
+
+					var dlgSearchOptions = self._dlgSearchOptions;
+
+					dlgSearchOptions.showDialog({
+						title : Messages.searchOptions_Title
+					});
+				}
 
 			}, 'domActionSearchOptions');
 			this._actionOptions.startup();
 
+			/*
+			 * Dialog: Search options
+			 */
+			this._dlgSearchOptions = new DialogSearchOptions({
+//						fitContentArea : false,
+				resizable : true
+			});
+
 			/**
-			 * domSearchInput
+			 * Field: Search input
 			 */
 			this._searchInput = new SearchInput({
 

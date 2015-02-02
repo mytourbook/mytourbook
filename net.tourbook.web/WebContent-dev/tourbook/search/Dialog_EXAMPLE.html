@@ -1,0 +1,35 @@
+<div
+	data-dojo-attach-point="_apContainer"
+	data-dojo-type="idx.layout.BorderContainer"
+	data-dojo-props="gutters:true">
+	
+	<div
+		data-dojo-attach-point="_apTopPane"
+		data-dojo-type="dijit.layout.ContentPane"
+		data-dojo-props="splitter:true,region:'top'"
+		style="position: relative;">
+
+		<div
+			data-dojo-attach-point="_apSloshBucket"
+			style=" position:	absolute;
+					top: 		0;
+					left: 		0;
+					right: 		0;
+
+					/* it is very complicated to set a bottom margin, it needs absolute and relative positioning */
+					bottom: 	10px;	
+					
+					min-height:	100px;
+					min-width:	300px;
+					">
+		</div>
+	</div>
+	
+	<div
+		data-dojo-attach-point="centerPane"
+		data-dojo-type="dijit.layout.ContentPane"
+		data-dojo-props="region:'center'">
+
+		<div>Snippet_002_Dialog</div>
+	</div>
+</div>
