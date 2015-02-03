@@ -515,11 +515,9 @@ public class SlideoutSearchOptions extends AnimatedToolTipShell implements IColo
 
 	private void setDefaults() {
 
-		SearchUI.state.put(SearchUI.STATE_IS_SHOW_DATE_TIME, SearchUI.STATE_IS_SHOW_DATE_TIME_DEFAULT);
-		SearchUI.state.put(SearchUI.STATE_IS_SHOW_ITEM_NUMBER, SearchUI.STATE_IS_SHOW_ITEM_NUMBER_DEFAULT);
-		SearchUI.state.put(SearchUI.STATE_IS_SHOW_LUCENE_DOC_ID, SearchUI.STATE_IS_SHOW_LUCENE_DOC_ID_DEFAULT);
-		SearchUI.state.put(SearchUI.STATE_IS_SORT_DATE_ASCENDING, SearchUI.STATE_IS_SORT_DATE_ASCENDING_DEFAULT);
+		SearchUI.setSearchOptionDefaults();
 
+		// these are only SWT UI properties
 		SearchUI.state
 				.put(SearchViewSWT.STATE_IS_SHOW_TOP_NAVIGATOR, SearchViewSWT.STATE_IS_SHOW_TOP_NAVIGATOR_DEFAULT);
 		SearchUI.state.put(SearchViewSWT.STATE_HITS_PER_PAGE, SearchViewSWT.STATE_HITS_PER_PAGE_DEFAULT);

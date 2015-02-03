@@ -1,8 +1,8 @@
 
 @import url(../../dojo/resources/dojo.css);
-@import url(../../dijit/themes/claro/claro.css);
+@import url(../../dijit/themes/tundra/tundra.css);
 @import url(../../dgrid/css/dgrid.css);
-@import url(../../dgrid/css/skins/claro.css);
+@import url(../../dgrid/css/skins/tundra.css);
 
 
 /*
@@ -49,11 +49,22 @@
 
 .search .dijitTextBoxHover
 {
-	background-image:		none;    	/* hide default gradient image */						
+	background-image:		none;    			/* hide default gradient image */						
 	border-width:			1px;	
 	border-color:			#aaa;
 }
 
+/*
+	Search options dialog
+*/
+.searchOptions .dijitDialog
+{
+	border:					1px solid #bbb;		/* replace blue border */
+}
+
+/*
+	Search container
+*/
 #domContainer 
 {
     height:					100%;

@@ -6,6 +6,8 @@ define(//
 
 		searchInput_PlaceHolder : 'Search Tours, Marker and Waypoints',
 
+		searchOptions_Action_RestoreDefaults : 'Restore Defaults',
+		
 		searchOptions_Group_Sorting : 'Sorting',
 		searchOptions_Group_Result : 'Result',
 
@@ -17,8 +19,6 @@ define(//
 
 		searchOptions_Radio_SortAscending : 'Ascending',
 		searchOptions_Radio_SortDescending : 'Descending',
-
-		searchOptions_Spinner_DisplayedResults : 'Number of displayed results',
 
 		searchOptions_Title : 'Search Options',
 		searchOptions_Tooltip : 'Search Options.',

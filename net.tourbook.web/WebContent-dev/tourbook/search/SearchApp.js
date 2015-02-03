@@ -201,7 +201,7 @@ Messages //
 
 			grid.on('dgrid-select', function(event) {
 
-				// tour, marker or waypoint is selected -> select it in the UI
+				// tour, marker or waypoint is selected -> fire an event, select it in the UI
 
 				var row = event.rows[0];
 				var selectedId = row.data[SearchMgr.XHR_PARAM_SELECTED_ID];

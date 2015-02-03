@@ -2,7 +2,10 @@
 	
 	<div class="dijitDialogPaneContentArea">
 	
-		<div id="groupSorting" 
+		
+		<!-- Group: Sorting -->
+		
+		<div 
 			data-dojo-type="dijit/TitlePane" 
 			data-dojo-props="toggleable:false, title: '${messages.searchOptions_Group_Sorting}'">
 			
@@ -12,145 +15,68 @@
 						${messages.searchOptions_Label_SortAscending}					
 					</td>
 					<td>
-						<input 
-							id="sortByDateAscending" 
+						<div id="apSortByDateAscending"
 							data-dojo-type="dijit/form/RadioButton"
-							data-dojo-attach-event="click:onSelection">
-						<label for="sortByDateAscending">${messages.searchOptions_Radio_SortAscending}</label>
+							data-dojo-attach-point="apSortByDateAscending"
+							data-dojo-attach-event="click:onSelection"></div>
+						<label for="apSortByDateAscending">${messages.searchOptions_Radio_SortAscending}</label>
 					
-						<input 
-							id="sortByDateDescending" 
+						<div id="apSortByDateDescending"
 							data-dojo-type="dijit/form/RadioButton"
-							data-dojo-attach-event="click:onSelection">
-						<label for="sortByDateDescending">${messages.searchOptions_Radio_SortDescending}</label>
+							data-dojo-attach-point="apSortByDateDescending"
+							data-dojo-attach-event="click:onSelection"></div>
+						<label for="apSortByDateDescending">${messages.searchOptions_Radio_SortDescending}</label>
 					</td>
 				</tr>
 			</table>
 		</div>
+		
 		<br>
-		<div id="groupResult" 
+		
+		
+		<!-- Group: Result -->
+		
+		<div 
 			data-dojo-type="dijit/TitlePane" 
 			data-dojo-props="toggleable:false, title: '${messages.searchOptions_Group_Result}'">
 			
 			<!-- Show date/time -->
 			<div class="formFieldVSpace">
-				<input id="chkShowDateTime" 
+				<div id="apChkShowDateTime"
 					data-dojo-type="dijit/form/CheckBox" 
-					data-dojo-attach-event="click:onSelection"/> 
-				<label for="chkShowDateTime">${messages.searchOptions_Checkbox_ShowDateTime}</label>
+					data-dojo-attach-point="apChkShowDateTime"
+					data-dojo-attach-event="click:onSelection"></div> 
+				<label for="apChkShowDateTime">${messages.searchOptions_Checkbox_ShowDateTime}</label>
 			</div>
 			
 			<!-- Show item number -->
 			<div class="formFieldVSpace">
-				<input id="chkShowItemNumber" 
+				<div id="apChkShowItemNumber"
 					data-dojo-type="dijit/form/CheckBox" 
-					data-dojo-attach-event="click:onSelection"/> 
-				<label for="chkShowItemNumber">${messages.searchOptions_Checkbox_ShowItemNumber}</label>
+					data-dojo-attach-point="apChkShowItemNumber"
+					data-dojo-attach-event="click:onSelection"></div> 
+				<label for="apChkShowItemNumber">${messages.searchOptions_Checkbox_ShowItemNumber}</label>
 			</div>
 			
 			<!-- Show Lucene doc ID -->
 			<div class="formFieldVSpace">
-				<input id="chkShowLuceneID" 
+				<div id="apChkShowLuceneID"
+					data-dojo-attach-point="apChkShowLuceneID"
 					data-dojo-type="dijit/form/CheckBox" 
-					data-dojo-attach-event="click:onSelection"/> 
-				<label for="chkShowLuceneID">${messages.searchOptions_Checkbox_ShowLuceneDocId}</label>
-			</div>
-			
-			<!-- Number ob displayed results -->
-			<div class="formFieldVSpace">
-				<label for="spinnerDisplayedResults" 
-					style="padding-right: 1em;">${messages.searchOptions_Spinner_DisplayedResults}</label>
-					
-				<input id="spinnerDisplayedResults"
-					data-dojo-type="dijit/form/NumberSpinner"
-				    data-dojo-props="smallDelta:10, constraints:{min:1, max:1000, places:0}"
-					data-dojo-attach-event="change:onSelection,click:onSelection"
-					style="width:5em"/> 
+					data-dojo-attach-event="click:onSelection"></div> 
+				<label for="apChkShowLuceneID">${messages.searchOptions_Checkbox_ShowLuceneDocId}</label>
 			</div>
 		</div>
-	</div>
-
-	<!-- 
-
-
-
-		<script>
-			require(["dijit/form/RadioButton", "dojo/on", "dijit/registry", "dojo/parser", "dojo/domReady!"], function(RadioButton, on, registry, parser){
-				parser.parse();
-
-				on(document.getElementById("summaryBtn"), "click", function(evt){
-					var toppings = [];
-
-					if(registry.byId("topping1").get("checked")){
-						toppings.push(registry.byId("topping1").get("value"));
-					}
-
-					if(registry.byId("topping2").get("checked")){
-						toppings.push(registry.byId("topping2").get("value"));
-					}
-
-					if(registry.byId("topping3").get("checked")) {
-						toppings.push(registry.byId("topping3").get("value"));
-					}
-
-					alert("Topping: " + toppings.join(", "));
-				});
-			});
-
-		</script>	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-			
-<div id="tp2" data-dojo-type="dijit/TitlePane" data-dojo-props="title: '<img src=\'images/bullet.png\'>I\'m a TitlePane Too'">
-    Click arrow to close me.
-</div>
-
-
-    <div class="dijitDialogPaneActionBar">
-        <button data-dojo-type="dijit/form/Button" type="button" data-dojo-attach-event="click:actionRegister">Register</button>
-        <button data-dojo-type="dijit/form/Button" type="button" data-dojo-attach-event="click:actionCancel">Cancel</button>
-    </div>
-	 
-	 
-	<div data-dojo-type="dijit/layout/ContentPane">
-		<label>Sorting by Date</label>
-	
-		<input 
-			id="mycheck" 
-			name="mycheck" 
-			data-dojo-type="dijit/form/CheckBox" 
-			value="agreed" 
-			checked 
-			onChange="alert('onChange called with parameter = ' + arguments[0] + ', and widget value = ' + this.get('value'))" /> 
-		<label for="mycheck">I agree</label>
-				data-dojo-attach-point="_apSloshBucket"
-	 -->	
-	
 		
-	<!-- 
-		<div 	
-			id="domChkSortByDateAscending" 
-			data-dojo-type="dijit/form/Checkbox"></div>
-		<label for="domChkSortByDateAscending">Ascending</label>
-	
-		<div data-dojo-attach-point="domChkSortByDateDescending"
+		<br>
 		
-			id="domChkSortByDateAscending" 
-			data-dojo-type="dijit/form/Checkbox"></div>
-		<label for="domChkSortByDateAscending">I agree</label>
-	
+		<!-- Actions -->
+		<div style="text-align:right;">
+			<span id="apActionDefaults"
+				data-dojo-type="dijit/form/Button"
+				data-dojo-attach-point="apActionDefaults"
+				data-dojo-attach-event="click:actionRestoreDefaults"
+				>${messages.searchOptions_Action_RestoreDefaults}</span> 
+		</div>
 	</div>
-	 -->
 </div>

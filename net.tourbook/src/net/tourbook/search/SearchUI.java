@@ -99,8 +99,10 @@ public class SearchUI implements XHRHandler, DisposeListener {
 	private static final String				XHR_ACTION_PROPOSALS					= "proposals";											//$NON-NLS-1$
 	private static final String				XHR_ACTION_SEARCH						= "search";											//$NON-NLS-1$
 	private static final String				XHR_ACTION_SELECT						= "select";											//$NON-NLS-1$
+	private static final String				XHR_ACTION_SET_SEARCH_OPTIONS			= "setSearchOptions";									//$NON-NLS-1$
 	//
 	private static final String				XHR_PARAM_ACTION						= "action";											//$NON-NLS-1$
+	private static final String				XHR_PARAM_SEARCH_OPTIONS				= "searchOptions";										//$NON-NLS-1$
 	private static final String				XHR_PARAM_SEARCH_TEXT					= "searchText";										//$NON-NLS-1$
 	private static final String				XHR_PARAM_SELECTED_ID					= "selectedId";										//$NON-NLS-1$
 	//
@@ -111,6 +113,13 @@ public class SearchUI implements XHRHandler, DisposeListener {
 	private static final String				JSON_NAME								= "name";												//$NON-NLS-1$
 	private static final String				JSON_HTML_CONTENT						= "htmlContent";										//$NON-NLS-1$
 	private static final String				JSON_SELECTED_ID						= "selectedId";										//$NON-NLS-1$
+	//
+	// search options
+	private static final String				JSON_IS_SEARCH_OPTIONS_DEFAULT			= "isSearchOptionsDefault";							//$NON-NLS-1$
+	private static final String				JSON_IS_SHOW_LUCENE_ID					= "isShowLuceneID";									//$NON-NLS-1$
+	private static final String				JSON_IS_SHOW_ITEM_NUMBER				= "isShowItemNumber";									//$NON-NLS-1$
+	private static final String				JSON_IS_SHOW_DATE_TIME					= "isShowDateTime";									//$NON-NLS-1$
+	private static final String				JSON_IS_SORT_BY_DATE_ASCENDING			= "isSortByDateAscending";								//$NON-NLS-1$
 	//
 	private static final String				SEARCH_FOLDER							= "/tourbook/search/";									//$NON-NLS-1$
 	private static final String				SEARCH_PAGE								= "search.mthtml";										//$NON-NLS-1$
@@ -264,6 +273,17 @@ public class SearchUI implements XHRHandler, DisposeListener {
 				STATE_IS_SORT_DATE_ASCENDING_DEFAULT);
 
 		FTSearchManager.setResultSorting(isSortDateAscending);
+	}
+
+	/**
+	 * Set defaults for the search options in the state.
+	 */
+	static void setSearchOptionDefaults() {
+
+		state.put(STATE_IS_SHOW_DATE_TIME, STATE_IS_SHOW_DATE_TIME_DEFAULT);
+		state.put(STATE_IS_SHOW_ITEM_NUMBER, STATE_IS_SHOW_ITEM_NUMBER_DEFAULT);
+		state.put(STATE_IS_SHOW_LUCENE_DOC_ID, STATE_IS_SHOW_LUCENE_DOC_ID_DEFAULT);
+		state.put(STATE_IS_SORT_DATE_ASCENDING, STATE_IS_SORT_DATE_ASCENDING_DEFAULT);
 	}
 
 	ItemResponse createHTML_10_Item(final SearchResultItem resultItem, final int itemNumber) {
@@ -520,6 +540,10 @@ public class SearchUI implements XHRHandler, DisposeListener {
 			xhr_Select(params);
 
 			// there is no response
+
+		} else if (XHR_ACTION_SET_SEARCH_OPTIONS.equals(action)) {
+
+			response = xhr_SetSearchOptions(params);
 
 		} else if (XHR_ACTION_PROPOSALS.equals(action)) {
 
@@ -927,6 +951,53 @@ public class SearchUI implements XHRHandler, DisposeListener {
 				}
 			});
 		}
+	}
+
+	/**
+	 * Set search options from the web UI.
+	 * 
+	 * @param params
+	 * @return
+	 * @throws UnsupportedEncodingException
+	 */
+	private String xhr_SetSearchOptions(final Map<String, Object> params) throws UnsupportedEncodingException {
+
+		final JSONObject responceObj = new JSONObject();
+
+		final Object xhrSearchOptions = params.get(XHR_PARAM_SEARCH_OPTIONS);
+		final String jsSearchOptions = URLDecoder.decode((String) xhrSearchOptions, WEB.UTF_8);
+		final JSONObject jsonSearchOptions = new JSONObject(jsSearchOptions);
+
+		if (jsonSearchOptions.isNull("isRestoreDefaults") == false) {
+
+			// the action restore default is selected in the web UI
+
+			setSearchOptionDefaults();
+
+			// return defaults
+
+			responceObj.put(JSON_IS_SEARCH_OPTIONS_DEFAULT, true);
+
+			responceObj.put(JSON_IS_SHOW_DATE_TIME, STATE_IS_SHOW_DATE_TIME_DEFAULT);
+			responceObj.put(JSON_IS_SHOW_ITEM_NUMBER, STATE_IS_SHOW_ITEM_NUMBER_DEFAULT);
+			responceObj.put(JSON_IS_SHOW_LUCENE_ID, STATE_IS_SHOW_LUCENE_DOC_ID_DEFAULT);
+
+			responceObj.put(JSON_IS_SORT_BY_DATE_ASCENDING, STATE_IS_SORT_DATE_ASCENDING_DEFAULT);
+
+		} else {
+
+			// update state
+
+			responceObj.put(JSON_IS_SEARCH_OPTIONS_DEFAULT, false);
+
+			state.put(STATE_IS_SHOW_DATE_TIME, jsonSearchOptions.getBoolean(JSON_IS_SHOW_DATE_TIME));
+			state.put(STATE_IS_SHOW_ITEM_NUMBER, jsonSearchOptions.getBoolean(JSON_IS_SHOW_ITEM_NUMBER));
+			state.put(STATE_IS_SHOW_LUCENE_DOC_ID, jsonSearchOptions.getBoolean(JSON_IS_SHOW_LUCENE_ID));
+
+			state.put(STATE_IS_SORT_DATE_ASCENDING, jsonSearchOptions.getBoolean(JSON_IS_SORT_BY_DATE_ASCENDING));
+		}
+
+		return responceObj.toString();
 	}
 
 }
