@@ -146,7 +146,7 @@
 		</copy>
 
     	<!--
-			copy Dojo resources
+			copy Dojo resources (images)
 		-->
 		<echo level="info" message="### Copying Dojo resources, toolkit->rel ..." />
 		<copy todir="${WebContentRel}" preservelastmodified="no" verbose="yes">
@@ -155,6 +155,22 @@
 			    <include name="**/dojo/resources/blank.gif"/>
 			    <include name="**/dijit/themes/claro/form/images/commonFormArrows.png"/>
 			    <include name="**/dijit/themes/claro/images/standardGradient.png"/>
+			    	
+				<!-- 
+				
+				/MyTourbook-DojoToolkit/dijit/themes/tundra/images/buttonActive.png
+				/MyTourbook-DojoToolkit/dijit/themes/tundra/images/buttonEnabled.png
+				/MyTourbook-DojoToolkit/dijit/themes/tundra/images/buttonHover.png
+				/MyTourbook-DojoToolkit/dijit/themes/tundra/images/checkmark.png
+				/MyTourbook-DojoToolkit/dijit/themes/tundra/images/spriteArrows.png
+				/MyTourbook-DojoToolkit/dijit/themes/tundra/images/tabClose.png
+				/MyTourbook-DojoToolkit/dijit/themes/tundra/images/tabCloseHover.png
+				/MyTourbook-DojoToolkit/dijit/themes/tundra/images/titleBar.png
+				/MyTourbook-DojoToolkit/dijit/themes/tundra/images/validationInputBg.png
+								
+				
+				-->
+				
 			</fileset>
 		</copy>
 

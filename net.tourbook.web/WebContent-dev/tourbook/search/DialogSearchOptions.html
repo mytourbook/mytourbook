@@ -11,20 +11,27 @@
 			
 			<table>
 				<tr>
-					<td style="padding-right:2em;">
+					<td style="padding-right:2em;     
+						white-space: nowrap;">
 						${messages.searchOptions_Label_SortAscending}					
 					</td>
-					<td>
-						<div id="apSortByDateAscending"
+					<td style="white-space: nowrap;">
+						<input 
+							type="radio" 
+					    	name="sorting" 
+							id="apSortByDateAscending"
 							data-dojo-type="dijit/form/RadioButton"
 							data-dojo-attach-point="apSortByDateAscending"
-							data-dojo-attach-event="click:onSelection"></div>
+							data-dojo-attach-event="change:apSelection"/>
 						<label for="apSortByDateAscending">${messages.searchOptions_Radio_SortAscending}</label>
 					
-						<div id="apSortByDateDescending"
+						<input 
+							type="radio" 
+					    	name="sorting" 
+							id="apSortByDateDescending"
 							data-dojo-type="dijit/form/RadioButton"
 							data-dojo-attach-point="apSortByDateDescending"
-							data-dojo-attach-event="click:onSelection"></div>
+							data-dojo-attach-event="change:apSelection"/>
 						<label for="apSortByDateDescending">${messages.searchOptions_Radio_SortDescending}</label>
 					</td>
 				</tr>
@@ -42,28 +49,41 @@
 			
 			<!-- Show date/time -->
 			<div class="formFieldVSpace">
-				<div id="apChkShowDateTime"
+			<!-- 
+				<input type="checkbox" name="vehicle" value="Bike"/>I have a bike
+				<br>
+			    	name="apChkShowDateTime"
+			    	value="apChkShowDateTime" 
+			 -->
+				<input 
+					type="checkbox" 
+					id="apChkShowDateTime"
 					data-dojo-type="dijit/form/CheckBox" 
 					data-dojo-attach-point="apChkShowDateTime"
-					data-dojo-attach-event="click:onSelection"></div> 
+					data-dojo-attach-event="click:apSelection"/> 
 				<label for="apChkShowDateTime">${messages.searchOptions_Checkbox_ShowDateTime}</label>
+				<br>
 			</div>
 			
 			<!-- Show item number -->
 			<div class="formFieldVSpace">
-				<div id="apChkShowItemNumber"
+				<input 
+					type="checkbox" 
+					id="apChkShowItemNumber"
 					data-dojo-type="dijit/form/CheckBox" 
 					data-dojo-attach-point="apChkShowItemNumber"
-					data-dojo-attach-event="click:onSelection"></div> 
+					data-dojo-attach-event="click:apSelection"/> 
 				<label for="apChkShowItemNumber">${messages.searchOptions_Checkbox_ShowItemNumber}</label>
 			</div>
 			
 			<!-- Show Lucene doc ID -->
 			<div class="formFieldVSpace">
-				<div id="apChkShowLuceneID"
+				<input 
+					type="checkbox" 
+					id="apChkShowLuceneID"
 					data-dojo-attach-point="apChkShowLuceneID"
 					data-dojo-type="dijit/form/CheckBox" 
-					data-dojo-attach-event="click:onSelection"></div> 
+					data-dojo-attach-event="click:apSelection"/> 
 				<label for="apChkShowLuceneID">${messages.searchOptions_Checkbox_ShowLuceneDocId}</label>
 			</div>
 		</div>
@@ -75,7 +95,7 @@
 			<span id="apActionDefaults"
 				data-dojo-type="dijit/form/Button"
 				data-dojo-attach-point="apActionDefaults"
-				data-dojo-attach-event="click:actionRestoreDefaults"
+				data-dojo-attach-event="click:apActionRestoreDefaults"
 				>${messages.searchOptions_Action_RestoreDefaults}</span> 
 		</div>
 	</div>

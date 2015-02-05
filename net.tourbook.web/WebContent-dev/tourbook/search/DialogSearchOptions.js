@@ -1,6 +1,8 @@
 define(
 [
 	'dojo/_base/declare',
+	"dojo/_base/lang",
+	'dojo/on',
 	"dojo/request/xhr",
 
 	'dijit/form/NumberSpinner',
@@ -16,6 +18,8 @@ define(
 ], function(//
 //	
 declare, //
+lang, //
+on, //
 xhr, //
 
 // these widgets MUST be preloaded when used in the template
@@ -37,10 +41,30 @@ Messages //
 
 		templateString : template,
 
-		// create field which is needed that the messages can be accessed
+		// create messages field which is needed that messages can be accessed in the template
 		messages : Messages,
 
-		actionRestoreDefaults : function actionRestoreDefaults() {
+		postCreate : function() {
+
+			this.inherited(arguments);
+
+			// hide dialog when mouse has leaved it
+			on(this.domNode, "mouseleave", lang.hitch(this, "hideDialog"));
+		},
+
+		/**
+		 * Overwrite BaseDialog.showDialog and restore the state of the UI.
+		 */
+		showDialog : function showDialog() {
+
+			this._searchApp = arguments[0].searchApp;
+
+			this.inherited(arguments);
+
+			this._restoreState();
+		},
+
+		apActionRestoreDefaults : function apActionRestoreDefaults() {
 
 			this._setSearchOptions({
 
@@ -48,25 +72,29 @@ Messages //
 			});
 		},
 
-		create : function() {
-			return this.inherited(arguments);
-		},
+		/**
+		 * Selection is from an attach point.
+		 */
+		apSelection : function apSelection() {
 
-		onSelection : function onSelection() {
-
-			this._setSearchOptions({
-
+			var searchOptions = //
+			{
 				isSortByDateAscending : apSortByDateAscending.checked,
 
 				isShowDateTime : apChkShowDateTime.checked,
 				isShowItemNumber : apChkShowItemNumber.checked,
 				isShowLuceneID : apChkShowLuceneID.checked
-			});
+			};
+
+			this._setSearchOptions(searchOptions);
 		},
 
+		/**
+		 * Set search options in the backend and reload current search with new search options.
+		 */
 		_setSearchOptions : function _setSearchOptions(searchOptions) {
 
-			var self = this;
+			var _this = this;
 
 			var jsonSearchOptions = JSON.stringify(searchOptions);
 
@@ -87,22 +115,47 @@ Messages //
 				if (xhrData.isSearchOptionsDefault) {
 
 					// set defaults in the UI
-
-					self.apSortByDateAscending.set('checked', xhrData.isSortByDateAscending);
-					self.apSortByDateDescending.set('checked', !xhrData.isSortByDateAscending);
-
-					self.apChkShowDateTime.set('checked', xhrData.isShowDateTime);
-					self.apChkShowItemNumber.set('checked', xhrData.isShowItemNumber);
-					self.apChkShowLuceneID.set('checked', xhrData.isShowLuceneID);
+					_this._updateUIFromState(_this, xhrData);
 				}
 
 				// repeat previous search
 
-			}, function(err) {
-
-				// Handle the error condition
-				console.error("error: " + err);
+				_this._searchApp._searchInput.loadSearchResults(true);
 			});
+		},
+
+		/**
+		 * 
+		 */
+		_restoreState : function _restoreState(callBack) {
+
+			var _this = this;
+
+			var xhrQuery = {};
+			xhrQuery[SearchMgr.XHR_PARAM_ACTION] = SearchMgr.XHR_ACTION_GET_SEARCH_OPTIONS;
+
+			xhr(SearchMgr.XHR_SEARCH_HANDLER, {
+
+				handleAs : 'json',
+				preventCache : true,
+				timeout : 5000,
+
+				query : xhrQuery
+
+			}).then(function(xhrData) {
+
+				_this._updateUIFromState(_this, xhrData);
+			});
+		},
+
+		_updateUIFromState : function _updateUIFromState(dialog, xhrData) {
+
+			dialog.apSortByDateAscending.set('checked', xhrData.isSortByDateAscending);
+			dialog.apSortByDateDescending.set('checked', !xhrData.isSortByDateAscending);
+
+			dialog.apChkShowDateTime.set('checked', xhrData.isShowDateTime);
+			dialog.apChkShowItemNumber.set('checked', xhrData.isShowItemNumber);
+			dialog.apChkShowLuceneID.set('checked', xhrData.isShowLuceneID);
 		}
 
 	});

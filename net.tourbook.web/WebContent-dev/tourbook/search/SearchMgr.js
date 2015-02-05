@@ -19,6 +19,8 @@ function(declare) {
 	SearchMgr.XHR_ACTION_PROPOSALS = "proposals";
 	SearchMgr.XHR_ACTION_SEARCH = "search";
 	SearchMgr.XHR_ACTION_SELECT = "select";
+	
+	SearchMgr.XHR_ACTION_GET_SEARCH_OPTIONS = "getSearchOptions";
 	SearchMgr.XHR_ACTION_SET_SEARCH_OPTIONS = "setSearchOptions";
 
 	SearchMgr.XHR_PARAM_SEARCH_OPTIONS = "searchOptions";

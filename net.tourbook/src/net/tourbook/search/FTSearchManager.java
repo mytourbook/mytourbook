@@ -1078,7 +1078,7 @@ public class FTSearchManager {
 	public static void setupSuggester() {
 
 		if (_suggester == null) {
-			
+
 //			_suggester = setupSuggester_Analyzing();
 //			_suggester = setupSuggester_AnalyzingInfix();
 //			_suggester = setupSuggester_NGramAnalyzing();

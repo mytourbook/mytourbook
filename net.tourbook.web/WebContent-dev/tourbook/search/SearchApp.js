@@ -65,47 +65,57 @@ Messages //
 
 		createUI : function createUI() {
 
-			var self = this;
-
-			// set 'search' class to overwrite css theme properties
-//			var searchInputContainer=registry.byId('domSearchInputContainer');
-//			domClass.add(searchInputContainer, 'search');
+			var app = this;
 
 			/**
-			 * Action: Search Options
+			 * Action: Show search options.
 			 */
-			this._actionOptions = new Button({
-
+			this._actionSearchOptions = new Button(//
+			{
 				// label is displayed as tooltip
 				label : Messages.searchOptions_Tooltip,
+
 				showLabel : false,
 				iconClass : 'actionOptionsIcon',
 
+				// show dialog when button is pressed with the keyboard
 				onClick : function() {
+					this.showDialog();
+				},
 
-					var dlgSearchOptions = self._dlgSearchOptions;
+				// show dialog when action button is hovered
+				onMouseOver : function() {
+					this.showDialog();
+				},
 
-					dlgSearchOptions.showDialog({
-						title : Messages.searchOptions_Title
-					});
+				showDialog : function showDialog() {
+
+					var dialogProperties = //
+					{
+						title : Messages.searchOptions_Title,
+
+						// set flag that the dialog is positioned below this button
+						layoutParent : this,
+
+						searchApp : app
+					};
+
+					app._dlgSearchOptions.showDialog(dialogProperties);
 				}
 
 			}, 'domActionSearchOptions');
-			this._actionOptions.startup();
+			this._actionSearchOptions.startup();
 
-			/*
+			/**
 			 * Dialog: Search options
 			 */
-			this._dlgSearchOptions = new DialogSearchOptions({
-//						fitContentArea : false,
-				resizable : true
-			});
+			this._dlgSearchOptions = new DialogSearchOptions();
 
 			/**
 			 * Field: Search input
 			 */
-			this._searchInput = new SearchInput({
-
+			this._searchInput = new SearchInput(//
+			{
 				id : 'searchInput',
 				name : 'idSearch',
 
@@ -134,12 +144,12 @@ Messages //
 
 		createUI_Grid : function createUI_Grid() {
 
-			var self = this;
+			var app = this;
 
 			// copied from http://dgrid.io/tutorials/0.4/grids_and_stores/demo/OnDemandGrid-comparison.html
 			// ??? WHEN fetchRange IS NOT DEFINED, DATA WILL NOT BE RETRIEVED ???
-			var collection = new (declare('tourbook.search.ResultStore', RequestMemory, {
-
+			var collection = new (declare('tourbook.search.ResultStore', RequestMemory,//
+			{
 				fetchRange : function(kwArgs) {
 
 					var start = kwArgs.start, //
@@ -151,7 +161,7 @@ Messages //
 					var results = this._request(requestArgs);
 
 					// keep data from the reponse which contain additional data, e.g. status, error
-					self.responseData = results.response
+					app.responseData = results.response
 
 					var queryResult = new QueryResults(//
 					results.data, //
@@ -167,7 +177,7 @@ Messages //
 				// a valid url is necessary
 				// target will be set for each search request
 				//			target : 'about:blank',
-				target : self._searchInput.getSearchUrl(),
+				target : app._searchInput.createSearchUrl(),
 
 				useRangeHeaders : true
 			});

@@ -515,7 +515,7 @@ public class SlideoutSearchOptions extends AnimatedToolTipShell implements IColo
 
 	private void setDefaults() {
 
-		SearchUI.setSearchOptionDefaults();
+		SearchUI.setStateDefaultSearchOption();
 
 		// these are only SWT UI properties
 		SearchUI.state

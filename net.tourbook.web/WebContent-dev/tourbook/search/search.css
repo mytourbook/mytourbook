@@ -33,9 +33,8 @@
 }
 
 /*
-	Dijit overwrites for the search text field.
+	Overwrite dijit for the search text field.
 */
-
 .search .dijitTextBox
 {
 	border-color: 			#f4f4f4;
@@ -55,7 +54,7 @@
 }
 
 /*
-	Search options dialog
+	Overwrite dijit for the search options dialog.
 */
 .searchOptions .dijitDialog
 {

@@ -1298,7 +1298,7 @@ public class SearchViewSWT extends ViewPart {
 				STATE_IS_SHOW_TOP_NAVIGATOR,
 				STATE_IS_SHOW_TOP_NAVIGATOR_DEFAULT);
 
-		SearchUI.restoreState_Options();
+		SearchUI.setInternalSearchOptions();
 	}
 
 	private void saveState() {

@@ -31,8 +31,7 @@ SearchMgr //
 ) {
 
 	var SearchUI = declare("tourbook.search.SearchInput",
-	[
-		FilteringSelect
+	[ FilteringSelect
 	], {
 
 		_loadProposals : function _loadProposals(xhrSearchText) {
@@ -78,16 +77,19 @@ SearchMgr //
 			});
 		},
 
-		_loadSearchResults : function _loadSearchResults() {
+		/**
+		 * Get search results for the current search text.
+		 */
+		loadSearchResults : function loadSearchResults(isForceRefresh) {
 
 			// show selected item
 
-			var newSearchUrl = this.getSearchUrl();
+			var newSearchUrl = this.createSearchUrl();
 
-			console.warn("_loadSearchResults '" + newSearchUrl + "'");
+			console.warn("loadSearchResults '" + newSearchUrl + "'");
 
 			// check if loading is needed
-			if (this._currentSearchUrl !== newSearchUrl) {
+			if (isForceRefresh || this._currentSearchUrl !== newSearchUrl) {
 
 				// keep current search
 				this._currentSearchUrl = newSearchUrl;
@@ -119,7 +121,7 @@ SearchMgr //
 
 			// load results only with the <Enter> key
 			if (event.keyCode == keys.ENTER) {
-				this._loadSearchResults();
+				this.loadSearchResults();
 			}
 		},
 
@@ -127,7 +129,7 @@ SearchMgr //
 			return this.get('displayedValue').trim();
 		},
 
-		getSearchUrl : function getSearchUrl() {
+		createSearchUrl : function createSearchUrl() {
 
 			var searchText = this.getSearchText();
 

@@ -99,6 +99,7 @@ public class SearchUI implements XHRHandler, DisposeListener {
 	private static final String				XHR_ACTION_PROPOSALS					= "proposals";											//$NON-NLS-1$
 	private static final String				XHR_ACTION_SEARCH						= "search";											//$NON-NLS-1$
 	private static final String				XHR_ACTION_SELECT						= "select";											//$NON-NLS-1$
+	private static final String				XHR_ACTION_GET_SEARCH_OPTIONS			= "getSearchOptions";									//$NON-NLS-1$
 	private static final String				XHR_ACTION_SET_SEARCH_OPTIONS			= "setSearchOptions";									//$NON-NLS-1$
 	//
 	private static final String				XHR_PARAM_ACTION						= "action";											//$NON-NLS-1$
@@ -130,10 +131,11 @@ public class SearchUI implements XHRHandler, DisposeListener {
 	private static String					_iconUrl_Tour;
 	private static String					_iconUrl_Marker;
 	private static String					_iconUrl_WayPoint;
-	private static boolean					_isUIShowDateTime;
-
-	private static boolean					_isUIShowItemNumber;
-	private static boolean					_isUIShowLuceneDocId;
+	//
+	private static boolean					_isUI_ShowDateTime;
+	private static boolean					_isUI_ShowItemNumber;
+	private static boolean					_isUI_ShowLuceneDocId;
+	private static boolean					_isUI_SortDateAscending;
 
 	private static final DateTimeFormatter	_dateFormatter							= DateTimeFormat.mediumDate();
 	//
@@ -254,35 +256,41 @@ public class SearchUI implements XHRHandler, DisposeListener {
 		}
 	}
 
-	static void restoreState_Options() {
+	/**
+	 * Set internal search options from the state. These internal options are used when creating the
+	 * search result.
+	 */
+	static void setInternalSearchOptions() {
 
-		_isUIShowDateTime = Util.getStateBoolean(state, //
+		_isUI_ShowDateTime = Util.getStateBoolean(state, //
 				STATE_IS_SHOW_DATE_TIME,
 				STATE_IS_SHOW_DATE_TIME_DEFAULT);
 
-		_isUIShowLuceneDocId = Util.getStateBoolean(state, //
+		_isUI_ShowLuceneDocId = Util.getStateBoolean(state, //
 				STATE_IS_SHOW_LUCENE_DOC_ID,
 				STATE_IS_SHOW_LUCENE_DOC_ID_DEFAULT);
 
-		_isUIShowItemNumber = Util.getStateBoolean(state, //
+		_isUI_ShowItemNumber = Util.getStateBoolean(state, //
 				STATE_IS_SHOW_ITEM_NUMBER,
 				STATE_IS_SHOW_ITEM_NUMBER_DEFAULT);
 
-		final boolean isSortDateAscending = Util.getStateBoolean(state,//
+		_isUI_SortDateAscending = Util.getStateBoolean(state,//
 				STATE_IS_SORT_DATE_ASCENDING,
 				STATE_IS_SORT_DATE_ASCENDING_DEFAULT);
 
-		FTSearchManager.setResultSorting(isSortDateAscending);
+		// set sorting in the search manager
+		FTSearchManager.setResultSorting(_isUI_SortDateAscending);
 	}
 
 	/**
 	 * Set defaults for the search options in the state.
 	 */
-	static void setSearchOptionDefaults() {
+	static void setStateDefaultSearchOption() {
 
 		state.put(STATE_IS_SHOW_DATE_TIME, STATE_IS_SHOW_DATE_TIME_DEFAULT);
 		state.put(STATE_IS_SHOW_ITEM_NUMBER, STATE_IS_SHOW_ITEM_NUMBER_DEFAULT);
 		state.put(STATE_IS_SHOW_LUCENE_DOC_ID, STATE_IS_SHOW_LUCENE_DOC_ID_DEFAULT);
+
 		state.put(STATE_IS_SORT_DATE_ASCENDING, STATE_IS_SORT_DATE_ASCENDING_DEFAULT);
 	}
 
@@ -426,12 +434,12 @@ public class SearchUI implements XHRHandler, DisposeListener {
 					}
 
 					// info
-					if (_isUIShowDateTime || _isUIShowItemNumber || _isUIShowLuceneDocId) {
+					if (_isUI_ShowDateTime || _isUI_ShowItemNumber || _isUI_ShowLuceneDocId) {
 
 						sb.append("<div class='item-info'>"); //$NON-NLS-1$
 						sb.append("<table><tbody><tr>");
 						{
-							if (_isUIShowDateTime) {
+							if (_isUI_ShowDateTime) {
 
 								final long tourStartTime = resultItem.tourStartTime;
 								if (tourStartTime != 0) {
@@ -445,11 +453,11 @@ public class SearchUI implements XHRHandler, DisposeListener {
 								}
 							}
 
-							if (_isUIShowItemNumber) {
+							if (_isUI_ShowItemNumber) {
 								sb.append(TAG_TD + Integer.toString(itemNumber) + TAG_TD_END);
 							}
 
-							if (_isUIShowLuceneDocId) {
+							if (_isUI_ShowLuceneDocId) {
 								sb.append(TAG_TD + String.format("%d", docId) + TAG_TD_END);
 							}
 						}
@@ -540,6 +548,10 @@ public class SearchUI implements XHRHandler, DisposeListener {
 			xhr_Select(params);
 
 			// there is no response
+
+		} else if (XHR_ACTION_GET_SEARCH_OPTIONS.equals(action)) {
+
+			response = xhr_GetSearchOptions(params);
 
 		} else if (XHR_ACTION_SET_SEARCH_OPTIONS.equals(action)) {
 
@@ -807,6 +819,22 @@ public class SearchUI implements XHRHandler, DisposeListener {
 		}
 	}
 
+	private String xhr_GetSearchOptions(final Map<String, Object> params) {
+
+		// ensure state options are set
+		setInternalSearchOptions();
+
+		final JSONObject responceObj = new JSONObject();
+
+		responceObj.put(JSON_IS_SHOW_DATE_TIME, _isUI_ShowDateTime);
+		responceObj.put(JSON_IS_SHOW_ITEM_NUMBER, _isUI_ShowItemNumber);
+		responceObj.put(JSON_IS_SHOW_LUCENE_ID, _isUI_ShowLuceneDocId);
+
+		responceObj.put(JSON_IS_SORT_BY_DATE_ASCENDING, _isUI_SortDateAscending);
+
+		return responceObj.toString();
+	}
+
 	private String xhr_Proposals(final Map<String, Object> params) throws UnsupportedEncodingException {
 
 		final JSONObject jsonResponse = new JSONObject();
@@ -970,14 +998,15 @@ public class SearchUI implements XHRHandler, DisposeListener {
 
 		if (jsonSearchOptions.isNull("isRestoreDefaults") == false) {
 
-			// the action restore default is selected in the web UI
+			// the action 'Restore Default' is selected in the web UI
 
-			setSearchOptionDefaults();
+			setStateDefaultSearchOption();
+			setInternalSearchOptions();
 
-			// return defaults
-
+			// set flag that defaults are returned
 			responceObj.put(JSON_IS_SEARCH_OPTIONS_DEFAULT, true);
 
+			// create xhr response with default values
 			responceObj.put(JSON_IS_SHOW_DATE_TIME, STATE_IS_SHOW_DATE_TIME_DEFAULT);
 			responceObj.put(JSON_IS_SHOW_ITEM_NUMBER, STATE_IS_SHOW_ITEM_NUMBER_DEFAULT);
 			responceObj.put(JSON_IS_SHOW_LUCENE_ID, STATE_IS_SHOW_LUCENE_DOC_ID_DEFAULT);
@@ -988,16 +1017,18 @@ public class SearchUI implements XHRHandler, DisposeListener {
 
 			// update state
 
-			responceObj.put(JSON_IS_SEARCH_OPTIONS_DEFAULT, false);
-
 			state.put(STATE_IS_SHOW_DATE_TIME, jsonSearchOptions.getBoolean(JSON_IS_SHOW_DATE_TIME));
 			state.put(STATE_IS_SHOW_ITEM_NUMBER, jsonSearchOptions.getBoolean(JSON_IS_SHOW_ITEM_NUMBER));
 			state.put(STATE_IS_SHOW_LUCENE_DOC_ID, jsonSearchOptions.getBoolean(JSON_IS_SHOW_LUCENE_ID));
 
 			state.put(STATE_IS_SORT_DATE_ASCENDING, jsonSearchOptions.getBoolean(JSON_IS_SORT_BY_DATE_ASCENDING));
+
+			setInternalSearchOptions();
+
+			// create xhr response
+			responceObj.put(JSON_IS_SEARCH_OPTIONS_DEFAULT, false);
 		}
 
 		return responceObj.toString();
 	}
-
 }
