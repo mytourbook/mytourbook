@@ -13,7 +13,9 @@ define(
 	'dojo/request/xhr',
 
 	'dijit/form/Button',
+	"dijit/popup",
 	'dijit/registry',
+	'dijit/TooltipDialog',
 
 	'dgrid/Keyboard',
 	'dgrid/OnDemandList',
@@ -45,7 +47,9 @@ parser, //
 xhr, //
 
 Button, //
+popup, //
 registry, //
+TooltipDialog, //
 
 Keyboard, //
 OnDemandList, //
@@ -64,6 +68,46 @@ Messages //
 	var SearchApp = declare('tourbook.search.SearchApp', [], {
 
 		createUI : function createUI() {
+
+			this._createUI_Actions();
+
+			/**
+			 * Dialog: Search options
+			 */
+			this._dlgSearchOptions = new DialogSearchOptions(//
+			{
+				searchApp : this
+			});
+
+			/**
+			 * Field: Search input
+			 */
+			this._searchInput = new SearchInput(//
+			{
+				id : 'searchInput',
+				name : 'idSearch',
+
+				placeHolder : Messages.searchInput_PlaceHolder,
+
+				hasDownArrow : false,
+
+				searchAttr : 'id',
+				labelAttr : 'name',
+				labelType : 'html'
+
+			}, 'domSearchInput');
+
+			domClass.add(this._searchInput.domNode, 'domSearchInput');
+
+			var grid = this.createUI_Grid();
+
+			this._searchInput.setGrid(grid);
+
+			// set focus to the search field
+			this._searchInput.focus();
+		},
+
+		_createUI_Actions : function _createUI_Actions() {
 
 			var app = this;
 
@@ -96,8 +140,6 @@ Messages //
 
 						// set flag that the dialog is positioned below this button
 						layoutParent : this,
-
-						searchApp : app
 					};
 
 					app._dlgSearchOptions.showDialog(dialogProperties);
@@ -105,41 +147,6 @@ Messages //
 
 			}, 'domActionSearchOptions');
 			this._actionSearchOptions.startup();
-
-			/**
-			 * Dialog: Search options
-			 */
-			this._dlgSearchOptions = new DialogSearchOptions();
-
-			/**
-			 * Field: Search input
-			 */
-			this._searchInput = new SearchInput(//
-			{
-				id : 'searchInput',
-				name : 'idSearch',
-
-				// this will overwrite all dijit classes for this dom node
-//				baseClass : 'domSearchInput',
-
-				placeHolder : Messages.searchInput_PlaceHolder,
-
-				hasDownArrow : false,
-
-				searchAttr : 'id',
-				labelAttr : 'name',
-				labelType : 'html'
-
-			}, 'domSearchInput');
-
-			domClass.add(this._searchInput.domNode, 'domSearchInput');
-
-			var grid = this.createUI_Grid();
-
-			this._searchInput.setGrid(grid);
-
-			// set focus to the search field
-			this._searchInput.focus();
 		},
 
 		createUI_Grid : function createUI_Grid() {
@@ -150,29 +157,64 @@ Messages //
 			// ??? WHEN fetchRange IS NOT DEFINED, DATA WILL NOT BE RETRIEVED ???
 			var collection = new (declare('tourbook.search.ResultStore', RequestMemory,//
 			{
-				fetchRange : function(kwArgs) {
+				/**
+				 * Overwrite fetchRange in dstore.Cache
+				 */
+				fetchRange : function(args) {
 
-					var start = kwArgs.start, //
-					end = kwArgs.end, //
+					var //
+					start = args.start, //
+					end = args.end, //
 
 					requestArgs = {};
 					requestArgs.headers = this._renderRangeHeaders(start, end);
 
-					var results = this._request(requestArgs);
+					var response = this._request(requestArgs);
 
 					// keep data from the reponse which contain additional data, e.g. status, error
-					app.responseData = results.response
+					app.responseData = response.response
 
+					/*
+					 * Create query result
+					 */
 					var queryResult = new QueryResults(//
-					results.data, //
+
+					// data
+					response.data, //
+
+					// options
 					{
-						totalLength : results.total,
-						response : results.response
+						totalLength : response.total,
+						response : response.response
+					});
+
+					/*
+					 * Update status
+					 */
+					response.response.then(function(args) {
+
+						var //
+
+						/*
+						 * The data must be parsed a second time but didn't find a solution to do it better after 2 days of
+						 * try and error.
+						 */
+						requestData = JSON.parse(args.data), //
+
+						searchText = app._searchInput.getSearchText(), //
+						searchTime = requestData.searchTime, //
+						searchTotal = requestData.totalHits, //
+
+						statusText = "" + searchTotal + " - " + searchTime;
+
+						// update status
+						dom.byId('domAppStatus').innerHTML = statusText;
 					});
 
 					return queryResult;
 				}
-			}))({
+			}))(//
+			{
 
 				// a valid url is necessary
 				// target will be set for each search request
@@ -209,9 +251,8 @@ Messages //
 
 			}, 'domGrid');
 
+			// fire an event when tour, marker or waypoint is selected to select it in the UI
 			grid.on('dgrid-select', function(event) {
-
-				// tour, marker or waypoint is selected -> fire an event, select it in the UI
 
 				var row = event.rows[0];
 				var selectedId = row.data[SearchMgr.XHR_PARAM_SELECTED_ID];
@@ -224,13 +265,18 @@ Messages //
 
 					handleAs : 'json',
 					preventCache : true,
-					timeout : 60000,
+					timeout : SearchMgr.XHR_TIMEOUT,
 
 					query : xhrQuery
 				});
 			});
 
 			return grid;
+		},
+
+		_createUI_Status : function() {
+
+			this.apStatus.innerHTML = "test";
 		},
 
 		startApp : function startApp() {

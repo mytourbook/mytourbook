@@ -50,7 +50,8 @@
 {
 	background-image:		none;    			/* hide default gradient image */						
 	border-width:			1px;	
-	border-color:			#aaa;
+	xborder-color:			#aaa;
+	border-color:			#f4f4f4;
 }
 
 /*
@@ -86,6 +87,15 @@
 }
 
 /*
+	Search status
+*/
+#domAppStatus
+{
+	text-align: 			right;
+	white-space:			nowrap;
+}
+
+/*
 	Search options
 */
 .actionOptionsIcon
@@ -96,6 +106,11 @@
 	background-image: 		url("/tourbook/resources/options.png");
 	background-repeat:		no-repeat;
 	background-position: 	center;
+}
+
+#domSearchStatus
+{
+	color:					red;
 }
 
 /*

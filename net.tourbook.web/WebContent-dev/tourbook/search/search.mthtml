@@ -46,8 +46,11 @@ $DOJO_SEARCH$
 	        
 			<table style="width:100%">
 				<tr>
-					<td style="width:100%; padding-left:0.2em; padding-right:0.4em;">
+					<td style="width:99%; padding-left:0.2em; padding-right:0.4em;">
 				    	<div id="domSearchInput"></div>
+					</td>
+					<td>
+						<div id="domAppStatus" title="Searchresults - Searchtime">&nbsp;</div>
 					</td>
 					<td>
 					    <div id="domActionSearchOptions"></div>
@@ -63,7 +66,6 @@ $DOJO_SEARCH$
 			<div id="domError"></div>
 	        
 			<div id="domGrid"></div>
-			<div id="domStatus"></div>
 	    </div>
 
 	</div>

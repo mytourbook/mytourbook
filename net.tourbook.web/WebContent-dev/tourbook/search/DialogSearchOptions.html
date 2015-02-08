@@ -2,6 +2,62 @@
 	
 	<div class="dijitDialogPaneContentArea">
 	
+		<div id="domSearchStatus" style="padding-bottom:0.2em;"></div>
+	
+	
+		<!-- Group: Content -->
+		
+		<div 
+			data-dojo-type="dijit/TitlePane" 
+			data-dojo-props="toggleable:false, title: '${messages.searchOptions_Group_Content}'">
+			
+			<!-- Show All (tour, marker, waypoint)-->
+			
+			<div class="formFieldVSpace">
+				<input 
+					type="checkbox" 
+					id="apChkShowContentAll"
+					data-dojo-type="dijit/form/CheckBox" 
+					data-dojo-attach-point="apChkShowContentAll"
+					data-dojo-attach-event="click:apSearchAll"/> 
+				<label for="apChkShowContentAll">${messages.searchOptions_Checkbox_ShowContentAll}</label>
+			</div>
+			
+			<div style="padding-left:1em;">
+			
+				<!-- Show tours -->
+				<input 
+					type="checkbox" 
+					id="apChkShowContentTour"
+					data-dojo-type="dijit/form/CheckBox" 
+					data-dojo-attach-point="apChkShowContentTour"
+					data-dojo-attach-event="click:apSelection"/> 
+				<label for="apChkShowContentTour">${messages.searchOptions_Checkbox_ShowContentTour}</label>
+
+
+				<!-- Show marker -->
+				<input 
+					type="checkbox" 
+					id="apChkShowContentMarker"
+					data-dojo-type="dijit/form/CheckBox" 
+					data-dojo-attach-point="apChkShowContentMarker"
+					data-dojo-attach-event="click:apSelection"/> 
+				<label for="apChkShowContentMarker">${messages.searchOptions_Checkbox_ShowContentMarker}</label>
+
+				<!-- Show waypoints -->
+				<input 
+					type="checkbox" 
+					id="apChkShowContentWaypoint"
+					data-dojo-type="dijit/form/CheckBox" 
+					data-dojo-attach-point="apChkShowContentWaypoint"
+					data-dojo-attach-event="click:apSelection"/> 
+				<label for="apChkShowContentWaypoint">${messages.searchOptions_Checkbox_ShowContentWaypoint}</label>
+				
+			</div>
+		</div>
+		
+		<br>
+		
 		
 		<!-- Group: Sorting -->
 		
@@ -10,12 +66,16 @@
 			data-dojo-props="toggleable:false, title: '${messages.searchOptions_Group_Sorting}'">
 			
 			<table>
+			
+				<!-- Sort by date -->
 				<tr>
 					<td style="padding-right:2em;     
 						white-space: nowrap;">
 						${messages.searchOptions_Label_SortAscending}					
 					</td>
 					<td style="white-space: nowrap;">
+					
+						<!-- sort ascending -->
 						<input 
 							type="radio" 
 					    	name="sorting" 
@@ -25,6 +85,7 @@
 							data-dojo-attach-event="change:apSelection"/>
 						<label for="apSortByDateAscending">${messages.searchOptions_Radio_SortAscending}</label>
 					
+						<!-- sort descending -->
 						<input 
 							type="radio" 
 					    	name="sorting" 
@@ -49,12 +110,6 @@
 			
 			<!-- Show date/time -->
 			<div class="formFieldVSpace">
-			<!-- 
-				<input type="checkbox" name="vehicle" value="Bike"/>I have a bike
-				<br>
-			    	name="apChkShowDateTime"
-			    	value="apChkShowDateTime" 
-			 -->
 				<input 
 					type="checkbox" 
 					id="apChkShowDateTime"

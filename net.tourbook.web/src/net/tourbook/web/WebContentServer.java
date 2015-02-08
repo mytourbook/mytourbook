@@ -55,13 +55,13 @@ public class WebContentServer {
 
 	// logs: time, url
 	private static boolean					LOG_URL						= true;
-	private static boolean					LOG_DOJO					= true;
+	private static boolean					LOG_DOJO					= false;
 
 	// logs: header
 	private static boolean					LOG_HEADER					= false;
 
 	// logs: xhr
-	public static boolean					LOG_XHR						= false;
+	public static boolean					LOG_XHR						= true;
 
 	// variables which are replaced in .mthtml files
 	private static final String				MTHTML_DOJO_SEARCH			= "DOJO_SEARCH";			//$NON-NLS-1$

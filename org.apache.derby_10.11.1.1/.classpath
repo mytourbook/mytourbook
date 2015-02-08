@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
+	<classpathentry exported="true" kind="lib" path="lucene-queries-4.10.1.jar" sourcepath="C:/E/java-resources/apache/lucene/lucene-4.10.1-src.zip"/>
 	<classpathentry exported="true" kind="lib" path="lucene-misc-4.10.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lucene-suggest-4.10.1.jar" sourcepath="C:/E/java-resources/apache/lucene/lucene-4.10.1-src.zip"/>
 	<classpathentry exported="true" kind="lib" path="lucene-highlighter-4.10.1.jar" sourcepath="C:/E/java-resources/apache/lucene/lucene-4.10.1-src.zip"/>

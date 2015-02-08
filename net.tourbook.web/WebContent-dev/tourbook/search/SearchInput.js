@@ -55,7 +55,7 @@ SearchMgr //
 
 				handleAs : "json",
 				preventCache : true,
-				timeout : 60000,
+				timeout : SearchMgr.XHR_TIMEOUT,
 
 				query : query
 
@@ -125,6 +125,9 @@ SearchMgr //
 			}
 		},
 
+		/**
+		 * Returns text which is entered for searching.
+		 */
 		getSearchText : function getSearchText() {
 			return this.get('displayedValue').trim();
 		},

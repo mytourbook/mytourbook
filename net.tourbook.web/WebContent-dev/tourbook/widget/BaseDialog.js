@@ -46,7 +46,7 @@ Dialog //
 					content : this,
 
 					/**
-					 * Overwrite _position
+					 * Overwrite _position to pin the dialog to the layoutParent node.
 					 */
 					_position : function _position() {
 						// summary:
@@ -57,7 +57,7 @@ Dialog //
 
 						if (layoutParent) {
 
-							// pin the dialog to the bottom of the layoutParent
+							// pin this dialog to the bottom of the layoutParent
 
 							if (!domClass.contains(this.ownerDocumentBody, "dojoMove")) { // don't do anything if called during auto-scroll
 

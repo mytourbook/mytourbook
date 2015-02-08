@@ -15,7 +15,7 @@ table
 {
 	border-collapse:		collapse;
 
-	/* debug table */
+	/* show border to debug tables */
 	xborder:				1px solid; 
 }
 

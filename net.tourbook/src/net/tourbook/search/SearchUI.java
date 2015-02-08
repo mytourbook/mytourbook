@@ -74,6 +74,15 @@ public class SearchUI implements XHRHandler, DisposeListener {
 	final static IDialogSettings			state									= TourbookPlugin
 																							.getState("net.tourbook.search.SearchUI");		//$NON-NLS-1$
 
+	static final String						STATE_IS_SHOW_CONTENT_ALL				= "STATE_IS_SHOW_CONTENT_ALL";							//$NON-NLS-1$
+	static final boolean					STATE_IS_SHOW_CONTENT_ALL_DEFAULT		= true;
+	static final String						STATE_IS_SHOW_CONTENT_MARKER			= "STATE_IS_SHOW_CONTENT_MARKER";						//$NON-NLS-1$
+	static final boolean					STATE_IS_SHOW_CONTENT_MARKER_DEFAULT	= true;
+	static final String						STATE_IS_SHOW_CONTENT_TOUR				= "STATE_IS_SHOW_CONTENT_TOUR";						//$NON-NLS-1$
+	static final boolean					STATE_IS_SHOW_CONTENT_TOUR_DEFAULT		= true;
+	static final String						STATE_IS_SHOW_CONTENT_WAYPOINT			= "STATE_IS_SHOW_CONTENT_WAYPOINT";					//$NON-NLS-1$
+	static final boolean					STATE_IS_SHOW_CONTENT_WAYPOINT_DEFAULT	= true;
+
 	static final String						STATE_IS_SHOW_DATE_TIME					= "STATE_IS_SHOW_DATE_TIME";							//$NON-NLS-1$
 	static final boolean					STATE_IS_SHOW_DATE_TIME_DEFAULT			= false;
 	//
@@ -117,6 +126,11 @@ public class SearchUI implements XHRHandler, DisposeListener {
 	//
 	// search options
 	private static final String				JSON_IS_SEARCH_OPTIONS_DEFAULT			= "isSearchOptionsDefault";							//$NON-NLS-1$
+	//
+	private static final String				JSON_IS_SHOW_CONTENT_ALL				= "isShowContentAll";									//$NON-NLS-1$
+	private static final String				JSON_IS_SHOW_CONTENT_MARKER				= "isShowContentMarker";								//$NON-NLS-1$
+	private static final String				JSON_IS_SHOW_CONTENT_TOUR				= "isShowContentTour";									//$NON-NLS-1$
+	private static final String				JSON_IS_SHOW_CONTENT_WAYPOINT			= "isShowContentWaypoint";								//$NON-NLS-1$
 	private static final String				JSON_IS_SHOW_LUCENE_ID					= "isShowLuceneID";									//$NON-NLS-1$
 	private static final String				JSON_IS_SHOW_ITEM_NUMBER				= "isShowItemNumber";									//$NON-NLS-1$
 	private static final String				JSON_IS_SHOW_DATE_TIME					= "isShowDateTime";									//$NON-NLS-1$
@@ -132,6 +146,10 @@ public class SearchUI implements XHRHandler, DisposeListener {
 	private static String					_iconUrl_Marker;
 	private static String					_iconUrl_WayPoint;
 	//
+	private static boolean					_isUI_ShowContentAll;
+	private static boolean					_isUI_ShowContentMarker;
+	private static boolean					_isUI_ShowContentTour;
+	private static boolean					_isUI_ShowContentWaypoint;
 	private static boolean					_isUI_ShowDateTime;
 	private static boolean					_isUI_ShowItemNumber;
 	private static boolean					_isUI_ShowLuceneDocId;
@@ -191,6 +209,9 @@ public class SearchUI implements XHRHandler, DisposeListener {
 		HREF_PARAM_TOUR_ID = HREF_TOKEN + PARAM_TOUR_ID + HREF_VALUE_SEP;
 
 		SEARCH_SWT_CSS_STYLE = "<style>" + WEB.getFileContent(SEARCH_SWT_CSS_FILE, false) + "</style>"; //$NON-NLS-1$ //$NON-NLS-2$
+
+		// initialize search options
+		setInternalSearchOptions();
 	}
 
 	private ViewPart						_view;
@@ -257,10 +278,43 @@ public class SearchUI implements XHRHandler, DisposeListener {
 	}
 
 	/**
+	 * Set defaults for the search options in the state.
+	 */
+	static void saveDefaultSearchOption() {
+
+		state.put(STATE_IS_SHOW_CONTENT_ALL, STATE_IS_SHOW_CONTENT_ALL_DEFAULT);
+		state.put(STATE_IS_SHOW_CONTENT_MARKER, STATE_IS_SHOW_CONTENT_MARKER_DEFAULT);
+		state.put(STATE_IS_SHOW_CONTENT_TOUR, STATE_IS_SHOW_CONTENT_TOUR_DEFAULT);
+		state.put(STATE_IS_SHOW_CONTENT_WAYPOINT, STATE_IS_SHOW_CONTENT_WAYPOINT_DEFAULT);
+
+		state.put(STATE_IS_SHOW_DATE_TIME, STATE_IS_SHOW_DATE_TIME_DEFAULT);
+		state.put(STATE_IS_SHOW_ITEM_NUMBER, STATE_IS_SHOW_ITEM_NUMBER_DEFAULT);
+		state.put(STATE_IS_SHOW_LUCENE_DOC_ID, STATE_IS_SHOW_LUCENE_DOC_ID_DEFAULT);
+
+		state.put(STATE_IS_SORT_DATE_ASCENDING, STATE_IS_SORT_DATE_ASCENDING_DEFAULT);
+	}
+
+	/**
 	 * Set internal search options from the state. These internal options are used when creating the
 	 * search result.
 	 */
 	static void setInternalSearchOptions() {
+
+		_isUI_ShowContentAll = Util.getStateBoolean(state, //
+				STATE_IS_SHOW_CONTENT_ALL,
+				STATE_IS_SHOW_CONTENT_ALL_DEFAULT);
+
+		_isUI_ShowContentMarker = Util.getStateBoolean(state, //
+				STATE_IS_SHOW_CONTENT_MARKER,
+				STATE_IS_SHOW_CONTENT_MARKER_DEFAULT);
+
+		_isUI_ShowContentTour = Util.getStateBoolean(state, //
+				STATE_IS_SHOW_CONTENT_TOUR,
+				STATE_IS_SHOW_CONTENT_TOUR_DEFAULT);
+
+		_isUI_ShowContentWaypoint = Util.getStateBoolean(state, //
+				STATE_IS_SHOW_CONTENT_WAYPOINT,
+				STATE_IS_SHOW_CONTENT_WAYPOINT_DEFAULT);
 
 		_isUI_ShowDateTime = Util.getStateBoolean(state, //
 				STATE_IS_SHOW_DATE_TIME,
@@ -279,19 +333,12 @@ public class SearchUI implements XHRHandler, DisposeListener {
 				STATE_IS_SORT_DATE_ASCENDING_DEFAULT);
 
 		// set sorting in the search manager
-		FTSearchManager.setResultSorting(_isUI_SortDateAscending);
-	}
-
-	/**
-	 * Set defaults for the search options in the state.
-	 */
-	static void setStateDefaultSearchOption() {
-
-		state.put(STATE_IS_SHOW_DATE_TIME, STATE_IS_SHOW_DATE_TIME_DEFAULT);
-		state.put(STATE_IS_SHOW_ITEM_NUMBER, STATE_IS_SHOW_ITEM_NUMBER_DEFAULT);
-		state.put(STATE_IS_SHOW_LUCENE_DOC_ID, STATE_IS_SHOW_LUCENE_DOC_ID_DEFAULT);
-
-		state.put(STATE_IS_SORT_DATE_ASCENDING, STATE_IS_SORT_DATE_ASCENDING_DEFAULT);
+		FTSearchManager.setSearchOptions(
+				_isUI_ShowContentAll,
+				_isUI_ShowContentMarker,
+				_isUI_ShowContentTour,
+				_isUI_ShowContentWaypoint,
+				_isUI_SortDateAscending);
 	}
 
 	ItemResponse createHTML_10_Item(final SearchResultItem resultItem, final int itemNumber) {
@@ -826,6 +873,11 @@ public class SearchUI implements XHRHandler, DisposeListener {
 
 		final JSONObject responceObj = new JSONObject();
 
+		responceObj.put(JSON_IS_SHOW_CONTENT_ALL, _isUI_ShowContentAll);
+		responceObj.put(JSON_IS_SHOW_CONTENT_MARKER, _isUI_ShowContentMarker);
+		responceObj.put(JSON_IS_SHOW_CONTENT_TOUR, _isUI_ShowContentTour);
+		responceObj.put(JSON_IS_SHOW_CONTENT_WAYPOINT, _isUI_ShowContentWaypoint);
+
 		responceObj.put(JSON_IS_SHOW_DATE_TIME, _isUI_ShowDateTime);
 		responceObj.put(JSON_IS_SHOW_ITEM_NUMBER, _isUI_ShowItemNumber);
 		responceObj.put(JSON_IS_SHOW_LUCENE_ID, _isUI_ShowLuceneDocId);
@@ -875,6 +927,8 @@ public class SearchUI implements XHRHandler, DisposeListener {
 	private String xhr_Search(final Map<String, Object> params, final HttpExchange httpExchange, final StringBuilder log)
 			throws UnsupportedEncodingException {
 
+		final long start = System.nanoTime();
+
 		final Headers headers = httpExchange.getRequestHeaders();
 
 		final JSONArray allItems = new JSONArray();
@@ -888,6 +942,7 @@ public class SearchUI implements XHRHandler, DisposeListener {
 		if (range != null) {
 
 			final String[] ranges = range.substring("items=".length()).split("-");
+
 			searchPosFrom = Integer.valueOf(ranges[0]);
 			searchPosTo = Integer.valueOf(ranges[1]);
 		}
@@ -933,6 +988,9 @@ public class SearchUI implements XHRHandler, DisposeListener {
 				}
 				sb.append("</div>\n"); //$NON-NLS-1$
 
+				/*
+				 * Create JSON for an item.
+				 */
 				final JSONObject jsonResponse = new JSONObject();
 
 				jsonResponse.put(JSON_ID, resultItem.docId);
@@ -953,14 +1011,23 @@ public class SearchUI implements XHRHandler, DisposeListener {
 				WEB.RESPONSE_HEADER_CONTENT_RANGE,
 				getContentRange(searchResult, searchPosFrom, allItemSize));
 
-//		final String response = allItems.toString();
+		final String searchTime = String.format("%.1f ms", //
+				(float) (System.nanoTime() - start) / 1000000);
 
-		final JSONObject responceObj = new JSONObject();
-		responceObj.put("items", allItems);
-		responceObj.put("status", "no state");
-		responceObj.put("error", "no error");
+		final int totalHits = searchResult == null ? 0 : searchResult.totalHits;
 
-		return responceObj.toString();
+		/*
+		 * Create JSON response
+		 */
+		final JSONObject response = new JSONObject();
+
+		response.put("items", allItems);
+		response.put("searchTime", searchTime);
+		response.put("totalHits", totalHits);
+//		response.put("status", "no state");
+//		response.put("error", "no error");
+
+		return response.toString();
 	}
 
 	private void xhr_Select(final Map<String, Object> params) throws UnsupportedEncodingException {
@@ -1000,13 +1067,18 @@ public class SearchUI implements XHRHandler, DisposeListener {
 
 			// the action 'Restore Default' is selected in the web UI
 
-			setStateDefaultSearchOption();
+			saveDefaultSearchOption();
 			setInternalSearchOptions();
 
 			// set flag that defaults are returned
 			responceObj.put(JSON_IS_SEARCH_OPTIONS_DEFAULT, true);
 
 			// create xhr response with default values
+			responceObj.put(JSON_IS_SHOW_CONTENT_ALL, STATE_IS_SHOW_CONTENT_ALL_DEFAULT);
+			responceObj.put(JSON_IS_SHOW_CONTENT_MARKER, STATE_IS_SHOW_CONTENT_MARKER_DEFAULT);
+			responceObj.put(JSON_IS_SHOW_CONTENT_TOUR, STATE_IS_SHOW_CONTENT_TOUR_DEFAULT);
+			responceObj.put(JSON_IS_SHOW_CONTENT_WAYPOINT, STATE_IS_SHOW_CONTENT_WAYPOINT_DEFAULT);
+
 			responceObj.put(JSON_IS_SHOW_DATE_TIME, STATE_IS_SHOW_DATE_TIME_DEFAULT);
 			responceObj.put(JSON_IS_SHOW_ITEM_NUMBER, STATE_IS_SHOW_ITEM_NUMBER_DEFAULT);
 			responceObj.put(JSON_IS_SHOW_LUCENE_ID, STATE_IS_SHOW_LUCENE_DOC_ID_DEFAULT);
@@ -1016,6 +1088,11 @@ public class SearchUI implements XHRHandler, DisposeListener {
 		} else {
 
 			// update state
+
+			state.put(STATE_IS_SHOW_CONTENT_ALL, jsonSearchOptions.getBoolean(JSON_IS_SHOW_CONTENT_ALL));
+			state.put(STATE_IS_SHOW_CONTENT_MARKER, jsonSearchOptions.getBoolean(JSON_IS_SHOW_CONTENT_MARKER));
+			state.put(STATE_IS_SHOW_CONTENT_TOUR, jsonSearchOptions.getBoolean(JSON_IS_SHOW_CONTENT_TOUR));
+			state.put(STATE_IS_SHOW_CONTENT_WAYPOINT, jsonSearchOptions.getBoolean(JSON_IS_SHOW_CONTENT_WAYPOINT));
 
 			state.put(STATE_IS_SHOW_DATE_TIME, jsonSearchOptions.getBoolean(JSON_IS_SHOW_DATE_TIME));
 			state.put(STATE_IS_SHOW_ITEM_NUMBER, jsonSearchOptions.getBoolean(JSON_IS_SHOW_ITEM_NUMBER));

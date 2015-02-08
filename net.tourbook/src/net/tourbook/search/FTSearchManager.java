@@ -63,8 +63,12 @@ import org.apache.lucene.index.MultiFields;
 import org.apache.lucene.index.MultiReader;
 import org.apache.lucene.index.Terms;
 import org.apache.lucene.index.TermsEnum;
+import org.apache.lucene.queries.BooleanFilter;
+import org.apache.lucene.queries.FilterClause;
 import org.apache.lucene.queryparser.classic.MultiFieldQueryParser;
+import org.apache.lucene.search.BooleanClause.Occur;
 import org.apache.lucene.search.IndexSearcher;
+import org.apache.lucene.search.NumericRangeFilter;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.Sort;
@@ -120,7 +124,11 @@ public class FTSearchManager {
 	private static TopDocs					_topDocs;
 	private static String					_topDocsSearchText;
 
-	private static boolean					_isSortDateAscending		= false;
+	private static boolean					_isShowContentAll;
+	private static boolean					_isShowContentMarker;
+	private static boolean					_isShowContentTour;
+	private static boolean					_isShowContentWaypoint;
+	private static boolean					_isSortDateAscending		= false;								// -> sort descending
 
 	// configure field with offsets at index time
 	private static final FieldType			_longSearchField			= new FieldType(LongField.TYPE_STORED);
@@ -788,10 +796,61 @@ public class FTSearchManager {
 
 				// this is a new search
 
+				/*
+				 * Set sorting
+				 */
 				final SortField sortByTime = new SortField(SEARCH_FIELD_TIME, Type.LONG, _isSortDateAscending == false);
 				final Sort sort = new Sort(sortByTime);
 
-				_topDocs = _indexSearcher.search(query, _indexReader.maxDoc(), sort);
+				if (_isShowContentAll) {
+
+					// no filtering
+					_topDocs = _indexSearcher.search(query, _indexReader.maxDoc(), sort);
+
+				} else {
+
+					// filter by content
+
+					final BooleanFilter searchFilter = new BooleanFilter();
+
+					if (_isShowContentMarker) {
+
+						final NumericRangeFilter<Integer> filter = NumericRangeFilter.newIntRange(
+								SEARCH_FIELD_DOC_SOURCE,
+								DOC_SOURCE_TOUR_MARKER,
+								DOC_SOURCE_TOUR_MARKER,
+								true,
+								true);
+
+						searchFilter.add(new FilterClause(filter, Occur.SHOULD));
+					}
+
+					if (_isShowContentTour) {
+
+						final NumericRangeFilter<Integer> filter = NumericRangeFilter.newIntRange(
+								SEARCH_FIELD_DOC_SOURCE,
+								DOC_SOURCE_TOUR,
+								DOC_SOURCE_TOUR,
+								true,
+								true);
+
+						searchFilter.add(new FilterClause(filter, Occur.SHOULD));
+					}
+
+					if (_isShowContentWaypoint) {
+
+						final NumericRangeFilter<Integer> filter = NumericRangeFilter.newIntRange(
+								SEARCH_FIELD_DOC_SOURCE,
+								DOC_SOURCE_WAY_POINT,
+								DOC_SOURCE_WAY_POINT,
+								true,
+								true);
+
+						searchFilter.add(new FilterClause(filter, Occur.SHOULD));
+					}
+
+					_topDocs = _indexSearcher.search(query, searchFilter, _indexReader.maxDoc(), sort);
+				}
 
 				_topDocsSearchText = searchText;
 			}
@@ -979,7 +1038,16 @@ public class FTSearchManager {
 		return searchResult;
 	}
 
-	static void setResultSorting(final boolean isSortDateAscending) {
+	static void setSearchOptions(	final boolean isShowContentAll,
+									final boolean isShowContentMarker,
+									final boolean isShowContentTour,
+									final boolean isShowContentWaypoint,
+									final boolean isSortDateAscending) {
+
+		_isShowContentAll = isShowContentAll;
+		_isShowContentMarker = isShowContentMarker;
+		_isShowContentTour = isShowContentTour;
+		_isShowContentWaypoint = isShowContentWaypoint;
 
 		_isSortDateAscending = isSortDateAscending;
 	}

@@ -2,6 +2,7 @@ define(
 [
 	'dojo/_base/declare',
 	"dojo/_base/lang",
+	'dojo/dom',
 	'dojo/on',
 	"dojo/request/xhr",
 
@@ -19,6 +20,7 @@ define(
 //	
 declare, //
 lang, //
+dom, //
 on, //
 xhr, //
 
@@ -44,6 +46,10 @@ Messages //
 		// create messages field which is needed that messages can be accessed in the template
 		messages : Messages,
 
+		constructor : function(args) {
+			this._searchApp = args.searchApp;
+		},
+
 		postCreate : function() {
 
 			this.inherited(arguments);
@@ -55,9 +61,7 @@ Messages //
 		/**
 		 * Overwrite BaseDialog.showDialog and restore the state of the UI.
 		 */
-		showDialog : function showDialog() {
-
-			this._searchApp = arguments[0].searchApp;
+		showDialog : function showDialog(args) {
 
 			this.inherited(arguments);
 
@@ -66,10 +70,21 @@ Messages //
 
 		apActionRestoreDefaults : function apActionRestoreDefaults() {
 
-			this._setSearchOptions({
-
+			this._setSearchOptions(//
+			{
 				isRestoreDefaults : true
 			});
+		},
+
+		/**
+		 * Search all checkbox
+		 */
+		apSearchAll : function apSearchAll() {
+
+			this._enableControls();
+
+			// fire selection
+			this.apSelection();
 		},
 
 		/**
@@ -79,14 +94,88 @@ Messages //
 
 			var searchOptions = //
 			{
-				isSortByDateAscending : apSortByDateAscending.checked,
+				isShowContentAll : this.apChkShowContentAll.get('checked'),
+				isShowContentTour : this.apChkShowContentTour.get('checked'),
+				isShowContentMarker : this.apChkShowContentMarker.get('checked'),
+				isShowContentWaypoint : this.apChkShowContentWaypoint.get('checked'),
 
-				isShowDateTime : apChkShowDateTime.checked,
-				isShowItemNumber : apChkShowItemNumber.checked,
-				isShowLuceneID : apChkShowLuceneID.checked
+				isSortByDateAscending : this.apSortByDateAscending.get('checked'),
+
+				isShowDateTime : this.apChkShowDateTime.get('checked'),
+				isShowItemNumber : this.apChkShowItemNumber.get('checked'),
+				isShowLuceneID : this.apChkShowLuceneID.get('checked')
 			};
 
-			this._setSearchOptions(searchOptions);
+			if (this._isValid()) {
+				this._setSearchOptions(searchOptions);
+			}
+		},
+
+		_isValid : function _isValid() {
+
+			var //
+			statusText = '', //
+			isValid = true, //
+
+			isShowContentAll = this.apChkShowContentAll.get('checked'), //
+			isShowContentTour = this.apChkShowContentTour.get('checked'), //
+			isShowContentMarker = this.apChkShowContentMarker.get('checked'), //
+			isShowContentWaypoint = this.apChkShowContentWaypoint.get('checked');
+
+			if (isShowContentAll) {
+
+				// content is valid
+
+			} else {
+
+				// at least one content must be checked
+
+				if (isShowContentTour == false //
+					&& isShowContentMarker == false //
+					&& isShowContentWaypoint == false) {
+
+					statusText = 'Nothing can be found.';
+					isValid = false;
+				}
+			}
+
+			// update status
+			dom.byId('domSearchStatus').innerHTML = statusText;
+
+			return isValid;
+		},
+
+		_enableControls : function _enableControls() {
+
+			var isShowContentAll = this.apChkShowContentAll.get('checked');
+
+			this.apChkShowContentTour.set('disabled', isShowContentAll);
+			this.apChkShowContentMarker.set('disabled', isShowContentAll);
+			this.apChkShowContentWaypoint.set('disabled', isShowContentAll);
+		},
+
+		/**
+		 * 
+		 */
+		_restoreState : function _restoreState(callBack) {
+
+			var _this = this;
+
+			var xhrQuery = {};
+			xhrQuery[SearchMgr.XHR_PARAM_ACTION] = SearchMgr.XHR_ACTION_GET_SEARCH_OPTIONS;
+
+			xhr(SearchMgr.XHR_SEARCH_HANDLER, {
+
+				handleAs : 'json',
+				preventCache : true,
+				timeout : SearchMgr.XHR_TIMEOUT,
+
+				query : xhrQuery
+
+			}).then(function(xhrData) {
+
+				_this._updateUI_FromState(_this, xhrData);
+			});
 		},
 
 		/**
@@ -106,7 +195,7 @@ Messages //
 
 				handleAs : 'json',
 				preventCache : true,
-				timeout : 5000,
+				timeout : SearchMgr.XHR_TIMEOUT,
 
 				query : xhrQuery
 
@@ -115,7 +204,7 @@ Messages //
 				if (xhrData.isSearchOptionsDefault) {
 
 					// set defaults in the UI
-					_this._updateUIFromState(_this, xhrData);
+					_this._updateUI_FromState(_this, xhrData);
 				}
 
 				// repeat previous search
@@ -124,31 +213,12 @@ Messages //
 			});
 		},
 
-		/**
-		 * 
-		 */
-		_restoreState : function _restoreState(callBack) {
+		_updateUI_FromState : function _updateUI_FromState(dialog, xhrData) {
 
-			var _this = this;
-
-			var xhrQuery = {};
-			xhrQuery[SearchMgr.XHR_PARAM_ACTION] = SearchMgr.XHR_ACTION_GET_SEARCH_OPTIONS;
-
-			xhr(SearchMgr.XHR_SEARCH_HANDLER, {
-
-				handleAs : 'json',
-				preventCache : true,
-				timeout : 5000,
-
-				query : xhrQuery
-
-			}).then(function(xhrData) {
-
-				_this._updateUIFromState(_this, xhrData);
-			});
-		},
-
-		_updateUIFromState : function _updateUIFromState(dialog, xhrData) {
+			dialog.apChkShowContentAll.set('checked', xhrData.isShowContentAll);
+			dialog.apChkShowContentTour.set('checked', xhrData.isShowContentTour);
+			dialog.apChkShowContentMarker.set('checked', xhrData.isShowContentMarker);
+			dialog.apChkShowContentWaypoint.set('checked', xhrData.isShowContentWaypoint);
 
 			dialog.apSortByDateAscending.set('checked', xhrData.isSortByDateAscending);
 			dialog.apSortByDateDescending.set('checked', !xhrData.isSortByDateAscending);
@@ -156,6 +226,9 @@ Messages //
 			dialog.apChkShowDateTime.set('checked', xhrData.isShowDateTime);
 			dialog.apChkShowItemNumber.set('checked', xhrData.isShowItemNumber);
 			dialog.apChkShowLuceneID.set('checked', xhrData.isShowLuceneID);
+
+			dialog._enableControls();
+			dialog._isValid();
 		}
 
 	});

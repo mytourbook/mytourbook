@@ -8,11 +8,17 @@ define(//
 
 		searchOptions_Action_RestoreDefaults : 'Restore Defaults',
 		
+		searchOptions_Group_Content:'What should be searched?',
 		searchOptions_Group_Sorting : 'Sorting',
 		searchOptions_Group_Result : 'Result',
 
 		searchOptions_Label_SortAscending : 'By Date',
 
+		searchOptions_Checkbox_ShowContentAll:'All',
+		searchOptions_Checkbox_ShowContentTour:'Tours',
+		searchOptions_Checkbox_ShowContentMarker:'Markers',
+		searchOptions_Checkbox_ShowContentWaypoint:'Waypoints',
+		
 		searchOptions_Checkbox_ShowDateTime : 'Show date/time',
 		searchOptions_Checkbox_ShowItemNumber : 'Show item number',
 		searchOptions_Checkbox_ShowLuceneDocId : 'Show Lucene doc ID',
@@ -22,7 +28,7 @@ define(//
 
 		searchOptions_Title : 'Search Options',
 		searchOptions_Tooltip : 'Search Options.',
-
+		
 		dummy : ''
 	},
 
