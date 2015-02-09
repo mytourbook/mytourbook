@@ -39,8 +39,7 @@ $DOJO_SEARCH$
 	<div id="domContainer"
 	    data-dojo-type="dijit/layout/LayoutContainer">
     
-	    <div id="domSearchInputContainer"
-	    	class="search"
+	    <div id="domSearchInputContainer" class="search"
 	        data-dojo-type="dijit/layout/ContentPane"
 	        data-dojo-props="region:'top'">
 	        
@@ -50,7 +49,7 @@ $DOJO_SEARCH$
 				    	<div id="domSearchInput"></div>
 					</td>
 					<td>
-						<div id="domAppStatus" title="Searchresults - Searchtime">&nbsp;</div>
+						<div id="domAppStatus">&nbsp;</div>
 					</td>
 					<td>
 					    <div id="domActionSearchOptions"></div>

@@ -12,3 +12,4 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  net.tourbook.common
 Export-Package: net.tourbook.web
+Import-Package: org.json

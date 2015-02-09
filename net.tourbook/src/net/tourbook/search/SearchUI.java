@@ -45,6 +45,7 @@ import net.tourbook.web.XHRHandler;
 
 import org.apache.lucene.search.suggest.Lookup.LookupResult;
 import org.eclipse.jface.dialogs.IDialogSettings;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.window.Window;
@@ -69,10 +70,14 @@ import com.sun.net.httpserver.HttpExchange;
  */
 public class SearchUI implements XHRHandler, DisposeListener {
 
+	private static final String				JSON_STATE_SEARCH_TEXT					= "searchText";										//$NON-NLS-1$
+
 	private static final String				IMAGE_ACTION_TOUR_WAY_POINT				= net.tourbook.map2.Messages.Image_Action_TourWayPoint;
 
 	final static IDialogSettings			state									= TourbookPlugin
 																							.getState("net.tourbook.search.SearchUI");		//$NON-NLS-1$
+
+	private static final String				STATE_CURRENT_SEARCH_TEXT				= "STATE_CURRENT_SEARCH_TEXT";							//$NON-NLS-1$
 
 	static final String						STATE_IS_SHOW_CONTENT_ALL				= "STATE_IS_SHOW_CONTENT_ALL";							//$NON-NLS-1$
 	static final boolean					STATE_IS_SHOW_CONTENT_ALL_DEFAULT		= true;
@@ -95,26 +100,31 @@ public class SearchUI implements XHRHandler, DisposeListener {
 	static final String						STATE_IS_SORT_DATE_ASCENDING			= "STATE_IS_SORT_DATE_ASCENDING";						//$NON-NLS-1$
 	static final boolean					STATE_IS_SORT_DATE_ASCENDING_DEFAULT	= false;
 
-	private static final String				REQUEST_HEADER_RANGE					= "Range";
+	private static final String				REQUEST_HEADER_RANGE					= "Range";												//$NON-NLS-1$
 
-	private static final String				CONTENT_RANGE_ITEMS						= "items %d-%d/%d";
-	private static final String				CONTENT_RANGE_ZERO						= "0-0/0";
+	private static final String				CONTENT_RANGE_ITEMS						= "items %d-%d/%d";									//$NON-NLS-1$
+	private static final String				CONTENT_RANGE_ZERO						= "0-0/0";												//$NON-NLS-1$
 
 	/*
 	 * This will handle all xhr actions, they are also defined in SearchMgr.js
 	 */
 	private static final String				XHR_SEARCH_INPUT_HANDLER				= "/xhrSearch";										//$NON-NLS-1$
 	//
+	private static final String				XHR_ACTION_ITEM_ACTION					= "itemAction";										//$NON-NLS-1$
 	private static final String				XHR_ACTION_PROPOSALS					= "proposals";											//$NON-NLS-1$
 	private static final String				XHR_ACTION_SEARCH						= "search";											//$NON-NLS-1$
 	private static final String				XHR_ACTION_SELECT						= "select";											//$NON-NLS-1$
 	private static final String				XHR_ACTION_GET_SEARCH_OPTIONS			= "getSearchOptions";									//$NON-NLS-1$
 	private static final String				XHR_ACTION_SET_SEARCH_OPTIONS			= "setSearchOptions";									//$NON-NLS-1$
-	//
+	private static final String				XHR_ACTION_GET_STATE					= "getState";											//$NON-NLS-1$
+//	private static final String				XHR_ACTION_SET_STATE					= "setState";											//$NON-NLS-1$
+																																			//
 	private static final String				XHR_PARAM_ACTION						= "action";											//$NON-NLS-1$
+	private static final String				XHR_PARAM_ACTION_URL					= "actionUrl";											//$NON-NLS-1$
 	private static final String				XHR_PARAM_SEARCH_OPTIONS				= "searchOptions";										//$NON-NLS-1$
-	private static final String				XHR_PARAM_SEARCH_TEXT					= "searchText";										//$NON-NLS-1$
+	private static final String				XHR_PARAM_SEARCH_TEXT					= JSON_STATE_SEARCH_TEXT;
 	private static final String				XHR_PARAM_SELECTED_ID					= "selectedId";										//$NON-NLS-1$
+	private static final String				XHR_PARAM_STATE							= "state";												//$NON-NLS-1$
 	//
 	/*
 	 * JSON response values
@@ -157,8 +167,8 @@ public class SearchUI implements XHRHandler, DisposeListener {
 
 	private static final DateTimeFormatter	_dateFormatter							= DateTimeFormat.mediumDate();
 	//
-	static final String						TAG_TD									= "<td>";
-	static final String						TAG_TD_END								= "</td>";
+	static final String						TAG_TD									= "<td>";												//$NON-NLS-1$
+	static final String						TAG_TD_END								= "</td>";												//$NON-NLS-1$
 	static final String						CSS_ITEM_CONTAINER						= "item-container";									//$NON-NLS-1$
 
 	static final String						PAGE_ABOUT_BLANK						= "about:blank";										//$NON-NLS-1$
@@ -166,7 +176,8 @@ public class SearchUI implements XHRHandler, DisposeListener {
 	/**
 	 * This is necessary otherwise XULrunner in Linux do not fire a location change event.
 	 */
-	static final String						HTTP_PROTOCOL_DUMMY						= WEB.WEB_PROTOCOL + "dummy/a?";						//$NON-NLS-1$
+	static final String						ACTION_URL								= WebContentServer.SERVER_URL
+																							+ "/action?";									//$NON-NLS-1$
 
 	static final String						HREF_TOKEN								= "&";													//$NON-NLS-1$
 	static final String						HREF_VALUE_SEP							= "=";													//$NON-NLS-1$
@@ -216,6 +227,7 @@ public class SearchUI implements XHRHandler, DisposeListener {
 
 	private ViewPart						_view;
 	private Browser							_browser;
+	private DialogQuickEdit					_dialogQuickEdit;
 
 	private PostSelectionProvider			_postSelectionProvider;
 
@@ -368,12 +380,12 @@ public class SearchUI implements XHRHandler, DisposeListener {
 				itemTitleText = tourTitle;
 			}
 
-			hrefSelectItem = HTTP_PROTOCOL_DUMMY
+			hrefSelectItem = ACTION_URL
 					+ HREF_ACTION_SELECT_TOUR
 					+ (HREF_PARAM_TOUR_ID + tourId)
 					+ (HREF_PARAM_DOC_ID + docId);
 
-			hrefEditItem = HTTP_PROTOCOL_DUMMY
+			hrefEditItem = ACTION_URL
 					+ HREF_ACTION_EDIT_TOUR
 					+ (HREF_PARAM_TOUR_ID + tourId)
 					+ (HREF_PARAM_DOC_ID + docId);
@@ -388,13 +400,13 @@ public class SearchUI implements XHRHandler, DisposeListener {
 				itemTitleText = tourMarkerLabel;
 			}
 
-			hrefSelectItem = HTTP_PROTOCOL_DUMMY
+			hrefSelectItem = ACTION_URL
 					+ HREF_ACTION_SELECT_MARKER
 					+ (HREF_PARAM_TOUR_ID + tourId)
 					+ (HREF_PARAM_MARKER_ID + markerId)
 					+ (HREF_PARAM_DOC_ID + docId);
 
-			hrefEditItem = HTTP_PROTOCOL_DUMMY
+			hrefEditItem = ACTION_URL
 					+ HREF_ACTION_EDIT_MARKER
 					+ (HREF_PARAM_TOUR_ID + tourId)
 					+ (HREF_PARAM_MARKER_ID + markerId)
@@ -410,7 +422,7 @@ public class SearchUI implements XHRHandler, DisposeListener {
 				itemTitleText = tourMarkerLabel;
 			}
 
-			hrefSelectItem = HTTP_PROTOCOL_DUMMY
+			hrefSelectItem = ACTION_URL
 					+ HREF_ACTION_SELECT_WAY_POINT
 					+ (HREF_PARAM_TOUR_ID + tourId)
 					+ (HREF_PARAM_MARKER_ID + markerId)
@@ -451,6 +463,7 @@ public class SearchUI implements XHRHandler, DisposeListener {
 					+ (" title='" + itemTitle + "'") //$NON-NLS-1$ //$NON-NLS-2$
 					+ ">"); // //$NON-NLS-1$
 		}
+
 		{
 			sb.append("<table><tbody><tr>");
 			{
@@ -516,6 +529,7 @@ public class SearchUI implements XHRHandler, DisposeListener {
 			}
 			sb.append("</tr></tbody></table>");
 		}
+
 		if (_isWebUI == false) {
 			sb.append("</a>");
 		}
@@ -529,9 +543,27 @@ public class SearchUI implements XHRHandler, DisposeListener {
 
 	private String createHTML_20_Action(final String actionUrl, final String hoverMessage, final String backgroundImage) {
 
+		String url;
+
+		if (_isWebUI) {
+
+			/*
+			 * Action is fired with an xhr request to the server
+			 */
+
+			url = " href='#anchor-without-scrolling'"
+					+ " onclick="
+					+ "'"
+					+ (" tourbook.search.SearchApp.action(\"" + actionUrl + "\");")
+					+ " return false;"
+					+ "'";
+		} else {
+			url = " href='" + actionUrl + "'";
+		}
+
 		return "<a class='action'" // //$NON-NLS-1$
 				+ (" style='background-image: url(" + backgroundImage + ");'") //$NON-NLS-1$ //$NON-NLS-2$
-				+ (" href='" + actionUrl + "'") //$NON-NLS-1$ //$NON-NLS-2$
+				+ url
 				+ (" title='" + hoverMessage + "'") //$NON-NLS-1$ //$NON-NLS-2$
 				+ ">" // //$NON-NLS-1$
 				+ "</a>"; //$NON-NLS-1$
@@ -590,19 +622,29 @@ public class SearchUI implements XHRHandler, DisposeListener {
 
 			response = xhr_Search(params, httpExchange, log);
 
+		} else if (XHR_ACTION_ITEM_ACTION.equals(action)) {
+
+			xhr_ItemAction(params);
+
 		} else if (XHR_ACTION_SELECT.equals(action)) {
 
 			xhr_Select(params);
-
-			// there is no response
 
 		} else if (XHR_ACTION_GET_SEARCH_OPTIONS.equals(action)) {
 
 			response = xhr_GetSearchOptions(params);
 
+		} else if (XHR_ACTION_GET_STATE.equals(action)) {
+
+			response = xhr_GetState(params);
+
 		} else if (XHR_ACTION_SET_SEARCH_OPTIONS.equals(action)) {
 
 			response = xhr_SetSearchOptions(params);
+
+//		} else if (XHR_ACTION_GET_STATE.equals(action)) {
+//
+//			xhr_SetState(params);
 
 		} else if (XHR_ACTION_PROPOSALS.equals(action)) {
 
@@ -614,17 +656,36 @@ public class SearchUI implements XHRHandler, DisposeListener {
 
 	void hrefActionEditTour(final Long tourId) {
 
+		// ensure this dialog is modal (only one dialog can be opened)
+		if (_dialogQuickEdit != null) {
+
+			MessageDialog.openInformation(
+					Display.getCurrent().getActiveShell(),
+					Messages.App_Action_Dialog_ActionIsInProgress_Title,
+					Messages.App_Action_Dialog_ActionIsInProgress_Message);
+
+			return;
+		}
+
 		// get tour by id
 		final TourData tourData = TourManager.getTour(tourId);
 		if (tourData == null) {
 			return;
 		}
 
-		if (new DialogQuickEdit(//
-				Display.getCurrent().getActiveShell(),
-				tourData).open() == Window.OK) {
+		try {
 
-			saveModifiedTour(tourData);
+			_dialogQuickEdit = new DialogQuickEdit(//
+					Display.getCurrent().getActiveShell(),
+					tourData);
+
+			if (_dialogQuickEdit.open() == Window.OK) {
+
+				saveModifiedTour(tourData);
+			}
+
+		} finally {
+			_dialogQuickEdit = null;
 		}
 	}
 
@@ -738,9 +799,9 @@ public class SearchUI implements XHRHandler, DisposeListener {
 	 */
 	private boolean performAction(final String location) {
 
-//		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] performAction()")
-//				+ ("\tlocation: " + location));
-//		// TODO remove SYSTEM.OUT.PRINTLN
+		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] performAction()")
+				+ ("\tlocation: " + location));
+		// TODO remove SYSTEM.OUT.PRINTLN
 
 		String action = null;
 
@@ -887,6 +948,35 @@ public class SearchUI implements XHRHandler, DisposeListener {
 		return responceObj.toString();
 	}
 
+	private String xhr_GetState(final Map<String, Object> params) {
+
+		final String searchText = Util.getStateString(state, STATE_CURRENT_SEARCH_TEXT, UI.EMPTY_STRING);
+
+		final JSONObject responceObj = new JSONObject();
+
+		responceObj.put(JSON_STATE_SEARCH_TEXT, searchText);
+
+		return responceObj.toString();
+	}
+
+	private void xhr_ItemAction(final Map<String, Object> params) throws UnsupportedEncodingException {
+
+		final Object xhrParameter = params.get(XHR_PARAM_ACTION_URL);
+
+		if (xhrParameter instanceof String) {
+
+			final String xhrAction = URLDecoder.decode((String) xhrParameter, WEB.UTF_8);
+
+			// run in UI thread
+			_browser.getDisplay().asyncExec(new Runnable() {
+				@Override
+				public void run() {
+					performAction(xhrAction);
+				}
+			});
+		}
+	}
+
 	private String xhr_Proposals(final Map<String, Object> params) throws UnsupportedEncodingException {
 
 		final JSONObject jsonResponse = new JSONObject();
@@ -958,6 +1048,9 @@ public class SearchUI implements XHRHandler, DisposeListener {
 
 			String searchText = URLDecoder.decode(xhrSearchText, WEB.UTF_8);
 
+			// keep search text in state
+			state.put(STATE_CURRENT_SEARCH_TEXT, searchText);
+
 			// ensure white space is removed
 			searchText = searchText.trim();
 
@@ -1011,8 +1104,13 @@ public class SearchUI implements XHRHandler, DisposeListener {
 				WEB.RESPONSE_HEADER_CONTENT_RANGE,
 				getContentRange(searchResult, searchPosFrom, allItemSize));
 
-		final String searchTime = String.format("%.1f ms", //
-				(float) (System.nanoTime() - start) / 1000000);
+		final float timeDiff = (float) (System.nanoTime() - start) / 1000000;
+		String searchTime;
+		if (timeDiff < 1.0) {
+			searchTime = String.format("%.2f ms", timeDiff);
+		} else {
+			searchTime = String.format("%.0f ms", timeDiff);
+		}
 
 		final int totalHits = searchResult == null ? 0 : searchResult.totalHits;
 
@@ -1024,8 +1122,6 @@ public class SearchUI implements XHRHandler, DisposeListener {
 		response.put("items", allItems);
 		response.put("searchTime", searchTime);
 		response.put("totalHits", totalHits);
-//		response.put("status", "no state");
-//		response.put("error", "no error");
 
 		return response.toString();
 	}
@@ -1060,8 +1156,7 @@ public class SearchUI implements XHRHandler, DisposeListener {
 		final JSONObject responceObj = new JSONObject();
 
 		final Object xhrSearchOptions = params.get(XHR_PARAM_SEARCH_OPTIONS);
-		final String jsSearchOptions = URLDecoder.decode((String) xhrSearchOptions, WEB.UTF_8);
-		final JSONObject jsonSearchOptions = new JSONObject(jsSearchOptions);
+		final JSONObject jsonSearchOptions = WEB.getJSONObject(xhrSearchOptions);
 
 		if (jsonSearchOptions.isNull("isRestoreDefaults") == false) {
 
@@ -1107,5 +1202,16 @@ public class SearchUI implements XHRHandler, DisposeListener {
 		}
 
 		return responceObj.toString();
+	}
+
+	@SuppressWarnings("unused")
+	private void xhr_SetState(final Map<String, Object> params) throws UnsupportedEncodingException {
+
+		final Object rawState = params.get(XHR_PARAM_STATE);
+		final JSONObject jsonState = WEB.getJSONObject(rawState);
+
+		final String searchText = jsonState.getString(JSON_STATE_SEARCH_TEXT);
+
+		state.put(STATE_CURRENT_SEARCH_TEXT, searchText);
 	}
 }

@@ -69,7 +69,7 @@ Messages //
 
 		createUI : function createUI() {
 
-			this._createUI_Actions();
+			this.createUI_Actions();
 
 			/**
 			 * Dialog: Search options
@@ -103,11 +103,11 @@ Messages //
 
 			this._searchInput.setGrid(grid);
 
-			// set focus to the search field
-			this._searchInput.focus();
+			// set tooltips
+			dom.byId('domAppStatus').title = Messages.searchStatus_Tooltip;
 		},
 
-		_createUI_Actions : function _createUI_Actions() {
+		createUI_Actions : function createUI_Actions() {
 
 			var app = this;
 
@@ -209,6 +209,8 @@ Messages //
 
 						// update status
 						dom.byId('domAppStatus').innerHTML = statusText;
+						// Search Results - Time
+
 					});
 
 					return queryResult;
@@ -274,14 +276,61 @@ Messages //
 			return grid;
 		},
 
-		_createUI_Status : function() {
+		restoreState : function restoreState() {
 
-			this.apStatus.innerHTML = "test";
+			var app = this;
+
+			var query = {};
+			query[SearchMgr.XHR_PARAM_ACTION] = SearchMgr.XHR_ACTION_GET_STATE;
+
+			xhr(SearchMgr.XHR_SEARCH_HANDLER, {
+
+				query : query,
+				timeout : SearchMgr.XHR_TIMEOUT,
+				handleAs : "json",
+				preventCache : true
+
+			}).then(function(state) {
+
+				var searchInput = app._searchInput;
+
+				searchInput.setSearchText(state.searchText);
+				searchInput.selectAll();
+			});
 		},
+
+// saveState() is disabled because an xhr request during page unload is not working !!!
+// 		
+//		saveState : function saveState() {
+//
+//			var searchText = this._searchInput.getSearchText();
+//
+//			var state = //
+//			{
+//				searchText : encodeURIComponent(searchText)
+//			};
+//
+//			var query = {};
+//			query[SearchMgr.XHR_PARAM_ACTION] = SearchMgr.XHR_ACTION_SET_STATE;
+//			query[SearchMgr.XHR_PARAM_STATE] = state;
+//
+//			xhr(SearchMgr.XHR_SEARCH_HANDLER, {
+//
+//				query : query,
+//				timeout : SearchMgr.XHR_TIMEOUT,
+//				handleAs : "json",
+//				preventCache : true
+//			});
+//		},
 
 		startApp : function startApp() {
 
 			this.createUI();
+
+			this.restoreState();
+
+			// set focus to the search field
+			this._searchInput.focus();
 
 			// resize UI, otherwise not everthing is correctly rearranged
 			registry.byId('domContainer').resize();
@@ -298,6 +347,22 @@ Messages //
 			}).play();
 		}
 	});
+	
+	SearchApp.action = function(actionUrl){
+		
+		var query = {};
+		query[SearchMgr.XHR_PARAM_ACTION] = SearchMgr.XHR_ACTION_ITEM_ACTION;
+		query[SearchMgr.XHR_PARAM_ACTION_URL] = encodeURIComponent(actionUrl);
+
+		xhr(SearchMgr.XHR_SEARCH_HANDLER, {
+
+			handleAs : 'json',
+			preventCache : true,
+			timeout : SearchMgr.XHR_TIMEOUT,
+
+			query : query
+		});
+	};
 
 	parser.parse().then(function() {
 		new SearchApp().startApp();

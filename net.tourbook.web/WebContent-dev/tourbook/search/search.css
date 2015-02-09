@@ -37,6 +37,7 @@
 */
 .search .dijitTextBox
 {
+	background-image: 		none;					/* hide gradient */
 	border-color: 			#f4f4f4;
 	background-color:		#f4f4f4;
 }
@@ -48,10 +49,10 @@
 
 .search .dijitTextBoxHover
 {
-	background-image:		none;    			/* hide default gradient image */						
+	background-image:		none;    				/* hide default gradient image */						
 	border-width:			1px;	
-	xborder-color:			#aaa;
-	border-color:			#f4f4f4;
+	border-color:			#eee;
+	xborder-color:			#f4f4f4;
 }
 
 /*
@@ -59,7 +60,16 @@
 */
 .searchOptions .dijitDialog
 {
-	border:					1px solid #bbb;		/* replace blue border */
+	border:					1px solid #bbb;			/* replace blue border */
+}
+
+.searchOptions .dijitTitlePaneTitle
+{
+	background-image:		none;					/* hide gray */
+	border:					1px solid #fff;			/* overwrite (hide) border */		
+	border-bottom:			1px solid #bfbfbf;		/* set border only at the bottom */
+	padding-left: 			0px;
+	margin-left:			-5px;
 }
 
 /*
@@ -91,6 +101,7 @@
 */
 #domAppStatus
 {
+	color:					#666;
 	text-align: 			right;
 	white-space:			nowrap;
 }

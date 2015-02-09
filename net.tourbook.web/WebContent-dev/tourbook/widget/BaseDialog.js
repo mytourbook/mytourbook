@@ -68,7 +68,7 @@ Dialog //
 								dialogBounds = domGeometry.position(domDialog), //
 								parentBounds = domGeometry.position(layoutParent.domNode);
 
-								l = Math.floor(viewport.w - dialogBounds.w), //
+								l = Math.floor(viewport.w - dialogBounds.w - 1), //
 								t = Math.floor(parentBounds.y + parentBounds.h);
 
 								domStyle.set(domDialog, //

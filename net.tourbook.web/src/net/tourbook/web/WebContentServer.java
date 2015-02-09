@@ -86,7 +86,7 @@ public class WebContentServer {
 	private static final String				DOJO_PUT_SELECTOR			= "/put-selector/";		//$NON-NLS-1$
 	private static final String				DOJO_XSTYLE					= "/xstyle/";				//$NON-NLS-1$
 
-	static String							SERVER_URL;
+	public static final String				SERVER_URL;
 
 	private static Map<String, XHRHandler>	_allXHRHandler				= new HashMap<>();
 	private static Map<String, Object>		_mthtmlValues				= new HashMap<>();
@@ -133,6 +133,9 @@ public class WebContentServer {
 						+ "	<script src='/tourbook/search/SearchApp.js.jgz'></script>	\n" //$NON-NLS-1$
 		;
 
+		/*
+		 * Text replacements for commen messages.
+		 */
 		_mthtmlValues.put(MTHTML_DOJO_SEARCH, dojoSearch);
 		_mthtmlValues.put(MTHTML_LOCALE, Locale.getDefault().getLanguage());
 		_mthtmlValues.put(MTHTML_MESSAGE_LOADING, Messages.Web_Content_Loading);
@@ -414,6 +417,7 @@ public class WebContentServer {
 			}
 
 			final String xhrKey = requestUriPath;
+
 			final XHRHandler xhrHandler = _allXHRHandler.get(xhrKey);
 
 			if (xhrHandler == null) {

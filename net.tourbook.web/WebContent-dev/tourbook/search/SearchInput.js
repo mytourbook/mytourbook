@@ -53,11 +53,10 @@ SearchMgr //
 
 			xhr(SearchMgr.XHR_SEARCH_HANDLER, {
 
+				query : query,
 				handleAs : "json",
 				preventCache : true,
-				timeout : SearchMgr.XHR_TIMEOUT,
-
-				query : query
+				timeout : SearchMgr.XHR_TIMEOUT
 
 			}).then(function(xhrData) {
 
@@ -132,6 +131,13 @@ SearchMgr //
 			return this.get('displayedValue').trim();
 		},
 
+		/**
+		 * Set text into the search field.
+		 */
+		setSearchText : function setSearchText(value) {
+			this.set('displayedValue', value);
+		},
+
 		createSearchUrl : function createSearchUrl() {
 
 			var searchText = this.getSearchText();
@@ -181,6 +187,14 @@ SearchMgr //
 			// overwrite dijit._HasDropDown
 			// force with to the max proposal with
 			this.autoWidth = false;
+		},
+
+		/**
+		 * Select all text in the input field.
+		 */
+		selectAll : function selectAll() {
+
+			this.textbox.select();
 		},
 
 		setGrid : function(grid) {

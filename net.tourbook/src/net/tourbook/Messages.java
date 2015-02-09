@@ -278,7 +278,11 @@ public class Messages extends NLS {
 	public static String		App_Action_Cancel;
 	public static String		App_Action_Close_ToolTip;
 	public static String		App_Action_Columns;
-//	public static String		App_Action_Delete;
+public static String	App_Action_Dialog_ActionIsInProgress_Message;
+
+	public static String	App_Action_Dialog_ActionIsInProgress_Title;
+
+	//	public static String		App_Action_Delete;
 	public static String		App_Action_Duplicate;
 	public static String		App_Action_edit_tour;
 	public static String		App_Action_Edit;

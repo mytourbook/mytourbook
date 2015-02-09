@@ -1,4 +1,4 @@
-<div id="${id}">
+<div id="${id}" style="white-space: nowrap;">
 	
 	<div class="dijitDialogPaneContentArea">
 	
@@ -13,7 +13,7 @@
 			
 			<!-- Show All (tour, marker, waypoint)-->
 			
-			<div class="formFieldVSpace">
+			<div>
 				<input 
 					type="checkbox" 
 					id="apChkShowContentAll"
@@ -23,7 +23,7 @@
 				<label for="apChkShowContentAll">${messages.searchOptions_Checkbox_ShowContentAll}</label>
 			</div>
 			
-			<div style="padding-left:1em;">
+			<div class="fieldVertSpaceTop" style="padding-left:1em;">
 			
 				<!-- Show tours -->
 				<input 
@@ -69,11 +69,10 @@
 			
 				<!-- Sort by date -->
 				<tr>
-					<td style="padding-right:2em;     
-						white-space: nowrap;">
+					<td style="padding-right:2em;">
 						${messages.searchOptions_Label_SortAscending}					
 					</td>
-					<td style="white-space: nowrap;">
+					<td>
 					
 						<!-- sort ascending -->
 						<input 
@@ -109,7 +108,7 @@
 			data-dojo-props="toggleable:false, title: '${messages.searchOptions_Group_Result}'">
 			
 			<!-- Show date/time -->
-			<div class="formFieldVSpace">
+			<div>
 				<input 
 					type="checkbox" 
 					id="apChkShowDateTime"
@@ -121,7 +120,7 @@
 			</div>
 			
 			<!-- Show item number -->
-			<div class="formFieldVSpace">
+			<div class="fieldVertSpaceTop">
 				<input 
 					type="checkbox" 
 					id="apChkShowItemNumber"
@@ -132,7 +131,7 @@
 			</div>
 			
 			<!-- Show Lucene doc ID -->
-			<div class="formFieldVSpace">
+			<div class="fieldVertSpaceTop">
 				<input 
 					type="checkbox" 
 					id="apChkShowLuceneID"

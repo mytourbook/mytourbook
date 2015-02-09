@@ -17,10 +17,12 @@ package net.tourbook.web;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.net.URLDecoder;
 
 import net.tourbook.common.ReplacingOutputStream;
 import net.tourbook.common.UI;
@@ -29,6 +31,7 @@ import net.tourbook.common.util.Util;
 
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
+import org.json.JSONObject;
 
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
@@ -60,13 +63,7 @@ public class WEB {
 																				? WEB_CONTENT_DEVELOPMENT_FOLDER
 																				: WEB_CONTENT_RELEASE_FOLDER;
 
-	public static final String	WEB_PROTOCOL							= "http://";									//$NON-NLS-1$
-	public static String		SERVER_URL;
-
-	static {
-
-		SERVER_URL = WebContentServer.SERVER_URL;
-	}
+	public static String		SERVER_URL								= WebContentServer.SERVER_URL;
 
 	public static final String	UTF_8									= "UTF-8";										//$NON-NLS-1$
 
@@ -194,6 +191,14 @@ public class WEB {
 		}
 
 		return webContent;
+	}
+
+	public static JSONObject getJSONObject(final Object rawData) throws UnsupportedEncodingException {
+
+		final String jsData = URLDecoder.decode((String) rawData, WEB.UTF_8);
+		final JSONObject jsonData = new JSONObject(jsData);
+
+		return jsonData;
 	}
 
 	/**
