@@ -15,10 +15,101 @@
    height="1052.3622047"
    id="svg2985"
    version="1.1"
-   inkscape:version="0.48.5 r10040"
+   inkscape:version="0.91pre3 r13670"
    sodipodi:docname="tour.svg">
   <defs
      id="defs2987">
+    <linearGradient
+       id="linearGradient4977">
+      <stop
+         style="stop-color:#6eacfb;stop-opacity:1"
+         offset="0"
+         id="stop4979" />
+      <stop
+         style="stop-color:#ffffff;stop-opacity:1"
+         offset="1"
+         id="stop4981" />
+    </linearGradient>
+    <linearGradient
+       id="linearGradient4946">
+      <stop
+         id="stop4948"
+         offset="0"
+         style="stop-color:#ff1f1e;stop-opacity:1;" />
+      <stop
+         id="stop4950"
+         offset="1"
+         style="stop-color:#ffffff;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient
+       inkscape:collect="always"
+       id="linearGradient7796">
+      <stop
+         style="stop-color:#b3b918;stop-opacity:1"
+         offset="0"
+         id="stop7798" />
+      <stop
+         id="stop11746"
+         offset="0.4099043"
+         style="stop-color:#b3b918;stop-opacity:1" />
+      <stop
+         style="stop-color:#bb35e7;stop-opacity:1"
+         offset="0.41809466"
+         id="stop11748" />
+      <stop
+         style="stop-color:#bb35e7;stop-opacity:1"
+         offset="1"
+         id="stop7800" />
+    </linearGradient>
+    <linearGradient
+       id="linearGradient7786">
+      <stop
+         id="stop7788"
+         offset="0"
+         style="stop-color:#dbff00;stop-opacity:1" />
+      <stop
+         id="stop11798"
+         offset="0.54143679"
+         style="stop-color:#dbff00;stop-opacity:1" />
+      <stop
+         style="stop-color:#b3b918;stop-opacity:1"
+         offset="0.54519737"
+         id="stop11794" />
+      <stop
+         style="stop-color:#b3b918;stop-opacity:1"
+         offset="0.6197136"
+         id="stop7794" />
+      <stop
+         style="stop-color:#f1f1f1;stop-opacity:1"
+         offset="0.62422079"
+         id="stop7792" />
+      <stop
+         id="stop7790"
+         offset="1"
+         style="stop-color:#f1f1f1;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient
+       id="linearGradient6309">
+      <stop
+         style="stop-color:#31ffff;stop-opacity:1"
+         offset="0"
+         id="stop6311" />
+      <stop
+         id="stop6315"
+         offset="1"
+         style="stop-color:#0024f9;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient
+       id="linearGradient6301">
+      <stop
+         id="stop6303"
+         offset="0"
+         style="stop-color:#00eee4;stop-opacity:1" />
+      <stop
+         style="stop-color:#0800e4;stop-opacity:1"
+         offset="1"
+         id="stop6307" />
+    </linearGradient>
     <linearGradient
        id="linearGradient4932">
       <stop
@@ -3857,6 +3948,71 @@
        id="linearGradient4523"
        xlink:href="#linearGradient5160-45-7"
        inkscape:collect="always" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient6309"
+       id="linearGradient6273"
+       gradientUnits="userSpaceOnUse"
+       x1="146.55728"
+       y1="75.433586"
+       x2="155.9753"
+       y2="75.375412" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient6301"
+       id="linearGradient6275"
+       gradientUnits="userSpaceOnUse"
+       x1="147.26399"
+       y1="68.057266"
+       x2="154.56187"
+       y2="67.999092" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient7786"
+       id="linearGradient7784"
+       gradientUnits="userSpaceOnUse"
+       x1="168.08307"
+       y1="78.152008"
+       x2="168.01262"
+       y2="65.608566" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient7796"
+       id="linearGradient7802"
+       x1="177.96573"
+       y1="76.540901"
+       x2="177.96573"
+       y2="61.609386"
+       gradientUnits="userSpaceOnUse" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient4946"
+       id="linearGradient4944"
+       gradientUnits="userSpaceOnUse"
+       x1="187.80292"
+       y1="79.263084"
+       x2="187.80292"
+       y2="66.37175" />
+    <linearGradient
+       y2="64.612999"
+       x2="183.94179"
+       y1="69.049561"
+       x1="183.94179"
+       gradientUnits="userSpaceOnUse"
+       id="linearGradient4600-7"
+       xlink:href="#linearGradient4977"
+       inkscape:collect="always"
+       gradientTransform="translate(9.851988e-6,-8.0381246e-7)" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient4460"
+       id="linearGradient5030"
+       gradientUnits="userSpaceOnUse"
+       x1="191.8069"
+       y1="72.461624"
+       x2="191.8069"
+       y2="64.980614"
+       gradientTransform="translate(-1.2103519e-5,1e-7)" />
   </defs>
   <sodipodi:namedview
      id="base"
@@ -3865,16 +4021,16 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="22.640001"
-     inkscape:cx="123.56108"
-     inkscape:cy="957.08927"
+     inkscape:zoom="22.627417"
+     inkscape:cx="187.44889"
+     inkscape:cy="976.00292"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="true"
-     inkscape:window-width="1980"
-     inkscape:window-height="830"
-     inkscape:window-x="336"
-     inkscape:window-y="113"
+     inkscape:window-width="1463"
+     inkscape:window-height="1330"
+     inkscape:window-x="504"
+     inkscape:window-y="78"
      inkscape:window-maximized="0"
      inkscape:snap-grids="true"
      inkscape:snap-page="false"
@@ -3896,7 +4052,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -4121,6 +4277,71 @@
        x="120.00008"
        y="86.362183"
        inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook\icons\tour-chart.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <rect
+       style="opacity:0.98999999;fill:none;stroke:none"
+       id="rect6561-8-1-8-5"
+       width="16"
+       height="16"
+       x="140"
+       y="61.362183"
+       inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook\icons\graph-overlapped.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <path
+       style="fill:url(#linearGradient6273);fill-opacity:1;stroke:url(#linearGradient6275);stroke-width:1;stroke-linecap:butt;stroke-linejoin:round"
+       d="m 140.49998,76.862183 15,0 -7.5,-15 z"
+       id="path4660-1-4"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook\icons\graph-overlapped.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"
+       sodipodi:nodetypes="cccc" />
+    <path
+       style="fill:url(#linearGradient7784);fill-opacity:1;stroke:url(#linearGradient7802);stroke-width:1;stroke-linecap:butt;stroke-linejoin:round;stroke-opacity:1"
+       d="m 160.5,76.862221 14.99999,0 -7.49999,-15 z"
+       id="path4660-1-0-0-2-3"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook\icons\graph-overlapped.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"
+       sodipodi:nodetypes="cccc" />
+    <path
+       style="fill:url(#linearGradient4600-7);fill-opacity:1;stroke:#6eacfb;stroke-width:1;stroke-linecap:butt;stroke-linejoin:round;stroke-opacity:1"
+       d="m 180.49997,69.055422 7.17762,0 -3.58881,-7.177626 z"
+       id="path4660-1-0-0-2-2-96"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook\icons\graph-overlapped.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"
+       sodipodi:nodetypes="cccc" />
+    <path
+       style="fill:url(#linearGradient4944);fill-opacity:1;stroke:#ff1f1e;stroke-width:0.99999994;stroke-linecap:butt;stroke-linejoin:round;stroke-opacity:1"
+       d="m 180.93068,76.862186 12.00006,0 -6.00002,-12.000063 z"
+       id="path4660-1-0-0-2-0"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook\icons\graph-overlapped.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"
+       sodipodi:nodetypes="cccc" />
+    <path
+       style="fill:url(#linearGradient5030);fill-opacity:1;stroke:#25e224;stroke-width:1;stroke-linecap:butt;stroke-linejoin:round;stroke-opacity:1"
+       d="m 186.45582,72.889899 9.00124,0 -4.50062,-9.00129 z"
+       id="path4660-1-0-9"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook\icons\graph-overlapped.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"
+       sodipodi:nodetypes="cccc" />
+    <rect
+       style="color:#000000;display:inline;overflow:visible;visibility:visible;fill:none;stroke:#158cf7;stroke-width:0;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none;enable-background:accumulate"
+       id="rect4471-2"
+       width="16"
+       height="16"
+       x="180"
+       y="61.362179"
+       inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook\icons\graph-overlapped.png"
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90" />
   </g>

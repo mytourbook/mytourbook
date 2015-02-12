@@ -140,6 +140,8 @@ public class TourChartConfiguration {
 	public boolean					isShowMarkerPoint;
 	public boolean					isShowSignImage;
 
+	public boolean					isGraphOverlapped;
+
 	public int						markerHoverSize;
 	public int						markerLabelOffset;
 
