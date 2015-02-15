@@ -1,6 +1,6 @@
 define(//
 {
 	
-//	searchInput_PlaceHolder : 'Search Tours, Marker and Waypoints'
+//	search_Text_Search_PlaceHolder : 'Search Tours, Marker and Waypoints'
 	
 });

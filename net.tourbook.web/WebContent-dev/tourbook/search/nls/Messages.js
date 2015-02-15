@@ -4,15 +4,14 @@ define(//
 
 	root : {
 
-		searchInput_PlaceHolder : 'Search Tours, Marker and Waypoints',
+		search_Action_StartSearch_Tooltip : 'Start searching.',
+		search_Action_SearchOptions_Tooltip : 'Search Options.',
+		search_Label_Status_Tooltip : 'Number of search results - Search time',
+		search_Text_Search_PlaceHolder : 'Search Tours, Marker and Waypoints',
+
+		searchGrid_Label_NoDataMessage : 'No search results found.',
 
 		searchOptions_Action_RestoreDefaults : 'Restore Defaults',
-
-		searchOptions_Group_Content : 'What should be searched?',
-		searchOptions_Group_Sorting : 'Sorting',
-		searchOptions_Group_Result : 'Result',
-
-		searchOptions_Label_SortAscending : 'By Date',
 
 		searchOptions_Checkbox_ShowContentAll : 'All',
 		searchOptions_Checkbox_ShowContentTour : 'Tours',
@@ -23,13 +22,16 @@ define(//
 		searchOptions_Checkbox_ShowItemNumber : 'Show item number',
 		searchOptions_Checkbox_ShowLuceneDocId : 'Show Lucene doc ID',
 
+		searchOptions_Dialog_Header : 'Search Options',
+
+		searchOptions_Group_Content : 'What should be searched?',
+		searchOptions_Group_Sorting : 'Sorting',
+		searchOptions_Group_Result : 'Result',
+
+		searchOptions_Label_SortAscending : 'By Date',
+
 		searchOptions_Radio_SortAscending : 'Ascending',
-		searchOptions_Radio_SortDescending : 'Descending',
-
-		searchOptions_Title : 'Search Options',
-		searchOptions_Tooltip : 'Search Options.',
-
-		searchStatus_Tooltip : 'Search Results - Time'
+		searchOptions_Radio_SortDescending : 'Descending'
 	},
 
 	// list of available languages in MT except EN which are defined in 'root'

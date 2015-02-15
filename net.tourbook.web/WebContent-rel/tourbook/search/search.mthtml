@@ -10,11 +10,12 @@
  -->
 
 	<title>$MESSAGE_SEARCH_TITLE$</title>
-	<link rel='stylesheet' href='default.css'>
+	
+	<link rel='stylesheet' href='startup.css'>
 
 </head>
 
-<body class="claro">
+<body class="tundra mtBase mtDialog">
 
 	<div id="domLoading">
 		<div>$MESSAGE_LOADING$</div>
@@ -24,8 +25,9 @@
 		
 		var dojoConfig = 
 		{
-		 	async : 	true,
-			locale : 	'$LOCALE$',
+		 	//parseOnLoad:	true,
+		 	async : 		true,			// this is very important otherwise loading is very slow
+			locale : 		'$LOCALE$',
 		};
 		
 	</script>
@@ -34,28 +36,28 @@ $DOJO_SEARCH$
 	
 	<script>require(['tourbook/search/SearchApp']);</script>
 	
+	
 	<div id="domContainer"
 	    data-dojo-type="dijit/layout/LayoutContainer">
     
-	    <div id="domSearchInputContainer"
+	    <div id="domSearchInputContainer" 
+	    	class="search"
 	        data-dojo-type="dijit/layout/ContentPane"
 	        data-dojo-props="region:'top'">
 	        
 			<table style="width:100%">
 				<tr>
-					<td style="width:99%; padding-left:0.2em;">
+					<td style="width:99%; padding-left:0.2em; padding-right:0.4em;">
 				    	<div id="domSearchInput"></div>
 					</td>
-					<td style="padding-left:0.2em;">
-					    <div id="hoverNode"></div>
+					<td style="margin-right:0.2em">
+					    <div id="domActionStartSearch"></div>
 					</td>
-					<td style="padding-left:0.2em;">
-					    <div id="hoverNode"></div>
-					    <div id="domButtonOptions" 
-					    	data-dojo-type="dijit/form/Button"
-					        data-dojo-props="onClick: function(){ console.log('First button was clicked!'); }">
-					        Click Me!
-					    </div>
+					<td>
+						<div id="domAppStatus">&nbsp;</div>
+					</td>
+					<td>
+					    <div id="domActionSearchOptions"></div>
 					</td>
 				</tr>
 			</table>
@@ -65,10 +67,7 @@ $DOJO_SEARCH$
 	        data-dojo-type="dijit/layout/ContentPane"
 	        data-dojo-props="region:'center'">
 
-			<div id="domError"></div>
-	        
 			<div id="domGrid"></div>
-			<div id="domStatus"></div>
 	    </div>
 
 	</div>

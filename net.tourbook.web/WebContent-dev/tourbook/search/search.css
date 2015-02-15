@@ -5,6 +5,37 @@
 @import url(../../dgrid/css/skins/tundra.css);
 
 
+a /* an <a> covers the whole item */
+{
+	text-decoration:		none;
+	color:					#444;
+}
+
+.mtBase 
+{
+	font-family: 			verdana, helvetica, arial, sans-serif;
+	font-size: 				13px;	
+	line-height:			130%;
+}
+
+/*
+	Overwrite dijit dialog
+*/
+.mtDialog .dijitDialog
+{
+	border:					1px solid #bbb;			/* replace blue border */
+	line-height:			80%;
+}
+
+.mtDialog .dijitTitlePaneTitle						/* group for widgets */
+{
+	background-image:		none;					/* hide gray */
+	border:					1px solid #fff;			/* overwrite (hide) border */		
+	border-bottom:			1px solid #bfbfbf;		/* set border only at the bottom */
+	padding-left: 			0px;
+	margin-left:			-5px;
+}
+
 /*
 	Dijit Button
 	
@@ -51,25 +82,12 @@
 {
 	background-image:		none;    				/* hide default gradient image */						
 	border-width:			1px;	
-	border-color:			#eee;
-	xborder-color:			#f4f4f4;
+	border-color:			#bbb;
 }
 
-/*
-	Overwrite dijit for the search options dialog.
-*/
-.searchOptions .dijitDialog
+.search .dijitInputField 
 {
-	border:					1px solid #bbb;			/* replace blue border */
-}
-
-.searchOptions .dijitTitlePaneTitle
-{
-	background-image:		none;					/* hide gray */
-	border:					1px solid #fff;			/* overwrite (hide) border */		
-	border-bottom:			1px solid #bfbfbf;		/* set border only at the bottom */
-	padding-left: 			0px;
-	margin-left:			-5px;
+	padding: 				2px;
 }
 
 /*
@@ -107,16 +125,25 @@
 }
 
 /*
-	Search options
+	Search actions
 */
-.actionOptionsIcon
+.actionIcon
 {
 	/* set width/height wider than the image -> the focus rubberband looks much better */
 	width:					20px; 
 	height:					20px; 
-	background-image: 		url("/tourbook/resources/options.png");
 	background-repeat:		no-repeat;
 	background-position: 	center;
+}
+
+.actionOptionsIcon
+{
+	background-image: 		url("/tourbook/resources/options.png");
+}
+
+.actionSearchIcon
+{
+	background-image: 		url("/tourbook/resources/search.png");
 }
 
 #domSearchStatus
@@ -141,17 +168,33 @@
 	
 #domGrid div:focus 
 { 
-	xoutline: 				none; 
 	outline-width:			1px;		/* 1px is default */
 }
 
-
-a /* an <a> covers the whole item */
+#domGrid .dgrid-row:HOVER
 {
-	text-decoration:		none;
-	color:					#444;
+    background-color: 		#eee;
 }
 
+#domGrid .dgrid-selected
+{
+    background-color: 		#ddd;
+}
+
+#domGrid .dgrid-selected:HOVER
+{
+    background-color: 		#ccc;
+}
+
+
+.dgrid-no-data,
+.dgrid-loading 
+{
+	color: 					#aaa;
+	font-size: 				2em;
+	padding: 				1em;
+	line-height: 			normal;		/* mtBase line-height looks ugly when text is wrapped*/
+}
 
 /*
 	Item container

@@ -227,7 +227,8 @@ public class SearchUI implements XHRHandler, DisposeListener {
 
 	private ViewPart						_view;
 	private Browser							_browser;
-	private DialogQuickEdit					_dialogQuickEdit;
+
+	private boolean							_isModalDialogOpen						= false;
 
 	private PostSelectionProvider			_postSelectionProvider;
 
@@ -255,7 +256,6 @@ public class SearchUI implements XHRHandler, DisposeListener {
 		WebContentServer.addXHRHandler(XHR_SEARCH_INPUT_HANDLER, this);
 
 		_browser = browser;
-
 		_browser.addDisposeListener(this);
 
 		/*
@@ -657,7 +657,7 @@ public class SearchUI implements XHRHandler, DisposeListener {
 	void hrefActionEditTour(final Long tourId) {
 
 		// ensure this dialog is modal (only one dialog can be opened)
-		if (_dialogQuickEdit != null) {
+		if (_isModalDialogOpen) {
 
 			MessageDialog.openInformation(
 					Display.getCurrent().getActiveShell(),
@@ -673,19 +673,21 @@ public class SearchUI implements XHRHandler, DisposeListener {
 			return;
 		}
 
+		_isModalDialogOpen = true;
+
 		try {
 
-			_dialogQuickEdit = new DialogQuickEdit(//
+			final DialogQuickEdit dialogQuickEdit = new DialogQuickEdit(//
 					Display.getCurrent().getActiveShell(),
 					tourData);
 
-			if (_dialogQuickEdit.open() == Window.OK) {
+			if (dialogQuickEdit.open() == Window.OK) {
 
 				saveModifiedTour(tourData);
 			}
 
 		} finally {
-			_dialogQuickEdit = null;
+			_isModalDialogOpen = false;
 		}
 	}
 
@@ -724,18 +726,38 @@ public class SearchUI implements XHRHandler, DisposeListener {
 
 	private void hrefActionMarker_Edit(final TourData tourData, final TourMarker tourMarker) {
 
+		// ensure this dialog is modal (only one dialog can be opened)
+		if (_isModalDialogOpen) {
+
+			MessageDialog.openInformation(
+					Display.getCurrent().getActiveShell(),
+					Messages.App_Action_Dialog_ActionIsInProgress_Title,
+					Messages.App_Action_Dialog_ActionIsInProgress_Message);
+
+			return;
+		}
+
 		if (tourData.isManualTour()) {
 			// a manually created tour do not have time slices -> no markers
 			return;
 		}
 
-		final DialogMarker markerDialog = new DialogMarker(//
-				_browser.getShell(),
-				tourData,
-				tourMarker);
+		_isModalDialogOpen = true;
 
-		if (markerDialog.open() == Window.OK) {
-			saveModifiedTour(tourData);
+		try {
+
+			final DialogMarker dialogMarker = new DialogMarker(//
+					_browser.getShell(),
+					tourData,
+					tourMarker);
+
+			if (dialogMarker.open() == Window.OK) {
+				saveModifiedTour(tourData);
+			}
+
+		} finally {
+
+			_isModalDialogOpen = false;
 		}
 	}
 
@@ -799,9 +821,9 @@ public class SearchUI implements XHRHandler, DisposeListener {
 	 */
 	private boolean performAction(final String location) {
 
-		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] performAction()")
-				+ ("\tlocation: " + location));
-		// TODO remove SYSTEM.OUT.PRINTLN
+//		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] performAction()")
+//				+ ("\tlocation: " + location));
+//		// TODO remove SYSTEM.OUT.PRINTLN
 
 		String action = null;
 
@@ -1094,6 +1116,12 @@ public class SearchUI implements XHRHandler, DisposeListener {
 			}
 
 			allItemSize = allItems.length();
+
+		} else {
+
+			// also keep empty search text
+
+			state.put(STATE_CURRENT_SEARCH_TEXT, UI.EMPTY_STRING);
 		}
 
 		final Headers responseHeaders = httpExchange.getResponseHeaders();
@@ -1204,14 +1232,4 @@ public class SearchUI implements XHRHandler, DisposeListener {
 		return responceObj.toString();
 	}
 
-	@SuppressWarnings("unused")
-	private void xhr_SetState(final Map<String, Object> params) throws UnsupportedEncodingException {
-
-		final Object rawState = params.get(XHR_PARAM_STATE);
-		final JSONObject jsonState = WEB.getJSONObject(rawState);
-
-		final String searchText = jsonState.getString(JSON_STATE_SEARCH_TEXT);
-
-		state.put(STATE_CURRENT_SEARCH_TEXT, searchText);
-	}
 }

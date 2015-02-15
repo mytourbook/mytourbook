@@ -1,4 +1,4 @@
 define(//
 {
-	searchInput_PlaceHolder : 'nl'
+	search_Text_Search_PlaceHolder : 'nl'
 });

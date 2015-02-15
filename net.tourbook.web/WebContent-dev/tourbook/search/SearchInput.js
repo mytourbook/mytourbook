@@ -4,14 +4,18 @@ define(
 [
 	"dojo/_base/declare",
 	"dojo/_base/lang",
+
 	"dojo/dom",
 	"dojo/keys", // keys.DOWN_ARROW keys.ENTER keys.ESCAPE
 	"dojo/on",
 	"dojo/request/xhr",
 	"dojo/store/Memory",
 	"dojo/window",
+
 	"dijit/form/FilteringSelect",
-	'./SearchMgr'
+
+	'./SearchMgr',
+	'dojo/i18n!./nls/Messages'
 ], //
 function(
 //
@@ -27,7 +31,8 @@ winUtils, //
 
 FilteringSelect, //
 
-SearchMgr //
+SearchMgr, //
+Messages //
 ) {
 
 	var SearchUI = declare("tourbook.search.SearchInput",
@@ -79,13 +84,13 @@ SearchMgr //
 		/**
 		 * Get search results for the current search text.
 		 */
-		loadSearchResults : function loadSearchResults(isForceRefresh) {
+		startSearch : function startSearch(isForceRefresh) {
 
 			// show selected item
 
 			var newSearchUrl = this.createSearchUrl();
 
-			console.warn("loadSearchResults '" + newSearchUrl + "'");
+			console.warn("startSearch '" + newSearchUrl + "'");
 
 			// check if loading is needed
 			if (isForceRefresh || this._currentSearchUrl !== newSearchUrl) {
@@ -93,10 +98,15 @@ SearchMgr //
 				// keep current search
 				this._currentSearchUrl = newSearchUrl;
 
-				// overwrite store url
-				this._grid.collection.target = newSearchUrl;
+				var grid = this._grid;
+				
+				// set no data message when a search is started manually
+				grid.noDataMessage = Messages.searchGrid_Label_NoDataMessage;
 
-				this._grid.refresh();
+				// overwrite store url
+				grid.collection.target = newSearchUrl;
+
+				grid.refresh();
 			}
 		},
 
@@ -120,7 +130,7 @@ SearchMgr //
 
 			// load results only with the <Enter> key
 			if (event.keyCode == keys.ENTER) {
-				this.loadSearchResults();
+				this.startSearch();
 			}
 		},
 

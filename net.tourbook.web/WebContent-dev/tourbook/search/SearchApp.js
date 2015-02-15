@@ -32,11 +32,13 @@ define(
 
 	'dojo/domReady!'
 ], function(
-//
+//	
+// dojo/_base
 declare, //
 fx, //
 lang, //
 
+// dojo
 aspect, //
 dom, //
 domClass, //
@@ -46,11 +48,13 @@ on, //
 parser, //
 xhr, //
 
+// dijit
 Button, //
 popup, //
 registry, //
 TooltipDialog, //
 
+// dgrid
 Keyboard, //
 OnDemandList, //
 Selection, //
@@ -87,7 +91,7 @@ Messages //
 				id : 'searchInput',
 				name : 'idSearch',
 
-				placeHolder : Messages.searchInput_PlaceHolder,
+				placeHolder : Messages.search_Text_Search_PlaceHolder,
 
 				hasDownArrow : false,
 
@@ -104,7 +108,7 @@ Messages //
 			this._searchInput.setGrid(grid);
 
 			// set tooltips
-			dom.byId('domAppStatus').title = Messages.searchStatus_Tooltip;
+			dom.byId('domAppStatus').title = Messages.search_Label_Status_Tooltip;
 		},
 
 		createUI_Actions : function createUI_Actions() {
@@ -117,29 +121,29 @@ Messages //
 			this._actionSearchOptions = new Button(//
 			{
 				// label is displayed as tooltip
-				label : Messages.searchOptions_Tooltip,
+				label : Messages.search_Action_SearchOptions_Tooltip,
 
 				showLabel : false,
-				iconClass : 'actionOptionsIcon',
+				iconClass : 'actionIcon actionOptionsIcon',
 
 				// show dialog when button is pressed with the keyboard
 				onClick : function() {
-					this.showDialog();
+					this._showDialog();
 				},
 
 				// show dialog when action button is hovered
 				onMouseOver : function() {
-					this.showDialog();
+					this._showDialog();
 				},
 
-				showDialog : function showDialog() {
+				_showDialog : function _showDialog() {
 
 					var dialogProperties = //
 					{
-						title : Messages.searchOptions_Title,
+						title : Messages.searchOptions_Dialog_Header,
 
 						// set flag that the dialog is positioned below this button
-						layoutParent : this,
+						layoutParent : this
 					};
 
 					app._dlgSearchOptions.showDialog(dialogProperties);
@@ -147,6 +151,25 @@ Messages //
 
 			}, 'domActionSearchOptions');
 			this._actionSearchOptions.startup();
+
+			/**
+			 * Action: Start search.
+			 */
+			this._actionStartSearch = new Button(//
+			{
+				// label is displayed as tooltip
+				label : Messages.search_Action_StartSearch_Tooltip,
+
+				showLabel : false,
+				iconClass : 'actionIcon actionSearchIcon',
+
+				// show dialog when button is pressed with the keyboard
+				onClick : function() {
+					app._searchInput.startSearch();
+				}
+
+			}, 'domActionStartSearch');
+			this._actionStartSearch.startup();
 		},
 
 		createUI_Grid : function createUI_Grid() {
@@ -155,12 +178,13 @@ Messages //
 
 			// copied from http://dgrid.io/tutorials/0.4/grids_and_stores/demo/OnDemandGrid-comparison.html
 			// ??? WHEN fetchRange IS NOT DEFINED, DATA WILL NOT BE RETRIEVED ???
-			var collection = new (declare('tourbook.search.ResultStore', RequestMemory,//
+			var collection = new (declare('tourbook.search.ResultStore', //
+			RequestMemory,//
 			{
 				/**
 				 * Overwrite fetchRange in dstore.Cache
 				 */
-				fetchRange : function(args) {
+				fetchRange : function fetchRange(args) {
 
 					var //
 					start = args.start, //
@@ -226,7 +250,7 @@ Messages //
 				useRangeHeaders : true
 			});
 
-			var grid = new (declare('tourbook.search.ResultUIList',
+			var grid = new (declare('tourbook.search.Grid',
 			[
 				OnDemandList,
 				Keyboard,
@@ -234,6 +258,9 @@ Messages //
 			], {
 
 				selectionMode : 'single',
+
+				// default is empty, this message will be set when a search is started manually
+				noDataMessage : '',
 
 				renderRow : function(value) {
 
@@ -347,9 +374,12 @@ Messages //
 			}).play();
 		}
 	});
-	
-	SearchApp.action = function(actionUrl){
-		
+
+	/**
+	 * Run an action in the MT app when the search UI is in the browser and not in the MT app.
+	 */
+	SearchApp.action = function(actionUrl) {
+
 		var query = {};
 		query[SearchMgr.XHR_PARAM_ACTION] = SearchMgr.XHR_ACTION_ITEM_ACTION;
 		query[SearchMgr.XHR_PARAM_ACTION_URL] = encodeURIComponent(actionUrl);

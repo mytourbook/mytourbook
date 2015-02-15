@@ -50,41 +50,43 @@ import com.sun.net.httpserver.HttpServer;
  */
 public class WebContentServer {
 
-	private static final boolean			IS_DEBUG_PORT				= true;
+	private static final boolean			IS_DEBUG_PORT				= false;
 	private static final int				NUMBER_OF_SERVER_THREADS	= 1;
 
 	// logs: time, url
-	private static boolean					LOG_URL						= true;
+	private static boolean					LOG_URL						= false;
 	private static boolean					LOG_DOJO					= false;
 
 	// logs: header
 	private static boolean					LOG_HEADER					= false;
 
 	// logs: xhr
-	public static boolean					LOG_XHR						= true;
+	public static boolean					LOG_XHR						= false;
+
+	private static boolean					IS_LOGGING					= LOG_URL || LOG_XHR || LOG_HEADER || LOG_DOJO;
 
 	// variables which are replaced in .mthtml files
-	private static final String				MTHTML_DOJO_SEARCH			= "DOJO_SEARCH";			//$NON-NLS-1$
-	private static final String				MTHTML_MESSAGE_LOADING		= "MESSAGE_LOADING";		//$NON-NLS-1$
-	private static final String				MTHTML_MESSAGE_SEARCH_TITLE	= "MESSAGE_SEARCH_TITLE";	//$NON-NLS-1$
-	private static final String				MTHTML_LOCALE				= "LOCALE";				//$NON-NLS-1$
+	private static final String				MTHTML_DOJO_SEARCH			= "DOJO_SEARCH";								//$NON-NLS-1$
+	private static final String				MTHTML_MESSAGE_LOADING		= "MESSAGE_LOADING";							//$NON-NLS-1$
+	private static final String				MTHTML_MESSAGE_SEARCH_TITLE	= "MESSAGE_SEARCH_TITLE";						//$NON-NLS-1$
+	private static final String				MTHTML_LOCALE				= "LOCALE";									//$NON-NLS-1$
 
-	private static final String				ROOT_FILE_PATH_NAME			= "/";						//$NON-NLS-1$
+	private static final String				ROOT_FILE_PATH_NAME			= "/";											//$NON-NLS-1$
 
-	private static final String				PROTOCOL_HTTP				= "http://";				//$NON-NLS-1$
-	private static final String				URI_INNER_PROTOCOL_FILE		= "/file:";				//$NON-NLS-1$
+	private static final String				PROTOCOL_HTTP				= "http://";									//$NON-NLS-1$
+	private static final String				URI_INNER_PROTOCOL_FILE		= "/file:";									//$NON-NLS-1$
 
-	private static final String				REQUEST_PATH_TOURBOOK		= "/tourbook";				//$NON-NLS-1$
+	private static final String				REQUEST_PATH_TOURBOOK		= "/tourbook";									//$NON-NLS-1$
 
-	private static final String				XHR_HEADER_KEY				= "X-requested-with";		//$NON-NLS-1$
-	private static final String				XHR_HEADER_VALUE			= "XMLHttpRequest";		//$NON-NLS-1$
+	private static final String				XHR_HEADER_KEY				= "X-requested-with";							//$NON-NLS-1$
+	private static final String				XHR_HEADER_VALUE			= "XMLHttpRequest";							//$NON-NLS-1$
 
-	private static final String				DOJO_ROOT					= "/dojo/";				//$NON-NLS-1$
-	private static final String				DOJO_DIJIT					= "/dijit/";				//$NON-NLS-1$
-	private static final String				DOJO_DGRID					= "/dgrid/";				//$NON-NLS-1$
-	private static final String				DOJO_DSTORE					= "/dstore/";				//$NON-NLS-1$
-	private static final String				DOJO_PUT_SELECTOR			= "/put-selector/";		//$NON-NLS-1$
-	private static final String				DOJO_XSTYLE					= "/xstyle/";				//$NON-NLS-1$
+	private static final String				DOJO_ROOT					= "/dojo/";									//$NON-NLS-1$
+	private static final String				DOJO_DIJIT					= "/dijit/";									//$NON-NLS-1$
+	private static final String				DOJO_DGRID					= "/dgrid/";									//$NON-NLS-1$
+	private static final String				DOJO_DSTORE					= "/dstore/";									//$NON-NLS-1$
+	private static final String				DOJO_PUT_SELECTOR			= "/put-selector/";							//$NON-NLS-1$
+	private static final String				DOJO_XSTYLE					= "/xstyle/";									//$NON-NLS-1$
 
 	public static final String				SERVER_URL;
 
@@ -111,6 +113,32 @@ public class WebContentServer {
 
 		SERVER_URL = PROTOCOL_HTTP + loopbackAddress.getHostAddress() + ':' + _serverPort;
 
+//
+// This font is disabled because it is not easy to read it.
+//
+//		/*
+//		 * Set css font to the same as the whole app.
+//		 */
+//		final FontData dlgFont = JFaceResources.getDialogFont().getFontData()[0];
+//
+//		final float fontHeight = dlgFont.getHeight() * 1.0f;
+//		final String fontSize = String.format(Locale.US, "%.1f", fontHeight);
+//
+//		final String cssFont = ""//
+//				+ "<style>															\n"
+//				+ "body																\n"
+//				+ "{																\n"
+//				+ ("	font-family:	" + dlgFont.getName() + ", sans-serif;		\n")
+//				+ ("	font-size:		" + fontSize + "pt;							\n")
+//
+//				/*
+//				 * IE do not set the font weight correctly, 599 is too light compared the external
+//				 * IE, 600 is heavier than the external IE, 400 is by definition the default.
+//				 */
+//				+ "		font-weight:	400;										\n"
+//				+ "}																\n"
+//				+ "</STYLE>															\n";
+
 		// Steps when switching between DEBUG and RELEASE build:
 		// =====================================================
 		// - Set DEBUG flag in WEB.java
@@ -132,6 +160,8 @@ public class WebContentServer {
 						+ "	<script src='/dojo/dojo.js.jgz'></script>					\n" //$NON-NLS-1$
 						+ "	<script src='/tourbook/search/SearchApp.js.jgz'></script>	\n" //$NON-NLS-1$
 		;
+
+//		dojoSearch += cssFont;
 
 		/*
 		 * Text replacements for commen messages.
@@ -291,7 +321,7 @@ public class WebContentServer {
 			StatusUtil.log(e);
 		} finally {
 
-			if (log.length() > 0 && (LOG_URL || LOG_XHR || LOG_HEADER || LOG_DOJO)) {
+			if (log.length() > 0 && IS_LOGGING) {
 
 				final String msg = String.format("%s %5.1f ms  %-16s [%s] %s", //
 						UI.timeStampNano(),

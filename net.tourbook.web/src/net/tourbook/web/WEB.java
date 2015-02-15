@@ -46,7 +46,7 @@ public class WEB {
 	 * {@value #WEB_CONTENT_DEVELOPMENT_FOLDER} folder otherwise it is delivered from the
 	 * {@value #WEB_CONTENT_RELEASE_FOLDER} folder.
 	 */
-	static boolean				IS_DEBUG								= true;
+	static boolean				IS_DEBUG								= false;
 
 	static final String			DEBUG_PATH_XUL_RUNNER					= "C:/E/XULRunner/";							//$NON-NLS-1$
 	static final String			DEBUG_PATH_DOJO							= "C:/E/js-resources/dojo/";					//$NON-NLS-1$
@@ -96,7 +96,7 @@ public class WEB {
 	private static final String	FILE_EXTENSION_PNG						= "png";										//$NON-NLS-1$
 
 	/**
-	 * HTML page which contains variable replacements which are processed in
+	 * This file extension is for HTML pages which contain variable replacements, processed in
 	 * {@link ReplacingOutputStream}.
 	 */
 	public static final String	FILE_EXTENSION_MTHTML					= "mthtml";									//$NON-NLS-1$

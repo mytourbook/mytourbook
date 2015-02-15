@@ -151,25 +151,12 @@
 		<echo level="info" message="### Copying Dojo resources, toolkit->rel ..." />
 		<copy todir="${WebContentRel}" preservelastmodified="no" verbose="yes">
 			<fileset dir="${dojoToolkitFolder}" id="id">
+				
 			    <include name="**/dgrid/css/skins/images/row_back.png"/>
 			    <include name="**/dojo/resources/blank.gif"/>
-			    <include name="**/dijit/themes/claro/form/images/commonFormArrows.png"/>
-			    <include name="**/dijit/themes/claro/images/standardGradient.png"/>
-			    	
-				<!-- 
 				
-				/MyTourbook-DojoToolkit/dijit/themes/tundra/images/buttonActive.png
-				/MyTourbook-DojoToolkit/dijit/themes/tundra/images/buttonEnabled.png
-				/MyTourbook-DojoToolkit/dijit/themes/tundra/images/buttonHover.png
-				/MyTourbook-DojoToolkit/dijit/themes/tundra/images/checkmark.png
-				/MyTourbook-DojoToolkit/dijit/themes/tundra/images/spriteArrows.png
-				/MyTourbook-DojoToolkit/dijit/themes/tundra/images/tabClose.png
-				/MyTourbook-DojoToolkit/dijit/themes/tundra/images/tabCloseHover.png
-				/MyTourbook-DojoToolkit/dijit/themes/tundra/images/titleBar.png
-				/MyTourbook-DojoToolkit/dijit/themes/tundra/images/validationInputBg.png
-								
-				
-				-->
+				<!-- copy all theme images even when something are not used because there are not too many and size is small -->
+			    <include name="**/dijit/themes/tundra/images/*.png"/>
 				
 			</fileset>
 		</copy>

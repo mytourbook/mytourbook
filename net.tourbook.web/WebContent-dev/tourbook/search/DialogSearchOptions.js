@@ -209,7 +209,7 @@ Messages //
 
 				// repeat previous search
 
-				_this._searchApp._searchInput.loadSearchResults(true);
+				_this._searchApp._searchInput.startSearch(true);
 			});
 		},
 
