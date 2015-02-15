@@ -449,10 +449,12 @@ public class TourManager {
 												final Object customData,
 												final IWorkbenchPart part) {
 
-		final Object[] allListeners = _tourEventListeners.getListeners();
-		for (final Object listener : allListeners) {
-			((ITourEventListener) listener).tourChanged(part, tourEventId, customData);
-		}
+		fireEvent(tourEventId, customData, part);
+
+//		final Object[] allListeners = _tourEventListeners.getListeners();
+//		for (final Object listener : allListeners) {
+//			((ITourEventListener) listener).tourChanged(part, tourEventId, customData);
+//		}
 	}
 
 	public static int[] getAllGraphIDs() {

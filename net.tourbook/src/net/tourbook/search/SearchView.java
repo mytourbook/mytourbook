@@ -47,7 +47,7 @@ import org.eclipse.ui.part.ViewPart;
 
 import de.byteholder.geoclipse.util.Util;
 
-public class SearchView extends ViewPart implements IActiveSearchView {
+public class SearchView extends ViewPart implements ISearchView {
 
 	public static final String		ID	= "net.tourbook.search.SearchView"; //$NON-NLS-1$
 
@@ -61,25 +61,41 @@ public class SearchView extends ViewPart implements IActiveSearchView {
 	 */
 	private Browser					_browser;
 
+	/**
+	 * This is a hidden feature.
+	 * <p>
+	 * When the search view is opened with the Ctrl key, the Linux view is opened.
+	 */
+	private static boolean			_isForceLinuxView;
+
+	/**
+	 * Use hidden feature to open the Linux view instead of the Windows view.
+	 * 
+	 * @param isForceLinuxView
+	 */
+	public static void setIsForceLinuxView(final boolean isForceLinuxView) {
+
+		_isForceLinuxView = isForceLinuxView;
+	}
+
 	private void addPartListener() {
 
 		_partListener = new IPartListener2() {
 
 			@Override
-			public void partActivated(final IWorkbenchPartReference partRef) {
-				SearchMgr.setActiveSearchView(SearchView.this);
-			}
+			public void partActivated(final IWorkbenchPartReference partRef) {}
 
 			@Override
 			public void partBroughtToTop(final IWorkbenchPartReference partRef) {}
 
 			@Override
-			public void partClosed(final IWorkbenchPartReference partRef) {}
+			public void partClosed(final IWorkbenchPartReference partRef) {
+
+				SearchMgr.setSearchView(null);
+			}
 
 			@Override
-			public void partDeactivated(final IWorkbenchPartReference partRef) {
-				SearchMgr.setActiveSearchView(null);
-			}
+			public void partDeactivated(final IWorkbenchPartReference partRef) {}
 
 			@Override
 			public void partHidden(final IWorkbenchPartReference partRef) {}
@@ -88,7 +104,10 @@ public class SearchView extends ViewPart implements IActiveSearchView {
 			public void partInputChanged(final IWorkbenchPartReference partRef) {}
 
 			@Override
-			public void partOpened(final IWorkbenchPartReference partRef) {}
+			public void partOpened(final IWorkbenchPartReference partRef) {
+
+				SearchMgr.setSearchView(SearchView.this);
+			}
 
 			@Override
 			public void partVisible(final IWorkbenchPartReference partRef) {}
@@ -141,11 +160,25 @@ public class SearchView extends ViewPart implements IActiveSearchView {
 
 		FTSearchManager.setupSuggester();
 
+		addPartListener();
+		addTourEventListener();
+
+		// this part is a selection provider
+		_postSelectionProvider = new PostSelectionProvider(ID);
+		getSite().setSelectionProvider(_postSelectionProvider);
+
 		if (UI.IS_WIN) {
-			createUI_10_Search(parent);
+
+			if (_isForceLinuxView) {
+				createUI_20_Linux(parent);
+			} else {
+				createUI_10_Search(parent);
+			}
+
 		} else {
 			createUI_20_Linux(parent);
 		}
+
 	}
 
 	private void createUI_10_Search(final Composite parent) {
@@ -156,7 +189,7 @@ public class SearchView extends ViewPart implements IActiveSearchView {
 			GridDataFactory.fillDefaults().grab(true, true).applyTo(_browser);
 
 		} catch (final SWTError e) {
-			StatusUtil.showStatus("Could not instantiate Browser: " + e.getMessage(), e);
+			StatusUtil.showStatus("Could not instantiate Browser: " + e.getMessage(), e);//$NON-NLS-1$
 			return;
 		}
 
@@ -166,13 +199,6 @@ public class SearchView extends ViewPart implements IActiveSearchView {
 				SearchMgr.onBrowserLocation(event);
 			}
 		});
-
-		addPartListener();
-		addTourEventListener();
-
-		// this part is a selection provider
-		_postSelectionProvider = new PostSelectionProvider(ID);
-		getSite().setSelectionProvider(_postSelectionProvider);
 
 		// show search page
 		_browser.setUrl(SearchMgr.SEARCH_URL);
@@ -187,7 +213,6 @@ public class SearchView extends ViewPart implements IActiveSearchView {
 			final Link linkLinuxBrowser = new Link(container, SWT.WRAP | SWT.READ_ONLY);
 			GridDataFactory.fillDefaults()//
 					.grab(true, true)
-					.align(SWT.FILL, SWT.BEGINNING)
 					.applyTo(linkLinuxBrowser);
 
 			linkLinuxBrowser.setText(NLS.bind(
@@ -208,7 +233,11 @@ public class SearchView extends ViewPart implements IActiveSearchView {
 	public void dispose() {
 
 		TourManager.getInstance().removeTourEventListener(_tourEventListener);
-		getViewSite().getPage().removePartListener(_partListener);
+
+		if (_partListener != null) {
+
+			getViewSite().getPage().removePartListener(_partListener);
+		}
 
 		super.dispose();
 	}

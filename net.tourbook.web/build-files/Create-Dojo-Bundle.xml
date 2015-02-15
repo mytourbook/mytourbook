@@ -1,6 +1,7 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <project name="CreateDojoFiles" default="all" basedir=".">
-	
+
+	<!-- THIS FOLDER IS ALSO SET IN "mytourbook-app.profile.js" -->
 	<property name="dojoToolkitFolder"				value="C:/E/js-resources/dojo/MyTourbook-DojoToolkit" />
 	
 	<property name="WebContentDev"					value="../WebContent-dev" />
@@ -15,22 +16,27 @@
 	<property name="dojoBuildFolder"				value="../../../../mytourbook-BUILD-dojo" />
 	<property name="dojoBuildReleaseFolder"			value="${dojoBuildFolder}/mt-dojo-release" />
 
-	<target name="all" depends="cleanBuild,cleanMTRelease,shrink,copyResources,compress,cleanBuild" />
+	<target name="all" depends="cleanBuildFiles,cleanMTRelease,shrink,copyResources,compress,cleanBuildFiles" />
 
-	<target name="cleanBuild">
-		<echo level="info" message="Clean build folder" />
+	<target name="cleanBuildFiles">
+		
+		<echo level="info" message="Cleaning tourbook in Dojo Toolkit build folder" />
+		
 		<delete dir="${tourbookInDojoToolkitFolder}" />
+		
 		<delete includeEmptyDirs="true">
 			<fileset dir="${dojoBuildFolder}" includes="**/*" defaultexcludes="no"/>
 		</delete>
 	</target>
 
 	<target name="cleanMTRelease">
-		<echo level="info" message="Clean MT release folder" />
+		<echo level="info" message="Cleaning MT release folder" />
 		<delete dir="${WebContentRelTourbook}" />
 	</target>
 
 	<target name="shrink">
+		
+		<mkdir dir="mytourbook-Dojo-BUILD-autocreated"/>
 
 		<echo level="info" message="### Copying src files into dojo root ..." />
 		<copy todir="${tourbookInDojoToolkitFolder}" preservelastmodified="yes" verbose="no">
@@ -88,6 +94,9 @@
 		
 		<gzip  	src="${dojoBuildReleaseFolder}/tourbook/search/search.css" 
 				destfile="${WebContentRelTourbook}/search/search.css.jgz"/>
+
+		<!-- finally cleanup all temp files -->
+		<antcall target="cleanBuildFiles"/>
 
 	</target>
 

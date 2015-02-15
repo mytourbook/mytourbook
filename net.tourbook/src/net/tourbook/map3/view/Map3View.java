@@ -382,7 +382,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 					_currentLeftSliderValueIndex,
 					_currentRightSliderValueIndex);
 
-			TourManager.fireEventWithCustomData(//
+			TourManager.fireEvent(//
 					TourEventId.SLIDER_POSITION_CHANGED,
 					sliderSelection,
 					Map3View.this);
@@ -592,6 +592,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 	private void addSelectionListener() {
 
 		_postSelectionListener = new ISelectionListener() {
+			@Override
 			public void selectionChanged(final IWorkbenchPart part, final ISelection selection) {
 
 				if (part == Map3View.this) {
@@ -641,6 +642,10 @@ public class Map3View extends ViewPart implements ITourProvider {
 
 						syncMapWith_TourMarker(tourData, tourMarker);
 					}
+
+				} else if ((eventId == TourEventId.TOUR_SELECTION) && eventData instanceof ISelection) {
+
+					onSelectionChanged((ISelection) eventData);
 
 				} else if (eventId == TourEventId.SLIDER_POSITION_CHANGED && eventData instanceof ISelection) {
 
@@ -853,6 +858,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 				 * menu actions has done they tasks
 				 */
 				Display.getCurrent().asyncExec(new Runnable() {
+					@Override
 					public void run() {
 
 						hideTourInfo();
@@ -881,6 +887,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 		final Map3ContextMenu swt_awt_ContextMenu = new Map3ContextMenu(display, _swtContextMenu);
 
 		display.asyncExec(new Runnable() {
+			@Override
 			public void run() {
 //				System.out.println("SWT calling menu"); //$NON-NLS-1$
 				swt_awt_ContextMenu.swtIndirectShowMenu(xPosScreen, yPosScreen);
@@ -1216,6 +1223,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 
 		// run in SWT thread
 		_mapContainer.getDisplay().asyncExec(new Runnable() {
+			@Override
 			public void run() {
 
 				// activate this view
@@ -1407,6 +1415,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 
 			_mapContainer.getDisplay().asyncExec(new Runnable() {
 
+				@Override
 				public void run() {
 
 					createContextMenu(mouseEvent.getXOnScreen(), mouseEvent.getYOnScreen());

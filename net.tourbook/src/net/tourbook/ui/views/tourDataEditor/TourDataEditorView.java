@@ -1619,6 +1619,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 					updateUI_FromModel(_tourData, false, true);
 
+				} else if ((eventId == TourEventId.TOUR_SELECTION) && eventData instanceof ISelection) {
+
+					onSelectionChanged((ISelection) eventData);
+
 				} else if (eventId == TourEventId.MARKER_SELECTION) {
 
 					if (eventData instanceof SelectionTourMarker) {

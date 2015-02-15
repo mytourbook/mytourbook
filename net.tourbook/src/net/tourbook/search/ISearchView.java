@@ -19,7 +19,10 @@ import net.tourbook.common.util.PostSelectionProvider;
 
 import org.eclipse.ui.IWorkbenchPart;
 
-public interface IActiveSearchView {
+/**
+ *
+ */
+public interface ISearchView {
 
 	IWorkbenchPart getPart();
 

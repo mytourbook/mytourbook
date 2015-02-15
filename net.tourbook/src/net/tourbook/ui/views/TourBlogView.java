@@ -286,6 +286,10 @@ public class TourBlogView extends ViewPart {
 
 					clearView();
 
+				} else if ((eventId == TourEventId.TOUR_SELECTION) && eventData instanceof ISelection) {
+
+					onSelectionChanged((ISelection) eventData);
+
 				} else if (eventId == TourEventId.MARKER_SELECTION) {
 
 					if (eventData instanceof SelectionTourMarker) {

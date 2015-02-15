@@ -50,6 +50,7 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.browser.LocationEvent;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Shell;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
@@ -234,9 +235,8 @@ public class SearchMgr implements XHRHandler {
 		WebContentServer.addXHRHandler(XHR_SEARCH_INPUT_HANDLER, SearchMgr.getInstance());
 	}
 
-	private static IActiveSearchView		_activeSearchView;
-
 	private static SearchMgr				_searchMgr;
+	private static ISearchView				_searchView;
 
 	private static boolean					_isModalDialogOpen						= false;
 
@@ -245,6 +245,24 @@ public class SearchMgr implements XHRHandler {
 		String	createdHtml;
 		String	selectedId;
 
+	}
+
+	/**
+	 * !!! With an active shell the dialog positions are maintained !!!
+	 * 
+	 * @return
+	 */
+	private static Shell getActiveShell() {
+
+		final Display display = Display.getDefault();
+		final Shell[] allShells = display.getShells();
+
+		final Shell activeShell = allShells[allShells.length - 1];
+
+		activeShell.forceActive();
+		activeShell.forceFocus();
+
+		return activeShell;
 	}
 
 	private static String getIconUrl(final String iconImage) {
@@ -263,182 +281,13 @@ public class SearchMgr implements XHRHandler {
 		return _searchMgr;
 	}
 
-	static void hrefActionEditTour(final Long tourId) {
-
-		// ensure this dialog is modal (only one dialog can be opened)
-		if (_isModalDialogOpen) {
-
-			MessageDialog.openInformation(
-					Display.getCurrent().getActiveShell(),
-					Messages.App_Action_Dialog_ActionIsInProgress_Title,
-					Messages.App_Action_Dialog_ActionIsInProgress_Message);
-
-			return;
-		}
-
-		// get tour by id
-		final TourData tourData = TourManager.getTour(tourId);
-		if (tourData == null) {
-			return;
-		}
-
-		_isModalDialogOpen = true;
-
-		try {
-
-			final DialogQuickEdit dialogQuickEdit = new DialogQuickEdit(//
-					Display.getCurrent().getActiveShell(),
-					tourData);
-
-			if (dialogQuickEdit.open() == Window.OK) {
-
-				saveModifiedTour(tourData);
-			}
-
-		} finally {
-			_isModalDialogOpen = false;
-		}
-	}
-
-	static void hrefActionMarker(final String action, final long tourId, final long markerId) {
-
-		// get tour by id
-		final TourData tourData = TourManager.getTour(tourId);
-		if (tourData == null) {
-			return;
-		}
-
-		TourMarker selectedTourMarker = null;
-
-		// get marker by id
-		for (final TourMarker tourMarker : tourData.getTourMarkers()) {
-			if (tourMarker.getMarkerId() == markerId) {
-				selectedTourMarker = tourMarker;
-				break;
-			}
-		}
-
-		if (selectedTourMarker == null) {
-			return;
-		}
-
-		switch (action) {
-		case SearchMgr.ACTION_EDIT_MARKER:
-			hrefActionMarker_Edit(tourData, selectedTourMarker);
-			break;
-
-		case SearchMgr.ACTION_SELECT_MARKER:
-			hrefActionMarker_Select(tourData, selectedTourMarker);
-			break;
-		}
-	}
-
-	private static void hrefActionMarker_Edit(final TourData tourData, final TourMarker tourMarker) {
-
-		// ensure this dialog is modal (only one dialog can be opened)
-		if (_isModalDialogOpen) {
-
-			MessageDialog.openInformation(
-					Display.getCurrent().getActiveShell(),
-					Messages.App_Action_Dialog_ActionIsInProgress_Title,
-					Messages.App_Action_Dialog_ActionIsInProgress_Message);
-
-			return;
-		}
-
-		if (tourData.isManualTour()) {
-			// a manually created tour do not have time slices -> no markers
-			return;
-		}
-
-		_isModalDialogOpen = true;
-
-		try {
-
-			final DialogMarker dialogMarker = new DialogMarker(//
-					Display.getDefault().getActiveShell(),
-					tourData,
-					tourMarker);
-
-			if (dialogMarker.open() == Window.OK) {
-				saveModifiedTour(tourData);
-			}
-
-		} finally {
-
-			_isModalDialogOpen = false;
-		}
-	}
-
-	private static void hrefActionMarker_Select(final TourData tourData, final TourMarker selectedTourMarker) {
-
-		if (_activeSearchView == null) {
-			return;
-		}
-
-		final ArrayList<TourMarker> selectedTourMarkers = new ArrayList<TourMarker>();
-		selectedTourMarkers.add(selectedTourMarker);
-
-		final SelectionTourMarker markerSelection = new SelectionTourMarker(tourData, selectedTourMarkers);
-
-		// ensure that the selection provider contain the correct data
-		_activeSearchView.getPostSelectionProvider().setSelectionNoFireEvent(markerSelection);
-
-		TourManager.fireEvent(//
-				TourEventId.MARKER_SELECTION,
-				markerSelection,
-				_activeSearchView.getPart());
-	}
-
-	static void hrefActionWayPoint(final String action, final long tourId, final long markerId) {
-
-		if (_activeSearchView == null) {
-			return;
-		}
-
-		// get tour by id
-		final TourData tourData = TourManager.getTour(tourId);
-		if (tourData == null) {
-			return;
-		}
-
-		TourWayPoint selectedWayPoint = null;
-
-		// get marker by id
-		for (final TourWayPoint wayPoint : tourData.getTourWayPoints()) {
-			if (wayPoint.getWayPointId() == markerId) {
-				selectedWayPoint = wayPoint;
-				break;
-			}
-		}
-
-		if (selectedWayPoint == null) {
-			return;
-		}
-
-		// fire selection
-		final ISelection selection = new StructuredSelection(selectedWayPoint);
-		_activeSearchView.getPostSelectionProvider().setSelection(selection);
-	}
-
-	static void onBrowserLocation(final LocationEvent event) {
-
-		final String location = event.location;
-
-		if (performAction(location)) {
-
-			// keep current page when an action is performed, OTHERWISE the current page will disappear :-(
-			event.doit = false;
-		}
-	}
-
 	/**
 	 * @param location
 	 * @return Returns <code>true</code> when a action is performed.
 	 */
-	private static boolean performAction(final String location) {
+	private static boolean hrefAction(final String location) {
 
-		if (_activeSearchView == null) {
+		if (_searchView == null) {
 			return false;
 		}
 
@@ -495,31 +344,212 @@ public class SearchMgr implements XHRHandler {
 
 		case ACTION_EDIT_TOUR:
 
-			hrefActionEditTour(tourId);
+			hrefAction_Tour_Edit(tourId);
 
 			break;
 
 		case ACTION_SELECT_TOUR:
 
-			_activeSearchView.getPostSelectionProvider().setSelection(new SelectionTourId(tourId));
+			hrefAction_Tour_Select(tourId);
 
 			break;
 
 		case ACTION_EDIT_MARKER:
 		case ACTION_SELECT_MARKER:
 
-			hrefActionMarker(action, tourId, markerId);
+			hrefAction_Marker(action, tourId, markerId);
 
 			break;
 
 		case ACTION_SELECT_WAY_POINT:
 
-			hrefActionWayPoint(action, tourId, markerId);
+			hrefAction_WayPoint(action, tourId, markerId);
 
 			break;
 		}
 
 		return true;
+	}
+
+	private static void hrefAction_Marker(final String action, final long tourId, final long markerId) {
+
+		// get tour by id
+		final TourData tourData = TourManager.getTour(tourId);
+		if (tourData == null) {
+			return;
+		}
+
+		TourMarker selectedTourMarker = null;
+
+		// get marker by id
+		for (final TourMarker tourMarker : tourData.getTourMarkers()) {
+			if (tourMarker.getMarkerId() == markerId) {
+				selectedTourMarker = tourMarker;
+				break;
+			}
+		}
+
+		if (selectedTourMarker == null) {
+			return;
+		}
+
+		switch (action) {
+		case SearchMgr.ACTION_EDIT_MARKER:
+			hrefAction_Marker_Edit(tourData, selectedTourMarker);
+			break;
+
+		case SearchMgr.ACTION_SELECT_MARKER:
+			hrefAction_Marker_Select(tourData, selectedTourMarker);
+			break;
+		}
+	}
+
+	private static void hrefAction_Marker_Edit(final TourData tourData, final TourMarker tourMarker) {
+
+		final Shell activeShell = getActiveShell();
+
+		// ensure this dialog is modal (only one dialog can be opened)
+		if (_isModalDialogOpen) {
+
+			MessageDialog.openInformation(
+					activeShell,
+					Messages.App_Action_Dialog_ActionIsInProgress_Title,
+					Messages.App_Action_Dialog_ActionIsInProgress_Message);
+
+			return;
+		}
+
+		if (tourData.isManualTour()) {
+			// a manually created tour do not have time slices -> no markers
+			return;
+		}
+
+		_isModalDialogOpen = true;
+
+		try {
+
+			final DialogMarker dialogMarker = new DialogMarker(//
+					activeShell,
+					tourData,
+					tourMarker);
+
+			if (dialogMarker.open() == Window.OK) {
+				saveModifiedTour(tourData);
+			}
+
+		} finally {
+
+			_isModalDialogOpen = false;
+		}
+	}
+
+	private static void hrefAction_Marker_Select(final TourData tourData, final TourMarker selectedTourMarker) {
+
+		if (_searchView == null) {
+			return;
+		}
+
+		final ArrayList<TourMarker> selectedTourMarkers = new ArrayList<TourMarker>();
+		selectedTourMarkers.add(selectedTourMarker);
+
+		final SelectionTourMarker markerSelection = new SelectionTourMarker(tourData, selectedTourMarkers);
+
+		updateSelectionProvider(markerSelection);
+
+		TourManager.fireEvent(//
+				TourEventId.MARKER_SELECTION,
+				markerSelection,
+				_searchView.getPart());
+	}
+
+	private static void hrefAction_Tour_Edit(final Long tourId) {
+
+		final Shell activeShell = getActiveShell();
+
+		// ensure this dialog is modal (only one dialog can be opened)
+		if (_isModalDialogOpen) {
+
+			MessageDialog.openInformation(
+					activeShell,
+					Messages.App_Action_Dialog_ActionIsInProgress_Title,
+					Messages.App_Action_Dialog_ActionIsInProgress_Message);
+
+			return;
+		}
+
+		// get tour by id
+		final TourData tourData = TourManager.getTour(tourId);
+		if (tourData == null) {
+			return;
+		}
+
+		_isModalDialogOpen = true;
+
+		try {
+
+			final DialogQuickEdit dialogQuickEdit = new DialogQuickEdit(//
+					activeShell,
+					tourData);
+
+			if (dialogQuickEdit.open() == Window.OK) {
+
+				saveModifiedTour(tourData);
+			}
+
+		} finally {
+			_isModalDialogOpen = false;
+		}
+	}
+
+	private static void hrefAction_Tour_Select(final long tourId) {
+
+		final SelectionTourId selection = new SelectionTourId(tourId);
+
+		updateSelectionProvider(selection);
+
+		TourManager.fireEvent(TourEventId.TOUR_SELECTION, selection, _searchView.getPart());
+	}
+
+	private static void hrefAction_WayPoint(final String action, final long tourId, final long markerId) {
+
+		if (_searchView == null) {
+			return;
+		}
+
+		// get tour by id
+		final TourData tourData = TourManager.getTour(tourId);
+		if (tourData == null) {
+			return;
+		}
+
+		TourWayPoint selectedWayPoint = null;
+
+		// get marker by id
+		for (final TourWayPoint wayPoint : tourData.getTourWayPoints()) {
+			if (wayPoint.getWayPointId() == markerId) {
+				selectedWayPoint = wayPoint;
+				break;
+			}
+		}
+
+		if (selectedWayPoint == null) {
+			return;
+		}
+
+		// fire selection
+		final ISelection selection = new StructuredSelection(selectedWayPoint);
+		_searchView.getPostSelectionProvider().setSelection(selection);
+	}
+
+	static void onBrowserLocation(final LocationEvent event) {
+
+		final String location = event.location;
+
+		if (hrefAction(location)) {
+
+			// keep current page when an action is performed, OTHERWISE the current page will disappear :-(
+			event.doit = false;
+		}
 	}
 
 	/**
@@ -550,10 +580,6 @@ public class SearchMgr implements XHRHandler {
 				TourManager.saveModifiedTour(tourData);
 			}
 		});
-	}
-
-	public static void setActiveSearchView(final IActiveSearchView searchView) {
-		_activeSearchView = searchView;
 	}
 
 	/**
@@ -603,7 +629,22 @@ public class SearchMgr implements XHRHandler {
 				_isUI_SortDateAscending);
 	}
 
-	ItemResponse createHTML_10_Item(final SearchResultItem resultItem, final int itemNumber) {
+	public static void setSearchView(final ISearchView searchView) {
+
+		_searchView = searchView;
+	}
+
+	/**
+	 * Ensure that the selection provider contains the same data.
+	 * 
+	 * @param selection
+	 */
+	private static void updateSelectionProvider(final ISelection selection) {
+
+		_searchView.getPostSelectionProvider().setSelectionNoFireEvent(selection);
+	}
+
+	private ItemResponse createHTML_10_Item(final SearchResultItem resultItem, final int itemNumber) {
 
 		final StringBuilder sb = new StringBuilder();
 
@@ -931,7 +972,7 @@ public class SearchMgr implements XHRHandler {
 			Display.getDefault().asyncExec(new Runnable() {
 				@Override
 				public void run() {
-					performAction(xhrAction);
+					hrefAction(xhrAction);
 				}
 			});
 		}
@@ -1104,7 +1145,7 @@ public class SearchMgr implements XHRHandler {
 			Display.getDefault().asyncExec(new Runnable() {
 				@Override
 				public void run() {
-					performAction(xhrAction);
+					hrefAction(xhrAction);
 				}
 			});
 		}

@@ -26,7 +26,6 @@ import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.search.SearchMgr.ItemResponse;
 import net.tourbook.tour.ITourEventListener;
 import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.TourEvent;
@@ -160,7 +159,7 @@ public class SearchViewSWT extends ViewPart {
 
 	private Text						_txtSearch;
 
-	private SearchUI					_searchUI;
+//	private SearchUI					_searchUI;
 
 	public class MTContentProposalAdapter extends ContentProposalAdapter {
 
@@ -603,62 +602,62 @@ public class SearchViewSWT extends ViewPart {
 	private String createHTML_20_Body(final SearchResult searchResult, final String stateText) {
 
 		final StringBuilder sb = new StringBuilder();
-		final StringBuilder sbNavigator = new StringBuilder();
-
-		if (searchResult != null) {
-
-			createHTML_40_PageNavigator(sbNavigator, searchResult);
-
-			/*
-			 * top navigator
-			 */
-			if (_isUIShowTopNavigator) {
-				sb.append("<div style='padding-top:3px;'></div>");
-				sb.append(sbNavigator);
-				sb.append("<div style='padding-top:3px;'></div>");
-			}
-
-			/*
-			 * items
-			 */
-			final int itemBaseNumber = searchResult.pageNumber * searchResult.hitsPerPage;
-			int itemIndex = 0;
-
-			for (final SearchResultItem resultItem : searchResult.items) {
-
-				final int itemNumber = itemBaseNumber + (++itemIndex);
-
-				String selectedItemClass = UI.EMPTY_STRING;
-
-				if (_selectedDocId != -1 && _selectedDocId == resultItem.docId) {
-					selectedItemClass = UI.SPACE1 + CSS_SELECTED;
-				}
-
-				sb.append("<div"
-						+ (" class='" + SearchMgr.CSS_ITEM_CONTAINER + selectedItemClass + "'")
-						+ " id='" + resultItem.docId + "'>\n"); //$NON-NLS-1$
-				{
-					final ItemResponse itemResponse = _searchUI.createHTML_10_Item(resultItem, itemNumber);
-					sb.append(itemResponse.createdHtml);
-
-				}
-				sb.append("</div>\n"); //$NON-NLS-1$
-			}
-
-			/*
-			 * bottom navigator
-			 */
-			sb.append("<div style='padding-top:3px;'></div>");
-			sb.append(sbNavigator);
-			sb.append("<div style='padding-top:3px;'></div>");
-		}
-
-		// state
-		sb.append("<div class='result-state'>"); //$NON-NLS-1$
-		{
-			sb.append(stateText);
-		}
-		sb.append("</div>\n"); //$NON-NLS-1$
+//		final StringBuilder sbNavigator = new StringBuilder();
+//
+//		if (searchResult != null) {
+//
+//			createHTML_40_PageNavigator(sbNavigator, searchResult);
+//
+//			/*
+//			 * top navigator
+//			 */
+//			if (_isUIShowTopNavigator) {
+//				sb.append("<div style='padding-top:3px;'></div>");
+//				sb.append(sbNavigator);
+//				sb.append("<div style='padding-top:3px;'></div>");
+//			}
+//
+//			/*
+//			 * items
+//			 */
+//			final int itemBaseNumber = searchResult.pageNumber * searchResult.hitsPerPage;
+//			int itemIndex = 0;
+//
+//			for (final SearchResultItem resultItem : searchResult.items) {
+//
+//				final int itemNumber = itemBaseNumber + (++itemIndex);
+//
+//				String selectedItemClass = UI.EMPTY_STRING;
+//
+//				if (_selectedDocId != -1 && _selectedDocId == resultItem.docId) {
+//					selectedItemClass = UI.SPACE1 + CSS_SELECTED;
+//				}
+//
+//				sb.append("<div"
+//						+ (" class='" + SearchMgr.CSS_ITEM_CONTAINER + selectedItemClass + "'")
+//						+ " id='" + resultItem.docId + "'>\n"); //$NON-NLS-1$
+//				{
+//					final ItemResponse itemResponse = _searchUI.createHTML_10_Item(resultItem, itemNumber);
+//					sb.append(itemResponse.createdHtml);
+//
+//				}
+//				sb.append("</div>\n"); //$NON-NLS-1$
+//			}
+//
+//			/*
+//			 * bottom navigator
+//			 */
+//			sb.append("<div style='padding-top:3px;'></div>");
+//			sb.append(sbNavigator);
+//			sb.append("<div style='padding-top:3px;'></div>");
+//		}
+//
+//		// state
+//		sb.append("<div class='result-state'>"); //$NON-NLS-1$
+//		{
+//			sb.append(stateText);
+//		}
+//		sb.append("</div>\n"); //$NON-NLS-1$
 
 		return sb.toString();
 	}
@@ -819,7 +818,7 @@ public class SearchViewSWT extends ViewPart {
 		// this part is a selection provider
 		getSite().setSelectionProvider(_postSelectionProvider = new PostSelectionProvider(ID));
 
-		_searchUI = new SearchUI(this, _browser, _postSelectionProvider, false);
+//		_searchUI = new SearchUI(this, _browser, _postSelectionProvider, false);
 
 		restoreState();
 
@@ -1138,7 +1137,7 @@ public class SearchViewSWT extends ViewPart {
 
 			setSelectedDocId(docId);
 
-			_searchUI.hrefActionEditTour(tourId);
+//			_searchUI.hrefActionEditTour(tourId);
 
 			break;
 
@@ -1155,7 +1154,7 @@ public class SearchViewSWT extends ViewPart {
 
 			setSelectedDocId(docId);
 
-			_searchUI.hrefActionMarker(action, tourId, markerId);
+//			_searchUI.hrefActionMarker(action, tourId, markerId);
 
 			break;
 
@@ -1163,7 +1162,7 @@ public class SearchViewSWT extends ViewPart {
 
 			setSelectedDocId(docId);
 
-			_searchUI.hrefActionWayPoint(action, tourId, markerId);
+//			_searchUI.hrefActionWayPoint(action, tourId, markerId);
 
 			break;
 

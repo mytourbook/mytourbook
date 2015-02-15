@@ -37,7 +37,7 @@ public class SearchViewXUL extends ViewPart {
 
 	public static final String		ID	= "net.tourbook.search.SearchViewXUL";	//$NON-NLS-1$
 
-	private SearchUI				_searchUI;
+//	private SearchUI				_searchUI;
 
 	private PostSelectionProvider	_postSelectionProvider;
 
@@ -150,7 +150,7 @@ public class SearchViewXUL extends ViewPart {
 		addPartListener();
 		addTourEventListener();
 
-		_searchUI = new SearchUI(this, browser, _postSelectionProvider, true);
+//		_searchUI = new SearchUI(this, browser, _postSelectionProvider, true);
 	}
 
 	@Override
@@ -164,6 +164,6 @@ public class SearchViewXUL extends ViewPart {
 
 	@Override
 	public void setFocus() {
-		_searchUI.setFocus();
+//		_searchUI.setFocus();
 	}
 }

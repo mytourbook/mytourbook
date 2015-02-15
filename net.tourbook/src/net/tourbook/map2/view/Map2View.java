@@ -858,6 +858,10 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 						onSelectionChanged_TourMarker((SelectionTourMarker) eventData, false);
 					}
 
+				} else if ((eventId == TourEventId.TOUR_SELECTION) && eventData instanceof ISelection) {
+
+					onSelectionChanged((ISelection) eventData);
+
 				} else if (eventId == TourEventId.SLIDER_POSITION_CHANGED && eventData instanceof ISelection) {
 
 					onSelectionChanged((ISelection) eventData);

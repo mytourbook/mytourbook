@@ -42,11 +42,13 @@ import com.sun.net.httpserver.HttpExchange;
 public class WEB {
 
 	/**
+	 * This is the <b>MAIN</b> switch to run Dojo in the dev or release folder.
+	 * <p>
 	 * When <code>true</code> the web content is delivered from the
 	 * {@value #WEB_CONTENT_DEVELOPMENT_FOLDER} folder otherwise it is delivered from the
 	 * {@value #WEB_CONTENT_RELEASE_FOLDER} folder.
 	 */
-	static boolean				IS_DEBUG								= true;
+	static boolean				IS_DEBUG								= false;
 
 	static final String			DEBUG_PATH_XUL_RUNNER					= "C:/E/XULRunner/";							//$NON-NLS-1$
 	static final String			DEBUG_PATH_DOJO							= "C:/E/js-resources/dojo/";					//$NON-NLS-1$

@@ -29,9 +29,7 @@ public class ActionHandler_OpenSearchViewIE extends AbstractHandler {
 		final IViewPart part = Util.showView(SearchViewIE.ID, true);
 
 		if (part instanceof SearchViewSWT) {
-
-			final SearchViewSWT searchView = (SearchViewSWT) part;
-			searchView.actionOpenSearchView();
+			((SearchViewSWT) part).actionOpenSearchView();
 		}
 
 		return null;
