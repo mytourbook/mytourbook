@@ -667,6 +667,8 @@ public static String	App_Action_Dialog_ActionIsInProgress_Message;
 	public static String		Image__graph_cadence_disabled;
 	public static String		Image__graph_gradient_disabled;
 	public static String		Image__graph_heartbeat_disabled;
+
+	public static String	Image__Graph_Overlapped;
 	public static String		Image__graph_pace_disabled;
 	public static String		Image__graph_power_disabled;
 	public static String		Image__graph_speed_disabled;
@@ -1276,6 +1278,8 @@ public static String	App_Action_Dialog_ActionIsInProgress_Message;
 	public static String		Tour_Action_graph_speed_tooltip;
 	public static String		Tour_Action_graph_temperature_tooltip;
 	public static String		Tour_Action_graph_tour_compare_tooltip;
+
+	public static String	Tour_Action_GraphOverlapped;
 	public static String		Tour_Action_HrZone_Title;
 	public static String		Tour_Action_HrZoneGraphType_Default;
 	public static String		Tour_Action_HrZoneGraphType_NoGradient;

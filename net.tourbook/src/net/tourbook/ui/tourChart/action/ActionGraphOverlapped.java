@@ -13,17 +13,29 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.chart;
+package net.tourbook.ui.tourChart.action;
 
-public enum ChartType {
+import net.tourbook.Messages;
+import net.tourbook.application.TourbookPlugin;
+import net.tourbook.ui.tourChart.TourChart;
 
-	LINE,
+import org.eclipse.jface.action.Action;
 
-	BAR,
+public class ActionGraphOverlapped extends Action {
 
-	LINE_WITH_BARS,
+	private TourChart	_tourChart;
 
-	XY_SCATTER,
+	public ActionGraphOverlapped(final TourChart tourChart) {
 
-	HISTORY
+		super(Messages.Tour_Action_GraphOverlapped, AS_CHECK_BOX);
+
+		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__Graph_Overlapped));
+
+		_tourChart = tourChart;
+	}
+
+	@Override
+	public void run() {
+		_tourChart.actionGraphOverlapped(isChecked());
+	}
 }

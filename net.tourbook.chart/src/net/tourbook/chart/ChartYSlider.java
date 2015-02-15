@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2012  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -48,7 +48,7 @@ public class ChartYSlider {
 	 */
 	int							devYClickOffset;
 
-	private GraphDrawingData	_drawingData;
+	private GraphDrawingData	_graphDrawingData;
 
 	/**
 	 * Constructor
@@ -68,7 +68,7 @@ public class ChartYSlider {
 	 * @return Returns the drawingData.
 	 */
 	public GraphDrawingData getDrawingData() {
-		return _drawingData;
+		return _graphDrawingData;
 	}
 
 	/**
@@ -92,7 +92,7 @@ public class ChartYSlider {
 	 */
 	void handleChartResize(final GraphDrawingData drawingData, final int sliderType) {
 
-		_drawingData = drawingData;
+		_graphDrawingData = drawingData;
 
 		final int devGraphHeight = drawingData.devGraphHeight;
 		final int devYBottom = drawingData.getDevYBottom();
