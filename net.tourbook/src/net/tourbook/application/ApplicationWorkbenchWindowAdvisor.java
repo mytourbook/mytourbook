@@ -256,14 +256,17 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
 		configurerWindow.addPageListener(new IPageListener() {
 
+			@Override
 			public void pageActivated(final IWorkbenchPage page) {
 				updateTitle();
 			}
 
+			@Override
 			public void pageClosed(final IWorkbenchPage page) {
 				updateTitle();
 			}
 
+			@Override
 			public void pageOpened(final IWorkbenchPage page) {}
 		});
 
@@ -289,34 +292,43 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
 		configurerWindow.getPartService().addPartListener(new IPartListener2() {
 
+			@Override
 			public void partActivated(final IWorkbenchPartReference ref) {
 				if ((ref instanceof IEditorReference) || (ref instanceof IViewReference)) {
 					updateTitle();
 				}
 			}
 
+			@Override
 			public void partBroughtToTop(final IWorkbenchPartReference ref) {
 				if ((ref instanceof IEditorReference) || (ref instanceof IViewReference)) {
 					updateTitle();
 				}
 			}
 
+			@Override
 			public void partClosed(final IWorkbenchPartReference ref) {
 				updateTitle();
 			}
 
+			@Override
 			public void partDeactivated(final IWorkbenchPartReference ref) {}
 
+			@Override
 			public void partHidden(final IWorkbenchPartReference ref) {}
 
+			@Override
 			public void partInputChanged(final IWorkbenchPartReference ref) {}
 
+			@Override
 			public void partOpened(final IWorkbenchPartReference ref) {}
 
+			@Override
 			public void partVisible(final IWorkbenchPartReference ref) {}
 		});
 
 		_partPropertyListener = new IPropertyListener() {
+			@Override
 			public void propertyChanged(final Object source, final int propId) {
 
 				if (propId == IWorkbenchPartConstants.PROP_TITLE) {
@@ -426,6 +438,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 //		// TODO remove SYSTEM.OUT.PRINTLN
 
 		Display.getDefault().asyncExec(new Runnable() {
+			@Override
 			public void run() {
 
 				TagMenuManager.restoreTagState();
@@ -436,7 +449,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
 				setupProxy();
 
-				WebContentServer.start();
+//				WebContentServer.start();
 			}
 		});
 	}

@@ -26,7 +26,6 @@ import java.util.Map;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
-import net.tourbook.common.util.PostSelectionProvider;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
@@ -49,13 +48,8 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.window.Window;
-import org.eclipse.swt.browser.Browser;
-import org.eclipse.swt.browser.LocationAdapter;
 import org.eclipse.swt.browser.LocationEvent;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.ui.part.ViewPart;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
@@ -68,14 +62,14 @@ import com.sun.net.httpserver.HttpExchange;
 /**
  *
  */
-public class SearchUI implements XHRHandler, DisposeListener {
-
-	private static final String				JSON_STATE_SEARCH_TEXT					= "searchText";										//$NON-NLS-1$
+public class SearchMgr implements XHRHandler {
 
 	private static final String				IMAGE_ACTION_TOUR_WAY_POINT				= net.tourbook.map2.Messages.Image_Action_TourWayPoint;
 
 	final static IDialogSettings			state									= TourbookPlugin
-																							.getState("net.tourbook.search.SearchUI");		//$NON-NLS-1$
+																							.getState("net.tourbook.search.SearchMgr");	//$NON-NLS-1$
+
+	private static final String				JSON_STATE_SEARCH_TEXT					= "searchText";										//$NON-NLS-1$
 
 	private static final String				STATE_CURRENT_SEARCH_TEXT				= "STATE_CURRENT_SEARCH_TEXT";							//$NON-NLS-1$
 
@@ -87,13 +81,11 @@ public class SearchUI implements XHRHandler, DisposeListener {
 	static final boolean					STATE_IS_SHOW_CONTENT_TOUR_DEFAULT		= true;
 	static final String						STATE_IS_SHOW_CONTENT_WAYPOINT			= "STATE_IS_SHOW_CONTENT_WAYPOINT";					//$NON-NLS-1$
 	static final boolean					STATE_IS_SHOW_CONTENT_WAYPOINT_DEFAULT	= true;
-
+	//
 	static final String						STATE_IS_SHOW_DATE_TIME					= "STATE_IS_SHOW_DATE_TIME";							//$NON-NLS-1$
 	static final boolean					STATE_IS_SHOW_DATE_TIME_DEFAULT			= false;
-	//
 	static final String						STATE_IS_SHOW_ITEM_NUMBER				= "STATE_IS_SHOW_ITEM_NUMBER";							//$NON-NLS-1$
 	static final boolean					STATE_IS_SHOW_ITEM_NUMBER_DEFAULT		= false;
-	//
 	static final String						STATE_IS_SHOW_LUCENE_DOC_ID				= "STATE_IS_SHOW_LUCENE_DOC_ID";						//$NON-NLS-1$
 	static final boolean					STATE_IS_SHOW_LUCENE_DOC_ID_DEFAULT		= false;
 	//
@@ -124,8 +116,8 @@ public class SearchUI implements XHRHandler, DisposeListener {
 	private static final String				XHR_PARAM_SEARCH_OPTIONS				= "searchOptions";										//$NON-NLS-1$
 	private static final String				XHR_PARAM_SEARCH_TEXT					= JSON_STATE_SEARCH_TEXT;
 	private static final String				XHR_PARAM_SELECTED_ID					= "selectedId";										//$NON-NLS-1$
-	private static final String				XHR_PARAM_STATE							= "state";												//$NON-NLS-1$
-	//
+//	private static final String				XHR_PARAM_STATE							= "state";												//$NON-NLS-1$
+																																			//
 	/*
 	 * JSON response values
 	 */
@@ -151,6 +143,12 @@ public class SearchUI implements XHRHandler, DisposeListener {
 	private static final String				SEARCH_SWT_CSS_FILE						= SEARCH_FOLDER + "search-swt.css";					//$NON-NLS-1$
 	static String							SEARCH_SWT_CSS_STYLE;
 	//
+	/**
+	 * This is necessary otherwise XULrunner in Linux do not fire a location change event.
+	 */
+	static String							ACTION_URL;
+	static String							SEARCH_URL;
+	//
 	private static String					_actionUrl_EditImage;
 	private static String					_iconUrl_Tour;
 	private static String					_iconUrl_Marker;
@@ -172,12 +170,6 @@ public class SearchUI implements XHRHandler, DisposeListener {
 	static final String						CSS_ITEM_CONTAINER						= "item-container";									//$NON-NLS-1$
 
 	static final String						PAGE_ABOUT_BLANK						= "about:blank";										//$NON-NLS-1$
-
-	/**
-	 * This is necessary otherwise XULrunner in Linux do not fire a location change event.
-	 */
-	static final String						ACTION_URL								= WebContentServer.SERVER_URL
-																							+ "/action?";									//$NON-NLS-1$
 
 	static final String						HREF_TOKEN								= "&";													//$NON-NLS-1$
 	static final String						HREF_VALUE_SEP							= "=";													//$NON-NLS-1$
@@ -205,6 +197,9 @@ public class SearchUI implements XHRHandler, DisposeListener {
 
 	static {
 
+		ACTION_URL = WEB.SERVER_URL + "/action?"; //$NON-NLS-1$
+		SEARCH_URL = WEB.SERVER_URL + SEARCH_FOLDER + SEARCH_PAGE;
+
 		// e.g. ...&action=EditMarker...
 
 		final String HREF_ACTION = HREF_TOKEN + PARAM_ACTION + HREF_VALUE_SEP;
@@ -221,43 +216,6 @@ public class SearchUI implements XHRHandler, DisposeListener {
 
 		SEARCH_SWT_CSS_STYLE = "<style>" + WEB.getFileContent(SEARCH_SWT_CSS_FILE, false) + "</style>"; //$NON-NLS-1$ //$NON-NLS-2$
 
-		// initialize search options
-		setInternalSearchOptions();
-	}
-
-	private ViewPart						_view;
-	private Browser							_browser;
-
-	private boolean							_isModalDialogOpen						= false;
-
-	private PostSelectionProvider			_postSelectionProvider;
-
-	private boolean							_isWebUI;
-
-	class ItemResponse {
-
-		String	createdHtml;
-		String	selectedId;
-
-	}
-
-	SearchUI(	final ViewPart view,
-				final Browser browser,
-				final PostSelectionProvider postSelectionProvider,
-				final boolean isWebUI) {
-
-		_view = view;
-		_postSelectionProvider = postSelectionProvider;
-		_isWebUI = isWebUI;
-
-		// ensure web server is started
-		WebContentServer.start();
-
-		WebContentServer.addXHRHandler(XHR_SEARCH_INPUT_HANDLER, this);
-
-		_browser = browser;
-		_browser.addDisposeListener(this);
-
 		/*
 		 * set image urls
 		 */
@@ -267,26 +225,301 @@ public class SearchUI implements XHRHandler, DisposeListener {
 
 		_actionUrl_EditImage = getIconUrl(Messages.Image__quick_edit);
 
-		if (_isWebUI) {
+		// initialize search options
+		setInternalSearchOptions();
 
-			_browser.addLocationListener(new LocationAdapter() {
-				@Override
-				public void changing(final LocationEvent event) {
-					onBrowserLocation(event);
-				}
-			});
+		// ensure web server is started
+		WebContentServer.start();
 
-// !!! This will crash the whole app on Linux !!!
-//			final String searchUrl = WEB.SERVER_URL + SEARCH_FOLDER + SEARCH_PAGE;
-//			_browser.setUrl(searchUrl);
-//
-// This worked partly, Dojo could not load all web resources
-//			final String html = WEB.getFileContent(SEARCH_FOLDER + SEARCH_PAGE, true);
-//			_browser.setText(html);
+		WebContentServer.addXHRHandler(XHR_SEARCH_INPUT_HANDLER, SearchMgr.getInstance());
+	}
 
-			final String searchUrl = WEB.SERVER_URL + SEARCH_FOLDER + SEARCH_PAGE;
-			_browser.setUrl(searchUrl);
+	private static IActiveSearchView		_activeSearchView;
+
+	private static SearchMgr				_searchMgr;
+
+	private static boolean					_isModalDialogOpen						= false;
+
+	class ItemResponse {
+
+		String	createdHtml;
+		String	selectedId;
+
+	}
+
+	private static String getIconUrl(final String iconImage) {
+
+		final String iconUrl = net.tourbook.ui.UI.getIconUrl(iconImage);
+
+		return WEB.SERVER_URL + '/' + iconUrl;
+	}
+
+	private static XHRHandler getInstance() {
+
+		if (_searchMgr == null) {
+			_searchMgr = new SearchMgr();
 		}
+
+		return _searchMgr;
+	}
+
+	static void hrefActionEditTour(final Long tourId) {
+
+		// ensure this dialog is modal (only one dialog can be opened)
+		if (_isModalDialogOpen) {
+
+			MessageDialog.openInformation(
+					Display.getCurrent().getActiveShell(),
+					Messages.App_Action_Dialog_ActionIsInProgress_Title,
+					Messages.App_Action_Dialog_ActionIsInProgress_Message);
+
+			return;
+		}
+
+		// get tour by id
+		final TourData tourData = TourManager.getTour(tourId);
+		if (tourData == null) {
+			return;
+		}
+
+		_isModalDialogOpen = true;
+
+		try {
+
+			final DialogQuickEdit dialogQuickEdit = new DialogQuickEdit(//
+					Display.getCurrent().getActiveShell(),
+					tourData);
+
+			if (dialogQuickEdit.open() == Window.OK) {
+
+				saveModifiedTour(tourData);
+			}
+
+		} finally {
+			_isModalDialogOpen = false;
+		}
+	}
+
+	static void hrefActionMarker(final String action, final long tourId, final long markerId) {
+
+		// get tour by id
+		final TourData tourData = TourManager.getTour(tourId);
+		if (tourData == null) {
+			return;
+		}
+
+		TourMarker selectedTourMarker = null;
+
+		// get marker by id
+		for (final TourMarker tourMarker : tourData.getTourMarkers()) {
+			if (tourMarker.getMarkerId() == markerId) {
+				selectedTourMarker = tourMarker;
+				break;
+			}
+		}
+
+		if (selectedTourMarker == null) {
+			return;
+		}
+
+		switch (action) {
+		case SearchMgr.ACTION_EDIT_MARKER:
+			hrefActionMarker_Edit(tourData, selectedTourMarker);
+			break;
+
+		case SearchMgr.ACTION_SELECT_MARKER:
+			hrefActionMarker_Select(tourData, selectedTourMarker);
+			break;
+		}
+	}
+
+	private static void hrefActionMarker_Edit(final TourData tourData, final TourMarker tourMarker) {
+
+		// ensure this dialog is modal (only one dialog can be opened)
+		if (_isModalDialogOpen) {
+
+			MessageDialog.openInformation(
+					Display.getCurrent().getActiveShell(),
+					Messages.App_Action_Dialog_ActionIsInProgress_Title,
+					Messages.App_Action_Dialog_ActionIsInProgress_Message);
+
+			return;
+		}
+
+		if (tourData.isManualTour()) {
+			// a manually created tour do not have time slices -> no markers
+			return;
+		}
+
+		_isModalDialogOpen = true;
+
+		try {
+
+			final DialogMarker dialogMarker = new DialogMarker(//
+					Display.getDefault().getActiveShell(),
+					tourData,
+					tourMarker);
+
+			if (dialogMarker.open() == Window.OK) {
+				saveModifiedTour(tourData);
+			}
+
+		} finally {
+
+			_isModalDialogOpen = false;
+		}
+	}
+
+	private static void hrefActionMarker_Select(final TourData tourData, final TourMarker selectedTourMarker) {
+
+		if (_activeSearchView == null) {
+			return;
+		}
+
+		final ArrayList<TourMarker> selectedTourMarkers = new ArrayList<TourMarker>();
+		selectedTourMarkers.add(selectedTourMarker);
+
+		final SelectionTourMarker markerSelection = new SelectionTourMarker(tourData, selectedTourMarkers);
+
+		// ensure that the selection provider contain the correct data
+		_activeSearchView.getPostSelectionProvider().setSelectionNoFireEvent(markerSelection);
+
+		TourManager.fireEvent(//
+				TourEventId.MARKER_SELECTION,
+				markerSelection,
+				_activeSearchView.getPart());
+	}
+
+	static void hrefActionWayPoint(final String action, final long tourId, final long markerId) {
+
+		if (_activeSearchView == null) {
+			return;
+		}
+
+		// get tour by id
+		final TourData tourData = TourManager.getTour(tourId);
+		if (tourData == null) {
+			return;
+		}
+
+		TourWayPoint selectedWayPoint = null;
+
+		// get marker by id
+		for (final TourWayPoint wayPoint : tourData.getTourWayPoints()) {
+			if (wayPoint.getWayPointId() == markerId) {
+				selectedWayPoint = wayPoint;
+				break;
+			}
+		}
+
+		if (selectedWayPoint == null) {
+			return;
+		}
+
+		// fire selection
+		final ISelection selection = new StructuredSelection(selectedWayPoint);
+		_activeSearchView.getPostSelectionProvider().setSelection(selection);
+	}
+
+	static void onBrowserLocation(final LocationEvent event) {
+
+		final String location = event.location;
+
+		if (performAction(location)) {
+
+			// keep current page when an action is performed, OTHERWISE the current page will disappear :-(
+			event.doit = false;
+		}
+	}
+
+	/**
+	 * @param location
+	 * @return Returns <code>true</code> when a action is performed.
+	 */
+	private static boolean performAction(final String location) {
+
+		if (_activeSearchView == null) {
+			return false;
+		}
+
+		String action = null;
+
+		long tourId = -1;
+		long markerId = -1;
+
+		final String[] urlParameter = location.split(HREF_TOKEN);
+
+		// loop all url parameter
+		for (final String part : urlParameter) {
+
+			final int valueSepPos = part.indexOf(HREF_VALUE_SEP);
+
+			String key;
+			String value = null;
+
+			if (valueSepPos == -1) {
+				key = part;
+			} else {
+				key = part.substring(0, valueSepPos);
+				value = part.substring(valueSepPos + 1, part.length());
+			}
+
+			if (key == null) {
+				// this should not happen
+				return false;
+			}
+
+			switch (key) {
+			case PARAM_ACTION:
+				action = value;
+				break;
+
+			case PARAM_MARKER_ID:
+				markerId = Long.parseLong(value);
+				break;
+
+			case PARAM_TOUR_ID:
+				tourId = Long.parseLong(value);
+				break;
+
+			default:
+				break;
+			}
+		}
+
+		if (action == null) {
+			return false;
+		}
+
+		switch (action) {
+
+		case ACTION_EDIT_TOUR:
+
+			hrefActionEditTour(tourId);
+
+			break;
+
+		case ACTION_SELECT_TOUR:
+
+			_activeSearchView.getPostSelectionProvider().setSelection(new SelectionTourId(tourId));
+
+			break;
+
+		case ACTION_EDIT_MARKER:
+		case ACTION_SELECT_MARKER:
+
+			hrefActionMarker(action, tourId, markerId);
+
+			break;
+
+		case ACTION_SELECT_WAY_POINT:
+
+			hrefActionWayPoint(action, tourId, markerId);
+
+			break;
+		}
+
+		return true;
 	}
 
 	/**
@@ -304,6 +537,23 @@ public class SearchUI implements XHRHandler, DisposeListener {
 		state.put(STATE_IS_SHOW_LUCENE_DOC_ID, STATE_IS_SHOW_LUCENE_DOC_ID_DEFAULT);
 
 		state.put(STATE_IS_SORT_DATE_ASCENDING, STATE_IS_SORT_DATE_ASCENDING_DEFAULT);
+	}
+
+	private static void saveModifiedTour(final TourData tourData) {
+
+		/*
+		 * Run async because a tour save will fire a tour change event.
+		 */
+		Display.getDefault().asyncExec(new Runnable() {
+			@Override
+			public void run() {
+				TourManager.saveModifiedTour(tourData);
+			}
+		});
+	}
+
+	public static void setActiveSearchView(final IActiveSearchView searchView) {
+		_activeSearchView = searchView;
 	}
 
 	/**
@@ -455,84 +705,69 @@ public class SearchUI implements XHRHandler, DisposeListener {
 					+ "</div>\n"); //$NON-NLS-1$
 		}
 
-		if (_isWebUI == false) {
-
-			// web UI is using the Dojo list which do not need an <a> tag because a selection event is fired
-			sb.append("<a class='item'" //
-					+ (" href='" + hrefSelectItem + "'") //$NON-NLS-1$ //$NON-NLS-2$
-					+ (" title='" + itemTitle + "'") //$NON-NLS-1$ //$NON-NLS-2$
-					+ ">"); // //$NON-NLS-1$
-		}
-
+		sb.append("<table><tbody><tr>");
 		{
-			sb.append("<table><tbody><tr>");
+			/*
+			 * Item image
+			 */
+			sb.append("<td class='item-image'>");
+			sb.append("<img src='" + iconUrl + "'></img>");
+			sb.append(TAG_TD_END);
+
+			/*
+			 * Item content
+			 */
+			sb.append("<td style='width:100%;'>");
 			{
-				/*
-				 * Item image
-				 */
-				sb.append("<td class='item-image'>");
-				sb.append("<img src='" + iconUrl + "'></img>");
-				sb.append(TAG_TD_END);
+				// title
+				if (isDescription) {
+					sb.append("<span class='item-title'>" + itemTitle + "</span>");
+				} else {
+					sb.append("<span class='item-title-no-description'>" + itemTitle + "</span>");
+				}
 
-				/*
-				 * Item content
-				 */
-				sb.append("<td style='width:100%;'>");
-				{
-					// title
-					if (isDescription) {
-						sb.append("<span class='item-title'>" + itemTitle + "</span>");
-					} else {
-						sb.append("<span class='item-title-no-description'>" + itemTitle + "</span>");
-					}
+				// description
+				if (isDescription) {
+					sb.append("<div class='item-description'>"); //$NON-NLS-1$
+					sb.append(description);
+					sb.append("</div>\n"); //$NON-NLS-1$
+				}
 
-					// description
-					if (isDescription) {
-						sb.append("<div class='item-description'>"); //$NON-NLS-1$
-						sb.append(description);
-						sb.append("</div>\n"); //$NON-NLS-1$
-					}
+				// info
+				if (_isUI_ShowDateTime || _isUI_ShowItemNumber || _isUI_ShowLuceneDocId) {
 
-					// info
-					if (_isUI_ShowDateTime || _isUI_ShowItemNumber || _isUI_ShowLuceneDocId) {
+					sb.append("<div class='item-info'>"); //$NON-NLS-1$
+					sb.append("<table><tbody><tr>");
+					{
+						if (_isUI_ShowDateTime) {
 
-						sb.append("<div class='item-info'>"); //$NON-NLS-1$
-						sb.append("<table><tbody><tr>");
-						{
-							if (_isUI_ShowDateTime) {
+							final long tourStartTime = resultItem.tourStartTime;
+							if (tourStartTime != 0) {
 
-								final long tourStartTime = resultItem.tourStartTime;
-								if (tourStartTime != 0) {
+								final DateTime dt = new DateTime(tourStartTime);
 
-									final DateTime dt = new DateTime(tourStartTime);
+								sb.append(TAG_TD
+										+ String.format("%s", _dateFormatter.print(dt.getMillis()))
+										+ TAG_TD_END);
 
-									sb.append(TAG_TD
-											+ String.format("%s", _dateFormatter.print(dt.getMillis()))
-											+ TAG_TD_END);
-
-								}
-							}
-
-							if (_isUI_ShowItemNumber) {
-								sb.append(TAG_TD + Integer.toString(itemNumber) + TAG_TD_END);
-							}
-
-							if (_isUI_ShowLuceneDocId) {
-								sb.append(TAG_TD + String.format("%d", docId) + TAG_TD_END);
 							}
 						}
-						sb.append("</tr></tbody></table>");
-						sb.append("</div>\n"); //$NON-NLS-1$
-					}
-				}
-				sb.append(TAG_TD_END);
-			}
-			sb.append("</tr></tbody></table>");
-		}
 
-		if (_isWebUI == false) {
-			sb.append("</a>");
+						if (_isUI_ShowItemNumber) {
+							sb.append(TAG_TD + Integer.toString(itemNumber) + TAG_TD_END);
+						}
+
+						if (_isUI_ShowLuceneDocId) {
+							sb.append(TAG_TD + String.format("%d", docId) + TAG_TD_END);
+						}
+					}
+					sb.append("</tr></tbody></table>");
+					sb.append("</div>\n"); //$NON-NLS-1$
+				}
+			}
+			sb.append(TAG_TD_END);
 		}
+		sb.append("</tr></tbody></table>");
 
 		final ItemResponse itemResponse = new ItemResponse();
 		itemResponse.createdHtml = sb.toString();
@@ -545,21 +780,16 @@ public class SearchUI implements XHRHandler, DisposeListener {
 
 		String url;
 
-		if (_isWebUI) {
+		/*
+		 * Action is fired with an xhr request to the server
+		 */
 
-			/*
-			 * Action is fired with an xhr request to the server
-			 */
-
-			url = " href='#anchor-without-scrolling'"
-					+ " onclick="
-					+ "'"
-					+ (" tourbook.search.SearchApp.action(\"" + actionUrl + "\");")
-					+ " return false;"
-					+ "'";
-		} else {
-			url = " href='" + actionUrl + "'";
-		}
+		url = " href='#anchor-without-scrolling'"
+				+ " onclick="
+				+ "'"
+				+ (" tourbook.search.SearchApp.action(\"" + actionUrl + "\");")
+				+ " return false;"
+				+ "'";
 
 		return "<a class='action'" // //$NON-NLS-1$
 				+ (" style='background-image: url(" + backgroundImage + ");'") //$NON-NLS-1$ //$NON-NLS-2$
@@ -589,26 +819,8 @@ public class SearchUI implements XHRHandler, DisposeListener {
 		return contentRange;
 	}
 
-	private String getIconUrl(final String iconImage) {
-
-		final String iconUrl = net.tourbook.ui.UI.getIconUrl(iconImage);
-
-		if (_isWebUI) {
-			return WEB.SERVER_URL + '/' + iconUrl;
-		}
-
-		return iconUrl;
-	}
-
 	@Override
 	public void handleXHREvent(final HttpExchange httpExchange, final StringBuilder log) throws IOException {
-
-		if (_browser.isDisposed()) {
-
-			// this happened when the request is from an external browser.
-
-			return;
-		}
 
 		// get parameters from url query string
 		@SuppressWarnings("unchecked")
@@ -652,280 +864,6 @@ public class SearchUI implements XHRHandler, DisposeListener {
 		}
 
 		writeRespone(httpExchange, response);
-	}
-
-	void hrefActionEditTour(final Long tourId) {
-
-		// ensure this dialog is modal (only one dialog can be opened)
-		if (_isModalDialogOpen) {
-
-			MessageDialog.openInformation(
-					Display.getCurrent().getActiveShell(),
-					Messages.App_Action_Dialog_ActionIsInProgress_Title,
-					Messages.App_Action_Dialog_ActionIsInProgress_Message);
-
-			return;
-		}
-
-		// get tour by id
-		final TourData tourData = TourManager.getTour(tourId);
-		if (tourData == null) {
-			return;
-		}
-
-		_isModalDialogOpen = true;
-
-		try {
-
-			final DialogQuickEdit dialogQuickEdit = new DialogQuickEdit(//
-					Display.getCurrent().getActiveShell(),
-					tourData);
-
-			if (dialogQuickEdit.open() == Window.OK) {
-
-				saveModifiedTour(tourData);
-			}
-
-		} finally {
-			_isModalDialogOpen = false;
-		}
-	}
-
-	void hrefActionMarker(final String action, final long tourId, final long markerId) {
-
-		// get tour by id
-		final TourData tourData = TourManager.getTour(tourId);
-		if (tourData == null) {
-			return;
-		}
-
-		TourMarker selectedTourMarker = null;
-
-		// get marker by id
-		for (final TourMarker tourMarker : tourData.getTourMarkers()) {
-			if (tourMarker.getMarkerId() == markerId) {
-				selectedTourMarker = tourMarker;
-				break;
-			}
-		}
-
-		if (selectedTourMarker == null) {
-			return;
-		}
-
-		switch (action) {
-		case SearchUI.ACTION_EDIT_MARKER:
-			hrefActionMarker_Edit(tourData, selectedTourMarker);
-			break;
-
-		case SearchUI.ACTION_SELECT_MARKER:
-			hrefActionMarker_Select(tourData, selectedTourMarker);
-			break;
-		}
-	}
-
-	private void hrefActionMarker_Edit(final TourData tourData, final TourMarker tourMarker) {
-
-		// ensure this dialog is modal (only one dialog can be opened)
-		if (_isModalDialogOpen) {
-
-			MessageDialog.openInformation(
-					Display.getCurrent().getActiveShell(),
-					Messages.App_Action_Dialog_ActionIsInProgress_Title,
-					Messages.App_Action_Dialog_ActionIsInProgress_Message);
-
-			return;
-		}
-
-		if (tourData.isManualTour()) {
-			// a manually created tour do not have time slices -> no markers
-			return;
-		}
-
-		_isModalDialogOpen = true;
-
-		try {
-
-			final DialogMarker dialogMarker = new DialogMarker(//
-					_browser.getShell(),
-					tourData,
-					tourMarker);
-
-			if (dialogMarker.open() == Window.OK) {
-				saveModifiedTour(tourData);
-			}
-
-		} finally {
-
-			_isModalDialogOpen = false;
-		}
-	}
-
-	private void hrefActionMarker_Select(final TourData tourData, final TourMarker selectedTourMarker) {
-
-		final ArrayList<TourMarker> selectedTourMarkers = new ArrayList<TourMarker>();
-		selectedTourMarkers.add(selectedTourMarker);
-
-		final SelectionTourMarker markerSelection = new SelectionTourMarker(tourData, selectedTourMarkers);
-
-		// ensure that the selection provider contain the correct data
-		_postSelectionProvider.setSelectionNoFireEvent(markerSelection);
-
-		TourManager.fireEvent(//
-				TourEventId.MARKER_SELECTION,
-				markerSelection,
-				_view.getSite().getPart());
-	}
-
-	void hrefActionWayPoint(final String action, final long tourId, final long markerId) {
-
-		// get tour by id
-		final TourData tourData = TourManager.getTour(tourId);
-		if (tourData == null) {
-			return;
-		}
-
-		TourWayPoint selectedWayPoint = null;
-
-		// get marker by id
-		for (final TourWayPoint wayPoint : tourData.getTourWayPoints()) {
-			if (wayPoint.getWayPointId() == markerId) {
-				selectedWayPoint = wayPoint;
-				break;
-			}
-		}
-
-		if (selectedWayPoint == null) {
-			return;
-		}
-
-		// fire selection
-		final ISelection selection = new StructuredSelection(selectedWayPoint);
-		_postSelectionProvider.setSelection(selection);
-	}
-
-	private void onBrowserLocation(final LocationEvent event) {
-
-		final String location = event.location;
-
-		if (performAction(location)) {
-
-			// keep current page when an action is performed, OTHERWISE the current page will disappear :-(
-			event.doit = false;
-		}
-	}
-
-	/**
-	 * @param location
-	 * @return Returns <code>true</code> when a action is performed.
-	 */
-	private boolean performAction(final String location) {
-
-//		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] performAction()")
-//				+ ("\tlocation: " + location));
-//		// TODO remove SYSTEM.OUT.PRINTLN
-
-		String action = null;
-
-		long tourId = -1;
-		long markerId = -1;
-
-		final String[] urlParameter = location.split(HREF_TOKEN);
-
-		// loop all url parameter
-		for (final String part : urlParameter) {
-
-			final int valueSepPos = part.indexOf(HREF_VALUE_SEP);
-
-			String key;
-			String value = null;
-
-			if (valueSepPos == -1) {
-				key = part;
-			} else {
-				key = part.substring(0, valueSepPos);
-				value = part.substring(valueSepPos + 1, part.length());
-			}
-
-			if (key == null) {
-				// this should not happen
-				return false;
-			}
-
-			switch (key) {
-			case PARAM_ACTION:
-				action = value;
-				break;
-
-			case PARAM_MARKER_ID:
-				markerId = Long.parseLong(value);
-				break;
-
-			case PARAM_TOUR_ID:
-				tourId = Long.parseLong(value);
-				break;
-
-			default:
-				break;
-			}
-		}
-
-		if (action == null) {
-			return false;
-		}
-
-		switch (action) {
-
-		case ACTION_EDIT_TOUR:
-
-			hrefActionEditTour(tourId);
-
-			break;
-
-		case ACTION_SELECT_TOUR:
-
-			_postSelectionProvider.setSelection(new SelectionTourId(tourId));
-
-			break;
-
-		case ACTION_EDIT_MARKER:
-		case ACTION_SELECT_MARKER:
-
-			hrefActionMarker(action, tourId, markerId);
-
-			break;
-
-		case ACTION_SELECT_WAY_POINT:
-
-			hrefActionWayPoint(action, tourId, markerId);
-
-			break;
-		}
-
-		return true;
-	}
-
-	private void saveModifiedTour(final TourData tourData) {
-
-		/*
-		 * Run async because a tour save will fire a tour change event.
-		 */
-		_browser.getDisplay().asyncExec(new Runnable() {
-			@Override
-			public void run() {
-				TourManager.saveModifiedTour(tourData);
-			}
-		});
-	}
-
-	void setFocus() {
-		_browser.setFocus();
-	}
-
-	@Override
-	public void widgetDisposed(final DisposeEvent e) {
-
-		WebContentServer.removeXHRHandler(XHR_SEARCH_INPUT_HANDLER);
 	}
 
 	private void writeRespone(final HttpExchange httpExchange, final String response) {
@@ -990,7 +928,7 @@ public class SearchUI implements XHRHandler, DisposeListener {
 			final String xhrAction = URLDecoder.decode((String) xhrParameter, WEB.UTF_8);
 
 			// run in UI thread
-			_browser.getDisplay().asyncExec(new Runnable() {
+			Display.getDefault().asyncExec(new Runnable() {
 				@Override
 				public void run() {
 					performAction(xhrAction);
@@ -1163,7 +1101,7 @@ public class SearchUI implements XHRHandler, DisposeListener {
 			final String xhrAction = URLDecoder.decode((String) xhrSelectedId, WEB.UTF_8);
 
 			// run in UI thread
-			_browser.getDisplay().asyncExec(new Runnable() {
+			Display.getDefault().asyncExec(new Runnable() {
 				@Override
 				public void run() {
 					performAction(xhrAction);

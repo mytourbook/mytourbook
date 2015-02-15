@@ -300,6 +300,24 @@ Messages //
 				});
 			});
 
+//			dblclickCell: handler(".dgrid-content .dgrid-cell", "dblclick"),
+//			
+//			grid.on('dgrid-cell:dblclick', function(event) {
+//				
+//				var row = event.rows[0];
+//				var selectedId = row.data[SearchMgr.XHR_PARAM_SELECTED_ID];
+//
+//				alert(selectedId);
+//			});
+//
+//			grid.on('dgrid-row:contextmenu', function(event) {
+//				
+//				var row = event.rows[0];
+//				var selectedId = row.data[SearchMgr.XHR_PARAM_SELECTED_ID];
+//				
+//				alert(selectedId);
+//			});
+
 			return grid;
 		},
 

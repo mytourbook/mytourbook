@@ -5,11 +5,33 @@
 @import url(../../dgrid/css/skins/tundra.css);
 
 
+table
+{
+	border-collapse:		collapse;
+
+	/* show border to debug tables */
+	xborder:				1px solid; 
+}
+
 a /* an <a> covers the whole item */
 {
 	text-decoration:		none;
 	color:					#444;
 }
+
+/*
+	Vertical spacing between fields.
+*/
+.fieldVertSpaceTop
+{
+	margin-top:				0.5em;	
+}
+
+.fieldVertSpaceBottom
+{
+	margin-bottom:			0.5em;	
+}
+
 
 .mtBase 
 {
@@ -191,8 +213,8 @@ a /* an <a> covers the whole item */
 .dgrid-loading 
 {
 	color: 					#aaa;
-	font-size: 				2em;
-	padding: 				1em;
+	font-size: 				1em;
+	padding: 				0.5em;
 	line-height: 			normal;		/* mtBase line-height looks ugly when text is wrapped*/
 }
 

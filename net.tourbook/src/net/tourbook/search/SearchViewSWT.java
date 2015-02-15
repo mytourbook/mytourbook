@@ -26,7 +26,7 @@ import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.search.SearchUI.ItemResponse;
+import net.tourbook.search.SearchMgr.ItemResponse;
 import net.tourbook.tour.ITourEventListener;
 import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.TourEvent;
@@ -111,10 +111,10 @@ public class SearchViewSWT extends ViewPart {
 
 		// e.g. ...&action=EditMarker...
 
-		final String HREF_ACTION = SearchUI.HREF_TOKEN + SearchUI.PARAM_ACTION + SearchUI.HREF_VALUE_SEP;
+		final String HREF_ACTION = SearchMgr.HREF_TOKEN + SearchMgr.PARAM_ACTION + SearchMgr.HREF_VALUE_SEP;
 
 		HREF_ACTION_NAVIGATE_PAGE = HREF_ACTION + ACTION_NAVIGATE_PAGE;
-		HREF_PARAM_PAGE = SearchUI.HREF_TOKEN + PARAM_PAGE + SearchUI.HREF_VALUE_SEP;
+		HREF_PARAM_PAGE = SearchMgr.HREF_TOKEN + PARAM_PAGE + SearchMgr.HREF_VALUE_SEP;
 	}
 
 	private final IPreferenceStore		_prefStore							= TourbookPlugin.getPrefStore();
@@ -588,7 +588,7 @@ public class SearchViewSWT extends ViewPart {
 		final String html = ""// //$NON-NLS-1$
 				+ "	<meta http-equiv='Content-Type' content='text/html; charset=UTF-8' />\n" //$NON-NLS-1$
 				+ "	<meta http-equiv='X-UA-Compatible' content='IE=edge' />\n" //$NON-NLS-1$
-				+ SearchUI.SEARCH_SWT_CSS_STYLE
+				+ SearchMgr.SEARCH_SWT_CSS_STYLE
 				+ "\n"; //$NON-NLS-1$
 
 		return html;
@@ -635,7 +635,7 @@ public class SearchViewSWT extends ViewPart {
 				}
 
 				sb.append("<div"
-						+ (" class='" + SearchUI.CSS_ITEM_CONTAINER + selectedItemClass + "'")
+						+ (" class='" + SearchMgr.CSS_ITEM_CONTAINER + selectedItemClass + "'")
 						+ " id='" + resultItem.docId + "'>\n"); //$NON-NLS-1$
 				{
 					final ItemResponse itemResponse = _searchUI.createHTML_10_Item(resultItem, itemNumber);
@@ -716,7 +716,7 @@ public class SearchViewSWT extends ViewPart {
 		for (int currentPage = firstPage; currentPage < lastPage; currentPage++) {
 
 			final int visiblePageNo = currentPage + 1;
-			final String hrefPage = SearchUI.ACTION_URL + HREF_ACTION_NAVIGATE_PAGE + HREF_PARAM_PAGE + currentPage;
+			final String hrefPage = SearchMgr.ACTION_URL + HREF_ACTION_NAVIGATE_PAGE + HREF_PARAM_PAGE + currentPage;
 
 			/*
 			 * Previous page
@@ -728,7 +728,7 @@ public class SearchViewSWT extends ViewPart {
 			/*
 			 * Every page
 			 */
-			sbPages.append(SearchUI.TAG_TD);
+			sbPages.append(SearchMgr.TAG_TD);
 			{
 				if (currentPage == activePageNumber) {
 					sbPages.append("<div class='page-number page-selected'>" + visiblePageNo + "</div>");
@@ -736,7 +736,7 @@ public class SearchViewSWT extends ViewPart {
 					sbPages.append("<a class='page-number' href='" + hrefPage + "'>" + visiblePageNo + "</a>");
 				}
 			}
-			sbPages.append(SearchUI.TAG_TD_END);
+			sbPages.append(SearchMgr.TAG_TD_END);
 
 			/*
 			 * Next page
@@ -746,20 +746,20 @@ public class SearchViewSWT extends ViewPart {
 			}
 		}
 
-		sbNext.append(SearchUI.TAG_TD_END);
-		sbPrevious.append(SearchUI.TAG_TD_END);
+		sbNext.append(SearchMgr.TAG_TD_END);
+		sbPrevious.append(SearchMgr.TAG_TD_END);
 
 		/*
 		 * first page
 		 */
-		sbFirst.append(SearchUI.TAG_TD);
+		sbFirst.append(SearchMgr.TAG_TD);
 		{
 			if (firstPage > 0) {
-				final String hrefPage = SearchUI.ACTION_URL + HREF_ACTION_NAVIGATE_PAGE + HREF_PARAM_PAGE + 0;
+				final String hrefPage = SearchMgr.ACTION_URL + HREF_ACTION_NAVIGATE_PAGE + HREF_PARAM_PAGE + 0;
 				sbFirst.append("<a" + " class='page-number' href='" + hrefPage + "'>1</a>");
 			}
 		}
-		sbFirst.append(SearchUI.TAG_TD_END);
+		sbFirst.append(SearchMgr.TAG_TD_END);
 		if (firstPage > 0) {
 			sbFirst.append("<td>..</td>");
 		}
@@ -770,17 +770,17 @@ public class SearchViewSWT extends ViewPart {
 		if (lastPage < maxPage - 0) {
 			sbLast.append("<td>..</td>");
 		}
-		sbLast.append(SearchUI.TAG_TD);
+		sbLast.append(SearchMgr.TAG_TD);
 		{
 			if (lastPage < maxPage) {
-				final String hrefPage = SearchUI.ACTION_URL
+				final String hrefPage = SearchMgr.ACTION_URL
 						+ HREF_ACTION_NAVIGATE_PAGE
 						+ HREF_PARAM_PAGE
 						+ (maxPage - 1);
 				sbLast.append("<a class='page-number' href='" + hrefPage + "'>" + maxPage + "</a>");
 			}
 		}
-		sbLast.append(SearchUI.TAG_TD_END);
+		sbLast.append(SearchMgr.TAG_TD_END);
 
 		/*
 		 * put all together
@@ -1057,7 +1057,7 @@ public class SearchViewSWT extends ViewPart {
 
 		final String location = event.location;
 
-		final String[] locationParts = location.split(SearchUI.HREF_TOKEN);
+		final String[] locationParts = location.split(SearchMgr.HREF_TOKEN);
 
 		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
 				+ ("\tlocation: " + location)
@@ -1074,7 +1074,7 @@ public class SearchViewSWT extends ViewPart {
 
 		for (final String part : locationParts) {
 
-			final int valueSepPos = part.indexOf(SearchUI.HREF_VALUE_SEP);
+			final int valueSepPos = part.indexOf(SearchMgr.HREF_VALUE_SEP);
 
 			String key;
 			String value = null;
@@ -1092,11 +1092,11 @@ public class SearchViewSWT extends ViewPart {
 			}
 
 			switch (key) {
-			case SearchUI.PARAM_ACTION:
+			case SearchMgr.PARAM_ACTION:
 				action = value;
 				break;
 
-			case SearchUI.PARAM_DOC_ID:
+			case SearchMgr.PARAM_DOC_ID:
 				docId = Integer.parseInt(value);
 				break;
 
@@ -1104,11 +1104,11 @@ public class SearchViewSWT extends ViewPart {
 				page = Integer.parseInt(value);
 				break;
 
-			case SearchUI.PARAM_MARKER_ID:
+			case SearchMgr.PARAM_MARKER_ID:
 				markerId = Long.parseLong(value);
 				break;
 
-			case SearchUI.PARAM_TOUR_ID:
+			case SearchMgr.PARAM_TOUR_ID:
 				tourId = Long.parseLong(value);
 				break;
 
@@ -1117,7 +1117,7 @@ public class SearchViewSWT extends ViewPart {
 			}
 		}
 
-		if (location.equals(SearchUI.PAGE_ABOUT_BLANK) && action == null) {
+		if (location.equals(SearchMgr.PAGE_ABOUT_BLANK) && action == null) {
 
 			// about:blank is the initial page
 
@@ -1134,7 +1134,7 @@ public class SearchViewSWT extends ViewPart {
 
 		switch (action) {
 
-		case SearchUI.ACTION_EDIT_TOUR:
+		case SearchMgr.ACTION_EDIT_TOUR:
 
 			setSelectedDocId(docId);
 
@@ -1142,7 +1142,7 @@ public class SearchViewSWT extends ViewPart {
 
 			break;
 
-		case SearchUI.ACTION_SELECT_TOUR:
+		case SearchMgr.ACTION_SELECT_TOUR:
 
 			setSelectedDocId(docId);
 
@@ -1150,8 +1150,8 @@ public class SearchViewSWT extends ViewPart {
 
 			break;
 
-		case SearchUI.ACTION_EDIT_MARKER:
-		case SearchUI.ACTION_SELECT_MARKER:
+		case SearchMgr.ACTION_EDIT_MARKER:
+		case SearchMgr.ACTION_SELECT_MARKER:
 
 			setSelectedDocId(docId);
 
@@ -1159,7 +1159,7 @@ public class SearchViewSWT extends ViewPart {
 
 			break;
 
-		case SearchUI.ACTION_SELECT_WAY_POINT:
+		case SearchMgr.ACTION_SELECT_WAY_POINT:
 
 			setSelectedDocId(docId);
 
@@ -1270,16 +1270,17 @@ public class SearchViewSWT extends ViewPart {
 
 	private void restoreState() {
 
-		final int popupWidth = Util.getStateInt(SearchUI.state, STATE_POPUP_WIDTH, _pc.convertWidthInCharsToPixels(40));
+		final int popupWidth = Util
+				.getStateInt(SearchMgr.state, STATE_POPUP_WIDTH, _pc.convertWidthInCharsToPixels(40));
 		final int popupHeight = Util.getStateInt(
-				SearchUI.state,
+				SearchMgr.state,
 				STATE_POPUP_HEIGHT,
 				_pc.convertHeightInCharsToPixels(20));
 		final Point popupSize = new Point(popupWidth, popupHeight);
 
 		_contentProposalAdapter.setPopupSize(popupSize);
 
-		final String searchText = Util.getStateString(SearchUI.state, STATE_SEARCH_TEXT, UI.EMPTY_STRING);
+		final String searchText = Util.getStateString(SearchMgr.state, STATE_SEARCH_TEXT, UI.EMPTY_STRING);
 		_txtSearch.setText(searchText);
 		// move cursor to the end of the text
 		_txtSearch.setSelection(searchText.length());
@@ -1291,23 +1292,23 @@ public class SearchViewSWT extends ViewPart {
 
 	private void restoreState_Options() {
 
-		_hitsPerPage = Util.getStateInt(SearchUI.state, STATE_HITS_PER_PAGE, STATE_HITS_PER_PAGE_DEFAULT);
-		_numberOfPages = Util.getStateInt(SearchUI.state, STATE_NUMBER_OF_PAGES, STATE_NUMBER_OF_PAGES_DEFAULT);
+		_hitsPerPage = Util.getStateInt(SearchMgr.state, STATE_HITS_PER_PAGE, STATE_HITS_PER_PAGE_DEFAULT);
+		_numberOfPages = Util.getStateInt(SearchMgr.state, STATE_NUMBER_OF_PAGES, STATE_NUMBER_OF_PAGES_DEFAULT);
 
-		_isUIShowTopNavigator = Util.getStateBoolean(SearchUI.state,//
+		_isUIShowTopNavigator = Util.getStateBoolean(SearchMgr.state,//
 				STATE_IS_SHOW_TOP_NAVIGATOR,
 				STATE_IS_SHOW_TOP_NAVIGATOR_DEFAULT);
 
-		SearchUI.setInternalSearchOptions();
+		SearchMgr.setInternalSearchOptions();
 	}
 
 	private void saveState() {
 
 		final Point popupSize = _contentProposalAdapter.getPopupSize();
-		SearchUI.state.put(STATE_POPUP_WIDTH, popupSize.x);
-		SearchUI.state.put(STATE_POPUP_HEIGHT, popupSize.y);
+		SearchMgr.state.put(STATE_POPUP_WIDTH, popupSize.x);
+		SearchMgr.state.put(STATE_POPUP_HEIGHT, popupSize.y);
 
-		SearchUI.state.put(STATE_SEARCH_TEXT, _txtSearch.getText());
+		SearchMgr.state.put(STATE_SEARCH_TEXT, _txtSearch.getText());
 	}
 
 	@Override
@@ -1333,7 +1334,7 @@ public class SearchViewSWT extends ViewPart {
 		sb.append("if (oldId >= 0) {");
 		sb.append("	var divOldSelection = document.getElementById(oldId.toString());");
 		sb.append("	if (divOldSelection) {");
-		sb.append("		divOldSelection.setAttribute('class', '" + SearchUI.CSS_ITEM_CONTAINER + "');");
+		sb.append("		divOldSelection.setAttribute('class', '" + SearchMgr.CSS_ITEM_CONTAINER + "');");
 		sb.append("	}");
 		sb.append("}");
 
@@ -1341,7 +1342,7 @@ public class SearchViewSWT extends ViewPart {
 		sb.append("	var divSelection = document.getElementById(selectedId.toString());");
 		sb.append("	if (divSelection) {");
 		sb.append("		divSelection.setAttribute('class', '"
-				+ SearchUI.CSS_ITEM_CONTAINER
+				+ SearchMgr.CSS_ITEM_CONTAINER
 				+ UI.SPACE
 				+ CSS_SELECTED
 				+ "');");

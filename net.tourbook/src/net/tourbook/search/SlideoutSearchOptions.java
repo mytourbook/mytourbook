@@ -458,19 +458,19 @@ public class SlideoutSearchOptions extends AnimatedToolTipShell implements IColo
 	private void restoreState() {
 
 		_chkShowDateTime.setSelection(Util.getStateBoolean(
-				SearchUI.state,
-				SearchUI.STATE_IS_SHOW_DATE_TIME,
-				SearchUI.STATE_IS_SHOW_DATE_TIME_DEFAULT));
+				SearchMgr.state,
+				SearchMgr.STATE_IS_SHOW_DATE_TIME,
+				SearchMgr.STATE_IS_SHOW_DATE_TIME_DEFAULT));
 
 		_chkShowLuceneDocId.setSelection(Util.getStateBoolean(
-				SearchUI.state,
-				SearchUI.STATE_IS_SHOW_LUCENE_DOC_ID,
-				SearchUI.STATE_IS_SHOW_LUCENE_DOC_ID_DEFAULT));
+				SearchMgr.state,
+				SearchMgr.STATE_IS_SHOW_LUCENE_DOC_ID,
+				SearchMgr.STATE_IS_SHOW_LUCENE_DOC_ID_DEFAULT));
 
 		_chkShowItemNumber.setSelection(Util.getStateBoolean(
-				SearchUI.state,
-				SearchUI.STATE_IS_SHOW_ITEM_NUMBER,
-				SearchUI.STATE_IS_SHOW_ITEM_NUMBER_DEFAULT));
+				SearchMgr.state,
+				SearchMgr.STATE_IS_SHOW_ITEM_NUMBER,
+				SearchMgr.STATE_IS_SHOW_ITEM_NUMBER_DEFAULT));
 
 //		_chkShowScore.setSelection(Util.getStateBoolean(
 //				_state,
@@ -478,50 +478,50 @@ public class SlideoutSearchOptions extends AnimatedToolTipShell implements IColo
 //				SearchView.STATE_IS_SHOW_SCORE_DEFAULT));
 
 		_chkTopNavigator.setSelection(Util.getStateBoolean(
-				SearchUI.state,
+				SearchMgr.state,
 				SearchViewSWT.STATE_IS_SHOW_TOP_NAVIGATOR,
 				SearchViewSWT.STATE_IS_SHOW_TOP_NAVIGATOR_DEFAULT));
 
 		// sort by date
 		final boolean isSortDateAscending = Util.getStateBoolean(
-				SearchUI.state,
-				SearchUI.STATE_IS_SORT_DATE_ASCENDING,
-				SearchUI.STATE_IS_SORT_DATE_ASCENDING_DEFAULT);
+				SearchMgr.state,
+				SearchMgr.STATE_IS_SORT_DATE_ASCENDING,
+				SearchMgr.STATE_IS_SORT_DATE_ASCENDING_DEFAULT);
 		_rdoTimeAscending.setSelection(isSortDateAscending);
 		_rdoTimeDescending.setSelection(isSortDateAscending == false);
 
 		_spinnerDisplayedResults.setSelection(Util.getStateInt(
-				SearchUI.state,
+				SearchMgr.state,
 				SearchViewSWT.STATE_HITS_PER_PAGE,
 				SearchViewSWT.STATE_HITS_PER_PAGE_DEFAULT));
 
 		_spinnerNumberOfPages.setSelection(Util.getStateInt(
-				SearchUI.state,
+				SearchMgr.state,
 				SearchViewSWT.STATE_NUMBER_OF_PAGES,
 				SearchViewSWT.STATE_NUMBER_OF_PAGES_DEFAULT));
 	}
 
 	private void saveState() {
 
-		SearchUI.state.put(SearchUI.STATE_IS_SHOW_DATE_TIME, _chkShowDateTime.getSelection());
-		SearchUI.state.put(SearchUI.STATE_IS_SHOW_ITEM_NUMBER, _chkShowItemNumber.getSelection());
-		SearchUI.state.put(SearchUI.STATE_IS_SHOW_LUCENE_DOC_ID, _chkShowLuceneDocId.getSelection());
-		SearchUI.state.put(SearchUI.STATE_IS_SORT_DATE_ASCENDING, _rdoTimeAscending.getSelection());
+		SearchMgr.state.put(SearchMgr.STATE_IS_SHOW_DATE_TIME, _chkShowDateTime.getSelection());
+		SearchMgr.state.put(SearchMgr.STATE_IS_SHOW_ITEM_NUMBER, _chkShowItemNumber.getSelection());
+		SearchMgr.state.put(SearchMgr.STATE_IS_SHOW_LUCENE_DOC_ID, _chkShowLuceneDocId.getSelection());
+		SearchMgr.state.put(SearchMgr.STATE_IS_SORT_DATE_ASCENDING, _rdoTimeAscending.getSelection());
 
-		SearchUI.state.put(SearchViewSWT.STATE_IS_SHOW_TOP_NAVIGATOR, _chkTopNavigator.getSelection());
-		SearchUI.state.put(SearchViewSWT.STATE_HITS_PER_PAGE, _spinnerDisplayedResults.getSelection());
-		SearchUI.state.put(SearchViewSWT.STATE_NUMBER_OF_PAGES, _spinnerNumberOfPages.getSelection());
+		SearchMgr.state.put(SearchViewSWT.STATE_IS_SHOW_TOP_NAVIGATOR, _chkTopNavigator.getSelection());
+		SearchMgr.state.put(SearchViewSWT.STATE_HITS_PER_PAGE, _spinnerDisplayedResults.getSelection());
+		SearchMgr.state.put(SearchViewSWT.STATE_NUMBER_OF_PAGES, _spinnerNumberOfPages.getSelection());
 	}
 
 	private void setDefaults() {
 
-		SearchUI.saveDefaultSearchOption();
+		SearchMgr.saveDefaultSearchOption();
 
 		// these are only SWT UI properties
-		SearchUI.state
+		SearchMgr.state
 				.put(SearchViewSWT.STATE_IS_SHOW_TOP_NAVIGATOR, SearchViewSWT.STATE_IS_SHOW_TOP_NAVIGATOR_DEFAULT);
-		SearchUI.state.put(SearchViewSWT.STATE_HITS_PER_PAGE, SearchViewSWT.STATE_HITS_PER_PAGE_DEFAULT);
-		SearchUI.state.put(SearchViewSWT.STATE_NUMBER_OF_PAGES, SearchViewSWT.STATE_NUMBER_OF_PAGES_DEFAULT);
+		SearchMgr.state.put(SearchViewSWT.STATE_HITS_PER_PAGE, SearchViewSWT.STATE_HITS_PER_PAGE_DEFAULT);
+		SearchMgr.state.put(SearchViewSWT.STATE_NUMBER_OF_PAGES, SearchViewSWT.STATE_NUMBER_OF_PAGES_DEFAULT);
 
 		restoreState();
 

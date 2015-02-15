@@ -1,28 +1,17 @@
+/*
+	Setup css only for the startup of the app, mainly the loading message.
+*/
+
+body 
+{
+	font-family: 			verdana, helvetica, arial, sans-serif;
+	font-size: 				13px;	
+	line-height:			130%;
+}
 
 html, body 
 {
     height:					100%;
-}
-
-table
-{
-	border-collapse:		collapse;
-
-	/* show border to debug tables */
-	xborder:				1px solid; 
-}
-
-/*
-	Vertical spacing between fields.
-*/
-.fieldVertSpaceTop
-{
-	margin-top:				0.5em;	
-}
-
-.fieldVertSpaceBottom
-{
-	margin-bottom:			0.5em;	
 }
 
 #domLoading 
