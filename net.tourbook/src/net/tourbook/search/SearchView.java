@@ -43,7 +43,6 @@ import org.eclipse.swt.widgets.Link;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
-import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.part.ViewPart;
 
 import de.byteholder.geoclipse.util.Util;
@@ -60,14 +59,7 @@ public class SearchView extends ViewPart implements IActiveSearchView {
 	/*
 	 * UI controls
 	 */
-	private PageBook				_pageBook;
-
 	private Browser					_browser;
-
-	private Composite				_pageSearchLinux;
-	private Composite				_pageSearch;
-
-	private Link					_linkLinuxBrowser;
 
 	private void addPartListener() {
 
@@ -149,48 +141,10 @@ public class SearchView extends ViewPart implements IActiveSearchView {
 
 		FTSearchManager.setupSuggester();
 
-		createUI(parent);
-
-		_pageBook.showPage(UI.IS_WIN ? _pageSearch : _pageSearchLinux);
-
-// this is for debugging
-//		_pageBook.showPage(UI.IS_LINUX ? _pageSearch : _pageSearchLinux);
-	}
-
-	private void createUI(final Composite parent) {
-
-		_pageBook = new PageBook(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, true).applyTo(_pageBook);
-
-		_pageSearchLinux = new Composite(_pageBook, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, true).applyTo(_pageSearchLinux);
-		GridLayoutFactory.swtDefaults().numColumns(1).applyTo(_pageSearchLinux);
-		{
-			_linkLinuxBrowser = new Link(_pageSearchLinux, SWT.WRAP | SWT.READ_ONLY);
-			GridDataFactory.fillDefaults()//
-					.grab(true, true)
-					.align(SWT.FILL, SWT.BEGINNING)
-					.applyTo(_linkLinuxBrowser);
-
-			_linkLinuxBrowser.setText(NLS.bind(
-					Messages.Search_View_Link_LinuxBrowser,
-					SearchMgr.SEARCH_URL,
-					SearchMgr.SEARCH_URL));
-
-			_linkLinuxBrowser.addSelectionListener(new SelectionAdapter() {
-				@Override
-				public void widgetSelected(final SelectionEvent e) {
-					Util.openLink(Display.getCurrent().getActiveShell(), SearchMgr.SEARCH_URL);
-				}
-			});
-		}
-
-		_pageSearch = new Composite(_pageBook, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, true).applyTo(_pageSearch);
-		GridLayoutFactory.fillDefaults().applyTo(_pageSearch);
-		_pageBook.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
-		{
-			createUI_10_Search(_pageSearch);
+		if (UI.IS_WIN) {
+			createUI_10_Search(parent);
+		} else {
+			createUI_20_Linux(parent);
 		}
 	}
 
@@ -222,6 +176,32 @@ public class SearchView extends ViewPart implements IActiveSearchView {
 
 		// show search page
 		_browser.setUrl(SearchMgr.SEARCH_URL);
+	}
+
+	private void createUI_20_Linux(final Composite parent) {
+
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
+		GridLayoutFactory.swtDefaults().numColumns(1).applyTo(container);
+		{
+			final Link linkLinuxBrowser = new Link(container, SWT.WRAP | SWT.READ_ONLY);
+			GridDataFactory.fillDefaults()//
+					.grab(true, true)
+					.align(SWT.FILL, SWT.BEGINNING)
+					.applyTo(linkLinuxBrowser);
+
+			linkLinuxBrowser.setText(NLS.bind(
+					Messages.Search_View_Link_LinuxBrowser,
+					SearchMgr.SEARCH_URL,
+					SearchMgr.SEARCH_URL));
+
+			linkLinuxBrowser.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(final SelectionEvent e) {
+					Util.openLink(Display.getCurrent().getActiveShell(), SearchMgr.SEARCH_URL);
+				}
+			});
+		}
 	}
 
 	@Override
