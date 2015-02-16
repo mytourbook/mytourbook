@@ -13,6 +13,12 @@ define(//
 
 		searchOptions_Action_RestoreDefaults : 'Restore Defaults',
 
+		searchOptions_Checkbox_EaseSearching : "Do ease searching",
+		searchOptions_Checkbox_EaseSearching_Tooltip : //
+		"When ease searching is selected, a * wildcard is appended to the search text, this is similar like internet search engines.<br><br>"
+			+ "The * wildcard is appended internally and is not visible.<br><br>"
+			+ "It is also usefull to disable this feature when doing a sophisticated search with all Lucene query parser options.",
+
 		searchOptions_Checkbox_ShowContentAll : 'All',
 		searchOptions_Checkbox_ShowContentTour : 'Tours',
 		searchOptions_Checkbox_ShowContentMarker : 'Markers',
@@ -31,7 +37,17 @@ define(//
 		searchOptions_Label_SortAscending : 'By Date',
 
 		searchOptions_Radio_SortAscending : 'Ascending',
-		searchOptions_Radio_SortDescending : 'Descending'
+		searchOptions_Radio_SortDescending : 'Descending',
+
+		searchTooltip_Title : "Wildcard Search",
+		searchTooltip_Label_1 : "A search can also be done with wildcards and other features, more details are in the ",
+		searchTooltip_Label_2 : "Lucene query parser description.",
+		searchTooltip_Label_3 : "Lucene is the used search engine.",
+		searchTooltip_Url : 'http://lucene.apache.org/core/4_10_3/queryparser/org/apache/lucene/queryparser/classic/package-summary.html#Wildcard_Searches',
+
+		searchValidation_SearchFilter : 'Nothing can be found.',
+
+		dummy : ''
 	},
 
 	// list of available languages in MT except EN which are defined in 'root'

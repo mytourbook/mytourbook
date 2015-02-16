@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -28,9 +28,9 @@ public enum TourEventId {
 	TOUR_CHANGED,
 
 	/**
-	 * Event data contain the selected tours.
+	 * All computed data for all tours are modified
 	 */
-	TOUR_SELECTION,
+	ALL_TOURS_ARE_MODIFIED,
 
 	/**
 	 * {@link TourData} has been modified, the UI must be updated by reloading {@link TourData}
@@ -87,15 +87,15 @@ public enum TourEventId {
 	SLIDER_POSITION_CHANGED,
 
 	/**
-	 * All computed data for all tours are modified
-	 */
-	ALL_TOURS_ARE_MODIFIED,
-
-	/**
 	 * remove the tour which is currently displayed because the tour is removed from a view or a
 	 * view is closed which provided the tour
 	 */
 	CLEAR_DISPLAYED_TOUR,
+
+	/**
+	 * Event data contain the selected tours.
+	 */
+	TOUR_SELECTION,
 
 	/**
 	 * A tour marker is selected, event data contain a {@link SelectionTourMarker}.

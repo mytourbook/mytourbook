@@ -47,6 +47,9 @@ $DOJO_SEARCH$
 	        
 			<table style="width:100%">
 				<tr>
+					<td>
+						<div id="domInfo" class="actionIcon" tabindex="0">&nbsp;</div>
+					</td>
 					<td style="width:99%; padding-left:0.2em; padding-right:0.4em;">
 				    	<div id="domSearchInput"></div>
 					</td>
@@ -54,7 +57,7 @@ $DOJO_SEARCH$
 					    <div id="domActionStartSearch"></div>
 					</td>
 					<td>
-						<div id="domAppStatus">&nbsp;</div>
+						<div id="domAppStatus" style="padding-left:0.2em;">&nbsp;</div>
 					</td>
 					<td>
 					    <div id="domActionSearchOptions"></div>

@@ -99,16 +99,16 @@ public class FTSearchManager {
 
 	private static final Version			LUCENE_VERSION				= Version.LUCENE_4_10_1;
 
-	private static final String				LUCENE_INDEX_FOLDER_NAME	= "lucene-index";						//$NON-NLS-1$
+	private static final String				LUCENE_INDEX_FOLDER_NAME	= "lucene-index";					//$NON-NLS-1$
 
-	private static final String				SEARCH_FIELD_DESCRIPTION	= "description";						//$NON-NLS-1$
-	private static final String				SEARCH_FIELD_DOC_SOURCE		= "docSource";							//$NON-NLS-1$
-	private static final String				SEARCH_FIELD_MARKER_ID		= "markerID";							//$NON-NLS-1$
-	private static final String				SEARCH_FIELD_TITLE			= "title";								//$NON-NLS-1$
-	private static final String				SEARCH_FIELD_TOUR_ID		= "tourID";							//$NON-NLS-1$
-	private static final String				SEARCH_FIELD_TIME			= "time";								//$NON-NLS-1$
+	private static final String				SEARCH_FIELD_DESCRIPTION	= "description";					//$NON-NLS-1$
+	private static final String				SEARCH_FIELD_DOC_SOURCE		= "docSource";						//$NON-NLS-1$
+	private static final String				SEARCH_FIELD_MARKER_ID		= "markerID";						//$NON-NLS-1$
+	private static final String				SEARCH_FIELD_TITLE			= "title";							//$NON-NLS-1$
+	private static final String				SEARCH_FIELD_TOUR_ID		= "tourID";						//$NON-NLS-1$
+	private static final String				SEARCH_FIELD_TIME			= "time";							//$NON-NLS-1$
 
-	private static final String				LOG_CREATE_INDEX			= "Created ft index: %s\t %d ms";		//$NON-NLS-1$
+	private static final String				LOG_CREATE_INDEX			= "Created ft index: %s\t %d ms";	//$NON-NLS-1$
 
 	static final int						DOC_SOURCE_TOUR				= 1;
 	static final int						DOC_SOURCE_TOUR_MARKER		= 2;
@@ -128,14 +128,14 @@ public class FTSearchManager {
 	private static boolean					_isShowContentMarker;
 	private static boolean					_isShowContentTour;
 	private static boolean					_isShowContentWaypoint;
-	private static boolean					_isSortDateAscending		= false;								// -> sort descending
+	private static boolean					_isSortDateAscending		= false;							// -> sort descending
 
 	// configure field with offsets at index time
-	private static final FieldType			_longSearchField			= new FieldType(LongField.TYPE_STORED);
-	private static final FieldType			_textSearchField			= new FieldType(TextField.TYPE_STORED);
+//	private static final FieldType			_longSearchField			= new FieldType(LongField.TYPE_STORED);
+//	private static final FieldType			_textSearchField			= new FieldType(TextField.TYPE_STORED);
 	{
-		_longSearchField.setIndexOptions(IndexOptions.DOCS_AND_FREQS_AND_POSITIONS_AND_OFFSETS);
-		_textSearchField.setIndexOptions(IndexOptions.DOCS_AND_FREQS_AND_POSITIONS_AND_OFFSETS);
+//		_longSearchField.setIndexOptions(IndexOptions.DOCS_AND_FREQS_AND_POSITIONS_AND_OFFSETS);
+//		_textSearchField.setIndexOptions(IndexOptions.DOCS_AND_FREQS_AND_POSITIONS_AND_OFFSETS);
 	}
 
 	/**
@@ -300,20 +300,27 @@ public class FTSearchManager {
 											final String description,
 											final long time) throws IOException {
 
+//		private static final FieldType			_longSearchField			= new FieldType(LongField.TYPE_STORED);
+//		private static final FieldType			_textSearchField			= new FieldType(TextField.TYPE_STORED);
+//		{
+//			_longSearchField.setIndexOptions(IndexOptions.DOCS_AND_FREQS_AND_POSITIONS_AND_OFFSETS);
+//			_textSearchField.setIndexOptions(IndexOptions.DOCS_AND_FREQS_AND_POSITIONS_AND_OFFSETS);
+//		}
+
 		final Document doc = new Document();
 
 		doc.add(new IntField(SEARCH_FIELD_DOC_SOURCE, DOC_SOURCE_TOUR_MARKER, Store.YES));
 
 		doc.add(new LongField(SEARCH_FIELD_MARKER_ID, markerId, Store.YES));
 		doc.add(new LongField(SEARCH_FIELD_TOUR_ID, tourId, Store.YES));
-		doc.add(new LongField(SEARCH_FIELD_TIME, time, _longSearchField));
+		doc.add(new LongField(SEARCH_FIELD_TIME, time, createFieldType_Long()));
 
 		if (title != null) {
-			doc.add(new Field(SEARCH_FIELD_TITLE, title, _textSearchField));
+			doc.add(new Field(SEARCH_FIELD_TITLE, title, createFieldType_Text()));
 		}
 
 		if (description != null) {
-			doc.add(new Field(SEARCH_FIELD_DESCRIPTION, description, _textSearchField));
+			doc.add(new Field(SEARCH_FIELD_DESCRIPTION, description, createFieldType_Text()));
 		}
 
 		indexWriter.addDocument(doc);
@@ -330,14 +337,14 @@ public class FTSearchManager {
 		doc.add(new IntField(SEARCH_FIELD_DOC_SOURCE, DOC_SOURCE_TOUR, Store.YES));
 
 		doc.add(new LongField(SEARCH_FIELD_TOUR_ID, tourId, Store.YES));
-		doc.add(new LongField(SEARCH_FIELD_TIME, time, _longSearchField));
+		doc.add(new LongField(SEARCH_FIELD_TIME, time, createFieldType_Long()));
 
 		if (title != null) {
-			doc.add(new Field(SEARCH_FIELD_TITLE, title, _textSearchField));
+			doc.add(new Field(SEARCH_FIELD_TITLE, title, createFieldType_Text()));
 		}
 
 		if (description != null) {
-			doc.add(new Field(SEARCH_FIELD_DESCRIPTION, description, _textSearchField));
+			doc.add(new Field(SEARCH_FIELD_DESCRIPTION, description, createFieldType_Text()));
 		}
 
 		indexWriter.addDocument(doc);
@@ -358,18 +365,42 @@ public class FTSearchManager {
 		doc.add(new LongField(SEARCH_FIELD_TOUR_ID, tourId, Store.YES));
 
 		if (time != 0) {
-			doc.add(new LongField(SEARCH_FIELD_TIME, time, _longSearchField));
+			doc.add(new LongField(SEARCH_FIELD_TIME, time, createFieldType_Long()));
 		}
 
 		if (title != null) {
-			doc.add(new Field(SEARCH_FIELD_TITLE, title, _textSearchField));
+			doc.add(new Field(SEARCH_FIELD_TITLE, title, createFieldType_Text()));
 		}
 
 		if (description != null) {
-			doc.add(new Field(SEARCH_FIELD_DESCRIPTION, description, _textSearchField));
+			doc.add(new Field(SEARCH_FIELD_DESCRIPTION, description, createFieldType_Text()));
 		}
 
 		indexWriter.addDocument(doc);
+	}
+
+	private static FieldType createFieldType_Long() {
+
+		final FieldType _longSearchField = new FieldType(LongField.TYPE_STORED);
+		_longSearchField.setIndexOptions(IndexOptions.DOCS_AND_FREQS_AND_POSITIONS_AND_OFFSETS);
+
+		return _longSearchField;
+	}
+
+	/**
+	 * This field must be created for each document otherwise the highlighter will throw the
+	 * exception
+	 * <p>
+	 * <b>field 'description' was indexed without offsets, cannot highlight</b>
+	 * 
+	 * @return
+	 */
+	private static FieldType createFieldType_Text() {
+
+		final FieldType _textSearchField = new FieldType(TextField.TYPE_STORED);
+		_textSearchField.setIndexOptions(IndexOptions.DOCS_AND_FREQS_AND_POSITIONS_AND_OFFSETS);
+
+		return _textSearchField;
 	}
 
 	private static void createStores_TourData(final Connection conn, final IProgressMonitor monitor)

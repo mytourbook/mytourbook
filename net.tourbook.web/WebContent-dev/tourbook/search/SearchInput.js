@@ -99,7 +99,7 @@ Messages //
 				this._currentSearchUrl = newSearchUrl;
 
 				var grid = this._grid;
-				
+
 				// set no data message when a search is started manually
 				grid.noDataMessage = Messages.searchGrid_Label_NoDataMessage;
 
@@ -138,7 +138,10 @@ Messages //
 		 * Returns text which is entered for searching.
 		 */
 		getSearchText : function getSearchText() {
-			return this.get('displayedValue').trim();
+
+			var text = this.get('displayedValue');
+
+			return text.trim();
 		},
 
 		/**

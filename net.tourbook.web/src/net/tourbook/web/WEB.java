@@ -48,10 +48,12 @@ public class WEB {
 	 * {@value #WEB_CONTENT_DEVELOPMENT_FOLDER} folder otherwise it is delivered from the
 	 * {@value #WEB_CONTENT_RELEASE_FOLDER} folder.
 	 */
-	static boolean				IS_DEBUG								= false;
+	static boolean				IS_DEBUG								= true;
 
 	static final String			DEBUG_PATH_XUL_RUNNER					= "C:/E/XULRunner/";							//$NON-NLS-1$
 	static final String			DEBUG_PATH_DOJO							= "C:/E/js-resources/dojo/";					//$NON-NLS-1$
+
+	public static final String	PROTOCOL_HTTP							= "http://";									//$NON-NLS-1$
 
 	static final String			DOJO_TOOLKIT_FOLDER						= "/MyTourbook-DojoToolkit";					//$NON-NLS-1$
 
@@ -65,7 +67,7 @@ public class WEB {
 																				? WEB_CONTENT_DEVELOPMENT_FOLDER
 																				: WEB_CONTENT_RELEASE_FOLDER;
 
-	public static String		SERVER_URL								= WebContentServer.SERVER_URL;
+//	public static String		SERVER_URL								= WebContentServer.SERVER_URL;
 
 	public static final String	UTF_8									= "UTF-8";										//$NON-NLS-1$
 

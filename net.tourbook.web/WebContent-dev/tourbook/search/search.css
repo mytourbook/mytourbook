@@ -13,10 +13,11 @@ table
 	xborder:				1px solid; 
 }
 
-a /* an <a> covers the whole item */
+a
 {
 	text-decoration:		none;
-	color:					#444;
+	color:					#666;
+	xcolor:					red;
 }
 
 /*
@@ -38,6 +39,16 @@ a /* an <a> covers the whole item */
 	font-family: 			verdana, helvetica, arial, sans-serif;
 	font-size: 				13px;	
 	line-height:			130%;
+}
+
+.mtBase .dijitTooltipContainer
+{
+	border:					1px solid #bbb;			/* replace blue border */
+	/* 
+		Limit width otherwise the viewport width is used.
+		With a width below 30em the text can overflow the container 
+	 */
+	width:					27em;					
 }
 
 /*
@@ -166,6 +177,11 @@ a /* an <a> covers the whole item */
 .actionSearchIcon
 {
 	background-image: 		url("/tourbook/resources/search.png");
+}
+
+#domInfo
+{
+	background-image: 		url("/tourbook/resources/photo-tooltip.png");
 }
 
 #domSearchStatus

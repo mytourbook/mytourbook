@@ -56,6 +56,11 @@ Messages //
 
 			// hide dialog when mouse has leaved it
 			on(this.domNode, "mouseleave", lang.hitch(this, "hideDialog"));
+
+			/*
+			 * Tooltips with html tags must be defined in the js code, otherwise the tags do not work.
+			 */
+			this.apChk_EaseSearching_Tooltip.label = Messages.searchOptions_Checkbox_EaseSearching_Tooltip;
 		},
 
 		/**
@@ -92,21 +97,24 @@ Messages //
 		 */
 		apSelection : function apSelection() {
 
-			var searchOptions = //
-			{
-				isShowContentAll : this.apChkShowContentAll.get('checked'),
-				isShowContentTour : this.apChkShowContentTour.get('checked'),
-				isShowContentMarker : this.apChkShowContentMarker.get('checked'),
-				isShowContentWaypoint : this.apChkShowContentWaypoint.get('checked'),
-
-				isSortByDateAscending : this.apSortByDateAscending.get('checked'),
-
-				isShowDateTime : this.apChkShowDateTime.get('checked'),
-				isShowItemNumber : this.apChkShowItemNumber.get('checked'),
-				isShowLuceneID : this.apChkShowLuceneID.get('checked')
-			};
-
 			if (this._isValid()) {
+
+				var searchOptions = //
+				{
+					isEaseSearching : this.apChkEaseSearching.get('checked'),
+
+					isShowContentAll : this.apChkShowContentAll.get('checked'),
+					isShowContentTour : this.apChkShowContentTour.get('checked'),
+					isShowContentMarker : this.apChkShowContentMarker.get('checked'),
+					isShowContentWaypoint : this.apChkShowContentWaypoint.get('checked'),
+
+					isSortByDateAscending : this.apSortByDateAscending.get('checked'),
+
+					isShowDateTime : this.apChkShowDateTime.get('checked'),
+					isShowItemNumber : this.apChkShowItemNumber.get('checked'),
+					isShowLuceneID : this.apChkShowLuceneID.get('checked')
+				};
+
 				this._setSearchOptions(searchOptions);
 			}
 		},
@@ -134,7 +142,7 @@ Messages //
 					&& isShowContentMarker == false //
 					&& isShowContentWaypoint == false) {
 
-					statusText = 'Nothing can be found.';
+					statusText = Messages.searchValidation_SearchFilter;
 					isValid = false;
 				}
 			}
@@ -214,6 +222,8 @@ Messages //
 		},
 
 		_updateUI_FromState : function _updateUI_FromState(dialog, xhrData) {
+
+			dialog.apChkEaseSearching.set('checked', xhrData.isEaseSearching);
 
 			dialog.apChkShowContentAll.set('checked', xhrData.isShowContentAll);
 			dialog.apChkShowContentTour.set('checked', xhrData.isShowContentTour);

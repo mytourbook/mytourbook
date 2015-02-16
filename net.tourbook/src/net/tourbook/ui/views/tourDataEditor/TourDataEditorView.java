@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -1623,14 +1623,14 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 					onSelectionChanged((ISelection) eventData);
 
-				} else if (eventId == TourEventId.MARKER_SELECTION) {
+				} else if (eventId == TourEventId.MARKER_SELECTION && eventData instanceof SelectionTourMarker) {
 
-					if (eventData instanceof SelectionTourMarker) {
+					// ensure that the tour is displayed
+					onSelectionChanged((ISelection) eventData);
 
-						final SelectionTourMarker tourMarkerSelection = (SelectionTourMarker) eventData;
+					final SelectionTourMarker tourMarkerSelection = (SelectionTourMarker) eventData;
 
-						onSelectionChanged_TourMarker(tourMarkerSelection);
-					}
+					onSelectionChanged_TourMarker(tourMarkerSelection);
 
 				} else if (eventId == TourEventId.CLEAR_DISPLAYED_TOUR) {
 
@@ -5018,6 +5018,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 				displayTour(tourIds.get(0));
 			}
 
+		} else if (selection instanceof SelectionTourMarker) {
+
+			displayTour(((SelectionTourMarker) selection).getTourData());
+
 		} else if (selection instanceof SelectionTourCatalogView) {
 
 			final SelectionTourCatalogView tourCatalogSelection = (SelectionTourCatalogView) selection;
@@ -5122,6 +5126,20 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 				if (currentTourId == _selectionTourId) {
 					isCurrentTourSelected = true;
 				}
+			}
+
+		} else if (selection instanceof SelectionTourMarker) {
+
+			final TourData tourData = ((SelectionTourMarker) selection).getTourData();
+			if (tourData == null) {
+				return false;
+			}
+
+			_selectionTourId = tourData.getTourId();
+
+			if ((tourData != null) && (currentTourId == _selectionTourId)) {
+				isCurrentTourSelected = true;
+				selectedTourData = tourData;
 			}
 
 		} else if (selection instanceof SelectionChartInfo) {

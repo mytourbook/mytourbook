@@ -73,7 +73,6 @@ public class WebContentServer {
 
 	private static final String				ROOT_FILE_PATH_NAME			= "/";											//$NON-NLS-1$
 
-	private static final String				PROTOCOL_HTTP				= "http://";									//$NON-NLS-1$
 	private static final String				URI_INNER_PROTOCOL_FILE		= "/file:";									//$NON-NLS-1$
 
 	private static final String				REQUEST_PATH_TOURBOOK		= "/tourbook";									//$NON-NLS-1$
@@ -111,7 +110,7 @@ public class WebContentServer {
 		final InetAddress loopbackAddress = InetAddress.getLoopbackAddress();
 		inetAddress = new InetSocketAddress(loopbackAddress, _serverPort);
 
-		SERVER_URL = PROTOCOL_HTTP + loopbackAddress.getHostAddress() + ':' + _serverPort;
+		SERVER_URL = WEB.PROTOCOL_HTTP + loopbackAddress.getHostAddress() + ':' + _serverPort;
 
 //
 // This font is disabled because it is not easy to read it.

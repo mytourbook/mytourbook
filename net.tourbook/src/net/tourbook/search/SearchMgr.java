@@ -74,6 +74,9 @@ public class SearchMgr implements XHRHandler {
 
 	private static final String				STATE_CURRENT_SEARCH_TEXT				= "STATE_CURRENT_SEARCH_TEXT";							//$NON-NLS-1$
 
+	static final String						STATE_IS_EASE_SEARCHING					= "STATE_IS_EASE_SEARCHING";							//$NON-NLS-1$
+	static final boolean					STATE_IS_EASE_SEARCHING_DEFAULT			= true;
+
 	static final String						STATE_IS_SHOW_CONTENT_ALL				= "STATE_IS_SHOW_CONTENT_ALL";							//$NON-NLS-1$
 	static final boolean					STATE_IS_SHOW_CONTENT_ALL_DEFAULT		= true;
 	static final String						STATE_IS_SHOW_CONTENT_MARKER			= "STATE_IS_SHOW_CONTENT_MARKER";						//$NON-NLS-1$
@@ -130,6 +133,7 @@ public class SearchMgr implements XHRHandler {
 	// search options
 	private static final String				JSON_IS_SEARCH_OPTIONS_DEFAULT			= "isSearchOptionsDefault";							//$NON-NLS-1$
 	//
+	private static final String				JSON_IS_EASE_SEARCHING					= "isEaseSearching";									//$NON-NLS-1$
 	private static final String				JSON_IS_SHOW_CONTENT_ALL				= "isShowContentAll";									//$NON-NLS-1$
 	private static final String				JSON_IS_SHOW_CONTENT_MARKER				= "isShowContentMarker";								//$NON-NLS-1$
 	private static final String				JSON_IS_SHOW_CONTENT_TOUR				= "isShowContentTour";									//$NON-NLS-1$
@@ -155,6 +159,7 @@ public class SearchMgr implements XHRHandler {
 	private static String					_iconUrl_Marker;
 	private static String					_iconUrl_WayPoint;
 	//
+	private static boolean					_isUI_EaseSearching;
 	private static boolean					_isUI_ShowContentAll;
 	private static boolean					_isUI_ShowContentMarker;
 	private static boolean					_isUI_ShowContentTour;
@@ -198,8 +203,8 @@ public class SearchMgr implements XHRHandler {
 
 	static {
 
-		ACTION_URL = WEB.SERVER_URL + "/action?"; //$NON-NLS-1$
-		SEARCH_URL = WEB.SERVER_URL + SEARCH_FOLDER + SEARCH_PAGE;
+		ACTION_URL = WebContentServer.SERVER_URL + "/action?"; //$NON-NLS-1$
+		SEARCH_URL = WebContentServer.SERVER_URL + SEARCH_FOLDER + SEARCH_PAGE;
 
 		// e.g. ...&action=EditMarker...
 
@@ -269,7 +274,7 @@ public class SearchMgr implements XHRHandler {
 
 		final String iconUrl = net.tourbook.ui.UI.getIconUrl(iconImage);
 
-		return WEB.SERVER_URL + '/' + iconUrl;
+		return WebContentServer.SERVER_URL + '/' + iconUrl;
 	}
 
 	private static XHRHandler getInstance() {
@@ -337,6 +342,24 @@ public class SearchMgr implements XHRHandler {
 		}
 
 		if (action == null) {
+
+			final boolean isAppUrl = location.startsWith(WebContentServer.SERVER_URL);
+
+			// check if an external links is called
+			if (location.startsWith(WEB.PROTOCOL_HTTP) && !isAppUrl) {
+
+				// identified external link
+
+				Display.getDefault().asyncExec(new Runnable() {
+					@Override
+					public void run() {
+						Util.openLink(Display.getDefault().getActiveShell(), location);
+					}
+				});
+
+				return true;
+			}
+
 			return false;
 		}
 
@@ -547,7 +570,7 @@ public class SearchMgr implements XHRHandler {
 
 		if (hrefAction(location)) {
 
-			// keep current page when an action is performed, OTHERWISE the current page will disappear :-(
+			// keep current page when an action is performed, OTHERWISE the current page will disappear or is replaced :-(
 			event.doit = false;
 		}
 	}
@@ -556,6 +579,8 @@ public class SearchMgr implements XHRHandler {
 	 * Set defaults for the search options in the state.
 	 */
 	static void saveDefaultSearchOption() {
+
+		state.put(STATE_IS_EASE_SEARCHING, STATE_IS_EASE_SEARCHING_DEFAULT);
 
 		state.put(STATE_IS_SHOW_CONTENT_ALL, STATE_IS_SHOW_CONTENT_ALL_DEFAULT);
 		state.put(STATE_IS_SHOW_CONTENT_MARKER, STATE_IS_SHOW_CONTENT_MARKER_DEFAULT);
@@ -587,6 +612,10 @@ public class SearchMgr implements XHRHandler {
 	 * search result.
 	 */
 	static void setInternalSearchOptions() {
+
+		_isUI_EaseSearching = Util.getStateBoolean(state, //
+				STATE_IS_EASE_SEARCHING,
+				STATE_IS_EASE_SEARCHING_DEFAULT);
 
 		_isUI_ShowContentAll = Util.getStateBoolean(state, //
 				STATE_IS_SHOW_CONTENT_ALL,
@@ -935,6 +964,8 @@ public class SearchMgr implements XHRHandler {
 
 		final JSONObject responceObj = new JSONObject();
 
+		responceObj.put(JSON_IS_EASE_SEARCHING, _isUI_EaseSearching);
+
 		responceObj.put(JSON_IS_SHOW_CONTENT_ALL, _isUI_ShowContentAll);
 		responceObj.put(JSON_IS_SHOW_CONTENT_MARKER, _isUI_ShowContentMarker);
 		responceObj.put(JSON_IS_SHOW_CONTENT_TOUR, _isUI_ShowContentTour);
@@ -1055,7 +1086,7 @@ public class SearchMgr implements XHRHandler {
 			// ensure white space is removed
 			searchText = searchText.trim();
 
-			if (searchText.endsWith(UI.SYMBOL_STAR) == false) {
+			if (searchText.endsWith(UI.SYMBOL_STAR) == false && _isUI_EaseSearching) {
 
 				// Append a * otherwise nothing is found
 				searchText += UI.SYMBOL_STAR;
@@ -1100,7 +1131,7 @@ public class SearchMgr implements XHRHandler {
 
 			// also keep empty search text
 
-			state.put(STATE_CURRENT_SEARCH_TEXT, UI.EMPTY_STRING);
+//			state.put(STATE_CURRENT_SEARCH_TEXT, UI.EMPTY_STRING);
 		}
 
 		final Headers responseHeaders = httpExchange.getResponseHeaders();
@@ -1176,6 +1207,8 @@ public class SearchMgr implements XHRHandler {
 			responceObj.put(JSON_IS_SEARCH_OPTIONS_DEFAULT, true);
 
 			// create xhr response with default values
+			responceObj.put(JSON_IS_EASE_SEARCHING, STATE_IS_EASE_SEARCHING_DEFAULT);
+
 			responceObj.put(JSON_IS_SHOW_CONTENT_ALL, STATE_IS_SHOW_CONTENT_ALL_DEFAULT);
 			responceObj.put(JSON_IS_SHOW_CONTENT_MARKER, STATE_IS_SHOW_CONTENT_MARKER_DEFAULT);
 			responceObj.put(JSON_IS_SHOW_CONTENT_TOUR, STATE_IS_SHOW_CONTENT_TOUR_DEFAULT);
@@ -1190,6 +1223,8 @@ public class SearchMgr implements XHRHandler {
 		} else {
 
 			// update state
+
+			state.put(STATE_IS_EASE_SEARCHING, jsonSearchOptions.getBoolean(JSON_IS_EASE_SEARCHING));
 
 			state.put(STATE_IS_SHOW_CONTENT_ALL, jsonSearchOptions.getBoolean(JSON_IS_SHOW_CONTENT_ALL));
 			state.put(STATE_IS_SHOW_CONTENT_MARKER, jsonSearchOptions.getBoolean(JSON_IS_SHOW_CONTENT_MARKER));
