@@ -36,7 +36,7 @@ $DOJO_SEARCH$
 	
 	<script>require(['tourbook/search/SearchApp']);</script>
 	
-	
+	<!-- UI  -->
 	<div id="domContainer"
 	    data-dojo-type="dijit/layout/LayoutContainer">
     
@@ -54,13 +54,13 @@ $DOJO_SEARCH$
 				    	<div id="domSearchInput"></div>
 					</td>
 					<td style="margin-right:0.2em">
-					    <div id="domActionStartSearch"></div>
+					    <div id="domAction_StartSearch"></div>
 					</td>
 					<td>
 						<div id="domAppStatus" style="padding-left:0.2em;">&nbsp;</div>
 					</td>
 					<td>
-					    <div id="domActionSearchOptions"></div>
+					    <div id="domAction_SearchOptions"></div>
 					</td>
 				</tr>
 			</table>
@@ -73,6 +73,19 @@ $DOJO_SEARCH$
 			<div id="domGrid"></div>
 	    </div>
 
+	</div>
+
+	<!-- Context menu -->
+	<div 
+		id="domContextMenu_SearchResult" 
+		data-dojo-type="dijit/Menu" 
+		data-dojo-props="targetNodeIds:['domGrid'], selector:'div.dgrid-row'" 
+		style="display: none;">
+		
+		<div 
+			id="domAction_EditMarker"
+			data-dojo-type="dijit/MenuItem" 
+			data-dojo-props="xiconClass:'dijitEditorIcon dijitEditorIconCut'">Edit Marker...</div>
 	</div>
 	
 </body>

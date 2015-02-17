@@ -80,6 +80,8 @@ public class WebContentServer {
 	private static final String				XHR_HEADER_KEY				= "X-requested-with";							//$NON-NLS-1$
 	private static final String				XHR_HEADER_VALUE			= "XMLHttpRequest";							//$NON-NLS-1$
 
+	private static final String				ICON_RESOURCE_REQUEST		= "/$MT-ICON$/";								//$NON-NLS-1$
+
 	private static final String				DOJO_ROOT					= "/dojo/";									//$NON-NLS-1$
 	private static final String				DOJO_DIJIT					= "/dijit/";									//$NON-NLS-1$
 	private static final String				DOJO_DGRID					= "/dgrid/";									//$NON-NLS-1$
@@ -96,6 +98,7 @@ public class WebContentServer {
 	private static final int				_serverPort;
 
 	private static InetSocketAddress		inetAddress;
+	private static IconRequestHandler		_iconRequestHandler;
 
 	private String[]						set;
 
@@ -199,7 +202,8 @@ public class WebContentServer {
 
 			boolean isResourceUrl = false;
 
-			final String rootPath = WEB.getFile(ROOT_FILE_PATH_NAME).getCanonicalFile().getPath();
+			final File rootFile = WEB.getFile(ROOT_FILE_PATH_NAME);
+			final String rootPath = rootFile.getCanonicalFile().getPath();
 
 			final URI requestURI = httpExchange.getRequestURI();
 			String requestUriPath = requestURI.getPath();
@@ -209,6 +213,8 @@ public class WebContentServer {
 
 			final String xhrValue = requestHeaders.getFirst(XHR_HEADER_KEY);
 			final boolean isXHR = XHR_HEADER_VALUE.equals(xhrValue);
+
+			final boolean isIconRequest = requestUriPath.startsWith(ICON_RESOURCE_REQUEST);
 
 			boolean isDojoRequest = false;
 
@@ -251,7 +257,15 @@ public class WebContentServer {
 			/*
 			 * Handle request
 			 */
-			if (isXHR) {
+			if (isIconRequest) {
+
+				final String iconFilename = requestUriPath.substring(
+						ICON_RESOURCE_REQUEST.length(),
+						requestUriPath.length());
+
+				handle_Icon(httpExchange, iconFilename, log);
+
+			} else if (isXHR) {
 
 				// XHR request
 
@@ -422,6 +436,21 @@ public class WebContentServer {
 		}
 	}
 
+	private static void handle_Icon(final HttpExchange httpExchange, final String iconFilename, final StringBuilder log) {
+
+		try {
+
+			if (_iconRequestHandler == null) {
+				StatusUtil.logError("IconRequestHandler is not set for " + iconFilename);//$NON-NLS-1$
+			} else {
+				_iconRequestHandler.handleIconRequest(httpExchange, iconFilename, log);
+			}
+
+		} catch (final Exception e) {
+			StatusUtil.log(e);
+		}
+	}
+
 	private static void handle_XHR(final HttpExchange httpExchange, final String requestUriPath, final StringBuilder log) {
 
 		final InputStream reqBody = null;
@@ -493,6 +522,10 @@ public class WebContentServer {
 	public static XHRHandler removeXHRHandler(final String xhrKey) {
 
 		return _allXHRHandler.remove(xhrKey);
+	}
+
+	public static void setIconRequestHandler(final IconRequestHandler iconRequestHandler) {
+		_iconRequestHandler = iconRequestHandler;
 	}
 
 	public static void start() {

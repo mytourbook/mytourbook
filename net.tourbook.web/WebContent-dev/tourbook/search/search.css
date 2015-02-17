@@ -171,17 +171,17 @@ a
 
 .actionOptionsIcon
 {
-	background-image: 		url("/tourbook/resources/options.png");
+	background-image: 		url("/$MT-ICON$/options.png");
 }
 
 .actionSearchIcon
 {
-	background-image: 		url("/tourbook/resources/search.png");
+	background-image: 		url("/$MT-ICON$/search.png");
 }
 
 #domInfo
 {
-	background-image: 		url("/tourbook/resources/photo-tooltip.png");
+	background-image: 		url("/$MT-ICON$/photo-tooltip.png");
 }
 
 #domSearchStatus

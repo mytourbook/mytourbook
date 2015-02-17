@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 
 import net.tourbook.Messages;
+import net.tourbook.application.IconRequestManager;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.StatusUtil;
@@ -128,6 +129,9 @@ public class SearchMgr implements XHRHandler {
 	private static final String				JSON_ID									= "id";												//$NON-NLS-1$
 	private static final String				JSON_NAME								= "name";												//$NON-NLS-1$
 	private static final String				JSON_HTML_CONTENT						= "htmlContent";										//$NON-NLS-1$
+	private static final String				JSON_ITEM_IS_MARKER						= "isMarker";											//$NON-NLS-1$
+	private static final String				JSON_ITEM_IS_TOUR						= "isTour";											//$NON-NLS-1$
+	private static final String				JSON_ITEM_IS_WAYPOINT					= "isWaypoint";										//$NON-NLS-1$
 	private static final String				JSON_SELECTED_ID						= "selectedId";										//$NON-NLS-1$
 	//
 	// search options
@@ -238,6 +242,8 @@ public class SearchMgr implements XHRHandler {
 		WebContentServer.start();
 
 		WebContentServer.addXHRHandler(XHR_SEARCH_INPUT_HANDLER, SearchMgr.getInstance());
+
+		IconRequestManager.setIconRequestHandler();
 	}
 
 	private static SearchMgr				_searchMgr;
@@ -250,6 +256,9 @@ public class SearchMgr implements XHRHandler {
 		String	createdHtml;
 		String	selectedId;
 
+		boolean	isMarker;
+		boolean	isTour;
+		boolean	isWayPoint;
 	}
 
 	/**
@@ -277,7 +286,7 @@ public class SearchMgr implements XHRHandler {
 		return WebContentServer.SERVER_URL + '/' + iconUrl;
 	}
 
-	private static XHRHandler getInstance() {
+	private static SearchMgr getInstance() {
 
 		if (_searchMgr == null) {
 			_searchMgr = new SearchMgr();
@@ -842,6 +851,9 @@ public class SearchMgr implements XHRHandler {
 		final ItemResponse itemResponse = new ItemResponse();
 		itemResponse.createdHtml = sb.toString();
 		itemResponse.selectedId = hrefSelectItem;
+		itemResponse.isMarker = isMarker;
+		itemResponse.isTour = isTour;
+		itemResponse.isWayPoint = isWayPoint;
 
 		return itemResponse;
 	}
@@ -1118,9 +1130,14 @@ public class SearchMgr implements XHRHandler {
 				 */
 				final JSONObject jsonResponse = new JSONObject();
 
+				// set unique grid row id
 				jsonResponse.put(JSON_ID, resultItem.docId);
+
 				jsonResponse.put(JSON_HTML_CONTENT, sb.toString());
 				jsonResponse.put(JSON_SELECTED_ID, itemResponse.selectedId);
+				jsonResponse.put(JSON_ITEM_IS_MARKER, itemResponse.isMarker);
+				jsonResponse.put(JSON_ITEM_IS_TOUR, itemResponse.isTour);
+				jsonResponse.put(JSON_ITEM_IS_WAYPOINT, itemResponse.isWayPoint);
 
 				allItems.put(jsonResponse);
 			}

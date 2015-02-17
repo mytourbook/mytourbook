@@ -13,11 +13,11 @@ define(//
 
 		searchOptions_Action_RestoreDefaults : 'Restore Defaults',
 
-		searchOptions_Checkbox_EaseSearching : "Do ease searching",
+		searchOptions_Checkbox_EaseSearching : "Use ease searching",
 		searchOptions_Checkbox_EaseSearching_Tooltip : //
-		"When ease searching is selected, a * wildcard is appended to the search text, this is similar like internet search engines.<br><br>"
+		"When 'ease searching' is selected, a * wildcard is appended to the search text, this is similar how internet search engines are finding results.<br><br>"
 			+ "The * wildcard is appended internally and is not visible.<br><br>"
-			+ "It is also usefull to disable this feature when doing a sophisticated search with all Lucene query parser options.",
+			+ "It can also be helpfull to deactivate 'ease searching' when doing a search with Lucene query parser options.",
 
 		searchOptions_Checkbox_ShowContentAll : 'All',
 		searchOptions_Checkbox_ShowContentTour : 'Tours',
