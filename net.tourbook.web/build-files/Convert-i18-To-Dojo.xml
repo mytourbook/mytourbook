@@ -1,0 +1,30 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<project name="Convert-i18-Java-To-Dojo.xml" default="main" basedir=".">
+
+	
+	<taskdef name="i18ToDojo" classname="net.tourbook.ant.I18ToDojo" classpath="../bin"/>
+	
+	<property name="dojoProperties" value="Messages.js"/>
+	<property name="javaProperties" value="messages.properties"/>
+
+	<property name="searchNLS" location="../WebContent-dev/tourbook/search/nls"/>
+
+	<!--
+	
+		Convert Java properties into Dojo language files.
+
+	-->
+	<target name="main">
+		
+		<i18ToDojo	
+			
+			rootLanguage	="en"
+			otherLanguages	="cs_CZ,de,es,nl,fr,it"
+			
+			i18dir			="${searchNLS}"
+			javaproperties	="${javaProperties}" 
+			dojoproperties	="${dojoProperties}"/>
+		
+	</target>
+
+</project>
