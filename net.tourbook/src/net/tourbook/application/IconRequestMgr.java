@@ -26,7 +26,6 @@ import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 import net.tourbook.web.IconRequestHandler;
 import net.tourbook.web.WEB;
-import net.tourbook.web.WebContentServer;
 
 import org.eclipse.core.runtime.FileLocator;
 
@@ -35,25 +34,21 @@ import com.sun.net.httpserver.HttpExchange;
 /**
  * The icon request handler must be located in this plugin because it contains the icon images.
  */
-public class IconRequestManager implements IconRequestHandler {
+public class IconRequestMgr implements IconRequestHandler {
 
 	private static final String			ICON_FOLDER	= "/icons/";	//$NON-NLS-1$
 
-	private static IconRequestManager	_instance;
+	private static IconRequestMgr	_instance;
 
-	private static IconRequestHandler getInstance() {
+	public static IconRequestHandler getInstance() {
 
 		if (_instance == null) {
-			_instance = new IconRequestManager();
+			_instance = new IconRequestMgr();
 		}
 
 		return _instance;
 	}
 
-	public static void setIconRequestHandler() {
-
-		WebContentServer.setIconRequestHandler(getInstance());
-	}
 
 	/**
 	 * @param filePathName

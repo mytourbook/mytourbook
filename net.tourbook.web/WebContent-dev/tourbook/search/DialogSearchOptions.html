@@ -9,7 +9,7 @@
 		
 		<div 
 			data-dojo-type="dijit/TitlePane" 
-			data-dojo-props="toggleable:false, title: '${messages.searchOptions_Group_Content}'">
+			data-dojo-props="toggleable:false, title: '${messages.Search_Options_Group_Content}'">
 			
 			<!-- Show All (tour, marker, waypoint)-->
 			
@@ -20,7 +20,7 @@
 					data-dojo-type="dijit/form/CheckBox" 
 					data-dojo-attach-point="apChkShowContentAll"
 					data-dojo-attach-event="click:apSearchAll"/> 
-				<label for="apChkShowContentAll">${messages.searchOptions_Checkbox_ShowContentAll}</label>
+				<label for="apChkShowContentAll">${messages.Search_Options_Checkbox_ShowContentAll}</label>
 			</div>
 			
 			<div class="fieldVertSpaceTop" style="padding-left:1em;">
@@ -32,7 +32,7 @@
 					data-dojo-type="dijit/form/CheckBox" 
 					data-dojo-attach-point="apChkShowContentTour"
 					data-dojo-attach-event="click:apSelection"/> 
-				<label for="apChkShowContentTour">${messages.searchOptions_Checkbox_ShowContentTour}</label>
+				<label for="apChkShowContentTour">${messages.Search_Options_Checkbox_ShowContentTour}</label>
 
 
 				<!-- Show marker -->
@@ -42,7 +42,7 @@
 					data-dojo-type="dijit/form/CheckBox" 
 					data-dojo-attach-point="apChkShowContentMarker"
 					data-dojo-attach-event="click:apSelection"/> 
-				<label for="apChkShowContentMarker">${messages.searchOptions_Checkbox_ShowContentMarker}</label>
+				<label for="apChkShowContentMarker">${messages.Search_Options_Checkbox_ShowContentMarker}</label>
 
 				<!-- Show waypoints -->
 				<input 
@@ -51,7 +51,7 @@
 					data-dojo-type="dijit/form/CheckBox" 
 					data-dojo-attach-point="apChkShowContentWaypoint"
 					data-dojo-attach-event="click:apSelection"/> 
-				<label for="apChkShowContentWaypoint">${messages.searchOptions_Checkbox_ShowContentWaypoint}</label>
+				<label for="apChkShowContentWaypoint">${messages.Search_Options_Checkbox_ShowContentWaypoint}</label>
 				
 			</div>
 			
@@ -65,7 +65,7 @@
 					data-dojo-attach-event="click:apSelection"/> 
 				<label 
 					id="apChkEaseSearching_Label"
-					for="apChkEaseSearching">${messages.searchOptions_Checkbox_EaseSearching}</label>
+					for="apChkEaseSearching">${messages.Search_Options_Checkbox_EaseSearching}</label>
 				<div 
 					data-dojo-type="dijit/Tooltip" 
 					data-dojo-attach-point="apChk_EaseSearching_Tooltip"
@@ -82,14 +82,14 @@
 		
 		<div 
 			data-dojo-type="dijit/TitlePane" 
-			data-dojo-props="toggleable:false, title: '${messages.searchOptions_Group_Sorting}'">
+			data-dojo-props="toggleable:false, title: '${messages.Search_Options_Group_Sorting}'">
 			
 			<table>
 			
 				<!-- Sort by date -->
 				<tr>
 					<td style="padding-right:2em;">
-						${messages.searchOptions_Label_SortAscending}					
+						${messages.Search_Options_Label_SortAscending}					
 					</td>
 					<td>
 					
@@ -101,7 +101,7 @@
 							data-dojo-type="dijit/form/RadioButton"
 							data-dojo-attach-point="apSortByDateAscending"
 							data-dojo-attach-event="change:apSelection"/>
-						<label for="apSortByDateAscending">${messages.searchOptions_Radio_SortAscending}</label>
+						<label for="apSortByDateAscending">${messages.Search_Options_Radio_SortAscending}</label>
 					
 						<!-- sort descending -->
 						<input 
@@ -111,7 +111,7 @@
 							data-dojo-type="dijit/form/RadioButton"
 							data-dojo-attach-point="apSortByDateDescending"
 							data-dojo-attach-event="change:apSelection"/>
-						<label for="apSortByDateDescending">${messages.searchOptions_Radio_SortDescending}</label>
+						<label for="apSortByDateDescending">${messages.Search_Options_Radio_SortDescending}</label>
 					</td>
 				</tr>
 			</table>
@@ -124,7 +124,7 @@
 		
 		<div 
 			data-dojo-type="dijit/TitlePane" 
-			data-dojo-props="toggleable:false, title: '${messages.searchOptions_Group_Result}'">
+			data-dojo-props="toggleable:false, title: '${messages.Search_Options_Group_Result}'">
 			
 			<!-- Show date/time -->
 			<div>
@@ -134,7 +134,7 @@
 					data-dojo-type="dijit/form/CheckBox" 
 					data-dojo-attach-point="apChkShowDateTime"
 					data-dojo-attach-event="click:apSelection"/> 
-				<label for="apChkShowDateTime">${messages.searchOptions_Checkbox_ShowDateTime}</label>
+				<label for="apChkShowDateTime">${messages.Search_Options_Checkbox_ShowDateTime}</label>
 				<br>
 			</div>
 			
@@ -146,7 +146,7 @@
 					data-dojo-type="dijit/form/CheckBox" 
 					data-dojo-attach-point="apChkShowItemNumber"
 					data-dojo-attach-event="click:apSelection"/> 
-				<label for="apChkShowItemNumber">${messages.searchOptions_Checkbox_ShowItemNumber}</label>
+				<label for="apChkShowItemNumber">${messages.Search_Options_Checkbox_ShowItemNumber}</label>
 			</div>
 			
 			<!-- Show Lucene doc ID -->
@@ -157,7 +157,7 @@
 					data-dojo-attach-point="apChkShowLuceneID"
 					data-dojo-type="dijit/form/CheckBox" 
 					data-dojo-attach-event="click:apSelection"/> 
-				<label for="apChkShowLuceneID">${messages.searchOptions_Checkbox_ShowLuceneDocId}</label>
+				<label for="apChkShowLuceneID">${messages.Search_Options_Checkbox_ShowLuceneDocId}</label>
 			</div>
 		</div>
 		
@@ -169,7 +169,7 @@
 				data-dojo-type="dijit/form/Button"
 				data-dojo-attach-point="apActionDefaults"
 				data-dojo-attach-event="click:apActionRestoreDefaults"
-				>${messages.searchOptions_Action_RestoreDefaults}</span> 
+				>${messages.Search_Options_Action_RestoreDefaults}</span> 
 		</div>
 	</div>
 </div>

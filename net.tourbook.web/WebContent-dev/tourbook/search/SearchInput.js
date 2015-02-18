@@ -101,7 +101,7 @@ Messages //
 				var grid = this._grid;
 
 				// set no data message when a search is started manually
-				grid.noDataMessage = Messages.searchGrid_Label_NoDataMessage;
+				grid.noDataMessage = Messages.Search_Grid_Label_NoDataMessage;
 
 				// overwrite store url
 				grid.collection.target = newSearchUrl;

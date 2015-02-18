@@ -16,8 +16,9 @@ table
 a
 {
 	text-decoration:		none;
-	color:					#666;
-	xcolor:					red;
+	xfont-weight:			bold;
+	xcolor:					#666;
+	color:					#24b;
 }
 
 /*
@@ -41,14 +42,21 @@ a
 	line-height:			130%;
 }
 
-.mtBase .dijitTooltipContainer
+.mtBase .dijitMenu,
+.mtBase .dijitMenuBar,
+.mtBase .dijitTooltipContainer,
+.mtDialog .dijitDialog
 {
 	border:					1px solid #bbb;			/* replace blue border */
+}
+
+.mtBase .dijitTooltipContainer
+{
 	/* 
 		Limit width otherwise the viewport width is used.
 		With a width below 30em the text can overflow the container 
 	 */
-	width:					27em;					
+	width:					28em;					
 }
 
 /*
@@ -56,7 +64,6 @@ a
 */
 .mtDialog .dijitDialog
 {
-	border:					1px solid #bbb;			/* replace blue border */
 	line-height:			80%;
 }
 
@@ -157,33 +164,6 @@ a
 	white-space:			nowrap;
 }
 
-/*
-	Search actions
-*/
-.actionIcon
-{
-	/* set width/height wider than the image -> the focus rubberband looks much better */
-	width:					20px; 
-	height:					20px; 
-	background-repeat:		no-repeat;
-	background-position: 	center;
-}
-
-.actionOptionsIcon
-{
-	background-image: 		url("/$MT-ICON$/options.png");
-}
-
-.actionSearchIcon
-{
-	background-image: 		url("/$MT-ICON$/search.png");
-}
-
-#domInfo
-{
-	background-image: 		url("/$MT-ICON$/photo-tooltip.png");
-}
-
 #domSearchStatus
 {
 	color:					red;
@@ -203,6 +183,7 @@ a
     	
     border:					0px;
 }
+
 	
 #domGrid div:focus 
 { 
@@ -341,3 +322,21 @@ a.item:VISITED
 	padding-right:			20px;
 }
 
+
+/*
+	Search actions
+*/
+.actionIcon
+{
+	/* set width/height wider than the image -> the focus rubberband looks much better */
+	width:					20px; 
+	height:					20px; 
+	background-repeat:		no-repeat;
+	background-position: 	center;
+}
+
+.iconOptions {				background-image: url("/$MT-ICON$/options.png");}
+.iconPhotoTooltip {			background-image: url("/$MT-ICON$/photo-tooltip.png");}
+.iconSearch {				background-image: url("/$MT-ICON$/search.png");}
+.iconTourChart {			background-image: url("/$MT-ICON$/tour-chart.png");}
+.iconTourMarker {			background-image: url("/$MT-ICON$/tour-marker.png");}

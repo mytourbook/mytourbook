@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Map;
 
 import net.tourbook.Messages;
-import net.tourbook.application.IconRequestManager;
+import net.tourbook.application.IconRequestMgr;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.StatusUtil;
@@ -129,6 +129,7 @@ public class SearchMgr implements XHRHandler {
 	private static final String				JSON_ID									= "id";												//$NON-NLS-1$
 	private static final String				JSON_NAME								= "name";												//$NON-NLS-1$
 	private static final String				JSON_HTML_CONTENT						= "htmlContent";										//$NON-NLS-1$
+	private static final String				JSON_ITEM_ACTION_URL_EDIT_ITEM			= "actionUrl_EditItem";								//$NON-NLS-1$
 	private static final String				JSON_ITEM_IS_MARKER						= "isMarker";											//$NON-NLS-1$
 	private static final String				JSON_ITEM_IS_TOUR						= "isTour";											//$NON-NLS-1$
 	private static final String				JSON_ITEM_IS_WAYPOINT					= "isWaypoint";										//$NON-NLS-1$
@@ -237,21 +238,17 @@ public class SearchMgr implements XHRHandler {
 
 		// initialize search options
 		setInternalSearchOptions();
-
-		// ensure web server is started
-		WebContentServer.start();
-
-		WebContentServer.addXHRHandler(XHR_SEARCH_INPUT_HANDLER, SearchMgr.getInstance());
-
-		IconRequestManager.setIconRequestHandler();
 	}
 
 	private static SearchMgr				_searchMgr;
+
 	private static ISearchView				_searchView;
 
 	private static boolean					_isModalDialogOpen						= false;
 
 	class ItemResponse {
+
+		String	actionUrl_EditItem;
 
 		String	createdHtml;
 		String	selectedId;
@@ -667,7 +664,18 @@ public class SearchMgr implements XHRHandler {
 				_isUI_SortDateAscending);
 	}
 
+	/**
+	 * Web content server is available only when the search view is opened.
+	 * 
+	 * @param searchView
+	 */
 	public static void setSearchView(final ISearchView searchView) {
+
+		if (searchView == null) {
+			webContentServer_Stop();
+		} else {
+			webContentServer_Start();
+		}
 
 		_searchView = searchView;
 	}
@@ -680,6 +688,22 @@ public class SearchMgr implements XHRHandler {
 	private static void updateSelectionProvider(final ISelection selection) {
 
 		_searchView.getPostSelectionProvider().setSelectionNoFireEvent(selection);
+	}
+
+	private static void webContentServer_Start() {
+
+		WebContentServer.start();
+
+		WebContentServer.addXHRHandler(XHR_SEARCH_INPUT_HANDLER, SearchMgr.getInstance());
+		WebContentServer.setIconRequestHandler(IconRequestMgr.getInstance());
+	}
+
+	private static void webContentServer_Stop() {
+
+		WebContentServer.stop();
+
+		WebContentServer.removeXHRHandler(XHR_SEARCH_INPUT_HANDLER);
+		WebContentServer.setIconRequestHandler(null);
 	}
 
 	private ItemResponse createHTML_10_Item(final SearchResultItem resultItem, final int itemNumber) {
@@ -854,6 +878,7 @@ public class SearchMgr implements XHRHandler {
 		itemResponse.isMarker = isMarker;
 		itemResponse.isTour = isTour;
 		itemResponse.isWayPoint = isWayPoint;
+		itemResponse.actionUrl_EditItem = hrefEditItem;
 
 		return itemResponse;
 	}
@@ -1135,6 +1160,7 @@ public class SearchMgr implements XHRHandler {
 
 				jsonResponse.put(JSON_HTML_CONTENT, sb.toString());
 				jsonResponse.put(JSON_SELECTED_ID, itemResponse.selectedId);
+				jsonResponse.put(JSON_ITEM_ACTION_URL_EDIT_ITEM, itemResponse.actionUrl_EditItem);
 				jsonResponse.put(JSON_ITEM_IS_MARKER, itemResponse.isMarker);
 				jsonResponse.put(JSON_ITEM_IS_TOUR, itemResponse.isTour);
 				jsonResponse.put(JSON_ITEM_IS_WAYPOINT, itemResponse.isWayPoint);

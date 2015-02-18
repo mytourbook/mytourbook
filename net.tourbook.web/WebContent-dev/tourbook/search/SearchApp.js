@@ -97,7 +97,7 @@ Messages //
 				id : 'searchInput',
 				name : 'idSearch',
 
-				placeHolder : Messages.search_Text_Search_PlaceHolder,
+				placeHolder : Messages.Search_App_Text_Search_PlaceHolder,
 
 				hasDownArrow : false,
 
@@ -122,15 +122,15 @@ Messages //
 				],
 				showDelay : 100,
 				label : "<div style='width:30em;'>" //
-					+ ("<b>" + Messages.searchTooltip_Title + "</b><br>") //
-					+ Messages.searchTooltip_Label_1
-					+ ("<a href='" + Messages.searchTooltip_Url + "'>" + Messages.searchTooltip_Label_2 + "</a><br><br>") //
-					+ Messages.searchTooltip_Label_3 //
+					+ ("<b>" + Messages.Search_App_Tooltip_Title + "</b><br>") //
+					+ Messages.Search_App_Tooltip_Label_1
+					+ ("<a href='" + SearchMgr.Search_App_Tooltip_Url + "'>" + Messages.Search_App_Tooltip_Label_2 + "</a><br><br>") //
+					+ Messages.Search_App_Tooltip_Label_3 //
 					+ "</div>"
 			});
 
 			// set tooltips
-			dom.byId('domAppStatus').title = Messages.search_Label_Status_Tooltip;
+			dom.byId('domAppStatus').title = Messages.Search_App_Label_Status_Tooltip;
 		},
 
 		createUI_Actions : function createUI_Actions() {
@@ -143,10 +143,10 @@ Messages //
 			this._actionSearchOptions = new Button(//
 			{
 				// label is displayed as tooltip
-				label : Messages.search_Action_SearchOptions_Tooltip,
+				label : Messages.Search_App_Action_SearchOptions_Tooltip,
 
 				showLabel : false,
-				iconClass : 'actionIcon actionOptionsIcon',
+				iconClass : 'actionIcon iconOptions',
 
 				// show dialog when button is pressed with the keyboard
 				onClick : function() {
@@ -162,7 +162,7 @@ Messages //
 
 					var dialogProperties = //
 					{
-						title : Messages.searchOptions_Dialog_Header,
+						title : Messages.Search_Options_Dialog_Header,
 
 						// set flag that the dialog is positioned below this button
 						layoutParent : this
@@ -180,10 +180,10 @@ Messages //
 			this._actionStartSearch = new Button(//
 			{
 				// label is displayed as tooltip
-				label : Messages.search_Action_StartSearch_Tooltip,
+				label : Messages.Search_App_Action_StartSearch_Tooltip,
 
 				showLabel : false,
-				iconClass : 'actionIcon actionSearchIcon',
+				iconClass : 'actionIcon iconSearch',
 
 				// show dialog when button is pressed with the keyboard
 				onClick : function() {
@@ -322,30 +322,45 @@ Messages //
 			});
 
 			/**
-			 * Context menu
+			 * Context menu, is defined declaratively. 
 			 */
-			var selectedRowData;
+			var contextMenuItemData;
+
 			var actionEditMarker = registry.byId('domAction_EditMarker');
+			var actionEditTour = registry.byId('domAction_EditTour');
 
-			actionEditMarker.on('click', function(event) {
-
-				var selectedId = selectedRowData[SearchMgr.XHR_PARAM_SELECTED_ID];
-				alert(selectedId);
-			});
-
+			/*
+			 * Setup context menu action
+			 */
 			grid.on('.dgrid-row:contextmenu', function(evt) {
 
 				evt.preventDefault();
 				var row = grid.row(evt);
 
-				// keep selected item
-				selectedRowData = row && row.data ? row.data : null;
+				// keep context item
+				contextMenuItemData = row && row.data ? row.data : null;
 
-				var isMarker = selectedRowData.isMarker;
-				var isTour = selectedRowData.isTour;
+				/*
+				 * enable/disable actions
+				 */
+				var isMarker = contextMenuItemData.isMarker;
+				var isTour = contextMenuItemData.isTour;
 
 				actionEditMarker.set('disabled', !isMarker);
+				actionEditTour.set('disabled', !isTour);
 			});
+			
+			/*
+			 * Run context menu action
+			 */
+			var runUrlAction = function doUrlAction(event) {
+				
+				var actionUrl = contextMenuItemData.actionUrl_EditItem;
+				SearchApp.action(actionUrl);
+			};
+			
+			actionEditMarker.on('click', runUrlAction);
+			actionEditTour.on('click', runUrlAction);
 
 			return grid;
 		},
@@ -424,8 +439,10 @@ Messages //
 
 	/**
 	 * Run an action in the MT app when the search UI is in the browser and not in the MT app.
+	 * <p>
+	 * The action is also startet from the Web UI.
 	 */
-	SearchApp.action = function(actionUrl) {
+	SearchApp.action = function action(actionUrl) {
 
 		var query = {};
 		query[SearchMgr.XHR_PARAM_ACTION] = SearchMgr.XHR_ACTION_ITEM_ACTION;

@@ -60,7 +60,7 @@ Messages //
 			/*
 			 * Tooltips with html tags must be defined in the js code, otherwise the tags do not work.
 			 */
-			this.apChk_EaseSearching_Tooltip.label = Messages.searchOptions_Checkbox_EaseSearching_Tooltip;
+			this.apChk_EaseSearching_Tooltip.label = Messages.Search_Options_Checkbox_EaseSearching_Tooltip;
 		},
 
 		/**
@@ -142,7 +142,7 @@ Messages //
 					&& isShowContentMarker == false //
 					&& isShowContentWaypoint == false) {
 
-					statusText = Messages.searchValidation_SearchFilter;
+					statusText = Messages.Search_Validation_SearchFilter;
 					isValid = false;
 				}
 			}
