@@ -7,7 +7,7 @@
 	<property name="dojoProperties" value="Messages.js"/>
 	<property name="javaProperties" value="messages.properties"/>
 
-	<property name="searchNLS" location="../WebContent-dev/tourbook/search/nls"/>
+	<property name="searchNLS" location="../../net.tourbook.web/WebContent-dev/tourbook/search/nls"/>
 
 	<!--
 	
@@ -22,8 +22,8 @@
 			otherLanguages	="cs_CZ,de,es,nl,fr,it"
 			
 			i18dir			="${searchNLS}"
-			javaproperties	="${javaProperties}" 
-			dojoproperties	="${dojoProperties}"/>
+			javaProperties	="${javaProperties}" 
+			dojoProperties	="${dojoProperties}"/>
 		
 	</target>
 

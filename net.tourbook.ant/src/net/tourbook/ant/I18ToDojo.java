@@ -32,6 +32,8 @@ import org.apache.tools.ant.Task;
  */
 public class I18ToDojo extends Task {
 
+	private String		FILE_CREATE_HEADER	= "// created with " + I18ToDojo.class.getCanonicalName() + "\n";
+
 	/**
 	 * Java properties file.
 	 */
@@ -46,8 +48,8 @@ public class I18ToDojo extends Task {
 
 	private String		_i18dir;
 
-	private String		_dojoPropFileName;
-	private String		_dojoPropFileExt;
+//	private String		_dojoPropFileName;
+//	private String		_dojoPropFileExt;
 
 	private String		_rootLanguage;
 
@@ -57,7 +59,7 @@ public class I18ToDojo extends Task {
 	public void execute() throws BuildException {
 
 		writeDojo_Root();
-//		writeDojo_i18();
+		writeDojo_i18();
 	}
 
 	/**
@@ -105,9 +107,9 @@ public class I18ToDojo extends Task {
 
 		_dojoProperties = properties;
 
-		final String[] fileParts = properties.split("\\.");
-		_dojoPropFileName = fileParts[0];
-		_dojoPropFileExt = fileParts[1];
+//		final String[] fileParts = properties.split("\\.");
+//		_dojoPropFileName = fileParts[0];
+//		_dojoPropFileExt = fileParts[1];
 	}
 
 	public void setI18dir(final String i18dir) {
@@ -139,19 +141,42 @@ public class I18ToDojo extends Task {
 
 	private void writeDojo_i18() {
 
+		System.out.println("i18 convert");
+
 		for (final String language : _otherLanguages) {
 
-			final String dojoI18Properties;
-			final String javaI18Properties = _javaPropFileName + "_" + language + "." + _javaPropFileExt;
+//			/net.tourbook.web/WebContent-dev/tourbook/search/nls/messages_de.properties
+//			/net.tourbook.web/WebContent-dev/tourbook/search/nls/de/Messages.js
 
-			final FileOutputStream outStream = null;
+			final String dojoI18Folder = _i18dir + "/" + language;
+
+			final String javaI18PropFilePath = (_i18dir + "/" + _javaPropFileName + "_" + language + "." + _javaPropFileExt);
+			final String dojoI18PropFilePath = (dojoI18Folder + "/" + _dojoProperties);
+
+			/*
+			 * Check if java language file is available, it can be unavailable
+			 */
+			final File i18File = new File(javaI18PropFilePath);
+			if (i18File.exists() == false) {
+				continue;
+			}
+
+			System.out.println("	from: " + javaI18PropFilePath);
+			System.out.println("	to:   " + dojoI18PropFilePath);
+			// TODO remove SYSTEM.OUT.PRINTLN
+
+			FileOutputStream outStream = null;
 			try {
 
-//				outStream = new FileOutputStream(dojoI18Properties);
+				// ensure folder is created
+				new File(dojoI18Folder).mkdirs();
 
-//				writeDojo_I18_10_Header(outStream);
-				writeDojo_Messages(outStream, javaI18Properties);
-//				writeDojo_I18_20_Footer(outStream);
+				// create dojo file
+				outStream = new FileOutputStream(dojoI18PropFilePath, false);
+
+				writeDojo_I18_10_Header(outStream);
+				writeDojo_Messages(outStream, javaI18PropFilePath);
+				writeDojo_I18_20_Footer(outStream);
 
 			} catch (final IOException e) {
 				e.printStackTrace();
@@ -165,6 +190,24 @@ public class I18ToDojo extends Task {
 				}
 			}
 		}
+	}
+
+	private void writeDojo_I18_10_Header(final FileOutputStream outStream) throws IOException {
+
+		final String header = "" //
+				+ FILE_CREATE_HEADER//
+				+ "define(//							\n"//
+				+ "{									\n";
+
+		outStream.write(header.getBytes());
+	}
+
+	private void writeDojo_I18_20_Footer(final FileOutputStream outStream) throws IOException {
+
+		final String footer = ""//
+				+ "});		\n";
+
+		outStream.write(footer.getBytes());
 	}
 
 	/**
@@ -261,7 +304,6 @@ public class I18ToDojo extends Task {
 				+ "	{									\n";
 
 		outStream.write(header.getBytes());
-
 	}
 
 	private void writeDojo_Root_20_Footer(final FileOutputStream outStream) throws IOException {

@@ -1,6 +1,5 @@
-define(//
-{
-	
-//	Search_App_Text_Search_PlaceHolder : 'Search Tours, Marker and Waypoints'
-	
-});
+// created with net.tourbook.ant.I18ToDojo
+define(//							
+{									
+		Search_App                                         : 'es'
+});		

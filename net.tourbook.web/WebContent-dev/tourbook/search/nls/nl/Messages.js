@@ -1,4 +1,5 @@
-define(//
-{
-	Search_App_Text_Search_PlaceHolder : 'nl'
-});
+// created with net.tourbook.ant.I18ToDojo
+define(//							
+{									
+		Search_App                                         : 'nl'
+});		

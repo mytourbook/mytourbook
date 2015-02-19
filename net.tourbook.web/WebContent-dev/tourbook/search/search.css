@@ -56,7 +56,7 @@ a
 		Limit width otherwise the viewport width is used.
 		With a width below 30em the text can overflow the container 
 	 */
-	width:					28em;					
+	width:					30em;					
 }
 
 /*
