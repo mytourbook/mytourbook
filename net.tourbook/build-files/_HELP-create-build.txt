@@ -1,16 +1,23 @@
 
 ##########################
 
+	Create Dojo files, when net.tourbook.web is modified
+
+##########################
+
+	- in net.tourbook.web.WEB set IS_DEBUG = false
+	- 1. run script /net.tourbook.ant/build-files/Convert-i18-To-Dojo.xml
+	- 2. run script /net.tourbook.web/build-files/Create-Dojo-Bundle.xml
+
+
+
+##########################
+
 Create Translation Archive
 
 ##########################
 
 - switch to workspace "C:\DAT\ws_mt-with-GIT"
-
-	# steps when net.tourbook.web is modified
-	- in net.tourbook.web.WEB set IS_DEBUG = false
-	- 1. run script /net.tourbook.ant/build-files/Convert-i18-To-Dojo.xml
-	- 2. run script /net.tourbook.web/build-files/Create-Dojo-Bundle.xml
 
 	- set version number in "feature.net.tourbook.app"
 	- force feature version number into net.tourbook.* plugins

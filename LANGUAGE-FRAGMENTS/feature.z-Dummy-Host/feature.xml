@@ -2,7 +2,7 @@
 <feature
       id="feature.z_Dummy_Host"
       label="Z_Dummy_Host"
-      version="14.10.1.qualifier"
+      version="14.15.0.qualifier"
       provider-name="dummy feature">
 
    <description url="http://www.example.com/description">
@@ -82,6 +82,13 @@
 
    <plugin
          id="net.tourbook.statistics"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="net.tourbook.web"
          download-size="0"
          install-size="0"
          version="0.0.0"

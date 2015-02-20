@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Ant
 Bundle-SymbolicName: net.tourbook.ant
-Bundle-Version: 14.4.2.qualifier
+Bundle-Version: 14.15.0.qualifier
 Bundle-Activator: net.tourbook.ant.Activator
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
