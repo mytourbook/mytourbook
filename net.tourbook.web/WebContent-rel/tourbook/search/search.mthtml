@@ -37,6 +37,8 @@ $DOJO_SEARCH$
 	<script>require(['tourbook/search/SearchApp']);</script>
 	
 	
+	<!-- UI  -->
+	
 	<div id="domContainer"
 	    data-dojo-type="dijit/layout/LayoutContainer">
     
@@ -47,17 +49,20 @@ $DOJO_SEARCH$
 	        
 			<table style="width:100%">
 				<tr>
+					<td>
+						<div id="domInfo" class="actionIcon iconPhotoTooltip" tabindex="0">&nbsp;</div>
+					</td>
 					<td style="width:99%; padding-left:0.2em; padding-right:0.4em;">
 				    	<div id="domSearchInput"></div>
 					</td>
 					<td style="margin-right:0.2em">
-					    <div id="domActionStartSearch"></div>
+					    <div id="domAction_StartSearch"></div>
 					</td>
 					<td>
-						<div id="domAppStatus">&nbsp;</div>
+						<div id="domAppStatus" style="padding-left:0.2em;">&nbsp;</div>
 					</td>
 					<td>
-					    <div id="domActionSearchOptions"></div>
+					    <div id="domAction_SearchOptions"></div>
 					</td>
 				</tr>
 			</table>
@@ -70,6 +75,26 @@ $DOJO_SEARCH$
 			<div id="domGrid"></div>
 	    </div>
 
+	</div>
+
+
+	<!-- Context menu -->
+	
+	<div 
+		id="domContextMenu_SearchResult" 
+		data-dojo-type="dijit/Menu" 
+		data-dojo-props="targetNodeIds:['domGrid'], selector:'div.dgrid-row'" 
+		style="display: none;">
+		
+		<div 
+			id="domAction_EditTour"
+			data-dojo-type="dijit/MenuItem" 
+			data-dojo-props="iconClass:'iconTourChart'">Edit Tour...</div>
+
+		<div 
+			id="domAction_EditMarker"
+			data-dojo-type="dijit/MenuItem" 
+			data-dojo-props="iconClass:'iconTourMarker'">Edit Marker...</div>
 	</div>
 	
 </body>

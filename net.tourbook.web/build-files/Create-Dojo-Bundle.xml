@@ -36,12 +36,12 @@
 
 	<target name="shrink">
 		
-		<mkdir dir="mytourbook-Dojo-BUILD-autocreated"/>
-
 		<echo level="info" message="### Copying src files into dojo root ..." />
 		<copy todir="${tourbookInDojoToolkitFolder}" preservelastmodified="yes" verbose="no">
 			<fileset dir="${WebContentDevTourbook}">
 				<include name="**/*" />
+				<exclude name="**/*.properties"/>
+				<exclude name="**/*.java"/>
 			</fileset>
 		</copy>
 
@@ -166,6 +166,7 @@
 				
 				<!-- copy all theme images even when something are not used because there are not too many and size is small -->
 			    <include name="**/dijit/themes/tundra/images/*.png"/>
+			    <include name="**/dijit/themes/tundra/images/*.gif"/>
 				
 			</fileset>
 		</copy>

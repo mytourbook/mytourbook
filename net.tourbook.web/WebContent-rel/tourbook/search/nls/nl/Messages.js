@@ -1,3 +1,3 @@
 //>>built
-define("tourbook/search/nls/nl/Messages",{search_Text_Search_PlaceHolder:"nl"});
+define("tourbook/search/nls/nl/Messages",{Search_App:"nl"});
 //# sourceMappingURL=Messages.js.map

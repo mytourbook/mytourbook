@@ -16,7 +16,7 @@ define(//
 		Search_Grid_Label_NoDataMessage                    : 'No search results found.',
 		Search_Options_Action_RestoreDefaults              : 'Restore Defaults',
 		Search_Options_Checkbox_EaseSearching              : 'Use ease searching',
-		Search_Options_Checkbox_EaseSearching_Tooltip      : '<b>* Wildcard Search</b><br>' + 'When <i>ease searching</i> is selected, a * wildcard is appended to the search text. The search results will be similar compared with internet search engines and how they are finding results.<br><br>' + '' + 'The * wildcard is appended internally and is not visible.<br><br>' + '' + '<b>Extended Search</b><br>' + 'It can also be helpfull to deactivate <i>ease searching</i> when doing an extended search with Lucene query parser options.',
+		Search_Options_Checkbox_EaseSearching_Tooltip      : '<b>* Wildcard Search</b><br>' + 'When <i>Use ease searching</i> is selected, a * wildcard is appended to the search text, this is done internally which is not visible.<br><br>' + '' + '<b>Extended Search</b><br>' + 'It can be helpfull to deactivate <i>Use ease searching</i> when doing a search with Lucene query parser options.',
 		Search_Options_Checkbox_ShowContentAll             : 'All',
 		Search_Options_Checkbox_ShowContentMarker          : 'Markers',
 		Search_Options_Checkbox_ShowContentTour            : 'Tours',

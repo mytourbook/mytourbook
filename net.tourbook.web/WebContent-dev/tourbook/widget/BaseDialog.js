@@ -35,7 +35,14 @@ Dialog //
 
 		_dialog : null,
 
+		/**
+		 * Counter how many tooltips are opened, this dialog will not be closed when >0.
+		 */
+		openedTooltips : 0,
+
 		createDialog : function createDialog(args) {
+
+			this.openedTooltips = 0;
 
 			if (this._dialog == null) {
 
@@ -46,7 +53,7 @@ Dialog //
 					content : this,
 
 					/**
-					 * Overwrite _position to pin the dialog to the layoutParent node.
+					 * Overwrite _position in dijit._DialogBase to pin the dialog to the layoutParent node.
 					 */
 					_position : function _position() {
 						// summary:
@@ -96,19 +103,31 @@ Dialog //
 
 			this.createDialog(args);
 
-			this._dialog.show().then(function() {
-
-			});
+			this._dialog.show();
 		},
 
-		hideDialog : function() {
-			if (this._dialog != null)
+		hideDialog : function(event) {
+
+			if (this._dialog != null) {
+
+//				console.log("this.openedTooltips: " + this.openedTooltips);
+
+				/*
+				 * THIS IS ABSOLUTELY NOT WORKING PROPERLY, but sometimes, therefore it is enabled, with the close button
+				 * the dialog can be hidden in all cases.
+				 */
+				if (this.openedTooltips > 0) {
+					return;
+				}
+
 				this._dialog.hide();
+			}
 		},
 
 		destroyDialog : function() {
-			if (this._dialog != null)
+			if (this._dialog != null) {
 				this._dialog.destroy();
+			}
 		}
 
 	});

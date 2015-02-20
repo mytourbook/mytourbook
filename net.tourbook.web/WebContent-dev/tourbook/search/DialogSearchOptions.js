@@ -52,15 +52,27 @@ Messages //
 
 		postCreate : function() {
 
+			var dlg = this;
+
 			this.inherited(arguments);
 
 			// hide dialog when mouse has leaved it
 			on(this.domNode, "mouseleave", lang.hitch(this, "hideDialog"));
 
 			/*
-			 * Tooltips with html tags must be defined in the js code, otherwise the tags do not work.
+			 * Tooltips with html tags must be defined in the js code, otherwise the TAGs do not work.
 			 */
 			this.apChk_EaseSearching_Tooltip.label = Messages.Search_Options_Checkbox_EaseSearching_Tooltip;
+
+			this.apChk_EaseSearching_Tooltip.onShow = function() {
+				dlg.openedTooltips++;
+//				console.log("onShow: " + dlg.openedTooltips);
+			};
+
+			this.apChk_EaseSearching_Tooltip.onHide = function() {
+				dlg.openedTooltips--;
+//				console.log("onHide: " + dlg.openedTooltips);
+			};
 		},
 
 		/**
