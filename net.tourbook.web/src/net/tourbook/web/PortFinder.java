@@ -74,9 +74,9 @@ public class PortFinder {
 			}
 		}
 
-		throw new RuntimeException("Could not find an available port between "
+		throw new RuntimeException("Could not find an available port between " //$NON-NLS-1$
 				+ MIN_PORT_NUMBER
-				+ " and "
+				+ " and " //$NON-NLS-1$
 				+ MAX_PORT_NUMBER);
 	}
 }

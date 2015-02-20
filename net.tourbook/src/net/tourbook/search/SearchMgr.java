@@ -792,7 +792,7 @@ public class SearchMgr implements XHRHandler {
 		String itemTitle = itemTitleText;
 		if (itemTitle.length() == 0) {
 			// show new line that the icon is not overwritten
-			itemTitle = "</br>";
+			itemTitle = "</br>"; //$NON-NLS-1$
 		}
 
 		final String description = resultItem.description;
@@ -808,25 +808,25 @@ public class SearchMgr implements XHRHandler {
 					+ "</div>\n"); //$NON-NLS-1$
 		}
 
-		sb.append("<table><tbody><tr>");
+		sb.append("<table><tbody><tr>"); //$NON-NLS-1$
 		{
 			/*
 			 * Item image
 			 */
-			sb.append("<td class='item-image'>");
-			sb.append("<img src='" + iconUrl + "'></img>");
+			sb.append("<td class='item-image'>"); //$NON-NLS-1$
+			sb.append("<img src='" + iconUrl + "'></img>"); //$NON-NLS-1$ //$NON-NLS-2$
 			sb.append(TAG_TD_END);
 
 			/*
 			 * Item content
 			 */
-			sb.append("<td style='width:100%;'>");
+			sb.append("<td style='width:100%;'>"); //$NON-NLS-1$
 			{
 				// title
 				if (isDescription) {
-					sb.append("<span class='item-title'>" + itemTitle + "</span>");
+					sb.append("<span class='item-title'>" + itemTitle + "</span>"); //$NON-NLS-1$ //$NON-NLS-2$
 				} else {
-					sb.append("<span class='item-title-no-description'>" + itemTitle + "</span>");
+					sb.append("<span class='item-title-no-description'>" + itemTitle + "</span>"); //$NON-NLS-1$ //$NON-NLS-2$
 				}
 
 				// description
@@ -840,7 +840,7 @@ public class SearchMgr implements XHRHandler {
 				if (_isUI_ShowDateTime || _isUI_ShowItemNumber || _isUI_ShowLuceneDocId) {
 
 					sb.append("<div class='item-info'>"); //$NON-NLS-1$
-					sb.append("<table><tbody><tr>");
+					sb.append("<table><tbody><tr>"); //$NON-NLS-1$
 					{
 						if (_isUI_ShowDateTime) {
 
@@ -850,7 +850,7 @@ public class SearchMgr implements XHRHandler {
 								final DateTime dt = new DateTime(tourStartTime);
 
 								sb.append(TAG_TD
-										+ String.format("%s", _dateFormatter.print(dt.getMillis()))
+										+ String.format("%s", _dateFormatter.print(dt.getMillis())) //$NON-NLS-1$
 										+ TAG_TD_END);
 
 							}
@@ -861,16 +861,16 @@ public class SearchMgr implements XHRHandler {
 						}
 
 						if (_isUI_ShowLuceneDocId) {
-							sb.append(TAG_TD + String.format("%d", docId) + TAG_TD_END);
+							sb.append(TAG_TD + String.format("%d", docId) + TAG_TD_END); //$NON-NLS-1$
 						}
 					}
-					sb.append("</tr></tbody></table>");
+					sb.append("</tr></tbody></table>"); //$NON-NLS-1$
 					sb.append("</div>\n"); //$NON-NLS-1$
 				}
 			}
 			sb.append(TAG_TD_END);
 		}
-		sb.append("</tr></tbody></table>");
+		sb.append("</tr></tbody></table>"); //$NON-NLS-1$
 
 		final ItemResponse itemResponse = new ItemResponse();
 		itemResponse.createdHtml = sb.toString();
@@ -891,12 +891,12 @@ public class SearchMgr implements XHRHandler {
 		 * Action is fired with an xhr request to the server
 		 */
 
-		url = " href='#anchor-without-scrolling'"
-				+ " onclick="
-				+ "'"
-				+ (" tourbook.search.SearchApp.action(\"" + actionUrl + "\");")
-				+ " return false;"
-				+ "'";
+		url = " href='#anchor-without-scrolling'" //$NON-NLS-1$
+				+ " onclick=" //$NON-NLS-1$
+				+ "'" //$NON-NLS-1$
+				+ (" tourbook.search.SearchApp.action(\"" + actionUrl + "\");") //$NON-NLS-1$ //$NON-NLS-2$
+				+ " return false;" //$NON-NLS-1$
+				+ "'"; //$NON-NLS-1$
 
 		return "<a class='action'" // //$NON-NLS-1$
 				+ (" style='background-image: url(" + backgroundImage + ");'") //$NON-NLS-1$ //$NON-NLS-2$
@@ -1076,7 +1076,7 @@ public class SearchMgr implements XHRHandler {
 			allItems.put(item);
 		}
 
-		jsonResponse.put("items", allItems);
+		jsonResponse.put("items", allItems); //$NON-NLS-1$
 
 		final String response = jsonResponse.toString();
 
@@ -1100,7 +1100,7 @@ public class SearchMgr implements XHRHandler {
 
 		if (range != null) {
 
-			final String[] ranges = range.substring("items=".length()).split("-");
+			final String[] ranges = range.substring("items=".length()).split("-"); //$NON-NLS-1$ //$NON-NLS-2$
 
 			searchPosFrom = Integer.valueOf(ranges[0]);
 			searchPosTo = Integer.valueOf(ranges[1]);
@@ -1112,7 +1112,7 @@ public class SearchMgr implements XHRHandler {
 		if (xhrSearchText != null) {
 
 			if (WebContentServer.LOG_XHR) {
-				log.append("range: " + searchPosFrom + "-" + searchPosTo + "\t" + headers.entrySet());
+				log.append("range: " + searchPosFrom + "-" + searchPosTo + "\t" + headers.entrySet()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			}
 
 			String searchText = URLDecoder.decode(xhrSearchText, WEB.UTF_8);
@@ -1143,7 +1143,7 @@ public class SearchMgr implements XHRHandler {
 				final int itemNumber = itemBaseNumber + (++itemIndex);
 				ItemResponse itemResponse = null;
 
-				sb.append("<div" + (" class='" + CSS_ITEM_CONTAINER + "'") + " id='" + resultItem.docId + "'>\n"); //$NON-NLS-1$
+				sb.append("<div" + (" class='" + CSS_ITEM_CONTAINER + "'") + " id='" + resultItem.docId + "'>\n"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
 				{
 					itemResponse = createHTML_10_Item(resultItem, itemNumber);
 					sb.append(itemResponse.createdHtml);
@@ -1188,9 +1188,9 @@ public class SearchMgr implements XHRHandler {
 		final float timeDiff = (float) (System.nanoTime() - start) / 1000000;
 		String searchTime;
 		if (timeDiff < 1.0) {
-			searchTime = String.format("%.2f ms", timeDiff);
+			searchTime = String.format("%.2f ms", timeDiff); //$NON-NLS-1$
 		} else {
-			searchTime = String.format("%.0f ms", timeDiff);
+			searchTime = String.format("%.0f ms", timeDiff); //$NON-NLS-1$
 		}
 
 		final int totalHits = searchResult == null ? 0 : searchResult.totalHits;
@@ -1200,9 +1200,9 @@ public class SearchMgr implements XHRHandler {
 		 */
 		final JSONObject response = new JSONObject();
 
-		response.put("items", allItems);
-		response.put("searchTime", searchTime);
-		response.put("totalHits", totalHits);
+		response.put("items", allItems); //$NON-NLS-1$
+		response.put("searchTime", searchTime); //$NON-NLS-1$
+		response.put("totalHits", totalHits); //$NON-NLS-1$
 
 		return response.toString();
 	}
@@ -1239,7 +1239,7 @@ public class SearchMgr implements XHRHandler {
 		final Object xhrSearchOptions = params.get(XHR_PARAM_SEARCH_OPTIONS);
 		final JSONObject jsonSearchOptions = WEB.getJSONObject(xhrSearchOptions);
 
-		if (jsonSearchOptions.isNull("isRestoreDefaults") == false) {
+		if (jsonSearchOptions.isNull("isRestoreDefaults") == false) { //$NON-NLS-1$
 
 			// the action 'Restore Default' is selected in the web UI
 

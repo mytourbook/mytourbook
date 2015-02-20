@@ -24,11 +24,11 @@ import com.sun.net.httpserver.HttpExchange;
  */
 public class RequestParameterFilter extends Filter {
 
-	private static final String	REQUEST_METHOD_POST		= "post";
-	public static final String	ATTRIBUTE_PARAMETERS	= "parameters";
+	private static final String	REQUEST_METHOD_POST		= "post"; //$NON-NLS-1$
+	public static final String	ATTRIBUTE_PARAMETERS	= "parameters"; //$NON-NLS-1$
 
-	private static final String	REGEX_VALUE_SEP			= "[=]";
-	private static final String	REGEX_PARAMETER_SEP		= "[&]";
+	private static final String	REGEX_VALUE_SEP			= "[=]"; //$NON-NLS-1$
+	private static final String	REGEX_PARAMETER_SEP		= "[&]"; //$NON-NLS-1$
 
 	@Override
 	public String description() {

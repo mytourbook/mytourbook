@@ -1239,7 +1239,7 @@ public class FTSearchManager {
 							final Analyzer indexAnalyzer = new StandardAnalyzer(new CharArraySet(0, true));
 							final Analyzer queryAnalyzer = new WhitespaceAnalyzer();
 
-							_infixStore = openStore("AnalyzingInfixSuggesterSTORE");
+							_infixStore = openStore("AnalyzingInfixSuggesterSTORE"); //$NON-NLS-1$
 
 							suggester[0] = new AnalyzingInfixSuggester(
 									LUCENE_VERSION,

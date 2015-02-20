@@ -35,15 +35,15 @@ public class SearchResultItem {
 
 	@Override
 	public String toString() {
-		return "SearchResultItem ["
-				+ ("tourId=" + tourId + ", ")
-				+ ("markerId=" + markerId + ", ")
-				+ ("tourStartTime=" + tourStartTime + ", ")
+		return "SearchResultItem [" //$NON-NLS-1$
+				+ ("tourId=" + tourId + ", ") //$NON-NLS-1$ //$NON-NLS-2$
+				+ ("markerId=" + markerId + ", ") //$NON-NLS-1$ //$NON-NLS-2$
+				+ ("tourStartTime=" + tourStartTime + ", ") //$NON-NLS-1$ //$NON-NLS-2$
 //				+ ("markerLabel=" + markerLabel + ", ")
-				+ ("tourTitle=" + title + ", ")
-				+ ("description=" + description + ", ")
+				+ ("tourTitle=" + title + ", ") //$NON-NLS-1$ //$NON-NLS-2$
+				+ ("description=" + description + ", ") //$NON-NLS-1$ //$NON-NLS-2$
 //				+ ("score=" + score)
-				+ "]";
+				+ "]"; //$NON-NLS-1$
 	}
 
 }

@@ -41,6 +41,7 @@ import com.sun.net.httpserver.HttpExchange;
  */
 public class WEB {
 
+
 	/**
 	 * This is the <b>MAIN</b> switch to run Dojo in the dev or release folder. In debug mode the
 	 * Dojo files are delivered separately to debug them, in release mode all Dojo files are
@@ -52,15 +53,16 @@ public class WEB {
 	 */
 	static boolean				IS_DEBUG								= false;
 
-	static final String			DEBUG_PATH_XUL_RUNNER					= "C:/E/XULRunner/";							//$NON-NLS-1$
 	static final String			DEBUG_PATH_DOJO							= "C:/E/js-resources/dojo/";					//$NON-NLS-1$
+	static final String			DEBUG_PATH_XUL_RUNNER					= "C:/E/XULRunner/";							//$NON-NLS-1$
+	private static final String	DEBUG_PATH_FIREBUG_LITE					= "/WebContent-firebug-lite";					//$NON-NLS-1$
 
 	public static final String	PROTOCOL_HTTP							= "http://";									//$NON-NLS-1$
 
 	static final String			DOJO_TOOLKIT_FOLDER						= "/MyTourbook-DojoToolkit";					//$NON-NLS-1$
 
-	private static final String	WEB_CONTENT_DEVELOPMENT_FOLDER			= "/WebContent-dev";
-	private static final String	WEB_CONTENT_RELEASE_FOLDER				= "/WebContent-rel";
+	private static final String	WEB_CONTENT_DEVELOPMENT_FOLDER			= "/WebContent-dev";							//$NON-NLS-1$
+	private static final String	WEB_CONTENT_RELEASE_FOLDER				= "/WebContent-rel";							//$NON-NLS-1$
 
 	/**
 	 * Root folder for web content in the web plugin.
@@ -178,13 +180,13 @@ public class WEB {
 			if (isConvertPaths) {
 
 				final String fromHtmlDojoPath = DOJO_TOOLKIT_FOLDER;
-				final String fromHtmlFirebugPath = "/WebContent-firebug-lite";
+				final String fromHtmlFirebugPath = DEBUG_PATH_FIREBUG_LITE;
 
 				final String toSystemDojoPath = DEBUG_PATH_DOJO;
 				final String toSystemFirebugPath = DEBUG_PATH_XUL_RUNNER;
 
 				// replace local paths, which do not start with a /
-				webContent = replaceLocalPath(webContent, webFile);
+				webContent = replaceLocalDebugPath(webContent, webFile);
 
 				webContent = replacePath(webContent, fromHtmlDojoPath, toSystemDojoPath);
 				webContent = replacePath(webContent, fromHtmlFirebugPath, toSystemFirebugPath);
@@ -222,7 +224,7 @@ public class WEB {
 
 	}
 
-	private static String replaceLocalPath(final String webContent, final File webFile) {
+	private static String replaceLocalDebugPath(final String webContent, final File webFile) {
 
 		String replacedContent = UI.EMPTY_STRING;
 
@@ -232,8 +234,8 @@ public class WEB {
 			final File folderPath = filePath.removeLastSegments(1).toFile();
 			final String urlPath = folderPath.toURI().toURL().toExternalForm();
 
-			replacedContent = webContent.replaceAll("href=\"(?!/)", "href=\"" + urlPath);
-			replacedContent = replacedContent.replaceAll("src=\"(?!/)", "src=\"" + urlPath);
+			replacedContent = webContent.replaceAll("href=\"(?!/)", "href=\"" + urlPath); //$NON-NLS-1$ //$NON-NLS-2$
+			replacedContent = replacedContent.replaceAll("src=\"(?!/)", "src=\"" + urlPath); //$NON-NLS-1$ //$NON-NLS-2$
 
 		} catch (final MalformedURLException e) {
 			StatusUtil.log(e);

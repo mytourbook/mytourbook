@@ -95,7 +95,7 @@ public class UI {
 	public static final boolean								IS_WIN							= "win32".equals(SWT.getPlatform()) //$NON-NLS-1$
 																									|| "wpf".equals(SWT.getPlatform());	//$NON-NLS-1$
 
-	private static final String								ICONS_PATH						= "/icons/";
+	private static final String								ICONS_PATH						= "/icons/"; //$NON-NLS-1$
 
 	public static final String								EMPTY_STRING					= "";											//$NON-NLS-1$
 	public static final String								SPACE							= " ";											//$NON-NLS-1$

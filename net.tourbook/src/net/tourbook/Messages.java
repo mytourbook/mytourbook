@@ -280,7 +280,6 @@ public class Messages extends NLS {
 	public static String		App_Action_Columns;
 	public static String		App_Action_Dialog_ActionIsInProgress_Message;
 	public static String		App_Action_Dialog_ActionIsInProgress_Title;
-	//	public static String		App_Action_Delete;
 	public static String		App_Action_Duplicate;
 	public static String		App_Action_edit_tour;
 	public static String		App_Action_Edit;
@@ -299,7 +298,6 @@ public class Messages extends NLS {
 	public static String		App_Action_open_tour_segmenter_tooltip;
 	public static String		App_Action_OpenOtherViews;
 	public static String		App_Action_Remove;
-	public static String		App_Action_RestoreDefaults;
 	public static String		App_Action_set_tour_type;
 	public static String		App_Action_Save;
 	public static String		App_Action_SetPerson;
@@ -1198,19 +1196,6 @@ public class Messages extends NLS {
 	public static String		Slideout_ChartMarkerOptions_Label_Offset_Tooltip;
 //	public static String		Slideout_ChartMarkerOptions_Label_SignImageSize;
 //	public static String		Slideout_ChartMarkerOptions_Label_SignImageSize_Tooltip;
-
-	public static String		Slideout_SearchViewOptions_Checkbox_IsShowDateTime;
-	public static String		Slideout_SearchViewOptions_Checkbox_IsShowDocId;
-	public static String		Slideout_SearchViewOptions_Checkbox_IsShowItemNumber;
-	public static String		Slideout_SearchViewOptions_Checkbox_IsShowTopNavigator;
-	public static String		Slideout_SearchViewOptions_Group_PageNavigation;
-	public static String		Slideout_SearchViewOptions_Group_Result;
-	public static String		Slideout_SearchViewOptions_Group_Sorting;
-	public static String		Slideout_SearchViewOptions_Label_NumberOfDisplayedResults;
-	public static String		Slideout_SearchViewOptions_Label_NumberOfPages;
-	public static String		Slideout_SearchViewOptions_Label_SortAscending;
-	public static String		Slideout_SearchViewOptions_Label_SortByDate;
-	public static String		Slideout_SearchViewOptions_Label_SortDescending;
 
 	public static String		Slideout_TourMarkerFilter_Checkbox_IsReduceLatLonDigits;
 	public static String		Slideout_TourMarkerFilter_Checkbox_IsReduceLatLonDigits_Tooltip;

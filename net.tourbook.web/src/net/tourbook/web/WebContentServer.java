@@ -336,7 +336,7 @@ public class WebContentServer {
 
 			if (log.length() > 0 && IS_LOGGING) {
 
-				final String msg = String.format("%s %5.1f ms  %-16s [%s] %s", //
+				final String msg = String.format("%s %5.1f ms  %-16s [%s] %s", // //$NON-NLS-1$
 						UI.timeStampNano(),
 						(float) (System.nanoTime() - start) / 1000000,
 						Thread.currentThread().getName(),
@@ -354,13 +354,13 @@ public class WebContentServer {
 
 		try {
 
-			final String response = "403 (Forbidden)\n";
+			final String response = "403 (Forbidden)\n";//$NON-NLS-1$
 			httpExchange.sendResponseHeaders(403, response.length());
 
 			os = httpExchange.getResponseBody();
 			os.write(response.getBytes());
 
-			StatusUtil.log(response + " " + file.getPath());
+			StatusUtil.log(response + " " + file.getPath());//$NON-NLS-1$
 
 		} catch (final Exception e) {
 			StatusUtil.log(e);
@@ -375,13 +375,13 @@ public class WebContentServer {
 
 		try {
 
-			final String response = String.format("%s\n404 (Not Found)\n", requestUriPath);
+			final String response = String.format("%s\n404 (Not Found)\n", requestUriPath);//$NON-NLS-1$
 			httpExchange.sendResponseHeaders(404, response.length());
 
 			os = httpExchange.getResponseBody();
 			os.write(response.getBytes());
 
-			StatusUtil.log(response + " " + file.getPath());
+			StatusUtil.log(response + " " + file.getPath());//$NON-NLS-1$
 
 		} catch (final Exception e) {
 			StatusUtil.log(e);
@@ -479,7 +479,7 @@ public class WebContentServer {
 			final XHRHandler xhrHandler = _allXHRHandler.get(xhrKey);
 
 			if (xhrHandler == null) {
-				StatusUtil.logError("XHR handler is not set for " + xhrKey);
+				StatusUtil.logError("XHR handler is not set for " + xhrKey);//$NON-NLS-1$
 			} else {
 				xhrHandler.handleXHREvent(httpExchange, log);
 			}
@@ -495,10 +495,10 @@ public class WebContentServer {
 
 	private static void logHeader(final StringBuilder log, final Set<Entry<String, List<String>>> headerEntries) {
 
-		log.append("\n");
+		log.append("\n");//$NON-NLS-1$
 
 		for (final Entry<String, List<String>> entry : headerEntries) {
-			log.append(String.format("%-20s %s\n", entry.getKey(), entry.getValue()));
+			log.append(String.format("%-20s %s\n", entry.getKey(), entry.getValue()));//$NON-NLS-1$
 		}
 	}
 
@@ -511,7 +511,7 @@ public class WebContentServer {
 				.getAttribute(RequestParameterFilter.ATTRIBUTE_PARAMETERS);
 
 		if (params.size() > 0) {
-			log.append("\tparams: " + params);
+			log.append("\tparams: " + params);//$NON-NLS-1$
 		}
 	}
 
@@ -538,7 +538,7 @@ public class WebContentServer {
 
 			_server = HttpServer.create(inetAddress, 0);
 
-			final HttpContext context = _server.createContext("/", new DefaultHandler());
+			final HttpContext context = _server.createContext("/", new DefaultHandler());//$NON-NLS-1$
 
 			// convert uri query parameters into a "parameters" map
 			context.getFilters().add(new RequestParameterFilter());
@@ -569,7 +569,7 @@ public class WebContentServer {
 
 	@Override
 	public String toString() {
-		return "WebContentServer [set=" + Arrays.toString(set) + "]";
+		return "WebContentServer [set=" + Arrays.toString(set) + "]"; //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 }

@@ -23,11 +23,21 @@ public class Messages extends NLS {
 
 	public static String		App_Action_Apply;
 
+	public static String	App_Action_Dialog_ActionIsInProgress_Message;
+
+	public static String	App_Action_Dialog_ActionIsInProgress_Title;
+
 	public static String		graph_label_gradient_unit;
 	public static String		graph_label_heartbeat_unit;
 
 	public static String		Image__PulseZones;
 	public static String		Image__PulseZones_Disabled;
+
+	public static String	Image__quick_edit;
+
+	public static String	Image__TourChart;
+
+	public static String	Image__TourMarker;
 
 	public static String		Image_Action_Map_SyncPhotoWithMap;
 	public static String		Image_Action_Map_SyncPhotoWithMap_Disabled;
@@ -144,6 +154,10 @@ public class Messages extends NLS {
 	public static String		modify_mapprovider_dialog_area_message;
 	public static String		modify_mapprovider_dialog_area_title;
 	public static String		modify_mapprovider_dialog_title;
+
+	public static String	Search_View_Action_EditMarker_Tooltip;
+
+	public static String	Search_View_Action_EditTour_Tooltip;
 
 	public static String		statusLine_mapInfo_data;
 	public static String		statusLine_mapInfo_defaultText;
