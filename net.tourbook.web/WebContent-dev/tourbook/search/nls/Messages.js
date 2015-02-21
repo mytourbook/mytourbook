@@ -4,7 +4,6 @@ define(//
 										
 	root : 								
 	{									
-		Search_App                                         : 'en',
 		Search_App_Action_SearchOptions_Tooltip            : 'Search Options.',
 		Search_App_Action_StartSearch_Tooltip              : 'Start searching.',
 		Search_App_Label_Status_Tooltip                    : 'Number of search results - Search time',

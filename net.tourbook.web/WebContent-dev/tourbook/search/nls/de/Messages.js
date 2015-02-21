@@ -1,7 +1,6 @@
 // created with net.tourbook.ant.I18ToDojo
 define(//							
 {									
-		Search_App                                         : 'de',
 		Search_App_Action_SearchOptions_Tooltip            : 'Einstellungen für die Suche.',
 		Search_App_Action_StartSearch_Tooltip              : 'Suche starten.',
 		Search_App_Label_Status_Tooltip                    : 'Anzahl der Suchergebnisse - Zeit für die Suche',
