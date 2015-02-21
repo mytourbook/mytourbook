@@ -17,7 +17,7 @@ Create Translation Archive
 
 ##########################
 
-- switch to workspace "C:\DAT\ws_mt-with-GIT"
+- switch to workspace "C:\DAT\ws_mt-with-GIT or ws_MT-E4"
 
 	- set version number in "feature.net.tourbook.app"
 	- force feature version number into net.tourbook.* plugins
@@ -36,13 +36,14 @@ Create Translation Archive
 	- set synch option back to "synch versions on build (recommended)"
 
 	
-- switch to workspace "C:\DAT\ws_mt-with-GIT"
+- switch to workspace "C:\DAT\ws_mt-with-GIT or ws_MT-E4"
 
 	- run script "Create_Translation_Archive"
 
 
 - test translations
-
+	
+	- select mt-TRANSLATION-TEST in Q-Dir
 	- select folder "C:\DAT\ws_mt-Translation-TEST"
 	- delete all folders but NOT ".metadata"
 	- extract "mt-translations.zip" into this folder
@@ -63,7 +64,7 @@ requirements:
 - buckminster is installed to see better error messages
   (buckminster developemnet is not continued, TYCHO is used to build eclipse projects)
 
-- switch to workspace "C:\DAT\ws_mt-with-GIT"
+- switch to workspace "C:\DAT\ws_mt-with-GIT or ws_MT-E4"
 
 	- set version number in
 		- about.mappings
@@ -95,7 +96,7 @@ Create Update Site
 
 - create translation archive when necessary, see above instructions
 
-- switch to workspace "C:\DAT\ws_mt-with-GIT"
+- switch to workspace "C:\DAT\ws_mt-with-GIT or ws_MT-E4"
 
 	- run script "Create_MyTourbook_BuildFiles"
 
