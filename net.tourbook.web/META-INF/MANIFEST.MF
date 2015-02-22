@@ -11,5 +11,6 @@ Bundle-Localization: plugin
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  net.tourbook.common
-Export-Package: net.tourbook.web
+Export-Package: net.tourbook.web,
+ tourbook.search.nls
 Import-Package: org.json

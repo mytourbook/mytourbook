@@ -89,12 +89,12 @@ $DOJO_SEARCH$
 		<div 
 			id="domAction_EditTour"
 			data-dojo-type="dijit/MenuItem" 
-			data-dojo-props="iconClass:'iconTourChart'">Edit Tour...</div>
+			data-dojo-props="iconClass:'iconTourChart'"></div>
 
 		<div 
 			id="domAction_EditMarker"
 			data-dojo-type="dijit/MenuItem" 
-			data-dojo-props="iconClass:'iconTourMarker'">Edit Marker...</div>
+			data-dojo-props="iconClass:'iconTourMarker'"></div>
 	</div>
 	
 </body>

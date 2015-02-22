@@ -4,14 +4,13 @@ define(//
 										
 	root : 								
 	{									
+		Search_App_Action_EditMarker                       : 'Edit Marker',
+		Search_App_Action_EditTour                         : 'Edit Tour',
 		Search_App_Action_SearchOptions_Tooltip            : 'Search Options.',
 		Search_App_Action_StartSearch_Tooltip              : 'Start searching.',
 		Search_App_Label_Status_Tooltip                    : 'Number of search results - Search time',
 		Search_App_Text_Search_PlaceHolder                 : 'Search Tours, Marker and Waypoints',
-		Search_App_Tooltip_Label_1                         : 'A search can also be done with * or ? wildcards and other features, read more details in the ',
-		Search_App_Tooltip_Label_2                         : 'Lucene query parser description. ',
-		Search_App_Tooltip_Label_3                         : 'Lucene is the internal used search engine.',
-		Search_App_Tooltip_Title                           : 'Wildcard Search',
+		Search_App_Tooltip                                 : '<b>Wildcard Search</b><br>' + 'A search can also be done with * or ? wildcards and other features, read more details in the <a href=\'{0}\'>Lucene query parser description.</a><br><br>' + '' + 'Lucene is the internal used search engine.' + '',
 		Search_Grid_Label_NoDataMessage                    : 'No search results found.',
 		Search_Options_Action_RestoreDefaults              : 'Restore Defaults',
 		Search_Options_Checkbox_EaseSearching              : 'Use ease searching',

@@ -43,7 +43,7 @@ Create Translation Archive
 
 - test translations
 	
-	- select mt-TRANSLATION-TEST in Q-Dir
+	- select favorite mt-TRANSLATION-TEST in Q-Dir
 	- select folder "C:\DAT\ws_mt-Translation-TEST"
 	- delete all folders but NOT ".metadata"
 	- extract "mt-translations.zip" into this folder

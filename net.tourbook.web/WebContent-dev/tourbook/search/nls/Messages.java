@@ -21,14 +21,13 @@ public class Messages extends NLS {
 
 	private static final String	BUNDLE_NAME	= "tourbook.search.nls.messages";	//$NON-NLS-1$
 
+	public static String		Search_App_Action_EditMarker;
+	public static String		Search_App_Action_EditTour;
 	public static String		Search_App_Action_SearchOptions_Tooltip;
 	public static String		Search_App_Action_StartSearch_Tooltip;
 	public static String		Search_App_Label_Status_Tooltip;
 	public static String		Search_App_Text_Search_PlaceHolder;
-	public static String		Search_App_Tooltip_Label_1;
-	public static String		Search_App_Tooltip_Label_2;
-	public static String		Search_App_Tooltip_Label_3;
-	public static String		Search_App_Tooltip_Title;
+	public static String		Search_App_Tooltip;
 
 	public static String		Search_Grid_Label_NoDataMessage;
 

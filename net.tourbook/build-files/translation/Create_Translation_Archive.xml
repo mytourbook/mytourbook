@@ -21,10 +21,10 @@
 
 		<echo message="${ant.version}" />
 
-		<antcall target="delete-all-translation-files" />
 		<!--
-			<antcall target="delete-all-translation-temp-files" />
+		<antcall target="delete-all-translation-files" />
 		-->
+			<antcall target="delete-all-translation-temp-files" />
 
 		<antcall target="copy-empty-language-projects" />
 		<antcall target="copy-language-property-files" />
@@ -81,7 +81,7 @@
 
 			<fileset dir="${path-mt-trunk}">
 
-				<include name="**/plugin*.properties" />
+				<include name="**/plugin*.xproperties" />
 				<include name="**/messages*.properties" />
 
 				<exclude name="**/bin/" />
@@ -91,6 +91,9 @@
 						I didn't find another way how to exclude them 
 				-->
 				<exclude name="**/net.tourbook.rxtx*/" />
+				
+				<!-- exclude duplicated js text files -->
+				<exclude name="**/WebContent-rel/"/>
 
 				<!-- ignore empty files -->
 				<size value="0" when="more" />

@@ -507,7 +507,7 @@
 					commandId="command.de.byteholder.geoclipse.poi.ShowPOI"
 					icon="icons/find.png"
 					label="%View_Name_SearchPOI"
-					tooltip="%View_Name_SearchPOI_Mnemonic"
+					mnemonic="%View_Name_SearchPOI_Mnemonic"
 				/>
    
 

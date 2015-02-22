@@ -1,14 +1,13 @@
 // created with net.tourbook.ant.I18ToDojo
 define(//							
 {									
+		Search_App_Action_EditMarker                       : 'Markierung bearbeiten',
+		Search_App_Action_EditTour                         : 'Tour bearbeiten',
 		Search_App_Action_SearchOptions_Tooltip            : 'Einstellungen für die Suche.',
 		Search_App_Action_StartSearch_Tooltip              : 'Suche starten.',
 		Search_App_Label_Status_Tooltip                    : 'Anzahl der Suchergebnisse - Zeit für die Suche',
 		Search_App_Text_Search_PlaceHolder                 : 'Touren, Markierungen und Wegpunkte suchen',
-		Search_App_Tooltip_Label_1                         : 'Eine Suche kann auch mit * oder ? Platzhalter und anderen Optionen durchgeführt werden.<br><br>' + 'Die Dokumentation darüber findet man in der englischen Beschreibung ',
-		Search_App_Tooltip_Label_2                         : 'Lucene query parser description. ',
-		Search_App_Tooltip_Label_3                         : 'Lucene ist die intern verwendete Suchmaschine.',
-		Search_App_Tooltip_Title                           : 'Platzhaltersuche',
+		Search_App_Tooltip                                 : '<b>Platzhaltersuche</b><br>' + '' + 'Eine Suche kann auch mit * oder ? Platzhalter und anderen Optionen durchgeführt werden.<br><br>' + 'Die Dokumentation darüber findet man in der englischen Beschreibung <a href=\'{0}\'>Lucene query parser description.</a><br><br>' + '' + 'Lucene ist die intern verwendete Suchmaschine.',
 		Search_Grid_Label_NoDataMessage                    : 'Keine Suchergebnisse gefunden.',
 		Search_Options_Action_RestoreDefaults              : 'Standardwerte wiederherstellen',
 		Search_Options_Checkbox_EaseSearching              : 'Einfaches Suchen verwenden',

@@ -41,7 +41,6 @@ import com.sun.net.httpserver.HttpExchange;
  */
 public class WEB {
 
-
 	/**
 	 * This is the <b>MAIN</b> switch to run Dojo in the dev or release folder. In debug mode the
 	 * Dojo files are delivered separately to debug them, in release mode all Dojo files are
@@ -52,6 +51,27 @@ public class WEB {
 	 * {@value #WEB_CONTENT_RELEASE_FOLDER} folder.
 	 */
 	static boolean				IS_DEBUG								= false;
+
+	/*
+	 * It is very complicated to support testing for language translators, therefore it is currently
+	 * not yet implemented.
+	 */
+//	static boolean				IS_DEBUG_NLS							= true;
+
+	static String				DEFAULT_LANGUAGE						= "en";										//$NON-NLS-1$
+
+	/**
+	 * Supported languages.
+	 */
+	static String[]				SUPPORTED_LANGUAGES						= { //
+																		"cs_CZ", //$NON-NLS-1$
+			"de",//$NON-NLS-1$
+			DEFAULT_LANGUAGE,
+			"es",//$NON-NLS-1$
+			"fr",//$NON-NLS-1$
+			"it",//$NON-NLS-1$
+			"nl" //$NON-NLS-1$
+																		};
 
 	static final String			DEBUG_PATH_DOJO							= "C:/E/js-resources/dojo/";					//$NON-NLS-1$
 	static final String			DEBUG_PATH_XUL_RUNNER					= "C:/E/XULRunner/";							//$NON-NLS-1$

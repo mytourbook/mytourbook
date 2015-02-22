@@ -94,6 +94,9 @@ public class WebContentServer {
 	private static Map<String, XHRHandler>	_allXHRHandler				= new HashMap<>();
 	private static Map<String, Object>		_mthtmlValues				= new HashMap<>();
 
+	/**
+	 * Possible alternative: https://github.com/NanoHttpd/nanohttpd
+	 */
 	private static HttpServer				_server;
 	private static final int				_serverPort;
 
@@ -166,12 +169,25 @@ public class WebContentServer {
 //		dojoSearch += cssFont;
 
 		/*
+		 * Get valid locale, invalid locale will cause errors of not supported Dojo files.
+		 */
+		final String uiLanguage = Locale.getDefault().getLanguage();
+		String dojoLocale = WEB.DEFAULT_LANGUAGE;
+
+		for (final String suppLanguage : WEB.SUPPORTED_LANGUAGES) {
+			if (suppLanguage.equals(uiLanguage)) {
+				dojoLocale = suppLanguage;
+				break;
+			}
+		}
+
+		/*
 		 * Text replacements for commen messages.
 		 */
 		_mthtmlValues.put(MTHTML_DOJO_SEARCH, dojoSearch);
-		_mthtmlValues.put(MTHTML_LOCALE, Locale.getDefault().getLanguage());
-		_mthtmlValues.put(MTHTML_MESSAGE_LOADING, Messages.Web_Content_Loading);
-		_mthtmlValues.put(MTHTML_MESSAGE_SEARCH_TITLE, Messages.Search_Title);
+		_mthtmlValues.put(MTHTML_LOCALE, dojoLocale);
+		_mthtmlValues.put(MTHTML_MESSAGE_LOADING, Messages.Web_Page_ContentLoading);
+		_mthtmlValues.put(MTHTML_MESSAGE_SEARCH_TITLE, Messages.Web_Page_Search_Title);
 	}
 
 	private static class DefaultHandler implements HttpHandler {

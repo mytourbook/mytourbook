@@ -26,12 +26,12 @@ public class MessagesUsed {
 	{
 		used = Messages.Search_App_Action_SearchOptions_Tooltip;
 		used = Messages.Search_App_Action_StartSearch_Tooltip;
+		used = Messages.Search_App_Action_EditMarker;
+		used = Messages.Search_App_Action_EditTour;
+
 		used = Messages.Search_App_Label_Status_Tooltip;
 		used = Messages.Search_App_Text_Search_PlaceHolder;
-		used = Messages.Search_App_Tooltip_Label_1;
-		used = Messages.Search_App_Tooltip_Label_2;
-		used = Messages.Search_App_Tooltip_Label_3;
-		used = Messages.Search_App_Tooltip_Title;
+		used = Messages.Search_App_Tooltip;
 
 		used = Messages.Search_Grid_Label_NoDataMessage;
 

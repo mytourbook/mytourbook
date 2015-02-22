@@ -139,6 +139,17 @@ public class TourTypeContributionItem extends CustomControlContribution {
 				if (e.widget instanceof Control) {
 
 					final Control control = (Control) e.widget;
+
+					if (control.isDisposed()) {
+
+						/**
+						 * This error occures when the customized dialog for the perspective is
+						 * opened -> needs to be fixed.
+						 */
+
+						return;
+					}
+
 					control.setCursor(_cursorHand);
 
 					openContextMenuOpen(control, e);
@@ -396,6 +407,7 @@ public class TourTypeContributionItem extends CustomControlContribution {
 		 * something else is selected
 		 */
 		Display.getDefault().timerExec(500, new Runnable() {
+			@Override
 			public void run() {
 
 				// check if a hide event has occured

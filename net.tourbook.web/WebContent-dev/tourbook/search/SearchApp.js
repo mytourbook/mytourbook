@@ -28,11 +28,11 @@ define(
 
 	'put-selector/put',
 
+	'tourbook/util/NLS',
 	'./DialogSearchOptions',
 	'./SearchInput',
 	'./SearchMgr',
 	'dojo/i18n!./nls/Messages',
-
 	'dojo/domReady!'
 ], function(
 //	
@@ -69,6 +69,7 @@ RequestMemory, //
 
 put, //
 
+NLS, //
 DialogSearchOptions, //
 SearchInput, //
 SearchMgr, //
@@ -113,20 +114,23 @@ Messages //
 
 			this._searchInput.setGrid(grid);
 
+			/**
+			 * Tooltip: App info
+			 */
+			var appLabel = NLS.bind0(Messages.Search_App_Tooltip, SearchMgr.Search_App_Tooltip_Url);
+
 			new Tooltip(
 			//
 			{
 				connectId : 'domInfo',
+
 				position :
 				[ 'below'
 				],
+
 				showDelay : 100,
-				label : "<div style='width:30em;'>" //
-					+ ("<b>" + Messages.Search_App_Tooltip_Title + "</b><br>") //
-					+ Messages.Search_App_Tooltip_Label_1
-					+ ("<a href='" + SearchMgr.Search_App_Tooltip_Url + "'>" + Messages.Search_App_Tooltip_Label_2 + "</a><br><br>") //
-					+ Messages.Search_App_Tooltip_Label_3 //
-					+ "</div>"
+
+				label : "<div style='width:30em;'>" + appLabel + "</div>"
 			});
 
 			// set tooltips
@@ -322,12 +326,15 @@ Messages //
 			});
 
 			/**
-			 * Context menu, is defined declaratively. 
+			 * Context menu, is defined declaratively.
 			 */
 			var contextMenuItemData;
 
 			var actionEditMarker = registry.byId('domAction_EditMarker');
 			var actionEditTour = registry.byId('domAction_EditTour');
+
+			actionEditMarker.set('label', Messages.Search_App_Action_EditMarker);
+			actionEditTour.set('label', Messages.Search_App_Action_EditTour);
 
 			/*
 			 * Setup context menu action
@@ -349,16 +356,16 @@ Messages //
 				actionEditMarker.set('disabled', !isMarker);
 				actionEditTour.set('disabled', !isTour);
 			});
-			
+
 			/*
 			 * Run context menu action
 			 */
 			var runUrlAction = function doUrlAction(event) {
-				
+
 				var actionUrl = contextMenuItemData.actionUrl_EditItem;
 				SearchApp.action(actionUrl);
 			};
-			
+
 			actionEditMarker.on('click', runUrlAction);
 			actionEditTour.on('click', runUrlAction);
 

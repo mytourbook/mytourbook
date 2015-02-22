@@ -91,7 +91,9 @@ public class SearchView extends ViewPart implements ISearchView {
 			@Override
 			public void partClosed(final IWorkbenchPartReference partRef) {
 
-				SearchMgr.setSearchView(null);
+				if (partRef.getPart(false) == SearchView.this) {
+					SearchMgr.setSearchView(null);
+				}
 			}
 
 			@Override
@@ -106,7 +108,9 @@ public class SearchView extends ViewPart implements ISearchView {
 			@Override
 			public void partOpened(final IWorkbenchPartReference partRef) {
 
-				SearchMgr.setSearchView(SearchView.this);
+				if (partRef.getPart(false) == SearchView.this) {
+					SearchMgr.setSearchView(SearchView.this);
+				}
 			}
 
 			@Override

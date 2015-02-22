@@ -6,9 +6,9 @@ public class Messages extends NLS {
 
 	private static final String	BUNDLE_NAME	= "net.tourbook.web.messages";	//$NON-NLS-1$
 
-	public static String	Search_Title;
+	public static String	Web_Page_ContentLoading;
 
-	public static String		Web_Content_Loading;
+	public static String	Web_Page_Search_Title;
 
 	static {
 		// initialize resource bundle

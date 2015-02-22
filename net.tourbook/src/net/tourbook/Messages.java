@@ -1168,8 +1168,6 @@ public class Messages extends NLS {
 
 	public static String		Search_Manager_CreateFTIndex;
 
-	public static String		Search_View_Action_EditMarker_Tooltip;
-	public static String		Search_View_Action_EditTour_Tooltip;
 	public static String		Search_View_Link_LinuxBrowser;
 
 	public static String		Slideout_ChartMarkerOptions_Checkbox_IsShowHiddenMarker;

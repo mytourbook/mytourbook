@@ -31,7 +31,7 @@
 
 	<target name="cleanMTRelease">
 		<echo level="info" message="Cleaning MT release folder" />
-		<delete dir="${WebContentRelTourbook}" />
+		<delete dir="${WebContentRel}" />
 	</target>
 
 	<target name="shrink">
@@ -106,14 +106,24 @@
     <target name="copyResources">
 		
     	<!--
-			copy MT resources without js
+			copy MT web resources without js
 		-->
 		<echo level="info" message="### Copying resources without js, dev->rel ..." />
 		<copy todir="${WebContentRelTourbook}" preservelastmodified="no" verbose="yes">
+			
 			<fileset dir="${WebContentDevTourbook}">
+				
 				<include name="**/*"/>
+				
+				<!-- .java and .properties are used to create the language files -->
+				<exclude name="**/*.java"/>
+				<exclude name="**/*.properties"/>
+				
+				<!-- NLS will be copied in the next task other js is compressed -->
 				<exclude name="**/*.js"/>
+				
 				<exclude name="**/search.css"/> <!-- this file is in the build layer -->
+				
 			</fileset>
 		</copy>
 		
@@ -123,7 +133,13 @@
 		<echo level="info" message="### Copying nls resources, build->rel ..." />
 		<copy todir="${WebContentRel}/tourbook/search/nls" preservelastmodified="no" verbose="yes">
 			<fileset dir="${dojoBuildReleaseFolder}/tourbook/search/nls">
-				<include name="**/*.js"/>
+				
+				<include name="*.js"/>
+				
+				<!-- remove not used files -->
+				<exclude name="Messages.js"/>
+				<exclude name="*.uncompressed.js"/>
+				
 			</fileset>
 		</copy>
             
@@ -134,23 +150,6 @@
 		<copy todir="${WebContentRel}" preservelastmodified="no" verbose="yes">
 			<fileset dir="${WebContentDev}">
 				<include name="**/favicon.ico"/>
-			</fileset>
-		</copy>
-
-    	<!--
-			copy JS debug resources
-		-->
-		<echo level="info" message="### Copying JS debug resources, build->rel ..." />
-		<copy todir="${WebContentRel}" preservelastmodified="no" verbose="yes">
-			<fileset dir="${dojoBuildReleaseFolder}">
-				<include name="**/dojo.js.map"/>
-				<include name="**/dojo.js.uncompressed.js"/>
-			</fileset>
-		</copy>
-		<copy todir="${WebContentRelTourbook}" preservelastmodified="no" verbose="yes">
-			<fileset dir="${dojoBuildReleaseFolder}/tourbook">
-				<include name="**/*.js.map"/>
-				<include name="**/*.js.uncompressed.js"/>
 			</fileset>
 		</copy>
 
