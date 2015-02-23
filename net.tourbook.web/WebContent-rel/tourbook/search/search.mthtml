@@ -2,9 +2,10 @@
 <html>
 <head>
 	<meta http-equiv='Content-Type' content='text/html; charset=UTF-8' />
+	
 <!-- 
 	Setting this tag is a catastrophe because a tour can not be selected in the 
-	search rusult with the mouse only with the keyboard.
+	search result with the mouse only with the keyboard.
 	 
 	<meta http-equiv='X-UA-Compatible' content='IE=edge' />
  -->

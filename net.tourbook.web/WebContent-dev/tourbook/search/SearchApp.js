@@ -251,7 +251,7 @@ Messages //
 						 */
 						requestData = JSON.parse(args.data), //
 
-						searchText = app._searchInput.getSearchText(), //
+//						searchText = app._searchInput.getSearchText(), //
 						searchTime = requestData.searchTime, //
 						searchTotal = requestData.totalHits, //
 

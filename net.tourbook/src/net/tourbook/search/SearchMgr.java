@@ -1057,7 +1057,7 @@ public class SearchMgr implements XHRHandler {
 			proposals = FTSearchManager.getProposals(searchText);
 		}
 
-		if (proposals.size() == 0) {
+		if (proposals == null || proposals.size() == 0) {
 			return UI.EMPTY_STRING;
 		}
 
@@ -1186,6 +1186,8 @@ public class SearchMgr implements XHRHandler {
 		String searchTime;
 		if (timeDiff < 1.0) {
 			searchTime = String.format("%.2f ms", timeDiff); //$NON-NLS-1$
+		} else if (timeDiff < 10.0) {
+			searchTime = String.format("%.1f ms", timeDiff); //$NON-NLS-1$
 		} else {
 			searchTime = String.format("%.0f ms", timeDiff); //$NON-NLS-1$
 		}

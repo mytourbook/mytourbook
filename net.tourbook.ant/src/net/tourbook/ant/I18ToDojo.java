@@ -15,10 +15,12 @@
  *******************************************************************************/
 package net.tourbook.ant;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -32,28 +34,27 @@ import org.apache.tools.ant.Task;
  */
 public class I18ToDojo extends Task {
 
-	private String		FILE_CREATE_HEADER	= "// created with " + I18ToDojo.class.getCanonicalName() + "\n"; //$NON-NLS-1$ //$NON-NLS-2$
+	private static final String	UTF_8				= "UTF-8";															//$NON-NLS-1$
+
+	private String				FILE_CREATE_HEADER	= "// created with " + I18ToDojo.class.getCanonicalName() + "\n";	//$NON-NLS-1$ //$NON-NLS-2$
 
 	/**
 	 * Java properties file.
 	 */
-	private String		_javaProperties;
-	private String		_javaPropFileName;
-	private String		_javaPropFileExt;
+	private String				_javaProperties;
+	private String				_javaPropFileName;
+	private String				_javaPropFileExt;
 
 	/**
 	 * Created Javascript dojo file.
 	 */
-	private String		_dojoProperties;
+	private String				_dojoProperties;
 
-	private String		_i18dir;
+	private String				_i18dir;
 
-//	private String		_dojoPropFileName;
-//	private String		_dojoPropFileExt;
+	private String				_rootLanguage;
 
-	private String		_rootLanguage;
-
-	private String[]	_otherLanguages;
+	private String[]			_otherLanguages;
 
 	@Override
 	public void execute() throws BuildException {
@@ -165,25 +166,29 @@ public class I18ToDojo extends Task {
 			System.out.println("	to:   " + dojoI18PropFilePath); //$NON-NLS-1$
 			// TODO remove SYSTEM.OUT.PRINTLN
 
-			FileOutputStream outStream = null;
+			BufferedWriter writer = null;
+
 			try {
 
 				// ensure folder is created
 				new File(dojoI18Folder).mkdirs();
 
 				// create dojo file
-				outStream = new FileOutputStream(dojoI18PropFilePath, false);
+				writer = new BufferedWriter(//
+						new OutputStreamWriter(//
+								new FileOutputStream(dojoI18PropFilePath, false),
+								UTF_8));
 
-				writeDojo_I18_10_Header(outStream);
-				writeDojo_Messages(outStream, javaI18PropFilePath);
-				writeDojo_I18_20_Footer(outStream);
+				writeDojo_I18_10_Header(writer);
+				writeDojo_Messages(writer, javaI18PropFilePath);
+				writeDojo_I18_20_Footer(writer);
 
 			} catch (final IOException e) {
 				e.printStackTrace();
 			} finally {
 				try {
-					if (outStream != null) {
-						outStream.close();
+					if (writer != null) {
+						writer.close();
 					}
 				} catch (final IOException e) {
 					e.printStackTrace();
@@ -192,30 +197,30 @@ public class I18ToDojo extends Task {
 		}
 	}
 
-	private void writeDojo_I18_10_Header(final FileOutputStream outStream) throws IOException {
+	private void writeDojo_I18_10_Header(final BufferedWriter writer) throws IOException {
 
 		final String header = "" // //$NON-NLS-1$
 				+ FILE_CREATE_HEADER//
 				+ "define(//							\n"// //$NON-NLS-1$
 				+ "{									\n"; //$NON-NLS-1$
 
-		outStream.write(header.getBytes());
+		writer.append(header);
 	}
 
-	private void writeDojo_I18_20_Footer(final FileOutputStream outStream) throws IOException {
+	private void writeDojo_I18_20_Footer(final BufferedWriter writer) throws IOException {
 
 		final String footer = ""// //$NON-NLS-1$
 				+ "});		\n"; //$NON-NLS-1$
 
-		outStream.write(footer.getBytes());
+		writer.append(footer);
 	}
 
 	/**
-	 * @param outStream
+	 * @param writer
 	 * @param javaProperties
 	 * @throws IOException
 	 */
-	private void writeDojo_Messages(final FileOutputStream outStream, final String javaProperties) throws IOException {
+	private void writeDojo_Messages(final BufferedWriter writer, final String javaProperties) throws IOException {
 
 		final Properties properties = loadJavaProperties(javaProperties);
 
@@ -256,7 +261,7 @@ public class I18ToDojo extends Task {
 					message.append(",\n"); //$NON-NLS-1$
 				}
 
-				outStream.write(message.toString().getBytes());
+				writer.append(message.toString());
 			}
 		}
 	}
@@ -271,21 +276,24 @@ public class I18ToDojo extends Task {
 		System.out.println("	to:   " + dojoPropFilePath); //$NON-NLS-1$
 		// TODO remove SYSTEM.OUT.PRINTLN
 
-		FileOutputStream outStream = null;
+		BufferedWriter writer = null;
+
 		try {
 
-			outStream = new FileOutputStream(dojoPropFilePath);
-
-			writeDojo_Root_10_Header(outStream);
-			writeDojo_Messages(outStream, javaPropFilePath);
-			writeDojo_Root_20_Footer(outStream);
+			writer = new BufferedWriter(//
+					new OutputStreamWriter(//
+							new FileOutputStream(dojoPropFilePath, false),
+							UTF_8));
+			writeDojo_Root_10_Header(writer);
+			writeDojo_Messages(writer, javaPropFilePath);
+			writeDojo_Root_20_Footer(writer);
 
 		} catch (final IOException e) {
 			e.printStackTrace();
 		} finally {
 			try {
-				if (outStream != null) {
-					outStream.close();
+				if (writer != null) {
+					writer.close();
 				}
 			} catch (final IOException e) {
 				e.printStackTrace();
@@ -293,7 +301,7 @@ public class I18ToDojo extends Task {
 		}
 	}
 
-	private void writeDojo_Root_10_Header(final FileOutputStream outStream) throws IOException {
+	private void writeDojo_Root_10_Header(final BufferedWriter writer) throws IOException {
 
 		final String header = "" //$NON-NLS-1$
 				+ "define(//							\n" //$NON-NLS-1$
@@ -303,10 +311,10 @@ public class I18ToDojo extends Task {
 				+ "	root : 								\n" //$NON-NLS-1$
 				+ "	{									\n"; //$NON-NLS-1$
 
-		outStream.write(header.getBytes());
+		writer.write(header);
 	}
 
-	private void writeDojo_Root_20_Footer(final FileOutputStream outStream) throws IOException {
+	private void writeDojo_Root_20_Footer(final BufferedWriter writer) throws IOException {
 
 		final String footer = "" //$NON-NLS-1$
 				+ "	},		\n" //$NON-NLS-1$
@@ -315,7 +323,7 @@ public class I18ToDojo extends Task {
 				+ writeDojo_Root_22_Languages().toString()
 				+ "});		\n"; //$NON-NLS-1$
 
-		outStream.write(footer.getBytes());
+		writer.write(footer);
 	}
 
 	private StringBuilder writeDojo_Root_22_Languages() {
