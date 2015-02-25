@@ -401,7 +401,15 @@ public class ChartComponentGraph extends Canvas {
 
 	private PixelConverter				_pc;
 
+	/**
+	 * Is <code>true</code> when a chart can be overlapped. The overlap feature is currently
+	 * supported for graphs which all have the chart type ChartType.LINE.
+	 */
 	boolean								_canChartBeOverlapped;
+
+	/**
+	 * Is <code>true</code> when overlapped graphs are enabled.
+	 */
 	boolean								_isChartOverlapped;
 
 	/**
@@ -1586,8 +1594,11 @@ public class ChartComponentGraph extends Canvas {
 			final boolean isDrawBackground = !_canChartBeOverlapped
 					|| (_canChartBeOverlapped && (isStackedChart || isFirstOverlappedGraph));
 
-			final boolean isDrawGridAndXUnits = !_canChartBeOverlapped
+			final boolean isDrawXUnits = !_canChartBeOverlapped
 					|| (_canChartBeOverlapped && (isStackedChart || isLastOverlappedGraph));
+
+			final boolean isDrawGrid = !_canChartBeOverlapped
+					|| (_canChartBeOverlapped && (isStackedChart || isFirstOverlappedGraph));
 
 			boolean isDrawTitle;
 			if (_canChartBeOverlapped && _isChartOverlapped) {
@@ -1608,7 +1619,13 @@ public class ChartComponentGraph extends Canvas {
 
 			drawAsync_150_SegmentBackground(gcGraph, graphDrawingData);
 
-			if (isDrawGridAndXUnits) {
+			if (isDrawGrid) {
+
+				// draw horizontal grid
+				drawAsync_220_HGrid(gcGraph, graphDrawingData);
+			}
+
+			if (isDrawXUnits) {
 
 				if (isLastGraph) {
 					// draw the unit label and unit tick for the last graph
@@ -1616,9 +1633,6 @@ public class ChartComponentGraph extends Canvas {
 				} else {
 					drawAsync_210_XUnits_VGrid(gcChart, gcGraph, graphDrawingData, false);
 				}
-
-				// draw only the horizontal grid
-				drawAsync_220_XAsis_HGrid(gcGraph, graphDrawingData, false);
 			}
 
 			// draw units and grid on the x and y axis
@@ -1647,7 +1661,7 @@ public class ChartComponentGraph extends Canvas {
 			}
 
 			// draw only the x-axis, this is drawn lately because the graph can overwrite it
-			drawAsync_220_XAsis_HGrid(gcGraph, graphDrawingData, true);
+			drawAsync_230_XAxis(gcGraph, graphDrawingData);
 
 			// draw graph image into the chart image
 			gcChart.drawImage(_chartImage10Graphs, 0, graphDrawingData.getDevYTop());
@@ -2132,11 +2146,7 @@ public class ChartComponentGraph extends Canvas {
 	 * @param drawingData
 	 * @param isDrawOnlyXAsis
 	 */
-	private void drawAsync_220_XAsis_HGrid(	final GC gcGraph,
-											final GraphDrawingData drawingData,
-											final boolean isDrawOnlyXAsis) {
-
-		final Display display = getDisplay();
+	private void drawAsync_220_HGrid(final GC gcGraph, final GraphDrawingData drawingData) {
 
 		final ArrayList<ChartUnit> yUnits = drawingData.getYUnits();
 		final int unitListSize = yUnits.size();
@@ -2173,35 +2183,76 @@ public class ChartComponentGraph extends Canvas {
 			final boolean isXAxis = (isTopDown && unitIndex == unitListSize - 1) || //
 					(isBottomUp && unitIndex == 0);
 
-			if (isDrawOnlyXAsis) {
+			if (isXAxis == false && isDrawHorizontalGrid) {
 
-				// draw only the x-axis
+				// draw gridlines
 
-				if (isXAxis) {
-
+				if (yUnit.isMajorValue) {
 					gcGraph.setLineStyle(SWT.LINE_SOLID);
-					gcGraph.setForeground(display.getSystemColor(SWT.COLOR_DARK_GRAY));
-					gcGraph.drawLine(0, devY, devVisibleChartWidth, devY);
-
-					// only the x-axis needs to be drawn
-					break;
+					gcGraph.setForeground(_gridColorMajor);
+				} else {
+					gcGraph.setLineDash(DOT_DASHES);
+					gcGraph.setForeground(_gridColor);
 				}
+				gcGraph.drawLine(0, devY, devVisibleChartWidth, devY);
+			}
 
+			unitIndex++;
+		}
+	}
+
+	/**
+	 * draw the horizontal gridlines or the x-axis
+	 * 
+	 * @param gcGraph
+	 * @param drawingData
+	 * @param isDrawOnlyXAsis
+	 */
+	private void drawAsync_230_XAxis(final GC gcGraph, final GraphDrawingData drawingData) {
+
+		final Display display = getDisplay();
+
+		final ArrayList<ChartUnit> yUnits = drawingData.getYUnits();
+		final int unitListSize = yUnits.size();
+
+		final double scaleY = drawingData.getScaleY();
+		final float graphYBottom = drawingData.getGraphYBottom();
+		final int devGraphHeight = drawingData.devGraphHeight;
+		final int devVisibleChartWidth = getDevVisibleChartWidth();
+
+		final boolean isBottomUp = drawingData.getYData().isYAxisDirection();
+		final boolean isTopDown = isBottomUp == false;
+
+		final int devYTop = 0;
+		final int devYBottom = devGraphHeight;
+
+		int devY;
+		int unitIndex = 0;
+
+		// loop: all units
+		for (final ChartUnit yUnit : yUnits) {
+
+			final double unitValue = yUnit.value;
+			final double devYUnit = (((unitValue - graphYBottom) * scaleY) + 0.5);
+
+			if (isBottomUp || unitListSize == 1) {
+				devY = devYBottom - (int) devYUnit;
 			} else {
+				devY = devYTop + (int) devYUnit;
+			}
 
-				if (isXAxis == false && isDrawHorizontalGrid) {
+			// check if a y-unit is on the x axis
+			final boolean isXAxis = (isTopDown && unitIndex == unitListSize - 1) || //
+					(isBottomUp && unitIndex == 0);
 
-					// draw gridlines
+			if (isXAxis) {
 
-					if (yUnit.isMajorValue) {
-						gcGraph.setLineStyle(SWT.LINE_SOLID);
-						gcGraph.setForeground(_gridColorMajor);
-					} else {
-						gcGraph.setLineDash(DOT_DASHES);
-						gcGraph.setForeground(_gridColor);
-					}
-					gcGraph.drawLine(0, devY, devVisibleChartWidth, devY);
-				}
+				gcGraph.setLineStyle(SWT.LINE_SOLID);
+				gcGraph.setForeground(display.getSystemColor(SWT.COLOR_DARK_GRAY));
+				gcGraph.drawLine(0, devY, devVisibleChartWidth, devY);
+
+				// only the x-axis needs to be drawn
+				break;
 			}
 
 			unitIndex++;
