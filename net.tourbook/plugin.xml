@@ -1702,6 +1702,14 @@
 			contextId="org.eclipse.ui.contexts.window"
 			schemeId="net.tourbook.scheme"/>
 
+		<!-- Tools -->
+	
+		<key
+			commandId="command.net.tourbook.search.SearchView"
+			sequence="%Shortcut_Key_App_Search"
+			contextId="org.eclipse.ui.contexts.window"
+			schemeId="net.tourbook.scheme"/>
+  
 	</extension>
 
 

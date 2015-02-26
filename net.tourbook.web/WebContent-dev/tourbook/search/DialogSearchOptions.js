@@ -162,6 +162,9 @@ Messages //
 			// update status
 			dom.byId('domSearchStatus').innerHTML = statusText;
 
+			// resize dialog because status text has changed and can be too long 
+			this._dialog.resize();
+
 			return isValid;
 		},
 

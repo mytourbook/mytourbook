@@ -11,7 +11,7 @@ define(//
 		Search_Grid_Label_NoDataMessage                    : 'Keine Suchergebnisse gefunden.',
 		Search_Options_Action_RestoreDefaults              : 'Standardwerte wiederherstellen',
 		Search_Options_Checkbox_EaseSearching              : 'Einfaches Suchen verwenden',
-		Search_Options_Checkbox_EaseSearching_Tooltip      : '<b>* Platzhalter Suche</b><br>' + 'Wenn <i>Einfaches Suchen</i> ausgewählt ist, wird der * Platzhalter an den zu suchenden Text angehängt, dieser Platzhalter wird intern hinzugefügt und ist nicht sichtbar.<br><br>' + '' + '<b>Erweiterte Suchoptionen</b><br>' + 'Es kann hilfreich sein, <i>Einfaches Suchen</i> zu deaktivieren wenn die Suche mit den erweiteren Suchoptionen der Lucene Suchmaschine durchgeführt werden.',
+		Search_Options_Checkbox_EaseSearching_Tooltip      : '<b>* Platzhalter Suche</b><br>' + 'Wenn <i>Einfaches Suchen</i> ausgewählt ist, wird der * Platzhalter an den zu suchenden Text angehängt, dieser Platzhalter wird intern hinzugefügt und ist nicht sichtbar.<br><br>' + '' + '<b>Erweiterte Suchoptionen</b><br>' + 'Es kann hilfreich sein, <i>Einfaches Suchen</i> zu deaktivieren wenn die Suche mit den erweiteren Suchoptionen der Lucene Suchmaschine durchgeführt wird.',
 		Search_Options_Checkbox_ShowContentAll             : 'Alles',
 		Search_Options_Checkbox_ShowContentMarker          : 'Markierungen',
 		Search_Options_Checkbox_ShowContentTour            : 'Touren',

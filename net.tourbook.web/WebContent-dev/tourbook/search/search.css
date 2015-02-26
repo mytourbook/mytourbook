@@ -155,7 +155,7 @@ a
 }
 
 /*
-	Search status
+	Status fields
 */
 #domAppStatus
 {
@@ -167,6 +167,7 @@ a
 #domSearchStatus
 {
 	color:					red;
+	white-space: 			normal;		/* disable nowrap */
 }
 
 /*

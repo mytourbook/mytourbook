@@ -36,7 +36,7 @@ public class ActionHandler_OpenSearchView extends AbstractHandler {
 			final Event widgetEvent = (Event) event;
 			final int stateMask = widgetEvent.stateMask;
 
-			isCtrlKey = (stateMask & SWT.MOD1) > 0;
+			isCtrlKey = (stateMask & SWT.SHIFT) > 0;
 		}
 
 
