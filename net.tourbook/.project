@@ -41,7 +41,7 @@
 			<arguments>
 				<dictionary>
 					<key>LaunchConfigHandle</key>
-					<value>&lt;project&gt;/.externalToolBuilders/org.eclipse.wst.validation.validationbuilder (10).launch</value>
+					<value>&lt;project&gt;/.externalToolBuilders/org.eclipse.wst.validation.validationbuilder (2).launch</value>
 				</dictionary>
 			</arguments>
 		</buildCommand>
@@ -58,7 +58,13 @@
 		<link>
 			<name>dojo-EXTERNAL</name>
 			<type>2</type>
-			<location>C:/E/js-resources/dojo/WebContent-dojo</location>
+			<locationURI>MT_DOJO</locationURI>
 		</link>
 	</linkedResources>
+	<variableList>
+		<variable>
+			<name>MT_DOJO</name>
+			<value>file:/C:/E/js-resources/dojo/MyTourbook-DojoToolkit</value>
+		</variable>
+	</variableList>
 </projectDescription>

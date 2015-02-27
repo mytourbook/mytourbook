@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -63,6 +63,7 @@ import net.tourbook.ui.tourChart.action.ActionCanAutoZoomToSlider;
 import net.tourbook.ui.tourChart.action.ActionCanMoveSlidersWhenZoomed;
 import net.tourbook.ui.tourChart.action.ActionChartOptions;
 import net.tourbook.ui.tourChart.action.ActionGraph;
+import net.tourbook.ui.tourChart.action.ActionGraphOverlapped;
 import net.tourbook.ui.tourChart.action.ActionHrZoneDropDownMenu;
 import net.tourbook.ui.tourChart.action.ActionHrZoneGraphType;
 import net.tourbook.ui.tourChart.action.ActionShowBreaktimeValues;
@@ -109,6 +110,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 	public static final String			ACTION_ID_CAN_AUTO_ZOOM_TO_SLIDER		= "ACTION_ID_CAN_AUTO_ZOOM_TO_SLIDER";						//$NON-NLS-1$
 	public static final String			ACTION_ID_CAN_MOVE_SLIDERS_WHEN_ZOOMED	= "ACTION_ID_CAN_MOVE_SLIDERS_WHEN_ZOOMED";				//$NON-NLS-1$
 	public static final String			ACTION_ID_EDIT_CHART_PREFERENCES		= "ACTION_ID_EDIT_CHART_PREFERENCES";						//$NON-NLS-1$
+	private static final String			ACTION_ID_IS_GRAPH_OVERLAPPED			= "ACTION_ID_IS_GRAPH_OVERLAPPED";							//$NON-NLS-1$
 	public static final String			ACTION_ID_IS_SHOW_BREAKTIME_VALUES		= "ACTION_ID_IS_SHOW_BREAKTIME_VALUES";					//$NON-NLS-1$
 	public static final String			ACTION_ID_IS_SHOW_SRTM_DATA				= "ACTION_ID_IS_SHOW_SRTM_DATA";							//$NON-NLS-1$
 	public static final String			ACTION_ID_IS_SHOW_START_TIME			= "ACTION_ID_IS_SHOW_START_TIME";							//$NON-NLS-1$
@@ -209,6 +211,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
 		TourChart	__tourChart	= TourChart.this;
 
+		@Override
 		public void handleEvent(final Event event) {
 
 			if (__tourChart.isDisposed()) {
@@ -408,6 +411,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 //		});
 
 		addDisposeListener(new DisposeListener() {
+			@Override
 			public void widgetDisposed(final DisposeEvent e) {
 				onDispose();
 			}
@@ -516,6 +520,16 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		}
 
 		updateZoomOptionActionHandlers();
+	}
+
+	public void actionGraphOverlapped(final boolean isItemChecked) {
+
+		_prefStore.setValue(ITourbookPreferences.GRAPH_IS_GRAPH_OVERLAPPED, isItemChecked);
+
+		_tcc.isGraphOverlapped = isItemChecked;
+		updateTourChart(true);
+
+		setActionChecked(ACTION_ID_IS_GRAPH_OVERLAPPED, isItemChecked);
 	}
 
 	public void actionShowBreaktimeValues(final boolean isItemChecked) {
@@ -772,6 +786,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 	private void addPrefListeners() {
 
 		_prefChangeListener = new IPropertyChangeListener() {
+			@Override
 			public void propertyChange(final PropertyChangeEvent event) {
 
 				if (_tcc == null) {
@@ -986,6 +1001,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		_allTourChartActions.put(ACTION_ID_IS_SHOW_SRTM_DATA, new ActionShowSRTMData(this));
 		_allTourChartActions.put(ACTION_ID_IS_SHOW_START_TIME, new ActionShowStartTime(this));
 		_allTourChartActions.put(ACTION_ID_IS_SHOW_TOUR_PHOTOS, new ActionTourPhotos(this));
+		_allTourChartActions.put(ACTION_ID_IS_GRAPH_OVERLAPPED, new ActionGraphOverlapped(this));
 		_allTourChartActions.put(ACTION_ID_IS_SHOW_VALUEPOINT_TOOLTIP, new ActionShowValuePointToolTip(this));
 		_allTourChartActions.put(ACTION_ID_X_AXIS_DISTANCE, new ActionXAxisDistance(this));
 		_allTourChartActions.put(ACTION_ID_X_AXIS_TIME, new ActionXAxisTime(this));
@@ -1677,6 +1693,13 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		tourAction.setChecked(canShowSRTMData ? _tcc.isSRTMDataVisible : false);
 
 		/*
+		 * Overlapped graphs
+		 */
+		tourAction = _allTourChartActions.get(ACTION_ID_IS_GRAPH_OVERLAPPED);
+		tourAction.setEnabled(true);
+		tourAction.setChecked(_tcc.isGraphOverlapped);
+
+		/*
 		 * x-axis time/distance
 		 */
 		final boolean isShowTimeOnXAxis = _tcc.isShowTimeOnXAxis;
@@ -1761,6 +1784,8 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		tbm.add(_allTourChartActions.get(getGraphActionId(TourManager.GRAPH_ALTIMETER)));
 		tbm.add(_allTourChartActions.get(getGraphActionId(TourManager.GRAPH_CADENCE)));
 
+		tbm.add(new Separator());
+		tbm.add(_allTourChartActions.get(ACTION_ID_IS_GRAPH_OVERLAPPED));
 		tbm.add(_allTourChartActions.get(ACTION_ID_HR_ZONE_DROPDOWN_MENU));
 		tbm.add(_allTourChartActions.get(ACTION_ID_IS_SHOW_TOUR_PHOTOS));
 		tbm.add(_actionTourChartMarker);
@@ -1889,10 +1914,6 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 	public TourMarker getSelectedTourMarker() {
 		return _selectedTourMarker;
 	}
-
-//	ChartLabel getMarkerTooltipLabel() {
-//		return _tooltipLabel;
-//	}
 
 	@Override
 	public ArrayList<TourData> getSelectedTours() {

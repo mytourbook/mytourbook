@@ -4,3 +4,24 @@ Detected Problems in 13.2:
 * photo gallery in the tour marker dialog box it not correctly initialized, state is not set
 * tooltip flickering occures only with bad display drivers !!!
 
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+E4 and Java 8
+
+MyTourbook do not run when it is exported with E4/Java 8, in the dev environment it runs with Java 8. The problem with exported and E4/Java 8 is, that the application cannot be closed with the close button, it must be killed in the task manager.
+ 
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+ XULRunner for windows requires 32 bit Java
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+ The search Web 2.0 do not run with an IBM JVM because it do not include the com.sun.net.httpserver.* components.
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+Ubuntu with XULRunner and browser.setUrl() will crash, browser.setText() is working, why?
+
+Tested with browser.setText() and the file:/// protocol but this is also not working with the error "Access is denied." even when lot of Dojo files are loaded but not all. Dojo also do not support the file:/// protocol.
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!

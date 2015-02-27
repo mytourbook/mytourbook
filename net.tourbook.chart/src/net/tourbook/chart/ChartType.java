@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2012  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -16,12 +16,6 @@
 package net.tourbook.chart;
 
 public enum ChartType {
-
-//	public static final int				CHART_TYPE_LINE				= 10;
-//	public static final int				CHART_TYPE_BAR				= 20;
-//	public static final int				CHART_TYPE_LINE_WITH_BARS	= 30;
-//	public static final int				CHART_TYPE_XY_SCATTER		= 40;
-//	public static final int				CHART_TYPE_HISTORY			= 50;
 
 	LINE,
 

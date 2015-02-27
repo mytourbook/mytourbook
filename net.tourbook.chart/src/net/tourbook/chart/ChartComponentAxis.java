@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -105,12 +105,14 @@ public class ChartComponentAxis extends Canvas {
 		});
 
 		addPaintListener(new PaintListener() {
+			@Override
 			public void paintControl(final PaintEvent event) {
 				onPaint(event.gc);
 			}
 		});
 
 		addDisposeListener(new DisposeListener() {
+			@Override
 			public void widgetDisposed(final DisposeEvent e) {
 				_axisImage = Util.disposeResource(_axisImage);
 			}
@@ -138,14 +140,17 @@ public class ChartComponentAxis extends Canvas {
 
 		addMouseTrackListener(new MouseTrackListener() {
 
+			@Override
 			public void mouseEnter(final MouseEvent e) {
 				onMouseEnter(e);
 			}
 
+			@Override
 			public void mouseExit(final MouseEvent e) {
 				onMouseExit(e);
 			}
 
+			@Override
 			public void mouseHover(final MouseEvent e) {}
 		});
 
@@ -161,6 +166,7 @@ public class ChartComponentAxis extends Canvas {
 		});
 
 		addListener(SWT.MouseWheel, new Listener() {
+			@Override
 			public void handleEvent(final Event event) {
 				onMouseWheel(event);
 			}
@@ -345,10 +351,35 @@ public class ChartComponentAxis extends Canvas {
 
 		gc.setLineStyle(SWT.LINE_SOLID);
 
+		int graphNo = 0;
+		final int lastGraphNo = _graphDrawingData.size();
+
+		final boolean isGraphOverlapped = _componentGraph._isChartOverlapped;
+		final boolean canChartBeOverlapped = _componentGraph._canChartBeOverlapped;
+		final boolean isStackedChart = !isGraphOverlapped;
+
 		final int devX = _isLeft ? axisRect.width - 1 : 0;
 
 		// loop: all graphs
 		for (final GraphDrawingData drawingData : _graphDrawingData) {
+
+			graphNo++;
+
+			final boolean isLastGraph = graphNo == lastGraphNo;
+//			final boolean isFirstGraph = graphNo == 1;
+
+			/*
+			 * Draw units only for the last overlapped graph
+			 */
+
+			final boolean isLastOverlappedGraph = isGraphOverlapped && isLastGraph;
+
+			final boolean isDrawGridAndUnits = !canChartBeOverlapped
+					|| (canChartBeOverlapped && (isStackedChart || isLastOverlappedGraph));
+
+			if (isDrawGridAndUnits == false) {
+				continue;
+			}
 
 			final ArrayList<ChartUnit> yUnits = drawingData.getYUnits();
 			final int numberOfUnits = yUnits.size();
@@ -367,7 +398,7 @@ public class ChartComponentAxis extends Canvas {
 			final int devYTop = devYBottom - devGraphHeight;
 
 			/*
-			 * draw axis title
+			 * Draw y-axis title
 			 */
 			if (_isLeft && title != null) {
 
@@ -410,9 +441,11 @@ public class ChartComponentAxis extends Canvas {
 				fgColor.dispose();
 			}
 
+			/*
+			 * Draw y units
+			 */
 			int devY;
 
-			// loop: all units
 			for (final ChartUnit yUnit : yUnits) {
 
 				final double unitValue = yUnit.value;

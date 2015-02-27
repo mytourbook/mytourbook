@@ -396,6 +396,8 @@ public class TourManager {
 		tcc.xAxisTime = isTourStartTime ? X_AXIS_START_TIME.TOUR_START_TIME : X_AXIS_START_TIME.START_WITH_0;
 		tcc.isSRTMDataVisible = _prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_SRTM_VISIBLE);
 
+		tcc.isGraphOverlapped = _prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_GRAPH_OVERLAPPED);
+
 		tcc.isShowTourPhotos = _prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_TOUR_PHOTO_VISIBLE);
 		tcc.isShowTourPhotoTooltip = _prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_TOUR_PHOTO_TOOLTIP_VISIBLE);
 
@@ -447,10 +449,12 @@ public class TourManager {
 												final Object customData,
 												final IWorkbenchPart part) {
 
-		final Object[] allListeners = _tourEventListeners.getListeners();
-		for (final Object listener : allListeners) {
-			((ITourEventListener) listener).tourChanged(part, tourEventId, customData);
-		}
+		fireEvent(tourEventId, customData, part);
+
+//		final Object[] allListeners = _tourEventListeners.getListeners();
+//		for (final Object listener : allListeners) {
+//			((ITourEventListener) listener).tourChanged(part, tourEventId, customData);
+//		}
 	}
 
 	public static int[] getAllGraphIDs() {
@@ -761,6 +765,7 @@ public class TourManager {
 		 */
 		Display.getDefault().syncExec(new Runnable() {
 
+			@Override
 			public void run() {
 
 				try {
@@ -2366,6 +2371,7 @@ public class TourManager {
 		}
 
 		chartDataModel.setShowNoLineValues(tourChartConfig.isShowBreaktimeValues);
+		chartDataModel.setIsGraphOverlapped(tourChartConfig.isGraphOverlapped);
 
 		chartDataModel.setCustomData(CUSTOM_DATA_TIME, xDataTime);
 		chartDataModel.setCustomData(CUSTOM_DATA_DISTANCE, xDataDist);

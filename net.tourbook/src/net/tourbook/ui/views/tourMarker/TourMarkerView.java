@@ -137,8 +137,10 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 
 	class MarkerViewerContentProvicer implements IStructuredContentProvider {
 
+		@Override
 		public void dispose() {}
 
+		@Override
 		public Object[] getElements(final Object inputElement) {
 			if (_tourData == null) {
 				return new Object[0];
@@ -147,6 +149,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 			}
 		}
 
+		@Override
 		public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
 	}
 
@@ -173,10 +176,13 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 
 		_partListener = new IPartListener2() {
 
+			@Override
 			public void partActivated(final IWorkbenchPartReference partRef) {}
 
+			@Override
 			public void partBroughtToTop(final IWorkbenchPartReference partRef) {}
 
+			@Override
 			public void partClosed(final IWorkbenchPartReference partRef) {
 				if (partRef.getPart(false) == TourMarkerView.this) {
 
@@ -185,14 +191,19 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 				}
 			}
 
+			@Override
 			public void partDeactivated(final IWorkbenchPartReference partRef) {}
 
+			@Override
 			public void partHidden(final IWorkbenchPartReference partRef) {}
 
+			@Override
 			public void partInputChanged(final IWorkbenchPartReference partRef) {}
 
+			@Override
 			public void partOpened(final IWorkbenchPartReference partRef) {}
 
+			@Override
 			public void partVisible(final IWorkbenchPartReference partRef) {}
 		};
 		getViewSite().getPage().addPartListener(_partListener);
@@ -201,6 +212,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 	private void addPrefListener() {
 
 		_prefChangeListener = new IPropertyChangeListener() {
+			@Override
 			public void propertyChange(final PropertyChangeEvent event) {
 
 				final String property = event.getProperty();
@@ -242,6 +254,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 
 		_postSelectionListener = new ISelectionListener() {
 
+			@Override
 			public void selectionChanged(final IWorkbenchPart part, final ISelection selection) {
 
 				if (part == TourMarkerView.this) {
@@ -257,6 +270,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 	private void addTourEventListener() {
 
 		_tourEventListener = new ITourEventListener() {
+			@Override
 			public void tourChanged(final IWorkbenchPart part, final TourEventId eventId, final Object eventData) {
 
 				if (_isInUpdate) {
@@ -292,6 +306,10 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 							}
 						}
 					}
+
+				} else if ((eventId == TourEventId.TOUR_SELECTION) && eventData instanceof ISelection) {
+
+					onSelectionChanged((ISelection) eventData);
 
 				} else if (eventId == TourEventId.MARKER_SELECTION) {
 
@@ -401,12 +419,14 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 		_markerViewer.setSorter(new MarkerViewerSorter());
 
 		_markerViewer.addSelectionChangedListener(new ISelectionChangedListener() {
+			@Override
 			public void selectionChanged(final SelectionChangedEvent event) {
 				onSelect_TourMarker((StructuredSelection) event.getSelection());
 			}
 		});
 
 		_markerViewer.addDoubleClickListener(new IDoubleClickListener() {
+			@Override
 			public void doubleClick(final DoubleClickEvent event) {
 
 				if (isTourSavedInDb() == false) {
@@ -433,6 +453,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 		final MenuManager menuMgr = new MenuManager("#PopupMenu"); //$NON-NLS-1$
 		menuMgr.setRemoveAllWhenShown(true);
 		menuMgr.addMenuListener(new IMenuListener() {
+			@Override
 			public void menuAboutToShow(final IMenuManager manager) {
 				fillContextMenu(manager);
 			}
@@ -754,6 +775,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 		return _markerViewer;
 	}
 
+	@Override
 	public ArrayList<TourData> getSelectedTours() {
 
 		final ArrayList<TourData> selectedTours = new ArrayList<TourData>();
@@ -932,6 +954,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 
 		// a tour is not displayed, find a tour provider which provides a tour
 		Display.getCurrent().asyncExec(new Runnable() {
+			@Override
 			public void run() {
 
 				// validate widget

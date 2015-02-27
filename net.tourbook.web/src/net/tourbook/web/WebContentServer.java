@@ -26,12 +26,14 @@ import java.net.URI;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import net.tourbook.common.ReplacingOutputStream;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
@@ -48,38 +50,58 @@ import com.sun.net.httpserver.HttpServer;
  */
 public class WebContentServer {
 
-	private static boolean					IS_DEBUG_PORT				= true;
+	private static final boolean			IS_DEBUG_PORT				= false;
 	private static final int				NUMBER_OF_SERVER_THREADS	= 1;
 
 	// logs: time, url
-	private static boolean					LOG_URL						= true;
+	private static boolean					LOG_URL						= false;
 	private static boolean					LOG_DOJO					= false;
 
 	// logs: header
 	private static boolean					LOG_HEADER					= false;
 
 	// logs: xhr
-	private static boolean					LOG_XHR						= true;
+	public static boolean					LOG_XHR						= false;
 
-	private static final String				ROOT_FILE_PATH_NAME			= "/";					//$NON-NLS-1$
+	private static boolean					IS_LOGGING					= LOG_URL || LOG_XHR || LOG_HEADER || LOG_DOJO;
 
-	private static final String				PROTOCOL_HTTP				= "http://";			//$NON-NLS-1$
-	private static final String				PROTOCOL_COLUMN				= ":";					//$NON-NLS-1$
+	// variables which are replaced in .mthtml files
+	private static final String				MTHTML_DOJO_SEARCH			= "DOJO_SEARCH";								//$NON-NLS-1$
+	private static final String				MTHTML_MESSAGE_LOADING		= "MESSAGE_LOADING";							//$NON-NLS-1$
+	private static final String				MTHTML_MESSAGE_SEARCH_TITLE	= "MESSAGE_SEARCH_TITLE";						//$NON-NLS-1$
+	private static final String				MTHTML_LOCALE				= "LOCALE";									//$NON-NLS-1$
 
-	private static final String				DOJO_PATH					= "/WebContent-dojo/";	//$NON-NLS-1$
-	private static final String				REQUEST_PATH_TOURBOOK		= "/tourbook";			//$NON-NLS-1$
+	private static final String				ROOT_FILE_PATH_NAME			= "/";											//$NON-NLS-1$
 
-	private static final String				XHR_HEADER_KEY				= "X-requested-with";	//$NON-NLS-1$
-	private static final String				XHR_HEADER_VALUE			= "XMLHttpRequest";	//$NON-NLS-1$
+	private static final String				URI_INNER_PROTOCOL_FILE		= "/file:";									//$NON-NLS-1$
 
-	static String							SERVER_URL;
+	private static final String				REQUEST_PATH_TOURBOOK		= "/tourbook";									//$NON-NLS-1$
+
+	private static final String				XHR_HEADER_KEY				= "X-requested-with";							//$NON-NLS-1$
+	private static final String				XHR_HEADER_VALUE			= "XMLHttpRequest";							//$NON-NLS-1$
+
+	private static final String				ICON_RESOURCE_REQUEST		= "/$MT-ICON$/";								//$NON-NLS-1$
+
+	private static final String				DOJO_ROOT					= "/dojo/";									//$NON-NLS-1$
+	private static final String				DOJO_DIJIT					= "/dijit/";									//$NON-NLS-1$
+	private static final String				DOJO_DGRID					= "/dgrid/";									//$NON-NLS-1$
+	private static final String				DOJO_DSTORE					= "/dstore/";									//$NON-NLS-1$
+	private static final String				DOJO_PUT_SELECTOR			= "/put-selector/";							//$NON-NLS-1$
+	private static final String				DOJO_XSTYLE					= "/xstyle/";									//$NON-NLS-1$
+
+	public static final String				SERVER_URL;
 
 	private static Map<String, XHRHandler>	_allXHRHandler				= new HashMap<>();
+	private static Map<String, Object>		_mthtmlValues				= new HashMap<>();
 
+	/**
+	 * Possible alternative: https://github.com/NanoHttpd/nanohttpd
+	 */
 	private static HttpServer				_server;
 	private static final int				_serverPort;
 
 	private static InetSocketAddress		inetAddress;
+	private static IconRequestHandler		_iconRequestHandler;
 
 	private String[]						set;
 
@@ -94,7 +116,78 @@ public class WebContentServer {
 		final InetAddress loopbackAddress = InetAddress.getLoopbackAddress();
 		inetAddress = new InetSocketAddress(loopbackAddress, _serverPort);
 
-		SERVER_URL = PROTOCOL_HTTP + loopbackAddress.getHostAddress() + PROTOCOL_COLUMN + _serverPort;
+		SERVER_URL = WEB.PROTOCOL_HTTP + loopbackAddress.getHostAddress() + ':' + _serverPort;
+
+//
+// This font is disabled because it is not easy to read it.
+//
+//		/*
+//		 * Set css font to the same as the whole app.
+//		 */
+//		final FontData dlgFont = JFaceResources.getDialogFont().getFontData()[0];
+//
+//		final float fontHeight = dlgFont.getHeight() * 1.0f;
+//		final String fontSize = String.format(Locale.US, "%.1f", fontHeight);
+//
+//		final String cssFont = ""//
+//				+ "<style>															\n"
+//				+ "body																\n"
+//				+ "{																\n"
+//				+ ("	font-family:	" + dlgFont.getName() + ", sans-serif;		\n")
+//				+ ("	font-size:		" + fontSize + "pt;							\n")
+//
+//				/*
+//				 * IE do not set the font weight correctly, 599 is too light compared the external
+//				 * IE, 600 is heavier than the external IE, 400 is by definition the default.
+//				 */
+//				+ "		font-weight:	400;										\n"
+//				+ "}																\n"
+//				+ "</STYLE>															\n";
+
+		// Steps when switching between DEBUG and RELEASE build:
+		// =====================================================
+		// - Set DEBUG flag in WEB.java
+		// - Run ant file Create-Dojo-Bundle.xml when RELEASE build is enabled.
+		// - Restart app.
+
+		final String dojoSearch = WEB.IS_DEBUG //
+
+				? "" //$NON-NLS-1$
+
+						// DEBUG build
+						+ "	<link rel='stylesheet' href='search.css'>					\n" //$NON-NLS-1$
+						+ "	<script src='/dojo/dojo.js'></script>						\n" //$NON-NLS-1$
+
+				: "" //$NON-NLS-1$
+
+						// RELEASE build
+						+ "	<link rel='stylesheet' href='search.css.jgz'>				\n" //$NON-NLS-1$
+						+ "	<script src='/dojo/dojo.js.jgz'></script>					\n" //$NON-NLS-1$
+						+ "	<script src='/tourbook/search/SearchApp.js.jgz'></script>	\n" //$NON-NLS-1$
+		;
+
+//		dojoSearch += cssFont;
+
+		/*
+		 * Get valid locale, invalid locale will cause errors of not supported Dojo files.
+		 */
+		final String uiLanguage = Locale.getDefault().getLanguage();
+		String dojoLocale = WEB.DEFAULT_LANGUAGE;
+
+		for (final String suppLanguage : WEB.SUPPORTED_LANGUAGES) {
+			if (suppLanguage.equals(uiLanguage)) {
+				dojoLocale = suppLanguage;
+				break;
+			}
+		}
+
+		/*
+		 * Text replacements for commen messages.
+		 */
+		_mthtmlValues.put(MTHTML_DOJO_SEARCH, dojoSearch);
+		_mthtmlValues.put(MTHTML_LOCALE, dojoLocale);
+		_mthtmlValues.put(MTHTML_MESSAGE_LOADING, Messages.Web_Page_ContentLoading);
+		_mthtmlValues.put(MTHTML_MESSAGE_SEARCH_TITLE, Messages.Web_Page_Search_Title);
 	}
 
 	private static class DefaultHandler implements HttpHandler {
@@ -125,7 +218,8 @@ public class WebContentServer {
 
 			boolean isResourceUrl = false;
 
-			final String rootPath = WEB.getFile(ROOT_FILE_PATH_NAME).getCanonicalFile().getPath();
+			final File rootFile = WEB.getFile(ROOT_FILE_PATH_NAME);
+			final String rootPath = rootFile.getCanonicalFile().getPath();
 
 			final URI requestURI = httpExchange.getRequestURI();
 			String requestUriPath = requestURI.getPath();
@@ -136,45 +230,58 @@ public class WebContentServer {
 			final String xhrValue = requestHeaders.getFirst(XHR_HEADER_KEY);
 			final boolean isXHR = XHR_HEADER_VALUE.equals(xhrValue);
 
-			final String DOJO_ROOT = "/dojo/";
-			final String DOJO_DIJIT = "/dijit/";
-			final String DOJO_DGRID = "/dgrid/";
-			final String DOJO_DSTORE = "/dstore/";
-			final String DOJO_PUT_SELECTOR = "/put-selector/";
-			final String DOJO_XSTYLE = "/xstyle/";
+			final boolean isIconRequest = requestUriPath.startsWith(ICON_RESOURCE_REQUEST);
 
 			boolean isDojoRequest = false;
 
-			if (requestUriPath.startsWith(DOJO_ROOT)
-					|| requestUriPath.startsWith(DOJO_DIJIT)
-					|| requestUriPath.startsWith(DOJO_DGRID)
-					|| requestUriPath.startsWith(DOJO_DSTORE)
-					|| requestUriPath.startsWith(DOJO_PUT_SELECTOR)
-					|| requestUriPath.startsWith(DOJO_XSTYLE)
+			if (WEB.IS_DEBUG
+					&& (requestUriPath.startsWith(DOJO_ROOT)
+							|| requestUriPath.startsWith(DOJO_DIJIT)
+							|| requestUriPath.startsWith(DOJO_DGRID)
+							|| requestUriPath.startsWith(DOJO_DSTORE)
+							|| requestUriPath.startsWith(DOJO_PUT_SELECTOR) || requestUriPath.startsWith(DOJO_XSTYLE))
 			//
 			) {
 				isDojoRequest = true;
-				requestUriPath = DOJO_PATH + requestUriPath;
+				requestUriPath = WEB.DOJO_TOOLKIT_FOLDER + requestUriPath;
 			}
 
+			/*
+			 * Log request
+			 */
 			if (isDojoRequest) {
 				if (LOG_DOJO) {
 					log.append(requestUriPath);
 				}
+			} else if (isXHR) {
+
+				if (LOG_XHR) {
+					log.append(requestUriPath);
+					logParameter(httpExchange, log);
+				}
+
 			} else {
 
-				if (LOG_URL || LOG_XHR) {
+				if (LOG_URL) {
 					log.append(requestUriPath);
-				}
-				if (LOG_URL && LOG_XHR) {
-					logParameter(httpExchange, log);
 				}
 				if (LOG_HEADER && isXHR) {
 					logHeader(log, headerEntries);
 				}
 			}
 
-			if (isXHR) {
+			/*
+			 * Handle request
+			 */
+			if (isIconRequest) {
+
+				final String iconFilename = requestUriPath.substring(
+						ICON_RESOURCE_REQUEST.length(),
+						requestUriPath.length());
+
+				handle_Icon(httpExchange, iconFilename, log);
+
+			} else if (isXHR) {
 
 				// XHR request
 
@@ -189,7 +296,7 @@ public class WebContentServer {
 					// Dojo requests
 
 					isResourceUrl = true;
-					requestedOSPath = "C:/E/js-resources/dojo/" + requestUriPath;
+					requestedOSPath = WEB.DEBUG_PATH_DOJO + requestUriPath;
 
 				} else if (requestUriPath.startsWith(REQUEST_PATH_TOURBOOK)) {
 
@@ -197,6 +304,11 @@ public class WebContentServer {
 
 					isResourceUrl = true;
 					requestedOSPath = rootPath + requestUriPath;
+
+				} else if (requestUriPath.startsWith(URI_INNER_PROTOCOL_FILE)) {
+
+					isResourceUrl = true;
+					requestedOSPath = requestUriPath.substring(URI_INNER_PROTOCOL_FILE.length());
 
 				} else {
 
@@ -208,6 +320,10 @@ public class WebContentServer {
 				if (requestedOSPath != null) {
 
 					final File file = new File(requestedOSPath).getCanonicalFile();
+
+					if (LOG_URL) {
+//						log.append("\t-->\t" + file.toString());
+					}
 
 					if (!file.getPath().startsWith(rootPath) && !isResourceUrl) {
 
@@ -234,9 +350,9 @@ public class WebContentServer {
 			StatusUtil.log(e);
 		} finally {
 
-			if (log.length() > 0 && (LOG_URL || LOG_XHR || LOG_HEADER || LOG_DOJO)) {
+			if (log.length() > 0 && IS_LOGGING) {
 
-				final String msg = String.format("%s %5.1f ms  %-16s [%s] %s", //
+				final String msg = String.format("%s %5.1f ms  %-16s [%s] %s", // //$NON-NLS-1$
 						UI.timeStampNano(),
 						(float) (System.nanoTime() - start) / 1000000,
 						Thread.currentThread().getName(),
@@ -254,13 +370,13 @@ public class WebContentServer {
 
 		try {
 
-			final String response = "403 (Forbidden)\n";
+			final String response = "403 (Forbidden)\n";//$NON-NLS-1$
 			httpExchange.sendResponseHeaders(403, response.length());
 
 			os = httpExchange.getResponseBody();
 			os.write(response.getBytes());
 
-			StatusUtil.log(response + " " + file.getPath());
+			StatusUtil.log(response + " " + file.getPath());//$NON-NLS-1$
 
 		} catch (final Exception e) {
 			StatusUtil.log(e);
@@ -275,13 +391,13 @@ public class WebContentServer {
 
 		try {
 
-			final String response = String.format("%s\n404 (Not Found)\n", requestUriPath);
+			final String response = String.format("%s\n404 (Not Found)\n", requestUriPath);//$NON-NLS-1$
 			httpExchange.sendResponseHeaders(404, response.length());
 
 			os = httpExchange.getResponseBody();
 			os.write(response.getBytes());
 
-			StatusUtil.log(response + " " + file.getPath());
+			StatusUtil.log(response + " " + file.getPath());//$NON-NLS-1$
 
 		} catch (final Exception e) {
 			StatusUtil.log(e);
@@ -294,19 +410,36 @@ public class WebContentServer {
 
 		FileInputStream fs = null;
 		OutputStream os = null;
+		ReplacingOutputStream replacingOS = null;
 
 		try {
 
-			WEB.setResponseHeaderContentType(httpExchange, file);
+			final String extension = WEB.setResponseHeaderContentType(httpExchange, file);
+
 			httpExchange.sendResponseHeaders(200, 0);
 
-			os = httpExchange.getResponseBody();
 			fs = new FileInputStream(file);
+			os = httpExchange.getResponseBody();
 
-			final byte[] buffer = new byte[0x10000];
-			int count = 0;
-			while ((count = fs.read(buffer)) >= 0) {
-				os.write(buffer, 0, count);
+			if (extension.equals(WEB.FILE_EXTENSION_MTHTML)) {
+
+				// replaces also values in .mthtml files
+
+				replacingOS = new ReplacingOutputStream(os, _mthtmlValues);
+
+				int c;
+
+				while ((c = fs.read()) != -1) {
+					replacingOS.write(c);
+				}
+
+			} else {
+
+				final byte[] buffer = new byte[0x10000];
+				int count = 0;
+				while ((count = fs.read(buffer)) >= 0) {
+					os.write(buffer, 0, count);
+				}
 			}
 
 		} catch (final Exception e) {
@@ -315,6 +448,22 @@ public class WebContentServer {
 
 			Util.close(fs);
 			Util.close(os);
+			Util.close(replacingOS);
+		}
+	}
+
+	private static void handle_Icon(final HttpExchange httpExchange, final String iconFilename, final StringBuilder log) {
+
+		try {
+
+			if (_iconRequestHandler == null) {
+				StatusUtil.logError("IconRequestHandler is not set for " + iconFilename);//$NON-NLS-1$
+			} else {
+				_iconRequestHandler.handleIconRequest(httpExchange, iconFilename, log);
+			}
+
+		} catch (final Exception e) {
+			StatusUtil.log(e);
 		}
 	}
 
@@ -342,10 +491,11 @@ public class WebContentServer {
 			}
 
 			final String xhrKey = requestUriPath;
+
 			final XHRHandler xhrHandler = _allXHRHandler.get(xhrKey);
 
 			if (xhrHandler == null) {
-				StatusUtil.logError("XHR handler is not set for " + xhrKey);
+				StatusUtil.logError("XHR handler is not set for " + xhrKey);//$NON-NLS-1$
 			} else {
 				xhrHandler.handleXHREvent(httpExchange, log);
 			}
@@ -361,10 +511,10 @@ public class WebContentServer {
 
 	private static void logHeader(final StringBuilder log, final Set<Entry<String, List<String>>> headerEntries) {
 
-		log.append("\n");
+		log.append("\n");//$NON-NLS-1$
 
 		for (final Entry<String, List<String>> entry : headerEntries) {
-			log.append(String.format("%-20s %s\n", entry.getKey(), entry.getValue()));
+			log.append(String.format("%-20s %s\n", entry.getKey(), entry.getValue()));//$NON-NLS-1$
 		}
 	}
 
@@ -377,7 +527,7 @@ public class WebContentServer {
 				.getAttribute(RequestParameterFilter.ATTRIBUTE_PARAMETERS);
 
 		if (params.size() > 0) {
-			log.append("\tparams: " + params);
+			log.append("\tparams: " + params);//$NON-NLS-1$
 		}
 	}
 
@@ -390,6 +540,10 @@ public class WebContentServer {
 		return _allXHRHandler.remove(xhrKey);
 	}
 
+	public static void setIconRequestHandler(final IconRequestHandler iconRequestHandler) {
+		_iconRequestHandler = iconRequestHandler;
+	}
+
 	public static void start() {
 
 		if (_server != null) {
@@ -400,7 +554,7 @@ public class WebContentServer {
 
 			_server = HttpServer.create(inetAddress, 0);
 
-			final HttpContext context = _server.createContext("/", new DefaultHandler());
+			final HttpContext context = _server.createContext("/", new DefaultHandler());//$NON-NLS-1$
 
 			// convert uri query parameters into a "parameters" map
 			context.getFilters().add(new RequestParameterFilter());
@@ -431,7 +585,7 @@ public class WebContentServer {
 
 	@Override
 	public String toString() {
-		return "WebContentServer [set=" + Arrays.toString(set) + "]";
+		return "WebContentServer [set=" + Arrays.toString(set) + "]"; //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 }

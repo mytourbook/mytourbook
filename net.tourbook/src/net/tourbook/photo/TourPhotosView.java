@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2012  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2015  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -25,6 +25,7 @@ import net.tourbook.data.TourData;
 import net.tourbook.tour.ITourEventListener;
 import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.SelectionTourIds;
+import net.tourbook.tour.SelectionTourMarker;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.UI;
@@ -218,6 +219,7 @@ public class TourPhotosView extends ViewPart implements IPhotoEventListener {
 	private void addPrefListener() {
 
 		_prefChangeListener = new IPropertyChangeListener() {
+			@Override
 			public void propertyChange(final PropertyChangeEvent event) {
 
 				final String property = event.getProperty();
@@ -237,6 +239,7 @@ public class TourPhotosView extends ViewPart implements IPhotoEventListener {
 	private void addSelectionListener() {
 
 		_postSelectionListener = new ISelectionListener() {
+			@Override
 			public void selectionChanged(final IWorkbenchPart part, final ISelection selection) {
 				if (part == TourPhotosView.this) {
 					return;
@@ -250,6 +253,7 @@ public class TourPhotosView extends ViewPart implements IPhotoEventListener {
 	private void addTourEventListener() {
 
 		_tourEventListener = new ITourEventListener() {
+			@Override
 			public void tourChanged(final IWorkbenchPart part, final TourEventId eventId, final Object eventData) {
 
 				if (part == TourPhotosView.this) {
@@ -259,6 +263,14 @@ public class TourPhotosView extends ViewPart implements IPhotoEventListener {
 				if (eventId == TourEventId.TOUR_CHANGED || eventId == TourEventId.UPDATE_UI) {
 
 					// check if a tour must be updated
+
+				} else if (eventId == TourEventId.MARKER_SELECTION && eventData instanceof SelectionTourMarker) {
+
+					onSelectionChanged((SelectionTourMarker) eventData);
+
+				} else if ((eventId == TourEventId.TOUR_SELECTION) && eventData instanceof ISelection) {
+
+					onSelectionChanged((ISelection) eventData);
 
 				} else if (eventId == TourEventId.CLEAR_DISPLAYED_TOUR) {
 
@@ -469,13 +481,19 @@ public class TourPhotosView extends ViewPart implements IPhotoEventListener {
 
 			updateUI(allPhotos);
 
+		} else if (selection instanceof SelectionTourMarker) {
+
+			final TourData tourData = ((SelectionTourMarker) selection).getTourData();
+
+			getPhotos(allPhotos, tourData);
+			updateUI(allPhotos);
+
 		} else if (selection instanceof SelectionTourId) {
 
 			final SelectionTourId tourIdSelection = (SelectionTourId) selection;
 			final TourData tourData = TourManager.getInstance().getTourData(tourIdSelection.getTourId());
 
 			getPhotos(allPhotos, tourData);
-
 			updateUI(allPhotos);
 
 		} else if (selection instanceof SelectionTourIds) {

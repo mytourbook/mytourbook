@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -55,11 +55,13 @@ public class ChartDataModel {
 	private HashMap<String, Object>		_customData					= new HashMap<String, Object>();
 
 	/**
-	 * true: the chart graphs are separate drawn vertically
-	 * <p>
-	 * false: the chart graphs are drawn on top of each other
+	 * Is <code>true</code> when the graphs are all painted at the same position to overlap each
+	 * other. <br>
+	 * Is <code>false</code> when the graphs are painted vertically positioned above each other
+	 * (which is the default since the first 10 years and also the reason why MyTourbook was
+	 * created).
 	 */
-	private boolean						_isStackedChart				= true;
+	private boolean						_isGraphOverlapped;
 
 	/**
 	 * minimum width for the chart, this can be overwritten for e.g. to show in a year chart for
@@ -77,8 +79,6 @@ public class ChartDataModel {
 	 */
 	private boolean						_isNoLinesValuesDisplayed;
 
-//	private IChartInfoPainter			_chartInfoPainter;
-
 	public ChartDataModel(final ChartType chartType) {
 		_chartType = chartType;
 	}
@@ -93,13 +93,6 @@ public class ChartDataModel {
 	public void addYData(final ChartDataYSerie data) {
 		_yData.add(data);
 	}
-
-//	/**
-//	 * @return the _chartInfoPainter
-//	 */
-//	public IChartInfoPainter getChartInfoPainter() {
-//		return _chartInfoPainter;
-//	}
 
 	public int getChartMinWidth() {
 		return _chartMinWidth;
@@ -162,12 +155,19 @@ public class ChartDataModel {
 		return _yData;
 	}
 
-	public boolean isNoLinesValuesDisplayed() {
-		return _isNoLinesValuesDisplayed;
+	/**
+	 * @return Returns <code>true</code> when all graphs are painted at the same position to overlap
+	 *         each other.<br>
+	 *         Returns <code>false</code> when the graphs are painted vertically positioned above
+	 *         each other (which is the default since the first 10 years and also the reason why
+	 *         MyTourbook was created).
+	 */
+	public boolean isGraphOverlapped() {
+		return _isGraphOverlapped;
 	}
 
-	public boolean isStackedChart() {
-		return _isStackedChart;
+	public boolean isNoLinesValuesDisplayed() {
+		return _isNoLinesValuesDisplayed;
 	}
 
 	/**
@@ -183,14 +183,6 @@ public class ChartDataModel {
 			ySerie._visibleMaxValue = ySerie.getOriginalMaxValue();
 		}
 	}
-
-//	/**
-//	 * @param chartInfoPainter
-//	 *            the _chartInfoPainter to set
-//	 */
-//	public void setChartInfoPainter(final IChartInfoPainter chartInfoPainter) {
-//		_chartInfoPainter = chartInfoPainter;
-//	}
 
 	public void setChartMinWidth(final int chartMinWidth) {
 		_chartMinWidth = chartMinWidth;
@@ -212,12 +204,12 @@ public class ChartDataModel {
 		_errorMessage = errorMessage;
 	}
 
-	public void setShowNoLineValues(final boolean isNoLinesValuesDisplayed) {
-		_isNoLinesValuesDisplayed = isNoLinesValuesDisplayed;
+	public void setIsGraphOverlapped(final boolean isOverlapped) {
+		_isGraphOverlapped = isOverlapped;
 	}
 
-	public void setStackedChart(final boolean isStackedChart) {
-		_isStackedChart = isStackedChart;
+	public void setShowNoLineValues(final boolean isNoLinesValuesDisplayed) {
+		_isNoLinesValuesDisplayed = isNoLinesValuesDisplayed;
 	}
 
 	public void setTitle(final String title) {

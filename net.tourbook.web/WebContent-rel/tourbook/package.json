@@ -1,0 +1,9 @@
+{
+	"name":			"mytourbook",
+	"version":		"14.14.1",
+	
+	"description":	"MyTourbook web applications.",
+	"homepage":		"http://mytourbook.sourceforge.net",
+	
+	"dojoBuild":	"build-profile.js",
+}

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?pde version="3.5"?>
 
-<product name="MyTourbook" uid="net.tourbook.product" id="net.tourbook.product" application="net.tourbook.application" version="14.14.0.qualifier" useFeatures="true" includeLaunchers="true">
+<product name="MyTourbook" uid="net.tourbook.product" id="net.tourbook.product" application="net.tourbook.application" version="15.3.0.qualifier" useFeatures="true" includeLaunchers="true">
 
    <aboutInfo>
       <image path="/net.tourbook/icons/application/tourbook-about.png"/>
@@ -21,9 +21,12 @@
       <programArgs>#_enable_debug_mode_by_removing_the_#_character_in_the_next_lines
 #-consolelog 
 #-debug
-#-clean</programArgs>
-      <vmArgs>-Xmx1024m</vmArgs>
-      <vmArgsLin>-Dorg.eclipse.swt.browser.XULRunnerPath=/opt/xulrunner</vmArgsLin>
+#-clean
+      </programArgs>
+      <vmArgs>-Xmx1024m
+      </vmArgs>
+      <vmArgsLin>-Dorg.eclipse.swt.browser.XULRunnerPath=/opt/xulrunner
+      </vmArgsLin>
    </launcherArgs>
 
    <windowImages i16="/net.tourbook/icons/application/tourbook16.png" i32="/net.tourbook/icons/application/tourbook32.png" i48="/net.tourbook/icons/application/tourbook48.png" i64="/net.tourbook/icons/application/tourbook64.png" i128="/net.tourbook/icons/application/tourbook128.png"/>
@@ -338,7 +341,7 @@ END OF TERMS AND CONDITIONS
    </plugins>
 
    <features>
-      <feature id="net.tourbook.product.feature" version="14.14.0.qualifier"/>
+      <feature id="net.tourbook.product.feature" version="15.3.0.qualifier"/>
    </features>
 
 

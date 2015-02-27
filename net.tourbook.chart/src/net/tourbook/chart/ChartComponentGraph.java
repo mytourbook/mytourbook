@@ -18,6 +18,7 @@ package net.tourbook.chart;
 import java.io.InputStream;
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 
 import net.tourbook.common.PointLong;
@@ -135,6 +136,7 @@ public class ChartComponentGraph extends Canvas {
 	 * drawing data which is used to draw the chart, when this list is empty, an error is displayed
 	 */
 	private ArrayList<GraphDrawingData>	_graphDrawingData				= new ArrayList<GraphDrawingData>();
+	private ArrayList<GraphDrawingData>	_revertedGraphDrawingData;
 
 	/**
 	 * zoom ratio between the visible and the virtual chart width
@@ -400,6 +402,17 @@ public class ChartComponentGraph extends Canvas {
 	private PixelConverter				_pc;
 
 	/**
+	 * Is <code>true</code> when a chart can be overlapped. The overlap feature is currently
+	 * supported for graphs which all have the chart type ChartType.LINE.
+	 */
+	boolean								_canChartBeOverlapped;
+
+	/**
+	 * Is <code>true</code> when overlapped graphs are enabled.
+	 */
+	boolean								_isChartOverlapped;
+
+	/**
 	 * Constructor
 	 * 
 	 * @param parent
@@ -491,6 +504,7 @@ public class ChartComponentGraph extends Canvas {
 	private void addListener() {
 
 		addPaintListener(new PaintListener() {
+			@Override
 			public void paintControl(final PaintEvent event) {
 
 				if (_isChartDragged) {
@@ -523,6 +537,7 @@ public class ChartComponentGraph extends Canvas {
 		});
 
 		addMouseMoveListener(new MouseMoveListener() {
+			@Override
 			public void mouseMove(final MouseEvent e) {
 				if (_isGraphVisible) {
 					onMouseMove(e.time & 0xFFFFFFFFL, e.x, e.y);
@@ -531,18 +546,21 @@ public class ChartComponentGraph extends Canvas {
 		});
 
 		addMouseListener(new MouseListener() {
+			@Override
 			public void mouseDoubleClick(final MouseEvent e) {
 				if (_isGraphVisible) {
 					onMouseDoubleClick(e);
 				}
 			}
 
+			@Override
 			public void mouseDown(final MouseEvent e) {
 				if (_isGraphVisible) {
 					onMouseDown(e);
 				}
 			}
 
+			@Override
 			public void mouseUp(final MouseEvent e) {
 				if (_isGraphVisible) {
 					onMouseUp(e);
@@ -551,22 +569,26 @@ public class ChartComponentGraph extends Canvas {
 		});
 
 		addMouseTrackListener(new MouseTrackListener() {
+			@Override
 			public void mouseEnter(final MouseEvent e) {
 				if (_isGraphVisible) {
 					onMouseEnter(e);
 				}
 			}
 
+			@Override
 			public void mouseExit(final MouseEvent e) {
 				if (_isGraphVisible) {
 					onMouseExit(e);
 				}
 			}
 
+			@Override
 			public void mouseHover(final MouseEvent e) {}
 		});
 
 		addListener(SWT.MouseWheel, new Listener() {
+			@Override
 			public void handleEvent(final Event event) {
 				onMouseWheel(event, false, false);
 			}
@@ -574,6 +596,7 @@ public class ChartComponentGraph extends Canvas {
 
 		addFocusListener(new FocusListener() {
 
+			@Override
 			public void focusGained(final FocusEvent e) {
 
 				setFocusToControl();
@@ -584,6 +607,7 @@ public class ChartComponentGraph extends Canvas {
 				redraw();
 			}
 
+			@Override
 			public void focusLost(final FocusEvent e) {
 
 				_isFocusActive = false;
@@ -594,6 +618,7 @@ public class ChartComponentGraph extends Canvas {
 		});
 
 		addListener(SWT.Traverse, new Listener() {
+			@Override
 			public void handleEvent(final Event event) {
 
 				switch (event.detail) {
@@ -624,12 +649,14 @@ public class ChartComponentGraph extends Canvas {
 		});
 
 		addListener(SWT.KeyDown, new Listener() {
+			@Override
 			public void handleEvent(final Event event) {
 				onKeyDown(event);
 			}
 		});
 
 		addDisposeListener(new DisposeListener() {
+			@Override
 			public void widgetDisposed(final DisposeEvent e) {
 				onDispose();
 			}
@@ -742,10 +769,30 @@ public class ChartComponentGraph extends Canvas {
 	}
 
 	/**
+	 * @param allGraphDrawingData
+	 * @return Returns <code>true</code> when a chart can be overlapped.
+	 *         <p>
+	 *         The overlap feature is currently supported for graphs which all have the chart type
+	 *         {@link ChartType#LINE}.
+	 */
+	private boolean canChartBeOverlapped(final ArrayList<GraphDrawingData> allGraphDrawingData) {
+
+		for (final GraphDrawingData graphDrawingData : allGraphDrawingData) {
+
+			if (graphDrawingData.getChartType() != ChartType.LINE) {
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	/**
 	 * when the chart was modified, recompute all
 	 */
 	private void computeChart() {
 		getDisplay().asyncExec(new Runnable() {
+			@Override
 			public void run() {
 				if (!isDisposed()) {
 					_chartComponents.onResize();
@@ -868,6 +915,7 @@ public class ChartComponentGraph extends Canvas {
 		menuMgr.setRemoveAllWhenShown(true);
 
 		menuMgr.addMenuListener(new IMenuListener() {
+			@Override
 			public void menuAboutToShow(final IMenuManager menuMgr) {
 
 				actionSelectBars();
@@ -1124,6 +1172,7 @@ public class ChartComponentGraph extends Canvas {
 
 			final int	__runnableScrollCounter	= _autoScrollCounter[0];
 
+			@Override
 			public void run() {
 
 				if (__runnableScrollCounter != _autoScrollCounter[0]) {
@@ -1330,6 +1379,7 @@ public class ChartComponentGraph extends Canvas {
 
 			// zoom into the chart
 			getDisplay().asyncExec(new Runnable() {
+				@Override
 				public void run() {
 					if (!isDisposed()) {
 						_chart.onExecuteZoomInWithSlider();
@@ -1365,6 +1415,7 @@ public class ChartComponentGraph extends Canvas {
 
 			final int	__runnableBgCounter	= _drawAsyncCounter[0];
 
+			@Override
 			public void run() {
 
 				/*
@@ -1510,7 +1561,17 @@ public class ChartComponentGraph extends Canvas {
 	private void drawAsync_110_GraphImage(final GC gcChart, final GC gcGraph) {
 
 		int graphIndex = 0;
-		final int lastGraphIndex = _graphDrawingData.size() - 1;
+		int graphNo = 0;
+		final int lastGraphNo = _graphDrawingData.size();
+
+		final boolean isStackedChart = !_isChartOverlapped;
+
+		ArrayList<GraphDrawingData> allGraphDrawingData;
+		if (_canChartBeOverlapped && _isChartOverlapped) {
+			allGraphDrawingData = _revertedGraphDrawingData;
+		} else {
+			allGraphDrawingData = _graphDrawingData;
+		}
 
 		// reset line positions, they are set when a line graph is painted
 		_lineDevPositions.clear();
@@ -1520,58 +1581,90 @@ public class ChartComponentGraph extends Canvas {
 		final Rectangle graphBounds = _chartImage10Graphs.getBounds();
 
 		// loop: all graphs in the chart
-		for (final GraphDrawingData drawingData : _graphDrawingData) {
+		for (final GraphDrawingData graphDrawingData : allGraphDrawingData) {
+
+			graphNo++;
+
+			final boolean isFirstGraph = graphNo == 1;
+			final boolean isLastGraph = graphNo == lastGraphNo;
+
+			final boolean isFirstOverlappedGraph = _isChartOverlapped && graphNo == 1;
+			final boolean isLastOverlappedGraph = _isChartOverlapped && isLastGraph;
+
+			final boolean isDrawBackground = !_canChartBeOverlapped
+					|| (_canChartBeOverlapped && (isStackedChart || isFirstOverlappedGraph));
+
+			final boolean isDrawXUnits = !_canChartBeOverlapped
+					|| (_canChartBeOverlapped && (isStackedChart || isLastOverlappedGraph));
+
+			final boolean isDrawGrid = !_canChartBeOverlapped
+					|| (_canChartBeOverlapped && (isStackedChart || isFirstOverlappedGraph));
+
+			boolean isDrawTitle;
+			if (_canChartBeOverlapped && _isChartOverlapped) {
+				isDrawTitle = isLastGraph;
+			} else {
+				isDrawTitle = isFirstGraph;
+			}
 
 			// fill background
-			gcGraph.setBackground(chartBackgroundColor);
-			gcGraph.fillRectangle(graphBounds);
-
-			if (graphIndex == 0) {
-				drawAsync_200_XTitle(gcChart, drawingData);
+			if (isDrawBackground) {
+				gcGraph.setBackground(chartBackgroundColor);
+				gcGraph.fillRectangle(graphBounds);
 			}
 
-			drawAsync_150_SegmentBackground(gcGraph, drawingData);
-
-			if (graphIndex == lastGraphIndex) {
-				// draw the unit label and unit tick for the last graph
-				drawAsync_210_XUnitsAndVGrid(gcChart, gcGraph, drawingData, true);
-			} else {
-				drawAsync_210_XUnitsAndVGrid(gcChart, gcGraph, drawingData, false);
+			if (isDrawTitle) {
+				drawAsync_200_XTitle(gcChart, graphDrawingData);
 			}
 
-			// draw only the horizontal grid
-			drawAsync_220_XAsisHGrid(gcGraph, drawingData, false);
+			drawAsync_150_SegmentBackground(gcGraph, graphDrawingData);
+
+			if (isDrawGrid) {
+
+				// draw horizontal grid
+				drawAsync_220_HGrid(gcGraph, graphDrawingData);
+			}
+
+			if (isDrawXUnits) {
+
+				if (isLastGraph) {
+					// draw the unit label and unit tick for the last graph
+					drawAsync_210_XUnits_VGrid(gcChart, gcGraph, graphDrawingData, true);
+				} else {
+					drawAsync_210_XUnits_VGrid(gcChart, gcGraph, graphDrawingData, false);
+				}
+			}
 
 			// draw units and grid on the x and y axis
-			final ChartType chartType = drawingData.getChartType();
+			final ChartType chartType = graphDrawingData.getChartType();
 
 			if (chartType == ChartType.LINE) {
 
-				drawAsync_500_LineGraph(gcGraph, drawingData);
-				drawAsync_520_RangeMarker(gcGraph, drawingData);
+				drawAsync_500_LineGraph(gcGraph, graphDrawingData, graphIndex, isLastGraph);
+				drawAsync_520_RangeMarker(gcGraph, graphDrawingData);
 
 			} else if (chartType == ChartType.BAR) {
 
-				drawAsync_530_BarGraph(gcGraph, drawingData);
+				drawAsync_530_BarGraph(gcGraph, graphDrawingData);
 
 			} else if (chartType == ChartType.LINE_WITH_BARS) {
 
-				drawAsync_540_LineWithBarGraph(gcGraph, drawingData);
+				drawAsync_540_LineWithBarGraph(gcGraph, graphDrawingData);
 
 			} else if (chartType == ChartType.XY_SCATTER) {
 
-				drawAsync_550_XYScatter(gcGraph, drawingData);
+				drawAsync_550_XYScatter(gcGraph, graphDrawingData);
 
 			} else if (chartType == ChartType.HISTORY) {
 
-				drawAsync_600_History(gcGraph, drawingData);
+				drawAsync_600_History(gcGraph, graphDrawingData);
 			}
 
 			// draw only the x-axis, this is drawn lately because the graph can overwrite it
-			drawAsync_220_XAsisHGrid(gcGraph, drawingData, true);
+			drawAsync_230_XAxis(gcGraph, graphDrawingData);
 
 			// draw graph image into the chart image
-			gcChart.drawImage(_chartImage10Graphs, 0, drawingData.getDevYTop());
+			gcChart.drawImage(_chartImage10Graphs, 0, graphDrawingData.getDevYTop());
 
 //			System.out.println("20 <- 10\tdrawAsync110GraphImage");
 //			// TODO remove SYSTEM.OUT.PRINTLN
@@ -1789,10 +1882,10 @@ public class ChartComponentGraph extends Canvas {
 	 *            <code>true</code> indicate to draws the unit tick and unit label additional to the
 	 *            unit grid line
 	 */
-	private void drawAsync_210_XUnitsAndVGrid(	final GC gcChart,
-												final GC gcGraph,
-												final GraphDrawingData graphDrawingData,
-												final boolean isDrawUnit) {
+	private void drawAsync_210_XUnits_VGrid(final GC gcChart,
+											final GC gcGraph,
+											final GraphDrawingData graphDrawingData,
+											final boolean isDrawUnit) {
 
 		final Display display = getDisplay();
 
@@ -2053,11 +2146,7 @@ public class ChartComponentGraph extends Canvas {
 	 * @param drawingData
 	 * @param isDrawOnlyXAsis
 	 */
-	private void drawAsync_220_XAsisHGrid(	final GC gcGraph,
-											final GraphDrawingData drawingData,
-											final boolean isDrawOnlyXAsis) {
-
-		final Display display = getDisplay();
+	private void drawAsync_220_HGrid(final GC gcGraph, final GraphDrawingData drawingData) {
 
 		final ArrayList<ChartUnit> yUnits = drawingData.getYUnits();
 		final int unitListSize = yUnits.size();
@@ -2094,42 +2183,86 @@ public class ChartComponentGraph extends Canvas {
 			final boolean isXAxis = (isTopDown && unitIndex == unitListSize - 1) || //
 					(isBottomUp && unitIndex == 0);
 
-			if (isDrawOnlyXAsis) {
+			if (isXAxis == false && isDrawHorizontalGrid) {
 
-				// draw only the x-axis
+				// draw gridlines
 
-				if (isXAxis) {
-
+				if (yUnit.isMajorValue) {
 					gcGraph.setLineStyle(SWT.LINE_SOLID);
-					gcGraph.setForeground(display.getSystemColor(SWT.COLOR_DARK_GRAY));
-					gcGraph.drawLine(0, devY, devVisibleChartWidth, devY);
-
-					// only the x-axis needs to be drawn
-					break;
+					gcGraph.setForeground(_gridColorMajor);
+				} else {
+					gcGraph.setLineDash(DOT_DASHES);
+					gcGraph.setForeground(_gridColor);
 				}
-
-			} else {
-
-				if (isXAxis == false && isDrawHorizontalGrid) {
-
-					// draw gridlines
-
-					if (yUnit.isMajorValue) {
-						gcGraph.setLineStyle(SWT.LINE_SOLID);
-						gcGraph.setForeground(_gridColorMajor);
-					} else {
-						gcGraph.setLineDash(DOT_DASHES);
-						gcGraph.setForeground(_gridColor);
-					}
-					gcGraph.drawLine(0, devY, devVisibleChartWidth, devY);
-				}
+				gcGraph.drawLine(0, devY, devVisibleChartWidth, devY);
 			}
 
 			unitIndex++;
 		}
 	}
 
-	private void drawAsync_500_LineGraph(final GC gcGraph, final GraphDrawingData graphDrawingData) {
+	/**
+	 * draw the horizontal gridlines or the x-axis
+	 * 
+	 * @param gcGraph
+	 * @param drawingData
+	 * @param isDrawOnlyXAsis
+	 */
+	private void drawAsync_230_XAxis(final GC gcGraph, final GraphDrawingData drawingData) {
+
+		final Display display = getDisplay();
+
+		final ArrayList<ChartUnit> yUnits = drawingData.getYUnits();
+		final int unitListSize = yUnits.size();
+
+		final double scaleY = drawingData.getScaleY();
+		final float graphYBottom = drawingData.getGraphYBottom();
+		final int devGraphHeight = drawingData.devGraphHeight;
+		final int devVisibleChartWidth = getDevVisibleChartWidth();
+
+		final boolean isBottomUp = drawingData.getYData().isYAxisDirection();
+		final boolean isTopDown = isBottomUp == false;
+
+		final int devYTop = 0;
+		final int devYBottom = devGraphHeight;
+
+		int devY;
+		int unitIndex = 0;
+
+		// loop: all units
+		for (final ChartUnit yUnit : yUnits) {
+
+			final double unitValue = yUnit.value;
+			final double devYUnit = (((unitValue - graphYBottom) * scaleY) + 0.5);
+
+			if (isBottomUp || unitListSize == 1) {
+				devY = devYBottom - (int) devYUnit;
+			} else {
+				devY = devYTop + (int) devYUnit;
+			}
+
+			// check if a y-unit is on the x axis
+			final boolean isXAxis = (isTopDown && unitIndex == unitListSize - 1) || //
+					(isBottomUp && unitIndex == 0);
+
+			if (isXAxis) {
+
+				gcGraph.setLineStyle(SWT.LINE_SOLID);
+				gcGraph.setForeground(display.getSystemColor(SWT.COLOR_DARK_GRAY));
+				gcGraph.drawLine(0, devY, devVisibleChartWidth, devY);
+
+				// only the x-axis needs to be drawn
+				break;
+			}
+
+			unitIndex++;
+		}
+	}
+
+	private void drawAsync_500_LineGraph(	final GC gcGraph,
+											final GraphDrawingData graphDrawingData,
+											final int graphIndex,
+											final boolean isTopGraph) {
 
 		final ChartDataXSerie xData = graphDrawingData.getXData();
 		final ChartDataYSerie yData = graphDrawingData.getYData();
@@ -2166,6 +2299,21 @@ public class ChartComponentGraph extends Canvas {
 			int graphLineAlpha = (int) (_chart.graphTransparencyLine * _chart.graphTransparencyAdjustment);
 			int graphFillingAlpha = (int) (_chart.graphTransparencyFilling * _chart.graphTransparencyAdjustment);
 
+			if (_canChartBeOverlapped && _isChartOverlapped) {
+
+				// reduce opacity for overlapped graphs
+
+				if (isTopGraph) {
+
+					graphFillingAlpha *= 0.6;
+
+				} else {
+
+					graphFillingAlpha *= 0.2;
+				}
+			}
+
+			// check ranges
 			graphLineAlpha = graphLineAlpha < 0 ? 0 : graphLineAlpha > 255 ? 255 : graphLineAlpha;
 			graphFillingAlpha = graphFillingAlpha < 0 ? 0 : graphFillingAlpha > 255 ? 255 : graphFillingAlpha;
 
@@ -2179,7 +2327,8 @@ public class ChartComponentGraph extends Canvas {
 					rgbBgBright,
 					graphLineAlpha,
 					graphFillingAlpha,
-					graphValueOffset);
+					graphValueOffset,
+					isTopGraph);
 
 		} else {
 
@@ -2201,7 +2350,8 @@ public class ChartComponentGraph extends Canvas {
 					rgbBgBright,
 					noneMarkerLineAlpha,
 					noneMarkerFillingAlpha,
-					graphValueOffset);
+					graphValueOffset,
+					isTopGraph);
 
 			// draw the x-marker
 			drawAsync_510_LineGraphSegment(
@@ -2214,7 +2364,8 @@ public class ChartComponentGraph extends Canvas {
 					rgbBgBright,
 					_chart.graphTransparencyLine,
 					_chart.graphTransparencyFilling,
-					graphValueOffset);
+					graphValueOffset,
+					isTopGraph);
 		}
 	}
 
@@ -2231,6 +2382,8 @@ public class ChartComponentGraph extends Canvas {
 	 * @param graphLineAlpha
 	 * @param graphFillingAlpha
 	 * @param graphValueOffset
+	 * @param isTopGraph
+	 * @param isFillGraph
 	 * @param isSegmented
 	 *            When <code>true</code> the whole graph is painted with several segments, otherwise
 	 *            the whole graph is painted once.
@@ -2244,7 +2397,8 @@ public class ChartComponentGraph extends Canvas {
 												final RGB rgbBgBright,
 												final int graphLineAlpha,
 												final int graphFillingAlpha,
-												final double graphValueOffset) {
+												final double graphValueOffset,
+												final boolean isTopGraph) {
 
 		final ChartDataXSerie xData = graphDrawingData.getXData();
 		final ChartDataYSerie yData = graphDrawingData.getYData();
@@ -2282,6 +2436,18 @@ public class ChartComponentGraph extends Canvas {
 
 		final double scaleX = graphDrawingData.getScaleX();
 		final double scaleY = graphDrawingData.getScaleY();
+
+// this feature also needs that the y-axis is scaled accordingly -> this not yet implemted
+//
+//		if (_canChartBeOverlapped && _isChartOverlapped) {
+//
+//			// reduce scale for overlapped graphs
+//
+//			if (!isTopGraph) {
+//
+//				scaleY *= 0.6;
+//			}
+//		}
 
 		final Display display = getDisplay();
 
@@ -2448,7 +2614,6 @@ public class ChartComponentGraph extends Canvas {
 					path2.moveTo(devXFirstPointF, devY0Inverse - devY2);
 					path2.lineTo(devXFirstPointF, devY0Inverse - devY2);
 				}
-
 
 				/*
 				 * set line hover positions for the first point
@@ -2823,7 +2988,8 @@ public class ChartComponentGraph extends Canvas {
 					rgbBg2,
 					graphLineAlpha,
 					graphFillingAlpha,
-					graphValueOffset);
+					graphValueOffset,
+					true);
 
 			runningIndex++;
 		}
@@ -3823,20 +3989,36 @@ public class ChartComponentGraph extends Canvas {
 
 		final Display display = getDisplay();
 
+		final boolean isGraphOverlapped = _chartDrawingData.chartDataModel.isGraphOverlapped();
+
 		final int devSliderLinePos = (int) (slider.getXXDevSliderLinePos() - _xxDevViewPortLeftBorder);
 
 		final int grayColorIndex = 60;
 		final Color colorTxt = new Color(display, grayColorIndex, grayColorIndex, grayColorIndex);
 
-		int labelIndex = 0;
+		int graphNo = 0;
 
 		final ArrayList<ChartXSliderLabel> labelList = slider.getLabelList();
 
 		// draw slider for each graph
 		for (final GraphDrawingData drawingData : _graphDrawingData) {
 
+			graphNo++;
+
+			/*
+			 * Draw only for the last overlapped graph
+			 */
+			final ChartType chartType = drawingData.getChartType();
+			final boolean isLastOverlappedGraph = isGraphOverlapped
+					&& graphNo == _graphDrawingData.size()
+					&& chartType == ChartType.LINE;
+
+			if (isGraphOverlapped && isLastOverlappedGraph == false) {
+				continue;
+			}
+
 			final ChartDataYSerie yData = drawingData.getYData();
-			final ChartXSliderLabel label = labelList.get(labelIndex);
+			final ChartXSliderLabel label = labelList.get(graphNo - 1);
 
 			final Color colorLine = new Color(display, yData.getRgbLine()[0]);
 			final Color colorBright = new Color(display, yData.getRgbBright()[0]);
@@ -3916,8 +4098,6 @@ public class ChartComponentGraph extends Canvas {
 			colorLine.dispose();
 			colorBright.dispose();
 			colorDark.dispose();
-
-			labelIndex++;
 		}
 
 		colorTxt.dispose();
@@ -5004,10 +5184,30 @@ public class ChartComponentGraph extends Canvas {
 			return null;
 		}
 
+		final boolean isGraphOverlapped = _chartDrawingData.chartDataModel.isGraphOverlapped();
+		final boolean isStackedChart = !isGraphOverlapped;
+
+		int graphNo = 0;
+		final int lastGraph = _ySliders.size();
+
 		for (final ChartYSlider ySlider : _ySliders) {
-			if (ySlider.getHitRectangle().contains(graphX, devY)) {
-				_hitYSlider = ySlider;
-				return ySlider;
+
+			graphNo++;
+
+			// there are 2 y-sliders for each graph
+			final boolean isLastGraph = graphNo == lastGraph || graphNo == lastGraph - 1;
+			final boolean isLastOverlappedGraph = isGraphOverlapped && isLastGraph;
+
+			final boolean canDoHitChecking = !_canChartBeOverlapped
+					|| (_canChartBeOverlapped && (isStackedChart || isLastOverlappedGraph));
+
+			if (canDoHitChecking) {
+
+				if (ySlider.getHitRectangle().contains(graphX, devY)) {
+
+					_hitYSlider = ySlider;
+					return ySlider;
+				}
 			}
 		}
 
@@ -5309,6 +5509,7 @@ public class ChartComponentGraph extends Canvas {
 		// stop dragging the x-slider
 		_xSliderDragged = null;
 
+		@SuppressWarnings("unused")
 		ChartMouseEvent mouseEvent;
 
 		if ((mouseEvent = _chart.onExternalMouseDoubleClick(eventTime, devXMouse, devYMouse)).isWorked) {
@@ -6201,6 +6402,7 @@ public class ChartComponentGraph extends Canvas {
 				 * zoom the chart
 				 */
 				Display.getCurrent().asyncExec(new Runnable() {
+					@Override
 					public void run() {
 
 						zoomInWithSlider();
@@ -6654,6 +6856,24 @@ public class ChartComponentGraph extends Canvas {
 		_graphDrawingData = chartDrawingData.graphDrawingData;
 
 		_isGraphVisible = _graphDrawingData != null && _graphDrawingData.isEmpty() == false;
+
+		_canChartBeOverlapped = canChartBeOverlapped(_graphDrawingData);
+		_isChartOverlapped = _chartDrawingData.chartDataModel.isGraphOverlapped();
+		if (_canChartBeOverlapped && _isChartOverlapped) {
+
+			/*
+			 * Revert sequence that the top graph is painted as last and not as the first that it
+			 * will overlap the other graphs.
+			 */
+
+			_revertedGraphDrawingData = new ArrayList<GraphDrawingData>();
+
+			for (final GraphDrawingData graphDrawingData : _graphDrawingData) {
+				_revertedGraphDrawingData.add(graphDrawingData);
+			}
+
+			Collections.reverse(_revertedGraphDrawingData);
+		}
 
 		// force all graphics to be recreated
 		_isChartDirty = true;

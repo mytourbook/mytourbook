@@ -17,53 +17,143 @@ package net.tourbook.web;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.net.URLDecoder;
 
+import net.tourbook.common.ReplacingOutputStream;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
+import org.json.JSONObject;
 
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 
+/**
+ * Web tools.
+ */
 public class WEB {
 
-	public static final String	UTF_8								= "UTF-8";						//$NON-NLS-1$
+	/**
+	 * This is the <b>MAIN</b> switch to run Dojo in the dev or release folder. In debug mode the
+	 * Dojo files are delivered separately to debug them, in release mode all Dojo files are
+	 * compacted and gzip'ed.
+	 * <p>
+	 * When <code>true</code> the web content is delivered from the
+	 * {@value #WEB_CONTENT_DEVELOPMENT_FOLDER} folder otherwise it is delivered from the
+	 * {@value #WEB_CONTENT_RELEASE_FOLDER} folder.
+	 */
+	static boolean				IS_DEBUG								= false;
 
-	public static String		SERVER_URL;
+	/*
+	 * It is very complicated to support testing for language translators, therefore it is currently
+	 * not yet implemented.
+	 */
+//	static boolean				IS_DEBUG_NLS							= true;
 
-	static {
-
-		SERVER_URL = WebContentServer.SERVER_URL;
-	}
+	static String				DEFAULT_LANGUAGE						= "en";										//$NON-NLS-1$
 
 	/**
-	 * Root folder for web content in the plugin.
+	 * Supported languages.
 	 */
-	private static final String	PLUGIN_WEB_CONTENT_FOLDER			= "/WebContent";				//$NON-NLS-1$
+	static String[]				SUPPORTED_LANGUAGES						= { //
+																		"cs_CZ", //$NON-NLS-1$
+			"de",//$NON-NLS-1$
+			DEFAULT_LANGUAGE,
+			"es",//$NON-NLS-1$
+			"fr",//$NON-NLS-1$
+			"it",//$NON-NLS-1$
+			"nl" //$NON-NLS-1$
+																		};
 
-	public static final String	RESPONSE_HEADER_CONTENT_RANGE		= "Content-Range";				//$NON-NLS-1$
-	public static final String	RESPONSE_HEADER_CONTENT_TYPE		= "Content-Type";				//$NON-NLS-1$
+	static final String			DEBUG_PATH_DOJO							= "C:/E/js-resources/dojo/";					//$NON-NLS-1$
+	private static final String	DEBUG_PATH_XUL_RUNNER					= "C:/E/XULRunner/";							//$NON-NLS-1$
+	private static final String	DEBUG_PATH_FIREBUG_LITE					= "/WebContent-firebug-lite";					//$NON-NLS-1$
 
-	private static final String	CONTENT_TYPE_APPLICATION_JAVASCRIPT	= "application/javascript";	//$NON-NLS-1$
-	public static final String	CONTENT_TYPE_APPLICATION_JSON		= "application/json";			//$NON-NLS-1$
-	private static final String	CONTENT_TYPE_IMAGE_JPG				= "image/jpeg";				//$NON-NLS-1$
-	private static final String	CONTENT_TYPE_IMAGE_PNG				= "image/png";					//$NON-NLS-1$
-	private static final String	CONTENT_TYPE_TEXT_CSS				= "text/css";					//$NON-NLS-1$
-	private static final String	CONTENT_TYPE_TEXT_HTML				= "text/html";					//$NON-NLS-1$
-	private static final String	CONTENT_TYPE_UNKNOWN				= "application/octet-stream";	//$NON-NLS-1$
+	public static final String	PROTOCOL_HTTP							= "http://";									//$NON-NLS-1$
 
-	private static final String	FILE_EXTENSION_CSS					= "css";						//$NON-NLS-1$
-	private static final String	FILE_EXTENSION_HTML					= "html";						//$NON-NLS-1$
-	private static final String	FILE_EXTENSION_JPG					= "jpg";						//$NON-NLS-1$
-	private static final String	FILE_EXTENSION_JS					= "js";						//$NON-NLS-1$
-	private static final String	FILE_EXTENSION_PNG					= "png";						//$NON-NLS-1$
+	static final String			DOJO_TOOLKIT_FOLDER						= "/MyTourbook-DojoToolkit";					//$NON-NLS-1$
+
+	private static final String	WEB_CONTENT_DEVELOPMENT_FOLDER			= "/WebContent-dev";							//$NON-NLS-1$
+	private static final String	WEB_CONTENT_RELEASE_FOLDER				= "/WebContent-rel";							//$NON-NLS-1$
+
+	/**
+	 * Root folder for web content in the web plugin.
+	 */
+	private static final String	WEB_CONTENT_FOLDER						= IS_DEBUG
+																				? WEB_CONTENT_DEVELOPMENT_FOLDER
+																				: WEB_CONTENT_RELEASE_FOLDER;
+
+	public static final String	UTF_8									= "UTF-8";										//$NON-NLS-1$
+
+	public static final String	RESPONSE_HEADER_ACCEPT_LANGUAGE			= "Accept-Language";							//$NON-NLS-1$
+	private static final String	RESPONSE_HEADER_CONTENT_ENCODING		= "Content-Encoding";							//$NON-NLS-1$
+	public static final String	RESPONSE_HEADER_CONTENT_RANGE			= "Content-Range";								//$NON-NLS-1$
+	public static final String	RESPONSE_HEADER_CONTENT_TYPE			= "Content-Type";								//$NON-NLS-1$
+
+	private static final String	CONTENT_ENCODING_GZIP					= "gzip";										//$NON-NLS-1$
+
+	private static final String	CONTENT_TYPE_APPLICATION_JAVASCRIPT		= "application/javascript";					//$NON-NLS-1$
+	public static final String	CONTENT_TYPE_APPLICATION_JSON			= "application/json";							//$NON-NLS-1$
+	private static final String	CONTENT_TYPE_APPLICATION_X_JAVASCRIPT	= "application/x-javascript; charset=UTF-8";	//$NON-NLS-1$
+	private static final String	CONTENT_TYPE_IMAGE_GIF					= "image/gif";									//$NON-NLS-1$
+	private static final String	CONTENT_TYPE_IMAGE_JPG					= "image/jpeg";								//$NON-NLS-1$
+	private static final String	CONTENT_TYPE_IMAGE_PNG					= "image/png";									//$NON-NLS-1$
+	private static final String	CONTENT_TYPE_IMAGE_X_ICO				= "image/x-icon";								//$NON-NLS-1$
+	private static final String	CONTENT_TYPE_TEXT_CSS					= "text/css";									//$NON-NLS-1$
+	private static final String	CONTENT_TYPE_TEXT_HTML					= "text/html";									//$NON-NLS-1$
+	private static final String	CONTENT_TYPE_UNKNOWN					= "application/octet-stream";					//$NON-NLS-1$
+
+	private static final String	FILE_EXTENSION_CSS						= "css";										//$NON-NLS-1$
+	private static final String	FILE_EXTENSION_GIF						= "gif";										//$NON-NLS-1$
+	private static final String	FILE_EXTENSION_HTML						= "html";										//$NON-NLS-1$
+	private static final String	FILE_EXTENSION_ICO						= "ico";										//$NON-NLS-1$
+	private static final String	FILE_EXTENSION_JGZ						= "jgz";										//$NON-NLS-1$
+	private static final String	FILE_EXTENSION_JPG						= "jpg";										//$NON-NLS-1$
+	private static final String	FILE_EXTENSION_JS						= "js";										//$NON-NLS-1$
+	private static final String	FILE_EXTENSION_MAP						= "map";										//$NON-NLS-1$
+	private static final String	FILE_EXTENSION_PNG						= "png";										//$NON-NLS-1$
+
+	/**
+	 * This file extension is for HTML pages which contain variable replacements, processed in
+	 * {@link ReplacingOutputStream}.
+	 */
+	public static final String	FILE_EXTENSION_MTHTML					= "mthtml";									//$NON-NLS-1$
+
+	/**
+	 * @param path
+	 * @return Returns the 2nd last extension or <code>null</code> when not available.
+	 */
+	private static String getCompressedExtension(final Path path) {
+
+		if (path.hasTrailingSeparator()) {
+			return null;
+		}
+
+		final String lastSegment = path.lastSegment();
+		if (lastSegment == null) {
+			return null;
+		}
+
+		final int endIndex = lastSegment.lastIndexOf('.');
+		if (endIndex == -1) {
+			return null;
+		}
+
+		final int index = lastSegment.lastIndexOf('.', endIndex - 1);
+		if (index == -1) {
+			return null;
+		}
+
+		return lastSegment.substring(index + 1, endIndex);
+	}
 
 	/**
 	 * @param filePathName
@@ -73,7 +163,14 @@ public class WEB {
 	 */
 	public static File getFile(final String filePathName) throws IOException, URISyntaxException {
 
-		final URL bundleUrl = Activator.getDefault().getBundle().getEntry(PLUGIN_WEB_CONTENT_FOLDER + filePathName);
+		final String bundleFileName = WEB_CONTENT_FOLDER + filePathName;
+
+		final URL bundleUrl = Activator.getDefault().getBundle().getEntry(bundleFileName);
+
+		if (bundleUrl == null) {
+			StatusUtil.log("File is not available: " + bundleFileName);//$NON-NLS-1$
+			return null;
+		}
 
 		final URL fileUrl = FileLocator.toFileURL(bundleUrl);
 		final File file = new File(fileUrl.toURI());
@@ -84,11 +181,11 @@ public class WEB {
 
 	/**
 	 * @param webContentFile
-	 *            Absolute file path name which parent is {@value #PLUGIN_WEB_CONTENT_FOLDER}.
+	 *            Absolute file path name which parent is {@value #WEB_CONTENT_FOLDER}.
 	 * @param isConvertPaths
 	 *            Converts absolute paths to file paths.
 	 * @return Returns the content of a file from the WebContent folder, this folder is the root for
-	 *         web resources located in {@value #PLUGIN_WEB_CONTENT_FOLDER}.
+	 *         web resources located in {@value #WEB_CONTENT_FOLDER}.
 	 */
 	public static String getFileContent(final String webContentFile, final boolean isConvertPaths) {
 
@@ -102,14 +199,14 @@ public class WEB {
 
 			if (isConvertPaths) {
 
-				final String fromHtmlDojoPath = "/WebContent-dojo";
-				final String fromHtmlFirebugPath = "/WebContent-firebug-lite";
+				final String fromHtmlDojoPath = DOJO_TOOLKIT_FOLDER;
+				final String fromHtmlFirebugPath = DEBUG_PATH_FIREBUG_LITE;
 
-				final String toSystemDojoPath = "C:/E/js-resources/dojo/";
-				final String toSystemFirebugPath = "C:/E/XULRunner/";
+				final String toSystemDojoPath = DEBUG_PATH_DOJO;
+				final String toSystemFirebugPath = DEBUG_PATH_XUL_RUNNER;
 
 				// replace local paths, which do not start with a /
-				webContent = replaceLocalPath(webContent, webFile);
+				webContent = replaceLocalDebugPath(webContent, webFile);
 
 				webContent = replacePath(webContent, fromHtmlDojoPath, toSystemDojoPath);
 				webContent = replacePath(webContent, fromHtmlFirebugPath, toSystemFirebugPath);
@@ -122,6 +219,14 @@ public class WEB {
 		return webContent;
 	}
 
+	public static JSONObject getJSONObject(final Object rawData) throws UnsupportedEncodingException {
+
+		final String jsData = URLDecoder.decode((String) rawData, WEB.UTF_8);
+		final JSONObject jsonData = new JSONObject(jsData);
+
+		return jsonData;
+	}
+
 	/**
 	 * @param filePathName
 	 * @return Returns the root of the WebContent folder.
@@ -130,7 +235,7 @@ public class WEB {
 	 */
 	public static URI getRoot() throws IOException, URISyntaxException {
 
-		final URL bundleUrl = Activator.getDefault().getBundle().getEntry(PLUGIN_WEB_CONTENT_FOLDER);
+		final URL bundleUrl = Activator.getDefault().getBundle().getEntry(WEB_CONTENT_FOLDER);
 
 		final URL fileUrl = FileLocator.toFileURL(bundleUrl);
 		final URI fileUri = fileUrl.toURI();
@@ -139,7 +244,7 @@ public class WEB {
 
 	}
 
-	private static String replaceLocalPath(final String webContent, final File webFile) {
+	private static String replaceLocalDebugPath(final String webContent, final File webFile) {
 
 		String replacedContent = UI.EMPTY_STRING;
 
@@ -149,8 +254,8 @@ public class WEB {
 			final File folderPath = filePath.removeLastSegments(1).toFile();
 			final String urlPath = folderPath.toURI().toURL().toExternalForm();
 
-			replacedContent = webContent.replaceAll("href=\"(?!/)", "href=\"" + urlPath);
-			replacedContent = replacedContent.replaceAll("src=\"(?!/)", "src=\"" + urlPath);
+			replacedContent = webContent.replaceAll("href=\"(?!/)", "href=\"" + urlPath); //$NON-NLS-1$ //$NON-NLS-2$
+			replacedContent = replacedContent.replaceAll("src=\"(?!/)", "src=\"" + urlPath); //$NON-NLS-1$ //$NON-NLS-2$
 
 		} catch (final MalformedURLException e) {
 			StatusUtil.log(e);
@@ -189,42 +294,104 @@ public class WEB {
 	 * 
 	 * @param httpExchange
 	 * @param file
+	 * @return Returns the file extension.
 	 */
-	public static void setResponseHeaderContentType(final HttpExchange httpExchange, final File file) {
+	public static String setResponseHeaderContentType(final HttpExchange httpExchange, final File file) {
+
+		String contentType = null;
+		boolean isCompressed = false;
 
 		final Path path = new Path(file.getAbsolutePath());
-		final String extension = path.getFileExtension().toLowerCase();
 
-		String contentType;
+		String extension = null;
+		String rawExtension = path.getFileExtension();
 
-		switch (extension) {
-		case FILE_EXTENSION_CSS:
-			contentType = CONTENT_TYPE_TEXT_CSS;
-			break;
+		if (rawExtension != null) {
 
-		case FILE_EXTENSION_HTML:
-			contentType = CONTENT_TYPE_TEXT_HTML;
-			break;
+			extension = rawExtension.toLowerCase();
 
-		case FILE_EXTENSION_JPG:
-			contentType = CONTENT_TYPE_IMAGE_JPG;
-			break;
+			String compressedExtension = null;
 
-		case FILE_EXTENSION_JS:
-			contentType = CONTENT_TYPE_APPLICATION_JAVASCRIPT;
-			break;
+			if (FILE_EXTENSION_JGZ.equals(extension)) {
 
-		case FILE_EXTENSION_PNG:
-			contentType = CONTENT_TYPE_IMAGE_PNG;
-			break;
+				// file is compressed
 
-		default:
+				rawExtension = getCompressedExtension(path);
+
+				if (rawExtension != null) {
+					compressedExtension = rawExtension.toLowerCase();
+				}
+			}
+
+			switch (extension) {
+
+			case FILE_EXTENSION_CSS:
+				contentType = CONTENT_TYPE_TEXT_CSS;
+				break;
+
+			case FILE_EXTENSION_GIF:
+				contentType = CONTENT_TYPE_IMAGE_GIF;
+				break;
+
+			case FILE_EXTENSION_HTML:
+			case FILE_EXTENSION_MTHTML:
+				contentType = CONTENT_TYPE_TEXT_HTML;
+				break;
+
+			case FILE_EXTENSION_ICO:
+				contentType = CONTENT_TYPE_IMAGE_X_ICO;
+				break;
+
+			case FILE_EXTENSION_JGZ:
+
+				if (compressedExtension != null) {
+
+					switch (compressedExtension) {
+
+					case FILE_EXTENSION_CSS:
+						contentType = CONTENT_TYPE_TEXT_CSS;
+						isCompressed = true;
+						break;
+
+					case FILE_EXTENSION_JS:
+						contentType = CONTENT_TYPE_APPLICATION_X_JAVASCRIPT;
+						isCompressed = true;
+						break;
+					}
+				}
+				break;
+
+			case FILE_EXTENSION_JPG:
+				contentType = CONTENT_TYPE_IMAGE_JPG;
+				break;
+
+			case FILE_EXTENSION_JS:
+				contentType = CONTENT_TYPE_APPLICATION_JAVASCRIPT;
+				break;
+
+			case FILE_EXTENSION_MAP: // .js.map
+				contentType = CONTENT_TYPE_APPLICATION_JSON;
+				break;
+
+			case FILE_EXTENSION_PNG:
+				contentType = CONTENT_TYPE_IMAGE_PNG;
+				break;
+			}
+		}
+
+		if (contentType == null) {
+
 			contentType = CONTENT_TYPE_UNKNOWN;
-			break;
+			StatusUtil.log("Content type is unknow for " + file);//$NON-NLS-1$
 		}
 
 		final Headers responseHeaders = httpExchange.getResponseHeaders();
 		responseHeaders.set(RESPONSE_HEADER_CONTENT_TYPE, contentType);
-	}
 
+		if (isCompressed) {
+			responseHeaders.set(RESPONSE_HEADER_CONTENT_ENCODING, CONTENT_ENCODING_GZIP);
+		}
+
+		return extension;
+	}
 }

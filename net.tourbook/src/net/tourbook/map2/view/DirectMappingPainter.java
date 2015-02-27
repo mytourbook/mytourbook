@@ -69,6 +69,7 @@ public class DirectMappingPainter implements IDirectPainter {
 		_isTourVisible = false;
 	}
 
+	@Override
 	public void dispose() {
 		disposeImage(_imageLeftSlider);
 		disposeImage(_imageRightSlider);
@@ -90,8 +91,11 @@ public class DirectMappingPainter implements IDirectPainter {
 		final double[] latitudeSerie = _tourData.latitudeSerie;
 		final double[] longitudeSerie = _tourData.longitudeSerie;
 
+		// force array bounds
+		sliderValueIndex = Math.min(Math.max(sliderValueIndex, 0), latitudeSerie.length - 1);
+
 		// get world position for the slider coordinates
-		sliderValueIndex = Math.min(sliderValueIndex, latitudeSerie.length - 1);
+
 		final java.awt.Point worldPixelMarkerAWT = mp.geoToPixel(new GeoPosition(
 				latitudeSerie[sliderValueIndex],
 				longitudeSerie[sliderValueIndex]), zoomLevel);
@@ -187,6 +191,7 @@ public class DirectMappingPainter implements IDirectPainter {
 		gc.drawLine(positionX + 1, linePositionY, positionX + 20, linePositionY);
 	}
 
+	@Override
 	public void paint(final DirectPainterContext painterContext) {
 
 		if ((_map == null) || (_tourData == null) || (_isTourVisible == false)) {

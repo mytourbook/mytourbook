@@ -1296,11 +1296,12 @@ public class ChartComponents extends Composite {
 		final int devChartHeight = getDevChartHeightWithoutTrim();
 
 		int devGraphHeight = devChartHeight;
+		final boolean isChartStacked = _chartDataModel.isGraphOverlapped() == false;
 
 		/*
 		 * adjust graph device height for stacked graphs, a gap is between two graphs
 		 */
-		if (_chartDataModel.isStackedChart() && graphCount > 1) {
+		if (isChartStacked && graphCount > 1) {
 			final int devGraphHeightSpace = devGraphHeight - (_chartsVerticalDistance * (graphCount - 1));
 			devGraphHeight = (devGraphHeightSpace / graphCount);
 		}
@@ -1314,7 +1315,7 @@ public class ChartComponents extends Composite {
 		// calculate the vertical device offset
 		int devYTop = _devMarginTop + _devXTitleBarHeight;
 
-		if (_chartDataModel.isStackedChart()) {
+		if (isChartStacked) {
 			// each chart has its own drawing rectangle which are stacked on
 			// top of each other
 			devYTop += (currentGraph * (devGraphHeight + _devSliderBarHeight))
@@ -1343,11 +1344,12 @@ public class ChartComponents extends Composite {
 		final int devChartHeight = getDevChartHeightWithoutTrim();
 
 		int devGraphHeight = devChartHeight;
+		final boolean isChartStacked = _chartDataModel.isGraphOverlapped() == false;
 
 		/*
 		 * adjust graph device height for stacked graphs, a gap is between two graphs
 		 */
-		if (_chartDataModel.isStackedChart() && graphCount > 1) {
+		if (isChartStacked && graphCount > 1) {
 			final int devGraphHeightSpace = devGraphHeight - (_chartsVerticalDistance * (graphCount - 1));
 			devGraphHeight = (devGraphHeightSpace / graphCount);
 		}
@@ -1483,23 +1485,24 @@ public class ChartComponents extends Composite {
 		final float graphScaleY = devGraphHeight / value1;
 
 		// calculate the vertical device offset
-		int devYTop = _devMarginTop + _devXTitleBarHeight;
+		int devYBottom = _devMarginTop + _devXTitleBarHeight;
 
-		if (_chartDataModel.isStackedChart()) {
-			// each chart has its own drawing rectangle which are stacked on
-			// top of each other
-			devYTop += (currentGraph * (devGraphHeight + _devSliderBarHeight))
-					+ ((currentGraph - 1) * _chartsVerticalDistance);
+		if (_chartDataModel.isGraphOverlapped()) {
+
+			// all charts are drawn at the same rectangle
+			devYBottom += devGraphHeight + _devSliderBarHeight;
 
 		} else {
-			// all charts are drawn on the same rectangle
-			devYTop += devGraphHeight;
+			// each chart has its own drawing rectangle which are stacked on
+			// top of each other
+			devYBottom += (currentGraph * (devGraphHeight + _devSliderBarHeight))
+					+ ((currentGraph - 1) * _chartsVerticalDistance);
 		}
 
 		drawingData.setScaleY(graphScaleY);
 
-		drawingData.setDevYBottom(devYTop);
-		drawingData.setDevYTop(devYTop - devGraphHeight);
+		drawingData.setDevYBottom(devYBottom);
+		drawingData.setDevYTop(devYBottom - devGraphHeight);
 
 		drawingData.setGraphYBottom((float) scaledMinValue / valueScaling);
 		drawingData.setGraphYTop((float) scaledMaxValue / valueScaling);
@@ -1507,7 +1510,7 @@ public class ChartComponents extends Composite {
 		drawingData.devGraphHeight = devGraphHeight;
 		drawingData.setDevSliderHeight(_devSliderBarHeight);
 
-		final ArrayList<ChartUnit> unitList = drawingData.getYUnits();
+		final ArrayList<ChartUnit> units = drawingData.getYUnits();
 		final int valueDivisor = yData.getValueDivisor();
 		int loopCounter = 0;
 
@@ -1525,7 +1528,7 @@ public class ChartComponents extends Composite {
 					false);
 			final boolean isMajorValue = descaledValue % majorValue == 0;
 
-			unitList.add(new ChartUnit((float) descaledValue, unitLabel, isMajorValue));
+			units.add(new ChartUnit((float) descaledValue, unitLabel, isMajorValue));
 
 			// prevent endless loops when the unit is 0
 			if (scaledValue == scaledMaxValue || loopCounter++ > 1000) {
@@ -1536,7 +1539,7 @@ public class ChartComponents extends Composite {
 		}
 
 		if (unitType == ChartDataSerie.AXIS_UNIT_HOUR_MINUTE_24H && scaledValue > scaledMaxValue) {
-			unitList.add(new ChartUnit(scaledMaxValue / valueScaling, UI.EMPTY_STRING));
+			units.add(new ChartUnit(scaledMaxValue / valueScaling, UI.EMPTY_STRING));
 		}
 	}
 
@@ -1550,10 +1553,11 @@ public class ChartComponents extends Composite {
 		final int devChartHeight = getDevChartHeightWithoutTrim();
 
 		int devGraphHeight = devChartHeight;
+		final boolean isChartStacked = _chartDataModel.isGraphOverlapped() == false;
 
 		// adjust graph device height for stacked graphs, a gap is between two
 		// graphs
-		if (_chartDataModel.isStackedChart() && graphCount > 1) {
+		if (isChartStacked && graphCount > 1) {
 			final int devGraphHeightSpace = (devGraphHeight - (_chartsVerticalDistance * (graphCount - 1)));
 			devGraphHeight = (devGraphHeightSpace / graphCount);
 		}
@@ -1660,23 +1664,24 @@ public class ChartComponents extends Composite {
 		final float graphScaleY = (float) (devGraphHeight) / graphValueRange;
 
 		// calculate the vertical device offset
-		int devYTop = _devMarginTop + _devXTitleBarHeight;
+		int devYBottom = _devMarginTop + _devXTitleBarHeight;
 
-		if (_chartDataModel.isStackedChart()) {
-			// each chart has its own drawing rectangle which are stacked on
-			// top of each other
-			devYTop += (currentGraph * (devGraphHeight + _devSliderBarHeight))
-					+ ((currentGraph - 1) * _chartsVerticalDistance);
+		if (_chartDataModel.isGraphOverlapped()) {
+
+			// all charts are drawn at the same rectangle
+			devYBottom += devGraphHeight + _devSliderBarHeight;
 
 		} else {
-			// all charts are drawn on the same rectangle
-			devYTop += devGraphHeight;
+			// each chart has its own drawing rectangle which are stacked on
+			// top of each other
+			devYBottom += (currentGraph * (devGraphHeight + _devSliderBarHeight))
+					+ ((currentGraph - 1) * _chartsVerticalDistance);
 		}
 
 		drawingData.setScaleY(graphScaleY);
 
-		drawingData.setDevYBottom(devYTop);
-		drawingData.setDevYTop(devYTop - devGraphHeight);
+		drawingData.setDevYBottom(devYBottom);
+		drawingData.setDevYTop(devYBottom - devGraphHeight);
 
 		drawingData.setGraphYBottom(graphMinValue);
 		drawingData.setGraphYTop(graphMaxValue);
@@ -2235,11 +2240,13 @@ public class ChartComponents extends Composite {
 			 */
 			final Display display = Display.getCurrent();
 			display.asyncExec(new Runnable() {
+				@Override
 				public void run() {
 					display.timerExec(BAR_SELECTION_DELAY_TIME, new Runnable() {
 
 						final int	__runnableKeyDownCounter	= _keyDownCounter[0];
 
+						@Override
 						public void run() {
 							if (__runnableKeyDownCounter == _keyDownCounter[0]
 									&& __runnableKeyDownCounter != _lastKeyDownCounter[0]) {

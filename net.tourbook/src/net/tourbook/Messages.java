@@ -278,7 +278,8 @@ public class Messages extends NLS {
 	public static String		App_Action_Cancel;
 	public static String		App_Action_Close_ToolTip;
 	public static String		App_Action_Columns;
-//	public static String		App_Action_Delete;
+	public static String		App_Action_Dialog_ActionIsInProgress_Message;
+	public static String		App_Action_Dialog_ActionIsInProgress_Title;
 	public static String		App_Action_Duplicate;
 	public static String		App_Action_edit_tour;
 	public static String		App_Action_Edit;
@@ -287,7 +288,6 @@ public class Messages extends NLS {
 	public static String		App_Action_JoinTours;
 	public static String		App_Action_Menu_Directory;
 	public static String		App_Action_Menu_help;
-
 	public static String		App_Action_Menu_New;
 	public static String		App_Action_Menu_tools;
 	public static String		App_Action_Menu_Tour;
@@ -298,8 +298,6 @@ public class Messages extends NLS {
 	public static String		App_Action_open_tour_segmenter_tooltip;
 	public static String		App_Action_OpenOtherViews;
 	public static String		App_Action_Remove;
-
-	public static String		App_Action_RestoreDefaults;
 	public static String		App_Action_set_tour_type;
 	public static String		App_Action_Save;
 	public static String		App_Action_SetPerson;
@@ -647,7 +645,6 @@ public class Messages extends NLS {
 	public static String		Image__edit_tour_marker_new;
 	public static String		Image__edit_tour_marker_new_disabled;
 	public static String		Image__expand_all;
-
 	public static String		Image__Eye;
 	public static String		Image__graph_altimeter;
 	public static String		Image__graph_altitude;
@@ -663,6 +660,7 @@ public class Messages extends NLS {
 	public static String		Image__graph_cadence_disabled;
 	public static String		Image__graph_gradient_disabled;
 	public static String		Image__graph_heartbeat_disabled;
+	public static String		Image__Graph_Overlapped;
 	public static String		Image__graph_pace_disabled;
 	public static String		Image__graph_power_disabled;
 	public static String		Image__graph_speed_disabled;
@@ -698,7 +696,6 @@ public class Messages extends NLS {
 	public static String		Image__RawData_Import;
 	public static String		Image__RawData_Transfer;
 	public static String		Image__RawData_TransferDirect;
-
 	public static String		Image__Remove;
 	public static String		Image__refresh;
 	public static String		Image__remove_all;
@@ -1081,20 +1078,14 @@ public class Messages extends NLS {
 	public static String		Pref_Statistic_Label_separator;
 
 	public static String		Pref_Tour_Button_FailedUpdate;
-
 	public static String		Pref_Tour_Dialog_ConfirmDatabaseUpdate_Message;
-
 	public static String		Pref_Tour_Dialog_ConfirmDatabaseUpdate_Title;
-
 	public static String		Pref_Tour_Dialog_TourCacheIsModified_Message;
 	public static String		Pref_Tour_Dialog_TourCacheIsModified_Title;
 	public static String		Pref_Tour_Group_FailedUpdates;
-
 	public static String		Pref_Tour_Group_TourCache;
 	public static String		Pref_Tour_Label_FailedUpdateInfo;
-
 	public static String		Pref_Tour_Label_FailedUpdateInfo_BOLD;
-
 	public static String		Pref_Tour_Label_TourCacheSize;
 	public static String		Pref_Tour_Label_TourCacheSize_Info;
 
@@ -1177,8 +1168,7 @@ public class Messages extends NLS {
 
 	public static String		Search_Manager_CreateFTIndex;
 
-	public static String		Search_View_Action_EditMarker_Tooltip;
-	public static String		Search_View_Action_EditTour_Tooltip;
+	public static String		Search_View_Link_LinuxBrowser;
 
 	public static String		Slideout_ChartMarkerOptions_Checkbox_IsShowHiddenMarker;
 	public static String		Slideout_ChartMarkerOptions_Checkbox_IsShowMarker;
@@ -1203,19 +1193,6 @@ public class Messages extends NLS {
 	public static String		Slideout_ChartMarkerOptions_Label_Offset_Tooltip;
 //	public static String		Slideout_ChartMarkerOptions_Label_SignImageSize;
 //	public static String		Slideout_ChartMarkerOptions_Label_SignImageSize_Tooltip;
-
-	public static String		Slideout_SearchViewOptions_Checkbox_IsShowDateTime;
-	public static String		Slideout_SearchViewOptions_Checkbox_IsShowDocId;
-	public static String		Slideout_SearchViewOptions_Checkbox_IsShowItemNumber;
-	public static String		Slideout_SearchViewOptions_Checkbox_IsShowTopNavigator;
-	public static String		Slideout_SearchViewOptions_Group_PageNavigation;
-	public static String		Slideout_SearchViewOptions_Group_Result;
-	public static String		Slideout_SearchViewOptions_Group_Sorting;
-	public static String		Slideout_SearchViewOptions_Label_NumberOfDisplayedResults;
-	public static String		Slideout_SearchViewOptions_Label_NumberOfPages;
-	public static String		Slideout_SearchViewOptions_Label_SortAscending;
-	public static String		Slideout_SearchViewOptions_Label_SortByDate;
-	public static String		Slideout_SearchViewOptions_Label_SortDescending;
 
 	public static String		Slideout_TourMarkerFilter_Checkbox_IsReduceLatLonDigits;
 	public static String		Slideout_TourMarkerFilter_Checkbox_IsReduceLatLonDigits_Tooltip;
@@ -1272,6 +1249,8 @@ public class Messages extends NLS {
 	public static String		Tour_Action_graph_speed_tooltip;
 	public static String		Tour_Action_graph_temperature_tooltip;
 	public static String		Tour_Action_graph_tour_compare_tooltip;
+
+	public static String		Tour_Action_GraphOverlapped;
 	public static String		Tour_Action_HrZone_Title;
 	public static String		Tour_Action_HrZoneGraphType_Default;
 	public static String		Tour_Action_HrZoneGraphType_NoGradient;

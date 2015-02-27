@@ -122,8 +122,8 @@ public class SearchUtils {
 	 */
 	private static String getLanguageCode(final Class<? extends Analyzer> analyzerClass) {
 		final String className = analyzerClass.getName();
-		final String packageName = className.substring(0, className.lastIndexOf("."));
-		final String languageCode = packageName.substring(packageName.lastIndexOf(".") + 1, packageName.length());
+		final String packageName = className.substring(0, className.lastIndexOf('.'));
+		final String languageCode = packageName.substring(packageName.lastIndexOf('.') + 1, packageName.length());
 
 		return languageCode;
 	}

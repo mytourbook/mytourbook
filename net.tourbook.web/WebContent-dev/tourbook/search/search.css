@@ -1,0 +1,343 @@
+
+@import url(../../dojo/resources/dojo.css);
+@import url(../../dijit/themes/tundra/tundra.css);
+@import url(../../dgrid/css/dgrid.css);
+@import url(../../dgrid/css/skins/tundra.css);
+
+
+table
+{
+	border-collapse:		collapse;
+
+	/* show border to debug tables */
+	xborder:				1px solid; 
+}
+
+a
+{
+	text-decoration:		none;
+	xfont-weight:			bold;
+	xcolor:					#666;
+	color:					#24b;
+}
+
+/*
+	Vertical spacing between fields.
+*/
+.fieldVertSpaceTop
+{
+	margin-top:				0.5em;	
+}
+
+.fieldVertSpaceBottom
+{
+	margin-bottom:			0.5em;	
+}
+
+
+.mtBase 
+{
+	font-family: 			verdana, helvetica, arial, sans-serif;
+	font-size: 				13px;	
+	line-height:			130%;
+}
+
+.mtBase .dijitMenu,
+.mtBase .dijitMenuBar,
+.mtBase .dijitTooltipContainer,
+.mtDialog .dijitDialog
+{
+	border:					1px solid #bbb;			/* replace blue border */
+}
+
+.mtBase .dijitTooltipContainer
+{
+	/* 
+		Limit width otherwise the viewport width is used.
+		With a width below 30em the text can overflow the container 
+	 */
+	width:					30em;					
+}
+
+/*
+	Overwrite dijit dialog
+*/
+.mtDialog .dijitDialog
+{
+	line-height:			80%;
+}
+
+.mtDialog .dijitTitlePaneTitle						/* group for widgets */
+{
+	background-image:		none;					/* hide gray */
+	border:					1px solid #fff;			/* overwrite (hide) border */		
+	border-bottom:			1px solid #bfbfbf;		/* set border only at the bottom */
+	padding-left: 			0px;
+	margin-left:			-5px;
+}
+
+/*
+	Dijit Button
+	
+	Overwrite dojo css by setting the custom class after the dojo class in the <body> tag.
+*/
+.search .dijitButton
+{
+	margin: 				0;	
+}
+
+.search .dijitButton .dijitButtonNode {
+    
+    font-size: 				1.2em;
+    
+    border-radius: 			0;
+    border: 				1px solid transparent;
+
+    background-color: 		transparent;
+    background-image: 		none;
+
+    box-shadow:				none;
+}
+
+.search .dijitButtonHover .dijitButtonNode {
+    background-color: 		#ddd;
+}
+
+/*
+	Overwrite dijit for the search text field.
+*/
+.search .dijitTextBox
+{
+	background-image: 		none;					/* hide gradient */
+	border-color: 			#f4f4f4;
+	background-color:		#f4f4f4;
+}
+
+.search .dijitTextBoxFocused
+{
+	border-color:			#ddd;	
+}
+
+.search .dijitTextBoxHover
+{
+	background-image:		none;    				/* hide default gradient image */						
+	border-width:			1px;	
+	border-color:			#bbb;
+}
+
+.search .dijitInputField 
+{
+	padding: 				2px;
+}
+
+/*
+	Search container
+*/
+#domContainer 
+{
+    height:					100%;
+}
+
+
+/*
+	Search field
+*/
+#domSearchInputContainer
+{
+	padding:				0px;	
+	background-color:		#f4f4f4;
+	overflow:				hidden;
+}
+
+.domSearchInput
+{
+	width:					100%;
+}
+
+/*
+	Status fields
+*/
+#domAppStatus
+{
+	color:					#666;
+	text-align: 			right;
+	white-space:			nowrap;
+}
+
+#domSearchStatus
+{
+	color:					red;
+	white-space: 			normal;		/* disable nowrap */
+}
+
+/*
+	Grid
+*/
+#domGrid 
+{
+    position: 				absolute;
+    top: 					0;
+    bottom: 				0;
+    left: 					0;
+    right: 					0;
+    height: 				auto;
+    	
+    border:					0px;
+}
+
+	
+#domGrid div:focus 
+{ 
+	outline-width:			1px;		/* 1px is default */
+}
+
+#domGrid .dgrid-row:HOVER
+{
+    background-color: 		#eee;
+}
+
+#domGrid .dgrid-selected
+{
+    background-color: 		#ddd;
+}
+
+#domGrid .dgrid-selected:HOVER
+{
+    background-color: 		#ccc;
+}
+
+
+.dgrid-no-data,
+.dgrid-loading 
+{
+	color: 					#aaa;
+	font-size: 				1em;
+	padding: 				0.5em;
+	line-height: 			normal;		/* mtBase line-height looks ugly when text is wrapped*/
+}
+
+/*
+	Item container
+*/
+
+.item-container 
+{
+	clear: 					both;		/* start new item */
+	padding:				2px 0 2px 0;
+	xmargin-bottom:			1px;
+}
+
+/* show hidden actions when search item is hovered */
+.item-container:HOVER .action-container
+{												
+	opacity:				1.0;
+	filter: 				alpha(opacity=100); 	/* IE needs this even in html standard mode*/
+}
+
+.item-container .action-container a:HOVER 
+{ 
+	border: 				1px solid #aaa;
+	border-radius:			3px;
+}
+
+/*
+	Actions
+*/
+.action-container 
+{
+	opacity:				0;
+	filter: 				alpha(opacity=0);
+
+	xbackground-color: 		#0ff;
+	position:				absolute;
+	right:					2px;					
+	z-index:				10;
+	xpadding:				0 1px 0px 0px;
+}
+
+a.action:LINK,
+a.action:VISITED 
+{
+	display:				block;
+	width: 					20px; 
+	height: 				20px; 
+
+	text-decoration:		none;
+	
+	background-repeat:		no-repeat;
+	background-position:	center;
+
+	border-radius:			3px;
+	border:					1px solid rgba(0, 0, 0, 0.0);	/* hide border with transparent color */
+
+	cursor: 				pointer; 
+}
+
+/*
+	Result state
+*/
+.result-state
+{
+	padding-top:			20px;
+}
+
+/*
+	Item
+*/
+.item-image 
+{
+	vertical-align:			top;
+	padding-left:			5px;
+	padding-right:			10px;
+}
+
+a.item:LINK,
+a.item:VISITED 
+{
+	/* enforce width to the right border */
+	display:				block;
+	width:					auto;					
+
+	text-decoration:		none;
+}
+
+.item-title
+{
+	text-decoration: 		underline;
+}
+
+.item-title-no-description
+{
+	/* hide underline when only the title is available but not a description */
+	text-decoration: 		none;
+}
+
+.item-info
+{
+	font-size:				80%;
+	color:					#888;
+}
+
+.item-info td
+{
+	padding-right:			20px;
+}
+
+
+/*
+	Search actions
+*/
+.actionIcon
+{
+	/* set width/height wider than the image -> the focus rubberband looks much better */
+	width:					20px; 
+	height:					20px; 
+	background-repeat:		no-repeat;
+	background-position: 	center;
+}
+
+.iconOptions {				background-image: url("/$MT-ICON$/options.png");}
+.iconPhotoTooltip {			background-image: url("/$MT-ICON$/photo-tooltip.png");}
+.iconSearch {				background-image: url("/$MT-ICON$/search.png");}
+.iconTourChart {			background-image: url("/$MT-ICON$/tour-chart.png");}
+.iconTourMarker {			background-image: url("/$MT-ICON$/tour-marker.png");}

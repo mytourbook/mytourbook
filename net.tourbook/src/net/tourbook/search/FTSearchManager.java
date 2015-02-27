@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -63,8 +63,12 @@ import org.apache.lucene.index.MultiFields;
 import org.apache.lucene.index.MultiReader;
 import org.apache.lucene.index.Terms;
 import org.apache.lucene.index.TermsEnum;
+import org.apache.lucene.queries.BooleanFilter;
+import org.apache.lucene.queries.FilterClause;
 import org.apache.lucene.queryparser.classic.MultiFieldQueryParser;
+import org.apache.lucene.search.BooleanClause.Occur;
 import org.apache.lucene.search.IndexSearcher;
+import org.apache.lucene.search.NumericRangeFilter;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.Sort;
@@ -95,16 +99,16 @@ public class FTSearchManager {
 
 	private static final Version			LUCENE_VERSION				= Version.LUCENE_4_10_1;
 
-	private static final String				LUCENE_INDEX_FOLDER_NAME	= "lucene-index";						//$NON-NLS-1$
+	private static final String				LUCENE_INDEX_FOLDER_NAME	= "lucene-index";					//$NON-NLS-1$
 
-	private static final String				SEARCH_FIELD_DESCRIPTION	= "description";						//$NON-NLS-1$
-	private static final String				SEARCH_FIELD_DOC_SOURCE		= "docSource";							//$NON-NLS-1$
-	private static final String				SEARCH_FIELD_MARKER_ID		= "markerID";							//$NON-NLS-1$
-	private static final String				SEARCH_FIELD_TITLE			= "title";								//$NON-NLS-1$
-	private static final String				SEARCH_FIELD_TOUR_ID		= "tourID";							//$NON-NLS-1$
-	private static final String				SEARCH_FIELD_TIME			= "time";								//$NON-NLS-1$
+	private static final String				SEARCH_FIELD_DESCRIPTION	= "description";					//$NON-NLS-1$
+	private static final String				SEARCH_FIELD_DOC_SOURCE		= "docSource";						//$NON-NLS-1$
+	private static final String				SEARCH_FIELD_MARKER_ID		= "markerID";						//$NON-NLS-1$
+	private static final String				SEARCH_FIELD_TITLE			= "title";							//$NON-NLS-1$
+	private static final String				SEARCH_FIELD_TOUR_ID		= "tourID";						//$NON-NLS-1$
+	private static final String				SEARCH_FIELD_TIME			= "time";							//$NON-NLS-1$
 
-	private static final String				LOG_CREATE_INDEX			= "Created ft index: %s\t %d ms";		//$NON-NLS-1$
+	private static final String				LOG_CREATE_INDEX			= "Created ft index: %s\t %d ms";	//$NON-NLS-1$
 
 	static final int						DOC_SOURCE_TOUR				= 1;
 	static final int						DOC_SOURCE_TOUR_MARKER		= 2;
@@ -120,14 +124,18 @@ public class FTSearchManager {
 	private static TopDocs					_topDocs;
 	private static String					_topDocsSearchText;
 
-	private static boolean					_isSortDateAscending		= false;
+	private static boolean					_isShowContentAll;
+	private static boolean					_isShowContentMarker;
+	private static boolean					_isShowContentTour;
+	private static boolean					_isShowContentWaypoint;
+	private static boolean					_isSortDateAscending		= false;							// -> sort descending
 
 	// configure field with offsets at index time
-	private static final FieldType			_longSearchField			= new FieldType(LongField.TYPE_STORED);
-	private static final FieldType			_textSearchField			= new FieldType(TextField.TYPE_STORED);
+//	private static final FieldType			_longSearchField			= new FieldType(LongField.TYPE_STORED);
+//	private static final FieldType			_textSearchField			= new FieldType(TextField.TYPE_STORED);
 	{
-		_longSearchField.setIndexOptions(IndexOptions.DOCS_AND_FREQS_AND_POSITIONS_AND_OFFSETS);
-		_textSearchField.setIndexOptions(IndexOptions.DOCS_AND_FREQS_AND_POSITIONS_AND_OFFSETS);
+		// _longSearchField.setIndexOptions(IndexOptions.DOCS_AND_FREQS_AND_POSITIONS_AND_OFFSETS);
+		// _textSearchField.setIndexOptions(IndexOptions.DOCS_AND_FREQS_AND_POSITIONS_AND_OFFSETS);
 	}
 
 	/**
@@ -270,9 +278,12 @@ public class FTSearchManager {
 		_suggester = null;
 
 		if (_indexReader != null) {
+
 			try {
+
 				_indexReader.close();
 				_indexReader = null;
+
 			} catch (final IOException e) {
 				StatusUtil.showStatus(e);
 			}
@@ -292,20 +303,27 @@ public class FTSearchManager {
 											final String description,
 											final long time) throws IOException {
 
+//		private static final FieldType			_longSearchField			= new FieldType(LongField.TYPE_STORED);
+//		private static final FieldType			_textSearchField			= new FieldType(TextField.TYPE_STORED);
+		// {
+		// _longSearchField.setIndexOptions(IndexOptions.DOCS_AND_FREQS_AND_POSITIONS_AND_OFFSETS);
+		// _textSearchField.setIndexOptions(IndexOptions.DOCS_AND_FREQS_AND_POSITIONS_AND_OFFSETS);
+		// }
+
 		final Document doc = new Document();
 
 		doc.add(new IntField(SEARCH_FIELD_DOC_SOURCE, DOC_SOURCE_TOUR_MARKER, Store.YES));
 
 		doc.add(new LongField(SEARCH_FIELD_MARKER_ID, markerId, Store.YES));
 		doc.add(new LongField(SEARCH_FIELD_TOUR_ID, tourId, Store.YES));
-		doc.add(new LongField(SEARCH_FIELD_TIME, time, _longSearchField));
+		doc.add(new LongField(SEARCH_FIELD_TIME, time, createFieldType_Long()));
 
 		if (title != null) {
-			doc.add(new Field(SEARCH_FIELD_TITLE, title, _textSearchField));
+			doc.add(new Field(SEARCH_FIELD_TITLE, title, createFieldType_Text()));
 		}
 
 		if (description != null) {
-			doc.add(new Field(SEARCH_FIELD_DESCRIPTION, description, _textSearchField));
+			doc.add(new Field(SEARCH_FIELD_DESCRIPTION, description, createFieldType_Text()));
 		}
 
 		indexWriter.addDocument(doc);
@@ -322,14 +340,14 @@ public class FTSearchManager {
 		doc.add(new IntField(SEARCH_FIELD_DOC_SOURCE, DOC_SOURCE_TOUR, Store.YES));
 
 		doc.add(new LongField(SEARCH_FIELD_TOUR_ID, tourId, Store.YES));
-		doc.add(new LongField(SEARCH_FIELD_TIME, time, _longSearchField));
+		doc.add(new LongField(SEARCH_FIELD_TIME, time, createFieldType_Long()));
 
 		if (title != null) {
-			doc.add(new Field(SEARCH_FIELD_TITLE, title, _textSearchField));
+			doc.add(new Field(SEARCH_FIELD_TITLE, title, createFieldType_Text()));
 		}
 
 		if (description != null) {
-			doc.add(new Field(SEARCH_FIELD_DESCRIPTION, description, _textSearchField));
+			doc.add(new Field(SEARCH_FIELD_DESCRIPTION, description, createFieldType_Text()));
 		}
 
 		indexWriter.addDocument(doc);
@@ -350,18 +368,42 @@ public class FTSearchManager {
 		doc.add(new LongField(SEARCH_FIELD_TOUR_ID, tourId, Store.YES));
 
 		if (time != 0) {
-			doc.add(new LongField(SEARCH_FIELD_TIME, time, _longSearchField));
+			doc.add(new LongField(SEARCH_FIELD_TIME, time, createFieldType_Long()));
 		}
 
 		if (title != null) {
-			doc.add(new Field(SEARCH_FIELD_TITLE, title, _textSearchField));
+			doc.add(new Field(SEARCH_FIELD_TITLE, title, createFieldType_Text()));
 		}
 
 		if (description != null) {
-			doc.add(new Field(SEARCH_FIELD_DESCRIPTION, description, _textSearchField));
+			doc.add(new Field(SEARCH_FIELD_DESCRIPTION, description, createFieldType_Text()));
 		}
 
 		indexWriter.addDocument(doc);
+	}
+
+	private static FieldType createFieldType_Long() {
+
+		final FieldType _longSearchField = new FieldType(LongField.TYPE_STORED);
+		_longSearchField.setIndexOptions(IndexOptions.DOCS_AND_FREQS_AND_POSITIONS_AND_OFFSETS);
+
+		return _longSearchField;
+	}
+
+	/**
+	 * This field must be created for each document otherwise the highlighter will throw the
+	 * exception
+	 * <p>
+	 * <b>field 'description' was indexed without offsets, cannot highlight</b>
+	 * 
+	 * @return
+	 */
+	private static FieldType createFieldType_Text() {
+
+		final FieldType _textSearchField = new FieldType(TextField.TYPE_STORED);
+		_textSearchField.setIndexOptions(IndexOptions.DOCS_AND_FREQS_AND_POSITIONS_AND_OFFSETS);
+
+		return _textSearchField;
 	}
 
 	private static void createStores_TourData(final Connection conn, final IProgressMonitor monitor)
@@ -638,21 +680,21 @@ public class FTSearchManager {
 
 		Analyzer analyzer = null;
 
-//		try {
-//
-//			final Locale currentLocale = Locale.getDefault();
-//
-////			currentLocale = Locale.GERMAN;
-////			currentLocale = Locale.ENGLISH;
-////
-////			analyzer = SearchUtils.getAnalyzerForLocale(currentLocale);
-////			analyzer = new GermanAnalyzer();
-////			analyzer = new EnglishAnalyzer();
-//
-//
-//		} catch (final SQLException e) {
-//			StatusUtil.showStatus(e);
-//		}
+		// try {
+		//
+		// final Locale currentLocale = Locale.getDefault();
+		//
+		// // currentLocale = Locale.GERMAN;
+		// // currentLocale = Locale.ENGLISH;
+		// //
+		// // analyzer = SearchUtils.getAnalyzerForLocale(currentLocale);
+		// // analyzer = new GermanAnalyzer();
+		// // analyzer = new EnglishAnalyzer();
+		//
+		//
+		// } catch (final SQLException e) {
+		// StatusUtil.showStatus(e);
+		// }
 
 		analyzer = new StandardAnalyzer(new CharArraySet(0, true));
 
@@ -683,6 +725,12 @@ public class FTSearchManager {
 
 			if (_suggester == null) {
 				setupSuggester();
+			}
+
+			if (_indexReader.numDocs() == 0) {
+
+				// Suggester for 0 documents causes an exception
+				return null;
 			}
 
 			final List<LookupResult> suggestions = _suggester.lookup(contents, false, 10000);
@@ -767,6 +815,17 @@ public class FTSearchManager {
 
 			setupIndexReader();
 
+			int maxDoc = _indexReader.maxDoc();
+
+			if (maxDoc == 0) {
+
+				// there are 0 documents
+
+				searchResult.totalHits = 0;
+
+				return;
+			}
+
 			final String[] queryFields = {
 					//
 					SEARCH_FIELD_TITLE,
@@ -788,10 +847,61 @@ public class FTSearchManager {
 
 				// this is a new search
 
+				/*
+				 * Set sorting
+				 */
 				final SortField sortByTime = new SortField(SEARCH_FIELD_TIME, Type.LONG, _isSortDateAscending == false);
 				final Sort sort = new Sort(sortByTime);
 
-				_topDocs = _indexSearcher.search(query, _indexReader.maxDoc(), sort);
+				if (_isShowContentAll) {
+
+					// no filtering
+					_topDocs = _indexSearcher.search(query, maxDoc, sort);
+
+				} else {
+
+					// filter by content
+
+					final BooleanFilter searchFilter = new BooleanFilter();
+
+					if (_isShowContentMarker) {
+
+						final NumericRangeFilter<Integer> filter = NumericRangeFilter.newIntRange(
+								SEARCH_FIELD_DOC_SOURCE,
+								DOC_SOURCE_TOUR_MARKER,
+								DOC_SOURCE_TOUR_MARKER,
+								true,
+								true);
+
+						searchFilter.add(new FilterClause(filter, Occur.SHOULD));
+					}
+
+					if (_isShowContentTour) {
+
+						final NumericRangeFilter<Integer> filter = NumericRangeFilter.newIntRange(
+								SEARCH_FIELD_DOC_SOURCE,
+								DOC_SOURCE_TOUR,
+								DOC_SOURCE_TOUR,
+								true,
+								true);
+
+						searchFilter.add(new FilterClause(filter, Occur.SHOULD));
+					}
+
+					if (_isShowContentWaypoint) {
+
+						final NumericRangeFilter<Integer> filter = NumericRangeFilter.newIntRange(
+								SEARCH_FIELD_DOC_SOURCE,
+								DOC_SOURCE_WAY_POINT,
+								DOC_SOURCE_WAY_POINT,
+								true,
+								true);
+
+						searchFilter.add(new FilterClause(filter, Occur.SHOULD));
+					}
+
+					_topDocs = _indexSearcher.search(query, searchFilter, maxDoc, sort);
+				}
 
 				_topDocsSearchText = searchText;
 			}
@@ -916,7 +1026,7 @@ public class FTSearchManager {
 					final Document doc = indexReader.document(docId, fieldsToLoad);
 
 					resultItem.docId = docId;
-//					resultItem.score = scoreDocs[docStartIndex + hitIndex].score;
+					// resultItem.score = scoreDocs[docStartIndex + hitIndex].score;
 
 					for (final IndexableField indexField : doc.getFields()) {
 
@@ -979,7 +1089,16 @@ public class FTSearchManager {
 		return searchResult;
 	}
 
-	static void setResultSorting(final boolean isSortDateAscending) {
+	static void setSearchOptions(	final boolean isShowContentAll,
+									final boolean isShowContentMarker,
+									final boolean isShowContentTour,
+									final boolean isShowContentWaypoint,
+									final boolean isSortDateAscending) {
+
+		_isShowContentAll = isShowContentAll;
+		_isShowContentMarker = isShowContentMarker;
+		_isShowContentTour = isShowContentTour;
+		_isShowContentWaypoint = isShowContentWaypoint;
 
 		_isSortDateAscending = isSortDateAscending;
 	}
@@ -1078,10 +1197,11 @@ public class FTSearchManager {
 	public static void setupSuggester() {
 
 		if (_suggester == null) {
-			
-//			_suggester = setupSuggester_Analyzing();
-//			_suggester = setupSuggester_AnalyzingInfix();
-//			_suggester = setupSuggester_NGramAnalyzing();
+
+			// _suggester = setupSuggester_Analyzing();
+			// _suggester = setupSuggester_AnalyzingInfix();
+			// _suggester = setupSuggester_NGramAnalyzing();
+
 			_suggester = setupSuggester_FreeText();
 		}
 	}
@@ -1140,7 +1260,7 @@ public class FTSearchManager {
 							final Analyzer indexAnalyzer = new StandardAnalyzer(new CharArraySet(0, true));
 							final Analyzer queryAnalyzer = new WhitespaceAnalyzer();
 
-							_infixStore = openStore("AnalyzingInfixSuggesterSTORE");
+							_infixStore = openStore("AnalyzingInfixSuggesterSTORE"); //$NON-NLS-1$
 
 							suggester[0] = new AnalyzingInfixSuggester(
 									LUCENE_VERSION,
@@ -1166,6 +1286,16 @@ public class FTSearchManager {
 
 		setupIndexReader();
 
+		int numDocs = _indexReader.numDocs();
+		if (numDocs == 0) {
+
+			/*
+			 * Suggester for 0 documents causes an exception
+			 */
+
+			return null;
+		}
+
 		final Lookup suggester[] = new FreeTextSuggester[1];
 
 		Display.getDefault().syncExec(new Runnable() {
@@ -1179,11 +1309,23 @@ public class FTSearchManager {
 						try {
 
 							final DocumentInputIterator inputIterator = new DocumentInputIterator(_indexReader);
+
 //							final Analyzer queryAnalyzer = new WhitespaceAnalyzer();
 							final Analyzer queryAnalyzer = new StandardAnalyzer(new CharArraySet(0, true));
 
 							suggester[0] = new FreeTextSuggester(queryAnalyzer, queryAnalyzer, 4, (byte) 0x20);
-							suggester[0].build(inputIterator);
+
+							try {
+								suggester[0].build(inputIterator);
+							} catch (IllegalArgumentException e) {
+
+								// java.lang.IllegalArgumentException: need at least one suggestion
+
+								/*
+								 * This exception can occure when there are documents available but
+								 * do not contain any content which the suggester can use.
+								 */
+							}
 
 						} catch (final Exception e) {
 							StatusUtil.showStatus(e);
@@ -1204,45 +1346,45 @@ public class FTSearchManager {
 
 		try {
 
-//			static {
-//
-//					analyzer = new Analyzer() {
-//
-//						@Override
+			// static {
+			//
+			// analyzer = new Analyzer() {
+			//
+			// @Override
 //						public TokenStream tokenStream(final String fieldName, final Reader reader) {
-//
-//							TokenStream result = new StandardTokenizer(reader);
-//
-//							result = new StandardFilter(result);
-//							result = new LowerCaseFilter(result);
-//							result = new ISOLatin1AccentFilter(result);
-//							result = new StopFilter(result, ENGLISH_STOP_WORDS);
-//							result = new EdgeNGramTokenFilter(result, Side.FRONT, 1, 20);
-//
-//							return result;
-//						}
-//					};
-//
+			//
+			// TokenStream result = new StandardTokenizer(reader);
+			//
+			// result = new StandardFilter(result);
+			// result = new LowerCaseFilter(result);
+			// result = new ISOLatin1AccentFilter(result);
+			// result = new StopFilter(result, ENGLISH_STOP_WORDS);
+			// result = new EdgeNGramTokenFilter(result, Side.FRONT, 1, 20);
+			//
+			// return result;
+			// }
+			// };
+			//
 //					autocompletionAnalyzer = new AnalyzerWrapper(Analyzer.PER_FIELD_REUSE_STRATEGY) {
-//
-//						@Override
-//						protected Analyzer getWrappedAnalyzer(final String fieldName) {
-//							return analyzer;
-//						}
-//
-//						@Override
+			//
+			// @Override
+			// protected Analyzer getWrappedAnalyzer(final String fieldName) {
+			// return analyzer;
+			// }
+			//
+			// @Override
 //						protected TokenStreamComponents wrapComponents(	final String fieldName,
-//																		final TokenStreamComponents components) {
-//
+			// final TokenStreamComponents components) {
+			//
 //							final NGramTokenFilter filter = new NGramTokenFilter(components.getTokenStream(), 2, 100);
-//							final Tokenizer tokenizer = components.getTokenizer();
-//
-//							return new TokenStreamComponents(tokenizer, filter);
-//						}
-//					};
-//
+			// final Tokenizer tokenizer = components.getTokenizer();
+			//
+			// return new TokenStreamComponents(tokenizer, filter);
+			// }
+			// };
+			//
 //					newInfixSuggester = new AnalyzingSuggester(autocompletionAnalyzer, analyzer);
-//				}
+			// }
 
 		} catch (final Exception e) {
 			StatusUtil.showStatus(e);
@@ -1253,35 +1395,35 @@ public class FTSearchManager {
 
 	public static void updateIndex(final ArrayList<TourData> modifiedTours) {
 
-//		setupIndexReader();
-//
-//		FSDirectory indexStore = null;
-//		final PreparedStatement stmt = null;
-//		IndexWriter indexWriter = null;
-//
-//		try {
-//
-//			indexStore = openStore(TourDatabase.TABLE_TOUR_DATA);
-//			indexWriter = new IndexWriter(indexStore, getIndexWriterConfig());
-//
-//		} catch (final IOException e) {
-//			StatusUtil.showStatus(e);
-//		} finally {
-//
-//			if (indexWriter != null) {
-//				try {
-//					indexWriter.close();
-//				} catch (final IOException e) {
-//					StatusUtil.showStatus(e);
-//				}
-//			}
-//
-//			if (indexStore != null) {
-//				indexStore.close();
-//			}
-//
-//			Util.closeSql(stmt);
-//		}
+		// setupIndexReader();
+		//
+		// FSDirectory indexStore = null;
+		// final PreparedStatement stmt = null;
+		// IndexWriter indexWriter = null;
+		//
+		// try {
+		//
+		// indexStore = openStore(TourDatabase.TABLE_TOUR_DATA);
+		// indexWriter = new IndexWriter(indexStore, getIndexWriterConfig());
+		//
+		// } catch (final IOException e) {
+		// StatusUtil.showStatus(e);
+		// } finally {
+		//
+		// if (indexWriter != null) {
+		// try {
+		// indexWriter.close();
+		// } catch (final IOException e) {
+		// StatusUtil.showStatus(e);
+		// }
+		// }
+		//
+		// if (indexStore != null) {
+		// indexStore.close();
+		// }
+		//
+		// Util.closeSql(stmt);
+		// }
 
 	}
 }

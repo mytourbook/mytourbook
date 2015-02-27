@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -19,10 +19,6 @@ import java.util.ArrayList;
 
 public class SearchResult {
 
-	/**
-	 * Key is tour ID.
-	 */
-//	final TreeMap<String, SearchResultItem>	items	= new TreeMap<String, SearchResultItem>();
 	final ArrayList<SearchResultItem>	items	= new ArrayList<SearchResultItem>();
 
 	int									totalHits;

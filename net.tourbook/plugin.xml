@@ -498,18 +498,6 @@
 			<!-- Search -->
 	
 				<command
-					commandId="command.net.tourbook.search.SearchViewXUL"
-					icon="icons/searchXUL.png"
-					label="%View_Name_SearchAll"
-					mnemonic="%View_Name_SearchAll_Mnemonic"/>
-			
-				<command
-					commandId="command.net.tourbook.search.SearchViewIE"
-					icon="icons/searchIE.png"
-					label="%View_Name_SearchAll"
-					mnemonic="%View_Name_SearchAll_Mnemonic"/>
-	
-				<command
 					commandId="command.net.tourbook.search.SearchView"
 					icon="icons/search.png"
 					label="%View_Name_SearchAll"
@@ -519,7 +507,7 @@
 					commandId="command.de.byteholder.geoclipse.poi.ShowPOI"
 					icon="icons/find.png"
 					label="%View_Name_SearchPOI"
-					tooltip="%View_Name_SearchPOI_Mnemonic"
+					mnemonic="%View_Name_SearchPOI_Mnemonic"
 				/>
    
 
@@ -909,20 +897,6 @@
 				<!-- Search -->
 
 				<command
-					commandId="command.net.tourbook.search.SearchViewXUL"
-					icon="icons/searchXUL.png"
-					label="%View_Name_SearchAll"
-					tooltip="%View_Name_SearchAll_Tooltip"
-				/>
-
-				<command
-					commandId="command.net.tourbook.search.SearchViewIE"
-					icon="icons/searchIE.png"
-					label="%View_Name_SearchAll"
-					tooltip="%View_Name_SearchAll_Tooltip"
-				/>
-
-				<command
 					commandId="command.net.tourbook.search.SearchView"
 					icon="icons/search.png"
 					label="%View_Name_SearchAll"
@@ -1107,18 +1081,6 @@
 			id="command.net.tourbook.search.SearchView"
 			name="%View_Name_SearchAll"
 			defaultHandler="net.tourbook.search.ActionHandler_OpenSearchView"
-			/>
-
-		<command
-			id="command.net.tourbook.search.SearchViewIE"
-			name="%View_Name_SearchAll"
-			defaultHandler="net.tourbook.search.ActionHandler_OpenSearchViewIE"
-			/>
-
-		<command
-			id="command.net.tourbook.search.SearchViewXUL"
-			name="%View_Name_SearchAll"
-			defaultHandler="net.tourbook.search.ActionHandler_OpenSearchViewXUL"
 			/>
 
 		<command
@@ -1503,25 +1465,9 @@
 
 			<view
 				category="net.tourbook.category.Tools"
-				class="net.tourbook.search.SearchViewSWT"
+				class="net.tourbook.search.SearchView"
 				icon="icons/search.png"
 				id="net.tourbook.search.SearchView"
-				name="%View_Name_SearchAll"
-			/>
-
-			<view
-				category="net.tourbook.category.Tools"
-				class="net.tourbook.search.SearchViewIE"
-				icon="icons/searchIE.png"
-				id="net.tourbook.search.SearchViewIE"
-				name="%View_Name_SearchAll"
-			/>
-
-			<view
-				category="net.tourbook.category.Tools"
-				class="net.tourbook.search.SearchViewXUL"
-				icon="icons/searchXUL.png"
-				id="net.tourbook.search.SearchViewXUL"
 				name="%View_Name_SearchAll"
 			/>
 
@@ -1759,11 +1705,10 @@
 		<!-- Tools -->
 	
 		<key
-			commandId="command.net.tourbook.search.SearchViewXUL"
+			commandId="command.net.tourbook.search.SearchView"
 			sequence="%Shortcut_Key_App_Search"
 			contextId="org.eclipse.ui.contexts.window"
-			schemeId="net.tourbook.scheme"
-		/>
+			schemeId="net.tourbook.scheme"/>
   
 	</extension>
 

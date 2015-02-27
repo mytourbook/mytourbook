@@ -1,0 +1,41 @@
+/*
+	Setup css only for the startup of the app, mainly the loading message.
+*/
+
+body 
+{
+	font-family: 			verdana, helvetica, arial, sans-serif;
+	font-size: 				13px;	
+	line-height:			130%;
+}
+
+html, body 
+{
+    height:					100%;
+}
+
+#domLoading 
+{
+	/* this is part of the trick to align vertically in the middle */
+	display:				table;		
+	
+	position:				absolute;
+	z-index:				1001;
+	top:					0;
+	left:					0;
+	width:					100%;
+	height:					100%;
+	background-color:		#fff;
+	
+	color: 					#aaa;
+	font-size: 				2em;
+}
+
+#domLoading div
+{
+	/* this is part of the trick to align vertically in the middle */
+	display:				table-cell;
+
+	vertical-align: 		middle;
+	text-align: 			center;
+}
