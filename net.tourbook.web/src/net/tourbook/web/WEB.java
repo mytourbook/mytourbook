@@ -63,8 +63,9 @@ public class WEB {
 	/**
 	 * Supported languages.
 	 */
-	static String[]				SUPPORTED_LANGUAGES						= { //
-																		"cs_CZ", //$NON-NLS-1$
+	static String[]				SUPPORTED_LANGUAGES						= { // 
+																		// cs_CZ
+			"cs", //$NON-NLS-1$
 			"de",//$NON-NLS-1$
 			DEFAULT_LANGUAGE,
 			"es",//$NON-NLS-1$

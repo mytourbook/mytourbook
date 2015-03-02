@@ -171,12 +171,12 @@ public class WebContentServer {
 		/*
 		 * Get valid locale, invalid locale will cause errors of not supported Dojo files.
 		 */
-		final String uiLanguage = Locale.getDefault().getLanguage();
+		final String localeLanguage = Locale.getDefault().getLanguage();
 		String dojoLocale = WEB.DEFAULT_LANGUAGE;
 
-		for (final String suppLanguage : WEB.SUPPORTED_LANGUAGES) {
-			if (suppLanguage.equals(uiLanguage)) {
-				dojoLocale = suppLanguage;
+		for (final String supportedLanguage : WEB.SUPPORTED_LANGUAGES) {
+			if (supportedLanguage.equals(localeLanguage)) {
+				dojoLocale = supportedLanguage;
 				break;
 			}
 		}

@@ -32,8 +32,8 @@ define(//
 		Search_Validation_SearchFilter                     : 'Nothing can be found with these search options.'
 	},		
 			
-	// list of available languages, default (en) is defined in 'root'
-	cs_CZ : true,
+	// list of available languages, default (en) is defined in 'root' (cs_CZ)
+	cs : true,
 	de : true,
 	es : true,
 	nl : true,
