@@ -36,21 +36,35 @@ public class ReplacingOutputStream extends OutputStream {
 
 		final StringBuilder sb = new StringBuilder();
 		for (final Integer intval : replacement) {
-			sb.append(Character.toChars(intval));
+			final char[] chars = Character.toChars(intval);
+			sb.append(chars);
 		}
+
 		replacement.clear();
 
 		final String oldValue = sb.toString();
-		final Object _newValue = replacementValues.get(oldValue);
-		if (_newValue == null) {
+		final Object replaceValue = replacementValues.get(oldValue);
+
+		if (replaceValue == null) {
 			throw new RuntimeException("Could not find replacement variable for value '" + oldValue + "'."); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 
-		final String newValue = _newValue.toString();
-		for (int i = 0; i < newValue.length(); ++i) {
+		if (replaceValue instanceof byte[]) {
 
-			final int value = newValue.codePointAt(i);
-			delegate.write(value);
+			final byte[] newValue = (byte[]) replaceValue;
+
+			delegate.write(newValue);
+
+		} else {
+
+			final String newValue = replaceValue.toString();
+
+			for (int i = 0; i < newValue.length(); ++i) {
+
+				final int value = newValue.codePointAt(i);
+
+				delegate.write(value);
+			}
 		}
 	}
 

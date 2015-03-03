@@ -20,6 +20,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.URI;
@@ -67,9 +68,10 @@ public class WebContentServer {
 
 	// variables which are replaced in .mthtml files
 	private static final String				MTHTML_DOJO_SEARCH			= "DOJO_SEARCH";								//$NON-NLS-1$
+	private static final String				MTHTML_LOCALE				= "LOCALE";									//$NON-NLS-1$
+
 	private static final String				MTHTML_MESSAGE_LOADING		= "MESSAGE_LOADING";							//$NON-NLS-1$
 	private static final String				MTHTML_MESSAGE_SEARCH_TITLE	= "MESSAGE_SEARCH_TITLE";						//$NON-NLS-1$
-	private static final String				MTHTML_LOCALE				= "LOCALE";									//$NON-NLS-1$
 
 	private static final String				ROOT_FILE_PATH_NAME			= "/";											//$NON-NLS-1$
 
@@ -186,8 +188,28 @@ public class WebContentServer {
 		 */
 		_mthtmlValues.put(MTHTML_DOJO_SEARCH, dojoSearch);
 		_mthtmlValues.put(MTHTML_LOCALE, dojoLocale);
-		_mthtmlValues.put(MTHTML_MESSAGE_LOADING, Messages.Web_Page_ContentLoading);
-		_mthtmlValues.put(MTHTML_MESSAGE_SEARCH_TITLE, Messages.Web_Page_Search_Title);
+//		_mthtmlValues.put(MTHTML_MESSAGE_LOADING, Messages.Web_Page_ContentLoading);
+//		_mthtmlValues.put(MTHTML_MESSAGE_SEARCH_TITLE, Messages.Web_Page_Search_Title);
+		try {
+
+//			final String umlaute = new String("ÄÖÜ äöü".getBytes(UI.UTF_8));
+//			final String umlauteRaw = "ÄÖÜ äöü ";
+
+			final String umlauteRaw = "ÄÖÜ äöü " + Messages.Web_Page_ContentLoading + Messages.Web_Page_Search_Title;
+			final byte[] umlauteBytes = umlauteRaw.getBytes(UI.UTF_8);
+			final String umlauteUTF8 = new String(umlauteBytes, UI.UTF_8);
+
+//			final String umlaute = URLEncoder.encode("ÄÖÜ äöü", UI.UTF_8);
+
+			System.out.println((UI.timeStampNano()) + ("umlaute: " + umlauteUTF8));
+			// TODO remove SYSTEM.OUT.PRINTLN
+
+			_mthtmlValues.put(MTHTML_MESSAGE_LOADING, umlauteBytes);
+			_mthtmlValues.put(MTHTML_MESSAGE_SEARCH_TITLE, umlauteBytes);
+
+		} catch (final UnsupportedEncodingException e) {
+			e.printStackTrace();
+		}
 	}
 
 	private static class DefaultHandler implements HttpHandler {
@@ -410,6 +432,13 @@ public class WebContentServer {
 
 		FileInputStream fs = null;
 		OutputStream os = null;
+
+//		FileOutputStream fos = new FileOutputStream("File2Hex.txt");
+//		  OutputStreamWriter osw = new OutputStreamWriter(fos, "UTF-8");
+//		  osw.write("\uFEFF");
+
+//		  writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), UI.UTF_8));
+
 		ReplacingOutputStream replacingOS = null;
 
 		try {

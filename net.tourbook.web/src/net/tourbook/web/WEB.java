@@ -50,7 +50,7 @@ public class WEB {
 	 * {@value #WEB_CONTENT_DEVELOPMENT_FOLDER} folder otherwise it is delivered from the
 	 * {@value #WEB_CONTENT_RELEASE_FOLDER} folder.
 	 */
-	static boolean				IS_DEBUG								= false;
+	static boolean				IS_DEBUG								= true;
 
 	/*
 	 * It is very complicated to support testing for language translators, therefore it is currently
@@ -63,7 +63,7 @@ public class WEB {
 	/**
 	 * Supported languages.
 	 */
-	static String[]				SUPPORTED_LANGUAGES						= { // 
+	static String[]				SUPPORTED_LANGUAGES						= { //
 																		// cs_CZ
 			"cs", //$NON-NLS-1$
 			"de",//$NON-NLS-1$
