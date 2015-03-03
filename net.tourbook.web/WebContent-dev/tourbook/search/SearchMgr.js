@@ -1,5 +1,6 @@
 // 'use strict';
 
+/*eslint-env amd */
 define(
 	[ //
 	"dojo/_base/declare"
