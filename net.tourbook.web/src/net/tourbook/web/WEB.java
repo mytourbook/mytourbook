@@ -50,7 +50,7 @@ public class WEB {
 	 * {@value #WEB_CONTENT_DEVELOPMENT_FOLDER} folder otherwise it is delivered from the
 	 * {@value #WEB_CONTENT_RELEASE_FOLDER} folder.
 	 */
-	static boolean				IS_DEBUG								= true;
+	static boolean				IS_DEBUG								= false;
 
 	/*
 	 * It is very complicated to support testing for language translators, therefore it is currently

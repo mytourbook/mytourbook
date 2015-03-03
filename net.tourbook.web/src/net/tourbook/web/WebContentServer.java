@@ -184,28 +184,17 @@ public class WebContentServer {
 		}
 
 		/*
-		 * Text replacements for commen messages.
+		 * Text replacements for common messages.
 		 */
 		_mthtmlValues.put(MTHTML_DOJO_SEARCH, dojoSearch);
 		_mthtmlValues.put(MTHTML_LOCALE, dojoLocale);
-//		_mthtmlValues.put(MTHTML_MESSAGE_LOADING, Messages.Web_Page_ContentLoading);
-//		_mthtmlValues.put(MTHTML_MESSAGE_SEARCH_TITLE, Messages.Web_Page_Search_Title);
+
 		try {
 
-//			final String umlaute = new String("ִײÜ הצü".getBytes(UI.UTF_8));
-//			final String umlauteRaw = "ִײÜ הצü ";
+			// these text must be converted into UTF-8 otherwise they are displayed unusable
 
-			final String umlauteRaw = "ִײÜ הצü " + Messages.Web_Page_ContentLoading + Messages.Web_Page_Search_Title;
-			final byte[] umlauteBytes = umlauteRaw.getBytes(UI.UTF_8);
-			final String umlauteUTF8 = new String(umlauteBytes, UI.UTF_8);
-
-//			final String umlaute = URLEncoder.encode("ִײÜ הצü", UI.UTF_8);
-
-			System.out.println((UI.timeStampNano()) + ("umlaute: " + umlauteUTF8));
-			// TODO remove SYSTEM.OUT.PRINTLN
-
-			_mthtmlValues.put(MTHTML_MESSAGE_LOADING, umlauteBytes);
-			_mthtmlValues.put(MTHTML_MESSAGE_SEARCH_TITLE, umlauteBytes);
+			_mthtmlValues.put(MTHTML_MESSAGE_LOADING, Messages.Web_Page_ContentLoading.getBytes(UI.UTF_8));
+			_mthtmlValues.put(MTHTML_MESSAGE_SEARCH_TITLE, Messages.Web_Page_Search_Title.getBytes(UI.UTF_8));
 
 		} catch (final UnsupportedEncodingException e) {
 			e.printStackTrace();
