@@ -20,7 +20,7 @@
 	<property name="path-language-target-temp" value="${path-language-archive}/temp/unzip" />
  
 	<!--
-		DEFAULT target
+		DEFAULT target (cs_CZ)
 	-->
 	<target name="unzip-all-archives">
 
@@ -33,10 +33,10 @@
 		</delete>
 
 		<!-- 
-			cs_CZ - CZECH: unzip archive: mt-cs_CZ.zip 
+			cs - CZECH: unzip archive: mt-cs.zip 
 		-->
 		<antcall target="unzip-archive-for-one-language">
-			<param name="archive-language" value="cs_CZ" />
+			<param name="archive-language" value="cs" />
 		</antcall>
 
 		<!-- 

@@ -19,9 +19,9 @@ var profile = (function() {
 
 	return {
 
-		// some properties are set in Create-Dojo-Bundle.xml
+		// some properties are set in Create-Dojo-Bundle.xml (cs_CZ)
 
-		localeList : "cs_CZ,de,en,es,fr,it,nl",
+		localeList : "cs,de,en,es,fr,it,nl",
 
 		// Strips all comments and whitespace from CSS files and inlines @imports where possible.
 		cssOptimize : 'comments',

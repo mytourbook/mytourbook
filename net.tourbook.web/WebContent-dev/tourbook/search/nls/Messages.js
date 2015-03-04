@@ -33,7 +33,7 @@ define(//
 	},		
 			
 	// list of available languages, default (en) is defined in 'root'
-	cs_CZ : true,
+	cs : true,
 	de : true,
 	es : true,
 	nl : true,

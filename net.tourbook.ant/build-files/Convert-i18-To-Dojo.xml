@@ -11,7 +11,7 @@
 
 	<!--
 	
-		Convert Java properties into Dojo language files.
+		Convert Java properties into Dojo language files (cs_CZ)
 
 	-->
 	<target name="main">
@@ -19,7 +19,7 @@
 		<i18ToDojo	
 			
 			rootLanguage	="en"
-			otherLanguages	="cs_CZ,de,es,nl,fr,it"
+			otherLanguages	="cs,de,es,nl,fr,it"
 			
 			i18dir			="${searchNLS}"
 			javaProperties	="${javaProperties}" 

@@ -20,6 +20,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.URI;
@@ -67,9 +68,10 @@ public class WebContentServer {
 
 	// variables which are replaced in .mthtml files
 	private static final String				MTHTML_DOJO_SEARCH			= "DOJO_SEARCH";								//$NON-NLS-1$
+	private static final String				MTHTML_LOCALE				= "LOCALE";									//$NON-NLS-1$
+
 	private static final String				MTHTML_MESSAGE_LOADING		= "MESSAGE_LOADING";							//$NON-NLS-1$
 	private static final String				MTHTML_MESSAGE_SEARCH_TITLE	= "MESSAGE_SEARCH_TITLE";						//$NON-NLS-1$
-	private static final String				MTHTML_LOCALE				= "LOCALE";									//$NON-NLS-1$
 
 	private static final String				ROOT_FILE_PATH_NAME			= "/";											//$NON-NLS-1$
 
@@ -171,23 +173,32 @@ public class WebContentServer {
 		/*
 		 * Get valid locale, invalid locale will cause errors of not supported Dojo files.
 		 */
-		final String uiLanguage = Locale.getDefault().getLanguage();
+		final String localeLanguage = Locale.getDefault().getLanguage();
 		String dojoLocale = WEB.DEFAULT_LANGUAGE;
 
-		for (final String suppLanguage : WEB.SUPPORTED_LANGUAGES) {
-			if (suppLanguage.equals(uiLanguage)) {
-				dojoLocale = suppLanguage;
+		for (final String supportedLanguage : WEB.SUPPORTED_LANGUAGES) {
+			if (supportedLanguage.equals(localeLanguage)) {
+				dojoLocale = supportedLanguage;
 				break;
 			}
 		}
 
 		/*
-		 * Text replacements for commen messages.
+		 * Text replacements for common messages.
 		 */
 		_mthtmlValues.put(MTHTML_DOJO_SEARCH, dojoSearch);
 		_mthtmlValues.put(MTHTML_LOCALE, dojoLocale);
-		_mthtmlValues.put(MTHTML_MESSAGE_LOADING, Messages.Web_Page_ContentLoading);
-		_mthtmlValues.put(MTHTML_MESSAGE_SEARCH_TITLE, Messages.Web_Page_Search_Title);
+
+		try {
+
+			// these text must be converted into UTF-8 otherwise they are displayed unusable
+
+			_mthtmlValues.put(MTHTML_MESSAGE_LOADING, Messages.Web_Page_ContentLoading.getBytes(UI.UTF_8));
+			_mthtmlValues.put(MTHTML_MESSAGE_SEARCH_TITLE, Messages.Web_Page_Search_Title.getBytes(UI.UTF_8));
+
+		} catch (final UnsupportedEncodingException e) {
+			e.printStackTrace();
+		}
 	}
 
 	private static class DefaultHandler implements HttpHandler {
@@ -410,6 +421,13 @@ public class WebContentServer {
 
 		FileInputStream fs = null;
 		OutputStream os = null;
+
+//		FileOutputStream fos = new FileOutputStream("File2Hex.txt");
+//		  OutputStreamWriter osw = new OutputStreamWriter(fos, "UTF-8");
+//		  osw.write("\uFEFF");
+
+//		  writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), UI.UTF_8));
+
 		ReplacingOutputStream replacingOS = null;
 
 		try {
