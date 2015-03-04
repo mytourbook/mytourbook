@@ -89,27 +89,15 @@ public class FitContextData {
 
 			final com.garmin.fit.DateTime garminTime = mesg.getTimestamp();
 
+			// convert garmin time into linux time
 			final long garminTimeS = garminTime.getTimestamp();
 			final long garminTimeMS = garminTimeS * 1000;
 			final long linuxTime = garminTimeMS + com.garmin.fit.DateTime.OFFSET;
-
-// THIS CREATES A WRONG TIME
-//			final Date javaDate = garminTime.getDate();
-//			final DateTime absoluteTime = new DateTime(javaDate);
-//			final long absoluteTimeMS = absoluteTime.getMillis();
 
 			gearData.absoluteTime = linuxTime;
 			gearData.gears = gearChangeData;
 
 			tourGears.add(gearData);
-
-//			System.out.println("ctxGear "
-//					+ ("garminTimestamp: " + garminTime.getTimestamp())
-//					+ ("\tjavaTime: " + absoluteTimeMS)
-//					+ ("\tlinuxTime: " + linuxTime)
-//			//
-//					);
-//			// TODO remove SYSTEM.OUT.PRINTLN
 		}
 	}
 

@@ -25,5 +25,7 @@ public enum ChartType {
 
 	XY_SCATTER,
 
-	HISTORY
+	HISTORY,
+
+	HORIZONTAL_BAR
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -67,6 +67,7 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 	private static final String		GRAPH_LABEL_ALTIMETER						= net.tourbook.common.Messages.Graph_Label_Altimeter;
 	private static final String		GRAPH_LABEL_ALTITUDE						= net.tourbook.common.Messages.Graph_Label_Altitude;
 	private static final String		GRAPH_LABEL_CADENCE							= net.tourbook.common.Messages.Graph_Label_Cadence;
+	private static final String		GRAPH_LABEL_GEARS							= net.tourbook.common.Messages.Graph_Label_Gears;
 	private static final String		GRAPH_LABEL_GRADIENT						= net.tourbook.common.Messages.Graph_Label_Gradient;
 	private static final String		GRAPH_LABEL_HEARTBEAT						= net.tourbook.common.Messages.Graph_Label_Heartbeat;
 	private static final String		GRAPH_LABEL_HEARTBEAT_UNIT					= net.tourbook.common.Messages.Graph_Label_Heartbeat_Unit;
@@ -262,12 +263,15 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 //		_graphCheckboxList.getTable().setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
 
 		_graphCheckboxList.setContentProvider(new IStructuredContentProvider() {
+			@Override
 			public void dispose() {}
 
+			@Override
 			public Object[] getElements(final Object inputElement) {
 				return _viewerGraphs.toArray();
 			}
 
+			@Override
 			public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
 		});
 
@@ -280,6 +284,7 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 		});
 
 		_graphCheckboxList.addCheckStateListener(new ICheckStateListener() {
+			@Override
 			public void checkStateChanged(final CheckStateChangedEvent event) {
 
 				// keep the checked status
@@ -294,6 +299,7 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 		});
 
 		_graphCheckboxList.addSelectionChangedListener(new ISelectionChangedListener() {
+			@Override
 			public void selectionChanged(final SelectionChangedEvent event) {
 				enableUpDownActions();
 				doLiveUpdate();
@@ -318,8 +324,10 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 			_btnUp.setText(Messages.Pref_Graphs_Button_up);
 			_btnUp.setEnabled(false);
 			_btnUp.addSelectionListener(new SelectionListener() {
+				@Override
 				public void widgetDefaultSelected(final SelectionEvent e) {}
 
+				@Override
 				public void widgetSelected(final SelectionEvent e) {
 					moveSelectionUp();
 					enableUpDownActions();
@@ -335,8 +343,10 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 			_btnDown.setText(Messages.Pref_Graphs_Button_down);
 			_btnDown.setEnabled(false);
 			_btnDown.addSelectionListener(new SelectionListener() {
+				@Override
 				public void widgetDefaultSelected(final SelectionEvent e) {}
 
+				@Override
 				public void widgetSelected(final SelectionEvent e) {
 					moveSelectionDown();
 					enableUpDownActions();
@@ -924,6 +934,7 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 	/*
 	 * @see org.eclipse.ui.IWorkbenchPreferencePage#init(org.eclipse.ui.IWorkbench)
 	 */
+	@Override
 	public void init(final IWorkbench workbench) {
 		setPreferenceStore(_prefStore);
 	}
@@ -933,6 +944,7 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 		_pc = new PixelConverter(parent);
 
 		_defaultMouseWheelListener = new MouseWheelListener() {
+			@Override
 			public void mouseScrolled(final MouseEvent event) {
 				UI.adjustSpinnerValueOnMouseScroll(event);
 				onSelection();
@@ -954,6 +966,7 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 		final Graph graphPulse = new Graph(TourManager.GRAPH_PULSE, GRAPH_LABEL_HEARTBEAT);
 		final Graph graphTemperature = new Graph(TourManager.GRAPH_TEMPERATURE, GRAPH_LABEL_TEMPERATURE);
 		final Graph graphCadence = new Graph(TourManager.GRAPH_CADENCE, GRAPH_LABEL_CADENCE);
+		final Graph graphGears = new Graph(TourManager.GRAPH_GEARS, GRAPH_LABEL_GEARS);
 		final Graph graphAltimeter = new Graph(TourManager.GRAPH_ALTIMETER, GRAPH_LABEL_ALTIMETER);
 		final Graph graphGradient = new Graph(TourManager.GRAPH_GRADIENT, GRAPH_LABEL_GRADIENT);
 
@@ -965,6 +978,7 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 		_graphMap.put(TourManager.GRAPH_PULSE, graphPulse);
 		_graphMap.put(TourManager.GRAPH_TEMPERATURE, graphTemperature);
 		_graphMap.put(TourManager.GRAPH_CADENCE, graphCadence);
+		_graphMap.put(TourManager.GRAPH_GEARS, graphGears);
 		_graphMap.put(TourManager.GRAPH_ALTIMETER, graphAltimeter);
 		_graphMap.put(TourManager.GRAPH_GRADIENT, graphGradient);
 
@@ -976,6 +990,7 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 		_graphList.add(graphPulse);
 		_graphList.add(graphTemperature);
 		_graphList.add(graphCadence);
+		_graphList.add(graphGears);
 		_graphList.add(graphAltimeter);
 		_graphList.add(graphGradient);
 	}

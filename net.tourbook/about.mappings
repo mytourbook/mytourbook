@@ -1,4 +1,4 @@
 # these settings are merged into the file plugin.properties
 # version is also set in net.tourbook.application.ApplicationVersion 
-0=15.3.0
+0=15.?.0
 1=2015

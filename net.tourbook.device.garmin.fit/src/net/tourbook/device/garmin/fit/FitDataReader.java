@@ -77,11 +77,12 @@ public class FitDataReader extends TourbookDevice {
 					 */
 					if (fieldName.equals("") // //$NON-NLS-1$
 
-							|| fieldName.equals("timestamp") //$NON-NLS-1$
+//							|| fieldName.equals("timestamp") //$NON-NLS-1$
 
 							//
 							// record data
 							//
+
 							|| fieldName.equals("event") //$NON-NLS-1$
 							|| fieldName.equals("event_type") //$NON-NLS-1$
 							|| fieldName.equals("message_index") //$NON-NLS-1$
@@ -95,10 +96,16 @@ public class FitDataReader extends TourbookDevice {
 							|| fieldName.equals("position_long") //$NON-NLS-1$
 							|| fieldName.equals("speed") //$NON-NLS-1$
 							|| fieldName.equals("temperature") //$NON-NLS-1$
-//							|| fieldName.equals("front_gear") //$NON-NLS-1$
-//							|| fieldName.equals("front_gear_num") //$NON-NLS-1$
-//							|| fieldName.equals("rear_gear") //$NON-NLS-1$
-//							|| fieldName.equals("rear_gear_num") //$NON-NLS-1$
+							
+							|| fieldName.equals("front_gear") //$NON-NLS-1$
+							|| fieldName.equals("front_gear_num") //$NON-NLS-1$
+							|| fieldName.equals("rear_gear") //$NON-NLS-1$
+							|| fieldName.equals("rear_gear_num") //$NON-NLS-1$
+							
+							|| fieldName.equals("enhanced_altitude") //$NON-NLS-1$
+							|| fieldName.equals("enhanced_speed") //$NON-NLS-1$
+							|| fieldName.equals("enhanced_avg_speed") //$NON-NLS-1$
+							|| fieldName.equals("enhanced_max_speed") //$NON-NLS-1$
 
 							//
 							// lap data
@@ -212,26 +219,29 @@ public class FitDataReader extends TourbookDevice {
 			broadcaster.addListener(new RecordMesgListenerImpl(context));
 			broadcaster.addListener(new SessionMesgListenerImpl(context));
 
-			// START - show debug info
-			// START - show debug info
-			// START - show debug info
-			System.out.println();
-			System.out.println();
-			System.out.println((System.currentTimeMillis() + " [" + getClass().getSimpleName() + "]")
-					+ (" \t" + importFilePath));
-			System.out.println();
-			System.out.println(String.format(//
-					"%s %-5s %-30s %20s %s", //$NON-NLS-1$
-					"Timestamp",
-					"Num",
-					"Name",
-					"Value",
-					"Units"));
-			System.out.println();
-			addDebugListener(broadcaster);
-			// END - show debug info
-			// END - show debug info
-			// END - show debug info
+//			// 
+//			// START - show debug info
+//			// 
+//			
+//			System.out.println();
+//			System.out.println();
+//			System.out.println((System.currentTimeMillis() + " [" + getClass().getSimpleName() + "]")
+//					+ (" \t" + importFilePath));
+//			System.out.println();
+//			System.out.println(String.format(//
+//					"%s %-5s %-30s %20s %s", //$NON-NLS-1$
+//					"Timestamp",
+//					"Num",
+//					"Name",
+//					"Value",
+//					"Units"));
+//			System.out.println();
+//
+//			addDebugListener(broadcaster);
+//
+//			// 
+//			// END - show debug info
+//			// 
 
 			broadcaster.run(fis);
 

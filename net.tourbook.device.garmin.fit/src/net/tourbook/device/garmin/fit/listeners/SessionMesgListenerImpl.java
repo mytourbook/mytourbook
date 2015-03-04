@@ -31,7 +31,8 @@ public class SessionMesgListenerImpl extends AbstractMesgListener implements Ses
 
 		final TourData tourData = getTourData();
 
-		tourData.setTourStartTime(new org.joda.time.DateTime(startTime.getDate()));
+// since FIT SDK > 12 the tour start time is different with the records, therefore the tour start time is set later		
+//		tourData.setTourStartTime(new org.joda.time.DateTime(startTime.getDate()));
 
 		final Sport sport = mesg.getSport();
 		if (sport != null) {

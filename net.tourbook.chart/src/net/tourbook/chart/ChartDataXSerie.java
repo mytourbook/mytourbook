@@ -73,7 +73,7 @@ public class ChartDataXSerie extends ChartDataSerie {
 	 * Defines <code>true</code> or <code>false</code> if a line should be drawn for a value point,
 	 * can be <code>null</code> to disable this feature.
 	 */
-	public boolean[]		_noLine;
+	private boolean[]		_noLine;
 
 	/**
 	 * X-axis start Date/Time

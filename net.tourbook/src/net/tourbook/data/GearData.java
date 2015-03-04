@@ -17,6 +17,8 @@ package net.tourbook.data;
 
 import java.io.Serializable;
 
+import org.joda.time.DateTime;
+
 public class GearData implements Serializable {
 
 	private static final long	serialVersionUID	= 1L;
@@ -52,7 +54,7 @@ public class GearData implements Serializable {
 	@Override
 	public String toString() {
 		return "GearData ["
-				+ ("absoluteTime=" + absoluteTime + ", ")
+				+ ("absoluteTime=" + new DateTime(absoluteTime) + ", ")
 				+ ("FrontGearNum=" + getFrontGearNum() + ", ")
 				+ ("FrontGearTeeth=" + getFrontGearTeeth() + ", ")
 				+ ("RearGearNum=" + getRearGearNum() + ", ")

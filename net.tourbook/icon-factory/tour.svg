@@ -20,6 +20,28 @@
   <defs
      id="defs2987">
     <linearGradient
+       id="linearGradient6481">
+      <stop
+         style="stop-color:#3c650b;stop-opacity:1"
+         offset="0"
+         id="stop6483" />
+      <stop
+         style="stop-color:#ffffff;stop-opacity:1;"
+         offset="1"
+         id="stop6485" />
+    </linearGradient>
+    <linearGradient
+       id="linearGradient4513-8-4-5-3-6-2-7">
+      <stop
+         id="stop6475"
+         offset="0"
+         style="stop-color:#9e541d;stop-opacity:1;" />
+      <stop
+         id="stop6477"
+         offset="1"
+         style="stop-color:#ffffff;stop-opacity:1;" />
+    </linearGradient>
+    <linearGradient
        id="linearGradient4977">
       <stop
          style="stop-color:#6eacfb;stop-opacity:1"
@@ -3767,7 +3789,7 @@
        xlink:href="#linearGradient4513-8-4-5-3-6-2-7"
        inkscape:collect="always" />
     <linearGradient
-       id="linearGradient4513-8-4-5-3-6-2-7">
+       id="linearGradient6479">
       <stop
          style="stop-color:#9e541d;stop-opacity:1;"
          offset="0"
@@ -4013,6 +4035,15 @@
        x2="191.8069"
        y2="64.980614"
        gradientTransform="translate(-1.2103519e-5,1e-7)" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient6481"
+       id="linearGradient6330"
+       gradientUnits="userSpaceOnUse"
+       x1="270.10889"
+       y1="51.787136"
+       x2="270.10889"
+       y2="40.432831" />
   </defs>
   <sodipodi:namedview
      id="base"
@@ -4021,16 +4052,16 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="22.627417"
-     inkscape:cx="187.44889"
-     inkscape:cy="976.00292"
+     inkscape:zoom="16"
+     inkscape:cx="274.0007"
+     inkscape:cy="995.85341"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="true"
-     inkscape:window-width="1463"
-     inkscape:window-height="1330"
-     inkscape:window-x="504"
-     inkscape:window-y="78"
+     inkscape:window-width="1755"
+     inkscape:window-height="1337"
+     inkscape:window-x="409"
+     inkscape:window-y="70"
      inkscape:window-maximized="0"
      inkscape:snap-grids="true"
      inkscape:snap-page="false"
@@ -4060,6 +4091,15 @@
      inkscape:label="Layer 1"
      inkscape:groupmode="layer"
      id="layer1">
+    <path
+       sodipodi:nodetypes="cccc"
+       inkscape:export-ydpi="90"
+       inkscape:export-xdpi="90"
+       inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook\icons\graph-gears.png"
+       inkscape:connector-curvature="0"
+       id="path6328"
+       d="m 280.49997,51.862183 14.99999,0 -7.49999,-15 z"
+       style="fill:url(#linearGradient6330);fill-opacity:1;stroke:#3c650b;stroke-width:1;stroke-linecap:butt;stroke-linejoin:round;stroke-opacity:1" />
     <rect
        style="opacity:0.98999999;fill:none;stroke:none"
        id="rect6561-8-1-8"
@@ -4342,6 +4382,16 @@
        x="180"
        y="61.362179"
        inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook\icons\graph-overlapped.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <rect
+       style="opacity:0.98999999;fill:none;stroke:none"
+       id="rect6561-8-1-9-9-5-5-9-9-1-9-1-4-7"
+       width="16"
+       height="16"
+       x="282"
+       y="58.362183"
+       inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook\icons\graph-gears.png"
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90" />
   </g>

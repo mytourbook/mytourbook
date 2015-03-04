@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -38,6 +38,38 @@ public class SerieData implements Serializable {
 	public float[]				speedSerie20;
 	public float[]				powerSerie20;
 
+	/**
+	 * Gears are in the HEX format (left to right)
+	 * <p>
+	 * Front teeth<br>
+	 * Front gear number<br>
+	 * Back teeth<br>
+	 * Back gear number<br>
+	 * 
+	 * <pre>
+	 * 
+	 * public int getFrontGearNum() {
+	 * 	return (int) (gears &gt;&gt; 16 &amp; 0xff);
+	 * }
+	 * 
+	 * public int getFrontGearTeeth() {
+	 * 	return (int) (gears &gt;&gt; 24 &amp; 0xff);
+	 * }
+	 * 
+	 * public int getRearGearNum() {
+	 * 	return (int) (gears &amp; 0xff);
+	 * }
+	 * 
+	 * public int getRearGearTeeth() {
+	 * 	return (int) (gears &gt;&gt; 8 &amp; 0xff);
+	 * }
+	 * 
+	 * </pre>
+	 * 
+	 * @since Db-version 27
+	 */
+	public long[]				gears;
+
 	public double[]				longitude;
 	public double[]				latitude;
 
@@ -54,4 +86,5 @@ public class SerieData implements Serializable {
 	public int[]				powerSerie;
 
 	public int[]				deviceMarker;
+
 }

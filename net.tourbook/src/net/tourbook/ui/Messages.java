@@ -180,6 +180,13 @@ public class Messages extends NLS {
 	public static String		ColumnFactory_DPTolerance_Header;
 	public static String		ColumnFactory_DPTolerance_Label;
 	public static String		ColumnFactory_DPTolerance_Tooltip;
+	public static String		ColumnFactory_GearRatio_Header;
+	public static String		ColumnFactory_GearRatio_Label;
+	public static String		ColumnFactory_GearRatio_Tooltip;
+	public static String		ColumnFactory_GearTeeth_Header;
+	public static String		ColumnFactory_GearTeeth_Label;
+
+	public static String	ColumnFactory_GearTeeth_Tooltip;
 	public static String		ColumnFactory_Id_Label;
 	public static String		ColumnFactory_Id_Tooltip;
 	public static String		ColumnFactory_InetAddress_Label;

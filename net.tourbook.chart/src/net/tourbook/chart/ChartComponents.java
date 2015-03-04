@@ -1481,8 +1481,8 @@ public class ChartComponents extends Composite {
 		final double majorValue = Util.getMajorDecimalValue(graphUnit);
 
 		// calculate the vertical scaling between graph and device
-		final float value1 = (float) scaledValueRange / valueScaling;
-		final float graphScaleY = devGraphHeight / value1;
+		final double value1 = (double) scaledValueRange / valueScaling;
+		final double graphScaleY = devGraphHeight / value1;
 
 		// calculate the vertical device offset
 		int devYBottom = _devMarginTop + _devXTitleBarHeight;

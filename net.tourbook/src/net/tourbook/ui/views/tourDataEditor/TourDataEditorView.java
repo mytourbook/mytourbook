@@ -188,25 +188,20 @@ import org.joda.time.format.DateTimeFormatter;
  */
 public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITourViewer2, ITourProvider2 {
 
+
 	public static final String					ID								= "net.tourbook.views.TourDataEditorView";	//$NON-NLS-1$
 
 	private static final int					COLUMN_SPACING					= 20;
 
-	private final IPreferenceStore				_prefStore						= TourbookPlugin.getDefault() //
-																						.getPreferenceStore();
-
-	private final IDialogSettings				_viewState						= TourbookPlugin.getDefault() //
-																						.getDialogSettingsSection(ID);
-
-	private final IDialogSettings				_viewStateSlice					= TourbookPlugin.getDefault() //
-																						.getDialogSettingsSection(//
-																								ID + ".slice");			//$NON-NLS-1$
+	private final IPreferenceStore				_prefStore						= TourbookPlugin.getPrefStore();
+	private final IDialogSettings				_viewState						= TourbookPlugin.getState(ID);
+	private final IDialogSettings				_viewStateSlice					= TourbookPlugin
+																						.getState(ID + ".slice");			//$NON-NLS-1$
 
 	private final boolean						_isOSX							= net.tourbook.common.UI.IS_OSX;
 	private final boolean						_isLinux						= net.tourbook.common.UI.IS_LINUX;
 
 	private static final String					WIDGET_KEY						= "widgetKey";								//$NON-NLS-1$
-
 	private static final String					WIDGET_KEY_TOURDISTANCE			= "tourDistance";							//$NON-NLS-1$
 	private static final String					WIDGET_KEY_ALTITUDE_UP			= "altitudeUp";							//$NON-NLS-1$
 	private static final String					WIDGET_KEY_ALTITUDE_DOWN		= "altitudeDown";							//$NON-NLS-1$
@@ -220,11 +215,9 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	private static final int					BUSY_INDICATOR_ITEMS			= 5000;
 
 	private static final String					STATE_SELECTED_TAB				= "tourDataEditor.selectedTab";			//$NON-NLS-1$
-
 	private static final String					STATE_ROW_EDIT_MODE				= "tourDataEditor.rowEditMode";			//$NON-NLS-1$
 	private static final String					STATE_IS_EDIT_MODE				= "tourDataEditor.isEditMode";				//$NON-NLS-1$
 	private static final String					STATE_CSV_EXPORT_PATH			= "tourDataEditor.csvExportPath";			//$NON-NLS-1$
-
 	private static final String					STATE_SECTION_CHARACTERISTICS	= "STATE_SECTION_CHARACTERISTICS";			//$NON-NLS-1$
 	private static final String					STATE_SECTION_DATE_TIME			= "STATE_SECTION_DATE_TIME";				//$NON-NLS-1$
 	private static final String					STATE_SECTION_INFO				= "STATE_SECTION_INFO";					//$NON-NLS-1$
@@ -232,16 +225,16 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	private static final String					STATE_SECTION_TITLE				= "STATE_SECTION_TITLE";					//$NON-NLS-1$
 	private static final String					STATE_SECTION_WEATHER			= "STATE_SECTION_WEATHER";					//$NON-NLS-1$
 
+	private static final String					GEAR_TEETH_SEPARATOR			= " / ";									//$NON-NLS-1$
+
 	/**
 	 * Tour start daytime in seconds
 	 */
 	private int									_tourStartDayTime;
-
 	/*
 	 * data series which are displayed in the viewer
 	 */
 	private int[]								_serieTime;
-
 	private float[]								_serieDistance;
 	private float[]								_serieAltitude;
 	private float[]								_serieTemperature;
@@ -253,37 +246,37 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	private float[]								_seriePulse;
 	private double[]							_serieLatitude;
 	private double[]							_serieLongitude;
+	private float[][]							_serieGears;
 	private boolean[]							_serieBreakTime;
-
-	// slice viewer
+	//
 	private ColumnDefinition					_colDefAltitude;
 	private ColumnDefinition					_colDefCadence;
 	private ColumnDefinition					_colDefPulse;
 	private ColumnDefinition					_colDefTemperature;
 	private ColumnDefinition					_colDefLatitude;
 	private ColumnDefinition					_colDefLongitude;
-
+	//
 	private MessageManager						_messageManager;
-
 	private PostSelectionProvider				_postSelectionProvider;
-
 	private ISelectionListener					_postSelectionListener;
 	private IPartListener2						_partListener;
 	private IPropertyChangeListener				_prefChangeListener;
 	private ITourEventListener					_tourEventListener;
 	private ITourSaveListener					_tourSaveListener;
+	//
 	private final Calendar						_calendar						= GregorianCalendar.getInstance();
-
 	private final DateTimeFormatter				_dtFormatter					= DateTimeFormat.mediumDateTime();
-
 	private final NumberFormat					_nf1							= NumberFormat.getNumberInstance();
 	private final NumberFormat					_nf1NoGroup						= NumberFormat.getNumberInstance();
+	private final NumberFormat					_nf2							= NumberFormat.getNumberInstance();
 	private final NumberFormat					_nf3							= NumberFormat.getNumberInstance();
 	private final NumberFormat					_nf6							= NumberFormat.getNumberInstance();
 	private final NumberFormat					_nf3NoGroup						= NumberFormat.getNumberInstance();
 	{
 		_nf1.setMinimumFractionDigits(1);
 		_nf1.setMaximumFractionDigits(1);
+		_nf2.setMinimumFractionDigits(2);
+		_nf2.setMaximumFractionDigits(2);
 		_nf3.setMinimumFractionDigits(3);
 		_nf3.setMaximumFractionDigits(3);
 		_nf6.setMinimumFractionDigits(6);
@@ -302,11 +295,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	 * <code>false</code>: cell can be selected in the viewer
 	 */
 	private boolean								_isRowEditMode					= true;
-
 	private boolean								_isEditMode;
-
 	private long								_sliceViewerTourId				= -1;
-
 	private SelectionChartXSliderPosition		_sliceViewerXSliderPosition;
 	private boolean								_isTourDirty					= false;
 
@@ -2070,7 +2060,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		// define columns for the viewers
 		_sliceColumnManager = new ColumnManager(this, _viewStateSlice);
-		defineSliceViewerAllColumns(parent);
+		defineAllColumns(parent);
 
 		restoreStateBeforeUI();
 
@@ -3355,35 +3345,37 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		return _tab4Container;
 	}
 
-	private void defineSliceViewerAllColumns(final Composite parent) {
+	private void defineAllColumns(final Composite parent) {
 
-		defineSliceViewerColumns_1_First();
-		defineSliceViewerColumns_Sequence();
-		defineSliceViewerColumns_TimeInHHMMSSRelative();
-		defineSliceViewerColumns_TimeOfDay();
-		defineSliceViewerColumns_TimeInSeconds();
-		defineSliceViewerColumns_Distance();
-		defineSliceViewerColumns_Altitude();
-		defineSliceViewerColumns_Gradient();
-		defineSliceViewerColumns_Pulse();
-		defineSliceViewerColumns_Marker();
-		defineSliceViewerColumns_Temperature();
-		defineSliceViewerColumns_Cadence();
-		defineSliceViewerColumns_Speed();
-		defineSliceViewerColumns_Pace();
-		defineSliceViewerColumns_Power();
-		defineSliceViewerColumns_Latitude();
-		defineSliceViewerColumns_Longitude();
-		defineSliceViewerColumns_TimeDiff();
-		defineSliceViewerColumns_DistanceDiff();
-		defineSliceViewerColumns_BreakTime();
-		defineSliceViewerColumns_SpeedDiff();
+		defineColumn_1_First();
+		defineColumn_Sequence();
+		defineColumn_TimeInHHMMSSRelative();
+		defineColumn_TimeOfDay();
+		defineColumn_TimeInSeconds();
+		defineColumn_Distance();
+		defineColumn_Altitude();
+		defineColumn_Gradient();
+		defineColumn_Pulse();
+		defineColumn_Marker();
+		defineColumn_Temperature();
+		defineColumn_Cadence();
+		defineColumn_GearRatio();
+		defineColumn_GearTeeth();
+		defineColumn_Speed();
+		defineColumn_Pace();
+		defineColumn_Power();
+		defineColumn_Latitude();
+		defineColumn_Longitude();
+		defineColumn_TimeDiff();
+		defineColumn_DistanceDiff();
+		defineColumn_BreakTime();
+		defineColumn_SpeedDiff();
 	}
 
 	/**
 	 * 1. column will be hidden because the alignment for the first column is always to the left
 	 */
-	private void defineSliceViewerColumns_1_First() {
+	private void defineColumn_1_First() {
 
 		final ColumnDefinition colDef = TableColumnFactory.FIRST_COLUMN.createColumn(_sliceColumnManager, _pc);
 
@@ -3400,7 +3392,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	/**
 	 * column: altitude
 	 */
-	private void defineSliceViewerColumns_Altitude() {
+	private void defineColumn_Altitude() {
 
 		ColumnDefinition colDef;
 
@@ -3424,7 +3416,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	/**
 	 * column: cadence
 	 */
-	private void defineSliceViewerColumns_BreakTime() {
+	private void defineColumn_BreakTime() {
 
 		ColumnDefinition colDef;
 
@@ -3448,7 +3440,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	/**
 	 * column: cadence
 	 */
-	private void defineSliceViewerColumns_Cadence() {
+	private void defineColumn_Cadence() {
 
 		ColumnDefinition colDef;
 
@@ -3470,7 +3462,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	/**
 	 * column: distance
 	 */
-	private void defineSliceViewerColumns_Distance() {
+	private void defineColumn_Distance() {
 
 		final ColumnDefinition colDef = TableColumnFactory.DISTANCE.createColumn(_sliceColumnManager, _pc);
 
@@ -3498,7 +3490,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	/**
 	 * column: distance difference in seconds to previous slice
 	 */
-	private void defineSliceViewerColumns_DistanceDiff() {
+	private void defineColumn_DistanceDiff() {
 
 		final ColumnDefinition colDef = TableColumnFactory.DISTANCE_DIFF.createColumn(_sliceColumnManager, _pc);
 
@@ -3534,9 +3526,63 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	}
 
 	/**
+	 * Column: Gear ratio
+	 */
+	private void defineColumn_GearRatio() {
+
+		final ColumnDefinition colDef = TableColumnFactory.GEAR_RATIO.createColumn(_sliceColumnManager, _pc);
+
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				if (_serieGears == null) {
+
+					cell.setText(UI.EMPTY_STRING);
+
+				} else {
+
+					final int serieIndex = ((TimeSlice) cell.getElement()).serieIndex;
+					final float gearRatio = _serieGears[0][serieIndex];
+
+					cell.setText(_nf1.format(gearRatio));
+				}
+			}
+		});
+	}
+
+	/**
+	 * Column: Gear teeth
+	 */
+	private void defineColumn_GearTeeth() {
+
+		final ColumnDefinition colDef = TableColumnFactory.GEAR_TEETH.createColumn(_sliceColumnManager, _pc);
+
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				if (_serieGears == null) {
+
+					cell.setText(UI.EMPTY_STRING);
+
+				} else {
+
+					final int serieIndex = ((TimeSlice) cell.getElement()).serieIndex;
+
+					final long frontTeeth = (long) _serieGears[1][serieIndex];
+					final long rearTeeth = (long) _serieGears[2][serieIndex];
+
+					cell.setText(Long.toString(frontTeeth) + GEAR_TEETH_SEPARATOR + Long.toString(rearTeeth));
+				}
+			}
+		});
+	}
+
+	/**
 	 * column: gradient
 	 */
-	private void defineSliceViewerColumns_Gradient() {
+	private void defineColumn_Gradient() {
 
 		final ColumnDefinition colDef = TableColumnFactory.GRADIENT.createColumn(_sliceColumnManager, _pc);
 
@@ -3544,6 +3590,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
+
 				if (_serieGradient != null) {
 					final TimeSlice timeSlice = (TimeSlice) cell.getElement();
 
@@ -3558,7 +3605,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	/**
 	 * column: latitude
 	 */
-	private void defineSliceViewerColumns_Latitude() {
+	private void defineColumn_Latitude() {
 
 		ColumnDefinition colDef;
 
@@ -3581,7 +3628,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	/**
 	 * column: longitude
 	 */
-	private void defineSliceViewerColumns_Longitude() {
+	private void defineColumn_Longitude() {
 
 		ColumnDefinition colDef;
 		_colDefLongitude = colDef = TableColumnFactory.LONGITUDE.createColumn(_sliceColumnManager, _pc);
@@ -3604,7 +3651,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	/**
 	 * column: marker
 	 */
-	private void defineSliceViewerColumns_Marker() {
+	private void defineColumn_Marker() {
 
 		ColumnDefinition colDef;
 		colDef = TableColumnFactory.MARKER.createColumn(_sliceColumnManager, _pc);
@@ -3635,7 +3682,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	/**
 	 * column: pace
 	 */
-	private void defineSliceViewerColumns_Pace() {
+	private void defineColumn_Pace() {
 
 		final ColumnDefinition colDef = TableColumnFactory.PACE.createColumn(_sliceColumnManager, _pc);
 
@@ -3657,7 +3704,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	/**
 	 * column: power
 	 */
-	private void defineSliceViewerColumns_Power() {
+	private void defineColumn_Power() {
 
 		final ColumnDefinition colDef = TableColumnFactory.POWER.createColumn(_sliceColumnManager, _pc);
 
@@ -3678,7 +3725,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	/**
 	 * column: pulse
 	 */
-	private void defineSliceViewerColumns_Pulse() {
+	private void defineColumn_Pulse() {
 
 		ColumnDefinition colDef;
 		_colDefPulse = colDef = TableColumnFactory.PULSE.createColumn(_sliceColumnManager, _pc);
@@ -3699,7 +3746,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	/**
 	 * column: #
 	 */
-	private void defineSliceViewerColumns_Sequence() {
+	private void defineColumn_Sequence() {
 
 		final ColumnDefinition colDef = TableColumnFactory.SEQUENCE.createColumn(_sliceColumnManager, _pc);
 
@@ -3739,7 +3786,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	/**
 	 * column: speed
 	 */
-	private void defineSliceViewerColumns_Speed() {
+	private void defineColumn_Speed() {
 
 		final ColumnDefinition colDef = TableColumnFactory.SPEED.createColumn(_sliceColumnManager, _pc);
 
@@ -3763,7 +3810,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	/**
 	 * column: speed diff
 	 */
-	private void defineSliceViewerColumns_SpeedDiff() {
+	private void defineColumn_SpeedDiff() {
 
 		final ColumnDefinition colDef = TableColumnFactory.SPEED_DIFF.createColumn(_sliceColumnManager, _pc);
 
@@ -3801,7 +3848,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	/**
 	 * column: temperature
 	 */
-	private void defineSliceViewerColumns_Temperature() {
+	private void defineColumn_Temperature() {
 
 		ColumnDefinition colDef;
 		_colDefTemperature = colDef = TableColumnFactory.TEMPERATURE.createColumn(_sliceColumnManager, _pc);
@@ -3840,7 +3887,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	/**
 	 * column: time difference in seconds to previous slice
 	 */
-	private void defineSliceViewerColumns_TimeDiff() {
+	private void defineColumn_TimeDiff() {
 
 		final ColumnDefinition colDef = TableColumnFactory.TOUR_TIME_DIFF.createColumn(_sliceColumnManager, _pc);
 
@@ -3866,7 +3913,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	/**
 	 * column: time hh:mm:ss relative to tour start
 	 */
-	private void defineSliceViewerColumns_TimeInHHMMSSRelative() {
+	private void defineColumn_TimeInHHMMSSRelative() {
 
 		final ColumnDefinition colDef = TableColumnFactory.TOUR_TIME_HH_MM_SS.createColumn(_sliceColumnManager, _pc);
 
@@ -3887,7 +3934,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	/**
 	 * column: time in seconds
 	 */
-	private void defineSliceViewerColumns_TimeInSeconds() {
+	private void defineColumn_TimeInSeconds() {
 
 		final ColumnDefinition colDef = TableColumnFactory.TOUR_TIME.createColumn(_sliceColumnManager, _pc);
 
@@ -3909,7 +3956,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	/**
 	 * column: time of day in hh:mm:ss
 	 */
-	private void defineSliceViewerColumns_TimeOfDay() {
+	private void defineColumn_TimeOfDay() {
 
 		final ColumnDefinition colDef = TableColumnFactory.TOUR_TIME_OF_DAY_HH_MM_SS.createColumn(
 				_sliceColumnManager,
@@ -4489,6 +4536,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		_serieAltitude = _tourData.altitudeSerie;
 
 		_serieCadence = _tourData.cadenceSerie;
+		_serieGears = _tourData.getGears();
 		_seriePulse = _tourData.pulseSerie;
 
 		_serieLatitude = _tourData.latitudeSerie;
@@ -5395,7 +5443,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		_sliceColumnManager.saveState(_viewStateSlice);
 		_sliceColumnManager.clearColumns();
 
-		defineSliceViewerAllColumns(_sliceViewerContainer);
+		defineAllColumns(_sliceViewerContainer);
 		_sliceViewer = (TableViewer) recreateViewer(_sliceViewer);
 	}
 

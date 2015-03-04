@@ -16,6 +16,7 @@ import net.tourbook.device.garmin.fit.FitContextData.ContextTimeData;
 import net.tourbook.importdata.TourbookDevice;
 
 import org.apache.commons.io.FilenameUtils;
+import org.joda.time.DateTime;
 
 import com.garmin.fit.EventMesg;
 
@@ -89,9 +90,17 @@ public class FitContext {
 
 				tourData.setIsDistanceFromSensor(isSpeedSensorPresent());
 
-				tourData.createTimeSeries(timeDataList, false);
+				if (timeDataList.size() > 0) {
 
-				validateGearData(tourData, gearList);
+					long tourStartTime = timeDataList.get(0).absoluteTime;
+
+					tourData.setTourStartTime(new DateTime(tourStartTime));
+
+					tourData.createTimeSeries(timeDataList, false);
+
+					// must be called after time series are created
+					validateGearData(tourData, gearList);
+				}
 
 				// after all data are added, the tour id can be created
 				final String uniqueId = _device.createUniqueId(tourData, Util.UNIQUE_ID_SUFFIX_GARMIN_FIT);

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -612,6 +612,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 
 		// delay loading, that the app filters are initialized
 		Display.getCurrent().asyncExec(new Runnable() {
+			@Override
 			public void run() {
 
 				_tourViewer.setInput(this);
@@ -759,6 +760,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		defineColumn_Marker();
 		defineColumn_Calories();
 		defineColumn_RestPulse();
+//		defineColumn_Gears();
 
 		defineColumn_TimeRecording();
 		defineColumn_TimeBreak();
@@ -1130,6 +1132,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 			}
 		});
 	}
+
 
 	/**
 	 * column: markers
@@ -2507,6 +2510,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		return _columnManager;
 	}
 
+	@Override
 	public PostSelectionProvider getPostSelectionProvider() {
 		return _postSelectionProvider;
 	}
@@ -2517,6 +2521,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		}
 	}
 
+	@Override
 	public Set<Long> getSelectedTourIDs() {
 
 		final Set<Long> tourIds = new HashSet<Long>();
