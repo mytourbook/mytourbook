@@ -188,7 +188,6 @@ import org.joda.time.format.DateTimeFormatter;
  */
 public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITourViewer2, ITourProvider2 {
 
-
 	public static final String					ID								= "net.tourbook.views.TourDataEditorView";	//$NON-NLS-1$
 
 	private static final int					COLUMN_SPACING					= 20;
@@ -3545,7 +3544,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 					final int serieIndex = ((TimeSlice) cell.getElement()).serieIndex;
 					final float gearRatio = _serieGears[0][serieIndex];
 
-					cell.setText(_nf1.format(gearRatio));
+					cell.setText(_nf2.format(gearRatio));
 				}
 			}
 		});
@@ -3573,7 +3572,14 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 					final long frontTeeth = (long) _serieGears[1][serieIndex];
 					final long rearTeeth = (long) _serieGears[2][serieIndex];
 
-					cell.setText(Long.toString(frontTeeth) + GEAR_TEETH_SEPARATOR + Long.toString(rearTeeth));
+					cell.setText(Long.toString(frontTeeth)
+							+ GEAR_TEETH_SEPARATOR
+							+ Long.toString(rearTeeth)
+//							+ " - "
+//							+ Long.toString((long) _serieGears[3][serieIndex])
+//							+ GEAR_TEETH_SEPARATOR
+//							+ Long.toString((long) _serieGears[4][serieIndex])
+							);
 				}
 			}
 		});

@@ -660,10 +660,8 @@ public class Messages extends NLS {
 	public static String		Image__graph_cadence_disabled;
 	public static String		Image__graph_gradient_disabled;
 	public static String		Image__graph_heartbeat_disabled;
-	public static String	Image__Graph_Gears;
-
-	public static String	Image__Graph_Gears_disabled;
-
+	public static String		Image__Graph_Gears;
+	public static String		Image__Graph_Gears_disabled;
 	public static String		Image__Graph_Overlapped;
 	public static String		Image__graph_pace_disabled;
 	public static String		Image__graph_power_disabled;
@@ -1221,6 +1219,7 @@ public class Messages extends NLS {
 	public static String		Tooltip_ValuePoint_Action_Value_Cadence;
 	public static String		Tooltip_ValuePoint_Action_Value_ChartZoomFactor;
 	public static String		Tooltip_ValuePoint_Action_Value_Distance;
+	public static String		Tooltip_ValuePoint_Action_Value_Gears;
 	public static String		Tooltip_ValuePoint_Action_Value_Gradient;
 	public static String		Tooltip_ValuePoint_Action_Value_Header;
 	public static String		Tooltip_ValuePoint_Action_Value_Pace;
@@ -1253,9 +1252,7 @@ public class Messages extends NLS {
 	public static String		Tour_Action_graph_speed_tooltip;
 	public static String		Tour_Action_graph_temperature_tooltip;
 	public static String		Tour_Action_graph_tour_compare_tooltip;
-
-	public static String	Tour_Action_GraphGears;
-
+	public static String		Tour_Action_GraphGears;
 	public static String		Tour_Action_GraphOverlapped;
 	public static String		Tour_Action_HrZone_Title;
 	public static String		Tour_Action_HrZoneGraphType_Default;
