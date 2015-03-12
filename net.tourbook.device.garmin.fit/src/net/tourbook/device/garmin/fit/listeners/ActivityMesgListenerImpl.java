@@ -8,13 +8,14 @@ import com.garmin.fit.ActivityMesgListener;
 
 public class ActivityMesgListenerImpl extends AbstractMesgListener implements ActivityMesgListener {
 
-	public ActivityMesgListenerImpl(FitContext context) {
+	public ActivityMesgListenerImpl(final FitContext context) {
 		super(context);
 	}
 
 	@Override
-	public void onMesg(ActivityMesg mesg) {
-		Integer numSessions = mesg.getNumSessions();
+	public void onMesg(final ActivityMesg mesg) {
+
+		final Integer numSessions = mesg.getNumSessions();
 		if (numSessions == null || numSessions < 1) {
 			throw new FitDataReaderException("Invalid number of sessions: " //$NON-NLS-1$
 					+ numSessions

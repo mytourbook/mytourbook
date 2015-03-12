@@ -2,6 +2,7 @@ package net.tourbook.device.garmin.fit;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -12,10 +13,10 @@ import net.tourbook.data.GearData;
 import net.tourbook.data.TimeData;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
-import net.tourbook.device.garmin.fit.FitContextData.ContextTimeData;
 import net.tourbook.importdata.TourbookDevice;
 
 import org.apache.commons.io.FilenameUtils;
+import org.eclipse.core.runtime.Assert;
 import org.joda.time.DateTime;
 
 import com.garmin.fit.EventMesg;
@@ -45,6 +46,8 @@ public class FitContext {
 	private String					_sessionIndex;
 	private int						_serieIndex;
 
+	private DateTime				_sessionTime;
+
 	private float					_lapDistance;
 	private int						_lapTime;
 
@@ -66,13 +69,13 @@ public class FitContext {
 
 	public void finalizeTour() {
 
-		final FitContextDataHandler contextDataHandler = new FitContextDataHandler() {
+		_contextData.processData(new FitContextDataHandler() {
 
 			@Override
 			public void setupTour(	final TourData tourData,
-									final ArrayList<TimeData> timeDataList,
-									final Set<TourMarker> tourMarkerSet,
-									final List<GearData> gearList) {
+									final List<TimeData> timeDataList,
+									final List<TourMarker> tourMarkerSet,
+									final List<GearData> gears) {
 
 				resetSpeedAtFirstPosition(timeDataList);
 
@@ -90,17 +93,13 @@ public class FitContext {
 
 				tourData.setIsDistanceFromSensor(isSpeedSensorPresent());
 
-				if (timeDataList.size() > 0) {
+				final long recordStartTime = timeDataList.get(0).absoluteTime;
+				final long sessionStartTime = _sessionTime.getMillis();
 
-					long tourStartTime = timeDataList.get(0).absoluteTime;
+				Assert.isTrue(recordStartTime == sessionStartTime);
+				tourData.setTourStartTime(new DateTime(recordStartTime));
 
-					tourData.setTourStartTime(new DateTime(tourStartTime));
-
-					tourData.createTimeSeries(timeDataList, false);
-
-					// must be called after time series are created
-					validateGearData(tourData, gearList);
-				}
+				tourData.createTimeSeries(timeDataList, false);
 
 				// after all data are added, the tour id can be created
 				final String uniqueId = _device.createUniqueId(tourData, Util.UNIQUE_ID_SUFFIX_GARMIN_FIT);
@@ -115,12 +114,14 @@ public class FitContext {
 					tourData.computeComputedValues();
 					tourData.computeAltimeterGradientSerie();
 
-					tourData.setTourMarkers(tourMarkerSet);
-					tourData.finalizeTourMarkerWithRelativeTime();
+					// must be called after time series are created
+					setupTour_Gears(tourData, gears);
+
+					setupTour_Marker(tourData, tourMarkerSet);
 				}
 			}
 
-			private void validateGearData(final TourData tourData, final List<GearData> gearList) {
+			private void setupTour_Gears(final TourData tourData, final List<GearData> gearList) {
 
 				/*
 				 * validate gear list
@@ -173,9 +174,61 @@ public class FitContext {
 					tourData.setGears(validatedGearList);
 				}
 			}
-		};
 
-		_contextData.processData(contextDataHandler);
+			private void setupTour_Marker(final TourData tourData, final List<TourMarker> tourMarkers) {
+
+				final int[] timeSerie = tourData.timeSerie;
+				final int lastSerieIndex = timeSerie.length;
+				final long tourStartTimeS = tourData.getTourStartTimeMS() / 1000;
+
+				final Set<TourMarker> validatedTourMarkers = new HashSet<TourMarker>();
+
+				for (final TourMarker tourMarker : tourMarkers) {
+
+					final long markerLapTimeS = tourMarker.getDeviceLapTime() / 1000;
+
+					for (int serieIndex = 0; serieIndex < timeSerie.length; serieIndex++) {
+
+						final int relativeTimeS = timeSerie[serieIndex];
+						final long tourTimeS = tourStartTimeS + relativeTimeS;
+
+						if (markerLapTimeS <= tourTimeS) {
+
+							int markerSerieIndex = serieIndex
+							// ensure that the correct index is set for the marker
+							- 1;
+
+							// check bounds
+							if (markerSerieIndex < 0) {
+								markerSerieIndex = 0;
+							}
+
+							/*
+							 * Fit devices adds a marker at the end, this is annoing therefore it is
+							 * removed. It is not only the last time slice it can also be about the
+							 * last 5 time slices.
+							 */
+							if (markerSerieIndex > lastSerieIndex - 5) {
+
+								// check next marker
+								break;
+							}
+
+							tourMarker.setSerieIndex(markerSerieIndex);
+
+							validatedTourMarkers.add(tourMarker);
+
+							// check next marker
+							break;
+						}
+					}
+
+				}
+
+				tourData.setTourMarkers(validatedTourMarkers);
+				tourData.finalizeTourMarkerWithRelativeTime();
+			}
+		});
 	}
 
 	public FitContextData getContextData() {
@@ -219,7 +272,7 @@ public class FitContext {
 	 */
 	public int getSerieIndex(final long lapAbsoluteTime, final float lapDistance) {
 
-		final List<ContextTimeData> allTimeData = _contextData.getAllTimeData();
+		final List<TimeData> allTimeData = _contextData.getAllTimeData();
 
 		final int timeDataSize = allTimeData.size();
 
@@ -231,8 +284,7 @@ public class FitContext {
 
 			for (int serieIndex = 0; serieIndex < timeDataSize; serieIndex++) {
 
-				final ContextTimeData contextTimeData = allTimeData.get(serieIndex);
-				final TimeData timeData = contextTimeData.getTimeData();
+				final TimeData timeData = allTimeData.get(serieIndex);
 
 				final long absoluteTime = timeData.absoluteTime;
 				if (absoluteTime != Long.MIN_VALUE) {
@@ -244,7 +296,7 @@ public class FitContext {
 					}
 				}
 
-				// check if distance is recorded
+				// check if distance is recorded, fixed problem when a fit tour do not contain distance data
 				if (lapDistance > 0) {
 
 					final float tourAbsoluteDistance = timeData.absoluteDistance;
@@ -322,7 +374,7 @@ public class FitContext {
 		_contextData.ctxTourData_20_Finalize();
 	}
 
-	private void resetSpeedAtFirstPosition(final ArrayList<TimeData> timeDataList) {
+	private void resetSpeedAtFirstPosition(final List<TimeData> timeDataList) {
 		if (!timeDataList.isEmpty()) {
 			timeDataList.get(0).speed = Float.MIN_VALUE;
 		}
@@ -358,6 +410,10 @@ public class FitContext {
 
 	public void setSessionIndex(final String sessionIndex) {
 		_sessionIndex = sessionIndex;
+	}
+
+	public void setSessionStartTime(final org.joda.time.DateTime dateTime) {
+		_sessionTime = dateTime;
 	}
 
 	public void setSoftwareVersion(final String softwareVersion) {

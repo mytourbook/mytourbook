@@ -1,8 +1,6 @@
 package net.tourbook.device.garmin.fit;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 import net.tourbook.data.GearData;
 import net.tourbook.data.TimeData;
@@ -16,9 +14,6 @@ import net.tourbook.data.TourMarker;
  */
 interface FitContextDataHandler {
 
-	void setupTour(	TourData tourData,
-					ArrayList<TimeData> timeDataList,
-					Set<TourMarker> tourMarkerSet,
-					List<GearData> gearList);
+	void setupTour(TourData tourData, List<TimeData> allTimeData, List<TourMarker> tourMarkers, List<GearData> gears);
 
 }

@@ -3292,7 +3292,7 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 	 * @param isCreateMarker
 	 *            creates markers when <code>true</code>
 	 */
-	public void createTimeSeries(final ArrayList<TimeData> timeDataList, final boolean isCreateMarker) {
+	public void createTimeSeries(final List<TimeData> timeDataList, final boolean isCreateMarker) {
 
 		final int serieSize = timeDataList.size();
 		if (serieSize == 0) {

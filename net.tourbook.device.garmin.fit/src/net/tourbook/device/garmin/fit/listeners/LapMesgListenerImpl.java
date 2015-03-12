@@ -1,5 +1,7 @@
 package net.tourbook.device.garmin.fit.listeners;
 
+import java.util.Date;
+
 import net.tourbook.data.TourMarker;
 import net.tourbook.device.garmin.fit.FitContext;
 
@@ -7,6 +9,9 @@ import com.garmin.fit.DateTime;
 import com.garmin.fit.LapMesg;
 import com.garmin.fit.LapMesgListener;
 
+/**
+ * A {@link TourMarker} is set for each lap.
+ */
 public class LapMesgListenerImpl extends AbstractMesgListener implements LapMesgListener {
 
 	private int	_lapCounter;
@@ -20,12 +25,12 @@ public class LapMesgListenerImpl extends AbstractMesgListener implements LapMesg
 
 		context.mesgLap_10_Before();
 
-		onMesg_SetupMarker(lapMesg);
+		setMarker(lapMesg);
 
 		context.mesgLap_20_After();
 	}
 
-	private void onMesg_SetupMarker(final LapMesg lapMesg) {
+	private void setMarker(final LapMesg lapMesg) {
 
 		final Integer messageIndex = getLapMessageIndex(lapMesg);
 		final TourMarker tourMarker = getTourMarker();
@@ -59,17 +64,11 @@ public class LapMesgListenerImpl extends AbstractMesgListener implements LapMesg
 		}
 
 		/*
-		 * Set time slice position
+		 * Set lap time, later the time slice position (serie index) will be set.
 		 */
-		final DateTime timestamp = lapMesg.getTimestamp();
-		final long absoluteTime = timestamp.getTimestamp();
+		final DateTime garminTime = lapMesg.getTimestamp();
+		final Date linuxTime = garminTime.getDate();
 
-		int serieIndex = context.getSerieIndex(absoluteTime, lapDistance) - 1;
-
-		// check bounds
-		if (serieIndex < 0) {
-			serieIndex = 0;
-		}
-		tourMarker.setSerieIndex(serieIndex);
+		tourMarker.setDeviceLapTime(linuxTime.getTime());
 	}
 }

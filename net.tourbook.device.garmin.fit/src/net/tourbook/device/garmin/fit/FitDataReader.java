@@ -35,6 +35,7 @@ import net.tourbook.importdata.SerialParameters;
 import net.tourbook.importdata.TourbookDevice;
 
 import org.apache.commons.io.IOUtils;
+import org.joda.time.DateTime;
 
 import com.garmin.fit.Decode;
 import com.garmin.fit.Field;
@@ -58,19 +59,19 @@ public class FitDataReader extends TourbookDevice {
 			@Override
 			public void onMesg(final Mesg mesg) {
 
-				long timestamp = 0;
+				long garminTimestamp = 0;
 
 				for (final Field field : mesg.getFields()) {
 
 					final String fieldName = field.getName();
 
-					if (fieldName.equals("temperature")) { //$NON-NLS-1$
-						int a = 0;
-						a++;
-					}
+//					if (fieldName.equals("temperature")) { //$NON-NLS-1$
+//						int a = 0;
+//						a++;
+//					}
 
 					if (fieldName.equals("timestamp")) { //$NON-NLS-1$
-						timestamp = (Long) field.getValue();
+						garminTimestamp = (Long) field.getValue();
 					}
 					/*
 					 * Set fields which should NOT be displayed in the log
@@ -96,12 +97,12 @@ public class FitDataReader extends TourbookDevice {
 							|| fieldName.equals("position_long") //$NON-NLS-1$
 							|| fieldName.equals("speed") //$NON-NLS-1$
 							|| fieldName.equals("temperature") //$NON-NLS-1$
-							
+
 							|| fieldName.equals("front_gear") //$NON-NLS-1$
 							|| fieldName.equals("front_gear_num") //$NON-NLS-1$
 							|| fieldName.equals("rear_gear") //$NON-NLS-1$
 							|| fieldName.equals("rear_gear_num") //$NON-NLS-1$
-							
+
 							|| fieldName.equals("enhanced_altitude") //$NON-NLS-1$
 							|| fieldName.equals("enhanced_speed") //$NON-NLS-1$
 							|| fieldName.equals("enhanced_avg_speed") //$NON-NLS-1$
@@ -145,8 +146,12 @@ public class FitDataReader extends TourbookDevice {
 						continue;
 					}
 
-					System.out.println(String.format("%s %-5d %-30s %20s %s", //$NON-NLS-1$
-							Long.toString(timestamp),
+					final long linuxTime = (garminTimestamp * 1000) + com.garmin.fit.DateTime.OFFSET;
+
+					System.out.println(String.format("%s %d %s %-5d %-30s %20s %s", //$NON-NLS-1$
+							new DateTime(linuxTime), // show readable date/time
+							linuxTime / 1000,
+							Long.toString(garminTimestamp),
 							field.getNum(),
 							fieldName,
 							field.getValue(),
@@ -219,10 +224,10 @@ public class FitDataReader extends TourbookDevice {
 			broadcaster.addListener(new RecordMesgListenerImpl(context));
 			broadcaster.addListener(new SessionMesgListenerImpl(context));
 
-//			// 
+//			//
 //			// START - show debug info
-//			// 
-//			
+//			//
+//
 //			System.out.println();
 //			System.out.println();
 //			System.out.println((System.currentTimeMillis() + " [" + getClass().getSimpleName() + "]")
@@ -239,9 +244,9 @@ public class FitDataReader extends TourbookDevice {
 //
 //			addDebugListener(broadcaster);
 //
-//			// 
+//			//
 //			// END - show debug info
-//			// 
+//			//
 
 			broadcaster.run(fis);
 
