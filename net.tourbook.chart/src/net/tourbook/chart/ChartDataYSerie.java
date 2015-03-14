@@ -113,6 +113,8 @@ public class ChartDataYSerie extends ChartDataSerie {
 
 	private boolean[]				_lineGaps;
 
+	private ISliderLabelProvider	_sliderLabelProvider;
+
 	/**
 	 * When this value is > 0 a line chart will not draw a line to the next value point when the
 	 * difference in the x-data values is greater than this value.
@@ -251,6 +253,10 @@ public class ChartDataYSerie extends ChartDataSerie {
 	 */
 	public int getSliderLabelFormat() {
 		return _sliderLabelFormat;
+	}
+
+	public ISliderLabelProvider getSliderLabelProvider() {
+		return _sliderLabelProvider;
 	}
 
 	public String getXTitle() {
@@ -563,6 +569,10 @@ public class ChartDataYSerie extends ChartDataSerie {
 	 */
 	public void setSliderLabelFormat(final int sliderLabelFormat) {
 		_sliderLabelFormat = sliderLabelFormat;
+	}
+
+	public void setSliderLabelProvider(final ISliderLabelProvider sliderLabelProvider) {
+		_sliderLabelProvider = sliderLabelProvider;
 	}
 
 	/**

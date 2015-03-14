@@ -82,6 +82,7 @@ public class TourManager {
 	private static final String				GRAPH_LABEL_CADENCE						= net.tourbook.common.Messages.Graph_Label_Cadence;
 	private static final String				GRAPH_LABEL_CADENCE_UNIT				= net.tourbook.common.Messages.Graph_Label_Cadence_Unit;
 	private static final String				GRAPH_LABEL_GEARS						= net.tourbook.common.Messages.Graph_Label_Gears;
+	private static final String				GRAPH_LABEL_GEARS_UNIT					= net.tourbook.common.Messages.Graph_Label_Gears_Unit;
 	private static final String				GRAPH_LABEL_GRADIENT					= net.tourbook.common.Messages.Graph_Label_Gradient;
 	private static final String				GRAPH_LABEL_GRADIENT_UNIT				= net.tourbook.common.Messages.Graph_Label_Gradient_Unit;
 	private static final String				GRAPH_LABEL_HEARTBEAT					= net.tourbook.common.Messages.Graph_Label_Heartbeat;
@@ -118,6 +119,8 @@ public class TourManager {
 
 	public static final String				X_AXIS_TIME								= "time";														//$NON-NLS-1$
 	public static final String				X_AXIS_DISTANCE							= "distance";													//$NON-NLS-1$
+
+	public static final String				GEAR_VALUE_FORMAT						= "%2d/%2d - %1.2f";											//$NON-NLS-1$
 
 	public static final int					GRAPH_ALTITUDE							= 1000;
 	public static final int					GRAPH_SPEED								= 1001;
@@ -2241,9 +2244,9 @@ public class TourManager {
 			} else {
 				yDataCadence.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_FILL_BOTTOM);
 			}
-			yDataCadence.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_NO);
 //			yDataCadence.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_FILL_BOTTOM_NO_BORDER);
-			yDataCadence.setLineGaps(tourData.getCadenceGaps());
+//			yDataCadence.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_NO);
+//			yDataCadence.setLineGaps(tourData.getCadenceGaps());
 
 			setGraphColor(yDataCadence, GraphColorManager.PREF_GRAPH_CADENCE);
 			chartDataModel.addXyData(yDataCadence);
@@ -2268,10 +2271,12 @@ public class TourManager {
 			yDataGears = createChartDataSerie(chartGearSerie, ChartType.HORIZONTAL_BAR);
 
 			yDataGears.setYTitle(GRAPH_LABEL_GEARS);
+			yDataGears.setUnitLabel(GRAPH_LABEL_GEARS_UNIT);
 			yDataGears.setShowYSlider(true);
 			yDataGears.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_GEARS);
+			yDataGears.setSliderLabelProvider(new GearSliderLabelProvider(gearSerie));
 
-			yDataGears.setLineGaps(tourData.getCadenceGaps());
+//			yDataGears.setLineGaps(tourData.getCadenceGaps());
 
 			setGraphColor(yDataGears, GraphColorManager.PREF_GRAPH_GEAR);
 			chartDataModel.addXyData(yDataGears);

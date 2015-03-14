@@ -129,7 +129,8 @@ public class RawDataManager {
 		Tour, //
 		AllTimeSlices, //
 		OnlyAltitudeValues, //
-		OnlyTemperatureValues,
+		OnlyTemperatureValues, //
+		OnlyGearValues,
 	}
 
 	private RawDataManager() {}
@@ -153,6 +154,7 @@ public class RawDataManager {
 	public static void showMsgBoxInvalidFormat(final ArrayList<String> notImportedFiles) {
 
 		Display.getDefault().syncExec(new Runnable() {
+			@Override
 			public void run() {
 
 				final StringBuilder fileText = new StringBuilder();
@@ -303,6 +305,7 @@ public class RawDataManager {
 					true,
 					new IRunnableWithProgress() {
 
+						@Override
 						public void run(final IProgressMonitor monitor) throws InvocationTargetException,
 								InterruptedException {
 
@@ -347,6 +350,7 @@ public class RawDataManager {
 								updateTourDataFromDb(monitor);
 
 								Display.getDefault().syncExec(new Runnable() {
+									@Override
 									public void run() {
 										final RawDataView view = showRawDataView();
 										if (view != null) {
@@ -460,6 +464,8 @@ public class RawDataManager {
 
 	private boolean actionReimportTour_10_Confirm(final ReImport reimportTour) {
 
+		final Shell activeShell = Display.getCurrent().getActiveShell();
+
 		if (reimportTour == ReImport.Tour) {
 
 			if (_prefStore.getBoolean(ITourbookPreferences.TOGGLE_STATE_REIMPORT_TOUR)) {
@@ -469,7 +475,7 @@ public class RawDataManager {
 			} else {
 
 				final MessageDialogWithToggle dialog = MessageDialogWithToggle.openOkCancelConfirm(//
-						Display.getCurrent().getActiveShell(),//
+						activeShell,//
 						Messages.import_data_dlg_reimport_title, //
 						Messages.Import_Data_Dialog_ConfirmReimport_Message, //
 						Messages.App_ToggleState_DoNotShowAgain, //
@@ -492,7 +498,7 @@ public class RawDataManager {
 			} else {
 
 				final MessageDialogWithToggle dialog = MessageDialogWithToggle.openOkCancelConfirm(//
-						Display.getCurrent().getActiveShell(),//
+						activeShell,//
 						Messages.import_data_dlg_reimport_title, //
 						Messages.Import_Data_Dialog_ConfirmReimportTimeSlices_Message, //
 						Messages.App_ToggleState_DoNotShowAgain, //
@@ -517,7 +523,7 @@ public class RawDataManager {
 			} else {
 
 				final MessageDialogWithToggle dialog = MessageDialogWithToggle.openOkCancelConfirm(//
-						Display.getCurrent().getActiveShell(),//
+						activeShell,//
 						Messages.import_data_dlg_reimport_title, //
 						Messages.Import_Data_Dialog_ConfirmReimportAltitudeValues_Message, //
 						Messages.App_ToggleState_DoNotShowAgain, //
@@ -533,6 +539,30 @@ public class RawDataManager {
 				}
 			}
 
+		} else if (reimportTour == ReImport.OnlyGearValues) {
+
+			if (_prefStore.getBoolean(ITourbookPreferences.TOGGLE_STATE_REIMPORT_GEAR_VALUES)) {
+
+				return true;
+
+			} else {
+
+				final MessageDialogWithToggle dialog = MessageDialogWithToggle.openOkCancelConfirm(//
+						activeShell,//
+						Messages.import_data_dlg_reimport_title, //
+						Messages.Import_Data_Dialog_ConfirmReimportGearValues_Message, //
+						Messages.App_ToggleState_DoNotShowAgain, //
+						false, // toggle default state
+						null,
+						null);
+
+				if (dialog.getReturnCode() == Window.OK) {
+					_prefStore
+							.setValue(ITourbookPreferences.TOGGLE_STATE_REIMPORT_GEAR_VALUES, dialog.getToggleState());
+					return true;
+				}
+			}
+
 		} else if (reimportTour == ReImport.OnlyTemperatureValues) {
 
 			if (_prefStore.getBoolean(ITourbookPreferences.TOGGLE_STATE_REIMPORT_TEMPERATURE_VALUES)) {
@@ -542,7 +572,7 @@ public class RawDataManager {
 			} else {
 
 				final MessageDialogWithToggle dialog = MessageDialogWithToggle.openOkCancelConfirm(//
-						Display.getCurrent().getActiveShell(),//
+						activeShell,//
 						Messages.import_data_dlg_reimport_title, //
 						Messages.Import_Data_Dialog_ConfirmReimportTemperatureValues_Message, //
 						Messages.App_ToggleState_DoNotShowAgain, //
@@ -785,7 +815,10 @@ public class RawDataManager {
 
 			} else if (reimportId == ReImport.AllTimeSlices
 					|| reimportId == ReImport.OnlyAltitudeValues
-					|| reimportId == ReImport.OnlyTemperatureValues) {
+					|| reimportId == ReImport.OnlyGearValues
+					|| reimportId == ReImport.OnlyTemperatureValues
+			//
+			) {
 
 				// replace part of the tour
 
@@ -793,6 +826,12 @@ public class RawDataManager {
 
 					// reimport altitude only
 					oldTourData.altitudeSerie = reimportedTourData.altitudeSerie;
+				}
+
+				if (reimportId == ReImport.AllTimeSlices || reimportId == ReImport.OnlyGearValues) {
+
+					// reimport gear only
+					oldTourData.gearSerie = reimportedTourData.gearSerie;
 				}
 
 				if (reimportId == ReImport.AllTimeSlices || reimportId == ReImport.OnlyTemperatureValues) {
@@ -914,6 +953,7 @@ public class RawDataManager {
 
 			// sort device list by sorting priority
 			Collections.sort(_devicesBySortPriority, new Comparator<TourbookDevice>() {
+				@Override
 				public int compare(final TourbookDevice o1, final TourbookDevice o2) {
 
 					// 1. sort by prio
@@ -1015,6 +1055,7 @@ public class RawDataManager {
 
 		BusyIndicator.showWhile(null, new Runnable() {
 
+			@Override
 			public void run() {
 
 				boolean isDataImported = false;
@@ -1032,6 +1073,7 @@ public class RawDataManager {
 						// Check if the file we want to import requires confirmation and if yes, ask user
 						if (device.userConfirmationRequired()) {
 							display.syncExec(new Runnable() {
+								@Override
 								public void run() {
 									final Shell activeShell = display.getActiveShell();
 									if (activeShell != null) {
@@ -1462,6 +1504,7 @@ public class RawDataManager {
 							false,
 							new IRunnableWithProgress() {
 
+								@Override
 								public void run(final IProgressMonitor monitor) throws InvocationTargetException,
 										InterruptedException {
 
@@ -1545,6 +1588,7 @@ public class RawDataManager {
 
 		// prevent async error
 		Display.getDefault().syncExec(new Runnable() {
+			@Override
 			public void run() {
 				TourManager.fireEvent(TourEventId.CLEAR_DISPLAYED_TOUR, null, null);
 			}

@@ -1007,7 +1007,7 @@ public class ChartComponentGraph extends Canvas {
 
 		final int devSliderLinePos = (int) (xSlider.getXXDevSliderLinePos() - _xxDevViewPortLeftBorder);
 
-		int sliderValuesIndex = xSlider.getValuesIndex();
+		int sliderValueIndex = xSlider.getValuesIndex();
 		// final int valueX = slider.getValueX();
 
 		final ArrayList<ChartXSliderLabel> labelList = new ArrayList<ChartXSliderLabel>();
@@ -1025,10 +1025,14 @@ public class ChartComponentGraph extends Canvas {
 			final ChartDataYSerie yData = drawingData.getYData();
 			final int labelFormat = yData.getSliderLabelFormat();
 			final int valueDivisor = yData.getValueDivisor();
+			final float[][] allYValues = yData.getHighValuesFloat();
+			final ISliderLabelProvider sliderLabelProvider = yData.getSliderLabelProvider();
 
-			if (labelFormat == ChartDataYSerie.SLIDER_LABEL_FORMAT_MM_SS) {
+			final boolean isSliderLabelProviderAvailable = sliderLabelProvider != null;
 
-				// format: mm:ss
+			if (labelFormat == ChartDataYSerie.SLIDER_LABEL_FORMAT_MM_SS || isSliderLabelProviderAvailable) {
+
+				// format: mm:ss or custom label provider
 
 			} else {
 
@@ -1046,18 +1050,22 @@ public class ChartComponentGraph extends Canvas {
 
 			// draw label on the left or on the right side of the slider,
 			// depending on the slider position
-			final float[] yValues = yData.getHighValuesFloat()[0];
+			final float[] yValues = allYValues[0];
 
 			// make sure the slider value index is not of bounds, this can
 			// happen when the data have changed
-			sliderValuesIndex = Math.min(sliderValuesIndex, yValues.length - 1);
+			sliderValueIndex = Math.min(sliderValueIndex, yValues.length - 1);
 
-			final float yValue = yValues[sliderValuesIndex];
+			final float yValue = yValues[sliderValueIndex];
 			// final int xAxisUnit = xData.getAxisUnit();
 			final StringBuilder labelText = new StringBuilder();
 
 			// create the slider text
-			if (labelFormat == ChartDataYSerie.SLIDER_LABEL_FORMAT_MM_SS) {
+			if (isSliderLabelProviderAvailable) {
+
+				labelText.append(sliderLabelProvider.getLabel(sliderValueIndex));
+
+			} else if (labelFormat == ChartDataYSerie.SLIDER_LABEL_FORMAT_MM_SS) {
 
 				// format: mm:ss
 
@@ -1673,6 +1681,14 @@ public class ChartComponentGraph extends Canvas {
 
 //			System.out.println("20 <- 10\tdrawAsync110GraphImage");
 //			// TODO remove SYSTEM.OUT.PRINTLN
+		}
+
+		if (_canChartBeOverlapped && _isChartOverlapped) {
+
+			// Revert sequence otherwise they are painted wrong.
+
+			Collections.reverse(_lineDevPositions);
+			Collections.reverse(_lineFocusRectangles);
 		}
 
 		if (valuePointToolTip != null && _hoveredValuePointIndex != -1) {
@@ -4354,7 +4370,7 @@ public class ChartComponentGraph extends Canvas {
 			final ChartType chartType = drawingData.getChartType();
 			final boolean isLastOverlappedGraph = isGraphOverlapped
 					&& graphNo == _graphDrawingData.size()
-					&& chartType == ChartType.LINE;
+					&& (chartType == ChartType.LINE || chartType == ChartType.HORIZONTAL_BAR);
 
 			if (isGraphOverlapped && isLastOverlappedGraph == false) {
 				continue;
@@ -4525,7 +4541,7 @@ public class ChartComponentGraph extends Canvas {
 
 				// draw label text
 				gcGraph.setForeground(colorTxt);
-				gcGraph.drawText(label, labelX + 2, labelY - 2, true);
+				gcGraph.drawText(label, labelX + 2, labelY - 0, true);
 
 				// draw slider line
 				gcGraph.setForeground(colorLine);
@@ -5068,9 +5084,13 @@ public class ChartComponentGraph extends Canvas {
 					devOffsetPoint * 2,
 					devOffsetPoint * 2);
 
-//			// draw hovered rectangle
+//			// debug: draw hovered rectangle
 //			gcOverlay.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
-//			gcOverlay.drawRectangle(hoveredRectangle);
+//			gcOverlay.drawRectangle(
+//					(int) hoveredRectangle.x,
+//					(int) hoveredRectangle.y,
+//					(int) hoveredRectangle.width,
+//					(int) hoveredRectangle.height);
 
 			// move to next graph
 			graphIndex++;

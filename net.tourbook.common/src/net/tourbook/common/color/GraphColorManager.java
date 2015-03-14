@@ -416,10 +416,10 @@ public class GraphColorManager {
 
 		allColorDef.add(new ColorDefinition(PREF_GRAPH_GEAR,//
 				Messages.Graph_Label_Gears,
-				new RGB(255, 255, 255),
-				new RGB(0, 128, 255),
-				new RGB(0, 128, 255),
-				new RGB(0, 83, 166),
+				new RGB(0x5B, 0x5B, 0x5B),
+				new RGB(0xFF, 0x00, 0x00),
+				new RGB(0x31, 0x31, 0x31),
+				new RGB(0x31, 0x31, 0x31),
 				null));
 
 		allColorDef.add(new ColorDefinition(PREF_GRAPH_TOUR_COMPARE, //

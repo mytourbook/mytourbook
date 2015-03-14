@@ -29,6 +29,7 @@ import net.tourbook.common.color.GraphColorManager;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.tour.TourManager;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ToolBarManager;
@@ -66,6 +67,7 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 	private static final String				GRAPH_LABEL_CADENCE_UNIT		= net.tourbook.common.Messages.Graph_Label_Cadence_Unit;
 	private static final String				GRAPH_LABEL_DISTANCE			= net.tourbook.common.Messages.Graph_Label_Distance;
 	private static final String				GRAPH_LABEL_GEARS				= net.tourbook.common.Messages.Graph_Label_Gears;
+	private static final String				GRAPH_LABEL_GEARS_UNIT			= net.tourbook.common.Messages.Graph_Label_Gears_Unit;
 	private static final String				GRAPH_LABEL_GRADIENT			= net.tourbook.common.Messages.Graph_Label_Gradient;
 	private static final String				GRAPH_LABEL_GRADIENT_UNIT		= net.tourbook.common.Messages.Graph_Label_Gradient_Unit;
 	private static final String				GRAPH_LABEL_HEARTBEAT			= net.tourbook.common.Messages.Graph_Label_Heartbeat;
@@ -812,11 +814,7 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 						GRAPH_LABEL_GEARS,
 						GraphColorManager.PREF_GRAPH_GEAR);
 
-//				createUILabel(//
-//						container,
-//						GRAPH_LABEL_GEARS,
-//						GRAPH_LABEL_GEARS,
-//						GraphColorManager.PREF_GRAPH_GEAR);
+				createUILabel(container, GRAPH_LABEL_GEARS_UNIT, GRAPH_LABEL_GEARS, GraphColorManager.PREF_GRAPH_GEAR);
 			}
 			_firstColumnControls.add(_lblGears);
 			_firstColumnContainerControls.add(container);
@@ -1338,10 +1336,12 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 //			_gears[4] = rear gear number, starting with 1
 
 			_lblGears.setText(String.format(
-					"%1.2f %2d/%2d",
-					gears[0][valueIndex],
+					TourManager.GEAR_VALUE_FORMAT,
 					(int) gears[1][valueIndex],
-					(int) gears[2][valueIndex]));
+					(int) gears[2][valueIndex],
+					gears[0][valueIndex]
+			//
+					));
 		}
 
 		if (_isVisibleAndAvailable_Gradient) {

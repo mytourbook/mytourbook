@@ -39,7 +39,7 @@ public class SerieData implements Serializable {
 	public float[]				powerSerie20;
 
 	/**
-	 * Gears are in the HEX format (left to right)
+	 * Gears are in this format (left to right)
 	 * <p>
 	 * Front teeth<br>
 	 * Front gear number<br>

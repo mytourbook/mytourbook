@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Set;
 
 import net.tourbook.common.UI;
+import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.GearData;
 import net.tourbook.data.TimeData;
@@ -16,7 +17,6 @@ import net.tourbook.data.TourMarker;
 import net.tourbook.importdata.TourbookDevice;
 
 import org.apache.commons.io.FilenameUtils;
-import org.eclipse.core.runtime.Assert;
 import org.joda.time.DateTime;
 
 import com.garmin.fit.EventMesg;
@@ -30,7 +30,7 @@ import com.garmin.fit.EventMesg;
 public class FitContext {
 
 	private TourbookDevice			_device;
-	private final String			_filimportFilePathename;
+	private final String			_importFilePathName;
 
 	private FitContextData			_contextData;
 
@@ -60,7 +60,7 @@ public class FitContext {
 						final HashMap<Long, TourData> newlyImportedTours) {
 
 		_device = device;
-		_filimportFilePathename = importFilePath;
+		_importFilePathName = importFilePath;
 		_alreadyImportedTours = alreadyImportedTours;
 		_newlyImportedTours = newlyImportedTours;
 
@@ -83,8 +83,8 @@ public class FitContext {
 //				tourData.setTourTitle(getTourTitle());
 //				tourData.setTourDescription(getTourDescription());
 
-				tourData.importRawDataFile = _filimportFilePathename;
-				tourData.setTourImportFilePath(_filimportFilePathename);
+				tourData.importRawDataFile = _importFilePathName;
+				tourData.setTourImportFilePath(_importFilePathName);
 
 				tourData.setDeviceId(getDeviceId());
 				tourData.setDeviceName(getDeviceName());
@@ -96,7 +96,17 @@ public class FitContext {
 				final long recordStartTime = timeDataList.get(0).absoluteTime;
 				final long sessionStartTime = _sessionTime.getMillis();
 
-				Assert.isTrue(recordStartTime == sessionStartTime);
+				if (recordStartTime != sessionStartTime) {
+
+					StatusUtil.log(String
+							.format(
+									"Import file %s has other session start time, sessionStartTime=%s recordStartTime=%s, Difference=%d sec",//$NON-NLS-1$
+									_importFilePathName,
+									new DateTime(sessionStartTime),
+									new DateTime(recordStartTime),
+									(recordStartTime - sessionStartTime) / 1000));
+				}
+
 				tourData.setTourStartTime(new DateTime(recordStartTime));
 
 				tourData.createTimeSeries(timeDataList, false);
@@ -322,7 +332,7 @@ public class FitContext {
 	}
 
 	public String getTourTitle() {
-		return String.format("%s (%s)", FilenameUtils.getBaseName(_filimportFilePathename), getSessionIndex()); //$NON-NLS-1$
+		return String.format("%s (%s)", FilenameUtils.getBaseName(_importFilePathName), getSessionIndex()); //$NON-NLS-1$
 	}
 
 	public boolean isHeartRateSensorPresent() {
