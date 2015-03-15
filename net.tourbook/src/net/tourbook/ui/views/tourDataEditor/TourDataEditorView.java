@@ -224,8 +224,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	private static final String					STATE_SECTION_TITLE				= "STATE_SECTION_TITLE";					//$NON-NLS-1$
 	private static final String					STATE_SECTION_WEATHER			= "STATE_SECTION_WEATHER";					//$NON-NLS-1$
 
-	private static final String					GEAR_TEETH_SEPARATOR			= " / ";									//$NON-NLS-1$
-
 	/**
 	 * Tour start daytime in seconds
 	 */
@@ -3572,14 +3570,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 					final long frontTeeth = (long) _serieGears[1][serieIndex];
 					final long rearTeeth = (long) _serieGears[2][serieIndex];
 
-					cell.setText(Long.toString(frontTeeth)
-							+ GEAR_TEETH_SEPARATOR
-							+ Long.toString(rearTeeth)
-//							+ " - "
-//							+ Long.toString((long) _serieGears[3][serieIndex])
-//							+ GEAR_TEETH_SEPARATOR
-//							+ Long.toString((long) _serieGears[4][serieIndex])
-							);
+					cell.setText(String.format(TourManager.GEAR_TEETH_FORMAT, frontTeeth, rearTeeth));
 				}
 			}
 		});

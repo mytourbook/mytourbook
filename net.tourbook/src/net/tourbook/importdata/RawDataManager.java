@@ -832,6 +832,8 @@ public class RawDataManager {
 
 					// reimport gear only
 					oldTourData.gearSerie = reimportedTourData.gearSerie;
+					oldTourData.setFrontShiftCount(reimportedTourData.getFrontShiftCount());
+					oldTourData.setRearShiftCount(reimportedTourData.getRearShiftCount());
 				}
 
 				if (reimportId == ReImport.AllTimeSlices || reimportId == ReImport.OnlyTemperatureValues) {

@@ -120,7 +120,8 @@ public class TourManager {
 	public static final String				X_AXIS_TIME								= "time";														//$NON-NLS-1$
 	public static final String				X_AXIS_DISTANCE							= "distance";													//$NON-NLS-1$
 
-	public static final String				GEAR_VALUE_FORMAT						= "%2d/%2d - %1.2f";											//$NON-NLS-1$
+	public static final String				GEAR_TEETH_FORMAT						= "%2d:%2d";													//$NON-NLS-1$
+	public static final String				GEAR_VALUE_FORMAT						= GEAR_TEETH_FORMAT + " - %1.2f";								//$NON-NLS-1$
 
 	public static final int					GRAPH_ALTITUDE							= 1000;
 	public static final int					GRAPH_SPEED								= 1001;

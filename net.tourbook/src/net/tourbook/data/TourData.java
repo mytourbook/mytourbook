@@ -559,6 +559,12 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	 */
 	private int													photoTimeAdjustment;
 
+	// ############################################# GEARS #############################################
+
+	private int													frontShiftCount;
+
+	private int													rearShiftCount;
+
 	// ############################################# UNUSED FIELDS START #############################################
 	/**
 	 * ssss distance msw
@@ -4622,6 +4628,10 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 		return dpTolerance;
 	}
 
+	public int getFrontShiftCount() {
+		return frontShiftCount;
+	}
+
 	/**
 	 * @return Returns <code>null</code> when tour do not contain photos, otherwise a list of
 	 *         {@link Photo}'s is returned.
@@ -4972,6 +4982,10 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 		computePulseSmoothed();
 
 		return pulseSerieSmoothed;
+	}
+
+	public int getRearShiftCount() {
+		return rearShiftCount;
 	}
 
 	public int getRestPulse() {
@@ -5955,43 +5969,27 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 		this.dpTolerance = dpTolerance;
 	}
 
-	public void setGears(final List<GearData> validatedGearList) {
+	public void setFrontShiftCount(final int frontShiftCount) {
+		this.frontShiftCount = frontShiftCount;
+	}
 
-		final int gearSize = validatedGearList.size();
+	public void setGears(final List<GearData> gears) {
+
+		final int gearSize = gears.size();
 
 		if (gearSize == 0) {
 			return;
 		}
 
-//		// dump gears
-//		System.out.println("Gears");
-//		System.out.println(tourStartTime / 1000);
-
-//		public int getFrontGearNum() {
-//			return (int) (gears >> 16 & 0xff);
-//		}
-//
-//		public int getFrontGearTeeth() {
-//			return (int) (gears >> 24 & 0xff);
-//		}
-//
-//		public int getRearGearNum() {
-//			return (int) (gears & 0xff);
-//		}
-//
-//		public int getRearGearTeeth() {
-//			return (int) (gears >> 8 & 0xff);
-//		}
-
 		// convert gear data into a gearSerie
 
-		final long[] gearRaw = new long[timeSerie.length];
+		final long[] gearSerie = new long[timeSerie.length];
 
 		int gearIndex = 0;
 		final int nextGearIndex = gearSize > 0 ? 1 : 0;
 
-		GearData currentGear = validatedGearList.get(0);
-		GearData nextGear = validatedGearList.get(nextGearIndex);
+		GearData currentGear = gears.get(0);
+		GearData nextGear = gears.get(nextGearIndex);
 
 		long nextGearTime;
 		if (gearIndex >= nextGearIndex) {
@@ -6001,7 +5999,12 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 			nextGearTime = nextGear.absoluteTime;
 		}
 
-		for (int timeIndex = 0; timeIndex < gearRaw.length; timeIndex++) {
+		int frontShiftCount = 0;
+		int rearShiftCount = 0;
+		int currentFrontGear = currentGear.getFrontGearTeeth();
+		int currentRearGear = currentGear.getRearGearTeeth();
+
+		for (int timeIndex = 0; timeIndex < gearSerie.length; timeIndex++) {
 
 			final long currentTime = tourStartTime + timeSerie[timeIndex] * 1000;
 
@@ -6013,38 +6016,42 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 
 				if (gearIndex < gearSize - 1) {
 
+					// next gear is available
+
 					currentGear = nextGear;
 
-					nextGear = validatedGearList.get(gearIndex);
+					nextGear = gears.get(gearIndex);
 					nextGearTime = nextGear.absoluteTime;
+
+					final int nextFrontGear = nextGear.getFrontGearTeeth();
+					final int nextRearGear = nextGear.getRearGearTeeth();
+
+					if (currentFrontGear != nextFrontGear) {
+						frontShiftCount++;
+					}
+
+					if (currentRearGear != nextRearGear) {
+						rearShiftCount++;
+					}
+
+					currentFrontGear = nextFrontGear;
+					currentRearGear = nextRearGear;
 
 				} else {
 
 					// there are no further gears
+
 					nextGearTime = Long.MAX_VALUE;
 				}
 			}
 
-			gearRaw[timeIndex] = currentGear.gears;
+			gearSerie[timeIndex] = currentGear.gears;
 		}
 
-//		for (final GearData gearData : validatedGearList) {
-//
-//			long gearTime = gearData.absoluteTime;
-//
-//			System.out.println(String.format(
-//					"%d   %h   %-5d %-5d %-5d %-5d",
-//					gearTime / 1000,
-//					gearData.gears,
-//					gearData.getFrontGearTeeth(),
-//					gearData.getFrontGearNum(),
-//					gearData.getRearGearTeeth(),
-//					gearData.getRearGearNum()));
-//			// TODO remove SYSTEM.OUT.PRINTLN
-//		}
-//		System.out.println(tourEndTime / 1000);
+		this.gearSerie = gearSerie;
 
-		this.gearSerie = gearRaw;
+		this.frontShiftCount = frontShiftCount;
+		this.rearShiftCount = rearShiftCount;
 	}
 
 	/**
@@ -6088,6 +6095,10 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 	public void setPowerSerie(final float[] powerSerie) {
 		this.powerSerie = powerSerie;
 		this.isPowerSerieFromDevice = true;
+	}
+
+	public void setRearShiftCount(final int rearShiftCount) {
+		this.rearShiftCount = rearShiftCount;
 	}
 
 	public void setRestPulse(final int restPulse) {

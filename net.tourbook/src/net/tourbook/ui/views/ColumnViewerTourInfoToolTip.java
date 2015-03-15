@@ -94,7 +94,7 @@ public abstract class ColumnViewerTourInfoToolTip extends ToolTip implements ITo
 
 			// there are no data available
 
-			container = _tourInfoUI.createUINoData(parent);
+			container = _tourInfoUI.createUI_NoData(parent);
 
 			// allow the actions to be selected
 			setHideOnMouseDown(true);

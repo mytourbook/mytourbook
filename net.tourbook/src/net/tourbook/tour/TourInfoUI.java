@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -61,6 +61,8 @@ public class TourInfoUI {
 	private static final int			SHELL_MARGIN			= 5;
 	private static final int			MAX_DATA_WIDTH			= 300;
 
+	private static final String			GEAR_SHIFTS_FORMAT		= "%d : %d";						//$NON-NLS-1$
+
 	private Color						_bgColor;
 	private Color						_fgColor;
 	private Font						_boldFont;
@@ -99,10 +101,11 @@ public class TourInfoUI {
 																		.appendSuffix("h ", "h ") //$NON-NLS-1$ //$NON-NLS-2$
 																		.toFormatter();
 
+	private boolean						_hasDescription;
+	private boolean						_hasGears;
+	private boolean						_hasTags;
 	private boolean						_hasTourType;
 	private boolean						_hasWeather;
-	private boolean						_hasTags;
-	private boolean						_hasDescription;
 
 	private boolean						_isActionsVisible		= false;
 
@@ -117,42 +120,17 @@ public class TourInfoUI {
 	 * UI controls
 	 */
 	private Composite					_ttContainer;
-	private Label						_lblTitle;
-	private Label						_lblDate;
-	private CLabel						_lblTourType;
-	private Label						_lblTourTypeText;
-	private Text						_txtWeather;
-	private Label						_lblTourTags;
+
 	private Text						_txtDescription;
+	private Text						_txtWeather;
 
-	/*
-	 * 1. column
-	 */
-	private Label						_lblRecordingTime;
-	private Label						_lblMovingTime;
-	private Label						_lblBreakTime;
-	private Label						_lblRecordingTimeHour;
-	private Label						_lblMovingTimeHour;
-	private Label						_lblBreakTimeHour;
-
-	private Label						_lblWindSpeed;
-	private Label						_lblWindSpeedUnit;
-	private Label						_lblWindDirection;
-	private Label						_lblWindDirectionUnit;
-	private Label						_lblTemperature;
 	private CLabel						_lblClouds;
-	private Label						_lblCloudsUnit;
+	private CLabel						_lblTourType;
 
-	/*
-	 * 2. column
-	 */
-	private Label						_lblDistance;
-	private Label						_lblDistanceUnit;
 	private Label						_lblAltitudeUp;
 	private Label						_lblAltitudeUpUnit;
 	private Label						_lblAltitudeDown;
 	private Label						_lblAltitudeDownUnit;
-
 	private Label						_lblAvgSpeed;
 	private Label						_lblAvgSpeedUnit;
 	private Label						_lblAvgPace;
@@ -161,13 +139,31 @@ public class TourInfoUI {
 	private Label						_lblAvgPulseUnit;
 	private Label						_lblAvgCadence;
 	private Label						_lblAvgCadenceUnit;
-
+	private Label						_lblBreakTime;
+	private Label						_lblBreakTimeHour;
 	private Label						_lblCalories;
-	private Label						_lblRestPulse;
-
+	private Label						_lblCloudsUnit;
+	private Label						_lblDate;
 	private Label						_lblDateTimeCreatedValue;
 	private Label						_lblDateTimeModifiedValue;
 	private Label						_lblDateTimeModified;
+	private Label						_lblDistance;
+	private Label						_lblDistanceUnit;
+	private Label						_lblGearFrontShifts;
+	private Label						_lblGearRearShifts;
+	private Label						_lblMovingTime;
+	private Label						_lblMovingTimeHour;
+	private Label						_lblRecordingTime;
+	private Label						_lblRecordingTimeHour;
+	private Label						_lblRestPulse;
+	private Label						_lblTemperature;
+	private Label						_lblTitle;
+	private Label						_lblTourTags;
+	private Label						_lblTourTypeText;
+	private Label						_lblWindSpeed;
+	private Label						_lblWindSpeedUnit;
+	private Label						_lblWindDirection;
+	private Label						_lblWindDirectionUnit;
 
 	/*
 	 * actions
@@ -221,6 +217,7 @@ public class TourInfoUI {
 		_hasTourType = tourType != null;
 		_hasDescription = tourDescription != null && tourDescription.length() > 0;
 		_hasWeather = _tourData.getWeather().length() > 0;
+		_hasGears = _tourData.getFrontShiftCount() > 0 || _tourData.getRearShiftCount() > 0;
 
 		final Composite container = createUI(parent);
 
@@ -257,19 +254,19 @@ public class TourInfoUI {
 					.applyTo(_ttContainer);
 //			_ttContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
 			{
-				createUI10UpperPart(_ttContainer);
+				createUI_10_UpperPart(_ttContainer);
 
-				createUI30LeftColumn(_ttContainer);
-				createUI40RightColumn(_ttContainer);
-				createUI50LowerPart(_ttContainer);
-				createUI60CreateModifyTime(_ttContainer);
+				createUI_30_LeftColumn(_ttContainer);
+				createUI_40_RightColumn(_ttContainer);
+				createUI_50_LowerPart(_ttContainer);
+				createUI_60_CreateModifyTime(_ttContainer);
 			}
 		}
 
 		return shellContainer;
 	}
 
-	private void createUI10UpperPart(final Composite parent) {
+	private void createUI_10_UpperPart(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(container);
@@ -309,17 +306,17 @@ public class TourInfoUI {
 			/*
 			 * action toolbar in the top right corner
 			 */
-			createUI12Toolbar(container);
+			createUI_12_Toolbar(container);
 
 			/*
 			 * date
 			 */
-			_lblDate = createUILabelValue(container, SWT.LEAD);
+			_lblDate = createUI_LabelValue(container, SWT.LEAD);
 			GridDataFactory.fillDefaults().span(3, 1).applyTo(_lblDate);
 		}
 	}
 
-	private void createUI12Toolbar(final Composite container) {
+	private void createUI_12_Toolbar(final Composite container) {
 
 		if (_isActionsVisible == false) {
 			// actions are not enabled
@@ -348,7 +345,7 @@ public class TourInfoUI {
 		tbm.update(true);
 	}
 
-	private void createUI30LeftColumn(final Composite parent) {
+	private void createUI_30_LeftColumn(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).applyTo(container);
@@ -360,13 +357,13 @@ public class TourInfoUI {
 			/*
 			 * recording time
 			 */
-			Label label = createUILabel(container, Messages.Tour_Tooltip_Label_RecordingTime);
+			Label label = createUI_Label(container, Messages.Tour_Tooltip_Label_RecordingTime);
 			_firstColumnControls.add(label);
 
-			_lblRecordingTime = createUILabelValue(container, SWT.TRAIL);
+			_lblRecordingTime = createUI_LabelValue(container, SWT.TRAIL);
 			_secondColumnControls.add(_lblRecordingTime);
 
-			_lblRecordingTimeHour = createUILabel(container, Messages.Tour_Tooltip_Label_Hour);
+			_lblRecordingTimeHour = createUI_Label(container, Messages.Tour_Tooltip_Label_Hour);
 
 			// force this column to take the rest of the space
 			GridDataFactory.fillDefaults().grab(true, false).applyTo(_lblRecordingTimeHour);
@@ -374,92 +371,90 @@ public class TourInfoUI {
 			/*
 			 * moving time
 			 */
-			label = createUILabel(container, Messages.Tour_Tooltip_Label_MovingTime);
+			label = createUI_Label(container, Messages.Tour_Tooltip_Label_MovingTime);
 			_firstColumnControls.add(label);
 
-			_lblMovingTime = createUILabelValue(container, SWT.TRAIL);
+			_lblMovingTime = createUI_LabelValue(container, SWT.TRAIL);
 			_secondColumnControls.add(_lblMovingTime);
 
-			_lblMovingTimeHour = createUILabel(container, Messages.Tour_Tooltip_Label_Hour);
+			_lblMovingTimeHour = createUI_Label(container, Messages.Tour_Tooltip_Label_Hour);
 
 			/*
 			 * break time
 			 */
-			label = createUILabel(container, Messages.Tour_Tooltip_Label_BreakTime);
+			label = createUI_Label(container, Messages.Tour_Tooltip_Label_BreakTime);
 			_firstColumnControls.add(label);
 
-			_lblBreakTime = createUILabelValue(container, SWT.TRAIL);
+			_lblBreakTime = createUI_LabelValue(container, SWT.TRAIL);
 			_secondColumnControls.add(_lblBreakTime);
 
-			_lblBreakTimeHour = createUILabel(container, Messages.Tour_Tooltip_Label_Hour);
+			_lblBreakTimeHour = createUI_Label(container, Messages.Tour_Tooltip_Label_Hour);
 
 			// ----------------- spacer ----------------
-			label = createUILabel(container, null);
+			label = createUI_Label(container, null);
 			GridDataFactory.fillDefaults().span(3, 1).applyTo(label);
 
 			/*
 			 * distance
 			 */
-			label = createUILabel(container, Messages.Tour_Tooltip_Label_Distance);
+			label = createUI_Label(container, Messages.Tour_Tooltip_Label_Distance);
 			_firstColumnControls.add(label);
 
-			_lblDistance = createUILabelValue(container, SWT.TRAIL);
+			_lblDistance = createUI_LabelValue(container, SWT.TRAIL);
 			_secondColumnControls.add(_lblDistance);
 
-			_lblDistanceUnit = createUILabelValue(container, SWT.LEAD);
+			_lblDistanceUnit = createUI_LabelValue(container, SWT.LEAD);
 
 			/*
 			 * altitude up
 			 */
-			label = createUILabel(container, Messages.Tour_Tooltip_Label_AltitudeUp);
+			label = createUI_Label(container, Messages.Tour_Tooltip_Label_AltitudeUp);
 			_firstColumnControls.add(label);
 
-			_lblAltitudeUp = createUILabelValue(container, SWT.TRAIL);
+			_lblAltitudeUp = createUI_LabelValue(container, SWT.TRAIL);
 			_secondColumnControls.add(_lblAltitudeUp);
 
-			_lblAltitudeUpUnit = createUILabelValue(container, SWT.LEAD);
+			_lblAltitudeUpUnit = createUI_LabelValue(container, SWT.LEAD);
 
 			/*
 			 * altitude up
 			 */
-			label = createUILabel(container, Messages.Tour_Tooltip_Label_AltitudeDown);
+			label = createUI_Label(container, Messages.Tour_Tooltip_Label_AltitudeDown);
 			_firstColumnControls.add(label);
 
-			_lblAltitudeDown = createUILabelValue(container, SWT.TRAIL);
+			_lblAltitudeDown = createUI_LabelValue(container, SWT.TRAIL);
 			_secondColumnControls.add(_lblAltitudeDown);
 
-			_lblAltitudeDownUnit = createUILabelValue(container, SWT.LEAD);
+			_lblAltitudeDownUnit = createUI_LabelValue(container, SWT.LEAD);
 
 			// ----------------- spacer ----------------
-			label = createUILabel(container, null);
+			label = createUI_Label(container, null);
 			GridDataFactory.fillDefaults().span(3, 1).applyTo(label);
 
 			/*
 			 * calories
 			 */
-			label = createUILabel(container, Messages.Tour_Tooltip_Label_Calories);
+			label = createUI_Label(container, Messages.Tour_Tooltip_Label_Calories);
 			_firstColumnControls.add(label);
 
-			_lblCalories = createUILabelValue(container, SWT.TRAIL);
+			_lblCalories = createUI_LabelValue(container, SWT.TRAIL);
 			_secondColumnControls.add(_lblCalories);
-			createUILabel(container, Messages.Value_Unit_Calories);
+			createUI_Label(container, Messages.Value_Unit_Calories);
 
 			/*
 			 * rest pulse
 			 */
-			label = createUILabel(container, Messages.Tour_Tooltip_Label_RestPulse);
+			label = createUI_Label(container, Messages.Tour_Tooltip_Label_RestPulse);
 			_firstColumnControls.add(label);
 
-			_lblRestPulse = createUILabelValue(container, SWT.TRAIL);
+			_lblRestPulse = createUI_LabelValue(container, SWT.TRAIL);
 			_secondColumnControls.add(_lblRestPulse);
 
-			createUILabel(container, Messages.Value_Unit_Pulse);
+			createUI_Label(container, Messages.Value_Unit_Pulse);
 		}
 	}
 
-	private void createUI40RightColumn(final Composite parent) {
-
-		Label label;
+	private void createUI_40_RightColumn(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).applyTo(container);
@@ -468,105 +463,142 @@ public class TourInfoUI {
 		GridLayoutFactory.fillDefaults().numColumns(3).spacing(5, 0).applyTo(container);
 //		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
 		{
-			/*
-			 * avg speed
-			 */
-			label = createUILabel(container, Messages.Tour_Tooltip_Label_AvgSpeed);
-			_firstColumnControls.add(label);
+			createUI_42_Avg(container);
 
-			_lblAvgSpeed = createUILabelValue(container, SWT.TRAIL);
-			_secondColumnControls.add(_lblAvgSpeed);
-
-			_lblAvgSpeedUnit = createUILabelValue(container, SWT.LEAD);
-
-			/*
-			 * avg pace
-			 */
-			label = createUILabel(container, Messages.Tour_Tooltip_Label_AvgPace);
-			_firstColumnControls.add(label);
-
-			_lblAvgPace = createUILabelValue(container, SWT.TRAIL);
-			_secondColumnControls.add(_lblAvgPace);
-
-			_lblAvgPaceUnit = createUILabelValue(container, SWT.LEAD);
-
-			/*
-			 * avg pulse
-			 */
-			label = createUILabel(container, Messages.Tour_Tooltip_Label_AvgPulse);
-			_firstColumnControls.add(label);
-
-			_lblAvgPulse = createUILabelValue(container, SWT.TRAIL);
-			_secondColumnControls.add(_lblAvgPulse);
-
-			_lblAvgPulseUnit = createUILabelValue(container, SWT.LEAD);
-
-			/*
-			 * avg cadence
-			 */
-			label = createUILabel(container, Messages.Tour_Tooltip_Label_AvgCadence);
-			_firstColumnControls.add(label);
-
-			_lblAvgCadence = createUILabelValue(container, SWT.TRAIL);
-			_secondColumnControls.add(_lblAvgCadence);
-
-			_lblAvgCadenceUnit = createUILabelValue(container, SWT.LEAD);
-
-			// ########### spacer ##########
-			label = createUILabel(container, null);
+			// spacer
+			Label label = createUI_Label(container, null);
 			GridDataFactory.fillDefaults().span(3, 1).applyTo(label);
 
-			/*
-			 * clouds
-			 */
-			label = createUILabel(container, Messages.Tour_Tooltip_Label_Clouds);
-			_firstColumnControls.add(label);
+			createUI_44_Weather(container);
 
-			// icon: clouds
-			_lblClouds = new CLabel(container, SWT.TRAIL);
-			GridDataFactory.fillDefaults().align(SWT.END, SWT.FILL).applyTo(_lblClouds);
-			_lblClouds.setForeground(_fgColor);
-			_lblClouds.setBackground(_bgColor);
+			if (_hasGears) {
 
-			// text: clouds
-			_lblCloudsUnit = createUILabelValue(container, SWT.LEAD);
-			GridDataFactory.swtDefaults().applyTo(_lblCloudsUnit);
+				// spacer
+				label = createUI_Label(container, null);
+				GridDataFactory.fillDefaults().span(3, 1).applyTo(label);
 
-			/*
-			 * temperature
-			 */
-			label = createUILabel(container, Messages.Tour_Tooltip_Label_Temperature);
-			_firstColumnControls.add(label);
-
-			_lblTemperature = createUILabelValue(container, SWT.TRAIL);
-			_secondColumnControls.add(_lblTemperature);
-
-			createUILabel(container, UI.UNIT_LABEL_TEMPERATURE);
-			/*
-			 * wind speed
-			 */
-			label = createUILabel(container, Messages.Tour_Tooltip_Label_WindSpeed);
-			_firstColumnControls.add(label);
-
-			_lblWindSpeed = createUILabelValue(container, SWT.TRAIL);
-			_secondColumnControls.add(_lblWindSpeed);
-
-			_lblWindSpeedUnit = createUILabelValue(container, SWT.LEAD);
-
-			/*
-			 * wind direction
-			 */
-			label = createUILabel(container, Messages.Tour_Tooltip_Label_WindDirection);
-			_firstColumnControls.add(label);
-
-			_lblWindDirection = createUILabelValue(container, SWT.TRAIL);
-			_secondColumnControls.add(_lblWindDirection);
-
-			_lblWindDirectionUnit = createUILabelValue(container, SWT.LEAD);
+				createUI_46_Gears(container);
+			}
 		}
 	}
 
-	private void createUI50LowerPart(final Composite parent) {
+	private void createUI_42_Avg(final Composite parent) {
+
+		Label label;
+
+		/*
+		 * avg speed
+		 */
+		label = createUI_Label(parent, Messages.Tour_Tooltip_Label_AvgSpeed);
+		_firstColumnControls.add(label);
+
+		_lblAvgSpeed = createUI_LabelValue(parent, SWT.TRAIL);
+		_secondColumnControls.add(_lblAvgSpeed);
+
+		_lblAvgSpeedUnit = createUI_LabelValue(parent, SWT.LEAD);
+
+		/*
+		 * avg pace
+		 */
+		label = createUI_Label(parent, Messages.Tour_Tooltip_Label_AvgPace);
+		_firstColumnControls.add(label);
+
+		_lblAvgPace = createUI_LabelValue(parent, SWT.TRAIL);
+		_secondColumnControls.add(_lblAvgPace);
+
+		_lblAvgPaceUnit = createUI_LabelValue(parent, SWT.LEAD);
+
+		/*
+		 * avg pulse
+		 */
+		label = createUI_Label(parent, Messages.Tour_Tooltip_Label_AvgPulse);
+		_firstColumnControls.add(label);
+
+		_lblAvgPulse = createUI_LabelValue(parent, SWT.TRAIL);
+		_secondColumnControls.add(_lblAvgPulse);
+
+		_lblAvgPulseUnit = createUI_LabelValue(parent, SWT.LEAD);
+
+		/*
+		 * avg cadence
+		 */
+		label = createUI_Label(parent, Messages.Tour_Tooltip_Label_AvgCadence);
+		_firstColumnControls.add(label);
+
+		_lblAvgCadence = createUI_LabelValue(parent, SWT.TRAIL);
+		_secondColumnControls.add(_lblAvgCadence);
+
+		_lblAvgCadenceUnit = createUI_LabelValue(parent, SWT.LEAD);
+	}
+
+	private void createUI_44_Weather(final Composite parent) {
+
+		Label label;
+
+		/*
+		 * clouds
+		 */
+		label = createUI_Label(parent, Messages.Tour_Tooltip_Label_Clouds);
+		_firstColumnControls.add(label);
+
+		// icon: clouds
+		_lblClouds = new CLabel(parent, SWT.TRAIL);
+		GridDataFactory.fillDefaults().align(SWT.END, SWT.FILL).applyTo(_lblClouds);
+		_lblClouds.setForeground(_fgColor);
+		_lblClouds.setBackground(_bgColor);
+
+		// text: clouds
+		_lblCloudsUnit = createUI_LabelValue(parent, SWT.LEAD);
+		GridDataFactory.swtDefaults().applyTo(_lblCloudsUnit);
+
+		/*
+		 * temperature
+		 */
+		label = createUI_Label(parent, Messages.Tour_Tooltip_Label_Temperature);
+		_firstColumnControls.add(label);
+
+		_lblTemperature = createUI_LabelValue(parent, SWT.TRAIL);
+		_secondColumnControls.add(_lblTemperature);
+
+		createUI_Label(parent, UI.UNIT_LABEL_TEMPERATURE);
+		/*
+		 * wind speed
+		 */
+		label = createUI_Label(parent, Messages.Tour_Tooltip_Label_WindSpeed);
+		_firstColumnControls.add(label);
+
+		_lblWindSpeed = createUI_LabelValue(parent, SWT.TRAIL);
+		_secondColumnControls.add(_lblWindSpeed);
+
+		_lblWindSpeedUnit = createUI_LabelValue(parent, SWT.LEAD);
+
+		/*
+		 * wind direction
+		 */
+		label = createUI_Label(parent, Messages.Tour_Tooltip_Label_WindDirection);
+		_firstColumnControls.add(label);
+
+		_lblWindDirection = createUI_LabelValue(parent, SWT.TRAIL);
+		_secondColumnControls.add(_lblWindDirection);
+
+		_lblWindDirectionUnit = createUI_LabelValue(parent, SWT.LEAD);
+	}
+
+	private void createUI_46_Gears(final Composite parent) {
+
+		/*
+		 * Front/rear gear shifts
+		 */
+		final Label label = createUI_Label(parent, Messages.Tour_Tooltip_Label_GearShifts);
+		_firstColumnControls.add(label);
+
+		_lblGearFrontShifts = createUI_LabelValue(parent, SWT.TRAIL);
+		_secondColumnControls.add(_lblGearFrontShifts);
+
+		_lblGearRearShifts = createUI_LabelValue(parent, SWT.LEAD);
+	}
+
+	private void createUI_50_LowerPart(final Composite parent) {
 
 		if (_hasTags == false && _hasDescription == false && _hasWeather == false && _hasTourType == false) {
 			return;
@@ -587,11 +619,11 @@ public class TourInfoUI {
 			 */
 			if (_hasTourType) {
 
-				label = createUILabel(container, Messages.Tour_Tooltip_Label_TourType);
+				label = createUI_Label(container, Messages.Tour_Tooltip_Label_TourType);
 				GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).applyTo(label);
 				_firstColumnControls.add(label);
 
-				_lblTourTypeText = createUILabelValue(container, SWT.LEAD | SWT.WRAP);
+				_lblTourTypeText = createUI_LabelValue(container, SWT.LEAD | SWT.WRAP);
 				GridDataFactory.fillDefaults()//
 						.grab(true, false)
 						.hint(MAX_DATA_WIDTH, SWT.DEFAULT)
@@ -603,11 +635,11 @@ public class TourInfoUI {
 			 */
 			if (_hasTags) {
 
-				label = createUILabel(container, Messages.Tour_Tooltip_Label_Tags);
+				label = createUI_Label(container, Messages.Tour_Tooltip_Label_Tags);
 				GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).applyTo(label);
 				_firstColumnControls.add(label);
 
-				_lblTourTags = createUILabelValue(container, SWT.LEAD | SWT.WRAP);
+				_lblTourTags = createUI_LabelValue(container, SWT.LEAD | SWT.WRAP);
 				GridDataFactory.fillDefaults()//
 						.grab(true, false)
 						.hint(MAX_DATA_WIDTH, SWT.DEFAULT)
@@ -619,7 +651,7 @@ public class TourInfoUI {
 			 */
 			if (_hasWeather) {
 
-				label = createUILabel(container, Messages.Tour_Tooltip_Label_Weather);
+				label = createUI_Label(container, Messages.Tour_Tooltip_Label_Weather);
 				GridDataFactory.fillDefaults()//
 						.span(2, 1)
 						.indent(0, 5)
@@ -642,7 +674,7 @@ public class TourInfoUI {
 			if (_hasDescription) {
 
 				// label
-				label = createUILabel(container, Messages.Tour_Tooltip_Label_Description);
+				label = createUI_Label(container, Messages.Tour_Tooltip_Label_Description);
 				GridDataFactory.fillDefaults()//
 						.span(2, 1)
 						.indent(0, 5)
@@ -674,7 +706,7 @@ public class TourInfoUI {
 		}
 	}
 
-	private void createUI60CreateModifyTime(final Composite parent) {
+	private void createUI_60_CreateModifyTime(final Composite parent) {
 
 		if (_uiDtCreated == null && _uiDtModified == null) {
 			return;
@@ -700,9 +732,9 @@ public class TourInfoUI {
 				/*
 				 * date/time created
 				 */
-				createUILabel(containerCreated, Messages.Tour_Tooltip_Label_DateTimeCreated);
+				createUI_Label(containerCreated, Messages.Tour_Tooltip_Label_DateTimeCreated);
 
-				_lblDateTimeCreatedValue = createUILabelValue(containerCreated, SWT.LEAD);
+				_lblDateTimeCreatedValue = createUI_LabelValue(containerCreated, SWT.LEAD);
 				GridDataFactory.fillDefaults().applyTo(_lblDateTimeCreatedValue);
 			}
 
@@ -715,13 +747,13 @@ public class TourInfoUI {
 				/*
 				 * date/time modified
 				 */
-				_lblDateTimeModified = createUILabel(containerModified, Messages.Tour_Tooltip_Label_DateTimeModified);
+				_lblDateTimeModified = createUI_Label(containerModified, Messages.Tour_Tooltip_Label_DateTimeModified);
 				GridDataFactory.fillDefaults()//
 						.grab(true, false)
 						.align(SWT.END, SWT.FILL)
 						.applyTo(_lblDateTimeModified);
 
-				_lblDateTimeModifiedValue = createUILabelValue(containerModified, SWT.TRAIL);
+				_lblDateTimeModifiedValue = createUI_LabelValue(containerModified, SWT.TRAIL);
 				GridDataFactory.fillDefaults()//
 						.align(SWT.END, SWT.FILL)
 						.applyTo(_lblDateTimeModifiedValue);
@@ -729,7 +761,7 @@ public class TourInfoUI {
 		}
 	}
 
-	private Label createUILabel(final Composite parent, final String labelText) {
+	private Label createUI_Label(final Composite parent, final String labelText) {
 
 		final Label label = new Label(parent, SWT.NONE);
 		label.setForeground(_fgColor);
@@ -742,7 +774,7 @@ public class TourInfoUI {
 		return label;
 	}
 
-	private Label createUILabelValue(final Composite parent, final int style) {
+	private Label createUI_LabelValue(final Composite parent, final int style) {
 
 		final Label label = new Label(parent, style);
 		GridDataFactory.fillDefaults().applyTo(label);
@@ -752,7 +784,7 @@ public class TourInfoUI {
 		return label;
 	}
 
-	public Composite createUINoData(final Composite parent) {
+	public Composite createUI_NoData(final Composite parent) {
 
 		final Display display = parent.getDisplay();
 
@@ -1013,6 +1045,12 @@ public class TourInfoUI {
 
 		_lblCalories.setText(Integer.toString(_tourData.getCalories()));
 		_lblRestPulse.setText(Integer.toString(_tourData.getRestPulse()));
+
+		// gears
+		if (_hasGears) {
+			_lblGearFrontShifts.setText(Integer.toString(_tourData.getFrontShiftCount()));
+			_lblGearRearShifts.setText(Integer.toString(_tourData.getRearShiftCount()));
+		}
 
 		/*
 		 * date/time

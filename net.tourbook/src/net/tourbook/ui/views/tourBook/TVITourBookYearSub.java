@@ -104,7 +104,10 @@ public class TVITourBookYearSub extends TVITourBookItem {
 				//
 				+ "numberOfTimeSlices, " //							32	//$NON-NLS-1$
 				+ "numberOfPhotos, " //								33	//$NON-NLS-1$
-				+ "dpTolerance" //									34	//$NON-NLS-1$
+				+ "dpTolerance, " //								34	//$NON-NLS-1$
+				//
+				+ "frontShiftCount, " //							35	//$NON-NLS-1$
+				+ "rearShiftCount" //								36	//$NON-NLS-1$
 				//
 				+ UI.NEW_LINE
 
@@ -217,6 +220,9 @@ public class TVITourBookYearSub extends TVITourBookItem {
 					tourItem.colNumberOfTimeSlices = result.getInt(32);
 					tourItem.colNumberOfPhotos = result.getInt(33);
 					tourItem.colDPTolerance = result.getInt(34);
+
+					tourItem.colFrontShiftCount = result.getInt(35);
+					tourItem.colRearShiftCount = result.getInt(36);
 
 					// -----------------------------------------------
 

@@ -157,6 +157,8 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 	private static final String							CSV_HEADER_DEVICE_START_DISTANCE	= "DeviceStartDistance";					//$NON-NLS-1$
 	private static final String							CSV_HEADER_DISTANCE					= "Distance (%s)";							//$NON-NLS-1$
 	private static final String							CSV_HEADER_DP_TOLERANCE				= "DPTolerance";							//$NON-NLS-1$
+	private static final String							CSV_HEADER_GEAR_FRONT_SHIFT_COUNT	= "FrontShiftCount";						//$NON-NLS-1$
+	private static final String							CSV_HEADER_GEAR_REAR_SHIFT_COUNT	= "RearShiftCount";						//$NON-NLS-1$
 	private static final String							CSV_HEADER_ISO_DATE_TIME			= "ISO8601";								//$NON-NLS-1$
 	private static final String							CSV_HEADER_MOVING_TIME				= "MovingTime (%s)";						//$NON-NLS-1$
 	private static final String							CSV_HEADER_NUMBER_OF_MARKER			= "NumberOfMarkers";						//$NON-NLS-1$
@@ -760,7 +762,6 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		defineColumn_Marker();
 		defineColumn_Calories();
 		defineColumn_RestPulse();
-//		defineColumn_Gears();
 
 		defineColumn_TimeRecording();
 		defineColumn_TimeBreak();
@@ -780,6 +781,9 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 
 		defineColumn_WeatherWindSpeed();
 		defineColumn_WeatherWindDirection();
+
+		defineColumn_Gear_FrontShiftCount();
+		defineColumn_Gear_RearShiftCount();
 
 		defineColumn_WeekNo();
 		defineColumn_WeekYear();
@@ -1133,6 +1137,53 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		});
 	}
 
+	/**
+	 * Column: Front shift count.
+	 */
+	private void defineColumn_Gear_FrontShiftCount() {
+
+		final TreeColumnDefinition colDef = TreeColumnFactory.GEAR_FRONT_SHIFT_COUNT.createColumn(_columnManager, _pc);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final Object element = cell.getElement();
+				final int numberOfShifts = ((TVITourBookItem) element).colFrontShiftCount;
+
+				if (numberOfShifts == 0) {
+					cell.setText(UI.EMPTY_STRING);
+				} else {
+					cell.setText(Integer.toString(numberOfShifts));
+				}
+
+				setCellColor(cell, element);
+			}
+		});
+	}
+
+	/**
+	 * Column: Rear shift count.
+	 */
+	private void defineColumn_Gear_RearShiftCount() {
+
+		final TreeColumnDefinition colDef = TreeColumnFactory.GEAR_REAR_SHIFT_COUNT.createColumn(_columnManager, _pc);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final Object element = cell.getElement();
+				final int numberOfShifts = ((TVITourBookItem) element).colRearShiftCount;
+
+				if (numberOfShifts == 0) {
+					cell.setText(UI.EMPTY_STRING);
+				} else {
+					cell.setText(Integer.toString(numberOfShifts));
+				}
+
+				setCellColor(cell, element);
+			}
+		});
+	}
 
 	/**
 	 * column: markers
@@ -1144,6 +1195,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
+
 				final Object element = cell.getElement();
 				if (element instanceof TVITourBookTour) {
 
@@ -1263,18 +1315,17 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
+
 				final Object element = cell.getElement();
-				if (element instanceof TVITourBookTour) {
+				final int numberOfPhotos = ((TVITourBookItem) element).colNumberOfPhotos;
 
-					final int numberOfPhotos = ((TVITourBookTour) element).colNumberOfPhotos;
-					if (numberOfPhotos == 0) {
-						cell.setText(UI.EMPTY_STRING);
-					} else {
-						cell.setText(Integer.toString(numberOfPhotos));
-					}
-
-					setCellColor(cell, element);
+				if (numberOfPhotos == 0) {
+					cell.setText(UI.EMPTY_STRING);
+				} else {
+					cell.setText(Integer.toString(numberOfPhotos));
 				}
+
+				setCellColor(cell, element);
 			}
 		});
 	}
@@ -2004,6 +2055,9 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		csvField(sb, CSV_HEADER_DP_TOLERANCE);
 		csvField(sb, CSV_HEADER_PERSON);
 
+		csvField(sb, CSV_HEADER_GEAR_FRONT_SHIFT_COUNT);
+		csvField(sb, CSV_HEADER_GEAR_REAR_SHIFT_COUNT);
+
 		// end of line
 		sb.append(net.tourbook.ui.UI.SYSTEM_NEW_LINE);
 
@@ -2230,12 +2284,11 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 
 		// CSV_HEADER_NUMBER_OF_PHOTOS
 		{
-			if (isTour) {
-				final int numberOfPhotos = tviTour.colNumberOfPhotos;
-				if (numberOfPhotos != 0) {
-					sb.append(Integer.toString(numberOfPhotos));
-				}
+			final int numberOfPhotos = tviItem.colNumberOfPhotos;
+			if (numberOfPhotos != 0) {
+				sb.append(Integer.toString(numberOfPhotos));
 			}
+
 			sb.append(UI.TAB);
 		}
 
@@ -2438,6 +2491,22 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 				final long dbPersonId = tviTour.colPersonId;
 				sb.append(PersonManager.getPersonName(dbPersonId));
 			}
+			sb.append(UI.TAB);
+		}
+
+		// CSV_HEADER_GEAR_FRONT_SHIFT_COUNT
+		{
+			final int shiftCount = tviItem.colFrontShiftCount;
+			sb.append(Integer.toString(shiftCount));
+
+			sb.append(UI.TAB);
+		}
+
+		// CSV_HEADER_GEAR_REAR_SHIFT_COUNT
+		{
+			final int shiftCount = tviItem.colRearShiftCount;
+			sb.append(Integer.toString(shiftCount));
+
 			sb.append(UI.TAB);
 		}
 	}
