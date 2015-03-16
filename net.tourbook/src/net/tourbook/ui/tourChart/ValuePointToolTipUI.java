@@ -67,7 +67,6 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 	private static final String				GRAPH_LABEL_CADENCE_UNIT		= net.tourbook.common.Messages.Graph_Label_Cadence_Unit;
 	private static final String				GRAPH_LABEL_DISTANCE			= net.tourbook.common.Messages.Graph_Label_Distance;
 	private static final String				GRAPH_LABEL_GEARS				= net.tourbook.common.Messages.Graph_Label_Gears;
-	private static final String				GRAPH_LABEL_GEARS_UNIT			= net.tourbook.common.Messages.Graph_Label_Gears_Unit;
 	private static final String				GRAPH_LABEL_GRADIENT			= net.tourbook.common.Messages.Graph_Label_Gradient;
 	private static final String				GRAPH_LABEL_GRADIENT_UNIT		= net.tourbook.common.Messages.Graph_Label_Gradient_Unit;
 	private static final String				GRAPH_LABEL_HEARTBEAT			= net.tourbook.common.Messages.Graph_Label_Heartbeat;
@@ -814,7 +813,7 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 						GRAPH_LABEL_GEARS,
 						GraphColorManager.PREF_GRAPH_GEAR);
 
-				createUILabel(container, GRAPH_LABEL_GEARS_UNIT, GRAPH_LABEL_GEARS, GraphColorManager.PREF_GRAPH_GEAR);
+				createUILabel(container, UI.EMPTY_STRING, GRAPH_LABEL_GEARS, GraphColorManager.PREF_GRAPH_GEAR);
 			}
 			_firstColumnControls.add(_lblGears);
 			_firstColumnContainerControls.add(container);

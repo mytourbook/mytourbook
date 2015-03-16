@@ -2333,7 +2333,7 @@ public class ChartComponents extends Composite {
 
 		// loop all graphs - find the title for the y-axis
 		for (final ChartDataYSerie yData : yDataList) {
-			if (yData.getYTitle() != null || yData.getUnitLabel() != null) {
+			if (yData.getYTitle() != null || yData.getUnitLabel().length() > 0) {
 				isYTitle = true;
 				break;
 			}

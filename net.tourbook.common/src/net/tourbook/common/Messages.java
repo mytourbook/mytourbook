@@ -50,7 +50,6 @@ public class Messages extends NLS {
 	public static String		Graph_Label_Cadence_Unit;
 	public static String		Graph_Label_Distance;
 	public static String		Graph_Label_Gears;
-	public static String		Graph_Label_Gears_Unit;
 	public static String		Graph_Label_Gradient;
 	public static String		Graph_Label_Gradient_Unit;
 	public static String		Graph_Label_Heartbeat;

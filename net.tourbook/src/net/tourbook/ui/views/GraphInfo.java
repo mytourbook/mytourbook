@@ -177,13 +177,15 @@ class GraphInfo {
 			toolTip = _chartData.getLabel();
 		}
 
+		final String unitLabel = _chartData.getUnitLabel();
+
 		final Label label = new Label(_parent, SWT.NONE);
 		GridDataFactory.fillDefaults()//
 				.align(SWT.FILL, SWT.CENTER)
 				.indent(_tourChartAnalyzerView._columnSpacing, 0)
 				.grab(true, false)
 				.applyTo(label);
-		label.setText(UI.SPACE + _chartData.getUnitLabel());
+		label.setText(unitLabel.length() > 0 ? UI.SPACE + unitLabel : unitLabel);
 		label.setToolTipText(toolTip);
 		label.setForeground(lineColor);
 //			label.setBackground(_bgColorHeader);

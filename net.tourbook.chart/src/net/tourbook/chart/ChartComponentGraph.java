@@ -23,6 +23,7 @@ import java.util.HashMap;
 
 import net.tourbook.common.PointLong;
 import net.tourbook.common.RectangleLong;
+import net.tourbook.common.UI;
 
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
@@ -1082,8 +1083,11 @@ public class ChartComponentGraph extends Canvas {
 				}
 			}
 
-			labelText.append(' ');
-			labelText.append(yData.getUnitLabel());
+			final String unitLabel = yData.getUnitLabel();
+			if (unitLabel.length() > 0) {
+				labelText.append(' ');
+				labelText.append(unitLabel);
+			}
 			labelText.append(' ');
 
 			// calculate position of the slider label
@@ -4513,11 +4517,15 @@ public class ChartComponentGraph extends Canvas {
 				final float devYValue = (float) (((double) devYBottom - devYSliderLine) / drawingData.getScaleY() + drawingData
 						.getGraphYBottom());
 
+				final String unitLabel = yData.getUnitLabel();
+
 				// create the slider text
 				labelText.append(Util.formatValue(devYValue, yData.getAxisUnit(), yData.getValueDivisor(), true));
-				labelText.append(' ');
-				labelText.append(yData.getUnitLabel());
-				labelText.append("  "); //$NON-NLS-1$
+				if (unitLabel.length() > 0) {
+					labelText.append(UI.SPACE);
+					labelText.append(unitLabel);
+				}
+				labelText.append(UI.SPACE);
 				final String label = labelText.toString();
 
 				final Point labelExtend = gcGraph.stringExtent(label);

@@ -82,7 +82,6 @@ public class TourManager {
 	private static final String				GRAPH_LABEL_CADENCE						= net.tourbook.common.Messages.Graph_Label_Cadence;
 	private static final String				GRAPH_LABEL_CADENCE_UNIT				= net.tourbook.common.Messages.Graph_Label_Cadence_Unit;
 	private static final String				GRAPH_LABEL_GEARS						= net.tourbook.common.Messages.Graph_Label_Gears;
-	private static final String				GRAPH_LABEL_GEARS_UNIT					= net.tourbook.common.Messages.Graph_Label_Gears_Unit;
 	private static final String				GRAPH_LABEL_GRADIENT					= net.tourbook.common.Messages.Graph_Label_Gradient;
 	private static final String				GRAPH_LABEL_GRADIENT_UNIT				= net.tourbook.common.Messages.Graph_Label_Gradient_Unit;
 	private static final String				GRAPH_LABEL_HEARTBEAT					= net.tourbook.common.Messages.Graph_Label_Heartbeat;
@@ -2272,7 +2271,6 @@ public class TourManager {
 			yDataGears = createChartDataSerie(chartGearSerie, ChartType.HORIZONTAL_BAR);
 
 			yDataGears.setYTitle(GRAPH_LABEL_GEARS);
-			yDataGears.setUnitLabel(GRAPH_LABEL_GEARS_UNIT);
 			yDataGears.setShowYSlider(true);
 			yDataGears.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_GEARS);
 			yDataGears.setSliderLabelProvider(new GearSliderLabelProvider(gearSerie));
