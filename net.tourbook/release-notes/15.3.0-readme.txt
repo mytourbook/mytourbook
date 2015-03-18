@@ -1,23 +1,57 @@
-Version: 15.3.0                                              9.3.2015
-
-
-
-
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+Version: 15.3.0                                                         9.3.2015
 
 
 New 	
 ===
 
-* 
-  
+* Fulltext Search 
+
+The search feature has been implemented in version 14.14 Alpha but was published
+as experimental because of a major database update.
+
+Since it was published, there has been no problems, therefore the search feature
+is now in the normal release. In version 15.3 there are no changes in the 
+database.
+
+Compared with version 14.14 Alpha there are not many functional changes but the
+UI has been replaced completly with the Dojo toolkit which is the reason why it
+took so long.
+
+
+Why Dojo and not SWT?
+
+* The author was not happy with the typeahead of the search text field.
+* Other reasons.
+
+
+Improvements compared with 14.14 Alpha
+
+* Paging of the search results has been replaced with a long list which is 
+  loaded on demand (when the list is scrolled).
+* Better typeahead when the search text is entered.
+* Search result can be filtered by Tour/Marker/Waypoint.
+
+
+Known Problems
+
+* Some search options (checkboxes) cannot be changed with the keyboard, it works
+  with the mouse or when the UI is running in an external web browser.
+* Tooltips do not hide always when mouse is not hovering it, this is a bit 
+  tricky depending where the mouse is moved.
+* When the value point tooltip is displayed, the actions to edit a tour/marker 
+  can fail, the dialog boxes getting closed immediately.
+  Workaround: hide value point tooltip.
  
+
+What's next?
+
+There are many ideas how the search feature can be improved.
+
+
+
 Improvements
 ============
 
-* 
+* Tour Chart
 
-
-
-
-
+  - Overlapped graphs
