@@ -334,7 +334,6 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 		final Display display = parent.getDisplay();
 
 		_fgBorder = _colorCache.getColor(new RGB(0xe5, 0xe5, 0xcb));
-//		_bgColor = _colorCache.getColor(new RGB(0xff, 0xff, 0xf0));
 		_bgColor = _colorCache.getColor(new RGB(0xff, 0xff, 0xff));
 		_fgColor = display.getSystemColor(SWT.COLOR_DARK_GRAY);
 
@@ -811,8 +810,13 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 						SWT.TRAIL,
 						10,
 						GRAPH_LABEL_GEARS,
-						GraphColorManager.PREF_GRAPH_GEAR);
 
+				// this is a bit tricky, use default color because the text color is white
+						null
+//						GraphColorManager.PREF_GRAPH_GEAR
+				);
+
+				// no unit
 				createUILabel(container, UI.EMPTY_STRING, GRAPH_LABEL_GEARS, GraphColorManager.PREF_GRAPH_GEAR);
 			}
 			_firstColumnControls.add(_lblGears);
@@ -915,6 +919,7 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 	 *            Hint for the width in characters.
 	 * @param tooltip
 	 * @param colorId
+	 *            Can be <code>null</code>.
 	 * @return
 	 */
 	private Label createUILabelValue(	final Composite parent,
@@ -945,7 +950,7 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 		GridDataFactory.fillDefaults()//
 				.hint(charsWidth, SWT.DEFAULT)
 				.applyTo(label);
-		label.setForeground(_fgColor);
+
 		label.setBackground(_bgColor);
 
 		if (tooltip != null) {
@@ -953,11 +958,15 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 		}
 
 		if (colorId == null) {
+
 			label.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_BLACK));
+
 		} else {
+
 			final Color fgColor = _colorCache.getColor(//
 					colorId, //
 					_colorManager.getGraphColorDefinition(colorId).getTextColor_Active());
+
 			label.setForeground(fgColor);
 		}
 

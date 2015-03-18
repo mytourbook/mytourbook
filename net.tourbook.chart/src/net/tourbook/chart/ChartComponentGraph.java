@@ -3540,9 +3540,6 @@ public class ChartComponentGraph extends Canvas {
 
 		final Display display = getDisplay();
 
-		// path is scaled in device pixel
-//		final Path path = new Path(display);
-
 		final int devGraphHeight = graphDrawingData.devGraphHeight;
 		final float devYGraphBottom = (float) (scaleY * graphYBorderBottom);
 
@@ -3673,10 +3670,9 @@ public class ChartComponentGraph extends Canvas {
 			}
 
 			/*
-			 * draw line to current point
+			 * draw box when value has changed
 			 */
-			if (true) {
-
+			{
 				final float devYBar = devY0Inverse - devY;
 
 				if (devY == devYPrev) {
@@ -3765,6 +3761,19 @@ public class ChartComponentGraph extends Canvas {
 				// ensure bar is painted
 				if (barWidth < 1) {
 					barWidth = 1;
+				}
+
+				if (yValues2[valueIndex - 1] == 1) {
+
+					// grosses Kettenblatt
+
+					gc.setBackground(colorBgBright);
+
+				} else {
+
+					// kleines Kettenblatt
+
+					gc.setBackground(colorBgDark);
 				}
 
 				gc.fillRectangle(//
@@ -4479,8 +4488,8 @@ public class ChartComponentGraph extends Canvas {
 
 		final Display display = getDisplay();
 
-		final int grayColorIndex = 60;
-		final Color colorTxt = new Color(display, grayColorIndex, grayColorIndex, grayColorIndex);
+//		final int grayColorIndex = 60;
+//		final Color colorTxt = new Color(display, grayColorIndex, grayColorIndex, grayColorIndex);
 
 		final int devXChartWidth = getDevVisibleChartWidth();
 
@@ -4493,6 +4502,7 @@ public class ChartComponentGraph extends Canvas {
 				final Color colorLine = new Color(display, yData.getRgbLine()[0]);
 				final Color colorBright = new Color(display, yData.getRgbBright()[0]);
 				final Color colorDark = new Color(display, yData.getRgbDark()[0]);
+				final Color colorText = new Color(display, yData.getRgbText()[0]);
 
 				final GraphDrawingData drawingData = ySlider.getDrawingData();
 				final int devYBottom = drawingData.getDevYBottom();
@@ -4531,25 +4541,25 @@ public class ChartComponentGraph extends Canvas {
 				final Point labelExtend = gcGraph.stringExtent(label);
 
 				final int labelHeight = labelExtend.y - 2;
-				final int labelWidth = labelExtend.x + 0;
+				final int labelWidth = labelExtend.x + 1;
 				final int labelX = _ySliderGraphX - labelWidth - 5;
 				final int labelY = devYLabelPos - labelHeight;
 
 				// draw label background
 				gcGraph.setForeground(colorBright);
 				gcGraph.setBackground(colorDark);
-				gcGraph.setAlpha(0xb0);
+//				gcGraph.setAlpha(0xb0);
 				gcGraph.fillGradientRectangle(labelX, labelY, labelWidth, labelHeight, true);
 
 				// draw label border
-				gcGraph.setAlpha(0xa0);
+//				gcGraph.setAlpha(0xa0);
 				gcGraph.setForeground(colorLine);
 				gcGraph.drawRectangle(labelX, labelY, labelWidth, labelHeight);
-				gcGraph.setAlpha(0xff);
+//				gcGraph.setAlpha(0xff);
 
 				// draw label text
-				gcGraph.setForeground(colorTxt);
-				gcGraph.drawText(label, labelX + 2, labelY - 0, true);
+				gcGraph.setForeground(colorText);
+				gcGraph.drawText(label, labelX + 3, labelY - 0, true);
 
 				// draw slider line
 				gcGraph.setForeground(colorLine);
@@ -4559,13 +4569,14 @@ public class ChartComponentGraph extends Canvas {
 				colorLine.dispose();
 				colorBright.dispose();
 				colorDark.dispose();
+				colorText.dispose();
 
 				// only 1 y-slider can be hit
 				break;
 			}
 		}
 
-		colorTxt.dispose();
+//		colorTxt.dispose();
 	}
 
 	private void drawSync_430_XMarker(final GC gc) {

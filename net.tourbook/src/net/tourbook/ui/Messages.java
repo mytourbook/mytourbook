@@ -321,14 +321,14 @@ public class Messages extends NLS {
 	public static String		Tour_Tooltip_Label_DefaultTitle;
 	public static String		Tour_Tooltip_Label_Description;
 	public static String		Tour_Tooltip_Label_Distance;
-
-	public static String	Tour_Tooltip_Label_GearShifts;
-
+	public static String		Tour_Tooltip_Label_GearShifts;
 	public static String		Tour_Tooltip_Label_Hour;
+	public static String		Tour_Tooltip_Label_MaxAltitude;
+	public static String		Tour_Tooltip_Label_MaxPulse;
+	public static String		Tour_Tooltip_Label_MaxSpeed;
 	public static String		Tour_Tooltip_Label_MovingTime;
 	public static String		Tour_Tooltip_Label_NoTour;
-	public static String	Tour_Tooltip_Label_RearGearShifts;
-
+	public static String		Tour_Tooltip_Label_RearGearShifts;
 	public static String		Tour_Tooltip_Label_RecordingTime;
 	public static String		Tour_Tooltip_Label_RestPulse;
 	public static String		Tour_Tooltip_Label_Tags;
