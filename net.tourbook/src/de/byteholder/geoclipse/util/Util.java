@@ -1,18 +1,8 @@
 package de.byteholder.geoclipse.util;
 
-import java.net.MalformedURLException;
-import java.net.URL;
-
-import net.tourbook.common.util.StatusUtil;
-
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.VerifyEvent;
 import org.eclipse.swt.events.VerifyListener;
-import org.eclipse.swt.widgets.Shell;
-import org.eclipse.ui.PartInitException;
-import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.browser.IWebBrowser;
-import org.eclipse.ui.browser.IWorkbenchBrowserSupport;
 
 public class Util {
 
@@ -54,49 +44,6 @@ public class Util {
 		return sb.toString();
 	}
 
-	public static void log(final String message) {
-//		System.out.println(//
-//				System.nanoTime() + " "
-//				//                                                 012345678901234
-//						+ Thread.currentThread().getName().concat("               ").substring(0, 14)
-//						+ "\t"
-//						+ message);
-	}
-
-	/**
-	 * Open a link
-	 */
-	public static void openLink(final Shell shell, String href) {
-
-		// format the href for an html file (file:///<filename.html>
-		// required for Mac only.
-		if (href.startsWith("file:")) { //$NON-NLS-1$
-			href = href.substring(5);
-			while (href.startsWith("/")) { //$NON-NLS-1$
-				href = href.substring(1);
-			}
-			href = "file:///" + href; //$NON-NLS-1$
-
-		} else if (href.startsWith("http") == false) { //$NON-NLS-1$
-
-			// Ensure that a protocol is set otherwise a MalformedURLException exception occures
-			href = "http://" + href; //$NON-NLS-1$
-		}
-
-		final IWorkbenchBrowserSupport support = PlatformUI.getWorkbench().getBrowserSupport();
-
-		try {
-
-			final IWebBrowser browser = support.getExternalBrowser();
-			browser.openURL(new URL(urlEncodeForSpaces(href.toCharArray())));
-
-		} catch (final MalformedURLException e) {
-			StatusUtil.showStatus(e);
-		} catch (final PartInitException e) {
-			StatusUtil.showStatus(e);
-		}
-	}
-
 	/**
 	 *** Returns true if the specified character should be hex-encoded in a URL
 	 ***
@@ -114,26 +61,10 @@ public class Util {
 		}
 	}
 
-	/**
-	 * This method encodes the url, removes the spaces from the url and replaces the same with
-	 * <code>"%20"</code>. This method is required to fix Bug 77840.
-	 * 
-	 * @since 3.0.2
-	 */
-	private static String urlEncodeForSpaces(final char[] input) {
-		final StringBuffer retu = new StringBuffer(input.length);
-		for (final char element : input) {
-			if (element == ' ') {
-				retu.append("%20"); //$NON-NLS-1$
-			} else {
-				retu.append(element);
-			}
-		}
-		return retu.toString();
-	}
-
 	public static VerifyListener verifyListenerInteger(final boolean canBeNegative) {
+
 		return new VerifyListener() {
+			@Override
 			public void verifyText(final VerifyEvent e) {
 
 				// check backspace and del key

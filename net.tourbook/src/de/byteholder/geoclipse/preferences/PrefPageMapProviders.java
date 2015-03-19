@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -31,6 +31,7 @@ import java.util.ArrayList;
 
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.util.StatusUtil;
+import net.tourbook.web.WEB;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IPath;
@@ -121,7 +122,6 @@ import de.byteholder.geoclipse.mapprovider.MPWrapper;
 import de.byteholder.geoclipse.mapprovider.MapProviderManager;
 import de.byteholder.geoclipse.mapprovider.MapProviderNavigator;
 import de.byteholder.geoclipse.ui.MessageDialogNoClose;
-import de.byteholder.geoclipse.util.Util;
 
 public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPreferencePage {
 
@@ -932,7 +932,7 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 			link.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(final SelectionEvent e) {
-					Util.openLink(Display.getCurrent().getActiveShell(), Messages.External_Link_MapProviders);
+					WEB.openUrl(Messages.External_Link_MapProviders);
 				}
 			});
 

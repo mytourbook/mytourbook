@@ -31,6 +31,7 @@ import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.UI;
 import net.tourbook.ui.views.SmoothingUI;
+import net.tourbook.web.WEB;
 
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.GridDataFactory;
@@ -276,9 +277,7 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 				linkDP.addSelectionListener(new SelectionAdapter() {
 					@Override
 					public void widgetSelected(final SelectionEvent e) {
-						Util.openLink(
-								Display.getCurrent().getActiveShell(),
-								PrefPageComputedValues.URL_DOUGLAS_PEUCKER_ALGORITHM);
+						WEB.openUrl(PrefPageComputedValues.URL_DOUGLAS_PEUCKER_ALGORITHM);
 					}
 				});
 
@@ -789,6 +788,7 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 		return BreakTimeTool.BREAK_TIME_METHODS[selectedIndex];
 	}
 
+	@Override
 	public void init(final IWorkbench workbench) {}
 
 	private void initUI(final Composite parent) {
@@ -842,6 +842,7 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 
 		final IComputeTourValues computeTourValueConfig = new IComputeTourValues() {
 
+			@Override
 			public boolean computeTourValues(final TourData oldTourData) {
 
 				final int tourRecordingTime = (int) oldTourData.getTourRecordingTime();
@@ -859,12 +860,14 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 				return true;
 			}
 
+			@Override
 			public String getResultText() {
 
 				return NLS.bind(Messages.Compute_BreakTime_ForAllTour_Job_Result, //
 						new Object[] { UI.format_hh_mm_ss(oldBreakTime[0]), UI.format_hh_mm_ss(newBreakTime[0]), });
 			}
 
+			@Override
 			public String getSubTaskText(final TourData savedTourData) {
 
 				String subTaskText = null;
@@ -909,6 +912,7 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 
 		final IComputeTourValues computeTourValueConfig = new IComputeTourValues() {
 
+			@Override
 			public boolean computeTourValues(final TourData oldTourData) {
 
 				// keep old value
@@ -917,6 +921,7 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 				return oldTourData.computeAltitudeUpDown();
 			}
 
+			@Override
 			public String getResultText() {
 
 				return NLS.bind(Messages.Compute_TourValue_ElevationGain_ResultText, //
@@ -927,6 +932,7 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 						});
 			}
 
+			@Override
 			public String getSubTaskText(final TourData savedTourData) {
 
 				String subTaskText = null;

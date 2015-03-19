@@ -945,7 +945,7 @@ public class TourBlogView extends ViewPart {
 			// open link in the external browser
 
 			// check if this is a valid web url and not any other protocol
-			Util.openLink(_browser.getShell(), location);
+			WEB.openUrl(location);
 		}
 
 		if (location.equals(PAGE_ABOUT_BLANK) == false) {

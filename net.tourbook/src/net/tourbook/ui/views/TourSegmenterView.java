@@ -57,6 +57,7 @@ import net.tourbook.ui.TableColumnFactory;
 import net.tourbook.ui.action.ActionModifyColumns;
 import net.tourbook.ui.tourChart.TourChart;
 import net.tourbook.ui.tourChart.TourChartView;
+import net.tourbook.web.WEB;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuManager;
@@ -385,8 +386,10 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 		public ViewContentProvider() {}
 
+		@Override
 		public void dispose() {}
 
+		@Override
 		public Object[] getElements(final Object parent) {
 			if (_tourData == null) {
 				return new Object[0];
@@ -401,6 +404,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 			}
 		}
 
+		@Override
 		public void inputChanged(final Viewer v, final Object oldInput, final Object newInput) {}
 	}
 
@@ -487,10 +491,13 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 		// set the part listener
 		_partListener = new IPartListener2() {
+			@Override
 			public void partActivated(final IWorkbenchPartReference partRef) {}
 
+			@Override
 			public void partBroughtToTop(final IWorkbenchPartReference partRef) {}
 
+			@Override
 			public void partClosed(final IWorkbenchPartReference partRef) {
 				if (partRef.getPart(false) == TourSegmenterView.this) {
 					saveState();
@@ -498,16 +505,21 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 				}
 			}
 
+			@Override
 			public void partDeactivated(final IWorkbenchPartReference partRef) {}
 
+			@Override
 			public void partHidden(final IWorkbenchPartReference partRef) {
 				onPartHidden();
 			}
 
+			@Override
 			public void partInputChanged(final IWorkbenchPartReference partRef) {}
 
+			@Override
 			public void partOpened(final IWorkbenchPartReference partRef) {}
 
+			@Override
 			public void partVisible(final IWorkbenchPartReference partRef) {
 				onPartVisible();
 			}
@@ -519,6 +531,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	private void addPrefListener() {
 
 		_prefChangeListener = new IPropertyChangeListener() {
+			@Override
 			public void propertyChange(final PropertyChangeEvent event) {
 
 				final String property = event.getProperty();
@@ -576,6 +589,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	private void addSelectionListener() {
 
 		_postSelectionListener = new ISelectionListener() {
+			@Override
 			public void selectionChanged(final IWorkbenchPart part, final ISelection selection) {
 
 				if (part == TourSegmenterView.this) {
@@ -592,6 +606,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	private void addTourEventListener() {
 
 		_tourEventListener = new ITourEventListener() {
+			@Override
 			public void tourChanged(final IWorkbenchPart part, final TourEventId eventId, final Object eventData) {
 
 				if (_tourData == null || part == TourSegmenterView.this) {
@@ -790,6 +805,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		// when previous onSelectionChanged did not display a tour, get tour from tour manager
 		if (_tourData == null) {
 			Display.getCurrent().asyncExec(new Runnable() {
+				@Override
 				public void run() {
 
 					final ArrayList<TourData> selectedTours = TourManager.getSelectedTours();
@@ -1096,6 +1112,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		// sort markers by time - they are unsorted
 		final ArrayList<TourMarker> markerList = new ArrayList<TourMarker>(tourMarkers);
 		Collections.sort(markerList, new Comparator<TourMarker>() {
+			@Override
 			public int compare(final TourMarker tm1, final TourMarker tm2) {
 				return tm1.getSerieIndex() - tm2.getSerieIndex();
 			}
@@ -1282,6 +1299,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 				}
 			});
 			_spinnerDistance.addMouseWheelListener(new MouseWheelListener() {
+				@Override
 				public void mouseScrolled(final MouseEvent event) {
 					UI.adjustSpinnerValueOnMouseScroll(event);
 					onChangedDistance();
@@ -1323,6 +1341,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 				}
 			});
 			_spinnerMinAltitude.addMouseWheelListener(new MouseWheelListener() {
+				@Override
 				public void mouseScrolled(final MouseEvent event) {
 					UI.adjustSpinnerValueOnMouseScroll(event);
 					onChangeBreakTime();
@@ -1473,6 +1492,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 				_spinnerBreakMinAvgSpeedAS.setMaximum(PrefPageComputedValues.BREAK_MAX_SPEED_KM_H); // 10.0 km/h
 				_spinnerBreakMinAvgSpeedAS.setDigits(1);
 				_spinnerBreakMinAvgSpeedAS.addMouseWheelListener(new MouseWheelListener() {
+					@Override
 					public void mouseScrolled(final MouseEvent event) {
 						UI.adjustSpinnerValueOnMouseScroll(event);
 						onChangeBreakTime();
@@ -1501,6 +1521,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 				_spinnerBreakMinSliceSpeedAS.setMaximum(PrefPageComputedValues.BREAK_MAX_SPEED_KM_H); // 10.0 km/h
 				_spinnerBreakMinSliceSpeedAS.setDigits(1);
 				_spinnerBreakMinSliceSpeedAS.addMouseWheelListener(new MouseWheelListener() {
+					@Override
 					public void mouseScrolled(final MouseEvent event) {
 						UI.adjustSpinnerValueOnMouseScroll(event);
 						onChangeBreakTime();
@@ -1528,6 +1549,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 				_spinnerBreakMinSliceTimeAS.setMinimum(0); // 0 sec
 				_spinnerBreakMinSliceTimeAS.setMaximum(10); // 10 sec
 				_spinnerBreakMinSliceTimeAS.addMouseWheelListener(new MouseWheelListener() {
+					@Override
 					public void mouseScrolled(final MouseEvent event) {
 						UI.adjustSpinnerValueOnMouseScroll(event);
 						onChangeBreakTime();
@@ -1572,6 +1594,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 				}
 			});
 			_spinnerBreakMinAvgSpeed.addMouseWheelListener(new MouseWheelListener() {
+				@Override
 				public void mouseScrolled(final MouseEvent event) {
 					UI.adjustSpinnerValueOnMouseScroll(event);
 					onChangeBreakTime();
@@ -1615,6 +1638,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 				}
 			});
 			_spinnerBreakMinSliceSpeed.addMouseWheelListener(new MouseWheelListener() {
+				@Override
 				public void mouseScrolled(final MouseEvent event) {
 					UI.adjustSpinnerValueOnMouseScroll(event);
 					onChangeBreakTime();
@@ -1656,6 +1680,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 					}
 				});
 				_spinnerBreakShortestTime.addMouseWheelListener(new MouseWheelListener() {
+					@Override
 					public void mouseScrolled(final MouseEvent event) {
 						UI.adjustSpinnerValueOnMouseScroll(event);
 						onChangeBreakTime();
@@ -1688,6 +1713,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 					}
 				});
 				_spinnerBreakMaxDistance.addMouseWheelListener(new MouseWheelListener() {
+					@Override
 					public void mouseScrolled(final MouseEvent event) {
 						UI.adjustSpinnerValueOnMouseScroll(event);
 						onChangeBreakTime();
@@ -1725,6 +1751,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 					}
 				});
 				_spinnerBreakSliceDiff.addMouseWheelListener(new MouseWheelListener() {
+					@Override
 					public void mouseScrolled(final MouseEvent event) {
 						UI.adjustSpinnerValueOnMouseScroll(event);
 						onChangeBreakTime();
@@ -1807,6 +1834,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		_segmentViewer.setSorter(new ViewSorter());
 
 		_segmentViewer.addSelectionChangedListener(new ISelectionChangedListener() {
+			@Override
 			public void selectionChanged(final SelectionChangedEvent event) {
 
 				final StructuredSelection selection = (StructuredSelection) event.getSelection();
@@ -1890,9 +1918,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		linkDP.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(final SelectionEvent e) {
-				Util.openLink(
-						Display.getCurrent().getActiveShell(),
-						PrefPageComputedValues.URL_DOUGLAS_PEUCKER_ALGORITHM);
+				WEB.openUrl(PrefPageComputedValues.URL_DOUGLAS_PEUCKER_ALGORITHM);
 			}
 		});
 
@@ -1911,6 +1937,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		});
 
 		spinner.addMouseWheelListener(new MouseWheelListener() {
+			@Override
 			public void mouseScrolled(final MouseEvent event) {
 				UI.adjustSpinnerValueOnMouseScroll(event);
 				onChangedTolerance();
@@ -2620,6 +2647,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		return null;
 	}
 
+	@Override
 	public ColumnManager getColumnManager() {
 		return _columnManager;
 	}
@@ -2697,6 +2725,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		return null;
 	}
 
+	@Override
 	public ColumnViewer getViewer() {
 		return _segmentViewer;
 	}
@@ -2827,6 +2856,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		 * data editor
 		 */
 		Display.getCurrent().asyncExec(new Runnable() {
+			@Override
 			public void run() {
 
 				// check if view is disposed
@@ -2992,6 +3022,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 				PrefPageComputedValues.TAB_FOLDER_BREAK_TIME).open();
 	}
 
+	@Override
 	public ColumnViewer recreateViewer(final ColumnViewer columnViewer) {
 
 		_containerViewer.setRedraw(false);
@@ -3009,6 +3040,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		return _segmentViewer;
 	}
 
+	@Override
 	public void reloadViewer() {
 		// force input to be reloaded
 		_segmentViewer.setInput(new Object[0]);

@@ -26,6 +26,7 @@ import net.tourbook.tour.ITourEventListener;
 import net.tourbook.tour.TourEvent;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
+import net.tourbook.web.WEB;
 
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
@@ -38,14 +39,11 @@ import org.eclipse.swt.browser.LocationEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Link;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.part.ViewPart;
-
-import de.byteholder.geoclipse.util.Util;
 
 public class SearchView extends ViewPart implements ISearchView {
 
@@ -227,7 +225,7 @@ public class SearchView extends ViewPart implements ISearchView {
 			linkLinuxBrowser.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(final SelectionEvent e) {
-					Util.openLink(Display.getCurrent().getActiveShell(), SearchMgr.SEARCH_URL);
+					WEB.openUrl(SearchMgr.SEARCH_URL);
 				}
 			});
 		}

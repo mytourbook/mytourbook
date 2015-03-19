@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,19 +15,20 @@
  *******************************************************************************/
 package net.tourbook.ui.action;
 
+import net.tourbook.web.WEB;
+
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.swt.widgets.Display;
 
 import de.byteholder.geoclipse.preferences.Messages;
-import de.byteholder.geoclipse.util.Util;
 
 public class ActionHandlerOpenHomePage extends AbstractHandler {
 
+	@Override
 	public Object execute(final ExecutionEvent event) throws ExecutionException {
 
-		Util.openLink(Display.getCurrent().getActiveShell(), Messages.External_Link_HomePage);
+		WEB.openUrl(Messages.External_Link_HomePage);
 
 		return null;
 	}

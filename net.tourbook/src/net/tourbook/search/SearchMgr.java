@@ -358,7 +358,7 @@ public class SearchMgr implements XHRHandler {
 				Display.getDefault().asyncExec(new Runnable() {
 					@Override
 					public void run() {
-						Util.openLink(Display.getDefault().getActiveShell(), location);
+						WEB.openUrl(location);
 					}
 				});
 

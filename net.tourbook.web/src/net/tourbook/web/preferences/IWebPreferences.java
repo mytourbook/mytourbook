@@ -13,24 +13,9 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.web;
+package net.tourbook.web.preferences;
 
-import org.eclipse.osgi.util.NLS;
+public interface IWebPreferences {
 
-public class Messages extends NLS {
-
-	private static final String	BUNDLE_NAME	= "net.tourbook.web.messages";	//$NON-NLS-1$
-
-	public static String		PrefPage_Web_Label_ExternalWebBrowser;
-	public static String		PrefPage_Web_Label_ExternalWebBrowser_Info;
-
-	public static String		Web_Page_ContentLoading;
-	public static String		Web_Page_Search_Title;
-
-	static {
-		// initialize resource bundle
-		NLS.initializeMessages(BUNDLE_NAME, Messages.class);
-	}
-
-	private Messages() {}
+	public static final String	EXTERNAL_WEB_BROWSER	= "EXTERNAL_WEB_BROWSER";	//$NON-NLS-1$
 }

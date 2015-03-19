@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+
+	<!-- PREF PAGES   -->
+
+	<extension point="org.eclipse.ui.preferencePages">
+		
+		<page category="net.tourbook.preferences.PrefPageGeneralId"
+			class="net.tourbook.web.preferences.PrefPageWebBrowser"
+			id="net.tourbook.web.preferences.PrefPageWebBrowser"
+			name="%PrefPage_Web_WebBrowser">
+		</page>
+
+   </extension>
+
+
+</plugin>

@@ -28,9 +28,15 @@ import net.tourbook.common.ReplacingOutputStream;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
+import net.tourbook.web.preferences.IWebPreferences;
 
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.browser.IWebBrowser;
+import org.eclipse.ui.browser.IWorkbenchBrowserSupport;
 import org.json.JSONObject;
 
 import com.sun.net.httpserver.Headers;
@@ -50,7 +56,7 @@ public class WEB {
 	 * {@value #WEB_CONTENT_DEVELOPMENT_FOLDER} folder otherwise it is delivered from the
 	 * {@value #WEB_CONTENT_RELEASE_FOLDER} folder.
 	 */
-	static boolean				IS_DEBUG								= false;
+	static boolean							IS_DEBUG								= false;
 
 	/*
 	 * It is very complicated to support testing for language translators, therefore it is currently
@@ -58,13 +64,13 @@ public class WEB {
 	 */
 //	static boolean				IS_DEBUG_NLS							= true;
 
-	static String				DEFAULT_LANGUAGE						= "en";										//$NON-NLS-1$
+	static String							DEFAULT_LANGUAGE						= "en";										//$NON-NLS-1$
 
 	/**
 	 * Supported languages.
 	 */
-	static String[]				SUPPORTED_LANGUAGES						= { //
-																		// cs_CZ
+	static String[]							SUPPORTED_LANGUAGES						= { //
+																					// cs_CZ
 			"cs", //$NON-NLS-1$
 			"de",//$NON-NLS-1$
 			DEFAULT_LANGUAGE,
@@ -72,61 +78,85 @@ public class WEB {
 			"fr",//$NON-NLS-1$
 			"it",//$NON-NLS-1$
 			"nl" //$NON-NLS-1$
-																		};
+																					};
 
-	static final String			DEBUG_PATH_DOJO							= "C:/E/js-resources/dojo/";					//$NON-NLS-1$
-	private static final String	DEBUG_PATH_XUL_RUNNER					= "C:/E/XULRunner/";							//$NON-NLS-1$
-	private static final String	DEBUG_PATH_FIREBUG_LITE					= "/WebContent-firebug-lite";					//$NON-NLS-1$
+	static final String						DEBUG_PATH_DOJO							= "C:/E/js-resources/dojo/";					//$NON-NLS-1$
+	private static final String				DEBUG_PATH_XUL_RUNNER					= "C:/E/XULRunner/";							//$NON-NLS-1$
+	private static final String				DEBUG_PATH_FIREBUG_LITE					= "/WebContent-firebug-lite";					//$NON-NLS-1$
 
-	public static final String	PROTOCOL_HTTP							= "http://";									//$NON-NLS-1$
+	public static final String				PROTOCOL_HTTP							= "http://";									//$NON-NLS-1$
 
-	static final String			DOJO_TOOLKIT_FOLDER						= "/MyTourbook-DojoToolkit";					//$NON-NLS-1$
+	static final String						DOJO_TOOLKIT_FOLDER						= "/MyTourbook-DojoToolkit";					//$NON-NLS-1$
 
-	private static final String	WEB_CONTENT_DEVELOPMENT_FOLDER			= "/WebContent-dev";							//$NON-NLS-1$
-	private static final String	WEB_CONTENT_RELEASE_FOLDER				= "/WebContent-rel";							//$NON-NLS-1$
+	private static final String				WEB_CONTENT_DEVELOPMENT_FOLDER			= "/WebContent-dev";							//$NON-NLS-1$
+	private static final String				WEB_CONTENT_RELEASE_FOLDER				= "/WebContent-rel";							//$NON-NLS-1$
 
 	/**
 	 * Root folder for web content in the web plugin.
 	 */
-	private static final String	WEB_CONTENT_FOLDER						= IS_DEBUG
-																				? WEB_CONTENT_DEVELOPMENT_FOLDER
-																				: WEB_CONTENT_RELEASE_FOLDER;
+	private static final String				WEB_CONTENT_FOLDER						= IS_DEBUG
+																							? WEB_CONTENT_DEVELOPMENT_FOLDER
+																							: WEB_CONTENT_RELEASE_FOLDER;
 
-	public static final String	UTF_8									= "UTF-8";										//$NON-NLS-1$
+	public static final String				UTF_8									= "UTF-8";										//$NON-NLS-1$
+	private static final String				ENCODED_SPACE							= "%20";										//$NON-NLS-1$
 
-	public static final String	RESPONSE_HEADER_ACCEPT_LANGUAGE			= "Accept-Language";							//$NON-NLS-1$
-	private static final String	RESPONSE_HEADER_CONTENT_ENCODING		= "Content-Encoding";							//$NON-NLS-1$
-	public static final String	RESPONSE_HEADER_CONTENT_RANGE			= "Content-Range";								//$NON-NLS-1$
-	public static final String	RESPONSE_HEADER_CONTENT_TYPE			= "Content-Type";								//$NON-NLS-1$
+	public static final String				RESPONSE_HEADER_ACCEPT_LANGUAGE			= "Accept-Language";							//$NON-NLS-1$
+	private static final String				RESPONSE_HEADER_CONTENT_ENCODING		= "Content-Encoding";							//$NON-NLS-1$
+	public static final String				RESPONSE_HEADER_CONTENT_RANGE			= "Content-Range";								//$NON-NLS-1$
+	public static final String				RESPONSE_HEADER_CONTENT_TYPE			= "Content-Type";								//$NON-NLS-1$
 
-	private static final String	CONTENT_ENCODING_GZIP					= "gzip";										//$NON-NLS-1$
+	private static final String				CONTENT_ENCODING_GZIP					= "gzip";										//$NON-NLS-1$
 
-	private static final String	CONTENT_TYPE_APPLICATION_JAVASCRIPT		= "application/javascript";					//$NON-NLS-1$
-	public static final String	CONTENT_TYPE_APPLICATION_JSON			= "application/json";							//$NON-NLS-1$
-	private static final String	CONTENT_TYPE_APPLICATION_X_JAVASCRIPT	= "application/x-javascript; charset=UTF-8";	//$NON-NLS-1$
-	private static final String	CONTENT_TYPE_IMAGE_GIF					= "image/gif";									//$NON-NLS-1$
-	private static final String	CONTENT_TYPE_IMAGE_JPG					= "image/jpeg";								//$NON-NLS-1$
-	private static final String	CONTENT_TYPE_IMAGE_PNG					= "image/png";									//$NON-NLS-1$
-	private static final String	CONTENT_TYPE_IMAGE_X_ICO				= "image/x-icon";								//$NON-NLS-1$
-	private static final String	CONTENT_TYPE_TEXT_CSS					= "text/css";									//$NON-NLS-1$
-	private static final String	CONTENT_TYPE_TEXT_HTML					= "text/html";									//$NON-NLS-1$
-	private static final String	CONTENT_TYPE_UNKNOWN					= "application/octet-stream";					//$NON-NLS-1$
+	private static final String				CONTENT_TYPE_APPLICATION_JAVASCRIPT		= "application/javascript";					//$NON-NLS-1$
+	public static final String				CONTENT_TYPE_APPLICATION_JSON			= "application/json";							//$NON-NLS-1$
+	private static final String				CONTENT_TYPE_APPLICATION_X_JAVASCRIPT	= "application/x-javascript; charset=UTF-8";	//$NON-NLS-1$
+	private static final String				CONTENT_TYPE_IMAGE_GIF					= "image/gif";									//$NON-NLS-1$
+	private static final String				CONTENT_TYPE_IMAGE_JPG					= "image/jpeg";								//$NON-NLS-1$
+	private static final String				CONTENT_TYPE_IMAGE_PNG					= "image/png";									//$NON-NLS-1$
+	private static final String				CONTENT_TYPE_IMAGE_X_ICO				= "image/x-icon";								//$NON-NLS-1$
+	private static final String				CONTENT_TYPE_TEXT_CSS					= "text/css";									//$NON-NLS-1$
+	private static final String				CONTENT_TYPE_TEXT_HTML					= "text/html";									//$NON-NLS-1$
+	private static final String				CONTENT_TYPE_UNKNOWN					= "application/octet-stream";					//$NON-NLS-1$
 
-	private static final String	FILE_EXTENSION_CSS						= "css";										//$NON-NLS-1$
-	private static final String	FILE_EXTENSION_GIF						= "gif";										//$NON-NLS-1$
-	private static final String	FILE_EXTENSION_HTML						= "html";										//$NON-NLS-1$
-	private static final String	FILE_EXTENSION_ICO						= "ico";										//$NON-NLS-1$
-	private static final String	FILE_EXTENSION_JGZ						= "jgz";										//$NON-NLS-1$
-	private static final String	FILE_EXTENSION_JPG						= "jpg";										//$NON-NLS-1$
-	private static final String	FILE_EXTENSION_JS						= "js";										//$NON-NLS-1$
-	private static final String	FILE_EXTENSION_MAP						= "map";										//$NON-NLS-1$
-	private static final String	FILE_EXTENSION_PNG						= "png";										//$NON-NLS-1$
+	private static final String				FILE_EXTENSION_CSS						= "css";										//$NON-NLS-1$
+	private static final String				FILE_EXTENSION_GIF						= "gif";										//$NON-NLS-1$
+	private static final String				FILE_EXTENSION_HTML						= "html";										//$NON-NLS-1$
+	private static final String				FILE_EXTENSION_ICO						= "ico";										//$NON-NLS-1$
+	private static final String				FILE_EXTENSION_JGZ						= "jgz";										//$NON-NLS-1$
+	private static final String				FILE_EXTENSION_JPG						= "jpg";										//$NON-NLS-1$
+	private static final String				FILE_EXTENSION_JS						= "js";										//$NON-NLS-1$
+	private static final String				FILE_EXTENSION_MAP						= "map";										//$NON-NLS-1$
+	private static final String				FILE_EXTENSION_PNG						= "png";										//$NON-NLS-1$
 
 	/**
 	 * This file extension is for HTML pages which contain variable replacements, processed in
 	 * {@link ReplacingOutputStream}.
 	 */
-	public static final String	FILE_EXTENSION_MTHTML					= "mthtml";									//$NON-NLS-1$
+	public static final String				FILE_EXTENSION_MTHTML					= "mthtml";									//$NON-NLS-1$
+
+	private static final IPreferenceStore	_prefStore								= Activator
+																							.getDefault()
+																							.getPreferenceStore();
+
+	/**
+	 * Replace space characters with <code>%20</code>.
+	 */
+	private static String encodeUrlForSpaces(final char[] url) {
+
+		final StringBuffer encodedUrl = new StringBuffer(url.length);
+
+		for (final char element : url) {
+
+			if (element == ' ') {
+				encodedUrl.append(ENCODED_SPACE);
+			} else {
+				encodedUrl.append(element);
+			}
+		}
+
+		return encodedUrl.toString();
+	}
 
 	/**
 	 * @param path
@@ -222,7 +252,7 @@ public class WEB {
 
 	public static JSONObject getJSONObject(final Object rawData) throws UnsupportedEncodingException {
 
-		final String jsData = URLDecoder.decode((String) rawData, WEB.UTF_8);
+		final String jsData = URLDecoder.decode((String) rawData, UTF_8);
 		final JSONObject jsonData = new JSONObject(jsData);
 
 		return jsonData;
@@ -243,6 +273,106 @@ public class WEB {
 
 		return fileUri;
 
+	}
+
+	/**
+	 * Open url with default or external web browser.
+	 * 
+	 * @param url
+	 */
+	public static void openUrl(String href) {
+
+		// format the href for an html file (file:///<filename.html>) required for Mac only.
+
+		if (href.startsWith("file:")) { //$NON-NLS-1$
+			href = href.substring(5);
+			while (href.startsWith("/")) { //$NON-NLS-1$
+				href = href.substring(1);
+			}
+			href = "file:///" + href; //$NON-NLS-1$
+
+		} else if (href.startsWith("http") == false) { //$NON-NLS-1$
+
+			// Ensure that a protocol is set otherwise a MalformedURLException exception occures
+			href = "http://" + href; //$NON-NLS-1$
+		}
+
+		final String externalWebBrowser = _prefStore.getString(IWebPreferences.EXTERNAL_WEB_BROWSER);
+
+		if (externalWebBrowser.length() == 0) {
+
+			// external web browser is not defined
+			openUrl_WithDefaultWebbrowser(href);
+
+		} else {
+
+			openUrl_WithExternalBrowser(externalWebBrowser, href);
+		}
+	}
+
+	/**
+	 * Open a link
+	 */
+	private static void openUrl_WithDefaultWebbrowser(final String href) {
+
+		final IWorkbenchBrowserSupport support = PlatformUI.getWorkbench().getBrowserSupport();
+
+		try {
+
+			final IWebBrowser browser = support.getExternalBrowser();
+			browser.openURL(new URL(encodeUrlForSpaces(href.toCharArray())));
+
+		} catch (final MalformedURLException e) {
+			StatusUtil.showStatus(e);
+		} catch (final PartInitException e) {
+			StatusUtil.showStatus(e);
+		}
+	}
+
+	private static void openUrl_WithExternalBrowser(final String extApp, final String url) {
+
+		final String encodedUrl = Util.encodeSpace(url);
+
+		String commands[] = null;
+		if (UI.IS_WIN) {
+
+			final String[] commandsWin = { "\"" + extApp + "\"", //$NON-NLS-1$ //$NON-NLS-2$
+					"\"" + encodedUrl + "\"" }; //$NON-NLS-1$ //$NON-NLS-2$
+
+			commands = commandsWin;
+
+		} else if (UI.IS_OSX) {
+
+			final String[] commandsOSX = { "/usr/bin/open", "-a", // //$NON-NLS-1$ //$NON-NLS-2$
+					extApp,
+					encodedUrl };
+
+			commands = commandsOSX;
+
+		} else if (UI.IS_LINUX) {
+
+			final String[] commandsLinux = { extApp, encodedUrl };
+
+			commands = commandsLinux;
+		}
+
+		if (commands != null) {
+
+			try {
+
+				// log command
+				final StringBuilder sb = new StringBuilder();
+				for (final String cmd : commands) {
+					sb.append(cmd + " "); //$NON-NLS-1$
+				}
+				StatusUtil.logInfo(sb.toString());
+
+				Runtime.getRuntime().exec(commands);
+
+			} catch (final Exception e) {
+				StatusUtil.showStatus(e);
+			}
+		}
 	}
 
 	private static String replaceLocalDebugPath(final String webContent, final File webFile) {
