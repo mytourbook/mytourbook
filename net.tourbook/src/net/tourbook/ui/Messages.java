@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -328,7 +328,6 @@ public class Messages extends NLS {
 	public static String		Tour_Tooltip_Label_MaxSpeed;
 	public static String		Tour_Tooltip_Label_MovingTime;
 	public static String		Tour_Tooltip_Label_NoTour;
-	public static String		Tour_Tooltip_Label_RearGearShifts;
 	public static String		Tour_Tooltip_Label_RecordingTime;
 	public static String		Tour_Tooltip_Label_RestPulse;
 	public static String		Tour_Tooltip_Label_Tags;

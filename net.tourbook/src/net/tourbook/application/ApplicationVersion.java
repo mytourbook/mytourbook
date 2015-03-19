@@ -22,10 +22,11 @@ import org.osgi.framework.Version;
 public class ApplicationVersion {
 
 	public static final String	SPLASH_COPYRIGHT_YEAR		= "2015";			//$NON-NLS-1$
-//
-//	private static final String	DEVELOPMENT_VERSION_TEXT	= UI.EMPTY_STRING;
-//	private static final String	DEV_WINDOW_TITLE			= UI.EMPTY_STRING;
-//	private static String		_subVersion					= UI.EMPTY_STRING;
+
+// X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X
+	private static final String	DEVELOPMENT_VERSION_TEXT	= UI.EMPTY_STRING;
+	private static final String	DEV_WINDOW_TITLE			= UI.EMPTY_STRING;
+	private static String		_subVersion					= UI.EMPTY_STRING;
 
 // X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X
 //	private static final String	DEVELOPMENT_VERSION_TEXT	= "DEVELOPMENT";									//$NON-NLS-1$
@@ -37,10 +38,10 @@ public class ApplicationVersion {
 //	private static final String	DEV_WINDOW_TITLE			= UI.DASH_WITH_SPACE + DEVELOPMENT_VERSION_TEXT;
 //	private static String		_subVersion					= UI.EMPTY_STRING;
 
-	// X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X
-	private static final String	DEVELOPMENT_VERSION_TEXT	= "Gears";											//$NON-NLS-1$
-	private static final String	DEV_WINDOW_TITLE			= UI.DASH_WITH_SPACE + DEVELOPMENT_VERSION_TEXT;
-	private static String		_subVersion					= UI.EMPTY_STRING;
+//	// X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X
+//	private static final String	DEVELOPMENT_VERSION_TEXT	= "Gears";											//$NON-NLS-1$
+//	private static final String	DEV_WINDOW_TITLE			= UI.DASH_WITH_SPACE + DEVELOPMENT_VERSION_TEXT;
+//	private static String		_subVersion					= UI.EMPTY_STRING;
 
 	private static String		_versionFull;
 	private static String		_versionSimple;

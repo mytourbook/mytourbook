@@ -53,13 +53,13 @@ public class GearData implements Serializable {
 
 	@Override
 	public String toString() {
-		return "GearData ["
-				+ ("absoluteTime=" + new DateTime(absoluteTime) + ", ")
-				+ ("FrontGearNum=" + getFrontGearNum() + ", ")
-				+ ("FrontGearTeeth=" + getFrontGearTeeth() + ", ")
-				+ ("RearGearNum=" + getRearGearNum() + ", ")
-				+ ("RearGearTeeth=" + getRearGearTeeth())
-				+ "]\n";
+		return "GearData [" //$NON-NLS-1$
+				+ ("absoluteTime=" + new DateTime(absoluteTime) + ", ") //$NON-NLS-1$ //$NON-NLS-2$
+				+ ("FrontGearNum=" + getFrontGearNum() + ", ") //$NON-NLS-1$ //$NON-NLS-2$
+				+ ("FrontGearTeeth=" + getFrontGearTeeth() + ", ") //$NON-NLS-1$ //$NON-NLS-2$
+				+ ("RearGearNum=" + getRearGearNum() + ", ") //$NON-NLS-1$ //$NON-NLS-2$
+				+ ("RearGearTeeth=" + getRearGearTeeth()) //$NON-NLS-1$
+				+ "]\n"; //$NON-NLS-1$
 	}
 
 }

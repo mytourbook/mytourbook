@@ -1,4 +1,4 @@
-Version: 15.4.0                                              9.3.2015
+Version: 15.3.0                                              22.3.2015
 
 
 
@@ -12,6 +12,10 @@ New
 * Gears
 
 - Import gear values from .fit files.
+
+- Reimport only gear values for already imported tours.
+	- Tour book view
+	- Import view
 
 - Show gears in 
 	- Tour book view

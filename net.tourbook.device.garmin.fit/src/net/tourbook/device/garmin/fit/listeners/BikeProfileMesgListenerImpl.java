@@ -42,7 +42,7 @@ public class BikeProfileMesgListenerImpl extends AbstractMesgListener implements
 		final int numRearGear = mesg.getNumRearGear();
 
 		System.out.println(String.format(
-				"BikeProfileMesg\t%-5s%-5s%-5s%-5s%-5s%-5s",
+				"BikeProfileMesg\t%-5s%-5s%-5s%-5s%-5s%-5s", //$NON-NLS-1$
 				frontGear,
 				frontGearNum,
 				numFrontGear,
