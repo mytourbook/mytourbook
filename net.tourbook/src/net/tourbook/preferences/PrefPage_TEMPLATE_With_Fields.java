@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -18,6 +18,7 @@ package net.tourbook.preferences;
 import net.tourbook.application.TourbookPlugin;
 
 import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.widgets.Composite;
@@ -33,6 +34,7 @@ public class PrefPage_TEMPLATE_With_Fields extends FieldEditorPreferencePage imp
 	/*
 	 * UI controls
 	 */
+	private PixelConverter		_pc;
 
 	@Override
 	protected void createFieldEditors() {
@@ -48,12 +50,14 @@ public class PrefPage_TEMPLATE_With_Fields extends FieldEditorPreferencePage imp
 		final Composite parent = getFieldEditorParent();
 		GridLayoutFactory.fillDefaults().applyTo(parent);
 
+		_pc = new PixelConverter(parent);
 	}
 
 	private void enableControls() {
 
 	}
 
+	@Override
 	public void init(final IWorkbench workbench) {
 
 		setPreferenceStore(_prefStore);

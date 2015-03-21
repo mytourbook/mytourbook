@@ -16,119 +16,188 @@
 package net.tourbook.web.preferences;
 
 import net.tourbook.common.UI;
-import net.tourbook.web.Activator;
+import net.tourbook.common.util.Util;
 import net.tourbook.web.Messages;
+import net.tourbook.web.WEB;
 
+import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
-import org.eclipse.jface.preference.FieldEditorPreferencePage;
-import org.eclipse.jface.preference.FileFieldEditor;
-import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.jface.preference.StringFieldEditor;
+import org.eclipse.jface.layout.PixelConverter;
+import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
-public class PrefPageWebBrowser extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
+public class PrefPageWebBrowser extends PreferencePage implements IWorkbenchPreferencePage {
 
-	public static final String			ID			= "net.tourbook.web.preferences.PrefPageWebBrowser";	//$NON-NLS-1$
+	public static final String	ID		= "net.tourbook.web.preferences.PrefPageWebBrowser";	//$NON-NLS-1$
 
-	private final IPreferenceStore		_prefStore	= Activator.getDefault().getPreferenceStore();
+	private IDialogSettings		_state	= WEB.getState();
+
+	private PixelConverter		_pc;
 
 	/*
 	 * UI controls
 	 */
-	private FileFieldEditorNoValidation	_editorWebBrowser;
+	private Button				_chkUseExternalWebBrowser;
 
-	public class FileFieldEditorNoValidation extends FileFieldEditor {
+	private Label				_lblHint;
+	private Label				_lblInfo;
 
-		/**
-		 * {@inheritDoc}
-		 */
-		public FileFieldEditorNoValidation(final String name, final String labelText, final Composite parent) {
-			super(name, labelText, parent);
-		}
-
-		@Override
-		protected boolean checkState() {
-			return true;
-		}
-	}
+	private Text				_txtWebBrowser;
 
 	public PrefPageWebBrowser() {
 //		noDefaultAndApplyButton();
 	}
 
 	@Override
-	protected void createFieldEditors() {
-		createUI();
+	protected Control createContents(final Composite parent) {
+
+		final Composite ui = createUI(parent);
+
+		restoreState();
+
+		enableControls();
+
+		return ui;
 	}
 
-	private void createUI() {
+	private Composite createUI(final Composite parent) {
 
-		final Composite parent = getFieldEditorParent();
+		_pc = new PixelConverter(parent);
 
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(parent);
-		GridLayoutFactory.fillDefaults().applyTo(parent);
-//		parent.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
-		{
-			createUI_10_WebBrowser(parent);
-		}
-	}
-
-	/**
-	 * field: path to save raw tour data
-	 */
-	private void createUI_10_WebBrowser(final Composite parent) {
-
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+		GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
 		{
 			/*
 			 * label: info
 			 */
-			final Label label = new Label(parent, SWT.WRAP);
+			_lblInfo = new Label(container, SWT.WRAP);
 			GridDataFactory.fillDefaults()//
-					.span(3, 1)
 					.hint(UI.DEFAULT_DESCRIPTION_WIDTH, SWT.DEFAULT)
-					.applyTo(label);
-			label.setText(Messages.PrefPage_Web_Label_ExternalWebBrowser_Info);
+					.applyTo(_lblInfo);
+			_lblInfo.setText(Messages.PrefPage_Web_Label_ExternalWebBrowser_Info);
+
+			/*
+			 * Checkbox: Use external webbrowser
+			 */
+			_chkUseExternalWebBrowser = new Button(container, SWT.CHECK);
+			GridDataFactory
+					.fillDefaults()
+					.indent(0, _pc.convertHorizontalDLUsToPixels(4))
+					.applyTo(_chkUseExternalWebBrowser);
+			_chkUseExternalWebBrowser.setText(Messages.PrefPage_Web_Checkbox_ExternalWebBrowser);
+			_chkUseExternalWebBrowser.setToolTipText(Messages.PrefPage_Web_Checkbox_ExternalWebBrowser_Tooltip);
+			_chkUseExternalWebBrowser.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(final SelectionEvent e) {
+					onSelectExternalWebBrowser();
+				}
+			});
+
+			final Composite browserContainer = new Composite(container, SWT.NONE);
+			GridDataFactory.fillDefaults()//
+					.grab(true, false)
+					.indent(_pc.convertWidthInCharsToPixels(2), 0)
+					.applyTo(browserContainer);
+			GridLayoutFactory.fillDefaults().applyTo(browserContainer);
 			{
 				/*
-				 * editor: external web browser
+				 * Command line + parameters
 				 */
-				_editorWebBrowser = new FileFieldEditorNoValidation(
-						IWebPreferences.EXTERNAL_WEB_BROWSER,
-						Messages.PrefPage_Web_Label_ExternalWebBrowser,
-						parent);
-				_editorWebBrowser.setEmptyStringAllowed(true);
-				_editorWebBrowser.setValidateStrategy(StringFieldEditor.VALIDATE_ON_KEY_STROKE);
+				_txtWebBrowser = new Text(browserContainer, SWT.BORDER
+						| SWT.WRAP
+						| SWT.MULTI
+						| SWT.V_SCROLL
+						| SWT.H_SCROLL);
+				GridDataFactory.fillDefaults()//
+						.grab(true, false)
+						.hint(SWT.DEFAULT, _pc.convertHeightInCharsToPixels(10))
+						.applyTo(_txtWebBrowser);
 
-				addField(_editorWebBrowser);
+				/*
+				 * Label: Hint
+				 */
+				_lblHint = new Label(browserContainer, SWT.WRAP);
+				GridDataFactory.fillDefaults()//
+						.hint(UI.DEFAULT_DESCRIPTION_WIDTH, SWT.DEFAULT)
+						.applyTo(_lblHint);
+				_lblHint.setText(Messages.PrefPage_Web_Label_ExternalWebBrowser_Hint);
 			}
 		}
 
-		// set layout after the fields are created
-		GridLayoutFactory.fillDefaults()//
-				.numColumns(3)
-				.applyTo(parent);
+		return container;
+	}
 
-		/*
-		 * set width for the text control that the pref dialog is not as wide as the full path
-		 */
-		final int pathWidth = 200;
+	private void enableControls() {
 
-		final Text rawPathControl = _editorWebBrowser.getTextControl(parent);
-		final GridData gd = (GridData) rawPathControl.getLayoutData();
-		gd.widthHint = pathWidth;
+		final boolean useExternalWebBrowser = _chkUseExternalWebBrowser.getSelection();
 
-//		parent.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
+		_lblHint.setEnabled(useExternalWebBrowser);
+		_txtWebBrowser.setEnabled(useExternalWebBrowser);
 	}
 
 	@Override
 	public void init(final IWorkbench workbench) {
-		setPreferenceStore(_prefStore);
+
+	}
+
+	@Override
+	public boolean okToLeave() {
+
+		return super.okToLeave();
+	}
+
+	private void onSelectExternalWebBrowser() {
+
+		enableControls();
+	}
+
+	@Override
+	protected void performDefaults() {
+
+		_txtWebBrowser.setText(WEB.STATE_EXTERNAL_WEB_BROWSER_DEFAULT);
+		_chkUseExternalWebBrowser.setSelection(WEB.STATE_USE_EXTERNAL_WEB_BROWSER_DEFAULT);
+
+		super.performDefaults();
+	}
+
+	@Override
+	public boolean performOk() {
+
+		final boolean isOK = super.performOk();
+		if (isOK) {
+			saveState();
+		}
+
+		return isOK;
+	}
+
+	private void restoreState() {
+
+		_txtWebBrowser.setText(Util.getStateString(
+				_state,
+				WEB.STATE_EXTERNAL_WEB_BROWSER,
+				WEB.STATE_EXTERNAL_WEB_BROWSER_DEFAULT));
+
+		_chkUseExternalWebBrowser.setSelection(Util.getStateBoolean(
+				_state,
+				WEB.STATE_USE_EXTERNAL_WEB_BROWSER,
+				WEB.STATE_USE_EXTERNAL_WEB_BROWSER_DEFAULT));
+	}
+
+	private void saveState() {
+
+		_state.put(WEB.STATE_EXTERNAL_WEB_BROWSER, _txtWebBrowser.getText());
+		_state.put(WEB.STATE_USE_EXTERNAL_WEB_BROWSER, _chkUseExternalWebBrowser.getSelection());
 	}
 }

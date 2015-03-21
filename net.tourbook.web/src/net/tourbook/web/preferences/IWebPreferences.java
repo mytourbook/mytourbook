@@ -17,5 +17,4 @@ package net.tourbook.web.preferences;
 
 public interface IWebPreferences {
 
-	public static final String	EXTERNAL_WEB_BROWSER	= "EXTERNAL_WEB_BROWSER";	//$NON-NLS-1$
 }

@@ -23,16 +23,16 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLDecoder;
+import java.util.ArrayList;
 
 import net.tourbook.common.ReplacingOutputStream;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
-import net.tourbook.web.preferences.IWebPreferences;
 
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.browser.IWebBrowser;
@@ -135,9 +135,13 @@ public class WEB {
 	 */
 	public static final String				FILE_EXTENSION_MTHTML					= "mthtml";									//$NON-NLS-1$
 
-	private static final IPreferenceStore	_prefStore								= Activator
-																							.getDefault()
-																							.getPreferenceStore();
+	public static final String				STATE_EXTERNAL_WEB_BROWSER				= "STATE_EXTERNAL_WEB_BROWSER";				//$NON-NLS-1$
+	public static final String				STATE_EXTERNAL_WEB_BROWSER_DEFAULT		= UI.EMPTY_STRING;
+	public static final String				STATE_USE_EXTERNAL_WEB_BROWSER			= "STATE_USE_EXTERNAL_WEB_BROWSER";			//$NON-NLS-1$
+	public static final boolean				STATE_USE_EXTERNAL_WEB_BROWSER_DEFAULT	= false;
+
+	private static final IDialogSettings	_state									= Activator.getState(WEB.class
+																							.getCanonicalName());
 
 	/**
 	 * Replace space characters with <code>%20</code>.
@@ -275,6 +279,10 @@ public class WEB {
 
 	}
 
+	public static IDialogSettings getState() {
+		return _state;
+	}
+
 	/**
 	 * Open url with default or external web browser.
 	 * 
@@ -297,9 +305,10 @@ public class WEB {
 			href = "http://" + href; //$NON-NLS-1$
 		}
 
-		final String externalWebBrowser = _prefStore.getString(IWebPreferences.EXTERNAL_WEB_BROWSER);
+		final boolean useExternalWebBrowser = _state.getBoolean(STATE_USE_EXTERNAL_WEB_BROWSER);
+		final String externalWebBrowser = _state.get(STATE_EXTERNAL_WEB_BROWSER);
 
-		if (externalWebBrowser.length() == 0) {
+		if (useExternalWebBrowser == false) {
 
 			// external web browser is not defined
 			openUrl_WithDefaultWebbrowser(href);
@@ -329,49 +338,66 @@ public class WEB {
 		}
 	}
 
-	private static void openUrl_WithExternalBrowser(final String extApp, final String url) {
+	private static void openUrl_WithExternalBrowser(final String externalWebBrowser, final String url) {
 
 		final String encodedUrl = Util.encodeSpace(url);
 
-		String commands[] = null;
+		final String[] appCmdLines = externalWebBrowser.split("[\\r\\n]+"); //$NON-NLS-1$
+
+		final ArrayList<String> commands = new ArrayList<String>();
+
 		if (UI.IS_WIN) {
 
-			final String[] commandsWin = { "\"" + extApp + "\"", //$NON-NLS-1$ //$NON-NLS-2$
-					"\"" + encodedUrl + "\"" }; //$NON-NLS-1$ //$NON-NLS-2$
+			for (int cmdIndex = 0; cmdIndex < appCmdLines.length; cmdIndex++) {
 
-			commands = commandsWin;
+				final String appCmd = appCmdLines[cmdIndex];
+
+				if (cmdIndex == 0) {
+					commands.add("\"" + appCmd + "\""); //$NON-NLS-1$ //$NON-NLS-2$
+				} else {
+					// don't add apostrophes, this causes errors
+					commands.add(appCmd);
+				}
+			}
+
+			commands.add("\"" + encodedUrl + "\""); //$NON-NLS-1$ //$NON-NLS-2$
 
 		} else if (UI.IS_OSX) {
 
-			final String[] commandsOSX = { "/usr/bin/open", "-a", // //$NON-NLS-1$ //$NON-NLS-2$
-					extApp,
-					encodedUrl };
+			commands.add("/usr/bin/open"); //$NON-NLS-1$
+			commands.add("-a"); //$NON-NLS-1$
 
-			commands = commandsOSX;
+			for (final String appCmd : appCmdLines) {
+				commands.add(appCmd);
+			}
+
+			commands.add(encodedUrl);
 
 		} else if (UI.IS_LINUX) {
 
-			final String[] commandsLinux = { extApp, encodedUrl };
+			for (final String appCmd : appCmdLines) {
+				commands.add(appCmd);
+			}
 
-			commands = commandsLinux;
+			commands.add(encodedUrl);
 		}
 
-		if (commands != null) {
+		try {
 
-			try {
-
-				// log command
-				final StringBuilder sb = new StringBuilder();
-				for (final String cmd : commands) {
-					sb.append(cmd + " "); //$NON-NLS-1$
-				}
-				StatusUtil.logInfo(sb.toString());
-
-				Runtime.getRuntime().exec(commands);
-
-			} catch (final Exception e) {
-				StatusUtil.showStatus(e);
+			// log command
+			final StringBuilder sb = new StringBuilder();
+			for (final String cmd : commands) {
+				sb.append(cmd + " "); //$NON-NLS-1$
 			}
+			StatusUtil.logInfo(sb.toString());
+
+			// run command
+			final String[] commandArray = commands.toArray(new String[commands.size()]);
+
+			Runtime.getRuntime().exec(commandArray);
+
+		} catch (final Exception e) {
+			StatusUtil.showStatus(e);
 		}
 	}
 

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2012  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -115,13 +115,13 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 		GridDataFactory.fillDefaults().grab(true, true).applyTo(parent);
 		GridLayoutFactory.fillDefaults().applyTo(parent);
 		{
-			createUI10MeasurementSystem(parent);
-			createUI30WeekNumber(parent);
-			createUI40Notes(parent);
+			createUI_10_MeasurementSystem(parent);
+			createUI_20_WeekNumber(parent);
+			createUI_30_Notes(parent);
 		}
 	}
 
-	private void createUI10MeasurementSystem(final Composite parent) {
+	private void createUI_10_MeasurementSystem(final Composite parent) {
 
 		final Group group = new Group(parent, SWT.NONE);
 		group.setText(Messages.Pref_general_system_measurement);
@@ -247,7 +247,7 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 		GridDataFactory.fillDefaults().span(2, 1).indent(0, 5).applyTo(showSystemInUI);
 	}
 
-	private void createUI30WeekNumber(final Composite parent) {
+	private void createUI_20_WeekNumber(final Composite parent) {
 
 		final Group group = new Group(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(group);
@@ -326,7 +326,7 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 		}
 	}
 
-	private void createUI40Notes(final Composite parent) {
+	private void createUI_30_Notes(final Composite parent) {
 
 		final Group group = new Group(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, true).applyTo(group);
@@ -394,6 +394,7 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 //		GridLayoutFactory.swtDefaults().applyTo(group);
 //	}
 
+	@Override
 	public void init(final IWorkbench workbench) {
 
 		_prefStore = TourbookPlugin.getDefault().getPreferenceStore();
@@ -424,6 +425,7 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 				.getInt(ITourbookPreferences.CALENDAR_WEEK_MIN_DAYS_IN_FIRST_WEEK);
 
 		final IRunnableWithProgress runnable = new IRunnableWithProgress() {
+			@Override
 			public void run(final IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 
 				Connection conn = null;
@@ -519,6 +521,7 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 						Messages.pref_general_restart_app_message)) {
 
 					Display.getCurrent().asyncExec(new Runnable() {
+						@Override
 						public void run() {
 							PlatformUI.getWorkbench().restart();
 						}
