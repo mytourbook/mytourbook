@@ -422,12 +422,6 @@ public class WebContentServer {
 		FileInputStream fs = null;
 		OutputStream os = null;
 
-//		FileOutputStream fos = new FileOutputStream("File2Hex.txt");
-//		  OutputStreamWriter osw = new OutputStreamWriter(fos, "UTF-8");
-//		  osw.write("\uFEFF");
-
-//		  writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), UI.UTF_8));
-
 		ReplacingOutputStream replacingOS = null;
 
 		try {
@@ -465,7 +459,11 @@ public class WebContentServer {
 		} finally {
 
 			Util.close(fs);
-			Util.close(os);
+
+			if (Util.close(os) == false) {
+				StatusUtil.log(String.format("File: '%s'", file.toString()));//$NON-NLS-1$
+			}
+
 			Util.close(replacingOS);
 		}
 	}

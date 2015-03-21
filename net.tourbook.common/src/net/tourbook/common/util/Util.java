@@ -125,15 +125,22 @@ public class Util {
 		}
 	}
 
-	public static void close(final OutputStream os) {
+	/**
+	 * @param os
+	 * @return Returns <code>false</code> when an exception occures.
+	 */
+	public static boolean close(final OutputStream os) {
 
 		if (os != null) {
 			try {
 				os.close();
 			} catch (final IOException e) {
 				StatusUtil.log(e);
+				return false;
 			}
 		}
+
+		return true;
 	}
 
 	public static void closeReader(final BufferedReader reader) {
