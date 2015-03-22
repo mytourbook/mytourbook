@@ -6027,11 +6027,27 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 					final int nextRearGear = nextGear.getRearGearTeeth();
 
 					if (currentFrontGear != nextFrontGear) {
+
 						frontShiftCount++;
+
+//						System.out
+//								.println((net.tourbook.common.UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
+//										+ ("\tcurrentFrontGear: " + currentFrontGear)
+//										+ ("\tnextFrontGear: " + nextFrontGear)
+//										+ ("\tfrontShiftCount: " + frontShiftCount));
+//						// TODO remove SYSTEM.OUT.PRINTLN
 					}
 
 					if (currentRearGear != nextRearGear) {
+
 						rearShiftCount++;
+
+//						System.out
+//								.println((net.tourbook.common.UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
+//										+ ("\tcurrentRearGear: " + currentRearGear)
+//										+ ("\tnextRearGear: " + nextRearGear)
+//										+ ("\trearShiftCount: " + rearShiftCount));
+//						// TODO remove SYSTEM.OUT.PRINTLN
 					}
 
 					currentFrontGear = nextFrontGear;
@@ -6042,6 +6058,8 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 					// there are no further gears
 
 					nextGearTime = Long.MAX_VALUE;
+
+					currentGear = nextGear;
 				}
 			}
 
@@ -6052,6 +6070,41 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 
 		this.frontShiftCount = frontShiftCount;
 		this.rearShiftCount = rearShiftCount;
+	}
+
+	public void setGears(final long[] gearSerieData) {
+
+		if (gearSerieData.length < 1) {
+			return;
+		}
+
+		int frontShifts = 0;
+		int rearShifts = 0;
+
+		int currentFrontGear = (int) (gearSerieData[0] >> 24 & 0xff);
+		int currentRearGear = (int) (gearSerieData[0] >> 8 & 0xff);
+
+		for (final long gear : gearSerieData) {
+
+			final int nextFrontGear = (int) (gear >> 24 & 0xff);
+			final int nextRearGear = (int) (gear >> 8 & 0xff);
+
+			if (currentFrontGear != nextFrontGear) {
+				frontShifts++;
+			}
+
+			if (currentRearGear != nextRearGear) {
+				rearShifts++;
+			}
+
+			currentFrontGear = nextFrontGear;
+			currentRearGear = nextRearGear;
+		}
+
+		this.gearSerie = gearSerieData;
+
+		this.frontShiftCount = frontShifts;
+		this.rearShiftCount = rearShifts;
 	}
 
 	/**

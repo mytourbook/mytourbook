@@ -845,53 +845,59 @@ public class TourManager {
 
 		if (isRemoveTime) {
 			// this must be done before the time series are modified
-			removeTimeSlicesTimeAndDistance(tourData, firstIndex, lastIndex);
+			removeTimeSlices_TimeAndDistance(tourData, firstIndex, lastIndex);
 		}
 
+		long[] longSerie;
 		float[] floatSerie;
 		double[] doubleSerie;
 
 		floatSerie = tourData.altitudeSerie;
 		if (floatSerie != null) {
-			tourData.altitudeSerie = removeTimeSlicesFloat(floatSerie, firstIndex, lastIndex);
+			tourData.altitudeSerie = removeTimeSlices_Float(floatSerie, firstIndex, lastIndex);
 		}
 
 		floatSerie = tourData.cadenceSerie;
 		if (floatSerie != null) {
-			tourData.cadenceSerie = removeTimeSlicesFloat(floatSerie, firstIndex, lastIndex);
+			tourData.cadenceSerie = removeTimeSlices_Float(floatSerie, firstIndex, lastIndex);
 		}
 
 		floatSerie = tourData.distanceSerie;
 		if (floatSerie != null) {
-			tourData.distanceSerie = removeTimeSlicesFloat(floatSerie, firstIndex, lastIndex);
+			tourData.distanceSerie = removeTimeSlices_Float(floatSerie, firstIndex, lastIndex);
+		}
+
+		longSerie = tourData.gearSerie;
+		if (longSerie != null) {
+			tourData.setGears(removeTimeSlices_Long(longSerie, firstIndex, lastIndex));
 		}
 
 		floatSerie = tourData.pulseSerie;
 		if (floatSerie != null) {
-			tourData.pulseSerie = removeTimeSlicesFloat(floatSerie, firstIndex, lastIndex);
+			tourData.pulseSerie = removeTimeSlices_Float(floatSerie, firstIndex, lastIndex);
 		}
 
 		floatSerie = tourData.temperatureSerie;
 		if (floatSerie != null) {
-			tourData.temperatureSerie = removeTimeSlicesFloat(floatSerie, firstIndex, lastIndex);
+			tourData.temperatureSerie = removeTimeSlices_Float(floatSerie, firstIndex, lastIndex);
 		}
 
 		final int[] intSerie = tourData.timeSerie;
 		if (intSerie != null) {
 
-			tourData.timeSerie = removeTimeSlicesInteger(intSerie, firstIndex, lastIndex);
+			tourData.timeSerie = removeTimeSlices_Integer(intSerie, firstIndex, lastIndex);
 
 			doubleSerie = tourData.getTimeSerieDouble();
-			tourData.setTimeSerieDouble(removeTimeSlicesDouble(doubleSerie, firstIndex, lastIndex));
+			tourData.setTimeSerieDouble(removeTimeSlices_Double(doubleSerie, firstIndex, lastIndex));
 		}
 
 		doubleSerie = tourData.latitudeSerie;
 		if (doubleSerie != null) {
-			tourData.latitudeSerie = removeTimeSlicesDouble(doubleSerie, firstIndex, lastIndex);
+			tourData.latitudeSerie = removeTimeSlices_Double(doubleSerie, firstIndex, lastIndex);
 		}
 		doubleSerie = tourData.longitudeSerie;
 		if (doubleSerie != null) {
-			tourData.longitudeSerie = removeTimeSlicesDouble(doubleSerie, firstIndex, lastIndex);
+			tourData.longitudeSerie = removeTimeSlices_Double(doubleSerie, firstIndex, lastIndex);
 		}
 
 		/*
@@ -902,13 +908,13 @@ public class TourManager {
 		if (isTourPower) {
 			floatSerie = tourData.getPowerSerie();
 			if (floatSerie != null) {
-				tourData.setPowerSerie(removeTimeSlicesFloat(floatSerie, firstIndex, lastIndex));
+				tourData.setPowerSerie(removeTimeSlices_Float(floatSerie, firstIndex, lastIndex));
 			}
 		}
 		if (isTourSpeed) {
 			floatSerie = tourData.getSpeedSerieFromDevice();
 			if (floatSerie != null) {
-				tourData.setSpeedSerie(removeTimeSlicesFloat(floatSerie, firstIndex, lastIndex));
+				tourData.setSpeedSerie(removeTimeSlices_Float(floatSerie, firstIndex, lastIndex));
 			}
 		}
 
@@ -922,7 +928,7 @@ public class TourManager {
 		removeTourMarkers(tourData, firstIndex, lastIndex, isRemoveTime);
 	}
 
-	private static double[] removeTimeSlicesDouble(final double[] dataSerie, final int firstIndex, final int lastIndex) {
+	private static double[] removeTimeSlices_Double(final double[] dataSerie, final int firstIndex, final int lastIndex) {
 
 		final int oldSerieLength = dataSerie.length;
 		final int newSerieLength = oldSerieLength - (lastIndex - firstIndex + 1);
@@ -954,7 +960,7 @@ public class TourManager {
 		return newDataSerie;
 	}
 
-	private static float[] removeTimeSlicesFloat(final float[] dataSerie, final int firstIndex, final int lastIndex) {
+	private static float[] removeTimeSlices_Float(final float[] dataSerie, final int firstIndex, final int lastIndex) {
 
 		final int oldSerieLength = dataSerie.length;
 		final int newSerieLength = oldSerieLength - (lastIndex - firstIndex + 1);
@@ -986,7 +992,7 @@ public class TourManager {
 		return newDataSerie;
 	}
 
-	private static int[] removeTimeSlicesInteger(final int[] oldDataSerie, final int firstIndex, final int lastIndex) {
+	private static int[] removeTimeSlices_Integer(final int[] oldDataSerie, final int firstIndex, final int lastIndex) {
 
 		final int oldSerieLength = oldDataSerie.length;
 		final int newSerieLength = oldSerieLength - (lastIndex - firstIndex + 1);
@@ -1018,7 +1024,39 @@ public class TourManager {
 		return newDataSerie;
 	}
 
-	private static void removeTimeSlicesTimeAndDistance(final TourData _tourData,
+	private static long[] removeTimeSlices_Long(final long[] dataSerie, final int firstIndex, final int lastIndex) {
+
+		final int oldSerieLength = dataSerie.length;
+		final int newSerieLength = oldSerieLength - (lastIndex - firstIndex + 1);
+
+		final long[] newDataSerie = new long[newSerieLength];
+
+		if (firstIndex == 0) {
+
+			// delete from start, copy data by skipping removed slices
+			System.arraycopy(dataSerie, lastIndex + 1, newDataSerie, 0, newSerieLength);
+
+		} else if (lastIndex == oldSerieLength - 1) {
+
+			// delete until the end
+			System.arraycopy(dataSerie, 0, newDataSerie, 0, newSerieLength);
+
+		} else {
+
+			// delete somewhere in the middle
+
+			// copy start segment
+			System.arraycopy(dataSerie, 0, newDataSerie, 0, firstIndex);
+
+			// copy end segment
+			final int copyLength = oldSerieLength - (lastIndex + 1);
+			System.arraycopy(dataSerie, lastIndex + 1, newDataSerie, firstIndex, copyLength);
+		}
+
+		return newDataSerie;
+	}
+
+	private static void removeTimeSlices_TimeAndDistance(	final TourData _tourData,
 														final int firstIndex,
 														final int lastIndex) {
 

@@ -107,7 +107,7 @@ public class PrefPageWebBrowser extends PreferencePage implements IWorkbenchPref
 			final Composite browserContainer = new Composite(container, SWT.NONE);
 			GridDataFactory.fillDefaults()//
 					.grab(true, false)
-					.indent(_pc.convertWidthInCharsToPixels(2), 0)
+					.indent(_pc.convertWidthInCharsToPixels(3), 0)
 					.applyTo(browserContainer);
 			GridLayoutFactory.fillDefaults().applyTo(browserContainer);
 			{
