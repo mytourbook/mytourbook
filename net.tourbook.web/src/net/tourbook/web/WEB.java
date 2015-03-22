@@ -342,7 +342,7 @@ public class WEB {
 
 		final String encodedUrl = Util.encodeSpace(url);
 
-		final String[] appCmdLines = externalWebBrowser.split("[\\r\\n]+"); //$NON-NLS-1$
+		final String[] appCmdLines = externalWebBrowser.split("[\\r\\n\\s]+"); //$NON-NLS-1$
 
 		final ArrayList<String> commands = new ArrayList<String>();
 
@@ -385,16 +385,24 @@ public class WEB {
 		try {
 
 			// log command
-			final StringBuilder sb = new StringBuilder();
-			for (final String cmd : commands) {
-				sb.append(cmd + " "); //$NON-NLS-1$
+			final StringBuilder cmdLine = new StringBuilder();
+			for (int cmdIndex = 0; cmdIndex < commands.size(); cmdIndex++) {
+
+				final String cmd = commands.get(cmdIndex);
+
+				if (cmdIndex > 0) {
+					cmdLine.append(' ');
+				}
+
+				cmdLine.append(cmd); //$NON-NLS-1$
 			}
-			StatusUtil.logInfo(sb.toString());
+			StatusUtil.logInfo(cmdLine.toString());
 
 			// run command
 			final String[] commandArray = commands.toArray(new String[commands.size()]);
 
 			Runtime.getRuntime().exec(commandArray);
+//			Runtime.getRuntime().exec(cmdLine.toString());
 
 		} catch (final Exception e) {
 			StatusUtil.showStatus(e);
