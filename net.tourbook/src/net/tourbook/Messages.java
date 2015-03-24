@@ -716,7 +716,11 @@ public class Messages extends NLS {
 	public static String		Image__synch_graph_bySize_disabled;
 	public static String		Image__synch_statistics;
 	public static String		Image__synch_statistics_Disabled;
-//	public static String		Image__Symbol_Difference;
+	public static String		Image__SearchExternal;
+
+	public static String		Image__SearchExternal_Disabled;
+
+	//	public static String		Image__Symbol_Difference;
 	public static String		Image__Synced;
 	public static String		Image__tag;
 	public static String		Image__tag_category;
@@ -1171,6 +1175,10 @@ public class Messages extends NLS {
 //	public static String		SignImage_Viewer_Column_Name_Label;
 
 	public static String		Search_Manager_CreateFTIndex;
+
+	public static String		Search_View_Action_ExternalSearchUI;
+	public static String		Search_View_Action_ExternalSearchUI_Tooltip;
+	public static String	Search_View_Link_ExternalBrowser;
 
 	public static String		Search_View_Link_LinuxBrowser;
 
