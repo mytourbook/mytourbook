@@ -23,12 +23,5 @@ public class SearchResult {
 
 	int									totalHits;
 
-	/**
-	 * First page is <code>0</code>.
-	 */
-	int									pageNumber;
-
-	int									hitsPerPage;
-
 	String								error;
 }

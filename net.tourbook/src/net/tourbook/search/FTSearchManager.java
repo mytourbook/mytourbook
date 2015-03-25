@@ -815,7 +815,7 @@ public class FTSearchManager {
 
 			setupIndexReader();
 
-			int maxDoc = _indexReader.maxDoc();
+			final int maxDoc = _indexReader.maxDoc();
 
 			if (maxDoc == 0) {
 
@@ -1058,28 +1058,6 @@ public class FTSearchManager {
 		}
 	}
 
-	/**
-	 * @param searchText
-	 * @param pageNumber
-	 *            Starting from 0.
-	 * @param hitsPerPage
-	 * @return
-	 */
-	public static SearchResult searchByPage(final String searchText, final int pageNumber, final int hitsPerPage) {
-
-		final int searchPosFrom = pageNumber * hitsPerPage;
-		final int searchPosTo = (pageNumber + 1) * hitsPerPage - 1;
-
-		final SearchResult searchResult = new SearchResult();
-
-		searchResult.pageNumber = pageNumber;
-		searchResult.hitsPerPage = hitsPerPage;
-
-		search(searchText, searchPosFrom, searchPosTo, searchResult);
-
-		return searchResult;
-	}
-
 	public static SearchResult searchByPosition(final String searchText, final int searchPosFrom, final int searchPosTo) {
 
 		final SearchResult searchResult = new SearchResult();
@@ -1286,7 +1264,7 @@ public class FTSearchManager {
 
 		setupIndexReader();
 
-		int numDocs = _indexReader.numDocs();
+		final int numDocs = _indexReader.numDocs();
 		if (numDocs == 0) {
 
 			/*
@@ -1317,7 +1295,7 @@ public class FTSearchManager {
 
 							try {
 								suggester[0].build(inputIterator);
-							} catch (IllegalArgumentException e) {
+							} catch (final IllegalArgumentException e) {
 
 								// java.lang.IllegalArgumentException: need at least one suggestion
 
