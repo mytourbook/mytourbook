@@ -21,13 +21,13 @@ public class Messages extends NLS {
 
 	private static final String	BUNDLE_NAME	= "net.tourbook.web.messages";				//$NON-NLS-1$
 
-	public static String		PrefPage_Web_Checkbox_ExternalWebBrowser;
-	public static String		PrefPage_Web_Checkbox_ExternalWebBrowser_Tooltip_Linux;
-	public static String		PrefPage_Web_Checkbox_ExternalWebBrowser_Tooltip_Win;
+	public static String		PrefPage_Web_Checkbox_CustomWebBrowser;
+	public static String		PrefPage_Web_Checkbox_CustomWebBrowser_Tooltip_Linux;
+	public static String		PrefPage_Web_Checkbox_CustomWebBrowser_Tooltip_Win;
 
-	public static String		PrefPage_Web_Label_ExternalWebBrowser_Hint_Linux;
-	public static String		PrefPage_Web_Label_ExternalWebBrowser_Hint_Win;
-	public static String		PrefPage_Web_Label_ExternalWebBrowser_Info;
+	public static String		PrefPage_Web_Label_CustomWebBrowser_Hint_Linux;
+	public static String		PrefPage_Web_Label_CustomWebBrowser_Hint_Win;
+	public static String		PrefPage_Web_Label_CustomWebBrowser_Info;
 
 	public static String		Web_Page_ContentLoading;
 	public static String		Web_Page_Search_Title;

@@ -85,7 +85,7 @@ public class PrefPageWebBrowser extends PreferencePage implements IWorkbenchPref
 			GridDataFactory.fillDefaults()//
 					.hint(UI.DEFAULT_DESCRIPTION_WIDTH, SWT.DEFAULT)
 					.applyTo(_lblInfo);
-			_lblInfo.setText(Messages.PrefPage_Web_Label_ExternalWebBrowser_Info);
+			_lblInfo.setText(Messages.PrefPage_Web_Label_CustomWebBrowser_Info);
 
 			/*
 			 * Checkbox: Use external webbrowser
@@ -95,10 +95,10 @@ public class PrefPageWebBrowser extends PreferencePage implements IWorkbenchPref
 					.fillDefaults()
 					.indent(0, _pc.convertHorizontalDLUsToPixels(4))
 					.applyTo(_chkUseExternalWebBrowser);
-			_chkUseExternalWebBrowser.setText(Messages.PrefPage_Web_Checkbox_ExternalWebBrowser);
+			_chkUseExternalWebBrowser.setText(Messages.PrefPage_Web_Checkbox_CustomWebBrowser);
 			_chkUseExternalWebBrowser.setToolTipText(UI.IS_WIN
-					? Messages.PrefPage_Web_Checkbox_ExternalWebBrowser_Tooltip_Win
-					: Messages.PrefPage_Web_Checkbox_ExternalWebBrowser_Tooltip_Linux);
+					? Messages.PrefPage_Web_Checkbox_CustomWebBrowser_Tooltip_Win
+					: Messages.PrefPage_Web_Checkbox_CustomWebBrowser_Tooltip_Linux);
 
 			_chkUseExternalWebBrowser.addSelectionListener(new SelectionAdapter() {
 				@Override
@@ -136,8 +136,8 @@ public class PrefPageWebBrowser extends PreferencePage implements IWorkbenchPref
 						.applyTo(_lblHint);
 
 				_lblHint.setText(UI.IS_WIN
-						? Messages.PrefPage_Web_Label_ExternalWebBrowser_Hint_Win
-						: Messages.PrefPage_Web_Label_ExternalWebBrowser_Hint_Linux);
+						? Messages.PrefPage_Web_Label_CustomWebBrowser_Hint_Win
+						: Messages.PrefPage_Web_Label_CustomWebBrowser_Hint_Linux);
 			}
 		}
 
