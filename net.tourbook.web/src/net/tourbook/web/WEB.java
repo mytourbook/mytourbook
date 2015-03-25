@@ -394,15 +394,17 @@ public class WEB {
 					cmdLine.append(' ');
 				}
 
-				cmdLine.append(cmd); //$NON-NLS-1$
+				cmdLine.append(cmd);
 			}
 			StatusUtil.logInfo(cmdLine.toString());
 
 			// run command
 			final String[] commandArray = commands.toArray(new String[commands.size()]);
 
+			/**
+			 * Spaces or " in parameters (web browser profile name) are not working, not supported
+			 */
 			Runtime.getRuntime().exec(commandArray);
-//			Runtime.getRuntime().exec(cmdLine.toString());
 
 		} catch (final Exception e) {
 			StatusUtil.showStatus(e);

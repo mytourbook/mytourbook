@@ -97,6 +97,7 @@ public class PrefPageWebBrowser extends PreferencePage implements IWorkbenchPref
 					.applyTo(_chkUseExternalWebBrowser);
 			_chkUseExternalWebBrowser.setText(Messages.PrefPage_Web_Checkbox_ExternalWebBrowser);
 			_chkUseExternalWebBrowser.setToolTipText(Messages.PrefPage_Web_Checkbox_ExternalWebBrowser_Tooltip);
+
 			_chkUseExternalWebBrowser.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(final SelectionEvent e) {
