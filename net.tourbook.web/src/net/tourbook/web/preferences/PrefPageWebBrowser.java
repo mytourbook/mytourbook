@@ -132,7 +132,10 @@ public class PrefPageWebBrowser extends PreferencePage implements IWorkbenchPref
 				GridDataFactory.fillDefaults()//
 						.hint(UI.DEFAULT_DESCRIPTION_WIDTH, SWT.DEFAULT)
 						.applyTo(_lblHint);
-				_lblHint.setText(Messages.PrefPage_Web_Label_ExternalWebBrowser_Hint);
+
+				_lblHint.setText(UI.IS_WIN
+						? Messages.PrefPage_Web_Label_ExternalWebBrowser_Hint_Win
+						: Messages.PrefPage_Web_Label_ExternalWebBrowser_Hint_Linux);
 			}
 		}
 

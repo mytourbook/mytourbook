@@ -19,12 +19,12 @@ import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS {
 
-	private static final String	BUNDLE_NAME	= "net.tourbook.web.messages";	//$NON-NLS-1$
+	private static final String	BUNDLE_NAME	= "net.tourbook.web.messages";			//$NON-NLS-1$
 
 	public static String		PrefPage_Web_Checkbox_ExternalWebBrowser;
-
-	public static String	PrefPage_Web_Checkbox_ExternalWebBrowser_Tooltip;
-	public static String		PrefPage_Web_Label_ExternalWebBrowser_Hint;
+	public static String		PrefPage_Web_Checkbox_ExternalWebBrowser_Tooltip;
+	public static String		PrefPage_Web_Label_ExternalWebBrowser_Hint_Win;
+	public static String		PrefPage_Web_Label_ExternalWebBrowser_Hint_Linux;
 	public static String		PrefPage_Web_Label_ExternalWebBrowser_Info;
 
 	public static String		Web_Page_ContentLoading;

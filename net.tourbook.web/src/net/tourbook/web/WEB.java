@@ -342,11 +342,12 @@ public class WEB {
 
 		final String encodedUrl = Util.encodeSpace(url);
 
-		final String[] appCmdLines = externalWebBrowser.split("[\\r\\n\\s]+"); //$NON-NLS-1$
 
 		final ArrayList<String> commands = new ArrayList<String>();
 
 		if (UI.IS_WIN) {
+
+			final String[] appCmdLines = externalWebBrowser.split("[\\r\\n]+"); //$NON-NLS-1$
 
 			for (int cmdIndex = 0; cmdIndex < appCmdLines.length; cmdIndex++) {
 
@@ -364,6 +365,8 @@ public class WEB {
 
 		} else if (UI.IS_OSX) {
 
+			final String[] appCmdLines = externalWebBrowser.split("[\\r\\n\\s]+"); //$NON-NLS-1$
+
 			commands.add("/usr/bin/open"); //$NON-NLS-1$
 			commands.add("-a"); //$NON-NLS-1$
 
@@ -374,6 +377,8 @@ public class WEB {
 			commands.add(encodedUrl);
 
 		} else if (UI.IS_LINUX) {
+
+			final String[] appCmdLines = externalWebBrowser.split("[\\r\\n\\s]+"); //$NON-NLS-1$
 
 			for (final String appCmd : appCmdLines) {
 				commands.add(appCmd);

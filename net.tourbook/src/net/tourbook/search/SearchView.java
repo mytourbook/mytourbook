@@ -29,6 +29,7 @@ import net.tourbook.tour.TourEvent;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
 import net.tourbook.web.WEB;
+import net.tourbook.web.preferences.PrefPageWebBrowser;
 
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -47,6 +48,7 @@ import org.eclipse.swt.widgets.Link;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
+import org.eclipse.ui.dialogs.PreferencesUtil;
 import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.part.ViewPart;
 
@@ -264,6 +266,8 @@ public class SearchView extends ViewPart implements ISearchView {
 					WEB.openUrl(SearchMgr.SEARCH_URL);
 				}
 			});
+
+			createUI_50_SetupExternalWebbrowser(parent, container);
 		}
 	}
 
@@ -273,6 +277,9 @@ public class SearchView extends ViewPart implements ISearchView {
 		GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
 		GridLayoutFactory.swtDefaults().numColumns(1).applyTo(container);
 		{
+			/*
+			 * Link: Search page url
+			 */
 			final Link linkLinuxBrowser = new Link(container, SWT.WRAP | SWT.READ_ONLY);
 			GridDataFactory.fillDefaults()//
 					.grab(true, true)
@@ -289,7 +296,33 @@ public class SearchView extends ViewPart implements ISearchView {
 					WEB.openUrl(SearchMgr.SEARCH_URL);
 				}
 			});
+
+			createUI_50_SetupExternalWebbrowser(parent, container);
 		}
+	}
+
+	private void createUI_50_SetupExternalWebbrowser(final Composite parent, final Composite container) {
+
+		/*
+		 * Link: Setup browser
+		 */
+		final Link linkSetupBrowser = new Link(container, SWT.WRAP);
+		GridDataFactory.fillDefaults()//
+				.align(SWT.FILL, SWT.END)
+				.applyTo(linkSetupBrowser);
+
+		linkSetupBrowser.setText(Messages.Search_View_Link_SetupExternalBrowser);
+		linkSetupBrowser.setEnabled(true);
+		linkSetupBrowser.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(final SelectionEvent e) {
+				PreferencesUtil.createPreferenceDialogOn(//
+						parent.getShell(),
+						PrefPageWebBrowser.ID,
+						null,
+						null).open();
+			}
+		});
 	}
 
 	@Override

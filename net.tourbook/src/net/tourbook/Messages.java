@@ -1178,9 +1178,10 @@ public class Messages extends NLS {
 
 	public static String		Search_View_Action_ExternalSearchUI;
 	public static String		Search_View_Action_ExternalSearchUI_Tooltip;
-	public static String	Search_View_Link_ExternalBrowser;
 
+	public static String		Search_View_Link_ExternalBrowser;
 	public static String		Search_View_Link_LinuxBrowser;
+	public static String		Search_View_Link_SetupExternalBrowser;
 
 	public static String		Slideout_ChartMarkerOptions_Checkbox_IsShowHiddenMarker;
 	public static String		Slideout_ChartMarkerOptions_Checkbox_IsShowMarker;

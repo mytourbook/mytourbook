@@ -12,6 +12,7 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  net.tourbook.common
 Export-Package: net.tourbook.web,
+ net.tourbook.web.preferences,
  tourbook.search.nls
 Import-Package: org.json
 Bundle-ClassPath: .
