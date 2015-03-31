@@ -14,6 +14,6 @@ import net.tourbook.data.TourMarker;
  */
 interface FitContextDataHandler {
 
-	void setupTour(TourData tourData, List<TimeData> allTimeData, List<TourMarker> tourMarkers, List<GearData> gears);
+	void finalizeTour(TourData tourData, List<TimeData> allTimeData, List<TourMarker> tourMarkers, List<GearData> gears);
 
 }
