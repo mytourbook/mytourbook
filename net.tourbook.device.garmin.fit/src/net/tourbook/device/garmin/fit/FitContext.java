@@ -69,13 +69,13 @@ public class FitContext {
 
 	public void finalizeTour() {
 
-		_contextData.processData(new FitContextDataHandler() {
+		_contextData.processAllTours(new FitContextDataHandler() {
 
 			@Override
-			public void setupTour(	final TourData tourData,
-									final List<TimeData> timeDataList,
-									final List<TourMarker> tourMarkerSet,
-									final List<GearData> gears) {
+			public void finalizeTour(	final TourData tourData,
+										final List<TimeData> timeDataList,
+										final List<TourMarker> tourMarkers,
+										final List<GearData> gears) {
 
 				resetSpeedAtFirstPosition(timeDataList);
 
@@ -127,11 +127,15 @@ public class FitContext {
 					// must be called after time series are created
 					setupTour_Gears(tourData, gears);
 
-					setupTour_Marker(tourData, tourMarkerSet);
+					setupTour_Marker(tourData, tourMarkers);
 				}
 			}
 
 			private void setupTour_Gears(final TourData tourData, final List<GearData> gearList) {
+
+				if (gearList == null) {
+					return;
+				}
 
 				/*
 				 * validate gear list
@@ -187,6 +191,10 @@ public class FitContext {
 
 			private void setupTour_Marker(final TourData tourData, final List<TourMarker> tourMarkers) {
 
+				if (tourMarkers == null) {
+					return;
+				}
+
 				final int[] timeSerie = tourData.timeSerie;
 				final int lastSerieIndex = timeSerie.length;
 				final long tourStartTimeS = tourData.getTourStartTimeMS() / 1000;
@@ -232,7 +240,6 @@ public class FitContext {
 							break;
 						}
 					}
-
 				}
 
 				tourData.setTourMarkers(validatedTourMarkers);
@@ -349,39 +356,39 @@ public class FitContext {
 
 	public void mesgEvent(final EventMesg mesg) {
 
-		_contextData.ctxGear(mesg);
+		_contextData.ctxEventMesg(mesg);
 	}
 
 	public void mesgLap_10_Before() {
 
-		_contextData.ctxTourMarker_10_Initialize();
+		_contextData.ctxMarker_10_Initialize();
 	}
 
 	public void mesgLap_20_After() {
 
-		_contextData.ctxTourMarker_20_Finalize();
+		_contextData.ctxMarker_20_Finalize();
 	}
 
 	public void mesgRecord_10_Before() {
 
-		_contextData.ctxTimeData_10_Initialize();
+		_contextData.ctxTime_10_Initialize();
 	}
 
 	public void mesgRecord_20_After() {
 
-		_contextData.ctxTimeData_20_Finalize();
+		_contextData.ctxTime_20_Finalize();
 		_serieIndex++;
 	}
 
 	public void mesgSession_10_Before() {
 
 		_serieIndex = 0;
-		_contextData.ctxTourData_10_Initialize();
+		_contextData.ctxTour_10_Initialize();
 	}
 
 	public void mesgSession_20_After() {
 
-		_contextData.ctxTourData_20_Finalize();
+		_contextData.ctxTour_20_Finalize();
 	}
 
 	private void resetSpeedAtFirstPosition(final List<TimeData> timeDataList) {

@@ -45,7 +45,7 @@ import com.garmin.fit.MesgBroadcaster;
 import com.garmin.fit.MesgListener;
 
 /**
- * Garmin FIT activity reader based on official Garmin SDK.
+ * Garmin FIT activity reader based on the official Garmin SDK.
  * 
  * @author Marcin Kuthan <marcin.kuthan@gmail.com>
  * @author Wolfgang Schramm
@@ -213,7 +213,7 @@ public class FitDataReader extends TourbookDevice {
 					alreadyImportedTours,
 					newlyImportedTours);
 
-			// fit listener
+			// setup all fit listeners
 			broadcaster.addListener(new ActivityMesgListenerImpl(context));
 			broadcaster.addListener(new BikeProfileMesgListenerImpl(context));
 			broadcaster.addListener(new DeviceInfoMesgListenerImpl(context));
