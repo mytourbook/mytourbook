@@ -619,72 +619,83 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 			@Override
 			public void tourChanged(final IWorkbenchPart part, final TourEventId eventId, final Object eventData) {
 
-				if (_tourData == null || part == TourSegmenterView.this) {
+				if (part == TourSegmenterView.this) {
 					return;
 				}
 
-				if (eventId == TourEventId.TOUR_CHANGED && eventData instanceof TourEvent) {
+				if (eventId == TourEventId.TOUR_SELECTION && eventData instanceof ISelection) {
 
-					final TourEvent tourEvent = (TourEvent) eventData;
-					final ArrayList<TourData> modifiedTours = tourEvent.getModifiedTours();
+					onSelectionChanged((ISelection) eventData);
 
-					if (modifiedTours == null || modifiedTours.size() == 0) {
-						return;
-					}
-
-					final TourData modifiedTourData = modifiedTours.get(0);
-					final long viewTourId = _tourData.getTourId();
-
-					if (modifiedTourData.getTourId() == viewTourId) {
-
-						// update existing tour
-
-						if (checkDataValidation(modifiedTourData)) {
-
-							if (tourEvent.isReverted) {
-
-								/*
-								 * tour is reverted, saving existing tour is not necessary, just
-								 * update the tour
-								 */
-								setTour(modifiedTourData, true);
-
-							} else {
-
-								// it's the same tour but tour is modified
-
-								onSelectionChanged(new SelectionTourData(null, modifiedTourData));
-							}
-						}
-
-					} else {
-
-						// display new tour
-
-						onSelectionChanged(new SelectionTourData(null, modifiedTourData));
-					}
-
-					// removed old tour data from the selection provider
-					_postSelectionProvider.clearSelection();
-
-				} else if (eventId == TourEventId.CLEAR_DISPLAYED_TOUR) {
-
-					clearView();
-
-				} else if (eventId == TourEventId.UPDATE_UI) {
-
-					// check if a tour must be updated
+				} else {
 
 					if (_tourData == null) {
 						return;
 					}
 
-					final Long tourId = _tourData.getTourId();
+					if (eventId == TourEventId.TOUR_CHANGED && eventData instanceof TourEvent) {
 
-					// update ui
-					if (net.tourbook.ui.UI.containsTourId(eventData, tourId) != null) {
+						final TourEvent tourEvent = (TourEvent) eventData;
+						final ArrayList<TourData> modifiedTours = tourEvent.getModifiedTours();
 
-						setTour(TourManager.getInstance().getTourData(tourId), true);
+						if (modifiedTours == null || modifiedTours.size() == 0) {
+							return;
+						}
+
+						final TourData modifiedTourData = modifiedTours.get(0);
+						final long viewTourId = _tourData.getTourId();
+
+						if (modifiedTourData.getTourId() == viewTourId) {
+
+							// update existing tour
+
+							if (checkDataValidation(modifiedTourData)) {
+
+								if (tourEvent.isReverted) {
+
+									/*
+									 * tour is reverted, saving existing tour is not necessary, just
+									 * update the tour
+									 */
+									setTour(modifiedTourData, true);
+
+								} else {
+
+									// it's the same tour but tour is modified
+
+									onSelectionChanged(new SelectionTourData(null, modifiedTourData));
+								}
+							}
+
+						} else {
+
+							// display new tour
+
+							onSelectionChanged(new SelectionTourData(null, modifiedTourData));
+						}
+
+						// removed old tour data from the selection provider
+						_postSelectionProvider.clearSelection();
+
+					} else if (eventId == TourEventId.CLEAR_DISPLAYED_TOUR) {
+
+						clearView();
+
+					} else if (eventId == TourEventId.UPDATE_UI) {
+
+						// check if a tour must be updated
+
+						if (_tourData == null) {
+							return;
+						}
+
+						final Long tourId = _tourData.getTourId();
+
+						// update ui
+						if (net.tourbook.ui.UI.containsTourId(eventData, tourId) != null) {
+
+							setTour(TourManager.getInstance().getTourData(tourId), true);
+						}
 					}
 				}
 			}

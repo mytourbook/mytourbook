@@ -241,6 +241,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 	private int											_selectedYearSub					= -1;
 	private final ArrayList<Long>						_selectedTourIds					= new ArrayList<Long>();
 
+	private boolean										_isInStartup;
 	private boolean										_isInReload;
 	private boolean										_isRecTimeFormat_hhmmss;
 	private boolean										_isDriveTimeFormat_hhmmss;
@@ -618,6 +619,8 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 			public void run() {
 
 				_tourViewer.setInput(this);
+
+				_isInStartup = true;
 
 				reselectTourViewer();
 			}
@@ -2817,7 +2820,20 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 					: new SelectionTourIds(_selectedTourIds);
 
 		}
-		_postSelectionProvider.setSelection(selection);
+
+		// _postSelectionProvider should be removed when all parts are listening to the TourManager event
+		if (_isInStartup) {
+
+			_isInStartup = false;
+
+			// this view can be inactive -> selection is not fired with the SelectionProvider interface
+
+			TourManager.fireEvent(TourEventId.TOUR_SELECTION, selection, this);
+
+		} else {
+
+			_postSelectionProvider.setSelection(selection);
+		}
 
 		enableActions();
 	}
