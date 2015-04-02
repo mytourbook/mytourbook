@@ -25,6 +25,7 @@ import java.util.Set;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.SelectionChartXSliderPosition;
+import net.tourbook.common.UI;
 import net.tourbook.common.util.CSS;
 import net.tourbook.common.util.PostSelectionProvider;
 import net.tourbook.common.util.StatusUtil;
@@ -73,7 +74,6 @@ import org.eclipse.swt.browser.ProgressAdapter;
 import org.eclipse.swt.browser.ProgressEvent;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISelectionListener;
@@ -163,15 +163,16 @@ public class TourBlogView extends ViewPart {
 	 * UI controls
 	 */
 	private PageBook				_pageBook;
-	private Label					_pageNoTour;
+
 	private Composite				_pageNoBrowser;
+	private Composite				_pageNoData;
 	private Composite				_pageContent;
+	private Composite				_uiParent;
 
 	private Browser					_browser;
 	private TourChart				_tourChart;
 	private Text					_txtNoBrowser;
 
-	private Composite				_uiParent;
 
 	private void addPartListener() {
 
@@ -621,8 +622,7 @@ public class TourBlogView extends ViewPart {
 		_pageBook = new PageBook(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, true).applyTo(_pageBook);
 
-		_pageNoTour = new Label(_pageBook, SWT.NONE);
-		_pageNoTour.setText(Messages.UI_Label_no_chart_is_selected);
+		_pageNoData = UI.createUI_PageNoData(_pageBook, Messages.UI_Label_no_chart_is_selected);
 
 		_pageNoBrowser = new Composite(_pageBook, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, true).applyTo(_pageNoBrowser);
@@ -1062,7 +1062,7 @@ public class TourBlogView extends ViewPart {
 
 	private void showInvalidPage() {
 
-		_pageBook.showPage(_browser == null ? _pageNoBrowser : _pageNoTour);
+		_pageBook.showPage(_browser == null ? _pageNoBrowser : _pageNoData);
 	}
 
 	private void showTourFromTourProvider() {

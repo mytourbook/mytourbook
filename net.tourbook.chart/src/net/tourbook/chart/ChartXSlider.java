@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2012  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -23,7 +23,7 @@ import java.util.ArrayList;
 import net.tourbook.common.RectangleLong;
 
 /**
- * the slider is moved on the x-axis and displays the current position in the slider label
+ * The slider is moved on the x-axis and displays the current position in the slider label.
  */
 public class ChartXSlider {
 
@@ -35,6 +35,8 @@ public class ChartXSlider {
 	 * position of the slider line within the slider (starting from left)
 	 */
 	public final static int					SLIDER_LINE_WIDTH	= 10;
+
+	int										sliderType			= SLIDER_TYPE_NONE;
 
 	private final RectangleLong				_hitRectangle		= new RectangleLong(0, 0, SLIDER_LINE_WIDTH * 2, 0);
 
@@ -67,8 +69,6 @@ public class ChartXSlider {
 
 	private ChartComponentGraph				_chartGraph;
 
-	int										sliderType			= SLIDER_TYPE_NONE;
-
 	/**
 	 * Constructor
 	 * 
@@ -79,7 +79,7 @@ public class ChartXSlider {
 		_chartGraph = graph;
 		this.sliderType = sliderType;
 
-		moveToXXDevPosition(xxDevSliderPosition, true, true);
+		moveToXXDevPosition(xxDevSliderPosition, true, true, false);
 	}
 
 	/**
@@ -141,8 +141,6 @@ public class ChartXSlider {
 		// resize the hit rectangle
 		_hitRectangle.height = devGraphHeight;
 
-		final long xxDevGraphWidth = _chartGraph.getXXDevGraphWidth();
-
 		if (sliderType == SLIDER_TYPE_RIGHT) {
 			// position the right slider to the right side, this is done only
 			// the first time
@@ -151,19 +149,26 @@ public class ChartXSlider {
 			// run the positioning after all is done, otherwise not all is
 			// initialized
 			_chartGraph.getDisplay().asyncExec(new Runnable() {
+				@Override
 				public void run() {
 
-					moveToXXDevPosition(xxDevGraphWidth, true, true);
-					_chartGraph.setXSliderValue(ChartXSlider.this);
+					/**
+					 * Get position here because it can be changed !!!
+					 */
+					final long xxDevGraphWidth = _chartGraph.getXXDevGraphWidth();
+
+					moveToXXDevPosition(xxDevGraphWidth, true, true, true);
 				}
 			});
 
 		} else {
 
 			// reposition the slider line but keep the position ratio
+
+			final long xxDevGraphWidth = _chartGraph.getXXDevGraphWidth();
 			final double devSliderPos = xxDevGraphWidth * _positionRatio;
 
-			moveToXXDevPosition(devSliderPos < 0 ? 0 : devSliderPos, true, false);
+			moveToXXDevPosition(devSliderPos < 0 ? 0 : devSliderPos, true, false, false);
 		}
 	}
 
@@ -175,11 +180,12 @@ public class ChartXSlider {
 	 */
 	void moveToXXDevPosition(	double xxDevLinePos,
 								final boolean isAdjustToImageWidth,
-								final boolean isAdjustPositionRatio) {
+								final boolean isAdjustPositionRatio,
+								final boolean isUpdateValueFromRatio) {
 
-		final long _xxDevGraphWidth = _chartGraph.getXXDevGraphWidth();
+		final long xxDevGraphWidth = _chartGraph.getXXDevGraphWidth();
 
-		if (_xxDevGraphWidth == 0) {
+		if (xxDevGraphWidth == 0) {
 			return;
 		}
 
@@ -188,7 +194,7 @@ public class ChartXSlider {
 		 * is auto-zoomed to the slider position in the mouse up event
 		 */
 		if (isAdjustToImageWidth) {
-			xxDevLinePos = Math.min(_xxDevGraphWidth, Math.max(0, xxDevLinePos));
+			xxDevLinePos = Math.min(xxDevGraphWidth, Math.max(0, xxDevLinePos));
 		}
 
 		// reposition the hit rectangle
@@ -201,10 +207,14 @@ public class ChartXSlider {
 
 		if (isAdjustPositionRatio) {
 
-			_positionRatio = xxDevLinePos / (_xxDevGraphWidth - 0);
+			_positionRatio = xxDevLinePos / (xxDevGraphWidth - 0);
 
 			// enforce max value
 			_positionRatio = Math.min(_positionRatio, 1);
+
+			if (isUpdateValueFromRatio) {
+				_chartGraph.setXSliderValue_FromRatio(ChartXSlider.this);
+			}
 		}
 
 		// fire change event when the position has changed
@@ -221,7 +231,7 @@ public class ChartXSlider {
 		xxDevSliderPos = xxDevSliderPos < 0 ? 0 : xxDevSliderPos;
 
 		_chartGraph.setXSliderValue_FromRatio(this);
-		moveToXXDevPosition(xxDevSliderPos, true, true);
+		moveToXXDevPosition(xxDevSliderPos, true, true, false);
 	}
 
 	/**
@@ -244,6 +254,16 @@ public class ChartXSlider {
 	void setValueIndex(final int valueIndex) {
 
 		_valueIndex = valueIndex;
+	}
+
+	@Override
+	public String toString() {
+		return "ChartXSlider ["
+				+ ("_positionRatio=" + _positionRatio + " ")
+				+ ("_valueIndex=" + _valueIndex + " ")
+				+ ("_xxDevSliderLinePos=" + _xxDevSliderLinePos + " ")
+				+ ("sliderType=" + sliderType + " ")
+				+ "]";
 	}
 
 }

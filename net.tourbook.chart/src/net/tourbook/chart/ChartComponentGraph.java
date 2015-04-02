@@ -5306,14 +5306,22 @@ public class ChartComponentGraph extends Canvas {
 	 * @return Returns the left slider
 	 */
 	ChartXSlider getLeftSlider() {
-		return _xSliderA.getXXDevSliderLinePos() < _xSliderB.getXXDevSliderLinePos() ? _xSliderA : _xSliderB;
+
+		final long posSliderA = _xSliderA.getXXDevSliderLinePos();
+		final long posSliderB = _xSliderB.getXXDevSliderLinePos();
+
+		return posSliderA < posSliderB ? _xSliderA : _xSliderB;
 	}
 
 	/**
 	 * @return Returns the right most slider
 	 */
 	ChartXSlider getRightSlider() {
-		return _xSliderA.getXXDevSliderLinePos() < _xSliderB.getXXDevSliderLinePos() ? _xSliderB : _xSliderA;
+
+		final long posSliderA = _xSliderA.getXXDevSliderLinePos();
+		final long posSliderB = _xSliderB.getXXDevSliderLinePos();
+
+		return posSliderA < posSliderB ? _xSliderB : _xSliderA;
 	}
 
 	ChartXSlider getSelectedSlider() {
@@ -5647,8 +5655,8 @@ public class ChartComponentGraph extends Canvas {
 		final ChartXSlider leftSlider = getLeftSlider();
 		final long xxDevLeftPosition = _xxDevViewPortLeftBorder + _devXMouseDown;
 
-		setXSliderValue(leftSlider);
-		leftSlider.moveToXXDevPosition(xxDevLeftPosition, true, true);
+		setXSliderValue_FromHoveredValuePoint(leftSlider);
+		leftSlider.moveToXXDevPosition(xxDevLeftPosition, true, true, false);
 
 		setZoomInPosition();
 
@@ -5664,8 +5672,8 @@ public class ChartComponentGraph extends Canvas {
 		final ChartXSlider rightSlider = getRightSlider();
 		final long xxDevRightPosition = _xxDevViewPortLeftBorder + _devXMouseDown;
 
-		setXSliderValue(rightSlider);
-		rightSlider.moveToXXDevPosition(xxDevRightPosition, true, true);
+		setXSliderValue_FromHoveredValuePoint(rightSlider);
+		rightSlider.moveToXXDevPosition(xxDevRightPosition, true, true, false);
 
 		setZoomInPosition();
 
@@ -5695,16 +5703,16 @@ public class ChartComponentGraph extends Canvas {
 		 */
 		final long xxDevLeftPosition = _xxDevViewPortLeftBorder + 2;
 
-		setXSliderValue(leftSlider);
-		leftSlider.moveToXXDevPosition(xxDevLeftPosition, true, true);
+		setXSliderValue_FromHoveredValuePoint(leftSlider);
+		leftSlider.moveToXXDevPosition(xxDevLeftPosition, true, true, false);
 
 		/*
 		 * adjust right slider
 		 */
 		final long xxDevRightPosition = _xxDevViewPortLeftBorder + getDevVisibleChartWidth() - 2;
 
-		setXSliderValue(rightSlider);
-		rightSlider.moveToXXDevPosition(xxDevRightPosition, true, true);
+		setXSliderValue_FromHoveredValuePoint(rightSlider);
+		rightSlider.moveToXXDevPosition(xxDevRightPosition, true, true, false);
 
 		_isSliderDirty = true;
 		redraw();
@@ -5728,10 +5736,9 @@ public class ChartComponentGraph extends Canvas {
 		 */
 		xxDevSliderLinePos = Math.min(_xxDevGraphWidth, Math.max(0, xxDevSliderLinePos));
 
-		setXSliderValue(xSlider);
-
 		// set new slider line position
-		xSlider.moveToXXDevPosition(xxDevSliderLinePos, true, true);
+		setXSliderValue_FromHoveredValuePoint(xSlider);
+		xSlider.moveToXXDevPosition(xxDevSliderLinePos, true, true, false);
 	}
 
 	/**
@@ -7427,8 +7434,8 @@ public class ChartComponentGraph extends Canvas {
 		_xxDevViewPortLeftBorder = xxDevViewPortOffset;
 		_graphZoomRatio = graphZoomRatio;
 
-		_xSliderA.moveToXXDevPosition(xxDevViewPortOffset, false, true);
-		_xSliderB.moveToXXDevPosition(xxDevGraphWidth, false, true);
+		_xSliderA.moveToXXDevPosition(xxDevViewPortOffset, false, true, false);
+		_xSliderB.moveToXXDevPosition(xxDevGraphWidth, false, true, false);
 	}
 
 	/**
@@ -7503,7 +7510,7 @@ public class ChartComponentGraph extends Canvas {
 	 * 
 	 * @param xSlider
 	 */
-	void setXSliderValue(final ChartXSlider xSlider) {
+	void setXSliderValue_FromHoveredValuePoint(final ChartXSlider xSlider) {
 
 		final ChartDataXSerie xData = getXData();
 
@@ -7670,7 +7677,7 @@ public class ChartComponentGraph extends Canvas {
 		final double xxDevLinePos = _xxDevGraphWidth * xValue / lastXValue;
 
 		slider.setValueIndex(valueIndex);
-		slider.moveToXXDevPosition(xxDevLinePos, true, true);
+		slider.moveToXXDevPosition(xxDevLinePos, true, true, false);
 
 		setChartPosition(slider, isCenterSliderPosition);
 
@@ -7770,7 +7777,7 @@ public class ChartComponentGraph extends Canvas {
 
 			final double linePos = _xxDevGraphWidth * (xValues[valueIndex] / xValues[xValues.length - 1]);
 
-			slider.moveToXXDevPosition(linePos, true, true);
+			slider.moveToXXDevPosition(linePos, true, true, false);
 
 		} catch (final ArrayIndexOutOfBoundsException e) {
 			// ignore

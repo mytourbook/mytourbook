@@ -28,6 +28,7 @@ import net.tourbook.chart.ChartDataXSerie;
 import net.tourbook.chart.IChartListener;
 import net.tourbook.chart.ISliderMoveListener;
 import net.tourbook.chart.SelectionChartInfo;
+import net.tourbook.common.UI;
 import net.tourbook.data.TourCompared;
 import net.tourbook.data.TourData;
 import net.tourbook.database.TourDatabase;
@@ -51,7 +52,6 @@ import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.part.PageBook;
@@ -97,7 +97,7 @@ public class TourCatalogViewComparedTour extends TourChartViewPart implements IS
 	private TourChart							_ctRefTourChart;
 
 	private PageBook							_pageBook;
-	private Label								_pageNoChart;
+	private Composite							_pageNoData;
 
 	private ITourEventListener					_refTourPropertyListener;
 
@@ -169,6 +169,7 @@ public class TourCatalogViewComparedTour extends TourChartViewPart implements IS
 	private void addRefTourPropertyListener() {
 
 		_refTourPropertyListener = new ITourEventListener() {
+			@Override
 			public void tourChanged(final IWorkbenchPart part, final TourEventId propertyId, final Object propertyData) {
 
 				if (propertyId == TourEventId.REFERENCE_TOUR_CHANGED
@@ -221,15 +222,14 @@ public class TourCatalogViewComparedTour extends TourChartViewPart implements IS
 
 		_pageBook = new PageBook(parent, SWT.NONE);
 
-		_pageNoChart = new Label(_pageBook, SWT.NONE);
-		_pageNoChart.setText(Messages.UI_Label_no_chart_is_selected);
+		_pageNoData = UI.createUI_PageNoData(_pageBook, Messages.UI_Label_no_chart_is_selected);
 
 		createTourChart();
 		createActions();
 
 		addRefTourPropertyListener();
 
-		_pageBook.showPage(_pageNoChart);
+		_pageBook.showPage(_pageNoData);
 
 		// show current selected tour
 		final ISelection selection = getSite().getWorkbenchWindow().getSelectionService().getSelection();
@@ -251,6 +251,7 @@ public class TourCatalogViewComparedTour extends TourChartViewPart implements IS
 
 		// fire a slider move selection when a slider was moved in the tour chart
 		_tourChart.addSliderMoveListener(new ISliderMoveListener() {
+			@Override
 			public void sliderMoved(final SelectionChartInfo chartInfoSelection) {
 
 				TourManager.fireEventWithCustomData(//
@@ -261,6 +262,7 @@ public class TourCatalogViewComparedTour extends TourChartViewPart implements IS
 		});
 
 		_tourChart.addDataModelListener(new IDataModelListener() {
+			@Override
 			public void dataModelChanged(final ChartDataModel changedChartDataModel) {
 
 				if (_tourData == null) {
@@ -284,10 +286,12 @@ public class TourCatalogViewComparedTour extends TourChartViewPart implements IS
 
 		_tourChart.addXMarkerDraggingListener(new IChartListener() {
 
+			@Override
 			public double getXMarkerValueDiff() {
 				return _refTourXMarkerValueDifference;
 			}
 
+			@Override
 			public void xMarkerMoved(final int movedXMarkerStartValueIndex, final int movedXMarkerEndValueIndex) {
 				onMoveSynchedMarker(movedXMarkerStartValueIndex, movedXMarkerEndValueIndex);
 			}
@@ -376,12 +380,14 @@ public class TourCatalogViewComparedTour extends TourChartViewPart implements IS
 				_comparedTourItem), this);
 	}
 
+	@Override
 	public ArrayList<TourData> getSelectedTours() {
 		final ArrayList<TourData> selectedTours = new ArrayList<TourData>();
 		selectedTours.add(_tourData);
 		return selectedTours;
 	}
 
+	@Override
 	public TourChart getTourChart() {
 		return _tourChart;
 	}
@@ -604,6 +610,7 @@ public class TourCatalogViewComparedTour extends TourChartViewPart implements IS
 		}
 	}
 
+	@Override
 	public void synchCharts(final boolean isSynched, final int synchMode) {
 
 		if (_ctRefTourChart != null) {
@@ -655,7 +662,7 @@ public class TourCatalogViewComparedTour extends TourChartViewPart implements IS
 			_ctRefId = -1;
 			_ctCompareId = -1;
 
-			_pageBook.showPage(_pageNoChart);
+			_pageBook.showPage(_pageNoData);
 
 			return;
 		}

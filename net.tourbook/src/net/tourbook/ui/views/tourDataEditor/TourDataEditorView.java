@@ -419,7 +419,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	// ################################################## UI controls ##################################################
 	//
 
-	private Label								_pageNoTour;
+	private Composite							_pageNoData;
 	private Form								_pageEditorForm;
 
 	private CTabFolder							_tabFolder;
@@ -1728,7 +1728,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 			setTourClean();
 
-			_pageBook.showPage(_pageNoTour);
+			_pageBook.showPage(_pageNoData);
 		}
 	}
 
@@ -2081,7 +2081,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		restoreStateWithUI();
 
-		_pageBook.showPage(_pageNoTour);
+		_pageBook.showPage(_pageNoData);
 
 		displaySelectedTour();
 	}
@@ -2122,8 +2122,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		_pageBook = new PageBook(parent, SWT.NONE);
 		_pageBook.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
-		_pageNoTour = new Label(_pageBook, SWT.NONE);
-		_pageNoTour.setText(Messages.UI_Label_no_chart_is_selected);
+		_pageNoData = UI.createUI_PageNoData(_pageBook, Messages.UI_Label_no_chart_is_selected);
 
 		_tk = new FormToolkit(parent.getDisplay());
 
@@ -6186,7 +6185,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 									final boolean isDirtyDisabled) {
 
 		if (tourData == null) {
-			_pageBook.showPage(_pageNoTour);
+			_pageBook.showPage(_pageNoData);
 			return;
 		}
 
