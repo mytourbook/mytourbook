@@ -1,0 +1,15 @@
+Version: 15.3.2                                           27. March 2015
+
+
+New 	
+===
+
+* Tour Segmenter
+
+The new tour segmeter "by Altitude (with DB) - merged" is similar compared with the segmeter "by Altitude (with DB)". The new segmenter will merge all up and down values which makes it easier to see the segments in the tour segmenter view or in the tour chart.
+ 
+ 
+Improvements 	
+============
+
+  Add

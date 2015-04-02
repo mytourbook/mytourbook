@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -729,11 +729,14 @@ public class Messages extends NLS {
 	public static String		Image__tour_new;
 	public static String		Image__tour_new_disabled;
 	public static String		Image__tour_options;
-	public static String		Image__tour_segmenter;
 	public static String		Image__tour_viewer;
 	public static String		Image__TourChart;
 	public static String		Image__TourMarker;
-//	public static String		Image__TourSignImport;
+	public static String	Image__TourSegments;
+
+	public static String	Image__TourSegments_Disabled;
+
+	//	public static String		Image__TourSignImport;
 	public static String		Image__undo_edit;
 	public static String		Image__undo_edit_disabled;
 	public static String		Image__undo_tour_type_filter;
@@ -1402,6 +1405,8 @@ public class Messages extends NLS {
 	public static String		Tour_Segmenter_Label_DPTolerance;
 	public static String		Tour_Segmenter_Label_DPTolerance_Tooltip;
 	public static String		Tour_Segmenter_Label_no_chart;
+	public static String	Tour_Segmenter_Type_ByAltitude_Merged;
+
 	public static String		Tour_Segmenter_Type_ByBreakTime;
 
 	public static String		Tour_Statistic_Combo_BarVOrder_InfoItem;
@@ -1549,6 +1554,7 @@ public class Messages extends NLS {
 	public static String		TourAnalyzer_Label_left;
 	public static String		TourAnalyzer_Label_maximum;
 	public static String		TourAnalyzer_Label_minimum;
+	public static String		TourAnalyzer_Label_NoTourOrChart;
 	public static String		TourAnalyzer_Label_right;
 	public static String		TourAnalyzer_Label_value;
 
