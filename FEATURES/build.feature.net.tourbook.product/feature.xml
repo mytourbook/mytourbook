@@ -2,7 +2,7 @@
 <feature
       id="net.tourbook.product.feature"
       label="MyTourbook Product Features"
-      version="15.3.1.qualifier"
+      version="15.3.2.qualifier"
       provider-name="MyTourbook">
 
    <description>

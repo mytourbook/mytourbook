@@ -1,4 +1,4 @@
-Version: 15.3.2                                           27. March 2015
+Version: 15.3.2                                           ?. April 2015
 
 
 New 	
@@ -7,9 +7,15 @@ New
 * Tour Segmenter
 
 The new tour segmeter "by Altitude (with DB) - merged" is similar compared with the segmeter "by Altitude (with DB)". The new segmenter will merge all up and down values which makes it easier to see the segments in the tour segmenter view or in the tour chart.
- 
- 
-Improvements 	
-============
+   
+  
+Bugs
+====
 
-  Add
+* Fixed import for Forerunner 210
+
+* Fixed startup of MyTourbook
+  - Tour is selected in a tour provider view.
+  - Tour chart vertical sliders are set at the borders.
+  - Tour Analyzer shows the correct values.
+
