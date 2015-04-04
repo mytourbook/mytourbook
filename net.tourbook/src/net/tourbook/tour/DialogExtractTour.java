@@ -215,7 +215,6 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
 
 	private Text								_txtTourTitle;
 
-
 	/**
 	 * Split or extract a tour
 	 * 
@@ -995,6 +994,9 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
 				: Messages.Dialog_ExtractTour_Label_DeviceName);
 
 		_tourDataTarget.setIsDistanceFromSensor(_tourDataSource.isDistanceSensorPresent());
+		_tourDataTarget.setIsPowerSensorPresent(_tourDataSource.isDistanceSensorPresent());
+		_tourDataTarget.setIsPulseSensorPresent(_tourDataSource.isPulseSensorPresent());
+
 		_tourDataTarget.setDeviceTimeInterval(_tourDataSource.getDeviceTimeInterval());
 
 		_tourDataTarget.setTourRecordingTime(extractedRecordingTime);

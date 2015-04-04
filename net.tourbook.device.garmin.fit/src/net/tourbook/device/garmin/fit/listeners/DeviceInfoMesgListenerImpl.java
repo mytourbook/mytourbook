@@ -23,7 +23,8 @@ public class DeviceInfoMesgListenerImpl extends AbstractMesgListener implements 
 	private boolean hasSpeedSensor(final Short deviceType) {
 
 		return deviceType.equals(AntplusDeviceType.BIKE_SPEED)
-				|| deviceType.equals(AntplusDeviceType.BIKE_SPEED_CADENCE);
+				|| deviceType.equals(AntplusDeviceType.BIKE_SPEED_CADENCE)
+				|| deviceType.equals(AntplusDeviceType.STRIDE_SPEED_DISTANCE);
 	}
 
 	@Override
@@ -33,9 +34,26 @@ public class DeviceInfoMesgListenerImpl extends AbstractMesgListener implements 
 
 		if (deviceType != null) {
 
-			context.setSpeedSensorPresent(hasSpeedSensor(deviceType));
-			context.setHeartRateSensorPresent(hasHeartRateSensor(deviceType));
-			context.setPowerSensorPresent(hasPowerSensor(deviceType));
+			final boolean hasSpeedSensor = hasSpeedSensor(deviceType);
+			final boolean hasHeartRateSensor = hasHeartRateSensor(deviceType);
+			final boolean hasPowerSensor = hasPowerSensor(deviceType);
+
+			/*
+			 * This event occures several times and can set a true to false, therefore only true is
+			 * set, false is the default.
+			 */
+
+			if (hasSpeedSensor) {
+				context.setSpeedSensorPresent(hasSpeedSensor);
+			}
+
+			if (hasHeartRateSensor) {
+				context.setHeartRateSensorPresent(hasHeartRateSensor);
+			}
+
+			if (hasPowerSensor) {
+				context.setPowerSensorPresent(hasPowerSensor);
+			}
 		}
 	}
 

@@ -91,7 +91,9 @@ public class FitContext {
 				tourData.setDeviceFirmwareVersion(_softwareVersion);
 				tourData.setDeviceTimeInterval((short) -1);
 
-				tourData.setIsDistanceFromSensor(isSpeedSensorPresent());
+				tourData.setIsDistanceFromSensor(_isSpeedSensorPresent);
+				tourData.setIsPulseSensorPresent(_isHeartRateSensorPresent);
+				tourData.setIsPowerSensorPresent(_isPowerSensorPresent);
 
 				final long recordStartTime = timeDataList.get(0).absoluteTime;
 				final long sessionStartTime = _sessionTime.getMillis();
@@ -340,18 +342,6 @@ public class FitContext {
 
 	public String getTourTitle() {
 		return String.format("%s (%s)", FilenameUtils.getBaseName(_importFilePathName), getSessionIndex()); //$NON-NLS-1$
-	}
-
-	public boolean isHeartRateSensorPresent() {
-		return _isHeartRateSensorPresent;
-	}
-
-	public boolean isPowerSensorPresent() {
-		return _isPowerSensorPresent;
-	}
-
-	public boolean isSpeedSensorPresent() {
-		return _isSpeedSensorPresent;
 	}
 
 	public void mesgEvent(final EventMesg mesg) {

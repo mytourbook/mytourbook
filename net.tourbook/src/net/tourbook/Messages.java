@@ -732,9 +732,9 @@ public class Messages extends NLS {
 	public static String		Image__tour_viewer;
 	public static String		Image__TourChart;
 	public static String		Image__TourMarker;
-	public static String	Image__TourSegments;
+	public static String		Image__TourSegments;
 
-	public static String	Image__TourSegments_Disabled;
+	public static String		Image__TourSegments_Disabled;
 
 	//	public static String		Image__TourSignImport;
 	public static String		Image__undo_edit;
@@ -1346,7 +1346,7 @@ public class Messages extends NLS {
 	public static String		Tour_Editor_Label_DateTimeModified;
 	public static String		Tour_Editor_Label_DeviceFirmwareVersion;
 	public static String		Tour_Editor_Label_DeviceSensor_Tooltip;
-	public static String		Tour_Editor_Label_DistanceSensor_Tooltip;
+	public static String		Tour_Editor_Label_DistanceSensor;
 	public static String		Tour_Editor_Label_Hours_Tooltip;
 	public static String		Tour_Editor_Label_Minutes_Tooltip;
 	public static String		Tour_Editor_Label_PowerSensor;
@@ -1405,7 +1405,7 @@ public class Messages extends NLS {
 	public static String		Tour_Segmenter_Label_DPTolerance;
 	public static String		Tour_Segmenter_Label_DPTolerance_Tooltip;
 	public static String		Tour_Segmenter_Label_no_chart;
-	public static String	Tour_Segmenter_Type_ByAltitude_Merged;
+	public static String		Tour_Segmenter_Type_ByAltitude_Merged;
 
 	public static String		Tour_Segmenter_Type_ByBreakTime;
 

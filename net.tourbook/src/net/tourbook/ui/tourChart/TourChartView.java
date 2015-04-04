@@ -244,7 +244,7 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 
 				} else if (eventId == TourEventId.TOUR_CHANGED && eventData instanceof TourEvent) {
 
-					if (_tourData == null || part == TourChartView.this) {
+					if (_tourData == null) {
 						return;
 					}
 

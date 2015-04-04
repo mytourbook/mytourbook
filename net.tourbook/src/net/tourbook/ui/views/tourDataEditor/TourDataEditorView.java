@@ -188,41 +188,43 @@ import org.joda.time.format.DateTimeFormatter;
  */
 public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITourViewer2, ITourProvider2 {
 
-	public static final String					ID								= "net.tourbook.views.TourDataEditorView";	//$NON-NLS-1$
+	public static final String					ID								= "net.tourbook.views.TourDataEditorView";					//$NON-NLS-1$
+
+	private static final String					GRAPH_LABEL_HEARTBEAT_UNIT		= net.tourbook.common.Messages.Graph_Label_Heartbeat_Unit;
 
 	private static final int					COLUMN_SPACING					= 20;
 
 	private final IPreferenceStore				_prefStore						= TourbookPlugin.getPrefStore();
 	private final IDialogSettings				_viewState						= TourbookPlugin.getState(ID);
 	private final IDialogSettings				_viewStateSlice					= TourbookPlugin
-																						.getState(ID + ".slice");			//$NON-NLS-1$
+																						.getState(ID + ".slice");							//$NON-NLS-1$
 
 	private final boolean						_isOSX							= net.tourbook.common.UI.IS_OSX;
 	private final boolean						_isLinux						= net.tourbook.common.UI.IS_LINUX;
 
-	private static final String					WIDGET_KEY						= "widgetKey";								//$NON-NLS-1$
-	private static final String					WIDGET_KEY_TOURDISTANCE			= "tourDistance";							//$NON-NLS-1$
-	private static final String					WIDGET_KEY_ALTITUDE_UP			= "altitudeUp";							//$NON-NLS-1$
-	private static final String					WIDGET_KEY_ALTITUDE_DOWN		= "altitudeDown";							//$NON-NLS-1$
-	private static final String					WIDGET_KEY_PERSON				= "tourPerson";							//$NON-NLS-1$
+	private static final String					WIDGET_KEY						= "widgetKey";												//$NON-NLS-1$
+	private static final String					WIDGET_KEY_TOURDISTANCE			= "tourDistance";											//$NON-NLS-1$
+	private static final String					WIDGET_KEY_ALTITUDE_UP			= "altitudeUp";											//$NON-NLS-1$
+	private static final String					WIDGET_KEY_ALTITUDE_DOWN		= "altitudeDown";											//$NON-NLS-1$
+	private static final String					WIDGET_KEY_PERSON				= "tourPerson";											//$NON-NLS-1$
 
-	private static final String					MESSAGE_KEY_ANOTHER_SELECTION	= "anotherSelection";						//$NON-NLS-1$
+	private static final String					MESSAGE_KEY_ANOTHER_SELECTION	= "anotherSelection";										//$NON-NLS-1$
 
 	/**
 	 * shows the busy indicator to load the slice viewer when there are more items as this value
 	 */
 	private static final int					BUSY_INDICATOR_ITEMS			= 5000;
 
-	private static final String					STATE_SELECTED_TAB				= "tourDataEditor.selectedTab";			//$NON-NLS-1$
-	private static final String					STATE_ROW_EDIT_MODE				= "tourDataEditor.rowEditMode";			//$NON-NLS-1$
-	private static final String					STATE_IS_EDIT_MODE				= "tourDataEditor.isEditMode";				//$NON-NLS-1$
-	private static final String					STATE_CSV_EXPORT_PATH			= "tourDataEditor.csvExportPath";			//$NON-NLS-1$
-	private static final String					STATE_SECTION_CHARACTERISTICS	= "STATE_SECTION_CHARACTERISTICS";			//$NON-NLS-1$
-	private static final String					STATE_SECTION_DATE_TIME			= "STATE_SECTION_DATE_TIME";				//$NON-NLS-1$
-	private static final String					STATE_SECTION_INFO				= "STATE_SECTION_INFO";					//$NON-NLS-1$
-	private static final String					STATE_SECTION_PERSONAL			= "STATE_SECTION_PERSONAL";				//$NON-NLS-1$
-	private static final String					STATE_SECTION_TITLE				= "STATE_SECTION_TITLE";					//$NON-NLS-1$
-	private static final String					STATE_SECTION_WEATHER			= "STATE_SECTION_WEATHER";					//$NON-NLS-1$
+	private static final String					STATE_SELECTED_TAB				= "tourDataEditor.selectedTab";							//$NON-NLS-1$
+	private static final String					STATE_ROW_EDIT_MODE				= "tourDataEditor.rowEditMode";							//$NON-NLS-1$
+	private static final String					STATE_IS_EDIT_MODE				= "tourDataEditor.isEditMode";								//$NON-NLS-1$
+	private static final String					STATE_CSV_EXPORT_PATH			= "tourDataEditor.csvExportPath";							//$NON-NLS-1$
+	private static final String					STATE_SECTION_CHARACTERISTICS	= "STATE_SECTION_CHARACTERISTICS";							//$NON-NLS-1$
+	private static final String					STATE_SECTION_DATE_TIME			= "STATE_SECTION_DATE_TIME";								//$NON-NLS-1$
+	private static final String					STATE_SECTION_INFO				= "STATE_SECTION_INFO";									//$NON-NLS-1$
+	private static final String					STATE_SECTION_PERSONAL			= "STATE_SECTION_PERSONAL";								//$NON-NLS-1$
+	private static final String					STATE_SECTION_TITLE				= "STATE_SECTION_TITLE";									//$NON-NLS-1$
+	private static final String					STATE_SECTION_WEATHER			= "STATE_SECTION_WEATHER";									//$NON-NLS-1$
 
 	/**
 	 * Tour start daytime in seconds
@@ -2613,7 +2615,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			_spinRestPuls.addSelectionListener(_selectionListener);
 
 			// label: bpm
-			_tk.createLabel(container, net.tourbook.common.Messages.Graph_Label_Heartbeat_Unit);
+			_tk.createLabel(container, GRAPH_LABEL_HEARTBEAT_UNIT);
 		}
 	}
 
@@ -3151,10 +3153,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			/*
 			 * distance sensor
 			 */
-			_tk.createLabel(container, Messages.tour_editor_label_DistanceSensor);
+			_tk.createLabel(container, Messages.Tour_Editor_Label_DistanceSensor);
 
 			_txtDistanceSensor = createUI_FieldText(container);
-			_txtDistanceSensor.setToolTipText(Messages.Tour_Editor_Label_DistanceSensor_Tooltip);
+			_txtDistanceSensor.setToolTipText(Messages.Tour_Editor_Label_DeviceSensor_Tooltip);
 
 			/*
 			 * pulse sensor

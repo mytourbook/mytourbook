@@ -272,51 +272,58 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 			@Override
 			public void tourChanged(final IWorkbenchPart part, final TourEventId eventId, final Object eventData) {
 
+				if (part == TourMarkerView.this) {
+					return;
+				}
+
 				if (_isInUpdate) {
 					return;
 				}
 
-				if ((_tourData == null) || (part == TourMarkerView.this)) {
-					return;
-				}
-
-				if ((eventId == TourEventId.TOUR_CHANGED) && (eventData instanceof TourEvent)) {
-
-					final ArrayList<TourData> modifiedTours = ((TourEvent) eventData).getModifiedTours();
-					if (modifiedTours != null) {
-
-						// update modified tour
-
-						final long viewTourId = _tourData.getTourId();
-
-						for (final TourData tourData : modifiedTours) {
-							if (tourData.getTourId() == viewTourId) {
-
-								// get modified tour
-								_tourData = tourData;
-
-								updateUI_MarkerViewer();
-
-								// removed old tour data from the selection provider
-								_postSelectionProvider.clearSelection();
-
-								// nothing more to do, the view contains only one tour
-								return;
-							}
-						}
-					}
-
-				} else if ((eventId == TourEventId.TOUR_SELECTION) && eventData instanceof ISelection) {
+				if (eventId == TourEventId.TOUR_SELECTION && eventData instanceof ISelection) {
 
 					onSelectionChanged((ISelection) eventData);
 
-				} else if (eventId == TourEventId.MARKER_SELECTION) {
+				} else {
 
-					onTourEvent_TourMarker(eventData);
+					if (_tourData == null) {
+						return;
+					}
 
-				} else if (eventId == TourEventId.CLEAR_DISPLAYED_TOUR) {
+					if ((eventId == TourEventId.TOUR_CHANGED) && (eventData instanceof TourEvent)) {
 
-					clearView();
+						final ArrayList<TourData> modifiedTours = ((TourEvent) eventData).getModifiedTours();
+						if (modifiedTours != null) {
+
+							// update modified tour
+
+							final long viewTourId = _tourData.getTourId();
+
+							for (final TourData tourData : modifiedTours) {
+								if (tourData.getTourId() == viewTourId) {
+
+									// get modified tour
+									_tourData = tourData;
+
+									updateUI_MarkerViewer();
+
+									// removed old tour data from the selection provider
+									_postSelectionProvider.clearSelection();
+
+									// nothing more to do, the view contains only one tour
+									return;
+								}
+							}
+						}
+
+					} else if (eventId == TourEventId.MARKER_SELECTION) {
+
+						onTourEvent_TourMarker(eventData);
+
+					} else if (eventId == TourEventId.CLEAR_DISPLAYED_TOUR) {
+
+						clearView();
+					}
 				}
 			}
 		};

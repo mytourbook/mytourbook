@@ -6116,6 +6116,14 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 		this.isDistanceFromSensor = (short) (isFromSensor ? 1 : 0);
 	}
 
+	public void setIsPowerSensorPresent(final boolean isFromSensor) {
+		this.isPowerSensorPresent = (short) (isFromSensor ? 1 : 0);
+	}
+
+	public void setIsPulseSensorPresent(final boolean isFromSensor) {
+		this.isPulseSensorPresent = (short) (isFromSensor ? 1 : 0);
+	}
+
 	public void setMaxPulse(final float maxPulse) {
 		this.maxPulse = maxPulse;
 	}
