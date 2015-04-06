@@ -1,4 +1,4 @@
-Version 15.3.2                                             7. April 2015
+Version 15.3.2                                             6. April 2015
 
 New 	
 ===
@@ -19,8 +19,8 @@ Improvements
 ============
 
 * Tour Segmenter
-  Preserve selected tour segmenter when this view is closed and reopened.
-
+  - Preserve selected tour segmenter when this view is closed and 
+    reopened.
 
 Bugfix
 ======
