@@ -49,6 +49,11 @@ public abstract class ChartDataSerie {
 	private int						_valueDivisor							= 1;
 
 	/**
+	 * Number of digits which are displayed.
+	 */
+	private int						_displayedFractionalDigits				= 0;
+
+	/**
 	 * min value which is used to draw the chart
 	 */
 	protected double				_visibleMinValue;
@@ -281,6 +286,14 @@ public abstract class ChartDataSerie {
 
 		_visibleMinValue = minValue;
 		_visibleMinValueForced = minValue;
+	}
+
+	public int getDisplayedFractionalDigits() {
+		return _displayedFractionalDigits;
+	}
+
+	public void setDisplayedFractionalDigits(int _displayedFractionalDigits) {
+		this._displayedFractionalDigits = _displayedFractionalDigits;
 	}
 
 }

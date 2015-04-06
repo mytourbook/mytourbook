@@ -1026,6 +1026,7 @@ public class ChartComponentGraph extends Canvas {
 			final ChartDataYSerie yData = drawingData.getYData();
 			final int labelFormat = yData.getSliderLabelFormat();
 			final int valueDivisor = yData.getValueDivisor();
+			final int displayedDigits = yData.getDisplayedFractionalDigits();
 			final float[][] allYValues = yData.getHighValuesFloat();
 			final ISliderLabelProvider sliderLabelProvider = yData.getSliderLabelProvider();
 
@@ -1039,11 +1040,8 @@ public class ChartComponentGraph extends Canvas {
 
 				// use default format: ChartDataYSerie.SLIDER_LABEL_FORMAT_DEFAULT
 
-				if (valueDivisor == 1) {
-					_nf.setMinimumFractionDigits(0);
-				} else if (valueDivisor == 10) {
-					_nf.setMinimumFractionDigits(1);
-				}
+				_nf.setMinimumFractionDigits(displayedDigits);
+				_nf.setMaximumFractionDigits(displayedDigits);
 			}
 
 			final ChartXSliderLabel label = new ChartXSliderLabel();

@@ -142,7 +142,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	private static final String						STATE_DP_TOLERANCE_PULSE			= "STATE_DP_TOLERANCE_PULSE";			//$NON-NLS-1$
 	private static final String						STATE_MINIMUM_ALTITUDE				= "STATE_MINIMUM_ALTITUDE";			//$NON-NLS-1$
 	private static final String						STATE_SELECTED_DISTANCE				= "selectedDistance";					//$NON-NLS-1$
-	private static final String						STATE_SELECTED_SEGMENTER_INDEX		= "selectedSegmenterIndex";			//$NON-NLS-1$
+	private static final String						STATE_SELECTED_SEGMENTER_BY_USER	= "STATE_SELECTED_SEGMENTER_BY_USER";	//$NON-NLS-1$
 
 	/**
 	 * initially this was an int value, with 2 it's a string
@@ -3207,18 +3207,17 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 	private void restoreState() {
 
-		/*
-		 * selected segmenter, this is not working because the next selected tour can remove the
-		 * selected segementer
-		 */
-//		int segmenterIndex = -1;
-//		try {
-//			segmenterIndex = _state.getInt(STATE_SELECTED_SEGMENTER_INDEX);
-//		} catch (final NumberFormatException e) {}
-//		if (segmenterIndex < 0) {
-//			segmenterIndex = 0;
-//		}
-//		_cboSegmenterType.select(segmenterIndex);
+		// selected segmenter
+		final String stateSegmenterName = Util.getStateString(
+				_state,
+				STATE_SELECTED_SEGMENTER_BY_USER,
+				SegmenterType.ByAltitudeWithDP.name());
+		try {
+			_userSelectedSegmenterType = SegmenterType.valueOf(SegmenterType.class, stateSegmenterName);
+		} catch (final Exception e) {
+			// set default value
+			_userSelectedSegmenterType = SegmenterType.ByAltitudeWithDP;
+		}
 
 		// selected distance
 		final int stateDistance = Util.getStateInt(_state, STATE_SELECTED_DISTANCE, 10);
@@ -3392,7 +3391,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 		_columnManager.saveState(_state);
 
-		_state.put(STATE_SELECTED_SEGMENTER_INDEX, _comboSegmenterType.getSelectionIndex());
+		_state.put(STATE_SELECTED_SEGMENTER_BY_USER, _userSelectedSegmenterType.name());
 		_state.put(STATE_SELECTED_DISTANCE, _spinnerDistance.getSelection());
 		_state.put(STATE_MINIMUM_ALTITUDE, _spinnerMinAltitude.getSelection());
 		_state.put(STATE_DP_TOLERANCE_PULSE, _spinnerDPTolerancePulse.getSelection());

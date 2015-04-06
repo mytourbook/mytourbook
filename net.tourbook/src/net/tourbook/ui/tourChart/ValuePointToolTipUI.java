@@ -805,13 +805,13 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 
 			final Composite container = createUIValueContainer(parent);
 			{
-				_lblGears = createUILabelValue(
+				_lblGears = createUILabelValue(//
 						container,
 						SWT.TRAIL,
 						10,
 						GRAPH_LABEL_GEARS,
 
-				// this is a bit tricky, use default color because the text color is white
+						// this is a bit tricky, use default color because the text color is white
 						null
 //						GraphColorManager.PREF_GRAPH_GEAR
 				);
@@ -1303,8 +1303,8 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 		}
 
 		// check bounds
-		if (valueIndex >= timeSerie.length || valueIndex < 0) {
-			valueIndex = timeSerie.length;
+		if (valueIndex < 0 || valueIndex >= timeSerie.length) {
+			valueIndex = timeSerie.length - 1;
 		}
 
 		_currentValueIndex = valueIndex;

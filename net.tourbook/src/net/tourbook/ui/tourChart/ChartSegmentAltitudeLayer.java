@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -71,6 +71,7 @@ public class ChartSegmentAltitudeLayer implements IChartLayer {
 	 * @param drawingData
 	 * @param fChartComponents
 	 */
+	@Override
 	public void draw(	final GC gc,
 						final GraphDrawingData drawingData,
 						final Chart chart,
@@ -95,7 +96,7 @@ public class ChartSegmentAltitudeLayer implements IChartLayer {
 		final LineAttributes vertLineLA = new LineAttributes(5);
 		vertLineLA.dashOffset = 3;
 		vertLineLA.style = SWT.LINE_CUSTOM;
-		vertLineLA.dash = new float[] { 1f, 4f };
+		vertLineLA.dash = new float[] { 1f, 2f };
 		vertLineLA.width = 1f;
 
 		final Color colorLine = new Color(display, _lineColor);
@@ -165,12 +166,12 @@ public class ChartSegmentAltitudeLayer implements IChartLayer {
 				 */
 				int devYLine;
 				if (isAltitudeUp) {
-					devYLine = devYSegment - 2 * textHeight;
+					devYLine = devYSegment - 1 * textHeight;
 					if (devYLine < devYTop) {
 						devYLine = devYTop;
 					}
 				} else {
-					devYLine = devYSegment + 2 * textHeight;
+					devYLine = devYSegment + 1 * textHeight;
 					if (devYLine > devYBottom) {
 						devYLine = devYBottom - textHeight;
 					}
@@ -192,7 +193,19 @@ public class ChartSegmentAltitudeLayer implements IChartLayer {
 
 					final int segmentWidth = devXOffset - previousPoint.x;
 					final int devXValue = previousPoint.x + segmentWidth / 2 - textWidth / 2;
-					int devYValue = devYSegment + (isAltitudeUp ? -textHeight : 0);
+
+					int devYValue;
+
+					final int yDiff = (devYSegment - previousPoint.y) / 2;
+
+					if (isAltitudeUp) {
+
+						devYValue = devYSegment - yDiff - 2 * textHeight;
+
+					} else {
+
+						devYValue = devYSegment - yDiff + 2 * textHeight;
+					}
 
 					/*
 					 * Ensure the value text do not overlap, if possible :-)
@@ -224,6 +237,7 @@ public class ChartSegmentAltitudeLayer implements IChartLayer {
 							devYValue - margin,
 							textWidth + 2 * margin,
 							textHeight + 2 * margin);
+
 					if (isAltitudeUp) {
 						prevUpTextRect = textRect;
 					} else {

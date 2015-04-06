@@ -1,21 +1,39 @@
-Version: 15.3.2                                           ?. April 2015
-
+Version 15.3.2                                             7. April 2015
 
 New 	
 ===
 
 * Tour Segmenter
 
-The new tour segmeter "by Altitude (with DB) - merged" is similar compared with the segmeter "by Altitude (with DB)", it will merge all consecutive up and down values. This makes it easier to see the segments in the tour segmenter view and in the tour chart.
-   
-  
-Bugs
-====
+The new tour segmenter "By Altitude (with DB) - merged" creates the same
+segments compared with the segmeter "By Altitude (with DB)", however the 
+new segmenter will merge all consecutive up and down values into one 
+segment which makes it easier to see the segments in the tour segmenter 
+view or in the tour chart.
 
-* Fixed import for Forerunner 210
+The idea for this new segmenter came spontaneous but I'm wondering why 
+it came not some years earlier.
 
-* Fixed startup of MyTourbook
+
+Improvements
+============
+
+* Tour Segmenter
+  Preserve selected tour segmenter when this view is closed and reopened.
+
+
+Bugfix
+======
+
+* Import
+  Fixed bug #90: Can't open Garmin FIT files in 15.3.1 
+
+* Startup
+  Fixed startup of MyTourbook
   - A tour is selected in a tour provider view.
   - Vertical sliders in the tour chart are set to the borders.
   - Tour Analyzer shows the correct values.
 
+* Tour Editor
+  Fixed sensor state for distance, pulse and power.
+  

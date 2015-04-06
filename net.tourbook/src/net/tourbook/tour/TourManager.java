@@ -2021,6 +2021,7 @@ public class TourManager {
 			yDataAltitude.setYTitle(GRAPH_LABEL_ALTITUDE);
 			yDataAltitude.setUnitLabel(UI.UNIT_LABEL_ALTITUDE);
 			yDataAltitude.setShowYSlider(true);
+			yDataAltitude.setDisplayedFractionalDigits(2);
 			yDataAltitude.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_ALTITUDE);
 			yDataAltitude.setCustomData(CUSTOM_DATA_ANALYZER_INFO, new TourChartAnalyzerInfo(true));
 
@@ -2087,6 +2088,7 @@ public class TourManager {
 			yDataSpeed.setYTitle(GRAPH_LABEL_SPEED);
 			yDataSpeed.setUnitLabel(UI.UNIT_LABEL_SPEED);
 			yDataSpeed.setShowYSlider(true);
+			yDataSpeed.setDisplayedFractionalDigits(1);
 			yDataSpeed.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_SPEED);
 			yDataSpeed.setCustomData(CUSTOM_DATA_ANALYZER_INFO, //
 					new TourChartAnalyzerInfo(true, true, _computeSpeedAvg, 1));
@@ -2228,6 +2230,7 @@ public class TourManager {
 			yDataGradient.setYTitle(GRAPH_LABEL_GRADIENT);
 			yDataGradient.setUnitLabel(GRAPH_LABEL_GRADIENT_UNIT);
 			yDataGradient.setShowYSlider(true);
+			yDataGradient.setDisplayedFractionalDigits(1);
 			yDataGradient.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_GRADIENT);
 			yDataGradient.setCustomData(CUSTOM_DATA_ANALYZER_INFO, //
 					new TourChartAnalyzerInfo(true, true, _computeGradientAvg, 1));
@@ -2331,6 +2334,7 @@ public class TourManager {
 			yDataTemperature.setYTitle(GRAPH_LABEL_TEMPERATURE);
 			yDataTemperature.setUnitLabel(UI.UNIT_LABEL_TEMPERATURE);
 			yDataTemperature.setShowYSlider(true);
+			yDataTemperature.setDisplayedFractionalDigits(1);
 			yDataTemperature.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_TEMPERATURE);
 			yDataTemperature.setCustomData(CUSTOM_DATA_ANALYZER_INFO, new TourChartAnalyzerInfo(true, true));
 
