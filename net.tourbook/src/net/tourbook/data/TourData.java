@@ -2516,6 +2516,11 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 			altitudeSerieSmoothed = new float[size];
 			altitudeSerieImperialSmoothed = new float[size];
 
+			gradientSerie = new float[size];
+
+			altimeterSerie = new float[size];
+			altimeterSerieImperial = new float[size];
+
 			if (isAltitudeSmoothed) {
 
 				for (int serieIndex = 0; serieIndex < size; serieIndex++) {
@@ -2545,11 +2550,6 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 		paceSerieSecondsImperial = new float[size];
 		paceSerieMinute = new float[size];
 		paceSerieMinuteImperial = new float[size];
-
-		gradientSerie = new float[size];
-
-		altimeterSerie = new float[size];
-		altimeterSerieImperial = new float[size];
 
 		// ensure data series are created to prevent exceptions
 		if (size < 2) {
@@ -2668,6 +2668,7 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 		 * Compute the terrain slope
 		 */
 		if (isAltitudeAvailable) {
+
 			for (int serieIndex = 0; serieIndex < size; serieIndex++) {
 
 				final double vh_sc_Value = Vh_sc[serieIndex];

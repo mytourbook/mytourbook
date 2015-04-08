@@ -96,6 +96,7 @@ public class FitDataReader extends TourbookDevice {
 							|| fieldName.equals("position_lat") //$NON-NLS-1$
 							|| fieldName.equals("position_long") //$NON-NLS-1$
 							|| fieldName.equals("speed") //$NON-NLS-1$
+							|| fieldName.equals("compressed_speed_distance") //$NON-NLS-1$
 							|| fieldName.equals("temperature") //$NON-NLS-1$
 
 							|| fieldName.equals("front_gear") //$NON-NLS-1$

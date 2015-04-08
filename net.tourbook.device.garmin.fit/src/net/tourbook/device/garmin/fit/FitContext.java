@@ -16,7 +16,6 @@ import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.importdata.TourbookDevice;
 
-import org.apache.commons.io.FilenameUtils;
 import org.joda.time.DateTime;
 
 import com.garmin.fit.EventMesg;
@@ -332,16 +331,9 @@ public class FitContext {
 		return _serieIndex;
 	}
 
-	public String getSessionIndex() {
-		return _sessionIndex;
-	}
-
-	public String getTourDescription() {
-		return getTourTitle();
-	}
-
 	public String getTourTitle() {
-		return String.format("%s (%s)", FilenameUtils.getBaseName(_importFilePathName), getSessionIndex()); //$NON-NLS-1$
+
+		return String.format("%s (%s)", _importFilePathName, _sessionIndex); //$NON-NLS-1$
 	}
 
 	public void mesgEvent(final EventMesg mesg) {
