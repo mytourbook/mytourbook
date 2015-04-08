@@ -35,6 +35,7 @@ import net.tourbook.common.UI;
 import net.tourbook.data.TourData;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.ITourEventListener;
+import net.tourbook.tour.SelectionDeletedTours;
 import net.tourbook.tour.SelectionTourChart;
 import net.tourbook.tour.SelectionTourData;
 import net.tourbook.tour.SelectionTourId;
@@ -748,10 +749,6 @@ public class TourChartAnalyzerView extends ViewPart {
 			return;
 		}
 
-//		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
-//				+ ("\tonSelectionChanged: " + selection));
-//		// TODO remove SYSTEM.OUT.PRINTLN
-
 		if (selection instanceof SelectionChartInfo) {
 
 			updateInfo((SelectionChartInfo) selection, false);
@@ -762,7 +759,13 @@ public class TourChartAnalyzerView extends ViewPart {
 
 		} else if (selection instanceof SelectionTourData) {
 
-			final TourChart tourChart = ((SelectionTourData) selection).getTourChart();
+			final SelectionTourData selectionTourData = (SelectionTourData) selection;
+
+			TourChart tourChart = selectionTourData.getTourChart();
+
+			if (tourChart == null) {
+				tourChart = TourManager.getActiveTourChart(selectionTourData.getTourData());
+			}
 
 			if (tourChart != null) {
 				updateInfo(tourChart.getChartInfo(), false);
@@ -775,9 +778,14 @@ public class TourChartAnalyzerView extends ViewPart {
 		} else if (selection instanceof SelectionTourChart) {
 
 			final TourChart tourChart = ((SelectionTourChart) selection).getTourChart();
+
 			if (tourChart != null) {
 				updateInfo(tourChart.getChartInfo(), false);
 			}
+
+		} else if (selection instanceof SelectionDeletedTours) {
+
+			clearView();
 		}
 	}
 

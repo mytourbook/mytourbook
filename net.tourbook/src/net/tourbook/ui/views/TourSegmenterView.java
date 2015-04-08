@@ -39,7 +39,6 @@ import net.tourbook.data.AltitudeUpDownSegment;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.data.TourSegment;
-import net.tourbook.database.MyTourbookException;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.PrefPageComputedValues;
 import net.tourbook.tour.BreakTimeMethod;
@@ -50,7 +49,6 @@ import net.tourbook.tour.SelectionDeletedTours;
 import net.tourbook.tour.SelectionTourData;
 import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.SelectionTourIds;
-import net.tourbook.tour.TourEditor;
 import net.tourbook.tour.TourEvent;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
@@ -58,7 +56,6 @@ import net.tourbook.ui.ImageComboLabel;
 import net.tourbook.ui.TableColumnFactory;
 import net.tourbook.ui.action.ActionModifyColumns;
 import net.tourbook.ui.tourChart.TourChart;
-import net.tourbook.ui.tourChart.TourChartView;
 import net.tourbook.web.WEB;
 
 import org.eclipse.jface.action.Action;
@@ -100,16 +97,11 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Table;
-import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISelectionListener;
-import org.eclipse.ui.IViewPart;
-import org.eclipse.ui.IViewReference;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
-import org.eclipse.ui.IWorkbenchWindow;
-import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.dialogs.PreferencesUtil;
 import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.part.ViewPart;
@@ -1308,6 +1300,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 						onSelectSegmenterType(true);
 					}
 				});
+
 				/*
 				 * fill the segmenter list that the next layout shows the combo that all segmenter
 				 * names are visible
@@ -1950,7 +1943,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 					if (segments.length > 0) {
 
 						if (_tourChart == null) {
-							_tourChart = getActiveTourChart(_tourData);
+							_tourChart = TourManager.getActiveTourChart(_tourData);
 						}
 
 						final int startIndex = ((TourSegment) (segments[0])).serieIndexStart;
@@ -2694,72 +2687,6 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 				TourSegmenterView.this);
 	}
 
-	/**
-	 * try to get the tour chart and/or editor from the active part
-	 * 
-	 * @param tourData
-	 * @return Returns the {@link TourChart} for the requested {@link TourData}
-	 */
-	private TourChart getActiveTourChart(final TourData tourData) {
-
-		// get tour chart from the active editor part
-		for (final IWorkbenchWindow wbWindow : PlatformUI.getWorkbench().getWorkbenchWindows()) {
-			for (final IWorkbenchPage wbPage : wbWindow.getPages()) {
-
-				final IEditorPart activeEditor = wbPage.getActiveEditor();
-				if (activeEditor instanceof TourEditor) {
-
-					/*
-					 * check if the tour data in the editor is the same
-					 */
-					final TourChart tourChart = ((TourEditor) activeEditor).getTourChart();
-					final TourData tourChartTourData = tourChart.getTourData();
-					if (tourChartTourData == tourData) {
-
-						try {
-							TourManager.checkTourData(tourData, tourChartTourData);
-						} catch (final MyTourbookException e) {
-							e.printStackTrace();
-						}
-					}
-				}
-			}
-		}
-
-		// get tour chart from the tour chart view
-		for (final IWorkbenchWindow wbWindow : PlatformUI.getWorkbench().getWorkbenchWindows()) {
-			for (final IWorkbenchPage wbPage : wbWindow.getPages()) {
-
-				final IViewReference viewRef = wbPage.findViewReference(TourChartView.ID);
-				if (viewRef != null) {
-
-					final IViewPart view = viewRef.getView(false);
-					if (view instanceof TourChartView) {
-
-						final TourChartView tourChartView = ((TourChartView) view);
-
-						/*
-						 * check if the tour data in the tour chart is the same
-						 */
-						final TourChart tourChart = tourChartView.getTourChart();
-						final TourData tourChartTourData = tourChart.getTourData();
-						if (tourChartTourData == tourData) {
-							try {
-								TourManager.checkTourData(tourData, tourChartTourData);
-							} catch (final MyTourbookException e) {
-								e.printStackTrace();
-							}
-
-							return tourChart;
-						}
-					}
-				}
-			}
-		}
-
-		return null;
-	}
-
 	@Override
 	public ColumnManager getColumnManager() {
 		return _columnManager;
@@ -3063,7 +2990,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 //					}
 
 					if (eventTourChart == null) {
-						eventTourChart = getActiveTourChart(eventTourData);
+						eventTourChart = TourManager.getActiveTourChart(eventTourData);
 					}
 
 					_tourChart = eventTourChart;

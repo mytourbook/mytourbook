@@ -49,6 +49,7 @@ import net.tourbook.ui.action.ActionEditQuick;
 import net.tourbook.ui.action.ActionEditTour;
 import net.tourbook.ui.tourChart.TourChart;
 import net.tourbook.ui.tourChart.TourChartConfiguration;
+import net.tourbook.ui.tourChart.TourChartView;
 import net.tourbook.ui.tourChart.X_AXIS_START_TIME;
 import net.tourbook.ui.views.TourChartAnalyzerInfo;
 import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
@@ -66,6 +67,7 @@ import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IViewReference;
 import org.eclipse.ui.IWorkbenchPage;
@@ -480,6 +482,72 @@ public class TourManager {
 //		}
 	}
 
+	/**
+	 * Try to get the tour chart and/or editor from the active part.
+	 * 
+	 * @param tourData
+	 * @return Returns the {@link TourChart} for the requested {@link TourData}
+	 */
+	public static TourChart getActiveTourChart(final TourData tourData) {
+
+		// get tour chart from the active editor part
+		for (final IWorkbenchWindow wbWindow : PlatformUI.getWorkbench().getWorkbenchWindows()) {
+			for (final IWorkbenchPage wbPage : wbWindow.getPages()) {
+
+				final IEditorPart activeEditor = wbPage.getActiveEditor();
+				if (activeEditor instanceof TourEditor) {
+
+					/*
+					 * check if the tour data in the editor is the same
+					 */
+					final TourChart tourChart = ((TourEditor) activeEditor).getTourChart();
+					final TourData tourChartTourData = tourChart.getTourData();
+					if (tourChartTourData == tourData) {
+
+						try {
+							TourManager.checkTourData(tourData, tourChartTourData);
+						} catch (final MyTourbookException e) {
+							e.printStackTrace();
+						}
+					}
+				}
+			}
+		}
+
+		// get tour chart from the tour chart view
+		for (final IWorkbenchWindow wbWindow : PlatformUI.getWorkbench().getWorkbenchWindows()) {
+			for (final IWorkbenchPage wbPage : wbWindow.getPages()) {
+
+				final IViewReference viewRef = wbPage.findViewReference(TourChartView.ID);
+				if (viewRef != null) {
+
+					final IViewPart view = viewRef.getView(false);
+					if (view instanceof TourChartView) {
+
+						final TourChartView tourChartView = ((TourChartView) view);
+
+						/*
+						 * check if the tour data in the tour chart is the same
+						 */
+						final TourChart tourChart = tourChartView.getTourChart();
+						final TourData tourChartTourData = tourChart.getTourData();
+						if (tourChartTourData == tourData) {
+							try {
+								TourManager.checkTourData(tourData, tourChartTourData);
+							} catch (final MyTourbookException e) {
+								e.printStackTrace();
+							}
+
+							return tourChart;
+						}
+					}
+				}
+			}
+		}
+
+		return null;
+	}
+
 	public static int[] getAllGraphIDs() {
 		return _allGraphIDs;
 	}
@@ -492,7 +560,6 @@ public class TourManager {
 
 		return _instance;
 	}
-
 	/**
 	 * Searches all tour providers in the workbench and returns tours which are selected
 	 * 
