@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -255,6 +255,7 @@ public class GPX_SAX_Handler extends DefaultHandler {
 
 	private void displayError(final ParseException e) {
 		Display.getDefault().syncExec(new Runnable() {
+			@Override
 			public void run() {
 				final String message = e.getMessage();
 				MessageDialog.openError(Display.getCurrent().getActiveShell(), "Error", message); //$NON-NLS-1$
@@ -811,6 +812,7 @@ public class GPX_SAX_Handler extends DefaultHandler {
 		if (needsSort) {
 			/* sort the _timeDataList */
 			Collections.sort(_timeDataList, new Comparator<TimeData>() {
+				@Override
 				public int compare(final TimeData td1, final TimeData td2) {
 					if (td1.absoluteTime < td2.absoluteTime) {
 						return -1;
