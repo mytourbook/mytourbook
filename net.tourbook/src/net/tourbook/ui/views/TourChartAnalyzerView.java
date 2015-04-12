@@ -244,7 +244,11 @@ public class TourChartAnalyzerView extends ViewPart {
 					return;
 				}
 
-				if (eventId == TourEventId.SLIDER_POSITION_CHANGED && eventData instanceof ISelection) {
+				if ((eventId == TourEventId.TOUR_SELECTION) && eventData instanceof ISelection) {
+
+					onSelectionChanged((ISelection) eventData);
+
+				} else if (eventId == TourEventId.SLIDER_POSITION_CHANGED && eventData instanceof ISelection) {
 
 					onSelectionChanged((ISelection) eventData);
 

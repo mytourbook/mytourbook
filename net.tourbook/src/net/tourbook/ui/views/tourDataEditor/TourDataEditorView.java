@@ -1559,97 +1559,105 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			@Override
 			public void tourChanged(final IWorkbenchPart part, final TourEventId eventId, final Object eventData) {
 
-				if ((_tourData == null) || (part == TourDataEditorView.this)) {
+				if (part == TourDataEditorView.this) {
 					return;
 				}
 
-				final long tourDataEditorTourId = _tourData.getTourId();
+				if ((eventId == TourEventId.TOUR_SELECTION) && eventData instanceof ISelection) {
 
-				if ((eventId == TourEventId.TOUR_CHANGED) && (eventData instanceof TourEvent)) {
+					onSelectionChanged((ISelection) eventData);
 
-					final TourEvent tourEvent = (TourEvent) eventData;
-					final ArrayList<TourData> modifiedTours = tourEvent.getModifiedTours();
+				} else {
 
-					if (modifiedTours == null) {
+					if (_tourData == null) {
 						return;
 					}
 
-					for (final TourData tourData : modifiedTours) {
-						if (tourData.getTourId() == tourDataEditorTourId) {
+					final long tourDataEditorTourId = _tourData.getTourId();
 
-							// update modified tour
+					if ((eventId == TourEventId.TOUR_CHANGED) && (eventData instanceof TourEvent)) {
 
-							if (tourEvent.tourDataEditorSavedTour == _tourData) {
+						final TourEvent tourEvent = (TourEvent) eventData;
+						final ArrayList<TourData> modifiedTours = tourEvent.getModifiedTours();
 
-								/*
-								 * nothing to do because the tour is already saved (it was not
-								 * modified before) and the UI is already updated
-								 */
-								return;
-							}
-
-							if (tourEvent.isReverted) {
-								setTourClean();
-							} else {
-								setTourDirty();
-							}
-
-							updateUI_FromModel(tourData, true, tourEvent.isReverted);
-
-							// nothing more to do, the editor contains only one tour
+						if (modifiedTours == null) {
 							return;
 						}
-					}
 
-					// removed old tour data from the selection provider
-					_postSelectionProvider.clearSelection();
+						for (final TourData tourData : modifiedTours) {
+							if (tourData.getTourId() == tourDataEditorTourId) {
 
-				} else if (eventId == TourEventId.TAG_STRUCTURE_CHANGED) {
+								// update modified tour
 
-					updateUI_FromModel(_tourData, false, true);
+								if (tourEvent.tourDataEditorSavedTour == _tourData) {
 
-				} else if ((eventId == TourEventId.TOUR_SELECTION) && eventData instanceof ISelection) {
+									/*
+									 * nothing to do because the tour is already saved (it was not
+									 * modified before) and the UI is already updated
+									 */
+									return;
+								}
 
-					onSelectionChanged((ISelection) eventData);
+								if (tourEvent.isReverted) {
+									setTourClean();
+								} else {
+									setTourDirty();
+								}
 
-				} else if (eventId == TourEventId.MARKER_SELECTION && eventData instanceof SelectionTourMarker) {
+								updateUI_FromModel(tourData, true, tourEvent.isReverted);
 
-					// ensure that the tour is displayed
-					onSelectionChanged((ISelection) eventData);
+								// nothing more to do, the editor contains only one tour
+								return;
+							}
+						}
 
-					final SelectionTourMarker tourMarkerSelection = (SelectionTourMarker) eventData;
+						// removed old tour data from the selection provider
+						_postSelectionProvider.clearSelection();
 
-					onSelectionChanged_TourMarker(tourMarkerSelection);
-
-				} else if (eventId == TourEventId.CLEAR_DISPLAYED_TOUR) {
-
-					clearEditorContent();
-
-				} else if (eventId == TourEventId.SEGMENT_LAYER_CHANGED) {
-
-					updateUI_FromModel(_tourData, true, true);
-
-				} else if (eventId == TourEventId.TOUR_CHART_PROPERTY_IS_MODIFIED) {
-
-					updateUI_FromModel(_tourData, true, true);
-
-				} else if (eventId == TourEventId.UPDATE_UI) {
-
-					// check if this tour data editor contains a tour which must be updated
-
-					// update editor
-					if (net.tourbook.ui.UI.containsTourId(eventData, tourDataEditorTourId) != null) {
-
-						// reload tour data
-						_tourData = TourManager.getInstance().getTourData(_tourData.getTourId());
+					} else if (eventId == TourEventId.TAG_STRUCTURE_CHANGED) {
 
 						updateUI_FromModel(_tourData, false, true);
+
+					} else if (eventId == TourEventId.MARKER_SELECTION && eventData instanceof SelectionTourMarker) {
+
+						// ensure that the tour is displayed
+						onSelectionChanged((ISelection) eventData);
+
+						final SelectionTourMarker tourMarkerSelection = (SelectionTourMarker) eventData;
+
+						onSelectionChanged_TourMarker(tourMarkerSelection);
+
+					} else if (eventId == TourEventId.CLEAR_DISPLAYED_TOUR) {
+
+						clearEditorContent();
+
+					} else if (eventId == TourEventId.SEGMENT_LAYER_CHANGED) {
+
+						updateUI_FromModel(_tourData, true, true);
+
+					} else if (eventId == TourEventId.TOUR_CHART_PROPERTY_IS_MODIFIED) {
+
+						updateUI_FromModel(_tourData, true, true);
+
+					} else if (eventId == TourEventId.UPDATE_UI) {
+
+						// check if this tour data editor contains a tour which must be updated
+
+						// update editor
+						if (net.tourbook.ui.UI.containsTourId(eventData, tourDataEditorTourId) != null) {
+
+							// reload tour data
+							_tourData = TourManager.getInstance().getTourData(_tourData.getTourId());
+
+							updateUI_FromModel(_tourData, false, true);
+						}
+
+					} else if (eventId == TourEventId.SLIDER_POSITION_CHANGED && eventData instanceof ISelection) {
+
+						onSelectionChanged((ISelection) eventData);
 					}
-
-				} else if (eventId == TourEventId.SLIDER_POSITION_CHANGED && eventData instanceof ISelection) {
-
-					onSelectionChanged((ISelection) eventData);
 				}
+
 			}
 		};
 
