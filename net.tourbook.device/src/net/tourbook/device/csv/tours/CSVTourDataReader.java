@@ -27,6 +27,7 @@ import java.util.Set;
 import java.util.StringTokenizer;
 
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.util.StatusUtil;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourTag;
 import net.tourbook.data.TourType;
@@ -97,6 +98,7 @@ public class CSVTourDataReader extends TourbookDevice {
 		return false;
 	}
 
+	@Override
 	public String getDeviceModeName(final int profileId) {
 		return null;
 	}
@@ -111,6 +113,7 @@ public class CSVTourDataReader extends TourbookDevice {
 		return -1;
 	}
 
+	@Override
 	public int getTransferDataSize() {
 		return -1;
 	}
@@ -387,9 +390,13 @@ public class CSVTourDataReader extends TourbookDevice {
 			}
 
 		} catch (final Exception e) {
-			e.printStackTrace();
+
+			StatusUtil.log(e);
+
 			return false;
+
 		} finally {
+
 			try {
 				if (fileReader != null) {
 					fileReader.close();
@@ -402,6 +409,7 @@ public class CSVTourDataReader extends TourbookDevice {
 					// fire modify event
 
 					display.syncExec(new Runnable() {
+						@Override
 						public void run() {
 							TourManager.fireEvent(TourEventId.TAG_STRUCTURE_CHANGED);
 						}
@@ -413,6 +421,7 @@ public class CSVTourDataReader extends TourbookDevice {
 					// fire modify event
 
 					display.syncExec(new Runnable() {
+						@Override
 						public void run() {
 							TourbookPlugin
 									.getDefault()
@@ -423,7 +432,7 @@ public class CSVTourDataReader extends TourbookDevice {
 				}
 
 			} catch (final IOException e) {
-				e.printStackTrace();
+				StatusUtil.log(e);
 			}
 		}
 
@@ -435,6 +444,7 @@ public class CSVTourDataReader extends TourbookDevice {
 	 * 
 	 * @return true for a valid .crp data format
 	 */
+	@Override
 	public boolean validateRawData(final String fileName) {
 
 		BufferedReader fileReader = null;

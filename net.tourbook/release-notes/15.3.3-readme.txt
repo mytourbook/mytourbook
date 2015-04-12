@@ -1,0 +1,31 @@
+Version 15.3.3                                             ?. April 2015
+
+
+
+DOKU DOKU DOKU DOKU DOKU DOKU DOKU DOKU DOKU DOKU DOKU DOKU DOKU DOKU DOKU DOKU DOKU DOKU DOKU DOKU DOKU 
+
+* Attach example files for csv import
+
+
+DOKU DOKU DOKU DOKU DOKU DOKU DOKU DOKU DOKU DOKU DOKU DOKU DOKU DOKU DOKU DOKU DOKU DOKU DOKU DOKU DOKU 
+
+
+New 	
+===
+
+
+Improvements
+============
+
+* GPX Import
+  - Support import of .gpx files which are not xml well formed, 
+    feature request #123 
+	 http://sourceforge.net/p/mytourbook/feature-requests/123/
+
+
+Bugfix
+======
+
+* Fixed import for FR70 device.
+
+  

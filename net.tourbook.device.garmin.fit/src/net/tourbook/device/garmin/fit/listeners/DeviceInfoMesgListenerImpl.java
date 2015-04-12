@@ -31,6 +31,8 @@ public class DeviceInfoMesgListenerImpl extends AbstractMesgListener implements 
 	public void onMesg(final DeviceInfoMesg mesg) {
 
 		final Short deviceType = mesg.getDeviceType();
+		final Short antDeviceType = mesg.getAntDeviceType();
+		final Short antplusDeviceType = mesg.getAntplusDeviceType();
 
 		if (deviceType != null) {
 
@@ -54,6 +56,23 @@ public class DeviceInfoMesgListenerImpl extends AbstractMesgListener implements 
 			if (hasPowerSensor) {
 				context.setPowerSensorPresent(hasPowerSensor);
 			}
+		}
+
+		if (deviceType != null || antDeviceType != null || antplusDeviceType != null) {
+
+//			System.out.println(String.format("\n"//
+//					+ "DeviceInfoMesg" //
+//					+ "\tdev %d" //
+//					+ "\tantDev %d" //
+//					+ "\tantplusDev %d"
+//					+ "\n", //$NON-NLS-1$
+////
+//					deviceType,
+//					antDeviceType,
+//					antplusDeviceType
+//			//
+//					));
+//			// TODO remove SYSTEM.OUT.PRINTLN
 		}
 	}
 
