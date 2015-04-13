@@ -92,6 +92,11 @@ public class GPX_SAX_Handler extends DefaultHandler {
 	private static final String				TAG_EXT_TEMP				= "gpxtpx:atemp";									//$NON-NLS-1$
 	private static final String				TAG_EXT_DISTANCE			= "gpxdata:distance";								//$NON-NLS-1$
 
+	// xmlns:un="http://www.falk.de/GPX/OutdoorExtension"
+	private static final String				TAG_EXT_UN_CAD				= "un:cad";										//$NON-NLS-1$
+	private static final String				TAG_EXT_UN_HR				= "un:hr";											//$NON-NLS-1$
+	private static final String				TAG_EXT_UN_POWER			= "un:power";										//$NON-NLS-1$
+
 	private static final String				ATTR_LATITUDE				= "lat";											//$NON-NLS-1$
 	private static final String				ATTR_LONGITUDE				= "lon";											//$NON-NLS-1$
 
@@ -131,9 +136,11 @@ public class GPX_SAX_Handler extends DefaultHandler {
 
 	// gpx extensions
 	private boolean							_isInCadence				= false;
-	private boolean							_isInHr						= false;
-	private boolean							_isInTemp					= false;
 	private boolean							_isInDistance				= false;
+	private boolean							_isInHr						= false;
+	private boolean							_isInPower					= false;
+	private boolean							_isInTemp					= false;
+
 	// www.cluetrust.com extensions
 	private boolean							_isInGpxDataExtension		= false;
 
@@ -231,6 +238,7 @@ public class GPX_SAX_Handler extends DefaultHandler {
 				|| _isInName
 				|| _isInCadence
 				|| _isInHr
+				|| _isInPower
 				|| _isInTemp
 				|| _isInDistance
 				//
@@ -323,9 +331,10 @@ public class GPX_SAX_Handler extends DefaultHandler {
 						_isInCadence = false;
 						_timeSlice.cadence = getFloatValue(charData);
 
-					} else if (name.equals(TAG_EXT_CAD_1)) {
+					} else if (name.equals(TAG_EXT_CAD_1) || name.equals(TAG_EXT_UN_CAD)) {
 
 						// </cadence>
+						// </un:cad>
 
 						_isInCadence = false;
 						_timeSlice.cadence = getIntValue(charData);
@@ -337,13 +346,23 @@ public class GPX_SAX_Handler extends DefaultHandler {
 						_isInHr = false;
 						_timeSlice.pulse = getFloatValue(charData);
 
-					} else if (name.equals(TAG_EXT_HR_1) || name.equals(TAG_EXT_HR_2)) {
+					} else if (name.equals(TAG_EXT_HR_1) //
+							|| name.equals(TAG_EXT_HR_2)
+							|| name.equals(TAG_EXT_UN_HR)) {
 
 						// </gpxdata:hr>
 						// </heartrate>
+						// </un:hr>
 
 						_isInHr = false;
 						_timeSlice.pulse = getIntValue(charData);
+
+					} else if (name.equals(TAG_EXT_UN_POWER)) {
+
+						// </un:power>
+
+						_isInPower = false;
+						_timeSlice.power = getFloatValue(charData);
 
 					} else if (name.equals(TAG_EXT_TEMP)) {
 
@@ -914,14 +933,24 @@ public class GPX_SAX_Handler extends DefaultHandler {
 						_isInTime = true;
 						_characters.delete(0, _characters.length());
 
-					} else if (name.equals(TAG_EXT_CAD) || name.equals(TAG_EXT_CAD_1)) {
+					} else if (name.equals(TAG_EXT_CAD) //
+							|| name.equals(TAG_EXT_CAD_1)
+							|| name.equals(TAG_EXT_UN_CAD)) {
 
 						_isInCadence = true;
 						_characters.delete(0, _characters.length());
 
-					} else if (name.equals(TAG_EXT_HR) || name.equals(TAG_EXT_HR_1) || name.equals(TAG_EXT_HR_2)) {
+					} else if (name.equals(TAG_EXT_HR)
+							|| name.equals(TAG_EXT_HR_1)
+							|| name.equals(TAG_EXT_HR_2)
+							|| name.equals(TAG_EXT_UN_HR)) {
 
 						_isInHr = true;
+						_characters.delete(0, _characters.length());
+
+					} else if (name.equals(TAG_EXT_UN_POWER)) {
+
+						_isInPower = true;
 						_characters.delete(0, _characters.length());
 
 					} else if (name.equals(TAG_EXT_TEMP)) {

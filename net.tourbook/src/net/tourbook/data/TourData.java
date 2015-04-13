@@ -3320,12 +3320,13 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 		 */
 		timeSerie = new int[serieSize];
 
-		final boolean isDistance = setupDistanceStartingValues(timeDataSerie, isAbsoluteData);
-		final boolean isAltitude = setupAltitudeStartingValues(timeDataSerie, isAbsoluteData);
-		final boolean isPulse = setupPulseStartingValues(timeDataSerie);
-		final boolean isCadence = setupCadenceStartingValues(timeDataSerie);
-		final boolean isTemperature = setupTemperatureStartingValues(timeDataSerie);
-		final boolean isGPS = setupLatLonStartingValues(timeDataSerie);
+		final boolean isDistance = setupStartingValues_Distance(timeDataSerie, isAbsoluteData);
+		final boolean isAltitude = setupStartingValues_Altitude(timeDataSerie, isAbsoluteData);
+		final boolean isPulse = setupStartingValues_Pulse(timeDataSerie);
+		final boolean isCadence = setupStartingValues_Cadence(timeDataSerie);
+		final boolean isPower = setupStartingValues_Power(timeDataSerie);
+		final boolean isTemperature = setupStartingValues_Temperature(timeDataSerie);
+		final boolean isGPS = setupStartingValues_LatLon(timeDataSerie);
 
 		/*
 		 * Speed
@@ -3336,17 +3337,6 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 			isSpeed = true;
 
 			isSpeedSerieFromDevice = true;
-		}
-
-		/*
-		 * Power
-		 */
-		boolean isPower = false;
-		if (firstTimeDataItem.power != Float.MIN_VALUE) {
-			powerSerie = new float[serieSize];
-			isPower = true;
-
-			isPowerSerieFromDevice = true;
 		}
 
 		// time in seconds relative to the tour start
@@ -6456,6 +6446,14 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 		this.tourType = tourType;
 	}
 
+	public void setupHistoryTour() {
+
+		// each tourData requires a tour id to identify it in equals();
+		tourId = System.nanoTime();
+
+		isHistoryTour = true;
+	}
+
 	/**
 	 * Search for first valid value and fill up the data serie until the first valid value is
 	 * reached.
@@ -6466,7 +6464,7 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 	 * @return Returns <code>true</code> when values are available in the data serie and
 	 *         {@link #altitudeSerie} has valid start values.
 	 */
-	private boolean setupAltitudeStartingValues(final TimeData[] timeDataSerie, final boolean isAbsoluteData) {
+	private boolean setupStartingValues_Altitude(final TimeData[] timeDataSerie, final boolean isAbsoluteData) {
 
 		final TimeData firstTimeData = timeDataSerie[0];
 		final int serieSize = timeDataSerie.length;
@@ -6518,7 +6516,7 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 		return isAvailable;
 	}
 
-	private boolean setupCadenceStartingValues(final TimeData[] timeDataSerie) {
+	private boolean setupStartingValues_Cadence(final TimeData[] timeDataSerie) {
 
 		final TimeData firstTimeData = timeDataSerie[0];
 		final int serieSize = timeDataSerie.length;
@@ -6557,7 +6555,7 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 		return isAvailable;
 	}
 
-	private boolean setupDistanceStartingValues(final TimeData[] timeDataSerie, final boolean isAbsoluteData) {
+	private boolean setupStartingValues_Distance(final TimeData[] timeDataSerie, final boolean isAbsoluteData) {
 
 		final TimeData firstTimeData = timeDataSerie[0];
 		final int serieSize = timeDataSerie.length;
@@ -6572,15 +6570,7 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 		return isAvailable;
 	}
 
-	public void setupHistoryTour() {
-
-		// each tourData requires a tour id to identify it in equals();
-		tourId = System.nanoTime();
-
-		isHistoryTour = true;
-	}
-
-	private boolean setupLatLonStartingValues(final TimeData[] timeDataSerie) {
+	private boolean setupStartingValues_LatLon(final TimeData[] timeDataSerie) {
 
 		final int serieSize = timeDataSerie.length;
 		boolean isGPS = false;
@@ -6613,7 +6603,50 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 		return isGPS;
 	}
 
-	private boolean setupPulseStartingValues(final TimeData[] timeDataSerie) {
+	private boolean setupStartingValues_Power(final TimeData[] timeDataSerie) {
+
+		final TimeData firstTimeData = timeDataSerie[0];
+		final int serieSize = timeDataSerie.length;
+
+		boolean isAvailable = false;
+
+		if (firstTimeData.power == Float.MIN_VALUE) {
+
+			for (int timeDataIndex = 0; timeDataIndex < serieSize; timeDataIndex++) {
+
+				final TimeData timeData = timeDataSerie[timeDataIndex];
+				final float power = timeData.power;
+
+				if (power != Float.MIN_VALUE) {
+
+					// power values are available, starting values are set to 0
+
+					powerSerie = new float[serieSize];
+					isAvailable = true;
+
+					// update values to 0
+					for (int invalidIndex = 0; invalidIndex < timeDataIndex; invalidIndex++) {
+						timeDataSerie[invalidIndex].power = 0;
+					}
+
+					break;
+				}
+			}
+
+		} else {
+
+			// power values are available
+
+			powerSerie = new float[serieSize];
+			isAvailable = true;
+		}
+
+		isPowerSerieFromDevice = isAvailable;
+
+		return isAvailable;
+	}
+
+	private boolean setupStartingValues_Pulse(final TimeData[] timeDataSerie) {
 
 		final TimeData firstTimeData = timeDataSerie[0];
 		final int serieSize = timeDataSerie.length;
@@ -6653,7 +6686,7 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 		return isAvailable;
 	}
 
-	private boolean setupTemperatureStartingValues(final TimeData[] timeDataSerie) {
+	private boolean setupStartingValues_Temperature(final TimeData[] timeDataSerie) {
 
 		final TimeData firstTimeData = timeDataSerie[0];
 		final int serieSize = timeDataSerie.length;
