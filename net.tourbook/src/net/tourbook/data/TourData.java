@@ -4472,12 +4472,14 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 	}
 
 	/**
-	 * @return the calories
+	 * @return Returns the calories or <code>0</code> when calories are not available.
 	 */
 	public int getCalories() {
+
 		if (calories == null) {
 			return 0;
 		}
+
 		return calories;
 	}
 

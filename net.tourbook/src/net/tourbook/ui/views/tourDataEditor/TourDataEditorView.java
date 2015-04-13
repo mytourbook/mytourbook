@@ -28,6 +28,7 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -4247,7 +4248,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		_txtAltitudeUp.setEnabled(isManualAndEdit);
 		_txtAltitudeDown.setEnabled(isManualAndEdit);
 
-		_spinTourCalories.setEnabled(isManualAndEdit);
+		_spinTourCalories.setEnabled(canEdit);
 		_spinRestPuls.setEnabled(canEdit);
 
 		_linkTag.setEnabled(canEdit);
@@ -4744,7 +4745,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	 * @return Returns the title of the active tour
 	 */
 	public String getTourTitle() {
-		return TourManager.getTourTitle(_tourData);
+
+		final Date tourDate = _tourData.getTourStartTime().toDate();
+
+		return TourManager.getTourTitle(tourDate);
 	}
 
 	@Override

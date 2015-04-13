@@ -21,6 +21,11 @@ Improvements
   - Support import of .gpx files which are not xml well formed, 
     feature request #123 
 	 http://sourceforge.net/p/mytourbook/feature-requests/123/
+	
+  - Import values with these tags: <un:cad> <un:hr> <un:power>
+
+* Tour Editor
+  - Calories can always be edited, removed restriction.
 
 
 Bugfix

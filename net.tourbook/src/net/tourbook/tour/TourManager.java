@@ -560,6 +560,7 @@ public class TourManager {
 
 		return _instance;
 	}
+
 	/**
 	 * Searches all tour providers in the workbench and returns tours which are selected
 	 * 
@@ -682,7 +683,12 @@ public class TourManager {
 	}
 
 	public static String getTourTitle(final Date date) {
-		return getTourDateLong(date) //
+
+		final String weekDay = net.tourbook.ui.UI.WeekDayFormatter.format(date);
+
+		return weekDay //
+				+ UI.COMMA_SPACE
+				+ getTourDateLong(date)
 				+ UI.DASH_WITH_SPACE
 				+ getTourTimeShort(date);
 	}
@@ -691,6 +697,7 @@ public class TourManager {
 	 * @return returns the title of this tour
 	 */
 	public static String getTourTitle(final TourData tourData) {
+
 		return getTourDateLong(getTourDateTime(tourData).toDate())//
 				+ UI.DASH_WITH_SPACE
 				+ getTourTimeShort(tourData);
@@ -1124,8 +1131,8 @@ public class TourManager {
 	}
 
 	private static void removeTimeSlices_TimeAndDistance(	final TourData _tourData,
-														final int firstIndex,
-														final int lastIndex) {
+															final int firstIndex,
+															final int lastIndex) {
 
 		final int[] timeSerie = _tourData.timeSerie;
 		final float[] distSerie = _tourData.distanceSerie;
