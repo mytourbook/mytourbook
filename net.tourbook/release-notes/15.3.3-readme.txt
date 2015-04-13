@@ -27,6 +27,9 @@ Improvements
 * Tour Editor
   - Calories can always be edited, removed restriction.
 
+* Tour Calendar
+  - Prevent that empty lines are displayed.
+  - Prevent that the same text is displayed multiple times for the same tour.
 
 Bugfix
 ======

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2011-2014  Matthias Helmling and Contributors
+ * Copyright (C) 2011-2015 Matthias Helmling and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -154,6 +154,11 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 	private boolean								_showDayNumberInTinyView	= false;
 	Point										_refTextExtent;
 
+	/**
+	 * Cache font height;
+	 */
+	private int									_fontHeight;
+
 	private class Day {
 
 		private long	dayId;
@@ -239,6 +244,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 	private void addListener() {
 
 		addPaintListener(new PaintListener() {
+			@Override
 			public void paintControl(final PaintEvent event) {
 				drawCalendar(event.gc);
 			}
@@ -258,6 +264,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 			}
 
+			@Override
 			public void mouseDown(final MouseEvent e) {
 				onMouseMove(e);
 			}
@@ -270,6 +277,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		});
 
 		addMouseMoveListener(new MouseMoveListener() {
+			@Override
 			public void mouseMove(final MouseEvent e) {
 				onMouseMove(e);
 			}
@@ -277,11 +285,13 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 		addFocusListener(new FocusListener() {
 
+			@Override
 			public void focusGained(final FocusEvent e) {
 				// System.out.println("Focus gained");
 				// redraw();
 			}
 
+			@Override
 			public void focusLost(final FocusEvent e) {
 				// System.out.println("Focus lost");
 				// redraw();
@@ -319,6 +329,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		});
 
 		addListener(SWT.KeyDown, new Listener() {
+			@Override
 			public void handleEvent(final Event event) {
 				switch (event.keyCode) {
 				case SWT.ARROW_LEFT:
@@ -424,6 +435,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 //		});
 
 		addListener(SWT.MouseWheel, new Listener() {
+			@Override
 			public void handleEvent(final Event event) {
 				final Point p = new Point(event.x, event.y);
 				if (_calendarAllDaysRectangle.contains(p)) {
@@ -462,6 +474,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		});
 
 		addDisposeListener(new DisposeListener() {
+			@Override
 			public void widgetDisposed(final DisposeEvent e) {
 				_colorCache.dispose();
 			}
@@ -477,24 +490,29 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 		addFocusListener(new FocusListener() {
 
+			@Override
 			public void focusGained(final FocusEvent e) {
 				// redraw();
 			}
 
+			@Override
 			public void focusLost(final FocusEvent e) {
 				// redraw();
 			}
 		});
 
 		addMouseTrackListener(new MouseTrackListener() {
+			@Override
 			public void mouseEnter(final MouseEvent e) {
 				// forceFocus();
 			}
 
+			@Override
 			public void mouseExit(final MouseEvent e) {
 				redraw();
 			}
 
+			@Override
 			public void mouseHover(final MouseEvent e) {}
 		});
 
@@ -527,6 +545,8 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 //		System.out.println(_graphClean ? "clean!" : "NOT clean!");
 //		System.out.println(_highlightChanged ? "HL changed!" : "HL NOT changed");
 //		System.out.println("-----------");
+
+		_fontHeight = gc.getFontMetrics().getHeight();
 
 		if (_graphClean && _image != null) {
 
@@ -987,16 +1007,29 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 		gc.setForeground(fg);
 		gc.setClipping(r.x + 1, r.y, r.width - 2, r.height);
+
 		int y = r.y + 1;
-		final int fontHeight = gc.getFontMetrics().getHeight();
-		// final int minToShow = (2 * gc.stringExtent("Hello").y / 3);
-		final int minToShow = (2 * fontHeight / 3);
-		for (int i = 0; i < _tourInfoFormatter.length && y < r.y + r.height - minToShow; i++) {
-			final String info = _tourInfoFormatter[i].format(data);
-			gc.drawText(info, r.x + 2, y, true);
-			// y += gc.stringExtent(info).y;
-			y += fontHeight;
+		final int minToShow = (2 * _fontHeight / 3);
+
+		String prevInfo = null;
+
+		for (int formatterIndex = 0; formatterIndex < _tourInfoFormatter.length && y < r.y + r.height - minToShow; formatterIndex++) {
+
+			final String info = _tourInfoFormatter[formatterIndex].format(data);
+
+			// Prevent that the same text is displayed multiple times.
+			if (info.length() > 0 && info.equals(prevInfo) == false) {
+
+				// this is another text
+
+				gc.drawText(info, r.x + 2, y, true);
+
+				y += _fontHeight;
+			}
+
+			prevInfo = info;
 		}
+
 		gc.setClipping(_nullRec);
 	}
 
@@ -1043,7 +1076,6 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		String text;
 		final boolean doClip = true;
 
-		final int fontHeight = gc.getFontMetrics().getHeight();
 //		final int minToShow = (2 * fontHeight / 3);
 
 		Point extent;
@@ -1073,7 +1105,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 				}
 				gc.drawText(text, xx, y);
 			}
-			y += fontHeight;
+			y += _fontHeight;
 		}
 
 		gc.setFont(normalFont);
@@ -1088,6 +1120,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		for (final Object listener2 : listeners) {
 			final ICalendarSelectionProvider listener = (ICalendarSelectionProvider) listener2;
 			SafeRunnable.run(new SafeRunnable() {
+				@Override
 				public void run() {
 					listener.selectionChanged(selection);
 				}
@@ -1101,6 +1134,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		for (final Object listener2 : listeners) {
 			final ICalendarSelectionProvider listener = (ICalendarSelectionProvider) listener2;
 			SafeRunnable.run(new SafeRunnable() {
+				@Override
 				public void run() {
 					listener.selectionChanged(_selectedItem);
 				}
