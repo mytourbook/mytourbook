@@ -211,9 +211,6 @@ public class Messages extends NLS {
 	public static String		action_tour_editor_delete_time_slices_keep_time;
 	public static String		action_tour_editor_delete_time_slices_remove_time;
 	public static String		action_tourbook_select_year_month_tours;
-	public static String		action_tourbook_year_sub;
-	public static String		action_tourbook_year_sub_month;
-	public static String		action_tourbook_year_sub_week;
 	public static String		action_tourCatalog_open_compare_wizard;
 	public static String		action_tourType_modify_tourTypes;
 
@@ -717,7 +714,6 @@ public class Messages extends NLS {
 	public static String		Image__synch_statistics;
 	public static String		Image__synch_statistics_Disabled;
 	public static String		Image__SearchExternal;
-
 	public static String		Image__SearchExternal_Disabled;
 
 	//	public static String		Image__Symbol_Difference;
@@ -730,10 +726,11 @@ public class Messages extends NLS {
 	public static String		Image__tour_new_disabled;
 	public static String		Image__tour_options;
 	public static String		Image__tour_viewer;
+	public static String		Image__TourBook_Month;
+	public static String		Image__TourBook_Week;
 	public static String		Image__TourChart;
 	public static String		Image__TourMarker;
 	public static String		Image__TourSegments;
-
 	public static String		Image__TourSegments_Disabled;
 
 	//	public static String		Image__TourSignImport;
@@ -1311,6 +1308,7 @@ public class Messages extends NLS {
 	public static String		Tour_Book_Action_DeleteSelectedTours_Monitor;
 	public static String		Tour_Book_Action_DeleteSelectedTours_MonitorSubtask;
 	public static String		Tour_Book_Action_ExportViewCSV;
+	public static String		Tour_Book_Action_ToggleMonthWeek_Tooltip;
 	public static String		Tour_Book_Combo_statistic_tooltip;
 	public static String		Tour_Book_Combo_year_tooltip;
 	public static String		Tour_Book_Label_chart_title;

@@ -191,7 +191,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 	private static final String							CSV_EXPORT_DEFAULT_FILE_NAME		= "TourBook_";								//$NON-NLS-1$
 	private static final String							CSV_EXPORT_DURATION_HHH_MM_SS		= "hhh:mm:ss";								//$NON-NLS-1$
 
-	private static int									_yearSubCategory					= TourItem.ITEM_TYPE_MONTH;
+	private static int									_yearSubCategory					= TVITourBookItem.ITEM_TYPE_MONTH;
 
 	private final IPreferenceStore						_prefStore							= TourbookPlugin
 																									.getPrefStore();
@@ -256,13 +256,6 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 	private TagMenuManager								_tagMenuMgr;
 	private TreeViewerTourInfoToolTip					_tourInfoToolTip;
 
-	/*
-	 * UI controls
-	 */
-	private Composite									_viewerContainer;
-
-	private TreeViewer									_tourViewer;
-
 	private ActionCollapseAll							_actionCollapseAll;
 	private ActionCollapseOthers						_actionCollapseOthers;
 	private ActionComputeDistanceValuesFromGeoposition	_actionComputeDistanceValuesFromGeoposition;
@@ -286,7 +279,14 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 	private ActionSetAltitudeValuesFromSRTM				_actionSetAltitudeFromSRTM;
 	private ActionSetTourTypeMenu						_actionSetTourType;
 	private ActionSetPerson								_actionSetOtherPerson;
-	private ActionYearSubCategorySelect					_actionYearSubCategorySelect;
+	private ActionToggleMonthWeek						_actionToggleMonthWeek;
+
+	/*
+	 * UI controls
+	 */
+	private Composite									_viewerContainer;
+
+	private TreeViewer									_tourViewer;
 
 	private PixelConverter								_pc;
 
@@ -415,6 +415,30 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 			// reselect selection
 			_tourViewer.setSelection(_tourViewer.getSelection());
 		}
+	}
+
+	void actionToggleMonthWeek() {
+
+		if (_yearSubCategory == TVITourBookItem.ITEM_TYPE_WEEK) {
+
+			// toggle to month
+
+			_yearSubCategory = TVITourBookItem.ITEM_TYPE_MONTH;
+
+			_actionToggleMonthWeek.setImageDescriptor(//
+					TourbookPlugin.getImageDescriptor(Messages.Image__TourBook_Week));
+
+		} else {
+
+			// toggle to week
+
+			_yearSubCategory = TVITourBookItem.ITEM_TYPE_WEEK;
+
+			_actionToggleMonthWeek.setImageDescriptor(//
+					TourbookPlugin.getImageDescriptor(Messages.Image__TourBook_Month));
+		}
+
+		reopenFirstSelectedTour();
 	}
 
 	private void addPartListener() {
@@ -578,7 +602,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		_actionSetOtherPerson = new ActionSetPerson(this);
 		_actionSetTourType = new ActionSetTourTypeMenu(this);
 		_actionSelectAllTours = new ActionSelectAllTours(this);
-		_actionYearSubCategorySelect = new ActionYearSubCategorySelect(this);
+		_actionToggleMonthWeek = new ActionToggleMonthWeek(this);
 
 		_tagMenuMgr = new TagMenuManager(this, true);
 
@@ -2521,7 +2545,6 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		 */
 		final IMenuManager menuMgr = getViewSite().getActionBars().getMenuManager();
 		menuMgr.add(_actionSelectAllTours);
-		menuMgr.add(_actionYearSubCategorySelect);
 		menuMgr.add(new Separator());
 
 		menuMgr.add(_actionModifyColumns);
@@ -2530,6 +2553,8 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		 * fill view toolbar
 		 */
 		final IToolBarManager tbm = getViewSite().getActionBars().getToolBarManager();
+
+		tbm.add(_actionToggleMonthWeek);
 
 		tbm.add(_actionExpandSelection);
 		tbm.add(_actionCollapseAll);
@@ -2889,19 +2914,23 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		tree.setRedraw(true);
 	}
 
-	public void reopenFirstSelectedTour() {
+	void reopenFirstSelectedTour() {
 
-		Object selection = ((IStructuredSelection) _tourViewer.getSelection()).getFirstElement();
 		_selectedYear = -1;
 		_selectedYearSub = -1;
-		TVITourBookTour item = null;
+		TVITourBookTour selectedTourItem = null;
+
+		Object selection = ((IStructuredSelection) _tourViewer.getSelection()).getFirstElement();
 		if (selection instanceof TVITourBookTour) {
-			item = (TVITourBookTour) selection;
-			_selectedYear = item.tourYear;
+
+			selectedTourItem = (TVITourBookTour) selection;
+
+			_selectedYear = selectedTourItem.tourYear;
+
 			if (getYearSub() == TVITourBookItem.ITEM_TYPE_WEEK) {
-				_selectedYearSub = item.tourWeek;
+				_selectedYearSub = selectedTourItem.tourWeek;
 			} else {
-				_selectedYearSub = item.tourMonth;
+				_selectedYearSub = selectedTourItem.tourMonth;
 			}
 		}
 
@@ -2910,10 +2939,12 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 
 		selection = ((IStructuredSelection) _tourViewer.getSelection()).getFirstElement();
 		if (selection instanceof TVITourBookTour) {
-			item = (TVITourBookTour) selection;
+
+			selectedTourItem = (TVITourBookTour) selection;
+
 			_tourViewer.collapseAll();
-			_tourViewer.expandToLevel(item, 0);
-			_tourViewer.setSelection(new StructuredSelection(item), false);
+			_tourViewer.expandToLevel(selectedTourItem, 0);
+			_tourViewer.setSelection(new StructuredSelection(selectedTourItem), false);
 		}
 	}
 
@@ -3022,8 +3053,14 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 
 		_actionSelectAllTours.setChecked(_state.getBoolean(STATE_IS_SELECT_YEAR_MONTH_TOURS));
 
-		_yearSubCategory = Util.getStateInt(_state, STATE_YEAR_SUB_CATEGORY, TourItem.ITEM_TYPE_MONTH);
-		_actionYearSubCategorySelect.setSubCategoryChecked(_yearSubCategory);
+		/*
+		 * Year sub category
+		 */
+		_yearSubCategory = Util.getStateInt(_state, STATE_YEAR_SUB_CATEGORY, TVITourBookItem.ITEM_TYPE_MONTH);
+		_actionToggleMonthWeek.setImageDescriptor(//
+				TourbookPlugin.getImageDescriptor(_yearSubCategory == TVITourBookItem.ITEM_TYPE_WEEK
+						? Messages.Image__TourBook_Month
+						: Messages.Image__TourBook_Week));
 
 		updateToolTipState();
 	}
@@ -3067,10 +3104,6 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 	@Override
 	public void setFocus() {
 		_tourViewer.getControl().setFocus();
-	}
-
-	public void setYearSub(final int tourItemType) {
-		_yearSubCategory = tourItemType;
 	}
 
 	private void updateToolTipState() {

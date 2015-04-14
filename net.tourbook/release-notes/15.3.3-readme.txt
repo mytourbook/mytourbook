@@ -31,6 +31,9 @@ Improvements
   - Prevent that empty lines are displayed.
   - Prevent that the same text is displayed multiple times for the same tour.
 
+* Tour Book
+  - Toggle between year subcategories with an action button in the toolbar. Previously this action was in a view submenu.
+  
 Bugfix
 ======
 
