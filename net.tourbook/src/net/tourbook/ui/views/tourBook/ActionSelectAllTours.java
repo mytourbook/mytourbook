@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -16,6 +16,7 @@
 package net.tourbook.ui.views.tourBook;
 
 import net.tourbook.Messages;
+import net.tourbook.application.TourbookPlugin;
 
 import org.eclipse.jface.action.Action;
 
@@ -30,6 +31,7 @@ public class ActionSelectAllTours extends Action {
 		_tourViewer = tourViewer;
 
 		setText(Messages.action_tourbook_select_year_month_tours);
+		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__TourBook_SelectAll));
 	}
 
 	@Override

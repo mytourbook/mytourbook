@@ -32,7 +32,7 @@ Improvements
   - Prevent that the same text is displayed multiple times for the same tour.
 
 * Tour Book
-  - Toggle between year subcategories with an action button in the toolbar. Previously this action was in a view submenu.
+  - Moved first two actions from the view menu into the view toolbar. This makes it easier to access it.
   
 Bugfix
 ======

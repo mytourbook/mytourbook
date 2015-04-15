@@ -2544,8 +2544,6 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		 * fill view menu
 		 */
 		final IMenuManager menuMgr = getViewSite().getActionBars().getMenuManager();
-		menuMgr.add(_actionSelectAllTours);
-		menuMgr.add(new Separator());
 
 		menuMgr.add(_actionModifyColumns);
 
@@ -2554,8 +2552,10 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		 */
 		final IToolBarManager tbm = getViewSite().getActionBars().getToolBarManager();
 
+		tbm.add(_actionSelectAllTours);
 		tbm.add(_actionToggleMonthWeek);
 
+		tbm.add(new Separator());
 		tbm.add(_actionExpandSelection);
 		tbm.add(_actionCollapseAll);
 

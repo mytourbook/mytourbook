@@ -727,6 +727,7 @@ public class Messages extends NLS {
 	public static String		Image__tour_options;
 	public static String		Image__tour_viewer;
 	public static String		Image__TourBook_Month;
+	public static String		Image__TourBook_SelectAll;
 	public static String		Image__TourBook_Week;
 	public static String		Image__TourChart;
 	public static String		Image__TourMarker;
