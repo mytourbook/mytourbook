@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -182,43 +182,38 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
 
 	private DateTime							_extractedTourStartTime;
 
+	private ActionOpenPrefDialog				_actionOpenTourTypePrefs;
+
+	private TourPerson[]						_people;
+	protected Point								_shellDefaultSize;
+	private TagMenuManager						_tagMenuMgr;
+
 	/*
 	 * UI controls
 	 */
 	private Composite							_dlgInnerContainer;
 
-	private Text								_txtTourTitle;
-	private Combo								_cboTourTitleSource;
-
-	private Combo								_cboSplitMethod;
-
-	private Button								_chkKeepOriginalDateTime;
-	private Label								_lblTourStartDate;
-	private Label								_lblTourStartTime;
-	private org.eclipse.swt.widgets.DateTime	_dtTourDate;
-	private org.eclipse.swt.widgets.DateTime	_dtTourTime;
-
-	private Combo								_cboTourTypeSource;
-	private Link								_linkTourType;
-	private CLabel								_lblTourType;
-
-	private Link								_linkTag;
-	private Label								_lblTourTags;
-
 	private Combo								_cboPerson;
+	private Combo								_cboSplitMethod;
+	private Combo								_cboTourTitleSource;
+	private Combo								_cboTourTypeSource;
 
 	private Button								_chkIncludeDescription;
 	private Button								_chkIncludeMarkerWaypoints;
+	private Button								_chkKeepOriginalDateTime;
 
-	private ActionOpenPrefDialog				_actionOpenTourTypePrefs;
+	private org.eclipse.swt.widgets.DateTime	_dtTourDate;
+	private org.eclipse.swt.widgets.DateTime	_dtTourTime;
 
-	/*
-	 * end of UI controls
-	 */
+	private Label								_lblTourStartDate;
+	private Label								_lblTourStartTime;
+	private Label								_lblTourTags;
+	private CLabel								_lblTourType;
 
-	private TourPerson[]						_people;
-	protected Point								_shellDefaultSize;
-	private TagMenuManager						_tagMenuMgr;
+	private Link								_linkTourType;
+	private Link								_linkTag;
+
+	private Text								_txtTourTitle;
 
 	/**
 	 * Split or extract a tour
@@ -426,19 +421,19 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
 		GridLayoutFactory.swtDefaults().margins(10, 10).numColumns(3).spacing(10, 8).applyTo(_dlgInnerContainer);
 //		_dlgInnerContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
 		{
-			createUI10SplitMethod(_dlgInnerContainer);
-			createUI20Title(_dlgInnerContainer);
-			createUI22TourTime(_dlgInnerContainer, defaultSelectionAdapter);
-			createUI30TypeTags(_dlgInnerContainer);
-			createUI40Person(_dlgInnerContainer);
-			createUI50DescriptionMarker(_dlgInnerContainer, defaultSelectionAdapter);
+			createUI_10_SplitMethod(_dlgInnerContainer);
+			createUI_20_Title(_dlgInnerContainer);
+			createUI_22_TourTime(_dlgInnerContainer, defaultSelectionAdapter);
+			createUI_30_TypeTags(_dlgInnerContainer);
+			createUI_40_Person(_dlgInnerContainer);
+			createUI_50_DescriptionMarker(_dlgInnerContainer, defaultSelectionAdapter);
 		}
 	}
 
 	/**
 	 * split method
 	 */
-	private void createUI10SplitMethod(final Composite parent) {
+	private void createUI_10_SplitMethod(final Composite parent) {
 
 		// label
 		final Label label = new Label(parent, SWT.NONE);
@@ -461,7 +456,7 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
 	/**
 	 * tour title
 	 */
-	private void createUI20Title(final Composite parent) {
+	private void createUI_20_Title(final Composite parent) {
 
 		// label: title
 		final Label label = new Label(parent, SWT.NONE);
@@ -502,7 +497,7 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
 	/**
 	 * tour time
 	 */
-	private void createUI22TourTime(final Composite parent, final SelectionAdapter defaultSelectionAdapter) {
+	private void createUI_22_TourTime(final Composite parent, final SelectionAdapter defaultSelectionAdapter) {
 
 		final SelectionAdapter dateTimeUpdateListener = new SelectionAdapter() {
 			@Override
@@ -566,7 +561,7 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
 	 * 
 	 * @param defaultSelectionAdapter
 	 */
-	private void createUI30TypeTags(final Composite parent) {
+	private void createUI_30_TypeTags(final Composite parent) {
 
 		/*
 		 * tour type
@@ -641,7 +636,7 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
 	/**
 	 * person
 	 */
-	private void createUI40Person(final Composite parent) {
+	private void createUI_40_Person(final Composite parent) {
 
 		// label
 		final Label label = new Label(parent, SWT.NONE);
@@ -661,7 +656,7 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
 	/**
 	 * checkbox: set marker for each tour
 	 */
-	private void createUI50DescriptionMarker(final Composite parent, final SelectionAdapter defaultSelectionAdapter) {
+	private void createUI_50_DescriptionMarker(final Composite parent, final SelectionAdapter defaultSelectionAdapter) {
 
 		/*
 		 * checkbox: description
@@ -737,6 +732,7 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
 		final float[] tourAltitudeSerie = _tourDataSource.altitudeSerie;
 		final float[] tourCadenceSerie = _tourDataSource.cadenceSerie;
 		final float[] tourDistanceSerie = _tourDataSource.distanceSerie;
+		final long[] tourGearSerie = _tourDataSource.gearSerie;
 		final double[] tourLatitudeSerie = _tourDataSource.latitudeSerie;
 		final double[] tourLongitudeSerie = _tourDataSource.longitudeSerie;
 		final float[] tourPulseSerie = _tourDataSource.pulseSerie;
@@ -746,6 +742,7 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
 		final boolean isTourAltitude = (tourAltitudeSerie != null) && (tourAltitudeSerie.length > 0);
 		final boolean isTourCadence = (tourCadenceSerie != null) && (tourCadenceSerie.length > 0);
 		final boolean isTourDistance = (tourDistanceSerie != null) && (tourDistanceSerie.length > 0);
+		final boolean isTourGear = (tourGearSerie != null) && (tourGearSerie.length > 0);
 		final boolean isTourLat = (tourLatitudeSerie != null) && (tourLatitudeSerie.length > 0);
 		final boolean isTourLon = (tourLongitudeSerie != null) && (tourLongitudeSerie.length > 0);
 		final boolean isTourPulse = (tourPulseSerie != null) && (tourPulseSerie.length > 0);
@@ -774,6 +771,8 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
 			dataSerieLength = tourCadenceSerie.length;
 		} else if (isTourDistance) {
 			dataSerieLength = tourDistanceSerie.length;
+		} else if (isTourGear) {
+			dataSerieLength = tourGearSerie.length;
 		} else if (isTourLat) {
 			dataSerieLength = tourLatitudeSerie.length;
 		} else if (isTourLon) {
@@ -805,6 +804,7 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
 		final float[] extractAltitudeSerie = new float[extractSerieLength];
 		final float[] extractCadenceSerie = new float[extractSerieLength];
 		final float[] extractDistanceSerie = new float[extractSerieLength];
+		final long[] extractGearSerie = new long[extractSerieLength];
 		final double[] extractLatitudeSerie = new double[extractSerieLength];
 		final double[] extractLongitudeSerie = new double[extractSerieLength];
 		final float[] extractPowerSerie = new float[extractSerieLength];
@@ -870,21 +870,30 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
 				extractDistanceSerie[extractedSerieIndex] = tourDistanceSerie[sourceSerieIndex] - relTourStartDistance;
 			}
 
-			if (isTourPulse) {
-				extractPulseSerie[extractedSerieIndex] = tourPulseSerie[sourceSerieIndex];
+			if (isTourGear) {
+				extractGearSerie[extractedSerieIndex] = tourGearSerie[sourceSerieIndex];
 			}
+
 			if (isTourLat) {
 				extractLatitudeSerie[extractedSerieIndex] = tourLatitudeSerie[sourceSerieIndex];
 			}
+
 			if (isTourLon) {
 				extractLongitudeSerie[extractedSerieIndex] = tourLongitudeSerie[sourceSerieIndex];
 			}
+
+			if (isTourPulse) {
+				extractPulseSerie[extractedSerieIndex] = tourPulseSerie[sourceSerieIndex];
+			}
+
 			if (isTourTemperature) {
 				extractTemperatureSerie[extractedSerieIndex] = tourTemperatureSerie[sourceSerieIndex];
 			}
+
 			if (isTourPower) {
 				extractPowerSerie[extractedSerieIndex] = tourPowerSerie[sourceSerieIndex];
 			}
+
 			if (isTourSpeed) {
 				extractSpeedSerie[extractedSerieIndex] = tourSpeedSerie[sourceSerieIndex];
 			}
@@ -985,6 +994,9 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
 				: Messages.Dialog_ExtractTour_Label_DeviceName);
 
 		_tourDataTarget.setIsDistanceFromSensor(_tourDataSource.isDistanceSensorPresent());
+		_tourDataTarget.setIsPowerSensorPresent(_tourDataSource.isDistanceSensorPresent());
+		_tourDataTarget.setIsPulseSensorPresent(_tourDataSource.isPulseSensorPresent());
+
 		_tourDataTarget.setDeviceTimeInterval(_tourDataSource.getDeviceTimeInterval());
 
 		_tourDataTarget.setTourRecordingTime(extractedRecordingTime);
@@ -1008,6 +1020,9 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
 		}
 		if (isTourCadence) {
 			_tourDataTarget.cadenceSerie = extractCadenceSerie;
+		}
+		if (isTourGear) {
+			_tourDataTarget.setGears(extractGearSerie);
 		}
 		if (isTourLat) {
 			_tourDataTarget.latitudeSerie = extractLatitudeSerie;

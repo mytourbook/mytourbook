@@ -23,6 +23,7 @@ import net.tourbook.common.util.PostSelectionProvider;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.tour.ITourEventListener;
+import net.tourbook.tour.SelectionTourData;
 import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.SelectionTourIds;
 import net.tourbook.tour.SelectionTourMarker;
@@ -488,6 +489,13 @@ public class TourPhotosView extends ViewPart implements IPhotoEventListener {
 			getPhotos(allPhotos, tourData);
 			updateUI(allPhotos);
 
+		} else if (selection instanceof SelectionTourData) {
+
+			final TourData tourData = ((SelectionTourData) selection).getTourData();
+
+			getPhotos(allPhotos, tourData);
+			updateUI(allPhotos);
+
 		} else if (selection instanceof SelectionTourId) {
 
 			final SelectionTourId tourIdSelection = (SelectionTourId) selection;
@@ -580,33 +588,21 @@ public class TourPhotosView extends ViewPart implements IPhotoEventListener {
 
 	private void showTour() {
 
-		onSelectionChanged(getSite().getWorkbenchWindow().getSelectionService().getSelection());
+		Display.getCurrent().asyncExec(new Runnable() {
+			@Override
+			public void run() {
 
-//		if (_currentPhotoSelection == null) {
-//
-//			// a tour is not displayed, find a tour provider which provides a tour
-//			Display.getCurrent().asyncExec(new Runnable() {
-//				public void run() {
-//
-//					// validate widget
-//					if (_photoGallery.isDisposed()) {
-//						return;
-//					}
-//
-//					/*
-//					 * check if tour was set from a selection provider
-//					 */
-//					if (_currentPhotoSelection != null) {
-//						return;
-//					}
-//
-//					final ArrayList<TourData> selectedTours = TourManager.getSelectedTours();
-//					if (selectedTours != null && selectedTours.size() > 0) {
-//						updateUI(selectedTours.get(0));
-//					}
-//				}
-//			});
-//		}
+				// validate widget
+				if (_photoGallery.isDisposed()) {
+					return;
+				}
+
+				final ArrayList<TourData> selectedTours = TourManager.getSelectedTours();
+				if (selectedTours != null && selectedTours.size() > 0) {
+					onSelectionChanged(new SelectionTourData(selectedTours.get(0)));
+				}
+			}
+		});
 	}
 
 	private void updateColors(final boolean isRestore) {

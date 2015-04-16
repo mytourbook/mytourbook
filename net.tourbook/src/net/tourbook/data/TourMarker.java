@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -254,6 +254,12 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 	private long					_createId									= 0;
 
 	/**
+	 * Device time in ms.
+	 */
+	@Transient
+	private long					_deviceLapTime;
+
+	/**
 	 * 
 	 */
 	private static int				_defaultSignImageMaxSize					= -1;
@@ -391,6 +397,10 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 		return description == null ? UI.EMPTY_STRING : description;
 	}
 
+	public long getDeviceLapTime() {
+		return _deviceLapTime;
+	}
+
 	/**
 	 * @return Returns distance in meters in the metric system or -1 when the distance is not
 	 *         available
@@ -440,14 +450,6 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 		return _markerBounds;
 	}
 
-//	/**
-//	 * @return Returns the {@link TourSign} for this {@link TourMarker} or <code>null</code> when
-//	 *         it's not set.
-//	 */
-//	public TourSign getTourSign() {
-//		return tourSign;
-//	}
-
 	/**
 	 * @return Returns {@link TourMarker} entity id.
 	 */
@@ -456,7 +458,7 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 	}
 
 	/**
-	 * @return Returns position of this marker in the data serie
+	 * @return Returns position of this marker in the data serie.
 	 */
 	public int getSerieIndex() {
 		return serieIndex;
@@ -670,6 +672,10 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 		this.description = description;
 	}
 
+	public void setDeviceLapTime(final long lapTime) {
+		_deviceLapTime = lapTime;
+	}
+
 	/**
 	 * Sets the distance with the metric system
 	 * 
@@ -700,10 +706,6 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 	public void setLabelPosition(final int visualPosition) {
 		this.visualPosition = visualPosition;
 	}
-
-//	public void setTourSign(final TourSign tourSign) {
-//		this.tourSign = tourSign;
-//	}
 
 	public void setLabelXOffset(final int labelXOffset) {
 		this.labelXOffset = labelXOffset;
@@ -761,10 +763,11 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 		this.isMarkerVisible = isMarkerVisible ? 1 : 0;
 	}
 
-//	public void setTourSign(final TourSign tourSign) {
-//		this.tourSign = tourSign;
-//	}
-
+	/**
+	 * Set position of this marker in the data serie.
+	 * 
+	 * @param serieIndex
+	 */
 	public void setSerieIndex(final int serieIndex) {
 		this.serieIndex = serieIndex;
 	}

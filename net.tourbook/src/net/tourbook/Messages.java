@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -660,6 +660,8 @@ public class Messages extends NLS {
 	public static String		Image__graph_cadence_disabled;
 	public static String		Image__graph_gradient_disabled;
 	public static String		Image__graph_heartbeat_disabled;
+	public static String		Image__Graph_Gears;
+	public static String		Image__Graph_Gears_disabled;
 	public static String		Image__Graph_Overlapped;
 	public static String		Image__graph_pace_disabled;
 	public static String		Image__graph_power_disabled;
@@ -714,7 +716,11 @@ public class Messages extends NLS {
 	public static String		Image__synch_graph_bySize_disabled;
 	public static String		Image__synch_statistics;
 	public static String		Image__synch_statistics_Disabled;
-//	public static String		Image__Symbol_Difference;
+	public static String		Image__SearchExternal;
+
+	public static String		Image__SearchExternal_Disabled;
+
+	//	public static String		Image__Symbol_Difference;
 	public static String		Image__Synced;
 	public static String		Image__tag;
 	public static String		Image__tag_category;
@@ -723,11 +729,14 @@ public class Messages extends NLS {
 	public static String		Image__tour_new;
 	public static String		Image__tour_new_disabled;
 	public static String		Image__tour_options;
-	public static String		Image__tour_segmenter;
 	public static String		Image__tour_viewer;
 	public static String		Image__TourChart;
 	public static String		Image__TourMarker;
-//	public static String		Image__TourSignImport;
+	public static String		Image__TourSegments;
+
+	public static String		Image__TourSegments_Disabled;
+
+	//	public static String		Image__TourSignImport;
 	public static String		Image__undo_edit;
 	public static String		Image__undo_edit_disabled;
 	public static String		Image__undo_tour_type_filter;
@@ -759,6 +768,7 @@ public class Messages extends NLS {
 	public static String		Import_Data_Action_EditImportPreferences;
 	public static String		Import_Data_Action_Reimport_EntireTour;
 	public static String		Import_Data_Action_Reimport_OnlyAltitudeValues;
+	public static String		Import_Data_Action_Reimport_OnlyGearValues;
 	public static String		Import_Data_Action_Reimport_OnlyTemperatureValues;
 	public static String		Import_Data_Action_Reimport_OnlyTimeSlices;
 	public static String		Import_Data_Action_Reimport_Tour;
@@ -766,6 +776,7 @@ public class Messages extends NLS {
 	public static String		Import_Data_Action_RemoveToursWhenClosed;
 	public static String		Import_Data_Dialog_ConfirmReimport_Message;
 	public static String		Import_Data_Dialog_ConfirmReimportAltitudeValues_Message;
+	public static String		Import_Data_Dialog_ConfirmReimportGearValues_Message;
 	public static String		Import_Data_Dialog_ConfirmReimportTemperatureValues_Message;
 	public static String		Import_Data_Dialog_ConfirmReimportTimeSlices_Message;
 	public static String		Import_Data_Dialog_GetAlternativePath_Message;
@@ -1168,7 +1179,12 @@ public class Messages extends NLS {
 
 	public static String		Search_Manager_CreateFTIndex;
 
+	public static String		Search_View_Action_ExternalSearchUI;
+	public static String		Search_View_Action_ExternalSearchUI_Tooltip;
+
+	public static String		Search_View_Link_ExternalBrowser;
 	public static String		Search_View_Link_LinuxBrowser;
+	public static String		Search_View_Link_SetupExternalBrowser;
 
 	public static String		Slideout_ChartMarkerOptions_Checkbox_IsShowHiddenMarker;
 	public static String		Slideout_ChartMarkerOptions_Checkbox_IsShowMarker;
@@ -1217,6 +1233,7 @@ public class Messages extends NLS {
 	public static String		Tooltip_ValuePoint_Action_Value_Cadence;
 	public static String		Tooltip_ValuePoint_Action_Value_ChartZoomFactor;
 	public static String		Tooltip_ValuePoint_Action_Value_Distance;
+	public static String		Tooltip_ValuePoint_Action_Value_Gears;
 	public static String		Tooltip_ValuePoint_Action_Value_Gradient;
 	public static String		Tooltip_ValuePoint_Action_Value_Header;
 	public static String		Tooltip_ValuePoint_Action_Value_Pace;
@@ -1249,7 +1266,7 @@ public class Messages extends NLS {
 	public static String		Tour_Action_graph_speed_tooltip;
 	public static String		Tour_Action_graph_temperature_tooltip;
 	public static String		Tour_Action_graph_tour_compare_tooltip;
-
+	public static String		Tour_Action_GraphGears;
 	public static String		Tour_Action_GraphOverlapped;
 	public static String		Tour_Action_HrZone_Title;
 	public static String		Tour_Action_HrZoneGraphType_Default;
@@ -1329,7 +1346,7 @@ public class Messages extends NLS {
 	public static String		Tour_Editor_Label_DateTimeModified;
 	public static String		Tour_Editor_Label_DeviceFirmwareVersion;
 	public static String		Tour_Editor_Label_DeviceSensor_Tooltip;
-	public static String		Tour_Editor_Label_DistanceSensor_Tooltip;
+	public static String		Tour_Editor_Label_DistanceSensor;
 	public static String		Tour_Editor_Label_Hours_Tooltip;
 	public static String		Tour_Editor_Label_Minutes_Tooltip;
 	public static String		Tour_Editor_Label_PowerSensor;
@@ -1388,6 +1405,8 @@ public class Messages extends NLS {
 	public static String		Tour_Segmenter_Label_DPTolerance;
 	public static String		Tour_Segmenter_Label_DPTolerance_Tooltip;
 	public static String		Tour_Segmenter_Label_no_chart;
+	public static String		Tour_Segmenter_Type_ByAltitude_Merged;
+
 	public static String		Tour_Segmenter_Type_ByBreakTime;
 
 	public static String		Tour_Statistic_Combo_BarVOrder_InfoItem;
@@ -1535,6 +1554,7 @@ public class Messages extends NLS {
 	public static String		TourAnalyzer_Label_left;
 	public static String		TourAnalyzer_Label_maximum;
 	public static String		TourAnalyzer_Label_minimum;
+	public static String		TourAnalyzer_Label_NoTourOrChart;
 	public static String		TourAnalyzer_Label_right;
 	public static String		TourAnalyzer_Label_value;
 

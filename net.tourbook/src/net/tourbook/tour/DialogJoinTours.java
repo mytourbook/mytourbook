@@ -950,6 +950,8 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
 		float joinedDistance = 0;
 		int joinedCalories = 0;
 		boolean isJoinedDistanceFromSensor = false;
+		boolean isJoinedPowerFromSensor = false;
+		boolean isJoinedPulseFromSensor = false;
 		short joinedDeviceTimeInterval = -1;
 		String joinedWeatherClouds = UI.EMPTY_STRING;
 		String joinedWeather = UI.EMPTY_STRING;
@@ -1276,7 +1278,11 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
 			 * other tour values
 			 */
 			if (isFirstTour) {
+
 				isJoinedDistanceFromSensor = tourTourData.isDistanceSensorPresent();
+				isJoinedPowerFromSensor = tourTourData.isPowerSensorPresent();
+				isJoinedPulseFromSensor = tourTourData.isPulseSensorPresent();
+
 				joinedDeviceTimeInterval = tourTourData.getDeviceTimeInterval();
 
 				joinedWeather = tourTourData.getWeather();
@@ -1287,11 +1293,23 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
 				joinedRestPulse = tourTourData.getRestPulse();
 
 			} else {
+
 				if (isJoinedDistanceFromSensor && tourTourData.isDistanceSensorPresent()) {
 					// keep TRUE state
 				} else {
 					isJoinedDistanceFromSensor = false;
 				}
+				if (isJoinedPowerFromSensor && tourTourData.isPowerSensorPresent()) {
+					// keep TRUE state
+				} else {
+					isJoinedPowerFromSensor = false;
+				}
+				if (isJoinedPulseFromSensor && tourTourData.isPulseSensorPresent()) {
+					// keep TRUE state
+				} else {
+					isJoinedPulseFromSensor = false;
+				}
+
 				if (joinedDeviceTimeInterval == tourTourData.getDeviceTimeInterval()) {
 					// keep value
 				} else {
@@ -1334,6 +1352,9 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
 		_joinedTourData.setDeviceName(Messages.Dialog_JoinTours_Label_DeviceName);
 
 		_joinedTourData.setIsDistanceFromSensor(isJoinedDistanceFromSensor);
+		_joinedTourData.setIsPowerSensorPresent(isJoinedPowerFromSensor);
+		_joinedTourData.setIsPulseSensorPresent(isJoinedPulseFromSensor);
+
 		_joinedTourData.setDeviceTimeInterval(joinedDeviceTimeInterval);
 
 		_joinedTourData.setCalories(joinedCalories);

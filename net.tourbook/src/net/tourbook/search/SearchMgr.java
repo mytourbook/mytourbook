@@ -358,7 +358,7 @@ public class SearchMgr implements XHRHandler {
 				Display.getDefault().asyncExec(new Runnable() {
 					@Override
 					public void run() {
-						Util.openLink(Display.getDefault().getActiveShell(), location);
+						WEB.openUrl(location);
 					}
 				});
 
@@ -1131,13 +1131,12 @@ public class SearchMgr implements XHRHandler {
 			/*
 			 * create items html
 			 */
-			final int itemBaseNumber = searchResult.pageNumber * searchResult.hitsPerPage;
 			int itemIndex = 0;
 
 			for (final SearchResultItem resultItem : searchResult.items) {
 
 				final StringBuilder sb = new StringBuilder();
-				final int itemNumber = itemBaseNumber + (++itemIndex);
+				final int itemNumber = searchPosFrom + (++itemIndex);
 				ItemResponse itemResponse = null;
 
 				sb.append("<div" + (" class='" + CSS_ITEM_CONTAINER + "'") + " id='" + resultItem.docId + "'>\n"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$

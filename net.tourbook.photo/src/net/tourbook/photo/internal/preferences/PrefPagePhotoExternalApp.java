@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2012  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -77,14 +77,14 @@ public class PrefPagePhotoExternalApp extends FieldEditorPreferencePage implemen
 		GridLayoutFactory.fillDefaults().applyTo(parent);
 //		parent.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
 		{
-			createUI_30_ExternalPhotoViewer(parent);
+			createUI_10_ExternalPhotoViewer(parent);
 		}
 	}
 
 	/**
 	 * field: path to save raw tour data
 	 */
-	private void createUI_30_ExternalPhotoViewer(final Composite parent) {
+	private void createUI_10_ExternalPhotoViewer(final Composite parent) {
 
 		final Group group = new Group(parent, SWT.NONE);
 		GridDataFactory.fillDefaults()//
@@ -187,6 +187,7 @@ public class PrefPagePhotoExternalApp extends FieldEditorPreferencePage implemen
 		gd.widthHint = pathWidth;
 	}
 
+	@Override
 	public void init(final IWorkbench workbench) {
 		setPreferenceStore(_prefStore);
 	}

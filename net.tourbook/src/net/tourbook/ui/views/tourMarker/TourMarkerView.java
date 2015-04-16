@@ -80,7 +80,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.ui.IActionBars;
@@ -130,7 +129,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 	 * UI controls
 	 */
 	private PageBook				_pageBook;
-	private Label					_pageNoTour;
+	private Composite				_pageNoData;
 	private Composite				_viewerContainer;
 
 	private Font					_boldFont;
@@ -273,51 +272,58 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 			@Override
 			public void tourChanged(final IWorkbenchPart part, final TourEventId eventId, final Object eventData) {
 
+				if (part == TourMarkerView.this) {
+					return;
+				}
+
 				if (_isInUpdate) {
 					return;
 				}
 
-				if ((_tourData == null) || (part == TourMarkerView.this)) {
-					return;
-				}
-
-				if ((eventId == TourEventId.TOUR_CHANGED) && (eventData instanceof TourEvent)) {
-
-					final ArrayList<TourData> modifiedTours = ((TourEvent) eventData).getModifiedTours();
-					if (modifiedTours != null) {
-
-						// update modified tour
-
-						final long viewTourId = _tourData.getTourId();
-
-						for (final TourData tourData : modifiedTours) {
-							if (tourData.getTourId() == viewTourId) {
-
-								// get modified tour
-								_tourData = tourData;
-
-								updateUI_MarkerViewer();
-
-								// removed old tour data from the selection provider
-								_postSelectionProvider.clearSelection();
-
-								// nothing more to do, the view contains only one tour
-								return;
-							}
-						}
-					}
-
-				} else if ((eventId == TourEventId.TOUR_SELECTION) && eventData instanceof ISelection) {
+				if (eventId == TourEventId.TOUR_SELECTION && eventData instanceof ISelection) {
 
 					onSelectionChanged((ISelection) eventData);
 
-				} else if (eventId == TourEventId.MARKER_SELECTION) {
+				} else {
 
-					onTourEvent_TourMarker(eventData);
+					if (_tourData == null) {
+						return;
+					}
 
-				} else if (eventId == TourEventId.CLEAR_DISPLAYED_TOUR) {
+					if ((eventId == TourEventId.TOUR_CHANGED) && (eventData instanceof TourEvent)) {
 
-					clearView();
+						final ArrayList<TourData> modifiedTours = ((TourEvent) eventData).getModifiedTours();
+						if (modifiedTours != null) {
+
+							// update modified tour
+
+							final long viewTourId = _tourData.getTourId();
+
+							for (final TourData tourData : modifiedTours) {
+								if (tourData.getTourId() == viewTourId) {
+
+									// get modified tour
+									_tourData = tourData;
+
+									updateUI_MarkerViewer();
+
+									// removed old tour data from the selection provider
+									_postSelectionProvider.clearSelection();
+
+									// nothing more to do, the view contains only one tour
+									return;
+								}
+							}
+						}
+
+					} else if (eventId == TourEventId.MARKER_SELECTION) {
+
+						onTourEvent_TourMarker(eventData);
+
+					} else if (eventId == TourEventId.CLEAR_DISPLAYED_TOUR) {
+
+						clearView();
+					}
 				}
 			}
 		};
@@ -364,7 +370,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 		getSite().setSelectionProvider(_postSelectionProvider = new PostSelectionProvider(ID));
 
 		// show default page
-		_pageBook.showPage(_pageNoTour);
+		_pageBook.showPage(_pageNoData);
 
 		// show marker from last selection
 		onSelectionChanged(getSite().getWorkbenchWindow().getSelectionService().getSelection());
@@ -379,8 +385,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 		_pageBook = new PageBook(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, true).applyTo(_pageBook);
 
-		_pageNoTour = new Label(_pageBook, SWT.NONE);
-		_pageNoTour.setText(Messages.UI_Label_no_chart_is_selected);
+		_pageNoData = net.tourbook.common.UI.createUI_PageNoData(_pageBook, Messages.UI_Label_no_chart_is_selected);
 
 		_viewerContainer = new Composite(_pageBook, SWT.NONE);
 		GridLayoutFactory.fillDefaults().applyTo(_viewerContainer);
@@ -950,7 +955,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 
 	private void showTourFromTourProvider() {
 
-		_pageBook.showPage(_pageNoTour);
+		_pageBook.showPage(_pageNoData);
 
 		// a tour is not displayed, find a tour provider which provides a tour
 		Display.getCurrent().asyncExec(new Runnable() {
@@ -992,7 +997,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 
 		} else {
 
-			_pageBook.showPage(_pageNoTour);
+			_pageBook.showPage(_pageNoData);
 		}
 
 		enableActions();

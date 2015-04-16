@@ -1481,8 +1481,8 @@ public class ChartComponents extends Composite {
 		final double majorValue = Util.getMajorDecimalValue(graphUnit);
 
 		// calculate the vertical scaling between graph and device
-		final float value1 = (float) scaledValueRange / valueScaling;
-		final float graphScaleY = devGraphHeight / value1;
+		final double value1 = (double) scaledValueRange / valueScaling;
+		final double graphScaleY = devGraphHeight / value1;
 
 		// calculate the vertical device offset
 		int devYBottom = _devMarginTop + _devXTitleBarHeight;
@@ -2333,7 +2333,7 @@ public class ChartComponents extends Composite {
 
 		// loop all graphs - find the title for the y-axis
 		for (final ChartDataYSerie yData : yDataList) {
-			if (yData.getYTitle() != null || yData.getUnitLabel() != null) {
+			if (yData.getYTitle() != null || yData.getUnitLabel().length() > 0) {
 				isYTitle = true;
 				break;
 			}

@@ -31,9 +31,15 @@ public class RecordMesgListenerImpl extends AbstractMesgListener implements Reco
 
 		final TimeData timeData = getTimeData();
 
-		final DateTime timestamp = mesg.getTimestamp();
-		if (timestamp != null) {
-			timeData.absoluteTime = DataConverters.convertTimestamp(timestamp);
+		final DateTime garminTime = mesg.getTimestamp();
+		if (garminTime != null) {
+
+			// convert garmin time into linux time
+			final long garminTimeS = garminTime.getTimestamp();
+			final long garminTimeMS = garminTimeS * 1000;
+			final long linuxTime = garminTimeMS + com.garmin.fit.DateTime.OFFSET;
+
+			timeData.absoluteTime = linuxTime;
 		}
 
 		final Integer positionLat = mesg.getPositionLat();

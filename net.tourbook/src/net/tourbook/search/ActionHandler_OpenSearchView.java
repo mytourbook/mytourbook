@@ -20,27 +20,11 @@ import net.tourbook.common.util.Util;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.widgets.Event;
 
 public class ActionHandler_OpenSearchView extends AbstractHandler {
 
 	@Override
 	public Object execute(final ExecutionEvent execEvent) throws ExecutionException {
-
-		boolean isCtrlKey = false;
-
-		final Object event = execEvent.getTrigger();
-		if (event instanceof Event) {
-
-			final Event widgetEvent = (Event) event;
-			final int stateMask = widgetEvent.stateMask;
-
-			isCtrlKey = (stateMask & SWT.SHIFT) > 0;
-		}
-
-
-		SearchView.setIsForceLinuxView(isCtrlKey);
 
 		Util.showView(SearchView.ID, true);
 

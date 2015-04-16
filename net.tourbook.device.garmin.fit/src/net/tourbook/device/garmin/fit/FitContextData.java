@@ -2,15 +2,16 @@ package net.tourbook.device.garmin.fit;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
+import net.tourbook.data.GearData;
 import net.tourbook.data.TimeData;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.ui.tourChart.ChartLabel;
+
+import com.garmin.fit.EventMesg;
 
 /**
  * Wrapper for tour data used by {@link FitContext}.
@@ -19,114 +20,139 @@ import net.tourbook.ui.tourChart.ChartLabel;
  */
 public class FitContextData {
 
-	private final List<ContextTourData>							_allTourData	= new ArrayList<ContextTourData>();
-	private final Map<ContextTourData, List<ContextTimeData>>	_attTimeData	= new HashMap<ContextTourData, List<ContextTimeData>>();
-	private final Map<ContextTourData, List<ContextTourMarker>>	_allTourMarker	= new HashMap<FitContextData.ContextTourData, List<ContextTourMarker>>();
+	private final List<TourContext>						_allTourContext	= new ArrayList<TourContext>();
 
-	private ContextTourData										_currentTourData;
-	private ContextTimeData										_currentTimeData;
-	private ContextTourMarker									_currentTourMarker;
+	private final Map<TourContext, List<GearData>>		_allGearData	= new HashMap<TourContext, List<GearData>>();
+	private final Map<TourContext, List<TimeData>>		_allTimeData	= new HashMap<TourContext, List<TimeData>>();
+	private final Map<TourContext, List<TourMarker>>	_allTourMarker	= new HashMap<TourContext, List<TourMarker>>();
 
-	private List<ContextTimeData>								_currentContextTimeDataList;
+	private TourContext									_currentTourContext;
 
-	class ContextTimeData {
+	private TimeData									_currentTimeData;
+	private List<TimeData>								_currentTimeDataList;
 
-		private TimeData	__data;
+	private TourMarker									_currentTourMarker;
 
-		TimeData getTimeData() {
-			return __data;
+	/**
+	 * Tour context is a little bit tricky and cannot be replaced with just a {@link TourData}
+	 * instance. {@link TourContext} is the key to other tour values.
+	 */
+	private class TourContext {
+
+		private TourData	__tourData;
+
+		public TourContext(final TourData tourData) {
+			__tourData = tourData;
 		}
 
 		@Override
 		public String toString() {
-			return "ContextTimeData [__data=" + __data + "]"; //$NON-NLS-1$ //$NON-NLS-2$
+			return "TourContext [__tourData=" + __tourData + "]"; //$NON-NLS-1$ //$NON-NLS-2$
 		}
 	}
 
-	private class ContextTourData {
+	/**
+	 * Gear data are available in the common {@link EventMesg}.
+	 * 
+	 * @param mesg
+	 */
+	public void ctxEventMesg(final EventMesg mesg) {
 
-		private TourData	__data;
+		// ensure a tour is setup
+		ctxTour_10_Initialize();
 
-		@Override
-		public String toString() {
-			return "ContextTourData [__data=" + __data + "]"; //$NON-NLS-1$ //$NON-NLS-2$
+		final Long gearChangeData = mesg.getGearChangeData();
+
+		// check if gear data are available, it can be null
+		if (gearChangeData != null) {
+
+			// get gear list for current tour
+			List<GearData> tourGears = _allGearData.get(_currentTourContext);
+
+			if (tourGears == null) {
+				tourGears = new ArrayList<GearData>();
+				_allGearData.put(_currentTourContext, tourGears);
+			}
+
+			// create gear data for the current time
+			final GearData gearData = new GearData();
+
+			final com.garmin.fit.DateTime garminTime = mesg.getTimestamp();
+
+			// convert garmin time into linux time
+			final long garminTimeS = garminTime.getTimestamp();
+			final long garminTimeMS = garminTimeS * 1000;
+			final long linuxTime = garminTimeMS + com.garmin.fit.DateTime.OFFSET;
+
+			gearData.absoluteTime = linuxTime;
+			gearData.gears = gearChangeData;
+
+			tourGears.add(gearData);
 		}
 	}
 
-	private class ContextTourMarker {
+	public void ctxMarker_10_Initialize() {
 
-		private TourMarker	__data;
+		ctxTour_10_Initialize();
 
-		@Override
-		public String toString() {
-			return "ContextTourMarker [__data=" + __data + "]"; //$NON-NLS-1$ //$NON-NLS-2$
-		}
-	}
+		List<TourMarker> tourMarkers = _allTourMarker.get(_currentTourContext);
 
-	public void ctxTimeData_10_Initialize() {
-
-		ctxTourData_10_Initialize();
-
-		_currentContextTimeDataList = _attTimeData.get(_currentTourData);
-		if (_currentContextTimeDataList == null) {
-
-			_currentContextTimeDataList = new ArrayList<ContextTimeData>();
-			_attTimeData.put(_currentTourData, _currentContextTimeDataList);
+		if (tourMarkers == null) {
+			tourMarkers = new ArrayList<TourMarker>();
+			_allTourMarker.put(_currentTourContext, tourMarkers);
 		}
 
-		_currentTimeData = new ContextTimeData();
-		_currentTimeData.__data = new TimeData();
-
-		_currentContextTimeDataList.add(_currentTimeData);
+		_currentTourMarker = new TourMarker(getCurrentTourData(), ChartLabel.MARKER_TYPE_DEVICE);
+		tourMarkers.add(_currentTourMarker);
 	}
 
-	public void ctxTimeData_20_Finalize() {
+	public void ctxMarker_20_Finalize() {
+
+		_currentTourMarker = null;
+	}
+
+	public void ctxTime_10_Initialize() {
+
+		ctxTour_10_Initialize();
+
+//		_currentTimeDataList = _allTimeData.get(_currentTourData);
+
+		if (_currentTimeDataList == null) {
+			_currentTimeDataList = new ArrayList<TimeData>();
+			_allTimeData.put(_currentTourContext, _currentTimeDataList);
+		}
+
+		_currentTimeData = new TimeData();
+		_currentTimeDataList.add(_currentTimeData);
+	}
+
+	public void ctxTime_20_Finalize() {
 
 		_currentTimeData = null;
 	}
 
-	public void ctxTourData_10_Initialize() {
+	public void ctxTour_10_Initialize() {
 
-		if (_currentTourData == null) {
+		if (_currentTourContext == null) {
 
-			_currentTourData = new ContextTourData();
-			_currentTourData.__data = new TourData();
+			final TourData currentTourData = new TourData();
 
-			_allTourData.add(_currentTourData);
+			_currentTourContext = new TourContext(currentTourData);
+
+			_allTourContext.add(_currentTourContext);
 		}
 	}
 
-	public void ctxTourData_20_Finalize() {
+	public void ctxTour_20_Finalize() {
 
-		ctxTimeData_20_Finalize();
+		ctxTime_20_Finalize();
 
-		_currentTourData = null;
-		_currentContextTimeDataList = null;
+		_currentTourContext = null;
+		_currentTimeDataList = null;
 	}
 
-	public void ctxTourMarker_10_Initialize() {
-
-		ctxTourData_10_Initialize();
-
-		List<ContextTourMarker> currentContextTourMarkerList = _allTourMarker.get(_currentTourData);
-		if (currentContextTourMarkerList == null) {
-
-			currentContextTourMarkerList = new ArrayList<ContextTourMarker>();
-			_allTourMarker.put(_currentTourData, currentContextTourMarkerList);
-		}
-
-		_currentTourMarker = new ContextTourMarker();
-		_currentTourMarker.__data = new TourMarker(getCurrentTourData(), ChartLabel.MARKER_TYPE_DEVICE);
-
-		currentContextTourMarkerList.add(_currentTourMarker);
-	}
-
-	public void ctxTourMarker_20_Finalize() {
-		_currentTourMarker = null;
-	}
-
-	public List<ContextTimeData> getAllTimeData() {
-		return _currentContextTimeDataList;
+	public List<TimeData> getAllTimeData() {
+		return _currentTimeDataList;
 	}
 
 	public TimeData getCurrentTimeData() {
@@ -135,17 +161,17 @@ public class FitContextData {
 			throw new IllegalArgumentException("Time data is not initialized"); //$NON-NLS-1$
 		}
 
-		return _currentTimeData.__data;
+		return _currentTimeData;
 
 	}
 
 	public TourData getCurrentTourData() {
 
-		if (_currentTourData == null) {
+		if (_currentTourContext == null) {
 			throw new IllegalArgumentException("Tour data is not initialized"); //$NON-NLS-1$
 		}
 
-		return _currentTourData.__data;
+		return _currentTourContext.__tourData;
 	}
 
 	public TourMarker getCurrentTourMarker() {
@@ -154,41 +180,27 @@ public class FitContextData {
 			throw new IllegalArgumentException("Tour marker is not initialized"); //$NON-NLS-1$
 		}
 
-		return _currentTourMarker.__data;
+		return _currentTourMarker;
 	}
 
-	public void processData(final FitContextDataHandler handler) {
+	public void processAllTours(final FitContextDataHandler handler) {
 
-		for (final ContextTourData contextTourData : _allTourData) {
+		for (final TourContext tourContext : _allTourContext) {
 
-			final List<ContextTimeData> contextTimeDataList = _attTimeData.get(contextTourData);
+			final List<TimeData> timeDataList = _allTimeData.get(tourContext);
 
-			final ArrayList<TimeData> timeDataList = new ArrayList<TimeData>(contextTimeDataList.size());
-			for (final ContextTimeData contextTimeData : contextTimeDataList) {
-				timeDataList.add(contextTimeData.__data);
+			// ensure data are avaialble
+			if (timeDataList == null) {
+				// nothing is imported
+				continue;
 			}
 
-			final int lastSerieIndex = timeDataList.size() - 1;
+			final TourData tourData = tourContext.__tourData;
 
-			final List<ContextTourMarker> contextTourMarkerList = _allTourMarker.get(contextTourData);
+			final List<TourMarker> tourMarkers = _allTourMarker.get(tourContext);
+			final List<GearData> tourGears = _allGearData.get(tourContext);
 
-			final Set<TourMarker> tourMarkerSet = new HashSet<TourMarker>(contextTourMarkerList.size());
-			for (final ContextTourMarker contextTourMarker : contextTourMarkerList) {
-
-				final TourMarker tourMarker = contextTourMarker.__data;
-
-				/*
-				 * Fit devices adds a marker at the end, this is annoing therefore it is removed. It
-				 * is not only the last time slice it can also be about the last 5 time slices.
-				 */
-				if (tourMarker.getSerieIndex() > lastSerieIndex - 5) {
-					continue;
-				}
-
-				tourMarkerSet.add(tourMarker);
-			}
-
-			handler.handleTour(contextTourData.__data, timeDataList, tourMarkerSet);
+			handler.finalizeTour(tourData, timeDataList, tourMarkers, tourGears);
 		}
 	}
 

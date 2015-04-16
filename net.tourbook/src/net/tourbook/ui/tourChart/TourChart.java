@@ -105,7 +105,20 @@ import org.eclipse.ui.IWorkbenchPart;
  */
 public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdater {
 
+
 	private static final String			ID										= "net.tourbook.ui.tourChart";								//$NON-NLS-1$
+
+	private static final String			GRAPH_LABEL_ALTIMETER					= net.tourbook.common.Messages.Graph_Label_Altimeter;
+	private static final String			GRAPH_LABEL_ALTITUDE					= net.tourbook.common.Messages.Graph_Label_Altitude;
+	private static final String			GRAPH_LABEL_CADENCE						= net.tourbook.common.Messages.Graph_Label_Cadence;
+	private static final String			GRAPH_LABEL_GEARS						= net.tourbook.common.Messages.Graph_Label_Gears;
+	private static final String			GRAPH_LABEL_GRADIENT					= net.tourbook.common.Messages.Graph_Label_Gradient;
+	private static final String			GRAPH_LABEL_HEARTBEAT					= net.tourbook.common.Messages.Graph_Label_Heartbeat;
+	private static final String			GRAPH_LABEL_PACE						= net.tourbook.common.Messages.Graph_Label_Pace;
+	private static final String			GRAPH_LABEL_POWER						= net.tourbook.common.Messages.Graph_Label_Power;
+	private static final String			GRAPH_LABEL_SPEED						= net.tourbook.common.Messages.Graph_Label_Speed;
+	private static final String			GRAPH_LABEL_TEMPERATURE					= net.tourbook.common.Messages.Graph_Label_Temperature;
+	private static final String			GRAPH_LABEL_TOUR_COMPARE				= net.tourbook.common.Messages.Graph_Label_Tour_Compare;
 
 	public static final String			ACTION_ID_CAN_AUTO_ZOOM_TO_SLIDER		= "ACTION_ID_CAN_AUTO_ZOOM_TO_SLIDER";						//$NON-NLS-1$
 	public static final String			ACTION_ID_CAN_MOVE_SLIDERS_WHEN_ZOOMED	= "ACTION_ID_CAN_MOVE_SLIDERS_WHEN_ZOOMED";				//$NON-NLS-1$
@@ -1043,70 +1056,77 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
 		createActions_12_GraphAction(
 				TourManager.GRAPH_ALTITUDE,
-				net.tourbook.common.Messages.Graph_Label_Altitude,
+				GRAPH_LABEL_ALTITUDE,
 				Messages.Tour_Action_graph_altitude_tooltip,
 				Messages.Image__graph_altitude,
 				Messages.Image__graph_altitude_disabled);
 
 		createActions_12_GraphAction(
 				TourManager.GRAPH_SPEED,
-				net.tourbook.common.Messages.Graph_Label_Speed,
+				GRAPH_LABEL_SPEED,
 				Messages.Tour_Action_graph_speed_tooltip,
 				Messages.Image__graph_speed,
 				Messages.Image__graph_speed_disabled);
 
 		createActions_12_GraphAction(
 				TourManager.GRAPH_PACE,
-				net.tourbook.common.Messages.Graph_Label_Pace,
+				GRAPH_LABEL_PACE,
 				Messages.Tour_Action_graph_pace_tooltip,
 				Messages.Image__graph_pace,
 				Messages.Image__graph_pace_disabled);
 
 		createActions_12_GraphAction(
 				TourManager.GRAPH_POWER,
-				net.tourbook.common.Messages.Graph_Label_Power,
+				GRAPH_LABEL_POWER,
 				Messages.Tour_Action_graph_power_tooltip,
 				Messages.Image__graph_power,
 				Messages.Image__graph_power_disabled);
 
 		createActions_12_GraphAction(
 				TourManager.GRAPH_ALTIMETER,
-				net.tourbook.common.Messages.Graph_Label_Altimeter,
+				GRAPH_LABEL_ALTIMETER,
 				Messages.Tour_Action_graph_altimeter_tooltip,
 				Messages.Image__graph_altimeter,
 				Messages.Image__graph_altimeter_disabled);
 
 		createActions_12_GraphAction(
 				TourManager.GRAPH_PULSE,
-				net.tourbook.common.Messages.Graph_Label_Heartbeat,
+				GRAPH_LABEL_HEARTBEAT,
 				Messages.Tour_Action_graph_heartbeat_tooltip,
 				Messages.Image__graph_heartbeat,
 				Messages.Image__graph_heartbeat_disabled);
 
 		createActions_12_GraphAction(
 				TourManager.GRAPH_TEMPERATURE,
-				net.tourbook.common.Messages.Graph_Label_Temperature,
+				GRAPH_LABEL_TEMPERATURE,
 				Messages.Tour_Action_graph_temperature_tooltip,
 				Messages.Image__graph_temperature,
 				Messages.Image__graph_temperature_disabled);
 
 		createActions_12_GraphAction(
 				TourManager.GRAPH_CADENCE,
-				net.tourbook.common.Messages.Graph_Label_Cadence,
+				GRAPH_LABEL_CADENCE,
 				Messages.Tour_Action_graph_cadence_tooltip,
 				Messages.Image__graph_cadence,
 				Messages.Image__graph_cadence_disabled);
 
 		createActions_12_GraphAction(
+				TourManager.GRAPH_GEARS,
+				GRAPH_LABEL_GEARS,
+				Messages.Tour_Action_GraphGears,
+				Messages.Image__Graph_Gears,
+				Messages.Image__Graph_Gears_disabled);
+
+		createActions_12_GraphAction(
 				TourManager.GRAPH_GRADIENT,
-				net.tourbook.common.Messages.Graph_Label_Gradient,
+				GRAPH_LABEL_GRADIENT,
 				Messages.Tour_Action_graph_gradient_tooltip,
 				Messages.Image__graph_gradient,
 				Messages.Image__graph_gradient_disabled);
 
 		createActions_12_GraphAction(
 				TourManager.GRAPH_TOUR_COMPARE,
-				net.tourbook.common.Messages.Graph_Label_Tour_Compare,
+				GRAPH_LABEL_TOUR_COMPARE,
 				Messages.Tour_Action_graph_tour_compare_tooltip,
 				Messages.Image__graph_tour_compare,
 				Messages.Image__graph_tour_compare_disabled);
@@ -1783,6 +1803,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		tbm.add(_allTourChartActions.get(getGraphActionId(TourManager.GRAPH_GRADIENT)));
 		tbm.add(_allTourChartActions.get(getGraphActionId(TourManager.GRAPH_ALTIMETER)));
 		tbm.add(_allTourChartActions.get(getGraphActionId(TourManager.GRAPH_CADENCE)));
+		tbm.add(_allTourChartActions.get(getGraphActionId(TourManager.GRAPH_GEARS)));
 
 		tbm.add(new Separator());
 		tbm.add(_allTourChartActions.get(ACTION_ID_IS_GRAPH_OVERLAPPED));
@@ -2300,6 +2321,9 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		if (yDataWithLabels == null) {
 			yDataWithLabels = (ChartDataYSerie) dataModel.getCustomData(TourManager.CUSTOM_DATA_CADENCE);
 		}
+		if (yDataWithLabels == null) {
+			yDataWithLabels = (ChartDataYSerie) dataModel.getCustomData(TourManager.CUSTOM_DATA_GEAR_RATIO);
+		}
 
 		setGraphLayer_Layer(TourManager.CUSTOM_DATA_ALTITUDE, _tourData.segmentSerieAltitudeDiff, yDataWithLabels);
 		setGraphLayer_Layer(TourManager.CUSTOM_DATA_PULSE, _tourData.segmentSeriePulse, yDataWithLabels);
@@ -2310,6 +2334,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		setGraphLayer_Layer(TourManager.CUSTOM_DATA_ALTIMETER, _tourData.segmentSerieAltitudeUpH, yDataWithLabels);
 		setGraphLayer_Layer(TourManager.CUSTOM_DATA_TEMPERATURE, null, yDataWithLabels);
 		setGraphLayer_Layer(TourManager.CUSTOM_DATA_CADENCE, null, yDataWithLabels);
+		setGraphLayer_Layer(TourManager.CUSTOM_DATA_GEAR_RATIO, null, yDataWithLabels);
 
 		setGraphLayer_Layer(TourManager.CUSTOM_DATA_HISTORY, null, null);
 	}

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2015  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -49,6 +49,11 @@ public abstract class ChartDataSerie {
 	private int						_valueDivisor							= 1;
 
 	/**
+	 * Number of digits which are displayed.
+	 */
+	private int						_displayedFractionalDigits				= 0;
+
+	/**
 	 * min value which is used to draw the chart
 	 */
 	protected double				_visibleMinValue;
@@ -85,12 +90,12 @@ public abstract class ChartDataSerie {
 	/**
 	 * Text label for the unit
 	 */
-	private String					_unitLabel								= new String();
+	private String					_unitLabel								= UI.EMPTY_STRING;
 
 	/**
 	 * Text label for the chart data, e.g. distance, altitude, speed...
 	 */
-	private String					_label									= new String();
+	private String					_label									= UI.EMPTY_STRING;
 
 	private HashMap<String, Object>	_customData								= new HashMap<String, Object>();
 
@@ -281,6 +286,14 @@ public abstract class ChartDataSerie {
 
 		_visibleMinValue = minValue;
 		_visibleMinValueForced = minValue;
+	}
+
+	public int getDisplayedFractionalDigits() {
+		return _displayedFractionalDigits;
+	}
+
+	public void setDisplayedFractionalDigits(int _displayedFractionalDigits) {
+		this._displayedFractionalDigits = _displayedFractionalDigits;
 	}
 
 }

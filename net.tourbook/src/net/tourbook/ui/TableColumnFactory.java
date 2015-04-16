@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -401,12 +401,12 @@ public abstract class TableColumnFactory {
 				@Override
 				public void update(final ViewerCell cell) {
 					
-					TourData tourData = (TourData) cell.getElement();
+					final TourData tourData = (TourData) cell.getElement();
 					
-					String deviceName = tourData.getDeviceName();
-					String firmwareVersion = tourData.getDeviceFirmwareVersion();
+					final String deviceName = tourData.getDeviceName();
+					final String firmwareVersion = tourData.getDeviceFirmwareVersion();
 					
-					String name = firmwareVersion.length() == 0//
+					final String name = firmwareVersion.length() == 0//
 							? deviceName
 							: deviceName
 									+ UI.SPACE
@@ -532,13 +532,45 @@ public abstract class TableColumnFactory {
 		};
 	};
 
+	public static final TableColumnFactory GEAR_RATIO = new TableColumnFactory() {
+		
+		@Override
+		public ColumnDefinition createColumn(final ColumnManager columnManager, final PixelConverter pixelConverter) {
+
+			final ColumnDefinition colDef = new TableColumnDefinition(columnManager, "gearRatio", SWT.TRAIL); //$NON-NLS-1$
+		
+			colDef.setColumnLabel(Messages.ColumnFactory_GearRatio_Label);
+			colDef.setColumnHeaderText(Messages.ColumnFactory_GearRatio_Header);
+			colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_GearRatio_Tooltip);
+			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(8));
+			
+			return colDef;
+		};
+	};
+
+	public static final TableColumnFactory GEAR_TEETH = new TableColumnFactory() {
+		
+		@Override
+		public ColumnDefinition createColumn(final ColumnManager columnManager, final PixelConverter pixelConverter) {
+			
+			final ColumnDefinition colDef = new TableColumnDefinition(columnManager, "gearTeeth", SWT.TRAIL); //$NON-NLS-1$
+			
+			colDef.setColumnLabel(Messages.ColumnFactory_GearTeeth_Label);
+			colDef.setColumnHeaderText(Messages.ColumnFactory_GearTeeth_Header);
+			colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_GearTeeth_Tooltip);
+			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
+			
+			return colDef;
+		};
+	};
+	
 	public static final TableColumnFactory GRADIENT = new TableColumnFactory() {
 		
 		@Override
 		public ColumnDefinition createColumn(final ColumnManager columnManager, final PixelConverter pixelConverter) {
 			
 			final ColumnDefinition colDef = new TableColumnDefinition(columnManager, "gradient", SWT.TRAIL); //$NON-NLS-1$
-		
+			
 			colDef.setColumnLabel(Messages.ColumnFactory_gradient_label);
 			colDef.setColumnHeaderText(Messages.ColumnFactory_gradient);
 			colDef.setColumnUnit(Messages.ColumnFactory_gradient);

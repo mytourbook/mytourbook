@@ -110,6 +110,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 				+ (Integer.toString(TourManager.GRAPH_PACE) + separator)
 				+ (Integer.toString(TourManager.GRAPH_TEMPERATURE) + separator)
 				+ (Integer.toString(TourManager.GRAPH_CADENCE) + separator)
+				+ (Integer.toString(TourManager.GRAPH_GEARS) + separator)
 				+ (Integer.toString(TourManager.GRAPH_ALTIMETER) + separator)
 				+ (Integer.toString(TourManager.GRAPH_GRADIENT) + separator)
 				+ Integer.toString(TourManager.GRAPH_POWER));

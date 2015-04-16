@@ -22,6 +22,7 @@ import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.PrefPageComputedValues;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
+import net.tourbook.web.WEB;
 
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
@@ -36,7 +37,6 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Spinner;
@@ -410,11 +410,10 @@ public class SmoothingAlgorithmJamet implements ISmoothingAlgorithm {
 			link.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(final SelectionEvent e) {
-					Util.openLink(//
-							Display.getCurrent().getActiveShell(),
-							//
-							// the url MUST be splitted otherwise the messages editor will truncate the url
-							//
+					WEB.openUrl(
+					//
+					// the url MUST be splitted otherwise the messages editor will truncate the url
+					//
 							Messages.External_Link_MyTourbook + Messages.External_Link_MyTourbook_TourChartSmoothing);
 				}
 			});

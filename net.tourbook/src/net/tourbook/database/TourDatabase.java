@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -90,11 +90,14 @@ import com.mchange.v2.c3p0.ComboPooledDataSource;
 
 public class TourDatabase {
 
+
 	/**
 	 * version for the database which is required that the tourbook application works successfully
 	 */
-	private static final int						TOURBOOK_DB_VERSION							= 26;										// 14.?
+	private static final int						TOURBOOK_DB_VERSION							= 27;
 
+//	private static final int						TOURBOOK_DB_VERSION							= 27;	// 15.5?
+//	private static final int						TOURBOOK_DB_VERSION							= 26;	// 14.14 / 15.3
 //	private static final int						TOURBOOK_DB_VERSION							= 25;	// 14.10
 //	private static final int						TOURBOOK_DB_VERSION							= 24;	// 14.7
 //	private static final int						TOURBOOK_DB_VERSION							= 23;	// 13.2.0
@@ -117,7 +120,7 @@ public class TourDatabase {
 //	private static final int						TOURBOOK_DB_VERSION							= 6;	// 8.12
 //	private static final int						TOURBOOK_DB_VERSION							= 5;	// 8.11
 
-	private static final String						SQL_STATE_XJ004_DATABASE_NOT_FOUND			= "XJ004";									//$NON-NLS-1$
+//	private static final String						SQL_STATE_XJ004_DATABASE_NOT_FOUND			= "XJ004";									//$NON-NLS-1$
 
 	public static boolean							IS_POST_UPDATE_019_to_020					= false;
 
@@ -210,6 +213,8 @@ public class TourDatabase {
 																										+ "_" + ENTITY_ID_TOUR;			//$NON-NLS-1$
 	private static final String						KEY_TYPE									= TABLE_TOUR_TYPE
 																										+ "_" + ENTITY_ID_TYPE;			//$NON-NLS-1$
+	//
+	private static final String						DEFAULT_0									= "0";										//$NON-NLS-1$
 	//
 	private static volatile TourDatabase			_instance;
 
@@ -1125,9 +1130,11 @@ public class TourDatabase {
 		final Display display = Display.getDefault();
 
 		display.syncExec(new Runnable() {
+			@Override
 			public void run() {
 
 				BusyIndicator.showWhile(display, new Runnable() {
+					@Override
 					public void run() {
 
 						Connection conn = null;
@@ -1458,6 +1465,7 @@ public class TourDatabase {
 		if (field != null && field.length() > maxLength) {
 
 			Display.getDefault().syncExec(new Runnable() {
+				@Override
 				public void run() {
 
 					if (isForceTruncation) {
@@ -2262,6 +2270,13 @@ public class TourDatabase {
 				+ "	photoTimeAdjustment		INTEGER DEFAULT 0,												\n" //$NON-NLS-1$
 				//
 				// version 23 end ---------
+
+				// version 27 start  -  15.5.0
+				//
+				+ "	frontShiftCount			INTEGER DEFAULT 0,												\n" //$NON-NLS-1$
+				+ "	rearShiftCount			INTEGER DEFAULT 0,												\n" //$NON-NLS-1$
+				//
+				// version 27 end ---------
 
 				+ "	serieData				BLOB 															\n" //$NON-NLS-1$
 
@@ -3702,6 +3717,13 @@ public class TourDatabase {
 			}
 
 			/*
+			 * 26 -> 27
+			 */
+			if (currentDbVersion == 26) {
+				currentDbVersion = newVersion = updateDbDesign_026_to_027(conn, monitor);
+			}
+
+			/*
 			 * update version number
 			 */
 			updateDbDesign_VersionNumber(conn, newVersion);
@@ -5127,7 +5149,6 @@ public class TourDatabase {
 					SQL.AddCol_Float(stmt, TABLE_TOUR_MARKER, "altitude", SQL_FLOAT_MIN_VALUE); //$NON-NLS-1$
 					SQL.AddCol_Double(stmt, TABLE_TOUR_MARKER, "latitude", SQL_DOUBLE_MIN_VALUE); //$NON-NLS-1$
 					SQL.AddCol_Double(stmt, TABLE_TOUR_MARKER, "longitude", SQL_DOUBLE_MIN_VALUE); //$NON-NLS-1$
-
 				}
 			}
 		}
@@ -5274,6 +5295,36 @@ public class TourDatabase {
 //
 //				}
 //			}
+		}
+		stmt.close();
+
+		logDbUpdateEnd(newDbVersion);
+
+		return newDbVersion;
+	}
+
+	private int updateDbDesign_026_to_027(final Connection conn, final IProgressMonitor monitor) throws SQLException {
+
+		final int newDbVersion = 27;
+
+		logDbUpdateStart(newDbVersion);
+
+		if (monitor != null) {
+			monitor.subTask(NLS.bind(Messages.Tour_Database_Update, newDbVersion));
+		}
+
+		final Statement stmt = conn.createStatement();
+		{
+			// check if db is updated to version 27
+			if (isColumnAvailable(conn, TABLE_TOUR_DATA, "frontShiftCount") == false) { //$NON-NLS-1$
+
+				// Table: TABLE_TOUR_DATA
+				{
+					// Add new columns
+					SQL.AddCol_Int(stmt, TABLE_TOUR_DATA, "frontShiftCount", DEFAULT_0);//$NON-NLS-1$
+					SQL.AddCol_Int(stmt, TABLE_TOUR_DATA, "rearShiftCount", DEFAULT_0); //$NON-NLS-1$
+				}
+			}
 		}
 		stmt.close();
 

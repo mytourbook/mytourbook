@@ -59,7 +59,6 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IViewPart;
@@ -105,11 +104,12 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 	 * UI controls
 	 */
 	private PageBook				_pageBook;
-	private Label					_pageNoChart;
+	private Composite				_pageNoData;
 
 	private TourChart				_tourChart;
 
 	private void addPartListener() {
+
 		_partListener = new IPartListener2() {
 
 			@Override
@@ -157,6 +157,7 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 				}
 			}
 		};
+
 		getViewSite().getPage().addPartListener(_partListener);
 	}
 
@@ -243,7 +244,7 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 
 				} else if (eventId == TourEventId.TOUR_CHANGED && eventData instanceof TourEvent) {
 
-					if (_tourData == null || part == TourChartView.this) {
+					if (_tourData == null) {
 						return;
 					}
 
@@ -323,7 +324,7 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 		_tourData = null;
 		_tourChart.updateChart(null, false);
 
-		_pageBook.showPage(_pageNoChart);
+		_pageBook.showPage(_pageNoData);
 
 		// removed old tour data from the selection provider
 		_postSelectionProvider.clearSelection();
@@ -352,8 +353,7 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 
 		_pageBook = new PageBook(parent, SWT.NONE);
 
-		_pageNoChart = new Label(_pageBook, SWT.NONE);
-		_pageNoChart.setText(Messages.UI_Label_no_chart_is_selected);
+		_pageNoData = net.tourbook.common.UI.createUI_PageNoData(_pageBook, Messages.UI_Label_no_chart_is_selected);
 
 		_tourChart = new TourChart(_pageBook, SWT.FLAT, this);
 		_tourChart.setShowZoomActions(true);
@@ -712,11 +712,12 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 
 	private void showTour() {
 
-		onSelectionChanged(getSite().getWorkbenchWindow().getSelectionService().getSelection());
+		final ISelection selection = getSite().getWorkbenchWindow().getSelectionService().getSelection();
+		onSelectionChanged(selection);
 
 		if (_tourData == null) {
 
-			_pageBook.showPage(_pageNoChart);
+			_pageBook.showPage(_pageNoData);
 
 			// a tour is not displayed, find a tour provider which provides a tour
 			Display.getCurrent().asyncExec(new Runnable() {

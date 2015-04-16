@@ -53,6 +53,7 @@ public class GraphColorManager {
 	public static final String				PREF_GRAPH_ALTIMETER		= "altimeter";			//$NON-NLS-1$
 	public static final String				PREF_GRAPH_ALTITUDE			= "altitude";			//$NON-NLS-1$
 	public static final String				PREF_GRAPH_CADENCE			= "cadence";			//$NON-NLS-1$
+	public static final String				PREF_GRAPH_GEAR				= "gear";				//$NON-NLS-1$
 	public static final String				PREF_GRAPH_DISTANCE			= "distance";			//$NON-NLS-1$
 	public static final String				PREF_GRAPH_HEARTBEAT		= "heartbeat";			//$NON-NLS-1$
 	public static final String				PREF_GRAPH_HISTORY			= "History";			//$NON-NLS-1$
@@ -411,6 +412,14 @@ public class GraphColorManager {
 				new RGB(228, 106, 16),
 				new RGB(228, 106, 16),
 				new RGB(139, 64, 10),
+				null));
+
+		allColorDef.add(new ColorDefinition(PREF_GRAPH_GEAR,//
+				Messages.Graph_Label_Gears,
+				new RGB(0x5B, 0x5B, 0x5B),
+				new RGB(0xFF, 0x00, 0x00),
+				new RGB(0x31, 0x31, 0x31),
+				new RGB(0xff, 0xff, 0xff),
 				null));
 
 		allColorDef.add(new ColorDefinition(PREF_GRAPH_TOUR_COMPARE, //

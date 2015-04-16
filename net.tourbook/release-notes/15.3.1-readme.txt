@@ -1,0 +1,28 @@
+Version: 15.3.1                                           27. March 2015
+
+
+New 	
+===
+
+* Gears
+  - Show gear values in views and tooltips.
+  - Import/Reimport gear values.
+
+* Custom Web Browser
+  Setup and use a custom web browser to open web pages, 
+  request feature #120.
+
+ 
+Improvements 	
+============
+
+* Search
+  Do a search from an external webbrowser. This hidden feature for 
+  Windows is now easier accessable.
+
+* Tour Info Tooltip
+
+  Show max values for
+  - Altitude
+  - Pulse
+  - Speed

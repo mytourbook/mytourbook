@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -30,7 +30,7 @@ public class DPPoint {
 	/**
 	 * Index of this point in the original time serie
 	 */
-	public int	serieIndex;
+	public int		serieIndex;
 
 	public DPPoint(final double x, final double y, final int serieIndex) {
 		this.x = x;
@@ -61,6 +61,13 @@ public class DPPoint {
 	 */
 	public Vector diff(final DPPoint point) {
 		return new Vector(x - point.x, y - point.y, serieIndex);
+	}
+
+	@Override
+	public String toString() {
+		return "DPPoint " //
+				+ String.format("i:%-5d   x=%-5.0f   y=%-5.1f", serieIndex, x, y)
+				+ "\n";
 	}
 
 }

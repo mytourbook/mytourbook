@@ -117,7 +117,7 @@ public class TourInfoToolTipProvider implements ITourToolTipProvider, IInfoToolT
 
 			// there are no data available
 
-			container = _tourInfoUI.createUINoData(parent);
+			container = _tourInfoUI.createUI_NoData(parent);
 
 		} else {
 

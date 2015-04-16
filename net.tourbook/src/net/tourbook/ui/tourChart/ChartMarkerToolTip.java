@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -27,6 +27,7 @@ import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.tour.ActionOpenMarkerDialog;
 import net.tourbook.ui.ITourProvider;
+import net.tourbook.web.WEB;
 
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.layout.GridDataFactory;
@@ -55,8 +56,6 @@ import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.ToolBar;
-
-import de.byteholder.geoclipse.util.Util;
 
 /**
  * created: 30.5.2014
@@ -465,6 +464,7 @@ public class ChartMarkerToolTip extends AnimatedToolTipShell implements ITourPro
 					.applyTo(linkUrl);
 
 			linkUrl.addListener(SWT.Selection, new Listener() {
+				@Override
 				public void handleEvent(final Event event) {
 					onSelectUrl(event.text);
 				}
@@ -815,7 +815,7 @@ public class ChartMarkerToolTip extends AnimatedToolTipShell implements ITourPro
 
 	private void onSelectUrl(final String address) {
 
-		Util.openLink(Display.getCurrent().getActiveShell(), address);
+		WEB.openUrl(address);
 
 		// close tooltip when a link is selected
 		hideNow();

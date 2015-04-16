@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -576,7 +576,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 
 			final TourData firstTourData = _allTourData.get(0);
 
-			paintTours_20_One(firstTourData, false, true);
+			paintTours_20_One(firstTourData, false);
 			positionMapTo_ValueIndex(firstTourData, _currentSelectedSliderValueIndex);
 		}
 	}
@@ -591,13 +591,13 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 
 		if (_isMapSynchedWithTour) {
 
-//			// remove prevous positions
-//			TourManager.getInstance().resetMapPositions();
+			// force tour to be repainted, that it is synched immediately
+			_previousTourData = null;
 
 			_actionShowTourInMap.setChecked(true);
 			_map.setShowOverlays(true);
 
-			paintTours_20_One(_allTourData.get(0), true, true);
+			paintTours_20_One(_allTourData.get(0), true);
 
 		} else {
 
@@ -608,14 +608,18 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 	}
 
 	public void actionZoomIn() {
+
 		_map.setZoom(_map.getZoom() + 1);
 		centerTour();
+
 		_map.paint();
 	}
 
 	public void actionZoomOut() {
+
 		_map.setZoom(_map.getZoom() - 1);
 		centerTour();
+
 		_map.paint();
 	}
 
@@ -1692,7 +1696,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 			final SelectionTourData selectionTourData = (SelectionTourData) selection;
 			final TourData tourData = selectionTourData.getTourData();
 
-			paintTours_20_One(tourData, false, true);
+			paintTours_20_One(tourData, false);
 			paintPhotoSelection(selection);
 
 			enableActions();
@@ -1702,7 +1706,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 			final SelectionTourId tourIdSelection = (SelectionTourId) selection;
 			final TourData tourData = TourManager.getInstance().getTourData(tourIdSelection.getTourId());
 
-			paintTours_20_One(tourData, false, true);
+			paintTours_20_One(tourData, false);
 			paintPhotoSelection(selection);
 
 			enableActions();
@@ -1732,7 +1736,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 
 				final TourData tourData = TourManager.getInstance().getTourData(tourIds.get(0));
 
-				paintTours_20_One(tourData, false, true);
+				paintTours_20_One(tourData, false);
 				paintPhotoSelection(selection);
 
 				enableActions();
@@ -1876,14 +1880,14 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 				final long tourId = comparedTour.getTourId();
 
 				final TourData tourData = TourManager.getInstance().getTourData(tourId);
-				paintTours_20_One(tourData, false, true);
+				paintTours_20_One(tourData, false);
 
 			} else if (firstElement instanceof TVICompareResultComparedTour) {
 
 				final TVICompareResultComparedTour compareResultItem = (TVICompareResultComparedTour) firstElement;
 				final TourData tourData = TourManager.getInstance().getTourData(
 						compareResultItem.getComparedTourData().getTourId());
-				paintTours_20_One(tourData, false, true);
+				paintTours_20_One(tourData, false);
 
 			} else if (firstElement instanceof TourWayPoint) {
 
@@ -1891,7 +1895,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 
 				final TourData tourData = wp.getTourData();
 
-				paintTours_20_One(tourData, false, true);
+				paintTours_20_One(tourData, false);
 
 				_map.setPOI(_wayPointToolTipProvider, wp);
 
@@ -1917,7 +1921,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 
 				final TourData tourData = TourManager.getInstance().getTourData(refItem.getTourId());
 
-				paintTours_20_One(tourData, false, true);
+				paintTours_20_One(tourData, false);
 
 				enableActions();
 			}
@@ -2142,6 +2146,9 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 		_map.paint();
 	}
 
+	/**
+	 * Show tours which are set in {@link #_allTourData}.
+	 */
 	private void paintTours_10_All() {
 
 		if (_allTourData.size() == 0) {
@@ -2160,9 +2167,11 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 			enableActions(true);
 
 		} else {
-			paintTours_20_One(_allTourData.get(0), true, false);
+			paintTours_20_One(_allTourData.get(0), true);
 			enableActions();
 		}
+
+		paintPhotoSelection(null);
 	}
 
 	/**
@@ -2173,7 +2182,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 	 * @param isSynchronized
 	 *            when <code>true</code>, map will be synchronized
 	 */
-	private void paintTours_20_One(final TourData tourData, final boolean forceRedraw, final boolean isSynchronized) {
+	private void paintTours_20_One(final TourData tourData, final boolean forceRedraw) {
 
 		_isTourOrWayPoint = true;
 
@@ -2231,7 +2240,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 		/*
 		 * set position and zoom level for the tour
 		 */
-		if (_isMapSynchedWithTour && isSynchronized) {
+		if (_isMapSynchedWithTour) {
 
 			if (((forceRedraw == false) && (_previousTourData != null)) || (tourData == _previousTourData)) {
 

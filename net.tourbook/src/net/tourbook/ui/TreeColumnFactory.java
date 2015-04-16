@@ -315,6 +315,36 @@ public abstract class TreeColumnFactory {
 		};
 	};
 
+	public static final TreeColumnFactory GEAR_FRONT_SHIFT_COUNT = new TreeColumnFactory() {
+		@Override
+		public TreeColumnDefinition createColumn(final ColumnManager columnManager, final PixelConverter pixelConverter) {
+			
+			final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "GearFrontShiftCount", SWT.TRAIL); //$NON-NLS-1$
+			
+			colDef.setColumnLabel(Messages.ColumnFactory_GearFrontShiftCount_Label);
+			colDef.setColumnHeaderText(Messages.ColumnFactory_GearFrontShiftCount_Header);
+			colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_GearFrontShiftCount_Tooltip);
+			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(8));
+			
+			return colDef;
+		};
+	};
+	
+	public static final TreeColumnFactory GEAR_REAR_SHIFT_COUNT = new TreeColumnFactory() {
+		@Override
+		public TreeColumnDefinition createColumn(final ColumnManager columnManager, final PixelConverter pixelConverter) {
+			
+			final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "GearRearShiftCount", SWT.TRAIL); //$NON-NLS-1$
+			
+			colDef.setColumnLabel(Messages.ColumnFactory_GearRearShiftCount_Label);
+			colDef.setColumnHeaderText(Messages.ColumnFactory_GearRearShiftCount_Header);
+			colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_GearRearShiftCount_Tooltip);
+			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(8));
+			
+			return colDef;
+		};
+	};
+	
 	public static final TreeColumnFactory MAX_ALTITUDE = new TreeColumnFactory() {
 		@Override
 		public TreeColumnDefinition createColumn(final ColumnManager columnManager, final PixelConverter pixelConverter) {

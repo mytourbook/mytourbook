@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -19,6 +19,7 @@ import net.tourbook.application.TourbookPlugin;
 
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.swt.SWT;
@@ -36,6 +37,7 @@ public class PrefPage_TEMPLATE_Without_Fields extends PreferencePage implements 
 	/*
 	 * UI controls
 	 */
+	private PixelConverter		_pc;
 
 	@Override
 	protected Control createContents(final Composite parent) {
@@ -49,6 +51,8 @@ public class PrefPage_TEMPLATE_Without_Fields extends PreferencePage implements 
 	}
 
 	private Composite createUI(final Composite parent) {
+
+		_pc = new PixelConverter(parent);
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
@@ -64,6 +68,7 @@ public class PrefPage_TEMPLATE_Without_Fields extends PreferencePage implements 
 
 	}
 
+	@Override
 	public void init(final IWorkbench workbench) {
 
 	}

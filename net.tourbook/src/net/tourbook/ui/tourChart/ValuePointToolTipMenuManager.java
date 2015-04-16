@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2012  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -49,6 +49,7 @@ public class ValuePointToolTipMenuManager {
 	static final int					VALUE_ID_TIME_OF_DAY						= 1 << 12;
 	static final int					VALUE_ID_TIME_SLICES						= 1 << 13;
 	static final int					VALUE_ID_CHART_ZOOM_FACTOR					= 1 << 14;
+	static final int					VALUE_ID_GEARS								= 1 << 15;
 
 	static final String					STATE_VALUE_POINT_TOOLTIP_VISIBLE_GRAPHS	= "ValuePoint_ToolTip_VisibleGraphs";		//$NON-NLS-1$
 	static final String					STATE_VALUE_POINT_TOOLTIP_ORIENTATION		= "ValuePoint_ToolTip_Orientation";		//$NON-NLS-1$
@@ -87,6 +88,7 @@ public class ValuePointToolTipMenuManager {
 	private ActionValueItem				_actionValueCadence;
 	private ActionValueItem				_actionValueChartZoomFactor;
 	private ActionValueItem				_actionValueDistance;
+	private ActionValueItem				_actionValueGears;
 	private ActionValueItem				_actionValueGradient;
 	private ActionValueItem				_actionValueHeader;
 	private ActionValueItem				_actionValuePace;
@@ -357,56 +359,62 @@ public class ValuePointToolTipMenuManager {
 		_actionValueAltitude = new ActionValueItem(
 				VALUE_ID_ALTITUDE,
 				Messages.Tooltip_ValuePoint_Action_Value_Altitude,
-				net.tourbook.Messages.Image__graph_altitude,
-				net.tourbook.Messages.Image__graph_altitude_disabled);
+				Messages.Image__graph_altitude,
+				Messages.Image__graph_altitude_disabled);
 
 		_actionValueAltimeter = new ActionValueItem(
 				VALUE_ID_ALTIMETER,
 				Messages.Tooltip_ValuePoint_Action_Value_Altimeter,
-				net.tourbook.Messages.Image__graph_altimeter,
-				net.tourbook.Messages.Image__graph_altimeter_disabled);
+				Messages.Image__graph_altimeter,
+				Messages.Image__graph_altimeter_disabled);
 
 		_actionValueCadence = new ActionValueItem(
 				VALUE_ID_CADENCE,
 				Messages.Tooltip_ValuePoint_Action_Value_Cadence,
-				net.tourbook.Messages.Image__graph_cadence,
-				net.tourbook.Messages.Image__graph_cadence_disabled);
+				Messages.Image__graph_cadence,
+				Messages.Image__graph_cadence_disabled);
+
+		_actionValueGears = new ActionValueItem(
+				VALUE_ID_GEARS,
+				Messages.Tooltip_ValuePoint_Action_Value_Gears,
+				Messages.Image__Graph_Gears,
+				Messages.Image__Graph_Gears_disabled);
 
 		_actionValueGradient = new ActionValueItem(
 				VALUE_ID_GRADIENT,
 				Messages.Tooltip_ValuePoint_Action_Value_Gradient,
-				net.tourbook.Messages.Image__graph_gradient,
-				net.tourbook.Messages.Image__graph_gradient_disabled);
+				Messages.Image__graph_gradient,
+				Messages.Image__graph_gradient_disabled);
 
 		_actionValuePace = new ActionValueItem(
 				VALUE_ID_PACE,
 				Messages.Tooltip_ValuePoint_Action_Value_Pace,
-				net.tourbook.Messages.Image__graph_pace,
-				net.tourbook.Messages.Image__graph_pace_disabled);
+				Messages.Image__graph_pace,
+				Messages.Image__graph_pace_disabled);
 
 		_actionValuePower = new ActionValueItem(
 				VALUE_ID_POWER,
 				Messages.Tooltip_ValuePoint_Action_Value_Power,
-				net.tourbook.Messages.Image__graph_power,
-				net.tourbook.Messages.Image__graph_power_disabled);
+				Messages.Image__graph_power,
+				Messages.Image__graph_power_disabled);
 
 		_actionValuePulse = new ActionValueItem(
 				VALUE_ID_PULSE,
 				Messages.Tooltip_ValuePoint_Action_Value_Pulse,
-				net.tourbook.Messages.Image__graph_heartbeat,
-				net.tourbook.Messages.Image__graph_heartbeat_disabled);
+				Messages.Image__graph_heartbeat,
+				Messages.Image__graph_heartbeat_disabled);
 
 		_actionValueSpeed = new ActionValueItem(
 				VALUE_ID_SPEED,
 				Messages.Tooltip_ValuePoint_Action_Value_Speed,
-				net.tourbook.Messages.Image__graph_speed,
-				net.tourbook.Messages.Image__graph_speed_disabled);
+				Messages.Image__graph_speed,
+				Messages.Image__graph_speed_disabled);
 
 		_actionValueTemperature = new ActionValueItem(
 				VALUE_ID_TEMPERATURE,
 				Messages.Tooltip_ValuePoint_Action_Value_Temperature,
-				net.tourbook.Messages.Image__graph_temperature,
-				net.tourbook.Messages.Image__graph_temperature_disabled);
+				Messages.Image__graph_temperature,
+				Messages.Image__graph_temperature_disabled);
 	}
 
 	private void createPinActions() {
@@ -480,6 +488,10 @@ public class ValuePointToolTipMenuManager {
 				(_allVisibleValueIds & VALUE_ID_DISTANCE) > 0,
 				_tourData.distanceSerie != null);
 
+		_actionValueGears.setState( //
+				(_allVisibleValueIds & VALUE_ID_GEARS) > 0,
+				_tourData.getGears() != null);
+
 		_actionValueGradient.setState( //
 				(_allVisibleValueIds & VALUE_ID_GRADIENT) > 0,
 				_tourData.getGradientSerie() != null);
@@ -545,6 +557,7 @@ public class ValuePointToolTipMenuManager {
 		addItem(_actionValueGradient);
 		addItem(_actionValueAltimeter);
 		addItem(_actionValueCadence);
+		addItem(_actionValueGears);
 		addItem(_actionValueChartZoomFactor);
 		addItem(_actionCloseTTContextMenu);
 

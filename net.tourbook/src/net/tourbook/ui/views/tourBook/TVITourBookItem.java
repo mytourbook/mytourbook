@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -45,29 +45,32 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
 	static {
 		SQL_SUM_COLUMNS = UI.EMPTY_STRING
 		//
-				+ "SUM(TOURDISTANCE)," // 								1	//$NON-NLS-1$
-				+ "SUM(TOURRECORDINGTIME)," //							2	//$NON-NLS-1$
-				+ "SUM(TOURDRIVINGTIME)," //							3	//$NON-NLS-1$
-				+ "SUM(TOURALTUP)," //									4	//$NON-NLS-1$
-				+ "SUM(TOURALTDOWN)," //								5	//$NON-NLS-1$
-				+ "SUM(1)," //											6	//$NON-NLS-1$
+				+ "SUM(TOURDISTANCE)," // 								0	//$NON-NLS-1$
+				+ "SUM(TOURRECORDINGTIME)," //							1	//$NON-NLS-1$
+				+ "SUM(TOURDRIVINGTIME)," //							2	//$NON-NLS-1$
+				+ "SUM(TOURALTUP)," //									3	//$NON-NLS-1$
+				+ "SUM(TOURALTDOWN)," //								4	//$NON-NLS-1$
+				+ "SUM(1)," //											5	//$NON-NLS-1$
 				//
-				+ "MAX(MAXSPEED)," //									7	//$NON-NLS-1$
-				+ "SUM(TOURDISTANCE)," //								8	//$NON-NLS-1$
-				+ "SUM(TOURDRIVINGTIME)," //							9	//$NON-NLS-1$
-				+ "MAX(MAXALTITUDE)," //								10	//$NON-NLS-1$
-				+ "MAX(MAXPULSE)," //									11	//$NON-NLS-1$
+				+ "MAX(MAXSPEED)," //									6	//$NON-NLS-1$
+				+ "SUM(TOURDISTANCE)," //								7	//$NON-NLS-1$
+				+ "SUM(TOURDRIVINGTIME)," //							8	//$NON-NLS-1$
+				+ "MAX(MAXALTITUDE)," //								9	//$NON-NLS-1$
+				+ "MAX(MAXPULSE)," //									10	//$NON-NLS-1$
 				//
-				+ "AVG( CASE WHEN AVGPULSE = 0			THEN NULL ELSE AVGPULSE END)," //			12	//$NON-NLS-1$
-				+ "AVG( CASE WHEN AVGCADENCE = 0		THEN NULL ELSE AVGCADENCE END )," //		13	//$NON-NLS-1$
-				+ "AVG( CASE WHEN AvgTemperature = 0	THEN NULL ELSE DOUBLE(AvgTemperature) / TemperatureScale END )," //	14	//$NON-NLS-1$
-				+ "AVG( CASE WHEN WEATHERWINDDIR = 0	THEN NULL ELSE WEATHERWINDDIR END )," //	15	//$NON-NLS-1$
-				+ "AVG( CASE WHEN WEATHERWINDSPD = 0	THEN NULL ELSE WEATHERWINDSPD END )," //	16	//$NON-NLS-1$
-				+ "AVG( CASE WHEN RESTPULSE = 0			THEN NULL ELSE RESTPULSE END )," //			17	//$NON-NLS-1$
+				+ "AVG( CASE WHEN AVGPULSE = 0			THEN NULL ELSE AVGPULSE END)," //			11	//$NON-NLS-1$
+				+ "AVG( CASE WHEN AVGCADENCE = 0		THEN NULL ELSE AVGCADENCE END )," //		12	//$NON-NLS-1$
+				+ "AVG( CASE WHEN AvgTemperature = 0	THEN NULL ELSE DOUBLE(AvgTemperature) / TemperatureScale END )," //	13	//$NON-NLS-1$
+				+ "AVG( CASE WHEN WEATHERWINDDIR = 0	THEN NULL ELSE WEATHERWINDDIR END )," //	14	//$NON-NLS-1$
+				+ "AVG( CASE WHEN WEATHERWINDSPD = 0	THEN NULL ELSE WEATHERWINDSPD END )," //	15	//$NON-NLS-1$
+				+ "AVG( CASE WHEN RESTPULSE = 0			THEN NULL ELSE RESTPULSE END )," //			16	//$NON-NLS-1$
 				//
-				+ "SUM(CALORIES)," //									18	//$NON-NLS-1$
-				+ "SUM(numberOfTimeSlices)," //							19	//$NON-NLS-1$
-				+ "SUM(numberOfPhotos)"; //								20	//$NON-NLS-1$
+				+ "SUM(CALORIES)," //									17	//$NON-NLS-1$
+				+ "SUM(numberOfTimeSlices)," //							18	//$NON-NLS-1$
+				+ "SUM(numberOfPhotos)," //								19	//$NON-NLS-1$
+				//
+				+ "SUM(frontShiftCount)," //							20	//$NON-NLS-1$
+				+ "SUM(rearShiftCount)"; //								21	//$NON-NLS-1$
 	}
 
 	TourBookView					tourBookView;
@@ -123,7 +126,12 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
 
 	int								colNumberOfTimeSlices;
 	int								colNumberOfPhotos;
+
 	int								colDPTolerance;
+
+	int								colFrontShiftCount;
+	int								colRearShiftCount;
+
 
 	TVITourBookItem(final TourBookView view) {
 
@@ -170,9 +178,13 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
 		colNumberOfTimeSlices = result.getInt(startIndex + 18);
 		colNumberOfPhotos = result.getInt(startIndex + 19);
 
+		colFrontShiftCount = result.getInt(startIndex + 20);
+		colRearShiftCount = result.getInt(startIndex + 21);
+
 		colPausedTime = colRecordingTime - colDrivingTime;
 	}
 
+	@Override
 	public Long getTourId() {
 		return null;
 	}

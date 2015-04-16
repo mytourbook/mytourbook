@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -35,36 +35,38 @@ public class ChartDataYSerie extends ChartDataSerie {
 	/**
 	 * the bars has only a low and high value
 	 */
-	public static final int			BAR_LAYOUT_SINGLE_SERIE		= 1;
+	public static final int			BAR_LAYOUT_SINGLE_SERIE				= 1;
 
 	/**
 	 * the bars are displayed one of the other
 	 */
-	public static final int			BAR_LAYOUT_STACKED			= 2;
+	public static final int			BAR_LAYOUT_STACKED					= 2;
 
 	/**
 	 * the bars are displayed beside each other
 	 */
-	public static final int			BAR_LAYOUT_BESIDE			= 3;
+	public static final int			BAR_LAYOUT_BESIDE					= 3;
 
-	public static final String		YDATA_INFO					= "yDataInfo";					//$NON-NLS-1$
+	public static final String		YDATA_INFO							= "yDataInfo";					//$NON-NLS-1$
 
-	public static final int			FILL_METHOD_FILL_BOTTOM		= 1;
-	public static final int			FILL_METHOD_FILL_ZERO		= 2;
-	public static final int			FILL_METHOD_CUSTOM			= 100;
-	public static final int			BAR_DRAW_METHOD_BOTTOM		= 200;
+	public static final int			FILL_METHOD_NO						= 0;
+	public static final int			FILL_METHOD_FILL_BOTTOM				= 1;
+	public static final int			FILL_METHOD_FILL_ZERO				= 2;
+	public static final int			FILL_METHOD_FILL_BOTTOM_NO_BORDER	= 3;
+	public static final int			FILL_METHOD_CUSTOM					= 100;
+	public static final int			BAR_DRAW_METHOD_BOTTOM				= 200;
 
 	/**
 	 * Slider label format: n.1
 	 */
-	public static final int			SLIDER_LABEL_FORMAT_DEFAULT	= 0;
+	public static final int			SLIDER_LABEL_FORMAT_DEFAULT			= 0;
 	/**
 	 * Slider label format: mm:ss
 	 */
-	public static final int			SLIDER_LABEL_FORMAT_MM_SS	= 1;
+	public static final int			SLIDER_LABEL_FORMAT_MM_SS			= 1;
 
-	private int						_sliderLabelFormat			= SLIDER_LABEL_FORMAT_DEFAULT;
-	private int						_chartLayout				= BAR_LAYOUT_SINGLE_SERIE;
+	private int						_sliderLabelFormat					= SLIDER_LABEL_FORMAT_DEFAULT;
+	private int						_chartLayout						= BAR_LAYOUT_SINGLE_SERIE;
 	private String					_yTitle;
 
 	/**
@@ -72,31 +74,31 @@ public class ChartDataYSerie extends ChartDataSerie {
 	 */
 	private int[][]					_colorIndex;
 
-	private int						_graphFillMethod			= FILL_METHOD_FILL_BOTTOM;
+	private int						_graphFillMethod					= FILL_METHOD_FILL_BOTTOM;
 
-	private boolean					_isShowYSlider				= false;
+	private boolean					_isShowYSlider						= false;
 
 	/**
 	 * This value is set when a y-slider is dragged
 	 */
-	float							adjustedYValue				= Float.MIN_VALUE;
+	float							adjustedYValue						= Float.MIN_VALUE;
 
 	/**
 	 * <p>
 	 * true: the direction is from bottom to top by increasing number <br>
 	 * false: the direction is from top to bottom by increasing number
 	 */
-	private boolean					_yAxisDirection				= true;
+	private boolean					_yAxisDirection						= true;
 
 	/**
 	 * Contains all layers which are drawn on top of the graph before the slider
 	 */
-	private ArrayList<IChartLayer>	_customFgLayers				= new ArrayList<IChartLayer>();
+	private ArrayList<IChartLayer>	_customFgLayers						= new ArrayList<IChartLayer>();
 
 	/**
 	 * Contains all layers which are drawn in the background of the graph
 	 */
-	private ArrayList<IChartLayer>	_customBgLayers				= new ArrayList<IChartLayer>();
+	private ArrayList<IChartLayer>	_customBgLayers						= new ArrayList<IChartLayer>();
 
 	/**
 	 * Contains a painter which fills the graph
@@ -108,6 +110,10 @@ public class ChartDataYSerie extends ChartDataSerie {
 	private ChartYSlider			_ySlider2;
 
 	private final ChartType			_chartType;
+
+	private boolean[]				_lineGaps;
+
+	private ISliderLabelProvider	_sliderLabelProvider;
 
 	/**
 	 * When this value is > 0 a line chart will not draw a line to the next value point when the
@@ -229,16 +235,16 @@ public class ChartDataYSerie extends ChartDataSerie {
 		return _highValuesFloat;
 	}
 
+	public boolean[] getLineGaps() {
+		return _lineGaps;
+	}
+
 	/**
 	 * @return Returns the lowValues.
 	 */
 	public float[][] getLowValuesFloat() {
 		return _lowValuesFloat;
 	}
-
-//	public int getDisabledLineToNext() {
-//		return _disabledLineToNext;
-//	}
 
 	/**
 	 * @return Returns the format how the slider label will be formatted, which can be <br>
@@ -247,6 +253,10 @@ public class ChartDataYSerie extends ChartDataSerie {
 	 */
 	public int getSliderLabelFormat() {
 		return _sliderLabelFormat;
+	}
+
+	public ISliderLabelProvider getSliderLabelProvider() {
+		return _sliderLabelProvider;
 	}
 
 	public String getXTitle() {
@@ -341,6 +351,10 @@ public class ChartDataYSerie extends ChartDataSerie {
 		_graphFillMethod = fillMethod;
 	}
 
+	public void setLineGaps(final boolean[] lineGaps) {
+		_lineGaps = lineGaps;
+	}
+
 	private void setMinMaxValues(final float[][] valueSeries) {
 
 		if (valueSeries == null || valueSeries.length == 0 || valueSeries[0] == null || valueSeries[0].length == 0) {
@@ -359,6 +373,7 @@ public class ChartDataYSerie extends ChartDataSerie {
 
 			if (_chartType == ChartType.LINE
 					|| _chartType == ChartType.LINE_WITH_BARS
+					|| _chartType == ChartType.HORIZONTAL_BAR
 					|| _chartType == ChartType.XY_SCATTER
 					|| _chartType == ChartType.HISTORY) {
 
@@ -554,6 +569,10 @@ public class ChartDataYSerie extends ChartDataSerie {
 	 */
 	public void setSliderLabelFormat(final int sliderLabelFormat) {
 		_sliderLabelFormat = sliderLabelFormat;
+	}
+
+	public void setSliderLabelProvider(final ISliderLabelProvider sliderLabelProvider) {
+		_sliderLabelProvider = sliderLabelProvider;
 	}
 
 	/**

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -180,6 +180,18 @@ public class Messages extends NLS {
 	public static String		ColumnFactory_DPTolerance_Header;
 	public static String		ColumnFactory_DPTolerance_Label;
 	public static String		ColumnFactory_DPTolerance_Tooltip;
+	public static String		ColumnFactory_GearFrontShiftCount_Header;
+	public static String		ColumnFactory_GearFrontShiftCount_Label;
+	public static String		ColumnFactory_GearFrontShiftCount_Tooltip;
+	public static String		ColumnFactory_GearRatio_Header;
+	public static String		ColumnFactory_GearRatio_Label;
+	public static String		ColumnFactory_GearRatio_Tooltip;
+	public static String		ColumnFactory_GearRearShiftCount_Header;
+	public static String		ColumnFactory_GearRearShiftCount_Label;
+	public static String		ColumnFactory_GearRearShiftCount_Tooltip;
+	public static String		ColumnFactory_GearTeeth_Header;
+	public static String		ColumnFactory_GearTeeth_Label;
+	public static String		ColumnFactory_GearTeeth_Tooltip;
 	public static String		ColumnFactory_Id_Label;
 	public static String		ColumnFactory_Id_Tooltip;
 	public static String		ColumnFactory_InetAddress_Label;
@@ -309,7 +321,11 @@ public class Messages extends NLS {
 	public static String		Tour_Tooltip_Label_DefaultTitle;
 	public static String		Tour_Tooltip_Label_Description;
 	public static String		Tour_Tooltip_Label_Distance;
+	public static String		Tour_Tooltip_Label_GearShifts;
 	public static String		Tour_Tooltip_Label_Hour;
+	public static String		Tour_Tooltip_Label_MaxAltitude;
+	public static String		Tour_Tooltip_Label_MaxPulse;
+	public static String		Tour_Tooltip_Label_MaxSpeed;
 	public static String		Tour_Tooltip_Label_MovingTime;
 	public static String		Tour_Tooltip_Label_NoTour;
 	public static String		Tour_Tooltip_Label_RecordingTime;

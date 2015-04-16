@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -14,6 +14,8 @@
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.ui.views;
+
+import gnu.trove.list.array.TIntArrayList;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -57,6 +59,7 @@ import net.tourbook.ui.TableColumnFactory;
 import net.tourbook.ui.action.ActionModifyColumns;
 import net.tourbook.ui.tourChart.TourChart;
 import net.tourbook.ui.tourChart.TourChartView;
+import net.tourbook.web.WEB;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuManager;
@@ -139,7 +142,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	private static final String						STATE_DP_TOLERANCE_PULSE			= "STATE_DP_TOLERANCE_PULSE";			//$NON-NLS-1$
 	private static final String						STATE_MINIMUM_ALTITUDE				= "STATE_MINIMUM_ALTITUDE";			//$NON-NLS-1$
 	private static final String						STATE_SELECTED_DISTANCE				= "selectedDistance";					//$NON-NLS-1$
-	private static final String						STATE_SELECTED_SEGMENTER_INDEX		= "selectedSegmenterIndex";			//$NON-NLS-1$
+	private static final String						STATE_SELECTED_SEGMENTER_BY_USER	= "STATE_SELECTED_SEGMENTER_BY_USER";	//$NON-NLS-1$
 
 	/**
 	 * initially this was an int value, with 2 it's a string
@@ -238,6 +241,11 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 				SEGMENTER_REQUIRES_ALTITUDE | SEGMENTER_REQUIRES_DISTANCE));
 
 		_allTourSegmenter.add(new TourSegmenter(
+				SegmenterType.ByAltitudeWithDPMerged,
+				Messages.Tour_Segmenter_Type_ByAltitude_Merged,
+				SEGMENTER_REQUIRES_ALTITUDE | SEGMENTER_REQUIRES_DISTANCE));
+
+		_allTourSegmenter.add(new TourSegmenter(
 				SegmenterType.ByComputedAltiUpDown,
 				Messages.tour_segmenter_type_byComputedAltiUpDown,
 				SEGMENTER_REQUIRES_ALTITUDE));
@@ -297,7 +305,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 	private PageBook								_pageBookUI;
 	private PageBook								_pageBookSegmenter;
-	private PageBook								_pagebookBreakTime;
+	private PageBook								_pageBookBreakTime;
 
 	private Button									_btnSaveTourDP;
 	private Button									_btnSaveTourMin;
@@ -309,6 +317,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	private Composite								_pageBreakByAvgSpeed;
 	private Composite								_pageBreakBySliceSpeed;
 	private Composite								_pageBreakByTimeDistance;
+	private Composite								_pageNoData;
 	private Composite								_pageSegTypeDPAltitude;
 	private Composite								_pageSegTypeDPPulse;
 	private Composite								_pageSegTypeByMarker;
@@ -326,7 +335,6 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	private Label									_lblBreakDistanceUnit;
 	private Label									_lblDistanceValue;
 	private Label									_lblMinAltitude;
-	private Label									_lblNoData;
 	private Label									_lblTourBreakTime;
 
 	private Spinner									_spinnerBreakMinAvgSpeedAS;
@@ -357,7 +365,9 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 			super(Messages.App_Action_open_tour_segmenter, SWT.TOGGLE);
 
 			setToolTipText(Messages.App_Action_open_tour_segmenter_tooltip);
-			setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__tour_segmenter));
+
+			setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__TourSegments));
+			setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__TourSegments_Disabled));
 		}
 
 		@Override
@@ -368,6 +378,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 	public static enum SegmenterType {
 		ByAltitudeWithDP, //
+		ByAltitudeWithDPMerged, //
 		ByPulseWithDP, //
 		ByMarker, //
 		ByDistance, //
@@ -385,8 +396,10 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 		public ViewContentProvider() {}
 
+		@Override
 		public void dispose() {}
 
+		@Override
 		public Object[] getElements(final Object parent) {
 			if (_tourData == null) {
 				return new Object[0];
@@ -401,6 +414,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 			}
 		}
 
+		@Override
 		public void inputChanged(final Viewer v, final Object oldInput, final Object newInput) {}
 	}
 
@@ -487,10 +501,13 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 		// set the part listener
 		_partListener = new IPartListener2() {
+			@Override
 			public void partActivated(final IWorkbenchPartReference partRef) {}
 
+			@Override
 			public void partBroughtToTop(final IWorkbenchPartReference partRef) {}
 
+			@Override
 			public void partClosed(final IWorkbenchPartReference partRef) {
 				if (partRef.getPart(false) == TourSegmenterView.this) {
 					saveState();
@@ -498,16 +515,21 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 				}
 			}
 
+			@Override
 			public void partDeactivated(final IWorkbenchPartReference partRef) {}
 
+			@Override
 			public void partHidden(final IWorkbenchPartReference partRef) {
 				onPartHidden();
 			}
 
+			@Override
 			public void partInputChanged(final IWorkbenchPartReference partRef) {}
 
+			@Override
 			public void partOpened(final IWorkbenchPartReference partRef) {}
 
+			@Override
 			public void partVisible(final IWorkbenchPartReference partRef) {
 				onPartVisible();
 			}
@@ -519,6 +541,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	private void addPrefListener() {
 
 		_prefChangeListener = new IPropertyChangeListener() {
+			@Override
 			public void propertyChange(final PropertyChangeEvent event) {
 
 				final String property = event.getProperty();
@@ -576,6 +599,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	private void addSelectionListener() {
 
 		_postSelectionListener = new ISelectionListener() {
+			@Override
 			public void selectionChanged(final IWorkbenchPart part, final ISelection selection) {
 
 				if (part == TourSegmenterView.this) {
@@ -592,74 +616,86 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	private void addTourEventListener() {
 
 		_tourEventListener = new ITourEventListener() {
+			@Override
 			public void tourChanged(final IWorkbenchPart part, final TourEventId eventId, final Object eventData) {
 
-				if (_tourData == null || part == TourSegmenterView.this) {
+				if (part == TourSegmenterView.this) {
 					return;
 				}
 
-				if (eventId == TourEventId.TOUR_CHANGED && eventData instanceof TourEvent) {
+				if (eventId == TourEventId.TOUR_SELECTION && eventData instanceof ISelection) {
 
-					final TourEvent tourEvent = (TourEvent) eventData;
-					final ArrayList<TourData> modifiedTours = tourEvent.getModifiedTours();
+					onSelectionChanged((ISelection) eventData);
 
-					if (modifiedTours == null || modifiedTours.size() == 0) {
-						return;
-					}
-
-					final TourData modifiedTourData = modifiedTours.get(0);
-					final long viewTourId = _tourData.getTourId();
-
-					if (modifiedTourData.getTourId() == viewTourId) {
-
-						// update existing tour
-
-						if (checkDataValidation(modifiedTourData)) {
-
-							if (tourEvent.isReverted) {
-
-								/*
-								 * tour is reverted, saving existing tour is not necessary, just
-								 * update the tour
-								 */
-								setTour(modifiedTourData, true);
-
-							} else {
-
-								// it's the same tour but tour is modified
-
-								onSelectionChanged(new SelectionTourData(null, modifiedTourData));
-							}
-						}
-
-					} else {
-
-						// display new tour
-
-						onSelectionChanged(new SelectionTourData(null, modifiedTourData));
-					}
-
-					// removed old tour data from the selection provider
-					_postSelectionProvider.clearSelection();
-
-				} else if (eventId == TourEventId.CLEAR_DISPLAYED_TOUR) {
-
-					clearView();
-
-				} else if (eventId == TourEventId.UPDATE_UI) {
-
-					// check if a tour must be updated
+				} else {
 
 					if (_tourData == null) {
 						return;
 					}
 
-					final Long tourId = _tourData.getTourId();
+					if (eventId == TourEventId.TOUR_CHANGED && eventData instanceof TourEvent) {
 
-					// update ui
-					if (net.tourbook.ui.UI.containsTourId(eventData, tourId) != null) {
+						final TourEvent tourEvent = (TourEvent) eventData;
+						final ArrayList<TourData> modifiedTours = tourEvent.getModifiedTours();
 
-						setTour(TourManager.getInstance().getTourData(tourId), true);
+						if (modifiedTours == null || modifiedTours.size() == 0) {
+							return;
+						}
+
+						final TourData modifiedTourData = modifiedTours.get(0);
+						final long viewTourId = _tourData.getTourId();
+
+						if (modifiedTourData.getTourId() == viewTourId) {
+
+							// update existing tour
+
+							if (checkDataValidation(modifiedTourData)) {
+
+								if (tourEvent.isReverted) {
+
+									/*
+									 * tour is reverted, saving existing tour is not necessary, just
+									 * update the tour
+									 */
+									setTour(modifiedTourData, true);
+
+								} else {
+
+									// it's the same tour but tour is modified
+
+									onSelectionChanged(new SelectionTourData(null, modifiedTourData));
+								}
+							}
+
+						} else {
+
+							// display new tour
+
+							onSelectionChanged(new SelectionTourData(null, modifiedTourData));
+						}
+
+						// removed old tour data from the selection provider
+						_postSelectionProvider.clearSelection();
+
+					} else if (eventId == TourEventId.CLEAR_DISPLAYED_TOUR) {
+
+						clearView();
+
+					} else if (eventId == TourEventId.UPDATE_UI) {
+
+						// check if a tour must be updated
+
+						if (_tourData == null) {
+							return;
+						}
+
+						final Long tourId = _tourData.getTourId();
+
+						// update ui
+						if (net.tourbook.ui.UI.containsTourId(eventData, tourId) != null) {
+
+							setTour(TourManager.getInstance().getTourData(tourId), true);
+						}
 					}
 				}
 			}
@@ -691,6 +727,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		}
 
 		_pageBookUI.showPage(_pageSegmenter);
+		enableActions();
 
 		return true;
 	}
@@ -725,7 +762,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 	private void clearView() {
 
-		_pageBookUI.showPage(_lblNoData);
+		_pageBookUI.showPage(_pageNoData);
 
 		_tourData = null;
 		_tourChart = null;
@@ -734,6 +771,8 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 		// removed old tour data from the selection provider
 		_postSelectionProvider.clearSelection();
+
+		enableActions();
 	}
 
 	private void createActions() {
@@ -780,26 +819,12 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		// set default value, show segments in opened charts
 		_actionShowSegments.setChecked(true);
 
-		_pageBookUI.showPage(_lblNoData);
+		_pageBookUI.showPage(_pageNoData);
+		enableActions();
 
 		restoreState();
 
-		// update viewer with current selection
-		onSelectionChanged(getSite().getWorkbenchWindow().getSelectionService().getSelection());
-
-		// when previous onSelectionChanged did not display a tour, get tour from tour manager
-		if (_tourData == null) {
-			Display.getCurrent().asyncExec(new Runnable() {
-				public void run() {
-
-					final ArrayList<TourData> selectedTours = TourManager.getSelectedTours();
-
-					if (selectedTours != null && selectedTours.size() > 0) {
-						onSelectionChanged(new SelectionTourData(null, selectedTours.get(0)));
-					}
-				}
-			});
-		}
+		showTour();
 	}
 
 	private Object[] createSegmenterContent() {
@@ -851,7 +876,10 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		}
 
 		if (_tourData == null) {
-			_pageBookUI.showPage(_lblNoData);
+
+			_pageBookUI.showPage(_pageNoData);
+			enableActions();
+
 			return;
 		}
 
@@ -869,6 +897,10 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		if (selectedSegmenterType == SegmenterType.ByAltitudeWithDP) {
 
 			createSegmentsBy_AltitudeWithDP();
+
+		} else if (selectedSegmenterType == SegmenterType.ByAltitudeWithDPMerged) {
+
+			createSegmentsBy_AltitudeWithDPMerged();
 
 		} else if (selectedSegmenterType == SegmenterType.ByPulseWithDP) {
 
@@ -907,7 +939,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		final float[] distanceSerie = _tourData.getMetricDistanceSerie();
 		final float[] altitudeSerie = _tourData.altitudeSerie;
 
-		// convert data series into points
+		// convert data series into dp points
 		final DPPoint graphPoints[] = new DPPoint[distanceSerie.length];
 		for (int serieIndex = 0; serieIndex < graphPoints.length; serieIndex++) {
 			graphPoints[serieIndex] = new DPPoint(distanceSerie[serieIndex], altitudeSerie[serieIndex], serieIndex);
@@ -925,6 +957,85 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 			final DPPoint point = (DPPoint) dpPoints[iPoint];
 			segmentSerieIndex[iPoint] = point.serieIndex;
 		}
+	}
+
+	/**
+	 * Create Douglas-Peucker segments from distance and altitude. All segments are merged which
+	 * have the same vertical direction.
+	 */
+	private void createSegmentsBy_AltitudeWithDPMerged() {
+
+		final float[] distanceSerie = _tourData.getMetricDistanceSerie();
+		final float[] altitudeSerie = _tourData.altitudeSerie;
+
+		final int serieSize = distanceSerie.length;
+
+		// convert data series into dp points
+		final DPPoint graphPoints[] = new DPPoint[serieSize];
+		for (int serieIndex = 0; serieIndex < graphPoints.length; serieIndex++) {
+			graphPoints[serieIndex] = new DPPoint(distanceSerie[serieIndex], altitudeSerie[serieIndex], serieIndex);
+		}
+
+		final Object[] simplePoints = new DouglasPeuckerSimplifier(_dpToleranceAltitude, graphPoints).simplify();
+
+		/*
+		 * copie the data index for the simplified points into the tour data
+		 */
+
+		final TIntArrayList segmentSerieIndex = new TIntArrayList();
+
+		// set first point
+		segmentSerieIndex.add(0);
+
+		DPPoint prevDpPoint = (DPPoint) simplePoints[0];
+
+		double prevAltitude = prevDpPoint.y;
+		boolean isPrevAltiUp = false;
+		boolean isPrevAltiDown = false;
+
+		for (int pointIndex = 1; pointIndex < simplePoints.length; pointIndex++) {
+
+			final DPPoint currentDpPoint = (DPPoint) simplePoints[pointIndex];
+
+			final double currentAltitude = currentDpPoint.y;
+
+			if (pointIndex == 1) {
+
+				// first point
+
+				isPrevAltiUp = (currentAltitude - prevAltitude) >= 0;
+				isPrevAltiDown = (currentAltitude - prevAltitude) < 0;
+
+			} else {
+
+				// all other points
+
+				final boolean isCurrentAltiUp = (currentAltitude - prevAltitude) >= 0;
+				final boolean isCurrentAltiDown = (currentAltitude - prevAltitude) < 0;
+
+				if (isPrevAltiUp && isCurrentAltiUp || isPrevAltiDown && isCurrentAltiDown) {
+
+					// up or down have not changed
+
+				} else {
+
+					// up or down have changed
+
+					segmentSerieIndex.add(prevDpPoint.serieIndex);
+
+					isPrevAltiUp = isCurrentAltiUp;
+					isPrevAltiDown = isCurrentAltiDown;
+				}
+			}
+
+			prevDpPoint = currentDpPoint;
+			prevAltitude = currentAltitude;
+		}
+
+		// add last point
+		segmentSerieIndex.add(serieSize - 1);
+
+		_tourData.segmentSerieIndex = segmentSerieIndex.toArray();
 	}
 
 	private void createSegmentsBy_AltiUpDown() {
@@ -1096,6 +1207,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		// sort markers by time - they are unsorted
 		final ArrayList<TourMarker> markerList = new ArrayList<TourMarker>(tourMarkers);
 		Collections.sort(markerList, new Comparator<TourMarker>() {
+			@Override
 			public int compare(final TourMarker tm1, final TourMarker tm2) {
 				return tm1.getSerieIndex() - tm2.getSerieIndex();
 			}
@@ -1154,8 +1266,14 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 		_pageBookUI = new PageBook(parent, SWT.NONE);
 
-		_lblNoData = new Label(_pageBookUI, SWT.WRAP);
-		_lblNoData.setText(Messages.Tour_Segmenter_Label_no_chart);
+		_pageNoData = new Composite(_pageBookUI, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(_pageNoData);
+		GridLayoutFactory.swtDefaults().numColumns(1).applyTo(_pageNoData);
+		{
+			final Label lblNoData = new Label(_pageNoData, SWT.WRAP);
+			GridDataFactory.fillDefaults().grab(true, true).applyTo(lblNoData);
+			lblNoData.setText(Messages.Tour_Segmenter_Label_no_chart);
+		}
 
 		_pageSegmenter = new Composite(_pageBookUI, SWT.NONE);
 		GridLayoutFactory.fillDefaults().spacing(0, 0).applyTo(_pageSegmenter);
@@ -1282,6 +1400,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 				}
 			});
 			_spinnerDistance.addMouseWheelListener(new MouseWheelListener() {
+				@Override
 				public void mouseScrolled(final MouseEvent event) {
 					UI.adjustSpinnerValueOnMouseScroll(event);
 					onChangedDistance();
@@ -1323,6 +1442,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 				}
 			});
 			_spinnerMinAltitude.addMouseWheelListener(new MouseWheelListener() {
+				@Override
 				public void mouseScrolled(final MouseEvent event) {
 					UI.adjustSpinnerValueOnMouseScroll(event);
 					onChangeBreakTime();
@@ -1428,13 +1548,13 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 			/*
 			 * pagebook: break algorithm
 			 */
-			_pagebookBreakTime = new PageBook(container, SWT.NONE);
-			GridDataFactory.fillDefaults().span(2, 1).grab(true, false).applyTo(_pagebookBreakTime);
+			_pageBookBreakTime = new PageBook(container, SWT.NONE);
+			GridDataFactory.fillDefaults().span(2, 1).grab(true, false).applyTo(_pageBookBreakTime);
 			{
-				_pageBreakByAvgSliceSpeed = createUI_53_BreakBy_AvgSliceSpeed(_pagebookBreakTime);
-				_pageBreakByAvgSpeed = createUI_54_BreakBy_AvgSpeed(_pagebookBreakTime);
-				_pageBreakBySliceSpeed = createUI_55_BreakBy_SliceSpeed(_pagebookBreakTime);
-				_pageBreakByTimeDistance = createUI_56_BreakBy_TimeDistance(_pagebookBreakTime);
+				_pageBreakByAvgSliceSpeed = createUI_53_BreakBy_AvgSliceSpeed(_pageBookBreakTime);
+				_pageBreakByAvgSpeed = createUI_54_BreakBy_AvgSpeed(_pageBookBreakTime);
+				_pageBreakBySliceSpeed = createUI_55_BreakBy_SliceSpeed(_pageBookBreakTime);
+				_pageBreakByTimeDistance = createUI_56_BreakBy_TimeDistance(_pageBookBreakTime);
 			}
 
 			/*
@@ -1473,6 +1593,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 				_spinnerBreakMinAvgSpeedAS.setMaximum(PrefPageComputedValues.BREAK_MAX_SPEED_KM_H); // 10.0 km/h
 				_spinnerBreakMinAvgSpeedAS.setDigits(1);
 				_spinnerBreakMinAvgSpeedAS.addMouseWheelListener(new MouseWheelListener() {
+					@Override
 					public void mouseScrolled(final MouseEvent event) {
 						UI.adjustSpinnerValueOnMouseScroll(event);
 						onChangeBreakTime();
@@ -1501,6 +1622,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 				_spinnerBreakMinSliceSpeedAS.setMaximum(PrefPageComputedValues.BREAK_MAX_SPEED_KM_H); // 10.0 km/h
 				_spinnerBreakMinSliceSpeedAS.setDigits(1);
 				_spinnerBreakMinSliceSpeedAS.addMouseWheelListener(new MouseWheelListener() {
+					@Override
 					public void mouseScrolled(final MouseEvent event) {
 						UI.adjustSpinnerValueOnMouseScroll(event);
 						onChangeBreakTime();
@@ -1528,6 +1650,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 				_spinnerBreakMinSliceTimeAS.setMinimum(0); // 0 sec
 				_spinnerBreakMinSliceTimeAS.setMaximum(10); // 10 sec
 				_spinnerBreakMinSliceTimeAS.addMouseWheelListener(new MouseWheelListener() {
+					@Override
 					public void mouseScrolled(final MouseEvent event) {
 						UI.adjustSpinnerValueOnMouseScroll(event);
 						onChangeBreakTime();
@@ -1572,6 +1695,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 				}
 			});
 			_spinnerBreakMinAvgSpeed.addMouseWheelListener(new MouseWheelListener() {
+				@Override
 				public void mouseScrolled(final MouseEvent event) {
 					UI.adjustSpinnerValueOnMouseScroll(event);
 					onChangeBreakTime();
@@ -1615,6 +1739,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 				}
 			});
 			_spinnerBreakMinSliceSpeed.addMouseWheelListener(new MouseWheelListener() {
+				@Override
 				public void mouseScrolled(final MouseEvent event) {
 					UI.adjustSpinnerValueOnMouseScroll(event);
 					onChangeBreakTime();
@@ -1656,6 +1781,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 					}
 				});
 				_spinnerBreakShortestTime.addMouseWheelListener(new MouseWheelListener() {
+					@Override
 					public void mouseScrolled(final MouseEvent event) {
 						UI.adjustSpinnerValueOnMouseScroll(event);
 						onChangeBreakTime();
@@ -1688,6 +1814,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 					}
 				});
 				_spinnerBreakMaxDistance.addMouseWheelListener(new MouseWheelListener() {
+					@Override
 					public void mouseScrolled(final MouseEvent event) {
 						UI.adjustSpinnerValueOnMouseScroll(event);
 						onChangeBreakTime();
@@ -1725,6 +1852,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 					}
 				});
 				_spinnerBreakSliceDiff.addMouseWheelListener(new MouseWheelListener() {
+					@Override
 					public void mouseScrolled(final MouseEvent event) {
 						UI.adjustSpinnerValueOnMouseScroll(event);
 						onChangeBreakTime();
@@ -1807,6 +1935,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		_segmentViewer.setSorter(new ViewSorter());
 
 		_segmentViewer.addSelectionChangedListener(new ISelectionChangedListener() {
+			@Override
 			public void selectionChanged(final SelectionChangedEvent event) {
 
 				final StructuredSelection selection = (StructuredSelection) event.getSelection();
@@ -1890,9 +2019,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		linkDP.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(final SelectionEvent e) {
-				Util.openLink(
-						Display.getCurrent().getActiveShell(),
-						PrefPageComputedValues.URL_DOUGLAS_PEUCKER_ALGORITHM);
+				WEB.openUrl(PrefPageComputedValues.URL_DOUGLAS_PEUCKER_ALGORITHM);
 			}
 		});
 
@@ -1911,6 +2038,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		});
 
 		spinner.addMouseWheelListener(new MouseWheelListener() {
+			@Override
 			public void mouseScrolled(final MouseEvent event) {
 				UI.adjustSpinnerValueOnMouseScroll(event);
 				onChangedTolerance();
@@ -2531,6 +2659,13 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		super.dispose();
 	}
 
+	private void enableActions() {
+
+		final boolean isTourAvailable = _tourData != null;
+
+		_actionShowSegments.setEnabled(isTourAvailable);
+	}
+
 	/**
 	 * Notify listeners to show/hide the segments.
 	 * 
@@ -2539,6 +2674,11 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	 *            set visible depending on the action state.
 	 */
 	private void fireSegmentLayerChanged(final boolean isForceHidden) {
+
+		if (_tourData == null) {
+			// prevent NPE
+			return;
+		}
 
 		final boolean isSegmentLayerVisible = isForceHidden == true ? false : _actionShowSegments.isChecked();
 
@@ -2620,6 +2760,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		return null;
 	}
 
+	@Override
 	public ColumnManager getColumnManager() {
 		return _columnManager;
 	}
@@ -2697,6 +2838,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		return null;
 	}
 
+	@Override
 	public ColumnViewer getViewer() {
 		return _segmentViewer;
 	}
@@ -2783,22 +2925,22 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 		if (selectedBreakMethod.methodId.equals(BreakTimeTool.BREAK_TIME_METHOD_BY_AVG_SPEED)) {
 
-			_pagebookBreakTime.showPage(_pageBreakByAvgSpeed);
+			_pageBookBreakTime.showPage(_pageBreakByAvgSpeed);
 			_comboBreakMethod.setToolTipText(Messages.Compute_BreakTime_Label_Description_ComputeByAvgSpeed);
 
 		} else if (selectedBreakMethod.methodId.equals(BreakTimeTool.BREAK_TIME_METHOD_BY_SLICE_SPEED)) {
 
-			_pagebookBreakTime.showPage(_pageBreakBySliceSpeed);
+			_pageBookBreakTime.showPage(_pageBreakBySliceSpeed);
 			_comboBreakMethod.setToolTipText(Messages.Compute_BreakTime_Label_Description_ComputeBySliceSpeed);
 
 		} else if (selectedBreakMethod.methodId.equals(BreakTimeTool.BREAK_TIME_METHOD_BY_AVG_SLICE_SPEED)) {
 
-			_pagebookBreakTime.showPage(_pageBreakByAvgSliceSpeed);
+			_pageBookBreakTime.showPage(_pageBreakByAvgSliceSpeed);
 			_comboBreakMethod.setToolTipText(Messages.Compute_BreakTime_Label_Description_ComputeByAvgSliceSpeed);
 
 		} else if (selectedBreakMethod.methodId.equals(BreakTimeTool.BREAK_TIME_METHOD_BY_TIME_DISTANCE)) {
 
-			_pagebookBreakTime.showPage(_pageBreakByTimeDistance);
+			_pageBookBreakTime.showPage(_pageBreakByTimeDistance);
 			_comboBreakMethod.setToolTipText(Messages.Compute_BreakTime_Label_Description_ComputeByTime);
 		}
 
@@ -2827,10 +2969,12 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		 * data editor
 		 */
 		Display.getCurrent().asyncExec(new Runnable() {
+			@Override
 			public void run() {
 
 				// check if view is disposed
 				if (_pageBookUI.isDisposed() || _isClearView) {
+					enableActions();
 					return;
 				}
 
@@ -2948,7 +3092,8 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 			_userSelectedSegmenterType = selectedSegmenterType;
 		}
 
-		if (selectedSegmenterType == SegmenterType.ByAltitudeWithDP) {
+		if (selectedSegmenterType == SegmenterType.ByAltitudeWithDP
+				|| selectedSegmenterType == SegmenterType.ByAltitudeWithDPMerged) {
 
 			_pageBookSegmenter.showPage(_pageSegTypeDPAltitude);
 
@@ -2992,6 +3137,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 				PrefPageComputedValues.TAB_FOLDER_BREAK_TIME).open();
 	}
 
+	@Override
 	public ColumnViewer recreateViewer(final ColumnViewer columnViewer) {
 
 		_containerViewer.setRedraw(false);
@@ -3009,6 +3155,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		return _segmentViewer;
 	}
 
+	@Override
 	public void reloadViewer() {
 		// force input to be reloaded
 		_segmentViewer.setInput(new Object[0]);
@@ -3060,18 +3207,17 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 	private void restoreState() {
 
-		/*
-		 * selected segmenter, this is not working because the next selected tour can remove the
-		 * selected segementer
-		 */
-//		int segmenterIndex = -1;
-//		try {
-//			segmenterIndex = _state.getInt(STATE_SELECTED_SEGMENTER_INDEX);
-//		} catch (final NumberFormatException e) {}
-//		if (segmenterIndex < 0) {
-//			segmenterIndex = 0;
-//		}
-//		_cboSegmenterType.select(segmenterIndex);
+		// selected segmenter
+		final String stateSegmenterName = Util.getStateString(
+				_state,
+				STATE_SELECTED_SEGMENTER_BY_USER,
+				SegmenterType.ByAltitudeWithDP.name());
+		try {
+			_userSelectedSegmenterType = SegmenterType.valueOf(SegmenterType.class, stateSegmenterName);
+		} catch (final Exception e) {
+			// set default value
+			_userSelectedSegmenterType = SegmenterType.ByAltitudeWithDP;
+		}
 
 		// selected distance
 		final int stateDistance = Util.getStateInt(_state, STATE_SELECTED_DISTANCE, 10);
@@ -3245,7 +3391,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 		_columnManager.saveState(_state);
 
-		_state.put(STATE_SELECTED_SEGMENTER_INDEX, _comboSegmenterType.getSelectionIndex());
+		_state.put(STATE_SELECTED_SEGMENTER_BY_USER, _userSelectedSegmenterType.name());
 		_state.put(STATE_SELECTED_DISTANCE, _spinnerDistance.getSelection());
 		_state.put(STATE_MINIMUM_ALTITUDE, _spinnerMinAltitude.getSelection());
 		_state.put(STATE_DP_TOLERANCE_PULSE, _spinnerDPTolerancePulse.getSelection());
@@ -3348,6 +3494,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 			_tourData = tourData;
 
 			_pageBookUI.showPage(_pageSegmenter);
+			enableActions();
 
 			// update tour title
 			_lblTitle.setText(TourManager.getTourTitleDetailed(_tourData));
@@ -3379,6 +3526,27 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 		if (_tourData != null && _savedDpToleranceAltitude != getDPTolerance_FromTour()) {
 			_isTourDirty = true;
+		}
+	}
+
+	private void showTour() {
+
+		// update viewer with current selection
+		onSelectionChanged(getSite().getWorkbenchWindow().getSelectionService().getSelection());
+
+		// when previous onSelectionChanged did not display a tour, get tour from tour manager
+		if (_tourData == null) {
+			Display.getCurrent().asyncExec(new Runnable() {
+				@Override
+				public void run() {
+
+					final ArrayList<TourData> selectedTours = TourManager.getSelectedTours();
+
+					if (selectedTours != null && selectedTours.size() > 0) {
+						onSelectionChanged(new SelectionTourData(null, selectedTours.get(0)));
+					}
+				}
+			});
 		}
 	}
 

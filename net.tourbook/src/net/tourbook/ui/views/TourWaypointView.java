@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -75,7 +75,6 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.ui.IPartListener2;
@@ -119,7 +118,8 @@ public class TourWaypointView extends ViewPart implements ITourProvider, ITourVi
 	private PageBook				_pageBook;
 
 	private TableViewer				_wpViewer;
-	private Label					_pageNoChart;
+
+	private Composite				_pageNoData;
 	private Composite				_viewerContainer;
 
 	private ActionModifyColumns		_actionModifyColumns;
@@ -197,8 +197,10 @@ public class TourWaypointView extends ViewPart implements ITourProvider, ITourVi
 
 	class WaypointViewerContentProvider implements IStructuredContentProvider {
 
+		@Override
 		public void dispose() {}
 
+		@Override
 		public Object[] getElements(final Object inputElement) {
 			if (_tourData == null) {
 				return new Object[0];
@@ -207,6 +209,7 @@ public class TourWaypointView extends ViewPart implements ITourProvider, ITourVi
 			}
 		}
 
+		@Override
 		public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
 	}
 
@@ -217,24 +220,32 @@ public class TourWaypointView extends ViewPart implements ITourProvider, ITourVi
 	private void addPartListener() {
 		_partListener = new IPartListener2() {
 
+			@Override
 			public void partActivated(final IWorkbenchPartReference partRef) {}
 
+			@Override
 			public void partBroughtToTop(final IWorkbenchPartReference partRef) {}
 
+			@Override
 			public void partClosed(final IWorkbenchPartReference partRef) {
 				if (partRef.getPart(false) == TourWaypointView.this) {
 					saveState();
 				}
 			}
 
+			@Override
 			public void partDeactivated(final IWorkbenchPartReference partRef) {}
 
+			@Override
 			public void partHidden(final IWorkbenchPartReference partRef) {}
 
+			@Override
 			public void partInputChanged(final IWorkbenchPartReference partRef) {}
 
+			@Override
 			public void partOpened(final IWorkbenchPartReference partRef) {}
 
+			@Override
 			public void partVisible(final IWorkbenchPartReference partRef) {}
 		};
 		getViewSite().getPage().addPartListener(_partListener);
@@ -243,6 +254,7 @@ public class TourWaypointView extends ViewPart implements ITourProvider, ITourVi
 	private void addPrefListener() {
 
 		_prefChangeListener = new IPropertyChangeListener() {
+			@Override
 			public void propertyChange(final PropertyChangeEvent event) {
 
 				final String property = event.getProperty();
@@ -284,6 +296,7 @@ public class TourWaypointView extends ViewPart implements ITourProvider, ITourVi
 	private void addSelectionListener() {
 
 		_postSelectionListener = new ISelectionListener() {
+			@Override
 			public void selectionChanged(final IWorkbenchPart part, final ISelection selection) {
 				if (part == TourWaypointView.this) {
 					return;
@@ -297,6 +310,7 @@ public class TourWaypointView extends ViewPart implements ITourProvider, ITourVi
 	private void addTourEventListener() {
 
 		_tourPropertyListener = new ITourEventListener() {
+			@Override
 			public void tourChanged(final IWorkbenchPart part, final TourEventId eventId, final Object eventData) {
 
 				if ((_tourData == null) || (part == TourWaypointView.this)) {
@@ -341,7 +355,7 @@ public class TourWaypointView extends ViewPart implements ITourProvider, ITourVi
 
 		_postSelectionProvider.clearSelection();
 
-		_pageBook.showPage(_pageNoChart);
+		_pageBook.showPage(_pageNoData);
 	}
 
 	private void createActions() {
@@ -358,6 +372,7 @@ public class TourWaypointView extends ViewPart implements ITourProvider, ITourVi
 		final MenuManager menuMgr = new MenuManager("#PopupMenu"); //$NON-NLS-1$
 		menuMgr.setRemoveAllWhenShown(true);
 		menuMgr.addMenuListener(new IMenuListener() {
+			@Override
 			public void menuAboutToShow(final IMenuManager manager) {
 				fillContextMenu(manager);
 			}
@@ -397,7 +412,7 @@ public class TourWaypointView extends ViewPart implements ITourProvider, ITourVi
 		getSite().setSelectionProvider(_postSelectionProvider = new PostSelectionProvider(ID));
 
 		// show default page
-		_pageBook.showPage(_pageNoChart);
+		_pageBook.showPage(_pageNoData);
 
 		// show marker from last selection
 		onSelectionChanged(getSite().getWorkbenchWindow().getSelectionService().getSelection());
@@ -412,8 +427,7 @@ public class TourWaypointView extends ViewPart implements ITourProvider, ITourVi
 		_pageBook = new PageBook(parent, SWT.NONE);
 		_pageBook.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
-		_pageNoChart = new Label(_pageBook, SWT.NONE);
-		_pageNoChart.setText(Messages.UI_Label_no_chart_is_selected);
+		_pageNoData = net.tourbook.common.UI.createUI_PageNoData(_pageBook, Messages.UI_Label_no_chart_is_selected);
 
 		_viewerContainer = new Composite(_pageBook, SWT.NONE);
 		GridLayoutFactory.fillDefaults().applyTo(_viewerContainer);
@@ -463,6 +477,7 @@ public class TourWaypointView extends ViewPart implements ITourProvider, ITourVi
 		_wpViewer.setComparator(new WayPointComparator());
 
 		_wpViewer.addSelectionChangedListener(new ISelectionChangedListener() {
+			@Override
 			public void selectionChanged(final SelectionChangedEvent event) {
 				final StructuredSelection selection = (StructuredSelection) event.getSelection();
 				if (selection != null) {
@@ -472,6 +487,7 @@ public class TourWaypointView extends ViewPart implements ITourProvider, ITourVi
 		});
 
 		_wpViewer.addDoubleClickListener(new IDoubleClickListener() {
+			@Override
 			public void doubleClick(final DoubleClickEvent event) {
 
 				if (isTourInDb() == false) {
@@ -777,6 +793,7 @@ public class TourWaypointView extends ViewPart implements ITourProvider, ITourVi
 		return _columnManager;
 	}
 
+	@Override
 	public ArrayList<TourData> getSelectedTours() {
 
 		final ArrayList<TourData> selectedTours = new ArrayList<TourData>();
@@ -910,10 +927,11 @@ public class TourWaypointView extends ViewPart implements ITourProvider, ITourVi
 
 	private void showTourFromTourProvider() {
 
-		_pageBook.showPage(_pageNoChart);
+		_pageBook.showPage(_pageNoData);
 
 		// a tour is not displayed, find a tour provider which provides a tour
 		Display.getCurrent().asyncExec(new Runnable() {
+			@Override
 			public void run() {
 
 				// validate widget

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -294,13 +294,16 @@ public class Chart extends ViewForm {
 			isUseLeftSlider = true;
 		}
 
+		final ChartXSlider leftSlider = componentGraph.getLeftSlider();
+		final ChartXSlider rightSlider = componentGraph.getRightSlider();
+
 		final SelectionChartInfo chartInfo = new SelectionChartInfo(this);
 
 		chartInfo.chartDataModel = _chartDataModel;
 		chartInfo.chartDrawingData = _chartComponents.getChartDrawingData();
 
-		chartInfo.leftSliderValuesIndex = componentGraph.getLeftSlider().getValuesIndex();
-		chartInfo.rightSliderValuesIndex = componentGraph.getRightSlider().getValuesIndex();
+		chartInfo.leftSliderValuesIndex = leftSlider.getValuesIndex();
+		chartInfo.rightSliderValuesIndex = rightSlider.getValuesIndex();
 
 		if (isUseLeftSlider) {
 			chartInfo.selectedSliderValuesIndex = chartInfo.leftSliderValuesIndex;
@@ -487,6 +490,7 @@ public class Chart extends ViewForm {
 		for (final Object listener2 : listeners) {
 			final IBarSelectionListener listener = (IBarSelectionListener) listener2;
 			SafeRunnable.run(new SafeRunnable() {
+				@Override
 				public void run() {
 					listener.selectionChanged(serieIndex, valueIndex);
 				}
@@ -503,6 +507,7 @@ public class Chart extends ViewForm {
 		for (final Object listener2 : listeners) {
 			final IBarSelectionListener listener = (IBarSelectionListener) listener2;
 			SafeRunnable.run(new SafeRunnable() {
+				@Override
 				public void run() {
 					listener.selectionChanged(serieIndex, valueIndex);
 				}
@@ -554,6 +559,7 @@ public class Chart extends ViewForm {
 		for (final Object listener2 : listeners) {
 			final ISliderMoveListener listener = (ISliderMoveListener) listener2;
 			SafeRunnable.run(new SafeRunnable() {
+				@Override
 				public void run() {
 					listener.sliderMoved(chartInfo);
 				}
@@ -1170,6 +1176,7 @@ public class Chart extends ViewForm {
 		}
 
 		getDisplay().asyncExec(new Runnable() {
+			@Override
 			public void run() {
 				_synchedChart.setSynchConfig(_chartComponents._synchConfigOut);
 			}
@@ -1241,7 +1248,9 @@ public class Chart extends ViewForm {
 		_chartDataModel = chartDataModel;
 
 		createActions();
+
 		_chartComponents.setModel(chartDataModel, isShowAllData);
+
 		enableActions();
 
 		// reset last selected x-data

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -32,6 +32,7 @@ import java.util.Comparator;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.persistence.Basic;
@@ -558,6 +559,12 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	 */
 	private int													photoTimeAdjustment;
 
+	// ############################################# GEARS #############################################
+
+	private int													frontShiftCount;
+
+	private int													rearShiftCount;
+
 	// ############################################# UNUSED FIELDS START #############################################
 	/**
 	 * ssss distance msw
@@ -829,12 +836,39 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	@Transient
 	public double[]												latitudeSerie;
 
-	/*
-	 * computed data series
-	 */
-
 	@Transient
 	public double[]												longitudeSerie;
+
+	/**
+	 * Gears which are saved in a tour are in this HEX format (left to right)
+	 * <p>
+	 * Front teeth<br>
+	 * Front gear number<br>
+	 * Back teeth<br>
+	 * Back gear number<br>
+	 * <code>
+	 * <pre>
+final float	frontTeeth	= (gearRaw &gt;&gt; 24 &amp; 0xff);
+final long	frontGear	= (gearRaw &gt;&gt; 16 &amp; 0xff);
+final float	rearTeeth	= (gearRaw &gt;&gt; 8 &amp; 0xff);
+final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
+	 * </pre>
+	 * </code>
+	 */
+	@Transient
+	public long[]												gearSerie;
+
+	/**
+	 * Gears have this format:
+	 * <p>
+	 * _gears[0] = gear ratio<br>
+	 * _gears[1] = front gear teeth<br>
+	 * _gears[2] = rear gear teeth<br>
+	 * _gears[3] = front gear number, starting with 1<br>
+	 * _gears[4] = rear gear number, starting with 1<br>
+	 */
+	@Transient
+	private float[][]											_gears;
 
 	/**
 	 * Contains the bounds of the tour in latitude/longitude:
@@ -1058,6 +1092,12 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	@Transient
 	private double[]											timeSerieWithTimeZoneAdjustment;
 
+	/**
+	 * A value is <code>true</code> when cadence is 0.
+	 */
+	@Transient
+	private boolean[]											_cadenceGaps;
+
 	public TourData() {}
 
 	/**
@@ -1267,6 +1307,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 		_hrZones = null;
 		_hrZoneContext = null;
+
+		_gears = null;
+
+		_cadenceGaps = null;
 	}
 
 	/**
@@ -3254,7 +3298,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	 * @param isCreateMarker
 	 *            creates markers when <code>true</code>
 	 */
-	public void createTimeSeries(final ArrayList<TimeData> timeDataList, final boolean isCreateMarker) {
+	public void createTimeSeries(final List<TimeData> timeDataList, final boolean isCreateMarker) {
 
 		final int serieSize = timeDataList.size();
 		if (serieSize == 0) {
@@ -4415,6 +4459,27 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		return breakTimeSerie;
 	}
 
+	public boolean[] getCadenceGaps() {
+
+		if (cadenceSerie == null) {
+			return null;
+		}
+
+		if (_cadenceGaps != null) {
+			return _cadenceGaps;
+		}
+
+		_cadenceGaps = new boolean[cadenceSerie.length];
+
+		for (int serieIndex = 0; serieIndex < cadenceSerie.length; serieIndex++) {
+
+			final float cadence = cadenceSerie[serieIndex];
+			_cadenceGaps[serieIndex] = cadence == 0 ? true : false;
+		}
+
+		return _cadenceGaps;
+	}
+
 	/**
 	 * @return the calories
 	 */
@@ -4563,6 +4628,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		return dpTolerance;
 	}
 
+	public int getFrontShiftCount() {
+		return frontShiftCount;
+	}
+
 	/**
 	 * @return Returns <code>null</code> when tour do not contain photos, otherwise a list of
 	 *         {@link Photo}'s is returned.
@@ -4586,6 +4655,56 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		createGalleryPhotos();
 
 		return _galleryPhotos;
+	}
+
+	/**
+	 * @return Returns <code>null</code> when gears are not available otherwise it returns gears
+	 *         with this format
+	 *         <p>
+	 *         _gears[0] = gear ratio<br>
+	 *         _gears[1] = front gear teeth<br>
+	 *         _gears[2] = rear gear teeth<br>
+	 *         _gears[3] = front gear number, starting with 1<br>
+	 *         _gears[4] = rear gear number, starting with 1<br>
+	 */
+	public float[][] getGears() {
+
+		if (gearSerie == null || timeSerie == null) {
+			return null;
+		}
+
+		if (_gears != null) {
+			return _gears;
+		}
+
+		/*
+		 * Create gears from gear raw data
+		 */
+
+		final int gearSize = timeSerie.length;
+
+		_gears = new float[5][gearSize];
+
+		for (int gearIndex = 0; gearIndex < gearSize; gearIndex++) {
+
+			final long gearRaw = gearSerie[gearIndex];
+
+			final float frontTeeth = (gearRaw >> 24 & 0xff);
+			final float rearTeeth = (gearRaw >> 8 & 0xff);
+
+			final float frontGearNo = (gearRaw >> 16 & 0xff);
+			final float rearGearNo = (gearRaw >> 0 & 0xff);
+
+			final float gearRatio = frontTeeth / rearTeeth;
+
+			_gears[0][gearIndex] = gearRatio;
+			_gears[1][gearIndex] = frontTeeth;
+			_gears[2][gearIndex] = rearTeeth;
+			_gears[3][gearIndex] = frontGearNo;
+			_gears[4][gearIndex] = rearGearNo;
+		}
+
+		return _gears;
 	}
 
 	/**
@@ -4865,6 +4984,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		return pulseSerieSmoothed;
 	}
 
+	public int getRearShiftCount() {
+		return rearShiftCount;
+	}
+
 	public int getRestPulse() {
 		return restPulse;
 	}
@@ -4915,24 +5038,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 			return speedSerieImperial;
 		}
 	}
-
-//	public double[] getTimeSerieDouble() {
-//
-//		if (timeSerieHistory == null) {
-//			return null;
-//		}
-//
-//		if (timeSerieHistoryDouble == null) {
-//
-//			timeSerieHistoryDouble = new double[timeSerieHistory.length];
-//
-//			for (int serieIndex = 0; serieIndex < timeSerieHistory.length; serieIndex++) {
-//				timeSerieHistoryDouble[serieIndex] = timeSerieHistory[serieIndex];
-//			}
-//		}
-//
-//		return timeSerieHistoryDouble;
-//	}
 
 	/**
 	 * @return returns the speed data in the metric measurement system
@@ -5683,6 +5788,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		latitudeSerie = serieData.latitude;
 		longitudeSerie = serieData.longitude;
 
+		gearSerie = serieData.gears;
+
 		if (powerSerie != null) {
 			isPowerSerieFromDevice = true;
 		}
@@ -5724,6 +5831,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 		serieData.latitude = latitudeSerie;
 		serieData.longitude = longitudeSerie;
+
+		serieData.gears = gearSerie;
 
 		/*
 		 * time serie size
@@ -5860,6 +5969,144 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		this.dpTolerance = dpTolerance;
 	}
 
+	public void setFrontShiftCount(final int frontShiftCount) {
+		this.frontShiftCount = frontShiftCount;
+	}
+
+	public void setGears(final List<GearData> gears) {
+
+		final int gearSize = gears.size();
+
+		if (gearSize == 0) {
+			return;
+		}
+
+		// convert gear data into a gearSerie
+
+		final long[] gearSerie = new long[timeSerie.length];
+
+		int gearIndex = 0;
+		final int nextGearIndex = gearSize > 0 ? 1 : 0;
+
+		GearData currentGear = gears.get(0);
+		GearData nextGear = gears.get(nextGearIndex);
+
+		long nextGearTime;
+		if (gearIndex >= nextGearIndex) {
+			// there are no further gears
+			nextGearTime = Long.MAX_VALUE;
+		} else {
+			nextGearTime = nextGear.absoluteTime;
+		}
+
+		int frontShiftCount = 0;
+		int rearShiftCount = 0;
+		int currentFrontGear = currentGear.getFrontGearTeeth();
+		int currentRearGear = currentGear.getRearGearTeeth();
+
+		for (int timeIndex = 0; timeIndex < gearSerie.length; timeIndex++) {
+
+			final long currentTime = tourStartTime + timeSerie[timeIndex] * 1000;
+
+			if (currentTime >= nextGearTime) {
+
+				// advance to the next gear
+
+				gearIndex++;
+
+				if (gearIndex < gearSize - 1) {
+
+					// next gear is available
+
+					currentGear = nextGear;
+
+					nextGear = gears.get(gearIndex);
+					nextGearTime = nextGear.absoluteTime;
+
+					final int nextFrontGear = nextGear.getFrontGearTeeth();
+					final int nextRearGear = nextGear.getRearGearTeeth();
+
+					if (currentFrontGear != nextFrontGear) {
+
+						frontShiftCount++;
+
+//						System.out
+//								.println((net.tourbook.common.UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
+//										+ ("\tcurrentFrontGear: " + currentFrontGear)
+//										+ ("\tnextFrontGear: " + nextFrontGear)
+//										+ ("\tfrontShiftCount: " + frontShiftCount));
+//						// TODO remove SYSTEM.OUT.PRINTLN
+					}
+
+					if (currentRearGear != nextRearGear) {
+
+						rearShiftCount++;
+
+//						System.out
+//								.println((net.tourbook.common.UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
+//										+ ("\tcurrentRearGear: " + currentRearGear)
+//										+ ("\tnextRearGear: " + nextRearGear)
+//										+ ("\trearShiftCount: " + rearShiftCount));
+//						// TODO remove SYSTEM.OUT.PRINTLN
+					}
+
+					currentFrontGear = nextFrontGear;
+					currentRearGear = nextRearGear;
+
+				} else {
+
+					// there are no further gears
+
+					nextGearTime = Long.MAX_VALUE;
+
+					currentGear = nextGear;
+				}
+			}
+
+			gearSerie[timeIndex] = currentGear.gears;
+		}
+
+		this.gearSerie = gearSerie;
+
+		this.frontShiftCount = frontShiftCount;
+		this.rearShiftCount = rearShiftCount;
+	}
+
+	public void setGears(final long[] gearSerieData) {
+
+		if (gearSerieData.length < 1) {
+			return;
+		}
+
+		int frontShifts = 0;
+		int rearShifts = 0;
+
+		int currentFrontGear = (int) (gearSerieData[0] >> 24 & 0xff);
+		int currentRearGear = (int) (gearSerieData[0] >> 8 & 0xff);
+
+		for (final long gear : gearSerieData) {
+
+			final int nextFrontGear = (int) (gear >> 24 & 0xff);
+			final int nextRearGear = (int) (gear >> 8 & 0xff);
+
+			if (currentFrontGear != nextFrontGear) {
+				frontShifts++;
+			}
+
+			if (currentRearGear != nextRearGear) {
+				rearShifts++;
+			}
+
+			currentFrontGear = nextFrontGear;
+			currentRearGear = nextRearGear;
+		}
+
+		this.gearSerie = gearSerieData;
+
+		this.frontShiftCount = frontShifts;
+		this.rearShiftCount = rearShifts;
+	}
+
 	/**
 	 * Set state if the distance is from a sensor or not, default is <code>false</code>
 	 * 
@@ -5867,6 +6114,14 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	 */
 	public void setIsDistanceFromSensor(final boolean isFromSensor) {
 		this.isDistanceFromSensor = (short) (isFromSensor ? 1 : 0);
+	}
+
+	public void setIsPowerSensorPresent(final boolean isFromSensor) {
+		this.isPowerSensorPresent = (short) (isFromSensor ? 1 : 0);
+	}
+
+	public void setIsPulseSensorPresent(final boolean isFromSensor) {
+		this.isPulseSensorPresent = (short) (isFromSensor ? 1 : 0);
 	}
 
 	public void setMaxPulse(final float maxPulse) {
@@ -5901,6 +6156,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	public void setPowerSerie(final float[] powerSerie) {
 		this.powerSerie = powerSerie;
 		this.isPowerSerieFromDevice = true;
+	}
+
+	public void setRearShiftCount(final int rearShiftCount) {
+		this.rearShiftCount = rearShiftCount;
 	}
 
 	public void setRestPulse(final int restPulse) {

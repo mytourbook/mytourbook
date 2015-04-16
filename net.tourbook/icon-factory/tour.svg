@@ -15,10 +15,81 @@
    height="1052.3622047"
    id="svg2985"
    version="1.1"
-   inkscape:version="0.91pre3 r13670"
+   inkscape:version="0.91 r13725"
    sodipodi:docname="tour.svg">
   <defs
      id="defs2987">
+    <linearGradient
+       id="linearGradient5006">
+      <stop
+         id="stop5008"
+         offset="0"
+         style="stop-color:#1b1b1b;stop-opacity:1" />
+      <stop
+         style="stop-color:#383838;stop-opacity:1"
+         offset="0.47855261"
+         id="stop5010" />
+      <stop
+         id="stop5012"
+         offset="0.48335773"
+         style="stop-color:#b60000;stop-opacity:1" />
+      <stop
+         id="stop5014"
+         offset="1"
+         style="stop-color:#b60000;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient
+       id="linearGradient4988">
+      <stop
+         style="stop-color:#383838;stop-opacity:1"
+         offset="0"
+         id="stop4990" />
+      <stop
+         id="stop4994"
+         offset="0.51636761"
+         style="stop-color:#ffffff;stop-opacity:1" />
+      <stop
+         style="stop-color:#e72727;stop-opacity:1"
+         offset="0.52009761"
+         id="stop4996" />
+      <stop
+         style="stop-color:#ffffff;stop-opacity:1"
+         offset="1"
+         id="stop4992" />
+    </linearGradient>
+    <linearGradient
+       id="linearGradient6481">
+      <stop
+         id="stop4970"
+         offset="0"
+         style="stop-color:#3c650b;stop-opacity:1" />
+      <stop
+         id="stop4972"
+         offset="1"
+         style="stop-color:#ffffff;stop-opacity:1;" />
+    </linearGradient>
+    <linearGradient
+       id="linearGradient4974">
+      <stop
+         style="stop-color:#3c650b;stop-opacity:1"
+         offset="0"
+         id="stop6483" />
+      <stop
+         style="stop-color:#ffffff;stop-opacity:1;"
+         offset="1"
+         id="stop6485" />
+    </linearGradient>
+    <linearGradient
+       id="linearGradient4513-8-4-5-3-6-2-7">
+      <stop
+         id="stop6475"
+         offset="0"
+         style="stop-color:#9e541d;stop-opacity:1;" />
+      <stop
+         id="stop6477"
+         offset="1"
+         style="stop-color:#ffffff;stop-opacity:1;" />
+    </linearGradient>
     <linearGradient
        id="linearGradient4977">
       <stop
@@ -3767,7 +3838,7 @@
        xlink:href="#linearGradient4513-8-4-5-3-6-2-7"
        inkscape:collect="always" />
     <linearGradient
-       id="linearGradient4513-8-4-5-3-6-2-7">
+       id="linearGradient6479">
       <stop
          style="stop-color:#9e541d;stop-opacity:1;"
          offset="0"
@@ -4013,6 +4084,33 @@
        x2="191.8069"
        y2="64.980614"
        gradientTransform="translate(-1.2103519e-5,1e-7)" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient6481"
+       id="linearGradient6330"
+       gradientUnits="userSpaceOnUse"
+       x1="270.10889"
+       y1="51.787136"
+       x2="270.10889"
+       y2="40.432831" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient4988"
+       id="linearGradient4966"
+       gradientUnits="userSpaceOnUse"
+       x1="304.85889"
+       y1="51.787136"
+       x2="304.85889"
+       y2="38.751965" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient5006"
+       id="linearGradient5004"
+       x1="306.875"
+       y1="51.830963"
+       x2="306.875"
+       y2="38.353222"
+       gradientUnits="userSpaceOnUse" />
   </defs>
   <sodipodi:namedview
      id="base"
@@ -4021,16 +4119,16 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="22.627417"
-     inkscape:cx="187.44889"
-     inkscape:cy="976.00292"
+     inkscape:zoom="16"
+     inkscape:cx="291.04484"
+     inkscape:cy="993.52215"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="true"
-     inkscape:window-width="1463"
-     inkscape:window-height="1330"
-     inkscape:window-x="504"
-     inkscape:window-y="78"
+     inkscape:window-width="1583"
+     inkscape:window-height="1333"
+     inkscape:window-x="343"
+     inkscape:window-y="72"
      inkscape:window-maximized="0"
      inkscape:snap-grids="true"
      inkscape:snap-page="false"
@@ -4060,6 +4158,15 @@
      inkscape:label="Layer 1"
      inkscape:groupmode="layer"
      id="layer1">
+    <path
+       sodipodi:nodetypes="cccc"
+       inkscape:export-ydpi="90"
+       inkscape:export-xdpi="90"
+       inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook\icons\graph-gears.png"
+       inkscape:connector-curvature="0"
+       id="path6328"
+       d="m 280.49997,51.862183 14.99999,0 -7.49999,-15 z"
+       style="fill:url(#linearGradient6330);fill-opacity:1;stroke:#3c650b;stroke-width:1;stroke-linecap:butt;stroke-linejoin:round;stroke-opacity:1" />
     <rect
        style="opacity:0.98999999;fill:none;stroke:none"
        id="rect6561-8-1-8"
@@ -4344,5 +4451,24 @@
        inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook\icons\graph-overlapped.png"
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90" />
+    <rect
+       style="opacity:0.98999999;fill:none;stroke:none"
+       id="rect6561-8-1-9-9-5-5-9-9-1-9-1-4-7"
+       width="16"
+       height="16"
+       x="282"
+       y="58.362183"
+       inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook\icons\graph-gears.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <path
+       sodipodi:nodetypes="cccc"
+       inkscape:export-ydpi="90"
+       inkscape:export-xdpi="90"
+       inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook\icons\graph-gears.png"
+       inkscape:connector-curvature="0"
+       id="path6328-0"
+       d="m 300.49997,51.862183 14.99999,0 -7.49999,-15 z"
+       style="fill:url(#linearGradient4966);fill-opacity:1;stroke:url(#linearGradient5004);stroke-width:1;stroke-linecap:butt;stroke-linejoin:round;stroke-opacity:1" />
   </g>
 </svg>
