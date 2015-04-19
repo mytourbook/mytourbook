@@ -53,7 +53,7 @@ import com.garmin.fit.MesgListener;
 public class FitDataReader extends TourbookDevice {
 
 	@SuppressWarnings("unused")
-	private void addDebugListener(final MesgBroadcaster broadcaster) {
+	private void addAllLogListener(final MesgBroadcaster broadcaster) {
 
 		broadcaster.addListener(new MesgListener() {
 			@Override
@@ -73,12 +73,13 @@ public class FitDataReader extends TourbookDevice {
 					if (fieldName.equals("timestamp")) { //$NON-NLS-1$
 						garminTimestamp = (Long) field.getValue();
 					}
+
 					/*
 					 * Set fields which should NOT be displayed in the log
 					 */
 					if (fieldName.equals("") // //$NON-NLS-1$
 
-//							|| fieldName.equals("timestamp") //$NON-NLS-1$
+							|| fieldName.equals("timestamp") //$NON-NLS-1$
 
 							//
 							// record data
@@ -87,6 +88,7 @@ public class FitDataReader extends TourbookDevice {
 							|| fieldName.equals("event") //$NON-NLS-1$
 							|| fieldName.equals("event_type") //$NON-NLS-1$
 							|| fieldName.equals("message_index") //$NON-NLS-1$
+
 							|| fieldName.equals("altitude") //$NON-NLS-1$
 							|| fieldName.equals("cadence") //$NON-NLS-1$
 							|| fieldName.equals("distance") //$NON-NLS-1$
@@ -243,7 +245,7 @@ public class FitDataReader extends TourbookDevice {
 //					"Units"));
 //			System.out.println();
 //
-//			addDebugListener(broadcaster);
+//			addAllLogListener(broadcaster);
 //
 //			//
 //			// END - show debug info

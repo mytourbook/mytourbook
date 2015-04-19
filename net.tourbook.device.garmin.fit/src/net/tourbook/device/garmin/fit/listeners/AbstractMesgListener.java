@@ -15,9 +15,9 @@ import com.garmin.fit.Mesg;
  */
 public abstract class AbstractMesgListener {
 
-	private static final Integer		DEFAULT_MESSAGE_INDEX	= Integer.valueOf(0);
+	private static final Integer	DEFAULT_MESSAGE_INDEX	= Integer.valueOf(0);
 
-	protected final FitContext	context;
+	protected final FitContext		context;
 
 	public AbstractMesgListener(final FitContext context) {
 		this.context = context;
@@ -32,6 +32,7 @@ public abstract class AbstractMesgListener {
 	}
 
 	protected Integer getMessageIndex(final Mesg mesg) {
+
 		final Integer messageIndex = mesg.getFieldIntegerValue(254);
 		return messageIndex != null ? messageIndex : DEFAULT_MESSAGE_INDEX;
 	}

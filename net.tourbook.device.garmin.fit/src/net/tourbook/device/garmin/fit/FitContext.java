@@ -43,7 +43,6 @@ public class FitContext {
 	private String					_softwareVersion;
 
 	private String					_sessionIndex;
-	private int						_serieIndex;
 
 	private DateTime				_sessionTime;
 
@@ -280,57 +279,6 @@ public class FitContext {
 		return _lapTime;
 	}
 
-	/**
-	 * When tour markers are created, they are created in the sequence of the time slices or at the
-	 * end of the session.
-	 * 
-	 * @param lapAbsoluteTime
-	 * @param lapDistance
-	 * @return
-	 */
-	public int getSerieIndex(final long lapAbsoluteTime, final float lapDistance) {
-
-		final List<TimeData> allTimeData = _contextData.getAllTimeData();
-
-		final int timeDataSize = allTimeData.size();
-
-		if (_serieIndex >= timeDataSize) {
-
-			/*
-			 * The serie index is out of tour scope, try to get the index from time or distance.
-			 */
-
-			for (int serieIndex = 0; serieIndex < timeDataSize; serieIndex++) {
-
-				final TimeData timeData = allTimeData.get(serieIndex);
-
-				final long absoluteTime = timeData.absoluteTime;
-				if (absoluteTime != Long.MIN_VALUE) {
-
-					final long tourAbsoluteTime = absoluteTime / 1000;
-
-					if (tourAbsoluteTime >= lapAbsoluteTime) {
-						return serieIndex;
-					}
-				}
-
-				// check if distance is recorded, fixed problem when a fit tour do not contain distance data
-				if (lapDistance > 0) {
-
-					final float tourAbsoluteDistance = timeData.absoluteDistance;
-					if (tourAbsoluteDistance != Float.MIN_VALUE) {
-
-						if (tourAbsoluteDistance >= lapDistance) {
-							return serieIndex;
-						}
-					}
-				}
-			}
-		}
-
-		return _serieIndex;
-	}
-
 	public String getTourTitle() {
 
 		return String.format("%s (%s)", _importFilePathName, _sessionIndex); //$NON-NLS-1$
@@ -359,12 +307,10 @@ public class FitContext {
 	public void mesgRecord_20_After() {
 
 		_contextData.ctxTime_20_Finalize();
-		_serieIndex++;
 	}
 
 	public void mesgSession_10_Before() {
 
-		_serieIndex = 0;
 		_contextData.ctxTour_10_Initialize();
 	}
 

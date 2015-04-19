@@ -17,6 +17,10 @@ New
 Improvements
 ============
 
+* FIT Import
+  - Support Bryton 210 .fit files. This data format contains duplicated time records which must be merged to have valid tour data.
+    The manufacturer field contains the value "DEVELOPMENT" (255)
+
 * GPX Import
   - Support import of .gpx files which are not xml well formed, 
     feature request #123 

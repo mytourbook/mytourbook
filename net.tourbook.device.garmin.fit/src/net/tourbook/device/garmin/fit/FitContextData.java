@@ -33,6 +33,8 @@ public class FitContextData {
 
 	private TourMarker									_currentTourMarker;
 
+	private TimeData									_previousTimeData;
+
 	/**
 	 * Tour context is a little bit tricky and cannot be replaced with just a {@link TourData}
 	 * instance. {@link TourContext} is the key to other tour values.
@@ -98,7 +100,9 @@ public class FitContextData {
 		List<TourMarker> tourMarkers = _allTourMarker.get(_currentTourContext);
 
 		if (tourMarkers == null) {
+
 			tourMarkers = new ArrayList<TourMarker>();
+
 			_allTourMarker.put(_currentTourContext, tourMarkers);
 		}
 
@@ -113,21 +117,85 @@ public class FitContextData {
 
 	public void ctxTime_10_Initialize() {
 
+		// ensure tour is setup
 		ctxTour_10_Initialize();
 
-//		_currentTimeDataList = _allTimeData.get(_currentTourData);
-
 		if (_currentTimeDataList == null) {
+
 			_currentTimeDataList = new ArrayList<TimeData>();
+
 			_allTimeData.put(_currentTourContext, _currentTimeDataList);
 		}
 
 		_currentTimeData = new TimeData();
-		_currentTimeDataList.add(_currentTimeData);
 	}
 
 	public void ctxTime_20_Finalize() {
 
+		if (_currentTimeData == null) {
+			// this occured
+			return;
+		}
+
+		boolean useThisTimeSlice = true;
+
+		if (_previousTimeData != null) {
+
+			final long prevTime = _previousTimeData.absoluteTime;
+			final long currentTime = _currentTimeData.absoluteTime;
+
+			if (prevTime == currentTime) {
+
+				/*
+				 * Ignore and merge duplicated records. The device Bryton 210 creates duplicated
+				 * enries, to have valid data for this device, they must be merged.
+				 */
+
+				useThisTimeSlice = false;
+
+				if (_previousTimeData.absoluteAltitude == Float.MIN_VALUE) {
+					_previousTimeData.absoluteAltitude = _currentTimeData.absoluteAltitude;
+				}
+
+				if (_previousTimeData.absoluteDistance == Float.MIN_VALUE) {
+					_previousTimeData.absoluteDistance = _currentTimeData.absoluteDistance;
+				}
+
+				if (_previousTimeData.cadence == Float.MIN_VALUE) {
+					_previousTimeData.cadence = _currentTimeData.cadence;
+				}
+
+				if (_previousTimeData.latitude == Double.MIN_VALUE) {
+					_previousTimeData.latitude = _currentTimeData.latitude;
+				}
+
+				if (_previousTimeData.longitude == Double.MIN_VALUE) {
+					_previousTimeData.longitude = _currentTimeData.longitude;
+				}
+
+				if (_previousTimeData.power == Float.MIN_VALUE) {
+					_previousTimeData.power = _currentTimeData.power;
+				}
+
+				if (_previousTimeData.pulse == Float.MIN_VALUE) {
+					_previousTimeData.pulse = _currentTimeData.pulse;
+				}
+
+				if (_previousTimeData.speed == Float.MIN_VALUE) {
+					_previousTimeData.speed = _currentTimeData.speed;
+				}
+
+				if (_previousTimeData.temperature == Float.MIN_VALUE) {
+					_previousTimeData.temperature = _currentTimeData.temperature;
+				}
+			}
+		}
+
+		if (useThisTimeSlice) {
+			_currentTimeDataList.add(_currentTimeData);
+		}
+
+		_previousTimeData = _currentTimeData;
 		_currentTimeData = null;
 	}
 
@@ -149,10 +217,6 @@ public class FitContextData {
 
 		_currentTourContext = null;
 		_currentTimeDataList = null;
-	}
-
-	public List<TimeData> getAllTimeData() {
-		return _currentTimeDataList;
 	}
 
 	public TimeData getCurrentTimeData() {
