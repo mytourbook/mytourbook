@@ -218,8 +218,8 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 	/**
 	 * @since Db version 25
 	 */
-
 	private double					latitude									= TourDatabase.DEFAULT_DOUBLE;
+
 	/**
 	 * @since Db version 25
 	 */

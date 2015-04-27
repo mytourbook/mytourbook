@@ -105,7 +105,6 @@ public class Messages extends NLS {
 	public static String		dialog_export_dialog_title;
 	public static String		dialog_export_dir_dialog_message;
 	public static String		dialog_export_dir_dialog_text;
-	public static String		dialog_export_error_camouflageSpeedIsInvalid;
 	public static String		dialog_export_file_dialog_text;
 	public static String		dialog_export_group_exportFileName;
 	public static String		dialog_export_group_options;
@@ -139,11 +138,17 @@ public class Messages extends NLS {
 	public static String		Dialog_DoubleClickAction_NoAction_Title;
 
 	public static String		Dialog_Export_Error_CourseNameIsInvalid;
+	public static String		Dialog_Export_Group_GPX_Options;
 	public static String		Dialog_Export_Group_TCX_Options;
+	public static String		Dialog_Export_Label_GPX_DistanceValues;
 	public static String		Dialog_Export_Label_TCX_CourseName;
 	public static String		Dialog_Export_Label_TCX_NameFrom;
 	public static String		Dialog_Export_Label_TCX_NameFrom_Tooltip;
 	public static String		Dialog_Export_Label_TCX_Type;
+	public static String		Dialog_Export_Radio_GPX_DistanceAbsolute;
+	public static String		Dialog_Export_Radio_GPX_DistanceAbsolute_Tooltip;
+	public static String		Dialog_Export_Radio_GPX_DistanceRelative;
+	public static String		Dialog_Export_Radio_GPX_DistanceRelative_Tooltip;
 	public static String		Dialog_Export_Radio_TCX_Aktivities;
 	public static String		Dialog_Export_Radio_TCX_Aktivities_Tooltip;
 	public static String		Dialog_Export_Radio_TCX_Courses;

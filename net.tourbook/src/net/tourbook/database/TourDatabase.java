@@ -90,13 +90,13 @@ import com.mchange.v2.c3p0.ComboPooledDataSource;
 
 public class TourDatabase {
 
-
 	/**
 	 * version for the database which is required that the tourbook application works successfully
 	 */
-	private static final int						TOURBOOK_DB_VERSION							= 27;
+	private static final int						TOURBOOK_DB_VERSION							= 28;
 
-//	private static final int						TOURBOOK_DB_VERSION							= 27;	// 15.5?
+//	private static final int						TOURBOOK_DB_VERSION							= 28;	// 15.5
+//	private static final int						TOURBOOK_DB_VERSION							= 27;	// 15.3.1
 //	private static final int						TOURBOOK_DB_VERSION							= 26;	// 14.14 / 15.3
 //	private static final int						TOURBOOK_DB_VERSION							= 25;	// 14.10
 //	private static final int						TOURBOOK_DB_VERSION							= 24;	// 14.7
@@ -2719,7 +2719,14 @@ public class TourDatabase {
 				+ "	description			VARCHAR(" + TourWayPoint.DB_LENGTH_DESCRIPTION + "),				\n" //$NON-NLS-1$ //$NON-NLS-2$
 				+ "	comment				VARCHAR(" + TourWayPoint.DB_LENGTH_COMMENT + "),					\n" //$NON-NLS-1$ //$NON-NLS-2$
 				+ "	symbol				VARCHAR(" + TourWayPoint.DB_LENGTH_SYMBOL + "),						\n" //$NON-NLS-1$ //$NON-NLS-2$
-				+ "	category			VARCHAR(" + TourWayPoint.DB_LENGTH_CATEGORY + ")					\n" //$NON-NLS-1$ //$NON-NLS-2$
+				+ "	category			VARCHAR(" + TourWayPoint.DB_LENGTH_CATEGORY + "),					\n" //$NON-NLS-1$ //$NON-NLS-2$
+
+				// version 28 start - create common fields with TourMarker
+				//
+				+ "	urlText				VARCHAR(" + TourMarker.DB_LENGTH_URL_TEXT + "),						\n" //$NON-NLS-1$ //$NON-NLS-2$
+				+ "	urlAddress			VARCHAR(" + TourMarker.DB_LENGTH_URL_ADDRESS + ")					\n" //$NON-NLS-1$ //$NON-NLS-2$
+				//
+				// version 28 end ---------
 				//
 				+ ")"); //$NON-NLS-1$
 	}
@@ -3721,6 +3728,13 @@ public class TourDatabase {
 			 */
 			if (currentDbVersion == 26) {
 				currentDbVersion = newVersion = updateDbDesign_026_to_027(conn, monitor);
+			}
+
+			/*
+			 * 27 -> 28
+			 */
+			if (currentDbVersion == 27) {
+				currentDbVersion = newVersion = updateDbDesign_027_to_028(conn, monitor);
 			}
 
 			/*
@@ -5274,6 +5288,10 @@ public class TourDatabase {
 
 		final int newDbVersion = 26;
 
+		/**
+		 * This version is never used but is not deleted to keep this info.
+		 */
+
 		logDbUpdateStart(newDbVersion);
 
 		if (monitor != null) {
@@ -5323,6 +5341,40 @@ public class TourDatabase {
 					// Add new columns
 					SQL.AddCol_Int(stmt, TABLE_TOUR_DATA, "frontShiftCount", DEFAULT_0);//$NON-NLS-1$
 					SQL.AddCol_Int(stmt, TABLE_TOUR_DATA, "rearShiftCount", DEFAULT_0); //$NON-NLS-1$
+				}
+			}
+		}
+		stmt.close();
+
+		logDbUpdateEnd(newDbVersion);
+
+		return newDbVersion;
+	}
+
+	private int updateDbDesign_027_to_028(final Connection conn, final IProgressMonitor monitor) throws SQLException {
+
+		final int newDbVersion = 28;
+
+		logDbUpdateStart(newDbVersion);
+
+		if (monitor != null) {
+			monitor.subTask(NLS.bind(Messages.Tour_Database_Update, newDbVersion));
+		}
+
+		final Statement stmt = conn.createStatement();
+		{
+			// check if db is updated to version 28
+			if (isColumnAvailable(conn, TABLE_TOUR_WAYPOINT, "urlText") == false) { //$NON-NLS-1$
+
+				/*
+				 * Table: TABLE_TOUR_WAYPOINT
+				 */
+				{
+					/*
+					 * Add new columns
+					 */
+					SQL.AddCol_VarCar(stmt, TABLE_TOUR_WAYPOINT, "urlText", TourMarker.DB_LENGTH_URL_TEXT); //$NON-NLS-1$
+					SQL.AddCol_VarCar(stmt, TABLE_TOUR_WAYPOINT, "urlAddress", TourMarker.DB_LENGTH_URL_ADDRESS); //$NON-NLS-1$
 				}
 			}
 		}

@@ -23,6 +23,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.TimeZone;
 
+import net.tourbook.common.UI;
 import net.tourbook.common.util.MtMath;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TimeData;
@@ -33,7 +34,6 @@ import net.tourbook.device.Activator;
 import net.tourbook.device.IPreferences;
 import net.tourbook.importdata.DeviceData;
 import net.tourbook.importdata.TourbookDevice;
-import net.tourbook.ui.UI;
 
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -49,6 +49,10 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 public class GPX_SAX_Handler extends DefaultHandler {
+
+//	// A CDATA section starts with "<![CDATA[" and ends with "]]>"
+//	private static final String				CDATA_START					= "<![CDATA[";										//$NON-NLS-1$
+//	private static final String				CDATA_END					= "]]>";											//$NON-NLS-1$
 
 	private static final String				NAME_SPACE_GPX_1_0			= "http://www.topografix.com/GPX/1/0";				//$NON-NLS-1$
 	private static final String				NAME_SPACE_GPX_1_1			= "http://www.topografix.com/GPX/1/1";				//$NON-NLS-1$
@@ -68,6 +72,7 @@ public class GPX_SAX_Handler extends DefaultHandler {
 
 	private static final String				TAG_TRK						= "trk";											//$NON-NLS-1$
 	private static final String				TAG_TRK_NAME				= "name";											//$NON-NLS-1$
+	private static final String				TAG_TRK_DESC				= "desc";											//$NON-NLS-1$
 	private static final String				TAG_TRKPT					= "trkpt";											//$NON-NLS-1$
 
 	private static final String				TAG_TIME					= "time";											//$NON-NLS-1$
@@ -101,16 +106,19 @@ public class GPX_SAX_Handler extends DefaultHandler {
 	private static final String				ATTR_LONGITUDE				= "lon";											//$NON-NLS-1$
 
 	private static final String				TAG_WPT						= "wpt";											//$NON-NLS-1$
-	private static final Object				TAG_WPT_ELE					= "ele";											//$NON-NLS-1$
-	private static final Object				TAG_WPT_TIME				= "time";											//$NON-NLS-1$
-	private static final Object				TAG_WPT_NAME				= "name";											//$NON-NLS-1$
-	private static final Object				TAG_WPT_CMT					= "cmt";											//$NON-NLS-1$
-	private static final Object				TAG_WPT_DESC				= "desc";											//$NON-NLS-1$
-	private static final Object				TAG_WPT_SYM					= "sym";											//$NON-NLS-1$
-	private static final Object				TAG_WPT_TYPE				= "type";											//$NON-NLS-1$
-	////////////////////////
+	private static final String				TAG_WPT_CMT					= "cmt";											//$NON-NLS-1$
+	private static final String				TAG_WPT_DESC				= "desc";											//$NON-NLS-1$
+	private static final String				TAG_WPT_ELE					= "ele";											//$NON-NLS-1$
+	private static final String				TAG_WPT_NAME				= "name";											//$NON-NLS-1$
+	private static final String				TAG_WPT_SYM					= "sym";											//$NON-NLS-1$
+	private static final String				TAG_WPT_TIME				= "time";											//$NON-NLS-1$
+	private static final String				TAG_WPT_TYPE				= "type";											//$NON-NLS-1$
 
-//	private static final Calendar			_calendar				= GregorianCalendar.getInstance();
+	// <url> URL associated with the waypoint
+	private static final String				TAG_WPT_URL					= "url";											//$NON-NLS-1$
+
+	// <urlname> Text to display on the <url> hyperlink
+	private static final String				TAG_WPT_URLNAME				= "urlname";										//$NON-NLS-1$
 
 	private static final DateTimeFormatter	_dtIsoParser				= ISODateTimeFormat.dateTimeParser();
 	private static final DateTimeFormatter	_dtFormatterShort			= DateTimeFormat.mediumDateTime();
@@ -128,6 +136,7 @@ public class GPX_SAX_Handler extends DefaultHandler {
 
 	private boolean							_isInTrk					= false;
 	private boolean							_isInTrkName				= false;
+	private boolean							_isInTrkDesc;
 	private boolean							_isInTrkPt					= false;
 
 	private boolean							_isInTime					= false;
@@ -155,17 +164,20 @@ public class GPX_SAX_Handler extends DefaultHandler {
 	 * wap points
 	 */
 	private boolean							_isInWpt					= false;
-	private boolean							_isInWptEle					= false;
-	private boolean							_isInWptTime				= false;
-	private boolean							_isInWptName				= false;
-	private boolean							_isInWptCmt					= false;
-	private boolean							_isInWptDesc				= false;
-	private boolean							_isInWptSym					= false;
-	private boolean							_isInWptType				= false;
+	private boolean							_isInWpt_Ele				= false;
+	private boolean							_isInWpt_Time				= false;
+	private boolean							_isInWpt_Name				= false;
+	private boolean							_isInWpt_Cmt				= false;
+	private boolean							_isInWpt_Desc				= false;
+	private boolean							_isInWpt_Sym				= false;
+	private boolean							_isInWpt_Type				= false;
+	private boolean							_isInWpt_UrlAddress;
+	private boolean							_isInWpt_UrlText;
 
 	private final ArrayList<TimeData>		_timeDataList				= new ArrayList<TimeData>();
 	private TimeData						_timeSlice;
 	private TimeData						_prevTimeSlice;
+	private String							_trkDesc;
 	private String							_trkName;
 
 	private final TourbookDevice			_device;
@@ -174,7 +186,7 @@ public class GPX_SAX_Handler extends DefaultHandler {
 	private HashMap<Long, TourData>			_newlyImportedTours;
 	private int								_trackCounter;
 
-	private final ArrayList<TourWayPoint>	_wptList					= new ArrayList<TourWayPoint>();
+	private final ArrayList<TourWayPoint>	_allWayPoints				= new ArrayList<TourWayPoint>();
 	private TourWayPoint					_wpt;
 
 	private final ArrayList<GPXDataLap>		_gpxDataList				= new ArrayList<GPXDataLap>();
@@ -232,7 +244,8 @@ public class GPX_SAX_Handler extends DefaultHandler {
 	@Override
 	public void characters(final char[] chars, final int startIndex, final int length) throws SAXException {
 
-		if (_isInTrkName //
+		if (_isInTrkName
+				|| _isInTrkDesc
 				|| _isInTime
 				|| _isInEle
 				|| _isInName
@@ -242,13 +255,15 @@ public class GPX_SAX_Handler extends DefaultHandler {
 				|| _isInTemp
 				|| _isInDistance
 				//
-				|| _isInWptCmt
-				|| _isInWptDesc
-				|| _isInWptEle
-				|| _isInWptName
-				|| _isInWptSym
-				|| _isInWptTime
-				|| _isInWptType
+				|| _isInWpt_Cmt
+				|| _isInWpt_Desc
+				|| _isInWpt_Ele
+				|| _isInWpt_Name
+				|| _isInWpt_Sym
+				|| _isInWpt_Time
+				|| _isInWpt_Type
+				|| _isInWpt_UrlAddress
+				|| _isInWpt_UrlText
 				//
 				|| _isInGpxDataIndex
 				|| _isInGpxDataStartTime
@@ -283,11 +298,26 @@ public class GPX_SAX_Handler extends DefaultHandler {
 
 		try {
 
+			final String charData = _characters.toString();
+
+//			System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
+//					+ ("\tcharData: " + charData));
+//			// TODO remove SYSTEM.OUT.PRINTLN
+
+//			if (charData.startsWith(CDATA_START)) {
+//
+//				if (charData.endsWith(CDATA_END)) {
+//
+//					final int start = CDATA_START.length();
+//					final int end = charData.length() - CDATA_END.length();
+//
+//					charData = charData.substring(start, end);
+//				}
+//			}
+
 			if (_isInTrk) {
 
 				if (_isInTrkPt) {
-
-					final String charData = _characters.toString();
 
 					if (name.equals(TAG_ELE)) {
 
@@ -403,11 +433,16 @@ public class GPX_SAX_Handler extends DefaultHandler {
 					// </name> track name
 
 					_isInTrkName = false;
-					_trkName = _characters.toString();
+					_trkName = charData;
+
+				} else if (name.equals(TAG_TRK_DESC)) {
+
+					// </name> track name
+
+					_isInTrkDesc = false;
+					_trkDesc = charData;
 
 				} else if (_isInGpxDataLap) {
-
-					final String charData = _characters.toString();
 
 					if (name.equals(TAG_GPX_DATA_INDEX)) {
 
@@ -455,13 +490,11 @@ public class GPX_SAX_Handler extends DefaultHandler {
 
 				// in <wpt>
 
-				final String charData = _characters.toString();
-
 				if (name.equals(TAG_WPT_ELE)) {
 
 					// </ele> elevation
 
-					_isInWptEle = false;
+					_isInWpt_Ele = false;
 
 					_wpt.setAltitude(getFloatValue(charData));
 
@@ -469,7 +502,7 @@ public class GPX_SAX_Handler extends DefaultHandler {
 
 					// </time>
 
-					_isInWptTime = false;
+					_isInWpt_Time = false;
 
 					try {
 						_wpt.setTime(_dtIsoParser.parseDateTime(charData).getMillis());
@@ -496,36 +529,50 @@ public class GPX_SAX_Handler extends DefaultHandler {
 
 					// </name> name
 
-					_isInWptName = false;
+					_isInWpt_Name = false;
 					_wpt.setName(charData);
 
 				} else if (name.equals(TAG_WPT_CMT)) {
 
 					// </cmt> comment
 
-					_isInWptCmt = false;
+					_isInWpt_Cmt = false;
 					_wpt.setComment(charData);
 
 				} else if (name.equals(TAG_WPT_DESC)) {
 
 					// </desc> description
 
-					_isInWptDesc = false;
+					_isInWpt_Desc = false;
 					_wpt.setDescription(charData);
 
 				} else if (name.equals(TAG_WPT_SYM)) {
 
 					// </sym> symbol
 
-					_isInWptSym = false;
+					_isInWpt_Sym = false;
 					_wpt.setSymbol(charData);
 
 				} else if (name.equals(TAG_WPT_TYPE)) {
 
 					// </type> type/category
 
-					_isInWptType = true;
+					_isInWpt_Type = true;
 					_wpt.setCategory(charData);
+
+				} else if (name.equals(TAG_WPT_URL)) {
+
+					// </url> url address
+
+					_isInWpt_UrlAddress = false;
+					_wpt.setUrlAddress(charData);
+
+				} else if (name.equals(TAG_WPT_URLNAME)) {
+
+					// </urlname> url text
+
+					_isInWpt_UrlText = false;
+					_wpt.setUrlText(charData);
 				}
 			}
 
@@ -612,6 +659,7 @@ public class GPX_SAX_Handler extends DefaultHandler {
 		final TourData tourData = new TourData();
 
 		tourData.setTourTitle(_trkName);
+		tourData.setTourDescription(_trkDesc);
 
 		/*
 		 * set tour start date/time
@@ -632,7 +680,7 @@ public class GPX_SAX_Handler extends DefaultHandler {
 		tourData.importRawDataFile = _importFilePath;
 		tourData.setTourImportFilePath(_importFilePath);
 
-		tourData.setWayPoints(_wptList);
+		tourData.setWayPoints(_allWayPoints);
 
 		tourData.setDeviceId(_device.deviceId);
 		tourData.setDeviceName(_device.visibleName);
@@ -733,7 +781,9 @@ public class GPX_SAX_Handler extends DefaultHandler {
 			return;
 		}
 
-		_wptList.add(_wpt);
+		if (_wpt.isValidForSave()) {
+			_allWayPoints.add(_wpt);
+		}
 
 		_wpt = null;
 	}
@@ -983,6 +1033,11 @@ public class GPX_SAX_Handler extends DefaultHandler {
 					_isInTrkName = true;
 					_characters.delete(0, _characters.length());
 
+				} else if (name.equals(TAG_TRK_DESC)) {
+
+					_isInTrkDesc = true;
+					_characters.delete(0, _characters.length());
+
 				} else if (name.equals(TAG_GPX_DATA_EXTENSIONS)) {
 
 					/*
@@ -1032,37 +1087,47 @@ public class GPX_SAX_Handler extends DefaultHandler {
 
 				if (name.equals(TAG_WPT_ELE)) {
 
-					_isInWptEle = true;
+					_isInWpt_Ele = true;
 					_characters.delete(0, _characters.length());
 
 				} else if (name.equals(TAG_WPT_TIME)) {
 
-					_isInWptTime = true;
+					_isInWpt_Time = true;
 					_characters.delete(0, _characters.length());
 
 				} else if (name.equals(TAG_WPT_NAME)) {
 
-					_isInWptName = true;
+					_isInWpt_Name = true;
 					_characters.delete(0, _characters.length());
 
 				} else if (name.equals(TAG_WPT_CMT)) {
 
-					_isInWptCmt = true;
+					_isInWpt_Cmt = true;
 					_characters.delete(0, _characters.length());
 
 				} else if (name.equals(TAG_WPT_DESC)) {
 
-					_isInWptDesc = true;
+					_isInWpt_Desc = true;
 					_characters.delete(0, _characters.length());
 
 				} else if (name.equals(TAG_WPT_SYM)) {
 
-					_isInWptSym = true;
+					_isInWpt_Sym = true;
 					_characters.delete(0, _characters.length());
 
 				} else if (name.equals(TAG_WPT_TYPE)) {
 
-					_isInWptType = true;
+					_isInWpt_Type = true;
+					_characters.delete(0, _characters.length());
+
+				} else if (name.equals(TAG_WPT_URL)) {
+
+					_isInWpt_UrlAddress = true;
+					_characters.delete(0, _characters.length());
+
+				} else if (name.equals(TAG_WPT_URLNAME)) {
+
+					_isInWpt_UrlText = true;
 					_characters.delete(0, _characters.length());
 
 				}

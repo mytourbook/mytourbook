@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -22,12 +22,13 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.Transient;
 
+import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.map.GeoPosition;
 import net.tourbook.common.util.IHoveredArea;
 import net.tourbook.common.util.StatusUtil;
+import net.tourbook.database.FIELD_VALIDATION;
 import net.tourbook.database.TourDatabase;
-import net.tourbook.map2.Messages;
 
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.swt.graphics.Image;
@@ -39,61 +40,79 @@ import org.eclipse.swt.graphics.Image;
 @Entity
 public class TourWayPoint implements Cloneable, Comparable<Object>, IHoveredArea {
 
-	public static final int	DB_LENGTH_NAME			= 1024;
-	public static final int	DB_LENGTH_DESCRIPTION	= 4096;
-	public static final int	DB_LENGTH_COMMENT		= 4096;
-	public static final int	DB_LENGTH_SYMBOL		= 1024;
-	public static final int	DB_LENGTH_CATEGORY		= 1024;
+	private static final String	IMAGE_MAP_WAY_POINT_HOVERED	= net.tourbook.map2.Messages.Image_Map_WayPoint_Hovered;
+
+	public static final int		DB_LENGTH_NAME				= 1024;
+	public static final int		DB_LENGTH_DESCRIPTION		= 4096;
+	public static final int		DB_LENGTH_COMMENT			= 4096;
+	public static final int		DB_LENGTH_SYMBOL			= 1024;
+	public static final int		DB_LENGTH_CATEGORY			= 1024;
 
 	/**
 	 * Unique id for the {@link TourWayPoint} entity
 	 */
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private long			wayPointId				= TourDatabase.ENTITY_IS_NOT_SAVED;
+	private long				wayPointId					= TourDatabase.ENTITY_IS_NOT_SAVED;
 
 	@ManyToOne(optional = false)
-	private TourData		tourData;
+	private TourData			tourData;
 
 	// initialize with invalid values
-	private double			longitude				= Double.MIN_VALUE;
-	private double			latitude				= Double.MIN_VALUE;
+	private double				longitude					= Double.MIN_VALUE;
+	private double				latitude					= Double.MIN_VALUE;
 
 	/**
 	 * absolute time
 	 */
-	private long			time					= 0;
+	private long				time						= 0;
 
 	/**
 	 * Altitude in meters.
 	 */
-	private float			altitude				= Float.MIN_VALUE;
+	private float				altitude					= Float.MIN_VALUE;
 
-	private String			name;
+	private String				name;
 
-	private String			description;
-	private String			comment;
-	private String			symbol;
-	private String			category;
+	private String				description;
+	private String				comment;
+	private String				symbol;
+	private String				category;
+
+	/**
+	 * Text to display on the hyperlink, can be <code>null</code>
+	 * 
+	 * @since DB version 28
+	 */
+	// <urlname> Text to display on the <url> hyperlink
+	private String				urlText;
+
+	/**
+	 * URL associated with the waypoint, can be <code>null</code>
+	 * 
+	 * @since DB version 28
+	 */
+	// <url> URL associated with the waypoint
+	private String				urlAddress;
 
 	@Transient
-	private GeoPosition		_geoPosition;
+	private GeoPosition			_geoPosition;
 
 	/**
 	 * Unique id for manually created waypoints because the {@link #wayPointId} is 0 when the
 	 * waypoint is not persisted.
 	 */
 	@Transient
-	private long			_createId				= 0;
+	private long				_createId					= 0;
 
 	@Transient
-	private static Image	_twpHoveredImage;
+	private static Image		_twpHoveredImage;
 
 	/**
 	 * manually created way points or imported way points create a unique id to identify them, saved
 	 * way points are compared with the way point id
 	 */
-	private static int		_createCounter			= 0;
+	private static int			_createCounter				= 0;
 
 	public TourWayPoint() {}
 
@@ -227,11 +246,9 @@ public class TourWayPoint implements Cloneable, Comparable<Object>, IHoveredArea
 
 		final ImageRegistry imageRegistry = TourbookPlugin.getDefault().getImageRegistry();
 
-		imageRegistry.put(
-				Messages.Image_Map_WayPoint_Hovered,
-				TourbookPlugin.getImageDescriptor(Messages.Image_Map_WayPoint_Hovered));
+		imageRegistry.put(IMAGE_MAP_WAY_POINT_HOVERED, TourbookPlugin.getImageDescriptor(IMAGE_MAP_WAY_POINT_HOVERED));
 
-		_twpHoveredImage = imageRegistry.get(Messages.Image_Map_WayPoint_Hovered);
+		_twpHoveredImage = imageRegistry.get(IMAGE_MAP_WAY_POINT_HOVERED);
 
 		return _twpHoveredImage;
 	}
@@ -269,6 +286,14 @@ public class TourWayPoint implements Cloneable, Comparable<Object>, IHoveredArea
 		return tourData;
 	}
 
+	public String getUrlAddress() {
+		return urlAddress;
+	}
+
+	public String getUrlText() {
+		return urlText;
+	}
+
 	/**
 	 * @return Returns the persistence id or {@link TourDatabase#ENTITY_IS_NOT_SAVED} when the
 	 *         entity is not yet saved
@@ -284,6 +309,44 @@ public class TourWayPoint implements Cloneable, Comparable<Object>, IHoveredArea
 		result = prime * result + (int) (_createId ^ (_createId >>> 32));
 		result = prime * result + (int) (wayPointId ^ (wayPointId >>> 32));
 		return result;
+	}
+
+	/**
+	 * Checks if VARCHAR fields have the correct length
+	 * 
+	 * @return Returns <code>true</code> when the data are valid and can be saved
+	 */
+	public boolean isValidForSave() {
+
+		/*
+		 * Check: url text
+		 */
+		FIELD_VALIDATION fieldValidation = TourDatabase.isFieldValidForSave(
+				urlText,
+				TourMarker.DB_LENGTH_URL_TEXT,
+				Messages.Db_Field_TourMarker_UrlText);
+
+		if (fieldValidation == FIELD_VALIDATION.IS_INVALID) {
+			return false;
+		} else if (fieldValidation == FIELD_VALIDATION.TRUNCATE) {
+			urlText = urlText.substring(0, TourMarker.DB_LENGTH_URL_TEXT);
+		}
+
+		/*
+		 * Check: url address
+		 */
+		fieldValidation = TourDatabase.isFieldValidForSave(
+				urlAddress,
+				TourMarker.DB_LENGTH_URL_ADDRESS,
+				Messages.Db_Field_TourMarker_UrlAddress);
+
+		if (fieldValidation == FIELD_VALIDATION.IS_INVALID) {
+			return false;
+		} else if (fieldValidation == FIELD_VALIDATION.TRUNCATE) {
+			urlAddress = urlAddress.substring(0, TourMarker.DB_LENGTH_URL_ADDRESS);
+		}
+
+		return true;
 	}
 
 	public void setAltitude(final Float altitude) {
@@ -332,26 +395,29 @@ public class TourWayPoint implements Cloneable, Comparable<Object>, IHoveredArea
 		this.time = time;
 	}
 
-	@Override
-	public String toString() {
-
-		final StringBuilder sb = new StringBuilder();
-		sb.append("wayPointId:"); //$NON-NLS-1$
-		sb.append(wayPointId);
-		sb.append("\tcreateId:"); //$NON-NLS-1$
-		sb.append(_createId);
-		sb.append("\tname:"); //$NON-NLS-1$
-		sb.append(name);
-		sb.append("\tlat:"); //$NON-NLS-1$
-		sb.append(latitude);
-		sb.append("\tlon:"); //$NON-NLS-1$
-		sb.append(longitude);
-		sb.append("\tdesc:"); //$NON-NLS-1$
-		sb.append(description);
-		sb.append("\tcom:"); //$NON-NLS-1$
-		sb.append(comment);
-
-		return sb.toString();
+	public void setUrlAddress(final String urlAddress) {
+		this.urlAddress = urlAddress;
 	}
 
+	public void setUrlText(final String urlText) {
+		this.urlText = urlText;
+	}
+
+	@Override
+	public String toString() {
+		return "TourWayPoint ["
+
+				+ ("time=" + time + ", ")
+				+ ("wayPointId=" + wayPointId + ", ")
+				+ ("longitude=" + longitude + ", ")
+				+ ("latitude=" + latitude + ", ")
+				+ ("altitude=" + altitude + ", ")
+				+ ("name=" + name + ", ")
+				+ ("description=" + description + ", ")
+				+ ("comment=" + comment + ", ")
+				+ ("symbol=" + symbol + ", ")
+				+ ("category=" + category)
+
+				+ "]\n";
+	}
 }

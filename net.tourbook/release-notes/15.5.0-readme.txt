@@ -1,4 +1,4 @@
-Version 15.3.3                                             ?. April 2015
+Version 15.5.0                                             ?. May 2015
 
 
 
@@ -20,6 +20,8 @@ Improvements
 * FIT Import
   - Support Bryton 210 .fit files. This data format contains duplicated time records which must be merged to have valid tour data.
     The manufacturer field contains the value "DEVELOPMENT" (255)
+  - Support FR70 .fit files. 
+    This data format can contain 0 sessions but the data are still valid.
 
 * GPX Import
   - Support import of .gpx files which are not xml well formed, 
@@ -27,7 +29,10 @@ Improvements
 	 http://sourceforge.net/p/mytourbook/feature-requests/123/
 	
   - Import values with these tags: <un:cad> <un:hr> <un:power>
-
+  
+* GPX Export
+  - Export url/url text for tour marker/waypoints.
+ 
 * Tour Editor
   - Calories can always be edited, removed restriction.
 
@@ -38,9 +43,13 @@ Improvements
 * Tour Book
   - Moved first two actions from the view menu into the view toolbar. This makes it easier to access it.
   
+  
 Bugfix
 ======
 
-* Fixed import for FR70 device.
+* Fit Import
 
+* GPX Export 
+  Export texts with special characters
+  https://sourceforge.net/p/mytourbook/bugs/72/
   

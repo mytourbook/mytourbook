@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -27,8 +27,10 @@ import org.eclipse.swt.widgets.Display;
  */
 public class ExportTourTCX extends ExportTourExtension {
 
+	private static final String	TCX_2_0_TEMPLATE	= "/format-templates/tcx-2.0.vm";	//$NON-NLS-1$
+
 	/**
-	 * plugin extension constructor
+	 * Plugin extension constructor
 	 */
 	public ExportTourTCX() {}
 
@@ -41,8 +43,7 @@ public class ExportTourTCX extends ExportTourExtension {
 				tourDataList,
 				tourStartIndex,
 				tourEndIndex,
-				"/format-templates/tcx-2.0.vm", //$NON-NLS-1$
-				true).open();
+				TCX_2_0_TEMPLATE).open();
 	}
 
 }

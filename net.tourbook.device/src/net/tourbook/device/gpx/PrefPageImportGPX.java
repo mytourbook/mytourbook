@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -121,18 +121,19 @@ public class PrefPageImportGPX extends PreferencePage implements IWorkbenchPrefe
 						.applyTo(container);
 				GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
 				{
-					_rdoDistanceRelative = new Button(container, SWT.RADIO);
-					_rdoDistanceRelative.setText(Messages.PrefPage_GPX_Radio_DistanceRelative);
-					_rdoDistanceRelative.setToolTipText(Messages.PrefPage_GPX_Radio_DistanceRelative_Tooltip);
-
 					_rdoDistanceAbsolute = new Button(container, SWT.RADIO);
 					_rdoDistanceAbsolute.setText(Messages.PrefPage_GPX_Radio_DistanceAbsolute);
 					_rdoDistanceAbsolute.setToolTipText(Messages.PrefPage_GPX_Radio_DistanceAbsolute_Tooltip);
+
+					_rdoDistanceRelative = new Button(container, SWT.RADIO);
+					_rdoDistanceRelative.setText(Messages.PrefPage_GPX_Radio_DistanceRelative);
+					_rdoDistanceRelative.setToolTipText(Messages.PrefPage_GPX_Radio_DistanceRelative_Tooltip);
 				}
 			}
 		}
 	}
 
+	@Override
 	public void init(final IWorkbench workbench) {}
 
 	private void initUI(final Composite parent) {

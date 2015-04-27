@@ -10,7 +10,7 @@ Require-Bundle: org.eclipse.core.runtime,
  net.tourbook,
  net.tourbook.ext.jars,
  net.tourbook.common,
- net.tourbook.ext.velocity;bundle-version="12.1.0"
+ net.tourbook.ext.velocity
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Import-Package: net.tourbook.ext.velocity,
