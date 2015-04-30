@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -62,8 +62,6 @@ public class ActionExport extends Action implements IMenuCreator {
 
 			_exportTourExtension = exportTourExtension;
 		}
-
-//		ActionExportTour(final String visibleName, final String fileExtension) {}
 
 		@Override
 		public void run() {
@@ -128,6 +126,7 @@ public class ActionExport extends Action implements IMenuCreator {
 		}
 	}
 
+	@Override
 	public void dispose() {
 		if (_menu != null) {
 			_menu.dispose();
@@ -179,10 +178,12 @@ public class ActionExport extends Action implements IMenuCreator {
 		return _exportExtensionPoints;
 	}
 
+	@Override
 	public Menu getMenu(final Control parent) {
 		return null;
 	}
 
+	@Override
 	public Menu getMenu(final Menu parent) {
 
 		dispose();

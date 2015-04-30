@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -147,10 +147,13 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	private static final String				STATE_IS_REMOVE_TOURS_WHEN_VIEW_CLOSED		= "STATE_IS_REMOVE_TOURS_WHEN_VIEW_CLOSED"; //$NON-NLS-1$
 
 	public static final String				STATE_IS_MERGE_TRACKS						= "isMergeTracks";							//$NON-NLS-1$
-	public static final boolean				STATE_IS_MERGE_TRACKS_DEFAULT				= false;
 	public static final String				STATE_IS_CHECKSUM_VALIDATION				= "isChecksumValidation";					//$NON-NLS-1$
-	public static final boolean				STATE_IS_CHECKSUM_VALIDATION_DEFAULT		= true;
+	public static final String				STATE_IS_CONVERT_WAYPOINTS					= "STATE_IS_CONVERT_WAYPOINTS";			//$NON-NLS-1$
 	public static final String				STATE_IS_CREATE_TOUR_ID_WITH_TIME			= "isCreateTourIdWithTime";				//$NON-NLS-1$
+
+	public static final boolean				STATE_IS_MERGE_TRACKS_DEFAULT				= false;
+	public static final boolean				STATE_IS_CHECKSUM_VALIDATION_DEFAULT		= true;
+	public static final boolean				STATE_IS_CONVERT_WAYPOINTS_DEFAULT			= true;
 	public static final boolean				STATE_IS_CREATE_TOUR_ID_WITH_TIME_DEFAULT	= false;
 
 	public static final String				IMAGE_DATA_TRANSFER							= "IMAGE_DATA_TRANSFER";					//$NON-NLS-1$

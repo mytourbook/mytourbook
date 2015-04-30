@@ -68,7 +68,7 @@ public class TourWayPoint implements Cloneable, Comparable<Object>, IHoveredArea
 	private long				time						= 0;
 
 	/**
-	 * Altitude in meters.
+	 * Altitude in meters or {@link Float#MIN_VALUE} when not available.
 	 */
 	private float				altitude					= Float.MIN_VALUE;
 
@@ -211,9 +211,19 @@ public class TourWayPoint implements Cloneable, Comparable<Object>, IHoveredArea
 	}
 
 	/**
-	 * @return Returns altitude in meters or {@link Float#MIN_VALUE} when altitude is not set
+	 * @return Returns altitude in meters or {@link Float#MIN_VALUE} when altitude is not set.
 	 */
 	public float getAltitude() {
+		return altitude;
+	}
+
+	/**
+	 * @return Returns altitude in meters as {@link Double} or {@link Float#MIN_VALUE} when altitude
+	 *         is not set.
+	 *         <p>
+	 *         <b>Have absolute <i>NO</i> idea why velocity is not working with float values.</b>
+	 */
+	public double getAltitudeDouble() {
 		return altitude;
 	}
 
@@ -309,6 +319,15 @@ public class TourWayPoint implements Cloneable, Comparable<Object>, IHoveredArea
 		result = prime * result + (int) (_createId ^ (_createId >>> 32));
 		result = prime * result + (int) (wayPointId ^ (wayPointId >>> 32));
 		return result;
+	}
+
+	/**
+	 * @return Returns <code>true</code> when altitude is available.
+	 *         <p>
+	 *         This method is used when exporting waypoints.
+	 */
+	public boolean hasValidAltitude() {
+		return altitude != Float.MIN_VALUE;
 	}
 
 	/**

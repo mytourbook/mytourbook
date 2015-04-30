@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -21,9 +21,14 @@ import org.dinopolis.gpstool.gpsinput.garmin.GarminTrackpointAdapter;
 public class GarminTrackpointAdapterExtended extends GarminTrackpointAdapter {
 
 	private double	_temperature	= Double.NaN;
+	private long	gear;
 
 	public GarminTrackpointAdapterExtended(final GarminTrackpoint trackpoint) {
 		super(trackpoint);
+	}
+
+	public long getGear() {
+		return gear;
 	}
 
 	/**
@@ -51,7 +56,18 @@ public class GarminTrackpointAdapterExtended extends GarminTrackpointAdapter {
 			return true;
 		}
 
+		if (hasValidGear()) {
+			return true;
+		}
+
 		return false;
+	}
+
+	/**
+	 * @return Returns <code>true</code> when valid gear is available.
+	 */
+	public boolean hasValidGear() {
+		return (gear != 0);
 	}
 
 	/**
@@ -62,6 +78,10 @@ public class GarminTrackpointAdapterExtended extends GarminTrackpointAdapter {
 	 */
 	public boolean hasValidTemperature() {
 		return (!Double.isNaN(_temperature));
+	}
+
+	public void setGear(final long gear) {
+		this.gear = gear;
 	}
 
 	public void setTemperature(final double temperature) {

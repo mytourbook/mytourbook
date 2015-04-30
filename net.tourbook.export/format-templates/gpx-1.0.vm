@@ -1,33 +1,35 @@
-<?xml version="1.0" encoding="UTF-8" ?> $dateformatter.applyPattern("yyyy-MM-dd'T'HH:mm:ss'Z'") $double6formatter.applyPattern("0.000000") $double2formatter.applyPattern("0.00") $intformatter.applyPattern("0")
+<?xml version="1.0" encoding="UTF-8" ?>
 <gpx  version="1.1"
 	creator="$creator"
 	xmlns="http://www.topografix.com/GPX/1/1"
 	xmlns:gpxdata="http://www.cluetrust.com/XML/GPXDATA/1/0"
 	xmlns:gpxx="http://www.garmin.com/xmlschemas/GpxExtensions/v3"
 	xmlns:gpxtpx="http://www.garmin.com/xmlschemas/TrackPointExtension/v1"
+	xmlns:mt="net.tourbook/1"
 	xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd 
 	http://www.cluetrust.com/XML/GPXDATA/1/0 http://www.cluetrust.com/Schemas/gpxdata10.xsd 
 	http://www.garmin.com/xmlschemas/GpxExtensions/v3 http://www.garmin.com/xmlschemas/GpxExtensionsv3.xsd 
 	http://www.garmin.com/xmlschemas/TrackPointExtension/v1 http://www.garmin.com/xmlschemas/TrackPointExtensionv1.xsd"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 	<metadata>	
-		<time>$dateformatter.format($starttime)</time>
+		<time>$dateformat.format($starttime)</time>
 		<bounds minlat="$min_latitude" minlon="$min_longitude" maxlat="$max_latitude" maxlon="$max_longitude"/>
 	</metadata>
 ##
 ##
-## print all waypoints that are available:
+##
+## WAYPOINTS
 ##
 #if($hasWayPoints)
-#foreach($point in $waypoints)
-	<wpt lat="$double6formatter.format($point.Latitude)" lon="$double6formatter.format($point.Longitude)">
+#foreach($point in $wayPoints)
+	<wpt lat="$nf6.format($point.Latitude)" lon="$nf6.format($point.Longitude)">
 ##
 #if($point.getTime())
-		<time>$dateformatter.format($point.getTime())</time>
+		<time>$dateformat.format($point.Time)</time>
 #end
 ##
 #if($point.hasValidAltitude())
-		<ele>$intformatter.format($point.Altitude)</ele>
+		<ele>$nf3.format($point.AltitudeDouble)</ele>
 #end
 ##
 #if($point.getName().length() > 0)
@@ -55,7 +57,53 @@
 #end
 ##
 ##
-## print all routes that are available:
+##
+## TOUR MARKER
+##
+#if($hasTourMarkers)
+#foreach($marker in $tourMarkers)
+	<wpt lat="$nf6.format($marker.Latitude)" lon="$nf6.format($marker.Longitude)">
+##
+		<time>$dateformat.format($marker.MarkerTime)</time>
+##
+#if($marker.hasAltitude())
+		<ele>$nf3.format($marker.AltitudeDouble)</ele>
+#end
+##
+#if($marker.getLabel().length() > 0)
+		<name><![CDATA[$!marker.Label]]></name>
+#end
+##
+#if($marker.getDescription().length() > 0)
+		<desc><![CDATA[$!marker.Description]]></desc>
+#end
+##
+#if($marker.getUrlAddress().length() > 0)
+		<url><![CDATA[$!marker.UrlAddress]]></url>
+#end
+##
+#if($marker.getUrlText().length() > 0)
+		<urlname><![CDATA[$!marker.UrlText]]></urlname>
+#end
+		<extensions>
+##
+			<mt:distance>$marker.Distance</mt:distance>
+			<mt:isVisible>$marker.isMarkerVisible()</mt:isVisible>
+			<mt:labelPos>$marker.LabelPosition</mt:labelPos>
+			<mt:labelXOffset>$marker.LabelXOffset</mt:labelXOffset>
+			<mt:labelYOffset>$marker.LabelYOffset</mt:labelYOffset>
+			<mt:serieIndex>$marker.SerieIndex</mt:serieIndex>
+			<mt:type>$marker.Type</mt:type>
+##
+		</extensions>
+##
+	</wpt>
+#end
+#end
+##
+##
+##
+## ROUTES
 ##
 #if($hasRoutes)
 #foreach($route in $routes)
@@ -67,9 +115,9 @@
 		<number>$velocityCount</number>
 #set ($points = $route.getWaypoints())
 #foreach ($point in $points)
-		<rtept lat="$double6formatter.format($point.Latitude)" lon="$double6formatter.format($point.Longitude)">
+		<rtept lat="$nf6.format($point.Latitude)" lon="$nf6.format($point.Longitude)">
 #if($point.hasValidAltitude())
-			<ele>$intformatter.format($point.Altitude)</ele>
+			<ele>$nf3.format($point.Altitude)</ele>
 #end
 #if($point.getName().length() > 0)
 			<name><![CDATA[$!point.Name]]></name>
@@ -84,7 +132,8 @@
 #end
 ##
 ##
-## print all tracks that are available:
+##
+## TRACKS
 ##
 #if($hasTracks)
 #foreach($track in $tracks)
@@ -111,20 +160,21 @@
 		<trkseg>
 #set($close_segment = true)
 #end
-			<trkpt lat="$double6formatter.format($point.Latitude)" lon="$double6formatter.format($point.Longitude)">
-#if($point.hasValidAltitude())
-				<ele>$intformatter.format($point.Altitude)</ele>
-#end
+			<trkpt lat="$nf6.format($point.Latitude)" lon="$nf6.format($point.Longitude)">
+##
 #if($point.getDate())
-				<time>$dateformatter.format($point.getDate())</time>
+				<time>$dateformat.format($point.Date)</time>
 #end
 ##
+#if($point.hasValidAltitude())
+				<ele>$nf3.format($point.Altitude)</ele>
+#end
 ##
 #if($point.hasValidExtention())
 				<extensions>
 					<gpxtpx:TrackPointExtension>
 #if($point.hasValidTemperature())
-						<gpxtpx:atemp>$double1formatter.format($point.getTemperature())</gpxtpx:atemp>
+						<gpxtpx:atemp>$nf1.format($point.Temperature)</gpxtpx:atemp>
 #end
 #if($point.hasValidHeartrate())
 						<gpxtpx:hr>$point.Heartrate</gpxtpx:hr>
@@ -134,7 +184,10 @@
 #end
 					</gpxtpx:TrackPointExtension>
 #if($point.hasValidDistance())
-					<gpxdata:distance>$double6formatter.format($point.Distance)</gpxdata:distance>
+					<gpxdata:distance>$nf3.format($point.Distance)</gpxdata:distance>
+#end
+#if($point.hasValidGear())
+					<mt:gear>$point.Gear</mt:gear>
 #end
 				</extensions>
 #end

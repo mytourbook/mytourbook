@@ -848,9 +848,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	 * Back gear number<br>
 	 * <code>
 	 * <pre>
-final float	frontTeeth	= (gearRaw &gt;&gt; 24 &amp; 0xff);
+final long	frontTeeth	= (gearRaw &gt;&gt; 24 &amp; 0xff);
 final long	frontGear	= (gearRaw &gt;&gt; 16 &amp; 0xff);
-final float	rearTeeth	= (gearRaw &gt;&gt; 8 &amp; 0xff);
+final long	rearTeeth	= (gearRaw &gt;&gt; 8 &amp; 0xff);
 final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 	 * </pre>
 	 * </code>
@@ -3130,6 +3130,87 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 	}
 
 	/**
+	 * Converts all waypoints into {@link TourMarker}s when position and time are the same.
+	 */
+	public void convertWayPoints() {
+
+		if (timeSerie == null || latitudeSerie == null || longitudeSerie == null) {
+			return;
+		}
+
+		final int timeDiffRange = 1000;
+		final double posDiffRange = 0.00000001;
+
+		final ArrayList<TourWayPoint> removedWayPoints = new ArrayList<TourWayPoint>();
+
+		for (final TourWayPoint wp : tourWayPoints) {
+
+			final long wpTime = wp.getTime();
+			final double wpLat = wp.getLatitude();
+			final double wpLon = wp.getLongitude();
+
+			for (int serieIndex = 0; serieIndex < timeSerie.length; serieIndex++) {
+
+				final int relativeTime = timeSerie[serieIndex];
+				final long tourTime = tourStartTime + relativeTime * 1000;
+
+				long timeDiff = tourTime - wpTime;
+				if (timeDiff < 0) {
+					timeDiff = -timeDiff;
+				}
+
+				if (timeDiff < timeDiffRange) {
+
+					final double tourLat = latitudeSerie[serieIndex];
+					final double tourLon = longitudeSerie[serieIndex];
+
+					double latDiff = tourLat - wpLat;
+					double lonDiff = tourLon - wpLon;
+
+					if (latDiff < 0) {
+						latDiff = -latDiff;
+					}
+					if (lonDiff < 0) {
+						lonDiff = -lonDiff;
+					}
+
+					if (latDiff < posDiffRange && lonDiff < posDiffRange) {
+
+						// time and position is the same
+
+						final TourMarker tourMarker = new TourMarker(this, ChartLabel.MARKER_TYPE_CUSTOM);
+
+						tourMarker.setSerieIndex(serieIndex);
+						tourMarker.setTime(relativeTime, wpTime);
+
+						tourMarker.setLatitude(wpLat);
+						tourMarker.setLongitude(wpLon);
+
+						tourMarker.setDescription(wp.getDescription());
+						tourMarker.setLabel(wp.getName());
+
+						tourMarker.setUrlAddress(wp.getUrlAddress());
+						tourMarker.setUrlText(wp.getUrlText());
+
+						final float altitude = wp.getAltitude();
+						if (altitude != Float.MIN_VALUE) {
+							tourMarker.setAltitude(altitude);
+						}
+
+						tourMarkers.add(tourMarker);
+						removedWayPoints.add(wp);
+
+						break;
+					}
+				}
+			}
+		}
+
+		// collapse waypoints
+		tourWayPoints.removeAll(removedWayPoints);
+	}
+
+	/**
 	 * Create {@link Photo}'s from {@link TourPhoto}'s
 	 */
 	public void createGalleryPhotos() {
@@ -3320,13 +3401,14 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 		 */
 		timeSerie = new int[serieSize];
 
-		final boolean isDistance = setupStartingValues_Distance(timeDataSerie, isAbsoluteData);
 		final boolean isAltitude = setupStartingValues_Altitude(timeDataSerie, isAbsoluteData);
-		final boolean isPulse = setupStartingValues_Pulse(timeDataSerie);
 		final boolean isCadence = setupStartingValues_Cadence(timeDataSerie);
-		final boolean isPower = setupStartingValues_Power(timeDataSerie);
-		final boolean isTemperature = setupStartingValues_Temperature(timeDataSerie);
+		final boolean isDistance = setupStartingValues_Distance(timeDataSerie, isAbsoluteData);
+		final boolean isGear = setupStartingValues_Gear(timeDataSerie);
 		final boolean isGPS = setupStartingValues_LatLon(timeDataSerie);
+		final boolean isPower = setupStartingValues_Power(timeDataSerie);
+		final boolean isPulse = setupStartingValues_Pulse(timeDataSerie);
+		final boolean isTemperature = setupStartingValues_Temperature(timeDataSerie);
 
 		/*
 		 * Speed
@@ -3475,6 +3557,13 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 					// cadence is not interpolated, ensure to set valid values
 					final float tdCadence = timeData.cadence;
 					cadenceSerie[serieIndex] = tdCadence == Float.MIN_VALUE ? 0 : tdCadence;
+				}
+
+				/*
+				 * Gear
+				 */
+				if (isGear) {
+					gearSerie[serieIndex] = timeData.gear;
 				}
 
 				/*
@@ -6566,6 +6655,47 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 
 		if ((firstTimeData.distance != Float.MIN_VALUE) || isAbsoluteData) {
 			distanceSerie = new float[serieSize];
+			isAvailable = true;
+		}
+
+		return isAvailable;
+	}
+
+	private boolean setupStartingValues_Gear(final TimeData[] timeDataSerie) {
+
+		final TimeData firstTimeData = timeDataSerie[0];
+		final int serieSize = timeDataSerie.length;
+
+		boolean isAvailable = false;
+
+		if (firstTimeData.gear == 0) {
+
+			// search for first gear value
+
+			for (int timeDataIndex = 0; timeDataIndex < serieSize; timeDataIndex++) {
+
+				final TimeData timeData = timeDataSerie[timeDataIndex];
+				final long gearValue = timeData.gear;
+
+				if (gearValue != 0) {
+
+					// gear is available, starting values are set to first valid gear value
+
+					gearSerie = new long[serieSize];
+					isAvailable = true;
+
+					for (int invalidIndex = 0; invalidIndex < timeDataIndex; invalidIndex++) {
+						timeDataSerie[invalidIndex].gear = gearValue;
+					}
+					break;
+				}
+			}
+
+		} else {
+
+			// gear is available
+
+			gearSerie = new long[serieSize];
 			isAvailable = true;
 		}
 

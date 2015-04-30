@@ -112,7 +112,6 @@ public class Messages extends NLS {
 	public static String		dialog_export_label_exportFilePath;
 	public static String		dialog_export_label_fileName;
 	public static String		dialog_export_label_filePath;
-	public static String		dialog_export_lbl_exportFilePath;
 	public static String		dialog_export_msg_fileAlreadyExists;
 	public static String		dialog_export_msg_fileNameIsInvalid;
 	public static String		dialog_export_msg_pathIsNotAvailable;
@@ -137,9 +136,10 @@ public class Messages extends NLS {
 	public static String		Dialog_DoubleClickAction_NoAction_Message;
 	public static String		Dialog_DoubleClickAction_NoAction_Title;
 
+	public static String		Dialog_Export_Checkbox_Description_Tooltip;
+	public static String		Dialog_Export_Checkbox_TourData;
+	public static String		Dialog_Export_Checkbox_TourData_Tooltip;
 	public static String		Dialog_Export_Error_CourseNameIsInvalid;
-	public static String		Dialog_Export_Group_GPX_Options;
-	public static String		Dialog_Export_Group_TCX_Options;
 	public static String		Dialog_Export_Label_GPX_DistanceValues;
 	public static String		Dialog_Export_Label_TCX_CourseName;
 	public static String		Dialog_Export_Label_TCX_NameFrom;
@@ -155,6 +155,8 @@ public class Messages extends NLS {
 	public static String		Dialog_Export_Radio_TCX_Courses_Tooltip;
 	public static String		Dialog_Export_Radio_TCX_NameFromField;
 	public static String		Dialog_Export_Radio_TCX_NameFromTour;
+	public static String		Dialog_Export_SubTask_CreatingExportFile;
+	public static String		Dialog_Export_SubTask_Export;
 
 	public static String		Dialog_ExtractTour_DlgArea_Message;
 	public static String		Dialog_ExtractTour_DlgArea_Title;

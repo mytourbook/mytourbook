@@ -65,6 +65,11 @@ public class TimeData implements Serializable {
 	public float				cadence				= Float.MIN_VALUE;
 
 	/**
+	 * 
+	 */
+	public long					gear;
+
+	/**
 	 * absolute value for pulse or {@link Float#MIN_VALUE} when value is not set
 	 */
 	public float				pulse				= Float.MIN_VALUE;
