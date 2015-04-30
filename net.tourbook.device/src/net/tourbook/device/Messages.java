@@ -26,6 +26,10 @@ public class Messages extends NLS {
 	public static String		Port_Listener_Error_ntd001;
 	public static String		Port_Listener_Error_ntd002;
 
+	public static String	PrefPage_GPX_Checkbox_ConvertWayPoints;
+
+	public static String	PrefPage_GPX_Checkbox_ConvertWayPoints_Tooltip;
+
 	public static String		PrefPage_GPX_Checkbox_OneTour;
 	public static String		PrefPage_GPX_Group_DistanceValues;
 	public static String		PrefPage_GPX_Label_DistanceValues;

@@ -52,7 +52,9 @@ public class PrefPageImportGPX extends PreferencePage implements IWorkbenchPrefe
 	/*
 	 * UI controls
 	 */
+	private Button					_chkConvertWayPoints;
 	private Button					_chkOneTour;
+
 	private Button					_rdoDistanceRelative;
 	private Button					_rdoDistanceAbsolute;
 
@@ -74,19 +76,27 @@ public class PrefPageImportGPX extends PreferencePage implements IWorkbenchPrefe
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
 		GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
 		{
-			createUI_10_OneTour(container);
+			createUI_10_Options(container);
 			createUI_20_Distance(container);
 		}
 
 		return container;
 	}
 
-	private void createUI_10_OneTour(final Composite parent) {
+	private void createUI_10_Options(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
 		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
 		{
+			// checkbox: convert waypoints
+			{
+				_chkConvertWayPoints = new Button(container, SWT.CHECK);
+				GridDataFactory.fillDefaults().span(2, 1).applyTo(_chkConvertWayPoints);
+				_chkConvertWayPoints.setText(Messages.PrefPage_GPX_Checkbox_ConvertWayPoints);
+				_chkConvertWayPoints.setToolTipText(Messages.PrefPage_GPX_Checkbox_ConvertWayPoints_Tooltip);
+			}
+
 			// checkbox: merge all tracks into one tour
 			{
 				_chkOneTour = new Button(container, SWT.CHECK);
@@ -147,6 +157,9 @@ public class PrefPageImportGPX extends PreferencePage implements IWorkbenchPrefe
 		// merge all tracks into one tour
 		_chkOneTour.setSelection(RawDataView.STATE_IS_MERGE_TRACKS_DEFAULT);
 
+		// convert waypoints
+		_chkConvertWayPoints.setSelection(RawDataView.STATE_IS_CONVERT_WAYPOINTS_DEFAULT);
+
 		// relative/absolute distance
 		final boolean isRelativeDistance = _prefStore.getDefaultBoolean(IPreferences.GPX_IS_RELATIVE_DISTANCE_VALUE);
 
@@ -177,6 +190,13 @@ public class PrefPageImportGPX extends PreferencePage implements IWorkbenchPrefe
 				RawDataView.STATE_IS_MERGE_TRACKS_DEFAULT);
 		_chkOneTour.setSelection(isMergeIntoOneTour);
 
+		// convert waypoints
+		final boolean isConvertWayPoints = Util.getStateBoolean(
+				_importState,
+				RawDataView.STATE_IS_CONVERT_WAYPOINTS,
+				RawDataView.STATE_IS_CONVERT_WAYPOINTS_DEFAULT);
+		_chkConvertWayPoints.setSelection(isConvertWayPoints);
+
 		// relative/absolute distance
 		final boolean isRelativeDistance = _prefStore.getBoolean(IPreferences.GPX_IS_RELATIVE_DISTANCE_VALUE);
 
@@ -190,6 +210,11 @@ public class PrefPageImportGPX extends PreferencePage implements IWorkbenchPrefe
 		final boolean isMergeIntoOneTour = _chkOneTour.getSelection();
 		_importState.put(RawDataView.STATE_IS_MERGE_TRACKS, isMergeIntoOneTour);
 		_rawDataMgr.setMergeTracks(isMergeIntoOneTour);
+
+		// convert waypoints
+		final boolean isConvertWayPoints = _chkConvertWayPoints.getSelection();
+		_importState.put(RawDataView.STATE_IS_CONVERT_WAYPOINTS, isConvertWayPoints);
+		_rawDataMgr.setState_ConvertWayPoints(isConvertWayPoints);
 
 		// relative/absolute distance
 		_prefStore.setValue(IPreferences.GPX_IS_RELATIVE_DISTANCE_VALUE, _rdoDistanceRelative.getSelection());

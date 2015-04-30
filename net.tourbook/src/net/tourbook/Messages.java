@@ -112,7 +112,6 @@ public class Messages extends NLS {
 	public static String		dialog_export_label_exportFilePath;
 	public static String		dialog_export_label_fileName;
 	public static String		dialog_export_label_filePath;
-	public static String		dialog_export_lbl_exportFilePath;
 	public static String		dialog_export_msg_fileAlreadyExists;
 	public static String		dialog_export_msg_fileNameIsInvalid;
 	public static String		dialog_export_msg_pathIsNotAvailable;
@@ -155,6 +154,10 @@ public class Messages extends NLS {
 	public static String		Dialog_Export_Radio_TCX_Courses_Tooltip;
 	public static String		Dialog_Export_Radio_TCX_NameFromField;
 	public static String		Dialog_Export_Radio_TCX_NameFromTour;
+
+	public static String	Dialog_Export_SubTask_CreatingExportFile;
+
+	public static String	Dialog_Export_SubTask_Export;
 
 	public static String		Dialog_ExtractTour_DlgArea_Message;
 	public static String		Dialog_ExtractTour_DlgArea_Title;

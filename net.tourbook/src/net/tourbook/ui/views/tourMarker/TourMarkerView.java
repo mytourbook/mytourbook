@@ -840,10 +840,10 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 			// a tour was selected, get the chart and update the marker viewer
 
 			final SelectionTourData tourDataSelection = (SelectionTourData) selection;
-			_tourData = tourDataSelection.getTourData();
+			final TourData tourData = tourDataSelection.getTourData();
 
-			if (_tourData != null) {
-				tourId = _tourData.getTourId();
+			if (tourData != null) {
+				tourId = tourData.getTourId();
 			}
 
 		} else if (selection instanceof SelectionTourId) {
@@ -985,7 +985,11 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 
 	private void updateUI_MarkerViewer() {
 
-		if (isTourSavedInDb()) {
+		if (_tourData == null) {
+
+			_pageBook.showPage(_pageNoData);
+
+		} else {
 
 			_isInUpdate = true;
 			{
@@ -994,10 +998,6 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 			_isInUpdate = false;
 
 			_pageBook.showPage(_viewerContainer);
-
-		} else {
-
-			_pageBook.showPage(_pageNoData);
 		}
 
 		enableActions();

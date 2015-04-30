@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -110,10 +110,12 @@ public class RawDataManager {
 
 	private boolean							_isImportCanceled;
 	//
-	private boolean							_importSettingsCreateTourIdWithTime	= RawDataView.STATE_IS_CREATE_TOUR_ID_WITH_TIME_DEFAULT;
-	private int								_importSettingsImportYear			= ADJUST_IMPORT_YEAR_IS_DISABLED;
-	private boolean							_importSettingsIsMergeTracks		= RawDataView.STATE_IS_MERGE_TRACKS_DEFAULT;
-	private boolean							_importSettingsIsChecksumValidation	= RawDataView.STATE_IS_CHECKSUM_VALIDATION_DEFAULT;
+	private int								_importState_ImportYear				= ADJUST_IMPORT_YEAR_IS_DISABLED;
+
+	private boolean							_importState_IsConvertWayPoints		= RawDataView.STATE_IS_CONVERT_WAYPOINTS_DEFAULT;
+	private boolean							_importState_IsCreateTourIdWithTime	= RawDataView.STATE_IS_CREATE_TOUR_ID_WITH_TIME_DEFAULT;
+	private boolean							_importState_IsMergeTracks			= RawDataView.STATE_IS_MERGE_TRACKS_DEFAULT;
+	private boolean							_importState_IsChecksumValidation	= RawDataView.STATE_IS_CHECKSUM_VALIDATION_DEFAULT;
 
 	private List<TourbookDevice>			_devicesBySortPriority;
 
@@ -299,74 +301,73 @@ public class RawDataManager {
 
 		setImportCanceled(false);
 
-		try {
-			new ProgressMonitorDialog(Display.getDefault().getActiveShell()).run(
-					true,
-					true,
-					new IRunnableWithProgress() {
+		final IRunnableWithProgress importRunnable = new IRunnableWithProgress() {
 
+			@Override
+			public void run(final IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+
+				int imported = 0;
+				final int importSize = selectedFilePaths.size();
+
+				monitor.beginTask(Messages.import_data_importTours_task, importSize);
+
+				setImportId();
+
+				int importCounter = 0;
+				final ArrayList<String> notImportedFiles = new ArrayList<String>();
+
+				// loop: import all selected files
+				for (final IPath filePath : selectedFilePaths) {
+
+					if (monitor.isCanceled()) {
+						// stop importing but process imported tours
+						break;
+					}
+
+					monitor.worked(1);
+					monitor.subTask(NLS.bind(Messages.import_data_importTours_subTask, //
+							new Object[] { ++imported, importSize, filePath }));
+
+					final String osFilePath = filePath.toOSString();
+
+					// ignore files which are imported as children from other imported files
+					if (_importedFileNamesChildren.contains(osFilePath)) {
+						continue;
+					}
+
+					if (importRawData(new File(osFilePath), null, false, null, true)) {
+						importCounter++;
+					} else {
+						notImportedFiles.add(osFilePath);
+					}
+				}
+
+				if (importCounter > 0) {
+
+					updateTourDataFromDb(monitor);
+
+					Display.getDefault().syncExec(new Runnable() {
 						@Override
-						public void run(final IProgressMonitor monitor) throws InvocationTargetException,
-								InterruptedException {
+						public void run() {
 
-							int workedDone = 0;
-							final int workedAll = selectedFilePaths.size();
+							final RawDataView view = showRawDataView();
 
-							monitor.beginTask(Messages.import_data_importTours_task, workedAll);
-
-							setImportId();
-
-							int importCounter = 0;
-							final ArrayList<String> notImportedFiles = new ArrayList<String>();
-
-							// loop: import all selected files
-							for (final IPath filePath : selectedFilePaths) {
-
-								monitor.worked(1);
-								monitor.subTask(NLS.bind(Messages.import_data_importTours_subTask, //
-										new Object[] { workedDone++, workedAll, filePath }));
-
-								final String osFilePath = filePath.toOSString();
-
-								// ignore files which are imported as children from other imported files
-								if (_importedFileNamesChildren.contains(osFilePath)) {
-									continue;
-								}
-
-								if (importRawData(new File(osFilePath), null, false, null, true)) {
-									importCounter++;
-								} else {
-									notImportedFiles.add(osFilePath);
-								}
-
-								if (monitor.isCanceled()) {
-									// stop importing but process imported tours
-									break;
-								}
-							}
-
-							if (importCounter > 0) {
-
-								updateTourDataFromDb(monitor);
-
-								Display.getDefault().syncExec(new Runnable() {
-									@Override
-									public void run() {
-										final RawDataView view = showRawDataView();
-										if (view != null) {
-											view.reloadViewer();
-											view.selectFirstTour();
-										}
-									}
-								});
-							}
-
-							if (notImportedFiles.size() > 0) {
-								showMsgBoxInvalidFormat(notImportedFiles);
+							if (view != null) {
+								view.reloadViewer();
+								view.selectFirstTour();
 							}
 						}
 					});
+				}
 
+				if (notImportedFiles.size() > 0) {
+					showMsgBoxInvalidFormat(notImportedFiles);
+				}
+			}
+		};
+
+		try {
+			new ProgressMonitorDialog(Display.getDefault().getActiveShell()).run(true, true, importRunnable);
 		} catch (final InvocationTargetException e) {
 			StatusUtil.log(e);
 		} catch (final InterruptedException e) {
@@ -996,7 +997,7 @@ public class RawDataManager {
 	 * @return Returns the import year or <code>-1</code> when the year was not set
 	 */
 	public int getImportYear() {
-		return _importSettingsImportYear;
+		return _importState_ImportYear;
 	}
 
 	/**
@@ -1197,18 +1198,19 @@ public class RawDataManager {
 
 		_newlyImportedTours.clear();
 
-		device.setIsChecksumValidation(_importSettingsIsChecksumValidation);
+		device.setIsChecksumValidation(_importState_IsChecksumValidation);
 
 		if (device.validateRawData(sourceFileName)) {
 
 			// file contains valid raw data for the raw data reader
 
-			if (_importSettingsImportYear != -1) {
-				device.setImportYear(_importSettingsImportYear);
+			if (_importState_ImportYear != -1) {
+				device.setImportYear(_importState_ImportYear);
 			}
 
-			device.setMergeTracks(_importSettingsIsMergeTracks);
-			device.setCreateTourIdWithTime(_importSettingsCreateTourIdWithTime);
+			device.setMergeTracks(_importState_IsMergeTracks);
+			device.setCreateTourIdWithTime(_importState_IsCreateTourIdWithTime);
+			device.setConvertWayPoints(_importState_IsConvertWayPoints);
 
 			// copy file to destinationPath
 			if (destinationPath != null) {
@@ -1436,7 +1438,7 @@ public class RawDataManager {
 	}
 
 	public void setCreateTourIdWithTime(final boolean isActionChecked) {
-		_importSettingsCreateTourIdWithTime = isActionChecked;
+		_importState_IsCreateTourIdWithTime = isActionChecked;
 	}
 
 	public void setImportCanceled(final boolean importCanceled) {
@@ -1451,15 +1453,20 @@ public class RawDataManager {
 	}
 
 	public void setImportYear(final int year) {
-		_importSettingsImportYear = year;
+		_importState_ImportYear = year;
 	}
 
 	public void setIsChecksumValidation(final boolean checked) {
-		_importSettingsIsChecksumValidation = checked;
+		_importState_IsChecksumValidation = checked;
 	}
 
 	public void setMergeTracks(final boolean checked) {
-		_importSettingsIsMergeTracks = checked;
+		_importState_IsMergeTracks = checked;
+	}
+
+	public void setState_ConvertWayPoints(final boolean isConvertWayPoints) {
+
+		_importState_IsConvertWayPoints = isConvertWayPoints;
 	}
 
 	private RawDataView showRawDataView() {

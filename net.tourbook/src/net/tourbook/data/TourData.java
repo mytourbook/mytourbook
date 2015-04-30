@@ -3130,6 +3130,87 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 	}
 
 	/**
+	 * Converts all waypoints into {@link TourMarker}s when position and time of the are the same.
+	 */
+	public void convertWayPoints() {
+
+		if (timeSerie == null || latitudeSerie == null || longitudeSerie == null) {
+			return;
+		}
+
+		final int timeDiffRange = 1000;
+		final double posDiffRange = 0.00000001;
+
+		final ArrayList<TourWayPoint> removedWayPoints = new ArrayList<TourWayPoint>();
+
+		for (final TourWayPoint wp : tourWayPoints) {
+
+			final long wpTime = wp.getTime();
+			final double wpLat = wp.getLatitude();
+			final double wpLon = wp.getLongitude();
+
+			for (int serieIndex = 0; serieIndex < timeSerie.length; serieIndex++) {
+
+				final int relativeTime = timeSerie[serieIndex];
+				final long tourTime = tourStartTime + relativeTime * 1000;
+
+				long timeDiff = tourTime - wpTime;
+				if (timeDiff < 0) {
+					timeDiff = -timeDiff;
+				}
+
+				if (timeDiff < timeDiffRange) {
+
+					final double tourLat = latitudeSerie[serieIndex];
+					final double tourLon = longitudeSerie[serieIndex];
+
+					double latDiff = tourLat - wpLat;
+					double lonDiff = tourLon - wpLon;
+
+					if (latDiff < 0) {
+						latDiff = -latDiff;
+					}
+					if (lonDiff < 0) {
+						lonDiff = -lonDiff;
+					}
+
+					if (latDiff < posDiffRange && lonDiff < posDiffRange) {
+
+						// time and position is the same
+
+						final TourMarker tourMarker = new TourMarker(this, ChartLabel.MARKER_TYPE_CUSTOM);
+
+						tourMarker.setSerieIndex(serieIndex);
+						tourMarker.setTime(relativeTime, wpTime);
+
+						tourMarker.setLatitude(wpLat);
+						tourMarker.setLongitude(wpLon);
+
+						tourMarker.setDescription(wp.getDescription());
+						tourMarker.setLabel(wp.getName());
+
+						tourMarker.setUrlAddress(wp.getUrlAddress());
+						tourMarker.setUrlText(wp.getUrlText());
+
+						final float altitude = wp.getAltitude();
+						if (altitude != Float.MIN_VALUE) {
+							tourMarker.setAltitude(altitude);
+						}
+
+						tourMarkers.add(tourMarker);
+						removedWayPoints.add(wp);
+
+						break;
+					}
+				}
+			}
+		}
+
+		// collapse waypoints
+		tourWayPoints.removeAll(removedWayPoints);
+	}
+
+	/**
 	 * Create {@link Photo}'s from {@link TourPhoto}'s
 	 */
 	public void createGalleryPhotos() {

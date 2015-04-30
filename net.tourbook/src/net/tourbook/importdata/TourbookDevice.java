@@ -26,6 +26,7 @@ import net.tourbook.common.util.FileUtils;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
+import net.tourbook.data.TourMarker;
 
 public abstract class TourbookDevice implements IRawDataReader {
 
@@ -98,6 +99,11 @@ public abstract class TourbookDevice implements IRawDataReader {
 	 * A tour id will be created with recording time when <code>true</code>.
 	 */
 	public boolean					isCreateTourIdWithRecordingTime;
+
+	/**
+	 * When <code>true</code> imported waypoints will be converted into {@link TourMarker}.
+	 */
+	public boolean					isConvertWayPoints;
 
 	public TourbookDevice() {}
 
@@ -292,6 +298,10 @@ public abstract class TourbookDevice implements IRawDataReader {
 		}
 
 		return true;
+	}
+
+	public void setConvertWayPoints(final boolean isConvertWayPoints) {
+		this.isConvertWayPoints = isConvertWayPoints;
 	}
 
 	public void setCreateTourIdWithTime(final boolean isCreateTourIdWithTime) {

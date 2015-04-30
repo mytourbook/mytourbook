@@ -390,6 +390,16 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 	}
 
 	/**
+	 * @return Returns altitude in meters as {@link Double} or {@link Float#MIN_VALUE} when altitude
+	 *         is not set.
+	 *         <p>
+	 *         <b>Have absolute <i>NO</i> idea why velocity is not working with float values.</b>
+	 */
+	public double getAltitudeDouble() {
+		return altitude;
+	}
+
+	/**
 	 * @return Returns description of the marker when available, otherwise an empty string.
 	 */
 	public String getDescription() {
@@ -432,10 +442,16 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 		return labelYOffset;
 	}
 
+	/**
+	 * @return Returns latitude or {@link TourDatabase#DEFAULT_DOUBLE} when not available.
+	 */
 	public double getLatitude() {
 		return latitude;
 	}
 
+	/**
+	 * @return Returns longitude or {@link TourDatabase#DEFAULT_DOUBLE} when not available.
+	 */
 	public double getLongitude() {
 		return longitude;
 	}
@@ -455,6 +471,24 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 	 */
 	public long getMarkerId() {
 		return markerId;
+	}
+
+	/**
+	 * @return Return the absolute time of the marker in ms since 1970-01-01T00:00:00Z.
+	 */
+	public long getMarkerTime() {
+
+		if (tourTime != Long.MIN_VALUE) {
+			return tourTime;
+		}
+
+		if (time == -1) {
+			return 0;
+		}
+
+		final long markerTime = tourData.getTourStartTimeMS() + time * 1000;
+
+		return markerTime;
 	}
 
 	/**
@@ -493,6 +527,10 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 
 	public int getVisibleType() {
 		return _visibleType;
+	}
+
+	public boolean hasAltitude() {
+		return altitude != TourDatabase.DEFAULT_FLOAT;
 	}
 
 	/**

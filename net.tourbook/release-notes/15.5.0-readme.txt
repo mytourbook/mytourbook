@@ -23,23 +23,28 @@ Improvements
   - Support FR70 .fit files. 
     This data format can contain 0 sessions but the data are still valid.
 
+	 
 * GPX Import
   - Support import of .gpx files which are not xml well formed, 
     feature request #123 
 	 http://sourceforge.net/p/mytourbook/feature-requests/123/
-	
   - Import values with these tags: <un:cad> <un:hr> <un:power>
+  - Convert waypoints into tour marker.
+  - Import all tour marker fields.
   
 * GPX Export
-  - Export url/url text for tour marker/waypoints.
+  - Export url and url text for tour marker/waypoints. 
+  - Export all tour marker fields which allows to exactly recreate them when imported.
  
 * Tour Editor
   - Calories can always be edited, removed restriction.
 
+  
 * Tour Calendar
   - Prevent that empty lines are displayed.
   - Prevent that the same text is displayed multiple times for the same tour.
 
+  
 * Tour Book
   - Moved first two actions from the view menu into the view toolbar. This makes it easier to access it.
   
