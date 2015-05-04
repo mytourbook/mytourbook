@@ -223,7 +223,7 @@ public class TourWayPoint implements Cloneable, Comparable<Object>, IHoveredArea
 	 *         <p>
 	 *         <b>Have absolute <i>NO</i> idea why velocity is not working with float values.</b>
 	 */
-	public double getAltitudeDouble() {
+	public double getAltitudeD() {
 		return altitude;
 	}
 

@@ -34,7 +34,7 @@ Improvements
   
 * GPX Export
   - Export url and url text for tour marker/waypoints. 
-  - Export all tour marker fields which allows to exactly recreate them when imported.
+  - Export all tour/marker fields which allows to exactly recreate it when imported.
  
 * Tour Editor
   - Calories can always be edited, removed restriction.

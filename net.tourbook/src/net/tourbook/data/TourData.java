@@ -387,11 +387,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	private String												deviceTourType;
 
 	/**
-	 * Profile id which is defined by the device
-	 */
-	private short												deviceMode;																				// db-version 3
-
-	/**
 	 * Visible name for the used profile which is defined in {@link #deviceMode}, e.g. Jogging,
 	 * Running, Bike1, Bike2...
 	 */
@@ -431,7 +426,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	private int													weatherWindSpd;																			// db-version 8
 	private String												weatherClouds;																				// db-version 8
 	private String												weather;																					// db-version 13
-	private float												deviceAvgSpeed;																			// db-version 12
 
 	@XmlElement
 	private String												tourTitle;																					// db-version 4
@@ -565,7 +559,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 	private int													rearShiftCount;
 
-	// ############################################# UNUSED FIELDS START #############################################
+	// ############################################# UNUSED FIELDS - START #############################################
 	/**
 	 * ssss distance msw
 	 * <p>
@@ -575,7 +569,16 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	private int													distance;
 
 	@SuppressWarnings("unused")
+	private float												deviceAvgSpeed;																			// db-version 12
+
+	@SuppressWarnings("unused")
 	private int													deviceDistance;
+
+	/**
+	 * Profile id which is defined by the device
+	 */
+	@SuppressWarnings("unused")
+	private short												deviceMode;																				// db-version 3
 
 	@SuppressWarnings("unused")
 	private int													deviceTotalUp;
@@ -592,7 +595,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	@SuppressWarnings("unused")
 	private int													deviceWeight;
 
-	// ############################################# UNUSED FIELDS END #############################################
+	// ############################################# UNUSED FIELDS - END #############################################
 
 	/**
 	 * data series for time, altitude,...
@@ -4448,10 +4451,18 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 		return avgCadence;
 	}
 
+	public double getAvgCadenceD() {
+		return avgCadence;
+	}
+
 	/**
 	 * @return the avgPulse
 	 */
 	public float getAvgPulse() {
+		return avgPulse;
+	}
+
+	public double getAvgPulseD() {
 		return avgPulse;
 	}
 
@@ -4462,10 +4473,18 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 		return avgTemperature;
 	}
 
+	public double getAvgTemperatureD() {
+		return avgTemperature;
+	}
+
 	/**
 	 * @return the bikerWeight
 	 */
 	public float getBikerWeight() {
+		return bikerWeight;
+	}
+
+	public double getBikerWeightD() {
 		return bikerWeight;
 	}
 
@@ -4606,20 +4625,12 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 		return _dateTimeModified;
 	}
 
-	public float getDeviceAvgSpeed() {
-		return deviceAvgSpeed;
-	}
-
 	public String getDeviceFirmwareVersion() {
 		return deviceFirmwareVersion == null ? UI.EMPTY_STRING : deviceFirmwareVersion;
 	}
 
 	public String getDeviceId() {
 		return devicePluginId;
-	}
-
-	public short getDeviceMode() {
-		return deviceMode;
 	}
 
 	/**
@@ -6006,10 +6017,6 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 
 	public void setDateTimeModified(final long dateTimeModified) {
 		this.dateTimeModified = dateTimeModified;
-	}
-
-	public void setDeviceAvgSpeed(final float deviceAvgSpeed) {
-		this.deviceAvgSpeed = deviceAvgSpeed;
 	}
 
 	public void setDeviceFirmwareVersion(final String deviceFirmwareVersion) {

@@ -158,10 +158,6 @@ public class Messages extends NLS {
 	public static String		Dialog_Export_SubTask_CreatingExportFile;
 	public static String		Dialog_Export_SubTask_Export;
 
-	public static String	Dialog_Export_SubTask_CreatingExportFile;
-
-	public static String	Dialog_Export_SubTask_Export;
-
 	public static String		Dialog_ExtractTour_DlgArea_Message;
 	public static String		Dialog_ExtractTour_DlgArea_Title;
 	public static String		Dialog_ExtractTour_Label_DeviceName;

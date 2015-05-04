@@ -1,7 +1,6 @@
 package net.tourbook.device.garmin.fit.listeners;
 
 import net.tourbook.data.TourData;
-import net.tourbook.device.garmin.fit.DataConverters;
 import net.tourbook.device.garmin.fit.FitContext;
 import net.tourbook.device.garmin.fit.FitDataReaderException;
 
@@ -54,11 +53,6 @@ public class SessionMesgListenerImpl extends AbstractMesgListener implements Ses
 		final Short avgCadence = mesg.getAvgCadence();
 		if (avgCadence != null) {
 			tourData.setAvgCadence(avgCadence);
-		}
-
-		final Float avgSpeed = mesg.getAvgSpeed();
-		if (avgSpeed != null) {
-			tourData.setDeviceAvgSpeed(DataConverters.convertSpeed(avgSpeed));
 		}
 
 		final Integer totalCalories = mesg.getTotalCalories();

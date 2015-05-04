@@ -14,6 +14,43 @@
 	<metadata>	
 		<time>$dateformat.format($starttime)</time>
 		<bounds minlat="$min_latitude" minlon="$min_longitude" maxlat="$max_latitude" maxlon="$max_longitude"/>
+##
+#if($hasTourData)
+		<extensions>
+#if($tourData.AvgCadenceD() > 0)
+			<mt:avgCadence>$nf1.format($tourData.AvgCadenceD)</mt:avgCadence>
+#end
+#if($tourData.AvgPulseD() > 0)
+			<mt:avgPulse>$nf1.format($tourData.AvgPulseD)</mt:avgPulse>
+#end
+#if($tourData.AvgTemperatureD() > 0)
+			<mt:avgTemperature>$nf1.format($tourData.AvgTemperatureD)</mt:avgTemperature>
+#end
+#if($tourData.BikerWeightD() > 0)
+			<mt:bikerWeight>$nf1.format($tourData.BikerWeightD)</mt:BikerWeight>
+#end
+#if($tourData.Calories() > 0)
+			<mt:calories>$tourData.Calories</mt:calories>
+#end
+#if($tourData.ConconiDeflection() > 0)
+			<mt:conconiDeflection>$tourData.ConconiDeflection</mt:conconiDeflection>
+#end
+#if($tourData.getDateTimeCreated())
+			<mt:dateTimeCreated>$dtIso.print($tourData.getDateTimeCreated().getMillis())</mt:dateTimeCreated>
+#end
+#if($tourData.getDateTimeModified())
+			<mt:dateTimeModified>$dtIso.print($tourData.getDateTimeModified().getMillis())</mt:dateTimeModified>
+#end
+#if($tourData.getDeviceFirmwareVersion().length() > 0)
+			<mt:deviceFirmwareVersion>$tourData.DeviceFirmwareVersion</mt:deviceFirmwareVersion>
+#end
+			<mt:deviceId>$tourData.DeviceId</mt:deviceId>
+			<mt:deviceModeName>$tourData.DeviceModeName</mt:deviceModeName>
+##			<mt:>$tourData.</mt:>
+##			<mt:>$nf1.format($tourData.)</mt:>
+		</extensions>
+#end
+##
 	</metadata>
 ##
 ##
@@ -29,7 +66,7 @@
 #end
 ##
 #if($point.hasValidAltitude())
-		<ele>$nf3.format($point.AltitudeDouble)</ele>
+		<ele>$nf3.format($point.AltitudeD)</ele>
 #end
 ##
 #if($point.getName().length() > 0)
@@ -67,7 +104,7 @@
 		<time>$dateformat.format($marker.MarkerTime)</time>
 ##
 #if($marker.hasAltitude())
-		<ele>$nf3.format($marker.AltitudeDouble)</ele>
+		<ele>$nf3.format($marker.AltitudeD)</ele>
 #end
 ##
 #if($marker.getLabel().length() > 0)
@@ -85,8 +122,9 @@
 #if($marker.getUrlText().length() > 0)
 		<urlname><![CDATA[$!marker.UrlText]]></urlname>
 #end
-		<extensions>
 ##
+#if($hasTourData)
+		<extensions>
 			<mt:distance>$marker.Distance</mt:distance>
 			<mt:isVisible>$marker.isMarkerVisible()</mt:isVisible>
 			<mt:labelPos>$marker.LabelPosition</mt:labelPos>
@@ -94,8 +132,8 @@
 			<mt:labelYOffset>$marker.LabelYOffset</mt:labelYOffset>
 			<mt:serieIndex>$marker.SerieIndex</mt:serieIndex>
 			<mt:type>$marker.Type</mt:type>
-##
 		</extensions>
+#end
 ##
 	</wpt>
 #end

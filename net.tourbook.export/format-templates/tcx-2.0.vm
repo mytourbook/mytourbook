@@ -1,5 +1,8 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no" ?> $dateformatter.applyPattern("yyyy-MM-dd'T'HH:mm:ss'Z'") $double6formatter.applyPattern("0.000000") $intformatter.applyPattern("0") $double2formatter.applyPattern("0.00")
-<TrainingCenterDatabase xmlns="http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2 http://www.garmin.com/xmlschemas/TrainingCenterDatabasev2.xsd">
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?> 
+<TrainingCenterDatabase 
+	xmlns="http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xsi:schemaLocation="http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2 http://www.garmin.com/xmlschemas/TrainingCenterDatabasev2.xsd">
 #if($iscourses)
 	<Courses>
 		<Course>
@@ -8,10 +11,10 @@
 	<Activities>
 		<Activity Sport="Biking">
 #end
-			<Id>$dateformatter.format($starttime)</Id>
-			<Lap StartTime="$dateformatter.format($starttime)">
-				<TotalTimeSeconds>$double2formatter.format($totaltime)</TotalTimeSeconds>
-				<DistanceMeters>$double6formatter.format($totaldistance)</DistanceMeters>
+			<Id>$dateformat.format($starttime)</Id>
+			<Lap StartTime="$dateformat.format($starttime)">
+				<TotalTimeSeconds>$totaltime</TotalTimeSeconds>
+				<DistanceMeters>$nf3.format($totaldistance)</DistanceMeters>
 				<Calories>$lap.getCalories()</Calories>
 #if($averageheartrate)
 				<AverageHeartRateBpm xsi:type="HeartRateInBeatsPerMinute_t">
@@ -34,17 +37,17 @@
 #foreach ($point in $points)
 					<Trackpoint>
 #if($point.getDate())
-                        <Time>$dateformatter.format($point.getDate())</Time>
+                        <Time>$dateformat.format($point.getDate())</Time>
 #end
 						<Position>
-							<LatitudeDegrees>$double6formatter.format($point.Latitude)</LatitudeDegrees>
-							<LongitudeDegrees>$double6formatter.format($point.Longitude)</LongitudeDegrees>
+							<LatitudeDegrees>$nf6.format($point.Latitude)</LatitudeDegrees>
+							<LongitudeDegrees>$nf6.format($point.Longitude)</LongitudeDegrees>
 						</Position>
 #if($point.hasValidAltitude())
-						<AltitudeMeters>$intformatter.format($point.Altitude)</AltitudeMeters>
+						<AltitudeMeters>$nf3.format($point.Altitude)</AltitudeMeters>
 #end
 #if($point.hasValidDistance())
-						<DistanceMeters>$double6formatter.format($point.Distance)</DistanceMeters>
+						<DistanceMeters>$nf3.format($point.Distance)</DistanceMeters>
 #end
 #if($point.hasValidHeartrate())
 						<HeartRateBpm xsi:type="HeartRateInBeatsPerMinute_t">
@@ -61,6 +64,7 @@
 			</Lap>
 #if ($lap.hasNotes())
 			<Notes>$lap.getNotes()</Notes>
+			<Notes><![CDATA[$!lap.Notes]]></Notes>
 #end
             <Creator xsi:type="Device_t">
               <Name>$creator</Name>
