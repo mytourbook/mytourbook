@@ -40,8 +40,8 @@
                         <Time>$dateformat.format($point.getDate())</Time>
 #end
 						<Position>
-							<LatitudeDegrees>$nf6.format($point.Latitude)</LatitudeDegrees>
-							<LongitudeDegrees>$nf6.format($point.Longitude)</LongitudeDegrees>
+							<LatitudeDegrees>$nf8.format($point.Latitude)</LatitudeDegrees>
+							<LongitudeDegrees>$nf8.format($point.Longitude)</LongitudeDegrees>
 						</Position>
 #if($point.hasValidAltitude())
 						<AltitudeMeters>$nf3.format($point.Altitude)</AltitudeMeters>
@@ -63,7 +63,6 @@
 #end
 			</Lap>
 #if ($lap.hasNotes())
-			<Notes>$lap.getNotes()</Notes>
 			<Notes><![CDATA[$!lap.Notes]]></Notes>
 #end
             <Creator xsi:type="Device_t">

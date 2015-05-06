@@ -136,10 +136,17 @@ public class Messages extends NLS {
 	public static String		Dialog_DoubleClickAction_NoAction_Message;
 	public static String		Dialog_DoubleClickAction_NoAction_Title;
 
-	public static String		Dialog_Export_Checkbox_Description_Tooltip;
-	public static String		Dialog_Export_Checkbox_TourData;
-	public static String		Dialog_Export_Checkbox_TourData_Tooltip;
+	public static String		Dialog_Export_Checkbox_Description;
+
+	public static String	Dialog_Export_Checkbox_TourFields;
+
+	public static String	Dialog_Export_Checkbox_TourFields_Tooltip;
+
 	public static String		Dialog_Export_Error_CourseNameIsInvalid;
+	public static String		Dialog_Export_Group_How;
+	public static String		Dialog_Export_Group_How_Tooltip;
+	public static String		Dialog_Export_Group_What;
+	public static String		Dialog_Export_Group_What_Tooltip;
 	public static String		Dialog_Export_Label_GPX_DistanceValues;
 	public static String		Dialog_Export_Label_TCX_CourseName;
 	public static String		Dialog_Export_Label_TCX_NameFrom;

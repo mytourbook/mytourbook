@@ -669,6 +669,20 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	private TourBike											tourBike;
 
 	/**
+	 * <br>
+	 * <br>
+	 * <br>
+	 * <br>
+	 * <br>
+	 * ################################### TRANSIENT DATA ######################################## <br>
+	 * <br>
+	 * <br>
+	 * <br>
+	 * <br>
+	 * <br>
+	 */
+
+	/**
 	 * Contains time in <b>seconds</b> relativ to the tour start which is defined in
 	 * {@link #tourStartTime}.
 	 * <p>
@@ -679,10 +693,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	 */
 	@Transient
 	public int[]												timeSerie;
-
-	/*
-	 * ################################### TRANSIENT DATA ########################################
-	 */
 
 	/**
 	 * contains the absolute distance in m (metric system)
@@ -4451,18 +4461,10 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 		return avgCadence;
 	}
 
-	public double getAvgCadenceD() {
-		return avgCadence;
-	}
-
 	/**
 	 * @return the avgPulse
 	 */
 	public float getAvgPulse() {
-		return avgPulse;
-	}
-
-	public double getAvgPulseD() {
 		return avgPulse;
 	}
 
@@ -4473,18 +4475,10 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 		return avgTemperature;
 	}
 
-	public double getAvgTemperatureD() {
-		return avgTemperature;
-	}
-
 	/**
 	 * @return the bikerWeight
 	 */
 	public float getBikerWeight() {
-		return bikerWeight;
-	}
-
-	public double getBikerWeightD() {
 		return bikerWeight;
 	}
 
@@ -4653,6 +4647,10 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 		} else {
 			return devicePluginName;
 		}
+	}
+
+	public String getDevicePluginName() {
+		return devicePluginName;
 	}
 
 	/**
@@ -6337,7 +6335,7 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 	}
 
 	/**
-	 * Set total driving/moving time in seconds
+	 * Set total driving/moving time in seconds.
 	 * 
 	 * @param tourDrivingTime
 	 */

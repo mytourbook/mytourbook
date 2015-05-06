@@ -391,16 +391,6 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 	}
 
 	/**
-	 * @return Returns altitude in meters as {@link Double} or {@link Float#MIN_VALUE} when altitude
-	 *         is not set.
-	 *         <p>
-	 *         <b>Have absolute <i>NO</i> idea why velocity is not working with float values.</b>
-	 */
-	public double getAltitudeD() {
-		return altitude;
-	}
-
-	/**
 	 * @return Returns description of the marker when available, otherwise an empty string.
 	 */
 	public String getDescription() {
