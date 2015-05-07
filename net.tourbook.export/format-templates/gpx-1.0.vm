@@ -55,8 +55,7 @@
 #set ($tourType = $tourData.getTourType())
 #if($tourType)
 			<mt:tourType>
-				<mt:id>$tourType.getTypeId()</mt:id>
-				<mt:name>$tourType.getName()</mt:name>
+				<mt:name><![CDATA[$!tourType.getName()]]></mt:name>
 			</mt:tourType>
 #end
 ##
@@ -69,8 +68,7 @@
 #set ($tags = $tourData.getTourTags())
 #foreach ($tag in $tags)			
 				<mt:tag>
-					<mt:id>$tag.getTagId()</mt:id>
-					<mt:name>$tag.getTagName()</mt:name>
+					<mt:name><![CDATA[$!tag.getTagName()]]></mt:name>
 				</mt:tag>
 #end
 			</mt:tags>

@@ -36,6 +36,8 @@ import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourPerson;
+import net.tourbook.data.TourTag;
+import net.tourbook.data.TourType;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
@@ -120,6 +122,9 @@ public class RawDataManager {
 	private List<TourbookDevice>			_devicesBySortPriority;
 
 	private HashMap<String, TourbookDevice>	_devicesByExtension;
+
+	private final ArrayList<TourType>		_tempTourTypes						= new ArrayList<TourType>();
+	private final ArrayList<TourTag>		_tempTourTags						= new ArrayList<TourTag>();
 
 	/**
 	 * Filepath from the previous reimported tour
@@ -1000,6 +1005,14 @@ public class RawDataManager {
 		return _importState_ImportYear;
 	}
 
+	public ArrayList<TourTag> getTempTourTags() {
+		return _tempTourTags;
+	}
+
+	public ArrayList<TourType> getTempTourTypes() {
+		return _tempTourTypes;
+	}
+
 	/**
 	 * Import a tour from a file, all imported tours can be retrieved with
 	 * {@link #getImportedTours()}
@@ -1389,9 +1402,14 @@ public class RawDataManager {
 	}
 
 	public void removeAllTours() {
+
 		_toursInImportView.clear();
+
 		_importedFileNames.clear();
 		_importedFileNamesChildren.clear();
+
+		_tempTourTags.clear();
+		_tempTourTypes.clear();
 	}
 
 	public void removeTours(final TourData[] removedTours) {
@@ -1623,4 +1641,5 @@ public class RawDataManager {
 			}
 		}
 	}
+
 }

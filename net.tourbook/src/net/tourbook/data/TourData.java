@@ -3665,6 +3665,11 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 		tourRecordingTime = recordingTime;
 		setTourEndTimeMS();
 
+		if (isGear) {
+			// set shift counts
+			setGears(gearSerie);
+		}
+
 		cleanupDataSeries();
 
 		/*
