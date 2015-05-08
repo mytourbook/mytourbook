@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -402,13 +402,11 @@ public class CSVTourDataReader extends TourbookDevice {
 					fileReader.close();
 				}
 
-				final Display display = Display.getDefault();
-
 				if (isNewTag) {
 
 					// fire modify event
 
-					display.syncExec(new Runnable() {
+					Display.getDefault().syncExec(new Runnable() {
 						@Override
 						public void run() {
 							TourManager.fireEvent(TourEventId.TAG_STRUCTURE_CHANGED);
@@ -420,7 +418,7 @@ public class CSVTourDataReader extends TourbookDevice {
 
 					// fire modify event
 
-					display.syncExec(new Runnable() {
+					Display.getDefault().syncExec(new Runnable() {
 						@Override
 						public void run() {
 							TourbookPlugin

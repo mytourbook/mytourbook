@@ -938,7 +938,7 @@ public class TourInfoUI {
 		 */
 		if (_lblTourType != null && _lblTourType.isDisposed() == false) {
 			_lblTourType.setToolTipText(_uiTourTypeName);
-			net.tourbook.ui.UI.updateUITourType(_tourData, _lblTourType, false);
+			net.tourbook.ui.UI.updateUI_TourType(_tourData, _lblTourType, false);
 		}
 
 		String tourTitle = _tourData.getTourTitle();
@@ -954,7 +954,7 @@ public class TourInfoUI {
 			_lblTourTypeText.setText(_tourData.getTourType().getName());
 		}
 		if (_hasTags) {
-			net.tourbook.ui.UI.updateUITags(_tourData, _lblTourTags);
+			net.tourbook.ui.UI.updateUI_Tags(_tourData, _lblTourTags);
 		}
 		if (_hasDescription) {
 			_txtDescription.setText(_tourData.getTourDescription());

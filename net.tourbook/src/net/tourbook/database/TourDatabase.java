@@ -30,6 +30,7 @@ import java.sql.Statement;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.GregorianCalendar;
@@ -63,6 +64,7 @@ import net.tourbook.data.TourType;
 import net.tourbook.data.TourWayPoint;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tag.TagCollection;
+import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.TourTypeFilter;
 import net.tourbook.ui.UI;
@@ -555,8 +557,200 @@ public class TourDatabase {
 	}
 
 	/**
-	 * removes all tour tags which are loaded from the database so the next time they will be
-	 * reloaded
+	 * @param tourData
+	 * @return Returns <code>true</code> when new tags are created.
+	 */
+	private static boolean check_Tags(final TourData tourData) {
+
+		final Set<TourTag> tourTags = tourData.getTourTags();
+
+		if (tourTags.size() == 0) {
+			return false;
+		}
+
+		final ArrayList<TourTag> oldTags = new ArrayList<TourTag>();
+		final ArrayList<TourTag> newTags = new ArrayList<TourTag>();
+
+		HashMap<Long, TourTag> allDbTags = TourDatabase.getAllTourTags();
+
+		for (final TourTag tourTag : tourTags) {
+
+			if (tourTag.getTagId() != TourDatabase.ENTITY_IS_NOT_SAVED) {
+				// tag is saved
+				continue;
+			}
+
+			// tag is not yet saved
+			// 1. tag can still be new
+			// 2. tag is already created but not updated in the not yet saved tour
+
+			final TourTag dbTag = findTourTag(tourTag.getTagName(), allDbTags.values());
+
+			if (dbTag != null) {
+
+				// use found tag
+
+				oldTags.add(tourTag);
+				newTags.add(dbTag);
+
+			} else {
+
+				// create new tag
+
+				final TourTag savedTag = TourDatabase.saveEntity(//
+						tourTag,
+						TourDatabase.ENTITY_IS_NOT_SAVED,
+						TourTag.class);
+
+				if (savedTag != null) {
+
+					oldTags.add(tourTag);
+					newTags.add(savedTag);
+
+					// reload db tags
+					TourDatabase.clearTourTags();
+					allDbTags = TourDatabase.getAllTourTags();
+				}
+			}
+		}
+
+		final boolean isNewTags = newTags.size() > 0;
+
+		if (isNewTags) {
+
+			// replace tags in the tour
+
+			tourTags.removeAll(oldTags);
+			tourTags.addAll(newTags);
+		}
+
+		return isNewTags;
+	}
+
+	/**
+	 * @param tourData
+	 * @return Returns <code>true</code> when a new tour type is created.
+	 */
+	private static boolean check_TourType(final TourData tourData) {
+
+		final TourType tourType = tourData.getTourType();
+
+		if (tourType == null) {
+			return false;
+		}
+
+		if (tourType.getTypeId() != TourDatabase.ENTITY_IS_NOT_SAVED) {
+			// type is saved
+			return false;
+		}
+
+		TourType newType = null;
+
+		final Collection<TourType> allDbTypes = TourDatabase.getAllTourTypes();
+
+		// type is not yet saved
+		// 1. type can still be new
+		// 2. type is already created but not updated in the not yet saved tour
+
+		final TourType dbType = findTourType(tourType.getName(), allDbTypes);
+
+		if (dbType != null) {
+
+			// use found tag
+
+			newType = dbType;
+
+		} else {
+
+			// create new tag
+
+			final TourType savedType = TourDatabase.saveEntity(//
+					tourType,
+					TourDatabase.ENTITY_IS_NOT_SAVED,
+					TourTag.class);
+
+			if (savedType != null) {
+
+				newType = savedType;
+
+				// force reload of the db tour types
+				TourDatabase.clearTourTypes();
+				TourManager.getInstance().clearTourDataCache();
+			}
+		}
+
+		final boolean isNewTourType = newType != null;
+
+		if (isNewTourType) {
+
+			// replace tour type in the tour
+
+			tourData.setTourType(newType);
+		}
+
+		return isNewTourType;
+	}
+
+	/**
+	 * This error can occure when transient instances are not saved.
+	 * 
+	 * <pre>
+	 * 
+	 * !ENTRY net.tourbook.common 4 0 2015-05-08 16:10:55.578
+	 * !MESSAGE Tour cannot be saved in the database
+	 * !STACK 0
+	 * org.hibernate.TransientObjectException: object references an unsaved transient instance - save the transient instance before flushing: net.tourbook.data.TourData.tourType -> net.tourbook.data.TourType
+	 * 	at org.hibernate.engine.CascadingAction$9.noCascade(CascadingAction.java:376)
+	 * 	at org.hibernate.engine.Cascade.cascade(Cascade.java:163)
+	 * 	at org.hibernate.event.def.AbstractFlushingEventListener.cascadeOnFlush(AbstractFlushingEventListener.java:154)
+	 * 	at org.hibernate.event.def.AbstractFlushingEventListener.prepareEntityFlushes(AbstractFlushingEventListener.java:145)
+	 * 	at org.hibernate.event.def.AbstractFlushingEventListener.flushEverythingToExecutions(AbstractFlushingEventListener.java:88)
+	 * 	at org.hibernate.event.def.DefaultFlushEventListener.onFlush(DefaultFlushEventListener.java:49)
+	 * 	at org.hibernate.impl.SessionImpl.flush(SessionImpl.java:1028)
+	 * 	at org.hibernate.impl.SessionImpl.managedFlush(SessionImpl.java:366)
+	 * 	at org.hibernate.transaction.JDBCTransaction.commit(JDBCTransaction.java:137)
+	 * 	at org.hibernate.ejb.TransactionImpl.commit(TransactionImpl.java:54)
+	 * 	at net.tourbook.database.TourDatabase.saveTour(TourDatabase.java:1731)
+	 * 
+	 * </pre>
+	 * 
+	 * @param tourData
+	 */
+	private static void checkUnsavedTransientInstances(final TourData tourData) {
+
+		final boolean isNewTag = check_Tags(tourData);
+		final boolean isNewTourType = check_TourType(tourData);
+
+		if (isNewTag) {
+
+			// fire modify event
+
+			Display.getDefault().syncExec(new Runnable() {
+				@Override
+				public void run() {
+					TourManager.fireEvent(TourEventId.TAG_STRUCTURE_CHANGED);
+				}
+			});
+		}
+
+		if (isNewTourType) {
+
+			// fire modify event
+
+			Display.getDefault().syncExec(new Runnable() {
+				@Override
+				public void run() {
+					TourbookPlugin.getPrefStore().setValue(
+							ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED,
+							Math.random());
+				}
+			});
+		}
+	}
+
+	/**
+	 * Removes all tour tags which are loaded from the database so the next time they will be
+	 * reloaded.
 	 */
 	public static synchronized void clearTourTags() {
 
@@ -571,8 +765,8 @@ public class TourDatabase {
 	}
 
 	/**
-	 * remove all tour types and set their images dirty that the next time they have to be loaded
-	 * from the database and the images are recreated
+	 * Remove all tour types and set their images dirty that the next time they have to be loaded
+	 * from the database and the images are recreated.
 	 */
 	public static synchronized void clearTourTypes() {
 
@@ -923,6 +1117,50 @@ public class TourDatabase {
 		System.out.println();
 
 		stmt.executeUpdate(sql);
+	}
+
+	/**
+	 * Find tag by name.
+	 * 
+	 * @param tagName
+	 * @param allTags
+	 * @return Returns found {@link TourTag} or <code>null</code> when not available.
+	 */
+	public static TourTag findTourTag(final String tagName, final Collection<TourTag> allTags) {
+
+		for (final TourTag tourTag : allTags) {
+
+			if (tourTag.getTagName().equalsIgnoreCase(tagName)) {
+
+				// existing tag is found
+
+				return tourTag;
+			}
+		}
+
+		return null;
+	}
+
+	/**
+	 * Find tour type in other tour types.
+	 * 
+	 * @param tourTypeName
+	 * @param allDbTypes
+	 * @return Returns found {@link TourType} or <code>null</code> when not available.
+	 */
+	public static TourType findTourType(final String tourTypeName, final Collection<TourType> allDbTypes) {
+
+		for (final TourType tourType : allDbTypes) {
+
+			if (tourTypeName.equalsIgnoreCase(tourType.getName())) {
+
+				// existing type is found
+
+				return tourType;
+			}
+		}
+
+		return null;
 	}
 
 	/**
@@ -1309,7 +1547,7 @@ public class TourDatabase {
 
 	/**
 	 * @param tagIds
-	 * @return Returns the tag names separated with a comma or an empty string when tagIds are
+	 * @return Returns the tag names separated with a comma or an empty string when tagIds are.
 	 *         <code>null</code>
 	 */
 	public static String getTagNames(final ArrayList<Long> tagIds) {
@@ -1319,16 +1557,14 @@ public class TourDatabase {
 		}
 
 		final HashMap<Long, TourTag> hashTags = getAllTourTags();
-		final ArrayList<String> tagList = new ArrayList<String>();
-
-		final StringBuilder sb = new StringBuilder();
+		final ArrayList<String> tagNames = new ArrayList<String>();
 
 		// get tag name for each tag id
 		for (final Long tagId : tagIds) {
 			final TourTag tag = hashTags.get(tagId);
 
 			if (tag != null) {
-				tagList.add(tag.getTagName());
+				tagNames.add(tag.getTagName());
 			} else {
 				try {
 					throw new MyTourbookException("tag id '" + tagId + "' is not available"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -1338,12 +1574,39 @@ public class TourDatabase {
 			}
 		}
 
+		return getTagNamesText(tagNames);
+	}
+
+	/**
+	 * @param tourTags
+	 * @return Returns the tag names separated with a comma or an empty string when not available.
+	 */
+	public static String getTagNames(final Set<TourTag> tourTags) {
+
+		if (tourTags.size() == 0) {
+			return UI.EMPTY_STRING;
+		}
+
+		final ArrayList<String> tagNames = new ArrayList<String>();
+
+		// get tag name for each tag id
+		for (final TourTag tag : tourTags) {
+			tagNames.add(tag.getTagName());
+		}
+
+		return getTagNamesText(tagNames);
+	}
+
+	private static String getTagNamesText(final ArrayList<String> tagNames) {
+
 		// sort tags by name
-		Collections.sort(tagList);
+		Collections.sort(tagNames);
 
 		// convert list into visible string
 		int tagIndex = 0;
-		for (final String tagName : tagList) {
+		final StringBuilder sb = new StringBuilder();
+
+		for (final String tagName : tagNames) {
 			if (tagIndex++ > 0) {
 				sb.append(", ");//$NON-NLS-1$
 			}
@@ -1618,7 +1881,7 @@ public class TourDatabase {
 	 * @param tourData
 	 * @param isUpdateModifiedDate
 	 *            When <code>true</code> the modified date is updated. For updating computed field
-	 *            it does not make sence to set the modified date.
+	 *            it does not make sense to set the modified date.
 	 * @return persisted {@link TourData} or <code>null</code> when saving fails
 	 */
 	public static TourData saveTour(final TourData tourData, final boolean isUpdateModifiedDate) {
@@ -1668,6 +1931,8 @@ public class TourDatabase {
 				+ (dtNow.getHourOfDay() * 10000L)
 				+ (dtNow.getMinuteOfHour() * 100L)
 				+ dtNow.getSecondOfMinute();
+
+		checkUnsavedTransientInstances(tourData);
 
 		EntityManager em = TourDatabase.getInstance().getEntityManager();
 

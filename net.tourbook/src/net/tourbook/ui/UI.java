@@ -1224,22 +1224,19 @@ public class UI {
 		});
 	}
 
-	public static void updateUITags(final TourData tourData, final Label tourTagLabel) {
+	public static void updateUI_Tags(final TourData tourData, final Label tourTagLabel) {
 
 		// tour tags
 		final Set<TourTag> tourTags = tourData.getTourTags();
 
 		if (tourTags == null || tourTags.size() == 0) {
+
 			tourTagLabel.setText(UI.EMPTY_STRING);
+
 		} else {
 
-			// get all tag id's
-			final ArrayList<Long> tagIds = new ArrayList<Long>();
-			for (final TourTag tourTag : tourTags) {
-				tagIds.add(tourTag.getTagId());
-			}
+			final String tagLabels = TourDatabase.getTagNames(tourTags);
 
-			final String tagLabels = TourDatabase.getTagNames(tagIds);
 			tourTagLabel.setText(tagLabels);
 			tourTagLabel.setToolTipText(tagLabels);
 		}
@@ -1254,7 +1251,7 @@ public class UI {
 	 * @param lblTourType
 	 * @param isTextDisplayed
 	 */
-	public static void updateUITourType(final TourData tourData, final CLabel lblTourType, final boolean isTextDisplayed) {
+	public static void updateUI_TourType(final TourData tourData, final CLabel lblTourType, final boolean isTextDisplayed) {
 
 		final TourType tourType = tourData.getTourType();
 

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -187,6 +187,20 @@ public class TourType implements Comparable<Object> {
 		colorLineRed = (short) rgbLine.red;
 		colorLineGreen = (short) rgbLine.green;
 		colorLineBlue = (short) rgbLine.blue;
+	}
+
+	/**
+	 * @param bright
+	 * @param dark
+	 * @param line
+	 * @param text
+	 */
+	public void setColors(final RGB bright, final RGB dark, final RGB line, final RGB text) {
+		
+		setColorBright(bright);
+		setColorDark(dark);
+		setColorLine(line);
+		setColorText(text);
 	}
 
 	public void setColorText(final RGB rgbText) {

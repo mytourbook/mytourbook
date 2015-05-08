@@ -160,8 +160,8 @@ public class GPX_SAX_Handler extends DefaultHandler {
 	private static final String				TAG_MT_TOUR_DRIVING_TIME		= "mt:tourDrivingTime";					//$NON-NLS-1$
 	private static final String				TAG_MT_TOUR_RECORDING_TIME		= "mt:tourRecordingTime";					//$NON-NLS-1$
 
-	private static final String				TAG_MT_TOUR_ALTITUDE_UP			= "mt:tourAltDown";						//$NON-NLS-1$
-	private static final String				TAG_MT_TOUR_ALTITUDE_DOWN		= "mt:tourAltUp";							//$NON-NLS-1$
+	private static final String				TAG_MT_TOUR_ALTITUDE_UP			= "mt:tourAltUp";							//$NON-NLS-1$
+	private static final String				TAG_MT_TOUR_ALTITUDE_DOWN		= "mt:tourAltDown";						//$NON-NLS-1$
 	private static final String				TAG_MT_TOUR_DISTANCE			= "mt:tourDistance";						//$NON-NLS-1$
 
 	private static final String				TAG_MT_TOUR_CALORIES			= "mt:calories";							//$NON-NLS-1$
@@ -171,6 +171,7 @@ public class GPX_SAX_Handler extends DefaultHandler {
 	private static final String				TAG_MT_TOUR_CONCONI_DEFLECTION	= "mt:conconiDeflection";					//$NON-NLS-1$
 	private static final String				TAG_MT_TOUR_DP_TOLERANCE		= "mt:dpTolerance";						//$NON-NLS-1$
 
+	private static final String				TAG_MT_TOUR_TEMPERATURE			= "mt:temperature";						//$NON-NLS-1$
 	private static final String				TAG_MT_TOUR_WEATHER				= "mt:weather";							//$NON-NLS-1$
 	private static final String				TAG_MT_TOUR_WEATHER_CLOUDS		= "mt:weatherClouds";						//$NON-NLS-1$
 	private static final String				TAG_MT_TOUR_WEATHER_WIND_DIR	= "mt:weatherWindDirection";				//$NON-NLS-1$
@@ -280,6 +281,11 @@ public class GPX_SAX_Handler extends DefaultHandler {
 	private boolean							_isAbsoluteDistance;
 	private float							_gpxAbsoluteDistance;
 
+	/**
+	 * Is <code>true</code> when tour contained mt: custom tags.
+	 */
+	private boolean							_isMTData;
+
 	{
 		GPX_TIME_FORMAT.setTimeZone(TimeZone.getTimeZone("UTC")); //$NON-NLS-1$
 		GPX_TIME_FORMAT_SSSZ.setTimeZone(TimeZone.getTimeZone("UTC")); //$NON-NLS-1$
@@ -381,12 +387,17 @@ public class GPX_SAX_Handler extends DefaultHandler {
 
 			final Set<TourMarker> tourMarkers = tourData.getTourMarkers();
 
-			// sort by serie index
-			final ArrayList<TourMarker> sortedMarkers = new ArrayList<TourMarker>(tourMarkers);
-			Collections.sort(sortedMarkers);
+			if (tourMarkers.size() > 0) {
 
-			final TourMarker firstMarker = sortedMarkers.get(0);
-			tourMarkers.remove(firstMarker);
+				// this happened
+
+				// sort by serie index
+				final ArrayList<TourMarker> sortedMarkers = new ArrayList<TourMarker>(tourMarkers);
+				Collections.sort(sortedMarkers);
+
+				final TourMarker firstMarker = sortedMarkers.get(0);
+				tourMarkers.remove(firstMarker);
+			}
 		}
 	}
 
@@ -590,6 +601,11 @@ public class GPX_SAX_Handler extends DefaultHandler {
 		} else if (name.equals(TAG_MT_TOUR_DP_TOLERANCE)) {
 
 			_tourData.setDpTolerance((short) getIntValue(charData));
+			_isInMT_Tour = false;
+
+		} else if (name.equals(TAG_MT_TOUR_TEMPERATURE)) {
+
+			_tourData.setAvgTemperature(getFloatValue(charData));
 			_isInMT_Tour = false;
 
 		} else if (name.equals(TAG_MT_TOUR_WEATHER)) {
@@ -943,32 +959,43 @@ public class GPX_SAX_Handler extends DefaultHandler {
 
 		if (_timeDataList.size() == 0) {
 			// there is not data
-			return;
+// disabled to imports tour without tracks
+//			return;
 		}
 
 		// insert Laps into _timeDataList
 		insertLapData();
 
-		final TimeData firstTimeData = _timeDataList.get(0);
-
 		// create data object for each tour
 
-		_tourData.setTourTitle(_trkName);
-		_tourData.setTourDescription(_trkDesc);
+		if (_isMTData) {
 
-		/*
-		 * set tour start date/time
-		 */
-		DateTime dtTourStart;
-		if (_gpxHasLocalTime) {
-			// Polar WebSync creates GPX files with local time :-(
-			// workaround: create DateTime object with UTC TimeZone => time is NOT converted to localtime
-			dtTourStart = new DateTime(firstTimeData.absoluteTime, DateTimeZone.UTC);
+			// title and description are already set
+
+			_tourData.setIsImportedMTTour(true);
+
 		} else {
-			dtTourStart = new DateTime(firstTimeData.absoluteTime);
+			_tourData.setTourTitle(_trkName);
+			_tourData.setTourDescription(_trkDesc);
 		}
 
-		_tourData.setTourStartTime(dtTourStart);
+		if (_timeDataList.size() > 0) {
+
+			// set tour start date/time
+
+			final TimeData firstTimeData = _timeDataList.get(0);
+			DateTime dtTourStart;
+
+			if (_gpxHasLocalTime) {
+				// Polar WebSync creates GPX files with local time :-(
+				// workaround: create DateTime object with UTC TimeZone => time is NOT converted to localtime
+				dtTourStart = new DateTime(firstTimeData.absoluteTime, DateTimeZone.UTC);
+			} else {
+				dtTourStart = new DateTime(firstTimeData.absoluteTime);
+			}
+
+			_tourData.setTourStartTime(dtTourStart);
+		}
 
 		_tourData.setDeviceTimeInterval((short) -1);
 
@@ -1049,10 +1076,10 @@ public class GPX_SAX_Handler extends DefaultHandler {
 
 		for (final String tagName : _allImportedTagNames) {
 
-			TourTag tourTag = findTourTag(tagName, dbTags);
+			TourTag tourTag = TourDatabase.findTourTag(tagName, dbTags);
 
 			if (tourTag == null) {
-				tourTag = findTourTag(tagName, tempTags);
+				tourTag = TourDatabase.findTourTag(tagName, tempTags);
 			}
 
 			if (tourTag == null) {
@@ -1073,15 +1100,13 @@ public class GPX_SAX_Handler extends DefaultHandler {
 			return;
 		}
 
-		TourType tourType = findTourType(_tourTypeName, TourDatabase.getAllTourTypes());
+		TourType tourType = TourDatabase.findTourType(_tourTypeName, TourDatabase.getAllTourTypes());
 
 		final ArrayList<TourType> tempTourTypes = RawDataManager.getInstance().getTempTourTypes();
 
 		if (tourType == null) {
-			tourType = findTourType(_tourTypeName, tempTourTypes);
+			tourType = TourDatabase.findTourType(_tourTypeName, tempTourTypes);
 		}
-
-//		final TourType newSavedTourType = null;
 
 		if (tourType == null) {
 
@@ -1089,27 +1114,20 @@ public class GPX_SAX_Handler extends DefaultHandler {
 
 			final TourType newTourType = new TourType(_tourTypeName);
 
-			final TourTypeColorDefinition newColorDefinition = new TourTypeColorDefinition(
+			final TourTypeColorDefinition newColor = new TourTypeColorDefinition(//
 					newTourType,
 					Long.toString(newTourType.getTypeId()),
 					newTourType.getName());
 
-			newTourType.setColorBright(newColorDefinition.getGradientBright_Default());
-			newTourType.setColorDark(newColorDefinition.getGradientDark_Default());
-			newTourType.setColorLine(newColorDefinition.getLineColor_Default());
-			newTourType.setColorText(newColorDefinition.getTextColor_Default());
+			newTourType.setColors(
+					newColor.getGradientBright_Default(),
+					newColor.getGradientDark_Default(),
+					newColor.getLineColor_Default(),
+					newColor.getTextColor_Default());
 
 			tempTourTypes.add(newTourType);
 
-			// save new entity
-//			newSavedTourType = TourDatabase.saveEntity(newTourType, newTourType.getTypeId(), TourType.class);
-//			if (newSavedTourType != null) {
-//
-//				tourType = newSavedTourType;
-//
-//				TourDatabase.clearTourTypes();
-//				TourManager.getInstance().clearTourDataCache();
-//			}
+			tourType = newTourType;
 		}
 
 		_tourData.setTourType(tourType);
@@ -1225,40 +1243,6 @@ public class GPX_SAX_Handler extends DefaultHandler {
 
 		_tempTourMarker = null;
 		_wayPoint = null;
-	}
-
-	private TourTag findTourTag(final String tagName, final Collection<TourTag> allTags) {
-
-		for (final TourTag tourTag : allTags) {
-
-			if (tourTag.getTagName().equals(tagName)) {
-
-				// existing tag is found
-
-				return tourTag;
-			}
-		}
-
-		return null;
-	}
-
-	/**
-	 * Find tour type in existing tour types.
-	 * 
-	 * @param tourTypeName
-	 * @param allTourTypes
-	 * @return Returns found {@link TourType} or <code>null</code> when not available.
-	 */
-	private TourType findTourType(final String tourTypeName, final ArrayList<TourType> allTourTypes) {
-
-		for (final TourType tourType : allTourTypes) {
-
-			if (tourTypeName.equalsIgnoreCase(tourType.getName())) {
-				return tourType;
-			}
-		}
-
-		return null;
 	}
 
 	private boolean getBooleanValue(final String textValue) {
@@ -1559,10 +1543,13 @@ public class GPX_SAX_Handler extends DefaultHandler {
 				|| name.equals(TAG_MT_TOUR_CONCONI_DEFLECTION)
 				|| name.equals(TAG_MT_TOUR_DP_TOLERANCE)
 
+				|| name.equals(TAG_MT_TOUR_TEMPERATURE)
 				|| name.equals(TAG_MT_TOUR_WEATHER)
 				|| name.equals(TAG_MT_TOUR_WEATHER_CLOUDS)
 				|| name.equals(TAG_MT_TOUR_WEATHER_WIND_DIR)
 				|| name.equals(TAG_MT_TOUR_WEATHER_WIND_SPEED)) {
+
+			_isMTData = true;
 
 			_isInMT_Tour = true;
 			_characters.delete(0, _characters.length());

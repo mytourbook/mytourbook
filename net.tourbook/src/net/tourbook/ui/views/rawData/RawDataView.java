@@ -1224,7 +1224,9 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 			public void update(final ViewerCell cell) {
 
 				final Object element = cell.getElement();
-				final Set<TourTag> tourTags = ((TourData) element).getTourTags();
+				final TourData tourData = (TourData) element;
+
+				final Set<TourTag> tourTags = tourData.getTourTags();
 
 				if (tourTags.size() == 0) {
 
@@ -1235,12 +1237,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 				} else {
 
 					// convert the tags into a list of tag ids
-					final ArrayList<Long> tagIds = new ArrayList<Long>();
-					for (final TourTag tourTag : tourTags) {
-						tagIds.add(tourTag.getTagId());
-					}
 
-					cell.setText(TourDatabase.getTagNames(tagIds));
+					cell.setText(TourDatabase.getTagNames(tourTags));
 				}
 			}
 		});
@@ -1374,8 +1372,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 				if (tourType == null) {
 					cell.setText(UI.EMPTY_STRING);
 				} else {
-					final long tourTypeId = tourType.getTypeId();
-					cell.setText(UI.getInstance().getTourTypeLabel(tourTypeId));
+					cell.setText(tourType.getName());
 				}
 			}
 		});

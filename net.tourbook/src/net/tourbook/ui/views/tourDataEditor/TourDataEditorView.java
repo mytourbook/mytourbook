@@ -6434,8 +6434,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		_timePaused.setTime(pausedTime);
 
 		// tour type/tags
-		net.tourbook.ui.UI.updateUITourType(_tourData, _lblTourType, true);
-		net.tourbook.ui.UI.updateUITags(_tourData, _lblTourTags);
+		net.tourbook.ui.UI.updateUI_TourType(_tourData, _lblTourType, true);
+		net.tourbook.ui.UI.updateUI_Tags(_tourData, _lblTourTags);
 
 		// measurement system
 		_lblTourDistanceUnit.setText(UI.UNIT_LABEL_DISTANCE);
@@ -6712,8 +6712,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	private void updateUI_TourTypeTags() {
 
 		// tour type/tags
-		net.tourbook.ui.UI.updateUITourType(_tourData, _lblTourType, true);
-		net.tourbook.ui.UI.updateUITags(_tourData, _lblTourTags);
+		net.tourbook.ui.UI.updateUI_TourType(_tourData, _lblTourType, true);
+		net.tourbook.ui.UI.updateUI_Tags(_tourData, _lblTourTags);
 
 		// reflow layout that the tags are aligned correctly
 		_tourContainer.layout(true);

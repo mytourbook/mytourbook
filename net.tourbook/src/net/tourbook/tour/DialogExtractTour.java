@@ -1423,8 +1423,8 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
 	private void updateUITourTypeTags() {
 
 		// tour type/tags
-		UI.updateUITourType(_tourDataTarget, _lblTourType, true);
-		UI.updateUITags(_tourDataTarget, _lblTourTags);
+		UI.updateUI_TourType(_tourDataTarget, _lblTourType, true);
+		UI.updateUI_Tags(_tourDataTarget, _lblTourTags);
 
 		// reflow layout that the tags are aligned correctly
 		_dlgInnerContainer.layout(true);

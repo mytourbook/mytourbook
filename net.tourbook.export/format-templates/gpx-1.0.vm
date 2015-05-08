@@ -43,13 +43,14 @@
 			<mt:conconiDeflection>$tourData.ConconiDeflection</mt:conconiDeflection>
 			<mt:dpTolerance>$tourData.DpTolerance</mt:dpTolerance>
 ## weather
+			<mt:temperature>$tourData.AvgTemperature</mt:temperature>
 			<mt:weather><![CDATA[$!tourData.weather]]></mt:weather>
 			<mt:weatherClouds><![CDATA[$!tourData.weatherClouds]]></mt:weatherClouds>
 			<mt:weatherWindDirection>$tourData.getWeatherWindDir()</mt:weatherWindDirection>
 			<mt:weatherWindSpeed>$tourData.getWeatherWindSpeed()</mt:weatherWindSpeed>
 ##
 ##
-## Tour type
+## TYPE
 ##
 ##
 #set ($tourType = $tourData.getTourType())
@@ -60,7 +61,7 @@
 #end
 ##
 ##
-## Tour tags
+## TAGS
 ##
 ##
 #if($tourData.getTourTags().size() > 0)

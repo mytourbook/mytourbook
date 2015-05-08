@@ -1680,8 +1680,8 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
 	private void updateUITourTypeTags() {
 
 		// tour type/tags
-		UI.updateUITourType(_joinedTourData, _lblTourType, true);
-		UI.updateUITags(_joinedTourData, _lblTourTags);
+		UI.updateUI_TourType(_joinedTourData, _lblTourType, true);
+		UI.updateUI_Tags(_joinedTourData, _lblTourTags);
 
 		// reflow layout that the tags are aligned correctly
 		_dlgInnerContainer.layout(true);

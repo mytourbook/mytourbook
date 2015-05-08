@@ -1111,6 +1111,13 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 	@Transient
 	private boolean[]											_cadenceGaps;
 
+	/**
+	 * Is <code>true</code> when the tour is imported and contained MT specific fields, e.g. tour
+	 * recording time, average temperature, ...
+	 */
+	@Transient
+	private boolean												_isImportedMTTour;
+
 	public TourData() {}
 
 	/**
@@ -1665,7 +1672,14 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 	 */
 	public boolean computeAltitudeUpDown() {
 
-		final float prefDPTolerance = _prefStore.getFloat(ITourbookPreferences.COMPUTED_ALTITUDE_DP_TOLERANCE);
+		float prefDPTolerance;
+
+		if (_isImportedMTTour) {
+			// use imported value
+			prefDPTolerance = dpTolerance / 10;
+		} else {
+			prefDPTolerance = _prefStore.getFloat(ITourbookPreferences.COMPUTED_ALTITUDE_DP_TOLERANCE);
+		}
 
 		AltitudeUpDown altiUpDown;
 		if (distanceSerie != null) {
@@ -3111,6 +3125,11 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 
 		if (isManualTour()) {
 			// manual tours do not have data series
+			return;
+		}
+
+		if (_isImportedMTTour) {
+			// these types of tour are setting the driving time
 			return;
 		}
 
@@ -6206,6 +6225,10 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 	 */
 	public void setIsDistanceFromSensor(final boolean isFromSensor) {
 		this.isDistanceFromSensor = (short) (isFromSensor ? 1 : 0);
+	}
+
+	public void setIsImportedMTTour(final boolean isImportedMTTour) {
+		_isImportedMTTour = isImportedMTTour;
 	}
 
 	public void setIsPowerSensorPresent(final boolean isFromSensor) {

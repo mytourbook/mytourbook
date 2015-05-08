@@ -833,13 +833,8 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 						cell.setText(UI.EMPTY_STRING);
 
 					} else {
-						// convert the tags into a list of tag ids
-						final ArrayList<Long> tagIds = new ArrayList<Long>();
-						for (final TourTag tourTag : tourTags) {
-							tagIds.add(tourTag.getTagId());
-						}
 
-						cell.setText(TourDatabase.getTagNames(tagIds));
+						cell.setText(TourDatabase.getTagNames(tourTags));
 						setCellColor(cell, element);
 					}
 				}
