@@ -45,7 +45,9 @@ public class TVICatalogComparedTour extends TVICatalogTourItem {
 	long			tourTypeId;
 	String			tourTitle;
 	Date			tourDate;
+
 	float			tourSpeed;
+	float			avgPulse;
 
 	ArrayList<Long>	tagIds;
 
@@ -76,6 +78,10 @@ public class TVICatalogComparedTour extends TVICatalogTourItem {
 
 	@Override
 	protected void fetchChildren() {}
+
+	public float getAvgPulse() {
+		return avgPulse;
+	}
 
 	/**
 	 * @return Returns the Id for {@link TourCompared} entity
@@ -128,6 +134,10 @@ public class TVICatalogComparedTour extends TVICatalogTourItem {
 		if (unfetchedChildren != null) {
 			unfetchedChildren.remove(this);
 		}
+	}
+
+	public void setAvgPulse(final float avgPulse) {
+		this.avgPulse = avgPulse;
 	}
 
 	void setEndIndex(final int endIndex) {

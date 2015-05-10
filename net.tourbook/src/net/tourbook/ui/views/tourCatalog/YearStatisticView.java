@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -71,18 +71,20 @@ import org.joda.time.DateTimeConstants;
 
 public class YearStatisticView extends ViewPart {
 
-	public static final String					ID							= "net.tourbook.views.tourCatalog.yearStatisticView";	//$NON-NLS-1$
+	public static final String					ID							= "net.tourbook.views.tourCatalog.yearStatisticView";		//$NON-NLS-1$
+
+	private static final String					GRAPH_LABEL_CADENCE_UNIT	= net.tourbook.common.Messages.Graph_Label_Cadence_Unit;
 
 	private final boolean						_isOSX						= net.tourbook.common.UI.IS_OSX;
 	private final boolean						_isLinux					= net.tourbook.common.UI.IS_LINUX;
 
-	static final String							STATE_NUMBER_OF_YEARS		= "numberOfYearsToDisplay";							//$NON-NLS-1$
+	static final String							STATE_NUMBER_OF_YEARS		= "numberOfYearsToDisplay";								//$NON-NLS-1$
 
 	private final IPreferenceStore				_prefStore					= TourbookPlugin.getDefault() //
 																					.getPreferenceStore();
 	private final IDialogSettings				_state						= TourbookPlugin.getDefault() //
 																					.getDialogSettingsSection(
-																							"TourCatalogViewYearStatistic");		//$NON-NLS-1$
+																							"TourCatalogViewYearStatistic");			//$NON-NLS-1$
 
 	private IPropertyChangeListener				_prefChangeListener;
 	private IPartListener2						_partListener;
@@ -121,6 +123,11 @@ public class YearStatisticView extends ViewPart {
 	 * Tour speed for all years
 	 */
 	private ArrayList<Float>					_tourSpeed					= new ArrayList<Float>();
+
+	/**
+	 * Average pulse for all years.
+	 */
+	private ArrayList<Float>					_avgPulse					= new ArrayList<Float>();
 
 	/**
 	 * this is the last year (on the right side) which is displayed in the statistics
@@ -167,7 +174,7 @@ public class YearStatisticView extends ViewPart {
 
 	void actionSynchScale(final boolean isSynchMaxValue) {
 		_isSynchMaxValue = isSynchMaxValue;
-		updateYearChart(false);
+		updateUI_YearChart(false);
 	}
 
 	private void addCompareTourPropertyListener() {
@@ -182,7 +189,7 @@ public class YearStatisticView extends ViewPart {
 					final TourPropertyCompareTourChanged compareTourProperty = (TourPropertyCompareTourChanged) propertyData;
 
 					if (compareTourProperty.isDataSaved) {
-						updateYearChart(false);
+						updateUI_YearChart(false);
 					}
 				}
 			}
@@ -245,7 +252,7 @@ public class YearStatisticView extends ViewPart {
 
 					_pageChart.layout();
 
-					updateYearChart(false);
+					updateUI_YearChart(false);
 				}
 			}
 		};
@@ -269,6 +276,54 @@ public class YearStatisticView extends ViewPart {
 		getSite().getPage().addPostSelectionListener(_postSelectionListener);
 	}
 
+	/**
+	 * Set/restore min/max values.
+	 */
+	private void computeMinMaxValues(final ChartDataYSerie yDataSpeed) {
+
+		final TVICatalogRefTourItem refItem = _currentRefItem;
+		final float minValue = (float) yDataSpeed.getVisibleMinValue();
+		final float maxValue = (float) yDataSpeed.getVisibleMaxValue();
+
+		final float dataMinValue = minValue;// - (minValue / 100);
+		final float dataMaxValue = maxValue;// + (maxValue / 100);
+
+		if (_isSynchMaxValue) {
+
+			if (refItem.yearMapMinValue == Float.MIN_VALUE) {
+
+				// min/max values have not yet been saved
+
+				/*
+				 * set the min value 10% below the computed so that the lowest value is not at the
+				 * bottom
+				 */
+				yDataSpeed.setVisibleMinValue(dataMinValue);
+				yDataSpeed.setVisibleMaxValue(dataMaxValue);
+
+				refItem.yearMapMinValue = dataMinValue;
+				refItem.yearMapMaxValue = dataMaxValue;
+
+			} else {
+
+				/*
+				 * restore min/max values, but make sure min/max values for the current graph are
+				 * visible and not outside of the chart
+				 */
+
+				refItem.yearMapMinValue = Math.min(refItem.yearMapMinValue, dataMinValue);
+				refItem.yearMapMaxValue = Math.max(refItem.yearMapMaxValue, dataMaxValue);
+
+				yDataSpeed.setVisibleMinValue(refItem.yearMapMinValue);
+				yDataSpeed.setVisibleMaxValue(refItem.yearMapMaxValue);
+			}
+
+		} else {
+			yDataSpeed.setVisibleMinValue(dataMinValue);
+			yDataSpeed.setVisibleMaxValue(dataMaxValue);
+		}
+	}
+
 	private void createActions() {
 
 		_actionSynchChartScale = new ActionSynchYearScale(this);
@@ -282,7 +337,7 @@ public class YearStatisticView extends ViewPart {
 	/**
 	 * create segments for the chart
 	 */
-	ChartSegments createChartSegments() {
+	private ChartSegments createChartSegments() {
 
 		final long segmentStart[] = new long[_numberOfYears];
 		final long segmentEnd[] = new long[_numberOfYears];
@@ -570,7 +625,7 @@ public class YearStatisticView extends ViewPart {
 				// reference tour is selected
 
 				_currentRefItem = refItem;
-				updateYearChart(true);
+				updateUI_YearChart(true);
 
 			} else {
 
@@ -587,7 +642,7 @@ public class YearStatisticView extends ViewPart {
 					// update year data
 					setYearData();
 
-					updateYearChart(false);
+					updateUI_YearChart(false);
 				}
 			}
 
@@ -639,7 +694,7 @@ public class YearStatisticView extends ViewPart {
 			final SelectionRemovedComparedTours removedCompTours = (SelectionRemovedComparedTours) selection;
 
 			if (removedCompTours.removedComparedTours.size() > 0) {
-				updateYearChart(false);
+				updateUI_YearChart(false);
 			}
 		}
 	}
@@ -663,7 +718,7 @@ public class YearStatisticView extends ViewPart {
 		_numberOfYears = numberOfYears;
 		setYearData();
 
-		updateYearChart(false);
+		updateUI_YearChart(false);
 
 		// reselect last selected tour
 		selectTourInYearChart(selectedTourId);
@@ -677,7 +732,7 @@ public class YearStatisticView extends ViewPart {
 		// update year data
 		setYearData();
 
-		updateYearChart(false);
+		updateUI_YearChart(false);
 	}
 
 	private void restoreState() {
@@ -766,7 +821,7 @@ public class YearStatisticView extends ViewPart {
 	 * @param isShowLatestYear
 	 *            shows the latest year and the years before
 	 */
-	private void updateYearChart(final boolean isShowLatestYear) {
+	private void updateUI_YearChart(final boolean isShowLatestYear) {
 
 		if (_currentRefItem == null) {
 			return;
@@ -786,13 +841,17 @@ public class YearStatisticView extends ViewPart {
 			}
 		}
 
-		_allTours.clear();
-		_DOYValues.clear();
-		_tourSpeed.clear();
-
 		final int firstYear = getFirstYear();
 
-		// loop: all years
+		/**
+		 * Create data for all years
+		 */
+		_allTours.clear();
+		_DOYValues.clear();
+
+		_avgPulse.clear();
+		_tourSpeed.clear();
+
 		for (final Object yearItemObj : yearItems) {
 			if (yearItemObj instanceof TVICatalogYearItem) {
 
@@ -811,9 +870,11 @@ public class YearStatisticView extends ViewPart {
 
 							final DateTime dt = new DateTime(tourItem.getTourDate());
 
-							_DOYValues.add(getYearDOYs(dt.getYear()) + dt.getDayOfYear() - 1);
-							_tourSpeed.add(tourItem.getTourSpeed() / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE);
 							_allTours.add(tourItem);
+							_DOYValues.add(getYearDOYs(dt.getYear()) + dt.getDayOfYear() - 1);
+
+							_avgPulse.add(tourItem.getAvgPulse());
+							_tourSpeed.add(tourItem.getTourSpeed() / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE);
 						}
 					}
 				}
@@ -827,67 +888,49 @@ public class YearStatisticView extends ViewPart {
 		xData.setChartSegments(createChartSegments());
 		chartModel.setXData(xData);
 
-		// set the bar low/high data
-		final ChartDataYSerie yData = new ChartDataYSerie(ChartType.BAR, ArrayListToArray.toFloat(_tourSpeed));
-
-		TourManager.setGraphColor(yData, GraphColorManager.PREF_GRAPH_SPEED);
-
-		/*
-		 * set/restore min/max values
+		/**
+		 * Speed
 		 */
-		final TVICatalogRefTourItem refItem = _currentRefItem;
-		final float minValue = (float) yData.getVisibleMinValue();
-		final float maxValue = (float) yData.getVisibleMaxValue();
+		// set the bar low/high data
+		final ChartDataYSerie yDataSpeed = new ChartDataYSerie(ChartType.BAR, ArrayListToArray.toFloat(_tourSpeed));
+		computeMinMaxValues(yDataSpeed);
 
-		final float dataMinValue = minValue;// - (minValue / 100);
-		final float dataMaxValue = maxValue;// + (maxValue / 100);
+		TourManager.setGraphColor(yDataSpeed, GraphColorManager.PREF_GRAPH_SPEED);
 
-		if (_isSynchMaxValue) {
-
-			if (refItem.yearMapMinValue == Float.MIN_VALUE) {
-
-				// min/max values have not yet been saved
-
-				/*
-				 * set the min value 10% below the computed so that the lowest value is not at the
-				 * bottom
-				 */
-				yData.setVisibleMinValue(dataMinValue);
-				yData.setVisibleMaxValue(dataMaxValue);
-
-				refItem.yearMapMinValue = dataMinValue;
-				refItem.yearMapMaxValue = dataMaxValue;
-
-			} else {
-
-				/*
-				 * restore min/max values, but make sure min/max values for the current graph are
-				 * visible and not outside of the chart
-				 */
-
-				refItem.yearMapMinValue = Math.min(refItem.yearMapMinValue, dataMinValue);
-				refItem.yearMapMaxValue = Math.max(refItem.yearMapMaxValue, dataMaxValue);
-
-				yData.setVisibleMinValue(refItem.yearMapMinValue);
-				yData.setVisibleMaxValue(refItem.yearMapMaxValue);
-			}
-
-		} else {
-			yData.setVisibleMinValue(dataMinValue);
-			yData.setVisibleMaxValue(dataMaxValue);
-		}
-
-		yData.setYTitle(Messages.tourCatalog_view_label_year_chart_title);
-		yData.setUnitLabel(UI.UNIT_LABEL_SPEED);
+		yDataSpeed.setYTitle(Messages.tourCatalog_view_label_year_chart_title);
+		yDataSpeed.setUnitLabel(UI.UNIT_LABEL_SPEED);
 
 		/*
 		 * ensure that painting of the bar is started at the bottom and not at the visible min which
 		 * is above the bottom !!!
 		 */
-		yData.setGraphFillMethod(ChartDataYSerie.BAR_DRAW_METHOD_BOTTOM);
+		yDataSpeed.setGraphFillMethod(ChartDataYSerie.BAR_DRAW_METHOD_BOTTOM);
 
-		chartModel.addYData(yData);
+		chartModel.addYData(yDataSpeed);
 
+		/**
+		 * Pulse
+		 */
+		// set the bar low/high data
+		final ChartDataYSerie yDataPulse = new ChartDataYSerie(ChartType.BAR, ArrayListToArray.toFloat(_avgPulse));
+		computeMinMaxValues(yDataPulse);
+
+		TourManager.setGraphColor(yDataPulse, GraphColorManager.PREF_GRAPH_HEARTBEAT);
+
+		yDataPulse.setYTitle(Messages.tourCatalog_view_label_year_chart_title);
+		yDataPulse.setUnitLabel(GRAPH_LABEL_CADENCE_UNIT);
+
+		/*
+		 * ensure that painting of the bar is started at the bottom and not at the visible min which
+		 * is above the bottom !!!
+		 */
+		yDataPulse.setGraphFillMethod(ChartDataYSerie.BAR_DRAW_METHOD_BOTTOM);
+
+		chartModel.addYData(yDataPulse);
+
+		/**
+		 * Setup UI
+		 */
 		// set tool tip info
 		chartModel.setCustomData(ChartDataModel.BAR_TOOLTIP_INFO_PROVIDER, new IChartInfoProvider() {
 			@Override

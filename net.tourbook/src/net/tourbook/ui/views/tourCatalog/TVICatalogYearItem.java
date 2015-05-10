@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -80,14 +80,15 @@ public class TVICatalogYearItem extends TVICatalogItem {
 		sb.append(" TourCompared.comparedId,"); // 		1 //$NON-NLS-1$
 		sb.append(" TourCompared.tourId,"); //			2 //$NON-NLS-1$
 		sb.append(" TourCompared.tourDate,"); //		3 //$NON-NLS-1$
-		sb.append(" TourCompared.tourSpeed,"); //		4 //$NON-NLS-1$
-		sb.append(" TourCompared.startIndex,"); //		5 //$NON-NLS-1$
-		sb.append(" TourCompared.endIndex,"); //		6 //$NON-NLS-1$
+		sb.append(" TourCompared.avgPulse,"); //		4 //$NON-NLS-1$
+		sb.append(" TourCompared.tourSpeed,"); //		5 //$NON-NLS-1$
+		sb.append(" TourCompared.startIndex,"); //		6 //$NON-NLS-1$
+		sb.append(" TourCompared.endIndex,"); //		7 //$NON-NLS-1$
 
-		sb.append(" TourData.tourTitle,"); //			7		 //$NON-NLS-1$
-		sb.append(" TourData.tourType_typeId,"); //		8 //$NON-NLS-1$
+		sb.append(" TourData.tourTitle,"); //			8		 //$NON-NLS-1$
+		sb.append(" TourData.tourType_typeId,"); //		9 //$NON-NLS-1$
 
-		sb.append(" jTdataTtag.TourTag_tagId"); //		9 //$NON-NLS-1$
+		sb.append(" jTdataTtag.TourTag_tagId"); //		10 //$NON-NLS-1$
 
 		sb.append(" FROM " + TourDatabase.TABLE_TOUR_COMPARED + " TourCompared"); //$NON-NLS-1$ //$NON-NLS-2$
 
@@ -117,7 +118,7 @@ public class TVICatalogYearItem extends TVICatalogItem {
 			while (result.next()) {
 
 				final long tourId = result.getLong(2);
-				final Object resultTagId = result.getObject(9);
+				final Object resultTagId = result.getObject(10);
 
 				if (tourId == lastTourId) {
 
@@ -140,15 +141,17 @@ public class TVICatalogYearItem extends TVICatalogItem {
 					tourItem.setTourId(tourId);
 
 					tourItem.tourDate = result.getDate(3);
-					tourItem.tourSpeed = result.getFloat(4);
 
-					tourItem.startIndex = result.getInt(5);
-					tourItem.endIndex = result.getInt(6);
+					tourItem.avgPulse = result.getFloat(4);
+					tourItem.tourSpeed = result.getFloat(5);
 
-					tourItem.tourTitle = result.getString(7);
+					tourItem.startIndex = result.getInt(6);
+					tourItem.endIndex = result.getInt(7);
+
+					tourItem.tourTitle = result.getString(8);
 
 					// tour type
-					final Object tourTypeId = result.getObject(8);
+					final Object tourTypeId = result.getObject(9);
 					tourItem.tourTypeId = (tourTypeId == null ? //
 							TourDatabase.ENTITY_IS_NOT_SAVED
 							: (Long) tourTypeId);

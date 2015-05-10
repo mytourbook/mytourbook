@@ -157,6 +157,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	private static final int						COLUMN_PACE							= 20;
 	private static final int						COLUMN_GRADIENT						= 30;
 	private static final int						COLUMN_PULSE						= 40;
+	private static final int						COLUMN_CADENCE						= 50;
 
 	private static final float						SPEED_DIGIT_VALUE					= 10.0f;
 
@@ -225,6 +226,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	 * The sequence defines how they are displayed in the combobox.
 	 */
 	private static final ArrayList<TourSegmenter>	_allTourSegmenter					= new ArrayList<TourSegmenter>();
+
 	static {
 
 		_allTourSegmenter.add(new TourSegmenter(
@@ -452,6 +454,10 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 			case COLUMN_GRADIENT:
 				rc = (int) ((segment1.gradient - segment2.gradient) * 100);
+				break;
+
+			case COLUMN_CADENCE:
+				rc = (int) (segment1.cadence - segment2.cadence);
 				break;
 			}
 
@@ -2075,6 +2081,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		defineColumn_AvgPaceDifference();
 		defineColumn_AvgPulse();
 		defineColumn_AvgPulseDifference();
+		defineColumn_AvgCadence();
 
 		defineColumn_AltitudeUpSummarizedBorder(defaultListener);
 		defineColumn_AltitudeDownSummarizedBorder(defaultListener);
@@ -2294,6 +2301,37 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 					cell.setText(UI.EMPTY_STRING);
 				} else {
 					cell.setText(_nf_0_0.format(altitude));
+				}
+			}
+		});
+	}
+
+	/**
+	 * column: Average cadence
+	 */
+	private void defineColumn_AvgCadence() {
+
+		final ColumnDefinition colDef;
+
+		colDef = TableColumnFactory.AVG_CADENCE.createColumn(_columnManager, _pc);
+		colDef.setIsDefaultColumn();
+		colDef.setColumnSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(final SelectionEvent event) {
+				((ViewSorter) _segmentViewer.getSorter()).setSortColumn(COLUMN_CADENCE);
+				_segmentViewer.refresh();
+			}
+		});
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final float cadence = ((TourSegment) cell.getElement()).cadence;
+
+				if (cadence == 0) {
+					cell.setText(UI.EMPTY_STRING);
+				} else {
+					cell.setText(_nf_1_1.format(cadence));
 				}
 			}
 		});

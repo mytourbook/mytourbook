@@ -105,7 +105,6 @@ import org.eclipse.ui.IWorkbenchPart;
  */
 public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdater {
 
-
 	private static final String			ID										= "net.tourbook.ui.tourChart";								//$NON-NLS-1$
 
 	private static final String			GRAPH_LABEL_ALTIMETER					= net.tourbook.common.Messages.Graph_Label_Altimeter;
@@ -211,8 +210,8 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 	private ChartLayerMarker			_layerMarker;
 	private ChartLayer2ndAltiSerie		_layer2ndAltiSerie;
 	private ChartLayerPhoto				_layerPhoto;
-	private ChartSegmentAltitudeLayer	_layerSegment;
-	private ChartSegmentValueLayer		_layerSegmentValue;
+	private ChartSegmentAltitudeLayer	_layerSegmentAltitude;
+	private ChartSegmentValueLayer		_layerSegmentOther;
 
 	private Color						_photoOverlayBGColorLink;
 	private Color						_photoOverlayBGColorTour;
@@ -1541,8 +1540,8 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		/*
 		 * create segment layer
 		 */
-		_layerSegment = new ChartSegmentAltitudeLayer();
-		_layerSegment.setupLayerData(_tourData, new RGB(0, 177, 219));
+		_layerSegmentAltitude = new ChartSegmentAltitudeLayer();
+		_layerSegmentAltitude.setupLayerData(_tourData, new RGB(0, 177, 219));
 
 		for (final int serieIndex : segmentSerie) {
 
@@ -1551,16 +1550,16 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 			chartMarker.graphX = xDataSerie[serieIndex];
 			chartMarker.serieIndex = serieIndex;
 
-			_layerSegment.addMarker(chartMarker);
+			_layerSegmentAltitude.addMarker(chartMarker);
 		}
 
 		/*
 		 * create segment value layer
 		 */
-		_layerSegmentValue = new ChartSegmentValueLayer();
-		_layerSegmentValue.setLineColor(new RGB(231, 104, 38));
-		_layerSegmentValue.setTourData(_tourData);
-		_layerSegmentValue.setXDataSerie(xDataSerie);
+		_layerSegmentOther = new ChartSegmentValueLayer();
+		_layerSegmentOther.setLineColor(new RGB(231, 104, 38));
+		_layerSegmentOther.setTourData(_tourData);
+		_layerSegmentOther.setXDataSerie(xDataSerie);
 
 		// draw the graph lighter that the segments are more visible
 		setGraphAlpha(0.5);
@@ -2333,7 +2332,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		setGraphLayer_Layer(TourManager.CUSTOM_DATA_GRADIENT, _tourData.segmentSerieGradient, yDataWithLabels);
 		setGraphLayer_Layer(TourManager.CUSTOM_DATA_ALTIMETER, _tourData.segmentSerieAltitudeUpH, yDataWithLabels);
 		setGraphLayer_Layer(TourManager.CUSTOM_DATA_TEMPERATURE, null, yDataWithLabels);
-		setGraphLayer_Layer(TourManager.CUSTOM_DATA_CADENCE, null, yDataWithLabels);
+		setGraphLayer_Layer(TourManager.CUSTOM_DATA_CADENCE, _tourData.segmentSerieCadence, yDataWithLabels);
 		setGraphLayer_Layer(TourManager.CUSTOM_DATA_GEAR_RATIO, null, yDataWithLabels);
 
 		setGraphLayer_Layer(TourManager.CUSTOM_DATA_HISTORY, null, null);
@@ -2388,12 +2387,12 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		final ChartDataYSerie yDataAltitude = (ChartDataYSerie) dataModel
 				.getCustomData(TourManager.CUSTOM_DATA_ALTITUDE);
 		if (yData == yDataAltitude) {
-			if (_layerSegment != null) {
-				customFgLayers.add(_layerSegment);
+			if (_layerSegmentAltitude != null) {
+				customFgLayers.add(_layerSegmentAltitude);
 			}
 		} else {
-			if (_layerSegmentValue != null) {
-				customFgLayers.add(_layerSegmentValue);
+			if (_layerSegmentOther != null) {
+				customFgLayers.add(_layerSegmentOther);
 			}
 		}
 
@@ -2713,8 +2712,8 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		if (isLayerVisible) {
 			createLayer_Segment();
 		} else {
-			_layerSegment = null;
-			_layerSegmentValue = null;
+			_layerSegmentAltitude = null;
+			_layerSegmentOther = null;
 			resetGraphAlpha();
 		}
 

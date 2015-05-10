@@ -3458,7 +3458,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			public void update(final ViewerCell cell) {
 				if (_serieCadence != null) {
 					final TimeSlice timeSlice = (TimeSlice) cell.getElement();
-					cell.setText(Integer.toString((int) _serieCadence[timeSlice.serieIndex]));
+					cell.setText(_nf1.format(_serieCadence[timeSlice.serieIndex]));
 				} else {
 					cell.setText(UI.EMPTY_STRING);
 				}

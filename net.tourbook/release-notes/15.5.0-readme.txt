@@ -1,4 +1,4 @@
-Version 15.5.0                                             ?. May 2015
+Version 15.6.0                                             ?. June 2015
 
 
 
@@ -13,6 +13,9 @@ DOKU DOKU DOKU DOKU DOKU DOKU DOKU DOKU DOKU DOKU DOKU DOKU DOKU DOKU DOKU DOKU 
 New 	
 ===
 
+* Tour Catalog
+  - Show average pulse for each compared tour.
+
 
 Improvements
 ============
@@ -22,7 +25,7 @@ Improvements
     The manufacturer field contains the value "DEVELOPMENT" (255)
   - Support FR70 .fit files. 
     This data format can contain 0 sessions but the data are still valid.
-
+  - Import fractional cadence.
 	 
 * GPX Import
   - Support import of .gpx files which are not xml well formed, 

@@ -356,9 +356,10 @@ public class TourCatalogViewComparedTour extends TourChartViewPart implements IS
 	 */
 	private void fireChangeEvent(final int startIndex, final int endIndex) {
 
+		final float avgPulse = _tourData.computeAvgPulseSegment(startIndex, endIndex);
 		final float speed = TourManager.computeTourSpeed(_tourData, startIndex, endIndex);
 
-		fireChangeEvent(startIndex, endIndex, speed, false);
+		fireChangeEvent(startIndex, endIndex, avgPulse, speed, false);
 	}
 
 	/**
@@ -369,15 +370,23 @@ public class TourCatalogViewComparedTour extends TourChartViewPart implements IS
 	 * @param speed
 	 * @param isDataSaved
 	 */
-	private void fireChangeEvent(final int startIndex, final int endIndex, final float speed, final boolean isDataSaved) {
+	private void fireChangeEvent(	final int startIndex,
+									final int endIndex,
+									final float avgPulse,
+									final float speed,
+									final boolean isDataSaved) {
 
-		TourManager.fireEventWithCustomData(TourEventId.COMPARE_TOUR_CHANGED, new TourPropertyCompareTourChanged(
+		final TourPropertyCompareTourChanged customData = new TourPropertyCompareTourChanged(
 				_ctCompareId,
 				startIndex,
 				endIndex,
-				speed,
 				isDataSaved,
-				_comparedTourItem), this);
+				_comparedTourItem);
+
+		customData.avgPulse = avgPulse;
+		customData.speed = speed;
+
+		TourManager.fireEventWithCustomData(TourEventId.COMPARE_TOUR_CHANGED, customData, this);
 	}
 
 	@Override
@@ -501,11 +510,13 @@ public class TourCatalogViewComparedTour extends TourChartViewPart implements IS
 
 				final ChartDataModel chartDataModel = _tourChart.getChartDataModel();
 
+				final float avgPulse = _tourData.computeAvgPulseSegment(_movedStartIndex, _movedEndIndex);
 				final float speed = TourManager.computeTourSpeed(_tourData, _movedStartIndex, _movedEndIndex);
 
 				// set new data in entity
 				comparedTour.setStartIndex(_movedStartIndex);
 				comparedTour.setEndIndex(_movedEndIndex);
+				comparedTour.setAvgPulse(avgPulse);
 				comparedTour.setTourSpeed(speed);
 
 				// update entity
@@ -530,7 +541,7 @@ public class TourCatalogViewComparedTour extends TourChartViewPart implements IS
 				_tourChart.updateChart(chartDataModel, true);
 				enableSaveAction();
 
-				fireChangeEvent(_defaultStartIndex, _defaultEndIndex, speed, true);
+				fireChangeEvent(_defaultStartIndex, _defaultEndIndex, avgPulse, speed, true);
 			}
 		} catch (final Exception e) {
 			e.printStackTrace();

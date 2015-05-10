@@ -934,6 +934,8 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 	public float[]												segmentSerieSpeed;
 
 	@Transient
+	public float[]												segmentSerieCadence;
+	@Transient
 	public float[]												segmentSeriePace;
 	@Transient
 	public float[]												segmentSeriePaceDiff;
@@ -1957,6 +1959,7 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 		int cadenceCount = 0;
 
 		for (final float cadence : cadenceSerie) {
+
 			if (cadence > 0) {
 				cadenceCount++;
 				cadenceSum += cadence;
@@ -1965,6 +1968,105 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 		if (cadenceCount > 0) {
 			avgCadence = cadenceSum / cadenceCount;
 		}
+	}
+
+	private float computeAvgCadenceSegment(final int firstIndex, final int lastIndex) {
+
+		// check if data are available
+		if (cadenceSerie == null || cadenceSerie.length == 0 || timeSerie == null || timeSerie.length == 0) {
+			return 0;
+		}
+
+		// check for 1 point
+		if (firstIndex == lastIndex) {
+			return cadenceSerie[firstIndex];
+		}
+
+		// check for 2 points
+		if (lastIndex - firstIndex == 1) {
+			return (cadenceSerie[firstIndex] + cadenceSerie[lastIndex]) / 2;
+		}
+
+		// get break time when not yet set
+		if (breakTimeSerie == null) {
+			getBreakTime();
+		}
+
+		// at least 3 points are available
+		int prevTime = timeSerie[firstIndex];
+		int currentTime = timeSerie[firstIndex];
+		int nextTime = timeSerie[firstIndex + 1];
+
+		/**
+		 * a break is set from the previous to the current time slice
+		 */
+		final boolean hasBreakTime = breakTimeSerie != null;
+		boolean isPrevBreak = hasBreakTime ? breakTimeSerie[firstIndex] : false;
+		boolean isNextBreak = hasBreakTime ? breakTimeSerie[firstIndex + 1] : false;
+
+		float cadenceSquare = 0;
+		float timeSquare = 0;
+
+		for (int serieIndex = firstIndex; serieIndex <= lastIndex; serieIndex++) {
+
+			if (hasBreakTime) {
+
+				/*
+				 * break time requires distance data, so it's possible that break time data are not
+				 * available
+				 */
+
+				if (breakTimeSerie[serieIndex] == true) {
+
+					// break has occured in this time slice
+
+					if (serieIndex < lastIndex) {
+
+						isPrevBreak = isNextBreak;
+						isNextBreak = breakTimeSerie[serieIndex + 1];
+
+						prevTime = currentTime;
+						currentTime = nextTime;
+						nextTime = timeSerie[serieIndex + 1];
+					}
+
+					continue;
+				}
+			}
+
+			final float cadence = cadenceSerie[serieIndex];
+
+			float timeDiffPrev = 0;
+			float timeDiffNext = 0;
+
+			if (serieIndex > firstIndex && isPrevBreak == false) {
+				// prev is available
+				timeDiffPrev = ((float) currentTime - prevTime) / 2;
+			}
+
+			if (serieIndex < lastIndex && isNextBreak == false) {
+				// next is available
+				timeDiffNext = ((float) nextTime - currentTime) / 2;
+			}
+
+			if (cadence > 0) {
+				cadenceSquare += cadence * timeDiffPrev + cadence * timeDiffNext;
+				timeSquare += timeDiffPrev + timeDiffNext;
+			}
+
+			if (serieIndex < lastIndex) {
+
+				isPrevBreak = isNextBreak;
+				isNextBreak = hasBreakTime ? breakTimeSerie[serieIndex + 1] : false;
+
+				prevTime = currentTime;
+				currentTime = nextTime;
+				nextTime = timeSerie[serieIndex + 1];
+			}
+
+		}
+
+		return timeSquare == 0 ? 0 : cadenceSquare / timeSquare;
 	}
 
 	public void computeAvgPulse() {
@@ -1976,7 +2078,7 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 		avgPulse = computeAvgPulseSegment(0, timeSerie.length - 1);
 	}
 
-	private float computeAvgPulseSegment(final int firstIndex, final int lastIndex) {
+	public float computeAvgPulseSegment(final int firstIndex, final int lastIndex) {
 
 		// check if data are available
 		if ((pulseSerie == null) || (pulseSerie.length == 0) || (timeSerie == null) || (timeSerie.length == 0)) {
@@ -4063,9 +4165,10 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 			return new Object[0];
 		}
 
-		final boolean isPulseSerie = (pulseSerie != null) && (pulseSerie.length > 0);
 		final boolean isAltitudeSerie = (altitudeSerie != null) && (altitudeSerie.length > 0);
+		final boolean isCadenceSerie = (cadenceSerie != null) && (cadenceSerie.length > 0);
 		final boolean isDistanceSerie = (distanceSerie != null) && (distanceSerie.length > 0);
+		final boolean isPulseSerie = (pulseSerie != null) && (pulseSerie.length > 0);
 
 		final float[] localPowerSerie = getPowerSerie();
 		final boolean isPowerSerie = (localPowerSerie != null) && (localPowerSerie.length > 0);
@@ -4090,6 +4193,7 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 			distanceStart = distanceSerie[firstSerieIndex];
 		}
 
+		final float cadenceStart;
 		int timeTotal = 0;
 		float distanceTotal = 0;
 
@@ -4117,10 +4221,10 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 		segmentSerieSpeed = new float[segmentSerieLength];
 		segmentSeriePace = new float[segmentSerieLength];
 
-		segmentSeriePulse = new float[segmentSerieLength];
-		segmentSeriePower = new float[segmentSerieLength];
+		segmentSerieCadence = new float[segmentSerieLength];
 		segmentSerieGradient = new float[segmentSerieLength];
-//		segmentSerieCadence = new float[segmentSerieLength];
+		segmentSeriePower = new float[segmentSerieLength];
+		segmentSeriePulse = new float[segmentSerieLength];
 
 		// compute values between start and end
 		for (int segmentIndex = 1; segmentIndex < segmentSerieLength; segmentIndex++) {
@@ -4268,6 +4372,12 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 			} else {
 				// hide pulse in the view
 				segment.pulseDiff = Float.MIN_VALUE;
+			}
+
+			if (isCadenceSerie) {
+
+				final float segmentAvgCadence = computeAvgCadenceSegment(segmentStartIndex, segmentEndIndex);
+				segmentSerieCadence[segmentIndex] = segment.cadence = segmentAvgCadence;
 			}
 
 			// end point of current segment is the start of the next segment

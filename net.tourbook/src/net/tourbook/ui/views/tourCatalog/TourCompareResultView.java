@@ -221,6 +221,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 
 //							resultItem.movedStartIndex = compareTourProperty.startIndex;
 //							resultItem.movedEndIndex = compareTourProperty.endIndex;
+
 							resultItem.movedSpeed = compareTourProperty.speed;
 
 							// update viewer
@@ -245,12 +246,14 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 
 								compareTourItem.dbStartIndex = compareTourProperty.startIndex;
 								compareTourItem.dbEndIndex = compareTourProperty.endIndex;
+
 								compareTourItem.dbSpeed = compareTourProperty.speed;
 
 							} else {
 
 //								compareTourItem.movedStartIndex = compareTourProperty.startIndex;
 //								compareTourItem.movedEndIndex = compareTourProperty.endIndex;
+
 								compareTourItem.movedSpeed = compareTourProperty.speed;
 							}
 

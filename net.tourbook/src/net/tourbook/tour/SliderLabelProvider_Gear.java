@@ -13,39 +13,29 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.data;
+package net.tourbook.tour;
 
-public class TourSegment {
+import net.tourbook.chart.ISliderLabelProvider;
 
-	public int		serieIndexStart;
-	public int		serieIndexEnd;
+public class SliderLabelProvider_Gear implements ISliderLabelProvider {
 
-	public int		recordingTime;
-	public int		drivingTime;
-	public int		breakTime;
-	public int		timeTotal;
 
-	public float	distanceDiff;
-	public float	distanceTotal;
+	private float[][]			_gearSerie;
 
-	public float	altitudeUpHour;
-	public float	altitudeUpSummarizedBorder;
-	public float	altitudeUpSummarizedComputed;
+	public SliderLabelProvider_Gear(final float[][] gearSerie) {
+		_gearSerie = gearSerie;
+	}
 
-	public float	altitudeDownHour;
-	public float	altitudeDownSummarizedBorder;
-	public float	altitudeDownSummarizedComputed;
+	@Override
+	public String getLabel(final int sliderValueIndex) {
 
-	public float	altitudeDiffSegmentBorder;
-	public float	altitudeDiffSegmentComputed;
+		return String.format(
+				TourManager.GEAR_VALUE_FORMAT,
+				(int) _gearSerie[1][sliderValueIndex],
+				(int) _gearSerie[2][sliderValueIndex],
+				_gearSerie[0][sliderValueIndex]
+		//
+				);
+	}
 
-	public float	cadence;
-	public float	gradient;
-	public float	power;
-	public float	speed;
-
-	public float	pace;
-	public float	paceDiff;
-	public float	pulse;
-	public float	pulseDiff;
 }

@@ -64,7 +64,14 @@ public class RecordMesgListenerImpl extends AbstractMesgListener implements Reco
 
 		final Short cadence = mesg.getCadence();
 		if (cadence != null) {
-			timeData.cadence = cadence;
+
+			final Float fractCadence = mesg.getFractionalCadence();
+
+			if (fractCadence == null) {
+				timeData.cadence = cadence;
+			} else {
+				timeData.cadence = cadence + fractCadence;
+			}
 		}
 
 		final Float distance = mesg.getDistance();

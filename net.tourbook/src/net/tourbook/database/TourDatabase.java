@@ -97,7 +97,7 @@ public class TourDatabase {
 	 */
 	private static final int						TOURBOOK_DB_VERSION							= 28;
 
-//	private static final int						TOURBOOK_DB_VERSION							= 28;	// 15.5
+//	private static final int						TOURBOOK_DB_VERSION							= 28;	// 15.6
 //	private static final int						TOURBOOK_DB_VERSION							= 27;	// 15.3.1
 //	private static final int						TOURBOOK_DB_VERSION							= 26;	// 14.14 / 15.3
 //	private static final int						TOURBOOK_DB_VERSION							= 25;	// 14.10
@@ -2322,7 +2322,13 @@ public class TourDatabase {
 				+ "	EndIndex 		INTEGER NOT NULL,														\n" //$NON-NLS-1$
 				+ "	TourDate	 	DATE NOT NULL,															\n" //$NON-NLS-1$
 				+ "	StartYear		INTEGER NOT NULL,														\n" //$NON-NLS-1$
-				+ "	TourSpeed	 	FLOAT																	\n" //$NON-NLS-1$
+				+ "	TourSpeed	 	FLOAT,																	\n" //$NON-NLS-1$
+				//
+				// version 28 start
+				//
+				+ "	AvgPulse		FLOAT																	\n" //$NON-NLS-1$
+				//
+				// version 28 end ---------
 				//
 				+ ")"); //$NON-NLS-1$
 	}
@@ -5628,6 +5634,20 @@ public class TourDatabase {
 
 		final Statement stmt = conn.createStatement();
 		{
+			// check if db is updated to version 28
+			if (isColumnAvailable(conn, TABLE_TOUR_COMPARED, "AvgPulse") == false) { //$NON-NLS-1$
+
+				/*
+				 * Table: TABLE_TOUR_COMPARED
+				 */
+				{
+					/*
+					 * Add new columns
+					 */
+					SQL.AddCol_Float(stmt, TABLE_TOUR_COMPARED, "AvgPulse", DEFAULT_0); //$NON-NLS-1$
+				}
+			}
+
 			// check if db is updated to version 28
 			if (isColumnAvailable(conn, TABLE_TOUR_WAYPOINT, "urlText") == false) { //$NON-NLS-1$
 

@@ -2353,6 +2353,7 @@ public class TourManager {
 			yDataCadence.setShowYSlider(true);
 			yDataCadence.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_CADENCE);
 			yDataCadence.setCustomData(CUSTOM_DATA_ANALYZER_INFO, new TourChartAnalyzerInfo(true));
+			yDataCadence.setSliderLabelProvider(new SliderLabelProvider_Cadence(cadenceSerie));
 
 			if (isHrZoneDisplayed) {
 				yDataCadence.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_CUSTOM);
@@ -2388,7 +2389,7 @@ public class TourManager {
 			yDataGears.setYTitle(GRAPH_LABEL_GEARS);
 			yDataGears.setShowYSlider(true);
 			yDataGears.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_GEARS);
-			yDataGears.setSliderLabelProvider(new GearSliderLabelProvider(gearSerie));
+			yDataGears.setSliderLabelProvider(new SliderLabelProvider_Gear(gearSerie));
 
 //			yDataGears.setLineGaps(tourData.getCadenceGaps());
 

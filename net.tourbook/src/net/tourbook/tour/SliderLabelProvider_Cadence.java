@@ -15,27 +15,42 @@
  *******************************************************************************/
 package net.tourbook.tour;
 
+import java.text.NumberFormat;
+
 import net.tourbook.chart.ISliderLabelProvider;
 
-public class GearSliderLabelProvider implements ISliderLabelProvider {
+public class SliderLabelProvider_Cadence implements ISliderLabelProvider {
 
+	private final NumberFormat	_nf_1_0	= NumberFormat.getNumberInstance();
+	private final NumberFormat	_nf_1_1	= NumberFormat.getNumberInstance();
+	{
+		_nf_1_0.setMinimumFractionDigits(1);
+		_nf_1_0.setMaximumFractionDigits(0);
 
-	private float[][]			_gearSerie;
+		_nf_1_1.setMinimumFractionDigits(1);
+		_nf_1_1.setMaximumFractionDigits(1);
+	}
 
-	public GearSliderLabelProvider(final float[][] gearSerie) {
-		_gearSerie = gearSerie;
+	private float[]				_cadenceSerie;
+
+	public SliderLabelProvider_Cadence(final float[] cadenceSerie) {
+		_cadenceSerie = cadenceSerie;
 	}
 
 	@Override
 	public String getLabel(final int sliderValueIndex) {
 
-		return String.format(
-				TourManager.GEAR_VALUE_FORMAT,
-				(int) _gearSerie[1][sliderValueIndex],
-				(int) _gearSerie[2][sliderValueIndex],
-				_gearSerie[0][sliderValueIndex]
-		//
-				);
+		final float cadence = _cadenceSerie[sliderValueIndex];
+		final float cadDigits = cadence - (int) cadence;
+
+		/*
+		 * Show digits only when it's large enough
+		 */
+		if (cadDigits > 0.1) {
+			return _nf_1_1.format(cadence);
+		} else {
+			return _nf_1_0.format(cadence);
+		}
 	}
 
 }

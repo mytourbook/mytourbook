@@ -171,6 +171,15 @@ public class TourCompareManager {
 
 		final TourData tourData = comparedTourItem.comparedTourData;
 
+		final float avgPulse = tourData.computeAvgPulseSegment(
+				comparedTourItem.computedStartIndex,
+				comparedTourItem.computedEndIndex);
+
+		final float speed = TourManager.computeTourSpeed(
+				tourData,
+				comparedTourItem.computedStartIndex,
+				comparedTourItem.computedEndIndex);
+
 		final TourCompared comparedTour = new TourCompared();
 
 		comparedTour.setStartIndex(comparedTourItem.computedStartIndex);
@@ -181,11 +190,7 @@ public class TourCompareManager {
 		comparedTour.setTourDate(tourData.getTourStartTimeMS());
 		comparedTour.setStartYear(tourData.getTourStartTime().getYear());
 
-		final float speed = TourManager.computeTourSpeed(
-				tourData,
-				comparedTourItem.computedStartIndex,
-				comparedTourItem.computedEndIndex);
-
+		comparedTour.setAvgPulse(avgPulse);
 		comparedTour.setTourSpeed(speed);
 
 		// persist entity
@@ -197,6 +202,7 @@ public class TourCompareManager {
 		comparedTourItem.compId = comparedTour.getComparedId();
 		comparedTourItem.dbStartIndex = comparedTourItem.computedStartIndex;
 		comparedTourItem.dbEndIndex = comparedTourItem.computedEndIndex;
+
 		comparedTourItem.dbSpeed = speed;
 	}
 
@@ -526,6 +532,7 @@ public class TourCompareManager {
 
 		Display.getDefault().asyncExec(new Runnable() {
 
+			@Override
 			public void run() {
 
 				final IWorkbench workbench = PlatformUI.getWorkbench();

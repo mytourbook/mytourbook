@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -280,6 +280,8 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 							// update entity
 							comparedTour.setStartIndex(compareTourProperty.startIndex);
 							comparedTour.setEndIndex(compareTourProperty.endIndex);
+
+							comparedTour.setAvgPulse(compareTourProperty.avgPulse);
 							comparedTour.setTourSpeed(compareTourProperty.speed);
 
 							// update the viewer
@@ -643,7 +645,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 		defineColumnTitle();
 		defineColumnTags();
 		defineColumnSpeed();
-
+		defineColumnAvgPulse();
 	}
 
 	/**
@@ -718,6 +720,29 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 					cell.setText(DateFormat.getDateInstance(DateFormat.SHORT).format(
 							((TVICatalogComparedTour) element).getTourDate()));
 
+				}
+			}
+		});
+	}
+
+	/**
+	 * column: Avg pulse
+	 */
+	private void defineColumnAvgPulse() {
+
+		final TreeColumnDefinition colDef = TreeColumnFactory.AVG_PULSE.createColumn(_columnManager, _pc);
+		colDef.setIsDefaultColumn();
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+				final Object element = cell.getElement();
+				if (element instanceof TVICatalogComparedTour) {
+
+					final float avgPulse = ((TVICatalogComparedTour) element).getAvgPulse();
+
+					if (avgPulse > 0) {
+						cell.setText(_nf1.format(avgPulse));
+					}
 				}
 			}
 		});
