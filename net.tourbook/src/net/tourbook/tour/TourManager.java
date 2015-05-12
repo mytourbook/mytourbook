@@ -2568,7 +2568,7 @@ public class TourManager {
 	}
 
 	private ChartDataYSerie createChartDataSerie(final float[] dataSerie, final ChartType chartType) {
-		return new ChartDataYSerie(chartType, dataSerie);
+		return new ChartDataYSerie(chartType, dataSerie, false);
 	}
 
 	private ChartDataYSerie createChartDataSerie(final float[][] dataSerie, final ChartType chartType) {

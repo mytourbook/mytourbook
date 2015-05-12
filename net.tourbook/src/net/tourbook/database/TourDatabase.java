@@ -4004,7 +4004,9 @@ public class TourDatabase {
 			/*
 			 * 27 -> 28
 			 */
+			boolean isPostUpdate28 = false;
 			if (currentDbVersion == 27) {
+				isPostUpdate28 = true;
 				currentDbVersion = newVersion = updateDbDesign_027_to_028(conn, monitor);
 			}
 
@@ -4044,6 +4046,10 @@ public class TourDatabase {
 			}
 			if (isPostUpdate25) {
 				updateDbDesign_024_to_025_PostUpdate(conn, monitor);
+			}
+
+			if (isPostUpdate28) {
+				updateDbDesign_027_to_028_PostUpdate(conn, monitor);
 			}
 
 		} catch (final SQLException e) {
@@ -5668,6 +5674,73 @@ public class TourDatabase {
 		logDbUpdateEnd(newDbVersion);
 
 		return newDbVersion;
+	}
+
+	/**
+	 * @param conn
+	 * @param monitor
+	 * @throws SQLException
+	 */
+	private void updateDbDesign_027_to_028_PostUpdate(final Connection conn, final IProgressMonitor monitor)
+			throws SQLException {
+
+		final PreparedStatement stmtSelect = conn.prepareStatement(//
+				//
+				"SELECT" //									//$NON-NLS-1$
+							//
+						+ " comparedId," // 				// 1 //$NON-NLS-1$
+						+ " tourId," // 					// 2 //$NON-NLS-1$
+						+ " startIndex," // 				// 3 //$NON-NLS-1$
+						+ " endIndex" // 					// 4 //$NON-NLS-1$
+						//
+						+ " FROM " + TourDatabase.TABLE_TOUR_COMPARED //		//$NON-NLS-1$
+				);
+
+		final PreparedStatement stmtUpdate = conn.prepareStatement(//
+				//
+				"UPDATE " + TABLE_TOUR_COMPARED //			//$NON-NLS-1$
+						//
+						+ " SET" //							//$NON-NLS-1$
+						//
+						+ " avgPulse=?" //					// 1 //$NON-NLS-1$
+						//
+						+ " WHERE comparedId=?"); //		// 2 //$NON-NLS-1$
+
+		final ResultSet result = stmtSelect.executeQuery();
+
+		int compTourCounter = 0;
+		final int numberOfComparedTours = stmtSelect.getMaxRows();
+
+		while (result.next()) {
+
+			if (monitor != null) {
+				monitor.subTask(NLS.bind(//
+						Messages.Tour_Database_PostUpdate_028_SetAvgPulse,
+						new Object[] { ++compTourCounter, numberOfComparedTours }));
+			}
+
+			// get date from database
+			final long compareId = result.getLong(1);
+			final long tourId = result.getLong(2);
+			final int startIndex = result.getInt(3);
+			final int endIndex = result.getInt(4);
+
+			final TourData tourData = TourManager.getTour(tourId);
+
+			if (tourData == null) {
+
+				StatusUtil.log(NLS.bind(Messages.Tour_Database_CannotGetTour_Message, tourId, compareId));
+
+			} else {
+
+				final float avgPulse = tourData.computeAvgPulseSegment(startIndex, endIndex);
+
+				// update average pulse for the compared tour
+				stmtUpdate.setFloat(1, avgPulse);
+				stmtUpdate.setLong(2, compareId);
+				stmtUpdate.executeUpdate();
+			}
+		}
 	}
 
 	private void updateDbDesign_VersionNumber(final Connection conn, final int newVersion) throws SQLException {

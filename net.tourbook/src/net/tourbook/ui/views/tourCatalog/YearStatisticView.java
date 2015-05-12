@@ -73,7 +73,8 @@ public class YearStatisticView extends ViewPart {
 
 	public static final String					ID							= "net.tourbook.views.tourCatalog.yearStatisticView";		//$NON-NLS-1$
 
-	private static final String					GRAPH_LABEL_CADENCE_UNIT	= net.tourbook.common.Messages.Graph_Label_Cadence_Unit;
+	private static final String					GRAPH_LABEL_HEARTBEAT		= net.tourbook.common.Messages.Graph_Label_Heartbeat;
+	private static final String					GRAPH_LABEL_HEARTBEAT_UNIT	= net.tourbook.common.Messages.Graph_Label_Heartbeat_Unit;
 
 	private final boolean						_isOSX						= net.tourbook.common.UI.IS_OSX;
 	private final boolean						_isLinux					= net.tourbook.common.UI.IS_LINUX;
@@ -279,11 +280,11 @@ public class YearStatisticView extends ViewPart {
 	/**
 	 * Set/restore min/max values.
 	 */
-	private void computeMinMaxValues(final ChartDataYSerie yDataSpeed) {
+	private void computeMinMaxValues(final ChartDataYSerie yData) {
 
 		final TVICatalogRefTourItem refItem = _currentRefItem;
-		final float minValue = (float) yDataSpeed.getVisibleMinValue();
-		final float maxValue = (float) yDataSpeed.getVisibleMaxValue();
+		final float minValue = (float) yData.getVisibleMinValue();
+		final float maxValue = (float) yData.getVisibleMaxValue();
 
 		final float dataMinValue = minValue;// - (minValue / 100);
 		final float dataMaxValue = maxValue;// + (maxValue / 100);
@@ -298,8 +299,8 @@ public class YearStatisticView extends ViewPart {
 				 * set the min value 10% below the computed so that the lowest value is not at the
 				 * bottom
 				 */
-				yDataSpeed.setVisibleMinValue(dataMinValue);
-				yDataSpeed.setVisibleMaxValue(dataMaxValue);
+				yData.setVisibleMinValue(dataMinValue);
+				yData.setVisibleMaxValue(dataMaxValue);
 
 				refItem.yearMapMinValue = dataMinValue;
 				refItem.yearMapMaxValue = dataMaxValue;
@@ -314,13 +315,13 @@ public class YearStatisticView extends ViewPart {
 				refItem.yearMapMinValue = Math.min(refItem.yearMapMinValue, dataMinValue);
 				refItem.yearMapMaxValue = Math.max(refItem.yearMapMaxValue, dataMaxValue);
 
-				yDataSpeed.setVisibleMinValue(refItem.yearMapMinValue);
-				yDataSpeed.setVisibleMaxValue(refItem.yearMapMaxValue);
+				yData.setVisibleMinValue(refItem.yearMapMinValue);
+				yData.setVisibleMaxValue(refItem.yearMapMaxValue);
 			}
 
 		} else {
-			yDataSpeed.setVisibleMinValue(dataMinValue);
-			yDataSpeed.setVisibleMaxValue(dataMaxValue);
+			yData.setVisibleMinValue(dataMinValue);
+			yData.setVisibleMaxValue(dataMaxValue);
 		}
 	}
 
@@ -415,13 +416,15 @@ public class YearStatisticView extends ViewPart {
 		toolTipFormat.append(Messages.tourCatalog_view_tooltip_speed);
 		toolTipFormat.append(UI.NEW_LINE);
 
-		final String toolTipLabel = String.format(//
-				toolTipFormat.toString(),
-				_nf1.format(_tourSpeed.get(valueIndex)));
+		final String ttText = UI.EMPTY_STRING
+				+ String.format(Messages.tourCatalog_view_tooltip_speed, _nf1.format(_tourSpeed.get(valueIndex)))
+				+ UI.NEW_LINE
+				+ String.format(Messages.Year_Statistic_Tooltip_Pulse, _avgPulse.get(valueIndex));
 
 		final ChartToolTipInfo toolTipInfo = new ChartToolTipInfo();
+
 		toolTipInfo.setTitle(_dtFormatter.format(tourDate.toDate()));
-		toolTipInfo.setLabel(toolTipLabel);
+		toolTipInfo.setLabel(ttText);
 
 		return toolTipInfo;
 	}
@@ -892,7 +895,10 @@ public class YearStatisticView extends ViewPart {
 		 * Speed
 		 */
 		// set the bar low/high data
-		final ChartDataYSerie yDataSpeed = new ChartDataYSerie(ChartType.BAR, ArrayListToArray.toFloat(_tourSpeed));
+		final ChartDataYSerie yDataSpeed = new ChartDataYSerie(
+				ChartType.BAR,
+				ArrayListToArray.toFloat(_tourSpeed),
+				true);
 		computeMinMaxValues(yDataSpeed);
 
 		TourManager.setGraphColor(yDataSpeed, GraphColorManager.PREF_GRAPH_SPEED);
@@ -912,13 +918,13 @@ public class YearStatisticView extends ViewPart {
 		 * Pulse
 		 */
 		// set the bar low/high data
-		final ChartDataYSerie yDataPulse = new ChartDataYSerie(ChartType.BAR, ArrayListToArray.toFloat(_avgPulse));
+		final ChartDataYSerie yDataPulse = new ChartDataYSerie(ChartType.BAR, ArrayListToArray.toFloat(_avgPulse), true);
 		computeMinMaxValues(yDataPulse);
 
 		TourManager.setGraphColor(yDataPulse, GraphColorManager.PREF_GRAPH_HEARTBEAT);
 
-		yDataPulse.setYTitle(Messages.tourCatalog_view_label_year_chart_title);
-		yDataPulse.setUnitLabel(GRAPH_LABEL_CADENCE_UNIT);
+		yDataPulse.setYTitle(GRAPH_LABEL_HEARTBEAT);
+		yDataPulse.setUnitLabel(GRAPH_LABEL_HEARTBEAT_UNIT);
 
 		/*
 		 * ensure that painting of the bar is started at the bottom and not at the visible min which

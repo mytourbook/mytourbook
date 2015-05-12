@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -104,6 +104,8 @@ public class TourCatalogViewComparedTour extends TourChartViewPart implements IS
 	private ActionSynchChartHorizontalByScale	_actionSynchChartsByScale;
 	private ActionSynchChartHorizontalBySize	_actionSynchChartsBySize;
 
+	private ActionNavigatePreviousTour			_actionNavigatePrevTour;
+	private ActionNavigateNextTour				_actionNavigateNextTour;
 	private ActionSaveComparedTour				_actionSaveComparedTour;
 	private ActionUndoChanges					_actionUndoChanges;
 
@@ -125,6 +127,42 @@ public class TourCatalogViewComparedTour extends TourChartViewPart implements IS
 	 * object for the currently displayed compared tour
 	 */
 	private Object								_comparedTourItem;
+
+	private class ActionNavigateNextTour extends Action {
+
+		public ActionNavigateNextTour() {
+
+			super(null, AS_PUSH_BUTTON);
+
+			setToolTipText(Messages.TourCatalog_View_Action_NavigateNextTour);
+
+			setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__save));
+			setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__save_disabled));
+		}
+
+		@Override
+		public void run() {
+			actionNavigateTour(true);
+		}
+	}
+
+	private class ActionNavigatePreviousTour extends Action {
+
+		public ActionNavigatePreviousTour() {
+
+			super(null, AS_PUSH_BUTTON);
+
+			setToolTipText(Messages.TourCatalog_View_Action_NavigatePrevTour);
+
+			setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__save));
+			setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__save_disabled));
+		}
+
+		@Override
+		public void run() {
+			actionNavigateTour(false);
+		}
+	}
 
 	private class ActionSaveComparedTour extends Action {
 
@@ -166,6 +204,10 @@ public class TourCatalogViewComparedTour extends TourChartViewPart implements IS
 		}
 	}
 
+	private void actionNavigateTour(final boolean isNextTour) {
+		
+	}
+
 	private void addRefTourPropertyListener() {
 
 		_refTourPropertyListener = new ITourEventListener() {
@@ -200,6 +242,8 @@ public class TourCatalogViewComparedTour extends TourChartViewPart implements IS
 		_actionSynchChartsBySize = new ActionSynchChartHorizontalBySize(this);
 		_actionSynchChartsByScale = new ActionSynchChartHorizontalByScale(this);
 
+		_actionNavigatePrevTour = new ActionNavigatePreviousTour();
+		_actionNavigateNextTour = new ActionNavigateNextTour();
 		_actionSaveComparedTour = new ActionSaveComparedTour();
 		_actionUndoChanges = new ActionUndoChanges();
 
@@ -308,7 +352,7 @@ public class TourCatalogViewComparedTour extends TourChartViewPart implements IS
 		super.dispose();
 	}
 
-	private void enableSaveAction() {
+	private void enableActions() {
 
 		final boolean isNotMoved = _defaultStartIndex == _movedStartIndex && _defaultEndIndex == _movedEndIndex;
 
@@ -539,7 +583,7 @@ public class TourCatalogViewComparedTour extends TourChartViewPart implements IS
 				setRangeMarkers(xData);
 
 				_tourChart.updateChart(chartDataModel, true);
-				enableSaveAction();
+				enableActions();
 
 				fireChangeEvent(_defaultStartIndex, _defaultEndIndex, avgPulse, speed, true);
 			}
@@ -595,7 +639,7 @@ public class TourCatalogViewComparedTour extends TourChartViewPart implements IS
 
 		_isDataDirty = isDirty;
 
-		enableSaveAction();
+		enableActions();
 
 		_actionUndoChanges.setEnabled(isDirty);
 	}
@@ -709,7 +753,7 @@ public class TourCatalogViewComparedTour extends TourChartViewPart implements IS
 
 			updateChart();
 			enableSynchronization();
-			enableSaveAction();
+			enableActions();
 
 			/*
 			 * fire change event to update tour markers

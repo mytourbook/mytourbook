@@ -1335,9 +1335,13 @@ public class Messages extends NLS {
 
 	public static String		Tour_Database_CannotConnectToDerbyServer_Message;
 	public static String		Tour_Database_CannotConnectToDerbyServer_Title;
+
+	public static String	Tour_Database_CannotGetTour_Message;
 	public static String		Tour_Database_Dialog_ValidateFields_Message;
 	public static String		Tour_Database_Dialog_ValidateFields_Title;
 	public static String		Tour_Database_load_all_tours;
+	public static String	Tour_Database_PostUpdate_028_SetAvgPulse;
+
 	public static String		Tour_Database_PostUpdate011_SetTourCreateTime;
 	public static String		Tour_Database_PostUpdate020_ConvertIntToFloat;
 	public static String		Tour_Database_PostUpdate021_SetTourStartEndTime;
@@ -1693,6 +1697,8 @@ public class Messages extends NLS {
 	public static String		Year_Statistic_Combo_LastYears_Tooltip;
 	public static String		Year_Statistic_Combo_NumberOfYears_Tooltip;
 	public static String		Year_Statistic_Label_NumberOfYears;
+
+	public static String	Year_Statistic_Tooltip_Pulse;
 
 	static {
 		// initialize resource bundle

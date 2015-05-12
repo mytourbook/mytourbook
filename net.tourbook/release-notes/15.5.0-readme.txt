@@ -10,16 +10,16 @@ DOKU DOKU DOKU DOKU DOKU DOKU DOKU DOKU DOKU DOKU DOKU DOKU DOKU DOKU DOKU DOKU 
 DOKU DOKU DOKU DOKU DOKU DOKU DOKU DOKU DOKU DOKU DOKU DOKU DOKU DOKU DOKU DOKU DOKU DOKU DOKU DOKU DOKU 
 
 
-New 	
-===
-
-* Tour Catalog
-  - Show average pulse for each compared tour.
-
 
 Improvements
 ============
 
+* Tour Catalog + Year Statistic
+  - Show average pulse for each compared tour.
+
+* Compared Tour
+  - New actions to navigate to next/previous tour.  
+  
 * FIT Import
   - Support Bryton 210 .fit files. This data format contains duplicated time records which must be merged to have valid tour data.
     The manufacturer field contains the value "DEVELOPMENT" (255)

@@ -124,19 +124,29 @@ public class ChartDataYSerie extends ChartDataSerie {
 	 */
 //	private int						_disabledLineToNext;
 
-	public ChartDataYSerie(final ChartType chartType, final float[] valueSerie) {
+	/**
+	 * @param chartType
+	 * @param valueSerie
+	 * @param isIgnoreZero
+	 *            When <code>true</code> then 0 values will be ignored when computing min/max
+	 *            values.
+	 */
+	public ChartDataYSerie(final ChartType chartType, final float[] valueSerie, final boolean isIgnoreZero) {
+
 		_chartType = chartType;
-		setMinMaxValues(new float[][] { valueSerie });
+		setMinMaxValues(new float[][] { valueSerie }, isIgnoreZero);
 	}
 
 	public ChartDataYSerie(final ChartType chartType, final float[] lowValueSerie, final float[] highValueSerie) {
+
 		_chartType = chartType;
 		setMinMaxValues(new float[][] { lowValueSerie }, new float[][] { highValueSerie });
 	}
 
 	public ChartDataYSerie(final ChartType chartType, final float[][] valueSeries) {
+
 		_chartType = chartType;
-		setMinMaxValues(valueSeries);
+		setMinMaxValues(valueSeries, false);
 	}
 
 	public ChartDataYSerie(final ChartType chartType, final float[][] lowValueSeries, final float[][] highValueSeries) {
@@ -355,7 +365,14 @@ public class ChartDataYSerie extends ChartDataSerie {
 		_lineGaps = lineGaps;
 	}
 
-	private void setMinMaxValues(final float[][] valueSeries) {
+	/**
+	 * @param valueSeries
+	 * @param isIgnoreZero
+	 *            When <code>true</code> then zero values will be ignored.
+	 *            <p>
+	 *            <b>Is not yet implemented for all cases !</b>
+	 */
+	private void setMinMaxValues(final float[][] valueSeries, final boolean isIgnoreZero) {
 
 		if (valueSeries == null || valueSeries.length == 0 || valueSeries[0] == null || valueSeries[0].length == 0) {
 
@@ -368,8 +385,27 @@ public class ChartDataYSerie extends ChartDataSerie {
 
 			_highValuesFloat = valueSeries;
 
-			// set initial min/max value
-			_visibleMaxValue = _visibleMinValue = valueSeries[0][0];
+			/*
+			 * Set initial min/max value
+			 */
+			float firstValue = 0;
+			if (isIgnoreZero) {
+
+				// find first value which is not zero
+				outerValues: for (final float[] valuesOuter : valueSeries) {
+					for (final float valuesInner : valuesOuter) {
+						if (valuesInner != 0) {
+							firstValue = valuesInner;
+							break outerValues;
+						}
+					}
+				}
+
+			} else {
+
+				firstValue = valueSeries[0][0];
+			}
+			_visibleMaxValue = _visibleMinValue = firstValue;
 
 			if (_chartType == ChartType.LINE
 					|| _chartType == ChartType.LINE_WITH_BARS
@@ -387,9 +423,14 @@ public class ChartDataYSerie extends ChartDataSerie {
 
 					// get the min/max highValues for all data
 					for (final float[] valuesOuter : valueSeries) {
-						for (final float valuesInner : valuesOuter) {
-							_visibleMaxValue = (_visibleMaxValue >= valuesInner) ? _visibleMaxValue : valuesInner;
-							_visibleMinValue = (_visibleMinValue <= valuesInner) ? _visibleMinValue : valuesInner;
+						for (final float innerValue : valuesOuter) {
+
+							if (isIgnoreZero && innerValue == 0) {
+								continue;
+							}
+
+							_visibleMinValue = (_visibleMinValue <= innerValue) ? _visibleMinValue : innerValue;
+							_visibleMaxValue = (_visibleMaxValue >= innerValue) ? _visibleMaxValue : innerValue;
 						}
 					}
 					break;

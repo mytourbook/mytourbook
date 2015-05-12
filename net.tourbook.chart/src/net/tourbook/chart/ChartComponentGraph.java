@@ -4837,10 +4837,8 @@ public class ChartComponentGraph extends Canvas {
 
 			// draw the selection darker when the focus is set
 			if (_isFocusActive) {
-//				gc.setAlpha(0xb0);
 				gc.setAlpha(0xf0);
 			} else {
-//				gc.setAlpha(0x70);
 				gc.setAlpha(0xa0);
 			}
 
@@ -4848,32 +4846,45 @@ public class ChartComponentGraph extends Canvas {
 			gc.setForeground(colorDarkSelected);
 			gc.setBackground(colorBrightSelected);
 
-			gc.fillGradientRectangle(
-					barShapeSelected.x + 1,
-					barShapeSelected.y + 1,
-					barShapeSelected.width - 1,
-					barShapeSelected.height - 1,
-					true);
+			if (barShapeSelected.height < 0) {
 
-			// draw bar border
-			gc.setForeground(colorLineSelected);
-			gc.drawRoundRectangle(
-					barShapeSelected.x,
-					barShapeSelected.y,
-					barShapeSelected.width,
-					barShapeSelected.height,
-					4,
-					4);
+				// bar is below the x-axis, just draw a simple line
 
-			// draw bar thicker
-			gc.setBackground(colorDarkSelected);
-			gc.fillRoundRectangle(//
-					barBarSelected.x,
-					barBarSelected.y,
-					barBarSelected.width,
-					barBarSelected.height,
-					2,
-					2);
+				gc.setForeground(colorLineSelected);
+				gc.drawLine(//
+						barShapeSelected.x,
+						devYBottom + 1,
+						barShapeSelected.x + barShapeSelected.width,
+						devYBottom + 1);
+			} else {
+
+				gc.fillGradientRectangle(
+						barShapeSelected.x + 1,
+						barShapeSelected.y + 1,
+						barShapeSelected.width - 1,
+						barShapeSelected.height - 1,
+						true);
+
+				// draw bar border
+				gc.setForeground(colorLineSelected);
+				gc.drawRoundRectangle(
+						barShapeSelected.x,
+						barShapeSelected.y,
+						barShapeSelected.width,
+						barShapeSelected.height,
+						4,
+						4);
+
+				// draw bar thicker
+				gc.setBackground(colorDarkSelected);
+				gc.fillRoundRectangle(//
+						barBarSelected.x,
+						barBarSelected.y,
+						barBarSelected.width,
+						barBarSelected.height,
+						2,
+						2);
+			}
 
 			/*
 			 * draw a marker below the x-axis to make the selection more visible
