@@ -41,7 +41,9 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbench;
+import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
@@ -512,6 +514,7 @@ public class TourCompareManager {
 		return _comparedTourItems.toArray(new TVICompareResultComparedTour[_comparedTourItems.size()]);
 	}
 
+
 	/**
 	 * Get the tour data for all reference tours
 	 * 
@@ -526,6 +529,33 @@ public class TourCompareManager {
 			_refTourItems[tourIndex] = refTour;
 			_refToursData[tourIndex] = TourManager.getInstance().getTourData(refTour.tourId);
 		}
+	}
+
+	/**
+	 * @param isNextTour
+	 *            When <code>true</code> then navigate to the next tour, when <code>false</code>
+	 *            then navigate to the previous tour.
+	 * @return Returns the navigated tour or <code>null</code> when there is no next/previous tour.
+	 */
+	Object navigateTour(final boolean isNextTour) {
+
+		Object navigatedTour = null;
+
+		final IWorkbench workbench = PlatformUI.getWorkbench();
+		final IWorkbenchWindow window = workbench.getActiveWorkbenchWindow();
+		final IWorkbenchPage activePage = window.getActivePage();
+
+		final IViewPart yearStatView = activePage.findView(YearStatisticView.ID);
+		if (yearStatView instanceof YearStatisticView) {
+			navigatedTour = ((YearStatisticView) yearStatView).navigateTour(isNextTour);
+		}
+
+		final IViewPart comparedTours = activePage.findView(TourCompareResultView.ID);
+		if (comparedTours instanceof TourCompareResultView) {
+			navigatedTour = ((TourCompareResultView) comparedTours).navigateTour(isNextTour);
+		}
+
+		return navigatedTour;
 	}
 
 	private void showCompareResults() {

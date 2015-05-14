@@ -5684,6 +5684,21 @@ public class TourDatabase {
 	private void updateDbDesign_027_to_028_PostUpdate(final Connection conn, final IProgressMonitor monitor)
 			throws SQLException {
 
+		// get number of compared tours
+		final String sql = "SELECT COUNT(*) FROM " + TourDatabase.TABLE_TOUR_COMPARED; //$NON-NLS-1$
+
+		final PreparedStatement stmt = conn.prepareStatement(sql);
+		ResultSet result = stmt.executeQuery();
+
+		// get first result
+		result.next();
+
+		// get first value
+		final int numberOfComparedTours = result.getInt(1);
+		if (numberOfComparedTours == 0) {
+			return;
+		}
+
 		final PreparedStatement stmtSelect = conn.prepareStatement(//
 				//
 				"SELECT" //									//$NON-NLS-1$
@@ -5693,7 +5708,7 @@ public class TourDatabase {
 						+ " startIndex," // 				// 3 //$NON-NLS-1$
 						+ " endIndex" // 					// 4 //$NON-NLS-1$
 						//
-						+ " FROM " + TourDatabase.TABLE_TOUR_COMPARED //		//$NON-NLS-1$
+						+ " FROM " + TourDatabase.TABLE_TOUR_COMPARED //$NON-NLS-1$
 				);
 
 		final PreparedStatement stmtUpdate = conn.prepareStatement(//
@@ -5706,10 +5721,9 @@ public class TourDatabase {
 						//
 						+ " WHERE comparedId=?"); //		// 2 //$NON-NLS-1$
 
-		final ResultSet result = stmtSelect.executeQuery();
+		result = stmtSelect.executeQuery();
 
 		int compTourCounter = 0;
-		final int numberOfComparedTours = stmtSelect.getMaxRows();
 
 		while (result.next()) {
 

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -16,6 +16,8 @@
 package net.tourbook.ui.views.tourCatalog;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 
 import net.tourbook.common.util.TreeViewerItem;
@@ -25,16 +27,34 @@ import net.tourbook.common.util.TreeViewerItem;
  */
 public class TVICompareResultReferenceTour extends TVICompareResultItem {
 
-	String										label;
+	String												label;
 
-	long										tourId;
+	long												tourId;
 
-	RefTourItem									refTourItem;
+	RefTourItem											refTourItem;
 
 	/**
 	 * keeps the tourId's for all compared tours which have already been stored in the db
 	 */
-	private HashMap<Long, StoredComparedTour>	_storedComparedTours;
+	private HashMap<Long, StoredComparedTour>			_storedComparedTours;
+
+	private static Comparator<? super TreeViewerItem>	_compareResultComparator;
+	static {
+
+		_compareResultComparator = new Comparator<TreeViewerItem>() {
+
+			@Override
+			public int compare(final TreeViewerItem e1, final TreeViewerItem e2) {
+
+				final TVICompareResultComparedTour result1 = (TVICompareResultComparedTour) e1;
+				final TVICompareResultComparedTour result2 = (TVICompareResultComparedTour) e2;
+
+				return (int) (result1.minAltitudeDiff - result2.minAltitudeDiff);
+			}
+
+		};
+
+	}
 
 	public TVICompareResultReferenceTour(	final TVICompareResultRootItem parentItem,
 											final String label,
@@ -117,6 +137,10 @@ public class TVICompareResultReferenceTour extends TVICompareResultItem {
 			}
 		}
 
+		/*
+		 * Sort children that the next/prev navigation is working correctly.
+		 */
+		Collections.sort(children, _compareResultComparator);
 	}
 
 	@Override

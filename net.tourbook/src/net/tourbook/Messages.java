@@ -689,6 +689,10 @@ public class Messages extends NLS {
 	public static String		Image__MarkerFilter_WithoutGPS;
 	public static String		Image__MarkerFilter_WithoutGPS_Disabled;
 	public static String		Image__MyTourbook16;
+	public static String	Image__Navigate_Next;
+
+	public static String	Image__Navigate_Previous;
+
 	public static String		Image__options;
 	public static String		Image__Options_Bright;
 	public static String		Image__Photo_FilterNotSavedPhotos;
@@ -1624,6 +1628,10 @@ public class Messages extends NLS {
 	public static String		tourCatalog_wizard_Page_compared_tours_title;
 	public static String		tourCatalog_wizard_Page_reference_tour_title;
 	public static String		tourCatalog_wizard_Wizard_title;
+
+	public static String	TourCatalog_View_Action_NavigateNextTour;
+
+	public static String	TourCatalog_View_Action_NavigatePrevTour;
 
 	public static String		TourChart_Property_chart_type_bar;
 	public static String		TourChart_Property_chart_type_line;

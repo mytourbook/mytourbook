@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -83,7 +83,6 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
-import org.eclipse.jface.viewers.ViewerSorter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
@@ -130,8 +129,9 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 	private final NumberFormat					_nf1				= NumberFormat.getNumberInstance();
 	private final NumberFormat					_nf2				= NumberFormat.getNumberInstance();
 	{
-		_nf1.setMinimumFractionDigits(2);
-		_nf2.setMaximumFractionDigits(2);
+		_nf1.setMinimumFractionDigits(1);
+		_nf1.setMaximumFractionDigits(1);
+
 		_nf2.setMinimumFractionDigits(2);
 		_nf2.setMaximumFractionDigits(2);
 	}
@@ -333,7 +333,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 
 					_columnManager.saveState(_state);
 					_columnManager.clearColumns();
-					defineAllViewerColumns(_viewerContainer);
+					defineAllColumns(_viewerContainer);
 
 					recreateViewer(null);
 
@@ -365,29 +365,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 
 			@Override
 			public void selectionChanged(final IWorkbenchPart part, final ISelection selection) {
-
-				if (selection instanceof SelectionRemovedComparedTours) {
-
-					removeComparedToursFromViewer(selection);
-
-				} else if (selection instanceof SelectionPersistedCompareResults) {
-
-					final SelectionPersistedCompareResults selectionPersisted = (SelectionPersistedCompareResults) selection;
-
-					final ArrayList<TVICompareResultComparedTour> persistedCompareResults = selectionPersisted.persistedCompareResults;
-
-					if (persistedCompareResults.size() > 0) {
-
-						final TVICompareResultComparedTour comparedTourItem = persistedCompareResults.get(0);
-
-						// uncheck persisted tours
-						_tourViewer.setChecked(comparedTourItem, false);
-
-						// update changed item
-						_tourViewer.update(comparedTourItem, null);
-
-					}
-				}
+				onSelectionChanged(part, selection);
 			}
 		};
 
@@ -454,7 +432,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 
 		// define all columns for the viewer
 		_columnManager = new ColumnManager(this, _state);
-		defineAllViewerColumns(parent);
+		defineAllColumns(parent);
 
 		createUI(parent);
 
@@ -477,11 +455,11 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 		_viewerContainer = new Composite(parent, SWT.NONE);
 		GridLayoutFactory.fillDefaults().applyTo(_viewerContainer);
 		{
-			createUI10TourViewer(_viewerContainer);
+			createUI_10_TourViewer(_viewerContainer);
 		}
 	}
 
-	private Control createUI10TourViewer(final Composite parent) {
+	private Control createUI_10_TourViewer(final Composite parent) {
 
 		// tour tree
 		final Tree tree = new Tree(parent, SWT.H_SCROLL
@@ -502,22 +480,10 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 		_tourViewer.setContentProvider(new ResultContentProvider());
 		_tourViewer.setUseHashlookup(true);
 
-		_tourViewer.setSorter(new ViewerSorter() {
-			@Override
-			public int compare(final Viewer viewer, final Object obj1, final Object obj2) {
-
-				if (obj1 instanceof TVICompareResultComparedTour) {
-					return (int) (((TVICompareResultComparedTour) obj1).minAltitudeDiff - ((TVICompareResultComparedTour) obj2).minAltitudeDiff);
-				}
-
-				return 0;
-			}
-		});
-
 		_tourViewer.addSelectionChangedListener(new ISelectionChangedListener() {
 			@Override
 			public void selectionChanged(final SelectionChangedEvent event) {
-				onSelectionChanged(event);
+				onSelect(event);
 			}
 		});
 
@@ -551,8 +517,10 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 			public void checkStateChanged(final CheckStateChangedEvent event) {
 
 				if (event.getElement() instanceof TVICompareResultComparedTour) {
+
 					final TVICompareResultComparedTour compareResult = (TVICompareResultComparedTour) event
 							.getElement();
+
 					if (event.getChecked() && compareResult.isSaved()) {
 						/*
 						 * uncheck elements which are already stored for the reftour, it would be
@@ -570,7 +538,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 			}
 		});
 
-		createUI20ContextMenu();
+		createUI_20_ContextMenu();
 
 		// set tour info tooltip provider
 		_tourInfoToolTip = new TreeViewerTourInfoToolTip(_tourViewer);
@@ -581,7 +549,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 	/**
 	 * create the views context menu
 	 */
-	private void createUI20ContextMenu() {
+	private void createUI_20_ContextMenu() {
 
 		final MenuManager menuMgr = new MenuManager("#PopupMenu"); //$NON-NLS-1$
 		menuMgr.setRemoveAllWhenShown(true);
@@ -609,24 +577,24 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 		_columnManager.createHeaderContextMenu(tree, treeContextMenu);
 	}
 
-	private void defineAllViewerColumns(final Composite parent) {
+	private void defineAllColumns(final Composite parent) {
 
-		defineViewerColumnComparedTour();
-		defineViewerColumnDiff();
-		defineViewerColumnSpeedComputed();
-		defineViewerColumnSpeedSaved();
-		defineViewerColumnSpeedMoved();
-		defineViewerColumnDistance();
-		defineViewerColumnTimeInterval();
-		defineViewerColumnTourType();
-		defineViewerColumnTitle();
-		defineViewerColumnTags();
+		defineColumn_ComparedTour();
+		defineColumn_Diff();
+		defineColumn_SpeedComputed();
+		defineColumn_SpeedSaved();
+		defineColumn_SpeedMoved();
+		defineColumn_Distance();
+		defineColumn_TimeInterval();
+		defineColumn_TourType();
+		defineColumn_Title();
+		defineColumn_Tags();
 	}
 
 	/**
 	 * tree column: reference tour/date
 	 */
-	private void defineViewerColumnComparedTour() {
+	private void defineColumn_ComparedTour() {
 
 		final TreeColumnDefinition colDef = new TreeColumnDefinition(_columnManager, "comparedTour", SWT.LEAD); //$NON-NLS-1$
 
@@ -683,7 +651,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 	/**
 	 * column: altitude difference
 	 */
-	private void defineViewerColumnDiff() {
+	private void defineColumn_Diff() {
 
 		final TreeColumnDefinition colDef = new TreeColumnDefinition(_columnManager, "diff", SWT.TRAIL); //$NON-NLS-1$
 
@@ -714,7 +682,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 	/**
 	 * column: distance
 	 */
-	private void defineViewerColumnDistance() {
+	private void defineColumn_Distance() {
 
 		final TreeColumnDefinition colDef = TreeColumnFactory.DISTANCE.createColumn(_columnManager, _pc);
 		colDef.setLabelProvider(new CellLabelProvider() {
@@ -736,7 +704,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 	/**
 	 * column: speed computed
 	 */
-	private void defineViewerColumnSpeedComputed() {
+	private void defineColumn_SpeedComputed() {
 
 		final TreeColumnDefinition colDef = new TreeColumnDefinition(_columnManager, "speedComputed", SWT.TRAIL); //$NON-NLS-1$
 
@@ -754,7 +722,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 
 					final TVICompareResultComparedTour compareItem = (TVICompareResultComparedTour) element;
 
-					cell.setText(_nf1.format(compareItem.compareSpeed / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE));
+					cell.setText(_nf2.format(compareItem.compareSpeed / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE));
 					setCellColor(cell, element);
 				}
 			}
@@ -764,7 +732,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 	/**
 	 * column: speed moved
 	 */
-	private void defineViewerColumnSpeedMoved() {
+	private void defineColumn_SpeedMoved() {
 
 		final TreeColumnDefinition colDef = new TreeColumnDefinition(_columnManager, "speedMoved", SWT.TRAIL); //$NON-NLS-1$
 
@@ -781,7 +749,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 
 					final TVICompareResultComparedTour compareItem = (TVICompareResultComparedTour) element;
 
-					cell.setText(_nf1.format(compareItem.movedSpeed / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE));
+					cell.setText(_nf2.format(compareItem.movedSpeed / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE));
 					setCellColor(cell, element);
 				}
 			}
@@ -791,7 +759,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 	/**
 	 * column: speed saved
 	 */
-	private void defineViewerColumnSpeedSaved() {
+	private void defineColumn_SpeedSaved() {
 
 		final TreeColumnDefinition colDef = new TreeColumnDefinition(_columnManager, "speedSaved", SWT.TRAIL); //$NON-NLS-1$
 
@@ -808,7 +776,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 
 					final TVICompareResultComparedTour compareItem = (TVICompareResultComparedTour) element;
 
-					cell.setText(_nf1.format(compareItem.dbSpeed / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE));
+					cell.setText(_nf2.format(compareItem.dbSpeed / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE));
 					setCellColor(cell, element);
 				}
 			}
@@ -818,7 +786,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 	/**
 	 * column: tags
 	 */
-	private void defineViewerColumnTags() {
+	private void defineColumn_Tags() {
 
 		final TreeColumnDefinition colDef = TreeColumnFactory.TOUR_TAGS.createColumn(_columnManager, _pc);
 		colDef.setLabelProvider(new CellLabelProvider() {
@@ -848,7 +816,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 	/**
 	 * column: time interval
 	 */
-	private void defineViewerColumnTimeInterval() {
+	private void defineColumn_TimeInterval() {
 
 		final TreeColumnDefinition colDef = TreeColumnFactory.TIME_INTERVAL.createColumn(_columnManager, _pc);
 		colDef.setLabelProvider(new CellLabelProvider() {
@@ -867,7 +835,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 	/**
 	 * column: title
 	 */
-	private void defineViewerColumnTitle() {
+	private void defineColumn_Title() {
 
 		final TreeColumnDefinition colDef = TreeColumnFactory.TITLE.createColumn(_columnManager, _pc);
 		colDef.setLabelProvider(new CellLabelProvider() {
@@ -885,7 +853,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 	/**
 	 * column: tour type
 	 */
-	private void defineViewerColumnTourType() {
+	private void defineColumn_TourType() {
 
 		final TreeColumnDefinition colDef = TreeColumnFactory.TOUR_TYPE.createColumn(_columnManager, _pc);
 		colDef.setLabelProvider(new CellLabelProvider() {
@@ -1120,6 +1088,36 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 		}
 	}
 
+	private TVICompareResultComparedTour getSelectedComparedTour() {
+
+		final TreeSelection selection = (TreeSelection) _tourViewer.getSelection();
+		for (final Iterator<?> iterator = selection.iterator(); iterator.hasNext();) {
+
+			final Object treeItem = iterator.next();
+			if (treeItem instanceof TVICompareResultComparedTour) {
+
+				return (TVICompareResultComparedTour) treeItem;
+			}
+		}
+
+		return null;
+	}
+
+	private TVICompareResultReferenceTour getSelectedRefTour() {
+
+		final TreeSelection selection = (TreeSelection) _tourViewer.getSelection();
+		for (final Iterator<?> iterator = selection.iterator(); iterator.hasNext();) {
+
+			final Object treeItem = iterator.next();
+			if (treeItem instanceof TVICompareResultReferenceTour) {
+
+				return (TVICompareResultReferenceTour) treeItem;
+			}
+		}
+
+		return null;
+	}
+
 	@Override
 	public ArrayList<TourData> getSelectedTours() {
 
@@ -1155,7 +1153,101 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 		return _tourViewer;
 	}
 
-	private void onSelectionChanged(final SelectionChangedEvent event) {
+	TVICompareResultComparedTour navigateTour(final boolean isNextTour) {
+
+		final TVICompareResultComparedTour selectedCompareResult = getSelectedComparedTour();
+		if (selectedCompareResult != null) {
+
+			// compared tour is selected
+
+			final TreeViewerItem parentItem = selectedCompareResult.getParentItem();
+			if (parentItem instanceof TVICompareResultReferenceTour) {
+
+				final TVICompareResultReferenceTour refTourItem = (TVICompareResultReferenceTour) parentItem;
+
+				final ArrayList<TreeViewerItem> children = refTourItem.getChildren();
+				for (int childIndex = 0; childIndex < children.size(); childIndex++) {
+
+					final TreeViewerItem refTourChild = children.get(childIndex);
+					if (refTourChild == selectedCompareResult) {
+
+						if (isNextTour) {
+
+							// navigate next
+
+							if (childIndex < children.size() - 1) {
+
+								// next tour is available
+
+								final TreeViewerItem nextRefTourChild = children.get(childIndex + 1);
+								if (nextRefTourChild instanceof TVICompareResultComparedTour) {
+									return (TVICompareResultComparedTour) nextRefTourChild;
+								}
+
+							} else {
+
+								// return first tour
+
+								final TreeViewerItem nextRefTourChild = children.get(0);
+								if (nextRefTourChild instanceof TVICompareResultComparedTour) {
+									return (TVICompareResultComparedTour) nextRefTourChild;
+								}
+							}
+
+						} else {
+
+							// navigate previous
+
+							if (childIndex > 0) {
+
+								// previous tour is available
+
+								final TreeViewerItem nextChild = children.get(childIndex - 1);
+								if (nextChild instanceof TVICompareResultComparedTour) {
+									return (TVICompareResultComparedTour) nextChild;
+								}
+
+							} else {
+
+								// return last tour
+
+								final TreeViewerItem prevChild = children.get(children.size() - 1);
+								if (prevChild instanceof TVICompareResultComparedTour) {
+									return (TVICompareResultComparedTour) prevChild;
+								}
+							}
+						}
+					}
+				}
+			}
+
+		} else {
+
+			final TVICompareResultReferenceTour selectedRefTour = getSelectedRefTour();
+			if (selectedRefTour != null) {
+
+				// ref tour is selected
+
+				final ArrayList<TreeViewerItem> refChildren = selectedRefTour.getFetchedChildren();
+				if (refChildren.size() > 0) {
+
+					// navigate to the first child and ignore direction
+
+					_tourViewer.expandToLevel(selectedRefTour, 1);
+
+					// return first tour
+					final TreeViewerItem nextRefTourChild = refChildren.get(0);
+					if (nextRefTourChild instanceof TVICompareResultComparedTour) {
+						return (TVICompareResultComparedTour) nextRefTourChild;
+					}
+				}
+			}
+		}
+
+		return null;
+	}
+
+	private void onSelect(final SelectionChangedEvent event) {
 
 		final IStructuredSelection selection = (IStructuredSelection) event.getSelection();
 
@@ -1175,6 +1267,45 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 		}
 	}
 
+	private void onSelectionChanged(final IWorkbenchPart part, final ISelection selection) {
+
+		if (part == TourCompareResultView.this) {
+			return;
+		}
+
+		if (selection instanceof StructuredSelection) {
+
+			final Object firstElement = ((StructuredSelection) selection).getFirstElement();
+
+			if (firstElement instanceof TVICompareResultComparedTour) {
+
+				_tourViewer.setSelection(selection, true);
+			}
+
+		} else if (selection instanceof SelectionRemovedComparedTours) {
+
+			removeComparedToursFromViewer(selection);
+
+		} else if (selection instanceof SelectionPersistedCompareResults) {
+
+			final SelectionPersistedCompareResults selectionPersisted = (SelectionPersistedCompareResults) selection;
+
+			final ArrayList<TVICompareResultComparedTour> persistedCompareResults = selectionPersisted.persistedCompareResults;
+
+			if (persistedCompareResults.size() > 0) {
+
+				final TVICompareResultComparedTour comparedTourItem = persistedCompareResults.get(0);
+
+				// uncheck persisted tours
+				_tourViewer.setChecked(comparedTourItem, false);
+
+				// update changed item
+				_tourViewer.update(comparedTourItem, null);
+
+			}
+		}
+	}
+
 	@Override
 	public ColumnViewer recreateViewer(final ColumnViewer columnViewer) {
 
@@ -1185,7 +1316,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 
 			_tourViewer.getTree().dispose();
 
-			createUI10TourViewer(_viewerContainer);
+			createUI_10_TourViewer(_viewerContainer);
 			_viewerContainer.layout();
 
 			_tourViewer.setInput(_rootItem = new TVICompareResultRootItem());
@@ -1238,10 +1369,11 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 		}
 
 		if (removedComparedTours.size() > 0) {
-			// this viewer is also updated by the remove selection
-			_postSelectionProvider.setSelection(selectionRemovedCompareTours);
-		}
 
+			_postSelectionProvider.setSelection(selectionRemovedCompareTours);
+
+			removeComparedToursFromViewer(selectionRemovedCompareTours);
+		}
 	}
 
 	private void removeComparedToursFromViewer(final ISelection selection) {

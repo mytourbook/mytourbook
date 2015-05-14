@@ -17,8 +17,10 @@ Improvements
 * Tour Catalog + Year Statistic
   - Show average pulse for each compared tour.
 
+  
 * Compared Tour
-  - New actions to navigate to next/previous tour.  
+  - New actions to navigate to next/previous tour which is retrieved from the "Year Statistic" or the "Compare Result" view.
+  
   
 * FIT Import
   - Support Bryton 210 .fit files. This data format contains duplicated time records which must be merged to have valid tour data.
@@ -26,6 +28,7 @@ Improvements
   - Support FR70 .fit files. 
     This data format can contain 0 sessions but the data are still valid.
   - Import fractional cadence.
+	 
 	 
 * GPX Import
   - Support import of .gpx files which are not xml well formed, 
@@ -35,9 +38,11 @@ Improvements
   - Convert waypoints into tour marker.
   - Import all tour marker fields.
   
+  
 * GPX Export
   - Export url and url text for tour marker/waypoints. 
   - Export all tour/marker fields which allows to exactly recreate it when imported.
+ 
  
 * Tour Editor
   - Calories can always be edited, removed restriction.

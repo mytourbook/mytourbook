@@ -136,7 +136,7 @@ public class TourCatalogViewComparedTour extends TourChartViewPart implements IS
 
 			setToolTipText(Messages.TourCatalog_View_Action_NavigateNextTour);
 
-			setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__save));
+			setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__Navigate_Previous));
 			setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__save_disabled));
 		}
 
@@ -154,7 +154,7 @@ public class TourCatalogViewComparedTour extends TourChartViewPart implements IS
 
 			setToolTipText(Messages.TourCatalog_View_Action_NavigatePrevTour);
 
-			setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__save));
+			setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__Navigate_Next));
 			setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__save_disabled));
 		}
 
@@ -205,7 +205,27 @@ public class TourCatalogViewComparedTour extends TourChartViewPart implements IS
 	}
 
 	private void actionNavigateTour(final boolean isNextTour) {
-		
+
+		boolean isNavigated = false;
+
+		final Object navigatedTour = TourCompareManager.getInstance().navigateTour(isNextTour);
+
+		if (navigatedTour instanceof TVICatalogComparedTour) {
+
+			isNavigated = true;
+			updateTourChart((TVICatalogComparedTour) navigatedTour);
+
+		} else if (navigatedTour instanceof TVICompareResultComparedTour) {
+
+			isNavigated = true;
+			updateTourChart((TVICompareResultComparedTour) navigatedTour);
+		}
+
+		if (isNavigated) {
+
+			// fire selection
+			_postSelectionProvider.setSelection(new StructuredSelection(navigatedTour));
+		}
 	}
 
 	private void addRefTourPropertyListener() {
@@ -249,6 +269,8 @@ public class TourCatalogViewComparedTour extends TourChartViewPart implements IS
 
 		final IToolBarManager tbm = _tourChart.getToolBarManager();
 
+		tbm.add(_actionNavigatePrevTour);
+		tbm.add(_actionNavigateNextTour);
 		tbm.add(_actionSaveComparedTour);
 		tbm.add(_actionUndoChanges);
 
@@ -735,16 +757,9 @@ public class TourCatalogViewComparedTour extends TourChartViewPart implements IS
 	 */
 	private boolean updateTourChart() {
 
-		// check if the compared tour is displayed
-//		if (fVisibleComparedTourId == fCTTourId) {
-//			return false;
-//		}
-
 		final TourCompareConfig tourCompareConfig = ReferenceTourManager.getInstance().getTourCompareConfig(_ctRefId);
 
 		if (tourCompareConfig != null) {
-
-//			fVisibleComparedTourId = fCTTourId;
 
 			_tourChartConfig = tourCompareConfig.getCompTourChartConfig();
 

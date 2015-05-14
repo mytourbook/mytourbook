@@ -145,12 +145,15 @@ public class YearStatisticView extends ViewPart {
 	 */
 	private StructuredSelection					_currentSelection;
 
-	private ITourEventListener					_compareTourPropertyListener;
+	private ITourEventListener					_tourEventListener;
 
 	private boolean								_isSynchMaxValue;
 
 	private int									_numberOfYears;
 
+	/**
+	 * Contains the index in {@link #_allTours} for the currently selected tour.
+	 */
 	private int									_selectedTourIndex;
 
 	/*
@@ -176,27 +179,6 @@ public class YearStatisticView extends ViewPart {
 	void actionSynchScale(final boolean isSynchMaxValue) {
 		_isSynchMaxValue = isSynchMaxValue;
 		updateUI_YearChart(false);
-	}
-
-	private void addCompareTourPropertyListener() {
-
-		_compareTourPropertyListener = new ITourEventListener() {
-			@Override
-			public void tourChanged(final IWorkbenchPart part, final TourEventId propertyId, final Object propertyData) {
-
-				if (propertyId == TourEventId.COMPARE_TOUR_CHANGED
-						&& propertyData instanceof TourPropertyCompareTourChanged) {
-
-					final TourPropertyCompareTourChanged compareTourProperty = (TourPropertyCompareTourChanged) propertyData;
-
-					if (compareTourProperty.isDataSaved) {
-						updateUI_YearChart(false);
-					}
-				}
-			}
-		};
-
-		TourManager.getInstance().addTourEventListener(_compareTourPropertyListener);
 	}
 
 	private void addPartListener() {
@@ -249,7 +231,7 @@ public class YearStatisticView extends ViewPart {
 
 					// recreate the chart
 					_yearChart.dispose();
-					createUI14Chart(_pageChart);
+					createUI_30_Chart(_pageChart);
 
 					_pageChart.layout();
 
@@ -275,6 +257,27 @@ public class YearStatisticView extends ViewPart {
 			}
 		};
 		getSite().getPage().addPostSelectionListener(_postSelectionListener);
+	}
+
+	private void addTourEventListener() {
+
+		_tourEventListener = new ITourEventListener() {
+			@Override
+			public void tourChanged(final IWorkbenchPart part, final TourEventId propertyId, final Object propertyData) {
+
+				if (propertyId == TourEventId.COMPARE_TOUR_CHANGED
+						&& propertyData instanceof TourPropertyCompareTourChanged) {
+
+					final TourPropertyCompareTourChanged compareTourProperty = (TourPropertyCompareTourChanged) propertyData;
+
+					if (compareTourProperty.isDataSaved) {
+						updateUI_YearChart(false);
+					}
+				}
+			}
+		};
+
+		TourManager.getInstance().addTourEventListener(_tourEventListener);
 	}
 
 	/**
@@ -377,7 +380,7 @@ public class YearStatisticView extends ViewPart {
 		createUI(parent);
 
 		addSelectionListener();
-		addCompareTourPropertyListener();
+		addTourEventListener();
 		addPrefListener();
 		addPartListener();
 
@@ -436,24 +439,24 @@ public class YearStatisticView extends ViewPart {
 		_pageNoChart = new Label(_pageBook, SWT.NONE);
 		_pageNoChart.setText(Messages.tourCatalog_view_label_year_not_selected);
 
-		createUI10PageYearChart();
+		createUI_10_PageYearChart();
 	}
 
-	private void createUI10PageYearChart() {
+	private void createUI_10_PageYearChart() {
 
 		_pageChart = new Composite(_pageBook, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, true).applyTo(_pageChart);
 		GridLayoutFactory.fillDefaults().spacing(0, 0).numColumns(1).applyTo(_pageChart);
 		{
-			createUI12Toolbar(_pageChart);
-			createUI14Chart(_pageChart);
+			createUI_20_Toolbar(_pageChart);
+			createUI_30_Chart(_pageChart);
 		}
 	}
 
 	/**
 	 * toolbar
 	 */
-	private void createUI12Toolbar(final Composite parent) {
+	private void createUI_20_Toolbar(final Composite parent) {
 
 		final PixelConverter pc = new PixelConverter(parent);
 
@@ -518,7 +521,7 @@ public class YearStatisticView extends ViewPart {
 	/**
 	 * year chart
 	 */
-	private void createUI14Chart(final Composite parent) {
+	private void createUI_30_Chart(final Composite parent) {
 
 		_yearChart = new Chart(parent, SWT.BORDER);
 
@@ -564,7 +567,7 @@ public class YearStatisticView extends ViewPart {
 
 		getSite().getPage().removePostSelectionListener(_postSelectionListener);
 		getViewSite().getPage().removePartListener(_partListener);
-		TourManager.getInstance().removeTourEventListener(_compareTourPropertyListener);
+		TourManager.getInstance().removeTourEventListener(_tourEventListener);
 
 		_prefStore.removePropertyChangeListener(_prefChangeListener);
 
@@ -614,6 +617,45 @@ public class YearStatisticView extends ViewPart {
 	 */
 	void initYearNumbers() {
 
+	}
+
+	TVICatalogComparedTour navigateTour(final boolean isNextTour) {
+
+		final int numberOfTours = _allTours.size();
+
+		if (numberOfTours < 2) {
+			return null;
+		}
+
+		int navIndex;
+		if (isNextTour) {
+
+			// get nexttour
+
+			if (_selectedTourIndex >= numberOfTours - 1) {
+
+				navIndex = 0;
+
+			} else {
+
+				navIndex = _selectedTourIndex + 1;
+			}
+
+		} else {
+
+			// get previous tour
+
+			if (_selectedTourIndex <= 0) {
+
+				navIndex = numberOfTours - 1;
+
+			} else {
+
+				navIndex = _selectedTourIndex - 1;
+			}
+		}
+
+		return _allTours.get(navIndex);
 	}
 
 	private void onSelectionChanged(final ISelection selection) {

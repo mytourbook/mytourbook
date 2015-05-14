@@ -108,10 +108,8 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 	private static final String			MEMENTO_TOUR_CATALOG_ACTIVE_REF_ID	= "tour.catalog.active.ref.id";					//$NON-NLS-1$
 	private static final String			MEMENTO_TOUR_CATALOG_LINK_TOUR		= "tour.catalog.link.tour";						//$NON-NLS-1$
 
-	private final IPreferenceStore		_prefStore							= TourbookPlugin.getDefault() //
-																					.getPreferenceStore();
-	private final IDialogSettings		_state								= TourbookPlugin.getDefault() //
-																					.getDialogSettingsSection(ID);
+	private final IPreferenceStore		_prefStore							= TourbookPlugin.getPrefStore();
+	private final IDialogSettings		_state								= TourbookPlugin.getState(ID);
 
 	private TVICatalogRootItem			_rootItem;
 
@@ -125,7 +123,6 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 
 	private ISelectionListener			_postSelectionListener;
 	private IPartListener2				_partListener;
-	private ITourEventListener			_compareTourPropertyListener;
 	private IPropertyChangeListener		_prefChangeListener;
 	private ITourEventListener			_tourEventListener;
 
@@ -249,50 +246,6 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 				}
 			}
 		}
-	}
-
-	private void addCompareTourPropertyListener() {
-
-		_compareTourPropertyListener = new ITourEventListener() {
-			@Override
-			public void tourChanged(final IWorkbenchPart part, final TourEventId propertyId, final Object propertyData) {
-
-				if (propertyId == TourEventId.COMPARE_TOUR_CHANGED
-						&& propertyData instanceof TourPropertyCompareTourChanged) {
-
-					final TourPropertyCompareTourChanged compareTourProperty = (TourPropertyCompareTourChanged) propertyData;
-
-					// check if the compared tour was saved in the database
-					if (compareTourProperty.isDataSaved) {
-
-						final ArrayList<Long> compareIds = new ArrayList<Long>();
-						compareIds.add(compareTourProperty.compareId);
-
-						// find the compared tour in the viewer
-						final ArrayList<TVICatalogComparedTour> comparedTours = new ArrayList<TVICatalogComparedTour>();
-
-						getComparedTours(comparedTours, _rootItem, compareIds);
-
-						if (comparedTours.size() > 0) {
-
-							final TVICatalogComparedTour comparedTour = comparedTours.get(0);
-
-							// update entity
-							comparedTour.setStartIndex(compareTourProperty.startIndex);
-							comparedTour.setEndIndex(compareTourProperty.endIndex);
-
-							comparedTour.setAvgPulse(compareTourProperty.avgPulse);
-							comparedTour.setTourSpeed(compareTourProperty.speed);
-
-							// update the viewer
-							_tourViewer.update(comparedTour, null);
-						}
-					}
-				}
-			}
-		};
-
-		TourManager.getInstance().addTourEventListener(_compareTourPropertyListener);
 	}
 
 	private void addPartListener() {
@@ -466,7 +419,38 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 					return;
 				}
 
-				if (eventId == TourEventId.TOUR_CHANGED && eventData instanceof TourEvent) {
+				if (eventId == TourEventId.COMPARE_TOUR_CHANGED && eventData instanceof TourPropertyCompareTourChanged) {
+
+					final TourPropertyCompareTourChanged compareTourProperty = (TourPropertyCompareTourChanged) eventData;
+
+					// check if the compared tour was saved in the database
+					if (compareTourProperty.isDataSaved) {
+
+						final ArrayList<Long> compareIds = new ArrayList<Long>();
+						compareIds.add(compareTourProperty.compareId);
+
+						// find the compared tour in the viewer
+						final ArrayList<TVICatalogComparedTour> comparedTours = new ArrayList<TVICatalogComparedTour>();
+
+						getComparedTours(comparedTours, _rootItem, compareIds);
+
+						if (comparedTours.size() > 0) {
+
+							final TVICatalogComparedTour comparedTour = comparedTours.get(0);
+
+							// update entity
+							comparedTour.setStartIndex(compareTourProperty.startIndex);
+							comparedTour.setEndIndex(compareTourProperty.endIndex);
+
+							comparedTour.setAvgPulse(compareTourProperty.avgPulse);
+							comparedTour.setTourSpeed(compareTourProperty.speed);
+
+							// update the viewer
+							_tourViewer.update(comparedTour, null);
+						}
+					}
+
+				} else if (eventId == TourEventId.TOUR_CHANGED && eventData instanceof TourEvent) {
 
 					// get a clone of the modified tours because the tours are removed from the list
 					final ArrayList<TourData> modifiedTours = ((TourEvent) eventData).getModifiedTours();
@@ -481,6 +465,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 				}
 			}
 		};
+
 		TourManager.getInstance().addTourEventListener(_tourEventListener);
 	}
 
@@ -521,7 +506,6 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 
 		addPartListener();
 		addPostSelectionListener();
-		addCompareTourPropertyListener();
 		addTourEventListener();
 		addPrefListener();
 
@@ -544,11 +528,11 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 		_viewerContainer = new Composite(parent, SWT.NONE);
 		GridLayoutFactory.fillDefaults().applyTo(_viewerContainer);
 		{
-			createUI10TourViewer(_viewerContainer);
+			createUI_10_TourViewer(_viewerContainer);
 		}
 	}
 
-	private void createUI10TourViewer(final Composite parent) {
+	private void createUI_10_TourViewer(final Composite parent) {
 
 		// tour tree
 		final Tree tree = new Tree(parent, SWT.H_SCROLL | SWT.V_SCROLL | SWT.FLAT | SWT.MULTI | SWT.FULL_SELECTION);
@@ -600,7 +584,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 			}
 		});
 
-		createUI20ContextMenu();
+		createUI_20_ContextMenu();
 
 		// set tour info tooltip provider
 		_tourInfoToolTip = new TreeViewerTourInfoToolTip(_tourViewer);
@@ -609,7 +593,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 	/**
 	 * create the views context menu
 	 */
-	private void createUI20ContextMenu() {
+	private void createUI_20_ContextMenu() {
 
 		final Tree tree = (Tree) _tourViewer.getControl();
 
@@ -862,7 +846,6 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 		getSite().getPage().removePostSelectionListener(_postSelectionListener);
 		getViewSite().getPage().removePartListener(_partListener);
 
-		TourManager.getInstance().removeTourEventListener(_compareTourPropertyListener);
 		TourManager.getInstance().removeTourEventListener(_tourEventListener);
 
 		_prefStore.removePropertyChangeListener(_prefChangeListener);
@@ -1009,6 +992,69 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 		return _columnManager;
 	}
 
+	/**
+	 * @return Returns the first ref tour which is selected or <code>null</code> when a ref tour is
+	 *         not selected.
+	 */
+	private TVICatalogRefTourItem getFirstSelectedRefTour() {
+
+		final IStructuredSelection selectedTours = ((IStructuredSelection) _tourViewer.getSelection());
+
+		// loop: all selected items
+		for (final Iterator<?> iter = selectedTours.iterator(); iter.hasNext();) {
+
+			final Object treeItem = iter.next();
+			if (treeItem instanceof TVICatalogRefTourItem) {
+
+				return ((TVICatalogRefTourItem) treeItem);
+			}
+		}
+
+		return null;
+	}
+
+	/**
+	 * @return Returns the first tour which is selected or <code>null</code> when a tour is not
+	 *         selected.
+	 */
+	private TVICatalogComparedTour getFirstSelectedTour() {
+
+		final IStructuredSelection selectedTours = ((IStructuredSelection) _tourViewer.getSelection());
+
+		// loop: all selected items
+		for (final Iterator<?> iter = selectedTours.iterator(); iter.hasNext();) {
+
+			final Object treeItem = iter.next();
+			if (treeItem instanceof TVICatalogComparedTour) {
+
+				return ((TVICatalogComparedTour) treeItem);
+			}
+		}
+
+		return null;
+	}
+
+	/**
+	 * @return Returns the first year which is selected or <code>null</code> when a year is not
+	 *         selected.
+	 */
+	private TVICatalogYearItem getFirstSelectedYear() {
+
+		final IStructuredSelection selectedTours = ((IStructuredSelection) _tourViewer.getSelection());
+
+		// loop: all selected items
+		for (final Iterator<?> iter = selectedTours.iterator(); iter.hasNext();) {
+
+			final Object treeItem = iter.next();
+			if (treeItem instanceof TVICatalogYearItem) {
+
+				return ((TVICatalogYearItem) treeItem);
+			}
+		}
+
+		return null;
+	}
+
 	@Override
 	public ArrayList<Long> getSelectedReferenceTours() {
 
@@ -1137,7 +1183,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 		{
 			_tourViewer.getTree().dispose();
 
-			createUI10TourViewer(_viewerContainer);
+			createUI_10_TourViewer(_viewerContainer);
 			_viewerContainer.layout();
 
 			_tourViewer.setInput(_rootItem = new TVICatalogRootItem(this));
