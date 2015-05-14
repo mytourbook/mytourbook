@@ -65,9 +65,9 @@ public class DPPoint {
 
 	@Override
 	public String toString() {
-		return "DPPoint " //
-				+ String.format("i:%-5d   x=%-5.0f   y=%-5.1f", serieIndex, x, y)
-				+ "\n";
+		return "DPPoint " // //$NON-NLS-1$
+				+ String.format("i:%-5d   x=%-5.0f   y=%-5.1f", serieIndex, x, y) //$NON-NLS-1$
+				+ "\n"; //$NON-NLS-1$
 	}
 
 }

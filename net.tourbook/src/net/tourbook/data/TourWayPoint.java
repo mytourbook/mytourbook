@@ -424,19 +424,19 @@ public class TourWayPoint implements Cloneable, Comparable<Object>, IHoveredArea
 
 	@Override
 	public String toString() {
-		return "TourWayPoint ["
+		return "TourWayPoint [" //$NON-NLS-1$
 
-				+ ("time=" + time + ", ")
-				+ ("wayPointId=" + wayPointId + ", ")
-				+ ("longitude=" + longitude + ", ")
-				+ ("latitude=" + latitude + ", ")
-				+ ("altitude=" + altitude + ", ")
-				+ ("name=" + name + ", ")
-				+ ("description=" + description + ", ")
-				+ ("comment=" + comment + ", ")
-				+ ("symbol=" + symbol + ", ")
-				+ ("category=" + category)
+				+ ("time=" + time + ", ") //$NON-NLS-1$ //$NON-NLS-2$
+				+ ("wayPointId=" + wayPointId + ", ") //$NON-NLS-1$ //$NON-NLS-2$
+				+ ("longitude=" + longitude + ", ") //$NON-NLS-1$ //$NON-NLS-2$
+				+ ("latitude=" + latitude + ", ") //$NON-NLS-1$ //$NON-NLS-2$
+				+ ("altitude=" + altitude + ", ") //$NON-NLS-1$ //$NON-NLS-2$
+				+ ("name=" + name + ", ") //$NON-NLS-1$ //$NON-NLS-2$
+				+ ("description=" + description + ", ") //$NON-NLS-1$ //$NON-NLS-2$
+				+ ("comment=" + comment + ", ") //$NON-NLS-1$ //$NON-NLS-2$
+				+ ("symbol=" + symbol + ", ") //$NON-NLS-1$ //$NON-NLS-2$
+				+ ("category=" + category) //$NON-NLS-1$
 
-				+ "]\n";
+				+ "]\n"; //$NON-NLS-1$
 	}
 }

@@ -107,7 +107,6 @@ public class Messages extends NLS {
 	public static String		dialog_export_dir_dialog_text;
 	public static String		dialog_export_file_dialog_text;
 	public static String		dialog_export_group_exportFileName;
-	public static String		dialog_export_group_options;
 	public static String		dialog_export_label_DefaultFileName;
 	public static String		dialog_export_label_exportFilePath;
 	public static String		dialog_export_label_fileName;
@@ -137,11 +136,8 @@ public class Messages extends NLS {
 	public static String		Dialog_DoubleClickAction_NoAction_Title;
 
 	public static String		Dialog_Export_Checkbox_Description;
-
-	public static String	Dialog_Export_Checkbox_TourFields;
-
-	public static String	Dialog_Export_Checkbox_TourFields_Tooltip;
-
+	public static String		Dialog_Export_Checkbox_TourFields;
+	public static String		Dialog_Export_Checkbox_TourFields_Tooltip;
 	public static String		Dialog_Export_Error_CourseNameIsInvalid;
 	public static String		Dialog_Export_Group_How;
 	public static String		Dialog_Export_Group_How_Tooltip;
@@ -472,7 +468,6 @@ public class Messages extends NLS {
 	public static String		Db_Field_TourData_Title;
 	public static String		Db_Field_TourData_TourImportFilePath;
 	public static String		Db_Field_TourData_Weather;
-
 	public static String		Db_Field_TourMarker_UrlAddress;
 	public static String		Db_Field_TourMarker_UrlText;
 
@@ -689,10 +684,8 @@ public class Messages extends NLS {
 	public static String		Image__MarkerFilter_WithoutGPS;
 	public static String		Image__MarkerFilter_WithoutGPS_Disabled;
 	public static String		Image__MyTourbook16;
-	public static String	Image__Navigate_Next;
-
-	public static String	Image__Navigate_Previous;
-
+	public static String		Image__Navigate_Next;
+	public static String		Image__Navigate_Previous;
 	public static String		Image__options;
 	public static String		Image__Options_Bright;
 	public static String		Image__Photo_FilterNotSavedPhotos;
@@ -1339,13 +1332,11 @@ public class Messages extends NLS {
 
 	public static String		Tour_Database_CannotConnectToDerbyServer_Message;
 	public static String		Tour_Database_CannotConnectToDerbyServer_Title;
-
-	public static String	Tour_Database_CannotGetTour_Message;
+	public static String		Tour_Database_CannotGetTour_Message;
 	public static String		Tour_Database_Dialog_ValidateFields_Message;
 	public static String		Tour_Database_Dialog_ValidateFields_Title;
 	public static String		Tour_Database_load_all_tours;
-	public static String	Tour_Database_PostUpdate_028_SetAvgPulse;
-
+	public static String		Tour_Database_PostUpdate_028_SetAvgPulse;
 	public static String		Tour_Database_PostUpdate011_SetTourCreateTime;
 	public static String		Tour_Database_PostUpdate020_ConvertIntToFloat;
 	public static String		Tour_Database_PostUpdate021_SetTourStartEndTime;
@@ -1505,7 +1496,6 @@ public class Messages extends NLS {
 	public static String		tour_editor_label_wind_speed_Tooltip;
 	public static String		tour_editor_label_clouds;
 	public static String		tour_editor_label_clouds_Tooltip;
-	public static String		tour_editor_label_DistanceSensor;
 	public static String		tour_editor_label_temperature;
 	public static String		tour_editor_label_temperature_Tooltip;
 	public static String		tour_editor_label_rest_pulse;
@@ -1629,9 +1619,8 @@ public class Messages extends NLS {
 	public static String		tourCatalog_wizard_Page_reference_tour_title;
 	public static String		tourCatalog_wizard_Wizard_title;
 
-	public static String	TourCatalog_View_Action_NavigateNextTour;
-
-	public static String	TourCatalog_View_Action_NavigatePrevTour;
+	public static String		TourCatalog_View_Action_NavigateNextTour;
+	public static String		TourCatalog_View_Action_NavigatePrevTour;
 
 	public static String		TourChart_Property_chart_type_bar;
 	public static String		TourChart_Property_chart_type_line;
@@ -1705,8 +1694,7 @@ public class Messages extends NLS {
 	public static String		Year_Statistic_Combo_LastYears_Tooltip;
 	public static String		Year_Statistic_Combo_NumberOfYears_Tooltip;
 	public static String		Year_Statistic_Label_NumberOfYears;
-
-	public static String	Year_Statistic_Tooltip_Pulse;
+	public static String		Year_Statistic_Tooltip_Pulse;
 
 	static {
 		// initialize resource bundle

@@ -258,12 +258,12 @@ public class ChartXSlider {
 
 	@Override
 	public String toString() {
-		return "ChartXSlider ["
-				+ ("_positionRatio=" + _positionRatio + " ")
-				+ ("_valueIndex=" + _valueIndex + " ")
-				+ ("_xxDevSliderLinePos=" + _xxDevSliderLinePos + " ")
-				+ ("sliderType=" + sliderType + " ")
-				+ "]";
+		return "ChartXSlider [" //$NON-NLS-1$
+				+ ("_positionRatio=" + _positionRatio + " ") //$NON-NLS-1$ //$NON-NLS-2$
+				+ ("_valueIndex=" + _valueIndex + " ") //$NON-NLS-1$ //$NON-NLS-2$
+				+ ("_xxDevSliderLinePos=" + _xxDevSliderLinePos + " ") //$NON-NLS-1$ //$NON-NLS-2$
+				+ ("sliderType=" + sliderType + " ") //$NON-NLS-1$ //$NON-NLS-2$
+				+ "]"; //$NON-NLS-1$
 	}
 
 }
