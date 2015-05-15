@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -28,40 +28,47 @@ import net.tourbook.ui.UI;
 
 public abstract class TVITagViewItem extends TreeViewerItem {
 
-	static final String	SQL_SUM_COLUMNS			= UI.EMPTY_STRING //
-														+ "SUM(tourDistance)," // 		0	//$NON-NLS-1$
-														+ "SUM(tourRecordingTime)," //	1	//$NON-NLS-1$
-														+ "SUM(tourDrivingTime)," //	2	//$NON-NLS-1$
-														+ "SUM(tourAltUp)," //			3	//$NON-NLS-1$
-														+ "SUM(tourAltDown)," //		4	//$NON-NLS-1$
-														//
-														+ "MAX(maxPulse)," //			5	//$NON-NLS-1$
-														+ "MAX(maxAltitude)," //		6	//$NON-NLS-1$
-														+ "MAX(maxSpeed)," //			7	//$NON-NLS-1$
-														//
-														+ "AVG(avgPulse)," //			8	//$NON-NLS-1$
-														+ "AVG(avgCadence)," //			9	//$NON-NLS-1$
-														+ "AVG(DOUBLE(avgTemperature) / TemperatureScale)," //		10	//$NON-NLS-1$
-														//
-														// tour counter
-														+ "SUM(1)" //					11	//$NON-NLS-1$
-												;
+	static final String	SQL_SUM_COLUMNS;
+	static final String	SQL_SUM_COLUMNS_TOUR;
 
-	static final String	SQL_SUM_COLUMNS_TOUR	= UI.EMPTY_STRING //
-														+ "tourDistance," // 			0	//$NON-NLS-1$
-														+ "tourRecordingTime," //		1	//$NON-NLS-1$
-														+ "tourDrivingTime," //			2	//$NON-NLS-1$
-														+ "tourAltUp," //				3	//$NON-NLS-1$
-														+ "tourAltDown," //				4	//$NON-NLS-1$
-														//
-														+ "maxPulse," //				5	//$NON-NLS-1$
-														+ "maxAltitude," //				6	//$NON-NLS-1$
-														+ "maxSpeed," //				7	//$NON-NLS-1$
-														//
-														+ "avgPulse," //				8	//$NON-NLS-1$
-														+ "avgCadence," //				9	//$NON-NLS-1$
-														+ "(DOUBLE(AvgTemperature) / TemperatureScale)" //			10	//$NON-NLS-1$
-												;
+	static {
+
+		SQL_SUM_COLUMNS = UI.EMPTY_STRING //
+				//
+				+ "SUM(tourDistance)," // 									0	//$NON-NLS-1$
+				+ "SUM(tourRecordingTime)," //								1	//$NON-NLS-1$
+				+ "SUM(tourDrivingTime)," //								2	//$NON-NLS-1$
+				+ "SUM(tourAltUp)," //										3	//$NON-NLS-1$
+				+ "SUM(tourAltDown)," //									4	//$NON-NLS-1$
+				//
+				+ "MAX(maxPulse)," //										5	//$NON-NLS-1$
+				+ "MAX(maxAltitude)," //									6	//$NON-NLS-1$
+				+ "MAX(maxSpeed)," //										7	//$NON-NLS-1$
+				//
+				+ "AVG( CASE WHEN AVGPULSE = 0			THEN NULL ELSE AVGPULSE END)," //									8	//$NON-NLS-1$
+				+ "AVG( CASE WHEN AVGCADENCE = 0		THEN NULL ELSE AVGCADENCE END )," //								9	//$NON-NLS-1$
+				+ "AVG( CASE WHEN AvgTemperature = 0	THEN NULL ELSE DOUBLE(AvgTemperature) / TemperatureScale END )," //	10	//$NON-NLS-1$
+
+				// tour counter
+				+ "SUM(1)" //					11	//$NON-NLS-1$
+		;
+
+		SQL_SUM_COLUMNS_TOUR = UI.EMPTY_STRING //
+				+ "tourDistance," // 			0	//$NON-NLS-1$
+				+ "tourRecordingTime," //		1	//$NON-NLS-1$
+				+ "tourDrivingTime," //			2	//$NON-NLS-1$
+				+ "tourAltUp," //				3	//$NON-NLS-1$
+				+ "tourAltDown," //				4	//$NON-NLS-1$
+				//
+				+ "maxPulse," //				5	//$NON-NLS-1$
+				+ "maxAltitude," //				6	//$NON-NLS-1$
+				+ "maxSpeed," //				7	//$NON-NLS-1$
+				//
+				+ "avgPulse," //				8	//$NON-NLS-1$
+				+ "avgCadence," //				9	//$NON-NLS-1$
+				+ "(DOUBLE(AvgTemperature) / TemperatureScale)" //			10	//$NON-NLS-1$
+		;
+	}
 
 	/**
 	 * content which is displayed in the tree column
@@ -84,8 +91,8 @@ public abstract class TVITagViewItem extends TreeViewerItem {
 	float				colAvgSpeed;
 	float				colAvgPace;
 
-	long				colAvgPulse;
-	long				colAvgCadence;
+	float				colAvgPulse;
+	float				colAvgCadence;
 	float				colAvgTemperature;
 
 	long				colTourCounter;
@@ -159,8 +166,8 @@ public abstract class TVITagViewItem extends TreeViewerItem {
 		colMaxAltitude = result.getLong(startIndex + 6);
 		colMaxSpeed = result.getFloat(startIndex + 7);
 
-		colAvgPulse = result.getLong(startIndex + 8);
-		colAvgCadence = result.getLong(startIndex + 9);
+		colAvgPulse = result.getFloat(startIndex + 8);
+		colAvgCadence = result.getFloat(startIndex + 9);
 		colAvgTemperature = result.getFloat(startIndex + 10);
 
 		// prevent divide by 0

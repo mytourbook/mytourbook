@@ -137,59 +137,62 @@ import org.joda.time.format.ISODateTimeFormat;
 
 public class TourBookView extends ViewPart implements ITourProvider, ITourViewer3, ITourProviderByID {
 
-	static public final String							ID									= "net.tourbook.views.tourListView";		//$NON-NLS-1$
+	static public final String							ID									= "net.tourbook.views.tourListView";						//$NON-NLS-1$
 
-	private static final String							STATE_CSV_EXPORT_PATH				= "STATE_CSV_EXPORT_PATH";					//$NON-NLS-1$
-	private static final String							STATE_SELECTED_YEAR					= "SelectedYear";							//$NON-NLS-1$
-	private static final String							STATE_SELECTED_MONTH				= "SelectedMonth";							//$NON-NLS-1$
-	private static final String							STATE_SELECTED_TOURS				= "SelectedTours";							//$NON-NLS-1$
-	private static final String							STATE_IS_SELECT_YEAR_MONTH_TOURS	= "IsSelectYearMonthTours";				//$NON-NLS-1$
-	private static final String							STATE_YEAR_SUB_CATEGORY				= "YearSubCategory";						//$NON-NLS-1$
+	private static final String							GRAPH_LABEL_HEARTBEAT_UNIT			= net.tourbook.common.Messages.Graph_Label_Heartbeat_Unit;
 
-	private static final String							CSV_HEADER_AVERAGE_CADENCE			= "AvgCadence";							//$NON-NLS-1$
-	private static final String							CSV_HEADER_AVERAGE_PACE				= "AvgPace (%s)";							//$NON-NLS-1$
-	private static final String							CSV_HEADER_AVERAGE_SPEED			= "AvgSpeed (%s)";							//$NON-NLS-1$
-	private static final String							CSV_HEADER_AVERAGE_TEMPERATURE		= "AvgTemperature (%s)";					//$NON-NLS-1$
-	private static final String							CSV_HEADER_ALTITUDE_DOWN			= "AltitudeDown (%s)";						//$NON-NLS-1$
-	private static final String							CSV_HEADER_ALTITUDE_UP				= "AltitudeUp (%s)";						//$NON-NLS-1$
-	private static final String							CSV_HEADER_CALORIES					= "Calories";								//$NON-NLS-1$
-	private static final String							CSV_HEADER_DAY						= "Day";									//$NON-NLS-1$
-	private static final String							CSV_HEADER_DEVICE_START_DISTANCE	= "DeviceStartDistance";					//$NON-NLS-1$
-	private static final String							CSV_HEADER_DISTANCE					= "Distance (%s)";							//$NON-NLS-1$
-	private static final String							CSV_HEADER_DP_TOLERANCE				= "DPTolerance";							//$NON-NLS-1$
-	private static final String							CSV_HEADER_GEAR_FRONT_SHIFT_COUNT	= "FrontShiftCount";						//$NON-NLS-1$
-	private static final String							CSV_HEADER_GEAR_REAR_SHIFT_COUNT	= "RearShiftCount";						//$NON-NLS-1$
-	private static final String							CSV_HEADER_ISO_DATE_TIME			= "ISO8601";								//$NON-NLS-1$
-	private static final String							CSV_HEADER_MOVING_TIME				= "MovingTime (%s)";						//$NON-NLS-1$
-	private static final String							CSV_HEADER_NUMBER_OF_MARKER			= "NumberOfMarkers";						//$NON-NLS-1$
-	private static final String							CSV_HEADER_NUMBER_OF_PHOTOS			= "NumberOfPhotos";						//$NON-NLS-1$
-	private static final String							CSV_HEADER_NUMBER_OF_TOURS			= "NumberOfTours";							//$NON-NLS-1$
-	private static final String							CSV_HEADER_WEATHER					= "Weather";								//$NON-NLS-1$
-	private static final String							CSV_HEADER_WIND_DIRECTION			= "WindDirection";							//$NON-NLS-1$
-	private static final String							CSV_HEADER_WIND_SPEED				= "WindSpeed";								//$NON-NLS-1$
-	private static final String							CSV_HEADER_MAX_ALTITUDE				= "MaxAltitude (%s)";						//$NON-NLS-1$
-	private static final String							CSV_HEADER_MAX_PULSE				= "MaxPulse";								//$NON-NLS-1$
-	private static final String							CSV_HEADER_MAX_SPEED				= "MaxSpeed (%s)";							//$NON-NLS-1$
-	private static final String							CSV_HEADER_MONTH					= "Month";									//$NON-NLS-1$
-	private static final String							CSV_HEADER_PAUSED_TIME				= "PausedTime (%s)";						//$NON-NLS-1$
-	private static final String							CSV_HEADER_PAUSED_TIME_RELATIVE		= "RelativePausedTime (%)";				//$NON-NLS-1$
-	private static final String							CSV_HEADER_PERSON					= "Person";								//$NON-NLS-1$
-	private static final String							CSV_HEADER_RECORDING_TIME			= "RecordingTime (%s)";					//$NON-NLS-1$
-	private static final String							CSV_HEADER_RESTPULSE				= "RestPulse";								//$NON-NLS-1$
-	private static final String							CSV_HEADER_TAGS						= "Tags";									//$NON-NLS-1$
-	private static final String							CSV_HEADER_TIME						= "Time";									//$NON-NLS-1$
-	private static final String							CSV_HEADER_TIME_INTERVAL			= "TimeInterval";							//$NON-NLS-1$
-	private static final String							CSV_HEADER_TIME_SLICES				= "TimeSlices";							//$NON-NLS-1$
-	private static final String							CSV_HEADER_TITLE					= "Title";									//$NON-NLS-1$
-	private static final String							CSV_HEADER_TOUR_TYPE_ID				= "TourTypeId";							//$NON-NLS-1$
-	private static final String							CSV_HEADER_TOUR_TYPE_NAME			= "TourTypeName";							//$NON-NLS-1$
-	private static final String							CSV_HEADER_WEEK						= "Week";									//$NON-NLS-1$
-	private static final String							CSV_HEADER_WEEKDAY					= "Weekday";								//$NON-NLS-1$
-	private static final String							CSV_HEADER_WEEK_YEAR				= "WeekYear";								//$NON-NLS-1$
-	private static final String							CSV_HEADER_YEAR						= "Year";									//$NON-NLS-1$
+	private static final String							STATE_CSV_EXPORT_PATH				= "STATE_CSV_EXPORT_PATH";									//$NON-NLS-1$
+	private static final String							STATE_SELECTED_YEAR					= "SelectedYear";											//$NON-NLS-1$
+	private static final String							STATE_SELECTED_MONTH				= "SelectedMonth";											//$NON-NLS-1$
+	private static final String							STATE_SELECTED_TOURS				= "SelectedTours";											//$NON-NLS-1$
+	private static final String							STATE_IS_SELECT_YEAR_MONTH_TOURS	= "IsSelectYearMonthTours";								//$NON-NLS-1$
+	private static final String							STATE_YEAR_SUB_CATEGORY				= "YearSubCategory";										//$NON-NLS-1$
 
-	private static final String							CSV_EXPORT_DEFAULT_FILE_NAME		= "TourBook_";								//$NON-NLS-1$
-	private static final String							CSV_EXPORT_DURATION_HHH_MM_SS		= "hhh:mm:ss";								//$NON-NLS-1$
+	private static final String							CSV_HEADER_AVERAGE_CADENCE			= "AvgCadence";											//$NON-NLS-1$
+	private static final String							CSV_HEADER_AVERAGE_PACE				= "AvgPace (%s)";											//$NON-NLS-1$
+	private static final String							CSV_HEADER_AVERAGE_PULSE			= "AvgPulse (%s)";											//$NON-NLS-1$
+	private static final String							CSV_HEADER_AVERAGE_SPEED			= "AvgSpeed (%s)";											//$NON-NLS-1$
+	private static final String							CSV_HEADER_AVERAGE_TEMPERATURE		= "AvgTemperature (%s)";									//$NON-NLS-1$
+	private static final String							CSV_HEADER_ALTITUDE_DOWN			= "AltitudeDown (%s)";										//$NON-NLS-1$
+	private static final String							CSV_HEADER_ALTITUDE_UP				= "AltitudeUp (%s)";										//$NON-NLS-1$
+	private static final String							CSV_HEADER_CALORIES					= "Calories";												//$NON-NLS-1$
+	private static final String							CSV_HEADER_DAY						= "Day";													//$NON-NLS-1$
+	private static final String							CSV_HEADER_DEVICE_START_DISTANCE	= "DeviceStartDistance";									//$NON-NLS-1$
+	private static final String							CSV_HEADER_DISTANCE					= "Distance (%s)";											//$NON-NLS-1$
+	private static final String							CSV_HEADER_DP_TOLERANCE				= "DPTolerance";											//$NON-NLS-1$
+	private static final String							CSV_HEADER_GEAR_FRONT_SHIFT_COUNT	= "FrontShiftCount";										//$NON-NLS-1$
+	private static final String							CSV_HEADER_GEAR_REAR_SHIFT_COUNT	= "RearShiftCount";										//$NON-NLS-1$
+	private static final String							CSV_HEADER_ISO_DATE_TIME			= "ISO8601";												//$NON-NLS-1$
+	private static final String							CSV_HEADER_MOVING_TIME				= "MovingTime (%s)";										//$NON-NLS-1$
+	private static final String							CSV_HEADER_NUMBER_OF_MARKER			= "NumberOfMarkers";										//$NON-NLS-1$
+	private static final String							CSV_HEADER_NUMBER_OF_PHOTOS			= "NumberOfPhotos";										//$NON-NLS-1$
+	private static final String							CSV_HEADER_NUMBER_OF_TOURS			= "NumberOfTours";											//$NON-NLS-1$
+	private static final String							CSV_HEADER_WEATHER					= "Weather";												//$NON-NLS-1$
+	private static final String							CSV_HEADER_WIND_DIRECTION			= "WindDirection";											//$NON-NLS-1$
+	private static final String							CSV_HEADER_WIND_SPEED				= "WindSpeed";												//$NON-NLS-1$
+	private static final String							CSV_HEADER_MAX_ALTITUDE				= "MaxAltitude (%s)";										//$NON-NLS-1$
+	private static final String							CSV_HEADER_MAX_PULSE				= "MaxPulse";												//$NON-NLS-1$
+	private static final String							CSV_HEADER_MAX_SPEED				= "MaxSpeed (%s)";											//$NON-NLS-1$
+	private static final String							CSV_HEADER_MONTH					= "Month";													//$NON-NLS-1$
+	private static final String							CSV_HEADER_PAUSED_TIME				= "PausedTime (%s)";										//$NON-NLS-1$
+	private static final String							CSV_HEADER_PAUSED_TIME_RELATIVE		= "RelativePausedTime (%)";								//$NON-NLS-1$
+	private static final String							CSV_HEADER_PERSON					= "Person";												//$NON-NLS-1$
+	private static final String							CSV_HEADER_RECORDING_TIME			= "RecordingTime (%s)";									//$NON-NLS-1$
+	private static final String							CSV_HEADER_RESTPULSE				= "RestPulse";												//$NON-NLS-1$
+	private static final String							CSV_HEADER_TAGS						= "Tags";													//$NON-NLS-1$
+	private static final String							CSV_HEADER_TIME						= "Time";													//$NON-NLS-1$
+	private static final String							CSV_HEADER_TIME_INTERVAL			= "TimeInterval";											//$NON-NLS-1$
+	private static final String							CSV_HEADER_TIME_SLICES				= "TimeSlices";											//$NON-NLS-1$
+	private static final String							CSV_HEADER_TITLE					= "Title";													//$NON-NLS-1$
+	private static final String							CSV_HEADER_TOUR_TYPE_ID				= "TourTypeId";											//$NON-NLS-1$
+	private static final String							CSV_HEADER_TOUR_TYPE_NAME			= "TourTypeName";											//$NON-NLS-1$
+	private static final String							CSV_HEADER_WEEK						= "Week";													//$NON-NLS-1$
+	private static final String							CSV_HEADER_WEEKDAY					= "Weekday";												//$NON-NLS-1$
+	private static final String							CSV_HEADER_WEEK_YEAR				= "WeekYear";												//$NON-NLS-1$
+	private static final String							CSV_HEADER_YEAR						= "Year";													//$NON-NLS-1$
+
+	private static final String							CSV_EXPORT_DEFAULT_FILE_NAME		= "TourBook_";												//$NON-NLS-1$
+	private static final String							CSV_EXPORT_DURATION_HHH_MM_SS		= "hhh:mm:ss";												//$NON-NLS-1$
 
 	private static int									_yearSubCategory					= TVITourBookItem.ITEM_TYPE_MONTH;
 
@@ -211,17 +214,17 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 	private final DateTimeFormatter						_dtFormatter;
 	private final DateTimeFormatter						_isoFormatter;
 	private final NumberFormat							_nf1;
-	private final NumberFormat							_nf1NoGroup;
+	private final NumberFormat							_nf1_NoGroup;
 
 	{
 		_nf1 = NumberFormat.getNumberInstance();
 		_nf1.setMinimumFractionDigits(1);
 		_nf1.setMaximumFractionDigits(1);
 
-		_nf1NoGroup = NumberFormat.getNumberInstance();
-		_nf1NoGroup.setMinimumFractionDigits(1);
-		_nf1NoGroup.setMaximumFractionDigits(1);
-		_nf1NoGroup.setGroupingUsed(false);
+		_nf1_NoGroup = NumberFormat.getNumberInstance();
+		_nf1_NoGroup.setMinimumFractionDigits(1);
+		_nf1_NoGroup.setMaximumFractionDigits(1);
+		_nf1_NoGroup.setGroupingUsed(false);
 
 		_dtFormatter = DateTimeFormat.forPattern("yyyy-MM-dd_HH-mm-ss"); //$NON-NLS-1$
 		_isoFormatter = ISODateTimeFormat.basicDateTimeNoMillis();
@@ -947,12 +950,12 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 			public void update(final ViewerCell cell) {
 
 				final Object element = cell.getElement();
-				final long dbAvgCadence = ((TVITourBookItem) element).colAvgCadence;
+				final float dbAvgCadence = ((TVITourBookItem) element).colAvgCadence;
 
 				if (dbAvgCadence == 0) {
 					cell.setText(UI.EMPTY_STRING);
 				} else {
-					cell.setText(Long.toString(dbAvgCadence));
+					cell.setText(_nf1.format(dbAvgCadence));
 				}
 
 				setCellColor(cell, element);
@@ -995,12 +998,12 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 			public void update(final ViewerCell cell) {
 
 				final Object element = cell.getElement();
-				final long dbAvgPulse = ((TVITourBookItem) element).colAvgPulse;
+				final float dbAvgPulse = ((TVITourBookItem) element).colAvgPulse;
 
 				if (dbAvgPulse == 0) {
 					cell.setText(UI.EMPTY_STRING);
 				} else {
-					cell.setText(Long.toString(dbAvgPulse));
+					cell.setText(_nf1.format(dbAvgPulse));
 				}
 
 				setCellColor(cell, element);
@@ -2074,6 +2077,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		csvField(sb, String.format(CSV_HEADER_AVERAGE_SPEED, UI.UNIT_LABEL_SPEED));
 		csvField(sb, String.format(CSV_HEADER_AVERAGE_PACE, UI.UNIT_LABEL_PACE));
 		csvField(sb, CSV_HEADER_AVERAGE_CADENCE);
+		csvField(sb, String.format(CSV_HEADER_AVERAGE_PULSE, GRAPH_LABEL_HEARTBEAT_UNIT));
 		csvField(sb, String.format(CSV_HEADER_AVERAGE_TEMPERATURE, UI.UNIT_LABEL_TEMPERATURE));
 		csvField(sb, CSV_HEADER_WEEK_YEAR);
 		csvField(sb, CSV_HEADER_TIME_SLICES);
@@ -2207,7 +2211,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		{
 			final float dbDistance = tviItem.colDistance;
 			if (dbDistance != 0) {
-				sb.append(_nf1NoGroup.format(dbDistance / 1000 / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE));
+				sb.append(_nf1_NoGroup.format(dbDistance / 1000 / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE));
 			}
 			sb.append(UI.TAB);
 		}
@@ -2266,7 +2270,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 					? 0
 					: (float) dbPausedTime / dbRecordingTime * 100;
 			if (relativePausedTime != 0) {
-				sb.append(_nf1NoGroup.format(relativePausedTime));
+				sb.append(_nf1_NoGroup.format(relativePausedTime));
 			}
 			sb.append(UI.TAB);
 		}
@@ -2401,7 +2405,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		{
 			final float dbMaxSpeed = tviItem.colMaxSpeed;
 			if (dbMaxSpeed != 0) {
-				sb.append(_nf1NoGroup.format(dbMaxSpeed / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE));
+				sb.append(_nf1_NoGroup.format(dbMaxSpeed / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE));
 			}
 			sb.append(UI.TAB);
 		}
@@ -2421,7 +2425,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		{
 			final float speed = tviItem.colAvgSpeed / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
 			if (speed != 0) {
-				sb.append(_nf1NoGroup.format(speed));
+				sb.append(_nf1_NoGroup.format(speed));
 			}
 			sb.append(UI.TAB);
 		}
@@ -2437,9 +2441,18 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 
 		// CSV_HEADER_AVERAGE_CADENCE
 		{
-			final long dbAvgCadence = tviItem.colAvgCadence;
+			final float dbAvgCadence = tviItem.colAvgCadence;
 			if (dbAvgCadence != 0) {
-				sb.append(Long.toString(dbAvgCadence));
+				sb.append(_nf1_NoGroup.format(dbAvgCadence));
+			}
+			sb.append(UI.TAB);
+		}
+
+		// CSV_HEADER_AVERAGE_PULSE
+		{
+			final float pulse = tviItem.colAvgPulse;
+			if (pulse != 0) {
+				sb.append(_nf1_NoGroup.format(pulse));
 			}
 			sb.append(UI.TAB);
 		}
@@ -2454,7 +2467,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 							* net.tourbook.ui.UI.UNIT_FAHRENHEIT_MULTI
 							+ net.tourbook.ui.UI.UNIT_FAHRENHEIT_ADD;
 				}
-				sb.append(_nf1NoGroup.format(temperature));
+				sb.append(_nf1_NoGroup.format(temperature));
 			}
 			sb.append(UI.TAB);
 		}
@@ -2506,7 +2519,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 			if (isTour) {
 				final int dpTolerance = tviItem.colDPTolerance;
 				if (dpTolerance != 0) {
-					sb.append(_nf1NoGroup.format(dpTolerance / 10.0));
+					sb.append(_nf1_NoGroup.format(dpTolerance / 10.0));
 				}
 			}
 			sb.append(UI.TAB);

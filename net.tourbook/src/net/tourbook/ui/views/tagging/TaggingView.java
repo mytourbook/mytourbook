@@ -869,10 +869,10 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 					return;
 				}
 
-				final long colAvgCadence = ((TVITagViewItem) element).colAvgCadence;
+				final float colAvgCadence = ((TVITagViewItem) element).colAvgCadence;
 				if (colAvgCadence != 0) {
 
-					cell.setText(Long.toString(colAvgCadence));
+					cell.setText(_nf1.format(colAvgCadence));
 					setCellColor(cell, element);
 				}
 			}
@@ -918,10 +918,10 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 					return;
 				}
 
-				final long colAvgPulse = ((TVITagViewItem) element).colAvgPulse;
+				final float colAvgPulse = ((TVITagViewItem) element).colAvgPulse;
 				if (colAvgPulse != 0) {
 
-					cell.setText(Long.toString(colAvgPulse));
+					cell.setText(_nf1.format(colAvgPulse));
 					setCellColor(cell, element);
 				}
 			}

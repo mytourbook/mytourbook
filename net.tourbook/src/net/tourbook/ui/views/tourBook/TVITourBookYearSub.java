@@ -199,8 +199,8 @@ public class TVITourBookYearSub extends TVITourBookItem {
 					tourItem.colMaxSpeed = result.getFloat(14);
 					tourItem.colMaxAltitude = result.getLong(15);
 					tourItem.colMaxPulse = result.getLong(16);
-					tourItem.colAvgPulse = result.getLong(17);
-					tourItem.colAvgCadence = result.getLong(18);
+					tourItem.colAvgPulse = result.getFloat(17);
+					tourItem.colAvgCadence = result.getFloat(18);
 					tourItem.colAvgTemperature = result.getFloat(19);
 
 					final int dbHour = result.getInt(22);

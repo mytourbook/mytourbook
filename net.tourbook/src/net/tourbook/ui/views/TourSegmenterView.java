@@ -2418,7 +2418,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 				if (pulse == 0) {
 					cell.setText(UI.EMPTY_STRING);
 				} else {
-					cell.setText(Integer.toString((int) pulse));
+					cell.setText(_nf_1_1.format(pulse));
 				}
 			}
 		});

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -29,7 +29,7 @@ public abstract class TreeColumnFactory {
 		public TreeColumnDefinition createColumn(final ColumnManager columnManager, final PixelConverter pixelConverter) {
 
 			final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "altitudeDown", SWT.TRAIL); //$NON-NLS-1$
-			final String unitLabel = UI.UNIT_LABEL_ALTITUDE + UI.SPACE + UI.SYMBOL_ARROW_DOWN; 
+			final String unitLabel = UI.UNIT_LABEL_ALTITUDE + UI.SPACE + UI.SYMBOL_ARROW_DOWN;
 
 			colDef.setColumnLabel(Messages.ColumnFactory_altitude_down_label);
 			colDef.setColumnHeaderText(unitLabel);
@@ -46,7 +46,7 @@ public abstract class TreeColumnFactory {
 		public TreeColumnDefinition createColumn(final ColumnManager columnManager, final PixelConverter pixelConverter) {
 
 			final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "altitudeUp", SWT.TRAIL); //$NON-NLS-1$
-			final String unitLabel = UI.UNIT_LABEL_ALTITUDE + UI.SPACE + UI.SYMBOL_ARROW_UP; 
+			final String unitLabel = UI.UNIT_LABEL_ALTITUDE + UI.SPACE + UI.SYMBOL_ARROW_UP;
 
 			colDef.setColumnLabel(Messages.ColumnFactory_altitude_up_label);
 			colDef.setColumnHeaderText(unitLabel);
@@ -68,7 +68,7 @@ public abstract class TreeColumnFactory {
 			colDef.setColumnHeaderText(Messages.ColumnFactory_avg_cadence);
 			colDef.setColumnUnit(Messages.ColumnFactory_avg_cadence);
 			colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_avg_cadence_tooltip);
-			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(9));
+			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(12));
 
 			return colDef;
 		};
