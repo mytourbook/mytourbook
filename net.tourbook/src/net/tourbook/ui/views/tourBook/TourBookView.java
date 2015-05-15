@@ -2933,31 +2933,39 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		_selectedYearSub = -1;
 		TVITourBookTour selectedTourItem = null;
 
-		Object selection = ((IStructuredSelection) _tourViewer.getSelection()).getFirstElement();
-		if (selection instanceof TVITourBookTour) {
+		final ISelection oldSelection = _tourViewer.getSelection();
+		if (oldSelection != null) {
 
-			selectedTourItem = (TVITourBookTour) selection;
+			final Object selection = ((IStructuredSelection) oldSelection).getFirstElement();
+			if (selection instanceof TVITourBookTour) {
 
-			_selectedYear = selectedTourItem.tourYear;
+				selectedTourItem = (TVITourBookTour) selection;
 
-			if (getYearSub() == TVITourBookItem.ITEM_TYPE_WEEK) {
-				_selectedYearSub = selectedTourItem.tourWeek;
-			} else {
-				_selectedYearSub = selectedTourItem.tourMonth;
+				_selectedYear = selectedTourItem.tourYear;
+
+				if (getYearSub() == TVITourBookItem.ITEM_TYPE_WEEK) {
+					_selectedYearSub = selectedTourItem.tourWeek;
+				} else {
+					_selectedYearSub = selectedTourItem.tourMonth;
+				}
 			}
 		}
 
 		reloadViewer();
 		reselectTourViewer();
 
-		selection = ((IStructuredSelection) _tourViewer.getSelection()).getFirstElement();
-		if (selection instanceof TVITourBookTour) {
+		final IStructuredSelection newSelection = (IStructuredSelection) _tourViewer.getSelection();
+		if (newSelection != null) {
 
-			selectedTourItem = (TVITourBookTour) selection;
+			final Object selection = newSelection.getFirstElement();
+			if (selection instanceof TVITourBookTour) {
 
-			_tourViewer.collapseAll();
-			_tourViewer.expandToLevel(selectedTourItem, 0);
-			_tourViewer.setSelection(new StructuredSelection(selectedTourItem), false);
+				selectedTourItem = (TVITourBookTour) selection;
+
+				_tourViewer.collapseAll();
+				_tourViewer.expandToLevel(selectedTourItem, 0);
+				_tourViewer.setSelection(new StructuredSelection(selectedTourItem), false);
+			}
 		}
 	}
 
