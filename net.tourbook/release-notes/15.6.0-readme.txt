@@ -28,7 +28,7 @@ Improvements
   - Support FR70 .fit files. 
     This data format can contain 0 sessions but the data are still valid.
   - Import fractional cadence.
-	 
+	 	 
 	 
 * GPX Import
   - Support import of .gpx files which are not xml well formed, 
@@ -38,10 +38,13 @@ Improvements
   - Convert waypoints into tour marker.
   - Import all tour marker fields.
   
+* Export Dialog
+  - Restructured UI.
   
 * GPX Export
   - Export url and url text for tour marker/waypoints. 
-  - Export all tour/marker fields which allows to exactly recreate it when imported.
+  - Export all tour/marker fields which allows to exactly recreate them when imported.
+  - Export several tour fields with the custom tag <mt:...>
  
  
 * Tour Editor

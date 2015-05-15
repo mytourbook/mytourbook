@@ -1332,7 +1332,6 @@ public class Messages extends NLS {
 
 	public static String		Tour_Database_CannotConnectToDerbyServer_Message;
 	public static String		Tour_Database_CannotConnectToDerbyServer_Title;
-	public static String		Tour_Database_CannotGetTour_Message;
 	public static String		Tour_Database_Dialog_ValidateFields_Message;
 	public static String		Tour_Database_Dialog_ValidateFields_Title;
 	public static String		Tour_Database_load_all_tours;

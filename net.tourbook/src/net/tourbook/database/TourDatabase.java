@@ -5743,7 +5743,10 @@ public class TourDatabase {
 
 			if (tourData == null) {
 
-				StatusUtil.log(NLS.bind(Messages.Tour_Database_CannotGetTour_Message, tourId, compareId));
+				StatusUtil.log(NLS.bind(
+						"Cannot get tour {0} from database to update the average pulse in the compared tour {1}.",//$NON-NLS-1$
+						tourId,
+						compareId));
 
 			} else {
 

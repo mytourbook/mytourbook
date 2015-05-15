@@ -205,7 +205,7 @@ public abstract class TableColumnFactory {
 			
 			final ColumnDefinition colDef = new TableColumnDefinition(columnManager, "avgCadence", SWT.TRAIL); //$NON-NLS-1$
 			
-			colDef.setColumnLabel(Messages.ColumnFactory_Avg_Cadence_Label);
+			colDef.setColumnLabel(Messages.ColumnFactory_avg_cadence_label);
 			colDef.setColumnHeaderText(Messages.ColumnFactory_avg_cadence);
 			colDef.setColumnUnit(Messages.ColumnFactory_avg_cadence);
 			colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_avg_cadence_tooltip);
