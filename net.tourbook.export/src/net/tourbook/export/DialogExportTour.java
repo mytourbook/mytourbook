@@ -1966,7 +1966,7 @@ public class DialogExportTour extends TitleAreaDialog {
 
 		// camouflage speed
 		_chkCamouflageSpeed.setSelection(_state.getBoolean(STATE_IS_CAMOUFLAGE_SPEED));
-		_spinnerCamouflageSpeed.setSelection(_state.getInt(STATE_CAMOUFLAGE_SPEED));
+		_spinnerCamouflageSpeed.setSelection(Util.getStateInt(_state, STATE_CAMOUFLAGE_SPEED, 10));
 
 		// export file/path
 		net.tourbook.ui.UI.restoreCombo(_comboFile, _state.getArray(STATE_EXPORT_FILE_NAME));
