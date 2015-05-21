@@ -111,6 +111,7 @@ public class DialogExportTour extends TitleAreaDialog {
 	private static final String				STATE_GPX_IS_EXPORT_DESCRITION	= "STATE_GPX_IS_EXPORT_DESCRITION";			//$NON-NLS-1$
 	private static final String				STATE_GPX_IS_EXPORT_MARKERS		= "STATE_GPX_IS_EXPORT_MARKERS";				//$NON-NLS-1$
 	private static final String				STATE_GPX_IS_EXPORT_TOUR_DATA	= "STATE_GPX_IS_EXPORT_TOUR_DATA";				//$NON-NLS-1$
+	private static final String				STATE_GPX_IS_WITH_BAROMETER		= "STATE_GPX_IS_WITH_BAROMETER";				//$NON-NLS-1$
 
 	private static final String				STATE_TCX_IS_COURSES			= "STATE_TCX_IS_COURSES";						//$NON-NLS-1$
 	private static final String				STATE_TCX_IS_EXPORT_DESCRITION	= "STATE_TCX_IS_EXPORT_DESCRITION";			//$NON-NLS-1$
@@ -124,6 +125,15 @@ public class DialogExportTour extends TitleAreaDialog {
 	private static final String				STATE_IS_MERGE_ALL_TOURS		= "isMergeAllTours";							//$NON-NLS-1$
 	private static final String				STATE_EXPORT_PATH_NAME			= "exportPathName";							//$NON-NLS-1$
 	private static final String				STATE_EXPORT_FILE_NAME			= "exportFileName";							//$NON-NLS-1$
+
+	/**
+	 * This is a special parameter to force elevation values from the device and not from the
+	 * lat/lon + srtm data <a
+	 * href="http://strava.github.io/api/v3/uploads/">http://strava.github.io/api/v3/uploads/</a>.
+	 * 
+	 * @since 15.6
+	 */
+	private static final String				STRAVA_WITH_BAROMETER			= " with barometer";							//$NON-NLS-1$
 
 	/*
 	 * Velocity (VC) context values
@@ -225,16 +235,17 @@ public class DialogExportTour extends TitleAreaDialog {
 	private FileCollisionBehavior			_exportState_FileCollisionBehaviour;
 	private boolean							_exportState_isAbsoluteDistance;
 	private boolean							_exportState_IsCamouflageSpeed;
+	private boolean							_exportState_IsDescription;
 	private boolean							_exportState_IsMergeTours;
 	private boolean							_exportState_IsOverwriteFiles;
-	private boolean							_exportState_IsRangeExport;
+	private boolean							_exportState_IsRange;
 
 	private boolean							_exportState_GPX_IsExportMarkers;
 	private boolean							_exportState_GPX_IsExportAllTourData;
+	private boolean							_exportState_GPX_IsExportWithBarometer;
 
 	private String							_exportState_TCX_CourseName;
 	private boolean							_exportState_TCX_IsCourses;
-	private boolean							_exportState_TCX_IsExportDescription;
 
 	private PixelConverter					_pc;
 
@@ -249,11 +260,12 @@ public class DialogExportTour extends TitleAreaDialog {
 	private Button							_chkMergeAllTours;
 	private Button							_chkOverwriteFiles;
 
-	private Button							_chkGPX_Markers;
-	private Button							_chkGPX_NoneGPXFields;
 	private Button							_chkGPX_Description;
 	private Button							_rdoGPX_DistanceAbsolute;
 	private Button							_rdoGPX_DistanceRelative;
+	private Button							_chkGPX_Markers;
+	private Button							_chkGPX_NoneGPXFields;
+	private Button							_chkGPX_WithBarometer;
 
 	private Button							_chkTCX_Description;
 	private Button							_rdoTCX_Activities;
@@ -425,31 +437,65 @@ public class DialogExportTour extends TitleAreaDialog {
 
 	private void createUI_10_Options(final Composite parent) {
 
-		/*
-		 * What
-		 */
-		final Group groupWhat = new Group(parent, SWT.NONE);
-		groupWhat.setText(Messages.Dialog_Export_Group_What);
-		groupWhat.setToolTipText(Messages.Dialog_Export_Group_What_Tooltip);
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(groupWhat);
-		GridLayoutFactory.swtDefaults().applyTo(groupWhat);
-//		groupWhat.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
 		{
-			createUI_20_Option_What(groupWhat);
-			createUI_40_Option_TourRange(groupWhat);
+			createUI_12_OptionsLeft(container);
+			createUI_14_OptionsRight(container);
 		}
+	}
+
+	private void createUI_12_OptionsLeft(final Composite parent) {
+
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+		GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
+		{
+			/*
+			 * What
+			 */
+			final Group groupWhat = new Group(container, SWT.NONE);
+			groupWhat.setText(Messages.Dialog_Export_Group_What);
+			groupWhat.setToolTipText(Messages.Dialog_Export_Group_What_Tooltip);
+			GridDataFactory.fillDefaults().grab(true, false).applyTo(groupWhat);
+			GridLayoutFactory.swtDefaults().applyTo(groupWhat);
+//			groupWhat.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
+			{
+				createUI_20_Option_What(groupWhat);
+				createUI_40_Option_TourRange(groupWhat);
+			}
+
+			/*
+			 * How
+			 */
+			final Group groupHow = new Group(container, SWT.NONE);
+			groupHow.setText(Messages.Dialog_Export_Group_How);
+			groupHow.setToolTipText(Messages.Dialog_Export_Group_How_Tooltip);
+			GridDataFactory.fillDefaults().grab(true, false).applyTo(groupHow);
+			GridLayoutFactory.swtDefaults().applyTo(groupHow);
+//			groupHow.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
+			{
+				createUI_50_Option_How(groupHow);
+			}
+		}
+	}
+
+	private void createUI_14_OptionsRight(final Composite parent) {
 
 		/*
-		 * How
+		 * Custom options
 		 */
-		final Group groupHow = new Group(parent, SWT.NONE);
-		groupHow.setText(Messages.Dialog_Export_Group_How);
-		groupHow.setToolTipText(Messages.Dialog_Export_Group_How_Tooltip);
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(groupHow);
-		GridLayoutFactory.swtDefaults().applyTo(groupHow);
-//		groupHow.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
-		{
-			createUI_50_Option_How(groupHow);
+		if (_isSetup_GPX) {
+
+			final Group groupCustomGPX = new Group(parent, SWT.NONE);
+			groupCustomGPX.setText(Messages.Dialog_Export_Group_Custom);
+			groupCustomGPX.setToolTipText(Messages.Dialog_Export_Group_Custom_Tooltip);
+			GridDataFactory.fillDefaults().grab(false, false).applyTo(groupCustomGPX);
+			GridLayoutFactory.swtDefaults().applyTo(groupCustomGPX);
+			{
+				createUI_72_Option_GPX_Custom(groupCustomGPX);
+			}
 		}
 	}
 
@@ -473,7 +519,7 @@ public class DialogExportTour extends TitleAreaDialog {
 			_chkGPX_Markers.setToolTipText(Messages.dialog_export_chk_exportMarkers_tooltip);
 
 			/*
-			 * checkbox: export custom data
+			 * checkbox: export tour data
 			 */
 			_chkGPX_NoneGPXFields = new Button(parent, SWT.CHECK);
 			GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).grab(true, false).applyTo(_chkGPX_NoneGPXFields);
@@ -671,6 +717,17 @@ public class DialogExportTour extends TitleAreaDialog {
 				_rdoGPX_DistanceRelative.setToolTipText(Messages.Dialog_Export_Radio_GPX_DistanceRelative_Tooltip);
 			}
 		}
+	}
+
+	private void createUI_72_Option_GPX_Custom(final Composite parent) {
+
+		/*
+		 * checkbox: export with barometer
+		 */
+		_chkGPX_WithBarometer = new Button(parent, SWT.CHECK);
+		GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).grab(true, false).applyTo(_chkGPX_WithBarometer);
+		_chkGPX_WithBarometer.setText(Messages.Dialog_Export_Checkbox_WithBarometer);
+		_chkGPX_WithBarometer.setToolTipText(Messages.Dialog_Export_Checkbox_WithBarometer_Tooltip);
 	}
 
 	private void createUI_80_Option_TCX_ActivitiesCourses(final Composite parent) {
@@ -925,7 +982,7 @@ public class DialogExportTour extends TitleAreaDialog {
 		_exportState_FileCollisionBehaviour = new FileCollisionBehavior();
 
 		if (_isSetup_TourRange) {
-			_exportState_IsRangeExport = _chkExportTourRange.getSelection();
+			_exportState_IsRange = _chkExportTourRange.getSelection();
 		}
 
 		if (_isSetup_MultipleTours) {
@@ -936,16 +993,17 @@ public class DialogExportTour extends TitleAreaDialog {
 
 			_exportState_isAbsoluteDistance = _rdoGPX_DistanceAbsolute.getSelection();
 
-			_exportState_TCX_IsExportDescription = _chkGPX_Description.getSelection();
-			_exportState_GPX_IsExportMarkers = _chkGPX_Markers.getSelection();
 			_exportState_GPX_IsExportAllTourData = _chkGPX_NoneGPXFields.getSelection();
+			_exportState_IsDescription = _chkGPX_Description.getSelection();
+			_exportState_GPX_IsExportMarkers = _chkGPX_Markers.getSelection();
+			_exportState_GPX_IsExportWithBarometer = _chkGPX_WithBarometer.getSelection();
 
 		} else if (_isSetup_TCX) {
 
 			// .tcx files do always contain absolute distances
 			_exportState_isAbsoluteDistance = true;
 
-			_exportState_TCX_IsExportDescription = _chkTCX_Description.getSelection();
+			_exportState_IsDescription = _chkTCX_Description.getSelection();
 
 			_exportState_TCX_IsCourses = _rdoTCX_Courses.getSelection();
 			_exportState_TCX_CourseName = _comboTcxCourseName.getText();
@@ -1250,12 +1308,17 @@ public class DialogExportTour extends TitleAreaDialog {
 		/*
 		 * Creator
 		 */
-		vcContext.put("creator",//$NON-NLS-1$
-				String.format("MyTourbook %d.%d.%d.%s - http://mytourbook.sourceforge.net",//$NON-NLS-1$
-						version.getMajor(),
-						version.getMinor(),
-						version.getMicro(),
-						version.getQualifier()));
+		String creatorText = String.format("MyTourbook %d.%d.%d.%s - http://mytourbook.sourceforge.net",//$NON-NLS-1$
+				version.getMajor(),
+				version.getMinor(),
+				version.getMicro(),
+				version.getQualifier());
+
+		if (_exportState_GPX_IsExportWithBarometer) {
+			creatorText += STRAVA_WITH_BAROMETER;
+		}
+
+		vcContext.put("creator", creatorText); //$NON-NLS-1$
 	}
 
 	/**
@@ -1432,7 +1495,7 @@ public class DialogExportTour extends TitleAreaDialog {
 		/*
 		 * Description
 		 */
-		if (_exportState_TCX_IsExportDescription) {
+		if (_exportState_IsDescription) {
 			final String notes = tourData.getTourDescription();
 			if ((notes != null) && (notes.length() > 0)) {
 				lap.setNotes(notes);
@@ -1454,7 +1517,7 @@ public class DialogExportTour extends TitleAreaDialog {
 		/*
 		 * Description
 		 */
-		if (_exportState_TCX_IsExportDescription) {
+		if (_exportState_IsDescription) {
 
 			final String notes = tourData.getTourDescription();
 
@@ -1510,7 +1573,7 @@ public class DialogExportTour extends TitleAreaDialog {
 		int endIndex = timeSerie.length - 1;
 
 		// adjust start/end when a part is exported
-		if (_exportState_IsRangeExport) {
+		if (_exportState_IsRange) {
 			startIndex = _tourStartIndex;
 			endIndex = _tourEndIndex;
 		}
@@ -1520,7 +1583,7 @@ public class DialogExportTour extends TitleAreaDialog {
 		/*
 		 * Track title/description
 		 */
-		if (_exportState_TCX_IsExportDescription) {
+		if (_exportState_IsDescription) {
 
 			final String tourTitle = tourData.getTourTitle();
 			if (tourTitle.length() > 0) {
@@ -1665,7 +1728,7 @@ public class DialogExportTour extends TitleAreaDialog {
 		boolean isRange = false;
 
 		// adjust start/end when a part is exported
-		if (_exportState_IsRangeExport) {
+		if (_exportState_IsRange) {
 			startIndex = _tourStartIndex;
 			endIndex = _tourEndIndex;
 			isRange = true;
@@ -1930,8 +1993,9 @@ public class DialogExportTour extends TitleAreaDialog {
 			final boolean isAbsoluteDistance = Util.getStateBoolean(_state, STATE_GPX_IS_ABSOLUTE_DISTANCE, true);
 
 			_chkGPX_Description.setSelection(_state.getBoolean(STATE_GPX_IS_EXPORT_DESCRITION));
-			_chkGPX_NoneGPXFields.setSelection(_state.getBoolean(STATE_GPX_IS_EXPORT_TOUR_DATA));
 			_chkGPX_Markers.setSelection(_state.getBoolean(STATE_GPX_IS_EXPORT_MARKERS));
+			_chkGPX_NoneGPXFields.setSelection(_state.getBoolean(STATE_GPX_IS_EXPORT_TOUR_DATA));
+			_chkGPX_WithBarometer.setSelection(_state.getBoolean(STATE_GPX_IS_WITH_BAROMETER));
 
 			_rdoGPX_DistanceAbsolute.setSelection(isAbsoluteDistance);
 			_rdoGPX_DistanceRelative.setSelection(!isAbsoluteDistance);
@@ -1982,6 +2046,7 @@ public class DialogExportTour extends TitleAreaDialog {
 			_state.put(STATE_GPX_IS_ABSOLUTE_DISTANCE, _rdoGPX_DistanceAbsolute.getSelection());
 			_state.put(STATE_GPX_IS_EXPORT_MARKERS, _chkGPX_Markers.getSelection());
 			_state.put(STATE_GPX_IS_EXPORT_TOUR_DATA, _chkGPX_NoneGPXFields.getSelection());
+			_state.put(STATE_GPX_IS_WITH_BAROMETER, _chkGPX_WithBarometer.getSelection());
 
 		} else if (_isSetup_TCX) {
 

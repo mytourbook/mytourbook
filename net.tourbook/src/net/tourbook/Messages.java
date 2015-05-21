@@ -138,7 +138,11 @@ public class Messages extends NLS {
 	public static String		Dialog_Export_Checkbox_Description;
 	public static String		Dialog_Export_Checkbox_TourFields;
 	public static String		Dialog_Export_Checkbox_TourFields_Tooltip;
+	public static String		Dialog_Export_Checkbox_WithBarometer;
+	public static String		Dialog_Export_Checkbox_WithBarometer_Tooltip;
 	public static String		Dialog_Export_Error_CourseNameIsInvalid;
+	public static String		Dialog_Export_Group_Custom;
+	public static String		Dialog_Export_Group_Custom_Tooltip;
 	public static String		Dialog_Export_Group_How;
 	public static String		Dialog_Export_Group_How_Tooltip;
 	public static String		Dialog_Export_Group_What;
