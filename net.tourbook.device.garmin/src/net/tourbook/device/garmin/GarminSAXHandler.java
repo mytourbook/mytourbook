@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -786,6 +786,7 @@ public class GarminSAXHandler extends DefaultHandler {
 						} catch (final ParseException e3) {
 
 							Display.getDefault().syncExec(new Runnable() {
+								@Override
 								public void run() {
 									final String message = e3.getMessage();
 									MessageDialog.openError(Display.getCurrent().getActiveShell(), "Error", message); //$NON-NLS-1$
