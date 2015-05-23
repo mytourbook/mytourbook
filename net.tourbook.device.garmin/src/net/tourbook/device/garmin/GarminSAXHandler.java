@@ -81,12 +81,11 @@ public class GarminSAXHandler extends DefaultHandler {
 
 	private static final DateTimeFormatter	_dtParser					= ISODateTimeFormat.dateTimeParser();
 
-	private static final SimpleDateFormat	TIME_FORMAT					= new SimpleDateFormat(
-																				"yyyy-MM-dd'T'HH:mm:ss'Z'");							//$NON-NLS-1$
-	private static final SimpleDateFormat	TIME_FORMAT_SSSZ			= new SimpleDateFormat(
-																				"yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");						//$NON-NLS-1$
-	private static final SimpleDateFormat	TIME_FORMAT_RFC822			= new SimpleDateFormat(//
-																				"yyyy-MM-dd'T'HH:mm:ssZ");								//$NON-NLS-1$
+	private static final SimpleDateFormat	TIME_FORMAT;
+	private static final SimpleDateFormat	TIME_FORMAT_SSSZ;
+	private static final SimpleDateFormat	TIME_FORMAT_RFC822;
+
+	private boolean							_importState_IsIgnoreSpeedValues;
 
 	private boolean							_isInActivity				= false;
 	private boolean							_isInCourse					= false;
@@ -140,7 +139,12 @@ public class GarminSAXHandler extends DefaultHandler {
 	private String							_tourNotes;
 	private Sport							_sport;
 
-	{
+	static {
+
+		TIME_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'"); //$NON-NLS-1$
+		TIME_FORMAT_SSSZ = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"); //$NON-NLS-1$
+		TIME_FORMAT_RFC822 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ"); //$NON-NLS-1$
+
 		TIME_FORMAT.setTimeZone(TimeZone.getTimeZone("UTC")); //$NON-NLS-1$
 		TIME_FORMAT_SSSZ.setTimeZone(TimeZone.getTimeZone("UTC")); //$NON-NLS-1$
 		TIME_FORMAT_RFC822.setTimeZone(TimeZone.getTimeZone("UTC")); //$NON-NLS-1$
@@ -167,6 +171,10 @@ public class GarminSAXHandler extends DefaultHandler {
 		_importFilePath = importFileName;
 		_alreadyImportedTours = alreadyImportedTours;
 		_newlyImportedTours = newlyImportedTours;
+
+		final IPreferenceStore store = Activator.getDefault().getPreferenceStore();
+
+		_importState_IsIgnoreSpeedValues = store.getBoolean(IPreferences.IS_IGNORE_SPEED_VALUES);
 	}
 
 	private static void formatDT(	final DateTimeFormatter jodaFormatter,
@@ -446,11 +454,11 @@ public class GarminSAXHandler extends DefaultHandler {
 
 			if (_isInTrackpoint) {
 
-				getData_TrackPoint20End(name);
+				getData_TrackPoint_20_End(name);
 
 			} else if (_isInCreator) {
 
-				getData_Creator20End(name);
+				getData_Creator_20_End(name);
 			}
 
 			if (name.equals(TAG_TRACKPOINT)) {
@@ -618,7 +626,7 @@ public class GarminSAXHandler extends DefaultHandler {
 		}
 	}
 
-	private void getData_Creator10Start(final String name) {
+	private void getData_Creator_10_Start(final String name) {
 
 		if (name.equals(TAG_CREATOR_NAME)) {
 			_isInCreatorName = true;
@@ -633,7 +641,7 @@ public class GarminSAXHandler extends DefaultHandler {
 		_characters.delete(0, _characters.length());
 	}
 
-	private void getData_Creator20End(final String name) {
+	private void getData_Creator_20_End(final String name) {
 
 		final String charData = _characters.toString();
 
@@ -654,7 +662,7 @@ public class GarminSAXHandler extends DefaultHandler {
 		}
 	}
 
-	private void getData_TrackPoint10Start(final String name) {
+	private void getData_TrackPoint_10_Start(final String name) {
 
 		if (name.equals(TAG_HEART_RATE_BPM)) {
 			_isInHeartRate = true;
@@ -689,6 +697,7 @@ public class GarminSAXHandler extends DefaultHandler {
 			_characters.delete(0, _characters.length());
 
 		} else if (name.equals(TAG_NS3_SPEED)) {
+
 			_isInNs3Speed = true;
 			_characters.delete(0, _characters.length());
 
@@ -702,7 +711,7 @@ public class GarminSAXHandler extends DefaultHandler {
 		}
 	}
 
-	private void getData_TrackPoint20End(final String name) throws ParseException {
+	private void getData_TrackPoint_20_End(final String name) throws ParseException {
 
 		if (_isInHeartRateValue && name.equals(TAG_VALUE)) {
 
@@ -758,7 +767,12 @@ public class GarminSAXHandler extends DefaultHandler {
 
 			_isInNs3Speed = false;
 
-			_timeData.speed = Util.parseFloat(_characters.toString());
+			if (_importState_IsIgnoreSpeedValues == false) {
+
+				// use speed values from the device
+
+				_timeData.speed = Util.parseFloat(_characters.toString());
+			}
 
 		} else if (name.equals(TAG_NS3_WATTS)) {
 
@@ -886,7 +900,7 @@ public class GarminSAXHandler extends DefaultHandler {
 
 					if (_isInTrackpoint) {
 
-						getData_TrackPoint10Start(name);
+						getData_TrackPoint_10_Start(name);
 
 					} else if (name.equals(TAG_TRACKPOINT)) {
 
@@ -923,7 +937,7 @@ public class GarminSAXHandler extends DefaultHandler {
 
 						if (_isInTrackpoint) {
 
-							getData_TrackPoint10Start(name);
+							getData_TrackPoint_10_Start(name);
 
 						} else if (name.equals(TAG_TRACKPOINT)) {
 
@@ -947,7 +961,7 @@ public class GarminSAXHandler extends DefaultHandler {
 
 					if (_isInTrackpoint) {
 
-						getData_TrackPoint10Start(name);
+						getData_TrackPoint_10_Start(name);
 
 					} else if (name.equals(TAG_TRACKPOINT)) {
 
@@ -984,7 +998,7 @@ public class GarminSAXHandler extends DefaultHandler {
 				if (_isInActivity || _isInCourse) {
 
 					if (_isInCreator) {
-						getData_Creator10Start(name);
+						getData_Creator_10_Start(name);
 					}
 
 					if (name.equals(TAG_NOTES)) {

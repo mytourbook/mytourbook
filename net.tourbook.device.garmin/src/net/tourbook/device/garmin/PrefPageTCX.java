@@ -20,6 +20,7 @@ import net.tourbook.common.preferences.BooleanFieldEditor2;
 
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -42,15 +43,26 @@ public class PrefPageTCX extends FieldEditorPreferencePage implements IWorkbench
 
 	private final IPreferenceStore	_prefStore					= Activator.getDefault().getPreferenceStore();
 
+	private SelectionAdapter		_defaultSelectionListener;
+
+	private PixelConverter			_pc;
+
+	/*
+	 * UI controls
+	 */
 	private Composite				_containerCharacter;
 
 	private Group					_groupNotesImport;
 
-	private BooleanFieldEditor		_boolean_ImportIntoDescription;
-	private BooleanFieldEditor2		_boolean_ImportIntoTitle;
+	private BooleanFieldEditor2		_editBool_IgnoreSpeedValues;
+	private BooleanFieldEditor		_editBool_ImportIntoDescription;
+	private BooleanFieldEditor2		_editBool_ImportIntoTitle;
 
-	private IntegerFieldEditor		_integer_TruncatedNotes;
+	private IntegerFieldEditor		_editInt_TruncatedNotes;
 
+	private Label					_lblIgnoreSpeed;
+
+	private Button					_chkIgnoreSpeed;
 	private Button					_rdoImportAll;
 	private Button					_rdoImportTruncated;
 
@@ -68,6 +80,14 @@ public class PrefPageTCX extends FieldEditorPreferencePage implements IWorkbench
 		final Composite parent = getFieldEditorParent();
 		GridLayoutFactory.fillDefaults().applyTo(parent);
 
+		initUI(parent);
+
+		createUI_10_Notes(parent);
+		createUI_20_Other(parent);
+	}
+
+	private void createUI_10_Notes(final Composite parent) {
+
 		_groupNotesImport = new Group(parent, SWT.NONE);
 		_groupNotesImport.setText(Messages.prefPage_tcx_group_importNotes);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(_groupNotesImport);
@@ -78,26 +98,21 @@ public class PrefPageTCX extends FieldEditorPreferencePage implements IWorkbench
 			label.setText(Messages.prefPage_tcx_label_importNotes);
 
 			// check: import into title field
-			_boolean_ImportIntoTitle = new BooleanFieldEditor2(
+			_editBool_ImportIntoTitle = new BooleanFieldEditor2(
 					IPreferences.IS_IMPORT_INTO_TITLE_FIELD,
 					Messages.prefPage_tcx_check_importIntoTitleField,
 					_groupNotesImport);
-			_boolean_ImportIntoTitle.fillIntoGrid(_groupNotesImport, 2);
-			_boolean_ImportIntoTitle.setPreferenceStore(_prefStore);
-			_boolean_ImportIntoTitle.load();
-			addField(_boolean_ImportIntoTitle);
+			_editBool_ImportIntoTitle.fillIntoGrid(_groupNotesImport, 2);
+			_editBool_ImportIntoTitle.setPreferenceStore(_prefStore);
+			_editBool_ImportIntoTitle.load();
+			addField(_editBool_ImportIntoTitle);
 
 			/*
 			 * setPropertyChangeListener() is occupied by the pref page when the field is added to
 			 * the page with addField
 			 */
-			final Button chkImportIntoTitle = _boolean_ImportIntoTitle.getChangeControl(_groupNotesImport);
-			chkImportIntoTitle.addSelectionListener(new SelectionAdapter() {
-				@Override
-				public void widgetSelected(final SelectionEvent e) {
-					enableFields();
-				}
-			});
+			final Button chkImportIntoTitle = _editBool_ImportIntoTitle.getChangeControl(_groupNotesImport);
+			chkImportIntoTitle.addSelectionListener(_defaultSelectionListener);
 
 			// container: title
 			final Composite containerTitle = new Composite(_groupNotesImport, SWT.NONE);
@@ -108,48 +123,38 @@ public class PrefPageTCX extends FieldEditorPreferencePage implements IWorkbench
 				_rdoImportAll = new Button(containerTitle, SWT.RADIO);
 				GridDataFactory.fillDefaults().span(2, 1).applyTo(_rdoImportAll);
 				_rdoImportAll.setText(Messages.prefPage_tcx_radio_importIntoTitleAll);
-				_rdoImportAll.addSelectionListener(new SelectionAdapter() {
-					@Override
-					public void widgetSelected(final SelectionEvent event) {
-						enableFields();
-					}
-				});
+				_rdoImportAll.addSelectionListener(_defaultSelectionListener);
 
 				// radio: import truncated
 				_rdoImportTruncated = new Button(containerTitle, SWT.RADIO);
 				_rdoImportTruncated.setText(Messages.prefPage_tcx_radio_importIntoTitleTruncated);
-				_rdoImportTruncated.addSelectionListener(new SelectionAdapter() {
-					@Override
-					public void widgetSelected(final SelectionEvent event) {
-						enableFields();
-					}
-				});
+				_rdoImportTruncated.addSelectionListener(_defaultSelectionListener);
 
 				// editor: number of characters
 				_containerCharacter = new Composite(containerTitle, SWT.NONE);
 				{
-					_integer_TruncatedNotes = new IntegerFieldEditor(
+					_editInt_TruncatedNotes = new IntegerFieldEditor(
 							IPreferences.NUMBER_OF_TITLE_CHARACTERS,
 							UI.EMPTY_STRING,
 							_containerCharacter);
-					_integer_TruncatedNotes.setValidRange(10, 1000);
-					_integer_TruncatedNotes.fillIntoGrid(_containerCharacter, 2);
-					_integer_TruncatedNotes.setPreferenceStore(_prefStore);
-					_integer_TruncatedNotes.load();
-					UI.setFieldWidth(_containerCharacter, _integer_TruncatedNotes, UI.DEFAULT_FIELD_WIDTH);
-					addField(_integer_TruncatedNotes);
+					_editInt_TruncatedNotes.setValidRange(10, 1000);
+					_editInt_TruncatedNotes.fillIntoGrid(_containerCharacter, 2);
+					_editInt_TruncatedNotes.setPreferenceStore(_prefStore);
+					_editInt_TruncatedNotes.load();
+					UI.setFieldWidth(_containerCharacter, _editInt_TruncatedNotes, UI.DEFAULT_FIELD_WIDTH);
+					addField(_editInt_TruncatedNotes);
 				}
 			}
 
 			// check: import into description field
-			_boolean_ImportIntoDescription = new BooleanFieldEditor(
+			_editBool_ImportIntoDescription = new BooleanFieldEditor(
 					IPreferences.IS_IMPORT_INTO_DESCRIPTION_FIELD,
 					Messages.prefPage_tcx_check_importIntoDescriptionField,
 					_groupNotesImport);
-			_boolean_ImportIntoDescription.fillIntoGrid(_groupNotesImport, 2);
-			_boolean_ImportIntoDescription.setPreferenceStore(_prefStore);
-			_boolean_ImportIntoDescription.load();
-			addField(_boolean_ImportIntoDescription);
+			_editBool_ImportIntoDescription.fillIntoGrid(_groupNotesImport, 2);
+			_editBool_ImportIntoDescription.setPreferenceStore(_prefStore);
+			_editBool_ImportIntoDescription.load();
+			addField(_editBool_ImportIntoDescription);
 		}
 
 		// add layout to the group
@@ -158,15 +163,40 @@ public class PrefPageTCX extends FieldEditorPreferencePage implements IWorkbench
 		regionalLayout.marginHeight = 5;
 	}
 
+	private void createUI_20_Other(final Composite parent) {
+
+		// check: ignore speed values
+		_editBool_IgnoreSpeedValues = new BooleanFieldEditor2(
+				IPreferences.IS_IGNORE_SPEED_VALUES,
+				Messages.PrefPage_TCX_Check_IgnoreSpeedValues,
+				parent);
+		_editBool_IgnoreSpeedValues.fillIntoGrid(parent, 1);
+		_editBool_IgnoreSpeedValues.setPreferenceStore(_prefStore);
+		_editBool_IgnoreSpeedValues.load();
+		addField(_editBool_IgnoreSpeedValues);
+
+		_chkIgnoreSpeed = _editBool_IgnoreSpeedValues.getChangeControl(parent);
+		_chkIgnoreSpeed.addSelectionListener(_defaultSelectionListener);
+
+		_lblIgnoreSpeed = new Label(parent, SWT.WRAP);
+		GridDataFactory.fillDefaults()//
+				.indent(_pc.convertHorizontalDLUsToPixels(10), 0)
+				.hint(_pc.convertWidthInCharsToPixels(40), SWT.DEFAULT)
+				.applyTo(_lblIgnoreSpeed);
+		_lblIgnoreSpeed.setText(Messages.PrefPage_TCX_Check_IgnoreSpeedValues_Tooltip);
+	}
+
 	private void enableFields() {
 
-		final boolean isTitleImport = _boolean_ImportIntoTitle.getBooleanValue();
+		final boolean isTitleImport = _editBool_ImportIntoTitle.getBooleanValue();
 		final boolean isTruncateTitle = _rdoImportTruncated.getSelection();
 
+		_lblIgnoreSpeed.setEnabled(_chkIgnoreSpeed.getSelection());
+		
 		_rdoImportAll.setEnabled(isTitleImport);
 		_rdoImportTruncated.setEnabled(isTitleImport);
 
-		_integer_TruncatedNotes.setEnabled(isTitleImport && isTruncateTitle, _containerCharacter);
+		_editInt_TruncatedNotes.setEnabled(isTitleImport && isTruncateTitle, _containerCharacter);
 	}
 
 	@Override
@@ -174,12 +204,26 @@ public class PrefPageTCX extends FieldEditorPreferencePage implements IWorkbench
 		setPreferenceStore(_prefStore);
 	}
 
+	private void initUI(final Composite parent) {
+
+		_pc = new PixelConverter(parent);
+
+		_defaultSelectionListener = new SelectionAdapter() {
+			@Override
+			public void widgetSelected(final SelectionEvent e) {
+				enableFields();
+			}
+		};
+	}
+
 	@Override
 	protected void performDefaults() {
 
-		_boolean_ImportIntoDescription.loadDefault();
-		_boolean_ImportIntoTitle.loadDefault();
-		_integer_TruncatedNotes.loadDefault();
+		_editBool_IgnoreSpeedValues.loadDefault();
+		_editBool_ImportIntoDescription.loadDefault();
+		_editBool_ImportIntoTitle.loadDefault();
+
+		_editInt_TruncatedNotes.loadDefault();
 
 		if (_prefStore.getDefaultBoolean(IPreferences.IS_TITLE_IMPORT_ALL)) {
 			_rdoImportAll.setSelection(true);

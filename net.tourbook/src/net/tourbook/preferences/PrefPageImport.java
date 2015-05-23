@@ -99,7 +99,7 @@ public class PrefPageImport extends PreferencePage implements IWorkbenchPreferen
 				_txtIdInfo = new Label(container, SWT.WRAP | SWT.READ_ONLY);
 				GridDataFactory.fillDefaults()//
 						.grab(true, false)
-						.indent(_pc.convertWidthInCharsToPixels(3), 0)
+						.indent(_pc.convertHorizontalDLUsToPixels(10), 0)
 						.hint(_pc.convertWidthInCharsToPixels(40), SWT.DEFAULT)
 						.applyTo(_txtIdInfo);
 				_txtIdInfo.setText(Messages.PrefPage_Import_Checkbox_CreateTourIdWithTime_Tooltip);
@@ -116,6 +116,7 @@ public class PrefPageImport extends PreferencePage implements IWorkbenchPreferen
 		_txtIdInfo.setEnabled(isTourIdWithTime);
 	}
 
+	@Override
 	public void init(final IWorkbench workbench) {
 
 	}
