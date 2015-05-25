@@ -31,7 +31,8 @@ public class Messages extends NLS {
 	public static String		Garmin_unknown_device;
 
 	public static String		PrefPage_TCX_Check_IgnoreSpeedValues;
-	public static String		PrefPage_TCX_Check_IgnoreSpeedValues_Tooltip;
+
+	public static String	PrefPage_TCX_Label_IgnoreSpeedValues;
 	public static String		prefPage_tcx_check_importIntoDescriptionField;
 	public static String		prefPage_tcx_check_importIntoTitleField;
 	public static String		prefPage_tcx_group_importNotes;

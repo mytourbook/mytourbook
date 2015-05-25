@@ -165,7 +165,9 @@ public class PrefPageTCX extends FieldEditorPreferencePage implements IWorkbench
 
 	private void createUI_20_Other(final Composite parent) {
 
-		// check: ignore speed values
+		/*
+		 * Check: Ignore speed values
+		 */
 		_editBool_IgnoreSpeedValues = new BooleanFieldEditor2(
 				IPreferences.IS_IGNORE_SPEED_VALUES,
 				Messages.PrefPage_TCX_Check_IgnoreSpeedValues,
@@ -178,12 +180,15 @@ public class PrefPageTCX extends FieldEditorPreferencePage implements IWorkbench
 		_chkIgnoreSpeed = _editBool_IgnoreSpeedValues.getChangeControl(parent);
 		_chkIgnoreSpeed.addSelectionListener(_defaultSelectionListener);
 
+		/*
+		 * Label: Info
+		 */
 		_lblIgnoreSpeed = new Label(parent, SWT.WRAP);
 		GridDataFactory.fillDefaults()//
 				.indent(_pc.convertHorizontalDLUsToPixels(10), 0)
 				.hint(_pc.convertWidthInCharsToPixels(40), SWT.DEFAULT)
 				.applyTo(_lblIgnoreSpeed);
-		_lblIgnoreSpeed.setText(Messages.PrefPage_TCX_Check_IgnoreSpeedValues_Tooltip);
+		_lblIgnoreSpeed.setText(Messages.PrefPage_TCX_Label_IgnoreSpeedValues);
 	}
 
 	private void enableFields() {
