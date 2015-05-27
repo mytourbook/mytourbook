@@ -9,55 +9,74 @@ DOKU DOKU DOKU DOKU DOKU DOKU DOKU DOKU DOKU DOKU DOKU DOKU DOKU DOKU DOKU DOKU 
 
 DOKU DOKU DOKU DOKU DOKU DOKU DOKU DOKU DOKU DOKU DOKU DOKU DOKU DOKU DOKU DOKU DOKU DOKU DOKU DOKU DOKU 
 
+  
 
+New + Improvements
+==================	
 
-Improvements
-============
+* GPX Import
+  - Support .gpx files which are not xml well formed #123     
+  - Import values with these tags: <un:cad> <un:hr> <un:power>
+  - Convert waypoints into tour markers.
+  - Import all tour marker fields and some of the tour fields with the
+    custom tags <mt:...>
 
 * FIT Import
-  - Import fractional cadence.
-  - Support Bryton 210 .fit files. This data format contains duplicated time records which must be merged to have valid tour data.
-    The manufacturer field contains the value "DEVELOPMENT" (255)
-  - Support FR70 .fit files. 
-    This data format can contain 0 sessions but the data are still valid.
-	 
-* GPX Import
-  - Support .gpx files which are not xml well formed, 
-    feature request #123 	 http://sourceforge.net/p/mytourbook/feature-requests/123/
-  - Import values with these tags: <un:cad> <un:hr> <un:power>
-  - Convert waypoints into tour marker.
-  - Import all tour marker fields and some of the tour fields with the custom tags <mt:...>
-  
+  - Import fractional cadence. This improves the data quality for jogger.
+  - Support .fit files from Bryton 210.
+    This data format can contain duplicated time records which must be 
+    merged to have valid tour data. The manufacturer field can contain 
+    the value "DEVELOPMENT" (255).
+  - Support .fit files from Garmin FR70.
+    This data format can contain 0 sessions but the data are still 
+    valid.
+
+* TCX Import
+  - New option to ignore device speed values.
+
 * Export Dialog
-  - Restructured UI.
-  
+  - New fields and improved UI.
+
 * GPX Export
-  - Export url and url text for tour marker/waypoints. 
-  - Export all tour/marker fields which allows to exactly recreate them when imported.
+  - Export distance with absolute or relative values #119
+  - Export url and url text for tour marker/waypoints.
+  - Export all tour/marker fields which allows to exactly recreate them 
+    when imported.
   - Export some tour fields with the custom tags <mt:...>
-  
+  - Special option: Append "with barometer" to the field "creator".
+
 * Tour Book
-  - Moved first two actions from the view menu into the view toolbar. This makes it easier to access it.
- 
+  - Moved year subcategory actions from the view menu into the view 
+    toolbar.
+
 * Tour Calendar
   - Prevent that empty lines are displayed.
-  - Prevent that the same text is displayed multiple times for the same tour.
+  - Prevent that the same text is displayed multiple times for the same 
+    tour.
+
+* Reference Tours
+  - Show number of tours for each reference tour when view is collapsed.
+
+* Year Statistic
+  - Keep year range when another reference tour is selected.
 
 * Tour Editor
-  - Calories can always be edited, removed restriction.
-  
+  - Calories can be edited always, removed restriction.
+
 * Tour Catalog + Year Statistic
   - Show average pulse for each compared tour.
-  
-* Compared Tour Chart
-  - New actions to navigate to next/previous tour which is retrieved from the "Year Statistic" or the "Compare Result" view.
- 
-    
-Bugfix
-======
 
-* GPX Export 
-  Export texts with special characters, any text fields are now exported as CDATA
-  https://sourceforge.net/p/mytourbook/bugs/72/
-  
-  
+* Compared Tour Chart
+  - New actions to navigate to the next/previous tour which is retrieved 
+    from the "Year Statistic" or" the "Compare Result" view.
+    With this feature the mouse must be moved much less than before to 
+    adjust/save/navigate compared tours.
+
+ 
+Bugfix
+======	
+
+GPX Export
+  - Fixed bug #72: Export texts with special characters, any text fields 
+    are now exported as CDATA
+   

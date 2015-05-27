@@ -879,10 +879,26 @@ public class YearStatisticView extends ViewPart {
 		// get the last year when it's forced
 		if (isShowLatestYear && yearItems != null && yearItems.length > 0) {
 
-			final Object item = yearItems[yearItems.length - 1];
+			final Object firstItem = yearItems[0];
+			final Object lastItem = yearItems[yearItems.length - 1];
 
-			if (item instanceof TVICatalogYearItem) {
-				_lastYear = ((TVICatalogYearItem) item).year;
+			if (lastItem instanceof TVICatalogYearItem) {
+
+				final int newFirstYear = ((TVICatalogYearItem) firstItem).year;
+				final int newLastYear = ((TVICatalogYearItem) lastItem).year;
+
+				/*
+				 * Use current years when the new items are in the current range, otherwise adjust
+				 * the years
+				 */
+				if (newLastYear <= _lastYear && newFirstYear >= _lastYear - _numberOfYears) {
+
+					// new years are within the current year range
+
+				} else {
+
+					_lastYear = newLastYear;
+				}
 			}
 		}
 
