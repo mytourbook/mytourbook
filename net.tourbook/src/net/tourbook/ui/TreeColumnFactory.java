@@ -396,6 +396,21 @@ public abstract class TreeColumnFactory {
 		};
 	};
 
+	public static final TreeColumnFactory NUMBER_OF_TOURS = new TreeColumnFactory() {
+		@Override
+		public TreeColumnDefinition createColumn(final ColumnManager columnManager, final PixelConverter pixelConverter) {
+			
+			final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "NumberOfTours", SWT.TRAIL); //$NON-NLS-1$
+
+			colDef.setColumnLabel(Messages.ColumnFactory_NumberOfTours_Label);
+			colDef.setColumnHeaderText(Messages.ColumnFactory_NumberOfTours_Header);
+			colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_NumberOfTours_Tooltip);
+			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(8));
+			
+			return colDef;
+		};
+	};
+
 	public static final TreeColumnFactory PAUSED_TIME = new TreeColumnFactory() {
 		@Override
 		public TreeColumnDefinition createColumn(final ColumnManager columnManager, final PixelConverter pixelConverter) {

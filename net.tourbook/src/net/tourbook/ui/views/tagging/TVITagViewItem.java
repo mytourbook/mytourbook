@@ -107,26 +107,26 @@ public abstract class TVITagViewItem extends TreeViewerItem {
 	public static void readTagTotals(final TVITagViewTag tagItem) {
 
 		try {
-			final StringBuilder sb = new StringBuilder();
+
 			final SQLFilter sqlFilter = new SQLFilter();
 
 			/*
 			 * get tags
 			 */
-			sb.append("SELECT "); //$NON-NLS-1$
-			sb.append(SQL_SUM_COLUMNS);
+			final String sql = "" //$NON-NLS-1$
+			//
+					+ ("SELECT " + SQL_SUM_COLUMNS) //$NON-NLS-1$
+					+ (" FROM " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + " jtblTagData") //$NON-NLS-1$ //$NON-NLS-2$
 
-			sb.append(" FROM " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + " jtblTagData"); //$NON-NLS-1$ //$NON-NLS-2$
+					// get data for a tour
+					+ (" LEFT OUTER JOIN " + TourDatabase.TABLE_TOUR_DATA + " TourData ON ") //$NON-NLS-1$ //$NON-NLS-2$
+					+ (" jtblTagData.TourData_tourId = TourData.tourId") //$NON-NLS-1$
 
-			// get data for a tour
-			sb.append(" LEFT OUTER JOIN " + TourDatabase.TABLE_TOUR_DATA + " TourData ON "); //$NON-NLS-1$ //$NON-NLS-2$
-			sb.append(" jtblTagData.TourData_tourId = TourData.tourId"); //$NON-NLS-1$
-
-			sb.append(" WHERE jtblTagData.TourTag_TagId = ?"); //$NON-NLS-1$
-			sb.append(sqlFilter.getWhereClause());
+					+ " WHERE jtblTagData.TourTag_TagId = ?" //$NON-NLS-1$
+					+ sqlFilter.getWhereClause();
 
 			final Connection conn = TourDatabase.getInstance().getConnection();
-			final PreparedStatement statement = conn.prepareStatement(sb.toString());
+			final PreparedStatement statement = conn.prepareStatement(sql);
 			statement.setLong(1, tagItem.getTagId());
 			sqlFilter.setParameters(statement, 2);
 

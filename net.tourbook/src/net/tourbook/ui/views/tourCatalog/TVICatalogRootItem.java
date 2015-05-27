@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -44,22 +44,27 @@ public class TVICatalogRootItem extends TVICatalogItem {
 		final ArrayList<TreeViewerItem> children = new ArrayList<TreeViewerItem>();
 		setChildren(children);
 
-		final StringBuilder sb = new StringBuilder();
+		final String sql = "" //$NON-NLS-1$
+		//
+				+ "SELECT" //$NON-NLS-1$
 
-		sb.append("SELECT"); //$NON-NLS-1$
+				+ " label," //$NON-NLS-1$
+				+ " refId," //$NON-NLS-1$
+				+ " TourData_tourId," //$NON-NLS-1$
 
-		sb.append(" label,"); //$NON-NLS-1$
-		sb.append(" refId,"); //$NON-NLS-1$
-		sb.append(" TourData_tourId"); //$NON-NLS-1$
-//		sb.append(" SUM(1)");
+				// get number of compared tours
+				+ "(	select sum(1)" //$NON-NLS-1$
+				+ ("		from " + TourDatabase.TABLE_TOUR_COMPARED) //$NON-NLS-1$
+				+ ("		where " + TourDatabase.TABLE_TOUR_COMPARED + ".reftourid=" + TourDatabase.TABLE_TOUR_REFERENCE + ".refid") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				+ ")" //$NON-NLS-1$
 
-		sb.append(" FROM " + TourDatabase.TABLE_TOUR_REFERENCE); //$NON-NLS-1$
-		sb.append(" ORDER BY label"); //$NON-NLS-1$
+				+ (" FROM " + TourDatabase.TABLE_TOUR_REFERENCE) //$NON-NLS-1$
+				+ (" ORDER BY label"); //$NON-NLS-1$
 
 		try {
 
 			final Connection conn = TourDatabase.getInstance().getConnection();
-			final PreparedStatement statement = conn.prepareStatement(sb.toString());
+			final PreparedStatement statement = conn.prepareStatement(sql);
 			final ResultSet result = statement.executeQuery();
 
 			while (result.next()) {
@@ -70,7 +75,7 @@ public class TVICatalogRootItem extends TVICatalogItem {
 				refItem.label = result.getString(1);
 				refItem.refId = result.getLong(2);
 				refItem.setTourId(result.getLong(3));
-//				refItem.tourCounter = result.getInt(1);
+				refItem.tourCounter = result.getInt(4);
 			}
 
 			conn.close();

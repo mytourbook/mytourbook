@@ -211,6 +211,10 @@ public class Messages extends NLS {
 	public static String		ColumnFactory_NumberOfTourPhotos_Header;
 	public static String		ColumnFactory_NumberOfTourPhotos_Label;
 	public static String		ColumnFactory_NumberOfTourPhotos_Tooltip;
+	public static String		ColumnFactory_NumberOfTours_Header;
+	public static String		ColumnFactory_NumberOfTours_Label;
+	public static String		ColumnFactory_NumberOfTours_Tooltip;
+
 	public static String		ColumnFactory_PhotoTimeAdjustment_Header;
 	public static String		ColumnFactory_PhotoTimeAdjustment_Label;
 	public static String		ColumnFactory_PhotoTimeAdjustment_Tooltip;

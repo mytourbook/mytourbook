@@ -624,18 +624,19 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 
 	private void defineAllColumns(final Composite parent) {
 
-		defineColumn1stColumn();
-		defineColumnTourType();
-		defineColumnTitle();
-		defineColumnTags();
-		defineColumnSpeed();
-		defineColumnAvgPulse();
+		defineColumn_1stColumn();
+		defineColumn_Count();
+		defineColumn_TourType();
+		defineColumn_Title();
+		defineColumn_Tags();
+		defineColumn_Speed();
+		defineColumn_AvgPulse();
 	}
 
 	/**
 	 * first column: ref tour name/compare tour name /year
 	 */
-	private void defineColumn1stColumn() {
+	private void defineColumn_1stColumn() {
 
 		final TreeColumnDefinition colDef = TreeColumnFactory.REF_TOUR.createColumn(_columnManager, _pc);
 		colDef.setIsDefaultColumn();
@@ -712,7 +713,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 	/**
 	 * column: Avg pulse
 	 */
-	private void defineColumnAvgPulse() {
+	private void defineColumn_AvgPulse() {
 
 		final TreeColumnDefinition colDef = TreeColumnFactory.AVG_PULSE.createColumn(_columnManager, _pc);
 		colDef.setIsDefaultColumn();
@@ -733,9 +734,31 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 	}
 
 	/**
+	 * column: Count
+	 */
+	private void defineColumn_Count() {
+		
+		final TreeColumnDefinition colDef = TreeColumnFactory.NUMBER_OF_TOURS.createColumn(_columnManager, _pc);
+		colDef.setIsDefaultColumn();
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+				final Object element = cell.getElement();
+				if (element instanceof TVICatalogRefTourItem) {
+					
+					final int numberOfTours = ((TVICatalogRefTourItem) element).tourCounter;
+					if (numberOfTours > 0) {
+						cell.setText(Integer.toString(numberOfTours));
+					}
+				}
+			}
+		});
+	}
+
+	/**
 	 * column: speed
 	 */
-	private void defineColumnSpeed() {
+	private void defineColumn_Speed() {
 
 		final TreeColumnDefinition colDef = TreeColumnFactory.SPEED.createColumn(_columnManager, _pc);
 		colDef.setIsDefaultColumn();
@@ -757,7 +780,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 	/**
 	 * column: tags
 	 */
-	private void defineColumnTags() {
+	private void defineColumn_Tags() {
 
 		final TreeColumnDefinition colDef = TreeColumnFactory.TOUR_TAGS.createColumn(_columnManager, _pc);
 		colDef.setIsDefaultColumn();
@@ -791,7 +814,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 	/**
 	 * column: title
 	 */
-	private void defineColumnTitle() {
+	private void defineColumn_Title() {
 
 		final TreeColumnDefinition colDef = TreeColumnFactory.TITLE.createColumn(_columnManager, _pc);
 		colDef.setIsDefaultColumn();
@@ -825,7 +848,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 	/**
 	 * column: tour type
 	 */
-	private void defineColumnTourType() {
+	private void defineColumn_TourType() {
 
 		final TreeColumnDefinition colDef = TreeColumnFactory.TOUR_TYPE.createColumn(_columnManager, _pc);
 		colDef.setIsDefaultColumn();
