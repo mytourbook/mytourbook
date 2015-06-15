@@ -81,7 +81,7 @@
 
 			<fileset dir="${path-mt-trunk}">
 
-				<include name="**/plugin*.xproperties" />
+				<include name="**/plugin*.properties" />
 				<include name="**/messages*.properties" />
 
 				<exclude name="**/bin/" />

@@ -18,7 +18,7 @@ New + Improvements
   - Support .gpx files which are not xml well formed #123     
   - Import values with these tags: <un:cad> <un:hr> <un:power>
   - Convert waypoints into tour markers.
-  - Import all tour marker fields and some of the tour fields with the
+  - Import all tour marker fields and many of the tour fields with the
     custom tags <mt:...>
 
 * FIT Import
@@ -42,7 +42,8 @@ New + Improvements
   - Export url and url text for tour marker/waypoints.
   - Export all tour/marker fields which allows to exactly recreate them 
     when imported.
-  - Export some tour fields with the custom tags <mt:...>
+  - Many of the tour fields can be exported with the custom tags 
+    <mt:...>
   - Special option: Append "with barometer" to the field "creator".
 
 * Tour Book
