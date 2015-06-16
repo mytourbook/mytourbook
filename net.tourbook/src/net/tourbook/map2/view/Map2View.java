@@ -284,9 +284,12 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 																								.getInstance();
 	private MapGraphId						_tourColorId;
 
-	private int								_tourIdHash;
-	private int								_tourDataHash;
-	private long							_tourHashOverlayKey;
+	private int								_hashTourId;
+	private int								_hashTourData;
+	private long							_hashTourOverlayKey;
+
+	private int								_hashFilteredPhotos;
+	private int								_hashAllPhotos;
 
 	/**
 	 * Is <code>true</code> when a link photo is displayed, otherwise a tour photo (photo which is
@@ -2035,10 +2038,22 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 
 	private void paintPhotos(final ArrayList<Photo> allPhotos) {
 
+		/*
+		 * TESTING if a map redraw can be avoided, 15.6.2015
+		 */
+		final int filteredPhotoHash = _filteredPhotos.hashCode();
+		final int allPhotoHash = _allPhotos.hashCode();
+		if (filteredPhotoHash == _hashFilteredPhotos && allPhotoHash == _hashAllPhotos) {
+			return;
+		}
+
 		_allPhotos.clear();
 		_allPhotos.addAll(allPhotos);
 
 		runPhotoFilter();
+
+		_hashFilteredPhotos = _filteredPhotos.hashCode();
+		_hashAllPhotos = _allPhotos.hashCode();
 
 //		// dump tour photos
 //		System.out.println(net.tourbook.common.UI.timeStampNano() + " paintPhotos\t");
@@ -2105,6 +2120,15 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 
 	private void paintTours(final ArrayList<Long> tourIdList) {
 
+		/*
+		 * TESTING if a map redraw can be avoided, 15.6.2015
+		 */
+		final int tourIdsHashCode = tourIdList.hashCode();
+		final int allToursHashCode = _allTourData.hashCode();
+		if (tourIdsHashCode == _hashTourId && allToursHashCode == _hashTourData) {
+			return;
+		}
+
 		_isTourOrWayPoint = true;
 
 		// force single tour to be repainted
@@ -2115,17 +2139,17 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 		_map.setShowOverlays(_isShowTour || _isShowPhoto);
 		_map.setShowLegend(_isShowTour && _isShowLegend);
 
-		long newOverlayKey = _tourHashOverlayKey;
+		long newOverlayKey = _hashTourOverlayKey;
 
-		if (tourIdList.hashCode() != _tourIdHash || _allTourData.hashCode() != _tourDataHash) {
+		if (tourIdList.hashCode() != _hashTourId || _allTourData.hashCode() != _hashTourData) {
 
 			// tour data needs to be loaded
 
 			newOverlayKey = TourManager.loadTourData(tourIdList, _allTourData);
 
-			_tourIdHash = tourIdList.hashCode();
-			_tourDataHash = _allTourData.hashCode();
-			_tourHashOverlayKey = newOverlayKey;
+			_hashTourId = tourIdList.hashCode();
+			_hashTourData = _allTourData.hashCode();
+			_hashTourOverlayKey = newOverlayKey;
 		}
 
 		_tourPainterConfig.setTourData(_allTourData, _isShowTour);
@@ -2600,6 +2624,9 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 		actionSetDefaultPosition();
 	}
 
+	/**
+	 * Filter photos by rating stars.
+	 */
 	private void runPhotoFilter() {
 
 		_filteredPhotos.clear();

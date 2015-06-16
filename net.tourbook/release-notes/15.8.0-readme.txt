@@ -1,0 +1,14 @@
+Version 15.8.0                                             ?. August 2015
+
+
+
+New + Improvements
+==================	
+
+
+Map2
+- Prevent redrawing for multiple tours.
+
+ 
+Bugfix
+======	

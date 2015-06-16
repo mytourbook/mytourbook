@@ -87,6 +87,7 @@ import net.tourbook.tour.TourManager;
 import net.tourbook.ui.UI;
 import net.tourbook.ui.tourChart.ChartLabel;
 import net.tourbook.ui.tourChart.ChartLayer2ndAltiSerie;
+import net.tourbook.ui.tourChart.TourChart;
 import net.tourbook.ui.views.ISmoothingAlgorithm;
 import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
 
@@ -1106,6 +1107,13 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 	 */
 	@Transient
 	private double[]											timeSerieWithTimeZoneAdjustment;
+
+	/**
+	 * {@link TourData} contains multiple tours or a virtual tour. It is created when multiple tours
+	 * are selected to be displayed in the {@link TourChart}.
+	 */
+	@Transient
+	public boolean												isMultipleTours;
 
 	/**
 	 * A value is <code>true</code> when cadence is 0.
@@ -6686,6 +6694,14 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 		tourId = System.nanoTime();
 
 		isHistoryTour = true;
+	}
+
+	public void setupMultipleTour() {
+
+		// each tourData requires a tour id to identify it in equals();
+		tourId = System.nanoTime();
+
+		isMultipleTours = true;
 	}
 
 	/**

@@ -1894,9 +1894,9 @@ public class TourDatabase {
 		}
 
 		/*
-		 * history tour cannot be saved
+		 * History tour or multiple tours cannot be saved
 		 */
-		if (tourData.isHistoryTour) {
+		if (tourData.isHistoryTour || tourData.isMultipleTours) {
 			return null;
 		}
 

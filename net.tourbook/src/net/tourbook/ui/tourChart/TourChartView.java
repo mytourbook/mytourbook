@@ -16,6 +16,8 @@
 package net.tourbook.ui.tourChart;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
@@ -531,7 +533,14 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 					// force update when photo link selection occured
 					_isForceUpdate = _tourPhotoLink != null;
 
-					updateChart(tourIds.get(0));
+					if (tourIds.size() > 0) {
+
+						// show multiple tours
+						updateChart(tourIds);
+
+					} else {
+						updateChart(tourIds.get(0));
+					}
 				}
 
 			} else if (selection instanceof SelectionChartInfo) {
@@ -751,6 +760,60 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 		final TourData savedTourData = TourManager.saveModifiedTour(tourData);
 
 		updateChart(savedTourData);
+	}
+
+	private void updateChart(final ArrayList<Long> tourIds) {
+
+		final TourData multipleTourData = new TourData();
+		multipleTourData.setupMultipleTour();
+
+		int timeSerieSize = 0;
+
+		// get all tours from the tour id
+		final ArrayList<TourData> multipleTours = new ArrayList<TourData>();
+		for (final Long tourId : tourIds) {
+
+			final TourData tourData = TourManager.getInstance().getTourData(tourId);
+
+			multipleTours.add(tourData);
+
+			timeSerieSize += tourData.timeSerie.length;
+		}
+
+		// sort tours by start date/time
+		Collections.sort(multipleTours, new Comparator<TourData>() {
+			@Override
+			public int compare(final TourData t1, final TourData t2) {
+				return t1.getTourStartTimeMS() < t2.getTourStartTimeMS() ? -1 : 1;
+			}
+		});
+
+		// create data series for multiple tours
+
+		final int[] timeSerie2 = multipleTourData.timeSerie = new int[timeSerieSize];
+		final float[] altitudeSerie2 = multipleTourData.altitudeSerie = new float[timeSerieSize];
+
+		int timeSerie2Start = 0;
+
+		for (final TourData tourData : multipleTours) {
+
+			final int[] timeSerie1 = tourData.timeSerie;
+			final float[] altitudeSerie1 = tourData.altitudeSerie;
+
+			final int serieLength1 = timeSerie1.length;
+
+			System.arraycopy(timeSerie1, 0, timeSerie2, timeSerie2Start, serieLength1);
+
+			if (altitudeSerie1 != null) {
+				System.arraycopy(altitudeSerie1, 0, altitudeSerie2, timeSerie2Start, serieLength1);
+			}
+
+			timeSerie2Start += serieLength1;
+		}
+
+		updateChart(multipleTourData);
+
+		fireSliderPosition();
 	}
 
 	private void updateChart(final long tourId) {
