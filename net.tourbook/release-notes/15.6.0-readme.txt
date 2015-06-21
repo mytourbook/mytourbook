@@ -1,4 +1,4 @@
-Version 15.6.0                                             ?. June 2015
+Version 15.6.0                                             20. June 2015
 
 
 
@@ -16,7 +16,7 @@ New + Improvements
 
 * GPX Import
   - Support .gpx files which are not xml well formed #123     
-  - Import values with these tags: <un:cad> <un:hr> <un:power>
+  - Import values from these tags: <un:cad> <un:hr> <un:power>
   - Convert waypoints into tour markers.
   - Import all tour marker fields and many of the tour fields with the
     custom tags <mt:...>
@@ -24,9 +24,9 @@ New + Improvements
 * FIT Import
   - Import fractional cadence. This improves the data quality for jogger.
   - Support .fit files from Bryton 210.
-    This data format can contain duplicated time records which must be 
-    merged to have valid tour data. The manufacturer field can contain 
-    the value "DEVELOPMENT" (255).
+    This data format can contain duplicated time records, they are 
+    merged to be a valid tour. The manufacturer field can contain the 
+    value "DEVELOPMENT" (255).
   - Support .fit files from Garmin FR70.
     This data format can contain 0 sessions but the data are still 
     valid.
@@ -59,7 +59,7 @@ New + Improvements
   - Show number of tours for each reference tour when view is collapsed.
 
 * Year Statistic
-  - Keep year range when another reference tour is selected.
+  - Keep year range when another tour is selected.
 
 * Tour Editor
   - Calories can be edited always, removed restriction.
