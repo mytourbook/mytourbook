@@ -863,6 +863,7 @@ public class TourPhotoManager implements IPhotoServiceProvider {
 			final long tourEndDate = lastPhotoTime + 5 * UI.DAY_IN_SECONDS * 1000;
 
 			BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
+				@Override
 				public void run() {
 					loadToursFromDb_Runnable(tourStartDate, tourEndDate);
 				}
@@ -1082,6 +1083,7 @@ public class TourPhotoManager implements IPhotoServiceProvider {
 
 				// check which images are available at the new location
 				BusyIndicator.showWhile(display, new Runnable() {
+					@Override
 					public void run() {
 
 						final IPath folderPath = new Path(newImageFolder[0]).addTrailingSeparator();
@@ -1156,6 +1158,7 @@ public class TourPhotoManager implements IPhotoServiceProvider {
 		if (modifiedImages.size() > 0) {
 
 			BusyIndicator.showWhile(display, new Runnable() {
+				@Override
 				public void run() {
 
 					final ArrayList<ImagePathReplacement> replacedImagesInDb = replaceImageFilePath_InSQLDb(
@@ -1700,7 +1703,13 @@ public class TourPhotoManager implements IPhotoServiceProvider {
 		final int numberOfTimeSlices = timeSerie.length;
 
 		final long tourStart = tourData.getTourStartTime().getMillis() / 1000;
-		long timeSliceEnd = tourStart + (long) (timeSerie[1] / 2.0);
+		long timeSliceEnd;
+		if (numberOfTimeSlices > 1) {
+			timeSliceEnd = tourStart + (long) (timeSerie[1] / 2.0);
+		} else {
+			// tour contains only 1 time slice
+			timeSliceEnd = tourStart;
+		}
 
 		int timeIndex = 0;
 		int photoIndex = 0;
