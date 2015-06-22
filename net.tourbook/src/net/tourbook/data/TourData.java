@@ -1116,6 +1116,18 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 	public boolean												isMultipleTours;
 
 	/**
+	 * Contains the tour start index in the data series.
+	 */
+	@Transient
+	public int[]												multipleTourStartIndex;
+
+	/**
+	 * Contains tour titles for different widths.
+	 */
+	@Transient
+	public String[]												multipleTourTitles;
+
+	/**
 	 * A value is <code>true</code> when cadence is 0.
 	 */
 	@Transient
@@ -2318,7 +2330,7 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 	}
 
 	/**
-	 * compute maximum and average fields
+	 * Compute maximum and average fields.
 	 */
 	public void computeComputedValues() {
 
@@ -5530,6 +5542,9 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 		return tourDistance;
 	}
 
+	/**
+	 * @return Returns driving/moving time in seconds.
+	 */
 	public long getTourDrivingTime() {
 		return tourDrivingTime;
 	}

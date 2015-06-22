@@ -86,8 +86,8 @@ public class TourInfoUI {
 
 	private static PeriodType			_tourPeriodTemplate		= PeriodType.yearMonthDayTime()
 																// hide these components
-																		.withMinutesRemoved()
-																		.withSecondsRemoved()
+//																		.withMinutesRemoved()
+//																		.withSecondsRemoved()
 																		.withMillisRemoved();
 
 	private final PeriodFormatter		_durationFormatter		= new PeriodFormatterBuilder()
@@ -970,9 +970,9 @@ public class TourInfoUI {
 		final DateTime dtTourStart = _tourData.getTourStartTime();
 		final DateTime dtTourEnd = dtTourStart.plus(recordingTime * 1000);
 
-		final boolean isHistory = recordingTime < net.tourbook.common.UI.DAY_IN_SECONDS;
+		final boolean is1DayTour = recordingTime < net.tourbook.common.UI.DAY_IN_SECONDS;
 
-		if (isHistory) {
+		if (is1DayTour) {
 
 			// < 1 day
 
@@ -1023,11 +1023,13 @@ public class TourInfoUI {
 			_lblMovingTimeHour.setVisible(false);
 			_lblBreakTimeHour.setVisible(false);
 
-			final Period tourPeriod = new Period(dtTourStart, dtTourEnd, _tourPeriodTemplate);
+			final Period recordingPeriod = new Period(dtTourStart, dtTourEnd, _tourPeriodTemplate);
+			final Period movingPeriod = recordingPeriod.minusSeconds((int) breakTime);
+			final Period breakPeriod = new Period(breakTime * 1000, _tourPeriodTemplate, null);
 
-			_lblRecordingTime.setText(tourPeriod.toString(_durationFormatter));
-			_lblMovingTime.setText(UI.EMPTY_STRING);
-			_lblBreakTime.setText(UI.EMPTY_STRING);
+			_lblRecordingTime.setText(recordingPeriod.toString(_durationFormatter));
+			_lblMovingTime.setText(movingPeriod.normalizedStandard(_tourPeriodTemplate).toString(_durationFormatter));
+			_lblBreakTime.setText(breakPeriod.toString(_durationFormatter));
 		}
 
 		int windSpeed = _tourData.getWeatherWindSpeed();

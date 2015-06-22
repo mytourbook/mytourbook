@@ -53,7 +53,8 @@ public class ChartDataXSerie extends ChartDataSerie {
 	private int[]			_rangeMarkerEndIndex;
 
 	/**
-	 * Segment contains information to show statistics for several years
+	 * Segment contains information to show divide the chart into parts, e.g. statistics for several
+	 * years.
 	 */
 	private ChartSegments	_chartSegments;
 

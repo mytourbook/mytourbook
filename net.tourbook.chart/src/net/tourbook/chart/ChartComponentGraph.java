@@ -1716,7 +1716,7 @@ public class ChartComponentGraph extends Canvas {
 
 		final ChartSegments chartSegments = drawingData.getXData().getChartSegments();
 
-		if (chartSegments == null || chartSegments.isDrawSegmentBackground == false) {
+		if (chartSegments == null) {
 			return;
 		}
 
@@ -1732,7 +1732,7 @@ public class ChartComponentGraph extends Canvas {
 			return;
 		}
 
-		final Color alternateColor = new Color(gc.getDevice(), 0xf5, 0xf5, 0xf5); // efefef
+		final Color alternateColor = new Color(gc.getDevice(), 0xf5, 0xf5, 0xf5);
 
 		for (int segmentIndex = 0; segmentIndex < startValues.length; segmentIndex++) {
 
@@ -1843,21 +1843,22 @@ public class ChartComponentGraph extends Canvas {
 
 				for (int segmentIndex = 0; segmentIndex < valueStart.length; segmentIndex++) {
 
-					// draw the title in the center of the segment
 					final String segmentTitle = segmentTitles[segmentIndex];
+
 					if (segmentTitle != null) {
 
 						final int devXSegmentStart = (int) (scaleX * valueStart[segmentIndex] - _xxDevViewPortLeftBorder);
 						final int devXSegmentEnd = (int) (scaleX * (valueEnd[segmentIndex] + 1) - _xxDevViewPortLeftBorder);
 
-						final int devXSegmentLength = devXSegmentEnd - devXSegmentStart;
-						final int devXSegmentCenter = devXSegmentEnd - (devXSegmentLength / 2);
+						final int segmentLength = devXSegmentEnd - devXSegmentStart;
+						final int devXSegmentCenter = devXSegmentEnd - (segmentLength / 2);
 
 						final int devXTitleCenter = gc.textExtent(segmentTitle).x / 2;
 
 						final int devX = devXSegmentCenter - devXTitleCenter;
 
 						if (devX <= devXChartTitleEnd) {
+
 							// skip title when it overlaps the previous title
 							continue;
 						}

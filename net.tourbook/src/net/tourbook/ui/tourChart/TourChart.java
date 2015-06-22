@@ -188,8 +188,8 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 	private IFillPainter				_hrZonePainter;
 
 	private ActionChartOptions			_actionOptions;
-	private TourToolTip					_tourToolTip;
 
+	private TourToolTip					_tourToolTip;
 	private TourInfoToolTipProvider		_tourInfoToolTipProvider;
 
 	private ChartPhotoToolTip			_photoTooltip;

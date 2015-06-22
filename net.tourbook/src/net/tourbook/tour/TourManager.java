@@ -26,6 +26,7 @@ import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.ChartDataSerie;
 import net.tourbook.chart.ChartDataXSerie;
 import net.tourbook.chart.ChartDataYSerie;
+import net.tourbook.chart.ChartSegments;
 import net.tourbook.chart.ChartType;
 import net.tourbook.chart.ComputeChartValue;
 import net.tourbook.common.CommonActivator;
@@ -2551,6 +2552,10 @@ public class TourManager {
 			chartDataModel.addXyData(yDataHistory);
 			chartDataModel.addYData(yDataHistory);
 			chartDataModel.setCustomData(CUSTOM_DATA_HISTORY, yDataHistory);
+
+		} else if (tourData.isMultipleTours) {
+
+			createTourSegments(tourData, chartDataModel);
 		}
 
 		chartDataModel.setShowNoLineValues(tourChartConfig.isShowBreaktimeValues);
@@ -2573,6 +2578,52 @@ public class TourManager {
 
 	private ChartDataYSerie createChartDataSerie(final float[][] dataSerie, final ChartType chartType) {
 		return new ChartDataYSerie(chartType, dataSerie);
+	}
+
+	/**
+	 * Create segments for the chart, each tour is a segment. Segments are used to draw different
+	 * background colors.
+	 * 
+	 * @param tourData
+	 * @param chartDataModel
+	 */
+	private void createTourSegments(final TourData tourData, final ChartDataModel chartDataModel) {
+
+		final ChartDataXSerie xData = chartDataModel.getXData();
+		final double[] xValues = xData.getHighValuesDouble()[0];
+
+		final int[] multipleTourStartIndex = tourData.multipleTourStartIndex;
+		final int[] timeSerie = tourData.timeSerie;
+
+		final int numberOfTours = multipleTourStartIndex.length;
+
+		final long segmentStartValue[] = new long[numberOfTours];
+		final long segmentEndValue[] = new long[numberOfTours];
+
+		for (int tourIndex = 0; tourIndex < numberOfTours; tourIndex++) {
+
+			final int tourStartIndex = multipleTourStartIndex[tourIndex];
+
+			int tourEndIndex;
+			if (tourIndex == numberOfTours - 1) {
+
+				// last tour
+				tourEndIndex = timeSerie.length - 1;
+
+			} else {
+				tourEndIndex = multipleTourStartIndex[tourIndex + 1] - 1;
+			}
+
+			segmentStartValue[tourIndex] = (long) xValues[tourStartIndex];
+			segmentEndValue[tourIndex] = (long) xValues[tourEndIndex];
+		}
+
+		final ChartSegments chartSegments = new ChartSegments();
+		chartSegments.valueStart = segmentStartValue;
+		chartSegments.valueEnd = segmentEndValue;
+		chartSegments.segmentTitle = tourData.multipleTourTitles;
+
+		xData.setChartSegments(chartSegments);
 	}
 
 	public TourChart getActiveTourChart() {
