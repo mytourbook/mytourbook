@@ -214,7 +214,8 @@ public class FitContext {
 
 							int markerSerieIndex = serieIndex
 							// ensure that the correct index is set for the marker
-							- 1;
+//							- 1;
+							;
 
 							// check bounds
 							if (markerSerieIndex < 0) {

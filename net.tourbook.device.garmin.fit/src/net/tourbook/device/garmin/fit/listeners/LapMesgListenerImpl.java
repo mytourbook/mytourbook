@@ -55,7 +55,8 @@ public class LapMesgListenerImpl extends AbstractMesgListener implements LapMesg
 		if (totalElapsedTime != null) {
 
 			lapTime = context.getLapTime();
-			lapTime += Math.round(totalElapsedTime);
+//			lapTime += Math.round(totalElapsedTime);
+			lapTime += totalElapsedTime;
 
 			context.setLapTime(lapTime);
 
