@@ -47,6 +47,7 @@ import net.tourbook.common.util.IToolTipHideListener;
 import net.tourbook.common.util.ITourToolTipProvider;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.TourToolTip;
+import net.tourbook.common.util.Util;
 import net.tourbook.data.TourWayPoint;
 import net.tourbook.map2.view.WayPointToolTipProvider;
 import net.tourbook.ui.IInfoToolTipProvider;
@@ -2157,52 +2158,45 @@ public class Map extends Canvas {
 		final double latitude = mapCenter.latitude;
 		final double longitude = mapCenter.longitude;
 
-		final double devDistance = _mp.getDistance(new GeoPosition(latitude - 0.5, longitude), new GeoPosition(
-				latitude + 0.5,
-				longitude), _mapZoomLevel);
+		final double devDistance = _mp.getDistance(//
+				new GeoPosition(latitude - 0.5, longitude),
+				new GeoPosition(latitude + 0.5, longitude),
+				_mapZoomLevel);
 
-		final double scaleLat = metricWidth * (devScaleWidth / devDistance);
+		final double scaleGeo = metricWidth * (devScaleWidth / devDistance);
 
-//		if (scaleLat > 3000) {
-//			// hide scale because it's getting inaccurate
-//			return;
-//		}
+		final double scaleGeoRounded = Util.roundDecimalValue(scaleGeo);
+		final int devScaleWidthRounded = (int) (scaleGeoRounded / metricWidth * devDistance);
 
 		// get scale text
-		String scaleUI;
-		if (scaleLat >= 100f) {
-			scaleUI = Integer.toString((int) scaleLat);
-		} else if (scaleLat >= 10f) {
-			scaleUI = _nf1.format(scaleLat);
-		} else if (scaleLat >= 1f) {
-			scaleUI = _nf2.format(scaleLat);
+		String scaleFormatted;
+		if (scaleGeoRounded < 1f) {
+			scaleFormatted = _nf2.format(scaleGeoRounded);
 		} else {
-			scaleUI = _nf3.format(scaleLat);
+			scaleFormatted = Integer.toString((int) scaleGeoRounded);
 		}
-		final String scaleText = scaleUI + UI.SPACE + _distanceUnitLabel;
+		final String scaleText = scaleFormatted + UI.SPACE + _distanceUnitLabel;
 		final Point textExtent = gc.textExtent(scaleText);
 
-		final int devX1 = viewPortWidth - 5 - devScaleWidth;
-		final int devX2 = devX1 + devScaleWidth;
+		final int devX1 = viewPortWidth - 5 - devScaleWidthRounded;
+		final int devX2 = devX1 + devScaleWidthRounded;
 
 		int devY = _worldPixelTopLeftViewport.height - 5 - 3;
 
-		final int segmentWidth = devScaleWidth / 4;
+		final int segmentWidth = devScaleWidthRounded / 4;
 
 		final int devYScaleLines = devY;
 
 		final Color white = SYS_COLOR_WHITE;
-		final Color black = SYS_COLOR_BLACK;
 		final Color gray = SYS_COLOR_DARK_GRAY;
 
-		paint_52_ScaleLine(gc, devX1, devX2, devY++, segmentWidth, gray, gray);
-		paint_52_ScaleLine(gc, devX1, devX2, devY++, segmentWidth, white, black);
-		paint_52_ScaleLine(gc, devX1, devX2, devY++, segmentWidth, white, black);
-		paint_52_ScaleLine(gc, devX1, devX2, devY++, segmentWidth, white, black);
+		paint_52_ScaleLine(gc, devX1, devX2, devY++, segmentWidth, white, white);
+		paint_52_ScaleLine(gc, devX1, devX2, devY++, segmentWidth, white, white);
+		paint_52_ScaleLine(gc, devX1, devX2, devY++, segmentWidth, white, white);
 		paint_52_ScaleLine(gc, devX1, devX2, devY, segmentWidth, gray, gray);
 
 		final int devYText = devYScaleLines - textExtent.y;
-		final int devXText = devX1 + devScaleWidth - textExtent.x;
+		final int devXText = devX1 + devScaleWidthRounded - textExtent.x;
 
 		// paint text border
 		final Color borderColor = new Color(_display, 0xF1, 0xEE, 0xE8);

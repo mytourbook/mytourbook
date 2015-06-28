@@ -270,7 +270,7 @@ public class TVITagViewYear extends TVITagViewItem {
 					tourItem.tourId = tourId;
 					tourItem.getTourColumnData(result, resultTagId, 3);
 
-					tourItem.treeColumn = UI.DateFormatterShort.format(tourItem.tourDate.toDate());
+					tourItem.treeColumn = net.tourbook.common.UI.DateFormatterShort.format(tourItem.tourDate.toDate());
 				}
 
 				lastTourId = tourId;

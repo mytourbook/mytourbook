@@ -475,11 +475,18 @@ public class ChartComponents extends Composite {
 					unitLabelValue = unitLabelValue % DAY_IN_SECONDS;
 				}
 
-				final String unitLabel = net.tourbook.chart.Util.formatValue(
-						(float) unitLabelValue,
+//				String unitLabel = net.tourbook.chart.Util.formatValue(
+//						(float) unitLabelValue,
+//						unitType,
+//						valueDivisor,
+//						true);
+
+				final int valueDecimals = 3;
+				final String unitLabel = net.tourbook.chart.Util.formatNumber(
+						unitLabelValue,
 						unitType,
 						valueDivisor,
-						true);
+						valueDecimals);
 
 				final boolean isMajorValue = unitLabelValue % majorValue == 0;
 

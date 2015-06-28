@@ -5,8 +5,11 @@ Version 15.8.0                                             ?. August 2015
 New + Improvements
 ==================	
 
+Tour Chart
+- Show/navigate multiple tours.
 
 Map2
+- Draw map scale with rounded units and without black/white color (I always puzzled how to interpret the scale colors).
 - Prevent redrawing for multiple tours.
 
  

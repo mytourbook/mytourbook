@@ -69,7 +69,7 @@ public class TVIWizardCompareYear extends TVIWizardCompareItem {
 				final int dbYear = result.getInt(1);
 				final int dbMonth = result.getInt(2);
 				fCalendar.set(dbYear, dbMonth - 1, 1);
-				monthItem.treeColumn = UI.MonthFormatter.format(fCalendar.getTime());
+				monthItem.treeColumn = net.tourbook.common.UI.MonthFormatter.format(fCalendar.getTime());
 
 				monthItem.tourYear = dbYear;
 				monthItem.tourMonth = dbMonth;

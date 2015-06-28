@@ -49,6 +49,7 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Cursor;
+import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Path;
@@ -414,6 +415,11 @@ public class ChartComponentGraph extends Canvas {
 	boolean								_isChartOverlapped;
 
 	/**
+	 * Cache font to improve performance.
+	 */
+	private Font						_uiFont;
+
+	/**
 	 * Constructor
 	 * 
 	 * @param parent
@@ -427,6 +433,7 @@ public class ChartComponentGraph extends Canvas {
 		super(parent, SWT.H_SCROLL | SWT.NO_BACKGROUND);
 
 		_chart = chartWidget;
+		_uiFont = _chart.getFont();
 
 		_pc = new PixelConverter(_chart);
 
@@ -1513,7 +1520,7 @@ public class ChartComponentGraph extends Canvas {
 		final GC gcChart = new GC(_chartImage20Chart);
 		final GC gcGraph = new GC(_chartImage10Graphs);
 		{
-			gcChart.setFont(_chart.getFont());
+			gcChart.setFont(_uiFont);
 
 			// fill background
 
@@ -1839,7 +1846,8 @@ public class ChartComponentGraph extends Canvas {
 
 			if (valueStart != null && valueEnd != null && segmentTitles != null) {
 
-				int devXChartTitleEnd = -1;
+				final int titlePadding = 5;
+				int devXTitleEnd = -1;
 
 				for (int segmentIndex = 0; segmentIndex < valueStart.length; segmentIndex++) {
 
@@ -1853,19 +1861,35 @@ public class ChartComponentGraph extends Canvas {
 						final int segmentLength = devXSegmentEnd - devXSegmentStart;
 						final int devXSegmentCenter = devXSegmentEnd - (segmentLength / 2);
 
-						final int devXTitleCenter = gc.textExtent(segmentTitle).x / 2;
+						final int titleWidth = gc.textExtent(segmentTitle).x;
+						final int devXTitleCenter = titleWidth / 2;
 
-						final int devX = devXSegmentCenter - devXTitleCenter;
+						int devX = devXSegmentCenter - devXTitleCenter;
 
-						if (devX <= devXChartTitleEnd) {
+						// draw 1st title always
+						if (_xxDevViewPortLeftBorder == 0 && segmentIndex == 0) {
+
+							if (devX < 0) {
+								devX = 0;
+							}
+
+							devXTitleEnd = titleWidth + titlePadding;
+
+						} else if (devX <= devXTitleEnd) {
 
 							// skip title when it overlaps the previous title
 							continue;
+
+						} else {
+
+							devXTitleEnd = devXSegmentCenter + devXTitleCenter + titlePadding;
 						}
 
 						gc.drawText(segmentTitle, devX, devYTitle, false);
 
-						devXChartTitleEnd = devXSegmentCenter + devXTitleCenter + 3;
+//						// debug
+//						gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
+						gc.drawLine(devXSegmentStart, 1, devXSegmentStart, devYTitle - 1);
 					}
 				}
 			}

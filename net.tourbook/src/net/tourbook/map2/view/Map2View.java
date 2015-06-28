@@ -97,6 +97,7 @@ import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourInfoToolTipProvider;
 import net.tourbook.tour.TourManager;
 import net.tourbook.training.TrainingManager;
+import net.tourbook.ui.tourChart.TourChart;
 import net.tourbook.ui.views.tourCatalog.SelectionTourCatalogView;
 import net.tourbook.ui.views.tourCatalog.TVICatalogComparedTour;
 import net.tourbook.ui.views.tourCatalog.TVICatalogRefTourItem;
@@ -1330,8 +1331,8 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 		_actionShowWayPoints.setEnabled(_isTourOrWayPoint);
 
 		_actionSynchTourZoomLevel.setEnabled(isOneTour);
-		_actionSynchWithSlider.setEnabled(isOneTour);
-		_actionSynchWithTour.setEnabled(isOneTour && canSyncTour);
+		_actionSynchWithSlider.setEnabled(canSyncTour);
+		_actionSynchWithTour.setEnabled(canSyncTour);
 
 		if (numberOfTours == 0) {
 
@@ -1571,6 +1572,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 		 */
 		double allMinLatitude = Double.MIN_VALUE;
 		double allMaxLatitude = 0;
+
 		double allMinLongitude = 0;
 		double allMaxLongitude = 0;
 
@@ -1628,52 +1630,6 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 
 			return mapPositions;
 		}
-	}
-
-	/**
-	 * Calculate the bounds for the tour in latitude and longitude values
-	 * 
-	 * @param tourData
-	 * @return
-	 */
-	private Set<GeoPosition> getTourBounds(final TourData tourData) {
-
-		final double[] latitudeSerie = tourData.latitudeSerie;
-		final double[] longitudeSerie = tourData.longitudeSerie;
-
-		if ((latitudeSerie == null) || (longitudeSerie == null)) {
-			return null;
-		}
-
-		/*
-		 * get min/max longitude/latitude
-		 */
-		double minLatitude = latitudeSerie[0];
-		double maxLatitude = latitudeSerie[0];
-		double minLongitude = longitudeSerie[0];
-		double maxLongitude = longitudeSerie[0];
-
-		for (int serieIndex = 0; serieIndex < latitudeSerie.length; serieIndex++) {
-
-			final double latitude = latitudeSerie[serieIndex];
-			final double longitude = longitudeSerie[serieIndex];
-
-			minLatitude = latitude < minLatitude ? latitude : minLatitude;
-			maxLatitude = latitude > maxLatitude ? latitude : maxLatitude;
-
-			minLongitude = longitude < minLongitude ? longitude : minLongitude;
-			maxLongitude = longitude > maxLongitude ? longitude : maxLongitude;
-
-			if (minLatitude == 0) {
-				minLatitude = -180D;
-			}
-		}
-
-		final Set<GeoPosition> mapPositions = new HashSet<GeoPosition>();
-		mapPositions.add(new GeoPosition(minLatitude, minLongitude));
-		mapPositions.add(new GeoPosition(maxLatitude, maxLongitude));
-
-		return mapPositions;
 	}
 
 	private void onSelectionChanged(final ISelection selection) {
@@ -1757,33 +1713,50 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 		} else if (selection instanceof SelectionChartInfo) {
 
 			final SelectionChartInfo chartInfo = (SelectionChartInfo) selection;
-			final ChartDataModel chartDataModel = chartInfo.chartDataModel;
 
-			if (chartDataModel != null) {
+			TourData tourData = null;
 
-				final Object tourId = chartDataModel.getCustomData(TourManager.CUSTOM_DATA_TOUR_ID);
-				if (tourId instanceof Long) {
+			final Chart chart = chartInfo.getChart();
+			if (chart instanceof TourChart) {
+				final TourChart tourChart = (TourChart) chart;
+				tourData = tourChart.getTourData();
+			}
 
-					TourData tourData = TourManager.getInstance().getTourData((Long) tourId);
-					if (tourData == null) {
+			if (tourData != null && tourData.isMultipleTours) {
 
-						// tour is not in the database, try to get it from the raw data manager
+				// multiple tours are selected
 
-						final HashMap<Long, TourData> rawData = RawDataManager.getInstance().getImportedTours();
-						tourData = rawData.get(tourId);
-					}
+			} else {
 
-					if (tourData != null) {
+				// use old behaviour
 
-						positionMapTo_TourSliders(
-								tourData,
-								chartInfo.leftSliderValuesIndex,
-								chartInfo.rightSliderValuesIndex,
-								chartInfo.selectedSliderValuesIndex);
+				final ChartDataModel chartDataModel = chartInfo.chartDataModel;
+				if (chartDataModel != null) {
 
-						enableActions();
+					final Object tourId = chartDataModel.getCustomData(TourManager.CUSTOM_DATA_TOUR_ID);
+					if (tourId instanceof Long) {
+
+						tourData = TourManager.getInstance().getTourData((Long) tourId);
+						if (tourData == null) {
+
+							// tour is not in the database, try to get it from the raw data manager
+
+							final HashMap<Long, TourData> rawData = RawDataManager.getInstance().getImportedTours();
+							tourData = rawData.get(tourId);
+						}
 					}
 				}
+			}
+
+			if (tourData != null) {
+
+				positionMapTo_TourSliders(
+						tourData,
+						chartInfo.leftSliderValuesIndex,
+						chartInfo.rightSliderValuesIndex,
+						chartInfo.selectedSliderValuesIndex);
+
+				enableActions();
 			}
 
 		} else if (selection instanceof SelectionChartXSliderPosition) {
@@ -2041,11 +2014,12 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 		/*
 		 * TESTING if a map redraw can be avoided, 15.6.2015
 		 */
-		final int filteredPhotoHash = _filteredPhotos.hashCode();
-		final int allPhotoHash = _allPhotos.hashCode();
-		if (filteredPhotoHash == _hashFilteredPhotos && allPhotoHash == _hashAllPhotos) {
-			return;
-		}
+// DISABLED BECAUSE PHOTOS ARE NOT ALWAYS DISPLAYED
+//		final int filteredPhotoHash = _filteredPhotos.hashCode();
+//		final int allPhotoHash = _allPhotos.hashCode();
+//		if (filteredPhotoHash == _hashFilteredPhotos && allPhotoHash == _hashAllPhotos) {
+//			return;
+//		}
 
 		_allPhotos.clear();
 		_allPhotos.addAll(allPhotos);
@@ -2165,6 +2139,15 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 			_map.disposeOverlayImageCache();
 		}
 
+		if (_isMapSynchedWithTour) {
+
+			// use default position for the tour
+
+			final Set<GeoPosition> tourBounds = getTourBounds(_allTourData);
+
+			setBoundsZoomLevel(tourBounds, true);
+		}
+
 		createLegendImage(_tourPainterConfig.getMapColorProvider());
 
 		_map.paint();
@@ -2255,8 +2238,13 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 				_actionShowSliderInLegend.isChecked());
 
 		// set the tour bounds
-		final Set<GeoPosition> tourBounds = getTourBounds(tourData);
-		_tourPainterConfig.setTourBounds(tourBounds);
+		final GeoPosition[] tourBounds = tourData.getGeoBounds();
+
+		final HashSet<GeoPosition> tourBoundsSet = new HashSet<GeoPosition>();
+		tourBoundsSet.add(tourBounds[0]);
+		tourBoundsSet.add(tourBounds[1]);
+
+		_tourPainterConfig.setTourBounds(tourBoundsSet);
 
 		_map.setShowOverlays(_isShowTour || _isShowPhoto);
 		_map.setShowLegend(_isShowTour && _isShowLegend);
@@ -2281,7 +2269,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 			if (tourData.mapCenterPositionLatitude == Double.MIN_VALUE) {
 
 				// use default position for the tour
-				setBoundsZoomLevel(tourBounds, true);
+				setBoundsZoomLevel(tourBoundsSet, true);
 
 			} else {
 

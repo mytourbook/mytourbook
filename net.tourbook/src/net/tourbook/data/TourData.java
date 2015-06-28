@@ -1122,6 +1122,12 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 	public int[]												multipleTourStartIndex;
 
 	/**
+	 * Contains the tour start time for each tour.
+	 */
+	@Transient
+	public long[]												multipleTourStartTime;
+
+	/**
 	 * Contains tour titles for different widths.
 	 */
 	@Transient
@@ -1359,6 +1365,7 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 	 * clears the cached world positions, this is necessary when the data serie have been modified
 	 */
 	public void clearWorldPositions() {
+
 		_tourWorldPosition.clear();
 	}
 

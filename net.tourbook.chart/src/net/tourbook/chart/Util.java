@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.chart;
 
+import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.Formatter;
 
@@ -26,19 +27,20 @@ import org.eclipse.swt.widgets.Display;
 
 public class Util {
 
-	public static final String			EMPTY_STRING	= "";								//$NON-NLS-1$
-	private static final String			SYMBOL_DASH		= "-";								//$NON-NLS-1$
-	public static final String			DASH_WITH_SPACE	= " - ";							//$NON-NLS-1$
+	public static final String			EMPTY_STRING	= "";									//$NON-NLS-1$
+	private static final String			SYMBOL_DASH		= "-";									//$NON-NLS-1$
+	public static final String			DASH_WITH_SPACE	= " - ";								//$NON-NLS-1$
 
-	private static final String			FORMAT_0F		= "0f";							//$NON-NLS-1$
-	private static final String			FORMAT_MM_SS	= "%d:%02d";						//$NON-NLS-1$
-	private static final String			FORMAT_HH_MM	= "%d:%02d";						//$NON-NLS-1$
-	private static final String			FORMAT_HH_MM_SS	= "%d:%02d:%02d";					//$NON-NLS-1$
+	private static final String			FORMAT_0F		= "0f";								//$NON-NLS-1$
+	private static final String			FORMAT_MM_SS	= "%d:%02d";							//$NON-NLS-1$
+	private static final String			FORMAT_HH_MM	= "%d:%02d";							//$NON-NLS-1$
+	private static final String			FORMAT_HH_MM_SS	= "%d:%02d:%02d";						//$NON-NLS-1$
 
 	private final static NumberFormat	_nf0			= NumberFormat.getNumberInstance();
 	private final static NumberFormat	_nf1			= NumberFormat.getNumberInstance();
 	private final static NumberFormat	_nf2			= NumberFormat.getNumberInstance();
 	private final static NumberFormat	_nf3			= NumberFormat.getNumberInstance();
+	private final static NumberFormat	_df				= DecimalFormat.getNumberInstance();
 
 	static {
 		_nf0.setMinimumFractionDigits(0);
@@ -52,6 +54,9 @@ public class Util {
 
 		_nf3.setMinimumFractionDigits(3);
 		_nf3.setMaximumFractionDigits(3);
+
+		_df.setMinimumFractionDigits(0);
+		_df.setMaximumFractionDigits(6);
 	}
 
 	private static StringBuilder		_sbFormatter	= new StringBuilder();
@@ -221,7 +226,7 @@ public class Util {
 		return String.format(format, divValue).toString();
 	}
 
-	public static String formatNumber(	final double value,
+	public static String formatNumber(	final double rawValue,
 										final int unitType,
 										final int valueDivisor,
 										final int valueDecimals) {
@@ -230,30 +235,11 @@ public class Util {
 
 		if (unitType == ChartDataSerie.AXIS_UNIT_NUMBER) {
 
-			final double divValue = value / valueDivisor;
+			valueText = _df.format(rawValue / valueDivisor);
 
-			if (valueDecimals == 0 || divValue % 1 == 0) {
-
-				valueText = _nf0.format(divValue);
-
-			} else {
-
-				switch (valueDecimals) {
-				case 2:
-					valueText = _nf2.format(divValue);
-					break;
-				case 3:
-					valueText = _nf3.format(divValue);
-					break;
-
-				default:
-					valueText = _nf1.format(divValue);
-					break;
-				}
-			}
 		} else {
 
-			valueText = Util.formatValue(value, unitType, valueDivisor, true);
+			valueText = Util.formatValue(rawValue, unitType, valueDivisor, true);
 		}
 
 		return valueText;
@@ -329,36 +315,6 @@ public class Util {
 	 */
 	public static String formatValue(final int value, final int unitType) {
 		return formatValue(value, unitType, 1, false);
-	}
-
-	/**
-	 * Round floating value by removing the trailing part, which causes problem when creating units.
-	 * For the value 200.00004 the .00004 part will be removed
-	 * 
-	 * @param graphValue
-	 * @param graphUnit
-	 * @return
-	 */
-	public static float truncateFloatToUnit(final float graphValue, final float graphUnit) {
-
-		if (graphUnit < 1) {
-
-			final float gvDiv1 = graphValue / graphUnit;
-			final long gvDiv2 = (long) (gvDiv1);
-			final float gvDiv3 = gvDiv2 * graphUnit;
-
-			return gvDiv3;
-
-		} else {
-
-			// graphUnit >= 1
-
-			final float gvDiv1 = graphValue * graphUnit;
-			final long gvDiv2 = (long) (gvDiv1);
-			final float gvDiv3 = gvDiv2 / graphUnit;
-
-			return gvDiv3;
-		}
 	}
 
 }

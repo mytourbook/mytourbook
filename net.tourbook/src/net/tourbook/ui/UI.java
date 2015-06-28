@@ -79,8 +79,6 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 
 public class UI {
 
@@ -221,22 +219,6 @@ public class UI {
 	private static final int								TOUR_TYPE_IMAGE_HEIGHT			= 16;
 
 	private static UI										instance;
-
-	public static final DateFormat							TimeFormatterShort				= DateFormat
-																									.getTimeInstance(DateFormat.SHORT);
-	public static final DateFormat							DateFormatterShort				= DateFormat
-																									.getDateInstance(DateFormat.SHORT);
-	public static final DateFormat							DateFormatterLong				= DateFormat
-																									.getDateInstance(DateFormat.LONG);
-	public static final DateFormat							DateFormatterFull				= DateFormat
-																									.getDateInstance(DateFormat.FULL);
-	public static final SimpleDateFormat					MonthFormatter					= new SimpleDateFormat(
-																									"MMM");								//$NON-NLS-1$
-	public static final SimpleDateFormat					WeekDayFormatter				= new SimpleDateFormat(
-																									"EEEE");								//$NON-NLS-1$
-
-	public static final DateTimeFormatter					DTFormatterShort				= DateTimeFormat
-																									.shortDateTime();
 
 	private static DateFormat								_dateFormatterShort;
 	private static DateFormat								_timeFormatterShort;

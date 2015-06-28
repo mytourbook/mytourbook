@@ -1181,6 +1181,10 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
 		final boolean isTimeSerie = timeSerie != null;
 
+		final boolean isMultipleTours = _tourData.isMultipleTours;
+		final int[] multipleStartTimeIndex = _tourData.multipleTourStartIndex;
+		final long[] multipleStartTime = _tourData.multipleTourStartTime;
+
 		final long tourStart = _tourData.getTourStartTime().getMillis() / 1000;
 		final int numberOfTimeSlices = isTimeSerie ? timeSerie.length : historySerie.length;
 
@@ -1199,7 +1203,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		 */
 		final int numberOfPhotos = srcPhotos.size();
 
-		// set value serie for the x-axis
+		// set value serie for the x-axis, it can be time or distance
 		double[] xAxisSerie = null;
 		xAxisSerie = _tcc.isShowTimeOnXAxis //
 				? _tourData.getTimeSerieWithTimeZoneAdjusted()
@@ -1209,6 +1213,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		if (isTimeSerie) {
 			timeSliceEnd = tourStart + (long) (timeSerie[1] / 2.0);
 		} else {
+			// is history
 			timeSliceEnd = tourStart + (long) (historySerie[1] / 2.0);
 		}
 
@@ -1217,8 +1222,28 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
 		// tour time serie, fit photos into a tour
 
-		int timeIndex = 0;
+		int serieIndex = 0;
 
+		int nextTourIndex = 1;
+		int nextTourSerieIndex = 0;
+		long firstTourStartTime = 0;
+		long tourStartTime = 0;
+		long tourRecordingTime = 0;
+
+		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") + ("\t"));
+		// TODO remove SYSTEM.OUT.PRINTLN
+
+		// setup first multiple tour
+		if (isMultipleTours) {
+
+			firstTourStartTime = multipleStartTime[0];
+			// this is the first tour
+
+			tourStartTime = firstTourStartTime;
+			nextTourSerieIndex = multipleStartTimeIndex[nextTourIndex];
+		}
+
+		// loop serieIndex
 		while (true) {
 
 			// check if a photo is in the current time slice
@@ -1238,15 +1263,54 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 					imageTime = photo.imageExifTime;
 				}
 
+				if (isMultipleTours) {
+
+					// adjust time because multiple tours do not have a gap between tours
+					// it took me several hours to find this algorithm, but now it works :-)
+
+					if (nextTourSerieIndex == 0) {
+						int a = 0;
+						a++;
+					}
+
+					if (serieIndex >= nextTourSerieIndex) {
+
+						// setup next tour
+
+						final int tourDuration = timeSerie[nextTourSerieIndex - 1];
+						tourRecordingTime = tourDuration;
+
+						tourStartTime = multipleStartTime[nextTourIndex];
+
+						if (nextTourIndex < multipleStartTimeIndex.length - 1) {
+
+							nextTourIndex++;
+							nextTourSerieIndex = multipleStartTimeIndex[nextTourIndex];
+
+							System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
+									+ ("\tnextTourSerieIndex: " + nextTourSerieIndex));
+							// TODO remove SYSTEM.OUT.PRINTLN
+
+						}
+					}
+
+					final long tourTimeOffset = tourStartTime - firstTourStartTime;
+					final long xAxisOffset = tourRecordingTime * 1000;
+
+					final long timeOffset = tourTimeOffset - xAxisOffset;
+
+					imageTime -= timeOffset;
+				}
+
 				final long photoTime = imageTime / 1000;
 
 				if (photoTime <= timeSliceEnd) {
 
 					// photo is available in the current time slice
 
-					final double xValue = xAxisSerie[timeIndex];
+					final double xValue = xAxisSerie[serieIndex];
 
-					chartPhotos.add(new ChartPhoto(photo, xValue, timeIndex));
+					chartPhotos.add(new ChartPhoto(photo, xValue, serieIndex));
 
 					photoIndex++;
 
@@ -1274,9 +1338,9 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 			 */
 
 			// advance to the next time slice on the x-axis
-			timeIndex++;
+			serieIndex++;
 
-			if (timeIndex >= numberOfTimeSlices - 1) {
+			if (serieIndex >= numberOfTimeSlices - 1) {
 
 				/*
 				 * end of tour is reached but there are still photos available, set remaining photos
@@ -1286,7 +1350,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 				while (true) {
 
 					final double xValue = xAxisSerie[numberOfTimeSlices - 1];
-					chartPhotos.add(new ChartPhoto(photo, xValue, timeIndex));
+					chartPhotos.add(new ChartPhoto(photo, xValue, serieIndex));
 
 					photoIndex++;
 
@@ -1299,14 +1363,18 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
 			} else {
 
+				// calculate next time slice
+
 				long valuePointTime;
 				long sliceDuration;
+
 				if (isTimeSerie) {
-					valuePointTime = timeSerie[timeIndex];
-					sliceDuration = timeSerie[timeIndex + 1] - valuePointTime;
+					valuePointTime = timeSerie[serieIndex];
+					sliceDuration = timeSerie[serieIndex + 1] - valuePointTime;
 				} else {
-					valuePointTime = historySerie[timeIndex];
-					sliceDuration = historySerie[timeIndex + 1] - valuePointTime;
+					// is history
+					valuePointTime = historySerie[serieIndex];
+					sliceDuration = historySerie[serieIndex + 1] - valuePointTime;
 				}
 
 				timeSliceEnd = tourStart + valuePointTime + (sliceDuration / 2);

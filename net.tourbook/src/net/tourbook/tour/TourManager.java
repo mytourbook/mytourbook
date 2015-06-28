@@ -625,11 +625,11 @@ public class TourManager {
 	}
 
 	public static String getTourDateFull(final TourData tourData) {
-		return net.tourbook.ui.UI.DateFormatterFull.format(tourData.getTourStartTimeMS());
+		return UI.DateFormatterFull.format(tourData.getTourStartTimeMS());
 	}
 
 	private static String getTourDateLong(final Date date) {
-		return net.tourbook.ui.UI.DateFormatterLong.format(date.getTime());
+		return UI.DateFormatterLong.format(date.getTime());
 	}
 
 	/**
@@ -641,7 +641,7 @@ public class TourManager {
 			return UI.EMPTY_STRING;
 		}
 
-		return net.tourbook.ui.UI.DateFormatterShort.format(tourData.getTourStartTimeMS());
+		return UI.DateFormatterShort.format(tourData.getTourStartTimeMS());
 	}
 
 	/**
@@ -653,7 +653,7 @@ public class TourManager {
 	}
 
 	public static String getTourDateTimeFull(final Date dt) {
-		return net.tourbook.ui.UI.DateFormatterFull.format(dt) + UI.DASH_WITH_SPACE
+		return UI.DateFormatterFull.format(dt) + UI.DASH_WITH_SPACE
 
 		;
 	}
@@ -669,23 +669,23 @@ public class TourManager {
 	}
 
 	public static String getTourDateTimeShort(final TourData tourData) {
-		return net.tourbook.ui.UI.DTFormatterShort.print(tourData.getTourStartTime());
+		return UI.DTFormatterShort.print(tourData.getTourStartTime());
 	}
 
 	private static String getTourTimeShort(final Date date) {
-		return net.tourbook.ui.UI.TimeFormatterShort.format(date.getTime());
+		return UI.TimeFormatterShort.format(date.getTime());
 	}
 
 	/**
 	 * @return returns the date of this tour
 	 */
 	public static String getTourTimeShort(final TourData tourData) {
-		return net.tourbook.ui.UI.TimeFormatterShort.format(tourData.getTourStartTimeMS());
+		return UI.TimeFormatterShort.format(tourData.getTourStartTimeMS());
 	}
 
 	public static String getTourTitle(final Date date) {
 
-		final String weekDay = net.tourbook.ui.UI.WeekDayFormatter.format(date);
+		final String weekDay = UI.WeekDayFormatter.format(date);
 
 		return weekDay //
 				+ UI.COMMA_SPACE
@@ -716,6 +716,20 @@ public class TourManager {
 				+ UI.DASH_WITH_SPACE
 				+ getTourTimeShort(tourData)
 				+ ((tourTitle.length() == 0) ? UI.EMPTY_STRING : UI.DASH_WITH_SPACE + tourTitle);
+	}
+
+	public static String getTourTitleMultiple(final TourData tourData) {
+
+		final String[] multipleTourTitles = tourData.multipleTourTitles;
+
+		if (multipleTourTitles == null || multipleTourTitles.length < 2) {
+			return UI.EMPTY_STRING;
+		}
+
+		final String firstTour = multipleTourTitles[0];
+		final String lastTour = multipleTourTitles[multipleTourTitles.length - 1];
+
+		return firstTour + UI.DASH_WITH_SPACE + lastTour;
 	}
 
 	/**
@@ -2592,6 +2606,10 @@ public class TourManager {
 		final ChartDataXSerie xData = chartDataModel.getXData();
 		final double[] xValues = xData.getHighValuesDouble()[0];
 
+		if (xValues == null) {
+			return;
+		}
+
 		final int[] multipleTourStartIndex = tourData.multipleTourStartIndex;
 		final int[] timeSerie = tourData.timeSerie;
 
@@ -2605,6 +2623,7 @@ public class TourManager {
 			final int tourStartIndex = multipleTourStartIndex[tourIndex];
 
 			int tourEndIndex;
+
 			if (tourIndex == numberOfTours - 1) {
 
 				// last tour
@@ -2612,6 +2631,10 @@ public class TourManager {
 
 			} else {
 				tourEndIndex = multipleTourStartIndex[tourIndex + 1] - 1;
+			}
+
+			if (tourEndIndex == -1) {
+				tourEndIndex = tourStartIndex;
 			}
 
 			segmentStartValue[tourIndex] = (long) xValues[tourStartIndex];

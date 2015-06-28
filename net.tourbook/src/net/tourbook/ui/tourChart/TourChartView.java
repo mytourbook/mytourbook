@@ -18,6 +18,8 @@ package net.tourbook.ui.tourChart;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
+import java.util.Set;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
@@ -29,6 +31,7 @@ import net.tourbook.chart.SelectionChartXSliderPosition;
 import net.tourbook.common.util.PostSelectionProvider;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
+import net.tourbook.data.TourPhoto;
 import net.tourbook.photo.IPhotoEventListener;
 import net.tourbook.photo.PhotoEventId;
 import net.tourbook.photo.PhotoManager;
@@ -80,9 +83,9 @@ import org.joda.time.format.DateTimeFormatter;
  */
 public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoEventListener, ITourModifyListener {
 
-	public static final String		ID			= "net.tourbook.views.TourChartView";	//$NON-NLS-1$
+	public static final String		ID				= "net.tourbook.views.TourChartView";	//$NON-NLS-1$
 
-	private final IPreferenceStore	_prefStore	= TourbookPlugin.getPrefStore();
+	private final IPreferenceStore	_prefStore		= TourbookPlugin.getPrefStore();
 
 	private TourChartConfiguration	_tourChartConfig;
 	private TourData				_tourData;
@@ -350,24 +353,51 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 
 		multipleTourData.setupMultipleTour();
 
-		final int numberOfTours = multipleTours.size();
+		int numberOfTours = 0;
+
+		// get number of tours which contain serie data
+		for (final TourData tourData : multipleTours) {
+
+			if (tourData.timeSerie == null) {
+				// skip manual tours
+				continue;
+			}
+
+			numberOfTours++;
+		}
 
 		final int[] toTimeSerie = multipleTourData.timeSerie = new int[numberOfTimeSlices];
 		final float[] toAltitudeSerie = multipleTourData.altitudeSerie = new float[numberOfTimeSlices];
 		final float[] toDistanceSerie = multipleTourData.distanceSerie = new float[numberOfTimeSlices];
-		final int[] tourStartIndex = multipleTourData.multipleTourStartIndex = new int[numberOfTours];
+		final double[] toLatitudeSerie = multipleTourData.latitudeSerie = new double[numberOfTimeSlices];
+		final double[] toLongitudeSerie = multipleTourData.longitudeSerie = new double[numberOfTimeSlices];
+
+		final int[] multipleStartIndex = multipleTourData.multipleTourStartIndex = new int[numberOfTours];
+		final long[] multipleStartTime = multipleTourData.multipleTourStartTime = new long[numberOfTours];
 		final String[] tourTitles = multipleTourData.multipleTourTitles = new String[numberOfTours];
+		final HashSet<TourPhoto> tourPhotos = new HashSet<>();
 
 		int toStartIndex = 0;
 		int tourRecordingTime = 0;
 		float tourDistance = 0;
+		float tourAltUp = 0;
+		float tourAltDown = 0;
 
 		for (int tourIndex = 0; tourIndex < numberOfTours; tourIndex++) {
 
-			final TourData tourData = multipleTours.get(tourIndex);
-			final int[] fromTimeSerie = tourData.timeSerie;
-			final float[] fromAltitudeSerie = tourData.altitudeSerie;
-			final float[] fromDistanceSerie = tourData.distanceSerie;
+			final TourData fromTourData = multipleTours.get(tourIndex);
+
+			final int[] fromTimeSerie = fromTourData.timeSerie;
+
+			if (fromTimeSerie == null || fromTimeSerie.length == 0) {
+				// skip manual tours
+				continue;
+			}
+
+			final float[] fromAltitudeSerie = fromTourData.altitudeSerie;
+			final float[] fromDistanceSerie = fromTourData.distanceSerie;
+			final double[] fromLatitudeSerie = fromTourData.latitudeSerie;
+			final double[] fromLongitudeSerie = fromTourData.longitudeSerie;
 
 			final int fromSerieLength = fromTimeSerie.length;
 
@@ -384,7 +414,7 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 
 			} else {
 
-				// other time series
+				// 2nd + other time series
 
 				// adjust relative time series
 				for (int serieIndex = 0; serieIndex < fromSerieLength; serieIndex++) {
@@ -399,28 +429,48 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 				}
 			}
 
+			/*
+			 * Copy data series
+			 */
 			if (fromAltitudeSerie != null) {
 				System.arraycopy(fromAltitudeSerie, 0, toAltitudeSerie, toStartIndex, fromSerieLength);
 			}
+			if (fromLatitudeSerie != null) {
+				System.arraycopy(fromLatitudeSerie, 0, toLatitudeSerie, toStartIndex, fromSerieLength);
+			}
+			if (fromLongitudeSerie != null) {
+				System.arraycopy(fromLongitudeSerie, 0, toLongitudeSerie, toStartIndex, fromSerieLength);
+			}
+
+			final Set<TourPhoto> fromTourPhotos = fromTourData.getTourPhotos();
+			tourPhotos.addAll(fromTourPhotos);
 
 			// summarize tour distance
 			if (fromDistanceSerie != null) {
 				tourDistance += fromDistanceSerie[fromSerieLength - 1];
 			}
 
-			// keep index for each tour start
-			tourStartIndex[tourIndex] = toStartIndex;
+			// keep data for each tour
+			multipleStartIndex[tourIndex] = toStartIndex;
+
+			System.out.println((" [" + getClass().getSimpleName() + "] ") + ("\ttoStartIndex: " + toStartIndex));
+			// TODO remove SYSTEM.OUT.PRINTLN
 
 			toStartIndex += fromSerieLength;
 
 			final int fromTourEnd = fromTimeSerie[fromSerieLength - 1];
 			tourRecordingTime += fromTourEnd;
 
-			/*
-			 * Set tour titles
-			 */
-			tourTitles[tourIndex] = _dtFormatter.print(tourData.getTourStartTimeMS());
+			tourAltUp += fromTourData.getTourAltUp();
+			tourAltDown += fromTourData.getTourAltDown();
+
+			// Set tour titles
+			final long tourStartTime = fromTourData.getTourStartTimeMS();
+			tourTitles[tourIndex] = _dtFormatter.print(tourStartTime);
+			multipleStartTime[tourIndex] = tourStartTime;
 		}
+
+		multipleTourData.setTourPhotos(tourPhotos, null);
 
 		final TourData firstTour = multipleTours.get(0);
 		final DateTime tourStartTime = new DateTime(firstTour.getTourStartTimeMS());
@@ -429,7 +479,10 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 		multipleTourData.setTourRecordingTime(tourRecordingTime);
 		multipleTourData.setTourDistance(tourDistance);
 
-		multipleTourData.computeAltitudeUpDown();
+		// computing these values is VERY cpu intensive because of the DP algorithm
+		multipleTourData.setTourAltUp(tourAltUp);
+		multipleTourData.setTourAltDown(tourAltDown);
+
 		multipleTourData.computeTourDrivingTime();
 		multipleTourData.computeComputedValues();
 
@@ -883,7 +936,10 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 
 			multipleTours.add(tourData);
 
-			numberOfTimeSlices += tourData.timeSerie.length;
+			final int[] timeSerie = tourData.timeSerie;
+			if (timeSerie != null) {
+				numberOfTimeSlices += timeSerie.length;
+			}
 		}
 
 		// sort tours by start date/time

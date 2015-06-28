@@ -196,8 +196,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	private static final int					COLUMN_SPACING					= 20;
 
 	private final IPreferenceStore				_prefStore						= TourbookPlugin.getPrefStore();
-	private final IDialogSettings				_viewState						= TourbookPlugin.getState(ID);
-	private final IDialogSettings				_viewStateSlice					= TourbookPlugin
+	private final IDialogSettings				_state							= TourbookPlugin.getState(ID);
+	private final IDialogSettings				_stateSlice						= TourbookPlugin
 																						.getState(ID + ".slice");							//$NON-NLS-1$
 
 	private final boolean						_isOSX							= net.tourbook.common.UI.IS_OSX;
@@ -226,6 +226,9 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	private static final String					STATE_SECTION_PERSONAL			= "STATE_SECTION_PERSONAL";								//$NON-NLS-1$
 	private static final String					STATE_SECTION_TITLE				= "STATE_SECTION_TITLE";									//$NON-NLS-1$
 	private static final String					STATE_SECTION_WEATHER			= "STATE_SECTION_WEATHER";									//$NON-NLS-1$
+
+	static final String							STATE_LAT_LON_DIGITS			= "STATE_LAT_LON_DIGITS";									//$NON-NLS-1$
+	static final int							DEFAULT_LAT_LON_DIGITS			= 5;
 
 	/**
 	 * Tour start daytime in seconds
@@ -418,6 +421,38 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	// pages
 	private PageBook							_pageBook;
 
+	/*
+	 * actions
+	 */
+	private ActionComputeDistanceValues			_actionComputeDistanceValues;
+	private ActionCreateTour					_actionCreateTour;
+	private ActionCreateTourMarker				_actionCreateTourMarker;
+	private ActionCSVTimeSliceExport			_actionCsvTimeSliceExport;
+	private ActionDeleteDistanceValues			_actionDeleteDistanceValues;
+	private ActionDeleteTimeSlicesKeepTime		_actionDeleteTimeSlicesKeepTime;
+	private ActionDeleteTimeSlicesRemoveTime	_actionDeleteTimeSlicesRemoveTime;
+	private ActionExport						_actionExportTour;
+	private ActionExtractTour					_actionExtractTour;
+	private ActionModifyColumns					_actionModifyColumns;
+	private ActionOpenAdjustAltitudeDialog		_actionOpenAdjustAltitudeDialog;
+	private ActionOpenMarkerDialog				_actionOpenMarkerDialog;
+	private ActionOpenPrefDialog				_actionOpenTourTypePrefs;
+	private ActionSaveTour						_actionSaveTour;
+	private ActionSetStartDistanceTo0			_actionSetStartDistanceTo0;
+	private ActionSplitTour						_actionSplitTour;
+	private ActionToggleReadEditMode			_actionToggleReadEditMode;
+	private ActionToggleRowSelectMode			_actionToggleRowSelectMode;
+	private ActionUndoChanges					_actionUndoChanges;
+	private ActionViewSettings					_actionViewSettings;
+
+	private TagMenuManager						_tagMenuMgr;
+
+	/**
+	 * Number of digits for the lat/lon columns.
+	 */
+	private int									_latLonDigits;
+	private final NumberFormat					_nfLatLon						= NumberFormat.getNumberInstance();
+
 	//
 	// ################################################## UI controls ##################################################
 	//
@@ -429,6 +464,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	private CTabItem							_tabTour;
 	private CTabItem							_tabSlices;
 	private CTabItem							_tabInfo;
+
 	/**
 	 * contains the controls which are displayed in the first column, these controls are used to get
 	 * the maximum width and set the first column within the differenct section to the same width
@@ -444,6 +480,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	/*
 	 * UI controls
 	 */
+	private Composite							_uiParent;
 	private Composite							_tourContainer;
 	private ScrolledComposite					_tab1Container;
 	private ScrolledComposite					_tab4Container;
@@ -451,6 +488,13 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 	private Composite							_tab3Container;
 	private Composite							_sliceViewerContainer;
+
+	private Section								_sectionTitle;
+	private Section								_sectionDateTime;
+	private Section								_sectionPersonal;
+	private Section								_sectionWeather;
+	private Section								_sectionCharacteristics;
+	private Section								_sectionInfo;
 
 	private Label								_timeSliceLabel;
 	private TableViewer							_sliceViewer;
@@ -521,42 +565,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	private Text								_txtRefTour;
 	private Text								_txtTimeSlicesCount;
 	private Text								_txtTourId;
-
-	//
-	// ################################################## End of UI controls ##################################################
-	//
-
-	/*
-	 * actions
-	 */
-	private ActionComputeDistanceValues			_actionComputeDistanceValues;
-	private ActionCreateTour					_actionCreateTour;
-	private ActionCreateTourMarker				_actionCreateTourMarker;
-	private ActionCSVTimeSliceExport			_actionCsvTimeSliceExport;
-	private ActionDeleteDistanceValues			_actionDeleteDistanceValues;
-	private ActionDeleteTimeSlicesKeepTime		_actionDeleteTimeSlicesKeepTime;
-	private ActionDeleteTimeSlicesRemoveTime	_actionDeleteTimeSlicesRemoveTime;
-	private ActionExport						_actionExportTour;
-	private ActionExtractTour					_actionExtractTour;
-	private ActionModifyColumns					_actionModifyColumns;
-	private ActionOpenAdjustAltitudeDialog		_actionOpenAdjustAltitudeDialog;
-	private ActionOpenMarkerDialog				_actionOpenMarkerDialog;
-	private ActionOpenPrefDialog				_actionOpenTourTypePrefs;
-	private ActionSaveTour						_actionSaveTour;
-	private ActionSetStartDistanceTo0			_actionSetStartDistanceTo0;
-	private ActionSplitTour						_actionSplitTour;
-	private ActionToggleReadEditMode			_actionToggleReadEditMode;
-	private ActionToggleRowSelectMode			_actionToggleRowSelectMode;
-	private ActionUndoChanges					_actionUndoChanges;
-
-	private TagMenuManager						_tagMenuMgr;
-
-	private Section								_sectionTitle;
-	private Section								_sectionDateTime;
-	private Section								_sectionPersonal;
-	private Section								_sectionWeather;
-	private Section								_sectionCharacteristics;
-	private Section								_sectionInfo;
 
 	private final class SliceDoubleEditingSupport extends EditingSupport {
 
@@ -1034,7 +1042,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		final FileDialog dialog = new FileDialog(Display.getCurrent().getActiveShell(), SWT.SAVE);
 		dialog.setText(Messages.dialog_export_file_dialog_text);
 
-		dialog.setFilterPath(_viewState.get(STATE_CSV_EXPORT_PATH));
+		dialog.setFilterPath(_state.get(STATE_CSV_EXPORT_PATH));
 		dialog.setFilterExtensions(new String[] { Util.CSV_FILE_EXTENSION });
 		dialog.setFileName(net.tourbook.ui.UI.format_yyyymmdd_hhmmss(_tourData)
 				+ UI.SYMBOL_DOT
@@ -1048,7 +1056,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		final File exportFilePath = new Path(selectedFilePath).toFile();
 
 		// keep export path
-		_viewState.put(STATE_CSV_EXPORT_PATH, exportFilePath.getPath());
+		_state.put(STATE_CSV_EXPORT_PATH, exportFilePath.getPath());
 
 		if (exportFilePath.exists()) {
 			if (net.tourbook.ui.UI.confirmOverwrite(exportFilePath) == false) {
@@ -1790,6 +1798,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		_actionSplitTour = new ActionSplitTour(this);
 		_actionExtractTour = new ActionExtractTour(this);
 
+		_actionViewSettings = new ActionViewSettings(this, _uiParent);
+
 		_actionOpenTourTypePrefs = new ActionOpenPrefDialog(
 				Messages.action_tourType_modify_tourTypes,
 				ITourbookPreferences.PREF_PAGE_TOUR_TYPE);
@@ -2062,12 +2072,13 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	@Override
 	public void createPartControl(final Composite parent) {
 
+		_uiParent = parent;
 		_pc = new PixelConverter(parent);
 
 		updateInternalUnitValues();
 
 		// define columns for the viewers
-		_sliceColumnManager = new ColumnManager(this, _viewStateSlice);
+		_sliceColumnManager = new ColumnManager(this, _stateSlice);
 		defineAllColumns(parent);
 
 		restoreStateBeforeUI();
@@ -3624,7 +3635,12 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 				if (_serieLatitude != null) {
 
 					final TimeSlice timeSlice = (TimeSlice) cell.getElement();
-					cell.setText(Double.toString(_serieLatitude[timeSlice.serieIndex]));
+
+					final double latitude = _serieLatitude[timeSlice.serieIndex];
+					final String valueText = _nfLatLon.format(latitude);
+
+					cell.setText(valueText);
+
 				} else {
 					cell.setText(UI.EMPTY_STRING);
 				}
@@ -3647,7 +3663,12 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 				if (_serieLongitude != null) {
 
 					final TimeSlice timeSlice = (TimeSlice) cell.getElement();
-					cell.setText(Double.toString(_serieLongitude[timeSlice.serieIndex]));
+
+					final double longitude = _serieLongitude[timeSlice.serieIndex];
+					final String valueText = _nfLatLon.format(longitude);
+
+					cell.setText(valueText);
+
 				} else {
 					cell.setText(UI.EMPTY_STRING);
 				}
@@ -4371,6 +4392,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		tbm.add(new Separator());
 		tbm.add(_actionCreateTour);
+		tbm.add(_actionViewSettings);
 
 		tbm.update(true);
 
@@ -4744,11 +4766,18 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	/**
 	 * @return Returns the title of the active tour
 	 */
-	public String getTourTitle() {
+	private String getTourTitle() {
 
-		final Date tourDate = _tourData.getTourStartTime().toDate();
+		if (_tourData.isMultipleTours) {
 
-		return TourManager.getTourTitle(tourDate);
+			return TourManager.getTourTitleMultiple(_tourData);
+
+		} else {
+
+			final Date tourDate = _tourData.getTourStartTime().toDate();
+
+			return TourManager.getTourTitle(tourDate);
+		}
 	}
 
 	@Override
@@ -5450,7 +5479,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	private void recreateViewer() {
 
 		// recreate slice viewer
-		_sliceColumnManager.saveState(_viewStateSlice);
+		_sliceColumnManager.saveState(_stateSlice);
 		_sliceColumnManager.clearColumns();
 
 		defineAllColumns(_sliceViewerContainer);
@@ -5586,15 +5615,18 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 	private void restoreStateBeforeUI() {
 
-		_isRowEditMode = _viewState.getBoolean(STATE_ROW_EDIT_MODE);
-		_isEditMode = _viewState.getBoolean(STATE_IS_EDIT_MODE);
+		_isRowEditMode = _state.getBoolean(STATE_ROW_EDIT_MODE);
+		_isEditMode = _state.getBoolean(STATE_IS_EDIT_MODE);
+
+		_latLonDigits = Util.getStateInt(_state, STATE_LAT_LON_DIGITS, DEFAULT_LAT_LON_DIGITS);
+		setup_LatLonDigits();
 	}
 
 	private void restoreStateWithUI() {
 
 		// select tab
 		try {
-			_tabFolder.setSelection(_viewState.getInt(STATE_SELECTED_TAB));
+			_tabFolder.setSelection(_state.getInt(STATE_SELECTED_TAB));
 		} catch (final NumberFormatException e) {
 			_tabFolder.setSelection(_tabTour);
 		}
@@ -5611,33 +5643,33 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 //				_prefStore.getInt(ITourbookPreferences.APPEARANCE_TAGGING_AUTO_OPEN_DELAY));
 
 		// expand/collapse sections
-		_sectionCharacteristics.setExpanded(Util.getStateBoolean(_viewState, STATE_SECTION_CHARACTERISTICS, true));
-		_sectionDateTime.setExpanded(Util.getStateBoolean(_viewState, STATE_SECTION_DATE_TIME, true));
-		_sectionInfo.setExpanded(Util.getStateBoolean(_viewState, STATE_SECTION_INFO, true));
-		_sectionPersonal.setExpanded(Util.getStateBoolean(_viewState, STATE_SECTION_PERSONAL, true));
-		_sectionTitle.setExpanded(Util.getStateBoolean(_viewState, STATE_SECTION_TITLE, true));
-		_sectionWeather.setExpanded(Util.getStateBoolean(_viewState, STATE_SECTION_WEATHER, true));
+		_sectionCharacteristics.setExpanded(Util.getStateBoolean(_state, STATE_SECTION_CHARACTERISTICS, true));
+		_sectionDateTime.setExpanded(Util.getStateBoolean(_state, STATE_SECTION_DATE_TIME, true));
+		_sectionInfo.setExpanded(Util.getStateBoolean(_state, STATE_SECTION_INFO, true));
+		_sectionPersonal.setExpanded(Util.getStateBoolean(_state, STATE_SECTION_PERSONAL, true));
+		_sectionTitle.setExpanded(Util.getStateBoolean(_state, STATE_SECTION_TITLE, true));
+		_sectionWeather.setExpanded(Util.getStateBoolean(_state, STATE_SECTION_WEATHER, true));
 	}
 
 	private void saveState() {
 
 		// selected tab
-		_viewState.put(STATE_SELECTED_TAB, _tabFolder.getSelectionIndex());
+		_state.put(STATE_SELECTED_TAB, _tabFolder.getSelectionIndex());
 
 		// row/column edit mode
-		_viewState.put(STATE_IS_EDIT_MODE, _actionToggleReadEditMode.isChecked());
-		_viewState.put(STATE_ROW_EDIT_MODE, _actionToggleRowSelectMode.isChecked());
+		_state.put(STATE_IS_EDIT_MODE, _actionToggleReadEditMode.isChecked());
+		_state.put(STATE_ROW_EDIT_MODE, _actionToggleRowSelectMode.isChecked());
 
 		// viewer state
-		_sliceColumnManager.saveState(_viewStateSlice);
+		_sliceColumnManager.saveState(_stateSlice);
 
 		// editor state
-		_viewState.put(STATE_SECTION_CHARACTERISTICS, _sectionCharacteristics.isExpanded());
-		_viewState.put(STATE_SECTION_DATE_TIME, _sectionDateTime.isExpanded());
-		_viewState.put(STATE_SECTION_INFO, _sectionInfo.isExpanded());
-		_viewState.put(STATE_SECTION_PERSONAL, _sectionPersonal.isExpanded());
-		_viewState.put(STATE_SECTION_TITLE, _sectionTitle.isExpanded());
-		_viewState.put(STATE_SECTION_WEATHER, _sectionWeather.isExpanded());
+		_state.put(STATE_SECTION_CHARACTERISTICS, _sectionCharacteristics.isExpanded());
+		_state.put(STATE_SECTION_DATE_TIME, _sectionDateTime.isExpanded());
+		_state.put(STATE_SECTION_INFO, _sectionInfo.isExpanded());
+		_state.put(STATE_SECTION_PERSONAL, _sectionPersonal.isExpanded());
+		_state.put(STATE_SECTION_TITLE, _sectionTitle.isExpanded());
+		_state.put(STATE_SECTION_WEATHER, _sectionWeather.isExpanded());
 	}
 
 	/**
@@ -5942,6 +5974,15 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		 * start "*" marker in the part name
 		 */
 		firePropertyChange(PROP_DIRTY);
+	}
+
+	/**
+	 * Setup the geo position formatter.
+	 */
+	private void setup_LatLonDigits() {
+
+		_nfLatLon.setMinimumFractionDigits(_latLonDigits);
+		_nfLatLon.setMaximumFractionDigits(_latLonDigits);
 	}
 
 	/**
@@ -6297,6 +6338,24 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		_pageBook.showPage(_pageEditorForm);
 
 		_isSetField = false;
+	}
+
+	void updateUI_LatLonDigits(final int selectedDigits) {
+
+		if (selectedDigits == _latLonDigits) {
+			// nothing has changed
+			return;
+		}
+
+		_latLonDigits = selectedDigits;
+
+		setup_LatLonDigits();
+
+		_sliceViewer.getControl().setRedraw(false);
+		{
+			_sliceViewer.refresh(true);
+		}
+		_sliceViewer.getControl().setRedraw(true);
 	}
 
 	private void updateUI_RefTourInfo(final Collection<TourReference> refTours) {

@@ -126,7 +126,7 @@ public class TVITourBookYear extends TVITourBookItem {
 		} else { // default to month
 
 			calendar.set(year, yearSub - 1, 1);
-			return UI.MonthFormatter.format(calendar.getTime());
+			return net.tourbook.common.UI.MonthFormatter.format(calendar.getTime());
 		}
 	}
 }
