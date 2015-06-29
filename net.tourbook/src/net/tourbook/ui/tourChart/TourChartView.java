@@ -353,18 +353,7 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 
 		multipleTourData.setupMultipleTour();
 
-		int numberOfTours = 0;
-
-		// get number of tours which contain serie data
-		for (final TourData tourData : multipleTours) {
-
-			if (tourData.timeSerie == null) {
-				// skip manual tours
-				continue;
-			}
-
-			numberOfTours++;
-		}
+		final int numberOfTours = multipleTours.size();
 
 		final int[] toTimeSerie = multipleTourData.timeSerie = new int[numberOfTimeSlices];
 		final float[] toAltitudeSerie = multipleTourData.altitudeSerie = new float[numberOfTimeSlices];
@@ -383,16 +372,14 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 		float tourAltUp = 0;
 		float tourAltDown = 0;
 
-		for (int tourIndex = 0; tourIndex < numberOfTours; tourIndex++) {
+
+		boolean isFirstTour = true;
+
+		for (int tourIndex = 0; tourIndex < multipleTours.size(); tourIndex++) {
 
 			final TourData fromTourData = multipleTours.get(tourIndex);
 
 			final int[] fromTimeSerie = fromTourData.timeSerie;
-
-			if (fromTimeSerie == null || fromTimeSerie.length == 0) {
-				// skip manual tours
-				continue;
-			}
 
 			final float[] fromAltitudeSerie = fromTourData.altitudeSerie;
 			final float[] fromDistanceSerie = fromTourData.distanceSerie;
@@ -401,9 +388,11 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 
 			final int fromSerieLength = fromTimeSerie.length;
 
-			if (toStartIndex == 0) {
+			if (isFirstTour) {
 
 				// first time serie
+
+				isFirstTour = false;
 
 				// copy data series from first tour
 				System.arraycopy(fromTimeSerie, 0, toTimeSerie, toStartIndex, fromSerieLength);
@@ -453,8 +442,6 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 			// keep data for each tour
 			multipleStartIndex[tourIndex] = toStartIndex;
 
-			System.out.println((" [" + getClass().getSimpleName() + "] ") + ("\ttoStartIndex: " + toStartIndex));
-			// TODO remove SYSTEM.OUT.PRINTLN
 
 			toStartIndex += fromSerieLength;
 
@@ -934,10 +921,12 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 
 			final TourData tourData = TourManager.getInstance().getTourData(tourId);
 
-			multipleTours.add(tourData);
-
 			final int[] timeSerie = tourData.timeSerie;
-			if (timeSerie != null) {
+
+			// ignore tours which have no data series
+			if (timeSerie != null && timeSerie.length > 0) {
+
+				multipleTours.add(tourData);
 				numberOfTimeSlices += timeSerie.length;
 			}
 		}

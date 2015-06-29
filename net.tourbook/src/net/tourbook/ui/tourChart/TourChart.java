@@ -1230,9 +1230,6 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		long tourStartTime = 0;
 		long tourRecordingTime = 0;
 
-		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") + ("\t"));
-		// TODO remove SYSTEM.OUT.PRINTLN
-
 		// setup first multiple tour
 		if (isMultipleTours) {
 
@@ -1248,8 +1245,6 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
 			// check if a photo is in the current time slice
 			while (true) {
-
-//				boolean isSavedInTour = photo.isSavedInTour;
 
 				final long imageAdjustedTime = isPhotoSavedInTour //
 						? photo.adjustedTimeTour
@@ -1268,11 +1263,6 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 					// adjust time because multiple tours do not have a gap between tours
 					// it took me several hours to find this algorithm, but now it works :-)
 
-					if (nextTourSerieIndex == 0) {
-						int a = 0;
-						a++;
-					}
-
 					if (serieIndex >= nextTourSerieIndex) {
 
 						// setup next tour
@@ -1286,11 +1276,6 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
 							nextTourIndex++;
 							nextTourSerieIndex = multipleStartTimeIndex[nextTourIndex];
-
-							System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
-									+ ("\tnextTourSerieIndex: " + nextTourSerieIndex));
-							// TODO remove SYSTEM.OUT.PRINTLN
-
 						}
 					}
 
