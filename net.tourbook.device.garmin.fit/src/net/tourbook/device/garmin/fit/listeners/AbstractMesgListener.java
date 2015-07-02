@@ -23,7 +23,7 @@ public abstract class AbstractMesgListener {
 		this.context = context;
 	}
 
-	protected FitContextData getContextData() {
+	private FitContextData getContextData() {
 		return context.getContextData();
 	}
 

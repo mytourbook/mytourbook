@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -17,6 +17,12 @@ package net.tourbook.device.garmin.fit;
 
 public interface IPreferences {
 
-	String	FIT_TEMPERATURE_ADJUSTMENT	= "FIT_TEMPERATURE_ADJUSTMENT"; //$NON-NLS-1$
+	String	FIT_TEMPERATURE_ADJUSTMENT			= "FIT_TEMPERATURE_ADJUSTMENT";		//$NON-NLS-1$
+
+	String	FIT_IS_IGNORE_LAST_MARKER			= "FIT_IS_IGNORE_LAST_MARKER";			//$NON-NLS-1$
+	String	FIT_IGNORE_LAST_MARKER_TIME_SLICES	= "FIT_IGNORE_LAST_MARKER_TIME_SLICES"; //$NON-NLS-1$
+
+	String	FIT_IS_REMOVE_EXCEEDED_TIME_SLICE	= "FIT_IS_REMOVE_EXCEEDED_TIME_SLICE";	//$NON-NLS-1$
+	String	FIT_EXCEEDED_TIME_SLICE_DURATION	= "FIT_EXCEEDED_TIME_SLICE_DURATION";	//$NON-NLS-1$
 
 }

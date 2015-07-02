@@ -3955,12 +3955,14 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 
 				for (int interpolationIndex = serieIndex; interpolationIndex < nextValidIndex; interpolationIndex++) {
 
-					field[interpolationIndex] = createTimeSeries_40_linear_interpolation(
+					final double interpolationValue = createTimeSeries_40_linear_interpolation(
 							time1,
 							time2,
 							val1,
 							val2,
 							time[interpolationIndex]);
+
+					field[interpolationIndex] = interpolationValue;
 				}
 
 				serieIndex = nextValidIndex - 1;

@@ -18,7 +18,7 @@ public class SessionMesgListenerImpl extends AbstractMesgListener implements Ses
 	@Override
 	public void onMesg(final SessionMesg mesg) {
 
-		context.mesgSession_10_Before();
+		context.onMesgSession_10_Before();
 
 		final Integer messageIndex = getMessageIndex(mesg);
 		context.setSessionIndex(messageIndex.toString());
@@ -85,6 +85,6 @@ public class SessionMesgListenerImpl extends AbstractMesgListener implements Ses
 			tourData.setTourDrivingTime(Math.round(totalTimerTime));
 		}
 
-		context.mesgSession_20_After();
+		context.onMesgSession_20_After();
 	}
 }

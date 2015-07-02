@@ -149,11 +149,11 @@ public class FitDataReader extends TourbookDevice {
 						continue;
 					}
 
-					final long linuxTime = (garminTimestamp * 1000) + com.garmin.fit.DateTime.OFFSET;
+					final long javaTime = (garminTimestamp * 1000) + com.garmin.fit.DateTime.OFFSET;
 
 					System.out.println(String.format("%s %d %s %-5d %-30s %20s %s", //$NON-NLS-1$
-							new DateTime(linuxTime), // show readable date/time
-							linuxTime / 1000,
+							new DateTime(javaTime), // show readable date/time
+							javaTime / 1000,
 							Long.toString(garminTimestamp),
 							field.getNum(),
 							fieldName,

@@ -14,32 +14,63 @@ import com.garmin.fit.RecordMesgListener;
 
 public class RecordMesgListenerImpl extends AbstractMesgListener implements RecordMesgListener {
 
-	private IPreferenceStore	_prefStore	= Activator.getDefault().getPreferenceStore();
+	private IPreferenceStore	_prefStore				= Activator.getDefault().getPreferenceStore();
+
 	private float				_temperatureAdjustment;
+
+	private boolean				_isRemoveExceededTimeSlice;
+	private long				_exceededTimeSliceLimit;
+	private long				_exceededTimeSliceDuration;
+	private long				_previousAbsoluteTime	= Long.MIN_VALUE;
 
 	public RecordMesgListenerImpl(final FitContext context) {
 
 		super(context);
 
 		_temperatureAdjustment = _prefStore.getFloat(IPreferences.FIT_TEMPERATURE_ADJUSTMENT);
+		_isRemoveExceededTimeSlice = _prefStore.getBoolean(IPreferences.FIT_IS_REMOVE_EXCEEDED_TIME_SLICE);
+
+		// convert into seconds
+		_exceededTimeSliceLimit = (long) _prefStore.getInt(IPreferences.FIT_EXCEEDED_TIME_SLICE_DURATION) * 1000;
 	}
 
 	@Override
 	public void onMesg(final RecordMesg mesg) {
 
-		context.mesgRecord_10_Before();
+		context.onMesgRecord_10_Before();
 
 		final TimeData timeData = getTimeData();
 
 		final DateTime garminTime = mesg.getTimestamp();
 		if (garminTime != null) {
 
-			// convert garmin time into linux time
+			// convert garmin time into java time
 			final long garminTimeS = garminTime.getTimestamp();
 			final long garminTimeMS = garminTimeS * 1000;
-			final long linuxTime = garminTimeMS + com.garmin.fit.DateTime.OFFSET;
+			final long sliceJavaTime = garminTimeMS + com.garmin.fit.DateTime.OFFSET;
 
-			timeData.absoluteTime = linuxTime;
+			long absoluteTime = sliceJavaTime;
+
+			if (_isRemoveExceededTimeSlice) {
+
+				// set initial value
+				if (_previousAbsoluteTime == Long.MIN_VALUE) {
+					_previousAbsoluteTime = sliceJavaTime;
+				}
+
+				// check if time slice is exceeded
+				final long timeDiff = sliceJavaTime - _previousAbsoluteTime;
+				if (timeDiff >= _exceededTimeSliceLimit) {
+
+					// calculated exceeded time and add 1 second that 2 slices do not have the same time
+					_exceededTimeSliceDuration = timeDiff + 1 * 1000;
+				}
+
+				absoluteTime -= _exceededTimeSliceDuration;
+				_previousAbsoluteTime = sliceJavaTime;
+			}
+
+			timeData.absoluteTime = absoluteTime;
 		}
 
 		final Integer positionLat = mesg.getPositionLat();
@@ -103,7 +134,7 @@ public class RecordMesgListenerImpl extends AbstractMesgListener implements Reco
 			}
 		}
 
-		context.mesgRecord_20_After();
+		context.onMesgRecord_20_After();
 	}
 
 }

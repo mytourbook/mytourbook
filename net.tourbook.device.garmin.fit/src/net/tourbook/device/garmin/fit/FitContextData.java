@@ -61,7 +61,7 @@ public class FitContextData {
 	public void ctxEventMesg(final EventMesg mesg) {
 
 		// ensure a tour is setup
-		ctxTour_10_Initialize();
+		onMesgSession_Tour_10_Initialize();
 
 		final Long gearChangeData = mesg.getGearChangeData();
 
@@ -81,21 +81,49 @@ public class FitContextData {
 
 			final com.garmin.fit.DateTime garminTime = mesg.getTimestamp();
 
-			// convert garmin time into linux time
+			// convert garmin time into java time
 			final long garminTimeS = garminTime.getTimestamp();
 			final long garminTimeMS = garminTimeS * 1000;
-			final long linuxTime = garminTimeMS + com.garmin.fit.DateTime.OFFSET;
+			final long javaTime = garminTimeMS + com.garmin.fit.DateTime.OFFSET;
 
-			gearData.absoluteTime = linuxTime;
+			gearData.absoluteTime = javaTime;
 			gearData.gears = gearChangeData;
 
 			tourGears.add(gearData);
 		}
 	}
 
-	public void ctxMarker_10_Initialize() {
+	public TimeData getCurrentTimeData() {
 
-		ctxTour_10_Initialize();
+		if (_currentTimeData == null) {
+			throw new IllegalArgumentException("Time data is not initialized"); //$NON-NLS-1$
+		}
+
+		return _currentTimeData;
+
+	}
+
+	public TourData getCurrentTourData() {
+
+		if (_currentTourContext == null) {
+			throw new IllegalArgumentException("Tour data is not initialized"); //$NON-NLS-1$
+		}
+
+		return _currentTourContext.__tourData;
+	}
+
+	public TourMarker getCurrentTourMarker() {
+
+		if (_currentTourMarker == null) {
+			throw new IllegalArgumentException("Tour marker is not initialized"); //$NON-NLS-1$
+		}
+
+		return _currentTourMarker;
+	}
+
+	public void onMesgLap_Marker_10_Initialize() {
+
+		onMesgSession_Tour_10_Initialize();
 
 		List<TourMarker> tourMarkers = _allTourMarker.get(_currentTourContext);
 
@@ -110,15 +138,15 @@ public class FitContextData {
 		tourMarkers.add(_currentTourMarker);
 	}
 
-	public void ctxMarker_20_Finalize() {
+	public void onMesgLap_Marker_20_Finalize() {
 
 		_currentTourMarker = null;
 	}
 
-	public void ctxTime_10_Initialize() {
-
+	public void onMesgRecord_Time_10_Initialize() {
+ 
 		// ensure tour is setup
-		ctxTour_10_Initialize();
+		onMesgSession_Tour_10_Initialize();
 
 		if (_currentTimeDataList == null) {
 
@@ -130,7 +158,7 @@ public class FitContextData {
 		_currentTimeData = new TimeData();
 	}
 
-	public void ctxTime_20_Finalize() {
+	public void onMesgRecord_Time_20_Finalize() {
 
 		if (_currentTimeData == null) {
 			// this occured
@@ -199,7 +227,7 @@ public class FitContextData {
 		_currentTimeData = null;
 	}
 
-	public void ctxTour_10_Initialize() {
+	public void onMesgSession_Tour_10_Initialize() {
 
 		if (_currentTourContext == null) {
 
@@ -211,40 +239,12 @@ public class FitContextData {
 		}
 	}
 
-	public void ctxTour_20_Finalize() {
+	public void onMesgSession_Tour_20_Finalize() {
 
-		ctxTime_20_Finalize();
+		onMesgRecord_Time_20_Finalize();
 
 		_currentTourContext = null;
 		_currentTimeDataList = null;
-	}
-
-	public TimeData getCurrentTimeData() {
-
-		if (_currentTimeData == null) {
-			throw new IllegalArgumentException("Time data is not initialized"); //$NON-NLS-1$
-		}
-
-		return _currentTimeData;
-
-	}
-
-	public TourData getCurrentTourData() {
-
-		if (_currentTourContext == null) {
-			throw new IllegalArgumentException("Tour data is not initialized"); //$NON-NLS-1$
-		}
-
-		return _currentTourContext.__tourData;
-	}
-
-	public TourMarker getCurrentTourMarker() {
-
-		if (_currentTourMarker == null) {
-			throw new IllegalArgumentException("Tour marker is not initialized"); //$NON-NLS-1$
-		}
-
-		return _currentTourMarker;
 	}
 
 	public void processAllTours(final FitContextDataHandler handler) {

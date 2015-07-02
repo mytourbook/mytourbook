@@ -23,4 +23,5 @@ Export-Package: cop.swt.widgets.viewers.table.celleditors,
  net.tourbook.common.widgets,
  net.tourbook.opengl
 Import-Package: gnu.trove.map.hash,
- org.joda.time
+ org.joda.time,
+ org.joda.time.format

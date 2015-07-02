@@ -67,7 +67,7 @@ public class FitContext {
 
 	public void finalizeTour() {
 
-		_contextData.processAllTours(new FitContextDataHandler() {
+		final FitContextDataHandler contextHandler = new FitContextDataHandler() {
 
 			@Override
 			public void finalizeTour(	final TourData tourData,
@@ -98,13 +98,14 @@ public class FitContext {
 
 				if (recordStartTime != sessionStartTime) {
 
-					StatusUtil.log(String
-							.format(
-									"Import file %s has other session start time, sessionStartTime=%s recordStartTime=%s, Difference=%d sec",//$NON-NLS-1$
-									_importFilePathName,
-									new DateTime(sessionStartTime),
-									new DateTime(recordStartTime),
-									(recordStartTime - sessionStartTime) / 1000));
+					StatusUtil
+							.log(String
+									.format(
+											"Import file %s has other session start time, sessionStartTime=%s recordStartTime=%s, Difference=%d sec",//$NON-NLS-1$
+											_importFilePathName,
+											new DateTime(sessionStartTime),
+											new DateTime(recordStartTime),
+											(recordStartTime - sessionStartTime) / 1000));
 				}
 
 				tourData.setTourStartTime(new DateTime(recordStartTime));
@@ -246,7 +247,9 @@ public class FitContext {
 				tourData.setTourMarkers(validatedTourMarkers);
 				tourData.finalizeTourMarkerWithRelativeTime();
 			}
-		});
+		};
+
+		_contextData.processAllTours(contextHandler);
 	}
 
 	public FitContextData getContextData() {
@@ -285,39 +288,32 @@ public class FitContext {
 		return String.format("%s (%s)", _importFilePathName, _sessionIndex); //$NON-NLS-1$
 	}
 
-	public void mesgEvent(final EventMesg mesg) {
-
+	public void onMesg(final EventMesg mesg) {
 		_contextData.ctxEventMesg(mesg);
 	}
 
-	public void mesgLap_10_Before() {
-
-		_contextData.ctxMarker_10_Initialize();
+	public void onMesgLap_10_Before() {
+		_contextData.onMesgLap_Marker_10_Initialize();
 	}
 
-	public void mesgLap_20_After() {
-
-		_contextData.ctxMarker_20_Finalize();
+	public void onMesgLap_20_After() {
+		_contextData.onMesgLap_Marker_20_Finalize();
 	}
 
-	public void mesgRecord_10_Before() {
-
-		_contextData.ctxTime_10_Initialize();
+	public void onMesgRecord_10_Before() {
+		_contextData.onMesgRecord_Time_10_Initialize();
 	}
 
-	public void mesgRecord_20_After() {
-
-		_contextData.ctxTime_20_Finalize();
+	public void onMesgRecord_20_After() {
+		_contextData.onMesgRecord_Time_20_Finalize();
 	}
 
-	public void mesgSession_10_Before() {
-
-		_contextData.ctxTour_10_Initialize();
+	public void onMesgSession_10_Before() {
+		_contextData.onMesgSession_Tour_10_Initialize();
 	}
 
-	public void mesgSession_20_After() {
-
-		_contextData.ctxTour_20_Finalize();
+	public void onMesgSession_20_After() {
+		_contextData.onMesgSession_Tour_20_Finalize();
 	}
 
 	private void resetSpeedAtFirstPosition(final List<TimeData> timeDataList) {

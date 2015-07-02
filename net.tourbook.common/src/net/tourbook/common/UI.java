@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -77,6 +77,8 @@ import org.epics.css.dal.Timestamp;
 import org.epics.css.dal.Timestamp.Format;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
+import org.joda.time.format.PeriodFormatter;
+import org.joda.time.format.PeriodFormatterBuilder;
 
 public class UI {
 
@@ -217,6 +219,8 @@ public class UI {
 	public static final String			UNIT_LABEL_POWER						= "Watt";																	//$NON-NLS-1$
 	public static final String			UNIT_LABEL_MS							= "ms";																	//$NON-NLS-1$
 
+	public static final PeriodFormatter	DEFAULT_DURATION_FORMATTER;
+
 	/*
 	 * SET_FORMATTING_OFF
 	 */
@@ -325,6 +329,48 @@ public class UI {
 		IMAGE_REGISTRY.put(IWeather.WEATHER_ID_SEVERE_WEATHER_ALERT,//
 				CommonActivator.getImageDescriptor(Messages.Image__Weather_Severe));
 
+		final String commaSpace = Messages.Period_Format_commaspace;
+		final String space2 = Messages.Period_Format_spaceandspace;
+		final String[] variants = {
+			Messages.Period_Format_space,
+			Messages.Period_Format_comma,
+			Messages.Period_Format_commandand,
+			Messages.Period_Format_commaspaceand };
+
+		DEFAULT_DURATION_FORMATTER = new PeriodFormatterBuilder()
+
+				.appendYears()
+				.appendSuffix(Messages.Period_Format_year, Messages.Period_Format_years)
+				.appendSeparator(commaSpace, space2, variants)
+
+				.appendMonths()
+				.appendSuffix(Messages.Period_Format_month, Messages.Period_Format_months)
+				.appendSeparator(commaSpace, space2, variants)
+
+				.appendWeeks()
+				.appendSuffix(Messages.Period_Format_week, Messages.Period_Format_weeks)
+				.appendSeparator(commaSpace, space2, variants)
+
+				.appendDays()
+				.appendSuffix(Messages.Period_Format_day, Messages.Period_Format_days)
+				.appendSeparator(commaSpace, space2, variants)
+
+				.appendHours()
+				.appendSuffix(Messages.Period_Format_hour, Messages.Period_Format_hours)
+				.appendSeparator(commaSpace, space2, variants)
+
+				.appendMinutes()
+				.appendSuffix(Messages.Period_Format_minute, Messages.Period_Format_minutes)
+				.appendSeparator(commaSpace, space2, variants)
+
+				.appendSeconds()
+				.appendSuffix(Messages.Period_Format_second, Messages.Period_Format_seconds)
+				.appendSeparator(commaSpace, space2, variants)
+
+				.appendMillis()
+				.appendSuffix(Messages.Period_Format_millisecond, Messages.Period_Format_milliseconds)
+
+				.toFormatter();
 	}
 
 	public static void addSashColorHandler(final Sash sash) {
@@ -460,6 +506,7 @@ public class UI {
 
 		return pageNoData;
 	}
+
 // this conversion is not working for all png images, found SWT2Dutil.java
 //
 //	/**

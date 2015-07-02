@@ -23,11 +23,11 @@ public class LapMesgListenerImpl extends AbstractMesgListener implements LapMesg
 	@Override
 	public void onMesg(final LapMesg lapMesg) {
 
-		context.mesgLap_10_Before();
+		context.onMesgLap_10_Before();
 
 		setMarker(lapMesg);
 
-		context.mesgLap_20_After();
+		context.onMesgLap_20_After();
 	}
 
 	private void setMarker(final LapMesg lapMesg) {

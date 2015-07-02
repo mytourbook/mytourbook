@@ -99,6 +99,29 @@ public class Messages extends NLS {
 	public static String		Map3_PropertyTooltip_Action_Close_Tooltip;
 	public static String		Map3_PropertyTooltip_Action_MoveToDefaultLocation_Tooltip;
 
+	public static String		Period_Format_space;
+	public static String		Period_Format_comma;
+	public static String		Period_Format_commandand;
+	public static String		Period_Format_commaspaceand;
+	public static String		Period_Format_commaspace;
+	public static String		Period_Format_spaceandspace;
+	public static String		Period_Format_year;
+	public static String		Period_Format_years;
+	public static String		Period_Format_month;
+	public static String		Period_Format_months;
+	public static String		Period_Format_week;
+	public static String		Period_Format_weeks;
+	public static String		Period_Format_day;
+	public static String		Period_Format_days;
+	public static String		Period_Format_hour;
+	public static String		Period_Format_hours;
+	public static String		Period_Format_minute;
+	public static String		Period_Format_minutes;
+	public static String		Period_Format_second;
+	public static String		Period_Format_seconds;
+	public static String		Period_Format_millisecond;
+	public static String		Period_Format_milliseconds;
+
 	public static String		Weather_Clounds_Clouds;
 	public static String		Weather_Clounds_Clouny;
 	public static String		Weather_Clounds_IsNotDefined;
