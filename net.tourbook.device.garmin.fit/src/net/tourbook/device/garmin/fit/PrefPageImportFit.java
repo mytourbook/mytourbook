@@ -54,25 +54,12 @@ public class PrefPageImportFit extends PreferencePage implements IWorkbenchPrefe
 	private SelectionAdapter	_defaultSelectionListener;
 
 	private static PeriodType	_tourPeriodTemplate	= PeriodType.yearMonthDayTime()
-													// hide these components
-//																.withMinutesRemoved()
-//																.withSecondsRemoved()
-//																.withMillisRemoved()
+//															// hide these components
+//															.withMinutesRemoved()
+//															.withSecondsRemoved()
+															.withMillisRemoved()
+//
 													;
-
-//	private final PeriodFormatter	_durationFormatter	= new PeriodFormatterBuilder()
-//																.appendYears()
-//																.appendSuffix("y ", "y ") //$NON-NLS-1$ //$NON-NLS-2$
-//																.appendMonths()
-//																.appendSuffix("m ", "m ") //$NON-NLS-1$ //$NON-NLS-2$
-//																.appendDays()
-//																.appendSuffix("d ", "d ") //$NON-NLS-1$ //$NON-NLS-2$
-//																.appendHours()
-//																.appendSuffix("h ", "h ") //$NON-NLS-1$ //$NON-NLS-2$
-//																.toFormatter();
-	{}
-
-//	private final PeriodFormatter	_durationFormatter	= PeriodFormat.getDefault();
 
 	/*
 	 * UI controls
@@ -405,6 +392,6 @@ public class PrefPageImportFit extends PreferencePage implements IWorkbenchPrefe
 
 		final Period tourPeriod = new Period(0, duration * 1000, _tourPeriodTemplate);
 
-		_lblSplitTour_DurationUnit.setText(tourPeriod.toString(UI.DEFAULT_DURATION_FORMATTER));
+		_lblSplitTour_DurationUnit.setText(tourPeriod.toString(UI.DEFAULT_DURATION_FORMATTER_SHORT));
 	}
 }

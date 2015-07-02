@@ -53,8 +53,6 @@ import org.joda.time.Period;
 import org.joda.time.PeriodType;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
-import org.joda.time.format.PeriodFormatter;
-import org.joda.time.format.PeriodFormatterBuilder;
 
 public class TourInfoUI {
 
@@ -86,20 +84,10 @@ public class TourInfoUI {
 
 	private static PeriodType			_tourPeriodTemplate		= PeriodType.yearMonthDayTime()
 																// hide these components
-																		.withMinutesRemoved()
+//																		.withMinutesRemoved()
 																		.withSecondsRemoved()
-																		.withMillisRemoved();
-
-	private final PeriodFormatter		_durationFormatter		= new PeriodFormatterBuilder()
-																		.appendYears()
-																		.appendSuffix("y ", "y ") //$NON-NLS-1$ //$NON-NLS-2$
-																		.appendMonths()
-																		.appendSuffix("m ", "m ") //$NON-NLS-1$ //$NON-NLS-2$
-																		.appendDays()
-																		.appendSuffix("d ", "d ") //$NON-NLS-1$ //$NON-NLS-2$
-																		.appendHours()
-																		.appendSuffix("h ", "h ") //$NON-NLS-1$ //$NON-NLS-2$
-																		.toFormatter();
+																		.withMillisRemoved()
+																;
 
 	private boolean						_hasDescription;
 	private boolean						_hasGears;
@@ -970,9 +958,9 @@ public class TourInfoUI {
 		final DateTime dtTourStart = _tourData.getTourStartTime();
 		final DateTime dtTourEnd = dtTourStart.plus(recordingTime * 1000);
 
-		final boolean isHistory = recordingTime < net.tourbook.common.UI.DAY_IN_SECONDS;
+		final boolean isLargeDuration = recordingTime < net.tourbook.common.UI.DAY_IN_SECONDS;
 
-		if (isHistory) {
+		if (isLargeDuration) {
 
 			// < 1 day
 
@@ -1019,15 +1007,18 @@ public class TourInfoUI {
 			//
 					));
 
+			// hide labels, they are displayed with the period values
 			_lblRecordingTimeHour.setVisible(false);
 			_lblMovingTimeHour.setVisible(false);
 			_lblBreakTimeHour.setVisible(false);
 
-			final Period tourPeriod = new Period(dtTourStart, dtTourEnd, _tourPeriodTemplate);
+			final Period recordingPeriod = new Period(dtTourStart, dtTourEnd, _tourPeriodTemplate);
+			final Period movingPeriod = new Period(0, movingTime * 1000, _tourPeriodTemplate);
+			final Period breakPeriod = new Period(0, breakTime * 1000, _tourPeriodTemplate);
 
-			_lblRecordingTime.setText(tourPeriod.toString(_durationFormatter));
-			_lblMovingTime.setText(UI.EMPTY_STRING);
-			_lblBreakTime.setText(UI.EMPTY_STRING);
+			_lblRecordingTime.setText(recordingPeriod.toString(UI.DEFAULT_DURATION_FORMATTER_SHORT));
+			_lblMovingTime.setText(movingPeriod.toString(UI.DEFAULT_DURATION_FORMATTER_SHORT));
+			_lblBreakTime.setText(breakPeriod.toString(UI.DEFAULT_DURATION_FORMATTER_SHORT));
 		}
 
 		int windSpeed = _tourData.getWeatherWindSpeed();
