@@ -32,7 +32,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 		store.setDefault(IPreferences.FIT_IS_IGNORE_LAST_MARKER, false);
 		store.setDefault(IPreferences.FIT_IGNORE_LAST_MARKER_TIME_SLICES, 5);
 
-		store.setDefault(IPreferences.FIT_IS_REMOVE_EXCEEDED_TIME_SLICE, false);
+		store.setDefault(IPreferences.FIT_IS_REPLACE_EXCEEDED_TIME_SLICE, false);
 		store.setDefault(IPreferences.FIT_EXCEEDED_TIME_SLICE_DURATION, 365 * 24 * 60 * 60);
 	}
 

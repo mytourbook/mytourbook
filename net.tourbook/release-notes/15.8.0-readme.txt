@@ -1,0 +1,18 @@
+Version 15.8.0                                             ?. August 2015
+
+  
+
+New + Improvements
+==================	
+
+* FIT Import
+  - Replace time slices when it exceeds a selected duration.
+    This fixes a device bug because the .fit file contained a time slice with more than 17 years.
+
+ 
+Bugfix
+======	
+
+* Photo
+  - Fixed ArrayIndexOutOfBoundsException when tour contains only 1 time slice.
+   

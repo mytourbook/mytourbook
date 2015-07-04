@@ -16,6 +16,7 @@ import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.importdata.TourbookDevice;
 
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.joda.time.DateTime;
 
 import com.garmin.fit.EventMesg;
@@ -27,6 +28,8 @@ import com.garmin.fit.EventMesg;
  * @author Marcin Kuthan <marcin.kuthan@gmail.com>
  */
 public class FitContext {
+
+	private IPreferenceStore		_prefStore	= Activator.getDefault().getPreferenceStore();
 
 	private TourbookDevice			_device;
 	private final String			_importFilePathName;
@@ -52,6 +55,9 @@ public class FitContext {
 	private Map<Long, TourData>		_alreadyImportedTours;
 	private HashMap<Long, TourData>	_newlyImportedTours;
 
+	private boolean					_isIgnoreLastMarker;
+	private int						_lastMarkerTimeSlices;
+
 	public FitContext(	final TourbookDevice device,
 						final String importFilePath,
 						final Map<Long, TourData> alreadyImportedTours,
@@ -63,6 +69,9 @@ public class FitContext {
 		_newlyImportedTours = newlyImportedTours;
 
 		_contextData = new FitContextData();
+
+		_isIgnoreLastMarker = _prefStore.getBoolean(IPreferences.FIT_IS_IGNORE_LAST_MARKER);
+		_lastMarkerTimeSlices = _prefStore.getInt(IPreferences.FIT_IGNORE_LAST_MARKER_TIME_SLICES);
 	}
 
 	public void finalizeTour() {
@@ -198,48 +207,83 @@ public class FitContext {
 
 				final int[] timeSerie = tourData.timeSerie;
 				final int lastSerieIndex = timeSerie.length;
-				final long tourStartTimeS = tourData.getTourStartTimeMS() / 1000;
+				final long absoluteTourStartTimeS = tourData.getTourStartTimeMS() / 1000;
 
 				final Set<TourMarker> validatedTourMarkers = new HashSet<TourMarker>();
+				final int tourMarkerSize = tourMarkers.size();
 
-				for (final TourMarker tourMarker : tourMarkers) {
+				for (int markerIndex = 0; markerIndex < tourMarkerSize; markerIndex++) {
 
-					final long markerLapTimeS = tourMarker.getDeviceLapTime() / 1000;
+					final TourMarker tourMarker = tourMarkers.get(markerIndex);
+					final int relativeMarkerTime = tourMarker.getTime();
+					final long absoluteMarkerTime = tourMarker.getTourTime();
 
-					for (int serieIndex = 0; serieIndex < timeSerie.length; serieIndex++) {
+					if (relativeMarkerTime == -1 && absoluteMarkerTime != Long.MIN_VALUE) {
 
-						final int relativeTimeS = timeSerie[serieIndex];
-						final long tourTimeS = tourStartTimeS + relativeTimeS;
+						// only absolute time is set
 
-						if (markerLapTimeS <= tourTimeS) {
+						for (int serieIndex = 0; serieIndex < timeSerie.length; serieIndex++) {
 
-							int markerSerieIndex = serieIndex
-							// ensure that the correct index is set for the marker
-//							- 1;
-							;
+							final int relativeTimeS = timeSerie[serieIndex];
+							final long tourTimeS = absoluteTourStartTimeS + relativeTimeS;
 
-							// check bounds
-							if (markerSerieIndex < 0) {
-								markerSerieIndex = 0;
-							}
+							final long absoluteMarkerTimeS = absoluteMarkerTime / 1000;
 
-							/*
-							 * Fit devices adds a marker at the end, this is annoing therefore it is
-							 * removed. It is not only the last time slice it can also be about the
-							 * last 5 time slices.
-							 */
-							if (markerSerieIndex > lastSerieIndex - 5) {
+							if (absoluteMarkerTimeS <= tourTimeS) {
+
+								tourMarker.setSerieIndex(serieIndex);
+
+								validatedTourMarkers.add(tourMarker);
 
 								// check next marker
 								break;
 							}
+						}
 
-							tourMarker.setSerieIndex(markerSerieIndex);
+					} else {
 
-							validatedTourMarkers.add(tourMarker);
+						final long markerLapTimeS = tourMarker.getDeviceLapTime() / 1000;
 
-							// check next marker
-							break;
+						for (int serieIndex = 0; serieIndex < timeSerie.length; serieIndex++) {
+
+							final int relativeTimeS = timeSerie[serieIndex];
+							final long tourTimeS = absoluteTourStartTimeS + relativeTimeS;
+
+							final long timeDiff = markerLapTimeS - tourTimeS;
+
+//							if (markerLapTimeS <= tourTimeS) {
+							if (timeDiff <= 0) {
+
+								if (markerIndex == tourMarkerSize - 1) {
+
+									// this is the last marker
+
+									if (_isIgnoreLastMarker == false) {
+
+										// check if the last marker can be ignored
+
+										/**
+										 * Fit devices adds a marker at the end, this is annoing
+										 * therefore it is removed. It is not only the last time
+										 * slice it can also be about the last 5 time slices.
+										 * <p>
+										 * Since version 15.8 this feature can be customized.
+										 */
+										if (serieIndex > lastSerieIndex - _lastMarkerTimeSlices) {
+
+											// check next marker
+											break;
+										}
+									}
+								}
+
+								tourMarker.setSerieIndex(serieIndex);
+
+								validatedTourMarkers.add(tourMarker);
+
+								// check next marker
+								break;
+							}
 						}
 					}
 				}

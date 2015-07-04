@@ -68,8 +68,11 @@ public class LapMesgListenerImpl extends AbstractMesgListener implements LapMesg
 		 * Set lap time, later the time slice position (serie index) will be set.
 		 */
 		final DateTime garminTime = lapMesg.getTimestamp();
-		final Date linuxTime = garminTime.getDate();
+		final Date javaTime = garminTime.getDate();
 
-		tourMarker.setDeviceLapTime(linuxTime.getTime());
+		tourMarker.setDeviceLapTime(javaTime.getTime());
+
+//		System.out.println(new org.joda.time.DateTime(javaTime.getTime()) + "\tLapMesgListener\t");
+//		// TODO remove SYSTEM.OUT.PRINTLN
 	}
 }

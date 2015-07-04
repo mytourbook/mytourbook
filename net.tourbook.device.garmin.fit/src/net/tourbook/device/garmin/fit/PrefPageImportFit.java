@@ -55,11 +55,7 @@ public class PrefPageImportFit extends PreferencePage implements IWorkbenchPrefe
 
 	private static PeriodType	_tourPeriodTemplate	= PeriodType.yearMonthDayTime()
 //															// hide these components
-//															.withMinutesRemoved()
-//															.withSecondsRemoved()
-															.withMillisRemoved()
-//
-													;
+															.withMillisRemoved();
 
 	/*
 	 * UI controls
@@ -210,26 +206,26 @@ public class PrefPageImportFit extends PreferencePage implements IWorkbenchPrefe
 		final Group group = new Group(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(group);
 		GridLayoutFactory.swtDefaults().numColumns(3).applyTo(group);
-		group.setText(Messages.PrefPage_Fit_Group_SplitTour);
+		group.setText(Messages.PrefPage_Fit_Group_ReplaceTimeSlice);
 		{
 			// checkbox
 			{
 				_chkRemoveExceededDuration = new Button(group, SWT.CHECK);
 				GridDataFactory.fillDefaults().span(3, 1).applyTo(_chkRemoveExceededDuration);
-				_chkRemoveExceededDuration.setText(Messages.PrefPage_Fit_Checkbox_SplitTour);
+				_chkRemoveExceededDuration.setText(Messages.PrefPage_Fit_Checkbox_ReplaceTimeSlice);
 				_chkRemoveExceededDuration.addSelectionListener(_defaultSelectionListener);
 			}
 
 			// label: info
 			{
 				_lblSplitTour_Info = createUI_InfoLabel(group, 3);
-				_lblSplitTour_Info.setText(Messages.PrefPage_Fit_Checkbox_SplitTour_Info);
+				_lblSplitTour_Info.setText(Messages.PrefPage_Fit_Label_ReplaceTimeSlice_Info);
 			}
 
 			// label: duration
 			{
 				_lblSplitTour_Duration = new Label(group, SWT.NONE);
-				_lblSplitTour_Duration.setText(Messages.PrefPage_Fit_Label_SplitTour_Duration);
+				_lblSplitTour_Duration.setText(Messages.PrefPage_Fit_Label_ReplaceTimeSlice_Duration);
 			}
 
 			// spinner
@@ -324,7 +320,7 @@ public class PrefPageImportFit extends PreferencePage implements IWorkbenchPrefe
 				_prefStore.getDefaultInt(IPreferences.FIT_IGNORE_LAST_MARKER_TIME_SLICES));
 
 		_chkRemoveExceededDuration.setSelection(//
-				_prefStore.getDefaultBoolean(IPreferences.FIT_IS_REMOVE_EXCEEDED_TIME_SLICE));
+				_prefStore.getDefaultBoolean(IPreferences.FIT_IS_REPLACE_EXCEEDED_TIME_SLICE));
 		_spinnerExceededDuration.setSelection(//
 				_prefStore.getDefaultInt(IPreferences.FIT_EXCEEDED_TIME_SLICE_DURATION));
 
@@ -357,7 +353,7 @@ public class PrefPageImportFit extends PreferencePage implements IWorkbenchPrefe
 				_prefStore.getInt(IPreferences.FIT_IGNORE_LAST_MARKER_TIME_SLICES));
 
 		_chkRemoveExceededDuration.setSelection(//
-				_prefStore.getBoolean(IPreferences.FIT_IS_REMOVE_EXCEEDED_TIME_SLICE));
+				_prefStore.getBoolean(IPreferences.FIT_IS_REPLACE_EXCEEDED_TIME_SLICE));
 		_spinnerExceededDuration.setSelection(//
 				_prefStore.getInt(IPreferences.FIT_EXCEEDED_TIME_SLICE_DURATION));
 
@@ -379,7 +375,7 @@ public class PrefPageImportFit extends PreferencePage implements IWorkbenchPrefe
 				_spinnerIgnorLastMarker_TimeSlices.getSelection());
 
 		_prefStore.setValue(//
-				IPreferences.FIT_IS_REMOVE_EXCEEDED_TIME_SLICE,
+				IPreferences.FIT_IS_REPLACE_EXCEEDED_TIME_SLICE,
 				_chkRemoveExceededDuration.getSelection());
 		_prefStore.setValue(//
 				IPreferences.FIT_EXCEEDED_TIME_SLICE_DURATION,
