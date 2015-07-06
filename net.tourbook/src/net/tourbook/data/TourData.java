@@ -1116,7 +1116,7 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 	public boolean												isMultipleTours;
 
 	/**
-	 * Contains the tour start index in the data series.
+	 * Contains the tour start index in the data series for each tour.
 	 */
 	@Transient
 	public int[]												multipleTourStartIndex;
@@ -1128,10 +1128,24 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 	public long[]												multipleTourStartTime;
 
 	/**
-	 * Contains tour titles for different widths.
+	 * Contains tour titles for each tour.
 	 */
 	@Transient
 	public String[]												multipleTourTitles;
+
+	/**
+	 * Number of tour markers in each tour.
+	 */
+	@Transient
+	public int[]												multipleNumberOfMarkers;
+
+	/**
+	 * List with all tour markers which is used only for multiple tours. This list is required
+	 * because the tour markers cannnot be modified and a Set with all tourmarkers is not sorted as
+	 * it should.
+	 */
+	@Transient
+	public ArrayList<TourMarker>								multiTourMarkers;
 
 	/**
 	 * A value is <code>true</code> when cadence is 0.
@@ -5610,6 +5624,9 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 		return tourMarkers;
 	}
 
+	/**
+	 * @return Returns {@link TourMarker}'s sorted by serie index.
+	 */
 	public ArrayList<TourMarker> getTourMarkersSorted() {
 
 		if (_sortedMarkers != null) {

@@ -1165,6 +1165,45 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		createChartActions();
 	}
 
+	private ChartLabel createChartLabel(final TourMarker tourMarker,
+										final double[] xAxisSerie,
+										final int xAxisSerieIndex,
+										final int labelPosition) {
+
+		final ChartLabel chartLabel = new ChartLabel();
+
+		chartLabel.data = tourMarker;
+
+		// create marker label
+		String markerLabel = tourMarker.getLabel();
+		final boolean isDescription = tourMarker.getDescription().length() > 0;
+		final boolean isUrlAddress = tourMarker.getUrlAddress().length() > 0;
+		final boolean isUrlText = tourMarker.getUrlText().length() > 0;
+		if (isDescription | isUrlAddress | isUrlText) {
+			markerLabel += UI.SPACE2 + UI.SYMBOL_FOOT_NOTE;
+		}
+
+		chartLabel.graphX = xAxisSerie[xAxisSerieIndex];
+		chartLabel.serieIndex = xAxisSerieIndex;
+
+		chartLabel.markerLabel = markerLabel;
+		chartLabel.visualPosition = labelPosition;
+		chartLabel.type = tourMarker.getType();
+		chartLabel.visualType = tourMarker.getVisibleType();
+
+		chartLabel.labelXOffset = tourMarker.getLabelXOffset();
+		chartLabel.labelYOffset = tourMarker.getLabelYOffset();
+
+		chartLabel.isVisible = tourMarker.isMarkerVisible();
+
+//		final TourSign tourSign = tourMarker.getTourSign();
+//		if (tourSign != null) {
+//			chartLabel.markerSignPhoto = tourSign.getSignImagePhoto();
+//		}
+
+		return chartLabel;
+	}
+
 	/**
 	 * Create chart photos, these are photos which contain the time slice position.
 	 * 
@@ -1260,7 +1299,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
 				if (isMultipleTours) {
 
-					// adjust time because multiple tours do not have a gap between tours
+					// adjust image time because multiple tours do not have a gap between tours
 					// it took me several hours to find this algorithm, but now it works :-)
 
 					if (serieIndex >= nextTourSerieIndex) {
@@ -1396,85 +1435,106 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 				hideMarkerLayer();
 			}
 
-		} else {
+			return;
+		}
 
-			// marker layer is visible
+		// marker layer is visible
 
-			final ChartMarkerConfig cmc = new ChartMarkerConfig();
+		final ChartMarkerConfig cmc = new ChartMarkerConfig();
 
-			cmc.isDrawMarkerWithDefaultColor = _tcc.isDrawMarkerWithDefaultColor;
-			cmc.isShowHiddenMarker = _tcc.isShowHiddenMarker;
-			cmc.isShowMarkerLabel = _tcc.isShowMarkerLabel;
-			cmc.isShowMarkerTooltip = _tcc.isShowMarkerTooltip;
-			cmc.isShowMarkerPoint = _tcc.isShowMarkerPoint;
-			cmc.isShowSignImage = _tcc.isShowSignImage;
-			cmc.isShowLabelTempPos = _tcc.isShowLabelTempPos;
+		cmc.isDrawMarkerWithDefaultColor = _tcc.isDrawMarkerWithDefaultColor;
+		cmc.isShowHiddenMarker = _tcc.isShowHiddenMarker;
+		cmc.isShowMarkerLabel = _tcc.isShowMarkerLabel;
+		cmc.isShowMarkerTooltip = _tcc.isShowMarkerTooltip;
+		cmc.isShowMarkerPoint = _tcc.isShowMarkerPoint;
+		cmc.isShowSignImage = _tcc.isShowSignImage;
+		cmc.isShowLabelTempPos = _tcc.isShowLabelTempPos;
 
-			cmc.markerLabelTempPos = _tcc.markerLabelTempPos;
-			cmc.markerTooltipPosition = _tcc.markerTooltipPosition;
+		cmc.markerLabelTempPos = _tcc.markerLabelTempPos;
+		cmc.markerTooltipPosition = _tcc.markerTooltipPosition;
 
-			cmc.markerHoverSize = _tcc.markerHoverSize;
-			cmc.markerLabelOffset = _tcc.markerLabelOffset;
-			cmc.markerPointSize = _tcc.markerPointSize;
-			cmc.markerSignImageSize = _tcc.markerSignImageSize;
+		cmc.markerHoverSize = _tcc.markerHoverSize;
+		cmc.markerLabelOffset = _tcc.markerLabelOffset;
+		cmc.markerPointSize = _tcc.markerPointSize;
+		cmc.markerSignImageSize = _tcc.markerSignImageSize;
 
-			cmc.markerColorDefault = _tcc.markerColorDefault;
-			cmc.markerColorDevice = _tcc.markerColorDevice;
-			cmc.markerColorHidden = _tcc.markerColorHidden;
+		cmc.markerColorDefault = _tcc.markerColorDefault;
+		cmc.markerColorDevice = _tcc.markerColorDevice;
+		cmc.markerColorHidden = _tcc.markerColorHidden;
 
-			if (_layerMarker == null) {
+		if (_layerMarker == null) {
 
-				// setup marker layer, a layer is created only once
+			// setup marker layer, a layer is created only once
 
-				_layerMarker = new ChartLayerMarker(this);
+			_layerMarker = new ChartLayerMarker(this);
 
-				// set overlay painter
-				addChartOverlay(_layerMarker);
+			// set overlay painter
+			addChartOverlay(_layerMarker);
 
-				addMouseChartListener(_mouseMarkerListener);
+			addMouseChartListener(_mouseMarkerListener);
+		}
+
+		_layerMarker.setChartMarkerConfig(cmc);
+		_markerTooltip.setChartMarkerConfig(cmc);
+
+		// set data serie for the x-axis
+		final double[] xAxisSerie = _tcc.isShowTimeOnXAxis ? //
+				_tourData.getTimeSerieDouble()
+				: _tourData.getDistanceSerieDouble();
+
+		if (_tourData.isMultipleTours) {
+
+			final int[] multipleStartTimeIndex = _tourData.multipleTourStartIndex;
+			final int[] multipleNumberOfMarkers = _tourData.multipleNumberOfMarkers;
+
+			int tourIndex = 0;
+			int numberOfMultiMarkers = 0;
+			int tourSerieIndex = 0;
+
+			// setup first multiple tour
+			tourSerieIndex = multipleStartTimeIndex[tourIndex];
+			numberOfMultiMarkers = multipleNumberOfMarkers[tourIndex];
+
+			final ArrayList<TourMarker> allTourMarkers = _tourData.multiTourMarkers;
+
+			for (int markerIndex = 0; markerIndex < allTourMarkers.size(); markerIndex++) {
+
+				if (markerIndex >= numberOfMultiMarkers) {
+
+					// setup next tour
+
+					tourIndex++;
+
+					if (tourIndex <= multipleStartTimeIndex.length - 1) {
+
+						tourSerieIndex = multipleStartTimeIndex[tourIndex];
+						numberOfMultiMarkers += multipleNumberOfMarkers[tourIndex];
+					}
+				}
+
+				final TourMarker tourMarker = allTourMarkers.get(markerIndex);
+				final int markerSerieIndex = tourSerieIndex + tourMarker.getSerieIndex();
+
+				tourMarker.setMultiTourSerieIndex(markerSerieIndex);
+
+				final ChartLabel chartLabel = createChartLabel(//
+						tourMarker,
+						xAxisSerie,
+						markerSerieIndex,
+						tourMarker.getLabelPosition());
+
+				cmc.chartLabels.add(chartLabel);
 			}
 
-			_layerMarker.setChartMarkerConfig(cmc);
-			_markerTooltip.setChartMarkerConfig(cmc);
-
-			// set data serie for the x-axis
-			final double[] xAxisSerie = _tcc.isShowTimeOnXAxis ? //
-					_tourData.getTimeSerieDouble()
-					: _tourData.getDistanceSerieDouble();
+		} else {
 
 			for (final TourMarker tourMarker : _tourData.getTourMarkers()) {
 
-				final ChartLabel chartLabel = new ChartLabel();
-
-				chartLabel.data = tourMarker;
-
-				final int markerIndex = Math.min(tourMarker.getSerieIndex(), xAxisSerie.length - 1);
-
-				String markerLabel = tourMarker.getLabel();
-				final boolean isDescription = tourMarker.getDescription().length() > 0;
-				final boolean isUrlAddress = tourMarker.getUrlAddress().length() > 0;
-				final boolean isUrlText = tourMarker.getUrlText().length() > 0;
-				if (isDescription | isUrlAddress | isUrlText) {
-					markerLabel += UI.SPACE2 + UI.SYMBOL_FOOT_NOTE;
-				}
-
-				chartLabel.graphX = xAxisSerie[markerIndex];
-				chartLabel.serieIndex = markerIndex;
-
-				chartLabel.markerLabel = markerLabel;
-				chartLabel.visualPosition = tourMarker.getLabelPosition();
-				chartLabel.type = tourMarker.getType();
-				chartLabel.visualType = tourMarker.getVisibleType();
-
-				chartLabel.labelXOffset = tourMarker.getLabelXOffset();
-				chartLabel.labelYOffset = tourMarker.getLabelYOffset();
-
-				chartLabel.isVisible = tourMarker.isMarkerVisible();
-
-//				final TourSign tourSign = tourMarker.getTourSign();
-//				if (tourSign != null) {
-//					chartLabel.markerSignPhoto = tourSign.getSignImagePhoto();
-//				}
+				final ChartLabel chartLabel = createChartLabel(
+						tourMarker,
+						xAxisSerie,
+						tourMarker.getSerieIndex(),
+						tourMarker.getLabelPosition());
 
 				cmc.chartLabels.add(chartLabel);
 			}

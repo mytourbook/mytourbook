@@ -367,7 +367,12 @@ public class ChartMarkerToolTip extends AnimatedToolTipShell implements ITourPro
 
 	private void createUI_70_Values(final Composite parent) {
 
-		final int valueIndex = _hoveredTourMarker.getSerieIndex();
+		int valueIndex;
+		if (_tourData.isMultipleTours) {
+			valueIndex = _hoveredTourMarker.getMultiTourSerieIndex();
+		} else {
+			valueIndex = _hoveredTourMarker.getSerieIndex();
+		}
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults()//

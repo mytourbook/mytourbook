@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -182,6 +182,7 @@ public class ChartLayerMarker implements IChartLayer, IChartOverlay {
 	/**
 	 * Draws the marker(s) for the current graph config.
 	 */
+	@Override
 	public void draw(final GC gc, final GraphDrawingData drawingData, final Chart chart, final PixelConverter pc) {
 
 		final Device display = gc.getDevice();
@@ -523,7 +524,6 @@ public class ChartLayerMarker implements IChartLayer, IChartOverlay {
 		colorHidden.dispose();
 
 		gc.setClipping((Rectangle) null);
-
 	}
 
 	/**

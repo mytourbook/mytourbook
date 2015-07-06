@@ -261,6 +261,12 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 	private long					_deviceLapTime;
 
 	/**
+	 * Serie index in {@link TourData} when tour is {@link TourData#isMultipleTours}.
+	 */
+	@Transient
+	private int						_multiTourSerieIndex						= -1;
+
+	/**
 	 * 
 	 */
 	private static int				_defaultSignImageMaxSize					= -1;
@@ -480,6 +486,10 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 		final long markerTime = tourData.getTourStartTimeMS() + time * 1000;
 
 		return markerTime;
+	}
+
+	public int getMultiTourSerieIndex() {
+		return _multiTourSerieIndex;
 	}
 
 	/**
@@ -790,6 +800,10 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 
 	public void setMarkerVisible(final boolean isMarkerVisible) {
 		this.isMarkerVisible = isMarkerVisible ? 1 : 0;
+	}
+
+	public void setMultiTourSerieIndex(final int multiTourSerieIndex) {
+		this._multiTourSerieIndex = multiTourSerieIndex;
 	}
 
 	/**

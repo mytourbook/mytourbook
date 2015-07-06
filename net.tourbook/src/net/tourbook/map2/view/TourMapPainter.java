@@ -1004,46 +1004,15 @@ public class TourMapPainter extends MapPainter {
 
 				if (_tourPaintConfig.isShowTourMarker) {
 
-					// ckeck if markers are available
-					final ArrayList<TourMarker> sortedMarkers = tourData.getTourMarkersSorted();
-					if (sortedMarkers.size() > 0) {
-
-						// draw tour marker
-
-						int markerCounter = 0;
-
-						for (final TourMarker tourMarker : sortedMarkers) {
-
-							// skip marker when hidden or not set
-							if (tourMarker.isMarkerVisible() == false || tourMarker.getLabel().length() == 0) {
-								continue;
-							}
-
-							final int serieIndex = tourMarker.getSerieIndex();
-
-							/*
-							 * check bounds because when a tour is split, it can happen that the
-							 * marker serie index is out of scope
-							 */
-							if (serieIndex >= latitudeSerie.length) {
-								continue;
-							}
-
-							// draw tour marker
-							if (drawTourMarker(
-									gcTile,
-									map,
-									tile,
-									latitudeSerie[serieIndex],
-									longitudeSerie[serieIndex],
-									tourMarker,
-									parts)) {
-								markerCounter++;
-							}
-						}
-
-						isContentInTile = isContentInTile || markerCounter > 0;
-					}
+					isContentInTile = doPaint_Marker(
+							gcTile,
+							map,
+							tile,
+							parts,
+							isContentInTile,
+							tourData,
+							latitudeSerie,
+							longitudeSerie);
 				}
 
 				if (_tourPaintConfig.isShowWayPoints) {
@@ -1126,6 +1095,124 @@ public class TourMapPainter extends MapPainter {
 			isContentInTile = isContentInTile || photoCounter > 0;
 		}
 
+		return isContentInTile;
+	}
+
+	private boolean doPaint_Marker(	final GC gcTile,
+									final Map map,
+									final Tile tile,
+									final int parts,
+									boolean isContentInTile,
+									final TourData tourData,
+									final double[] latitudeSerie,
+									final double[] longitudeSerie) {
+
+		if (tourData.isMultipleTours) {
+
+			final int[] multipleStartTimeIndex = tourData.multipleTourStartIndex;
+			final int[] multipleNumberOfMarkers = tourData.multipleNumberOfMarkers;
+
+			int tourIndex = 0;
+			int numberOfMultiMarkers = 0;
+			int tourSerieIndex = 0;
+
+			// setup first multiple tour
+			tourSerieIndex = multipleStartTimeIndex[tourIndex];
+			numberOfMultiMarkers = multipleNumberOfMarkers[tourIndex];
+
+			final ArrayList<TourMarker> allTourMarkers = tourData.multiTourMarkers;
+
+			// draw tour marker
+
+			int markerCounter = 0;
+
+			for (int markerIndex = 0; markerIndex < allTourMarkers.size(); markerIndex++) {
+
+				if (markerIndex >= numberOfMultiMarkers) {
+
+					// setup next tour
+
+					tourIndex++;
+
+					if (tourIndex <= multipleStartTimeIndex.length - 1) {
+
+						tourSerieIndex = multipleStartTimeIndex[tourIndex];
+						numberOfMultiMarkers += multipleNumberOfMarkers[tourIndex];
+					}
+				}
+
+				final TourMarker tourMarker = allTourMarkers.get(markerIndex);
+
+				// skip marker when hidden or not set
+				if (tourMarker.isMarkerVisible() == false || tourMarker.getLabel().length() == 0) {
+					continue;
+				}
+
+				final int markerSerieIndex = tourSerieIndex + tourMarker.getSerieIndex();
+
+				tourMarker.setMultiTourSerieIndex(markerSerieIndex);
+
+				// draw tour marker
+				if (drawTourMarker(
+						gcTile,
+						map,
+						tile,
+						latitudeSerie[markerSerieIndex],
+						longitudeSerie[markerSerieIndex],
+						tourMarker,
+						parts)) {
+
+					markerCounter++;
+				}
+			}
+
+			isContentInTile = isContentInTile || markerCounter > 0;
+
+		} else {
+
+			final ArrayList<TourMarker> sortedMarkers = tourData.getTourMarkersSorted();
+
+			// ckeck if markers are available
+			if (sortedMarkers.size() > 0) {
+
+				// draw tour marker
+
+				int markerCounter = 0;
+
+				for (final TourMarker tourMarker : sortedMarkers) {
+
+					// skip marker when hidden or not set
+					if (tourMarker.isMarkerVisible() == false || tourMarker.getLabel().length() == 0) {
+						continue;
+					}
+
+					final int serieIndex = tourMarker.getSerieIndex();
+
+					/*
+					 * check bounds because when a tour is split, it can happen that the marker
+					 * serie index is out of scope
+					 */
+					if (serieIndex >= latitudeSerie.length) {
+						continue;
+					}
+
+					// draw tour marker
+					if (drawTourMarker(
+							gcTile,
+							map,
+							tile,
+							latitudeSerie[serieIndex],
+							longitudeSerie[serieIndex],
+							tourMarker,
+							parts)) {
+
+						markerCounter++;
+					}
+				}
+
+				isContentInTile = isContentInTile || markerCounter > 0;
+			}
+		}
 		return isContentInTile;
 	}
 

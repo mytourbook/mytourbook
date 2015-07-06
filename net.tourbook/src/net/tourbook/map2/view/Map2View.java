@@ -1914,21 +1914,37 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 
 		updateUI_ShowTour(tourData);
 
-		final ArrayList<TourMarker> tourMarker = markerSelection.getSelectedTourMarker();
-		final int numberOfTourMarkers = tourMarker.size();
+		final ArrayList<TourMarker> allTourMarker = markerSelection.getSelectedTourMarker();
+		final int numberOfTourMarkers = allTourMarker.size();
 
 		int leftSliderValueIndex = 0;
 		int rightSliderValueIndex = 0;
 
-		if (numberOfTourMarkers == 1) {
+		if (tourData.isMultipleTours) {
 
-			leftSliderValueIndex = tourMarker.get(0).getSerieIndex();
-			rightSliderValueIndex = leftSliderValueIndex;
+			if (numberOfTourMarkers == 1) {
 
-		} else if (numberOfTourMarkers > 1) {
+				leftSliderValueIndex = allTourMarker.get(0).getMultiTourSerieIndex();
+				rightSliderValueIndex = leftSliderValueIndex;
 
-			leftSliderValueIndex = tourMarker.get(0).getSerieIndex();
-			rightSliderValueIndex = tourMarker.get(numberOfTourMarkers - 1).getSerieIndex();
+			} else if (numberOfTourMarkers > 1) {
+
+				leftSliderValueIndex = allTourMarker.get(0).getMultiTourSerieIndex();
+				rightSliderValueIndex = allTourMarker.get(numberOfTourMarkers - 1).getMultiTourSerieIndex();
+			}
+
+		} else {
+
+			if (numberOfTourMarkers == 1) {
+
+				leftSliderValueIndex = allTourMarker.get(0).getSerieIndex();
+				rightSliderValueIndex = leftSliderValueIndex;
+
+			} else if (numberOfTourMarkers > 1) {
+
+				leftSliderValueIndex = allTourMarker.get(0).getSerieIndex();
+				rightSliderValueIndex = allTourMarker.get(numberOfTourMarkers - 1).getSerieIndex();
+			}
 		}
 
 		if (_isMapSynchedWithTour || _isMapSynchedWithSlider) {

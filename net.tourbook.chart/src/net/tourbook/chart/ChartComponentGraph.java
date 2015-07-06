@@ -141,7 +141,8 @@ public class ChartComponentGraph extends Canvas {
 	private ArrayList<GraphDrawingData>	_revertedGraphDrawingData;
 
 	/**
-	 * zoom ratio between the visible and the virtual chart width
+	 * Zoom ratio between the visible and the virtual chart width, is 1.0 when not zoomed, is > 1
+	 * when zoomed.
 	 */
 	private double						_graphZoomRatio					= 1;
 
@@ -1839,53 +1840,73 @@ public class ChartComponentGraph extends Canvas {
 			 */
 
 			final double scaleX = graphDrawingData.getScaleX();
+			final int devVisibleChartWidth = graphDrawingData.getChartDrawingData().devVisibleChartWidth;
 
 			final long[] valueStart = chartSegments.valueStart;
 			final long[] valueEnd = chartSegments.valueEnd;
 			final String[] segmentTitles = chartSegments.segmentTitle;
+			final boolean isZoomed = getZoomRatio() > 1.0;
 
 			if (valueStart != null && valueEnd != null && segmentTitles != null) {
 
 				final int titlePadding = 5;
 				int devXTitleEnd = -1;
+				boolean isFirstSegment = true;
 
 				for (int segmentIndex = 0; segmentIndex < valueStart.length; segmentIndex++) {
 
 					final String segmentTitle = segmentTitles[segmentIndex];
 
-					if (segmentTitle != null) {
+					if (segmentTitle == null) {
+						continue;
+					}
 
-						final int devXSegmentStart = (int) (scaleX * valueStart[segmentIndex] - _xxDevViewPortLeftBorder);
-						final int devXSegmentEnd = (int) (scaleX * (valueEnd[segmentIndex] + 1) - _xxDevViewPortLeftBorder);
+					final int devXSegmentStart = (int) (scaleX * valueStart[segmentIndex] - _xxDevViewPortLeftBorder);
+					final int devXSegmentEnd = (int) (scaleX * (valueEnd[segmentIndex] + 1) - _xxDevViewPortLeftBorder);
 
-						final int segmentLength = devXSegmentEnd - devXSegmentStart;
-						final int devXSegmentCenter = devXSegmentEnd - (segmentLength / 2);
+					if (devXSegmentEnd < 0) {
+						// segment is to the left of the left border
+						continue;
+					}
 
-						final int titleWidth = gc.textExtent(segmentTitle).x;
-						final int devXTitleCenter = titleWidth / 2;
+					if (devXSegmentStart > devVisibleChartWidth) {
+						// segment is to the right of the right border
+						break;
+					}
 
-						int devX = devXSegmentCenter - devXTitleCenter;
+					final int titleWidth = gc.textExtent(segmentTitle).x;
+					final int titleWidth2 = titleWidth / 2;
 
-						// draw 1st title always
-						if (_xxDevViewPortLeftBorder == 0 && segmentIndex == 0) {
+					final int visibleSegmentStart = Math.max(0, devXSegmentStart);
+					final int visibleSegmentEnd = Math.min(devXSegmentEnd, devVisibleChartWidth);
+					final int visibleSegmentWidth = visibleSegmentEnd - visibleSegmentStart;
 
-							if (devX < 0) {
-								devX = 0;
-							}
+					// center in the middle of the visible segment
+					int devXTitle = visibleSegmentStart + visibleSegmentWidth / 2 - titleWidth2;
 
-							devXTitleEnd = titleWidth + titlePadding;
+					if (isFirstSegment && isZoomed == false) {
 
-						} else if (devX <= devXTitleEnd) {
+						// title for the first segment is always displayed when not zoomed
 
-							// skip title when it overlaps the previous title
-							continue;
+						isFirstSegment = false;
 
-						} else {
-
-							devXTitleEnd = devXSegmentCenter + devXTitleCenter + titlePadding;
+						// ensure title is not truncated at the left border
+						if (devXTitle < 0) {
+							devXTitle = 0;
 						}
+					}
 
-						gc.drawText(segmentTitle, devX, devYTitle, false);
+					// ensure that the title do not overlap a previous title
+					if (devXTitle > devXTitleEnd) {
+
+						// keep position when the title is drawn
+						devXTitleEnd = devXTitle + titleWidth + titlePadding;
+
+						gc.drawText(segmentTitle, devXTitle, devYTitle, false);
+					}
+
+					// draw segment start line but not for the first segment
+					if (segmentIndex != 0) {
 
 //						// debug
 //						gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));

@@ -18,6 +18,7 @@ package net.tourbook.chart;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 
+import net.tourbook.common.UI;
 import net.tourbook.common.util.ITourToolTipProvider;
 
 import org.eclipse.swt.SWT;
@@ -237,7 +238,7 @@ public class ChartComponentAxis extends Canvas {
 			gc.setBackground(_chart.getBackgroundColor());
 			gc.fillRectangle(_axisImage.getBounds());
 
-			draw_10_MoveMarker(gc, axisRect);
+			draw_10_ZoomMarker(gc, axisRect);
 			draw_20_YUnits(gc, axisRect);
 
 			if (_tourToolTipProvider != null) {
@@ -256,7 +257,7 @@ public class ChartComponentAxis extends Canvas {
 	 * @param gc
 	 * @param rect
 	 */
-	private void draw_10_MoveMarker(final GC gc, final Rectangle rect) {
+	private void draw_10_ZoomMarker(final GC gc, final Rectangle rect) {
 
 		final double zoomRatio = _componentGraph.getZoomRatio();
 		if (zoomRatio == 1.0) {
@@ -290,23 +291,17 @@ public class ChartComponentAxis extends Canvas {
 					devZoomMarkerWidth,
 					devMarkerHeight);
 
-//			/*
-//			 * show zoom ratio
-//			 */
-//			String zoomText;
-//			if (zoomRatio < 10) {
-//				zoomText = _nf1.format(zoomRatio);
-//			} else {
-//				zoomText = Long.toString((long) zoomRatio);
-//			}
-//
-//			final int textHeight = gc.textExtent(zoomText).y;
-//
-//			gc.setForeground(_display.getSystemColor(SWT.COLOR_DARK_GRAY));
-//			gc.drawText(zoomText, //
-//					1,
-//					devYMarker - textHeight - 0,
-//					true);
+			/*
+			 * show zoom ratio
+			 */
+			final String zoomText = getZoomText(moveRatio * 100);
+			final int textHeight = gc.textExtent(zoomText).y;
+
+			gc.setForeground(_display.getSystemColor(SWT.COLOR_DARK_GRAY));
+			gc.drawText(zoomText, //
+					1,
+					devYMarker - textHeight + 2,
+					true);
 
 		} else {
 
@@ -320,24 +315,20 @@ public class ChartComponentAxis extends Canvas {
 					devZoomMarkerWidth,
 					devMarkerHeight);
 
-//			/*
-//			 * show moved chart in%
-//			 */
-//			final StringBuilder sb = new StringBuilder();
-//			sb.append(Long.toString((long) (moveValue * 100)));
-////			sb.append(UI.SPACE);
-////			sb.append(UI.SYMBOL_PERCENTAGE);
-//			final String zoomText = sb.toString();
-//
-//			final Point textExtent = gc.textExtent(zoomText);
-//			final int textWidth = textExtent.x;
-//			final int textHeight = textExtent.y;
-//
-//			gc.setForeground(_display.getSystemColor(SWT.COLOR_DARK_GRAY));
-//			gc.drawText(zoomText, //
-//					devAxisWidth - textWidth - 0,
-//					devYMarker - textHeight + 0,
-//					true);
+			/*
+			 * show moved chart in%
+			 */
+			final String zoomText = getZoomText(moveValue * 100);
+			final Point textExtent = gc.textExtent(zoomText);
+
+			final int textWidth = textExtent.x;
+			final int textHeight = textExtent.y;
+
+			gc.setForeground(_display.getSystemColor(SWT.COLOR_DARK_GRAY));
+			gc.drawText(zoomText, //
+					devAxisWidth - textWidth - 0,
+					devYMarker - textHeight + 2,
+					true);
 		}
 	}
 
@@ -494,6 +485,22 @@ public class ChartComponentAxis extends Canvas {
 
 	public Rectangle getAxisClientArea() {
 		return _clientArea;
+	}
+
+	private String getZoomText(final double percentValue) {
+
+		String zoomText;
+
+		if (percentValue == 100) {
+			zoomText = Integer.toString((int) percentValue);
+		} else if (percentValue > 0.1) {
+			zoomText = _nf1.format(percentValue);
+		} else if (percentValue > 0.0000000000001) {
+			zoomText = "> 0";
+		} else {
+			zoomText = UI.EMPTY_STRING;
+		}
+		return zoomText;
 	}
 
 	private void onDispose() {
