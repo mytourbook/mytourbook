@@ -258,7 +258,7 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 	 * Device time in ms.
 	 */
 	@Transient
-	private long					_deviceLapTime;
+	private long					_deviceLapTime								= Long.MIN_VALUE;
 
 	/**
 	 * 

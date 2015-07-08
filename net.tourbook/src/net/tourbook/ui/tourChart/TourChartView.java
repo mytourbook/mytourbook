@@ -448,7 +448,7 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 	private void onSelectionChanged(final ISelection selection) {
 
 //		System.out.println((net.tourbook.common.UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
-//				+ ("\tonSelectionChanged"));
+//				+ ("\tonSelectionChanged: " + selection));
 //		// TODO remove SYSTEM.OUT.PRINTLN
 
 		// prevent to listen to own events

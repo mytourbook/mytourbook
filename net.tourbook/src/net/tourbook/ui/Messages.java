@@ -221,6 +221,9 @@ public class Messages extends NLS {
 	public static String		ColumnFactory_restpulse_label;
 	public static String		ColumnFactory_restpulse;
 	public static String		ColumnFactory_restpulse_tooltip;
+	public static String		ColumnFactory_SerieIndex;
+	public static String		ColumnFactory_SerieIndex_Label;
+	public static String		ColumnFactory_SerieIndex_Tooltip;
 	public static String		ColumnFactory_SerieStartEndIndex;
 	public static String		ColumnFactory_SerieStartEndIndex_Label;
 	public static String		ColumnFactory_SerieStartEndIndex_Tooltip;

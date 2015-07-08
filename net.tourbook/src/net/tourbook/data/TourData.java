@@ -1371,6 +1371,41 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 		return 0;
 	}
 
+	/**
+	 * Complete tour marker with altitude/lat/lon.
+	 * 
+	 * @param tourMarker
+	 * @param serieIndex
+	 */
+	public void completeTourMarker(final TourMarker tourMarker, final int serieIndex) {
+
+		if (altitudeSerie != null) {
+			tourMarker.setAltitude(altitudeSerie[serieIndex]);
+		}
+
+		if (latitudeSerie != null) {
+			tourMarker.setGeoPosition(latitudeSerie[serieIndex], longitudeSerie[serieIndex]);
+		}
+	}
+
+	/**
+	 * Complete all tour marker after all data are imported.
+	 * <p>
+	 * Relative tour time must be available that the absolute time can be set.
+	 */
+	public void completeTourMarkerWithRelativeTime() {
+
+		for (final TourMarker tourMarker : this.getTourMarkers()) {
+
+			final int serieIndex = tourMarker.getSerieIndex();
+			final int relativeTourTime = tourMarker.getTime();
+
+			tourMarker.setTime(relativeTourTime, tourStartTime + (relativeTourTime * 1000));
+
+			completeTourMarker(tourMarker, serieIndex);
+		}
+	}
+
 	public void computeAltimeterGradientSerie() {
 
 		// check if needed data are available
@@ -4458,30 +4493,6 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 	}
 
 	/**
-	 * Finalize all marker data after all data are imported.
-	 * <p>
-	 * Relative tour time must be available that the absolute time can be set.
-	 */
-	public void finalizeTourMarkerWithRelativeTime() {
-
-		for (final TourMarker tourMarker : this.getTourMarkers()) {
-
-			final int serieIndex = tourMarker.getSerieIndex();
-			final int relativeTourTime = tourMarker.getTime();
-
-			tourMarker.setTime(relativeTourTime, tourStartTime + (relativeTourTime * 1000));
-
-			if (altitudeSerie != null) {
-				tourMarker.setAltitude(altitudeSerie[serieIndex]);
-			}
-
-			if (latitudeSerie != null) {
-				tourMarker.setGeoPosition(latitudeSerie[serieIndex], longitudeSerie[serieIndex]);
-			}
-		}
-	}
-
-	/**
 	 * @return Returns the metric or imperial altimeter serie depending on the active measurement
 	 */
 	public float[] getAltimeterSerie() {
@@ -7102,6 +7113,10 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 				.append(super.toString())
 				.append(" identityHashCode:") //$NON-NLS-1$
 				.append(System.identityHashCode(this))
+
+				.append("\n\tsize:" + tourMarkers.size())
+				.append(" " + tourMarkers)
+
 				.toString();
 	}
 

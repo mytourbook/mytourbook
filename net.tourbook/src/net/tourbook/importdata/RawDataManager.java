@@ -403,8 +403,11 @@ public class RawDataManager {
 		File reimportedFile = null;
 
 		// prevent async error in the save tour method, cleanup environment
-		TourManager.fireEvent(TourEventId.CLEAR_DISPLAYED_TOUR, null, null);
 		tourViewer.getPostSelectionProvider().clearSelection();
+
+		Util.clearSelection();
+
+		TourManager.fireEvent(TourEventId.CLEAR_DISPLAYED_TOUR, null, null);
 
 		// get selected tours
 		final IStructuredSelection selectedTours = ((IStructuredSelection) tourViewer.getViewer().getSelection());
@@ -816,6 +819,8 @@ public class RawDataManager {
 			if (reimportId == ReImport.Tour) {
 
 				// replace complete tour
+
+				TourManager.getInstance().removeTourFromCache(oldTourData.getTourId());
 
 				tourData = reimportedTourData;
 

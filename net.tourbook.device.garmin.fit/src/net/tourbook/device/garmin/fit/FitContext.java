@@ -56,6 +56,7 @@ public class FitContext {
 	private HashMap<Long, TourData>	_newlyImportedTours;
 
 	private boolean					_isIgnoreLastMarker;
+	private boolean					_isSetLastMarker;
 	private int						_lastMarkerTimeSlices;
 
 	public FitContext(	final TourbookDevice device,
@@ -71,6 +72,7 @@ public class FitContext {
 		_contextData = new FitContextData();
 
 		_isIgnoreLastMarker = _prefStore.getBoolean(IPreferences.FIT_IS_IGNORE_LAST_MARKER);
+		_isSetLastMarker = _isIgnoreLastMarker == false;
 		_lastMarkerTimeSlices = _prefStore.getInt(IPreferences.FIT_IGNORE_LAST_MARKER_TIME_SLICES);
 	}
 
@@ -201,95 +203,97 @@ public class FitContext {
 
 			private void setupTour_Marker(final TourData tourData, final List<TourMarker> tourMarkers) {
 
-				if (tourMarkers == null) {
+				if (tourMarkers == null || tourMarkers.size() == 0) {
 					return;
 				}
 
 				final int[] timeSerie = tourData.timeSerie;
-				final int lastSerieIndex = timeSerie.length;
-				final long absoluteTourStartTimeS = tourData.getTourStartTimeMS() / 1000;
+				final int serieSize = timeSerie.length;
 
-				final Set<TourMarker> validatedTourMarkers = new HashSet<TourMarker>();
+				final long absoluteTourStartTime = tourData.getTourStartTimeMS();
+				final long absoluteTourEndTime = tourData.getTourEndTimeMS();
+
+				final ArrayList<TourMarker> validatedTourMarkers = new ArrayList<>();
 				final int tourMarkerSize = tourMarkers.size();
 
-				for (int markerIndex = 0; markerIndex < tourMarkerSize; markerIndex++) {
+				int markerIndex = 0;
+				int serieIndex = 0;
+
+				boolean isBreakMarkerLoop = false;
+
+				markerLoop:
+
+				for (; markerIndex < tourMarkerSize; markerIndex++) {
 
 					final TourMarker tourMarker = tourMarkers.get(markerIndex);
-					final int relativeMarkerTime = tourMarker.getTime();
-					final long absoluteMarkerTime = tourMarker.getTourTime();
+					final long absoluteMarkerTime = tourMarker.getDeviceLapTime();
 
-					if (relativeMarkerTime == -1 && absoluteMarkerTime != Long.MIN_VALUE) {
+					boolean isSetMarker = false;
 
-						// only absolute time is set
+					for (; serieIndex < serieSize; serieIndex++) {
 
-						for (int serieIndex = 0; serieIndex < timeSerie.length; serieIndex++) {
+						int relativeTourTimeS = timeSerie[serieIndex];
+						long absoluteTourTime = absoluteTourStartTime + relativeTourTimeS * 1000;
 
-							final int relativeTimeS = timeSerie[serieIndex];
-							final long tourTimeS = absoluteTourStartTimeS + relativeTimeS;
+						final long timeDiffEnd = absoluteTourEndTime - absoluteMarkerTime;
+						if (timeDiffEnd < 0) {
 
-							final long absoluteMarkerTimeS = absoluteMarkerTime / 1000;
+							// there cannot be a marker after the tour
+							if (markerIndex < tourMarkerSize) {
 
-							if (absoluteMarkerTimeS <= tourTimeS) {
+								// there are still markers available which are not set in the tour, set a last marker into the last time slice
 
-								tourMarker.setSerieIndex(serieIndex);
+								// set values for the last time slice
+								serieIndex = serieSize - 1;
+								relativeTourTimeS = timeSerie[serieIndex];
+								absoluteTourTime = absoluteTourStartTime + relativeTourTimeS * 1000;
 
-								validatedTourMarkers.add(tourMarker);
-
-								// check next marker
-								break;
+								isSetMarker = true;
 							}
+
+							isBreakMarkerLoop = true;
 						}
 
-					} else {
+						final long timeDiffMarker = absoluteMarkerTime - absoluteTourTime;
+						if (timeDiffMarker <= 0) {
 
-						final long markerLapTimeS = tourMarker.getDeviceLapTime() / 1000;
+							// time for the marker is found
 
-						for (int serieIndex = 0; serieIndex < timeSerie.length; serieIndex++) {
+							isSetMarker = true;
+						}
 
-							final int relativeTimeS = timeSerie[serieIndex];
-							final long tourTimeS = absoluteTourStartTimeS + relativeTimeS;
+						if (isSetMarker) {
 
-							final long timeDiff = markerLapTimeS - tourTimeS;
+							/*
+							 * a last marker can be set when it's far enough away from the end, this
+							 * will disable the last tour marker
+							 */
+							final boolean canSetLastMarker = _isIgnoreLastMarker
+									&& serieIndex < serieSize - _lastMarkerTimeSlices;
 
-//							if (markerLapTimeS <= tourTimeS) {
-							if (timeDiff <= 0) {
+							if (_isSetLastMarker || canSetLastMarker) {
 
-								if (markerIndex == tourMarkerSize - 1) {
-
-									// this is the last marker
-
-									if (_isIgnoreLastMarker == false) {
-
-										// check if the last marker can be ignored
-
-										/**
-										 * Fit devices adds a marker at the end, this is annoing
-										 * therefore it is removed. It is not only the last time
-										 * slice it can also be about the last 5 time slices.
-										 * <p>
-										 * Since version 15.8 this feature can be customized.
-										 */
-										if (serieIndex > lastSerieIndex - _lastMarkerTimeSlices) {
-
-											// check next marker
-											break;
-										}
-									}
-								}
-
+								tourMarker.setTime(relativeTourTimeS, absoluteTourTime);
 								tourMarker.setSerieIndex(serieIndex);
 
-								validatedTourMarkers.add(tourMarker);
+								tourData.completeTourMarker(tourMarker, serieIndex);
 
-								// check next marker
-								break;
+								validatedTourMarkers.add(tourMarker);
 							}
+
+							// check next marker
+							break;
 						}
+					}
+
+					if (isBreakMarkerLoop) {
+						break markerLoop;
 					}
 				}
 
-				tourData.setTourMarkers(validatedTourMarkers);
-				tourData.finalizeTourMarkerWithRelativeTime();
+				final Set<TourMarker> tourTourMarkers = new HashSet<TourMarker>(validatedTourMarkers);
+
+				tourData.setTourMarkers(tourTourMarkers);
 			}
 		};
 

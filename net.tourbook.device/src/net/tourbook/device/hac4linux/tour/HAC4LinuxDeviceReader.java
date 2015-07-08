@@ -620,7 +620,7 @@ public class HAC4LinuxDeviceReader extends TourbookDevice {
 				tourData.computeComputedValues();
 				tourData.computeTourDrivingTime();
 
-				tourData.finalizeTourMarkerWithRelativeTime();
+				tourData.completeTourMarkerWithRelativeTime();
 			}
 
 		} catch (final FileNotFoundException e) {

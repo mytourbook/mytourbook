@@ -1202,7 +1202,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		final int[] timeSerie = _tourData.timeSerie;
 		final Set<TourMarker> tourMarkers = _tourData.getTourMarkers();
 
-		// sort markers by time - they are unsorted
+		// sort markers by time - they can be unsorted
 		final ArrayList<TourMarker> markerList = new ArrayList<TourMarker>(tourMarkers);
 		Collections.sort(markerList, new Comparator<TourMarker>() {
 			@Override
@@ -1213,16 +1213,29 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 		final ArrayList<Integer> segmentSerieIndex = new ArrayList<Integer>();
 
+		int prevSerieIndex = 0;
+
 		// set first segment at tour start
-		segmentSerieIndex.add(0);
+		segmentSerieIndex.add(prevSerieIndex);
 
 		// create segment for each marker
 		for (final TourMarker tourMarker : markerList) {
-			segmentSerieIndex.add(tourMarker.getSerieIndex());
+
+			final int serieIndex = tourMarker.getSerieIndex();
+
+			// prevent to set a second segment at the same position
+			if (serieIndex != prevSerieIndex) {
+				segmentSerieIndex.add(serieIndex);
+			}
+
+			prevSerieIndex = serieIndex;
 		}
 
 		// add segment end at the tour end
-		segmentSerieIndex.add(timeSerie.length - 1);
+		final int lastIndex = timeSerie.length - 1;
+		if (prevSerieIndex != lastIndex) {
+			segmentSerieIndex.add(lastIndex);
+		}
 
 		_tourData.segmentSerieIndex = ArrayListToArray.toInt(segmentSerieIndex);
 	}

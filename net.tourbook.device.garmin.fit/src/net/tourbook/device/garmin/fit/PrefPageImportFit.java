@@ -173,13 +173,13 @@ public class PrefPageImportFit extends PreferencePage implements IWorkbenchPrefe
 			// label: info
 			{
 				_lblIgnorLastMarker_Info = createUI_InfoLabel(group, 3);
-				_lblIgnorLastMarker_Info.setText(Messages.PrefPage_Fit_Checkbox_IgnoreLastMarker_Info);
+				_lblIgnorLastMarker_Info.setText(Messages.PrefPage_Fit_Label_IgnoreLastMarker_Info);
 			}
 
 			// label: ignore time slices
 			{
 				_lblIgnorLastMarker_TimeSlices = new Label(group, SWT.NONE);
-				_lblIgnorLastMarker_TimeSlices.setText(Messages.PrefPage_Fit_Label_IgnoredTimeSlices);
+				_lblIgnorLastMarker_TimeSlices.setText(Messages.PrefPage_Fit_Label_IgnoreLastMarker_TimeSlices);
 			}
 
 			// spinner

@@ -389,7 +389,7 @@ public class CRPDataReader extends TourbookDevice {
 				tourData.setTourAltUp(tourAltUp);
 				tourData.setTourAltDown(tourAltDown);
 
-				tourData.finalizeTourMarkerWithRelativeTime();
+				tourData.completeTourMarkerWithRelativeTime();
 			}
 
 			returnValue = true;

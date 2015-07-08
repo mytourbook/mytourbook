@@ -50,19 +50,19 @@ public class LapMesgListenerImpl extends AbstractMesgListener implements LapMesg
 			tourMarker.setDistance(lapDistance);
 		}
 
-		int lapTime = -1;
-		final Float totalElapsedTime = lapMesg.getTotalElapsedTime();
-		if (totalElapsedTime != null) {
-
-			lapTime = context.getLapTime();
-//			lapTime += Math.round(totalElapsedTime);
-			lapTime += totalElapsedTime;
-
-			context.setLapTime(lapTime);
-
-			// the correct absolute time will be set later
-			tourMarker.setTime(lapTime, Long.MIN_VALUE);
-		}
+//		int lapTime = -1;
+//		final Float totalElapsedTime = lapMesg.getTotalElapsedTime();
+//		if (totalElapsedTime != null) {
+//
+//			lapTime = context.getLapTime();
+////			lapTime += Math.round(totalElapsedTime);
+//			lapTime += totalElapsedTime;
+//
+//			context.setLapTime(lapTime);
+//
+//			// the correct absolute time will be set later
+//			tourMarker.setTime(lapTime, Long.MIN_VALUE);
+//		}
 
 		/*
 		 * Set lap time, later the time slice position (serie index) will be set.
