@@ -182,6 +182,7 @@ public class ChartLayerMarker implements IChartLayer, IChartOverlay {
 	/**
 	 * Draws the marker(s) for the current graph config.
 	 */
+	@Override
 	public void draw(final GC gc, final GraphDrawingData drawingData, final Chart chart, final PixelConverter pc) {
 
 		final Device display = gc.getDevice();
@@ -207,9 +208,11 @@ public class ChartLayerMarker implements IChartLayer, IChartOverlay {
 
 		final int devYTop = drawingData.getDevYTop();
 		final int devYBottom = drawingData.getDevYBottom();
-		final long devGraphImageOffset = chart.getXXDevViewPortLeftBorder();
+		final long devVirtualGraphImageOffset = chart.getXXDevViewPortLeftBorder();
 		final int devGraphHeight = drawingData.devGraphHeight;
-		final long devGraphWidth = drawingData.devVirtualGraphWidth;
+		final long devVirtualGraphWidth = drawingData.devVirtualGraphWidth;
+		final int devVisibleChartWidth = drawingData.getChartDrawingData().devVisibleChartWidth;
+		final boolean isZoomed = devVirtualGraphWidth != devVisibleChartWidth;
 
 		final float graphYBottom = drawingData.getGraphYBottom();
 		final float[] yValues = drawingData.getYData().getHighValuesFloat()[0];
@@ -273,7 +276,8 @@ public class ChartLayerMarker implements IChartLayer, IChartOverlay {
 			final float yValue = yValues[chartLabel.serieIndex];
 			final int devYGraph = (int) ((yValue - graphYBottom) * scaleY) - 0;
 
-			_devXMarker = (int) (chartLabel.graphX * scaleX - devGraphImageOffset);
+			final double virtualXPos = chartLabel.graphX * scaleX;
+			_devXMarker = (int) (virtualXPos - devVirtualGraphImageOffset);
 			_devYMarker = devYBottom - devYGraph;
 
 			final Point labelExtend = gc.textExtent(chartLabel.markerLabel);
@@ -350,9 +354,14 @@ public class ChartLayerMarker implements IChartLayer, IChartOverlay {
 					_devXMarker -= vLabelWidth;
 
 					// don't draw the marker to the right of the chart
-					final long devXImageOffset = chart.getXXDevViewPortLeftBorder();
-					if (devXImageOffset == 0 && _devXMarker < 0) {
+					if (devVirtualGraphImageOffset == 0 && _devXMarker < 0) {
 						_devXMarker = 0;
+					}
+
+					// don't draw the marker to the right of the chart
+					final double devVirtualMarkerRightPos = virtualXPos + vLabelWidth;
+					if (devVirtualMarkerRightPos > devVirtualGraphWidth) {
+						_devXMarker = (int) (devVirtualGraphWidth - vLabelWidth - devVirtualGraphImageOffset);
 					}
 
 					// force label to be not below the bottom
@@ -423,14 +432,14 @@ public class ChartLayerMarker implements IChartLayer, IChartOverlay {
 					 */
 
 					// don't draw the marker to the left of the chart
-					final long devXImageOffset = chart.getXXDevViewPortLeftBorder();
-					if (devXImageOffset == 0 && _devXMarker < 0) {
+					if (devVirtualGraphImageOffset == 0 && _devXMarker < 0) {
 						_devXMarker = 0;
 					}
 
 					// don't draw the marker to the right of the chart
-					if (_devXMarker + labelWidth > devGraphWidth) {
-						_devXMarker = (int) (devGraphWidth - labelWidth);
+					final double devVirtualMarkerRightPos = virtualXPos + labelWidth;
+					if (devVirtualMarkerRightPos > devVirtualGraphWidth) {
+						_devXMarker = (int) (devVirtualGraphWidth - labelWidth - devVirtualGraphImageOffset - 2);
 					}
 
 					// force label to be not below the bottom
