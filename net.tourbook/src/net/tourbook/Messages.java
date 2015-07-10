@@ -749,7 +749,7 @@ public class Messages extends NLS {
 	public static String		Image__TourSegments;
 	public static String		Image__TourSegments_Disabled;
 
-	//	public static String		Image__TourSignImport;
+//	public static String		Image__TourSignImport;
 	public static String		Image__undo_edit;
 	public static String		Image__undo_edit_disabled;
 	public static String		Image__undo_tour_type_filter;
@@ -784,8 +784,7 @@ public class Messages extends NLS {
 	public static String		Import_Data_Action_Reimport_OnlyGearValues;
 	public static String		Import_Data_Action_Reimport_OnlyTemperatureValues;
 	public static String		Import_Data_Action_Reimport_OnlyTimeSlices;
-
-	public static String	Import_Data_Action_Reimport_OnlyTourMarker;
+	public static String		Import_Data_Action_Reimport_OnlyTourMarker;
 	public static String		Import_Data_Action_Reimport_Tour;
 	public static String		Import_Data_Action_RemoveTour;
 	public static String		Import_Data_Action_RemoveToursWhenClosed;
@@ -794,10 +793,11 @@ public class Messages extends NLS {
 	public static String		Import_Data_Dialog_ConfirmReimportGearValues_Message;
 	public static String		Import_Data_Dialog_ConfirmReimportTemperatureValues_Message;
 	public static String		Import_Data_Dialog_ConfirmReimportTimeSlices_Message;
-
-	public static String	Import_Data_Dialog_ConfirmReimportTourMarker_Message;
+	public static String		Import_Data_Dialog_ConfirmReimportTourMarker_Message;
 	public static String		Import_Data_Dialog_GetAlternativePath_Message;
 	public static String		Import_Data_Dialog_GetReimportedFilePath_Message;
+	public static String		Import_Data_Dialog_Reimport_SubTask;
+	public static String		Import_Data_Dialog_Reimport_Task;
 	public static String		Import_Data_Dialog_Reimport_Title;
 	public static String		Import_Data_Dialog_ReimportIsInvalid_CommonError_Message;
 	public static String		Import_Data_Dialog_ReimportIsInvalid_DifferentTourId_Message;
@@ -809,7 +809,6 @@ public class Messages extends NLS {
 	public static String		Import_Data_Link_Import;
 	public static String		Import_Data_Link_ReceiveFromSerialPort_Configured;
 	public static String		Import_Data_Link_ReceiveFromSerialPort_Directly;
-
 	public static String		Import_Wizard_Control_combo_person_default_settings;
 	public static String		Import_Wizard_Control_combo_ports_not_available;
 	public static String		Import_Wizard_Dlg_message;

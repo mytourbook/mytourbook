@@ -117,6 +117,9 @@ public class Util {
 		spinner.setSelection(spinner.getSelection() + newValue);
 	}
 
+	/**
+	 * Clear all selection providers in all workench pages.
+	 */
 	public static void clearSelection() {
 
 		final IWorkbenchWindow wbWin = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
