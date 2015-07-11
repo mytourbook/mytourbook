@@ -114,7 +114,7 @@ public class RecordMesgListenerImpl extends AbstractMesgListener implements Reco
 						tourMarker.setDistance(distance);
 					}
 
-					tourMarker.setTime(-1, absoluteTime);
+					tourMarker.setDeviceLapTime(absoluteTime);
 				}
 				context.onMesgLap_20_After();
 			}
