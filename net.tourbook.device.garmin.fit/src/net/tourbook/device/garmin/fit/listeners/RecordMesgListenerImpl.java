@@ -1,12 +1,18 @@
 package net.tourbook.device.garmin.fit.listeners;
 
+import net.tourbook.common.UI;
 import net.tourbook.data.TimeData;
+import net.tourbook.data.TourMarker;
 import net.tourbook.device.garmin.fit.Activator;
 import net.tourbook.device.garmin.fit.DataConverters;
 import net.tourbook.device.garmin.fit.FitContext;
 import net.tourbook.device.garmin.fit.IPreferences;
+import net.tourbook.device.garmin.fit.Messages;
 
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.osgi.util.NLS;
+import org.joda.time.Period;
+import org.joda.time.PeriodType;
 
 import com.garmin.fit.DateTime;
 import com.garmin.fit.RecordMesg;
@@ -14,32 +20,104 @@ import com.garmin.fit.RecordMesgListener;
 
 public class RecordMesgListenerImpl extends AbstractMesgListener implements RecordMesgListener {
 
-	private IPreferenceStore	_prefStore	= Activator.getDefault().getPreferenceStore();
+	private IPreferenceStore	_prefStore				= Activator.getDefault().getPreferenceStore();
+
 	private float				_temperatureAdjustment;
+
+	private boolean				_isReplaceExceededTimeSlice;
+	private long				_exceededTimeSliceLimit;
+	private long				_exceededTimeSliceDuration;
+	private long				_previousAbsoluteTime	= Long.MIN_VALUE;
 
 	public RecordMesgListenerImpl(final FitContext context) {
 
 		super(context);
 
 		_temperatureAdjustment = _prefStore.getFloat(IPreferences.FIT_TEMPERATURE_ADJUSTMENT);
+
+		_isReplaceExceededTimeSlice = _prefStore.getBoolean(IPreferences.FIT_IS_REPLACE_EXCEEDED_TIME_SLICE);
+		_exceededTimeSliceLimit = _prefStore.getInt(IPreferences.FIT_EXCEEDED_TIME_SLICE_DURATION);
+
+		// convert into milliseconds
+		_exceededTimeSliceLimit *= 1000;
 	}
 
 	@Override
 	public void onMesg(final RecordMesg mesg) {
 
-		context.mesgRecord_10_Before();
+		context.onMesgRecord_10_Before();
 
 		final TimeData timeData = getTimeData();
 
+		final Float distance = mesg.getDistance();
+		if (distance != null) {
+			timeData.absoluteDistance = distance;
+		}
+
+		long absoluteTime = 0;
 		final DateTime garminTime = mesg.getTimestamp();
 		if (garminTime != null) {
 
-			// convert garmin time into linux time
+			boolean isCreateExceededMarker = false;
+
+			// convert garmin time into java time
 			final long garminTimeS = garminTime.getTimestamp();
 			final long garminTimeMS = garminTimeS * 1000;
-			final long linuxTime = garminTimeMS + com.garmin.fit.DateTime.OFFSET;
+			final long sliceJavaTime = garminTimeMS + com.garmin.fit.DateTime.OFFSET;
 
-			timeData.absoluteTime = linuxTime;
+			absoluteTime = sliceJavaTime;
+			long timeDiff = 0;
+
+			if (_isReplaceExceededTimeSlice) {
+
+				// set initial value
+				if (_previousAbsoluteTime == Long.MIN_VALUE) {
+					_previousAbsoluteTime = sliceJavaTime;
+				}
+
+				// check if time slice is exceeded
+				timeDiff = sliceJavaTime - _previousAbsoluteTime;
+				if (timeDiff >= _exceededTimeSliceLimit) {
+
+					// time slice has exceeded the limit
+
+					// calculated exceeded time and add 1 second that 2 slices do not have the same time
+					_exceededTimeSliceDuration = timeDiff + 1 * 1000;
+
+					isCreateExceededMarker = true;
+				}
+
+				absoluteTime -= _exceededTimeSliceDuration;
+				_previousAbsoluteTime = sliceJavaTime;
+			}
+
+			timeData.absoluteTime = absoluteTime;
+
+			if (isCreateExceededMarker) {
+
+				/*
+				 * Create a marker for the exceeded time slice
+				 */
+
+				context.onMesgLap_10_Before();
+				{
+					final TourMarker tourMarker = getTourMarker();
+
+					final PeriodType periodTemplate = PeriodType.yearMonthDayTime().withMillisRemoved();
+					final Period duration = new Period(0, timeDiff, periodTemplate);
+
+					tourMarker.setLabel(NLS.bind(
+							Messages.Import_Error_ExceededTimeSlice,
+							duration.toString(UI.DEFAULT_DURATION_FORMATTER_SHORT)));
+
+					if (distance != null) {
+						tourMarker.setDistance(distance);
+					}
+
+					tourMarker.setDeviceLapTime(absoluteTime);
+				}
+				context.onMesgLap_20_After();
+			}
 		}
 
 		final Integer positionLat = mesg.getPositionLat();
@@ -74,11 +152,6 @@ public class RecordMesgListenerImpl extends AbstractMesgListener implements Reco
 			}
 		}
 
-		final Float distance = mesg.getDistance();
-		if (distance != null) {
-			timeData.absoluteDistance = distance;
-		}
-
 		final Float speed = mesg.getSpeed();
 		if (speed != null) {
 			timeData.speed = DataConverters.convertSpeed(speed);
@@ -103,7 +176,10 @@ public class RecordMesgListenerImpl extends AbstractMesgListener implements Reco
 			}
 		}
 
-		context.mesgRecord_20_After();
+//		System.out.println(new org.joda.time.DateTime(absoluteTime) + "\tRecordMesgListener\t");
+//		// TODO remove SYSTEM.OUT.PRINTLN
+
+		context.onMesgRecord_20_After();
 	}
 
 }

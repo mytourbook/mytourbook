@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -18,9 +18,11 @@ package net.tourbook.ui.views.tourMarker;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Set;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.UI;
 import net.tourbook.common.util.ColumnDefinition;
 import net.tourbook.common.util.ColumnManager;
 import net.tourbook.common.util.ITourViewer;
@@ -41,7 +43,6 @@ import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.TableColumnFactory;
-import net.tourbook.ui.UI;
 import net.tourbook.ui.action.ActionModifyColumns;
 import net.tourbook.ui.tourChart.ChartLabel;
 import net.tourbook.ui.views.tourCatalog.SelectionTourCatalogView;
@@ -141,10 +142,18 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 
 		@Override
 		public Object[] getElements(final Object inputElement) {
+
 			if (_tourData == null) {
 				return new Object[0];
 			} else {
-				return _tourData.getTourMarkers().toArray();
+
+				final Set<TourMarker> tourMarkers = _tourData.getTourMarkers();
+
+//				System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
+//						+ ("\n\t_tourData: " + _tourData));
+//				// TODO remove SYSTEM.OUT.PRINTLN
+
+				return tourMarkers.toArray();
 			}
 		}
 
@@ -483,6 +492,8 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 		defineColumn_Name();
 		defineColumn_Description();
 		defineColumn_Url();
+
+		defineColumn_SerieIndex();
 	}
 
 	/**
@@ -520,7 +531,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 				if (markerDistance == -1) {
 					cell.setText(UI.EMPTY_STRING);
 				} else {
-					cell.setText(_nf3.format(markerDistance / 1000 / UI.UNIT_VALUE_DISTANCE));
+					cell.setText(_nf3.format(markerDistance / 1000 / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE));
 				}
 
 				if (tourMarker.getType() == ChartLabel.MARKER_TYPE_DEVICE) {
@@ -563,7 +574,9 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 						prevDistance = prevDistance < 0 ? 0 : prevDistance;
 					}
 
-					cell.setText(_nf3.format((markerDistance - prevDistance) / 1000 / UI.UNIT_VALUE_DISTANCE));
+					cell.setText(_nf3.format((markerDistance - prevDistance)
+							/ 1000
+							/ net.tourbook.ui.UI.UNIT_VALUE_DISTANCE));
 				}
 			}
 		});
@@ -608,6 +621,23 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 	}
 
 	/**
+	 * Column: Serie index
+	 */
+	private void defineColumn_SerieIndex() {
+
+		_colDefName = TableColumnFactory.SERIE_INDEX.createColumn(_columnManager, _pc);
+
+		_colDefName.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final TourMarker marker = (TourMarker) cell.getElement();
+				cell.setText(Integer.toString(marker.getSerieIndex()));
+			}
+		});
+	}
+
+	/**
 	 * Column: Time
 	 */
 	private void defineColumn_Time() {
@@ -625,7 +655,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 				final TourMarker marker = (TourMarker) cell.getElement();
 				final long time = marker.getTime();
 
-				cell.setText(UI.format_hh_mm_ss(time));
+				cell.setText(net.tourbook.ui.UI.format_hh_mm_ss(time));
 			}
 		});
 	}
@@ -650,7 +680,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 					}
 				}
 
-				cell.setText(UI.format_hh_mm_ss(((TourMarker) cell.getElement()).getTime() - lastTime));
+				cell.setText(net.tourbook.ui.UI.format_hh_mm_ss(((TourMarker) cell.getElement()).getTime() - lastTime));
 
 				final String text = ((TourMarker) cell.getElement()).getLabel();
 
@@ -834,6 +864,10 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 		}
 
 		long tourId = TourDatabase.ENTITY_IS_NOT_SAVED;
+
+//		System.out.println((net.tourbook.common.UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
+//				+ ("\tonSelectionChanged: " + selection));
+//		// TODO remove SYSTEM.OUT.PRINTLN
 
 		if (selection instanceof SelectionTourData) {
 

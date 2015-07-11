@@ -3521,20 +3521,23 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 					final TimeSlice timeSlice = (TimeSlice) cell.getElement();
 					final int serieIndex = timeSlice.serieIndex;
 
+					float distanceDiff;
+
 					if (serieIndex == 0) {
-						cell.setText(Integer.toString(0));
+						// first time slice can contain a distance, occured in .fit files
+						distanceDiff = _serieDistance[0] / 1000 / _unitValueDistance;
 					} else {
 
 						final float distancePrevious = _serieDistance[serieIndex - 1] / 1000 / _unitValueDistance;
 						final float distance = _serieDistance[serieIndex] / 1000 / _unitValueDistance;
 
-						final float distanceDiff = distance - distancePrevious;
-
-						if (distanceDiff < 0.001) {
-							cell.setText(UI.EMPTY_STRING);
-						} else {
-							cell.setText(_nf3.format(distanceDiff));
-						}
+						distanceDiff = distance - distancePrevious;
+					}
+					
+					if (distanceDiff < 0.001) {
+						cell.setText(UI.EMPTY_STRING);
+					} else {
+						cell.setText(_nf3.format(distanceDiff));
 					}
 				} else {
 					cell.setText(UI.EMPTY_STRING);

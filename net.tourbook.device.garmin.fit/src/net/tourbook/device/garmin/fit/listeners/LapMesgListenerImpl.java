@@ -23,11 +23,11 @@ public class LapMesgListenerImpl extends AbstractMesgListener implements LapMesg
 	@Override
 	public void onMesg(final LapMesg lapMesg) {
 
-		context.mesgLap_10_Before();
+		context.onMesgLap_10_Before();
 
 		setMarker(lapMesg);
 
-		context.mesgLap_20_After();
+		context.onMesgLap_20_After();
 	}
 
 	private void setMarker(final LapMesg lapMesg) {
@@ -50,25 +50,29 @@ public class LapMesgListenerImpl extends AbstractMesgListener implements LapMesg
 			tourMarker.setDistance(lapDistance);
 		}
 
-		int lapTime = -1;
-		final Float totalElapsedTime = lapMesg.getTotalElapsedTime();
-		if (totalElapsedTime != null) {
-
-			lapTime = context.getLapTime();
-			lapTime += Math.round(totalElapsedTime);
-
-			context.setLapTime(lapTime);
-
-			// the correct absolute time will be set later
-			tourMarker.setTime(lapTime, Long.MIN_VALUE);
-		}
+//		int lapTime = -1;
+//		final Float totalElapsedTime = lapMesg.getTotalElapsedTime();
+//		if (totalElapsedTime != null) {
+//
+//			lapTime = context.getLapTime();
+////			lapTime += Math.round(totalElapsedTime);
+//			lapTime += totalElapsedTime;
+//
+//			context.setLapTime(lapTime);
+//
+//			// the correct absolute time will be set later
+//			tourMarker.setTime(lapTime, Long.MIN_VALUE);
+//		}
 
 		/*
 		 * Set lap time, later the time slice position (serie index) will be set.
 		 */
 		final DateTime garminTime = lapMesg.getTimestamp();
-		final Date linuxTime = garminTime.getDate();
+		final Date javaTime = garminTime.getDate();
 
-		tourMarker.setDeviceLapTime(linuxTime.getTime());
+		tourMarker.setDeviceLapTime(javaTime.getTime());
+
+//		System.out.println(new org.joda.time.DateTime(javaTime.getTime()) + "\tLapMesgListener\t");
+//		// TODO remove SYSTEM.OUT.PRINTLN
 	}
 }

@@ -1252,13 +1252,29 @@ public abstract class TableColumnFactory {
 		};
 	};
 
+	public static final TableColumnFactory SERIE_INDEX = new TableColumnFactory() {
+		
+		@Override
+		public ColumnDefinition createColumn(final ColumnManager columnManager, final PixelConverter pixelConverter) {
+			
+			final ColumnDefinition colDef = new TableColumnDefinition(columnManager, "serieIndex", SWT.TRAIL); //$NON-NLS-1$
+	
+			colDef.setColumnLabel(Messages.ColumnFactory_SerieIndex_Label);
+			colDef.setColumnHeaderText(Messages.ColumnFactory_SerieIndex);
+			colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_SerieIndex_Tooltip);
+			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(8));
+			
+			return colDef;
+		};
+	};
+
 	public static final TableColumnFactory SERIE_START_END_INDEX = new TableColumnFactory() {
 		
 		@Override
 		public ColumnDefinition createColumn(final ColumnManager columnManager, final PixelConverter pixelConverter) {
 			
-			final ColumnDefinition colDef = new TableColumnDefinition(columnManager, "serieStartEndIndex", SWT.LEAD); //$NON-NLS-1$
-	
+			final ColumnDefinition colDef = new TableColumnDefinition(columnManager, "serieStartEndIndex", SWT.TRAIL); //$NON-NLS-1$
+			
 			colDef.setColumnLabel(Messages.ColumnFactory_SerieStartEndIndex_Label);
 			colDef.setColumnHeaderText(Messages.ColumnFactory_SerieStartEndIndex);
 			colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_SerieStartEndIndex_Tooltip);
@@ -1267,7 +1283,7 @@ public abstract class TableColumnFactory {
 			return colDef;
 		};
 	};
-
+	
 	public static final TableColumnFactory SEQUENCE = new TableColumnFactory() {
 		
 		@Override

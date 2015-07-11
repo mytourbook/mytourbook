@@ -258,7 +258,7 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 	 * Device time in ms.
 	 */
 	@Transient
-	private long					_deviceLapTime;
+	private long					_deviceLapTime								= Long.MIN_VALUE;
 
 	/**
 	 * Serie index in {@link TourData} when tour is {@link TourData#isMultipleTours}.
@@ -500,15 +500,15 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 	}
 
 	/**
-	 * @return Returns time in seconds relative to the tour start. When value is not available it is
-	 *         set to -1.
+	 * @return Returns time in seconds relative to the tour start or -1 when value is not set.
 	 */
 	public int getTime() {
 		return time;
 	}
 
 	/**
-	 * @return Return the absolute time in ms since 1970-01-01T00:00:00Z.
+	 * @return Returns the absolute time in ms since 1970-01-01T00:00:00Z or {@link Long#MIN_VALUE}
+	 *         when value is not set.
 	 */
 	public long getTourTime() {
 		return tourTime;

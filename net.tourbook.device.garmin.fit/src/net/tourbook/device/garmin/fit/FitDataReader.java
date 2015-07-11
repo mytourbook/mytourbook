@@ -79,12 +79,14 @@ public class FitDataReader extends TourbookDevice {
 					 */
 					if (fieldName.equals("") // //$NON-NLS-1$
 
+							|| fieldName.equals("time") //$NON-NLS-1$
 							|| fieldName.equals("timestamp") //$NON-NLS-1$
 
 							//
 							// record data
 							//
 
+							|| fieldName.equals("activity_type") //$NON-NLS-1$
 							|| fieldName.equals("event") //$NON-NLS-1$
 							|| fieldName.equals("event_type") //$NON-NLS-1$
 							|| fieldName.equals("message_index") //$NON-NLS-1$
@@ -110,6 +112,10 @@ public class FitDataReader extends TourbookDevice {
 							|| fieldName.equals("enhanced_speed") //$NON-NLS-1$
 							|| fieldName.equals("enhanced_avg_speed") //$NON-NLS-1$
 							|| fieldName.equals("enhanced_max_speed") //$NON-NLS-1$
+
+							|| fieldName.equals("stance_time") //$NON-NLS-1$
+							|| fieldName.equals("stance_time_percent") //$NON-NLS-1$
+							|| fieldName.equals("vertical_oscillation") //$NON-NLS-1$
 
 							//
 							// lap data
@@ -142,6 +148,10 @@ public class FitDataReader extends TourbookDevice {
 							|| fieldName.equals("total_distance") //$NON-NLS-1$
 							|| fieldName.equals("total_elapsed_time") //$NON-NLS-1$
 							|| fieldName.equals("total_timer_time") //$NON-NLS-1$
+
+							|| fieldName.equals("avg_stance_time") //$NON-NLS-1$
+							|| fieldName.equals("avg_stance_time_percent") //$NON-NLS-1$
+							|| fieldName.equals("avg_vertical_oscillation") //$NON-NLS-1$
 							//
 							|| fieldName.equals("unknown") //$NON-NLS-1$
 					//
@@ -149,11 +159,11 @@ public class FitDataReader extends TourbookDevice {
 						continue;
 					}
 
-					final long linuxTime = (garminTimestamp * 1000) + com.garmin.fit.DateTime.OFFSET;
+					final long javaTime = (garminTimestamp * 1000) + com.garmin.fit.DateTime.OFFSET;
 
 					System.out.println(String.format("%s %d %s %-5d %-30s %20s %s", //$NON-NLS-1$
-							new DateTime(linuxTime), // show readable date/time
-							linuxTime / 1000,
+							new DateTime(javaTime), // show readable date/time
+							javaTime / 1000,
 							Long.toString(garminTimestamp),
 							field.getNum(),
 							fieldName,

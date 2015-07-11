@@ -269,7 +269,7 @@ public class ChartSegmentAltitudeLayer implements IChartLayer {
 		} else if (altiDiff < 0) {
 			return Display.getCurrent().getSystemColor(SWT.COLOR_DARK_GREEN);
 		} else {
-			return Display.getCurrent().getSystemColor(SWT.COLOR_GRAY);
+			return Display.getCurrent().getSystemColor(SWT.COLOR_DARK_GRAY);
 		}
 	}
 

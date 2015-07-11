@@ -41,6 +41,7 @@ import java.util.Calendar;
 import net.tourbook.common.UI;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
+import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.SelectionEvent;
@@ -53,6 +54,8 @@ import org.eclipse.ui.IMemento;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.ui.IWorkbenchPartSite;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
@@ -112,6 +115,34 @@ public class Util {
 		final int newValue = ((event.count > 0 ? 1 : -1) * accelerator);
 
 		spinner.setSelection(spinner.getSelection() + newValue);
+	}
+
+	/**
+	 * Clear all selection providers in all workench pages.
+	 */
+	public static void clearSelection() {
+
+		final IWorkbenchWindow wbWin = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+		if (wbWin != null) {
+
+			final IWorkbenchPage[] wbPages = wbWin.getPages();
+			for (final IWorkbenchPage wbPage : wbPages) {
+
+				final IWorkbenchPart wbWinPagePart = wbPage.getActivePart();
+				if (wbWinPagePart != null) {
+
+					final IWorkbenchPartSite site = wbWinPagePart.getSite();
+					if (site != null) {
+
+						final ISelectionProvider selectionProvider = site.getSelectionProvider();
+
+						if (selectionProvider instanceof PostSelectionProvider) {
+							((PostSelectionProvider) selectionProvider).clearSelection();
+						}
+					}
+				}
+			}
+		}
 	}
 
 	public static void close(final InputStream is) {

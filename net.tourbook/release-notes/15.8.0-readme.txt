@@ -12,6 +12,12 @@ Tour Chart
 Improvements
 ============	
 
+* FIT Import
+  - Ignore tour markers at the end of the tour, can be configured in the Fit pref pages
+  
+  - Replace time slices when it exceeds a selected duration.
+    This fixes a device bug because the .fit file contained a time slice with more than 17 years.
+	 
 
 Map2
 - Draw map scale with rounded units and without black/white color (I always puzzled how to interpret the scale colors).
@@ -20,3 +26,7 @@ Map2
  
 Bugfix
 ======	
+
+* Photo
+  - Fixed ArrayIndexOutOfBoundsException when tour contains only 1 time slice.
+   

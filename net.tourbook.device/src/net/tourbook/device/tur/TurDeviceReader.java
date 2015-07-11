@@ -340,7 +340,7 @@ public class TurDeviceReader extends TourbookDevice {
 				tourData.computeTourDrivingTime();
 
 				processDeviceData_10_CreateMarker(tourData, fileTurData);
-				tourData.finalizeTourMarkerWithRelativeTime();
+				tourData.completeTourMarkerWithRelativeTime();
 			}
 
 		} catch (final FileNotFoundException e) {

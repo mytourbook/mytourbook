@@ -16,6 +16,7 @@ import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.importdata.TourbookDevice;
 
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.joda.time.DateTime;
 
 import com.garmin.fit.EventMesg;
@@ -27,6 +28,8 @@ import com.garmin.fit.EventMesg;
  * @author Marcin Kuthan <marcin.kuthan@gmail.com>
  */
 public class FitContext {
+
+	private IPreferenceStore		_prefStore	= Activator.getDefault().getPreferenceStore();
 
 	private TourbookDevice			_device;
 	private final String			_importFilePathName;
@@ -52,6 +55,10 @@ public class FitContext {
 	private Map<Long, TourData>		_alreadyImportedTours;
 	private HashMap<Long, TourData>	_newlyImportedTours;
 
+	private boolean					_isIgnoreLastMarker;
+	private boolean					_isSetLastMarker;
+	private int						_lastMarkerTimeSlices;
+
 	public FitContext(	final TourbookDevice device,
 						final String importFilePath,
 						final Map<Long, TourData> alreadyImportedTours,
@@ -63,11 +70,15 @@ public class FitContext {
 		_newlyImportedTours = newlyImportedTours;
 
 		_contextData = new FitContextData();
+
+		_isIgnoreLastMarker = _prefStore.getBoolean(IPreferences.FIT_IS_IGNORE_LAST_MARKER);
+		_isSetLastMarker = _isIgnoreLastMarker == false;
+		_lastMarkerTimeSlices = _prefStore.getInt(IPreferences.FIT_IGNORE_LAST_MARKER_TIME_SLICES);
 	}
 
 	public void finalizeTour() {
 
-		_contextData.processAllTours(new FitContextDataHandler() {
+		final FitContextDataHandler contextHandler = new FitContextDataHandler() {
 
 			@Override
 			public void finalizeTour(	final TourData tourData,
@@ -98,13 +109,14 @@ public class FitContext {
 
 				if (recordStartTime != sessionStartTime) {
 
-					StatusUtil.log(String
-							.format(
-									"Import file %s has other session start time, sessionStartTime=%s recordStartTime=%s, Difference=%d sec",//$NON-NLS-1$
-									_importFilePathName,
-									new DateTime(sessionStartTime),
-									new DateTime(recordStartTime),
-									(recordStartTime - sessionStartTime) / 1000));
+					StatusUtil
+							.log(String
+									.format(
+											"Import file %s has other session start time, sessionStartTime=%s recordStartTime=%s, Difference=%d sec",//$NON-NLS-1$
+											_importFilePathName,
+											new DateTime(sessionStartTime),
+											new DateTime(recordStartTime),
+											(recordStartTime - sessionStartTime) / 1000));
 				}
 
 				tourData.setTourStartTime(new DateTime(recordStartTime));
@@ -191,61 +203,101 @@ public class FitContext {
 
 			private void setupTour_Marker(final TourData tourData, final List<TourMarker> tourMarkers) {
 
-				if (tourMarkers == null) {
+				if (tourMarkers == null || tourMarkers.size() == 0) {
 					return;
 				}
 
 				final int[] timeSerie = tourData.timeSerie;
-				final int lastSerieIndex = timeSerie.length;
-				final long tourStartTimeS = tourData.getTourStartTimeMS() / 1000;
+				final int serieSize = timeSerie.length;
 
-				final Set<TourMarker> validatedTourMarkers = new HashSet<TourMarker>();
+				final long absoluteTourStartTime = tourData.getTourStartTimeMS();
+				final long absoluteTourEndTime = tourData.getTourEndTimeMS();
 
-				for (final TourMarker tourMarker : tourMarkers) {
+				final ArrayList<TourMarker> validatedTourMarkers = new ArrayList<>();
+				final int tourMarkerSize = tourMarkers.size();
 
-					final long markerLapTimeS = tourMarker.getDeviceLapTime() / 1000;
+				int markerIndex = 0;
+				int serieIndex = 0;
 
-					for (int serieIndex = 0; serieIndex < timeSerie.length; serieIndex++) {
+				boolean isBreakMarkerLoop = false;
 
-						final int relativeTimeS = timeSerie[serieIndex];
-						final long tourTimeS = tourStartTimeS + relativeTimeS;
+				markerLoop:
 
-						if (markerLapTimeS <= tourTimeS) {
+				for (; markerIndex < tourMarkerSize; markerIndex++) {
 
-							int markerSerieIndex = serieIndex
-							// ensure that the correct index is set for the marker
-							- 1;
+					final TourMarker tourMarker = tourMarkers.get(markerIndex);
+					final long absoluteMarkerTime = tourMarker.getDeviceLapTime();
 
-							// check bounds
-							if (markerSerieIndex < 0) {
-								markerSerieIndex = 0;
+					boolean isSetMarker = false;
+
+					for (; serieIndex < serieSize; serieIndex++) {
+
+						int relativeTourTimeS = timeSerie[serieIndex];
+						long absoluteTourTime = absoluteTourStartTime + relativeTourTimeS * 1000;
+
+						final long timeDiffEnd = absoluteTourEndTime - absoluteMarkerTime;
+						if (timeDiffEnd < 0) {
+
+							// there cannot be a marker after the tour
+							if (markerIndex < tourMarkerSize) {
+
+								// there are still markers available which are not set in the tour, set a last marker into the last time slice
+
+								// set values for the last time slice
+								serieIndex = serieSize - 1;
+								relativeTourTimeS = timeSerie[serieIndex];
+								absoluteTourTime = absoluteTourStartTime + relativeTourTimeS * 1000;
+
+								isSetMarker = true;
 							}
+
+							isBreakMarkerLoop = true;
+						}
+
+						final long timeDiffMarker = absoluteMarkerTime - absoluteTourTime;
+						if (timeDiffMarker <= 0) {
+
+							// time for the marker is found
+
+							isSetMarker = true;
+						}
+
+						if (isSetMarker) {
 
 							/*
-							 * Fit devices adds a marker at the end, this is annoing therefore it is
-							 * removed. It is not only the last time slice it can also be about the
-							 * last 5 time slices.
+							 * a last marker can be set when it's far enough away from the end, this
+							 * will disable the last tour marker
 							 */
-							if (markerSerieIndex > lastSerieIndex - 5) {
+							final boolean canSetLastMarker = _isIgnoreLastMarker
+									&& serieIndex < serieSize - _lastMarkerTimeSlices;
 
-								// check next marker
-								break;
+							if (_isSetLastMarker || canSetLastMarker) {
+
+								tourMarker.setTime(relativeTourTimeS, absoluteTourTime);
+								tourMarker.setSerieIndex(serieIndex);
+
+								tourData.completeTourMarker(tourMarker, serieIndex);
+
+								validatedTourMarkers.add(tourMarker);
 							}
-
-							tourMarker.setSerieIndex(markerSerieIndex);
-
-							validatedTourMarkers.add(tourMarker);
 
 							// check next marker
 							break;
 						}
 					}
+
+					if (isBreakMarkerLoop) {
+						break markerLoop;
+					}
 				}
 
-				tourData.setTourMarkers(validatedTourMarkers);
-				tourData.finalizeTourMarkerWithRelativeTime();
+				final Set<TourMarker> tourTourMarkers = new HashSet<TourMarker>(validatedTourMarkers);
+
+				tourData.setTourMarkers(tourTourMarkers);
 			}
-		});
+		};
+
+		_contextData.processAllTours(contextHandler);
 	}
 
 	public FitContextData getContextData() {
@@ -284,39 +336,32 @@ public class FitContext {
 		return String.format("%s (%s)", _importFilePathName, _sessionIndex); //$NON-NLS-1$
 	}
 
-	public void mesgEvent(final EventMesg mesg) {
-
+	public void onMesg(final EventMesg mesg) {
 		_contextData.ctxEventMesg(mesg);
 	}
 
-	public void mesgLap_10_Before() {
-
-		_contextData.ctxMarker_10_Initialize();
+	public void onMesgLap_10_Before() {
+		_contextData.onMesgLap_Marker_10_Initialize();
 	}
 
-	public void mesgLap_20_After() {
-
-		_contextData.ctxMarker_20_Finalize();
+	public void onMesgLap_20_After() {
+		_contextData.onMesgLap_Marker_20_Finalize();
 	}
 
-	public void mesgRecord_10_Before() {
-
-		_contextData.ctxTime_10_Initialize();
+	public void onMesgRecord_10_Before() {
+		_contextData.onMesgRecord_Time_10_Initialize();
 	}
 
-	public void mesgRecord_20_After() {
-
-		_contextData.ctxTime_20_Finalize();
+	public void onMesgRecord_20_After() {
+		_contextData.onMesgRecord_Time_20_Finalize();
 	}
 
-	public void mesgSession_10_Before() {
-
-		_contextData.ctxTour_10_Initialize();
+	public void onMesgSession_10_Before() {
+		_contextData.onMesgSession_Tour_10_Initialize();
 	}
 
-	public void mesgSession_20_After() {
-
-		_contextData.ctxTour_20_Finalize();
+	public void onMesgSession_20_After() {
+		_contextData.onMesgSession_Tour_20_Finalize();
 	}
 
 	private void resetSpeedAtFirstPosition(final List<TimeData> timeDataList) {

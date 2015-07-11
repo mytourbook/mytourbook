@@ -40,7 +40,7 @@ public class EventMesgListenerImpl extends AbstractMesgListener implements Event
 //				));
 //		// TODO remove SYSTEM.OUT.PRINTLN
 
-		context.mesgEvent(mesg);
+		context.onMesg(mesg);
 	}
 
 }

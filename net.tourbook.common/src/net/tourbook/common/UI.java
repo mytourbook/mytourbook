@@ -81,6 +81,8 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
+import org.joda.time.format.PeriodFormatter;
+import org.joda.time.format.PeriodFormatterBuilder;
 
 public class UI {
 
@@ -221,6 +223,9 @@ public class UI {
 	public static final String				UNIT_LABEL_POWER						= "Watt";																	//$NON-NLS-1$
 	public static final String				UNIT_LABEL_MS							= "ms";																	//$NON-NLS-1$
 
+	public static final PeriodFormatter	DEFAULT_DURATION_FORMATTER;
+	public static final PeriodFormatter	DEFAULT_DURATION_FORMATTER_SHORT;
+
 	/*
 	 * SET_FORMATTING_OFF
 	 */
@@ -341,6 +346,83 @@ public class UI {
 		IMAGE_REGISTRY.put(IWeather.WEATHER_ID_SEVERE_WEATHER_ALERT,//
 				CommonActivator.getImageDescriptor(Messages.Image__Weather_Severe));
 
+		final String commaSpace = Messages.Period_Format_CommaSpace;
+		final String space2 = Messages.Period_Format_SpaceAndSpace;
+		final String[] variants = {
+			Messages.Period_Format_Space,
+			Messages.Period_Format_Comma,
+			Messages.Period_Format_CommandAnd,
+			Messages.Period_Format_CommaSpaceAnd };
+
+		DEFAULT_DURATION_FORMATTER = new PeriodFormatterBuilder()
+
+				.appendYears()
+				.appendSuffix(Messages.Period_Format_Year, Messages.Period_Format_Years)
+				.appendSeparator(commaSpace, space2, variants)
+
+				.appendMonths()
+				.appendSuffix(Messages.Period_Format_Month, Messages.Period_Format_Months)
+				.appendSeparator(commaSpace, space2, variants)
+
+				.appendWeeks()
+				.appendSuffix(Messages.Period_Format_Week, Messages.Period_Format_Weeks)
+				.appendSeparator(commaSpace, space2, variants)
+
+				.appendDays()
+				.appendSuffix(Messages.Period_Format_Day, Messages.Period_Format_Days)
+				.appendSeparator(commaSpace, space2, variants)
+
+				.appendHours()
+				.appendSuffix(Messages.Period_Format_Hour, Messages.Period_Format_Hours)
+				.appendSeparator(commaSpace, space2, variants)
+
+				.appendMinutes()
+				.appendSuffix(Messages.Period_Format_Minute, Messages.Period_Format_Minutes)
+				.appendSeparator(commaSpace, space2, variants)
+
+				.appendSeconds()
+				.appendSuffix(Messages.Period_Format_Second, Messages.Period_Format_Seconds)
+				.appendSeparator(commaSpace, space2, variants)
+
+				.appendMillis()
+				.appendSuffix(Messages.Period_Format_Millisecond, Messages.Period_Format_Milliseconds)
+
+				.toFormatter();
+
+		DEFAULT_DURATION_FORMATTER_SHORT = new PeriodFormatterBuilder()
+
+				.appendYears()
+				.appendSuffix(Messages.Period_Format_Year_Short, Messages.Period_Format_Year_Short)
+				.appendSeparator(commaSpace, space2, variants)
+
+				.appendMonths()
+				.appendSuffix(Messages.Period_Format_Month_Short, Messages.Period_Format_Month_Short)
+				.appendSeparator(commaSpace, space2, variants)
+
+				.appendWeeks()
+				.appendSuffix(Messages.Period_Format_Week_Short, Messages.Period_Format_Week_Short)
+				.appendSeparator(commaSpace, space2, variants)
+
+				.appendDays()
+				.appendSuffix(Messages.Period_Format_Day_Short, Messages.Period_Format_Day_Short)
+				.appendSeparator(commaSpace, space2, variants)
+
+				.appendHours()
+				.appendSuffix(Messages.Period_Format_Hour_Short, Messages.Period_Format_Hour_Short)
+				.appendSeparator(commaSpace, space2, variants)
+
+				.appendMinutes()
+				.appendSuffix(Messages.Period_Format_Minute_Short, Messages.Period_Format_Minute_Short)
+				.appendSeparator(commaSpace, space2, variants)
+
+				.appendSeconds()
+				.appendSuffix(Messages.Period_Format_Second_Short, Messages.Period_Format_Second_Short)
+				.appendSeparator(commaSpace, space2, variants)
+
+				.appendMillis()
+				.appendSuffix(Messages.Period_Format_Millisecond_Short, Messages.Period_Format_Millisecond_Short)
+
+				.toFormatter();
 	}
 
 	public static void addSashColorHandler(final Sash sash) {

@@ -99,6 +99,37 @@ public class Messages extends NLS {
 	public static String		Map3_PropertyTooltip_Action_Close_Tooltip;
 	public static String		Map3_PropertyTooltip_Action_MoveToDefaultLocation_Tooltip;
 
+	public static String		Period_Format_Space;
+	public static String		Period_Format_Comma;
+	public static String		Period_Format_CommandAnd;
+	public static String		Period_Format_CommaSpaceAnd;
+	public static String		Period_Format_CommaSpace;
+	public static String		Period_Format_SpaceAndSpace;
+	public static String		Period_Format_Year;
+	public static String		Period_Format_Years;
+	public static String		Period_Format_Year_Short;
+	public static String		Period_Format_Month;
+	public static String		Period_Format_Months;
+	public static String		Period_Format_Month_Short;
+	public static String		Period_Format_Week;
+	public static String		Period_Format_Weeks;
+	public static String		Period_Format_Week_Short;
+	public static String		Period_Format_Day;
+	public static String		Period_Format_Days;
+	public static String		Period_Format_Day_Short;
+	public static String		Period_Format_Hour;
+	public static String		Period_Format_Hours;
+	public static String		Period_Format_Hour_Short;
+	public static String		Period_Format_Minute;
+	public static String		Period_Format_Minutes;
+	public static String		Period_Format_Minute_Short;
+	public static String		Period_Format_Second;
+	public static String		Period_Format_Seconds;
+	public static String		Period_Format_Second_Short;
+	public static String		Period_Format_Millisecond;
+	public static String		Period_Format_Milliseconds;
+	public static String		Period_Format_Millisecond_Short;
+
 	public static String		Weather_Clounds_Clouds;
 	public static String		Weather_Clounds_Clouny;
 	public static String		Weather_Clounds_IsNotDefined;
