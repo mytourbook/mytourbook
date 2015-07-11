@@ -6,6 +6,8 @@ public class Messages extends NLS {
 
 	private static final String	BUNDLE_NAME	= "net.tourbook.device.garmin.fit.messages";	//$NON-NLS-1$
 
+	public static String		Import_Error_ExceededTimeSlice;
+
 	public static String		PrefPage_Fit_Checkbox_IgnoreLastMarker;
 	public static String		PrefPage_Fit_Checkbox_ReplaceTimeSlice;
 	public static String		PrefPage_Fit_Group_AdjustTemperature;

@@ -7,6 +7,7 @@ import net.tourbook.device.garmin.fit.Activator;
 import net.tourbook.device.garmin.fit.DataConverters;
 import net.tourbook.device.garmin.fit.FitContext;
 import net.tourbook.device.garmin.fit.IPreferences;
+import net.tourbook.device.garmin.fit.Messages;
 
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.osgi.util.NLS;
@@ -57,7 +58,7 @@ public class RecordMesgListenerImpl extends AbstractMesgListener implements Reco
 		final DateTime garminTime = mesg.getTimestamp();
 		if (garminTime != null) {
 
-			boolean isCreateMarker = false;
+			boolean isCreateExceededMarker = false;
 
 			// convert garmin time into java time
 			final long garminTimeS = garminTime.getTimestamp();
@@ -83,7 +84,7 @@ public class RecordMesgListenerImpl extends AbstractMesgListener implements Reco
 					// calculated exceeded time and add 1 second that 2 slices do not have the same time
 					_exceededTimeSliceDuration = timeDiff + 1 * 1000;
 
-					isCreateMarker = true;
+					isCreateExceededMarker = true;
 				}
 
 				absoluteTime -= _exceededTimeSliceDuration;
@@ -92,7 +93,7 @@ public class RecordMesgListenerImpl extends AbstractMesgListener implements Reco
 
 			timeData.absoluteTime = absoluteTime;
 
-			if (isCreateMarker) {
+			if (isCreateExceededMarker) {
 
 				/*
 				 * Create a marker for the exceeded time slice
@@ -106,7 +107,7 @@ public class RecordMesgListenerImpl extends AbstractMesgListener implements Reco
 					final Period duration = new Period(0, timeDiff, periodTemplate);
 
 					tourMarker.setLabel(NLS.bind(
-							"Exceeded time slice, duration: {0}",
+							Messages.Import_Error_ExceededTimeSlice,
 							duration.toString(UI.DEFAULT_DURATION_FORMATTER_SHORT)));
 
 					if (distance != null) {
