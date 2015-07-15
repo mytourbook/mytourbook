@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -20,7 +20,8 @@ import org.eclipse.swt.graphics.Image;
 public interface IHoveredArea {
 
 	/**
-	 * @return Returns an image which is displayed when the hovered area is hovered with the mouse.
+	 * @return Returns an image which is displayed when the hovered area is hovered with the mouse,
+	 *         can be <code>null</code> when an image is not available.
 	 */
 	Image getHoveredImage();
 

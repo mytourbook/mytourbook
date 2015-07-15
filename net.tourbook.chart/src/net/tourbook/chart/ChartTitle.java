@@ -1,40 +1,44 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
- * 
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.ui.action;
+package net.tourbook.chart;
 
-import net.tourbook.common.util.IToolTipProvider;
-import net.tourbook.ui.ITourProvider;
+public class ChartTitle {
 
-public class ActionTourToolTipEditQuick extends ActionEditQuick {
+	public Long	tourId;
 
-	private final IToolTipProvider	_tourInfo;
+	public int	devX;
+	public int	devY;
 
-	public ActionTourToolTipEditQuick(	final IToolTipProvider tourInfoToolTipProvider,
-										final ITourProvider tourProvider) {
+	public int	width;
+	public int	height;
 
-		super(tourProvider);
+	public int	devYBottom;
+	public int	devYTop;
+	public int	devGraphWidth;
 
-		_tourInfo = tourInfoToolTipProvider;
-	}
+	public ChartTitle() {}
 
 	@Override
-	public void run() {
-
-		_tourInfo.hideToolTip();
-
-		super.run();
+	public String toString() {
+		return "ChartTitle ["
+				+ ("devX=" + devX + ", ")
+				+ ("devY=" + devY + ", ")
+				+ ("width=" + width + ", ")
+				+ ("height=" + height)
+				+ "]";
 	}
+
 }

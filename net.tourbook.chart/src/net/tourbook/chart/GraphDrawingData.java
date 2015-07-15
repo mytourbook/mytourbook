@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -31,6 +31,8 @@ public class GraphDrawingData {
 	public static final int			BAR_POS_LEFT				= 0;
 	public static final int			BAR_POS_CENTER				= 1;
 //	public static final int			BAR_POS_CENTER_UNIT_TICK	= 2;							// center bar in the unit tick
+
+	private ChartDrawingData		chartDrawingData;
 
 	private ChartDataXSerie			_xData;
 	private ChartDataXSerie			_xData2nd;
@@ -104,8 +106,6 @@ public class GraphDrawingData {
 	private boolean					_isCheckUnitBorderOverlap	= true;
 
 	private boolean[]				_isDrawUnits				= null;
-
-	private ChartDrawingData		chartDrawingData;
 
 	public GraphDrawingData(final ChartDrawingData chartDrawingData, final ChartType chartType) {
 

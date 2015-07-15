@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -24,7 +24,7 @@ import org.eclipse.swt.widgets.Event;
 /**
  * Tour tooltip provider which can display tour data in a tooltip.
  */
-public interface ITourToolTipProvider {
+public interface ITourToolTipProvider extends IToolTipProvider {
 
 	/**
 	 * This method is called after the tool tip is hidden. This method can be used to cleanup
@@ -42,11 +42,6 @@ public interface ITourToolTipProvider {
 	 * @return the content area created
 	 */
 	public Composite createToolTipContentArea(Event event, Composite parent);
-
-	/**
-	 * Hides the {@link TourToolTip}
-	 */
-	public void hide();
 
 	/**
 	 * Paints the tool tip icon in the control

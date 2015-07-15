@@ -1733,7 +1733,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 				final ChartDataModel chartDataModel = chartInfo.chartDataModel;
 				if (chartDataModel != null) {
 
-					final Object tourId = chartDataModel.getCustomData(TourManager.CUSTOM_DATA_TOUR_ID);
+					final Object tourId = chartDataModel.getCustomData(Chart.CUSTOM_DATA_TOUR_ID);
 					if (tourId instanceof Long) {
 
 						tourData = TourManager.getInstance().getTourData((Long) tourId);
@@ -1769,7 +1769,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 
 			final ChartDataModel chartDataModel = chart.getChartDataModel();
 
-			final Object tourId = chartDataModel.getCustomData(TourManager.CUSTOM_DATA_TOUR_ID);
+			final Object tourId = chartDataModel.getCustomData(Chart.CUSTOM_DATA_TOUR_ID);
 			if (tourId instanceof Long) {
 
 				final TourData tourData = TourManager.getInstance().getTourData((Long) tourId);

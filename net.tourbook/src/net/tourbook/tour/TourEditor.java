@@ -79,6 +79,7 @@ public class TourEditor extends EditorPart implements IPersistableEditor {
 		// set the part listener
 		_partListener = new IPartListener2() {
 
+			@Override
 			public void partActivated(final IWorkbenchPartReference partRef) {
 				if (partRef.getPart(false) == TourEditor.this) {
 					if (partRef.getPart(false) == TourEditor.this) {
@@ -87,22 +88,29 @@ public class TourEditor extends EditorPart implements IPersistableEditor {
 				}
 			}
 
+			@Override
 			public void partBroughtToTop(final IWorkbenchPartReference partRef) {}
 
+			@Override
 			public void partClosed(final IWorkbenchPartReference partRef) {}
 
+			@Override
 			public void partDeactivated(final IWorkbenchPartReference partRef) {}
 
+			@Override
 			public void partHidden(final IWorkbenchPartReference partRef) {
 				if (partRef.getPart(false) == TourEditor.this) {
 					_tourChart.partIsHidden();
 				}
 			}
 
+			@Override
 			public void partInputChanged(final IWorkbenchPartReference partRef) {}
 
+			@Override
 			public void partOpened(final IWorkbenchPartReference partRef) {}
 
+			@Override
 			public void partVisible(final IWorkbenchPartReference partRef) {
 				if (partRef.getPart(false) == TourEditor.this) {
 					_tourChart.partIsVisible();
@@ -118,6 +126,7 @@ public class TourEditor extends EditorPart implements IPersistableEditor {
 
 		_postSelectionListener = new ISelectionListener() {
 
+			@Override
 			public void selectionChanged(final IWorkbenchPart part, final ISelection selection) {
 
 				if (part == TourEditor.this) {
@@ -135,6 +144,7 @@ public class TourEditor extends EditorPart implements IPersistableEditor {
 	private void addTourEventListener() {
 
 		_tourEventListener = new ITourEventListener() {
+			@Override
 			public void tourChanged(final IWorkbenchPart part, final TourEventId eventId, final Object eventData) {
 
 				if (part == TourEditor.this) {
@@ -224,6 +234,7 @@ public class TourEditor extends EditorPart implements IPersistableEditor {
 
 		// fire a slider move selection when a slider was moved in the tour chart
 		_tourChart.addSliderMoveListener(new ISliderMoveListener() {
+			@Override
 			public void sliderMoved(final SelectionChartInfo chartInfoSelection) {
 
 				TourManager.fireEventWithCustomData(//
@@ -304,7 +315,7 @@ public class TourEditor extends EditorPart implements IPersistableEditor {
 
 				// it's not the same chart, check if it's the same tour
 
-				final Object tourId = chart.getChartDataModel().getCustomData(TourManager.CUSTOM_DATA_TOUR_ID);
+				final Object tourId = chart.getChartDataModel().getCustomData(Chart.CUSTOM_DATA_TOUR_ID);
 				if (tourId instanceof Long) {
 
 					final TourData tourData = TourManager.getInstance().getTourData((Long) tourId);
@@ -342,7 +353,7 @@ public class TourEditor extends EditorPart implements IPersistableEditor {
 			final ChartDataModel chartDataModel = ((SelectionChartInfo) selection).chartDataModel;
 			if (chartDataModel != null) {
 
-				final Object tourId = chartDataModel.getCustomData(TourManager.CUSTOM_DATA_TOUR_ID);
+				final Object tourId = chartDataModel.getCustomData(Chart.CUSTOM_DATA_TOUR_ID);
 				if (tourId instanceof Long) {
 
 					final TourData tourData = TourManager.getInstance().getTourData((Long) tourId);
@@ -368,6 +379,7 @@ public class TourEditor extends EditorPart implements IPersistableEditor {
 		}
 	}
 
+	@Override
 	public void restoreState(final IMemento memento) {
 
 		if (memento == null) {
@@ -375,6 +387,7 @@ public class TourEditor extends EditorPart implements IPersistableEditor {
 		}
 	}
 
+	@Override
 	public void saveState(final IMemento memento) {
 		memento.putString(MEMENTO_TOUR_ID, Long.toString(_editorInput.getTourId()));
 	}
@@ -408,6 +421,7 @@ public class TourEditor extends EditorPart implements IPersistableEditor {
 			// show the tour chart
 
 			_tourChart.addDataModelListener(new IDataModelListener() {
+				@Override
 				public void dataModelChanged(final ChartDataModel changedChartDataModel) {
 
 					// set title

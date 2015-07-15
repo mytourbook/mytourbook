@@ -67,6 +67,7 @@ public class WayPointToolTipProvider implements ITourToolTipProvider, IMapToolTi
 		_hoveredWayPoint = null;
 	}
 
+	@Override
 	public Composite createToolTipContentArea(final Event event, final Composite parent) {
 
 		if (_hoveredWayPoint == null) {
@@ -281,7 +282,7 @@ public class WayPointToolTipProvider implements ITourToolTipProvider, IMapToolTi
 	}
 
 	@Override
-	public void hide() {}
+	public void hideToolTip() {}
 
 	@Override
 	public void paint(final GC gc, final Rectangle rectangle) {

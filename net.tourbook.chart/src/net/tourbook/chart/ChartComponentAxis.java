@@ -18,7 +18,6 @@ package net.tourbook.chart;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 
-import net.tourbook.common.UI;
 import net.tourbook.common.util.ITourToolTipProvider;
 
 import org.eclipse.swt.SWT;
@@ -46,7 +45,10 @@ import org.eclipse.swt.widgets.Listener;
 
 public class ChartComponentAxis extends Canvas {
 
-	private static final int			UNIT_OFFSET	= 7;
+	private static final String			ZOOM_TEXT_0				= "0";								//$NON-NLS-1$
+	private static final String			ZOOM_TEXT_LARGER_THEN_0	= "> 0";							//$NON-NLS-1$
+
+	private static final int			UNIT_OFFSET				= 7;
 
 	private final Chart					_chart;
 
@@ -72,7 +74,7 @@ public class ChartComponentAxis extends Canvas {
 	 * 1   hovered
 	 * </pre>
 	 */
-	private int							_hoverState	= -1;
+	private int							_hoverState				= -1;
 
 	/**
 	 * Client area of this axis canvas
@@ -84,7 +86,7 @@ public class ChartComponentAxis extends Canvas {
 	private Display						_display;
 	private Color						_moveMarkerColor;
 
-	private final NumberFormat			_nf1		= NumberFormat.getNumberInstance();
+	private final NumberFormat			_nf1					= NumberFormat.getNumberInstance();
 	{
 		_nf1.setMinimumFractionDigits(1);
 		_nf1.setMaximumFractionDigits(1);
@@ -491,14 +493,14 @@ public class ChartComponentAxis extends Canvas {
 
 		String zoomText;
 
-		if (percentValue == 100) {
+		if (percentValue == 100.00000000) {
 			zoomText = Integer.toString((int) percentValue);
-		} else if (percentValue > 0.1) {
+		} else if (percentValue > 0.05) {
 			zoomText = _nf1.format(percentValue);
 		} else if (percentValue > 0.0000000000001) {
-			zoomText = "> 0";
+			zoomText = ZOOM_TEXT_LARGER_THEN_0;
 		} else {
-			zoomText = UI.EMPTY_STRING;
+			zoomText = ZOOM_TEXT_0;
 		}
 		return zoomText;
 	}

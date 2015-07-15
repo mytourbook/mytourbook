@@ -85,6 +85,7 @@ public abstract class ToolTip {
 
 	private class TooltipHideListener implements Listener {
 
+		@Override
 		public void handleEvent(final Event event) {
 
 			if (event.widget instanceof Control) {
@@ -143,6 +144,7 @@ public abstract class ToolTip {
 	}
 
 	private class ToolTipOwnerControlListener implements Listener {
+		@Override
 		public void handleEvent(final Event event) {
 			switch (event.type) {
 			case SWT.Dispose:
@@ -196,6 +198,7 @@ public abstract class ToolTip {
 		this.style = style;
 		this.control.addDisposeListener(new DisposeListener() {
 
+			@Override
 			public void widgetDisposed(final DisposeEvent e) {
 				data = null;
 				deactivate();
@@ -205,6 +208,7 @@ public abstract class ToolTip {
 
 		this.listener = new ToolTipOwnerControlListener();
 		this.shellListener = new Listener() {
+			@Override
 			public void handleEvent(final Event event) {
 
 				final Control ttControl = ToolTip.this.control;
@@ -215,6 +219,7 @@ public abstract class ToolTip {
 
 				ttControl.getDisplay().asyncExec(new Runnable() {
 
+					@Override
 					public void run() {
 
 						// check again, NPE has occured during debugging
@@ -334,6 +339,63 @@ public abstract class ToolTip {
 		}
 
 		return location;
+	}
+
+	/**
+	 * @param tipSize
+	 * @param ttTopLeft
+	 *            Top/left location for the hovered area relativ to the display
+	 * @return
+	 */
+	protected Point fixupDisplayBoundsWithMonitor(final Point tipSize, final Point ttTopLeft) {
+
+		Rectangle displayBounds;
+		final Monitor[] allMonitors = control.getDisplay().getMonitors();
+
+		if (allMonitors.length > 1) {
+
+			// By default present in the monitor of the control
+			displayBounds = control.getMonitor().getBounds();
+			final Point topLeft2 = new Point(ttTopLeft.x, ttTopLeft.y);
+
+			// Search on which monitor the event occurred
+			Rectangle monitorBounds;
+			for (final Monitor monitor : allMonitors) {
+				monitorBounds = monitor.getBounds();
+				if (monitorBounds.contains(topLeft2)) {
+					displayBounds = monitorBounds;
+					break;
+				}
+			}
+
+		} else {
+			displayBounds = control.getDisplay().getBounds();
+		}
+
+		final Point bottomRight = new Point(//
+				ttTopLeft.x + tipSize.x,
+				ttTopLeft.y + tipSize.y);
+
+		if (!(displayBounds.contains(ttTopLeft) && displayBounds.contains(bottomRight))) {
+
+			if (bottomRight.x > displayBounds.x + displayBounds.width) {
+				ttTopLeft.x -= bottomRight.x - (displayBounds.x + displayBounds.width);
+			}
+
+			if (bottomRight.y > displayBounds.y + displayBounds.height) {
+				ttTopLeft.y -= bottomRight.y - (displayBounds.y + displayBounds.height);
+			}
+
+			if (ttTopLeft.x < displayBounds.x) {
+				ttTopLeft.x += displayBounds.x;
+			}
+
+			if (ttTopLeft.y < displayBounds.y) {
+				ttTopLeft.y = displayBounds.y;
+			}
+		}
+
+		return ttTopLeft;
 	}
 
 	/**
@@ -484,6 +546,7 @@ public abstract class ToolTip {
 			if (hideOnMouseDown != this.hideOnMouseDown) {
 				control.getDisplay().syncExec(new Runnable() {
 
+					@Override
 					public void run() {
 						if (CURRENT_TOOLTIP != null && CURRENT_TOOLTIP.isDisposed()) {
 							toolTipHookByTypeRecursively(CURRENT_TOOLTIP, hideOnMouseDown, SWT.MouseDown);
@@ -684,6 +747,7 @@ public abstract class ToolTip {
 
 		if (popupDelay > 0) {
 			control.getDisplay().timerExec(popupDelay, new Runnable() {
+				@Override
 				public void run() {
 					toolTipShow(shell, event);
 				}
@@ -695,6 +759,7 @@ public abstract class ToolTip {
 		if (hideDelay > 0) {
 			control.getDisplay().timerExec(popupDelay + hideDelay, new Runnable() {
 
+				@Override
 				public void run() {
 					toolTipHide(shell, null);
 				}

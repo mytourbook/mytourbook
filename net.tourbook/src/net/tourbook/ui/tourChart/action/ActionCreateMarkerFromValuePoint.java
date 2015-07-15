@@ -95,7 +95,7 @@ public class ActionCreateMarkerFromValuePoint extends Action {
 		final Chart chart = _chartContextProvider.getChart();
 
 		TourData tourData = null;
-		final Object tourId = chart.getChartDataModel().getCustomData(TourManager.CUSTOM_DATA_TOUR_ID);
+		final Object tourId = chart.getChartDataModel().getCustomData(Chart.CUSTOM_DATA_TOUR_ID);
 		if (tourId instanceof Long) {
 			tourData = TourManager.getInstance().getTourData((Long) tourId);
 		}

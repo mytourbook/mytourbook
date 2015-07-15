@@ -42,7 +42,7 @@ public class ChartLayerMarker implements IChartLayer, IChartOverlay {
 	private int					LABEL_OFFSET;
 	private int					MARKER_HOVER_SIZE;
 	private int					MARKER_POINT_SIZE;
-	private int					SIGN_IMAGE_MAX_SIZE;
+//	private int					SIGN_IMAGE_MAX_SIZE;
 
 	private TourChart			_tourChart;
 	private ChartMarkerConfig	_cmc;
@@ -180,7 +180,7 @@ public class ChartLayerMarker implements IChartLayer, IChartOverlay {
 	}
 
 	/**
-	 * Draws the marker(s) for the current graph config.
+	 * This paints the marker(s) for the current graph config.
 	 */
 	@Override
 	public void draw(final GC gc, final GraphDrawingData drawingData, final Chart chart, final PixelConverter pc) {
@@ -188,14 +188,14 @@ public class ChartLayerMarker implements IChartLayer, IChartOverlay {
 		final Device display = gc.getDevice();
 
 		final int markerPointSize = _cmc.markerPointSize;
-		final int markerSignImageSize = _cmc.markerSignImageSize;
+//		final int markerSignImageSize = _cmc.markerSignImageSize;
 		final int labelOffset = _cmc.markerLabelOffset;
 		final int hoverSize = _cmc.markerHoverSize;
 
 		MARKER_POINT_SIZE = pc.convertVerticalDLUsToPixels(markerPointSize);
 		MARKER_HOVER_SIZE = pc.convertVerticalDLUsToPixels(hoverSize);
 		LABEL_OFFSET = pc.convertVerticalDLUsToPixels(labelOffset);
-		SIGN_IMAGE_MAX_SIZE = pc.convertVerticalDLUsToPixels(markerSignImageSize);
+//		SIGN_IMAGE_MAX_SIZE = pc.convertVerticalDLUsToPixels(markerSignImageSize);
 
 		/*
 		 * Set marker point size even that the label positioning has the correct distance otherwise
@@ -211,8 +211,8 @@ public class ChartLayerMarker implements IChartLayer, IChartOverlay {
 		final long devVirtualGraphImageOffset = chart.getXXDevViewPortLeftBorder();
 		final int devGraphHeight = drawingData.devGraphHeight;
 		final long devVirtualGraphWidth = drawingData.devVirtualGraphWidth;
-		final int devVisibleChartWidth = drawingData.getChartDrawingData().devVisibleChartWidth;
-		final boolean isZoomed = devVirtualGraphWidth != devVisibleChartWidth;
+//		final int devVisibleChartWidth = drawingData.getChartDrawingData().devVisibleChartWidth;
+//		final boolean isZoomed = devVirtualGraphWidth != devVisibleChartWidth;
 
 		final float graphYBottom = drawingData.getGraphYBottom();
 		final float[] yValues = drawingData.getYData().getHighValuesFloat()[0];
@@ -535,7 +535,7 @@ public class ChartLayerMarker implements IChartLayer, IChartOverlay {
 	}
 
 	/**
-	 * Draw hovered marker.
+	 * This paints the hovered marker.
 	 * <p>
 	 * {@inheritDoc}
 	 */

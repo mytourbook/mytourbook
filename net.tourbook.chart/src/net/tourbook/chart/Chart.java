@@ -55,6 +55,8 @@ public class Chart extends ViewForm {
 
 	static final int				NO_BAR_SELECTION					= -1;
 
+	public static final String		CUSTOM_DATA_TOUR_ID					= "tourId";							//$NON-NLS-1$
+
 	public static final int			SYNCH_MODE_NO						= 0;
 	public static final int			SYNCH_MODE_BY_SCALE					= 1;
 	public static final int			SYNCH_MODE_BY_SIZE					= 2;

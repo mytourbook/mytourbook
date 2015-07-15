@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.Set;
 
 import net.tourbook.common.UI;
-import net.tourbook.common.util.ITourToolTipProvider;
+import net.tourbook.common.util.IToolTipProvider;
 import net.tourbook.common.util.Util;
 import net.tourbook.common.weather.IWeather;
 import net.tourbook.data.TourData;
@@ -177,16 +177,16 @@ public class TourInfoUI {
 	private DateTime					_uiDtModified;
 	private String						_uiTourTypeName;
 
-	private ITourToolTipProvider		_tourInfoToolTipProvider;
+	private IToolTipProvider			_tourToolTipProvider;
 	private ITourProvider				_tourProvider;
 
 	public Composite createContentArea(	final Composite parent,
 										final TourData tourData,
-										final ITourToolTipProvider tourInfoToolTipProvider,
+										final IToolTipProvider tourToolTipProvider,
 										final ITourProvider tourProvider) {
 
 		_tourData = tourData;
-		_tourInfoToolTipProvider = tourInfoToolTipProvider;
+		_tourToolTipProvider = tourToolTipProvider;
 		_tourProvider = tourProvider;
 
 		final Display display = parent.getDisplay();
@@ -320,8 +320,8 @@ public class TourInfoUI {
 		/*
 		 * create actions
 		 */
-		_actionEditTour = new ActionTourToolTipEditTour(_tourInfoToolTipProvider, _tourProvider);
-		_actionEditQuick = new ActionTourToolTipEditQuick(_tourInfoToolTipProvider, _tourProvider);
+		_actionEditTour = new ActionTourToolTipEditTour(_tourToolTipProvider, _tourProvider);
+		_actionEditQuick = new ActionTourToolTipEditQuick(_tourToolTipProvider, _tourProvider);
 
 		/*
 		 * create toolbar

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -147,12 +147,14 @@ public abstract class AnimatedToolTipShell {
 	}
 
 	private class OwnerControlListener implements Listener {
+		@Override
 		public void handleEvent(final Event event) {
 			onOwnerControlEvent(event);
 		}
 	}
 
 	private final class OwnerShellListener implements Listener {
+		@Override
 		public void handleEvent(final Event event) {
 			onOwnerShellEvent(event);
 		}
@@ -162,6 +164,7 @@ public abstract class AnimatedToolTipShell {
 	 * This listener is added to ALL widgets within the tooltip shell.
 	 */
 	private class ToolTipAllControlsListener implements Listener {
+		@Override
 		public void handleEvent(final Event event) {
 			onTTAllControlsEvent(event);
 		}
@@ -181,6 +184,7 @@ public abstract class AnimatedToolTipShell {
 	}
 
 	private class ToolTipDisplayListener implements Listener {
+		@Override
 		public void handleEvent(final Event event) {
 
 			switch (event.type) {
@@ -192,6 +196,7 @@ public abstract class AnimatedToolTipShell {
 	}
 
 	private final class ToolTipShellListener implements Listener {
+		@Override
 		public void handleEvent(final Event event) {
 			onTTShellEvent(event);
 		}
@@ -614,8 +619,8 @@ public abstract class AnimatedToolTipShell {
 					/*
 					 * SWT.TOOL must be disabled that NO_FOCUS is working !!!
 					 */
-//							| SWT.TOOL
-//							| SWT.RESIZE
+//					| SWT.TOOL
+//					| SWT.RESIZE
 					| SWT.NO_FOCUS
 					| trimStyle;
 
@@ -998,6 +1003,7 @@ public abstract class AnimatedToolTipShell {
 
 			_display.asyncExec(new Runnable() {
 
+				@Override
 				public void run() {
 
 					// hide tooltip when another shell is activated
@@ -1075,6 +1081,7 @@ public abstract class AnimatedToolTipShell {
 					final Point ownerLocation = _ownerControl.toControl(ttDisplayLocation);
 
 					_display.asyncExec(new Runnable() {
+						@Override
 						public void run() {
 
 							final MouseEvent mouseEvent = new MouseEvent(event);
@@ -1114,6 +1121,7 @@ public abstract class AnimatedToolTipShell {
 
 				_display.asyncExec(new Runnable() {
 
+					@Override
 					public void run() {
 
 						// hide tooltip when another shell is activated
@@ -1221,6 +1229,10 @@ public abstract class AnimatedToolTipShell {
 	}
 
 	private void setShellVisible(final boolean isVisible) {
+
+//		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
+//				+ ("\tsetShellVisible: " + isVisible));
+//		// TODO remove SYSTEM.OUT.PRINTLN
 
 		if (isVisible) {
 

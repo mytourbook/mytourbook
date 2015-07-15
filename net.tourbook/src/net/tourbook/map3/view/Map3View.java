@@ -1512,7 +1512,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 			final ChartDataModel chartDataModel = chartInfo.chartDataModel;
 			if (chartDataModel != null) {
 
-				final Object tourId = chartDataModel.getCustomData(TourManager.CUSTOM_DATA_TOUR_ID);
+				final Object tourId = chartDataModel.getCustomData(Chart.CUSTOM_DATA_TOUR_ID);
 				if (tourId instanceof Long) {
 
 					syncMapWith_ChartSlider(chartInfo, (Long) tourId);
@@ -1529,7 +1529,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 
 			final ChartDataModel chartDataModel = chart.getChartDataModel();
 
-			final Object tourId = chartDataModel.getCustomData(TourManager.CUSTOM_DATA_TOUR_ID);
+			final Object tourId = chartDataModel.getCustomData(Chart.CUSTOM_DATA_TOUR_ID);
 			if (tourId instanceof Long) {
 
 				final TourData tourData = TourManager.getInstance().getTourData((Long) tourId);

@@ -137,7 +137,7 @@ public class ChartComponentGraph extends Canvas {
 	/**
 	 * drawing data which is used to draw the chart, when this list is empty, an error is displayed
 	 */
-	private ArrayList<GraphDrawingData>	_graphDrawingData				= new ArrayList<GraphDrawingData>();
+	private ArrayList<GraphDrawingData>	_allGraphDrawingData			= new ArrayList<GraphDrawingData>();
 	private ArrayList<GraphDrawingData>	_revertedGraphDrawingData;
 
 	/**
@@ -491,11 +491,11 @@ public class ChartComponentGraph extends Canvas {
 
 		boolean[] selectedBarItems;
 
-		if (_graphDrawingData.size() == 0) {
+		if (_allGraphDrawingData.size() == 0) {
 			selectedBarItems = null;
 		} else {
 
-			final GraphDrawingData graphDrawingData = _graphDrawingData.get(0);
+			final GraphDrawingData graphDrawingData = _allGraphDrawingData.get(0);
 			final ChartDataXSerie xData = graphDrawingData.getXData();
 
 			selectedBarItems = new boolean[xData._highValuesDouble[0].length];
@@ -1029,7 +1029,7 @@ public class ChartComponentGraph extends Canvas {
 		final int rightPos = leftPos + getDevVisibleChartWidth();
 
 		// create slider label for each graph
-		for (final GraphDrawingData drawingData : _graphDrawingData) {
+		for (final GraphDrawingData drawingData : _allGraphDrawingData) {
 
 			final ChartDataYSerie yData = drawingData.getYData();
 			final int labelFormat = yData.getSliderLabelFormat();
@@ -1464,7 +1464,7 @@ public class ChartComponentGraph extends Canvas {
 			return;
 		}
 
-		if (_graphDrawingData.size() == 0) {
+		if (_allGraphDrawingData.size() == 0) {
 			// drawing data are not set
 			return;
 		}
@@ -1507,7 +1507,7 @@ public class ChartComponentGraph extends Canvas {
 		 * The graph image is only a part where ONE single graph is painted without any title or
 		 * unit tick/values
 		 */
-		final GraphDrawingData graphDrawingData = _graphDrawingData.get(0);
+		final GraphDrawingData graphDrawingData = _allGraphDrawingData.get(0);
 		final int devGraphHeight = graphDrawingData.devGraphHeight;
 		final Rectangle graphImageRect = new Rectangle(0, 0, //
 				devNewImageWidth,
@@ -1581,7 +1581,7 @@ public class ChartComponentGraph extends Canvas {
 	private void drawAsync_110_GraphImage(final GC gcChart, final GC gcGraph) {
 
 		int graphNo = 0;
-		final int lastGraphNo = _graphDrawingData.size();
+		final int lastGraphNo = _allGraphDrawingData.size();
 
 		final boolean isStackedChart = !_isChartOverlapped;
 
@@ -1589,7 +1589,7 @@ public class ChartComponentGraph extends Canvas {
 		if (_canChartBeOverlapped && _isChartOverlapped) {
 			allGraphDrawingData = _revertedGraphDrawingData;
 		} else {
-			allGraphDrawingData = _graphDrawingData;
+			allGraphDrawingData = _allGraphDrawingData;
 		}
 
 		// reset line positions, they are set when a line graph is painted
@@ -1770,10 +1770,16 @@ public class ChartComponentGraph extends Canvas {
 
 	private void drawAsync_200_XTitle(final GC gc, final GraphDrawingData graphDrawingData) {
 
-		final ChartSegments chartSegments = graphDrawingData.getXData().getChartSegments();
-		final HistoryTitle historyTitle = graphDrawingData.getXData().getHistoryTitle();
+		final int devYBottom = graphDrawingData.getDevYBottom();
+		final int devYTop = devYBottom - graphDrawingData.devGraphHeight;
+
+		final ChartDataXSerie xData = graphDrawingData.getXData();
+		final ChartSegments chartSegments = xData.getChartSegments();
+		final HistoryTitle historyTitle = xData.getHistoryTitle();
 
 		final int devYTitle = _chartDrawingData.devMarginTop;
+
+		final ArrayList<ChartTitle> chartTitles = _chartDrawingData.chartTitles;
 
 		final int devGraphWidth = getDevVisibleChartWidth();
 
@@ -1845,6 +1851,8 @@ public class ChartComponentGraph extends Canvas {
 			final long[] valueStart = chartSegments.valueStart;
 			final long[] valueEnd = chartSegments.valueEnd;
 			final String[] segmentTitles = chartSegments.segmentTitle;
+			final Object[] segmentTourIds = chartSegments.segmentCustomData;
+
 			final boolean isZoomed = getZoomRatio() > 1.0;
 
 			if (valueStart != null && valueEnd != null && segmentTitles != null) {
@@ -1874,7 +1882,9 @@ public class ChartComponentGraph extends Canvas {
 						break;
 					}
 
-					final int titleWidth = gc.textExtent(segmentTitle).x;
+					final Point textExtent = gc.textExtent(segmentTitle);
+					final int titleWidth = textExtent.x;
+					final int titleHeight = textExtent.y;
 					final int titleWidth2 = titleWidth / 2;
 
 					final int visibleSegmentStart = Math.max(0, devXSegmentStart);
@@ -1903,6 +1913,25 @@ public class ChartComponentGraph extends Canvas {
 						devXTitleEnd = devXTitle + titleWidth + titlePadding;
 
 						gc.drawText(segmentTitle, devXTitle, devYTitle, false);
+
+						if (segmentTourIds[segmentIndex] instanceof Long) {
+
+							final ChartTitle chartTitle = new ChartTitle();
+
+							chartTitle.tourId = (Long) segmentTourIds[segmentIndex];
+
+							chartTitle.devX = devXTitle;
+							chartTitle.devY = devYTitle;
+
+							chartTitle.width = titleWidth;
+							chartTitle.height = titleHeight;
+
+							chartTitle.devYBottom = devYBottom;
+							chartTitle.devYTop = devYTop;
+							chartTitle.devGraphWidth = _chartDrawingData.devVisibleChartWidth;
+
+							chartTitles.add(chartTitle);
+						}
 					}
 
 					// draw segment start line but not for the first segment
@@ -1927,7 +1956,9 @@ public class ChartComponentGraph extends Canvas {
 				return;
 			}
 
-			final int titleWidth = gc.textExtent(title).x;
+			final Point textExtent = gc.textExtent(title);
+			final int titleWidth = textExtent.x;
+			final int titleHeight = textExtent.y;
 			final int devXTitle = (devGraphWidth / 2) - (titleWidth / 2);
 
 			gc.drawText(title, //
@@ -1935,6 +1966,25 @@ public class ChartComponentGraph extends Canvas {
 					devYTitle,
 					true);
 
+			final Object tourIdObject = _chartDrawingData.chartDataModel.getCustomData(Chart.CUSTOM_DATA_TOUR_ID);
+			if (tourIdObject instanceof Long) {
+
+				final ChartTitle chartTitle = new ChartTitle();
+				
+				chartTitle.tourId = (Long) tourIdObject;
+
+				chartTitle.devX = devXTitle;
+				chartTitle.devY = devYTitle;
+
+				chartTitle.width = titleWidth;
+				chartTitle.height = titleHeight;
+
+				chartTitle.devYBottom = devYBottom;
+				chartTitle.devYTop = devYTop;
+				chartTitle.devGraphWidth = _chartDrawingData.devVisibleChartWidth;
+
+				chartTitles.add(chartTitle);
+			}
 		}
 
 	}
@@ -4078,7 +4128,7 @@ public class ChartComponentGraph extends Canvas {
 //		System.out.println(UI.timeStampNano() + " drawSync_000_onPaint: START");
 //		// TODO remove SYSTEM.OUT.PRINTLN
 
-		if (_graphDrawingData == null || _graphDrawingData.size() == 0) {
+		if (_allGraphDrawingData == null || _allGraphDrawingData.size() == 0) {
 
 			// fill the image area when there is no graphic
 			gc.setBackground(_chart.getBackgroundColor());
@@ -4281,7 +4331,7 @@ public class ChartComponentGraph extends Canvas {
 //			System.out.println("30 <- 20\tdrawSync300Image30Custom");
 //			// TODO remove SYSTEM.OUT.PRINTLN
 
-			for (final GraphDrawingData graphDrawingData : _graphDrawingData) {
+			for (final GraphDrawingData graphDrawingData : _allGraphDrawingData) {
 
 				final ArrayList<IChartLayer> customFgLayers = graphDrawingData.getYData().getCustomForegroundLayers();
 
@@ -4417,7 +4467,7 @@ public class ChartComponentGraph extends Canvas {
 		final ArrayList<ChartXSliderLabel> labelList = slider.getLabelList();
 
 		// draw slider for each graph
-		for (final GraphDrawingData drawingData : _graphDrawingData) {
+		for (final GraphDrawingData drawingData : _allGraphDrawingData) {
 
 			graphNo++;
 
@@ -4426,7 +4476,7 @@ public class ChartComponentGraph extends Canvas {
 			 */
 			final ChartType chartType = drawingData.getChartType();
 			final boolean isLastOverlappedGraph = isGraphOverlapped
-					&& graphNo == _graphDrawingData.size()
+					&& graphNo == _allGraphDrawingData.size()
 					&& (chartType == ChartType.LINE || chartType == ChartType.HORIZONTAL_BAR);
 
 			if (isGraphOverlapped && isLastOverlappedGraph == false) {
@@ -4631,7 +4681,7 @@ public class ChartComponentGraph extends Canvas {
 		final int devDraggingDiff = _devXMarkerDraggedPos - _devXMarkerDraggedStartPos;
 
 		// draw x-marker for each graph
-		for (final GraphDrawingData drawingData : _graphDrawingData) {
+		for (final GraphDrawingData drawingData : _allGraphDrawingData) {
 
 			final ChartDataXSerie xData = drawingData.getXData();
 
@@ -4770,7 +4820,7 @@ public class ChartComponentGraph extends Canvas {
 		final ChartType chartType = _chart.getChartDataModel().getChartType();
 
 		// loop: all graphs
-		for (final GraphDrawingData drawingData : _graphDrawingData) {
+		for (final GraphDrawingData drawingData : _allGraphDrawingData) {
 
 			if (chartType == ChartType.LINE) {
 
@@ -4976,7 +5026,7 @@ public class ChartComponentGraph extends Canvas {
 		gcOverlay.setAlpha(0xd0);
 
 		// loop: all graphs
-		for (final GraphDrawingData drawingData : _graphDrawingData) {
+		for (final GraphDrawingData drawingData : _allGraphDrawingData) {
 
 			// get the chart data
 			final ChartDataYSerie yData = drawingData.getYData();
@@ -5072,7 +5122,7 @@ public class ChartComponentGraph extends Canvas {
 		gcOverlay.setAntialias(SWT.ON);
 
 		// loop: all graphs
-		for (final GraphDrawingData drawingData : _graphDrawingData) {
+		for (final GraphDrawingData drawingData : _allGraphDrawingData) {
 
 			// draw only line graphs
 			if (_chart.getChartDataModel().getChartType() != ChartType.LINE) {
@@ -5197,7 +5247,7 @@ public class ChartComponentGraph extends Canvas {
 
 		if (_isOverlayDirty) {
 
-			for (final GraphDrawingData graphDrawingData : _graphDrawingData) {
+			for (final GraphDrawingData graphDrawingData : _allGraphDrawingData) {
 
 				final ArrayList<IChartLayer> customFgLayers = graphDrawingData.getYData().getCustomForegroundLayers();
 
@@ -5393,15 +5443,15 @@ public class ChartComponentGraph extends Canvas {
 	 * @return Returns the x-Data in the drawing data list
 	 */
 	private ChartDataXSerie getXData() {
-		if (_graphDrawingData.size() == 0) {
+		if (_allGraphDrawingData.size() == 0) {
 			return null;
 		} else {
-			return _graphDrawingData.get(0).getXData();
+			return _allGraphDrawingData.get(0).getXData();
 		}
 	}
 
 	private GraphDrawingData getXDrawingData() {
-		return _graphDrawingData.get(0);
+		return _allGraphDrawingData.get(0);
 	}
 
 	/**
@@ -5505,7 +5555,7 @@ public class ChartComponentGraph extends Canvas {
 		boolean isBarHit = false;
 
 		// loop: all graphs
-		for (final GraphDrawingData drawingData : _graphDrawingData) {
+		for (final GraphDrawingData drawingData : _allGraphDrawingData) {
 
 			final Rectangle[][] barFocusRectangles = drawingData.getBarFocusRectangles();
 			if (barFocusRectangles == null) {
@@ -7331,11 +7381,11 @@ public class ChartComponentGraph extends Canvas {
 
 		// create empty list if list is not available, so we do not need
 		// to check for null and isEmpty
-		_graphDrawingData = chartDrawingData.graphDrawingData;
+		_allGraphDrawingData = chartDrawingData.graphDrawingData;
 
-		_isGraphVisible = _graphDrawingData != null && _graphDrawingData.isEmpty() == false;
+		_isGraphVisible = _allGraphDrawingData != null && _allGraphDrawingData.isEmpty() == false;
 
-		_canChartBeOverlapped = canChartBeOverlapped(_graphDrawingData);
+		_canChartBeOverlapped = canChartBeOverlapped(_allGraphDrawingData);
 		_isChartOverlapped = _chartDrawingData.chartDataModel.isGraphOverlapped();
 
 		if (_canChartBeOverlapped && _isChartOverlapped) {
@@ -7347,7 +7397,7 @@ public class ChartComponentGraph extends Canvas {
 
 			_revertedGraphDrawingData = new ArrayList<GraphDrawingData>();
 
-			for (final GraphDrawingData graphDrawingData : _graphDrawingData) {
+			for (final GraphDrawingData graphDrawingData : _allGraphDrawingData) {
 				_revertedGraphDrawingData.add(graphDrawingData);
 			}
 
@@ -7540,11 +7590,11 @@ public class ChartComponentGraph extends Canvas {
 
 			// set focus to first bar item
 
-			if (_graphDrawingData.size() == 0) {
+			if (_allGraphDrawingData.size() == 0) {
 				_selectedBarItems = null;
 			} else {
 
-				final GraphDrawingData graphDrawingData = _graphDrawingData.get(0);
+				final GraphDrawingData graphDrawingData = _allGraphDrawingData.get(0);
 				final ChartDataXSerie xData = graphDrawingData.getXData();
 
 				_selectedBarItems = new boolean[xData._highValuesDouble[0].length];
@@ -7805,11 +7855,11 @@ public class ChartComponentGraph extends Canvas {
 	 */
 	private void switchSliderTo2ndXData(final ChartXSlider slider) {
 
-		if (_graphDrawingData.size() == 0) {
+		if (_allGraphDrawingData.size() == 0) {
 			return;
 		}
 
-		final GraphDrawingData graphDrawingData = _graphDrawingData.get(0);
+		final GraphDrawingData graphDrawingData = _allGraphDrawingData.get(0);
 		if (graphDrawingData == null) {
 			return;
 		}
@@ -7933,7 +7983,7 @@ public class ChartComponentGraph extends Canvas {
 		_ySliders = new ArrayList<ChartYSlider>();
 
 		// loop: get all y-sliders from all graphs
-		for (final GraphDrawingData drawingData : _graphDrawingData) {
+		for (final GraphDrawingData drawingData : _allGraphDrawingData) {
 
 			final ChartDataYSerie yData = drawingData.getYData();
 

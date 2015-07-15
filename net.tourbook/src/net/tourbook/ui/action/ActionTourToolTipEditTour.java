@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,26 +15,24 @@
  *******************************************************************************/
 package net.tourbook.ui.action;
 
-import net.tourbook.common.util.ITourToolTipProvider;
+import net.tourbook.common.util.IToolTipProvider;
 import net.tourbook.ui.ITourProvider;
 
 public class ActionTourToolTipEditTour extends ActionEditTour {
 
-	private final ITourToolTipProvider	_tourInfo;
+	private final IToolTipProvider	_ttProvider;
 
-	public ActionTourToolTipEditTour(	final ITourToolTipProvider _tourInfoToolTipProvider,
-										final ITourProvider _tourProvider) {
+	public ActionTourToolTipEditTour(final IToolTipProvider _toolTipProvider, final ITourProvider _tourProvider) {
 
 		super(_tourProvider);
 
-		_tourInfo = _tourInfoToolTipProvider;
+		_ttProvider = _toolTipProvider;
 	}
-
 
 	@Override
 	public void run() {
 
-		_tourInfo.hide();
+		_ttProvider.hideToolTip();
 
 		super.run();
 	}

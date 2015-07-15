@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -106,7 +106,7 @@ public class TourInfoToolTipProvider implements ITourToolTipProvider, IInfoToolT
 	@Override
 	public Composite createToolTipContentArea(final Event event, final Composite parent) {
 
-		Composite container;
+		Composite ui;
 
 		if (_tourId != -1) {
 			// first get data from the tour id when it is set
@@ -117,13 +117,13 @@ public class TourInfoToolTipProvider implements ITourToolTipProvider, IInfoToolT
 
 			// there are no data available
 
-			container = _tourInfoUI.createUI_NoData(parent);
+			ui = _tourInfoUI.createUI_NoData(parent);
 
 		} else {
 
 			// tour data is available
 
-			container = _tourInfoUI.createContentArea(parent, _tourData, this, this);
+			ui = _tourInfoUI.createContentArea(parent, _tourData, this, this);
 
 			// allow the actions to be selected
 			if (_tourToolTip != null) {
@@ -138,7 +138,7 @@ public class TourInfoToolTipProvider implements ITourToolTipProvider, IInfoToolT
 			}
 		});
 
-		return container;
+		return ui;
 	}
 
 	@Override
@@ -181,7 +181,8 @@ public class TourInfoToolTipProvider implements ITourToolTipProvider, IInfoToolT
 		return selectedTour;
 	}
 
-	public void hide() {
+	@Override
+	public void hideToolTip() {
 		if (_tourToolTip != null) {
 			_tourToolTip.hide();
 		}

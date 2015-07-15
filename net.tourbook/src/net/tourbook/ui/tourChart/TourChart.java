@@ -28,7 +28,9 @@ import net.tourbook.chart.ChartCursor;
 import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.ChartDataSerie;
 import net.tourbook.chart.ChartDataYSerie;
+import net.tourbook.chart.ChartDrawingData;
 import net.tourbook.chart.ChartMouseEvent;
+import net.tourbook.chart.ChartTitle;
 import net.tourbook.chart.ChartType;
 import net.tourbook.chart.ChartYDataMinMaxKeeper;
 import net.tourbook.chart.IChartLayer;
@@ -142,6 +144,8 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 	public static final double			MIN_ADJUSTMENT							= 1e-3;
 	public static final double			MAX_ADJUSTMENT							= 1e-5;
 
+	private static final int			TITLE_HOVER_SIZE						= 5;
+
 	private final IPreferenceStore		_prefStore								= TourbookPlugin.getPrefStore();
 	private final IDialogSettings		_state									= TourbookPlugin.getState(ID);
 
@@ -194,11 +198,16 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
 	private ChartPhotoToolTip			_photoTooltip;
 	private ChartMarkerToolTip			_markerTooltip;
+	private ChartTitleToolTip			_tourTitleToolTipProvider;
 	private ValuePointToolTipUI			_valuePointToolTip;
 
 	private ControlListener				_ttControlListener						= new ControlListener();
 	private IMouseListener				_mouseMarkerListener					= new MouseMarkerListener();
 	private IMouseListener				_mousePhotoListener						= new MousePhotoListener();
+	private IMouseListener				_mouseTitleListener						= new MouseTitleListener();
+
+	private long						_hoveredTitleEventTime;
+	private boolean						_isTitleHovered;
 
 	/*
 	 * UI controls
@@ -347,7 +356,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
 	}
 
-	public class MouseMarkerListener extends MouseAdapter {
+	private class MouseMarkerListener extends MouseAdapter {
 
 		@Override
 		public void chartResized() {
@@ -380,7 +389,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		}
 	}
 
-	public class MousePhotoListener extends MouseAdapter {
+	private class MousePhotoListener extends MouseAdapter {
 
 		@Override
 		public void chartResized() {
@@ -395,6 +404,24 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		@Override
 		public void mouseMove(final ChartMouseEvent event) {
 			onPhotoMouseMove(event);
+		}
+	}
+
+	public class MouseTitleListener extends MouseAdapter {
+
+		@Override
+		public void chartResized() {
+			onTitleChartResized();
+		}
+
+		@Override
+		public void mouseExit() {
+			onTitleMouseExit();
+		}
+
+		@Override
+		public void mouseMove(final ChartMouseEvent event) {
+			onTitleMouseMove(event);
 		}
 	}
 
@@ -471,6 +498,11 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 			}
 		});
 		setTourToolTipProvider(_tourInfoToolTipProvider);
+
+		/*
+		 * Setup tour title tooltip
+		 */
+		_tourTitleToolTipProvider = new ChartTitleToolTip(this);
 
 		/*
 		 * setup value point tooltip
@@ -2022,6 +2054,35 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 	}
 
 	/**
+	 * @param mouseEvent
+	 * @return Returns the hovered title or <code>null</code> when a title is not hovered.
+	 */
+	private ChartTitle getHoveredTitle(final ChartMouseEvent mouseEvent) {
+
+		final int devXMouse = mouseEvent.devXMouse;
+		final int devYMouse = mouseEvent.devYMouse;
+
+		final ChartDrawingData chartDrawingData = getChartDrawingData();
+		final ArrayList<ChartTitle> chartTitles = chartDrawingData.chartTitles;
+
+		for (final ChartTitle chartTitle : chartTitles) {
+
+			final int devXLabel = chartTitle.devX;
+			final int devYLabel = chartTitle.devY;
+
+			if (devXMouse > devXLabel - TITLE_HOVER_SIZE
+					&& devXMouse < devXLabel + chartTitle.width + TITLE_HOVER_SIZE
+					&& devYMouse > devYLabel - TITLE_HOVER_SIZE
+					&& devYMouse < devYLabel + chartTitle.height + TITLE_HOVER_SIZE) {
+
+				return chartTitle;
+			}
+		}
+
+		return null;
+	}
+
+	/**
 	 * @return Returns a {@link TourMarker} when a {@link ChartLabel} (marker) is hovered or
 	 *         <code>null</code> when a {@link ChartLabel} is not hovered.
 	 */
@@ -2279,6 +2340,47 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		if (isHovered) {
 			mouseEvent.isWorked = isHovered;
 		}
+	}
+
+	private void onTitleChartResized() {
+		// TODO Auto-generated method stub
+
+	}
+
+	private void onTitleMouseExit() {
+		// TODO Auto-generated method stub
+
+	}
+
+	private void onTitleMouseMove(final ChartMouseEvent mouseEvent) {
+
+//		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
+//				+ ("\tonTitleMouseMove: " + mouseEvent));
+//		// TODO remove SYSTEM.OUT.PRINTLN
+
+		if (mouseEvent.eventTime == _hoveredTitleEventTime) {
+
+			// ignore events with the same time
+
+			mouseEvent.isWorked = _isTitleHovered;
+			mouseEvent.cursor = ChartCursor.Arrow;
+
+			return;
+		}
+
+		_hoveredTitleEventTime = mouseEvent.eventTime;
+
+		final ChartTitle hoveredTitle = getHoveredTitle(mouseEvent);
+
+		_isTitleHovered = hoveredTitle != null;
+		if (_isTitleHovered) {
+
+			// set worked that no other actions are done in this event
+			mouseEvent.isWorked = _isTitleHovered;
+			mouseEvent.cursor = ChartCursor.Arrow;
+		}
+
+		_tourTitleToolTipProvider.open(hoveredTitle);
 	}
 
 	public void partIsDeactivated() {
@@ -2975,6 +3077,8 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
 			setMouseMode(_prefStore.getString(ITourbookPreferences.GRAPH_MOUSE_MODE).equals(Chart.MOUSE_MODE_SLIDER));
 		}
+
+		addMouseChartListener(_mouseTitleListener);
 
 		_tourInfoToolTipProvider.setTourData(_tourData);
 		_valuePointToolTip.setTourData(_tourData);

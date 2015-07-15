@@ -22,6 +22,7 @@ import java.util.Set;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.ChartDataSerie;
 import net.tourbook.chart.ChartDataXSerie;
@@ -97,7 +98,6 @@ public class TourManager {
 	private static final String				GRAPH_LABEL_TOUR_COMPARE				= net.tourbook.common.Messages.Graph_Label_Tour_Compare;
 	private static final String				GRAPH_LABEL_TOUR_COMPARE_UNIT			= net.tourbook.common.Messages.Graph_Label_Tour_Compare_Unit;
 
-	public static final String				CUSTOM_DATA_TOUR_ID						= "tourId";													//$NON-NLS-1$
 	public static final String				CUSTOM_DATA_TOUR_DATA					= "tourData";													//$NON-NLS-1$
 	public static final String				CUSTOM_DATA_TOUR_CHART_CONFIGURATION	= "tourChartConfig";											//$NON-NLS-1$
 
@@ -1743,7 +1743,7 @@ public class TourManager {
 				}
 
 				TourData tourData = null;
-				final Object tourId = chartModel.getCustomData(TourManager.CUSTOM_DATA_TOUR_ID);
+				final Object tourId = chartModel.getCustomData(Chart.CUSTOM_DATA_TOUR_ID);
 				if (tourId instanceof Long) {
 					tourData = TourManager.getInstance().getTourData((Long) tourId);
 					if (tourData == null) {
@@ -1800,7 +1800,7 @@ public class TourManager {
 				}
 
 				TourData tourData = null;
-				final Object tourId = chartModel.getCustomData(TourManager.CUSTOM_DATA_TOUR_ID);
+				final Object tourId = chartModel.getCustomData(Chart.CUSTOM_DATA_TOUR_ID);
 				if (tourId instanceof Long) {
 					tourData = TourManager.getInstance().getTourData((Long) tourId);
 					if (tourData == null) {
@@ -1856,7 +1856,7 @@ public class TourManager {
 				final float[] altitudeValues = ((ChartDataYSerie) (customDataAltitude)).getHighValuesFloat()[0];
 
 				TourData tourData = null;
-				final Object tourId = chartModel.getCustomData(TourManager.CUSTOM_DATA_TOUR_ID);
+				final Object tourId = chartModel.getCustomData(Chart.CUSTOM_DATA_TOUR_ID);
 				if (tourId instanceof Long) {
 					tourData = TourManager.getInstance().getTourData((Long) tourId);
 					if (tourData == null) {
@@ -2579,7 +2579,7 @@ public class TourManager {
 		chartDataModel.setCustomData(CUSTOM_DATA_DISTANCE, xDataDist);
 
 		chartDataModel.setCustomData(CUSTOM_DATA_TOUR_DATA, tourData);
-		chartDataModel.setCustomData(CUSTOM_DATA_TOUR_ID, tourData.getTourId());
+		chartDataModel.setCustomData(Chart.CUSTOM_DATA_TOUR_ID, tourData.getTourId());
 
 		chartDataModel.setCustomData(CUSTOM_DATA_TOUR_CHART_CONFIGURATION, tourChartConfig);
 
@@ -2644,7 +2644,9 @@ public class TourManager {
 		final ChartSegments chartSegments = new ChartSegments();
 		chartSegments.valueStart = segmentStartValue;
 		chartSegments.valueEnd = segmentEndValue;
+
 		chartSegments.segmentTitle = tourData.multipleTourTitles;
+		chartSegments.segmentCustomData = tourData.multipleTourIds;
 
 		xData.setChartSegments(chartSegments);
 	}

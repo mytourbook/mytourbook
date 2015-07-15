@@ -24,6 +24,7 @@ public class ChartSegments {
 	public long[]	valueEnd;
 
 	public String[]	segmentTitle;
+	public Object[]	segmentCustomData;
 
 	public int		allValues;
 

@@ -37,7 +37,6 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.Monitor;
 
 /**
  * Tour info tooltip, implemented custom tooltip similar like
@@ -121,64 +120,6 @@ public abstract class ColumnViewerTourInfoToolTip extends ToolTip implements ITo
 		return container;
 	}
 
-	/**
-	 * @param tipSize
-	 * @param ttTopLeft
-	 *            Top/left location for the hovered area relativ to the display
-	 * @param devXAdjusted
-	 * @return
-	 */
-	protected Point fixupDisplayBounds(final Point tipSize, final Point ttTopLeft) {
-
-		Rectangle displayBounds;
-		final Monitor[] allMonitors = _ttControl.getDisplay().getMonitors();
-
-		if (allMonitors.length > 1) {
-
-			// By default present in the monitor of the control
-			displayBounds = _ttControl.getMonitor().getBounds();
-			final Point topLeft2 = new Point(ttTopLeft.x, ttTopLeft.y);
-
-			// Search on which monitor the event occurred
-			Rectangle monitorBounds;
-			for (final Monitor monitor : allMonitors) {
-				monitorBounds = monitor.getBounds();
-				if (monitorBounds.contains(topLeft2)) {
-					displayBounds = monitorBounds;
-					break;
-				}
-			}
-
-		} else {
-			displayBounds = _ttControl.getDisplay().getBounds();
-		}
-
-		final Point bottomRight = new Point(//
-				ttTopLeft.x + tipSize.x,
-				ttTopLeft.y + tipSize.y);
-
-		if (!(displayBounds.contains(ttTopLeft) && displayBounds.contains(bottomRight))) {
-
-			if (bottomRight.x > displayBounds.x + displayBounds.width) {
-				ttTopLeft.x -= bottomRight.x - (displayBounds.x + displayBounds.width);
-			}
-
-			if (bottomRight.y > displayBounds.y + displayBounds.height) {
-				ttTopLeft.y -= bottomRight.y - (displayBounds.y + displayBounds.height);
-			}
-
-			if (ttTopLeft.x < displayBounds.x) {
-				ttTopLeft.x += displayBounds.x;
-			}
-
-			if (ttTopLeft.y < displayBounds.y) {
-				ttTopLeft.y = displayBounds.y;
-			}
-		}
-
-		return ttTopLeft;
-	}
-
 	@Override
 	public Point getLocation(final Point tipSize, final Event event) {
 
@@ -239,7 +180,7 @@ public abstract class ColumnViewerTourInfoToolTip extends ToolTip implements ITo
 				ttDisplayLocation.y = ttDisplayLocation.y - tipSizeHeight - cellHeight;
 			}
 
-			return fixupDisplayBounds(tipSize, ttDisplayLocation);
+			return fixupDisplayBoundsWithMonitor(tipSize, ttDisplayLocation);
 		}
 
 		return super.getLocation(tipSize, event);
@@ -266,6 +207,11 @@ public abstract class ColumnViewerTourInfoToolTip extends ToolTip implements ITo
 	}
 
 	@Override
+	public void hideToolTip() {
+		hide();
+	}
+
+	@Override
 	public void paint(final GC gc, final Rectangle clientArea) {
 		// not used
 	}
@@ -274,10 +220,6 @@ public abstract class ColumnViewerTourInfoToolTip extends ToolTip implements ITo
 	public boolean setHoveredLocation(final int x, final int y) {
 		// not used
 		return false;
-	}
-
-	protected void setTourId(final Long tourId) {
-		_tourId = tourId;
 	}
 
 	@Override
@@ -306,7 +248,7 @@ public abstract class ColumnViewerTourInfoToolTip extends ToolTip implements ITo
 			tourId = ((IColumnViewerTourIdProvider) labelProvider).getTourId(_viewerCell);
 		}
 
-		setTourId(tourId);
+		_tourId = tourId;
 
 		if (tourId == null) {
 			// show default tooltip

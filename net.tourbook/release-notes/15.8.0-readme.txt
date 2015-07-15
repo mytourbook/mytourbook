@@ -7,26 +7,28 @@ New
 
 Tour Chart
 - Show/navigate multiple tours.
+- Title tooltip for each tour.
 
 
 Improvements
 ============	
 
 * FIT Import
-  - Ignore tour markers at the end of the tour, can be configured in the Fit pref pages
-  
-  - Replace time slices when it exceeds a selected duration.
-    This fixes a device bug because the .fit file contained a time slice with more than 17 years.
+- Ignore tour markers at the end of the tour, can be configured in the Fit pref pages
+- Replace time slices when it exceeds a selected duration.
+  This fixes a device bug because the .fit file contained a time slice with more than 17 years.
 	 
 
-Map2
+* Map2
 - Draw map scale with rounded units and without black/white color (I always puzzled how to interpret the scale colors).
 - Prevent redrawing for multiple tours.
 
+* Tour Editor
+- Customize number of displayed digits for the lat/lon column values.
  
 Bugfix
 ======	
 
 * Photo
-  - Fixed ArrayIndexOutOfBoundsException when tour contains only 1 time slice.
+- Fixed ArrayIndexOutOfBoundsException when tour contains only 1 time slice.
    

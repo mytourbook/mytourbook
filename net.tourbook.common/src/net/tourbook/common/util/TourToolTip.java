@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -82,8 +82,8 @@ public class TourToolTip extends ToolTip {
 		}
 
 		final Object[] listeners = _hideListeners.getListeners();
-		for (int i = 0; i < listeners.length; ++i) {
-			((IToolTipHideListener) listeners[i]).afterHideToolTip(event);
+		for (final Object listener2 : listeners) {
+			((IToolTipHideListener) listener2).afterHideToolTip(event);
 		}
 
 		/*
@@ -255,6 +255,7 @@ public class TourToolTip extends ToolTip {
 	 * @param hoveredAreaContext
 	 */
 	public void setHoveredContext(final HoveredAreaContext hoveredAreaContext) {
+
 		_hoveredContext = hoveredAreaContext;
 //
 //		System.out.println(System.currentTimeMillis() + " setHoveredContext()\t" + _hoveredContext);

@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.ui.tourChart.action;
 
+import net.tourbook.chart.Chart;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.tour.TourManager;
@@ -38,7 +39,7 @@ public class ActionConvertIntoSharedMarker_DISABLED extends Action {
 	public void run() {
 
 		TourData tourData = null;
-		final Object tourId = _tourChart.getChartDataModel().getCustomData(TourManager.CUSTOM_DATA_TOUR_ID);
+		final Object tourId = _tourChart.getChartDataModel().getCustomData(Chart.CUSTOM_DATA_TOUR_ID);
 		if (tourId instanceof Long) {
 			tourData = TourManager.getInstance().getTourData((Long) tourId);
 		}

@@ -376,6 +376,7 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 		final double[] toLatitudeSerie = multiTourData.latitudeSerie = new double[numberOfTimeSlices];
 		final double[] toLongitudeSerie = multiTourData.longitudeSerie = new double[numberOfTimeSlices];
 
+		final Long[] allTourId = multiTourData.multipleTourIds = new Long[numberOfTours];
 		final int[] allStartIndex = multiTourData.multipleTourStartIndex = new int[numberOfTours];
 		final long[] allStartTime = multiTourData.multipleTourStartTime = new long[numberOfTours];
 		final String[] allTourTitle = multiTourData.multipleTourTitles = new String[numberOfTours];
@@ -446,6 +447,8 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 			if (fromLongitudeSerie != null) {
 				System.arraycopy(fromLongitudeSerie, 0, toLongitudeSerie, toStartIndex, fromSerieLength);
 			}
+
+			allTourId[tourIndex] = fromTourData.getTourId();
 
 			final ArrayList<TourMarker> fromTourMarker = fromTourData.getTourMarkersSorted();
 			allTourMarker.addAll(fromTourMarker);
@@ -713,7 +716,7 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 
 				if (chartDataModel != null) {
 
-					final Object tourId = chartDataModel.getCustomData(TourManager.CUSTOM_DATA_TOUR_ID);
+					final Object tourId = chartDataModel.getCustomData(Chart.CUSTOM_DATA_TOUR_ID);
 					if (tourId instanceof Long) {
 
 						final TourData tourData = TourManager.getInstance().getTourData((Long) tourId);
@@ -743,7 +746,7 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 
 					// it's not the same chart, check if it's the same tour
 
-					final Object tourId = chart.getChartDataModel().getCustomData(TourManager.CUSTOM_DATA_TOUR_ID);
+					final Object tourId = chart.getChartDataModel().getCustomData(Chart.CUSTOM_DATA_TOUR_ID);
 					if (tourId instanceof Long) {
 
 						final TourData tourData = TourManager.getInstance().getTourData((Long) tourId);

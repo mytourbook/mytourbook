@@ -31,8 +31,8 @@ public class ChartMouseEvent {
 	public boolean		isWorked;
 
 	public int			devXMouse;
-	public int			devYMouse;
 
+	public int			devYMouse;
 	/**
 	 * This cursor is displayed when {@link #isWorked} is <code>true</code>, can be
 	 * <code>null</code> which shows the default cursor.
@@ -49,5 +49,17 @@ public class ChartMouseEvent {
 
 		devXMouse = eventMouseX;
 		devYMouse = eventMouseY;
+	}
+
+	@Override
+	public String toString() {
+		return "ChartMouseEvent ["
+				+ ("eventTime=" + eventTime + ", ")
+				+ ("type=" + type + ", ")
+				+ ("isWorked=" + isWorked + ", ")
+				+ ("devXMouse=" + devXMouse + ", ")
+				+ ("devYMouse=" + devYMouse + ", ")
+				+ ("cursor=" + cursor)
+				+ "]";
 	}
 }

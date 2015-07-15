@@ -1116,6 +1116,12 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 	public boolean												isMultipleTours;
 
 	/**
+	 * Contains the tour id's
+	 */
+	@Transient
+	public Long[]												multipleTourIds;
+
+	/**
 	 * Contains the tour start index in the data series for each tour.
 	 */
 	@Transient

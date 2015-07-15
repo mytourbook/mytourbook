@@ -44,6 +44,7 @@ import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.map.GeoPosition;
 import net.tourbook.common.util.HoveredAreaContext;
 import net.tourbook.common.util.IToolTipHideListener;
+import net.tourbook.common.util.IToolTipProvider;
 import net.tourbook.common.util.ITourToolTipProvider;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.TourToolTip;
@@ -3961,7 +3962,7 @@ public class Map extends Canvas {
 		paint();
 	}
 
-	public void setPOI(final ITourToolTipProvider tourToolTipProvider, final TourWayPoint twp) {
+	public void setPOI(final IToolTipProvider tourToolTipProvider, final TourWayPoint twp) {
 
 		// display poi in the center of the map which make it also visible
 		setMapCenter(twp.getPosition());
@@ -4315,7 +4316,7 @@ public class Map extends Canvas {
 		/*
 		 * check tour info tool tip provider as first
 		 */
-		for (final ITourToolTipProvider tttProvider : toolTipProvider) {
+		for (final IToolTipProvider tttProvider : toolTipProvider) {
 
 			if (tttProvider instanceof IInfoToolTipProvider) {
 
@@ -4335,7 +4336,7 @@ public class Map extends Canvas {
 		 */
 		if (newHoveredContext == null) {
 
-			for (final ITourToolTipProvider tttProvider : toolTipProvider) {
+			for (final IToolTipProvider tttProvider : toolTipProvider) {
 
 				if (tttProvider instanceof IMapToolTipProvider) {
 

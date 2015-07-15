@@ -5126,7 +5126,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			final ChartDataModel chartDataModel = ((SelectionChartInfo) selection).chartDataModel;
 			if (chartDataModel != null) {
 
-				final Object tourId = chartDataModel.getCustomData(TourManager.CUSTOM_DATA_TOUR_ID);
+				final Object tourId = chartDataModel.getCustomData(Chart.CUSTOM_DATA_TOUR_ID);
 				if (tourId instanceof Long) {
 
 					final TourData tourData = getTourData((Long) tourId);
@@ -5238,7 +5238,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			final ChartDataModel chartDataModel = chartInfo.chartDataModel;
 			if (chartDataModel != null) {
 
-				final Object tourId = chartDataModel.getCustomData(TourManager.CUSTOM_DATA_TOUR_ID);
+				final Object tourId = chartDataModel.getCustomData(Chart.CUSTOM_DATA_TOUR_ID);
 				if (tourId instanceof Long) {
 
 					final TourData tourData = getTourData((Long) tourId);
@@ -5267,7 +5267,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 				final ChartDataModel chartDataModel = chart.getChartDataModel();
 				if (chartDataModel != null) {
 
-					final Object tourId = chartDataModel.getCustomData(TourManager.CUSTOM_DATA_TOUR_ID);
+					final Object tourId = chartDataModel.getCustomData(Chart.CUSTOM_DATA_TOUR_ID);
 					if (tourId instanceof Long) {
 
 						final TourData tourData = getTourData((Long) tourId);
