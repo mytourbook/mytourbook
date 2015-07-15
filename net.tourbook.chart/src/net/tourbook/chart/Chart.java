@@ -1018,6 +1018,10 @@ public class Chart extends ViewForm {
 		_hoveredListener = hoveredValuePointListener;
 	}
 
+	public void setHoveredTitle(final ChartTitle hoveredTitle) {
+		_chartComponents.getChartComponentGraph().setHoveredTitle(hoveredTitle);
+	}
+
 	/**
 	 * Sets the mouse mode, when <code>true</code> the mode {@link #MOUSE_MODE_SLIDER} is active,
 	 * this is the default

@@ -26,6 +26,7 @@ import net.tourbook.chart.ChartType;
 import net.tourbook.chart.GraphDrawingData;
 import net.tourbook.chart.IChartLayer;
 import net.tourbook.chart.IChartOverlay;
+import net.tourbook.common.UI;
 
 import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.swt.SWT;
@@ -387,10 +388,14 @@ public class ChartLayerPhoto implements IChartLayer, IChartOverlay {
 	/**
 	 * Draw photos into the current graph.
 	 */
+	@Override
 	public void draw(	final GC gc,
 						final GraphDrawingData graphDrawingData,
 						final Chart chart,
 						final PixelConverter pixelConverter) {
+
+		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") + ("\tdraw"));
+		// TODO remove SYSTEM.OUT.PRINTLN
 
 		_display = Display.getCurrent();
 
@@ -679,10 +684,10 @@ public class ChartLayerPhoto implements IChartLayer, IChartOverlay {
 		_bgColorTour = bgColorTour;
 	}
 
-	void setHoveredData(final PhotoCategory hoveredPhotoCategory, final PhotoPaintGroup hoveredPhotoGroup) {
+	void setHoveredData(final PhotoCategory hoveredPhotoCategory, final PhotoPaintGroup hoveredPaintGroup) {
 
 		_hoveredPhotoCategory = hoveredPhotoCategory;
-		_hoveredPaintGroup = hoveredPhotoGroup;
+		_hoveredPaintGroup = hoveredPaintGroup;
 	}
 
 }

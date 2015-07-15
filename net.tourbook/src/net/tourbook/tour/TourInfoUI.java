@@ -215,6 +215,8 @@ public class TourInfoUI {
 
 		final Composite container = createUI(parent);
 
+//		_ttContainer.setRedraw(false);
+
 		updateUI();
 		enableControls();
 
@@ -222,6 +224,8 @@ public class TourInfoUI {
 		_ttContainer.layout(true, true);
 		UI.setEqualizeColumWidths(_firstColumnControls, 5);
 		UI.setEqualizeColumWidths(_secondColumnControls);
+
+//		_ttContainer.setRedraw(true);
 
 		return container;
 	}

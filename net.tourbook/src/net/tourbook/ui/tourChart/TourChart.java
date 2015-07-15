@@ -208,6 +208,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
 	private long						_hoveredTitleEventTime;
 	private boolean						_isTitleHovered;
+	private ChartTitle					_hoveredTitle;
 
 	/*
 	 * UI controls
@@ -1463,9 +1464,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
 			// marker layer is not displayed
 
-			if (_layerMarker != null) {
-				hideMarkerLayer();
-			}
+			hideMarkerLayer();
 
 			return;
 		}
@@ -1634,13 +1633,21 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 			/*
 			 * at least 1 photo is available
 			 */
-			_layerPhoto = new ChartLayerPhoto(chartPhotoGroups);
-			_layerPhoto.setBackgroundColor(_photoOverlayBGColorLink, _photoOverlayBGColorTour);
 
-			// set overlay painter
-			addChartOverlay(_layerPhoto);
+			/*
+			 * The old photo layer can still be available. This happens because the action button is
+			 * a three state button.
+			 */
+			if (_layerPhoto == null) {
 
-			addMouseChartListener(_mousePhotoListener);
+				_layerPhoto = new ChartLayerPhoto(chartPhotoGroups);
+				_layerPhoto.setBackgroundColor(_photoOverlayBGColorLink, _photoOverlayBGColorTour);
+
+				// set overlay painter
+				addChartOverlay(_layerPhoto);
+
+				addMouseChartListener(_mousePhotoListener);
+			}
 
 			if (isTimeSerie == false && isHistorySerie) {
 				// hide x slider in history chart
@@ -1653,13 +1660,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 			return;
 		}
 
-		if (_layerPhoto != null) {
-
-			// disable photo layer
-
-			removeChartOverlay(_layerPhoto);
-			_layerPhoto = null;
-		}
+		hidePhotoLayer();
 	}
 
 	/**
@@ -2138,8 +2139,11 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 	 */
 	private void hideMarkerLayer() {
 
-		removeChartOverlay(_layerMarker);
-		_layerMarker = null;
+		if (_layerMarker != null) {
+
+			removeChartOverlay(_layerMarker);
+			_layerMarker = null;
+		}
 
 		removeMouseChartListener(_mouseMarkerListener);
 	}
@@ -2150,6 +2154,17 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		_selectedTourMarker = null;
 
 		_markerTooltip.hideNow();
+	}
+
+	private void hidePhotoLayer() {
+
+		if (_layerPhoto != null) {
+
+			removeChartOverlay(_layerPhoto);
+			_layerPhoto = null;
+		}
+
+		removeMouseChartListener(_mousePhotoListener);
 	}
 
 	private void onDispose() {
@@ -2343,13 +2358,21 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 	}
 
 	private void onTitleChartResized() {
-		// TODO Auto-generated method stub
 
+		_hoveredTitle = null;
+
+		setHoveredTitle(null);
+
+		_tourTitleToolTipProvider.hide();
 	}
 
 	private void onTitleMouseExit() {
-		// TODO Auto-generated method stub
 
+		_hoveredTitle = null;
+
+		setHoveredTitle(null);
+
+		_tourTitleToolTipProvider.hide();
 	}
 
 	private void onTitleMouseMove(final ChartMouseEvent mouseEvent) {
@@ -2380,7 +2403,16 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 			mouseEvent.cursor = ChartCursor.Arrow;
 		}
 
-		_tourTitleToolTipProvider.open(hoveredTitle);
+		if (_hoveredTitle != hoveredTitle) {
+
+			// hovered title has changed
+
+			_hoveredTitle = hoveredTitle;
+
+			setHoveredTitle(hoveredTitle);
+
+			_tourTitleToolTipProvider.open(hoveredTitle);
+		}
 	}
 
 	public void partIsDeactivated() {
@@ -3030,7 +3062,10 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		// set current tour data and chart config to new values
 		_tourData = newTourData;
 		_tcc = newChartConfig;
+
+		// cleanup old data
 		_selectedTourMarker = null;
+		hidePhotoLayer();
 
 		final ChartDataModel newChartDataModel = TourManager.getInstance().createChartDataModel(
 				_tourData,
