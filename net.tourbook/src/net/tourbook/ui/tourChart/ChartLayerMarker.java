@@ -535,7 +535,7 @@ public class ChartLayerMarker implements IChartLayer, IChartOverlay {
 	}
 
 	/**
-	 * This paints the hovered marker.
+	 * This is painting the hovered marker.
 	 * <p>
 	 * {@inheritDoc}
 	 */

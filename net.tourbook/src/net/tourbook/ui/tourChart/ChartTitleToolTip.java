@@ -17,11 +17,10 @@ package net.tourbook.ui.tourChart;
 
 import java.util.ArrayList;
 
-import net.tourbook.Messages;
 import net.tourbook.chart.ChartComponentGraph;
 import net.tourbook.chart.ChartTitle;
 import net.tourbook.common.UI;
-import net.tourbook.common.tooltip.AnimatedToolTipShell;
+import net.tourbook.common.tooltip.AnimatedToolTipShell2;
 import net.tourbook.common.util.IToolTipProvider;
 import net.tourbook.data.TourData;
 import net.tourbook.tour.TourInfoUI;
@@ -38,51 +37,18 @@ import org.eclipse.swt.widgets.Composite;
 /**
  * created: 13.07.2015
  */
-public class ChartTitleToolTip extends AnimatedToolTipShell implements ITourProvider, IToolTipProvider {
+public class ChartTitleToolTip extends AnimatedToolTipShell2 implements ITourProvider, IToolTipProvider {
 
-	/**
-	 * Visual position for marker tooltip, they must correspond to the position id
-	 * TOOLTIP_POSITION_*.
-	 */
-	public static final String[]	TOOLTIP_POSITIONS;
+	private TourChart			_tourChart;
 
-	static {
-
-		TOOLTIP_POSITIONS = new String[] { //
-		//
-			Messages.Tour_Marker_TooltipPosition_Left, // 				0
-			Messages.Tour_Marker_TooltipPosition_Right, // 				1
-			Messages.Tour_Marker_TooltipPosition_Top, // 				2
-			Messages.Tour_Marker_TooltipPosition_Bottom, // 			3
-			Messages.Tour_Marker_TooltipPosition_ChartTop, // 			4
-			Messages.Tour_Marker_TooltipPosition_ChartBottom, // 		5
-		};
-	}
-
-	private static final int		TOOLTIP_POSITION_LEFT			= 0;
-	private static final int		TOOLTIP_POSITION_RIGHT			= 1;
-	private static final int		TOOLTIP_POSITION_ABOVE			= 2;
-	private static final int		TOOLTIP_POSITION_BELOW			= 3;
-	private static final int		TOOLTIP_POSITION_CHART_TOP		= 4;
-	private static final int		TOOLTIP_POSITION_CHART_BOTTOM	= 5;
-
-	public static final int			DEFAULT_TOOLTIP_POSITION		= TOOLTIP_POSITION_BELOW;
-
-	private TourChart				_tourChart;
-
-	private ChartTitle				_hoveredTitle;
-
-	/**
-	 * When <code>true</code> the actions are displayed, e.g. to open the marker dialog.
-	 */
-	private boolean					_isShowActions;
-
-//	private ChartMarkerConfig		_cmc;
+	private ChartTitle			_hoveredTitle;
 
 	/*
 	 * UI resources
 	 */
-	private final TourInfoUI		_tourInfoUI						= new TourInfoUI();
+	private final TourInfoUI	_tourInfoUI	= new TourInfoUI();
+
+	private Long				_hoveredTourId;
 
 	public ChartTitleToolTip(final TourChart tourChart) {
 
@@ -94,7 +60,7 @@ public class ChartTitleToolTip extends AnimatedToolTipShell implements ITourProv
 //		setIsAnimateLocation(false);
 
 		setFadeInSteps(10);
-		setFadeOutSteps(20);
+		setFadeOutSteps(10);
 		setFadeOutDelaySteps(10);
 	}
 
@@ -106,6 +72,7 @@ public class ChartTitleToolTip extends AnimatedToolTipShell implements ITourProv
 		 * not when nothing is hovered. This ensures that the tooltip has a valid state.
 		 */
 		_hoveredTitle = null;
+
 	}
 
 	@Override
@@ -147,12 +114,9 @@ public class ChartTitleToolTip extends AnimatedToolTipShell implements ITourProv
 
 			// tour data is available
 
-			ui = _tourInfoUI.createContentArea(parent, tourData, this, this);
+			_tourInfoUI.setActionsEnabled(true);
 
-			// allow the actions to be selected
-//			if (_tourToolTip != null) {
-//				_tourToolTip.setHideOnMouseDown(false);
-//			}
+			ui = _tourInfoUI.createContentArea(parent, tourData, this, this);
 		}
 		return ui;
 	}
@@ -160,8 +124,10 @@ public class ChartTitleToolTip extends AnimatedToolTipShell implements ITourProv
 	@Override
 	public ArrayList<TourData> getSelectedTours() {
 
+		final TourData tourData = TourManager.getInstance().getTourData(_hoveredTourId);
+
 		final ArrayList<TourData> tours = new ArrayList<TourData>();
-		tours.add(_tourChart.getTourData());
+		tours.add(tourData);
 
 		return tours;
 	}
@@ -180,7 +146,7 @@ public class ChartTitleToolTip extends AnimatedToolTipShell implements ITourProv
 //		final int devHoverSize = _hoveredTitle.devHoverSize;
 
 		final int devYTop = _hoveredTitle.devYTop;
-		final int devYBottom = _hoveredTitle.devYBottom;
+//		final int devYBottom = _hoveredTitle.devYBottom;
 
 		final int tipWidth = tipSize.x;
 		final int tipHeight = tipSize.y;
@@ -211,13 +177,6 @@ public class ChartTitleToolTip extends AnimatedToolTipShell implements ITourProv
 
 		// check display bounds
 		final ChartComponentGraph chartComponentGraph = _tourChart.getChartComponents().getChartComponentGraph();
-//		final Point dispPos = chartComponentGraph.toDisplay(ttPosX, ttPosY);
-
-//		if (dispPos.x < 0) {
-//
-//			// tooltip is outside of the display, set tooltip to the right of the tour marker
-//			ttPosX = devHoveredRight + 1;
-//		}
 
 		final Point graphLocation = chartComponentGraph.toDisplay(0, 0);
 		final Point ttLocation = chartComponentGraph.toDisplay(ttPosX, ttPosY);
@@ -233,7 +192,7 @@ public class ChartTitleToolTip extends AnimatedToolTipShell implements ITourProv
 			final int displayX = displayBounds.x;
 			final int displayY = displayBounds.y;
 			final int displayWidth = displayBounds.width;
-			final int displayHeight = displayBounds.height;
+//			final int displayHeight = displayBounds.height;
 
 			if (ttLocation.x < displayX) {
 				ttLocation.x = displayX;
@@ -302,6 +261,7 @@ public class ChartTitleToolTip extends AnimatedToolTipShell implements ITourProv
 			// another marker is hovered, show tooltip
 
 			_hoveredTitle = hoveredTitle;
+			_hoveredTourId = hoveredTitle.tourId;
 
 			showToolTip();
 		}

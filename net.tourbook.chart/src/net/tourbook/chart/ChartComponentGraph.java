@@ -1851,7 +1851,7 @@ public class ChartComponentGraph extends Canvas {
 			final long[] valueStart = chartSegments.valueStart;
 			final long[] valueEnd = chartSegments.valueEnd;
 			final String[] segmentTitles = chartSegments.segmentTitle;
-			final Object[] segmentTourIds = chartSegments.segmentCustomData;
+			final Object[] segmentCustomData = chartSegments.segmentCustomData;
 
 			final boolean isZoomed = getZoomRatio() > 1.0;
 
@@ -1914,11 +1914,11 @@ public class ChartComponentGraph extends Canvas {
 
 						gc.drawText(segmentTitle, devXTitle, devYTitle, false);
 
-						if (segmentTourIds[segmentIndex] instanceof Long) {
+						if (segmentCustomData != null && segmentCustomData[segmentIndex] instanceof Long) {
 
 							final ChartTitle chartTitle = new ChartTitle();
 
-							chartTitle.tourId = (Long) segmentTourIds[segmentIndex];
+							chartTitle.tourId = (Long) segmentCustomData[segmentIndex];
 
 							chartTitle.devX = devXTitle;
 							chartTitle.devY = devYTitle;
@@ -1970,7 +1970,7 @@ public class ChartComponentGraph extends Canvas {
 			if (tourIdObject instanceof Long) {
 
 				final ChartTitle chartTitle = new ChartTitle();
-				
+
 				chartTitle.tourId = (Long) tourIdObject;
 
 				chartTitle.devX = devXTitle;
