@@ -154,6 +154,12 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 				ITourbookPreferences.GRAPH_MARKER_COLOR_HIDDEN,
 				new RGB(0x24, 0x9C, 0xFF));
 
+		// tour info
+		store.setDefault(ITourbookPreferences.GRAPH_TOUR_INFO_IS_VISIBLE, true);
+		store.setDefault(ITourbookPreferences.GRAPH_TOUR_INFO_IS_TITLE_VISIBLE, true);
+		store.setDefault(ITourbookPreferences.GRAPH_TOUR_INFO_IS_TOOLTIP_VISIBLE, true);
+		store.setDefault(ITourbookPreferences.GRAPH_TOUR_INFO_TOOLTIP_DELAY, 200);
+
 		// is photo visible
 		store.setDefault(ITourbookPreferences.GRAPH_IS_TOUR_PHOTO_VISIBLE, true);
 		store.setDefault(ITourbookPreferences.GRAPH_IS_TOUR_PHOTO_TOOLTIP_VISIBLE, true);

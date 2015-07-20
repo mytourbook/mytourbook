@@ -730,8 +730,6 @@ public class Messages extends NLS {
 	public static String		Image__synch_statistics_Disabled;
 	public static String		Image__SearchExternal;
 	public static String		Image__SearchExternal_Disabled;
-
-	//	public static String		Image__Symbol_Difference;
 	public static String		Image__Synced;
 	public static String		Image__tag;
 	public static String		Image__tag_category;
@@ -745,11 +743,11 @@ public class Messages extends NLS {
 	public static String		Image__TourBook_SelectAll;
 	public static String		Image__TourBook_Week;
 	public static String		Image__TourChart;
+	public static String		Image__TourInfo;
+	public static String		Image__TourInfo_Disabled;
 	public static String		Image__TourMarker;
 	public static String		Image__TourSegments;
 	public static String		Image__TourSegments_Disabled;
-
-//	public static String		Image__TourSignImport;
 	public static String		Image__undo_edit;
 	public static String		Image__undo_edit_disabled;
 	public static String		Image__undo_tour_type_filter;
@@ -1226,6 +1224,14 @@ public class Messages extends NLS {
 //	public static String		Slideout_ChartMarkerOptions_Label_SignImageSize;
 //	public static String		Slideout_ChartMarkerOptions_Label_SignImageSize_Tooltip;
 
+	public static String	Slideout_TourInfoOptions_Checkbox_IsShowInfoTooltip;
+
+	public static String	Slideout_TourInfoOptions_Checkbox_IsShowTourTitle;
+
+	public static String	Slideout_TourInfoOptions_Label_TooltipDelay;
+
+	public static String	Slideout_TourInfoOptions_Label_TooltipDelay_Tooltip;
+
 	public static String		Slideout_TourMarkerFilter_Checkbox_IsReduceLatLonDigits;
 	public static String		Slideout_TourMarkerFilter_Checkbox_IsReduceLatLonDigits_Tooltip;
 	public static String		Slideout_TourMarkerFilter_Label_GeoFilter;
@@ -1295,7 +1301,6 @@ public class Messages extends NLS {
 	public static String		Tour_Action_Marker_PositionVertical;
 	public static String		Tour_Action_Marker_SetHidden;
 	public static String		Tour_Action_Marker_SetLabelPosition;
-//	public static String		Tour_Action_Marker_SetMarkerImage;
 	public static String		Tour_Action_Marker_SetVisible;
 	public static String		Tour_Action_MarkerOptions_Tooltip;
 	public static String		Tour_Action_scroll_zoomed_chart;
@@ -1307,6 +1312,7 @@ public class Messages extends NLS {
 	public static String		Tour_Action_ShowBreaktimeValues;
 	public static String		Tour_Action_ShowHrZones_Tooltip;
 	public static String		Tour_Action_ShowTourMarker;
+	public static String		Tour_Action_TourInfo_Tooltip;
 	public static String		Tour_Action_TourPhotos;
 	public static String		Tour_Action_TourPhotosWithoutTooltip_Tooltip;
 	public static String		Tour_Action_TourPhotosWithTooltip_Tooltip;

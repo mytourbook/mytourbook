@@ -176,7 +176,9 @@ public class ChartMarkerToolTip extends AnimatedToolTipShell implements ITourPro
 
 		_tourChart = tourChart;
 
+		setReceiveMouseExitEvent(true);
 		setReceiveMouseMoveEvent(true);
+
 		setIsShowShellTrimStyle(false);
 		setIsAnimateLocation(false);
 	}
@@ -796,6 +798,16 @@ public class ChartMarkerToolTip extends AnimatedToolTipShell implements ITourPro
 		_colorCache.dispose();
 
 		_firstColumnControls.clear();
+	}
+
+	@Override
+	protected void onMouseExitToolTip(final MouseEvent mouseEvent) {
+
+		/*
+		 * When exit tooltip, hide hovered label
+		 */
+		final ChartLayerMarker markerLayer = _tourChart.getLayerTourMarker();
+		markerLayer.setTooltipLabel(null);
 	}
 
 	@Override

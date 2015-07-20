@@ -26,7 +26,6 @@ import net.tourbook.chart.ChartType;
 import net.tourbook.chart.GraphDrawingData;
 import net.tourbook.chart.IChartLayer;
 import net.tourbook.chart.IChartOverlay;
-import net.tourbook.common.UI;
 
 import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.swt.SWT;
@@ -393,9 +392,6 @@ public class ChartLayerPhoto implements IChartLayer, IChartOverlay {
 						final GraphDrawingData graphDrawingData,
 						final Chart chart,
 						final PixelConverter pixelConverter) {
-
-		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") + ("\tdraw"));
-		// TODO remove SYSTEM.OUT.PRINTLN
 
 		_display = Display.getCurrent();
 

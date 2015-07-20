@@ -18,7 +18,7 @@ package net.tourbook.ui.tourChart;
 import java.util.ArrayList;
 
 import net.tourbook.chart.ChartComponentGraph;
-import net.tourbook.chart.ChartTitle;
+import net.tourbook.chart.TourSegment;
 import net.tourbook.common.UI;
 import net.tourbook.common.tooltip.AnimatedToolTipShell2;
 import net.tourbook.common.util.IToolTipProvider;
@@ -29,7 +29,6 @@ import net.tourbook.ui.ITourProvider;
 
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
-import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
@@ -41,7 +40,7 @@ public class ChartTitleToolTip extends AnimatedToolTipShell2 implements ITourPro
 
 	private TourChart			_tourChart;
 
-	private ChartTitle			_hoveredTitle;
+	private TourSegment			_hoveredTour;
 
 	/*
 	 * UI resources
@@ -56,12 +55,14 @@ public class ChartTitleToolTip extends AnimatedToolTipShell2 implements ITourPro
 
 		_tourChart = tourChart;
 
-		setReceiveMouseMoveEvent(true);
-//		setIsAnimateLocation(false);
-
-		setFadeInSteps(10);
-		setFadeOutSteps(10);
+		setFadeInSteps(20);
+		setFadeOutSteps(20);
 		setFadeOutDelaySteps(10);
+	}
+
+	void actionQuickEditTour() {
+
+		_tourInfoUI.actionQuickEditTour();
 	}
 
 	@Override
@@ -71,20 +72,20 @@ public class ChartTitleToolTip extends AnimatedToolTipShell2 implements ITourPro
 		 * This is the tricky part that the hovered marker is reset before the tooltip is closed and
 		 * not when nothing is hovered. This ensures that the tooltip has a valid state.
 		 */
-		_hoveredTitle = null;
+		_hoveredTour = null;
 
 	}
 
 	@Override
 	protected boolean canShowToolTip() {
 
-		return _hoveredTitle != null;
+		return _hoveredTour != null;
 	}
 
 	@Override
 	protected Composite createToolTipContentArea(final Composite shell) {
 
-		if (_hoveredTitle == null) {
+		if (_hoveredTour == null) {
 			return null;
 		}
 
@@ -102,7 +103,7 @@ public class ChartTitleToolTip extends AnimatedToolTipShell2 implements ITourPro
 
 		Composite ui;
 
-		final TourData tourData = TourManager.getInstance().getTourData(_hoveredTitle.tourId);
+		final TourData tourData = TourManager.getInstance().getTourData(_hoveredTour.tourId);
 
 		if (tourData == null) {
 
@@ -139,14 +140,12 @@ public class ChartTitleToolTip extends AnimatedToolTipShell2 implements ITourPro
 	@Override
 	public Point getToolTipLocation(final Point tipSize) {
 
-		final int devHoveredX = _hoveredTitle.devX;
-		int devHoveredY = _hoveredTitle.devY;
-		final int devHoveredWidth = _hoveredTitle.width;
-		final int devHoveredHeight = _hoveredTitle.height;
-//		final int devHoverSize = _hoveredTitle.devHoverSize;
+		final int devHoveredX = _hoveredTour.devXTitle;
+		int devHoveredY = _hoveredTour.devYTitle;
+		final int devHoveredWidth = _hoveredTour.titleWidth;
+		final int devHoveredHeight = _hoveredTour.titleHeight;
 
-		final int devYTop = _hoveredTitle.devYTop;
-//		final int devYBottom = _hoveredTitle.devYBottom;
+		final int devYTop = _hoveredTour.devYGraphTop;
 
 		final int tipWidth = tipSize.x;
 		final int tipHeight = tipSize.y;
@@ -161,7 +160,7 @@ public class ChartTitleToolTip extends AnimatedToolTipShell2 implements ITourPro
 
 		// position tooltip above the chart
 		ttPosX = devHoveredX + devHoveredWidth / 2 - tipWidth / 2;
-		ttPosY = 0 - tipHeight + 1;
+		ttPosY = -tipHeight + 1;
 
 		// ckeck if tooltip is left to the chart border
 		if (ttPosX + tipWidth < 0) {
@@ -169,10 +168,10 @@ public class ChartTitleToolTip extends AnimatedToolTipShell2 implements ITourPro
 			// set tooltip to the graph left border
 			ttPosX = -tipWidth - 1;
 
-		} else if (ttPosX > _hoveredTitle.devGraphWidth) {
+		} else if (ttPosX > _hoveredTour.devGraphWidth) {
 
 			// set tooltip to the graph right border
-			ttPosX = _hoveredTitle.devGraphWidth;
+			ttPosX = _hoveredTour.devGraphWidth;
 		}
 
 		// check display bounds
@@ -219,21 +218,11 @@ public class ChartTitleToolTip extends AnimatedToolTipShell2 implements ITourPro
 		_tourInfoUI.dispose();
 	}
 
-	@Override
-	protected void onMouseMoveInToolTip(final MouseEvent mouseEvent) {
-
-		/*
-		 * When in tooltip, the hovered label state is not displayed, keep it displayed
-		 */
-//		final ChartLayerMarker markerLayer = _tourChart.getLayerTourMarker();
-//		markerLayer.setTooltipLabel(_hoveredTitle);
-	}
-
-	void open(final ChartTitle hoveredTitle) {
+	void open(final TourSegment hoveredTour) {
 
 		boolean isKeepOpened = false;
 
-		if (hoveredTitle != null && isTooltipClosing()) {
+		if (hoveredTour != null && isTooltipClosing()) {
 
 			/**
 			 * This case occures when the tooltip is opened but is currently closing and the mouse
@@ -245,12 +234,12 @@ public class ChartTitleToolTip extends AnimatedToolTipShell2 implements ITourPro
 			isKeepOpened = true;
 		}
 
-		if (hoveredTitle == _hoveredTitle && isKeepOpened == false) {
+		if (hoveredTour == _hoveredTour && isKeepOpened == false) {
 			// nothing has changed
 			return;
 		}
 
-		if (hoveredTitle == null) {
+		if (hoveredTour == null) {
 
 			// a marker is not hovered or is hidden, hide tooltip
 
@@ -260,8 +249,8 @@ public class ChartTitleToolTip extends AnimatedToolTipShell2 implements ITourPro
 
 			// another marker is hovered, show tooltip
 
-			_hoveredTitle = hoveredTitle;
-			_hoveredTourId = hoveredTitle.tourId;
+			_hoveredTour = hoveredTour;
+			_hoveredTourId = hoveredTour.tourId;
 
 			showToolTip();
 		}

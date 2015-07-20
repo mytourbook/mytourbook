@@ -33,7 +33,7 @@ public class ChartDrawingData {
 	/**
 	 * Contains the painted chart titles and their positons.
 	 */
-	public ArrayList<ChartTitle>		chartTitles	= new ArrayList<ChartTitle>();
+	public ArrayList<TourSegment>		tourSegments	= new ArrayList<TourSegment>();
 
 	ChartDrawingData(final ArrayList<GraphDrawingData> graphDrawingData) {
 

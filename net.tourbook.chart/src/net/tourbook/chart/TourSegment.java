@@ -15,29 +15,35 @@
  *******************************************************************************/
 package net.tourbook.chart;
 
-public class ChartTitle {
+public class TourSegment {
 
-	public Long	tourId;
+	public static final int	TITLE_HOVER_MARGIN	= 5;
 
-	public int	devX;
-	public int	devY;
+	public Long				tourId;
 
-	public int	width;
-	public int	height;
+	public boolean			isDrawTitle;
+	public int				devXTitle;
+	public int				devYTitle;
 
-	public int	devYBottom;
-	public int	devYTop;
-	public int	devGraphWidth;
+	public int				titleWidth;
+	public int				titleHeight;
 
-	public ChartTitle() {}
+	public int				devYGraphTop;
+	public int				devGraphWidth;
+
+	public boolean			isDrawHoveredSegment;
+	public int				devXSegment;
+	public int				segmentWidth;
+
+	public TourSegment() {}
 
 	@Override
 	public String toString() {
 		return "ChartTitle ["
-				+ ("devX=" + devX + ", ")
-				+ ("devY=" + devY + ", ")
-				+ ("width=" + width + ", ")
-				+ ("height=" + height)
+				+ ("devX=" + devXTitle + ", ")
+				+ ("devY=" + devYTitle + ", ")
+				+ ("width=" + titleWidth + ", ")
+				+ ("height=" + titleHeight)
 				+ "]";
 	}
 

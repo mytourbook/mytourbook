@@ -42,6 +42,7 @@ public abstract class AnimatedToolTipShell2 {
 	public static final int				MOUSE_OVER_BEHAVIOUR_NO_IGNORE			= 0;
 
 	public static final int				MOUSE_OVER_BEHAVIOUR_IGNORE_OWNER		= 1;
+
 	/**
 	 * how long each tick is when fading in/out (in ms)
 	 */
@@ -71,11 +72,12 @@ public abstract class AnimatedToolTipShell2 {
 	private OwnerShellListener			_ownerShellListener;
 	private ToolTipShellListener		_ttShellListener;
 	private ToolTipAllControlsListener	_ttAllControlsListener;
-	private ToolTipDisplayListener		_ttDisplayListener;
+	private ToolTipDisplayFilter		_ttDisplayFilter;
+
 	/**
 	 * Keep track of added display listener that no more than <b>1</b> is set.
 	 */
-	private boolean						_isDisplayListenerSet;
+	private boolean						_isDisplayFilterActive;
 
 	/**
 	 * Is <code>true</code> when shell is fading out, otherwise <code>false</code>.
@@ -102,6 +104,8 @@ public abstract class AnimatedToolTipShell2 {
 	private boolean						_isReceiveOnMouseMove;
 
 	private int							_fadeInSteps							= FADE_IN_STEPS;
+	private int							_fadeInDelayCounter;
+	private int							_fadeInDelaySteps;
 
 	private int							_fadeOutSteps							= FADE_OUT_STEPS;
 	private int							_fadeOutDelaySteps						= FADE_OUT_DELAY_STEPS;
@@ -175,13 +179,13 @@ public abstract class AnimatedToolTipShell2 {
 		}
 	}
 
-	private class ToolTipDisplayListener implements Listener {
+	private class ToolTipDisplayFilter implements Listener {
 		@Override
 		public void handleEvent(final Event event) {
 
 			switch (event.type) {
 			case SWT.MouseMove:
-				onDisplayMouseMove();
+				onDisplayFilterMouseMove();
 				break;
 			}
 		}
@@ -208,7 +212,7 @@ public abstract class AnimatedToolTipShell2 {
 
 		_ttAllControlsListener = new ToolTipAllControlsListener();
 		_ttShellListener = new ToolTipShellListener();
-		_ttDisplayListener = new ToolTipDisplayListener();
+		_ttDisplayFilter = new ToolTipDisplayFilter();
 
 		_ownerControlListener = new OwnerControlListener();
 		_ownerShellListener = new OwnerShellListener();
@@ -222,13 +226,13 @@ public abstract class AnimatedToolTipShell2 {
 
 	private void addDisplayFilterListener() {
 
-		if (_isDisplayListenerSet) {
+		if (_isDisplayFilterActive) {
 			return;
 		}
 
-		_display.addFilter(SWT.MouseMove, _ttDisplayListener);
+		_display.addFilter(SWT.MouseMove, _ttDisplayFilter);
 
-		_isDisplayListenerSet = true;
+		_isDisplayFilterActive = true;
 	}
 
 	/**
@@ -278,6 +282,7 @@ public abstract class AnimatedToolTipShell2 {
 	}
 
 	private void addTTShellListener(final Shell shell) {
+
 		// hide tooltip if user selects outside of the shell
 		shell.addListener(SWT.Deactivate, _ttShellListener);
 		shell.addListener(SWT.Dispose, _ttShellListener);
@@ -318,7 +323,7 @@ public abstract class AnimatedToolTipShell2 {
 			setShellVisible(false);
 		}
 
-		disposeOldShells(false);
+		closeOldShells(false);
 	}
 
 	private void animation10_StartKomplex() {
@@ -338,6 +343,8 @@ public abstract class AnimatedToolTipShell2 {
 			} else {
 
 				// shell is not visible, do fading animation
+
+				_fadeInDelayCounter = 0;
 
 				// set location
 				final Point size = _currentShell.getSize();
@@ -383,6 +390,15 @@ public abstract class AnimatedToolTipShell2 {
 				int newAlpha = -1;
 
 				if (_isShellFadingIn) {
+
+					if (_fadeInDelayCounter++ < _fadeInDelaySteps) {
+
+						// delay fade in
+
+						_display.timerExec(FADE_TIME_INTERVAL, _animationTimer);
+
+						return;
+					}
 
 					if (_fadeInSteps <= 0) {
 						newAlpha = ALPHA_OPAQUE;
@@ -483,7 +499,7 @@ public abstract class AnimatedToolTipShell2 {
 			StatusUtil.log(err);
 		} finally {
 
-			disposeOldShells(true);
+			closeOldShells(true);
 		}
 	}
 
@@ -533,74 +549,17 @@ public abstract class AnimatedToolTipShell2 {
 	}
 
 	/**
-	 * @return Returns <code>true</code> to close the shell after it is completely hidden.
-	 */
-	protected boolean closeShellAfterHidden() {
-
-		return false;
-	}
-
-	/**
-	 * Creates the content area of the the tooltip.
-	 * 
-	 * @param shell
-	 *            the parent of the content area
-	 * @return the content area created
-	 */
-	protected abstract Composite createToolTipContentArea(Composite shell);
-
-	/**
-	 * Create a shell but do not display it
-	 * 
-	 * @return Returns <code>true</code> when shell is created.
-	 */
-	private void createUI() {
-
-		if (_currentShell != null && _currentShell.isDisposed() == false) {
-			// hide old shell
-			_oldShells.add(new ShellWrapper(_currentShell));
-		}
-
-		final int trimStyle = _isShowShellTrimStyle ? 0 : SWT.NO_TRIM;
-
-		/*
-		 * create new shell
-		 */
-		final int shellStyle = SWT.ON_TOP //
-				/*
-				 * SWT.TOOL must be disabled that NO_FOCUS is working !!!
-				 */
-//				| SWT.TOOL
-//				| SWT.RESIZE
-				| SWT.NO_FOCUS
-				| trimStyle;
-
-		_currentShell = new Shell(_ownerControl.getShell(), shellStyle);
-
-		_currentShell.setLayout(new FillLayout());
-
-		addTTShellListener(_currentShell);
-
-		// create ui
-		createToolTipContentArea(_currentShell);
-
-		_currentShell.layout();
-		_currentShell.pack(true);
-
-		addTTAllControlsListener(_currentShell);
-	}
-
-	/**
 	 * @param isWithFadeOut
 	 *            When <code>true</code>, first the shell is faded out and then it's disposed.
 	 */
-	private void disposeOldShells(final boolean isWithFadeOut) {
+	private void closeOldShells(final boolean isWithFadeOut) {
+
+		if (_oldShells.size() == 0) {
+			// nothing to do
+			return;
+		}
 
 		if (isWithFadeOut) {
-
-//			System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
-//					+ ("\tdisposeOldShells: " + _oldShells.size()));
-//			// TODO remove SYSTEM.OUT.PRINTLN
 
 			// fade out and then dispose
 
@@ -614,10 +573,6 @@ public abstract class AnimatedToolTipShell2 {
 
 					int newAlpha;
 					final int currentAlpha = oldShell.getAlpha();
-
-//					System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
-//							+ ("\t\tcurrentAlpha: " + currentAlpha));
-//					// TODO remove SYSTEM.OUT.PRINTLN
 
 					if (_fadeOutSteps <= 0) {
 
@@ -664,7 +619,7 @@ public abstract class AnimatedToolTipShell2 {
 			_oldShells.removeAll(disposedShells);
 
 			if (_oldShells.size() > 0) {
-
+				// there are still visible shells
 				_display.timerExec(FADE_TIME_INTERVAL, _animationTimer);
 			}
 
@@ -677,6 +632,57 @@ public abstract class AnimatedToolTipShell2 {
 			}
 			_oldShells.clear();
 		}
+	}
+
+	/**
+	 * Creates the content area of the the tooltip.
+	 * 
+	 * @param shell
+	 *            the parent of the content area
+	 * @return the content area created
+	 */
+	protected abstract Composite createToolTipContentArea(Composite shell);
+
+	/**
+	 * Create a shell but do not display it
+	 * 
+	 * @return Returns <code>true</code> when shell is created.
+	 */
+	private void createUI() {
+
+		if (_currentShell != null && _currentShell.isDisposed() == false) {
+
+			// hide old shell
+			_oldShells.add(new ShellWrapper(_currentShell));
+		}
+
+		final int trimStyle = _isShowShellTrimStyle ? 0 : SWT.NO_TRIM;
+
+		/*
+		 * create new shell
+		 */
+		final int shellStyle = SWT.ON_TOP //
+				/*
+				 * SWT.TOOL must be disabled that NO_FOCUS is working !!!
+				 */
+//				| SWT.TOOL
+//				| SWT.RESIZE
+				| SWT.NO_FOCUS
+				| trimStyle;
+
+		_currentShell = new Shell(_ownerControl.getShell(), shellStyle);
+
+		_currentShell.setLayout(new FillLayout());
+
+		addTTShellListener(_currentShell);
+
+		// create ui
+		createToolTipContentArea(_currentShell);
+
+		_currentShell.layout();
+		_currentShell.pack(true);
+
+		addTTAllControlsListener(_currentShell);
 	}
 
 	private Point fixupDisplayBounds(final Point tipSize, final Point location) {
@@ -763,7 +769,7 @@ public abstract class AnimatedToolTipShell2 {
 		// hide shell
 		setShellVisible(false);
 
-		disposeOldShells(false);
+		closeOldShells(false);
 	}
 
 	/**
@@ -772,7 +778,11 @@ public abstract class AnimatedToolTipShell2 {
 	 */
 	private boolean isShellHidden() {
 
-		return _currentShell == null || _currentShell.isDisposed() || _currentShell.isVisible() == false;
+		final boolean isShellHidden = _currentShell == null
+				|| _currentShell.isDisposed()
+				|| _currentShell.isVisible() == false;
+
+		return isShellHidden;
 	}
 
 	/**
@@ -805,7 +815,7 @@ public abstract class AnimatedToolTipShell2 {
 	/**
 	 * @return Returns <code>true</code> when the tooltip should be kept opened.
 	 */
-	private boolean onDisplayMouseMove() {
+	private boolean onDisplayFilterMouseMove() {
 
 //		final long start = System.nanoTime();
 
@@ -814,7 +824,6 @@ public abstract class AnimatedToolTipShell2 {
 		}
 
 		if (canCloseToolTip() == false) {
-
 			return true;
 		}
 
@@ -906,7 +915,7 @@ public abstract class AnimatedToolTipShell2 {
 
 		if (isInTooltip && _isShellFadingOut) {
 
-			// don't hide when mouse is hovering hiding tooltip
+			// don't hide when mouse is hovering hiding tooltip again
 
 			ttShow();
 
@@ -937,15 +946,17 @@ public abstract class AnimatedToolTipShell2 {
 		// hide tooltip definitively
 
 		removeOwnerShellListener();
-		removeDisplayFilterListener();
+		removeDisplayFilter();
 
 		// deactivate auto close timer
 		_display.timerExec(-1, _ttAutoCloseTimer);
 
 		_currentShell.dispose();
 
-		disposeOldShells(false);
+		closeOldShells(false);
 	}
+
+	protected void onMouseExitToolTip(final MouseEvent mouseEvent) {}
 
 	protected void onMouseMoveInToolTip(final MouseEvent mouseEvent) {}
 
@@ -1034,10 +1045,7 @@ public abstract class AnimatedToolTipShell2 {
 
 		case SWT.MouseMove:
 
-			if (_isReceiveOnMouseMove //
-//					&& _isShellFadingIn == false
-//					&& _isShellFadingOut == false//
-			) {
+			if (_isReceiveOnMouseMove) {
 
 				final Widget widget = event.widget;
 
@@ -1066,7 +1074,7 @@ public abstract class AnimatedToolTipShell2 {
 
 	private void onTTAutoCloseTimer() {
 
-		final boolean isKeepOpened = onDisplayMouseMove();
+		final boolean isKeepOpened = onDisplayFilterMouseMove();
 
 		if (isKeepOpened) {
 
@@ -1126,15 +1134,15 @@ public abstract class AnimatedToolTipShell2 {
 
 	}
 
-	private void removeDisplayFilterListener() {
+	private void removeDisplayFilter() {
 
-		if (_isDisplayListenerSet == false) {
+		if (_isDisplayFilterActive == false) {
 			return;
 		}
 
-		_display.removeFilter(SWT.MouseMove, _ttDisplayListener);
+		_display.removeFilter(SWT.MouseMove, _ttDisplayFilter);
 
-		_isDisplayListenerSet = false;
+		_isDisplayFilterActive = false;
 	}
 
 	/**
@@ -1156,6 +1164,10 @@ public abstract class AnimatedToolTipShell2 {
 
 	protected void setBehaviourOnMouseOver(final int mouseOverBehaviour) {
 		_mouseOverBehaviour = mouseOverBehaviour;
+	}
+
+	public void setFadeInDelayTime(final int delayTimeInMS) {
+		_fadeInDelaySteps = delayTimeInMS / FADE_TIME_INTERVAL;
 	}
 
 	public void setFadeInSteps(final int fadeInSteps) {
@@ -1204,11 +1216,9 @@ public abstract class AnimatedToolTipShell2 {
 
 			_currentShell.setVisible(false);
 
-			removeDisplayFilterListener();
+			removeDisplayFilter();
 
-			if (closeShellAfterHidden()) {
-				close();
-			}
+			close();
 		}
 	}
 
@@ -1241,6 +1251,7 @@ public abstract class AnimatedToolTipShell2 {
 		if (_isShellFadingOut) {
 
 			// shell is already fading out
+
 			return;
 		}
 

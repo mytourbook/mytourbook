@@ -552,6 +552,11 @@ public class ChartLayerMarker implements IChartLayer, IChartOverlay {
 		final boolean isHovered = _hoveredLabel != null || _tooltipLabel != null;
 		final boolean isSelected = selectedTourMarker != null;
 
+//		System.out
+//				.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
+//						+ ("\tisHovered isSelected\t" + isHovered + "\t" + isSelected + "\t" + _hoveredLabel + "\t" + _tooltipLabel));
+//		// TODO remove SYSTEM.OUT.PRINTLN
+
 		if (isHovered == false && isSelected == false) {
 			return;
 		}
@@ -798,7 +803,7 @@ public class ChartLayerMarker implements IChartLayer, IChartOverlay {
 
 	public void setTooltipLabel(final ChartLabel tooltipLabel) {
 
-		if (tooltipLabel == _tooltipLabel) {
+		if (_tooltipLabel == tooltipLabel) {
 			return;
 		}
 

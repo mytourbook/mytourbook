@@ -110,6 +110,14 @@ public interface ITourbookPreferences {
 	public static final String	GRAPH_ZOOM_AUTO_ZOOM_TO_SLIDER				= "graphs.zoom.autozoom-to-slider";						//$NON-NLS-1$
 
 	/*
+	 * Tour info
+	 */
+	public static final String	GRAPH_TOUR_INFO_IS_VISIBLE					= "GRAPH_IS_TOUR_INFO_VISIBLE";							//$NON-NLS-1$
+	public static final String	GRAPH_TOUR_INFO_IS_TITLE_VISIBLE			= "GRAPH_TOUR_INFO_IS_TITLE_VISIBLE";						//$NON-NLS-1$
+	public static final String	GRAPH_TOUR_INFO_IS_TOOLTIP_VISIBLE			= "GRAPH_TOUR_INFO_IS_TOOLTIP_VISIBLE";					//$NON-NLS-1$
+	public static final String	GRAPH_TOUR_INFO_TOOLTIP_DELAY				= "GRAPH_TOUR_INFO_TOOLTIP_DELAY";							//$NON-NLS-1$
+
+	/*
 	 * Min/Max values
 	 */
 	public static final String	GRAPH_ALTIMETER_IS_MIN_ENABLED				= "GRAPH_ALTIMETER_IS_MIN_ENABLED";						//$NON-NLS-1$

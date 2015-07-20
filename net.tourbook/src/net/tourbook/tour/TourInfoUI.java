@@ -86,8 +86,7 @@ public class TourInfoUI {
 																// hide these components
 //																		.withMinutesRemoved()
 																		.withSecondsRemoved()
-																		.withMillisRemoved()
-																;
+																		.withMillisRemoved();
 
 	private boolean						_hasDescription;
 	private boolean						_hasGears;
@@ -95,7 +94,18 @@ public class TourInfoUI {
 	private boolean						_hasTourType;
 	private boolean						_hasWeather;
 
+	/*
+	 * actions
+	 */
+	private ActionTourToolTipEditTour	_actionEditTour;
+	private ActionTourToolTipEditQuick	_actionEditQuick;
+
 	private boolean						_isActionsVisible		= false;
+
+	/**
+	 * Tour which is displayed in the tool tip
+	 */
+	private TourData					_tourData;
 
 	/**
 	 * contains the controls which are displayed in the first column, these controls are used to get
@@ -160,17 +170,6 @@ public class TourInfoUI {
 	private Label						_lblWindDirectionUnit;
 
 	/*
-	 * actions
-	 */
-	private ActionTourToolTipEditTour	_actionEditTour;
-	private ActionTourToolTipEditQuick	_actionEditQuick;
-
-	/**
-	 * Tour which is displayed in the tool tip
-	 */
-	private TourData					_tourData;
-
-	/*
 	 * fields which are optionally displayed when they are not null
 	 */
 	private DateTime					_uiDtCreated;
@@ -179,6 +178,14 @@ public class TourInfoUI {
 
 	private IToolTipProvider			_tourToolTipProvider;
 	private ITourProvider				_tourProvider;
+
+	/**
+	 * Run tour action quick edit.
+	 */
+	public void actionQuickEditTour() {
+
+		_actionEditQuick.run();
+	}
 
 	public Composite createContentArea(	final Composite parent,
 										final TourData tourData,

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -34,13 +34,13 @@ import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.swt.widgets.Widget;
 
-public class ActionChartOptions extends Action implements IMenuCreator {
+public class ActionTourChartOptions extends Action implements IMenuCreator {
 
 	private Menu		_menu	= null;
 
 	private TourChart	_tourChart;
 
-	public ActionChartOptions(final TourChart tourChart) {
+	public ActionTourChartOptions(final TourChart tourChart) {
 
 		super(null, Action.AS_DROP_DOWN_MENU);
 
@@ -57,6 +57,7 @@ public class ActionChartOptions extends Action implements IMenuCreator {
 		item.fill(_menu, -1);
 	}
 
+	@Override
 	public void dispose() {
 		if (_menu != null) {
 			_menu.dispose();
@@ -64,6 +65,7 @@ public class ActionChartOptions extends Action implements IMenuCreator {
 		}
 	}
 
+	@Override
 	public Menu getMenu(final Control parent) {
 
 		// recreate menu each time
@@ -90,6 +92,7 @@ public class ActionChartOptions extends Action implements IMenuCreator {
 		return _menu;
 	}
 
+	@Override
 	public Menu getMenu(final Menu parent) {
 		return null;
 	}

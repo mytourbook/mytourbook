@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -18,8 +18,7 @@ package net.tourbook.ui.tourChart.action;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
-import net.tourbook.common.tooltip.IOpeningDialog;
-import net.tourbook.ui.tourChart.SlideoutTourChartMarker;
+import net.tourbook.ui.tourChart.SlideoutTourChartInfo;
 import net.tourbook.ui.tourChart.TourChart;
 
 import org.eclipse.jface.action.ContributionItem;
@@ -38,22 +37,20 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 
-public class ActionTourChartMarker extends ContributionItem implements IOpeningDialog {
+public class ActionTourChartInfo extends ContributionItem {
 
-	private static final String		IMAGE_EDIT_TOUR_MARKER			= Messages.Image__edit_tour_marker;
-	private static final String		IMAGE_EDIT_TOUR_MARKER_DISABLED	= Messages.Image__edit_tour_marker_disabled;
+	private static final String		IMAGE_TOUR_INFO				= Messages.Image__TourInfo;
+	private static final String		IMAGE_TOUR_INFO_DISABLED	= Messages.Image__TourInfo_Disabled;
 
-	private IDialogSettings			_state							= TourbookPlugin.getState(//
-																			getClass().getSimpleName());
-
-	private final String			_dialogId						= getClass().getCanonicalName();
+	private IDialogSettings			_state						= TourbookPlugin.getState(//
+																		getClass().getSimpleName());
 
 	private TourChart				_tourChart;
 
 	private ToolBar					_toolBar;
 	private ToolItem				_actionToolItem;
 
-	private SlideoutTourChartMarker	_slideoutMarkerOptions;
+	private SlideoutTourChartInfo	_slideoutTourInfo;
 
 	/*
 	 * UI controls
@@ -63,13 +60,13 @@ public class ActionTourChartMarker extends ContributionItem implements IOpeningD
 	private Image					_imageEnabled;
 	private Image					_imageDisabled;
 
-	public ActionTourChartMarker(final TourChart tourChart, final Control parent) {
+	public ActionTourChartInfo(final TourChart tourChart, final Control parent) {
 
 		_tourChart = tourChart;
 		_parent = parent;
 
-		_imageEnabled = TourbookPlugin.getImageDescriptor(IMAGE_EDIT_TOUR_MARKER).createImage();
-		_imageDisabled = TourbookPlugin.getImageDescriptor(IMAGE_EDIT_TOUR_MARKER_DISABLED).createImage();
+		_imageEnabled = TourbookPlugin.getImageDescriptor(IMAGE_TOUR_INFO).createImage();
+		_imageDisabled = TourbookPlugin.getImageDescriptor(IMAGE_TOUR_INFO_DISABLED).createImage();
 	}
 
 	@Override
@@ -108,30 +105,19 @@ public class ActionTourChartMarker extends ContributionItem implements IOpeningD
 				}
 			});
 
-			_slideoutMarkerOptions = new SlideoutTourChartMarker(_parent, _toolBar, _state, _tourChart);
+			_slideoutTourInfo = new SlideoutTourChartInfo(_parent, _toolBar, _state, _tourChart);
 
 			updateUI();
 		}
-	}
-
-	@Override
-	public String getDialogId() {
-		return _dialogId;
-	}
-
-	@Override
-	public void hideDialog() {
-
-		_slideoutMarkerOptions.hideNow();
 	}
 
 	private void onAction() {
 
 		updateUI();
 
-		final boolean isMarkerVisible = _actionToolItem.getSelection();
+		final boolean isTourInfoVisible = _actionToolItem.getSelection();
 
-		if (isMarkerVisible) {
+		if (isTourInfoVisible) {
 
 			final Rectangle itemBounds = _actionToolItem.getBounds();
 
@@ -140,14 +126,14 @@ public class ActionTourChartMarker extends ContributionItem implements IOpeningD
 			itemBounds.x = itemDisplayPosition.x;
 			itemBounds.y = itemDisplayPosition.y;
 
-			_slideoutMarkerOptions.open(itemBounds, false);
+			_slideoutTourInfo.open(itemBounds, false);
 
 		} else {
 
-			_slideoutMarkerOptions.close();
+			_slideoutTourInfo.close();
 		}
 
-		_tourChart.actionShowTourMarker(isMarkerVisible);
+		_tourChart.actionShowTourInfo(isTourInfoVisible);
 	}
 
 	private void onMouseMove(final ToolItem item, final MouseEvent mouseEvent) {
@@ -173,7 +159,7 @@ public class ActionTourChartMarker extends ContributionItem implements IOpeningD
 			itemBounds.y = itemDisplayPosition.y;
 		}
 
-		_slideoutMarkerOptions.open(itemBounds, true);
+		_slideoutTourInfo.open(itemBounds, true);
 	}
 
 	public void setEnabled(final boolean isEnabled) {
@@ -203,13 +189,13 @@ public class ActionTourChartMarker extends ContributionItem implements IOpeningD
 
 		if (_actionToolItem.getSelection()) {
 
-			// hide tooltip because the marker options slideout is displayed
+			// hide tooltip because the tour info options slideout is displayed
 
 			_actionToolItem.setToolTipText(UI.EMPTY_STRING);
 
 		} else {
 
-			_actionToolItem.setToolTipText(Messages.Tour_Action_MarkerOptions_Tooltip);
+			_actionToolItem.setToolTipText(Messages.Tour_Action_TourInfo_Tooltip);
 		}
 	}
 }

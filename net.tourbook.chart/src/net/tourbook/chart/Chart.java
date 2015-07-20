@@ -1018,8 +1018,8 @@ public class Chart extends ViewForm {
 		_hoveredListener = hoveredValuePointListener;
 	}
 
-	public void setHoveredTitle(final ChartTitle hoveredTitle) {
-		_chartComponents.getChartComponentGraph().setHoveredTitle(hoveredTitle);
+	public void setHoveredTour(final TourSegment tourSegment) {
+		_chartComponents.getChartComponentGraph().setHoveredTour(tourSegment);
 	}
 
 	/**

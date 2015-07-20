@@ -8,6 +8,7 @@ New
 Tour Chart
 - Show/navigate multiple tours.
 - Title tooltip for each tour.
+- Customize tour info.
 
 
 Improvements

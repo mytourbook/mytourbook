@@ -113,6 +113,7 @@ public abstract class AnimatedToolTipShell {
 
 	private ToolTipAutoCloseTimer		_ttAutoCloseTimer;
 
+	private boolean						_isReceiveOnMouseExit;
 	private boolean						_isReceiveOnMouseMove;
 
 	private int							_fadeInSteps							= FADE_IN_STEPS;
@@ -918,10 +919,6 @@ public abstract class AnimatedToolTipShell {
 
 			// don't hide when mouse is hovering hiding tooltip
 
-//			System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
-//					+ (" onDisplayMouseMove\tisInTooltip && _isShellFadingOut"));
-//			// TODO remove SYSTEM.OUT.PRINTLN
-
 			ttShow();
 
 		} else if (isHide) {
@@ -937,14 +934,6 @@ public abstract class AnimatedToolTipShell {
 				isKeepOpened = false;
 			}
 		}
-
-//		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
-//				+ (" onDisplayMouseMove\t" + ((float) (System.nanoTime() - start) / 1000000) + " ms")//
-//				+ ("\tisInTooltip: " + isInTooltip)
-//				+ ("\tisHide: " + isHide)
-//		//
-//				);
-//		// TODO remove SYSTEM.OUT.PRINTLN
 
 		return isKeepOpened;
 
@@ -966,6 +955,8 @@ public abstract class AnimatedToolTipShell {
 
 		_shell.dispose();
 	}
+
+	protected void onMouseExitToolTip(final MouseEvent mouseEvent) {}
 
 	protected void onMouseMoveInToolTip(final MouseEvent mouseEvent) {}
 
@@ -1064,14 +1055,33 @@ public abstract class AnimatedToolTipShell {
 
 		case SWT.MouseExit:
 
+			if (_isReceiveOnMouseExit) {
+
+				final Widget widget = event.widget;
+
+				if (widget instanceof Control) {
+
+					final Point ttDisplayLocation = ((Control) widget).toDisplay(event.x, event.y);
+					final Point ownerLocation = _ownerControl.toControl(ttDisplayLocation);
+
+					_display.asyncExec(new Runnable() {
+						@Override
+						public void run() {
+
+							final MouseEvent mouseEvent = new MouseEvent(event);
+							mouseEvent.x = ownerLocation.x;
+							mouseEvent.y = ownerLocation.y;
+
+							onMouseExitToolTip(mouseEvent);
+						}
+					});
+				}
+			}
 			break;
 
 		case SWT.MouseMove:
 
-			if (_isReceiveOnMouseMove //
-//					&& _isShellFadingIn == false
-//					&& _isShellFadingOut == false//
-			) {
+			if (_isReceiveOnMouseMove) {
 
 				final Widget widget = event.widget;
 
@@ -1222,6 +1232,10 @@ public abstract class AnimatedToolTipShell {
 	 */
 	public void setIsShowShellTrimStyle(final boolean isShowShellTrimStyle) {
 		_isShowShellTrimStyle = isShowShellTrimStyle;
+	}
+
+	public void setReceiveMouseExitEvent(final boolean isReceive) {
+		_isReceiveOnMouseExit = isReceive;
 	}
 
 	public void setReceiveMouseMoveEvent(final boolean isReceive) {

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -188,6 +188,14 @@ public class TourChartConfiguration {
 	public boolean					isShowTourPhotos		= true;											;
 	public boolean					isShowTourPhotoTooltip	= true;
 
+	/*
+	 * Tour info
+	 */
+	public boolean					isTourInfoVisible		= true;
+	public boolean					isShowInfoTitle			= true;
+	public boolean					isShowInfoTooltip		= true;
+	public int						infoTooltipDelay;
+
 	/**
 	 * @param keepMinMaxValues
 	 *            set <code>true</code> to keep min/max values when tour data will change
@@ -226,6 +234,13 @@ public class TourChartConfiguration {
 		markerColorHidden = PreferenceConverter.getColor(_prefStore,//
 				ITourbookPreferences.GRAPH_MARKER_COLOR_HIDDEN);
 
+		/*
+		 * Tour info
+		 */
+		isTourInfoVisible = _prefStore.getBoolean(ITourbookPreferences.GRAPH_TOUR_INFO_IS_VISIBLE);
+		isShowInfoTitle = _prefStore.getBoolean(ITourbookPreferences.GRAPH_TOUR_INFO_IS_TITLE_VISIBLE);
+		isShowInfoTooltip = _prefStore.getBoolean(ITourbookPreferences.GRAPH_TOUR_INFO_IS_TOOLTIP_VISIBLE);
+		infoTooltipDelay = _prefStore.getInt(ITourbookPreferences.GRAPH_TOUR_INFO_TOOLTIP_DELAY);
 	}
 
 	public void addVisibleGraph(final int visibleGraph) {
@@ -274,6 +289,7 @@ public class TourChartConfiguration {
 	 *            the keepMinMaxValues to set
 	 */
 	public void setMinMaxKeeper(final boolean keepMinMaxValues) {
+
 		if (keepMinMaxValues) {
 			_minMaxKeeper = new ChartYDataMinMaxKeeper();
 		} else {
