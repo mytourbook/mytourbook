@@ -13,20 +13,11 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.statistic;
+package net.tourbook.chart;
 
-public interface IYearStatistic {
-
-	/**
-	 * Preferences for the statistics has changed.
-	 */
-	public abstract void preferencesHasChanged();
-
-	/**
-	 * Update statistic with the data in the context.
-	 * 
-	 * @param statContext
-	 */
-	public abstract void updateStatistic(StatisticContext statContext);
+/**
+ * Configuration how the chart title is displayed.
+ */
+public class ChartTitleConfig {
 
 }

@@ -126,6 +126,7 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 	private Button					_chkMinPulse;
 	private Button					_chkMaxPulse;
 	private Button					_chkMoveSlidersWhenZoomed;
+	private Button					_chkSegmentAlternateColor;
 	private Button					_chkShowHorizontalGridLines;
 	private Button					_chkShowHrZoneBackground;
 	private Button					_chkShowStartTime;
@@ -414,6 +415,15 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 			_chkGraphAntialiasing.setText(Messages.Pref_Graphs_Checkbox_GraphAntialiasing);
 			_chkGraphAntialiasing.setToolTipText(Messages.Pref_Graphs_Checkbox_GraphAntialiasing_Tooltip);
 			_chkGraphAntialiasing.addSelectionListener(_defaultSelectionListener);
+
+			/*
+			 * Checkbox: Segments with alternate colors
+			 */
+			_chkSegmentAlternateColor = new Button(container, SWT.CHECK);
+			GridDataFactory.fillDefaults().span(2, 1).applyTo(_chkSegmentAlternateColor);
+			_chkSegmentAlternateColor.setText(Messages.Pref_Graphs_Checkbox_SegmentAlternateColor);
+			_chkSegmentAlternateColor.setToolTipText(Messages.Pref_Graphs_Checkbox_SegmentAlternateColor_Tooltip);
+			_chkSegmentAlternateColor.addSelectionListener(_defaultSelectionListener);
 
 			/*
 			 * checkbox: HR zones
@@ -1126,6 +1136,9 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 			_chkGraphAntialiasing.setSelection(//
 					_prefStore.getDefaultBoolean(ITourbookPreferences.GRAPH_ANTIALIASING));
 
+			_chkSegmentAlternateColor.setSelection(//
+					_prefStore.getDefaultBoolean(ITourbookPreferences.GRAPH_IS_SEGMENT_ALTERNATE_COLOR));
+
 			_chkShowHrZoneBackground.setSelection(//
 					_prefStore.getDefaultBoolean(ITourbookPreferences.GRAPH_IS_HR_ZONE_BACKGROUND_VISIBLE));
 
@@ -1228,6 +1241,9 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 
 		_chkGraphAntialiasing.setSelection(//
 				_prefStore.getBoolean(ITourbookPreferences.GRAPH_ANTIALIASING));
+
+		_chkSegmentAlternateColor.setSelection(//
+				_prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_SEGMENT_ALTERNATE_COLOR));
 
 		_chkShowHrZoneBackground.setSelection(//
 				_prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_HR_ZONE_BACKGROUND_VISIBLE));
@@ -1391,6 +1407,9 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 
 		_prefStore.setValue(ITourbookPreferences.GRAPH_ANTIALIASING,//
 				_chkGraphAntialiasing.getSelection());
+
+		_prefStore.setValue(ITourbookPreferences.GRAPH_IS_SEGMENT_ALTERNATE_COLOR,//
+				_chkSegmentAlternateColor.getSelection());
 
 		_prefStore.setValue(ITourbookPreferences.GRAPH_IS_HR_ZONE_BACKGROUND_VISIBLE,//
 				_chkShowHrZoneBackground.getSelection());

@@ -82,8 +82,8 @@ public class ChartComponentGraph extends Canvas {
 
 	private static final NumberFormat	_nf								= NumberFormat.getNumberInstance();
 
-	private static final RGB			_gridRGB						= new RGB(241, 239, 226);
-	private static final RGB			_gridRGBMajor					= new RGB(222, 220, 208);
+	private static final RGB			_gridRGB						= new RGB(240, 240, 240);
+	private static final RGB			_gridRGBMajor					= new RGB(220, 220, 220);
 
 	private static final int[][]		_leftAccelerator				= new int[][] {
 			{ -40, -200 },
@@ -421,6 +421,11 @@ public class ChartComponentGraph extends Canvas {
 	 * Cache font to improve performance.
 	 */
 	private Font						_uiFont;
+
+	/**
+	 * Configuration how the chart title is displayed.
+	 */
+	ChartTitleConfig					chartTitleConfig				= new ChartTitleConfig();
 
 	/**
 	 * Constructor
@@ -1630,16 +1635,18 @@ public class ChartComponentGraph extends Canvas {
 
 			// fill background
 			if (isDrawBackground) {
+
 				gcGraph.setBackground(chartBackgroundColor);
 				gcGraph.fillRectangle(graphBounds);
+
+				if (_chart.isShowSegmentAlternateColor) {
+					drawAsync_150_SegmentBackground(gcGraph, graphDrawingData);
+				}
 			}
 
 			if (isDrawTitle) {
 				drawAsync_200_XTitle(gcChart, graphDrawingData);
 			}
-
-// is disabled for a cleaner UI
-//			drawAsync_150_SegmentBackground(gcGraph, graphDrawingData);
 
 			if (isDrawGrid) {
 
@@ -1723,7 +1730,6 @@ public class ChartComponentGraph extends Canvas {
 	 * @param gc
 	 * @param drawingData
 	 */
-	@SuppressWarnings("unused")
 	private void drawAsync_150_SegmentBackground(final GC gc, final GraphDrawingData drawingData) {
 
 		final ChartSegments chartSegments = drawingData.getXData().getChartSegments();
@@ -1745,35 +1751,35 @@ public class ChartComponentGraph extends Canvas {
 		}
 
 		final Color alternateColor = new Color(gc.getDevice(), 0xf5, 0xf5, 0xf5);
+		{
+			for (int segmentIndex = 0; segmentIndex < startValues.length; segmentIndex++) {
 
-		for (int segmentIndex = 0; segmentIndex < startValues.length; segmentIndex++) {
+				if (segmentIndex % 2 == 1) {
 
-			if (segmentIndex % 2 == 1) {
+					// draw segment background color for every second segment
 
-				// draw segment background color for every second segment
+					final long startValue = startValues[segmentIndex];
+					final long endValue = endValues[segmentIndex];
 
-				final long startValue = startValues[segmentIndex];
-				final long endValue = endValues[segmentIndex];
+					final int devXValueStart = (int) ((scaleX * startValue) - _xxDevViewPortLeftBorder);
 
-				final int devXValueStart = (int) ((scaleX * startValue) - _xxDevViewPortLeftBorder);
+					// adjust endValue to fill the last part of the segment
+					final int devValueEnd = (int) (scaleX * (endValue + 1) - _xxDevViewPortLeftBorder);
 
-				// adjust endValue to fill the last part of the segment
-				final int devValueEnd = (int) (scaleX * (endValue + 1) - _xxDevViewPortLeftBorder);
-
-				gc.setBackground(alternateColor);
-				gc.fillRectangle(//
-						devXValueStart,
-						devYTop,
-						devValueEnd - devXValueStart,
-						devYBottom - devYTop);
+					gc.setBackground(alternateColor);
+					gc.fillRectangle(//
+							devXValueStart,
+							devYTop,
+							devValueEnd - devXValueStart,
+							devYBottom - devYTop);
+				}
 			}
 		}
-
 		alternateColor.dispose();
 	}
 
 	private void drawAsync_200_XTitle(final GC gc, final GraphDrawingData graphDrawingData) {
-		
+
 //		_chartDrawingData.
 
 		final int devYBottom = graphDrawingData.getDevYBottom();
@@ -2256,7 +2262,7 @@ public class ChartComponentGraph extends Canvas {
 					 * degrades performance dramatically
 					 */
 //					gcGraph.setLineWidth(0);
-					gcGraph.setLineDash(DOT_DASHES);
+//					gcGraph.setLineDash(DOT_DASHES);
 					gcGraph.setForeground(_gridColor);
 				}
 				gcGraph.drawLine(devXUnitTick, 0, devXUnitTick, graphDrawingData.devGraphHeight);
@@ -2276,6 +2282,11 @@ public class ChartComponentGraph extends Canvas {
 	 */
 	private void drawAsync_220_HGrid(final GC gcGraph, final GraphDrawingData drawingData) {
 
+		if (_chart.isShowHorizontalGridLines == false) {
+			// h-grid is not visible
+			return;
+		}
+
 		final ArrayList<ChartUnit> yUnits = drawingData.getYUnits();
 		final int unitListSize = yUnits.size();
 
@@ -2290,10 +2301,11 @@ public class ChartComponentGraph extends Canvas {
 		final int devYTop = 0;
 		final int devYBottom = devGraphHeight;
 
-		final boolean isDrawHorizontalGrid = _chart.isShowHorizontalGridLines;
-
 		int devY;
 		int unitIndex = 0;
+
+		gcGraph.setLineStyle(SWT.LINE_SOLID);
+		gcGraph.setLineStyle(SWT.LINE_SOLID);
 
 		// loop: all units
 		for (final ChartUnit yUnit : yUnits) {
@@ -2311,15 +2323,15 @@ public class ChartComponentGraph extends Canvas {
 			final boolean isXAxis = (isTopDown && unitIndex == unitListSize - 1) || //
 					(isBottomUp && unitIndex == 0);
 
-			if (isXAxis == false && isDrawHorizontalGrid) {
+			if (isXAxis == false) {
 
 				// draw gridlines
 
 				if (yUnit.isMajorValue) {
-					gcGraph.setLineStyle(SWT.LINE_SOLID);
+//					gcGraph.setLineStyle(SWT.LINE_SOLID);
 					gcGraph.setForeground(_gridColorMajor);
 				} else {
-					gcGraph.setLineDash(DOT_DASHES);
+//					gcGraph.setLineDash(DOT_DASHES);
 					gcGraph.setForeground(_gridColor);
 				}
 				gcGraph.drawLine(0, devY, devVisibleChartWidth, devY);
@@ -2370,8 +2382,8 @@ public class ChartComponentGraph extends Canvas {
 			}
 
 			// check if a y-unit is on the x axis
-			final boolean isXAxis = (isTopDown && unitIndex == unitListSize - 1) || //
-					(isBottomUp && unitIndex == 0);
+			final boolean isXAxis = (isTopDown && unitIndex == unitListSize - 1) //
+					|| (isBottomUp && unitIndex == 0);
 
 			if (isXAxis) {
 

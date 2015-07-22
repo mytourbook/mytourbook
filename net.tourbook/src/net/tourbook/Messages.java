@@ -942,6 +942,10 @@ public class Messages extends NLS {
 	public static String		Pref_Graphs_Checkbox_ForcePulseValue;
 	public static String		Pref_Graphs_Checkbox_GraphAntialiasing;
 	public static String		Pref_Graphs_Checkbox_GraphAntialiasing_Tooltip;
+	public static String	Pref_Graphs_Checkbox_SegmentAlternateColor;
+
+	public static String	Pref_Graphs_Checkbox_SegmentAlternateColor_Tooltip;
+
 	public static String		Pref_Graphs_Checkbox_ShowHorizontalGrid;
 	public static String		Pref_Graphs_Checkbox_ShowVerticalGrid;
 	public static String		Pref_Graphs_Dialog_GridLine_Warning_Message;
@@ -1224,13 +1228,10 @@ public class Messages extends NLS {
 //	public static String		Slideout_ChartMarkerOptions_Label_SignImageSize;
 //	public static String		Slideout_ChartMarkerOptions_Label_SignImageSize_Tooltip;
 
-	public static String	Slideout_TourInfoOptions_Checkbox_IsShowInfoTooltip;
-
-	public static String	Slideout_TourInfoOptions_Checkbox_IsShowTourTitle;
-
-	public static String	Slideout_TourInfoOptions_Label_TooltipDelay;
-
-	public static String	Slideout_TourInfoOptions_Label_TooltipDelay_Tooltip;
+	public static String		Slideout_TourInfoOptions_Checkbox_IsShowInfoTooltip;
+	public static String		Slideout_TourInfoOptions_Checkbox_IsShowTourTitle;
+	public static String		Slideout_TourInfoOptions_Label_TooltipDelay;
+	public static String		Slideout_TourInfoOptions_Label_TooltipDelay_Tooltip;
 
 	public static String		Slideout_TourMarkerFilter_Checkbox_IsReduceLatLonDigits;
 	public static String		Slideout_TourMarkerFilter_Checkbox_IsReduceLatLonDigits_Tooltip;

@@ -39,7 +39,7 @@ import net.tourbook.common.util.Util;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.ITourEventListener;
 import net.tourbook.tour.TourEventId;
-import net.tourbook.tour.TourInfoToolTipProvider;
+import net.tourbook.tour.TourInfoIconToolTipProvider;
 import net.tourbook.tour.TourManager;
 
 import org.eclipse.jface.action.IAction;
@@ -164,7 +164,7 @@ public class YearStatisticView extends ViewPart {
 
 	private Chart								_yearChart;
 	private YearStatisticTourToolTip			_tourToolTip;
-	private TourInfoToolTipProvider				_tourInfoToolTipProvider	= new TourInfoToolTipProvider();
+	private TourInfoIconToolTipProvider				_tourInfoToolTipProvider	= new TourInfoIconToolTipProvider();
 
 	private Composite							_toolbar;
 	private Combo								_cboLastYear;
@@ -557,7 +557,7 @@ public class YearStatisticView extends ViewPart {
 			}
 		});
 
-		_yearChart.setTourToolTipProvider(_tourInfoToolTipProvider);
+		_yearChart.setTourInfoIconToolTipProvider(_tourInfoToolTipProvider);
 		_tourInfoToolTipProvider.setActionsEnabled(true);
 
 	}
@@ -1003,12 +1003,12 @@ public class YearStatisticView extends ViewPart {
 			}
 		});
 
-		// set grid size
-		_yearChart.setGrid(
+		_yearChart.updateProperties(
 				_prefStore.getInt(ITourbookPreferences.GRAPH_GRID_HORIZONTAL_DISTANCE),
 				_prefStore.getInt(ITourbookPreferences.GRAPH_GRID_VERTICAL_DISTANCE),
 				_prefStore.getBoolean(ITourbookPreferences.GRAPH_GRID_IS_SHOW_HORIZONTAL_GRIDLINES),
-				_prefStore.getBoolean(ITourbookPreferences.GRAPH_GRID_IS_SHOW_VERTICAL_GRIDLINES));
+				_prefStore.getBoolean(ITourbookPreferences.GRAPH_GRID_IS_SHOW_VERTICAL_GRIDLINES),
+				_prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_SEGMENT_ALTERNATE_COLOR));
 
 		// show the data in the chart
 		_yearChart.updateChart(chartModel, false, true);

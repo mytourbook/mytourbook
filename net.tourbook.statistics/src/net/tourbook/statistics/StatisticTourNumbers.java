@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -53,9 +53,7 @@ import org.eclipse.ui.IViewSite;
 
 public class StatisticTourNumbers extends YearStatistic {
 
-	private final IPreferenceStore		_prefStore							= TourbookPlugin
-																					.getDefault()
-																					.getPreferenceStore();
+	private final IPreferenceStore		_prefStore							= TourbookPlugin.getPrefStore();
 
 	private IPropertyChangeListener		_prefChangeListener;
 
@@ -95,6 +93,7 @@ public class StatisticTourNumbers extends YearStatistic {
 	private int[][]						_statTimeSumColorIndex;
 
 	private int							_currentYear;
+	private int							_numberOfYears;
 	private TourPerson					_activePerson;
 	private TourTypeFilter				_activeTourTypeFilter;
 
@@ -122,6 +121,7 @@ public class StatisticTourNumbers extends YearStatistic {
 
 		// create pref listener
 		_prefChangeListener = new IPropertyChangeListener() {
+			@Override
 			public void propertyChange(final PropertyChangeEvent event) {
 				final String property = event.getProperty();
 
@@ -146,7 +146,7 @@ public class StatisticTourNumbers extends YearStatistic {
 					resetMinMaxKeeper();
 
 					// update chart
-					updateStatistic(new StatisticContext(_activePerson, _activeTourTypeFilter, _currentYear, 1, false));
+					preferencesHasChanged();
 				}
 			}
 		};
@@ -156,6 +156,7 @@ public class StatisticTourNumbers extends YearStatistic {
 
 		// remove pref listener
 		container.addDisposeListener(new DisposeListener() {
+			@Override
 			public void widgetDisposed(final DisposeEvent e) {
 				_prefStore.removePropertyChangeListener(_prefChangeListener);
 			}
@@ -595,12 +596,15 @@ public class StatisticTourNumbers extends YearStatistic {
 		return units;
 	}
 
+	@Override
 	public void preferencesHasChanged() {
-		updateStatistic(new StatisticContext(_activePerson, _activeTourTypeFilter, _currentYear, 1, false));
+		updateStatistic(new StatisticContext(_activePerson, _activeTourTypeFilter, _currentYear, _numberOfYears, false));
 	}
 
 	private void resetMinMaxKeeper() {
+
 		if (_isSynchScaleEnabled == false) {
+
 			_minMaxKeeperStatAltitudeCounter.resetMinMax();
 			_minMaxKeeperStatAltitudeSum.resetMinMax();
 			_minMaxKeeperStatDistanceCounter.resetMinMax();
@@ -618,7 +622,7 @@ public class StatisticTourNumbers extends YearStatistic {
 		_isSynchScaleEnabled = isSynchScaleEnabled;
 	}
 
-	private void updateChartAltitude(	final Chart statAltitudeChart,
+	private void updateChartAltitude(	final Chart chart,
 										final BarChartMinMaxKeeper statAltitudeMinMaxKeeper,
 										final int[][] lowValues,
 										final int[][] highValues,
@@ -658,16 +662,10 @@ public class StatisticTourNumbers extends YearStatistic {
 			statAltitudeMinMaxKeeper.setMinMaxValues(chartDataModel);
 		}
 
-		// set grid size
-		final IPreferenceStore prefStore = TourbookPlugin.getDefault().getPreferenceStore();
-		statAltitudeChart.setGrid(
-				prefStore.getInt(ITourbookPreferences.GRAPH_GRID_HORIZONTAL_DISTANCE),
-				prefStore.getInt(ITourbookPreferences.GRAPH_GRID_VERTICAL_DISTANCE),
-				prefStore.getBoolean(ITourbookPreferences.GRAPH_GRID_IS_SHOW_HORIZONTAL_GRIDLINES),
-				prefStore.getBoolean(ITourbookPreferences.GRAPH_GRID_IS_SHOW_VERTICAL_GRIDLINES));
+		setChartProperties(chart);
 
 		// show the new data in the chart
-		statAltitudeChart.updateChart(chartDataModel, true);
+		chart.updateChart(chartDataModel, true);
 	}
 
 	/**
@@ -721,13 +719,7 @@ public class StatisticTourNumbers extends YearStatistic {
 			statDistanceMinMaxKeeper.setMinMaxValues(chartDataModel);
 		}
 
-		// set grid size
-		final IPreferenceStore prefStore = TourbookPlugin.getDefault().getPreferenceStore();
-		statDistanceChart.setGrid(
-				prefStore.getInt(ITourbookPreferences.GRAPH_GRID_HORIZONTAL_DISTANCE),
-				prefStore.getInt(ITourbookPreferences.GRAPH_GRID_VERTICAL_DISTANCE),
-				prefStore.getBoolean(ITourbookPreferences.GRAPH_GRID_IS_SHOW_HORIZONTAL_GRIDLINES),
-				prefStore.getBoolean(ITourbookPreferences.GRAPH_GRID_IS_SHOW_VERTICAL_GRIDLINES));
+		setChartProperties(statDistanceChart);
 
 		// show the new data fDataModel in the chart
 		statDistanceChart.updateChart(chartDataModel, true);
@@ -835,13 +827,7 @@ public class StatisticTourNumbers extends YearStatistic {
 			statDurationMinMaxKeeper.setMinMaxValues(chartDataModel);
 		}
 
-		// set grid size
-		final IPreferenceStore prefStore = TourbookPlugin.getDefault().getPreferenceStore();
-		statDurationChart.setGrid(
-				prefStore.getInt(ITourbookPreferences.GRAPH_GRID_HORIZONTAL_DISTANCE),
-				prefStore.getInt(ITourbookPreferences.GRAPH_GRID_VERTICAL_DISTANCE),
-				prefStore.getBoolean(ITourbookPreferences.GRAPH_GRID_IS_SHOW_HORIZONTAL_GRIDLINES),
-				prefStore.getBoolean(ITourbookPreferences.GRAPH_GRID_IS_SHOW_VERTICAL_GRIDLINES));
+		setChartProperties(statDurationChart);
 
 		// show the new data data model in the chart
 		statDurationChart.updateChart(chartDataModel, true);
@@ -870,16 +856,13 @@ public class StatisticTourNumbers extends YearStatistic {
 		}
 	}
 
-	//	public void refreshStatistic(	final TourPerson person,
-//									final TourTypeFilter typeId,
-//									final int year,
-//									final int numberOfYears,
-//									final boolean refreshData) {
+	@Override
 	public void updateStatistic(final StatisticContext statContext) {
 
 		_activePerson = statContext.appPerson;
 		_activeTourTypeFilter = statContext.appTourTypeFilter;
 		_currentYear = statContext.statYoungestYear;
+		_numberOfYears = statContext.statNumberOfYears;
 
 		_tourDayData = DataProviderTourDay.getInstance().getDayData(
 				statContext.appPerson,

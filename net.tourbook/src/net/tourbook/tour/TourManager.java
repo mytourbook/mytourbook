@@ -430,7 +430,7 @@ public class TourManager {
 		tcc.isShowBreaktimeValues = _prefStore.getBoolean(//
 				ITourbookPreferences.GRAPH_IS_BREAKTIME_VALUES_VISIBLE);
 
-		updateZoomOptionsInChartConfig(tcc, _prefStore);
+		tcc.updateZoomOptions();
 
 		return tcc;
 	}
@@ -1549,19 +1549,6 @@ public class TourManager {
 		_tourDataEditorInstance = tourDataEditorView;
 	}
 
-	/**
-	 * update the zoom options in the chart configuration from the pref store
-	 * 
-	 * @param chartConfig
-	 * @param prefStore
-	 */
-	public static void updateZoomOptionsInChartConfig(	final TourChartConfiguration chartConfig,
-														final IPreferenceStore prefStore) {
-
-		chartConfig.autoZoomToSlider = prefStore.getBoolean(ITourbookPreferences.GRAPH_ZOOM_AUTO_ZOOM_TO_SLIDER);
-		chartConfig.moveSlidersWhenZoomed = prefStore.getBoolean(ITourbookPreferences.GRAPH_MOVE_SLIDERS_WHEN_ZOOMED);
-	}
-
 	public void addTourEventListener(final ITourEventListener listener) {
 		_tourEventListeners.add(listener);
 	}
@@ -1922,31 +1909,32 @@ public class TourManager {
 	}
 
 	/**
-	 * Creates a chart data fDataModel from the tour data
+	 * Creates a chart data model from the tour data.
 	 * 
 	 * @param tourData
 	 *            data which contains the tour data
 	 * @param tourChartProperty
-	 * @param fTourChartConfig
 	 * @return
 	 */
-	public ChartDataModel createChartDataModel(final TourData tourData, final TourChartConfiguration chartConfig) {
+	public ChartDataModel createChartDataModel(final TourData tourData, final TourChartConfiguration tcc) {
 
-		return createChartDataModel_10(tourData, chartConfig, false);
+		return createChartDataModel_10(tourData, tcc, false);
 	}
 
 	public ChartDataModel createChartDataModel(	final TourData tourData,
-												final TourChartConfiguration chartConfig,
+												final TourChartConfiguration tcc,
 												final boolean hasPropertyChanged) {
 
-		return createChartDataModel_10(tourData, chartConfig, hasPropertyChanged);
+		return createChartDataModel_10(tourData, tcc, hasPropertyChanged);
 	}
 
 	private ChartDataModel createChartDataModel_10(	final TourData tourData,
-													final TourChartConfiguration tourChartConfig,
+													final TourChartConfiguration tcc,
 													final boolean hasPropertyChanged) {
 
 		final ChartDataModel chartDataModel = new ChartDataModel(ChartType.LINE);
+
+		chartDataModel.setTitle(getTourTitleDetailed(tourData));
 
 		/*
 		 * TIME SERIE is a MUST data serie
@@ -1999,12 +1987,12 @@ public class TourManager {
 		boolean isShowTimeOnXAxis;
 		if (xDataDist == null) {
 			isShowTimeOnXAxis = true;
-			tourChartConfig.isForceTimeOnXAxis = true;
+			tcc.isForceTimeOnXAxis = true;
 		} else {
-			isShowTimeOnXAxis = tourChartConfig.isShowTimeOnXAxisBackup;
-			tourChartConfig.isForceTimeOnXAxis = false;
+			isShowTimeOnXAxis = tcc.isShowTimeOnXAxisBackup;
+			tcc.isForceTimeOnXAxis = false;
 		}
-		tourChartConfig.isShowTimeOnXAxis = isShowTimeOnXAxis;
+		tcc.isShowTimeOnXAxis = isShowTimeOnXAxis;
 
 		if (isShowTimeOnXAxis) {
 
@@ -2033,7 +2021,7 @@ public class TourManager {
 
 			final int photoTimeOfDay = tourTimeOfDay - tourData.getPhotoTimeAdjustment();
 
-			final X_AXIS_START_TIME configXAxisTime = tourChartConfig.xAxisTime;
+			final X_AXIS_START_TIME configXAxisTime = tcc.xAxisTime;
 
 			final double xAxisStartValue = configXAxisTime == X_AXIS_START_TIME.START_WITH_0
 					? 0
@@ -2070,8 +2058,8 @@ public class TourManager {
 		}
 
 		// HR zones can be displayed when they are available
-		tourChartConfig.canShowHrZones = tourData.getNumberOfHrZones() > 0;
-		final boolean isHrZoneDisplayed = tourChartConfig.canShowHrZones && tourChartConfig.isHrZoneDisplayed;
+		tcc.canShowHrZones = tourData.getNumberOfHrZones() > 0;
+		final boolean isHrZoneDisplayed = tcc.canShowHrZones && tcc.isHrZoneDisplayed;
 
 		/*
 		 * altitude
@@ -2083,9 +2071,9 @@ public class TourManager {
 
 			if (tourData.isSRTMAvailable()) {
 
-				tourChartConfig.canShowSRTMData = true;
+				tcc.canShowSRTMData = true;
 
-				if (tourChartConfig.isSRTMDataVisible) {
+				if (tcc.isSRTMDataVisible) {
 
 					final float[] srtmDataSerie = tourData.getSRTMSerie();
 					if (srtmDataSerie != null) {
@@ -2100,7 +2088,7 @@ public class TourManager {
 			} else {
 
 				// SRTM data are not available
-				tourChartConfig.canShowSRTMData = false;
+				tcc.canShowSRTMData = false;
 			}
 
 			if (yDataAltitude == null) {
@@ -2462,7 +2450,7 @@ public class TourManager {
 		 * all visible graphs are added as y-data to the chart data model in the sequence as they
 		 * were activated
 		 */
-		for (final int actionId : tourChartConfig.getVisibleGraphs()) {
+		for (final int actionId : tcc.getVisibleGraphs()) {
 
 			switch (actionId) {
 			case GRAPH_ALTITUDE:
@@ -2572,8 +2560,8 @@ public class TourManager {
 			createTourSegments(tourData, chartDataModel);
 		}
 
-		chartDataModel.setShowNoLineValues(tourChartConfig.isShowBreaktimeValues);
-		chartDataModel.setIsGraphOverlapped(tourChartConfig.isGraphOverlapped);
+		chartDataModel.setShowNoLineValues(tcc.isShowBreaktimeValues);
+		chartDataModel.setIsGraphOverlapped(tcc.isGraphOverlapped);
 
 		chartDataModel.setCustomData(CUSTOM_DATA_TIME, xDataTime);
 		chartDataModel.setCustomData(CUSTOM_DATA_DISTANCE, xDataDist);
@@ -2581,7 +2569,7 @@ public class TourManager {
 		chartDataModel.setCustomData(CUSTOM_DATA_TOUR_DATA, tourData);
 		chartDataModel.setCustomData(Chart.CUSTOM_DATA_TOUR_ID, tourData.getTourId());
 
-		chartDataModel.setCustomData(CUSTOM_DATA_TOUR_CHART_CONFIGURATION, tourChartConfig);
+		chartDataModel.setCustomData(CUSTOM_DATA_TOUR_CHART_CONFIGURATION, tcc);
 
 		return chartDataModel;
 	}

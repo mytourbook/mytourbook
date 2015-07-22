@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -105,24 +105,30 @@ public class WizardPage_10_CompareTour extends WizardPage {
 
 	private class TourContentProvider implements ITreeContentProvider {
 
+		@Override
 		public void dispose() {}
 
+		@Override
 		public Object[] getChildren(final Object parentElement) {
 			return ((TreeViewerItem) parentElement).getFetchedChildrenAsArray();
 		}
 
+		@Override
 		public Object[] getElements(final Object inputElement) {
 			return _rootItem.getFetchedChildrenAsArray();
 		}
 
+		@Override
 		public Object getParent(final Object element) {
 			return ((TreeViewerItem) element).getParentItem();
 		}
 
+		@Override
 		public boolean hasChildren(final Object element) {
 			return ((TreeViewerItem) element).hasChildren();
 		}
 
+		@Override
 		public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
 	}
 
@@ -133,6 +139,7 @@ public class WizardPage_10_CompareTour extends WizardPage {
 		setTitle(Messages.tourCatalog_wizard_Page_compared_tours_title);
 	}
 
+	@Override
 	public void createControl(final Composite parent) {
 
 		final Composite pageContainer = createUI(parent);
@@ -210,18 +217,21 @@ public class WizardPage_10_CompareTour extends WizardPage {
 		_tourViewer.setUseHashlookup(true);
 
 		_tourViewer.addSelectionChangedListener(new ISelectionChangedListener() {
+			@Override
 			public void selectionChanged(final SelectionChangedEvent event) {
 				showCompareTour(event);
 			}
 		});
 
 		_tourViewer.addCheckStateListener(new ICheckStateListener() {
+			@Override
 			public void checkStateChanged(final CheckStateChangedEvent event) {
 				validatePage();
 			}
 		});
 
 		_tourViewer.addDoubleClickListener(new IDoubleClickListener() {
+			@Override
 			public void doubleClick(final DoubleClickEvent event) {
 
 				final Object selection = ((IStructuredSelection) _tourViewer.getSelection()).getFirstElement();
@@ -258,12 +268,12 @@ public class WizardPage_10_CompareTour extends WizardPage {
 				_compareTourChart = new Chart(_pageBook, SWT.NONE);
 				_compareTourChart.setBackgroundColor(parent.getDisplay().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
 
-				// set grid size
-				_compareTourChart.setGrid(
+				_compareTourChart.updateProperties(
 						_prefStore.getInt(ITourbookPreferences.GRAPH_GRID_HORIZONTAL_DISTANCE),
 						_prefStore.getInt(ITourbookPreferences.GRAPH_GRID_VERTICAL_DISTANCE),
 						_prefStore.getBoolean(ITourbookPreferences.GRAPH_GRID_IS_SHOW_HORIZONTAL_GRIDLINES),
-						_prefStore.getBoolean(ITourbookPreferences.GRAPH_GRID_IS_SHOW_VERTICAL_GRIDLINES));
+						_prefStore.getBoolean(ITourbookPreferences.GRAPH_GRID_IS_SHOW_VERTICAL_GRIDLINES),
+						_prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_SEGMENT_ALTERNATE_COLOR));
 
 				_pageTourIsNotSelected = new Label(_pageBook, SWT.NONE);
 				_pageTourIsNotSelected.setText(Messages.tourCatalog_wizard_Label_a_tour_is_not_selected);
@@ -417,6 +427,7 @@ public class WizardPage_10_CompareTour extends WizardPage {
 		if (isEnabled && _isTourViewerInitialized == false) {
 
 			BusyIndicator.showWhile(null, new Runnable() {
+				@Override
 				public void run() {
 
 					// initialize the data before the view input is set

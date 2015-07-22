@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -425,12 +425,7 @@ public abstract class StatisticWeek extends YearStatistic {
 
 	private void getPreferences() {
 
-		// set grid properties
-		_chart.setGrid(
-				_prefStore.getInt(ITourbookPreferences.GRAPH_GRID_HORIZONTAL_DISTANCE),
-				_prefStore.getInt(ITourbookPreferences.GRAPH_GRID_VERTICAL_DISTANCE),
-				_prefStore.getBoolean(ITourbookPreferences.GRAPH_GRID_IS_SHOW_HORIZONTAL_GRIDLINES),
-				_prefStore.getBoolean(ITourbookPreferences.GRAPH_GRID_IS_SHOW_VERTICAL_GRIDLINES));
+		setChartProperties(_chart);
 
 		// set week start values
 		_firstDayOfWeek = _prefStore.getInt(ITourbookPreferences.CALENDAR_WEEK_FIRST_DAY_OF_WEEK);
@@ -440,6 +435,7 @@ public abstract class StatisticWeek extends YearStatistic {
 		_tooltipCalendar.setMinimalDaysInFirstWeek(_minimalDaysInFirstWeek);
 	}
 
+	@Override
 	public void preferencesHasChanged() {
 		updateStatistic();
 	}
@@ -463,6 +459,7 @@ public abstract class StatisticWeek extends YearStatistic {
 				false));
 	}
 
+	@Override
 	public void updateStatistic(final StatisticContext statContext) {
 
 		_appPerson = statContext.appPerson;

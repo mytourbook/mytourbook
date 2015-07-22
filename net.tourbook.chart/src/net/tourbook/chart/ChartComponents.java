@@ -281,9 +281,9 @@ public class ChartComponents extends Composite {
 	private ChartDrawingData createDrawingData() {
 
 		// compute the graphs and axis
-		final ArrayList<GraphDrawingData> graphDrawingData = new ArrayList<GraphDrawingData>();
+		final ArrayList<GraphDrawingData> allGraphDrawingData = new ArrayList<GraphDrawingData>();
 
-		final ChartDrawingData chartDrawingData = new ChartDrawingData(graphDrawingData);
+		final ChartDrawingData chartDrawingData = new ChartDrawingData(allGraphDrawingData);
 
 		chartDrawingData.chartDataModel = _chartDataModel;
 
@@ -297,17 +297,17 @@ public class ChartComponents extends Composite {
 		// loop all graphs
 		for (final ChartDataYSerie yData : yDataList) {
 
-			final GraphDrawingData drawingData = new GraphDrawingData(chartDrawingData, yData.getChartType());
+			final GraphDrawingData graphDrawingData = new GraphDrawingData(chartDrawingData, yData.getChartType());
 
-			graphDrawingData.add(drawingData);
+			allGraphDrawingData.add(graphDrawingData);
 
 			// set chart title above the first graph
 			if (graphIndex == 1) {
 
-				drawingData.setXTitle(_chartDataModel.getTitle());
+				graphDrawingData.setXTitle(_chartDataModel.getTitle());
 
 				// set the chart title height and margin
-				final String title = drawingData.getXTitle();
+				final String title = graphDrawingData.getXTitle();
 				final ChartSegments chartSegments = xData.getChartSegments();
 
 				if (title != null && title.length() > 0 || //
@@ -319,13 +319,13 @@ public class ChartComponents extends Composite {
 			}
 
 			// set x/y data
-			drawingData.setXData(xData);
-			drawingData.setXData2nd(xData2nd);
-			drawingData.setYData(yData);
+			graphDrawingData.setXData(xData);
+			graphDrawingData.setXData2nd(xData2nd);
+			graphDrawingData.setYData(yData);
 
 			// compute x/y values
-			createDrawingData_X(drawingData);
-			createDrawingData_Y(drawingData, graphCount, graphIndex);
+			createDrawingData_X(graphDrawingData);
+			createDrawingData_Y(graphDrawingData, graphCount, graphIndex);
 
 			// reset adjusted y-slider value
 			yData.adjustedYValue = Float.MIN_VALUE;

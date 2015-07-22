@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -220,7 +220,7 @@ public class TrainingView extends ViewPart {
 
 		_isShowAllPulseValues = _actionShowAllPulseValues.isChecked();
 
-		updateUI30HrZonesFromModel();
+		updateUI_30_HrZonesFromModel();
 	}
 
 	void actionSynchChartScale() {
@@ -231,7 +231,7 @@ public class TrainingView extends ViewPart {
 			_minMaxKeeper.resetMinMax();
 		}
 
-		updateUI30HrZonesFromModel();
+		updateUI_30_HrZonesFromModel();
 	}
 
 	private void addPartListener() {
@@ -271,6 +271,7 @@ public class TrainingView extends ViewPart {
 	private void addPrefListener() {
 
 		_prefChangeListener = new IPropertyChangeListener() {
+			@Override
 			public void propertyChange(final PropertyChangeEvent event) {
 
 				final String property = event.getProperty();
@@ -286,16 +287,13 @@ public class TrainingView extends ViewPart {
 				} else if (property.equals(ITourbookPreferences.GRAPH_GRID_HORIZONTAL_DISTANCE)
 						|| property.equals(ITourbookPreferences.GRAPH_GRID_VERTICAL_DISTANCE)
 						|| property.equals(ITourbookPreferences.GRAPH_GRID_IS_SHOW_HORIZONTAL_GRIDLINES)
-						|| property.equals(ITourbookPreferences.GRAPH_GRID_IS_SHOW_VERTICAL_GRIDLINES)) {
+						|| property.equals(ITourbookPreferences.GRAPH_GRID_IS_SHOW_VERTICAL_GRIDLINES)
+						|| property.equals(ITourbookPreferences.GRAPH_IS_SEGMENT_ALTERNATE_COLOR)) {
 
-					_chartHrTime.setGrid(
-							_prefStore.getInt(ITourbookPreferences.GRAPH_GRID_HORIZONTAL_DISTANCE),
-							_prefStore.getInt(ITourbookPreferences.GRAPH_GRID_VERTICAL_DISTANCE),
-							_prefStore.getBoolean(ITourbookPreferences.GRAPH_GRID_IS_SHOW_HORIZONTAL_GRIDLINES),
-							_prefStore.getBoolean(ITourbookPreferences.GRAPH_GRID_IS_SHOW_VERTICAL_GRIDLINES));
+					setChartProperties();
 
 					// grid has changed, update chart
-					updateUI30HrZonesFromModel();
+					updateUI_30_HrZonesFromModel();
 				}
 			}
 		};
@@ -309,6 +307,7 @@ public class TrainingView extends ViewPart {
 	private void addSelectionListener() {
 
 		_postSelectionListener = new ISelectionListener() {
+			@Override
 			public void selectionChanged(final IWorkbenchPart part, final ISelection selection) {
 
 				if (part == TrainingView.this) {
@@ -325,6 +324,7 @@ public class TrainingView extends ViewPart {
 
 		_tourEventListener = new ITourEventListener() {
 
+			@Override
 			public void tourChanged(final IWorkbenchPart part, final TourEventId eventId, final Object eventData) {
 
 				if (part == TrainingView.this) {
@@ -339,7 +339,7 @@ public class TrainingView extends ViewPart {
 					final ArrayList<TourData> modifiedTours = ((TourEvent) eventData).getModifiedTours();
 
 					if ((modifiedTours != null) && (modifiedTours.size() > 0)) {
-						updateUI20(modifiedTours.get(0));
+						updateUI_20(modifiedTours.get(0));
 					}
 				} else if (eventId == TourEventId.TOUR_CHART_PROPERTY_IS_MODIFIED) {
 
@@ -347,7 +347,7 @@ public class TrainingView extends ViewPart {
 
 						_tourData.clearComputedSeries();
 
-						updateUI20(_tourData);
+						updateUI_20(_tourData);
 					}
 				}
 			}
@@ -393,15 +393,6 @@ public class TrainingView extends ViewPart {
 
 		showTour();
 	}
-
-//	private ChartToolTip1 createToolTipInfo(final int valueIndex) {
-//
-//		final ChartToolTip1 toolTipInfo = new ChartToolTip1();
-//		toolTipInfo.setTitle(tourTitle);
-//		toolTipInfo.setLabel(toolTipLabel);
-//
-//		return toolTipInfo;
-//	}
 
 	private void createUI(final Composite parent) {
 
@@ -568,14 +559,10 @@ public class TrainingView extends ViewPart {
 		_chartHrTime = new Chart(parent, SWT.FLAT);
 		GridDataFactory.fillDefaults().grab(true, true).applyTo(_chartHrTime);
 
-		// set grid size
-		_chartHrTime.setGrid(
-				_prefStore.getInt(ITourbookPreferences.GRAPH_GRID_HORIZONTAL_DISTANCE),
-				_prefStore.getInt(ITourbookPreferences.GRAPH_GRID_VERTICAL_DISTANCE),
-				_prefStore.getBoolean(ITourbookPreferences.GRAPH_GRID_IS_SHOW_HORIZONTAL_GRIDLINES),
-				_prefStore.getBoolean(ITourbookPreferences.GRAPH_GRID_IS_SHOW_VERTICAL_GRIDLINES));
+		setChartProperties();
 
 		_chartHrTime.addBarSelectionListener(new IBarSelectionListener() {
+			@Override
 			public void selectionChanged(final int serieIndex, final int valueIndex) {
 
 //					_postSelectionProvider.setSelection(selection);
@@ -761,6 +748,7 @@ public class TrainingView extends ViewPart {
 					.applyTo(_canvasHrZoneImage);
 
 			_canvasHrZoneImage.addPaintListener(new PaintListener() {
+				@Override
 				public void paintControl(final PaintEvent e) {
 
 					if (_hrZoneImage == null || _hrZoneImage.isDisposed()) {
@@ -783,11 +771,12 @@ public class TrainingView extends ViewPart {
 			_canvasHrZoneImage.addControlListener(new ControlAdapter() {
 				@Override
 				public void controlResized(final ControlEvent e) {
-					updateUI44HrZoneImage();
+					updateUI_44_HrZoneImage();
 				}
 			});
 
 			_canvasHrZoneImage.addDisposeListener(new DisposeListener() {
+				@Override
 				public void widgetDisposed(final DisposeEvent e) {
 					if (_hrZoneImage != null) {
 						_hrZoneImage.dispose();
@@ -940,7 +929,7 @@ public class TrainingView extends ViewPart {
 		}
 		_isUpdateUI = false;
 
-		updateUI30HrZonesFromModel();
+		updateUI_30_HrZonesFromModel();
 	}
 
 	/**
@@ -964,7 +953,7 @@ public class TrainingView extends ViewPart {
 					return;
 				}
 
-				updateUI20(selectionTourData);
+				updateUI_20(selectionTourData);
 			}
 
 		} else if (selection instanceof SelectionTourIds) {
@@ -972,7 +961,7 @@ public class TrainingView extends ViewPart {
 			final SelectionTourIds selectionTourId = (SelectionTourIds) selection;
 			final ArrayList<Long> tourIds = selectionTourId.getTourIds();
 			if (tourIds != null && tourIds.size() > 0) {
-				updateUI10(tourIds.get(0));
+				updateUI(tourIds.get(0));
 			}
 
 		} else if (selection instanceof SelectionTourId) {
@@ -980,21 +969,21 @@ public class TrainingView extends ViewPart {
 			final SelectionTourId selectionTourId = (SelectionTourId) selection;
 			final Long tourId = selectionTourId.getTourId();
 
-			updateUI10(tourId);
+			updateUI(tourId);
 
 		} else if (selection instanceof StructuredSelection) {
 
 			final Object firstElement = ((StructuredSelection) selection).getFirstElement();
 			if (firstElement instanceof TVICatalogComparedTour) {
 
-				updateUI10(((TVICatalogComparedTour) firstElement).getTourId());
+				updateUI(((TVICatalogComparedTour) firstElement).getTourId());
 
 			} else if (firstElement instanceof TVICompareResultComparedTour) {
 
 				final TVICompareResultComparedTour compareResultItem = (TVICompareResultComparedTour) firstElement;
 				final TourData tourData = TourManager.getInstance().getTourData(
 						compareResultItem.getComparedTourData().getTourId());
-				updateUI20(tourData);
+				updateUI_20(tourData);
 			}
 
 		} else if (selection instanceof SelectionTourCatalogView) {
@@ -1003,7 +992,7 @@ public class TrainingView extends ViewPart {
 
 			final TVICatalogRefTourItem refItem = tourCatalogSelection.getRefItem();
 			if (refItem != null) {
-				updateUI10(refItem.getTourId());
+				updateUI(refItem.getTourId());
 			}
 
 		} else if (selection instanceof SelectionDeletedTours) {
@@ -1037,6 +1026,16 @@ public class TrainingView extends ViewPart {
 		_state.put(STATE_IS_SYNC_VERTICAL_CHART_SCALING, _actionSynchVerticalChartScaling.isChecked());
 	}
 
+	private void setChartProperties() {
+
+		_chartHrTime.updateProperties(
+				_prefStore.getInt(ITourbookPreferences.GRAPH_GRID_HORIZONTAL_DISTANCE),
+				_prefStore.getInt(ITourbookPreferences.GRAPH_GRID_VERTICAL_DISTANCE),
+				_prefStore.getBoolean(ITourbookPreferences.GRAPH_GRID_IS_SHOW_HORIZONTAL_GRIDLINES),
+				_prefStore.getBoolean(ITourbookPreferences.GRAPH_GRID_IS_SHOW_VERTICAL_GRIDLINES),
+				_prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_SEGMENT_ALTERNATE_COLOR));
+	}
+
 	@Override
 	public void setFocus() {
 
@@ -1057,6 +1056,7 @@ public class TrainingView extends ViewPart {
 
 		// a tour is not displayed, find a tour provider which provides a tour
 		Display.getCurrent().asyncExec(new Runnable() {
+			@Override
 			public void run() {
 
 				// validate widget
@@ -1073,23 +1073,23 @@ public class TrainingView extends ViewPart {
 
 				final ArrayList<TourData> selectedTours = TourManager.getSelectedTours();
 				if (selectedTours != null && selectedTours.size() > 0) {
-					updateUI20(selectedTours.get(0));
+					updateUI_20(selectedTours.get(0));
 				}
 			}
 		});
 	}
 
-	private void updateUI10(final long tourId) {
+	private void updateUI(final long tourId) {
 
 		if (_tourData != null && _tourData.getTourId() == tourId) {
 			// optimize
 			return;
 		}
 
-		updateUI20(TourManager.getInstance().getTourData(tourId));
+		updateUI_20(TourManager.getInstance().getTourData(tourId));
 	}
 
-	private void updateUI20(final TourData tourData) {
+	private void updateUI_20(final TourData tourData) {
 
 		if (tourData == null) {
 			// nothing to do
@@ -1112,13 +1112,13 @@ public class TrainingView extends ViewPart {
 			_currentPerson = tourPerson;
 		}
 
-		updateUI30HrZonesFromModel();
+		updateUI_30_HrZonesFromModel();
 	}
 
 	/**
 	 * Displays training data when a tour is available
 	 */
-	private void updateUI30HrZonesFromModel() {
+	private void updateUI_30_HrZonesFromModel() {
 
 		enableControls();
 
@@ -1188,14 +1188,14 @@ public class TrainingView extends ViewPart {
 				_currentPerson.getBirthDayWithDefault(),
 				_tourData.getTourStartTime());
 
-		updateUI40HrZoneChart(zoneMinMaxBpm);
-		updateUI42HrZoneData(zoneMinMaxBpm);
+		updateUI_40_HrZoneChart(zoneMinMaxBpm);
+		updateUI_42_HrZoneData(zoneMinMaxBpm);
 
 		// update hr zone image
-		updateUI44HrZoneImage();
+		updateUI_44_HrZoneImage();
 	}
 
-	private void updateUI40HrZoneChart(final HrZoneContext zoneMinMaxBpm) {
+	private void updateUI_40_HrZoneChart(final HrZoneContext zoneMinMaxBpm) {
 
 		final float[] pulseSerie = _tourData.getPulseSmoothedSerie();
 		final int[] timeSerie = _tourData.timeSerie;
@@ -1368,7 +1368,7 @@ public class TrainingView extends ViewPart {
 	 * @param zoneContext
 	 *            Contains age and HR max values.
 	 */
-	private void updateUI42HrZoneData(final HrZoneContext zoneContext) {
+	private void updateUI_42_HrZoneData(final HrZoneContext zoneContext) {
 
 		// create hr zones when not yet done or disposed
 		if (_hrZoneDataContainerContent == null || _hrZoneDataContainerContent.isDisposed()) {
@@ -1477,12 +1477,13 @@ public class TrainingView extends ViewPart {
 		}
 	}
 
-	private void updateUI44HrZoneImage() {
+	private void updateUI_44_HrZoneImage() {
 
 		Display.getDefault().asyncExec(new Runnable() {
 
 			final int	__counter	= ++_imageCounter;
 
+			@Override
 			public void run() {
 
 				// check if this is the newest request to create an image

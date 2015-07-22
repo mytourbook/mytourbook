@@ -539,7 +539,7 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 		_tourChart.addDataModelListener(new IDataModelListener() {
 			@Override
 			public void dataModelChanged(final ChartDataModel chartDataModel) {
-				chartDataModel.setTitle(TourManager.getTourTitleDetailed(_tourData));
+//				chartDataModel.setTitle(TourManager.getTourTitleDetailed(_tourData));
 			}
 		});
 

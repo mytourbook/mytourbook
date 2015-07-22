@@ -31,7 +31,7 @@ import org.eclipse.jface.preference.PreferenceConverter;
 import org.eclipse.swt.graphics.RGB;
 
 /**
- * Contains the configuration how the tour chart is displayed.
+ * Contains the configuration how a tour chart is displayed.
  */
 public class TourChartConfiguration {
 
@@ -194,7 +194,7 @@ public class TourChartConfiguration {
 	public boolean					isTourInfoVisible		= true;
 	public boolean					isShowInfoTitle			= true;
 	public boolean					isShowInfoTooltip		= true;
-	public int						infoTooltipDelay;
+	public int						tourInfoTooltipDelay;
 
 	/**
 	 * @param keepMinMaxValues
@@ -240,7 +240,7 @@ public class TourChartConfiguration {
 		isTourInfoVisible = _prefStore.getBoolean(ITourbookPreferences.GRAPH_TOUR_INFO_IS_VISIBLE);
 		isShowInfoTitle = _prefStore.getBoolean(ITourbookPreferences.GRAPH_TOUR_INFO_IS_TITLE_VISIBLE);
 		isShowInfoTooltip = _prefStore.getBoolean(ITourbookPreferences.GRAPH_TOUR_INFO_IS_TOOLTIP_VISIBLE);
-		infoTooltipDelay = _prefStore.getInt(ITourbookPreferences.GRAPH_TOUR_INFO_TOOLTIP_DELAY);
+		tourInfoTooltipDelay = _prefStore.getInt(ITourbookPreferences.GRAPH_TOUR_INFO_TOOLTIP_DELAY);
 	}
 
 	public void addVisibleGraph(final int visibleGraph) {
@@ -295,6 +295,18 @@ public class TourChartConfiguration {
 		} else {
 			_minMaxKeeper = null;
 		}
+	}
+
+	/**
+	 * Update zoom options from the pref store.
+	 * 
+	 * @param tcc
+	 * @param prefStore
+	 */
+	public void updateZoomOptions() {
+
+		autoZoomToSlider = _prefStore.getBoolean(ITourbookPreferences.GRAPH_ZOOM_AUTO_ZOOM_TO_SLIDER);
+		moveSlidersWhenZoomed = _prefStore.getBoolean(ITourbookPreferences.GRAPH_MOVE_SLIDERS_WHEN_ZOOMED);
 	}
 
 }

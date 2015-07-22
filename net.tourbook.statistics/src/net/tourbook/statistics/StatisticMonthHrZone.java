@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -20,7 +20,6 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
-import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.BarChartMinMaxKeeper;
 import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartDataModel;
@@ -33,13 +32,11 @@ import net.tourbook.chart.IChartInfoProvider;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourPerson;
 import net.tourbook.data.TourPersonHRZone;
-import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.statistic.StatisticContext;
 import net.tourbook.ui.TourTypeFilter;
 import net.tourbook.ui.UI;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
-import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.viewers.IPostSelectionProvider;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
@@ -51,9 +48,6 @@ import org.eclipse.ui.IViewSite;
 public class StatisticMonthHrZone extends YearStatistic {
 
 	private static final String			STATE_HR_ZONE_START_FOR_MONTH_BAR_ORDERING	= "STATE_HR_ZONE_START_FOR_MONTH_BAR_ORDERING"; ////$NON-NLS-1$
-
-	private final IPreferenceStore		_prefStore									= TourbookPlugin.getDefault() //
-																							.getPreferenceStore();
 
 	private TourPerson					_appPerson;
 	private TourTypeFilter				_appTourTypeFilter;
@@ -223,15 +217,7 @@ public class StatisticMonthHrZone extends YearStatistic {
 		chartDataModel.addYData(yData);
 	}
 
-	private void getPreferences() {
-
-		_chart.setGrid(
-				_prefStore.getInt(ITourbookPreferences.GRAPH_GRID_HORIZONTAL_DISTANCE),
-				_prefStore.getInt(ITourbookPreferences.GRAPH_GRID_VERTICAL_DISTANCE),
-				_prefStore.getBoolean(ITourbookPreferences.GRAPH_GRID_IS_SHOW_HORIZONTAL_GRIDLINES),
-				_prefStore.getBoolean(ITourbookPreferences.GRAPH_GRID_IS_SHOW_VERTICAL_GRIDLINES));
-	}
-
+	@Override
 	public void preferencesHasChanged() {
 		updateStatistic();
 	}
@@ -579,7 +565,7 @@ public class StatisticMonthHrZone extends YearStatistic {
 			_minMaxKeeper.setMinMaxValues(chartDataModel);
 		}
 
-		getPreferences();
+		setChartProperties(_chart);
 
 		// show the fDataModel in the chart
 		_chart.updateChart(chartDataModel, true);

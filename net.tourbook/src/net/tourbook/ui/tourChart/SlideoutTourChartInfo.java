@@ -101,7 +101,10 @@ public class SlideoutTourChartInfo extends AnimatedToolTipShell implements IColo
 	private Button					_chkShowInfoTitle;
 	private Button					_chkShowInfoTooltip;
 
+	private Label					_lblTooltipDelay;
+
 	private Spinner					_spinTooltipDelay;
+
 
 	private final class WaitTimer implements Runnable {
 		@Override
@@ -254,13 +257,13 @@ public class SlideoutTourChartInfo extends AnimatedToolTipShell implements IColo
 						 * Tooltip delay
 						 */
 						// Label
-						final Label label = new Label(container, SWT.NONE);
+						_lblTooltipDelay = new Label(container, SWT.NONE);
 						GridDataFactory.fillDefaults()//
 								.align(SWT.FILL, SWT.CENTER)
 								.indent(_pc.convertWidthInCharsToPixels(3), 0)
-								.applyTo(label);
-						label.setText(Messages.Slideout_TourInfoOptions_Label_TooltipDelay);
-						label.setToolTipText(Messages.Slideout_TourInfoOptions_Label_TooltipDelay_Tooltip);
+								.applyTo(_lblTooltipDelay);
+						_lblTooltipDelay.setText(Messages.Slideout_TourInfoOptions_Label_TooltipDelay);
+						_lblTooltipDelay.setToolTipText(Messages.Slideout_TourInfoOptions_Label_TooltipDelay_Tooltip);
 
 						// Spinner
 						_spinTooltipDelay = new Spinner(container, SWT.BORDER);
@@ -277,6 +280,10 @@ public class SlideoutTourChartInfo extends AnimatedToolTipShell implements IColo
 
 	private void enableControls() {
 
+		final boolean isShowInfoTooltip = _chkShowInfoTooltip.getSelection();
+
+		_lblTooltipDelay.setEnabled(isShowInfoTooltip);
+		_spinTooltipDelay.setEnabled(isShowInfoTooltip);
 	}
 
 	public Shell getShell() {
@@ -327,12 +334,12 @@ public class SlideoutTourChartInfo extends AnimatedToolTipShell implements IColo
 		/*
 		 * Update chart config
 		 */
-		tcc.infoTooltipDelay = tooltipDelay;
 		tcc.isShowInfoTitle = isShowInfoTitle;
 		tcc.isShowInfoTooltip = isShowInfoTooltip;
+		tcc.tourInfoTooltipDelay = tooltipDelay;
 
 		// update chart with new settings
-		_tourChart.updateUI_TourInfo(true);
+		_tourChart.updateUI_TourTitleInfo();
 
 		enableControls();
 	}
@@ -395,7 +402,7 @@ public class SlideoutTourChartInfo extends AnimatedToolTipShell implements IColo
 		_chkShowInfoTitle.setSelection(tcc.isShowInfoTitle);
 		_chkShowInfoTooltip.setSelection(tcc.isShowInfoTooltip);
 
-		_spinTooltipDelay.setSelection(tcc.infoTooltipDelay);
+		_spinTooltipDelay.setSelection(tcc.tourInfoTooltipDelay);
 	}
 
 }

@@ -58,7 +58,7 @@ import net.tourbook.tour.ITourMarkerModifyListener;
 import net.tourbook.tour.ITourModifyListener;
 import net.tourbook.tour.SelectionTourMarker;
 import net.tourbook.tour.TourEventId;
-import net.tourbook.tour.TourInfoToolTipProvider;
+import net.tourbook.tour.TourInfoIconToolTipProvider;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.tourChart.action.ActionCanAutoZoomToSlider;
@@ -192,8 +192,8 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 																						.getImageDescriptor(Messages.Image__PhotoImage);
 	private IFillPainter				_hrZonePainter;
 
-	private TourToolTip					_tourToolTip;
-	private TourInfoToolTipProvider		_tourInfoToolTipProvider;
+	private TourToolTip					_tourInfoIconToolTip;
+	private TourInfoIconToolTipProvider	_tourInfoIconToolTipProvider;
 
 	private ChartPhotoToolTip			_photoTooltip;
 	private ChartMarkerToolTip			_markerTooltip;
@@ -480,9 +480,11 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		/*
 		 * set values from pref store
 		 */
+		graphAntialiasing = _prefStore.getBoolean(ITourbookPreferences.GRAPH_ANTIALIASING) ? SWT.ON : SWT.OFF;
+		isShowSegmentAlternateColor = _prefStore.getBoolean(//
+				ITourbookPreferences.GRAPH_IS_SEGMENT_ALTERNATE_COLOR);
 		graphTransparencyLine = _prefStore.getInt(ITourbookPreferences.GRAPH_TRANSPARENCY_LINE);
 		graphTransparencyFilling = _prefStore.getInt(ITourbookPreferences.GRAPH_TRANSPARENCY_FILLING);
-		graphAntialiasing = _prefStore.getBoolean(ITourbookPreferences.GRAPH_ANTIALIASING) ? SWT.ON : SWT.OFF;
 
 		gridVerticalDistance = _prefStore.getInt(ITourbookPreferences.GRAPH_GRID_VERTICAL_DISTANCE);
 		gridHorizontalDistance = _prefStore.getInt(ITourbookPreferences.GRAPH_GRID_HORIZONTAL_DISTANCE);
@@ -495,11 +497,11 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		/*
 		 * setup tour info icon into the left axis
 		 */
-		_tourInfoToolTipProvider = new TourInfoToolTipProvider();
-		_tourToolTip = new TourToolTip(getToolTipControl());
-		_tourToolTip.addToolTipProvider(_tourInfoToolTipProvider);
+		_tourInfoIconToolTipProvider = new TourInfoIconToolTipProvider();
+		_tourInfoIconToolTip = new TourToolTip(getToolTipControl());
+		_tourInfoIconToolTip.addToolTipProvider(_tourInfoIconToolTipProvider);
 
-		_tourToolTip.addHideListener(new IToolTipHideListener() {
+		_tourInfoIconToolTip.addHideListener(new IToolTipHideListener() {
 			@Override
 			public void afterHideToolTip(final Event event) {
 
@@ -507,7 +509,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 				getToolTipControl().afterHideToolTip(event);
 			}
 		});
-		setTourToolTipProvider(_tourInfoToolTipProvider);
+		setTourInfoIconToolTipProvider(_tourInfoIconToolTipProvider);
 
 		/*
 		 * Setup tour title tooltip
@@ -529,7 +531,8 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 				handleTooltipMouseEvent(event, mouseDisplayPosition);
 			}
 		};
-		setValuePointToolTipProvider(_valuePointToolTip = new ValuePointToolTipUI(vpToolTipOwner, _state));
+		_valuePointToolTip = new ValuePointToolTipUI(vpToolTipOwner, _state);
+		setValuePointToolTipProvider(_valuePointToolTip);
 
 		_photoTooltip = new ChartPhotoToolTip(this, _state);
 		_markerTooltip = new ChartMarkerToolTip(this);
@@ -660,11 +663,13 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		setActionChecked(ACTION_ID_IS_SHOW_START_TIME, isItemChecked);
 	}
 
-	public void actionShowTourInfo(final boolean isShowTourInfo) {
+	public void actionShowTourInfo(final boolean isTourInfoVisible) {
 
-		_prefStore.setValue(ITourbookPreferences.GRAPH_TOUR_INFO_IS_VISIBLE, isShowTourInfo);
+		_prefStore.setValue(ITourbookPreferences.GRAPH_TOUR_INFO_IS_VISIBLE, isTourInfoVisible);
 
-		updateUI_TourInfo(isShowTourInfo);
+		_tcc.isTourInfoVisible = isTourInfoVisible;
+
+		updateUI_TourTitleInfo();
 	}
 
 	public void actionShowTourMarker(final Boolean isMarkerVisible) {
@@ -701,7 +706,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		_prefStore.setValue(ITourbookPreferences.GRAPH_IS_TOUR_PHOTO_VISIBLE, isShowPhotos);
 		_prefStore.setValue(ITourbookPreferences.GRAPH_IS_TOUR_PHOTO_TOOLTIP_VISIBLE, isShowTooltip);
 
-		updateUI_PhotoAction();
+		updatePhotoAction();
 
 		updateTourChart(true);
 	}
@@ -855,6 +860,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 				}
 
 				final String property = event.getProperty();
+
 				boolean isChartModified = false;
 				boolean keepMinMax = true;
 
@@ -863,7 +869,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
 					// zoom preferences has changed
 
-					TourManager.updateZoomOptionsInChartConfig(_tcc, _prefStore);
+					_tcc.updateZoomOptions();
 
 					isChartModified = true;
 
@@ -877,14 +883,37 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 					// dispose old colors
 					disposeColors();
 
-				} else if (property.equals(ITourbookPreferences.GRAPH_TRANSPARENCY_LINE)
+				} else if (property.equals(ITourbookPreferences.GRAPH_ANTIALIASING)
+						|| property.equals(ITourbookPreferences.GRAPH_IS_SEGMENT_ALTERNATE_COLOR)
+						|| property.equals(ITourbookPreferences.GRAPH_TRANSPARENCY_LINE)
 						|| property.equals(ITourbookPreferences.GRAPH_TRANSPARENCY_FILLING)
-						|| property.equals(ITourbookPreferences.GRAPH_ANTIALIASING)) {
+						|| property.equals(ITourbookPreferences.GRAPH_GRID_HORIZONTAL_DISTANCE)
+						|| property.equals(ITourbookPreferences.GRAPH_GRID_VERTICAL_DISTANCE)
+						|| property.equals(ITourbookPreferences.GRAPH_GRID_IS_SHOW_HORIZONTAL_GRIDLINES)
+						|| property.equals(ITourbookPreferences.GRAPH_GRID_IS_SHOW_VERTICAL_GRIDLINES)
+				//
+				) {
 
-					graphTransparencyLine = _prefStore.getInt(ITourbookPreferences.GRAPH_TRANSPARENCY_LINE);
-					graphTransparencyFilling = _prefStore.getInt(ITourbookPreferences.GRAPH_TRANSPARENCY_FILLING);
 					graphAntialiasing = _prefStore.getBoolean(//
 							ITourbookPreferences.GRAPH_ANTIALIASING) ? SWT.ON : SWT.OFF;
+
+					isShowSegmentAlternateColor = _prefStore.getBoolean(//
+							ITourbookPreferences.GRAPH_IS_SEGMENT_ALTERNATE_COLOR);
+
+					graphTransparencyLine = _prefStore.getInt(//
+							ITourbookPreferences.GRAPH_TRANSPARENCY_LINE);
+					graphTransparencyFilling = _prefStore.getInt(//
+							ITourbookPreferences.GRAPH_TRANSPARENCY_FILLING);
+
+					gridVerticalDistance = _prefStore.getInt(//
+							ITourbookPreferences.GRAPH_GRID_VERTICAL_DISTANCE);
+					gridHorizontalDistance = _prefStore.getInt(//
+							ITourbookPreferences.GRAPH_GRID_HORIZONTAL_DISTANCE);
+
+					isShowHorizontalGridLines = _prefStore.getBoolean(//
+							ITourbookPreferences.GRAPH_GRID_IS_SHOW_HORIZONTAL_GRIDLINES);
+					isShowVerticalGridLines = _prefStore.getBoolean(//
+							ITourbookPreferences.GRAPH_GRID_IS_SHOW_VERTICAL_GRIDLINES);
 
 					isChartModified = true;
 
@@ -908,20 +937,6 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
 					_valuePointToolTip.reopen();
 
-				} else if (property.equals(ITourbookPreferences.GRAPH_GRID_HORIZONTAL_DISTANCE)
-						|| property.equals(ITourbookPreferences.GRAPH_GRID_VERTICAL_DISTANCE)
-						|| property.equals(ITourbookPreferences.GRAPH_GRID_IS_SHOW_HORIZONTAL_GRIDLINES)
-						|| property.equals(ITourbookPreferences.GRAPH_GRID_IS_SHOW_VERTICAL_GRIDLINES)) {
-
-					gridVerticalDistance = _prefStore.getInt(ITourbookPreferences.GRAPH_GRID_VERTICAL_DISTANCE);
-					gridHorizontalDistance = _prefStore.getInt(ITourbookPreferences.GRAPH_GRID_HORIZONTAL_DISTANCE);
-
-					isShowHorizontalGridLines = _prefStore.getBoolean(//
-							ITourbookPreferences.GRAPH_GRID_IS_SHOW_HORIZONTAL_GRIDLINES);
-					isShowVerticalGridLines = _prefStore.getBoolean(//
-							ITourbookPreferences.GRAPH_GRID_IS_SHOW_VERTICAL_GRIDLINES);
-
-					isChartModified = true;
 				}
 
 				/*
@@ -2733,8 +2748,8 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 	 */
 	public void setTourInfoActionsEnabled(final boolean isEnabled) {
 
-		if (_tourInfoToolTipProvider != null) {
-			_tourInfoToolTipProvider.setActionsEnabled(isEnabled);
+		if (_tourInfoIconToolTipProvider != null) {
+			_tourInfoIconToolTipProvider.setActionsEnabled(isEnabled);
 		}
 	}
 
@@ -2896,6 +2911,37 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		}
 	}
 
+	private void updatePhotoAction() {
+
+		String toolTip;
+		ImageDescriptor imageDescriptor;
+
+		final boolean isShowPhotos = _tcc.isShowTourPhotos;
+		final boolean isShowTooltip = _tcc.isShowTourPhotoTooltip;
+
+		if (isShowPhotos && isShowTooltip) {
+
+			toolTip = Messages.Tour_Action_TourPhotosWithTooltip_Tooltip;
+			imageDescriptor = _imagePhotoTooltip;
+
+		} else if (!isShowPhotos && !isShowTooltip) {
+
+			toolTip = Messages.Tour_Action_TourPhotos;
+			imageDescriptor = _imagePhoto;
+
+		} else {
+
+			toolTip = Messages.Tour_Action_TourPhotosWithoutTooltip_Tooltip;
+			imageDescriptor = _imagePhoto;
+		}
+
+		final Action action = _allTourChartActions.get(ACTION_ID_IS_SHOW_TOUR_PHOTOS);
+
+		action.setToolTipText(toolTip);
+		action.setImageDescriptor(imageDescriptor);
+		action.setChecked(isShowPhotos);
+	}
+
 	/**
 	 * Check and enable the graph actions, the visible state of a graph is defined in the tour chart
 	 * config.
@@ -2970,7 +3016,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		 */
 		tourAction = _allTourChartActions.get(ACTION_ID_IS_SHOW_TOUR_PHOTOS);
 		tourAction.setEnabled(true);
-		updateUI_PhotoAction();
+		updatePhotoAction();
 
 		/*
 		 * Breaktime values
@@ -3099,17 +3145,20 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 														final boolean keepMinMaxValues,
 														final boolean isPropertyChanged) {
 
-		if ((newTourData == null) || (newTCC == null)) {
+		if (newTourData == null || newTCC == null) {
+
+			// there are no new tour data
 
 			_valuePointToolTip.setTourData(null);
-
 			return;
 		}
 
 		// keep min/max values for the 'old' chart in the chart config
-		if (_tcc != null) {
+		if (_tcc != null && keepMinMaxValues) {
+
 			final ChartYDataMinMaxKeeper oldMinMaxKeeper = _tcc.getMinMaxKeeper();
-			if ((oldMinMaxKeeper != null) && keepMinMaxValues) {
+
+			if (oldMinMaxKeeper != null) {
 				oldMinMaxKeeper.saveMinMaxValues(getChartDataModel());
 			}
 		}
@@ -3166,7 +3215,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 			setMouseMode(_prefStore.getString(ITourbookPreferences.GRAPH_MOUSE_MODE).equals(Chart.MOUSE_MODE_SLIDER));
 		}
 
-		_tourInfoToolTipProvider.setTourData(_tourData);
+		_tourInfoIconToolTipProvider.setTourData(_tourData);
 		_valuePointToolTip.setTourData(_tourData);
 	}
 
@@ -3204,53 +3253,25 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		updateCustomLayers();
 	}
 
-	private void updateUI_PhotoAction() {
-
-		String toolTip;
-		ImageDescriptor imageDescriptor;
-
-		final boolean isShowPhotos = _tcc.isShowTourPhotos;
-		final boolean isShowTooltip = _tcc.isShowTourPhotoTooltip;
-
-		if (isShowPhotos && isShowTooltip) {
-
-			toolTip = Messages.Tour_Action_TourPhotosWithTooltip_Tooltip;
-			imageDescriptor = _imagePhotoTooltip;
-
-		} else if (!isShowPhotos && !isShowTooltip) {
-
-			toolTip = Messages.Tour_Action_TourPhotos;
-			imageDescriptor = _imagePhoto;
-
-		} else {
-
-			toolTip = Messages.Tour_Action_TourPhotosWithoutTooltip_Tooltip;
-			imageDescriptor = _imagePhoto;
-		}
-
-		final Action action = _allTourChartActions.get(ACTION_ID_IS_SHOW_TOUR_PHOTOS);
-
-		action.setToolTipText(toolTip);
-		action.setImageDescriptor(imageDescriptor);
-		action.setChecked(isShowPhotos);
-	}
-
-	void updateUI_TourInfo(final boolean isShowTourInfo) {
-
-		_tcc.isTourInfoVisible = isShowTourInfo;
+	void updateUI_TourTitleInfo() {
 
 		// setup tour title listener
-		if (isShowTourInfo) {
+		if (_tcc.isShowInfoTooltip) {
+
+			// show tour info tooltip
 
 			addMouseChartListener(_mouseTitleListener);
 
-			_tourTitleToolTipProvider.setFadeInDelayTime(_tcc.infoTooltipDelay);
+			_tourTitleToolTipProvider.setFadeInDelayTime(_tcc.tourInfoTooltipDelay);
 
 		} else {
+
+			// hide tour info tooltip
+
 			removeMouseChartListener(_mouseTitleListener);
 		}
 
-		_actionTourInfo.setSelected(isShowTourInfo);
+		updateTourChart(true);
 	}
 
 	/**

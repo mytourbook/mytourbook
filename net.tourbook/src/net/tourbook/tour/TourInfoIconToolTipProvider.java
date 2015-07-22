@@ -37,7 +37,7 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 
-public class TourInfoToolTipProvider implements ITourToolTipProvider, IInfoToolTipProvider, IHoveredArea, ITourProvider {
+public class TourInfoIconToolTipProvider implements ITourToolTipProvider, IInfoToolTipProvider, IHoveredArea, ITourProvider {
 
 	private TourToolTip			_tourToolTip;
 
@@ -63,7 +63,7 @@ public class TourInfoToolTipProvider implements ITourToolTipProvider, IInfoToolT
 	 */
 	private boolean				_isHovered			= false;
 
-	public TourInfoToolTipProvider() {
+	public TourInfoIconToolTipProvider() {
 
 		createInfoIcon();
 

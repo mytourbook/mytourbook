@@ -94,7 +94,7 @@ import net.tourbook.tour.SelectionTourIds;
 import net.tourbook.tour.SelectionTourMarker;
 import net.tourbook.tour.TourEvent;
 import net.tourbook.tour.TourEventId;
-import net.tourbook.tour.TourInfoToolTipProvider;
+import net.tourbook.tour.TourInfoIconToolTipProvider;
 import net.tourbook.tour.TourManager;
 import net.tourbook.training.TrainingManager;
 import net.tourbook.ui.tourChart.TourChart;
@@ -255,7 +255,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 	 */
 	private TourToolTip						_tourToolTip;
 
-	private TourInfoToolTipProvider			_tourInfoToolTipProvider					= new TourInfoToolTipProvider();
+	private TourInfoIconToolTipProvider			_tourInfoToolTipProvider					= new TourInfoIconToolTipProvider();
 	private ITourToolTipProvider			_wayPointToolTipProvider					= new WayPointToolTipProvider();
 
 	private String							_poiName;

@@ -65,7 +65,7 @@ public class ChartComponentAxis extends Canvas {
 	 */
 	private boolean						_isLeft;
 
-	private ITourToolTipProvider		_tourToolTipProvider;
+	private ITourToolTipProvider		_tourInfoIconToolTipProvider;
 
 	/**
 	 * <pre>
@@ -188,9 +188,9 @@ public class ChartComponentAxis extends Canvas {
 
 	private void checkHoveredArea(final int x, final int y) {
 
-		if (_tourToolTipProvider != null) {
+		if (_tourInfoIconToolTipProvider != null) {
 
-			final int newHoverState = _tourToolTipProvider.setHoveredLocation(x, y) ? 1 : 0;
+			final int newHoverState = _tourInfoIconToolTipProvider.setHoveredLocation(x, y) ? 1 : 0;
 
 			if (_hoverState != newHoverState) {
 				// force redrawing of the axis
@@ -243,8 +243,8 @@ public class ChartComponentAxis extends Canvas {
 			draw_10_ZoomMarker(gc, axisRect);
 			draw_20_YUnits(gc, axisRect);
 
-			if (_tourToolTipProvider != null) {
-				_tourToolTipProvider.paint(gc, axisRect);
+			if (_tourInfoIconToolTipProvider != null) {
+				_tourInfoIconToolTipProvider.paint(gc, axisRect);
 			}
 		}
 		gc.dispose();
@@ -546,8 +546,8 @@ public class ChartComponentAxis extends Canvas {
 		 */
 		checkHoveredArea(event.x, event.y);
 
-		if (_tourToolTipProvider != null && _hoverState == 1) {
-			_tourToolTipProvider.show(new Point(event.x, event.y));
+		if (_tourInfoIconToolTipProvider != null && _hoverState == 1) {
+			_tourInfoIconToolTipProvider.show(new Point(event.x, event.y));
 		}
 	}
 
@@ -591,6 +591,6 @@ public class ChartComponentAxis extends Canvas {
 	}
 
 	void setTourToolTipProvider(final ITourToolTipProvider tourInfoToolTipProvider) {
-		_tourToolTipProvider = tourInfoToolTipProvider;
+		_tourInfoIconToolTipProvider = tourInfoToolTipProvider;
 	}
 }

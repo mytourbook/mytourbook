@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -110,12 +110,15 @@ public class WizardPage_20_ReferenceTour extends WizardPage {
 
 		public RefTourContentProvider() {}
 
+		@Override
 		public void dispose() {}
 
+		@Override
 		public Object[] getElements(final Object parent) {
 			return _refTours.toArray();
 		}
 
+		@Override
 		public void inputChanged(final Viewer v, final Object oldInput, final Object newInput) {}
 	}
 
@@ -128,6 +131,7 @@ public class WizardPage_20_ReferenceTour extends WizardPage {
 		setTitle(Messages.tourCatalog_wizard_Page_reference_tour_title);
 	}
 
+	@Override
 	public void createControl(final Composite parent) {
 
 		initializeDialogUnits(parent);
@@ -149,6 +153,7 @@ public class WizardPage_20_ReferenceTour extends WizardPage {
 		 * scrollbar from the ref tour table, only an async layout removes it.
 		 */
 		parent.getDisplay().asyncExec(new Runnable() {
+			@Override
 			public void run() {
 
 				final Shell shell = parent.getShell();
@@ -268,12 +273,14 @@ public class WizardPage_20_ReferenceTour extends WizardPage {
 		_refTourViewer.setComparator(new RefTourComparator());
 
 		_refTourViewer.addSelectionChangedListener(new ISelectionChangedListener() {
+			@Override
 			public void selectionChanged(final SelectionChangedEvent event) {
 				showReferenceTour(event);
 			}
 		});
 
 		_refTourViewer.addCheckStateListener(new ICheckStateListener() {
+			@Override
 			public void checkStateChanged(final CheckStateChangedEvent event) {
 				onCheckRefTour(event);
 			}
@@ -528,12 +535,12 @@ public class WizardPage_20_ReferenceTour extends WizardPage {
 			_groupChart.setText(NLS.bind(refTour.label + ": " //$NON-NLS-1$
 					+ Messages.tourCatalog_wizard_Group_chart_title, TourManager.getTourDateShort(tourData)));
 
-			// set grid size
-			_refTourChart.setGrid(
+			_refTourChart.updateProperties(
 					_prefStore.getInt(ITourbookPreferences.GRAPH_GRID_HORIZONTAL_DISTANCE),
 					_prefStore.getInt(ITourbookPreferences.GRAPH_GRID_VERTICAL_DISTANCE),
 					_prefStore.getBoolean(ITourbookPreferences.GRAPH_GRID_IS_SHOW_HORIZONTAL_GRIDLINES),
-					_prefStore.getBoolean(ITourbookPreferences.GRAPH_GRID_IS_SHOW_VERTICAL_GRIDLINES));
+					_prefStore.getBoolean(ITourbookPreferences.GRAPH_GRID_IS_SHOW_VERTICAL_GRIDLINES),
+					_prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_SEGMENT_ALTERNATE_COLOR));
 
 			_refTourChart.updateChart(chartDataModel, false);
 

@@ -144,6 +144,8 @@ public class Chart extends ViewForm {
 	 */
 	protected int					graphAntialiasing					= SWT.OFF;
 
+	protected boolean				isShowSegmentAlternateColor			= true;
+
 	/**
 	 * mouse behaviour:<br>
 	 * <br>
@@ -609,6 +611,10 @@ public class Chart extends ViewForm {
 		return _chartOverlayListener.getListeners();
 	}
 
+	protected ChartTitleConfig getChartTitleConfig() {
+		return _chartComponents.componentGraph.chartTitleConfig;
+	}
+
 	IHoveredValueListener getHoveredListener() {
 		return _hoveredListener;
 	}
@@ -874,13 +880,13 @@ public class Chart extends ViewForm {
 		_chartOverlayListener.remove(chartOverlay);
 	}
 
-	public void removeDoubleClickListener(final IBarSelectionListener listener) {
-		_barDoubleClickListeners.remove(listener);
-	}
-
 //	public void removeFocusListener(final Listener listener) {
 //		_focusListeners.remove(listener);
 //	}
+
+	public void removeDoubleClickListener(final IBarSelectionListener listener) {
+		_barDoubleClickListeners.remove(listener);
+	}
 
 	public void removeMouseChartListener(final IMouseListener mouseListener) {
 		_mouseChartListener.remove(mouseListener);
@@ -998,20 +1004,6 @@ public class Chart extends ViewForm {
 	 */
 	public void setGraphAlpha(final double adjustment) {
 		graphTransparencyAdjustment = adjustment;
-	}
-
-	public void setGrid(final int horizontalGrid,
-						final int verticalGrid,
-						final boolean isHGridVisible,
-						final boolean isVGridVisible) {
-
-		gridHorizontalDistance = horizontalGrid;
-		gridVerticalDistance = verticalGrid;
-
-		isShowHorizontalGridLines = isHGridVisible;
-		isShowVerticalGridLines = isVGridVisible;
-
-		_chartComponents.onResize();
 	}
 
 	protected void setHoveredListener(final IHoveredValueListener hoveredValuePointListener) {
@@ -1133,7 +1125,7 @@ public class Chart extends ViewForm {
 		_isFillToolbar = isFillToolbar;
 	}
 
-	public void setTourToolTipProvider(final ITourToolTipProvider tourToolTip) {
+	public void setTourInfoIconToolTipProvider(final ITourToolTipProvider tourToolTip) {
 
 		// set tour info icon into the left axis
 		getToolTipControl().setTourToolTipProvider(tourToolTip);
@@ -1280,6 +1272,32 @@ public class Chart extends ViewForm {
 		if (_allChartActions != null) {
 			_allChartActions.get(ACTION_ID_MOUSE_MODE).setChecked(_mouseMode.equals(MOUSE_MODE_SLIDER));
 		}
+	}
+
+	/**
+	 * Update different properties and refresh the chart.
+	 * 
+	 * @param horizontalGrid
+	 * @param verticalGrid
+	 * @param isHGridVisible
+	 * @param isVGridVisible
+	 * @param isAlternateColor
+	 */
+	public void updateProperties(	final int horizontalGrid,
+									final int verticalGrid,
+									final boolean isHGridVisible,
+									final boolean isVGridVisible,
+									final boolean isAlternateColor) {
+
+		gridHorizontalDistance = horizontalGrid;
+		gridVerticalDistance = verticalGrid;
+
+		isShowHorizontalGridLines = isHGridVisible;
+		isShowVerticalGridLines = isVGridVisible;
+
+		isShowSegmentAlternateColor = isAlternateColor;
+
+		_chartComponents.onResize();
 	}
 
 	public void zoomOut() {

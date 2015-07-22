@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -20,7 +20,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
-import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.BarChartMinMaxKeeper;
 import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartDataModel;
@@ -39,17 +38,15 @@ import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourPerson;
 import net.tourbook.database.TourDatabase;
-import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.statistic.StatisticContext;
 import net.tourbook.tour.SelectionTourId;
-import net.tourbook.tour.TourInfoToolTipProvider;
+import net.tourbook.tour.TourInfoIconToolTipProvider;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.TourTypeFilter;
 import net.tourbook.ui.action.ActionEditQuick;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
-import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.viewers.IPostSelectionProvider;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.swt.SWT;
@@ -72,7 +69,7 @@ public class StatisticTourTime extends YearStatistic implements IBarSelectionPro
 	private Chart						_chart;
 
 	private StatisticTourToolTip		_tourToolTip;
-	private TourInfoToolTipProvider		_tourInfoToolTipProvider	= new TourInfoToolTipProvider();
+	private TourInfoIconToolTipProvider	_tourInfoToolTipProvider	= new TourInfoIconToolTipProvider();
 
 	private TourDataTime				_tourTimeData;
 
@@ -153,10 +150,11 @@ public class StatisticTourTime extends YearStatistic implements IBarSelectionPro
 			}
 		});
 
-		_chart.setTourToolTipProvider(_tourInfoToolTipProvider);
+		_chart.setTourInfoIconToolTipProvider(_tourInfoToolTipProvider);
 		_tourInfoToolTipProvider.setActionsEnabled(true);
 
 		_chart.addBarSelectionListener(new IBarSelectionListener() {
+			@Override
 			public void selectionChanged(final int serieIndex, int valueIndex) {
 
 				final long[] tourIds = _tourTimeData.tourIds;
@@ -180,6 +178,7 @@ public class StatisticTourTime extends YearStatistic implements IBarSelectionPro
 		 * open tour with double click on the tour bar
 		 */
 		_chart.addDoubleClickListener(new IBarSelectionListener() {
+			@Override
 			public void selectionChanged(final int serieIndex, final int valueIndex) {
 				final long[] tourIds = _tourTimeData.tourIds;
 				if (tourIds.length > 0) {
@@ -198,6 +197,7 @@ public class StatisticTourTime extends YearStatistic implements IBarSelectionPro
 		 * open tour with Enter key
 		 */
 		_chart.addTraverseListener(new TraverseListener() {
+			@Override
 			public void keyTraversed(final TraverseEvent event) {
 
 				if (event.detail == SWT.TRAVERSE_RETURN) {
@@ -357,6 +357,7 @@ public class StatisticTourTime extends YearStatistic implements IBarSelectionPro
 		return toolTipInfo;
 	}
 
+	@Override
 	public Integer getSelectedMonth() {
 		return _currentMonth;
 	}
@@ -366,6 +367,7 @@ public class StatisticTourTime extends YearStatistic implements IBarSelectionPro
 		return _selectedTourId;
 	}
 
+	@Override
 	public Long getSelectedTourId() {
 		return _selectedTourId;
 	}
@@ -384,8 +386,9 @@ public class StatisticTourTime extends YearStatistic implements IBarSelectionPro
 		return selectedTours;
 	}
 
+	@Override
 	public void preferencesHasChanged() {
-		updateStatistic(new StatisticContext(_activePerson, _activeTourTypeFiler, _currentYear, 1, false));
+		updateStatistic(new StatisticContext(_activePerson, _activeTourTypeFiler, _currentYear, _numberOfYears, false));
 	}
 
 	@Override
@@ -554,13 +557,7 @@ public class StatisticTourTime extends YearStatistic implements IBarSelectionPro
 			_minMaxKeeper.setMinMaxValues(chartModel);
 		}
 
-		// set grid size
-		final IPreferenceStore prefStore = TourbookPlugin.getDefault().getPreferenceStore();
-		_chart.setGrid(
-				prefStore.getInt(ITourbookPreferences.GRAPH_GRID_HORIZONTAL_DISTANCE),
-				prefStore.getInt(ITourbookPreferences.GRAPH_GRID_VERTICAL_DISTANCE),
-				prefStore.getBoolean(ITourbookPreferences.GRAPH_GRID_IS_SHOW_HORIZONTAL_GRIDLINES),
-				prefStore.getBoolean(ITourbookPreferences.GRAPH_GRID_IS_SHOW_VERTICAL_GRIDLINES));
+		setChartProperties(_chart);
 
 		// show the data in the chart
 		_chart.updateChart(chartModel, false, true);
@@ -569,6 +566,7 @@ public class StatisticTourTime extends YearStatistic implements IBarSelectionPro
 		selectTour(selectedTourId);
 	}
 
+	@Override
 	public void updateStatistic(final StatisticContext statContext) {
 
 		_activePerson = statContext.appPerson;

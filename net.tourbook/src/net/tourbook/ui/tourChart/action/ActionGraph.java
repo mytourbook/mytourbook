@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -65,13 +65,13 @@ public class ActionGraph extends Action {
 	@Override
 	public void run() {
 
-		final TourChartConfiguration chartConfig = _tourChart.getTourChartConfig();
-		
-		if (chartConfig == null) {
+		final TourChartConfiguration tcc = _tourChart.getTourChartConfig();
+
+		if (tcc == null) {
 			return;
 		}
-		
-		final ArrayList<Integer> visibleGraphs = chartConfig.getVisibleGraphs();
+
+		final ArrayList<Integer> visibleGraphs = tcc.getVisibleGraphs();
 
 		final boolean isThisGraphVisible = visibleGraphs.contains(_graphId);
 
@@ -86,10 +86,10 @@ public class ActionGraph extends Action {
 
 		if (!isThisGraphVisible) {
 			// add the graph to the list
-			chartConfig.addVisibleGraph(_graphId);
+			tcc.addVisibleGraph(_graphId);
 		} else {
 			// remove the graph from the list
-			chartConfig.removeVisibleGraph(_graphId);
+			tcc.removeVisibleGraph(_graphId);
 		}
 
 		_tourChart.updateTourActions();

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -19,6 +19,7 @@ import java.util.ArrayList;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.chart.Chart;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.ITourbookPreferences;
@@ -51,6 +52,7 @@ public abstract class YearStatistic extends TourbookStatistic implements IYearSt
 
 		// create pref listener
 		_prefChangeListener = new IPropertyChangeListener() {
+			@Override
 			public void propertyChange(final PropertyChangeEvent event) {
 				final String property = event.getProperty();
 
@@ -60,7 +62,8 @@ public abstract class YearStatistic extends TourbookStatistic implements IYearSt
 						|| property.equals(ITourbookPreferences.GRAPH_GRID_HORIZONTAL_DISTANCE)
 						|| property.equals(ITourbookPreferences.GRAPH_GRID_VERTICAL_DISTANCE)
 						|| property.equals(ITourbookPreferences.GRAPH_GRID_IS_SHOW_HORIZONTAL_GRIDLINES)
-						|| property.equals(ITourbookPreferences.GRAPH_GRID_IS_SHOW_VERTICAL_GRIDLINES)) {
+						|| property.equals(ITourbookPreferences.GRAPH_GRID_IS_SHOW_VERTICAL_GRIDLINES)
+						|| property.equals(ITourbookPreferences.GRAPH_IS_SEGMENT_ALTERNATE_COLOR)) {
 
 					// update chart
 					preferencesHasChanged();
@@ -73,6 +76,7 @@ public abstract class YearStatistic extends TourbookStatistic implements IYearSt
 
 		// remove pre listener
 		container.addDisposeListener(new DisposeListener() {
+			@Override
 			public void widgetDisposed(final DisposeEvent e) {
 				_prefStore.removePropertyChangeListener(_prefChangeListener);
 			}
@@ -87,7 +91,6 @@ public abstract class YearStatistic extends TourbookStatistic implements IYearSt
 	public void createControl(final Composite parent) {
 		addPrefListener(parent);
 	}
-
 	/**
 	 * @param serieIndex
 	 * @param activeTourTypeFilter
@@ -119,5 +122,22 @@ public abstract class YearStatistic extends TourbookStatistic implements IYearSt
 	@Override
 	public void saveState(final IDialogSettings state) {
 		// do nothing
+	}
+
+	/**
+	 * Set chart properties from the pref store.
+	 * 
+	 * @param chart
+	 */
+	protected void setChartProperties(final Chart chart) {
+
+		final IPreferenceStore prefStore = TourbookPlugin.getDefault().getPreferenceStore();
+
+		chart.updateProperties(
+				prefStore.getInt(ITourbookPreferences.GRAPH_GRID_HORIZONTAL_DISTANCE),
+				prefStore.getInt(ITourbookPreferences.GRAPH_GRID_VERTICAL_DISTANCE),
+				prefStore.getBoolean(ITourbookPreferences.GRAPH_GRID_IS_SHOW_HORIZONTAL_GRIDLINES),
+				prefStore.getBoolean(ITourbookPreferences.GRAPH_GRID_IS_SHOW_VERTICAL_GRIDLINES),
+				prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_SEGMENT_ALTERNATE_COLOR));
 	}
 }

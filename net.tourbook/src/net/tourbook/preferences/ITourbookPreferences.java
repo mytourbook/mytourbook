@@ -76,6 +76,7 @@ public interface ITourbookPreferences {
 	public static final String	GRAPH_IS_GRAPH_OVERLAPPED					= "GRAPH_IS_GRAPH_OVERLAPPED";								//$NON-NLS-1$
 	public static final String	GRAPH_IS_HR_ZONE_BACKGROUND_VISIBLE			= "Graph_HrZone_IsVisible";								//$NON-NLS-1$
 	public static final String	GRAPH_IS_MARKER_VISIBLE						= "Graph_IsMarkerVisible";									//$NON-NLS-1$
+	public static final String	GRAPH_IS_SEGMENT_ALTERNATE_COLOR			= "GRAPH_IS_SEGMENT_ALTERNATE_COLOR";						//$NON-NLS-1$
 	public static final String	GRAPH_IS_SRTM_VISIBLE						= "Graph_IsSRTMVisible";									//$NON-NLS-1$
 	public static final String	GRAPH_IS_TOUR_PHOTO_TOOLTIP_VISIBLE			= "GRAPH_IS_TOUR_PHOTO_TOOLTIP_VISIBLE";					//$NON-NLS-1$
 	public static final String	GRAPH_IS_TOUR_PHOTO_VISIBLE					= "GRAPH_IS_TOUR_PHOTO_VISIBLE";							//$NON-NLS-1$
