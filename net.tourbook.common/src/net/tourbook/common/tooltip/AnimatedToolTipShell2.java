@@ -40,7 +40,6 @@ import org.eclipse.swt.widgets.Widget;
 public abstract class AnimatedToolTipShell2 {
 
 	public static final int				MOUSE_OVER_BEHAVIOUR_NO_IGNORE			= 0;
-
 	public static final int				MOUSE_OVER_BEHAVIOUR_IGNORE_OWNER		= 1;
 
 	/**
@@ -105,6 +104,10 @@ public abstract class AnimatedToolTipShell2 {
 
 	private int							_fadeInSteps							= FADE_IN_STEPS;
 	private int							_fadeInDelayCounter;
+
+	/**
+	 * Number of {@link #FADE_IN_STEPS} until the tooltip starts to fade in.
+	 */
 	private int							_fadeInDelaySteps;
 
 	private int							_fadeOutSteps							= FADE_OUT_STEPS;
@@ -112,6 +115,7 @@ public abstract class AnimatedToolTipShell2 {
 	private int							_mouseOverBehaviour						= MOUSE_OVER_BEHAVIOUR_NO_IGNORE;
 
 	private boolean						_isKeepToolTipOpenWhenResizedOrMoved	= true;
+
 	/*
 	 * UI resources
 	 */
@@ -328,6 +332,10 @@ public abstract class AnimatedToolTipShell2 {
 
 	private void animation10_StartKomplex() {
 
+//		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
+//				+ ("\tanimation10_StartKomplex"));
+//		// TODO remove SYSTEM.OUT.PRINTLN
+
 //		final long start = System.nanoTime();
 
 		if (_isShellFadingIn) {
@@ -509,21 +517,191 @@ public abstract class AnimatedToolTipShell2 {
 	protected abstract void beforeHideToolTip();
 
 	/**
-	 * @return When <code>false</code> is returned, the tooltip will <b>not</b> be closed. This can
-	 *         be used when the tooltip opens another dialog which prevents to close this tooltip,
-	 *         default is <code>true</code>.
-	 */
-	protected boolean canCloseToolTip() {
-		return true;
-	}
-
-	/**
 	 * Is called before the tooltip is displayed.
 	 * 
 	 * @return Returns <code>true</code> when the tooltip should be opened, otherwise
 	 *         <code>false</code>.
 	 */
 	protected abstract boolean canShowToolTip();
+
+	/**
+	 * @return Returns <code>true</code> when the tooltip should not be closed.
+	 */
+	private boolean checkShowOrHide() {
+
+		//		final long start = System.nanoTime();
+
+		int hideFlag = 0;
+		int showFlag = 0;
+
+		try {
+
+			final boolean isShellHidden = isShellHidden();
+			if (isShellHidden) {
+
+				hideFlag |= 0b1; // 1
+
+				return false;
+			}
+
+			if (isDoNotClose()) {
+
+				showFlag |= 0b1; // 1
+
+				return true;
+			}
+
+			// get control which is hovered with the mouse after the exit, can be null
+			final Control hoveredControl = _display.getCursorControl();
+
+			//		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
+			//				+ ("\thoveredControl: " + hoveredControl));
+			//		// TODO remove SYSTEM.OUT.PRINTLN
+
+			if (hoveredControl == null) {
+
+				hideFlag |= 0b10; // 2
+
+			} else {
+
+				/*
+				 * check if the hovered control is the owner control, if not, hide the tooltip
+				 */
+				Control hoveredParent = hoveredControl;
+
+				// move up child-parent hierarchy until shell is reached
+				while (true) {
+
+					//					System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
+					//							+ ("\t\thoveredParent: " + hoveredParent));
+					//					// TODO remove SYSTEM.OUT.PRINTLN
+
+					if (hoveredParent == _currentShell) {
+
+						// mouse is hovering in this tooltip
+
+						showFlag |= 0b100; // 3
+
+						break;
+					}
+
+					if (hoveredParent == _ownerControl) {
+
+						// mouse is hovering the owner control
+
+						if (_mouseOverBehaviour == MOUSE_OVER_BEHAVIOUR_NO_IGNORE) {
+
+							/*
+							 * owner is not ignored, which means when the mouse is hovered the
+							 * owner, the tooltip keeps opened, this is the default
+							 */
+
+							showFlag |= 0b1000; // 4
+
+						} else {
+
+							// MOUSE_OVER_BEHAVIOUR_IGNORE_OWNER
+
+							hideFlag |= 0b1000; // 4
+						}
+
+						break;
+					}
+
+					hoveredParent = hoveredParent.getParent();
+
+					if (hoveredParent == null) {
+
+						// mouse has left the tooltip and the owner control
+
+						hideFlag = 0b10000; // 5
+
+						break;
+					}
+				}
+			}
+
+			/**
+			 * !!! this adjustment do not work on Linux because the tooltip gets hidden when the
+			 * mouse tries to hover over the tooltip <br>
+			 * <br>
+			 * it seems to work on windows and linux with margin 1, when set to 0 the tooltip do
+			 * sometime not be poped up again and the i-icons is not deaktivated<br>
+			 * wolfgang 2010-07-23
+			 */
+
+			final Rectangle ttShellRect = _currentShell.getBounds();
+			final int margin = 10;
+
+			ttShellRect.x -= margin;
+			ttShellRect.y -= margin;
+			ttShellRect.width += 2 * margin;
+			ttShellRect.height += 2 * margin;
+
+			final Point displayCursorLocation = _display.getCursorLocation();
+
+			final boolean isMouseInTooltipRect = ttShellRect.contains(displayCursorLocation);
+			if (isMouseInTooltipRect) {
+				showFlag |= 0b10_0000; // 6
+			} else {
+				hideFlag |= 0b10_0000; // 6
+			}
+
+			if (isMouseInTooltipRect && _isShellFadingOut) {
+
+				//			System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
+				//					+ ("\tisInTooltip && _isShellFadingOut"));
+				//			// TODO remove SYSTEM.OUT.PRINTLN
+
+				// don't hide when mouse is hovering hiding tooltip
+
+				showFlag |= 0b100_0000; // 7
+
+				ttShow();
+
+				//			} else if (isMouseInTooltip && _isShellFadingIn && _fadeInDelayCounter < _fadeInDelaySteps) {
+				//
+				//				/*
+				//				 * Mouse is in the tooltip, fading in but still in the delay steps ->
+				//				 */
+				//
+				//
+				//				ttHide();
+				//
+			} else if (hideFlag > 0) {
+
+				// check no hide area
+
+				final Rectangle noHideArea = noHideOnMouseMove();
+
+				if (noHideArea == null || noHideArea.contains(displayCursorLocation) == false) {
+
+					// hide definitively
+
+					ttHide();
+
+					hideFlag |= 0b100_0000; // 7
+
+				} else {
+
+					showFlag |= 0b1000_0000; // 8
+				}
+			}
+
+		} finally {
+
+//			System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
+//					+ ("\thideFlag: " + Integer.toBinaryString(hideFlag))
+//					+ ("\tshowFlag: " + Integer.toBinaryString(showFlag))
+//					+ "\n"
+//			//
+//					);
+//			// TODO remove SYSTEM.OUT.PRINTLN
+
+		}
+
+		return showFlag > 0;
+	}
 
 	/**
 	 * Close tooltip immediatedly without animation.
@@ -773,6 +951,15 @@ public abstract class AnimatedToolTipShell2 {
 	}
 
 	/**
+	 * @return When returning <code>true</code> then the tooltip will <b>not</b> be closed. This can
+	 *         be used when the tooltip opens another dialog which prevents to close this tooltip,
+	 *         default is <code>true</code>.
+	 */
+	protected boolean isDoNotClose() {
+		return false;
+	}
+
+	/**
 	 * @return Return <code>true</code> when the tooltip shell is <code>null</code>, disposed or not
 	 *         visible.
 	 */
@@ -813,128 +1000,10 @@ public abstract class AnimatedToolTipShell2 {
 	}
 
 	/**
-	 * @return Returns <code>true</code> when the tooltip should be kept opened.
 	 */
-	private boolean onDisplayFilterMouseMove() {
+	private void onDisplayFilterMouseMove() {
 
-//		final long start = System.nanoTime();
-
-		if (isShellHidden()) {
-			return false;
-		}
-
-		if (canCloseToolTip() == false) {
-			return true;
-		}
-
-		boolean isHide = false;
-		boolean isKeepVisible = false;
-
-		// get control which is hovered with the mouse after the exit, can be null
-		final Control hoveredControl = _display.getCursorControl();
-
-		if (hoveredControl == null) {
-
-			isHide = true;
-
-		} else {
-
-			/*
-			 * check if the hovered control is the owner control, if not, hide the tooltip
-			 */
-			Control hoveredParent = hoveredControl;
-
-			// move up child-parent hierarchy until shell is reached
-			while (true) {
-
-				if (hoveredParent == _currentShell) {
-
-					// mouse is hovering in this tooltip
-
-					isKeepVisible = true;
-
-					break;
-				}
-
-				if (hoveredParent == _ownerControl) {
-
-					// mouse is hovering the owner control
-
-					if (_mouseOverBehaviour == MOUSE_OVER_BEHAVIOUR_NO_IGNORE) {
-
-						/*
-						 * owner is not ignored, which means when the mouse is hovered the owner,
-						 * the tooltip keeps opened, this is the default
-						 */
-
-						isKeepVisible = true;
-					}
-
-					break;
-				}
-
-				hoveredParent = hoveredParent.getParent();
-
-				if (hoveredParent == null) {
-
-					// mouse has left the tooltip and the owner control
-
-					isHide = true;
-
-					break;
-				}
-			}
-		}
-
-		/**
-		 * !!! this adjustment do not work on Linux because the tooltip gets hidden when the mouse
-		 * tries to mover over the tooltip <br>
-		 * <br>
-		 * it seems to work on windows and linux with margin 1, when set to 0 the tooltip do
-		 * sometime not be poped up again and the i-icons is not deaktivated<br>
-		 * wolfgang 2010-07-23
-		 */
-
-		final Rectangle ttShellRect = _currentShell.getBounds();
-		final int margin = 10;
-
-		ttShellRect.x -= margin;
-		ttShellRect.y -= margin;
-		ttShellRect.width += 2 * margin;
-		ttShellRect.height += 2 * margin;
-
-		final Point displayCursorLocation = _display.getCursorLocation();
-
-		final boolean isInTooltip = ttShellRect.contains(displayCursorLocation);
-
-		if (isKeepVisible == false && isHide == false && isInTooltip == false) {
-			isHide = true;
-		}
-
-		boolean isKeepOpened = true;
-
-		if (isInTooltip && _isShellFadingOut) {
-
-			// don't hide when mouse is hovering hiding tooltip again
-
-			ttShow();
-
-		} else if (isHide) {
-
-			final Rectangle noHideArea = noHideOnMouseMove();
-
-			if (noHideArea == null || noHideArea.contains(displayCursorLocation) == false) {
-
-				// hide definitively
-
-				ttHide();
-
-				isKeepOpened = false;
-			}
-		}
-
-		return isKeepOpened;
-
+		checkShowOrHide();
 	}
 
 	private void onDispose(final Event event) {
@@ -955,8 +1024,6 @@ public abstract class AnimatedToolTipShell2 {
 
 		closeOldShells(false);
 	}
-
-	protected void onMouseExitToolTip(final MouseEvent mouseEvent) {}
 
 	protected void onMouseMoveInToolTip(final MouseEvent mouseEvent) {}
 
@@ -1024,7 +1091,7 @@ public abstract class AnimatedToolTipShell2 {
 		case SWT.KeyDown:
 
 			if (event.keyCode == SWT.ESC) {
-				hide();
+				ttHide();
 			}
 
 			break;
@@ -1074,7 +1141,11 @@ public abstract class AnimatedToolTipShell2 {
 
 	private void onTTAutoCloseTimer() {
 
-		final boolean isKeepOpened = onDisplayFilterMouseMove();
+		final boolean isKeepOpened = checkShowOrHide();
+
+//		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
+//				+ ("\tonTTAutoCloseTimer - isKeepOpened: " + isKeepOpened));
+//// TODO remove SYSTEM.OUT.PRINTLN
 
 		if (isKeepOpened) {
 
@@ -1114,7 +1185,7 @@ public abstract class AnimatedToolTipShell2 {
 						_ownerControl.getShell() == _currentShell.getDisplay().getActiveShell()
 
 						// ... a sub shell is opened
-								|| canCloseToolTip() == false) {
+								|| isDoNotClose()) {
 
 							return;
 						}
@@ -1244,7 +1315,18 @@ public abstract class AnimatedToolTipShell2 {
 
 	private void ttHide() {
 
+//		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") + ("\tttHide"));
+//		// TODO remove SYSTEM.OUT.PRINTLN
+
 		if (isShellHidden()) {
+			return;
+		}
+
+		if (_fadeInDelayCounter < _fadeInDelaySteps) {
+
+			// fade in have not yet started -> hide shell
+			setShellVisible(false);
+
 			return;
 		}
 
@@ -1264,6 +1346,9 @@ public abstract class AnimatedToolTipShell2 {
 	}
 
 	private void ttShow() {
+
+//		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") + ("\tttShow"));
+//		// TODO remove SYSTEM.OUT.PRINTLN
 
 		// shell is not yet fading in
 

@@ -778,7 +778,8 @@ public abstract class AnimatedToolTipShell {
 
 		final boolean isShellVisible = _shell.isVisible();
 
-//		System.out.println(UI.timeStampNano() + " isShellVisible=" + isShellVisible);
+//		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
+//				+ ("\tisShellVisible: " + isShellVisible));
 //		// TODO remove SYSTEM.OUT.PRINTLN
 
 		return isShellVisible;

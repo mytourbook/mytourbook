@@ -82,6 +82,7 @@ public class SlideoutTourChartMarker extends AnimatedToolTipShell implements ICo
 		};
 
 		_defaultMouseWheelListener = new MouseWheelListener() {
+			@Override
 			public void mouseScrolled(final MouseEvent event) {
 				UI.adjustSpinnerValueOnMouseScroll(event);
 				onChangeUI();
@@ -89,6 +90,7 @@ public class SlideoutTourChartMarker extends AnimatedToolTipShell implements ICo
 		};
 
 		_defaultPropertyChangeListener = new IPropertyChangeListener() {
+			@Override
 			public void propertyChange(final PropertyChangeEvent event) {
 				onChangeUI();
 			}
@@ -756,7 +758,6 @@ public class SlideoutTourChartMarker extends AnimatedToolTipShell implements ICo
 	public void open(final Rectangle toolTipItemBounds, final boolean isOpenDelayed) {
 
 		if (isToolTipVisible()) {
-
 			return;
 		}
 

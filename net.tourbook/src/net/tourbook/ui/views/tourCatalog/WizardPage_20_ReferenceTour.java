@@ -30,7 +30,6 @@ import net.tourbook.common.form.SashLeftFixedForm;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.database.TourDatabase;
-import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.IReferenceTourProvider;
 import net.tourbook.ui.UI;
@@ -535,12 +534,7 @@ public class WizardPage_20_ReferenceTour extends WizardPage {
 			_groupChart.setText(NLS.bind(refTour.label + ": " //$NON-NLS-1$
 					+ Messages.tourCatalog_wizard_Group_chart_title, TourManager.getTourDateShort(tourData)));
 
-			_refTourChart.updateProperties(
-					_prefStore.getInt(ITourbookPreferences.GRAPH_GRID_HORIZONTAL_DISTANCE),
-					_prefStore.getInt(ITourbookPreferences.GRAPH_GRID_VERTICAL_DISTANCE),
-					_prefStore.getBoolean(ITourbookPreferences.GRAPH_GRID_IS_SHOW_HORIZONTAL_GRIDLINES),
-					_prefStore.getBoolean(ITourbookPreferences.GRAPH_GRID_IS_SHOW_VERTICAL_GRIDLINES),
-					_prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_SEGMENT_ALTERNATE_COLOR));
+			UI.setChartProperties(_refTourChart);
 
 			_refTourChart.updateChart(chartDataModel, false);
 

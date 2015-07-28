@@ -26,6 +26,7 @@ import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.statistic.IYearStatistic;
 import net.tourbook.statistic.TourbookStatistic;
 import net.tourbook.ui.TourTypeFilter;
+import net.tourbook.ui.UI;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -63,7 +64,10 @@ public abstract class YearStatistic extends TourbookStatistic implements IYearSt
 						|| property.equals(ITourbookPreferences.GRAPH_GRID_VERTICAL_DISTANCE)
 						|| property.equals(ITourbookPreferences.GRAPH_GRID_IS_SHOW_HORIZONTAL_GRIDLINES)
 						|| property.equals(ITourbookPreferences.GRAPH_GRID_IS_SHOW_VERTICAL_GRIDLINES)
-						|| property.equals(ITourbookPreferences.GRAPH_IS_SEGMENT_ALTERNATE_COLOR)) {
+						|| property.equals(ITourbookPreferences.GRAPH_IS_SEGMENT_ALTERNATE_COLOR)
+						|| property.equals(ITourbookPreferences.GRAPH_SEGMENT_ALTERNATE_COLOR)
+				//
+				) {
 
 					// update chart
 					preferencesHasChanged();
@@ -91,6 +95,7 @@ public abstract class YearStatistic extends TourbookStatistic implements IYearSt
 	public void createControl(final Composite parent) {
 		addPrefListener(parent);
 	}
+
 	/**
 	 * @param serieIndex
 	 * @param activeTourTypeFilter
@@ -131,13 +136,6 @@ public abstract class YearStatistic extends TourbookStatistic implements IYearSt
 	 */
 	protected void setChartProperties(final Chart chart) {
 
-		final IPreferenceStore prefStore = TourbookPlugin.getDefault().getPreferenceStore();
-
-		chart.updateProperties(
-				prefStore.getInt(ITourbookPreferences.GRAPH_GRID_HORIZONTAL_DISTANCE),
-				prefStore.getInt(ITourbookPreferences.GRAPH_GRID_VERTICAL_DISTANCE),
-				prefStore.getBoolean(ITourbookPreferences.GRAPH_GRID_IS_SHOW_HORIZONTAL_GRIDLINES),
-				prefStore.getBoolean(ITourbookPreferences.GRAPH_GRID_IS_SHOW_VERTICAL_GRIDLINES),
-				prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_SEGMENT_ALTERNATE_COLOR));
+		UI.setChartProperties(chart);
 	}
 }

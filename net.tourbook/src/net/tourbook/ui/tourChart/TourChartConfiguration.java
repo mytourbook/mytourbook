@@ -194,6 +194,7 @@ public class TourChartConfiguration {
 	public boolean					isTourInfoVisible		= true;
 	public boolean					isShowInfoTitle			= true;
 	public boolean					isShowInfoTooltip		= true;
+	public boolean					isShowInfoTourSeparator	= true;
 	public int						tourInfoTooltipDelay;
 
 	/**
@@ -240,6 +241,7 @@ public class TourChartConfiguration {
 		isTourInfoVisible = _prefStore.getBoolean(ITourbookPreferences.GRAPH_TOUR_INFO_IS_VISIBLE);
 		isShowInfoTitle = _prefStore.getBoolean(ITourbookPreferences.GRAPH_TOUR_INFO_IS_TITLE_VISIBLE);
 		isShowInfoTooltip = _prefStore.getBoolean(ITourbookPreferences.GRAPH_TOUR_INFO_IS_TOOLTIP_VISIBLE);
+		isShowInfoTourSeparator = _prefStore.getBoolean(ITourbookPreferences.GRAPH_TOUR_INFO_IS_TOUR_SEPARATOR_VISIBLE);
 		tourInfoTooltipDelay = _prefStore.getInt(ITourbookPreferences.GRAPH_TOUR_INFO_TOOLTIP_DELAY);
 	}
 

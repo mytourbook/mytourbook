@@ -18,6 +18,7 @@ package net.tourbook.ui.tourChart.action;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
+import net.tourbook.common.tooltip.IOpeningDialog;
 import net.tourbook.ui.tourChart.SlideoutTourChartInfo;
 import net.tourbook.ui.tourChart.TourChart;
 
@@ -37,13 +38,15 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 
-public class ActionTourChartInfo extends ContributionItem {
+public class ActionTourChartInfo extends ContributionItem implements IOpeningDialog {
 
 	private static final String		IMAGE_TOUR_INFO				= Messages.Image__TourInfo;
 	private static final String		IMAGE_TOUR_INFO_DISABLED	= Messages.Image__TourInfo_Disabled;
 
-	private IDialogSettings			_state						= TourbookPlugin.getState(//
-																		getClass().getSimpleName());
+	private static final String		ID							= "net.tourbook.ui.tourChart.action.ActionTourChartInfo";	//$NON-NLS-1$
+
+	private IDialogSettings			_state						= TourbookPlugin.getState(ID);
+	private String					_dialogId					= getClass().getCanonicalName();
 
 	private TourChart				_tourChart;
 
@@ -111,6 +114,16 @@ public class ActionTourChartInfo extends ContributionItem {
 		}
 	}
 
+	@Override
+	public String getDialogId() {
+		return _dialogId;
+	}
+
+	@Override
+	public void hideDialog() {
+		_slideoutTourInfo.hideNow();
+	}
+
 	private void onAction() {
 
 		updateUI();
@@ -126,7 +139,7 @@ public class ActionTourChartInfo extends ContributionItem {
 			itemBounds.x = itemDisplayPosition.x;
 			itemBounds.y = itemDisplayPosition.y;
 
-			_slideoutTourInfo.open(itemBounds, false);
+			openSlideout(itemBounds, false);
 
 		} else {
 
@@ -137,6 +150,11 @@ public class ActionTourChartInfo extends ContributionItem {
 	}
 
 	private void onMouseMove(final ToolItem item, final MouseEvent mouseEvent) {
+
+		// ignore other items
+		if (item != _actionToolItem) {
+			return;
+		}
 
 		if (_actionToolItem.getSelection() == false || _actionToolItem.isEnabled() == false) {
 
@@ -159,7 +177,15 @@ public class ActionTourChartInfo extends ContributionItem {
 			itemBounds.y = itemDisplayPosition.y;
 		}
 
-		_slideoutTourInfo.open(itemBounds, true);
+		openSlideout(itemBounds, true);
+	}
+
+	private void openSlideout(final Rectangle itemBounds, final boolean isOpenDelayed) {
+
+		// ensure other dialogs are closed
+		_tourChart.closeOpenedDialogs(this);
+
+		_slideoutTourInfo.open(itemBounds, isOpenDelayed);
 	}
 
 	public void setEnabled(final boolean isEnabled) {

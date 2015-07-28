@@ -120,9 +120,14 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 		store.setDefault(ITourbookPreferences.GRAPH_HR_ZONE_STYLE, TourChart.ACTION_ID_HR_ZONE_STYLE_GRAPH_TOP);
 
 		store.setDefault(ITourbookPreferences.GRAPH_ANTIALIASING, true);
-		store.setDefault(ITourbookPreferences.GRAPH_IS_SEGMENT_ALTERNATE_COLOR, true);
 		store.setDefault(ITourbookPreferences.GRAPH_TRANSPARENCY_LINE, 0xFF);
 		store.setDefault(ITourbookPreferences.GRAPH_TRANSPARENCY_FILLING, 0x80);
+
+		// segment alternate color
+		store.setDefault(ITourbookPreferences.GRAPH_IS_SEGMENT_ALTERNATE_COLOR, true);
+		PreferenceConverter.setDefault(store, //
+				ITourbookPreferences.GRAPH_SEGMENT_ALTERNATE_COLOR,
+				new RGB(0xf5, 0xf5, 0xf5));
 
 		// show breaktime values
 		store.setDefault(ITourbookPreferences.GRAPH_IS_BREAKTIME_VALUES_VISIBLE, true);
@@ -159,6 +164,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 		store.setDefault(ITourbookPreferences.GRAPH_TOUR_INFO_IS_VISIBLE, true);
 		store.setDefault(ITourbookPreferences.GRAPH_TOUR_INFO_IS_TITLE_VISIBLE, true);
 		store.setDefault(ITourbookPreferences.GRAPH_TOUR_INFO_IS_TOOLTIP_VISIBLE, true);
+		store.setDefault(ITourbookPreferences.GRAPH_TOUR_INFO_IS_TOUR_SEPARATOR_VISIBLE, false);
 		store.setDefault(ITourbookPreferences.GRAPH_TOUR_INFO_TOOLTIP_DELAY, 200);
 
 		// is photo visible

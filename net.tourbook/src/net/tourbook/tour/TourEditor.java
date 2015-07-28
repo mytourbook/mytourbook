@@ -157,7 +157,7 @@ public class TourEditor extends EditorPart implements IPersistableEditor {
 
 				} else if (eventId == TourEventId.TOUR_CHART_PROPERTY_IS_MODIFIED) {
 
-					_tourChart.updateTourChart(true);
+					_tourChart.updateTourChart();
 
 				} else if (eventId == TourEventId.TOUR_CHANGED && eventData instanceof TourEvent) {
 

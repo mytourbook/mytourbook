@@ -121,7 +121,6 @@ public class ActionTourChartMarker extends ContributionItem implements IOpeningD
 
 	@Override
 	public void hideDialog() {
-
 		_slideoutMarkerOptions.hideNow();
 	}
 
@@ -140,7 +139,7 @@ public class ActionTourChartMarker extends ContributionItem implements IOpeningD
 			itemBounds.x = itemDisplayPosition.x;
 			itemBounds.y = itemDisplayPosition.y;
 
-			_slideoutMarkerOptions.open(itemBounds, false);
+			openSlideout(itemBounds, false);
 
 		} else {
 
@@ -151,6 +150,11 @@ public class ActionTourChartMarker extends ContributionItem implements IOpeningD
 	}
 
 	private void onMouseMove(final ToolItem item, final MouseEvent mouseEvent) {
+
+		// ignore other items
+		if (item != _actionToolItem) {
+			return;
+		}
 
 		if (_actionToolItem.getSelection() == false || _actionToolItem.isEnabled() == false) {
 
@@ -173,7 +177,13 @@ public class ActionTourChartMarker extends ContributionItem implements IOpeningD
 			itemBounds.y = itemDisplayPosition.y;
 		}
 
-		_slideoutMarkerOptions.open(itemBounds, true);
+		openSlideout(itemBounds, true);
+	}
+
+	private void openSlideout(final Rectangle itemBounds, final boolean isOpenDelayed) {
+
+		_tourChart.closeOpenedDialogs(this);
+		_slideoutMarkerOptions.open(itemBounds, isOpenDelayed);
 	}
 
 	public void setEnabled(final boolean isEnabled) {

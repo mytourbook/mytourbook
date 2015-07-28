@@ -448,7 +448,7 @@ public class RawDataManager {
 
 					boolean isTourReImportedFromSameFile = false;
 
-					if (reimportedFile != null && _newlyImportedTours.size() > 0) {
+					if (reimportedFile[0] != null && _newlyImportedTours.size() > 0) {
 
 						// this case occures when a file contains multiple tours
 

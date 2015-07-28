@@ -28,6 +28,7 @@ import java.util.Set;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.chart.Chart;
 import net.tourbook.common.color.MapGraphId;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
@@ -1099,6 +1100,24 @@ public class UI {
 		composite.setLayout(gridLayout);
 	}
 
+	/**
+	 * Set chart properties from the pref store.
+	 * 
+	 * @param chart
+	 */
+	public static void setChartProperties(final Chart chart) {
+
+		final IPreferenceStore prefStore = TourbookPlugin.getDefault().getPreferenceStore();
+
+		chart.updateProperties(
+				prefStore.getInt(ITourbookPreferences.GRAPH_GRID_HORIZONTAL_DISTANCE),
+				prefStore.getInt(ITourbookPreferences.GRAPH_GRID_VERTICAL_DISTANCE),
+				prefStore.getBoolean(ITourbookPreferences.GRAPH_GRID_IS_SHOW_HORIZONTAL_GRIDLINES),
+				prefStore.getBoolean(ITourbookPreferences.GRAPH_GRID_IS_SHOW_VERTICAL_GRIDLINES),
+				prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_SEGMENT_ALTERNATE_COLOR),
+				PreferenceConverter.getColor(prefStore, ITourbookPreferences.GRAPH_SEGMENT_ALTERNATE_COLOR));
+	}
+
 	public static void setDefaultColor(final Control control) {
 		control.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_WIDGET_FOREGROUND));
 		control.setBackground(null);
@@ -1233,7 +1252,9 @@ public class UI {
 	 * @param lblTourType
 	 * @param isTextDisplayed
 	 */
-	public static void updateUI_TourType(final TourData tourData, final CLabel lblTourType, final boolean isTextDisplayed) {
+	public static void updateUI_TourType(	final TourData tourData,
+											final CLabel lblTourType,
+											final boolean isTextDisplayed) {
 
 		final TourType tourType = tourData.getTourType();
 

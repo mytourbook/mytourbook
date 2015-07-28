@@ -376,7 +376,7 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 		final double[] toLatitudeSerie = multiTourData.latitudeSerie = new double[numberOfTimeSlices];
 		final double[] toLongitudeSerie = multiTourData.longitudeSerie = new double[numberOfTimeSlices];
 
-		final Long[] allTourId = multiTourData.multipleTourIds = new Long[numberOfTours];
+		final Long[] allTourIds = multiTourData.multipleTourIds = new Long[numberOfTours];
 		final int[] allStartIndex = multiTourData.multipleTourStartIndex = new int[numberOfTours];
 		final long[] allStartTime = multiTourData.multipleTourStartTime = new long[numberOfTours];
 		final String[] allTourTitle = multiTourData.multipleTourTitles = new String[numberOfTours];
@@ -448,7 +448,7 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 				System.arraycopy(fromLongitudeSerie, 0, toLongitudeSerie, toStartIndex, fromSerieLength);
 			}
 
-			allTourId[tourIndex] = fromTourData.getTourId();
+			allTourIds[tourIndex] = fromTourData.getTourId();
 
 			final ArrayList<TourMarker> fromTourMarker = fromTourData.getTourMarkersSorted();
 			allTourMarker.addAll(fromTourMarker);

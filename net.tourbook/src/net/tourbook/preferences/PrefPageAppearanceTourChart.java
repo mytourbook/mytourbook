@@ -29,8 +29,12 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
+import org.eclipse.jface.preference.ColorSelector;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.preference.PreferenceConverter;
 import org.eclipse.jface.preference.PreferencePage;
+import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.CheckboxTableViewer;
 import org.eclipse.jface.viewers.ICheckStateListener;
@@ -93,6 +97,7 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 	private ArrayList<Graph>		_graphList;
 	private ArrayList<Graph>		_viewerGraphs;
 
+	private IPropertyChangeListener	_defaultChangePropertyListener;
 	private MouseWheelListener		_defaultMouseWheelListener;
 	private SelectionAdapter		_defaultSelectionListener;
 
@@ -150,6 +155,8 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 	private Spinner					_spinnerPaceMax;
 	private Spinner					_spinnerPulseMin;
 	private Spinner					_spinnerPulseMax;
+
+	private ColorSelector			_colorSegmentAlternateColor;
 
 	private static class Graph {
 
@@ -420,10 +427,13 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 			 * Checkbox: Segments with alternate colors
 			 */
 			_chkSegmentAlternateColor = new Button(container, SWT.CHECK);
-			GridDataFactory.fillDefaults().span(2, 1).applyTo(_chkSegmentAlternateColor);
 			_chkSegmentAlternateColor.setText(Messages.Pref_Graphs_Checkbox_SegmentAlternateColor);
 			_chkSegmentAlternateColor.setToolTipText(Messages.Pref_Graphs_Checkbox_SegmentAlternateColor_Tooltip);
 			_chkSegmentAlternateColor.addSelectionListener(_defaultSelectionListener);
+
+			// Color: Segment alternate color
+			_colorSegmentAlternateColor = new ColorSelector(container);
+			_colorSegmentAlternateColor.addListener(_defaultChangePropertyListener);
 
 			/*
 			 * checkbox: HR zones
@@ -915,6 +925,8 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 
 		_spinnerPulseMin.setEnabled(_chkMinPulse.getSelection());
 		_spinnerPulseMax.setEnabled(_chkMaxPulse.getSelection());
+
+		_colorSegmentAlternateColor.setEnabled(_chkSegmentAlternateColor.getSelection());
 	}
 
 	/**
@@ -964,6 +976,13 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 		_defaultSelectionListener = new SelectionAdapter() {
 			@Override
 			public void widgetSelected(final SelectionEvent e) {
+				onSelection();
+			}
+		};
+
+		_defaultChangePropertyListener = new IPropertyChangeListener() {
+			@Override
+			public void propertyChange(final PropertyChangeEvent event) {
 				onSelection();
 			}
 		};
@@ -1136,9 +1155,6 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 			_chkGraphAntialiasing.setSelection(//
 					_prefStore.getDefaultBoolean(ITourbookPreferences.GRAPH_ANTIALIASING));
 
-			_chkSegmentAlternateColor.setSelection(//
-					_prefStore.getDefaultBoolean(ITourbookPreferences.GRAPH_IS_SEGMENT_ALTERNATE_COLOR));
-
 			_chkShowHrZoneBackground.setSelection(//
 					_prefStore.getDefaultBoolean(ITourbookPreferences.GRAPH_IS_HR_ZONE_BACKGROUND_VISIBLE));
 
@@ -1147,6 +1163,12 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 
 			_spinnerGraphTransparencyLine.setSelection(//
 					_prefStore.getDefaultInt(ITourbookPreferences.GRAPH_TRANSPARENCY_LINE));
+
+			// segment alternate color
+			_chkSegmentAlternateColor.setSelection(//
+					_prefStore.getDefaultBoolean(ITourbookPreferences.GRAPH_IS_SEGMENT_ALTERNATE_COLOR));
+			_colorSegmentAlternateColor.setColorValue(//
+					PreferenceConverter.getDefaultColor(_prefStore, ITourbookPreferences.GRAPH_SEGMENT_ALTERNATE_COLOR));
 
 		} else if (selectedTab == _tab3_Grid) {
 
@@ -1242,9 +1264,6 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 		_chkGraphAntialiasing.setSelection(//
 				_prefStore.getBoolean(ITourbookPreferences.GRAPH_ANTIALIASING));
 
-		_chkSegmentAlternateColor.setSelection(//
-				_prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_SEGMENT_ALTERNATE_COLOR));
-
 		_chkShowHrZoneBackground.setSelection(//
 				_prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_HR_ZONE_BACKGROUND_VISIBLE));
 
@@ -1253,6 +1272,12 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 
 		_spinnerGraphTransparencyLine.setSelection(//
 				_prefStore.getInt(ITourbookPreferences.GRAPH_TRANSPARENCY_LINE));
+
+		// segment alternate color
+		_chkSegmentAlternateColor.setSelection(//
+				_prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_SEGMENT_ALTERNATE_COLOR));
+		_colorSegmentAlternateColor.setColorValue(//
+				PreferenceConverter.getColor(_prefStore, ITourbookPreferences.GRAPH_SEGMENT_ALTERNATE_COLOR));
 
 		restoreState_Tab_1_Graphs_Graphs();
 	}
@@ -1408,9 +1433,6 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 		_prefStore.setValue(ITourbookPreferences.GRAPH_ANTIALIASING,//
 				_chkGraphAntialiasing.getSelection());
 
-		_prefStore.setValue(ITourbookPreferences.GRAPH_IS_SEGMENT_ALTERNATE_COLOR,//
-				_chkSegmentAlternateColor.getSelection());
-
 		_prefStore.setValue(ITourbookPreferences.GRAPH_IS_HR_ZONE_BACKGROUND_VISIBLE,//
 				_chkShowHrZoneBackground.getSelection());
 
@@ -1419,6 +1441,12 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 
 		_prefStore.setValue(ITourbookPreferences.GRAPH_TRANSPARENCY_LINE, //
 				_spinnerGraphTransparencyLine.getSelection());
+
+		// segment alternate color
+		_prefStore.setValue(ITourbookPreferences.GRAPH_IS_SEGMENT_ALTERNATE_COLOR,//
+				_chkSegmentAlternateColor.getSelection());
+		PreferenceConverter.setValue(_prefStore, ITourbookPreferences.GRAPH_SEGMENT_ALTERNATE_COLOR,//
+				_colorSegmentAlternateColor.getColorValue());
 
 		saveState_Tab_1_Graphs_Graphs();
 	}

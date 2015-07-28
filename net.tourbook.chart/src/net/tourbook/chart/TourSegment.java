@@ -15,13 +15,16 @@
  *******************************************************************************/
 package net.tourbook.chart;
 
+import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.widgets.Control;
+
 public class TourSegment {
 
 	public static final int	TITLE_HOVER_MARGIN	= 5;
 
 	public Long				tourId;
 
-	public boolean			isDrawTitle;
 	public int				devXTitle;
 	public int				devYTitle;
 
@@ -31,20 +34,41 @@ public class TourSegment {
 	public int				devYGraphTop;
 	public int				devGraphWidth;
 
-	public boolean			isDrawHoveredSegment;
 	public int				devXSegment;
-	public int				segmentWidth;
+	public int				devSegmentWidth;
+
+	public Rectangle		noHideArea;
 
 	public TourSegment() {}
 
-	@Override
-	public String toString() {
-		return "ChartTitle ["
-				+ ("devX=" + devXTitle + ", ")
-				+ ("devY=" + devYTitle + ", ")
-				+ ("width=" + titleWidth + ", ")
-				+ ("height=" + titleHeight)
-				+ "]";
+	/**
+	 * Set an area from the segment display position which can be hovered and the tooltip do not get
+	 * hidden.
+	 * 
+	 * @param control
+	 */
+	void setNoHideArea(final Control control) {
+
+		final Point segmentDisplayPosition = control.toDisplay(devXSegment, 0);
+
+		final Rectangle segmentArea = new Rectangle(
+				segmentDisplayPosition.x,
+				segmentDisplayPosition.y,
+				devSegmentWidth,
+				devYTitle + titleHeight);
+
+		noHideArea = segmentArea;
 	}
 
+	@Override
+	public String toString() {
+		return "TourSegment ["
+//				+ ("devX=" + devXTitle + ", ")
+//				+ ("devY=" + devYTitle + ", ")
+//				+ ("width=" + titleWidth + ", ")
+//				+ ("height=" + titleHeight+", ")
+				+ ("tourId=" + tourId + ", ")
+				+ ("noHideArea=" + noHideArea)
+				+ "]";
+	}
 }

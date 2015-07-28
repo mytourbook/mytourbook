@@ -164,7 +164,7 @@ public class YearStatisticView extends ViewPart {
 
 	private Chart								_yearChart;
 	private YearStatisticTourToolTip			_tourToolTip;
-	private TourInfoIconToolTipProvider				_tourInfoToolTipProvider	= new TourInfoIconToolTipProvider();
+	private TourInfoIconToolTipProvider			_tourInfoToolTipProvider	= new TourInfoIconToolTipProvider();
 
 	private Composite							_toolbar;
 	private Combo								_cboLastYear;
@@ -1003,12 +1003,7 @@ public class YearStatisticView extends ViewPart {
 			}
 		});
 
-		_yearChart.updateProperties(
-				_prefStore.getInt(ITourbookPreferences.GRAPH_GRID_HORIZONTAL_DISTANCE),
-				_prefStore.getInt(ITourbookPreferences.GRAPH_GRID_VERTICAL_DISTANCE),
-				_prefStore.getBoolean(ITourbookPreferences.GRAPH_GRID_IS_SHOW_HORIZONTAL_GRIDLINES),
-				_prefStore.getBoolean(ITourbookPreferences.GRAPH_GRID_IS_SHOW_VERTICAL_GRIDLINES),
-				_prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_SEGMENT_ALTERNATE_COLOR));
+		net.tourbook.ui.UI.setChartProperties(_yearChart);
 
 		// show the data in the chart
 		_yearChart.updateChart(chartModel, false, true);

@@ -77,12 +77,14 @@ public class ActionShowMap3Layer extends ContributionItem implements IOpeningDia
 			_toolBar = toolbar;
 
 			toolbar.addDisposeListener(new DisposeListener() {
+				@Override
 				public void widgetDisposed(final DisposeEvent e) {
 					onDispose();
 				}
 			});
 
 			toolbar.addMouseMoveListener(new MouseMoveListener() {
+				@Override
 				public void mouseMove(final MouseEvent e) {
 
 					final Point mousePosition = new Point(e.x, e.y);
@@ -119,7 +121,6 @@ public class ActionShowMap3Layer extends ContributionItem implements IOpeningDia
 
 	@Override
 	public void hideDialog() {
-
 		_map3LayerDialog.hideNow();
 	}
 

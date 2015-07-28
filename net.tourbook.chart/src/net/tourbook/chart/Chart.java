@@ -32,6 +32,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -144,7 +145,11 @@ public class Chart extends ViewForm {
 	 */
 	protected int					graphAntialiasing					= SWT.OFF;
 
+	/*
+	 * Segment alternate color
+	 */
 	protected boolean				isShowSegmentAlternateColor			= true;
+	protected RGB					segmentAlternateColor				= new RGB(0xf5, 0xf5, 0xf5);
 
 	/**
 	 * mouse behaviour:<br>
@@ -1010,6 +1015,11 @@ public class Chart extends ViewForm {
 		_hoveredListener = hoveredValuePointListener;
 	}
 
+	/**
+	 * Set hovered tour in the {@link ChartComponentGraph}.
+	 * 
+	 * @param tourSegment
+	 */
 	public void setHoveredTour(final TourSegment tourSegment) {
 		_chartComponents.getChartComponentGraph().setHoveredTour(tourSegment);
 	}
@@ -1287,7 +1297,8 @@ public class Chart extends ViewForm {
 									final int verticalGrid,
 									final boolean isHGridVisible,
 									final boolean isVGridVisible,
-									final boolean isAlternateColor) {
+									final boolean isAlternateColor,
+									final RGB rgbAlternateColor) {
 
 		gridHorizontalDistance = horizontalGrid;
 		gridVerticalDistance = verticalGrid;
@@ -1296,6 +1307,7 @@ public class Chart extends ViewForm {
 		isShowVerticalGridLines = isVGridVisible;
 
 		isShowSegmentAlternateColor = isAlternateColor;
+		segmentAlternateColor = rgbAlternateColor;
 
 		_chartComponents.onResize();
 	}

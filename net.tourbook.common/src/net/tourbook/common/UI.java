@@ -779,7 +779,7 @@ public class UI {
 		return directionIndex;
 	}
 
-	public static Rectangle getDisplayBounds(final Composite composite, final Point location) {
+	public static Rectangle getDisplayBounds(final Control composite, final Point location) {
 
 		Rectangle displayBounds;
 		final Monitor[] allMonitors = composite.getDisplay().getMonitors();

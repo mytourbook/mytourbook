@@ -20,4 +20,7 @@ package net.tourbook.chart;
  */
 public class ChartTitleConfig {
 
+	public boolean	isShowInfoTitle;
+	public boolean	isShowInfoTourSeparator;
+
 }

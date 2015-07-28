@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,18 +15,32 @@
  *******************************************************************************/
 package net.tourbook.common.tooltip;
 
-/**
- * This is used when opening a dialog, make sure that other dialogs are hidden.
- */
-public interface IOpeningDialog {
+import java.util.HashMap;
+
+public class OpenDialogManager {
+
+	private HashMap<String, IOpeningDialog>	_openedDialogs	= new HashMap<>();
 
 	/**
-	 * @return Returns a unique id for this dialog.
+	 * Close all opened dialogs except the opening dialog.
+	 * 
+	 * @param openingDialog
 	 */
-	String getDialogId();
+	public void closeOpenedDialogs(final IOpeningDialog openingDialog) {
 
-	/**
-	 * Hides the opened dialog.
-	 */
-	void hideDialog();
+		final String openingDialogId = openingDialog.getDialogId();
+
+		// keep reference of all opened dialogs
+		_openedDialogs.put(openingDialogId, openingDialog);
+
+		for (final String dialogId : _openedDialogs.keySet()) {
+
+			if (dialogId.equals(openingDialogId)) {
+				continue;
+			}
+
+			_openedDialogs.get(dialogId).hideDialog();
+		}
+	}
+
 }

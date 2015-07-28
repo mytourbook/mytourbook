@@ -27,8 +27,6 @@ import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseTrackAdapter;
@@ -64,7 +62,6 @@ public class SlideoutTourChartInfo extends AnimatedToolTipShell implements IColo
 
 	private SelectionAdapter		_defaultSelectionAdapter;
 	private MouseWheelListener		_defaultMouseWheelListener;
-	private IPropertyChangeListener	_defaultPropertyChangeListener;
 
 	{
 		_defaultSelectionAdapter = new SelectionAdapter() {
@@ -81,13 +78,6 @@ public class SlideoutTourChartInfo extends AnimatedToolTipShell implements IColo
 				onChangeUI();
 			}
 		};
-
-		_defaultPropertyChangeListener = new IPropertyChangeListener() {
-			@Override
-			public void propertyChange(final PropertyChangeEvent event) {
-				onChangeUI();
-			}
-		};
 	}
 
 	private PixelConverter			_pc;
@@ -100,11 +90,11 @@ public class SlideoutTourChartInfo extends AnimatedToolTipShell implements IColo
 
 	private Button					_chkShowInfoTitle;
 	private Button					_chkShowInfoTooltip;
+	private Button					_chkShowInfoTourSeparator;
 
 	private Label					_lblTooltipDelay;
 
 	private Spinner					_spinTooltipDelay;
-
 
 	private final class WaitTimer implements Runnable {
 		@Override
@@ -127,6 +117,7 @@ public class SlideoutTourChartInfo extends AnimatedToolTipShell implements IColo
 		setToolTipCreateStyle(AnimatedToolTipShell.TOOLTIP_STYLE_KEEP_CONTENT);
 		setBehaviourOnMouseOver(AnimatedToolTipShell.MOUSE_OVER_BEHAVIOUR_IGNORE_OWNER);
 		setIsKeepShellOpenWhenMoved(false);
+
 		setFadeInSteps(1);
 		setFadeOutSteps(10);
 		setFadeOutDelaySteps(1);
@@ -241,6 +232,18 @@ public class SlideoutTourChartInfo extends AnimatedToolTipShell implements IColo
 					}
 					{
 						/*
+						 * Show tour separator
+						 */
+						_chkShowInfoTourSeparator = new Button(ttContainer, SWT.CHECK);
+						GridDataFactory.fillDefaults()//
+								.span(2, 1)
+								.applyTo(_chkShowInfoTourSeparator);
+						_chkShowInfoTourSeparator.setText(//
+								Messages.Slideout_TourInfoOptions_Checkbox_IsShowTourSeparator);
+						_chkShowInfoTourSeparator.addSelectionListener(_defaultSelectionAdapter);
+					}
+					{
+						/*
 						 * Show info tooltip
 						 */
 						_chkShowInfoTooltip = new Button(ttContainer, SWT.CHECK);
@@ -322,6 +325,7 @@ public class SlideoutTourChartInfo extends AnimatedToolTipShell implements IColo
 
 		final boolean isShowInfoTitle = _chkShowInfoTitle.getSelection();
 		final boolean isShowInfoTooltip = _chkShowInfoTooltip.getSelection();
+		final boolean isShowInfoTourSeparator = _chkShowInfoTourSeparator.getSelection();
 		final int tooltipDelay = _spinTooltipDelay.getSelection();
 
 		/*
@@ -329,6 +333,7 @@ public class SlideoutTourChartInfo extends AnimatedToolTipShell implements IColo
 		 */
 		_prefStore.setValue(ITourbookPreferences.GRAPH_TOUR_INFO_IS_TITLE_VISIBLE, isShowInfoTitle);
 		_prefStore.setValue(ITourbookPreferences.GRAPH_TOUR_INFO_IS_TOOLTIP_VISIBLE, isShowInfoTooltip);
+		_prefStore.setValue(ITourbookPreferences.GRAPH_TOUR_INFO_IS_TOUR_SEPARATOR_VISIBLE, isShowInfoTourSeparator);
 		_prefStore.setValue(ITourbookPreferences.GRAPH_TOUR_INFO_TOOLTIP_DELAY, tooltipDelay);
 
 		/*
@@ -336,6 +341,7 @@ public class SlideoutTourChartInfo extends AnimatedToolTipShell implements IColo
 		 */
 		tcc.isShowInfoTitle = isShowInfoTitle;
 		tcc.isShowInfoTooltip = isShowInfoTooltip;
+		tcc.isShowInfoTourSeparator = isShowInfoTourSeparator;
 		tcc.tourInfoTooltipDelay = tooltipDelay;
 
 		// update chart with new settings

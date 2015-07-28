@@ -31,7 +31,6 @@ import net.tourbook.common.form.SashLeftFixedForm;
 import net.tourbook.common.util.TreeViewerItem;
 import net.tourbook.data.TourData;
 import net.tourbook.database.TourDatabase;
-import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.tourChart.TourChartConfiguration;
 
@@ -268,12 +267,7 @@ public class WizardPage_10_CompareTour extends WizardPage {
 				_compareTourChart = new Chart(_pageBook, SWT.NONE);
 				_compareTourChart.setBackgroundColor(parent.getDisplay().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
 
-				_compareTourChart.updateProperties(
-						_prefStore.getInt(ITourbookPreferences.GRAPH_GRID_HORIZONTAL_DISTANCE),
-						_prefStore.getInt(ITourbookPreferences.GRAPH_GRID_VERTICAL_DISTANCE),
-						_prefStore.getBoolean(ITourbookPreferences.GRAPH_GRID_IS_SHOW_HORIZONTAL_GRIDLINES),
-						_prefStore.getBoolean(ITourbookPreferences.GRAPH_GRID_IS_SHOW_VERTICAL_GRIDLINES),
-						_prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_SEGMENT_ALTERNATE_COLOR));
+				net.tourbook.ui.UI.setChartProperties(_compareTourChart);
 
 				_pageTourIsNotSelected = new Label(_pageBook, SWT.NONE);
 				_pageTourIsNotSelected.setText(Messages.tourCatalog_wizard_Label_a_tour_is_not_selected);

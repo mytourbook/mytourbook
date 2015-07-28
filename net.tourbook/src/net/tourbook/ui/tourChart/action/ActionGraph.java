@@ -93,7 +93,7 @@ public class ActionGraph extends Action {
 		}
 
 		_tourChart.updateTourActions();
-		_tourChart.updateTourChart(true);
+		_tourChart.updateTourChart();
 	}
 
 }

@@ -55,6 +55,7 @@ import net.tourbook.common.color.IMapColorProvider;
 import net.tourbook.common.color.MapGraphId;
 import net.tourbook.common.color.MapUnits;
 import net.tourbook.common.tooltip.IOpeningDialog;
+import net.tourbook.common.tooltip.OpenDialogManager;
 import net.tourbook.common.util.SWTPopupOverAWT;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
@@ -230,7 +231,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 	 */
 	private MapGraphId							_graphId;
 
-	private HashMap<String, IOpeningDialog>		_openedDialogs							= new HashMap<>();
+	private OpenDialogManager					_openDlgMgr								= new OpenDialogManager();
 
 	/*
 	 * current position for the x-sliders (vertical slider)
@@ -719,20 +720,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 	 * @param openingDialog
 	 */
 	public void closeOpenedDialogs(final IOpeningDialog openingDialog) {
-
-		final String openingDialogId = openingDialog.getDialogId();
-
-		// keep reference of all opened dialogs
-		_openedDialogs.put(openingDialogId, openingDialog);
-
-		for (final String dialogId : _openedDialogs.keySet()) {
-
-			if (dialogId.equals(openingDialogId)) {
-				continue;
-			}
-
-			_openedDialogs.get(dialogId).hideDialog();
-		}
+		_openDlgMgr.closeOpenedDialogs(openingDialog);
 	}
 
 	/**
