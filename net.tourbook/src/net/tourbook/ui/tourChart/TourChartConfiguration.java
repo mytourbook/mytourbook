@@ -191,11 +191,14 @@ public class TourChartConfiguration {
 	/*
 	 * Tour info
 	 */
-	public boolean					isTourInfoVisible		= true;
-	public boolean					isShowInfoTitle			= true;
-	public boolean					isShowInfoTooltip		= true;
-	public boolean					isShowInfoTourSeparator	= true;
+	public boolean					isTourInfoVisible;
+	public boolean					isShowInfoTitle;
+	public boolean					isShowInfoTooltip;
+	public boolean					isShowInfoTourSeparator;
 	public int						tourInfoTooltipDelay;
+
+	@SuppressWarnings("unused")
+	private TourChartConfiguration() {}
 
 	/**
 	 * @param keepMinMaxValues

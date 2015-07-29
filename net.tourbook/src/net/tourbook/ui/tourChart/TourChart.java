@@ -3213,15 +3213,15 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 	 * Set {@link TourData} and {@link TourChartConfiguration} to create a new chart data model
 	 * 
 	 * @param tourData
-	 * @param tourChartSettings
+	 * @param tourChartConfig
 	 * @param keepMinMaxValues
 	 *            <code>true</code> keeps the min/max values from the previous chart
 	 */
 	public void updateTourChart(final TourData tourData,
-								final TourChartConfiguration tourChartSettings,
+								final TourChartConfiguration tourChartConfig,
 								final boolean keepMinMaxValues) {
 
-		updateTourChartInternal(tourData, tourChartSettings, keepMinMaxValues, false);
+		updateTourChartInternal(tourData, tourChartConfig, keepMinMaxValues, false);
 	}
 
 	/**

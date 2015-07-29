@@ -17,6 +17,9 @@ package net.tourbook.chart;
 
 import java.util.ArrayList;
 
+/**
+ * Contains data how a chart is painted.
+ */
 public class ChartDrawingData {
 
 	public ArrayList<GraphDrawingData>	graphDrawingData;

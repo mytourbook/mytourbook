@@ -407,6 +407,7 @@ public class SlideoutTourChartInfo extends AnimatedToolTipShell implements IColo
 
 		_chkShowInfoTitle.setSelection(tcc.isShowInfoTitle);
 		_chkShowInfoTooltip.setSelection(tcc.isShowInfoTooltip);
+		_chkShowInfoTourSeparator.setSelection(tcc.isShowInfoTourSeparator);
 
 		_spinTooltipDelay.setSelection(tcc.tourInfoTooltipDelay);
 	}

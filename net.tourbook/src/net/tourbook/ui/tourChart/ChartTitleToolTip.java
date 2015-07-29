@@ -155,7 +155,6 @@ public class ChartTitleToolTip extends AnimatedToolTipShell2 implements ITourPro
 		final int devHoveredX = _hoveredSegment.devXTitle;
 		int devHoveredY = _hoveredSegment.devYTitle;
 		final int devHoveredWidth = _hoveredSegment.titleWidth;
-		final int devHoveredHeight = _hoveredSegment.titleHeight;
 
 		final int devYTop = _hoveredSegment.devYGraphTop;
 
@@ -191,7 +190,6 @@ public class ChartTitleToolTip extends AnimatedToolTipShell2 implements ITourPro
 
 		final ToolBarManager tbm = (ToolBarManager) iTbm;
 		final ToolBar toolbarControl = tbm.getControl();
-		final Point toolbarLocation = toolbarControl.toDisplay(0, 0);
 
 		/*
 		 * Center horizontally in the middle of the tour segment and vertically above the toolbar
@@ -208,12 +206,14 @@ public class ChartTitleToolTip extends AnimatedToolTipShell2 implements ITourPro
 		final Rectangle displayBounds = UI.getDisplayBounds(toolbarControl, ttLocation);
 		final Point rightBottomBounds = new Point(tipSize.x + ttLocation.x, tipSize.y + ttLocation.y);
 
-		if (!(displayBounds.contains(ttLocation) && displayBounds.contains(rightBottomBounds))) {
+		final boolean isLocationInDisplay = displayBounds.contains(ttLocation);
+		final boolean isBottomInDisplay = displayBounds.contains(rightBottomBounds);
+
+		if (!(isLocationInDisplay && isBottomInDisplay)) {
 
 			final int displayX = displayBounds.x;
 			final int displayY = displayBounds.y;
 			final int displayWidth = displayBounds.width;
-//			final int displayHeight = displayBounds.height;
 
 			if (ttLocation.x < displayX) {
 				ttLocation.x = displayX;
@@ -224,7 +224,8 @@ public class ChartTitleToolTip extends AnimatedToolTipShell2 implements ITourPro
 			}
 
 			if (ttLocation.y < displayY) {
-				ttLocation.y = toolbarLocation.y + devHoveredY + devHoveredHeight /*- devHoverSize */+ 2;
+				// position evaluated with try and error until it fits
+				ttLocation.y = ttLocationX.y - ttPosY + graphControl.getSize().y;
 			}
 		}
 
@@ -244,7 +245,9 @@ public class ChartTitleToolTip extends AnimatedToolTipShell2 implements ITourPro
 	@Override
 	protected Rectangle noHideOnMouseMove() {
 
-		return _hoveredSegment == null ? null : _hoveredSegment.noHideArea;
+		return _hoveredSegment == null //
+				? null
+				: _hoveredSegment.getNoHideArea(_tourChart.getChartComponents().getChartComponentGraph());
 	}
 
 	private void onDispose() {
@@ -252,10 +255,6 @@ public class ChartTitleToolTip extends AnimatedToolTipShell2 implements ITourPro
 	}
 
 	void open(final TourSegment hoveredTour) {
-
-//		System.out
-//				.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") + ("\topen: " + hoveredTour));
-//		// TODO remove SYSTEM.OUT.PRINTLN
 
 		boolean isKeepOpened = false;
 
@@ -284,9 +283,6 @@ public class ChartTitleToolTip extends AnimatedToolTipShell2 implements ITourPro
 			_hoveredSegment = null;
 			_hoveredTourId = null;
 
-//			System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") + ("\thide"));
-//			// TODO remove SYSTEM.OUT.PRINTLN
-
 			hide();
 
 		} else {
@@ -295,9 +291,6 @@ public class ChartTitleToolTip extends AnimatedToolTipShell2 implements ITourPro
 
 			_hoveredSegment = hoveredTour;
 			_hoveredTourId = hoveredTour.tourId;
-
-//			System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") + ("\tshowToolTip"));
-//			// TODO remove SYSTEM.OUT.PRINTLN
 
 			showToolTip();
 		}

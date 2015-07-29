@@ -1960,8 +1960,6 @@ public class ChartComponentGraph extends Canvas {
 						tourSegment.devXSegment = visibleSegmentStart;
 						tourSegment.devSegmentWidth = visibleSegmentWidth;
 
-						tourSegment.setNoHideArea(this);
-
 						tourSegments.add(tourSegment);
 					}
 				}
@@ -2013,8 +2011,6 @@ public class ChartComponentGraph extends Canvas {
 
 				tourSegment.devXSegment = 0;
 				tourSegment.devSegmentWidth = _chartDrawingData.devVisibleChartWidth;
-
-				tourSegment.setNoHideArea(this);
 
 				tourSegments.add(tourSegment);
 			}

@@ -37,17 +37,16 @@ public class TourSegment {
 	public int				devXSegment;
 	public int				devSegmentWidth;
 
-	public Rectangle		noHideArea;
-
 	public TourSegment() {}
 
 	/**
-	 * Set an area from the segment display position which can be hovered and the tooltip do not get
+	 * Get an area from the segment display position which can be hovered and the tooltip do not get
 	 * hidden.
 	 * 
 	 * @param control
+	 * @return
 	 */
-	void setNoHideArea(final Control control) {
+	public Rectangle getNoHideArea(final Control control) {
 
 		final Point segmentDisplayPosition = control.toDisplay(devXSegment, 0);
 
@@ -57,7 +56,7 @@ public class TourSegment {
 				devSegmentWidth,
 				devYTitle + titleHeight);
 
-		noHideArea = segmentArea;
+		return segmentArea;
 	}
 
 	@Override
@@ -68,7 +67,6 @@ public class TourSegment {
 //				+ ("width=" + titleWidth + ", ")
 //				+ ("height=" + titleHeight+", ")
 				+ ("tourId=" + tourId + ", ")
-				+ ("noHideArea=" + noHideArea)
 				+ "]";
 	}
 }
