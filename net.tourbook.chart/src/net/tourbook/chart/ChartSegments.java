@@ -20,13 +20,13 @@ package net.tourbook.chart;
  */
 public class ChartSegments {
 
+	public int		allValues;
+
 	public long[]	valueStart;
 	public long[]	valueEnd;
 
 	public String[]	segmentTitle;
 	public Object[]	segmentCustomData;
-
-	public int		allValues;
 
 	public int[]	years;
 	public int[]	yearDays;

@@ -35,11 +35,12 @@ public class ActionReimportSubMenu extends Action implements IMenuCreator {
 	private Menu								_menu;
 
 	private ActionReimportEntireTour			_actionReimportEntireTour;
-	private ActionReimportOnlyTourMarker		_actionReimportOnlyTourMarker;
-	private ActionReimportOnlyTimeSlices		_actionReimportOnlyTimeSlices;
 	private ActionReimportOnlyAltitudeValues	_actionReimportOnlyAltitudeValues;
+	private ActionReimportOnlyTimeSlices		_actionReimportOnlyTimeSlices;
 	private ActionReimportOnlyGearValues		_actionReimportOnlyGearValues;
+	private ActionReimportOnlyPowerValues		_actionReimportOnlyPowerValues;
 	private ActionReimportOnlyTemperatureValues	_actionReimportOnlyTemperatureValues;
+	private ActionReimportOnlyTourMarker		_actionReimportOnlyTourMarker;
 
 	private ITourViewer3						_tourViewer;
 
@@ -80,6 +81,18 @@ public class ActionReimportSubMenu extends Action implements IMenuCreator {
 		}
 	}
 
+	private class ActionReimportOnlyPowerValues extends Action {
+
+		public ActionReimportOnlyPowerValues() {
+			setText(Messages.Import_Data_Action_Reimport_OnlyPowerAndSpeedValues);
+		}
+
+		@Override
+		public void run() {
+			RawDataManager.getInstance().actionReimportTour(RawDataManager.ReImport.OnlyPowerAndSpeedValues, _tourViewer);
+		}
+	}
+
 	private class ActionReimportOnlyTemperatureValues extends Action {
 
 		public ActionReimportOnlyTemperatureValues() {
@@ -107,16 +120,16 @@ public class ActionReimportSubMenu extends Action implements IMenuCreator {
 	}
 
 	private class ActionReimportOnlyTourMarker extends Action {
-		
+
 		public ActionReimportOnlyTourMarker() {
 			setText(Messages.Import_Data_Action_Reimport_OnlyTourMarker);
 		}
-		
+
 		@Override
 		public void run() {
 			RawDataManager.getInstance().actionReimportTour(RawDataManager.ReImport.OnlyTourMarker, _tourViewer);
 		}
-		
+
 	}
 
 	public ActionReimportSubMenu(final ITourViewer3 tourViewer) {
@@ -130,6 +143,7 @@ public class ActionReimportSubMenu extends Action implements IMenuCreator {
 		_actionReimportEntireTour = new ActionReimportEntireTour();
 		_actionReimportOnlyAltitudeValues = new ActionReimportOnlyAltitudeValues();
 		_actionReimportOnlyGearValues = new ActionReimportOnlyGearValues();
+		_actionReimportOnlyPowerValues = new ActionReimportOnlyPowerValues();
 		_actionReimportOnlyTemperatureValues = new ActionReimportOnlyTemperatureValues();
 		_actionReimportOnlyTimeSlices = new ActionReimportOnlyTimeSlices();
 		_actionReimportOnlyTourMarker = new ActionReimportOnlyTourMarker();
@@ -149,6 +163,7 @@ public class ActionReimportSubMenu extends Action implements IMenuCreator {
 		new ActionContributionItem(_actionReimportOnlyAltitudeValues).fill(menu, -1);
 		new ActionContributionItem(_actionReimportOnlyTemperatureValues).fill(menu, -1);
 		new ActionContributionItem(_actionReimportOnlyGearValues).fill(menu, -1);
+		new ActionContributionItem(_actionReimportOnlyPowerValues).fill(menu, -1);
 		new ActionContributionItem(_actionReimportOnlyTourMarker).fill(menu, -1);
 		new ActionContributionItem(_actionReimportOnlyTimeSlices).fill(menu, -1);
 		new ActionContributionItem(_actionReimportEntireTour).fill(menu, -1);

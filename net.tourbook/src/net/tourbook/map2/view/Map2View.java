@@ -1970,7 +1970,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 		long newOverlayKey = -1;
 		for (final TourData tourData : _allTourData) {
 
-			if (TourManager.isPaintDataValid(tourData)) {
+			if (TourManager.isLatLonAvailable(tourData)) {
 				newOverlayKey += tourData.getTourId();
 			}
 		}
@@ -2135,7 +2135,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 
 			// tour data needs to be loaded
 
-			newOverlayKey = TourManager.loadTourData(tourIdList, _allTourData);
+			newOverlayKey = TourManager.loadTourData(tourIdList, _allTourData, true);
 
 			_hashTourId = tourIdList.hashCode();
 			_hashTourData = _allTourData.hashCode();
@@ -2209,7 +2209,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 
 		_isTourOrWayPoint = true;
 
-		if (TourManager.isPaintDataValid(tourData) == false) {
+		if (TourManager.isLatLonAvailable(tourData) == false) {
 			showDefaultMap(_isShowPhoto);
 			return;
 		}
@@ -2337,7 +2337,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 		long newOverlayKey = -1;
 		for (final TourData tourData : _allTourData) {
 
-			if (TourManager.isPaintDataValid(tourData)) {
+			if (TourManager.isLatLonAvailable(tourData)) {
 				newOverlayKey += tourData.getTourId();
 			}
 		}
@@ -2399,7 +2399,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 
 		_isTourOrWayPoint = true;
 
-		if (TourManager.isPaintDataValid(tourData) == false) {
+		if (TourManager.isLatLonAvailable(tourData) == false) {
 			showDefaultMap(_isShowPhoto);
 			return;
 		}

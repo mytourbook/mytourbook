@@ -133,12 +133,13 @@ public class RawDataManager {
 
 	public static enum ReImport {
 
-		Tour, //
 		AllTimeSlices, //
 		OnlyAltitudeValues, //
-		OnlyTemperatureValues, //
 		OnlyGearValues, //
-		OnlyTourMarker,
+		OnlyPowerAndSpeedValues, //
+		OnlyTourMarker, //
+		OnlyTemperatureValues, //
+		Tour, //
 	}
 
 	private RawDataManager() {}
@@ -532,6 +533,14 @@ public class RawDataManager {
 				return true;
 			}
 
+		} else if (reimportTour == ReImport.OnlyPowerAndSpeedValues) {
+
+			if (actionReimportTour_12_ConfirmDialog(
+					ITourbookPreferences.TOGGLE_STATE_REIMPORT_POWER_AND_SPEED_VALUES,
+					Messages.Import_Data_Dialog_ConfirmReimportPowerAndSpeedValues_Message)) {
+				return true;
+			}
+
 		} else if (reimportTour == ReImport.OnlyTourMarker) {
 
 			if (actionReimportTour_12_ConfirmDialog(
@@ -584,110 +593,124 @@ public class RawDataManager {
 	 */
 	private File actionReimportTour_20_GetImportFile(final TourData tourData) {
 
-		String reimportFilePathName = null;
+		final String[] reimportFilePathName = { null };
 
-		/*
-		 * use path when tour is already imported
-		 */
-		final String importedFilePath = tourData.importRawDataFile;
-		if (importedFilePath != null) {
-			// check import file
-			final File importFile = new File(importedFilePath);
-			if (importFile.exists()) {
-				reimportFilePathName = importedFilePath;
-			}
-		}
+		Display.getDefault().syncExec(new Runnable() {
+			@Override
+			public void run() {
 
-		String oldImportFilePathName = null;
+				final Shell activeShell = Display.getDefault().getActiveShell();
 
-		if (reimportFilePathName == null) {
-
-			// get import file name
-			oldImportFilePathName = tourData.getTourImportFilePathRaw();
-			if (oldImportFilePathName == null) {
-
-				final String tourDateTimeShort = TourManager.getTourDateTimeShort(tourData);
-				MessageDialog.openInformation(
-						Display.getCurrent().getActiveShell(),
-						NLS.bind(Messages.Import_Data_Dialog_Reimport_Title, tourDateTimeShort),
-						NLS.bind(Messages.Import_Data_Dialog_GetReimportedFilePath_Message,//
-								tourDateTimeShort,
-								tourDateTimeShort));
-
-			} else {
-
-				// check import file
-				final File importFile = new File(oldImportFilePathName);
-				if (importFile.exists()) {
-
-					reimportFilePathName = oldImportFilePathName;
-
-				} else {
-
-					if (_previousSelectedReimportFolder != null) {
-
-						/*
-						 * try to use the folder from the previously reimported tour
-						 */
-
-						final String oldImportFileName = new Path(oldImportFilePathName).lastSegment();
-						final IPath newImportFilePath = _previousSelectedReimportFolder.append(oldImportFileName);
-
-						final String newImportFilePathName = newImportFilePath.toOSString();
-						final File newImportFile = new File(newImportFilePathName);
-						if (newImportFile.exists()) {
-							reimportFilePathName = newImportFilePathName;
-						}
+				/*
+				 * use path when tour is already imported
+				 */
+				final String importedFilePath = tourData.importRawDataFile;
+				if (importedFilePath != null) {
+					// check import file
+					final File importFile = new File(importedFilePath);
+					if (importFile.exists()) {
+						reimportFilePathName[0] = importedFilePath;
 					}
+				}
 
-					if (reimportFilePathName == null) {
+				String oldImportFilePathName = null;
 
-						MessageDialog
-								.openInformation(
-										Display.getCurrent().getActiveShell(),
+				if (reimportFilePathName[0] == null) {
+
+					// get import file name
+					oldImportFilePathName = tourData.getTourImportFilePathRaw();
+					if (oldImportFilePathName == null) {
+
+						final String tourDateTimeShort = TourManager.getTourDateTimeShort(tourData);
+						MessageDialog.openInformation(
+								activeShell,
+								NLS.bind(Messages.Import_Data_Dialog_Reimport_Title, tourDateTimeShort),
+								NLS.bind(Messages.Import_Data_Dialog_GetReimportedFilePath_Message,//
+										tourDateTimeShort,
+										tourDateTimeShort));
+
+					} else {
+
+						// check import file
+						final File importFile = new File(oldImportFilePathName);
+						if (importFile.exists()) {
+
+							reimportFilePathName[0] = oldImportFilePathName;
+
+						} else {
+
+							if (_previousSelectedReimportFolder != null) {
+
+								/*
+								 * try to use the folder from the previously reimported tour
+								 */
+
+								final String oldImportFileName = new Path(oldImportFilePathName).lastSegment();
+								final IPath newImportFilePath = _previousSelectedReimportFolder
+										.append(oldImportFileName);
+
+								final String newImportFilePathName = newImportFilePath.toOSString();
+								final File newImportFile = new File(newImportFilePathName);
+								if (newImportFile.exists()) {
+
+									// reimport file exists in the same folder
+									reimportFilePathName[0] = newImportFilePathName;
+								}
+							}
+
+							if (reimportFilePathName[0] == null) {
+
+								MessageDialog.openInformation(
+								//
+										activeShell,
 										Messages.import_data_dlg_reimport_title,
 										NLS.bind(
 												Messages.Import_Data_Dialog_GetAlternativePath_Message,
 												oldImportFilePathName));
+							}
+						}
 					}
 				}
+
+				if (reimportFilePathName[0] == null) {
+
+					final String tourDateTimeShort = TourManager.getTourDateTimeShort(tourData);
+
+					final FileDialog dialog = new FileDialog(activeShell, SWT.OPEN);
+					dialog.setText(NLS.bind(Messages.Import_Data_Dialog_Reimport_Title, tourDateTimeShort));
+
+					if (oldImportFilePathName != null) {
+
+						// select previous file location
+
+						final IPath importFilePath = new Path(oldImportFilePathName);
+						final String importFileName = importFilePath.lastSegment();
+
+						dialog.setFileName(importFileName);
+						dialog.setFilterPath(oldImportFilePathName);
+
+					} else if (_previousSelectedReimportFolder != null) {
+
+						dialog.setFilterPath(_previousSelectedReimportFolder.toOSString());
+					}
+
+					reimportFilePathName[0] = dialog.open();
+				}
 			}
-		}
+		});
 
-		if (reimportFilePathName == null) {
-
-			final String tourDateTimeShort = TourManager.getTourDateTimeShort(tourData);
-
-			final FileDialog dialog = new FileDialog(Display.getDefault().getActiveShell(), SWT.OPEN);
-			dialog.setText(NLS.bind(Messages.Import_Data_Dialog_Reimport_Title, tourDateTimeShort));
-
-			if (oldImportFilePathName != null) {
-
-				// select previous file location
-
-				final IPath importFilePath = new Path(oldImportFilePathName);
-				final String importFileName = importFilePath.lastSegment();
-
-				dialog.setFileName(importFileName);
-				dialog.setFilterPath(oldImportFilePathName);
-
-			} else if (_previousSelectedReimportFolder != null) {
-
-				dialog.setFilterPath(_previousSelectedReimportFolder.toOSString());
-			}
-
-			reimportFilePathName = dialog.open();
-		}
-
-		if (reimportFilePathName == null) {
+		if (reimportFilePathName[0] == null) {
 			// user has canceled the file dialog
 			return null;
 		}
 
-		// keep selected file path
-		_previousSelectedReimportFolder = new Path(reimportFilePathName).removeLastSegments(1);
+		/*
+		 * Keep selected file path which is used to reimport following tours from the same folder
+		 * that the user do not have to reselect again and again.
+		 */
+		_previousSelectedReimportFolder = new Path(reimportFilePathName[0]).removeLastSegments(1);
 
-		return new File(reimportFilePathName);
+		return new File(reimportFilePathName[0]);
 	}
 
 	private boolean actionReimportTour_30(	final ReImport reimportId,
@@ -804,6 +827,7 @@ public class RawDataManager {
 			} else if (reimportId == ReImport.AllTimeSlices
 					|| reimportId == ReImport.OnlyAltitudeValues
 					|| reimportId == ReImport.OnlyGearValues
+					|| reimportId == ReImport.OnlyPowerAndSpeedValues
 					|| reimportId == ReImport.OnlyTemperatureValues
 			//
 			) {
@@ -901,6 +925,27 @@ public class RawDataManager {
 			oldTourData.setRearShiftCount(reimportedTourData.getRearShiftCount());
 		}
 
+		if (reimportId == ReImport.AllTimeSlices || reimportId == ReImport.OnlyPowerAndSpeedValues) {
+
+			// reimport power and speed only when it's from the device
+
+			final boolean isDevicePower = reimportedTourData.isPowerSerieFromDevice();
+			if (isDevicePower) {
+				final float[] powerSerie = reimportedTourData.getPowerSerie();
+				if (powerSerie != null) {
+					oldTourData.setPowerSerie(powerSerie);
+				}
+			}
+
+			final boolean isDeviceSpeed = reimportedTourData.isSpeedSerieFromDevice();
+			if (isDeviceSpeed) {
+				final float[] speedSerie = reimportedTourData.getSpeedSerieFromDevice();
+				if (speedSerie != null) {
+					oldTourData.setSpeedSerie(speedSerie);
+				}
+			}
+		}
+
 		if (reimportId == ReImport.AllTimeSlices || reimportId == ReImport.OnlyTemperatureValues) {
 
 			// reimport temperature only
@@ -923,26 +968,7 @@ public class RawDataManager {
 			oldTourData.pulseSerie = reimportedTourData.pulseSerie;
 			oldTourData.timeSerie = reimportedTourData.timeSerie;
 
-			/*
-			 * get speed/power data when it's from the device
-			 */
-			final boolean isTourPower = reimportedTourData.isPowerSerieFromDevice();
-			if (isTourPower) {
-				final float[] powerSerie = reimportedTourData.getPowerSerie();
-				if (powerSerie != null) {
-					oldTourData.setPowerSerie(powerSerie);
-				}
-			}
-			final boolean isTourSpeed = reimportedTourData.isSpeedSerieFromDevice();
-			if (isTourSpeed) {
-				final float[] speedSerie = reimportedTourData.getSpeedSerieFromDevice();
-				if (speedSerie != null) {
-					oldTourData.setSpeedSerie(speedSerie);
-				}
-			}
-
 			oldTourData.setCalories(reimportedTourData.getCalories());
-
 		}
 	}
 
@@ -1041,16 +1067,22 @@ public class RawDataManager {
 		// check if importFile exist
 		if (importFile.exists() == false) {
 
-			final Shell activeShell = display.getActiveShell();
+			display.syncExec(new Runnable() {
+				@Override
+				public void run() {
 
-			// during initialisation there is no active shell
-			if (activeShell != null) {
+					final Shell activeShell = display.getActiveShell();
 
-				MessageDialog.openError(
-						activeShell,
-						Messages.DataImport_Error_file_does_not_exist_title,
-						NLS.bind(Messages.DataImport_Error_file_does_not_exist_msg, importFilePathName));
-			}
+					// during initialisation there is no active shell
+					if (activeShell != null) {
+
+						MessageDialog.openError(
+								activeShell,
+								Messages.DataImport_Error_file_does_not_exist_title,
+								NLS.bind(Messages.DataImport_Error_file_does_not_exist_msg, importFilePathName));
+					}
+				}
+			});
 
 			return false;
 		}

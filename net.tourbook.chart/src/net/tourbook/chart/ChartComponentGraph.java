@@ -3621,6 +3621,13 @@ public class ChartComponentGraph extends Canvas {
 		gc.setAntialias(SWT.OFF);
 	}
 
+	/**
+	 * Is used for drawing gear values.
+	 * 
+	 * @param gc
+	 * @param graphDrawingData
+	 * @param isTopGraph
+	 */
 	private void drawAsync_560_HorizontalBar(	final GC gc,
 												final GraphDrawingData graphDrawingData,
 												final boolean isTopGraph) {
@@ -3730,6 +3737,7 @@ public class ChartComponentGraph extends Canvas {
 
 		gc.setForeground(colorBgBright);
 		gc.setBackground(colorBgDark);
+
 
 		/*
 		 * draw the lines into the paths

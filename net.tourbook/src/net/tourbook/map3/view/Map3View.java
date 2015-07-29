@@ -2027,7 +2027,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 
 			final ArrayList<TourData> allTourData = new ArrayList<TourData>();
 
-			TourManager.loadTourData(allTourIds, allTourData);
+			TourManager.loadTourData(allTourIds, allTourData, true);
 
 			_allTourIdHash = allTourIds.hashCode();
 			_allTourDataHash = allTourData.hashCode();

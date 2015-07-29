@@ -739,7 +739,7 @@ public class TourManager {
 	 * @return <code>true</code> when {@link TourData} contains a tour which can be painted in the
 	 *         map
 	 */
-	public static boolean isPaintDataValid(final TourData tourData) {
+	public static boolean isLatLonAvailable(final TourData tourData) {
 
 		if (tourData == null) {
 			return false;
@@ -754,6 +754,7 @@ public class TourManager {
 				|| (longitudeSerie.length == 0)
 				|| (latitudeSerie == null)
 				|| (latitudeSerie.length == 0)) {
+
 			return false;
 		}
 
@@ -794,17 +795,22 @@ public class TourManager {
 	/**
 	 * @param allTourIds
 	 * @param allTourData
-	 *            Contains {@link TourData} for all tour ids.
+	 *            Contains loaded {@link TourData} for all tour ids which pass the lat/lon check.
+	 * @param isCheckLatLon
+	 *            When <code>true</code> only tours with lat/lon will be returned, otherwise all
+	 *            tours will be returned.
 	 * @return Returns a unique key for all {@link TourData}.
 	 */
-	public static long loadTourData(final ArrayList<Long> allTourIds, final ArrayList<TourData> allTourData) {
+	public static long loadTourData(final ArrayList<Long> allTourIds,
+									final ArrayList<TourData> allTourData,
+									final boolean isCheckLatLon) {
 
 		allTourData.clear();
 
 		// create a unique key for all tours
 		final long newOverlayKey[] = { 0 };
 
-		if (allTourIds.size() > 50) {
+		if (allTourIds.size() > 20) {
 
 			try {
 
@@ -830,7 +836,8 @@ public class TourManager {
 							}
 
 							final TourData tourData = TourManager.getInstance().getTourData(tourId);
-							if (isPaintDataValid(tourData)) {
+
+							if (isCheckLatLon == false || isLatLonAvailable(tourData)) {
 
 								// keep tour data for each tour id
 								allTourData.add(tourData);
@@ -855,7 +862,8 @@ public class TourManager {
 			for (final Long tourId : allTourIds) {
 
 				final TourData tourData = TourManager.getInstance().getTourData(tourId);
-				if (isPaintDataValid(tourData)) {
+
+				if (isCheckLatLon == false || isLatLonAvailable(tourData)) {
 
 					// keep tour data for each tour id
 					allTourData.add(tourData);
