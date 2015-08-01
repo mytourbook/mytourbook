@@ -862,7 +862,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 				_spinHours.setMaximum(999);
 				_spinHours.setToolTipText(Messages.Tour_Editor_Label_Hours_Tooltip);
 
-				_spinHours.addModifyListener(_modifyListener);
 				_spinHours.addMouseWheelListener(_mouseWheelListener);
 				_spinHours.addSelectionListener(_tourTimeListener);
 				_tk.adapt(_spinHours, true, true);
@@ -879,7 +878,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 				_spinMinutes.setMaximum(60);
 				_spinMinutes.setToolTipText(Messages.Tour_Editor_Label_Minutes_Tooltip);
 
-				_spinMinutes.addModifyListener(_modifyListener);
 				_spinMinutes.addMouseWheelListener(_mouseWheelListener);
 				_spinMinutes.addSelectionListener(_tourTimeListener);
 				_tk.adapt(_spinMinutes, true, true);
@@ -896,7 +894,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 				_spinSeconds.setMaximum(60);
 				_spinSeconds.setToolTipText(Messages.Tour_Editor_Label_Seconds_Tooltip);
 
-				_spinSeconds.addModifyListener(_modifyListener);
 				_spinSeconds.addMouseWheelListener(_mouseWheelListener);
 				_spinSeconds.addSelectionListener(_tourTimeListener);
 				_tk.adapt(_spinSeconds, true, true);
@@ -997,24 +994,24 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			return;
 		}
 
-		final TourData tourData = new TourData();
+		final TourData manualTourData = new TourData();
 
 		/*
 		 * set tour start date/time
 		 */
-		tourData.setTourStartTime(new org.joda.time.DateTime());
+		manualTourData.setTourStartTime(new org.joda.time.DateTime());
 
 		// tour id must be created after the tour date/time is set
-		tourData.createTourId();
+		manualTourData.createTourId();
 
-		tourData.setDeviceId(TourData.DEVICE_ID_FOR_MANUAL_TOUR);
+		manualTourData.setDeviceId(TourData.DEVICE_ID_FOR_MANUAL_TOUR);
 
-		tourData.setTourPerson(activePerson);
+		manualTourData.setTourPerson(activePerson);
 
 		// update UI
-		_tourData = tourData;
+		_tourData = manualTourData;
 		_tourChart = null;
-		updateUI_FromModel(tourData, false, true);
+		updateUI_FromModel(manualTourData, false, true);
 
 		// set editor into edit mode
 		_isEditMode = true;
@@ -1810,7 +1807,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	}
 
 	private void createFieldListener() {
-
+ 
 		_modifyListener = new ModifyListener() {
 			@Override
 			public void modifyText(final ModifyEvent e) {
@@ -1819,6 +1816,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 					return;
 				}
 
+				updateModelFromUI();
 				setTourDirty();
 			}
 		};
@@ -1826,10 +1824,14 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		_mouseWheelListener = new MouseWheelListener() {
 			@Override
 			public void mouseScrolled(final MouseEvent event) {
-				Util.adjustSpinnerValueOnMouseScroll(event);
+
 				if (_isSetField || _isSavingInProgress) {
 					return;
 				}
+
+				Util.adjustSpinnerValueOnMouseScroll(event);
+
+				updateModelFromUI();
 				setTourDirty();
 
 				updateUI_Time(event.widget);
@@ -1839,12 +1841,16 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		_selectionListener = new SelectionAdapter() {
 			@Override
 			public void widgetSelected(final SelectionEvent e) {
+
 				if (_isSetField || _isSavingInProgress) {
 					return;
 				}
+
+				updateModelFromUI();
 				setTourDirty();
 			}
 		};
+
 		_keyListener = new KeyAdapter() {
 			@Override
 			public void keyReleased(final KeyEvent e) {
@@ -1882,6 +1888,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 					return;
 				}
 
+				updateModelFromUI();
 				setTourDirty();
 
 				updateUI_Time(event.widget);
@@ -1998,7 +2005,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			}
 		};
 	}
-
+ 
 	/**
 	 * create the drop down menus, this must be created after the parent control is created
 	 */
@@ -2311,6 +2318,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 			_comboTitle.addKeyListener(_keyListener);
 			_comboTitle.addModifyListener(new ModifyListener() {
+
 				@Override
 				public void modifyText(final ModifyEvent e) {
 					if (_isSetField || _isSavingInProgress) {
@@ -2630,7 +2638,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			_spinRestPuls.setMaximum(200);
 			_spinRestPuls.setToolTipText(Messages.tour_editor_label_rest_pulse_Tooltip);
 
-			_spinRestPuls.addModifyListener(_modifyListener);
 			_spinRestPuls.addMouseWheelListener(_mouseWheelListener);
 			_spinRestPuls.addSelectionListener(_selectionListener);
 
@@ -2662,7 +2669,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			_spinTourCalories.setMinimum(0);
 			_spinTourCalories.setMaximum(1000000);
 
-			_spinTourCalories.addModifyListener(_modifyListener);
 			_spinTourCalories.addMouseWheelListener(_mouseWheelListener);
 			_spinTourCalories.addSelectionListener(_selectionListener);
 
@@ -3533,7 +3539,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 						distanceDiff = distance - distancePrevious;
 					}
-					
+
 					if (distanceDiff < 0.001) {
 						cell.setText(UI.EMPTY_STRING);
 					} else {
@@ -6041,9 +6047,13 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	}
 
 	/**
-	 * update {@link TourData} from the UI fields
+	 * Update {@link TourData} from the UI fields.
 	 */
 	private void updateModelFromUI() {
+
+		if (_tourData == null) {
+			return;
+		}
 
 		try {
 
@@ -6076,7 +6086,9 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			_tourData.setWeatherClouds(cloudValue);
 
 			if (_isTemperatureManuallyModified) {
+
 				float temperature = (float) _spinTemperature.getSelection() / 10;
+
 				if (_unitValueTemperature != 1) {
 					temperature = (temperature - net.tourbook.ui.UI.UNIT_FAHRENHEIT_ADD)
 							/ net.tourbook.ui.UI.UNIT_FAHRENHEIT_MULTI;
@@ -6130,6 +6142,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			}
 
 			if (_isManualTour) {
+
 				_tourData.setTourRecordingTime(_timeRecording.getTime());
 				_tourData.setTourDrivingTime(_timeDriving.getTime());
 			}
@@ -6142,7 +6155,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 			MessageDialog.openError(Display.getCurrent().getActiveShell(), "Error", e.getLocalizedMessage());//$NON-NLS-1$
 
-			e.printStackTrace();
+			StatusUtil.log(e);
 		}
 	}
 
