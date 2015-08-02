@@ -19,7 +19,7 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Control;
 
-public class TourSegment {
+public class ChartSegment {
 
 	public static final int	TITLE_HOVER_MARGIN	= 5;
 
@@ -37,7 +37,7 @@ public class TourSegment {
 	public int				devXSegment;
 	public int				devSegmentWidth;
 
-	public TourSegment() {}
+	public ChartSegment() {}
 
 	/**
 	 * Get an area from the segment display position which can be hovered and the tooltip do not get

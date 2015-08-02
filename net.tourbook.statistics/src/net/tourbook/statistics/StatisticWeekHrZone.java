@@ -83,8 +83,8 @@ public class StatisticWeekHrZone extends YearStatistic {
 	 */
 	ChartSegments createChartSegments() {
 
-		final long segmentStart[] = new long[_statNumberOfYears];
-		final long segmentEnd[] = new long[_statNumberOfYears];
+		final double segmentStart[] = new double[_statNumberOfYears];
+		final double segmentEnd[] = new double[_statNumberOfYears];
 		final String[] segmentTitle = new String[_statNumberOfYears];
 
 		final int oldestYear = _statYoungestYear - _statNumberOfYears + 1;
@@ -106,8 +106,8 @@ public class StatisticWeekHrZone extends YearStatistic {
 		}
 
 		final ChartSegments weekSegments = new ChartSegments();
-		weekSegments.valueStart = segmentStart;
-		weekSegments.valueEnd = segmentEnd;
+		weekSegments.segmentStartValue = segmentStart;
+		weekSegments.segmentEndValue = segmentEnd;
 		weekSegments.segmentTitle = segmentTitle;
 
 		weekSegments.years = _tourWeekData.years;

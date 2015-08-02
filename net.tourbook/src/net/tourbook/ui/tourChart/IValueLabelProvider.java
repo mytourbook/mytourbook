@@ -13,14 +13,10 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.chart;
+package net.tourbook.ui.tourChart;
 
-/**
- * Configuration how the chart title is displayed.
- */
-public class ChartTitleConfig {
+public interface IValueLabelProvider {
 
-	public boolean	isShowInfoTitle;
-	public boolean	isShowInfoTourSeparator;
+	String getLabel(float graphValue);
 
 }

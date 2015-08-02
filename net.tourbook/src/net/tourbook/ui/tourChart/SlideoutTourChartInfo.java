@@ -18,6 +18,7 @@ package net.tourbook.ui.tourChart;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
+import net.tourbook.common.color.ColorSelectorExtended;
 import net.tourbook.common.color.IColorSelectorListener;
 import net.tourbook.common.tooltip.AnimatedToolTipShell;
 import net.tourbook.preferences.ITourbookPreferences;
@@ -27,6 +28,9 @@ import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.preference.PreferenceConverter;
+import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseTrackAdapter;
@@ -60,6 +64,7 @@ public class SlideoutTourChartInfo extends AnimatedToolTipShell implements IColo
 	private boolean					_canOpenToolTip;
 	private boolean					_isAnotherDialogOpened;
 
+	private IPropertyChangeListener	_defaultChangePropertyListener;
 	private SelectionAdapter		_defaultSelectionAdapter;
 	private MouseWheelListener		_defaultMouseWheelListener;
 
@@ -78,6 +83,13 @@ public class SlideoutTourChartInfo extends AnimatedToolTipShell implements IColo
 				onChangeUI();
 			}
 		};
+
+		_defaultChangePropertyListener = new IPropertyChangeListener() {
+			@Override
+			public void propertyChange(final PropertyChangeEvent event) {
+				onChangeUI();
+			}
+		};
 	}
 
 	private PixelConverter			_pc;
@@ -91,10 +103,13 @@ public class SlideoutTourChartInfo extends AnimatedToolTipShell implements IColo
 	private Button					_chkShowInfoTitle;
 	private Button					_chkShowInfoTooltip;
 	private Button					_chkShowInfoTourSeparator;
+	private Button					_chkSegmentAlternateColor;
 
 	private Label					_lblTooltipDelay;
 
 	private Spinner					_spinTooltipDelay;
+
+	private ColorSelectorExtended	_colorSegmentAlternateColor;
 
 	private final class WaitTimer implements Runnable {
 		@Override
@@ -276,6 +291,22 @@ public class SlideoutTourChartInfo extends AnimatedToolTipShell implements IColo
 						_spinTooltipDelay.addSelectionListener(_defaultSelectionAdapter);
 						_spinTooltipDelay.addMouseWheelListener(_defaultMouseWheelListener);
 					}
+
+					{
+						/*
+						 * Checkbox: Segments with alternate colors
+						 */
+						_chkSegmentAlternateColor = new Button(container, SWT.CHECK);
+						_chkSegmentAlternateColor.setText(Messages.Pref_Graphs_Checkbox_SegmentAlternateColor);
+						_chkSegmentAlternateColor
+								.setToolTipText(Messages.Pref_Graphs_Checkbox_SegmentAlternateColor_Tooltip);
+						_chkSegmentAlternateColor.addSelectionListener(_defaultSelectionAdapter);
+
+						// Color: Segment alternate color
+						_colorSegmentAlternateColor = new ColorSelectorExtended(container);
+						_colorSegmentAlternateColor.addListener(_defaultChangePropertyListener);
+						_colorSegmentAlternateColor.addOpenListener(this);
+					}
 				}
 			}
 		}
@@ -302,15 +333,26 @@ public class SlideoutTourChartInfo extends AnimatedToolTipShell implements IColo
 	public Point getToolTipLocation(final Point tipSize) {
 
 //		final int tipWidth = tipSize.x;
-//
+		final int tipHeight = tipSize.y;
+
 //		final int itemWidth = _toolTipItemBounds.width;
 		final int itemHeight = _toolTipItemBounds.height;
 
 		// center horizontally
 		final int devX = _toolTipItemBounds.x;// + itemWidth / 2 - tipWidth / 2;
-		final int devY = _toolTipItemBounds.y + itemHeight + 0;
+		int devY = _toolTipItemBounds.y + itemHeight + 0;
+
+		final Rectangle displayBounds = this.getShell().getDisplay().getBounds();
+
+		if (devY + tipHeight > displayBounds.height) {
+
+			// slideout is below bottom, show it above the action button
+
+			devY = _toolTipItemBounds.y - tipHeight;
+		}
 
 		return new Point(devX, devY);
+
 	}
 
 	@Override
@@ -335,6 +377,12 @@ public class SlideoutTourChartInfo extends AnimatedToolTipShell implements IColo
 		_prefStore.setValue(ITourbookPreferences.GRAPH_TOUR_INFO_IS_TOOLTIP_VISIBLE, isShowInfoTooltip);
 		_prefStore.setValue(ITourbookPreferences.GRAPH_TOUR_INFO_IS_TOUR_SEPARATOR_VISIBLE, isShowInfoTourSeparator);
 		_prefStore.setValue(ITourbookPreferences.GRAPH_TOUR_INFO_TOOLTIP_DELAY, tooltipDelay);
+
+		// segment alternate color
+		_prefStore.setValue(ITourbookPreferences.GRAPH_IS_SEGMENT_ALTERNATE_COLOR,//
+				_chkSegmentAlternateColor.getSelection());
+		PreferenceConverter.setValue(_prefStore, ITourbookPreferences.GRAPH_SEGMENT_ALTERNATE_COLOR,//
+				_colorSegmentAlternateColor.getColorValue());
 
 		/*
 		 * Update chart config
@@ -410,6 +458,12 @@ public class SlideoutTourChartInfo extends AnimatedToolTipShell implements IColo
 		_chkShowInfoTourSeparator.setSelection(tcc.isShowInfoTourSeparator);
 
 		_spinTooltipDelay.setSelection(tcc.tourInfoTooltipDelay);
+
+		// segment alternate color
+		_chkSegmentAlternateColor.setSelection(//
+				_prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_SEGMENT_ALTERNATE_COLOR));
+		_colorSegmentAlternateColor.setColorValue(//
+				PreferenceConverter.getColor(_prefStore, ITourbookPreferences.GRAPH_SEGMENT_ALTERNATE_COLOR));
 	}
 
 }

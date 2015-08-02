@@ -4277,7 +4277,6 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 			distanceStart = distanceSerie[firstSerieIndex];
 		}
 
-		final float cadenceStart;
 		int timeTotal = 0;
 		float distanceTotal = 0;
 

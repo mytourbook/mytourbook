@@ -18,6 +18,7 @@ package net.tourbook.tour;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Formatter;
 import java.util.Set;
 
 import net.tourbook.Messages;
@@ -49,6 +50,7 @@ import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.ITourProviderAll;
 import net.tourbook.ui.action.ActionEditQuick;
 import net.tourbook.ui.action.ActionEditTour;
+import net.tourbook.ui.tourChart.IValueLabelProvider;
 import net.tourbook.ui.tourChart.TourChart;
 import net.tourbook.ui.tourChart.TourChartConfiguration;
 import net.tourbook.ui.tourChart.TourChartView;
@@ -82,6 +84,7 @@ import org.joda.time.DateTime;
 public class TourManager {
 
 	private static final String				GRAPH_LABEL_ALTIMETER					= net.tourbook.common.Messages.Graph_Label_Altimeter;
+
 	private static final String				GRAPH_LABEL_ALTITUDE					= net.tourbook.common.Messages.Graph_Label_Altitude;
 	private static final String				GRAPH_LABEL_CADENCE						= net.tourbook.common.Messages.Graph_Label_Cadence;
 	private static final String				GRAPH_LABEL_CADENCE_UNIT				= net.tourbook.common.Messages.Graph_Label_Cadence_Unit;
@@ -97,11 +100,11 @@ public class TourManager {
 	private static final String				GRAPH_LABEL_TEMPERATURE					= net.tourbook.common.Messages.Graph_Label_Temperature;
 	private static final String				GRAPH_LABEL_TOUR_COMPARE				= net.tourbook.common.Messages.Graph_Label_Tour_Compare;
 	private static final String				GRAPH_LABEL_TOUR_COMPARE_UNIT			= net.tourbook.common.Messages.Graph_Label_Tour_Compare_Unit;
-
 	public static final String				CUSTOM_DATA_TOUR_DATA					= "tourData";													//$NON-NLS-1$
-	public static final String				CUSTOM_DATA_TOUR_CHART_CONFIGURATION	= "tourChartConfig";											//$NON-NLS-1$
 
+	public static final String				CUSTOM_DATA_TOUR_CHART_CONFIGURATION	= "tourChartConfig";											//$NON-NLS-1$
 	public static final String				CUSTOM_DATA_ALTIMETER					= "altimeter";													//$NON-NLS-1$
+
 	public static final String				CUSTOM_DATA_ALTITUDE					= "altitude";													//$NON-NLS-1$
 	public static final String				CUSTOM_DATA_CADENCE						= "cadence";													//$NON-NLS-1$
 	public static final String				CUSTOM_DATA_DISTANCE					= "distance";													//$NON-NLS-1$
@@ -114,18 +117,18 @@ public class TourManager {
 	public static final String				CUSTOM_DATA_SPEED						= "speed";														//$NON-NLS-1$
 	public static final String				CUSTOM_DATA_TEMPERATURE					= "temperature";												//$NON-NLS-1$
 	public static final String				CUSTOM_DATA_TIME						= "time";														//$NON-NLS-1$
-
 	public static final String				CUSTOM_DATA_SEGMENT_VALUES				= "segmentValues";												//$NON-NLS-1$
+
 	public static final String				CUSTOM_DATA_ANALYZER_INFO				= "analyzerInfo";												//$NON-NLS-1$
 	public static final String				CUSTOM_DATA_CONCONI_TEST				= "CUSTOM_DATA_CONCONI_TEST";									//$NON-NLS-1$
-
 	public static final String				X_AXIS_TIME								= "time";														//$NON-NLS-1$
+
 	public static final String				X_AXIS_DISTANCE							= "distance";													//$NON-NLS-1$
-
 	public static final String				GEAR_TEETH_FORMAT						= "%2d:%2d";													//$NON-NLS-1$
-	public static final String				GEAR_VALUE_FORMAT						= GEAR_TEETH_FORMAT + " - %1.2f";								//$NON-NLS-1$
 
+	public static final String				GEAR_VALUE_FORMAT						= GEAR_TEETH_FORMAT + " - %1.2f";								//$NON-NLS-1$
 	public static final int					GRAPH_ALTITUDE							= 1000;
+
 	public static final int					GRAPH_SPEED								= 1001;
 	public static final int					GRAPH_ALTIMETER							= 1002;
 	public static final int					GRAPH_PULSE								= 1003;
@@ -136,7 +139,6 @@ public class TourManager {
 	public static final int					GRAPH_PACE								= 1008;
 	public static final int					GRAPH_GEARS								= 1009;
 	public static final int					GRAPH_TOUR_COMPARE						= 2000;
-
 	private static final int[]				_allGraphIDs							= new int[] {
 			GRAPH_ALTITUDE,
 			GRAPH_SPEED,
@@ -150,6 +152,10 @@ public class TourManager {
 			GRAPH_GEARS,
 			GRAPH_TOUR_COMPARE														};
 
+	private static StringBuilder			_sbFormatter							= new StringBuilder();
+	private static Formatter				_formatter								= new Formatter(_sbFormatter);
+	private static final String				FORMAT_MM_SS							= "%d:%02d";													//$NON-NLS-1$
+
 	private static TourManager				_instance;
 
 	private final static IPreferenceStore	_prefStore								= TourbookPlugin.getPrefStore();
@@ -160,23 +166,53 @@ public class TourManager {
 	 */
 	private static TourDataEditorView		_tourDataEditorInstance;
 
+	private static LabelProviderMMSS		_labelProviderMMSS						= new LabelProviderMMSS();
+	private static LabelProviderInt			_labelProviderInt						= new LabelProviderInt();
+
 	private ComputeChartValue				_computeAltimeterAvg;
+
 	private ComputeChartValue				_computeGradientAvg;
 	private ComputeChartValue				_computePaceAvg;
 	private ComputeChartValue				_computePowerAvg;
 	private ComputeChartValue				_computeSpeedAvg;
-
 	private final TourDataCache				_tourDataCache;
 
 	private static final ListenerList		_tourEventListeners						= new ListenerList(
 																							ListenerList.IDENTITY);
+
 	private static final ListenerList		_tourSaveListeners						= new ListenerList(
 																							ListenerList.IDENTITY);
-
 	/**
 	 * tour chart which shows the selected tour
 	 */
 	private TourChart						_activeTourChart;
+
+	public static class LabelProviderInt implements IValueLabelProvider {
+
+		@Override
+		public String getLabel(final float graphValue) {
+			return Integer.toString((int) graphValue);
+		}
+	}
+
+	public static class LabelProviderMMSS implements IValueLabelProvider {
+
+		@Override
+		public String getLabel(final float graphValue) {
+
+			_sbFormatter.setLength(0);
+
+			if (graphValue < 0) {
+				_sbFormatter.append(UI.SYMBOL_DASH);
+			}
+
+			final long timeAbsolute = (long) (graphValue < 0 ? 0 - graphValue : graphValue);
+
+			return _formatter.format(FORMAT_MM_SS, //
+					(timeAbsolute / 60),
+					(timeAbsolute % 60)).toString();
+		}
+	}
 
 	private TourManager() {
 
@@ -560,6 +596,14 @@ public class TourManager {
 		}
 
 		return _instance;
+	}
+
+	public static IValueLabelProvider getLabelProviderInt() {
+		return _labelProviderInt;
+	}
+
+	public static IValueLabelProvider getLabelProviderMMSS() {
+		return _labelProviderMMSS;
 	}
 
 	/**
@@ -2611,8 +2655,8 @@ public class TourManager {
 
 		final int numberOfTours = multipleTourStartIndex.length;
 
-		final long segmentStartValue[] = new long[numberOfTours];
-		final long segmentEndValue[] = new long[numberOfTours];
+		final double[] segmentStartValue = new double[numberOfTours];
+		final double[] segmentEndValue = new double[numberOfTours];
 
 		for (int tourIndex = 0; tourIndex < numberOfTours; tourIndex++) {
 
@@ -2633,13 +2677,14 @@ public class TourManager {
 				tourEndIndex = tourStartIndex;
 			}
 
-			segmentStartValue[tourIndex] = (long) xValues[tourStartIndex];
-			segmentEndValue[tourIndex] = (long) xValues[tourEndIndex];
+			segmentStartValue[tourIndex] = xValues[tourStartIndex];
+			segmentEndValue[tourIndex] = xValues[tourEndIndex];
 		}
 
 		final ChartSegments chartSegments = new ChartSegments();
-		chartSegments.valueStart = segmentStartValue;
-		chartSegments.valueEnd = segmentEndValue;
+
+		chartSegments.segmentStartValue = segmentStartValue;
+		chartSegments.segmentEndValue = segmentEndValue;
 
 		chartSegments.segmentTitle = tourData.multipleTourTitles;
 		chartSegments.segmentCustomData = tourData.multipleTourIds;
