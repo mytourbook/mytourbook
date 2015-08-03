@@ -343,8 +343,8 @@ public class YearStatisticView extends ViewPart {
 	 */
 	private ChartSegments createChartSegments() {
 
-		final long segmentStart[] = new long[_numberOfYears];
-		final long segmentEnd[] = new long[_numberOfYears];
+		final double segmentStart[] = new double[_numberOfYears];
+		final double segmentEnd[] = new double[_numberOfYears];
 		final String[] segmentTitle = new String[_numberOfYears];
 
 		final int firstYear = getFirstYear();
@@ -363,8 +363,8 @@ public class YearStatisticView extends ViewPart {
 		}
 
 		final ChartSegments chartSegments = new ChartSegments();
-		chartSegments.valueStart = segmentStart;
-		chartSegments.valueEnd = segmentEnd;
+		chartSegments.segmentStartValue = segmentStart;
+		chartSegments.segmentEndValue = segmentEnd;
 		chartSegments.segmentTitle = segmentTitle;
 
 		chartSegments.years = _displayedYears;

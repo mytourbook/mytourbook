@@ -18,6 +18,8 @@
  */
 package net.tourbook.ui.tourChart;
 
+import java.text.NumberFormat;
+
 import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartDataYSerie;
 import net.tourbook.chart.GraphDrawingData;
@@ -31,6 +33,7 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.RGB;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Display;
 
 /**
@@ -39,10 +42,17 @@ import org.eclipse.swt.widgets.Display;
 public class ChartSegmentValueLayer implements IChartLayer {
 
 	private RGB			lineColorRGB	= new RGB(255, 0, 0);
+	private RGB					textColorRGB	= new RGB(0x80, 0x80, 0x80);
 
 	private TourData	_tourData;
 
 	private double[]	_xDataSerie;
+
+	private final NumberFormat	_nf1			= NumberFormat.getNumberInstance();
+	{
+		_nf1.setMinimumFractionDigits(1);
+		_nf1.setMaximumFractionDigits(1);
+	}
 
 	/**
 	 * Draws the marker(s) for the current graph config
@@ -51,6 +61,7 @@ public class ChartSegmentValueLayer implements IChartLayer {
 	 * @param drawingData
 	 * @param chartComponents
 	 */
+	@Override
 	public void draw(	final GC gc,
 						final GraphDrawingData drawingData,
 						final Chart chart,
@@ -62,7 +73,27 @@ public class ChartSegmentValueLayer implements IChartLayer {
 			return;
 		}
 
+		final ChartDataYSerie yData = drawingData.getYData();
+
+		final Object segmentConfigObject = yData.getCustomData(TourManager.CUSTOM_DATA_SEGMENT_VALUES);
+		if (!(segmentConfigObject instanceof SegmentConfig)) {
+			return;
+		}
+
+		final SegmentConfig segmentConfig = (SegmentConfig) segmentConfigObject;
+
+		// check segment values
+		if (segmentConfig.segmentDataSerie == null) {
+			return;
+		}
+
+		final float[] segmentValues = segmentConfig.segmentDataSerie;
+		final IValueLabelProvider segmentLabelProvider = segmentConfig.labelProvider;
+
 		final Display display = Display.getCurrent();
+		Rectangle prevUpTextRect = null;
+		Rectangle prevDownTextRect = null;
+		boolean toggleAboveBelow = false;
 
 		final int devYTop = drawingData.getDevYTop();
 		final int devYBottom = drawingData.getDevYBottom();
@@ -70,68 +101,138 @@ public class ChartSegmentValueLayer implements IChartLayer {
 
 		final float graphYBottom = drawingData.getGraphYBottom();
 
-		final ChartDataYSerie yData = drawingData.getYData();
-
-		// get the segment values
-		final Object segmentValuesObject = yData.getCustomData(TourManager.CUSTOM_DATA_SEGMENT_VALUES);
-		if ((segmentValuesObject instanceof float[]) == false) {
-			return;
-		}
-		final float[] segmentValues = (float[]) segmentValuesObject;
-
 		final int valueDivisor = yData.getValueDivisor();
 		final double scaleX = drawingData.getScaleX();
 		final double scaleY = drawingData.getScaleY();
 
+		gc.setLineStyle(SWT.LINE_SOLID);
+
 		final Color lineColor = new Color(display, lineColorRGB);
+		final Color textColor = new Color(display, textColorRGB);
 		{
-			Point previousPoint = null;
+			Point previousValue = null;
 
 			for (int segmentIndex = 0; segmentIndex < segmentSerie.length; segmentIndex++) {
 
 				final int serieIndex = segmentSerie[segmentIndex];
-				final int devXOffset = (int) (_xDataSerie[serieIndex] * scaleX - devGraphImageXOffset);
+				final int devXValue = (int) (_xDataSerie[serieIndex] * scaleX - devGraphImageXOffset);
 
 				final float graphYValue = segmentValues[segmentIndex] * valueDivisor;
 				final int devYGraph = (int) (scaleY * (graphYValue - graphYBottom));
-				int devYMarker = devYBottom - devYGraph;
+				int devYValue = devYBottom - devYGraph;
 
 				// don't draw over the graph borders
-				if (devYMarker > devYBottom) {
-					devYMarker = devYBottom;
+				if (devYValue > devYBottom) {
+					devYValue = devYBottom;
 				}
-				if (devYMarker < devYTop) {
-					devYMarker = devYTop;
+				if (devYValue < devYTop) {
+					devYValue = devYTop;
 				}
 
 				/*
 				 * Connect two segments with a line
 				 */
-				if (previousPoint == null) {
+				if (previousValue == null) {
+					previousValue = new Point(devXValue, devYValue);
+					continue;
+				}
 
-					previousPoint = new Point(devXOffset, devYMarker);
+				String valueText;
+				if (segmentLabelProvider != null) {
+					valueText = segmentLabelProvider.getLabel(graphYValue);
+				} else {
+					valueText = _nf1.format(graphYValue);
+				}
+
+				final Point textExtent = gc.textExtent(valueText);
+
+				final int textWidth = textExtent.x;
+				final int textHeight = textExtent.y;
+
+				final int devXPrev = previousValue.x;
+
+				gc.setForeground(lineColor);
+				gc.drawLine(devXPrev, devYValue, devXValue, devYValue);
+
+				final int segmentWidth = devXValue - devXPrev;
+				final int devXText = devXPrev + segmentWidth / 2 - textWidth / 2;
+
+				final boolean isValueUp = graphYValue > 0;
+				int devYText;
+				boolean isDrawAbove;
+
+				if (segmentConfig.canHaveNegativeValues) {
+
+					isDrawAbove = isValueUp;
 
 				} else {
 
-					gc.setForeground(lineColor);
-
-					gc.setLineStyle(SWT.LINE_DOT);
-					gc.drawLine(previousPoint.x, previousPoint.y, previousPoint.x, devYMarker);
-
-					gc.setLineStyle(SWT.LINE_SOLID);
-					gc.drawLine(previousPoint.x, devYMarker, devXOffset, devYMarker);
-
-					previousPoint.x = devXOffset;
-					previousPoint.y = devYMarker;
+					// toggle above/below segment line
+					isDrawAbove = toggleAboveBelow = !toggleAboveBelow;
 				}
 
-				// draw a line from the marker to the top of the graph
-				gc.setForeground(display.getSystemColor(SWT.COLOR_GRAY));
-				gc.setLineStyle(SWT.LINE_DOT);
-				gc.drawLine(devXOffset, devYMarker, devXOffset, devYTop);
+				if (isDrawAbove) {
+
+					// draw above segment line
+					devYText = (int) (devYValue - 1.5 * textHeight);
+
+				} else {
+
+					// draw below segment line
+					devYText = (int) (devYValue + 0.5 * textHeight);
+				}
+
+				/*
+				 * Ensure the value texts do not overlap, if possible :-)
+				 */
+				Rectangle textRect = new Rectangle(devXText, devYText, textWidth, textHeight);
+
+				if (isDrawAbove) {
+					if (prevUpTextRect != null && prevUpTextRect.intersects(textRect)) {
+						devYText = prevUpTextRect.y - textHeight;
+					}
+				} else {
+					if (prevDownTextRect != null && prevDownTextRect.intersects(textRect)) {
+						devYText = prevDownTextRect.y + textHeight;
+					}
+				}
+
+				// don't draw over the graph borders
+				if (devYText < devYTop) {
+					devYText = devYTop;
+				}
+				if (devYText + textHeight > devYBottom) {
+					devYText = devYBottom - textHeight;
+				}
+
+				gc.setForeground(textColor);
+				gc.drawText(//
+						valueText,
+						devXText,
+						devYText,
+						true);
+
+				// keep current up/down rectangles
+				final int margin = 1;
+				textRect = new Rectangle(//
+						devXText - margin,
+						devYText - margin,
+						textWidth + 2 * margin,
+						textHeight + 2 * margin);
+
+				if (isDrawAbove) {
+					prevUpTextRect = textRect;
+				} else {
+					prevDownTextRect = textRect;
+				}
+
+				// advance to the next point
+				previousValue.x = devXValue;
+				previousValue.y = devYValue;
 			}
 		}
 		lineColor.dispose();
+		textColor.dispose();
 	}
 
 	public void setLineColor(final RGB lineColor) {

@@ -647,13 +647,23 @@ public class SlideoutTourChartMarker extends AnimatedToolTipShell implements ICo
 	public Point getToolTipLocation(final Point tipSize) {
 
 //		final int tipWidth = tipSize.x;
+		final int tipHeight = tipSize.y;
 //
 //		final int itemWidth = _toolTipItemBounds.width;
 		final int itemHeight = _toolTipItemBounds.height;
 
 		// center horizontally
 		final int devX = _toolTipItemBounds.x;// + itemWidth / 2 - tipWidth / 2;
-		final int devY = _toolTipItemBounds.y + itemHeight + 0;
+		int devY = _toolTipItemBounds.y + itemHeight + 0;
+
+		final Rectangle displayBounds = this.getShell().getDisplay().getBounds();
+
+		if (devY + tipHeight > displayBounds.height) {
+
+			// slideout is below bottom, show it above the action button
+
+			devY = _toolTipItemBounds.y - tipHeight;
+		}
 
 		return new Point(devX, devY);
 	}

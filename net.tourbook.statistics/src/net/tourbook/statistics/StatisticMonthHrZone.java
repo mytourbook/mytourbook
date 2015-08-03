@@ -80,8 +80,8 @@ public class StatisticMonthHrZone extends YearStatistic {
 		 * create segments for each year
 		 */
 		final int monthCounter = monthData.hrZoneValues[0].length;
-		final long segmentStart[] = new long[_statNumberOfYears];
-		final long segmentEnd[] = new long[_statNumberOfYears];
+		final double segmentStart[] = new double[_statNumberOfYears];
+		final double segmentEnd[] = new double[_statNumberOfYears];
 		final String[] segmentTitle = new String[_statNumberOfYears];
 
 		final int oldestYear = _statYoungestYear - _statNumberOfYears + 1;
@@ -105,8 +105,8 @@ public class StatisticMonthHrZone extends YearStatistic {
 		}
 
 		final ChartSegments monthSegments = new ChartSegments();
-		monthSegments.valueStart = segmentStart;
-		monthSegments.valueEnd = segmentEnd;
+		monthSegments.segmentStartValue = segmentStart;
+		monthSegments.segmentEndValue = segmentEnd;
 		monthSegments.segmentTitle = segmentTitle;
 
 		return monthSegments;

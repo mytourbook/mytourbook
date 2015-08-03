@@ -616,8 +616,8 @@ public class Chart extends ViewForm {
 		return _chartOverlayListener.getListeners();
 	}
 
-	protected ChartTitleConfig getChartTitleConfig() {
-		return _chartComponents.componentGraph.chartTitleConfig;
+	protected ChartSegmentConfig getChartSegmentConfig() {
+		return _chartComponents.componentGraph.chartSegmentConfig;
 	}
 
 	IHoveredValueListener getHoveredListener() {
@@ -1020,7 +1020,7 @@ public class Chart extends ViewForm {
 	 * 
 	 * @param tourSegment
 	 */
-	public void setHoveredTour(final TourSegment tourSegment) {
+	public void setHoveredSegment(final ChartSegment tourSegment) {
 		_chartComponents.getChartComponentGraph().setHoveredTour(tourSegment);
 	}
 

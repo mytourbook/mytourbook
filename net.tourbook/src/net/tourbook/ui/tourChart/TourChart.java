@@ -30,7 +30,8 @@ import net.tourbook.chart.ChartDataSerie;
 import net.tourbook.chart.ChartDataYSerie;
 import net.tourbook.chart.ChartDrawingData;
 import net.tourbook.chart.ChartMouseEvent;
-import net.tourbook.chart.ChartTitleConfig;
+import net.tourbook.chart.ChartSegment;
+import net.tourbook.chart.ChartSegmentConfig;
 import net.tourbook.chart.ChartType;
 import net.tourbook.chart.ChartYDataMinMaxKeeper;
 import net.tourbook.chart.IChartLayer;
@@ -40,7 +41,6 @@ import net.tourbook.chart.IMouseListener;
 import net.tourbook.chart.ITooltipOwner;
 import net.tourbook.chart.MouseAdapter;
 import net.tourbook.chart.SelectionChartXSliderPosition;
-import net.tourbook.chart.TourSegment;
 import net.tourbook.common.PointLong;
 import net.tourbook.common.UI;
 import net.tourbook.common.action.ActionOpenPrefDialog;
@@ -210,11 +210,11 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
 	private IMouseListener				_mouseMarkerListener					= new MouseMarkerListener();
 	private IMouseListener				_mousePhotoListener						= new MousePhotoListener();
-	private IMouseListener				_mouseTitleListener						= new MouseTitleListener();
-	private long						_hoveredTourEventTime;
+	private IMouseListener				_mouseSegmentListener					= new MouseSegmentListener();
+	private long						_hoveredSegmentEventTime;
 
-	private boolean						_isTourHovered;
-	private TourSegment					_hoveredSegment;
+	private boolean						_isSegmentHovered;
+	private ChartSegment				_hoveredSegment;
 
 	private ActionEditQuick				_actionEditQuick;
 
@@ -417,7 +417,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		}
 	}
 
-	public class MouseTitleListener extends MouseAdapter {
+	public class MouseSegmentListener extends MouseAdapter {
 
 		@Override
 		public void chartResized() {
@@ -1981,15 +1981,15 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 	 * @param mouseEvent
 	 * @return Returns the hovered title or <code>null</code> when a title is not hovered.
 	 */
-	private TourSegment getHoveredSegment(final ChartMouseEvent mouseEvent) {
+	private ChartSegment getHoveredSegment(final ChartMouseEvent mouseEvent) {
 
 		final int devXMouse = mouseEvent.devXMouse;
 		final int devYMouse = mouseEvent.devYMouse;
 
 		final ChartDrawingData chartDrawingData = getChartDrawingData();
-		final ArrayList<TourSegment> tourSegments = chartDrawingData.tourSegments;
+		final ArrayList<ChartSegment> tourSegments = chartDrawingData.tourSegments;
 
-		for (final TourSegment tourSegment : tourSegments) {
+		for (final ChartSegment tourSegment : tourSegments) {
 
 			final int devXSegment = tourSegment.devXSegment;
 			final int devYLabel = tourSegment.devYTitle;
@@ -2209,7 +2209,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 			setChartOverlayDirty();
 		}
 
-		if (getTourChartConfig().isShowMarkerTooltip) {
+		if (_tcc.isShowMarkerTooltip) {
 
 			// marker tooltip is displayed
 
@@ -2293,14 +2293,14 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
 		_hoveredSegment = null;
 
-		setHoveredTour(null);
+		setHoveredSegment(null);
 
 		_tourTitleToolTipProvider.hide();
 	}
 
 	private void onTitleMouseDoubleClick(final ChartMouseEvent mouseEvent) {
 
-		final TourSegment hoveredSegment = getHoveredSegment(mouseEvent);
+		final ChartSegment hoveredSegment = getHoveredSegment(mouseEvent);
 
 		_hoveredSegment = hoveredSegment;
 
@@ -2309,21 +2309,21 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		}
 
 		// title is hovered and double clicked, quick edit the tour
-		mouseEvent.isWorked = _isTourHovered;
+		mouseEvent.isWorked = _isSegmentHovered;
 
 		_actionEditQuick.run();
 	}
 
 	private void onTitleMouseDown(final ChartMouseEvent mouseEvent) {
 
-		final TourSegment tourSegment = getHoveredSegment(mouseEvent);
+		final ChartSegment tourSegment = getHoveredSegment(mouseEvent);
 
 		if (tourSegment == null) {
 			return;
 		}
 
 		// title is hovered and clicked, fire tour selection
-		mouseEvent.isWorked = _isTourHovered;
+		mouseEvent.isWorked = _isSegmentHovered;
 
 //		fireSelection
 	}
@@ -2332,7 +2332,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
 		_hoveredSegment = null;
 
-		setHoveredTour(null);
+		setHoveredSegment(null);
 
 		_tourTitleToolTipProvider.hide();
 	}
@@ -2340,28 +2340,28 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 	private void onTitleMouseMove(final ChartMouseEvent mouseEvent) {
 
 		// ignore events with the same time
-		if (mouseEvent.eventTime == _hoveredTourEventTime) {
+		if (mouseEvent.eventTime == _hoveredSegmentEventTime) {
 
-			mouseEvent.isWorked = _isTourHovered;
+			mouseEvent.isWorked = _isSegmentHovered;
 			mouseEvent.cursor = ChartCursor.Arrow;
 
 			return;
 		}
 
-		_hoveredTourEventTime = mouseEvent.eventTime;
+		_hoveredSegmentEventTime = mouseEvent.eventTime;
 
-		final TourSegment hoveredSegment = getHoveredSegment(mouseEvent);
+		final ChartSegment hoveredSegment = getHoveredSegment(mouseEvent);
 
-		_isTourHovered = hoveredSegment != null;
+		_isSegmentHovered = hoveredSegment != null;
 
-		if (_isTourHovered) {
+		if (_isSegmentHovered) {
 
 			// set worked that no other actions are done in this event
-			mouseEvent.isWorked = _isTourHovered;
+			mouseEvent.isWorked = _isSegmentHovered;
 			mouseEvent.cursor = ChartCursor.Arrow;
 		}
 
-		final TourSegment prevHoveredTour = _hoveredSegment;
+		final ChartSegment prevHoveredTour = _hoveredSegment;
 
 		if (_hoveredSegment != hoveredSegment) {
 
@@ -2371,7 +2371,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 			_hoveredSegment = hoveredSegment;
 
 			// update state in the chart
-			setHoveredTour(hoveredSegment);
+			setHoveredSegment(hoveredSegment);
 
 			if (_tcc.isShowInfoTooltip) {
 
@@ -2508,87 +2508,6 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 	}
 
 	/**
-	 * Set data for each graph
-	 * 
-	 * @param customDataKey
-	 * @param segmentDataSerie
-	 * @param yDataWithLabels
-	 */
-	private void setGraphLayer_Layer(	final String customDataKey,
-										final Object segmentDataSerie,
-										final ChartDataYSerie yDataWithLabels) {
-
-		final ChartDataModel dataModel = getChartDataModel();
-		final ChartDataYSerie yData = (ChartDataYSerie) dataModel.getCustomData(customDataKey);
-
-		if (yData == null) {
-			return;
-		}
-
-		final ArrayList<IChartLayer> customFgLayers = new ArrayList<IChartLayer>();
-
-		/**
-		 * Sequence of the graph layer is the z-order, last added layer is on the top
-		 */
-
-		/*
-		 * marker layer
-		 */
-		// show label layer only for ONE visible graph
-		if (_layerMarker != null && yData == yDataWithLabels) {
-			customFgLayers.add(_layerMarker);
-		}
-
-		/*
-		 * photo layer
-		 */
-		// show photo layer only for ONE visible graph
-		if (_layerPhoto != null
-				&& _tcc.isShowTourPhotos == true
-				&& (yData == yDataWithLabels || dataModel.getChartType() == ChartType.HISTORY)) {
-
-			customFgLayers.add(_layerPhoto);
-		}
-
-		/*
-		 * segment layer
-		 */
-		final ChartDataYSerie yDataAltitude = (ChartDataYSerie) dataModel
-				.getCustomData(TourManager.CUSTOM_DATA_ALTITUDE);
-		if (yData == yDataAltitude) {
-			if (_layerSegmentAltitude != null) {
-				customFgLayers.add(_layerSegmentAltitude);
-			}
-		} else {
-			if (_layerSegmentOther != null) {
-				customFgLayers.add(_layerSegmentOther);
-			}
-		}
-
-		/*
-		 * display merge layer only together with the altitude graph
-		 */
-		if ((_layer2ndAltiSerie != null) && customDataKey.equals(TourManager.CUSTOM_DATA_ALTITUDE)) {
-			customFgLayers.add(_layer2ndAltiSerie);
-		}
-
-		/*
-		 * HR zone painter
-		 */
-		if (_hrZonePainter != null) {
-			yData.setCustomFillPainter(_hrZonePainter);
-		}
-
-		// set custom layers, no layers are set when layer list is empty
-		yData.setCustomForegroundLayers(customFgLayers);
-
-		// set segment data series
-		if (segmentDataSerie != null) {
-			yData.setCustomData(TourManager.CUSTOM_DATA_SEGMENT_VALUES, segmentDataSerie);
-		}
-	}
-
-	/**
 	 * When a tour chart is opened in a dialog, some actions should not be done.
 	 * 
 	 * @param isDisplayedInDialog
@@ -2601,9 +2520,9 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 	public void setIsShowMarkerActions(final boolean isShowMarkerActions) {
 
 		_markerTooltip.setIsShowMarkerActions(isShowMarkerActions);
-	}
+		}
 
-	/**
+		/**
 	 * @param property
 	 * @param isChartModified
 	 * @param prefIsMaxEnabled
@@ -2613,7 +2532,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 	 * @param maxAdjustment
 	 *            Is disabled when set to {@link Double#MIN_VALUE}.
 	 * @return
-	 */
+		 */
 	private boolean setMaxDefaultValue(	final String property,
 										boolean isChartModified,
 										final String prefIsMaxEnabled,
@@ -2635,7 +2554,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 				if (yDataInfo == yDataInfoId) {
 					yData = yDataIterator;
 					break;
-				}
+			}
 			}
 
 			if (yData != null) {
@@ -2650,7 +2569,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 						maxValue = maxValue > 0 //
 								? maxValue - maxAdjustment
 								: maxValue + maxAdjustment;
-					}
+		}
 
 					yData.setVisibleMaxValue(valueDivisor == 0 ? maxValue : maxValue * valueDivisor);
 
@@ -2658,7 +2577,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
 					// reset visible max value to the original max value
 					yData.setVisibleMaxValue(yData.getOriginalMaxValue());
-				}
+	}
 
 				isChartModified = true;
 			}
@@ -2751,7 +2670,33 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
 		if (_tourInfoIconToolTipProvider != null) {
 			_tourInfoIconToolTipProvider.setActionsEnabled(isEnabled);
-		}
+				}
+			}
+
+	private void setupChartSegments() {
+
+		final ChartSegmentConfig ctConfig = getChartSegmentConfig();
+
+		if (_tcc.isTourInfoVisible) {
+
+			// show tour info tooltip
+			addMouseChartListener(_mouseSegmentListener);
+
+			ctConfig.isShowSegmentTitle = _tcc.isShowInfoTitle;
+			ctConfig.isShowSegmentSeparator = _tcc.isShowInfoTourSeparator;
+
+				} else {
+
+			// hide tour info tooltip
+			removeMouseChartListener(_mouseSegmentListener);
+
+			ctConfig.isShowSegmentTitle = false;
+			ctConfig.isShowSegmentSeparator = false;
+				}
+
+		ctConfig.isMultipleSegments = _tourData.isMultipleTours;
+
+		_tourTitleToolTipProvider.setFadeInDelayTime(_tcc.tourInfoTooltipDelay);
 	}
 
 	/**
@@ -2798,42 +2743,160 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 			yDataWithLabels = (ChartDataYSerie) dataModel.getCustomData(TourManager.CUSTOM_DATA_GEAR_RATIO);
 		}
 
-		setGraphLayer_Layer(TourManager.CUSTOM_DATA_ALTITUDE, _tourData.segmentSerieAltitudeDiff, yDataWithLabels);
-		setGraphLayer_Layer(TourManager.CUSTOM_DATA_PULSE, _tourData.segmentSeriePulse, yDataWithLabels);
-		setGraphLayer_Layer(TourManager.CUSTOM_DATA_SPEED, _tourData.segmentSerieSpeed, yDataWithLabels);
-		setGraphLayer_Layer(TourManager.CUSTOM_DATA_PACE, _tourData.segmentSeriePace, yDataWithLabels);
-		setGraphLayer_Layer(TourManager.CUSTOM_DATA_POWER, _tourData.segmentSeriePower, yDataWithLabels);
-		setGraphLayer_Layer(TourManager.CUSTOM_DATA_GRADIENT, _tourData.segmentSerieGradient, yDataWithLabels);
-		setGraphLayer_Layer(TourManager.CUSTOM_DATA_ALTIMETER, _tourData.segmentSerieAltitudeUpH, yDataWithLabels);
-		setGraphLayer_Layer(TourManager.CUSTOM_DATA_TEMPERATURE, null, yDataWithLabels);
-		setGraphLayer_Layer(TourManager.CUSTOM_DATA_CADENCE, _tourData.segmentSerieCadence, yDataWithLabels);
-		setGraphLayer_Layer(TourManager.CUSTOM_DATA_GEAR_RATIO, null, yDataWithLabels);
+		setupGraphLayer_Layer(TourManager.CUSTOM_DATA_ALTITUDE,//
+				_tourData.segmentSerieAltitudeDiff,
+				yDataWithLabels,
+				true,
+				TourManager.getLabelProviderInt());
 
-		setGraphLayer_Layer(TourManager.CUSTOM_DATA_HISTORY, null, null);
+		setupGraphLayer_Layer(TourManager.CUSTOM_DATA_PULSE, //
+				_tourData.segmentSeriePulse,
+				yDataWithLabels,
+				false,
+				null);
+
+		setupGraphLayer_Layer(TourManager.CUSTOM_DATA_SPEED, //
+				_tourData.segmentSerieSpeed,
+				yDataWithLabels,
+				false,
+				null);
+
+		setupGraphLayer_Layer(TourManager.CUSTOM_DATA_PACE,//
+				_tourData.segmentSeriePace,
+				yDataWithLabels,
+				false,
+				TourManager.getLabelProviderMMSS());
+
+		setupGraphLayer_Layer(TourManager.CUSTOM_DATA_POWER, //
+				_tourData.segmentSeriePower,
+				yDataWithLabels,
+				false,
+				TourManager.getLabelProviderInt());
+
+		setupGraphLayer_Layer(TourManager.CUSTOM_DATA_GRADIENT, //
+				_tourData.segmentSerieGradient,
+				yDataWithLabels,
+				true,
+				null);
+
+		setupGraphLayer_Layer(TourManager.CUSTOM_DATA_ALTIMETER, //
+				_tourData.segmentSerieAltitudeUpH,
+				yDataWithLabels,
+				true,
+				TourManager.getLabelProviderInt());
+
+		setupGraphLayer_Layer(TourManager.CUSTOM_DATA_TEMPERATURE, //
+				null,
+				yDataWithLabels,
+				true,
+				null);
+
+		setupGraphLayer_Layer(TourManager.CUSTOM_DATA_CADENCE, //
+				_tourData.segmentSerieCadence,
+				yDataWithLabels,
+				false,
+				null);
+
+		setupGraphLayer_Layer(TourManager.CUSTOM_DATA_GEAR_RATIO, //
+				null,
+				yDataWithLabels,
+				false,
+				null);
+
+		setupGraphLayer_Layer(TourManager.CUSTOM_DATA_HISTORY, //
+				null,
+				null,
+				false,
+				null);
 	}
 
-	private void setupTourTitle() {
+	/**
+	 * Set data for each graph
+	 * 
+	 * @param customDataKey
+	 * @param segmentDataSerie
+	 * @param yDataWithLabels
+	 */
+	private void setupGraphLayer_Layer(	final String customDataKey,
+										final float[] segmentDataSerie,
+										final ChartDataYSerie yDataWithLabels,
+										final boolean canHaveNegativeValues,
+										final IValueLabelProvider segmentLabelProvider) {
 
-		final ChartTitleConfig ctConfig = getChartTitleConfig();
+		final ChartDataModel dataModel = getChartDataModel();
+		final ChartDataYSerie yData = (ChartDataYSerie) dataModel.getCustomData(customDataKey);
 
-		if (_tcc.isTourInfoVisible) {
-
-			// show tour info tooltip
-			addMouseChartListener(_mouseTitleListener);
-
-			ctConfig.isShowInfoTitle = _tcc.isShowInfoTitle;
-			ctConfig.isShowInfoTourSeparator = _tcc.isShowInfoTourSeparator;
-
-		} else {
-
-			// hide tour info tooltip
-			removeMouseChartListener(_mouseTitleListener);
-
-			ctConfig.isShowInfoTitle = false;
-			ctConfig.isShowInfoTourSeparator = false;
+		if (yData == null) {
+			return;
 		}
 
-		_tourTitleToolTipProvider.setFadeInDelayTime(_tcc.tourInfoTooltipDelay);
+		final ArrayList<IChartLayer> customFgLayers = new ArrayList<IChartLayer>();
+
+	/**
+		 * Sequence of the graph layer is the z-order, last added layer is on the top
+	 */
+
+		/*
+		 * marker layer
+		 */
+		// show label layer only for ONE visible graph
+		if (_layerMarker != null && yData == yDataWithLabels) {
+			customFgLayers.add(_layerMarker);
+		}
+
+		/*
+		 * photo layer
+		 */
+		// show photo layer only for ONE visible graph
+		if (_layerPhoto != null
+				&& _tcc.isShowTourPhotos == true
+				&& (yData == yDataWithLabels || dataModel.getChartType() == ChartType.HISTORY)) {
+
+			customFgLayers.add(_layerPhoto);
+		}
+
+		/*
+		 * segment layer
+		 */
+		final ChartDataYSerie yDataAltitude = (ChartDataYSerie) dataModel
+				.getCustomData(TourManager.CUSTOM_DATA_ALTITUDE);
+		if (yData == yDataAltitude) {
+			if (_layerSegmentAltitude != null) {
+				customFgLayers.add(_layerSegmentAltitude);
+		}
+		} else {
+			if (_layerSegmentOther != null) {
+				customFgLayers.add(_layerSegmentOther);
+		}
+		}
+
+		/*
+		 * display merge layer only together with the altitude graph
+		 */
+		if ((_layer2ndAltiSerie != null) && customDataKey.equals(TourManager.CUSTOM_DATA_ALTITUDE)) {
+			customFgLayers.add(_layer2ndAltiSerie);
+		}
+
+		/*
+		 * HR zone painter
+		 */
+		if (_hrZonePainter != null) {
+			yData.setCustomFillPainter(_hrZonePainter);
+	}
+
+		// set custom layers, no layers are set when layer list is empty
+		yData.setCustomForegroundLayers(customFgLayers);
+
+		// set segment data series
+		if (segmentDataSerie != null) {
+
+			final SegmentConfig segmentConfig = new SegmentConfig(
+					segmentDataSerie,
+					canHaveNegativeValues,
+					segmentLabelProvider);
+
+			yData.setCustomData(TourManager.CUSTOM_DATA_SEGMENT_VALUES, segmentConfig);
+		}
 	}
 
 	/**
@@ -3298,7 +3361,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		createPainter_HrZone();
 
 		setupGraphLayer();
-		setupTourTitle();
+		setupChartSegments();
 
 		updateChart(newChartDataModel, !isMinMaxKeeper);
 
@@ -3351,7 +3414,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
 	void updateUI_TourTitleInfo() {
 
-		setupTourTitle();
+		setupChartSegments();
 
 		updateTourChart();
 	}

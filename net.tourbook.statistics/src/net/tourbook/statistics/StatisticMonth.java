@@ -70,8 +70,8 @@ public abstract class StatisticMonth extends YearStatistic {
 		 * create segments for each year
 		 */
 		final int monthCounter = tourMonthData.altitudeHigh[0].length;
-		final long segmentStart[] = new long[_numberOfYears];
-		final long segmentEnd[] = new long[_numberOfYears];
+		final double segmentStart[] = new double[_numberOfYears];
+		final double segmentEnd[] = new double[_numberOfYears];
 		final String[] segmentTitle = new String[_numberOfYears];
 
 		final int oldestYear = _currentYear - _numberOfYears + 1;
@@ -95,8 +95,8 @@ public abstract class StatisticMonth extends YearStatistic {
 		}
 
 		final ChartSegments monthSegments = new ChartSegments();
-		monthSegments.valueStart = segmentStart;
-		monthSegments.valueEnd = segmentEnd;
+		monthSegments.segmentStartValue = segmentStart;
+		monthSegments.segmentEndValue = segmentEnd;
 		monthSegments.segmentTitle = segmentTitle;
 
 		return monthSegments;

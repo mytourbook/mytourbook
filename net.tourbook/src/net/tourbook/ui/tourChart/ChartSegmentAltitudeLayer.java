@@ -41,6 +41,10 @@ import org.eclipse.swt.widgets.Display;
  */
 public class ChartSegmentAltitudeLayer implements IChartLayer {
 
+	private static final Color		SYSTEM_COLOR_0		= Display.getCurrent().getSystemColor(SWT.COLOR_DARK_GRAY);
+	private static final Color		SYSTEM_COLOR_DOWN	= Display.getCurrent().getSystemColor(SWT.COLOR_DARK_GREEN);
+	private static final Color		SYSTEM_COLOR_UP		= Display.getCurrent().getSystemColor(SWT.COLOR_RED);
+
 	private TourData				_tourData;
 	private ArrayList<ChartMarker>	_chartMarkers	= new ArrayList<ChartMarker>();
 
@@ -133,7 +137,7 @@ public class ChartSegmentAltitudeLayer implements IChartLayer {
 						altiDiff = segmentSerieAltitudeDiff[segmentIndex];
 					}
 				}
-				final boolean isAltitudeUp = altiDiff >= 0;
+				final boolean isValueUp = altiDiff >= 0;
 
 				final String valueText = _nf1.format(altiDiff);
 				final Point textExtent = gc.textExtent(valueText);
@@ -165,7 +169,7 @@ public class ChartSegmentAltitudeLayer implements IChartLayer {
 				 * Draw a line from the value marker to the top of the graph
 				 */
 				int devYLine;
-				if (isAltitudeUp) {
+				if (isValueUp) {
 					devYLine = devYSegment - 1 * textHeight;
 					if (devYLine < devYTop) {
 						devYLine = devYTop;
@@ -198,8 +202,7 @@ public class ChartSegmentAltitudeLayer implements IChartLayer {
 
 					final int yDiff = (devYSegment - previousPoint.y) / 2;
 
-					if (isAltitudeUp) {
-
+					if (isValueUp) {
 						devYValue = devYSegment - yDiff - 2 * textHeight;
 
 					} else {
@@ -212,7 +215,7 @@ public class ChartSegmentAltitudeLayer implements IChartLayer {
 					 */
 					Rectangle textRect = new Rectangle(devXValue, devYValue, textWidth, textHeight);
 
-					if (isAltitudeUp) {
+					if (isValueUp) {
 						if (prevUpTextRect != null && prevUpTextRect.intersects(textRect)) {
 							devYValue = prevUpTextRect.y - textHeight;
 						}
@@ -238,7 +241,7 @@ public class ChartSegmentAltitudeLayer implements IChartLayer {
 							textWidth + 2 * margin,
 							textHeight + 2 * margin);
 
-					if (isAltitudeUp) {
+					if (isValueUp) {
 						prevUpTextRect = textRect;
 					} else {
 						prevDownTextRect = textRect;
@@ -265,11 +268,11 @@ public class ChartSegmentAltitudeLayer implements IChartLayer {
 	private Color getColor(final float altiDiff) {
 
 		if (altiDiff > 0) {
-			return Display.getCurrent().getSystemColor(SWT.COLOR_RED);
+			return SYSTEM_COLOR_UP;
 		} else if (altiDiff < 0) {
-			return Display.getCurrent().getSystemColor(SWT.COLOR_DARK_GREEN);
+			return SYSTEM_COLOR_DOWN;
 		} else {
-			return Display.getCurrent().getSystemColor(SWT.COLOR_DARK_GRAY);
+			return SYSTEM_COLOR_0;
 		}
 	}
 

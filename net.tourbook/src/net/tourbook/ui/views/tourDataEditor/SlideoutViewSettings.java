@@ -189,13 +189,13 @@ public class SlideoutViewSettings extends AnimatedToolTipShell implements IColor
 		 * Lat/lon digits
 		 */
 		{
-			// checkbox: lat/lon digits
+			// label: lat/lon digits
 			_lblLatLonDigits = new Label(parent, SWT.NONE);
 			GridDataFactory.fillDefaults()//
 					.align(SWT.FILL, SWT.CENTER)
 					.applyTo(_lblLatLonDigits);
-			_lblLatLonDigits.setText(Messages.Slideout_TourMarkerFilter_Checkbox_IsReduceLatLonDigits);
-			_lblLatLonDigits.setToolTipText(Messages.Slideout_TourMarkerFilter_Checkbox_IsReduceLatLonDigits_Tooltip);
+			_lblLatLonDigits.setText(Messages.Slideout_TourEditor_Label_LatLonDigits);
+			_lblLatLonDigits.setToolTipText(Messages.Slideout_TourEditor_Label_LatLonDigits_Tooltip);
 
 			// spinner
 			_spinnerLatLonDigits = new Spinner(parent, SWT.BORDER);

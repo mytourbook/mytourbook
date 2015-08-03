@@ -22,8 +22,8 @@ public class ChartSegments {
 
 	public int		allValues;
 
-	public long[]	valueStart;
-	public long[]	valueEnd;
+	public double[]	segmentStartValue;
+	public double[]	segmentEndValue;
 
 	public String[]	segmentTitle;
 	public Object[]	segmentCustomData;

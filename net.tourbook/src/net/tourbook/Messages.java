@@ -1230,12 +1230,12 @@ public class Messages extends NLS {
 	public static String		Slideout_ChartMarkerOptions_Label_MarkerSize_Tooltip;
 	public static String		Slideout_ChartMarkerOptions_Label_Offset;
 	public static String		Slideout_ChartMarkerOptions_Label_Offset_Tooltip;
-//	public static String		Slideout_ChartMarkerOptions_Label_SignImageSize;
-//	public static String		Slideout_ChartMarkerOptions_Label_SignImageSize_Tooltip;
+
+	public static String		Slideout_TourEditor_Label_LatLonDigits;
+	public static String		Slideout_TourEditor_Label_LatLonDigits_Tooltip;
 
 	public static String		Slideout_TourInfoOptions_Checkbox_IsShowInfoTooltip;
-	public static String	Slideout_TourInfoOptions_Checkbox_IsShowTourSeparator;
-
+	public static String		Slideout_TourInfoOptions_Checkbox_IsShowTourSeparator;
 	public static String		Slideout_TourInfoOptions_Checkbox_IsShowTourTitle;
 	public static String		Slideout_TourInfoOptions_Label_TooltipDelay;
 	public static String		Slideout_TourInfoOptions_Label_TooltipDelay_Tooltip;

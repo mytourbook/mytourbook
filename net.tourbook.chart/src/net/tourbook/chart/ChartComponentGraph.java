@@ -297,10 +297,10 @@ public class ChartComponentGraph extends Canvas {
 	private Color						_gridColorMajor;
 
 	/**
-	 * Contains a {@link TourSegment} when a tour title area is hovered, otherwise <code>null</code>
+	 * Contains a {@link ChartSegment} when a tour title area is hovered, otherwise <code>null</code>
 	 * .
 	 */
-	private TourSegment					_hoveredSegment;
+	private ChartSegment					_hoveredSegment;
 
 	/**
 	 * serie index for the hovered bar, the bar is hidden when -1;
@@ -429,7 +429,7 @@ public class ChartComponentGraph extends Canvas {
 	/**
 	 * Configuration how the chart title is displayed.
 	 */
-	ChartTitleConfig					chartTitleConfig				= new ChartTitleConfig();
+	ChartSegmentConfig					chartSegmentConfig				= new ChartSegmentConfig();
 
 	/**
 	 * Constructor
@@ -1747,23 +1747,23 @@ public class ChartComponentGraph extends Canvas {
 
 		final double scaleX = drawingData.getScaleX();
 
-		final long[] startValues = chartSegments.valueStart;
-		final long[] endValues = chartSegments.valueEnd;
+		final double[] segmentStartValue = chartSegments.segmentStartValue;
+		final double[] segmentEndValue = chartSegments.segmentEndValue;
 
-		if (startValues == null || endValues == null) {
+		if (segmentStartValue == null || segmentEndValue == null) {
 			return;
 		}
 
 		final Color alternateColor = new Color(gc.getDevice(), _chart.segmentAlternateColor);
 		{
-			for (int segmentIndex = 0; segmentIndex < startValues.length; segmentIndex++) {
+			for (int segmentIndex = 0; segmentIndex < segmentStartValue.length; segmentIndex++) {
 
 				if (segmentIndex % 2 == 1) {
 
 					// draw segment background color for every second segment
 
-					final long startValue = startValues[segmentIndex];
-					final long endValue = endValues[segmentIndex];
+					final double startValue = segmentStartValue[segmentIndex];
+					final double endValue = segmentEndValue[segmentIndex];
 
 					final int devXValueStart = (int) ((scaleX * startValue) - _xxDevViewPortLeftBorder);
 
@@ -1795,7 +1795,7 @@ public class ChartComponentGraph extends Canvas {
 
 		final int devYTitle = _chartDrawingData.devMarginTop;
 
-		final ArrayList<TourSegment> tourSegments = _chartDrawingData.tourSegments;
+		final ArrayList<ChartSegment> tourSegments = _chartDrawingData.tourSegments;
 
 		final int devGraphWidth = getDevVisibleChartWidth();
 
@@ -1864,8 +1864,8 @@ public class ChartComponentGraph extends Canvas {
 			final double scaleX = graphDrawingData.getScaleX();
 			final int devVisibleChartWidth = graphDrawingData.getChartDrawingData().devVisibleChartWidth;
 
-			final long[] valueStart = chartSegments.valueStart;
-			final long[] valueEnd = chartSegments.valueEnd;
+			final double[] valueStart = chartSegments.segmentStartValue;
+			final double[] valueEnd = chartSegments.segmentEndValue;
 			final String[] segmentTitles = chartSegments.segmentTitle;
 			final Object[] segmentCustomData = chartSegments.segmentCustomData;
 
@@ -1922,7 +1922,7 @@ public class ChartComponentGraph extends Canvas {
 						}
 					}
 
-					if (chartTitleConfig.isShowInfoTitle) {
+					if (chartSegmentConfig.isShowSegmentTitle) {
 
 						// ensure that the title do not overlap a previous title
 						if (devXTitle > devXTitleEnd) {
@@ -1934,7 +1934,7 @@ public class ChartComponentGraph extends Canvas {
 						}
 					}
 
-					if (chartTitleConfig.isShowInfoTourSeparator) {
+					if (chartSegmentConfig.isShowSegmentSeparator) {
 
 						// draw segment start line but not for the first segment
 						if (segmentIndex != 0) {
@@ -1944,23 +1944,23 @@ public class ChartComponentGraph extends Canvas {
 
 					if (segmentCustomData != null && segmentCustomData[segmentIndex] instanceof Long) {
 
-						final TourSegment tourSegment = new TourSegment();
+						final ChartSegment chartSegment = new ChartSegment();
 
-						tourSegment.tourId = (Long) segmentCustomData[segmentIndex];
+						chartSegment.tourId = (Long) segmentCustomData[segmentIndex];
 
-						tourSegment.devXTitle = devXTitle;
-						tourSegment.devYTitle = devYTitle;
+						chartSegment.devXTitle = devXTitle;
+						chartSegment.devYTitle = devYTitle;
 
-						tourSegment.titleWidth = titleWidth;
-						tourSegment.titleHeight = titleHeight;
+						chartSegment.titleWidth = titleWidth;
+						chartSegment.titleHeight = titleHeight;
 
-						tourSegment.devYGraphTop = devYGraphTop;
-						tourSegment.devGraphWidth = _chartDrawingData.devVisibleChartWidth;
+						chartSegment.devYGraphTop = devYGraphTop;
+						chartSegment.devGraphWidth = _chartDrawingData.devVisibleChartWidth;
 
-						tourSegment.devXSegment = visibleSegmentStart;
-						tourSegment.devSegmentWidth = visibleSegmentWidth;
+						chartSegment.devXSegment = visibleSegmentStart;
+						chartSegment.devSegmentWidth = visibleSegmentWidth;
 
-						tourSegments.add(tourSegment);
+						tourSegments.add(chartSegment);
 					}
 				}
 			}
@@ -1985,7 +1985,7 @@ public class ChartComponentGraph extends Canvas {
 
 			final int devXTitle = (devGraphWidth / 2) - (titleWidth / 2);
 
-			if (chartTitleConfig.isShowInfoTitle) {
+			if (chartSegmentConfig.isShowSegmentTitle) {
 
 				gc.drawText(title, //
 						devXTitle < 0 ? 0 : devXTitle,
@@ -1996,7 +1996,7 @@ public class ChartComponentGraph extends Canvas {
 			final Object tourIdObject = _chartDrawingData.chartDataModel.getCustomData(Chart.CUSTOM_DATA_TOUR_ID);
 			if (tourIdObject instanceof Long) {
 
-				final TourSegment tourSegment = new TourSegment();
+				final ChartSegment tourSegment = new ChartSegment();
 
 				tourSegment.tourId = (Long) tourIdObject;
 
@@ -4483,7 +4483,7 @@ public class ChartComponentGraph extends Canvas {
 			}
 
 			if (_hoveredSegment != null) {
-				drawSync_462_HoveredTour(gcOverlay);
+				drawSync_462_HoveredSegment(gcOverlay);
 			}
 
 			if (_isOverlayDirty) {
@@ -5274,7 +5274,7 @@ public class ChartComponentGraph extends Canvas {
 		gcOverlay.setAntialias(SWT.OFF);
 	}
 
-	private void drawSync_462_HoveredTour(final GC gcOverlay) {
+	private void drawSync_462_HoveredSegment(final GC gcOverlay) {
 
 		gcOverlay.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
 		gcOverlay.setAlpha(0x10);
@@ -5284,6 +5284,10 @@ public class ChartComponentGraph extends Canvas {
 				0,
 				_hoveredSegment.devSegmentWidth,
 				_hoveredSegment.devYTitle + _hoveredSegment.titleHeight);
+
+		if (chartSegmentConfig.isMultipleSegments) {
+
+			// show hovered segment only when multiple tours are displayed otherwise it is a bit confusing
 
 		for (final GraphDrawingData graphDrawingData : _allGraphDrawingData) {
 
@@ -5295,6 +5299,7 @@ public class ChartComponentGraph extends Canvas {
 					devYBottom,
 					_hoveredSegment.devSegmentWidth,
 					devYTop - devYBottom);
+		}
 		}
 
 		// reset alpha
@@ -6570,11 +6575,12 @@ public class ChartComponentGraph extends Canvas {
 		} else {
 
 			ChartXSlider xSlider;
-			ChartMouseEvent mouseEvent;
 
-			if ((mouseEvent = _chart.onExternalMouseMove(eventTime, devXMouse, devYMouse)).isWorked) {
+			final ChartMouseEvent externalMouseEvent = _chart.onExternalMouseMove(eventTime, devXMouse, devYMouse);
 
-				setChartCursor(mouseEvent.cursor);
+			if (externalMouseEvent.isWorked) {
+
+				setChartCursor(externalMouseEvent.cursor);
 
 				_isOverlayDirty = true;
 				isRedraw = true;
@@ -7662,7 +7668,7 @@ public class ChartComponentGraph extends Canvas {
 		_hoveredValuePointIndex = -1;
 	}
 
-	void setHoveredTour(final TourSegment tourSegment) {
+	void setHoveredTour(final ChartSegment tourSegment) {
 
 		_hoveredSegment = tourSegment;
 

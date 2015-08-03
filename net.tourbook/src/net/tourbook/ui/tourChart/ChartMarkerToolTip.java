@@ -552,15 +552,16 @@ public class ChartMarkerToolTip extends AnimatedToolTipShell implements ITourPro
 	}
 
 	/**
+	 * @param hoveredLabel
 	 * @return Returns a {@link TourMarker} when a chart label (marker) is hovered or
 	 *         <code>null</code> when a marker is not hovered.
 	 */
-	private TourMarker getHoveredTourMarker() {
+	private TourMarker getHoveredTourMarker(final ChartLabel hoveredLabel) {
 
 		TourMarker tourMarker = null;
 
-		if (_hoveredLabel.data instanceof TourMarker) {
-			tourMarker = (TourMarker) _hoveredLabel.data;
+		if (hoveredLabel.data instanceof TourMarker) {
+			tourMarker = (TourMarker) hoveredLabel.data;
 		}
 
 		return tourMarker;
@@ -859,7 +860,7 @@ public class ChartMarkerToolTip extends AnimatedToolTipShell implements ITourPro
 			return;
 		}
 
-		if (hoveredLabel == null || hoveredLabel.paintedLabel == null) {
+		if (hoveredLabel == null /* || hoveredLabel.paintedLabel == null */) {
 
 			// a marker is not hovered or is hidden, hide tooltip
 
@@ -870,7 +871,7 @@ public class ChartMarkerToolTip extends AnimatedToolTipShell implements ITourPro
 			// another marker is hovered, show tooltip
 
 			_hoveredLabel = hoveredLabel;
-			_hoveredTourMarker = getHoveredTourMarker();
+			_hoveredTourMarker = getHoveredTourMarker(hoveredLabel);
 
 			showToolTip();
 		}

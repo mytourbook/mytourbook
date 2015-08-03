@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -50,6 +50,7 @@ public class ColorSelectorExtended extends ColorSelector {
 			final IColorSelectorListener colorSelectorListener = (IColorSelectorListener) listener;
 
 			SafeRunnable.run(new SafeRunnable() {
+				@Override
 				public void run() {
 					colorSelectorListener.colorDialogOpened(isOpened);
 				}

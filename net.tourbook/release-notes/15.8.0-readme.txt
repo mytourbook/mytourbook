@@ -31,6 +31,9 @@ Improvements
 
 * Tour Editor
 - Customize number of displayed digits for the lat/lon column values.
+
+* Tour Segmenter
+- Show segment values in the tour chart segments.
  
 Bugfix
 ======	

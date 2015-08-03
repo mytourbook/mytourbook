@@ -18,7 +18,7 @@ package net.tourbook.ui.tourChart;
 import java.util.ArrayList;
 
 import net.tourbook.chart.ChartComponentGraph;
-import net.tourbook.chart.TourSegment;
+import net.tourbook.chart.ChartSegment;
 import net.tourbook.common.UI;
 import net.tourbook.common.tooltip.AnimatedToolTipShell2;
 import net.tourbook.common.tooltip.IOpeningDialog;
@@ -45,7 +45,7 @@ public class ChartTitleToolTip extends AnimatedToolTipShell2 implements ITourPro
 	private String				_dialogId	= getClass().getCanonicalName();
 
 	private TourChart			_tourChart;
-	private TourSegment			_hoveredSegment;
+	private ChartSegment			_hoveredSegment;
 
 	/*
 	 * UI resources
@@ -254,7 +254,7 @@ public class ChartTitleToolTip extends AnimatedToolTipShell2 implements ITourPro
 		_tourInfoUI.dispose();
 	}
 
-	void open(final TourSegment hoveredTour) {
+	void open(final ChartSegment hoveredTour) {
 
 		boolean isKeepOpened = false;
 
