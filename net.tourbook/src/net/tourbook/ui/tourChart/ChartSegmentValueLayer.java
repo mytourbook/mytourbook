@@ -41,12 +41,13 @@ import org.eclipse.swt.widgets.Display;
  */
 public class ChartSegmentValueLayer implements IChartLayer {
 
-	private RGB			lineColorRGB	= new RGB(255, 0, 0);
+	private RGB					lineColorRGB	= new RGB(255, 0, 0);
 	private RGB					textColorRGB	= new RGB(0x80, 0x80, 0x80);
 
-	private TourData	_tourData;
+	private TourData			_tourData;
+	private double[]			_xDataSerie;
 
-	private double[]	_xDataSerie;
+	private boolean				_isShowSegmenterValues;
 
 	private final NumberFormat	_nf1			= NumberFormat.getNumberInstance();
 	{
@@ -154,76 +155,79 @@ public class ChartSegmentValueLayer implements IChartLayer {
 				gc.setForeground(lineColor);
 				gc.drawLine(devXPrev, devYValue, devXValue, devYValue);
 
-				final int segmentWidth = devXValue - devXPrev;
-				final int devXText = devXPrev + segmentWidth / 2 - textWidth / 2;
+				if (_isShowSegmenterValues) {
 
-				final boolean isValueUp = graphYValue > 0;
-				int devYText;
-				boolean isDrawAbove;
+					final int segmentWidth = devXValue - devXPrev;
+					final int devXText = devXPrev + segmentWidth / 2 - textWidth / 2;
 
-				if (segmentConfig.canHaveNegativeValues) {
+					final boolean isValueUp = graphYValue > 0;
+					int devYText;
+					boolean isDrawAbove;
 
-					isDrawAbove = isValueUp;
+					if (segmentConfig.canHaveNegativeValues) {
 
-				} else {
+						isDrawAbove = isValueUp;
 
-					// toggle above/below segment line
-					isDrawAbove = toggleAboveBelow = !toggleAboveBelow;
-				}
+					} else {
 
-				if (isDrawAbove) {
-
-					// draw above segment line
-					devYText = (int) (devYValue - 1.5 * textHeight);
-
-				} else {
-
-					// draw below segment line
-					devYText = (int) (devYValue + 0.5 * textHeight);
-				}
-
-				/*
-				 * Ensure the value texts do not overlap, if possible :-)
-				 */
-				Rectangle textRect = new Rectangle(devXText, devYText, textWidth, textHeight);
-
-				if (isDrawAbove) {
-					if (prevUpTextRect != null && prevUpTextRect.intersects(textRect)) {
-						devYText = prevUpTextRect.y - textHeight;
+						// toggle above/below segment line
+						isDrawAbove = toggleAboveBelow = !toggleAboveBelow;
 					}
-				} else {
-					if (prevDownTextRect != null && prevDownTextRect.intersects(textRect)) {
-						devYText = prevDownTextRect.y + textHeight;
+
+					if (isDrawAbove) {
+
+						// draw above segment line
+						devYText = (int) (devYValue - 1.5 * textHeight);
+
+					} else {
+
+						// draw below segment line
+						devYText = (int) (devYValue + 0.5 * textHeight);
 					}
-				}
 
-				// don't draw over the graph borders
-				if (devYText < devYTop) {
-					devYText = devYTop;
-				}
-				if (devYText + textHeight > devYBottom) {
-					devYText = devYBottom - textHeight;
-				}
+					/*
+					 * Ensure the value texts do not overlap, if possible :-)
+					 */
+					Rectangle textRect = new Rectangle(devXText, devYText, textWidth, textHeight);
 
-				gc.setForeground(textColor);
-				gc.drawText(//
-						valueText,
-						devXText,
-						devYText,
-						true);
+					if (isDrawAbove) {
+						if (prevUpTextRect != null && prevUpTextRect.intersects(textRect)) {
+							devYText = prevUpTextRect.y - textHeight;
+						}
+					} else {
+						if (prevDownTextRect != null && prevDownTextRect.intersects(textRect)) {
+							devYText = prevDownTextRect.y + textHeight;
+						}
+					}
 
-				// keep current up/down rectangles
-				final int margin = 1;
-				textRect = new Rectangle(//
-						devXText - margin,
-						devYText - margin,
-						textWidth + 2 * margin,
-						textHeight + 2 * margin);
+					// don't draw over the graph borders
+					if (devYText < devYTop) {
+						devYText = devYTop;
+					}
+					if (devYText + textHeight > devYBottom) {
+						devYText = devYBottom - textHeight;
+					}
 
-				if (isDrawAbove) {
-					prevUpTextRect = textRect;
-				} else {
-					prevDownTextRect = textRect;
+					gc.setForeground(textColor);
+					gc.drawText(//
+							valueText,
+							devXText,
+							devYText,
+							true);
+
+					// keep current up/down rectangles
+					final int margin = 1;
+					textRect = new Rectangle(//
+							devXText - margin,
+							devYText - margin,
+							textWidth + 2 * margin,
+							textHeight + 2 * margin);
+
+					if (isDrawAbove) {
+						prevUpTextRect = textRect;
+					} else {
+						prevDownTextRect = textRect;
+					}
 				}
 
 				// advance to the next point
@@ -233,6 +237,10 @@ public class ChartSegmentValueLayer implements IChartLayer {
 		}
 		lineColor.dispose();
 		textColor.dispose();
+	}
+
+	void setIsShowSegmenterValues(final boolean isShowSegmenterValues) {
+		_isShowSegmenterValues = isShowSegmenterValues;
 	}
 
 	public void setLineColor(final RGB lineColor) {

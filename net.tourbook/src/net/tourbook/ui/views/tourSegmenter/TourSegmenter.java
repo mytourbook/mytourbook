@@ -13,9 +13,9 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.ui.views;
+package net.tourbook.ui.views.tourSegmenter;
 
-import net.tourbook.ui.views.TourSegmenterView.SegmenterType;
+import net.tourbook.ui.views.tourSegmenter.TourSegmenterView.SegmenterType;
 
 class TourSegmenter implements Comparable<Object> {
 

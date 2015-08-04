@@ -512,11 +512,6 @@ public class TourManager {
 												final IWorkbenchPart part) {
 
 		fireEvent(tourEventId, customData, part);
-
-//		final Object[] allListeners = _tourEventListeners.getListeners();
-//		for (final Object listener : allListeners) {
-//			((ITourEventListener) listener).tourChanged(part, tourEventId, customData);
-//		}
 	}
 
 	/**

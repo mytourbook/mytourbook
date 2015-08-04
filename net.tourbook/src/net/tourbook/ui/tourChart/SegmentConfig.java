@@ -17,17 +17,22 @@ package net.tourbook.ui.tourChart;
 
 public class SegmentConfig {
 
+	float[]				segmentDataSerie;
+	IValueLabelProvider	labelProvider;
+
 	/**
 	 * Is <code>true</code> when negative values can occure, e.g. gradient.
 	 */
-	boolean						canHaveNegativeValues;
-	float[]						segmentDataSerie;
+	boolean				canHaveNegativeValues;
 
-	public IValueLabelProvider	labelProvider;
-
+	/**
+	 * @param segmentDataSerie
+	 * @param labelProvider
+	 * @param canHaveNegativeValues
+	 */
 	public SegmentConfig(	final float[] segmentDataSerie,
-							final boolean canHaveNegativeValues,
-							final IValueLabelProvider labelProvider) {
+							final IValueLabelProvider labelProvider,
+							final boolean canHaveNegativeValues) {
 
 		this.segmentDataSerie = segmentDataSerie;
 		this.canHaveNegativeValues = canHaveNegativeValues;

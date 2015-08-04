@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -65,26 +65,34 @@ public abstract class TourChartViewPart extends ViewPart {
 
 		_partListener = new IPartListener2() {
 
+			@Override
 			public void partActivated(final IWorkbenchPartReference partRef) {}
 
+			@Override
 			public void partBroughtToTop(final IWorkbenchPartReference partRef) {}
 
+			@Override
 			public void partClosed(final IWorkbenchPartReference partRef) {
 				if (partRef.getPart(false) == TourChartViewPart.this) {}
 			}
 
+			@Override
 			public void partDeactivated(final IWorkbenchPartReference partRef) {}
 
+			@Override
 			public void partHidden(final IWorkbenchPartReference partRef) {
 				if (partRef.getPart(false) == TourChartViewPart.this) {
 					_tourChart.partIsHidden();
 				}
 			}
 
+			@Override
 			public void partInputChanged(final IWorkbenchPartReference partRef) {}
 
+			@Override
 			public void partOpened(final IWorkbenchPartReference partRef) {}
 
+			@Override
 			public void partVisible(final IWorkbenchPartReference partRef) {
 				if (partRef.getPart(false) == TourChartViewPart.this) {
 					_tourChart.partIsVisible();
@@ -98,6 +106,7 @@ public abstract class TourChartViewPart extends ViewPart {
 	private void addPrefListener() {
 
 		_prefChangeListener = new IPropertyChangeListener() {
+			@Override
 			public void propertyChange(final PropertyChangeEvent event) {
 
 				final String property = event.getProperty();
@@ -131,6 +140,7 @@ public abstract class TourChartViewPart extends ViewPart {
 	private void addSelectionListener() {
 
 		_postSelectionListener = new ISelectionListener() {
+			@Override
 			public void selectionChanged(final IWorkbenchPart part, final ISelection selection) {
 				onSelectionChanged(part, selection);
 			}
@@ -141,6 +151,7 @@ public abstract class TourChartViewPart extends ViewPart {
 	private void addTourEventListener() {
 
 		_tourEventListener = new ITourEventListener() {
+			@Override
 			public void tourChanged(final IWorkbenchPart part, final TourEventId eventId, final Object eventData) {
 
 				if (_tourData == null || part == TourChartViewPart.this) {
@@ -148,7 +159,7 @@ public abstract class TourChartViewPart extends ViewPart {
 				}
 
 				if (eventId == TourEventId.SEGMENT_LAYER_CHANGED) {
-					_tourChart.updateLayerSegment((Boolean) eventData);
+					_tourChart.updateLayerSegment();
 
 				} else if (eventId == TourEventId.TOUR_CHART_PROPERTY_IS_MODIFIED) {
 					_tourChart.updateTourChart(true, true);

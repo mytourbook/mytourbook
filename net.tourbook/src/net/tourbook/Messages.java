@@ -1231,6 +1231,10 @@ public class Messages extends NLS {
 	public static String		Slideout_ChartMarkerOptions_Label_Offset;
 	public static String		Slideout_ChartMarkerOptions_Label_Offset_Tooltip;
 
+	public static String	Slideout_SegmenterChartOptions_Checkbox_IsShowSegmentValues;
+
+	public static String	Slideout_SegmenterChartOptions_Label_Title;
+
 	public static String		Slideout_TourEditor_Label_LatLonDigits;
 	public static String		Slideout_TourEditor_Label_LatLonDigits_Tooltip;
 
@@ -1431,6 +1435,8 @@ public class Messages extends NLS {
 	public static String		Tour_Marker_TooltipPosition_Left;
 	public static String		Tour_Marker_TooltipPosition_Right;
 	public static String		Tour_Marker_TooltipPosition_Top;
+
+	public static String	Tour_Segmenter_Action_ShowHideSegmentsInTourChart_Tooltip;
 
 	public static String		Tour_Segmenter_Button_SaveTour_Tooltip;
 	public static String		Tour_Segmenter_Label_AltitudeUpDown_Tooltip;
