@@ -776,7 +776,7 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 					// force update when photo link selection occured
 					_isForceUpdate = _tourPhotoLink != null;
 
-					if (tourIds.size() > 0) {
+					if (tourIds.size() > 1) {
 
 						// show multiple tours
 						updateChart(tourIds);
