@@ -159,6 +159,8 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	public static final boolean						STATE_IS_SHOW_SEGMENTER_VALUES_DEFAULT	= true;
 	public static final String						STATE_IS_SHOW_TOUR_SEGMENTS				= "STATE_IS_SHOW_TOUR_SEGMENTS";		//$NON-NLS-1$
 	public static final boolean						STATE_IS_SHOW_TOUR_SEGMENTS_DEFAULT		= true;
+	public static final String						STATE_SEGMENTER_VALUE_FONT_SIZE			= "STATE_SEGMENTER_VALUE_FONT_SIZE";	//$NON-NLS-1$
+	public static final int							STATE_SEGMENTER_VALUE_FONT_SIZE_DEFAULT	= 7;
 
 	private static final int						COLUMN_DEFAULT							= 0;									// sort by time
 	private static final int						COLUMN_SPEED							= 10;
@@ -2696,7 +2698,6 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	}
 
 	private void fillToolbar() {
-		
 
 		/*
 		 * fill view menu

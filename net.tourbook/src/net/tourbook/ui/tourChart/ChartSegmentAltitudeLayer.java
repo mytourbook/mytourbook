@@ -29,6 +29,7 @@ import net.tourbook.data.TourData;
 import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.LineAttributes;
 import org.eclipse.swt.graphics.Point;
@@ -45,6 +46,7 @@ public class ChartSegmentAltitudeLayer implements IChartLayer {
 	private static final Color		SYSTEM_COLOR_DOWN	= Display.getCurrent().getSystemColor(SWT.COLOR_DARK_GREEN);
 	private static final Color		SYSTEM_COLOR_UP		= Display.getCurrent().getSystemColor(SWT.COLOR_RED);
 
+	private TourChart				_tourChart;
 	private TourData				_tourData;
 	private ArrayList<ChartMarker>	_chartMarkers		= new ArrayList<ChartMarker>();
 
@@ -55,6 +57,11 @@ public class ChartSegmentAltitudeLayer implements IChartLayer {
 	{
 		_nf1.setMinimumFractionDigits(1);
 		_nf1.setMaximumFractionDigits(1);
+	}
+
+	ChartSegmentAltitudeLayer(final TourChart tourChart) {
+
+		_tourChart = tourChart;
 	}
 
 	/**
@@ -103,6 +110,10 @@ public class ChartSegmentAltitudeLayer implements IChartLayer {
 		vertLineLA.style = SWT.LINE_CUSTOM;
 		vertLineLA.dash = new float[] { 1f, 2f };
 		vertLineLA.width = 1f;
+
+		// setup font
+		final Font fontBackup = gc.getFont();
+		gc.setFont(_tourChart.getValueFont());
 
 		final Color colorLine = new Color(display, _lineColor);
 		{
@@ -271,6 +282,9 @@ public class ChartSegmentAltitudeLayer implements IChartLayer {
 			}
 		}
 		colorLine.dispose();
+
+		// restore font
+		gc.setFont(fontBackup);
 	}
 
 	private Color getColor(final float altiDiff) {
@@ -293,4 +307,5 @@ public class ChartSegmentAltitudeLayer implements IChartLayer {
 		_tourData = tourData;
 		_lineColor = lineColor;
 	}
+
 }

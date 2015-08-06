@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2012  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -261,6 +261,7 @@ public class PrefPagePhotoDirectory extends FieldEditorPreferencePage implements
 
 			_spinnerImageBorderSize.addSelectionListener(_viewerUISelectionListener);
 			_spinnerImageBorderSize.addMouseWheelListener(new MouseWheelListener() {
+				@Override
 				public void mouseScrolled(final MouseEvent event) {
 					Util.adjustSpinnerValueOnMouseScroll(event);
 					_isImageViewerUIModified = true;
@@ -306,6 +307,7 @@ public class PrefPagePhotoDirectory extends FieldEditorPreferencePage implements
 
 			_spinnerTextMinThumbSize.addSelectionListener(_viewerUISelectionListener);
 			_spinnerTextMinThumbSize.addMouseWheelListener(new MouseWheelListener() {
+				@Override
 				public void mouseScrolled(final MouseEvent event) {
 					Util.adjustSpinnerValueOnMouseScroll(event);
 					_isImageViewerUIModified = true;
@@ -420,6 +422,7 @@ public class PrefPagePhotoDirectory extends FieldEditorPreferencePage implements
 
 			_spinnerThumbSize.addSelectionListener(_viewerUISelectionListener);
 			_spinnerThumbSize.addMouseWheelListener(new MouseWheelListener() {
+				@Override
 				public void mouseScrolled(final MouseEvent event) {
 					Util.adjustSpinnerValueOnMouseScroll(event);
 					_isImageViewerUIModified = true;
@@ -481,6 +484,7 @@ public class PrefPagePhotoDirectory extends FieldEditorPreferencePage implements
 		}
 	}
 
+	@Override
 	public void init(final IWorkbench workbench) {
 		setPreferenceStore(_prefStore);
 	}

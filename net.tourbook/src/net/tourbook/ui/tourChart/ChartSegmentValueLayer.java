@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -24,12 +24,14 @@ import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartDataYSerie;
 import net.tourbook.chart.GraphDrawingData;
 import net.tourbook.chart.IChartLayer;
+import net.tourbook.common.UI;
 import net.tourbook.data.TourData;
 import net.tourbook.tour.TourManager;
 
 import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.RGB;
@@ -42,8 +44,9 @@ import org.eclipse.swt.widgets.Display;
 public class ChartSegmentValueLayer implements IChartLayer {
 
 	private RGB					lineColorRGB	= new RGB(255, 0, 0);
-	private RGB					textColorRGB	= new RGB(0x80, 0x80, 0x80);
+	private RGB					textColorRGB	= new RGB(0x20, 0x20, 0x20);
 
+	private TourChart			_tourChart;
 	private TourData			_tourData;
 	private double[]			_xDataSerie;
 
@@ -53,6 +56,11 @@ public class ChartSegmentValueLayer implements IChartLayer {
 	{
 		_nf1.setMinimumFractionDigits(1);
 		_nf1.setMaximumFractionDigits(1);
+	}
+
+	public ChartSegmentValueLayer(final TourChart tourChart) {
+
+		_tourChart = tourChart;
 	}
 
 	/**
@@ -106,6 +114,10 @@ public class ChartSegmentValueLayer implements IChartLayer {
 		final double scaleX = drawingData.getScaleX();
 		final double scaleY = drawingData.getScaleY();
 
+		// setup font
+		final Font fontBackup = gc.getFont();
+		gc.setFont(_tourChart.getValueFont());
+
 		gc.setLineStyle(SWT.LINE_SOLID);
 
 		final Color lineColor = new Color(display, lineColorRGB);
@@ -142,7 +154,13 @@ public class ChartSegmentValueLayer implements IChartLayer {
 				if (segmentLabelProvider != null) {
 					valueText = segmentLabelProvider.getLabel(graphYValue);
 				} else {
-					valueText = _nf1.format(graphYValue);
+
+					if (graphYValue < 0.0 || graphYValue > 0.0) {
+						valueText = _nf1.format(graphYValue);
+					} else {
+						// hide digits
+						valueText = UI.ZERO;
+					}
 				}
 
 				final Point textExtent = gc.textExtent(valueText);
@@ -237,6 +255,9 @@ public class ChartSegmentValueLayer implements IChartLayer {
 		}
 		lineColor.dispose();
 		textColor.dispose();
+
+		// restore font
+		gc.setFont(fontBackup);
 	}
 
 	void setIsShowSegmenterValues(final boolean isShowSegmenterValues) {

@@ -101,6 +101,8 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Composite;
@@ -233,9 +235,11 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 	private ChartLayerPhoto				_layerPhoto;
 	private ChartSegmentAltitudeLayer	_layerSegmentAltitude;
 	private ChartSegmentValueLayer		_layerSegmentOther;
-	private Color						_photoOverlayBGColorLink;
 
+	private Color						_photoOverlayBGColorLink;
 	private Color						_photoOverlayBGColorTour;
+
+	private Font						_valueFont;
 
 	/**
 	 * This listener is added to ALL widgets within the tooltip shell.
@@ -479,7 +483,6 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		});
 
 		addControlListener(this);
-
 		addPrefListeners();
 
 		final GraphColorManager colorProvider = GraphColorManager.getInstance();
@@ -940,6 +943,10 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
 					// chart needs not to be updated but update the actions
 //					enableTourActions();
+
+				} else if (property.equals(ITourbookPreferences.TOUR_SEGMENTER_CHART_VALUE_FONT)) {
+
+					updateUI_ValueFont();
 
 				} else if (property.equals(ITourbookPreferences.MEASUREMENT_SYSTEM)) {
 
@@ -1751,10 +1758,12 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 				_tourData.getTimeSerieDouble()
 				: _tourData.getDistanceSerieDouble();
 
+//				PreferenceConverter.getFontDataArray(getPreferenceStore(), getPreferenceName())
+
 		/*
 		 * create segment layer
 		 */
-		_layerSegmentAltitude = new ChartSegmentAltitudeLayer();
+		_layerSegmentAltitude = new ChartSegmentAltitudeLayer(this);
 		_layerSegmentAltitude.setupLayerData(_tourData, new RGB(0, 177, 219));
 		_layerSegmentAltitude.setIsShowSegmenterValues(isShowSegmenterValues);
 
@@ -1771,7 +1780,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		/*
 		 * create segment value layer
 		 */
-		_layerSegmentOther = new ChartSegmentValueLayer();
+		_layerSegmentOther = new ChartSegmentValueLayer(this);
 		_layerSegmentOther.setLineColor(new RGB(231, 104, 38));
 		_layerSegmentOther.setTourData(_tourData);
 		_layerSegmentOther.setXDataSerie(xDataSerie);
@@ -2075,6 +2084,15 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		return _tourData;
 	}
 
+	Font getValueFont() {
+
+		if (_valueFont == null) {
+			updateUI_ValueFont();
+		}
+
+		return _valueFont;
+	}
+
 	/**
 	 * Disable marker layer.
 	 */
@@ -2124,6 +2142,10 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 	}
 
 	private void onDispose() {
+
+		if (_valueFont != null) {
+			_valueFont.dispose();
+		}
 
 		_prefStore.removePropertyChangeListener(_prefChangeListener);
 
@@ -3029,9 +3051,6 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		setupGraphLayer();
 		updateCustomLayers();
 
-		/*
-		 * the chart needs to be redrawn because the alpha for filling the chart was modified
-		 */
 		redrawChart();
 	}
 
@@ -3407,6 +3426,19 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		setupChartSegments();
 
 		updateTourChart();
+	}
+
+	private void updateUI_ValueFont() {
+
+		if (_valueFont != null) {
+			_valueFont.dispose();
+		}
+
+		final FontData[] valueFontData = PreferenceConverter.getFontDataArray(
+				_prefStore,
+				ITourbookPreferences.TOUR_SEGMENTER_CHART_VALUE_FONT);
+
+		_valueFont = new Font(getDisplay(), valueFontData);
 	}
 
 	/**

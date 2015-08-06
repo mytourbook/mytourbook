@@ -1231,9 +1231,17 @@ public class Messages extends NLS {
 	public static String		Slideout_ChartMarkerOptions_Label_Offset;
 	public static String		Slideout_ChartMarkerOptions_Label_Offset_Tooltip;
 
+	public static String	Slideout_SegmenterChartOptions_Button_ValueFont;
+
 	public static String	Slideout_SegmenterChartOptions_Checkbox_IsShowSegmentValues;
 
+	public static String	Slideout_SegmenterChartOptions_Label_FontSize;
+
 	public static String	Slideout_SegmenterChartOptions_Label_Title;
+
+	public static String	Slideout_SegmenterChartOptions_Label_ValueFont;
+
+	public static String	Slideout_SegmenterChartOptions_Label_ValueFont_Example;
 
 	public static String		Slideout_TourEditor_Label_LatLonDigits;
 	public static String		Slideout_TourEditor_Label_LatLonDigits_Tooltip;

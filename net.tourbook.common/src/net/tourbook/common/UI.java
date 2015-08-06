@@ -106,7 +106,7 @@ public class UI {
 	public static final String				SPACE2									= "  ";																	//$NON-NLS-1$
 	public static final String				SPACE3									= "   ";																	//$NON-NLS-1$
 	public static final String				SPACE4									= "    ";																	//$NON-NLS-1$
-	public static final String				STRING_0								= "0";																		//$NON-NLS-1$
+	public static final String				ZERO									= "0";																		//$NON-NLS-1$
 
 	public static final String				SYMBOL_ARROW_UP							= "\u2191";																//$NON-NLS-1$
 	public static final String				SYMBOL_ARROW_DOWN						= "\u2193";																//$NON-NLS-1$
@@ -223,8 +223,8 @@ public class UI {
 	public static final String				UNIT_LABEL_POWER						= "Watt";																	//$NON-NLS-1$
 	public static final String				UNIT_LABEL_MS							= "ms";																	//$NON-NLS-1$
 
-	public static final PeriodFormatter	DEFAULT_DURATION_FORMATTER;
-	public static final PeriodFormatter	DEFAULT_DURATION_FORMATTER_SHORT;
+	public static final PeriodFormatter		DEFAULT_DURATION_FORMATTER;
+	public static final PeriodFormatter		DEFAULT_DURATION_FORMATTER_SHORT;
 
 	/*
 	 * SET_FORMATTING_OFF

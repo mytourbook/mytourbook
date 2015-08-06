@@ -16,14 +16,20 @@
 package net.tourbook.ui.views.tourSegmenter;
 
 import net.tourbook.Messages;
+import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
+import net.tourbook.common.font.FontFieldEditorExtended;
+import net.tourbook.common.font.IFontDialogListener;
 import net.tourbook.common.tooltip.AnimatedToolTipShell;
 import net.tourbook.common.util.Util;
+import net.tourbook.preferences.ITourbookPreferences;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
+import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.preference.PreferenceConverter;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.SWT;
@@ -32,6 +38,7 @@ import org.eclipse.swt.events.MouseTrackAdapter;
 import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Button;
@@ -40,13 +47,15 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.ToolBar;
 
 /**
  * Tour chart marker properties slideout.
  */
-public class SlideoutTourChartSegmenterConfig extends AnimatedToolTipShell {
+public class SlideoutTourChartSegmenterConfig extends AnimatedToolTipShell implements IFontDialogListener {
 
+	private static final IPreferenceStore	_prefStore			= TourbookPlugin.getPrefStore();
 	private static final IDialogSettings	_segmenterState		= TourSegmenterView.getState();
 
 	// initialize with default values which are (should) never be used
@@ -80,20 +89,30 @@ public class SlideoutTourChartSegmenterConfig extends AnimatedToolTipShell {
 		_defaultChangePropertyListener = new IPropertyChangeListener() {
 			@Override
 			public void propertyChange(final PropertyChangeEvent event) {
-				onChangeUI();
+				onChangeFont();
 			}
 		};
 	}
 
+	private boolean							_isAnotherDialogOpened;
 	private PixelConverter					_pc;
+
 	private TourSegmenterView				_tourSegmenterView;
 
 	/*
 	 * UI controls
 	 */
+//	private Composite						_fontContainer;
 	private Composite						_shellContainer;
+	private Composite						_ttContainer;
 
 	private Button							_chkShowSegmentValues;
+
+	private FontFieldEditorExtended			_valueFontEditor;
+
+	private Label							_lblFontSize;
+
+	private Spinner							_spinFontSize;
 
 	private final class WaitTimer implements Runnable {
 		@Override
@@ -139,6 +158,19 @@ public class SlideoutTourChartSegmenterConfig extends AnimatedToolTipShell {
 	}
 
 	@Override
+	protected boolean canCloseToolTip() {
+
+		/*
+		 * Do not hide this dialog when the color selector dialog or other dialogs are opened
+		 * because it will lock the UI completely !!!
+		 */
+
+		final boolean isCanClose = _isAnotherDialogOpened == false;
+
+		return isCanClose;
+	}
+
+	@Override
 	protected boolean canShowToolTip() {
 		return true;
 	}
@@ -174,56 +206,85 @@ public class SlideoutTourChartSegmenterConfig extends AnimatedToolTipShell {
 
 	private void createUI_10_Checkboxes(final Composite parent) {
 
-		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+		final int firstColumnIndent = _pc.convertWidthInCharsToPixels(3);
+
+		_ttContainer = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(_ttContainer);
+		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(_ttContainer);
 //		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
 		{
 			{
-				final Composite ttContainer = new Composite(container, SWT.NONE);
+				/*
+				 * Label: Title
+				 */
+				final Label label = new Label(_ttContainer, SWT.NONE);
 				GridDataFactory.fillDefaults()//
-						.grab(true, false)
 						.span(2, 1)
-						.applyTo(ttContainer);
-				GridLayoutFactory.fillDefaults().numColumns(2).applyTo(ttContainer);
-				{
-					{
-						/*
-						 * Label: Title
-						 */
-						final Label label = new Label(ttContainer, SWT.NONE);
-						GridDataFactory.fillDefaults().applyTo(label);
-						label.setText(Messages.Slideout_SegmenterChartOptions_Label_Title);
+						.applyTo(label);
+				label.setText(Messages.Slideout_SegmenterChartOptions_Label_Title);
 
-					}
-					{
-						/*
-						 * Checkbox: Show segment values
-						 */
-						_chkShowSegmentValues = new Button(ttContainer, SWT.CHECK);
-						GridDataFactory.fillDefaults()//
-								.span(2, 1)
-								.applyTo(_chkShowSegmentValues);
-						_chkShowSegmentValues
-								.setText(Messages.Slideout_SegmenterChartOptions_Checkbox_IsShowSegmentValues);
-						_chkShowSegmentValues.addSelectionListener(_defaultSelectionAdapter);
-					}
-				}
+			}
+			{
+				/*
+				 * Checkbox: Show segment values
+				 */
+				_chkShowSegmentValues = new Button(_ttContainer, SWT.CHECK);
+				GridDataFactory.fillDefaults()//
+						.span(2, 1)
+						.applyTo(_chkShowSegmentValues);
+				_chkShowSegmentValues.setText(Messages.Slideout_SegmenterChartOptions_Checkbox_IsShowSegmentValues);
+				_chkShowSegmentValues.addSelectionListener(_defaultSelectionAdapter);
+			}
+			{
+				/*
+				 * Font size
+				 */
+				// Label
+				_lblFontSize = new Label(_ttContainer, SWT.NONE);
+				GridDataFactory.fillDefaults()//
+						.align(SWT.FILL, SWT.CENTER)
+						.indent(firstColumnIndent, 0)
+						.applyTo(_lblFontSize);
+				_lblFontSize.setText(Messages.Slideout_SegmenterChartOptions_Label_FontSize);
+
+				// Spinner
+				_spinFontSize = new Spinner(_ttContainer, SWT.BORDER);
+				_spinFontSize.setMinimum(2);
+				_spinFontSize.setMaximum(100);
+				_spinFontSize.setPageIncrement(5);
+				_spinFontSize.addSelectionListener(_defaultSelectionAdapter);
+				_spinFontSize.addMouseWheelListener(_defaultMouseWheelListener);
+			}
+			{
+				/*
+				 * Font editor
+				 */
+				_valueFontEditor = new FontFieldEditorExtended(
+						ITourbookPreferences.TOUR_SEGMENTER_CHART_VALUE_FONT,
+						Messages.Slideout_SegmenterChartOptions_Label_ValueFont,
+						Messages.Slideout_SegmenterChartOptions_Label_ValueFont_Example,
+						_ttContainer);
+
+				_valueFontEditor.setPropertyChangeListener(_defaultChangePropertyListener);
+				_valueFontEditor.addOpenListener(this);
+				_valueFontEditor.setFirstColumnIndent(firstColumnIndent, 0);
 			}
 		}
 	}
 
 	private void enableControls() {
 
+		final boolean isShowValues = _chkShowSegmentValues.getSelection();
+
+		_lblFontSize.setEnabled(isShowValues);
+		_spinFontSize.setEnabled(isShowValues);
+		_valueFontEditor.setEnabled(isShowValues, _ttContainer);
 	}
 
-	public Shell getShell() {
+	@Override
+	public void fontDialogOpened(final boolean isDialogOpened) {
 
-		if (_shellContainer == null) {
-			return null;
-		}
-
-		return _shellContainer.getShell();
+		_isAnotherDialogOpened = isDialogOpened;
 	}
 
 	@Override
@@ -239,7 +300,7 @@ public class SlideoutTourChartSegmenterConfig extends AnimatedToolTipShell {
 		final int devX = _toolTipItemBounds.x;// + itemWidth / 2 - tipWidth / 2;
 		int devY = _toolTipItemBounds.y + itemHeight + 0;
 
-		final Rectangle displayBounds = this.getShell().getDisplay().getBounds();
+		final Rectangle displayBounds = _shellContainer.getShell().getDisplay().getBounds();
 
 		if (devY + tipHeight > displayBounds.height) {
 
@@ -258,19 +319,40 @@ public class SlideoutTourChartSegmenterConfig extends AnimatedToolTipShell {
 		return _toolTipItemBounds;
 	}
 
-	private void onChangeUI() {
+	private void onChangeFont() {
+
+		enableControls();
+
+		final Shell shell = _shellContainer.getShell();
+		shell.pack(true);
 
 		/*
 		 * Update state
 		 */
-		_segmenterState.put(TourSegmenterView.STATE_IS_SHOW_SEGMENTER_VALUES, _chkShowSegmentValues.getSelection());
+		_valueFontEditor.store();
+
+		updateUI_FontSize();
 
 		/*
 		 * Update UI
 		 */
 		_tourSegmenterView.fireSegmentLayerChanged();
+	}
+
+	private void onChangeUI() {
 
 		enableControls();
+
+		/*
+		 * Update state
+		 */
+		_segmenterState.put(TourSegmenterView.STATE_IS_SHOW_SEGMENTER_VALUES, _chkShowSegmentValues.getSelection());
+		_segmenterState.put(TourSegmenterView.STATE_SEGMENTER_VALUE_FONT_SIZE, _spinFontSize.getSelection());
+
+		/*
+		 * Update UI
+		 */
+		_tourSegmenterView.fireSegmentLayerChanged();
 	}
 
 	/**
@@ -330,6 +412,28 @@ public class SlideoutTourChartSegmenterConfig extends AnimatedToolTipShell {
 				_segmenterState,
 				TourSegmenterView.STATE_IS_SHOW_SEGMENTER_VALUES,
 				TourSegmenterView.STATE_IS_SHOW_SEGMENTER_VALUES_DEFAULT));
+
+		_spinFontSize.setSelection(Util.getStateInt(
+				_segmenterState,
+				TourSegmenterView.STATE_SEGMENTER_VALUE_FONT_SIZE,
+				TourSegmenterView.STATE_SEGMENTER_VALUE_FONT_SIZE_DEFAULT));
+
+		_valueFontEditor.setPreferenceStore(_prefStore);
+		_valueFontEditor.load();
+
+	}
+
+	private void updateUI_FontSize() {
+
+		final FontData[] selectedFont = PreferenceConverter.getFontDataArray(
+				_prefStore,
+				ITourbookPreferences.TOUR_SEGMENTER_CHART_VALUE_FONT);
+
+		final FontData font = selectedFont[0];
+
+		final int fontHeight = font.getHeight();
+
+		_spinFontSize.setSelection(fontHeight);
 	}
 
 }
