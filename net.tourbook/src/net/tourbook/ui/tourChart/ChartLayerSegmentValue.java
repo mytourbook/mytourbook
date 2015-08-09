@@ -41,9 +41,8 @@ import org.eclipse.swt.widgets.Display;
 /**
  * This layer displays the average values for a segment.
  */
-public class ChartSegmentValueLayer implements IChartLayer {
+public class ChartLayerSegmentValue implements IChartLayer {
 
-	private RGB					lineColorRGB	= new RGB(255, 0, 0);
 	private RGB					textColorRGB	= new RGB(0x20, 0x20, 0x20);
 
 	private TourChart			_tourChart;
@@ -59,7 +58,7 @@ public class ChartSegmentValueLayer implements IChartLayer {
 		_nf1.setMaximumFractionDigits(1);
 	}
 
-	public ChartSegmentValueLayer(final TourChart tourChart) {
+	public ChartLayerSegmentValue(final TourChart tourChart) {
 
 		_tourChart = tourChart;
 	}
@@ -83,14 +82,16 @@ public class ChartSegmentValueLayer implements IChartLayer {
 			return;
 		}
 
+		final int segmentSerieSize = segmentSerie.length;
+
 		final ChartDataYSerie yData = graphDrawingData.getYData();
 
 		final Object segmentConfigObject = yData.getCustomData(TourManager.CUSTOM_DATA_SEGMENT_VALUES);
-		if (!(segmentConfigObject instanceof SegmentConfig)) {
+		if ((segmentConfigObject instanceof ConfigGraphSegment) == false) {
 			return;
 		}
 
-		final SegmentConfig segmentConfig = (SegmentConfig) segmentConfigObject;
+		final ConfigGraphSegment segmentConfig = (ConfigGraphSegment) segmentConfigObject;
 
 		// check segment values
 		if (segmentConfig.segmentDataSerie == null) {
@@ -102,6 +103,11 @@ public class ChartSegmentValueLayer implements IChartLayer {
 
 		final float[] segmentValues = segmentConfig.segmentDataSerie;
 		final IValueLabelProvider segmentLabelProvider = segmentConfig.labelProvider;
+
+		Rectangle[] paintedValues = null;
+		if (_isShowSegmenterValues) {
+			paintedValues = segmentConfig.paintedValues = new Rectangle[segmentSerieSize];
+		}
 
 		final Display display = Display.getCurrent();
 		boolean toggleAboveBelow = false;
@@ -126,12 +132,12 @@ public class ChartSegmentValueLayer implements IChartLayer {
 		// do not draw over the graph area
 		gc.setClipping(0, devYTop, graphWidth, devYBottom - devYTop);
 
-		final Color lineColor = new Color(display, lineColorRGB);
+		final Color lineColor = new Color(display, segmentConfig.segmentLineColor);
 		final Color textColor = new Color(display, textColorRGB);
 		{
 			Point previousValue = null;
 
-			for (int segmentIndex = 0; segmentIndex < segmentSerie.length; segmentIndex++) {
+			for (int segmentIndex = 0; segmentIndex < segmentSerieSize; segmentIndex++) {
 
 				// get current value
 				final int serieIndex = segmentSerie[segmentIndex];
@@ -141,7 +147,7 @@ public class ChartSegmentValueLayer implements IChartLayer {
 				if (devXValue < 0 || devXValue > graphWidth) {
 
 					// get next value
-					if (segmentIndex < segmentSerie.length - 2) {
+					if (segmentIndex < segmentSerieSize - 2) {
 
 						final int serieIndexNext = segmentSerie[segmentIndex + 1];
 						final int devXValueNext = (int) (_xDataSerie[serieIndexNext] * scaleX - devGraphImageXOffset);
@@ -284,6 +290,9 @@ public class ChartSegmentValueLayer implements IChartLayer {
 						} else {
 							valueCheckerDown.setupNext(textRect);
 						}
+
+						// keep painted position to detect hovered values
+						paintedValues[segmentIndex] = textRect;
 					}
 				}
 
@@ -306,19 +315,15 @@ public class ChartSegmentValueLayer implements IChartLayer {
 		_isShowSegmenterValues = isShowSegmenterValues;
 	}
 
-	public void setLineColor(final RGB lineColor) {
-		this.lineColorRGB = lineColor;
-	}
-
 	void setStackedValues(final int stackedValues) {
 		_stackedValues = stackedValues;
 	}
 
-	public void setTourData(final TourData tourData) {
+	void setTourData(final TourData tourData) {
 		_tourData = tourData;
 	}
 
-	public void setXDataSerie(final double[] dataSerie) {
+	void setXDataSerie(final double[] dataSerie) {
 		_xDataSerie = dataSerie;
 	}
 }

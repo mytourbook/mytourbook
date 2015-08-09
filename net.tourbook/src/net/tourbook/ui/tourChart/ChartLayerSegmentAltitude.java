@@ -40,7 +40,7 @@ import org.eclipse.swt.widgets.Display;
 /**
  * This layer displays the altitude values.
  */
-public class ChartSegmentAltitudeLayer implements IChartLayer {
+public class ChartLayerSegmentAltitude implements IChartLayer {
 
 	private static final Color		SYSTEM_COLOR_0		= Display.getCurrent().getSystemColor(SWT.COLOR_DARK_GRAY);
 
@@ -63,7 +63,7 @@ public class ChartSegmentAltitudeLayer implements IChartLayer {
 		_nf1.setMaximumFractionDigits(1);
 	}
 
-	ChartSegmentAltitudeLayer(final TourChart tourChart) {
+	ChartLayerSegmentAltitude(final TourChart tourChart) {
 
 		_tourChart = tourChart;
 	}
@@ -332,19 +332,23 @@ public class ChartSegmentAltitudeLayer implements IChartLayer {
 		}
 	}
 
-	void setLayerConfig(final TourData tourData,
-						final RGB lineColor,
-						final boolean isShowSegmenterMarker,
-						final boolean isShowSegmenterValue,
-						final int checkedVisibleValues) {
-
-		_tourData = tourData;
-		_lineColor = lineColor;
-
-		_isShowSegmenterValue = isShowSegmenterValue;
+	void setIsShowSegmenterMarker(final boolean isShowSegmenterMarker) {
 		_isShowSegmenterMarker = isShowSegmenterMarker;
-
-		_stackedValues = checkedVisibleValues;
 	}
 
+	void setIsShowSegmenterValue(final boolean isShowSegmenterValue) {
+		_isShowSegmenterValue = isShowSegmenterValue;
+	}
+
+	void setLineColor(final RGB lineColor) {
+		_lineColor = lineColor;
+	}
+
+	void setStackedValues(final int stackedValues) {
+		_stackedValues = stackedValues;
+	}
+
+	void setTourData(final TourData tourData) {
+		_tourData = tourData;
+	}
 }

@@ -31,7 +31,9 @@ import net.tourbook.ui.views.ISmoothingAlgorithm;
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferenceConverter;
+import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.RGB;
+import org.eclipse.swt.widgets.Display;
 
 /**
  * Class used to initialize default preference values.
@@ -123,11 +125,16 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 		store.setDefault(ITourbookPreferences.GRAPH_TRANSPARENCY_LINE, 0xFF);
 		store.setDefault(ITourbookPreferences.GRAPH_TRANSPARENCY_FILLING, 0x80);
 
-		// segment alternate color
+		// chart/tour segment alternate color
 		store.setDefault(ITourbookPreferences.GRAPH_IS_SEGMENT_ALTERNATE_COLOR, true);
 		PreferenceConverter.setDefault(store, //
 				ITourbookPreferences.GRAPH_SEGMENT_ALTERNATE_COLOR,
 				new RGB(0xf5, 0xf5, 0xf5));
+
+		// tour segmenter chart value font
+		final FontData[] defaultFontData = Display.getDefault().getSystemFont().getFontData();
+		defaultFontData[0].setHeight(7);
+		PreferenceConverter.setDefault(store, ITourbookPreferences.TOUR_SEGMENTER_CHART_VALUE_FONT, defaultFontData);
 
 		// show breaktime values
 		store.setDefault(ITourbookPreferences.GRAPH_IS_BREAKTIME_VALUES_VISIBLE, true);
@@ -419,6 +426,5 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 		 */
 		store.setDefault(ITourbookPreferences.MAP3_IS_COLOR_SELECTOR_DISPLAYED, true);
 		store.setDefault(ITourbookPreferences.MAP3_NUMBER_OF_COLOR_SELECTORS, 10);
-
 	}
 }

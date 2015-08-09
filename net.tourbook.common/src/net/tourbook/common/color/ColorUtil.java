@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -19,8 +19,24 @@ import java.awt.Color;
 
 import org.eclipse.swt.graphics.Device;
 import org.eclipse.swt.graphics.RGB;
+import org.eclipse.swt.widgets.Display;
 
 public class ColorUtil {
+
+	public static RGB getComplimentColor(final Display display, final RGB color) {
+
+		// get compliment color
+		final int red = (~color.red) & 0xff;
+		final int blue = (~color.blue) & 0xff;
+		final int green = (~color.green) & 0xff;
+
+		final double darker = 0.8;
+
+		return new RGB(//
+				(int) (red * darker),
+				(int) (green * darker),
+				(int) (blue * darker));
+	}
 
 	public static org.eclipse.swt.graphics.Color getContrastColor(final Device device, final int rgbValue) {
 

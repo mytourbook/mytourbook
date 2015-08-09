@@ -161,8 +161,8 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	public static final boolean						STATE_IS_SHOW_SEGMENTER_VALUE_DEFAULT			= true;
 	public static final String						STATE_IS_SHOW_TOUR_SEGMENTS						= "STATE_IS_SHOW_TOUR_SEGMENTS";			//$NON-NLS-1$
 	public static final boolean						STATE_IS_SHOW_TOUR_SEGMENTS_DEFAULT				= true;
-	public static final String						STATE_SEGMENTER_VALUE_FONT_SIZE					= "STATE_SEGMENTER_VALUE_FONT_SIZE";		//$NON-NLS-1$
-	public static final int							STATE_SEGMENTER_VALUE_FONT_SIZE_DEFAULT			= 7;
+//	public static final String						STATE_SEGMENTER_VALUE_FONT_SIZE					= "STATE_SEGMENTER_VALUE_FONT_SIZE";		//$NON-NLS-1$
+//	public static final int							STATE_SEGMENTER_VALUE_FONT_SIZE_DEFAULT			= 7;
 	public static final String						STATE_SEGMENTER_STACKED_VISIBLE_VALUES			= "STATE_SEGMENTER_STACKED_VISIBLE_VALUES"; //$NON-NLS-1$
 	public static final int							STATE_SEGMENTER_STACKED_VISIBLE_VALUES_DEFAULT	= 0;
 
@@ -222,8 +222,6 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	private int										_maxDistanceSpinner;
 	private int										_spinnerDistancePage;
 
-//	private boolean									_isSegmentLayerInTourChartVisible;
-//	private boolean									_isSegmentLayerInTourChartVisibleBackup;
 	private boolean									_isTourDirty									= false;
 	private boolean									_isSaving;
 
@@ -498,6 +496,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	public static IDialogSettings getState() {
 		return _state;
 	}
+
 
 	private void addPartListener() {
 

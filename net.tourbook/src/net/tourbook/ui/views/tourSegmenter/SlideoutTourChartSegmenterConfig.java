@@ -90,7 +90,7 @@ public class SlideoutTourChartSegmenterConfig extends AnimatedToolTipShell imple
 		_defaultChangePropertyListener = new IPropertyChangeListener() {
 			@Override
 			public void propertyChange(final PropertyChangeEvent event) {
-				onChangeFont();
+				onChangeFontInEditor();
 			}
 		};
 	}
@@ -103,7 +103,6 @@ public class SlideoutTourChartSegmenterConfig extends AnimatedToolTipShell imple
 	/*
 	 * UI controls
 	 */
-//	private Composite						_fontContainer;
 	private Composite						_shellContainer;
 	private Composite						_ttContainer;
 
@@ -112,7 +111,7 @@ public class SlideoutTourChartSegmenterConfig extends AnimatedToolTipShell imple
 
 	private FontFieldEditorExtended			_valueFontEditor;
 
-	private Label							_lblVisibleValuesStacked;
+	private Label							_lblVisibleStackedValues;
 	private Label							_lblFontSize;
 
 	private Spinner							_spinFontSize;
@@ -255,14 +254,14 @@ public class SlideoutTourChartSegmenterConfig extends AnimatedToolTipShell imple
 				 * Number of stacked values
 				 */
 				// Label
-				_lblVisibleValuesStacked = new Label(_ttContainer, SWT.NONE);
+				_lblVisibleStackedValues = new Label(_ttContainer, SWT.NONE);
 				GridDataFactory.fillDefaults()//
 						.align(SWT.FILL, SWT.CENTER)
 						.indent(firstColumnIndent, 0)
-						.applyTo(_lblVisibleValuesStacked);
-				_lblVisibleValuesStacked.setText(Messages.Slideout_SegmenterChartOptions_Label_StackedVisibleValues);
-				_lblVisibleValuesStacked.setToolTipText(//
-						Messages.Slideout_SegmenterChartOptions_Label_StackedVisibleValues_Tooltip);
+						.applyTo(_lblVisibleStackedValues);
+				_lblVisibleStackedValues.setText(Messages.Slideout_SegmenterChartOptions_Label_StackedValues);
+				_lblVisibleStackedValues.setToolTipText(//
+						Messages.Slideout_SegmenterChartOptions_Label_StackedValues_Tooltip);
 
 				// Spinner:
 				_spinVisibleValuesStacked = new Spinner(_ttContainer, SWT.BORDER);
@@ -328,7 +327,7 @@ public class SlideoutTourChartSegmenterConfig extends AnimatedToolTipShell imple
 		_lblFontSize.setEnabled(isShowValues);
 		_spinFontSize.setEnabled(isShowValues);
 
-		_lblVisibleValuesStacked.setEnabled(isShowValues);
+		_lblVisibleStackedValues.setEnabled(isShowValues);
 		_spinVisibleValuesStacked.setEnabled(isShowValues);
 
 		_valueFontEditor.setEnabled(isShowValues, _ttContainer);
@@ -372,7 +371,7 @@ public class SlideoutTourChartSegmenterConfig extends AnimatedToolTipShell imple
 		return _toolTipItemBounds;
 	}
 
-	private void onChangeFont() {
+	private void onChangeFontInEditor() {
 
 		enableControls();
 
@@ -500,19 +499,20 @@ public class SlideoutTourChartSegmenterConfig extends AnimatedToolTipShell imple
 				TourSegmenterView.STATE_IS_SHOW_SEGMENTER_VALUE,
 				TourSegmenterView.STATE_IS_SHOW_SEGMENTER_VALUE_DEFAULT));
 
-		_spinFontSize.setSelection(Util.getStateInt(
-				_segmenterState,
-				TourSegmenterView.STATE_SEGMENTER_VALUE_FONT_SIZE,
-				TourSegmenterView.STATE_SEGMENTER_VALUE_FONT_SIZE_DEFAULT));
-
 		_spinVisibleValuesStacked.setSelection(Util.getStateInt(
 				_segmenterState,
 				TourSegmenterView.STATE_SEGMENTER_STACKED_VISIBLE_VALUES,
 				TourSegmenterView.STATE_SEGMENTER_STACKED_VISIBLE_VALUES_DEFAULT));
 
+		restoreState_Font();
+	}
+
+	private void restoreState_Font() {
+
+		updateUI_FontSize();
+
 		_valueFontEditor.setPreferenceStore(_prefStore);
 		_valueFontEditor.load();
-
 	}
 
 	private void saveState() {
@@ -521,7 +521,6 @@ public class SlideoutTourChartSegmenterConfig extends AnimatedToolTipShell imple
 
 		_segmenterState.put(TourSegmenterView.STATE_IS_SHOW_SEGMENTER_MARKER, _chkShowSegmentMarker.getSelection());
 		_segmenterState.put(TourSegmenterView.STATE_IS_SHOW_SEGMENTER_VALUE, _chkShowSegmentValue.getSelection());
-		_segmenterState.put(TourSegmenterView.STATE_SEGMENTER_VALUE_FONT_SIZE, _spinFontSize.getSelection());
 
 		_segmenterState.put(TourSegmenterView.STATE_SEGMENTER_STACKED_VISIBLE_VALUES,//
 				_spinVisibleValuesStacked.getSelection());
@@ -537,9 +536,8 @@ public class SlideoutTourChartSegmenterConfig extends AnimatedToolTipShell imple
 
 		final FontData font = selectedFont[0];
 		final int fontHeight = font.getHeight();
-		_spinFontSize.setSelection(fontHeight);
 
-		saveState();
+		_spinFontSize.setSelection(fontHeight);
 	}
 
 }
