@@ -351,7 +351,7 @@ public class UI {
 		final String[] variants = {
 			Messages.Period_Format_Space,
 			Messages.Period_Format_Comma,
-			Messages.Period_Format_CommandAnd,
+			Messages.Period_Format_CommaAndAnd,
 			Messages.Period_Format_CommaSpaceAnd };
 
 		DEFAULT_DURATION_FORMATTER = new PeriodFormatterBuilder()

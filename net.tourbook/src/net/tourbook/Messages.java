@@ -305,8 +305,6 @@ public class Messages extends NLS {
 	public static String		App_Action_New;
 	public static String		App_Action_open_perspective;
 	public static String		App_Action_open_preferences;
-	public static String		App_Action_open_tour_segmenter;
-	public static String		App_Action_open_tour_segmenter_tooltip;
 	public static String		App_Action_OpenOtherViews;
 	public static String		App_Action_Remove;
 	public static String		App_Action_set_tour_type;
@@ -1231,7 +1229,6 @@ public class Messages extends NLS {
 	public static String		Slideout_ChartMarkerOptions_Label_Offset;
 	public static String		Slideout_ChartMarkerOptions_Label_Offset_Tooltip;
 
-	public static String		Slideout_SegmenterChartOptions_Button_ValueFont;
 	public static String		Slideout_SegmenterChartOptions_Checkbox_IsShowSegmentMarker;
 	public static String		Slideout_SegmenterChartOptions_Checkbox_IsShowSegmentValue;
 	public static String		Slideout_SegmenterChartOptions_Label_FontSize;

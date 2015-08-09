@@ -101,7 +101,7 @@ public class Messages extends NLS {
 
 	public static String		Period_Format_Space;
 	public static String		Period_Format_Comma;
-	public static String		Period_Format_CommandAnd;
+	public static String		Period_Format_CommaAndAnd;
 	public static String		Period_Format_CommaSpaceAnd;
 	public static String		Period_Format_CommaSpace;
 	public static String		Period_Format_SpaceAndSpace;
