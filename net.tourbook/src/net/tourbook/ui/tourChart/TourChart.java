@@ -1749,10 +1749,21 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 			return;
 		}
 
-		final boolean isShowSegmenterValues = Util.getStateBoolean(
+		final boolean isShowSegmenterMarker = Util.getStateBoolean(
 				_segmenterState,
-				TourSegmenterView.STATE_IS_SHOW_SEGMENTER_VALUES,
-				TourSegmenterView.STATE_IS_SHOW_SEGMENTER_VALUES_DEFAULT);
+				TourSegmenterView.STATE_IS_SHOW_SEGMENTER_MARKER,
+				TourSegmenterView.STATE_IS_SHOW_SEGMENTER_MARKER_DEFAULT);
+
+		final boolean isShowSegmenterValue = Util.getStateBoolean(
+				_segmenterState,
+				TourSegmenterView.STATE_IS_SHOW_SEGMENTER_VALUE,
+				TourSegmenterView.STATE_IS_SHOW_SEGMENTER_VALUE_DEFAULT);
+
+
+		final int stackedValues = Util.getStateInt(
+				_segmenterState,
+				TourSegmenterView.STATE_SEGMENTER_STACKED_VISIBLE_VALUES,
+				TourSegmenterView.STATE_SEGMENTER_STACKED_VISIBLE_VALUES_DEFAULT);
 
 		final double[] xDataSerie = _tcc.isShowTimeOnXAxis ? //
 				_tourData.getTimeSerieDouble()
@@ -1764,8 +1775,12 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		 * create segment layer
 		 */
 		_layerSegmentAltitude = new ChartSegmentAltitudeLayer(this);
-		_layerSegmentAltitude.setupLayerData(_tourData, new RGB(0, 177, 219));
-		_layerSegmentAltitude.setIsShowSegmenterValues(isShowSegmenterValues);
+		_layerSegmentAltitude.setLayerConfig(
+				_tourData,
+				new RGB(0, 177, 219),
+				isShowSegmenterMarker,
+				isShowSegmenterValue,
+				stackedValues);
 
 		for (final int serieIndex : segmentSerie) {
 
@@ -1784,7 +1799,8 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		_layerSegmentOther.setLineColor(new RGB(231, 104, 38));
 		_layerSegmentOther.setTourData(_tourData);
 		_layerSegmentOther.setXDataSerie(xDataSerie);
-		_layerSegmentOther.setIsShowSegmenterValues(isShowSegmenterValues);
+		_layerSegmentOther.setIsShowSegmenterValues(isShowSegmenterValue);
+		_layerSegmentOther.setStackedValues(stackedValues);
 
 		// draw the graph lighter that the segments are more visible
 		setGraphAlpha(0.5);

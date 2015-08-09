@@ -781,7 +781,7 @@ public class Messages extends NLS {
 	public static String		Import_Data_Action_Reimport_OnlyAltitudeValues;
 	public static String		Import_Data_Action_Reimport_OnlyGearValues;
 
-	public static String	Import_Data_Action_Reimport_OnlyPowerAndSpeedValues;
+	public static String		Import_Data_Action_Reimport_OnlyPowerAndSpeedValues;
 
 	public static String		Import_Data_Action_Reimport_OnlyTemperatureValues;
 	public static String		Import_Data_Action_Reimport_OnlyTimeSlices;
@@ -793,7 +793,7 @@ public class Messages extends NLS {
 	public static String		Import_Data_Dialog_ConfirmReimportAltitudeValues_Message;
 	public static String		Import_Data_Dialog_ConfirmReimportGearValues_Message;
 
-	public static String	Import_Data_Dialog_ConfirmReimportPowerAndSpeedValues_Message;
+	public static String		Import_Data_Dialog_ConfirmReimportPowerAndSpeedValues_Message;
 	public static String		Import_Data_Dialog_ConfirmReimportTemperatureValues_Message;
 	public static String		Import_Data_Dialog_ConfirmReimportTimeSlices_Message;
 	public static String		Import_Data_Dialog_ConfirmReimportTourMarker_Message;
@@ -947,9 +947,9 @@ public class Messages extends NLS {
 	public static String		Pref_Graphs_Checkbox_ForcePulseValue;
 	public static String		Pref_Graphs_Checkbox_GraphAntialiasing;
 	public static String		Pref_Graphs_Checkbox_GraphAntialiasing_Tooltip;
-	public static String	Pref_Graphs_Checkbox_SegmentAlternateColor;
+	public static String		Pref_Graphs_Checkbox_SegmentAlternateColor;
 
-	public static String	Pref_Graphs_Checkbox_SegmentAlternateColor_Tooltip;
+	public static String		Pref_Graphs_Checkbox_SegmentAlternateColor_Tooltip;
 
 	public static String		Pref_Graphs_Checkbox_ShowHorizontalGrid;
 	public static String		Pref_Graphs_Checkbox_ShowVerticalGrid;
@@ -1231,17 +1231,15 @@ public class Messages extends NLS {
 	public static String		Slideout_ChartMarkerOptions_Label_Offset;
 	public static String		Slideout_ChartMarkerOptions_Label_Offset_Tooltip;
 
-	public static String	Slideout_SegmenterChartOptions_Button_ValueFont;
-
-	public static String	Slideout_SegmenterChartOptions_Checkbox_IsShowSegmentValues;
-
-	public static String	Slideout_SegmenterChartOptions_Label_FontSize;
-
-	public static String	Slideout_SegmenterChartOptions_Label_Title;
-
-	public static String	Slideout_SegmenterChartOptions_Label_ValueFont;
-
-	public static String	Slideout_SegmenterChartOptions_Label_ValueFont_Example;
+	public static String		Slideout_SegmenterChartOptions_Button_ValueFont;
+	public static String		Slideout_SegmenterChartOptions_Checkbox_IsShowSegmentMarker;
+	public static String		Slideout_SegmenterChartOptions_Checkbox_IsShowSegmentValue;
+	public static String		Slideout_SegmenterChartOptions_Label_FontSize;
+	public static String		Slideout_SegmenterChartOptions_Label_StackedVisibleValues;
+	public static String		Slideout_SegmenterChartOptions_Label_StackedVisibleValues_Tooltip;
+	public static String		Slideout_SegmenterChartOptions_Label_Title;
+	public static String		Slideout_SegmenterChartOptions_Label_ValueFont;
+	public static String		Slideout_SegmenterChartOptions_Label_ValueFont_Example;
 
 	public static String		Slideout_TourEditor_Label_LatLonDigits;
 	public static String		Slideout_TourEditor_Label_LatLonDigits_Tooltip;
@@ -1444,7 +1442,7 @@ public class Messages extends NLS {
 	public static String		Tour_Marker_TooltipPosition_Right;
 	public static String		Tour_Marker_TooltipPosition_Top;
 
-	public static String	Tour_Segmenter_Action_ShowHideSegmentsInTourChart_Tooltip;
+	public static String		Tour_Segmenter_Action_ShowHideSegmentsInTourChart_Tooltip;
 
 	public static String		Tour_Segmenter_Button_SaveTour_Tooltip;
 	public static String		Tour_Segmenter_Label_AltitudeUpDown_Tooltip;

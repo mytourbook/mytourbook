@@ -50,6 +50,7 @@ public class ChartSegmentValueLayer implements IChartLayer {
 	private TourData			_tourData;
 	private double[]			_xDataSerie;
 
+	private int					_stackedValues;
 	private boolean				_isShowSegmenterValues;
 
 	private final NumberFormat	_nf1			= NumberFormat.getNumberInstance();
@@ -67,12 +68,12 @@ public class ChartSegmentValueLayer implements IChartLayer {
 	 * Draws the marker(s) for the current graph config
 	 * 
 	 * @param gc
-	 * @param drawingData
+	 * @param graphDrawingData
 	 * @param chartComponents
 	 */
 	@Override
 	public void draw(	final GC gc,
-						final GraphDrawingData drawingData,
+						final GraphDrawingData graphDrawingData,
 						final Chart chart,
 						final PixelConverter pixelConverter) {
 
@@ -82,7 +83,7 @@ public class ChartSegmentValueLayer implements IChartLayer {
 			return;
 		}
 
-		final ChartDataYSerie yData = drawingData.getYData();
+		final ChartDataYSerie yData = graphDrawingData.getYData();
 
 		final Object segmentConfigObject = yData.getCustomData(TourManager.CUSTOM_DATA_SEGMENT_VALUES);
 		if (!(segmentConfigObject instanceof SegmentConfig)) {
@@ -96,29 +97,34 @@ public class ChartSegmentValueLayer implements IChartLayer {
 			return;
 		}
 
+		final ValueOverlapChecker valueCheckerUp = new ValueOverlapChecker(_stackedValues);
+		final ValueOverlapChecker valueCheckerDown = new ValueOverlapChecker(_stackedValues);
+
 		final float[] segmentValues = segmentConfig.segmentDataSerie;
 		final IValueLabelProvider segmentLabelProvider = segmentConfig.labelProvider;
 
 		final Display display = Display.getCurrent();
-		Rectangle prevUpTextRect = null;
-		Rectangle prevDownTextRect = null;
 		boolean toggleAboveBelow = false;
 
-		final int devYTop = drawingData.getDevYTop();
-		final int devYBottom = drawingData.getDevYBottom();
+		final int graphWidth = graphDrawingData.getChartDrawingData().devVisibleChartWidth;
+		final int devYTop = graphDrawingData.getDevYTop();
+		final int devYBottom = graphDrawingData.getDevYBottom();
 		final long devGraphImageXOffset = chart.getXXDevViewPortLeftBorder();
 
-		final float graphYBottom = drawingData.getGraphYBottom();
+		final float graphYBottom = graphDrawingData.getGraphYBottom();
 
 		final int valueDivisor = yData.getValueDivisor();
-		final double scaleX = drawingData.getScaleX();
-		final double scaleY = drawingData.getScaleY();
+		final double scaleX = graphDrawingData.getScaleX();
+		final double scaleY = graphDrawingData.getScaleY();
 
 		// setup font
 		final Font fontBackup = gc.getFont();
 		gc.setFont(_tourChart.getValueFont());
 
 		gc.setLineStyle(SWT.LINE_SOLID);
+
+		// do not draw over the graph area
+		gc.setClipping(0, devYTop, graphWidth, devYBottom - devYTop);
 
 		final Color lineColor = new Color(display, lineColorRGB);
 		final Color textColor = new Color(display, textColorRGB);
@@ -127,20 +133,41 @@ public class ChartSegmentValueLayer implements IChartLayer {
 
 			for (int segmentIndex = 0; segmentIndex < segmentSerie.length; segmentIndex++) {
 
+				// get current value
 				final int serieIndex = segmentSerie[segmentIndex];
 				final int devXValue = (int) (_xDataSerie[serieIndex] * scaleX - devGraphImageXOffset);
 
+				// optimize performance
+				if (devXValue < 0 || devXValue > graphWidth) {
+
+					// get next value
+					if (segmentIndex < segmentSerie.length - 2) {
+
+						final int serieIndexNext = segmentSerie[segmentIndex + 1];
+						final int devXValueNext = (int) (_xDataSerie[serieIndexNext] * scaleX - devGraphImageXOffset);
+
+						if (devXValueNext < 0) {
+							// current and next value are outside of the visible area
+							continue;
+						}
+					}
+
+					// get previous value
+					if (segmentIndex > 0) {
+
+						final int serieIndexPrev = segmentSerie[segmentIndex - 1];
+						final int devXValuePrev = (int) (_xDataSerie[serieIndexPrev] * scaleX - devGraphImageXOffset);
+
+						if (devXValuePrev > graphWidth) {
+							// current and previous value are outside of the visible area
+							break;
+						}
+					}
+				}
+
 				final float graphYValue = segmentValues[segmentIndex] * valueDivisor;
 				final int devYGraph = (int) (scaleY * (graphYValue - graphYBottom));
-				int devYValue = devYBottom - devYGraph;
-
-				// don't draw over the graph borders
-				if (devYValue > devYBottom) {
-					devYValue = devYBottom;
-				}
-				if (devYValue < devYTop) {
-					devYValue = devYTop;
-				}
+				final int devYValue = devYBottom - devYGraph;
 
 				/*
 				 * Connect two segments with a line
@@ -152,7 +179,10 @@ public class ChartSegmentValueLayer implements IChartLayer {
 
 				String valueText;
 				if (segmentLabelProvider != null) {
+
+					// get value text from a label provider
 					valueText = segmentLabelProvider.getLabel(graphYValue);
+
 				} else {
 
 					if (graphYValue < 0.0 || graphYValue > 0.0) {
@@ -181,6 +211,7 @@ public class ChartSegmentValueLayer implements IChartLayer {
 					final boolean isValueUp = graphYValue > 0;
 					int devYText;
 					boolean isDrawAbove;
+					boolean isToggleAboveBelow = false;
 
 					if (segmentConfig.canHaveNegativeValues) {
 
@@ -190,61 +221,69 @@ public class ChartSegmentValueLayer implements IChartLayer {
 
 						// toggle above/below segment line
 						isDrawAbove = toggleAboveBelow = !toggleAboveBelow;
+						isToggleAboveBelow = true;
 					}
 
-					if (isDrawAbove) {
+					if (isDrawAbove || isToggleAboveBelow) {
 
 						// draw above segment line
-						devYText = (int) (devYValue - 1.5 * textHeight);
+						devYText = devYValue - textHeight;
 
 					} else {
 
 						// draw below segment line
-						devYText = (int) (devYValue + 0.5 * textHeight);
+						devYText = devYValue + 2;
 					}
 
 					/*
 					 * Ensure the value texts do not overlap, if possible :-)
 					 */
 					Rectangle textRect = new Rectangle(devXText, devYText, textWidth, textHeight);
+					boolean isDrawValue = true;
 
-					if (isDrawAbove) {
-						if (prevUpTextRect != null && prevUpTextRect.intersects(textRect)) {
-							devYText = prevUpTextRect.y - textHeight;
+					if (isDrawAbove || isToggleAboveBelow) {
+						if (valueCheckerUp.intersectsWithValues(textRect)) {
+							devYText = valueCheckerUp.getPreviousValue().y - textHeight;
 						}
+						if (valueCheckerUp.intersectsNoValues(textRect)) {
+							isDrawValue = false;
+						}
+
 					} else {
-						if (prevDownTextRect != null && prevDownTextRect.intersects(textRect)) {
-							devYText = prevDownTextRect.y + textHeight;
+						if (valueCheckerDown.intersectsWithValues(textRect)) {
+							devYText = valueCheckerDown.getPreviousValue().y + textHeight;
+						}
+						if (valueCheckerDown.intersectsNoValues(textRect)) {
+							isDrawValue = false;
 						}
 					}
 
-					// don't draw over the graph borders
-					if (devYText < devYTop) {
-						devYText = devYTop;
-					}
-					if (devYText + textHeight > devYBottom) {
-						devYText = devYBottom - textHeight;
+					if (devYText < devYTop || devYText + textHeight > devYBottom) {
+						isDrawValue = false;
 					}
 
-					gc.setForeground(textColor);
-					gc.drawText(//
-							valueText,
-							devXText,
-							devYText,
-							true);
+					if (isDrawValue) {
 
-					// keep current up/down rectangles
-					final int margin = 1;
-					textRect = new Rectangle(//
-							devXText - margin,
-							devYText - margin,
-							textWidth + 2 * margin,
-							textHeight + 2 * margin);
+						gc.setForeground(textColor);
+						gc.drawText(//
+								valueText,
+								devXText,
+								devYText,
+								true);
 
-					if (isDrawAbove) {
-						prevUpTextRect = textRect;
-					} else {
-						prevDownTextRect = textRect;
+						// keep current up/down rectangles
+						final int margin = 0;
+						textRect = new Rectangle(//
+								devXText - margin,
+								devYText - margin,
+								textWidth + 2 * margin,
+								textHeight + 2 * margin);
+
+						if (isDrawAbove || isToggleAboveBelow) {
+							valueCheckerUp.setupNext(textRect);
+						} else {
+							valueCheckerDown.setupNext(textRect);
+						}
 					}
 				}
 
@@ -256,6 +295,9 @@ public class ChartSegmentValueLayer implements IChartLayer {
 		lineColor.dispose();
 		textColor.dispose();
 
+		// reset clipping
+		gc.setClipping((Rectangle) null);
+
 		// restore font
 		gc.setFont(fontBackup);
 	}
@@ -266,6 +308,10 @@ public class ChartSegmentValueLayer implements IChartLayer {
 
 	public void setLineColor(final RGB lineColor) {
 		this.lineColorRGB = lineColor;
+	}
+
+	void setStackedValues(final int stackedValues) {
+		_stackedValues = stackedValues;
 	}
 
 	public void setTourData(final TourData tourData) {

@@ -43,17 +43,21 @@ import org.eclipse.swt.widgets.Display;
 public class ChartSegmentAltitudeLayer implements IChartLayer {
 
 	private static final Color		SYSTEM_COLOR_0		= Display.getCurrent().getSystemColor(SWT.COLOR_DARK_GRAY);
+
 	private static final Color		SYSTEM_COLOR_DOWN	= Display.getCurrent().getSystemColor(SWT.COLOR_DARK_GREEN);
 	private static final Color		SYSTEM_COLOR_UP		= Display.getCurrent().getSystemColor(SWT.COLOR_RED);
-
 	private TourChart				_tourChart;
+
 	private TourData				_tourData;
 	private ArrayList<ChartMarker>	_chartMarkers		= new ArrayList<ChartMarker>();
-
 	private RGB						_lineColor			= new RGB(189, 0, 255);
-	private boolean					_isShowSegmenterValues;
+
+	private boolean					_isShowSegmenterMarker;
+	private boolean					_isShowSegmenterValue;
+	private int						_stackedValues;
 
 	private final NumberFormat		_nf1				= NumberFormat.getNumberInstance();
+
 	{
 		_nf1.setMinimumFractionDigits(1);
 		_nf1.setMaximumFractionDigits(1);
@@ -80,29 +84,30 @@ public class ChartSegmentAltitudeLayer implements IChartLayer {
 	 * Draws the marker(s) for the current graph config
 	 * 
 	 * @param gc
-	 * @param drawingData
+	 * @param graphDrawingData
 	 * @param fChartComponents
 	 */
 	@Override
 	public void draw(	final GC gc,
-						final GraphDrawingData drawingData,
+						final GraphDrawingData graphDrawingData,
 						final Chart chart,
 						final PixelConverter pixelConverter) {
 
 		final Display display = Display.getCurrent();
 
-		final int devYTop = drawingData.getDevYTop();
-		final int devYBottom = drawingData.getDevYBottom();
-		final long devGraphImageOffset = chart.getXXDevViewPortLeftBorder();
+		final int graphWidth = graphDrawingData.getChartDrawingData().devVisibleChartWidth;
+		final int devYTop = graphDrawingData.getDevYTop();
+		final int devYBottom = graphDrawingData.getDevYBottom();
+		final long devGraphImageXOffset = chart.getXXDevViewPortLeftBorder();
 //		final int devGraphHeight = drawingData.devGraphHeight;
 
-		final float graphYBottom = drawingData.getGraphYBottom();
-		final float[] yValues = drawingData.getYData().getHighValuesFloat()[0];
-		final double scaleX = drawingData.getScaleX();
-		final double scaleY = drawingData.getScaleY();
+		final float graphYBottom = graphDrawingData.getGraphYBottom();
+		final float[] yValues = graphDrawingData.getYData().getHighValuesFloat()[0];
+		final double scaleX = graphDrawingData.getScaleX();
+		final double scaleY = graphDrawingData.getScaleY();
 
-		Rectangle prevUpTextRect = null;
-		Rectangle prevDownTextRect = null;
+		final ValueOverlapChecker valueCheckerUp = new ValueOverlapChecker(_stackedValues);
+		final ValueOverlapChecker valueCheckerDown = new ValueOverlapChecker(_stackedValues);
 
 		final LineAttributes defaultLineAttributes = gc.getLineAttributes();
 		final LineAttributes vertLineLA = new LineAttributes(5);
@@ -115,6 +120,14 @@ public class ChartSegmentAltitudeLayer implements IChartLayer {
 		final Font fontBackup = gc.getFont();
 		gc.setFont(_tourChart.getValueFont());
 
+		// do not draw over the graph area
+		gc.setClipping(0, devYTop, graphWidth, devYBottom - devYTop);
+
+		gc.setAntialias(chart.graphAntialiasing);
+		gc.setTextAntialias(chart.graphAntialiasing);
+
+		final ChartMarker[] chartMarkers = _chartMarkers.toArray(new ChartMarker[_chartMarkers.size()]);
+
 		final Color colorLine = new Color(display, _lineColor);
 		{
 			Point previousPoint = null;
@@ -122,24 +135,45 @@ public class ChartSegmentAltitudeLayer implements IChartLayer {
 			final float[] segmentSerieAltitudeDiff = _tourData.segmentSerieAltitudeDiff;
 			final float[] segmentSerieComputedAltitudeDiff = _tourData.segmentSerieComputedAltitudeDiff;
 
-			for (int segmentIndex = 0; segmentIndex < _chartMarkers.size(); segmentIndex++) {
+			for (int segmentIndex = 0; segmentIndex < chartMarkers.length; segmentIndex++) {
 
-				final ChartMarker chartMarker = _chartMarkers.get(segmentIndex);
-				final int devXOffset = (int) (chartMarker.graphX * scaleX - devGraphImageOffset);
+				// get current value
+				final ChartMarker chartMarker = chartMarkers[segmentIndex];
+				final int devXValue = (int) (chartMarker.graphX * scaleX - devGraphImageXOffset);
+
+				// optimize performance
+				if (devXValue < 0 || devXValue > graphWidth) {
+
+					// get next value
+					if (segmentIndex < chartMarkers.length - 2) {
+
+						final ChartMarker chartMarkerNext = chartMarkers[segmentIndex + 1];
+						final int devXValueNext = (int) (chartMarkerNext.graphX * scaleX - devGraphImageXOffset);
+
+						if (devXValueNext < 0) {
+							// current and next value are outside of the visible area
+							continue;
+						}
+					}
+
+					// get previous value
+					if (segmentIndex > 0) {
+
+						final ChartMarker chartMarkerPrev = chartMarkers[segmentIndex - 1];
+						final int devXValuePrev = (int) (chartMarkerPrev.graphX * scaleX - devGraphImageXOffset);
+
+						if (devXValuePrev > graphWidth) {
+							// current and previous value are outside of the visible area
+							break;
+						}
+					}
+				}
 
 				final int yValueIndex = Math.min(yValues.length - 1, chartMarker.serieIndex);
 				final float yValue = yValues[yValueIndex];
 
 				final int devYGraph = (int) ((yValue - graphYBottom) * scaleY);
-				int devYSegment = devYBottom - devYGraph;
-
-				// don't draw over the graph borders
-				if (devYSegment > devYBottom) {
-					devYSegment = devYBottom;
-				}
-				if (devYSegment < devYTop) {
-					devYSegment = devYTop;
-				}
+				final int devYSegment = devYBottom - devYGraph;
 
 				float altiDiff = 0;
 				if (segmentIndex > 0) {
@@ -164,7 +198,7 @@ public class ChartSegmentAltitudeLayer implements IChartLayer {
 				 */
 				if (previousPoint == null) {
 
-					previousPoint = new Point(devXOffset, devYSegment);
+					previousPoint = new Point(devXValue, devYSegment);
 
 				} else {
 
@@ -173,51 +207,41 @@ public class ChartSegmentAltitudeLayer implements IChartLayer {
 					gc.drawLine(//
 							previousPoint.x,
 							previousPoint.y,
-							devXOffset,
+							devXValue,
 							devYSegment);
 				}
 
 				/*
 				 * Draw a line from the value marker to the top or the bottom
 				 */
-				int devYLine;
-				if (isValueUp) {
+				if (_isShowSegmenterMarker) {
 
-					devYLine = devYSegment - 1 * textHeight;
-
-					// don't draw over the graph borders
-					if (devYLine < devYTop) {
-						devYLine = devYTop;
+					int devYLine;
+					if (isValueUp) {
+						devYLine = devYSegment - 1 * textHeight;
+					} else {
+						devYLine = devYSegment + 1 * textHeight;
 					}
 
-				} else {
-
-					devYLine = devYSegment + 1 * textHeight;
-
-					// don't draw over the graph borders
-					if (devYLine > devYBottom) {
-						devYLine = devYBottom - textHeight;
-					}
+					gc.setForeground(altiDiffColor);
+					gc.setLineAttributes(vertLineLA);
+					gc.drawLine(//
+							devXValue,
+							devYSegment,
+							devXValue,
+							devYLine);
 				}
-
-				gc.setForeground(altiDiffColor);
-				gc.setLineAttributes(vertLineLA);
-				gc.drawLine(//
-						devXOffset,
-						devYSegment,
-						devXOffset,
-						devYLine);
 
 				if (segmentIndex > 0) {
 
-					if (_isShowSegmenterValues) {
+					if (_isShowSegmenterValue) {
 
 						/*
 						 * Draw the diff value
 						 */
 
-						final int segmentWidth = devXOffset - previousPoint.x;
-						final int devXValue = previousPoint.x + segmentWidth / 2 - textWidth / 2;
+						final int segmentWidth = devXValue - previousPoint.x;
+						final int devXDiffValue = previousPoint.x + segmentWidth / 2 - textWidth / 2;
 
 						int devYValue;
 
@@ -225,63 +249,73 @@ public class ChartSegmentAltitudeLayer implements IChartLayer {
 
 						if (isValueUp) {
 							devYValue = devYSegment - yDiff - 2 * textHeight;
-
 						} else {
-
-							devYValue = devYSegment - yDiff + 2 * textHeight;
+							devYValue = devYSegment - yDiff + textHeight + 2;
 						}
 
 						/*
 						 * Ensure the value text do not overlap, if possible :-)
 						 */
-						Rectangle textRect = new Rectangle(devXValue, devYValue, textWidth, textHeight);
+						Rectangle textRect = new Rectangle(devXDiffValue, devYValue, textWidth, textHeight);
+
+						boolean isDrawValue = true;
 
 						if (isValueUp) {
-							if (prevUpTextRect != null && prevUpTextRect.intersects(textRect)) {
-								devYValue = prevUpTextRect.y - textHeight;
+
+							if (valueCheckerUp.intersectsWithValues(textRect)) {
+								devYValue = valueCheckerUp.getPreviousValue().y - textHeight;
 							}
+
+							if (valueCheckerUp.intersectsNoValues(textRect)) {
+								isDrawValue = false;
+							}
+
 						} else {
-							if (prevDownTextRect != null && prevDownTextRect.intersects(textRect)) {
-								devYValue = prevDownTextRect.y + textHeight;
+
+							if (valueCheckerDown.intersectsWithValues(textRect)) {
+								devYValue = valueCheckerDown.getPreviousValue().y + textHeight;
+							}
+
+							if (valueCheckerDown.intersectsNoValues(textRect)) {
+								isDrawValue = false;
 							}
 						}
 
 						// don't draw over the graph borders
-						if (devYValue < devYTop) {
-							devYValue = devYTop;
-						}
-						if (devYValue + textHeight > devYBottom) {
-							devYValue = devYBottom - textHeight;
-						}
+						if (isDrawValue && devYValue > devYTop && devYValue + textHeight < devYBottom) {
 
-						// keep current up/down rectangle
-						final int margin = 1;
-						textRect = new Rectangle(//
-								devXValue - margin,
-								devYValue - margin,
-								textWidth + 2 * margin,
-								textHeight + 2 * margin);
+							// keep current up/down rectangle
+							final int margin = 0;
+							textRect = new Rectangle(//
+									devXDiffValue - margin,
+									devYValue - margin,
+									textWidth + 2 * margin,
+									textHeight + 2 * margin);
 
-						if (isValueUp) {
-							prevUpTextRect = textRect;
-						} else {
-							prevDownTextRect = textRect;
+							if (isValueUp) {
+								valueCheckerUp.setupNext(textRect);
+							} else {
+								valueCheckerDown.setupNext(textRect);
+							}
+
+							gc.setForeground(altiDiffColor);
+							gc.drawText(//
+									valueText,
+									devXDiffValue,
+									devYValue,
+									true);
 						}
-
-						gc.setForeground(altiDiffColor);
-						gc.drawText(//
-								valueText,
-								devXValue,
-								devYValue,
-								true);
 					}
 
-					previousPoint.x = devXOffset;
+					previousPoint.x = devXValue;
 					previousPoint.y = devYSegment;
 				}
 			}
 		}
 		colorLine.dispose();
+
+		// reset clipping
+		gc.setClipping((Rectangle) null);
 
 		// restore font
 		gc.setFont(fontBackup);
@@ -298,14 +332,19 @@ public class ChartSegmentAltitudeLayer implements IChartLayer {
 		}
 	}
 
-	void setIsShowSegmenterValues(final boolean isShowSegmenterValues) {
-		_isShowSegmenterValues = isShowSegmenterValues;
-	}
-
-	void setupLayerData(final TourData tourData, final RGB lineColor) {
+	void setLayerConfig(final TourData tourData,
+						final RGB lineColor,
+						final boolean isShowSegmenterMarker,
+						final boolean isShowSegmenterValue,
+						final int checkedVisibleValues) {
 
 		_tourData = tourData;
 		_lineColor = lineColor;
+
+		_isShowSegmenterValue = isShowSegmenterValue;
+		_isShowSegmenterMarker = isShowSegmenterMarker;
+
+		_stackedValues = checkedVisibleValues;
 	}
 
 }

@@ -143,7 +143,7 @@ public class Chart extends ViewForm {
 	/**
 	 * Antialiasing for the graph, can be {@link SWT#ON} or {@link SWT#OFF}.
 	 */
-	protected int					graphAntialiasing					= SWT.OFF;
+	public int						graphAntialiasing					= SWT.OFF;
 
 	/*
 	 * Segment alternate color

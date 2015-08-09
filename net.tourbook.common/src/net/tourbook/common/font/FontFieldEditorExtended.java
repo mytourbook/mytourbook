@@ -129,7 +129,7 @@ public class FontFieldEditorExtended extends FieldEditor {
 		}
 
 		public int getPreferredHeight() {
-			return convertHorizontalDLUsToPixels(_txtPreviewText, 4 * 8);
+			return convertHorizontalDLUsToPixels(_txtPreviewText, 5 * 8);
 		}
 
 		/**
@@ -232,6 +232,9 @@ public class FontFieldEditorExtended extends FieldEditor {
 	protected void doFillIntoGrid(final Composite parent, final int numColumns) {
 
 		{
+			/*
+			 * Label: Font editor
+			 */
 			// create editor label
 			_lblEditor = getLabelControl(parent);
 
@@ -242,18 +245,20 @@ public class FontFieldEditorExtended extends FieldEditor {
 		}
 
 		{
-			if (_previewAreaText != null) {
+			/*
+			 * Label: Selected font
+			 */
+			_lblSelectedFont = getValueControl(parent);
 
-				_fontPreviewer = new DefaultPreviewer(_previewAreaText, parent);
-
-				final GridData gd = new GridData(GridData.FILL_HORIZONTAL);
-				gd.widthHint = _fontPreviewer.getPreferredWidth();
-				gd.heightHint = _fontPreviewer.getPreferredHeight();
-				_fontPreviewer.getControl().setLayoutData(gd);
-			}
+			final GridData gd = new GridData(GridData.FILL_HORIZONTAL | GridData.GRAB_HORIZONTAL);
+			gd.horizontalSpan = numColumns - getNumberOfControls() + 1;
+			_lblSelectedFont.setLayoutData(gd);
 		}
 
 		{
+			/*
+			 * Button: Change font
+			 */
 			_btnChangeFont = getChangeControl(parent);
 
 			final int widthHint = convertHorizontalDLUsToPixels(_btnChangeFont, IDialogConstants.BUTTON_WIDTH);
@@ -261,15 +266,23 @@ public class FontFieldEditorExtended extends FieldEditor {
 
 			final GridData gd = new GridData();
 			gd.widthHint = Math.max(widthHint, defaultWidth);
+			gd.verticalAlignment = SWT.BEGINNING;
 			_btnChangeFont.setLayoutData(gd);
 		}
-
+		
 		{
-			_lblSelectedFont = getValueControl(parent);
-
-			final GridData gd = new GridData(GridData.FILL_HORIZONTAL | GridData.GRAB_HORIZONTAL);
-			gd.horizontalSpan = numColumns - getNumberOfControls() + 1;
-			_lblSelectedFont.setLayoutData(gd);
+			/*
+			 * Font preview
+			 */
+			if (_previewAreaText != null) {
+				
+				_fontPreviewer = new DefaultPreviewer(_previewAreaText, parent);
+				
+				final GridData gd = new GridData(GridData.FILL_HORIZONTAL);
+				gd.widthHint = _fontPreviewer.getPreferredWidth();
+				gd.heightHint = _fontPreviewer.getPreferredHeight();
+				_fontPreviewer.getControl().setLayoutData(gd);
+			}
 		}
 	}
 
@@ -340,10 +353,14 @@ public class FontFieldEditorExtended extends FieldEditor {
 			_btnChangeFont.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(final SelectionEvent event) {
+
 					final FontDialog fontDialog = new FontDialog(_btnChangeFont.getShell());
+
 					if (chosenFont != null) {
 						fontDialog.setFontList(chosenFont);
 					}
+
+					fontDialog.setEffectsVisible(false);
 
 					fireOpenEvent(true);
 
