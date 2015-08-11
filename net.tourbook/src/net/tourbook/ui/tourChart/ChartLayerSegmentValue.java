@@ -133,7 +133,8 @@ public class ChartLayerSegmentValue implements IChartLayer {
 		gc.setClipping(0, devYTop, graphWidth, devYBottom - devYTop);
 
 		final Color lineColor = new Color(display, segmentConfig.segmentLineColor);
-		final Color textColor = new Color(display, textColorRGB);
+//		final Color textColor = new Color(display, textColorRGB);
+		final Color textColor = new Color(display, segmentConfig.segmentLineColor);
 		{
 			Point previousValue = null;
 

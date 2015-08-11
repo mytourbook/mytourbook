@@ -2192,7 +2192,7 @@ public class TourManager {
 		final float[] pulseSerie = tourData.getPulseSmoothedSerie();
 		if (pulseSerie != null) {
 
-			yDataPulse = createChartDataSerie(pulseSerie, chartType);
+			yDataPulse = createChartDataSerieNoZero(pulseSerie, chartType);
 
 			yDataPulse.setYTitle(GRAPH_LABEL_HEARTBEAT);
 			yDataPulse.setUnitLabel(GRAPH_LABEL_HEARTBEAT_UNIT);
@@ -2231,7 +2231,7 @@ public class TourManager {
 		ChartDataYSerie yDataSpeed = null;
 		if (speedSerie != null) {
 
-			yDataSpeed = createChartDataSerie(speedSerie, chartType);
+			yDataSpeed = createChartDataSerieNoZero(speedSerie, chartType);
 
 			yDataSpeed.setYTitle(GRAPH_LABEL_SPEED);
 			yDataSpeed.setUnitLabel(UI.UNIT_LABEL_SPEED);
@@ -2258,7 +2258,7 @@ public class TourManager {
 		ChartDataYSerie yDataPace = null;
 		if (paceSerie != null) {
 
-			yDataPace = createChartDataSerie(paceSerie, chartType);
+			yDataPace = createChartDataSerieNoZero(paceSerie, chartType);
 
 			yDataPace.setYTitle(GRAPH_LABEL_PACE);
 			yDataPace.setUnitLabel(UI.UNIT_LABEL_PACE);
@@ -2300,7 +2300,7 @@ public class TourManager {
 		ChartDataYSerie yDataPower = null;
 		if (powerSerie != null) {
 
-			yDataPower = createChartDataSerie(powerSerie, chartType);
+			yDataPower = createChartDataSerieNoZero(powerSerie, chartType);
 
 			yDataPower.setYTitle(GRAPH_LABEL_POWER);
 			yDataPower.setUnitLabel(GRAPH_LABEL_POWER_UNIT);
@@ -2326,7 +2326,7 @@ public class TourManager {
 		ChartDataYSerie yDataAltimeter = null;
 		if (altimeterSerie != null) {
 
-			yDataAltimeter = createChartDataSerie(altimeterSerie, chartType);
+			yDataAltimeter = createChartDataSerieNoZero(altimeterSerie, chartType);
 
 			yDataAltimeter.setYTitle(GRAPH_LABEL_ALTIMETER);
 			yDataAltimeter.setUnitLabel(UI.UNIT_LABEL_ALTIMETER);
@@ -2420,7 +2420,7 @@ public class TourManager {
 		ChartDataYSerie yDataCadence = null;
 		if (cadenceSerie != null) {
 
-			yDataCadence = createChartDataSerie(cadenceSerie, chartType);
+			yDataCadence = createChartDataSerieNoZero(cadenceSerie, chartType);
 
 			yDataCadence.setYTitle(GRAPH_LABEL_CADENCE);
 			yDataCadence.setUnitLabel(GRAPH_LABEL_CADENCE_UNIT);
@@ -2651,6 +2651,10 @@ public class TourManager {
 
 	private ChartDataYSerie createChartDataSerie(final float[][] dataSerie, final ChartType chartType) {
 		return new ChartDataYSerie(chartType, dataSerie);
+	}
+
+	private ChartDataYSerie createChartDataSerieNoZero(final float[] dataSerie, final ChartType chartType) {
+		return new ChartDataYSerie(chartType, dataSerie, true);
 	}
 
 	/**
@@ -2923,31 +2927,25 @@ public class TourManager {
 		 */
 		if (_tourDataEditorInstance.isDirty()) {
 
-			final StringBuilder sb = new StringBuilder()//
-					.append("ERROR: ") //$NON-NLS-1$
-					.append("The internal structure of the application is out of synch.") //$NON-NLS-1$
-					.append(UI.NEW_LINE2)
-					.append("You can solve the problem by:") //$NON-NLS-1$
-					.append(UI.NEW_LINE2)
-					.append("Save or revert the tour in the tour editor and select another tour") //$NON-NLS-1$
-					.append(UI.NEW_LINE2)
-					.append(UI.NEW_LINE)
-					.append("The tour editor contains the selected tour, but the data are different.") //$NON-NLS-1$
-					.append(UI.NEW_LINE2)
-					.append("Tour in Editor:") //$NON-NLS-1$
-					.append(tourDataForEditor.toStringWithHash())
-					.append(UI.NEW_LINE)
-					.append("Selected Tour:") //$NON-NLS-1$
-					.append(tourDataInEditor.toStringWithHash())
-					.append(UI.NEW_LINE2)
-					.append(UI.NEW_LINE)
-					.append("You should also inform the author of the application how this error occured. ") //$NON-NLS-1$
-					.append(
-							"However it isn't very easy to find out, what actions are exactly done, before this error occured. ") //$NON-NLS-1$
-					.append(UI.NEW_LINE2)
-					.append("These actions must be reproducable otherwise the bug cannot be identified."); //$NON-NLS-1$
+			final String error = "ERROR: " //															//$NON-NLS-1$
+					+ "The internal structure of the application is out of synch.\n"//					//$NON-NLS-1$
+					+ "\n" //																			//$NON-NLS-1$
+					+ "You can solve the problem by:\n"//												//$NON-NLS-1$
+					+ "\n"//																			//$NON-NLS-1$
+					+ "Save or revert the tour in the tour editor and select another tour\n"//			//$NON-NLS-1$
+					+ "\n\n" //																			//$NON-NLS-1$
+					+ "The tour editor contains the selected tour, but the data are different.\n" //	//$NON-NLS-1$
+					+ "\n" //																			//$NON-NLS-1$
+					+ ("Tour in Editor:" + tourDataForEditor.toStringWithHash() + "\n") //				//$NON-NLS-1$
+					+ ("Selected Tour: " + tourDataInEditor.toStringWithHash() + "\n") //				//$NON-NLS-1$
+					+ "\n\n" //																			//$NON-NLS-1$
+					+ "You should also inform the author of the application how this error occured." //	//$NON-NLS-1$
+					+ " However it isn't very easy to find out, what actions are exactly done," //		//$NON-NLS-1$
+					+ " before this error occured. \n" //												//$NON-NLS-1$
+					+ "\n" //																			//$NON-NLS-1$
+					+ "These actions must be reproducable otherwise the bug cannot be identified."; //	//$NON-NLS-1$
 
-			MessageDialog.openError(Display.getCurrent().getActiveShell(), "Error: Out of Synch", sb.toString()); //$NON-NLS-1$
+			MessageDialog.openError(Display.getCurrent().getActiveShell(), "Error: Out of Synch", error); //$NON-NLS-1$
 
 		} else {
 

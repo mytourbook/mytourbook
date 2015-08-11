@@ -22,6 +22,8 @@ import java.util.ArrayList;
  */
 public class ChartDataYSerie extends ChartDataSerie {
 
+	private static final double		FLOAT_ZERO							= 0.0001;
+
 	/**
 	 * contains the values for the chart, highValues contains the upper value, lowValues the lower
 	 * value. When lowValues is null then the low values is set to 0
@@ -134,23 +136,28 @@ public class ChartDataYSerie extends ChartDataSerie {
 	public ChartDataYSerie(final ChartType chartType, final float[] valueSerie, final boolean isIgnoreZero) {
 
 		_chartType = chartType;
+
 		setMinMaxValues(new float[][] { valueSerie }, isIgnoreZero);
 	}
 
 	public ChartDataYSerie(final ChartType chartType, final float[] lowValueSerie, final float[] highValueSerie) {
 
 		_chartType = chartType;
+
 		setMinMaxValues(new float[][] { lowValueSerie }, new float[][] { highValueSerie });
 	}
 
 	public ChartDataYSerie(final ChartType chartType, final float[][] valueSeries) {
 
 		_chartType = chartType;
+
 		setMinMaxValues(valueSeries, false);
 	}
 
 	public ChartDataYSerie(final ChartType chartType, final float[][] lowValueSeries, final float[][] highValueSeries) {
+
 		_chartType = chartType;
+
 		setMinMaxValues(lowValueSeries, highValueSeries);
 	}
 
@@ -196,6 +203,25 @@ public class ChartDataYSerie extends ChartDataSerie {
 
 	public ArrayList<IChartLayer> getCustomForegroundLayers() {
 		return _customFgLayers;
+	}
+
+	/**
+	 * @param valueSeries
+	 * @return Returns first value which is not 0.
+	 */
+	private float getFirstMinMaxWithoutZero(final float[][] valueSeries) {
+
+		float firstValue = 0;
+
+		outerValues: for (final float[] outerValues : valueSeries) {
+			for (final float value : outerValues) {
+				if (value < -FLOAT_ZERO || value > FLOAT_ZERO) {
+					firstValue = value;
+					break outerValues;
+				}
+			}
+		}
+		return firstValue;
 	}
 
 	/**
@@ -390,19 +416,8 @@ public class ChartDataYSerie extends ChartDataSerie {
 			 */
 			float firstValue = 0;
 			if (isIgnoreZero) {
-
-				// find first value which is not zero
-				outerValues: for (final float[] valuesOuter : valueSeries) {
-					for (final float valuesInner : valuesOuter) {
-						if (valuesInner != 0) {
-							firstValue = valuesInner;
-							break outerValues;
-						}
-					}
-				}
-
+				firstValue = getFirstMinMaxWithoutZero(valueSeries);
 			} else {
-
 				firstValue = valueSeries[0][0];
 			}
 			_visibleMaxValue = _visibleMinValue = firstValue;
@@ -413,7 +428,7 @@ public class ChartDataYSerie extends ChartDataSerie {
 					|| _chartType == ChartType.XY_SCATTER
 					|| _chartType == ChartType.HISTORY) {
 
-				setMinMaxValuesLine(valueSeries);
+				setMinMaxValuesLine(valueSeries, isIgnoreZero);
 
 			} else if (_chartType == ChartType.BAR) {
 
@@ -423,14 +438,14 @@ public class ChartDataYSerie extends ChartDataSerie {
 
 					// get the min/max highValues for all data
 					for (final float[] valuesOuter : valueSeries) {
-						for (final float innerValue : valuesOuter) {
+						for (final float value : valuesOuter) {
 
-							if (isIgnoreZero && innerValue == 0) {
+							if (isIgnoreZero && (value > -FLOAT_ZERO && value < FLOAT_ZERO)) {
 								continue;
 							}
 
-							_visibleMinValue = (_visibleMinValue <= innerValue) ? _visibleMinValue : innerValue;
-							_visibleMaxValue = (_visibleMaxValue >= innerValue) ? _visibleMaxValue : innerValue;
+							_visibleMinValue = (_visibleMinValue <= value) ? _visibleMinValue : value;
+							_visibleMaxValue = (_visibleMaxValue >= value) ? _visibleMaxValue : value;
 						}
 					}
 					break;
@@ -543,7 +558,7 @@ public class ChartDataYSerie extends ChartDataSerie {
 		}
 	}
 
-	private void setMinMaxValuesLine(final float[][] valueSeries) {
+	private void setMinMaxValuesLine(final float[][] valueSeries, final boolean isIgnoreZero) {
 
 		if (valueSeries == null || valueSeries.length == 0 || valueSeries[0] == null || valueSeries[0].length == 0) {
 
@@ -555,10 +570,18 @@ public class ChartDataYSerie extends ChartDataSerie {
 
 		} else {
 
-			_highValuesFloat = valueSeries;
+			/*
+			 * Set initial min/max value
+			 */
+			float firstValue = 0;
+			if (isIgnoreZero) {
+				firstValue = getFirstMinMaxWithoutZero(valueSeries);
+			} else {
+				firstValue = valueSeries[0][0];
+			}
+			_visibleMaxValue = _visibleMinValue = firstValue;
 
-			// set initial min/max value
-			_visibleMaxValue = _visibleMinValue = valueSeries[0][0];
+			_highValuesFloat = valueSeries;
 
 			// calculate min/max highValues
 			for (final float[] valueSerie : valueSeries) {
@@ -568,6 +591,12 @@ public class ChartDataYSerie extends ChartDataSerie {
 				}
 
 				for (final float value : valueSerie) {
+
+					if (isIgnoreZero && (value > -FLOAT_ZERO && value < FLOAT_ZERO)) {
+						// ignore zero
+						continue;
+					}
+
 					_visibleMaxValue = (_visibleMaxValue >= value) ? _visibleMaxValue : value;
 					_visibleMinValue = (_visibleMinValue <= value) ? _visibleMinValue : value;
 				}

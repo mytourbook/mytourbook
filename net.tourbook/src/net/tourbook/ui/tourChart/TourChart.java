@@ -1796,8 +1796,8 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
 		final int stackedValues = Util.getStateInt(
 				_segmenterState,
-				TourSegmenterView.STATE_SEGMENTER_STACKED_VISIBLE_VALUES,
-				TourSegmenterView.STATE_SEGMENTER_STACKED_VISIBLE_VALUES_DEFAULT);
+				TourSegmenterView.STATE_STACKED_VISIBLE_VALUES,
+				TourSegmenterView.STATE_STACKED_VISIBLE_VALUES_DEFAULT);
 
 		final double[] xDataSerie = _tcc.isShowTimeOnXAxis ? //
 				_tourData.getTimeSerieDouble()
@@ -1833,7 +1833,11 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		_layerSegmentOther.setStackedValues(stackedValues);
 
 		// draw the graph lighter that the segments are more visible
-		setGraphAlpha(0.5);
+		final int graphAlpha = Util.getStateInt(
+				_segmenterState,
+				TourSegmenterView.STATE_GRAPH_ALPHA,
+				TourSegmenterView.STATE_GRAPH_ALPHA_DEFAULT);
+		setGraphAlpha(graphAlpha / 100.0);
 	}
 
 	private void createPainter_HrZone() {

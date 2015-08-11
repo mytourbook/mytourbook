@@ -137,6 +137,8 @@ public class Chart extends ViewForm {
 	/**
 	 * The graph transparency can be adjusted with this value. This value is multiplied with the
 	 * {@link #graphTransparencyFilling} and {@link #graphTransparencyLine}.
+	 * <p>
+	 * Opacity: 0.0 = transparent, 1.0 = opaque.
 	 */
 	double							graphTransparencyAdjustment			= 1.0;
 

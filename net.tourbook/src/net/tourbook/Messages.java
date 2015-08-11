@@ -1232,6 +1232,8 @@ public class Messages extends NLS {
 	public static String		Slideout_SegmenterChartOptions_Checkbox_IsShowSegmentMarker;
 	public static String		Slideout_SegmenterChartOptions_Checkbox_IsShowSegmentValue;
 	public static String		Slideout_SegmenterChartOptions_Label_FontSize;
+	public static String		Slideout_SegmenterChartOptions_Label_GraphOpacity;
+	public static String		Slideout_SegmenterChartOptions_Label_GraphOpacity_Tooltip;
 	public static String		Slideout_SegmenterChartOptions_Label_StackedValues;
 	public static String		Slideout_SegmenterChartOptions_Label_StackedValues_Tooltip;
 	public static String		Slideout_SegmenterChartOptions_Label_Title;

@@ -15,13 +15,11 @@
  *******************************************************************************/
 package net.tourbook.ui.tourChart;
 
-import net.tourbook.common.color.ColorUtil;
 import net.tourbook.common.color.GraphColorManager;
 import net.tourbook.tour.TourManager;
 
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
-import org.eclipse.swt.widgets.Display;
 
 public class ConfigGraphSegment {
 
@@ -55,12 +53,14 @@ public class ConfigGraphSegment {
 		this.canHaveNegativeValues = canHaveNegativeValues;
 		this.labelProvider = labelProvider;
 
-		this.segmentLineColor = ColorUtil.getComplimentColor(
-				Display.getDefault(),
-				TourManager.getGraphColor(graphColorName, GraphColorManager.PREF_COLOR_TEXT));
+//		this.segmentLineColor = ColorUtil.getComplimentColor(
+//				Display.getDefault(),
+//				TourManager.getGraphColor(graphColorName, GraphColorManager.PREF_COLOR_TEXT));
 
-		final int bw = 0x80;
-		this.segmentLineColor = new RGB(bw, bw, bw);
+		this.segmentLineColor = TourManager.getGraphColor(graphColorName, GraphColorManager.PREF_COLOR_TEXT);
+
+//		final int bw = 0x80;
+//		this.segmentLineColor = new RGB(bw, bw, bw);
 	}
 
 }
