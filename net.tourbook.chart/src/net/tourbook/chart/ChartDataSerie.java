@@ -285,6 +285,13 @@ public abstract class ChartDataSerie {
 	}
 
 	public void setVisibleMinValue(final double minValue) {
+
+// debug: check Nan
+//		if (minValue != minValue) {
+//			int a = 0;
+//			a++;
+//		}
+
 		_visibleMinValue = minValue;
 	}
 

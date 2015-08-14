@@ -75,6 +75,8 @@ import org.eclipse.swt.widgets.Widget;
  */
 public class ChartComponentGraph extends Canvas {
 
+	private static final double			FLOAT_ZERO						= ChartDataYSerie.FLOAT_ZERO;
+
 	private static final double			ZOOM_RATIO_FACTOR				= 1.3;
 
 	private static final int			BAR_MARKER_WIDTH				= 16;
@@ -3770,7 +3772,7 @@ public class ChartComponentGraph extends Canvas {
 		int barXStart = 0;
 		int barXEnd = 0;
 		int barY = 0;
-		final int barHeight = 5;
+		final int barHeight = 3;
 		final int barHeight2 = barHeight / 2;
 
 		// get the colors
@@ -8266,6 +8268,8 @@ public class ChartComponentGraph extends Canvas {
 		 */
 		for (final ChartDataYSerie yData : yDataList) {
 
+			final boolean isIgnoreMinMaxZero = yData.isIgnoreMinMaxZero();
+
 			final float[][] yValueSeries = yData.getHighValuesFloat();
 			final float yValues[] = yValueSeries[0];
 
@@ -8276,8 +8280,9 @@ public class ChartComponentGraph extends Canvas {
 			xValueIndexRight = Math.min(xValueIndexRight, yValuesLastIndex);
 			xValueIndexRight = Math.max(xValueIndexRight, 0);
 
-			float dataMinValue = yValues[xValueIndexLeft];
-			float dataMaxValue = yValues[xValueIndexLeft];
+			// set dummy value
+			float dataMinValue = Float.MIN_VALUE;
+			float dataMaxValue = Float.MIN_VALUE;
 
 			for (final float[] yValueSerie : yValueSeries) {
 
@@ -8289,13 +8294,40 @@ public class ChartComponentGraph extends Canvas {
 
 					final float yValue = yValueSerie[valueIndex];
 
-					if (yValue < dataMinValue) {
-						dataMinValue = yValue;
+					if (yValue != yValue) {
+						// ignore NaN
+						continue;
 					}
-					if (yValue > dataMaxValue) {
-						dataMaxValue = yValue;
+
+					if (isIgnoreMinMaxZero && (yValue > -FLOAT_ZERO && yValue < FLOAT_ZERO)) {
+						// value is zero (almost) -> ignore
+						continue;
+					}
+
+					if (dataMinValue == Float.MIN_VALUE) {
+
+						// setup first value
+						dataMinValue = dataMaxValue = yValue;
+
+					} else {
+
+						// check subsequent values
+
+						if (yValue < dataMinValue) {
+							dataMinValue = yValue;
+						}
+						if (yValue > dataMaxValue) {
+							dataMaxValue = yValue;
+						}
 					}
 				}
+			}
+
+			if (dataMinValue == Float.MIN_VALUE) {
+
+				// a valid value is not found
+				dataMinValue = 0;
+				dataMaxValue = 1;
 			}
 
 			if (yData.isForceMinValue()) {

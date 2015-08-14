@@ -22,7 +22,7 @@ import java.util.ArrayList;
  */
 public class ChartDataYSerie extends ChartDataSerie {
 
-	private static final double		FLOAT_ZERO							= 0.0001;
+	static final double				FLOAT_ZERO							= 0.0001;
 
 	/**
 	 * contains the values for the chart, highValues contains the upper value, lowValues the lower
@@ -118,6 +118,11 @@ public class ChartDataYSerie extends ChartDataSerie {
 	private ISliderLabelProvider	_sliderLabelProvider;
 
 	/**
+	 * When <code>true</code> then 0 is ignored when min/max values of the data serie are computed.
+	 */
+	private boolean					_isIgnoreMinMaxZero;
+
+	/**
 	 * When this value is > 0 a line chart will not draw a line to the next value point when the
 	 * difference in the x-data values is greater than this value.
 	 * <p>
@@ -136,8 +141,9 @@ public class ChartDataYSerie extends ChartDataSerie {
 	public ChartDataYSerie(final ChartType chartType, final float[] valueSerie, final boolean isIgnoreZero) {
 
 		_chartType = chartType;
+		_isIgnoreMinMaxZero = isIgnoreZero;
 
-		setMinMaxValues(new float[][] { valueSerie }, isIgnoreZero);
+		setMinMaxValues(new float[][] { valueSerie });
 	}
 
 	public ChartDataYSerie(final ChartType chartType, final float[] lowValueSerie, final float[] highValueSerie) {
@@ -151,14 +157,15 @@ public class ChartDataYSerie extends ChartDataSerie {
 
 		_chartType = chartType;
 
-		setMinMaxValues(valueSeries, false);
+		setMinMaxValues(valueSeries);
 	}
 
 	public ChartDataYSerie(final ChartType chartType, final float[][] valueSerie, final boolean isIgnoreZero) {
 
 		_chartType = chartType;
+		_isIgnoreMinMaxZero = isIgnoreZero;
 
-		setMinMaxValues(valueSerie, isIgnoreZero);
+		setMinMaxValues(valueSerie);
 	}
 
 	public ChartDataYSerie(final ChartType chartType, final float[][] lowValueSeries, final float[][] highValueSeries) {
@@ -214,21 +221,56 @@ public class ChartDataYSerie extends ChartDataSerie {
 
 	/**
 	 * @param valueSeries
-	 * @return Returns first value which is not 0.
+	 * @return Returns first value of a dataseries.
 	 */
-	private float getFirstMinMaxWithoutZero(final float[][] valueSeries) {
+	private float getFirstMinMax(final float[][] valueSeries) {
 
-		float firstValue = 0;
+		if (_isIgnoreMinMaxZero) {
 
-		outerValues: for (final float[] outerValues : valueSeries) {
-			for (final float value : outerValues) {
-				if (value < -FLOAT_ZERO || value > FLOAT_ZERO) {
-					firstValue = value;
-					break outerValues;
+			// get first value which is not 0
+
+			for (final float[] outerValues : valueSeries) {
+
+				if (outerValues == null) {
+					continue;
+				}
+
+				for (final float value : outerValues) {
+
+					if (value != value) {
+						// ignore NaN
+						continue;
+					}
+
+					if (value < -FLOAT_ZERO || value > FLOAT_ZERO) {
+						return value;
+					}
+				}
+			}
+
+		} else {
+
+			// get first not NaN value
+
+			for (final float[] outerValues : valueSeries) {
+
+				if (outerValues == null) {
+					continue;
+				}
+
+				for (final float value : outerValues) {
+
+					if (value != value) {
+						// ignore NaN
+						continue;
+					}
+
+					return value;
 				}
 			}
 		}
-		return firstValue;
+
+		return 0;
 	}
 
 	/**
@@ -328,6 +370,14 @@ public class ChartDataYSerie extends ChartDataSerie {
 	}
 
 	/**
+	 * @return Returns <code>true</code> when 0 is ignored when min/max values of the data serie are
+	 *         computed.
+	 */
+	public boolean isIgnoreMinMaxZero() {
+		return _isIgnoreMinMaxZero;
+	}
+
+	/**
 	 * @return Returns the showYSlider.
 	 */
 	public boolean isShowYSlider() {
@@ -400,12 +450,12 @@ public class ChartDataYSerie extends ChartDataSerie {
 
 	/**
 	 * @param valueSeries
-	 * @param isIgnoreZero
+	 * @param _isIgnoreMinMaxZero
 	 *            When <code>true</code> then zero values will be ignored.
 	 *            <p>
 	 *            <b>Is not yet implemented for all cases !</b>
 	 */
-	private void setMinMaxValues(final float[][] valueSeries, final boolean isIgnoreZero) {
+	private void setMinMaxValues(final float[][] valueSeries) {
 
 		if (valueSeries == null || valueSeries.length == 0 || valueSeries[0] == null || valueSeries[0].length == 0) {
 
@@ -424,19 +474,14 @@ public class ChartDataYSerie extends ChartDataSerie {
 					|| _chartType == ChartType.XY_SCATTER
 					|| _chartType == ChartType.HISTORY) {
 
-				setMinMaxValuesLine(valueSeries, isIgnoreZero);
+				setMinMaxValuesLine(valueSeries);
 
 			} else {
 
 				/*
 				 * Set initial min/max value
 				 */
-				float firstValue = 0;
-				if (isIgnoreZero) {
-					firstValue = getFirstMinMaxWithoutZero(valueSeries);
-				} else {
-					firstValue = valueSeries[0][0];
-				}
+				final float firstValue = getFirstMinMax(valueSeries);
 				_visibleMaxValue = _visibleMinValue = firstValue;
 
 				if (_chartType == ChartType.BAR) {
@@ -449,7 +494,7 @@ public class ChartDataYSerie extends ChartDataSerie {
 						for (final float[] valuesOuter : valueSeries) {
 							for (final float value : valuesOuter) {
 
-								if (isIgnoreZero && (value > -FLOAT_ZERO && value < FLOAT_ZERO)) {
+								if (_isIgnoreMinMaxZero && (value > -FLOAT_ZERO && value < FLOAT_ZERO)) {
 									continue;
 								}
 
@@ -568,7 +613,7 @@ public class ChartDataYSerie extends ChartDataSerie {
 		}
 	}
 
-	private void setMinMaxValuesLine(final float[][] valueSeries, final boolean isIgnoreZero) {
+	private void setMinMaxValuesLine(final float[][] valueSeries) {
 
 		if (valueSeries == null || valueSeries.length == 0 || valueSeries[0] == null || valueSeries[0].length == 0) {
 
@@ -583,12 +628,7 @@ public class ChartDataYSerie extends ChartDataSerie {
 			/*
 			 * Set initial min/max value
 			 */
-			float firstValue = 0;
-			if (isIgnoreZero) {
-				firstValue = getFirstMinMaxWithoutZero(valueSeries);
-			} else {
-				firstValue = valueSeries[0][0];
-			}
+			final float firstValue = getFirstMinMax(valueSeries);
 			_visibleMaxValue = _visibleMinValue = firstValue;
 
 			_highValuesFloat = valueSeries;
@@ -607,7 +647,7 @@ public class ChartDataYSerie extends ChartDataSerie {
 						continue;
 					}
 
-					if (isIgnoreZero && (value > -FLOAT_ZERO && value < FLOAT_ZERO)) {
+					if (_isIgnoreMinMaxZero && (value > -FLOAT_ZERO && value < FLOAT_ZERO)) {
 						// ignore zero
 						continue;
 					}
@@ -684,4 +724,5 @@ public class ChartDataYSerie extends ChartDataSerie {
 	public String toString() {
 		return "[ChartDataYSerie]";//$NON-NLS-1$
 	}
+
 }
