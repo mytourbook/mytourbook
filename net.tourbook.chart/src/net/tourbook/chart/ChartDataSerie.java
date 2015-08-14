@@ -138,6 +138,10 @@ public abstract class ChartDataSerie {
 		return _defaultRGB;
 	}
 
+	public int getDisplayedFractionalDigits() {
+		return _displayedFractionalDigits;
+	}
+
 	public String getLabel() {
 		return _label;
 	}
@@ -228,6 +232,10 @@ public abstract class ChartDataSerie {
 		_defaultRGB = color;
 	}
 
+	public void setDisplayedFractionalDigits(final int _displayedFractionalDigits) {
+		this._displayedFractionalDigits = _displayedFractionalDigits;
+	}
+
 	public void setLabel(final String label) {
 		_label = label;
 	}
@@ -286,14 +294,6 @@ public abstract class ChartDataSerie {
 
 		_visibleMinValue = minValue;
 		_visibleMinValueForced = minValue;
-	}
-
-	public int getDisplayedFractionalDigits() {
-		return _displayedFractionalDigits;
-	}
-
-	public void setDisplayedFractionalDigits(int _displayedFractionalDigits) {
-		this._displayedFractionalDigits = _displayedFractionalDigits;
 	}
 
 }

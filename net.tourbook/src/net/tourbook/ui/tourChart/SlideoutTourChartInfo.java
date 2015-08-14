@@ -211,14 +211,14 @@ public class SlideoutTourChartInfo extends AnimatedToolTipShell implements IColo
 			GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
 			GridLayoutFactory.fillDefaults().applyTo(container);
 			{
-				createUI_10_Checkboxes(container);
+				createUI_10_Controls(container);
 			}
 		}
 
 		return _shellContainer;
 	}
 
-	private void createUI_10_Checkboxes(final Composite parent) {
+	private void createUI_10_Controls(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
@@ -255,6 +255,8 @@ public class SlideoutTourChartInfo extends AnimatedToolTipShell implements IColo
 								.applyTo(_chkShowInfoTourSeparator);
 						_chkShowInfoTourSeparator.setText(//
 								Messages.Slideout_TourInfoOptions_Checkbox_IsShowTourSeparator);
+						_chkShowInfoTourSeparator.setToolTipText(//
+								Messages.Slideout_TourInfoOptions_Checkbox_IsShowTourSeparator_Tooltip);
 						_chkShowInfoTourSeparator.addSelectionListener(_defaultSelectionAdapter);
 					}
 					{

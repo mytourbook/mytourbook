@@ -52,6 +52,7 @@ import org.eclipse.swt.graphics.Cursor;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.LineAttributes;
 import org.eclipse.swt.graphics.Path;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.RGB;
@@ -102,6 +103,13 @@ public class ChartComponentGraph extends Canvas {
 			{ 40, 50 },
 			{ Integer.MAX_VALUE, 200 }									};
 
+	private final LineAttributes		LINE_DASHED						= new LineAttributes(5);
+	{
+		LINE_DASHED.dashOffset = 3;
+		LINE_DASHED.style = SWT.LINE_CUSTOM;
+		LINE_DASHED.dash = new float[] { 1f, 2f };
+		LINE_DASHED.width = 1f;
+	}
 	Chart								_chart;
 
 	private final ChartComponents		_chartComponents;
@@ -297,10 +305,10 @@ public class ChartComponentGraph extends Canvas {
 	private Color						_gridColorMajor;
 
 	/**
-	 * Contains a {@link ChartSegment} when a tour title area is hovered, otherwise <code>null</code>
-	 * .
+	 * Contains a {@link ChartSegment} when a tour title area is hovered, otherwise
+	 * <code>null</code> .
 	 */
-	private ChartSegment					_hoveredSegment;
+	private ChartSegment				_hoveredSegment;
 
 	/**
 	 * serie index for the hovered bar, the bar is hidden when -1;
@@ -1668,6 +1676,10 @@ public class ChartComponentGraph extends Canvas {
 				}
 			}
 
+			if (chartSegmentConfig.isShowSegmentSeparator) {
+				drawAsync_240_TourSements(gcGraph, graphDrawingData);
+			}
+
 			// draw units and grid on the x and y axis
 			final ChartType chartType = graphDrawingData.getChartType();
 
@@ -1784,7 +1796,7 @@ public class ChartComponentGraph extends Canvas {
 
 	private void drawAsync_200_XTitle(final GC gc, final GraphDrawingData graphDrawingData) {
 
-//		_chartDrawingData.
+		final Display display = Display.getCurrent();
 
 		final int devYBottom = graphDrawingData.getDevYBottom();
 		final int devYGraphTop = devYBottom - graphDrawingData.devGraphHeight;
@@ -1930,17 +1942,27 @@ public class ChartComponentGraph extends Canvas {
 							// keep position when the title is drawn
 							devXTitleEnd = devXTitle + titleWidth + titlePadding;
 
+							gc.setForeground(display.getSystemColor(SWT.COLOR_BLACK));
 							gc.drawText(segmentTitle, devXTitle, devYTitle, false);
 						}
 					}
 
-					if (chartSegmentConfig.isShowSegmentSeparator) {
-
-						// draw segment start line but not for the first segment
-						if (segmentIndex != 0) {
-							gc.drawLine(devXSegmentStart, 1, devXSegmentStart, devYTitle - 1);
-						}
-					}
+//					if (chartSegmentConfig.isShowSegmentSeparator) {
+//
+//						// draw segment start line but not for the first segment
+//						if (segmentIndex != 0) {
+//
+//							gc.setLineAttributes(vertLineLA);
+//							gc.setForeground(display.getSystemColor(SWT.COLOR_DARK_GRAY));
+//
+////							gc.drawLine(devXSegmentStart, 1, devXSegmentStart, devYTitle - 1);
+//							gc.drawLine(//
+//									devXSegmentStart,
+//									devYTitle + titleHeight,
+//									devXSegmentStart,
+//									devYBottom);
+//						}
+//					}
 
 					if (segmentCustomData != null && segmentCustomData[segmentIndex] instanceof Long) {
 
@@ -2405,6 +2427,41 @@ public class ChartComponentGraph extends Canvas {
 
 			unitIndex++;
 		}
+	}
+
+	private void drawAsync_240_TourSements(final GC gcChart, final GraphDrawingData graphDrawingData) {
+
+		final ArrayList<ChartSegment> tourSegments = _chartDrawingData.tourSegments;
+
+		if (tourSegments.size() == 1) {
+			// ignore one tour chart
+			return;
+		}
+
+		final Display display = getDisplay();
+
+		gcChart.setLineAttributes(LINE_DASHED);
+		gcChart.setForeground(display.getSystemColor(SWT.COLOR_GRAY));
+
+		for (int segmentIndex = 0; segmentIndex < tourSegments.size(); segmentIndex++) {
+
+			final ChartSegment chartSegment = tourSegments.get(segmentIndex);
+			if (chartSegmentConfig.isShowSegmentSeparator) {
+
+				// draw segment start line but not for the first segment
+				if (segmentIndex != 0) {
+
+//					gc.drawLine(devXSegmentStart, 1, devXSegmentStart, devYTitle - 1);
+					gcChart.drawLine(//
+							chartSegment.devXSegment,
+							0,//graphDrawingData.getDevYTop(),
+							chartSegment.devXSegment,
+							graphDrawingData.getDevYBottom());
+				}
+			}
+		}
+
+		gcChart.setLineStyle(SWT.LINE_SOLID);
 	}
 
 	private void drawAsync_500_LineGraph(	final GC gcGraph,
@@ -3738,6 +3795,7 @@ public class ChartComponentGraph extends Canvas {
 		gc.setForeground(colorBgBright);
 		gc.setBackground(colorBgDark);
 
+		boolean isPrevInvalid = true;
 
 		/*
 		 * draw the lines into the paths
@@ -3749,16 +3807,29 @@ public class ChartComponentGraph extends Canvas {
 				break;
 			}
 
+			final float graphY = yValues[valueIndex];
+
+			if (graphY != graphY) {
+
+				// value is NaN
+
+				isPrevInvalid = true;
+				isDrawFirstPoint = true;
+
+				continue;
+			}
+
 			final double graphX = xValues[valueIndex] - graphValueOffset;
 			final double devX = graphX * scaleX;
 
-			final float graphY = yValues[valueIndex];
 			final float devY = (float) (graphY * scaleY);
 
 			// check if position is horizontal visible
-			if (devX < 0) {
+			if (devX < 0 || isPrevInvalid) {
 
 				// keep current position which is used as the starting point for painting
+
+				isPrevInvalid = false;
 
 				graphYPrev = graphY;
 
@@ -3803,7 +3874,7 @@ public class ChartComponentGraph extends Canvas {
 			}
 
 			/*
-			 * draw box when value has changed
+			 * draw bar when value has changed
 			 */
 			{
 				final float devYBar = devY0Inverse - devY;
@@ -3816,18 +3887,29 @@ public class ChartComponentGraph extends Canvas {
 
 					// y has changed
 
-					if (yValues2[valueIndex - 1] == 1) {
+					Color bgColor;
+					if (valueIndex == 0) {
 
-						// grosses Kettenblatt
+						// set initial value
 
-						gc.setBackground(colorBgBright);
+						bgColor = yValues2[0] == 1 ? colorBgBright : colorBgDark;
 
 					} else {
 
-						// kleines Kettenblatt
+						if (yValues2[valueIndex - 1] == 1) {
 
-						gc.setBackground(colorBgDark);
+							// grosses Kettenblatt
+
+							bgColor = colorBgBright;
+
+						} else {
+
+							// kleines Kettenblatt
+
+							bgColor = colorBgDark;
+						}
 					}
+					gc.setBackground(bgColor);
 
 					int barWidth = barXEnd - barXStart + devXOverlap2;
 
@@ -3878,7 +3960,7 @@ public class ChartComponentGraph extends Canvas {
 			}
 
 			/*
-			 * draw last point
+			 * draw last bar
 			 */
 			if (valueIndex == lastIndex || //
 
@@ -3896,18 +3978,29 @@ public class ChartComponentGraph extends Canvas {
 					barWidth = 1;
 				}
 
-				if (yValues2[valueIndex - 1] == 1) {
+				Color bgColor;
+				if (valueIndex == 0) {
 
-					// grosses Kettenblatt
+					// set initial value
 
-					gc.setBackground(colorBgBright);
+					bgColor = yValues2[0] == 1 ? colorBgBright : colorBgDark;
 
 				} else {
 
-					// kleines Kettenblatt
+					if (yValues2[valueIndex - 1] == 1) {
 
-					gc.setBackground(colorBgDark);
+						// grosses Kettenblatt
+
+						bgColor = colorBgBright;
+
+					} else {
+
+						// kleines Kettenblatt
+
+						bgColor = colorBgDark;
+					}
 				}
+				gc.setBackground(bgColor);
 
 				gc.fillRectangle(//
 						barXStart - devXOverlap,
@@ -5289,17 +5382,17 @@ public class ChartComponentGraph extends Canvas {
 
 			// show hovered segment only when multiple tours are displayed otherwise it is a bit confusing
 
-		for (final GraphDrawingData graphDrawingData : _allGraphDrawingData) {
+			for (final GraphDrawingData graphDrawingData : _allGraphDrawingData) {
 
-			final int devYTop = graphDrawingData.getDevYBottom() - graphDrawingData.devGraphHeight;
-			final int devYBottom = graphDrawingData.getDevYBottom();
+				final int devYTop = graphDrawingData.getDevYBottom() - graphDrawingData.devGraphHeight;
+				final int devYBottom = graphDrawingData.getDevYBottom();
 
-			gcOverlay.fillRectangle(//
-					_hoveredSegment.devXSegment,
-					devYBottom,
-					_hoveredSegment.devSegmentWidth,
-					devYTop - devYBottom);
-		}
+				gcOverlay.fillRectangle(//
+						_hoveredSegment.devXSegment,
+						devYBottom,
+						_hoveredSegment.devSegmentWidth,
+						devYTop - devYBottom);
+			}
 		}
 
 		// reset alpha

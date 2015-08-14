@@ -2937,6 +2937,10 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 			return;
 		}
 
+		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
+				+ ("\tonSelectionChanged:\t" + selection));
+		// TODO remove SYSTEM.OUT.PRINTLN
+
 		/*
 		 * run selection async because a tour could be modified and needs to be saved, modifications
 		 * are not reported to the tour data editor, saving needs also to be asynch with the tour

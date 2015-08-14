@@ -17,8 +17,11 @@ package net.tourbook.tour;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.Formatter;
+import java.util.HashSet;
 import java.util.Set;
 
 import net.tourbook.Messages;
@@ -40,6 +43,7 @@ import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.StringToArrayConverter;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
+import net.tourbook.data.TourPhoto;
 import net.tourbook.database.MyTourbookException;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.importdata.RawDataManager;
@@ -80,11 +84,12 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 
 public class TourManager {
 
 	private static final String				GRAPH_LABEL_ALTIMETER					= net.tourbook.common.Messages.Graph_Label_Altimeter;
-
 	private static final String				GRAPH_LABEL_ALTITUDE					= net.tourbook.common.Messages.Graph_Label_Altitude;
 	private static final String				GRAPH_LABEL_CADENCE						= net.tourbook.common.Messages.Graph_Label_Cadence;
 	private static final String				GRAPH_LABEL_CADENCE_UNIT				= net.tourbook.common.Messages.Graph_Label_Cadence_Unit;
@@ -100,11 +105,11 @@ public class TourManager {
 	private static final String				GRAPH_LABEL_TEMPERATURE					= net.tourbook.common.Messages.Graph_Label_Temperature;
 	private static final String				GRAPH_LABEL_TOUR_COMPARE				= net.tourbook.common.Messages.Graph_Label_Tour_Compare;
 	private static final String				GRAPH_LABEL_TOUR_COMPARE_UNIT			= net.tourbook.common.Messages.Graph_Label_Tour_Compare_Unit;
+	//
 	public static final String				CUSTOM_DATA_TOUR_DATA					= "tourData";													//$NON-NLS-1$
-
 	public static final String				CUSTOM_DATA_TOUR_CHART_CONFIGURATION	= "tourChartConfig";											//$NON-NLS-1$
+	//
 	public static final String				CUSTOM_DATA_ALTIMETER					= "altimeter";													//$NON-NLS-1$
-
 	public static final String				CUSTOM_DATA_ALTITUDE					= "altitude";													//$NON-NLS-1$
 	public static final String				CUSTOM_DATA_CADENCE						= "cadence";													//$NON-NLS-1$
 	public static final String				CUSTOM_DATA_DISTANCE					= "distance";													//$NON-NLS-1$
@@ -118,17 +123,17 @@ public class TourManager {
 	public static final String				CUSTOM_DATA_TEMPERATURE					= "temperature";												//$NON-NLS-1$
 	public static final String				CUSTOM_DATA_TIME						= "time";														//$NON-NLS-1$
 	public static final String				CUSTOM_DATA_SEGMENT_VALUES				= "segmentValues";												//$NON-NLS-1$
-
 	public static final String				CUSTOM_DATA_ANALYZER_INFO				= "analyzerInfo";												//$NON-NLS-1$
 	public static final String				CUSTOM_DATA_CONCONI_TEST				= "CUSTOM_DATA_CONCONI_TEST";									//$NON-NLS-1$
+	//
 	public static final String				X_AXIS_TIME								= "time";														//$NON-NLS-1$
-
 	public static final String				X_AXIS_DISTANCE							= "distance";													//$NON-NLS-1$
+	//
+	private final static String				FORMAT_MM_SS							= "%d:%02d";													//$NON-NLS-1$
 	public static final String				GEAR_TEETH_FORMAT						= "%2d:%2d";													//$NON-NLS-1$
-
 	public static final String				GEAR_VALUE_FORMAT						= GEAR_TEETH_FORMAT + " - %1.2f";								//$NON-NLS-1$
+	//
 	public static final int					GRAPH_ALTITUDE							= 1000;
-
 	public static final int					GRAPH_SPEED								= 1001;
 	public static final int					GRAPH_ALTIMETER							= 1002;
 	public static final int					GRAPH_PULSE								= 1003;
@@ -152,34 +157,33 @@ public class TourManager {
 			GRAPH_GEARS,
 			GRAPH_TOUR_COMPARE														};
 
-	private static StringBuilder			_sbFormatter							= new StringBuilder();
-	private static Formatter				_formatter								= new Formatter(_sbFormatter);
-	private static final String				FORMAT_MM_SS							= "%d:%02d";													//$NON-NLS-1$
+	private final static IPreferenceStore	_prefStore								= TourbookPlugin.getPrefStore();
 
 	private static TourManager				_instance;
 
-	private final static IPreferenceStore	_prefStore								= TourbookPlugin.getPrefStore();
+	private final static DateTimeFormatter	_dtFormatter							= DateTimeFormat.shortDate();
+	private final static StringBuilder		_sbFormatter							= new StringBuilder();
+	private final static Formatter			_formatter								= new Formatter(_sbFormatter);
 
 	/**
 	 * contains the instance of the {@link TourDataEditorView} or <code>null</code> when this part
 	 * is not opened
 	 */
 	private static TourDataEditorView		_tourDataEditorInstance;
-
+	//
 	private static LabelProviderMMSS		_labelProviderMMSS						= new LabelProviderMMSS();
 	private static LabelProviderInt			_labelProviderInt						= new LabelProviderInt();
-
+	//
 	private ComputeChartValue				_computeAltimeterAvg;
-
 	private ComputeChartValue				_computeGradientAvg;
 	private ComputeChartValue				_computePaceAvg;
 	private ComputeChartValue				_computePowerAvg;
 	private ComputeChartValue				_computeSpeedAvg;
+
 	private final TourDataCache				_tourDataCache;
 
 	private static final ListenerList		_tourEventListeners						= new ListenerList(
 																							ListenerList.IDENTITY);
-
 	private static final ListenerList		_tourSaveListeners						= new ListenerList(
 																							ListenerList.IDENTITY);
 	/**
@@ -469,6 +473,253 @@ public class TourManager {
 		tcc.updateZoomOptions();
 
 		return tcc;
+	}
+
+	/**
+	 * Create data series for multiple tours.
+	 * 
+	 * @param tourIds
+	 * @return
+	 */
+	public static TourData createMultipleTourData(final ArrayList<Long> tourIds) {
+
+		final ArrayList<TourData> allMultipleTours = new ArrayList<>();
+		final ArrayList<TourData> validatedMultipleTours = new ArrayList<>();
+
+		TourManager.loadTourData(tourIds, allMultipleTours, false);
+
+		// sort tours by start date/time
+		Collections.sort(allMultipleTours, new Comparator<TourData>() {
+			@Override
+			public int compare(final TourData t1, final TourData t2) {
+				return t1.getTourStartTimeMS() < t2.getTourStartTimeMS() ? -1 : 1;
+			}
+		});
+
+		int numTimeSlices = 0;
+
+		// get tours which have data series
+		for (final TourData tourData : allMultipleTours) {
+
+			final int[] timeSerie = tourData.timeSerie;
+
+			// ignore tours which have no data series
+			if (timeSerie != null && timeSerie.length > 0) {
+
+				validatedMultipleTours.add(tourData);
+				numTimeSlices += timeSerie.length;
+			}
+		}
+
+		final TourData multiTourData = new TourData();
+
+		multiTourData.setupMultipleTour();
+
+		final int numTours = validatedMultipleTours.size();
+
+		final int[] toTimeSerie = multiTourData.timeSerie = new int[numTimeSlices];
+		final float[] toAltitudeSerie = multiTourData.altitudeSerie = new float[numTimeSlices];
+		final float[] toCadenceSerie = multiTourData.cadenceSerie = new float[numTimeSlices];
+		final float[] toDistanceSerie = multiTourData.distanceSerie = new float[numTimeSlices];
+		final long[] toGearSerie = multiTourData.gearSerie = new long[numTimeSlices];
+		final double[] toLatitudeSerie = multiTourData.latitudeSerie = new double[numTimeSlices];
+		final double[] toLongitudeSerie = multiTourData.longitudeSerie = new double[numTimeSlices];
+		final float[] toPowerSerie = new float[numTimeSlices];
+		final float[] toPulseSerie = multiTourData.pulseSerie = new float[numTimeSlices];
+		final float[] toTemperaturSerie = multiTourData.temperatureSerie = new float[numTimeSlices];
+
+		final Long[] allTourIds = multiTourData.multipleTourIds = new Long[numTours];
+		final int[] allStartIndex = multiTourData.multipleTourStartIndex = new int[numTours];
+		final long[] allStartTime = multiTourData.multipleTourStartTime = new long[numTours];
+		final String[] allTourTitle = multiTourData.multipleTourTitles = new String[numTours];
+		final ArrayList<TourMarker> allTourMarker = multiTourData.multiTourMarkers = new ArrayList<>();
+		final int[] allTourMarkerNumbers = multiTourData.multipleNumberOfMarkers = new int[numTours];
+
+		final HashSet<TourPhoto> allTourPhoto = new HashSet<>();
+
+		int toStartIndex = 0;
+		int tourRecordingTime = 0;
+		float tourDistance = 0;
+		float tourAltUp = 0;
+		float tourAltDown = 0;
+
+		boolean isAltitudeSerie = false;
+		boolean isCadenceSerie = false;
+		boolean isDistanceSerie = false;
+		boolean isGearSerie = false;
+		boolean isLatLonSerie = false;
+		boolean isPowerSerie = false;
+		boolean isPulseSerie = false;
+		boolean isTempSerie = false;
+
+		boolean isFirstTour = true;
+
+		for (int tourIndex = 0; tourIndex < numTours; tourIndex++) {
+
+			final TourData fromTourData = validatedMultipleTours.get(tourIndex);
+
+			final int[] fromTimeSerie = fromTourData.timeSerie;
+
+			final float[] fromAltitudeSerie = fromTourData.altitudeSerie;
+			final float[] fromCadenceSerie = fromTourData.cadenceSerie;
+			final float[] fromDistanceSerie = fromTourData.distanceSerie;
+			final long[] fromGearSerie = fromTourData.gearSerie;
+			final double[] fromLatitudeSerie = fromTourData.latitudeSerie;
+			final double[] fromLongitudeSerie = fromTourData.longitudeSerie;
+			final float[] fromPulseSerie = fromTourData.pulseSerie;
+			final float[] fromTemperaturSerie = fromTourData.temperatureSerie;
+
+			final int fromSerieLength = fromTimeSerie.length;
+
+			if (isFirstTour) {
+
+				// first time serie
+
+				isFirstTour = false;
+
+				// copy data series from first tour
+				System.arraycopy(fromTimeSerie, 0, toTimeSerie, toStartIndex, fromSerieLength);
+
+				if (fromDistanceSerie != null) {
+					isDistanceSerie = true;
+					System.arraycopy(fromDistanceSerie, 0, toDistanceSerie, toStartIndex, fromSerieLength);
+				}
+
+			} else {
+
+				// 2nd + other time series
+
+				// adjust relative time series
+				for (int serieIndex = 0; serieIndex < fromSerieLength; serieIndex++) {
+					toTimeSerie[toStartIndex + serieIndex] = tourRecordingTime + fromTimeSerie[serieIndex];
+				}
+
+				// adjust relative distance
+				if (fromDistanceSerie != null) {
+					isDistanceSerie = true;
+					for (int serieIndex = 0; serieIndex < fromSerieLength; serieIndex++) {
+						toDistanceSerie[toStartIndex + serieIndex] = tourDistance + fromDistanceSerie[serieIndex];
+					}
+				}
+			}
+
+			/*
+			 * Copy data series
+			 */
+			if (fromAltitudeSerie != null) {
+				isAltitudeSerie = true;
+				System.arraycopy(fromAltitudeSerie, 0, toAltitudeSerie, toStartIndex, fromSerieLength);
+			}
+			if (fromCadenceSerie != null) {
+				isCadenceSerie = true;
+				System.arraycopy(fromCadenceSerie, 0, toCadenceSerie, toStartIndex, fromSerieLength);
+			}
+			if (fromGearSerie != null) {
+				isGearSerie = true;
+				System.arraycopy(fromGearSerie, 0, toGearSerie, toStartIndex, fromSerieLength);
+			}
+			if (fromLatitudeSerie != null) {
+				isLatLonSerie = true;
+				System.arraycopy(fromLatitudeSerie, 0, toLatitudeSerie, toStartIndex, fromSerieLength);
+				System.arraycopy(fromLongitudeSerie, 0, toLongitudeSerie, toStartIndex, fromSerieLength);
+			}
+			if (fromPulseSerie != null) {
+				isPulseSerie = true;
+				System.arraycopy(fromPulseSerie, 0, toPulseSerie, toStartIndex, fromSerieLength);
+			}
+			if (fromTemperaturSerie != null) {
+				isTempSerie = true;
+				System.arraycopy(fromTemperaturSerie, 0, toTemperaturSerie, toStartIndex, fromSerieLength);
+			}
+
+			// power is a special data serie
+			if (fromTourData.isPowerSerieFromDevice() && fromTourData.getPowerSerie() != null) {
+				isPowerSerie = true;
+				System.arraycopy(fromTourData.getPowerSerie(), 0, toPowerSerie, toStartIndex, fromSerieLength);
+			}
+
+			allTourIds[tourIndex] = fromTourData.getTourId();
+
+			// tour marker
+			final ArrayList<TourMarker> fromTourMarker = fromTourData.getTourMarkersSorted();
+			allTourMarker.addAll(fromTourMarker);
+			allTourMarkerNumbers[tourIndex] = fromTourMarker.size();
+
+			// photos
+			final Set<TourPhoto> fromTourPhotos = fromTourData.getTourPhotos();
+			allTourPhoto.addAll(fromTourPhotos);
+
+			/*
+			 * Keep data for each tour
+			 */
+			allStartIndex[tourIndex] = toStartIndex;
+			toStartIndex += fromSerieLength;
+
+			// summarize tour distance
+			if (fromDistanceSerie != null) {
+				tourDistance += fromDistanceSerie[fromSerieLength - 1];
+			}
+
+			// summarize recording time
+			final int fromTourEnd = fromTimeSerie[fromSerieLength - 1];
+			tourRecordingTime += fromTourEnd;
+
+			// summarize altitude up/down
+			tourAltUp += fromTourData.getTourAltUp();
+			tourAltDown += fromTourData.getTourAltDown();
+
+			// tour titles
+			final long tourStartTime = fromTourData.getTourStartTimeMS();
+			allTourTitle[tourIndex] = _dtFormatter.print(tourStartTime);
+			allStartTime[tourIndex] = tourStartTime;
+		}
+
+		/*
+		 * Remove data series when not available
+		 */
+		if (!isAltitudeSerie) {
+			multiTourData.altitudeSerie = null;
+		}
+		if (!isCadenceSerie) {
+			multiTourData.cadenceSerie = null;
+		}
+		if (!isDistanceSerie) {
+			multiTourData.distanceSerie = null;
+		}
+		if (!isGearSerie) {
+			multiTourData.gearSerie = null;
+		}
+		if (!isLatLonSerie) {
+			multiTourData.latitudeSerie = null;
+			multiTourData.longitudeSerie = null;
+		}
+		if (isPowerSerie) {
+			multiTourData.setPowerSerie(toPowerSerie);
+		}
+		if (!isPulseSerie) {
+			multiTourData.pulseSerie = null;
+		}
+		if (!isTempSerie) {
+			multiTourData.temperatureSerie = null;
+		}
+
+		multiTourData.setTourPhotos(allTourPhoto, null);
+
+		final TourData firstTour = validatedMultipleTours.get(0);
+		final DateTime tourStartTime = new DateTime(firstTour.getTourStartTimeMS());
+
+		multiTourData.setTourStartTime(tourStartTime);
+		multiTourData.setTourRecordingTime(tourRecordingTime);
+		multiTourData.setTourDistance(tourDistance);
+
+		// computing these values is VERY cpu intensive because of the DP algorithm
+		multiTourData.setTourAltUp(tourAltUp);
+		multiTourData.setTourAltDown(tourAltDown);
+
+		multiTourData.computeTourDrivingTime();
+		multiTourData.computeComputedValues();
+
+		return multiTourData;
 	}
 
 	public static void fireEvent(final TourEventId tourEventId) {
@@ -2454,11 +2705,11 @@ public class TourManager {
 					// gear ratio
 					gearSerie[0],
 
-					// front gear number, starting with 1
+					// front gear number, starting with 1 for the large chainwheel (Kettenblatt)
 					gearSerie[3] //
 			};
 
-			yDataGears = createChartDataSerie(chartGearSerie, ChartType.HORIZONTAL_BAR);
+			yDataGears = createChartDataSerieNoZero(chartGearSerie, ChartType.HORIZONTAL_BAR);
 
 			yDataGears.setYTitle(GRAPH_LABEL_GEARS);
 			yDataGears.setShowYSlider(true);
@@ -2654,6 +2905,10 @@ public class TourManager {
 	}
 
 	private ChartDataYSerie createChartDataSerieNoZero(final float[] dataSerie, final ChartType chartType) {
+		return new ChartDataYSerie(chartType, dataSerie, true);
+	}
+
+	private ChartDataYSerie createChartDataSerieNoZero(final float[][] dataSerie, final ChartType chartType) {
 		return new ChartDataYSerie(chartType, dataSerie, true);
 	}
 
