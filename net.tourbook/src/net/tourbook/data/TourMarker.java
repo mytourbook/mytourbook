@@ -803,7 +803,7 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 	}
 
 	public void setMultiTourSerieIndex(final int multiTourSerieIndex) {
-		this._multiTourSerieIndex = multiTourSerieIndex;
+		_multiTourSerieIndex = multiTourSerieIndex;
 	}
 
 	/**

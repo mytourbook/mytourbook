@@ -174,6 +174,9 @@ public class TourManager {
 	private static LabelProviderMMSS		_labelProviderMMSS						= new LabelProviderMMSS();
 	private static LabelProviderInt			_labelProviderInt						= new LabelProviderInt();
 	//
+	private static TourData					_multipleTourData;
+	private static int						_multipleTourDataHash;
+	//
 	private ComputeChartValue				_computeAltimeterAvg;
 	private ComputeChartValue				_computeGradientAvg;
 	private ComputeChartValue				_computePaceAvg;
@@ -252,7 +255,7 @@ public class TourManager {
 						public void run() {
 
 							// fire modify event
-							TourManager.fireEvent(TourEventId.UPDATE_UI);
+							fireEvent(TourEventId.UPDATE_UI);
 						}
 					});
 				}
@@ -475,13 +478,186 @@ public class TourManager {
 		return tcc;
 	}
 
+	public static void fireEvent(final TourEventId tourEventId) {
+
+		final Object[] allListeners = _tourEventListeners.getListeners();
+		for (final Object listener : allListeners) {
+			fireEvent_Final((ITourEventListener) listener, tourEventId, null, null);
+		}
+	}
+
+	public static void fireEvent(final TourEventId tourEventId, final TourEvent tourEvent) {
+
+		final Object[] allListeners = _tourEventListeners.getListeners();
+		for (final Object listener : allListeners) {
+			fireEvent_Final((ITourEventListener) listener, tourEventId, null, tourEvent);
+		}
+	}
+
+	public static void fireEvent(final TourEventId tourEventId, final TourEvent tourEvent, final IWorkbenchPart part) {
+
+		final Object[] allListeners = _tourEventListeners.getListeners();
+		for (final Object listener : allListeners) {
+			fireEvent_Final((ITourEventListener) listener, tourEventId, part, tourEvent);
+		}
+	}
+
 	/**
-	 * Create data series for multiple tours.
+	 * Fire {@link TourEventId} and check if the fired event also must do some actions in the
+	 * {@link TourManager}.
+	 * 
+	 * @param listener
+	 * @param tourEventId
+	 * @param part
+	 * @param customData
+	 */
+	private static void fireEvent_Final(final ITourEventListener listener,
+										final TourEventId tourEventId,
+										final IWorkbenchPart part,
+										final Object customData) {
+
+		if (tourEventId == TourEventId.CLEAR_DISPLAYED_TOUR) {
+
+			_multipleTourData = null;
+		}
+
+		listener.tourChanged(part, tourEventId, customData);
+	}
+
+	public static void fireEventWithCustomData(	final TourEventId tourEventId,
+												final Object customData,
+												final IWorkbenchPart part) {
+
+		final Object[] allListeners = _tourEventListeners.getListeners();
+		for (final Object listener : allListeners) {
+			fireEvent_Final((ITourEventListener) listener, tourEventId, part, customData);
+		}
+	}
+
+	/**
+	 * Try to get the tour chart and/or editor from the active part.
+	 * 
+	 * @param tourData
+	 * @return Returns the {@link TourChart} for the requested {@link TourData}
+	 */
+	public static TourChart getActiveTourChart(final TourData tourData) {
+
+		// get tour chart from the active editor part
+		for (final IWorkbenchWindow wbWindow : PlatformUI.getWorkbench().getWorkbenchWindows()) {
+			for (final IWorkbenchPage wbPage : wbWindow.getPages()) {
+
+				final IEditorPart activeEditor = wbPage.getActiveEditor();
+				if (activeEditor instanceof TourEditor) {
+
+					/*
+					 * check if the tour data in the editor is the same
+					 */
+					final TourChart tourChart = ((TourEditor) activeEditor).getTourChart();
+					final TourData tourChartTourData = tourChart.getTourData();
+					if (tourChartTourData == tourData) {
+
+						try {
+							TourManager.checkTourData(tourData, tourChartTourData);
+						} catch (final MyTourbookException e) {
+							e.printStackTrace();
+						}
+					}
+				}
+			}
+		}
+
+		// get tour chart from the tour chart view
+		for (final IWorkbenchWindow wbWindow : PlatformUI.getWorkbench().getWorkbenchWindows()) {
+			for (final IWorkbenchPage wbPage : wbWindow.getPages()) {
+
+				final IViewReference viewRef = wbPage.findViewReference(TourChartView.ID);
+				if (viewRef != null) {
+
+					final IViewPart view = viewRef.getView(false);
+					if (view instanceof TourChartView) {
+
+						final TourChartView tourChartView = ((TourChartView) view);
+
+						/*
+						 * check if the tour data in the tour chart is the same
+						 */
+						final TourChart tourChart = tourChartView.getTourChart();
+						final TourData tourChartTourData = tourChart.getTourData();
+						if (tourChartTourData == tourData) {
+							try {
+								TourManager.checkTourData(tourData, tourChartTourData);
+							} catch (final MyTourbookException e) {
+								e.printStackTrace();
+							}
+
+							return tourChart;
+						}
+					}
+				}
+			}
+		}
+
+		return null;
+	}
+
+	public static int[] getAllGraphIDs() {
+		return _allGraphIDs;
+	}
+
+	/**
+	 * Get color for a graph from the pref store.
+	 * 
+	 * @param graphName
+	 * @param colorProfileName
+	 *            Can be any of <br>
+	 *            {@link GraphColorManager#PREF_COLOR_BRIGHT},<br>
+	 *            {@link GraphColorManager#PREF_COLOR_DARK}<br>
+	 *            {@link GraphColorManager#PREF_COLOR_LINE}<br>
+	 *            {@link GraphColorManager#PREF_COLOR_MAPPING}<br>
+	 *            {@link GraphColorManager#PREF_COLOR_TEXT}.
+	 * @return
+	 */
+	public static RGB getGraphColor(final String graphName, final String colorProfileName) {
+
+		final String prefGraphName = ICommonPreferences.GRAPH_COLORS + graphName + "."; //$NON-NLS-1$
+
+		// get COLOR from common pref store
+		final IPreferenceStore commonPrefStore = CommonActivator.getPrefStore();
+
+		final RGB color = PreferenceConverter.getColor(commonPrefStore, prefGraphName + colorProfileName);
+
+		return color;
+	}
+
+	public static TourManager getInstance() {
+
+		if (_instance == null) {
+			_instance = new TourManager();
+		}
+
+		return _instance;
+	}
+
+	public static IValueLabelProvider getLabelProviderInt() {
+		return _labelProviderInt;
+	}
+
+	public static IValueLabelProvider getLabelProviderMMSS() {
+		return _labelProviderMMSS;
+	}
+
+	/**
+	 * Create one {@link TourData} for multiple tours.
 	 * 
 	 * @param tourIds
 	 * @return
 	 */
-	public static TourData createMultipleTourData(final ArrayList<Long> tourIds) {
+	public static TourData getMultipleTourData(final ArrayList<Long> tourIds) {
+
+		// check if the requested data are already available
+		if (_multipleTourData != null && tourIds.hashCode() == _multipleTourDataHash) {
+			return _multipleTourData;
+		}
 
 		final ArrayList<TourData> allMultipleTours = new ArrayList<>();
 		final ArrayList<TourData> validatedMultipleTours = new ArrayList<>();
@@ -703,6 +879,7 @@ public class TourManager {
 			multiTourData.temperatureSerie = null;
 		}
 
+		setupMultiTourMarker(multiTourData);
 		multiTourData.setTourPhotos(allTourPhoto, null);
 
 		final TourData firstTour = validatedMultipleTours.get(0);
@@ -719,162 +896,10 @@ public class TourManager {
 		multiTourData.computeTourDrivingTime();
 		multiTourData.computeComputedValues();
 
+		_multipleTourData = multiTourData;
+		_multipleTourDataHash = tourIds.hashCode();
+
 		return multiTourData;
-	}
-
-	public static void fireEvent(final TourEventId tourEventId) {
-
-		final Object[] allListeners = _tourEventListeners.getListeners();
-		for (final Object listener : allListeners) {
-			((ITourEventListener) listener).tourChanged(null, tourEventId, null);
-		}
-	}
-
-	public static void fireEvent(final TourEventId tourEventId, final ArrayList<TourData> modifiedTours) {
-		fireEvent(tourEventId, new TourEvent(modifiedTours));
-	}
-
-	public static void fireEvent(final TourEventId tourEventId, final Object customData, final IWorkbenchPart part) {
-
-		final Object[] allListeners = _tourEventListeners.getListeners();
-		for (final Object listener : allListeners) {
-			((ITourEventListener) listener).tourChanged(part, tourEventId, customData);
-		}
-	}
-
-	public static void fireEvent(final TourEventId tourEventId, final TourEvent tourEvent) {
-
-		final Object[] allListeners = _tourEventListeners.getListeners();
-		for (final Object listener : allListeners) {
-			((ITourEventListener) listener).tourChanged(null, tourEventId, tourEvent);
-		}
-	}
-
-	public static void fireEvent(final TourEventId tourEventId, final TourEvent tourEvent, final IWorkbenchPart part) {
-
-		final Object[] allListeners = _tourEventListeners.getListeners();
-		for (final Object listener : allListeners) {
-			((ITourEventListener) listener).tourChanged(part, tourEventId, tourEvent);
-		}
-	}
-
-	public static void fireEventWithCustomData(	final TourEventId tourEventId,
-												final Object customData,
-												final IWorkbenchPart part) {
-
-		fireEvent(tourEventId, customData, part);
-	}
-
-	/**
-	 * Try to get the tour chart and/or editor from the active part.
-	 * 
-	 * @param tourData
-	 * @return Returns the {@link TourChart} for the requested {@link TourData}
-	 */
-	public static TourChart getActiveTourChart(final TourData tourData) {
-
-		// get tour chart from the active editor part
-		for (final IWorkbenchWindow wbWindow : PlatformUI.getWorkbench().getWorkbenchWindows()) {
-			for (final IWorkbenchPage wbPage : wbWindow.getPages()) {
-
-				final IEditorPart activeEditor = wbPage.getActiveEditor();
-				if (activeEditor instanceof TourEditor) {
-
-					/*
-					 * check if the tour data in the editor is the same
-					 */
-					final TourChart tourChart = ((TourEditor) activeEditor).getTourChart();
-					final TourData tourChartTourData = tourChart.getTourData();
-					if (tourChartTourData == tourData) {
-
-						try {
-							TourManager.checkTourData(tourData, tourChartTourData);
-						} catch (final MyTourbookException e) {
-							e.printStackTrace();
-						}
-					}
-				}
-			}
-		}
-
-		// get tour chart from the tour chart view
-		for (final IWorkbenchWindow wbWindow : PlatformUI.getWorkbench().getWorkbenchWindows()) {
-			for (final IWorkbenchPage wbPage : wbWindow.getPages()) {
-
-				final IViewReference viewRef = wbPage.findViewReference(TourChartView.ID);
-				if (viewRef != null) {
-
-					final IViewPart view = viewRef.getView(false);
-					if (view instanceof TourChartView) {
-
-						final TourChartView tourChartView = ((TourChartView) view);
-
-						/*
-						 * check if the tour data in the tour chart is the same
-						 */
-						final TourChart tourChart = tourChartView.getTourChart();
-						final TourData tourChartTourData = tourChart.getTourData();
-						if (tourChartTourData == tourData) {
-							try {
-								TourManager.checkTourData(tourData, tourChartTourData);
-							} catch (final MyTourbookException e) {
-								e.printStackTrace();
-							}
-
-							return tourChart;
-						}
-					}
-				}
-			}
-		}
-
-		return null;
-	}
-
-	public static int[] getAllGraphIDs() {
-		return _allGraphIDs;
-	}
-
-	/**
-	 * Get color for a graph from the pref store.
-	 * 
-	 * @param graphName
-	 * @param colorProfileName
-	 *            Can be any of <br>
-	 *            {@link GraphColorManager#PREF_COLOR_BRIGHT},<br>
-	 *            {@link GraphColorManager#PREF_COLOR_DARK}<br>
-	 *            {@link GraphColorManager#PREF_COLOR_LINE}<br>
-	 *            {@link GraphColorManager#PREF_COLOR_MAPPING}<br>
-	 *            {@link GraphColorManager#PREF_COLOR_TEXT}.
-	 * @return
-	 */
-	public static RGB getGraphColor(final String graphName, final String colorProfileName) {
-
-		final String prefGraphName = ICommonPreferences.GRAPH_COLORS + graphName + "."; //$NON-NLS-1$
-
-		// get COLOR from common pref store
-		final IPreferenceStore commonPrefStore = CommonActivator.getPrefStore();
-
-		final RGB color = PreferenceConverter.getColor(commonPrefStore, prefGraphName + colorProfileName);
-
-		return color;
-	}
-
-	public static TourManager getInstance() {
-
-		if (_instance == null) {
-			_instance = new TourManager();
-		}
-
-		return _instance;
-	}
-
-	public static IValueLabelProvider getLabelProviderInt() {
-		return _labelProviderInt;
-	}
-
-	public static IValueLabelProvider getLabelProviderMMSS() {
-		return _labelProviderMMSS;
 	}
 
 	/**
@@ -1869,6 +1894,43 @@ public class TourManager {
 
 	public static void setTourDataEditor(final TourDataEditorView tourDataEditorView) {
 		_tourDataEditorInstance = tourDataEditorView;
+	}
+
+	private static void setupMultiTourMarker(final TourData tourData) {
+
+		final int[] multipleStartTimeIndex = tourData.multipleTourStartIndex;
+		final int[] multipleNumberOfMarkers = tourData.multipleNumberOfMarkers;
+		
+		int tourIndex = 0;
+		int numberOfMultiMarkers = 0;
+		int tourSerieIndex = 0;
+		
+		// setup first multiple tour
+		tourSerieIndex = multipleStartTimeIndex[tourIndex];
+		numberOfMultiMarkers = multipleNumberOfMarkers[tourIndex];
+		
+		final ArrayList<TourMarker> allTourMarkers = tourData.multiTourMarkers;
+		
+		for (int markerIndex = 0; markerIndex < allTourMarkers.size(); markerIndex++) {
+			
+			while (markerIndex >= numberOfMultiMarkers) {
+				
+				// setup next tour
+				
+				tourIndex++;
+				
+				if (tourIndex <= multipleStartTimeIndex.length - 1) {
+					
+					tourSerieIndex = multipleStartTimeIndex[tourIndex];
+					numberOfMultiMarkers += multipleNumberOfMarkers[tourIndex];
+				}
+			}
+			
+			final TourMarker tourMarker = allTourMarkers.get(markerIndex);
+			final int xAxisSerieIndex = tourSerieIndex + tourMarker.getSerieIndex();
+			
+			tourMarker.setMultiTourSerieIndex(xAxisSerieIndex);
+		}
 	}
 
 	public void addTourEventListener(final ITourEventListener listener) {

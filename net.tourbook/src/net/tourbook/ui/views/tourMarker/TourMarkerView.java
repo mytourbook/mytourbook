@@ -18,7 +18,6 @@ package net.tourbook.ui.views.tourMarker;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.Set;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
@@ -116,6 +115,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 	private ColumnManager			_columnManager;
 
 	private boolean					_isInUpdate;
+	private boolean					_isMultipleTours;
 
 	private ColumnDefinition		_colDefName;
 	private ColumnDefinition		_colDefVisibility;
@@ -147,13 +147,22 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 				return new Object[0];
 			} else {
 
-				final Set<TourMarker> tourMarkers = _tourData.getTourMarkers();
+				Object[] tourMarkers;
+
+				if (_tourData.isMultipleTours) {
+
+					tourMarkers = _tourData.multiTourMarkers.toArray();
+
+				} else {
+
+					tourMarkers = _tourData.getTourMarkers().toArray();
+				}
 
 //				System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
 //						+ ("\n\t_tourData: " + _tourData));
 //				// TODO remove SYSTEM.OUT.PRINTLN
 
-				return tourMarkers.toArray();
+				return tourMarkers;
 			}
 		}
 
@@ -164,7 +173,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 	/**
 	 * Sort the markers by time
 	 */
-	private static class MarkerViewerSorter extends ViewerSorter {
+	private class MarkerViewerSorter extends ViewerSorter {
 
 		@Override
 		public int compare(final Viewer viewer, final Object obj1, final Object obj2) {
@@ -172,7 +181,14 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 //			return ((TourMarker) (obj1)).getTime() - ((TourMarker) (obj2)).getTime();
 // time is disabled because it's not always available in gpx files
 
-			return ((TourMarker) (obj1)).getSerieIndex() - ((TourMarker) (obj2)).getSerieIndex();
+			if (_isMultipleTours) {
+
+				return ((TourMarker) (obj1)).getMultiTourSerieIndex() - ((TourMarker) (obj2)).getMultiTourSerieIndex();
+			} else {
+
+				return ((TourMarker) (obj1)).getSerieIndex() - ((TourMarker) (obj2)).getSerieIndex();
+			}
+
 		}
 	}
 
@@ -281,11 +297,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 			@Override
 			public void tourChanged(final IWorkbenchPart part, final TourEventId eventId, final Object eventData) {
 
-				if (part == TourMarkerView.this) {
-					return;
-				}
-
-				if (_isInUpdate) {
+				if (_isInUpdate || part == TourMarkerView.this) {
 					return;
 				}
 
@@ -313,6 +325,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 
 									// get modified tour
 									_tourData = tourData;
+									_isMultipleTours = tourData.isMultipleTours;
 
 									updateUI_MarkerViewer();
 
@@ -763,8 +776,9 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 	private void enableActions() {
 
 		final boolean isTourInDb = isTourSavedInDb();
+		final boolean isSingleTour = _tourData != null & _tourData.isMultipleTours == false;
 
-		_actionEditTourMarkers.setEnabled(isTourInDb);
+		_actionEditTourMarkers.setEnabled(isTourInDb && isSingleTour);
 	}
 
 	private void fillContextMenu(final IMenuManager menuMgr) {
@@ -851,7 +865,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 			selectedTourMarker.add((TourMarker) iterator.next());
 		}
 
-		TourManager.fireEvent(//
+		TourManager.fireEventWithCustomData(//
 				TourEventId.MARKER_SELECTION,
 				new SelectionTourMarker(_tourData, selectedTourMarker),
 				getSite().getPart());
@@ -859,26 +873,23 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 
 	private void onSelectionChanged(final ISelection selection) {
 
-		if (_isInUpdate) {
+		if (_isInUpdate || selection == null) {
 			return;
 		}
-
-		long tourId = TourDatabase.ENTITY_IS_NOT_SAVED;
 
 //		System.out.println((net.tourbook.common.UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
 //				+ ("\tonSelectionChanged: " + selection));
 //		// TODO remove SYSTEM.OUT.PRINTLN
+
+		long tourId = TourDatabase.ENTITY_IS_NOT_SAVED;
+		TourData tourData = null;
 
 		if (selection instanceof SelectionTourData) {
 
 			// a tour was selected, get the chart and update the marker viewer
 
 			final SelectionTourData tourDataSelection = (SelectionTourData) selection;
-			final TourData tourData = tourDataSelection.getTourData();
-
-			if (tourData != null) {
-				tourId = tourData.getTourId();
-			}
+			tourData = tourDataSelection.getTourData();
 
 		} else if (selection instanceof SelectionTourId) {
 
@@ -887,8 +898,14 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 		} else if (selection instanceof SelectionTourIds) {
 
 			final ArrayList<Long> tourIds = ((SelectionTourIds) selection).getTourIds();
-			if ((tourIds != null) && (tourIds.size() > 0)) {
-				tourId = tourIds.get(0);
+
+			if (tourIds != null && tourIds.size() > 0) {
+
+				if (tourIds.size() == 1) {
+					tourId = tourIds.get(0);
+				} else {
+					tourData = TourManager.getMultipleTourData(tourIds);
+				}
 			}
 
 		} else if (selection instanceof SelectionTourCatalogView) {
@@ -914,12 +931,20 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 			clearView();
 		}
 
-		if (tourId >= TourDatabase.ENTITY_IS_NOT_SAVED) {
+		if (tourData == null) {
 
-			final TourData tourData = TourManager.getInstance().getTourData(tourId);
-			if (tourData != null) {
-				_tourData = tourData;
+			if (tourId >= TourDatabase.ENTITY_IS_NOT_SAVED) {
+
+				tourData = TourManager.getInstance().getTourData(tourId);
+				if (tourData != null) {
+					_tourData = tourData;
+					_isMultipleTours = tourData.isMultipleTours;
+				}
 			}
+		} else {
+
+			_tourData = tourData;
+			_isMultipleTours = tourData.isMultipleTours;
 		}
 
 		updateUI_MarkerViewer();
@@ -940,6 +965,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 			if (tourData != _tourData) {
 
 				_tourData = tourData;
+				_isMultipleTours = tourData.isMultipleTours;
 
 				updateUI_MarkerViewer();
 			}
@@ -1010,8 +1036,22 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 
 				final ArrayList<TourData> selectedTours = TourManager.getSelectedTours();
 
-				if ((selectedTours != null) && (selectedTours.size() > 0)) {
-					onSelectionChanged(new SelectionTourData(selectedTours.get(0)));
+				if (selectedTours != null && selectedTours.size() > 0) {
+
+					if (selectedTours.size() > 1) {
+
+						final ArrayList<Long> tourIds = new ArrayList<>();
+						for (final TourData tourData : selectedTours) {
+							tourIds.add(tourData.getTourId());
+						}
+
+						onSelectionChanged(new SelectionTourIds(tourIds));
+
+					} else {
+
+						onSelectionChanged(new SelectionTourData(selectedTours.get(0)));
+					}
+
 				}
 			}
 		});

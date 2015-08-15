@@ -215,7 +215,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 	private IMouseListener				_mouseMarkerListener					= new MouseMarkerListener();
 	private IMouseListener				_mousePhotoListener						= new MousePhotoListener();
 	private IMouseListener				_mouseChartSegmentListener				= new MouseChartSegmentListener();
-	private IMouseListener				_mouseTourSegmentListener				= new MouseTourSegmentListener();
+//	private IMouseListener				_mouseTourSegmentListener				= new MouseTourSegmentListener();
 
 	private long						_hoveredSegmentEventTime;
 
@@ -453,38 +453,38 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		}
 	}
 
-	public class MouseTourSegmentListener extends MouseAdapter {
-
-//		@Override
-//		public void chartResized() {
-//			onTourSegment_ChartResized();
-//		}
+//	private class MouseTourSegmentListener extends MouseAdapter {
 //
-//		@Override
-//		public void mouseDoubleClick(final ChartMouseEvent event) {
-//			onTourSegment_MouseDoubleClick(event);
-//		}
-//
-//		@Override
-//		public void mouseDown(final ChartMouseEvent event) {
-//			onTourSegment_MouseDown(event);
-//		}
-//
-//		@Override
-//		public void mouseExit() {
-//			onTourSegment_MouseExit();
-//		}
-//
-//		@Override
-//		public void mouseMove(final ChartMouseEvent event) {
-//			onTourSegment_MouseMove(event);
-//		}
-//
-//		@Override
-//		public void mouseUp(final ChartMouseEvent event) {
-//			onTourSegment_MouseUp(event);
-//		}
-	}
+////		@Override
+////		public void chartResized() {
+////			onTourSegment_ChartResized();
+////		}
+////
+////		@Override
+////		public void mouseDoubleClick(final ChartMouseEvent event) {
+////			onTourSegment_MouseDoubleClick(event);
+////		}
+////
+////		@Override
+////		public void mouseDown(final ChartMouseEvent event) {
+////			onTourSegment_MouseDown(event);
+////		}
+////
+////		@Override
+////		public void mouseExit() {
+////			onTourSegment_MouseExit();
+////		}
+////
+////		@Override
+////		public void mouseMove(final ChartMouseEvent event) {
+////			onTourSegment_MouseMove(event);
+////		}
+////
+////		@Override
+////		public void mouseUp(final ChartMouseEvent event) {
+////			onTourSegment_MouseUp(event);
+////		}
+//	}
 
 	/**
 	 * @param parent
@@ -1303,6 +1303,13 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		createChartActions();
 	}
 
+	/**
+	 * @param tourMarker
+	 * @param xAxisSerie
+	 * @param xAxisSerieIndex
+	 * @param labelPosition
+	 * @return
+	 */
 	private ChartLabel createChartLabel(final TourMarker tourMarker,
 										final double[] xAxisSerie,
 										final int xAxisSerieIndex,
@@ -1579,6 +1586,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		final ChartMarkerConfig cmc = new ChartMarkerConfig();
 
 		cmc.isDrawMarkerWithDefaultColor = _tcc.isDrawMarkerWithDefaultColor;
+		cmc.isShowAbsoluteValues = _tcc.isShowAbsoluteValues;
 		cmc.isShowHiddenMarker = _tcc.isShowHiddenMarker;
 		cmc.isShowMarkerLabel = _tcc.isShowMarkerLabel;
 		cmc.isShowMarkerTooltip = _tcc.isShowMarkerTooltip;
@@ -1635,7 +1643,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
 			for (int markerIndex = 0; markerIndex < allTourMarkers.size(); markerIndex++) {
 
-				if (markerIndex >= numberOfMultiMarkers) {
+				while (markerIndex >= numberOfMultiMarkers) {
 
 					// setup next tour
 
@@ -1649,14 +1657,14 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 				}
 
 				final TourMarker tourMarker = allTourMarkers.get(markerIndex);
-				final int markerSerieIndex = tourSerieIndex + tourMarker.getSerieIndex();
+				final int xAxisSerieIndex = tourSerieIndex + tourMarker.getSerieIndex();
 
-				tourMarker.setMultiTourSerieIndex(markerSerieIndex);
+				tourMarker.setMultiTourSerieIndex(xAxisSerieIndex);
 
 				final ChartLabel chartLabel = createChartLabel(//
 						tourMarker,
 						xAxisSerie,
-						markerSerieIndex,
+						xAxisSerieIndex,
 						tourMarker.getLabelPosition());
 
 				cmc.chartLabels.add(chartLabel);
@@ -1989,7 +1997,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		// update selection globally
 		if (_isDisplayedInDialog == false) {
 
-			TourManager.fireEvent(//
+			TourManager.fireEventWithCustomData(//
 					TourEventId.MARKER_SELECTION,
 					tourMarkerSelection,
 					_part);
@@ -2609,11 +2617,6 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 	public void setIsDisplayedInDialog(final boolean isDisplayedInDialog) {
 
 		_isDisplayedInDialog = isDisplayedInDialog;
-	}
-
-	public void setIsShowMarkerActions(final boolean isShowMarkerActions) {
-
-		_markerTooltip.setIsShowMarkerActions(isShowMarkerActions);
 	}
 
 	/**
@@ -3485,6 +3488,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
 		_tourInfoIconToolTipProvider.setTourData(_tourData);
 		_valuePointToolTip.setTourData(_tourData);
+		_markerTooltip.setIsShowMarkerActions(_tourData.isMultipleTours == false);
 	}
 
 	private void updateUI_Marker(final Boolean isMarkerVisible) {

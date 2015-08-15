@@ -63,6 +63,8 @@ public class Messages extends NLS {
 	public static String		Graph_Label_Speed;
 	public static String		Graph_Label_Temperature;
 	public static String		Graph_Label_TimeDuration;
+	public static String	Graph_Label_Time;
+
 	public static String		Graph_Label_TimeOfDay;
 	public static String		Graph_Label_Tour;
 	public static String		Graph_Label_Tour_Compare;

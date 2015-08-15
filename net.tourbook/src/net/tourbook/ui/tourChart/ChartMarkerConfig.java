@@ -22,6 +22,7 @@ import org.eclipse.swt.graphics.RGB;
 public class ChartMarkerConfig {
 
 	public boolean						isDrawMarkerWithDefaultColor;
+	public boolean						isShowAbsoluteValues;
 	public boolean						isShowHiddenMarker;
 	public boolean						isShowLabelTempPos;
 	public boolean						isShowMarkerLabel;

@@ -1140,7 +1140,7 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 	public String[]												multipleTourTitles;
 
 	/**
-	 * Number of tour markers in each tour.
+	 * Contains the number of tour markers for each tour.
 	 */
 	@Transient
 	public int[]												multipleNumberOfMarkers;

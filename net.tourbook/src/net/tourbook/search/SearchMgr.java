@@ -484,7 +484,7 @@ public class SearchMgr implements XHRHandler {
 
 		updateSelectionProvider(markerSelection);
 
-		TourManager.fireEvent(//
+		TourManager.fireEventWithCustomData(//
 				TourEventId.MARKER_SELECTION,
 				markerSelection,
 				_searchView.getPart());
@@ -535,7 +535,10 @@ public class SearchMgr implements XHRHandler {
 
 		updateSelectionProvider(selection);
 
-		TourManager.fireEvent(TourEventId.TOUR_SELECTION, selection, _searchView.getPart());
+		TourManager.fireEventWithCustomData(//
+				TourEventId.TOUR_SELECTION,
+				selection,
+				_searchView.getPart());
 	}
 
 	private static void hrefAction_WayPoint(final String action, final long tourId, final long markerId) {

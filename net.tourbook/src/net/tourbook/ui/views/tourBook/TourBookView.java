@@ -2866,7 +2866,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 
 			// this view can be inactive -> selection is not fired with the SelectionProvider interface
 
-			TourManager.fireEvent(TourEventId.TOUR_SELECTION, selection, this);
+			TourManager.fireEventWithCustomData(TourEventId.TOUR_SELECTION, selection, this);
 
 		} else {
 

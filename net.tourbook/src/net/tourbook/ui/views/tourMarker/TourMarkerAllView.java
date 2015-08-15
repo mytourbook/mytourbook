@@ -1156,7 +1156,7 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 				 */
 				_postSelectionProvider.setSelectionNoFireEvent(selectionTourIds);
 
-				TourManager.fireEvent(//
+				TourManager.fireEventWithCustomData(//
 						TourEventId.MARKER_SELECTION,
 						new SelectionTourMarker(tourData, selectedTourMarkers),
 						getSite().getPart());

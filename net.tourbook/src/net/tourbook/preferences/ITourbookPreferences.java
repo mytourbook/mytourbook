@@ -89,6 +89,7 @@ public interface ITourbookPreferences {
 	public static final String	GRAPH_MARKER_COLOR_HIDDEN						= "GRAPH_MARKER_COLOR_HIDDEN";								//$NON-NLS-1$
 	public static final String	GRAPH_MARKER_IS_DRAW_WITH_DEFAULT_COLOR			= "GRAPH_MARKER_IS_DRAW_WITH_DEFAULT_COLOR";				//$NON-NLS-1$
 	public static final String	GRAPH_MARKER_IS_MODIFIED						= "GRAPH_MARKER_IS_MODIFIED";								//$NON-NLS-1$
+	public static final String	GRAPH_MARKER_IS_SHOW_ABSOLUTE_VALUES			= "GRAPH_MARKER_IS_SHOW_ABSOLUTE_VALUES";					//$NON-NLS-1$
 	public static final String	GRAPH_MARKER_IS_SHOW_HIDDEN_MARKER				= "GRAPH_MARKER_IS_SHOW_HIDDEN_MARKER";					//$NON-NLS-1$
 	public static final String	GRAPH_MARKER_IS_SHOW_LABEL_TEMP_POSITION		= "GRAPH_MARKER_IS_SHOW_LABEL_TEMP_POSITION";				//$NON-NLS-1$
 	public static final String	GRAPH_MARKER_IS_SHOW_MARKER_LABEL				= "GRAPH_MARKER_IS_SHOW_MARKER_LABEL";						//$NON-NLS-1$

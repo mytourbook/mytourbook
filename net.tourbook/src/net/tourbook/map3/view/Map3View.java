@@ -383,7 +383,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 					_currentLeftSliderValueIndex,
 					_currentRightSliderValueIndex);
 
-			TourManager.fireEvent(//
+			TourManager.fireEventWithCustomData(//
 					TourEventId.SLIDER_POSITION_CHANGED,
 					sliderSelection,
 					Map3View.this);

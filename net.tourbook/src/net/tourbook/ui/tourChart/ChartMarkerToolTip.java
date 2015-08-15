@@ -63,7 +63,7 @@ import org.eclipse.swt.widgets.ToolBar;
 public class ChartMarkerToolTip extends AnimatedToolTipShell implements ITourProvider {
 
 	private static final String				GRAPH_LABEL_ALTITUDE			= net.tourbook.common.Messages.Graph_Label_Altitude;
-	private static final String				GRAPH_LABEL_TIME_DURATION		= net.tourbook.common.Messages.Graph_Label_TimeDuration;
+	private static final String				GRAPH_LABEL_TIME				= net.tourbook.common.Messages.Graph_Label_Time;
 	private static final String				GRAPH_LABEL_DISTANCE			= net.tourbook.common.Messages.Graph_Label_Distance;
 
 	private static final int				DEFAULT_TEXT_WIDTH				= 50;
@@ -202,10 +202,12 @@ public class ChartMarkerToolTip extends AnimatedToolTipShell implements ITourPro
 
 	private void createActions() {
 
+		final boolean isSingleTour = _tourData.isMultipleTours == false;
+
 		_actionOpenMarkerDialog = new ActionOpenMarkerDialogInTooltip();
 
 		// setup action for the current tour marker
-		_actionOpenMarkerDialog.setEnabled(true);
+		_actionOpenMarkerDialog.setEnabled(isSingleTour);
 		_actionOpenMarkerDialog.setTourMarker(_hoveredTourMarker);
 	}
 
@@ -387,42 +389,82 @@ public class ChartMarkerToolTip extends AnimatedToolTipShell implements ITourPro
 				.applyTo(container);
 		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
 		{
-			/*
-			 * Altitude
-			 */
-			final boolean isAvailableAltitude = _tourData.getAltitudeSerie() != null;
-			if (isAvailableAltitude) {
+			{
+				/*
+				 * Altitude
+				 */
+				final boolean isAvailableAltitude = _tourData.getAltitudeSerie() != null;
+				if (isAvailableAltitude) {
 
-				final String valueText = _nf1NoGroup.format(_tourData.getAltitudeSmoothedSerie(false)[valueIndex]);
+					final String valueText = _nf1NoGroup.format(_tourData.getAltitudeSmoothedSerie(false)[valueIndex]);
 
-				createUI_72_ValueField(container, GRAPH_LABEL_ALTITUDE, UI.UNIT_LABEL_ALTITUDE, valueText);
+					createUI_72_ValueField(container, GRAPH_LABEL_ALTITUDE, UI.UNIT_LABEL_ALTITUDE, valueText);
+				}
 			}
 
-			/*
-			 * Distance
-			 */
-			final boolean isAvailableDistance = _tourData.distanceSerie != null;
-			if (isAvailableDistance) {
+			{
+				/*
+				 * Distance
+				 */
+				float distance = Float.MIN_VALUE;
 
-				final float distance = _tourData.distanceSerie[valueIndex]
-						/ 1000
-						/ net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
+				if (_cmc.isShowAbsoluteValues) {
 
-				final String valueText = _nf3NoGroup.format(distance);
+					// absolute distance
 
-				createUI_72_ValueField(container, GRAPH_LABEL_DISTANCE, UI.UNIT_LABEL_DISTANCE, valueText);
+					if (_tourData.distanceSerie != null) {
+						distance = _tourData.distanceSerie[valueIndex];
+					}
+
+				} else {
+
+					// relative distance
+
+					final float markerDistance = _hoveredTourMarker.getDistance();
+					if (markerDistance != 1) {
+						distance = markerDistance;
+					}
+				}
+
+				if (distance != Float.MIN_VALUE) {
+
+					distance = distance //
+							/ 1000
+							/ net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
+
+					final String valueText = _nf3NoGroup.format(distance);
+
+					createUI_72_ValueField(container, GRAPH_LABEL_DISTANCE, UI.UNIT_LABEL_DISTANCE, valueText);
+				}
 			}
 
-			/*
-			 * Duration
-			 */
-			final boolean isAvailableTimeDuration = _tourData.timeSerie != null;
-			if (isAvailableTimeDuration) {
+			{
+				/*
+				 * Duration
+				 */
+				int timeValue = Integer.MIN_VALUE;
 
-				final int[] timeSerie = _tourData.timeSerie;
-				final String valueText = net.tourbook.ui.UI.format_hhh_mm_ss(timeSerie[valueIndex]);
+				if (_cmc.isShowAbsoluteValues) {
 
-				createUI_72_ValueField(container, GRAPH_LABEL_TIME_DURATION, UI.UNIT_LABEL_TIME, valueText);
+					// absolute time
+
+					if (_tourData.timeSerie != null) {
+						timeValue = _tourData.timeSerie[valueIndex];
+					}
+
+				} else {
+
+					// relative time
+
+					timeValue = _hoveredTourMarker.getTime();
+				}
+
+				if (timeValue != Integer.MIN_VALUE) {
+
+					final String valueText = net.tourbook.ui.UI.format_hhh_mm_ss(timeValue);
+
+					createUI_72_ValueField(container, GRAPH_LABEL_TIME, UI.UNIT_LABEL_TIME, valueText);
+				}
 			}
 		}
 

@@ -1128,7 +1128,7 @@ public class TourMapPainter extends MapPainter {
 
 			for (int markerIndex = 0; markerIndex < allTourMarkers.size(); markerIndex++) {
 
-				if (markerIndex >= numberOfMultiMarkers) {
+				while (markerIndex >= numberOfMultiMarkers) {
 
 					// setup next tour
 

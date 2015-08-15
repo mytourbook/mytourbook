@@ -415,6 +415,15 @@ public abstract class AnimatedToolTipShell {
 
 				if (_isShellFadingIn) {
 
+					if (_fadeInDelayCounter++ < _fadeInDelaySteps) {
+
+						// delay fade in
+
+						_display.timerExec(FADE_TIME_INTERVAL, _animationTimer);
+
+						return;
+					}
+
 					final int shellStartX = _shellStartLocation.x;
 					final int shellStartY = _shellStartLocation.y;
 					final int shellEndX = _shellEndLocation.x;

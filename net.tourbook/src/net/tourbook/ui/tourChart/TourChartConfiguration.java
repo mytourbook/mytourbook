@@ -134,6 +134,7 @@ public class TourChartConfiguration {
 	public boolean					isShowMarkerLabel;
 
 	public boolean					isShowMarkerTooltip;
+	public boolean					isShowAbsoluteValues;
 
 	public int						markerTooltipPosition	= ChartMarkerToolTip.DEFAULT_TOOLTIP_POSITION;
 
@@ -224,6 +225,7 @@ public class TourChartConfiguration {
 
 		isDrawMarkerWithDefaultColor = _prefStore.getBoolean(//
 				ITourbookPreferences.GRAPH_MARKER_IS_DRAW_WITH_DEFAULT_COLOR);
+		isShowAbsoluteValues = _prefStore.getBoolean(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_ABSOLUTE_VALUES);
 		isShowHiddenMarker = _prefStore.getBoolean(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_HIDDEN_MARKER);
 		isShowLabelTempPos = _prefStore.getBoolean(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_LABEL_TEMP_POSITION);
 		isShowMarkerLabel = _prefStore.getBoolean(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_MARKER_LABEL);

@@ -1207,6 +1207,10 @@ public class Messages extends NLS {
 	public static String		Search_View_Link_LinuxBrowser;
 	public static String		Search_View_Link_SetupExternalBrowser;
 
+	public static String	Slideout_ChartMarkerOptions_Checkbox_IsShowAbsoluteValues;
+
+	public static String	Slideout_ChartMarkerOptions_Checkbox_IsShowAbsoluteValues_Tooltip;
+
 	public static String		Slideout_ChartMarkerOptions_Checkbox_IsShowHiddenMarker;
 	public static String		Slideout_ChartMarkerOptions_Checkbox_IsShowMarker;
 	public static String		Slideout_ChartMarkerOptions_Checkbox_IsShowMarkerPoint;

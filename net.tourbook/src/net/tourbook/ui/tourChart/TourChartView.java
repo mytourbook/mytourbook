@@ -362,9 +362,6 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 		_tourChart.setToolBarManager(getViewSite().getActionBars().getToolBarManager(), true);
 		_tourChart.setContextProvider(new TourChartContextProvider(this), true);
 
-		// allow the marker tooltip in the tour chart to open the marker dialog
-		_tourChart.setIsShowMarkerActions(true);
-
 		_tourChartConfig = TourManager.createDefaultTourChartConfig();
 
 		// set chart title
@@ -633,12 +630,12 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 		_isInSelectionChanged = true;
 		{
 			final TourData tourData = markerSelection.getTourData();
-			final long markerTourId = tourData.getTourId().longValue();
+			final Long markerTourId = tourData.getTourId();
 
 			/*
 			 * check if the marker tour is displayed
 			 */
-			if (_tourData == null || _tourData.getTourId().longValue() != markerTourId) {
+			if (_tourData == null || _tourData.getTourId().equals(markerTourId)) {
 
 				// show tour
 
@@ -650,8 +647,15 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 			 */
 			final ArrayList<TourMarker> tourMarker = markerSelection.getSelectedTourMarker();
 			final int numberOfTourMarkers = tourMarker.size();
+			final TourMarker firstTourMarker = tourMarker.get(0);
 
-			int leftSliderValueIndex = tourMarker.get(0).getSerieIndex();
+			int leftSliderValueIndex;
+			if (tourData.isMultipleTours) {
+				leftSliderValueIndex = firstTourMarker.getMultiTourSerieIndex();
+			} else {
+				leftSliderValueIndex = firstTourMarker.getSerieIndex();
+			}
+
 			int rightSliderValueIndex = 0;
 
 			if (numberOfTourMarkers == 1) {
@@ -660,8 +664,13 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 
 			} else if (numberOfTourMarkers > 1) {
 
-				leftSliderValueIndex = tourMarker.get(0).getSerieIndex();
-				rightSliderValueIndex = tourMarker.get(numberOfTourMarkers - 1).getSerieIndex();
+				final TourMarker lastTourMarker = tourMarker.get(numberOfTourMarkers - 1);
+
+				if (tourData.isMultipleTours) {
+					rightSliderValueIndex = lastTourMarker.getMultiTourSerieIndex();
+				} else {
+					rightSliderValueIndex = lastTourMarker.getSerieIndex();
+				}
 			}
 
 			final SelectionChartXSliderPosition xSliderPosition = new SelectionChartXSliderPosition(
@@ -767,7 +776,7 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 	 */
 	private void updateChart(final ArrayList<Long> tourIds) {
 
-		final TourData multipleTourData = TourManager.createMultipleTourData(tourIds);
+		final TourData multipleTourData = TourManager.getMultipleTourData(tourIds);
 
 		updateChart(multipleTourData);
 
