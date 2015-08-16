@@ -203,13 +203,13 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
 	private OpenDialogManager			_openDlgMgr								= new OpenDialogManager();
 
-	private TourToolTip					_tourInfoIconToolTip;
-	private TourInfoIconToolTipProvider	_tourInfoIconToolTipProvider;
+	private TourToolTip					_tourInfoIconTooltip;
+	private TourInfoIconToolTipProvider	_tourInfoIconTooltipProvider;
 	private ChartPhotoToolTip			_photoTooltip;
 
-	private ChartMarkerToolTip			_markerTooltip;
-	private ChartTitleToolTip			_tourTitleToolTipProvider;
-	private ValuePointToolTipUI			_valuePointToolTip;
+	private ChartMarkerToolTip			_tourMarkerTooltip;
+	private ChartTitleToolTip			_tourTitleTooltip;
+	private ValuePointToolTipUI			_valuePointTooltip;
 	private ControlListener				_ttControlListener						= new ControlListener();
 
 	private IMouseListener				_mouseMarkerListener					= new MouseMarkerListener();
@@ -547,11 +547,11 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		/*
 		 * setup tour info icon into the left axis
 		 */
-		_tourInfoIconToolTipProvider = new TourInfoIconToolTipProvider();
-		_tourInfoIconToolTip = new TourToolTip(getToolTipControl());
-		_tourInfoIconToolTip.addToolTipProvider(_tourInfoIconToolTipProvider);
+		_tourInfoIconTooltipProvider = new TourInfoIconToolTipProvider();
+		_tourInfoIconTooltip = new TourToolTip(getToolTipControl());
+		_tourInfoIconTooltip.addToolTipProvider(_tourInfoIconTooltipProvider);
 
-		_tourInfoIconToolTip.addHideListener(new IToolTipHideListener() {
+		_tourInfoIconTooltip.addHideListener(new IToolTipHideListener() {
 			@Override
 			public void afterHideToolTip(final Event event) {
 
@@ -559,12 +559,12 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 				getToolTipControl().afterHideToolTip(event);
 			}
 		});
-		setTourInfoIconToolTipProvider(_tourInfoIconToolTipProvider);
+		setTourInfoIconToolTipProvider(_tourInfoIconTooltipProvider);
 
 		/*
 		 * Setup tour title tooltip
 		 */
-		_tourTitleToolTipProvider = new ChartTitleToolTip(this);
+		_tourTitleTooltip = new ChartTitleToolTip(this);
 
 		/*
 		 * setup value point tooltip
@@ -581,11 +581,14 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 				handleTooltipMouseEvent(event, mouseDisplayPosition);
 			}
 		};
-		_valuePointToolTip = new ValuePointToolTipUI(vpToolTipOwner, _state);
-		setValuePointToolTipProvider(_valuePointToolTip);
+		_valuePointTooltip = new ValuePointToolTipUI(vpToolTipOwner, _state);
+		setValuePointToolTipProvider(_valuePointTooltip);
 
 		_photoTooltip = new ChartPhotoToolTip(this, _state);
-		_markerTooltip = new ChartMarkerToolTip(this);
+		_tourMarkerTooltip = new ChartMarkerToolTip(this);
+
+		// show delayed that it is not flickering when moving the mouse fast
+		_tourMarkerTooltip.setFadeInDelayTime(50);
 
 		setHoveredListener(new HoveredValueListener());
 	}
@@ -992,7 +995,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 					isChartModified = true;
 					keepMinMax = false;
 
-					_valuePointToolTip.reopen();
+					_valuePointTooltip.reopen();
 
 				}
 
@@ -1332,6 +1335,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		chartLabel.serieIndex = xAxisSerieIndex;
 
 		chartLabel.markerLabel = markerLabel;
+		chartLabel.isDescription = isDescription;
 		chartLabel.visualPosition = labelPosition;
 		chartLabel.type = tourMarker.getType();
 		chartLabel.visualType = tourMarker.getVisibleType();
@@ -1591,6 +1595,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		cmc.isShowMarkerLabel = _tcc.isShowMarkerLabel;
 		cmc.isShowMarkerTooltip = _tcc.isShowMarkerTooltip;
 		cmc.isShowMarkerPoint = _tcc.isShowMarkerPoint;
+		cmc.isShowOnlyWithDescription = _tcc.isShowOnlyWithDescription;
 		cmc.isShowSignImage = _tcc.isShowSignImage;
 		cmc.isShowLabelTempPos = _tcc.isShowLabelTempPos;
 
@@ -1619,7 +1624,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		}
 
 		_layerMarker.setChartMarkerConfig(cmc);
-		_markerTooltip.setChartMarkerConfig(cmc);
+		_tourMarkerTooltip.setChartMarkerConfig(cmc);
 
 		// set data serie for the x-axis
 		final double[] xAxisSerie = _tcc.isShowTimeOnXAxis ? //
@@ -1802,6 +1807,11 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 				TourSegmenterView.STATE_IS_SHOW_SEGMENTER_VALUE,
 				TourSegmenterView.STATE_IS_SHOW_SEGMENTER_VALUE_DEFAULT);
 
+		final boolean isShowDecimalPlaces = Util.getStateBoolean(
+				_segmenterState,
+				TourSegmenterView.STATE_IS_SHOW_SEGMENTER_DECIMAL_PLACES,
+				TourSegmenterView.STATE_IS_SHOW_SEGMENTER_DECIMAL_PLACES_DEFAULT);
+
 		final int stackedValues = Util.getStateInt(
 				_segmenterState,
 				TourSegmenterView.STATE_STACKED_VISIBLE_VALUES,
@@ -1820,6 +1830,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		_layerSegmentAltitude.setIsShowSegmenterMarker(isShowSegmenterMarker);
 		_layerSegmentAltitude.setIsShowSegmenterValue(isShowSegmenterValue);
 		_layerSegmentAltitude.setStackedValues(stackedValues);
+		_layerSegmentAltitude.setIsShowDecimalPlaces(isShowDecimalPlaces);
 
 		for (final int serieIndex : segmentSerie) {
 
@@ -1839,6 +1850,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		_layerSegmentOther.setXDataSerie(xDataSerie);
 		_layerSegmentOther.setIsShowSegmenterValues(isShowSegmenterValue);
 		_layerSegmentOther.setStackedValues(stackedValues);
+		_layerSegmentOther.setIsShowDecimalPlaces(isShowDecimalPlaces);
 
 		// draw the graph lighter that the segments are more visible
 		final int graphAlpha = Util.getStateInt(
@@ -2170,7 +2182,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		// disable selection
 		_selectedTourMarker = null;
 
-		_markerTooltip.hideNow();
+		_tourMarkerTooltip.hideNow();
 	}
 
 	private void hidePhotoLayer() {
@@ -2233,7 +2245,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
 		setHoveredSegment(null);
 
-		_tourTitleToolTipProvider.hide();
+		_tourTitleTooltip.hide();
 	}
 
 	private void onChartSegment_MouseMove(final ChartMouseEvent mouseEvent) {
@@ -2277,12 +2289,12 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 				// show/hide tooltip
 				if (hoveredSegment == null) {
 
-					_tourTitleToolTipProvider.hide();
+					_tourTitleTooltip.hide();
 
 				} else {
 
-					_openDlgMgr.closeOpenedDialogs(_tourTitleToolTipProvider);
-					_tourTitleToolTipProvider.open(hoveredSegment);
+					_openDlgMgr.closeOpenedDialogs(_tourTitleTooltip);
+					_tourTitleTooltip.open(hoveredSegment);
 				}
 			}
 
@@ -2290,7 +2302,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
 			// hide tooltip when not yet hidden
 
-			_tourTitleToolTipProvider.hide();
+			_tourTitleTooltip.hide();
 		}
 	}
 
@@ -2300,7 +2312,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
 		setHoveredSegment(null);
 
-		_tourTitleToolTipProvider.hide();
+		_tourTitleTooltip.hide();
 	}
 
 	private void onDispose() {
@@ -2314,7 +2326,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		_photoOverlayBGColorLink.dispose();
 		_photoOverlayBGColorTour.dispose();
 
-		_valuePointToolTip.hide();
+		_valuePointTooltip.hide();
 	}
 
 	private void onMarker_ChartResized() {
@@ -2326,7 +2338,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		// ensure that a marker do not keeps hovered state when chart is zoomed
 		_layerMarker.resetHoveredState();
 
-		_markerTooltip.hideNow();
+		_tourMarkerTooltip.hideNow();
 	}
 
 	private void onMarker_MouseDoubleClick(final ChartMouseEvent event) {
@@ -2421,7 +2433,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
 			// marker tooltip is displayed
 
-			_markerTooltip.open(hoveredLabel);
+			_tourMarkerTooltip.open(hoveredLabel);
 		}
 	}
 
@@ -2506,7 +2518,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 	public void partIsHidden() {
 
 		// hide value point tooltip
-		_valuePointToolTip.setShellVisible(false);
+		_valuePointTooltip.setShellVisible(false);
 
 		// hide photo tooltip
 		_photoTooltip.hide();
@@ -2515,7 +2527,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 	public void partIsVisible() {
 
 		// show tool tip again
-		_valuePointToolTip.setShellVisible(true);
+		_valuePointTooltip.setShellVisible(true);
 	}
 
 	public void removeTourMarkerSelectionListener(final ITourMarkerSelectionListener listener) {
@@ -2538,7 +2550,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 	void saveState() {
 
 		_photoTooltip.saveState();
-		_valuePointToolTip.saveState();
+		_valuePointTooltip.saveState();
 	}
 
 	void selectMarker(final SelectionChartXSliderPosition xSliderPosition) {
@@ -2765,8 +2777,8 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 	 */
 	public void setTourInfoActionsEnabled(final boolean isEnabled) {
 
-		if (_tourInfoIconToolTipProvider != null) {
-			_tourInfoIconToolTipProvider.setActionsEnabled(isEnabled);
+		if (_tourInfoIconTooltipProvider != null) {
+			_tourInfoIconTooltipProvider.setActionsEnabled(isEnabled);
 		}
 	}
 
@@ -2793,7 +2805,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
 		ctConfig.isMultipleSegments = _tourData.isMultipleTours;
 
-		_tourTitleToolTipProvider.setFadeInDelayTime(_tcc.tourInfoTooltipDelay);
+		_tourTitleTooltip.setFadeInDelayTime(_tcc.tourInfoTooltipDelay);
 	}
 
 	/**
@@ -3099,7 +3111,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 			_tourData = null;
 			_tcc = null;
 
-			_valuePointToolTip.setTourData(null);
+			_valuePointTooltip.setTourData(null);
 
 			// disable all actions
 			if (_allTourChartActions != null) {
@@ -3291,7 +3303,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		 */
 		tourAction = _allTourChartActions.get(ACTION_ID_IS_SHOW_VALUEPOINT_TOOLTIP);
 		tourAction.setEnabled(true);
-		final boolean isVisible = _valuePointToolTip.isVisible();
+		final boolean isVisible = _valuePointTooltip.isVisible();
 		tourAction.setChecked(isVisible);
 
 		/*
@@ -3417,7 +3429,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
 			// there are no new tour data
 
-			_valuePointToolTip.setTourData(null);
+			_valuePointTooltip.setTourData(null);
 			return;
 		}
 
@@ -3486,9 +3498,9 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 			setMouseMode(_prefStore.getString(ITourbookPreferences.GRAPH_MOUSE_MODE).equals(Chart.MOUSE_MODE_SLIDER));
 		}
 
-		_tourInfoIconToolTipProvider.setTourData(_tourData);
-		_valuePointToolTip.setTourData(_tourData);
-		_markerTooltip.setIsShowMarkerActions(_tourData.isMultipleTours == false);
+		_tourInfoIconTooltipProvider.setTourData(_tourData);
+		_valuePointTooltip.setTourData(_tourData);
+		_tourMarkerTooltip.setIsShowMarkerActions(_tourData.isMultipleTours == false);
 	}
 
 	private void updateUI_Marker(final Boolean isMarkerVisible) {

@@ -45,7 +45,7 @@ public abstract class AnimatedToolTipShell {
 	public static final int				MOUSE_OVER_BEHAVIOUR_IGNORE_OWNER		= 1;
 
 	/**
-	 * how long each tick is when fading in/out (in ms)
+	 * How long each tick is when fading in/out (in ms)
 	 */
 	private static final int			FADE_TIME_INTERVAL						= UI.IS_OSX ? 10 : 10;
 
@@ -116,7 +116,13 @@ public abstract class AnimatedToolTipShell {
 	private boolean						_isReceiveOnMouseExit;
 	private boolean						_isReceiveOnMouseMove;
 
+	/**
+	 * Number of {@link #FADE_IN_STEPS} until the tooltip starts to fade in.
+	 */
+	private int							_fadeInDelaySteps;
+
 	private int							_fadeInSteps							= FADE_IN_STEPS;
+	private int							_fadeInDelayCounter;
 	private int							_fadeOutSteps							= FADE_OUT_STEPS;
 	private int							_fadeOutDelaySteps						= FADE_OUT_DELAY_STEPS;
 
@@ -363,10 +369,11 @@ public abstract class AnimatedToolTipShell {
 
 				// shell is not visible, set position directly without moving animation, do only fading animation
 
+				_fadeInDelayCounter = 0;
+
 				_shellStartLocation = _shellEndLocation;
 
 				_shell.setLocation(_shellStartLocation.x, _shellStartLocation.y);
-
 				_shell.setAlpha(0);
 
 				setShellVisible(true);
@@ -1212,6 +1219,10 @@ public abstract class AnimatedToolTipShell {
 		_mouseOverBehaviour = mouseOverBehaviour;
 	}
 
+	public void setFadeInDelayTime(final int delayTimeInMS) {
+		_fadeInDelaySteps = delayTimeInMS / FADE_TIME_INTERVAL;
+	}
+
 	public void setFadeInSteps(final int fadeInSteps) {
 		_fadeInSteps = fadeInSteps;
 	}
@@ -1329,6 +1340,14 @@ public abstract class AnimatedToolTipShell {
 	private void ttHide() {
 
 		if (isShellHidden()) {
+			return;
+		}
+
+		if (_fadeInDelayCounter < _fadeInDelaySteps) {
+
+			// fading in have not yet started -> hide shell
+			setShellVisible(false);
+
 			return;
 		}
 

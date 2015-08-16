@@ -34,7 +34,6 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Display;
 
@@ -43,7 +42,6 @@ import org.eclipse.swt.widgets.Display;
  */
 public class ChartLayerSegmentValue implements IChartLayer {
 
-	private RGB					textColorRGB	= new RGB(0x20, 0x20, 0x20);
 
 	private TourChart			_tourChart;
 	private TourData			_tourData;
@@ -51,8 +49,10 @@ public class ChartLayerSegmentValue implements IChartLayer {
 
 	private int					_stackedValues;
 	private boolean				_isShowSegmenterValues;
+	private boolean				_isShowDecimalPlaces;
 
 	private final NumberFormat	_nf1			= NumberFormat.getNumberInstance();
+
 	{
 		_nf1.setMinimumFractionDigits(1);
 		_nf1.setMaximumFractionDigits(1);
@@ -133,7 +133,6 @@ public class ChartLayerSegmentValue implements IChartLayer {
 		gc.setClipping(0, devYTop, graphWidth, devYBottom - devYTop);
 
 		final Color lineColor = new Color(display, segmentConfig.segmentLineColor);
-//		final Color textColor = new Color(display, textColorRGB);
 		final Color textColor = new Color(display, segmentConfig.segmentLineColor);
 		{
 			Point previousValue = null;
@@ -193,8 +192,15 @@ public class ChartLayerSegmentValue implements IChartLayer {
 				} else {
 
 					if (graphYValue < 0.0 || graphYValue > 0.0) {
-						valueText = _nf1.format(graphYValue);
+
+						valueText = _isShowDecimalPlaces //
+								? _nf1.format(graphYValue)
+								: Integer.toString((int) (graphYValue > 0 //
+										? (graphYValue + 0.5)
+										: (graphYValue - 0.5)));
+
 					} else {
+
 						// hide digits
 						valueText = UI.ZERO;
 					}
@@ -310,6 +316,10 @@ public class ChartLayerSegmentValue implements IChartLayer {
 
 		// restore font
 		gc.setFont(fontBackup);
+	}
+
+	void setIsShowDecimalPlaces(final boolean isShowDecimalPlaces) {
+		_isShowDecimalPlaces = isShowDecimalPlaces;
 	}
 
 	void setIsShowSegmenterValues(final boolean isShowSegmenterValues) {

@@ -241,6 +241,12 @@ public class ChartLayerMarker implements IChartLayer, IChartOverlay {
 				}
 			}
 
+			if (_cmc.isShowOnlyWithDescription && chartLabel.isDescription == false) {
+
+				// skip marker which do not have a description
+				continue;
+			}
+
 			final boolean isEditColor = chartLabel.visualType != ChartLabel.VISIBLE_TYPE_DEFAULT;
 			final boolean isTextBgTransparent = isEditColor == false;
 			Color markerColor;

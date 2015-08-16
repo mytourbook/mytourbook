@@ -307,6 +307,7 @@ public class Messages extends NLS {
 	public static String		App_Action_open_preferences;
 	public static String		App_Action_OpenOtherViews;
 	public static String		App_Action_Remove;
+	public static String		App_Action_RestoreDefault_Tooltip;
 	public static String		App_Action_set_tour_type;
 	public static String		App_Action_Save;
 	public static String		App_Action_SetPerson;
@@ -631,6 +632,8 @@ public class Messages extends NLS {
 	public static String		Image__App_Close;
 	public static String		Image__App_Edit_Paste;
 	public static String		Image__App_OK;
+
+	public static String	Image__App_RestoreDefault;
 	public static String		Image__App_Trash;
 	public static String		Image__App_Trash_Disabled;
 	public static String		Image__ArrowDown;
@@ -1217,6 +1220,8 @@ public class Messages extends NLS {
 	public static String		Slideout_ChartMarkerOptions_Checkbox_IsShowMarkerTooltip;
 	public static String		Slideout_ChartMarkerOptions_Checkbox_IsShowMarkerWithDefaultColor;
 	public static String		Slideout_ChartMarkerOptions_Checkbox_IsShowMarkerWithDefaultColor_Tooltip;
+
+	public static String	Slideout_ChartMarkerOptions_Checkbox_IsShowOnlyWithDescription;
 //	public static String		Slideout_ChartMarkerOptions_Checkbox_IsShowSignImage;
 	public static String		Slideout_ChartMarkerOptions_Checkbox_IsShowTempPosition;
 	public static String		Slideout_ChartMarkerOptions_Checkbox_IsShowTempPosition_Tooltip;
@@ -1232,6 +1237,8 @@ public class Messages extends NLS {
 	public static String		Slideout_ChartMarkerOptions_Label_MarkerSize_Tooltip;
 	public static String		Slideout_ChartMarkerOptions_Label_Offset;
 	public static String		Slideout_ChartMarkerOptions_Label_Offset_Tooltip;
+
+	public static String	Slideout_SegmenterChartOptions_Checkbox_IsShowDecimalPlaces;
 
 	public static String		Slideout_SegmenterChartOptions_Checkbox_IsShowSegmentMarker;
 	public static String		Slideout_SegmenterChartOptions_Checkbox_IsShowSegmentValue;

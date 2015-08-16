@@ -1,16 +1,17 @@
-Version 15.8.0                                             ?. August 2015
+Version 15.9.0                                             ?. September 2015
 
 
 
 New
 ===
 
-Tour Chart
+* Tour Chart
 - Show/navigate multiple tours.
 - Title tooltip for each tour.
 - Customize tour info.
 - Customize segment color.
-- Show relative position value when zoomed in.
+- Zoom marker: show relative position value when zoomed in.
+- Show only tour marker which contain a description.
 
 
 Improvements
@@ -33,7 +34,7 @@ Improvements
 - Customize number of displayed digits for the lat/lon column values.
 
 * Tour Segmenter
-- Show segment values in the tour chart segments.
+- Options (value, font, opacity ...) how segments are displayed in the tour chart.
  
 Bugfix
 ======	

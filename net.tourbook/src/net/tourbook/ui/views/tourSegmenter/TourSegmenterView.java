@@ -110,77 +110,79 @@ import org.eclipse.ui.part.ViewPart;
  */
 public class TourSegmenterView extends ViewPart implements ITourViewer {
 
-	public static final String						ID										= "net.tourbook.views.TourSegmenter";	//$NON-NLS-1$
+	public static final String						ID												= "net.tourbook.views.TourSegmenter";		//$NON-NLS-1$
 
-	private static final String						DISTANCE_MILES_1_8						= "1/8";								//$NON-NLS-1$
-	private static final String						DISTANCE_MILES_1_4						= "1/4";								//$NON-NLS-1$
-	private static final String						DISTANCE_MILES_3_8						= "3/8";								//$NON-NLS-1$
-	private static final String						DISTANCE_MILES_1_2						= "1/2";								//$NON-NLS-1$
-	private static final String						DISTANCE_MILES_5_8						= "5/8";								//$NON-NLS-1$
-	private static final String						DISTANCE_MILES_3_4						= "3/4";								//$NON-NLS-1$
-	private static final String						DISTANCE_MILES_7_8						= "7/8";								//$NON-NLS-1$
+	private static final String						DISTANCE_MILES_1_8								= "1/8";									//$NON-NLS-1$
+	private static final String						DISTANCE_MILES_1_4								= "1/4";									//$NON-NLS-1$
+	private static final String						DISTANCE_MILES_3_8								= "3/8";									//$NON-NLS-1$
+	private static final String						DISTANCE_MILES_1_2								= "1/2";									//$NON-NLS-1$
+	private static final String						DISTANCE_MILES_5_8								= "5/8";									//$NON-NLS-1$
+	private static final String						DISTANCE_MILES_3_4								= "3/4";									//$NON-NLS-1$
+	private static final String						DISTANCE_MILES_7_8								= "7/8";									//$NON-NLS-1$
 
-	private static final String						FORMAT_ALTITUDE_DIFF					= "%d / %d %s";						//$NON-NLS-1$
+	private static final String						FORMAT_ALTITUDE_DIFF							= "%d / %d %s";							//$NON-NLS-1$
 
-	private static final int						SEGMENTER_REQUIRES_ALTITUDE				= 0x01;
-	private static final int						SEGMENTER_REQUIRES_DISTANCE				= 0x02;
-	private static final int						SEGMENTER_REQUIRES_PULSE				= 0x04;
-	private static final int						SEGMENTER_REQUIRES_MARKER				= 0x08;
+	private static final int						SEGMENTER_REQUIRES_ALTITUDE						= 0x01;
+	private static final int						SEGMENTER_REQUIRES_DISTANCE						= 0x02;
+	private static final int						SEGMENTER_REQUIRES_PULSE						= 0x04;
+	private static final int						SEGMENTER_REQUIRES_MARKER						= 0x08;
 
-	private static final int						MAX_DISTANCE_SPINNER_MILE				= 80;
-	private static final int						MAX_DISTANCE_SPINNER_METRIC				= 100;
+	private static final int						MAX_DISTANCE_SPINNER_MILE						= 80;
+	private static final int						MAX_DISTANCE_SPINNER_METRIC						= 100;
 
-	private static final String						STATE_DP_TOLERANCE_PULSE				= "STATE_DP_TOLERANCE_PULSE";			//$NON-NLS-1$
-	private static final String						STATE_MINIMUM_ALTITUDE					= "STATE_MINIMUM_ALTITUDE";			//$NON-NLS-1$
-	private static final String						STATE_SELECTED_DISTANCE					= "selectedDistance";					//$NON-NLS-1$
-	private static final String						STATE_SELECTED_SEGMENTER_BY_USER		= "STATE_SELECTED_SEGMENTER_BY_USER";	//$NON-NLS-1$
+	private static final String						STATE_DP_TOLERANCE_PULSE						= "STATE_DP_TOLERANCE_PULSE";				//$NON-NLS-1$
+	private static final String						STATE_MINIMUM_ALTITUDE							= "STATE_MINIMUM_ALTITUDE";				//$NON-NLS-1$
+	private static final String						STATE_SELECTED_DISTANCE							= "selectedDistance";						//$NON-NLS-1$
+	private static final String						STATE_SELECTED_SEGMENTER_BY_USER				= "STATE_SELECTED_SEGMENTER_BY_USER";		//$NON-NLS-1$
 
 	/**
 	 * Initially this was an int value, with 2 it's a string.
 	 */
-	private static final String						STATE_SELECTED_BREAK_METHOD2			= "selectedBreakMethod2";				//$NON-NLS-1$
+	private static final String						STATE_SELECTED_BREAK_METHOD2					= "selectedBreakMethod2";					//$NON-NLS-1$
 
-	private static final String						STATE_BREAK_TIME_MIN_AVG_SPEED_AS		= "selectedBreakTimeMinAvgSpeedAS";	//$NON-NLS-1$
-	private static final String						STATE_BREAK_TIME_MIN_SLICE_SPEED_AS		= "selectedBreakTimeMinSliceSpeedAS";	//$NON-NLS-1$
-	private static final String						STATE_BREAK_TIME_MIN_SLICE_TIME_AS		= "selectedBreakTimeMinSliceTimeAS";	//$NON-NLS-1$
+	private static final String						STATE_BREAK_TIME_MIN_AVG_SPEED_AS				= "selectedBreakTimeMinAvgSpeedAS";		//$NON-NLS-1$
+	private static final String						STATE_BREAK_TIME_MIN_SLICE_SPEED_AS				= "selectedBreakTimeMinSliceSpeedAS";		//$NON-NLS-1$
+	private static final String						STATE_BREAK_TIME_MIN_SLICE_TIME_AS				= "selectedBreakTimeMinSliceTimeAS";		//$NON-NLS-1$
 
-	private static final String						STATE_BREAK_TIME_MIN_AVG_SPEED			= "selectedBreakTimeMinAvgSpeed";		//$NON-NLS-1$
-	private static final String						STATE_BREAK_TIME_MIN_SLICE_SPEED		= "selectedBreakTimeMinSliceSpeed";	//$NON-NLS-1$
+	private static final String						STATE_BREAK_TIME_MIN_AVG_SPEED					= "selectedBreakTimeMinAvgSpeed";			//$NON-NLS-1$
+	private static final String						STATE_BREAK_TIME_MIN_SLICE_SPEED				= "selectedBreakTimeMinSliceSpeed";		//$NON-NLS-1$
 
-	private static final String						STATE_BREAK_TIME_MIN_DISTANCE_VALUE		= "selectedBreakTimeMinDistance";		//$NON-NLS-1$
-	private static final String						STATE_BREAK_TIME_MIN_TIME_VALUE			= "selectedBreakTimeMinTime";			//$NON-NLS-1$
-	private static final String						STATE_BREAK_TIME_SLICE_DIFF				= "selectedBreakTimeSliceDiff";		//$NON-NLS-1$
+	private static final String						STATE_BREAK_TIME_MIN_DISTANCE_VALUE				= "selectedBreakTimeMinDistance";			//$NON-NLS-1$
+	private static final String						STATE_BREAK_TIME_MIN_TIME_VALUE					= "selectedBreakTimeMinTime";				//$NON-NLS-1$
+	private static final String						STATE_BREAK_TIME_SLICE_DIFF						= "selectedBreakTimeSliceDiff";			//$NON-NLS-1$
 
 	/*
 	 * Tour segmenter
 	 */
-	public static final String						STATE_IS_SEGMENTER_ACTIVE				= "STATE_IS_SEGMENTER_ACTIVE";			//$NON-NLS-1$
-	public static final String						STATE_IS_SHOW_SEGMENTER_MARKER			= "STATE_IS_SHOW_SEGMENTER_MARKER";	//$NON-NLS-1$
-	public static final boolean						STATE_IS_SHOW_SEGMENTER_MARKER_DEFAULT	= true;
-	public static final String						STATE_IS_SHOW_SEGMENTER_VALUE			= "STATE_IS_SHOW_SEGMENTER_VALUE";		//$NON-NLS-1$
-	public static final boolean						STATE_IS_SHOW_SEGMENTER_VALUE_DEFAULT	= true;
-	public static final String						STATE_IS_SHOW_TOUR_SEGMENTS				= "STATE_IS_SHOW_TOUR_SEGMENTS";		//$NON-NLS-1$
-	public static final boolean						STATE_IS_SHOW_TOUR_SEGMENTS_DEFAULT		= true;
-	public static final String						STATE_GRAPH_ALPHA						= "STATE_GRAPH_ALPHA";					//$NON-NLS-1$
-	public static final int							STATE_GRAPH_ALPHA_DEFAULT				= 50;
-	public static final String						STATE_STACKED_VISIBLE_VALUES			= "STATE_STACKED_VISIBLE_VALUES";		//$NON-NLS-1$
-	public static final int							STATE_STACKED_VISIBLE_VALUES_DEFAULT	= 0;
+	public static final String						STATE_IS_SEGMENTER_ACTIVE						= "STATE_IS_SEGMENTER_ACTIVE";				//$NON-NLS-1$
+	public static final String						STATE_IS_SHOW_SEGMENTER_DECIMAL_PLACES			= "STATE_IS_SHOW_SEGMENTER_DECIMAL_PLACES"; //$NON-NLS-1$
+	public static final boolean						STATE_IS_SHOW_SEGMENTER_DECIMAL_PLACES_DEFAULT	= false;
+	public static final String						STATE_IS_SHOW_SEGMENTER_MARKER					= "STATE_IS_SHOW_SEGMENTER_MARKER";		//$NON-NLS-1$
+	public static final boolean						STATE_IS_SHOW_SEGMENTER_MARKER_DEFAULT			= false;
+	public static final String						STATE_IS_SHOW_SEGMENTER_VALUE					= "STATE_IS_SHOW_SEGMENTER_VALUE";			//$NON-NLS-1$
+	public static final boolean						STATE_IS_SHOW_SEGMENTER_VALUE_DEFAULT			= true;
+	public static final String						STATE_IS_SHOW_TOUR_SEGMENTS						= "STATE_IS_SHOW_TOUR_SEGMENTS";			//$NON-NLS-1$
+	public static final boolean						STATE_IS_SHOW_TOUR_SEGMENTS_DEFAULT				= true;
+	public static final String						STATE_GRAPH_ALPHA								= "STATE_GRAPH_ALPHA";						//$NON-NLS-1$
+	public static final int							STATE_GRAPH_ALPHA_DEFAULT						= 10;
+	public static final String						STATE_STACKED_VISIBLE_VALUES					= "STATE_STACKED_VISIBLE_VALUES";			//$NON-NLS-1$
+	public static final int							STATE_STACKED_VISIBLE_VALUES_DEFAULT			= 0;
 
-	private static final int						COLUMN_DEFAULT							= 0;									// sort by time
-	private static final int						COLUMN_SPEED							= 10;
-	private static final int						COLUMN_PACE								= 20;
-	private static final int						COLUMN_GRADIENT							= 30;
-	private static final int						COLUMN_PULSE							= 40;
-	private static final int						COLUMN_CADENCE							= 50;
+	private static final int						COLUMN_DEFAULT									= 0;										// sort by time
+	private static final int						COLUMN_SPEED									= 10;
+	private static final int						COLUMN_PACE										= 20;
+	private static final int						COLUMN_GRADIENT									= 30;
+	private static final int						COLUMN_PULSE									= 40;
+	private static final int						COLUMN_CADENCE									= 50;
 
-	private static final float						SPEED_DIGIT_VALUE						= 10.0f;
+	private static final float						SPEED_DIGIT_VALUE								= 10.0f;
 
-	private static final IPreferenceStore			_prefStore								= TourbookPlugin
-																									.getPrefStore();
-	private static final IDialogSettings			_state									= TourbookPlugin
-																									.getState(ID);
+	private static final IPreferenceStore			_prefStore										= TourbookPlugin
+																											.getPrefStore();
+	private static final IDialogSettings			_state											= TourbookPlugin
+																											.getState(ID);
 
-	private final boolean							_isOSX									= net.tourbook.common.UI.IS_OSX;
+	private final boolean							_isOSX											= net.tourbook.common.UI.IS_OSX;
 
 	private ColumnManager							_columnManager;
 
@@ -188,7 +190,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 	private float									_dpToleranceAltitude;
 	private float									_dpTolerancePulse;
-	private float									_savedDpToleranceAltitude				= -1;
+	private float									_savedDpToleranceAltitude						= -1;
 
 	private PostSelectionProvider					_postSelectionProvider;
 
@@ -197,14 +199,14 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	private IPropertyChangeListener					_prefChangeListener;
 	private ITourEventListener						_tourEventListener;
 
-	private final NumberFormat						_nf_0_0									= NumberFormat
-																									.getNumberInstance();
-	private final NumberFormat						_nf_1_0									= NumberFormat
-																									.getNumberInstance();
-	private final NumberFormat						_nf_1_1									= NumberFormat
-																									.getNumberInstance();
-	private final NumberFormat						_nf_3_3									= NumberFormat
-																									.getNumberInstance();
+	private final NumberFormat						_nf_0_0											= NumberFormat
+																											.getNumberInstance();
+	private final NumberFormat						_nf_1_0											= NumberFormat
+																											.getNumberInstance();
+	private final NumberFormat						_nf_1_1											= NumberFormat
+																											.getNumberInstance();
+	private final NumberFormat						_nf_3_3											= NumberFormat
+																											.getNumberInstance();
 	{
 		_nf_0_0.setMinimumFractionDigits(0);
 		_nf_0_0.setMaximumFractionDigits(0);
@@ -222,13 +224,13 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	private int										_maxDistanceSpinner;
 	private int										_spinnerDistancePage;
 
-	private boolean									_isTourDirty							= false;
+	private boolean									_isTourDirty									= false;
 	private boolean									_isSaving;
 
 	/**
 	 * when <code>true</code>, the tour dirty flag is disabled to load data into the fields
 	 */
-	private boolean									_isDirtyDisabled						= false;
+	private boolean									_isDirtyDisabled								= false;
 
 	private boolean									_isClearView;
 	private float									_altitudeUp;
@@ -239,7 +241,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	 * <p>
 	 * The sequence defines how they are displayed in the combobox.
 	 */
-	private static final ArrayList<TourSegmenter>	_allTourSegmenter						= new ArrayList<TourSegmenter>();
+	private static final ArrayList<TourSegmenter>	_allTourSegmenter								= new ArrayList<TourSegmenter>();
 
 	static {
 
@@ -279,7 +281,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 				SEGMENTER_REQUIRES_PULSE));
 	}
 
-	private ArrayList<TourSegmenter>				_availableSegmenter						= new ArrayList<TourSegmenter>();
+	private ArrayList<TourSegmenter>				_availableSegmenter								= new ArrayList<TourSegmenter>();
 
 	/**
 	 * segmenter type which the user has selected
@@ -303,7 +305,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	 * contains the controls which are displayed in the first column, these controls are used to get
 	 * the maximum width and set the first column within the differenct section to the same width
 	 */
-	private final ArrayList<Control>				_firstColBreakTime						= new ArrayList<Control>();
+	private final ArrayList<Control>				_firstColBreakTime								= new ArrayList<Control>();
 
 	private ActionModifyColumns						_actionModifyColumns;
 	private ActionTourChartSegmenterConfig			_actionTCSegmenterConfig;
@@ -2937,9 +2939,9 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 			return;
 		}
 
-		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
-				+ ("\tonSelectionChanged:\t" + selection));
-		// TODO remove SYSTEM.OUT.PRINTLN
+//		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
+//				+ ("\tonSelectionChanged:\t" + selection));
+//		// TODO remove SYSTEM.OUT.PRINTLN
 
 		/*
 		 * run selection async because a tour could be modified and needs to be saved, modifications

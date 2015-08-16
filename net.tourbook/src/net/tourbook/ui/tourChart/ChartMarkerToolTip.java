@@ -572,7 +572,7 @@ public class ChartMarkerToolTip extends AnimatedToolTipShell implements ITourPro
 		}
 
 		// add label rect
-		if (_cmc.isShowMarkerLabel) {
+		if (_cmc.isShowMarkerLabel && _hoveredLabel.paintedLabel != null) {
 
 			final Rectangle paintedLabel = _hoveredLabel.paintedLabel;
 			final int devLabelWidthRaw = paintedLabel.width;

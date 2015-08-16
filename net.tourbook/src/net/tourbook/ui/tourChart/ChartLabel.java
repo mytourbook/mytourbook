@@ -40,6 +40,7 @@ public class ChartLabel extends ChartMarker {
 	public static final int	VISIBLE_TYPE_TYPE_EDIT	= 20;
 
 	public boolean			isVisible;
+	public boolean			isDescription;
 
 	public String			markerLabel				= UI.EMPTY_STRING;
 

@@ -112,6 +112,7 @@ public class SlideoutTourChartMarker extends AnimatedToolTipShell implements ICo
 	private Button					_chkShowMarkerLabel;
 	private Button					_chkShowMarkerPoint;
 	private Button					_chkShowMarkerTooltip;
+	private Button					_chkShowOnlyWithDescription;
 
 	/**
 	 * Label temporary position, this position is not saved in the marker.
@@ -341,6 +342,19 @@ public class SlideoutTourChartMarker extends AnimatedToolTipShell implements ICo
 						.applyTo(_chkShowHiddenMarker);
 				_chkShowHiddenMarker.setText(Messages.Slideout_ChartMarkerOptions_Checkbox_IsShowHiddenMarker);
 				_chkShowHiddenMarker.addSelectionListener(_defaultSelectionAdapter);
+			}
+
+			{
+				/*
+				 * Show hidden marker
+				 */
+				_chkShowOnlyWithDescription = new Button(container, SWT.CHECK);
+				GridDataFactory.fillDefaults()//
+						.span(2, 1)
+						.applyTo(_chkShowOnlyWithDescription);
+				_chkShowOnlyWithDescription
+						.setText(Messages.Slideout_ChartMarkerOptions_Checkbox_IsShowOnlyWithDescription);
+				_chkShowOnlyWithDescription.addSelectionListener(_defaultSelectionAdapter);
 			}
 
 			{
@@ -585,6 +599,7 @@ public class SlideoutTourChartMarker extends AnimatedToolTipShell implements ICo
 		_comboLabelTempPosition.setEnabled(isLabelVisible && isShowTempPosition);
 
 		_chkShowHiddenMarker.setEnabled(isMarkerVisible);
+		_chkShowOnlyWithDescription.setEnabled(isMarkerVisible);
 		_chkDrawMarkerWithDefaultColor.setEnabled(isMarkerVisible);
 
 		_lblLabelOffset.setEnabled(isLabelVisible);
@@ -660,6 +675,7 @@ public class SlideoutTourChartMarker extends AnimatedToolTipShell implements ICo
 		final boolean isShowMarkerLabel = _chkShowMarkerLabel.getSelection();
 		final boolean isShowMarkerPoint = _chkShowMarkerPoint.getSelection();
 		final boolean isShowMarkerTooltip = _chkShowMarkerTooltip.getSelection();
+		final boolean isShowOnlyWithDescription = _chkShowOnlyWithDescription.getSelection();
 
 		final int hoverSize = _spinHoverSize.getSelection();
 		final int labelOffset = _spinLabelOffset.getSelection();
@@ -687,6 +703,7 @@ public class SlideoutTourChartMarker extends AnimatedToolTipShell implements ICo
 		_prefStore.setValue(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_MARKER_LABEL, isShowMarkerLabel);
 		_prefStore.setValue(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_MARKER_POINT, isShowMarkerPoint);
 		_prefStore.setValue(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_MARKER_TOOLTIP, isShowMarkerTooltip);
+		_prefStore.setValue(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_ONLY_WITH_DESCRIPTION, isShowOnlyWithDescription);
 
 		PreferenceConverter.setValue(_prefStore, //
 				ITourbookPreferences.GRAPH_MARKER_COLOR_DEFAULT,
@@ -708,6 +725,7 @@ public class SlideoutTourChartMarker extends AnimatedToolTipShell implements ICo
 		tcc.isShowMarkerLabel = isShowMarkerLabel;
 		tcc.isShowMarkerPoint = isShowMarkerPoint;
 		tcc.isShowMarkerTooltip = isShowMarkerTooltip;
+		tcc.isShowOnlyWithDescription = isShowOnlyWithDescription;
 
 		tcc.markerHoverSize = hoverSize;
 		tcc.markerLabelOffset = labelOffset;
@@ -795,10 +813,11 @@ public class SlideoutTourChartMarker extends AnimatedToolTipShell implements ICo
 		_chkDrawMarkerWithDefaultColor.setSelection(tcc.isDrawMarkerWithDefaultColor);
 		_chkShowAbsoluteValues.setSelection(tcc.isShowAbsoluteValues);
 		_chkShowHiddenMarker.setSelection(tcc.isShowHiddenMarker);
+		_chkShowLabelTempPosition.setSelection(tcc.isShowLabelTempPos);
 		_chkShowMarkerLabel.setSelection(tcc.isShowMarkerLabel);
 		_chkShowMarkerPoint.setSelection(tcc.isShowMarkerPoint);
 		_chkShowMarkerTooltip.setSelection(tcc.isShowMarkerTooltip);
-		_chkShowLabelTempPosition.setSelection(tcc.isShowLabelTempPos);
+		_chkShowOnlyWithDescription.setSelection(tcc.isShowOnlyWithDescription);
 
 		_comboLabelTempPosition.select(tcc.markerLabelTempPos);
 		_comboTooltipPosition.select(markerTooltipPosition);

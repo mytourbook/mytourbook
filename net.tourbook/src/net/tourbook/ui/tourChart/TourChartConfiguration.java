@@ -123,6 +123,12 @@ public class TourChartConfiguration {
 	public boolean					isShowHiddenMarker;
 
 	/**
+	 * When <code>true</code> then only markers with a description will be displayed. This makes it
+	 * easier to find marker descriptions.
+	 */
+	public boolean					isShowOnlyWithDescription;
+
+	/**
 	 * When <code>true</code>, all marker label with be drawn with default colors, otherwise they
 	 * are drawn with device or hidden color.
 	 */
@@ -231,6 +237,8 @@ public class TourChartConfiguration {
 		isShowMarkerLabel = _prefStore.getBoolean(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_MARKER_LABEL);
 		isShowMarkerPoint = _prefStore.getBoolean(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_MARKER_POINT);
 		isShowMarkerTooltip = _prefStore.getBoolean(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_MARKER_TOOLTIP);
+		isShowOnlyWithDescription = _prefStore.getBoolean(//
+				ITourbookPreferences.GRAPH_MARKER_IS_SHOW_ONLY_WITH_DESCRIPTION);
 		isShowSignImage = _prefStore.getBoolean(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_SIGN_IMAGE);
 
 		markerColorDefault = PreferenceConverter.getColor(_prefStore,//

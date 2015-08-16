@@ -52,6 +52,7 @@ public class ChartLayerSegmentAltitude implements IChartLayer {
 	private ArrayList<ChartMarker>	_chartMarkers		= new ArrayList<ChartMarker>();
 	private RGB						_lineColor			= new RGB(189, 0, 255);
 
+	private boolean					_isShowDecimalPlaces;
 	private boolean					_isShowSegmenterMarker;
 	private boolean					_isShowSegmenterValue;
 	private int						_stackedValues;
@@ -99,6 +100,7 @@ public class ChartLayerSegmentAltitude implements IChartLayer {
 		final int devYTop = graphDrawingData.getDevYTop();
 		final int devYBottom = graphDrawingData.getDevYBottom();
 		final long devGraphImageXOffset = chart.getXXDevViewPortLeftBorder();
+//		final int devGraphHeight = drawingData.devGraphHeight;
 
 		final float graphYBottom = graphDrawingData.getGraphYBottom();
 		final float[] yValues = graphDrawingData.getYData().getHighValuesFloat()[0];
@@ -106,6 +108,7 @@ public class ChartLayerSegmentAltitude implements IChartLayer {
 		final double scaleY = graphDrawingData.getScaleY();
 
 		final ValueOverlapChecker valueCheckerUp = new ValueOverlapChecker(_stackedValues);
+//		final ValueOverlapChecker valueCheckerDown = new ValueOverlapChecker(_stackedValues);
 
 		final LineAttributes defaultLineAttributes = gc.getLineAttributes();
 		final LineAttributes vertLineLA = new LineAttributes(5);
@@ -185,7 +188,12 @@ public class ChartLayerSegmentAltitude implements IChartLayer {
 				}
 				final boolean isValueUp = altiDiff >= 0;
 
-				final String valueText = _nf1.format(altiDiff);
+				final String valueText = _isShowDecimalPlaces //
+						? _nf1.format(altiDiff)
+						: Integer.toString((int) (altiDiff > 0 //
+								? (altiDiff + 0.5)
+								: (altiDiff - 0.5)));
+
 				final Point textExtent = gc.textExtent(valueText);
 
 				final int textWidth = textExtent.x;
@@ -260,13 +268,23 @@ public class ChartLayerSegmentAltitude implements IChartLayer {
 
 							final float devXNew = devXText + xGradientOffset - textWidth2;
 
+//							if (devXNew < devXPrev - textWidth2) {
+////								devXText = (int) (devXPrev - textWidth2);
+//								devXText = devXPrev;
+//							} else {
 							devXText = (int) devXNew;
+//							}
 
 						} else {
 
 							final float devXNew = devXText + xGradientOffset + textWidth2;
 
+//							if (devXNew > devXSegment) {
+////								devXText = devXText;
+//								devXText = devXSegment - textWidth;
+//							} else {
 							devXText = (int) devXNew;
+//							}
 						}
 
 						/*
@@ -274,7 +292,8 @@ public class ChartLayerSegmentAltitude implements IChartLayer {
 						 */
 						Rectangle textRect = new Rectangle(devXText, devYText, textWidth, textHeight);
 						boolean isDrawValue = true;
-
+//						if (isValueUp) {
+//
 						if (valueCheckerUp.intersectsWithValues(textRect)) {
 							devYText = valueCheckerUp.getPreviousValue().y - textHeight;
 						}
@@ -282,6 +301,24 @@ public class ChartLayerSegmentAltitude implements IChartLayer {
 						if (valueCheckerUp.intersectsNoValues(textRect)) {
 							isDrawValue = false;
 						}
+//
+//						} else {
+//
+////							if (valueCheckerDown.intersectsWithValues(textRect)) {
+////								devYText = valueCheckerDown.getPreviousValue().y + textHeight;
+////							}
+////
+////							if (valueCheckerDown.intersectsNoValues(textRect)) {
+////								isDrawValue = false;
+////							}
+//							if (valueCheckerUp.intersectsWithValues(textRect)) {
+//								devYText = valueCheckerUp.getPreviousValue().y + textHeight;
+//							}
+//
+//							if (valueCheckerUp.intersectsNoValues(textRect)) {
+//								isDrawValue = false;
+//							}
+//						}
 
 						// don't draw over the graph borders
 						if (isDrawValue && devYText > devYTop && devYText + textHeight < devYBottom) {
@@ -294,7 +331,12 @@ public class ChartLayerSegmentAltitude implements IChartLayer {
 									textWidth + 2 * margin,
 									textHeight + 2 * margin);
 
+//							if (isValueUp) {
 							valueCheckerUp.setupNext(textRect);
+//							} else {
+////								valueCheckerDown.setupNext(textRect);
+//								valueCheckerUp.setupNext(textRect);
+//							}
 
 //							// debugging
 //							gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
@@ -333,6 +375,10 @@ public class ChartLayerSegmentAltitude implements IChartLayer {
 		} else {
 			return SYSTEM_COLOR_0;
 		}
+	}
+
+	void setIsShowDecimalPlaces(final boolean isShowDecimalPlaces) {
+		_isShowDecimalPlaces = isShowDecimalPlaces;
 	}
 
 	void setIsShowSegmenterMarker(final boolean isShowSegmenterMarker) {

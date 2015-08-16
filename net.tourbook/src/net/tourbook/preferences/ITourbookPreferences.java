@@ -95,6 +95,7 @@ public interface ITourbookPreferences {
 	public static final String	GRAPH_MARKER_IS_SHOW_MARKER_LABEL				= "GRAPH_MARKER_IS_SHOW_MARKER_LABEL";						//$NON-NLS-1$
 	public static final String	GRAPH_MARKER_IS_SHOW_MARKER_POINT				= "GRAPH_MARKER_IS_SHOW_MARKER_POINT";						//$NON-NLS-1$
 	public static final String	GRAPH_MARKER_IS_SHOW_MARKER_TOOLTIP				= "GRAPH_MARKER_IS_SHOW_MARKER_TOOLTIP";					//$NON-NLS-1$
+	public static final String	GRAPH_MARKER_IS_SHOW_ONLY_WITH_DESCRIPTION		= "GRAPH_MARKER_IS_SHOW_ONLY_WITH_DESCRIPTION";			//$NON-NLS-1$
 	public static final String	GRAPH_MARKER_IS_SHOW_SIGN_IMAGE					= "GRAPH_MARKER_IS_SHOW_SIGN_IMAGE";						//$NON-NLS-1$
 	public static final String	GRAPH_MARKER_HOVER_SIZE							= "GRAPH_MARKER_HOVER_OFFSET";								//$NON-NLS-1$
 	public static final String	GRAPH_MARKER_LABEL_OFFSET						= "GRAPH_MARKER_LABEL_OFFSET";								//$NON-NLS-1$

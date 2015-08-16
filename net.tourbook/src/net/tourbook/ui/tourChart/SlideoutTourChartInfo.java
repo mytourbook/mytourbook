@@ -261,6 +261,21 @@ public class SlideoutTourChartInfo extends AnimatedToolTipShell implements IColo
 					}
 					{
 						/*
+						 * Checkbox: Segments with alternate colors
+						 */
+						_chkSegmentAlternateColor = new Button(ttContainer, SWT.CHECK);
+						_chkSegmentAlternateColor.setText(Messages.Pref_Graphs_Checkbox_SegmentAlternateColor);
+						_chkSegmentAlternateColor
+								.setToolTipText(Messages.Pref_Graphs_Checkbox_SegmentAlternateColor_Tooltip);
+						_chkSegmentAlternateColor.addSelectionListener(_defaultSelectionAdapter);
+
+						// Color: Segment alternate color
+						_colorSegmentAlternateColor = new ColorSelectorExtended(ttContainer);
+						_colorSegmentAlternateColor.addListener(_defaultChangePropertyListener);
+						_colorSegmentAlternateColor.addOpenListener(this);
+					}
+					{
+						/*
 						 * Show info tooltip
 						 */
 						_chkShowInfoTooltip = new Button(ttContainer, SWT.CHECK);
@@ -271,13 +286,12 @@ public class SlideoutTourChartInfo extends AnimatedToolTipShell implements IColo
 								Messages.Slideout_TourInfoOptions_Checkbox_IsShowInfoTooltip);
 						_chkShowInfoTooltip.addSelectionListener(_defaultSelectionAdapter);
 					}
-
 					{
 						/*
 						 * Tooltip delay
 						 */
 						// Label
-						_lblTooltipDelay = new Label(container, SWT.NONE);
+						_lblTooltipDelay = new Label(ttContainer, SWT.NONE);
 						GridDataFactory.fillDefaults()//
 								.align(SWT.FILL, SWT.CENTER)
 								.indent(_pc.convertWidthInCharsToPixels(3), 0)
@@ -286,28 +300,12 @@ public class SlideoutTourChartInfo extends AnimatedToolTipShell implements IColo
 						_lblTooltipDelay.setToolTipText(Messages.Slideout_TourInfoOptions_Label_TooltipDelay_Tooltip);
 
 						// Spinner
-						_spinTooltipDelay = new Spinner(container, SWT.BORDER);
+						_spinTooltipDelay = new Spinner(ttContainer, SWT.BORDER);
 						_spinTooltipDelay.setMinimum(0);
 						_spinTooltipDelay.setMaximum(1000);
 						_spinTooltipDelay.setPageIncrement(50);
 						_spinTooltipDelay.addSelectionListener(_defaultSelectionAdapter);
 						_spinTooltipDelay.addMouseWheelListener(_defaultMouseWheelListener);
-					}
-
-					{
-						/*
-						 * Checkbox: Segments with alternate colors
-						 */
-						_chkSegmentAlternateColor = new Button(container, SWT.CHECK);
-						_chkSegmentAlternateColor.setText(Messages.Pref_Graphs_Checkbox_SegmentAlternateColor);
-						_chkSegmentAlternateColor
-								.setToolTipText(Messages.Pref_Graphs_Checkbox_SegmentAlternateColor_Tooltip);
-						_chkSegmentAlternateColor.addSelectionListener(_defaultSelectionAdapter);
-
-						// Color: Segment alternate color
-						_colorSegmentAlternateColor = new ColorSelectorExtended(container);
-						_colorSegmentAlternateColor.addListener(_defaultChangePropertyListener);
-						_colorSegmentAlternateColor.addOpenListener(this);
 					}
 				}
 			}
