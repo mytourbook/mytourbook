@@ -2791,16 +2791,18 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 			// show tour info tooltip
 			addMouseChartListener(_mouseChartSegmentListener);
 
-			ctConfig.isShowSegmentTitle = _tcc.isShowInfoTitle;
+			ctConfig.isShowSegmentBackground = true;
 			ctConfig.isShowSegmentSeparator = _tcc.isShowInfoTourSeparator;
+			ctConfig.isShowSegmentTitle = _tcc.isShowInfoTitle;
 
 		} else {
 
 			// hide tour info tooltip
 			removeMouseChartListener(_mouseChartSegmentListener);
 
-			ctConfig.isShowSegmentTitle = false;
+			ctConfig.isShowSegmentBackground = false;
 			ctConfig.isShowSegmentSeparator = false;
+			ctConfig.isShowSegmentTitle = false;
 		}
 
 		ctConfig.isMultipleSegments = _tourData.isMultipleTours;

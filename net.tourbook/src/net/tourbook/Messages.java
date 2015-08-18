@@ -1259,6 +1259,8 @@ public class Messages extends NLS {
 
 	public static String	Slideout_TourInfoOptions_Checkbox_IsShowTourSeparator_Tooltip;
 	public static String		Slideout_TourInfoOptions_Checkbox_IsShowTourTitle;
+	public static String	Slideout_TourInfoOptions_Label_Title;
+
 	public static String		Slideout_TourInfoOptions_Label_TooltipDelay;
 	public static String		Slideout_TourInfoOptions_Label_TooltipDelay_Tooltip;
 

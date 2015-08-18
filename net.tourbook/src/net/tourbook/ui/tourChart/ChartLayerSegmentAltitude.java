@@ -107,8 +107,7 @@ public class ChartLayerSegmentAltitude implements IChartLayer {
 		final double scaleX = graphDrawingData.getScaleX();
 		final double scaleY = graphDrawingData.getScaleY();
 
-		final ValueOverlapChecker valueCheckerUp = new ValueOverlapChecker(_stackedValues);
-//		final ValueOverlapChecker valueCheckerDown = new ValueOverlapChecker(_stackedValues);
+		final ValueOverlapChecker posChecker = new ValueOverlapChecker(_stackedValues);
 
 		final LineAttributes defaultLineAttributes = gc.getLineAttributes();
 		final LineAttributes vertLineLA = new LineAttributes(5);
@@ -198,8 +197,6 @@ public class ChartLayerSegmentAltitude implements IChartLayer {
 
 				final int textWidth = textExtent.x;
 				final int textHeight = textExtent.y;
-				final float textWidth2 = textWidth / 2;
-				final float textHeight2 = textHeight / 2;
 
 				final Color upDownColor = getColor(altiDiff);
 
@@ -255,101 +252,69 @@ public class ChartLayerSegmentAltitude implements IChartLayer {
 						 * get default y position
 						 */
 						final float yDiff2 = (devYSegment - devYPrev) / 2;
-						int devYText = (int) (devYSegment - yDiff2 - textHeight2);
+						final int devYText = (int) (devYSegment - yDiff2 + (isValueUp ? -textHeight : 0));
 
 						/*
 						 * Get default x position
 						 */
 						final int segmentWidth = devXSegment - devXPrev;
 						final float segmentWidth2 = segmentWidth / 2;
-						int devXText = (int) (devXPrev + segmentWidth2 - textWidth2);
-						final float xGradientOffset = (textHeight2 * segmentWidth2 / yDiff2);
-						if (isValueUp) {
-
-							final float devXNew = devXText + xGradientOffset - textWidth2;
-
-//							if (devXNew < devXPrev - textWidth2) {
-////								devXText = (int) (devXPrev - textWidth2);
-//								devXText = devXPrev;
-//							} else {
-							devXText = (int) devXNew;
-//							}
-
-						} else {
-
-							final float devXNew = devXText + xGradientOffset + textWidth2;
-
-//							if (devXNew > devXSegment) {
-////								devXText = devXText;
-//								devXText = devXSegment - textWidth;
-//							} else {
-							devXText = (int) devXNew;
-//							}
-						}
+						final int devXText = (int) (devXPrev + segmentWidth2 - textWidth);
+//						final float xGradientOffset = 0;//(textHeight2 * segmentWidth2 / yDiff2);
 
 						/*
 						 * Ensure the value text do not overlap, if possible :-)
 						 */
-						Rectangle textRect = new Rectangle(devXText, devYText, textWidth, textHeight);
-						boolean isDrawValue = true;
-//						if (isValueUp) {
-//
-						if (valueCheckerUp.intersectsWithValues(textRect)) {
-							devYText = valueCheckerUp.getPreviousValue().y - textHeight;
-						}
+						final Rectangle textRect = new Rectangle(devXText, devYText, textWidth, textHeight);
 
-						if (valueCheckerUp.intersectsNoValues(textRect)) {
-							isDrawValue = false;
-						}
-//
-//						} else {
-//
-////							if (valueCheckerDown.intersectsWithValues(textRect)) {
-////								devYText = valueCheckerDown.getPreviousValue().y + textHeight;
-////							}
-////
-////							if (valueCheckerDown.intersectsNoValues(textRect)) {
-////								isDrawValue = false;
-////							}
-//							if (valueCheckerUp.intersectsWithValues(textRect)) {
-//								devYText = valueCheckerUp.getPreviousValue().y + textHeight;
-//							}
-//
-//							if (valueCheckerUp.intersectsNoValues(textRect)) {
-//								isDrawValue = false;
-//							}
-//						}
+						final Rectangle validRect = posChecker.getValidRect(textRect, isValueUp, textHeight, valueText);
 
 						// don't draw over the graph borders
-						if (isDrawValue && devYText > devYTop && devYText + textHeight < devYBottom) {
+						if (validRect != null && validRect.y > devYTop && validRect.y + textHeight < devYBottom) {
 
-							// keep current up/down rectangle
-							final int margin = -0;
-							textRect = new Rectangle(//
-									devXText - margin,
-									devYText - margin,
-									textWidth + 2 * margin,
-									textHeight + 2 * margin);
-
-//							if (isValueUp) {
-							valueCheckerUp.setupNext(textRect);
-//							} else {
-////								valueCheckerDown.setupNext(textRect);
-//								valueCheckerUp.setupNext(textRect);
-//							}
-
-//							// debugging
-//							gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
-//							gc.setLineStyle(SWT.LINE_DOT);
-//							gc.drawRectangle(textRect);
+							// keep current valid rectangle
+							posChecker.setupNext(validRect, isValueUp);
 
 							gc.setForeground(upDownColor);
 							gc.drawText(//
 									valueText,
 									devXText,
-									devYText,
+									validRect.y,
 									true);
+
+//							/*
+//							 * Debugging
+//							 */
+//							gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_GRAY));
+//							gc.setLineAttributes(defaultLineAttributes);
+//							gc.drawRectangle(validRect);
 						}
+
+//						/*
+//						 * Debugging
+//						 */
+//						gc.setLineAttributes(defaultLineAttributes);
+//						gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_DARK_BLUE));
+//						if (isValueUp) {
+//
+//							final int devY = devYSegment - (devYSegment - devYPrev) / 2;
+//							final int devX = (int) (devXSegment - segmentWidth2);
+//							gc.drawLine(//
+//									devX,
+//									devY,
+//									devX + 1 * textHeight,
+//									devY);
+//
+//						} else {
+//
+//							final int devY = devYSegment - (devYSegment - devYPrev) / 2;
+//							final int devX = (int) (devXSegment - segmentWidth2);
+//							gc.drawLine(//
+//									devX,
+//									devY,
+//									devX - 1 * textHeight,
+//									devY);
+//						}
 					}
 
 					devXPrev = devXSegment;

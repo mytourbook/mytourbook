@@ -437,7 +437,7 @@ public class ChartComponentGraph extends Canvas {
 	private Font						_uiFont;
 
 	/**
-	 * Configuration how the chart title is displayed.
+	 * Configuration how the chart info is displayed.
 	 */
 	ChartSegmentConfig					chartSegmentConfig				= new ChartSegmentConfig();
 
@@ -1653,7 +1653,7 @@ public class ChartComponentGraph extends Canvas {
 				gcGraph.setBackground(chartBackgroundColor);
 				gcGraph.fillRectangle(graphBounds);
 
-				if (_chart.isShowSegmentAlternateColor) {
+				if (_chart.isShowSegmentAlternateColor && chartSegmentConfig.isShowSegmentBackground) {
 					drawAsync_150_SegmentBackground(gcGraph, graphDrawingData);
 				}
 			}
@@ -2453,11 +2453,12 @@ public class ChartComponentGraph extends Canvas {
 				// draw segment start line but not for the first segment
 				if (segmentIndex != 0) {
 
-//					gc.drawLine(devXSegmentStart, 1, devXSegmentStart, devYTitle - 1);
+					final int devX = chartSegment.devXSegment;
+
 					gcChart.drawLine(//
-							chartSegment.devXSegment,
-							0,//graphDrawingData.getDevYTop(),
-							chartSegment.devXSegment,
+							devX,
+							0,
+							devX,
 							graphDrawingData.getDevYBottom());
 				}
 			}

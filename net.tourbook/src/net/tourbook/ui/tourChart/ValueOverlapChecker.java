@@ -25,58 +25,82 @@ import org.eclipse.swt.graphics.Rectangle;
  */
 public class ValueOverlapChecker {
 
-	private Rectangle	HIDDEN_RECT	= new Rectangle(-1000, -1000, 0, 0);
+	private Rectangle	INITIAL_HIDDEN_RECT	= new Rectangle(-1000, -1000, 0, 0);
 
+	/**
+	 * Contains all (previous) areas.
+	 */
+	private int			_numRects;
+
+	/**
+	 * Contains areas which are checked and rearranged.
+	 */
 	private int			_numPreviousValues;
-	private int			_numStackedValues;
 
-	private Rectangle[]	_previousValues;
+	private Rectangle[]	_prevValues;
 
 	public ValueOverlapChecker(final int numStackedValues) {
 
-		_numPreviousValues = numStackedValues + 10;
-		_numStackedValues = numStackedValues;
+		_numRects = numStackedValues + 10;
+		_numPreviousValues = numStackedValues + 1;
 
-		_previousValues = new Rectangle[_numPreviousValues];
+		_prevValues = new Rectangle[_numRects];
 
 		// setup checker with rectangles which are not visible
-		for (int rectIndex = 0; rectIndex < _previousValues.length; rectIndex++) {
-			_previousValues[rectIndex] = HIDDEN_RECT;
+		for (int rectIndex = 0; rectIndex < _numRects; rectIndex++) {
+			_prevValues[rectIndex] = INITIAL_HIDDEN_RECT;
 		}
 	}
 
-	Rectangle getPreviousValue() {
-		return _previousValues[0];
-	}
+	Rectangle getValidRect(	final Rectangle textRect,
+							final boolean isValueUp,
+							final int textHeight,
+							final String valueText) {
 
-	boolean intersectsNoValues(final Rectangle textRect) {
+		Rectangle validRect = null;
 
-		for (int rectIndex = _numStackedValues; rectIndex < _numPreviousValues; rectIndex++) {
-			if (_previousValues[rectIndex].intersects(textRect)) {
-				return true;
+		int yDiff;
+		if (isValueUp) {
+			yDiff = -textHeight;
+		} else {
+			yDiff = textHeight;
+		}
+
+		if (valueText.equals("0.4")) {
+			int a = 0;
+			a++;
+		}
+
+		for (int rectIndex = 0; rectIndex < _numRects; rectIndex++) {
+
+			final Rectangle prevRect = _prevValues[rectIndex];
+
+			if (prevRect.intersects(textRect)) {
+
+				if (rectIndex > _numPreviousValues) {
+					return null;
+				}
+
+				textRect.y = prevRect.y + yDiff;
+
+				validRect = null;
+				rectIndex = -1;
+
+			} else {
+
+				validRect = textRect;
 			}
 		}
 
-		return false;
+		return validRect;
 	}
 
-	boolean intersectsWithValues(final Rectangle textRect) {
+	void setupNext(final Rectangle textRect, final boolean isValueUp) {
 
-		for (int rectIndex = 0; rectIndex < _numStackedValues; rectIndex++) {
-			if (_previousValues[rectIndex].intersects(textRect)) {
-				return true;
-			}
+		for (int rectIndex = _numRects - 1; rectIndex > 0; rectIndex--) {
+			_prevValues[rectIndex] = _prevValues[rectIndex - 1];
 		}
 
-		return false;
-	}
-
-	void setupNext(final Rectangle textRect) {
-
-		for (int rectIndex = _numPreviousValues - 1; rectIndex > 0; rectIndex--) {
-			_previousValues[rectIndex] = _previousValues[rectIndex - 1];
-		}
-
-		_previousValues[0] = textRect;
+		_prevValues[0] = textRect;
 	}
 }

@@ -254,22 +254,22 @@ public class ChartLayerSegmentValue implements IChartLayer {
 					Rectangle textRect = new Rectangle(devXText, devYText, textWidth, textHeight);
 					boolean isDrawValue = true;
 
-					if (isDrawAbove || isToggleAboveBelow) {
-						if (valueCheckerUp.intersectsWithValues(textRect)) {
-							devYText = valueCheckerUp.getPreviousValue().y - textHeight;
-						}
-						if (valueCheckerUp.intersectsNoValues(textRect)) {
-							isDrawValue = false;
-						}
-
-					} else {
-						if (valueCheckerDown.intersectsWithValues(textRect)) {
-							devYText = valueCheckerDown.getPreviousValue().y + textHeight;
-						}
-						if (valueCheckerDown.intersectsNoValues(textRect)) {
-							isDrawValue = false;
-						}
-					}
+//					if (isDrawAbove || isToggleAboveBelow) {
+//						if (valueCheckerUp.intersectsWithValues(textRect)) {
+//							devYText = valueCheckerUp.getPreviousValue().y - textHeight;
+//						}
+//						if (valueCheckerUp.intersectsNoValues(textRect)) {
+//							isDrawValue = false;
+//						}
+//
+//					} else {
+//						if (valueCheckerDown.intersectsWithValues(textRect)) {
+//							devYText = valueCheckerDown.getPreviousValue().y + textHeight;
+//						}
+//						if (valueCheckerDown.intersectsNoValues(textRect)) {
+//							isDrawValue = false;
+//						}
+//					}
 
 					if (devYText < devYTop || devYText + textHeight > devYBottom) {
 						isDrawValue = false;
@@ -292,11 +292,11 @@ public class ChartLayerSegmentValue implements IChartLayer {
 								textWidth + 2 * margin,
 								textHeight + 2 * margin);
 
-						if (isDrawAbove || isToggleAboveBelow) {
-							valueCheckerUp.setupNext(textRect);
-						} else {
-							valueCheckerDown.setupNext(textRect);
-						}
+//						if (isDrawAbove || isToggleAboveBelow) {
+//							valueCheckerUp.setupNext(textRect);
+//						} else {
+//							valueCheckerDown.setupNext(textRect);
+//						}
 
 						// keep painted position to detect hovered values
 						paintedValues[segmentIndex] = textRect;

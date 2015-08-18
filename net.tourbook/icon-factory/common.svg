@@ -3668,9 +3668,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="11.313709"
-     inkscape:cx="74.782228"
-     inkscape:cy="1005.3011"
+     inkscape:zoom="16.000001"
+     inkscape:cx="90.628204"
+     inkscape:cy="1016.7652"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="true"
@@ -3678,7 +3678,7 @@
      inkscape:window-height="1399"
      inkscape:window-x="421"
      inkscape:window-y="3"
-     inkscape:window-maximized="0"
+     inkscape:window-maximized="1"
      inkscape:snap-grids="true"
      inkscape:snap-page="false"
      inkscape:snap-to-guides="false"
@@ -4358,56 +4358,31 @@
        id="rect4525-1-0-6"
        width="16"
        height="16"
-       x="80"
+       x="80.000084"
        y="11.362183"
        ry="0"
        rx="0"
-       inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook\icons\tourbook-month.png"
+       inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook\icons\app-default.png"
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90" />
-    <flowRoot
-       xml:space="preserve"
-       id="flowRoot8345"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.53845215px;line-height:125%;font-family:Gabriola;-inkscape-font-specification:Gabriola;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       transform="matrix(1.7192821,0,0,1.8729667,-60.183507,-12.856051)"
-       inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook\icons\tourbook-month.png"
+    <g
+       id="g4958"
+       transform="matrix(1.1617264,0,0,1.1699324,-13.036885,-0.99198076)"
+       inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook\icons\app-default.png"
        inkscape:export-xdpi="90"
-       inkscape:export-ydpi="90"><flowRegion
-         id="flowRegion8347"><rect
-           id="rect8349"
-           width="11.351503"
-           height="11.615795"
-           x="82"
-           y="14.362183"
-           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.53845215px;font-family:Gabriola;-inkscape-font-specification:Gabriola" /></flowRegion><flowPara
-         id="flowPara8351"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.53845215px;font-family:Gabriola;-inkscape-font-specification:Gabriola">M</flowPara></flowRoot>    <rect
-       style="color:#000000;display:inline;overflow:visible;visibility:visible;opacity:0.98999999;fill:none;stroke:none;stroke-width:0;marker:none;enable-background:accumulate"
-       id="rect4525-1-0-6-0"
-       width="16"
-       height="16"
-       x="100"
-       y="11.362183"
-       ry="0"
-       rx="0"
-       inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook\icons\tourbook-week.png"
-       inkscape:export-xdpi="90"
-       inkscape:export-ydpi="90" />
-    <flowRoot
-       xml:space="preserve"
-       id="flowRoot8345-4"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.53845215px;line-height:125%;font-family:Gabriola;-inkscape-font-specification:Gabriola;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       transform="matrix(1.7192821,0,0,1.8729667,-40.272981,-12.706982)"
-       inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook\icons\tourbook-week.png"
-       inkscape:export-xdpi="90"
-       inkscape:export-ydpi="90"><flowRegion
-         id="flowRegion8347-3"><rect
-           id="rect8349-8"
-           width="11.351503"
-           height="11.615795"
-           x="82"
-           y="14.362183"
-           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.53845215px;font-family:Gabriola;-inkscape-font-specification:Gabriola" /></flowRegion><flowPara
-         id="flowPara8351-5"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.53845215px;font-family:Gabriola;-inkscape-font-specification:Gabriola">W</flowPara></flowRoot>  </g>
+       inkscape:export-ydpi="90">
+      <path
+         sodipodi:nodetypes="csc"
+         inkscape:connector-curvature="0"
+         id="path3792-2"
+         d="m 93,18.362182 c 0,-2.761422 -2.238577,-5 -5,-5 -2.761423,0 -5,2.238577 -5,5"
+         style="color:#000000;display:inline;overflow:visible;visibility:visible;fill:none;stroke:#454545;stroke-width:1.71552765;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker:none;enable-background:accumulate" />
+      <path
+         sodipodi:nodetypes="cccc"
+         inkscape:connector-curvature="0"
+         id="path4956"
+         d="m 80.513864,18.362183 2.486136,3.5 2.508233,-3.5 z"
+         style="fill:#454545;fill-opacity:1;fill-rule:evenodd;stroke:#454545;stroke-width:0.85776371px;stroke-linecap:butt;stroke-linejoin:round;stroke-opacity:1" />
+    </g>
+  </g>
 </svg>

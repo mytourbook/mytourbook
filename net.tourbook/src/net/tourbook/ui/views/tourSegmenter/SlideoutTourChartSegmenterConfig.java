@@ -194,7 +194,7 @@ public class SlideoutTourChartSegmenterConfig extends AnimatedToolTipShell imple
 		_actionRestoreDefaults = new Action() {
 			@Override
 			public void run() {
-				saveState_Defaults();
+				resetToDefaults();
 			}
 		};
 
@@ -574,6 +574,40 @@ public class SlideoutTourChartSegmenterConfig extends AnimatedToolTipShell imple
 		}
 	}
 
+	private void resetToDefaults() {
+
+		// set font editor default values
+		_valueFontEditor.loadDefault();
+		_valueFontEditor.store();
+
+		_segmenterState.put(
+				TourSegmenterView.STATE_IS_SHOW_SEGMENTER_DECIMAL_PLACES,
+				TourSegmenterView.STATE_IS_SHOW_SEGMENTER_DECIMAL_PLACES_DEFAULT);
+		_segmenterState.put(
+				TourSegmenterView.STATE_IS_SHOW_SEGMENTER_MARKER,
+				TourSegmenterView.STATE_IS_SHOW_SEGMENTER_MARKER_DEFAULT);
+		_segmenterState.put(
+				TourSegmenterView.STATE_IS_SHOW_SEGMENTER_VALUE,
+				TourSegmenterView.STATE_IS_SHOW_SEGMENTER_VALUE_DEFAULT);
+
+		_segmenterState.put(//
+				TourSegmenterView.STATE_GRAPH_ALPHA,
+				TourSegmenterView.STATE_GRAPH_ALPHA_DEFAULT);
+		_segmenterState.put(
+				TourSegmenterView.STATE_STACKED_VISIBLE_VALUES,
+				TourSegmenterView.STATE_STACKED_VISIBLE_VALUES_DEFAULT);
+
+		// update UI with the default values from the state/pref store
+		restoreState();
+
+		enableControls();
+
+		/*
+		 * Update UI
+		 */
+		_tourSegmenterView.fireSegmentLayerChanged();
+	}
+
 	private void restoreState() {
 
 		_chkShowDecimalPlaces.setSelection(Util.getStateBoolean(
@@ -632,40 +666,6 @@ public class SlideoutTourChartSegmenterConfig extends AnimatedToolTipShell imple
 		_segmenterState.put(//
 				TourSegmenterView.STATE_STACKED_VISIBLE_VALUES,
 				_spinVisibleValuesStacked.getSelection());
-	}
-
-	private void saveState_Defaults() {
-
-		// set font editor default values
-		_valueFontEditor.loadDefault();
-		_valueFontEditor.store();
-
-		_segmenterState.put(
-				TourSegmenterView.STATE_IS_SHOW_SEGMENTER_DECIMAL_PLACES,
-				TourSegmenterView.STATE_IS_SHOW_SEGMENTER_DECIMAL_PLACES_DEFAULT);
-		_segmenterState.put(
-				TourSegmenterView.STATE_IS_SHOW_SEGMENTER_MARKER,
-				TourSegmenterView.STATE_IS_SHOW_SEGMENTER_MARKER_DEFAULT);
-		_segmenterState.put(
-				TourSegmenterView.STATE_IS_SHOW_SEGMENTER_VALUE,
-				TourSegmenterView.STATE_IS_SHOW_SEGMENTER_VALUE_DEFAULT);
-
-		_segmenterState.put(//
-				TourSegmenterView.STATE_GRAPH_ALPHA,
-				TourSegmenterView.STATE_GRAPH_ALPHA_DEFAULT);
-		_segmenterState.put(
-				TourSegmenterView.STATE_STACKED_VISIBLE_VALUES,
-				TourSegmenterView.STATE_STACKED_VISIBLE_VALUES_DEFAULT);
-
-		// update UI with the default values from the state/pref store
-		restoreState();
-
-		enableControls();
-
-		/*
-		 * Update UI
-		 */
-		_tourSegmenterView.fireSegmentLayerChanged();
 	}
 
 	private void updateUI_FontSize() {

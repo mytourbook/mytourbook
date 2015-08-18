@@ -20,6 +20,7 @@ package net.tourbook.chart;
  */
 public class ChartSegmentConfig {
 
+	public boolean	isShowSegmentBackground;
 	public boolean	isShowSegmentTitle;
 	public boolean	isShowSegmentSeparator;
 

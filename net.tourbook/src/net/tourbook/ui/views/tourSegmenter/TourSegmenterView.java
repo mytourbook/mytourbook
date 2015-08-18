@@ -2830,6 +2830,22 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		return _segmentViewer;
 	}
 
+	/**
+	 * @param tourId
+	 * @return Returns <code>true</code> when the tour is already displayed in the tour segmenter.
+	 */
+	private boolean isTourDisplayed(final Long tourId) {
+
+		if (_tourData != null) {
+			if (_tourData.getTourId().equals(tourId)) {
+				// don't reload the same tour
+				return true;
+			}
+		}
+
+		return false;
+	}
+
 	private void onChangeBreakTime() {
 
 		createSegments(true);
@@ -2957,44 +2973,46 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 					return;
 				}
 
-				TourData eventTourData = null;
+				TourData tourData = null;
 				TourChart eventTourChart = null;
 
 				if (selection instanceof SelectionTourData) {
 
 					final SelectionTourData selectionTourData = (SelectionTourData) selection;
 
-					eventTourData = selectionTourData.getTourData();
+					tourData = selectionTourData.getTourData();
 					eventTourChart = selectionTourData.getTourChart();
 
 				} else if (selection instanceof SelectionTourId) {
 
 					final SelectionTourId tourIdSelection = (SelectionTourId) selection;
 
-					if (_tourData != null) {
-						if (_tourData.getTourId().equals(tourIdSelection.getTourId())) {
-							// don't reload the same tour
-							return;
-						}
+					if (isTourDisplayed(tourIdSelection.getTourId())) {
+						return;
 					}
 
-					eventTourData = TourManager.getInstance().getTourData(tourIdSelection.getTourId());
+					tourData = TourManager.getInstance().getTourData(tourIdSelection.getTourId());
 
 				} else if (selection instanceof SelectionTourIds) {
 
 					final ArrayList<Long> tourIds = ((SelectionTourIds) selection).getTourIds();
+
 					if (tourIds != null && tourIds.size() > 0) {
 
-						final Long tourId = tourIds.get(0);
+						if (tourIds.size() == 1) {
 
-						if (_tourData != null) {
-							if (_tourData.getTourId().equals(tourId)) {
-								// don't reload the same tour
+							final Long tourId = tourIds.get(0);
+
+							if (isTourDisplayed(tourId)) {
 								return;
 							}
-						}
 
-						eventTourData = TourManager.getInstance().getTourData(tourId);
+							tourData = TourManager.getInstance().getTourData(tourId);
+
+						} else {
+
+							tourData = TourManager.getMultipleTourData(tourIds);
+						}
 					}
 
 				} else if (selection instanceof SelectionDeletedTours) {
@@ -3005,7 +3023,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 					return;
 				}
 
-				if (checkDataValidation(eventTourData) == false) {
+				if (checkDataValidation(tourData) == false) {
 					return;
 				}
 
@@ -3017,7 +3035,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 				/*
 				 * save previous tour when a new tour is selected
 				 */
-				if (_tourData != null && _tourData == eventTourData) {
+				if (_tourData != null && _tourData == tourData) {
 
 					// nothing to do, it's the same tour
 
@@ -3042,12 +3060,12 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 //					}
 
 					if (eventTourChart == null) {
-						eventTourChart = TourManager.getActiveTourChart(eventTourData);
+						eventTourChart = TourManager.getActiveTourChart(tourData);
 					}
 
 					_tourChart = eventTourChart;
 
-					setTour(eventTourData, false);
+					setTour(tourData, false);
 				}
 			}
 		});

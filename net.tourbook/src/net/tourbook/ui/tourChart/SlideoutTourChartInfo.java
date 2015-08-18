@@ -18,17 +18,22 @@ package net.tourbook.ui.tourChart;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
+import net.tourbook.common.action.ActionOpenPrefDialog;
 import net.tourbook.common.color.ColorSelectorExtended;
 import net.tourbook.common.color.IColorSelectorListener;
 import net.tourbook.common.tooltip.AnimatedToolTipShell;
 import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.preferences.PrefPageAppearanceTourChart;
 
+import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferenceConverter;
+import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.SWT;
@@ -93,6 +98,9 @@ public class SlideoutTourChartInfo extends AnimatedToolTipShell implements IColo
 	}
 
 	private PixelConverter			_pc;
+
+	private ActionOpenPrefDialog	_actionPrefDialog;
+	private Action					_actionRestoreDefaults;
 
 	/*
 	 * UI controls
@@ -189,8 +197,31 @@ public class SlideoutTourChartInfo extends AnimatedToolTipShell implements IColo
 		_isAnotherDialogOpened = isDialogOpened;
 	}
 
+	private void createActions() {
+
+		/*
+		 * Action: Restore default
+		 */
+		_actionRestoreDefaults = new Action() {
+			@Override
+			public void run() {
+				resetToDefaults();
+			}
+		};
+
+		_actionRestoreDefaults.setImageDescriptor(//
+				TourbookPlugin.getImageDescriptor(Messages.Image__App_RestoreDefault));
+		_actionRestoreDefaults.setToolTipText(Messages.App_Action_RestoreDefault_Tooltip);
+
+		_actionPrefDialog = new ActionOpenPrefDialog(
+				Messages.Tour_Action_EditChartPreferences,
+				PrefPageAppearanceTourChart.ID);
+	}
+
 	@Override
 	protected Composite createToolTipContentArea(final Composite parent) {
+
+		createActions();
 
 		final Composite ui = createUI(parent);
 
@@ -209,105 +240,131 @@ public class SlideoutTourChartInfo extends AnimatedToolTipShell implements IColo
 		{
 			final Composite container = new Composite(_shellContainer, SWT.NONE);
 			GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-			GridLayoutFactory.fillDefaults().applyTo(container);
+			GridLayoutFactory.fillDefaults()//
+					.numColumns(2)
+					.applyTo(container);
+//			container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
 			{
-				createUI_10_Controls(container);
+				createUI_10_Title(container);
+				createUI_12_Actions(container);
+				createUI_20_Controls(container);
 			}
 		}
 
 		return _shellContainer;
 	}
 
-	private void createUI_10_Controls(final Composite parent) {
+	private void createUI_10_Title(final Composite parent) {
+		{
+			/*
+			 * Label: Slideout title
+			 */
+			final Label label = new Label(parent, SWT.NONE);
+			GridDataFactory.fillDefaults()//
+//					.span(3, 1)
+					.applyTo(label);
+			label.setText(Messages.Slideout_TourInfoOptions_Label_Title);
+			label.setFont(JFaceResources.getBannerFont());
+		}
+	}
 
-		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
-//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
+	private void createUI_12_Actions(final Composite parent) {
+
+		final ToolBar toolbar = new ToolBar(parent, SWT.FLAT);
+		GridDataFactory.fillDefaults()//
+				.grab(true, false)
+				.align(SWT.END, SWT.BEGINNING)
+				.applyTo(toolbar);
+
+		final ToolBarManager tbm = new ToolBarManager(toolbar);
+
+		tbm.add(_actionRestoreDefaults);
+		tbm.add(_actionPrefDialog);
+
+		tbm.update(true);
+	}
+
+	private void createUI_20_Controls(final Composite parent) {
+
+		final Composite ttContainer = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults()//
+				.grab(true, false)
+				.span(2, 1)
+				.applyTo(ttContainer);
+		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(ttContainer);
 		{
 			{
-				final Composite ttContainer = new Composite(container, SWT.NONE);
+				/*
+				 * Show tour title
+				 */
+				_chkShowInfoTitle = new Button(ttContainer, SWT.CHECK);
 				GridDataFactory.fillDefaults()//
-						.grab(true, false)
 						.span(2, 1)
-						.applyTo(ttContainer);
-				GridLayoutFactory.fillDefaults().numColumns(2).applyTo(ttContainer);
-				{
-					{
-						/*
-						 * Show tour title
-						 */
-						_chkShowInfoTitle = new Button(ttContainer, SWT.CHECK);
-						GridDataFactory.fillDefaults()//
-								.span(2, 1)
-								.applyTo(_chkShowInfoTitle);
-						_chkShowInfoTitle.setText(//
-								Messages.Slideout_TourInfoOptions_Checkbox_IsShowTourTitle);
-						_chkShowInfoTitle.addSelectionListener(_defaultSelectionAdapter);
-					}
-					{
-						/*
-						 * Show tour separator
-						 */
-						_chkShowInfoTourSeparator = new Button(ttContainer, SWT.CHECK);
-						GridDataFactory.fillDefaults()//
-								.span(2, 1)
-								.applyTo(_chkShowInfoTourSeparator);
-						_chkShowInfoTourSeparator.setText(//
-								Messages.Slideout_TourInfoOptions_Checkbox_IsShowTourSeparator);
-						_chkShowInfoTourSeparator.setToolTipText(//
-								Messages.Slideout_TourInfoOptions_Checkbox_IsShowTourSeparator_Tooltip);
-						_chkShowInfoTourSeparator.addSelectionListener(_defaultSelectionAdapter);
-					}
-					{
-						/*
-						 * Checkbox: Segments with alternate colors
-						 */
-						_chkSegmentAlternateColor = new Button(ttContainer, SWT.CHECK);
-						_chkSegmentAlternateColor.setText(Messages.Pref_Graphs_Checkbox_SegmentAlternateColor);
-						_chkSegmentAlternateColor
-								.setToolTipText(Messages.Pref_Graphs_Checkbox_SegmentAlternateColor_Tooltip);
-						_chkSegmentAlternateColor.addSelectionListener(_defaultSelectionAdapter);
+						.applyTo(_chkShowInfoTitle);
+				_chkShowInfoTitle.setText(//
+						Messages.Slideout_TourInfoOptions_Checkbox_IsShowTourTitle);
+				_chkShowInfoTitle.addSelectionListener(_defaultSelectionAdapter);
+			}
+			{
+				/*
+				 * Show tour separator
+				 */
+				_chkShowInfoTourSeparator = new Button(ttContainer, SWT.CHECK);
+				GridDataFactory.fillDefaults()//
+						.span(2, 1)
+						.applyTo(_chkShowInfoTourSeparator);
+				_chkShowInfoTourSeparator.setText(//
+						Messages.Slideout_TourInfoOptions_Checkbox_IsShowTourSeparator);
+				_chkShowInfoTourSeparator.setToolTipText(//
+						Messages.Slideout_TourInfoOptions_Checkbox_IsShowTourSeparator_Tooltip);
+				_chkShowInfoTourSeparator.addSelectionListener(_defaultSelectionAdapter);
+			}
+			{
+				/*
+				 * Checkbox: Segments with alternate colors
+				 */
+				_chkSegmentAlternateColor = new Button(ttContainer, SWT.CHECK);
+				_chkSegmentAlternateColor.setText(Messages.Pref_Graphs_Checkbox_SegmentAlternateColor);
+				_chkSegmentAlternateColor.setToolTipText(Messages.Pref_Graphs_Checkbox_SegmentAlternateColor_Tooltip);
+				_chkSegmentAlternateColor.addSelectionListener(_defaultSelectionAdapter);
 
-						// Color: Segment alternate color
-						_colorSegmentAlternateColor = new ColorSelectorExtended(ttContainer);
-						_colorSegmentAlternateColor.addListener(_defaultChangePropertyListener);
-						_colorSegmentAlternateColor.addOpenListener(this);
-					}
-					{
-						/*
-						 * Show info tooltip
-						 */
-						_chkShowInfoTooltip = new Button(ttContainer, SWT.CHECK);
-						GridDataFactory.fillDefaults()//
-								.span(2, 1)
-								.applyTo(_chkShowInfoTooltip);
-						_chkShowInfoTooltip.setText(//
-								Messages.Slideout_TourInfoOptions_Checkbox_IsShowInfoTooltip);
-						_chkShowInfoTooltip.addSelectionListener(_defaultSelectionAdapter);
-					}
-					{
-						/*
-						 * Tooltip delay
-						 */
-						// Label
-						_lblTooltipDelay = new Label(ttContainer, SWT.NONE);
-						GridDataFactory.fillDefaults()//
-								.align(SWT.FILL, SWT.CENTER)
-								.indent(_pc.convertWidthInCharsToPixels(3), 0)
-								.applyTo(_lblTooltipDelay);
-						_lblTooltipDelay.setText(Messages.Slideout_TourInfoOptions_Label_TooltipDelay);
-						_lblTooltipDelay.setToolTipText(Messages.Slideout_TourInfoOptions_Label_TooltipDelay_Tooltip);
+				// Color: Segment alternate color
+				_colorSegmentAlternateColor = new ColorSelectorExtended(ttContainer);
+				_colorSegmentAlternateColor.addListener(_defaultChangePropertyListener);
+				_colorSegmentAlternateColor.addOpenListener(this);
+			}
+			{
+				/*
+				 * Show info tooltip
+				 */
+				_chkShowInfoTooltip = new Button(ttContainer, SWT.CHECK);
+				GridDataFactory.fillDefaults()//
+						.span(2, 1)
+						.applyTo(_chkShowInfoTooltip);
+				_chkShowInfoTooltip.setText(//
+						Messages.Slideout_TourInfoOptions_Checkbox_IsShowInfoTooltip);
+				_chkShowInfoTooltip.addSelectionListener(_defaultSelectionAdapter);
+			}
+			{
+				/*
+				 * Tooltip delay
+				 */
+				// Label
+				_lblTooltipDelay = new Label(ttContainer, SWT.NONE);
+				GridDataFactory.fillDefaults()//
+						.align(SWT.FILL, SWT.CENTER)
+						.indent(_pc.convertWidthInCharsToPixels(3), 0)
+						.applyTo(_lblTooltipDelay);
+				_lblTooltipDelay.setText(Messages.Slideout_TourInfoOptions_Label_TooltipDelay);
+				_lblTooltipDelay.setToolTipText(Messages.Slideout_TourInfoOptions_Label_TooltipDelay_Tooltip);
 
-						// Spinner
-						_spinTooltipDelay = new Spinner(ttContainer, SWT.BORDER);
-						_spinTooltipDelay.setMinimum(0);
-						_spinTooltipDelay.setMaximum(1000);
-						_spinTooltipDelay.setPageIncrement(50);
-						_spinTooltipDelay.addSelectionListener(_defaultSelectionAdapter);
-						_spinTooltipDelay.addMouseWheelListener(_defaultMouseWheelListener);
-					}
-				}
+				// Spinner
+				_spinTooltipDelay = new Spinner(ttContainer, SWT.BORDER);
+				_spinTooltipDelay.setMinimum(0);
+				_spinTooltipDelay.setMaximum(1000);
+				_spinTooltipDelay.setPageIncrement(50);
+				_spinTooltipDelay.addSelectionListener(_defaultSelectionAdapter);
+				_spinTooltipDelay.addMouseWheelListener(_defaultMouseWheelListener);
 			}
 		}
 	}
@@ -447,6 +504,30 @@ public class SlideoutTourChartInfo extends AnimatedToolTipShell implements IColo
 		if (_canOpenToolTip) {
 			showToolTip();
 		}
+	}
+
+	private void resetToDefaults() {
+
+		/*
+		 * Update UI with defaults from pref store
+		 */
+		_chkShowInfoTitle.setSelection(//
+				_prefStore.getDefaultBoolean(ITourbookPreferences.GRAPH_TOUR_INFO_IS_TITLE_VISIBLE));
+		_chkShowInfoTooltip.setSelection(//
+				_prefStore.getDefaultBoolean(ITourbookPreferences.GRAPH_TOUR_INFO_IS_TOOLTIP_VISIBLE));
+		_chkShowInfoTourSeparator.setSelection(//
+				_prefStore.getDefaultBoolean(ITourbookPreferences.GRAPH_TOUR_INFO_IS_TOUR_SEPARATOR_VISIBLE));
+
+		_spinTooltipDelay.setSelection(//
+				_prefStore.getDefaultInt(ITourbookPreferences.GRAPH_TOUR_INFO_TOOLTIP_DELAY));
+
+		// segment alternate color
+		_chkSegmentAlternateColor.setSelection(//
+				_prefStore.getDefaultBoolean(ITourbookPreferences.GRAPH_IS_SEGMENT_ALTERNATE_COLOR));
+		_colorSegmentAlternateColor.setColorValue(//
+				PreferenceConverter.getDefaultColor(_prefStore, ITourbookPreferences.GRAPH_SEGMENT_ALTERNATE_COLOR));
+
+		onChangeUI();
 	}
 
 	private void restoreState() {
