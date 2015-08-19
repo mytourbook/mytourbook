@@ -215,7 +215,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 	private IMouseListener				_mouseMarkerListener					= new MouseMarkerListener();
 	private IMouseListener				_mousePhotoListener						= new MousePhotoListener();
 	private IMouseListener				_mouseChartSegmentListener				= new MouseChartSegmentListener();
-//	private IMouseListener				_mouseTourSegmentListener				= new MouseTourSegmentListener();
+	private IMouseListener				_mouseMoveChartSegmentListener			= new MouseMoveChartSegmentListener();
 
 	private long						_hoveredSegmentEventTime;
 
@@ -395,11 +395,6 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		public void mouseExit() {
 			onChartSegment_MouseExit();
 		}
-
-		@Override
-		public void mouseMove(final ChartMouseEvent event) {
-			onChartSegment_MouseMove(event);
-		}
 	}
 
 	private class MouseMarkerListener extends MouseAdapter {
@@ -432,6 +427,18 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		@Override
 		public void mouseUp(final ChartMouseEvent event) {
 			onMarker_MouseUp(event);
+		}
+	}
+
+	/**
+	 * This mouse move listener is used to get mouse move events to show the tour tooltip when the
+	 * y-slider is dragged.
+	 */
+	public class MouseMoveChartSegmentListener extends MouseAdapter {
+
+		@Override
+		public void mouseMove(final ChartMouseEvent event) {
+			onChartSegment_MouseMove(event);
 		}
 	}
 
@@ -2790,6 +2797,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
 			// show tour info tooltip
 			addMouseChartListener(_mouseChartSegmentListener);
+			addMouseMoveChartListener(_mouseMoveChartSegmentListener);
 
 			ctConfig.isShowSegmentBackground = true;
 			ctConfig.isShowSegmentSeparator = _tcc.isShowInfoTourSeparator;
@@ -2799,6 +2807,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
 			// hide tour info tooltip
 			removeMouseChartListener(_mouseChartSegmentListener);
+			removeMouseMoveChartListener(_mouseMoveChartSegmentListener);
 
 			ctConfig.isShowSegmentBackground = false;
 			ctConfig.isShowSegmentSeparator = false;

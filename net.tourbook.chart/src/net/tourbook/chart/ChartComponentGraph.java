@@ -6597,7 +6597,21 @@ public class ChartComponentGraph extends Canvas {
 		boolean isRedraw = false;
 		boolean canShowHoveredValueTooltip = false;
 
-		if (_isXSliderVisible && _xSliderDragged != null) {
+		final ChartMouseEvent externalMouseMoveEvent = _chart.onExternalMouseMoveImportant(
+				eventTime,
+				devXMouse,
+				devYMouse);
+
+		if (externalMouseMoveEvent.isWorked) {
+
+			setChartCursor(externalMouseMoveEvent.cursor);
+
+			_isOverlayDirty = true;
+			isRedraw = true;
+
+			canShowHoveredValueTooltip = true;
+
+		} else if (_isXSliderVisible && _xSliderDragged != null) {
 
 			// x-slider is dragged
 

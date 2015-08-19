@@ -78,6 +78,7 @@ public class Chart extends ViewForm {
 	private final ListenerList		_barDoubleClickListeners			= new ListenerList();
 	private final ListenerList		_sliderMoveListeners				= new ListenerList();
 	private final ListenerList		_mouseChartListener					= new ListenerList();
+	private final ListenerList		_mouseChartMoveListener				= new ListenerList();
 	private final ListenerList		_chartOverlayListener				= new ListenerList();
 
 	private ChartComponents			_chartComponents;
@@ -219,12 +220,12 @@ public class Chart extends ViewForm {
 		_barDoubleClickListeners.add(listener);
 	}
 
-//	public void addFocusListener(final Listener listener) {
-//		_focusListeners.add(listener);
-//	}
-
 	public void addMouseChartListener(final IMouseListener mouseListener) {
 		_mouseChartListener.add(mouseListener);
+	}
+
+	public void addMouseMoveChartListener(final IMouseListener mouseListener) {
+		_mouseChartMoveListener.add(mouseListener);
 	}
 
 	/**
@@ -562,6 +563,14 @@ public class Chart extends ViewForm {
 		}
 	}
 
+	private void fireChartMouseMoveEvent(final ChartMouseEvent mouseEvent) {
+
+		final Object[] listeners = _mouseChartMoveListener.getListeners();
+		for (final Object listener : listeners) {
+			((IMouseListener) listener).mouseMove(mouseEvent);
+		}
+	}
+
 	public void fireSliderMoveEvent() {
 
 		final SelectionChartInfo chartInfo = createChartInfo();
@@ -846,6 +855,15 @@ public class Chart extends ViewForm {
 		return event;
 	}
 
+	ChartMouseEvent onExternalMouseMoveImportant(final long eventTime, final int devXMouse, final int devYMouse) {
+
+		final ChartMouseEvent event = new ChartMouseEvent(Chart.MouseMove, eventTime, devXMouse, devYMouse);
+
+		fireChartMouseMoveEvent(event);
+
+		return event;
+	}
+
 	ChartMouseEvent onExternalMouseUp(final long eventTime, final int devXMouse, final int devYMouse) {
 
 		final ChartMouseEvent event = new ChartMouseEvent(Chart.MouseUp, eventTime, devXMouse, devYMouse);
@@ -897,6 +915,10 @@ public class Chart extends ViewForm {
 
 	public void removeMouseChartListener(final IMouseListener mouseListener) {
 		_mouseChartListener.remove(mouseListener);
+	}
+
+	public void removeMouseMoveChartListener(final IMouseListener mouseListener) {
+		_mouseChartMoveListener.remove(mouseListener);
 	}
 
 	public void removeSelectionChangedListener(final IBarSelectionListener listener) {
