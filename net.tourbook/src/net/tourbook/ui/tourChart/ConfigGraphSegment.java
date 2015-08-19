@@ -32,7 +32,7 @@ public class ConfigGraphSegment {
 	boolean				canHaveNegativeValues;
 
 	/**
-	 * Position of the painted segment values
+	 * Position of the painted segment values which is used to get a hovered segment.
 	 */
 	Rectangle[]			paintedValues;
 

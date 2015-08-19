@@ -627,7 +627,7 @@ public class Chart extends ViewForm {
 		return _chartOverlayListener.getListeners();
 	}
 
-	protected ChartSegmentConfig getChartSegmentConfig() {
+	public ChartSegmentConfig getChartSegmentConfig() {
 		return _chartComponents.componentGraph.chartSegmentConfig;
 	}
 

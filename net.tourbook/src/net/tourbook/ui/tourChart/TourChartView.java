@@ -184,12 +184,17 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 						_tourChart.updateTourChart(_tourData, _tourChartConfig, false);
 					}
 
-				} else if (property.equals(ITourbookPreferences.TOUR_PERSON_LIST_IS_MODIFIED)) {
+				} else if (
+				//
 
-					/*
-					 * HR zone colors can be modified and person hash code has changed by saving the
-					 * person entity -> tour chart must be recreated
-					 */
+				/*
+				 * HR zone colors can be modified and person hash code has changed by saving the
+				 * person entity -> tour chart must be recreated
+				 */
+				property.equals(ITourbookPreferences.TOUR_PERSON_LIST_IS_MODIFIED)
+
+				// multiple tours can have the wrong person for hr zones
+						|| property.equals(ITourbookPreferences.APP_DATA_FILTER_IS_MODIFIED)) {
 
 					clearView();
 					showTour();

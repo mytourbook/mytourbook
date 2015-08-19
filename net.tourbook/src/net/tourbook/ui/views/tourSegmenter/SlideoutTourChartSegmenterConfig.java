@@ -429,14 +429,14 @@ public class SlideoutTourChartSegmenterConfig extends AnimatedToolTipShell imple
 	@Override
 	public Point getToolTipLocation(final Point tipSize) {
 
-//		final int tipWidth = tipSize.x;
+		final int tipWidth = tipSize.x;
 		final int tipHeight = tipSize.y;
 
-//		final int itemWidth = _toolTipItemBounds.width;
+		final int itemWidth = _toolTipItemBounds.width;
 		final int itemHeight = _toolTipItemBounds.height;
 
 		// center horizontally
-		final int devX = _toolTipItemBounds.x;// + itemWidth / 2 - tipWidth / 2;
+		final int devX = _toolTipItemBounds.x + itemWidth / 2 - tipWidth / 2;
 		int devY = _toolTipItemBounds.y + itemHeight + 0;
 
 		final Rectangle displayBounds = _shellContainer.getShell().getDisplay().getBounds();

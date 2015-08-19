@@ -23,7 +23,7 @@ public class ChartSegment {
 
 	public static final int	TITLE_HOVER_MARGIN	= 5;
 
-	public Long				tourId;
+	private Long			_tourId;
 
 	public int				devXTitle;
 	public int				devYTitle;
@@ -59,6 +59,17 @@ public class ChartSegment {
 		return segmentArea;
 	}
 
+	/**
+	 * @return Returns ID of a tour or <code>null</code> when not available.
+	 */
+	public Long getTourId() {
+		return _tourId;
+	}
+
+	public void setTourId(final Long tourId) {
+		_tourId = tourId;
+	}
+
 	@Override
 	public String toString() {
 		return "TourSegment ["
@@ -66,7 +77,7 @@ public class ChartSegment {
 //				+ ("devY=" + devYTitle + ", ")
 //				+ ("width=" + titleWidth + ", ")
 //				+ ("height=" + titleHeight+", ")
-				+ ("tourId=" + tourId + ", ")
+				+ ("tourId=" + _tourId + ", ")
 				+ "]";
 	}
 }

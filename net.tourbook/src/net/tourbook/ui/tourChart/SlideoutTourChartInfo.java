@@ -216,6 +216,11 @@ public class SlideoutTourChartInfo extends AnimatedToolTipShell implements IColo
 		_actionPrefDialog = new ActionOpenPrefDialog(
 				Messages.Tour_Action_EditChartPreferences,
 				PrefPageAppearanceTourChart.ID);
+
+		/*
+		 * Set shell to the parent otherwise the pref dialog is closed when the slideout is closed.
+		 */
+		_actionPrefDialog.setShell(_tourChart.getShell());
 	}
 
 	@Override
@@ -255,17 +260,14 @@ public class SlideoutTourChartInfo extends AnimatedToolTipShell implements IColo
 	}
 
 	private void createUI_10_Title(final Composite parent) {
-		{
-			/*
-			 * Label: Slideout title
-			 */
-			final Label label = new Label(parent, SWT.NONE);
-			GridDataFactory.fillDefaults()//
-//					.span(3, 1)
-					.applyTo(label);
-			label.setText(Messages.Slideout_TourInfoOptions_Label_Title);
-			label.setFont(JFaceResources.getBannerFont());
-		}
+
+		/*
+		 * Label: Slideout title
+		 */
+		final Label label = new Label(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().applyTo(label);
+		label.setText(Messages.Slideout_TourInfoOptions_Label_Title);
+		label.setFont(JFaceResources.getBannerFont());
 	}
 
 	private void createUI_12_Actions(final Composite parent) {

@@ -1780,7 +1780,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 
 	private void setColorProvider(final MapGraphId graphId) {
 
-		_actionMap3Colors.setData(graphId);
+		_actionMap3Colors.setPrefData(graphId);
 
 		final IMapColorProvider colorProvider = MapColorProvider.getActiveMap3ColorProvider(graphId);
 

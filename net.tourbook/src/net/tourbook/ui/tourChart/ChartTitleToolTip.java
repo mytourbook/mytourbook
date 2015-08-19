@@ -45,7 +45,7 @@ public class ChartTitleToolTip extends AnimatedToolTipShell2 implements ITourPro
 	private String				_dialogId	= getClass().getCanonicalName();
 
 	private TourChart			_tourChart;
-	private ChartSegment			_hoveredSegment;
+	private ChartSegment		_hoveredSegment;
 
 	/*
 	 * UI resources
@@ -60,7 +60,7 @@ public class ChartTitleToolTip extends AnimatedToolTipShell2 implements ITourPro
 
 		_tourChart = tourChart;
 
-		setFadeInSteps(10);
+		setFadeInSteps(5);
 		setFadeOutSteps(20);
 		setFadeOutDelaySteps(10);
 
@@ -110,7 +110,7 @@ public class ChartTitleToolTip extends AnimatedToolTipShell2 implements ITourPro
 
 		Composite ui;
 
-		final TourData tourData = TourManager.getInstance().getTourData(_hoveredSegment.tourId);
+		final TourData tourData = TourManager.getInstance().getTourData(_hoveredSegment.getTourId());
 
 		if (tourData == null) {
 
@@ -276,7 +276,7 @@ public class ChartTitleToolTip extends AnimatedToolTipShell2 implements ITourPro
 			return;
 		}
 
-		if (hoveredTour == null) {
+		if (hoveredTour == null || hoveredTour.getTourId() == null) {
 
 			// a marker is not hovered or is hidden, hide tooltip
 
@@ -290,7 +290,7 @@ public class ChartTitleToolTip extends AnimatedToolTipShell2 implements ITourPro
 			// another marker is hovered, show tooltip
 
 			_hoveredSegment = hoveredTour;
-			_hoveredTourId = hoveredTour.tourId;
+			_hoveredTourId = hoveredTour.getTourId();
 
 			showToolTip();
 		}

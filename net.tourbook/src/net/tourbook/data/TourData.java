@@ -946,6 +946,7 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 	public float[]												segmentSerieGradient;
 	@Transient
 	public float[]												segmentSeriePulse;
+
 	/**
 	 * Contains the filename from which the data is imported. When <code>null</code> the data is not
 	 * imported it is from the database.
@@ -2454,7 +2455,9 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 	 */
 	private void computeHrZones() {
 
-		if (timeSerie == null || pulseSerie == null || tourPerson == null) {
+		final TourPerson hrPerson = getDataPerson();
+
+		if (timeSerie == null || pulseSerie == null || hrPerson == null) {
 			return;
 		}
 
@@ -2462,10 +2465,10 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 			computePulseSmoothed();
 
 		}
-		_hrZoneContext = tourPerson.getHrZoneContext(
-				tourPerson.getHrMaxFormula(),
-				tourPerson.getMaxPulse(),
-				tourPerson.getBirthDayWithDefault(),
+		_hrZoneContext = hrPerson.getHrZoneContext(
+				hrPerson.getHrMaxFormula(),
+				hrPerson.getMaxPulse(),
+				hrPerson.getBirthDayWithDefault(),
 				getTourStartTime());
 
 		if (_hrZoneContext == null) {
@@ -4783,6 +4786,29 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 	}
 
 	/**
+	 * @return Returns the person for which the tour is saved or the active person when
+	 *         {@link TourData} contains multiple tours or <code>null</code> when the tour is not
+	 *         saved in the database.
+	 */
+	public TourPerson getDataPerson() {
+
+		TourPerson dataPerson = null;
+
+		if (isMultipleTours) {
+
+			// multiple tours do not have a person, get active person
+
+			dataPerson = TourbookPlugin.getActivePerson();
+
+		} else {
+
+			dataPerson = tourPerson;
+		}
+
+		return dataPerson;
+	}
+
+	/**
 	 * @return Returns {@link DateTime} when the tour was created or <code>null</code> when
 	 *         date/time is not available
 	 */
@@ -5666,7 +5692,7 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 
 	/**
 	 * @return Returns the person for which the tour is saved or <code>null</code> when the tour is
-	 *         not saved in the database
+	 *         not saved in the database.
 	 */
 	public TourPerson getTourPerson() {
 		return tourPerson;

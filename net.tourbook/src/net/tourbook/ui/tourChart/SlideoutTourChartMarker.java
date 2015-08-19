@@ -24,12 +24,15 @@ import net.tourbook.common.tooltip.AnimatedToolTipShell;
 import net.tourbook.data.TourMarker;
 import net.tourbook.preferences.ITourbookPreferences;
 
+import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferenceConverter;
+import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.SWT;
@@ -98,6 +101,8 @@ public class SlideoutTourChartMarker extends AnimatedToolTipShell implements ICo
 	}
 
 	private PixelConverter			_pc;
+
+	private Action					_actionRestoreDefaults;
 
 	/*
 	 * UI controls
@@ -208,8 +213,27 @@ public class SlideoutTourChartMarker extends AnimatedToolTipShell implements ICo
 		_isAnotherDialogOpened = isDialogOpened;
 	}
 
+	private void createActions() {
+
+		/*
+		 * Action: Restore default
+		 */
+		_actionRestoreDefaults = new Action() {
+			@Override
+			public void run() {
+				resetToDefaults();
+			}
+		};
+
+		_actionRestoreDefaults.setImageDescriptor(//
+				TourbookPlugin.getImageDescriptor(Messages.Image__App_RestoreDefault));
+		_actionRestoreDefaults.setToolTipText(Messages.App_Action_RestoreDefault_Tooltip);
+	}
+
 	@Override
 	protected Composite createToolTipContentArea(final Composite parent) {
+
+		createActions();
 
 		final Composite ui = createUI(parent);
 
@@ -230,8 +254,10 @@ public class SlideoutTourChartMarker extends AnimatedToolTipShell implements ICo
 			final Composite container = new Composite(_shellContainer, SWT.NONE);
 			GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
 			GridLayoutFactory.fillDefaults().applyTo(container);
+//			container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
 			{
-				createUI_10_Checkboxes(container);
+				createUI_10_Header(container);
+				createUI_20_Properties(container);
 				createUI_50_TempPosition(container);
 				createUI_90_Bottom(container);
 
@@ -249,7 +275,38 @@ public class SlideoutTourChartMarker extends AnimatedToolTipShell implements ICo
 		return _shellContainer;
 	}
 
-	private void createUI_10_Checkboxes(final Composite parent) {
+	private void createUI_10_Header(final Composite parent) {
+
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+		{
+			{
+				/*
+				 * Label: Slideout title
+				 */
+				final Label label = new Label(container, SWT.NONE);
+				GridDataFactory.fillDefaults().applyTo(label);
+				label.setText(Messages.Slideout_ChartMarkerOptions_Label_Title);
+				label.setFont(JFaceResources.getBannerFont());
+			}
+			{
+				final ToolBar toolbar = new ToolBar(container, SWT.FLAT);
+				GridDataFactory.fillDefaults()//
+						.grab(true, false)
+						.align(SWT.END, SWT.BEGINNING)
+						.applyTo(toolbar);
+
+				final ToolBarManager tbm = new ToolBarManager(toolbar);
+
+				tbm.add(_actionRestoreDefaults);
+
+				tbm.update(true);
+			}
+		}
+	}
+
+	private void createUI_20_Properties(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
@@ -800,6 +857,51 @@ public class SlideoutTourChartMarker extends AnimatedToolTipShell implements ICo
 		if (_canOpenToolTip) {
 			showToolTip();
 		}
+	}
+
+	private void resetToDefaults() {
+
+		/*
+		 * Update UI with defaults from pref store
+		 */
+
+		_chkDrawMarkerWithDefaultColor.setSelection(//
+				_prefStore.getDefaultBoolean(ITourbookPreferences.GRAPH_MARKER_IS_DRAW_WITH_DEFAULT_COLOR));
+		_chkShowAbsoluteValues.setSelection(//
+				_prefStore.getDefaultBoolean(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_ABSOLUTE_VALUES));
+		_chkShowHiddenMarker.setSelection(//
+				_prefStore.getDefaultBoolean(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_HIDDEN_MARKER));
+		_chkShowLabelTempPosition.setSelection(//
+				_prefStore.getDefaultBoolean(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_LABEL_TEMP_POSITION));
+		_chkShowMarkerLabel.setSelection(//
+				_prefStore.getDefaultBoolean(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_MARKER_LABEL));
+		_chkShowMarkerPoint.setSelection(//
+				_prefStore.getDefaultBoolean(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_MARKER_POINT));
+		_chkShowMarkerTooltip.setSelection(//
+				_prefStore.getDefaultBoolean(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_MARKER_TOOLTIP));
+		_chkShowOnlyWithDescription.setSelection(//
+				_prefStore.getDefaultBoolean(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_ONLY_WITH_DESCRIPTION));
+
+		_comboLabelTempPosition.select(//
+				_prefStore.getDefaultInt(ITourbookPreferences.GRAPH_MARKER_LABEL_TEMP_POSITION));
+		_comboTooltipPosition.select(//
+				_prefStore.getDefaultInt(ITourbookPreferences.GRAPH_MARKER_TOOLTIP_POSITION));
+
+		_spinHoverSize.setSelection(//
+				_prefStore.getDefaultInt(ITourbookPreferences.GRAPH_MARKER_HOVER_SIZE));
+		_spinMarkerPointSize.setSelection(//
+				_prefStore.getDefaultInt(ITourbookPreferences.GRAPH_MARKER_POINT_SIZE));
+		_spinLabelOffset.setSelection(//
+				_prefStore.getDefaultInt(ITourbookPreferences.GRAPH_MARKER_LABEL_OFFSET));
+
+		_colorDefaultMarker.setColorValue(//
+				PreferenceConverter.getColor(_prefStore, ITourbookPreferences.GRAPH_MARKER_COLOR_DEFAULT));
+		_colorDeviceMarker.setColorValue(//
+				PreferenceConverter.getDefaultColor(_prefStore, ITourbookPreferences.GRAPH_MARKER_COLOR_DEVICE));
+		_colorHiddenMarker.setColorValue(//
+				PreferenceConverter.getDefaultColor(_prefStore, ITourbookPreferences.GRAPH_MARKER_COLOR_HIDDEN));
+
+		onChangeUI();
 	}
 
 	private void restoreState() {

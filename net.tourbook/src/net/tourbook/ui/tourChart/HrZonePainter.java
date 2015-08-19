@@ -84,7 +84,7 @@ public class HrZonePainter implements IFillPainter {
 		final TourChartConfiguration tourChartConfig = (TourChartConfiguration) dataModel.getCustomData(//
 				TourManager.CUSTOM_DATA_TOUR_CHART_CONFIGURATION);
 
-		final TourPerson tourPerson = tourData.getTourPerson();
+		final TourPerson tourPerson = tourData.getDataPerson();
 		if (tourPerson == null) {
 			return;
 		}

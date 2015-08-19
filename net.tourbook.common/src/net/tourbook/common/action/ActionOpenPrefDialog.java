@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -20,13 +20,15 @@ import net.tourbook.common.Messages;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.dialogs.PreferencesUtil;
 
 public final class ActionOpenPrefDialog extends Action {
 
 	private String	_prefPageId;
+	private Object	_prefDialogData;
 
-	private Object	_data;
+	private Shell	_shell	= Display.getCurrent().getActiveShell();
 
 	/**
 	 * @param text
@@ -49,21 +51,26 @@ public final class ActionOpenPrefDialog extends Action {
 
 		this(text, prefPageId);
 
-		_data = data;
+		_prefDialogData = data;
 	}
 
 	@Override
 	public void run() {
 
 		PreferencesUtil.createPreferenceDialogOn(//
-				Display.getCurrent().getActiveShell(),
+				_shell,
 				_prefPageId,
 				null,
-				_data).open();
+				_prefDialogData).open();
 	}
 
-	public void setData(final Object data) {
+	public void setPrefData(final Object data) {
 
-		_data = data;
+		_prefDialogData = data;
+	}
+
+	public void setShell(final Shell shell) {
+
+		_shell = shell;
 	}
 }

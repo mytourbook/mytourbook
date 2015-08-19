@@ -31,11 +31,6 @@ public class Messages extends NLS {
 	public static String		Action_PhotosAndTours_FilterPhotos_Tooltip;
 	public static String		Action_PhotosAndTours_SavePhotoInTour;
 
-//	public static String		Action_SharedMarker_ConvertFromTourMarker;
-
-//	public static String		Action_Sign_MarkerImagePreferences;
-//	public static String		Action_Sign_RemoveMarkerImage;
-
 	public static String		Action_ToolTip_Hide;
 	public static String		Action_ToolTip_SetDefaults;
 
@@ -169,15 +164,6 @@ public class Messages extends NLS {
 	public static String		Dialog_ExtractTour_DlgArea_Title;
 	public static String		Dialog_ExtractTour_Label_DeviceName;
 	public static String		Dialog_ExtractTour_Label_SplitMethod;
-
-//	public static String		Dialog_ImportSigns_ConfirmImportFolder_Message;
-//	public static String		Dialog_ImportSigns_ConfirmImportFolder_Title;
-//	public static String		Dialog_ImportSigns_ConfirmImportSelection_Message;
-//	public static String		Dialog_ImportSigns_ConfirmImportSelection_Title;
-//	public static String		Dialog_ImportSigns_Dialog_Title;
-//	public static String		Dialog_ImportSigns_Dialog_Title_Message;
-//	public static String		Dialog_ImportSigns_MonitorTask;
-//	public static String		Dialog_ImportSigns_MonitorTask_SubTask;
 
 	public static String		Dialog_PersonManager_PersonIsNotAvailable_Message;
 	public static String		Dialog_PersonManager_PersonIsNotAvailable_Title;
@@ -548,8 +534,6 @@ public class Messages extends NLS {
 	public static String		Dlg_TourMarker_Button_HideAllMarker;
 	public static String		Dlg_TourMarker_Button_HideAllMarker_Tooltip;
 	public static String		Dlg_TourMarker_Button_PasteFromClipboard_Tooltip;
-//	public static String		Dlg_TourMarker_Button_reset_offset;
-//	public static String		Dlg_TourMarker_Button_reset_offset_tooltip;
 	public static String		Dlg_TourMarker_Button_ShowAllMarker;
 	public static String		Dlg_TourMarker_Button_ShowAllMarker_Tooltip;
 	public static String		Dlg_TourMarker_Button_undo;
@@ -557,30 +541,19 @@ public class Messages extends NLS {
 	public static String		Dlg_TourMarker_Checkbox_MarkerVisibility;
 	public static String		Dlg_TourMarker_Dlg_Message;
 	public static String		Dlg_TourMarker_Dlg_title;
-//	public static String		Dlg_TourMarker_Group_Image;
 	public static String		Dlg_TourMarker_Group_Label;
 	public static String		Dlg_TourMarker_Group_Url;
-//	public static String		Dlg_TourMarker_Label_Comment;
 	public static String		Dlg_TourMarker_Label_Description;
-//	public static String		Dlg_TourMarker_Label_horizontal_offset;
-//	public static String		Dlg_TourMarker_Label_ImagePosition;
 	public static String		Dlg_TourMarker_Label_Label;
 	public static String		Dlg_TourMarker_Label_LinkText;
 	public static String		Dlg_TourMarker_Label_LinkText_Tooltip;
 	public static String		Dlg_TourMarker_Label_LinkUrl;
 	public static String		Dlg_TourMarker_Label_LinkUrl_Tooltip;
-//	public static String		Dlg_TourMarker_Label_marker_name;
 	public static String		Dlg_TourMarker_Label_markers;
-//	public static String		Dlg_TourMarker_Label_Offset;
 	public static String		Dlg_TourMarker_Label_OffsetHorizontal;
-//	public static String		Dlg_TourMarker_Label_OffsetHorizontal_Tooltip;
 	public static String		Dlg_TourMarker_Label_OffsetVertical;
-//	public static String		Dlg_TourMarker_Label_OffsetVertical_Tooltip;
 	public static String		Dlg_TourMarker_Label_position;
 	public static String		Dlg_TourMarker_Label_Position_Tooltip;
-//	public static String		Dlg_TourMarker_Label_vertical_offset;
-//	public static String		Dlg_TourMarker_Link_Image;
-//	public static String		Dlg_TourMarker_Link_Sign;
 	public static String		Dlg_TourMarker_MsgBox_delete_marker_message;
 	public static String		Dlg_TourMarker_MsgBox_delete_marker_title;
 	public static String		Dlg_TourMarker_MsgBox_WrongFormat_Message;
@@ -633,7 +606,7 @@ public class Messages extends NLS {
 	public static String		Image__App_Edit_Paste;
 	public static String		Image__App_OK;
 
-	public static String	Image__App_RestoreDefault;
+	public static String		Image__App_RestoreDefault;
 	public static String		Image__App_Trash;
 	public static String		Image__App_Trash_Disabled;
 	public static String		Image__ArrowDown;
@@ -781,9 +754,7 @@ public class Messages extends NLS {
 	public static String		Import_Data_Action_Reimport_EntireTour;
 	public static String		Import_Data_Action_Reimport_OnlyAltitudeValues;
 	public static String		Import_Data_Action_Reimport_OnlyGearValues;
-
 	public static String		Import_Data_Action_Reimport_OnlyPowerAndSpeedValues;
-
 	public static String		Import_Data_Action_Reimport_OnlyTemperatureValues;
 	public static String		Import_Data_Action_Reimport_OnlyTimeSlices;
 	public static String		Import_Data_Action_Reimport_OnlyTourMarker;
@@ -793,7 +764,6 @@ public class Messages extends NLS {
 	public static String		Import_Data_Dialog_ConfirmReimport_Message;
 	public static String		Import_Data_Dialog_ConfirmReimportAltitudeValues_Message;
 	public static String		Import_Data_Dialog_ConfirmReimportGearValues_Message;
-
 	public static String		Import_Data_Dialog_ConfirmReimportPowerAndSpeedValues_Message;
 	public static String		Import_Data_Dialog_ConfirmReimportTemperatureValues_Message;
 	public static String		Import_Data_Dialog_ConfirmReimportTimeSlices_Message;
@@ -949,9 +919,7 @@ public class Messages extends NLS {
 	public static String		Pref_Graphs_Checkbox_GraphAntialiasing;
 	public static String		Pref_Graphs_Checkbox_GraphAntialiasing_Tooltip;
 	public static String		Pref_Graphs_Checkbox_SegmentAlternateColor;
-
 	public static String		Pref_Graphs_Checkbox_SegmentAlternateColor_Tooltip;
-
 	public static String		Pref_Graphs_Checkbox_ShowHorizontalGrid;
 	public static String		Pref_Graphs_Checkbox_ShowVerticalGrid;
 	public static String		Pref_Graphs_Dialog_GridLine_Warning_Message;
@@ -1210,19 +1178,15 @@ public class Messages extends NLS {
 	public static String		Search_View_Link_LinuxBrowser;
 	public static String		Search_View_Link_SetupExternalBrowser;
 
-	public static String	Slideout_ChartMarkerOptions_Checkbox_IsShowAbsoluteValues;
-
-	public static String	Slideout_ChartMarkerOptions_Checkbox_IsShowAbsoluteValues_Tooltip;
-
+	public static String		Slideout_ChartMarkerOptions_Checkbox_IsShowAbsoluteValues;
+	public static String		Slideout_ChartMarkerOptions_Checkbox_IsShowAbsoluteValues_Tooltip;
 	public static String		Slideout_ChartMarkerOptions_Checkbox_IsShowHiddenMarker;
 	public static String		Slideout_ChartMarkerOptions_Checkbox_IsShowMarker;
 	public static String		Slideout_ChartMarkerOptions_Checkbox_IsShowMarkerPoint;
 	public static String		Slideout_ChartMarkerOptions_Checkbox_IsShowMarkerTooltip;
 	public static String		Slideout_ChartMarkerOptions_Checkbox_IsShowMarkerWithDefaultColor;
 	public static String		Slideout_ChartMarkerOptions_Checkbox_IsShowMarkerWithDefaultColor_Tooltip;
-
-	public static String	Slideout_ChartMarkerOptions_Checkbox_IsShowOnlyWithDescription;
-//	public static String		Slideout_ChartMarkerOptions_Checkbox_IsShowSignImage;
+	public static String		Slideout_ChartMarkerOptions_Checkbox_IsShowOnlyWithDescription;
 	public static String		Slideout_ChartMarkerOptions_Checkbox_IsShowTempPosition;
 	public static String		Slideout_ChartMarkerOptions_Checkbox_IsShowTempPosition_Tooltip;
 	public static String		Slideout_ChartMarkerOptions_Combo_TooltipPosition_Tooltip;
@@ -1237,9 +1201,9 @@ public class Messages extends NLS {
 	public static String		Slideout_ChartMarkerOptions_Label_MarkerSize_Tooltip;
 	public static String		Slideout_ChartMarkerOptions_Label_Offset;
 	public static String		Slideout_ChartMarkerOptions_Label_Offset_Tooltip;
+	public static String		Slideout_ChartMarkerOptions_Label_Title;
 
-	public static String	Slideout_SegmenterChartOptions_Checkbox_IsShowDecimalPlaces;
-
+	public static String		Slideout_SegmenterChartOptions_Checkbox_IsShowDecimalPlaces;
 	public static String		Slideout_SegmenterChartOptions_Checkbox_IsShowSegmentMarker;
 	public static String		Slideout_SegmenterChartOptions_Checkbox_IsShowSegmentValue;
 	public static String		Slideout_SegmenterChartOptions_Label_FontSize;
@@ -1256,11 +1220,9 @@ public class Messages extends NLS {
 
 	public static String		Slideout_TourInfoOptions_Checkbox_IsShowInfoTooltip;
 	public static String		Slideout_TourInfoOptions_Checkbox_IsShowTourSeparator;
-
-	public static String	Slideout_TourInfoOptions_Checkbox_IsShowTourSeparator_Tooltip;
+	public static String		Slideout_TourInfoOptions_Checkbox_IsShowTourSeparator_Tooltip;
 	public static String		Slideout_TourInfoOptions_Checkbox_IsShowTourTitle;
-	public static String	Slideout_TourInfoOptions_Label_Title;
-
+	public static String		Slideout_TourInfoOptions_Label_Title;
 	public static String		Slideout_TourInfoOptions_Label_TooltipDelay;
 	public static String		Slideout_TourInfoOptions_Label_TooltipDelay_Tooltip;
 
@@ -1413,8 +1375,6 @@ public class Messages extends NLS {
 	public static String		Tour_Editor_Label_Weather;
 	public static String		Tour_Editor_Label_WindDirection_Unit;
 
-//	public static String		Tour_Marker_Action_Delta_Tooltip;
-//	public static String		Tour_Marker_Column_Description;
 	public static String		Tour_Marker_Column_Description_ShortCut;
 	public static String		Tour_Marker_Column_Description_Tooltip;
 	public static String		Tour_Marker_Column_horizontal_offset;
@@ -1457,14 +1417,12 @@ public class Messages extends NLS {
 	public static String		Tour_Marker_TooltipPosition_Top;
 
 	public static String		Tour_Segmenter_Action_ShowHideSegmentsInTourChart_Tooltip;
-
 	public static String		Tour_Segmenter_Button_SaveTour_Tooltip;
 	public static String		Tour_Segmenter_Label_AltitudeUpDown_Tooltip;
 	public static String		Tour_Segmenter_Label_DPTolerance;
 	public static String		Tour_Segmenter_Label_DPTolerance_Tooltip;
 	public static String		Tour_Segmenter_Label_no_chart;
 	public static String		Tour_Segmenter_Type_ByAltitude_Merged;
-
 	public static String		Tour_Segmenter_Type_ByBreakTime;
 
 	public static String		Tour_Statistic_Combo_BarVOrder_InfoItem;

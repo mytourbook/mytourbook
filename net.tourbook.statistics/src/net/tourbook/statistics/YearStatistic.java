@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.Chart;
+import net.tourbook.chart.ChartSegmentConfig;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.ITourbookPreferences;
@@ -137,5 +138,16 @@ public abstract class YearStatistic extends TourbookStatistic implements IYearSt
 	protected void setChartProperties(final Chart chart) {
 
 		UI.setChartProperties(chart);
+
+		/*
+		 * These settings are currently static, a UI to modify it is not yet implemented.
+		 */
+		final ChartSegmentConfig config = chart.getChartSegmentConfig();
+
+		config.isMultipleSegments = true;
+
+		config.isShowSegmentBackground = false;
+		config.isShowSegmentSeparator = true;
+		config.isShowSegmentTitle = true;
 	}
 }

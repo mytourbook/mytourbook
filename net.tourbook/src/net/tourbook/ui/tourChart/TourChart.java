@@ -534,20 +534,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		_photoOverlayBGColorTour = new Color(getDisplay(), //
 				colorProvider.getGraphColorDefinition(GraphColorManager.PREF_GRAPH_TOUR).getLineColor_Active());
 
-		/*
-		 * set values from pref store
-		 */
-		graphAntialiasing = _prefStore.getBoolean(ITourbookPreferences.GRAPH_ANTIALIASING) ? SWT.ON : SWT.OFF;
-		isShowSegmentAlternateColor = _prefStore.getBoolean(//
-				ITourbookPreferences.GRAPH_IS_SEGMENT_ALTERNATE_COLOR);
-		graphTransparencyLine = _prefStore.getInt(ITourbookPreferences.GRAPH_TRANSPARENCY_LINE);
-		graphTransparencyFilling = _prefStore.getInt(ITourbookPreferences.GRAPH_TRANSPARENCY_FILLING);
-
-		gridVerticalDistance = _prefStore.getInt(ITourbookPreferences.GRAPH_GRID_VERTICAL_DISTANCE);
-		gridHorizontalDistance = _prefStore.getInt(ITourbookPreferences.GRAPH_GRID_HORIZONTAL_DISTANCE);
-
-		isShowHorizontalGridLines = _prefStore.getBoolean(ITourbookPreferences.GRAPH_GRID_IS_SHOW_HORIZONTAL_GRIDLINES);
-		isShowVerticalGridLines = _prefStore.getBoolean(ITourbookPreferences.GRAPH_GRID_IS_SHOW_VERTICAL_GRIDLINES);
+		setupChartConfig();
 
 		setShowMouseMode();
 
@@ -955,28 +942,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 				//
 				) {
 
-					graphAntialiasing = _prefStore.getBoolean(//
-							ITourbookPreferences.GRAPH_ANTIALIASING) ? SWT.ON : SWT.OFF;
-
-					isShowSegmentAlternateColor = _prefStore.getBoolean(//
-							ITourbookPreferences.GRAPH_IS_SEGMENT_ALTERNATE_COLOR);
-					segmentAlternateColor = PreferenceConverter.getColor(_prefStore, //
-							ITourbookPreferences.GRAPH_SEGMENT_ALTERNATE_COLOR);
-
-					graphTransparencyLine = _prefStore.getInt(//
-							ITourbookPreferences.GRAPH_TRANSPARENCY_LINE);
-					graphTransparencyFilling = _prefStore.getInt(//
-							ITourbookPreferences.GRAPH_TRANSPARENCY_FILLING);
-
-					gridVerticalDistance = _prefStore.getInt(//
-							ITourbookPreferences.GRAPH_GRID_VERTICAL_DISTANCE);
-					gridHorizontalDistance = _prefStore.getInt(//
-							ITourbookPreferences.GRAPH_GRID_HORIZONTAL_DISTANCE);
-
-					isShowHorizontalGridLines = _prefStore.getBoolean(//
-							ITourbookPreferences.GRAPH_GRID_IS_SHOW_HORIZONTAL_GRIDLINES);
-					isShowVerticalGridLines = _prefStore.getBoolean(//
-							ITourbookPreferences.GRAPH_GRID_IS_SHOW_VERTICAL_GRIDLINES);
+					setupChartConfig();
 
 					isChartModified = true;
 
@@ -2138,12 +2104,14 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 			TourData tourData;
 
 			if (_tourData.isMultipleTours) {
-				tourData = TourManager.getTour(_hoveredSegment.tourId);
+				tourData = TourManager.getTour(_hoveredSegment.getTourId());
 			} else {
 				tourData = _tourData;
 			}
 
-			tourChartTours.add(tourData);
+			if (tourData != null) {
+				tourChartTours.add(tourData);
+			}
 		}
 
 		return tourChartTours;
@@ -2787,6 +2755,32 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		if (_tourInfoIconTooltipProvider != null) {
 			_tourInfoIconTooltipProvider.setActionsEnabled(isEnabled);
 		}
+	}
+
+	private void setupChartConfig() {
+
+		graphAntialiasing = _prefStore.getBoolean(//
+				ITourbookPreferences.GRAPH_ANTIALIASING) ? SWT.ON : SWT.OFF;
+
+		isShowSegmentAlternateColor = _prefStore.getBoolean(//
+				ITourbookPreferences.GRAPH_IS_SEGMENT_ALTERNATE_COLOR);
+		segmentAlternateColor = PreferenceConverter.getColor(_prefStore, //
+				ITourbookPreferences.GRAPH_SEGMENT_ALTERNATE_COLOR);
+
+		graphTransparencyLine = _prefStore.getInt(//
+				ITourbookPreferences.GRAPH_TRANSPARENCY_LINE);
+		graphTransparencyFilling = _prefStore.getInt(//
+				ITourbookPreferences.GRAPH_TRANSPARENCY_FILLING);
+
+		gridVerticalDistance = _prefStore.getInt(//
+				ITourbookPreferences.GRAPH_GRID_VERTICAL_DISTANCE);
+		gridHorizontalDistance = _prefStore.getInt(//
+				ITourbookPreferences.GRAPH_GRID_HORIZONTAL_DISTANCE);
+
+		isShowHorizontalGridLines = _prefStore.getBoolean(//
+				ITourbookPreferences.GRAPH_GRID_IS_SHOW_HORIZONTAL_GRIDLINES);
+		isShowVerticalGridLines = _prefStore.getBoolean(//
+				ITourbookPreferences.GRAPH_GRID_IS_SHOW_VERTICAL_GRIDLINES);
 	}
 
 	private void setupChartSegments() {

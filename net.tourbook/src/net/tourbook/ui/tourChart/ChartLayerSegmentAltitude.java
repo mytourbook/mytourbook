@@ -260,13 +260,11 @@ public class ChartLayerSegmentAltitude implements IChartLayer {
 						final int segmentWidth = devXSegment - devXPrev;
 						final float segmentWidth2 = segmentWidth / 2;
 						final int devXText = (int) (devXPrev + segmentWidth2 - textWidth);
-//						final float xGradientOffset = 0;//(textHeight2 * segmentWidth2 / yDiff2);
 
 						/*
 						 * Ensure the value text do not overlap, if possible :-)
 						 */
 						final Rectangle textRect = new Rectangle(devXText, devYText, textWidth, textHeight);
-
 						final Rectangle validRect = posChecker.getValidRect(textRect, isValueUp, textHeight, valueText);
 
 						// don't draw over the graph borders

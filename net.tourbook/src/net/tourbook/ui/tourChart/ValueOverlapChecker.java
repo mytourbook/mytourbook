@@ -41,7 +41,9 @@ public class ValueOverlapChecker {
 
 	public ValueOverlapChecker(final int numStackedValues) {
 
-		_numRects = numStackedValues + 10;
+		_numRects = numStackedValues + 20;
+
+		// +1 is necessary otherwise the segmenter values are not displayed
 		_numPreviousValues = numStackedValues + 1;
 
 		_prevValues = new Rectangle[_numRects];
@@ -66,25 +68,31 @@ public class ValueOverlapChecker {
 			yDiff = textHeight;
 		}
 
-		if (valueText.equals("0.4")) {
-			int a = 0;
-			a++;
-		}
+//		/*
+//		 * Debugging
+//		 */
+//		if (valueText.equals("-0.4")) {
+//			int a = 0;
+//			a++;
+//		}
 
+		int rectCounter = 0;
 		for (int rectIndex = 0; rectIndex < _numRects; rectIndex++) {
 
 			final Rectangle prevRect = _prevValues[rectIndex];
 
 			if (prevRect.intersects(textRect)) {
 
-				if (rectIndex > _numPreviousValues) {
-					return null;
-				}
 
 				textRect.y = prevRect.y + yDiff;
 
 				validRect = null;
 				rectIndex = -1;
+
+				rectCounter++;
+				if (rectCounter >= _numPreviousValues) {
+					return validRect;
+				}
 
 			} else {
 

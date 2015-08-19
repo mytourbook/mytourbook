@@ -246,7 +246,9 @@ public class TourManager {
 			@Override
 			public void propertyChange(final PropertyChangeEvent event) {
 
-				if (event.getProperty().equals(ITourbookPreferences.CLEAR_TOURDATA_CACHE)) {
+				final String property = event.getProperty();
+
+				if (property.equals(ITourbookPreferences.CLEAR_TOURDATA_CACHE)) {
 
 					clearTourDataCache();
 
@@ -258,6 +260,14 @@ public class TourManager {
 							fireEvent(TourEventId.UPDATE_UI);
 						}
 					});
+
+				} else if (property.equals(ITourbookPreferences.APP_DATA_FILTER_IS_MODIFIED)) {
+
+					/*
+					 * multiple tours can have the wrong person for hr zones
+					 */
+
+					_multipleTourData = null;
 				}
 			}
 		});

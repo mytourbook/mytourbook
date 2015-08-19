@@ -126,15 +126,17 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 		store.setDefault(ITourbookPreferences.GRAPH_TRANSPARENCY_FILLING, 0x80);
 
 		// chart/tour segment alternate color
-		store.setDefault(ITourbookPreferences.GRAPH_IS_SEGMENT_ALTERNATE_COLOR, true);
+		store.setDefault(ITourbookPreferences.GRAPH_IS_SEGMENT_ALTERNATE_COLOR, false);
 		PreferenceConverter.setDefault(store, //
 				ITourbookPreferences.GRAPH_SEGMENT_ALTERNATE_COLOR,
 				new RGB(0xf5, 0xf5, 0xf5));
 
 		// tour segmenter chart value font
-		final FontData[] defaultFontData = Display.getDefault().getSystemFont().getFontData();
-		defaultFontData[0].setHeight(7);
-		PreferenceConverter.setDefault(store, ITourbookPreferences.TOUR_SEGMENTER_CHART_VALUE_FONT, defaultFontData);
+		final FontData[] segmenterDefaultFontData = Display.getDefault().getSystemFont().getFontData();
+		segmenterDefaultFontData[0].setHeight(8);
+		PreferenceConverter.setDefault(store,//
+				ITourbookPreferences.TOUR_SEGMENTER_CHART_VALUE_FONT,
+				segmenterDefaultFontData);
 
 		// show breaktime values
 		store.setDefault(ITourbookPreferences.GRAPH_IS_BREAKTIME_VALUES_VISIBLE, true);
@@ -173,7 +175,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 		store.setDefault(ITourbookPreferences.GRAPH_TOUR_INFO_IS_VISIBLE, true);
 		store.setDefault(ITourbookPreferences.GRAPH_TOUR_INFO_IS_TITLE_VISIBLE, true);
 		store.setDefault(ITourbookPreferences.GRAPH_TOUR_INFO_IS_TOOLTIP_VISIBLE, true);
-		store.setDefault(ITourbookPreferences.GRAPH_TOUR_INFO_IS_TOUR_SEPARATOR_VISIBLE, false);
+		store.setDefault(ITourbookPreferences.GRAPH_TOUR_INFO_IS_TOUR_SEPARATOR_VISIBLE, true);
 		store.setDefault(ITourbookPreferences.GRAPH_TOUR_INFO_TOOLTIP_DELAY, 200);
 
 		// is photo visible

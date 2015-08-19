@@ -12,6 +12,7 @@ New
 - Customize segment color.
 - Zoom marker: show relative position value when zoomed in.
 - Show only tour marker which contain a description.
+- HR zones can only be displayed for multiple tours when an active person is selected, it is not available when 'All People' is selected.
 
 
 Improvements

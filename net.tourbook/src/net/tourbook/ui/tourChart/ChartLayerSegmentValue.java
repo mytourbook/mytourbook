@@ -98,16 +98,10 @@ public class ChartLayerSegmentValue implements IChartLayer {
 			return;
 		}
 
-		final ValueOverlapChecker valueCheckerUp = new ValueOverlapChecker(_stackedValues);
-		final ValueOverlapChecker valueCheckerDown = new ValueOverlapChecker(_stackedValues);
 
 		final float[] segmentValues = segmentConfig.segmentDataSerie;
 		final IValueLabelProvider segmentLabelProvider = segmentConfig.labelProvider;
 
-		Rectangle[] paintedValues = null;
-		if (_isShowSegmenterValues) {
-			paintedValues = segmentConfig.paintedValues = new Rectangle[segmentSerieSize];
-		}
 
 		final Display display = Display.getCurrent();
 		boolean toggleAboveBelow = false;
@@ -122,6 +116,8 @@ public class ChartLayerSegmentValue implements IChartLayer {
 		final int valueDivisor = yData.getValueDivisor();
 		final double scaleX = graphDrawingData.getScaleX();
 		final double scaleY = graphDrawingData.getScaleY();
+
+		final ValueOverlapChecker posChecker = new ValueOverlapChecker(_stackedValues);
 
 		// setup font
 		final Font fontBackup = gc.getFont();
@@ -249,57 +245,29 @@ public class ChartLayerSegmentValue implements IChartLayer {
 					}
 
 					/*
-					 * Ensure the value texts do not overlap, if possible :-)
+					 * Ensure the value text do not overlap, if possible :-)
 					 */
-					Rectangle textRect = new Rectangle(devXText, devYText, textWidth, textHeight);
-					boolean isDrawValue = true;
+					final Rectangle textRect = new Rectangle(devXText, devYText, textWidth, textHeight);
+					final Rectangle validRect = posChecker.getValidRect(textRect, isValueUp, textHeight, valueText);
 
-//					if (isDrawAbove || isToggleAboveBelow) {
-//						if (valueCheckerUp.intersectsWithValues(textRect)) {
-//							devYText = valueCheckerUp.getPreviousValue().y - textHeight;
-//						}
-//						if (valueCheckerUp.intersectsNoValues(textRect)) {
-//							isDrawValue = false;
-//						}
-//
-//					} else {
-//						if (valueCheckerDown.intersectsWithValues(textRect)) {
-//							devYText = valueCheckerDown.getPreviousValue().y + textHeight;
-//						}
-//						if (valueCheckerDown.intersectsNoValues(textRect)) {
-//							isDrawValue = false;
-//						}
-//					}
+					// don't draw over the graph borders
+					if (validRect != null && validRect.y > devYTop && validRect.y + textHeight < devYBottom) {
 
-					if (devYText < devYTop || devYText + textHeight > devYBottom) {
-						isDrawValue = false;
-					}
+						// keep current valid rectangle
+						posChecker.setupNext(validRect, isValueUp);
 
-					if (isDrawValue) {
-
-						gc.setForeground(textColor);
 						gc.drawText(//
 								valueText,
 								devXText,
-								devYText,
+								validRect.y,
 								true);
 
-						// keep current up/down rectangles
-						final int margin = 0;
-						textRect = new Rectangle(//
-								devXText - margin,
-								devYText - margin,
-								textWidth + 2 * margin,
-								textHeight + 2 * margin);
-
-//						if (isDrawAbove || isToggleAboveBelow) {
-//							valueCheckerUp.setupNext(textRect);
-//						} else {
-//							valueCheckerDown.setupNext(textRect);
-//						}
-
-						// keep painted position to detect hovered values
-						paintedValues[segmentIndex] = textRect;
+//						/*
+//						 * Debugging
+//						 */
+//						gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_GRAY));
+//						gc.setLineAttributes(defaultLineAttributes);
+//						gc.drawRectangle(validRect);
 					}
 				}
 

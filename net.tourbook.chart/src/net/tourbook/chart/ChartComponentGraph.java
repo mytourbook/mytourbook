@@ -1949,43 +1949,28 @@ public class ChartComponentGraph extends Canvas {
 						}
 					}
 
-//					if (chartSegmentConfig.isShowSegmentSeparator) {
-//
-//						// draw segment start line but not for the first segment
-//						if (segmentIndex != 0) {
-//
-//							gc.setLineAttributes(vertLineLA);
-//							gc.setForeground(display.getSystemColor(SWT.COLOR_DARK_GRAY));
-//
-////							gc.drawLine(devXSegmentStart, 1, devXSegmentStart, devYTitle - 1);
-//							gc.drawLine(//
-//									devXSegmentStart,
-//									devYTitle + titleHeight,
-//									devXSegmentStart,
-//									devYBottom);
-//						}
-//					}
+					/*
+					 * Keep segment drawing data
+					 */
+					final ChartSegment chartSegment = new ChartSegment();
 
 					if (segmentCustomData != null && segmentCustomData[segmentIndex] instanceof Long) {
-
-						final ChartSegment chartSegment = new ChartSegment();
-
-						chartSegment.tourId = (Long) segmentCustomData[segmentIndex];
-
-						chartSegment.devXTitle = devXTitle;
-						chartSegment.devYTitle = devYTitle;
-
-						chartSegment.titleWidth = titleWidth;
-						chartSegment.titleHeight = titleHeight;
-
-						chartSegment.devYGraphTop = devYGraphTop;
-						chartSegment.devGraphWidth = _chartDrawingData.devVisibleChartWidth;
-
-						chartSegment.devXSegment = visibleSegmentStart;
-						chartSegment.devSegmentWidth = visibleSegmentWidth;
-
-						tourSegments.add(chartSegment);
+						chartSegment.setTourId((Long) segmentCustomData[segmentIndex]);
 					}
+
+					chartSegment.devXTitle = devXTitle;
+					chartSegment.devYTitle = devYTitle;
+
+					chartSegment.titleWidth = titleWidth;
+					chartSegment.titleHeight = titleHeight;
+
+					chartSegment.devYGraphTop = devYGraphTop;
+					chartSegment.devGraphWidth = _chartDrawingData.devVisibleChartWidth;
+
+					chartSegment.devXSegment = visibleSegmentStart;
+					chartSegment.devSegmentWidth = visibleSegmentWidth;
+
+					tourSegments.add(chartSegment);
 				}
 			}
 
@@ -2017,27 +2002,29 @@ public class ChartComponentGraph extends Canvas {
 						true);
 			}
 
+			/*
+			 * Keep segment drawing data
+			 */
+			final ChartSegment chartSegment = new ChartSegment();
+
 			final Object tourIdObject = _chartDrawingData.chartDataModel.getCustomData(Chart.CUSTOM_DATA_TOUR_ID);
 			if (tourIdObject instanceof Long) {
-
-				final ChartSegment tourSegment = new ChartSegment();
-
-				tourSegment.tourId = (Long) tourIdObject;
-
-				tourSegment.devXTitle = devXTitle;
-				tourSegment.devYTitle = devYTitle;
-
-				tourSegment.titleWidth = titleWidth;
-				tourSegment.titleHeight = titleHeight;
-
-				tourSegment.devYGraphTop = devYGraphTop;
-				tourSegment.devGraphWidth = _chartDrawingData.devVisibleChartWidth;
-
-				tourSegment.devXSegment = 0;
-				tourSegment.devSegmentWidth = _chartDrawingData.devVisibleChartWidth;
-
-				tourSegments.add(tourSegment);
+				chartSegment.setTourId((Long) tourIdObject);
 			}
+
+			chartSegment.devXTitle = devXTitle;
+			chartSegment.devYTitle = devYTitle;
+
+			chartSegment.titleWidth = titleWidth;
+			chartSegment.titleHeight = titleHeight;
+
+			chartSegment.devYGraphTop = devYGraphTop;
+			chartSegment.devGraphWidth = _chartDrawingData.devVisibleChartWidth;
+
+			chartSegment.devXSegment = 0;
+			chartSegment.devSegmentWidth = _chartDrawingData.devVisibleChartWidth;
+
+			tourSegments.add(chartSegment);
 		}
 	}
 
@@ -3459,8 +3446,8 @@ public class ChartComponentGraph extends Canvas {
 	}
 
 	/**
-	 * Draws a bar graph, this requires that drawingData.getChartData2ndValues does not return null,
-	 * if null is returned, a line graph will be drawn instead
+	 * Draws a bar graph, this requires that drawingData.getChartData2ndValues does not return
+	 * <code>null</code>, if <code>null</code> is returned, a line graph will be drawn instead.
 	 * 
 	 * @param gc
 	 * @param drawingData
@@ -3916,7 +3903,7 @@ public class ChartComponentGraph extends Canvas {
 
 					int barWidth = barXEnd - barXStart + devXOverlap2;
 
-					// ensure bar is painted
+					// ensure bar is painted otherwise it look ugly
 					if (barWidth < 1) {
 						barWidth = 1;
 					}
