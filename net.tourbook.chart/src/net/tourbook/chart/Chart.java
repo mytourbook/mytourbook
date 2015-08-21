@@ -224,7 +224,7 @@ public class Chart extends ViewForm {
 		_mouseChartListener.add(mouseListener);
 	}
 
-	public void addMouseMoveChartListener(final IMouseListener mouseListener) {
+	public void addMouseChartMoveListener(final IMouseListener mouseListener) {
 		_mouseChartMoveListener.add(mouseListener);
 	}
 

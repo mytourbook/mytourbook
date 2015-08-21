@@ -42,7 +42,6 @@ import org.eclipse.swt.widgets.Display;
  */
 public class ChartLayerSegmentValue implements IChartLayer {
 
-
 	private TourChart			_tourChart;
 	private TourData			_tourData;
 	private double[]			_xDataSerie;
@@ -51,7 +50,7 @@ public class ChartLayerSegmentValue implements IChartLayer {
 	private boolean				_isShowSegmenterValues;
 	private boolean				_isShowDecimalPlaces;
 
-	private final NumberFormat	_nf1			= NumberFormat.getNumberInstance();
+	private final NumberFormat	_nf1	= NumberFormat.getNumberInstance();
 
 	{
 		_nf1.setMinimumFractionDigits(1);
@@ -92,16 +91,14 @@ public class ChartLayerSegmentValue implements IChartLayer {
 		}
 
 		final ConfigGraphSegment segmentConfig = (ConfigGraphSegment) segmentConfigObject;
+		final float[] segmentValues = segmentConfig.segmentDataSerie;
 
 		// check segment values
-		if (segmentConfig.segmentDataSerie == null) {
+		if (segmentValues == null) {
 			return;
 		}
 
-
-		final float[] segmentValues = segmentConfig.segmentDataSerie;
 		final IValueLabelProvider segmentLabelProvider = segmentConfig.labelProvider;
-
 
 		final Display display = Display.getCurrent();
 		boolean toggleAboveBelow = false;

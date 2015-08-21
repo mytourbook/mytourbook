@@ -21,9 +21,12 @@ package net.tourbook.ui.tourChart;
 import net.tourbook.common.UI;
 import net.tourbook.photo.Photo;
 
+import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
 
-public class ChartLabel extends ChartMarker {
+public class ChartLabel {
+
+	static final int		MARKER_HOVER_SIZE		= 4;
 
 	/**
 	 * marker was created in the device
@@ -42,6 +45,16 @@ public class ChartLabel extends ChartMarker {
 	public boolean			isVisible;
 	public boolean			isDescription;
 
+	/**
+	 * x-position in graph units
+	 */
+	public double			graphX;
+
+	/**
+	 * index in the data serie
+	 */
+	public int				serieIndex;
+
 	public String			markerLabel				= UI.EMPTY_STRING;
 
 	/**
@@ -56,14 +69,14 @@ public class ChartLabel extends ChartMarker {
 	public int				type;
 
 	public int				labelXOffset;
-	public int				labelYOffset;
 
+	public int				labelYOffset;
 	public int				visualType;
 
 	public Photo			markerSignPhoto;
 
 	/*
-	 * Painted marker positions
+	 * Painted label positions
 	 */
 	public int				devXMarker;
 	public int				devYMarker;
@@ -74,8 +87,8 @@ public class ChartLabel extends ChartMarker {
 	public Rectangle		paintedLabel;
 
 	public int				devHoverSize;
-	public int				devMarkerPointSize;
 
+	public int				devMarkerPointSize;
 	/**
 	 * Bounds where the marker sign image is painted.
 	 */
@@ -95,8 +108,15 @@ public class ChartLabel extends ChartMarker {
 	 * Graph margins
 	 */
 	public int				devYBottom;
+
 	public int				devYTop;
 	public int				devGraphWidth;
+
+	int						paintedX1;
+	int						paintedX2;
+	int						paintedY1;
+	int						paintedY2;
+	RGB						paintedRGB;
 
 	public ChartLabel() {}
 
@@ -110,12 +130,14 @@ public class ChartLabel extends ChartMarker {
 
 	@Override
 	public String toString() {
-		return "ChartLabel [devXMarker=" //$NON-NLS-1$
-				+ devXMarker
-				+ ", devYMarker=" //$NON-NLS-1$
-				+ devYMarker
-				+ ", markerLabel=" //$NON-NLS-1$
-				+ markerLabel
+		return "ChartLabel [" //
+//				+ ("paintedLabel=" + paintedLabel + ", ")
+//				+ ("serieIndex=" + serieIndex + ", ")
+//				+ ("graphX=" + graphX + ", ")
+//				+ ("devXMarker=" + devXMarker + ", ")
+//				+ ("devYMarker=" + devYMarker + ", ")
+				+ ("markerLabel=" + markerLabel)
 				+ "]"; //$NON-NLS-1$
 	}
+
 }

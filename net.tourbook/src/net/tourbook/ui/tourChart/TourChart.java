@@ -214,13 +214,22 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
 	private IMouseListener				_mouseMarkerListener					= new MouseMarkerListener();
 	private IMouseListener				_mousePhotoListener						= new MousePhotoListener();
-	private IMouseListener				_mouseChartSegmentListener				= new MouseChartSegmentListener();
-	private IMouseListener				_mouseMoveChartSegmentListener			= new MouseMoveChartSegmentListener();
+	private IMouseListener				_mouseSegmentLabel_Listener				= new MouseListener_SegmentLabel();
+	private IMouseListener				_mouseSegmentLabel_MoveListener			= new MouseListener_SegmentLabel_Move();
+	private IMouseListener				_mouseSegmentTitle_Listener				= new MouseListener_SegmentTitle();
+	private IMouseListener				_mouseSegmentTitle_MoveListener			= new MouseListener_SegmentTitle_Move();
 
-	private long						_hoveredSegmentEventTime;
+	private long						_hoveredSegmentLabelEventTime;
+	private long						_hoveredSegmentTitleEventTime;
 
-	private boolean						_isSegmentHovered;
-	private ChartSegment				_hoveredSegment;
+	private boolean						_isSegmentLabelHovered;
+	private ChartLabel					_hoveredSegmentLabel;
+	private ChartLabel					_selectedSegmentLabel;
+
+	private boolean						_isSegmentTitleHovered;
+	private ChartSegment				_hoveredSegmentTitle;
+
+	private Font						_segmenterValueFont;
 
 	private ActionEditQuick				_actionEditQuick;
 
@@ -240,8 +249,6 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
 	private Color						_photoOverlayBGColorLink;
 	private Color						_photoOverlayBGColorTour;
-
-	private Font						_segmenterValueFont;
 
 	/**
 	 * This listener is added to ALL widgets within the tooltip shell.
@@ -327,7 +334,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		}
 	}
 
-	public class HoveredValueListener implements IHoveredValueListener {
+	private class HoveredValueListener implements IHoveredValueListener {
 
 		@Override
 		public void hideTooltip() {
@@ -374,26 +381,68 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
 	}
 
-	public class MouseChartSegmentListener extends MouseAdapter {
+	private class MouseListener_SegmentLabel extends MouseAdapter {
 
 		@Override
 		public void chartResized() {
-			onChartSegment_Resized();
-		}
-
-		@Override
-		public void mouseDoubleClick(final ChartMouseEvent event) {
-			onChartSegment_MouseDoubleClick(event);
+			onSegmentLabel_Resized();
 		}
 
 		@Override
 		public void mouseDown(final ChartMouseEvent event) {
-			onChartSegment_MouseDown(event);
+			onSegmentLabel_MouseDown(event);
 		}
 
 		@Override
 		public void mouseExit() {
-			onChartSegment_MouseExit();
+			onSegmentLabel_MouseExit();
+		}
+	}
+
+	/**
+	 * This mouse move listener is used to get mouse move events to show the tour tooltip when the
+	 * y-slider is dragged.
+	 */
+	private class MouseListener_SegmentLabel_Move extends MouseAdapter {
+
+		@Override
+		public void mouseMove(final ChartMouseEvent event) {
+			onSegmentLabel_MouseMove(event);
+		}
+	}
+
+	private class MouseListener_SegmentTitle extends MouseAdapter {
+
+		@Override
+		public void chartResized() {
+			onSegmentTitle_Resized();
+		}
+
+		@Override
+		public void mouseDoubleClick(final ChartMouseEvent event) {
+			onSegmentTitle_MouseDoubleClick(event);
+		}
+
+		@Override
+		public void mouseDown(final ChartMouseEvent event) {
+			onSegmentTitle_MouseDown(event);
+		}
+
+		@Override
+		public void mouseExit() {
+			onSegmentTitle_MouseExit();
+		}
+	}
+
+	/**
+	 * This mouse move listener is used to get mouse move events to show the tour tooltip when the
+	 * y-slider is dragged.
+	 */
+	private class MouseListener_SegmentTitle_Move extends MouseAdapter {
+
+		@Override
+		public void mouseMove(final ChartMouseEvent event) {
+			onSegmentTitle_MouseMove(event);
 		}
 	}
 
@@ -430,18 +479,6 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		}
 	}
 
-	/**
-	 * This mouse move listener is used to get mouse move events to show the tour tooltip when the
-	 * y-slider is dragged.
-	 */
-	public class MouseMoveChartSegmentListener extends MouseAdapter {
-
-		@Override
-		public void mouseMove(final ChartMouseEvent event) {
-			onChartSegment_MouseMove(event);
-		}
-	}
-
 	private class MousePhotoListener extends MouseAdapter {
 
 		@Override
@@ -459,39 +496,6 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 			onPhoto_MouseMove(event);
 		}
 	}
-
-//	private class MouseTourSegmentListener extends MouseAdapter {
-//
-////		@Override
-////		public void chartResized() {
-////			onTourSegment_ChartResized();
-////		}
-////
-////		@Override
-////		public void mouseDoubleClick(final ChartMouseEvent event) {
-////			onTourSegment_MouseDoubleClick(event);
-////		}
-////
-////		@Override
-////		public void mouseDown(final ChartMouseEvent event) {
-////			onTourSegment_MouseDown(event);
-////		}
-////
-////		@Override
-////		public void mouseExit() {
-////			onTourSegment_MouseExit();
-////		}
-////
-////		@Override
-////		public void mouseMove(final ChartMouseEvent event) {
-////			onTourSegment_MouseMove(event);
-////		}
-////
-////		@Override
-////		public void mouseUp(final ChartMouseEvent event) {
-////			onTourSegment_MouseUp(event);
-////		}
-//	}
 
 	/**
 	 * @param parent
@@ -1805,14 +1809,17 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		_layerSegmentAltitude.setStackedValues(stackedValues);
 		_layerSegmentAltitude.setIsShowDecimalPlaces(isShowDecimalPlaces);
 
+		// set overlay painter
+		addChartOverlay(_layerSegmentAltitude);
+
 		for (final int serieIndex : segmentSerie) {
 
-			final ChartMarker chartMarker = new ChartMarker();
+			final ChartLabel chartLabel = new ChartLabel();
 
-			chartMarker.graphX = xDataSerie[serieIndex];
-			chartMarker.serieIndex = serieIndex;
+			chartLabel.graphX = xDataSerie[serieIndex];
+			chartLabel.serieIndex = serieIndex;
 
-			_layerSegmentAltitude.addMarker(chartMarker);
+			_layerSegmentAltitude.addMarker(chartLabel);
 		}
 
 		/*
@@ -1949,6 +1956,11 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		tbm.update(true);
 	}
 
+	private void fireSegmentLabelSelection(final ChartLabel selectedLabel) {
+		// TODO Auto-generated method stub
+
+	}
+
 	/**
 	 * Fires an event when the a tour marker is modified.
 	 * 
@@ -1967,26 +1979,27 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
 	private void fireTourMarkerSelection(final TourMarker tourMarker) {
 
+		if (_isDisplayedInDialog) {
+			return;
+		}
+
+		// update selection locally (e.g. in a dialog)
+
 		final ArrayList<TourMarker> allTourMarker = new ArrayList<TourMarker>();
 		allTourMarker.add(tourMarker);
 
 		final SelectionTourMarker tourMarkerSelection = new SelectionTourMarker(_tourData, allTourMarker);
 
-		// update selection locally (e.g. in a dialog)
 		final Object[] listeners = _tourMarkerSelectionListener.getListeners();
 		for (final Object listener2 : listeners) {
 			final ITourMarkerSelectionListener listener = (ITourMarkerSelectionListener) listener2;
 			listener.selectionChanged(tourMarkerSelection);
 		}
 
-		// update selection globally
-		if (_isDisplayedInDialog == false) {
-
-			TourManager.fireEventWithCustomData(//
-					TourEventId.MARKER_SELECTION,
-					tourMarkerSelection,
-					_part);
-		}
+		TourManager.fireEventWithCustomData(//
+				TourEventId.MARKER_SELECTION,
+				tourMarkerSelection,
+				_part);
 	}
 
 	/**
@@ -2029,7 +2042,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 	/**
 	 * @return Returns the hovered marker or <code>null</code> when a marker is not hovered.
 	 */
-	private ChartLabel getHoveredLabel() {
+	private ChartLabel getHoveredMarkerLabel() {
 
 		if (_layerMarker == null) {
 			return null;
@@ -2038,11 +2051,22 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		return _layerMarker.getHoveredLabel();
 	}
 
+	private ChartLabel getHoveredSegmentLabel(final ChartMouseEvent mouseEvent) {
+
+		final ChartLabel hoveredLabel = _layerSegmentAltitude.getHoveredLabel(mouseEvent);
+
+//		if (hoveredLabel == null) {
+//			hoveredLabel = _layerSegmentOther.getHoveredLabel(mouseEvent);
+//		}
+
+		return hoveredLabel;
+	}
+
 	/**
 	 * @param mouseEvent
 	 * @return Returns the hovered title or <code>null</code> when a title is not hovered.
 	 */
-	private ChartSegment getHoveredSegment(final ChartMouseEvent mouseEvent) {
+	private ChartSegment getHoveredSegmentTitle(final ChartMouseEvent mouseEvent) {
 
 		final int devXMouse = mouseEvent.devXMouse;
 		final int devYMouse = mouseEvent.devYMouse;
@@ -2075,11 +2099,11 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
 		TourMarker tourMarker = null;
 
-		final ChartLabel hoveredChartLabel = getHoveredLabel();
+		final ChartLabel hoveredMarkerLabel = getHoveredMarkerLabel();
 
-		if (hoveredChartLabel != null) {
-			if (hoveredChartLabel.data instanceof TourMarker) {
-				tourMarker = (TourMarker) hoveredChartLabel.data;
+		if (hoveredMarkerLabel != null) {
+			if (hoveredMarkerLabel.data instanceof TourMarker) {
+				tourMarker = (TourMarker) hoveredMarkerLabel.data;
 			}
 		}
 		return tourMarker;
@@ -2088,6 +2112,10 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 	ChartLayerMarker getLayerTourMarker() {
 
 		return _layerMarker;
+	}
+
+	ChartLabel getSelectedSegmentLabel() {
+		return _selectedSegmentLabel;
 	}
 
 	TourMarker getSelectedTourMarker() {
@@ -2104,7 +2132,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 			TourData tourData;
 
 			if (_tourData.isMultipleTours) {
-				tourData = TourManager.getTour(_hoveredSegment.getTourId());
+				tourData = TourManager.getTour(_hoveredSegmentTitle.getTourId());
 			} else {
 				tourData = _tourData;
 			}
@@ -2171,6 +2199,11 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		removeMouseChartListener(_mousePhotoListener);
 	}
 
+	private boolean isSegmentLayerVisible() {
+
+		return _layerSegmentAltitude != null && _layerSegmentOther != null;
+	}
+
 	private boolean isShowTourSegments() {
 
 		final boolean isSegmenterActive = Util.getStateBoolean(
@@ -2183,111 +2216,16 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 				TourSegmenterView.STATE_IS_SHOW_TOUR_SEGMENTS,
 				TourSegmenterView.STATE_IS_SHOW_TOUR_SEGMENTS_DEFAULT);
 
-		return isSegmenterActive && isShowTourSegments;
-	}
+		final boolean isVisible = isSegmenterActive && isShowTourSegments;
 
-	private void onChartSegment_MouseDoubleClick(final ChartMouseEvent mouseEvent) {
+		if (!isVisible) {
 
-		final ChartSegment hoveredSegment = getHoveredSegment(mouseEvent);
-
-		_hoveredSegment = hoveredSegment;
-
-		if (hoveredSegment == null) {
-			return;
+			// disable segment layers
+			_layerSegmentAltitude = null;
+			_layerSegmentOther = null;
 		}
 
-		// title is hovered and double clicked, quick edit the tour
-		mouseEvent.isWorked = _isSegmentHovered;
-
-		_actionEditQuick.run();
-	}
-
-	private void onChartSegment_MouseDown(final ChartMouseEvent mouseEvent) {
-
-		final ChartSegment tourSegment = getHoveredSegment(mouseEvent);
-
-		if (tourSegment == null) {
-			return;
-		}
-
-		// title is hovered and clicked, fire tour selection
-		mouseEvent.isWorked = _isSegmentHovered;
-	}
-
-	private void onChartSegment_MouseExit() {
-
-		_hoveredSegment = null;
-
-		setHoveredSegment(null);
-
-		_tourTitleTooltip.hide();
-	}
-
-	private void onChartSegment_MouseMove(final ChartMouseEvent mouseEvent) {
-
-		// ignore events with the same time
-		if (mouseEvent.eventTime == _hoveredSegmentEventTime) {
-
-			mouseEvent.isWorked = _isSegmentHovered;
-			mouseEvent.cursor = ChartCursor.Arrow;
-
-			return;
-		}
-
-		_hoveredSegmentEventTime = mouseEvent.eventTime;
-
-		final ChartSegment hoveredSegment = getHoveredSegment(mouseEvent);
-
-		_isSegmentHovered = hoveredSegment != null;
-
-		if (_isSegmentHovered) {
-
-			// set worked that no other actions are done in this event
-			mouseEvent.isWorked = _isSegmentHovered;
-			mouseEvent.cursor = ChartCursor.Arrow;
-		}
-
-		final ChartSegment prevHoveredTour = _hoveredSegment;
-
-		if (_hoveredSegment != hoveredSegment) {
-
-			// hovered title has changed, show or hide tooltip
-
-			// update internal state
-			_hoveredSegment = hoveredSegment;
-
-			// update state in the chart
-			setHoveredSegment(hoveredSegment);
-
-			if (_tcc.isShowInfoTooltip) {
-
-				// show/hide tooltip
-				if (hoveredSegment == null) {
-
-					_tourTitleTooltip.hide();
-
-				} else {
-
-					_openDlgMgr.closeOpenedDialogs(_tourTitleTooltip);
-					_tourTitleTooltip.open(hoveredSegment);
-				}
-			}
-
-		} else if (hoveredSegment == null && prevHoveredTour != null) {
-
-			// hide tooltip when not yet hidden
-
-			_tourTitleTooltip.hide();
-		}
-	}
-
-	private void onChartSegment_Resized() {
-
-		_hoveredSegment = null;
-
-		setHoveredSegment(null);
-
-		_tourTitleTooltip.hide();
+		return isVisible;
 	}
 
 	private void onDispose() {
@@ -2389,7 +2327,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
 		// check if the selected marker is hovered
 		final TourMarker hoveredMarker = getHoveredTourMarker();
-		if (_selectedTourMarker != null && (hoveredLabel == null) || (hoveredMarker != _selectedTourMarker)) {
+		if (_selectedTourMarker != null && hoveredLabel == null || (hoveredMarker != _selectedTourMarker)) {
 
 			_selectedTourMarker = null;
 
@@ -2484,6 +2422,207 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		}
 	}
 
+	/**
+	 * Fire selection for the selected segment label.
+	 * 
+	 * @param mouseEvent
+	 */
+	private void onSegmentLabel_MouseDown(final ChartMouseEvent mouseEvent) {
+
+		if (!isSegmentLayerVisible()) {
+			return;
+		}
+
+		final ChartLabel hoveredLabel = getHoveredSegmentLabel(mouseEvent);
+
+		if (hoveredLabel == null) {
+			return;
+		}
+
+		// notify the chart mouse listener that no other actions should be done
+		mouseEvent.isWorked = true;
+
+		_selectedSegmentLabel = hoveredLabel;
+
+		fireSegmentLabelSelection(hoveredLabel);
+
+		// redraw chart
+		setChartOverlayDirty();
+	}
+
+	private void onSegmentLabel_MouseExit() {
+
+		resetSegmentLabelState();
+	}
+
+	private void onSegmentLabel_MouseMove(final ChartMouseEvent mouseEvent) {
+
+		if (!isSegmentLayerVisible()) {
+			return;
+		}
+
+		// ignore events with the same time
+		if (mouseEvent.eventTime == _hoveredSegmentLabelEventTime) {
+
+			mouseEvent.isWorked = _isSegmentLabelHovered;
+			mouseEvent.cursor = ChartCursor.Arrow;
+
+			return;
+		}
+
+		_hoveredSegmentLabelEventTime = mouseEvent.eventTime;
+
+		boolean isUIDirty = false;
+		final ChartLabel hoveredLabel = getHoveredSegmentLabel(mouseEvent);
+
+		_isSegmentLabelHovered = hoveredLabel != null;
+
+		if (_selectedSegmentLabel != null && (_selectedSegmentLabel != hoveredLabel || hoveredLabel == null)) {
+
+			// hide selection
+			_selectedSegmentLabel = null;
+
+			isUIDirty = true;
+		}
+
+		if (_isSegmentLabelHovered) {
+
+			// set worked that no other actions are done in this event
+			mouseEvent.isWorked = _isSegmentLabelHovered;
+			mouseEvent.cursor = ChartCursor.Arrow;
+		}
+
+		if (hoveredLabel != _hoveredSegmentLabel) {
+
+			// hovered label has changed
+
+			setHoveredSegmentLabel(hoveredLabel);
+
+			// redraw is done here
+			isUIDirty = false;
+		}
+
+		if (isUIDirty) {
+
+			// redraw chart
+			setChartOverlayDirty();
+		}
+	}
+
+	private void onSegmentLabel_Resized() {
+
+		resetSegmentLabelState();
+	}
+
+	/**
+	 * Open tour quick editor.
+	 * 
+	 * @param mouseEvent
+	 */
+	private void onSegmentTitle_MouseDoubleClick(final ChartMouseEvent mouseEvent) {
+
+		final ChartSegment hoveredSegment = getHoveredSegmentTitle(mouseEvent);
+
+		_hoveredSegmentTitle = hoveredSegment;
+
+		if (hoveredSegment == null) {
+			return;
+		}
+
+		// title is hovered and double clicked, quick edit the tour
+		mouseEvent.isWorked = _isSegmentTitleHovered;
+
+		_actionEditQuick.run();
+	}
+
+	private void onSegmentTitle_MouseDown(final ChartMouseEvent mouseEvent) {
+
+		final ChartSegment tourSegment = getHoveredSegmentTitle(mouseEvent);
+
+		if (tourSegment == null) {
+			return;
+		}
+
+		// title is hovered and clicked, fire tour selection
+//		mouseEvent.isWorked = _isSegmentHovered;
+	}
+
+	private void onSegmentTitle_MouseExit() {
+
+		_hoveredSegmentTitle = null;
+
+		setHoveredSegment(null);
+
+		_tourTitleTooltip.hide();
+	}
+
+	private void onSegmentTitle_MouseMove(final ChartMouseEvent mouseEvent) {
+
+		// ignore events with the same time
+		if (mouseEvent.eventTime == _hoveredSegmentTitleEventTime) {
+
+			mouseEvent.isWorked = _isSegmentTitleHovered;
+			mouseEvent.cursor = ChartCursor.Arrow;
+
+			return;
+		}
+
+		_hoveredSegmentTitleEventTime = mouseEvent.eventTime;
+
+		final ChartSegment hoveredSegment = getHoveredSegmentTitle(mouseEvent);
+
+		_isSegmentTitleHovered = hoveredSegment != null;
+
+		if (_isSegmentTitleHovered) {
+
+			// set worked that no other actions are done in this event
+			mouseEvent.isWorked = _isSegmentTitleHovered;
+			mouseEvent.cursor = ChartCursor.Arrow;
+		}
+
+		final ChartSegment prevHoveredTour = _hoveredSegmentTitle;
+
+		if (_hoveredSegmentTitle != hoveredSegment) {
+
+			// hovered title has changed, show or hide tooltip
+
+			// update internal state
+			_hoveredSegmentTitle = hoveredSegment;
+
+			// update state in the chart
+			setHoveredSegment(hoveredSegment);
+
+			if (_tcc.isShowInfoTooltip) {
+
+				// show/hide tooltip
+				if (hoveredSegment == null) {
+
+					_tourTitleTooltip.hide();
+
+				} else {
+
+					_openDlgMgr.closeOpenedDialogs(_tourTitleTooltip);
+					_tourTitleTooltip.open(hoveredSegment);
+				}
+			}
+
+		} else if (hoveredSegment == null && prevHoveredTour != null) {
+
+			// hide tooltip when not yet hidden
+
+			_tourTitleTooltip.hide();
+		}
+	}
+
+	private void onSegmentTitle_Resized() {
+
+		_hoveredSegmentTitle = null;
+
+		setHoveredSegment(null);
+
+		_tourTitleTooltip.hide();
+	}
+
 	public void partIsDeactivated() {
 
 		// hide photo tooltip
@@ -2515,6 +2654,20 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
 	public void removeXAxisSelectionListener(final IXAxisSelectionListener listener) {
 		_xAxisSelectionListener.remove(listener);
+	}
+
+	private void resetSegmentLabelState() {
+
+		if (!isSegmentLayerVisible()) {
+			return;
+		}
+
+		// disable selection
+		_selectedSegmentLabel = null;
+
+		_layerSegmentAltitude.resetHoveredState();
+
+		setHoveredSegmentLabel(null);
 	}
 
 	void restoreState() {
@@ -2594,6 +2747,18 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 			action.setEnabled(isEnabled);
 			action.setChecked(isChecked);
 		}
+	}
+
+	/**
+	 * Set hovered segment label and update the UI.
+	 * 
+	 * @param hoveredLabel
+	 */
+	private void setHoveredSegmentLabel(final ChartLabel hoveredLabel) {
+
+		_hoveredSegmentLabel = hoveredLabel;
+
+		setChartOverlayDirty();
 	}
 
 	/**
@@ -2790,8 +2955,11 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		if (_tcc.isTourInfoVisible) {
 
 			// show tour info tooltip
-			addMouseChartListener(_mouseChartSegmentListener);
-			addMouseMoveChartListener(_mouseMoveChartSegmentListener);
+			addMouseChartListener(_mouseSegmentTitle_Listener);
+			addMouseChartMoveListener(_mouseSegmentTitle_MoveListener);
+
+			addMouseChartListener(_mouseSegmentLabel_Listener);
+			addMouseChartMoveListener(_mouseSegmentLabel_MoveListener);
 
 			ctConfig.isShowSegmentBackground = true;
 			ctConfig.isShowSegmentSeparator = _tcc.isShowInfoTourSeparator;
@@ -2800,8 +2968,11 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		} else {
 
 			// hide tour info tooltip
-			removeMouseChartListener(_mouseChartSegmentListener);
-			removeMouseMoveChartListener(_mouseMoveChartSegmentListener);
+			removeMouseChartListener(_mouseSegmentTitle_Listener);
+			removeMouseMoveChartListener(_mouseSegmentTitle_MoveListener);
+
+			removeMouseChartListener(_mouseSegmentLabel_Listener);
+			removeMouseMoveChartListener(_mouseSegmentLabel_MoveListener);
 
 			ctConfig.isShowSegmentBackground = false;
 			ctConfig.isShowSegmentSeparator = false;
@@ -3161,9 +3332,6 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 			createLayer_Segment();
 
 		} else {
-
-			_layerSegmentAltitude = null;
-			_layerSegmentOther = null;
 
 			resetGraphAlpha();
 		}

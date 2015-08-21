@@ -22,13 +22,16 @@ import java.text.NumberFormat;
 import java.util.ArrayList;
 
 import net.tourbook.chart.Chart;
+import net.tourbook.chart.ChartMouseEvent;
 import net.tourbook.chart.GraphDrawingData;
 import net.tourbook.chart.IChartLayer;
+import net.tourbook.chart.IChartOverlay;
 import net.tourbook.data.TourData;
 
 import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Device;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.LineAttributes;
@@ -40,16 +43,17 @@ import org.eclipse.swt.widgets.Display;
 /**
  * This layer displays the altitude values.
  */
-public class ChartLayerSegmentAltitude implements IChartLayer {
+public class ChartLayerSegmentAltitude implements IChartLayer, IChartOverlay {
 
 	private static final Color		SYSTEM_COLOR_0		= Display.getCurrent().getSystemColor(SWT.COLOR_DARK_GRAY);
-
 	private static final Color		SYSTEM_COLOR_DOWN	= Display.getCurrent().getSystemColor(SWT.COLOR_DARK_GREEN);
 	private static final Color		SYSTEM_COLOR_UP		= Display.getCurrent().getSystemColor(SWT.COLOR_RED);
-	private TourChart				_tourChart;
 
+	private TourChart				_tourChart;
 	private TourData				_tourData;
-	private ArrayList<ChartMarker>	_chartMarkers		= new ArrayList<ChartMarker>();
+
+	private ArrayList<ChartLabel>	_chartLabels		= new ArrayList<>();
+
 	private RGB						_lineColor			= new RGB(189, 0, 255);
 
 	private boolean					_isShowDecimalPlaces;
@@ -57,8 +61,15 @@ public class ChartLayerSegmentAltitude implements IChartLayer {
 	private boolean					_isShowSegmenterValue;
 	private int						_stackedValues;
 
-	private final NumberFormat		_nf1				= NumberFormat.getNumberInstance();
+	private long					_hoveredEventTime;
+	private ChartLabel				_hoveredLabel;
 
+	/**
+	 * Area where the graph is painted.
+	 */
+	private Rectangle				_graphRect;
+
+	private final NumberFormat		_nf1				= NumberFormat.getNumberInstance();
 	{
 		_nf1.setMinimumFractionDigits(1);
 		_nf1.setMaximumFractionDigits(1);
@@ -77,8 +88,8 @@ public class ChartLayerSegmentAltitude implements IChartLayer {
 	 *            Position of the marker on the x axis
 	 * @param label
 	 */
-	public void addMarker(final ChartMarker chartMarker) {
-		_chartMarkers.add(chartMarker);
+	public void addMarker(final ChartLabel chartMarker) {
+		_chartLabels.add(chartMarker);
 	}
 
 	/**
@@ -110,23 +121,24 @@ public class ChartLayerSegmentAltitude implements IChartLayer {
 		final ValueOverlapChecker posChecker = new ValueOverlapChecker(_stackedValues);
 
 		final LineAttributes defaultLineAttributes = gc.getLineAttributes();
-		final LineAttributes vertLineLA = new LineAttributes(5);
-		vertLineLA.dashOffset = 3;
-		vertLineLA.style = SWT.LINE_CUSTOM;
-		vertLineLA.dash = new float[] { 1f, 2f };
-		vertLineLA.width = 1f;
+		final LineAttributes markerLineAttribute = new LineAttributes(5);
+		markerLineAttribute.dashOffset = 3;
+		markerLineAttribute.style = SWT.LINE_CUSTOM;
+		markerLineAttribute.dash = new float[] { 1f, 2f };
+		markerLineAttribute.width = 1f;
 
 		// setup font
 		final Font fontBackup = gc.getFont();
 		gc.setFont(_tourChart.getValueFont());
 
 		// do not draw over the graph area
-		gc.setClipping(0, devYTop, graphWidth, devYBottom - devYTop);
+		_graphRect = new Rectangle(0, devYTop, graphWidth, devYBottom - devYTop);
+		gc.setClipping(_graphRect);
 
 		gc.setAntialias(chart.graphAntialiasing);
 		gc.setTextAntialias(chart.graphAntialiasing);
 
-		final ChartMarker[] chartMarkers = _chartMarkers.toArray(new ChartMarker[_chartMarkers.size()]);
+		final ChartLabel[] allChartLabel = _chartLabels.toArray(new ChartLabel[_chartLabels.size()]);
 
 		final Color colorLine = new Color(display, _lineColor);
 		{
@@ -137,20 +149,21 @@ public class ChartLayerSegmentAltitude implements IChartLayer {
 			final float[] segmentSerieAltitudeDiff = _tourData.segmentSerieAltitudeDiff;
 			final float[] segmentSerieComputedAltitudeDiff = _tourData.segmentSerieComputedAltitudeDiff;
 
-			for (int segmentIndex = 0; segmentIndex < chartMarkers.length; segmentIndex++) {
+			for (int segmentIndex = 0; segmentIndex < allChartLabel.length; segmentIndex++) {
 
 				// get current value
-				final ChartMarker chartMarker = chartMarkers[segmentIndex];
-				final int devXSegment = (int) (chartMarker.graphX * scaleX - devGraphImageXOffset);
+				final ChartLabel chartLabel = allChartLabel[segmentIndex];
+				final int devXSegment = (int) (chartLabel.graphX * scaleX - devGraphImageXOffset);
+				final int segmentWidth = devXSegment - devXPrev;
 
 				// optimize performance
-				if (devXSegment < 0 || devXSegment > graphWidth) {
+				if (devXSegment < 0 || devXSegment > graphWidth /* || segmentWidth < 1 */) {
 
 					// get next value
-					if (segmentIndex < chartMarkers.length - 2) {
+					if (segmentIndex < allChartLabel.length - 2) {
 
-						final ChartMarker chartMarkerNext = chartMarkers[segmentIndex + 1];
-						final int devXValueNext = (int) (chartMarkerNext.graphX * scaleX - devGraphImageXOffset);
+						final ChartLabel chartLabelNext = allChartLabel[segmentIndex + 1];
+						final int devXValueNext = (int) (chartLabelNext.graphX * scaleX - devGraphImageXOffset);
 
 						if (devXValueNext < 0) {
 							// current and next value are outside of the visible area
@@ -161,8 +174,8 @@ public class ChartLayerSegmentAltitude implements IChartLayer {
 					// get previous value
 					if (segmentIndex > 0) {
 
-						final ChartMarker chartMarkerPrev = chartMarkers[segmentIndex - 1];
-						final int devXValuePrev = (int) (chartMarkerPrev.graphX * scaleX - devGraphImageXOffset);
+						final ChartLabel chartLabelPrev = allChartLabel[segmentIndex - 1];
+						final int devXValuePrev = (int) (chartLabelPrev.graphX * scaleX - devGraphImageXOffset);
 
 						if (devXValuePrev > graphWidth) {
 							// current and previous value are outside of the visible area
@@ -171,7 +184,7 @@ public class ChartLayerSegmentAltitude implements IChartLayer {
 					}
 				}
 
-				final int yValueIndex = Math.min(yValues.length - 1, chartMarker.serieIndex);
+				final int yValueIndex = Math.min(yValues.length - 1, chartLabel.serieIndex);
 				final float yValue = yValues[yValueIndex];
 
 				final int devYGraph = (int) ((yValue - graphYBottom) * scaleY);
@@ -219,6 +232,12 @@ public class ChartLayerSegmentAltitude implements IChartLayer {
 							devYPrev,
 							devXSegment,
 							devYSegment);
+
+					chartLabel.paintedX1 = devXPrev;
+					chartLabel.paintedX2 = devXSegment;
+					chartLabel.paintedY1 = devYPrev;
+					chartLabel.paintedY2 = devYSegment;
+					chartLabel.paintedRGB = upDownColor.getRGB();
 				}
 
 				/*
@@ -234,7 +253,7 @@ public class ChartLayerSegmentAltitude implements IChartLayer {
 					}
 
 					gc.setForeground(upDownColor);
-					gc.setLineAttributes(vertLineLA);
+					gc.setLineAttributes(markerLineAttribute);
 					gc.drawLine(//
 							devXSegment,
 							devYSegment,
@@ -257,7 +276,6 @@ public class ChartLayerSegmentAltitude implements IChartLayer {
 						/*
 						 * Get default x position
 						 */
-						final int segmentWidth = devXSegment - devXPrev;
 						final float segmentWidth2 = segmentWidth / 2;
 						final int devXText = (int) (devXPrev + segmentWidth2 - textWidth);
 
@@ -279,6 +297,13 @@ public class ChartLayerSegmentAltitude implements IChartLayer {
 									devXText,
 									validRect.y,
 									true);
+
+							// keep area to detect hovered segments, enlarge area with the hover border to easier hit the label
+							validRect.x -= ChartLabel.MARKER_HOVER_SIZE;
+							validRect.y -= ChartLabel.MARKER_HOVER_SIZE;
+							validRect.width += 2 * ChartLabel.MARKER_HOVER_SIZE;
+							validRect.height += 2 * ChartLabel.MARKER_HOVER_SIZE;
+							chartLabel.paintedLabel = validRect;
 
 //							/*
 //							 * Debugging
@@ -329,6 +354,67 @@ public class ChartLayerSegmentAltitude implements IChartLayer {
 		gc.setFont(fontBackup);
 	}
 
+	@Override
+	public void drawOverlay(final GC gc, final GraphDrawingData graphDrawingData) {
+
+		if (_hoveredLabel == null) {
+			return;
+		}
+
+//		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
+//				+ ("\tdrawOverlay: " + _hoveredLabel));
+//		// TODO remove SYSTEM.OUT.PRINTLN
+
+		final int devYTop = graphDrawingData.getDevYTop();
+		final int devGraphHeight = graphDrawingData.devGraphHeight;
+
+		final ChartLabel selectedSegmentLabel = _tourChart.getSelectedSegmentLabel();
+		final boolean isSelected = selectedSegmentLabel != null;
+		if (isSelected) {
+			gc.setAlpha(0xa0);
+		} else {
+			gc.setAlpha(0x50);
+		}
+
+		gc.setClipping(0, devYTop, gc.getClipping().width, devGraphHeight);
+
+		final Device device = gc.getDevice();
+//		final Color colorDefault = new Color(device, _cmc.markerColorDefault);
+		final Color colorHovered = Display.getCurrent().getSystemColor(SWT.COLOR_GRAY);
+		{
+			/*
+			 * Draw label background
+			 */
+			gc.setBackground(colorHovered);
+			gc.fillRectangle(_hoveredLabel.paintedLabel);
+
+			/*
+			 * Draw line thicker
+			 */
+			final Color lineColor = new Color(device, _hoveredLabel.paintedRGB);
+			{
+				final int x1 = _hoveredLabel.paintedX1;
+				final int y1 = _hoveredLabel.paintedY1;
+				final int x2 = _hoveredLabel.paintedX2;
+				final int y2 = _hoveredLabel.paintedY2;
+
+//				gc.setAlpha(0xff);
+
+				gc.setForeground(lineColor);
+
+				gc.setAntialias(SWT.ON);
+				gc.setLineWidth(40);
+				gc.setLineCap(SWT.CAP_ROUND);
+				gc.drawLine(x1, y1, x2, y2);
+			}
+			lineColor.dispose();
+		}
+//		colorDefault.dispose();
+
+		gc.setAlpha(0xff);
+		gc.setClipping((Rectangle) null);
+	}
+
 	private Color getColor(final float altiDiff) {
 
 		if (altiDiff > 0) {
@@ -338,6 +424,52 @@ public class ChartLayerSegmentAltitude implements IChartLayer {
 		} else {
 			return SYSTEM_COLOR_0;
 		}
+	}
+
+	/**
+	 * @param mouseEvent
+	 * @return Returns the hovered {@link ChartLabel} or <code>null</code> when a {@link ChartLabel}
+	 *         is not hovered.
+	 */
+	ChartLabel getHoveredLabel(final ChartMouseEvent mouseEvent) {
+
+		if (mouseEvent.eventTime == _hoveredEventTime) {
+			return _hoveredLabel;
+		}
+
+		_hoveredEventTime = mouseEvent.eventTime;
+
+		if (_graphRect.contains(mouseEvent.devXMouse, mouseEvent.devYMouse)) {
+
+			// mouse is hovering the graph area
+
+			_hoveredLabel = getHoveredLabel_10(mouseEvent.devXMouse, mouseEvent.devYMouse);
+
+		} else {
+			_hoveredLabel = null;
+		}
+
+		return _hoveredLabel;
+	}
+
+	private ChartLabel getHoveredLabel_10(final int devXMouse, final int devYMouse) {
+
+		for (final ChartLabel chartLabel : _chartLabels) {
+
+			final Rectangle paintedLabel = chartLabel.paintedLabel;
+
+			if (paintedLabel != null && paintedLabel.contains(devXMouse, devYMouse)) {
+
+				// label is hit
+				return chartLabel;
+			}
+		}
+
+		return null;
+	}
+
+	void resetHoveredState() {
+		_hoveredLabel = null;
 	}
 
 	void setIsShowDecimalPlaces(final boolean isShowDecimalPlaces) {
@@ -363,4 +495,5 @@ public class ChartLayerSegmentAltitude implements IChartLayer {
 	void setTourData(final TourData tourData) {
 		_tourData = tourData;
 	}
+
 }
