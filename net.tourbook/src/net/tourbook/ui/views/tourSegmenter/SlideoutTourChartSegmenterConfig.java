@@ -29,6 +29,7 @@ import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.jface.layout.LayoutConstants;
 import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferenceConverter;
@@ -111,6 +112,7 @@ public class SlideoutTourChartSegmenterConfig extends AnimatedToolTipShell imple
 	private Composite						_shellContainer;
 	private Composite						_fontContainer;
 
+	private Button							_chkHideSmallValues;
 	private Button							_chkShowDecimalPlaces;
 	private Button							_chkShowSegmentMarker;
 	private Button							_chkShowSegmentValue;
@@ -119,10 +121,12 @@ public class SlideoutTourChartSegmenterConfig extends AnimatedToolTipShell imple
 
 	private Label							_lblFontSize;
 	private Label							_lblGraphOpacity;
+	private Label							_lblHideSmallValuesUnit;
 	private Label							_lblVisibleStackedValues;
 
 	private Spinner							_spinFontSize;
 	private Spinner							_spinGraphOpacity;
+	private Spinner							_spinHideSmallValues;
 	private Spinner							_spinVisibleValuesStacked;
 
 	private final class WaitTimer implements Runnable {
@@ -220,13 +224,17 @@ public class SlideoutTourChartSegmenterConfig extends AnimatedToolTipShell imple
 
 		_pc = new PixelConverter(parent);
 		_firstColumnIndent = _pc.convertWidthInCharsToPixels(3);
+		final Point defaultSpacing = LayoutConstants.getSpacing();
 
 		_shellContainer = new Composite(parent, SWT.NONE);
 		GridLayoutFactory.swtDefaults().applyTo(_shellContainer);
 		{
 			final Composite container = new Composite(_shellContainer, SWT.NONE);
 			GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-			GridLayoutFactory.fillDefaults().numColumns(4).applyTo(container);
+			GridLayoutFactory.fillDefaults()//
+					.numColumns(4)
+					.spacing(_pc.convertHorizontalDLUsToPixels(16), defaultSpacing.y)
+					.applyTo(container);
 //			container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
 			{
 				createUI_10_Title(container);
@@ -330,24 +338,37 @@ public class SlideoutTourChartSegmenterConfig extends AnimatedToolTipShell imple
 		}
 		{
 			/*
-			 * Number of stacked values
+			 * Hide small values
 			 */
-			// Label
-			_lblVisibleStackedValues = new Label(parent, SWT.NONE);
+			// Checkbox
+			_chkHideSmallValues = new Button(parent, SWT.CHECK);
 			GridDataFactory.fillDefaults()//
 					.align(SWT.FILL, SWT.CENTER)
-					.applyTo(_lblVisibleStackedValues);
-			_lblVisibleStackedValues.setText(Messages.Slideout_SegmenterChartOptions_Label_StackedValues);
-			_lblVisibleStackedValues.setToolTipText(//
-					Messages.Slideout_SegmenterChartOptions_Label_StackedValues_Tooltip);
+					.applyTo(_chkHideSmallValues);
+			_chkHideSmallValues.setText(Messages.Slideout_SegmenterChartOptions_Checkbox_HideSmallValues);
+			_chkHideSmallValues.setToolTipText(Messages.Slideout_SegmenterChartOptions_Label_HideSmallValues_Tooltip);
+			_chkHideSmallValues.addSelectionListener(_defaultSelectionAdapter);
 
-			// Spinner:
-			_spinVisibleValuesStacked = new Spinner(parent, SWT.BORDER);
-			_spinVisibleValuesStacked.setMinimum(0);
-			_spinVisibleValuesStacked.setMaximum(20);
-			_spinVisibleValuesStacked.setPageIncrement(5);
-			_spinVisibleValuesStacked.addSelectionListener(_defaultSelectionAdapter);
-			_spinVisibleValuesStacked.addMouseWheelListener(_defaultMouseWheelListener);
+			final Composite containerSmall = new Composite(parent, SWT.NONE);
+			GridDataFactory.fillDefaults().grab(true, false).applyTo(containerSmall);
+			GridLayoutFactory.fillDefaults().numColumns(2).applyTo(containerSmall);
+			{
+				// Spinner
+				_spinHideSmallValues = new Spinner(containerSmall, SWT.BORDER);
+				_spinHideSmallValues.setMinimum(0);
+				_spinHideSmallValues.setMaximum(500);
+				_spinHideSmallValues.setDigits(1);
+				_spinHideSmallValues.setPageIncrement(10);
+				_spinHideSmallValues.addSelectionListener(_defaultSelectionAdapter);
+				_spinHideSmallValues.addMouseWheelListener(_defaultMouseWheelListener);
+
+				// Label %
+				_lblHideSmallValuesUnit = new Label(containerSmall, SWT.NONE);
+				GridDataFactory.fillDefaults()//
+						.align(SWT.FILL, SWT.CENTER)
+						.applyTo(_lblHideSmallValuesUnit);
+				_lblHideSmallValuesUnit.setText(UI.SYMBOL_PERCENTAGE);
+			}
 		}
 		{
 			/*
@@ -383,6 +404,27 @@ public class SlideoutTourChartSegmenterConfig extends AnimatedToolTipShell imple
 		}
 		{
 			/*
+			 * Number of stacked values
+			 */
+			// Label
+			_lblVisibleStackedValues = new Label(parent, SWT.NONE);
+			GridDataFactory.fillDefaults()//
+					.align(SWT.FILL, SWT.CENTER)
+					.applyTo(_lblVisibleStackedValues);
+			_lblVisibleStackedValues.setText(Messages.Slideout_SegmenterChartOptions_Label_StackedValues);
+			_lblVisibleStackedValues.setToolTipText(//
+					Messages.Slideout_SegmenterChartOptions_Label_StackedValues_Tooltip);
+
+			// Spinner:
+			_spinVisibleValuesStacked = new Spinner(parent, SWT.BORDER);
+			_spinVisibleValuesStacked.setMinimum(0);
+			_spinVisibleValuesStacked.setMaximum(20);
+			_spinVisibleValuesStacked.setPageIncrement(5);
+			_spinVisibleValuesStacked.addSelectionListener(_defaultSelectionAdapter);
+			_spinVisibleValuesStacked.addMouseWheelListener(_defaultMouseWheelListener);
+		}
+		{
+			/*
 			 * Font editor
 			 */
 			_fontContainer = new Composite(parent, SWT.NONE);
@@ -409,12 +451,15 @@ public class SlideoutTourChartSegmenterConfig extends AnimatedToolTipShell imple
 
 		final boolean isShowValues = _chkShowSegmentValue.getSelection();
 
+		_chkHideSmallValues.setEnabled(isShowValues);
 		_chkShowDecimalPlaces.setEnabled(isShowValues);
 
 		_lblFontSize.setEnabled(isShowValues);
-		_spinFontSize.setEnabled(isShowValues);
-
+		_lblHideSmallValuesUnit.setEnabled(isShowValues);
 		_lblVisibleStackedValues.setEnabled(isShowValues);
+
+		_spinFontSize.setEnabled(isShowValues);
+		_spinHideSmallValues.setEnabled(isShowValues);
 		_spinVisibleValuesStacked.setEnabled(isShowValues);
 
 		_valueFontEditor.setEnabled(isShowValues, _fontContainer);
@@ -580,6 +625,14 @@ public class SlideoutTourChartSegmenterConfig extends AnimatedToolTipShell imple
 		_valueFontEditor.loadDefault();
 		_valueFontEditor.store();
 
+		// hide small values
+		_segmenterState.put(
+				TourSegmenterView.STATE_IS_HIDE_SMALL_VALUES,
+				TourSegmenterView.STATE_IS_HIDE_SMALL_VALUES_DEFAULT);
+		_segmenterState.put(//
+				TourSegmenterView.STATE_SMALL_VALUE_SIZE,
+				TourSegmenterView.STATE_SMALL_VALUE_SIZE_DEFAULT);
+
 		_segmenterState.put(
 				TourSegmenterView.STATE_IS_SHOW_SEGMENTER_DECIMAL_PLACES,
 				TourSegmenterView.STATE_IS_SHOW_SEGMENTER_DECIMAL_PLACES_DEFAULT);
@@ -609,6 +662,16 @@ public class SlideoutTourChartSegmenterConfig extends AnimatedToolTipShell imple
 	}
 
 	private void restoreState() {
+
+		// hide small values
+		_chkHideSmallValues.setSelection(Util.getStateBoolean(
+				_segmenterState,
+				TourSegmenterView.STATE_IS_HIDE_SMALL_VALUES,
+				TourSegmenterView.STATE_IS_HIDE_SMALL_VALUES_DEFAULT));
+		_spinHideSmallValues.setSelection(Util.getStateInt(
+				_segmenterState,
+				TourSegmenterView.STATE_SMALL_VALUE_SIZE,
+				TourSegmenterView.STATE_SMALL_VALUE_SIZE_DEFAULT));
 
 		_chkShowDecimalPlaces.setSelection(Util.getStateBoolean(
 				_segmenterState,
@@ -650,21 +713,21 @@ public class SlideoutTourChartSegmenterConfig extends AnimatedToolTipShell imple
 
 		// !!! font editor saves it's values automatically !!!
 
-		_segmenterState.put(
-				TourSegmenterView.STATE_IS_SHOW_SEGMENTER_DECIMAL_PLACES,
+		_segmenterState.put(TourSegmenterView.STATE_IS_SHOW_SEGMENTER_DECIMAL_PLACES,//
 				_chkShowDecimalPlaces.getSelection());
-		_segmenterState.put(//
-				TourSegmenterView.STATE_IS_SHOW_SEGMENTER_MARKER,
+		_segmenterState.put(TourSegmenterView.STATE_IS_SHOW_SEGMENTER_MARKER, //
 				_chkShowSegmentMarker.getSelection());
-		_segmenterState.put(//
-				TourSegmenterView.STATE_IS_SHOW_SEGMENTER_VALUE,
+		_segmenterState.put(TourSegmenterView.STATE_IS_SHOW_SEGMENTER_VALUE, //
 				_chkShowSegmentValue.getSelection());
 
-		_segmenterState.put(//
-				TourSegmenterView.STATE_GRAPH_ALPHA,
+		_segmenterState.put(TourSegmenterView.STATE_IS_HIDE_SMALL_VALUES, //
+				_chkHideSmallValues.getSelection());
+		_segmenterState.put(TourSegmenterView.STATE_SMALL_VALUE_SIZE, //
+				_spinHideSmallValues.getSelection());
+
+		_segmenterState.put(TourSegmenterView.STATE_GRAPH_ALPHA, //
 				_spinGraphOpacity.getSelection());
-		_segmenterState.put(//
-				TourSegmenterView.STATE_STACKED_VISIBLE_VALUES,
+		_segmenterState.put(TourSegmenterView.STATE_STACKED_VISIBLE_VALUES, //
 				_spinVisibleValuesStacked.getSelection());
 	}
 

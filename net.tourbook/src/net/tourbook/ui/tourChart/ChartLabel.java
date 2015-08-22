@@ -85,6 +85,7 @@ public class ChartLabel {
 	 * Painted positions
 	 */
 	public Rectangle		paintedLabel;
+	public Rectangle		hoveredLabel;
 
 	public int				devHoverSize;
 

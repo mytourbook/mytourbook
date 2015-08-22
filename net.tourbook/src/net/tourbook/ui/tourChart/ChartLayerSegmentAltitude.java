@@ -22,6 +22,7 @@ import java.text.NumberFormat;
 import java.util.ArrayList;
 
 import net.tourbook.chart.Chart;
+import net.tourbook.chart.ChartDataYSerie;
 import net.tourbook.chart.ChartMouseEvent;
 import net.tourbook.chart.GraphDrawingData;
 import net.tourbook.chart.IChartLayer;
@@ -36,7 +37,6 @@ import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.LineAttributes;
 import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Display;
 
@@ -54,15 +54,14 @@ public class ChartLayerSegmentAltitude implements IChartLayer, IChartOverlay {
 
 	private ArrayList<ChartLabel>	_chartLabels		= new ArrayList<>();
 
-	private RGB						_lineColor			= new RGB(189, 0, 255);
+	// hide small values
+	private boolean					_isHideSmallValues;
+	private double					_hiddenValueSize;
 
 	private boolean					_isShowDecimalPlaces;
 	private boolean					_isShowSegmenterMarker;
 	private boolean					_isShowSegmenterValue;
 	private int						_stackedValues;
-
-	private long					_hoveredEventTime;
-	private ChartLabel				_hoveredLabel;
 
 	/**
 	 * Area where the graph is painted.
@@ -105,18 +104,21 @@ public class ChartLayerSegmentAltitude implements IChartLayer, IChartOverlay {
 						final Chart chart,
 						final PixelConverter pixelConverter) {
 
-		final Display display = Display.getCurrent();
-
 		final int graphWidth = graphDrawingData.getChartDrawingData().devVisibleChartWidth;
 		final int devYTop = graphDrawingData.getDevYTop();
 		final int devYBottom = graphDrawingData.getDevYBottom();
 		final long devGraphImageXOffset = chart.getXXDevViewPortLeftBorder();
 //		final int devGraphHeight = drawingData.devGraphHeight;
 
+		final ChartDataYSerie yData = graphDrawingData.getYData();
 		final float graphYBottom = graphDrawingData.getGraphYBottom();
-		final float[] yValues = graphDrawingData.getYData().getHighValuesFloat()[0];
+		final float[] yValues = yData.getHighValuesFloat()[0];
 		final double scaleX = graphDrawingData.getScaleX();
 		final double scaleY = graphDrawingData.getScaleY();
+
+//		final double minValue = yData.getOriginalMinValue();
+		final double maxValue = yData.getOriginalMaxValue();
+		final double maxHiddenValue = maxValue * _hiddenValueSize;
 
 		final ValueOverlapChecker posChecker = new ValueOverlapChecker(_stackedValues);
 
@@ -138,134 +140,163 @@ public class ChartLayerSegmentAltitude implements IChartLayer, IChartOverlay {
 		gc.setAntialias(chart.graphAntialiasing);
 		gc.setTextAntialias(chart.graphAntialiasing);
 
-		final ChartLabel[] allChartLabel = _chartLabels.toArray(new ChartLabel[_chartLabels.size()]);
+		final ChartLabel[] allChartLabels = _chartLabels.toArray(new ChartLabel[_chartLabels.size()]);
 
-		final Color colorLine = new Color(display, _lineColor);
-		{
+		int devXPrev = Integer.MIN_VALUE;
+		int devYPrev = Integer.MIN_VALUE;
 
-			int devXPrev = Integer.MIN_VALUE;
-			int devYPrev = Integer.MIN_VALUE;
+		final float[] segmentSerieAltitudeDiff = _tourData.segmentSerieAltitudeDiff;
+		final float[] segmentSerieComputedAltitudeDiff = _tourData.segmentSerieComputedAltitudeDiff;
 
-			final float[] segmentSerieAltitudeDiff = _tourData.segmentSerieAltitudeDiff;
-			final float[] segmentSerieComputedAltitudeDiff = _tourData.segmentSerieComputedAltitudeDiff;
+		int segmentIndex;
+		for (segmentIndex = 0; segmentIndex < allChartLabels.length; segmentIndex++) {
 
-			for (int segmentIndex = 0; segmentIndex < allChartLabel.length; segmentIndex++) {
+			// get current value
+			final ChartLabel chartLabel = allChartLabels[segmentIndex];
+			final int devXSegment = (int) (chartLabel.graphX * scaleX - devGraphImageXOffset);
+			final int segmentWidth = devXSegment - devXPrev;
 
-				// get current value
-				final ChartLabel chartLabel = allChartLabel[segmentIndex];
-				final int devXSegment = (int) (chartLabel.graphX * scaleX - devGraphImageXOffset);
-				final int segmentWidth = devXSegment - devXPrev;
+			// optimize performance
+			if (devXSegment < 0 || devXSegment > graphWidth /* || segmentWidth < 1 */) {
 
-				// optimize performance
-				if (devXSegment < 0 || devXSegment > graphWidth /* || segmentWidth < 1 */) {
+				// get next value
+				if (segmentIndex < allChartLabels.length - 2) {
 
-					// get next value
-					if (segmentIndex < allChartLabel.length - 2) {
+					final ChartLabel chartLabelNext = allChartLabels[segmentIndex + 1];
+					final int devXValueNext = (int) (chartLabelNext.graphX * scaleX - devGraphImageXOffset);
 
-						final ChartLabel chartLabelNext = allChartLabel[segmentIndex + 1];
-						final int devXValueNext = (int) (chartLabelNext.graphX * scaleX - devGraphImageXOffset);
+					if (devXValueNext < 0) {
 
-						if (devXValueNext < 0) {
-							// current and next value are outside of the visible area
-							continue;
-						}
-					}
+						// current and next value are outside of the visible area
 
-					// get previous value
-					if (segmentIndex > 0) {
+						// prevent that hovering is recognized
+						chartLabel.paintedLabel = null;
+						chartLabel.hoveredLabel = null;
 
-						final ChartLabel chartLabelPrev = allChartLabel[segmentIndex - 1];
-						final int devXValuePrev = (int) (chartLabelPrev.graphX * scaleX - devGraphImageXOffset);
-
-						if (devXValuePrev > graphWidth) {
-							// current and previous value are outside of the visible area
-							break;
-						}
+						continue;
 					}
 				}
 
-				final int yValueIndex = Math.min(yValues.length - 1, chartLabel.serieIndex);
-				final float yValue = yValues[yValueIndex];
-
-				final int devYGraph = (int) ((yValue - graphYBottom) * scaleY);
-				final int devYSegment = devYBottom - devYGraph;
-
-				float altiDiff = 0;
+				// get previous value
 				if (segmentIndex > 0) {
-					if (segmentSerieComputedAltitudeDiff != null) {
-						altiDiff = segmentSerieComputedAltitudeDiff[segmentIndex];
-					} else {
-						altiDiff = segmentSerieAltitudeDiff[segmentIndex];
+
+					final ChartLabel chartLabelPrev = allChartLabels[segmentIndex - 1];
+					final int devXValuePrev = (int) (chartLabelPrev.graphX * scaleX - devGraphImageXOffset);
+
+					if (devXValuePrev > graphWidth) {
+
+						// current and previous value are outside of the visible area
+						break;
 					}
 				}
-				final boolean isValueUp = altiDiff >= 0;
+			}
 
-				final String valueText = _isShowDecimalPlaces //
-						? _nf1.format(altiDiff)
-						: Integer.toString((int) (altiDiff > 0 //
-								? (altiDiff + 0.5)
-								: (altiDiff - 0.5)));
+			final int yValueIndex = Math.min(yValues.length - 1, chartLabel.serieIndex);
+			final float yValue = yValues[yValueIndex];
 
-				final Point textExtent = gc.textExtent(valueText);
+			final int devYGraph = (int) ((yValue - graphYBottom) * scaleY);
+			final int devYSegment = devYBottom - devYGraph;
 
-				final int textWidth = textExtent.x;
-				final int textHeight = textExtent.y;
-
-				final Color upDownColor = getColor(altiDiff);
-
-				/*
-				 * Connect two segments with a line
-				 */
-				if (devXPrev == Integer.MIN_VALUE) {
-
-					// first visible segment
-
-					devXPrev = devXSegment;
-					devYPrev = devYSegment;
-
+			/*
+			 * Get up/down value
+			 */
+			float altiDiff = 0;
+			if (segmentIndex > 0) {
+				if (segmentSerieComputedAltitudeDiff != null) {
+					altiDiff = segmentSerieComputedAltitudeDiff[segmentIndex];
 				} else {
+					altiDiff = segmentSerieAltitudeDiff[segmentIndex];
+				}
+			}
+			final boolean isValueUp = altiDiff >= 0;
 
-					gc.setLineAttributes(defaultLineAttributes);
-					gc.setForeground(upDownColor);
-					gc.drawLine(//
-							devXPrev,
-							devYPrev,
-							devXSegment,
-							devYSegment);
+			/*
+			 * Get value text
+			 */
+			final String valueText = _isShowDecimalPlaces //
+					? _nf1.format(altiDiff)
+					: Integer.toString((int) (altiDiff > 0 //
+							? (altiDiff + 0.5)
+							: (altiDiff - 0.5)));
 
-					chartLabel.paintedX1 = devXPrev;
-					chartLabel.paintedX2 = devXSegment;
-					chartLabel.paintedY1 = devYPrev;
-					chartLabel.paintedY2 = devYSegment;
-					chartLabel.paintedRGB = upDownColor.getRGB();
+			final Point textExtent = gc.textExtent(valueText);
+
+			final int textWidth = textExtent.x;
+			final int textHeight = textExtent.y;
+
+			final Color upDownColor = getColor(altiDiff);
+
+			/*
+			 * Connect two segments with a line
+			 */
+			if (devXPrev == Integer.MIN_VALUE) {
+
+				// first visible segment
+
+				devXPrev = devXSegment;
+				devYPrev = devYSegment;
+
+			} else {
+
+				gc.setLineAttributes(defaultLineAttributes);
+				gc.setForeground(upDownColor);
+				gc.drawLine(//
+						devXPrev,
+						devYPrev,
+						devXSegment,
+						devYSegment);
+
+				chartLabel.paintedX1 = devXPrev;
+				chartLabel.paintedX2 = devXSegment;
+				chartLabel.paintedY1 = devYPrev;
+				chartLabel.paintedY2 = devYSegment;
+				chartLabel.paintedRGB = upDownColor.getRGB();
+			}
+
+			/*
+			 * Draw a line from the value marker to the top or the bottom
+			 */
+			if (_isShowSegmenterMarker) {
+
+				int devYLine;
+				if (isValueUp) {
+					devYLine = devYSegment - 1 * textHeight;
+				} else {
+					devYLine = devYSegment + 1 * textHeight;
 				}
 
-				/*
-				 * Draw a line from the value marker to the top or the bottom
-				 */
-				if (_isShowSegmenterMarker) {
+				gc.setForeground(upDownColor);
+				gc.setLineAttributes(markerLineAttribute);
+				gc.drawLine(//
+						devXSegment,
+						devYSegment,
+						devXSegment,
+						devYLine);
+			}
 
-					int devYLine;
-					if (isValueUp) {
-						devYLine = devYSegment - 1 * textHeight;
-					} else {
-						devYLine = devYSegment + 1 * textHeight;
+			if (segmentIndex > 0) {
+
+				if (_isShowSegmenterValue) {
+
+					// show segment value
+
+					boolean isShowValueText = true;
+
+					if (_isHideSmallValues) {
+						if (altiDiff >= 0) {
+							if (altiDiff < maxHiddenValue) {
+								isShowValueText = false;
+							}
+						} else {
+
+							// diff <0
+							if (-altiDiff < maxHiddenValue) {
+								isShowValueText = false;
+							}
+						}
 					}
 
-					gc.setForeground(upDownColor);
-					gc.setLineAttributes(markerLineAttribute);
-					gc.drawLine(//
-							devXSegment,
-							devYSegment,
-							devXSegment,
-							devYLine);
-				}
-
-				if (segmentIndex > 0) {
-
-					if (_isShowSegmenterValue) {
-
-						// show segment value
+					if (isShowValueText) {
 
 						/*
 						 * get default y position
@@ -298,12 +329,14 @@ public class ChartLayerSegmentAltitude implements IChartLayer, IChartOverlay {
 									validRect.y,
 									true);
 
-							// keep area to detect hovered segments, enlarge area with the hover border to easier hit the label
-							validRect.x -= ChartLabel.MARKER_HOVER_SIZE;
-							validRect.y -= ChartLabel.MARKER_HOVER_SIZE;
-							validRect.width += 2 * ChartLabel.MARKER_HOVER_SIZE;
-							validRect.height += 2 * ChartLabel.MARKER_HOVER_SIZE;
 							chartLabel.paintedLabel = validRect;
+
+							// keep area to detect hovered segments, enlarge it with the hover border to easier hit the label
+							chartLabel.hoveredLabel = new Rectangle(
+									validRect.x - ChartLabel.MARKER_HOVER_SIZE,
+									validRect.y - ChartLabel.MARKER_HOVER_SIZE,
+									validRect.width + 2 * ChartLabel.MARKER_HOVER_SIZE,
+									validRect.height + 2 * ChartLabel.MARKER_HOVER_SIZE);
 
 //							/*
 //							 * Debugging
@@ -339,13 +372,19 @@ public class ChartLayerSegmentAltitude implements IChartLayer, IChartOverlay {
 //									devY);
 //						}
 					}
-
-					devXPrev = devXSegment;
-					devYPrev = devYSegment;
 				}
+
+				devXPrev = devXSegment;
+				devYPrev = devYSegment;
 			}
 		}
-		colorLine.dispose();
+
+		// hide all following labels to prevent that hovering is recognized
+		for (; segmentIndex < allChartLabels.length; segmentIndex++) {
+			final ChartLabel chartLabel = allChartLabels[segmentIndex];
+			chartLabel.paintedLabel = null;
+			chartLabel.hoveredLabel = null;
+		}
 
 		// reset clipping
 		gc.setClipping((Rectangle) null);
@@ -357,54 +396,57 @@ public class ChartLayerSegmentAltitude implements IChartLayer, IChartOverlay {
 	@Override
 	public void drawOverlay(final GC gc, final GraphDrawingData graphDrawingData) {
 
-		if (_hoveredLabel == null) {
+		final ChartLabel selectedLabel = _tourChart.getSegmentLabel_Selected();
+		final ChartLabel hoveredLabel = _tourChart.getSegmentLabel_Hovered();
+
+		final boolean isSelected = selectedLabel != null;
+		final boolean isHovered = hoveredLabel != null;
+
+		if (!isHovered) {
 			return;
 		}
-
-//		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
-//				+ ("\tdrawOverlay: " + _hoveredLabel));
-//		// TODO remove SYSTEM.OUT.PRINTLN
 
 		final int devYTop = graphDrawingData.getDevYTop();
 		final int devGraphHeight = graphDrawingData.devGraphHeight;
 
-		final ChartLabel selectedSegmentLabel = _tourChart.getSelectedSegmentLabel();
-		final boolean isSelected = selectedSegmentLabel != null;
-		if (isSelected) {
-			gc.setAlpha(0xa0);
-		} else {
-			gc.setAlpha(0x50);
-		}
-
 		gc.setClipping(0, devYTop, gc.getClipping().width, devGraphHeight);
 
 		final Device device = gc.getDevice();
-//		final Color colorDefault = new Color(device, _cmc.markerColorDefault);
 		final Color colorHovered = Display.getCurrent().getSystemColor(SWT.COLOR_GRAY);
 		{
 			/*
 			 * Draw label background
 			 */
+			final Rectangle paintedLabel = hoveredLabel.hoveredLabel;
+			final int arc = 10;
+			gc.setAlpha(isSelected ? 0x60 : 0x30);
 			gc.setBackground(colorHovered);
-			gc.fillRectangle(_hoveredLabel.paintedLabel);
+			gc.fillRoundRectangle(paintedLabel.x, paintedLabel.y, paintedLabel.width, paintedLabel.height, arc, arc);
 
 			/*
 			 * Draw line thicker
 			 */
-			final Color lineColor = new Color(device, _hoveredLabel.paintedRGB);
+			final Color lineColor = new Color(device, hoveredLabel.paintedRGB);
 			{
-				final int x1 = _hoveredLabel.paintedX1;
-				final int y1 = _hoveredLabel.paintedY1;
-				final int x2 = _hoveredLabel.paintedX2;
-				final int y2 = _hoveredLabel.paintedY2;
-
-//				gc.setAlpha(0xff);
-
-				gc.setForeground(lineColor);
+				final int x1 = hoveredLabel.paintedX1;
+				final int y1 = hoveredLabel.paintedY1;
+				final int x2 = hoveredLabel.paintedX2;
+				final int y2 = hoveredLabel.paintedY2;
 
 				gc.setAntialias(SWT.ON);
-				gc.setLineWidth(40);
+				gc.setForeground(lineColor);
 				gc.setLineCap(SWT.CAP_ROUND);
+
+				// draw selected segment
+				if (isSelected) {
+					gc.setAlpha(0x20);
+					gc.setLineWidth(30);
+					gc.drawLine(x1, y1, x2, y2);
+				}
+
+				// draw hovered segment
+				gc.setAlpha(0xff);
+				gc.setLineWidth(5);
 				gc.drawLine(x1, y1, x2, y2);
 			}
 			lineColor.dispose();
@@ -433,32 +475,28 @@ public class ChartLayerSegmentAltitude implements IChartLayer, IChartOverlay {
 	 */
 	ChartLabel getHoveredLabel(final ChartMouseEvent mouseEvent) {
 
-		if (mouseEvent.eventTime == _hoveredEventTime) {
-			return _hoveredLabel;
-		}
-
-		_hoveredEventTime = mouseEvent.eventTime;
+		ChartLabel hoveredLabel;
 
 		if (_graphRect.contains(mouseEvent.devXMouse, mouseEvent.devYMouse)) {
 
 			// mouse is hovering the graph area
 
-			_hoveredLabel = getHoveredLabel_10(mouseEvent.devXMouse, mouseEvent.devYMouse);
+			hoveredLabel = getHoveredLabel_10(mouseEvent.devXMouse, mouseEvent.devYMouse);
 
 		} else {
-			_hoveredLabel = null;
+			hoveredLabel = null;
 		}
 
-		return _hoveredLabel;
+		return hoveredLabel;
 	}
 
 	private ChartLabel getHoveredLabel_10(final int devXMouse, final int devYMouse) {
 
 		for (final ChartLabel chartLabel : _chartLabels) {
 
-			final Rectangle paintedLabel = chartLabel.paintedLabel;
+			final Rectangle hoveredLabel = chartLabel.hoveredLabel;
 
-			if (paintedLabel != null && paintedLabel.contains(devXMouse, devYMouse)) {
+			if (hoveredLabel != null && hoveredLabel.contains(devXMouse, devYMouse)) {
 
 				// label is hit
 				return chartLabel;
@@ -466,10 +504,6 @@ public class ChartLayerSegmentAltitude implements IChartLayer, IChartOverlay {
 		}
 
 		return null;
-	}
-
-	void resetHoveredState() {
-		_hoveredLabel = null;
 	}
 
 	void setIsShowDecimalPlaces(final boolean isShowDecimalPlaces) {
@@ -484,16 +518,25 @@ public class ChartLayerSegmentAltitude implements IChartLayer, IChartOverlay {
 		_isShowSegmenterValue = isShowSegmenterValue;
 	}
 
-	void setLineColor(final RGB lineColor) {
-		_lineColor = lineColor;
+	void setSmallHiddenValues(final boolean isHideSmallValues, final int hiddenValueSize) {
+
+		_isHideSmallValues = isHideSmallValues;
+		_hiddenValueSize = hiddenValueSize / 10.0 / 100.0;
 	}
 
 	void setStackedValues(final int stackedValues) {
 		_stackedValues = stackedValues;
 	}
 
+	/**
+	 * Setup new tour for this layer.
+	 * 
+	 * @param tourData
+	 */
 	void setTourData(final TourData tourData) {
+
 		_tourData = tourData;
+		_chartLabels.clear();
 	}
 
 }
