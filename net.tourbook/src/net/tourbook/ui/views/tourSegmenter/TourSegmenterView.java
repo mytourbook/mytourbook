@@ -154,22 +154,26 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	/*
 	 * Tour segmenter
 	 */
+	public static final String						STATE_IS_SEGMENTER_ACTIVE						= "STATE_IS_SEGMENTER_ACTIVE";				//$NON-NLS-1$
+
 	public static final String						STATE_IS_HIDE_SMALL_VALUES						= "STATE_IS_HIDE_SMALL_VALUES";			//$NON-NLS-1$
 	public static final boolean						STATE_IS_HIDE_SMALL_VALUES_DEFAULT				= false;
-	public static final String						STATE_SMALL_VALUE_SIZE							= "STATE_SMALL_VALUE_SIZE";				//$NON-NLS-1$
-	public static final int							STATE_SMALL_VALUE_SIZE_DEFAULT					= 10;
-
-	public static final String						STATE_IS_SEGMENTER_ACTIVE						= "STATE_IS_SEGMENTER_ACTIVE";				//$NON-NLS-1$
 	public static final String						STATE_IS_SHOW_SEGMENTER_DECIMAL_PLACES			= "STATE_IS_SHOW_SEGMENTER_DECIMAL_PLACES"; //$NON-NLS-1$
 	public static final boolean						STATE_IS_SHOW_SEGMENTER_DECIMAL_PLACES_DEFAULT	= false;
+	public static final String						STATE_IS_SHOW_SEGMENTER_LINE					= "STATE_IS_SHOW_SEGMENTER_LINE";			//$NON-NLS-1$
+	public static final boolean						STATE_IS_SHOW_SEGMENTER_LINE_DEFAULT			= true;
 	public static final String						STATE_IS_SHOW_SEGMENTER_MARKER					= "STATE_IS_SHOW_SEGMENTER_MARKER";		//$NON-NLS-1$
 	public static final boolean						STATE_IS_SHOW_SEGMENTER_MARKER_DEFAULT			= false;
 	public static final String						STATE_IS_SHOW_SEGMENTER_VALUE					= "STATE_IS_SHOW_SEGMENTER_VALUE";			//$NON-NLS-1$
 	public static final boolean						STATE_IS_SHOW_SEGMENTER_VALUE_DEFAULT			= true;
 	public static final String						STATE_IS_SHOW_TOUR_SEGMENTS						= "STATE_IS_SHOW_TOUR_SEGMENTS";			//$NON-NLS-1$
 	public static final boolean						STATE_IS_SHOW_TOUR_SEGMENTS_DEFAULT				= true;
-	public static final String						STATE_GRAPH_ALPHA								= "STATE_GRAPH_ALPHA";						//$NON-NLS-1$
-	public static final int							STATE_GRAPH_ALPHA_DEFAULT						= 10;
+	public static final String						STATE_GRAPH_OPACITY								= "STATE_GRAPH_OPACITY";					//$NON-NLS-1$
+	public static final int							STATE_GRAPH_OPACITY_DEFAULT						= 10;
+	public static final String						STATE_LINE_OPACITY								= "STATE_LINE_OPACITY";					//$NON-NLS-1$
+	public static final int							STATE_LINE_OPACITY_DEFAULT						= 50;
+	public static final String						STATE_SMALL_VALUE_SIZE							= "STATE_SMALL_VALUE_SIZE";				//$NON-NLS-1$
+	public static final int							STATE_SMALL_VALUE_SIZE_DEFAULT					= 10;
 	public static final String						STATE_STACKED_VISIBLE_VALUES					= "STATE_STACKED_VISIBLE_VALUES";			//$NON-NLS-1$
 	public static final int							STATE_STACKED_VISIBLE_VALUES_DEFAULT			= 0;
 
@@ -314,6 +318,8 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 	private ActionModifyColumns						_actionModifyColumns;
 	private ActionTourChartSegmenterConfig			_actionTCSegmenterConfig;
+
+	private boolean									_isGetInitialTours;
 
 	/*
 	 * UI controls
@@ -773,6 +779,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		_tourData = null;
 		_tourChart = null;
 
+		_isGetInitialTours = true;
 		_isClearView = true;
 
 		// removed old tour data from the selection provider
@@ -2830,6 +2837,18 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		return null;
 	}
 
+	private String getTourTitle() {
+
+		if (_tourData.isMultipleTours) {
+
+			return TourManager.getTourTitleMultiple(_tourData);
+
+		} else {
+
+			return TourManager.getTourTitleDetailed(_tourData);
+		}
+	}
+
 	@Override
 	public ColumnViewer getViewer() {
 		return _segmentViewer;
@@ -2954,6 +2973,11 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	 */
 	private void onSelectionChanged(final ISelection selection) {
 
+		if (selection == null) {
+			// this happens when view is created
+			return;
+		}
+
 		_isClearView = false;
 
 		if (_isSaving) {
@@ -2975,6 +2999,15 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 				// check if view is disposed
 				if (_pageBookUI.isDisposed() || _isClearView) {
+					return;
+				}
+
+				if (_isGetInitialTours && _tourData != null) {
+
+					// tours are already setup
+
+					_isGetInitialTours = false;
+
 					return;
 				}
 
@@ -3507,7 +3540,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 			enableActions();
 
 			// update tour title
-			_lblTitle.setText(TourManager.getTourTitleDetailed(_tourData));
+			_lblTitle.setText(getTourTitle());
 
 			// keep original dp tolerance
 			_savedDpToleranceAltitude = _dpToleranceAltitude = getDPTolerance_FromTour();
@@ -3546,15 +3579,14 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 		// when previous onSelectionChanged did not display a tour, get tour from tour manager
 		if (_tourData == null) {
+
+			_isGetInitialTours = true;
+
 			Display.getCurrent().asyncExec(new Runnable() {
 				@Override
 				public void run() {
 
-					final ArrayList<TourData> selectedTours = TourManager.getSelectedTours();
-
-					if (selectedTours != null && selectedTours.size() > 0) {
-						onSelectionChanged(new SelectionTourData(null, selectedTours.get(0)));
-					}
+					onSelectionChanged(TourManager.getSelectedToursSelection());
 				}
 			});
 		}

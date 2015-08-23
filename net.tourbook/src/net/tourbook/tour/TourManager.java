@@ -71,6 +71,7 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferenceConverter;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
+import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.graphics.RGB;
@@ -949,6 +950,34 @@ public class TourManager {
 		}
 
 		return null;
+	}
+
+	public static ISelection getSelectedToursSelection() {
+
+		ISelection selection = null;
+
+		final ArrayList<TourData> selectedTours = getSelectedTours();
+
+		if (selectedTours != null && selectedTours.size() > 0) {
+
+			if (selectedTours.size() > 1) {
+
+				// convert tourdata into tour id's because this is better 'consumed'
+
+				final ArrayList<Long> tourIds = new ArrayList<>();
+				for (final TourData tourData : selectedTours) {
+					tourIds.add(tourData.getTourId());
+				}
+
+				selection = new SelectionTourIds(tourIds);
+
+			} else {
+
+				selection = new SelectionTourData(selectedTours.get(0));
+			}
+		}
+
+		return selection;
 	}
 
 	/**
@@ -1910,35 +1939,35 @@ public class TourManager {
 
 		final int[] multipleStartTimeIndex = tourData.multipleTourStartIndex;
 		final int[] multipleNumberOfMarkers = tourData.multipleNumberOfMarkers;
-		
+
 		int tourIndex = 0;
 		int numberOfMultiMarkers = 0;
 		int tourSerieIndex = 0;
-		
+
 		// setup first multiple tour
 		tourSerieIndex = multipleStartTimeIndex[tourIndex];
 		numberOfMultiMarkers = multipleNumberOfMarkers[tourIndex];
-		
+
 		final ArrayList<TourMarker> allTourMarkers = tourData.multiTourMarkers;
-		
+
 		for (int markerIndex = 0; markerIndex < allTourMarkers.size(); markerIndex++) {
-			
+
 			while (markerIndex >= numberOfMultiMarkers) {
-				
+
 				// setup next tour
-				
+
 				tourIndex++;
-				
+
 				if (tourIndex <= multipleStartTimeIndex.length - 1) {
-					
+
 					tourSerieIndex = multipleStartTimeIndex[tourIndex];
 					numberOfMultiMarkers += multipleNumberOfMarkers[tourIndex];
 				}
 			}
-			
+
 			final TourMarker tourMarker = allTourMarkers.get(markerIndex);
 			final int xAxisSerieIndex = tourSerieIndex + tourMarker.getSerieIndex();
-			
+
 			tourMarker.setMultiTourSerieIndex(xAxisSerieIndex);
 		}
 	}

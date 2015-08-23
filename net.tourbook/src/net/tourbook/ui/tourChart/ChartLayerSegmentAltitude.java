@@ -58,6 +58,10 @@ public class ChartLayerSegmentAltitude implements IChartLayer, IChartOverlay {
 	private boolean					_isHideSmallValues;
 	private double					_hiddenValueSize;
 
+	// show lines
+	private boolean					_isShowSegmenterLine;
+	private int						_lineOpacity;
+
 	private boolean					_isShowDecimalPlaces;
 	private boolean					_isShowSegmenterMarker;
 	private boolean					_isShowSegmenterValue;
@@ -238,13 +242,18 @@ public class ChartLayerSegmentAltitude implements IChartLayer, IChartOverlay {
 
 			} else {
 
-				gc.setLineAttributes(defaultLineAttributes);
-				gc.setForeground(upDownColor);
-				gc.drawLine(//
-						devXPrev,
-						devYPrev,
-						devXSegment,
-						devYSegment);
+				if (_isShowSegmenterLine) {
+
+					gc.setAlpha(_lineOpacity);
+					gc.setForeground(upDownColor);
+					gc.setLineAttributes(defaultLineAttributes);
+
+					gc.drawLine(//
+							devXPrev,
+							devYPrev,
+							devXSegment,
+							devYSegment);
+				}
 
 				chartLabel.paintedX1 = devXPrev;
 				chartLabel.paintedX2 = devXSegment;
@@ -265,8 +274,10 @@ public class ChartLayerSegmentAltitude implements IChartLayer, IChartOverlay {
 					devYLine = devYSegment + 1 * textHeight;
 				}
 
+				gc.setAlpha(0xff);
 				gc.setForeground(upDownColor);
 				gc.setLineAttributes(markerLineAttribute);
+
 				gc.drawLine(//
 						devXSegment,
 						devYSegment,
@@ -283,6 +294,9 @@ public class ChartLayerSegmentAltitude implements IChartLayer, IChartOverlay {
 					boolean isShowValueText = true;
 
 					if (_isHideSmallValues) {
+
+						// check values if they are small enough
+
 						if (altiDiff >= 0) {
 							if (altiDiff < maxHiddenValue) {
 								isShowValueText = false;
@@ -310,11 +324,26 @@ public class ChartLayerSegmentAltitude implements IChartLayer, IChartOverlay {
 						final float segmentWidth2 = segmentWidth / 2;
 						final int devXText = (int) (devXPrev + segmentWidth2 - textWidth);
 
+						final int borderWidth = 5;
+						final int borderWidth2 = 2 * borderWidth;
+						final int borderHeight = 0;
+						final int borderHeight2 = 2 * borderHeight;
+						final int textHeightWithBorder = textHeight + borderHeight2;
+
 						/*
 						 * Ensure the value text do not overlap, if possible :-)
 						 */
-						final Rectangle textRect = new Rectangle(devXText, devYText, textWidth, textHeight);
-						final Rectangle validRect = posChecker.getValidRect(textRect, isValueUp, textHeight, valueText);
+						final Rectangle textRect = new Rectangle(//
+								devXText - borderWidth2,
+								devYText - borderHeight,
+								textWidth + borderWidth2,
+								textHeightWithBorder);
+
+						final Rectangle validRect = posChecker.getValidRect(
+								textRect,
+								isValueUp,
+								textHeightWithBorder,
+								valueText);
 
 						// don't draw over the graph borders
 						if (validRect != null && validRect.y > devYTop && validRect.y + textHeight < devYBottom) {
@@ -322,21 +351,22 @@ public class ChartLayerSegmentAltitude implements IChartLayer, IChartOverlay {
 							// keep current valid rectangle
 							posChecker.setupNext(validRect, isValueUp);
 
+							gc.setAlpha(0xff);
 							gc.setForeground(upDownColor);
 							gc.drawText(//
 									valueText,
-									devXText,
-									validRect.y,
+									devXText - borderWidth,
+									validRect.y + borderHeight,
 									true);
 
 							chartLabel.paintedLabel = validRect;
 
 							// keep area to detect hovered segments, enlarge it with the hover border to easier hit the label
 							chartLabel.hoveredLabel = new Rectangle(
-									validRect.x - ChartLabel.MARKER_HOVER_SIZE,
-									validRect.y - ChartLabel.MARKER_HOVER_SIZE,
-									validRect.width + 2 * ChartLabel.MARKER_HOVER_SIZE,
-									validRect.height + 2 * ChartLabel.MARKER_HOVER_SIZE);
+									(validRect.x + borderWidth - ChartLabel.MARKER_HOVER_SIZE),
+									(validRect.y + borderHeight - ChartLabel.MARKER_HOVER_SIZE),
+									(validRect.width - borderWidth2 + 2 * ChartLabel.MARKER_HOVER_SIZE),
+									(validRect.height - borderHeight2 + 2 * ChartLabel.MARKER_HOVER_SIZE));
 
 //							/*
 //							 * Debugging
@@ -391,6 +421,8 @@ public class ChartLayerSegmentAltitude implements IChartLayer, IChartOverlay {
 
 		// restore font
 		gc.setFont(fontBackup);
+
+		gc.setAlpha(0xff);
 	}
 
 	@Override
@@ -518,7 +550,13 @@ public class ChartLayerSegmentAltitude implements IChartLayer, IChartOverlay {
 		_isShowSegmenterValue = isShowSegmenterValue;
 	}
 
-	void setSmallHiddenValues(final boolean isHideSmallValues, final int hiddenValueSize) {
+	void setLineProperties(final boolean isShowSegmenterLine, final int lineOpacity) {
+
+		_isShowSegmenterLine = isShowSegmenterLine;
+		_lineOpacity = (int) (lineOpacity / 100.0 * 255);
+	}
+
+	void setSmallHiddenValuesProperties(final boolean isHideSmallValues, final int hiddenValueSize) {
 
 		_isHideSmallValues = isHideSmallValues;
 		_hiddenValueSize = hiddenValueSize / 10.0 / 100.0;

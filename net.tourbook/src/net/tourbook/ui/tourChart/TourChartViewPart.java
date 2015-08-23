@@ -159,7 +159,7 @@ public abstract class TourChartViewPart extends ViewPart {
 				}
 
 				if (eventId == TourEventId.SEGMENT_LAYER_CHANGED) {
-					_tourChart.updateLayerSegment();
+					_tourChart.updateTourSegmenter();
 
 				} else if (eventId == TourEventId.TOUR_CHART_PROPERTY_IS_MODIFIED) {
 					_tourChart.updateTourChart(true, true);

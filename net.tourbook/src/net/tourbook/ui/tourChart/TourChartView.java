@@ -248,7 +248,7 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 
 						if (eventTourData.equals(_tourData)) {
 
-							_tourChart.updateLayerSegment();
+							_tourChart.updateTourSegmenter();
 
 						} else {
 

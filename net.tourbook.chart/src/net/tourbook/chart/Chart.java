@@ -567,7 +567,12 @@ public class Chart extends ViewForm {
 
 		final Object[] listeners = _mouseChartMoveListener.getListeners();
 		for (final Object listener : listeners) {
+
 			((IMouseListener) listener).mouseMove(mouseEvent);
+
+			if (mouseEvent.isWorked) {
+				return;
+			}
 		}
 	}
 
@@ -1028,6 +1033,8 @@ public class Chart extends ViewForm {
 	 * Adjust the alpha value for the filling operation, this value is multiplied with
 	 * {@link #graphTransparencyFilling} and {@link #graphTransparencyLine} which is set in the tour
 	 * chart preference page.
+	 * <p>
+	 * Opacity: 0.0 = transparent, 1.0 = opaque.
 	 * 
 	 * @param adjustment
 	 */

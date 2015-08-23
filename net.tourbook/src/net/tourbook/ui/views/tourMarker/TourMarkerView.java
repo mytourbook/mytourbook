@@ -1034,25 +1034,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 					return;
 				}
 
-				final ArrayList<TourData> selectedTours = TourManager.getSelectedTours();
-
-				if (selectedTours != null && selectedTours.size() > 0) {
-
-					if (selectedTours.size() > 1) {
-
-						final ArrayList<Long> tourIds = new ArrayList<>();
-						for (final TourData tourData : selectedTours) {
-							tourIds.add(tourData.getTourId());
-						}
-
-						onSelectionChanged(new SelectionTourIds(tourIds));
-
-					} else {
-
-						onSelectionChanged(new SelectionTourData(selectedTours.get(0)));
-					}
-
-				}
+				onSelectionChanged(TourManager.getSelectedToursSelection());
 			}
 		});
 	}

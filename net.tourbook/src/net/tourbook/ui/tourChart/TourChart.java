@@ -228,6 +228,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 	private boolean						_isSegmentTitleHovered;
 	private ChartSegment				_hoveredSegmentTitle;
 
+	private boolean						_isTourSegmenterVisible;
 	private Font						_segmenterValueFont;
 
 	private ActionEditQuick				_actionEditQuick;
@@ -1767,7 +1768,9 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 	 */
 	private void createLayer_TourSegmenter() {
 
-		if (!isShowTourSegmenterSegments()) {
+		setupTourSegmenter();
+
+		if (_isTourSegmenterVisible == false) {
 			return;
 		}
 
@@ -1792,6 +1795,15 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 				TourSegmenterView.STATE_SMALL_VALUE_SIZE,
 				TourSegmenterView.STATE_SMALL_VALUE_SIZE_DEFAULT);
 
+		// show segment lines
+		final boolean isShowSegmenterLine = Util.getStateBoolean(
+				_tourSegmenterState,
+				TourSegmenterView.STATE_IS_SHOW_SEGMENTER_LINE,
+				TourSegmenterView.STATE_IS_SHOW_SEGMENTER_LINE_DEFAULT);
+		final int lineOpacity = Util.getStateInt(_tourSegmenterState,//
+				TourSegmenterView.STATE_LINE_OPACITY,
+				TourSegmenterView.STATE_LINE_OPACITY_DEFAULT);
+
 		final boolean isShowSegmenterMarker = Util.getStateBoolean(
 				_tourSegmenterState,
 				TourSegmenterView.STATE_IS_SHOW_SEGMENTER_MARKER,
@@ -1812,6 +1824,10 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 				TourSegmenterView.STATE_STACKED_VISIBLE_VALUES,
 				TourSegmenterView.STATE_STACKED_VISIBLE_VALUES_DEFAULT);
 
+		final int graphOpacity = Util.getStateInt(_tourSegmenterState,//
+				TourSegmenterView.STATE_GRAPH_OPACITY,
+				TourSegmenterView.STATE_GRAPH_OPACITY_DEFAULT);
+
 		final double[] xDataSerie = _tcc.isShowTimeOnXAxis ? //
 				_tourData.getTimeSerieDouble()
 				: _tourData.getDistanceSerieDouble();
@@ -1830,7 +1846,8 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		_layerTourSegmenterAltitude.setTourData(_tourData);
 		_layerTourSegmenterAltitude.setIsShowSegmenterMarker(isShowSegmenterMarker);
 		_layerTourSegmenterAltitude.setIsShowSegmenterValue(isShowSegmenterValue);
-		_layerTourSegmenterAltitude.setSmallHiddenValues(isHideSmallValues, hiddenValueSize);
+		_layerTourSegmenterAltitude.setSmallHiddenValuesProperties(isHideSmallValues, hiddenValueSize);
+		_layerTourSegmenterAltitude.setLineProperties(isShowSegmenterLine, lineOpacity);
 		_layerTourSegmenterAltitude.setStackedValues(stackedValues);
 		_layerTourSegmenterAltitude.setIsShowDecimalPlaces(isShowDecimalPlaces);
 
@@ -1859,10 +1876,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		_layerTourSegmenterOther.setIsShowDecimalPlaces(isShowDecimalPlaces);
 
 		// draw the graph lighter that the segments are more visible
-		final int graphAlpha = Util.getStateInt(_tourSegmenterState,//
-				TourSegmenterView.STATE_GRAPH_ALPHA,
-				TourSegmenterView.STATE_GRAPH_ALPHA_DEFAULT);
-		setGraphAlpha(graphAlpha / 100.0);
+		setGraphAlpha(graphOpacity / 100.0);
 	}
 
 	private void createPainter_HrZone() {
@@ -2230,44 +2244,6 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		removeMouseChartListener(_mousePhotoListener);
 	}
 
-	private boolean isSegmentLayerHidden() {
-
-		return _layerTourSegmenterAltitude == null && _layerTourSegmenterOther == null;
-	}
-
-	/**
-	 * @return Returns <code>true</code> when the segments from the tour segmenter should be
-	 *         displayed.
-	 */
-	private boolean isShowTourSegmenterSegments() {
-
-		final boolean isSegmenterActive = Util.getStateBoolean(
-				_tourSegmenterState,
-				TourSegmenterView.STATE_IS_SEGMENTER_ACTIVE,
-				false);
-
-		final boolean isShowTourSegments = Util.getStateBoolean(
-				_tourSegmenterState,
-				TourSegmenterView.STATE_IS_SHOW_TOUR_SEGMENTS,
-				TourSegmenterView.STATE_IS_SHOW_TOUR_SEGMENTS_DEFAULT);
-
-		final boolean isVisible = isSegmenterActive && isShowTourSegments;
-
-		if (!isVisible) {
-
-			if (_layerTourSegmenterAltitude != null) {
-
-				// disable segment layers
-				removeChartOverlay(_layerTourSegmenterAltitude);
-
-				_layerTourSegmenterAltitude = null;
-				_layerTourSegmenterOther = null;
-			}
-		}
-
-		return isVisible;
-	}
-
 	private void onDispose() {
 
 		if (_segmenterValueFont != null) {
@@ -2469,10 +2445,6 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 	 */
 	private void onSegmentLabel_MouseDown(final ChartMouseEvent mouseEvent) {
 
-		if (isSegmentLayerHidden()) {
-			return;
-		}
-
 		final ChartLabel hoveredLabel = getHoveredSegmentLabel(mouseEvent);
 
 		if (hoveredLabel == null) {
@@ -2492,10 +2464,6 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 	}
 
 	private void onSegmentLabel_MouseMove(final ChartMouseEvent mouseEvent) {
-
-		if (isSegmentLayerHidden()) {
-			return;
-		}
 
 		// ignore events with the same time
 		if (mouseEvent.eventTime == _hoveredSegmentLabelEventTime) {
@@ -2561,10 +2529,6 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 	}
 
 	private void onSegmentLabel_Reset() {
-
-		if (isSegmentLayerHidden()) {
-			return;
-		}
 
 		_hoveredSegmentLabel = null;
 		_selectedSegmentLabel = null;
@@ -2980,42 +2944,6 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 				ITourbookPreferences.GRAPH_GRID_IS_SHOW_VERTICAL_GRIDLINES);
 	}
 
-	private void setupChartSegments() {
-
-		final ChartSegmentConfig ctConfig = getChartSegmentConfig();
-
-		if (_tcc.isTourInfoVisible) {
-
-			// show tour info
-			addMouseChartListener(_mouseSegmentTitle_Listener);
-			addMouseChartMoveListener(_mouseSegmentTitle_MoveListener);
-
-			addMouseChartListener(_mouseSegmentLabel_Listener);
-			addMouseChartMoveListener(_mouseSegmentLabel_MoveListener);
-
-			ctConfig.isShowSegmentBackground = true;
-			ctConfig.isShowSegmentSeparator = _tcc.isShowInfoTourSeparator;
-			ctConfig.isShowSegmentTitle = _tcc.isShowInfoTitle;
-
-		} else {
-
-			// hide tour info
-			removeMouseChartListener(_mouseSegmentTitle_Listener);
-			removeMouseMoveChartListener(_mouseSegmentTitle_MoveListener);
-
-			removeMouseChartListener(_mouseSegmentLabel_Listener);
-			removeMouseMoveChartListener(_mouseSegmentLabel_MoveListener);
-
-			ctConfig.isShowSegmentBackground = false;
-			ctConfig.isShowSegmentSeparator = false;
-			ctConfig.isShowSegmentTitle = false;
-		}
-
-		ctConfig.isMultipleSegments = _tourData.isMultipleTours;
-
-		_tourTitleTooltip.setFadeInDelayTime(_tcc.tourInfoTooltipDelay);
-	}
-
 	/**
 	 * set custom data for all graphs
 	 */
@@ -3072,7 +3000,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		/*
 		 * Setup tour segmenter data
 		 */
-		if (isShowTourSegmenterSegments()) {
+		if (_isTourSegmenterVisible) {
 
 			final IValueLabelProvider labelProviderInt = TourManager.getLabelProviderInt();
 			final IValueLabelProvider labelProviderMMSS = TourManager.getLabelProviderMMSS();
@@ -3233,6 +3161,75 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		_segmenterValueFont = new Font(getDisplay(), valueFontData);
 	}
 
+	private void setupSegments_Title() {
+
+		final ChartSegmentConfig csConfig = getChartSegmentConfig();
+
+		if (_tcc.isTourInfoVisible) {
+
+			// show tour info
+			addMouseChartListener(_mouseSegmentTitle_Listener);
+			addMouseChartMoveListener(_mouseSegmentTitle_MoveListener);
+
+			csConfig.isShowSegmentBackground = true;
+			csConfig.isShowSegmentSeparator = _tcc.isShowInfoTourSeparator;
+			csConfig.isShowSegmentTitle = _tcc.isShowInfoTitle;
+
+		} else {
+
+			// hide tour info
+			removeMouseChartListener(_mouseSegmentTitle_Listener);
+			removeMouseMoveChartListener(_mouseSegmentTitle_MoveListener);
+
+			csConfig.isShowSegmentBackground = false;
+			csConfig.isShowSegmentSeparator = false;
+			csConfig.isShowSegmentTitle = false;
+		}
+
+		csConfig.isMultipleSegments = _tourData.isMultipleTours;
+
+		_tourTitleTooltip.setFadeInDelayTime(_tcc.tourInfoTooltipDelay);
+	}
+
+	/**
+	 * Add/removes the toursegmenter mouse listeners and sets's the state
+	 * {@link #_isTourSegmenterVisible} if tour segmenter is visible or not.
+	 */
+	private void setupTourSegmenter() {
+
+		final boolean isSegmenterActive = Util.getStateBoolean(
+				_tourSegmenterState,
+				TourSegmenterView.STATE_IS_SEGMENTER_ACTIVE,
+				false);
+
+		final boolean isShowTourSegments = Util.getStateBoolean(
+				_tourSegmenterState,
+				TourSegmenterView.STATE_IS_SHOW_TOUR_SEGMENTS,
+				TourSegmenterView.STATE_IS_SHOW_TOUR_SEGMENTS_DEFAULT);
+
+		_isTourSegmenterVisible = isSegmenterActive && isShowTourSegments;
+
+		if (_isTourSegmenterVisible) {
+
+			addMouseChartListener(_mouseSegmentLabel_Listener);
+			addMouseChartMoveListener(_mouseSegmentLabel_MoveListener);
+
+		} else {
+
+			if (_layerTourSegmenterAltitude != null) {
+
+				// disable segment layers
+				removeChartOverlay(_layerTourSegmenterAltitude);
+
+				_layerTourSegmenterAltitude = null;
+				_layerTourSegmenterOther = null;
+			}
+
+			removeMouseChartListener(_mouseSegmentLabel_Listener);
+			removeMouseMoveChartListener(_mouseSegmentLabel_MoveListener);
+		}
+	}
+
 	/**
 	 * set's the chart which is synched with this chart
 	 * 
@@ -3351,30 +3348,6 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
 		setupGraphLayer();
 		updateCustomLayers();
-	}
-
-	/**
-	 * Updates the segment layer
-	 */
-	public void updateLayerSegment() {
-
-		if (_tourData == null) {
-			return;
-		}
-
-		if (isShowTourSegmenterSegments()) {
-
-			createLayer_TourSegmenter();
-
-		} else {
-
-			resetGraphAlpha();
-		}
-
-		setupGraphLayer();
-		updateCustomLayers();
-
-		redrawChart();
 	}
 
 	@Override
@@ -3691,7 +3664,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		createPainter_HrZone();
 
 		setupGraphLayer();
-		setupChartSegments();
+		setupSegments_Title();
 
 		updateChart(newChartDataModel, !isMinMaxKeeper);
 
@@ -3707,6 +3680,36 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		_tourInfoIconTooltipProvider.setTourData(_tourData);
 		_valuePointTooltip.setTourData(_tourData);
 		_tourMarkerTooltip.setIsShowMarkerActions(_tourData.isMultipleTours == false);
+	}
+
+	/**
+	 * Toursegmenter is modified, update the toursegmenter layer.
+	 */
+	public void updateTourSegmenter() {
+
+		if (_tourData == null) {
+			return;
+		}
+
+		setupTourSegmenter();
+
+		if (_isTourSegmenterVisible) {
+
+			// tour segmenter is visible
+
+			createLayer_TourSegmenter();
+
+		} else {
+
+			// tour segmenter is hidden
+
+			resetGraphAlpha();
+		}
+
+		setupGraphLayer();
+		updateCustomLayers();
+
+		redrawChart();
 	}
 
 	private void updateUI_Marker(final Boolean isMarkerVisible) {
@@ -3745,7 +3748,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
 	void updateUI_TourTitleInfo() {
 
-		setupChartSegments();
+		setupSegments_Title();
 
 		updateTourChart();
 	}

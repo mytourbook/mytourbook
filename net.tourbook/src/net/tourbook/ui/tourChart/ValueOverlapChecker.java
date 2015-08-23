@@ -68,13 +68,13 @@ public class ValueOverlapChecker {
 			yDiff = textHeight;
 		}
 
-//		/*
-//		 * Debugging
-//		 */
-//		if (valueText.equals("-0.4")) {
-//			int a = 0;
-//			a++;
-//		}
+		/*
+		 * Debugging
+		 */
+		if (valueText.equals("13")) {
+			int a = 0;
+			a++;
+		}
 
 		int rectCounter = 0;
 		for (int rectIndex = 0; rectIndex < _numRects; rectIndex++) {
@@ -82,7 +82,6 @@ public class ValueOverlapChecker {
 			final Rectangle prevRect = _prevValues[rectIndex];
 
 			if (prevRect.intersects(textRect)) {
-
 
 				textRect.y = prevRect.y + yDiff;
 

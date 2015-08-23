@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -26,7 +26,7 @@ import org.eclipse.swt.graphics.Rectangle;
 
 public class ChartLabel {
 
-	static final int		MARKER_HOVER_SIZE		= 4;
+	static final int		MARKER_HOVER_SIZE		= 6;
 
 	/**
 	 * marker was created in the device
