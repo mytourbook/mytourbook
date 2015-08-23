@@ -2748,7 +2748,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		// show/hide the segments in the chart
 		TourManager.fireEventWithCustomData(//
 				TourEventId.SEGMENT_LAYER_CHANGED,
-				null,
+				_tourData,
 				TourSegmenterView.this);
 	}
 

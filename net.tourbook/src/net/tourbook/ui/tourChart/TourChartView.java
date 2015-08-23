@@ -25,6 +25,7 @@ import net.tourbook.chart.ISliderMoveListener;
 import net.tourbook.chart.SelectionChartInfo;
 import net.tourbook.chart.SelectionChartXSliderPosition;
 import net.tourbook.common.util.PostSelectionProvider;
+import net.tourbook.common.util.StatusUtil;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.photo.IPhotoEventListener;
@@ -241,7 +242,26 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 
 				if (eventId == TourEventId.SEGMENT_LAYER_CHANGED) {
 
-					_tourChart.updateLayerSegment();
+					if (eventData instanceof TourData) {
+
+						final TourData eventTourData = (TourData) eventData;
+
+						if (eventTourData.equals(_tourData)) {
+
+							_tourChart.updateLayerSegment();
+
+						} else {
+
+							/*
+							 * This case happened that this event contained not the same tourdata as
+							 * the tourchart, it occured for multiple tours in tourdata.
+							 */
+
+							onSelectionChanged(new SelectionTourData(eventTourData));
+
+							StatusUtil.log(new Exception("Event contained wrong tourdata."));
+						}
+					}
 
 				} else if (eventId == TourEventId.TOUR_CHART_PROPERTY_IS_MODIFIED) {
 

@@ -44,7 +44,7 @@ public class ActionTourChartSegmenterConfig extends ContributionItem {
 	private ToolBar								_toolBar;
 	private ToolItem							_actionToolItem;
 
-	private SlideoutTourChartSegmenterConfig	_slideoutTCSConfig;
+	private SlideoutTourChartSegmenterProperties	_slideoutTCSConfig;
 
 	/*
 	 * UI controls
@@ -99,7 +99,7 @@ public class ActionTourChartSegmenterConfig extends ContributionItem {
 				}
 			});
 
-			_slideoutTCSConfig = new SlideoutTourChartSegmenterConfig(_parent, _toolBar, _tourSegmenterView);
+			_slideoutTCSConfig = new SlideoutTourChartSegmenterProperties(_parent, _toolBar, _tourSegmenterView);
 
 			updateUI_Action();
 		}
