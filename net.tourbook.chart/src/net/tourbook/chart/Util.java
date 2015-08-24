@@ -235,7 +235,30 @@ public class Util {
 
 		if (unitType == ChartDataSerie.AXIS_UNIT_NUMBER) {
 
-			valueText = _df.format(rawValue / valueDivisor);
+//			valueText = _df.format(rawValue / valueDivisor);
+
+			
+			final double divValue = rawValue / valueDivisor;
+
+			if (valueDecimals == 0 || divValue % 1 == 0) {
+
+				valueText = _nf0.format(divValue);
+
+			} else {
+
+				switch (valueDecimals) {
+				case 2:
+					valueText = _nf2.format(divValue);
+					break;
+				case 3:
+					valueText = _nf3.format(divValue);
+					break;
+
+				default:
+					valueText = _nf1.format(divValue);
+					break;
+				}
+			}
 
 		} else {
 

@@ -119,6 +119,9 @@ public class ChartLabel {
 	int						paintedY2;
 	RGB						paintedRGB;
 
+	int						xSliderSerieIndexLeft;
+	int						xSliderSerieIndexRight;
+
 	public ChartLabel() {}
 
 	/**

@@ -39,6 +39,8 @@ public class SelectionChartXSliderPosition implements ISelection {
 	 */
 	private boolean			_isAdjustStartIndex;
 
+	private Object			_customData;
+
 	public SelectionChartXSliderPosition(final Chart chart, final int leftValueIndex, final int rightValueIndex) {
 
 		_chart = chart;
@@ -79,6 +81,10 @@ public class SelectionChartXSliderPosition implements ISelection {
 		return _chart;
 	}
 
+	public Object getCustomData() {
+		return _customData;
+	}
+
 	/**
 	 * @return Returns the value index for the left slider or {@link #IGNORE_SLIDER_POSITION} when
 	 *         this value index should not be used.
@@ -106,6 +112,10 @@ public class SelectionChartXSliderPosition implements ISelection {
 
 	public void setChart(final Chart chart) {
 		_chart = chart;
+	}
+
+	public void setCustomData(final Object customData) {
+		_customData = customData;
 	}
 
 }

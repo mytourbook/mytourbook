@@ -240,6 +240,7 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
 		};
 
 		_defaultMouseWheelListener = new MouseWheelListener() {
+			@Override
 			public void mouseScrolled(final MouseEvent event) {
 				UI.adjustSpinnerValueOnMouseScroll(event);
 				onChangeMarkerUI();
@@ -377,8 +378,10 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
 
 	private class MarkerViewerContentProvider implements IStructuredContentProvider {
 
+		@Override
 		public void dispose() {}
 
+		@Override
 		public Object[] getElements(final Object inputElement) {
 			if (_tourData == null) {
 				return new Object[0];
@@ -387,6 +390,7 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
 			}
 		}
 
+		@Override
 		public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
 	}
 
@@ -587,6 +591,7 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
 
 		menuMgr.setRemoveAllWhenShown(true);
 		menuMgr.addMenuListener(new IMenuListener() {
+			@Override
 			public void menuAboutToShow(final IMenuManager menuMgr) {
 				fillContextMenu(menuMgr);
 			}
@@ -839,6 +844,7 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
 		_markerViewer.setSorter(new MarkerViewerSorter());
 
 		_markerViewer.addSelectionChangedListener(new ISelectionChangedListener() {
+			@Override
 			public void selectionChanged(final SelectionChangedEvent event) {
 				final StructuredSelection selection = (StructuredSelection) event.getSelection();
 				if (selection != null) {
@@ -848,6 +854,7 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
 		});
 
 		_markerViewer.addDoubleClickListener(new IDoubleClickListener() {
+			@Override
 			public void doubleClick(final DoubleClickEvent event) {
 				_comboMarkerName.setFocus();
 			}
@@ -1232,6 +1239,7 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
 		_tourChart.addTourMarkerSelectionListener(this);
 		_tourChart.addTourMarkerModifyListener(this);
 		_tourChart.addSliderMoveListener(new ISliderMoveListener() {
+			@Override
 			public void sliderMoved(final SelectionChartInfo chartInfoSelection) {
 
 				TourManager.fireEventWithCustomData(//
@@ -1243,6 +1251,7 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
 
 		// set title
 		_tourChart.addDataModelListener(new IDataModelListener() {
+			@Override
 			public void dataModelChanged(final ChartDataModel changedChartDataModel) {
 				changedChartDataModel.setTitle(TourManager.getTourTitleDetailed(_tourData));
 			}
@@ -1889,8 +1898,11 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
 		if (_isSetXSlider) {
 
 			// set slider position
-			_tourChart.setXSliderPosition(new SelectionChartXSliderPosition(_tourChart, newSelectedMarker
-					.getSerieIndex(), SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION));
+			_tourChart.setXSliderPosition(//
+					new SelectionChartXSliderPosition(
+							_tourChart,
+							newSelectedMarker.getSerieIndex(),
+							SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION));
 		}
 	}
 

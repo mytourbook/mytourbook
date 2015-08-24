@@ -2451,7 +2451,7 @@ public class ChartComponents extends Composite {
 	 * 
 	 * @param sliderPosition
 	 */
-	void setXSliderPosition(final SelectionChartXSliderPosition sliderPosition) {
+	void setXSliderPosition(final SelectionChartXSliderPosition sliderPosition, final boolean isFireEvent) {
 
 		if (sliderPosition == null) {
 			/*
@@ -2481,21 +2481,23 @@ public class ChartComponents extends Composite {
 			componentGraph.setXSliderValueIndex(//
 					leftSlider,
 					0,
-					isCenterSliderPosition);
+					isCenterSliderPosition,
+					isFireEvent);
 
 		} else if (slider1ValueIndex != SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION) {
 
 			componentGraph.setXSliderValueIndex(//
 					leftSlider,
 					slider1ValueIndex,
-					isCenterSliderPosition);
+					isCenterSliderPosition,
+					isFireEvent);
 		}
 
 		if (slider0ValueIndex != SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION) {
 
 			// move second slider before the first slider
 
-			componentGraph.setXSliderValueIndex(rightSlider, slider0ValueIndex, isCenterSliderPosition);
+			componentGraph.setXSliderValueIndex(rightSlider, slider0ValueIndex, isCenterSliderPosition, isFireEvent);
 
 		} else {
 
@@ -2505,14 +2507,16 @@ public class ChartComponents extends Composite {
 				componentGraph.setXSliderValueIndex(//
 						rightSlider,
 						xValues.length - 1,
-						isCenterSliderPosition);
+						isCenterSliderPosition,
+						isFireEvent);
 
 			} else if (slider2ValueIndex != SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION) {
 
 				componentGraph.setXSliderValueIndex(//
 						rightSlider,
 						slider2ValueIndex,
-						isCenterSliderPosition);
+						isCenterSliderPosition,
+						isFireEvent);
 			}
 		}
 

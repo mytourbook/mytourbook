@@ -82,6 +82,7 @@ import net.tourbook.ui.tourChart.action.ActionTourChartOptions;
 import net.tourbook.ui.tourChart.action.ActionTourPhotos;
 import net.tourbook.ui.tourChart.action.ActionXAxisDistance;
 import net.tourbook.ui.tourChart.action.ActionXAxisTime;
+import net.tourbook.ui.views.tourSegmenter.SelectedTourSegmenterSegments;
 import net.tourbook.ui.views.tourSegmenter.TourSegmenterView;
 
 import org.eclipse.core.runtime.Assert;
@@ -1289,53 +1290,6 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 	}
 
 	/**
-	 * @param tourMarker
-	 * @param xAxisSerie
-	 * @param xAxisSerieIndex
-	 * @param labelPosition
-	 * @return
-	 */
-	private ChartLabel createChartLabel(final TourMarker tourMarker,
-										final double[] xAxisSerie,
-										final int xAxisSerieIndex,
-										final int labelPosition) {
-
-		final ChartLabel chartLabel = new ChartLabel();
-
-		chartLabel.data = tourMarker;
-
-		// create marker label
-		String markerLabel = tourMarker.getLabel();
-		final boolean isDescription = tourMarker.getDescription().length() > 0;
-		final boolean isUrlAddress = tourMarker.getUrlAddress().length() > 0;
-		final boolean isUrlText = tourMarker.getUrlText().length() > 0;
-		if (isDescription | isUrlAddress | isUrlText) {
-			markerLabel += UI.SPACE2 + UI.SYMBOL_FOOT_NOTE;
-		}
-
-		chartLabel.graphX = xAxisSerie[xAxisSerieIndex];
-		chartLabel.serieIndex = xAxisSerieIndex;
-
-		chartLabel.markerLabel = markerLabel;
-		chartLabel.isDescription = isDescription;
-		chartLabel.visualPosition = labelPosition;
-		chartLabel.type = tourMarker.getType();
-		chartLabel.visualType = tourMarker.getVisibleType();
-
-		chartLabel.labelXOffset = tourMarker.getLabelXOffset();
-		chartLabel.labelYOffset = tourMarker.getLabelYOffset();
-
-		chartLabel.isVisible = tourMarker.isMarkerVisible();
-
-//		final TourSign tourSign = tourMarker.getTourSign();
-//		if (tourSign != null) {
-//			chartLabel.markerSignPhoto = tourSign.getSignImagePhoto();
-//		}
-
-		return chartLabel;
-	}
-
-	/**
 	 * Create chart photos, these are photos which contain the time slice position.
 	 * 
 	 * @param srcPhotos
@@ -1648,7 +1602,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
 				tourMarker.setMultiTourSerieIndex(xAxisSerieIndex);
 
-				final ChartLabel chartLabel = createChartLabel(//
+				final ChartLabel chartLabel = createLayer_Marker_ChartLabel(//
 						tourMarker,
 						xAxisSerie,
 						xAxisSerieIndex,
@@ -1661,7 +1615,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
 			for (final TourMarker tourMarker : _tourData.getTourMarkers()) {
 
-				final ChartLabel chartLabel = createChartLabel(
+				final ChartLabel chartLabel = createLayer_Marker_ChartLabel(
 						tourMarker,
 						xAxisSerie,
 						tourMarker.getSerieIndex(),
@@ -1670,6 +1624,53 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 				cmc.chartLabels.add(chartLabel);
 			}
 		}
+	}
+
+	/**
+	 * @param tourMarker
+	 * @param xAxisSerie
+	 * @param xAxisSerieIndex
+	 * @param labelPosition
+	 * @return
+	 */
+	private ChartLabel createLayer_Marker_ChartLabel(	final TourMarker tourMarker,
+														final double[] xAxisSerie,
+														final int xAxisSerieIndex,
+														final int labelPosition) {
+
+		final ChartLabel chartLabel = new ChartLabel();
+
+		chartLabel.data = tourMarker;
+
+		// create marker label
+		String markerLabel = tourMarker.getLabel();
+		final boolean isDescription = tourMarker.getDescription().length() > 0;
+		final boolean isUrlAddress = tourMarker.getUrlAddress().length() > 0;
+		final boolean isUrlText = tourMarker.getUrlText().length() > 0;
+		if (isDescription | isUrlAddress | isUrlText) {
+			markerLabel += UI.SPACE2 + UI.SYMBOL_FOOT_NOTE;
+		}
+
+		chartLabel.graphX = xAxisSerie[xAxisSerieIndex];
+		chartLabel.serieIndex = xAxisSerieIndex;
+
+		chartLabel.markerLabel = markerLabel;
+		chartLabel.isDescription = isDescription;
+		chartLabel.visualPosition = labelPosition;
+		chartLabel.type = tourMarker.getType();
+		chartLabel.visualType = tourMarker.getVisibleType();
+
+		chartLabel.labelXOffset = tourMarker.getLabelXOffset();
+		chartLabel.labelYOffset = tourMarker.getLabelYOffset();
+
+		chartLabel.isVisible = tourMarker.isMarkerVisible();
+
+//		final TourSign tourSign = tourMarker.getTourSign();
+//		if (tourSign != null) {
+//			chartLabel.markerSignPhoto = tourSign.getSignImagePhoto();
+//		}
+
+		return chartLabel;
 	}
 
 	private void createLayer_Photo() {
@@ -1778,9 +1779,9 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 			return;
 		}
 
-		final int[] segmentSerie = _tourData.segmentSerieIndex;
+		final int[] segmentSerieIndex = _tourData.segmentSerieIndex;
 
-		if (segmentSerie == null) {
+		if (segmentSerieIndex == null) {
 			// no segmented tour data available or segments are invisible
 			return;
 		}
@@ -1851,12 +1852,26 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		_layerTourSegmenterAltitude.setStackedValues(stackedValues);
 		_layerTourSegmenterAltitude.setIsShowDecimalPlaces(isShowDecimalPlaces);
 
-		for (final int serieIndex : segmentSerie) {
+		final int segmentIndexSize = segmentSerieIndex.length;
 
+		for (int segmentIndex = 0; segmentIndex < segmentIndexSize; segmentIndex++) {
+
+			final int serieIndex = segmentSerieIndex[segmentIndex];
 			final ChartLabel chartLabel = new ChartLabel();
 
 			chartLabel.graphX = xDataSerie[serieIndex];
 			chartLabel.serieIndex = serieIndex;
+
+			/*
+			 * Set slider positions
+			 */
+			final int prevSegmentIndex = segmentIndex - 1;
+			final int leftIndex = prevSegmentIndex < 0
+					? SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION
+					: segmentSerieIndex[prevSegmentIndex];
+
+			chartLabel.xSliderSerieIndexLeft = leftIndex;
+			chartLabel.xSliderSerieIndexRight = serieIndex;
 
 			_layerTourSegmenterAltitude.addMarker(chartLabel);
 		}
@@ -1996,8 +2011,35 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 	}
 
 	private void fireSegmentLabelSelection(final ChartLabel selectedLabel) {
-		// TODO Auto-generated method stub
 
+		// set sliders to the selected segment and fire this position
+
+		final int xSliderSerieIndexLeft = selectedLabel.xSliderSerieIndexLeft;
+		final int xSliderSerieIndexRight = selectedLabel.xSliderSerieIndexRight;
+
+		final SelectionChartXSliderPosition selectionSliderPosition = new SelectionChartXSliderPosition(//
+				this,
+				xSliderSerieIndexLeft,
+				xSliderSerieIndexRight);
+
+		final SelectedTourSegmenterSegments selectedSegments = new SelectedTourSegmenterSegments();
+		selectedSegments.tourData = _tourData;
+		selectedSegments.xSliderSerieIndexLeft = xSliderSerieIndexLeft;
+		selectedSegments.xSliderSerieIndexRight = xSliderSerieIndexRight;
+
+		selectionSliderPosition.setCustomData(selectedSegments);
+
+		/*
+		 * Set x slider position in the chart but do not fire an event because the event is fired
+		 * separately for each slider :-(
+		 */
+		setXSliderPosition(selectionSliderPosition, false);
+
+		// fire event for both x sliders
+		TourManager.fireEventWithCustomData(//
+				TourEventId.SLIDER_POSITION_CHANGED,
+				selectionSliderPosition,
+				_part);
 	}
 
 	/**

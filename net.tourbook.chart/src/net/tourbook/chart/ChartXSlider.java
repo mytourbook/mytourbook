@@ -172,6 +172,19 @@ public class ChartXSlider {
 		}
 	}
 
+	void moveToXXDevPosition(	final double xxDevLinePos,
+								final boolean isAdjustToImageWidth,
+								final boolean isAdjustPositionRatio,
+								final boolean isUpdateValueFromRatio) {
+
+		moveToXXDevPosition(//
+				xxDevLinePos,
+				isAdjustToImageWidth,
+				isAdjustPositionRatio,
+				isUpdateValueFromRatio,
+				true);
+	}
+
 	/**
 	 * Sets a new position for the sliderLine and also updates the slider/line rectangles and value.
 	 * A Slider move event is fired
@@ -181,7 +194,8 @@ public class ChartXSlider {
 	void moveToXXDevPosition(	double xxDevLinePos,
 								final boolean isAdjustToImageWidth,
 								final boolean isAdjustPositionRatio,
-								final boolean isUpdateValueFromRatio) {
+								final boolean isUpdateValueFromRatio,
+								final boolean isFireEvent) {
 
 		final long xxDevGraphWidth = _chartGraph.getXXDevGraphWidth();
 
@@ -218,7 +232,7 @@ public class ChartXSlider {
 		}
 
 		// fire change event when the position has changed
-		if ((long) xxDevLinePos != xxDevOldPos) {
+		if (isFireEvent && (long) xxDevLinePos != xxDevOldPos) {
 			_chartGraph._chart.fireSliderMoveEvent();
 		}
 	}

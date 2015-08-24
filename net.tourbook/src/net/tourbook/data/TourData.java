@@ -4245,11 +4245,12 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 	 * @param breakDistance
 	 * @return
 	 */
-	public Object[] createTourSegments(final BreakTimeTool btConfig) {
+	public ArrayList<TourSegment> createTourSegments(final BreakTimeTool btConfig) {
 
 		if ((segmentSerieIndex == null) || (segmentSerieIndex.length < 2)) {
+
 			// at least two points are required to build a segment
-			return new Object[0];
+			return null;
 		}
 
 		final boolean isAltitudeSerie = (altitudeSerie != null) && (altitudeSerie.length > 0);
@@ -4470,7 +4471,7 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 			timeStart = timeEnd;
 		}
 
-		return tourSegments.toArray();
+		return tourSegments;
 	}
 
 	public void dumpData() {

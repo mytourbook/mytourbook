@@ -26,7 +26,6 @@ import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.action.ToolBarManager;
-import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MenuEvent;
@@ -501,12 +500,7 @@ public class Chart extends ViewForm {
 		final Object[] listeners = _barSelectionListeners.getListeners();
 		for (final Object listener2 : listeners) {
 			final IBarSelectionListener listener = (IBarSelectionListener) listener2;
-			SafeRunnable.run(new SafeRunnable() {
-				@Override
-				public void run() {
-					listener.selectionChanged(serieIndex, valueIndex);
-				}
-			});
+			listener.selectionChanged(serieIndex, valueIndex);
 		}
 	}
 
@@ -518,12 +512,7 @@ public class Chart extends ViewForm {
 		final Object[] listeners = _barDoubleClickListeners.getListeners();
 		for (final Object listener2 : listeners) {
 			final IBarSelectionListener listener = (IBarSelectionListener) listener2;
-			SafeRunnable.run(new SafeRunnable() {
-				@Override
-				public void run() {
-					listener.selectionChanged(serieIndex, valueIndex);
-				}
-			});
+			listener.selectionChanged(serieIndex, valueIndex);
 		}
 	}
 
@@ -583,12 +572,7 @@ public class Chart extends ViewForm {
 		final Object[] listeners = _sliderMoveListeners.getListeners();
 		for (final Object listener2 : listeners) {
 			final ISliderMoveListener listener = (ISliderMoveListener) listener2;
-			SafeRunnable.run(new SafeRunnable() {
-				@Override
-				public void run() {
-					listener.sliderMoved(chartInfo);
-				}
-			});
+			listener.sliderMoved(chartInfo);
 		}
 	}
 
@@ -752,9 +736,10 @@ public class Chart extends ViewForm {
 
 		final ChartComponentGraph chartGraph = _chartComponents.getChartComponentGraph();
 
-		return new SelectionChartXSliderPosition(this, chartGraph.getLeftSlider().getValuesIndex(), chartGraph
-				.getRightSlider()
-				.getValuesIndex());
+		return new SelectionChartXSliderPosition(//
+				this,
+				chartGraph.getLeftSlider().getValuesIndex(),
+				chartGraph.getRightSlider().getValuesIndex());
 	}
 
 	public long getXXDevViewPortLeftBorder() {
@@ -1182,10 +1167,19 @@ public class Chart extends ViewForm {
 	 * @param sliderPosition
 	 */
 	public void setXSliderPosition(final SelectionChartXSliderPosition sliderPosition) {
+		_chartComponents.setXSliderPosition(sliderPosition, true);
+	}
+
+	/**
+	 * sets the position of the x-sliders
+	 * 
+	 * @param sliderPosition
+	 */
+	public void setXSliderPosition(final SelectionChartXSliderPosition sliderPosition, final boolean isFireEvent) {
 
 		// check if the position is for this chart
 		if (sliderPosition.getChart() == this) {
-			_chartComponents.setXSliderPosition(sliderPosition);
+			_chartComponents.setXSliderPosition(sliderPosition, isFireEvent);
 		}
 	}
 

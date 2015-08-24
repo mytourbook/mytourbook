@@ -71,10 +71,10 @@ public class ValueOverlapChecker {
 		/*
 		 * Debugging
 		 */
-		if (valueText.equals("13")) {
-			int a = 0;
-			a++;
-		}
+//		if (valueText.equals("13")) {
+//			int a = 0;
+//			a++;
+//		}
 
 		int rectCounter = 0;
 		for (int rectIndex = 0; rectIndex < _numRects; rectIndex++) {

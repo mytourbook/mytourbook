@@ -320,6 +320,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	private ActionTourChartSegmenterConfig			_actionTCSegmenterConfig;
 
 	private boolean									_isGetInitialTours;
+	private ArrayList<TourSegment>					_allTourSegments;
 
 	/*
 	 * UI controls
@@ -406,6 +407,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 		@Override
 		public Object[] getElements(final Object parent) {
+
 			if (_tourData == null) {
 				return new Object[0];
 			} else {
@@ -693,6 +695,23 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 						clearView();
 
+					} else if (eventId == TourEventId.SLIDER_POSITION_CHANGED
+							&& eventData instanceof SelectionChartXSliderPosition) {
+
+						final SelectionChartXSliderPosition xSliderSelection = (SelectionChartXSliderPosition) eventData;
+
+						final Object customData = xSliderSelection.getCustomData();
+						if (customData instanceof SelectedTourSegmenterSegments) {
+
+							/*
+							 * This event is fired in the tour chart when a toursegmenter segment is
+							 * selected
+							 */
+
+							final SelectedTourSegmenterSegments selectedSegments = (SelectedTourSegmenterSegments) customData;
+							selectTourSegments(selectedSegments);
+						}
+
 					} else if (eventId == TourEventId.UPDATE_UI) {
 
 						// check if a tour must be updated
@@ -862,7 +881,11 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 			btConfig = BreakTimeTool.getPrefValues();
 		}
 
-		return _tourData.createTourSegments(btConfig);
+		_allTourSegments = _tourData.createTourSegments(btConfig);
+
+		return _allTourSegments == null //
+				? new Object[0]
+				: _allTourSegments.toArray();
 	}
 
 	/**
@@ -1952,34 +1975,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		_segmentViewer.addSelectionChangedListener(new ISelectionChangedListener() {
 			@Override
 			public void selectionChanged(final SelectionChangedEvent event) {
-
-				final StructuredSelection selection = (StructuredSelection) event.getSelection();
-				if (selection != null) {
-
-					/*
-					 * select the chart sliders according to the selected segment(s)
-					 */
-
-					final Object[] segments = selection.toArray();
-
-					if (segments.length > 0) {
-
-						if (_tourChart == null) {
-							_tourChart = TourManager.getActiveTourChart(_tourData);
-						}
-
-						final int startIndex = ((TourSegment) (segments[0])).serieIndexStart;
-						final int endIndex = ((TourSegment) (segments[segments.length - 1])).serieIndexEnd;
-
-						final SelectionChartXSliderPosition selectionSliderPosition = new SelectionChartXSliderPosition(
-								_tourChart,
-								startIndex,
-								endIndex,
-								true);
-
-						_postSelectionProvider.setSelection(selectionSliderPosition);
-					}
-				}
+				onSelectSegment(event);
 			}
 		});
 
@@ -3109,6 +3105,37 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		});
 	}
 
+	private void onSelectSegment(final SelectionChangedEvent event) {
+
+		final StructuredSelection selection = (StructuredSelection) event.getSelection();
+		if (selection != null) {
+
+			/*
+			 * select the chart sliders according to the selected segment(s)
+			 */
+
+			final Object[] segments = selection.toArray();
+
+			if (segments.length > 0) {
+
+				if (_tourChart == null) {
+					_tourChart = TourManager.getActiveTourChart(_tourData);
+				}
+
+				final int startIndex = ((TourSegment) (segments[0])).serieIndexStart;
+				final int endIndex = ((TourSegment) (segments[segments.length - 1])).serieIndexEnd;
+
+				final SelectionChartXSliderPosition selectionSliderPosition = new SelectionChartXSliderPosition(
+						_tourChart,
+						startIndex,
+						endIndex,
+						true);
+
+				_postSelectionProvider.setSelection(selectionSliderPosition);
+			}
+		}
+	}
+
 	private void onSelectSegmenterType(final boolean isUserSelected) {
 
 		final TourSegmenter selectedSegmenter = getSelectedSegmenter();
@@ -3484,6 +3511,47 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		}
 
 		_comboBreakMethod.select(selectionIndex);
+	}
+
+	private void selectTourSegments(final SelectedTourSegmenterSegments selectedSegmenterConfig) {
+
+		if (selectedSegmenterConfig.tourData != _tourData || _allTourSegments == null) {
+			return;
+		}
+
+		/*
+		 * Find tour segments for the left and right slider
+		 */
+		final int selectedLeftIndex = selectedSegmenterConfig.xSliderSerieIndexLeft;
+		final int selectedRightIndex = selectedSegmenterConfig.xSliderSerieIndexRight;
+
+		TourSegment leftSegment = null;
+		TourSegment rightSegment = null;
+
+		final ArrayList<TourSegment> selectedSegments = new ArrayList<>();
+
+		for (final TourSegment tourSegment : _allTourSegments) {
+
+			if (leftSegment == null && tourSegment.serieIndexStart == selectedLeftIndex) {
+				leftSegment = tourSegment;
+				selectedSegments.add(leftSegment);
+			}
+
+			if (rightSegment == null && tourSegment.serieIndexEnd == selectedRightIndex) {
+				rightSegment = tourSegment;
+
+				if (leftSegment != rightSegment) {
+					selectedSegments.add(leftSegment);
+				}
+			}
+
+			if (leftSegment != null && rightSegment != null) {
+
+				_segmentViewer.setSelection(new StructuredSelection(selectedSegments), true);
+
+				return;
+			}
+		}
 	}
 
 	private void setCellColor(final ViewerCell cell, final float altiDiff) {

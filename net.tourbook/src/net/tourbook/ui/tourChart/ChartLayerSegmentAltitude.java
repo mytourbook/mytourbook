@@ -214,6 +214,25 @@ public class ChartLayerSegmentAltitude implements IChartLayer, IChartOverlay {
 			}
 			final boolean isValueUp = altiDiff >= 0;
 
+			boolean isShowValueText = true;
+
+			if (_isHideSmallValues) {
+
+				// check values if they are small enough
+
+				if (altiDiff >= 0) {
+					if (altiDiff < maxHiddenValue) {
+						isShowValueText = false;
+					}
+				} else {
+
+					// diff <0
+					if (-altiDiff < maxHiddenValue) {
+						isShowValueText = false;
+					}
+				}
+			}
+
 			/*
 			 * Get value text
 			 */
@@ -242,7 +261,7 @@ public class ChartLayerSegmentAltitude implements IChartLayer, IChartOverlay {
 
 			} else {
 
-				if (_isShowSegmenterLine) {
+				if (_isShowSegmenterLine && isShowValueText) {
 
 					gc.setAlpha(_lineOpacity);
 					gc.setForeground(upDownColor);
@@ -290,25 +309,6 @@ public class ChartLayerSegmentAltitude implements IChartLayer, IChartOverlay {
 				if (_isShowSegmenterValue) {
 
 					// show segment value
-
-					boolean isShowValueText = true;
-
-					if (_isHideSmallValues) {
-
-						// check values if they are small enough
-
-						if (altiDiff >= 0) {
-							if (altiDiff < maxHiddenValue) {
-								isShowValueText = false;
-							}
-						} else {
-
-							// diff <0
-							if (-altiDiff < maxHiddenValue) {
-								isShowValueText = false;
-							}
-						}
-					}
 
 					if (isShowValueText) {
 
@@ -441,49 +441,48 @@ public class ChartLayerSegmentAltitude implements IChartLayer, IChartOverlay {
 		final int devYTop = graphDrawingData.getDevYTop();
 		final int devGraphHeight = graphDrawingData.devGraphHeight;
 
+		gc.setLineStyle(SWT.LINE_SOLID);
 		gc.setClipping(0, devYTop, gc.getClipping().width, devGraphHeight);
 
 		final Device device = gc.getDevice();
 		final Color colorHovered = Display.getCurrent().getSystemColor(SWT.COLOR_GRAY);
+
+		/*
+		 * Draw label background
+		 */
+		final Rectangle paintedLabel = hoveredLabel.hoveredLabel;
+		final int arc = 10;
+		gc.setAlpha(isSelected ? 0x60 : 0x30);
+		gc.setBackground(colorHovered);
+		gc.fillRoundRectangle(paintedLabel.x, paintedLabel.y, paintedLabel.width, paintedLabel.height, arc, arc);
+
+		/*
+		 * Draw line thicker
+		 */
+		final Color lineColor = new Color(device, hoveredLabel.paintedRGB);
 		{
-			/*
-			 * Draw label background
-			 */
-			final Rectangle paintedLabel = hoveredLabel.hoveredLabel;
-			final int arc = 10;
-			gc.setAlpha(isSelected ? 0x60 : 0x30);
-			gc.setBackground(colorHovered);
-			gc.fillRoundRectangle(paintedLabel.x, paintedLabel.y, paintedLabel.width, paintedLabel.height, arc, arc);
+			final int x1 = hoveredLabel.paintedX1;
+			final int y1 = hoveredLabel.paintedY1;
+			final int x2 = hoveredLabel.paintedX2;
+			final int y2 = hoveredLabel.paintedY2;
 
-			/*
-			 * Draw line thicker
-			 */
-			final Color lineColor = new Color(device, hoveredLabel.paintedRGB);
-			{
-				final int x1 = hoveredLabel.paintedX1;
-				final int y1 = hoveredLabel.paintedY1;
-				final int x2 = hoveredLabel.paintedX2;
-				final int y2 = hoveredLabel.paintedY2;
+			gc.setAntialias(SWT.ON);
+			gc.setForeground(lineColor);
+			gc.setLineCap(SWT.CAP_ROUND);
 
-				gc.setAntialias(SWT.ON);
-				gc.setForeground(lineColor);
-				gc.setLineCap(SWT.CAP_ROUND);
-
-				// draw selected segment
-				if (isSelected) {
-					gc.setAlpha(0x20);
-					gc.setLineWidth(30);
-					gc.drawLine(x1, y1, x2, y2);
-				}
-
-				// draw hovered segment
-				gc.setAlpha(0xff);
-				gc.setLineWidth(5);
+			// draw selected segment
+			if (isSelected) {
+				gc.setAlpha(0x20);
+				gc.setLineWidth(30);
 				gc.drawLine(x1, y1, x2, y2);
 			}
-			lineColor.dispose();
+
+			// draw hovered segment
+			gc.setAlpha(0xff);
+			gc.setLineWidth(3);
+			gc.drawLine(x1, y1, x2, y2);
 		}
-//		colorDefault.dispose();
+		lineColor.dispose();
 
 		gc.setAlpha(0xff);
 		gc.setClipping((Rectangle) null);
@@ -506,6 +505,12 @@ public class ChartLayerSegmentAltitude implements IChartLayer, IChartOverlay {
 	 *         is not hovered.
 	 */
 	ChartLabel getHoveredLabel(final ChartMouseEvent mouseEvent) {
+
+		if (_graphRect == null) {
+
+			// this happened, propably when not initialized
+			return null;
+		}
 
 		ChartLabel hoveredLabel;
 

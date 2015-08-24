@@ -6187,7 +6187,7 @@ public class ChartComponentGraph extends Canvas {
 
 		if (isMoveSlider) {
 
-			setXSliderValueIndex(_selectedXSlider, valueIndex, false);
+			setXSliderValueIndex(_selectedXSlider, valueIndex, false, true);
 
 			redraw();
 			setCursorStyle(event.y);
@@ -6333,7 +6333,7 @@ public class ChartComponentGraph extends Canvas {
 			 * make sure that the slider is exactly positioned where the value is displayed in the
 			 * graph
 			 */
-			setXSliderValueIndex(xSlider, _hoveredValuePointIndex, false);
+			setXSliderValueIndex(xSlider, _hoveredValuePointIndex, false, true);
 
 			_isSliderDirty = true;
 			redraw();
@@ -7947,7 +7947,10 @@ public class ChartComponentGraph extends Canvas {
 	 * @param isCenterSliderPosition
 	 * @param isBorderOffset
 	 */
-	void setXSliderValueIndex(final ChartXSlider slider, int valueIndex, final boolean isCenterSliderPosition) {
+	void setXSliderValueIndex(	final ChartXSlider slider,
+								int valueIndex,
+								final boolean isCenterSliderPosition,
+								final boolean isFireEvent) {
 
 		final ChartDataXSerie xData = getXData();
 
@@ -7970,7 +7973,7 @@ public class ChartComponentGraph extends Canvas {
 		final double xxDevLinePos = _xxDevGraphWidth * xValue / lastXValue;
 
 		slider.setValueIndex(valueIndex);
-		slider.moveToXXDevPosition(xxDevLinePos, true, true, false);
+		slider.moveToXXDevPosition(xxDevLinePos, true, true, false, isFireEvent);
 
 		setChartPosition(slider, isCenterSliderPosition);
 
