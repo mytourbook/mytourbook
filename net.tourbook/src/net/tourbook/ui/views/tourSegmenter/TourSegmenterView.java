@@ -708,8 +708,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 							 * selected
 							 */
 
-							final SelectedTourSegmenterSegments selectedSegments = (SelectedTourSegmenterSegments) customData;
-							selectTourSegments(selectedSegments);
+							selectTourSegments((SelectedTourSegmenterSegments) customData);
 						}
 
 					} else if (eventId == TourEventId.UPDATE_UI) {
@@ -2740,11 +2739,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		 * Ensure segments are created because they can be null when tour is saved and a new
 		 * instance is displayed
 		 */
-		final boolean isSegmentLayerVisible = Util.getStateBoolean(
-				_state,
-				STATE_IS_SHOW_TOUR_SEGMENTS,
-				STATE_IS_SHOW_TOUR_SEGMENTS_DEFAULT);
-		if (isSegmentLayerVisible && _tourData.segmentSerieIndex == null) {
+		if (isSegmentLayerVisible() && _tourData.segmentSerieIndex == null) {
 			createSegments(false);
 		}
 
@@ -2848,6 +2843,16 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	@Override
 	public ColumnViewer getViewer() {
 		return _segmentViewer;
+	}
+
+	private boolean isSegmentLayerVisible() {
+
+		final boolean isSegmentLayerVisible = Util.getStateBoolean(
+				_state,
+				STATE_IS_SHOW_TOUR_SEGMENTS,
+				STATE_IS_SHOW_TOUR_SEGMENTS_DEFAULT);
+
+		return isSegmentLayerVisible;
 	}
 
 	/**
@@ -3130,6 +3135,20 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 						startIndex,
 						endIndex,
 						true);
+
+				if (isSegmentLayerVisible()) {
+
+					/*
+					 * Extend default selection with the segment positions
+					 */
+
+					final SelectedTourSegmenterSegments selectedSegments = new SelectedTourSegmenterSegments();
+					selectedSegments.tourData = _tourData;
+					selectedSegments.xSliderSerieIndexLeft = startIndex;
+					selectedSegments.xSliderSerieIndexRight = endIndex;
+
+					selectionSliderPosition.setCustomData(selectedSegments);
+				}
 
 				_postSelectionProvider.setSelection(selectionSliderPosition);
 			}
@@ -3533,16 +3552,24 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		for (final TourSegment tourSegment : _allTourSegments) {
 
 			if (leftSegment == null && tourSegment.serieIndexStart == selectedLeftIndex) {
+
 				leftSegment = tourSegment;
 				selectedSegments.add(leftSegment);
 			}
 
 			if (rightSegment == null && tourSegment.serieIndexEnd == selectedRightIndex) {
+
 				rightSegment = tourSegment;
 
 				if (leftSegment != rightSegment) {
-					selectedSegments.add(leftSegment);
+					selectedSegments.add(rightSegment);
 				}
+			}
+
+			if (leftSegment != null && rightSegment == null) {
+
+				// add all segments between the left and right
+				selectedSegments.add(tourSegment);
 			}
 
 			if (leftSegment != null && rightSegment != null) {

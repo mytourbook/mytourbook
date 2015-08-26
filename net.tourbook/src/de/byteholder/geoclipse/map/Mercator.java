@@ -1,6 +1,6 @@
 /* *****************************************************************************
  *  Copyright (C) 2008 Joshua Marinacci, Michael Kanis and others
- *  
+ * 
  *  This file is part of Geoclipse.
  *
  *  Geoclipse is free software: you can redistribute it and/or modify
@@ -14,7 +14,7 @@
  *  GNU General Public License for more details.
  *
  *  You should have received a copy of the GNU General Public License
- *  along with Geoclipse.  If not, see <http://www.gnu.org/licenses/>. 
+ *  along with Geoclipse.  If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************/
 
 package de.byteholder.geoclipse.map;
@@ -24,7 +24,6 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Point2D.Double;
 
 import net.tourbook.common.map.GeoPosition;
- 
 import de.byteholder.geoclipse.mapprovider.MP;
 
 /**
@@ -40,11 +39,11 @@ public final class Mercator extends Projection {
 //	// WGS-84 Ellipsoid
 //	private static final double	HALBACHSE_A		= 6378.137;
 //	private static final double	HALBACHSE_B		= 6356.7523142;
-//	
+//
 //	// = 1/298.2572229328709613   1/298.257223563 // ca. (A-B)/A
 //	private static final double	ABPLATTUNG_F	= (HALBACHSE_A - HALBACHSE_B) / HALBACHSE_A;
 
-	//http://www.kowoma.de/gps/geo/mapdatum/mapdatums.php 
+	//http://www.kowoma.de/gps/geo/mapdatum/mapdatums.php
 	//EUROPEAN 1950/1979, Western Europe
 	//static final double HALBACHSE_A = 6378.388;
 	//static final double HALBACHSE_B = 6356.911946;
@@ -89,7 +88,7 @@ public final class Mercator extends Projection {
 	}
 
 	//geodesic distanceString (in km) using Vincenty inverse formula for ellipsoids
-	//Source: http://www.movable-type.co.uk/scripts/LatLongVincenty.html 
+	//Source: http://www.movable-type.co.uk/scripts/LatLongVincenty.html
 //	private double distance(final GeoLat b1, final GeoLon l1, final GeoLat b2, final GeoLon l2) {
 //
 //		if (isNull(b1, l1, b2, l2)) {
@@ -251,7 +250,7 @@ public final class Mercator extends Projection {
 //
 ////		final GeoLat geoLat = new GeoLat(latitude);
 ////		final double cosGeoLat = geoLat.cos(); // siehe da, da werden die trigon. Fkt. gebraucht
-////		final int widthOfOneTileInKm = (int) (ERDRADIUS * 2 * Math.PI / Math.pow(2, zoom) * cosGeoLat); 
+////		final int widthOfOneTileInKm = (int) (ERDRADIUS * 2 * Math.PI / Math.pow(2, zoom) * cosGeoLat);
 //		// (Auf Zoom-Level z gibt es zwei hoch z Tiles in einer Richtung)
 //
 //		return (int) distanceKM;
@@ -300,14 +299,13 @@ public final class Mercator extends Projection {
 
 		final Point2D devMapCenter = mp.getMapCenterInPixelsAtZoom(zoom);
 
-		final double flon = (pixelX - devMapCenter.getX()) / mp.getLongitudeDegreeWidthInPixels(zoom);
+		final double lon = (pixelX - devMapCenter.getX()) / mp.getLongitudeDegreeWidthInPixels(zoom);
 
 		final double e1 = (pixelY - devMapCenter.getY()) / (-1 * mp.getLongitudeRadianWidthInPixels(zoom));
-
 		final double e2 = (2 * Math.atan(Math.exp(e1)) - Math.PI / 2) / (Math.PI / 180.0);
-		final double flat = e2;
+		final double lat = e2;
 
-		final GeoPosition wc = new GeoPosition(flat, flon);
+		final GeoPosition wc = new GeoPosition(lat, lon);
 
 		return wc;
 	}

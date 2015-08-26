@@ -401,8 +401,8 @@ public class SlideoutTourChartSegmenterProperties extends AnimatedToolTipShell i
 						.indent(_firstColumnIndent, 0)
 						.applyTo(_chkHideSmallValues);
 				_chkHideSmallValues.setText(Messages.Slideout_SegmenterChartOptions_Checkbox_HideSmallValues);
-				_chkHideSmallValues
-						.setToolTipText(Messages.Slideout_SegmenterChartOptions_Label_HideSmallValues_Tooltip);
+				_chkHideSmallValues.setToolTipText(//
+						Messages.Slideout_SegmenterChartOptions_Checkbox_HideSmallValues_Tooltip);
 				_chkHideSmallValues.addSelectionListener(_defaultSelectionAdapter);
 
 				// Spinner

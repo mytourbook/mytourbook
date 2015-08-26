@@ -1,6 +1,10 @@
 Version 15.9.0                                             ?. September 2015
 
+TOUR CHART MODIFIED !!!
 
+	Changed key to toggle the slider from <shift> to <ctrl>
+
+TOUR CHART MODIFIED !!!
 
 New
 ===
@@ -30,12 +34,14 @@ Improvements
 * Map2
 - Draw map scale with rounded units and without black/white color (I always puzzled how to interpret the scale colors).
 - Prevent redrawing for multiple tours.
+- Center map with both sliders, e.g. when a segment or multiple segments are selected in the tour segmenter. This solved a very long annoying behaviour.
 
 * Tour Editor
 - Customize number of displayed digits for the lat/lon column values.
 
 * Tour Segmenter
-- Options (value, font, opacity ...) how segments are displayed in the tour chart.
+- Properties (value, font, opacity ...) how segments are displayed in the tour chart.
+- Select tour segments with the mouse in the tour chart.
  
 Bugfix
 ======	

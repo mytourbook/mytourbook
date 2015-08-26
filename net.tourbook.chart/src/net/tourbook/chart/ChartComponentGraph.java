@@ -6103,8 +6103,8 @@ public class ChartComponentGraph extends Canvas {
 			}
 		}
 
-		// toggle selected slider with the shift key
-		if (isShift && isCtrl == false) {
+		// toggle selected slider with the ctrl key, key changed in 15.10 to select multiple segments which shift
+		if (isCtrl && isShift == false) {
 			_selectedXSlider = _selectedXSlider == _xSliderA ? _xSliderB : _xSliderA;
 			_isSliderDirty = true;
 			redraw();
@@ -6309,7 +6309,8 @@ public class ChartComponentGraph extends Canvas {
 
 		// use external mouse event listener
 		ChartMouseEvent mouseEvent;
-		if ((mouseEvent = _chart.onExternalMouseDownPre(event.time & 0xFFFFFFFFL, devXMouse, devYMouse)).isWorked) {
+		if ((mouseEvent = _chart
+				.onExternalMouseDownPre(event.time & 0xFFFFFFFFL, devXMouse, devYMouse, event.stateMask)).isWorked) {
 
 			setChartCursor(mouseEvent.cursor);
 			return;

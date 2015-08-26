@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -39,16 +39,32 @@ public class ChartMouseEvent {
 	 */
 	public ChartCursor	cursor;
 
+	public int			stateMask;
+
 	@SuppressWarnings("unused")
 	private ChartMouseEvent() {}
 
-	public ChartMouseEvent(final int eventType, final long time, final int eventMouseX, final int eventMouseY) {
+	public ChartMouseEvent(final int eventType, //
+							final long time,
+							final int eventMouseX,
+							final int eventMouseY) {
+
+		this(eventType, time, eventMouseX, eventMouseY, 0);
+	}
+
+	public ChartMouseEvent(	final int eventType,
+							final long time,
+							final int eventMouseX,
+							final int eventMouseY,
+							final int eventStateMask) {
 
 		type = eventType;
 		eventTime = time;
 
 		devXMouse = eventMouseX;
 		devYMouse = eventMouseY;
+
+		stateMask = eventStateMask;
 	}
 
 	@Override

@@ -122,6 +122,8 @@ public class ChartLabel {
 	int						xSliderSerieIndexLeft;
 	int						xSliderSerieIndexRight;
 
+	int						segmentIndex;
+
 	public ChartLabel() {}
 
 	/**

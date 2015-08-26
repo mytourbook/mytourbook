@@ -810,21 +810,37 @@ public class Chart extends ViewForm {
 
 	void onExternalChartResize() {
 
-		fireChartMouseEvent(new ChartMouseEvent(Chart.ChartResized, System.currentTimeMillis(), 0, 0));
+		fireChartMouseEvent(new ChartMouseEvent(//
+				Chart.ChartResized,
+				System.currentTimeMillis(),
+				0,
+				0));
 	}
 
 	ChartMouseEvent onExternalMouseDoubleClick(final long eventTime, final int devXMouse, final int devYMouse) {
 
-		final ChartMouseEvent event = new ChartMouseEvent(Chart.MouseDoubleClick, eventTime, devXMouse, devYMouse);
+		final ChartMouseEvent event = new ChartMouseEvent(//
+				Chart.MouseDoubleClick,
+				eventTime,
+				devXMouse,
+				devYMouse);
 
 		fireChartMouseEvent(event);
 
 		return event;
 	}
 
-	ChartMouseEvent onExternalMouseDownPre(final long eventTime, final int devXMouse, final int devYMouse) {
+	ChartMouseEvent onExternalMouseDownPre(	final long eventTime,
+											final int devXMouse,
+											final int devYMouse,
+											final int stateMask) {
 
-		final ChartMouseEvent event = new ChartMouseEvent(Chart.MouseDownPre, eventTime, devXMouse, devYMouse);
+		final ChartMouseEvent event = new ChartMouseEvent(
+				Chart.MouseDownPre,
+				eventTime,
+				devXMouse,
+				devYMouse,
+				stateMask);
 
 		fireChartMouseEvent(event);
 
@@ -838,7 +854,11 @@ public class Chart extends ViewForm {
 
 	ChartMouseEvent onExternalMouseMove(final long eventTime, final int devXMouse, final int devYMouse) {
 
-		final ChartMouseEvent event = new ChartMouseEvent(Chart.MouseMove, eventTime, devXMouse, devYMouse);
+		final ChartMouseEvent event = new ChartMouseEvent(//
+				Chart.MouseMove,
+				eventTime,
+				devXMouse,
+				devYMouse);
 
 		fireChartMouseEvent(event);
 
@@ -847,7 +867,11 @@ public class Chart extends ViewForm {
 
 	ChartMouseEvent onExternalMouseMoveImportant(final long eventTime, final int devXMouse, final int devYMouse) {
 
-		final ChartMouseEvent event = new ChartMouseEvent(Chart.MouseMove, eventTime, devXMouse, devYMouse);
+		final ChartMouseEvent event = new ChartMouseEvent(//
+				Chart.MouseMove,
+				eventTime,
+				devXMouse,
+				devYMouse);
 
 		fireChartMouseMoveEvent(event);
 
@@ -856,7 +880,11 @@ public class Chart extends ViewForm {
 
 	ChartMouseEvent onExternalMouseUp(final long eventTime, final int devXMouse, final int devYMouse) {
 
-		final ChartMouseEvent event = new ChartMouseEvent(Chart.MouseUp, eventTime, devXMouse, devYMouse);
+		final ChartMouseEvent event = new ChartMouseEvent(//
+				Chart.MouseUp,
+				eventTime,
+				devXMouse,
+				devYMouse);
 
 		fireChartMouseEvent(event);
 

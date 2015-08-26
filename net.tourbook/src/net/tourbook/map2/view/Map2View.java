@@ -102,6 +102,7 @@ import net.tourbook.ui.views.tourCatalog.SelectionTourCatalogView;
 import net.tourbook.ui.views.tourCatalog.TVICatalogComparedTour;
 import net.tourbook.ui.views.tourCatalog.TVICatalogRefTourItem;
 import net.tourbook.ui.views.tourCatalog.TVICompareResultComparedTour;
+import net.tourbook.ui.views.tourSegmenter.SelectedTourSegmenterSegments;
 
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
@@ -255,7 +256,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 	 */
 	private TourToolTip						_tourToolTip;
 
-	private TourInfoIconToolTipProvider			_tourInfoToolTipProvider					= new TourInfoIconToolTipProvider();
+	private TourInfoIconToolTipProvider		_tourInfoToolTipProvider					= new TourInfoIconToolTipProvider();
 	private ITourToolTipProvider			_wayPointToolTipProvider					= new WayPointToolTipProvider();
 
 	private String							_poiName;
@@ -827,6 +828,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 				onSelectionChanged(selection);
 			}
 		};
+
 		getSite().getPage().addPostSelectionListener(_postSelectionListener);
 	}
 
@@ -1754,7 +1756,8 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 						tourData,
 						chartInfo.leftSliderValuesIndex,
 						chartInfo.rightSliderValuesIndex,
-						chartInfo.selectedSliderValuesIndex);
+						chartInfo.selectedSliderValuesIndex,
+						null);
 
 				enableActions();
 			}
@@ -1767,28 +1770,41 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 				return;
 			}
 
-			final ChartDataModel chartDataModel = chart.getChartDataModel();
+			final Object customData = xSliderPos.getCustomData();
+			if (customData instanceof SelectedTourSegmenterSegments) {
 
-			final Object tourId = chartDataModel.getCustomData(Chart.CUSTOM_DATA_TOUR_ID);
-			if (tourId instanceof Long) {
+				/*
+				 * This event is fired in the tour chart when a toursegmenter segment is selected
+				 */
 
-				final TourData tourData = TourManager.getInstance().getTourData((Long) tourId);
-				if (tourData != null) {
+				selectTourSegments((SelectedTourSegmenterSegments) customData);
 
-					final int leftSliderValueIndex = xSliderPos.getLeftSliderValueIndex();
-					int rightSliderValueIndex = xSliderPos.getRightSliderValueIndex();
+			} else {
 
-					rightSliderValueIndex = rightSliderValueIndex == SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION
-							? leftSliderValueIndex
-							: rightSliderValueIndex;
+				final ChartDataModel chartDataModel = chart.getChartDataModel();
+				final Object tourId = chartDataModel.getCustomData(Chart.CUSTOM_DATA_TOUR_ID);
 
-					positionMapTo_TourSliders(//
-							tourData,
-							leftSliderValueIndex,
-							rightSliderValueIndex,
-							leftSliderValueIndex);
+				if (tourId instanceof Long) {
 
-					enableActions();
+					final TourData tourData = TourManager.getInstance().getTourData((Long) tourId);
+					if (tourData != null) {
+
+						final int leftSliderValueIndex = xSliderPos.getLeftSliderValueIndex();
+						int rightSliderValueIndex = xSliderPos.getRightSliderValueIndex();
+
+						rightSliderValueIndex = rightSliderValueIndex == SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION
+								? leftSliderValueIndex
+								: rightSliderValueIndex;
+
+						positionMapTo_TourSliders(//
+								tourData,
+								leftSliderValueIndex,
+								rightSliderValueIndex,
+								leftSliderValueIndex,
+								null);
+
+						enableActions();
+					}
 				}
 			}
 
@@ -1813,7 +1829,8 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 					mapPositionSelection.getTourData(),
 					valueIndex1,
 					valueIndex2,
-					valueIndex1);
+					valueIndex1,
+					null);
 
 			enableActions();
 
@@ -1955,7 +1972,8 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 						tourData,
 						leftSliderValueIndex,
 						rightSliderValueIndex,
-						leftSliderValueIndex);
+						leftSliderValueIndex,
+						null);
 
 			} else {
 
@@ -2395,7 +2413,8 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 	private void positionMapTo_TourSliders(	final TourData tourData,
 											final int leftSliderValuesIndex,
 											final int rightSliderValuesIndex,
-											final int selectedSliderIndex) {
+											final int selectedSliderIndex,
+											final Set<GeoPosition> geoPositions) {
 
 		_isTourOrWayPoint = true;
 
@@ -2419,7 +2438,16 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 
 		if (_isMapSynchedWithSlider) {
 
-			positionMapTo_ValueIndex(tourData, _currentSelectedSliderValueIndex);
+			if (geoPositions != null) {
+
+				// center to the left AND right slider
+
+				setBoundsZoomLevel(geoPositions, true);
+
+			} else {
+
+				positionMapTo_ValueIndex(tourData, _currentSelectedSliderValueIndex);
+			}
 
 			_map.paint();
 
@@ -2754,6 +2782,54 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 		_state.put(MEMENTO_TOUR_COLOR_ID, colorId.name());
 
 		_actionPhotoFilter.saveState();
+	}
+
+	private void selectTourSegments(final SelectedTourSegmenterSegments selectedSegmenterConfig) {
+
+
+		if (_allTourData.size() < 1) {
+			return;
+		}
+
+		final int leftSliderValueIndex = selectedSegmenterConfig.xSliderSerieIndexLeft;
+		final int rightSliderValueIndex = selectedSegmenterConfig.xSliderSerieIndexRight;
+
+		final TourData segmenterTourData = selectedSegmenterConfig.tourData;
+		final Set<GeoPosition> mapPositions = new HashSet<GeoPosition>();
+
+		if (_allTourData.size() == 1) {
+
+			final TourData mapTourData = _allTourData.get(0);
+
+			// ensure it's the same tour
+			if (segmenterTourData != mapTourData) {
+				return;
+			}
+
+			final GeoPosition leftPosition = new GeoPosition(
+					mapTourData.latitudeSerie[leftSliderValueIndex],
+					mapTourData.longitudeSerie[leftSliderValueIndex]);
+
+			final GeoPosition rightPosition = new GeoPosition(
+					mapTourData.latitudeSerie[rightSliderValueIndex],
+					mapTourData.longitudeSerie[rightSliderValueIndex]);
+
+			mapPositions.add(leftPosition);
+			mapPositions.add(rightPosition);
+
+			positionMapTo_TourSliders(//
+					mapTourData,
+					leftSliderValueIndex,
+					rightSliderValueIndex,
+					leftSliderValueIndex,
+					mapPositions);
+
+			enableActions();
+
+		} else {
+
+			// multiple tourdata, I'm not sure if this still occures after merging multiple tours into one tourdata
+		}
 	}
 
 	/**

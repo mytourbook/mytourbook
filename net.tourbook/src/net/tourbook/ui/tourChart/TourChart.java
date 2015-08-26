@@ -224,7 +224,9 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 	private boolean						_isSegmentLabelHovered;
 	private long						_hoveredSegmentLabelEventTime;
 	private ChartLabel					_hoveredSegmentLabel;
-	private ChartLabel					_selectedSegmentLabel;
+
+	private ChartLabel					_selectedSegmentLabel_1;
+	private ChartLabel					_selectedSegmentLabel_2;
 
 	private boolean						_isSegmentTitleHovered;
 	private ChartSegment				_hoveredSegmentTitle;
@@ -1845,12 +1847,12 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		}
 
 		_layerTourSegmenterAltitude.setTourData(_tourData);
+		_layerTourSegmenterAltitude.setIsShowDecimalPlaces(isShowDecimalPlaces);
 		_layerTourSegmenterAltitude.setIsShowSegmenterMarker(isShowSegmenterMarker);
 		_layerTourSegmenterAltitude.setIsShowSegmenterValue(isShowSegmenterValue);
-		_layerTourSegmenterAltitude.setSmallHiddenValuesProperties(isHideSmallValues, hiddenValueSize);
 		_layerTourSegmenterAltitude.setLineProperties(isShowSegmenterLine, lineOpacity);
+		_layerTourSegmenterAltitude.setSmallHiddenValuesProperties(isHideSmallValues, hiddenValueSize);
 		_layerTourSegmenterAltitude.setStackedValues(stackedValues);
-		_layerTourSegmenterAltitude.setIsShowDecimalPlaces(isShowDecimalPlaces);
 
 		final int segmentIndexSize = segmentSerieIndex.length;
 
@@ -1861,6 +1863,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
 			chartLabel.graphX = xDataSerie[serieIndex];
 			chartLabel.serieIndex = serieIndex;
+			chartLabel.segmentIndex = segmentIndex;
 
 			/*
 			 * Set slider positions
@@ -1885,10 +1888,12 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		}
 
 		_layerTourSegmenterOther.setTourData(_tourData);
-		_layerTourSegmenterOther.setXDataSerie(xDataSerie);
-		_layerTourSegmenterOther.setIsShowSegmenterValues(isShowSegmenterValue);
-		_layerTourSegmenterOther.setStackedValues(stackedValues);
 		_layerTourSegmenterOther.setIsShowDecimalPlaces(isShowDecimalPlaces);
+		_layerTourSegmenterOther.setIsShowSegmenterValues(isShowSegmenterValue);
+		_layerTourSegmenterOther.setLineProperties(isShowSegmenterLine, lineOpacity);
+		_layerTourSegmenterOther.setSmallHiddenValuesProperties(isHideSmallValues, hiddenValueSize);
+		_layerTourSegmenterOther.setStackedValues(stackedValues);
+		_layerTourSegmenterOther.setXDataSerie(xDataSerie);
 
 		// draw the graph lighter that the segments are more visible
 		setGraphAlpha(graphOpacity / 100.0);
@@ -2010,18 +2015,43 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		tbm.update(true);
 	}
 
-	private void fireSegmentLabelSelection(final ChartLabel selectedLabel) {
+	/**
+	 * Set sliders to the selected segment and fire this position.
+	 * 
+	 * @param selectedLabel1
+	 * @param selectedLabel2
+	 */
+	private void fireSegmentLabelSelection(final ChartLabel selectedLabel1, final ChartLabel selectedLabel2) {
 
-		// set sliders to the selected segment and fire this position
+		// get start/end index depending which segments are selected
+		ChartLabel startSegment = selectedLabel1;
+		ChartLabel endSegment;
+		if (selectedLabel2 == null) {
+			endSegment = startSegment;
+		} else {
+			endSegment = selectedLabel2;
+		}
 
-		final int xSliderSerieIndexLeft = selectedLabel.xSliderSerieIndexLeft;
-		final int xSliderSerieIndexRight = selectedLabel.xSliderSerieIndexRight;
+		// depending how the segments are selected, start can be larger than the end
+		if (startSegment.segmentIndex > endSegment.segmentIndex) {
+
+			// switch segments
+			final ChartLabel tempSegment = endSegment;
+			endSegment = startSegment;
+			startSegment = tempSegment;
+		}
+
+		final int xSliderSerieIndexLeft = startSegment.xSliderSerieIndexLeft;
+		final int xSliderSerieIndexRight = endSegment.xSliderSerieIndexRight;
 
 		final SelectionChartXSliderPosition selectionSliderPosition = new SelectionChartXSliderPosition(//
 				this,
 				xSliderSerieIndexLeft,
 				xSliderSerieIndexRight);
 
+		/*
+		 * Extend default selection with the sement positions
+		 */
 		final SelectedTourSegmenterSegments selectedSegments = new SelectedTourSegmenterSegments();
 		selectedSegments.tourData = _tourData;
 		selectedSegments.xSliderSerieIndexLeft = xSliderSerieIndexLeft;
@@ -2134,11 +2164,11 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
 	private ChartLabel getHoveredSegmentLabel(final ChartMouseEvent mouseEvent) {
 
-		final ChartLabel hoveredLabel = _layerTourSegmenterAltitude.getHoveredLabel(mouseEvent);
+		ChartLabel hoveredLabel = _layerTourSegmenterAltitude.getHoveredLabel(mouseEvent);
 
-//		if (hoveredLabel == null) {
-//			hoveredLabel = _layerSegmentOther.getHoveredLabel(mouseEvent);
-//		}
+		if (hoveredLabel == null) {
+			hoveredLabel = _layerTourSegmenterOther.getHoveredLabel(mouseEvent);
+		}
 
 		return hoveredLabel;
 	}
@@ -2199,8 +2229,12 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		return _hoveredSegmentLabel;
 	}
 
-	ChartLabel getSegmentLabel_Selected() {
-		return _selectedSegmentLabel;
+	ChartLabel getSegmentLabel_Selected_1() {
+		return _selectedSegmentLabel_1;
+	}
+
+	ChartLabel getSegmentLabel_Selected_2() {
+		return _selectedSegmentLabel_2;
 	}
 
 	TourMarker getSelectedTourMarker() {
@@ -2490,6 +2524,13 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		final ChartLabel hoveredLabel = getHoveredSegmentLabel(mouseEvent);
 
 		if (hoveredLabel == null) {
+
+			_selectedSegmentLabel_1 = null;
+			_selectedSegmentLabel_2 = null;
+
+			// redraw chart
+			setChartOverlayDirty();
+
 			return;
 		}
 
@@ -2497,9 +2538,30 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		mouseEvent.isWorked = true;
 		mouseEvent.cursor = ChartCursor.Arrow;
 
-		_selectedSegmentLabel = hoveredLabel;
+		final boolean isShift = (mouseEvent.stateMask & SWT.SHIFT) != 0;
 
-		fireSegmentLabelSelection(hoveredLabel);
+		if (isShift) {
+
+			if (_selectedSegmentLabel_1 == null) {
+
+				// start new selection
+				_selectedSegmentLabel_1 = hoveredLabel;
+				_selectedSegmentLabel_2 = null;
+
+			} else {
+
+				// extend selection
+				_selectedSegmentLabel_2 = hoveredLabel;
+			}
+
+		} else {
+
+			// start new selection
+			_selectedSegmentLabel_1 = hoveredLabel;
+			_selectedSegmentLabel_2 = null;
+		}
+
+		fireSegmentLabelSelection(_selectedSegmentLabel_1, _selectedSegmentLabel_2);
 
 		// redraw chart
 		setChartOverlayDirty();
@@ -2512,6 +2574,9 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
 			mouseEvent.isWorked = _isSegmentLabelHovered;
 			mouseEvent.cursor = ChartCursor.Arrow;
+
+			// must be painted otherwise it is flickering when selected
+			setChartOverlayDirty();
 
 			return;
 		}
@@ -2531,20 +2596,16 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
 		boolean isUpdateUI = false;
 
-		if (_selectedSegmentLabel != null && _selectedSegmentLabel != hoveredLabel) {
-
-			// disable selection
-			_selectedSegmentLabel = null;
-
-			isUpdateUI = true;
-		}
-
 		if (hoveredLabel != _hoveredSegmentLabel) {
 
 			// hovered label has changed
 
 			_hoveredSegmentLabel = hoveredLabel;
 
+			isUpdateUI = true;
+		}
+
+		if (_selectedSegmentLabel_1 != null) {
 			isUpdateUI = true;
 		}
 
@@ -2573,7 +2634,6 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 	private void onSegmentLabel_Reset() {
 
 		_hoveredSegmentLabel = null;
-		_selectedSegmentLabel = null;
 
 		setChartOverlayDirty();
 	}
@@ -2736,27 +2796,37 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		// set position for the x-sliders
 		setXSliderPosition(xSliderPosition);
 
-		/*
-		 * Select tour marker
-		 */
-		if (_layerMarker != null) {
+		final Object customData = xSliderPosition.getCustomData();
+		if (customData instanceof SelectedTourSegmenterSegments) {
 
-			final int leftSliderValueIndex = xSliderPosition.getLeftSliderValueIndex();
-			if (leftSliderValueIndex != SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION) {
+			final SelectedTourSegmenterSegments selectedSegments = (SelectedTourSegmenterSegments) customData;
 
-				// check if a marker is selected
-				for (final TourMarker tourMarker : _tourData.getTourMarkers()) {
+			// select segments
 
-					if (tourMarker.getSerieIndex() == leftSliderValueIndex) {
+		} else {
 
-						// marker is selected, get marker from chart label
+			/*
+			 * Select tour marker
+			 */
+			if (_layerMarker != null) {
 
-						_selectedTourMarker = tourMarker;
+				final int leftSliderValueIndex = xSliderPosition.getLeftSliderValueIndex();
+				if (leftSliderValueIndex != SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION) {
 
-						// redraw chart
-						setChartOverlayDirty();
+					// check if a marker is selected
+					for (final TourMarker tourMarker : _tourData.getTourMarkers()) {
 
-						break;
+						if (tourMarker.getSerieIndex() == leftSliderValueIndex) {
+
+							// marker is selected, get marker from chart label
+
+							_selectedTourMarker = tourMarker;
+
+							// redraw chart
+							setChartOverlayDirty();
+
+							break;
+						}
 					}
 				}
 			}
@@ -3732,6 +3802,10 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		if (_tourData == null) {
 			return;
 		}
+
+		// reset selection because some config settings can reduce the number of segments
+		_selectedSegmentLabel_1 = null;
+		_selectedSegmentLabel_2 = null;
 
 		setupTourSegmenter();
 

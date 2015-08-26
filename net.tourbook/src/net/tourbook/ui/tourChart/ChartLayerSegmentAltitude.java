@@ -18,6 +18,8 @@
  */
 package net.tourbook.ui.tourChart;
 
+import gnu.trove.list.array.TIntArrayList;
+
 import java.text.NumberFormat;
 import java.util.ArrayList;
 
@@ -122,7 +124,7 @@ public class ChartLayerSegmentAltitude implements IChartLayer, IChartOverlay {
 
 //		final double minValue = yData.getOriginalMinValue();
 		final double maxValue = yData.getOriginalMaxValue();
-		final double maxHiddenValue = maxValue * _hiddenValueSize;
+		final double maxGraphValue = maxValue * _hiddenValueSize;
 
 		final ValueOverlapChecker posChecker = new ValueOverlapChecker(_stackedValues);
 
@@ -215,19 +217,18 @@ public class ChartLayerSegmentAltitude implements IChartLayer, IChartOverlay {
 			final boolean isValueUp = altiDiff >= 0;
 
 			boolean isShowValueText = true;
-
 			if (_isHideSmallValues) {
 
 				// check values if they are small enough
 
 				if (altiDiff >= 0) {
-					if (altiDiff < maxHiddenValue) {
+					if (altiDiff < maxGraphValue) {
 						isShowValueText = false;
 					}
 				} else {
 
 					// diff <0
-					if (-altiDiff < maxHiddenValue) {
+					if (-altiDiff < maxGraphValue) {
 						isShowValueText = false;
 					}
 				}
@@ -306,102 +307,99 @@ public class ChartLayerSegmentAltitude implements IChartLayer, IChartOverlay {
 
 			if (segmentIndex > 0) {
 
-				if (_isShowSegmenterValue) {
+				if (_isShowSegmenterValue && isShowValueText) {
 
 					// show segment value
 
-					if (isShowValueText) {
+					/*
+					 * get default y position
+					 */
+					final float yDiff2 = (devYSegment - devYPrev) / 2;
+					final int devYText = (int) (devYSegment - yDiff2 + (isValueUp ? -textHeight : 0));
 
-						/*
-						 * get default y position
-						 */
-						final float yDiff2 = (devYSegment - devYPrev) / 2;
-						final int devYText = (int) (devYSegment - yDiff2 + (isValueUp ? -textHeight : 0));
+					/*
+					 * Get default x position
+					 */
+					final float segmentWidth2 = segmentWidth / 2;
+					final int devXText = (int) (devXPrev + segmentWidth2 - textWidth);
 
-						/*
-						 * Get default x position
-						 */
-						final float segmentWidth2 = segmentWidth / 2;
-						final int devXText = (int) (devXPrev + segmentWidth2 - textWidth);
+					final int borderWidth = 5;
+					final int borderWidth2 = 2 * borderWidth;
+					final int borderHeight = 0;
+					final int borderHeight2 = 2 * borderHeight;
+					final int textHeightWithBorder = textHeight + borderHeight2;
 
-						final int borderWidth = 5;
-						final int borderWidth2 = 2 * borderWidth;
-						final int borderHeight = 0;
-						final int borderHeight2 = 2 * borderHeight;
-						final int textHeightWithBorder = textHeight + borderHeight2;
+					/*
+					 * Ensure the value text do not overlap, if possible :-)
+					 */
+					final Rectangle textRect = new Rectangle(//
+							devXText - borderWidth2,
+							devYText - borderHeight,
+							textWidth + borderWidth2,
+							textHeightWithBorder);
 
-						/*
-						 * Ensure the value text do not overlap, if possible :-)
-						 */
-						final Rectangle textRect = new Rectangle(//
-								devXText - borderWidth2,
-								devYText - borderHeight,
-								textWidth + borderWidth2,
-								textHeightWithBorder);
+					final Rectangle validRect = posChecker.getValidRect(
+							textRect,
+							isValueUp,
+							textHeightWithBorder,
+							valueText);
 
-						final Rectangle validRect = posChecker.getValidRect(
-								textRect,
-								isValueUp,
-								textHeightWithBorder,
-								valueText);
+					// don't draw over the graph borders
+					if (validRect != null && validRect.y > devYTop && validRect.y + textHeight < devYBottom) {
 
-						// don't draw over the graph borders
-						if (validRect != null && validRect.y > devYTop && validRect.y + textHeight < devYBottom) {
+						// keep current valid rectangle
+						posChecker.setupNext(validRect, isValueUp);
 
-							// keep current valid rectangle
-							posChecker.setupNext(validRect, isValueUp);
+						gc.setAlpha(0xff);
+						gc.setForeground(upDownColor);
+						gc.drawText(//
+								valueText,
+								devXText - borderWidth,
+								validRect.y + borderHeight,
+								true);
 
-							gc.setAlpha(0xff);
-							gc.setForeground(upDownColor);
-							gc.drawText(//
-									valueText,
-									devXText - borderWidth,
-									validRect.y + borderHeight,
-									true);
+						chartLabel.paintedLabel = validRect;
 
-							chartLabel.paintedLabel = validRect;
-
-							// keep area to detect hovered segments, enlarge it with the hover border to easier hit the label
-							chartLabel.hoveredLabel = new Rectangle(
-									(validRect.x + borderWidth - ChartLabel.MARKER_HOVER_SIZE),
-									(validRect.y + borderHeight - ChartLabel.MARKER_HOVER_SIZE),
-									(validRect.width - borderWidth2 + 2 * ChartLabel.MARKER_HOVER_SIZE),
-									(validRect.height - borderHeight2 + 2 * ChartLabel.MARKER_HOVER_SIZE));
-
-//							/*
-//							 * Debugging
-//							 */
-//							gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_GRAY));
-//							gc.setLineAttributes(defaultLineAttributes);
-//							gc.drawRectangle(validRect);
-						}
+						// keep area to detect hovered segments, enlarge it with the hover border to easier hit the label
+						chartLabel.hoveredLabel = new Rectangle(
+								(validRect.x + borderWidth - ChartLabel.MARKER_HOVER_SIZE),
+								(validRect.y + borderHeight - ChartLabel.MARKER_HOVER_SIZE),
+								(validRect.width - borderWidth2 + 2 * ChartLabel.MARKER_HOVER_SIZE),
+								(validRect.height - borderHeight2 + 2 * ChartLabel.MARKER_HOVER_SIZE));
 
 //						/*
 //						 * Debugging
 //						 */
+//						gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_GRAY));
 //						gc.setLineAttributes(defaultLineAttributes);
-//						gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_DARK_BLUE));
-//						if (isValueUp) {
-//
-//							final int devY = devYSegment - (devYSegment - devYPrev) / 2;
-//							final int devX = (int) (devXSegment - segmentWidth2);
-//							gc.drawLine(//
-//									devX,
-//									devY,
-//									devX + 1 * textHeight,
-//									devY);
-//
-//						} else {
-//
-//							final int devY = devYSegment - (devYSegment - devYPrev) / 2;
-//							final int devX = (int) (devXSegment - segmentWidth2);
-//							gc.drawLine(//
-//									devX,
-//									devY,
-//									devX - 1 * textHeight,
-//									devY);
-//						}
+//						gc.drawRectangle(validRect);
 					}
+
+//					/*
+//					 * Debugging
+//					 */
+//					gc.setLineAttributes(defaultLineAttributes);
+//					gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_DARK_BLUE));
+//					if (isValueUp) {
+//
+//						final int devY = devYSegment - (devYSegment - devYPrev) / 2;
+//						final int devX = (int) (devXSegment - segmentWidth2);
+//						gc.drawLine(//
+//								devX,
+//								devY,
+//								devX + 1 * textHeight,
+//								devY);
+//
+//					} else {
+//
+//						final int devY = devYSegment - (devYSegment - devYPrev) / 2;
+//						final int devX = (int) (devXSegment - segmentWidth2);
+//						gc.drawLine(//
+//								devX,
+//								devY,
+//								devX - 1 * textHeight,
+//								devY);
+//					}
 				}
 
 				devXPrev = devXSegment;
@@ -428,13 +426,14 @@ public class ChartLayerSegmentAltitude implements IChartLayer, IChartOverlay {
 	@Override
 	public void drawOverlay(final GC gc, final GraphDrawingData graphDrawingData) {
 
-		final ChartLabel selectedLabel = _tourChart.getSegmentLabel_Selected();
 		final ChartLabel hoveredLabel = _tourChart.getSegmentLabel_Hovered();
+		final ChartLabel selectedLabel_1 = _tourChart.getSegmentLabel_Selected_1();
+		final ChartLabel selectedLabel_2 = _tourChart.getSegmentLabel_Selected_2();
 
-		final boolean isSelected = selectedLabel != null;
+		final boolean isSelected = selectedLabel_1 != null;
 		final boolean isHovered = hoveredLabel != null;
 
-		if (!isHovered) {
+		if (!isHovered && !isSelected) {
 			return;
 		}
 
@@ -450,39 +449,92 @@ public class ChartLayerSegmentAltitude implements IChartLayer, IChartOverlay {
 		/*
 		 * Draw label background
 		 */
-		final Rectangle paintedLabel = hoveredLabel.hoveredLabel;
-		final int arc = 10;
-		gc.setAlpha(isSelected ? 0x60 : 0x30);
-		gc.setBackground(colorHovered);
-		gc.fillRoundRectangle(paintedLabel.x, paintedLabel.y, paintedLabel.width, paintedLabel.height, arc, arc);
+		if (isHovered) {
 
-		/*
-		 * Draw line thicker
-		 */
-		final Color lineColor = new Color(device, hoveredLabel.paintedRGB);
-		{
-			final int x1 = hoveredLabel.paintedX1;
-			final int y1 = hoveredLabel.paintedY1;
-			final int x2 = hoveredLabel.paintedX2;
-			final int y2 = hoveredLabel.paintedY2;
+			final Rectangle paintedLabel = hoveredLabel.hoveredLabel;
+			final int arc = 10;
+			gc.setAlpha(isSelected ? 0x60 : 0x30);
+			gc.setBackground(colorHovered);
+			gc.fillRoundRectangle(paintedLabel.x, paintedLabel.y, paintedLabel.width, paintedLabel.height, arc, arc);
 
-			gc.setAntialias(SWT.ON);
-			gc.setForeground(lineColor);
-			gc.setLineCap(SWT.CAP_ROUND);
+			/*
+			 * Draw line thicker
+			 */
+			final Color lineColor = new Color(device, hoveredLabel.paintedRGB);
+			{
+				final int x1 = hoveredLabel.paintedX1;
+				final int y1 = hoveredLabel.paintedY1;
+				final int x2 = hoveredLabel.paintedX2;
+				final int y2 = hoveredLabel.paintedY2;
 
-			// draw selected segment
-			if (isSelected) {
-				gc.setAlpha(0x20);
-				gc.setLineWidth(30);
+				gc.setAntialias(SWT.ON);
+				gc.setForeground(lineColor);
+				gc.setLineCap(SWT.CAP_ROUND);
+
+				// draw hovered segment
+				gc.setAlpha(0xff);
+				gc.setLineWidth(3);
 				gc.drawLine(x1, y1, x2, y2);
 			}
-
-			// draw hovered segment
-			gc.setAlpha(0xff);
-			gc.setLineWidth(3);
-			gc.drawLine(x1, y1, x2, y2);
+			lineColor.dispose();
 		}
-		lineColor.dispose();
+
+		// draw selected segment
+		if (isSelected) {
+
+			// get start/end index depending which segments are selected
+			int startIndex = selectedLabel_1.segmentIndex;
+			int endIndex;
+			if (selectedLabel_2 == null) {
+				endIndex = startIndex;
+			} else {
+				endIndex = selectedLabel_2.segmentIndex;
+			}
+
+			// depending how the segments are selected, start can be larger than end
+			if (startIndex > endIndex) {
+				final int tempIndex = endIndex;
+				endIndex = startIndex;
+				startIndex = tempIndex;
+			}
+
+			/*
+			 * Create poline for all selected segments
+			 */
+			final TIntArrayList polyLine = new TIntArrayList();
+
+			for (int segmentIndex = startIndex; segmentIndex <= endIndex; segmentIndex++) {
+
+				final ChartLabel selectedLabel = _chartLabels.get(segmentIndex);
+
+				if (segmentIndex == startIndex) {
+
+					// first segment
+
+					polyLine.add(selectedLabel.paintedX1);
+					polyLine.add(selectedLabel.paintedY1);
+					polyLine.add(selectedLabel.paintedX2);
+					polyLine.add(selectedLabel.paintedY2);
+
+				} else {
+
+					// following segments
+
+					polyLine.add(selectedLabel.paintedX2);
+					polyLine.add(selectedLabel.paintedY2);
+				}
+			}
+
+			/*
+			 * Paint polyline
+			 */
+			gc.setAlpha(0x60);
+			gc.setLineWidth(15);
+			gc.setForeground(SYSTEM_COLOR_0);
+			gc.setLineCap(SWT.CAP_ROUND);
+			gc.setAntialias(SWT.ON);
+			gc.drawPolyline(polyLine.toArray());
+		}
 
 		gc.setAlpha(0xff);
 		gc.setClipping((Rectangle) null);
