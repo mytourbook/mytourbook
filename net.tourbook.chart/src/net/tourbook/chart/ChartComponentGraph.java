@@ -4450,10 +4450,11 @@ public class ChartComponentGraph extends Canvas {
 			 */
 			gcCustom.drawImage(_chartImage_20_Chart, 0, 0);
 
-//			System.out.println("30 <- 20\tdrawSync300Image30Custom");
-//			// TODO remove SYSTEM.OUT.PRINTLN
+			for (int graphIndex = 0; graphIndex < _allGraphDrawingData.size(); graphIndex++) {
 
-			for (final GraphDrawingData graphDrawingData : _allGraphDrawingData) {
+				final GraphDrawingData graphDrawingData = _allGraphDrawingData.get(graphIndex);
+
+				graphDrawingData.graphIndex = graphIndex;
 
 				final ArrayList<IChartLayer> customFgLayers = graphDrawingData.getYData().getCustomForegroundLayers();
 

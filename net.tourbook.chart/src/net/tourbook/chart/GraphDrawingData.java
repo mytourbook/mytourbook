@@ -107,6 +107,11 @@ public class GraphDrawingData {
 
 	private boolean[]				_isDrawUnits				= null;
 
+	/**
+	 * Number of the painted graph within a chart.
+	 */
+	public int						graphIndex;
+
 	public GraphDrawingData(final ChartDrawingData chartDrawingData, final ChartType chartType) {
 
 		this.chartDrawingData = chartDrawingData;

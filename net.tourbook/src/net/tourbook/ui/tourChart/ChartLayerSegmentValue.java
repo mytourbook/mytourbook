@@ -19,12 +19,14 @@
 package net.tourbook.ui.tourChart;
 
 import java.text.NumberFormat;
+import java.util.ArrayList;
 
 import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartDataYSerie;
 import net.tourbook.chart.ChartMouseEvent;
 import net.tourbook.chart.GraphDrawingData;
 import net.tourbook.chart.IChartLayer;
+import net.tourbook.chart.SelectionChartXSliderPosition;
 import net.tourbook.common.UI;
 import net.tourbook.data.TourData;
 import net.tourbook.tour.TourManager;
@@ -35,6 +37,7 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Display;
 
@@ -43,29 +46,33 @@ import org.eclipse.swt.widgets.Display;
  */
 public class ChartLayerSegmentValue implements IChartLayer {
 
-	private TourChart			_tourChart;
-	private TourData			_tourData;
+	private TourChart							_tourChart;
+	private TourData							_tourData;
 
-	private double				_hiddenValueSize;
-	private boolean				_isHideSmallValues;
-	private boolean				_isShowDecimalPlaces;
-	private boolean				_isShowSegmenterLine;
-	private boolean				_isShowSegmenterValues;
-	private int					_lineOpacity;
-	private int					_stackedValues;
-	private double[]			_xDataSerie;
+	private double								_hiddenValueSize;
+	private boolean								_isHideSmallValues;
+	private boolean								_isShowDecimalPlaces;
+	private boolean								_isShowSegmenterLine;
+	private boolean								_isShowSegmenterValues;
+	private int									_lineOpacity;
+	private int									_stackedValues;
+	private double[]							_xDataSerie;
 
-	private final NumberFormat	_nf1	= NumberFormat.getNumberInstance();
+	/**
+	 * Area where the graph is painted.
+	 */
+	private ArrayList<Rectangle>				_allGraphArea	= new ArrayList<>();
+
+	private ArrayList<ArrayList<ChartLabel>>	_allChartLabel	= new ArrayList<>();
+
+	private int									_paintedGraphs;
+
+	private final NumberFormat					_nf1			= NumberFormat.getNumberInstance();
 
 	{
 		_nf1.setMinimumFractionDigits(1);
 		_nf1.setMaximumFractionDigits(1);
 	}
-
-	/**
-	 * Area where the graph is painted.
-	 */
-	private Rectangle			_graphRect;
 
 	public ChartLayerSegmentValue(final TourChart tourChart) {
 
@@ -85,13 +92,13 @@ public class ChartLayerSegmentValue implements IChartLayer {
 						final Chart chart,
 						final PixelConverter pixelConverter) {
 
-		final int[] segmentSerie = _tourData.segmentSerieIndex;
+		final int[] segmentSerieIndex = _tourData.segmentSerieIndex;
 
-		if (segmentSerie == null) {
+		if (segmentSerieIndex == null) {
 			return;
 		}
 
-		final int segmentSerieSize = segmentSerie.length;
+		final int segmentSerieSize = segmentSerieIndex.length;
 
 		final ChartDataYSerie yData = graphDrawingData.getYData();
 
@@ -110,7 +117,6 @@ public class ChartLayerSegmentValue implements IChartLayer {
 
 		final IValueLabelProvider segmentLabelProvider = segmentConfig.labelProvider;
 
-		final Display display = Display.getCurrent();
 		boolean toggleAboveBelow = false;
 
 		final int graphWidth = graphDrawingData.getChartDrawingData().devVisibleChartWidth;
@@ -129,27 +135,44 @@ public class ChartLayerSegmentValue implements IChartLayer {
 
 		final ValueOverlapChecker posChecker = new ValueOverlapChecker(_stackedValues);
 
+		final Display display = Display.getCurrent();
+
 		// setup font
 		final Font fontBackup = gc.getFont();
 		gc.setFont(_tourChart.getValueFont());
 
 		gc.setLineStyle(SWT.LINE_SOLID);
 
-		// do not draw over the graph area
-		_graphRect = new Rectangle(0, devYTop, graphWidth, devYBottom - devYTop);
-		gc.setClipping(_graphRect);
+		/*
+		 * Remove previous data, this is a bit tricky because the first graph which is painted in
+		 * this layer can be 1 or 0.
+		 */
+		if (graphDrawingData.graphIndex <= _paintedGraphs) {
+			_allGraphArea.clear();
+			_allChartLabel.clear();
+		}
+		_paintedGraphs = graphDrawingData.graphIndex;
 
-		final Color lineColor = new Color(display, segmentConfig.segmentLineColor);
-		final Color textColor = new Color(display, segmentConfig.segmentLineColor);
+		final Rectangle graphArea = new Rectangle(0, devYTop, graphWidth, devYBottom - devYTop);
+		_allGraphArea.add(graphArea);
+
+		final ArrayList<ChartLabel> graphAreaLabels = new ArrayList<>();
+		_allChartLabel.add(graphAreaLabels);
+
+		// do not draw over the graph area
+		gc.setClipping(graphArea);
+
+		final RGB lineColorRGB = segmentConfig.segmentLineColor;
+		final Color lineColor = new Color(display, lineColorRGB);
+		gc.setForeground(lineColor);
 		{
 			int devXPrev = Integer.MIN_VALUE;
-			int devYPrev = Integer.MIN_VALUE;
 
 			int segmentIndex;
 			for (segmentIndex = 0; segmentIndex < segmentSerieSize; segmentIndex++) {
 
 				// get current value
-				final int serieIndex = segmentSerie[segmentIndex];
+				final int serieIndex = segmentSerieIndex[segmentIndex];
 				final int devXSegment = (int) (_xDataSerie[serieIndex] * scaleX - devGraphImageXOffset);
 				final int segmentWidth = devXSegment - devXPrev;
 
@@ -159,7 +182,7 @@ public class ChartLayerSegmentValue implements IChartLayer {
 					// get next value
 					if (segmentIndex < segmentSerieSize - 2) {
 
-						final int serieIndexNext = segmentSerie[segmentIndex + 1];
+						final int serieIndexNext = segmentSerieIndex[segmentIndex + 1];
 						final int devXValueNext = (int) (_xDataSerie[serieIndexNext] * scaleX - devGraphImageXOffset);
 
 						if (devXValueNext < 0) {
@@ -172,7 +195,7 @@ public class ChartLayerSegmentValue implements IChartLayer {
 					// get previous value
 					if (segmentIndex > 0) {
 
-						final int serieIndexPrev = segmentSerie[segmentIndex - 1];
+						final int serieIndexPrev = segmentSerieIndex[segmentIndex - 1];
 						final int devXValuePrev = (int) (_xDataSerie[serieIndexPrev] * scaleX - devGraphImageXOffset);
 
 						if (devXValuePrev > graphWidth) {
@@ -187,150 +210,199 @@ public class ChartLayerSegmentValue implements IChartLayer {
 				final int devYGraph = (int) (scaleY * (graphYValue - graphYBottom));
 				final int devYSegment = devYBottom - devYGraph;
 
-				boolean isShowValueText = true;
+				boolean isShowSegment = true;
+
 				if (_isHideSmallValues) {
 
 					// check values if they are small enough
 
 					if (graphYValue >= 0) {
 						if (graphYValue < maxGraphValue) {
-							isShowValueText = false;
+							isShowSegment = false;
+							continue;
 						}
 					} else {
 
 						// value <0
 						if (-graphYValue < maxGraphValue) {
-							isShowValueText = false;
+							isShowSegment = false;
 						}
 					}
 				}
 
-				/*
-				 * Get value text
-				 */
-				String valueText;
-				if (segmentLabelProvider != null) {
-
-					// get value text from a label provider
-					valueText = segmentLabelProvider.getLabel(graphYValue);
-
-				} else {
-
-					if (graphYValue < 0.0 || graphYValue > 0.0) {
-
-						valueText = _isShowDecimalPlaces //
-								? _nf1.format(graphYValue)
-								: Integer.toString((int) (graphYValue > 0 //
-										? (graphYValue + 0.5)
-										: (graphYValue - 0.5)));
-
-					} else {
-
-						// hide digits
-						valueText = UI.ZERO;
-					}
-				}
-
-				final Point textExtent = gc.textExtent(valueText);
-
-				final int textWidth = textExtent.x;
-				final int textHeight = textExtent.y;
-
-				/*
-				 * Connect two segments with a line
-				 */
-				if (devXPrev == Integer.MIN_VALUE) {
-
-					// first visible segment
-
-					devXPrev = devXSegment;
-					devYPrev = devYSegment;
-
-				} else {
-
-					if (_isShowSegmenterLine && isShowValueText) {
-
-						gc.setAlpha(_lineOpacity);
-						gc.setForeground(lineColor);
-						gc.drawLine(//
-								devXPrev,
-								devYSegment,
-								devXSegment,
-								devYSegment);
-					}
-
-//					chartLabel.paintedX1 = devXPrev;
-//					chartLabel.paintedX2 = devXSegment;
-//					chartLabel.paintedY1 = devYPrev;
-//					chartLabel.paintedY2 = devYSegment;
-//					chartLabel.paintedRGB = upDownColor.getRGB();
-				}
-
-				if (_isShowSegmenterValues && isShowValueText) {
-
-					final int devXText = devXPrev + segmentWidth / 2 - textWidth / 2;
-
-					final boolean isValueUp = graphYValue > 0;
-					int devYText;
-					boolean isDrawAbove;
-					boolean isToggleAboveBelow = false;
-
-					if (segmentConfig.canHaveNegativeValues) {
-
-						isDrawAbove = isValueUp;
-
-					} else {
-
-						// toggle above/below segment line
-						isDrawAbove = toggleAboveBelow = !toggleAboveBelow;
-						isToggleAboveBelow = true;
-					}
-
-					if (isDrawAbove || isToggleAboveBelow) {
-
-						// draw above segment line
-						devYText = devYSegment - textHeight;
-
-					} else {
-
-						// draw below segment line
-						devYText = devYSegment + 2;
-					}
+				if (isShowSegment) {
 
 					/*
-					 * Ensure the value text do not overlap, if possible :-)
+					 * Get value text
 					 */
-					final Rectangle textRect = new Rectangle(devXText, devYText, textWidth, textHeight);
-					final Rectangle validRect = posChecker.getValidRect(textRect, isValueUp, textHeight, valueText);
+					String valueText;
+					if (segmentLabelProvider != null) {
 
-					// don't draw over the graph borders
-					if (validRect != null && validRect.y > devYTop && validRect.y + textHeight < devYBottom) {
+						// get value text from a label provider
+						valueText = segmentLabelProvider.getLabel(graphYValue);
 
-						// keep current valid rectangle
-						posChecker.setupNext(validRect, isValueUp);
+					} else {
 
-						gc.drawText(//
-								valueText,
-								devXText,
-								validRect.y,
-								true);
+						if (graphYValue < 0.0 || graphYValue > 0.0) {
 
-//						/*
-//						 * Debugging
-//						 */
-//						gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_GRAY));
-//						gc.setLineAttributes(defaultLineAttributes);
-//						gc.drawRectangle(validRect);
+							valueText = _isShowDecimalPlaces //
+									? _nf1.format(graphYValue)
+									: Integer.toString((int) (graphYValue > 0 //
+											? (graphYValue + 0.5)
+											: (graphYValue - 0.5)));
+
+						} else {
+
+							// hide digits
+							valueText = UI.ZERO;
+						}
+					}
+
+					boolean isSegmentPainted = false;
+					final ChartLabel chartLabel = new ChartLabel();
+
+					/*
+					 * Connect two segments with a line
+					 */
+					if (devXPrev == Integer.MIN_VALUE) {
+
+						// first visible segment
+
+						devXPrev = devXSegment;
+
+					} else {
+
+						if (_isShowSegmenterLine) {
+
+							isSegmentPainted = true;
+
+							gc.setAlpha(_lineOpacity);
+							gc.drawLine(//
+									devXPrev,
+									devYSegment,
+									devXSegment,
+									devYSegment);
+						}
+
+						chartLabel.paintedX1 = devXPrev;
+						chartLabel.paintedY1 = devYSegment;
+						chartLabel.paintedX2 = devXSegment;
+						chartLabel.paintedY2 = devYSegment;
+						chartLabel.paintedRGB = lineColorRGB;
+
+						if (_isShowSegmenterValues) {
+
+							final Point textExtent = gc.textExtent(valueText);
+
+							final int textWidth = textExtent.x;
+							final int textHeight = textExtent.y;
+
+							isSegmentPainted = true;
+
+							final int devXText = devXPrev + segmentWidth / 2 - textWidth / 2;
+
+							final boolean isValueUp = graphYValue > 0;
+							int devYText;
+							boolean isDrawAbove;
+							boolean isToggleAboveBelow = false;
+
+							if (segmentConfig.canHaveNegativeValues) {
+
+								isDrawAbove = isValueUp;
+
+							} else {
+
+								// toggle above/below segment line
+								isDrawAbove = toggleAboveBelow = !toggleAboveBelow;
+								isToggleAboveBelow = true;
+							}
+
+							if (isDrawAbove || isToggleAboveBelow) {
+
+								// draw above segment line
+								devYText = devYSegment - textHeight;
+
+							} else {
+
+								// draw below segment line
+								devYText = devYSegment + 2;
+							}
+
+							final int borderWidth = 5;
+							final int borderWidth2 = 2 * borderWidth;
+							final int borderHeight = 0;
+							final int borderHeight2 = 2 * borderHeight;
+							final int textHeightWithBorder = textHeight + borderHeight2;
+
+							/*
+							 * Ensure the value text do not overlap, if possible :-)
+							 */
+							final Rectangle textRect = new Rectangle(//
+									devXText - borderWidth2,
+									devYText - borderHeight,
+									textWidth + borderWidth2,
+									textHeightWithBorder);
+
+							final Rectangle validRect = posChecker.getValidRect(
+									textRect,
+									isValueUp,
+									textHeightWithBorder,
+									valueText);
+
+							// don't draw over the graph borders
+							if (validRect != null && validRect.y > devYTop && validRect.y + textHeight < devYBottom) {
+
+								// keep current valid rectangle
+								posChecker.setupNext(validRect, isValueUp);
+
+								gc.drawText(//
+										valueText,
+										devXText,
+										validRect.y,
+										true);
+
+								chartLabel.paintedLabel = validRect;
+
+								// keep area to detect hovered segments, enlarge it with the hover border to easier hit the label
+								final Rectangle hoveredRect = new Rectangle(
+										(validRect.x + borderWidth),
+										(validRect.y + borderHeight - ChartLabel.MARKER_HOVER_SIZE),
+										(validRect.width - borderWidth2 + 2 * ChartLabel.MARKER_HOVER_SIZE),
+										(validRect.height - borderHeight2 + 2 * ChartLabel.MARKER_HOVER_SIZE));
+
+								chartLabel.hoveredLabel = hoveredRect;
+
+//							/*
+//							 * Debugging
+//							 */
+//							gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_GRAY));
+//							gc.drawRectangle(hoveredRect);
+							}
+						}
+					}
+
+					if (isSegmentPainted) {
+
+						/*
+						 * Set slider positions
+						 */
+						final int prevSegmentIndex = segmentIndex - 1;
+						final int leftIndex = prevSegmentIndex < 0
+								? SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION
+								: segmentSerieIndex[prevSegmentIndex];
+
+						chartLabel.xSliderSerieIndexLeft = leftIndex;
+						chartLabel.xSliderSerieIndexRight = serieIndex;
+
+						graphAreaLabels.add(chartLabel);
 					}
 				}
 
 				// advance to the next point
 				devXPrev = devXSegment;
-				devYPrev = devYSegment;
 			}
 		}
 		lineColor.dispose();
-		textColor.dispose();
 
 		// reset clipping
 		gc.setClipping((Rectangle) null);
@@ -346,39 +418,39 @@ public class ChartLayerSegmentValue implements IChartLayer {
 	 */
 	ChartLabel getHoveredLabel(final ChartMouseEvent mouseEvent) {
 
-		if (_graphRect == null) {
+		ChartLabel hoveredLabel = null;
 
-			// this happened, propably when not initialized
-			return null;
-		}
+		for (int graphIndex = 0; graphIndex < _allGraphArea.size(); graphIndex++) {
 
-		ChartLabel hoveredLabel;
+			final Rectangle graphArea = _allGraphArea.get(graphIndex);
 
-		if (_graphRect.contains(mouseEvent.devXMouse, mouseEvent.devYMouse)) {
+			if (graphArea.contains(mouseEvent.devXMouse, mouseEvent.devYMouse)) {
 
-			// mouse is hovering the graph area
+				// mouse is hovering the graph area
 
-			hoveredLabel = getHoveredLabel_10(mouseEvent.devXMouse, mouseEvent.devYMouse);
+				hoveredLabel = getHoveredLabel_10(graphIndex, mouseEvent.devXMouse, mouseEvent.devYMouse);
 
-		} else {
-			hoveredLabel = null;
+				break;
+			}
 		}
 
 		return hoveredLabel;
 	}
 
-	private ChartLabel getHoveredLabel_10(final int devXMouse, final int devYMouse) {
+	private ChartLabel getHoveredLabel_10(final int graphIndex, final int devXMouse, final int devYMouse) {
 
-//		for (final ChartLabel chartLabel : _chartLabels) {
-//
-//			final Rectangle hoveredLabel = chartLabel.hoveredLabel;
-//
-//			if (hoveredLabel != null && hoveredLabel.contains(devXMouse, devYMouse)) {
-//
-//				// label is hit
-//				return chartLabel;
-//			}
-//		}
+		final ArrayList<ChartLabel> chartLabels = _allChartLabel.get(graphIndex);
+
+		for (final ChartLabel chartLabel : chartLabels) {
+
+			final Rectangle hoveredLabel = chartLabel.hoveredLabel;
+
+			if (hoveredLabel != null && hoveredLabel.contains(devXMouse, devYMouse)) {
+
+				// label is hit
+				return chartLabel;
+			}
+		}
 
 		return null;
 	}

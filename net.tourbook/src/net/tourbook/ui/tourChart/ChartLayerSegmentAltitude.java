@@ -72,7 +72,7 @@ public class ChartLayerSegmentAltitude implements IChartLayer, IChartOverlay {
 	/**
 	 * Area where the graph is painted.
 	 */
-	private Rectangle				_graphRect;
+	private Rectangle				_graphArea;
 
 	private final NumberFormat		_nf1				= NumberFormat.getNumberInstance();
 	{
@@ -140,8 +140,8 @@ public class ChartLayerSegmentAltitude implements IChartLayer, IChartOverlay {
 		gc.setFont(_tourChart.getValueFont());
 
 		// do not draw over the graph area
-		_graphRect = new Rectangle(0, devYTop, graphWidth, devYBottom - devYTop);
-		gc.setClipping(_graphRect);
+		_graphArea = new Rectangle(0, devYTop, graphWidth, devYBottom - devYTop);
+		gc.setClipping(_graphArea);
 
 		gc.setAntialias(chart.graphAntialiasing);
 		gc.setTextAntialias(chart.graphAntialiasing);
@@ -558,7 +558,7 @@ public class ChartLayerSegmentAltitude implements IChartLayer, IChartOverlay {
 	 */
 	ChartLabel getHoveredLabel(final ChartMouseEvent mouseEvent) {
 
-		if (_graphRect == null) {
+		if (_graphArea == null) {
 
 			// this happened, propably when not initialized
 			return null;
@@ -566,7 +566,7 @@ public class ChartLayerSegmentAltitude implements IChartLayer, IChartOverlay {
 
 		ChartLabel hoveredLabel;
 
-		if (_graphRect.contains(mouseEvent.devXMouse, mouseEvent.devYMouse)) {
+		if (_graphArea.contains(mouseEvent.devXMouse, mouseEvent.devYMouse)) {
 
 			// mouse is hovering the graph area
 
