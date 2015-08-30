@@ -242,6 +242,11 @@ public class ChartDataYSerie extends ChartDataSerie {
 						continue;
 					}
 
+					if (value == Float.POSITIVE_INFINITY) {
+						// ignore infinity
+						continue;
+					}
+
 					if (value < -FLOAT_ZERO || value > FLOAT_ZERO) {
 						return value;
 					}
@@ -262,6 +267,11 @@ public class ChartDataYSerie extends ChartDataSerie {
 
 					if (value != value) {
 						// ignore NaN
+						continue;
+					}
+
+					if (value == Float.POSITIVE_INFINITY) {
+						// ignore infinity
 						continue;
 					}
 
@@ -646,16 +656,10 @@ public class ChartDataYSerie extends ChartDataSerie {
 						continue;
 					}
 
-//					if (value == Float.POSITIVE_INFINITY) {
-//
-//						// ignore infinity
-//
-//						StatusUtil.log(new Exception((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
-//								+ ("\tserieIndex:" + serieIndex)
-//								+ ("\tvalueIndex:" + valueIndex)));
-//
-//						continue;
-//					}
+					if (value == Float.POSITIVE_INFINITY) {
+						// ignore infinity
+						continue;
+					}
 
 					if (_isIgnoreMinMaxZero && (value > -FLOAT_ZERO && value < FLOAT_ZERO)) {
 						// ignore zero

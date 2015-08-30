@@ -4462,6 +4462,8 @@ public class ChartComponentGraph extends Canvas {
 					layer.draw(gcCustom, graphDrawingData, _chart, _pc);
 				}
 			}
+//			System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") + ("\t"));
+//			// TODO remove SYSTEM.OUT.PRINTLN
 
 		} finally {
 			gcCustom.dispose();
@@ -8303,6 +8305,11 @@ public class ChartComponentGraph extends Canvas {
 
 					if (yValue != yValue) {
 						// ignore NaN
+						continue;
+					}
+
+					if (yValue == Float.POSITIVE_INFINITY) {
+						// ignore infinity
 						continue;
 					}
 
