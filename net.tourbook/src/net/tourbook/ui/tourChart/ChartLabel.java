@@ -42,6 +42,8 @@ public class ChartLabel {
 	public static final int	VISIBLE_TYPE_TYPE_NEW	= 10;
 	public static final int	VISIBLE_TYPE_TYPE_EDIT	= 20;
 
+	static final int		MIN_HOVER_LINE_HEIGHT	= 50;
+
 	public boolean			isVisible;
 	public boolean			isDescription;
 
@@ -86,6 +88,7 @@ public class ChartLabel {
 	 */
 	public Rectangle		paintedLabel;
 	public Rectangle		hoveredLabel;
+	Rectangle				hoveredRect;
 
 	public int				devHoverSize;
 
@@ -137,12 +140,13 @@ public class ChartLabel {
 	@Override
 	public String toString() {
 		return "ChartLabel [" //
-//				+ ("paintedLabel=" + paintedLabel + ", ")
+				+ ("paintedLabel=" + paintedLabel + ", ")
+				+ ("segmentIndex=" + segmentIndex + ", ")
 //				+ ("serieIndex=" + serieIndex + ", ")
 //				+ ("graphX=" + graphX + ", ")
 //				+ ("devXMarker=" + devXMarker + ", ")
 //				+ ("devYMarker=" + devYMarker + ", ")
-				+ ("markerLabel=" + markerLabel)
+//				+ ("markerLabel=" + markerLabel)
 				+ "]"; //$NON-NLS-1$
 	}
 

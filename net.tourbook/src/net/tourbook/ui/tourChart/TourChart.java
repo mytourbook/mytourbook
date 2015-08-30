@@ -1793,7 +1793,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 				_tourSegmenterState,
 				TourSegmenterView.STATE_IS_HIDE_SMALL_VALUES,
 				TourSegmenterView.STATE_IS_HIDE_SMALL_VALUES_DEFAULT);
-		final int hiddenValueSize = Util.getStateInt(
+		final int smallValueSize = Util.getStateInt(
 				_tourSegmenterState,
 				TourSegmenterView.STATE_SMALL_VALUE_SIZE,
 				TourSegmenterView.STATE_SMALL_VALUE_SIZE_DEFAULT);
@@ -1851,7 +1851,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		_layerTourSegmenterAltitude.setIsShowSegmenterMarker(isShowSegmenterMarker);
 		_layerTourSegmenterAltitude.setIsShowSegmenterValue(isShowSegmenterValue);
 		_layerTourSegmenterAltitude.setLineProperties(isShowSegmenterLine, lineOpacity);
-		_layerTourSegmenterAltitude.setSmallHiddenValuesProperties(isHideSmallValues, hiddenValueSize);
+		_layerTourSegmenterAltitude.setSmallHiddenValuesProperties(isHideSmallValues, smallValueSize);
 		_layerTourSegmenterAltitude.setStackedValues(stackedValues);
 
 		final int segmentIndexSize = segmentSerieIndex.length;
@@ -1891,7 +1891,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		_layerTourSegmenterOther.setIsShowDecimalPlaces(isShowDecimalPlaces);
 		_layerTourSegmenterOther.setIsShowSegmenterValues(isShowSegmenterValue);
 		_layerTourSegmenterOther.setLineProperties(isShowSegmenterLine, lineOpacity);
-		_layerTourSegmenterOther.setSmallHiddenValuesProperties(isHideSmallValues, hiddenValueSize);
+		_layerTourSegmenterOther.setSmallHiddenValuesProperties(isHideSmallValues, smallValueSize);
 		_layerTourSegmenterOther.setStackedValues(stackedValues);
 		_layerTourSegmenterOther.setXDataSerie(xDataSerie);
 
@@ -3121,49 +3121,57 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 					_tourData.segmentSerieAltitudeDiff,
 					labelProviderInt,
 					true,
-					GraphColorManager.PREF_GRAPH_ALTITUDE);
+					GraphColorManager.PREF_GRAPH_ALTITUDE,
+					0.1);
 
 			segmentConfigPulse = new ConfigGraphSegment(
 					_tourData.segmentSeriePulse,
 					null,
 					false,
-					GraphColorManager.PREF_GRAPH_HEARTBEAT);
+					GraphColorManager.PREF_GRAPH_HEARTBEAT,
+					Double.MIN_VALUE);
 
 			segmentConfigSpeed = new ConfigGraphSegment(
 					_tourData.segmentSerieSpeed,
 					null,
 					false,
-					GraphColorManager.PREF_GRAPH_SPEED);
+					GraphColorManager.PREF_GRAPH_SPEED,
+					Double.MIN_VALUE);
 
 			segmentConfigPace = new ConfigGraphSegment(
 					_tourData.segmentSeriePace,
 					labelProviderMMSS,
 					false,
-					GraphColorManager.PREF_GRAPH_PACE);
+					GraphColorManager.PREF_GRAPH_PACE,
+					Double.MIN_VALUE);
 
 			segmentConfigPower = new ConfigGraphSegment(
 					_tourData.segmentSeriePower,
 					labelProviderInt,
 					false,
-					GraphColorManager.PREF_GRAPH_POWER);
+					GraphColorManager.PREF_GRAPH_POWER,
+					0.5);
 
 			segmentConfigGradient = new ConfigGraphSegment(
 					_tourData.segmentSerieGradient,
 					null,
 					true,
-					GraphColorManager.PREF_GRAPH_GRADIENT);
+					GraphColorManager.PREF_GRAPH_GRADIENT,
+					0.5);
 
 			segmentConfigAltimeter = new ConfigGraphSegment(
 					_tourData.segmentSerieAltitudeUpH,
 					labelProviderInt,
 					true,
-					GraphColorManager.PREF_GRAPH_ALTIMETER);
+					GraphColorManager.PREF_GRAPH_ALTIMETER,
+					0.5);
 
 			segmentConfigCadence = new ConfigGraphSegment(
 					_tourData.segmentSerieCadence,
 					null,
 					false,
-					GraphColorManager.PREF_GRAPH_CADENCE);
+					GraphColorManager.PREF_GRAPH_CADENCE,
+					Double.MIN_VALUE);
 		}
 
 		setupGraphLayer_Layer(TourManager.CUSTOM_DATA_ALTIMETER, yDataWithLabels, segmentConfigAltimeter);
@@ -3795,7 +3803,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 	}
 
 	/**
-	 * Toursegmenter is modified, update the toursegmenter layer.
+	 * Toursegmenter is modified, update its layers.
 	 */
 	public void updateTourSegmenter() {
 

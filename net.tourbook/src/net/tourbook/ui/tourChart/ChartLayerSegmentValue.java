@@ -37,7 +37,6 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Display;
 
@@ -49,7 +48,7 @@ public class ChartLayerSegmentValue implements IChartLayer {
 	private TourChart							_tourChart;
 	private TourData							_tourData;
 
-	private double								_hiddenValueSize;
+	private double								_smallValue;
 	private boolean								_isHideSmallValues;
 	private boolean								_isShowDecimalPlaces;
 	private boolean								_isShowSegmenterLine;
@@ -131,7 +130,17 @@ public class ChartLayerSegmentValue implements IChartLayer {
 		final double scaleY = graphDrawingData.getScaleY();
 
 		final double maxValue = yData.getOriginalMaxValue();
-		final double maxGraphValue = maxValue * _hiddenValueSize;
+		final double minValueAdjustment = segmentConfig.minValueAdjustment;
+		final double hiddenThreshold = maxValue * _smallValue * minValueAdjustment;
+
+		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] \t")
+				+ ("\t" + String.format("%9.2f  ", maxValue))
+				+ ("\t" + String.format("%9.2f  ", hiddenThreshold))
+				+ ("\t" + String.format("%3d  ", (int) (_smallValue * 100)))
+				+ ("\t" + minValueAdjustment)
+		//
+				);
+		// TODO remove SYSTEM.OUT.PRINTLN
 
 		final ValueOverlapChecker posChecker = new ValueOverlapChecker(_stackedValues);
 
@@ -162,8 +171,7 @@ public class ChartLayerSegmentValue implements IChartLayer {
 		// do not draw over the graph area
 		gc.setClipping(graphArea);
 
-		final RGB lineColorRGB = segmentConfig.segmentLineColor;
-		final Color lineColor = new Color(display, lineColorRGB);
+		final Color lineColor = new Color(display, segmentConfig.segmentLineRGB);
 		gc.setForeground(lineColor);
 		{
 			int devXPrev = Integer.MIN_VALUE;
@@ -217,14 +225,13 @@ public class ChartLayerSegmentValue implements IChartLayer {
 					// check values if they are small enough
 
 					if (graphYValue >= 0) {
-						if (graphYValue < maxGraphValue) {
+						if (graphYValue < hiddenThreshold) {
 							isShowSegment = false;
-							continue;
 						}
 					} else {
 
 						// value <0
-						if (-graphYValue < maxGraphValue) {
+						if (-graphYValue < hiddenThreshold) {
 							isShowSegment = false;
 						}
 					}
@@ -258,7 +265,6 @@ public class ChartLayerSegmentValue implements IChartLayer {
 						}
 					}
 
-					boolean isSegmentPainted = false;
 					final ChartLabel chartLabel = new ChartLabel();
 
 					/*
@@ -274,8 +280,6 @@ public class ChartLayerSegmentValue implements IChartLayer {
 
 						if (_isShowSegmenterLine) {
 
-							isSegmentPainted = true;
-
 							gc.setAlpha(_lineOpacity);
 							gc.drawLine(//
 									devXPrev,
@@ -286,9 +290,17 @@ public class ChartLayerSegmentValue implements IChartLayer {
 
 						chartLabel.paintedX1 = devXPrev;
 						chartLabel.paintedY1 = devYSegment;
+
 						chartLabel.paintedX2 = devXSegment;
 						chartLabel.paintedY2 = devYSegment;
-						chartLabel.paintedRGB = lineColorRGB;
+
+						chartLabel.hoveredRect = new Rectangle(//
+								devXPrev,
+								devYSegment - ChartLabel.MIN_HOVER_LINE_HEIGHT / 2,
+								segmentWidth,
+								ChartLabel.MIN_HOVER_LINE_HEIGHT);
+
+						chartLabel.paintedRGB = segmentConfig.segmentLineRGB;
 
 						if (_isShowSegmenterValues) {
 
@@ -297,14 +309,11 @@ public class ChartLayerSegmentValue implements IChartLayer {
 							final int textWidth = textExtent.x;
 							final int textHeight = textExtent.y;
 
-							isSegmentPainted = true;
-
 							final int devXText = devXPrev + segmentWidth / 2 - textWidth / 2;
 
 							final boolean isValueUp = graphYValue > 0;
 							int devYText;
 							boolean isDrawAbove;
-							boolean isToggleAboveBelow = false;
 
 							if (segmentConfig.canHaveNegativeValues) {
 
@@ -314,10 +323,9 @@ public class ChartLayerSegmentValue implements IChartLayer {
 
 								// toggle above/below segment line
 								isDrawAbove = toggleAboveBelow = !toggleAboveBelow;
-								isToggleAboveBelow = true;
 							}
 
-							if (isDrawAbove || isToggleAboveBelow) {
+							if (isDrawAbove) {
 
 								// draw above segment line
 								devYText = devYSegment - textHeight;
@@ -355,6 +363,7 @@ public class ChartLayerSegmentValue implements IChartLayer {
 								// keep current valid rectangle
 								posChecker.setupNext(validRect, isValueUp);
 
+								gc.setAlpha(0xff);
 								gc.drawText(//
 										valueText,
 										devXText,
@@ -381,21 +390,20 @@ public class ChartLayerSegmentValue implements IChartLayer {
 						}
 					}
 
-					if (isSegmentPainted) {
+					/*
+					 * Set slider positions
+					 */
+					final int prevSegmentIndex = segmentIndex - 1;
+					final int leftIndex = prevSegmentIndex < 0
+							? SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION
+							: segmentSerieIndex[prevSegmentIndex];
 
-						/*
-						 * Set slider positions
-						 */
-						final int prevSegmentIndex = segmentIndex - 1;
-						final int leftIndex = prevSegmentIndex < 0
-								? SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION
-								: segmentSerieIndex[prevSegmentIndex];
+					chartLabel.xSliderSerieIndexLeft = leftIndex;
+					chartLabel.xSliderSerieIndexRight = serieIndex;
 
-						chartLabel.xSliderSerieIndexLeft = leftIndex;
-						chartLabel.xSliderSerieIndexRight = serieIndex;
+					chartLabel.segmentIndex = segmentIndex;
 
-						graphAreaLabels.add(chartLabel);
-					}
+					graphAreaLabels.add(chartLabel);
 				}
 
 				// advance to the next point
@@ -444,10 +452,12 @@ public class ChartLayerSegmentValue implements IChartLayer {
 		for (final ChartLabel chartLabel : chartLabels) {
 
 			final Rectangle hoveredLabel = chartLabel.hoveredLabel;
+			final Rectangle hoveredRect = chartLabel.hoveredRect;
 
-			if (hoveredLabel != null && hoveredLabel.contains(devXMouse, devYMouse)) {
+			if ((hoveredLabel != null && hoveredLabel.contains(devXMouse, devYMouse))
+					|| (hoveredRect != null && hoveredRect.contains(devXMouse, devYMouse))) {
 
-				// label is hit
+				// segment is hit
 				return chartLabel;
 			}
 		}
@@ -469,10 +479,10 @@ public class ChartLayerSegmentValue implements IChartLayer {
 		_lineOpacity = (int) (lineOpacity / 100.0 * 255);
 	}
 
-	void setSmallHiddenValuesProperties(final boolean isHideSmallValues, final int hiddenValueSize) {
+	void setSmallHiddenValuesProperties(final boolean isHideSmallValues, final int smallValue) {
 
 		_isHideSmallValues = isHideSmallValues;
-		_hiddenValueSize = hiddenValueSize / 10.0 / 100.0;
+		_smallValue = smallValue / 100.0;
 	}
 
 	void setStackedValues(final int stackedValues) {

@@ -408,8 +408,7 @@ public class SlideoutTourChartSegmenterProperties extends AnimatedToolTipShell i
 				// Spinner
 				_spinHideSmallValues = new Spinner(containerSmall, SWT.BORDER);
 				_spinHideSmallValues.setMinimum(0);
-				_spinHideSmallValues.setMaximum(500);
-				_spinHideSmallValues.setDigits(1);
+				_spinHideSmallValues.setMaximum(90);
 				_spinHideSmallValues.setPageIncrement(10);
 				_spinHideSmallValues.addSelectionListener(_defaultSelectionAdapter);
 				_spinHideSmallValues.addMouseWheelListener(_defaultMouseWheelListener);

@@ -36,7 +36,9 @@ public class ConfigGraphSegment {
 	 */
 	Rectangle[]			paintedValues;
 
-	RGB					segmentLineColor;
+	RGB					segmentLineRGB;
+
+	double				minValueAdjustment;
 
 	/**
 	 * @param segmentDataSerie
@@ -47,20 +49,15 @@ public class ConfigGraphSegment {
 	public ConfigGraphSegment(	final float[] segmentDataSerie,
 								final IValueLabelProvider labelProvider,
 								final boolean canHaveNegativeValues,
-								final String graphColorName) {
+								final String graphColorName,
+								final double minValueAdjustment) {
 
 		this.segmentDataSerie = segmentDataSerie;
 		this.canHaveNegativeValues = canHaveNegativeValues;
 		this.labelProvider = labelProvider;
+		this.minValueAdjustment = minValueAdjustment;
 
-//		this.segmentLineColor = ColorUtil.getComplimentColor(
-//				Display.getDefault(),
-//				TourManager.getGraphColor(graphColorName, GraphColorManager.PREF_COLOR_TEXT));
-
-		this.segmentLineColor = TourManager.getGraphColor(graphColorName, GraphColorManager.PREF_COLOR_TEXT);
-
-//		final int bw = 0x80;
-//		this.segmentLineColor = new RGB(bw, bw, bw);
+		segmentLineRGB = TourManager.getGraphColor(graphColorName, GraphColorManager.PREF_COLOR_TEXT);
 	}
 
 }

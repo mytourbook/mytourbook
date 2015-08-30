@@ -29,7 +29,9 @@ import net.tourbook.chart.ChartMouseEvent;
 import net.tourbook.chart.GraphDrawingData;
 import net.tourbook.chart.IChartLayer;
 import net.tourbook.chart.IChartOverlay;
+import net.tourbook.common.UI;
 import net.tourbook.data.TourData;
+import net.tourbook.tour.TourManager;
 
 import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.swt.SWT;
@@ -58,7 +60,7 @@ public class ChartLayerSegmentAltitude implements IChartLayer, IChartOverlay {
 
 	// hide small values
 	private boolean					_isHideSmallValues;
-	private double					_hiddenValueSize;
+	private double					_smallValue;
 
 	// show lines
 	private boolean					_isShowSegmenterLine;
@@ -110,21 +112,37 @@ public class ChartLayerSegmentAltitude implements IChartLayer, IChartOverlay {
 						final Chart chart,
 						final PixelConverter pixelConverter) {
 
+		final ChartDataYSerie yData = graphDrawingData.getYData();
+
+		final Object segmentConfigObject = yData.getCustomData(TourManager.CUSTOM_DATA_SEGMENT_VALUES);
+		if ((segmentConfigObject instanceof ConfigGraphSegment) == false) {
+			return;
+		}
+		final ConfigGraphSegment segmentConfig = (ConfigGraphSegment) segmentConfigObject;
+
 		final int graphWidth = graphDrawingData.getChartDrawingData().devVisibleChartWidth;
 		final int devYTop = graphDrawingData.getDevYTop();
 		final int devYBottom = graphDrawingData.getDevYBottom();
 		final long devGraphImageXOffset = chart.getXXDevViewPortLeftBorder();
 //		final int devGraphHeight = drawingData.devGraphHeight;
 
-		final ChartDataYSerie yData = graphDrawingData.getYData();
 		final float graphYBottom = graphDrawingData.getGraphYBottom();
 		final float[] yValues = yData.getHighValuesFloat()[0];
 		final double scaleX = graphDrawingData.getScaleX();
 		final double scaleY = graphDrawingData.getScaleY();
 
-//		final double minValue = yData.getOriginalMinValue();
+		final double minValueAdjustment = segmentConfig.minValueAdjustment;
 		final double maxValue = yData.getOriginalMaxValue();
-		final double maxGraphValue = maxValue * _hiddenValueSize;
+		final double hideThreshold = maxValue * _smallValue * minValueAdjustment;
+
+		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
+				+ ("\t" + String.format("%9.2f  ", maxValue))
+				+ ("\t" + String.format("%9.2f  ", hideThreshold))
+				+ ("\t" + String.format("%3d  ", (int) (_smallValue * 100)))
+				+ ("\t" + minValueAdjustment)
+		//
+				);
+		// TODO remove SYSTEM.OUT.PRINTLN
 
 		final ValueOverlapChecker posChecker = new ValueOverlapChecker(_stackedValues);
 
@@ -178,6 +196,7 @@ public class ChartLayerSegmentAltitude implements IChartLayer, IChartOverlay {
 						// prevent that hovering is recognized
 						chartLabel.paintedLabel = null;
 						chartLabel.hoveredLabel = null;
+						chartLabel.hoveredRect = null;
 
 						continue;
 					}
@@ -202,6 +221,7 @@ public class ChartLayerSegmentAltitude implements IChartLayer, IChartOverlay {
 
 			final int devYGraph = (int) ((yValue - graphYBottom) * scaleY);
 			final int devYSegment = devYBottom - devYGraph;
+			final int segmentHeight = devYSegment - devYPrev;
 
 			/*
 			 * Get up/down value
@@ -222,13 +242,13 @@ public class ChartLayerSegmentAltitude implements IChartLayer, IChartOverlay {
 				// check values if they are small enough
 
 				if (altiDiff >= 0) {
-					if (altiDiff < maxGraphValue) {
+					if (altiDiff < hideThreshold) {
 						isShowValueText = false;
 					}
 				} else {
 
 					// diff <0
-					if (-altiDiff < maxGraphValue) {
+					if (-altiDiff < hideThreshold) {
 						isShowValueText = false;
 					}
 				}
@@ -276,9 +296,23 @@ public class ChartLayerSegmentAltitude implements IChartLayer, IChartOverlay {
 				}
 
 				chartLabel.paintedX1 = devXPrev;
-				chartLabel.paintedX2 = devXSegment;
 				chartLabel.paintedY1 = devYPrev;
+				chartLabel.paintedX2 = devXSegment;
 				chartLabel.paintedY2 = devYSegment;
+
+				int hoveredHeight = segmentHeight < 0 ? -segmentHeight : segmentHeight;
+				int devYHovered = devYPrev < devYSegment ? devYPrev : devYSegment;
+				if (hoveredHeight < ChartLabel.MIN_HOVER_LINE_HEIGHT) {
+					hoveredHeight = ChartLabel.MIN_HOVER_LINE_HEIGHT;
+					devYHovered -= ChartLabel.MIN_HOVER_LINE_HEIGHT / 2;
+				}
+
+				chartLabel.hoveredRect = new Rectangle(//
+						devXPrev,
+						devYHovered,
+						segmentWidth,
+						hoveredHeight);
+
 				chartLabel.paintedRGB = upDownColor.getRGB();
 			}
 
@@ -314,7 +348,7 @@ public class ChartLayerSegmentAltitude implements IChartLayer, IChartOverlay {
 					/*
 					 * get default y position
 					 */
-					final float yDiff2 = (devYSegment - devYPrev) / 2;
+					final float yDiff2 = segmentHeight / 2;
 					final int devYText = (int) (devYSegment - yDiff2 + (isValueUp ? -textHeight : 0));
 
 					/*
@@ -412,6 +446,7 @@ public class ChartLayerSegmentAltitude implements IChartLayer, IChartOverlay {
 			final ChartLabel chartLabel = allChartLabels[segmentIndex];
 			chartLabel.paintedLabel = null;
 			chartLabel.hoveredLabel = null;
+			chartLabel.hoveredRect = null;
 		}
 
 		// reset clipping
@@ -452,10 +487,19 @@ public class ChartLayerSegmentAltitude implements IChartLayer, IChartOverlay {
 		if (isHovered) {
 
 			final Rectangle paintedLabel = hoveredLabel.hoveredLabel;
-			final int arc = 10;
-			gc.setAlpha(isSelected ? 0x60 : 0x30);
-			gc.setBackground(colorHovered);
-			gc.fillRoundRectangle(paintedLabel.x, paintedLabel.y, paintedLabel.width, paintedLabel.height, arc, arc);
+			if (paintedLabel != null) {
+
+				final int arc = 10;
+				gc.setAlpha(isSelected ? 0x60 : 0x30);
+				gc.setBackground(colorHovered);
+				gc.fillRoundRectangle(//
+						paintedLabel.x,//
+						paintedLabel.y,
+						paintedLabel.width,
+						paintedLabel.height,
+						arc,
+						arc);
+			}
 
 			/*
 			 * Draw line thicker
@@ -529,7 +573,7 @@ public class ChartLayerSegmentAltitude implements IChartLayer, IChartOverlay {
 			 * Paint polyline
 			 */
 			gc.setAlpha(0x60);
-			gc.setLineWidth(15);
+			gc.setLineWidth(9);
 			gc.setForeground(SYSTEM_COLOR_0);
 			gc.setLineCap(SWT.CAP_ROUND);
 			gc.setAntialias(SWT.ON);
@@ -584,10 +628,12 @@ public class ChartLayerSegmentAltitude implements IChartLayer, IChartOverlay {
 		for (final ChartLabel chartLabel : _chartLabels) {
 
 			final Rectangle hoveredLabel = chartLabel.hoveredLabel;
+			final Rectangle hoveredRect = chartLabel.hoveredRect;
 
-			if (hoveredLabel != null && hoveredLabel.contains(devXMouse, devYMouse)) {
+			if ((hoveredLabel != null && hoveredLabel.contains(devXMouse, devYMouse))
+					|| (hoveredRect != null && hoveredRect.contains(devXMouse, devYMouse))) {
 
-				// label is hit
+				// segment is hit
 				return chartLabel;
 			}
 		}
@@ -613,10 +659,10 @@ public class ChartLayerSegmentAltitude implements IChartLayer, IChartOverlay {
 		_lineOpacity = (int) (lineOpacity / 100.0 * 255);
 	}
 
-	void setSmallHiddenValuesProperties(final boolean isHideSmallValues, final int hiddenValueSize) {
+	void setSmallHiddenValuesProperties(final boolean isHideSmallValues, final int smallValue) {
 
 		_isHideSmallValues = isHideSmallValues;
-		_hiddenValueSize = hiddenValueSize / 10.0 / 100.0;
+		_smallValue = smallValue / 100.0;
 	}
 
 	void setStackedValues(final int stackedValues) {

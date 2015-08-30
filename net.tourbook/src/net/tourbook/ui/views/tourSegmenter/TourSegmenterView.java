@@ -157,7 +157,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	public static final String						STATE_IS_SEGMENTER_ACTIVE						= "STATE_IS_SEGMENTER_ACTIVE";				//$NON-NLS-1$
 
 	public static final String						STATE_IS_HIDE_SMALL_VALUES						= "STATE_IS_HIDE_SMALL_VALUES";			//$NON-NLS-1$
-	public static final boolean						STATE_IS_HIDE_SMALL_VALUES_DEFAULT				= false;
+	public static final boolean						STATE_IS_HIDE_SMALL_VALUES_DEFAULT				= true;
 	public static final String						STATE_IS_SHOW_SEGMENTER_DECIMAL_PLACES			= "STATE_IS_SHOW_SEGMENTER_DECIMAL_PLACES"; //$NON-NLS-1$
 	public static final boolean						STATE_IS_SHOW_SEGMENTER_DECIMAL_PLACES_DEFAULT	= false;
 	public static final String						STATE_IS_SHOW_SEGMENTER_LINE					= "STATE_IS_SHOW_SEGMENTER_LINE";			//$NON-NLS-1$
@@ -173,7 +173,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	public static final String						STATE_LINE_OPACITY								= "STATE_LINE_OPACITY";					//$NON-NLS-1$
 	public static final int							STATE_LINE_OPACITY_DEFAULT						= 50;
 	public static final String						STATE_SMALL_VALUE_SIZE							= "STATE_SMALL_VALUE_SIZE";				//$NON-NLS-1$
-	public static final int							STATE_SMALL_VALUE_SIZE_DEFAULT					= 10;
+	public static final int							STATE_SMALL_VALUE_SIZE_DEFAULT					= 50;
 	public static final String						STATE_STACKED_VISIBLE_VALUES					= "STATE_STACKED_VISIBLE_VALUES";			//$NON-NLS-1$
 	public static final int							STATE_STACKED_VISIBLE_VALUES_DEFAULT			= 0;
 
