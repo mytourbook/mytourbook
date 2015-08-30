@@ -17,6 +17,9 @@ package net.tourbook.chart;
 
 import java.util.ArrayList;
 
+import net.tourbook.common.UI;
+import net.tourbook.common.util.StatusUtil;
+
 /**
  * Contains the highValues and display attributes for one data serie
  */
@@ -633,17 +636,30 @@ public class ChartDataYSerie extends ChartDataSerie {
 
 			_highValuesFloat = valueSeries;
 
-			// calculate min/max highValues
-			for (final float[] valueSerie : valueSeries) {
+			for (int serieIndex = 0; serieIndex < valueSeries.length; serieIndex++) {
+
+				final float[] valueSerie = valueSeries[serieIndex];
 
 				if (valueSerie == null) {
 					continue;
 				}
 
-				for (final float value : valueSerie) {
+				for (int valueIndex = 0; valueIndex < valueSerie.length; valueIndex++) {
 
+					final float value = valueSerie[valueIndex];
 					if (value != value) {
 						// ignore Nan
+						continue;
+					}
+
+					if (value == Float.POSITIVE_INFINITY) {
+
+						// ignore infinity
+
+						StatusUtil.log(new Exception((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
+								+ ("\tserieIndex:" + serieIndex)
+								+ ("\tvalueIndex:" + valueIndex)));
+
 						continue;
 					}
 
