@@ -5001,33 +5001,10 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 			final long gearRaw = gearSerie[gearIndex];
 
 			final float frontTeeth = (gearRaw >> 24 & 0xff);
-			float rearTeeth = (gearRaw >> 8 & 0xff);
+			final float rearTeeth = (gearRaw >> 8 & 0xff);
 
 			final float frontGearNo = (gearRaw >> 16 & 0xff);
 			final float rearGearNo = (gearRaw >> 0 & 0xff);
-
-			if (rearTeeth == 0) {
-
-				/**
-				 * This case happened but it should not. After checking the raw data they contained
-				 * the wrong values.
-				 * <p>
-				 * <code>
-				 * 
-				 *  2015-08-30 08:12:50.092'345 [FitContextData]
-				 * 
-				 * 	Gears: GearData [absoluteTime=2015-08-27T17:39:08.000+02:00,
-				 * 			FrontGearNum=2,
-				 * 			FrontGearTeeth=50,
-				 * 			RearGearNum=172,
-				 * 			RearGearTeeth=0]
-				 * </code>
-				 */
-
-				StatusUtil.log(new Exception("Wrong gear data, rearTeeth=0"));
-
-				rearTeeth = 1;
-			}
 
 			final float gearRatio = frontTeeth / rearTeeth;
 

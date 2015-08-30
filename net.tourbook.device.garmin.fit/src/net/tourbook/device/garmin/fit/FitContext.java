@@ -168,6 +168,37 @@ public class FitContext {
 						startGear = gearData;
 					}
 
+					final int rearTeeth = gearData.getRearGearTeeth();
+
+					if (rearTeeth == 0) {
+
+						/**
+						 * This case happened but it should not. After checking the raw data they
+						 * contained the wrong values.
+						 * <p>
+						 * <code>
+						 * 
+						 *  2015-08-30 08:12:50.092'345 [FitContextData]
+						 * 
+						 * 	Gears: GearData [absoluteTime=2015-08-27T17:39:08.000+02:00,
+						 * 			FrontGearNum	= 2,
+						 * 			FrontGearTeeth	= 50,
+						 * 			RearGearNum		= 172,	<---
+						 * 			RearGearTeeth	= 0		<---
+						 * ]
+						 * </code>
+						 */
+
+//						StatusUtil.log(new Exception("Wrong gear data, rearTeeth=0"));
+
+						/*
+						 * Set valid value but make it visible that the values are wrong, visible
+						 * value is 0x10 / 0x30 = 0.33
+						 */
+
+						gearData.gears = 0x10013001;
+					}
+
 					if (gearTime >= tourStartTime && gearTime <= tourEndTime) {
 
 						// set initial gears when available
