@@ -79,25 +79,12 @@ public class ChartLayerSegmentValue implements IChartLayer {
 	}
 
 	/**
-	 * Draws the marker(s) for the current graph config
-	 * 
-	 * @param gc
-	 * @param graphDrawingData
-	 * @param chartComponents
 	 */
 	@Override
 	public void draw(	final GC gc,
 						final GraphDrawingData graphDrawingData,
 						final Chart chart,
 						final PixelConverter pixelConverter) {
-
-		final int[] segmentSerieIndex = _tourData.segmentSerieIndex;
-
-		if (segmentSerieIndex == null) {
-			return;
-		}
-
-		final int segmentSerieSize = segmentSerieIndex.length;
 
 		final ChartDataYSerie yData = graphDrawingData.getYData();
 
@@ -129,13 +116,16 @@ public class ChartLayerSegmentValue implements IChartLayer {
 		final double scaleX = graphDrawingData.getScaleX();
 		final double scaleY = graphDrawingData.getScaleY();
 
-		final double maxValue = yData.getOriginalMaxValue();
 		final double minValueAdjustment = segmentConfig.minValueAdjustment;
-		final double hiddenThreshold = maxValue * _smallValue * minValueAdjustment;
+		final double maxValue = yData.getOriginalMaxValue();
+		final double hideThreshold = maxValue * _smallValue * minValueAdjustment;
+
+		final int[] segmentSerieIndex = _tourData.segmentSerieIndex;
+		final int segmentSerieSize = segmentSerieIndex.length;
 
 		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] \t")
 				+ ("\t" + String.format("%9.2f  ", maxValue))
-				+ ("\t" + String.format("%9.2f  ", hiddenThreshold))
+				+ ("\t" + String.format("%9.2f  ", hideThreshold))
 				+ ("\t" + String.format("%3d  ", (int) (_smallValue * 100)))
 				+ ("\t" + minValueAdjustment)
 		//
@@ -225,13 +215,13 @@ public class ChartLayerSegmentValue implements IChartLayer {
 					// check values if they are small enough
 
 					if (graphYValue >= 0) {
-						if (graphYValue < hiddenThreshold) {
+						if (graphYValue < hideThreshold) {
 							isShowSegment = false;
 						}
 					} else {
 
 						// value <0
-						if (-graphYValue < hiddenThreshold) {
+						if (-graphYValue < hideThreshold) {
 							isShowSegment = false;
 						}
 					}

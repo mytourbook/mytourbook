@@ -100,11 +100,6 @@ public class ChartLayerSegmentAltitude implements IChartLayer, IChartOverlay {
 	}
 
 	/**
-	 * Draws the marker(s) for the current graph config
-	 * 
-	 * @param gc
-	 * @param graphDrawingData
-	 * @param fChartComponents
 	 */
 	@Override
 	public void draw(	final GC gc,
@@ -124,7 +119,6 @@ public class ChartLayerSegmentAltitude implements IChartLayer, IChartOverlay {
 		final int devYTop = graphDrawingData.getDevYTop();
 		final int devYBottom = graphDrawingData.getDevYBottom();
 		final long devGraphImageXOffset = chart.getXXDevViewPortLeftBorder();
-//		final int devGraphHeight = drawingData.devGraphHeight;
 
 		final float graphYBottom = graphDrawingData.getGraphYBottom();
 		final float[] yValues = yData.getHighValuesFloat()[0];

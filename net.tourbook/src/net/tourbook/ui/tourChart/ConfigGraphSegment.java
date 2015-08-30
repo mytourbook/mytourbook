@@ -24,6 +24,10 @@ import org.eclipse.swt.graphics.Rectangle;
 public class ConfigGraphSegment {
 
 	float[]				segmentDataSerie;
+
+	/**
+	 * When <code>null</code> then the value is painted with 1 digit.
+	 */
 	IValueLabelProvider	labelProvider;
 
 	/**
@@ -41,21 +45,9 @@ public class ConfigGraphSegment {
 	double				minValueAdjustment;
 
 	/**
-	 * @param segmentDataSerie
-	 * @param labelProvider
-	 * @param canHaveNegativeValues
 	 * @param graphColorName
 	 */
-	public ConfigGraphSegment(	final float[] segmentDataSerie,
-								final IValueLabelProvider labelProvider,
-								final boolean canHaveNegativeValues,
-								final String graphColorName,
-								final double minValueAdjustment) {
-
-		this.segmentDataSerie = segmentDataSerie;
-		this.canHaveNegativeValues = canHaveNegativeValues;
-		this.labelProvider = labelProvider;
-		this.minValueAdjustment = minValueAdjustment;
+	public ConfigGraphSegment(final String graphColorName) {
 
 		segmentLineRGB = TourManager.getGraphColor(graphColorName, GraphColorManager.PREF_COLOR_TEXT);
 	}

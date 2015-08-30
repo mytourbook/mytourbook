@@ -3117,61 +3117,53 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 			final IValueLabelProvider labelProviderInt = TourManager.getLabelProviderInt();
 			final IValueLabelProvider labelProviderMMSS = TourManager.getLabelProviderMMSS();
 
-			segmentConfigAltitude = new ConfigGraphSegment(
-					_tourData.segmentSerieAltitudeDiff,
-					labelProviderInt,
-					true,
-					GraphColorManager.PREF_GRAPH_ALTITUDE,
-					0.1);
+			segmentConfigAltitude = new ConfigGraphSegment(GraphColorManager.PREF_GRAPH_ALTITUDE);
+			segmentConfigAltitude.segmentDataSerie = _tourData.segmentSerieAltitudeDiff;
+			segmentConfigAltitude.labelProvider = labelProviderInt;
+			segmentConfigAltitude.canHaveNegativeValues = true;
+			segmentConfigAltitude.minValueAdjustment = 0.1;
 
-			segmentConfigPulse = new ConfigGraphSegment(
-					_tourData.segmentSeriePulse,
-					null,
-					false,
-					GraphColorManager.PREF_GRAPH_HEARTBEAT,
-					Double.MIN_VALUE);
+			segmentConfigPulse = new ConfigGraphSegment(GraphColorManager.PREF_GRAPH_HEARTBEAT);
+			segmentConfigPulse.segmentDataSerie = _tourData.segmentSeriePulse;
+			segmentConfigPulse.labelProvider = null;
+			segmentConfigPulse.canHaveNegativeValues = false;
+			segmentConfigPulse.minValueAdjustment = Double.MIN_VALUE;
 
-			segmentConfigSpeed = new ConfigGraphSegment(
-					_tourData.segmentSerieSpeed,
-					null,
-					false,
-					GraphColorManager.PREF_GRAPH_SPEED,
-					Double.MIN_VALUE);
+			segmentConfigSpeed = new ConfigGraphSegment(GraphColorManager.PREF_GRAPH_SPEED);
+			segmentConfigSpeed.segmentDataSerie = _tourData.segmentSerieSpeed;
+			segmentConfigSpeed.labelProvider = null;
+			segmentConfigSpeed.canHaveNegativeValues = false;
+			segmentConfigSpeed.minValueAdjustment = Double.MIN_VALUE;
 
-			segmentConfigPace = new ConfigGraphSegment(
-					_tourData.segmentSeriePace,
-					labelProviderMMSS,
-					false,
-					GraphColorManager.PREF_GRAPH_PACE,
-					Double.MIN_VALUE);
+			segmentConfigPace = new ConfigGraphSegment(GraphColorManager.PREF_GRAPH_PACE);
+			segmentConfigPace.segmentDataSerie = _tourData.segmentSeriePace;
+			segmentConfigPace.labelProvider = labelProviderMMSS;
+			segmentConfigPace.canHaveNegativeValues = false;
+			segmentConfigPace.minValueAdjustment = Double.MIN_VALUE;
 
-			segmentConfigPower = new ConfigGraphSegment(
-					_tourData.segmentSeriePower,
-					labelProviderInt,
-					false,
-					GraphColorManager.PREF_GRAPH_POWER,
-					0.5);
+			segmentConfigPower = new ConfigGraphSegment(GraphColorManager.PREF_GRAPH_POWER);
+			segmentConfigPower.segmentDataSerie = _tourData.segmentSeriePower;
+			segmentConfigPower.labelProvider = labelProviderInt;
+			segmentConfigPower.canHaveNegativeValues = false;
+			segmentConfigPower.minValueAdjustment = 0.5;
 
-			segmentConfigGradient = new ConfigGraphSegment(
-					_tourData.segmentSerieGradient,
-					null,
-					true,
-					GraphColorManager.PREF_GRAPH_GRADIENT,
-					0.5);
+			segmentConfigGradient = new ConfigGraphSegment(GraphColorManager.PREF_GRAPH_GRADIENT);
+			segmentConfigGradient.segmentDataSerie = _tourData.segmentSerieGradient;
+			segmentConfigGradient.labelProvider = null;
+			segmentConfigGradient.canHaveNegativeValues = true;
+			segmentConfigGradient.minValueAdjustment = 0.5;
 
-			segmentConfigAltimeter = new ConfigGraphSegment(
-					_tourData.segmentSerieAltitudeUpH,
-					labelProviderInt,
-					true,
-					GraphColorManager.PREF_GRAPH_ALTIMETER,
-					0.5);
+			segmentConfigAltimeter = new ConfigGraphSegment(GraphColorManager.PREF_GRAPH_ALTIMETER);
+			segmentConfigAltimeter.segmentDataSerie = _tourData.segmentSerieAltitudeUpH;
+			segmentConfigAltimeter.labelProvider = labelProviderInt;
+			segmentConfigAltimeter.canHaveNegativeValues = true;
+			segmentConfigAltimeter.minValueAdjustment = 0.5;
 
-			segmentConfigCadence = new ConfigGraphSegment(
-					_tourData.segmentSerieCadence,
-					null,
-					false,
-					GraphColorManager.PREF_GRAPH_CADENCE,
-					Double.MIN_VALUE);
+			segmentConfigCadence = new ConfigGraphSegment(GraphColorManager.PREF_GRAPH_CADENCE);
+			segmentConfigCadence.segmentDataSerie = _tourData.segmentSerieCadence;
+			segmentConfigCadence.labelProvider = null;
+			segmentConfigCadence.canHaveNegativeValues = false;
+			segmentConfigCadence.minValueAdjustment = Double.MIN_VALUE;
 		}
 
 		setupGraphLayer_Layer(TourManager.CUSTOM_DATA_ALTIMETER, yDataWithLabels, segmentConfigAltimeter);
