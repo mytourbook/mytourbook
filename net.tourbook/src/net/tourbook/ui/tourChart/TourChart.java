@@ -15,6 +15,8 @@
  *******************************************************************************/
 package net.tourbook.ui.tourChart;
 
+import gnu.trove.list.array.TIntArrayList;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -2237,6 +2239,52 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		return _selectedSegmentLabel_2;
 	}
 
+	private ArrayList<TIntArrayList> getSelectedLines(	final ChartLabel selectedLabel_1,
+														final ChartLabel selectedLabel_2) {
+
+		final ArrayList<ChartLabel> labelsAltitude = _layerTourSegmenterAltitude.getPaintedLabels();
+		final ArrayList<ArrayList<ChartLabel>> labelsOther = _layerTourSegmenterOther.getPaintedLabels();
+
+		/*
+		 * Get segment start/end indices
+		 */
+		int startIndex = selectedLabel_1.segmentIndex;
+		int endIndex;
+		if (selectedLabel_2 == null) {
+			endIndex = startIndex;
+		} else {
+			endIndex = selectedLabel_2.segmentIndex;
+		}
+
+		// depending how the segments are selected in the UI, start can be larger than end
+		if (startIndex > endIndex) {
+			final int tempIndex = endIndex;
+			endIndex = startIndex;
+			startIndex = tempIndex;
+		}
+
+		/*
+		 * Create poline for all selected segments
+		 */
+		final ArrayList<TIntArrayList> selectedLines = new ArrayList<>();
+
+		if (labelsAltitude.size() > 0) {
+
+			final TIntArrayList selectedLine = getSelectedValues_Values(labelsAltitude, startIndex, endIndex);
+
+			selectedLines.add(selectedLine);
+		}
+
+		for (final ArrayList<ChartLabel> selectedLabels : labelsOther) {
+
+			final TIntArrayList selectedLine = getSelectedValues_Values(selectedLabels, startIndex, endIndex);
+
+			selectedLines.add(selectedLine);
+		}
+
+		return selectedLines;
+	}
+
 	TourMarker getSelectedTourMarker() {
 		return _selectedTourMarker;
 	}
@@ -2262,6 +2310,37 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		}
 
 		return tourChartTours;
+	}
+
+	private TIntArrayList getSelectedValues_Values(	final ArrayList<ChartLabel> chartLabels,
+													final int startIndex,
+													final int endIndex) {
+
+		final TIntArrayList selectedLine = new TIntArrayList();
+
+		for (int segmentIndex = startIndex; segmentIndex <= endIndex; segmentIndex++) {
+
+			final ChartLabel selectedLabel = chartLabels.get(segmentIndex);
+
+			if (segmentIndex == startIndex) {
+
+				// first segment
+
+				selectedLine.add(selectedLabel.paintedX1);
+				selectedLine.add(selectedLabel.paintedY1);
+				selectedLine.add(selectedLabel.paintedX2);
+				selectedLine.add(selectedLabel.paintedY2);
+
+			} else {
+
+				// following segments
+
+				selectedLine.add(selectedLabel.paintedX2);
+				selectedLine.add(selectedLabel.paintedY2);
+			}
+		}
+
+		return selectedLine;
 	}
 
 	public Map<String, Action> getTourChartActions() {
@@ -2529,7 +2608,8 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 			_selectedSegmentLabel_2 = null;
 
 			// redraw chart
-			setChartOverlayDirty();
+//			setChartOverlayDirty();
+			setSelectedLines(null);
 
 			return;
 		}
@@ -2564,7 +2644,12 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		fireSegmentLabelSelection(_selectedSegmentLabel_1, _selectedSegmentLabel_2);
 
 		// redraw chart
-		setChartOverlayDirty();
+//		setChartOverlayDirty();
+		final ArrayList<TIntArrayList> selectedLines = getSelectedLines(
+				_selectedSegmentLabel_1,
+				_selectedSegmentLabel_2);
+
+		setSelectedLines(selectedLines);
 	}
 
 	private void onSegmentLabel_MouseMove(final ChartMouseEvent mouseEvent) {

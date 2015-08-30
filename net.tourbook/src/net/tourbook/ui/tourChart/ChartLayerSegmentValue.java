@@ -60,9 +60,9 @@ public class ChartLayerSegmentValue implements IChartLayer {
 	/**
 	 * Area where the graph is painted.
 	 */
-	private ArrayList<Rectangle>				_allGraphArea	= new ArrayList<>();
+	private ArrayList<Rectangle>				_allGraphAreas	= new ArrayList<>();
 
-	private ArrayList<ArrayList<ChartLabel>>	_allChartLabel	= new ArrayList<>();
+	private ArrayList<ArrayList<ChartLabel>>	_allChartLabels	= new ArrayList<>();
 
 	private int									_paintedGraphs;
 
@@ -85,6 +85,17 @@ public class ChartLayerSegmentValue implements IChartLayer {
 						final GraphDrawingData graphDrawingData,
 						final Chart chart,
 						final PixelConverter pixelConverter) {
+
+		/**
+		 * Cleanup hovering data.
+		 * <p>
+		 * Remove previous data, this is a bit tricky because the first graph which is painted in
+		 * this layer can be 1 or 0.
+		 */
+		if (graphDrawingData.graphIndex <= _paintedGraphs) {
+			_allGraphAreas.clear();
+			_allChartLabels.clear();
+		}
 
 		final ChartDataYSerie yData = graphDrawingData.getYData();
 
@@ -141,22 +152,13 @@ public class ChartLayerSegmentValue implements IChartLayer {
 		gc.setFont(_tourChart.getValueFont());
 
 		gc.setLineStyle(SWT.LINE_SOLID);
-
-		/*
-		 * Remove previous data, this is a bit tricky because the first graph which is painted in
-		 * this layer can be 1 or 0.
-		 */
-		if (graphDrawingData.graphIndex <= _paintedGraphs) {
-			_allGraphArea.clear();
-			_allChartLabel.clear();
-		}
 		_paintedGraphs = graphDrawingData.graphIndex;
 
 		final Rectangle graphArea = new Rectangle(0, devYTop, graphWidth, devYBottom - devYTop);
-		_allGraphArea.add(graphArea);
+		_allGraphAreas.add(graphArea);
 
 		final ArrayList<ChartLabel> graphAreaLabels = new ArrayList<>();
-		_allChartLabel.add(graphAreaLabels);
+		_allChartLabels.add(graphAreaLabels);
 
 		// do not draw over the graph area
 		gc.setClipping(graphArea);
@@ -418,9 +420,9 @@ public class ChartLayerSegmentValue implements IChartLayer {
 
 		ChartLabel hoveredLabel = null;
 
-		for (int graphIndex = 0; graphIndex < _allGraphArea.size(); graphIndex++) {
+		for (int graphIndex = 0; graphIndex < _allGraphAreas.size(); graphIndex++) {
 
-			final Rectangle graphArea = _allGraphArea.get(graphIndex);
+			final Rectangle graphArea = _allGraphAreas.get(graphIndex);
 
 			if (graphArea.contains(mouseEvent.devXMouse, mouseEvent.devYMouse)) {
 
@@ -437,7 +439,7 @@ public class ChartLayerSegmentValue implements IChartLayer {
 
 	private ChartLabel getHoveredLabel_10(final int graphIndex, final int devXMouse, final int devYMouse) {
 
-		final ArrayList<ChartLabel> chartLabels = _allChartLabel.get(graphIndex);
+		final ArrayList<ChartLabel> chartLabels = _allChartLabels.get(graphIndex);
 
 		for (final ChartLabel chartLabel : chartLabels) {
 
@@ -453,6 +455,10 @@ public class ChartLayerSegmentValue implements IChartLayer {
 		}
 
 		return null;
+	}
+
+	ArrayList<ArrayList<ChartLabel>> getPaintedLabels() {
+		return _allChartLabels;
 	}
 
 	void setIsShowDecimalPlaces(final boolean isShowDecimalPlaces) {

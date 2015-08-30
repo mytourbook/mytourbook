@@ -15,6 +15,8 @@
  *******************************************************************************/
 package net.tourbook.chart;
 
+import gnu.trove.list.array.TIntArrayList;
+
 import java.io.InputStream;
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -384,6 +386,7 @@ public class ChartComponentGraph extends Canvas {
 	private final ColorCache			_colorCache						= new ColorCache();
 
 	private boolean						_isSelectionVisible;
+	private ArrayList<TIntArrayList>	_selectedLines;
 
 	/**
 	 * Is <code>true</code> when this chart gained the focus, <code>false</code> when the focus is
@@ -4961,16 +4964,38 @@ public class ChartComponentGraph extends Canvas {
 
 			if (chartType == ChartType.LINE) {
 
-//				drawLineSelection(gc, drawingData);
+				drawSync_442_LineSelection(gc, drawingData);
 
 			} else if (chartType == ChartType.BAR) {
 
-				drawSync_442_BarSelection(gc, drawingData);
+				drawSync_444_BarSelection(gc, drawingData);
 			}
 		}
 	}
 
-	private void drawSync_442_BarSelection(final GC gc, final GraphDrawingData drawingData) {
+	private void drawSync_442_LineSelection(final GC gc, final GraphDrawingData drawingData) {
+
+		if (_selectedLines == null) {
+			return;
+		}
+
+		final Color color = _isFocusActive //
+				? Display.getCurrent().getSystemColor(SWT.COLOR_BLUE)
+				: Display.getCurrent().getSystemColor(SWT.COLOR_GRAY);
+
+		gc.setAlpha(0x60);
+		gc.setLineWidth(9);
+		gc.setForeground(color);
+		gc.setLineCap(SWT.CAP_ROUND);
+		gc.setAntialias(SWT.ON);
+
+		// paint polylines
+		for (final TIntArrayList graphLine : _selectedLines) {
+			gc.drawPolyline(graphLine.toArray());
+		}
+	}
+
+	private void drawSync_444_BarSelection(final GC gc, final GraphDrawingData drawingData) {
 
 		// check if multiple bars are selected
 		boolean drawSelection = false;
@@ -7189,21 +7214,6 @@ public class ChartComponentGraph extends Canvas {
 		redraw();
 	}
 
-	/**
-	 * make the graph dirty and redraw it
-	 * 
-	 * @param isGraphDirty
-	 */
-	void redrawBarSelection() {
-
-		if (isDisposed()) {
-			return;
-		}
-
-		_isSelectionDirty = true;
-		redraw();
-	}
-
 	void redrawChart() {
 
 		if (isDisposed()) {
@@ -7222,6 +7232,19 @@ public class ChartComponentGraph extends Canvas {
 
 		_isCustomLayerImageDirty = true;
 
+		redraw();
+	}
+
+	/**
+	 * Make the graph selection dirty and redraw it.
+	 */
+	private void redrawSelection() {
+
+		if (isDisposed()) {
+			return;
+		}
+
+		_isSelectionDirty = true;
 		redraw();
 	}
 
@@ -7285,7 +7308,7 @@ public class ChartComponentGraph extends Canvas {
 
 		_selectedBarItems[selectedIndex] = true;
 
-		redrawBarSelection();
+		redrawSelection();
 
 		return selectedIndex;
 	}
@@ -7333,7 +7356,7 @@ public class ChartComponentGraph extends Canvas {
 
 		_selectedBarItems[selectedIndex] = true;
 
-		redrawBarSelection();
+		redrawSelection();
 
 		return selectedIndex;
 	}
@@ -7706,7 +7729,7 @@ public class ChartComponentGraph extends Canvas {
 					_selectedBarItems[selectedIndex] = true;
 				}
 
-				redrawBarSelection();
+				redrawSelection();
 			}
 			isFocus = true;
 		}
@@ -7799,7 +7822,13 @@ public class ChartComponentGraph extends Canvas {
 
 		_isSelectionVisible = true;
 
-		redrawBarSelection();
+		redrawSelection();
+	}
+
+	void setSelectedLines(final ArrayList<TIntArrayList> selectedLines) {
+
+		_selectedLines = selectedLines;
+		_isSelectionVisible = selectedLines != null && selectedLines.size() > 0;
 	}
 
 	/**

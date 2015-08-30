@@ -18,8 +18,6 @@
  */
 package net.tourbook.ui.tourChart;
 
-import gnu.trove.list.array.TIntArrayList;
-
 import java.text.NumberFormat;
 import java.util.ArrayList;
 
@@ -518,61 +516,61 @@ public class ChartLayerSegmentAltitude implements IChartLayer, IChartOverlay {
 		}
 
 		// draw selected segment
-		if (isSelected) {
-
-			// get start/end index depending which segments are selected
-			int startIndex = selectedLabel_1.segmentIndex;
-			int endIndex;
-			if (selectedLabel_2 == null) {
-				endIndex = startIndex;
-			} else {
-				endIndex = selectedLabel_2.segmentIndex;
-			}
-
-			// depending how the segments are selected, start can be larger than end
-			if (startIndex > endIndex) {
-				final int tempIndex = endIndex;
-				endIndex = startIndex;
-				startIndex = tempIndex;
-			}
-
-			/*
-			 * Create poline for all selected segments
-			 */
-			final TIntArrayList polyLine = new TIntArrayList();
-
-			for (int segmentIndex = startIndex; segmentIndex <= endIndex; segmentIndex++) {
-
-				final ChartLabel selectedLabel = _chartLabels.get(segmentIndex);
-
-				if (segmentIndex == startIndex) {
-
-					// first segment
-
-					polyLine.add(selectedLabel.paintedX1);
-					polyLine.add(selectedLabel.paintedY1);
-					polyLine.add(selectedLabel.paintedX2);
-					polyLine.add(selectedLabel.paintedY2);
-
-				} else {
-
-					// following segments
-
-					polyLine.add(selectedLabel.paintedX2);
-					polyLine.add(selectedLabel.paintedY2);
-				}
-			}
-
-			/*
-			 * Paint polyline
-			 */
-			gc.setAlpha(0x60);
-			gc.setLineWidth(9);
-			gc.setForeground(SYSTEM_COLOR_0);
-			gc.setLineCap(SWT.CAP_ROUND);
-			gc.setAntialias(SWT.ON);
-			gc.drawPolyline(polyLine.toArray());
-		}
+//		if (isSelected) {
+//
+//			// get start/end index depending which segments are selected
+//			int startIndex = selectedLabel_1.segmentIndex;
+//			int endIndex;
+//			if (selectedLabel_2 == null) {
+//				endIndex = startIndex;
+//			} else {
+//				endIndex = selectedLabel_2.segmentIndex;
+//			}
+//
+//			// depending how the segments are selected, start can be larger than end
+//			if (startIndex > endIndex) {
+//				final int tempIndex = endIndex;
+//				endIndex = startIndex;
+//				startIndex = tempIndex;
+//			}
+//
+//			/*
+//			 * Create poline for all selected segments
+//			 */
+//			final TIntArrayList polyLine = new TIntArrayList();
+//
+//			for (int segmentIndex = startIndex; segmentIndex <= endIndex; segmentIndex++) {
+//
+//				final ChartLabel selectedLabel = _chartLabels.get(segmentIndex);
+//
+//				if (segmentIndex == startIndex) {
+//
+//					// first segment
+//
+//					polyLine.add(selectedLabel.paintedX1);
+//					polyLine.add(selectedLabel.paintedY1);
+//					polyLine.add(selectedLabel.paintedX2);
+//					polyLine.add(selectedLabel.paintedY2);
+//
+//				} else {
+//
+//					// following segments
+//
+//					polyLine.add(selectedLabel.paintedX2);
+//					polyLine.add(selectedLabel.paintedY2);
+//				}
+//			}
+//
+//			/*
+//			 * Paint polyline
+//			 */
+//			gc.setAlpha(0x60);
+//			gc.setLineWidth(9);
+//			gc.setForeground(SYSTEM_COLOR_0);
+//			gc.setLineCap(SWT.CAP_ROUND);
+//			gc.setAntialias(SWT.ON);
+//			gc.drawPolyline(polyLine.toArray());
+//		}
 
 		gc.setAlpha(0xff);
 		gc.setClipping((Rectangle) null);
@@ -633,6 +631,10 @@ public class ChartLayerSegmentAltitude implements IChartLayer, IChartOverlay {
 		}
 
 		return null;
+	}
+
+	ArrayList<ChartLabel> getPaintedLabels() {
+		return _chartLabels;
 	}
 
 	void setIsShowDecimalPlaces(final boolean isShowDecimalPlaces) {
