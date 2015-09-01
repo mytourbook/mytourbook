@@ -48,12 +48,16 @@ public class ChartLayerSegmentValue implements IChartLayer {
 	private TourChart							_tourChart;
 	private TourData							_tourData;
 
-	private double								_smallValue;
+	// hide small values
 	private boolean								_isHideSmallValues;
-	private boolean								_isShowDecimalPlaces;
+	private double								_smallValue;
+
+	// show lines
 	private boolean								_isShowSegmenterLine;
-	private boolean								_isShowSegmenterValues;
 	private int									_lineOpacity;
+
+	private boolean								_isShowDecimalPlaces;
+	private boolean								_isShowSegmenterValues;
 	private int									_stackedValues;
 	private double[]							_xDataSerie;
 
@@ -64,7 +68,7 @@ public class ChartLayerSegmentValue implements IChartLayer {
 
 	private ArrayList<ArrayList<ChartLabel>>	_allChartLabels	= new ArrayList<>();
 
-	private int									_paintedGraphs;
+	private int									_paintedGraphIndex;
 
 	private final NumberFormat					_nf1			= NumberFormat.getNumberInstance();
 
@@ -92,7 +96,7 @@ public class ChartLayerSegmentValue implements IChartLayer {
 		 * Remove previous data, this is a bit tricky because the first graph which is painted in
 		 * this layer can be 1 or 0.
 		 */
-		if (graphDrawingData.graphIndex <= _paintedGraphs) {
+		if (graphDrawingData.graphIndex <= _paintedGraphIndex) {
 			_allGraphAreas.clear();
 			_allChartLabels.clear();
 		}
@@ -111,6 +115,10 @@ public class ChartLayerSegmentValue implements IChartLayer {
 		if (segmentValues == null) {
 			return;
 		}
+
+		_tourChart.setLineSelectionDirty();
+
+		_paintedGraphIndex = graphDrawingData.graphIndex;
 
 		final IValueLabelProvider segmentLabelProvider = segmentConfig.labelProvider;
 
@@ -134,25 +142,26 @@ public class ChartLayerSegmentValue implements IChartLayer {
 		final int[] segmentSerieIndex = _tourData.segmentSerieIndex;
 		final int segmentSerieSize = segmentSerieIndex.length;
 
-		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] \t")
-				+ ("\t" + String.format("%9.2f  ", maxValue))
-				+ ("\t" + String.format("%9.2f  ", hideThreshold))
-				+ ("\t" + String.format("%3d  ", (int) (_smallValue * 100)))
-				+ ("\t" + minValueAdjustment)
-		//
-				);
-		// TODO remove SYSTEM.OUT.PRINTLN
+//		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] \t")
+//				+ ("\t" + String.format("%9.2f  ", maxValue))
+//				+ ("\t" + String.format("%9.2f  ", hideThreshold))
+//				+ ("\t" + String.format("%3d  ", (int) (_smallValue * 100)))
+//				+ ("\t" + minValueAdjustment)
+//		//
+//				);
+//		// TODO remove SYSTEM.OUT.PRINTLN
 
 		final ValueOverlapChecker posChecker = new ValueOverlapChecker(_stackedValues);
 
+		int devXPrev = Integer.MIN_VALUE;
+
 		final Display display = Display.getCurrent();
 
-		// setup font
+		// setup font for values
 		final Font fontBackup = gc.getFont();
 		gc.setFont(_tourChart.getValueFont());
 
 		gc.setLineStyle(SWT.LINE_SOLID);
-		_paintedGraphs = graphDrawingData.graphIndex;
 
 		final Rectangle graphArea = new Rectangle(0, devYTop, graphWidth, devYBottom - devYTop);
 		_allGraphAreas.add(graphArea);
@@ -165,10 +174,10 @@ public class ChartLayerSegmentValue implements IChartLayer {
 
 		final Color lineColor = new Color(display, segmentConfig.segmentLineRGB);
 		gc.setForeground(lineColor);
-		{
-			int devXPrev = Integer.MIN_VALUE;
 
+		{
 			int segmentIndex;
+
 			for (segmentIndex = 0; segmentIndex < segmentSerieSize; segmentIndex++) {
 
 				// get current value
@@ -210,7 +219,7 @@ public class ChartLayerSegmentValue implements IChartLayer {
 				final int devYGraph = (int) (scaleY * (graphYValue - graphYBottom));
 				final int devYSegment = devYBottom - devYGraph;
 
-				boolean isShowSegment = true;
+				boolean isShowValueText = true;
 
 				if (_isHideSmallValues) {
 
@@ -218,18 +227,18 @@ public class ChartLayerSegmentValue implements IChartLayer {
 
 					if (graphYValue >= 0) {
 						if (graphYValue < hideThreshold) {
-							isShowSegment = false;
+							isShowValueText = false;
 						}
 					} else {
 
 						// value <0
 						if (-graphYValue < hideThreshold) {
-							isShowSegment = false;
+							isShowValueText = false;
 						}
 					}
 				}
 
-				if (isShowSegment) {
+				if (isShowValueText) {
 
 					/*
 					 * Get value text
@@ -286,11 +295,14 @@ public class ChartLayerSegmentValue implements IChartLayer {
 						chartLabel.paintedX2 = devXSegment;
 						chartLabel.paintedY2 = devYSegment;
 
+						final int hoveredHeight = ChartLabel.MIN_HOVER_LINE_HEIGHT;
+						final int devYHovered = devYSegment - hoveredHeight / 2;
+
 						chartLabel.hoveredRect = new Rectangle(//
 								devXPrev,
-								devYSegment - ChartLabel.MIN_HOVER_LINE_HEIGHT / 2,
+								devYHovered,
 								segmentWidth,
-								ChartLabel.MIN_HOVER_LINE_HEIGHT);
+								hoveredHeight);
 
 						chartLabel.paintedRGB = segmentConfig.segmentLineRGB;
 
@@ -373,11 +385,11 @@ public class ChartLayerSegmentValue implements IChartLayer {
 
 								chartLabel.hoveredLabel = hoveredRect;
 
-//							/*
-//							 * Debugging
-//							 */
-//							gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_GRAY));
-//							gc.drawRectangle(hoveredRect);
+//								/*
+//								 * Debugging
+//								 */
+//								gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_GRAY));
+//								gc.drawRectangle(hoveredRect);
 							}
 						}
 					}
@@ -409,6 +421,8 @@ public class ChartLayerSegmentValue implements IChartLayer {
 
 		// restore font
 		gc.setFont(fontBackup);
+
+		gc.setAlpha(0xff);
 	}
 
 	/**
@@ -486,7 +500,12 @@ public class ChartLayerSegmentValue implements IChartLayer {
 	}
 
 	void setTourData(final TourData tourData) {
+
 		_tourData = tourData;
+
+		// initialize painted labels
+		_allChartLabels.clear();
+		_allGraphAreas.clear();
 	}
 
 	void setXDataSerie(final double[] dataSerie) {

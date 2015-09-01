@@ -15,8 +15,6 @@
  *******************************************************************************/
 package net.tourbook.chart;
 
-import gnu.trove.list.array.TIntArrayList;
-
 import java.io.InputStream;
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -386,7 +384,6 @@ public class ChartComponentGraph extends Canvas {
 	private final ColorCache			_colorCache						= new ColorCache();
 
 	private boolean						_isSelectionVisible;
-	private ArrayList<TIntArrayList>	_selectedLines;
 
 	/**
 	 * Is <code>true</code> when this chart gained the focus, <code>false</code> when the focus is
@@ -443,6 +440,8 @@ public class ChartComponentGraph extends Canvas {
 	 * Configuration how the chart info is displayed.
 	 */
 	ChartSegmentConfig					chartSegmentConfig				= new ChartSegmentConfig();
+
+	private ILineSelectionPainter		_lineSelectionPainter;
 
 	/**
 	 * Constructor
@@ -4465,8 +4464,8 @@ public class ChartComponentGraph extends Canvas {
 					layer.draw(gcCustom, graphDrawingData, _chart, _pc);
 				}
 			}
-			System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") + ("\t"));
-			// TODO remove SYSTEM.OUT.PRINTLN
+//			System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") + ("\t"));
+//			// TODO remove SYSTEM.OUT.PRINTLN
 
 		} finally {
 			gcCustom.dispose();
@@ -4959,39 +4958,22 @@ public class ChartComponentGraph extends Canvas {
 
 		final ChartType chartType = _chart.getChartDataModel().getChartType();
 
-		// loop: all graphs
-		for (final GraphDrawingData drawingData : _allGraphDrawingData) {
+		if (chartType == ChartType.LINE) {
 
-			if (chartType == ChartType.LINE) {
-
-				drawSync_442_LineSelection(gc, drawingData);
-
-			} else if (chartType == ChartType.BAR) {
-
-				drawSync_444_BarSelection(gc, drawingData);
+			if (_isSelectionVisible && _lineSelectionPainter != null) {
+				_lineSelectionPainter.drawSelectedLines(gc, _allGraphDrawingData, _isFocusActive);
 			}
-		}
-	}
 
-	private void drawSync_442_LineSelection(final GC gc, final GraphDrawingData drawingData) {
+		} else {
 
-		if (_selectedLines == null) {
-			return;
-		}
+			// loop: all graphs
+			for (final GraphDrawingData drawingData : _allGraphDrawingData) {
 
-		final Color color = _isFocusActive //
-				? Display.getCurrent().getSystemColor(SWT.COLOR_BLUE)
-				: Display.getCurrent().getSystemColor(SWT.COLOR_GRAY);
+				if (chartType == ChartType.BAR) {
 
-		gc.setAlpha(0x60);
-		gc.setLineWidth(9);
-		gc.setForeground(color);
-		gc.setLineCap(SWT.CAP_ROUND);
-		gc.setAntialias(SWT.ON);
-
-		// paint polylines
-		for (final TIntArrayList graphLine : _selectedLines) {
-			gc.drawPolyline(graphLine.toArray());
+					drawSync_444_BarSelection(gc, drawingData);
+				}
+			}
 		}
 	}
 
@@ -7799,6 +7781,10 @@ public class ChartComponentGraph extends Canvas {
 		redraw();
 	}
 
+	public void setLineSelectionPainter(final ILineSelectionPainter _lineSelectionPainter) {
+		this._lineSelectionPainter = _lineSelectionPainter;
+	}
+
 	void setSelectedBars(final boolean[] selectedItems) {
 
 		if (selectedItems == null) {
@@ -7825,10 +7811,11 @@ public class ChartComponentGraph extends Canvas {
 		redrawSelection();
 	}
 
-	void setSelectedLines(final ArrayList<TIntArrayList> selectedLines) {
+	void setSelectedLines(final boolean isSelectionVisible) {
 
-		_selectedLines = selectedLines;
-		_isSelectionVisible = selectedLines != null && selectedLines.size() > 0;
+		_isSelectionVisible = isSelectionVisible;
+
+		redrawSelection();
 	}
 
 	/**
@@ -8458,6 +8445,10 @@ public class ChartComponentGraph extends Canvas {
 			}
 			labelIndex++;
 		}
+	}
+
+	public ILineSelectionPainter xxxget_lineSelectionPainter() {
+		return _lineSelectionPainter;
 	}
 
 	/**

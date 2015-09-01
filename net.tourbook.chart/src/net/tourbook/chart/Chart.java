@@ -15,9 +15,6 @@
  *******************************************************************************/
 package net.tourbook.chart;
 
-import gnu.trove.list.array.TIntArrayList;
-
-import java.util.ArrayList;
 import java.util.HashMap;
 
 import net.tourbook.common.form.ViewForm;
@@ -1071,6 +1068,11 @@ public class Chart extends ViewForm {
 		_chartComponents.getChartComponentGraph().setHoveredTour(tourSegment);
 	}
 
+	public void setLineSelectionPainter(final ILineSelectionPainter lineSelectionPainter) {
+
+		_chartComponents.getChartComponentGraph().setLineSelectionPainter(lineSelectionPainter);
+	}
+
 	/**
 	 * Sets the mouse mode, when <code>true</code> the mode {@link #MOUSE_MODE_SLIDER} is active,
 	 * this is the default
@@ -1127,9 +1129,9 @@ public class Chart extends ViewForm {
 		fireBarSelectionEvent(0, _barSelectionValueIndex);
 	}
 
-	public void setSelectedLines(final ArrayList<TIntArrayList> selectedLines) {
+	public void setSelectedLines(final boolean isSelectionVisible) {
 
-		_chartComponents.getChartComponentGraph().setSelectedLines(selectedLines);
+		_chartComponents.getChartComponentGraph().setSelectedLines(isSelectionVisible);
 	}
 
 	/**

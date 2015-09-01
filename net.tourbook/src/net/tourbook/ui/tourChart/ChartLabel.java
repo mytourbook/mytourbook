@@ -116,7 +116,10 @@ public class ChartLabel {
 	public int				devYTop;
 	public int				devGraphWidth;
 
-	int						paintedX1;
+	/**
+	 * {@link Integer#MIN_VALUE} is a flag that this value is not yet set.
+	 */
+	int						paintedX1				= Integer.MIN_VALUE;
 	int						paintedX2;
 	int						paintedY1;
 	int						paintedY2;
