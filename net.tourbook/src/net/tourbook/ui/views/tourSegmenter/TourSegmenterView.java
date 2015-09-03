@@ -171,11 +171,11 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	public static final String						STATE_GRAPH_OPACITY								= "STATE_GRAPH_OPACITY";					//$NON-NLS-1$
 	public static final int							STATE_GRAPH_OPACITY_DEFAULT						= 10;
 	public static final String						STATE_LINE_OPACITY								= "STATE_LINE_OPACITY";					//$NON-NLS-1$
-	public static final int							STATE_LINE_OPACITY_DEFAULT						= 50;
+	public static final int							STATE_LINE_OPACITY_DEFAULT						= 100;
 	public static final String						STATE_SMALL_VALUE_SIZE							= "STATE_SMALL_VALUE_SIZE";				//$NON-NLS-1$
 	public static final int							STATE_SMALL_VALUE_SIZE_DEFAULT					= 50;
 	public static final String						STATE_STACKED_VISIBLE_VALUES					= "STATE_STACKED_VISIBLE_VALUES";			//$NON-NLS-1$
-	public static final int							STATE_STACKED_VISIBLE_VALUES_DEFAULT			= 0;
+	public static final int							STATE_STACKED_VISIBLE_VALUES_DEFAULT			= 1;
 
 	private static final int						COLUMN_DEFAULT									= 0;										// sort by time
 	private static final int						COLUMN_SPEED									= 10;
@@ -968,7 +968,10 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 			graphPoints[serieIndex] = new DPPoint(distanceSerie[serieIndex], altitudeSerie[serieIndex], serieIndex);
 		}
 
-		final Object[] dpPoints = new DouglasPeuckerSimplifier(_dpToleranceAltitude, graphPoints).simplify();
+		final Object[] dpPoints = new DouglasPeuckerSimplifier(//
+				_dpToleranceAltitude,
+				graphPoints,
+				getForcedIndices()).simplify();
 
 		/*
 		 * copie the data index for the simplified points into the tour data
@@ -996,14 +999,30 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		// convert data series into dp points
 		final DPPoint graphPoints[] = new DPPoint[serieSize];
 		for (int serieIndex = 0; serieIndex < graphPoints.length; serieIndex++) {
-			graphPoints[serieIndex] = new DPPoint(distanceSerie[serieIndex], altitudeSerie[serieIndex], serieIndex);
+
+			graphPoints[serieIndex] = new DPPoint(//
+					distanceSerie[serieIndex],
+					altitudeSerie[serieIndex],
+					serieIndex);
 		}
 
-		final Object[] simplePoints = new DouglasPeuckerSimplifier(_dpToleranceAltitude, graphPoints).simplify();
+		final int[] forcedIndices = getForcedIndices();
+
+		final Object[] simplePoints = new DouglasPeuckerSimplifier(//
+				_dpToleranceAltitude,
+				graphPoints,
+				forcedIndices).simplify();
 
 		/*
 		 * copie the data index for the simplified points into the tour data
 		 */
+
+		int forcedIndex = 0;
+		int forcedIndexIndex = 0;
+		if (forcedIndices != null && forcedIndices.length > 0) {
+			forcedIndexIndex++;
+			forcedIndex = forcedIndices[forcedIndexIndex];
+		}
 
 		final TIntArrayList segmentSerieIndex = new TIntArrayList();
 
@@ -1016,13 +1035,33 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		boolean isPrevAltiUp = false;
 		boolean isPrevAltiDown = false;
 
-		for (int pointIndex = 1; pointIndex < simplePoints.length; pointIndex++) {
+		for (int simpleIndex = 1; simpleIndex < simplePoints.length; simpleIndex++) {
 
-			final DPPoint currentDpPoint = (DPPoint) simplePoints[pointIndex];
+			final DPPoint currentDpPoint = (DPPoint) simplePoints[simpleIndex];
+
+			boolean isAddPoint = false;
+
+			if (forcedIndices != null && forcedIndex == prevDpPoint.serieIndex) {
+
+				// this is a forced point
+
+				/*
+				 * This algorithm ensures that the points are set correctly any only once, highly
+				 * complicated algorithm but now it works.
+				 */
+				isAddPoint = true;
+
+				// get next forced index
+				forcedIndexIndex++;
+				if (forcedIndexIndex < forcedIndices.length) {
+					forcedIndex = forcedIndices[forcedIndexIndex];
+				}
+
+			}
 
 			final double currentAltitude = currentDpPoint.y;
 
-			if (pointIndex == 1) {
+			if (simpleIndex == 1) {
 
 				// first point
 
@@ -1044,11 +1083,15 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 					// up or down have changed
 
-					segmentSerieIndex.add(prevDpPoint.serieIndex);
+					isAddPoint = true;
 
 					isPrevAltiUp = isCurrentAltiUp;
 					isPrevAltiDown = isCurrentAltiDown;
 				}
+			}
+
+			if (isAddPoint) {
+				segmentSerieIndex.add(prevDpPoint.serieIndex);
 			}
 
 			prevDpPoint = currentDpPoint;
@@ -1284,8 +1327,10 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 			graphPoints[serieIndex] = new DPPoint(timeSerie[serieIndex], pulseSerie[serieIndex], serieIndex);
 		}
 
-		final DouglasPeuckerSimplifier dpSimplifier = new DouglasPeuckerSimplifier(_dpTolerancePulse, graphPoints);
-		final Object[] simplePoints = dpSimplifier.simplify();
+		final Object[] simplePoints = new DouglasPeuckerSimplifier(//
+				_dpTolerancePulse,
+				graphPoints,
+				getForcedIndices()).simplify();
 
 		/*
 		 * copie the data index for the simplified points into the tour data
@@ -2801,6 +2846,19 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		return (float) (_tourData.getDpTolerance() / 10.0);
 	}
 
+	private int[] getForcedIndices() {
+
+		final boolean isMultipleTours = _tourData.isMultipleTours;
+		final int[] multipleTourStartIndex = _tourData.multipleTourStartIndex;
+
+		int[] forcedIndices = null;
+		if (isMultipleTours) {
+			forcedIndices = multipleTourStartIndex;
+		}
+
+		return forcedIndices;
+	}
+
 	private BreakTimeMethod getSelectedBreakMethod() {
 
 		int selectedIndex = _comboBreakMethod.getSelectionIndex();
@@ -3136,6 +3194,9 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 						endIndex,
 						true);
 
+				/*
+				 * Add custom data but only when the segment layer is visible
+				 */
 				if (isSegmentLayerVisible()) {
 
 					/*

@@ -41,6 +41,12 @@ public class ChartMouseEvent {
 
 	public int			stateMask;
 
+	/**
+	 * When <code>true</code> then important actions can be done, e.g. a segment is hovered and a
+	 * dragged x-slider can be moved.
+	 */
+	public boolean		canDoImportantActions;
+
 	@SuppressWarnings("unused")
 	private ChartMouseEvent() {}
 

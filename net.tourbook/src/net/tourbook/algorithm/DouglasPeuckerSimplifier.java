@@ -31,13 +31,26 @@ public class DouglasPeuckerSimplifier {
 	 */
 	private boolean[]	_usedPoints;
 
-	public DouglasPeuckerSimplifier(final float tolerance, final DPPoint[] graphPoints) {
+	/**
+	 * Contains indices where a new segment should start
+	 */
+	private int[]		_forcedIndices;
+
+	public DouglasPeuckerSimplifier(final float tolerance, final DPPoint[] graphPoints, final int[] forcedIndices) {
 
 		_tolerance = tolerance;
 		_graphPoints = graphPoints;
+		_forcedIndices = forcedIndices;
 	}
 
 	public DPPoint[] simplify() {
+
+		int forcedIndex = 0;
+		int forcedIndexIndex = 0;
+		if (_forcedIndices != null && _forcedIndices.length > 0) {
+			forcedIndexIndex++;
+			forcedIndex = _forcedIndices[forcedIndexIndex];
+		}
 
 		// set all used points to false
 		_usedPoints = new boolean[_graphPoints.length];
@@ -54,10 +67,26 @@ public class DouglasPeuckerSimplifier {
 
 		// create a point list with all simplified points
 		final ArrayList<DPPoint> simplifiedPoints = new ArrayList<DPPoint>();
-		for (int iPoint = 0; iPoint < _graphPoints.length; iPoint++) {
-			if (_usedPoints[iPoint]) {
-				final DPPoint graphPoint = _graphPoints[iPoint];
-				simplifiedPoints.add(new DPPoint(graphPoint.x, graphPoint.y, iPoint));
+		for (int serieIndex = 0; serieIndex < _graphPoints.length; serieIndex++) {
+
+			boolean isPointUsed = _usedPoints[serieIndex];
+
+			if (_forcedIndices != null && forcedIndex == serieIndex) {
+
+				isPointUsed = true;
+
+				// get next forced index
+				forcedIndexIndex++;
+				if (forcedIndexIndex < _forcedIndices.length) {
+					forcedIndex = _forcedIndices[forcedIndexIndex];
+				}
+			}
+
+			if (isPointUsed) {
+
+				final DPPoint graphPoint = _graphPoints[serieIndex];
+
+				simplifiedPoints.add(new DPPoint(graphPoint.x, graphPoint.y, serieIndex));
 			}
 		}
 

@@ -50,19 +50,15 @@ public class SelectionChartInfo implements ISelection {
 
 	@Override
 	public String toString() {
-
-		final StringBuilder sb = new StringBuilder();
-
-		sb.append("[SelectionChartInfo] "); //$NON-NLS-1$
-		sb.append("left:"); //$NON-NLS-1$
-		sb.append(leftSliderValuesIndex);
-		sb.append(" right:"); //$NON-NLS-1$
-		sb.append(rightSliderValuesIndex);
-
-		sb.append("\n\t");//$NON-NLS-1$
-		sb.append(_chart.getChartDataModel());
-
-		return sb.toString();
+		return "SelectionChartInfo ["
+//				+ ("_chart=" + _chart + ", ")
+//				+ ("chartDataModel=" + chartDataModel + ", ")
+//				+ ("chartDrawingData=" + chartDrawingData + ", ")
+				+ ("leftSliderValuesIndex=" + leftSliderValuesIndex + ", ")
+				+ ("rightSliderValuesIndex=" + rightSliderValuesIndex + ", ")
+				+ ("selectedSliderValuesIndex=" + selectedSliderValuesIndex)
+				//
+				+ "]";
 	}
 
 }

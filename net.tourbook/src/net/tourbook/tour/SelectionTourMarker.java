@@ -40,16 +40,27 @@ public class SelectionTourMarker implements ISelection {
 		_selectedTourMarker = selectedTourMarker;
 	}
 
-	public TourData getTourData() {
-		return _tourData;
-	}
-
 	public ArrayList<TourMarker> getSelectedTourMarker() {
 		return _selectedTourMarker;
 	}
 
+	public TourData getTourData() {
+		return _tourData;
+	}
+
+	@Override
 	public boolean isEmpty() {
 		return false;
+	}
+
+	@Override
+	public String toString() {
+		return "SelectionTourMarker ["
+//				+ ("_tourData=" + _tourData + ", ")
+				+ ("_selectedTourMarker=" + _selectedTourMarker)
+				+
+				//
+				"]";
 	}
 
 }

@@ -157,7 +157,8 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
 
 //	private SignMenuManager				_signMenuManager			= new SignMenuManager(this);
 
-	private boolean						_isOkPressed							= false;
+	private boolean						_isOkPressed;
+	private boolean						_isInCreateUI;
 	private boolean						_isUpdateUI;
 	private boolean						_isSetXSlider							= true;
 
@@ -605,6 +606,8 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
 	@Override
 	protected Control createDialogArea(final Composite parent) {
 
+		_isInCreateUI = true;
+
 		final Composite dlgContainer = (Composite) super.createDialogArea(parent);
 
 		initUI(parent);
@@ -633,6 +636,8 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
 		_comboMarkerName.setFocus();
 
 		enableControls();
+
+		_isInCreateUI = false;
 
 		return dlgContainer;
 	}
@@ -1241,6 +1246,10 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
 		_tourChart.addSliderMoveListener(new ISliderMoveListener() {
 			@Override
 			public void sliderMoved(final SelectionChartInfo chartInfoSelection) {
+
+				if (_isInCreateUI) {
+					return;
+				}
 
 				TourManager.fireEventWithCustomData(//
 						TourEventId.SLIDER_POSITION_CHANGED,
@@ -1898,11 +1907,23 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
 		if (_isSetXSlider) {
 
 			// set slider position
-			_tourChart.setXSliderPosition(//
-					new SelectionChartXSliderPosition(
-							_tourChart,
-							newSelectedMarker.getSerieIndex(),
-							SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION));
+			final SelectionChartXSliderPosition sliderSelection = new SelectionChartXSliderPosition(
+					_tourChart,
+					newSelectedMarker.getSerieIndex(),
+					SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION);
+
+			// set x-slider in the tour chart but do not fire a default event
+			_tourChart.setXSliderPosition(sliderSelection, false);
+
+			/*
+			 * Fire a tour marker selection
+			 */
+			final ArrayList<TourMarker> selectedTourMarker = new ArrayList<>();
+			selectedTourMarker.add(newSelectedMarker);
+
+			final SelectionTourMarker tourMarkerSelection = new SelectionTourMarker(_tourData, selectedTourMarker);
+
+			fireGlobalSelection(tourMarkerSelection);
 		}
 	}
 

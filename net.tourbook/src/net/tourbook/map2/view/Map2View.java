@@ -1636,9 +1636,9 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 
 	private void onSelectionChanged(final ISelection selection) {
 
-//		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
-//				+ ("\tonSelectionChanged: " + selection));
-//		// TODO remove SYSTEM.OUT.PRINTLN
+		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
+				+ ("\tonSelectionChanged: " + selection));
+		// TODO remove SYSTEM.OUT.PRINTLN
 
 		if (_isPartVisible == false) {
 
@@ -1926,6 +1926,10 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 	}
 
 	private void onSelectionChanged_TourMarker(final SelectionTourMarker markerSelection, final boolean isDrawSlider) {
+
+		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
+				+ ("\tonSelectionChanged_TourMarker"));
+		// TODO remove SYSTEM.OUT.PRINTLN
 
 		final TourData tourData = markerSelection.getTourData();
 

@@ -253,7 +253,7 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 						} else {
 
 							/*
-							 * This case happened that this event contained not the same tourdata as
+							 * This case happened that this event contains not the same tourdata as
 							 * the tourchart, it occured for multiple tours in tourdata.
 							 */
 
@@ -381,6 +381,7 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 		_pageNoData = net.tourbook.common.UI.createUI_PageNoData(_pageBook, Messages.UI_Label_no_chart_is_selected);
 
 		_tourChart = new TourChart(_pageBook, SWT.FLAT, this);
+		_tourChart.setCanShowTourSegments(true);
 		_tourChart.setShowZoomActions(true);
 		_tourChart.setShowSlider(true);
 		_tourChart.setTourInfoActionsEnabled(true);
@@ -586,7 +587,7 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 									chartInfo.leftSliderValuesIndex,
 									chartInfo.rightSliderValuesIndex);
 
-							_tourChart.selectMarker(xSliderPosition);
+							_tourChart.selectXSliders(xSliderPosition);
 						}
 					}
 				}
@@ -616,7 +617,7 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 					}
 				}
 
-				_tourChart.selectMarker(xSliderPosition);
+				_tourChart.selectXSliders(xSliderPosition);
 
 			} else if (selection instanceof StructuredSelection) {
 
@@ -705,7 +706,7 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 					rightSliderValueIndex,
 					true);
 
-			_tourChart.selectMarker(xSliderPosition);
+			_tourChart.selectXSliders(xSliderPosition);
 		}
 		_isInSelectionChanged = false;
 	}

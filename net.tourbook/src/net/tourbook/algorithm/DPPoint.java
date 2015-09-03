@@ -33,8 +33,10 @@ public class DPPoint {
 	public int		serieIndex;
 
 	public DPPoint(final double x, final double y, final int serieIndex) {
+
 		this.x = x;
 		this.y = y;
+
 		this.serieIndex = serieIndex;
 	}
 

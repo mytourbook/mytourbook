@@ -118,4 +118,18 @@ public class SelectionChartXSliderPosition implements ISelection {
 		_customData = customData;
 	}
 
+	@Override
+	public String toString() {
+		return "SelectionChartXSliderPosition ["
+				+ ("_beforeLeftSliderIndex=" + _beforeLeftSliderIndex + ", ")
+				+ ("_leftSliderValueIndex=" + _leftSliderValueIndex + ", ")
+				+ ("_rightSliderValueIndex=" + _rightSliderValueIndex + ", ")
+				+ ("_isCenterSliderPosition=" + _isCenterSliderPosition + ", ")
+//				+ ("_chart=" + _chart + ", ")
+				+ ("_isAdjustStartIndex=" + _isAdjustStartIndex + ", ")
+//				+ ("_customData=" + _customData)
+				//
+				+ "]";
+	}
+
 }

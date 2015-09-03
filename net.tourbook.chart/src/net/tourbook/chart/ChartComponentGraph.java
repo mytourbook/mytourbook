@@ -6318,11 +6318,15 @@ public class ChartComponentGraph extends Canvas {
 		}
 
 		// use external mouse event listener
-		ChartMouseEvent mouseEvent;
-		if ((mouseEvent = _chart
-				.onExternalMouseDownPre(event.time & 0xFFFFFFFFL, devXMouse, devYMouse, event.stateMask)).isWorked) {
+		final ChartMouseEvent externalMouseMoveEvent = _chart.onExternalMouseDownPre(
+				event.time & 0xFFFFFFFFL,
+				devXMouse,
+				devYMouse,
+				event.stateMask);
 
-			setChartCursor(mouseEvent.cursor);
+		if (externalMouseMoveEvent.isWorked) {
+
+			setChartCursor(externalMouseMoveEvent.cursor);
 			return;
 		}
 
@@ -6600,6 +6604,8 @@ public class ChartComponentGraph extends Canvas {
 				devXMouse,
 				devYMouse);
 
+		boolean canDoOtherActions = false;
+
 		if (externalMouseMoveEvent.isWorked) {
 
 			setChartCursor(externalMouseMoveEvent.cursor);
@@ -6609,160 +6615,170 @@ public class ChartComponentGraph extends Canvas {
 
 			canShowHoveredValueTooltip = true;
 
-		} else if (_isXSliderVisible && _xSliderDragged != null) {
-
-			// x-slider is dragged
-
-			canShowHoveredValueTooltip = true;
-
-			// keep position of the slider line
-			_devXDraggedXSliderLine = devXMouse;
-
-			/*
-			 * when the x-slider is outside of the visual graph in horizontal direction, the graph
-			 * can be scrolled with the mouse
-			 */
-			final int devVisibleChartWidth = getDevVisibleChartWidth();
-			if (_devXDraggedXSliderLine > -1 && _devXDraggedXSliderLine < devVisibleChartWidth) {
-
-				// slider is within the visible area, autoscrolling is NOT done
-
-				// autoscroll could be active, disable it
-				_isAutoScroll = false;
-
-				moveXSlider(_xSliderDragged, devXMouse);
-
-				_isSliderDirty = true;
-				isRedraw = true;
-
-			} else {
-
-				/*
-				 * slider is outside the visible area, auto scroll the slider and graph when this is
-				 * not yet done
-				 */
-				if (_isAutoScroll == false) {
-					doAutoScroll(eventTime);
-				}
-			}
-
-		} else if (_isChartDraggedStarted || _isChartDragged) {
-
-			// chart is dragged with the mouse
-
-			_isChartDraggedStarted = false;
-			_isChartDragged = true;
-
-			_draggedChartDraggedPos = new Point(devXMouse, devYMouse);
-
-			isRedraw = true;
-
-		} else if (_isYSliderVisible && _ySliderDragged != null) {
-
-			// y-slider is dragged
-
-			final int devYSliderLine = devYMouse
-					- _ySliderDragged.devYClickOffset
-					+ ChartYSlider.halfSliderHitLineHeight;
-
-			_ySliderDragged.setDevYSliderLine(devYSliderLine);
-			_ySliderGraphX = devXMouse;
-
-			_isSliderDirty = true;
-			isRedraw = true;
-
-		} else if (_isXMarkerMoved) {
-
-			// X-Marker is dragged
-
-			_devXMarkerDraggedPos = devXMouse;
-
-			_isSliderDirty = true;
-			isRedraw = true;
-
 		} else {
 
-			ChartXSlider xSlider;
+			canDoOtherActions = true;
+		}
 
-			final ChartMouseEvent externalMouseEvent = _chart.onExternalMouseMove(eventTime, devXMouse, devYMouse);
+		final boolean canDoImportantActions = externalMouseMoveEvent.canDoImportantActions;
 
-			if (externalMouseEvent.isWorked) {
+		if (canDoOtherActions || externalMouseMoveEvent.isWorked && canDoImportantActions) {
 
-				setChartCursor(externalMouseEvent.cursor);
+			if (_isXSliderVisible && _xSliderDragged != null) {
 
-				_isOverlayDirty = true;
-				isRedraw = true;
+				// x-slider is dragged
 
 				canShowHoveredValueTooltip = true;
 
-			} else if (_isXSliderVisible && (xSlider = isXSliderHit(devXMouse, devYMouse)) != null) {
+				// keep position of the slider line
+				_devXDraggedXSliderLine = devXMouse;
 
-				// mouse is over an x-slider
+				/*
+				 * when the x-slider is outside of the visual graph in horizontal direction, the
+				 * graph can be scrolled with the mouse
+				 */
+				final int devVisibleChartWidth = getDevVisibleChartWidth();
+				if (_devXDraggedXSliderLine > -1 && _devXDraggedXSliderLine < devVisibleChartWidth) {
 
-				if (_mouseOverXSlider != xSlider) {
+					// slider is within the visible area, autoscrolling is NOT done
 
-					// a new x-slider is hovered
+					// autoscroll could be active, disable it
+					_isAutoScroll = false;
 
-					_mouseOverXSlider = xSlider;
-
-					// hide the y-slider
-					_hitYSlider = null;
+					moveXSlider(_xSliderDragged, devXMouse);
 
 					_isSliderDirty = true;
 					isRedraw = true;
+
+				} else {
+
+					/*
+					 * slider is outside the visible area, auto scroll the slider and graph when
+					 * this is not yet done
+					 */
+					if (_isAutoScroll == false) {
+						doAutoScroll(eventTime);
+					}
 				}
 
-				// set cursor
-				setCursor(_cursorResizeLeftRight);
+			} else if (_isChartDraggedStarted || _isChartDragged) {
 
-				canShowHoveredValueTooltip = true;
+				// chart is dragged with the mouse
 
-			} else if (_mouseOverXSlider != null) {
+				_isChartDraggedStarted = false;
+				_isChartDragged = true;
 
-				// mouse has left the x-slider
+				_draggedChartDraggedPos = new Point(devXMouse, devYMouse);
 
-				_mouseOverXSlider = null;
-				_isSliderDirty = true;
 				isRedraw = true;
 
-				canShowHoveredValueTooltip = true;
+			} else if (_isYSliderVisible && _ySliderDragged != null) {
 
-			} else if (_isYSliderVisible && isYSliderHit(devXMouse, devYMouse) != null) {
+				// y-slider is dragged
 
-				// cursor is within a y-slider
+				final int devYSliderLine = devYMouse
+						- _ySliderDragged.devYClickOffset
+						+ ChartYSlider.halfSliderHitLineHeight;
 
-				setCursor(_cursorResizeTopDown);
-
-				// show the y-slider labels
+				_ySliderDragged.setDevYSliderLine(devYSliderLine);
 				_ySliderGraphX = devXMouse;
 
 				_isSliderDirty = true;
 				isRedraw = true;
 
-				canShowHoveredValueTooltip = true;
+			} else if (_isXMarkerMoved) {
 
-			} else if (_chart._draggingListenerXMarker != null && isSynchMarkerHit(devXMouse)) {
+				// X-Marker is dragged
 
-				setCursor(_cursorDragged);
+				_devXMarkerDraggedPos = devXMouse;
 
-			} else if (_isXSliderVisible && isInXSliderSetArea(devYMouse)) {
-
-				// cursor is already set
-
-				canShowHoveredValueTooltip = true;
-
-			} else if (isBarHit(devXMouse, devYMouse)) {
-
-				_isHoveredBarDirty = true;
+				_isSliderDirty = true;
 				isRedraw = true;
-
-				setCursorStyle(devYMouse);
 
 			} else {
 
-				canShowHoveredValueTooltip = true;
+				ChartXSlider xSlider;
 
-				setCursorStyle(devYMouse);
+				final ChartMouseEvent externalMouseEvent = _chart.onExternalMouseMove(eventTime, devXMouse, devYMouse);
+
+				if (externalMouseEvent.isWorked) {
+
+					setChartCursor(externalMouseEvent.cursor);
+
+					_isOverlayDirty = true;
+					isRedraw = true;
+
+					canShowHoveredValueTooltip = true;
+
+				} else if (_isXSliderVisible && (xSlider = isXSliderHit(devXMouse, devYMouse)) != null) {
+
+					// mouse is over an x-slider
+
+					if (_mouseOverXSlider != xSlider) {
+
+						// a new x-slider is hovered
+
+						_mouseOverXSlider = xSlider;
+
+						// hide the y-slider
+						_hitYSlider = null;
+
+						_isSliderDirty = true;
+						isRedraw = true;
+					}
+
+					// set cursor
+					setCursor(_cursorResizeLeftRight);
+
+					canShowHoveredValueTooltip = true;
+
+				} else if (_mouseOverXSlider != null) {
+
+					// mouse has left the x-slider
+
+					_mouseOverXSlider = null;
+					_isSliderDirty = true;
+					isRedraw = true;
+
+					canShowHoveredValueTooltip = true;
+
+				} else if (_isYSliderVisible && isYSliderHit(devXMouse, devYMouse) != null) {
+
+					// cursor is within a y-slider
+
+					setCursor(_cursorResizeTopDown);
+
+					// show the y-slider labels
+					_ySliderGraphX = devXMouse;
+
+					_isSliderDirty = true;
+					isRedraw = true;
+
+					canShowHoveredValueTooltip = true;
+
+				} else if (_chart._draggingListenerXMarker != null && isSynchMarkerHit(devXMouse)) {
+
+					setCursor(_cursorDragged);
+
+				} else if (_isXSliderVisible && isInXSliderSetArea(devYMouse)) {
+
+					// cursor is already set
+
+					canShowHoveredValueTooltip = true;
+
+				} else if (isBarHit(devXMouse, devYMouse)) {
+
+					_isHoveredBarDirty = true;
+					isRedraw = true;
+
+					setCursorStyle(devYMouse);
+
+				} else {
+
+					canShowHoveredValueTooltip = true;
+
+					setCursorStyle(devYMouse);
+				}
 			}
 		}
 

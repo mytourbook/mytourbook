@@ -11,7 +11,10 @@ New
 
 * Tour Chart
 - Show/navigate multiple tours.
-- Title tooltip for each tour.
+- Title for each tour.
+  - Tour tooltip when hovered with mouse.
+  - Select tour with single click.
+  - Quick edit tour with double click.
 - Customize tour info.
 - Customize segment color.
 - Zoom marker: show relative position value when zoomed in.
@@ -41,7 +44,7 @@ Improvements
 
 * Tour Segmenter
 - Properties (value, font, opacity ...) how segments are displayed in the tour chart.
-- Select tour segments with the mouse in the tour chart.
+- Select tour segments with the mouse in the tour chart, multiple segments can be selected with the <Shift> key.
  
 Bugfix
 ======	

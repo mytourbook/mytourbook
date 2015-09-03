@@ -549,6 +549,10 @@ public class Chart extends ViewForm {
 			default:
 				break;
 			}
+
+			if (mouseEvent.isWorked) {
+				return;
+			}
 		}
 	}
 
