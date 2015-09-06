@@ -164,6 +164,8 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	public static final boolean						STATE_IS_SHOW_SEGMENTER_LINE_DEFAULT			= true;
 	public static final String						STATE_IS_SHOW_SEGMENTER_MARKER					= "STATE_IS_SHOW_SEGMENTER_MARKER";		//$NON-NLS-1$
 	public static final boolean						STATE_IS_SHOW_SEGMENTER_MARKER_DEFAULT			= false;
+	public static final String						STATE_IS_SHOW_SEGMENTER_TOOLTIP					= "STATE_IS_SHOW_SEGMENTER_TOOLTIP";		//$NON-NLS-1$
+	public static final boolean						STATE_IS_SHOW_SEGMENTER_TOOLTIP_DEFAULT			= true;
 	public static final String						STATE_IS_SHOW_SEGMENTER_VALUE					= "STATE_IS_SHOW_SEGMENTER_VALUE";			//$NON-NLS-1$
 	public static final boolean						STATE_IS_SHOW_SEGMENTER_VALUE_DEFAULT			= true;
 	public static final String						STATE_IS_SHOW_TOUR_SEGMENTS						= "STATE_IS_SHOW_TOUR_SEGMENTS";			//$NON-NLS-1$

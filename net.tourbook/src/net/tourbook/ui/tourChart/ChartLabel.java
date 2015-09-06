@@ -19,18 +19,11 @@
 package net.tourbook.ui.tourChart;
 
 import net.tourbook.common.UI;
-import net.tourbook.common.graphics.Line2D;
 import net.tourbook.photo.Photo;
 
-import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
 
 public class ChartLabel {
-
-	static final int		MARKER_HOVER_SIZE		= 12;
-	static final int		MARKER_HOVER_SIZE2		= MARKER_HOVER_SIZE / 2;
-
-	static final int		MIN_HOVER_LINE_HEIGHTx	= 50;
 
 	/**
 	 * marker was created in the device
@@ -85,13 +78,10 @@ public class ChartLabel {
 	public int				devXMarker;
 	public int				devYMarker;
 
-	/*
-	 * Painted positions
+	/**
+	 * Painted position.
 	 */
 	public Rectangle		paintedLabel;
-	Rectangle				hoveredLabelRect;
-	Rectangle				hoveredLineRect;
-	Line2D					hoveredLineShape;
 
 	public int				devHoverSize;
 
@@ -119,21 +109,7 @@ public class ChartLabel {
 	public int				devYTop;
 	public int				devGraphWidth;
 
-	/**
-	 * {@link Integer#MIN_VALUE} is a flag that this value is not yet set.
-	 */
-	int						paintedX1				= Integer.MIN_VALUE;
-	int						paintedX2;
-	int						paintedY1;
-	int						paintedY2;
-	RGB						paintedRGB;
-
-	int						xSliderSerieIndexLeft;
-	int						xSliderSerieIndexRight;
-
-	int						segmentIndex;
-
-	public ChartLabel() {}
+	ChartLabel() {}
 
 	/**
 	 * @return Returns <code>true</code> when the marker is created with the device.
@@ -146,8 +122,6 @@ public class ChartLabel {
 	@Override
 	public String toString() {
 		return "ChartLabel [" //
-				+ ("paintedLabel=" + paintedLabel + ", ")
-				+ ("segmentIndex=" + segmentIndex + ", ")
 //				+ ("serieIndex=" + serieIndex + ", ")
 //				+ ("graphX=" + graphX + ", ")
 //				+ ("devXMarker=" + devXMarker + ", ")

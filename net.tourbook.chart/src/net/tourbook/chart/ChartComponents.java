@@ -308,7 +308,7 @@ public class ChartComponents extends Composite {
 
 				// set the chart title height and margin
 				final String title = graphDrawingData.getXTitle();
-				final ChartSegments chartSegments = xData.getChartSegments();
+				final ChartStatisticSegments chartSegments = xData.getChartSegments();
 
 				if (title != null && title.length() > 0 || //
 						(chartSegments != null && chartSegments.segmentTitle != null)) {
@@ -535,7 +535,7 @@ public class ChartComponents extends Composite {
 
 	private void createDrawingData_X_Day(final GraphDrawingData drawingData) {
 
-		final ChartSegments chartSegments = drawingData.getXData().getChartSegments();
+		final ChartStatisticSegments chartSegments = drawingData.getXData().getChartSegments();
 		final long devVirtualGraphWidth = componentGraph.getXXDevGraphWidth();
 
 		createMonthUnequalUnits(drawingData, devVirtualGraphWidth, chartSegments.years, chartSegments.yearDays);
@@ -1182,7 +1182,7 @@ public class ChartComponents extends Composite {
 		final int allWeeks = xValues.length;
 		final float devWeekWidth = devVirtualGraphWidth / allWeeks;
 
-		final ChartSegments chartSegments = drawingData.getXData().getChartSegments();
+		final ChartStatisticSegments chartSegments = drawingData.getXData().getChartSegments();
 
 		final int[] yearDays = chartSegments.yearDays;
 
@@ -1211,7 +1211,7 @@ public class ChartComponents extends Composite {
 		final ChartDataYSerie yData = drawingData.getYData();
 		final ChartDataXSerie xData = drawingData.getXData();
 
-		final ChartSegments chartSegments = drawingData.getXData().getChartSegments();
+		final ChartStatisticSegments chartSegments = drawingData.getXData().getChartSegments();
 		final int[] yearValues = chartSegments.years;
 		final long devVirtualGraphWidth = componentGraph.getXXDevGraphWidth();
 

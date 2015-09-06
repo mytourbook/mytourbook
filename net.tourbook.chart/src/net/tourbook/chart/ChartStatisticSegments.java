@@ -16,9 +16,9 @@
 package net.tourbook.chart;
 
 /**
- * {@link ChartSegments} contains information to display a statistic for several years in the chart.
+ * {@link ChartStatisticSegments} contains information to display a statistic for several years in the chart.
  */
-public class ChartSegments {
+public class ChartStatisticSegments {
 
 	public int		allValues;
 

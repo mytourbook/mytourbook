@@ -48,39 +48,39 @@ import org.eclipse.swt.widgets.Display;
  */
 public class ChartLayerSegmentAltitude implements IChartLayer, IChartOverlay {
 
-	private static final Color		SYSTEM_COLOR_0		= Display.getCurrent().getSystemColor(SWT.COLOR_DARK_GRAY);
-	private static final Color		SYSTEM_COLOR_DOWN	= Display.getCurrent().getSystemColor(SWT.COLOR_DARK_GREEN);
-	private static final Color		SYSTEM_COLOR_UP		= Display.getCurrent().getSystemColor(SWT.COLOR_RED);
+	private static final Color			SYSTEM_COLOR_0		= Display.getCurrent().getSystemColor(SWT.COLOR_DARK_GRAY);
+	private static final Color			SYSTEM_COLOR_DOWN	= Display.getCurrent().getSystemColor(SWT.COLOR_DARK_GREEN);
+	private static final Color			SYSTEM_COLOR_UP		= Display.getCurrent().getSystemColor(SWT.COLOR_RED);
 
-	private TourChart				_tourChart;
-	private TourData				_tourData;
+	private TourChart					_tourChart;
+	private TourData					_tourData;
 
 	/**
 	 * Contains only chart labels which are painted (visible) all hidden labels are NOT in this
 	 * list.
 	 */
-	private ArrayList<ChartLabel>	_paintedLabels		= new ArrayList<>();
+	private ArrayList<SegmenterSegment>	_paintedSegments	= new ArrayList<>();
 
 	// hide small values
-	private boolean					_isHideSmallValues;
-	private double					_smallValue;
+	private boolean						_isHideSmallValues;
+	private double						_smallValue;
 
 	// show lines
-	private boolean					_isShowSegmenterLine;
-	private int						_lineOpacity;
+	private boolean						_isShowSegmenterLine;
+	private int							_lineOpacity;
 
-	private boolean					_isShowDecimalPlaces;
-	private boolean					_isShowSegmenterMarker;
-	private boolean					_isShowSegmenterValue;
-	private int						_stackedValues;
-	private double[]				_xDataSerie;
+	private boolean						_isShowDecimalPlaces;
+	private boolean						_isShowSegmenterMarker;
+	private boolean						_isShowSegmenterValue;
+	private int							_stackedValues;
+	private double[]					_xDataSerie;
 
 	/**
 	 * Area where the graph is painted.
 	 */
-	private Rectangle				_graphArea;
+	private Rectangle					_graphArea;
 
-	private final NumberFormat		_nf1				= NumberFormat.getNumberInstance();
+	private final NumberFormat			_nf1				= NumberFormat.getNumberInstance();
 	{
 		_nf1.setMinimumFractionDigits(1);
 		_nf1.setMaximumFractionDigits(1);
@@ -102,7 +102,7 @@ public class ChartLayerSegmentAltitude implements IChartLayer, IChartOverlay {
 		 * <p>
 		 * This layer is painted only once.
 		 */
-		_paintedLabels.clear();
+		_paintedSegments.clear();
 
 		final ChartDataYSerie yData = graphDrawingData.getYData();
 
@@ -269,7 +269,7 @@ public class ChartLayerSegmentAltitude implements IChartLayer, IChartOverlay {
 
 				final Color upDownColor = getColor(altiDiff);
 
-				final ChartLabel chartLabel = new ChartLabel();
+				final SegmenterSegment segmenterSegment = new SegmenterSegment();
 
 				/*
 				 * Connect two segments with a line
@@ -296,19 +296,19 @@ public class ChartLayerSegmentAltitude implements IChartLayer, IChartOverlay {
 								devYSegment);
 					}
 
-					chartLabel.paintedX1 = devXPrev;
-					chartLabel.paintedY1 = devYPrev;
+					segmenterSegment.paintedX1 = devXPrev;
+					segmenterSegment.paintedY1 = devYPrev;
 
-					chartLabel.paintedX2 = devXSegment;
-					chartLabel.paintedY2 = devYSegment;
+					segmenterSegment.paintedX2 = devXSegment;
+					segmenterSegment.paintedY2 = devYSegment;
 
-					chartLabel.hoveredLineShape = new Line2D(//
+					segmenterSegment.hoveredLineShape = new Line2D(//
 							devXPrev,
 							devYPrev,
 							devXSegment,
 							devYSegment);
 
-					chartLabel.paintedRGB = upDownColor.getRGB();
+					segmenterSegment.paintedRGB = upDownColor.getRGB();
 
 //					/*
 //					 * Debugging
@@ -393,19 +393,19 @@ public class ChartLayerSegmentAltitude implements IChartLayer, IChartOverlay {
 										true);
 
 								// ensure that only visible labels can be hovered
-								chartLabel.isVisible = true;
+								segmenterSegment.isVisible = true;
 							}
 
-							chartLabel.paintedLabel = validRect;
+							segmenterSegment.paintedLabel = validRect;
 
 							// keep area to detect hovered segments, enlarge it with the hover border to easier hit the label
 							final Rectangle hoveredRect = new Rectangle(
-									(validRect.x + borderWidth - ChartLabel.MARKER_HOVER_SIZE2),
-									(validRect.y + borderHeight - ChartLabel.MARKER_HOVER_SIZE2),
-									(validRect.width - borderWidth2 + ChartLabel.MARKER_HOVER_SIZE),
-									(validRect.height - borderHeight2 + ChartLabel.MARKER_HOVER_SIZE));
+									(validRect.x + borderWidth - SegmenterSegment.EXPANDED_HOVER_SIZE2),
+									(validRect.y + borderHeight - SegmenterSegment.EXPANDED_HOVER_SIZE2),
+									(validRect.width - borderWidth2 + SegmenterSegment.EXPANDED_HOVER_SIZE),
+									(validRect.height - borderHeight2 + SegmenterSegment.EXPANDED_HOVER_SIZE));
 
-							chartLabel.hoveredLabelRect = hoveredRect;
+							segmenterSegment.hoveredLabelRect = hoveredRect;
 
 //							/*
 //							 * Debugging
@@ -425,15 +425,15 @@ public class ChartLayerSegmentAltitude implements IChartLayer, IChartOverlay {
 						? SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION
 						: segmentSerieIndex[prevSegmentIndex];
 
-				chartLabel.xSliderSerieIndexLeft = leftIndex;
-				chartLabel.xSliderSerieIndexRight = serieIndex;
+				segmenterSegment.xSliderSerieIndexLeft = leftIndex;
+				segmenterSegment.xSliderSerieIndexRight = serieIndex;
 
-				chartLabel.segmentIndex = segmentIndex;
+				segmenterSegment.segmentIndex = segmentIndex;
 
-				chartLabel.serieIndex = serieIndex;
-				chartLabel.graphX = _xDataSerie[serieIndex];
+				segmenterSegment.serieIndex = serieIndex;
+				segmenterSegment.graphX = _xDataSerie[serieIndex];
 
-				_paintedLabels.add(chartLabel);
+				_paintedSegments.add(segmenterSegment);
 
 				// advance to the next point
 				devXPrev = devXSegment;
@@ -454,9 +454,9 @@ public class ChartLayerSegmentAltitude implements IChartLayer, IChartOverlay {
 	@Override
 	public void drawOverlay(final GC gc, final GraphDrawingData graphDrawingData) {
 
-		final ChartLabel hoveredLabel = _tourChart.getSegmentLabel_Hovered();
+		final SegmenterSegment hoveredSegment = _tourChart.getHoveredSegmenterSegment();
 
-		final boolean isHovered = hoveredLabel != null;
+		final boolean isHovered = hoveredSegment != null;
 
 		if (!isHovered) {
 			return;
@@ -476,8 +476,8 @@ public class ChartLayerSegmentAltitude implements IChartLayer, IChartOverlay {
 		 */
 		if (isHovered) {
 
-			final Rectangle hoveredRect = hoveredLabel.hoveredLabelRect;
-			if (hoveredRect != null && hoveredLabel.isVisible) {
+			final Rectangle hoveredRect = hoveredSegment.hoveredLabelRect;
+			if (hoveredRect != null && hoveredSegment.isVisible) {
 
 				final int arc = 10;
 //				gc.setAlpha(isSelected ? 0x60 : 0x30);
@@ -495,12 +495,12 @@ public class ChartLayerSegmentAltitude implements IChartLayer, IChartOverlay {
 			/*
 			 * Draw line thicker
 			 */
-			final Color lineColor = new Color(device, hoveredLabel.paintedRGB);
+			final Color lineColor = new Color(device, hoveredSegment.paintedRGB);
 			{
-				final int x1 = hoveredLabel.paintedX1;
-				final int y1 = hoveredLabel.paintedY1;
-				final int x2 = hoveredLabel.paintedX2;
-				final int y2 = hoveredLabel.paintedY2;
+				final int x1 = hoveredSegment.paintedX1;
+				final int y1 = hoveredSegment.paintedY1;
+				final int x2 = hoveredSegment.paintedX2;
+				final int y2 = hoveredSegment.paintedY2;
 
 				gc.setAntialias(SWT.ON);
 				gc.setForeground(lineColor);
@@ -534,7 +534,7 @@ public class ChartLayerSegmentAltitude implements IChartLayer, IChartOverlay {
 	 * @return Returns the hovered {@link ChartLabel} or <code>null</code> when a {@link ChartLabel}
 	 *         is not hovered.
 	 */
-	ChartLabel getHoveredLabel(final ChartMouseEvent mouseEvent) {
+	SegmenterSegment getHoveredSegment(final ChartMouseEvent mouseEvent) {
 
 		if (_graphArea == null) {
 
@@ -542,33 +542,33 @@ public class ChartLayerSegmentAltitude implements IChartLayer, IChartOverlay {
 			return null;
 		}
 
-		ChartLabel hoveredLabel = null;
+		SegmenterSegment hoveredLabel = null;
 
 		if (_graphArea.contains(mouseEvent.devXMouse, mouseEvent.devYMouse)) {
 
 			// mouse is hovering the graph area
 
-			hoveredLabel = getHoveredLabel_10(mouseEvent.devXMouse, mouseEvent.devYMouse);
+			hoveredLabel = getHoveredSegment_10(mouseEvent.devXMouse, mouseEvent.devYMouse);
 		}
 
 		return hoveredLabel;
 	}
 
-	private ChartLabel getHoveredLabel_10(final int devXMouse, final int devYMouse) {
+	private SegmenterSegment getHoveredSegment_10(final int devXMouse, final int devYMouse) {
 
-		for (final ChartLabel chartLabel : _paintedLabels) {
+		for (final SegmenterSegment chartLabel : _paintedSegments) {
 
 			final Rectangle hoveredLabelRect = chartLabel.hoveredLabelRect;
-			final Line2D hoveredLineRect = chartLabel.hoveredLineShape;
+			final Line2D hoveredLineShape = chartLabel.hoveredLineShape;
 
 			if (//
 				// the label must be visible that it is checked
 			(chartLabel.isVisible && hoveredLabelRect != null && hoveredLabelRect.contains(devXMouse, devYMouse))
-					|| (hoveredLineRect != null && hoveredLineRect.intersects(
-							devXMouse - ChartLabel.MARKER_HOVER_SIZE2,
-							devYMouse - ChartLabel.MARKER_HOVER_SIZE2,
-							ChartLabel.MARKER_HOVER_SIZE,
-							ChartLabel.MARKER_HOVER_SIZE))) {
+					|| (hoveredLineShape != null && hoveredLineShape.intersects(
+							devXMouse - SegmenterSegment.EXPANDED_HOVER_SIZE2,
+							devYMouse - SegmenterSegment.EXPANDED_HOVER_SIZE2,
+							SegmenterSegment.EXPANDED_HOVER_SIZE,
+							SegmenterSegment.EXPANDED_HOVER_SIZE))) {
 
 				// segment is hit
 				return chartLabel;
@@ -582,8 +582,8 @@ public class ChartLayerSegmentAltitude implements IChartLayer, IChartOverlay {
 	 * @return Returns <b>ONLY</b> labels which are visible. When zoomed in then some labels are not
 	 *         contained in this list.
 	 */
-	ArrayList<ChartLabel> getPaintedLabels() {
-		return _paintedLabels;
+	ArrayList<SegmenterSegment> getPaintedLabels() {
+		return _paintedSegments;
 	}
 
 	void setIsShowDecimalPlaces(final boolean isShowDecimalPlaces) {
@@ -623,7 +623,7 @@ public class ChartLayerSegmentAltitude implements IChartLayer, IChartOverlay {
 
 		_tourData = tourData;
 
-		_paintedLabels.clear();
+		_paintedSegments.clear();
 	}
 
 	void setXDataSerie(final double[] dataSerie) {

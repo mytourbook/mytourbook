@@ -25,7 +25,7 @@ import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.ChartDataXSerie;
 import net.tourbook.chart.ChartDataYSerie;
-import net.tourbook.chart.ChartSegments;
+import net.tourbook.chart.ChartStatisticSegments;
 import net.tourbook.chart.ChartToolTipInfo;
 import net.tourbook.chart.ChartType;
 import net.tourbook.chart.IBarSelectionListener;
@@ -341,7 +341,7 @@ public class YearStatisticView extends ViewPart {
 	/**
 	 * create segments for the chart
 	 */
-	private ChartSegments createChartSegments() {
+	private ChartStatisticSegments createChartSegments() {
 
 		final double segmentStart[] = new double[_numberOfYears];
 		final double segmentEnd[] = new double[_numberOfYears];
@@ -362,7 +362,7 @@ public class YearStatisticView extends ViewPart {
 			yearDaysSum += yearDays;
 		}
 
-		final ChartSegments chartSegments = new ChartSegments();
+		final ChartStatisticSegments chartSegments = new ChartStatisticSegments();
 		chartSegments.segmentStartValue = segmentStart;
 		chartSegments.segmentEndValue = segmentEnd;
 		chartSegments.segmentTitle = segmentTitle;

@@ -113,6 +113,7 @@ public class SlideoutTourChartSegmenterProperties extends AnimatedToolTipShell i
 	private Button							_chkShowDecimalPlaces;
 	private Button							_chkShowSegmentLine;
 	private Button							_chkShowSegmentMarker;
+	private Button							_chkShowSegmentTooltip;
 	private Button							_chkShowSegmentValue;
 
 	private FontFieldEditorExtended			_valueFontEditor;
@@ -335,6 +336,17 @@ public class SlideoutTourChartSegmenterProperties extends AnimatedToolTipShell i
 			_spinGraphOpacity.setPageIncrement(10);
 			_spinGraphOpacity.addSelectionListener(_defaultSelectionAdapter);
 			_spinGraphOpacity.addMouseWheelListener(_defaultMouseWheelListener);
+		}
+		{
+			/*
+			 * Checkbox: Show segment tooltip
+			 */
+			_chkShowSegmentTooltip = new Button(parent, SWT.CHECK);
+			GridDataFactory.fillDefaults()//
+					.span(2, 1)
+					.applyTo(_chkShowSegmentTooltip);
+			_chkShowSegmentTooltip.setText(Messages.Slideout_SegmenterChartOptions_Checkbox_IsShowSegmentTooltip);
+			_chkShowSegmentTooltip.addSelectionListener(_defaultSelectionAdapter);
 		}
 	}
 
@@ -613,6 +625,9 @@ public class SlideoutTourChartSegmenterProperties extends AnimatedToolTipShell i
 				TourSegmenterView.STATE_IS_SHOW_SEGMENTER_MARKER,
 				TourSegmenterView.STATE_IS_SHOW_SEGMENTER_MARKER_DEFAULT);
 		_segmenterState.put(
+				TourSegmenterView.STATE_IS_SHOW_SEGMENTER_TOOLTIP,
+				TourSegmenterView.STATE_IS_SHOW_SEGMENTER_TOOLTIP_DEFAULT);
+		_segmenterState.put(
 				TourSegmenterView.STATE_IS_SHOW_SEGMENTER_VALUE,
 				TourSegmenterView.STATE_IS_SHOW_SEGMENTER_VALUE_DEFAULT);
 
@@ -666,6 +681,11 @@ public class SlideoutTourChartSegmenterProperties extends AnimatedToolTipShell i
 				TourSegmenterView.STATE_IS_SHOW_SEGMENTER_MARKER,
 				TourSegmenterView.STATE_IS_SHOW_SEGMENTER_MARKER_DEFAULT));
 
+		_chkShowSegmentTooltip.setSelection(Util.getStateBoolean(
+				_segmenterState,
+				TourSegmenterView.STATE_IS_SHOW_SEGMENTER_TOOLTIP,
+				TourSegmenterView.STATE_IS_SHOW_SEGMENTER_TOOLTIP_DEFAULT));
+
 		_chkShowSegmentValue.setSelection(Util.getStateBoolean(
 				_segmenterState,
 				TourSegmenterView.STATE_IS_SHOW_SEGMENTER_VALUE,
@@ -710,6 +730,8 @@ public class SlideoutTourChartSegmenterProperties extends AnimatedToolTipShell i
 				_chkShowDecimalPlaces.getSelection());
 		_segmenterState.put(TourSegmenterView.STATE_IS_SHOW_SEGMENTER_MARKER, //
 				_chkShowSegmentMarker.getSelection());
+		_segmenterState.put(TourSegmenterView.STATE_IS_SHOW_SEGMENTER_TOOLTIP, //
+				_chkShowSegmentTooltip.getSelection());
 		_segmenterState.put(TourSegmenterView.STATE_IS_SHOW_SEGMENTER_VALUE, //
 				_chkShowSegmentValue.getSelection());
 

@@ -18,43 +18,45 @@ package net.tourbook.ui.tourChart;
 import java.util.ArrayList;
 
 import net.tourbook.chart.ChartComponentGraph;
-import net.tourbook.chart.ChartTitleSegment;
 import net.tourbook.common.UI;
 import net.tourbook.common.tooltip.AnimatedToolTipShell2;
 import net.tourbook.common.tooltip.IOpeningDialog;
 import net.tourbook.common.util.IToolTipProvider;
 import net.tourbook.data.TourData;
-import net.tourbook.tour.TourInfoUI;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.ITourProvider;
 
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.ToolBarManager;
+import org.eclipse.jface.layout.GridDataFactory;
+import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.ToolBar;
 
 /**
- * created: 13.07.2015
+ * created: 06.09.2015
  */
-public class ChartTitleToolTip extends AnimatedToolTipShell2 implements ITourProvider, IToolTipProvider, IOpeningDialog {
+public class TourSegmenterTooltip extends AnimatedToolTipShell2 implements ITourProvider, IToolTipProvider,
+		IOpeningDialog {
 
 	private String				_dialogId	= getClass().getCanonicalName();
 
 	private TourChart			_tourChart;
-	private ChartTitleSegment	_hoveredTitleSegment;
+	private SegmenterSegment	_hoveredSegment;
 
 	/*
 	 * UI resources
 	 */
-	private final TourInfoUI	_tourInfoUI	= new TourInfoUI();
 
 	private Long				_hoveredTourId;
 
-	public ChartTitleToolTip(final TourChart tourChart) {
+	public TourSegmenterTooltip(final TourChart tourChart) {
 
 		super(tourChart);
 
@@ -67,11 +69,6 @@ public class ChartTitleToolTip extends AnimatedToolTipShell2 implements ITourPro
 		setBehaviourOnMouseOver(MOUSE_OVER_BEHAVIOUR_IGNORE_OWNER);
 	}
 
-	void actionQuickEditTour() {
-
-		_tourInfoUI.actionQuickEditTour();
-	}
-
 	@Override
 	protected void beforeHideToolTip() {
 
@@ -79,20 +76,20 @@ public class ChartTitleToolTip extends AnimatedToolTipShell2 implements ITourPro
 		 * This is the tricky part that the hovered marker is reset before the tooltip is closed and
 		 * not when nothing is hovered. This ensures that the tooltip has a valid state.
 		 */
-		_hoveredTitleSegment = null;
+		_hoveredSegment = null;
 
 	}
 
 	@Override
 	protected boolean canShowToolTip() {
 
-		return _hoveredTitleSegment != null;
+		return _hoveredSegment != null;
 	}
 
 	@Override
 	protected Composite createToolTipContentArea(final Composite shell) {
 
-		if (_hoveredTitleSegment == null) {
+		if (_hoveredSegment == null) {
 			return null;
 		}
 
@@ -108,25 +105,18 @@ public class ChartTitleToolTip extends AnimatedToolTipShell2 implements ITourPro
 
 	private Composite createUI(final Composite parent) {
 
-		Composite ui;
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+		GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
+		{
 
-		final TourData tourData = TourManager.getInstance().getTourData(_hoveredTitleSegment.getTourId());
+			final Label label = new Label(container, SWT.NONE);
+			GridDataFactory.fillDefaults().applyTo(label);
+			label.setText("TourSegmenterToolTip");
 
-		if (tourData == null) {
-
-			// there are no data available
-
-			ui = _tourInfoUI.createUI_NoData(parent);
-
-		} else {
-
-			// tour data is available
-
-			_tourInfoUI.setActionsEnabled(true);
-
-			ui = _tourInfoUI.createContentArea(parent, tourData, this, this);
 		}
-		return ui;
+
+		return container;
 	}
 
 	@Override
@@ -152,11 +142,11 @@ public class ChartTitleToolTip extends AnimatedToolTipShell2 implements ITourPro
 	@Override
 	public Point getToolTipLocation(final Point tipSize) {
 
-		final int devHoveredX = _hoveredTitleSegment.devXTitle;
-		int devHoveredY = _hoveredTitleSegment.devYTitle;
-		final int devHoveredWidth = _hoveredTitleSegment.titleWidth;
+		final int devHoveredX = _hoveredSegment.devXTitle;
+		int devHoveredY = _hoveredSegment.devYTitle;
+		final int devHoveredWidth = _hoveredSegment.titleWidth;
 
-		final int devYTop = _hoveredTitleSegment.devYGraphTop;
+		final int devYTop = _hoveredSegment.devYGraphTop;
 
 		final int tipWidth = tipSize.x;
 		final int tipHeight = tipSize.y;
@@ -179,10 +169,10 @@ public class ChartTitleToolTip extends AnimatedToolTipShell2 implements ITourPro
 			// set tooltip to the graph left border
 			ttPosX = -tipWidth - 1;
 
-		} else if (ttPosX > _hoveredTitleSegment.devGraphWidth) {
+		} else if (ttPosX > _hoveredSegment.devGraphWidth) {
 
 			// set tooltip to the graph right border
-			ttPosX = _hoveredTitleSegment.devGraphWidth;
+			ttPosX = _hoveredSegment.devGraphWidth;
 		}
 
 		final ChartComponentGraph graphControl = _tourChart.getChartComponents().getChartComponentGraph();
@@ -245,59 +235,63 @@ public class ChartTitleToolTip extends AnimatedToolTipShell2 implements ITourPro
 	@Override
 	protected boolean isInNoHideArea(final Point displayCursorLocation) {
 
-		if (_hoveredTitleSegment == null) {
+		if (_hoveredSegment == null) {
+
 			return false;
+
 		} else {
-			return _hoveredTitleSegment.isInNoHideArea(
+
+			return _hoveredSegment.isInNoHideArea(
 					_tourChart.getChartComponents().getChartComponentGraph(),
 					displayCursorLocation);
 		}
 	}
 
 	private void onDispose() {
-		_tourInfoUI.dispose();
+
 	}
 
-	void open(final ChartTitleSegment titleSegment) {
+	void open(final SegmenterSegment hoveredSegment) {
 
-		boolean isKeepOpened = false;
-
-		if (titleSegment != null && isTooltipClosing()) {
-
-			/**
-			 * This case occures when the tooltip is opened but is currently closing and the mouse
-			 * is moved from the tooltip back to the hovered label.
-			 * <p>
-			 * This prevents that when the mouse is over the hovered label but not moved, that the
-			 * tooltip keeps opened.
-			 */
-			isKeepOpened = true;
-		}
-
-		if (titleSegment == _hoveredTitleSegment && isKeepOpened == false) {
-			// nothing has changed
-
-			return;
-		}
-
-		if (titleSegment == null || titleSegment.getTourId() == null) {
-
-			// a marker is not hovered or is hidden, hide tooltip
-
-			_hoveredTitleSegment = null;
-			_hoveredTourId = null;
-
-			hide();
-
-		} else {
-
-			// another marker is hovered, show tooltip
-
-			_hoveredTitleSegment = titleSegment;
-			_hoveredTourId = titleSegment.getTourId();
-
-			showToolTip();
-		}
+//		boolean isKeepOpened = false;
+//
+//		if (hoveredSegment != null && isTooltipClosing()) {
+//
+//			/**
+//			 * This case occures when the tooltip is opened but is currently closing and the mouse
+//			 * is moved from the tooltip back to the hovered label.
+//			 * <p>
+//			 * This prevents that when the mouse is over the hovered label but not moved, that the
+//			 * tooltip keeps opened.
+//			 */
+//			isKeepOpened = true;
+//		}
+//
+//		if (hoveredSegment == _hoveredSegment && isKeepOpened == false) {
+//
+//			// nothing has changed
+//
+//			return;
+//		}
+//
+//		if (hoveredSegment == null || hoveredSegment.getTourId() == null) {
+//
+//			// a marker is not hovered or is hidden, hide tooltip
+//
+//			_hoveredSegment = null;
+//			_hoveredTourId = null;
+//
+//			hide();
+//
+//		} else {
+//
+//			// another marker is hovered, show tooltip
+//
+//			_hoveredSegment = hoveredSegment;
+//			_hoveredTourId = hoveredSegment.getTourId();
+//
+//			showToolTip();
+//		}
 	}
 
 }

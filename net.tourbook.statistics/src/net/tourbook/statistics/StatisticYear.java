@@ -21,7 +21,7 @@ import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.ChartDataSerie;
 import net.tourbook.chart.ChartDataXSerie;
 import net.tourbook.chart.ChartDataYSerie;
-import net.tourbook.chart.ChartSegments;
+import net.tourbook.chart.ChartStatisticSegments;
 import net.tourbook.chart.ChartToolTipInfo;
 import net.tourbook.chart.ChartType;
 import net.tourbook.chart.IChartInfoProvider;
@@ -57,7 +57,7 @@ public abstract class StatisticYear extends YearStatistic {
 		return false;
 	}
 
-	ChartSegments createChartSegments(final TourDataYear tourDataYear) {
+	ChartStatisticSegments createChartSegments(final TourDataYear tourDataYear) {
 
 		final int yearCounter = tourDataYear.altitudeHigh[0].length;
 
@@ -75,7 +75,7 @@ public abstract class StatisticYear extends YearStatistic {
 			segmentEnd[yearIndex] = yearIndex;
 		}
 
-		final ChartSegments yearSegments = new ChartSegments();
+		final ChartStatisticSegments yearSegments = new ChartStatisticSegments();
 		yearSegments.segmentStartValue = segmentStart;
 		yearSegments.segmentEndValue = segmentEnd;
 		yearSegments.segmentTitle = segmentTitle;

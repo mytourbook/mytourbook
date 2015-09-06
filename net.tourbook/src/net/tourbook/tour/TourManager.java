@@ -31,7 +31,7 @@ import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.ChartDataSerie;
 import net.tourbook.chart.ChartDataXSerie;
 import net.tourbook.chart.ChartDataYSerie;
-import net.tourbook.chart.ChartSegments;
+import net.tourbook.chart.ChartStatisticSegments;
 import net.tourbook.chart.ChartType;
 import net.tourbook.chart.ComputeChartValue;
 import net.tourbook.common.CommonActivator;
@@ -3060,7 +3060,7 @@ public class TourManager {
 			segmentEndValue[tourIndex] = xValues[tourEndIndex];
 		}
 
-		final ChartSegments chartSegments = new ChartSegments();
+		final ChartStatisticSegments chartSegments = new ChartStatisticSegments();
 
 		chartSegments.segmentStartValue = segmentStartValue;
 		chartSegments.segmentEndValue = segmentEndValue;

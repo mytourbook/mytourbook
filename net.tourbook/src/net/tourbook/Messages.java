@@ -1204,11 +1204,11 @@ public class Messages extends NLS {
 	public static String		Slideout_ChartMarkerOptions_Label_Title;
 
 	public static String		Slideout_SegmenterChartOptions_Checkbox_HideSmallValues;
-
-	public static String	Slideout_SegmenterChartOptions_Checkbox_HideSmallValues_Tooltip;
+	public static String		Slideout_SegmenterChartOptions_Checkbox_HideSmallValues_Tooltip;
 	public static String		Slideout_SegmenterChartOptions_Checkbox_IsShowDecimalPlaces;
 	public static String		Slideout_SegmenterChartOptions_Checkbox_IsShowSegmentLine;
 	public static String		Slideout_SegmenterChartOptions_Checkbox_IsShowSegmentMarker;
+	public static String		Slideout_SegmenterChartOptions_Checkbox_IsShowSegmentTooltip;
 	public static String		Slideout_SegmenterChartOptions_Checkbox_IsShowSegmentValue;
 	public static String		Slideout_SegmenterChartOptions_Label_FontSize;
 	public static String		Slideout_SegmenterChartOptions_Label_GraphOpacity;

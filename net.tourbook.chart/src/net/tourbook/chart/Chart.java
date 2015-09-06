@@ -620,8 +620,8 @@ public class Chart extends ViewForm {
 		return _chartOverlayListener.getListeners();
 	}
 
-	public ChartSegmentConfig getChartSegmentConfig() {
-		return _chartComponents.componentGraph.chartSegmentConfig;
+	public ChartTitleSegmentConfig getChartTitleSegmentConfig() {
+		return _chartComponents.componentGraph.chartTitleSegmentConfig;
 	}
 
 	IHoveredValueListener getHoveredListener() {
@@ -1066,10 +1066,10 @@ public class Chart extends ViewForm {
 	/**
 	 * Set hovered tour in the {@link ChartComponentGraph}.
 	 * 
-	 * @param tourSegment
+	 * @param chartTitleSegment
 	 */
-	public void setHoveredSegment(final ChartSegment tourSegment) {
-		_chartComponents.getChartComponentGraph().setHoveredTour(tourSegment);
+	public void setHoveredTitleSegment(final ChartTitleSegment chartTitleSegment) {
+		_chartComponents.getChartComponentGraph().setHoveredTitleSegment(chartTitleSegment);
 	}
 
 	public void setLineSelectionPainter(final ILineSelectionPainter lineSelectionPainter) {

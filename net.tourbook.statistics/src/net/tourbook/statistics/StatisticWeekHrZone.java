@@ -26,7 +26,7 @@ import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.ChartDataSerie;
 import net.tourbook.chart.ChartDataXSerie;
 import net.tourbook.chart.ChartDataYSerie;
-import net.tourbook.chart.ChartSegments;
+import net.tourbook.chart.ChartStatisticSegments;
 import net.tourbook.chart.ChartType;
 import net.tourbook.chart.IChartInfoProvider;
 import net.tourbook.common.util.Util;
@@ -81,7 +81,7 @@ public class StatisticWeekHrZone extends YearStatistic {
 	/**
 	 * create segments for each week
 	 */
-	ChartSegments createChartSegments() {
+	ChartStatisticSegments createChartSegments() {
 
 		final double segmentStart[] = new double[_statNumberOfYears];
 		final double segmentEnd[] = new double[_statNumberOfYears];
@@ -105,7 +105,7 @@ public class StatisticWeekHrZone extends YearStatistic {
 			yearIndex++;
 		}
 
-		final ChartSegments weekSegments = new ChartSegments();
+		final ChartStatisticSegments weekSegments = new ChartStatisticSegments();
 		weekSegments.segmentStartValue = segmentStart;
 		weekSegments.segmentEndValue = segmentEnd;
 		weekSegments.segmentTitle = segmentTitle;

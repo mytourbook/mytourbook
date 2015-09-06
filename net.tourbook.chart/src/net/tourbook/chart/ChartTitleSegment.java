@@ -19,7 +19,7 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Control;
 
-public class ChartSegment {
+public class ChartTitleSegment {
 
 	public static final int	TITLE_HOVER_MARGIN	= 5;
 
@@ -37,16 +37,24 @@ public class ChartSegment {
 	public int				devXSegment;
 	public int				devSegmentWidth;
 
-	public ChartSegment() {}
+	public ChartTitleSegment() {}
+
+	/**
+	 * @return Returns ID of a tour or <code>null</code> when not available.
+	 */
+	public Long getTourId() {
+		return _tourId;
+	}
 
 	/**
 	 * Get an area from the segment display position which can be hovered and the tooltip do not get
 	 * hidden.
 	 * 
 	 * @param control
+	 * @param displayCursorLocation
 	 * @return
 	 */
-	public Rectangle getNoHideArea(final Control control) {
+	public boolean isInNoHideArea(final Control control, final Point displayCursorLocation) {
 
 		final Point segmentDisplayPosition = control.toDisplay(devXSegment, 0);
 
@@ -56,14 +64,7 @@ public class ChartSegment {
 				devSegmentWidth,
 				devYTitle + titleHeight);
 
-		return segmentArea;
-	}
-
-	/**
-	 * @return Returns ID of a tour or <code>null</code> when not available.
-	 */
-	public Long getTourId() {
-		return _tourId;
+		return segmentArea.contains(displayCursorLocation);
 	}
 
 	public void setTourId(final Long tourId) {

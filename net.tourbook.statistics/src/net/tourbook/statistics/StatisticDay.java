@@ -26,7 +26,7 @@ import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.ChartDataSerie;
 import net.tourbook.chart.ChartDataXSerie;
 import net.tourbook.chart.ChartDataYSerie;
-import net.tourbook.chart.ChartSegments;
+import net.tourbook.chart.ChartStatisticSegments;
 import net.tourbook.chart.ChartToolTipInfo;
 import net.tourbook.chart.ChartType;
 import net.tourbook.chart.IBarSelectionListener;
@@ -141,7 +141,7 @@ public abstract class StatisticDay extends YearStatistic implements IBarSelectio
 	/**
 	 * create segments for the chart
 	 */
-	ChartSegments createChartSegments(final TourDataDay tourTimeData) {
+	ChartStatisticSegments createChartSegments(final TourDataDay tourTimeData) {
 
 		final double[] segmentStart = new double[_numberOfYears];
 		final double[] segmentEnd = new double[_numberOfYears];
@@ -163,7 +163,7 @@ public abstract class StatisticDay extends YearStatistic implements IBarSelectio
 			yearDaysSum += yearDays;
 		}
 
-		final ChartSegments chartSegments = new ChartSegments();
+		final ChartStatisticSegments chartSegments = new ChartStatisticSegments();
 		chartSegments.segmentStartValue = segmentStart;
 		chartSegments.segmentEndValue = segmentEnd;
 		chartSegments.segmentTitle = segmentTitle;

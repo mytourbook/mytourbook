@@ -56,7 +56,7 @@ public class ChartDataXSerie extends ChartDataSerie {
 	 * Segment contains information to show divide the chart into parts, e.g. statistics for several
 	 * years.
 	 */
-	private ChartSegments	_chartSegments;
+	private ChartStatisticSegments	_chartSegments;
 
 	/**
 	 * Contains information how to draw the title for a history chart
@@ -91,7 +91,7 @@ public class ChartDataXSerie extends ChartDataSerie {
 		setMinMaxValues(values);
 	}
 
-	public ChartSegments getChartSegments() {
+	public ChartStatisticSegments getChartSegments() {
 		return _chartSegments;
 	}
 
@@ -162,7 +162,7 @@ public class ChartDataXSerie extends ChartDataSerie {
 		return _timeSerieWithTimeZoneAdjustment;
 	}
 
-	public void setChartSegments(final ChartSegments chartSegments) {
+	public void setChartSegments(final ChartStatisticSegments chartSegments) {
 		_chartSegments = chartSegments;
 	}
 

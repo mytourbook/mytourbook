@@ -18,7 +18,7 @@ package net.tourbook.chart;
 /**
  * Configuration how the chart segment is displayed.
  */
-public class ChartSegmentConfig {
+public class ChartTitleSegmentConfig {
 
 	public boolean	isShowSegmentTitle;
 	public boolean	isShowSegmentBackground;

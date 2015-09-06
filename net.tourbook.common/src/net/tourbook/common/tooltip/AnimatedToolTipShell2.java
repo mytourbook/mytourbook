@@ -672,19 +672,17 @@ public abstract class AnimatedToolTipShell2 {
 
 				// check no hide area
 
-				final Rectangle noHideArea = noHideOnMouseMove();
+				if (isInNoHideArea(displayCursorLocation)) {
 
-				if (noHideArea == null || noHideArea.contains(displayCursorLocation) == false) {
+					showFlag |= 0b1000_0000; // 8
+
+				} else {
 
 					// hide definitively
 
 					ttHide();
 
 					hideFlag |= 0b100_0000; // 7
-
-				} else {
-
-					showFlag |= 0b1000_0000; // 8
 				}
 			}
 
@@ -960,6 +958,15 @@ public abstract class AnimatedToolTipShell2 {
 	}
 
 	/**
+	 * @param displayCursorLocation
+	 * @return When the returned rectangle (which has display locations) is hit by the mouse, the
+	 *         tooltip should not be hidden. When <code>null</code> this check is ignored.
+	 */
+	protected boolean isInNoHideArea(final Point displayCursorLocation) {
+		return false;
+	}
+
+	/**
 	 * @return Return <code>true</code> when the tooltip shell is <code>null</code>, disposed or not
 	 *         visible.
 	 */
@@ -989,14 +996,6 @@ public abstract class AnimatedToolTipShell2 {
 		final boolean isShellVisible = _currentShell.isVisible();
 
 		return isShellVisible;
-	}
-
-	/**
-	 * @return When the returned rectangle (which has display locations) is hit by the mouse, the
-	 *         tooltip should not be hidden. When <code>null</code> this check is ignored.
-	 */
-	protected Rectangle noHideOnMouseMove() {
-		return null;
 	}
 
 	/**

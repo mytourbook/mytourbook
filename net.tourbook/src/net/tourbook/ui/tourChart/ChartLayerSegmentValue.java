@@ -45,32 +45,32 @@ import org.eclipse.swt.widgets.Display;
  */
 public class ChartLayerSegmentValue implements IChartLayer {
 
-	private TourChart							_tourChart;
-	private TourData							_tourData;
+	private TourChart								_tourChart;
+	private TourData								_tourData;
 
 	// hide small values
-	private boolean								_isHideSmallValues;
-	private double								_smallValue;
+	private boolean									_isHideSmallValues;
+	private double									_smallValue;
 
 	// show lines
-	private boolean								_isShowSegmenterLine;
-	private int									_lineOpacity;
+	private boolean									_isShowSegmenterLine;
+	private int										_lineOpacity;
 
-	private boolean								_isShowDecimalPlaces;
-	private boolean								_isShowSegmenterValues;
-	private int									_stackedValues;
-	private double[]							_xDataSerie;
+	private boolean									_isShowDecimalPlaces;
+	private boolean									_isShowSegmenterValues;
+	private int										_stackedValues;
+	private double[]								_xDataSerie;
 
 	/**
 	 * Area where the graph is painted.
 	 */
-	private ArrayList<Rectangle>				_allGraphAreas	= new ArrayList<>();
+	private ArrayList<Rectangle>					_allGraphAreas		= new ArrayList<>();
 
-	private ArrayList<ArrayList<ChartLabel>>	_allChartLabels	= new ArrayList<>();
+	private ArrayList<ArrayList<SegmenterSegment>>	_allPaintedSegments	= new ArrayList<>();
 
-	private int									_paintedGraphIndex;
+	private int										_paintedGraphIndex;
 
-	private final NumberFormat					_nf1			= NumberFormat.getNumberInstance();
+	private final NumberFormat						_nf1				= NumberFormat.getNumberInstance();
 
 	{
 		_nf1.setMinimumFractionDigits(1);
@@ -98,7 +98,7 @@ public class ChartLayerSegmentValue implements IChartLayer {
 		 */
 		if (graphDrawingData.graphIndex <= _paintedGraphIndex) {
 			_allGraphAreas.clear();
-			_allChartLabels.clear();
+			_allPaintedSegments.clear();
 		}
 
 		final ChartDataYSerie yData = graphDrawingData.getYData();
@@ -167,8 +167,8 @@ public class ChartLayerSegmentValue implements IChartLayer {
 		_allGraphAreas.add(graphArea);
 
 		// painted labels for each graph
-		final ArrayList<ChartLabel> paintedLabels = new ArrayList<>();
-		_allChartLabels.add(paintedLabels);
+		final ArrayList<SegmenterSegment> paintedSegment = new ArrayList<>();
+		_allPaintedSegments.add(paintedSegment);
 
 		// do not draw over the graph area
 		gc.setClipping(graphArea);
@@ -265,7 +265,7 @@ public class ChartLayerSegmentValue implements IChartLayer {
 					}
 				}
 
-				final ChartLabel chartLabel = new ChartLabel();
+				final SegmenterSegment segmenterSegment = new SegmenterSegment();
 
 				/*
 				 * Connect two segments with a line
@@ -288,19 +288,19 @@ public class ChartLayerSegmentValue implements IChartLayer {
 								devYSegment);
 					}
 
-					chartLabel.paintedX1 = devXPrev;
-					chartLabel.paintedY1 = devYSegment;
+					segmenterSegment.paintedX1 = devXPrev;
+					segmenterSegment.paintedY1 = devYSegment;
 
-					chartLabel.paintedX2 = devXSegment;
-					chartLabel.paintedY2 = devYSegment;
+					segmenterSegment.paintedX2 = devXSegment;
+					segmenterSegment.paintedY2 = devYSegment;
 
-					chartLabel.hoveredLineRect = new Rectangle(//
+					segmenterSegment.hoveredLineRect = new Rectangle(//
 							devXPrev,
-							devYSegment - ChartLabel.MARKER_HOVER_SIZE2,
+							devYSegment - SegmenterSegment.EXPANDED_HOVER_SIZE2,
 							segmentWidth,
-							ChartLabel.MARKER_HOVER_SIZE);
+							SegmenterSegment.EXPANDED_HOVER_SIZE);
 
-					chartLabel.paintedRGB = segmentConfig.segmentLineRGB;
+					segmenterSegment.paintedRGB = segmentConfig.segmentLineRGB;
 
 					if (_isShowSegmenterValues) {
 
@@ -373,19 +373,20 @@ public class ChartLayerSegmentValue implements IChartLayer {
 										true);
 
 								// ensure that only visible labels can be hovered
-								chartLabel.isVisible = true;
+								segmenterSegment.isVisible = true;
 							}
 
-							chartLabel.paintedLabel = validRect;
+							segmenterSegment.paintedLabel = validRect;
 
 							// keep area to detect hovered segments, enlarge it with the hover border to easier hit the label
 							final Rectangle hoveredRect = new Rectangle(
 									(validRect.x + borderWidth),
-									(validRect.y + borderHeight - ChartLabel.MARKER_HOVER_SIZE2),
-									(validRect.width - borderWidth2 + ChartLabel.MARKER_HOVER_SIZE),
-									(validRect.height - borderHeight2 + ChartLabel.MARKER_HOVER_SIZE));
+ (validRect.y
+									+ borderHeight - SegmenterSegment.EXPANDED_HOVER_SIZE2), (validRect.width
+									- borderWidth2 + SegmenterSegment.EXPANDED_HOVER_SIZE), (validRect.height
+									- borderHeight2 + SegmenterSegment.EXPANDED_HOVER_SIZE));
 
-							chartLabel.hoveredLabelRect = hoveredRect;
+							segmenterSegment.hoveredLabelRect = hoveredRect;
 
 //								/*
 //								 * Debugging
@@ -404,12 +405,12 @@ public class ChartLayerSegmentValue implements IChartLayer {
 						? SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION
 						: segmentSerieIndex[prevSegmentIndex];
 
-				chartLabel.xSliderSerieIndexLeft = leftIndex;
-				chartLabel.xSliderSerieIndexRight = serieIndex;
+				segmenterSegment.xSliderSerieIndexLeft = leftIndex;
+				segmenterSegment.xSliderSerieIndexRight = serieIndex;
 
-				chartLabel.segmentIndex = segmentIndex;
+				segmenterSegment.segmentIndex = segmentIndex;
 
-				paintedLabels.add(chartLabel);
+				paintedSegment.add(segmenterSegment);
 
 				// advance to the next point
 				devXPrev = devXSegment;
@@ -431,9 +432,9 @@ public class ChartLayerSegmentValue implements IChartLayer {
 	 * @return Returns the hovered {@link ChartLabel} or <code>null</code> when a {@link ChartLabel}
 	 *         is not hovered.
 	 */
-	ChartLabel getHoveredLabel(final ChartMouseEvent mouseEvent) {
+	SegmenterSegment getHoveredSegment(final ChartMouseEvent mouseEvent) {
 
-		ChartLabel hoveredLabel = null;
+		SegmenterSegment hoveredSegment = null;
 
 		for (int graphIndex = 0; graphIndex < _allGraphAreas.size(); graphIndex++) {
 
@@ -443,20 +444,20 @@ public class ChartLayerSegmentValue implements IChartLayer {
 
 				// mouse is hovering the graph area
 
-				hoveredLabel = getHoveredLabel_10(graphIndex, mouseEvent.devXMouse, mouseEvent.devYMouse);
+				hoveredSegment = getHoveredSegment_10(graphIndex, mouseEvent.devXMouse, mouseEvent.devYMouse);
 
 				break;
 			}
 		}
 
-		return hoveredLabel;
+		return hoveredSegment;
 	}
 
-	private ChartLabel getHoveredLabel_10(final int graphIndex, final int devXMouse, final int devYMouse) {
+	private SegmenterSegment getHoveredSegment_10(final int graphIndex, final int devXMouse, final int devYMouse) {
 
-		final ArrayList<ChartLabel> chartLabels = _allChartLabels.get(graphIndex);
+		final ArrayList<SegmenterSegment> paintedSegments = _allPaintedSegments.get(graphIndex);
 
-		for (final ChartLabel chartLabel : chartLabels) {
+		for (final SegmenterSegment chartLabel : paintedSegments) {
 
 			final Rectangle hoveredLabel = chartLabel.hoveredLabelRect;
 			final Rectangle hoveredRect = chartLabel.hoveredLineRect;
@@ -472,8 +473,8 @@ public class ChartLayerSegmentValue implements IChartLayer {
 		return null;
 	}
 
-	ArrayList<ArrayList<ChartLabel>> getPaintedLabels() {
-		return _allChartLabels;
+	ArrayList<ArrayList<SegmenterSegment>> getPaintedLabels() {
+		return _allPaintedSegments;
 	}
 
 	void setIsShowDecimalPlaces(final boolean isShowDecimalPlaces) {
@@ -505,7 +506,7 @@ public class ChartLayerSegmentValue implements IChartLayer {
 		_tourData = tourData;
 
 		// initialize painted labels
-		_allChartLabels.clear();
+		_allPaintedSegments.clear();
 		_allGraphAreas.clear();
 	}
 
