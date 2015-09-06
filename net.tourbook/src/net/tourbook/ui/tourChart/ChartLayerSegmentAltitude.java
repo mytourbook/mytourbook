@@ -28,6 +28,7 @@ import net.tourbook.chart.GraphDrawingData;
 import net.tourbook.chart.IChartLayer;
 import net.tourbook.chart.IChartOverlay;
 import net.tourbook.chart.SelectionChartXSliderPosition;
+import net.tourbook.common.graphics.Line2D;
 import net.tourbook.data.TourData;
 import net.tourbook.tour.TourManager;
 
@@ -282,7 +283,7 @@ public class ChartLayerSegmentAltitude implements IChartLayer, IChartOverlay {
 
 				} else {
 
-					if (_isShowSegmenterLine && isShowValueText) {
+					if (_isShowSegmenterLine /* && isShowValueText */) {
 
 						gc.setAlpha(_lineOpacity);
 						gc.setForeground(upDownColor);
@@ -301,20 +302,19 @@ public class ChartLayerSegmentAltitude implements IChartLayer, IChartOverlay {
 					chartLabel.paintedX2 = devXSegment;
 					chartLabel.paintedY2 = devYSegment;
 
-					int hoveredHeight = segmentHeight < 0 ? -segmentHeight : segmentHeight;
-					int devYHovered = devYPrev < devYSegment ? devYPrev : devYSegment;
-					if (hoveredHeight < ChartLabel.MIN_HOVER_LINE_HEIGHT) {
-						hoveredHeight = ChartLabel.MIN_HOVER_LINE_HEIGHT;
-						devYHovered -= ChartLabel.MIN_HOVER_LINE_HEIGHT / 2;
-					}
-
-					chartLabel.hoveredLineRect = new Rectangle(//
+					chartLabel.hoveredLineShape = new Line2D(//
 							devXPrev,
-							devYHovered,
-							segmentWidth,
-							hoveredHeight);
+							devYPrev,
+							devXSegment,
+							devYSegment);
 
 					chartLabel.paintedRGB = upDownColor.getRGB();
+
+//					/*
+//					 * Debugging
+//					 */
+//					gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_GRAY));
+//					gc.drawRectangle(chartLabel.hoveredLineShape.rectangle());
 
 					/*
 					 * Draw a line from the value marker to the top or the bottom
@@ -400,10 +400,10 @@ public class ChartLayerSegmentAltitude implements IChartLayer, IChartOverlay {
 
 							// keep area to detect hovered segments, enlarge it with the hover border to easier hit the label
 							final Rectangle hoveredRect = new Rectangle(
-									(validRect.x + borderWidth - ChartLabel.MARKER_HOVER_SIZE),
-									(validRect.y + borderHeight - ChartLabel.MARKER_HOVER_SIZE),
-									(validRect.width - borderWidth2 + 2 * ChartLabel.MARKER_HOVER_SIZE),
-									(validRect.height - borderHeight2 + 2 * ChartLabel.MARKER_HOVER_SIZE));
+									(validRect.x + borderWidth - ChartLabel.MARKER_HOVER_SIZE2),
+									(validRect.y + borderHeight - ChartLabel.MARKER_HOVER_SIZE2),
+									(validRect.width - borderWidth2 + ChartLabel.MARKER_HOVER_SIZE),
+									(validRect.height - borderHeight2 + ChartLabel.MARKER_HOVER_SIZE));
 
 							chartLabel.hoveredLabelRect = hoveredRect;
 
@@ -559,12 +559,16 @@ public class ChartLayerSegmentAltitude implements IChartLayer, IChartOverlay {
 		for (final ChartLabel chartLabel : _paintedLabels) {
 
 			final Rectangle hoveredLabelRect = chartLabel.hoveredLabelRect;
-			final Rectangle hoveredLineRect = chartLabel.hoveredLineRect;
+			final Line2D hoveredLineRect = chartLabel.hoveredLineShape;
 
 			if (//
 				// the label must be visible that it is checked
 			(chartLabel.isVisible && hoveredLabelRect != null && hoveredLabelRect.contains(devXMouse, devYMouse))
-					|| (hoveredLineRect != null && hoveredLineRect.contains(devXMouse, devYMouse))) {
+					|| (hoveredLineRect != null && hoveredLineRect.intersects(
+							devXMouse - ChartLabel.MARKER_HOVER_SIZE2,
+							devYMouse - ChartLabel.MARKER_HOVER_SIZE2,
+							ChartLabel.MARKER_HOVER_SIZE,
+							ChartLabel.MARKER_HOVER_SIZE))) {
 
 				// segment is hit
 				return chartLabel;

@@ -5654,13 +5654,13 @@ public class ChartComponentGraph extends Canvas {
 		return _zoomRatioLeftBorder;
 	}
 
-	private void handleChartResizeForSliders() {
+	private void handleChartResizeForSliders(final boolean isFireEvent) {
 
 		// update the width in the sliders
 		final int visibleGraphHeight = getDevVisibleGraphHeight();
 
-		getLeftSlider().handleChartResize(visibleGraphHeight);
-		getRightSlider().handleChartResize(visibleGraphHeight);
+		getLeftSlider().handleChartResize(visibleGraphHeight, isFireEvent);
+		getRightSlider().handleChartResize(visibleGraphHeight, isFireEvent);
 	}
 
 	/**
@@ -6326,7 +6326,12 @@ public class ChartComponentGraph extends Canvas {
 
 		if (externalMouseMoveEvent.isWorked) {
 
+			if (externalMouseMoveEvent.isDisableSliderDragging) {
+				_xSliderDragged = null;
+			}
+
 			setChartCursor(externalMouseMoveEvent.cursor);
+
 			return;
 		}
 
@@ -6604,8 +6609,6 @@ public class ChartComponentGraph extends Canvas {
 				devXMouse,
 				devYMouse);
 
-		boolean canDoOtherActions = false;
-
 		if (externalMouseMoveEvent.isWorked) {
 
 			setChartCursor(externalMouseMoveEvent.cursor);
@@ -6616,13 +6619,6 @@ public class ChartComponentGraph extends Canvas {
 			canShowHoveredValueTooltip = true;
 
 		} else {
-
-			canDoOtherActions = true;
-		}
-
-		final boolean canDoImportantActions = externalMouseMoveEvent.canDoImportantActions;
-
-		if (canDoOtherActions || externalMouseMoveEvent.isWorked && canDoImportantActions) {
 
 			if (_isXSliderVisible && _xSliderDragged != null) {
 
@@ -7797,8 +7793,8 @@ public class ChartComponentGraph extends Canvas {
 		redraw();
 	}
 
-	public void setLineSelectionPainter(final ILineSelectionPainter _lineSelectionPainter) {
-		this._lineSelectionPainter = _lineSelectionPainter;
+	void setLineSelectionPainter(final ILineSelectionPainter lineSelectionPainter) {
+		_lineSelectionPainter = lineSelectionPainter;
 	}
 
 	void setSelectedBars(final boolean[] selectedItems) {
@@ -8201,8 +8197,8 @@ public class ChartComponentGraph extends Canvas {
 		 * update all x-sliders
 		 */
 		final int visibleGraphHeight = getDevVisibleGraphHeight();
-		_xSliderA.handleChartResize(visibleGraphHeight);
-		_xSliderB.handleChartResize(visibleGraphHeight);
+		_xSliderA.handleChartResize(visibleGraphHeight, false);
+		_xSliderB.handleChartResize(visibleGraphHeight, false);
 
 		/*
 		 * update all y-sliders
@@ -8463,10 +8459,6 @@ public class ChartComponentGraph extends Canvas {
 		}
 	}
 
-	public ILineSelectionPainter xxxget_lineSelectionPainter() {
-		return _lineSelectionPainter;
-	}
-
 	/**
 	 * @param devXMousePosition
 	 *            This relative mouse position is used to keep the position when zoomed in, when set
@@ -8525,7 +8517,7 @@ public class ChartComponentGraph extends Canvas {
 			}
 
 			setZoomRatioLeftBorder();
-			handleChartResizeForSliders();
+			handleChartResizeForSliders(false);
 
 			updateVisibleMinMaxValues();
 			moveSlidersToBorder();
@@ -8618,7 +8610,7 @@ public class ChartComponentGraph extends Canvas {
 			_zoomRatioCenter = devCenterPos / devVirtualWidth;
 		}
 
-		handleChartResizeForSliders();
+		handleChartResizeForSliders(false);
 
 		updateVisibleMinMaxValues();
 
@@ -8639,8 +8631,8 @@ public class ChartComponentGraph extends Canvas {
 
 		// reposition the sliders
 		final int visibleGraphHeight = getDevVisibleGraphHeight();
-		_xSliderA.handleChartResize(visibleGraphHeight);
-		_xSliderB.handleChartResize(visibleGraphHeight);
+		_xSliderA.handleChartResize(visibleGraphHeight, false);
+		_xSliderB.handleChartResize(visibleGraphHeight, false);
 
 		_chart.enableActions();
 
@@ -8701,7 +8693,7 @@ public class ChartComponentGraph extends Canvas {
 
 			setZoomRatioLeftBorder();
 
-			handleChartResizeForSliders();
+			handleChartResizeForSliders(false);
 			updateVisibleMinMaxValues();
 
 			if (isUpdateChart) {
@@ -8719,7 +8711,7 @@ public class ChartComponentGraph extends Canvas {
 
 				setZoomRatioLeftBorder();
 
-				handleChartResizeForSliders();
+				handleChartResizeForSliders(false);
 				updateVisibleMinMaxValues();
 
 				if (isUpdateChart) {

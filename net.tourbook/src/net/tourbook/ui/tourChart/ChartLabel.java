@@ -19,6 +19,7 @@
 package net.tourbook.ui.tourChart;
 
 import net.tourbook.common.UI;
+import net.tourbook.common.graphics.Line2D;
 import net.tourbook.photo.Photo;
 
 import org.eclipse.swt.graphics.RGB;
@@ -26,7 +27,10 @@ import org.eclipse.swt.graphics.Rectangle;
 
 public class ChartLabel {
 
-	static final int		MARKER_HOVER_SIZE		= 6;
+	static final int		MARKER_HOVER_SIZE		= 12;
+	static final int		MARKER_HOVER_SIZE2		= MARKER_HOVER_SIZE / 2;
+
+	static final int		MIN_HOVER_LINE_HEIGHTx	= 50;
 
 	/**
 	 * marker was created in the device
@@ -41,8 +45,6 @@ public class ChartLabel {
 	public static final int	VISIBLE_TYPE_DEFAULT	= 0;
 	public static final int	VISIBLE_TYPE_TYPE_NEW	= 10;
 	public static final int	VISIBLE_TYPE_TYPE_EDIT	= 20;
-
-	static final int		MIN_HOVER_LINE_HEIGHT	= 50;
 
 	public boolean			isVisible;
 	public boolean			isDescription;
@@ -89,6 +91,7 @@ public class ChartLabel {
 	public Rectangle		paintedLabel;
 	Rectangle				hoveredLabelRect;
 	Rectangle				hoveredLineRect;
+	Line2D					hoveredLineShape;
 
 	public int				devHoverSize;
 

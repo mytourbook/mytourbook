@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -17,6 +17,8 @@ package net.tourbook.algorithm;
 
 import java.util.ArrayList;
 
+import net.tourbook.data.TourData;
+
 public class DouglasPeuckerSimplifier {
 
 	/**
@@ -32,24 +34,27 @@ public class DouglasPeuckerSimplifier {
 	private boolean[]	_usedPoints;
 
 	/**
-	 * Contains indices where a new segment should start
+	 * Contains indices where a new segment should start, this is used when a new tour start when
+	 * multiple tours are contained in {@link TourData}.
 	 */
-	private int[]		_forcedIndices;
+	private int[]		_forcedSegmentsIndices;
 
-	public DouglasPeuckerSimplifier(final float tolerance, final DPPoint[] graphPoints, final int[] forcedIndices) {
+	public DouglasPeuckerSimplifier(final float tolerance, final DPPoint[] graphPoints, final int[] forcedSegmentIndices) {
 
 		_tolerance = tolerance;
 		_graphPoints = graphPoints;
-		_forcedIndices = forcedIndices;
+		_forcedSegmentsIndices = forcedSegmentIndices;
 	}
 
 	public DPPoint[] simplify() {
 
 		int forcedIndex = 0;
-		int forcedIndexIndex = 0;
-		if (_forcedIndices != null && _forcedIndices.length > 0) {
-			forcedIndexIndex++;
-			forcedIndex = _forcedIndices[forcedIndexIndex];
+		int forcedSegmentIndex = 0;
+
+		if (_forcedSegmentsIndices != null && _forcedSegmentsIndices.length > 0) {
+
+			forcedSegmentIndex++;
+			forcedIndex = _forcedSegmentsIndices[forcedSegmentIndex];
 		}
 
 		// set all used points to false
@@ -69,16 +74,18 @@ public class DouglasPeuckerSimplifier {
 		final ArrayList<DPPoint> simplifiedPoints = new ArrayList<DPPoint>();
 		for (int serieIndex = 0; serieIndex < _graphPoints.length; serieIndex++) {
 
+			// get default state
 			boolean isPointUsed = _usedPoints[serieIndex];
 
-			if (_forcedIndices != null && forcedIndex == serieIndex) {
+			// get state when tourdata contains multiple tours
+			if (_forcedSegmentsIndices != null && forcedIndex == serieIndex) {
 
 				isPointUsed = true;
 
 				// get next forced index
-				forcedIndexIndex++;
-				if (forcedIndexIndex < _forcedIndices.length) {
-					forcedIndex = _forcedIndices[forcedIndexIndex];
+				forcedSegmentIndex++;
+				if (forcedSegmentIndex < _forcedSegmentsIndices.length) {
+					forcedIndex = _forcedSegmentsIndices[forcedSegmentIndex];
 				}
 			}
 

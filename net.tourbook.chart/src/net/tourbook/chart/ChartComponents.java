@@ -2203,8 +2203,7 @@ public class ChartComponents extends Composite {
 		// notify components about the new configuration
 		componentGraph.setDrawingData(_chartDrawingData);
 
-		// resize the sliders after the drawing data have changed and the new
-		// chart size is saved
+		// resize the sliders after the drawing data have changed and the new chart size is saved
 		componentGraph.updateSlidersOnResize();
 
 		// resize the axis

@@ -134,9 +134,12 @@ public class ChartXSlider {
 	}
 
 	/**
-	 * When the width of the graph changed, the slider bar position must be adjusted
+	 * When the width of the graph changed, the slider bar position must be adjusted.
+	 * 
+	 * @param devGraphHeight
+	 * @param isFireEvent
 	 */
-	void handleChartResize(final int devGraphHeight) {
+	void handleChartResize(final int devGraphHeight, final boolean isFireEvent) {
 
 		// resize the hit rectangle
 		_hitRectangle.height = devGraphHeight;
@@ -157,7 +160,7 @@ public class ChartXSlider {
 					 */
 					final long xxDevGraphWidth = _chartGraph.getXXDevGraphWidth();
 
-					moveToXXDevPosition(xxDevGraphWidth, true, true, true);
+					moveToXXDevPosition(xxDevGraphWidth, true, true, true, isFireEvent);
 				}
 			});
 
@@ -167,8 +170,9 @@ public class ChartXSlider {
 
 			final long xxDevGraphWidth = _chartGraph.getXXDevGraphWidth();
 			final double devSliderPos = xxDevGraphWidth * _positionRatio;
+			final double xxDevLinePos = devSliderPos < 0 ? 0 : devSliderPos;
 
-			moveToXXDevPosition(devSliderPos < 0 ? 0 : devSliderPos, true, false, false);
+			moveToXXDevPosition(xxDevLinePos, true, false, false, isFireEvent);
 		}
 	}
 

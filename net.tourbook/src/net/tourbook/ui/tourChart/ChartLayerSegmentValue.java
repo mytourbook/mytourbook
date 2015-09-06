@@ -278,7 +278,7 @@ public class ChartLayerSegmentValue implements IChartLayer {
 
 				} else {
 
-					if (_isShowSegmenterLine && isShowValueText) {
+					if (_isShowSegmenterLine /* && isShowValueText */) {
 
 						gc.setAlpha(_lineOpacity);
 						gc.drawLine(//
@@ -294,14 +294,11 @@ public class ChartLayerSegmentValue implements IChartLayer {
 					chartLabel.paintedX2 = devXSegment;
 					chartLabel.paintedY2 = devYSegment;
 
-					final int hoveredHeight = ChartLabel.MIN_HOVER_LINE_HEIGHT;
-					final int devYHovered = devYSegment - hoveredHeight / 2;
-
 					chartLabel.hoveredLineRect = new Rectangle(//
 							devXPrev,
-							devYHovered,
+							devYSegment - ChartLabel.MARKER_HOVER_SIZE2,
 							segmentWidth,
-							hoveredHeight);
+							ChartLabel.MARKER_HOVER_SIZE);
 
 					chartLabel.paintedRGB = segmentConfig.segmentLineRGB;
 
@@ -384,9 +381,9 @@ public class ChartLayerSegmentValue implements IChartLayer {
 							// keep area to detect hovered segments, enlarge it with the hover border to easier hit the label
 							final Rectangle hoveredRect = new Rectangle(
 									(validRect.x + borderWidth),
-									(validRect.y + borderHeight - ChartLabel.MARKER_HOVER_SIZE),
-									(validRect.width - borderWidth2 + 2 * ChartLabel.MARKER_HOVER_SIZE),
-									(validRect.height - borderHeight2 + 2 * ChartLabel.MARKER_HOVER_SIZE));
+									(validRect.y + borderHeight - ChartLabel.MARKER_HOVER_SIZE2),
+									(validRect.width - borderWidth2 + ChartLabel.MARKER_HOVER_SIZE),
+									(validRect.height - borderHeight2 + ChartLabel.MARKER_HOVER_SIZE));
 
 							chartLabel.hoveredLabelRect = hoveredRect;
 

@@ -1073,7 +1073,6 @@ public class Chart extends ViewForm {
 	}
 
 	public void setLineSelectionPainter(final ILineSelectionPainter lineSelectionPainter) {
-
 		_chartComponents.getChartComponentGraph().setLineSelectionPainter(lineSelectionPainter);
 	}
 

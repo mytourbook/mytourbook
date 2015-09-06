@@ -2760,6 +2760,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		// notify the chart mouse listener that no other actions should be done
 		mouseEvent.isWorked = true;
 		mouseEvent.cursor = ChartCursor.Arrow;
+		mouseEvent.isDisableSliderDragging = true;
 
 		final boolean isShift = (mouseEvent.stateMask & SWT.SHIFT) != 0;
 
@@ -2816,8 +2817,6 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 			// set worked that no other actions are done in this event
 			mouseEvent.isWorked = _isSegmentLabelHovered;
 			mouseEvent.cursor = ChartCursor.Arrow;
-
-			mouseEvent.canDoImportantActions = true;
 		}
 
 		boolean isUpdateUI = false;
@@ -4170,6 +4169,10 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		_selectedSegmentLabel_1 = null;
 		_selectedSegmentLabel_2 = null;
 		_selectedSegments = null;
+		
+		_selectedLine = null;
+		_selectedPaths = null;
+		_selectedPathsRGB = null;
 
 		setSelectedLines(false);
 

@@ -1816,7 +1816,13 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 			dpPoints[serieIndex] = new DPPoint(distanceSerie[serieIndex], altitudeSerie[serieIndex], serieIndex);
 		}
 
-		final DPPoint[] simplifiedPoints = new DouglasPeuckerSimplifier(dpTolerance, dpPoints).simplify();
+		int[] forcedIndices = null;
+		if (isMultipleTours) {
+			forcedIndices = multipleTourStartIndex;
+		}
+
+		final DPPoint[] simplifiedPoints = new DouglasPeuckerSimplifier(dpTolerance, dpPoints, forcedIndices)
+				.simplify();
 
 		float altitudeUpTotal = 0;
 		float altitudeDownTotal = 0;
