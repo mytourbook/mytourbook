@@ -177,7 +177,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	public static final String						STATE_SMALL_VALUE_SIZE							= "STATE_SMALL_VALUE_SIZE";				//$NON-NLS-1$
 	public static final int							STATE_SMALL_VALUE_SIZE_DEFAULT					= 50;
 	public static final String						STATE_STACKED_VISIBLE_VALUES					= "STATE_STACKED_VISIBLE_VALUES";			//$NON-NLS-1$
-	public static final int							STATE_STACKED_VISIBLE_VALUES_DEFAULT			= 1;
+	public static final int							STATE_STACKED_VISIBLE_VALUES_DEFAULT			= 2;
 
 	private static final int						COLUMN_DEFAULT									= 0;										// sort by time
 	private static final int						COLUMN_SPEED									= 10;

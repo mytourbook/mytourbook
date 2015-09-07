@@ -790,7 +790,7 @@ public class Chart extends ViewForm {
 			_chartComponents.getChartComponentGraph().zoomInWithoutSlider();
 			_chartComponents.onResize();
 		} else {
-			_chartComponents.getChartComponentGraph().zoomInWithMouse(Integer.MIN_VALUE);
+			_chartComponents.getChartComponentGraph().zoomInWithMouse(Integer.MIN_VALUE, 1.0);
 		}
 	}
 
@@ -809,7 +809,7 @@ public class Chart extends ViewForm {
 			return;
 		}
 
-		_chartComponents.getChartComponentGraph().zoomOutWithMouse(updateChart, Integer.MIN_VALUE);
+		_chartComponents.getChartComponentGraph().zoomOutWithMouse(updateChart, Integer.MIN_VALUE, 1.0);
 	}
 
 	void onExternalChartResize() {
