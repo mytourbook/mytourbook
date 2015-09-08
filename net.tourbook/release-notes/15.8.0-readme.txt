@@ -21,6 +21,7 @@ New
 - Show only tour marker which contain a description.
 - HR zones can only be displayed for multiple tours when an active person is selected, it is not available when 'All People' is selected.
 - Zoom in/out with smaller steps when <Alt> key is pressed.
+- Accelerate horizontal scrolling with mouse wheel and <Ctrl>+<Shift>
 
 
 Improvements
@@ -46,6 +47,8 @@ Improvements
 * Tour Segmenter
 - Properties (value, font, opacity ...) how segments are displayed in the tour chart.
 - Select tour segments with the mouse in the tour chart, multiple segments can be selected with the <Shift> key.
+- Navigate tour segments in the tour chart with the <Left> or <Right> key, multiple segments can be selected with the <Shift> key.
+
  
 Bugfix
 ======	

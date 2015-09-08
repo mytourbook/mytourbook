@@ -6077,25 +6077,32 @@ public class ChartComponentGraph extends Canvas {
 
 	private void onKeyDown(final Event event) {
 
-		final ChartType chartType = _chart.getChartDataModel().getChartType();
+		if ((_chart.onExternalKeyDown(event)).isWorked) {
 
-		if (chartType == ChartType.BAR) {
+			// nothing more to do
 
-			_chartComponents.selectBarItem(event);
+		} else {
 
-		} else if (chartType == ChartType.LINE) {
+			final ChartType chartType = _chart.getChartDataModel().getChartType();
 
-			switch (event.character) {
-			case '+':
-				_chart.onExecuteZoomIn();
-				break;
+			if (chartType == ChartType.BAR) {
 
-			case '-':
-				_chart.onExecuteZoomOut(true);
-				break;
+				_chartComponents.selectBarItem(event);
 
-			default:
-				onKeyDownMoveXSlider(event);
+			} else if (chartType == ChartType.LINE) {
+
+				switch (event.character) {
+				case '+':
+					_chart.onExecuteZoomIn();
+					break;
+
+				case '-':
+					_chart.onExecuteZoomOut(true);
+					break;
+
+				default:
+					onKeyDown_MoveXSlider(event);
+				}
 			}
 		}
 	}
@@ -6105,7 +6112,7 @@ public class ChartComponentGraph extends Canvas {
 	 * 
 	 * @param event
 	 */
-	private void onKeyDownMoveXSlider(final Event event) {
+	private void onKeyDown_MoveXSlider(final Event event) {
 
 		final int keyCode = event.keyCode;
 
@@ -6151,62 +6158,50 @@ public class ChartComponentGraph extends Canvas {
 
 		boolean isMoveSlider = false;
 
-//		if (isShift && isCtrl) {
-//
-//			/*
-//			 * this will reposition the x-slider to the exact value position in the graph, the Ctrl
-//			 * key must be pressed first before the Shift key otherwise the slider is toggles
-//			 */
-//			isMoveSlider = true;
-//
-//		} else
-		{
+		switch (keyCode) {
+		case SWT.PAGE_DOWN:
+		case SWT.ARROW_RIGHT:
 
-			switch (keyCode) {
-			case SWT.PAGE_DOWN:
-			case SWT.ARROW_RIGHT:
+			valueIndex += valueIndexDiff;
 
-				valueIndex += valueIndexDiff;
-
-				// wrap around
-				if (valueIndex >= xValues.length) {
-					valueIndex = 0;
-				}
-
-				isMoveSlider = true;
-
-				break;
-
-			case SWT.PAGE_UP:
-			case SWT.ARROW_LEFT:
-
-				valueIndex -= valueIndexDiff;
-
-				// wrap around
-				if (valueIndex < 0) {
-					valueIndex = xValues.length - 1;
-				}
-
-				isMoveSlider = true;
-
-				break;
-
-			case SWT.HOME:
-
+			// wrap around
+			if (valueIndex >= xValues.length) {
 				valueIndex = 0;
-
-				isMoveSlider = true;
-
-				break;
-
-			case SWT.END:
-
-				valueIndex = xValues.length - 1;
-
-				isMoveSlider = true;
-
-				break;
 			}
+
+			isMoveSlider = true;
+
+			break;
+
+		case SWT.PAGE_UP:
+		case SWT.ARROW_LEFT:
+
+			valueIndex -= valueIndexDiff;
+
+			// wrap around
+			if (valueIndex < 0) {
+				valueIndex = xValues.length - 1;
+			}
+
+			isMoveSlider = true;
+
+			break;
+
+		case SWT.HOME:
+
+			valueIndex = 0;
+
+			isMoveSlider = true;
+
+			break;
+
+		case SWT.END:
+
+			valueIndex = xValues.length - 1;
+
+			isMoveSlider = true;
+
+			break;
 		}
 
 		if (isMoveSlider) {
@@ -6694,6 +6689,11 @@ public class ChartComponentGraph extends Canvas {
 
 			ChartXSlider xSlider;
 
+			/**
+			 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!<br>
+			 * THE FEATURE onExternalMouseMoveImportant IS NOT YET FULLY IMPLEMENTED
+			 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!<br>
+			 */
 			final ChartMouseEvent externalMouseMoveEvent = _chart.onExternalMouseMoveImportant(
 					eventTime,
 					devXMouse,

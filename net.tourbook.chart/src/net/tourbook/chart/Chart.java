@@ -70,14 +70,16 @@ public class Chart extends ViewForm {
 	private static final int		MouseUp								= 30;
 	private static final int		MouseDoubleClick					= 40;
 	private static final int		MouseExit							= 50;
+	private static final int		KeyDown								= 110;
 	private static final int		ChartResized						= 999;
 
 //	private final ListenerList		_focusListeners						= new ListenerList();
 	private final ListenerList		_barSelectionListeners				= new ListenerList();
 	private final ListenerList		_barDoubleClickListeners			= new ListenerList();
 	private final ListenerList		_sliderMoveListeners				= new ListenerList();
-	private final ListenerList		_mouseChartListener					= new ListenerList();
-	private final ListenerList		_mouseChartMoveListener				= new ListenerList();
+	private final ListenerList		_chartKeyListener					= new ListenerList();
+	private final ListenerList		_chartMouseListener					= new ListenerList();
+	private final ListenerList		_chartMouseMoveListener				= new ListenerList();
 	private final ListenerList		_chartOverlayListener				= new ListenerList();
 
 	private ChartComponents			_chartComponents;
@@ -211,20 +213,24 @@ public class Chart extends ViewForm {
 		_barSelectionListeners.add(listener);
 	}
 
+	public void addChartKeyListener(final IKeyListener keyListener) {
+		_chartKeyListener.add(keyListener);
+	}
+
+	public void addChartMouseListener(final IMouseListener mouseListener) {
+		_chartMouseListener.add(mouseListener);
+	}
+
+	public void addChartMouseMoveListener(final IMouseListener mouseListener) {
+		_chartMouseMoveListener.add(mouseListener);
+	}
+
 	public void addChartOverlay(final IChartOverlay chartOverlay) {
 		_chartOverlayListener.add(chartOverlay);
 	}
 
 	public void addDoubleClickListener(final IBarSelectionListener listener) {
 		_barDoubleClickListeners.add(listener);
-	}
-
-	public void addMouseChartListener(final IMouseListener mouseListener) {
-		_mouseChartListener.add(mouseListener);
-	}
-
-	public void addMouseChartMoveListener(final IMouseListener mouseListener) {
-		_mouseChartMoveListener.add(mouseListener);
 	}
 
 	/**
@@ -518,7 +524,7 @@ public class Chart extends ViewForm {
 
 	private void fireChartMouseEvent(final ChartMouseEvent mouseEvent) {
 
-		final Object[] listeners = _mouseChartListener.getListeners();
+		final Object[] listeners = _chartMouseListener.getListeners();
 		for (final Object listener : listeners) {
 
 			switch (mouseEvent.type) {
@@ -558,12 +564,32 @@ public class Chart extends ViewForm {
 
 	private void fireChartMouseMoveEvent(final ChartMouseEvent mouseEvent) {
 
-		final Object[] listeners = _mouseChartMoveListener.getListeners();
+		final Object[] listeners = _chartMouseMoveListener.getListeners();
 		for (final Object listener : listeners) {
 
 			((IMouseListener) listener).mouseMove(mouseEvent);
 
 			if (mouseEvent.isWorked) {
+				return;
+			}
+		}
+	}
+
+	private void fireKeyEvent(final ChartKeyEvent keyEvent) {
+
+		final Object[] listeners = _chartKeyListener.getListeners();
+		for (final Object listener : listeners) {
+
+			switch (keyEvent.type) {
+			case Chart.KeyDown:
+				((IKeyListener) listener).keyDown(keyEvent);
+				break;
+
+			default:
+				break;
+			}
+
+			if (keyEvent.isWorked) {
 				return;
 			}
 		}
@@ -821,6 +847,15 @@ public class Chart extends ViewForm {
 				0));
 	}
 
+	ChartKeyEvent onExternalKeyDown(final Event event) {
+
+		final ChartKeyEvent keyEvent = new ChartKeyEvent(Chart.KeyDown, event.keyCode, event.stateMask);
+
+		fireKeyEvent(keyEvent);
+
+		return keyEvent;
+	}
+
 	ChartMouseEvent onExternalMouseDoubleClick(final long eventTime, final int devXMouse, final int devYMouse) {
 
 		final ChartMouseEvent event = new ChartMouseEvent(//
@@ -923,24 +958,28 @@ public class Chart extends ViewForm {
 		_chartComponents.getChartComponentGraph().redrawLayer();
 	}
 
-	public void removeChartOverlay(final IChartOverlay chartOverlay) {
-		_chartOverlayListener.remove(chartOverlay);
+	public void removeChartKeyListener(final IKeyListener keyListener) {
+		_chartKeyListener.remove(keyListener);
 	}
 
 //	public void removeFocusListener(final Listener listener) {
 //		_focusListeners.remove(listener);
 //	}
 
+	public void removeChartMouseListener(final IMouseListener mouseListener) {
+		_chartMouseListener.remove(mouseListener);
+	}
+
+	public void removeChartMouseMoveListener(final IMouseListener mouseListener) {
+		_chartMouseMoveListener.remove(mouseListener);
+	}
+
+	public void removeChartOverlay(final IChartOverlay chartOverlay) {
+		_chartOverlayListener.remove(chartOverlay);
+	}
+
 	public void removeDoubleClickListener(final IBarSelectionListener listener) {
 		_barDoubleClickListeners.remove(listener);
-	}
-
-	public void removeMouseChartListener(final IMouseListener mouseListener) {
-		_mouseChartListener.remove(mouseListener);
-	}
-
-	public void removeMouseMoveChartListener(final IMouseListener mouseListener) {
-		_mouseChartMoveListener.remove(mouseListener);
 	}
 
 	public void removeSelectionChangedListener(final IBarSelectionListener listener) {
@@ -1133,7 +1172,6 @@ public class Chart extends ViewForm {
 	}
 
 	public void setSelectedLines(final boolean isSelectionVisible) {
-
 		_chartComponents.getChartComponentGraph().setSelectedLines(isSelectionVisible);
 	}
 
@@ -1141,7 +1179,6 @@ public class Chart extends ViewForm {
 	 * Make the mouse mode button visible
 	 */
 	public void setShowMouseMode() {
-
 		_isShowMouseMode = true;
 	}
 
@@ -1150,12 +1187,10 @@ public class Chart extends ViewForm {
 	 *            <code>true</code> shows the sliders
 	 */
 	public void setShowSlider(final boolean isSliderVisible) {
-
 		_chartComponents.setSliderVisible(isSliderVisible);
 	}
 
 	public void setShowZoomActions(final boolean isShowZoomActions) {
-
 		_isShowZoomActions = isShowZoomActions;
 	}
 
