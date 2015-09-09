@@ -2254,10 +2254,11 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 	}
 
 	/**
-	 * Set sliders to the selected segment and fire this position.
+	 * Set sliders to the selected segments and fire these positions.
 	 * 
 	 * @param selectedSegment_1
 	 * @param selectedSegment_2
+	 *            Can be <code>null</code> when only 1 segment is selected.
 	 */
 	private void fireSegmenterSegmentSelection(	final SegmenterSegment selectedSegment_1,
 												final SegmenterSegment selectedSegment_2) {
@@ -2299,8 +2300,8 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		selectionSliderPosition.setCustomData(selectedSegments);
 
 		/*
-		 * Set x slider position in the chart but do not fire an event because the event is fired
-		 * separately for each slider :-(
+		 * Set x slider position in the chart but do not fire an event because the event would be
+		 * fired separately for each slider :-(
 		 */
 		setXSliderPosition(selectionSliderPosition, false);
 
@@ -2406,6 +2407,11 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 	}
 
 	private SegmenterSegment getHoveredSegmenterSegment(final ChartMouseEvent mouseEvent) {
+
+		if (_layerTourSegmenterAltitude == null) {
+			// this occured, it is possible that an event is fired but this layer is not yet set
+			return null;
+		}
 
 		SegmenterSegment hoveredSegmenterSegment = _layerTourSegmenterAltitude.getHoveredSegment(mouseEvent);
 
@@ -2554,15 +2560,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 	private void onChart_KeyDown(final ChartKeyEvent keyEvent) {
 
 		if (_isTourSegmenterVisible) {
-
-			if (keyEvent.keyCode == SWT.ARROW_LEFT) {
-
-				selectSegmenterSegment(keyEvent, true);
-
-			} else if (keyEvent.keyCode == SWT.ARROW_RIGHT) {
-
-				selectSegmenterSegment(keyEvent, false);
-			}
+			selectSegmenterSegment(keyEvent);
 		}
 	}
 
@@ -3082,90 +3080,261 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		_valuePointTooltip.saveState();
 	}
 
-	private void selectSegmenterSegment(final ChartKeyEvent keyEvent, final boolean isLeft) {
-
-		boolean isNavigated = false;
-
-//		final boolean isAltKey = (keyEvent.stateMask & SWT.MOD3) > 0;
-//		final boolean isCtrlKey = (keyEvent.stateMask & SWT.MOD1) > 0;
-		final boolean isShiftKey = (keyEvent.stateMask & SWT.MOD2) > 0;
-
+	private void selectSegmenterSegment(final ChartKeyEvent keyEvent) {
 
 		final int[] segmentSerieIndex = _tourData.segmentSerieIndex;
-		final int segmentSize = segmentSerieIndex.length;
+		final int numSegments = segmentSerieIndex.length;
 
-		if (_selectedSegmenterSegment_1 == null) {
+		int segmentIndex1 = -1;
+		int segmentIndex2 = -1;
+
+		final boolean isShiftKey = (keyEvent.stateMask & SWT.MOD2) > 0;
+		boolean isLeftKey = false;
+		boolean isHomeKey = false;
+		boolean isEndKey = false;
+
+		switch (keyEvent.keyCode) {
+		case SWT.PAGE_DOWN:
+		case SWT.ARROW_RIGHT:
+			// support these keys
+			break;
+
+		case SWT.PAGE_UP:
+		case SWT.ARROW_LEFT:
+			isLeftKey = true;
+			break;
+
+		case SWT.HOME:
+			isHomeKey = true;
+			break;
+
+		case SWT.END:
+			isEndKey = true;
+			break;
+
+		default:
+			// nothing can be navigated, do other actions
+			return;
+		}
+
+		boolean isNavigated = true;
+
+		if (_selectedSegmenterSegment_1 == null || isHomeKey || isEndKey) {
 
 			// nothing is selected, start from the right or left border
 
-			// left segment is selected
+			if (isLeftKey || isEndKey) {
 
-			_selectedSegmenterSegment_1 = new SegmenterSegment();
-			isNavigated = true;
+				// navigate to the left, start navigation from the right border
 
-			if (isLeft) {
-
-				// left navigation, start navigation from the right side
-
-				_selectedSegmenterSegment_1.segmentIndex = segmentSize - 1;
+				segmentIndex1 = numSegments - 1;
 
 			} else {
 
-				// start navigation from the left side
+				// navigate to the right, start navigation from the left border
 
-				_selectedSegmenterSegment_1.segmentIndex = 1;
+				segmentIndex1 = 1;
 			}
 
 		} else {
 
-			// left segment is selected
+			// at least one segment is selected
 
-			final int selectedSegmentIndex = _selectedSegmenterSegment_1.segmentIndex;
+			int selectedSegmentIndex1 = _selectedSegmenterSegment_1.segmentIndex;
+			int selectedSegmentIndex2 = -1;
 
-			_selectedSegmenterSegment_1 = new SegmenterSegment();
-			isNavigated = true;
+			if (_selectedSegmenterSegment_2 != null) {
+				selectedSegmentIndex2 = _selectedSegmenterSegment_2.segmentIndex;
 
-			if (isLeft) {
+				// swap index because with the mouse the left segment can be segment2 depending how they are selected
 
-				// left navigation, select previous segment
+				if (selectedSegmentIndex2 < selectedSegmentIndex1) {
 
-				if (selectedSegmentIndex > 1) {
+					final int tempIndex1 = selectedSegmentIndex1;
+					selectedSegmentIndex1 = selectedSegmentIndex2;
+					selectedSegmentIndex2 = tempIndex1;
+				}
+			}
 
-					_selectedSegmenterSegment_1.segmentIndex = selectedSegmentIndex - 1;
+			if (isShiftKey) {
+
+				if (_selectedSegmenterSegment_2 == null) {
+
+					// start multiple selection
+
+					if (isLeftKey) {
+
+						// expand to the left
+
+						if (selectedSegmentIndex1 > 1) {
+
+							// expand to the next left segment
+
+							segmentIndex1 = selectedSegmentIndex1 - 1;
+							segmentIndex2 = selectedSegmentIndex1;
+
+						} else {
+
+							// it cannot be expanded to the left
+
+							isNavigated = false;
+						}
+
+					} else {
+
+						// expand to the right
+
+						if (selectedSegmentIndex1 < numSegments - 1) {
+
+							// expand to the next left segment
+
+							segmentIndex1 = selectedSegmentIndex1;
+							segmentIndex2 = selectedSegmentIndex1 + 1;
+
+						} else {
+
+							// it cannot be expanded to the left
+
+							isNavigated = false;
+						}
+					}
 
 				} else {
 
-					// start navigation from the right side
-					_selectedSegmenterSegment_1.segmentIndex = segmentSize - 1;
+					// expand multiple selection
+
+					if (isLeftKey) {
+
+						// expand to the left
+
+						if (selectedSegmentIndex1 > 1) {
+
+							// expand to the next left segment
+
+							segmentIndex1 = selectedSegmentIndex1 - 1;
+							segmentIndex2 = selectedSegmentIndex2;
+
+						} else {
+
+							// it cannot be expanded to the left
+
+							isNavigated = false;
+						}
+
+					} else {
+
+						// expand to the right
+
+						if (selectedSegmentIndex2 < numSegments - 1) {
+
+							// expand to the next right segment
+
+							segmentIndex1 = selectedSegmentIndex1;
+							segmentIndex2 = selectedSegmentIndex2 + 1;
+
+						} else {
+
+							// it cannot be expanded to the right
+
+							isNavigated = false;
+						}
+					}
 				}
 
 			} else {
 
-				// right navigation, select next segment
+				// select a SINGLE segment
 
-				if (selectedSegmentIndex < segmentSize - 1) {
+				if (isLeftKey) {
 
-					_selectedSegmenterSegment_1.segmentIndex = selectedSegmentIndex + 1;
+					// navigate to the left
+
+					if (selectedSegmentIndex2 == -1) {
+
+						// there is no multiple selection
+						if (selectedSegmentIndex1 > 1) {
+
+							// select previous segment
+							segmentIndex1 = selectedSegmentIndex1 - 1;
+
+						} else {
+
+							// start navigation from the right border
+							segmentIndex1 = numSegments - 1;
+						}
+					} else {
+
+						// there is multiple selection, navigate to the left segment
+
+						segmentIndex1 = selectedSegmentIndex1;
+					}
 
 				} else {
 
-					// start navigation from the left side
-					_selectedSegmenterSegment_1.segmentIndex = 1;
+					// navigate to the right
+
+					if (selectedSegmentIndex2 == -1) {
+
+						// there is no multiple selection
+
+						if (selectedSegmentIndex1 < numSegments - 1) {
+
+							// select following segment
+							segmentIndex1 = selectedSegmentIndex1 + 1;
+
+						} else {
+
+							// start navigation from the left border
+							segmentIndex1 = 1;
+						}
+
+					} else {
+
+						// there is multiple selection, navigate to the right segment
+
+						segmentIndex1 = selectedSegmentIndex2;
+					}
 				}
 			}
 		}
 
 		if (isNavigated) {
 
-			keyEvent.isWorked = true;
+			_selectedSegmenterSegment_1 = new SegmenterSegment();
+
+			_selectedSegmenterSegment_1.segmentIndex = segmentIndex1;
+			_selectedSegmenterSegment_1.xSliderSerieIndexLeft = segmentSerieIndex[segmentIndex1 - 1];
+			_selectedSegmenterSegment_1.xSliderSerieIndexRight = segmentSerieIndex[segmentIndex1];
+
+			if (segmentIndex2 == -1) {
+
+				// disable multiple selections
+				_selectedSegmenterSegment_2 = null;
+
+			} else {
+
+				// setup multiple selection
+
+				_selectedSegmenterSegment_2 = new SegmenterSegment();
+
+				_selectedSegmenterSegment_2.segmentIndex = segmentIndex2;
+				_selectedSegmenterSegment_2.xSliderSerieIndexLeft = segmentSerieIndex[segmentIndex2 - 1];
+				_selectedSegmenterSegment_2.xSliderSerieIndexRight = segmentSerieIndex[segmentIndex2];
+			}
 
 			// redraw chart
 			setSelectedLines(true);
 			_isRecomputeLineSelection = true;
+
+			fireSegmenterSegmentSelection(_selectedSegmenterSegment_1, _selectedSegmenterSegment_2);
 		}
+
+		// prevent other actions in the chart even when a navigation cannot be done
+		keyEvent.isWorked = true;
 	}
 
 	private boolean selectTour(final ChartTitleSegment selectedTitleSegment) {
+
 		// TODO Auto-generated method stub
 
 		// exclude which is currently not yet supported
