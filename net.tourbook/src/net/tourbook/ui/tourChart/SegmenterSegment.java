@@ -66,6 +66,8 @@ public class SegmenterSegment {
 	Rectangle			hoveredLineRect;
 	Line2D				hoveredLineShape;
 
+	long				tourId;
+
 	SegmenterSegment() {}
 
 	/**
@@ -101,8 +103,8 @@ public class SegmenterSegment {
 
 	@Override
 	public String toString() {
-		return "ChartLabel [" //
-				+ ("paintedLabel=" + paintedLabel + ", ")
+		return "SegmenterSegment [" //
+//				+ ("paintedLabel=" + paintedLabel + ", ")
 				+ ("segmentIndex=" + segmentIndex + ", ")
 //				+ ("serieIndex=" + serieIndex + ", ")
 				+ "]"; //$NON-NLS-1$

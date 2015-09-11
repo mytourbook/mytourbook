@@ -1048,8 +1048,8 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 				// this is a forced point
 
 				/*
-				 * This algorithm ensures that the points are set correctly any only once, highly
-				 * complicated algorithm but now it works.
+				 * This algorithm ensures that the points are set only once, highly complicated
+				 * algorithm but now it works.
 				 */
 				isAddPoint = true;
 
@@ -3110,7 +3110,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 						} else {
 
-							tourData = TourManager.getMultipleTourData(tourIds);
+							tourData = TourManager.createMultipleTourData(tourIds);
 						}
 					}
 

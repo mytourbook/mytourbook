@@ -904,7 +904,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 				if (tourIds.size() == 1) {
 					tourId = tourIds.get(0);
 				} else {
-					tourData = TourManager.getMultipleTourData(tourIds);
+					tourData = TourManager.createMultipleTourData(tourIds);
 				}
 			}
 

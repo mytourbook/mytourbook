@@ -2863,7 +2863,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 				// show/hide tooltip
 				if (hoveredSegment == null) {
 
-					_tourTitleTooltip.hide();
+					_tourSegmenterTooltip.hide();
 
 				} else {
 
@@ -3088,7 +3088,9 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		int segmentIndex1 = -1;
 		int segmentIndex2 = -1;
 
+		final boolean isCtrlKey = (keyEvent.stateMask & SWT.MOD1) > 0;
 		final boolean isShiftKey = (keyEvent.stateMask & SWT.MOD2) > 0;
+
 		boolean isLeftKey = false;
 		boolean isHomeKey = false;
 		boolean isEndKey = false;
@@ -3117,7 +3119,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 			return;
 		}
 
-		boolean isNavigated = true;
+		boolean isNavigated = false;
 
 		if (_selectedSegmenterSegment_1 == null || isHomeKey || isEndKey) {
 
@@ -3135,6 +3137,8 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
 				segmentIndex1 = 1;
 			}
+
+			isNavigated = true;
 
 		} else {
 
@@ -3158,6 +3162,8 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
 			if (isShiftKey) {
 
+				// select multiple segments
+
 				if (_selectedSegmenterSegment_2 == null) {
 
 					// start multiple selection
@@ -3172,12 +3178,6 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
 							segmentIndex1 = selectedSegmentIndex1 - 1;
 							segmentIndex2 = selectedSegmentIndex1;
-
-						} else {
-
-							// it cannot be expanded to the left
-
-							isNavigated = false;
 						}
 
 					} else {
@@ -3190,12 +3190,6 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
 							segmentIndex1 = selectedSegmentIndex1;
 							segmentIndex2 = selectedSegmentIndex1 + 1;
-
-						} else {
-
-							// it cannot be expanded to the left
-
-							isNavigated = false;
 						}
 					}
 
@@ -3205,40 +3199,65 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
 					if (isLeftKey) {
 
-						// expand to the left
+						if (isCtrlKey) {
 
-						if (selectedSegmentIndex1 > 1) {
+							// reduce selection from the right border to the left
 
-							// expand to the next left segment
+							if (selectedSegmentIndex2 - selectedSegmentIndex1 > 0) {
 
-							segmentIndex1 = selectedSegmentIndex1 - 1;
-							segmentIndex2 = selectedSegmentIndex2;
+								segmentIndex1 = selectedSegmentIndex1;
+								segmentIndex2 = selectedSegmentIndex2 - 1;
+							}
 
 						} else {
 
-							// it cannot be expanded to the left
+							// expand to the left
 
-							isNavigated = false;
+							if (selectedSegmentIndex1 > 1) {
+
+								// expand to the next left segment
+
+								segmentIndex1 = selectedSegmentIndex1 - 1;
+								segmentIndex2 = selectedSegmentIndex2;
+							}
 						}
 
 					} else {
 
-						// expand to the right
+						if (isCtrlKey) {
 
-						if (selectedSegmentIndex2 < numSegments - 1) {
+							// reduce selection from the left border to the right
 
-							// expand to the next right segment
+							if (selectedSegmentIndex2 - selectedSegmentIndex1 > 0) {
 
-							segmentIndex1 = selectedSegmentIndex1;
-							segmentIndex2 = selectedSegmentIndex2 + 1;
+								segmentIndex1 = selectedSegmentIndex1 + 1;
+								segmentIndex2 = selectedSegmentIndex2;
+							}
 
 						} else {
 
-							// it cannot be expanded to the right
+							// expand to the right
 
-							isNavigated = false;
+							if (selectedSegmentIndex2 < numSegments - 1) {
+
+								// expand to the next right segment
+
+								segmentIndex1 = selectedSegmentIndex1;
+								segmentIndex2 = selectedSegmentIndex2 + 1;
+							}
 						}
 					}
+				}
+
+				if (segmentIndex2 != -1) {
+
+					// 2nd index is set
+					isNavigated = true;
+				}
+
+				if (segmentIndex1 == segmentIndex2) {
+					// this case can occure when selection is reduced -> disable multiple selections
+					segmentIndex2 = -1;
 				}
 
 			} else {
@@ -3262,6 +3281,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 							// start navigation from the right border
 							segmentIndex1 = numSegments - 1;
 						}
+
 					} else {
 
 						// there is multiple selection, navigate to the left segment
@@ -3295,6 +3315,8 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 						segmentIndex1 = selectedSegmentIndex2;
 					}
 				}
+
+				isNavigated = true;
 			}
 		}
 

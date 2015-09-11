@@ -223,6 +223,16 @@ public class TourSegmenterTooltip extends AnimatedToolTipShell2 implements ITour
 	}
 
 	@Override
+	public void hide() {
+
+		// reset state
+		_hoveredSegment = null;
+		_hoveredTourId = null;
+
+		super.hide();
+	}
+
+	@Override
 	public void hideDialog() {
 		hideNow();
 	}
@@ -253,45 +263,50 @@ public class TourSegmenterTooltip extends AnimatedToolTipShell2 implements ITour
 
 	void open(final SegmenterSegment hoveredSegment) {
 
-//		boolean isKeepOpened = false;
-//
-//		if (hoveredSegment != null && isTooltipClosing()) {
-//
-//			/**
-//			 * This case occures when the tooltip is opened but is currently closing and the mouse
-//			 * is moved from the tooltip back to the hovered label.
-//			 * <p>
-//			 * This prevents that when the mouse is over the hovered label but not moved, that the
-//			 * tooltip keeps opened.
-//			 */
-//			isKeepOpened = true;
-//		}
-//
-//		if (hoveredSegment == _hoveredSegment && isKeepOpened == false) {
-//
-//			// nothing has changed
-//
-//			return;
-//		}
-//
-//		if (hoveredSegment == null || hoveredSegment.getTourId() == null) {
-//
-//			// a marker is not hovered or is hidden, hide tooltip
-//
-//			_hoveredSegment = null;
-//			_hoveredTourId = null;
-//
-//			hide();
-//
-//		} else {
-//
-//			// another marker is hovered, show tooltip
-//
-//			_hoveredSegment = hoveredSegment;
-//			_hoveredTourId = hoveredSegment.getTourId();
-//
+		boolean isKeepOpened = false;
+
+		if (hoveredSegment != null && isTooltipClosing()) {
+
+			/**
+			 * This case occures when the tooltip is opened but is currently closing and the mouse
+			 * is moved from the tooltip back to the hovered label.
+			 * <p>
+			 * This prevents that when the mouse is over the hovered label but not moved, that the
+			 * tooltip keeps opened.
+			 */
+			isKeepOpened = true;
+		}
+
+		if (hoveredSegment == _hoveredSegment && isKeepOpened == false) {
+
+			// nothing has changed
+
+			return;
+		}
+
+		if (hoveredSegment == null) {
+
+			// a segment is not hovered or is hidden, hide tooltip
+
+			hide();
+
+		} else {
+
+			// another marker is hovered, show tooltip
+
+			_hoveredSegment = hoveredSegment;
+			_hoveredTourId = hoveredSegment.tourId;
+
 //			showToolTip();
-//		}
+		}
+
+		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
+				+ ("\t_hoveredTourId: " + _hoveredTourId)
+				+ ("\thoveredSegment: " + hoveredSegment)
+				+ ("\t_hoveredSegment: " + _hoveredSegment)
+		//
+				);
+		// TODO remove SYSTEM.OUT.PRINTLN
 	}
 
 }

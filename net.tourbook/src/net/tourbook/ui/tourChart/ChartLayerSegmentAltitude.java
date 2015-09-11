@@ -20,6 +20,7 @@ package net.tourbook.ui.tourChart;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartDataYSerie;
@@ -28,6 +29,7 @@ import net.tourbook.chart.GraphDrawingData;
 import net.tourbook.chart.IChartLayer;
 import net.tourbook.chart.IChartOverlay;
 import net.tourbook.chart.SelectionChartXSliderPosition;
+import net.tourbook.common.UI;
 import net.tourbook.common.graphics.Line2D;
 import net.tourbook.data.TourData;
 import net.tourbook.tour.TourManager;
@@ -139,6 +141,18 @@ public class ChartLayerSegmentAltitude implements IChartLayer, IChartOverlay {
 		final int[] segmentSerieIndex = _tourData.segmentSerieIndex;
 		final int segmentSerieSize = segmentSerieIndex.length;
 
+		final Long[] multipleTourIds = _tourData.multipleTourIds;
+		final int[] multipleTourStartIndex = _tourData.multipleTourStartIndex;
+		int tourIndex = 0;
+		int nextTourStartIndex = 0;
+
+		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
+				+ ("\tmultipleTourStartIndex: " + Arrays.toString(multipleTourStartIndex))
+				+ ("\tmultipleTourIds: " + Arrays.toString(multipleTourIds))
+		//
+				);
+		// TODO remove SYSTEM.OUT.PRINTLN
+
 //		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] \t")
 //				+ ("\t" + String.format("%9.2f  ", maxValue))
 //				+ ("\t" + String.format("%9.2f  ", hideThreshold))
@@ -148,7 +162,7 @@ public class ChartLayerSegmentAltitude implements IChartLayer, IChartOverlay {
 //				);
 //		// TODO remove SYSTEM.OUT.PRINTLN
 
-		final ValueOverlapChecker posChecker = new ValueOverlapChecker(_stackedValues);
+		final ValueOverlapChecker overlapChecker = new ValueOverlapChecker(_stackedValues);
 
 		int devXPrev = Integer.MIN_VALUE;
 		int devYPrev = Integer.MIN_VALUE;
@@ -180,8 +194,8 @@ public class ChartLayerSegmentAltitude implements IChartLayer, IChartOverlay {
 			for (segmentIndex = 0; segmentIndex < segmentSerieSize; segmentIndex++) {
 
 				// get current value
-				final int serieIndex = segmentSerieIndex[segmentIndex];
-				final int devXSegment = (int) (_xDataSerie[serieIndex] * scaleX - devGraphImageXOffset);
+				final int dataSerieIndex = segmentSerieIndex[segmentIndex];
+				final int devXSegment = (int) (_xDataSerie[dataSerieIndex] * scaleX - devGraphImageXOffset);
 				final int segmentWidth = devXSegment - devXPrev;
 
 				// optimize performance
@@ -214,7 +228,7 @@ public class ChartLayerSegmentAltitude implements IChartLayer, IChartOverlay {
 					}
 				}
 
-				final int yValueIndex = Math.min(yValues.length - 1, serieIndex);
+				final int yValueIndex = Math.min(yValues.length - 1, dataSerieIndex);
 				final float yValue = yValues[yValueIndex];
 
 				final int devYGraph = (int) ((yValue - graphYBottom) * scaleY);
@@ -370,7 +384,7 @@ public class ChartLayerSegmentAltitude implements IChartLayer, IChartOverlay {
 								textWidth + borderWidth2,
 								textHeightWithBorder);
 
-						final Rectangle validRect = posChecker.getValidRect(
+						final Rectangle validRect = overlapChecker.getValidRect(
 								textRect,
 								isValueUp,
 								textHeightWithBorder,
@@ -382,7 +396,7 @@ public class ChartLayerSegmentAltitude implements IChartLayer, IChartOverlay {
 							if (isShowValueText) {
 
 								// keep current valid rectangle
-								posChecker.setupNext(validRect, isValueUp);
+								overlapChecker.setupNext(validRect, isValueUp);
 
 								gc.setAlpha(0xff);
 								gc.setForeground(upDownColor);
@@ -424,14 +438,42 @@ public class ChartLayerSegmentAltitude implements IChartLayer, IChartOverlay {
 				final int leftIndex = prevSegmentIndex < 0
 						? SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION
 						: segmentSerieIndex[prevSegmentIndex];
-
 				segmenterSegment.xSliderSerieIndexLeft = leftIndex;
-				segmenterSegment.xSliderSerieIndexRight = serieIndex;
+				segmenterSegment.xSliderSerieIndexRight = dataSerieIndex;
 
 				segmenterSegment.segmentIndex = segmentIndex;
 
-				segmenterSegment.serieIndex = serieIndex;
-				segmenterSegment.graphX = _xDataSerie[serieIndex];
+				segmenterSegment.serieIndex = dataSerieIndex;
+				segmenterSegment.graphX = _xDataSerie[dataSerieIndex];
+
+				/*
+				 * Get tour id for each segment
+				 */
+				if (_tourData.isMultipleTours) {
+
+					for (; tourIndex < multipleTourIds.length;) {
+
+						if (dataSerieIndex - 1 < nextTourStartIndex) {
+
+							segmenterSegment.tourId = multipleTourIds[tourIndex - 0];
+							break;
+
+						} else {
+
+							tourIndex++;
+
+							if (tourIndex >= multipleTourIds.length) {
+								nextTourStartIndex = Integer.MAX_VALUE;
+							} else {
+								nextTourStartIndex = multipleTourStartIndex[tourIndex - 1];
+							}
+						}
+					}
+
+				} else {
+
+					segmenterSegment.tourId = _tourData.getTourId();
+				}
 
 				_paintedSegments.add(segmenterSegment);
 
