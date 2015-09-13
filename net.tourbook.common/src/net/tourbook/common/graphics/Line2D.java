@@ -13,15 +13,13 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-
-/*
- * Copied from com.sun.javafx.geom.Line2D and adjusted to int.
- */
-
 package net.tourbook.common.graphics;
 
 import org.eclipse.swt.graphics.Rectangle;
 
+/*
+ * Copied from com.sun.javafx.geom.Line2D and adjusted to int.
+ */
 public class Line2D {
 
 	/**

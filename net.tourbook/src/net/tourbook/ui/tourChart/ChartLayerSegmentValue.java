@@ -37,6 +37,7 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Display;
 
@@ -142,16 +143,12 @@ public class ChartLayerSegmentValue implements IChartLayer {
 		final int[] segmentSerieIndex = _tourData.segmentSerieIndex;
 		final int segmentSerieSize = segmentSerieIndex.length;
 
-//		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] \t")
-//				+ ("\t" + String.format("%9.2f  ", maxValue))
-//				+ ("\t" + String.format("%9.2f  ", hideThreshold))
-//				+ ("\t" + String.format("%3d  ", (int) (_smallValue * 100)))
-//				+ ("\t" + minValueAdjustment)
-//		//
-//				);
-//		// TODO remove SYSTEM.OUT.PRINTLN
+		final Long[] multipleTourIds = _tourData.multipleTourIds;
+		final int[] multipleTourStartIndex = _tourData.multipleTourStartIndex;
+		int tourIndex = 0;
+		int nextTourStartIndex = 0;
 
-		final ValueOverlapChecker posChecker = new ValueOverlapChecker(_stackedValues);
+		final ValueOverlapChecker overlapChecker = new ValueOverlapChecker(_stackedValues);
 
 		int devXPrev = Integer.MIN_VALUE;
 
@@ -173,17 +170,17 @@ public class ChartLayerSegmentValue implements IChartLayer {
 		// do not draw over the graph area
 		gc.setClipping(graphArea);
 
-		final Color lineColor = new Color(display, segmentConfig.segmentLineRGB);
-		gc.setForeground(lineColor);
-
+		RGB segmentRGB = segmentConfig.segmentLineRGB;
+		final Color segmentColor = new Color(display, segmentRGB);
+		gc.setForeground(segmentColor);
 		{
 			int segmentIndex;
 
 			for (segmentIndex = 0; segmentIndex < segmentSerieSize; segmentIndex++) {
 
 				// get current value
-				final int serieIndex = segmentSerieIndex[segmentIndex];
-				final int devXSegment = (int) (_xDataSerie[serieIndex] * scaleX - devGraphImageXOffset);
+				final int dataSerieIndex = segmentSerieIndex[segmentIndex];
+				final int devXSegment = (int) (_xDataSerie[dataSerieIndex] * scaleX - devGraphImageXOffset);
 				final int segmentWidth = devXSegment - devXPrev;
 
 				// optimize performance
@@ -300,7 +297,7 @@ public class ChartLayerSegmentValue implements IChartLayer {
 							segmentWidth,
 							SegmenterSegment.EXPANDED_HOVER_SIZE);
 
-					segmenterSegment.paintedRGB = segmentConfig.segmentLineRGB;
+					segmenterSegment.paintedRGB = segmentRGB;
 
 					if (_isShowSegmenterValues) {
 
@@ -351,7 +348,7 @@ public class ChartLayerSegmentValue implements IChartLayer {
 								textWidth + borderWidth2,
 								textHeightWithBorder);
 
-						final Rectangle validRect = posChecker.getValidRect(
+						final Rectangle validRect = overlapChecker.getValidRect(
 								textRect,
 								isValueUp,
 								textHeightWithBorder,
@@ -363,7 +360,7 @@ public class ChartLayerSegmentValue implements IChartLayer {
 							if (isShowValueText) {
 
 								// keep current valid rectangle
-								posChecker.setupNext(validRect, isValueUp);
+								overlapChecker.setupNext(validRect, isValueUp);
 
 								gc.setAlpha(0xff);
 								gc.drawText(//
@@ -373,18 +370,17 @@ public class ChartLayerSegmentValue implements IChartLayer {
 										true);
 
 								// ensure that only visible labels can be hovered
-								segmenterSegment.isVisible = true;
+								segmenterSegment.isValueVisible = true;
 							}
 
 							segmenterSegment.paintedLabel = validRect;
 
 							// keep area to detect hovered segments, enlarge it with the hover border to easier hit the label
-							final Rectangle hoveredRect = new Rectangle(
+							final Rectangle hoveredRect = new Rectangle(//
 									(validRect.x + borderWidth),
- (validRect.y
-									+ borderHeight - SegmenterSegment.EXPANDED_HOVER_SIZE2), (validRect.width
-									- borderWidth2 + SegmenterSegment.EXPANDED_HOVER_SIZE), (validRect.height
-									- borderHeight2 + SegmenterSegment.EXPANDED_HOVER_SIZE));
+									(validRect.y + borderHeight - SegmenterSegment.EXPANDED_HOVER_SIZE2),
+									(validRect.width - borderWidth2 + SegmenterSegment.EXPANDED_HOVER_SIZE),
+									(validRect.height - borderHeight2 + SegmenterSegment.EXPANDED_HOVER_SIZE));
 
 							segmenterSegment.hoveredLabelRect = hoveredRect;
 
@@ -406,17 +402,74 @@ public class ChartLayerSegmentValue implements IChartLayer {
 						: segmentSerieIndex[prevSegmentIndex];
 
 				segmenterSegment.xSliderSerieIndexLeft = leftIndex;
-				segmenterSegment.xSliderSerieIndexRight = serieIndex;
+				segmenterSegment.xSliderSerieIndexRight = dataSerieIndex;
 
 				segmenterSegment.segmentIndex = segmentIndex;
 
+				segmenterSegment.serieIndex = dataSerieIndex;
+				segmenterSegment.graphX = _xDataSerie[dataSerieIndex];
+
+				segmenterSegment.devGraphWidth = graphWidth;
+				segmenterSegment.devYGraphTop = devYTop;
+
+				/*
+				 * Get tour id for each segment
+				 */
+				if (_tourData.isMultipleTours) {
+
+					// multiple tours are displayed
+
+					/*
+					 * This algorithm is highly complicated because of the complex start values but
+					 * now it seams to work.
+					 */
+					for (; tourIndex < multipleTourStartIndex.length;) {
+
+						if (nextTourStartIndex == 0) {
+
+							// 1st segment
+
+							nextTourStartIndex = multipleTourStartIndex[1];
+
+							segmenterSegment.tourId = multipleTourIds[0];
+							break;
+
+						} else {
+
+							// 2nd...n segments
+
+							if (dataSerieIndex <= nextTourStartIndex) {
+
+								segmenterSegment.tourId = multipleTourIds[tourIndex];
+								break;
+
+							} else {
+
+								tourIndex++;
+
+								if (tourIndex >= multipleTourStartIndex.length - 1) {
+									nextTourStartIndex = Integer.MAX_VALUE;
+								} else {
+									nextTourStartIndex = multipleTourStartIndex[tourIndex + 1];
+								}
+							}
+						}
+					}
+
+				} else {
+
+					// a single tour is displayed
+
+					segmenterSegment.tourId = _tourData.getTourId();
+				}
+				
 				paintedSegment.add(segmenterSegment);
 
 				// advance to the next point
 				devXPrev = devXSegment;
 			}
 		}
-		lineColor.dispose();
+		segmentColor.dispose();
 
 		// reset clipping
 		gc.setClipping((Rectangle) null);

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -45,8 +45,6 @@ public class Messages extends NLS {
 	public static String		Action_zoom_to_slider;
 
 	public static String		Error_Message_001_Default;
-
-	public static String		Format_number_float;
 
 	public static String		Image_arrow_left;
 	public static String		Image_arrow_left_disabled;

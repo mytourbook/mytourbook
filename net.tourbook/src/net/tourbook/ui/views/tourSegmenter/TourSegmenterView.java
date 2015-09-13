@@ -713,6 +713,12 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 							selectTourSegments((SelectedTourSegmenterSegments) customData);
 						}
 
+					} else if (eventId == TourEventId.TOUR_CHART_PROPERTY_IS_MODIFIED) {
+
+						// tour chart smoothing can be modified
+
+						createSegments(false);
+
 					} else if (eventId == TourEventId.UPDATE_UI) {
 
 						// check if a tour must be updated
@@ -766,7 +772,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 	private int checkSegmenterData(final TourData tourData) {
 
-		final float[] altitudeSerie = tourData.altitudeSerie;
+		final float[] altitudeSerie = tourData.getAltitudeSmoothedSerie(false);
 		final float[] metricDistanceSerie = tourData.getMetricDistanceSerie();
 		final float[] pulseSerie = tourData.pulseSerie;
 		final Set<TourMarker> markerSerie = tourData.getTourMarkers();
@@ -962,7 +968,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	private void createSegmentsBy_AltitudeWithDP() {
 
 		final float[] distanceSerie = _tourData.getMetricDistanceSerie();
-		final float[] altitudeSerie = _tourData.altitudeSerie;
+		final float[] altitudeSerie = _tourData.getAltitudeSmoothedSerie(false);
 
 		// convert data series into dp points
 		final DPPoint graphPoints[] = new DPPoint[distanceSerie.length];
@@ -994,7 +1000,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	private void createSegmentsBy_AltitudeWithDPMerged() {
 
 		final float[] distanceSerie = _tourData.getMetricDistanceSerie();
-		final float[] altitudeSerie = _tourData.altitudeSerie;
+		final float[] altitudeSerie = _tourData.getAltitudeSmoothedSerie(false);
 
 		final int serieSize = distanceSerie.length;
 
@@ -2124,25 +2130,25 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		defineColumn_DrivingTime(defaultListener);
 		defineColumn_PausedTime(defaultListener);
 
-		defineColumn_AltitudeDiffSegmentBorder(defaultListener);
-		defineColumn_AltitudeDiffSegmentComputed(defaultListener);
-		defineColumn_AltitudeUpSummarizedComputed(defaultListener);
-		defineColumn_AltitudeDownSummarizedComputed(defaultListener);
+		defineColumn_AltitudeDiff_SegmentBorder(defaultListener);
+		defineColumn_AltitudeDiff_SegmentComputed(defaultListener);
+		defineColumn_AltitudeUp_SummarizedComputed(defaultListener);
+		defineColumn_AltitudeDown_SummarizedComputed(defaultListener);
 
 		defineColumn_Gradient();
 
-		defineColumn_AltitudeUpHour(defaultListener);
-		defineColumn_AltitudeDownHour(defaultListener);
+		defineColumn_AltitudeUp_Hour(defaultListener);
+		defineColumn_AltitudeDown_Hour(defaultListener);
 
 		defineColumn_AvgSpeed();
 		defineColumn_AvgPace();
-		defineColumn_AvgPaceDifference();
+		defineColumn_AvgPace_Difference();
 		defineColumn_AvgPulse();
-		defineColumn_AvgPulseDifference();
+		defineColumn_AvgPulse_Difference();
 		defineColumn_AvgCadence();
 
-		defineColumn_AltitudeUpSummarizedBorder(defaultListener);
-		defineColumn_AltitudeDownSummarizedBorder(defaultListener);
+		defineColumn_AltitudeUp_SummarizedBorder(defaultListener);
+		defineColumn_AltitudeDown_SummarizedBorder(defaultListener);
 
 		defineColumn_SerieStartEndIndex();
 	}
@@ -2150,7 +2156,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	/**
 	 * column: altitude diff segment border (m/ft)
 	 */
-	private void defineColumn_AltitudeDiffSegmentBorder(final SelectionAdapter defaultColumnSelectionListener) {
+	private void defineColumn_AltitudeDiff_SegmentBorder(final SelectionAdapter defaultColumnSelectionListener) {
 
 		final ColumnDefinition colDef;
 
@@ -2177,7 +2183,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	/**
 	 * column: computed altitude diff (m/ft)
 	 */
-	private void defineColumn_AltitudeDiffSegmentComputed(final SelectionAdapter defaultColumnSelectionListener) {
+	private void defineColumn_AltitudeDiff_SegmentComputed(final SelectionAdapter defaultColumnSelectionListener) {
 
 		final ColumnDefinition colDef;
 
@@ -2204,7 +2210,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	/**
 	 * column: altitude down m/h
 	 */
-	private void defineColumn_AltitudeDownHour(final SelectionAdapter defaultColumnSelectionListener) {
+	private void defineColumn_AltitudeDown_Hour(final SelectionAdapter defaultColumnSelectionListener) {
 
 		final ColumnDefinition colDef;
 
@@ -2235,7 +2241,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	/**
 	 * column: total altitude down (m/ft)
 	 */
-	private void defineColumn_AltitudeDownSummarizedBorder(final SelectionAdapter defaultColumnSelectionListener) {
+	private void defineColumn_AltitudeDown_SummarizedBorder(final SelectionAdapter defaultColumnSelectionListener) {
 
 		final ColumnDefinition colDef;
 
@@ -2261,7 +2267,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	/**
 	 * column: total altitude down (m/ft)
 	 */
-	private void defineColumn_AltitudeDownSummarizedComputed(final SelectionAdapter defaultColumnSelectionListener) {
+	private void defineColumn_AltitudeDown_SummarizedComputed(final SelectionAdapter defaultColumnSelectionListener) {
 
 		final ColumnDefinition colDef;
 
@@ -2286,7 +2292,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	/**
 	 * column: altitude up m/h
 	 */
-	private void defineColumn_AltitudeUpHour(final SelectionAdapter defaultColumnSelectionListener) {
+	private void defineColumn_AltitudeUp_Hour(final SelectionAdapter defaultColumnSelectionListener) {
 
 		final ColumnDefinition colDef;
 
@@ -2317,7 +2323,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	/**
 	 * column: total altitude up (m/ft)
 	 */
-	private void defineColumn_AltitudeUpSummarizedBorder(final SelectionAdapter defaultColumnSelectionListener) {
+	private void defineColumn_AltitudeUp_SummarizedBorder(final SelectionAdapter defaultColumnSelectionListener) {
 
 		final ColumnDefinition colDef;
 
@@ -2342,7 +2348,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	/**
 	 * column: total altitude up (m/ft)
 	 */
-	private void defineColumn_AltitudeUpSummarizedComputed(final SelectionAdapter defaultColumnSelectionListener) {
+	private void defineColumn_AltitudeUp_SummarizedComputed(final SelectionAdapter defaultColumnSelectionListener) {
 
 		final ColumnDefinition colDef;
 
@@ -2430,7 +2436,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	/**
 	 * column: pace difference
 	 */
-	private void defineColumn_AvgPaceDifference() {
+	private void defineColumn_AvgPace_Difference() {
 
 		final ColumnDefinition colDef;
 
@@ -2485,7 +2491,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	/**
 	 * column: pulse difference
 	 */
-	private void defineColumn_AvgPulseDifference() {
+	private void defineColumn_AvgPulse_Difference() {
 
 		final ColumnDefinition colDef;
 

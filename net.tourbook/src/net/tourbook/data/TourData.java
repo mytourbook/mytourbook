@@ -2059,7 +2059,7 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 		}
 	}
 
-	private float computeAvgCadenceSegment(final int firstIndex, final int lastIndex) {
+	public float computeAvgCadenceSegment(final int firstIndex, final int lastIndex) {
 
 		// check if data are available
 		if (cadenceSerie == null || cadenceSerie.length == 0 || timeSerie == null || timeSerie.length == 0) {
@@ -2093,8 +2093,8 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 		boolean isPrevBreak = hasBreakTime ? breakTimeSerie[firstIndex] : false;
 		boolean isNextBreak = hasBreakTime ? breakTimeSerie[firstIndex + 1] : false;
 
-		float cadenceSquare = 0;
-		float timeSquare = 0;
+		double cadenceSquare = 0;
+		double timeSquare = 0;
 
 		for (int serieIndex = firstIndex; serieIndex <= lastIndex; serieIndex++) {
 
@@ -2138,7 +2138,9 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 				timeDiffNext = ((float) nextTime - currentTime) / 2;
 			}
 
+			// ignore 0 values
 			if (cadence > 0) {
+
 				cadenceSquare += cadence * timeDiffPrev + cadence * timeDiffNext;
 				timeSquare += timeDiffPrev + timeDiffNext;
 			}
@@ -2155,7 +2157,7 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 
 		}
 
-		return timeSquare == 0 ? 0 : cadenceSquare / timeSquare;
+		return (float) (timeSquare == 0 ? 0 : cadenceSquare / timeSquare);
 	}
 
 	public void computeAvgPulse() {
@@ -2204,8 +2206,8 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 		boolean isPrevBreak = breakTimeSerie == null ? false : breakTimeSerie[firstIndex];
 		boolean isNextBreak = breakTimeSerie == null ? false : breakTimeSerie[firstIndex + 1];
 
-		float pulseSquare = 0;
-		float timeSquare = 0;
+		double pulseSquare = 0;
+		double timeSquare = 0;
 
 		for (int serieIndex = firstIndex; serieIndex <= lastIndex; serieIndex++) {
 
@@ -2266,7 +2268,7 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 
 		}
 
-		return timeSquare == 0 ? 0 : pulseSquare / timeSquare;
+		return (float) (timeSquare == 0 ? 0 : pulseSquare / timeSquare);
 	}
 
 	private void computeAvgTemperature() {
@@ -4259,7 +4261,9 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 			return null;
 		}
 
-		final boolean isAltitudeSerie = (altitudeSerie != null) && (altitudeSerie.length > 0);
+		final float[] segmenterAltitudeSerie = getAltitudeSmoothedSerie(false);
+
+		final boolean isAltitudeSerie = (segmenterAltitudeSerie != null) && (segmenterAltitudeSerie.length > 0);
 		final boolean isCadenceSerie = (cadenceSerie != null) && (cadenceSerie.length > 0);
 		final boolean isDistanceSerie = (distanceSerie != null) && (distanceSerie.length > 0);
 		final boolean isPulseSerie = (pulseSerie != null) && (pulseSerie.length > 0);
@@ -4279,7 +4283,7 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 
 		float altitudeStart = 0;
 		if (isAltitudeSerie) {
-			altitudeStart = altitudeSerie[firstSerieIndex];
+			altitudeStart = segmenterAltitudeSerie[firstSerieIndex];
 		}
 
 		float distanceStart = 0;
@@ -4334,16 +4338,16 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 			/*
 			 * time
 			 */
-			final int timeEnd = timeSerie[segmentEndIndex];
-			final int recordingTime = timeEnd - timeStart;
+			final int segmentEndTime = timeSerie[segmentEndIndex];
+			final int segmentRecordingTime = segmentEndTime - timeStart;
 			final int segmentBreakTime = getBreakTime(segmentStartIndex, segmentEndIndex, btConfig);
 
-			final float drivingTime = recordingTime - segmentBreakTime;
+			final float segmentDrivingTime = segmentRecordingTime - segmentBreakTime;
 
-			segmentSerieRecordingTime[segmentIndex] = segment.recordingTime = recordingTime;
-			segmentSerieDrivingTime[segmentIndex] = segment.drivingTime = (int) drivingTime;
+			segmentSerieRecordingTime[segmentIndex] = segment.recordingTime = segmentRecordingTime;
+			segmentSerieDrivingTime[segmentIndex] = segment.drivingTime = (int) segmentDrivingTime;
 			segmentSerieBreakTime[segmentIndex] = segment.breakTime = segmentBreakTime;
-			segmentSerieTimeTotal[segmentIndex] = segment.timeTotal = timeTotal += recordingTime;
+			segmentSerieTimeTotal[segmentIndex] = segment.timeTotal = timeTotal += segmentRecordingTime;
 
 			float segmentDistance = 0.0f;
 
@@ -4365,12 +4369,12 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 				if (segmentDistance != 0.0) {
 
 					// speed
-					segmentSerieSpeed[segmentIndex] = segment.speed = drivingTime == 0.0f ? //
+					segmentSerieSpeed[segmentIndex] = segment.speed = segmentDrivingTime == 0.0f ? //
 							0.0f
-							: segmentDistance / drivingTime * 3.6f / UI.UNIT_VALUE_DISTANCE;
+							: segmentDistance / segmentDrivingTime * 3.6f / UI.UNIT_VALUE_DISTANCE;
 
 					// pace
-					final float segmentPace = drivingTime * 1000 / (segmentDistance / UI.UNIT_VALUE_DISTANCE);
+					final float segmentPace = segmentDrivingTime * 1000 / (segmentDistance / UI.UNIT_VALUE_DISTANCE);
 					segment.pace = segmentPace;
 					segment.paceDiff = segment.pace - tourPace;
 					segmentSeriePace[segmentIndex] = segmentPace;
@@ -4382,7 +4386,7 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 			 */
 			if (isAltitudeSerie) {
 
-				final float altitudeEnd = altitudeSerie[segmentEndIndex];
+				final float altitudeEnd = segmenterAltitudeSerie[segmentEndIndex];
 				final float altitudeDiff = altitudeEnd - altitudeStart;
 
 				segmentSerieAltitudeDiff[segmentIndex] = segment.altitudeDiffSegmentBorder = altitudeDiff;
@@ -4419,16 +4423,16 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 				float altitudeDownH = 0;
 				float powerSum = 0;
 
-				float altitude1 = altitudeSerie[segmentStartIndex];
+				float altitude1 = segmenterAltitudeSerie[segmentStartIndex];
 
 				// get computed values: altitude up/down, pulse and power for a segment
 				for (int serieIndex = segmentStartIndex + 1; serieIndex <= segmentEndIndex; serieIndex++) {
 
-					final float altitude2 = altitudeSerie[serieIndex];
+					final float altitude2 = segmenterAltitudeSerie[serieIndex];
 					final float altitude2Diff = altitude2 - altitude1;
 					altitude1 = altitude2;
 
-					altitudeUpH += altitude2Diff >= 0 ? altitude2Diff : 0;
+					altitudeUpH += altitude2Diff > 0 ? altitude2Diff : 0;
 					altitudeDownH += altitude2Diff < 0 ? altitude2Diff : 0;
 
 					if (isPowerSerie) {
@@ -4439,9 +4443,9 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 				segment.altitudeUpHour = altitudeUpH;
 
 				segmentSerieAltitudeDownH[segmentIndex] = segment.altitudeDownHour = altitudeDownH;
-				segmentSerieAltitudeUpH[segmentIndex] = recordingTime == 0 ? //
+				segmentSerieAltitudeUpH[segmentIndex] = segmentDrivingTime == 0 ? //
 						0
-						: (altitudeUpH + altitudeDownH) / recordingTime * 3600 / UI.UNIT_VALUE_ALTITUDE;
+						: (altitudeUpH + altitudeDownH) / segmentDrivingTime * 3600 / UI.UNIT_VALUE_ALTITUDE;
 
 				final int segmentIndexDiff = segmentEndIndex - segmentStartIndex;
 				segmentSeriePower[segmentIndex] = segment.power = segmentIndexDiff == 0 ? 0 : powerSum
@@ -4474,7 +4478,7 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 			}
 
 			// end point of current segment is the start of the next segment
-			timeStart = timeEnd;
+			timeStart = segmentEndTime;
 		}
 
 		return tourSegments;
@@ -4617,32 +4621,35 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 			return null;
 		}
 
-		if (isForceSmoothing) {
+// ??? HAVE NO IDEA WHY THIS IS USED ???
+//		if (isForceSmoothing) {
+//
+//			// smooth altitude
+//			computeSmoothedDataSeries();
+//
+//		} else {
+//
+		if (altitudeSerieSmoothed != null) {
 
-			// smooth altitude
-			computeSmoothedDataSeries();
+			// return already smoothed altitude values
 
-		} else {
+			if (UI.UNIT_VALUE_ALTITUDE != 1) {
 
-			if (altitudeSerieSmoothed != null) {
+				// imperial system is used
 
-				// return already smoothed altitude values
+				return altitudeSerieImperialSmoothed;
 
-				if (UI.UNIT_VALUE_ALTITUDE != 1) {
-
-					// imperial system is used
-
-					return altitudeSerieImperialSmoothed;
-
-				} else {
-					return altitudeSerieSmoothed;
-				}
+			} else {
+				return altitudeSerieSmoothed;
 			}
 		}
+//		}
 
 		if (altitudeSerieSmoothed == null) {
+
 			// smoothed altitude values are not available
 			return getAltitudeSerie();
+
 		} else {
 
 			if (UI.UNIT_VALUE_ALTITUDE != 1) {

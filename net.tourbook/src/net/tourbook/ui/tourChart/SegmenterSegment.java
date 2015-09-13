@@ -30,7 +30,7 @@ public class SegmenterSegment {
 	static final int	EXPANDED_HOVER_SIZE		= 12;
 	static final int	EXPANDED_HOVER_SIZE2	= EXPANDED_HOVER_SIZE / 2;
 
-	boolean				isVisible;
+	boolean				isValueVisible;
 
 	/**
 	 * index in the data serie
@@ -68,6 +68,9 @@ public class SegmenterSegment {
 
 	long				tourId;
 
+	int					devGraphWidth;
+	int					devYGraphTop;
+
 	SegmenterSegment() {}
 
 	/**
@@ -83,20 +86,27 @@ public class SegmenterSegment {
 		if (hoveredLineShape == null) {
 			return false;
 		}
-//
-//		final Point segmentDisplayPosition = control.toDisplay(devXSegment, 0);
-//
-//		isInNoHideArea = hoveredLineShape.intersects(
-//				displayCursorLocation.x,
-//				displayCursorLocation.y,
-//				NO_HIDE_HOVER_SIZE,
-//				NO_HIDE_HOVER_SIZE);
-//
-//		final Rectangle segmentArea = new Rectangle(
-//				segmentDisplayPosition.x,
-//				segmentDisplayPosition.y,
-//				devSegmentWidth,
-//				devYTitle + titleHeight);
+
+		final Point controlCursorLocation = control.toControl(displayCursorLocation);
+
+		final int devXMouse = controlCursorLocation.x;
+		final int devYMouse = controlCursorLocation.y;
+
+		if (
+		//
+		// check segment value, it must be visible that it can be checked
+		(isValueVisible && hoveredLabelRect != null && hoveredLabelRect.contains(devXMouse, devYMouse))
+		//
+		// check segment line
+				|| (hoveredLineShape != null && hoveredLineShape.intersects(
+						devXMouse - SegmenterSegment.EXPANDED_HOVER_SIZE2,
+						devYMouse - SegmenterSegment.EXPANDED_HOVER_SIZE2,
+						SegmenterSegment.EXPANDED_HOVER_SIZE,
+						SegmenterSegment.EXPANDED_HOVER_SIZE))) {
+
+			// segment is hit
+			return true;
+		}
 
 		return false;
 	}

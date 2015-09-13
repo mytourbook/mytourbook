@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -31,7 +31,6 @@ public class Util {
 	private static final String			SYMBOL_DASH		= "-";									//$NON-NLS-1$
 	public static final String			DASH_WITH_SPACE	= " - ";								//$NON-NLS-1$
 
-	private static final String			FORMAT_0F		= "0f";								//$NON-NLS-1$
 	private static final String			FORMAT_MM_SS	= "%d:%02d";							//$NON-NLS-1$
 	private static final String			FORMAT_HH_MM	= "%d:%02d";							//$NON-NLS-1$
 	private static final String			FORMAT_HH_MM_SS	= "%d:%02d:%02d";						//$NON-NLS-1$
@@ -199,33 +198,6 @@ public class Util {
 				(timeAbsolute % 60)).toString();
 	}
 
-	/**
-	 * @param value
-	 *            The value which is formatted
-	 * @param divisor
-	 *            Divisor by which the value is divided
-	 * @param precision
-	 *            Decimal numbers after the decimal point
-	 * @param removeDecimalZero
-	 *            True removes trailing zeros after a decimal point
-	 * @return
-	 */
-	public static String formatInteger(	final int value,
-										final int divisor,
-										final int precision,
-										final boolean removeDecimalZero) {
-
-		final float divValue = (float) value / divisor;
-
-		String format = Messages.Format_number_float;
-
-		format += (removeDecimalZero && (divValue % 1 == 0)) //
-				? FORMAT_0F
-				: Integer.toString(precision) + 'f';
-
-		return String.format(format, divValue).toString();
-	}
-
 	public static String formatNumber(	final double rawValue,
 										final int unitType,
 										final int valueDivisor,
@@ -235,9 +207,6 @@ public class Util {
 
 		if (unitType == ChartDataSerie.AXIS_UNIT_NUMBER) {
 
-//			valueText = _df.format(rawValue / valueDivisor);
-
-			
 			final double divValue = rawValue / valueDivisor;
 
 			if (valueDecimals == 0 || divValue % 1 == 0) {

@@ -178,11 +178,13 @@ public class TourManager {
 	private static TourData					_multipleTourData;
 	private static int						_multipleTourDataHash;
 	//
-	private ComputeChartValue				_computeAltimeterAvg;
-	private ComputeChartValue				_computeGradientAvg;
-	private ComputeChartValue				_computePaceAvg;
-	private ComputeChartValue				_computePowerAvg;
-	private ComputeChartValue				_computeSpeedAvg;
+	private ComputeChartValue				_computeAvg_Altimeter;
+	private ComputeChartValue				_computeAvg_Cadence;
+	private ComputeChartValue				_computeAvg_Gradient;
+	private ComputeChartValue				_computeAvg_Pace;
+	private ComputeChartValue				_computeAvg_Power;
+	private ComputeChartValue				_computeAvg_Pulse;
+	private ComputeChartValue				_computeAvg_Speed;
 
 	private final TourDataCache				_tourDataCache;
 
@@ -572,7 +574,6 @@ public class TourManager {
 		boolean isTempSerie = false;
 
 		boolean isFirstTour = true;
-
 
 		for (int tourIndex = 0; tourIndex < numTours; tourIndex++) {
 
@@ -2141,11 +2142,11 @@ public class TourManager {
 	 */
 	private void createAvgCallbacks() {
 
-		_computeSpeedAvg = new ComputeChartValue() {
+		/*
+		 * Compute the average speed in km/h between the two sliders
+		 */
+		_computeAvg_Speed = new ComputeChartValue() {
 
-			/*
-			 * Compute the average speed in km/h between the two sliders
-			 */
 			@Override
 			public float compute() {
 
@@ -2161,14 +2162,7 @@ public class TourManager {
 					return 0;
 				}
 
-				TourData tourData = null;
-				final Object tourId = chartModel.getCustomData(Chart.CUSTOM_DATA_TOUR_ID);
-				if (tourId instanceof Long) {
-					tourData = TourManager.getInstance().getTourData((Long) tourId);
-					if (tourData == null) {
-						return 0;
-					}
-				}
+				final TourData tourData = (TourData) chartModel.getCustomData(TourManager.CUSTOM_DATA_TOUR_DATA);
 
 				final double leftDistance = distanceValues[valueIndexLeft];
 				final double rightDistance = distanceValues[valueIndexRight];
@@ -2198,11 +2192,11 @@ public class TourManager {
 			}
 		};
 
-		_computePaceAvg = new ComputeChartValue() {
+		/*
+		 * Compute the average pace between two sliders
+		 */
+		_computeAvg_Pace = new ComputeChartValue() {
 
-			/*
-			 * Compute the average pace between two sliders
-			 */
 			@Override
 			public float compute() {
 
@@ -2218,14 +2212,7 @@ public class TourManager {
 					return 0;
 				}
 
-				TourData tourData = null;
-				final Object tourId = chartModel.getCustomData(Chart.CUSTOM_DATA_TOUR_ID);
-				if (tourId instanceof Long) {
-					tourData = TourManager.getInstance().getTourData((Long) tourId);
-					if (tourData == null) {
-						return 0;
-					}
-				}
+				final TourData tourData = (TourData) chartModel.getCustomData(TourManager.CUSTOM_DATA_TOUR_DATA);
 
 				final double leftDistance = distanceValues[valueIndexLeft];
 				final double rightDistance = distanceValues[valueIndexRight];
@@ -2253,11 +2240,11 @@ public class TourManager {
 			}
 		};
 
-		_computeAltimeterAvg = new ComputeChartValue() {
+		/*
+		 * Compute the average altimeter speed between the two sliders
+		 */
+		_computeAvg_Altimeter = new ComputeChartValue() {
 
-			/*
-			 * Compute the average altimeter speed between the two sliders
-			 */
 			@Override
 			public float compute() {
 
@@ -2274,14 +2261,7 @@ public class TourManager {
 
 				final float[] altitudeValues = ((ChartDataYSerie) (customDataAltitude)).getHighValuesFloat()[0];
 
-				TourData tourData = null;
-				final Object tourId = chartModel.getCustomData(Chart.CUSTOM_DATA_TOUR_ID);
-				if (tourId instanceof Long) {
-					tourData = TourManager.getInstance().getTourData((Long) tourId);
-					if (tourData == null) {
-						return 0;
-					}
-				}
+				final TourData tourData = (TourData) chartModel.getCustomData(TourManager.CUSTOM_DATA_TOUR_DATA);
 
 				final float leftAltitude = altitudeValues[valueIndexLeft];
 				final float rightAltitude = altitudeValues[valueIndexRight];
@@ -2308,11 +2288,11 @@ public class TourManager {
 			}
 		};
 
-		_computeGradientAvg = new ComputeChartValue() {
+		/*
+		 * Compute the average altimeter speed between the two sliders
+		 */
+		_computeAvg_Gradient = new ComputeChartValue() {
 
-			/*
-			 * Compute the average altimeter speed between the two sliders
-			 */
 			@Override
 			public float compute() {
 
@@ -2336,6 +2316,44 @@ public class TourManager {
 				} else {
 					return (float) (((rightAltitude - leftAltitude)) / (rightDistance - leftDistance) * 100);
 				}
+			}
+		};
+
+		/*
+		 * Compute the average cadence between the two sliders.
+		 */
+		_computeAvg_Cadence = new ComputeChartValue() {
+
+			@Override
+			public float compute() {
+
+				if (valueIndexLeft == valueIndexRight) {
+					// left and right slider are at the same position
+					return 0;
+				}
+
+				final TourData tourData = (TourData) chartModel.getCustomData(TourManager.CUSTOM_DATA_TOUR_DATA);
+
+				return tourData.computeAvgCadenceSegment(valueIndexLeft, valueIndexRight);
+			}
+		};
+
+		/*
+		 * Compute the average pulse between two sliders.
+		 */
+		_computeAvg_Pulse = new ComputeChartValue() {
+
+			@Override
+			public float compute() {
+
+				if (valueIndexLeft == valueIndexRight) {
+					// left and right slider are at the same position
+					return 0;
+				}
+
+				final TourData tourData = (TourData) chartModel.getCustomData(TourManager.CUSTOM_DATA_TOUR_DATA);
+
+				return tourData.computeAvgPulseSegment(valueIndexLeft, valueIndexRight);
 			}
 		};
 	}
@@ -2559,7 +2577,8 @@ public class TourManager {
 			yDataPulse.setUnitLabel(GRAPH_LABEL_HEARTBEAT_UNIT);
 			yDataPulse.setShowYSlider(true);
 			yDataPulse.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_PULSE);
-			yDataPulse.setCustomData(CUSTOM_DATA_ANALYZER_INFO, new TourChartAnalyzerInfo(true));
+			yDataPulse.setCustomData(CUSTOM_DATA_ANALYZER_INFO, //
+					new TourChartAnalyzerInfo(true, _computeAvg_Pulse));
 
 			if (isHrZoneDisplayed) {
 				yDataPulse.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_CUSTOM);
@@ -2600,7 +2619,7 @@ public class TourManager {
 			yDataSpeed.setDisplayedFractionalDigits(1);
 			yDataSpeed.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_SPEED);
 			yDataSpeed.setCustomData(CUSTOM_DATA_ANALYZER_INFO, //
-					new TourChartAnalyzerInfo(true, true, _computeSpeedAvg, 1));
+					new TourChartAnalyzerInfo(true, true, _computeAvg_Speed, 1));
 
 			if (isHrZoneDisplayed) {
 				yDataSpeed.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_CUSTOM);
@@ -2628,7 +2647,7 @@ public class TourManager {
 			yDataPace.setSliderLabelFormat(ChartDataYSerie.SLIDER_LABEL_FORMAT_MM_SS);
 			yDataPace.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_PACE);
 			yDataPace.setCustomData(CUSTOM_DATA_ANALYZER_INFO, //
-					new TourChartAnalyzerInfo(true, false, _computePaceAvg, 1));
+					new TourChartAnalyzerInfo(true, false, _computeAvg_Pace, 1));
 
 			if (isHrZoneDisplayed) {
 				yDataPace.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_CUSTOM);
@@ -2668,7 +2687,7 @@ public class TourManager {
 			yDataPower.setShowYSlider(true);
 			yDataPower.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_POWER);
 			yDataPower.setCustomData(CUSTOM_DATA_ANALYZER_INFO, //
-					new TourChartAnalyzerInfo(true, false, _computePowerAvg, 0));
+					new TourChartAnalyzerInfo(true, false, _computeAvg_Power, 0));
 
 			if (isHrZoneDisplayed) {
 				yDataPower.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_CUSTOM);
@@ -2694,7 +2713,7 @@ public class TourManager {
 			yDataAltimeter.setShowYSlider(true);
 			yDataAltimeter.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_ALTIMETER);
 			yDataAltimeter.setCustomData(CUSTOM_DATA_ANALYZER_INFO, //
-					new TourChartAnalyzerInfo(true, false, _computeAltimeterAvg, 0));
+					new TourChartAnalyzerInfo(true, false, _computeAvg_Altimeter, 0));
 
 			if (isHrZoneDisplayed) {
 				yDataAltimeter.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_CUSTOM);
@@ -2742,7 +2761,7 @@ public class TourManager {
 			yDataGradient.setDisplayedFractionalDigits(1);
 			yDataGradient.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_GRADIENT);
 			yDataGradient.setCustomData(CUSTOM_DATA_ANALYZER_INFO, //
-					new TourChartAnalyzerInfo(true, true, _computeGradientAvg, 1));
+					new TourChartAnalyzerInfo(true, true, _computeAvg_Gradient, 1));
 
 			if (isHrZoneDisplayed) {
 				yDataGradient.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_CUSTOM);
@@ -2787,7 +2806,7 @@ public class TourManager {
 			yDataCadence.setUnitLabel(GRAPH_LABEL_CADENCE_UNIT);
 			yDataCadence.setShowYSlider(true);
 			yDataCadence.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_CADENCE);
-			yDataCadence.setCustomData(CUSTOM_DATA_ANALYZER_INFO, new TourChartAnalyzerInfo(true));
+			yDataCadence.setCustomData(CUSTOM_DATA_ANALYZER_INFO, new TourChartAnalyzerInfo(true, _computeAvg_Cadence));
 			yDataCadence.setSliderLabelProvider(new SliderLabelProvider_Cadence(cadenceSerie));
 
 			if (isHrZoneDisplayed) {

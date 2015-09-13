@@ -30,12 +30,16 @@ import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.ToolBar;
 
@@ -45,16 +49,24 @@ import org.eclipse.swt.widgets.ToolBar;
 public class TourSegmenterTooltip extends AnimatedToolTipShell2 implements ITourProvider, IToolTipProvider,
 		IOpeningDialog {
 
-	private String				_dialogId	= getClass().getCanonicalName();
+	private static final int	SHELL_MARGIN	= 5;
+
+	private String				_dialogId		= getClass().getCanonicalName();
 
 	private TourChart			_tourChart;
 	private SegmenterSegment	_hoveredSegment;
 
+	private Long				_hoveredTourId;
+
 	/*
 	 * UI resources
 	 */
+	private Color				_bgColor;
+	private Color				_fgColor;
 
-	private Long				_hoveredTourId;
+	private Composite			_ttContainer;
+
+	private Font				_boldFont;
 
 	public TourSegmenterTooltip(final TourChart tourChart) {
 
@@ -100,23 +112,44 @@ public class TourSegmenterTooltip extends AnimatedToolTipShell2 implements ITour
 			}
 		});
 
+		final Display display = shell.getDisplay();
+
+		_bgColor = display.getSystemColor(SWT.COLOR_INFO_BACKGROUND);
+		_fgColor = display.getSystemColor(SWT.COLOR_INFO_FOREGROUND);
+		_boldFont = JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT);
+
 		return createUI(shell);
 	}
 
 	private Composite createUI(final Composite parent) {
 
-		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-		GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
+		/*
+		 * shell container is necessary because the margins of the inner container will hide the
+		 * tooltip when the mouse is hovered, which is not as it should be.
+		 */
+		final Composite shellContainer = new Composite(parent, SWT.NONE);
+		shellContainer.setForeground(_fgColor);
+		shellContainer.setBackground(_bgColor);
+		GridLayoutFactory.fillDefaults().applyTo(shellContainer);
+//		shellContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
 		{
-
-			final Label label = new Label(container, SWT.NONE);
-			GridDataFactory.fillDefaults().applyTo(label);
-			label.setText("TourSegmenterToolTip");
-
+			_ttContainer = new Composite(shellContainer, SWT.NONE);
+			_ttContainer.setForeground(_fgColor);
+			_ttContainer.setBackground(_bgColor);
+			GridLayoutFactory.fillDefaults() //
+//					.numColumns(2)
+					.equalWidth(true)
+					.margins(SHELL_MARGIN, SHELL_MARGIN)
+					.applyTo(_ttContainer);
+//			_ttContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
+			{
+				final Label label = new Label(_ttContainer, SWT.NONE);
+				GridDataFactory.fillDefaults().applyTo(label);
+				label.setText("TourSegmenterToolTip");
+			}
 		}
 
-		return container;
+		return shellContainer;
 	}
 
 	@Override
@@ -142,9 +175,11 @@ public class TourSegmenterTooltip extends AnimatedToolTipShell2 implements ITour
 	@Override
 	public Point getToolTipLocation(final Point tipSize) {
 
-		final int devHoveredX = _hoveredSegment.devXTitle;
-		int devHoveredY = _hoveredSegment.devYTitle;
-		final int devHoveredWidth = _hoveredSegment.titleWidth;
+		final int segmentWidth = _hoveredSegment.paintedX2 - _hoveredSegment.paintedX1;
+
+		final int devHoveredX = _hoveredSegment.paintedX1;
+		int devHoveredY = Math.min(_hoveredSegment.paintedY2, _hoveredSegment.paintedY1);
+		final int devHoveredWidth = segmentWidth;
 
 		final int devYTop = _hoveredSegment.devYGraphTop;
 
@@ -297,16 +332,8 @@ public class TourSegmenterTooltip extends AnimatedToolTipShell2 implements ITour
 			_hoveredSegment = hoveredSegment;
 			_hoveredTourId = hoveredSegment.tourId;
 
-//			showToolTip();
+			showToolTip();
 		}
-
-		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
-				+ ("\t_hoveredTourId: " + _hoveredTourId)
-				+ ("\thoveredSegment: " + hoveredSegment)
-				+ ("\t_hoveredSegment: " + _hoveredSegment)
-		//
-				);
-		// TODO remove SYSTEM.OUT.PRINTLN
 	}
 
 }

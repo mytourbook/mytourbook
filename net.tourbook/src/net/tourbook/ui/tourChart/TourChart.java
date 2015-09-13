@@ -239,6 +239,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 	private SegmenterSegment				_selectedSegmenterSegment_2;
 	private boolean							_isRecomputeLineSelection;
 	private TIntArrayList					_selectedAltitudePoints;
+	private ArrayList<RGB>					_selectedAltitudeRGB;
 	private ArrayList<TIntArrayList>		_selectedOtherPoints;
 	private ArrayList<RGB>					_selectedPathsRGB;
 	//
@@ -1899,6 +1900,10 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
 		// draw the graph lighter that the segments are more visible
 		setGraphAlpha(graphOpacity / 100.0);
+
+		// reset selection
+		_selectedSegmenterSegment_1 = null;
+		_selectedSegmenterSegment_2 = null;
 	}
 
 	private void createPainter_HrZone() {
@@ -1959,14 +1964,25 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		gc.setLineJoin(SWT.JOIN_ROUND);
 		gc.setAntialias(SWT.ON);
 
+// SET CLIPPING FOR EACH GRAPH, this is a bit complex
+// SET CLIPPING FOR EACH GRAPH
+// SET CLIPPING FOR EACH GRAPH
+// SET CLIPPING FOR EACH GRAPH
+// SET CLIPPING FOR EACH GRAPH
+// SET CLIPPING FOR EACH GRAPH
+//		final int devYTop = graphDrawingData.getDevYTop();
+//		final int devGraphHeight = graphDrawingData.devGraphHeight;
+//
+//		gc.setClipping(0, devYTop, gc.getClipping().width, devGraphHeight);
+//		gc.setClipping((Rectangle) null);
+
 		// paint polylines
 		if (_selectedAltitudePoints != null) {
 
-			final Color color = display.getSystemColor(SWT.COLOR_GRAY);
-			gc.setForeground(color);
 			gc.setAlpha(isFocusActive ? 0xa0 : 0x60);
 
-			final Path path = new Path(display);
+			final Path path1 = new Path(display);
+			final Path path2 = new Path(display);
 			{
 				final int[] pathPoints = _selectedAltitudePoints.toArray();
 
@@ -1976,31 +1992,95 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 				int graphXPrev = 0;
 				int graphYPrev = 0;
 
+				RGB rgb1 = null;
+				RGB rgb2 = null;
+				RGB prevRGB = null;
+
 				for (int pointIndex = 0; pointIndex < pathPoints.length;) {
+
+					/*
+					 * get segment colors
+					 */
+					final RGB segmentRGB = _selectedAltitudeRGB.get(pointIndex / 2);
+					if (rgb1 == null) {
+						rgb1 = segmentRGB;
+					}
+					if (rgb2 == null && rgb1 != segmentRGB) {
+						rgb2 = segmentRGB;
+					}
 
 					graphX1 = pathPoints[pointIndex++];
 					graphY1 = pathPoints[pointIndex++];
 
 					if (pointIndex == 4) {
 
-						path.moveTo(graphXPrev, graphYPrev);
-						path.lineTo(graphX1, graphY1);
+						// draw start segment
+
+						path1.moveTo(graphXPrev, graphYPrev);
+						path1.lineTo(graphX1, graphY1);
 
 					} else if (pointIndex > 4) {
 
+						// draw following segments
+
 						// optimize, draw only when changed
 						if (graphX1 != graphXPrev || graphY1 != graphYPrev) {
-							path.lineTo(graphX1, graphY1);
+
+							if (segmentRGB == prevRGB) {
+
+								// use the same color as the previous
+
+								if (segmentRGB == rgb1) {
+									path1.lineTo(graphX1, graphY1);
+								} else {
+									path2.lineTo(graphX1, graphY1);
+								}
+
+							} else {
+
+								// color has changed, paint into other path
+
+								if (segmentRGB == rgb1) {
+									path1.moveTo(graphXPrev, graphYPrev);
+									path1.lineTo(graphX1, graphY1);
+								} else {
+									path2.moveTo(graphXPrev, graphYPrev);
+									path2.lineTo(graphX1, graphY1);
+								}
+							}
 						}
 					}
 
 					graphXPrev = graphX1;
 					graphYPrev = graphY1;
+
+					prevRGB = segmentRGB;
 				}
 
-				gc.drawPath(path);
+				gc.setLineCap(SWT.CAP_ROUND);
+
+				if (rgb1 != null) {
+
+					final Color color1 = new Color(display, rgb1);
+					{
+						gc.setForeground(color1);
+						gc.drawPath(path1);
+					}
+					color1.dispose();
+				}
+
+				if (rgb2 != null) {
+
+					final Color color2 = new Color(display, rgb2);
+					{
+						gc.setForeground(color2);
+						gc.drawPath(path2);
+					}
+					color2.dispose();
+				}
 			}
-			path.dispose();
+			path1.dispose();
+			path2.dispose();
 		}
 
 		// paint paths
@@ -2016,7 +2096,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 					continue;
 				}
 
-				final RGB pathRGB = _selectedPathsRGB.get(pathIndex);
+				final RGB pathRGB = _selectedPathsRGB.get(pathIndex * (graphLine.size() / 2));
 
 				final Path path = new Path(display);
 				final Color pathColor = new Color(display, pathRGB);
@@ -2053,8 +2133,9 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 				pathColor.dispose();
 				path.dispose();
 			}
-
 		}
+
+		gc.setLineCap(SWT.CAP_FLAT);
 	}
 
 	private void drawSelectedLines_CreateSelectedLines() {
@@ -2062,6 +2143,8 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		if (_selectedSegmenterSegment_1 == null) {
 
 			_selectedAltitudePoints = null;
+			_selectedAltitudeRGB = null;
+
 			_selectedOtherPoints = null;
 			_selectedPathsRGB = null;
 
@@ -2094,6 +2177,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		 */
 		TIntArrayList selectedAltitudePath = null;
 		final ArrayList<SegmenterSegment> paintedSegments_Altitude = _layerTourSegmenterAltitude.getPaintedLabels();
+		final ArrayList<RGB> selectedAltitudeRGB = new ArrayList<>();
 
 		if (paintedSegments_Altitude.size() > 0) {
 
@@ -2101,9 +2185,10 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 					paintedSegments_Altitude,
 					selectedSegmentIndexStart,
 					selectedSegmentIndexEnd,
-					null);
+					selectedAltitudeRGB);
 		}
 		_selectedAltitudePoints = selectedAltitudePath;
+		_selectedAltitudeRGB = selectedAltitudeRGB;
 
 		final ArrayList<TIntArrayList> selectedOtherPaths = new ArrayList<>();
 		final ArrayList<RGB> selectedPathsRGB = new ArrayList<>();
@@ -2151,6 +2236,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
 				lineSegments.add(paintedSegment.paintedX2);
 				lineSegments.add(paintedSegment.paintedY2);
+				allValueRGBs.add(paintedSegment.paintedRGB);
 
 			} else if (labelSegmentIndex >= selectedSegmentIndexStart
 			//
@@ -2165,12 +2251,11 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
 				lineSegments.add(paintedSegment.paintedX1);
 				lineSegments.add(paintedSegment.paintedY1);
+				allValueRGBs.add(paintedSegment.paintedRGB);
+
 				lineSegments.add(paintedSegment.paintedX2);
 				lineSegments.add(paintedSegment.paintedY2);
-
-				if (allValueRGBs != null) {
-					allValueRGBs.add(paintedSegment.paintedRGB);
-				}
+				allValueRGBs.add(paintedSegment.paintedRGB);
 			}
 		}
 
@@ -4501,6 +4586,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		_segmenterSelection = null;
 
 		_selectedAltitudePoints = null;
+		_selectedAltitudeRGB = null;
 		_selectedOtherPoints = null;
 		_selectedPathsRGB = null;
 

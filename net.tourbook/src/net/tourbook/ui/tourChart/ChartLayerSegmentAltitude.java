@@ -20,7 +20,6 @@ package net.tourbook.ui.tourChart;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartDataYSerie;
@@ -29,7 +28,6 @@ import net.tourbook.chart.GraphDrawingData;
 import net.tourbook.chart.IChartLayer;
 import net.tourbook.chart.IChartOverlay;
 import net.tourbook.chart.SelectionChartXSliderPosition;
-import net.tourbook.common.UI;
 import net.tourbook.common.graphics.Line2D;
 import net.tourbook.data.TourData;
 import net.tourbook.tour.TourManager;
@@ -42,6 +40,7 @@ import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.LineAttributes;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Display;
 
@@ -49,10 +48,6 @@ import org.eclipse.swt.widgets.Display;
  * This layer displays the altitude values.
  */
 public class ChartLayerSegmentAltitude implements IChartLayer, IChartOverlay {
-
-	private static final Color			SYSTEM_COLOR_0		= Display.getCurrent().getSystemColor(SWT.COLOR_DARK_GRAY);
-	private static final Color			SYSTEM_COLOR_DOWN	= Display.getCurrent().getSystemColor(SWT.COLOR_DARK_GREEN);
-	private static final Color			SYSTEM_COLOR_UP		= Display.getCurrent().getSystemColor(SWT.COLOR_RED);
 
 	private TourChart					_tourChart;
 	private TourData					_tourData;
@@ -146,22 +141,6 @@ public class ChartLayerSegmentAltitude implements IChartLayer, IChartOverlay {
 		int tourIndex = 0;
 		int nextTourStartIndex = 0;
 
-		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
-				+ ("\tmultipleTourStartIndex: " + Arrays.toString(multipleTourStartIndex))
-				+ ("\tmultipleTourIds: " + Arrays.toString(multipleTourIds))
-		//
-				);
-		// TODO remove SYSTEM.OUT.PRINTLN
-
-//		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] \t")
-//				+ ("\t" + String.format("%9.2f  ", maxValue))
-//				+ ("\t" + String.format("%9.2f  ", hideThreshold))
-//				+ ("\t" + String.format("%3d  ", (int) (_smallValue * 100)))
-//				+ ("\t" + minValueAdjustment)
-//		//
-//				);
-//		// TODO remove SYSTEM.OUT.PRINTLN
-
 		final ValueOverlapChecker overlapChecker = new ValueOverlapChecker(_stackedValues);
 
 		int devXPrev = Integer.MIN_VALUE;
@@ -188,6 +167,10 @@ public class ChartLayerSegmentAltitude implements IChartLayer, IChartOverlay {
 		gc.setAntialias(chart.graphAntialiasing);
 		gc.setTextAntialias(chart.graphAntialiasing);
 
+		final RGB segmentRGB = segmentConfig.segmentLineRGB;
+		final Color segmentColor = new Color(gc.getDevice(), segmentRGB);
+		final RGB downRGB = new RGB(0xff, 0x5e, 0x62);
+		final Color downColor = new Color(gc.getDevice(), downRGB);
 		{
 			int segmentIndex;
 
@@ -281,7 +264,15 @@ public class ChartLayerSegmentAltitude implements IChartLayer, IChartOverlay {
 				final int textWidth = textExtent.x;
 				final int textHeight = textExtent.y;
 
-				final Color upDownColor = getColor(altiDiff);
+				Color paintedColor;
+				RGB paintedRGB;
+				if (altiDiff >= 0) {
+					paintedColor = segmentColor;
+					paintedRGB = segmentRGB;
+				} else {
+					paintedColor = downColor;
+					paintedRGB = downRGB;
+				}
 
 				final SegmenterSegment segmenterSegment = new SegmenterSegment();
 
@@ -300,7 +291,7 @@ public class ChartLayerSegmentAltitude implements IChartLayer, IChartOverlay {
 					if (_isShowSegmenterLine /* && isShowValueText */) {
 
 						gc.setAlpha(_lineOpacity);
-						gc.setForeground(upDownColor);
+						gc.setForeground(paintedColor);
 						gc.setLineAttributes(defaultLineAttributes);
 
 						gc.drawLine(//
@@ -322,13 +313,8 @@ public class ChartLayerSegmentAltitude implements IChartLayer, IChartOverlay {
 							devXSegment,
 							devYSegment);
 
-					segmenterSegment.paintedRGB = upDownColor.getRGB();
-
-//					/*
-//					 * Debugging
-//					 */
-//					gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_GRAY));
-//					gc.drawRectangle(chartLabel.hoveredLineShape.rectangle());
+					// use ALLWAYS the same instance
+					segmenterSegment.paintedRGB = paintedRGB;
 
 					/*
 					 * Draw a line from the value marker to the top or the bottom
@@ -343,7 +329,7 @@ public class ChartLayerSegmentAltitude implements IChartLayer, IChartOverlay {
 						}
 
 						gc.setAlpha(0xff);
-						gc.setForeground(upDownColor);
+						gc.setForeground(paintedColor);
 						gc.setLineAttributes(markerLineAttribute);
 
 						gc.drawLine(//
@@ -399,7 +385,7 @@ public class ChartLayerSegmentAltitude implements IChartLayer, IChartOverlay {
 								overlapChecker.setupNext(validRect, isValueUp);
 
 								gc.setAlpha(0xff);
-								gc.setForeground(upDownColor);
+								gc.setForeground(paintedColor);
 								gc.drawText(//
 										valueText,
 										devXText - borderWidth,
@@ -407,7 +393,7 @@ public class ChartLayerSegmentAltitude implements IChartLayer, IChartOverlay {
 										true);
 
 								// ensure that only visible labels can be hovered
-								segmenterSegment.isVisible = true;
+								segmenterSegment.isValueVisible = true;
 							}
 
 							segmenterSegment.paintedLabel = validRect;
@@ -446,31 +432,56 @@ public class ChartLayerSegmentAltitude implements IChartLayer, IChartOverlay {
 				segmenterSegment.serieIndex = dataSerieIndex;
 				segmenterSegment.graphX = _xDataSerie[dataSerieIndex];
 
+				segmenterSegment.devGraphWidth = graphWidth;
+				segmenterSegment.devYGraphTop = devYTop;
+
 				/*
 				 * Get tour id for each segment
 				 */
 				if (_tourData.isMultipleTours) {
 
-					for (; tourIndex < multipleTourIds.length;) {
+					// multiple tours are displayed
 
-						if (dataSerieIndex - 1 < nextTourStartIndex) {
+					/*
+					 * This algorithm is highly complicated because of the complex start values but
+					 * now it seams to work.
+					 */
+					for (; tourIndex < multipleTourStartIndex.length;) {
 
-							segmenterSegment.tourId = multipleTourIds[tourIndex - 0];
+						if (nextTourStartIndex == 0) {
+
+							// 1st segment
+
+							nextTourStartIndex = multipleTourStartIndex[1];
+
+							segmenterSegment.tourId = multipleTourIds[0];
 							break;
 
 						} else {
 
-							tourIndex++;
+							// 2nd...n segments
 
-							if (tourIndex >= multipleTourIds.length) {
-								nextTourStartIndex = Integer.MAX_VALUE;
+							if (dataSerieIndex <= nextTourStartIndex) {
+
+								segmenterSegment.tourId = multipleTourIds[tourIndex];
+								break;
+
 							} else {
-								nextTourStartIndex = multipleTourStartIndex[tourIndex - 1];
+
+								tourIndex++;
+
+								if (tourIndex >= multipleTourStartIndex.length - 1) {
+									nextTourStartIndex = Integer.MAX_VALUE;
+								} else {
+									nextTourStartIndex = multipleTourStartIndex[tourIndex + 1];
+								}
 							}
 						}
 					}
 
 				} else {
+
+					// a single tour is displayed
 
 					segmenterSegment.tourId = _tourData.getTourId();
 				}
@@ -482,6 +493,8 @@ public class ChartLayerSegmentAltitude implements IChartLayer, IChartOverlay {
 				devYPrev = devYSegment;
 			}
 		}
+		segmentColor.dispose();
+		downColor.dispose();
 
 		// reset clipping
 		gc.setClipping((Rectangle) null);
@@ -519,7 +532,7 @@ public class ChartLayerSegmentAltitude implements IChartLayer, IChartOverlay {
 		if (isHovered) {
 
 			final Rectangle hoveredRect = hoveredSegment.hoveredLabelRect;
-			if (hoveredRect != null && hoveredSegment.isVisible) {
+			if (hoveredRect != null && hoveredSegment.isValueVisible) {
 
 				final int arc = 10;
 //				gc.setAlpha(isSelected ? 0x60 : 0x30);
@@ -560,17 +573,6 @@ public class ChartLayerSegmentAltitude implements IChartLayer, IChartOverlay {
 		gc.setClipping((Rectangle) null);
 	}
 
-	private Color getColor(final float altiDiff) {
-
-		if (altiDiff > 0) {
-			return SYSTEM_COLOR_UP;
-		} else if (altiDiff < 0) {
-			return SYSTEM_COLOR_DOWN;
-		} else {
-			return SYSTEM_COLOR_0;
-		}
-	}
-
 	/**
 	 * @param mouseEvent
 	 * @return Returns the hovered {@link ChartLabel} or <code>null</code> when a {@link ChartLabel}
@@ -605,7 +607,7 @@ public class ChartLayerSegmentAltitude implements IChartLayer, IChartOverlay {
 
 			if (//
 				// the label must be visible that it is checked
-			(chartLabel.isVisible && hoveredLabelRect != null && hoveredLabelRect.contains(devXMouse, devYMouse))
+			(chartLabel.isValueVisible && hoveredLabelRect != null && hoveredLabelRect.contains(devXMouse, devYMouse))
 					|| (hoveredLineShape != null && hoveredLineShape.intersects(
 							devXMouse - SegmenterSegment.EXPANDED_HOVER_SIZE2,
 							devYMouse - SegmenterSegment.EXPANDED_HOVER_SIZE2,
