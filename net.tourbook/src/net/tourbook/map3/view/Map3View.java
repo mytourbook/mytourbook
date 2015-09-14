@@ -368,12 +368,15 @@ public class Map3View extends ViewPart implements ITourProvider {
 
 		} else {
 
-			sliderSelection = new SelectionChartXSliderPosition(
+			final SelectionChartXSliderPosition xSliderSelection = new SelectionChartXSliderPosition(
 					tourChart,
 					serieIndex0,
 					serieIndexLeft,
-					serieIndexRight,
 					true);
+
+			xSliderSelection.setCenterSliderPosition(true);
+
+			sliderSelection = xSliderSelection;
 		}
 
 		if (sliderSelection != null) {

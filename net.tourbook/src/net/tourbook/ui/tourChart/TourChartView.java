@@ -703,8 +703,9 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 					_tourChart,
 					SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION,
 					leftSliderValueIndex,
-					rightSliderValueIndex,
-					true);
+					rightSliderValueIndex);
+
+			xSliderPosition.setCenterSliderPosition(true);
 
 			_tourChart.selectXSliders(xSliderPosition);
 		}

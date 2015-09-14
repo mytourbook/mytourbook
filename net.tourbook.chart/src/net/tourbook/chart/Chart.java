@@ -65,8 +65,7 @@ public class Chart extends ViewForm {
 	public static final String		MOUSE_MODE_ZOOM						= "zoom";								//$NON-NLS-1$
 
 	private static final int		MouseMove							= 10;
-	private static final int		MouseDownPre						= 20;
-//	private static final int		MouseDownPost						= 21;
+	private static final int		MouseDown							= 20;
 	private static final int		MouseUp								= 30;
 	private static final int		MouseDoubleClick					= 40;
 	private static final int		MouseExit							= 50;
@@ -540,7 +539,7 @@ public class Chart extends ViewForm {
 				((IMouseListener) listener).mouseMove(mouseEvent);
 				break;
 
-			case Chart.MouseDownPre:
+			case Chart.MouseDown:
 				((IMouseListener) listener).mouseDown(mouseEvent);
 				break;
 
@@ -869,17 +868,12 @@ public class Chart extends ViewForm {
 		return event;
 	}
 
-	ChartMouseEvent onExternalMouseDownPre(	final long eventTime,
+	ChartMouseEvent onExternalMouseDown(final long eventTime,
 											final int devXMouse,
 											final int devYMouse,
 											final int stateMask) {
 
-		final ChartMouseEvent event = new ChartMouseEvent(
-				Chart.MouseDownPre,
-				eventTime,
-				devXMouse,
-				devYMouse,
-				stateMask);
+		final ChartMouseEvent event = new ChartMouseEvent(Chart.MouseDown, eventTime, devXMouse, devYMouse, stateMask);
 
 		fireChartMouseEvent(event);
 

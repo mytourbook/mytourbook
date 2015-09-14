@@ -1807,7 +1807,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	}
 
 	private void createFieldListener() {
- 
+
 		_modifyListener = new ModifyListener() {
 			@Override
 			public void modifyText(final ModifyEvent e) {
@@ -2005,7 +2005,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			}
 		};
 	}
- 
+
 	/**
 	 * create the drop down menus, this must be created after the parent control is created
 	 */
@@ -4540,12 +4540,15 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 			} else {
 
-				sliderSelection = new SelectionChartXSliderPosition(
+				final SelectionChartXSliderPosition xSliderSelection = new SelectionChartXSliderPosition(
 						_tourChart,
 						serieIndex0,
 						serieIndex1,
-						serieIndex2,
-						true);
+						serieIndex2);
+
+				xSliderSelection.setCenterSliderPosition(true);
+
+				sliderSelection = xSliderSelection;
 			}
 
 			_postSelectionProvider.setSelection(sliderSelection);

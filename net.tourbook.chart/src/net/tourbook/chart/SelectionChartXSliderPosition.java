@@ -29,7 +29,16 @@ public class SelectionChartXSliderPosition implements ISelection {
 	private int				_leftSliderValueIndex			= IGNORE_SLIDER_POSITION;
 	private int				_rightSliderValueIndex			= IGNORE_SLIDER_POSITION;
 
+	/**
+	 * When <code>true</code> the slider will be positioned in the center of the chart.
+	 */
 	private boolean			_isCenterSliderPosition			= false;
+
+	/**
+	 * When <code>true</code> then the slider will be set visible in the chart by repositioning the
+	 * graph (this is the old default behaviour), otherwise <code>false</code>.
+	 */
+	private boolean			_isMoveChartToShowSlider		= true;
 
 	private Chart			_chart;
 
@@ -38,6 +47,12 @@ public class SelectionChartXSliderPosition implements ISelection {
 	 * exists since the beginning but is visible since the break time is visualized.
 	 */
 	private boolean			_isAdjustStartIndex;
+
+	/**
+	 * When <code>true</code> the zoom position is set to the center of the chart that the next zoom
+	 * starts from the center of the sliders.
+	 */
+	private boolean			_isCenterZoomPositionWithKey;
 
 	private Object			_customData;
 
@@ -63,14 +78,11 @@ public class SelectionChartXSliderPosition implements ISelection {
 	public SelectionChartXSliderPosition(	final Chart chart,
 											final int serieIndex0,
 											final int serieIndex1,
-											final int serieIndex2,
-											final boolean centerSliderPosition) {
+											final int serieIndex2) {
 
 		this(chart, serieIndex1, serieIndex2);
 
 		_beforeLeftSliderIndex = serieIndex0;
-
-		_isCenterSliderPosition = centerSliderPosition;
 	}
 
 	public int getBeforeLeftSliderIndex() {
@@ -105,9 +117,28 @@ public class SelectionChartXSliderPosition implements ISelection {
 		return _isCenterSliderPosition;
 	}
 
+	public boolean isCenterZoomPositionWithKey() {
+		return _isCenterZoomPositionWithKey;
+	}
+
 	@Override
 	public boolean isEmpty() {
 		return false;
+	}
+
+	/**
+	 * @return
+	 */
+	public boolean isMoveChartToShowSlider() {
+		return _isMoveChartToShowSlider;
+	}
+
+	public void setCenterSliderPosition(final boolean isCenterSliderPosition) {
+		_isCenterSliderPosition = isCenterSliderPosition;
+	}
+
+	public void setCenterZoomPositionWithKey(final boolean isCenterZoomPositionWithKey) {
+		_isCenterZoomPositionWithKey = isCenterZoomPositionWithKey;
 	}
 
 	public void setChart(final Chart chart) {
@@ -116,6 +147,10 @@ public class SelectionChartXSliderPosition implements ISelection {
 
 	public void setCustomData(final Object customData) {
 		_customData = customData;
+	}
+
+	public void setMoveChartToShowSlider(final boolean isMoveChartToShowSlider) {
+		_isMoveChartToShowSlider = isMoveChartToShowSlider;
 	}
 
 	@Override

@@ -180,6 +180,11 @@ public class ChartComponentGraph extends Canvas {
 	private double						_zoomRatioCenter;
 
 	/**
+	 * This zoom ratio is used when zooming the next time with the keyboard, when 0 this is ignored.
+	 */
+	private double						_zoomRatioCenterKey;
+
+	/**
 	 * when the slider is dragged and the mouse up event occures, the graph is zoomed to the sliders
 	 * when set to <code>true</code>
 	 */
@@ -1367,7 +1372,7 @@ public class ChartComponentGraph extends Canvas {
 		redraw();
 
 		// redraw chart
-		setChartPosition(_xSliderDragged, false);
+		setChartPosition(_xSliderDragged, false, true);
 
 		final boolean isRepeatScrollingLeft = _xxDevViewPortLeftBorder > 1;
 		final boolean isRepeatScrollingRight = _xxDevViewPortLeftBorder + xxDevNewSliderLinePos3 < _xxDevGraphWidth;
@@ -6014,6 +6019,54 @@ public class ChartComponentGraph extends Canvas {
 	}
 
 	/**
+	 * Set value index for a slider and move the slider to this position, the slider will be made
+	 * visible.
+	 * 
+	 * @param xSlider
+	 * @param valueIndex
+	 * @param isCenterSliderPosition
+	 * @param isMoveChartToShowSlider
+	 * @param isSetKeyCenterZoomPosition
+	 * @param isBorderOffset
+	 */
+	void moveXSlider(	final ChartXSlider xSlider,
+						int valueIndex,
+						final boolean isCenterSliderPosition,
+						final boolean isMoveChartToShowSlider,
+						final boolean isFireEvent,
+						final boolean isSetKeyCenterZoomPosition) {
+
+		final ChartDataXSerie xData = getXData();
+
+		if (xData == null) {
+			return;
+		}
+
+		final double[] xValues = xData.getHighValuesDouble()[0];
+		final int xValueLastIndex = xValues.length - 1;
+
+		// adjust the slider index to the array bounds
+		valueIndex = valueIndex < 0 ? //
+				0
+				: valueIndex > xValueLastIndex ? //
+						xValueLastIndex
+						: valueIndex;
+
+		final double xValue = xValues[valueIndex];
+		final double lastXValue = xValues[xValueLastIndex];
+		final double xxDevLinePos = _xxDevGraphWidth * xValue / lastXValue;
+
+		xSlider.setValueIndex(valueIndex);
+		xSlider.moveToXXDevPosition(xxDevLinePos, true, true, false, isFireEvent);
+
+		_zoomRatioCenterKey = isSetKeyCenterZoomPosition ? xxDevLinePos / _xxDevGraphWidth : 0;
+
+		setChartPosition(xSlider, isCenterSliderPosition, isMoveChartToShowSlider);
+
+		_isSliderDirty = true;
+	}
+
+	/**
 	 * Move the slider to a new position
 	 * 
 	 * @param xSlider
@@ -6093,11 +6146,24 @@ public class ChartComponentGraph extends Canvas {
 
 				switch (event.character) {
 				case '+':
+
+					// overwrite zoom ratio
+					if (_zoomRatioCenterKey != 0) {
+						_zoomRatioCenter = _zoomRatioCenterKey;
+					}
+
 					_chart.onExecuteZoomIn();
+
 					break;
 
 				case '-':
+
+					// overwrite zoom ratio
+					if (_zoomRatioCenterKey != 0) {
+						_zoomRatioCenter = _zoomRatioCenterKey;
+					}
 					_chart.onExecuteZoomOut(true);
+
 					break;
 
 				default:
@@ -6206,7 +6272,7 @@ public class ChartComponentGraph extends Canvas {
 
 		if (isMoveSlider) {
 
-			setXSliderValueIndex(_selectedXSlider, valueIndex, false, true);
+			moveXSlider(_selectedXSlider, valueIndex, false, true, true, false);
 
 			redraw();
 			setCursorStyle(event.y);
@@ -6327,20 +6393,20 @@ public class ChartComponentGraph extends Canvas {
 		}
 
 		// use external mouse event listener
-		final ChartMouseEvent externalMouseMoveEvent = _chart.onExternalMouseDownPre(
+		final ChartMouseEvent externalMouseEvent = _chart.onExternalMouseDown(
 				event.time & 0xFFFFFFFFL,
 				devXMouse,
 				devYMouse,
 				event.stateMask);
 
-		if (externalMouseMoveEvent.isWorked) {
+		if (externalMouseEvent.isWorked) {
 
 			// stop dragging because x-sliders are selected by selecting a tour segmenter segment
-			if (externalMouseMoveEvent.isDisableSliderDragging) {
+			if (externalMouseEvent.isDisableSliderDragging) {
 				_xSliderDragged = null;
 			}
 
-			setChartCursor(externalMouseMoveEvent.cursor);
+			setChartCursor(externalMouseEvent.cursor);
 
 			return;
 		}
@@ -6363,7 +6429,7 @@ public class ChartComponentGraph extends Canvas {
 			 * make sure that the slider is exactly positioned where the value is displayed in the
 			 * graph
 			 */
-			setXSliderValueIndex(xSlider, _hoveredValuePointIndex, false, true);
+			moveXSlider(xSlider, _hoveredValuePointIndex, false, true, true, false);
 
 			_isSliderDirty = true;
 			redraw();
@@ -6614,6 +6680,25 @@ public class ChartComponentGraph extends Canvas {
 		boolean isRedraw = false;
 		boolean canShowHoveredValueTooltip = false;
 
+		/**
+		 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!<br>
+		 * THE FEATURE onExternalMouseMoveImportant IS NOT YET FULLY IMPLEMENTED
+		 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!<br>
+		 */
+		final ChartMouseEvent externalMouseMoveEvent = _chart.onExternalMouseMoveImportant(
+				eventTime,
+				devXMouse,
+				devYMouse);
+		if (externalMouseMoveEvent.isWorked) {
+
+			setChartCursor(externalMouseMoveEvent.cursor);
+
+			_isOverlayDirty = true;
+			isRedraw = true;
+
+			canShowHoveredValueTooltip = true;
+		}
+
 		if (_isXSliderVisible && _xSliderDragged != null) {
 
 			// x-slider is dragged
@@ -6689,26 +6774,7 @@ public class ChartComponentGraph extends Canvas {
 
 			ChartXSlider xSlider;
 
-			/**
-			 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!<br>
-			 * THE FEATURE onExternalMouseMoveImportant IS NOT YET FULLY IMPLEMENTED
-			 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!<br>
-			 */
-			final ChartMouseEvent externalMouseMoveEvent = _chart.onExternalMouseMoveImportant(
-					eventTime,
-					devXMouse,
-					devYMouse);
-
-			if (externalMouseMoveEvent.isWorked) {
-
-				setChartCursor(externalMouseMoveEvent.cursor);
-
-				_isOverlayDirty = true;
-				isRedraw = true;
-
-				canShowHoveredValueTooltip = true;
-
-			} else {
+			if (externalMouseMoveEvent.isWorked == false) {
 
 				final ChartMouseEvent externalMouseEvent = _chart.onExternalMouseMove(eventTime, devXMouse, devYMouse);
 
@@ -7429,8 +7495,12 @@ public class ChartComponentGraph extends Canvas {
 	 * 
 	 * @param slider
 	 * @param isCenterSliderPosition
+	 * @param doSetSliderVisible
+	 * @param isSetKeyCenterZoomPosition
 	 */
-	private void setChartPosition(final ChartXSlider slider, final boolean isCenterSliderPosition) {
+	private void setChartPosition(	final ChartXSlider slider,
+									final boolean isCenterSliderPosition,
+									final boolean doSetSliderVisible) {
 
 		if (_graphZoomRatio == 1) {
 			// chart is not zoomed, nothing to do
@@ -7443,6 +7513,8 @@ public class ChartComponentGraph extends Canvas {
 		final long xxDevCenter = xxDevSliderLinePos - devXViewPortWidth / 2;
 
 		double xxDevOffset = xxDevSliderLinePos;
+		final long BORDER = 10;
+
 
 		if (isCenterSliderPosition) {
 
@@ -7455,15 +7527,15 @@ public class ChartComponentGraph extends Canvas {
 			 */
 			if (xxDevSliderLinePos < _xxDevViewPortLeftBorder) {
 
-				xxDevOffset = xxDevSliderLinePos + 1;
+				xxDevOffset = xxDevSliderLinePos + 1 - BORDER;
 
 			} else if (xxDevSliderLinePos > _xxDevViewPortLeftBorder + devXViewPortWidth) {
 
-				xxDevOffset = xxDevSliderLinePos - devXViewPortWidth;
+				xxDevOffset = xxDevSliderLinePos - devXViewPortWidth + BORDER;
 			}
 		}
 
-		if (xxDevOffset != xxDevSliderLinePos) {
+		if (xxDevOffset != xxDevSliderLinePos && doSetSliderVisible) {
 
 			/*
 			 * slider is not visible
@@ -7996,48 +8068,6 @@ public class ChartComponentGraph extends Canvas {
 //		xValue = (int) (slider.getPositionRatio() * 1000000000);
 
 		xSlider.setValueIndex(valueIndex);
-	}
-
-	/**
-	 * Set value index for a slider and move the slider to this position, the slider will be made
-	 * visible.
-	 * 
-	 * @param slider
-	 * @param valueIndex
-	 * @param isCenterSliderPosition
-	 * @param isBorderOffset
-	 */
-	void setXSliderValueIndex(	final ChartXSlider slider,
-								int valueIndex,
-								final boolean isCenterSliderPosition,
-								final boolean isFireEvent) {
-
-		final ChartDataXSerie xData = getXData();
-
-		if (xData == null) {
-			return;
-		}
-
-		final double[] xValues = xData.getHighValuesDouble()[0];
-		final int xValueLastIndex = xValues.length - 1;
-
-		// adjust the slider index to the array bounds
-		valueIndex = valueIndex < 0 ? //
-				0
-				: valueIndex > xValueLastIndex ? //
-						xValueLastIndex
-						: valueIndex;
-
-		final double xValue = xValues[valueIndex];
-		final double lastXValue = xValues[xValueLastIndex];
-		final double xxDevLinePos = _xxDevGraphWidth * xValue / lastXValue;
-
-		slider.setValueIndex(valueIndex);
-		slider.moveToXXDevPosition(xxDevLinePos, true, true, false, isFireEvent);
-
-		setChartPosition(slider, isCenterSliderPosition);
-
-		_isSliderDirty = true;
 	}
 
 	/**

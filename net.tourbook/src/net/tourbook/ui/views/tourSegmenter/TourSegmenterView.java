@@ -110,114 +110,116 @@ import org.eclipse.ui.part.ViewPart;
  */
 public class TourSegmenterView extends ViewPart implements ITourViewer {
 
-	public static final String						ID												= "net.tourbook.views.TourSegmenter";		//$NON-NLS-1$
+	public static final String						ID													= "net.tourbook.views.TourSegmenter";			//$NON-NLS-1$
 
-	private static final String						DISTANCE_MILES_1_8								= "1/8";									//$NON-NLS-1$
-	private static final String						DISTANCE_MILES_1_4								= "1/4";									//$NON-NLS-1$
-	private static final String						DISTANCE_MILES_3_8								= "3/8";									//$NON-NLS-1$
-	private static final String						DISTANCE_MILES_1_2								= "1/2";									//$NON-NLS-1$
-	private static final String						DISTANCE_MILES_5_8								= "5/8";									//$NON-NLS-1$
-	private static final String						DISTANCE_MILES_3_4								= "3/4";									//$NON-NLS-1$
-	private static final String						DISTANCE_MILES_7_8								= "7/8";									//$NON-NLS-1$
+	private static final String						DISTANCE_MILES_1_8									= "1/8";										//$NON-NLS-1$
+	private static final String						DISTANCE_MILES_1_4									= "1/4";										//$NON-NLS-1$
+	private static final String						DISTANCE_MILES_3_8									= "3/8";										//$NON-NLS-1$
+	private static final String						DISTANCE_MILES_1_2									= "1/2";										//$NON-NLS-1$
+	private static final String						DISTANCE_MILES_5_8									= "5/8";										//$NON-NLS-1$
+	private static final String						DISTANCE_MILES_3_4									= "3/4";										//$NON-NLS-1$
+	private static final String						DISTANCE_MILES_7_8									= "7/8";										//$NON-NLS-1$
 
-	private static final String						FORMAT_ALTITUDE_DIFF							= "%d / %d %s";							//$NON-NLS-1$
+	private static final String						FORMAT_ALTITUDE_DIFF								= "%d / %d %s";								//$NON-NLS-1$
 
-	private static final int						SEGMENTER_REQUIRES_ALTITUDE						= 0x01;
-	private static final int						SEGMENTER_REQUIRES_DISTANCE						= 0x02;
-	private static final int						SEGMENTER_REQUIRES_PULSE						= 0x04;
-	private static final int						SEGMENTER_REQUIRES_MARKER						= 0x08;
+	private static final int						SEGMENTER_REQUIRES_ALTITUDE							= 0x01;
+	private static final int						SEGMENTER_REQUIRES_DISTANCE							= 0x02;
+	private static final int						SEGMENTER_REQUIRES_PULSE							= 0x04;
+	private static final int						SEGMENTER_REQUIRES_MARKER							= 0x08;
 
-	private static final int						MAX_DISTANCE_SPINNER_MILE						= 80;
-	private static final int						MAX_DISTANCE_SPINNER_METRIC						= 100;
+	private static final int						MAX_DISTANCE_SPINNER_MILE							= 80;
+	private static final int						MAX_DISTANCE_SPINNER_METRIC							= 100;
 
-	private static final String						STATE_DP_TOLERANCE_PULSE						= "STATE_DP_TOLERANCE_PULSE";				//$NON-NLS-1$
-	private static final String						STATE_MINIMUM_ALTITUDE							= "STATE_MINIMUM_ALTITUDE";				//$NON-NLS-1$
-	private static final String						STATE_SELECTED_DISTANCE							= "selectedDistance";						//$NON-NLS-1$
-	private static final String						STATE_SELECTED_SEGMENTER_BY_USER				= "STATE_SELECTED_SEGMENTER_BY_USER";		//$NON-NLS-1$
+	private static final String						STATE_DP_TOLERANCE_ALTITUDE_MULTIPLE_TOURS			= "STATE_DP_TOLERANCE_ALTITUDE_MULTIPLE_TOURS"; //$NON-NLS-1$
+	private static final int						STATE_DP_TOLERANCE_ALTITUDE_MULTIPLE_TOURS_DEFAULT	= 100;
+	private static final String						STATE_DP_TOLERANCE_PULSE							= "STATE_DP_TOLERANCE_PULSE";					//$NON-NLS-1$
+	private static final String						STATE_MINIMUM_ALTITUDE								= "STATE_MINIMUM_ALTITUDE";					//$NON-NLS-1$
+	private static final String						STATE_SELECTED_DISTANCE								= "selectedDistance";							//$NON-NLS-1$
+	private static final String						STATE_SELECTED_SEGMENTER_BY_USER					= "STATE_SELECTED_SEGMENTER_BY_USER";			//$NON-NLS-1$
 
 	/**
 	 * Initially this was an int value, with 2 it's a string.
 	 */
-	private static final String						STATE_SELECTED_BREAK_METHOD2					= "selectedBreakMethod2";					//$NON-NLS-1$
+	private static final String						STATE_SELECTED_BREAK_METHOD2						= "selectedBreakMethod2";						//$NON-NLS-1$
 
-	private static final String						STATE_BREAK_TIME_MIN_AVG_SPEED_AS				= "selectedBreakTimeMinAvgSpeedAS";		//$NON-NLS-1$
-	private static final String						STATE_BREAK_TIME_MIN_SLICE_SPEED_AS				= "selectedBreakTimeMinSliceSpeedAS";		//$NON-NLS-1$
-	private static final String						STATE_BREAK_TIME_MIN_SLICE_TIME_AS				= "selectedBreakTimeMinSliceTimeAS";		//$NON-NLS-1$
+	private static final String						STATE_BREAK_TIME_MIN_AVG_SPEED_AS					= "selectedBreakTimeMinAvgSpeedAS";			//$NON-NLS-1$
+	private static final String						STATE_BREAK_TIME_MIN_SLICE_SPEED_AS					= "selectedBreakTimeMinSliceSpeedAS";			//$NON-NLS-1$
+	private static final String						STATE_BREAK_TIME_MIN_SLICE_TIME_AS					= "selectedBreakTimeMinSliceTimeAS";			//$NON-NLS-1$
 
-	private static final String						STATE_BREAK_TIME_MIN_AVG_SPEED					= "selectedBreakTimeMinAvgSpeed";			//$NON-NLS-1$
-	private static final String						STATE_BREAK_TIME_MIN_SLICE_SPEED				= "selectedBreakTimeMinSliceSpeed";		//$NON-NLS-1$
+	private static final String						STATE_BREAK_TIME_MIN_AVG_SPEED						= "selectedBreakTimeMinAvgSpeed";				//$NON-NLS-1$
+	private static final String						STATE_BREAK_TIME_MIN_SLICE_SPEED					= "selectedBreakTimeMinSliceSpeed";			//$NON-NLS-1$
 
-	private static final String						STATE_BREAK_TIME_MIN_DISTANCE_VALUE				= "selectedBreakTimeMinDistance";			//$NON-NLS-1$
-	private static final String						STATE_BREAK_TIME_MIN_TIME_VALUE					= "selectedBreakTimeMinTime";				//$NON-NLS-1$
-	private static final String						STATE_BREAK_TIME_SLICE_DIFF						= "selectedBreakTimeSliceDiff";			//$NON-NLS-1$
+	private static final String						STATE_BREAK_TIME_MIN_DISTANCE_VALUE					= "selectedBreakTimeMinDistance";				//$NON-NLS-1$
+	private static final String						STATE_BREAK_TIME_MIN_TIME_VALUE						= "selectedBreakTimeMinTime";					//$NON-NLS-1$
+	private static final String						STATE_BREAK_TIME_SLICE_DIFF							= "selectedBreakTimeSliceDiff";				//$NON-NLS-1$
 
 	/*
 	 * Tour segmenter
 	 */
-	public static final String						STATE_IS_SEGMENTER_ACTIVE						= "STATE_IS_SEGMENTER_ACTIVE";				//$NON-NLS-1$
+	public static final String						STATE_IS_SEGMENTER_ACTIVE							= "STATE_IS_SEGMENTER_ACTIVE";					//$NON-NLS-1$
 
-	public static final String						STATE_IS_HIDE_SMALL_VALUES						= "STATE_IS_HIDE_SMALL_VALUES";			//$NON-NLS-1$
-	public static final boolean						STATE_IS_HIDE_SMALL_VALUES_DEFAULT				= true;
-	public static final String						STATE_IS_SHOW_SEGMENTER_DECIMAL_PLACES			= "STATE_IS_SHOW_SEGMENTER_DECIMAL_PLACES"; //$NON-NLS-1$
-	public static final boolean						STATE_IS_SHOW_SEGMENTER_DECIMAL_PLACES_DEFAULT	= false;
-	public static final String						STATE_IS_SHOW_SEGMENTER_LINE					= "STATE_IS_SHOW_SEGMENTER_LINE";			//$NON-NLS-1$
-	public static final boolean						STATE_IS_SHOW_SEGMENTER_LINE_DEFAULT			= true;
-	public static final String						STATE_IS_SHOW_SEGMENTER_MARKER					= "STATE_IS_SHOW_SEGMENTER_MARKER";		//$NON-NLS-1$
-	public static final boolean						STATE_IS_SHOW_SEGMENTER_MARKER_DEFAULT			= false;
-	public static final String						STATE_IS_SHOW_SEGMENTER_TOOLTIP					= "STATE_IS_SHOW_SEGMENTER_TOOLTIP";		//$NON-NLS-1$
-	public static final boolean						STATE_IS_SHOW_SEGMENTER_TOOLTIP_DEFAULT			= true;
-	public static final String						STATE_IS_SHOW_SEGMENTER_VALUE					= "STATE_IS_SHOW_SEGMENTER_VALUE";			//$NON-NLS-1$
-	public static final boolean						STATE_IS_SHOW_SEGMENTER_VALUE_DEFAULT			= true;
-	public static final String						STATE_IS_SHOW_TOUR_SEGMENTS						= "STATE_IS_SHOW_TOUR_SEGMENTS";			//$NON-NLS-1$
-	public static final boolean						STATE_IS_SHOW_TOUR_SEGMENTS_DEFAULT				= true;
-	public static final String						STATE_GRAPH_OPACITY								= "STATE_GRAPH_OPACITY";					//$NON-NLS-1$
-	public static final int							STATE_GRAPH_OPACITY_DEFAULT						= 10;
-	public static final String						STATE_LINE_OPACITY								= "STATE_LINE_OPACITY";					//$NON-NLS-1$
-	public static final int							STATE_LINE_OPACITY_DEFAULT						= 100;
-	public static final String						STATE_SMALL_VALUE_SIZE							= "STATE_SMALL_VALUE_SIZE";				//$NON-NLS-1$
-	public static final int							STATE_SMALL_VALUE_SIZE_DEFAULT					= 50;
-	public static final String						STATE_STACKED_VISIBLE_VALUES					= "STATE_STACKED_VISIBLE_VALUES";			//$NON-NLS-1$
-	public static final int							STATE_STACKED_VISIBLE_VALUES_DEFAULT			= 2;
+	public static final String						STATE_IS_HIDE_SMALL_VALUES							= "STATE_IS_HIDE_SMALL_VALUES";				//$NON-NLS-1$
+	public static final boolean						STATE_IS_HIDE_SMALL_VALUES_DEFAULT					= true;
+	public static final String						STATE_IS_SHOW_SEGMENTER_DECIMAL_PLACES				= "STATE_IS_SHOW_SEGMENTER_DECIMAL_PLACES";	//$NON-NLS-1$
+	public static final boolean						STATE_IS_SHOW_SEGMENTER_DECIMAL_PLACES_DEFAULT		= false;
+	public static final String						STATE_IS_SHOW_SEGMENTER_LINE						= "STATE_IS_SHOW_SEGMENTER_LINE";				//$NON-NLS-1$
+	public static final boolean						STATE_IS_SHOW_SEGMENTER_LINE_DEFAULT				= true;
+	public static final String						STATE_IS_SHOW_SEGMENTER_MARKER						= "STATE_IS_SHOW_SEGMENTER_MARKER";			//$NON-NLS-1$
+	public static final boolean						STATE_IS_SHOW_SEGMENTER_MARKER_DEFAULT				= false;
+	public static final String						STATE_IS_SHOW_SEGMENTER_TOOLTIP						= "STATE_IS_SHOW_SEGMENTER_TOOLTIP";			//$NON-NLS-1$
+	public static final boolean						STATE_IS_SHOW_SEGMENTER_TOOLTIP_DEFAULT				= true;
+	public static final String						STATE_IS_SHOW_SEGMENTER_VALUE						= "STATE_IS_SHOW_SEGMENTER_VALUE";				//$NON-NLS-1$
+	public static final boolean						STATE_IS_SHOW_SEGMENTER_VALUE_DEFAULT				= true;
+	public static final String						STATE_IS_SHOW_TOUR_SEGMENTS							= "STATE_IS_SHOW_TOUR_SEGMENTS";				//$NON-NLS-1$
+	public static final boolean						STATE_IS_SHOW_TOUR_SEGMENTS_DEFAULT					= true;
+	public static final String						STATE_GRAPH_OPACITY									= "STATE_GRAPH_OPACITY";						//$NON-NLS-1$
+	public static final int							STATE_GRAPH_OPACITY_DEFAULT							= 10;
+	public static final String						STATE_LINE_OPACITY									= "STATE_LINE_OPACITY";						//$NON-NLS-1$
+	public static final int							STATE_LINE_OPACITY_DEFAULT							= 100;
+	public static final String						STATE_SMALL_VALUE_SIZE								= "STATE_SMALL_VALUE_SIZE";					//$NON-NLS-1$
+	public static final int							STATE_SMALL_VALUE_SIZE_DEFAULT						= 50;
+	public static final String						STATE_STACKED_VISIBLE_VALUES						= "STATE_STACKED_VISIBLE_VALUES";				//$NON-NLS-1$
+	public static final int							STATE_STACKED_VISIBLE_VALUES_DEFAULT				= 2;
 
-	private static final int						COLUMN_DEFAULT									= 0;										// sort by time
-	private static final int						COLUMN_SPEED									= 10;
-	private static final int						COLUMN_PACE										= 20;
-	private static final int						COLUMN_GRADIENT									= 30;
-	private static final int						COLUMN_PULSE									= 40;
-	private static final int						COLUMN_CADENCE									= 50;
+	private static final int						COLUMN_DEFAULT										= 0;											// sort by time
+	private static final int						COLUMN_SPEED										= 10;
+	private static final int						COLUMN_PACE											= 20;
+	private static final int						COLUMN_GRADIENT										= 30;
+	private static final int						COLUMN_PULSE										= 40;
+	private static final int						COLUMN_CADENCE										= 50;
 
-	private static final float						SPEED_DIGIT_VALUE								= 10.0f;
+	private static final float						SPEED_DIGIT_VALUE									= 10.0f;
 
-	private static final IPreferenceStore			_prefStore										= TourbookPlugin
-																											.getPrefStore();
-	private static final IDialogSettings			_state											= TourbookPlugin
-																											.getState(ID);
+	private static final IPreferenceStore			_prefStore											= TourbookPlugin
+																												.getPrefStore();
+	private static final IDialogSettings			_state												= TourbookPlugin
+																												.getState(ID);
 
-	private final boolean							_isOSX											= net.tourbook.common.UI.IS_OSX;
+	private final boolean							_isOSX												= net.tourbook.common.UI.IS_OSX;
 
 	private ColumnManager							_columnManager;
 
 	private TourData								_tourData;
 
 	private float									_dpToleranceAltitude;
+	private float									_dpToleranceAltitudeMultipleTours;
 	private float									_dpTolerancePulse;
-	private float									_savedDpToleranceAltitude						= -1;
+	private float									_savedDpToleranceAltitude							= -1;
 
 	private PostSelectionProvider					_postSelectionProvider;
-
 	private ISelectionListener						_postSelectionListener;
 	private IPartListener2							_partListener;
 	private IPropertyChangeListener					_prefChangeListener;
 	private ITourEventListener						_tourEventListener;
 
-	private final NumberFormat						_nf_0_0											= NumberFormat
-																											.getNumberInstance();
-	private final NumberFormat						_nf_1_0											= NumberFormat
-																											.getNumberInstance();
-	private final NumberFormat						_nf_1_1											= NumberFormat
-																											.getNumberInstance();
-	private final NumberFormat						_nf_3_3											= NumberFormat
-																											.getNumberInstance();
+	private final NumberFormat						_nf_0_0												= NumberFormat
+																												.getNumberInstance();
+	private final NumberFormat						_nf_1_0												= NumberFormat
+																												.getNumberInstance();
+	private final NumberFormat						_nf_1_1												= NumberFormat
+																												.getNumberInstance();
+	private final NumberFormat						_nf_3_3												= NumberFormat
+																												.getNumberInstance();
 	{
 		_nf_0_0.setMinimumFractionDigits(0);
 		_nf_0_0.setMaximumFractionDigits(0);
@@ -235,13 +237,13 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	private int										_maxDistanceSpinner;
 	private int										_spinnerDistancePage;
 
-	private boolean									_isTourDirty									= false;
+	private boolean									_isTourDirty										= false;
 	private boolean									_isSaving;
 
 	/**
 	 * when <code>true</code>, the tour dirty flag is disabled to load data into the fields
 	 */
-	private boolean									_isDirtyDisabled								= false;
+	private boolean									_isDirtyDisabled									= false;
 
 	private boolean									_isClearView;
 	private float									_altitudeUp;
@@ -252,7 +254,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	 * <p>
 	 * The sequence defines how they are displayed in the combobox.
 	 */
-	private static final ArrayList<TourSegmenter>	_allTourSegmenter								= new ArrayList<TourSegmenter>();
+	private static final ArrayList<TourSegmenter>	_allTourSegmenter									= new ArrayList<TourSegmenter>();
 
 	static {
 
@@ -292,7 +294,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 				SEGMENTER_REQUIRES_PULSE));
 	}
 
-	private ArrayList<TourSegmenter>				_availableSegmenter								= new ArrayList<TourSegmenter>();
+	private ArrayList<TourSegmenter>				_availableSegmenter									= new ArrayList<TourSegmenter>();
 
 	/**
 	 * segmenter type which the user has selected
@@ -316,7 +318,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	 * contains the controls which are displayed in the first column, these controls are used to get
 	 * the maximum width and set the first column within the differenct section to the same width
 	 */
-	private final ArrayList<Control>				_firstColBreakTime								= new ArrayList<Control>();
+	private final ArrayList<Control>				_firstColBreakTime									= new ArrayList<Control>();
 
 	private ActionModifyColumns						_actionModifyColumns;
 	private ActionTourChartSegmenterConfig			_actionTCSegmenterConfig;
@@ -1394,7 +1396,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 				_comboSegmenterType.addSelectionListener(new SelectionAdapter() {
 					@Override
 					public void widgetSelected(final SelectionEvent e) {
-						onSelectSegmenterType(true);
+						onSelect_SegmenterType(true);
 					}
 				});
 
@@ -1486,14 +1488,14 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 			_spinnerDistance.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(final SelectionEvent e) {
-					onChangedDistance();
+					onSelect_Distance();
 				}
 			});
 			_spinnerDistance.addMouseWheelListener(new MouseWheelListener() {
 				@Override
 				public void mouseScrolled(final MouseEvent event) {
 					UI.adjustSpinnerValueOnMouseScroll(event);
-					onChangedDistance();
+					onSelect_Distance();
 				}
 			});
 
@@ -1535,7 +1537,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 				@Override
 				public void mouseScrolled(final MouseEvent event) {
 					UI.adjustSpinnerValueOnMouseScroll(event);
-					onChangeBreakTime();
+					onSelect_BreakTime();
 				}
 			});
 
@@ -1626,7 +1628,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 			_comboBreakMethod.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(final SelectionEvent e) {
-					onSelectBreakTimeMethod();
+					onSelect_BreakTimeMethod();
 				}
 			});
 
@@ -1686,7 +1688,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 					@Override
 					public void mouseScrolled(final MouseEvent event) {
 						UI.adjustSpinnerValueOnMouseScroll(event);
-						onChangeBreakTime();
+						onSelect_BreakTime();
 					}
 				});
 
@@ -1715,7 +1717,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 					@Override
 					public void mouseScrolled(final MouseEvent event) {
 						UI.adjustSpinnerValueOnMouseScroll(event);
-						onChangeBreakTime();
+						onSelect_BreakTime();
 					}
 				});
 
@@ -1743,7 +1745,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 					@Override
 					public void mouseScrolled(final MouseEvent event) {
 						UI.adjustSpinnerValueOnMouseScroll(event);
-						onChangeBreakTime();
+						onSelect_BreakTime();
 					}
 				});
 
@@ -1781,14 +1783,14 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 			_spinnerBreakMinAvgSpeed.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(final SelectionEvent e) {
-					onChangeBreakTime();
+					onSelect_BreakTime();
 				}
 			});
 			_spinnerBreakMinAvgSpeed.addMouseWheelListener(new MouseWheelListener() {
 				@Override
 				public void mouseScrolled(final MouseEvent event) {
 					UI.adjustSpinnerValueOnMouseScroll(event);
-					onChangeBreakTime();
+					onSelect_BreakTime();
 				}
 			});
 
@@ -1825,14 +1827,14 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 			_spinnerBreakMinSliceSpeed.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(final SelectionEvent e) {
-					onChangeBreakTime();
+					onSelect_BreakTime();
 				}
 			});
 			_spinnerBreakMinSliceSpeed.addMouseWheelListener(new MouseWheelListener() {
 				@Override
 				public void mouseScrolled(final MouseEvent event) {
 					UI.adjustSpinnerValueOnMouseScroll(event);
-					onChangeBreakTime();
+					onSelect_BreakTime();
 				}
 			});
 
@@ -1867,14 +1869,14 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 				_spinnerBreakShortestTime.addSelectionListener(new SelectionAdapter() {
 					@Override
 					public void widgetSelected(final SelectionEvent e) {
-						onChangeBreakTime();
+						onSelect_BreakTime();
 					}
 				});
 				_spinnerBreakShortestTime.addMouseWheelListener(new MouseWheelListener() {
 					@Override
 					public void mouseScrolled(final MouseEvent event) {
 						UI.adjustSpinnerValueOnMouseScroll(event);
-						onChangeBreakTime();
+						onSelect_BreakTime();
 					}
 				});
 
@@ -1900,14 +1902,14 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 				_spinnerBreakMaxDistance.addSelectionListener(new SelectionAdapter() {
 					@Override
 					public void widgetSelected(final SelectionEvent e) {
-						onChangeBreakTime();
+						onSelect_BreakTime();
 					}
 				});
 				_spinnerBreakMaxDistance.addMouseWheelListener(new MouseWheelListener() {
 					@Override
 					public void mouseScrolled(final MouseEvent event) {
 						UI.adjustSpinnerValueOnMouseScroll(event);
-						onChangeBreakTime();
+						onSelect_BreakTime();
 					}
 				});
 
@@ -1938,14 +1940,14 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 				_spinnerBreakSliceDiff.addSelectionListener(new SelectionAdapter() {
 					@Override
 					public void widgetSelected(final SelectionEvent e) {
-						onChangeBreakTime();
+						onSelect_BreakTime();
 					}
 				});
 				_spinnerBreakSliceDiff.addMouseWheelListener(new MouseWheelListener() {
 					@Override
 					public void mouseScrolled(final MouseEvent event) {
 						UI.adjustSpinnerValueOnMouseScroll(event);
-						onChangeBreakTime();
+						onSelect_BreakTime();
 					}
 				});
 
@@ -2027,7 +2029,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		_segmentViewer.addSelectionChangedListener(new ISelectionChangedListener() {
 			@Override
 			public void selectionChanged(final SelectionChangedEvent event) {
-				onSelectSegment(event);
+				onSelect_Segment(event);
 			}
 		});
 
@@ -2096,7 +2098,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		spinner.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(final SelectionEvent e) {
-				onChangedTolerance();
+				onSelect_Tolerance();
 			}
 		});
 
@@ -2104,7 +2106,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 			@Override
 			public void mouseScrolled(final MouseEvent event) {
 				UI.adjustSpinnerValueOnMouseScroll(event);
-				onChangedTolerance();
+				onSelect_Tolerance();
 			}
 		});
 
@@ -2851,7 +2853,17 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	 */
 	private float getDPTolerance_FromTour() {
 
-		return (float) (_tourData.getDpTolerance() / 10.0);
+		if (_tourData.isMultipleTours) {
+
+			// DP tolerance is saved in the pref store
+
+			return _dpToleranceAltitudeMultipleTours;
+
+		} else {
+
+			return (float) (_tourData.getDpTolerance() / 10.0);
+		}
+
 	}
 
 	private int[] getForcedIndices() {
@@ -2860,8 +2872,43 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		final int[] multipleTourStartIndex = _tourData.multipleTourStartIndex;
 
 		int[] forcedIndices = null;
+
 		if (isMultipleTours) {
-			forcedIndices = multipleTourStartIndex;
+
+			/*
+			 * Create an extra segment between each tour that a segment do not cover more than 1
+			 * tour. This algorithm was introduced that a selected segment do not show also the next
+			 * tour in the tour map.
+			 */
+
+			int forcedIndex = 0;
+			final int forcedIndicesSize = multipleTourStartIndex.length * 2 - 1;
+
+			forcedIndices = new int[forcedIndicesSize];
+
+			for (final int tourStartIndex : multipleTourStartIndex) {
+
+				if (tourStartIndex == 0) {
+
+					// the first tour do not have an extra segment
+					forcedIndices[forcedIndex++] = 0;
+
+				} else {
+
+					if (forcedIndex == forcedIndicesSize - 1) {
+
+						// this is the last tour, it do not have an extra segment
+						forcedIndices[forcedIndex++] = tourStartIndex;
+
+					} else {
+
+						// these are all tours between the first and last
+
+						forcedIndices[forcedIndex++] = tourStartIndex - 1;
+						forcedIndices[forcedIndex++] = tourStartIndex;
+					}
+				}
+			}
 		}
 
 		return forcedIndices;
@@ -2937,36 +2984,6 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		return false;
 	}
 
-	private void onChangeBreakTime() {
-
-		createSegments(true);
-	}
-
-	private void onChangedDistance() {
-
-		updateUIDistance();
-
-		createSegments(true);
-	}
-
-	private void onChangedTolerance() {
-
-		final float dpToleranceAlti = (float) (_spinnerDPToleranceAltitude.getSelection() / 10.0);
-		final float dpTolerancePulse = (float) (_spinnerDPTolerancePulse.getSelection() / 10.0);
-
-		// check if tolerance has changed
-		if (_tourData == null || (_dpToleranceAltitude == dpToleranceAlti && _dpTolerancePulse == dpTolerancePulse)) {
-			return;
-		}
-
-		_dpToleranceAltitude = dpToleranceAlti;
-		_dpTolerancePulse = dpTolerancePulse;
-
-		setTourDirty();
-
-		createSegments(true);
-	}
-
 	private void onPartClosed() {
 
 		saveState();
@@ -3002,7 +3019,12 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		updateUIAltitude();
 	}
 
-	private void onSelectBreakTimeMethod() {
+	private void onSelect_BreakTime() {
+
+		createSegments(true);
+	}
+
+	private void onSelect_BreakTimeMethod() {
 
 		final BreakTimeMethod selectedBreakMethod = getSelectedBreakMethod();
 
@@ -3030,7 +3052,136 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		// break method pages have different heights, enforce layout of the whole view part
 		_pageSegmenter.layout(true, true);
 
-		onChangeBreakTime();
+		onSelect_BreakTime();
+	}
+
+	private void onSelect_Distance() {
+
+		updateUIDistance();
+
+		createSegments(true);
+	}
+
+	private void onSelect_Segment(final SelectionChangedEvent event) {
+
+		final StructuredSelection selection = (StructuredSelection) event.getSelection();
+		if (selection != null) {
+
+			/*
+			 * select the chart sliders according to the selected segment(s)
+			 */
+
+			final Object[] segments = selection.toArray();
+
+			if (segments.length > 0) {
+
+				if (_tourChart == null) {
+					_tourChart = TourManager.getActiveTourChart(_tourData);
+				}
+
+				final int startIndex = ((TourSegment) (segments[0])).serieIndexStart;
+				final int endIndex = ((TourSegment) (segments[segments.length - 1])).serieIndexEnd;
+
+				final SelectionChartXSliderPosition selectionSliderPosition = new SelectionChartXSliderPosition(
+						_tourChart,
+						startIndex,
+						endIndex,
+						true);
+
+				/*
+				 * Add custom data but only when the segment layer is visible
+				 */
+				if (isSegmentLayerVisible()) {
+
+					/*
+					 * Extend default selection with the segment positions
+					 */
+
+					final SelectedTourSegmenterSegments selectedSegments = new SelectedTourSegmenterSegments();
+					selectedSegments.tourData = _tourData;
+					selectedSegments.xSliderSerieIndexLeft = startIndex;
+					selectedSegments.xSliderSerieIndexRight = endIndex;
+
+					selectionSliderPosition.setCustomData(selectedSegments);
+				}
+
+				_postSelectionProvider.setSelection(selectionSliderPosition);
+			}
+		}
+	}
+
+	private void onSelect_SegmenterType(final boolean isUserSelected) {
+
+		final TourSegmenter selectedSegmenter = getSelectedSegmenter();
+		if (selectedSegmenter == null) {
+			clearView();
+			return;
+		}
+
+		final SegmenterType selectedSegmenterType = selectedSegmenter.segmenterType;
+
+		/*
+		 * keep segmenter type which the user selected, try to reselect this segmenter when a new
+		 * tour is displayed
+		 */
+		if (isUserSelected) {
+			_userSelectedSegmenterType = selectedSegmenterType;
+		}
+
+		if (selectedSegmenterType == SegmenterType.ByAltitudeWithDP
+				|| selectedSegmenterType == SegmenterType.ByAltitudeWithDPMerged) {
+
+			_pageBookSegmenter.showPage(_pageSegTypeDPAltitude);
+
+		} else if (selectedSegmenterType == SegmenterType.ByPulseWithDP) {
+
+			_pageBookSegmenter.showPage(_pageSegTypeDPPulse);
+
+		} else if (selectedSegmenterType == SegmenterType.ByMarker) {
+
+			_pageBookSegmenter.showPage(_pageSegTypeByMarker);
+
+		} else if (selectedSegmenterType == SegmenterType.ByDistance) {
+
+			_pageBookSegmenter.showPage(_pageSegTypeByDistance);
+
+		} else if (selectedSegmenterType == SegmenterType.ByComputedAltiUpDown) {
+
+			_pageBookSegmenter.showPage(_pageSegTypeByAltiUpDown);
+
+		} else if (selectedSegmenterType == SegmenterType.ByBreakTime) {
+
+			_pageBookSegmenter.showPage(_pageSegTypeByBreakTime);
+
+			// update ui + layout
+			onSelect_BreakTimeMethod();
+		}
+
+		_pageSegmenter.layout();
+
+		createSegments(true);
+	}
+
+	private void onSelect_Tolerance() {
+
+		final float dpToleranceAlti = (float) (_spinnerDPToleranceAltitude.getSelection() / 10.0);
+		final float dpTolerancePulse = (float) (_spinnerDPTolerancePulse.getSelection() / 10.0);
+
+		// check if tolerance has changed
+		if (_tourData == null || (_dpToleranceAltitude == dpToleranceAlti && _dpTolerancePulse == dpTolerancePulse)) {
+			return;
+		}
+
+		_dpToleranceAltitude = dpToleranceAlti;
+		_dpTolerancePulse = dpTolerancePulse;
+
+		if (_tourData.isMultipleTours) {
+			_dpToleranceAltitudeMultipleTours = dpToleranceAlti;
+		}
+
+		setTourDirty();
+
+		createSegments(true);
 	}
 
 	/**
@@ -3176,106 +3327,6 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		});
 	}
 
-	private void onSelectSegment(final SelectionChangedEvent event) {
-
-		final StructuredSelection selection = (StructuredSelection) event.getSelection();
-		if (selection != null) {
-
-			/*
-			 * select the chart sliders according to the selected segment(s)
-			 */
-
-			final Object[] segments = selection.toArray();
-
-			if (segments.length > 0) {
-
-				if (_tourChart == null) {
-					_tourChart = TourManager.getActiveTourChart(_tourData);
-				}
-
-				final int startIndex = ((TourSegment) (segments[0])).serieIndexStart;
-				final int endIndex = ((TourSegment) (segments[segments.length - 1])).serieIndexEnd;
-
-				final SelectionChartXSliderPosition selectionSliderPosition = new SelectionChartXSliderPosition(
-						_tourChart,
-						startIndex,
-						endIndex,
-						true);
-
-				/*
-				 * Add custom data but only when the segment layer is visible
-				 */
-				if (isSegmentLayerVisible()) {
-
-					/*
-					 * Extend default selection with the segment positions
-					 */
-
-					final SelectedTourSegmenterSegments selectedSegments = new SelectedTourSegmenterSegments();
-					selectedSegments.tourData = _tourData;
-					selectedSegments.xSliderSerieIndexLeft = startIndex;
-					selectedSegments.xSliderSerieIndexRight = endIndex;
-
-					selectionSliderPosition.setCustomData(selectedSegments);
-				}
-
-				_postSelectionProvider.setSelection(selectionSliderPosition);
-			}
-		}
-	}
-
-	private void onSelectSegmenterType(final boolean isUserSelected) {
-
-		final TourSegmenter selectedSegmenter = getSelectedSegmenter();
-		if (selectedSegmenter == null) {
-			clearView();
-			return;
-		}
-
-		final SegmenterType selectedSegmenterType = selectedSegmenter.segmenterType;
-
-		/*
-		 * keep segmenter type which the user selected, try to reselect this segmenter when a new
-		 * tour is displayed
-		 */
-		if (isUserSelected) {
-			_userSelectedSegmenterType = selectedSegmenterType;
-		}
-
-		if (selectedSegmenterType == SegmenterType.ByAltitudeWithDP
-				|| selectedSegmenterType == SegmenterType.ByAltitudeWithDPMerged) {
-
-			_pageBookSegmenter.showPage(_pageSegTypeDPAltitude);
-
-		} else if (selectedSegmenterType == SegmenterType.ByPulseWithDP) {
-
-			_pageBookSegmenter.showPage(_pageSegTypeDPPulse);
-
-		} else if (selectedSegmenterType == SegmenterType.ByMarker) {
-
-			_pageBookSegmenter.showPage(_pageSegTypeByMarker);
-
-		} else if (selectedSegmenterType == SegmenterType.ByDistance) {
-
-			_pageBookSegmenter.showPage(_pageSegTypeByDistance);
-
-		} else if (selectedSegmenterType == SegmenterType.ByComputedAltiUpDown) {
-
-			_pageBookSegmenter.showPage(_pageSegTypeByAltiUpDown);
-
-		} else if (selectedSegmenterType == SegmenterType.ByBreakTime) {
-
-			_pageBookSegmenter.showPage(_pageSegTypeByBreakTime);
-
-			// update ui + layout
-			onSelectBreakTimeMethod();
-		}
-
-		_pageSegmenter.layout();
-
-		createSegments(true);
-	}
-
 	private void onSetDefaults(final Composite parent) {
 
 		saveBreakTimeValuesInPrefStore();
@@ -3352,7 +3403,16 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		_spinnerBreakMinAvgSpeed.setSelection(//
 				(int) (btConfig.breakMinAvgSpeed * SPEED_DIGIT_VALUE * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE));
 
-		onSelectBreakTimeMethod();
+		onSelect_BreakTimeMethod();
+
+		/*
+		 * Altitude DP tolerance for multiple tours
+		 */
+		_dpToleranceAltitudeMultipleTours = (float) (STATE_DP_TOLERANCE_ALTITUDE_MULTIPLE_TOURS_DEFAULT / 10.0);
+
+		if (_tourData != null && _tourData.isMultipleTours) {
+			_spinnerDPToleranceAltitude.setSelection(STATE_DP_TOLERANCE_ALTITUDE_MULTIPLE_TOURS_DEFAULT);
+		}
 	}
 
 	private void restoreState() {
@@ -3385,10 +3445,18 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 		_spinnerMinAltitude.setSelection(Util.getStateInt(_state, STATE_MINIMUM_ALTITUDE, 50));
 
-		// DP tolerance pulse
+		/*
+		 * DP tolerance
+		 */
 		final int stateDPTolerancePulse = Util.getStateInt(_state, STATE_DP_TOLERANCE_PULSE, 50);
 		_dpTolerancePulse = stateDPTolerancePulse / 10.0f;
 		_spinnerDPTolerancePulse.setSelection(stateDPTolerancePulse);
+
+		final int stateDPToleranceMultipleTours = Util.getStateInt(
+				_state,
+				STATE_DP_TOLERANCE_ALTITUDE_MULTIPLE_TOURS,
+				STATE_DP_TOLERANCE_ALTITUDE_MULTIPLE_TOURS_DEFAULT);
+		_dpToleranceAltitudeMultipleTours = (float) (stateDPToleranceMultipleTours / 10.0);
 
 		/*
 		 * break time
@@ -3553,6 +3621,8 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		_state.put(STATE_SELECTED_DISTANCE, _spinnerDistance.getSelection());
 		_state.put(STATE_MINIMUM_ALTITUDE, _spinnerMinAltitude.getSelection());
 		_state.put(STATE_DP_TOLERANCE_PULSE, _spinnerDPTolerancePulse.getSelection());
+
+		_state.put(STATE_DP_TOLERANCE_ALTITUDE_MULTIPLE_TOURS, (int) (_dpToleranceAltitudeMultipleTours * 10));
 
 		saveBreakTimeValuesInState();
 	}
@@ -3719,7 +3789,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		_isDirtyDisabled = false;
 
 		updateUISegmenterSelector();
-		onSelectSegmenterType(false);
+		onSelect_SegmenterType(false);
 	}
 
 	/**

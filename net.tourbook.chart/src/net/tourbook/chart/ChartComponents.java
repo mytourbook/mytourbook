@@ -2473,49 +2473,70 @@ public class ChartComponents extends Composite {
 
 		final double[] xValues = _chartDataModel.getXData()._highValuesDouble[0];
 		final boolean isCenterSliderPosition = sliderPosition.isCenterSliderPosition();
+		final boolean isCenterZoomPosition = sliderPosition.isCenterZoomPositionWithKey();
+		final boolean isMoveChartToShowSlider = sliderPosition.isMoveChartToShowSlider();
 
-		// move left slider
+		/*
+		 * Move left slider
+		 */
 		if (slider1ValueIndex == SelectionChartXSliderPosition.SLIDER_POSITION_AT_CHART_BORDER) {
 
-			componentGraph.setXSliderValueIndex(//
+			componentGraph.moveXSlider(//
 					leftSlider,
 					0,
 					isCenterSliderPosition,
-					isFireEvent);
+					isMoveChartToShowSlider,
+					isFireEvent,
+					isCenterZoomPosition);
 
 		} else if (slider1ValueIndex != SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION) {
 
-			componentGraph.setXSliderValueIndex(//
+			componentGraph.moveXSlider(//
 					leftSlider,
 					slider1ValueIndex,
 					isCenterSliderPosition,
-					isFireEvent);
+					isMoveChartToShowSlider,
+					isFireEvent,
+					isCenterZoomPosition);
 		}
 
+		/*
+		 * Move right slider
+		 */
 		if (slider0ValueIndex != SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION) {
 
 			// move second slider before the first slider
 
-			componentGraph.setXSliderValueIndex(rightSlider, slider0ValueIndex, isCenterSliderPosition, isFireEvent);
+			componentGraph.moveXSlider(
+					rightSlider,
+					slider0ValueIndex,
+					isCenterSliderPosition,
+					isMoveChartToShowSlider,
+					isFireEvent,
+					isCenterZoomPosition);
 
 		} else {
 
 			// move right slider
 			if (slider2ValueIndex == SelectionChartXSliderPosition.SLIDER_POSITION_AT_CHART_BORDER) {
 
-				componentGraph.setXSliderValueIndex(//
+				componentGraph.moveXSlider(//
 						rightSlider,
 						xValues.length - 1,
 						isCenterSliderPosition,
-						isFireEvent);
+						isMoveChartToShowSlider,
+						isFireEvent,
+						isCenterZoomPosition);
 
 			} else if (slider2ValueIndex != SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION) {
 
-				componentGraph.setXSliderValueIndex(//
+				componentGraph.moveXSlider(//
 						rightSlider,
 						slider2ValueIndex,
 						isCenterSliderPosition,
-						isFireEvent);
+						isMoveChartToShowSlider,
+						isFireEvent,
+						isCenterZoomPosition);
 			}
 		}
 
