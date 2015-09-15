@@ -809,13 +809,13 @@ public class Chart extends ViewForm {
 		_chartComponents.getChartComponentGraph().zoomOutFitGraph();
 	}
 
-	void onExecuteZoomIn() {
+	void onExecuteZoomIn(final double accelerator) {
 
 		if (_chartComponents._devSliderBarHeight == 0) {
 			_chartComponents.getChartComponentGraph().zoomInWithoutSlider();
 			_chartComponents.onResize();
 		} else {
-			_chartComponents.getChartComponentGraph().zoomInWithMouse(Integer.MIN_VALUE, 1.0);
+			_chartComponents.getChartComponentGraph().zoomInWithMouse(Integer.MIN_VALUE, accelerator);
 		}
 	}
 
@@ -828,13 +828,13 @@ public class Chart extends ViewForm {
 		_chartComponents.onResize();
 	}
 
-	public void onExecuteZoomOut(final boolean updateChart) {
+	public void onExecuteZoomOut(final boolean updateChart, final double accelerator) {
 
 		if (_chartDataModel == null) {
 			return;
 		}
 
-		_chartComponents.getChartComponentGraph().zoomOutWithMouse(updateChart, Integer.MIN_VALUE, 1.0);
+		_chartComponents.getChartComponentGraph().zoomOutWithMouse(updateChart, Integer.MIN_VALUE, accelerator);
 	}
 
 	void onExternalChartResize() {

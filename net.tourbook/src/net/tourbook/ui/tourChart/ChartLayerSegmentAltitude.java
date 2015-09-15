@@ -573,6 +573,10 @@ public class ChartLayerSegmentAltitude implements IChartLayer, IChartOverlay {
 		gc.setClipping((Rectangle) null);
 	}
 
+	Rectangle getGraphArea() {
+		return _graphArea;
+	}
+
 	/**
 	 * @param mouseEvent
 	 * @return Returns the hovered {@link ChartLabel} or <code>null</code> when a {@link ChartLabel}
@@ -600,14 +604,16 @@ public class ChartLayerSegmentAltitude implements IChartLayer, IChartOverlay {
 
 	private SegmenterSegment getHoveredSegment_10(final int devXMouse, final int devYMouse) {
 
-		for (final SegmenterSegment chartLabel : _paintedSegments) {
+		for (final SegmenterSegment paintedSegment : _paintedSegments) {
 
-			final Rectangle hoveredLabelRect = chartLabel.hoveredLabelRect;
-			final Line2D hoveredLineShape = chartLabel.hoveredLineShape;
+			final Rectangle hoveredLabelRect = paintedSegment.hoveredLabelRect;
+			final Line2D hoveredLineShape = paintedSegment.hoveredLineShape;
 
 			if (//
 				// the label must be visible that it is checked
-			(chartLabel.isValueVisible && hoveredLabelRect != null && hoveredLabelRect.contains(devXMouse, devYMouse))
+			(paintedSegment.isValueVisible && hoveredLabelRect != null && hoveredLabelRect.contains(
+					devXMouse,
+					devYMouse))
 					|| (hoveredLineShape != null && hoveredLineShape.intersects(
 							devXMouse - SegmenterSegment.EXPANDED_HOVER_SIZE2,
 							devYMouse - SegmenterSegment.EXPANDED_HOVER_SIZE2,
@@ -615,7 +621,7 @@ public class ChartLayerSegmentAltitude implements IChartLayer, IChartOverlay {
 							SegmenterSegment.EXPANDED_HOVER_SIZE))) {
 
 				// segment is hit
-				return chartLabel;
+				return paintedSegment;
 			}
 		}
 
@@ -626,7 +632,7 @@ public class ChartLayerSegmentAltitude implements IChartLayer, IChartOverlay {
 	 * @return Returns <b>ONLY</b> labels which are visible. When zoomed in then some labels are not
 	 *         contained in this list.
 	 */
-	ArrayList<SegmenterSegment> getPaintedLabels() {
+	ArrayList<SegmenterSegment> getPaintedSegments() {
 		return _paintedSegments;
 	}
 

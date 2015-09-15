@@ -116,6 +116,7 @@ public class SegmenterSegment {
 		return "SegmenterSegment [" //
 //				+ ("paintedLabel=" + paintedLabel + ", ")
 				+ ("segmentIndex=" + segmentIndex + ", ")
+				+ ("hoveredLineRect=" + hoveredLineRect + ", ")
 //				+ ("serieIndex=" + serieIndex + ", ")
 				+ "]"; //$NON-NLS-1$
 	}

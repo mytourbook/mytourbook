@@ -101,6 +101,7 @@ public class ChartLayerSegmentValue implements IChartLayer {
 			_allGraphAreas.clear();
 			_allPaintedSegments.clear();
 		}
+		_paintedGraphIndex = graphDrawingData.graphIndex;
 
 		final ChartDataYSerie yData = graphDrawingData.getYData();
 
@@ -118,8 +119,6 @@ public class ChartLayerSegmentValue implements IChartLayer {
 		}
 
 		_tourChart.setLineSelectionDirty();
-
-		_paintedGraphIndex = graphDrawingData.graphIndex;
 
 		final IValueLabelProvider segmentLabelProvider = segmentConfig.labelProvider;
 
@@ -170,7 +169,7 @@ public class ChartLayerSegmentValue implements IChartLayer {
 		// do not draw over the graph area
 		gc.setClipping(graphArea);
 
-		RGB segmentRGB = segmentConfig.segmentLineRGB;
+		final RGB segmentRGB = segmentConfig.segmentLineRGB;
 		final Color segmentColor = new Color(display, segmentRGB);
 		gc.setForeground(segmentColor);
 		{
@@ -462,7 +461,7 @@ public class ChartLayerSegmentValue implements IChartLayer {
 
 					segmenterSegment.tourId = _tourData.getTourId();
 				}
-				
+
 				paintedSegment.add(segmenterSegment);
 
 				// advance to the next point
@@ -480,14 +479,16 @@ public class ChartLayerSegmentValue implements IChartLayer {
 		gc.setAlpha(0xff);
 	}
 
+	ArrayList<Rectangle> getAllGraphAreas() {
+		return _allGraphAreas;
+	}
+
 	/**
 	 * @param mouseEvent
 	 * @return Returns the hovered {@link ChartLabel} or <code>null</code> when a {@link ChartLabel}
 	 *         is not hovered.
 	 */
 	SegmenterSegment getHoveredSegment(final ChartMouseEvent mouseEvent) {
-
-		SegmenterSegment hoveredSegment = null;
 
 		for (int graphIndex = 0; graphIndex < _allGraphAreas.size(); graphIndex++) {
 
@@ -497,36 +498,42 @@ public class ChartLayerSegmentValue implements IChartLayer {
 
 				// mouse is hovering the graph area
 
-				hoveredSegment = getHoveredSegment_10(graphIndex, mouseEvent.devXMouse, mouseEvent.devYMouse);
+				final SegmenterSegment hoveredSegment = getHoveredSegment_10(
+						graphIndex,
+						mouseEvent.devXMouse,
+						mouseEvent.devYMouse);
 
-				break;
-			}
-		}
-
-		return hoveredSegment;
-	}
-
-	private SegmenterSegment getHoveredSegment_10(final int graphIndex, final int devXMouse, final int devYMouse) {
-
-		final ArrayList<SegmenterSegment> paintedSegments = _allPaintedSegments.get(graphIndex);
-
-		for (final SegmenterSegment chartLabel : paintedSegments) {
-
-			final Rectangle hoveredLabel = chartLabel.hoveredLabelRect;
-			final Rectangle hoveredRect = chartLabel.hoveredLineRect;
-
-			if ((hoveredLabel != null && hoveredLabel.contains(devXMouse, devYMouse))
-					|| (hoveredRect != null && hoveredRect.contains(devXMouse, devYMouse))) {
-
-				// segment is hit
-				return chartLabel;
+				if (hoveredSegment != null) {
+					// hovered segment is hit
+					return hoveredSegment;
+				}
 			}
 		}
 
 		return null;
 	}
 
-	ArrayList<ArrayList<SegmenterSegment>> getPaintedLabels() {
+	private SegmenterSegment getHoveredSegment_10(final int graphIndex, final int devXMouse, final int devYMouse) {
+
+		final ArrayList<SegmenterSegment> paintedSegments = _allPaintedSegments.get(graphIndex);
+
+		for (final SegmenterSegment paintedSegment : paintedSegments) {
+
+			final Rectangle hoveredLabel = paintedSegment.hoveredLabelRect;
+			final Rectangle hoveredRect = paintedSegment.hoveredLineRect;
+
+			if ((hoveredLabel != null && hoveredLabel.contains(devXMouse, devYMouse))
+					|| (hoveredRect != null && hoveredRect.contains(devXMouse, devYMouse))) {
+
+				// segment is hit
+				return paintedSegment;
+			}
+		}
+
+		return null;
+	}
+
+	ArrayList<ArrayList<SegmenterSegment>> getPaintedSegments() {
 		return _allPaintedSegments;
 	}
 

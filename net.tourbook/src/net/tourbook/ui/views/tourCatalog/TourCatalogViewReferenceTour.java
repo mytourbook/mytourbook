@@ -74,6 +74,7 @@ public class TourCatalogViewReferenceTour extends TourChartViewPart implements I
 
 		// set chart title
 		_tourChart.addDataModelListener(new IDataModelListener() {
+			@Override
 			public void dataModelChanged(final ChartDataModel chartDataModel) {
 
 				if (_tourData == null) {
@@ -86,6 +87,7 @@ public class TourCatalogViewReferenceTour extends TourChartViewPart implements I
 
 		// fire a slider move selection when a slider was moved in the tour chart
 		_tourChart.addSliderMoveListener(new ISliderMoveListener() {
+			@Override
 			public void sliderMoved(final SelectionChartInfo chartInfo) {
 
 				TourManager.fireEventWithCustomData(
@@ -104,12 +106,14 @@ public class TourCatalogViewReferenceTour extends TourChartViewPart implements I
 		}
 	}
 
+	@Override
 	public ArrayList<TourData> getSelectedTours() {
 		final ArrayList<TourData> selectedTour = new ArrayList<TourData>();
 		selectedTour.add(_tourData);
 		return selectedTour;
 	}
 
+	@Override
 	public TourChart getTourChart() {
 		return _tourChart;
 	}
@@ -176,6 +180,7 @@ public class TourCatalogViewReferenceTour extends TourChartViewPart implements I
 
 		_tourChart.addDataModelListener(new IDataModelListener() {
 
+			@Override
 			public void dataModelChanged(final ChartDataModel changedChartDataModel) {
 
 				if (_tourData == null) {
@@ -232,7 +237,7 @@ public class TourCatalogViewReferenceTour extends TourChartViewPart implements I
 		_activeRefId = refId;
 
 		// ???
-		_tourChart.onExecuteZoomOut(false);
+		_tourChart.onExecuteZoomOut(false, 1.0);
 
 		updateChart();
 

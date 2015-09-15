@@ -114,6 +114,7 @@ import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Path;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.RGB;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
@@ -257,7 +258,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 	private boolean							_isShowSegmenterTooltip;
 	private SelectedTourSegmenterSegments	_segmenterSelection;
 	private Font							_segmenterValueFont;
-	private int[]							_oldTourSegments;
+	private int								_oldTourSegmentsHash;
 
 	private ActionEditQuick					_actionEditQuick;
 
@@ -663,7 +664,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		if (isItemChecked) {
 			onExecuteZoomInWithSlider();
 		} else {
-			onExecuteZoomOut(true);
+			onExecuteZoomOut(true, 1.0);
 		}
 
 		updateZoomOptionActionHandlers();
@@ -1975,7 +1976,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 //		gc.setClipping(0, devYTop, gc.getClipping().width, devGraphHeight);
 //		gc.setClipping((Rectangle) null);
 
-		// paint polylines
+		// paint altitude line
 		if (_selectedAltitudePoints != null) {
 
 			gc.setAlpha(isFocusActive ? 0xa0 : 0x60);
@@ -2058,6 +2059,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 				}
 
 				gc.setLineCap(SWT.CAP_ROUND);
+				gc.setClipping(_layerTourSegmenterAltitude.getGraphArea());
 
 				if (rgb1 != null) {
 
@@ -2088,6 +2090,8 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
 			gc.setAlpha(isFocusActive ? 0x60 : 0x30);
 
+			final ArrayList<Rectangle> allGraphAreas = _layerTourSegmenterOther.getAllGraphAreas();
+
 			for (int pathIndex = 0; pathIndex < _selectedOtherPoints.size(); pathIndex++) {
 
 				final TIntArrayList graphLine = _selectedOtherPoints.get(pathIndex);
@@ -2096,6 +2100,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 					continue;
 				}
 
+				final Rectangle graphArea = allGraphAreas.get(pathIndex);
 				final RGB pathRGB = _selectedPathsRGB.get(pathIndex * (graphLine.size() / 2));
 
 				final Path path = new Path(display);
@@ -2128,6 +2133,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 					}
 
 					gc.setForeground(pathColor);
+					gc.setClipping(graphArea);
 					gc.drawPath(path);
 				}
 				pathColor.dispose();
@@ -2136,6 +2142,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		}
 
 		gc.setLineCap(SWT.CAP_FLAT);
+		gc.setClipping((Rectangle) null);
 	}
 
 	private void drawSelectedLines_CreateSelectedLines() {
@@ -2176,7 +2183,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		 * Create poline for all selected segments
 		 */
 		TIntArrayList selectedAltitudePath = null;
-		final ArrayList<SegmenterSegment> paintedSegments_Altitude = _layerTourSegmenterAltitude.getPaintedLabels();
+		final ArrayList<SegmenterSegment> paintedSegments_Altitude = _layerTourSegmenterAltitude.getPaintedSegments();
 		final ArrayList<RGB> selectedAltitudeRGB = new ArrayList<>();
 
 		if (paintedSegments_Altitude.size() > 0) {
@@ -2190,13 +2197,14 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		_selectedAltitudePoints = selectedAltitudePath;
 		_selectedAltitudeRGB = selectedAltitudeRGB;
 
-//		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
-//				+ ("\tselectedAltitudePath: " + Arrays.toString(selectedAltitudePath.toArray())));
-//		// TODO remove SYSTEM.OUT.PRINTLN
-
+		/*
+		 * 
+		 */
 		final ArrayList<TIntArrayList> selectedOtherPaths = new ArrayList<>();
 		final ArrayList<RGB> selectedPathsRGB = new ArrayList<>();
-		final ArrayList<ArrayList<SegmenterSegment>> paintedSegemntsOther = _layerTourSegmenterOther.getPaintedLabels();
+		final ArrayList<ArrayList<SegmenterSegment>> paintedSegemntsOther = _layerTourSegmenterOther
+				.getPaintedSegments();
+
 		for (final ArrayList<SegmenterSegment> paintedSegments : paintedSegemntsOther) {
 
 			final TIntArrayList selectedPath = drawSelectedLines_Values(
@@ -3169,14 +3177,17 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
 	/**
 	 * Reset tour segmenter selection.
-	 * 
-	 * @param newTourData
 	 */
-	private void resetSegmenterSelection(final TourData newTourData) {
+	private void resetSegmenterSelection() {
 
-		final int[] newTourSegments = newTourData.segmentSerieIndex;
+		final int[] tourSegments = _tourData.segmentSerieIndex;
 
-		if (newTourSegments == null || newTourSegments != null && newTourSegments.equals(_oldTourSegments) == false) {
+		int tourSegmentHash = Integer.MIN_VALUE;
+		if (tourSegments != null) {
+			tourSegmentHash = tourSegments.hashCode();
+		}
+
+		if (tourSegments == null || tourSegmentHash != _oldTourSegmentsHash) {
 
 			// reset selection when tour or segments have changed
 
@@ -3188,14 +3199,11 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 			_selectedSegmenterSegment_1 = null;
 			_selectedSegmenterSegment_2 = null;
 			_segmenterSelection = null;
-
-			_selectedAltitudePoints = null;
-			_selectedAltitudeRGB = null;
-			_selectedOtherPoints = null;
-			_selectedPathsRGB = null;
 		}
 
-		_oldTourSegments = newTourSegments;
+		_oldTourSegmentsHash = tourSegmentHash;
+
+		setLineSelectionDirty();
 	}
 
 	void restoreState() {
@@ -3610,10 +3618,10 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		_selectedSegmenterSegment_1 = null;
 		_selectedSegmenterSegment_2 = null;
 
-		ArrayList<SegmenterSegment> paintedSegmentLabels = _layerTourSegmenterAltitude.getPaintedLabels();
+		ArrayList<SegmenterSegment> paintedSegmentLabels = _layerTourSegmenterAltitude.getPaintedSegments();
 		if (paintedSegmentLabels.size() == 0) {
 
-			for (final ArrayList<SegmenterSegment> paintedLabels : _layerTourSegmenterOther.getPaintedLabels()) {
+			for (final ArrayList<SegmenterSegment> paintedLabels : _layerTourSegmenterOther.getPaintedSegments()) {
 				if (paintedLabels.size() > 0) {
 
 					paintedSegmentLabels = paintedLabels;
@@ -3641,7 +3649,16 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 			}
 
 			if (_selectedSegmenterSegment_1 != null && _selectedSegmenterSegment_2 != null) {
-				break;
+
+				/*
+				 * Prevent that both segments have the same index, the 2nd segment is used for
+				 * multiple selection, otherwise the selection with the mouse is a bit strange.
+				 */
+				if (_selectedSegmenterSegment_1.serieIndex == _selectedSegmenterSegment_2.serieIndex) {
+					_selectedSegmenterSegment_2 = null;
+				} else {
+					break;
+				}
 			}
 		}
 
@@ -4581,7 +4598,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		 */
 		_selectedTourMarker = null;
 		hidePhotoLayer();
-		resetSegmenterSelection(newTourData);
+		resetSegmenterSelection();
 
 		final ChartDataModel newChartDataModel = TourManager.getInstance().createChartDataModel(
 				_tourData,
@@ -4642,7 +4659,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 			return;
 		}
 
-		resetSegmenterSelection(_tourData);
+		resetSegmenterSelection();
 		setupTourSegmenter();
 
 		if (_isTourSegmenterVisible) {
