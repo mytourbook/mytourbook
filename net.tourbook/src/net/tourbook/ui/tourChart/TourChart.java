@@ -58,6 +58,7 @@ import net.tourbook.common.util.TourToolTip;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
+import net.tourbook.data.TourSegment;
 import net.tourbook.photo.Photo;
 import net.tourbook.photo.TourPhotoLink;
 import net.tourbook.preferences.ITourbookPreferences;
@@ -121,6 +122,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbenchPart;
 
 /**
@@ -161,37 +163,37 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 	public static final String				ACTION_ID_HR_ZONE_STYLE_WHITE_TOP		= "ACTION_ID_HR_ZONE_STYLE_WHITE_TOP";						//$NON-NLS-1$
 	public static final String				ACTION_ID_X_AXIS_DISTANCE				= "ACTION_ID_X_AXIS_DISTANCE";								//$NON-NLS-1$
 	public static final String				ACTION_ID_X_AXIS_TIME					= "ACTION_ID_X_AXIS_TIME";									//$NON-NLS-1$
+	//
 	/**
 	 * 1e-5 is too small for the min value, it do not correct the graph.
 	 */
 	public static final double				MIN_ADJUSTMENT							= 1e-3;
-
 	public static final double				MAX_ADJUSTMENT							= 1e-5;
+	//
 	private final IPreferenceStore			_prefStore								= TourbookPlugin.getPrefStore();
-
 	private final IDialogSettings			_state									= TourbookPlugin.getState(ID);
 	private final IDialogSettings			_tourSegmenterState						= TourSegmenterView.getState();
+	//
 	/**
 	 * Part in which the tour chart is created, can be <code>null</code> when created in a dialog.
 	 */
 	private IWorkbenchPart					_part;																								;
-
+	//
 	private TourData						_tourData;
-
 	private TourChartConfiguration			_tcc;
+	//
 	private Map<String, Action>				_allTourChartActions;
-
 	private ActionOpenMarkerDialog			_actionOpenMarkerDialog;
 	private ActionTourChartInfo				_actionTourInfo;
 	private ActionTourChartMarker			_actionTourMarker;
 	private ActionTourChartOptions			_actionTourOptions;
+	//
 	/**
 	 * datamodel listener is called when the chart data is created
 	 */
 	private IDataModelListener				_chartDataModelListener;
 
 	private IPropertyChangeListener			_prefChangeListener;
-
 	private final ListenerList				_tourMarkerModifyListener				= new ListenerList();
 	private final ListenerList				_tourMarkerSelectionListener			= new ListenerList();
 	private final ListenerList				_tourModifyListener						= new ListenerList();
@@ -214,12 +216,12 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 	private ImageDescriptor					_imagePhotoTooltip						= TourbookPlugin
 																							.getImageDescriptor(Messages.Image__PhotoImage);
 	private IFillPainter					_hrZonePainter;
+
 	private OpenDialogManager				_openDlgMgr								= new OpenDialogManager();
 
-	private TourToolTip						_tourInfoIconTooltip;
-
-	private TourInfoIconToolTipProvider		_tourInfoIconTooltipProvider;
 	private ChartPhotoToolTip				_photoTooltip;
+	private TourToolTip						_tourInfoIconTooltip;
+	private TourInfoIconToolTipProvider		_tourInfoIconTooltipProvider;
 	private ChartMarkerToolTip				_tourMarkerTooltip;
 	private TourSegmenterTooltip			_tourSegmenterTooltip;
 	private ChartTitleToolTip				_tourTitleTooltip;
@@ -2614,6 +2616,17 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		return _tourData;
 	}
 
+	public ArrayList<TourSegment> getTourSegments() {
+
+		final IViewPart viewPart = Util.getView(TourSegmenterView.ID);
+
+		if (viewPart instanceof TourSegmenterView) {
+			return ((TourSegmenterView) viewPart).getTourSegments();
+		}
+
+		return null;
+	}
+
 	Font getValueFont() {
 
 		if (_segmenterValueFont == null) {
@@ -3611,6 +3624,11 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 	}
 
 	private void selectXSliders_Segments(final SelectedTourSegmenterSegments selectedSegments) {
+
+		if (_layerTourSegmenterAltitude == null) {
+			// is not fully initialized
+			return;
+		}
 
 		// keep selection which is needed when the chart is resized and more/less/other segments are displayed
 		_segmenterSelection = selectedSegments;
@@ -4652,6 +4670,8 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
 	/**
 	 * Toursegmenter is modified, update its layers.
+	 * 
+	 * @param tourSegmenterView
 	 */
 	public void updateTourSegmenter() {
 

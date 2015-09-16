@@ -959,8 +959,7 @@ public abstract class AnimatedToolTipShell2 {
 
 	/**
 	 * @param displayCursorLocation
-	 * @return When the returned rectangle (which has display locations) is hit by the mouse, the
-	 *         tooltip should not be hidden. When <code>null</code> this check is ignored.
+	 * @return Returns <code>true</code> when the tooltip should not be closed.
 	 */
 	protected boolean isInNoHideArea(final Point displayCursorLocation) {
 		return false;

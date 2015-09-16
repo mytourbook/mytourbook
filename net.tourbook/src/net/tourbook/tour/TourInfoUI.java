@@ -74,7 +74,6 @@ public class TourInfoUI {
 
 	private final NumberFormat			_nf1					= NumberFormat.getInstance();
 	private final NumberFormat			_nf3					= NumberFormat.getInstance();
-
 	{
 		_nf1.setMinimumFractionDigits(1);
 		_nf1.setMaximumFractionDigits(1);
@@ -969,9 +968,9 @@ public class TourInfoUI {
 		final DateTime dtTourStart = _tourData.getTourStartTime();
 		final DateTime dtTourEnd = dtTourStart.plus(recordingTime * 1000);
 
-		final boolean isLargeDuration = recordingTime < net.tourbook.common.UI.DAY_IN_SECONDS;
+		final boolean isShorDuration = recordingTime < net.tourbook.common.UI.DAY_IN_SECONDS;
 
-		if (isLargeDuration) {
+		if (isShorDuration) {
 
 			// < 1 day
 

@@ -674,6 +674,8 @@ public abstract class AnimatedToolTipShell {
 			createToolTipContentArea(_shell);
 		}
 
+		onUpdateUI();
+
 		_shell.layout();
 		_shell.pack(true);
 
@@ -767,6 +769,14 @@ public abstract class AnimatedToolTipShell {
 
 		// hide shell
 		setShellVisible(false);
+	}
+
+	/**
+	 * @param displayCursorLocation
+	 * @return Returns <code>true</code> when the tooltip should not be closed.
+	 */
+	protected boolean isInNoHideArea(final Point displayCursorLocation) {
+		return false;
 	}
 
 	/**
@@ -940,15 +950,24 @@ public abstract class AnimatedToolTipShell {
 
 		} else if (isHide) {
 
-			final Rectangle noHideArea = noHideOnMouseMove();
+			final boolean isInNoHideArea = isInNoHideArea(displayCursorLocation);
 
-			if (noHideArea == null || noHideArea.contains(displayCursorLocation) == false) {
+			if (isInNoHideArea) {
 
-				// hide definitively
+				// keep open
 
-				ttHide();
+			} else {
 
-				isKeepOpened = false;
+				final Rectangle noHideArea = noHideOnMouseMove();
+
+				if (noHideArea == null || noHideArea.contains(displayCursorLocation) == false) {
+
+					// hide definitively
+
+					ttHide();
+
+					isKeepOpened = false;
+				}
 			}
 		}
 
@@ -1185,6 +1204,13 @@ public abstract class AnimatedToolTipShell {
 
 		}
 
+	}
+
+	/**
+	 * Is called after the UI is created but before it is packed.
+	 */
+	protected void onUpdateUI() {
+		// default do nothing
 	}
 
 	private void removeDisplayFilterListener() {

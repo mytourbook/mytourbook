@@ -2941,6 +2941,10 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		return null;
 	}
 
+	public ArrayList<TourSegment> getTourSegments() {
+		return _allTourSegments;
+	}
+
 	private String getTourTitle() {
 
 		if (_tourData.isMultipleTours) {

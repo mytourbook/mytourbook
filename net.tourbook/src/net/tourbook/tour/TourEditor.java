@@ -32,6 +32,7 @@ import net.tourbook.ui.UI;
 import net.tourbook.ui.tourChart.TourChart;
 import net.tourbook.ui.tourChart.TourChartConfiguration;
 import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
+import net.tourbook.ui.views.tourSegmenter.TourSegmenterView;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.viewers.ISelection;
@@ -153,7 +154,9 @@ public class TourEditor extends EditorPart implements IPersistableEditor {
 
 				if (eventId == TourEventId.SEGMENT_LAYER_CHANGED) {
 
-					_tourChart.updateTourSegmenter();
+					if (part instanceof TourSegmenterView) {
+						_tourChart.updateTourSegmenter();
+					}
 
 				} else if (eventId == TourEventId.TOUR_CHART_PROPERTY_IS_MODIFIED) {
 

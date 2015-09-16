@@ -24,6 +24,7 @@ import net.tourbook.tour.TourEvent;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.UI;
+import net.tourbook.ui.views.tourSegmenter.TourSegmenterView;
 
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
@@ -159,7 +160,10 @@ public abstract class TourChartViewPart extends ViewPart {
 				}
 
 				if (eventId == TourEventId.SEGMENT_LAYER_CHANGED) {
-					_tourChart.updateTourSegmenter();
+
+					if (part instanceof TourSegmenterView) {
+						_tourChart.updateTourSegmenter();
+					}
 
 				} else if (eventId == TourEventId.TOUR_CHART_PROPERTY_IS_MODIFIED) {
 					_tourChart.updateTourChart(true, true);

@@ -1086,6 +1086,46 @@ public class Util {
 		}
 	}
 
+	/**
+	 * @param viewId
+	 * @return Returns a view from it's ID or <code>null</code> when not found.
+	 */
+	public static IViewPart getView(final String viewId) {
+
+		final IWorkbench wb = PlatformUI.getWorkbench();
+		if (wb == null) {
+			return null;
+		}
+
+		final IWorkbenchWindow wbWin = wb.getActiveWorkbenchWindow();
+		if (wbWin == null) {
+			return null;
+		}
+
+		IWorkbenchPage activePage = wbWin.getActivePage();
+		if (activePage == null) {
+
+			// this case can happen when all perspectives are closed, try to open default perspective
+
+			final String defaultPerspectiveID = wb.getPerspectiveRegistry().getDefaultPerspective();
+			if (defaultPerspectiveID == null) {
+				return null;
+			}
+
+			try {
+				activePage = wb.showPerspective(defaultPerspectiveID, wbWin);
+			} catch (final WorkbenchException e) {
+				// ignore
+			}
+
+			if (activePage == null) {
+				return null;
+			}
+		}
+
+		return activePage.findView(viewId);
+	}
+
 	public static boolean getXmlBoolean(final IMemento xmlMemento, final String key, final Boolean defaultValue) {
 
 		Boolean value = xmlMemento.getBoolean(key);

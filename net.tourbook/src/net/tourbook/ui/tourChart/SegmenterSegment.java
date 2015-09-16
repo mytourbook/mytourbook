@@ -83,7 +83,7 @@ public class SegmenterSegment {
 	 */
 	public boolean isInNoHideArea(final Control control, final Point displayCursorLocation) {
 
-		if (hoveredLineShape == null) {
+		if (hoveredLineRect == null && hoveredLabelRect == null && hoveredLineShape == null) {
 			return false;
 		}
 
@@ -93,16 +93,20 @@ public class SegmenterSegment {
 		final int devYMouse = controlCursorLocation.y;
 
 		if (
+		// check segment line
+		(hoveredLineRect != null && hoveredLineRect.contains(devXMouse, devYMouse))
 		//
 		// check segment value, it must be visible that it can be checked
-		(isValueVisible && hoveredLabelRect != null && hoveredLabelRect.contains(devXMouse, devYMouse))
-		//
-		// check segment line
+				|| (isValueVisible && hoveredLabelRect != null && hoveredLabelRect.contains(devXMouse, devYMouse))
+				//
+				// check segment shape
 				|| (hoveredLineShape != null && hoveredLineShape.intersects(
 						devXMouse - SegmenterSegment.EXPANDED_HOVER_SIZE2,
 						devYMouse - SegmenterSegment.EXPANDED_HOVER_SIZE2,
 						SegmenterSegment.EXPANDED_HOVER_SIZE,
-						SegmenterSegment.EXPANDED_HOVER_SIZE))) {
+						SegmenterSegment.EXPANDED_HOVER_SIZE))
+		//
+		) {
 
 			// segment is hit
 			return true;

@@ -51,6 +51,7 @@ import net.tourbook.ui.views.tourCatalog.SelectionTourCatalogView;
 import net.tourbook.ui.views.tourCatalog.TVICatalogComparedTour;
 import net.tourbook.ui.views.tourCatalog.TVICatalogRefTourItem;
 import net.tourbook.ui.views.tourCatalog.TVICompareResultComparedTour;
+import net.tourbook.ui.views.tourSegmenter.TourSegmenterView;
 
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
@@ -242,7 +243,12 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 
 				if (eventId == TourEventId.SEGMENT_LAYER_CHANGED) {
 
-					if (eventData instanceof TourData) {
+					TourSegmenterView tourSegmenterView = null;
+					if (part instanceof TourSegmenterView) {
+						tourSegmenterView = (TourSegmenterView) part;
+					}
+
+					if (tourSegmenterView != null && eventData instanceof TourData) {
 
 						final TourData eventTourData = (TourData) eventData;
 

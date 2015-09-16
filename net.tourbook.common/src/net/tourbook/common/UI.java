@@ -1171,6 +1171,50 @@ public class UI {
 		}
 	}
 
+	public static void setEqualizeColumWidthsWithReset(	final ArrayList<Control> columnControls,
+														final int additionalSpace) {
+
+		// reset existing widthHint
+		for (final Control control : columnControls) {
+
+			final Object layoutData = control.getLayoutData();
+			if (layoutData instanceof GridData) {
+
+				final GridData gd = (GridData) layoutData;
+				gd.widthHint = SWT.DEFAULT;
+			}
+			control.pack(true);
+		}
+
+		int maxWidth = 0;
+
+		// get max width from all first columns controls
+		for (final Control control : columnControls) {
+
+			if (control.isDisposed()) {
+				// this should not happen, but it did during testing
+				return;
+			}
+
+			final int controlWidth = control.getSize().x;
+
+			final int width = controlWidth + additionalSpace;
+
+			maxWidth = width > maxWidth ? width : maxWidth;
+		}
+
+		// set width for all column controls
+		for (final Control control : columnControls) {
+
+			final Object layoutData = control.getLayoutData();
+			if (layoutData instanceof GridData) {
+
+				final GridData gd = (GridData) layoutData;
+				gd.widthHint = maxWidth;
+			}
+		}
+	}
+
 	public static GridData setFieldWidth(final Composite parent, final StringFieldEditor field, final int width) {
 		final GridData gd = new GridData();
 		gd.widthHint = width;
