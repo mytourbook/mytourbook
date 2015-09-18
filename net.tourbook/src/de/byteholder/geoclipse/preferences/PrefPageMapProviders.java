@@ -1466,7 +1466,7 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 		_btnDeleteMapProvider.setEnabled(isExistingMapProvider && isNonePluginMapProvider);
 		_btnDeleteOfflineMap.setEnabled(isExistingMapProvider && canDeleteOfflineMap);
 		_btnImport.setEnabled(isExistingMapProvider);
-		_btnExport.setEnabled(isExistingMapProvider & isNonePluginMapProvider);
+		_btnExport.setEnabled(isExistingMapProvider && isNonePluginMapProvider);
 
 		_lblDropTarget.setEnabled((_isModifiedMapProvider == false) && (_isNewMapProvider == false));
 		_lblMpDropTarget.setEnabled((_isModifiedMapProvider == false) && (_isNewMapProvider == false));

@@ -922,7 +922,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 		_actionTourCompareWizard.setEnabled(refItems > 0);
 
 		// enable remove button when only one type of item is selected
-		if (yearItems == 0 && ((refItems > 0 && tourItems == 0) || (refItems == 0 & tourItems > 0))) {
+		if (yearItems == 0 && ((refItems > 0 && tourItems == 0) || (refItems == 0 && tourItems > 0))) {
 			_actionRemoveComparedTours.setEnabled(true);
 		} else {
 			_actionRemoveComparedTours.setEnabled(false);

@@ -148,7 +148,7 @@ public class TourPainterConfiguration {
 			_tourDataList.addAll(tourDataList);
 		}
 
-		isTourVisible = isShowTour & _tourDataList.size() > 0;
+		isTourVisible = isShowTour && _tourDataList.size() > 0;
 	}
 
 	/**
@@ -163,6 +163,6 @@ public class TourPainterConfiguration {
 		_tourDataList.clear();
 		_tourDataList.add(tourData);
 
-		isTourVisible = isShowTour & _tourDataList.size() > 0;
+		isTourVisible = isShowTour && _tourDataList.size() > 0;
 	}
 }

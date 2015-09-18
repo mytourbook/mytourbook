@@ -187,6 +187,7 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 		};
 
 		_defaultMouseWheelListener = new MouseWheelListener() {
+			@Override
 			public void mouseScrolled(final MouseEvent event) {
 				Util.adjustSpinnerValueOnMouseScroll(event);
 				onModifyConfig();
@@ -909,6 +910,7 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 		colorSelector.addOpenListener(this);
 
 		colorSelector.addListener(new IPropertyChangeListener() {
+			@Override
 			public void propertyChange(final PropertyChangeEvent event) {
 				onModifyConfig();
 			}
@@ -972,7 +974,7 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 		final boolean isClampToGround = config.altitudeMode == WorldWind.CLAMP_TO_GROUND;
 		final boolean isShowCurtain = isClampToGround == false && config.isShowInterior;
 		final boolean isTrackPositionVisible = config.outlineWidth > 0.0;
-		final boolean isShowTrackPosition = config.isShowTrackPosition & isTrackPositionVisible;
+		final boolean isShowTrackPosition = config.isShowTrackPosition && isTrackPositionVisible;
 		final boolean isOffsetModeAbsolute = config.altitudeOffsetMode == TourTrackConfigManager.ALTITUDE_OFFSET_MODE_ABSOLUTE;
 		final boolean isOffsetModeRelative = config.altitudeOffsetMode == TourTrackConfigManager.ALTITUDE_OFFSET_MODE_RELATIVE;
 

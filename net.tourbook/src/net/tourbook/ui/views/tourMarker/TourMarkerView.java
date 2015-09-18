@@ -776,7 +776,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 	private void enableActions() {
 
 		final boolean isTourInDb = isTourSavedInDb();
-		final boolean isSingleTour = _tourData != null & _tourData.isMultipleTours == false;
+		final boolean isSingleTour = _tourData != null && _tourData.isMultipleTours == false;
 
 		_actionEditTourMarkers.setEnabled(isTourInDb && isSingleTour);
 	}
