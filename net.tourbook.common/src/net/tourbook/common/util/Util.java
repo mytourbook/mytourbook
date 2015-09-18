@@ -1505,7 +1505,7 @@ public class Util {
 	public static double roundDecimalValue(final double unitValue) {
 
 		if (unitValue == Double.POSITIVE_INFINITY) {
-			StatusUtil.log(new Exception("Value is infinity."));
+			StatusUtil.log(new Exception("Value is infinity.")); //$NON-NLS-1$
 			return 1;
 		}
 

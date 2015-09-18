@@ -890,7 +890,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 			btConfig = BreakTimeTool.getPrefValues();
 		}
 
-		_allTourSegments = _tourData.createTourSegments(btConfig);
+		_allTourSegments = _tourData.createSegmenterSegments(btConfig);
 
 		return _allTourSegments == null //
 				? new Object[0]

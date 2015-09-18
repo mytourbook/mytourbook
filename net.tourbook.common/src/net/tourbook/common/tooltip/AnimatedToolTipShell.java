@@ -335,6 +335,10 @@ public abstract class AnimatedToolTipShell {
 
 	private void animation10_StartKomplex() {
 
+//		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
+//				+ ("\tanimation10_StartKomplex"));
+//		// TODO remove SYSTEM.OUT.PRINTLN
+
 //		final long start = System.nanoTime();
 
 		if (_isShellFadingIn) {
@@ -442,11 +446,15 @@ public abstract class AnimatedToolTipShell {
 							&& shellCurrentLocation.y == shellEndY;
 
 					if (_fadeInSteps <= 0) {
+
 						newAlpha = ALPHA_OPAQUE;
+
 					} else {
+
 						final int diffAlpha = ALPHA_OPAQUE / _fadeInSteps;
 
 						newAlpha = currentAlpha + diffAlpha;
+
 						if (newAlpha > ALPHA_OPAQUE) {
 							newAlpha = ALPHA_OPAQUE;
 						}
@@ -471,11 +479,48 @@ public abstract class AnimatedToolTipShell {
 							final int diffX = shellStartX - shellEndX;
 							final int diffY = shellStartY - shellEndY;
 
-							final double moveX = (double) diffX / MOVE_STEPS * _animationMoveCounter;
-							final double moveY = (double) diffY / MOVE_STEPS * _animationMoveCounter;
+							final int moveX = (int) ((double) diffX / MOVE_STEPS * _animationMoveCounter);
+							final int moveY = (int) ((double) diffY / MOVE_STEPS * _animationMoveCounter);
 
-							final int shellCurrentX = (int) (shellStartX - moveX);
-							final int shellCurrentY = (int) (shellStartY - moveY);
+							int shellCurrentX = shellStartX - moveX;
+							final int shellCurrentY = shellStartY - moveY;
+
+							/**
+							 * This wrong behaviour occured (not very often bit it occured) that the
+							 * tooltip was moving to the invinity of the right or the left.
+							 * <p>
+							 * This check will prevent this bug.
+							 */
+							if (shellStartX - shellEndX < 0 && shellCurrentX > shellEndX) {
+
+//								System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
+//										+ ("shellCurrentX > shellEndX\t" + (shellCurrentX - shellEndX)));
+//								System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
+//										+ ("\tshellStartX:" + shellStartX)
+//										+ ("\tshellEndX:" + shellEndX)
+//										+ ("\tshellCurrentX:" + shellCurrentX)
+//										+ ("\tmoveX:" + moveX)
+//										//
+//										);
+//							// TODO remove SYSTEM.OUT.PRINTLN
+
+								shellCurrentX = shellEndX;
+
+							} else if (shellStartX - shellEndX > 0 && shellCurrentX < shellEndX) {
+
+//								System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
+//										+ ("shellCurrentX < shellEndX\t" + (shellEndX - shellCurrentX)));
+//								System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
+//										+ ("\tshellStartX:" + shellStartX)
+//										+ ("\tshellEndX:" + shellEndX)
+//										+ ("\tshellCurrentX:" + shellCurrentX)
+//										+ ("\tmoveX:" + moveX)
+//										//
+//										);
+//							// TODO remove SYSTEM.OUT.PRINTLN
+
+								shellCurrentX = shellEndX;
+							}
 
 							_shell.setLocation(shellCurrentX, shellCurrentY);
 						}
@@ -970,6 +1015,10 @@ public abstract class AnimatedToolTipShell {
 				}
 			}
 		}
+
+//		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
+//				+ ("\tdisplayCursorLocation:" + displayCursorLocation));
+//		// TODO remove SYSTEM.OUT.PRINTLN
 
 		return isKeepOpened;
 

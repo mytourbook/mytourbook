@@ -169,8 +169,8 @@ public class ChartLayerSegmentAltitude implements IChartLayer, IChartOverlay {
 
 		final RGB segmentRGB = segmentConfig.segmentLineRGB;
 		final Color segmentColor = new Color(gc.getDevice(), segmentRGB);
-		final RGB downRGB = new RGB(0xff, 0x5e, 0x62);
-		final Color downColor = new Color(gc.getDevice(), downRGB);
+		final RGB rgbUp = new RGB(0xff, 0x5e, 0x62);
+		final Color colorUp = new Color(gc.getDevice(), rgbUp);
 		{
 			int segmentIndex;
 
@@ -266,12 +266,12 @@ public class ChartLayerSegmentAltitude implements IChartLayer, IChartOverlay {
 
 				Color paintedColor;
 				RGB paintedRGB;
-				if (altiDiff >= 0) {
+				if (altiDiff < 0) {
 					paintedColor = segmentColor;
 					paintedRGB = segmentRGB;
 				} else {
-					paintedColor = downColor;
-					paintedRGB = downRGB;
+					paintedColor = colorUp;
+					paintedRGB = rgbUp;
 				}
 
 				final SegmenterSegment segmenterSegment = new SegmenterSegment();
@@ -494,7 +494,7 @@ public class ChartLayerSegmentAltitude implements IChartLayer, IChartOverlay {
 			}
 		}
 		segmentColor.dispose();
-		downColor.dispose();
+		colorUp.dispose();
 
 		// reset clipping
 		gc.setClipping((Rectangle) null);

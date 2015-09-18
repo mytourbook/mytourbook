@@ -136,7 +136,7 @@ public class ChartLayerSegmentValue implements IChartLayer {
 		final double scaleY = graphDrawingData.getScaleY();
 
 		final double minValueAdjustment = segmentConfig.minValueAdjustment;
-		final double maxValue = yData.getOriginalMaxValue();
+		final double maxValue = yData.getAvgPositiveValue();
 		final double hideThreshold = maxValue * _smallValue * minValueAdjustment;
 
 		final int[] segmentSerieIndex = _tourData.segmentSerieIndex;
@@ -375,8 +375,14 @@ public class ChartLayerSegmentValue implements IChartLayer {
 							segmenterSegment.paintedLabel = validRect;
 
 							// keep area to detect hovered segments, enlarge it with the hover border to easier hit the label
-							final Rectangle hoveredRect = new Rectangle(//
-									(validRect.x + borderWidth),
+//							final Rectangle hoveredRect = new Rectangle(//
+//									(validRect.x + borderWidth),
+//									(validRect.y + borderHeight - SegmenterSegment.EXPANDED_HOVER_SIZE2),
+//									(validRect.width - borderWidth2 + SegmenterSegment.EXPANDED_HOVER_SIZE),
+//									(validRect.height - borderHeight2 + SegmenterSegment.EXPANDED_HOVER_SIZE));
+
+							final Rectangle hoveredRect = new Rectangle(
+									(validRect.x),
 									(validRect.y + borderHeight - SegmenterSegment.EXPANDED_HOVER_SIZE2),
 									(validRect.width - borderWidth2 + SegmenterSegment.EXPANDED_HOVER_SIZE),
 									(validRect.height - borderHeight2 + SegmenterSegment.EXPANDED_HOVER_SIZE));

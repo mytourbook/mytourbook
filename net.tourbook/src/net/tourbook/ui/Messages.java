@@ -298,10 +298,14 @@ public class Messages extends NLS {
 	public static String		message_manager_sMessageSummary;
 	public static String		message_manager_sWarningSummary;
 
+	public static String	Segmenter_Tooltip_Label_Altimeter;
+
 	public static String		Segmenter_Tooltip_Label_AltitudeDifference;
 	public static String		Segmenter_Tooltip_Label_BreakTime;
 
 	public static String	Segmenter_Tooltip_Label_Distance;
+
+	public static String	Segmenter_Tooltip_Label_Gradient;
 
 	public static String	Segmenter_Tooltip_Label_MovingTime;
 

@@ -74,13 +74,13 @@ public class ChartMouseEvent {
 
 	@Override
 	public String toString() {
-		return "ChartMouseEvent ["
-				+ ("eventTime=" + eventTime + ", ")
-				+ ("type=" + type + ", ")
-				+ ("isWorked=" + isWorked + ", ")
-				+ ("devXMouse=" + devXMouse + ", ")
-				+ ("devYMouse=" + devYMouse + ", ")
-				+ ("cursor=" + cursor)
-				+ "]";
+		return "ChartMouseEvent [" //$NON-NLS-1$
+				+ ("eventTime=" + eventTime + ", ") //$NON-NLS-1$ //$NON-NLS-2$
+				+ ("type=" + type + ", ") //$NON-NLS-1$ //$NON-NLS-2$
+				+ ("isWorked=" + isWorked + ", ") //$NON-NLS-1$ //$NON-NLS-2$
+				+ ("devXMouse=" + devXMouse + ", ") //$NON-NLS-1$ //$NON-NLS-2$
+				+ ("devYMouse=" + devYMouse + ", ") //$NON-NLS-1$ //$NON-NLS-2$
+				+ ("cursor=" + cursor) //$NON-NLS-1$
+				+ "]"; //$NON-NLS-1$
 	}
 }

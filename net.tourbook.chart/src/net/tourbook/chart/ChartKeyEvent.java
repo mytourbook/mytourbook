@@ -44,6 +44,6 @@ public class ChartKeyEvent {
 
 	@Override
 	public String toString() {
-		return "ChartMouseEvent [" + ("type=" + type + ", ") + ("isWorked=" + isWorked + ", ") + "]";
+		return "ChartMouseEvent [" + ("type=" + type + ", ") + ("isWorked=" + isWorked + ", ") + "]"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
 	}
 }

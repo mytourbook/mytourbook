@@ -55,12 +55,12 @@ public class SelectionTourMarker implements ISelection {
 
 	@Override
 	public String toString() {
-		return "SelectionTourMarker ["
+		return "SelectionTourMarker [" //$NON-NLS-1$
 //				+ ("_tourData=" + _tourData + ", ")
-				+ ("_selectedTourMarker=" + _selectedTourMarker)
+				+ ("_selectedTourMarker=" + _selectedTourMarker) //$NON-NLS-1$
 				+
 				//
-				"]";
+				"]"; //$NON-NLS-1$
 	}
 
 }

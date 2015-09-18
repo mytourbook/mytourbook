@@ -173,7 +173,7 @@ public class TourCompareManager {
 
 		final TourData tourData = comparedTourItem.comparedTourData;
 
-		final float avgPulse = tourData.computeAvgPulseSegment(
+		final float avgPulse = tourData.computeAvg_PulseSegment(
 				comparedTourItem.computedStartIndex,
 				comparedTourItem.computedEndIndex);
 

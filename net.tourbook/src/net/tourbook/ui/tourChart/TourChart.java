@@ -3000,11 +3000,6 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 			_tourSegmenterTooltip.hide();
 		}
 
-		//???????????????????????????????????
-//		if (_selectedSegmenterSegment_1 != null) {
-//			isUpdateUI = true;
-//		}
-
 		if (isUpdateUI) {
 			setChartOverlayDirty();
 		}
@@ -3518,6 +3513,12 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
 		// prevent other actions in the chart even when a navigation cannot be done
 		keyEvent.isWorked = true;
+
+		/*
+		 * Hide segmenter tooltip, I tried to open the tooltip but this needs some more work to get
+		 * it running, THIS IS NOT A SIMPLE TASK.
+		 */
+		_tourSegmenterTooltip.hide();
 	}
 
 	private boolean selectTour(final ChartTitleSegment selectedTitleSegment) {
@@ -3674,9 +3675,10 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 				 */
 				if (_selectedSegmenterSegment_1.serieIndex == _selectedSegmenterSegment_2.serieIndex) {
 					_selectedSegmenterSegment_2 = null;
-				} else {
-					break;
+//				} else {
 				}
+
+				break;
 			}
 		}
 
@@ -3994,14 +3996,14 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 			yDataWithLabels = (ChartDataYSerie) dataModel.getCustomData(TourManager.CUSTOM_DATA_GEAR_RATIO);
 		}
 
-		ConfigGraphSegment segmentConfig_Altitude = null;
-		ConfigGraphSegment segmentConfig_Pulse = null;
-		ConfigGraphSegment segmentConfig_Speed = null;
-		ConfigGraphSegment segmentConfig_Pace = null;
-		ConfigGraphSegment segmentConfig_Power = null;
-		ConfigGraphSegment segmentConfig_Gradient = null;
-		ConfigGraphSegment segmentConfig_Altimeter = null;
-		ConfigGraphSegment segmentConfig_Cadence = null;
+		ConfigGraphSegment cfgAltitude = null;
+		ConfigGraphSegment cfgPulse = null;
+		ConfigGraphSegment cfgSpeed = null;
+		ConfigGraphSegment cfgPace = null;
+		ConfigGraphSegment cfgPower = null;
+		ConfigGraphSegment cfgGradient = null;
+		ConfigGraphSegment cfgAltimeter = null;
+		ConfigGraphSegment cfgCadence = null;
 
 		/*
 		 * Setup tour segmenter data
@@ -4011,65 +4013,65 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 			final IValueLabelProvider labelProviderInt = TourManager.getLabelProviderInt();
 			final IValueLabelProvider labelProviderMMSS = TourManager.getLabelProviderMMSS();
 
-			segmentConfig_Altitude = new ConfigGraphSegment(GraphColorManager.PREF_GRAPH_ALTITUDE);
-			segmentConfig_Altitude.segmentDataSerie = _tourData.segmentSerieAltitudeDiff;
-			segmentConfig_Altitude.labelProvider = labelProviderInt;
-			segmentConfig_Altitude.canHaveNegativeValues = true;
-			segmentConfig_Altitude.minValueAdjustment = 0.1;
+			cfgAltitude = new ConfigGraphSegment(GraphColorManager.PREF_GRAPH_ALTITUDE);
+			cfgAltitude.segmentDataSerie = _tourData.segmentSerieAltitudeDiff;
+			cfgAltitude.labelProvider = labelProviderInt;
+			cfgAltitude.canHaveNegativeValues = true;
+			cfgAltitude.minValueAdjustment = 0.1;
 
-			segmentConfig_Pulse = new ConfigGraphSegment(GraphColorManager.PREF_GRAPH_HEARTBEAT);
-			segmentConfig_Pulse.segmentDataSerie = _tourData.segmentSeriePulse;
-			segmentConfig_Pulse.labelProvider = null;
-			segmentConfig_Pulse.canHaveNegativeValues = false;
-			segmentConfig_Pulse.minValueAdjustment = Double.MIN_VALUE;
+			cfgPulse = new ConfigGraphSegment(GraphColorManager.PREF_GRAPH_HEARTBEAT);
+			cfgPulse.segmentDataSerie = _tourData.segmentSeriePulse;
+			cfgPulse.labelProvider = null;
+			cfgPulse.canHaveNegativeValues = false;
+			cfgPulse.minValueAdjustment = Double.MIN_VALUE;
 
-			segmentConfig_Speed = new ConfigGraphSegment(GraphColorManager.PREF_GRAPH_SPEED);
-			segmentConfig_Speed.segmentDataSerie = _tourData.segmentSerieSpeed;
-			segmentConfig_Speed.labelProvider = null;
-			segmentConfig_Speed.canHaveNegativeValues = false;
-			segmentConfig_Speed.minValueAdjustment = Double.MIN_VALUE;
+			cfgSpeed = new ConfigGraphSegment(GraphColorManager.PREF_GRAPH_SPEED);
+			cfgSpeed.segmentDataSerie = _tourData.segmentSerieSpeed;
+			cfgSpeed.labelProvider = null;
+			cfgSpeed.canHaveNegativeValues = false;
+			cfgSpeed.minValueAdjustment = Double.MIN_VALUE;
 
-			segmentConfig_Pace = new ConfigGraphSegment(GraphColorManager.PREF_GRAPH_PACE);
-			segmentConfig_Pace.segmentDataSerie = _tourData.segmentSeriePace;
-			segmentConfig_Pace.labelProvider = labelProviderMMSS;
-			segmentConfig_Pace.canHaveNegativeValues = false;
-			segmentConfig_Pace.minValueAdjustment = Double.MIN_VALUE;
+			cfgPace = new ConfigGraphSegment(GraphColorManager.PREF_GRAPH_PACE);
+			cfgPace.segmentDataSerie = _tourData.segmentSeriePace;
+			cfgPace.labelProvider = labelProviderMMSS;
+			cfgPace.canHaveNegativeValues = false;
+			cfgPace.minValueAdjustment = Double.MIN_VALUE;
 
-			segmentConfig_Power = new ConfigGraphSegment(GraphColorManager.PREF_GRAPH_POWER);
-			segmentConfig_Power.segmentDataSerie = _tourData.segmentSeriePower;
-			segmentConfig_Power.labelProvider = labelProviderInt;
-			segmentConfig_Power.canHaveNegativeValues = false;
-			segmentConfig_Power.minValueAdjustment = 0.5;
+			cfgPower = new ConfigGraphSegment(GraphColorManager.PREF_GRAPH_POWER);
+			cfgPower.segmentDataSerie = _tourData.segmentSeriePower;
+			cfgPower.labelProvider = labelProviderInt;
+			cfgPower.canHaveNegativeValues = false;
+			cfgPower.minValueAdjustment = 1.0;
 
-			segmentConfig_Gradient = new ConfigGraphSegment(GraphColorManager.PREF_GRAPH_GRADIENT);
-			segmentConfig_Gradient.segmentDataSerie = _tourData.segmentSerieGradient;
-			segmentConfig_Gradient.labelProvider = null;
-			segmentConfig_Gradient.canHaveNegativeValues = true;
-			segmentConfig_Gradient.minValueAdjustment = 0.5;
+			cfgGradient = new ConfigGraphSegment(GraphColorManager.PREF_GRAPH_GRADIENT);
+			cfgGradient.segmentDataSerie = _tourData.segmentSerieGradient;
+			cfgGradient.labelProvider = null;
+			cfgGradient.canHaveNegativeValues = true;
+			cfgGradient.minValueAdjustment = 1.0;
 
-			segmentConfig_Altimeter = new ConfigGraphSegment(GraphColorManager.PREF_GRAPH_ALTIMETER);
-			segmentConfig_Altimeter.segmentDataSerie = _tourData.segmentSerieAltitudeUpH;
-			segmentConfig_Altimeter.labelProvider = labelProviderInt;
-			segmentConfig_Altimeter.canHaveNegativeValues = true;
-			segmentConfig_Altimeter.minValueAdjustment = 0.5;
+			cfgAltimeter = new ConfigGraphSegment(GraphColorManager.PREF_GRAPH_ALTIMETER);
+			cfgAltimeter.segmentDataSerie = _tourData.segmentSerieAltitudeUpH;
+			cfgAltimeter.labelProvider = labelProviderInt;
+			cfgAltimeter.canHaveNegativeValues = true;
+			cfgAltimeter.minValueAdjustment = 1.0;
 
-			segmentConfig_Cadence = new ConfigGraphSegment(GraphColorManager.PREF_GRAPH_CADENCE);
-			segmentConfig_Cadence.segmentDataSerie = _tourData.segmentSerieCadence;
-			segmentConfig_Cadence.labelProvider = null;
-			segmentConfig_Cadence.canHaveNegativeValues = false;
-			segmentConfig_Cadence.minValueAdjustment = Double.MIN_VALUE;
+			cfgCadence = new ConfigGraphSegment(GraphColorManager.PREF_GRAPH_CADENCE);
+			cfgCadence.segmentDataSerie = _tourData.segmentSerieCadence;
+			cfgCadence.labelProvider = null;
+			cfgCadence.canHaveNegativeValues = false;
+			cfgCadence.minValueAdjustment = Double.MIN_VALUE;
 		}
 
-		setupGraphLayer_Layer(TourManager.CUSTOM_DATA_ALTIMETER, yDataWithLabels, segmentConfig_Altimeter);
-		setupGraphLayer_Layer(TourManager.CUSTOM_DATA_ALTITUDE, yDataWithLabels, segmentConfig_Altitude);
-		setupGraphLayer_Layer(TourManager.CUSTOM_DATA_CADENCE, yDataWithLabels, segmentConfig_Cadence);
+		setupGraphLayer_Layer(TourManager.CUSTOM_DATA_ALTIMETER, yDataWithLabels, cfgAltimeter);
+		setupGraphLayer_Layer(TourManager.CUSTOM_DATA_ALTITUDE, yDataWithLabels, cfgAltitude);
+		setupGraphLayer_Layer(TourManager.CUSTOM_DATA_CADENCE, yDataWithLabels, cfgCadence);
 		setupGraphLayer_Layer(TourManager.CUSTOM_DATA_GEAR_RATIO, yDataWithLabels, null);
-		setupGraphLayer_Layer(TourManager.CUSTOM_DATA_GRADIENT, yDataWithLabels, segmentConfig_Gradient);
+		setupGraphLayer_Layer(TourManager.CUSTOM_DATA_GRADIENT, yDataWithLabels, cfgGradient);
 		setupGraphLayer_Layer(TourManager.CUSTOM_DATA_HISTORY, null, null);
-		setupGraphLayer_Layer(TourManager.CUSTOM_DATA_PULSE, yDataWithLabels, segmentConfig_Pulse);
-		setupGraphLayer_Layer(TourManager.CUSTOM_DATA_SPEED, yDataWithLabels, segmentConfig_Speed);
-		setupGraphLayer_Layer(TourManager.CUSTOM_DATA_PACE, yDataWithLabels, segmentConfig_Pace);
-		setupGraphLayer_Layer(TourManager.CUSTOM_DATA_POWER, yDataWithLabels, segmentConfig_Power);
+		setupGraphLayer_Layer(TourManager.CUSTOM_DATA_PULSE, yDataWithLabels, cfgPulse);
+		setupGraphLayer_Layer(TourManager.CUSTOM_DATA_SPEED, yDataWithLabels, cfgSpeed);
+		setupGraphLayer_Layer(TourManager.CUSTOM_DATA_PACE, yDataWithLabels, cfgPace);
+		setupGraphLayer_Layer(TourManager.CUSTOM_DATA_POWER, yDataWithLabels, cfgPower);
 		setupGraphLayer_Layer(TourManager.CUSTOM_DATA_TEMPERATURE, yDataWithLabels, null);
 	}
 

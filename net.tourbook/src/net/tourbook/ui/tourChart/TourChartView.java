@@ -25,7 +25,6 @@ import net.tourbook.chart.ISliderMoveListener;
 import net.tourbook.chart.SelectionChartInfo;
 import net.tourbook.chart.SelectionChartXSliderPosition;
 import net.tourbook.common.util.PostSelectionProvider;
-import net.tourbook.common.util.StatusUtil;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.photo.IPhotoEventListener;
@@ -265,7 +264,7 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 
 							onSelectionChanged(new SelectionTourData(eventTourData));
 
-							StatusUtil.log(new Exception("Event contained wrong tourdata."));
+//							StatusUtil.log(new Exception("Event contained wrong tourdata."));
 						}
 					}
 

@@ -5750,7 +5750,7 @@ public class TourDatabase {
 
 			} else {
 
-				final float avgPulse = tourData.computeAvgPulseSegment(startIndex, endIndex);
+				final float avgPulse = tourData.computeAvg_PulseSegment(startIndex, endIndex);
 
 				// update average pulse for the compared tour
 				stmtUpdate.setFloat(1, avgPulse);

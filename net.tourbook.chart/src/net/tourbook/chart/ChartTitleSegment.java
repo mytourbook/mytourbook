@@ -73,12 +73,12 @@ public class ChartTitleSegment {
 
 	@Override
 	public String toString() {
-		return "TourSegment ["
+		return "TourSegment [" //$NON-NLS-1$
 //				+ ("devX=" + devXTitle + ", ")
 //				+ ("devY=" + devYTitle + ", ")
 //				+ ("width=" + titleWidth + ", ")
 //				+ ("height=" + titleHeight+", ")
-				+ ("tourId=" + _tourId + ", ")
-				+ "]";
+				+ ("tourId=" + _tourId + ", ") //$NON-NLS-1$ //$NON-NLS-2$
+				+ "]"; //$NON-NLS-1$
 	}
 }

@@ -74,6 +74,11 @@ public abstract class ChartDataSerie {
 	double							_originalMaxValue;
 
 	/**
+	 * Average for all positive values.
+	 */
+	double							_avgPositiveValue;
+
+	/**
 	 * when <code>true</code> the minimum value is forced when the dataserie is displayed
 	 */
 	private boolean					_isForceMinValue						= false;
@@ -105,6 +110,10 @@ public abstract class ChartDataSerie {
 	private RGB						_rgbText[]								= new RGB[] { new RGB(0, 0, 0) };
 
 	private RGB						_defaultRGB;
+
+	public double getAvgPositiveValue() {
+		return _avgPositiveValue;
+	}
 
 	public int getAxisUnit() {
 		return _axisUnit;

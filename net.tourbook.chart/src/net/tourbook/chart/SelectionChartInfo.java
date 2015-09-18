@@ -50,15 +50,15 @@ public class SelectionChartInfo implements ISelection {
 
 	@Override
 	public String toString() {
-		return "SelectionChartInfo ["
+		return "SelectionChartInfo [" //$NON-NLS-1$
 //				+ ("_chart=" + _chart + ", ")
 //				+ ("chartDataModel=" + chartDataModel + ", ")
 //				+ ("chartDrawingData=" + chartDrawingData + ", ")
-				+ ("leftSliderValuesIndex=" + leftSliderValuesIndex + ", ")
-				+ ("rightSliderValuesIndex=" + rightSliderValuesIndex + ", ")
-				+ ("selectedSliderValuesIndex=" + selectedSliderValuesIndex)
+				+ ("leftSliderValuesIndex=" + leftSliderValuesIndex + ", ") //$NON-NLS-1$ //$NON-NLS-2$
+				+ ("rightSliderValuesIndex=" + rightSliderValuesIndex + ", ") //$NON-NLS-1$ //$NON-NLS-2$
+				+ ("selectedSliderValuesIndex=" + selectedSliderValuesIndex) //$NON-NLS-1$
 				//
-				+ "]";
+				+ "]"; //$NON-NLS-1$
 	}
 
 }

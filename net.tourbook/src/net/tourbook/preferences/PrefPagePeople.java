@@ -364,7 +364,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 				/*
 				 * algorithmus for avg pulse is changed in version 11.7 (break time is now ignored)
 				 */
-				originalTourData.computeAvgPulse();
+				originalTourData.computeAvg_Pulse();
 
 				final int[] allHrZones = originalTourData.getHrZones();
 				if (allHrZones == null) {

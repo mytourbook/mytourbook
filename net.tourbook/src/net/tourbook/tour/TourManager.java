@@ -755,6 +755,64 @@ public class TourManager {
 		return multiTourData;
 	}
 
+	/**
+	 * Create segments for the chart, each tour is a segment. Segments are used to draw different
+	 * background colors.
+	 * 
+	 * @param tourData
+	 * @param chartDataModel
+	 */
+	private static void createStatisticSegments(final TourData tourData, final ChartDataModel chartDataModel) {
+
+		final ChartDataXSerie xData = chartDataModel.getXData();
+		final double[] xValues = xData.getHighValuesDouble()[0];
+
+		if (xValues == null) {
+			return;
+		}
+
+		final int[] multipleTourStartIndex = tourData.multipleTourStartIndex;
+		final int[] timeSerie = tourData.timeSerie;
+
+		final int numberOfTours = multipleTourStartIndex.length;
+
+		final double[] segmentStartValue = new double[numberOfTours];
+		final double[] segmentEndValue = new double[numberOfTours];
+
+		for (int tourIndex = 0; tourIndex < numberOfTours; tourIndex++) {
+
+			final int tourStartIndex = multipleTourStartIndex[tourIndex];
+
+			int tourEndIndex;
+
+			if (tourIndex == numberOfTours - 1) {
+
+				// last tour
+				tourEndIndex = timeSerie.length - 1;
+
+			} else {
+				tourEndIndex = multipleTourStartIndex[tourIndex + 1] - 1;
+			}
+
+			if (tourEndIndex == -1) {
+				tourEndIndex = tourStartIndex;
+			}
+
+			segmentStartValue[tourIndex] = xValues[tourStartIndex];
+			segmentEndValue[tourIndex] = xValues[tourEndIndex];
+		}
+
+		final ChartStatisticSegments chartSegments = new ChartStatisticSegments();
+
+		chartSegments.segmentStartValue = segmentStartValue;
+		chartSegments.segmentEndValue = segmentEndValue;
+
+		chartSegments.segmentTitle = tourData.multipleTourTitles;
+		chartSegments.segmentCustomData = tourData.multipleTourIds;
+
+		xData.setChartSegments(chartSegments);
+	}
+
 	public static void fireEvent(final TourEventId tourEventId) {
 
 		final Object[] allListeners = _tourEventListeners.getListeners();
@@ -2334,7 +2392,7 @@ public class TourManager {
 
 				final TourData tourData = (TourData) chartModel.getCustomData(TourManager.CUSTOM_DATA_TOUR_DATA);
 
-				return tourData.computeAvgCadenceSegment(valueIndexLeft, valueIndexRight);
+				return tourData.computeAvg_CadenceSegment(valueIndexLeft, valueIndexRight);
 			}
 		};
 
@@ -2353,7 +2411,7 @@ public class TourManager {
 
 				final TourData tourData = (TourData) chartModel.getCustomData(TourManager.CUSTOM_DATA_TOUR_DATA);
 
-				return tourData.computeAvgPulseSegment(valueIndexLeft, valueIndexRight);
+				return tourData.computeAvg_PulseSegment(valueIndexLeft, valueIndexRight);
 			}
 		};
 	}
@@ -3008,7 +3066,7 @@ public class TourManager {
 
 		} else if (tourData.isMultipleTours) {
 
-			createTourSegments(tourData, chartDataModel);
+			createStatisticSegments(tourData, chartDataModel);
 		}
 
 		chartDataModel.setShowNoLineValues(tcc.isShowBreaktimeValues);
@@ -3039,64 +3097,6 @@ public class TourManager {
 
 	private ChartDataYSerie createChartDataSerieNoZero(final float[][] dataSerie, final ChartType chartType) {
 		return new ChartDataYSerie(chartType, dataSerie, true);
-	}
-
-	/**
-	 * Create segments for the chart, each tour is a segment. Segments are used to draw different
-	 * background colors.
-	 * 
-	 * @param tourData
-	 * @param chartDataModel
-	 */
-	private void createTourSegments(final TourData tourData, final ChartDataModel chartDataModel) {
-
-		final ChartDataXSerie xData = chartDataModel.getXData();
-		final double[] xValues = xData.getHighValuesDouble()[0];
-
-		if (xValues == null) {
-			return;
-		}
-
-		final int[] multipleTourStartIndex = tourData.multipleTourStartIndex;
-		final int[] timeSerie = tourData.timeSerie;
-
-		final int numberOfTours = multipleTourStartIndex.length;
-
-		final double[] segmentStartValue = new double[numberOfTours];
-		final double[] segmentEndValue = new double[numberOfTours];
-
-		for (int tourIndex = 0; tourIndex < numberOfTours; tourIndex++) {
-
-			final int tourStartIndex = multipleTourStartIndex[tourIndex];
-
-			int tourEndIndex;
-
-			if (tourIndex == numberOfTours - 1) {
-
-				// last tour
-				tourEndIndex = timeSerie.length - 1;
-
-			} else {
-				tourEndIndex = multipleTourStartIndex[tourIndex + 1] - 1;
-			}
-
-			if (tourEndIndex == -1) {
-				tourEndIndex = tourStartIndex;
-			}
-
-			segmentStartValue[tourIndex] = xValues[tourStartIndex];
-			segmentEndValue[tourIndex] = xValues[tourEndIndex];
-		}
-
-		final ChartStatisticSegments chartSegments = new ChartStatisticSegments();
-
-		chartSegments.segmentStartValue = segmentStartValue;
-		chartSegments.segmentEndValue = segmentEndValue;
-
-		chartSegments.segmentTitle = tourData.multipleTourTitles;
-		chartSegments.segmentCustomData = tourData.multipleTourIds;
-
-		xData.setChartSegments(chartSegments);
 	}
 
 	public TourChart getActiveTourChart() {
@@ -3320,8 +3320,8 @@ public class TourManager {
 					+ "\n\n" //																			//$NON-NLS-1$
 					+ "The tour editor contains the selected tour, but the data are different.\n" //	//$NON-NLS-1$
 					+ "\n" //																			//$NON-NLS-1$
-					+ ("Tour in Editor:" + tourDataForEditor.toStringWithHash() + "\n") //				//$NON-NLS-1$
-					+ ("Selected Tour: " + tourDataInEditor.toStringWithHash() + "\n") //				//$NON-NLS-1$
+					+ ("Tour in Editor:" + tourDataForEditor.toStringWithHash() + "\n") //				//$NON-NLS-1$ //$NON-NLS-2$
+					+ ("Selected Tour: " + tourDataInEditor.toStringWithHash() + "\n") //				//$NON-NLS-1$ //$NON-NLS-2$
 					+ "\n\n" //																			//$NON-NLS-1$
 					+ "You should also inform the author of the application how this error occured." //	//$NON-NLS-1$
 					+ " However it isn't very easy to find out, what actions are exactly done," //		//$NON-NLS-1$

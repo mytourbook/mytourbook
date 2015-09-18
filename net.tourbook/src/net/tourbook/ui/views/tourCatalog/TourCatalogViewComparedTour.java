@@ -422,7 +422,7 @@ public class TourCatalogViewComparedTour extends TourChartViewPart implements IS
 	 */
 	private void fireChangeEvent(final int startIndex, final int endIndex) {
 
-		final float avgPulse = _tourData.computeAvgPulseSegment(startIndex, endIndex);
+		final float avgPulse = _tourData.computeAvg_PulseSegment(startIndex, endIndex);
 		final float speed = TourManager.computeTourSpeed(_tourData, startIndex, endIndex);
 
 		fireChangeEvent(startIndex, endIndex, avgPulse, speed, false);
@@ -576,7 +576,7 @@ public class TourCatalogViewComparedTour extends TourChartViewPart implements IS
 
 				final ChartDataModel chartDataModel = _tourChart.getChartDataModel();
 
-				final float avgPulse = _tourData.computeAvgPulseSegment(_movedStartIndex, _movedEndIndex);
+				final float avgPulse = _tourData.computeAvg_PulseSegment(_movedStartIndex, _movedEndIndex);
 				final float speed = TourManager.computeTourSpeed(_tourData, _movedStartIndex, _movedEndIndex);
 
 				// set new data in entity

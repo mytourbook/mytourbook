@@ -121,7 +121,7 @@ public class ChartLabel {
 
 	@Override
 	public String toString() {
-		return "ChartLabel [" //
+		return "ChartLabel [" // //$NON-NLS-1$
 //				+ ("serieIndex=" + serieIndex + ", ")
 //				+ ("graphX=" + graphX + ", ")
 //				+ ("devXMarker=" + devXMarker + ", ")

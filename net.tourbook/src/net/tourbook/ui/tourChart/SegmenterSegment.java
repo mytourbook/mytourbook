@@ -27,7 +27,7 @@ import org.eclipse.swt.widgets.Control;
 
 public class SegmenterSegment {
 
-	static final int	EXPANDED_HOVER_SIZE		= 12;
+	static final int	EXPANDED_HOVER_SIZE		= 20;
 	static final int	EXPANDED_HOVER_SIZE2	= EXPANDED_HOVER_SIZE / 2;
 
 	boolean				isValueVisible;
@@ -117,11 +117,11 @@ public class SegmenterSegment {
 
 	@Override
 	public String toString() {
-		return "SegmenterSegment [" //
+		return "SegmenterSegment [" // //$NON-NLS-1$
 //				+ ("paintedLabel=" + paintedLabel + ", ")
-				+ ("segmentIndex=" + segmentIndex + ", ")
-				+ ("hoveredLineRect=" + hoveredLineRect + ", ")
-//				+ ("serieIndex=" + serieIndex + ", ")
+				+ ("serieIndex=" + serieIndex + ", ") //$NON-NLS-1$ //$NON-NLS-2$
+				+ ("segmentIndex=" + segmentIndex + ", ") //$NON-NLS-1$ //$NON-NLS-2$
+				+ ("hoveredLineRect=" + hoveredLineRect + ", ") //$NON-NLS-1$ //$NON-NLS-2$
 				+ "]"; //$NON-NLS-1$
 	}
 }

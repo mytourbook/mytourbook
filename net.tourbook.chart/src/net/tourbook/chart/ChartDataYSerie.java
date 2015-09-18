@@ -473,6 +473,7 @@ public class ChartDataYSerie extends ChartDataSerie {
 
 			_visibleMaxValue = _visibleMinValue = 0;
 			_originalMaxValue = _originalMinValue = 0;
+			_avgPositiveValue = 0;
 
 		} else {
 
@@ -512,6 +513,7 @@ public class ChartDataYSerie extends ChartDataSerie {
 								_visibleMaxValue = (_visibleMaxValue >= value) ? _visibleMaxValue : value;
 							}
 						}
+
 						break;
 
 					case ChartDataYSerie.BAR_LAYOUT_STACKED:
@@ -558,6 +560,7 @@ public class ChartDataYSerie extends ChartDataSerie {
 
 			_visibleMaxValue = _visibleMinValue = 0;
 			_originalMaxValue = _originalMinValue = 0;
+			_avgPositiveValue = 0;
 
 			_lowValuesFloat = new float[1][2];
 			_highValuesFloat = new float[1][2];
@@ -633,6 +636,8 @@ public class ChartDataYSerie extends ChartDataSerie {
 			_visibleMaxValue = _visibleMinValue = 0;
 			_originalMaxValue = _originalMinValue = 0;
 
+			_avgPositiveValue = 0;
+
 		} else {
 
 			/*
@@ -640,6 +645,9 @@ public class ChartDataYSerie extends ChartDataSerie {
 			 */
 			final float firstValue = getFirstMinMax(valueSeries);
 			_visibleMaxValue = _visibleMinValue = firstValue;
+
+			double avgPositiveValue = 0;
+			int avgCounter = 0;
 
 			_highValuesFloat = valueSeries;
 
@@ -668,8 +676,15 @@ public class ChartDataYSerie extends ChartDataSerie {
 
 					_visibleMaxValue = (_visibleMaxValue >= value) ? _visibleMaxValue : value;
 					_visibleMinValue = (_visibleMinValue <= value) ? _visibleMinValue : value;
+
+					if (value > 0) {
+						avgPositiveValue += value;
+						avgCounter++;
+					}
 				}
 			}
+
+			_avgPositiveValue = avgPositiveValue / avgCounter;
 
 			/*
 			 * force the min/max values to have not the same value this is necessary to display a
