@@ -210,7 +210,6 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 	 * it.
 	 */
 	private TourMarker						_selectedTourMarker;
-	private Point							_markerMousePosition;
 
 	private ImageDescriptor					_imagePhoto								= TourbookPlugin
 																							.getImageDescriptor(Messages.Image__PhotoPhotos);
@@ -2613,13 +2612,11 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
 			if (_tourData.isMultipleTours) {
 
-				if (_markerMousePosition != null) {
+				if (_selectedTourMarker != null) {
 
 					// get tour from hovered marker
 
-					final long hoveredTourId = getHoveredTour(_markerMousePosition);
-
-					tourData = TourManager.getTour(hoveredTourId);
+					tourData = _selectedTourMarker.getTourData();
 				}
 
 			} else {
@@ -2724,10 +2721,8 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
 	private void onMarker_ChartResized() {
 
-		// hide tooltip otherwise it has the wrong location
-		// disable selection
+		// hide tooltip otherwise it has the wrong location, disable selection
 		_selectedTourMarker = null;
-		_markerMousePosition = null;
 
 		// ensure that a marker do not keeps hovered state when chart is zoomed
 		_layerMarker.resetHoveredState();
@@ -2783,7 +2778,6 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
 		// disable selection
 		_selectedTourMarker = null;
-		_markerMousePosition = null;
 
 		_layerMarker.resetHoveredState();
 
@@ -2806,9 +2800,6 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 			mouseEvent.isWorked = isLabelHovered;
 			mouseEvent.cursor = ChartCursor.Arrow;
 		}
-
-		// keep mouse position
-		_markerMousePosition = new Point(mouseEvent.devXMouse, mouseEvent.devYMouse);
 
 		// check if the selected marker is hovered
 		final TourMarker hoveredMarker = getHoveredTourMarker();
@@ -4652,7 +4643,6 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		 * Cleanup old data
 		 */
 		_selectedTourMarker = null;
-		_markerMousePosition = null;
 		hidePhotoLayer();
 		resetSegmenterSelection();
 

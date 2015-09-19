@@ -506,6 +506,10 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 		return time;
 	}
 
+	public TourData getTourData() {
+		return tourData;
+	}
+
 	/**
 	 * @return Returns the absolute time in ms since 1970-01-01T00:00:00Z or {@link Long#MIN_VALUE}
 	 *         when value is not set.
