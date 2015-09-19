@@ -1771,6 +1771,9 @@ public class TourManager {
 	private static ArrayList<TourData> saveModifiedTours(	final ArrayList<TourData> modifiedTours,
 															final boolean canFireNotification) {
 
+		// reset multiple tour data cache
+		_multipleTourData = null;
+
 		final ArrayList<TourData> savedTours = new ArrayList<TourData>();
 
 		if (modifiedTours.size() == 0) {
@@ -1785,7 +1788,7 @@ public class TourManager {
 
 			// no progress when only 1 tour is saved
 
-			saveModifiedToursOneTour(savedTours, tourDataEditorSavedTour, doFireChangeEvent, modifiedTours.get(0));
+			saveModifiedTours_OneTour(savedTours, tourDataEditorSavedTour, doFireChangeEvent, modifiedTours.get(0));
 
 		} else {
 
@@ -1808,7 +1811,7 @@ public class TourManager {
 									++saveCounter,
 									tourSize));
 
-							saveModifiedToursOneTour(savedTours, tourDataEditorSavedTour, doFireChangeEvent, tourData);
+							saveModifiedTours_OneTour(savedTours, tourDataEditorSavedTour, doFireChangeEvent, tourData);
 
 							monitor.worked(1);
 						}
@@ -1835,7 +1838,7 @@ public class TourManager {
 		return savedTours;
 	}
 
-	private static void saveModifiedToursOneTour(	final ArrayList<TourData> savedTours,
+	private static void saveModifiedTours_OneTour(	final ArrayList<TourData> savedTours,
 													final TourData[] tourDataEditorSavedTour,
 													final boolean[] doFireChangeEvent,
 													final TourData tourData) {

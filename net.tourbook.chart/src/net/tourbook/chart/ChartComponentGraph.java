@@ -1903,10 +1903,15 @@ public class ChartComponentGraph extends Canvas {
 
 				for (int segmentIndex = 0; segmentIndex < valueStart.length; segmentIndex++) {
 
-					final String segmentTitle = segmentTitles[segmentIndex];
+					String segmentTitle = segmentTitles[segmentIndex];
 
-					if (segmentTitle == null) {
-						continue;
+					if (segmentTitle == null || segmentTitle.length() == 0) {
+
+						/*
+						 * Create a dummy title, that the title segment is created. This segment is
+						 * used to get the hovered tour when multiple tours are displayed.
+						 */
+						segmentTitle = UI.EMPTY_STRING;
 					}
 
 					final int devXSegmentStart = (int) (scaleX * valueStart[segmentIndex] - _xxDevViewPortLeftBorder);

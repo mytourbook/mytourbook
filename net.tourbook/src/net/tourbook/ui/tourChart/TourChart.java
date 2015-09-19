@@ -183,6 +183,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 	private TourChartConfiguration			_tcc;
 	//
 	private Map<String, Action>				_allTourChartActions;
+	private ActionEditQuick					_actionEditQuick;
 	private ActionOpenMarkerDialog			_actionOpenMarkerDialog;
 	private ActionTourChartInfo				_actionTourInfo;
 	private ActionTourChartMarker			_actionTourMarker;
@@ -209,6 +210,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 	 * it.
 	 */
 	private TourMarker						_selectedTourMarker;
+	private Point							_markerMousePosition;
 
 	private ImageDescriptor					_imagePhoto								= TourbookPlugin
 																							.getImageDescriptor(Messages.Image__PhotoPhotos);
@@ -261,8 +263,6 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 	private SelectedTourSegmenterSegments	_segmenterSelection;
 	private Font							_segmenterValueFont;
 	private int								_oldTourSegmentsHash;
-
-	private ActionEditQuick					_actionEditQuick;
 
 	/*
 	 * UI controls
@@ -2554,6 +2554,27 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		return null;
 	}
 
+	private Long getHoveredTour(final Point mousePosition) {
+
+		final int devXMouse = mousePosition.x;
+
+		final ChartDrawingData chartDrawingData = getChartDrawingData();
+		final ArrayList<ChartTitleSegment> chartTitleSegments = chartDrawingData.chartTitleSegments;
+
+		for (final ChartTitleSegment chartTitleSegment : chartTitleSegments) {
+
+			final int devXSegment = chartTitleSegment.devXSegment;
+
+			if (devXMouse > devXSegment && devXMouse < devXSegment + chartTitleSegment.devSegmentWidth) {
+
+				// mouse is within a tour part
+				return chartTitleSegment.getTourId();
+			}
+		}
+
+		return null;
+	}
+
 	/**
 	 * @return Returns a {@link TourMarker} when a {@link ChartLabel} (marker) is hovered or
 	 *         <code>null</code> when a {@link ChartLabel} is not hovered.
@@ -2588,10 +2609,19 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
 		if (_tourData != null) {
 
-			TourData tourData;
+			TourData tourData = null;
 
 			if (_tourData.isMultipleTours) {
-				tourData = TourManager.getTour(_chartTitleSegment.getTourId());
+
+				if (_markerMousePosition != null) {
+
+					// get tour from hovered marker
+
+					final long hoveredTourId = getHoveredTour(_markerMousePosition);
+
+					tourData = TourManager.getTour(hoveredTourId);
+				}
+
 			} else {
 				tourData = _tourData;
 			}
@@ -2697,6 +2727,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		// hide tooltip otherwise it has the wrong location
 		// disable selection
 		_selectedTourMarker = null;
+		_markerMousePosition = null;
 
 		// ensure that a marker do not keeps hovered state when chart is zoomed
 		_layerMarker.resetHoveredState();
@@ -2752,6 +2783,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
 		// disable selection
 		_selectedTourMarker = null;
+		_markerMousePosition = null;
 
 		_layerMarker.resetHoveredState();
 
@@ -2774,6 +2806,9 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 			mouseEvent.isWorked = isLabelHovered;
 			mouseEvent.cursor = ChartCursor.Arrow;
 		}
+
+		// keep mouse position
+		_markerMousePosition = new Point(mouseEvent.devXMouse, mouseEvent.devYMouse);
 
 		// check if the selected marker is hovered
 		final TourMarker hoveredMarker = getHoveredTourMarker();
@@ -4617,6 +4652,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		 * Cleanup old data
 		 */
 		_selectedTourMarker = null;
+		_markerMousePosition = null;
 		hidePhotoLayer();
 		resetSegmenterSelection();
 
