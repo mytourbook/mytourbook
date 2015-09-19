@@ -192,7 +192,8 @@ public class TourSegmenterTooltip extends AnimatedToolTipShell implements ITourP
 			_ttContainer.setBackground(_bgColor);
 			GridLayoutFactory.fillDefaults() //
 					.numColumns(2)
-					.equalWidth(true)
+//					.equalWidth(true)
+					.spacing(20, 0)
 					.applyTo(_ttContainer);
 //			_ttContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
 			{
@@ -244,10 +245,16 @@ public class TourSegmenterTooltip extends AnimatedToolTipShell implements ITourP
 	private void createUI_30_LeftColumn(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).applyTo(container);
+		GridDataFactory.fillDefaults()//
+				.align(SWT.FILL, SWT.BEGINNING)
+				.indent(0, 10)
+				.applyTo(container);
 		container.setForeground(_fgColor);
 		container.setBackground(_bgColor);
-		GridLayoutFactory.fillDefaults().numColumns(3).spacing(5, 0).applyTo(container);
+		GridLayoutFactory.fillDefaults()//
+				.numColumns(3)
+				.spacing(5, 0)
+				.applyTo(container);
 //		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_MAGENTA));
 		{
 			createUI_32_Time(container);
@@ -342,10 +349,16 @@ public class TourSegmenterTooltip extends AnimatedToolTipShell implements ITourP
 	private void createUI_40_RightColumn(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).applyTo(container);
+		GridDataFactory.fillDefaults()//
+				.align(SWT.FILL, SWT.BEGINNING)
+				.indent(0, 10)
+				.applyTo(container);
 		container.setForeground(_fgColor);
 		container.setBackground(_bgColor);
-		GridLayoutFactory.fillDefaults().numColumns(3).spacing(5, 0).applyTo(container);
+		GridLayoutFactory.fillDefaults()//
+				.numColumns(3)
+				.spacing(5, 0)
+				.applyTo(container);
 //		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
 		{
 			createUI_42_Avg(container);
@@ -431,7 +444,6 @@ public class TourSegmenterTooltip extends AnimatedToolTipShell implements ITourP
 			_lblAltitude_DownHour_Unit = createUI_LabelValue(container, SWT.LEAD);
 		}
 	}
-
 
 	private Label createUI_Label(final Composite parent, final String labelText) {
 

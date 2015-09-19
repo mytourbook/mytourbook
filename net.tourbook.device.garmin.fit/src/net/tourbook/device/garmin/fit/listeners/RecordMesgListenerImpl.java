@@ -107,7 +107,7 @@ public class RecordMesgListenerImpl extends AbstractMesgListener implements Reco
 					final Period duration = new Period(0, timeDiff, periodTemplate);
 
 					tourMarker.setLabel(NLS.bind(
-							Messages.Import_Error_ExceededTimeSlice,
+							Messages.Import_Error_TourMarkerLabel_ExceededTimeSlice,
 							duration.toString(UI.DEFAULT_DURATION_FORMATTER_SHORT)));
 
 					if (distance != null) {

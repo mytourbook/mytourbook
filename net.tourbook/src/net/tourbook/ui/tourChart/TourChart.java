@@ -2149,7 +2149,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
 	private void drawSelectedLines_CreateSelectedLines() {
 
-		if (_selectedSegmenterSegment_1 == null) {
+		if (_selectedSegmenterSegment_1 == null || _layerTourSegmenterAltitude == null) {
 
 			_selectedAltitudePoints = null;
 			_selectedAltitudeRGB = null;
