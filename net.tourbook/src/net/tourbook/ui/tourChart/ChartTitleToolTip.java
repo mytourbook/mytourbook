@@ -64,6 +64,8 @@ public class ChartTitleToolTip extends AnimatedToolTipShell implements ITourProv
 		setFadeOutSteps(20);
 		setFadeOutDelaySteps(10);
 
+		setIsFixedBottomLocation(true);
+
 		setBehaviourOnMouseOver(MOUSE_OVER_BEHAVIOUR_IGNORE_OWNER);
 	}
 

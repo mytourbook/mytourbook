@@ -83,6 +83,11 @@ public abstract class AnimatedToolTipShell {
 	private boolean						_isAnimateLocation						= true;
 
 	/**
+	 * When <code>true</code> the vertical position is not animated and the position is the bottom.
+	 */
+	private boolean						_isFixedBottomLocation;
+
+	/**
 	 * Keep track of added display listener that no more than <b>1</b> is set.
 	 */
 	private boolean						_isDisplayListenerSet;
@@ -300,7 +305,9 @@ public abstract class AnimatedToolTipShell {
 
 	private void animation10_Start() {
 
-		final int a = 0;
+		int a = 0;
+		a++;
+		a++;
 
 		if (a == 1) {
 			animation10_Start_Simple();
@@ -368,6 +375,13 @@ public abstract class AnimatedToolTipShell {
 				// shell is already visible, move from the current position to the target position
 
 				_shellStartLocation = _shell.getLocation();
+
+				if (_isFixedBottomLocation) {
+
+					// do not animate the vertical position
+
+					_shellStartLocation.y = shellEndLocation.y;
+				}
 
 			} else {
 
@@ -483,43 +497,24 @@ public abstract class AnimatedToolTipShell {
 							final int moveY = (int) ((double) diffY / MOVE_STEPS * _animationMoveCounter);
 
 							int shellCurrentX = shellStartX - moveX;
-							final int shellCurrentY = shellStartY - moveY;
+							int shellCurrentY = shellStartY - moveY;
 
 							/**
-							 * This wrong behaviour occured (not very often bit it occured) that the
+							 * This wrong behaviour occured (not very often but it occured) that the
 							 * tooltip was moving to the invinity of the right or the left.
 							 * <p>
 							 * This check will prevent this bug.
 							 */
-							if (shellStartX - shellEndX < 0 && shellCurrentX > shellEndX) {
-
-//								System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
-//										+ ("shellCurrentX > shellEndX\t" + (shellCurrentX - shellEndX)));
-//								System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
-//										+ ("\tshellStartX:" + shellStartX)
-//										+ ("\tshellEndX:" + shellEndX)
-//										+ ("\tshellCurrentX:" + shellCurrentX)
-//										+ ("\tmoveX:" + moveX)
-//										//
-//										);
-//							// TODO remove SYSTEM.OUT.PRINTLN
+							if ((shellStartX - shellEndX < 0 && shellCurrentX > shellEndX)
+									|| (shellStartX - shellEndX > 0 && shellCurrentX < shellEndX)) {
 
 								shellCurrentX = shellEndX;
+							}
 
-							} else if (shellStartX - shellEndX > 0 && shellCurrentX < shellEndX) {
+							if ((shellStartY - shellEndY < 0 && shellCurrentY > shellEndY)
+									|| (shellStartY - shellEndY > 0 && shellCurrentY < shellEndY)) {
 
-//								System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
-//										+ ("shellCurrentX < shellEndX\t" + (shellEndX - shellCurrentX)));
-//								System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
-//										+ ("\tshellStartX:" + shellStartX)
-//										+ ("\tshellEndX:" + shellEndX)
-//										+ ("\tshellCurrentX:" + shellCurrentX)
-//										+ ("\tmoveX:" + moveX)
-//										//
-//										);
-//							// TODO remove SYSTEM.OUT.PRINTLN
-
-								shellCurrentX = shellEndX;
+								shellCurrentY = shellEndY;
 							}
 
 							_shell.setLocation(shellCurrentX, shellCurrentY);
@@ -1318,6 +1313,10 @@ public abstract class AnimatedToolTipShell {
 		_isAnimateLocation = isAnimateLocation;
 	}
 
+	public void setIsFixedBottomLocation(final boolean isFixedBottomLocation) {
+		_isFixedBottomLocation = isFixedBottomLocation;
+	}
+
 	public void setIsKeepShellOpenWhenMoved(final boolean isKeepShellOpenWhenMoved) {
 		_isKeepToolTipOpenWhenResizedOrMoved = isKeepShellOpenWhenMoved;
 	}
@@ -1339,21 +1338,21 @@ public abstract class AnimatedToolTipShell {
 	}
 
 	private void setShellAlpha(final Shell shell, final int alpha) {
-		
-		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
-				+ ("\tshell: " + _shell.hashCode())
-				+ ("\tsetShellAlpha: " + alpha));
-		// TODO remove SYSTEM.OUT.PRINTLN
+
+//		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
+//				+ ("\tshell: " + _shell.hashCode())
+//				+ ("\tsetShellAlpha: " + alpha));
+//		// TODO remove SYSTEM.OUT.PRINTLN
 
 		shell.setAlpha(alpha);
 	}
 
 	private void setShellVisible(final boolean isVisible) {
 
-		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
-				+ ("\tshell: " + _shell.hashCode())
-				+ ("\tsetShellVisible: " + isVisible));
-		// TODO remove SYSTEM.OUT.PRINTLN
+//		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
+//				+ ("\tshell: " + _shell.hashCode())
+//				+ ("\tsetShellVisible: " + isVisible));
+//		// TODO remove SYSTEM.OUT.PRINTLN
 
 		if (isVisible) {
 
