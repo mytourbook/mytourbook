@@ -316,8 +316,7 @@ public abstract class AnimatedToolTipShell2 {
 			final Point shellLocation = fixupDisplayBounds(size, defaultLocation);
 			_currentShell.setLocation(shellLocation.x, shellLocation.y);
 
-			_currentShell.setAlpha(0xff);
-
+			setShellAlpha(_currentShell, 0xff);
 			setShellVisible(true);
 
 		} else {
@@ -359,7 +358,7 @@ public abstract class AnimatedToolTipShell2 {
 				final Point defaultLocation = getToolTipLocation(size);
 				final Point shellLocation = fixupDisplayBounds(size, defaultLocation);
 
-				_currentShell.setAlpha(0);
+				setShellAlpha(_currentShell, 0);
 				_currentShell.setLocation(shellLocation.x, shellLocation.y);
 
 				setShellVisible(true);
@@ -458,7 +457,7 @@ public abstract class AnimatedToolTipShell2 {
 
 						// shell is not visible any more, hide it now
 
-						_currentShell.setAlpha(0);
+						setShellAlpha(_currentShell, 0);
 
 						// hide shell
 						setShellVisible(false);
@@ -476,7 +475,7 @@ public abstract class AnimatedToolTipShell2 {
 				} else {
 
 					if (newAlpha != currentAlpha) {
-						_currentShell.setAlpha(newAlpha);
+						setShellAlpha(_currentShell, newAlpha);
 					}
 
 					if (_currentShell.getAlpha() != newAlpha) {
@@ -775,7 +774,7 @@ public abstract class AnimatedToolTipShell2 {
 						continue;
 					}
 
-					oldShell.setAlpha(newAlpha);
+					setShellAlpha(oldShell, newAlpha);
 
 					if (oldShell.getAlpha() != newAlpha) {
 
@@ -940,7 +939,7 @@ public abstract class AnimatedToolTipShell2 {
 			return;
 		}
 
-		_currentShell.setAlpha(0);
+		setShellAlpha(_currentShell, 0);
 
 		// hide shell
 		setShellVisible(false);
@@ -1267,7 +1266,21 @@ public abstract class AnimatedToolTipShell2 {
 		_isReceiveOnMouseMove = isReceive;
 	}
 
+	private void setShellAlpha(final Shell shell, final int alpha) {
+
+		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
+				+ ("\tshell: " + shell.hashCode())
+				+ ("\tsetShellAlpha: " + alpha));
+		// TODO remove SYSTEM.OUT.PRINTLN
+
+		shell.setAlpha(alpha);
+	}
+
 	private void setShellVisible(final boolean isVisible) {
+
+		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
+				+ ("\tsetShellVisible: " + isVisible));
+		// TODO remove SYSTEM.OUT.PRINTLN
 
 		if (isVisible) {
 
