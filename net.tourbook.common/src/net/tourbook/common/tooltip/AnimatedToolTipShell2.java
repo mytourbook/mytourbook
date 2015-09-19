@@ -939,9 +939,8 @@ public abstract class AnimatedToolTipShell2 {
 			return;
 		}
 
-		setShellAlpha(_currentShell, 0);
-
 		// hide shell
+		setShellAlpha(_currentShell, 0);
 		setShellVisible(false);
 
 		closeOldShells(false);
@@ -1279,6 +1278,7 @@ public abstract class AnimatedToolTipShell2 {
 	private void setShellVisible(final boolean isVisible) {
 
 		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
+				+ ("\tshell: " + _currentShell.hashCode())
 				+ ("\tsetShellVisible: " + isVisible));
 		// TODO remove SYSTEM.OUT.PRINTLN
 

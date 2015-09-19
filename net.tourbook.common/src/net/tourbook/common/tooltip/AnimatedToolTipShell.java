@@ -321,7 +321,7 @@ public abstract class AnimatedToolTipShell {
 			final Point shellLocation = fixupDisplayBounds(size, defaultLocation);
 
 			_shell.setLocation(shellLocation.x, shellLocation.y);
-			_shell.setAlpha(0xff);
+			setShellAlpha(_shell, 0xff);
 
 			setShellVisible(true);
 
@@ -378,8 +378,8 @@ public abstract class AnimatedToolTipShell {
 				_shellStartLocation = _shellEndLocation;
 
 				_shell.setLocation(_shellStartLocation.x, _shellStartLocation.y);
-				_shell.setAlpha(0);
 
+				setShellAlpha(_shell, 0);
 				setShellVisible(true);
 			}
 
@@ -553,7 +553,7 @@ public abstract class AnimatedToolTipShell {
 
 						// shell is not visible any more, hide it now
 
-						_shell.setAlpha(0);
+						setShellAlpha(_shell, 0);
 
 						// hide shell
 						setShellVisible(false);
@@ -571,7 +571,7 @@ public abstract class AnimatedToolTipShell {
 				} else {
 
 					if (newAlpha != currentAlpha) {
-						_shell.setAlpha(newAlpha);
+						setShellAlpha(_shell, newAlpha);
 					}
 
 					if (_shell.getAlpha() != newAlpha) {
@@ -810,7 +810,7 @@ public abstract class AnimatedToolTipShell {
 			return;
 		}
 
-		_shell.setAlpha(0);
+		setShellAlpha(_shell, 0);
 
 		// hide shell
 		setShellVisible(false);
@@ -1338,11 +1338,22 @@ public abstract class AnimatedToolTipShell {
 		_isReceiveOnMouseMove = isReceive;
 	}
 
+	private void setShellAlpha(final Shell shell, final int alpha) {
+		
+		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
+				+ ("\tshell: " + _shell.hashCode())
+				+ ("\tsetShellAlpha: " + alpha));
+		// TODO remove SYSTEM.OUT.PRINTLN
+
+		shell.setAlpha(alpha);
+	}
+
 	private void setShellVisible(final boolean isVisible) {
 
-//		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
-//				+ ("\tsetShellVisible: " + isVisible));
-//		// TODO remove SYSTEM.OUT.PRINTLN
+		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
+				+ ("\tshell: " + _shell.hashCode())
+				+ ("\tsetShellVisible: " + isVisible));
+		// TODO remove SYSTEM.OUT.PRINTLN
 
 		if (isVisible) {
 
