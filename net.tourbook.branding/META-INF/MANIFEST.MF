@@ -1,8 +1,8 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-SymbolicName: net.tourbook.branding
-Bundle-Version: 15.6.0.qualifier
+Bundle-Version: 15.10.0.qualifier
 Bundle-Vendor: MyTourbook
 Bundle-ActivationPolicy: lazy
 Bundle-Name: Branding plugin
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7

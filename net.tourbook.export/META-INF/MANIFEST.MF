@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: GPX/TCX Export
 Bundle-SymbolicName: net.tourbook.export;singleton:=true
-Bundle-Version: 15.6.0.qualifier
+Bundle-Version: 15.10.0.qualifier
 Bundle-Activator: net.tourbook.export.Activator
 Bundle-Vendor: MyTourbook
 Require-Bundle: org.eclipse.core.runtime,
@@ -11,7 +11,7 @@ Require-Bundle: org.eclipse.core.runtime,
  net.tourbook.ext.jars,
  net.tourbook.common,
  net.tourbook.ext.velocity
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ActivationPolicy: lazy
 Import-Package: net.tourbook.ext.velocity,
  org.apache.velocity,
