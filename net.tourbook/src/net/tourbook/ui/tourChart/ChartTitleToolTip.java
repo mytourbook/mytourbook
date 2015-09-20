@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import net.tourbook.chart.ChartComponentGraph;
 import net.tourbook.chart.ChartTitleSegment;
 import net.tourbook.common.UI;
-import net.tourbook.common.tooltip.AnimatedToolTipShell;
+import net.tourbook.common.tooltip.AnimatedToolTipShell2;
 import net.tourbook.common.tooltip.IOpeningDialog;
 import net.tourbook.common.util.IToolTipProvider;
 import net.tourbook.data.TourData;
@@ -40,7 +40,7 @@ import org.eclipse.swt.widgets.ToolBar;
 /**
  * created: 13.07.2015
  */
-public class ChartTitleToolTip extends AnimatedToolTipShell implements ITourProvider, IToolTipProvider, IOpeningDialog {
+public class ChartTitleToolTip extends AnimatedToolTipShell2 implements ITourProvider, IToolTipProvider, IOpeningDialog {
 
 	private String				_dialogId	= getClass().getCanonicalName();
 
@@ -60,11 +60,10 @@ public class ChartTitleToolTip extends AnimatedToolTipShell implements ITourProv
 
 		_tourChart = tourChart;
 
-		setFadeInSteps(5);
-		setFadeOutSteps(20);
-		setFadeOutDelaySteps(10);
+		setFadeInSteps(10);
 
-		setIsFixedBottomLocation(true);
+		setFadeOutSteps(20);
+		setFadeOutDelaySteps(30);
 
 		setBehaviourOnMouseOver(MOUSE_OVER_BEHAVIOUR_IGNORE_OWNER);
 	}

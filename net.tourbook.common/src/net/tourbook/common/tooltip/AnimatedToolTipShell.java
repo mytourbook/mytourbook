@@ -548,8 +548,6 @@ public abstract class AnimatedToolTipShell {
 
 						// shell is not visible any more, hide it now
 
-						setShellAlpha(_shell, 0);
-
 						// hide shell
 						setShellVisible(false);
 

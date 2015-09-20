@@ -29,6 +29,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Layout;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Monitor;
 import org.eclipse.swt.widgets.Shell;
@@ -41,7 +42,6 @@ public abstract class AnimatedToolTipShell2 {
 
 	public static final int				MOUSE_OVER_BEHAVIOUR_NO_IGNORE			= 0;
 	public static final int				MOUSE_OVER_BEHAVIOUR_IGNORE_OWNER		= 1;
-
 	/**
 	 * how long each tick is when fading in/out (in ms)
 	 */
@@ -69,10 +69,10 @@ public abstract class AnimatedToolTipShell2 {
 	private OwnerControlListener		_ownerControlListener;
 
 	private OwnerShellListener			_ownerShellListener;
+
 	private ToolTipShellListener		_ttShellListener;
 	private ToolTipAllControlsListener	_ttAllControlsListener;
 	private ToolTipDisplayFilter		_ttDisplayFilter;
-
 	/**
 	 * Keep track of added display listener that no more than <b>1</b> is set.
 	 */
@@ -103,17 +103,17 @@ public abstract class AnimatedToolTipShell2 {
 	private boolean						_isReceiveOnMouseMove;
 
 	private int							_fadeInSteps							= FADE_IN_STEPS;
-	private int							_fadeInDelayCounter;
 
+	private int							_fadeInDelayCounter;
 	/**
 	 * Number of {@link #FADE_IN_STEPS} until the tooltip starts to fade in.
 	 */
 	private int							_fadeInDelaySteps;
 
 	private int							_fadeOutSteps							= FADE_OUT_STEPS;
+
 	private int							_fadeOutDelaySteps						= FADE_OUT_DELAY_STEPS;
 	private int							_mouseOverBehaviour						= MOUSE_OVER_BEHAVIOUR_NO_IGNORE;
-
 	private boolean						_isKeepToolTipOpenWhenResizedOrMoved	= true;
 
 	/*
@@ -124,15 +124,127 @@ public abstract class AnimatedToolTipShell2 {
 	/**
 	 * Tooltip shell which is currently visible
 	 */
-	private Shell						_currentShell;
+	private CurrentShellWrapper			_currentShell;
 
 	private ArrayList<ShellWrapper>		_oldShells								= new ArrayList<ShellWrapper>();
+
 	private Control						_ownerControl;
 
 	private final class AnimationTimer implements Runnable {
 		@Override
 		public void run() {
 			animation20_Runnable();
+		}
+	}
+
+	/**
+	 * This wrapper exists only to prevent flickering in Ubuntu 14.04 when a new shell is created
+	 * with alpha=0, with Windows it would not be necessary.
+	 */
+	private class CurrentShellWrapper {
+
+		private Shell			__shell;
+
+		private VisibleState	__visibleState	= VisibleState.NOT_VISIBLE;
+
+		private CurrentShellWrapper(final Shell shell) {
+			__shell = shell;
+		}
+
+		void close() {
+			__shell.close();
+		}
+
+		void dispose() {
+			__shell.dispose();
+		}
+
+		int getAlpha() {
+
+			if (__visibleState == VisibleState.VISIBLE_IS_SET) {
+
+				return __shell.getAlpha();
+
+			} else if (__visibleState == VisibleState.ALMOST_VISIBLE) {
+
+				return 0;
+			}
+
+			return 0;
+		}
+
+		Rectangle getBounds() {
+			return __shell.getBounds();
+		}
+
+		Point getSize() {
+			return __shell.getSize();
+		}
+
+		boolean isDisposed() {
+			return __shell.isDisposed();
+		}
+
+		boolean isVisible() {
+
+			if (__visibleState == VisibleState.VISIBLE_IS_SET) {
+
+				// shell is set visible/not visible
+
+				return __shell.isVisible();
+
+			} else if (__visibleState == VisibleState.ALMOST_VISIBLE) {
+
+				return true;
+			}
+
+			return false;
+		}
+
+		void layout() {
+			__shell.layout();
+		}
+
+		void pack(final boolean changed) {
+			__shell.pack(changed);
+		}
+
+		void setAlpha(final int alpha) {
+
+			__shell.setAlpha(alpha);
+
+			if (__visibleState == VisibleState.ALMOST_VISIBLE) {
+
+				// shell is not yet visible
+
+				__visibleState = VisibleState.VISIBLE_IS_SET;
+
+				/*
+				 * Set visibility lately to prevent Ubuntu flickering !!!
+				 */
+				__shell.setVisible(true);
+			}
+		}
+
+		void setLayout(final Layout layout) {
+			__shell.setLayout(layout);
+		}
+
+		void setLocation(final int x, final int y) {
+			__shell.setLocation(x, y);
+		}
+
+		void setVisible(final boolean isVisible) {
+
+			__visibleState = isVisible //
+					? VisibleState.VISIBLE_IS_SET
+					: VisibleState.NOT_VISIBLE;
+
+			__shell.setVisible(isVisible);
+		}
+
+		void setVisibleState(final VisibleState state) {
+			__visibleState = state;
 		}
 	}
 
@@ -200,6 +312,13 @@ public abstract class AnimatedToolTipShell2 {
 		public void handleEvent(final Event event) {
 			onTTShellEvent(event);
 		}
+	}
+
+	private enum VisibleState {
+
+		NOT_VISIBLE, //
+		ALMOST_VISIBLE, //
+		VISIBLE_IS_SET
 	}
 
 	/**
@@ -316,7 +435,7 @@ public abstract class AnimatedToolTipShell2 {
 			final Point shellLocation = fixupDisplayBounds(size, defaultLocation);
 			_currentShell.setLocation(shellLocation.x, shellLocation.y);
 
-			setShellAlpha(_currentShell, 0xff);
+			_currentShell.setAlpha(0xff);
 			setShellVisible(true);
 
 		} else {
@@ -358,10 +477,9 @@ public abstract class AnimatedToolTipShell2 {
 				final Point defaultLocation = getToolTipLocation(size);
 				final Point shellLocation = fixupDisplayBounds(size, defaultLocation);
 
-				setShellAlpha(_currentShell, 0);
 				_currentShell.setLocation(shellLocation.x, shellLocation.y);
 
-				setShellVisible(true);
+				_currentShell.setVisibleState(VisibleState.ALMOST_VISIBLE);
 			}
 
 		} else if (_isShellFadingOut) {
@@ -384,6 +502,7 @@ public abstract class AnimatedToolTipShell2 {
 		}
 
 		try {
+
 			/*
 			 * endAlpha will be the final fadeIn/fadeOut value when the animation stops
 			 */
@@ -457,8 +576,6 @@ public abstract class AnimatedToolTipShell2 {
 
 						// shell is not visible any more, hide it now
 
-						setShellAlpha(_currentShell, 0);
-
 						// hide shell
 						setShellVisible(false);
 
@@ -475,7 +592,7 @@ public abstract class AnimatedToolTipShell2 {
 				} else {
 
 					if (newAlpha != currentAlpha) {
-						setShellAlpha(_currentShell, newAlpha);
+						_currentShell.setAlpha(newAlpha);
 					}
 
 					if (_currentShell.getAlpha() != newAlpha) {
@@ -575,7 +692,7 @@ public abstract class AnimatedToolTipShell2 {
 					//							+ ("\t\thoveredParent: " + hoveredParent));
 					//					// TODO remove SYSTEM.OUT.PRINTLN
 
-					if (hoveredParent == _currentShell) {
+					if (hoveredParent == _currentShell.__shell) {
 
 						// mouse is hovering in this tooltip
 
@@ -774,7 +891,7 @@ public abstract class AnimatedToolTipShell2 {
 						continue;
 					}
 
-					setShellAlpha(oldShell, newAlpha);
+					oldShell.setAlpha(newAlpha);
 
 					if (oldShell.getAlpha() != newAlpha) {
 
@@ -828,7 +945,7 @@ public abstract class AnimatedToolTipShell2 {
 		if (_currentShell != null && _currentShell.isDisposed() == false) {
 
 			// hide old shell
-			_oldShells.add(new ShellWrapper(_currentShell));
+			_oldShells.add(new ShellWrapper(_currentShell.__shell));
 		}
 
 		final int trimStyle = _isShowShellTrimStyle ? 0 : SWT.NO_TRIM;
@@ -845,19 +962,19 @@ public abstract class AnimatedToolTipShell2 {
 				| SWT.NO_FOCUS
 				| trimStyle;
 
-		_currentShell = new Shell(_ownerControl.getShell(), shellStyle);
+		_currentShell = new CurrentShellWrapper(new Shell(_ownerControl.getShell(), shellStyle));
 
 		_currentShell.setLayout(new FillLayout());
 
-		addTTShellListener(_currentShell);
+		addTTShellListener(_currentShell.__shell);
 
 		// create ui
-		createToolTipContentArea(_currentShell);
+		createToolTipContentArea(_currentShell.__shell);
 
 		_currentShell.layout();
 		_currentShell.pack(true);
 
-		addTTAllControlsListener(_currentShell);
+		addTTAllControlsListener(_currentShell.__shell);
 	}
 
 	private Point fixupDisplayBounds(final Point tipSize, final Point location) {
@@ -940,7 +1057,6 @@ public abstract class AnimatedToolTipShell2 {
 		}
 
 		// hide shell
-		setShellAlpha(_currentShell, 0);
 		setShellVisible(false);
 
 		closeOldShells(false);
@@ -1062,7 +1178,7 @@ public abstract class AnimatedToolTipShell2 {
 
 					// hide tooltip when another shell is activated
 
-					if (_display.getActiveShell() != _currentShell) {
+					if (_display.getActiveShell() != _currentShell.__shell) {
 						ttHide();
 					}
 				}
@@ -1178,7 +1294,7 @@ public abstract class AnimatedToolTipShell2 {
 						if (// don't hide when ...
 
 						// ... main window is active
-						_ownerControl.getShell() == _currentShell.getDisplay().getActiveShell()
+						_ownerControl.getShell() == _currentShell.__shell.getDisplay().getActiveShell()
 
 						// ... a sub shell is opened
 								|| isDoNotClose()) {
@@ -1265,22 +1381,7 @@ public abstract class AnimatedToolTipShell2 {
 		_isReceiveOnMouseMove = isReceive;
 	}
 
-	private void setShellAlpha(final Shell shell, final int alpha) {
-
-		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
-				+ ("\tshell: " + shell.hashCode())
-				+ ("\tsetShellAlpha: " + alpha));
-		// TODO remove SYSTEM.OUT.PRINTLN
-
-		shell.setAlpha(alpha);
-	}
-
 	private void setShellVisible(final boolean isVisible) {
-
-		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
-				+ ("\tshell: " + _currentShell.hashCode())
-				+ ("\tsetShellVisible: " + isVisible));
-		// TODO remove SYSTEM.OUT.PRINTLN
 
 		if (isVisible) {
 
