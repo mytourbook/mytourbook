@@ -5391,6 +5391,11 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 				Display.getCurrent().asyncExec(new Runnable() {
 					@Override
 					public void run() {
+
+						if (_sliceViewer.getTable().isDisposed()) {
+							return;
+						}
+
 						selectTimeSlice(_sliceViewerXSliderPosition);
 						_sliceViewer.getTable().setFocus();
 					}
