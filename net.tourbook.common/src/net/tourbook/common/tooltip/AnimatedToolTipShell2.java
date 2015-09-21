@@ -497,11 +497,11 @@ public abstract class AnimatedToolTipShell2 {
 
 //		final long start = System.nanoTime();
 
-		if (isShellHidden()) {
-			return;
-		}
-
 		try {
+
+			if (isShellHidden()) {
+				return;
+			}
 
 			/*
 			 * endAlpha will be the final fadeIn/fadeOut value when the animation stops
@@ -913,6 +913,7 @@ public abstract class AnimatedToolTipShell2 {
 			_oldShells.removeAll(disposedShells);
 
 			if (_oldShells.size() > 0) {
+
 				// there are still visible shells
 				_display.timerExec(FADE_TIME_INTERVAL, _animationTimer);
 			}
@@ -1129,7 +1130,7 @@ public abstract class AnimatedToolTipShell2 {
 		// hide tooltip definitively
 
 		removeOwnerShellListener();
-		removeDisplayFilter();
+		removeDisplayFilterListener();
 
 		// deactivate auto close timer
 		_display.timerExec(-1, _ttAutoCloseTimer);
@@ -1319,7 +1320,7 @@ public abstract class AnimatedToolTipShell2 {
 
 	}
 
-	private void removeDisplayFilter() {
+	private void removeDisplayFilterListener() {
 
 		if (_isDisplayFilterActive == false) {
 			return;
@@ -1395,11 +1396,17 @@ public abstract class AnimatedToolTipShell2 {
 		_currentShell.dispose();
 		_currentShell = null;
 
-		removeDisplayFilter();
+		removeDisplayFilterListener();
 
-		close();
+		if (isHideOldWithDelay) {
 
-//		closeOldShells(false);
+			closeOldShells(true);
+
+		} else {
+
+			close();
+		}
+
 	}
 
 	private void setShellVisible() {

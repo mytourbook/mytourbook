@@ -121,7 +121,7 @@ public class ActionTourChartMarker extends ContributionItem implements IOpeningD
 
 	@Override
 	public void hideDialog() {
-		_slideoutMarkerOptions.hideNow();
+		_slideoutMarkerOptions.hide();
 	}
 
 	private void onAction() {

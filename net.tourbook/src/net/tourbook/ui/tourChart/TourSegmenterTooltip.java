@@ -594,12 +594,12 @@ public class TourSegmenterTooltip extends AnimatedToolTipShell implements ITourP
 
 	@Override
 	public void hideDialog() {
-		hideNow();
+		hide();
 	}
 
 	@Override
 	public void hideToolTip() {
-		hideNow();
+		hide();
 	}
 
 	@Override
