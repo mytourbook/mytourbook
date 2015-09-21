@@ -235,12 +235,12 @@ public class ChartTitleToolTip extends AnimatedToolTipShell2 implements ITourPro
 
 	@Override
 	public void hideDialog() {
-		hideNow();
+		hide();
 	}
 
 	@Override
 	public void hideToolTip() {
-		hideNow();
+		hide();
 	}
 
 	@Override

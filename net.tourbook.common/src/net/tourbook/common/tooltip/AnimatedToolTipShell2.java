@@ -67,7 +67,6 @@ public abstract class AnimatedToolTipShell2 {
 	private static final int			ALPHA_OPAQUE							= 0xff;
 
 	private OwnerControlListener		_ownerControlListener;
-
 	private OwnerShellListener			_ownerShellListener;
 
 	private ToolTipShellListener		_ttShellListener;
@@ -103,16 +102,16 @@ public abstract class AnimatedToolTipShell2 {
 	private boolean						_isReceiveOnMouseMove;
 
 	private int							_fadeInSteps							= FADE_IN_STEPS;
-
 	private int							_fadeInDelayCounter;
+
 	/**
 	 * Number of {@link #FADE_IN_STEPS} until the tooltip starts to fade in.
 	 */
 	private int							_fadeInDelaySteps;
 
 	private int							_fadeOutSteps							= FADE_OUT_STEPS;
-
 	private int							_fadeOutDelaySteps						= FADE_OUT_DELAY_STEPS;
+
 	private int							_mouseOverBehaviour						= MOUSE_OVER_BEHAVIOUR_NO_IGNORE;
 	private boolean						_isKeepToolTipOpenWhenResizedOrMoved	= true;
 
@@ -433,16 +432,17 @@ public abstract class AnimatedToolTipShell2 {
 			final Point size = _currentShell.getSize();
 			final Point defaultLocation = getToolTipLocation(size);
 			final Point shellLocation = fixupDisplayBounds(size, defaultLocation);
-			_currentShell.setLocation(shellLocation.x, shellLocation.y);
 
+			_currentShell.setLocation(shellLocation.x, shellLocation.y);
 			_currentShell.setAlpha(0xff);
-			setShellVisible(true);
+
+			setShellVisible();
 
 		} else {
 
 			// hide tooltip
 
-			setShellVisible(false);
+			setShellHidden(false);
 		}
 
 		closeOldShells(false);
@@ -577,7 +577,7 @@ public abstract class AnimatedToolTipShell2 {
 						// shell is not visible any more, hide it now
 
 						// hide shell
-						setShellVisible(false);
+						setShellHidden(true);
 
 						_isShellFadingOut = false;
 
@@ -870,7 +870,9 @@ public abstract class AnimatedToolTipShell2 {
 
 						newAlpha = 0;
 
-					} else if (oldShellWrapper.__fadeOutDelayCounter++ < _fadeOutDelaySteps) {
+					} else if (oldShellWrapper.__fadeOutDelayCounter++ < _fadeInDelaySteps + _fadeInSteps) {
+
+						// wait that it is not flickering when a new tooltip starts
 
 						continue;
 
@@ -1057,7 +1059,7 @@ public abstract class AnimatedToolTipShell2 {
 		}
 
 		// hide shell
-		setShellVisible(false);
+		setShellHidden(false);
 
 		closeOldShells(false);
 	}
@@ -1381,28 +1383,32 @@ public abstract class AnimatedToolTipShell2 {
 		_isReceiveOnMouseMove = isReceive;
 	}
 
-	private void setShellVisible(final boolean isVisible) {
+	/**
+	 * @param isHideOldWithDelay
+	 */
+	private void setShellHidden(final boolean isHideOldWithDelay) {
 
-		if (isVisible) {
+		// hide tooltip
 
-			// show tooltip
+		beforeHideToolTip();
 
-			_currentShell.setVisible(true);
+		_currentShell.dispose();
+		_currentShell = null;
 
-			addDisplayFilterListener();
+		removeDisplayFilter();
 
-		} else {
+		close();
 
-			// hide tooltip
+//		closeOldShells(false);
+	}
 
-			beforeHideToolTip();
+	private void setShellVisible() {
 
-			_currentShell.setVisible(false);
+		// show tooltip
 
-			removeDisplayFilter();
+		_currentShell.setVisible(true);
 
-			close();
-		}
+		addDisplayFilterListener();
 	}
 
 	private void showShellWhenVisible() {
@@ -1437,7 +1443,7 @@ public abstract class AnimatedToolTipShell2 {
 		if (_fadeInDelayCounter < _fadeInDelaySteps) {
 
 			// fade in have not yet started -> hide shell
-			setShellVisible(false);
+			setShellHidden(true);
 
 			return;
 		}

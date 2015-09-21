@@ -1,4 +1,10 @@
-Version 15.9.0                                             ?. September 2015
+Version 15.10.0                                             ?. October 2015
+
+BUGS
+
+* Tourchart
+- When zoomed in the selecting a segment works only in the visible area.
+
 
 TOUR CHART MODIFIED !!!
 
