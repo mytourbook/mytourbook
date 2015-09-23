@@ -125,22 +125,52 @@ public interface ITourbookPreferences {
 	/*
 	 * Min/Max values
 	 */
+	public static final String	GRAPH_IS_MIN_MAX_ENABLED						= "GRAPH_IS_MIN_MAX_ENABLED";								//$NON-NLS-1$
+
 	public static final String	GRAPH_ALTIMETER_IS_MIN_ENABLED					= "GRAPH_ALTIMETER_IS_MIN_ENABLED";						//$NON-NLS-1$
 	public static final String	GRAPH_ALTIMETER_IS_MAX_ENABLED					= "GRAPH_ALTIMETER_IS_MAX_ENABLED";						//$NON-NLS-1$
 	public static final String	GRAPH_ALTIMETER_MIN_VALUE						= "GRAPH_ALTIMETER_MIN_VALUE";								//$NON-NLS-1$
 	public static final String	GRAPH_ALTIMETER_MAX_VALUE						= "GRAPH_ALTIMETER_MAX_VALUE";								//$NON-NLS-1$
+
+	public static final String	GRAPH_ALTITUDE_IS_MIN_ENABLED					= "GRAPH_ALTITUDE_IS_MIN_ENABLED";							//$NON-NLS-1$
+	public static final String	GRAPH_ALTITUDE_IS_MAX_ENABLED					= "GRAPH_ALTITUDE_IS_MAX_ENABLED";							//$NON-NLS-1$
+	public static final String	GRAPH_ALTITUDE_MIN_VALUE						= "GRAPH_ALTITUDE_MIN_VALUE";								//$NON-NLS-1$
+	public static final String	GRAPH_ALTITUDE_MAX_VALUE						= "GRAPH_ALTITUDE_MAX_VALUE";								//$NON-NLS-1$
+
+	public static final String	GRAPH_CADENCE_IS_MIN_ENABLED					= "GRAPH_CADENCE_IS_MIN_ENABLED";							//$NON-NLS-1$
+	public static final String	GRAPH_CADENCE_IS_MAX_ENABLED					= "GRAPH_CADENCE_IS_MAX_ENABLED";							//$NON-NLS-1$
+	public static final String	GRAPH_CADENCE_MIN_VALUE							= "GRAPH_CADENCE_MIN_VALUE";								//$NON-NLS-1$
+	public static final String	GRAPH_CADENCE_MAX_VALUE							= "GRAPH_CADENCE_MAX_VALUE";								//$NON-NLS-1$
+
 	public static final String	GRAPH_GRADIENT_IS_MIN_ENABLED					= "GRAPH_GRADIENT_IS_MIN_ENABLED";							//$NON-NLS-1$
 	public static final String	GRAPH_GRADIENT_IS_MAX_ENABLED					= "GRAPH_GRADIENT_IS_MAX_ENABLED";							//$NON-NLS-1$
 	public static final String	GRAPH_GRADIENT_MIN_VALUE						= "GRAPH_GRADIENT_MIN_VALUE";								//$NON-NLS-1$
 	public static final String	GRAPH_GRADIENT_MAX_VALUE						= "GRAPH_GRADIENT_MAX_VALUE";								//$NON-NLS-1$
+
 	public static final String	GRAPH_PACE_IS_MIN_ENABLED						= "GRAPH_PACE_IS_MIN_ENABLED";								//$NON-NLS-1$
 	public static final String	GRAPH_PACE_IS_MAX_ENABLED						= "GRAPH_PACE_IS_MAX_ENABLED";								//$NON-NLS-1$
 	public static final String	GRAPH_PACE_MIN_VALUE							= "GRAPH_PACE_MIN_VALUE";									//$NON-NLS-1$
 	public static final String	GRAPH_PACE_MAX_VALUE							= "GRAPH_PACE_MAX_VALUE";									//$NON-NLS-1$
+
+	public static final String	GRAPH_POWER_IS_MIN_ENABLED						= "GRAPH_POWER_IS_MIN_ENABLED";							//$NON-NLS-1$
+	public static final String	GRAPH_POWER_IS_MAX_ENABLED						= "GRAPH_POWER_IS_MAX_ENABLED";							//$NON-NLS-1$
+	public static final String	GRAPH_POWER_MIN_VALUE							= "GRAPH_POWER_MIN_VALUE";									//$NON-NLS-1$
+	public static final String	GRAPH_POWER_MAX_VALUE							= "GRAPH_POWER_MAX_VALUE";									//$NON-NLS-1$
+
 	public static final String	GRAPH_PULSE_IS_MIN_ENABLED						= "GRAPH_PULSE_IS_MIN_ENABLED";							//$NON-NLS-1$
 	public static final String	GRAPH_PULSE_IS_MAX_ENABLED						= "GRAPH_PULSE_IS_MAX_ENABLED";							//$NON-NLS-1$
 	public static final String	GRAPH_PULSE_MIN_VALUE							= "GRAPH_PULSE_MIN_VALUE";									//$NON-NLS-1$
 	public static final String	GRAPH_PULSE_MAX_VALUE							= "GRAPH_PULSE_MAX_VALUE";									//$NON-NLS-1$
+
+	public static final String	GRAPH_SPEED_IS_MIN_ENABLED						= "GRAPH_SPEED_IS_MIN_ENABLED";							//$NON-NLS-1$
+	public static final String	GRAPH_SPEED_IS_MAX_ENABLED						= "GRAPH_SPEED_IS_MAX_ENABLED";							//$NON-NLS-1$
+	public static final String	GRAPH_SPEED_MIN_VALUE							= "GRAPH_SPEED_MIN_VALUE";									//$NON-NLS-1$
+	public static final String	GRAPH_SPEED_MAX_VALUE							= "GRAPH_SPEED_MAX_VALUE";									//$NON-NLS-1$
+
+	public static final String	GRAPH_TEMPERATURE_IS_MIN_ENABLED				= "GRAPH_TEMPERATURE_IS_MIN_ENABLED";						//$NON-NLS-1$
+	public static final String	GRAPH_TEMPERATURE_IS_MAX_ENABLED				= "GRAPH_TEMPERATURE_IS_MAX_ENABLED";						//$NON-NLS-1$
+	public static final String	GRAPH_TEMPERATURE_MIN_VALUE						= "GRAPH_TEMPERATURE_MIN_VALUE";							//$NON-NLS-1$
+	public static final String	GRAPH_TEMPERATURE_MAX_VALUE						= "GRAPH_TEMPERATURE_MAX_VALUE";							//$NON-NLS-1$
 
 	public static final String	GRAPH_GRID_VERTICAL_DISTANCE					= "graphs.grid.vertical-distance";							//$NON-NLS-1$
 	public static final String	GRAPH_GRID_HORIZONTAL_DISTANCE					= "graphs.grid.horizontal-distance";						//$NON-NLS-1$

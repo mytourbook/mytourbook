@@ -912,10 +912,16 @@ public class Messages extends NLS {
 	public static String		Pref_Graphs_Button_up;
 	public static String		Pref_Graphs_Check_autozoom;
 	public static String		Pref_Graphs_Check_show_start_time;
+	public static String		Pref_Graphs_Checkbox_EnableMinMaxValues;
 	public static String		Pref_Graphs_Checkbox_ForceAltimeterValue;
 	public static String		Pref_Graphs_Checkbox_ForceGradientValue;
 	public static String		Pref_Graphs_Checkbox_ForcePaceValue;
 	public static String		Pref_Graphs_Checkbox_ForcePulseValue;
+	public static String		Pref_Graphs_Checkbox_ForceValue_Altitude;
+	public static String		Pref_Graphs_Checkbox_ForceValue_Cadence;
+	public static String		Pref_Graphs_Checkbox_ForceValue_Power;
+	public static String		Pref_Graphs_Checkbox_ForceValue_Speed;
+	public static String		Pref_Graphs_Checkbox_ForceValue_Temperature;
 	public static String		Pref_Graphs_Checkbox_GraphAntialiasing;
 	public static String		Pref_Graphs_Checkbox_GraphAntialiasing_Tooltip;
 	public static String		Pref_Graphs_Checkbox_SegmentAlternateColor;

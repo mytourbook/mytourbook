@@ -483,7 +483,7 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 				_lblDataSerieCurrent = createUILabelValue(
 						container,
 						SWT.TRAIL,
-						6,
+						7,
 						Messages.Tooltip_ValuePoint_Label_SlicesCurrent_Tooltip,
 						null);
 
@@ -494,7 +494,7 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 				_lblDataSerieMax = createUILabelValue(
 						container,
 						SWT.LEAD,
-						6,
+						7,
 						Messages.Tooltip_ValuePoint_Label_SlicesMax_Tooltip,
 						null);
 			}

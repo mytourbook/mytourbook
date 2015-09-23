@@ -18,6 +18,7 @@ package net.tourbook.application;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
+import net.tourbook.common.util.StatusUtil;
 import net.tourbook.data.TourPerson;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.ui.TourTypeFilter;
@@ -227,6 +228,10 @@ public class TourbookPlugin extends AbstractUIPlugin {
 			final AbstractBundle abstractBundle = (AbstractBundle) bundle;
 			_version = abstractBundle.getVersion();
 		}
+
+		// log version that this info is easier accessable
+		final Version version = TourbookPlugin.getDefault().getVersion();
+		StatusUtil.log("AppVersion: " + version.toString());//$NON-NLS-1$
 	}
 
 	@Override

@@ -1017,6 +1017,31 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
 				}
 
+				final boolean isMinMaxEnabled = _prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_MIN_MAX_ENABLED);
+
+				/*
+				 * Altitude
+				 */
+				isChartModified |= setMinDefaultValue(
+						property,
+						isChartModified,
+						ITourbookPreferences.GRAPH_ALTITUDE_IS_MIN_ENABLED,
+						ITourbookPreferences.GRAPH_ALTITUDE_MIN_VALUE,
+						TourManager.GRAPH_ALTITUDE,
+						0,
+						MIN_ADJUSTMENT,
+						isMinMaxEnabled);
+
+				isChartModified |= setMaxDefaultValue(
+						property,
+						isChartModified,
+						ITourbookPreferences.GRAPH_ALTITUDE_IS_MAX_ENABLED,
+						ITourbookPreferences.GRAPH_ALTITUDE_MAX_VALUE,
+						TourManager.GRAPH_ALTITUDE,
+						0,
+						1e-2,
+						isMinMaxEnabled);
+
 				/*
 				 * Altimeter
 				 */
@@ -1027,7 +1052,8 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 						ITourbookPreferences.GRAPH_ALTIMETER_MIN_VALUE,
 						TourManager.GRAPH_ALTIMETER,
 						0,
-						MIN_ADJUSTMENT);
+						MIN_ADJUSTMENT,
+						isMinMaxEnabled);
 
 				isChartModified |= setMaxDefaultValue(
 						property,
@@ -1036,7 +1062,8 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 						ITourbookPreferences.GRAPH_ALTIMETER_MAX_VALUE,
 						TourManager.GRAPH_ALTIMETER,
 						0,
-						1e-2);
+						1e-2,
+						isMinMaxEnabled);
 
 				/*
 				 * Gradient
@@ -1048,7 +1075,8 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 						ITourbookPreferences.GRAPH_GRADIENT_MIN_VALUE,
 						TourManager.GRAPH_GRADIENT,
 						0,
-						MIN_ADJUSTMENT);
+						MIN_ADJUSTMENT,
+						isMinMaxEnabled);
 
 				isChartModified |= setMaxDefaultValue(
 						property,
@@ -1057,28 +1085,8 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 						ITourbookPreferences.GRAPH_GRADIENT_MAX_VALUE,
 						TourManager.GRAPH_GRADIENT,
 						0,
-						MAX_ADJUSTMENT);
-
-				/*
-				 * Pace
-				 */
-				isChartModified |= setMinDefaultValue(
-						property,
-						isChartModified,
-						ITourbookPreferences.GRAPH_PACE_IS_MIN_ENABLED,
-						ITourbookPreferences.GRAPH_PACE_MIN_VALUE,
-						TourManager.GRAPH_PACE,
-						60,
-						Double.MIN_VALUE);
-
-				isChartModified |= setMaxDefaultValue(
-						property,
-						isChartModified,
-						ITourbookPreferences.GRAPH_PACE_IS_MAX_ENABLED,
-						ITourbookPreferences.GRAPH_PACE_MAX_VALUE,
-						TourManager.GRAPH_PACE,
-						60,
-						Double.MIN_VALUE);
+						MAX_ADJUSTMENT,
+						isMinMaxEnabled);
 
 				/*
 				 * Pulse
@@ -1090,7 +1098,8 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 						ITourbookPreferences.GRAPH_PULSE_MIN_VALUE,
 						TourManager.GRAPH_PULSE,
 						0,
-						MIN_ADJUSTMENT);
+						MIN_ADJUSTMENT,
+						isMinMaxEnabled);
 
 				isChartModified |= setMaxDefaultValue(
 						property,
@@ -1099,7 +1108,123 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 						ITourbookPreferences.GRAPH_PULSE_MAX_VALUE,
 						TourManager.GRAPH_PULSE,
 						0,
-						1e-3);
+						1e-3,
+						isMinMaxEnabled);
+
+				/*
+				 * Speed
+				 */
+				isChartModified |= setMinDefaultValue(
+						property,
+						isChartModified,
+						ITourbookPreferences.GRAPH_SPEED_IS_MIN_ENABLED,
+						ITourbookPreferences.GRAPH_SPEED_MIN_VALUE,
+						TourManager.GRAPH_SPEED,
+						0,
+						Double.MIN_VALUE,
+						isMinMaxEnabled);
+
+				isChartModified |= setMaxDefaultValue(
+						property,
+						isChartModified,
+						ITourbookPreferences.GRAPH_SPEED_IS_MAX_ENABLED,
+						ITourbookPreferences.GRAPH_SPEED_MAX_VALUE,
+						TourManager.GRAPH_SPEED,
+						0,
+						Double.MIN_VALUE,
+						isMinMaxEnabled);
+
+				/*
+				 * Pace
+				 */
+				isChartModified |= setMinDefaultValue(
+						property,
+						isChartModified,
+						ITourbookPreferences.GRAPH_PACE_IS_MIN_ENABLED,
+						ITourbookPreferences.GRAPH_PACE_MIN_VALUE,
+						TourManager.GRAPH_PACE,
+						60,
+						Double.MIN_VALUE,
+						isMinMaxEnabled);
+
+				isChartModified |= setMaxDefaultValue(
+						property,
+						isChartModified,
+						ITourbookPreferences.GRAPH_PACE_IS_MAX_ENABLED,
+						ITourbookPreferences.GRAPH_PACE_MAX_VALUE,
+						TourManager.GRAPH_PACE,
+						60,
+						Double.MIN_VALUE,
+						isMinMaxEnabled);
+
+				/*
+				 * Cadence
+				 */
+				isChartModified |= setMinDefaultValue(
+						property,
+						isChartModified,
+						ITourbookPreferences.GRAPH_CADENCE_IS_MIN_ENABLED,
+						ITourbookPreferences.GRAPH_CADENCE_MIN_VALUE,
+						TourManager.GRAPH_CADENCE,
+						0,
+						MIN_ADJUSTMENT,
+						isMinMaxEnabled);
+
+				isChartModified |= setMaxDefaultValue(
+						property,
+						isChartModified,
+						ITourbookPreferences.GRAPH_CADENCE_IS_MAX_ENABLED,
+						ITourbookPreferences.GRAPH_CADENCE_MAX_VALUE,
+						TourManager.GRAPH_CADENCE,
+						0,
+						1e-3,
+						isMinMaxEnabled);
+
+				/*
+				 * Cadence
+				 */
+				isChartModified |= setMinDefaultValue(
+						property,
+						isChartModified,
+						ITourbookPreferences.GRAPH_POWER_IS_MIN_ENABLED,
+						ITourbookPreferences.GRAPH_POWER_MIN_VALUE,
+						TourManager.GRAPH_POWER,
+						0,
+						MIN_ADJUSTMENT,
+						isMinMaxEnabled);
+
+				isChartModified |= setMaxDefaultValue(
+						property,
+						isChartModified,
+						ITourbookPreferences.GRAPH_POWER_IS_MAX_ENABLED,
+						ITourbookPreferences.GRAPH_POWER_MAX_VALUE,
+						TourManager.GRAPH_POWER,
+						0,
+						1e-3,
+						isMinMaxEnabled);
+
+				/*
+				 * Cadence
+				 */
+				isChartModified |= setMinDefaultValue(
+						property,
+						isChartModified,
+						ITourbookPreferences.GRAPH_TEMPERATURE_IS_MIN_ENABLED,
+						ITourbookPreferences.GRAPH_TEMPERATURE_MIN_VALUE,
+						TourManager.GRAPH_TEMPERATURE,
+						0,
+						MIN_ADJUSTMENT,
+						isMinMaxEnabled);
+
+				isChartModified |= setMaxDefaultValue(
+						property,
+						isChartModified,
+						ITourbookPreferences.GRAPH_TEMPERATURE_IS_MAX_ENABLED,
+						ITourbookPreferences.GRAPH_TEMPERATURE_MAX_VALUE,
+						TourManager.GRAPH_TEMPERATURE,
+						0,
+						1e-3,
+						isMinMaxEnabled);
 
 				if (isChartModified) {
 					updateTourChart(keepMinMax);
@@ -2663,6 +2788,25 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		return _segmenterValueFont;
 	}
 
+	private ChartDataYSerie getYData(final int yDataInfoId) {
+
+		final ArrayList<ChartDataYSerie> yDataList = getChartDataModel().getYData();
+
+		// get y-data serie from custom data
+		ChartDataYSerie yData = null;
+
+		for (final ChartDataYSerie yDataIterator : yDataList) {
+
+			final Integer yDataInfo = (Integer) yDataIterator.getCustomData(ChartDataYSerie.YDATA_INFO);
+
+			if (yDataInfo == yDataInfoId) {
+				yData = yDataIterator;
+				break;
+			}
+		}
+		return yData;
+	}
+
 	/**
 	 * Disable marker layer.
 	 */
@@ -3773,59 +3917,76 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 	/**
 	 * @param property
 	 * @param isChartModified
-	 * @param prefIsMaxEnabled
-	 * @param prefMaxValue
+	 * @param prefName_IsMaxEnabled
+	 * @param prefName_MaxValue
 	 * @param yDataInfoId
 	 * @param valueDivisor
 	 * @param maxAdjustment
 	 *            Is disabled when set to {@link Double#MIN_VALUE}.
+	 * @param isMinMaxEnabled
 	 * @return
 	 */
 	private boolean setMaxDefaultValue(	final String property,
 										boolean isChartModified,
-										final String prefIsMaxEnabled,
-										final String prefMaxValue,
+										final String prefName_IsMaxEnabled,
+										final String prefName_MaxValue,
 										final int yDataInfoId,
 										final int valueDivisor,
-										final double maxAdjustment) {
+										final double maxAdjustment,
+										final boolean isMinMaxEnabled) {
 
-		if (property.equals(prefIsMaxEnabled) || property.equals(prefMaxValue)) {
+		boolean isAllMinMaxModified = false;
 
-			final boolean isMaxEnabled = _prefStore.getBoolean(prefIsMaxEnabled);
+		if (property.equals(ITourbookPreferences.GRAPH_IS_MIN_MAX_ENABLED)) {
 
-			final ArrayList<ChartDataYSerie> yDataList = getChartDataModel().getYData();
+			// global min/max value is set
 
-			// get y-data serie from custom data
-			ChartDataYSerie yData = null;
-			for (final ChartDataYSerie yDataIterator : yDataList) {
-				final Integer yDataInfo = (Integer) yDataIterator.getCustomData(ChartDataYSerie.YDATA_INFO);
-				if (yDataInfo == yDataInfoId) {
-					yData = yDataIterator;
-					break;
+			isAllMinMaxModified = true;
+		}
+
+		if (isMinMaxEnabled) {
+
+			if (isAllMinMaxModified || property.equals(prefName_IsMaxEnabled) || property.equals(prefName_MaxValue)) {
+
+				final ChartDataYSerie yData = getYData(yDataInfoId);
+
+				if (yData != null) {
+
+					final boolean isMaxEnabled = _prefStore.getBoolean(prefName_IsMaxEnabled);
+
+					if (isMinMaxEnabled && isMaxEnabled) {
+
+						// set visible max value from the preferences
+
+						double maxValue = _prefStore.getInt(prefName_MaxValue);
+
+						if (maxAdjustment != Double.MIN_VALUE) {
+							maxValue = maxValue > 0 //
+									? maxValue - maxAdjustment
+									: maxValue + maxAdjustment;
+						}
+
+						yData.setVisibleMaxValue(valueDivisor == 0 ? maxValue : maxValue * valueDivisor);
+
+					} else {
+
+						// reset visible max value to the original max value
+						yData.setVisibleMaxValue(yData.getOriginalMaxValue());
+					}
+
+					isChartModified = true;
 				}
 			}
 
+		} else {
+
+			// min/max is disabled, use default min value
+
+			final ChartDataYSerie yData = getYData(yDataInfoId);
 			if (yData != null) {
 
-				if (isMaxEnabled) {
-
-					// set visible max value from the preferences
-
-					double maxValue = _prefStore.getInt(prefMaxValue);
-
-					if (maxAdjustment != Double.MIN_VALUE) {
-						maxValue = maxValue > 0 //
-								? maxValue - maxAdjustment
-								: maxValue + maxAdjustment;
-					}
-
-					yData.setVisibleMaxValue(valueDivisor == 0 ? maxValue : maxValue * valueDivisor);
-
-				} else {
-
-					// reset visible max value to the original max value
-					yData.setVisibleMaxValue(yData.getOriginalMaxValue());
-				}
+				// reset visible max value to the original max value
+				yData.setVisibleMaxValue(yData.getOriginalMaxValue());
 
 				isChartModified = true;
 			}
@@ -3837,57 +3998,74 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 	/**
 	 * @param property
 	 * @param isChartModified
-	 * @param tagIsMinEnabled
-	 * @param tabMinValue
+	 * @param prefName_IsMinEnabled
+	 * @param prefName_MinValue
 	 * @param yDataInfoId
 	 * @param valueDivisor
 	 * @param minAdjustment
 	 *            Is disabled when set to {@link Double#MIN_VALUE}.
+	 * @param isMinMaxEnabled
 	 * @return
 	 */
 	private boolean setMinDefaultValue(	final String property,
 										boolean isChartModified,
-										final String tagIsMinEnabled,
-										final String tabMinValue,
+										final String prefName_IsMinEnabled,
+										final String prefName_MinValue,
 										final int yDataInfoId,
 										final int valueDivisor,
-										final double minAdjustment) {
+										final double minAdjustment,
+										final boolean isMinMaxEnabled) {
 
-		if (property.equals(tagIsMinEnabled) || property.equals(tabMinValue)) {
+		boolean isAllMinMaxModified = false;
 
-			final boolean isMinEnabled = _prefStore.getBoolean(tagIsMinEnabled);
+		if (property.equals(ITourbookPreferences.GRAPH_IS_MIN_MAX_ENABLED)) {
 
-			final ArrayList<ChartDataYSerie> yDataList = getChartDataModel().getYData();
+			// global min/max value is set
 
-			// get y-data serie from custom data
-			ChartDataYSerie yData = null;
-			for (final ChartDataYSerie yDataIterator : yDataList) {
-				final Integer yDataInfo = (Integer) yDataIterator.getCustomData(ChartDataYSerie.YDATA_INFO);
-				if (yDataInfo == yDataInfoId) {
-					yData = yDataIterator;
-					break;
+			isAllMinMaxModified = true;
+		}
+
+		if (isMinMaxEnabled) {
+
+			if (isAllMinMaxModified || property.equals(prefName_IsMinEnabled) || property.equals(prefName_MinValue)) {
+
+				final ChartDataYSerie yData = getYData(yDataInfoId);
+				if (yData != null) {
+
+					final boolean isMinEnabled = _prefStore.getBoolean(prefName_IsMinEnabled);
+
+					if (isMinMaxEnabled && isMinEnabled) {
+
+						// set visible min value from the preferences
+						double minValue = _prefStore.getInt(prefName_MinValue);
+
+						if (minAdjustment != Double.MIN_VALUE) {
+							minValue += minAdjustment;
+						}
+
+						yData.setVisibleMinValue(valueDivisor == 0 ? minValue : minValue * valueDivisor);
+
+					} else {
+
+						// reset visible min value to the original min value
+
+						yData.setVisibleMinValue(yData.getOriginalMinValue());
+					}
+
+					isChartModified = true;
 				}
 			}
 
+		} else {
+
+			// min/max is disabled, use default min value
+
+			final ChartDataYSerie yData = getYData(yDataInfoId);
 			if (yData != null) {
 
-				if (isMinEnabled) {
+				// reset visible min value to the original min value
 
-					// set visible min value from the preferences
-					double minValue = _prefStore.getInt(tabMinValue);
-
-					if (minAdjustment != Double.MIN_VALUE) {
-						minValue += minAdjustment;
-					}
-
-					yData.setVisibleMinValue(valueDivisor == 0 ? minValue : minValue * valueDivisor);
-
-				} else {
-
-					// reset visible min value to the original min value
-
-					yData.setVisibleMinValue(yData.getOriginalMinValue());
-				}
+				yData.setVisibleMinValue(yData.getOriginalMinValue());
 
 				isChartModified = true;
 			}

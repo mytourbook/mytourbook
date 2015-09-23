@@ -200,25 +200,52 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 		/*
 		 * Min/Max values
 		 */
-		store.setDefault(ITourbookPreferences.GRAPH_ALTIMETER_IS_MIN_ENABLED, false);
-		store.setDefault(ITourbookPreferences.GRAPH_ALTIMETER_IS_MAX_ENABLED, false);
+		store.setDefault(ITourbookPreferences.GRAPH_IS_MIN_MAX_ENABLED, true);
+
+		store.setDefault(ITourbookPreferences.GRAPH_ALTIMETER_IS_MIN_ENABLED, true);
+		store.setDefault(ITourbookPreferences.GRAPH_ALTIMETER_IS_MAX_ENABLED, true);
 		store.setDefault(ITourbookPreferences.GRAPH_ALTIMETER_MIN_VALUE, 0);
 		store.setDefault(ITourbookPreferences.GRAPH_ALTIMETER_MAX_VALUE, 1500);
 
-		store.setDefault(ITourbookPreferences.GRAPH_GRADIENT_IS_MIN_ENABLED, false);
-		store.setDefault(ITourbookPreferences.GRAPH_GRADIENT_IS_MAX_ENABLED, false);
-		store.setDefault(ITourbookPreferences.GRAPH_GRADIENT_MIN_VALUE, -10);
-		store.setDefault(ITourbookPreferences.GRAPH_GRADIENT_MAX_VALUE, 10);
+		store.setDefault(ITourbookPreferences.GRAPH_ALTITUDE_IS_MIN_ENABLED, false);
+		store.setDefault(ITourbookPreferences.GRAPH_ALTITUDE_IS_MAX_ENABLED, false);
+		store.setDefault(ITourbookPreferences.GRAPH_ALTITUDE_MIN_VALUE, 0);
+		store.setDefault(ITourbookPreferences.GRAPH_ALTITUDE_MAX_VALUE, 3000);
 
-		store.setDefault(ITourbookPreferences.GRAPH_PACE_IS_MIN_ENABLED, false);
-		store.setDefault(ITourbookPreferences.GRAPH_PACE_IS_MAX_ENABLED, false);
+		store.setDefault(ITourbookPreferences.GRAPH_CADENCE_IS_MIN_ENABLED, false);
+		store.setDefault(ITourbookPreferences.GRAPH_CADENCE_IS_MAX_ENABLED, false);
+		store.setDefault(ITourbookPreferences.GRAPH_CADENCE_MIN_VALUE, 50);
+		store.setDefault(ITourbookPreferences.GRAPH_CADENCE_MAX_VALUE, 100);
+
+		store.setDefault(ITourbookPreferences.GRAPH_GRADIENT_IS_MIN_ENABLED, true);
+		store.setDefault(ITourbookPreferences.GRAPH_GRADIENT_IS_MAX_ENABLED, true);
+		store.setDefault(ITourbookPreferences.GRAPH_GRADIENT_MIN_VALUE, -20);
+		store.setDefault(ITourbookPreferences.GRAPH_GRADIENT_MAX_VALUE, 20);
+
+		store.setDefault(ITourbookPreferences.GRAPH_PACE_IS_MIN_ENABLED, true);
+		store.setDefault(ITourbookPreferences.GRAPH_PACE_IS_MAX_ENABLED, true);
 		store.setDefault(ITourbookPreferences.GRAPH_PACE_MIN_VALUE, 1);
-		store.setDefault(ITourbookPreferences.GRAPH_PACE_MAX_VALUE, 5);
+		store.setDefault(ITourbookPreferences.GRAPH_PACE_MAX_VALUE, 6);
+
+		store.setDefault(ITourbookPreferences.GRAPH_SPEED_IS_MIN_ENABLED, true);
+		store.setDefault(ITourbookPreferences.GRAPH_SPEED_IS_MAX_ENABLED, true);
+		store.setDefault(ITourbookPreferences.GRAPH_SPEED_MIN_VALUE, 5);
+		store.setDefault(ITourbookPreferences.GRAPH_SPEED_MAX_VALUE, 150);
+
+		store.setDefault(ITourbookPreferences.GRAPH_POWER_IS_MIN_ENABLED, true);
+		store.setDefault(ITourbookPreferences.GRAPH_POWER_IS_MAX_ENABLED, true);
+		store.setDefault(ITourbookPreferences.GRAPH_POWER_MIN_VALUE, 100);
+		store.setDefault(ITourbookPreferences.GRAPH_POWER_MAX_VALUE, 400);
 
 		store.setDefault(ITourbookPreferences.GRAPH_PULSE_IS_MIN_ENABLED, false);
 		store.setDefault(ITourbookPreferences.GRAPH_PULSE_IS_MAX_ENABLED, false);
 		store.setDefault(ITourbookPreferences.GRAPH_PULSE_MIN_VALUE, 50);
 		store.setDefault(ITourbookPreferences.GRAPH_PULSE_MAX_VALUE, 200);
+
+		store.setDefault(ITourbookPreferences.GRAPH_TEMPERATURE_IS_MIN_ENABLED, false);
+		store.setDefault(ITourbookPreferences.GRAPH_TEMPERATURE_IS_MAX_ENABLED, false);
+		store.setDefault(ITourbookPreferences.GRAPH_TEMPERATURE_MIN_VALUE, -20);
+		store.setDefault(ITourbookPreferences.GRAPH_TEMPERATURE_MAX_VALUE, 50);
 
 		// value point tool tip
 		store.setDefault(ITourbookPreferences.VALUE_POINT_TOOL_TIP_IS_VISIBLE, true);

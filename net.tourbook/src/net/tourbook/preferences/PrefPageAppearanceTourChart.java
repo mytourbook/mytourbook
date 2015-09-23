@@ -71,12 +71,14 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 	private static final String		GRAPH_LABEL_ALTIMETER						= net.tourbook.common.Messages.Graph_Label_Altimeter;
 	private static final String		GRAPH_LABEL_ALTITUDE						= net.tourbook.common.Messages.Graph_Label_Altitude;
 	private static final String		GRAPH_LABEL_CADENCE							= net.tourbook.common.Messages.Graph_Label_Cadence;
+	private static final String		GRAPH_LABEL_CADENCE_UNIT					= net.tourbook.common.Messages.Graph_Label_Cadence_Unit;
 	private static final String		GRAPH_LABEL_GEARS							= net.tourbook.common.Messages.Graph_Label_Gears;
 	private static final String		GRAPH_LABEL_GRADIENT						= net.tourbook.common.Messages.Graph_Label_Gradient;
 	private static final String		GRAPH_LABEL_HEARTBEAT						= net.tourbook.common.Messages.Graph_Label_Heartbeat;
 	private static final String		GRAPH_LABEL_HEARTBEAT_UNIT					= net.tourbook.common.Messages.Graph_Label_Heartbeat_Unit;
 	private static final String		GRAPH_LABEL_PACE							= net.tourbook.common.Messages.Graph_Label_Pace;
 	private static final String		GRAPH_LABEL_POWER							= net.tourbook.common.Messages.Graph_Label_Power;
+	private static final String		GRAPH_LABEL_POWER_UNIT						= net.tourbook.common.Messages.Graph_Label_Power_Unit;
 	private static final String		GRAPH_LABEL_SHOW_HR_ZONE_BACKGROUND_TOOLTIP	= net.tourbook.common.Messages.Graph_Label_ShowHrZoneBackground_Tooltip;
 	private static final String		GRAPH_LABEL_SHOW_HR_ZONE_BACKGROUND			= net.tourbook.common.Messages.Graph_Label_ShowHrZoneBackground;
 	private static final String		GRAPH_LABEL_SPEED							= net.tourbook.common.Messages.Graph_Label_Speed;
@@ -86,10 +88,15 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 
 	private static final int		ALTIMETER_MIN								= -10000;
 	private static final int		ALTIMETER_MAX								= 10000;
+	private static final int		ALTITUDE_MIN								= -1000;
+	private static final int		ALTITUDE_MAX								= 10000;
+	private static final int		CADENCE_MAX									= 300;
 	private static final int		GRADIENT_MIN								= -100;
 	private static final int		GRADIENT_MAX								= 100;
-	private static final int		PACE_MIN									= 0;
 	private static final int		PACE_MAX									= 60;
+	private static final int		POWER_MAX									= 1000;
+	private static final int		SPEED_MAX									= 1000;
+	private static final int		TEMPERATURE_MAX								= 100;
 
 	private final IPreferenceStore	_prefStore									= TourbookPlugin.getPrefStore();
 
@@ -120,16 +127,27 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 	private Button					_btnDown;
 	private Button					_btnUp;
 
+	private Button					_chkEnableMinMax;
 	private Button					_chkGraphAntialiasing;
 	private Button					_chkLiveUpdate;
-	private Button					_chkMinAltimeter;
-	private Button					_chkMaxAltimeter;
-	private Button					_chkMinGradient;
-	private Button					_chkMaxGradient;
-	private Button					_chkMinPace;
-	private Button					_chkMaxPace;
-	private Button					_chkMinPulse;
-	private Button					_chkMaxPulse;
+	private Button					_chkMin_Altimeter;
+	private Button					_chkMax_Altimeter;
+	private Button					_chkMin_Altitude;
+	private Button					_chkMax_Altitude;
+	private Button					_chkMin_Cadence;
+	private Button					_chkMax_Cadence;
+	private Button					_chkMin_Gradient;
+	private Button					_chkMax_Gradient;
+	private Button					_chkMin_Pace;
+	private Button					_chkMax_Pace;
+	private Button					_chkMin_Power;
+	private Button					_chkMax_Power;
+	private Button					_chkMin_Pulse;
+	private Button					_chkMax_Pulse;
+	private Button					_chkMax_Speed;
+	private Button					_chkMin_Speed;
+	private Button					_chkMin_Temperature;
+	private Button					_chkMax_Temperature;
 	private Button					_chkMoveSlidersWhenZoomed;
 	private Button					_chkSegmentAlternateColor;
 	private Button					_chkShowHorizontalGridLines;
@@ -138,23 +156,54 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 	private Button					_chkShowVerticalGridLines;
 	private Button					_chkZoomToSlider;
 
+	private Label					_lblMaxValue;
+	private Label					_lblMinValue;
+	private Label					_lblMinMax_Altimeter;
+	private Label					_lblMinMax_AltimeterUnit;
+	private Label					_lblMinMax_Altitude;
+	private Label					_lblMinMax_AltitudeUnit;
+	private Label					_lblMinMax_Cadence;
+	private Label					_lblMinMax_CadenceUnit;
+	private Label					_lblMinMax_Gradient;
+	private Label					_lblMinMax_GradientUnit;
+	private Label					_lblMinMax_Pulse;
+	private Label					_lblMinMax_PulseUnit;
+	private Label					_lblMinMax_Pace;
+	private Label					_lblMinMax_PaceUnit;
+	private Label					_lblMinMax_Power;
+	private Label					_lblMinMax_PowerUnit;
+	private Label					_lblMinMax_Speed;
+	private Label					_lblMinMax_SpeedUnit;
+	private Label					_lblMinMax_Temperature;
+	private Label					_lblMinMax_TemperatureUnit;
+
 	private Button					_rdoMouseModeSlider;
 	private Button					_rdoMouseModeZoom;
 	private Button					_rdoShowDistance;
 	private Button					_rdoShowTime;
 
-	private Spinner					_spinnerAltimeterMin;
-	private Spinner					_spinnerAltimeterMax;
-	private Spinner					_spinnerGradientMin;
-	private Spinner					_spinnerGradientMax;
 	private Spinner					_spinnerGraphTransparencyLine;
 	private Spinner					_spinnerGraphTransparencyFilling;
 	private Spinner					_spinnerGridHorizontalDistance;
 	private Spinner					_spinnerGridVerticalDistance;
-	private Spinner					_spinnerPaceMin;
-	private Spinner					_spinnerPaceMax;
-	private Spinner					_spinnerPulseMin;
-	private Spinner					_spinnerPulseMax;
+	private Spinner					_spinnerMin_Altimeter;
+	private Spinner					_spinnerMax_Altimeter;
+	private Spinner					_spinnerMin_Altitude;
+	private Spinner					_spinnerMax_Altitude;
+	private Spinner					_spinnerMin_Cadence;
+	private Spinner					_spinnerMax_Cadence;
+	private Spinner					_spinnerMin_Gradient;
+	private Spinner					_spinnerMax_Gradient;
+	private Spinner					_spinnerMin_Pace;
+	private Spinner					_spinnerMax_Pace;
+	private Spinner					_spinnerMin_Power;
+	private Spinner					_spinnerMax_Power;
+	private Spinner					_spinnerMin_Pulse;
+	private Spinner					_spinnerMax_Pulse;
+	private Spinner					_spinnerMin_Speed;
+	private Spinner					_spinnerMax_Speed;
+	private Spinner					_spinnerMin_Temperature;
+	private Spinner					_spinnerMax_Temperature;
 
 	private ColorSelector			_colorSegmentAlternateColor;
 
@@ -206,7 +255,7 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 
 				_tab3_Grid = new TabItem(_tabFolder, SWT.NONE);
 				_tab3_Grid.setText(Messages.Pref_Graphs_Tab_Grid);
-				_tab3_Grid.setControl(createUI_60_Tab_3_Grid(_tabFolder));
+				_tab3_Grid.setControl(createUI_70_Tab_3_Grid(_tabFolder));
 
 				_tab4_Options = new TabItem(_tabFolder, SWT.NONE);
 				_tab4_Options.setText(Messages.Pref_Graphs_Tab_zoom_options);
@@ -460,233 +509,193 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 					.spacing(_pc.convertHorizontalDLUsToPixels(4), _pc.convertVerticalDLUsToPixels(4))
 					.applyTo(group);
 			group.setText(Messages.Pref_Graphs_force_minimum_value);
+//			group.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
 			{
-				createUI_52_Header(group);
-				createUI_54_MinMax_Altimeter(group);
-				createUI_55_MinMax_Gradient(group);
-				createUI_56_MinMax_Heartbeat(group);
-				createUI_58_MinMax_Pace(group);
+				createUI_52_MinMax_Enable(group);
+				createUI_54_MinMax_Header(group);
+
+				createUI_61_MinMax_Altitude(group);
+				createUI_62_MinMax_Altimeter(group);
+				createUI_63_MinMax_Gradient(group);
+				createUI_64_MinMax_Heartbeat(group);
+				createUI_65_MinMax_Speed(group);
+				createUI_66_MinMax_Pace(group);
+				createUI_67_MinMax_Cadence(group);
+				createUI_68_MinMax_Power(group);
+				createUI_69_MinMax_Temperature(group);
 			}
 		}
 
 		return container;
 	}
 
-	private void createUI_52_Header(final Group parent) {
+	private void createUI_52_MinMax_Enable(final Group parent) {
 
-		Label label;
-
-		// label: spacer
-		label = new Label(parent, SWT.NONE);
-
-		// label: min value
-		label = new Label(parent, SWT.NONE);
+		// ckeckbox: enable min/max
+		_chkEnableMinMax = new Button(parent, SWT.CHECK);
 		GridDataFactory.fillDefaults()//
-				.span(2, 1)
-				.indent(_columnSpacing, 0)
-				.applyTo(label);
-		label.setText(Messages.Pref_Graphs_Label_MinValue);
-
-		// label: max value
-		label = new Label(parent, SWT.NONE);
-		GridDataFactory.fillDefaults()//
-				.span(2, 1)
-				.indent(_columnSpacing, 0)
-				.applyTo(label);
-		label.setText(Messages.Pref_Graphs_Label_MaxValue);
-
-		// label: spacer
-		label = new Label(parent, SWT.NONE);
+				.span(6, 1)
+				.applyTo(_chkEnableMinMax);
+		_chkEnableMinMax.setText(Messages.Pref_Graphs_Checkbox_EnableMinMaxValues);
+		_chkEnableMinMax.addSelectionListener(_defaultSelectionListener);
 	}
 
-	private void createUI_54_MinMax_Altimeter(final Group parent) {
+	private void createUI_54_MinMax_Header(final Group parent) {
 
-		// label
-		final Label label = new Label(parent, SWT.NONE);
-		label.setText(Messages.Pref_Graphs_Checkbox_ForceAltimeterValue);
+		// label: spacer
+		new Label(parent, SWT.NONE);
 
-		// Altimeter min value
-		{
-			// ckeckbox
-			_chkMinAltimeter = new Button(parent, SWT.CHECK);
-			GridDataFactory.fillDefaults()//
-					.indent(_columnSpacing, 0)
-					.applyTo(_chkMinAltimeter);
-			_chkMinAltimeter.addSelectionListener(_defaultSelectionListener);
+		// label: min value
+		_lblMinValue = new Label(parent, SWT.NONE);
+		GridDataFactory.fillDefaults()//
+				.span(2, 1)
+				.indent(_columnSpacing, 0)
+				.applyTo(_lblMinValue);
+		_lblMinValue.setText(Messages.Pref_Graphs_Label_MinValue);
 
-			_spinnerAltimeterMin = new Spinner(parent, SWT.BORDER);
-			GridDataFactory.fillDefaults() //
-//					.align(SWT.FILL, SWT.CENTER)
-					.applyTo(_spinnerAltimeterMin);
-			_spinnerAltimeterMin.setMinimum(ALTIMETER_MIN);
-			_spinnerAltimeterMin.setMaximum(ALTIMETER_MAX);
-			_spinnerAltimeterMin.addMouseWheelListener(_defaultMouseWheelListener);
-			_spinnerAltimeterMin.addSelectionListener(_defaultSelectionListener);
-		}
+		// label: max value
+		_lblMaxValue = new Label(parent, SWT.NONE);
+		GridDataFactory.fillDefaults()//
+				.span(2, 1)
+				.indent(_columnSpacing, 0)
+				.applyTo(_lblMaxValue);
+		_lblMaxValue.setText(Messages.Pref_Graphs_Label_MaxValue);
 
-		// Altimeter max value
-		{
-			// ckeckbox
-			_chkMaxAltimeter = new Button(parent, SWT.CHECK);
-			GridDataFactory.fillDefaults()//
-					.indent(_columnSpacing, 0)
-					.applyTo(_chkMaxAltimeter);
-			_chkMaxAltimeter.addSelectionListener(_defaultSelectionListener);
-
-			// spinner
-			_spinnerAltimeterMax = new Spinner(parent, SWT.BORDER);
-			_spinnerAltimeterMax.setMinimum(ALTIMETER_MIN);
-			_spinnerAltimeterMax.setMaximum(ALTIMETER_MAX);
-			_spinnerAltimeterMax.addMouseWheelListener(_defaultMouseWheelListener);
-			_spinnerAltimeterMax.addSelectionListener(_defaultSelectionListener);
-		}
-
-		// spacer
+		// label: spacer
 		new Label(parent, SWT.NONE);
 	}
 
-	private void createUI_55_MinMax_Gradient(final Group parent) {
+	private void createUI_61_MinMax_Altitude(final Group parent) {
 
-		// label
-		Label label = new Label(parent, SWT.NONE);
-		label.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, false));
-		label.setText(Messages.Pref_Graphs_Checkbox_ForceGradientValue);
+		_lblMinMax_Altitude = createUI_Label(parent, Messages.Pref_Graphs_Checkbox_ForceValue_Altitude);
 
-		// Gradient min value
-		{
-			// ckeckbox
-			_chkMinGradient = new Button(parent, SWT.CHECK);
-			GridDataFactory.fillDefaults()//
-					.indent(_columnSpacing, 0)
-					.applyTo(_chkMinGradient);
-			_chkMinGradient.addSelectionListener(_defaultSelectionListener);
+		_chkMin_Altitude = createUI_Checkbox(parent);
+		_spinnerMin_Altitude = createUI_Spinner(parent, //
+				ALTITUDE_MIN,
+				ALTITUDE_MAX);
 
-			// spinner
-			_spinnerGradientMin = new Spinner(parent, SWT.BORDER);
-			GridDataFactory.fillDefaults().applyTo(_spinnerGradientMin);
-			_spinnerGradientMin.setMinimum(GRADIENT_MIN);
-			_spinnerGradientMin.setMaximum(GRADIENT_MAX);
-			_spinnerGradientMin.addMouseWheelListener(_defaultMouseWheelListener);
-			_spinnerGradientMin.addSelectionListener(_defaultSelectionListener);
-		}
+		_chkMax_Altitude = createUI_Checkbox(parent);
+		_spinnerMax_Altitude = createUI_Spinner(parent, //
+				ALTITUDE_MIN,
+				ALTITUDE_MAX);
 
-		// Gradient max value
-		{
-			// ckeckbox
-			_chkMaxGradient = new Button(parent, SWT.CHECK);
-			GridDataFactory.fillDefaults()//
-					.indent(_columnSpacing, 0)
-					.applyTo(_chkMaxGradient);
-			_chkMaxGradient.addSelectionListener(_defaultSelectionListener);
-
-			// spinner
-			_spinnerGradientMax = new Spinner(parent, SWT.BORDER);
-			GridDataFactory.fillDefaults().applyTo(_spinnerGradientMax);
-			_spinnerGradientMax.setMinimum(GRADIENT_MIN);
-			_spinnerGradientMax.setMaximum(GRADIENT_MAX);
-			_spinnerGradientMax.addMouseWheelListener(_defaultMouseWheelListener);
-			_spinnerGradientMax.addSelectionListener(_defaultSelectionListener);
-		}
-
-		// label: %
-		label = new Label(parent, SWT.NONE);
-		label.setText(UI.SYMBOL_PERCENTAGE);
+		_lblMinMax_AltitudeUnit = createUI_Label(parent, UI.UNIT_LABEL_ALTITUDE);
 	}
 
-	private void createUI_56_MinMax_Heartbeat(final Group parent) {
+	private void createUI_62_MinMax_Altimeter(final Group parent) {
 
-		// label
-		Label label = new Label(parent, SWT.NONE);
-		label.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, false));
-		label.setText(Messages.Pref_Graphs_Checkbox_ForcePulseValue);
+		_lblMinMax_Altimeter = createUI_Label(parent, Messages.Pref_Graphs_Checkbox_ForceAltimeterValue);
 
-		// Pulse min value
-		{
-			// ckeckbox
-			_chkMinPulse = new Button(parent, SWT.CHECK);
-			GridDataFactory.fillDefaults()//
-					.indent(_columnSpacing, 0)
-					.applyTo(_chkMinPulse);
-			_chkMinPulse.addSelectionListener(_defaultSelectionListener);
+		_chkMin_Altimeter = createUI_Checkbox(parent);
+		_spinnerMin_Altimeter = createUI_Spinner(parent, //
+				ALTIMETER_MIN,
+				ALTIMETER_MAX);
 
-			// spinner
-			_spinnerPulseMin = new Spinner(parent, SWT.BORDER);
-			GridDataFactory.fillDefaults().applyTo(_spinnerPulseMin);
-			_spinnerPulseMin.setMinimum(PrefPagePeople.HEART_BEAT_MIN);
-			_spinnerPulseMin.setMaximum(PrefPagePeople.HEART_BEAT_MAX);
-			_spinnerPulseMin.addMouseWheelListener(_defaultMouseWheelListener);
-			_spinnerPulseMin.addSelectionListener(_defaultSelectionListener);
-		}
+		_chkMax_Altimeter = createUI_Checkbox(parent);
+		_spinnerMax_Altimeter = createUI_Spinner(parent, //
+				ALTIMETER_MIN,
+				ALTIMETER_MAX);
 
-		// Pulse max value
-		{
-			// ckeckbox
-			_chkMaxPulse = new Button(parent, SWT.CHECK);
-			GridDataFactory.fillDefaults()//
-					.indent(_columnSpacing, 0)
-					.applyTo(_chkMaxPulse);
-			_chkMaxPulse.addSelectionListener(_defaultSelectionListener);
-
-			// spinner
-			_spinnerPulseMax = new Spinner(parent, SWT.BORDER);
-			GridDataFactory.fillDefaults().applyTo(_spinnerPulseMax);
-			_spinnerPulseMax.setMinimum(PrefPagePeople.HEART_BEAT_MIN);
-			_spinnerPulseMax.setMaximum(PrefPagePeople.HEART_BEAT_MAX);
-			_spinnerPulseMax.addMouseWheelListener(_defaultMouseWheelListener);
-			_spinnerPulseMax.addSelectionListener(_defaultSelectionListener);
-		}
-
-		// label: bpm
-		label = new Label(parent, SWT.NONE);
-		label.setText(GRAPH_LABEL_HEARTBEAT_UNIT);
+		_lblMinMax_AltimeterUnit = createUI_Label(parent, UI.UNIT_LABEL_ALTIMETER);
 	}
 
-	private void createUI_58_MinMax_Pace(final Group parent) {
+	private void createUI_63_MinMax_Gradient(final Group parent) {
 
-		// label
-		Label label = new Label(parent, SWT.NONE);
-		label.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, false));
-		label.setText(Messages.Pref_Graphs_Checkbox_ForcePaceValue);
+		_lblMinMax_Gradient = createUI_Label(parent, Messages.Pref_Graphs_Checkbox_ForceGradientValue);
 
-		// Pace min value
-		{
-			// ckeckbox
-			_chkMinPace = new Button(parent, SWT.CHECK);
-			GridDataFactory.fillDefaults()//
-					.indent(_columnSpacing, 0)
-					.applyTo(_chkMinPace);
-			_chkMinPace.addSelectionListener(_defaultSelectionListener);
+		_chkMin_Gradient = createUI_Checkbox(parent);
+		_spinnerMin_Gradient = createUI_Spinner(parent, //
+				GRADIENT_MIN,
+				GRADIENT_MAX);
 
-			// spinner
-			_spinnerPaceMin = new Spinner(parent, SWT.BORDER);
-			GridDataFactory.fillDefaults().applyTo(_spinnerPaceMin);
-			_spinnerPaceMin.setMinimum(PACE_MIN);
-			_spinnerPaceMin.setMaximum(PACE_MAX);
-			_spinnerPaceMin.addMouseWheelListener(_defaultMouseWheelListener);
-			_spinnerPaceMin.addSelectionListener(_defaultSelectionListener);
-		}
+		_chkMax_Gradient = createUI_Checkbox(parent);
+		_spinnerMax_Gradient = createUI_Spinner(parent, //
+				GRADIENT_MIN,
+				GRADIENT_MAX);
 
-		// Pace max value
-		{
-			// ckeckbox
-			_chkMaxPace = new Button(parent, SWT.CHECK);
-			GridDataFactory.fillDefaults()//
-					.indent(_columnSpacing, 0)
-					.applyTo(_chkMaxPace);
-			_chkMaxPace.addSelectionListener(_defaultSelectionListener);
+		_lblMinMax_GradientUnit = createUI_Label(parent, UI.SYMBOL_PERCENTAGE);
+	}
 
-			// spinner
-			_spinnerPaceMax = new Spinner(parent, SWT.BORDER);
-			GridDataFactory.fillDefaults().applyTo(_spinnerPaceMax);
-			_spinnerPaceMax.setMinimum(PACE_MIN);
-			_spinnerPaceMax.setMaximum(PACE_MAX);
-			_spinnerPaceMax.addMouseWheelListener(_defaultMouseWheelListener);
-			_spinnerPaceMax.addSelectionListener(_defaultSelectionListener);
-		}
+	private void createUI_64_MinMax_Heartbeat(final Group parent) {
 
-		// label: minutes
-		label = new Label(parent, SWT.NONE);
-		label.setText(Messages.app_unit_minutes);
+		_lblMinMax_Pulse = createUI_Label(parent, Messages.Pref_Graphs_Checkbox_ForcePulseValue);
+
+		_chkMin_Pulse = createUI_Checkbox(parent);
+		_spinnerMin_Pulse = createUI_Spinner(parent, //
+				PrefPagePeople.HEART_BEAT_MIN,
+				PrefPagePeople.HEART_BEAT_MAX);
+
+		_chkMax_Pulse = createUI_Checkbox(parent);
+		_spinnerMax_Pulse = createUI_Spinner(parent, //
+				PrefPagePeople.HEART_BEAT_MIN,
+				PrefPagePeople.HEART_BEAT_MAX);
+
+		_lblMinMax_PulseUnit = createUI_Label(parent, GRAPH_LABEL_HEARTBEAT_UNIT);
+	}
+
+	private void createUI_65_MinMax_Speed(final Group parent) {
+
+		_lblMinMax_Speed = createUI_Label(parent, Messages.Pref_Graphs_Checkbox_ForceValue_Speed);
+
+		_chkMin_Speed = createUI_Checkbox(parent);
+		_spinnerMin_Speed = createUI_Spinner(parent, 0, SPEED_MAX);
+
+		_chkMax_Speed = createUI_Checkbox(parent);
+		_spinnerMax_Speed = createUI_Spinner(parent, 0, SPEED_MAX);
+
+		_lblMinMax_SpeedUnit = createUI_Label(parent, UI.UNIT_LABEL_SPEED);
+	}
+
+	private void createUI_66_MinMax_Pace(final Group parent) {
+
+		_lblMinMax_Pace = createUI_Label(parent, Messages.Pref_Graphs_Checkbox_ForcePaceValue);
+
+		_chkMin_Pace = createUI_Checkbox(parent);
+		_spinnerMin_Pace = createUI_Spinner(parent, 0, PACE_MAX);
+
+		_chkMax_Pace = createUI_Checkbox(parent);
+		_spinnerMax_Pace = createUI_Spinner(parent, 0, PACE_MAX);
+
+		_lblMinMax_PaceUnit = createUI_Label(parent, Messages.app_unit_minutes);
+	}
+
+	private void createUI_67_MinMax_Cadence(final Group parent) {
+
+		_lblMinMax_Cadence = createUI_Label(parent, Messages.Pref_Graphs_Checkbox_ForceValue_Cadence);
+
+		_chkMin_Cadence = createUI_Checkbox(parent);
+		_spinnerMin_Cadence = createUI_Spinner(parent, 0, CADENCE_MAX);
+
+		_chkMax_Cadence = createUI_Checkbox(parent);
+		_spinnerMax_Cadence = createUI_Spinner(parent, 0, CADENCE_MAX);
+
+		_lblMinMax_CadenceUnit = createUI_Label(parent, GRAPH_LABEL_CADENCE_UNIT);
+	}
+
+	private void createUI_68_MinMax_Power(final Group parent) {
+
+		_lblMinMax_Power = createUI_Label(parent, Messages.Pref_Graphs_Checkbox_ForceValue_Power);
+
+		_chkMin_Power = createUI_Checkbox(parent);
+		_spinnerMin_Power = createUI_Spinner(parent, 0, POWER_MAX);
+
+		_chkMax_Power = createUI_Checkbox(parent);
+		_spinnerMax_Power = createUI_Spinner(parent, 0, POWER_MAX);
+
+		_lblMinMax_PowerUnit = createUI_Label(parent, GRAPH_LABEL_POWER_UNIT);
+	}
+
+	private void createUI_69_MinMax_Temperature(final Group parent) {
+
+		_lblMinMax_Temperature = createUI_Label(parent, Messages.Pref_Graphs_Checkbox_ForceValue_Temperature);
+
+		_chkMin_Temperature = createUI_Checkbox(parent);
+		_spinnerMin_Temperature = createUI_Spinner(parent, 0, TEMPERATURE_MAX);
+
+		_chkMax_Temperature = createUI_Checkbox(parent);
+		_spinnerMax_Temperature = createUI_Spinner(parent, 0, TEMPERATURE_MAX);
+
+		_lblMinMax_TemperatureUnit = createUI_Label(parent, UI.UNIT_LABEL_TEMPERATURE);
 	}
 
 	/**
@@ -694,19 +703,19 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 	 * 
 	 * @return
 	 */
-	private Control createUI_60_Tab_3_Grid(final Composite parent) {
+	private Control createUI_70_Tab_3_Grid(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridLayoutFactory.swtDefaults().applyTo(container);
 		{
-			createUI_62_Grid(container);
-			createUI_64_XAxisUnits(container);
+			createUI_72_Grid(container);
+			createUI_74_XAxisUnits(container);
 		}
 
 		return container;
 	}
 
-	private void createUI_62_Grid(final Composite parent) {
+	private void createUI_72_Grid(final Composite parent) {
 
 		final SelectionAdapter gridLineListener = new SelectionAdapter() {
 			@Override
@@ -796,7 +805,7 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 		}
 	}
 
-	private void createUI_64_XAxisUnits(final Composite container) {
+	private void createUI_74_XAxisUnits(final Composite container) {
 
 		// group: units for the x-axis
 		final Group group = new Group(container, SWT.NONE);
@@ -900,6 +909,41 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 		}
 	}
 
+	private Button createUI_Checkbox(final Group parent) {
+
+		// ckeckbox
+		final Button checkbox = new Button(parent, SWT.CHECK);
+		GridDataFactory.fillDefaults()//
+				.indent(_columnSpacing, 0)
+				.applyTo(checkbox);
+		checkbox.addSelectionListener(_defaultSelectionListener);
+
+		return checkbox;
+	}
+
+	private Label createUI_Label(final Group parent, final String text) {
+
+		// label
+		final Label label = new Label(parent, SWT.NONE);
+		label.setText(text);
+
+		return label;
+	}
+
+	private Spinner createUI_Spinner(final Group parent, final int minValue, final int maxValue) {
+
+		final Spinner spinner = new Spinner(parent, SWT.BORDER);
+		GridDataFactory.fillDefaults()//
+				.align(SWT.END, SWT.FILL)
+				.applyTo(spinner);
+		spinner.setMinimum(minValue);
+		spinner.setMaximum(maxValue);
+		spinner.addMouseWheelListener(_defaultMouseWheelListener);
+		spinner.addSelectionListener(_defaultSelectionListener);
+
+		return spinner;
+	}
+
 	private void doLiveUpdate() {
 
 		if (_chkLiveUpdate.getSelection()) {
@@ -914,17 +958,67 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 
 	private void enableControls() {
 
-		_spinnerAltimeterMin.setEnabled(_chkMinAltimeter.getSelection());
-		_spinnerAltimeterMax.setEnabled(_chkMaxAltimeter.getSelection());
+		final boolean isMinMaxEnabled = _chkEnableMinMax.getSelection();
 
-		_spinnerGradientMin.setEnabled(_chkMinGradient.getSelection());
-		_spinnerGradientMax.setEnabled(_chkMaxGradient.getSelection());
+		_lblMinValue.setEnabled(isMinMaxEnabled);
+		_lblMaxValue.setEnabled(isMinMaxEnabled);
 
-		_spinnerPaceMin.setEnabled(_chkMinPace.getSelection());
-		_spinnerPaceMax.setEnabled(_chkMaxPace.getSelection());
+		_lblMinMax_Altimeter.setEnabled(isMinMaxEnabled);
+		_lblMinMax_AltimeterUnit.setEnabled(isMinMaxEnabled);
+		_lblMinMax_Altitude.setEnabled(isMinMaxEnabled);
+		_lblMinMax_AltitudeUnit.setEnabled(isMinMaxEnabled);
+		_lblMinMax_Cadence.setEnabled(isMinMaxEnabled);
+		_lblMinMax_CadenceUnit.setEnabled(isMinMaxEnabled);
+		_lblMinMax_Gradient.setEnabled(isMinMaxEnabled);
+		_lblMinMax_GradientUnit.setEnabled(isMinMaxEnabled);
+		_lblMinMax_Pace.setEnabled(isMinMaxEnabled);
+		_lblMinMax_PaceUnit.setEnabled(isMinMaxEnabled);
+		_lblMinMax_Power.setEnabled(isMinMaxEnabled);
+		_lblMinMax_PowerUnit.setEnabled(isMinMaxEnabled);
+		_lblMinMax_Pulse.setEnabled(isMinMaxEnabled);
+		_lblMinMax_PulseUnit.setEnabled(isMinMaxEnabled);
+		_lblMinMax_Speed.setEnabled(isMinMaxEnabled);
+		_lblMinMax_SpeedUnit.setEnabled(isMinMaxEnabled);
+		_lblMinMax_Temperature.setEnabled(isMinMaxEnabled);
+		_lblMinMax_TemperatureUnit.setEnabled(isMinMaxEnabled);
 
-		_spinnerPulseMin.setEnabled(_chkMinPulse.getSelection());
-		_spinnerPulseMax.setEnabled(_chkMaxPulse.getSelection());
+		_chkMin_Altimeter.setEnabled(isMinMaxEnabled);
+		_chkMax_Altimeter.setEnabled(isMinMaxEnabled);
+		_chkMin_Altitude.setEnabled(isMinMaxEnabled);
+		_chkMax_Altitude.setEnabled(isMinMaxEnabled);
+		_chkMin_Cadence.setEnabled(isMinMaxEnabled);
+		_chkMax_Cadence.setEnabled(isMinMaxEnabled);
+		_chkMin_Gradient.setEnabled(isMinMaxEnabled);
+		_chkMax_Gradient.setEnabled(isMinMaxEnabled);
+		_chkMin_Pace.setEnabled(isMinMaxEnabled);
+		_chkMax_Pace.setEnabled(isMinMaxEnabled);
+		_chkMin_Power.setEnabled(isMinMaxEnabled);
+		_chkMax_Power.setEnabled(isMinMaxEnabled);
+		_chkMin_Pulse.setEnabled(isMinMaxEnabled);
+		_chkMax_Pulse.setEnabled(isMinMaxEnabled);
+		_chkMin_Speed.setEnabled(isMinMaxEnabled);
+		_chkMax_Speed.setEnabled(isMinMaxEnabled);
+		_chkMin_Temperature.setEnabled(isMinMaxEnabled);
+		_chkMax_Temperature.setEnabled(isMinMaxEnabled);
+
+		_spinnerMin_Altimeter.setEnabled(isMinMaxEnabled && _chkMin_Altimeter.getSelection());
+		_spinnerMax_Altimeter.setEnabled(isMinMaxEnabled && _chkMax_Altimeter.getSelection());
+		_spinnerMin_Altitude.setEnabled(isMinMaxEnabled && _chkMin_Altitude.getSelection());
+		_spinnerMax_Altitude.setEnabled(isMinMaxEnabled && _chkMax_Altitude.getSelection());
+		_spinnerMin_Cadence.setEnabled(isMinMaxEnabled && _chkMin_Cadence.getSelection());
+		_spinnerMax_Cadence.setEnabled(isMinMaxEnabled && _chkMax_Cadence.getSelection());
+		_spinnerMin_Gradient.setEnabled(isMinMaxEnabled && _chkMin_Gradient.getSelection());
+		_spinnerMax_Gradient.setEnabled(isMinMaxEnabled && _chkMax_Gradient.getSelection());
+		_spinnerMin_Pace.setEnabled(isMinMaxEnabled && _chkMin_Pace.getSelection());
+		_spinnerMax_Pace.setEnabled(isMinMaxEnabled && _chkMax_Pace.getSelection());
+		_spinnerMin_Power.setEnabled(isMinMaxEnabled && _chkMin_Power.getSelection());
+		_spinnerMax_Power.setEnabled(isMinMaxEnabled && _chkMax_Power.getSelection());
+		_spinnerMin_Pulse.setEnabled(isMinMaxEnabled && _chkMin_Pulse.getSelection());
+		_spinnerMax_Pulse.setEnabled(isMinMaxEnabled && _chkMax_Pulse.getSelection());
+		_spinnerMin_Speed.setEnabled(isMinMaxEnabled && _chkMin_Speed.getSelection());
+		_spinnerMax_Speed.setEnabled(isMinMaxEnabled && _chkMax_Speed.getSelection());
+		_spinnerMin_Temperature.setEnabled(isMinMaxEnabled && _chkMin_Temperature.getSelection());
+		_spinnerMax_Temperature.setEnabled(isMinMaxEnabled && _chkMax_Temperature.getSelection());
 
 		_colorSegmentAlternateColor.setEnabled(_chkSegmentAlternateColor.getSelection());
 	}
@@ -1184,45 +1278,62 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 
 		} else if (selectedTab == _tab2_MinMax) {
 
-			// min/max altimeter
-			_chkMinAltimeter.setSelection(//
-					_prefStore.getDefaultBoolean(ITourbookPreferences.GRAPH_ALTIMETER_IS_MIN_ENABLED));
-			_chkMaxAltimeter.setSelection(//
-					_prefStore.getDefaultBoolean(ITourbookPreferences.GRAPH_ALTIMETER_IS_MAX_ENABLED));
-			_spinnerAltimeterMin.setSelection(//
-					_prefStore.getDefaultInt(ITourbookPreferences.GRAPH_ALTIMETER_MIN_VALUE));
-			_spinnerAltimeterMax.setSelection(//
-					_prefStore.getDefaultInt(ITourbookPreferences.GRAPH_ALTIMETER_MAX_VALUE));
+			_chkEnableMinMax.setSelection(//
+					_prefStore.getDefaultBoolean(ITourbookPreferences.GRAPH_IS_MIN_MAX_ENABLED));
 
-			// min/max gradient
-			_chkMinGradient.setSelection(//
-					_prefStore.getDefaultBoolean(ITourbookPreferences.GRAPH_GRADIENT_IS_MIN_ENABLED));
-			_chkMaxGradient.setSelection(//
-					_prefStore.getDefaultBoolean(ITourbookPreferences.GRAPH_GRADIENT_IS_MAX_ENABLED));
-			_spinnerGradientMin.setSelection(//
-					_prefStore.getDefaultInt(ITourbookPreferences.GRAPH_GRADIENT_MIN_VALUE));
-			_spinnerGradientMax.setSelection(//
-					_prefStore.getDefaultInt(ITourbookPreferences.GRAPH_GRADIENT_MAX_VALUE));
-
-			// min/max pace
-			_chkMinPace.setSelection(//
-					_prefStore.getDefaultBoolean(ITourbookPreferences.GRAPH_PACE_IS_MIN_ENABLED));
-			_chkMaxPace.setSelection(//
-					_prefStore.getDefaultBoolean(ITourbookPreferences.GRAPH_PACE_IS_MAX_ENABLED));
-			_spinnerPaceMin.setSelection(//
-					_prefStore.getDefaultInt(ITourbookPreferences.GRAPH_PACE_MIN_VALUE));
-			_spinnerPaceMax.setSelection(//
-					_prefStore.getDefaultInt(ITourbookPreferences.GRAPH_PACE_MAX_VALUE));
+			// min/max altitude
+			prefRestoreDefault(_chkMin_Altitude, ITourbookPreferences.GRAPH_ALTITUDE_IS_MIN_ENABLED);
+			prefRestoreDefault(_chkMax_Altitude, ITourbookPreferences.GRAPH_ALTITUDE_IS_MAX_ENABLED);
+			prefRestoreDefault(_spinnerMin_Altitude, ITourbookPreferences.GRAPH_ALTITUDE_MIN_VALUE);
+			prefRestoreDefault(_spinnerMax_Altitude, ITourbookPreferences.GRAPH_ALTITUDE_MAX_VALUE);
 
 			// min/max pulse
-			_chkMinPulse.setSelection(//
-					_prefStore.getDefaultBoolean(ITourbookPreferences.GRAPH_PULSE_IS_MIN_ENABLED));
-			_chkMaxPulse.setSelection(//
-					_prefStore.getDefaultBoolean(ITourbookPreferences.GRAPH_PULSE_IS_MAX_ENABLED));
-			_spinnerPulseMin.setSelection(//
-					_prefStore.getDefaultInt(ITourbookPreferences.GRAPH_PULSE_MIN_VALUE));
-			_spinnerPulseMax.setSelection(//
-					_prefStore.getDefaultInt(ITourbookPreferences.GRAPH_PULSE_MAX_VALUE));
+			prefRestoreDefault(_chkMin_Pulse, ITourbookPreferences.GRAPH_PULSE_IS_MIN_ENABLED);
+			prefRestoreDefault(_chkMax_Pulse, ITourbookPreferences.GRAPH_PULSE_IS_MAX_ENABLED);
+			prefRestoreDefault(_spinnerMin_Pulse, ITourbookPreferences.GRAPH_PULSE_MIN_VALUE);
+			prefRestoreDefault(_spinnerMax_Pulse, ITourbookPreferences.GRAPH_PULSE_MAX_VALUE);
+
+			// min/max speed
+			prefRestoreDefault(_chkMin_Speed, ITourbookPreferences.GRAPH_SPEED_IS_MIN_ENABLED);
+			prefRestoreDefault(_chkMax_Speed, ITourbookPreferences.GRAPH_SPEED_IS_MAX_ENABLED);
+			prefRestoreDefault(_spinnerMin_Speed, ITourbookPreferences.GRAPH_SPEED_MIN_VALUE);
+			prefRestoreDefault(_spinnerMax_Speed, ITourbookPreferences.GRAPH_SPEED_MAX_VALUE);
+
+			// min/max pace
+			prefRestoreDefault(_chkMin_Pace, ITourbookPreferences.GRAPH_PACE_IS_MIN_ENABLED);
+			prefRestoreDefault(_chkMax_Pace, ITourbookPreferences.GRAPH_PACE_IS_MAX_ENABLED);
+			prefRestoreDefault(_spinnerMin_Pace, ITourbookPreferences.GRAPH_PACE_MIN_VALUE);
+			prefRestoreDefault(_spinnerMax_Pace, ITourbookPreferences.GRAPH_PACE_MAX_VALUE);
+
+			// min/max cadence
+			prefRestoreDefault(_chkMin_Cadence, ITourbookPreferences.GRAPH_CADENCE_IS_MIN_ENABLED);
+			prefRestoreDefault(_chkMax_Cadence, ITourbookPreferences.GRAPH_CADENCE_IS_MAX_ENABLED);
+			prefRestoreDefault(_spinnerMin_Cadence, ITourbookPreferences.GRAPH_CADENCE_MIN_VALUE);
+			prefRestoreDefault(_spinnerMax_Cadence, ITourbookPreferences.GRAPH_CADENCE_MAX_VALUE);
+
+			// min/max gradient
+			prefRestoreDefault(_chkMin_Gradient, ITourbookPreferences.GRAPH_GRADIENT_IS_MIN_ENABLED);
+			prefRestoreDefault(_chkMax_Gradient, ITourbookPreferences.GRAPH_GRADIENT_IS_MAX_ENABLED);
+			prefRestoreDefault(_spinnerMin_Gradient, ITourbookPreferences.GRAPH_GRADIENT_MIN_VALUE);
+			prefRestoreDefault(_spinnerMax_Gradient, ITourbookPreferences.GRAPH_GRADIENT_MAX_VALUE);
+
+			// min/max altimeter
+			prefRestoreDefault(_chkMin_Altimeter, ITourbookPreferences.GRAPH_ALTIMETER_IS_MIN_ENABLED);
+			prefRestoreDefault(_chkMax_Altimeter, ITourbookPreferences.GRAPH_ALTIMETER_IS_MAX_ENABLED);
+			prefRestoreDefault(_spinnerMin_Altimeter, ITourbookPreferences.GRAPH_ALTIMETER_MIN_VALUE);
+			prefRestoreDefault(_spinnerMax_Altimeter, ITourbookPreferences.GRAPH_ALTIMETER_MAX_VALUE);
+
+			// min/max power
+			prefRestoreDefault(_chkMin_Power, ITourbookPreferences.GRAPH_POWER_IS_MIN_ENABLED);
+			prefRestoreDefault(_chkMax_Power, ITourbookPreferences.GRAPH_POWER_IS_MAX_ENABLED);
+			prefRestoreDefault(_spinnerMin_Power, ITourbookPreferences.GRAPH_POWER_MIN_VALUE);
+			prefRestoreDefault(_spinnerMax_Power, ITourbookPreferences.GRAPH_POWER_MAX_VALUE);
+
+			// min/max temperature
+			prefRestoreDefault(_chkMin_Temperature, ITourbookPreferences.GRAPH_TEMPERATURE_IS_MIN_ENABLED);
+			prefRestoreDefault(_chkMax_Temperature, ITourbookPreferences.GRAPH_TEMPERATURE_IS_MAX_ENABLED);
+			prefRestoreDefault(_spinnerMin_Temperature, ITourbookPreferences.GRAPH_TEMPERATURE_MIN_VALUE);
+			prefRestoreDefault(_spinnerMax_Temperature, ITourbookPreferences.GRAPH_TEMPERATURE_MAX_VALUE);
 		}
 
 		// live update
@@ -1240,6 +1351,30 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 		saveState();
 
 		return super.performOk();
+	}
+
+	private void prefRestoreDefault(final Button button, final String prefName) {
+		button.setSelection(_prefStore.getDefaultBoolean(prefName));
+	}
+
+	private void prefRestoreDefault(final Spinner spinner, final String prefName) {
+		spinner.setSelection(_prefStore.getDefaultInt(prefName));
+	}
+
+	private void prefRestoreValue(final Button button, final String prefName) {
+		button.setSelection(_prefStore.getBoolean(prefName));
+	}
+
+	private void prefRestoreValue(final Spinner spinner, final String prefName) {
+		spinner.setSelection(_prefStore.getInt(prefName));
+	}
+
+	private void prefSaveValue(final Button button, final String prefName) {
+		_prefStore.setValue(prefName, button.getSelection());
+	}
+
+	private void prefSaveValue(final Spinner spinner, final String prefName) {
+		_prefStore.setValue(prefName, spinner.getSelection());
 	}
 
 	private void restoreState() {
@@ -1331,51 +1466,68 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 
 	private void restoreState_Tab_2_MinMax() {
 
-		// min/max altimeter
-		_chkMinAltimeter.setSelection(//
-				_prefStore.getBoolean(ITourbookPreferences.GRAPH_ALTIMETER_IS_MIN_ENABLED));
-		_chkMaxAltimeter.setSelection(//
-				_prefStore.getBoolean(ITourbookPreferences.GRAPH_ALTIMETER_IS_MAX_ENABLED));
-		_spinnerAltimeterMin.setSelection(//
-				_prefStore.getInt(ITourbookPreferences.GRAPH_ALTIMETER_MIN_VALUE));
-		_spinnerAltimeterMax.setSelection(//
-				_prefStore.getInt(ITourbookPreferences.GRAPH_ALTIMETER_MAX_VALUE));
+		_chkEnableMinMax.setSelection(//
+				_prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_MIN_MAX_ENABLED));
 
-		// min/max gradient
-		_chkMinGradient.setSelection(//
-				_prefStore.getBoolean(ITourbookPreferences.GRAPH_GRADIENT_IS_MIN_ENABLED));
-		_chkMaxGradient.setSelection(//
-				_prefStore.getBoolean(ITourbookPreferences.GRAPH_GRADIENT_IS_MAX_ENABLED));
-		_spinnerGradientMin.setSelection(//
-				_prefStore.getInt(ITourbookPreferences.GRAPH_GRADIENT_MIN_VALUE));
-		_spinnerGradientMax.setSelection(//
-				_prefStore.getInt(ITourbookPreferences.GRAPH_GRADIENT_MAX_VALUE));
-
-		// min/max pace
-		_chkMinPace.setSelection(//
-				_prefStore.getBoolean(ITourbookPreferences.GRAPH_PACE_IS_MIN_ENABLED));
-		_chkMaxPace.setSelection(//
-				_prefStore.getBoolean(ITourbookPreferences.GRAPH_PACE_IS_MAX_ENABLED));
-		_spinnerPaceMin.setSelection(//
-				_prefStore.getInt(ITourbookPreferences.GRAPH_PACE_MIN_VALUE));
-		_spinnerPaceMax.setSelection(//
-				_prefStore.getInt(ITourbookPreferences.GRAPH_PACE_MAX_VALUE));
+		// min/max altitude
+		prefRestoreValue(_chkMin_Altitude, ITourbookPreferences.GRAPH_ALTITUDE_IS_MIN_ENABLED);
+		prefRestoreValue(_chkMax_Altitude, ITourbookPreferences.GRAPH_ALTITUDE_IS_MAX_ENABLED);
+		prefRestoreValue(_spinnerMin_Altitude, ITourbookPreferences.GRAPH_ALTITUDE_MIN_VALUE);
+		prefRestoreValue(_spinnerMax_Altitude, ITourbookPreferences.GRAPH_ALTITUDE_MAX_VALUE);
 
 		// min/max pulse
-		_chkMinPulse.setSelection(//
-				_prefStore.getBoolean(ITourbookPreferences.GRAPH_PULSE_IS_MIN_ENABLED));
-		_chkMaxPulse.setSelection(//
-				_prefStore.getBoolean(ITourbookPreferences.GRAPH_PULSE_IS_MAX_ENABLED));
-		_spinnerPulseMin.setSelection(//
-				_prefStore.getInt(ITourbookPreferences.GRAPH_PULSE_MIN_VALUE));
-		_spinnerPulseMax.setSelection(//
-				_prefStore.getInt(ITourbookPreferences.GRAPH_PULSE_MAX_VALUE));
+		prefRestoreValue(_chkMin_Pulse, ITourbookPreferences.GRAPH_PULSE_IS_MIN_ENABLED);
+		prefRestoreValue(_chkMax_Pulse, ITourbookPreferences.GRAPH_PULSE_IS_MAX_ENABLED);
+		prefRestoreValue(_spinnerMin_Pulse, ITourbookPreferences.GRAPH_PULSE_MIN_VALUE);
+		prefRestoreValue(_spinnerMax_Pulse, ITourbookPreferences.GRAPH_PULSE_MAX_VALUE);
+
+		// min/max speed
+		prefRestoreValue(_chkMin_Speed, ITourbookPreferences.GRAPH_SPEED_IS_MIN_ENABLED);
+		prefRestoreValue(_chkMax_Speed, ITourbookPreferences.GRAPH_SPEED_IS_MAX_ENABLED);
+		prefRestoreValue(_spinnerMin_Speed, ITourbookPreferences.GRAPH_SPEED_MIN_VALUE);
+		prefRestoreValue(_spinnerMax_Speed, ITourbookPreferences.GRAPH_SPEED_MAX_VALUE);
+
+		// min/max pace
+		prefRestoreValue(_chkMin_Pace, ITourbookPreferences.GRAPH_PACE_IS_MIN_ENABLED);
+		prefRestoreValue(_chkMax_Pace, ITourbookPreferences.GRAPH_PACE_IS_MAX_ENABLED);
+		prefRestoreValue(_spinnerMin_Pace, ITourbookPreferences.GRAPH_PACE_MIN_VALUE);
+		prefRestoreValue(_spinnerMax_Pace, ITourbookPreferences.GRAPH_PACE_MAX_VALUE);
+
+		// min/max cadence
+		prefRestoreValue(_chkMin_Cadence, ITourbookPreferences.GRAPH_CADENCE_IS_MIN_ENABLED);
+		prefRestoreValue(_chkMax_Cadence, ITourbookPreferences.GRAPH_CADENCE_IS_MAX_ENABLED);
+		prefRestoreValue(_spinnerMin_Cadence, ITourbookPreferences.GRAPH_CADENCE_MIN_VALUE);
+		prefRestoreValue(_spinnerMax_Cadence, ITourbookPreferences.GRAPH_CADENCE_MAX_VALUE);
+
+		// min/max gradient
+		prefRestoreValue(_chkMin_Gradient, ITourbookPreferences.GRAPH_GRADIENT_IS_MIN_ENABLED);
+		prefRestoreValue(_chkMax_Gradient, ITourbookPreferences.GRAPH_GRADIENT_IS_MAX_ENABLED);
+		prefRestoreValue(_spinnerMin_Gradient, ITourbookPreferences.GRAPH_GRADIENT_MIN_VALUE);
+		prefRestoreValue(_spinnerMax_Gradient, ITourbookPreferences.GRAPH_GRADIENT_MAX_VALUE);
+
+		// min/max altimeter
+		prefRestoreValue(_chkMin_Altimeter, ITourbookPreferences.GRAPH_ALTIMETER_IS_MIN_ENABLED);
+		prefRestoreValue(_chkMax_Altimeter, ITourbookPreferences.GRAPH_ALTIMETER_IS_MAX_ENABLED);
+		prefRestoreValue(_spinnerMin_Altimeter, ITourbookPreferences.GRAPH_ALTIMETER_MIN_VALUE);
+		prefRestoreValue(_spinnerMax_Altimeter, ITourbookPreferences.GRAPH_ALTIMETER_MAX_VALUE);
+
+		// min/max power
+		prefRestoreValue(_chkMin_Power, ITourbookPreferences.GRAPH_POWER_IS_MIN_ENABLED);
+		prefRestoreValue(_chkMax_Power, ITourbookPreferences.GRAPH_POWER_IS_MAX_ENABLED);
+		prefRestoreValue(_spinnerMin_Power, ITourbookPreferences.GRAPH_POWER_MIN_VALUE);
+		prefRestoreValue(_spinnerMax_Power, ITourbookPreferences.GRAPH_POWER_MAX_VALUE);
+
+		// min/max temperature
+		prefRestoreValue(_chkMin_Temperature, ITourbookPreferences.GRAPH_TEMPERATURE_IS_MIN_ENABLED);
+		prefRestoreValue(_chkMax_Temperature, ITourbookPreferences.GRAPH_TEMPERATURE_IS_MAX_ENABLED);
+		prefRestoreValue(_spinnerMin_Temperature, ITourbookPreferences.GRAPH_TEMPERATURE_MIN_VALUE);
+		prefRestoreValue(_spinnerMax_Temperature, ITourbookPreferences.GRAPH_TEMPERATURE_MAX_VALUE);
 	}
 
 	private void restoreState_Tab_3_Grid() {
 
 		/*
-		 * Graid
+		 * Grid
 		 */
 		_spinnerGridHorizontalDistance.setSelection(//
 				_prefStore.getInt(ITourbookPreferences.GRAPH_GRID_HORIZONTAL_DISTANCE));
@@ -1481,29 +1633,61 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 
 	private void saveState_Tab_2_MinMax() {
 
-		// min/max altimeter
-		_prefStore.setValue(ITourbookPreferences.GRAPH_ALTIMETER_IS_MIN_ENABLED, _chkMinAltimeter.getSelection());
-		_prefStore.setValue(ITourbookPreferences.GRAPH_ALTIMETER_IS_MAX_ENABLED, _chkMaxAltimeter.getSelection());
-		_prefStore.setValue(ITourbookPreferences.GRAPH_ALTIMETER_MIN_VALUE, _spinnerAltimeterMin.getSelection());
-		_prefStore.setValue(ITourbookPreferences.GRAPH_ALTIMETER_MAX_VALUE, _spinnerAltimeterMax.getSelection());
+		_prefStore.setValue(ITourbookPreferences.GRAPH_IS_MIN_MAX_ENABLED, _chkEnableMinMax.getSelection());
 
-		// min/max gradient
-		_prefStore.setValue(ITourbookPreferences.GRAPH_GRADIENT_IS_MIN_ENABLED, _chkMinGradient.getSelection());
-		_prefStore.setValue(ITourbookPreferences.GRAPH_GRADIENT_IS_MAX_ENABLED, _chkMaxGradient.getSelection());
-		_prefStore.setValue(ITourbookPreferences.GRAPH_GRADIENT_MIN_VALUE, _spinnerGradientMin.getSelection());
-		_prefStore.setValue(ITourbookPreferences.GRAPH_GRADIENT_MAX_VALUE, _spinnerGradientMax.getSelection());
-
-		// min/max pace
-		_prefStore.setValue(ITourbookPreferences.GRAPH_PACE_IS_MIN_ENABLED, _chkMinPace.getSelection());
-		_prefStore.setValue(ITourbookPreferences.GRAPH_PACE_IS_MAX_ENABLED, _chkMaxPace.getSelection());
-		_prefStore.setValue(ITourbookPreferences.GRAPH_PACE_MIN_VALUE, _spinnerPaceMin.getSelection());
-		_prefStore.setValue(ITourbookPreferences.GRAPH_PACE_MAX_VALUE, _spinnerPaceMax.getSelection());
+		// min/max altitude
+		prefSaveValue(_chkMin_Altitude, ITourbookPreferences.GRAPH_ALTITUDE_IS_MIN_ENABLED);
+		prefSaveValue(_chkMax_Altitude, ITourbookPreferences.GRAPH_ALTITUDE_IS_MAX_ENABLED);
+		prefSaveValue(_spinnerMin_Altitude, ITourbookPreferences.GRAPH_ALTITUDE_MIN_VALUE);
+		prefSaveValue(_spinnerMax_Altitude, ITourbookPreferences.GRAPH_ALTITUDE_MAX_VALUE);
 
 		// min/max pulse
-		_prefStore.setValue(ITourbookPreferences.GRAPH_PULSE_IS_MIN_ENABLED, _chkMinPulse.getSelection());
-		_prefStore.setValue(ITourbookPreferences.GRAPH_PULSE_IS_MAX_ENABLED, _chkMaxPulse.getSelection());
-		_prefStore.setValue(ITourbookPreferences.GRAPH_PULSE_MIN_VALUE, _spinnerPulseMin.getSelection());
-		_prefStore.setValue(ITourbookPreferences.GRAPH_PULSE_MAX_VALUE, _spinnerPulseMax.getSelection());
+		prefSaveValue(_chkMin_Pulse, ITourbookPreferences.GRAPH_PULSE_IS_MIN_ENABLED);
+		prefSaveValue(_chkMax_Pulse, ITourbookPreferences.GRAPH_PULSE_IS_MAX_ENABLED);
+		prefSaveValue(_spinnerMin_Pulse, ITourbookPreferences.GRAPH_PULSE_MIN_VALUE);
+		prefSaveValue(_spinnerMax_Pulse, ITourbookPreferences.GRAPH_PULSE_MAX_VALUE);
+
+		// min/max speed
+		prefSaveValue(_chkMin_Speed, ITourbookPreferences.GRAPH_SPEED_IS_MIN_ENABLED);
+		prefSaveValue(_chkMax_Speed, ITourbookPreferences.GRAPH_SPEED_IS_MAX_ENABLED);
+		prefSaveValue(_spinnerMin_Speed, ITourbookPreferences.GRAPH_SPEED_MIN_VALUE);
+		prefSaveValue(_spinnerMax_Speed, ITourbookPreferences.GRAPH_SPEED_MAX_VALUE);
+
+		// min/max pace
+		prefSaveValue(_chkMin_Pace, ITourbookPreferences.GRAPH_PACE_IS_MIN_ENABLED);
+		prefSaveValue(_chkMax_Pace, ITourbookPreferences.GRAPH_PACE_IS_MAX_ENABLED);
+		prefSaveValue(_spinnerMin_Pace, ITourbookPreferences.GRAPH_PACE_MIN_VALUE);
+		prefSaveValue(_spinnerMax_Pace, ITourbookPreferences.GRAPH_PACE_MAX_VALUE);
+
+		// min/max cadence
+		prefSaveValue(_chkMin_Cadence, ITourbookPreferences.GRAPH_CADENCE_IS_MIN_ENABLED);
+		prefSaveValue(_chkMax_Cadence, ITourbookPreferences.GRAPH_CADENCE_IS_MAX_ENABLED);
+		prefSaveValue(_spinnerMin_Cadence, ITourbookPreferences.GRAPH_CADENCE_MIN_VALUE);
+		prefSaveValue(_spinnerMax_Cadence, ITourbookPreferences.GRAPH_CADENCE_MAX_VALUE);
+
+		// min/max gradient
+		prefSaveValue(_chkMin_Gradient, ITourbookPreferences.GRAPH_GRADIENT_IS_MIN_ENABLED);
+		prefSaveValue(_chkMax_Gradient, ITourbookPreferences.GRAPH_GRADIENT_IS_MAX_ENABLED);
+		prefSaveValue(_spinnerMin_Gradient, ITourbookPreferences.GRAPH_GRADIENT_MIN_VALUE);
+		prefSaveValue(_spinnerMax_Gradient, ITourbookPreferences.GRAPH_GRADIENT_MAX_VALUE);
+
+		// min/max altimeter
+		prefSaveValue(_chkMin_Altimeter, ITourbookPreferences.GRAPH_ALTIMETER_IS_MIN_ENABLED);
+		prefSaveValue(_chkMax_Altimeter, ITourbookPreferences.GRAPH_ALTIMETER_IS_MAX_ENABLED);
+		prefSaveValue(_spinnerMin_Altimeter, ITourbookPreferences.GRAPH_ALTIMETER_MIN_VALUE);
+		prefSaveValue(_spinnerMax_Altimeter, ITourbookPreferences.GRAPH_ALTIMETER_MAX_VALUE);
+
+		// min/max power
+		prefSaveValue(_chkMin_Power, ITourbookPreferences.GRAPH_POWER_IS_MIN_ENABLED);
+		prefSaveValue(_chkMax_Power, ITourbookPreferences.GRAPH_POWER_IS_MAX_ENABLED);
+		prefSaveValue(_spinnerMin_Power, ITourbookPreferences.GRAPH_POWER_MIN_VALUE);
+		prefSaveValue(_spinnerMax_Power, ITourbookPreferences.GRAPH_POWER_MAX_VALUE);
+
+		// min/max temperature
+		prefSaveValue(_chkMin_Temperature, ITourbookPreferences.GRAPH_TEMPERATURE_IS_MIN_ENABLED);
+		prefSaveValue(_chkMax_Temperature, ITourbookPreferences.GRAPH_TEMPERATURE_IS_MAX_ENABLED);
+		prefSaveValue(_spinnerMin_Temperature, ITourbookPreferences.GRAPH_TEMPERATURE_MIN_VALUE);
+		prefSaveValue(_spinnerMax_Temperature, ITourbookPreferences.GRAPH_TEMPERATURE_MAX_VALUE);
 	}
 
 	private void saveState_Tab_3_Grid() {
@@ -1570,62 +1754,68 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 
 	private void validateMinMax() {
 
-		if (_chkMinAltimeter.getSelection()) {
+		if (_chkEnableMinMax.getSelection() == false) {
 
-			final int min = _spinnerAltimeterMin.getSelection();
-			final int max = _spinnerAltimeterMax.getSelection();
+			// min/max is disabled
+			return;
+		}
+
+		if (_chkMin_Altimeter.getSelection()) {
+
+			final int min = _spinnerMin_Altimeter.getSelection();
+			final int max = _spinnerMax_Altimeter.getSelection();
 
 			if (min >= max) {
 
 				if (max == ALTIMETER_MAX) {
-					_spinnerAltimeterMin.setSelection(max - 1);
+					_spinnerMin_Altimeter.setSelection(max - 1);
 				} else {
-					_spinnerAltimeterMax.setSelection(min + 1);
+					_spinnerMax_Altimeter.setSelection(min + 1);
 				}
 			}
 		}
 
-		if (_chkMinGradient.getSelection()) {
+		if (_chkMin_Gradient.getSelection()) {
 
-			final int min = _spinnerGradientMin.getSelection();
-			final int max = _spinnerGradientMax.getSelection();
+			final int min = _spinnerMin_Gradient.getSelection();
+			final int max = _spinnerMax_Gradient.getSelection();
 
 			if (min >= max) {
 
 				if (max == GRADIENT_MAX) {
-					_spinnerGradientMin.setSelection(max - 1);
+					_spinnerMin_Gradient.setSelection(max - 1);
 				} else {
-					_spinnerGradientMax.setSelection(min + 1);
+					_spinnerMax_Gradient.setSelection(min + 1);
 				}
 			}
 		}
 
-		if (_chkMinPace.getSelection()) {
+		if (_chkMin_Pace.getSelection()) {
 
-			final int min = _spinnerPaceMin.getSelection();
-			final int max = _spinnerPaceMax.getSelection();
+			final int min = _spinnerMin_Pace.getSelection();
+			final int max = _spinnerMax_Pace.getSelection();
 
 			if (min >= max) {
 
 				if (max == PACE_MAX) {
-					_spinnerPaceMin.setSelection(max - 1);
+					_spinnerMin_Pace.setSelection(max - 1);
 				} else {
-					_spinnerPaceMax.setSelection(min + 1);
+					_spinnerMax_Pace.setSelection(min + 1);
 				}
 			}
 		}
 
-		if (_chkMinPulse.getSelection()) {
+		if (_chkMin_Pulse.getSelection()) {
 
-			final int min = _spinnerPulseMin.getSelection();
-			final int max = _spinnerPulseMax.getSelection();
+			final int min = _spinnerMin_Pulse.getSelection();
+			final int max = _spinnerMax_Pulse.getSelection();
 
 			if (min >= max) {
 
 				if (max == PrefPagePeople.HEART_BEAT_MAX) {
-					_spinnerPulseMin.setSelection(max - 1);
+					_spinnerMin_Pulse.setSelection(max - 1);
 				} else {
-					_spinnerPulseMax.setSelection(min + 1);
+					_spinnerMax_Pulse.setSelection(min + 1);
 				}
 			}
 		}
