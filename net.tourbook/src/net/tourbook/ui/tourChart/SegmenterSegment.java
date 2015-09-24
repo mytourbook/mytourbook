@@ -121,7 +121,7 @@ public class SegmenterSegment {
 //				+ ("paintedLabel=" + paintedLabel + ", ")
 				+ ("serieIndex=" + serieIndex + ", ") //$NON-NLS-1$ //$NON-NLS-2$
 				+ ("segmentIndex=" + segmentIndex + ", ") //$NON-NLS-1$ //$NON-NLS-2$
-				+ ("hoveredLineRect=" + hoveredLineRect + ", ") //$NON-NLS-1$ //$NON-NLS-2$
+//				+ ("hoveredLineRect=" + hoveredLineRect + ", ") //$NON-NLS-1$ //$NON-NLS-2$
 				+ "]"; //$NON-NLS-1$
 	}
 }

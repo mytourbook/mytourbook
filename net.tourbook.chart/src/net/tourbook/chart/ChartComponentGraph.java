@@ -1372,7 +1372,7 @@ public class ChartComponentGraph extends Canvas {
 		redraw();
 
 		// redraw chart
-		setChartPosition(_xSliderDragged, false, true);
+		setChartPosition(_xSliderDragged, false, true, 0);
 
 		final boolean isRepeatScrollingLeft = _xxDevViewPortLeftBorder > 1;
 		final boolean isRepeatScrollingRight = _xxDevViewPortLeftBorder + xxDevNewSliderLinePos3 < _xxDevGraphWidth;
@@ -6065,7 +6065,7 @@ public class ChartComponentGraph extends Canvas {
 
 		_zoomRatioCenterKey = isSetKeyCenterZoomPosition ? xxDevLinePos / _xxDevGraphWidth : 0;
 
-		setChartPosition(xSlider, isCenterSliderPosition, isMoveChartToShowSlider);
+		setChartPosition(xSlider, isCenterSliderPosition, isMoveChartToShowSlider, 15);
 
 		_isSliderDirty = true;
 	}
@@ -7510,12 +7510,15 @@ public class ChartComponentGraph extends Canvas {
 	 * 
 	 * @param slider
 	 * @param isCenterSliderPosition
-	 * @param doSetSliderVisible
-	 * @param isSetKeyCenterZoomPosition
+	 * @param isSetSliderVisible
+	 * @param borderOffset
+	 *            Set chart with an offset to the chart border, this is helpful when tour segments
+	 *            are selected that the surrounding area is also visible.
 	 */
 	private void setChartPosition(	final ChartXSlider slider,
 									final boolean isCenterSliderPosition,
-									final boolean doSetSliderVisible) {
+									final boolean isSetSliderVisible,
+									final int borderOffset) {
 
 		if (_graphZoomRatio == 1) {
 			// chart is not zoomed, nothing to do
@@ -7528,7 +7531,6 @@ public class ChartComponentGraph extends Canvas {
 		final long xxDevCenter = xxDevSliderLinePos - devXViewPortWidth / 2;
 
 		double xxDevOffset = xxDevSliderLinePos;
-		final long BORDER = 10;
 
 		if (isCenterSliderPosition) {
 
@@ -7541,15 +7543,15 @@ public class ChartComponentGraph extends Canvas {
 			 */
 			if (xxDevSliderLinePos < _xxDevViewPortLeftBorder) {
 
-				xxDevOffset = xxDevSliderLinePos + 1 - BORDER;
+				xxDevOffset = xxDevSliderLinePos + 1 - borderOffset;
 
 			} else if (xxDevSliderLinePos > _xxDevViewPortLeftBorder + devXViewPortWidth) {
 
-				xxDevOffset = xxDevSliderLinePos - devXViewPortWidth + BORDER;
+				xxDevOffset = xxDevSliderLinePos - devXViewPortWidth + borderOffset;
 			}
 		}
 
-		if (xxDevOffset != xxDevSliderLinePos && doSetSliderVisible) {
+		if (xxDevOffset != xxDevSliderLinePos && isSetSliderVisible) {
 
 			/*
 			 * slider is not visible
