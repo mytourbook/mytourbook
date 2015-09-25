@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -25,6 +25,7 @@ import java.util.GregorianCalendar;
 import java.util.HashMap;
 
 import net.tourbook.common.util.MtMath;
+import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TimeData;
 import net.tourbook.data.TourData;
@@ -67,6 +68,7 @@ public class NmeaDataReader extends TourbookDevice {
 		return false;
 	}
 
+	@Override
 	public String getDeviceModeName(final int modeId) {
 		return null;
 	}
@@ -81,6 +83,7 @@ public class NmeaDataReader extends TourbookDevice {
 		return -1;
 	}
 
+	@Override
 	public int getTransferDataSize() {
 		return -1;
 	}
@@ -89,10 +92,29 @@ public class NmeaDataReader extends TourbookDevice {
 
 		final Nmea0183 nmea = new Nmea0183();
 
+// Begin - workaround from Alexey - 25.9.2015
+
 		// parse all nmea lines
+
+		long ddmmyy = 0L;
+
 		for (final String nmeaLine : nmeaStrings) {
+
 			nmea.parse(nmeaLine);
+
+			if (nmeaLine.startsWith("$GPRMC") || nmeaLine.startsWith("$GPVTG")) {
+
+				// mandatory for these lines
+				ddmmyy = nmea.getDDMMYY();
+			}
 		}
+
+		// XXX workaround
+		nmea.setDDMMYY(ddmmyy);
+
+// End - workaround from Alexey - 25.9.2015
+
+		///////////////////////////////////////////
 
 		// get attributes
 		final double latitude = nmea.getLatitude();
@@ -171,8 +193,10 @@ public class NmeaDataReader extends TourbookDevice {
 		long nmeaTypes = Nmea0183.TYPE_NONE;
 		boolean startParsing = false;
 
+		BufferedReader reader = null;
+
 		try {
-			final BufferedReader reader = new BufferedReader(new FileReader(file));
+			reader = new BufferedReader(new FileReader(file));
 
 			while ((nmeaLine = reader.readLine()) != null) {
 
@@ -211,6 +235,7 @@ public class NmeaDataReader extends TourbookDevice {
 					} else {
 						nmeaTypes |= Nmea0183.TYPE_GPZDA;
 					}
+
 				} else {
 
 					// ignore invalid lines
@@ -231,12 +256,22 @@ public class NmeaDataReader extends TourbookDevice {
 			}
 
 		} catch (final Exception e) {
-			e.printStackTrace();
+			StatusUtil.log(e);
+		} finally {
+
+			if (reader != null) {
+				try {
+					reader.close();
+				} catch (final IOException e) {
+					StatusUtil.log(e);
+				}
+			}
 		}
 
 //	Begin of O. Budischewski, 2008.03.20
 		if (_isNullCoordinates == true) {
 			Display.getDefault().syncExec(new Runnable() {
+				@Override
 				public void run() {
 					MessageDialog.openInformation(
 							Display.getCurrent().getActiveShell(),
@@ -300,6 +335,7 @@ public class NmeaDataReader extends TourbookDevice {
 		return true;
 	}
 
+	@Override
 	public boolean validateRawData(final String fileName) {
 
 		BufferedReader reader = null;
@@ -315,13 +351,13 @@ public class NmeaDataReader extends TourbookDevice {
 			}
 
 		} catch (final Exception e) {
-			e.printStackTrace();
+			StatusUtil.log(e);
 		} finally {
 			if (reader != null) {
 				try {
 					reader.close();
 				} catch (final IOException e) {
-					e.printStackTrace();
+					StatusUtil.log(e);
 				}
 			}
 		}
