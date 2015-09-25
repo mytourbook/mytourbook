@@ -2620,8 +2620,17 @@ public class TourManager {
 			}
 
 			setGraphColor(yDataAltitude, GraphColorManager.PREF_GRAPH_ALTITUDE);
-//			adjustMinMax(yDataAltitude);
 			chartDataModel.addXyData(yDataAltitude);
+
+			// adjust pulse min/max values when it's defined in the pref store
+			setVisibleForcedValues(
+					yDataAltitude,
+					1,
+					0,
+					ITourbookPreferences.GRAPH_ALTITUDE_IS_MIN_ENABLED,
+					ITourbookPreferences.GRAPH_ALTITUDE_IS_MAX_ENABLED,
+					ITourbookPreferences.GRAPH_ALTITUDE_MIN_VALUE,
+					ITourbookPreferences.GRAPH_ALTITUDE_MAX_VALUE);
 		}
 
 		/*
@@ -2650,19 +2659,15 @@ public class TourManager {
 			setGraphColor(yDataPulse, GraphColorManager.PREF_GRAPH_HEARTBEAT);
 			chartDataModel.addXyData(yDataPulse);
 
-			/*
-			 * adjust pulse min/max values when it's defined in the pref store
-			 */
-			if (_prefStore.getBoolean(ITourbookPreferences.GRAPH_PULSE_IS_MIN_ENABLED)) {
-
-				yDataPulse.setVisibleMinValueForced(_prefStore.getInt(ITourbookPreferences.GRAPH_PULSE_MIN_VALUE));
-			}
-
-			// set max value after min value
-			if (_prefStore.getBoolean(ITourbookPreferences.GRAPH_PULSE_IS_MAX_ENABLED)) {
-
-				yDataPulse.setVisibleMaxValueForced(_prefStore.getInt(ITourbookPreferences.GRAPH_PULSE_MAX_VALUE));
-			}
+			// adjust pulse min/max values when it's defined in the pref store
+			setVisibleForcedValues(
+					yDataPulse,
+					1,
+					0,
+					ITourbookPreferences.GRAPH_PULSE_IS_MIN_ENABLED,
+					ITourbookPreferences.GRAPH_PULSE_IS_MAX_ENABLED,
+					ITourbookPreferences.GRAPH_PULSE_MIN_VALUE,
+					ITourbookPreferences.GRAPH_PULSE_MAX_VALUE);
 		}
 
 		/*
@@ -2690,6 +2695,16 @@ public class TourManager {
 
 			setGraphColor(yDataSpeed, GraphColorManager.PREF_GRAPH_SPEED);
 			chartDataModel.addXyData(yDataSpeed);
+
+			// adjust pulse min/max values when it's defined in the pref store
+			setVisibleForcedValues(
+					yDataSpeed,
+					1,
+					0,
+					ITourbookPreferences.GRAPH_SPEED_IS_MIN_ENABLED,
+					ITourbookPreferences.GRAPH_SPEED_IS_MAX_ENABLED,
+					ITourbookPreferences.GRAPH_SPEED_MIN_VALUE,
+					ITourbookPreferences.GRAPH_SPEED_MAX_VALUE);
 		}
 
 		/*
@@ -2719,19 +2734,15 @@ public class TourManager {
 			setGraphColor(yDataPace, GraphColorManager.PREF_GRAPH_PACE);
 			chartDataModel.addXyData(yDataPace);
 
-			/*
-			 * adjust pace min/max values when it's defined in the pref store
-			 */
-			if (_prefStore.getBoolean(ITourbookPreferences.GRAPH_PACE_IS_MIN_ENABLED)) {
-
-				yDataPace.setVisibleMinValueForced(_prefStore.getInt(ITourbookPreferences.GRAPH_PACE_MIN_VALUE) * 60);
-			}
-
-			// set max value after min value
-			if (_prefStore.getBoolean(ITourbookPreferences.GRAPH_PACE_IS_MAX_ENABLED)) {
-
-				yDataPace.setVisibleMaxValueForced(_prefStore.getInt(ITourbookPreferences.GRAPH_PACE_MAX_VALUE) * 60);
-			}
+			// adjust pulse min/max values when it's defined in the pref store
+			setVisibleForcedValues(
+					yDataPace,
+					60,
+					0,
+					ITourbookPreferences.GRAPH_PACE_IS_MIN_ENABLED,
+					ITourbookPreferences.GRAPH_PACE_IS_MAX_ENABLED,
+					ITourbookPreferences.GRAPH_PACE_MIN_VALUE,
+					ITourbookPreferences.GRAPH_PACE_MAX_VALUE);
 		}
 
 		/*
@@ -2758,6 +2769,16 @@ public class TourManager {
 
 			setGraphColor(yDataPower, GraphColorManager.PREF_GRAPH_POWER);
 			chartDataModel.addXyData(yDataPower);
+
+			// adjust pulse min/max values when it's defined in the pref store
+			setVisibleForcedValues(
+					yDataPower,
+					1,
+					0,
+					ITourbookPreferences.GRAPH_POWER_IS_MIN_ENABLED,
+					ITourbookPreferences.GRAPH_POWER_IS_MAX_ENABLED,
+					ITourbookPreferences.GRAPH_POWER_MIN_VALUE,
+					ITourbookPreferences.GRAPH_POWER_MAX_VALUE);
 		}
 
 		/*
@@ -2805,6 +2826,16 @@ public class TourManager {
 						? maxValue - maxAdjust
 						: maxValue + maxAdjust);
 			}
+
+			// adjust pulse min/max values when it's defined in the pref store
+			setVisibleForcedValues(
+					yDataAltimeter,
+					1,
+					1e-2,
+					ITourbookPreferences.GRAPH_ALTIMETER_IS_MIN_ENABLED,
+					ITourbookPreferences.GRAPH_ALTIMETER_IS_MAX_ENABLED,
+					ITourbookPreferences.GRAPH_ALTIMETER_MIN_VALUE,
+					ITourbookPreferences.GRAPH_ALTIMETER_MAX_VALUE);
 		}
 
 		/*
@@ -2833,25 +2864,15 @@ public class TourManager {
 			setGraphColor(yDataGradient, GraphColorManager.PREF_GRAPH_GRADIENT);
 			chartDataModel.addXyData(yDataGradient);
 
-			/*
-			 * adjust min/max values when defined in the pref store
-			 */
-			if (_prefStore.getBoolean(ITourbookPreferences.GRAPH_GRADIENT_IS_MIN_ENABLED)) {
-
-				final int minValue = _prefStore.getInt(ITourbookPreferences.GRAPH_GRADIENT_MIN_VALUE);
-
-				yDataGradient.setVisibleMinValueForced(minValue + TourChart.MIN_ADJUSTMENT);
-			}
-
-			if (_prefStore.getBoolean(ITourbookPreferences.GRAPH_GRADIENT_IS_MAX_ENABLED)) {
-
-				final double maxValue = _prefStore.getInt(ITourbookPreferences.GRAPH_GRADIENT_MAX_VALUE);
-
-				// set max value after min value, adjust max otherwise values above the max are painted
-				yDataGradient.setVisibleMaxValueForced(maxValue > 0 //
-						? maxValue - TourChart.MAX_ADJUSTMENT
-						: maxValue + TourChart.MAX_ADJUSTMENT);
-			}
+			// adjust pulse min/max values when it's defined in the pref store
+			setVisibleForcedValues(
+					yDataGradient,
+					1,
+					TourChart.MAX_ADJUSTMENT,
+					ITourbookPreferences.GRAPH_GRADIENT_IS_MIN_ENABLED,
+					ITourbookPreferences.GRAPH_GRADIENT_IS_MAX_ENABLED,
+					ITourbookPreferences.GRAPH_GRADIENT_MIN_VALUE,
+					ITourbookPreferences.GRAPH_GRADIENT_MAX_VALUE);
 		}
 
 		/*
@@ -2881,6 +2902,16 @@ public class TourManager {
 
 			setGraphColor(yDataCadence, GraphColorManager.PREF_GRAPH_CADENCE);
 			chartDataModel.addXyData(yDataCadence);
+
+			// adjust pulse min/max values when it's defined in the pref store
+			setVisibleForcedValues(
+					yDataCadence,
+					1,
+					0,
+					ITourbookPreferences.GRAPH_CADENCE_IS_MIN_ENABLED,
+					ITourbookPreferences.GRAPH_CADENCE_IS_MAX_ENABLED,
+					ITourbookPreferences.GRAPH_CADENCE_MIN_VALUE,
+					ITourbookPreferences.GRAPH_CADENCE_MAX_VALUE);
 		}
 
 		/*
@@ -2935,8 +2966,17 @@ public class TourManager {
 			}
 
 			setGraphColor(yDataTemperature, GraphColorManager.PREF_GRAPH_TEMPTERATURE);
-//			adjustMinMax(yDataTemperature);
 			chartDataModel.addXyData(yDataTemperature);
+
+			// adjust pulse min/max values when it's defined in the pref store
+			setVisibleForcedValues(
+					yDataTemperature,
+					1,
+					0,
+					ITourbookPreferences.GRAPH_TEMPERATURE_IS_MIN_ENABLED,
+					ITourbookPreferences.GRAPH_TEMPERATURE_IS_MAX_ENABLED,
+					ITourbookPreferences.GRAPH_TEMPERATURE_MIN_VALUE,
+					ITourbookPreferences.GRAPH_TEMPERATURE_MAX_VALUE);
 		}
 
 		/*
@@ -3371,6 +3411,53 @@ public class TourManager {
 
 	public void setActiveTourChart(final TourChart tourChart) {
 		_activeTourChart = tourChart;
+	}
+
+	/**
+	 * @param yData
+	 * @param valueMultiplier
+	 *            Will be multiplied with the pref store value.
+	 * @param maxValueAdjustment
+	 *            Will be added/subtracted from the pref max value.
+	 * @param prefName_IsMinEnabled
+	 * @param prefName_IsMaxEnabled
+	 * @param prefName_MinValue
+	 * @param prefName_MaxValue
+	 */
+	private void setVisibleForcedValues(final ChartDataYSerie yData,
+										final int valueMultiplier,
+										final double maxValueAdjustment,
+										final String prefName_IsMinEnabled,
+										final String prefName_IsMaxEnabled,
+										final String prefName_MinValue,
+										final String prefName_MaxValue) {
+
+		final boolean isMinMaxEnabled = _prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_MIN_MAX_ENABLED);
+		if (!isMinMaxEnabled) {
+			return;
+		}
+
+		if (_prefStore.getBoolean(prefName_IsMinEnabled)) {
+
+			yData.setVisibleMinValueForced(_prefStore.getInt(prefName_MinValue) * valueMultiplier);
+		}
+
+		// set max value after min value, adjust max otherwise values above the max are painted
+		if (_prefStore.getBoolean(prefName_IsMaxEnabled)) {
+
+			final int maxValue = _prefStore.getInt(prefName_MaxValue) * valueMultiplier;
+
+			if (maxValueAdjustment == 0) {
+
+				yData.setVisibleMaxValueForced(maxValue);
+
+			} else {
+
+				yData.setVisibleMaxValueForced(maxValue > 0 //
+						? maxValue - maxValueAdjustment
+						: maxValue + maxValueAdjustment);
+			}
+		}
 	}
 
 	/**

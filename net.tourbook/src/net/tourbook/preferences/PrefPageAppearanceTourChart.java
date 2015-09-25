@@ -23,6 +23,7 @@ import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.Chart;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.StringToArrayConverter;
+import net.tourbook.common.util.Util;
 import net.tourbook.tour.TourManager;
 
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -45,11 +46,13 @@ import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
@@ -64,6 +67,9 @@ import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
+/**
+ * @author IBM_ADMIN
+ */
 public class PrefPageAppearanceTourChart extends PreferencePage implements IWorkbenchPreferencePage {
 
 	public static final String		ID											= "net.tourbook.preferences.PrefPageChartGraphs";							//$NON-NLS-1$
@@ -93,9 +99,10 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 	private static final int		CADENCE_MAX									= 300;
 	private static final int		GRADIENT_MIN								= -100;
 	private static final int		GRADIENT_MAX								= 100;
-	private static final int		PACE_MAX									= 60;
+	private static final int		PACE_MAX									= 100;
 	private static final int		POWER_MAX									= 1000;
 	private static final int		SPEED_MAX									= 1000;
+	private static final int		TEMPERATURE_MIN								= -100;
 	private static final int		TEMPERATURE_MAX								= 100;
 
 	private final IPreferenceStore	_prefStore									= TourbookPlugin.getPrefStore();
@@ -206,6 +213,68 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 	private Spinner					_spinnerMax_Temperature;
 
 	private ColorSelector			_colorSegmentAlternateColor;
+
+	private Image					_imageAltimeter;
+	private Image					_imageAltitude;
+	private Image					_imageCadence;
+	private Image					_imageGradient;
+	private Image					_imagePace;
+	private Image					_imagePower;
+	private Image					_imagePulse;
+	private Image					_imageSpeed;
+	private Image					_imageTemperature;
+
+	private Image					_imageAltimeterDisabled;
+	private Image					_imageAltitudeDisabled;
+	private Image					_imageCadenceDisabled;
+	private Image					_imageGradientDisabled;
+	private Image					_imagePaceDisabled;
+	private Image					_imagePowerDisabled;
+	private Image					_imagePulseDisabled;
+	private Image					_imageSpeedDisabled;
+	private Image					_imageTemperatureDisabled;
+
+	private CLabel					_iconAltitude;
+	private CLabel					_iconAltimeter;
+	private CLabel					_iconGradient;
+	private CLabel					_iconPulse;
+	private CLabel					_iconSpeed;
+	private CLabel					_iconPace;
+	private CLabel					_iconCadence;
+	private CLabel					_iconPower;
+	private CLabel					_iconTemperature;
+
+	{
+
+		_imageAltimeter = TourbookPlugin.getImageDescriptor(Messages.Image__graph_altimeter).createImage();
+		_imageAltitude = TourbookPlugin.getImageDescriptor(Messages.Image__graph_altitude).createImage();
+		_imageCadence = TourbookPlugin.getImageDescriptor(Messages.Image__graph_cadence).createImage();
+		_imageGradient = TourbookPlugin.getImageDescriptor(Messages.Image__graph_gradient).createImage();
+		_imagePace = TourbookPlugin.getImageDescriptor(Messages.Image__graph_pace).createImage();
+		_imagePower = TourbookPlugin.getImageDescriptor(Messages.Image__graph_power).createImage();
+		_imagePulse = TourbookPlugin.getImageDescriptor(Messages.Image__graph_heartbeat).createImage();
+		_imageSpeed = TourbookPlugin.getImageDescriptor(Messages.Image__graph_speed).createImage();
+		_imageTemperature = TourbookPlugin.getImageDescriptor(Messages.Image__graph_temperature).createImage();
+
+		_imageAltimeterDisabled = TourbookPlugin.getImageDescriptor(Messages.Image__graph_altimeter_disabled)//
+				.createImage();
+		_imageAltitudeDisabled = TourbookPlugin.getImageDescriptor(Messages.Image__graph_altitude_disabled)//
+				.createImage();
+		_imageCadenceDisabled = TourbookPlugin.getImageDescriptor(Messages.Image__graph_cadence_disabled)//
+				.createImage();
+		_imageGradientDisabled = TourbookPlugin.getImageDescriptor(Messages.Image__graph_gradient_disabled)//
+				.createImage();
+		_imagePaceDisabled = TourbookPlugin.getImageDescriptor(Messages.Image__graph_pace_disabled)//
+				.createImage();
+		_imagePowerDisabled = TourbookPlugin.getImageDescriptor(Messages.Image__graph_power_disabled)//
+				.createImage();
+		_imagePulseDisabled = TourbookPlugin.getImageDescriptor(Messages.Image__graph_heartbeat_disabled)//
+				.createImage();
+		_imageSpeedDisabled = TourbookPlugin.getImageDescriptor(Messages.Image__graph_speed_disabled)//
+				.createImage();
+		_imageTemperatureDisabled = TourbookPlugin.getImageDescriptor(Messages.Image__graph_temperature_disabled)//
+				.createImage();
+	}
 
 	private static class Graph {
 
@@ -505,7 +574,7 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 			final Group group = new Group(container, SWT.NONE);
 			GridDataFactory.fillDefaults().grab(true, false).applyTo(group);
 			GridLayoutFactory.swtDefaults()//
-					.numColumns(6)
+					.numColumns(7)
 					.spacing(_pc.convertHorizontalDLUsToPixels(4), _pc.convertVerticalDLUsToPixels(4))
 					.applyTo(group);
 			group.setText(Messages.Pref_Graphs_force_minimum_value);
@@ -515,14 +584,14 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 				createUI_54_MinMax_Header(group);
 
 				createUI_61_MinMax_Altitude(group);
-				createUI_62_MinMax_Altimeter(group);
-				createUI_63_MinMax_Gradient(group);
-				createUI_64_MinMax_Heartbeat(group);
+				createUI_64_MinMax_Pulse(group);
 				createUI_65_MinMax_Speed(group);
 				createUI_66_MinMax_Pace(group);
-				createUI_67_MinMax_Cadence(group);
 				createUI_68_MinMax_Power(group);
 				createUI_69_MinMax_Temperature(group);
+				createUI_63_MinMax_Gradient(group);
+				createUI_62_MinMax_Altimeter(group);
+				createUI_67_MinMax_Cadence(group);
 			}
 		}
 
@@ -534,7 +603,7 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 		// ckeckbox: enable min/max
 		_chkEnableMinMax = new Button(parent, SWT.CHECK);
 		GridDataFactory.fillDefaults()//
-				.span(6, 1)
+				.span(7, 1)
 				.applyTo(_chkEnableMinMax);
 		_chkEnableMinMax.setText(Messages.Pref_Graphs_Checkbox_EnableMinMaxValues);
 		_chkEnableMinMax.addSelectionListener(_defaultSelectionListener);
@@ -543,6 +612,7 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 	private void createUI_54_MinMax_Header(final Group parent) {
 
 		// label: spacer
+		new Label(parent, SWT.NONE);
 		new Label(parent, SWT.NONE);
 
 		// label: min value
@@ -567,6 +637,8 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 
 	private void createUI_61_MinMax_Altitude(final Group parent) {
 
+		_iconAltitude = createUI_Icon(parent, _imageAltitude);
+
 		_lblMinMax_Altitude = createUI_Label(parent, Messages.Pref_Graphs_Checkbox_ForceValue_Altitude);
 
 		_chkMin_Altitude = createUI_Checkbox(parent);
@@ -583,6 +655,8 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 	}
 
 	private void createUI_62_MinMax_Altimeter(final Group parent) {
+
+		_iconAltimeter = createUI_Icon(parent, _imageAltimeter);
 
 		_lblMinMax_Altimeter = createUI_Label(parent, Messages.Pref_Graphs_Checkbox_ForceAltimeterValue);
 
@@ -601,6 +675,8 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 
 	private void createUI_63_MinMax_Gradient(final Group parent) {
 
+		_iconGradient = createUI_Icon(parent, _imageGradient);
+
 		_lblMinMax_Gradient = createUI_Label(parent, Messages.Pref_Graphs_Checkbox_ForceGradientValue);
 
 		_chkMin_Gradient = createUI_Checkbox(parent);
@@ -616,7 +692,9 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 		_lblMinMax_GradientUnit = createUI_Label(parent, UI.SYMBOL_PERCENTAGE);
 	}
 
-	private void createUI_64_MinMax_Heartbeat(final Group parent) {
+	private void createUI_64_MinMax_Pulse(final Group parent) {
+
+		_iconPulse = createUI_Icon(parent, _imagePulse);
 
 		_lblMinMax_Pulse = createUI_Label(parent, Messages.Pref_Graphs_Checkbox_ForcePulseValue);
 
@@ -635,6 +713,8 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 
 	private void createUI_65_MinMax_Speed(final Group parent) {
 
+		_iconSpeed = createUI_Icon(parent, _imageSpeed);
+
 		_lblMinMax_Speed = createUI_Label(parent, Messages.Pref_Graphs_Checkbox_ForceValue_Speed);
 
 		_chkMin_Speed = createUI_Checkbox(parent);
@@ -647,6 +727,8 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 	}
 
 	private void createUI_66_MinMax_Pace(final Group parent) {
+
+		_iconPace = createUI_Icon(parent, _imagePace);
 
 		_lblMinMax_Pace = createUI_Label(parent, Messages.Pref_Graphs_Checkbox_ForcePaceValue);
 
@@ -661,6 +743,8 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 
 	private void createUI_67_MinMax_Cadence(final Group parent) {
 
+		_iconCadence = createUI_Icon(parent, _imageCadence);
+
 		_lblMinMax_Cadence = createUI_Label(parent, Messages.Pref_Graphs_Checkbox_ForceValue_Cadence);
 
 		_chkMin_Cadence = createUI_Checkbox(parent);
@@ -673,6 +757,8 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 	}
 
 	private void createUI_68_MinMax_Power(final Group parent) {
+
+		_iconPower = createUI_Icon(parent, _imagePower);
 
 		_lblMinMax_Power = createUI_Label(parent, Messages.Pref_Graphs_Checkbox_ForceValue_Power);
 
@@ -687,13 +773,19 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 
 	private void createUI_69_MinMax_Temperature(final Group parent) {
 
+		_iconTemperature = createUI_Icon(parent, _imageTemperature);
+
 		_lblMinMax_Temperature = createUI_Label(parent, Messages.Pref_Graphs_Checkbox_ForceValue_Temperature);
 
 		_chkMin_Temperature = createUI_Checkbox(parent);
-		_spinnerMin_Temperature = createUI_Spinner(parent, 0, TEMPERATURE_MAX);
+		_spinnerMin_Temperature = createUI_Spinner(parent, //
+				TEMPERATURE_MIN,
+				TEMPERATURE_MAX);
 
 		_chkMax_Temperature = createUI_Checkbox(parent);
-		_spinnerMax_Temperature = createUI_Spinner(parent, 0, TEMPERATURE_MAX);
+		_spinnerMax_Temperature = createUI_Spinner(parent, //
+				TEMPERATURE_MIN,
+				TEMPERATURE_MAX);
 
 		_lblMinMax_TemperatureUnit = createUI_Label(parent, UI.UNIT_LABEL_TEMPERATURE);
 	}
@@ -921,6 +1013,15 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 		return checkbox;
 	}
 
+	private CLabel createUI_Icon(final Group parent, final Image image) {
+
+		final CLabel icon = new CLabel(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().indent(16, 0).applyTo(icon);
+		icon.setImage(image);
+
+		return icon;
+	}
+
 	private Label createUI_Label(final Group parent, final String text) {
 
 		// label
@@ -936,12 +1037,40 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 		GridDataFactory.fillDefaults()//
 				.align(SWT.END, SWT.FILL)
 				.applyTo(spinner);
+
 		spinner.setMinimum(minValue);
 		spinner.setMaximum(maxValue);
+
 		spinner.addMouseWheelListener(_defaultMouseWheelListener);
 		spinner.addSelectionListener(_defaultSelectionListener);
 
 		return spinner;
+	}
+
+	@Override
+	public void dispose() {
+
+		Util.disposeResource(_imageAltimeter);
+		Util.disposeResource(_imageAltitude);
+		Util.disposeResource(_imageCadence);
+		Util.disposeResource(_imageGradient);
+		Util.disposeResource(_imagePace);
+		Util.disposeResource(_imagePower);
+		Util.disposeResource(_imagePulse);
+		Util.disposeResource(_imageSpeed);
+		Util.disposeResource(_imageTemperature);
+
+		Util.disposeResource(_imageAltimeterDisabled);
+		Util.disposeResource(_imageAltitudeDisabled);
+		Util.disposeResource(_imageCadenceDisabled);
+		Util.disposeResource(_imageGradientDisabled);
+		Util.disposeResource(_imagePaceDisabled);
+		Util.disposeResource(_imagePowerDisabled);
+		Util.disposeResource(_imagePulseDisabled);
+		Util.disposeResource(_imageSpeedDisabled);
+		Util.disposeResource(_imageTemperatureDisabled);
+
+		super.dispose();
 	}
 
 	private void doLiveUpdate() {
@@ -1000,6 +1129,16 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 		_chkMax_Speed.setEnabled(isMinMaxEnabled);
 		_chkMin_Temperature.setEnabled(isMinMaxEnabled);
 		_chkMax_Temperature.setEnabled(isMinMaxEnabled);
+
+		_iconAltimeter.setImage(isMinMaxEnabled ? _imageAltimeter : _imageAltimeterDisabled);
+		_iconAltitude.setImage(isMinMaxEnabled ? _imageAltitude : _imageAltitudeDisabled);
+		_iconCadence.setImage(isMinMaxEnabled ? _imageCadence : _imageCadenceDisabled);
+		_iconGradient.setImage(isMinMaxEnabled ? _imageGradient : _imageGradientDisabled);
+		_iconPace.setImage(isMinMaxEnabled ? _imagePace : _imagePaceDisabled);
+		_iconPower.setImage(isMinMaxEnabled ? _imagePower : _imagePowerDisabled);
+		_iconPulse.setImage(isMinMaxEnabled ? _imagePulse : _imagePulseDisabled);
+		_iconSpeed.setImage(isMinMaxEnabled ? _imageSpeed : _imageSpeedDisabled);
+		_iconTemperature.setImage(isMinMaxEnabled ? _imageTemperature : _imageTemperatureDisabled);
 
 		_spinnerMin_Altimeter.setEnabled(isMinMaxEnabled && _chkMin_Altimeter.getSelection());
 		_spinnerMax_Altimeter.setEnabled(isMinMaxEnabled && _chkMax_Altimeter.getSelection());

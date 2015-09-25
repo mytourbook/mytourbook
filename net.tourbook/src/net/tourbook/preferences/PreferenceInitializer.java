@@ -244,7 +244,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 
 		store.setDefault(ITourbookPreferences.GRAPH_TEMPERATURE_IS_MIN_ENABLED, false);
 		store.setDefault(ITourbookPreferences.GRAPH_TEMPERATURE_IS_MAX_ENABLED, false);
-		store.setDefault(ITourbookPreferences.GRAPH_TEMPERATURE_MIN_VALUE, -20);
+		store.setDefault(ITourbookPreferences.GRAPH_TEMPERATURE_MIN_VALUE, -50);
 		store.setDefault(ITourbookPreferences.GRAPH_TEMPERATURE_MAX_VALUE, 50);
 
 		// value point tool tip

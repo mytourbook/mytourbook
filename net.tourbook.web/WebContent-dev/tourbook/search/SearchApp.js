@@ -222,7 +222,7 @@ Messages //
 					var response = this._request(requestArgs);
 
 					// keep data from the reponse which contain additional data, e.g. status, error
-					app.responseData = response.response
+					app.responseData = response.response;
 
 					/*
 					 * Create query result
