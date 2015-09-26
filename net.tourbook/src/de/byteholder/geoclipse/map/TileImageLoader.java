@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -39,6 +39,8 @@ import de.byteholder.geoclipse.mapprovider.MP;
  * This class loads the tile images. The run method is called from the executer in the thread queue.
  */
 public class TileImageLoader implements Runnable {
+
+	private static int	_stackTraceCounter;
 
 	/**
 	 * Loads a tile image from a map provider which is contained in the tile. Tiles are retrieved
@@ -207,15 +209,34 @@ public class TileImageLoader implements Runnable {
 						try {
 							if (inputStream != null) {
 
-								// the stream can contain an error message from the wms server
-								StatusUtil.showStatus(Util.readContentFromStream(inputStream), e);
+								/*
+								 * Print stack track otherwise many popups can occure
+								 */
+
+								if (_stackTraceCounter++ > 1) {
+
+									e.printStackTrace();
+
+								} else {
+
+									// the stream can contain an error message from the wms server
+									StatusUtil.showStatus(Util.readContentFromStream(inputStream), e);
+								}
 
 								inputStream.close();
 
 								isSaveImage = false;
 							}
 						} catch (final IOException e1) {
-							StatusUtil.log(e.getMessage(), e);
+
+							if (_stackTraceCounter++ > 1) {
+
+								e.printStackTrace();
+
+							} else {
+
+								StatusUtil.log(e.getMessage(), e);
+							}
 						}
 
 						MP.fireTileEvent(TileEventId.TILE_ERROR_LOADING, tile);
@@ -251,8 +272,8 @@ public class TileImageLoader implements Runnable {
 			if (parentTile != null) {
 
 				/*
-				 * the current tile is a child of a parent tile, create the parent image with
-				 * this child image data
+				 * the current tile is a child of a parent tile, create the parent image with this
+				 * child image data
 				 */
 
 				isNotifyObserver = false;
@@ -411,6 +432,7 @@ public class TileImageLoader implements Runnable {
 		return tileImageData;
 	}
 
+	@Override
 	public void run() {
 
 		/*
