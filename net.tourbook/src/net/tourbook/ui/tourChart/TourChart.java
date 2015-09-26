@@ -4233,7 +4233,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 			cfgGradient.segmentDataSerie = _tourData.segmentSerieGradient;
 			cfgGradient.labelProvider = null;
 			cfgGradient.canHaveNegativeValues = true;
-			cfgGradient.minValueAdjustment = 1.0;
+			cfgGradient.minValueAdjustment = 1.6;
 
 			cfgAltimeter = new ConfigGraphSegment(GraphColorManager.PREF_GRAPH_ALTIMETER);
 			cfgAltimeter.segmentDataSerie = _tourData.segmentSerieAltitudeUpH;
