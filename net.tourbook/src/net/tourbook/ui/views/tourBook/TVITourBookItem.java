@@ -30,12 +30,12 @@ import org.eclipse.jface.preference.IPreferenceStore;
 
 public abstract class TVITourBookItem extends TreeViewerItem implements ITourItem {
 
-	static final int				ITEM_TYPE_ROOT	= 0;
-	static final int				ITEM_TYPE_YEAR	= 20;
-	static final int				ITEM_TYPE_MONTH	= 30;
-	static final int				ITEM_TYPE_WEEK	= 40;
-	static final int				ITEM_TYPE_DAY	= 50;
-	static final int				ITEM_TYPE_TOUR	= 60;
+//	static final int				ITEM_TYPE_ROOT	= 0;
+//	static final int				ITEM_TYPE_YEAR	= 20;
+//	static final int				ITEM_TYPE_MONTH	= 30;
+//	static final int				ITEM_TYPE_WEEK	= 40;
+//	static final int				ITEM_TYPE_DAY	= 50;
+//	static final int				ITEM_TYPE_TOUR	= 60;
 
 	static final Calendar			calendar		= GregorianCalendar.getInstance();
 	private final IPreferenceStore	prefStore		= TourbookPlugin.getDefault().getPreferenceStore();

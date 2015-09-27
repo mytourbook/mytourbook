@@ -194,7 +194,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 	private static final String							CSV_EXPORT_DEFAULT_FILE_NAME		= "TourBook_";												//$NON-NLS-1$
 	private static final String							CSV_EXPORT_DURATION_HHH_MM_SS		= "hhh:mm:ss";												//$NON-NLS-1$
 
-	private static int									_yearSubCategory					= TVITourBookItem.ITEM_TYPE_MONTH;
+	private static YearSubCategory						_yearSubCategory					= YearSubCategory.MONTH;
 
 	private final IPreferenceStore						_prefStore							= TourbookPlugin
 																									.getPrefStore();
@@ -422,11 +422,11 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 
 	void actionToggleMonthWeek() {
 
-		if (_yearSubCategory == TVITourBookItem.ITEM_TYPE_WEEK) {
+		if (_yearSubCategory == YearSubCategory.WEEK) {
 
 			// toggle to month
 
-			_yearSubCategory = TVITourBookItem.ITEM_TYPE_MONTH;
+			_yearSubCategory = YearSubCategory.MONTH;
 
 			_actionToggleMonthWeek.setImageDescriptor(//
 					TourbookPlugin.getImageDescriptor(Messages.Image__TourBook_Week));
@@ -435,7 +435,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 
 			// toggle to week
 
-			_yearSubCategory = TVITourBookItem.ITEM_TYPE_WEEK;
+			_yearSubCategory = YearSubCategory.WEEK;
 
 			_actionToggleMonthWeek.setImageDescriptor(//
 					TourbookPlugin.getImageDescriptor(Messages.Image__TourBook_Month));
@@ -2719,7 +2719,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		return _tourViewer;
 	}
 
-	public int getYearSub() {
+	public YearSubCategory getYearSub() {
 		return _yearSubCategory;
 	}
 
@@ -2745,7 +2745,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 	 */
 	private boolean isYearSubWeek() {
 
-		return _yearSubCategory == TVITourBookItem.ITEM_TYPE_WEEK;
+		return _yearSubCategory == YearSubCategory.WEEK;
 	}
 
 	private void onSelectTreeItem(final SelectionChangedEvent event) {
@@ -2943,7 +2943,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 
 				_selectedYear = selectedTourItem.tourYear;
 
-				if (getYearSub() == TVITourBookItem.ITEM_TYPE_WEEK) {
+				if (getYearSub() == YearSubCategory.WEEK) {
 					_selectedYearSub = selectedTourItem.tourWeek;
 				} else {
 					_selectedYearSub = selectedTourItem.tourMonth;
@@ -3077,9 +3077,13 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		/*
 		 * Year sub category
 		 */
-		_yearSubCategory = Util.getStateInt(_state, STATE_YEAR_SUB_CATEGORY, TVITourBookItem.ITEM_TYPE_MONTH);
+		_yearSubCategory = (YearSubCategory) Util.getStateEnum(
+				_state,
+				STATE_YEAR_SUB_CATEGORY,
+				YearSubCategory.MONTH);
+
 		_actionToggleMonthWeek.setImageDescriptor(//
-				TourbookPlugin.getImageDescriptor(_yearSubCategory == TVITourBookItem.ITEM_TYPE_WEEK
+				TourbookPlugin.getImageDescriptor(_yearSubCategory == YearSubCategory.WEEK
 						? Messages.Image__TourBook_Month
 						: Messages.Image__TourBook_Week));
 
@@ -3102,7 +3106,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		// action: select tours for year/yearSub
 		_state.put(STATE_IS_SELECT_YEAR_MONTH_TOURS, _actionSelectAllTours.isChecked());
 
-		_state.put(STATE_YEAR_SUB_CATEGORY, _yearSubCategory);
+		_state.put(STATE_YEAR_SUB_CATEGORY, _yearSubCategory.name());
 
 		_columnManager.saveState(_state);
 	}

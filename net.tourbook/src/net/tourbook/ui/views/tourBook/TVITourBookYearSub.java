@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -30,9 +30,9 @@ import net.tourbook.ui.UI;
 
 public class TVITourBookYearSub extends TVITourBookItem {
 
-	private int	_category;
+	private YearSubCategory	_category;
 
-	public TVITourBookYearSub(final TourBookView view, final TVITourBookItem parentItem, final int itemType) {
+	public TVITourBookYearSub(final TourBookView view, final TVITourBookItem parentItem, final YearSubCategory itemType) {
 
 		super(view);
 
@@ -50,7 +50,7 @@ public class TVITourBookYearSub extends TVITourBookItem {
 		String sumYear = UI.EMPTY_STRING;
 		String sumYearSub = UI.EMPTY_STRING;
 
-		if (_category == ITEM_TYPE_WEEK) {
+		if (_category == YearSubCategory.WEEK) {
 			sumYear = "startWeekYear"; //$NON-NLS-1$
 			sumYearSub = "startWeek"; //$NON-NLS-1$
 		} else { // default to month
@@ -271,7 +271,7 @@ public class TVITourBookYearSub extends TVITourBookItem {
 		}
 	}
 
-	public int getCategory() {
+	public YearSubCategory getCategory() {
 		return _category;
 	}
 

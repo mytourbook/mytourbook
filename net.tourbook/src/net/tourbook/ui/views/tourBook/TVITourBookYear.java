@@ -30,7 +30,7 @@ import net.tourbook.ui.UI;
 
 public class TVITourBookYear extends TVITourBookItem {
 
-	private int	_subCategory;
+	private YearSubCategory	_subCategory;
 
 	public TVITourBookYear(final TourBookView view, final TVITourBookItem parentItem) {
 
@@ -53,7 +53,7 @@ public class TVITourBookYear extends TVITourBookItem {
 
 		String sumYear = UI.EMPTY_STRING;
 		String sumYearSub = UI.EMPTY_STRING;
-		if (_subCategory == ITEM_TYPE_WEEK) {
+		if (_subCategory == YearSubCategory.WEEK) {
 			sumYear = "startWeekYear"; //$NON-NLS-1$
 			sumYearSub = "startWeek"; //$NON-NLS-1$
 		} else { // default to month
@@ -113,7 +113,7 @@ public class TVITourBookYear extends TVITourBookItem {
 
 	private String formatItemString(final int year, final int yearSub) {
 
-		if (_subCategory == ITEM_TYPE_WEEK) {
+		if (_subCategory == YearSubCategory.WEEK) {
 
 			calendar.set(Calendar.YEAR, year);
 			calendar.set(Calendar.WEEK_OF_YEAR, yearSub);
