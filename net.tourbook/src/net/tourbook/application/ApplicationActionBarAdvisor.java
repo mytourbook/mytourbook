@@ -200,7 +200,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		}
 
 		// this must be set after the coolbar is created, otherwise it stops populating the coolbar
-		TourTypeFilterManager.setToolBarContribItem(coolBar, tbMgr_TourType, tbItemTourType, _tourTypeContribItem);
+		TourTypeFilterManager.setToolBarContribItem(_tourTypeContribItem);
 	}
 
 	@Override

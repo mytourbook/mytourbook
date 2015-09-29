@@ -49,8 +49,6 @@ public class TVITourBookYear extends TVITourBookItem {
 
 		final SQLFilter sqlFilter = new SQLFilter();
 
-		final StringBuilder sb = new StringBuilder();
-
 		String sumYear = UI.EMPTY_STRING;
 		String sumYearSub = UI.EMPTY_STRING;
 		if (_subCategory == YearSubCategory.WEEK) {
@@ -61,25 +59,27 @@ public class TVITourBookYear extends TVITourBookItem {
 			sumYearSub = "startMonth"; //$NON-NLS-1$
 		}
 
-		sb.append("SELECT "); //$NON-NLS-1$
+		final String sql = ""
+		//
+				+ "SELECT " //$NON-NLS-1$
 
-		sb.append(sumYear + ", "); //$NON-NLS-1$
-		sb.append(sumYearSub + ","); //$NON-NLS-1$
-		sb.append(SQL_SUM_COLUMNS);
+				+ (sumYear + ", ") //$NON-NLS-1$
+				+ (sumYearSub + ",") //$NON-NLS-1$
+				+ SQL_SUM_COLUMNS
 
-		sb.append(" FROM " + TourDatabase.TABLE_TOUR_DATA); //$NON-NLS-1$
+				+ (" FROM " + TourDatabase.TABLE_TOUR_DATA) //$NON-NLS-1$
 
-		sb.append(" WHERE " + sumYear + "=?"); //$NON-NLS-1$ //$NON-NLS-2$
-		sb.append(sqlFilter.getWhereClause());
+				+ (" WHERE " + sumYear + "=?") //$NON-NLS-1$ //$NON-NLS-2$
+				+ sqlFilter.getWhereClause()
 
-		sb.append(" GROUP BY " + sumYear + ", " + sumYearSub); //$NON-NLS-1$ //$NON-NLS-2$
-		sb.append(" ORDER BY " + sumYearSub); //$NON-NLS-1$
+				+ (" GROUP BY " + sumYear + ", " + sumYearSub) //$NON-NLS-1$ //$NON-NLS-2$
+				+ (" ORDER BY " + sumYearSub); //$NON-NLS-1$
 
 		try {
 
 			final Connection conn = TourDatabase.getInstance().getConnection();
 
-			final PreparedStatement statement = conn.prepareStatement(sb.toString());
+			final PreparedStatement statement = conn.prepareStatement(sql);
 			statement.setInt(1, tourYear);
 			sqlFilter.setParameters(statement, 2);
 

@@ -191,7 +191,7 @@ public class Util {
 			try {
 				conn.close();
 			} catch (final SQLException e) {
-				SQL.showSQLException(e);
+				SQL.showException(e);
 			}
 		}
 	}
@@ -202,7 +202,7 @@ public class Util {
 			try {
 				result.close();
 			} catch (final SQLException e) {
-				SQL.showSQLException(e);
+				SQL.showException(e);
 			}
 		}
 	}
@@ -213,7 +213,7 @@ public class Util {
 			try {
 				stmt.close();
 			} catch (final SQLException e) {
-				SQL.showSQLException(e);
+				SQL.showException(e);
 			}
 		}
 	}
@@ -723,17 +723,14 @@ public class Util {
 
 	public static String getSQLExceptionText(final SQLException e) {
 
-		final StringBuilder sb = new StringBuilder()//
-				.append("SQLException") //$NON-NLS-1$
-				.append(UI.NEW_LINE2)
-				.append("SQLState: " + (e).getSQLState()) //$NON-NLS-1$
-				.append(UI.NEW_LINE)
-				.append("ErrorCode: " + (e).getErrorCode()) //$NON-NLS-1$
-				.append(UI.NEW_LINE)
-				.append("Message: " + (e).getMessage()) //$NON-NLS-1$
-				.append(UI.NEW_LINE);
+		final String text = ""// //$NON-NLS-1$
 
-		return sb.toString();
+				+ ("SQLException" + UI.NEW_LINE2) //$NON-NLS-1$
+				+ ("SQLState: " + (e).getSQLState() + UI.NEW_LINE) //$NON-NLS-1$
+				+ ("ErrorCode: " + (e).getErrorCode() + UI.NEW_LINE) //$NON-NLS-1$
+				+ ("Message: " + (e).getMessage() + UI.NEW_LINE); //$NON-NLS-1$
+
+		return text;
 	}
 
 	public static String getStackTrace(final Throwable t) {

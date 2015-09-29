@@ -752,7 +752,7 @@ public class TourPhotoManager implements IPhotoServiceProvider {
 			}
 
 		} catch (final SQLException e) {
-			SQL.showSQLException(e);
+			SQL.showException(e);
 		} finally {
 			Util.closeSql(conn);
 		}
@@ -798,7 +798,7 @@ public class TourPhotoManager implements IPhotoServiceProvider {
 			numberOfTours = result.getInt(1);
 
 		} catch (final SQLException e) {
-			SQL.showSQLException(e);
+			SQL.showException(e);
 		} finally {
 			Util.closeSql(conn);
 		}

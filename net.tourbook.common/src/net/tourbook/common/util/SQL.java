@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -50,7 +50,7 @@ public final class SQL {
 		return SQL.SQL_STRING_SEPARATOR + string + SQL.SQL_STRING_SEPARATOR;
 	}
 
-	public static void showSQLException(SQLException exception) {
+	public static void showException(SQLException exception) {
 
 		while (exception != null) {
 
@@ -67,4 +67,23 @@ public final class SQL {
 		}
 	}
 
+	public static void showException(final SQLException exception, final String sqlStatement) {
+
+		Display.getDefault().asyncExec(new Runnable() {
+			@Override
+			public void run() {
+
+				final String message = "SQL statement: " + UI.NEW_LINE2 // //$NON-NLS-1$
+						+ sqlStatement
+						+ Util.getSQLExceptionText(exception);
+
+				MessageDialog.openError(Display.getDefault().getActiveShell(), //
+						"SQL Error", //$NON-NLS-1$
+						message);
+
+				StatusUtil.log(message);
+				StatusUtil.log(exception);
+			}
+		});
+	}
 }

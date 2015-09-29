@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -42,11 +42,8 @@ import net.tourbook.ui.TourTypeFilterSet;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.action.Action;
-import org.eclipse.jface.action.ICoolBarManager;
 import org.eclipse.jface.action.IMenuManager;
-import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.Separator;
-import org.eclipse.jface.action.ToolBarContributionItem;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -96,9 +93,6 @@ public class TourTypeFilterManager {
 	 */
 	private static ActionTTFilter				_selectedFilterAction;
 
-//	private static ICoolBarManager									_coolBar;
-//	private static IToolBarManager									_tbMgrTourType;
-//	private static ToolBarContributionItem							_tbItemTourType;
 	private static TourTypeContributionItem		_tourTypeContribItem;
 
 	static {
@@ -595,14 +589,7 @@ public class TourTypeFilterManager {
 		});
 	}
 
-	public static void setToolBarContribItem(	final ICoolBarManager coolBar,
-												final IToolBarManager tbMgrTourType,
-												final ToolBarContributionItem tbItemTourType,
-												final TourTypeContributionItem tourTypeContribItem) {
-
-//		_coolBar = coolBar;
-//		_tbMgrTourType = tbMgrTourType;
-//		_tbItemTourType = tbItemTourType;
+	public static void setToolBarContribItem(final TourTypeContributionItem tourTypeContribItem) {
 		_tourTypeContribItem = tourTypeContribItem;
 	}
 

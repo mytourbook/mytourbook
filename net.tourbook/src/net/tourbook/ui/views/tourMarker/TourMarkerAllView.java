@@ -1398,7 +1398,7 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 			}
 
 		} catch (final SQLException e) {
-			SQL.showSQLException(e);
+			SQL.showException(e);
 		} finally {
 			Util.closeSql(conn);
 			Util.closeSql(statement);

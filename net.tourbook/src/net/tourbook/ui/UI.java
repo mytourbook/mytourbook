@@ -1207,24 +1207,6 @@ public class UI {
 		});
 	}
 
-	public static void showSQLException(final SQLException e, final String sqlStatement) {
-
-		Display.getDefault().asyncExec(new Runnable() {
-			@Override
-			public void run() {
-
-				final String message = "SQL statement: " + UI.NEW_LINE2 + sqlStatement + Util.getSQLExceptionText(e); //$NON-NLS-1$
-
-				MessageDialog.openError(Display.getDefault().getActiveShell(), //
-						"SQL Error", //$NON-NLS-1$
-						message);
-
-				StatusUtil.log(message);
-				StatusUtil.log(e);
-			}
-		});
-	}
-
 	public static void updateUI_Tags(final TourData tourData, final Label tourTagLabel) {
 
 		// tour tags

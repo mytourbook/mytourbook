@@ -181,6 +181,8 @@ public class Messages extends NLS {
 	public static String		Action_Tag_AutoOpenCancel;
 	public static String		Action_Tag_AutoOpenOK;
 
+	public static String		Action_TourBook_CollateTours;
+
 	public static String		Action_TourType_ModifyTourTypeFilter;
 
 	public static String		Adjust_Altitude_Checkbox_SRTM_SelectWholeTour;
@@ -605,7 +607,6 @@ public class Messages extends NLS {
 	public static String		Image__App_Close;
 	public static String		Image__App_Edit_Paste;
 	public static String		Image__App_OK;
-
 	public static String		Image__App_RestoreDefault;
 	public static String		Image__App_Trash;
 	public static String		Image__App_Trash_Disabled;
@@ -1208,6 +1209,8 @@ public class Messages extends NLS {
 	public static String		Slideout_ChartMarkerOptions_Label_Offset;
 	public static String		Slideout_ChartMarkerOptions_Label_Offset_Tooltip;
 	public static String		Slideout_ChartMarkerOptions_Label_Title;
+
+	public static String		Slideout_CollatedTours_Label_Title;
 
 	public static String		Slideout_SegmenterChartOptions_Checkbox_HideSmallValues;
 	public static String		Slideout_SegmenterChartOptions_Checkbox_HideSmallValues_Tooltip;

@@ -37,12 +37,13 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
 //	static final int				ITEM_TYPE_DAY	= 50;
 //	static final int				ITEM_TYPE_TOUR	= 60;
 
-	static final Calendar			calendar		= GregorianCalendar.getInstance();
-	private final IPreferenceStore	prefStore		= TourbookPlugin.getDefault().getPreferenceStore();
+	static final Calendar			calendar	= GregorianCalendar.getInstance();
+	private final IPreferenceStore	prefStore	= TourbookPlugin.getDefault().getPreferenceStore();
 
 	static final String				SQL_SUM_COLUMNS;
 
 	static {
+
 		SQL_SUM_COLUMNS = UI.EMPTY_STRING
 		//
 				+ "SUM(TOURDISTANCE)," // 								0	//$NON-NLS-1$
@@ -92,7 +93,7 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
 	 */
 	long							colTourDate;
 	String							colTourTitle;
-	long							colPersonId;														// tourPerson_personId
+	long							colPersonId;													// tourPerson_personId
 
 	long							colCounter;
 	long							colCalories;
@@ -131,7 +132,6 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
 
 	int								colFrontShiftCount;
 	int								colRearShiftCount;
-
 
 	TVITourBookItem(final TourBookView view) {
 
