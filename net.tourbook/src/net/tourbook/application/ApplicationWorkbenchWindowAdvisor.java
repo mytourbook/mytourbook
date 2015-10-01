@@ -38,6 +38,7 @@ import net.tourbook.proxy.DefaultProxySelector;
 import net.tourbook.proxy.IPreferences;
 import net.tourbook.search.FTSearchManager;
 import net.tourbook.tag.TagMenuManager;
+import net.tourbook.tour.TourTypeFilterManager;
 import net.tourbook.tour.TourTypeMenuManager;
 import net.tourbook.ui.UI;
 import net.tourbook.ui.views.rawData.RawDataView;
@@ -440,6 +441,8 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 		Display.getDefault().asyncExec(new Runnable() {
 			@Override
 			public void run() {
+
+				TourTypeFilterManager.restoreState();
 
 				TagMenuManager.restoreTagState();
 				TourTypeMenuManager.restoreState();

@@ -38,28 +38,28 @@ import org.eclipse.swt.widgets.ToolItem;
 
 public class ActionCollateTours extends ContributionItem implements IOpeningDialog {
 
-	private static final String	IMAGE_TOUR_INFO				= Messages.Image__TourBook_Month;
-	private static final String	IMAGE_TOUR_INFO_DISABLED	= Messages.Image__TourBook_Month;
+	private static final String		IMAGE_TOUR_INFO				= Messages.Image__TourBook_Month;
+	private static final String		IMAGE_TOUR_INFO_DISABLED	= Messages.Image__TourBook_Month;
 
-	private static final String	ID							= "net.tourbook.ui.views.tourBook.ActionCollateTours";	//$NON-NLS-1$
+	private static final String		ID							= "net.tourbook.ui.views.tourBook.ActionCollateTours";	//$NON-NLS-1$
 
-	private IDialogSettings		_state						= TourbookPlugin.getState(ID);
-	private String				_dialogId					= getClass().getCanonicalName();
+	private IDialogSettings			_state						= TourbookPlugin.getState(ID);
+	private String					_dialogId					= getClass().getCanonicalName();
 
-	private TourBookView		_tourBookView;
+	private TourBookView			_tourBookView;
 
-	private ToolBar				_toolBar;
-	private ToolItem			_actionToolItem;
+	private ToolBar					_toolBar;
+	private ToolItem				_actionToolItem;
 
-	private SlideoutCollateTours	_slideoutViewType;
+	private SlideoutCollateTours	_slideoutCollateTours;
 
 	/*
 	 * UI controls
 	 */
-	private Control				_parent;
+	private Control					_parent;
 
-	private Image				_imageEnabled;
-	private Image				_imageDisabled;
+	private Image					_imageEnabled;
+	private Image					_imageDisabled;
 
 	public ActionCollateTours(final TourBookView tourBookView, final Control parent) {
 
@@ -106,7 +106,7 @@ public class ActionCollateTours extends ContributionItem implements IOpeningDial
 				}
 			});
 
-			_slideoutViewType = new SlideoutCollateTours(_parent, _toolBar, _state, _tourBookView);
+			_slideoutCollateTours = new SlideoutCollateTours(_parent, _toolBar, _state, _tourBookView);
 
 			updateUI();
 		}
@@ -119,7 +119,7 @@ public class ActionCollateTours extends ContributionItem implements IOpeningDial
 
 	@Override
 	public void hideDialog() {
-		_slideoutViewType.hideNow();
+		_slideoutCollateTours.hideNow();
 	}
 
 	private void onAction() {
@@ -141,7 +141,7 @@ public class ActionCollateTours extends ContributionItem implements IOpeningDial
 
 		} else {
 
-			_slideoutViewType.close();
+			_slideoutCollateTours.close();
 		}
 
 		_tourBookView.actionSelectViewType();
@@ -183,7 +183,7 @@ public class ActionCollateTours extends ContributionItem implements IOpeningDial
 		// ensure other dialogs are closed
 		_tourBookView.closeOpenedDialogs(this);
 
-		_slideoutViewType.open(itemBounds, isOpenDelayed);
+		_slideoutCollateTours.open(itemBounds, isOpenDelayed);
 	}
 
 	public void setEnabled(final boolean isEnabled) {

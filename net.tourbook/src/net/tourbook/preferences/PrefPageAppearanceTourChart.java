@@ -1870,6 +1870,11 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 
 	private void saveState_UI() {
 
+		if (_tabFolder == null) {
+			// this happened
+			return;
+		}
+
 		// keep selected tab
 		_prefStore.setValue(STATE_PREF_PAGE_CHART_GRAPHS_SELECTED_TAB, _tabFolder.getSelectionIndex());
 	}

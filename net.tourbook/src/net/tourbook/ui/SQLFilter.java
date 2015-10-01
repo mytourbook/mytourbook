@@ -73,10 +73,10 @@ public class SQLFilter {
 		final TourTypeFilter activeTourTypeFilter = TourbookPlugin.getActiveTourTypeFilter();
 		if (activeTourTypeFilter != null) {
 
-			final SQLData sqlData = activeTourTypeFilter.getSQLData();
+			final TourTypeSQLData sqlData = activeTourTypeFilter.getSQLData();
 
-			sb.append(sqlData.whereString);
-			_parameters.addAll(sqlData.longParameters);
+			sb.append(sqlData.getWhereString());
+			_parameters.addAll(sqlData.getParameters());
 		}
 
 		_sqlWhereClause = sb.toString();
@@ -100,10 +100,13 @@ public class SQLFilter {
 	public void setParameters(final PreparedStatement statement, final int startIndex) throws SQLException {
 
 		int parameterIndex = startIndex;
+
 		for (final Long longParameter : _parameters) {
 
 			if (longParameter != null) {
+
 				statement.setLong(parameterIndex, longParameter.longValue());
+
 				parameterIndex++;
 			}
 		}

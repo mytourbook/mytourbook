@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2012  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -30,18 +30,18 @@ import org.eclipse.swt.graphics.Image;
 public class TourTypeFilter {
 
 	/**
-	 * this is a system filter like all tour types or no tour types
+	 * This is a system filter like all tour types or no tour types.
 	 */
 	public static final int		FILTER_TYPE_SYSTEM				= 1;
 
 	/**
-	 * filter contains one tour type which is stored in the database, the tour type can be fetched
-	 * with {@link #getTourType()}
+	 * Filter contains one tour type which is stored in the database, the tour type can be fetched
+	 * with {@link #getTourType()}.
 	 */
 	public static final int		FILTER_TYPE_DB					= 2;
 
 	/**
-	 * filter contains several tour types
+	 * Filter contains several tour types.
 	 */
 	public static final int		FILTER_TYPE_TOURTYPE_SET		= 3;
 
@@ -215,9 +215,9 @@ public class TourTypeFilter {
 	}
 
 	/**
-	 * @return Returns a sql string for the WHERE clause to select the tour types in the database
+	 * @return Returns a sql string for the WHERE clause to select the tour types in the database.
 	 */
-	public SQLData getSQLData() {
+	public TourTypeSQLData getSQLData() {
 
 		String sqlWhereClause = UI.EMPTY_STRING;
 		final ArrayList<Long> sqlTourTypes = new ArrayList<Long>();
@@ -278,7 +278,7 @@ public class TourTypeFilter {
 			break;
 		}
 
-		return new SQLData(sqlWhereClause, sqlTourTypes);
+		return new TourTypeSQLData(sqlWhereClause, sqlTourTypes);
 	}
 
 	public int getSystemFilterId() {
@@ -350,11 +350,11 @@ public class TourTypeFilter {
 		return "TourTypeFilter [" //$NON-NLS-1$
 				+ ("name=" + getFilterName()) //$NON-NLS-1$
 				+ (", filterType=" + _filterType) //$NON-NLS-1$
-				+ (", tourType=" + _tourType) //$NON-NLS-1$
-				+ (", tourTypeSet=" + _tourTypeSet) //$NON-NLS-1$
-				+ (", systemFilterName=" + _systemFilterName) //$NON-NLS-1$
-				+ (", systemFilterId=" + _systemFilterId) //$NON-NLS-1$
-				+ "]"; //$NON-NLS-1$
+//				+ (", tourType=" + _tourType) //$NON-NLS-1$
+//				+ (", tourTypeSet=" + _tourTypeSet) //$NON-NLS-1$
+//				+ (", systemFilterName=" + _systemFilterName) //$NON-NLS-1$
+//				+ (", systemFilterId=" + _systemFilterId) //$NON-NLS-1$
+				+ "]\n"; //$NON-NLS-1$
 	}
 
 }

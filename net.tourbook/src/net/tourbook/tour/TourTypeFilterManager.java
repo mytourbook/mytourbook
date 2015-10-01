@@ -129,7 +129,7 @@ public class TourTypeFilterManager {
 
 			_tourTypeContribItem.updateUI(__ttFilter);
 
-			setActiveTourTypeFilter(__ttFilter);
+			setActiveTourTypeFilter(__ttFilter, true);
 		}
 
 		@Override
@@ -169,7 +169,7 @@ public class TourTypeFilterManager {
 
 						updateTourTypeFilter();
 
-						selectTourTypeFilter(activeTourTypeFilter);
+						selectTourTypeFilter(activeTourTypeFilter, false);
 					}
 				}
 			}
@@ -195,9 +195,6 @@ public class TourTypeFilterManager {
 			ttFilterAction.setChecked(isChecked);
 			ttFilterAction.setEnabled(isChecked == false);
 
-//			final String filterName = (isChecked ? "\u25cf   " : "     ") + ttFilterAction.__ttFilter.getFilterName(); //$NON-NLS-1$ //$NON-NLS-2$
-//			final String filterName = (isChecked ? "" : "    ") + ttFilterAction.__ttFilter.getFilterName();
-
 			String filterName;
 
 			if (isChecked) {
@@ -210,7 +207,6 @@ public class TourTypeFilterManager {
 
 			// disabled filter image is hidden because it look ugly on win32
 			ttFilterAction.setImageDescriptor(isChecked ? null : ttFilterAction.__filterImageDescriptor);
-//			ttFilterAction.setImageDescriptor(ttFilterAction.__filterImageDescriptor);
 
 			menuMgr.add(ttFilterAction);
 		}
@@ -219,7 +215,12 @@ public class TourTypeFilterManager {
 		menuMgr.add(_actionOpenTourTypePrefs);
 	}
 
-	private static ArrayList<TourTypeFilter> getTourTypeFilters() {
+	/**
+	 * @return Returns a list with all available tour type filters.
+	 *         <p>
+	 *         <b>This list MUST NOT BE MODIFIED as it is synched with another list !!!</b>
+	 */
+	public static ArrayList<TourTypeFilter> getTourTypeFilters() {
 
 		if (_tourTypeFilters == null) {
 			updateTourTypeFilter();
@@ -448,7 +449,7 @@ public class TourTypeFilterManager {
 		return filterList;
 	}
 
-	public static void restoreTourTypeFilter() {
+	public static void restoreState() {
 
 		final ArrayList<TourTypeFilter> tourTypeFilters = getTourTypeFilters();
 
@@ -482,7 +483,7 @@ public class TourTypeFilterManager {
 		}
 
 		// try to reselect the last tour type filter
-		selectTourTypeFilter(selectTourTypeFilter);
+		selectTourTypeFilter(selectTourTypeFilter, false);
 	}
 
 	public static void saveState(final IMemento memento) {
@@ -516,13 +517,13 @@ public class TourTypeFilterManager {
 
 			// select next filter
 
-			selectTourTypeFilter(_tourTypeFilters.get(++selectedFilterIndex));
+			selectTourTypeFilter(_tourTypeFilters.get(++selectedFilterIndex), true);
 
 		} else if (isNext == false && selectedFilterIndex > 0) {
 
 			// select previous filter
 
-			selectTourTypeFilter(_tourTypeFilters.get(--selectedFilterIndex));
+			selectTourTypeFilter(_tourTypeFilters.get(--selectedFilterIndex), true);
 
 		} else {
 			return false;
@@ -534,9 +535,11 @@ public class TourTypeFilterManager {
 	/**
 	 * reselect the tour type in the combo box and set the active tour type in the plugin activator
 	 * 
+	 * @param isFireEvent
 	 * @param tourTypeFilter
 	 */
-	private static TourTypeFilter selectTourTypeFilter(final TourTypeFilter requestedTourTypeFilter) {
+	private static TourTypeFilter selectTourTypeFilter(	final TourTypeFilter requestedTourTypeFilter,
+														final boolean isFireEvent) {
 
 		ActionTTFilter selectedTTFilterAction = null;
 
@@ -566,14 +569,18 @@ public class TourTypeFilterManager {
 
 		_tourTypeContribItem.updateUI(selectedFilter);
 
-		setActiveTourTypeFilter(selectedFilter);
+		setActiveTourTypeFilter(selectedFilter, isFireEvent);
 
 		return selectedFilter;
 	}
 
-	private static void setActiveTourTypeFilter(final TourTypeFilter ttFilter) {
+	private static void setActiveTourTypeFilter(final TourTypeFilter ttFilter, final boolean isFireEvent) {
 
 		TourbookPlugin.setActiveTourTypeFilter(ttFilter);
+
+		if (isFireEvent == false) {
+			return;
+		}
 
 		/*
 		 * fire as asynch that the combo box drop down is hidden and the combo text ist displayed

@@ -64,6 +64,8 @@ import net.tourbook.tour.TourManager;
 import net.tourbook.tour.TourTypeMenuManager;
 import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.ITourProviderByID;
+import net.tourbook.ui.TourTypeFilter;
+import net.tourbook.ui.TourTypeSQLData;
 import net.tourbook.ui.TreeColumnFactory;
 import net.tourbook.ui.action.ActionCollapseAll;
 import net.tourbook.ui.action.ActionCollapseOthers;
@@ -126,6 +128,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.ScrollBar;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISelectionListener;
@@ -253,6 +256,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 	private boolean										_isInReload;
 	private boolean										_isRecTimeFormat_hhmmss;
 	private boolean										_isDriveTimeFormat_hhmmss;
+	private boolean										_isInUIUpdate;
 
 	private boolean										_isToolTipInDate;
 	private boolean										_isToolTipInTags;
@@ -684,9 +688,9 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 			@Override
 			public void run() {
 
-				_tourViewer.setInput(this);
-
 				_isInStartup = true;
+
+				_tourViewer.setInput(this);
 
 				reselectTourViewer();
 			}
@@ -901,9 +905,9 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 					// tour item
 					cell.setText(tourItem.treeColumn);
 
-				} else if (element instanceof TVITourBookTourType) {
+				} else if (element instanceof TVITourBookCollateEvent) {
 
-					final TVITourBookTourType tourTypeItem = (TVITourBookTourType) element;
+					final TVITourBookCollateEvent tourTypeItem = (TVITourBookCollateEvent) element;
 
 					// tour item
 					cell.setText(tourTypeItem.treeColumn);
@@ -1600,14 +1604,21 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 				final Object element = cell.getElement();
 				final long drivingTime = ((TVITourBookItem) element).colDrivingTime;
 
-				if (element instanceof TVITourBookTour) {
-					if (_isDriveTimeFormat_hhmmss) {
-						cell.setText(net.tourbook.ui.UI.format_hh_mm_ss(drivingTime).toString());
+				if (drivingTime == 0) {
+
+					cell.setText(UI.EMPTY_STRING);
+
+				} else {
+
+					if (element instanceof TVITourBookTour) {
+						if (_isDriveTimeFormat_hhmmss) {
+							cell.setText(net.tourbook.ui.UI.format_hh_mm_ss(drivingTime).toString());
+						} else {
+							cell.setText(net.tourbook.ui.UI.format_hh_mm(drivingTime + 30).toString());
+						}
 					} else {
 						cell.setText(net.tourbook.ui.UI.format_hh_mm(drivingTime + 30).toString());
 					}
-				} else {
-					cell.setText(net.tourbook.ui.UI.format_hh_mm(drivingTime + 30).toString());
 				}
 
 				setCellColor(cell, element);
@@ -1654,14 +1665,21 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 				final Object element = cell.getElement();
 				final long recordingTime = ((TVITourBookItem) element).colRecordingTime;
 
-				if (element instanceof TVITourBookTour) {
-					if (_isRecTimeFormat_hhmmss) {
-						cell.setText(net.tourbook.ui.UI.format_hh_mm_ss(recordingTime).toString());
+				if (recordingTime == 0) {
+
+					cell.setText(UI.EMPTY_STRING);
+
+				} else {
+
+					if (element instanceof TVITourBookTour) {
+						if (_isRecTimeFormat_hhmmss) {
+							cell.setText(net.tourbook.ui.UI.format_hh_mm_ss(recordingTime).toString());
+						} else {
+							cell.setText(net.tourbook.ui.UI.format_hh_mm(recordingTime + 30).toString());
+						}
 					} else {
 						cell.setText(net.tourbook.ui.UI.format_hh_mm(recordingTime + 30).toString());
 					}
-				} else {
-					cell.setText(net.tourbook.ui.UI.format_hh_mm(recordingTime + 30).toString());
 				}
 
 				setCellColor(cell, element);
@@ -2678,6 +2696,17 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		enableActions();
 	}
 
+	TourTypeSQLData getCollatedSQL() {
+
+		final TourTypeFilter collatedFilter = CollateTourManager.getSelectedCollateFilter();
+
+		if (collatedFilter == null) {
+			return null;
+		}
+
+		return collatedFilter.getSQLData();
+	}
+
 	@Override
 	public ColumnManager getColumnManager() {
 		return _columnManager;
@@ -2777,6 +2806,13 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		return selectedTourData;
 	}
 
+	/**
+	 * @return Returns the shell of the tree/part.
+	 */
+	Shell getShell() {
+		return _tourViewer.getTree().getShell();
+	}
+
 	@Override
 	public ColumnViewer getViewer() {
 		return _tourViewer;
@@ -2805,6 +2841,10 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 				tourIds.add(tourItem.getTourId());
 			}
 		}
+	}
+
+	boolean isInUIUpdate() {
+		return _isInUIUpdate;
 	}
 
 	/**
@@ -2977,6 +3017,10 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 
 	@Override
 	public void reloadViewer() {
+
+		if (_isInReload) {
+			return;
+		}
 
 		final Tree tree = _tourViewer.getTree();
 		tree.setRedraw(false);
@@ -3209,6 +3253,10 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		_tourViewer.getControl().setFocus();
 	}
 
+	void setIsInUIUpdate(final boolean isInUpdate) {
+		_isInUIUpdate = isInUpdate;
+	}
+
 	private void updateToolTipState() {
 
 		_isToolTipInDate = _prefStore.getBoolean(ITourbookPreferences.VIEW_TOOLTIP_TOURBOOK_DATE);
@@ -3217,10 +3265,4 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		_isToolTipInTitle = _prefStore.getBoolean(ITourbookPreferences.VIEW_TOOLTIP_TOURBOOK_TITLE);
 		_isToolTipInTags = _prefStore.getBoolean(ITourbookPreferences.VIEW_TOOLTIP_TOURBOOK_TAGS);
 	}
-
-	void updateViewType() {
-		// TODO Auto-generated method stub
-
-	}
-
 }

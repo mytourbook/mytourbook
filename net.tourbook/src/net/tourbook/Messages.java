@@ -1210,6 +1210,7 @@ public class Messages extends NLS {
 	public static String		Slideout_ChartMarkerOptions_Label_Offset_Tooltip;
 	public static String		Slideout_ChartMarkerOptions_Label_Title;
 
+	public static String		Slideout_CollatedTours_Label_SelectTourType;
 	public static String		Slideout_CollatedTours_Label_Title;
 
 	public static String		Slideout_SegmenterChartOptions_Checkbox_HideSmallValues;
@@ -1344,6 +1345,10 @@ public class Messages extends NLS {
 	public static String		Tour_Book_Combo_statistic_tooltip;
 	public static String		Tour_Book_Combo_year_tooltip;
 	public static String		Tour_Book_Label_chart_title;
+
+	public static String	Tour_Book_Monitor_CollateSubtask;
+
+	public static String	Tour_Book_Monitor_CollateTask;
 
 	public static String		Tour_Data_LoadTourData_Monitor;
 	public static String		Tour_Data_LoadTourData_Monitor_SubTask;

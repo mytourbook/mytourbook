@@ -55,8 +55,8 @@ public class TourbookPlugin extends AbstractUIPlugin {
 	private static ResourceBundle			_resourceBundle;
 
 	/**
-	 * active person (selected in the combobox), is set to <code>null</code> when 'All People' are
-	 * selected
+	 * Active person which is selected in the app toolbar, when <code>null</code> then 'All People'
+	 * are selected.
 	 */
 	private static TourPerson				_activePerson;
 
@@ -182,7 +182,9 @@ public class TourbookPlugin extends AbstractUIPlugin {
 	}
 
 	public static void setActiveTourTypeFilter(final TourTypeFilter tourTypeFilter) {
+
 		_activeTourTypeFilter = tourTypeFilter;
+
 		TourDatabase.updateActiveTourTypeList(tourTypeFilter);
 	}
 

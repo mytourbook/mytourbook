@@ -22,13 +22,13 @@ import net.tourbook.ui.SQLFilter;
 
 import org.joda.time.DateTime;
 
-public class TVITourBookTourType extends TVITourBookItem {
+public class TVITourBookCollateEvent extends TVITourBookItem {
 
 	DateTime	eventStart;
 	DateTime	eventEnd;
 	String		eventStartText;
 
-	public TVITourBookTourType(final TourBookView view, final TVITourBookItem parentItem) {
+	public TVITourBookCollateEvent(final TourBookView view, final TVITourBookItem parentItem) {
 
 		super(view);
 
@@ -94,6 +94,11 @@ public class TVITourBookTourType extends TVITourBookItem {
 //		} catch (final SQLException e) {
 //			UI.showSQLException(e);
 //		}
+	}
+
+	@Override
+	public boolean hasChildren() {
+		return false;
 	}
 
 }

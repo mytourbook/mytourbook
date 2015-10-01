@@ -69,6 +69,10 @@ public final class ActionOpenPrefDialog extends Action {
 		_prefDialogData = data;
 	}
 
+	/**
+	 * Set shell to the parent otherwise the pref dialog is closed when the slideout is closed. Is a
+	 * bit tricky :-)
+	 */
 	public void setShell(final Shell shell) {
 
 		_shell = shell;
