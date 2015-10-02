@@ -714,6 +714,8 @@ public class Messages extends NLS {
 	public static String		Image__tour_new_disabled;
 	public static String		Image__tour_options;
 	public static String		Image__tour_viewer;
+	public static String		Image__TourBook_CollatedTours;
+	public static String		Image__TourBook_CollatedTours_Disabled;
 	public static String		Image__TourBook_Month;
 	public static String		Image__TourBook_SelectAll;
 	public static String		Image__TourBook_Week;
@@ -1346,9 +1348,9 @@ public class Messages extends NLS {
 	public static String		Tour_Book_Combo_year_tooltip;
 	public static String		Tour_Book_Label_chart_title;
 
-	public static String	Tour_Book_Monitor_CollateSubtask;
+	public static String		Tour_Book_Monitor_CollateSubtask;
 
-	public static String	Tour_Book_Monitor_CollateTask;
+	public static String		Tour_Book_Monitor_CollateTask;
 
 	public static String		Tour_Data_LoadTourData_Monitor;
 	public static String		Tour_Data_LoadTourData_Monitor_SubTask;

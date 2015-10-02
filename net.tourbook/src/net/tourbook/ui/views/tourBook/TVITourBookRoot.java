@@ -110,9 +110,6 @@ public class TVITourBookRoot extends TVITourBookItem {
 			final PreparedStatement statement = conn.prepareStatement(sql);
 			sqlFilter.setParameters(statement, 1);
 
-//			final long time = System.currentTimeMillis();
-//			System.out.println(System.currentTimeMillis() - time + "ms");
-
 			final ResultSet result = statement.executeQuery();
 			while (result.next()) {
 
@@ -162,9 +159,6 @@ public class TVITourBookRoot extends TVITourBookItem {
 			final PreparedStatement statement = conn.prepareStatement(sql);
 			sqlData.setParameters(statement, 1);
 
-//			final long time = System.currentTimeMillis();
-//			System.out.println(System.currentTimeMillis() - time + "ms");
-
 			final ResultSet result = statement.executeQuery();
 			while (result.next()) {
 
@@ -206,41 +200,7 @@ public class TVITourBookRoot extends TVITourBookItem {
 
 	private void getCollateTVI(final ArrayList<TVITourBookCollateEvent> collatedEvents) {
 
-		try {
-
-			/*
-			 * Run with a monitor because it can take a long time until all is computed.
-			 */
-
-			final IRunnableWithProgress runnable = new IRunnableWithProgress() {
-				@Override
-				public void run(final IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
-
-					getCollateTVI_Runnable(collatedEvents, monitor);
-				}
-			};
-
-			/*
-			 * Use the shell of the main app that the tooltip is not covered with the monitor,
-			 * otherwise it would be centered of the active shell.
-			 */
-			new ProgressMonitorDialog(tourBookView.getShell()).run(true, true, runnable);
-
-		} catch (final InvocationTargetException e) {
-			StatusUtil.showStatus(e);
-		} catch (final InterruptedException e) {
-			StatusUtil.showStatus(e);
-		}
-
-	}
-
-	private void getCollateTVI_Runnable(final ArrayList<TVITourBookCollateEvent> collatedEvents,
-										final IProgressMonitor monitor) {
-
-		int eventCounter = 0;
 		final int eventSize = collatedEvents.size();
-
-		monitor.beginTask(Messages.Tour_Book_Monitor_CollateTask, eventSize);
 
 		Connection conn = null;
 
@@ -256,6 +216,9 @@ public class TVITourBookRoot extends TVITourBookItem {
 				+ (" WHERE TourStartTime >= ? AND TourStartTime < ?") //$NON-NLS-1$
 				+ sqlFilter.getWhereClause();
 
+		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") + ("\t" + sql));
+		// TODO remove SYSTEM.OUT.PRINTLN
+
 		try {
 
 			conn = TourDatabase.getInstance().getConnection();
@@ -263,20 +226,22 @@ public class TVITourBookRoot extends TVITourBookItem {
 			final PreparedStatement statement = conn.prepareStatement(sql);
 			sqlFilter.setParameters(statement, 3);
 
-			long prevStart = 0;
+			final long[] prevStart = { 0 };
 
-			for (int eventIndex = 0; eventIndex < eventSize; eventIndex++) {
+			final int[] eventCounter = { 0 };
+			final long start = System.currentTimeMillis();
 
-				if (monitor.isCanceled()) {
-					break;
-				}
+			final int[] eventIndex = { 0 };
+			boolean isLongDuration = false;
 
-				final TVITourBookCollateEvent collateEvent = collatedEvents.get(eventIndex);
+			for (; eventIndex[0] < eventSize; eventIndex[0]++) {
 
-				final long eventStart = eventIndex == 0 ? Long.MIN_VALUE : prevStart;
+				final TVITourBookCollateEvent collateEvent = collatedEvents.get(eventIndex[0]);
+
+				final long eventStart = eventIndex[0] == 0 ? Long.MIN_VALUE : prevStart[0];
 				final long eventEnd = collateEvent.eventStart.getMillis();
 
-				prevStart = eventEnd;
+				prevStart[0] = eventEnd;
 
 				statement.setLong(1, eventStart);
 				statement.setLong(2, eventEnd);
@@ -287,8 +252,80 @@ public class TVITourBookRoot extends TVITourBookItem {
 					collateEvent.addSumColumns(result, 1);
 				}
 
-				monitor.subTask(NLS.bind(Messages.Tour_Book_Monitor_CollateSubtask, ++eventCounter, eventSize));
-				monitor.worked(1);
+				/*
+				 * Check if this is a long duration, run in progress monitor
+				 */
+				final long runDuration = System.currentTimeMillis() - start;
+				if (runDuration > 1000) {
+					isLongDuration = true;
+					break;
+				}
+
+				++eventCounter[0];
+			}
+
+			if (isLongDuration) {
+
+				try {
+
+					/*
+					 * Run with a monitor because it can take a longer time until all is computed.
+					 */
+
+					final IRunnableWithProgress runnable = new IRunnableWithProgress() {
+						@Override
+						public void run(final IProgressMonitor monitor) throws InvocationTargetException,
+								InterruptedException {
+
+							try {
+								monitor.beginTask(Messages.Tour_Book_Monitor_CollateTask, eventSize);
+								monitor.worked(eventCounter[0]);
+
+								for (; eventIndex[0] < eventSize; eventIndex[0]++) {
+
+									if (monitor.isCanceled()) {
+										break;
+									}
+
+									final TVITourBookCollateEvent collateEvent = collatedEvents.get(eventIndex[0]);
+
+									final long eventStart = eventIndex[0] == 0 ? Long.MIN_VALUE : prevStart[0];
+									final long eventEnd = collateEvent.eventStart.getMillis();
+
+									prevStart[0] = eventEnd;
+
+									statement.setLong(1, eventStart);
+									statement.setLong(2, eventEnd);
+
+									final ResultSet result = statement.executeQuery();
+
+									while (result.next()) {
+										collateEvent.addSumColumns(result, 1);
+									}
+
+									monitor.subTask(NLS.bind(
+											Messages.Tour_Book_Monitor_CollateSubtask,
+											++eventCounter[0],
+											eventSize));
+									monitor.worked(1);
+								}
+							} catch (final SQLException e) {
+								SQL.showException(e, sql);
+							}
+						}
+					};
+
+					/*
+					 * Use the shell of the main app that the tooltip is not covered with the
+					 * monitor, otherwise it would be centered of the active shell.
+					 */
+					new ProgressMonitorDialog(tourBookView.getShell()).run(true, true, runnable);
+
+				} catch (final InvocationTargetException e) {
+					StatusUtil.showStatus(e);
+				} catch (final InterruptedException e) {
+					StatusUtil.showStatus(e);
+				}
 			}
 
 		} catch (final SQLException e) {
@@ -296,5 +333,7 @@ public class TVITourBookRoot extends TVITourBookItem {
 		} finally {
 			Util.closeSql(conn);
 		}
+
 	}
+
 }

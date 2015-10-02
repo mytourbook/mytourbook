@@ -690,8 +690,19 @@ public class SlideoutCollateTours extends AnimatedToolTipShell {
 
 		CollateTourManager.setSelectedCollateFilter(ttFilter);
 
-		// the tree root items gets the selected tour type filter from the collate manager
-		_tourBookView.reloadViewer();
+		// run async that the UI is updated before a longer job to get the data from the db
+		Display.getCurrent().asyncExec(new Runnable() {
+			@Override
+			public void run() {
+
+				if (_cursorHand.isDisposed()) {
+					return;
+				}
+
+				// the tree root items gets the selected tour type filter from the collate manager
+				_tourBookView.reloadViewer();
+			}
+		});
 	}
 
 	private void selectCollateFilter_Next(final boolean isNext) {

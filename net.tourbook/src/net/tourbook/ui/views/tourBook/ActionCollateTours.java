@@ -38,8 +38,8 @@ import org.eclipse.swt.widgets.ToolItem;
 
 public class ActionCollateTours extends ContributionItem implements IOpeningDialog {
 
-	private static final String		IMAGE_TOUR_INFO				= Messages.Image__TourBook_Month;
-	private static final String		IMAGE_TOUR_INFO_DISABLED	= Messages.Image__TourBook_Month;
+	private static final String		IMAGE_TOUR_INFO				= Messages.Image__TourBook_CollatedTours;
+	private static final String		IMAGE_TOUR_INFO_DISABLED	= Messages.Image__TourBook_CollatedTours_Disabled;
 
 	private static final String		ID							= "net.tourbook.ui.views.tourBook.ActionCollateTours";	//$NON-NLS-1$
 

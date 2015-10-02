@@ -440,6 +440,8 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 			_viewType = ViewType.COLLATE_BY_TOUR_TYPE;
 		}
 
+		enableActions();
+
 		reloadViewer();
 	}
 
@@ -2013,6 +2015,8 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 			isDeviceTour = firstSavedTour.isManualTour() == false;
 		}
 
+		final boolean isCategorizedByYear = _viewType == ViewType.CATEGORIZED_BY_YEAR;
+
 		/*
 		 * enable actions
 		 */
@@ -2046,6 +2050,9 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 				: selectedItems == 1 //
 						? firstElementHasChildren
 						: true);
+
+		_actionSelectAllTours.setEnabled(isCategorizedByYear);
+		_actionToggleMonthWeek.setEnabled(isCategorizedByYear);
 
 		_tagMenuMgr.enableTagActions(isTourSelected, isOneTour, firstTour == null ? null : firstTour.getTagIds());
 
@@ -2642,9 +2649,9 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		 */
 		final IToolBarManager tbm = getViewSite().getActionBars().getToolBarManager();
 
-		tbm.add(_actionCollateTours);
 		tbm.add(_actionSelectAllTours);
 		tbm.add(_actionToggleMonthWeek);
+		tbm.add(_actionCollateTours);
 
 		tbm.add(new Separator());
 		tbm.add(_actionExpandSelection);
