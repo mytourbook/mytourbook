@@ -13,7 +13,7 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.ui.views.tourBook;
+package net.tourbook.ui.views.collateTours;
 
 import java.util.ArrayList;
 
@@ -22,13 +22,13 @@ import net.tourbook.ui.SQLFilter;
 
 import org.joda.time.DateTime;
 
-public class TVITourBookCollateEvent extends TVITourBookItem {
+public class TVICollatedTour_Event extends TVICollatedTour {
 
 	DateTime	eventStart;
 	DateTime	eventEnd;
 	String		eventStartText;
 
-	public TVITourBookCollateEvent(final TourBookView view, final TVITourBookItem parentItem) {
+	public TVICollatedTour_Event(final CollatedToursView view, final TVICollatedTour parentItem) {
 
 		super(view);
 

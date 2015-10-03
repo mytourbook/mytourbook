@@ -13,10 +13,22 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.ui.views.tourBook;
+package net.tourbook.ui.views.collateTours;
 
-enum ViewType {
+import net.tourbook.common.util.Util;
 
-	CATEGORIZED_BY_YEAR, //
-	COLLATE_BY_TOUR_TYPE
+import org.eclipse.core.commands.AbstractHandler;
+import org.eclipse.core.commands.ExecutionEvent;
+import org.eclipse.core.commands.ExecutionException;
+
+public class ActionHandler_OpenView_CollatedTours extends AbstractHandler {
+
+	@Override
+	public Object execute(final ExecutionEvent event) throws ExecutionException {
+
+		Util.showView(CollatedToursView.ID, true);
+
+		return null;
+	}
+
 }

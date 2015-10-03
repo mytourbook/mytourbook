@@ -13,7 +13,7 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.ui.views.tourBook;
+package net.tourbook.ui.views.collateTours;
 
 import java.util.ArrayList;
 
@@ -25,7 +25,7 @@ import org.eclipse.jface.dialogs.IDialogSettings;
 
 class CollateTourManager {
 
-	private static final String				ID								= "net.tourbook.ui.views.tourBook.CollateTourManager";	//$NON-NLS-1$
+	private static final String				ID								= "net.tourbook.ui.views.collateTours.CollateTourManager";	//$NON-NLS-1$
 
 	private static final String				STATE_SELECTED_COLLATE_FILTER	= "STATE_SELECTED_COLLATE_FILTER";						//$NON-NLS-1$
 

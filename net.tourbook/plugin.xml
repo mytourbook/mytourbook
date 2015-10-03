@@ -520,14 +520,14 @@
 				<!-- Tour Import -->
 				<command 
 					commandId="command.net.tourbook.views.rawData.RawDataView"
-					icon="icons/rawdata.gif"
+					icon="icons/imported-tours.png"
 					label="%view_name_Data_Import"
 					mnemonic="%view_name_Data_Import_Mnemonic"/>
 		            
 				<!-- Tour Book -->
 				<command 
 					commandId="command.net.tourbook.views.tourListView"
-					icon="icons/tour-list.gif"
+					icon="icons/tourbook-tours.png"
 					label="%view_name_Book"
 					mnemonic="%view_name_Book_Mnemonic"/>
 		            
@@ -541,17 +541,25 @@
 				<!-- Tour Catalog -->
 				<command 
 					commandId="command.net.tourbook.views.tourCatalog.TourCatalogView"
-					icon="icons/tour-map.gif"
+					icon="icons/reference-tours.png"
 					label="%view_name_ReferenceTours"
 					mnemonic="%view_name_ReferenceTours_Mnemonic"/>
 
 				<!-- Tagged Tours -->
 				<command 
 					commandId="command.net.tourbook.views.tagViewID"
-					icon="icons/tour-tag.gif"
+					icon="icons/tagged-tours.png"
 					label="%command_tagging_name"
 					mnemonic="%command_tagging_name_Mnemonic"
 					tooltip="%command_tagging_name_tooltip"/>
+
+				<!-- Collated Tours -->
+				<command 
+					commandId="command.net.tourbook.views.collatedToursViewID"
+					icon="icons/collated-tours.png"
+					label="%View_Name_CollatedTours"
+					mnemonic="%View_Name_CollatedTours_Mnemonic"
+					tooltip="%View_Name_CollatedTours_Tooltip"/>
 		            
 				<!-- Statistics -->
 				<command 
@@ -564,9 +572,6 @@
 					name="net.tourbook.separator.TourMarker"
 					visible="true"/>
 				 
-				<!-- Shared Marker -->
-				
-				
 				<!-- All Tour Marker -->
 				<command
 					commandId="command.net.tourbook.ui.views.TourMarkerAllView"
@@ -817,14 +822,14 @@
 				<!-- Tour Import -->
 				<command 
 					commandId="command.net.tourbook.views.rawData.RawDataView"
-					icon="icons/rawdata.gif"
+					icon="icons/imported-tours.png"
 					label="%view_name_Data_Import"
 					mnemonic="%view_name_Data_Import_Mnemonic"/>
 				
 				<!-- Tour Book -->
 				<command 
 					commandId="command.net.tourbook.views.tourListView"
-					icon="icons/tour-list.gif"
+					icon="icons/tourbook-tours.png"
 					label="%view_name_Book"
 					mnemonic="%view_name_Book_Mnemonic"/>
 				
@@ -1089,6 +1094,11 @@
 			defaultHandler="de.byteholder.geoclipse.poi.ActionHandlerOpenViewPOI"
 			/>
 
+		<command
+			id="command.net.tourbook.views.collatedToursViewID"
+			name="%View_Name_CollatedTours"
+			defaultHandler="net.tourbook.ui.views.collateTours.ActionHandler_OpenView_CollatedTours"
+			/>
 		<command
 			id="command.net.tourbook.ui.views.TourMarkerAllView"
 			name="%View_Name_TourMarkerAll"
@@ -1366,13 +1376,13 @@
 			<view
 				category="net.tourbook.category.tourList"
 				class="net.tourbook.ui.views.rawData.RawDataView"
-				icon="icons/rawdata.gif"
+				icon="icons/imported-tours.png"
 				id="net.tourbook.views.rawData.RawDataView"
 				name="%view_name_Data_Import"/>
 			<view
 				category="net.tourbook.category.tourList"
 				class="net.tourbook.ui.views.tourBook.TourBookView"
-				icon="icons/tour-list.gif"
+				icon="icons/tourbook-tours.png"
 				id="net.tourbook.views.tourListView"
 				name="%view_name_Book"/>
 			<view
@@ -1384,13 +1394,19 @@
 			<view
 				category="net.tourbook.category.tourList"
 				class="net.tourbook.ui.views.tagging.TaggingView"
-				icon="icons/tour-tag.gif"
+				icon="icons/tagged-tours.png"
 				id="net.tourbook.views.tagViewID"
 				name="%view_name_tagView"/>
 			<view
 				category="net.tourbook.category.tourList"
+				class="net.tourbook.ui.views.collateTours.CollatedToursView"
+				id="net.tourbook.ui.views.collateTours.CollatedToursView"
+				icon="icons/collated-tours.png"
+				name="%View_Name_CollatedTours"/>
+			<view
+				category="net.tourbook.category.tourList"
 				class="net.tourbook.ui.views.tourCatalog.TourCatalogView"
-				icon="icons/tour-map.gif"
+				icon="icons/reference-tours.png"
 				id="net.tourbook.views.tourCatalog.TourCatalogView"
 				name="%view_name_ReferenceTours"/>
 			<view

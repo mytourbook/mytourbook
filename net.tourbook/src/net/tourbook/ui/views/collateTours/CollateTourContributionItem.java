@@ -1,52 +1,49 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
- * 
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.ui.views.tourBook;
+package net.tourbook.ui.views.collateTours;
 
 import java.util.ArrayList;
 
 import net.tourbook.Messages;
+import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.action.ActionOpenPrefDialog;
-import net.tourbook.common.tooltip.AnimatedToolTipShell;
 import net.tourbook.data.TourType;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.ui.TourTypeFilter;
 import net.tourbook.ui.TourTypeFilterSet;
 
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.ControlContribution;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
-import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.events.MenuListener;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
-import org.eclipse.swt.events.MouseTrackAdapter;
 import org.eclipse.swt.events.MouseTrackListener;
 import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -60,41 +57,30 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Menu;
-import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.ToolBar;
 
-/**
- * Tour chart marker properties slideout.
- */
-public class SlideoutCollateTours extends AnimatedToolTipShell {
+class CollateTourContributionItem extends ControlContribution {
 
-	// initialize with default values which are (should) never be used
-	private Rectangle				_toolTipItemBounds	= new Rectangle(0, 0, 50, 50);
+	private static final String		ID					= "net.tourbook.tourTypeFilter";	//$NON-NLS-1$
 
-	private final WaitTimer			_waitTimer			= new WaitTimer();
+	private final IPreferenceStore	_prefStore			= TourbookPlugin.getPrefStore();
 
-	private boolean					_isWaitTimerStarted;
-	private boolean					_canOpenToolTip;
-	private boolean					_isContextOpening;
-	private boolean					_isShowTourTypeContextMenu;
-	private boolean					_isUIUpdating;
+	private CollatedToursView		_collatedToursView;
 
 	private MouseListener			_mouseListener;
 	private MouseTrackListener		_mouseTrackListener;
 	private MouseWheelListener		_mouseWheelListener;
 
-	private TourBookView			_tourBookView;
+	private ActionOpenPrefDialog	_actionOpenTourTypePrefs;
 
 	private int						_collateNameWidth;
 
-	private long					_lastHideTime;
+	private boolean					_isUIUpdating;
+	private boolean					_isContextOpening	= false;
+
 	private long					_lastOpenTime;
+	private long					_lastHideTime;
 
 	private TourTypeFilter			_selectCollateFilter;
-
-	private ActionOpenPrefDialog	_actionOpenTourTypePrefs;
-
-	private PixelConverter			_pc;
 
 	/*
 	 * UI controls
@@ -102,10 +88,7 @@ public class SlideoutCollateTours extends AnimatedToolTipShell {
 	private Menu					_contextMenu;
 	private Cursor					_cursorHand;
 
-	private Composite				_shellContainer;
-
 	private Label					_lblFilterIcon;
-
 	private Link					_lnkFilterText;
 
 	private class ActionTTFilter extends Action {
@@ -133,76 +116,11 @@ public class SlideoutCollateTours extends AnimatedToolTipShell {
 		}
 	}
 
-	private final class WaitTimer implements Runnable {
-		@Override
-		public void run() {
-			open_Runnable();
-		}
-	}
+	public CollateTourContributionItem(final CollatedToursView collatedToursView) {
 
-	public SlideoutCollateTours(final Control ownerControl,
-								final ToolBar toolBar,
-								final IDialogSettings state,
-								final TourBookView tourBookView) {
+		super(ID);
 
-		super(ownerControl);
-
-		_tourBookView = tourBookView;
-
-		addListener(ownerControl, toolBar);
-
-		setToolTipCreateStyle(AnimatedToolTipShell.TOOLTIP_STYLE_KEEP_CONTENT);
-		setBehaviourOnMouseOver(AnimatedToolTipShell.MOUSE_OVER_BEHAVIOUR_IGNORE_OWNER);
-		setIsKeepShellOpenWhenMoved(false);
-
-		setFadeInSteps(1);
-		setFadeOutSteps(10);
-		setFadeOutDelaySteps(1);
-	}
-
-	private void addListener(final Control ownerControl, final ToolBar toolBar) {
-
-		toolBar.addMouseTrackListener(new MouseTrackAdapter() {
-			@Override
-			public void mouseExit(final MouseEvent e) {
-
-				// prevent to open the tooltip
-				_canOpenToolTip = false;
-			}
-		});
-	}
-
-	@Override
-	protected void beforeHideToolTip() {
-
-	}
-
-	@Override
-	protected boolean canCloseToolTip() {
-
-		boolean isCanClose = true;
-
-		if (_contextMenu.isVisible() || _isContextOpening || _tourBookView.isInUIUpdate()) {
-
-			isCanClose = false;
-		}
-
-		return isCanClose;
-	}
-
-	@Override
-	protected boolean canShowToolTip() {
-		return true;
-	}
-
-	@Override
-	protected boolean closeShellAfterHidden() {
-
-		/*
-		 * Close the tooltip that the state is saved.
-		 */
-
-		return true;
+		_collatedToursView = collatedToursView;
 	}
 
 	private void createActions() {
@@ -211,11 +129,11 @@ public class SlideoutCollateTours extends AnimatedToolTipShell {
 				Messages.Action_TourType_ModifyTourTypeFilter,
 				ITourbookPreferences.PREF_PAGE_TOUR_TYPE_FILTER);
 
-		_actionOpenTourTypePrefs.setShell(_tourBookView.getShell());
+		_actionOpenTourTypePrefs.setShell(_collatedToursView.getShell());
 	}
 
 	@Override
-	protected Composite createToolTipContentArea(final Composite parent) {
+	protected Control createControl(final Composite parent) {
 
 		initUI(parent);
 
@@ -230,54 +148,26 @@ public class SlideoutCollateTours extends AnimatedToolTipShell {
 
 	private Composite createUI(final Composite parent) {
 
-		_shellContainer = new Composite(parent, SWT.NONE);
-		GridLayoutFactory.swtDefaults().applyTo(_shellContainer);
-		{
-			final Composite container = new Composite(_shellContainer, SWT.NONE);
-			GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-			GridLayoutFactory.fillDefaults()//
-					.numColumns(1)
-					.applyTo(container);
-//			container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
-			{
-				createUI_10_Title(container);
-				createUI_30_TourTypeSelector(container);
-			}
-		}
-
-		return _shellContainer;
-	}
-
-	private void createUI_10_Title(final Composite parent) {
-
-		/*
-		 * Label: Slideout title
-		 */
-		final Label label = new Label(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().applyTo(label);
-		label.setText(Messages.Slideout_CollatedTours_Label_Title);
-		label.setFont(JFaceResources.getBannerFont());
-	}
-
-	private void createUI_30_TourTypeSelector(final Composite parent) {
-
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults()//
 				.grab(true, true)
 				.applyTo(container);
-		container.addMouseListener(_mouseListener);
-		container.addMouseTrackListener(_mouseTrackListener);
-		container.addMouseWheelListener(_mouseWheelListener);
 		GridLayoutFactory.fillDefaults()//
 				.numColumns(2)
 				.spacing(0, 0)
 				.applyTo(container);
-//		_filterContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
+
+		container.addMouseListener(_mouseListener);
+		container.addMouseTrackListener(_mouseTrackListener);
+		container.addMouseWheelListener(_mouseWheelListener);
+//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
 		{
 			createUI_32_FilterIcon(container);
 			createUI_34_FilterText(container);
 			createUI_36_ContextMenu();
 		}
+
+		return container;
 	}
 
 	private void createUI_32_FilterIcon(final Composite parent) {
@@ -301,6 +191,7 @@ public class SlideoutCollateTours extends AnimatedToolTipShell {
 				.hint(_collateNameWidth, SWT.DEFAULT)
 				.align(SWT.FILL, SWT.CENTER)
 				.applyTo(_lnkFilterText);
+//		_lnkFilterText.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
 
 		_lnkFilterText.addMouseListener(_mouseListener);
 		_lnkFilterText.addMouseTrackListener(_mouseTrackListener);
@@ -383,14 +274,20 @@ public class SlideoutCollateTours extends AnimatedToolTipShell {
 		_lblFilterIcon.setMenu(_contextMenu);
 	}
 
+	@Override
+	public void dispose() {
+
+		UI.disposeResource(_cursorHand);
+
+		super.dispose();
+	}
+
 	/**
 	 * Fills the tour type filter context menu.
 	 * 
 	 * @param menuMgr
 	 */
 	private void fillContextMenu(final IMenuManager menuMgr) {
-
-//		final TourTypeFilter activeTTFilter = TourbookPlugin.getActiveTourTypeFilter();
 
 		final ArrayList<TourTypeFilter> _tourTypeFilters = CollateTourManager.getAllCollateFilters();
 
@@ -424,55 +321,14 @@ public class SlideoutCollateTours extends AnimatedToolTipShell {
 		menuMgr.add(_actionOpenTourTypePrefs);
 	}
 
-	public Shell getShell() {
-
-		if (_shellContainer == null) {
-			return null;
-		}
-
-		return _shellContainer.getShell();
-	}
-
-	@Override
-	public Point getToolTipLocation(final Point tipSize) {
-
-//		final int tipWidth = tipSize.x;
-		final int tipHeight = tipSize.y;
-
-//		final int itemWidth = _toolTipItemBounds.width;
-		final int itemHeight = _toolTipItemBounds.height;
-
-		// center horizontally
-		final int devX = _toolTipItemBounds.x;// + itemWidth / 2 - tipWidth / 2;
-		int devY = _toolTipItemBounds.y + itemHeight + 0;
-
-		final Rectangle displayBounds = this.getShell().getDisplay().getBounds();
-
-		if (devY + tipHeight > displayBounds.height) {
-
-			// slideout is below bottom, show it above the action button
-
-			devY = _toolTipItemBounds.y - tipHeight;
-		}
-
-		return new Point(devX, devY);
-
-	}
-
 	private void initUI(final Composite parent) {
 
-		_pc = new PixelConverter(parent);
+		final PixelConverter pc = new PixelConverter(parent);
 
 		_cursorHand = new Cursor(parent.getDisplay(), SWT.CURSOR_HAND);
 
-		_collateNameWidth = _pc.convertWidthInCharsToPixels(20);
+		_collateNameWidth = pc.convertWidthInCharsToPixels(20);
 
-		parent.addDisposeListener(new DisposeListener() {
-			@Override
-			public void widgetDisposed(final DisposeEvent e) {
-				onDispose();
-			}
-		});
 
 		_mouseWheelListener = new MouseWheelListener() {
 
@@ -531,7 +387,7 @@ public class SlideoutCollateTours extends AnimatedToolTipShell {
 
 					control.setCursor(_cursorHand);
 
-					openContextMenu_Open(control, e);
+//					openContextMenu_Open(control, e);
 				}
 			}
 
@@ -550,75 +406,6 @@ public class SlideoutCollateTours extends AnimatedToolTipShell {
 			public void mouseHover(final MouseEvent e) {}
 		};
 	}
-
-	@Override
-	protected boolean isInNoHideArea(final Point displayCursorLocation) {
-
-		return _tourBookView.isInUIUpdate();
-	}
-
-	@Override
-	protected Rectangle noHideOnMouseMove() {
-
-		return _toolTipItemBounds;
-	}
-
-	private void onDispose() {
-
-		UI.disposeResource(_cursorHand);
-	}
-
-	/**
-	 * @param toolTipItemBounds
-	 * @param isOpenDelayed
-	 */
-	public void open(final Rectangle toolTipItemBounds, final boolean isOpenDelayed) {
-
-		if (isToolTipVisible()) {
-			return;
-		}
-
-		if (isOpenDelayed == false) {
-
-			if (toolTipItemBounds != null) {
-
-				_toolTipItemBounds = toolTipItemBounds;
-
-				showToolTip();
-			}
-
-		} else {
-
-			if (toolTipItemBounds == null) {
-
-				// item is not hovered any more
-
-				_canOpenToolTip = false;
-
-				return;
-			}
-
-			_toolTipItemBounds = toolTipItemBounds;
-			_canOpenToolTip = true;
-
-			if (_isWaitTimerStarted == false) {
-
-				_isWaitTimerStarted = true;
-
-				Display.getCurrent().timerExec(50, _waitTimer);
-			}
-		}
-	}
-
-	private void open_Runnable() {
-
-		_isWaitTimerStarted = false;
-
-		if (_canOpenToolTip) {
-			showToolTip();
-		}
-	}
-
 	private void openContextMenu() {
 
 		if (_contextMenu.isVisible() || _isContextOpening) {
@@ -644,7 +431,7 @@ public class SlideoutCollateTours extends AnimatedToolTipShell {
 
 	private void openContextMenu_Open(final Control control, final MouseEvent mouseEvent) {
 
-		if (_isShowTourTypeContextMenu == false || _contextMenu.isVisible() || _isContextOpening) {
+		if (_contextMenu.isVisible() || _isContextOpening) {
 			// nothing to do
 			return;
 		}
@@ -671,11 +458,6 @@ public class SlideoutCollateTours extends AnimatedToolTipShell {
 
 	private void restoreState() {
 
-		restoreTourTypeFilter();
-	}
-
-	private void restoreTourTypeFilter() {
-
 		_selectCollateFilter = CollateTourManager.getSelectedCollateFilter();
 
 		// try to reselect the last tour type filter
@@ -700,7 +482,7 @@ public class SlideoutCollateTours extends AnimatedToolTipShell {
 				}
 
 				// the tree root items gets the selected tour type filter from the collate manager
-				_tourBookView.reloadViewer();
+				_collatedToursView.reloadViewer();
 			}
 		});
 	}
@@ -813,5 +595,4 @@ public class SlideoutCollateTours extends AnimatedToolTipShell {
 
 		return filterTooltip;
 	}
-
 }
