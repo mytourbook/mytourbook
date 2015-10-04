@@ -19,12 +19,11 @@ import java.text.DateFormat;
 import java.text.DateFormatSymbols;
 import java.text.NumberFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
+import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.tooltip.IOpeningDialog;
@@ -99,6 +98,7 @@ import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.ITreeSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StyledString;
+import org.eclipse.jface.viewers.StyledString.Styler;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
@@ -118,21 +118,27 @@ import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.part.ViewPart;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
-import org.joda.time.format.ISODateTimeFormat;
+import org.joda.time.DateTime;
 
 public class CollatedToursView extends ViewPart implements ITourProvider, ITourViewer3, ITourProviderByID {
 
-	static public final String							ID							= "net.tourbook.ui.views.collateTours.CollatedToursView";	//$NON-NLS-1$
+	static public final String							ID						= "net.tourbook.ui.views.collateTours.CollatedToursView";	//$NON-NLS-1$
 
-	private static final String							GRAPH_LABEL_HEARTBEAT_UNIT	= net.tourbook.common.Messages.Graph_Label_Heartbeat_Unit;
+	private static Styler								DATE_STYLER;
+	private static final String[]						WEEK_DAYS;
 
-	private final IPreferenceStore						_prefStore					= TourbookPlugin.getPrefStore();
-	private final IDialogSettings						_state						= TourbookPlugin.getState(ID);
+	static {
+
+		WEEK_DAYS = DateFormatSymbols.getInstance().getShortWeekdays();
+
+		DATE_STYLER = StyledString.createColorRegistryStyler(net.tourbook.ui.UI.VIEW_COLOR_SUB, null);
+	}
+
+	private final IPreferenceStore						_prefStore				= TourbookPlugin.getPrefStore();
+	private final IDialogSettings						_state					= TourbookPlugin.getState(ID);
 	//
 	private ColumnManager								_columnManager;
-	private OpenDialogManager							_openDlgMgr					= new OpenDialogManager();
+	private OpenDialogManager							_openDlgMgr				= new OpenDialogManager();
 	//
 	private PostSelectionProvider						_postSelectionProvider;
 	private ISelectionListener							_postSelectionListener;
@@ -142,14 +148,12 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 	//
 	private TVICollatedTour_Root						_rootItem;
 	//
-	private final DateTimeFormatter						_dtFormatter;
-	private final DateTimeFormatter						_isoFormatter;
 	private final NumberFormat							_nf1;
 	private final NumberFormat							_nf1_NoGroup;
 
-	private final Calendar								_calendar;
+	private final DateFormat							_df;
 	private final DateFormat							_timeFormatter;
-	private static final String[]						_weekDays;
+
 	{
 		_nf1 = NumberFormat.getNumberInstance();
 		_nf1.setMinimumFractionDigits(1);
@@ -160,21 +164,14 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 		_nf1_NoGroup.setMaximumFractionDigits(1);
 		_nf1_NoGroup.setGroupingUsed(false);
 
-		_dtFormatter = DateTimeFormat.forPattern("yyyy-MM-dd_HH-mm-ss"); //$NON-NLS-1$
-		_isoFormatter = ISODateTimeFormat.basicDateTimeNoMillis();
-
-		_calendar = GregorianCalendar.getInstance();
+		_df = DateFormat.getDateInstance(DateFormat.SHORT);
 		_timeFormatter = DateFormat.getTimeInstance(DateFormat.SHORT);
 	}
 
-	static {
-		_weekDays = DateFormatSymbols.getInstance().getShortWeekdays();
-	}
+	private int											_selectedYear			= -1;
 
-	private int											_selectedYear				= -1;
-
-	private int											_selectedYearSub			= -1;
-	private final ArrayList<Long>						_selectedTourIds			= new ArrayList<Long>();
+	private int											_selectedYearSub		= -1;
+	private final ArrayList<Long>						_selectedTourIds		= new ArrayList<Long>();
 
 	private boolean										_isInStartup;
 	private boolean										_isInReload;
@@ -188,7 +185,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 	private boolean										_isToolTipInTitle;
 	private boolean										_isToolTipInWeekDay;
 
-	private final TourDoubleClickState					_tourDoubleClickState		= new TourDoubleClickState();
+	private final TourDoubleClickState					_tourDoubleClickState	= new TourDoubleClickState();
 	private TagMenuManager								_tagMenuMgr;
 	private TreeViewerTourInfoToolTip					_tourInfoToolTip;
 
@@ -225,7 +222,6 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 	private TreeViewer									_tourViewer;
 
 	private PixelConverter								_pc;
-
 
 	private static class ItemComparer implements IElementComparer {
 
@@ -483,7 +479,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 
 		_parent = parent;
 
-		_pc = new PixelConverter(parent);
+		initUI(parent);
 
 		// define all columns for the viewer
 		_columnManager = new ColumnManager(this, _state);
@@ -622,7 +618,6 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 		_columnManager.createHeaderContextMenu(tree, treeContextMenu);
 	}
 
-
 	/**
 	 * Defines all columns for the table viewer in the column manager, the sequence defines the
 	 * default columns
@@ -631,7 +626,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 	 */
 	private void defineAllColumns(final Composite parent) {
 
-		defineColumn_1stColumn_Date();
+		defineColumn_1stColumn_CollateEvent();
 		defineColumn_WeekDay();
 		defineColumn_Time();
 		defineColumn_TourTypeImage();
@@ -684,11 +679,11 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 	}
 
 	/**
-	 * tree column: date
+	 * Tree column: Collate event
 	 */
-	private void defineColumn_1stColumn_Date() {
+	private void defineColumn_1stColumn_CollateEvent() {
 
-		final TreeColumnDefinition colDef = TreeColumnFactory.DATE.createColumn(_columnManager, _pc);
+		final TreeColumnDefinition colDef = TreeColumnFactory.COLLATE_EVENT.createColumn(_columnManager, _pc);
 		colDef.setIsDefaultColumn();
 		colDef.setCanModifyVisibility(false);
 		colDef.setLabelProvider(new TourInfoToolTipStyledCellLabelProvider() {
@@ -717,28 +712,63 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 				if (element instanceof TVICollatedTour_Tour) {
 
 					// tour item
-					cell.setText(tourItem.treeColumn);
+					cell.setText(_df.format(tourItem.colTourStartTime));
 
-				} else {
+				} else if (element instanceof TVICollatedTour_Event) {
 
-					// year/month or week item
+					final TVICollatedTour_Event collatedEvent = (TVICollatedTour_Event) element;
+
+					// collated event
 
 					final StyledString styledString = new StyledString();
 
+					/*
+					 * Event start
+					 */
+					String startText;
+
+					if (collatedEvent.isFirstEvent) {
+						startText = ". . . . . . ";
+					} else {
+						startText = _df.format(collatedEvent.eventStart.getMillis());
+					}
+					styledString.append(startText, DATE_STYLER);
+
+					/*
+					 * Event end
+					 */
+					styledString.append(UI.DASH_WITH_SPACE);
+					final DateTime eventEnd = collatedEvent.eventEnd;
+					if (eventEnd == null) {
+
+						// this can be null when the collation process is canceled by the user
+
+						styledString.append(UI.SYMBOL_QUESTION_MARK, DATE_STYLER);
+
+					} else {
+
+						String endText;
+
+						if (collatedEvent.isLastEvent) {
+							endText = Messages.Collate_Tours_Label_Today;
+						} else {
+							endText = _df.format(eventEnd.getMillis());
+						}
+
+						styledString.append(endText, DATE_STYLER);
+					}
+
+					/*
+					 * Event text
+					 */
+					styledString.append(UI.SPACE3);
 					styledString.append(tourItem.treeColumn);
+
+					/*
+					 * Number of tours for each event
+					 */
 					styledString.append(UI.SPACE3);
 					styledString.append(Long.toString(tourItem.colCounter), StyledString.QUALIFIER_STYLER);
-
-//					if (tourItem instanceof TVITourBookYearSub) {
-//
-//						cell.setForeground(//
-//								JFaceResources.getColorRegistry().get(net.tourbook.ui.UI.VIEW_COLOR_SUB_SUB));
-//
-//					} else {
-//
-//						cell.setForeground(//
-//								JFaceResources.getColorRegistry().get(net.tourbook.ui.UI.VIEW_COLOR_SUB));
-//					}
 
 					cell.setText(styledString.getString());
 					cell.setStyleRanges(styledString.getStyleRanges());
@@ -1311,10 +1341,9 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 				final Object element = cell.getElement();
 				if (element instanceof TVICollatedTour_Tour) {
 
-					final long tourDate = ((TVICollatedTour_Tour) element).colTourDate;
-					_calendar.setTimeInMillis(tourDate);
+					final long tourStartTime = ((TVICollatedTour_Tour) element).colTourStartTime;
 
-					cell.setText(_timeFormatter.format(_calendar.getTime()));
+					cell.setText(_timeFormatter.format(tourStartTime));
 					setCellColor(cell, element);
 				}
 			}
@@ -1702,7 +1731,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 
 					final int weekDay = ((TVICollatedTour_Tour) element).colWeekDay;
 
-					cell.setText(_weekDays[weekDay]);
+					cell.setText(WEEK_DAYS[weekDay]);
 					setCellColor(cell, element);
 				}
 			}
@@ -1809,7 +1838,6 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 			isDeviceTour = firstSavedTour.isManualTour() == false;
 		}
 
-
 		/*
 		 * enable actions
 		 */
@@ -1850,8 +1878,6 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 				? firstTour.getTourTypeId()
 				: TourDatabase.ENTITY_IS_NOT_SAVED);
 	}
-
-
 
 	private void fillActionBars() {
 
@@ -2040,6 +2066,16 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 		return _tourViewer;
 	}
 
+	private void initUI(final Composite parent) {
+
+		_pc = new PixelConverter(parent);
+
+		/*
+		 * This ensures that the unit's are set otherwise they can be null
+		 */
+		@SuppressWarnings("unused")
+		final boolean is = net.tourbook.ui.UI.IS_WIN;
+	}
 
 //	/**
 //	 * @param yearSubItem
@@ -2061,7 +2097,6 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 	boolean isInUIUpdate() {
 		return _isInUIUpdate;
 	}
-
 
 	private void onSelectTreeItem(final SelectionChangedEvent event) {
 

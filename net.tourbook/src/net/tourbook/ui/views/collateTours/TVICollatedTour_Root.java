@@ -93,6 +93,8 @@ public class TVICollatedTour_Root extends TVICollatedTour {
 
 		try {
 
+			int eventCounter = 0;
+
 			conn = TourDatabase.getInstance().getConnection();
 
 			final PreparedStatement statement = conn.prepareStatement(sql);
@@ -108,12 +110,12 @@ public class TVICollatedTour_Root extends TVICollatedTour {
 				collateEvents.add(collateEvent);
 
 				final DateTime eventStart = new DateTime(dbTourStartTime);
-				final String eventStartText = UI.DateFormatterShort.format(dbTourStartTime);
 
 				collateEvent.treeColumn = dbTourTitle == null ? UI.EMPTY_STRING : dbTourTitle;
 
 				collateEvent.eventStart = eventStart;
-				collateEvent.eventStartText = eventStartText;
+
+				collateEvent.isFirstEvent = eventCounter++ == 0;
 			}
 
 		} catch (final SQLException e) {
@@ -129,11 +131,10 @@ public class TVICollatedTour_Root extends TVICollatedTour {
 		collateEvents.add(collateEvent);
 
 		final DateTime eventStart = new DateTime();
-		final String eventStartText = UI.DateFormatterShort.format(eventStart.getMillis());
 
-		collateEvent.treeColumn = "Today";
+		collateEvent.treeColumn = UI.EMPTY_STRING;
 		collateEvent.eventStart = eventStart;
-		collateEvent.eventStartText = eventStartText;
+		collateEvent.isLastEvent = true;
 
 		return collateEvents;
 	}
@@ -151,7 +152,7 @@ public class TVICollatedTour_Root extends TVICollatedTour {
 				+ "SELECT " //						 //$NON-NLS-1$
 				+ SQL_SUM_COLUMNS
 
-				+ " FROM " + TourDatabase.TABLE_TOUR_DATA + UI.NEW_LINE //$NON-NLS-1$
+				+ " FROM " + TourDatabase.TABLE_TOUR_DATA + "\n" //$NON-NLS-1$ //$NON-NLS-2$
 
 				+ (" WHERE TourStartTime >= ? AND TourStartTime < ?") //$NON-NLS-1$
 				+ sqlFilter.getWhereClause();
@@ -173,12 +174,21 @@ public class TVICollatedTour_Root extends TVICollatedTour {
 
 			for (; eventIndex[0] < eventSize; eventIndex[0]++) {
 
+				final boolean isFirstEvent = eventIndex[0] == 0;
+
 				final TVICollatedTour_Event collateEvent = collatedEvents.get(eventIndex[0]);
 
-				final long eventStart = eventIndex[0] == 0 ? Long.MIN_VALUE : prevStart[0];
+				final long eventStart = isFirstEvent ? Long.MIN_VALUE : prevStart[0];
 				final long eventEnd = collateEvent.eventStart.getMillis();
 
 				prevStart[0] = eventEnd;
+
+				/*
+				 * This is a highly complicated algorithim that the eventStart is overwritten again
+				 */
+				collateEvent.eventStart = new DateTime(eventStart);
+				collateEvent.eventEnd = new DateTime(eventEnd);
+				collateEvent.isFirstEvent = isFirstEvent;
 
 				statement.setLong(1, eventStart);
 				statement.setLong(2, eventEnd);
@@ -193,7 +203,7 @@ public class TVICollatedTour_Root extends TVICollatedTour {
 				 * Check if this is a long duration, run in progress monitor
 				 */
 				final long runDuration = System.currentTimeMillis() - start;
-				if (runDuration > 1000) {
+				if (runDuration > 500) {
 					isLongDuration = true;
 					break;
 				}
@@ -224,12 +234,22 @@ public class TVICollatedTour_Root extends TVICollatedTour {
 										break;
 									}
 
+									final boolean isFirstEvent = eventIndex[0] == 0;
+
 									final TVICollatedTour_Event collateEvent = collatedEvents.get(eventIndex[0]);
 
-									final long eventStart = eventIndex[0] == 0 ? Long.MIN_VALUE : prevStart[0];
+									final long eventStart = isFirstEvent ? Long.MIN_VALUE : prevStart[0];
 									final long eventEnd = collateEvent.eventStart.getMillis();
 
 									prevStart[0] = eventEnd;
+
+									/*
+									 * This is a highly complicated algorithim that the eventStart
+									 * is overwritten again
+									 */
+									collateEvent.eventStart = new DateTime(eventStart);
+									collateEvent.eventEnd = new DateTime(eventEnd);
+									collateEvent.isFirstEvent = isFirstEvent;
 
 									statement.setLong(1, eventStart);
 									statement.setLong(2, eventEnd);

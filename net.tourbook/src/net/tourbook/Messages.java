@@ -346,6 +346,13 @@ public class Messages extends NLS {
 
 	public static String		App_Window_Title;
 
+	public static String	Collate_Tours_Label_Today;
+
+	public static String		Collate_Tours_Label_TooltipHeader_Multiple;
+	public static String		Collate_Tours_Label_TooltipHeader_Single;
+	public static String		Collate_Tours_Link_SelectTourType;
+	public static String		Collate_Tours_Link_SelectTourType_Tooltip;
+
 	public static String		Compare_Result_Action_check_selected_tours;
 	public static String		Compare_Result_Action_remove_save_result;
 	public static String		Compare_Result_Action_save_checked_tours;

@@ -15,7 +15,11 @@
  *******************************************************************************/
 package net.tourbook.common.util;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 
 import net.tourbook.common.UI;
 
@@ -28,6 +32,39 @@ import org.eclipse.swt.widgets.Display;
 public final class SQL {
 
 	public static final String	SQL_STRING_SEPARATOR	= "'";	//$NON-NLS-1$
+
+	public static void close(final Connection conn) {
+
+		if (conn != null) {
+			try {
+				conn.close();
+			} catch (final SQLException e) {
+				SQL.showException(e);
+			}
+		}
+	}
+
+	public static void close(final ResultSet result) {
+
+		if (result != null) {
+			try {
+				result.close();
+			} catch (final SQLException e) {
+				SQL.showException(e);
+			}
+		}
+	}
+
+	public static void close(final Statement stmt) {
+
+		if (stmt != null) {
+			try {
+				stmt.close();
+			} catch (final SQLException e) {
+				SQL.showException(e);
+			}
+		}
+	}
 
 	/**
 	 * @param text
@@ -48,6 +85,33 @@ public final class SQL {
 	public static String getSqlString(final String string) {
 
 		return SQL.SQL_STRING_SEPARATOR + string + SQL.SQL_STRING_SEPARATOR;
+	}
+
+	public static void logParameterMetaData(final PreparedStatement statement) {
+
+//		try {
+//
+//			if (statement instanceof org.apache.derby.impl.jdbc.EmbedPreparedStatement) {
+//				org.apache.derby.impl.jdbc.EmbedPreparedStatement new_name = (org.apache.derby.impl.jdbc.EmbedPreparedStatement) statement;
+//
+//			}
+//
+//
+//			final ParameterMetaData paraMeta = statement.getParameterMetaData();
+//
+//
+//			for (int paraIndex = 1; paraIndex <= paraMeta.getParameterCount(); paraIndex++) {
+//
+//				final int type = paraMeta.getParameterType(paraIndex);
+//				final String typeName = paraMeta.getParameterTypeName(paraIndex);
+//
+//				System.out.println((UI.timeStampNano() + " [" + "] ") + ("\t" + paraMeta));
+//				// TODO remove SYSTEM.OUT.PRINTLN
+//			}
+//
+//		} catch (final SQLException e) {
+//			showException(e);
+//		}
 	}
 
 	public static void showException(SQLException exception) {

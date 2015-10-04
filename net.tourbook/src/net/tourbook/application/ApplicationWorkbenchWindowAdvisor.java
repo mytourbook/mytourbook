@@ -438,6 +438,8 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 //		System.out.println("postWindowOpen()\t");
 //		// TODO remove SYSTEM.OUT.PRINTLN
 
+		UI.updateUnits();
+
 		Display.getDefault().asyncExec(new Runnable() {
 			@Override
 			public void run() {

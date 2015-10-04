@@ -18,7 +18,6 @@ package net.tourbook.ui.views.collateTours;
 import java.util.ArrayList;
 
 import net.tourbook.Messages;
-import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.action.ActionOpenPrefDialog;
 import net.tourbook.data.TourType;
@@ -35,8 +34,8 @@ import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
-import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
@@ -62,8 +61,6 @@ class CollateTourContributionItem extends ControlContribution {
 
 	private static final String		ID					= "net.tourbook.tourTypeFilter";	//$NON-NLS-1$
 
-	private final IPreferenceStore	_prefStore			= TourbookPlugin.getPrefStore();
-
 	private CollatedToursView		_collatedToursView;
 
 	private MouseListener			_mouseListener;
@@ -76,9 +73,6 @@ class CollateTourContributionItem extends ControlContribution {
 
 	private boolean					_isUIUpdating;
 	private boolean					_isContextOpening	= false;
-
-	private long					_lastOpenTime;
-	private long					_lastHideTime;
 
 	private TourTypeFilter			_selectCollateFilter;
 
@@ -329,7 +323,6 @@ class CollateTourContributionItem extends ControlContribution {
 
 		_collateNameWidth = pc.convertWidthInCharsToPixels(20);
 
-
 		_mouseWheelListener = new MouseWheelListener() {
 
 			private int	__lastEventTime;
@@ -386,8 +379,6 @@ class CollateTourContributionItem extends ControlContribution {
 					}
 
 					control.setCursor(_cursorHand);
-
-//					openContextMenu_Open(control, e);
 				}
 			}
 
@@ -397,8 +388,6 @@ class CollateTourContributionItem extends ControlContribution {
 
 					final Control control = (Control) e.widget;
 					control.setCursor(null);
-
-					openContextMenu_Hide(control, e);
 				}
 			}
 
@@ -406,6 +395,7 @@ class CollateTourContributionItem extends ControlContribution {
 			public void mouseHover(final MouseEvent e) {}
 		};
 	}
+
 	private void openContextMenu() {
 
 		if (_contextMenu.isVisible() || _isContextOpening) {
@@ -424,37 +414,6 @@ class CollateTourContributionItem extends ControlContribution {
 		_isContextOpening = false;
 	}
 
-	private void openContextMenu_Hide(final Control control, final MouseEvent mouseEvent) {
-
-		_lastHideTime = mouseEvent.time & 0xFFFFFFFFL;
-	}
-
-	private void openContextMenu_Open(final Control control, final MouseEvent mouseEvent) {
-
-		if (_contextMenu.isVisible() || _isContextOpening) {
-			// nothing to do
-			return;
-		}
-
-		_lastOpenTime = mouseEvent.time & 0xFFFFFFFFL;
-
-		/*
-		 * delay opening that the context is not opened when the tour type label is only hovered and
-		 * something else is selected
-		 */
-		Display.getDefault().timerExec(500, new Runnable() {
-			@Override
-			public void run() {
-
-				// check if a hide event has occured
-				if (_lastHideTime > _lastOpenTime) {
-					return;
-				}
-
-				openContextMenu();
-			}
-		});
-	}
 
 	private void restoreState() {
 
@@ -530,10 +489,13 @@ class CollateTourContributionItem extends ControlContribution {
 
 			final String filterName = isTTFilter //
 					? ttFilter.getFilterName()
-					: Messages.Slideout_CollatedTours_Label_SelectTourType;
+					: Messages.Collate_Tours_Link_SelectTourType;
 
 			final String shortFilterName = UI.shortenText(filterName, _lnkFilterText, _collateNameWidth, true);
-			final String filterTooltip = updateUI_TooltipText(isTTFilter, ttFilter, filterName);
+
+			final String filterTooltip = isTTFilter
+					? updateUI_TooltipText(ttFilter, filterName)
+					: Messages.Collate_Tours_Link_SelectTourType_Tooltip;
 
 			_lnkFilterText.setText("<a>" + shortFilterName + "</a>"); //$NON-NLS-1$ //$NON-NLS-2$
 			_lnkFilterText.setToolTipText(filterTooltip);
@@ -548,45 +510,45 @@ class CollateTourContributionItem extends ControlContribution {
 	/**
 	 * Create filter tooltip.
 	 */
-	private String updateUI_TooltipText(final boolean isTTFilter, final TourTypeFilter ttFilter, final String filterName) {
+	private String updateUI_TooltipText(final TourTypeFilter ttFilter, final String filterName) {
 
 		String filterTooltip;
 
-		if (isTTFilter) {
+		final int filterType = ttFilter.getFilterType();
 
-			if (ttFilter.getFilterType() == TourTypeFilter.FILTER_TYPE_TOURTYPE_SET) {
+		if (filterType == TourTypeFilter.FILTER_TYPE_TOURTYPE_SET) {
 
-				final StringBuilder sb = new StringBuilder();
-				sb.append(Messages.App_TourType_ToolTipTitle);
-				sb.append(filterName);
-				sb.append(UI.NEW_LINE2);
-				sb.append(Messages.App_TourType_ToolTip);
+			final StringBuilder sb = new StringBuilder();
+			sb.append(Messages.Collate_Tours_Label_TooltipHeader_Multiple);
+			sb.append(filterName);
+			sb.append(UI.NEW_LINE2);
+			sb.append(Messages.App_TourType_ToolTip);
 
-				final TourTypeFilterSet ttSet = ttFilter.getTourTypeSet();
-				if (ttSet != null) {
+			final TourTypeFilterSet ttSet = ttFilter.getTourTypeSet();
+			if (ttSet != null) {
 
-					int counter = 0;
+				int counter = 0;
 
-					for (final Object ttItem : ttSet.getTourTypes()) {
-						if (ttItem instanceof TourType) {
-							final TourType ttFilterFromSet = (TourType) ttItem;
+				for (final Object ttItem : ttSet.getTourTypes()) {
+					if (ttItem instanceof TourType) {
+						final TourType ttFilterFromSet = (TourType) ttItem;
 
-							if (counter == 0) {
-								sb.append("\n"); //$NON-NLS-1$
-							}
-
-							sb.append("\n\t\t\t"); //$NON-NLS-1$
-							sb.append(ttFilterFromSet.getName());
-
-							counter++;
+						if (counter > 0) {
+							sb.append("\n\t\t"); //$NON-NLS-1$
 						}
+
+						sb.append("\t"); //$NON-NLS-1$
+						sb.append(ttFilterFromSet.getName());
+
+						counter++;
 					}
 				}
-				filterTooltip = sb.toString();
-
-			} else {
-				filterTooltip = filterName;
 			}
+			filterTooltip = sb.toString();
+
+		} else if (filterType == TourTypeFilter.FILTER_TYPE_DB) {
+
+			filterTooltip = NLS.bind(Messages.Collate_Tours_Label_TooltipHeader_Single, filterName);
 
 		} else {
 

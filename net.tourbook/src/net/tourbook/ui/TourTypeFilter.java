@@ -193,16 +193,21 @@ public class TourTypeFilter {
 	}
 
 	public String getFilterName() {
+
 		switch (_filterType) {
 		case FILTER_TYPE_SYSTEM:
 			return _systemFilterName;
+
 		case FILTER_TYPE_DB:
 			return _tourType.getName();
+
 		case FILTER_TYPE_TOURTYPE_SET:
 			return _tourTypeSet.getName();
+
 		default:
 			break;
 		}
+
 		return "?"; //$NON-NLS-1$
 	}
 

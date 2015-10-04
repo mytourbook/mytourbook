@@ -221,17 +221,32 @@ public abstract class TreeColumnFactory {
 		};
 	};
 
-	public static final TreeColumnFactory DATE = new TreeColumnFactory() {
+	public static final TreeColumnFactory COLLATE_EVENT = new TreeColumnFactory() {
 		@Override
 		public TreeColumnDefinition createColumn(final ColumnManager columnManager, final PixelConverter pixelConverter) {
 
-			final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "date", SWT.TRAIL); //$NON-NLS-1$
+			final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "collateEvent", SWT.LEAD); //$NON-NLS-1$
 
+			colDef.setColumnLabel(Messages.ColumnFactory_CollateEvent_Label);
+			colDef.setColumnHeaderText(Messages.ColumnFactory_CollateEvent_Label);
+			colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_CollateEvent_Tooltip);
+			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(18));
+
+			return colDef;
+		};
+	};
+
+	public static final TreeColumnFactory DATE = new TreeColumnFactory() {
+		@Override
+		public TreeColumnDefinition createColumn(final ColumnManager columnManager, final PixelConverter pixelConverter) {
+			
+			final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "date", SWT.TRAIL); //$NON-NLS-1$
+			
 			colDef.setColumnLabel(Messages.ColumnFactory_date_label);
 			colDef.setColumnHeaderText(Messages.ColumnFactory_date);
 			colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_date_tooltip);
 			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(18));
-
+			
 			return colDef;
 		};
 	};

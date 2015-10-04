@@ -30,10 +30,10 @@ import org.eclipse.jface.preference.IPreferenceStore;
 
 public abstract class TVICollatedTour extends TreeViewerItem implements ITourItem {
 
-	static final Calendar			calendar	= GregorianCalendar.getInstance();
-	private final IPreferenceStore	prefStore	= TourbookPlugin.getDefault().getPreferenceStore();
+	static final Calendar					calendar	= GregorianCalendar.getInstance();
+	static private final IPreferenceStore	prefStore	= TourbookPlugin.getPrefStore();
 
-	static final String				SQL_SUM_COLUMNS;
+	static final String						SQL_SUM_COLUMNS;
 
 	static {
 
@@ -67,64 +67,54 @@ public abstract class TVICollatedTour extends TreeViewerItem implements ITourIte
 				+ "SUM(rearShiftCount)"; //								21	//$NON-NLS-1$
 	}
 
-	CollatedToursView				collateToursView;
+	CollatedToursView						collateToursView;
 
-	String							treeColumn;
-
-	int								tourYear;
+	String									treeColumn;
 
 	/**
-	 * month starts with 1 for january
+	 * Tour start time in ms.
 	 */
-	int								tourMonth;
-	int								tourWeek;
-	int								tourYearSub;
-	int								tourDay;
+	long									colTourStartTime;
+	String									colTourTitle;
+	long									colPersonId;									// tourPerson_personId
 
-	/**
-	 * Returns this Calendar's time value in milliseconds.
-	 */
-	long							colTourDate;
-	String							colTourTitle;
-	long							colPersonId;													// tourPerson_personId
+	long									colCounter;
+	long									colCalories;
+	long									colDistance;
 
-	long							colCounter;
-	long							colCalories;
-	long							colDistance;
+	long									colRecordingTime;
+	long									colDrivingTime;
+	long									colPausedTime;
 
-	long							colRecordingTime;
-	long							colDrivingTime;
-	long							colPausedTime;
+	long									colAltitudeUp;
+	long									colAltitudeDown;
 
-	long							colAltitudeUp;
-	long							colAltitudeDown;
+	float									colMaxSpeed;
+	long									colMaxAltitude;
+	long									colMaxPulse;
 
-	float							colMaxSpeed;
-	long							colMaxAltitude;
-	long							colMaxPulse;
+	float									colAvgSpeed;
+	float									colAvgPace;
+	float									colAvgPulse;
+	float									colAvgCadence;
+	float									colAvgTemperature;
 
-	float							colAvgSpeed;
-	float							colAvgPace;
-	float							colAvgPulse;
-	float							colAvgCadence;
-	float							colAvgTemperature;
+	int										colWindSpd;
+	int										colWindDir;
+	String									colClouds;
+	int										colRestPulse;
 
-	int								colWindSpd;
-	int								colWindDir;
-	String							colClouds;
-	int								colRestPulse;
+	int										colWeekNo;
+	int										colWeekDay;
+	int										colWeekYear;
 
-	int								colWeekNo;
-	int								colWeekDay;
-	int								colWeekYear;
+	int										colNumberOfTimeSlices;
+	int										colNumberOfPhotos;
 
-	int								colNumberOfTimeSlices;
-	int								colNumberOfPhotos;
+	int										colDPTolerance;
 
-	int								colDPTolerance;
-
-	int								colFrontShiftCount;
-	int								colRearShiftCount;
+	int										colFrontShiftCount;
+	int										colRearShiftCount;
 
 	TVICollatedTour(final CollatedToursView view) {
 
@@ -134,7 +124,7 @@ public abstract class TVICollatedTour extends TreeViewerItem implements ITourIte
 		calendar.setMinimalDaysInFirstWeek(prefStore.getInt(ITourbookPreferences.CALENDAR_WEEK_MIN_DAYS_IN_FIRST_WEEK));
 	}
 
-	public void addSumColumns(final ResultSet result, final int startIndex) throws SQLException {
+	void addSumColumns(final ResultSet result, final int startIndex) throws SQLException {
 
 		colDistance = result.getLong(startIndex + 0);
 

@@ -1149,10 +1149,12 @@ public class UI {
 				PreferenceConverter.getColor(prefStore, ITourbookPreferences.VIEW_LAYOUT_COLOR_CATEGORY));
 		colorRegistry.put(VIEW_COLOR_TITLE, //
 				PreferenceConverter.getColor(prefStore, ITourbookPreferences.VIEW_LAYOUT_COLOR_TITLE));
-		colorRegistry.put(VIEW_COLOR_SUB, //
+
+		colorRegistry.put(VIEW_COLOR_SUB, // year
 				PreferenceConverter.getColor(prefStore, ITourbookPreferences.VIEW_LAYOUT_COLOR_SUB));
-		colorRegistry.put(VIEW_COLOR_SUB_SUB, //
+		colorRegistry.put(VIEW_COLOR_SUB_SUB, // month
 				PreferenceConverter.getColor(prefStore, ITourbookPreferences.VIEW_LAYOUT_COLOR_SUB_SUB));
+
 		colorRegistry.put(VIEW_COLOR_TOUR, //
 				PreferenceConverter.getColor(prefStore, ITourbookPreferences.VIEW_LAYOUT_COLOR_TOUR));
 

@@ -456,11 +456,11 @@ public class TourTypeContributionItem extends CustomControlContribution {
 						if (ttItem instanceof TourType) {
 							final TourType ttFilterFromSet = (TourType) ttItem;
 
-							if (counter == 0) {
-								sb.append("\n"); //$NON-NLS-1$
+							if (counter > 0) {
+								sb.append("\n\t\t"); //$NON-NLS-1$
 							}
 
-							sb.append("\n\t\t\t"); //$NON-NLS-1$
+							sb.append("\t"); //$NON-NLS-1$
 							sb.append(ttFilterFromSet.getName());
 
 							counter++;
