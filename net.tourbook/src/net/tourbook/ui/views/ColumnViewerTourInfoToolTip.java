@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -220,6 +220,10 @@ public abstract class ColumnViewerTourInfoToolTip extends ToolTip implements ITo
 	public boolean setHoveredLocation(final int x, final int y) {
 		// not used
 		return false;
+	}
+
+	public void setNoTourTooltip(final String noTourTooltip) {
+		_tourInfoUI.setNoTourTooltip(noTourTooltip);
 	}
 
 	@Override

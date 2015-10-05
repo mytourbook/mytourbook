@@ -33,13 +33,15 @@ import org.joda.time.DateTime;
 
 public class TVICollatedTour_Event extends TVICollatedTour {
 
+	long		tourId;
+
 	DateTime	eventStart;
 	DateTime	eventEnd;
 
 	boolean		isFirstEvent;
 	boolean		isLastEvent;
 
-	public TVICollatedTour_Event(final CollatedToursView view, final TVICollatedTour parentItem) {
+	TVICollatedTour_Event(final CollatedToursView view, final TVICollatedTour parentItem) {
 
 		super(view);
 
@@ -247,6 +249,11 @@ public class TVICollatedTour_Event extends TVICollatedTour {
 	}
 
 	@Override
+	public Long getTourId() {
+		return tourId;
+	}
+
+	@Override
 	public boolean hasChildren() {
 
 		if (eventEnd == null) {
@@ -257,6 +264,11 @@ public class TVICollatedTour_Event extends TVICollatedTour {
 		}
 
 		return colCounter > 0;
+	}
+
+	@Override
+	public void setTagIds(final HashSet<Long> tagIds) {
+		sqlTagIds = tagIds;
 	}
 
 	@Override

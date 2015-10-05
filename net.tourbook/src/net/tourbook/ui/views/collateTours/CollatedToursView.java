@@ -46,6 +46,8 @@ import net.tourbook.tour.ActionOpenAdjustAltitudeDialog;
 import net.tourbook.tour.ActionOpenMarkerDialog;
 import net.tourbook.tour.ITourEventListener;
 import net.tourbook.tour.SelectionDeletedTours;
+import net.tourbook.tour.SelectionTourId;
+import net.tourbook.tour.SelectionTourIds;
 import net.tourbook.tour.TourDoubleClickState;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
@@ -168,9 +170,6 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 		_timeFormatter = DateFormat.getTimeInstance(DateFormat.SHORT);
 	}
 
-	private int											_selectedYear			= -1;
-
-	private int											_selectedYearSub		= -1;
 	private final ArrayList<Long>						_selectedTourIds		= new ArrayList<Long>();
 
 	private boolean										_isInStartup;
@@ -206,7 +205,6 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 	private ActionPrint									_actionPrintTour;
 	private ActionRefreshView							_actionRefreshView;
 	private ActionReimportSubMenu						_actionReimportSubMenu;
-	private ActionSelectAllTours						_actionSelectAllTours;
 	private ActionSetAltitudeValuesFromSRTM				_actionSetAltitudeFromSRTM;
 	private ActionSetTourTypeMenu						_actionSetTourType;
 	private ActionSetPerson								_actionSetOtherPerson;
@@ -289,14 +287,6 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 
 		@Override
 		public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
-	}
-
-	void actionSelectAllCollatedTours() {
-
-		if (_actionSelectAllTours.isChecked()) {
-			// reselect selection
-			_tourViewer.setSelection(_tourViewer.getSelection());
-		}
 	}
 
 	private void addPartListener() {
@@ -467,7 +457,6 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 		_actionSetAltitudeFromSRTM = new ActionSetAltitudeValuesFromSRTM(this);
 		_actionSetOtherPerson = new ActionSetPerson(this);
 		_actionSetTourType = new ActionSetTourTypeMenu(this);
-		_actionSelectAllTours = new ActionSelectAllTours(this);
 
 		_tagMenuMgr = new TagMenuManager(this, true);
 
@@ -558,7 +547,10 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 
 				final Object selection = ((IStructuredSelection) _tourViewer.getSelection()).getFirstElement();
 
-				if (selection instanceof TVICollatedTour_Tour) {
+				if (selection instanceof TVICollatedTour_Tour //
+//						|| selection instanceof TVICollatedTour_Event
+				//
+				) {
 
 					TourManager.getInstance().tourDoubleClickAction(CollatedToursView.this, _tourDoubleClickState);
 
@@ -585,6 +577,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 
 		// set tour info tooltip provider
 		_tourInfoToolTip = new TreeViewerTourInfoToolTip(_tourViewer);
+		_tourInfoToolTip.setNoTourTooltip(Messages.Collate_Tours_Label_DummyTour_Tooltip);
 	}
 
 	/**
@@ -695,12 +688,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 					return null;
 				}
 
-				final Object element = cell.getElement();
-				if ((element instanceof TVICollatedTour_Tour)) {
-					return ((TVICollatedTour_Tour) element).getTourId();
-				}
-
-				return null;
+				return getCellTourId(cell);
 			}
 
 			@Override
@@ -728,7 +716,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 					String startText;
 
 					if (collatedEvent.isFirstEvent) {
-						startText = ". . . . . . ";
+						startText = Messages.Collate_Tours_Label_TimeScale_BeforePresent;
 					} else {
 						startText = _df.format(collatedEvent.eventStart.getMillis());
 					}
@@ -750,7 +738,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 						String endText;
 
 						if (collatedEvent.isLastEvent) {
-							endText = Messages.Collate_Tours_Label_Today;
+							endText = Messages.Collate_Tours_Label_TimeScale_Today;
 						} else {
 							endText = _df.format(eventEnd.getMillis());
 						}
@@ -1290,20 +1278,26 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 					return null;
 				}
 
-				final Object element = cell.getElement();
-				if ((element instanceof TVICollatedTour_Tour)) {
-					return ((TVICollatedTour_Tour) element).getTourId();
-				}
-
-				return null;
+				return getCellTourId(cell);
 			}
 
 			@Override
 			public void update(final ViewerCell cell) {
 				final Object element = cell.getElement();
+
+				ArrayList<Long> tagIds = null;
 				if (element instanceof TVICollatedTour_Tour) {
 
-					cell.setText(TourDatabase.getTagNames(((TVICollatedTour_Tour) element).getTagIds()));
+					tagIds = ((TVICollatedTour_Tour) element).getTagIds();
+
+				} else if (element instanceof TVICollatedTour_Event) {
+
+					tagIds = ((TVICollatedTour_Event) element).getTagIds();
+				}
+
+				if (tagIds != null) {
+
+					cell.setText(TourDatabase.getTagNames(tagIds));
 					setCellColor(cell, element);
 				}
 			}
@@ -1328,12 +1322,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 					return null;
 				}
 
-				final Object element = cell.getElement();
-				if ((element instanceof TVICollatedTour_Tour)) {
-					return ((TVICollatedTour_Tour) element).getTourId();
-				}
-
-				return null;
+				return getCellTourId(cell);
 			}
 
 			@Override
@@ -1552,20 +1541,20 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 					return null;
 				}
 
-				final Object element = cell.getElement();
-				if ((element instanceof TVICollatedTour_Tour)) {
-					return ((TVICollatedTour_Tour) element).getTourId();
-				}
-
-				return null;
+				return getCellTourId(cell);
 			}
 
 			@Override
 			public void update(final ViewerCell cell) {
-				final Object element = cell.getElement();
-				if (element instanceof TVICollatedTour_Tour) {
 
-					cell.setText(((TVICollatedTour_Tour) element).colTourTitle);
+				final Object element = cell.getElement();
+
+				if (element instanceof TVICollatedTour_Tour //
+						|| element instanceof TVICollatedTour_Event) {
+
+					final String colTourTitle = ((TVICollatedTour) element).colTourTitle;
+
+					cell.setText(colTourTitle);
 					setCellColor(cell, element);
 				}
 			}
@@ -1716,12 +1705,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 					return null;
 				}
 
-				final Object element = cell.getElement();
-				if ((element instanceof TVICollatedTour_Tour)) {
-					return ((TVICollatedTour_Tour) element).getTourId();
-				}
-
-				return null;
+				return getCellTourId(cell);
 			}
 
 			@Override
@@ -1809,14 +1793,25 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 		 */
 		int tourItems = 0;
 
-		TVICollatedTour_Tour firstTour = null;
+		TVICollatedTour firstTour = null;
 
 		for (final Iterator<?> iter = selection.iterator(); iter.hasNext();) {
 
 			final Object treeItem = iter.next();
-			if (treeItem instanceof TVICollatedTour_Tour) {
-				if (tourItems == 0) {
-					firstTour = (TVICollatedTour_Tour) treeItem;
+			if (treeItem instanceof TVICollatedTour) {
+
+				boolean isDummyTour = false;
+
+				// check if this is a dummy tour, the last tour is a dummy tour
+				if (treeItem instanceof TVICollatedTour_Event) {
+
+					if (((TVICollatedTour_Event) treeItem).isLastEvent) {
+						isDummyTour = true;
+					}
+				}
+
+				if (firstTour == null && !isDummyTour) {
+					firstTour = (TVICollatedTour) treeItem;
 				}
 				tourItems++;
 			}
@@ -1833,7 +1828,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 		final boolean firstElementHasChildren = firstElement == null ? false : firstElement.hasChildren();
 		TourData firstSavedTour = null;
 
-		if (isOneTour) {
+		if (isOneTour && firstTour != null) {
 			firstSavedTour = TourManager.getInstance().getTourData(firstTour.getTourId());
 			isDeviceTour = firstSavedTour.isManualTour() == false;
 		}
@@ -1870,13 +1865,11 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 						? firstElementHasChildren
 						: true);
 
-		_actionSelectAllTours.setEnabled(true);
-
 		_tagMenuMgr.enableTagActions(isTourSelected, isOneTour, firstTour == null ? null : firstTour.getTagIds());
 
-		TourTypeMenuManager.enableRecentTourTypeActions(isTourSelected, isOneTour
-				? firstTour.getTourTypeId()
-				: TourDatabase.ENTITY_IS_NOT_SAVED);
+//		TourTypeMenuManager.enableRecentTourTypeActions(isTourSelected, isOneTour
+//				? firstTour.getTourTypeId()
+//				: TourDatabase.ENTITY_IS_NOT_SAVED);
 	}
 
 	private void fillActionBars() {
@@ -1894,7 +1887,6 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 		final IToolBarManager tbm = getViewSite().getActionBars().getToolBarManager();
 
 		tbm.add(_contribItem_CollatedTours);
-		tbm.add(_actionSelectAllTours);
 
 		tbm.add(new Separator());
 		tbm.add(_actionExpandSelection);
@@ -1944,6 +1936,19 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 		enableActions();
 	}
 
+	private Long getCellTourId(final ViewerCell cell) {
+
+		final Object element = cell.getElement();
+
+		if (element instanceof TVICollatedTour_Tour) {
+			return ((TVICollatedTour_Tour) element).getTourId();
+		} else if (element instanceof TVICollatedTour_Event) {
+			return ((TVICollatedTour_Event) element).getTourId();
+		}
+
+		return null;
+	}
+
 	TourTypeSQLData getCollatedSQL() {
 
 		final TourTypeFilter collatedFilter = CollateTourManager.getSelectedCollateFilter();
@@ -1976,54 +1981,16 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 
 		final Set<Long> tourIds = new HashSet<Long>();
 
-//		final IStructuredSelection selectedTours = ((IStructuredSelection) _tourViewer.getSelection());
-//		if (selectedTours.size() < 2) {
-//
-//			// one item is selected
-//
-//			final Object selectedItem = selectedTours.getFirstElement();
-//			if (selectedItem instanceof TVITourBookYear) {
-//
-//				// one year is selected
-//
-//				if (_actionSelectAllTours.isChecked()) {
-//
-//					// loop: all months
-//					for (final TreeViewerItem viewerItem : ((TVITourBookYear) selectedItem).getFetchedChildren()) {
-//						if (viewerItem instanceof TVITourBookYearSub) {
-//							getYearSubTourIDs((TVITourBookYearSub) viewerItem, tourIds);
-//						}
-//					}
-//				}
-//
-//			} else if (selectedItem instanceof TVITourBookYearSub) {
-//
-//				// one month/week is selected
-//
-//				if (_actionSelectAllTours.isChecked()) {
-//					getYearSubTourIDs((TVITourBookYearSub) selectedItem, tourIds);
-//				}
-//
-//			} else if (selectedItem instanceof TVITourBookTour) {
-//
-//				// one tour is selected
-//
-//				tourIds.add(((TVITourBookTour) selectedItem).getTourId());
-//			}
-//
-//		} else {
-//
-//			// multiple items are selected
-//
-//			// get all selected tours, ignore year and month items
-//			for (final Iterator<?> tourIterator = selectedTours.iterator(); tourIterator.hasNext();) {
-//				final Object viewItem = tourIterator.next();
-//
-//				if (viewItem instanceof TVITourBookTour) {
-//					tourIds.add(((TVITourBookTour) viewItem).getTourId());
-//				}
-//			}
-//		}
+		final IStructuredSelection selectedTours = ((IStructuredSelection) _tourViewer.getSelection());
+
+		for (final Iterator<?> tourIterator = selectedTours.iterator(); tourIterator.hasNext();) {
+
+			final Object viewItem = tourIterator.next();
+
+			if (viewItem instanceof TVICollatedTour) {
+				tourIds.add(((TVICollatedTour) viewItem).getTourId());
+			}
+		}
 
 		return tourIds;
 	}
@@ -2066,17 +2033,6 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 		return _tourViewer;
 	}
 
-	private void initUI(final Composite parent) {
-
-		_pc = new PixelConverter(parent);
-
-		/*
-		 * This ensures that the unit's are set otherwise they can be null
-		 */
-		@SuppressWarnings("unused")
-		final boolean is = net.tourbook.ui.UI.IS_WIN;
-	}
-
 //	/**
 //	 * @param yearSubItem
 //	 * @param tourIds
@@ -2094,6 +2050,17 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 //		}
 //	}
 
+	private void initUI(final Composite parent) {
+
+		_pc = new PixelConverter(parent);
+
+		/*
+		 * This ensures that the unit's are set otherwise they can be null
+		 */
+		@SuppressWarnings("unused")
+		final boolean is = net.tourbook.ui.UI.IS_WIN;
+	}
+
 	boolean isInUIUpdate() {
 		return _isInUIUpdate;
 	}
@@ -2104,126 +2071,53 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 			return;
 		}
 
-//		final boolean isSelectAllChildren = _actionSelectAllTours.isChecked();
-//
-//		final HashSet<Long> tourIds = new HashSet<Long>();
-//
-//		boolean isFirstYear = true;
-//		boolean isFirstYearSub = true;
-//		boolean isFirstTour = true;
-//
-//		final IStructuredSelection selectedTours = (IStructuredSelection) (event.getSelection());
-//		// loop: all selected items
-//		for (final Iterator<?> itemIterator = selectedTours.iterator(); itemIterator.hasNext();) {
-//
-//			final Object treeItem = itemIterator.next();
-//
-//			if (isSelectAllChildren) {
-//
-//				// get ALL tours from all selected tree items (year/month/tour)
-//
-//				if (treeItem instanceof TVITourBookYear) {
-//
-//					// year is selected
-//
-//					final TVITourBookYear yearItem = ((TVITourBookYear) treeItem);
-//					if (isFirstYear) {
-//						// keep selected year
-//						isFirstYear = false;
-//						_selectedYear = yearItem.tourYear;
-//					}
-//
-//					// get all tours for the selected year
-//					for (final TreeViewerItem viewerItem : yearItem.getFetchedChildren()) {
-//						if (viewerItem instanceof TVITourBookYearSub) {
-//							getYearSubTourIDs((TVITourBookYearSub) viewerItem, tourIds);
-//						}
-//					}
-//
-//				} else if (treeItem instanceof TVITourBookYearSub) {
-//
-//					// month/week/day is selected
-//
-//					final TVITourBookYearSub yearSubItem = (TVITourBookYearSub) treeItem;
-//					if (isFirstYearSub) {
-//						// keep selected year/month/week/day
-//						isFirstYearSub = false;
-//						_selectedYear = yearSubItem.tourYear;
-//						_selectedYearSub = yearSubItem.tourYearSub;
-//					}
-//
-//					// get all tours for the selected month
-//					getYearSubTourIDs(yearSubItem, tourIds);
-//
-//				} else if (treeItem instanceof TVITourBookTour) {
-//
-//					// tour is selected
-//
-//					final TVITourBookTour tourItem = (TVITourBookTour) treeItem;
-//					if (isFirstTour) {
-//						// keep selected tour
-//						isFirstTour = false;
-//						_selectedYear = tourItem.tourYear;
-//						_selectedYearSub = tourItem.tourYearSub;
-//					}
-//
-//					tourIds.add(tourItem.getTourId());
-//				}
-//
-//			} else {
-//
-//				// get only selected tours
-//
-//				if (treeItem instanceof TVITourBookTour) {
-//
-//					final TVITourBookTour tourItem = (TVITourBookTour) treeItem;
-//
-//					if (isFirstTour) {
-//						// keep selected tour
-//						isFirstTour = false;
-//						_selectedYear = tourItem.tourYear;
-//						_selectedYearSub = tourItem.tourYearSub;
-//					}
-//
-//					tourIds.add(tourItem.getTourId());
-//				}
-//			}
-//		}
-//
-//		ISelection selection;
-//		if (tourIds.size() == 0) {
-//
-//			// fire selection that nothing is selected
-//
-//			selection = new SelectionTourIds(new ArrayList<Long>());
-//
-//		} else {
-//
-//			// keep selected tour id's
-//			_selectedTourIds.clear();
-//			_selectedTourIds.addAll(tourIds);
-//
-//			selection = tourIds.size() == 1 //
-//					? new SelectionTourId(_selectedTourIds.get(0))
-//					: new SelectionTourIds(_selectedTourIds);
-//
-//		}
-//
-//		// _postSelectionProvider should be removed when all parts are listening to the TourManager event
-//		if (_isInStartup) {
-//
-//			_isInStartup = false;
-//
-//			// this view can be inactive -> selection is not fired with the SelectionProvider interface
-//
-//			TourManager.fireEventWithCustomData(TourEventId.TOUR_SELECTION, selection, this);
-//
-//		} else {
-//
-//			_postSelectionProvider.setSelection(selection);
-//		}
-//
-//		enableActions();
+		final HashSet<Long> tourIds = new HashSet<Long>();
+
+		final IStructuredSelection selectedTours = (IStructuredSelection) (event.getSelection());
+		// loop: all selected items
+		for (final Iterator<?> itemIterator = selectedTours.iterator(); itemIterator.hasNext();) {
+
+			final Object treeItem = itemIterator.next();
+
+			final TVICollatedTour tourItem = (TVICollatedTour) treeItem;
+
+			tourIds.add(tourItem.getTourId());
+		}
+
+		ISelection selection;
+		if (tourIds.size() == 0) {
+
+			// fire selection that nothing is selected
+
+			selection = new SelectionTourIds(new ArrayList<Long>());
+
+		} else {
+
+			// keep selected tour id's
+			_selectedTourIds.clear();
+			_selectedTourIds.addAll(tourIds);
+
+			selection = tourIds.size() == 1 //
+					? new SelectionTourId(_selectedTourIds.get(0))
+					: new SelectionTourIds(_selectedTourIds);
+
+		}
+
+		// _postSelectionProvider should be removed when all parts are listening to the TourManager event
+		if (_isInStartup) {
+
+			_isInStartup = false;
+
+			// this view can be inactive -> selection is not fired with the SelectionProvider interface
+
+			TourManager.fireEventWithCustomData(TourEventId.TOUR_SELECTION, selection, this);
+
+		} else {
+
+			_postSelectionProvider.setSelection(selection);
+		}
+
+		enableActions();
 	}
 
 	private void readDisplayFormats() {
@@ -2474,10 +2368,6 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 //		_state.put(STATE_YEAR_SUB_CATEGORY, _yearSubCategory.name());
 
 		_columnManager.saveState(_state);
-	}
-
-	public void setActiveYear(final int activeYear) {
-		_selectedYear = activeYear;
 	}
 
 	private void setCellColor(final ViewerCell cell, final Object element) {

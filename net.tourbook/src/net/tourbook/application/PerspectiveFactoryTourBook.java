@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -21,6 +21,7 @@ import net.tourbook.statistic.TourStatisticsView;
 import net.tourbook.ui.tourChart.TourChartView;
 import net.tourbook.ui.views.TourWaypointView;
 import net.tourbook.ui.views.calendar.CalendarView;
+import net.tourbook.ui.views.collateTours.CollatedToursView;
 import net.tourbook.ui.views.rawData.RawDataView;
 import net.tourbook.ui.views.tourBook.TourBookView;
 import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
@@ -39,6 +40,7 @@ public class PerspectiveFactoryTourBook implements IPerspectiveFactory {
 	private static final String	FOLDER_ID_MARKER	= "marker";							//$NON-NLS-1$
 	private static final String	FOLDER_ID_LIST		= "list";								//$NON-NLS-1$
 
+	@Override
 	public void createInitialLayout(final IPageLayout layout) {
 
 		/*
@@ -77,6 +79,7 @@ public class PerspectiveFactoryTourBook implements IPerspectiveFactory {
 		listFolder.addView(RawDataView.ID);
 		listFolder.addView(TourBookView.ID);
 		listFolder.addView(CalendarView.ID);
+		listFolder.addView(CollatedToursView.ID);
 		listFolder.addView(TourStatisticsView.ID);
 		listFolder.addPlaceholder(PicDirView.ID);
 

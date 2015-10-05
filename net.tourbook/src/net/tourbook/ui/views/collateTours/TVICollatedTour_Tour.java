@@ -21,7 +21,7 @@ import java.util.HashSet;
 import net.tourbook.common.util.TreeViewerItem;
 import net.tourbook.database.TourDatabase;
 
-public class TVICollatedTour_Tour extends TVICollatedTour{
+public class TVICollatedTour_Tour extends TVICollatedTour {
 
 	long					tourId;
 	long					tourTypeId;
@@ -29,13 +29,7 @@ public class TVICollatedTour_Tour extends TVICollatedTour{
 	long					colStartDistance;
 	short					colTimeInterval;
 
-	HashSet<Long>			sqlTagIds;
 	HashSet<Long>			sqlMarkerIds;
-
-	/**
-	 * id's for the tags or <code>null</code> when tags are not available
-	 */
-	private ArrayList<Long>	_tagIds;
 
 	/**
 	 * id's for the markers or <code>null</code> when markers are not available
@@ -67,13 +61,6 @@ public class TVICollatedTour_Tour extends TVICollatedTour{
 		return _markerIds;
 	}
 
-	public ArrayList<Long> getTagIds() {
-		if (sqlTagIds != null && _tagIds == null) {
-			_tagIds = new ArrayList<Long>(sqlTagIds);
-		}
-		return _tagIds;
-	}
-
 	@Override
 	public Long getTourId() {
 		return tourId;
@@ -97,10 +84,6 @@ public class TVICollatedTour_Tour extends TVICollatedTour{
 
 	public void setMarkerIds(final HashSet<Long> markerIds) {
 		sqlMarkerIds = markerIds;
-	}
-
-	public void setTagIds(final HashSet<Long> tagIds) {
-		sqlTagIds = tagIds;
 	}
 
 }

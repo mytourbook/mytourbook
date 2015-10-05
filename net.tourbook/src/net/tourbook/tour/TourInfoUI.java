@@ -59,7 +59,7 @@ public class TourInfoUI {
 	private static final int			SHELL_MARGIN			= 5;
 	private static final int			MAX_DATA_WIDTH			= 300;
 
-	private static final String			REAR_SHIFT_FORMAT		= "/  ";							//$NON-NLS-1$
+	private static final String			REAR_SHIFT_FORMAT		= "/  ";								//$NON-NLS-1$
 
 	private Color						_bgColor;
 	private Color						_fgColor;
@@ -69,7 +69,7 @@ public class TourInfoUI {
 	private final DateTimeFormatter		_timeFormatter			= DateTimeFormat.mediumTime();
 	private final DateTimeFormatter		_dtFormatterCreated		= DateTimeFormat.mediumDateTime();
 
-	private final DateTimeFormatter		_dtHistoryFormatter		= DateTimeFormat.forStyle("FM");	//$NON-NLS-1$
+	private final DateTimeFormatter		_dtHistoryFormatter		= DateTimeFormat.forStyle("FM");		//$NON-NLS-1$
 //	private final DateTimeFormatter		_dtWeekday				= DateTimeFormat.forPattern("E");	//$NON-NLS-1$
 
 	private final NumberFormat			_nf1					= NumberFormat.getInstance();
@@ -105,6 +105,8 @@ public class TourInfoUI {
 	 * Tour which is displayed in the tool tip
 	 */
 	private TourData					_tourData;
+
+	private String						_noTourTooltip			= Messages.Tour_Tooltip_Label_NoTour;
 
 	/**
 	 * contains the controls which are displayed in the first column, these controls are used to get
@@ -855,7 +857,7 @@ public class TourInfoUI {
 					.applyTo(container);
 			{
 				final Label label = new Label(container, SWT.NONE);
-				label.setText(Messages.Tour_Tooltip_Label_NoTour);
+				label.setText(_noTourTooltip);
 				label.setForeground(fgColor);
 				label.setBackground(bgColor);
 			}
@@ -927,6 +929,15 @@ public class TourInfoUI {
 	 */
 	public void setActionsEnabled(final boolean isEnabled) {
 		_isActionsVisible = isEnabled;
+	}
+
+	/**
+	 * Set text for the tooltip which is displayed when a tour is not hovered.
+	 * 
+	 * @param noTourTooltip
+	 */
+	public void setNoTourTooltip(final String noTourTooltip) {
+		_noTourTooltip = noTourTooltip;
 	}
 
 	private void updateUI() {

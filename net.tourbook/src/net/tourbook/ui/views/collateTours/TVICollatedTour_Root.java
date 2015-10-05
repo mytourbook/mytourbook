@@ -21,6 +21,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashSet;
 
 import net.tourbook.Messages;
 import net.tourbook.common.UI;
@@ -58,11 +59,13 @@ public class TVICollatedTour_Root extends TVICollatedTour {
 				return;
 			}
 
+			final SQLFilter sqlFilter = new SQLFilter();
+
 			final ArrayList<TVICollatedTour_Event> collateEvents = getCollateEvents(sqlData);
 
 			children.addAll(collateEvents);
 
-			getCollateTVI(collateEvents);
+			getCollateTVI(collateEvents, sqlFilter);
 		}
 		collateToursView.setIsInUIUpdate(false);
 	}
@@ -79,15 +82,23 @@ public class TVICollatedTour_Root extends TVICollatedTour {
 
 		final String sql = "" // //$NON-NLS-1$
 
-				+ "SELECT" //						 //$NON-NLS-1$
-				+ " tourStartTime," //			1 //$NON-NLS-1$
-				+ " tourTitle" //				2 //$NON-NLS-1$
+				+ "SELECT" //											//$NON-NLS-1$
+
+				+ " tourID, " //									1	//$NON-NLS-1$
+				+ " jTdataTtag.TourTag_tagId, "//					2	//$NON-NLS-1$
+
+				+ " tourStartTime, " //								3	//$NON-NLS-1$
+				+ " tourTitle" //									4	//$NON-NLS-1$
 
 				+ " FROM " + TourDatabase.TABLE_TOUR_DATA + "\n" //$NON-NLS-1$ //$NON-NLS-2$
 
-				+ (" WHERE 1=1" + sqlData.getWhereString()) // //$NON-NLS-1$
+				// get tag id's
+				+ (" LEFT OUTER JOIN " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + " jTdataTtag") //$NON-NLS-1$ //$NON-NLS-2$
+				+ (" ON TourData.tourId = jTdataTtag.TourData_tourId") //$NON-NLS-1$
 
-				+ " ORDER BY tourStartTime";//			//$NON-NLS-1$
+				+ (" WHERE 1=1" + sqlData.getWhereString()) // 			//$NON-NLS-1$
+
+				+ " ORDER BY tourStartTime";//							//$NON-NLS-1$
 
 		Connection conn = null;
 
@@ -100,22 +111,54 @@ public class TVICollatedTour_Root extends TVICollatedTour {
 			final PreparedStatement statement = conn.prepareStatement(sql);
 			sqlData.setParameters(statement, 1);
 
+			long prevTourId = -1;
+			HashSet<Long> tagIds = null;
+
 			final ResultSet result = statement.executeQuery();
 			while (result.next()) {
 
-				final long dbTourStartTime = result.getLong(1);
-				final String dbTourTitle = result.getString(2);
+				final long dbTourId = result.getLong(1);
+				final Object dbTagId = result.getObject(2);
 
-				final TVICollatedTour_Event collateEvent = new TVICollatedTour_Event(collateToursView, this);
-				collateEvents.add(collateEvent);
+				if (dbTourId == prevTourId) {
 
-				final DateTime eventStart = new DateTime(dbTourStartTime);
+					// additional result set's for the same tour
 
-				collateEvent.treeColumn = dbTourTitle == null ? UI.EMPTY_STRING : dbTourTitle;
+					// get tags from outer join
+					if (dbTagId instanceof Long) {
+						tagIds.add((Long) dbTagId);
+					}
 
-				collateEvent.eventStart = eventStart;
+				} else {
 
-				collateEvent.isFirstEvent = eventCounter++ == 0;
+					final long dbTourStartTime = result.getLong(3);
+					final String dbTourTitle = result.getString(4);
+
+					final TVICollatedTour_Event collateEvent = new TVICollatedTour_Event(collateToursView, this);
+					collateEvents.add(collateEvent);
+
+					final DateTime eventStart = new DateTime(dbTourStartTime);
+
+					collateEvent.treeColumn = dbTourTitle == null ? UI.EMPTY_STRING : dbTourTitle;
+
+					collateEvent.tourId = dbTourId;
+					collateEvent.eventStart = eventStart;
+
+					collateEvent.isFirstEvent = eventCounter++ == 0;
+
+					collateEvent.colTourTitle = dbTourTitle;
+
+					// get first tag id
+					if (dbTagId instanceof Long) {
+
+						tagIds = new HashSet<Long>();
+						tagIds.add((Long) dbTagId);
+
+						collateEvent.setTagIds(tagIds);
+					}
+				}
+
+				prevTourId = dbTourId;
 			}
 
 		} catch (final SQLException e) {
@@ -139,13 +182,11 @@ public class TVICollatedTour_Root extends TVICollatedTour {
 		return collateEvents;
 	}
 
-	private void getCollateTVI(final ArrayList<TVICollatedTour_Event> collatedEvents) {
+	private void getCollateTVI(final ArrayList<TVICollatedTour_Event> collatedEvents, final SQLFilter sqlFilter) {
 
 		final int eventSize = collatedEvents.size();
 
 		Connection conn = null;
-
-		final SQLFilter sqlFilter = new SQLFilter();
 
 		final String sql = "" //$NON-NLS-1$
 				//

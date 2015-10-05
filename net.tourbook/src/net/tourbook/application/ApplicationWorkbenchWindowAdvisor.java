@@ -438,13 +438,17 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 //		System.out.println("postWindowOpen()\t");
 //		// TODO remove SYSTEM.OUT.PRINTLN
 
+		/**
+		 * THIS IS VERY CRITICAL TO BE SET BEFORE THE ASYNC RUNNABLE STARTS, OTHERWISE THE VIEWS
+		 * DISPLAY THE WRONG DATA. E.G. COLLATED TOURS SHOWS ALL TOURS AND NOT FOR THE SELECTED
+		 * TOURTYPE.
+		 */
 		UI.updateUnits();
+		TourTypeFilterManager.restoreState();
 
 		Display.getDefault().asyncExec(new Runnable() {
 			@Override
 			public void run() {
-
-				TourTypeFilterManager.restoreState();
 
 				TagMenuManager.restoreTagState();
 				TourTypeMenuManager.restoreState();

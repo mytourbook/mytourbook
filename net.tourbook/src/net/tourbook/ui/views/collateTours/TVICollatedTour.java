@@ -17,8 +17,10 @@ package net.tourbook.ui.views.collateTours;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.HashSet;
 
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.util.TreeViewerItem;
@@ -72,48 +74,54 @@ public abstract class TVICollatedTour extends TreeViewerItem implements ITourIte
 	String									treeColumn;
 
 	/**
+	 * Id's for the tags or <code>null</code> when tags are not available.
+	 */
+	private ArrayList<Long>					_tagIds;
+	HashSet<Long>							sqlTagIds;
+
+	/**
 	 * Tour start time in ms.
 	 */
 	long									colTourStartTime;
+
 	String									colTourTitle;
 	long									colPersonId;									// tourPerson_personId
-
 	long									colCounter;
 	long									colCalories;
-	long									colDistance;
 
+	long									colDistance;
 	long									colRecordingTime;
 	long									colDrivingTime;
-	long									colPausedTime;
 
+	long									colPausedTime;
 	long									colAltitudeUp;
 	long									colAltitudeDown;
 
 	float									colMaxSpeed;
 	long									colMaxAltitude;
-	long									colMaxPulse;
 
+	long									colMaxPulse;
 	float									colAvgSpeed;
 	float									colAvgPace;
+
 	float									colAvgPulse;
 	float									colAvgCadence;
 	float									colAvgTemperature;
-
 	int										colWindSpd;
 	int										colWindDir;
+
 	String									colClouds;
 	int										colRestPulse;
-
 	int										colWeekNo;
 	int										colWeekDay;
-	int										colWeekYear;
 
+	int										colWeekYear;
 	int										colNumberOfTimeSlices;
 	int										colNumberOfPhotos;
 
 	int										colDPTolerance;
-
 	int										colFrontShiftCount;
+
 	int										colRearShiftCount;
 
 	TVICollatedTour(final CollatedToursView view) {
@@ -123,7 +131,6 @@ public abstract class TVICollatedTour extends TreeViewerItem implements ITourIte
 		calendar.setFirstDayOfWeek(prefStore.getInt(ITourbookPreferences.CALENDAR_WEEK_FIRST_DAY_OF_WEEK));
 		calendar.setMinimalDaysInFirstWeek(prefStore.getInt(ITourbookPreferences.CALENDAR_WEEK_MIN_DAYS_IN_FIRST_WEEK));
 	}
-
 	void addSumColumns(final ResultSet result, final int startIndex) throws SQLException {
 
 		colDistance = result.getLong(startIndex + 0);
@@ -167,9 +174,22 @@ public abstract class TVICollatedTour extends TreeViewerItem implements ITourIte
 		colPausedTime = colRecordingTime - colDrivingTime;
 	}
 
+	public ArrayList<Long> getTagIds() {
+
+		if (sqlTagIds != null && _tagIds == null) {
+			_tagIds = new ArrayList<Long>(sqlTagIds);
+		}
+
+		return _tagIds;
+	}
+
 	@Override
 	public Long getTourId() {
 		return null;
+	}
+
+	public void setTagIds(final HashSet<Long> tagIds) {
+		sqlTagIds = tagIds;
 	}
 
 }
