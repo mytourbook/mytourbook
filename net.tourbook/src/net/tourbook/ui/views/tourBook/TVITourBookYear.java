@@ -59,7 +59,7 @@ public class TVITourBookYear extends TVITourBookItem {
 			sumYearSub = "startMonth"; //$NON-NLS-1$
 		}
 
-		final String sql = ""
+		final String sql = "" //$NON-NLS-1$
 		//
 				+ "SELECT " //$NON-NLS-1$
 

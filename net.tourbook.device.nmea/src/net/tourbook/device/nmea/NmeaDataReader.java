@@ -102,7 +102,7 @@ public class NmeaDataReader extends TourbookDevice {
 
 			nmea.parse(nmeaLine);
 
-			if (nmeaLine.startsWith("$GPRMC") || nmeaLine.startsWith("$GPVTG")) {
+			if (nmeaLine.startsWith("$GPRMC") || nmeaLine.startsWith("$GPVTG")) { //$NON-NLS-1$ //$NON-NLS-2$
 
 				// mandatory for these lines
 				ddmmyy = nmea.getDDMMYY();

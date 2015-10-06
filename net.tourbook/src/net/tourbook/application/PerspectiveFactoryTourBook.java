@@ -79,7 +79,7 @@ public class PerspectiveFactoryTourBook implements IPerspectiveFactory {
 		listFolder.addView(RawDataView.ID);
 		listFolder.addView(TourBookView.ID);
 		listFolder.addView(CalendarView.ID);
-		listFolder.addView(CollatedToursView.ID);
+		listFolder.addPlaceholder(CollatedToursView.ID);
 		listFolder.addView(TourStatisticsView.ID);
 		listFolder.addPlaceholder(PicDirView.ID);
 

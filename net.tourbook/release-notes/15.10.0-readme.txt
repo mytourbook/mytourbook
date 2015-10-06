@@ -1,0 +1,15 @@
+Version 15.10.0 Beta                                  26. September 2015
+
+   
+New Last Minute Feature
+=======================
+
+* Collated Tours
+
+
+
+Improvements
+============	
+
+* NMEA import
+	- Merged date fix from Alexey.

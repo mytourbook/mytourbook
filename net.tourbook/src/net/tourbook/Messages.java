@@ -181,8 +181,6 @@ public class Messages extends NLS {
 	public static String		Action_Tag_AutoOpenCancel;
 	public static String		Action_Tag_AutoOpenOK;
 
-	public static String		Action_TourBook_CollateTours;
-
 	public static String		Action_TourType_ModifyTourTypeFilter;
 
 	public static String		Adjust_Altitude_Checkbox_SRTM_SelectWholeTour;
@@ -338,6 +336,7 @@ public class Messages extends NLS {
 
 	public static String		App_Tour_type_item_all_types;
 	public static String		App_Tour_type_item_not_defined;
+
 	public static String		App_TourType_ToolTip;
 	public static String		App_TourType_ToolTipTitle;
 
@@ -346,12 +345,9 @@ public class Messages extends NLS {
 
 	public static String		App_Window_Title;
 
-	public static String	Collate_Tours_Label_DummyTour_Tooltip;
-
-	public static String	Collate_Tours_Label_TimeScale_BeforePresent;
-
-	public static String	Collate_Tours_Label_TimeScale_Today;
-
+	public static String		Collate_Tours_Label_DummyTour_Tooltip;
+	public static String		Collate_Tours_Label_TimeScale_BeforePresent;
+	public static String		Collate_Tours_Label_TimeScale_Today;
 	public static String		Collate_Tours_Label_TooltipHeader_Multiple;
 	public static String		Collate_Tours_Label_TooltipHeader_Single;
 	public static String		Collate_Tours_Link_SelectTourType;
@@ -1220,9 +1216,6 @@ public class Messages extends NLS {
 	public static String		Slideout_ChartMarkerOptions_Label_Offset;
 	public static String		Slideout_ChartMarkerOptions_Label_Offset_Tooltip;
 	public static String		Slideout_ChartMarkerOptions_Label_Title;
-
-	public static String		Slideout_CollatedTours_Label_SelectTourType;
-	public static String		Slideout_CollatedTours_Label_Title;
 
 	public static String		Slideout_SegmenterChartOptions_Checkbox_HideSmallValues;
 	public static String		Slideout_SegmenterChartOptions_Checkbox_HideSmallValues_Tooltip;

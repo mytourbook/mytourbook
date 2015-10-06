@@ -273,11 +273,11 @@ public class TVICollatedTour_Event extends TVICollatedTour {
 
 	@Override
 	public String toString() {
-		return "\nTVICollatedTour_Event\n"//
-				+ ("eventStart=" + eventStart + ", \n")
-				+ ("eventEnd=" + eventEnd + ", \n")
+		return "\nTVICollatedTour_Event\n"// //$NON-NLS-1$
+				+ ("eventStart=" + eventStart + ", \n") //$NON-NLS-1$ //$NON-NLS-2$
+				+ ("eventEnd=" + eventEnd + ", \n") //$NON-NLS-1$ //$NON-NLS-2$
 //				+ ("eventStartText=" + eventStartText)
-				+ "\n";
+				+ "\n"; //$NON-NLS-1$
 	}
 
 }

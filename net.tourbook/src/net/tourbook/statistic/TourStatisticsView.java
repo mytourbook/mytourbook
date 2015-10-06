@@ -69,24 +69,32 @@ public class TourStatisticsView extends ViewPart implements ITourProvider {
 		// set the part listener
 		_partListener = new IPartListener2() {
 
+			@Override
 			public void partActivated(final IWorkbenchPartReference partRef) {}
 
+			@Override
 			public void partBroughtToTop(final IWorkbenchPartReference partRef) {}
 
+			@Override
 			public void partClosed(final IWorkbenchPartReference partRef) {
 				if (partRef.getPart(false) == TourStatisticsView.this) {
 					saveState();
 				}
 			}
 
+			@Override
 			public void partDeactivated(final IWorkbenchPartReference partRef) {}
 
+			@Override
 			public void partHidden(final IWorkbenchPartReference partRef) {}
 
+			@Override
 			public void partInputChanged(final IWorkbenchPartReference partRef) {}
 
+			@Override
 			public void partOpened(final IWorkbenchPartReference partRef) {}
 
+			@Override
 			public void partVisible(final IWorkbenchPartReference partRef) {}
 		};
 
@@ -98,6 +106,7 @@ public class TourStatisticsView extends ViewPart implements ITourProvider {
 
 		_prefChangeListener = new IPropertyChangeListener() {
 
+			@Override
 			public void propertyChange(final PropertyChangeEvent event) {
 
 				final String property = event.getProperty();
@@ -139,6 +148,7 @@ public class TourStatisticsView extends ViewPart implements ITourProvider {
 		// this view part is a selection listener
 		_postSelectionListener = new ISelectionListener() {
 
+			@Override
 			public void selectionChanged(final IWorkbenchPart part, final ISelection selection) {
 
 				if (selection instanceof SelectionDeletedTours) {
@@ -154,6 +164,7 @@ public class TourStatisticsView extends ViewPart implements ITourProvider {
 	private void addTourEventListener() {
 
 		_tourEventListener = new ITourEventListener() {
+			@Override
 			public void tourChanged(final IWorkbenchPart part, final TourEventId eventId, final Object propertyData) {
 
 				if (eventId == TourEventId.TOUR_CHANGED && propertyData instanceof TourEvent) {
@@ -194,10 +205,19 @@ public class TourStatisticsView extends ViewPart implements ITourProvider {
 		addSelectionListener();
 		addTourEventListener();
 
-		_activePerson = TourbookPlugin.getActivePerson();
-		_activeTourTypeFilter = TourbookPlugin.getActiveTourTypeFilter();
+		/*
+		 * Start async that the workspace is fully initialized with all data filters
+		 */
+		parent.getDisplay().asyncExec(new Runnable() {
+			@Override
+			public void run() {
 
-		_statContainer.restoreStatistics(_state, _activePerson, _activeTourTypeFilter);
+				_activePerson = TourbookPlugin.getActivePerson();
+				_activeTourTypeFilter = TourbookPlugin.getActiveTourTypeFilter();
+
+				_statContainer.restoreStatistics(_state, _activePerson, _activeTourTypeFilter);
+			}
+		});
 	}
 
 	@Override
@@ -212,6 +232,7 @@ public class TourStatisticsView extends ViewPart implements ITourProvider {
 		super.dispose();
 	}
 
+	@Override
 	public ArrayList<TourData> getSelectedTours() {
 
 		final TourbookStatistic selectedStatistic = _statContainer.getSelectedStatistic();

@@ -1280,6 +1280,12 @@ public class Map3View extends ViewPart implements ITourProvider {
 
 		for (final TourData tourData : allTours) {
 
+			if (tourData == null) {
+
+				// this occured, propably when there is no tour in the db
+				continue;
+			}
+
 			final double[] latitudeSerie = tourData.latitudeSerie;
 
 			if (latitudeSerie != null && latitudeSerie.length > 0) {

@@ -96,6 +96,7 @@ import org.eclipse.swt.graphics.Cursor;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
+import org.eclipse.swt.graphics.Path;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
@@ -2182,64 +2183,49 @@ public class Map extends Canvas {
 		final int devX1 = viewPortWidth - 5 - devScaleWidthRounded;
 		final int devX2 = devX1 + devScaleWidthRounded;
 
-		int devY = _worldPixelTopLeftViewport.height - 5 - 3;
-
-		final int segmentWidth = devScaleWidthRounded / 4;
+		final int devY = _worldPixelTopLeftViewport.height - 5 - 3;
 
 		final int devYScaleLines = devY;
 
-		final Color white = SYS_COLOR_WHITE;
-		final Color gray = SYS_COLOR_DARK_GRAY;
+		final Path path1 = new Path(_display);
+		final Path path2 = new Path(_display);
+		final int offset = -1;
+		{
+			path1.moveTo(devX1, devY);
+			path1.lineTo(devX2, devY);
 
-		paint_52_ScaleLine(gc, devX1, devX2, devY++, segmentWidth, white, white);
-		paint_52_ScaleLine(gc, devX1, devX2, devY++, segmentWidth, white, white);
-		paint_52_ScaleLine(gc, devX1, devX2, devY++, segmentWidth, white, white);
-		paint_52_ScaleLine(gc, devX1, devX2, devY, segmentWidth, gray, gray);
+			path2.moveTo(devX1, devY + offset);
+			path2.lineTo(devX2, devY + offset);
+
+			gc.setLineWidth(1);
+
+			gc.setForeground(SYS_COLOR_WHITE);
+			gc.drawPath(path1);
+
+			gc.setForeground(SYS_COLOR_BLACK);
+			gc.drawPath(path2);
+		}
+		path1.dispose();
+		path2.dispose();
 
 		final int devYText = devYScaleLines - textExtent.y;
 		final int devXText = devX1 + devScaleWidthRounded - textExtent.x;
 
-		// paint text border
+		// paint text with shadow
 		final Color borderColor = new Color(_display, 0xF1, 0xEE, 0xE8);
 		{
 			gc.setForeground(borderColor);
+//			gc.drawText(scaleText, devXText + 1, devYText + 1, true);
+
 			gc.drawText(scaleText, devXText - 1, devYText, true);
 			gc.drawText(scaleText, devXText + 1, devYText, true);
 			gc.drawText(scaleText, devXText, devYText - 1, true);
 			gc.drawText(scaleText, devXText, devYText + 1, true);
+
+			gc.setForeground(SYS_COLOR_BLACK);
+			gc.drawText(scaleText, devXText, devYText, true);
 		}
 		borderColor.dispose();
-
-		// paint text
-		gc.setForeground(SYS_COLOR_BLACK);
-		gc.drawText(scaleText, devXText, devYText, true);
-	}
-
-	private void paint_52_ScaleLine(final GC gc,
-									final int devX1,
-									final int devX2,
-									final int devY,
-									final int segmentWidth,
-									final Color firstColor,
-									final Color secondColor) {
-
-		gc.setForeground(SYS_COLOR_DARK_GRAY);
-		gc.drawPoint(devX1, devY);
-
-		gc.setForeground(firstColor);
-		gc.drawLine(devX1 + 1, devY, (devX1 + segmentWidth), devY);
-
-		gc.setForeground(secondColor);
-		gc.drawLine(devX1 + segmentWidth, devY, devX1 + 2 * segmentWidth, devY);
-
-		gc.setForeground(firstColor);
-		gc.drawLine(devX1 + 2 * segmentWidth, devY, devX1 + 3 * segmentWidth, devY);
-
-		gc.setForeground(secondColor);
-		gc.drawLine(devX1 + 3 * segmentWidth, devY, devX2, devY);
-
-		gc.setForeground(SYS_COLOR_DARK_GRAY);
-		gc.drawPoint(devX2, devY);
 	}
 
 	private void paintOfflineArea(final GC gc) {
