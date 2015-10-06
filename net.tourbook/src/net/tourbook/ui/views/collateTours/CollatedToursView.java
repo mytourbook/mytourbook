@@ -214,7 +214,6 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 	/*
 	 * UI controls
 	 */
-	private Composite									_parent;
 	private Composite									_viewerContainer;
 
 	private TreeViewer									_tourViewer;
@@ -465,8 +464,6 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 
 	@Override
 	public void createPartControl(final Composite parent) {
-
-		_parent = parent;
 
 		initUI(parent);
 

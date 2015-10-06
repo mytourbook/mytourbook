@@ -27,6 +27,8 @@ public class TreeViewerTourInfoToolTip extends ColumnViewerTourInfoToolTip {
 	public TreeViewerTourInfoToolTip(final TreeViewer treeViewer) {
 
 		super(treeViewer.getTree(), NO_RECREATE, treeViewer);
+
+		setPopupDelay(20);
 	}
 
 }

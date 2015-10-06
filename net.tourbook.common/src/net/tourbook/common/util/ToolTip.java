@@ -44,7 +44,7 @@ public abstract class ToolTip {
 
 	private int							yShift					= 0;
 
-	private int							popupDelay				= 0;
+	private int							popupDelay				= 100;
 
 	private int							hideDelay				= 0;
 
@@ -144,19 +144,23 @@ public abstract class ToolTip {
 	}
 
 	private class ToolTipOwnerControlListener implements Listener {
+
 		@Override
 		public void handleEvent(final Event event) {
+
 			switch (event.type) {
 			case SWT.Dispose:
 			case SWT.KeyDown:
 			case SWT.MouseDown:
-			case SWT.MouseMove:
 			case SWT.MouseWheel:
 				toolTipHide(getShell(), event);
 				break;
-			case SWT.MouseHover:
+
+			case SWT.MouseMove:
+//			case SWT.MouseHover:
 				toolTipCreate(event);
 				break;
+
 			case SWT.MouseExit:
 				/*
 				 * Check if the mouse exit happened because we move over the tooltip
