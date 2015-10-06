@@ -44,7 +44,7 @@ public abstract class ToolTip {
 
 	private int							yShift					= 0;
 
-	private int							popupDelay				= 100;
+	private int							popupDelay				= 0;
 
 	private int							hideDelay				= 0;
 
@@ -152,12 +152,11 @@ public abstract class ToolTip {
 			case SWT.Dispose:
 			case SWT.KeyDown:
 			case SWT.MouseDown:
+			case SWT.MouseMove:
 			case SWT.MouseWheel:
 				toolTipHide(getShell(), event);
 				break;
-
-			case SWT.MouseMove:
-//			case SWT.MouseHover:
+			case SWT.MouseHover:
 				toolTipCreate(event);
 				break;
 
