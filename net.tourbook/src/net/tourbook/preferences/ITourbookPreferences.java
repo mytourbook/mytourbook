@@ -372,6 +372,12 @@ public interface ITourbookPreferences {
 	public static final String	VIEW_TOOLTIP									= "view.tooltip.";											//$NON-NLS-1$
 	public static final String	VIEW_TOOLTIP_IS_MODIFIED						= VIEW_TOOLTIP + "isModified";								//$NON-NLS-1$
 
+	public static final String	VIEW_TOOLTIP_COLLATED_COLLATION					= "VIEW_TOOLTIP_COLLATED_COLLATION";						//$NON-NLS-1$
+	public static final String	VIEW_TOOLTIP_COLLATED_TIME						= "VIEW_TOOLTIP_COLLATED_TIME";							//$NON-NLS-1$
+	public static final String	VIEW_TOOLTIP_COLLATED_TITLE						= "VIEW_TOOLTIP_COLLATED_TITLE";							//$NON-NLS-1$
+	public static final String	VIEW_TOOLTIP_COLLATED_TAGS						= "VIEW_TOOLTIP_COLLATED_TAGS";							//$NON-NLS-1$
+	public static final String	VIEW_TOOLTIP_COLLATED_WEEKDAY					= "VIEW_TOOLTIP_COLLATED_WEEKDAY";							//$NON-NLS-1$
+
 	public static final String	VIEW_TOOLTIP_TOURBOOK_DATE						= VIEW_TOOLTIP + "tourbook.date";							//$NON-NLS-1$
 	public static final String	VIEW_TOOLTIP_TOURBOOK_TIME						= VIEW_TOOLTIP + "tourbook.time";							//$NON-NLS-1$
 	public static final String	VIEW_TOOLTIP_TOURBOOK_WEEKDAY					= VIEW_TOOLTIP + "tourbook.weekday";						//$NON-NLS-1$

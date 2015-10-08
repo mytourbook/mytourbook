@@ -178,7 +178,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 	private boolean										_isDriveTimeFormat_hhmmss;
 	private boolean										_isInUIUpdate;
 
-	private boolean										_isToolTipInDate;
+	private boolean										_isToolTipInCollation;
 	private boolean										_isToolTipInTags;
 	private boolean										_isToolTipInTime;
 	private boolean										_isToolTipInTitle;
@@ -681,7 +681,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 			@Override
 			public Long getTourId(final ViewerCell cell) {
 
-				if (_isToolTipInDate == false) {
+				if (_isToolTipInCollation == false) {
 					return null;
 				}
 
@@ -742,12 +742,6 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 
 						styledString.append(endText, DATE_STYLER);
 					}
-
-					/*
-					 * Event text
-					 */
-					styledString.append(UI.SPACE3);
-					styledString.append(tourItem.treeColumn);
 
 					/*
 					 * Number of tours for each event
@@ -2174,195 +2168,18 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 
 	void reopenFirstSelectedTour() {
 
-//		_selectedYear = -1;
-//		_selectedYearSub = -1;
-//		TVITourBookTour selectedTourItem = null;
-//
-//		final ISelection oldSelection = _tourViewer.getSelection();
-//		if (oldSelection != null) {
-//
-//			final Object selection = ((IStructuredSelection) oldSelection).getFirstElement();
-//			if (selection instanceof TVITourBookTour) {
-//
-//				selectedTourItem = (TVITourBookTour) selection;
-//
-//				_selectedYear = selectedTourItem.tourYear;
-//
-//				if (getYearSub() == YearSubCategory.WEEK) {
-//					_selectedYearSub = selectedTourItem.tourWeek;
-//				} else {
-//					_selectedYearSub = selectedTourItem.tourMonth;
-//				}
-//			}
-//		}
-//
-//		reloadViewer();
-//		reselectTourViewer();
-//
-//		final IStructuredSelection newSelection = (IStructuredSelection) _tourViewer.getSelection();
-//		if (newSelection != null) {
-//
-//			final Object selection = newSelection.getFirstElement();
-//			if (selection instanceof TVITourBookTour) {
-//
-//				selectedTourItem = (TVITourBookTour) selection;
-//
-//				_tourViewer.collapseAll();
-//				_tourViewer.expandToLevel(selectedTourItem, 0);
-//				_tourViewer.setSelection(new StructuredSelection(selectedTourItem), false);
-//			}
-//		}
 	}
 
 	private void reselectTourViewer() {
 
-		// find the old selected year/[month/week] in the new tour items
-//		TreeViewerItem reselectYearItem = null;
-//		TreeViewerItem reselectYearSubItem = null;
-//		final ArrayList<TreeViewerItem> reselectTourItems = new ArrayList<TreeViewerItem>();
-//
-//		/*
-//		 * get the year/month/tour item in the data model
-//		 */
-//		final ArrayList<TreeViewerItem> rootItems = _rootItem.getChildren();
-//
-//		for (final TreeViewerItem rootItem : rootItems) {
-//
-//			if (rootItem instanceof TVITourBookYear) {
-//
-//				final TVITourBookYear tourBookYear = ((TVITourBookYear) rootItem);
-//				if (tourBookYear.tourYear == _selectedYear) {
-//
-//					reselectYearItem = rootItem;
-//
-//					final Object[] yearSubItems = tourBookYear.getFetchedChildrenAsArray();
-//					for (final Object yearSub : yearSubItems) {
-//
-//						final TVITourBookYearSub tourBookYearSub = ((TVITourBookYearSub) yearSub);
-//						if (tourBookYearSub.tourYearSub == _selectedYearSub) {
-//
-//							reselectYearSubItem = tourBookYearSub;
-//
-//							final Object[] tourItems = tourBookYearSub.getFetchedChildrenAsArray();
-//							for (final Object tourItem : tourItems) {
-//
-//								final TVITourBookTour tourBookTour = ((TVITourBookTour) tourItem);
-//								final long treeTourId = tourBookTour.tourId;
-//
-//								for (final Long tourId : _selectedTourIds) {
-//									if (treeTourId == tourId) {
-//										reselectTourItems.add(tourBookTour);
-//										break;
-//									}
-//								}
-//							}
-//							break;
-//						}
-//					}
-//					break;
-//				}
-//			}
-//		}
-//
-//		// select year/month/tour in the viewer
-//		if (reselectTourItems.size() > 0) {
-//
-//			_tourViewer.setSelection(new StructuredSelection(reselectTourItems) {}, false);
-//
-//		} else if (reselectYearSubItem != null) {
-//
-//			_tourViewer.setSelection(new StructuredSelection(reselectYearSubItem) {}, false);
-//
-//		} else if (reselectYearItem != null) {
-//
-//			_tourViewer.setSelection(new StructuredSelection(reselectYearItem) {}, false);
-//
-//		} else if (rootItems.size() > 0) {
-//
-//			// the old year was not found, select the newest year
-//
-//			final TreeViewerItem yearItem = rootItems.get(rootItems.size() - 1);
-//
-//			_tourViewer.setSelection(new StructuredSelection(yearItem) {}, true);
-//		}
-//
-//		// move the horizontal scrollbar to the left border
-//		final ScrollBar horizontalBar = _tourViewer.getTree().getHorizontalBar();
-//		if (horizontalBar != null) {
-//			horizontalBar.setSelection(0);
-//		}
 	}
 
 	private void restoreState() {
-
-//		// set tour viewer reselection data
-//		try {
-//			_selectedYear = _state.getInt(STATE_SELECTED_YEAR);
-//		} catch (final NumberFormatException e) {
-//			_selectedYear = -1;
-//		}
-//
-//		try {
-//			_selectedYearSub = _state.getInt(STATE_SELECTED_MONTH);
-//		} catch (final NumberFormatException e) {
-//			_selectedYearSub = -1;
-//		}
-//
-//		final String[] selectedTourIds = _state.getArray(STATE_SELECTED_TOURS);
-//		_selectedTourIds.clear();
-//
-//		if (selectedTourIds != null) {
-//			for (final String tourId : selectedTourIds) {
-//				try {
-//					_selectedTourIds.add(Long.valueOf(tourId));
-//				} catch (final NumberFormatException e) {
-//					// ignore
-//				}
-//			}
-//		}
-//
-//		_actionSelectAllTours.setChecked(_state.getBoolean(STATE_IS_SELECT_YEAR_MONTH_TOURS));
-//
-//		_viewType = (ViewType) Util.getStateEnum(//
-//				_state,
-//				STATE_VIEW_TYPE,
-//				ViewType.CATEGORIZED_BY_YEAR);
-//		_actionCollateTours.setSelected(_viewType == ViewType.COLLATE_BY_TOUR_TYPE);
-//
-//		/*
-//		 * Year sub category
-//		 */
-//		_yearSubCategory = (YearSubCategory) Util.getStateEnum(//
-//				_state,
-//				STATE_YEAR_SUB_CATEGORY,
-//				YearSubCategory.MONTH);
-//		_actionToggleMonthWeek.setImageDescriptor(//
-//				TourbookPlugin.getImageDescriptor(_yearSubCategory == YearSubCategory.WEEK
-//						? Messages.Image__TourBook_Month
-//						: Messages.Image__TourBook_Week));
 
 		updateToolTipState();
 	}
 
 	private void saveState() {
-
-//		// save selection in the tour viewer
-//		_state.put(STATE_SELECTED_YEAR, _selectedYear);
-//		_state.put(STATE_SELECTED_MONTH, _selectedYearSub);
-//
-//		// convert tour id's into string
-//		final ArrayList<String> selectedTourIds = new ArrayList<String>();
-//		for (final Long tourId : _selectedTourIds) {
-//			selectedTourIds.add(tourId.toString());
-//		}
-//		_state.put(STATE_SELECTED_TOURS, selectedTourIds.toArray(new String[selectedTourIds.size()]));
-//
-//		// action: select tours for year/yearSub
-//		_state.put(STATE_IS_SELECT_YEAR_MONTH_TOURS, _actionSelectAllTours.isChecked());
-//
-//		_state.put(STATE_VIEW_TYPE, _viewType.name());
-//
-//		_state.put(STATE_YEAR_SUB_CATEGORY, _yearSubCategory.name());
 
 		_columnManager.saveState(_state);
 	}
@@ -2389,10 +2206,10 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 
 	private void updateToolTipState() {
 
-		_isToolTipInDate = _prefStore.getBoolean(ITourbookPreferences.VIEW_TOOLTIP_TOURBOOK_DATE);
-		_isToolTipInTime = _prefStore.getBoolean(ITourbookPreferences.VIEW_TOOLTIP_TOURBOOK_TIME);
-		_isToolTipInWeekDay = _prefStore.getBoolean(ITourbookPreferences.VIEW_TOOLTIP_TOURBOOK_WEEKDAY);
-		_isToolTipInTitle = _prefStore.getBoolean(ITourbookPreferences.VIEW_TOOLTIP_TOURBOOK_TITLE);
-		_isToolTipInTags = _prefStore.getBoolean(ITourbookPreferences.VIEW_TOOLTIP_TOURBOOK_TAGS);
+		_isToolTipInCollation = _prefStore.getBoolean(ITourbookPreferences.VIEW_TOOLTIP_COLLATED_COLLATION);
+		_isToolTipInTime = _prefStore.getBoolean(ITourbookPreferences.VIEW_TOOLTIP_COLLATED_TIME);
+		_isToolTipInWeekDay = _prefStore.getBoolean(ITourbookPreferences.VIEW_TOOLTIP_COLLATED_WEEKDAY);
+		_isToolTipInTitle = _prefStore.getBoolean(ITourbookPreferences.VIEW_TOOLTIP_COLLATED_TITLE);
+		_isToolTipInTags = _prefStore.getBoolean(ITourbookPreferences.VIEW_TOOLTIP_COLLATED_TAGS);
 	}
 }

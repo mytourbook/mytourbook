@@ -430,13 +430,6 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 		final IWorkbenchWindowConfigurer configurer = getWindowConfigurer();
 
 		configurer.setTitle(_appTitle);
-	}
-
-	@Override
-	public void postWindowOpen() {
-
-//		System.out.println("postWindowOpen()\t");
-//		// TODO remove SYSTEM.OUT.PRINTLN
 
 		/**
 		 * THIS IS VERY CRITICAL TO BE SET BEFORE THE ASYNC RUNNABLE STARTS, OTHERWISE THE VIEWS
@@ -445,6 +438,14 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 		 */
 		UI.updateUnits();
 		TourTypeFilterManager.restoreState();
+	}
+
+	@Override
+	public void postWindowOpen() {
+
+//		System.out.println("postWindowOpen()\t");
+//		// TODO remove SYSTEM.OUT.PRINTLN
+
 
 		Display.getDefault().asyncExec(new Runnable() {
 			@Override
@@ -457,8 +458,6 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 				setupAppSelectionListener();
 
 				setupProxy();
-
-//				WebContentServer.start();
 			}
 		});
 	}

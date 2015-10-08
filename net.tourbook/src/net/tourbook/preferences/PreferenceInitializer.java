@@ -426,6 +426,12 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 		/*
 		 * view column tooltip
 		 */
+		store.setDefault(ITourbookPreferences.VIEW_TOOLTIP_COLLATED_COLLATION, true);
+		store.setDefault(ITourbookPreferences.VIEW_TOOLTIP_COLLATED_TIME, true);
+		store.setDefault(ITourbookPreferences.VIEW_TOOLTIP_COLLATED_TITLE, true);
+		store.setDefault(ITourbookPreferences.VIEW_TOOLTIP_COLLATED_TAGS, true);
+		store.setDefault(ITourbookPreferences.VIEW_TOOLTIP_COLLATED_WEEKDAY, true);
+
 		store.setDefault(ITourbookPreferences.VIEW_TOOLTIP_TOURBOOK_DATE, true);
 		store.setDefault(ITourbookPreferences.VIEW_TOOLTIP_TOURBOOK_TIME, true);
 		store.setDefault(ITourbookPreferences.VIEW_TOOLTIP_TOURBOOK_TITLE, true);

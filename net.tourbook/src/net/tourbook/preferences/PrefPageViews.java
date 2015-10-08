@@ -68,24 +68,30 @@ public class PrefPageViews extends FieldEditorPreferencePage implements IWorkben
 	/*
 	 * UI constrols
 	 */
-	private Button					_chkTourImportDate;
-	private Button					_chkTourImportTime;
-	private Button					_chkTourImportTitle;
-	private Button					_chkTourImportTags;
+	private Button					_chkTourImport_Date;
+	private Button					_chkTourImport_Time;
+	private Button					_chkTourImport_Title;
+	private Button					_chkTourImport_Tags;
 
-	private Button					_chkTourBookDate;
-	private Button					_chkTourBookTime;
-	private Button					_chkTourBookTitle;
-	private Button					_chkTourBookTags;
-	private Button					_chkTourBookWeekday;
+	private Button					_chkTourBook_Date;
+	private Button					_chkTourBook_Time;
+	private Button					_chkTourBook_Title;
+	private Button					_chkTourBook_Tags;
+	private Button					_chkTourBook_Weekday;
 
-	private Button					_chkTaggingTag;
-	private Button					_chkTaggingTitle;
-	private Button					_chkTaggingTags;
+	private Button					_chkCollateTour_Date;
+	private Button					_chkCollateTour_Time;
+	private Button					_chkCollateTour_Title;
+	private Button					_chkCollateTour_Tags;
+	private Button					_chkCollateTour_Weekday;
 
-	private Button					_chkTourCatalogRefTour;
-	private Button					_chkTourCatalogTitle;
-	private Button					_chkTourCatalogTags;
+	private Button					_chkTagging_Tag;
+	private Button					_chkTagging_Title;
+	private Button					_chkTagging_Tags;
+
+	private Button					_chkTourCatalog_RefTour;
+	private Button					_chkTourCatalog_Title;
+	private Button					_chkTourCatalog_Tags;
 
 	/*
 	 * none UI controls
@@ -115,12 +121,12 @@ public class PrefPageViews extends FieldEditorPreferencePage implements IWorkben
 			GridDataFactory.fillDefaults().grab(true, false).applyTo(parent);
 			GridLayoutFactory.fillDefaults().applyTo(parent);
 
-			createUI10ViewActions(parent);
-			createUI30ViewTooltip(parent);
+			createUI_10_ViewActions(parent);
+			createUI_30_ViewTooltip(parent);
 		}
 	}
 
-	private void createUI10ViewActions(final Composite parent) {
+	private void createUI_10_ViewActions(final Composite parent) {
 
 		/*
 		 * group: column time format
@@ -188,7 +194,7 @@ public class PrefPageViews extends FieldEditorPreferencePage implements IWorkben
 
 	}
 
-	private void createUI30ViewTooltip(final Composite parent) {
+	private void createUI_30_ViewTooltip(final Composite parent) {
 
 		final Group group = new Group(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(group);
@@ -208,17 +214,18 @@ public class PrefPageViews extends FieldEditorPreferencePage implements IWorkben
 					.numColumns(6)
 					.applyTo(container);
 			{
-				createUI31ToolTipTourImport(container);
-				createUI32ToolTipTourBook(container);
-				createUI33ToolTipTagging(container);
-				createUI34ToolTipTourCatalog(container);
+				createUI_31_ToolTip_TourImport(container);
+				createUI_33_ToolTip_TourBook(container);
+				createUI_35_ToolTip_CollateTour(container);
+				createUI_37_ToolTip_Tagging(container);
+				createUI_39_ToolTip_TourCatalog(container);
 			}
 
 			createUI39ToolTipActions(group);
 		}
 	}
 
-	private void createUI31ToolTipTourImport(final Composite container) {
+	private void createUI_31_ToolTip_TourImport(final Composite container) {
 
 		Label label = new Label(container, SWT.NONE);
 		GridDataFactory.fillDefaults()//
@@ -229,37 +236,37 @@ public class PrefPageViews extends FieldEditorPreferencePage implements IWorkben
 		/*
 		 * checkbox: date
 		 */
-		_chkTourImportDate = new Button(container, SWT.CHECK);
-		_chkTourImportDate.setText(Messages.PrefPage_ViewTooltip_Label_Date);
-		_chkTourImportDate.addSelectionListener(_toolTipSelectionAdapter);
+		_chkTourImport_Date = new Button(container, SWT.CHECK);
+		_chkTourImport_Date.setText(Messages.PrefPage_ViewTooltip_Label_Date);
+		_chkTourImport_Date.addSelectionListener(_toolTipSelectionAdapter);
 
 		/*
 		 * checkbox: time
 		 */
-		_chkTourImportTime = new Button(container, SWT.CHECK);
-		_chkTourImportTime.setText(Messages.PrefPage_ViewTooltip_Label_Time);
-		_chkTourImportTime.addSelectionListener(_toolTipSelectionAdapter);
+		_chkTourImport_Time = new Button(container, SWT.CHECK);
+		_chkTourImport_Time.setText(Messages.PrefPage_ViewTooltip_Label_Time);
+		_chkTourImport_Time.addSelectionListener(_toolTipSelectionAdapter);
 
 		/*
 		 * checkbox: title
 		 */
-		_chkTourImportTitle = new Button(container, SWT.CHECK);
-		_chkTourImportTitle.setText(Messages.PrefPage_ViewTooltip_Label_Title);
-		_chkTourImportTitle.addSelectionListener(_toolTipSelectionAdapter);
+		_chkTourImport_Title = new Button(container, SWT.CHECK);
+		_chkTourImport_Title.setText(Messages.PrefPage_ViewTooltip_Label_Title);
+		_chkTourImport_Title.addSelectionListener(_toolTipSelectionAdapter);
 
 		/*
 		 * checkbox: tags
 		 */
-		_chkTourImportTags = new Button(container, SWT.CHECK);
-		_chkTourImportTags.setText(Messages.PrefPage_ViewTooltip_Label_Tags);
-		_chkTourImportTags.addSelectionListener(_toolTipSelectionAdapter);
+		_chkTourImport_Tags = new Button(container, SWT.CHECK);
+		_chkTourImport_Tags.setText(Messages.PrefPage_ViewTooltip_Label_Tags);
+		_chkTourImport_Tags.addSelectionListener(_toolTipSelectionAdapter);
 
 		// spacer
 		label = new Label(container, SWT.NONE);
 		GridDataFactory.fillDefaults().span(1, 1).applyTo(label);
 	}
 
-	private void createUI32ToolTipTourBook(final Composite container) {
+	private void createUI_33_ToolTip_TourBook(final Composite container) {
 
 		final Label label = new Label(container, SWT.NONE);
 		GridDataFactory.fillDefaults().applyTo(label);
@@ -268,40 +275,82 @@ public class PrefPageViews extends FieldEditorPreferencePage implements IWorkben
 		/*
 		 * checkbox: first column (year/month/day)
 		 */
-		_chkTourBookDate = new Button(container, SWT.CHECK);
-		_chkTourBookDate.setText(Messages.PrefPage_ViewTooltip_Label_Day);
-		_chkTourBookDate.addSelectionListener(_toolTipSelectionAdapter);
+		_chkTourBook_Date = new Button(container, SWT.CHECK);
+		_chkTourBook_Date.setText(Messages.PrefPage_ViewTooltip_Label_Day);
+		_chkTourBook_Date.addSelectionListener(_toolTipSelectionAdapter);
 
 		/*
 		 * checkbox: time
 		 */
-		_chkTourBookTime = new Button(container, SWT.CHECK);
-		_chkTourBookTime.setText(Messages.PrefPage_ViewTooltip_Label_Time);
-		_chkTourBookTime.addSelectionListener(_toolTipSelectionAdapter);
+		_chkTourBook_Time = new Button(container, SWT.CHECK);
+		_chkTourBook_Time.setText(Messages.PrefPage_ViewTooltip_Label_Time);
+		_chkTourBook_Time.addSelectionListener(_toolTipSelectionAdapter);
 
 		/*
 		 * checkbox: title
 		 */
-		_chkTourBookTitle = new Button(container, SWT.CHECK);
-		_chkTourBookTitle.setText(Messages.PrefPage_ViewTooltip_Label_Title);
-		_chkTourBookTitle.addSelectionListener(_toolTipSelectionAdapter);
+		_chkTourBook_Title = new Button(container, SWT.CHECK);
+		_chkTourBook_Title.setText(Messages.PrefPage_ViewTooltip_Label_Title);
+		_chkTourBook_Title.addSelectionListener(_toolTipSelectionAdapter);
 
 		/*
 		 * checkbox: tags
 		 */
-		_chkTourBookTags = new Button(container, SWT.CHECK);
-		_chkTourBookTags.setText(Messages.PrefPage_ViewTooltip_Label_Tags);
-		_chkTourBookTags.addSelectionListener(_toolTipSelectionAdapter);
+		_chkTourBook_Tags = new Button(container, SWT.CHECK);
+		_chkTourBook_Tags.setText(Messages.PrefPage_ViewTooltip_Label_Tags);
+		_chkTourBook_Tags.addSelectionListener(_toolTipSelectionAdapter);
 
 		/*
 		 * checkbox: weekday
 		 */
-		_chkTourBookWeekday = new Button(container, SWT.CHECK);
-		_chkTourBookWeekday.setText(Messages.PrefPage_ViewTooltip_Label_WeekDay);
-		_chkTourBookWeekday.addSelectionListener(_toolTipSelectionAdapter);
+		_chkTourBook_Weekday = new Button(container, SWT.CHECK);
+		_chkTourBook_Weekday.setText(Messages.PrefPage_ViewTooltip_Label_WeekDay);
+		_chkTourBook_Weekday.addSelectionListener(_toolTipSelectionAdapter);
 	}
 
-	private void createUI33ToolTipTagging(final Composite container) {
+	private void createUI_35_ToolTip_CollateTour(final Composite container) {
+
+		final Label label = new Label(container, SWT.NONE);
+		GridDataFactory.fillDefaults().applyTo(label);
+		label.setText(Messages.PrefPage_ViewTooltip_Label_CollatedTours);
+
+		/*
+		 * checkbox: first column (year/month/day)
+		 */
+		_chkCollateTour_Date = new Button(container, SWT.CHECK);
+		_chkCollateTour_Date.setText(Messages.PrefPage_ViewTooltip_Chkbox_Collation);
+		_chkCollateTour_Date.addSelectionListener(_toolTipSelectionAdapter);
+
+		/*
+		 * checkbox: time
+		 */
+		_chkCollateTour_Time = new Button(container, SWT.CHECK);
+		_chkCollateTour_Time.setText(Messages.PrefPage_ViewTooltip_Label_Time);
+		_chkCollateTour_Time.addSelectionListener(_toolTipSelectionAdapter);
+
+		/*
+		 * checkbox: title
+		 */
+		_chkCollateTour_Title = new Button(container, SWT.CHECK);
+		_chkCollateTour_Title.setText(Messages.PrefPage_ViewTooltip_Label_Title);
+		_chkCollateTour_Title.addSelectionListener(_toolTipSelectionAdapter);
+
+		/*
+		 * checkbox: tags
+		 */
+		_chkCollateTour_Tags = new Button(container, SWT.CHECK);
+		_chkCollateTour_Tags.setText(Messages.PrefPage_ViewTooltip_Label_Tags);
+		_chkCollateTour_Tags.addSelectionListener(_toolTipSelectionAdapter);
+
+		/*
+		 * checkbox: weekday
+		 */
+		_chkCollateTour_Weekday = new Button(container, SWT.CHECK);
+		_chkCollateTour_Weekday.setText(Messages.PrefPage_ViewTooltip_Label_WeekDay);
+		_chkCollateTour_Weekday.addSelectionListener(_toolTipSelectionAdapter);
+	}
+
+	private void createUI_37_ToolTip_Tagging(final Composite container) {
 
 		Label label = new Label(container, SWT.NONE);
 		GridDataFactory.fillDefaults().applyTo(label);
@@ -310,9 +359,9 @@ public class PrefPageViews extends FieldEditorPreferencePage implements IWorkben
 		/*
 		 * checkbox: first column (tag)
 		 */
-		_chkTaggingTag = new Button(container, SWT.CHECK);
-		_chkTaggingTag.setText(Messages.PrefPage_ViewTooltip_Label_TagFirstColumn);
-		_chkTaggingTag.addSelectionListener(_toolTipSelectionAdapter);
+		_chkTagging_Tag = new Button(container, SWT.CHECK);
+		_chkTagging_Tag.setText(Messages.PrefPage_ViewTooltip_Label_TagFirstColumn);
+		_chkTagging_Tag.addSelectionListener(_toolTipSelectionAdapter);
 
 		// spacer
 		label = new Label(container, SWT.NONE);
@@ -321,23 +370,23 @@ public class PrefPageViews extends FieldEditorPreferencePage implements IWorkben
 		/*
 		 * checkbox: title
 		 */
-		_chkTaggingTitle = new Button(container, SWT.CHECK);
-		_chkTaggingTitle.setText(Messages.PrefPage_ViewTooltip_Label_Title);
-		_chkTaggingTitle.addSelectionListener(_toolTipSelectionAdapter);
+		_chkTagging_Title = new Button(container, SWT.CHECK);
+		_chkTagging_Title.setText(Messages.PrefPage_ViewTooltip_Label_Title);
+		_chkTagging_Title.addSelectionListener(_toolTipSelectionAdapter);
 
 		/*
 		 * checkbox: tags
 		 */
-		_chkTaggingTags = new Button(container, SWT.CHECK);
-		_chkTaggingTags.setText(Messages.PrefPage_ViewTooltip_Label_Tags);
-		_chkTaggingTags.addSelectionListener(_toolTipSelectionAdapter);
+		_chkTagging_Tags = new Button(container, SWT.CHECK);
+		_chkTagging_Tags.setText(Messages.PrefPage_ViewTooltip_Label_Tags);
+		_chkTagging_Tags.addSelectionListener(_toolTipSelectionAdapter);
 
 		// spacer
 		label = new Label(container, SWT.NONE);
 		GridDataFactory.fillDefaults().span(1, 1).applyTo(label);
 	}
 
-	private void createUI34ToolTipTourCatalog(final Composite container) {
+	private void createUI_39_ToolTip_TourCatalog(final Composite container) {
 
 		Label label = new Label(container, SWT.NONE);
 		GridDataFactory.fillDefaults().applyTo(label);
@@ -346,9 +395,9 @@ public class PrefPageViews extends FieldEditorPreferencePage implements IWorkben
 		/*
 		 * checkbox: first column (reference tour)
 		 */
-		_chkTourCatalogRefTour = new Button(container, SWT.CHECK);
-		_chkTourCatalogRefTour.setText(Messages.PrefPage_ViewTooltip_Label_ReferenceTour);
-		_chkTourCatalogRefTour.addSelectionListener(_toolTipSelectionAdapter);
+		_chkTourCatalog_RefTour = new Button(container, SWT.CHECK);
+		_chkTourCatalog_RefTour.setText(Messages.PrefPage_ViewTooltip_Label_ReferenceTour);
+		_chkTourCatalog_RefTour.addSelectionListener(_toolTipSelectionAdapter);
 
 		// spacer
 		label = new Label(container, SWT.NONE);
@@ -357,16 +406,16 @@ public class PrefPageViews extends FieldEditorPreferencePage implements IWorkben
 		/*
 		 * checkbox: title
 		 */
-		_chkTourCatalogTitle = new Button(container, SWT.CHECK);
-		_chkTourCatalogTitle.setText(Messages.PrefPage_ViewTooltip_Label_Title);
-		_chkTourCatalogTitle.addSelectionListener(_toolTipSelectionAdapter);
+		_chkTourCatalog_Title = new Button(container, SWT.CHECK);
+		_chkTourCatalog_Title.setText(Messages.PrefPage_ViewTooltip_Label_Title);
+		_chkTourCatalog_Title.addSelectionListener(_toolTipSelectionAdapter);
 
 		/*
 		 * checkbox: tags
 		 */
-		_chkTourCatalogTags = new Button(container, SWT.CHECK);
-		_chkTourCatalogTags.setText(Messages.PrefPage_ViewTooltip_Label_Tags);
-		_chkTourCatalogTags.addSelectionListener(_toolTipSelectionAdapter);
+		_chkTourCatalog_Tags = new Button(container, SWT.CHECK);
+		_chkTourCatalog_Tags.setText(Messages.PrefPage_ViewTooltip_Label_Tags);
+		_chkTourCatalog_Tags.addSelectionListener(_toolTipSelectionAdapter);
 
 		// spacer
 		label = new Label(container, SWT.NONE);
@@ -426,30 +475,37 @@ public class PrefPageViews extends FieldEditorPreferencePage implements IWorkben
 		}
 	}
 
+	@Override
 	public void init(final IWorkbench workbench) {
 		setPreferenceStore(_prefStore);
 	}
 
 	private void onSelectEnable(final boolean isSelected) {
 
-		_chkTourImportDate.setSelection(isSelected);
-		_chkTourImportTime.setSelection(isSelected);
-		_chkTourImportTitle.setSelection(isSelected);
-		_chkTourImportTags.setSelection(isSelected);
+		_chkTourImport_Date.setSelection(isSelected);
+		_chkTourImport_Time.setSelection(isSelected);
+		_chkTourImport_Title.setSelection(isSelected);
+		_chkTourImport_Tags.setSelection(isSelected);
 
-		_chkTourBookDate.setSelection(isSelected);
-		_chkTourBookTime.setSelection(isSelected);
-		_chkTourBookTitle.setSelection(isSelected);
-		_chkTourBookTags.setSelection(isSelected);
-		_chkTourBookWeekday.setSelection(isSelected);
+		_chkTourBook_Date.setSelection(isSelected);
+		_chkTourBook_Time.setSelection(isSelected);
+		_chkTourBook_Title.setSelection(isSelected);
+		_chkTourBook_Tags.setSelection(isSelected);
+		_chkTourBook_Weekday.setSelection(isSelected);
 
-		_chkTaggingTag.setSelection(isSelected);
-		_chkTaggingTitle.setSelection(isSelected);
-		_chkTaggingTags.setSelection(isSelected);
+		_chkCollateTour_Date.setSelection(isSelected);
+		_chkCollateTour_Time.setSelection(isSelected);
+		_chkCollateTour_Title.setSelection(isSelected);
+		_chkCollateTour_Tags.setSelection(isSelected);
+		_chkCollateTour_Weekday.setSelection(isSelected);
 
-		_chkTourCatalogRefTour.setSelection(isSelected);
-		_chkTourCatalogTitle.setSelection(isSelected);
-		_chkTourCatalogTags.setSelection(isSelected);
+		_chkTagging_Tag.setSelection(isSelected);
+		_chkTagging_Title.setSelection(isSelected);
+		_chkTagging_Tags.setSelection(isSelected);
+
+		_chkTourCatalog_RefTour.setSelection(isSelected);
+		_chkTourCatalog_Title.setSelection(isSelected);
+		_chkTourCatalog_Tags.setSelection(isSelected);
 	}
 
 	@Override
@@ -459,38 +515,49 @@ public class PrefPageViews extends FieldEditorPreferencePage implements IWorkben
 
 		super.performDefaults();
 
-		_chkTourImportDate.setSelection(//
+		_chkTourImport_Date.setSelection(//
 				_prefStore.getDefaultBoolean(ITourbookPreferences.VIEW_TOOLTIP_TOURIMPORT_DATE));
-		_chkTourImportTime.setSelection(//
+		_chkTourImport_Time.setSelection(//
 				_prefStore.getDefaultBoolean(ITourbookPreferences.VIEW_TOOLTIP_TOURIMPORT_TIME));
-		_chkTourImportTitle.setSelection(//
+		_chkTourImport_Title.setSelection(//
 				_prefStore.getDefaultBoolean(ITourbookPreferences.VIEW_TOOLTIP_TOURIMPORT_TITLE));
-		_chkTourImportTags.setSelection(//
+		_chkTourImport_Tags.setSelection(//
 				_prefStore.getDefaultBoolean(ITourbookPreferences.VIEW_TOOLTIP_TOURIMPORT_TAGS));
 
-		_chkTourBookDate.setSelection(//
+		_chkTourBook_Date.setSelection(//
 				_prefStore.getDefaultBoolean(ITourbookPreferences.VIEW_TOOLTIP_TOURBOOK_DATE));
-		_chkTourBookTime.setSelection(//
+		_chkTourBook_Time.setSelection(//
 				_prefStore.getDefaultBoolean(ITourbookPreferences.VIEW_TOOLTIP_TOURBOOK_TIME));
-		_chkTourBookTitle.setSelection(//
+		_chkTourBook_Title.setSelection(//
 				_prefStore.getDefaultBoolean(ITourbookPreferences.VIEW_TOOLTIP_TOURBOOK_TITLE));
-		_chkTourBookTags.setSelection(//
+		_chkTourBook_Tags.setSelection(//
 				_prefStore.getDefaultBoolean(ITourbookPreferences.VIEW_TOOLTIP_TOURBOOK_TAGS));
-		_chkTourBookWeekday.setSelection(//
+		_chkTourBook_Weekday.setSelection(//
 				_prefStore.getDefaultBoolean(ITourbookPreferences.VIEW_TOOLTIP_TOURBOOK_WEEKDAY));
 
-		_chkTaggingTag.setSelection(//
+		_chkCollateTour_Date.setSelection(//
+				_prefStore.getDefaultBoolean(ITourbookPreferences.VIEW_TOOLTIP_COLLATED_COLLATION));
+		_chkCollateTour_Time.setSelection(//
+				_prefStore.getDefaultBoolean(ITourbookPreferences.VIEW_TOOLTIP_COLLATED_TIME));
+		_chkCollateTour_Title.setSelection(//
+				_prefStore.getDefaultBoolean(ITourbookPreferences.VIEW_TOOLTIP_COLLATED_TITLE));
+		_chkCollateTour_Tags.setSelection(//
+				_prefStore.getDefaultBoolean(ITourbookPreferences.VIEW_TOOLTIP_COLLATED_TAGS));
+		_chkCollateTour_Weekday.setSelection(//
+				_prefStore.getDefaultBoolean(ITourbookPreferences.VIEW_TOOLTIP_COLLATED_WEEKDAY));
+
+		_chkTagging_Tag.setSelection(//
 				_prefStore.getDefaultBoolean(ITourbookPreferences.VIEW_TOOLTIP_TAGGING_TAG));
-		_chkTaggingTitle.setSelection(//
+		_chkTagging_Title.setSelection(//
 				_prefStore.getDefaultBoolean(ITourbookPreferences.VIEW_TOOLTIP_TAGGING_TITLE));
-		_chkTaggingTags.setSelection(//
+		_chkTagging_Tags.setSelection(//
 				_prefStore.getDefaultBoolean(ITourbookPreferences.VIEW_TOOLTIP_TAGGING_TAGS));
 
-		_chkTourCatalogRefTour.setSelection(//
+		_chkTourCatalog_RefTour.setSelection(//
 				_prefStore.getDefaultBoolean(ITourbookPreferences.VIEW_TOOLTIP_TOURCATALOG_REFTOUR));
-		_chkTourCatalogTitle.setSelection(//
+		_chkTourCatalog_Title.setSelection(//
 				_prefStore.getDefaultBoolean(ITourbookPreferences.VIEW_TOOLTIP_TOURCATALOG_TITLE));
-		_chkTourCatalogTags.setSelection(//
+		_chkTourCatalog_Tags.setSelection(//
 				_prefStore.getDefaultBoolean(ITourbookPreferences.VIEW_TOOLTIP_TOURCATALOG_TAGS));
 	}
 
@@ -501,26 +568,50 @@ public class PrefPageViews extends FieldEditorPreferencePage implements IWorkben
 
 		if (isOK) {
 
-			_prefStore.setValue(ITourbookPreferences.VIEW_TOOLTIP_TOURIMPORT_DATE, _chkTourImportDate.getSelection());
-			_prefStore.setValue(ITourbookPreferences.VIEW_TOOLTIP_TOURIMPORT_TIME, _chkTourImportTime.getSelection());
-			_prefStore.setValue(ITourbookPreferences.VIEW_TOOLTIP_TOURIMPORT_TITLE, _chkTourImportTitle.getSelection());
-			_prefStore.setValue(ITourbookPreferences.VIEW_TOOLTIP_TOURIMPORT_TAGS, _chkTourImportTags.getSelection());
+			_prefStore.setValue(ITourbookPreferences.VIEW_TOOLTIP_TOURIMPORT_DATE,//
+					_chkTourImport_Date.getSelection());
+			_prefStore.setValue(ITourbookPreferences.VIEW_TOOLTIP_TOURIMPORT_TIME,//
+					_chkTourImport_Time.getSelection());
+			_prefStore.setValue(ITourbookPreferences.VIEW_TOOLTIP_TOURIMPORT_TITLE, //
+					_chkTourImport_Title.getSelection());
+			_prefStore.setValue(ITourbookPreferences.VIEW_TOOLTIP_TOURIMPORT_TAGS, //
+					_chkTourImport_Tags.getSelection());
 
-			_prefStore.setValue(ITourbookPreferences.VIEW_TOOLTIP_TOURBOOK_DATE, _chkTourBookDate.getSelection());
-			_prefStore.setValue(ITourbookPreferences.VIEW_TOOLTIP_TOURBOOK_TIME, _chkTourBookTime.getSelection());
-			_prefStore.setValue(ITourbookPreferences.VIEW_TOOLTIP_TOURBOOK_TITLE, _chkTourBookTitle.getSelection());
-			_prefStore.setValue(ITourbookPreferences.VIEW_TOOLTIP_TOURBOOK_TAGS, _chkTourBookTags.getSelection());
-			_prefStore.setValue(ITourbookPreferences.VIEW_TOOLTIP_TOURBOOK_WEEKDAY, _chkTourBookWeekday.getSelection());
+			_prefStore.setValue(ITourbookPreferences.VIEW_TOOLTIP_TOURBOOK_DATE, //
+					_chkTourBook_Date.getSelection());
+			_prefStore.setValue(ITourbookPreferences.VIEW_TOOLTIP_TOURBOOK_TIME, //
+					_chkTourBook_Time.getSelection());
+			_prefStore.setValue(ITourbookPreferences.VIEW_TOOLTIP_TOURBOOK_TITLE, //
+					_chkTourBook_Title.getSelection());
+			_prefStore.setValue(ITourbookPreferences.VIEW_TOOLTIP_TOURBOOK_TAGS, //
+					_chkTourBook_Tags.getSelection());
+			_prefStore.setValue(ITourbookPreferences.VIEW_TOOLTIP_TOURBOOK_WEEKDAY, //
+					_chkTourBook_Weekday.getSelection());
 
-			_prefStore.setValue(ITourbookPreferences.VIEW_TOOLTIP_TAGGING_TAG, _chkTaggingTag.getSelection());
-			_prefStore.setValue(ITourbookPreferences.VIEW_TOOLTIP_TAGGING_TITLE, _chkTaggingTitle.getSelection());
-			_prefStore.setValue(ITourbookPreferences.VIEW_TOOLTIP_TAGGING_TAGS, _chkTaggingTags.getSelection());
+			_prefStore.setValue(ITourbookPreferences.VIEW_TOOLTIP_COLLATED_COLLATION, //
+					_chkCollateTour_Date.getSelection());
+			_prefStore.setValue(ITourbookPreferences.VIEW_TOOLTIP_COLLATED_TIME, //
+					_chkCollateTour_Time.getSelection());
+			_prefStore.setValue(ITourbookPreferences.VIEW_TOOLTIP_COLLATED_TITLE, //
+					_chkCollateTour_Title.getSelection());
+			_prefStore.setValue(ITourbookPreferences.VIEW_TOOLTIP_COLLATED_TAGS, //
+					_chkCollateTour_Tags.getSelection());
+			_prefStore.setValue(ITourbookPreferences.VIEW_TOOLTIP_COLLATED_WEEKDAY,//
+					_chkCollateTour_Weekday.getSelection());
+
+			_prefStore.setValue(ITourbookPreferences.VIEW_TOOLTIP_TAGGING_TAG, //
+					_chkTagging_Tag.getSelection());
+			_prefStore.setValue(ITourbookPreferences.VIEW_TOOLTIP_TAGGING_TITLE, //
+					_chkTagging_Title.getSelection());
+			_prefStore.setValue(ITourbookPreferences.VIEW_TOOLTIP_TAGGING_TAGS, //
+					_chkTagging_Tags.getSelection());
 
 			_prefStore.setValue(ITourbookPreferences.VIEW_TOOLTIP_TOURCATALOG_REFTOUR,//
-					_chkTourCatalogRefTour.getSelection());
+					_chkTourCatalog_RefTour.getSelection());
 			_prefStore.setValue(ITourbookPreferences.VIEW_TOOLTIP_TOURCATALOG_TITLE,//
-					_chkTourCatalogTitle.getSelection());
-			_prefStore.setValue(ITourbookPreferences.VIEW_TOOLTIP_TOURCATALOG_TAGS, _chkTourCatalogTags.getSelection());
+					_chkTourCatalog_Title.getSelection());
+			_prefStore.setValue(ITourbookPreferences.VIEW_TOOLTIP_TOURCATALOG_TAGS, //
+					_chkTourCatalog_Tags.getSelection());
 
 			fireModifyEvent();
 		}
@@ -530,38 +621,49 @@ public class PrefPageViews extends FieldEditorPreferencePage implements IWorkben
 
 	private void restoreState() {
 
-		_chkTourImportDate.setSelection(//
+		_chkTourImport_Date.setSelection(//
 				_prefStore.getBoolean(ITourbookPreferences.VIEW_TOOLTIP_TOURIMPORT_DATE));
-		_chkTourImportTime.setSelection(//
+		_chkTourImport_Time.setSelection(//
 				_prefStore.getBoolean(ITourbookPreferences.VIEW_TOOLTIP_TOURIMPORT_TIME));
-		_chkTourImportTitle.setSelection(//
+		_chkTourImport_Title.setSelection(//
 				_prefStore.getBoolean(ITourbookPreferences.VIEW_TOOLTIP_TOURIMPORT_TITLE));
-		_chkTourImportTags.setSelection(//
+		_chkTourImport_Tags.setSelection(//
 				_prefStore.getBoolean(ITourbookPreferences.VIEW_TOOLTIP_TOURIMPORT_TAGS));
 
-		_chkTourBookDate.setSelection(//
+		_chkTourBook_Date.setSelection(//
 				_prefStore.getBoolean(ITourbookPreferences.VIEW_TOOLTIP_TOURBOOK_DATE));
-		_chkTourBookTime.setSelection(//
+		_chkTourBook_Time.setSelection(//
 				_prefStore.getBoolean(ITourbookPreferences.VIEW_TOOLTIP_TOURBOOK_TIME));
-		_chkTourBookTitle.setSelection(//
+		_chkTourBook_Title.setSelection(//
 				_prefStore.getBoolean(ITourbookPreferences.VIEW_TOOLTIP_TOURBOOK_TITLE));
-		_chkTourBookTags.setSelection(//
+		_chkTourBook_Tags.setSelection(//
 				_prefStore.getBoolean(ITourbookPreferences.VIEW_TOOLTIP_TOURBOOK_TAGS));
-		_chkTourBookWeekday.setSelection(//
+		_chkTourBook_Weekday.setSelection(//
 				_prefStore.getBoolean(ITourbookPreferences.VIEW_TOOLTIP_TOURBOOK_WEEKDAY));
 
-		_chkTaggingTag.setSelection(//
+		_chkCollateTour_Date.setSelection(//
+				_prefStore.getBoolean(ITourbookPreferences.VIEW_TOOLTIP_COLLATED_COLLATION));
+		_chkCollateTour_Time.setSelection(//
+				_prefStore.getBoolean(ITourbookPreferences.VIEW_TOOLTIP_COLLATED_TIME));
+		_chkCollateTour_Title.setSelection(//
+				_prefStore.getBoolean(ITourbookPreferences.VIEW_TOOLTIP_COLLATED_TITLE));
+		_chkCollateTour_Tags.setSelection(//
+				_prefStore.getBoolean(ITourbookPreferences.VIEW_TOOLTIP_COLLATED_TAGS));
+		_chkCollateTour_Weekday.setSelection(//
+				_prefStore.getBoolean(ITourbookPreferences.VIEW_TOOLTIP_COLLATED_WEEKDAY));
+
+		_chkTagging_Tag.setSelection(//
 				_prefStore.getBoolean(ITourbookPreferences.VIEW_TOOLTIP_TAGGING_TAG));
-		_chkTaggingTitle.setSelection(//
+		_chkTagging_Title.setSelection(//
 				_prefStore.getBoolean(ITourbookPreferences.VIEW_TOOLTIP_TAGGING_TITLE));
-		_chkTaggingTags.setSelection(//
+		_chkTagging_Tags.setSelection(//
 				_prefStore.getBoolean(ITourbookPreferences.VIEW_TOOLTIP_TAGGING_TAGS));
 
-		_chkTourCatalogRefTour.setSelection(//
+		_chkTourCatalog_RefTour.setSelection(//
 				_prefStore.getBoolean(ITourbookPreferences.VIEW_TOOLTIP_TOURCATALOG_REFTOUR));
-		_chkTourCatalogTitle.setSelection(//
+		_chkTourCatalog_Title.setSelection(//
 				_prefStore.getBoolean(ITourbookPreferences.VIEW_TOOLTIP_TOURCATALOG_TITLE));
-		_chkTourCatalogTags.setSelection(//
+		_chkTourCatalog_Tags.setSelection(//
 				_prefStore.getBoolean(ITourbookPreferences.VIEW_TOOLTIP_TOURCATALOG_TAGS));
 	}
 

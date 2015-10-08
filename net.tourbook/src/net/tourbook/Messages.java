@@ -1154,7 +1154,9 @@ public class Messages extends NLS {
 
 	public static String		PrefPage_ViewTooltip_Button_DisableAll;
 	public static String		PrefPage_ViewTooltip_Button_EnableAll;
+	public static String		PrefPage_ViewTooltip_Chkbox_Collation;
 	public static String		PrefPage_ViewTooltip_Group;
+	public static String		PrefPage_ViewTooltip_Label_CollatedTours;
 	public static String		PrefPage_ViewTooltip_Label_Date;
 	public static String		PrefPage_ViewTooltip_Label_Day;
 	public static String		PrefPage_ViewTooltip_Label_Info;
