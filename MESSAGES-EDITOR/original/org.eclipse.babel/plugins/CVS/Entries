@@ -1,7 +1,0 @@
-D/org.eclipse.babel.build.ant////
-D/org.eclipse.babel.build.core////
-D/org.eclipse.babel.build.ui////
-D/org.eclipse.babel.core////
-D/org.eclipse.babel.editor////
-D/org.eclipse.babel.editor.nls////
-D/org.eclipse.babel.runtime////
