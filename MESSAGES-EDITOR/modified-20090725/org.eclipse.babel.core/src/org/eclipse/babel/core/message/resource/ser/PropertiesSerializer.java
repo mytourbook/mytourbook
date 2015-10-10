@@ -140,58 +140,76 @@ public class PropertiesSerializer {
 						"$1\\\\" + SYSTEM_LINE_SEP); //$NON-NLS-1$
 			}
 
-			// Wrap lines
-			if (config.isWrapLinesEnabled() && valueStartPos < lineLength) {
+			/*
+			 * Do not wrap text when it contains "http://..." because this can very likely break a
+			 * long url.
+			 */
+			final boolean isHttp = value.indexOf("http://") != -1 || value.indexOf("https://") != -1;
 
-				final StringBuffer valueBuf = new StringBuffer(value);
+			if (isHttp) {
 
-				while (valueBuf.length() + valueStartPos > lineLength || valueBuf.indexOf("\n") != -1) { //$NON-NLS-1$
+				/*
+				 * This is not yet fully implemented compared with the line break algorithm, all
+				 * lines now begin at the line start.
+				 */
 
-					int endPos = Math.min(valueBuf.length(), lineLength - valueStartPos);
-					final String line = valueBuf.substring(0, endPos);
-
-					int breakPos = line.indexOf(SYSTEM_LINE_SEP);
-					if (breakPos != -1) {
-
-						endPos = breakPos + SYSTEM_LINE_SEP.length();
-						saveValue(text, valueBuf.substring(0, endPos));
-						//text.append(valueBuf.substring(0, endPos));
-
-					} else {
-
-						breakPos = line.lastIndexOf(' ');
-
-						if (breakPos != -1) {
-							endPos = breakPos + 1;
-							saveValue(text, valueBuf.substring(0, endPos));
-							//text.append(valueBuf.substring(0, endPos));
-							text.append("\\"); //$NON-NLS-1$
-							text.append(SYSTEM_LINE_SEP);
-						}
-					}
-
-					valueBuf.delete(0, endPos);
-
-					// Figure out starting position for next line
-					if (!config.isWrapAlignEqualsEnabled()) {
-						valueStartPos = config.getWrapIndentLength();
-					}
-
-					if (!active && valueStartPos > 0) {
-						text.append("##"); //$NON-NLS-1$
-					}
-
-					for (int i = 0; i < valueStartPos; i++) {
-						text.append(' ');
-					}
-				}
-
-				text.append(valueBuf);
+				saveValue(text, value);
 
 			} else {
 
-				saveValue(text, value);
-				//text.append(value);
+				// Wrap lines
+				if (config.isWrapLinesEnabled() && valueStartPos < lineLength) {
+
+					final StringBuffer valueBuf = new StringBuffer(value);
+
+					while (valueBuf.length() + valueStartPos > lineLength || valueBuf.indexOf("\n") != -1) { //$NON-NLS-1$
+
+						int endPos = Math.min(valueBuf.length(), lineLength - valueStartPos);
+						final String line = valueBuf.substring(0, endPos);
+
+						int breakPos = line.indexOf(SYSTEM_LINE_SEP);
+						if (breakPos != -1) {
+
+							endPos = breakPos + SYSTEM_LINE_SEP.length();
+							saveValue(text, valueBuf.substring(0, endPos));
+							//text.append(valueBuf.substring(0, endPos));
+
+						} else {
+
+							breakPos = line.lastIndexOf(' ');
+
+							if (breakPos != -1) {
+								endPos = breakPos + 1;
+								saveValue(text, valueBuf.substring(0, endPos));
+								//text.append(valueBuf.substring(0, endPos));
+								text.append("\\"); //$NON-NLS-1$
+								text.append(SYSTEM_LINE_SEP);
+							}
+						}
+
+						valueBuf.delete(0, endPos);
+
+						// Figure out starting position for next line
+						if (!config.isWrapAlignEqualsEnabled()) {
+							valueStartPos = config.getWrapIndentLength();
+						}
+
+						if (!active && valueStartPos > 0) {
+							text.append("##"); //$NON-NLS-1$
+						}
+
+						for (int i = 0; i < valueStartPos; i++) {
+							text.append(' ');
+						}
+					}
+
+					text.append(valueBuf);
+
+				} else {
+
+					saveValue(text, value);
+					//text.append(value);
+				}
 			}
 		}
 	}

@@ -2,7 +2,7 @@
 <feature
       id="org.eclipse.babel_update.site_feature"
       label="org.eclipse.babel plugins"
-      version="1.0.1.v20090725-1023"
+      version="1.0.2.qualifier"
       provider-name="MyTourbook">
 
    <description url="http://www.example.com/description">
