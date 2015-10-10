@@ -1,0 +1,1 @@
+This version is used to edit properties files in MyTourbook
