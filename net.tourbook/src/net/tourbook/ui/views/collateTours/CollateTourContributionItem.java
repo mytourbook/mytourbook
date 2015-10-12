@@ -168,7 +168,7 @@ class CollateTourContributionItem extends ControlContribution {
 
 		_lblFilterIcon = new Label(parent, SWT.NONE);
 		GridDataFactory.fillDefaults()//
-				.grab(false, true)
+				.hint(16, 16)
 				.align(SWT.FILL, SWT.CENTER)
 				.applyTo(_lblFilterIcon);
 
