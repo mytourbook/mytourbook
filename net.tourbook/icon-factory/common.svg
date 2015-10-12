@@ -3668,16 +3668,16 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="16.000001"
-     inkscape:cx="90.628204"
-     inkscape:cy="1016.7652"
+     inkscape:zoom="22.627418"
+     inkscape:cx="123.78619"
+     inkscape:cy="1025.4031"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="true"
-     inkscape:window-width="1590"
-     inkscape:window-height="1399"
-     inkscape:window-x="421"
-     inkscape:window-y="3"
+     inkscape:window-width="2484"
+     inkscape:window-height="1421"
+     inkscape:window-x="69"
+     inkscape:window-y="-7"
      inkscape:window-maximized="1"
      inkscape:snap-grids="true"
      inkscape:snap-page="false"
@@ -4383,6 +4383,78 @@
          id="path4956"
          d="m 80.513864,18.362183 2.486136,3.5 2.508233,-3.5 z"
          style="fill:#454545;fill-opacity:1;fill-rule:evenodd;stroke:#454545;stroke-width:0.85776371px;stroke-linecap:butt;stroke-linejoin:round;stroke-opacity:1" />
+    </g>
+    <rect
+       style="color:#000000;display:inline;overflow:visible;visibility:visible;opacity:0.98999999;fill:none;stroke:none;stroke-width:0;marker:none;enable-background:accumulate"
+       id="rect4525-1-0-6-8"
+       width="16"
+       height="16"
+       x="100.00008"
+       y="11.362183"
+       ry="0"
+       rx="0"
+       inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook\icons\app-sort.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <g
+       id="g5015"
+       transform="matrix(1.0069757,0,0,1.0781284,-4.2478507,-0.96563695)"
+       inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook\icons\app-sort.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90">
+      <g
+         inkscape:export-ydpi="90"
+         inkscape:export-xdpi="90"
+         inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook\icons\app-default.png"
+         transform="matrix(1.1975567,0,0,1.1715172,7.5910007,-0.73894947)"
+         id="g4958-5-9">
+        <g
+           id="g4974">
+          <path
+             sodipodi:nodetypes="cc"
+             inkscape:connector-curvature="0"
+             transform="matrix(0,0.85475024,-0.86078788,0,103.63806,-76.389607)"
+             id="path4989"
+             d="m 102.45409,23.964339 c 3.60611,0 4.99323,0 8.39962,0"
+             style="color:#000000;display:inline;overflow:visible;visibility:visible;fill:none;stroke:#454545;stroke-width:1.88927543;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker:none;enable-background:accumulate" />
+          <path
+             sodipodi:nodetypes="cccc"
+             inkscape:connector-curvature="0"
+             id="path4956-1-4"
+             d="m 80.513864,18.362183 2.486136,3.5 2.508233,-3.5 z"
+             style="fill:#454545;fill-opacity:1;fill-rule:evenodd;stroke:#454545;stroke-width:0.81027579px;stroke-linecap:butt;stroke-linejoin:round;stroke-opacity:1" />
+        </g>
+      </g>
+    </g>
+    <g
+       id="g5015-1"
+       transform="matrix(-1.0069757,0,0,-1.0781284,220.14774,39.690208)"
+       inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook\icons\app-sort.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90">
+      <g
+         inkscape:export-ydpi="90"
+         inkscape:export-xdpi="90"
+         inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook\icons\app-default.png"
+         transform="matrix(1.1975567,0,0,1.1715172,7.5910007,-0.73894947)"
+         id="g4958-5-9-9">
+        <g
+           id="g4974-3">
+          <path
+             sodipodi:nodetypes="cc"
+             inkscape:connector-curvature="0"
+             transform="matrix(0,0.85475024,-0.86078788,0,103.63806,-76.389607)"
+             id="path4989-7"
+             d="m 102.45409,23.964339 c 3.60611,0 4.99323,0 8.39962,0"
+             style="color:#000000;display:inline;overflow:visible;visibility:visible;fill:none;stroke:#454545;stroke-width:1.88927543;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker:none;enable-background:accumulate" />
+          <path
+             sodipodi:nodetypes="cccc"
+             inkscape:connector-curvature="0"
+             id="path4956-1-4-4"
+             d="m 80.513864,18.362183 2.486136,3.5 2.508233,-3.5 z"
+             style="fill:#454545;fill-opacity:1;fill-rule:evenodd;stroke:#454545;stroke-width:0.81027579px;stroke-linecap:butt;stroke-linejoin:round;stroke-opacity:1" />
+        </g>
+      </g>
     </g>
   </g>
 </svg>

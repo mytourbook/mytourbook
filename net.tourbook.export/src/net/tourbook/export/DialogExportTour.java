@@ -1906,27 +1906,6 @@ public class DialogExportTour extends TitleAreaDialog {
 		return _comboPath.getText().trim();
 	}
 
-	private String[] getUniqueItems(final String[] pathItems, final String currentItem) {
-
-		final ArrayList<String> pathList = new ArrayList<String>();
-
-		pathList.add(currentItem);
-
-		for (final String pathItem : pathItems) {
-
-			// ignore duplicate entries
-			if (currentItem.equals(pathItem) == false) {
-				pathList.add(pathItem);
-			}
-
-			if (pathList.size() >= COMBO_HISTORY_LENGTH) {
-				break;
-			}
-		}
-
-		return pathList.toArray(new String[pathList.size()]);
-	}
-
 	private void initUI(final Composite parent) {
 
 		_pc = new PixelConverter(parent);
@@ -2013,7 +1992,7 @@ public class DialogExportTour extends TitleAreaDialog {
 			_rdoTCX_NameFromTour.setSelection(isFromTour);
 			_rdoTCX_NameFromField.setSelection(!isFromTour);
 
-			net.tourbook.ui.UI.restoreCombo(_comboTcxCourseName, _state.getArray(STATE_TCX_COURSE_NAME));
+			UI.restoreCombo(_comboTcxCourseName, _state.getArray(STATE_TCX_COURSE_NAME));
 
 			updateUI_CourseName();
 		}
@@ -2033,8 +2012,8 @@ public class DialogExportTour extends TitleAreaDialog {
 		_spinnerCamouflageSpeed.setSelection(Util.getStateInt(_state, STATE_CAMOUFLAGE_SPEED, 10));
 
 		// export file/path
-		net.tourbook.ui.UI.restoreCombo(_comboFile, _state.getArray(STATE_EXPORT_FILE_NAME));
-		net.tourbook.ui.UI.restoreCombo(_comboPath, _state.getArray(STATE_EXPORT_PATH_NAME));
+		UI.restoreCombo(_comboFile, _state.getArray(STATE_EXPORT_FILE_NAME));
+		UI.restoreCombo(_comboPath, _state.getArray(STATE_EXPORT_PATH_NAME));
 		_chkOverwriteFiles.setSelection(_state.getBoolean(STATE_IS_OVERWRITE_FILES));
 	}
 
@@ -2053,7 +2032,9 @@ public class DialogExportTour extends TitleAreaDialog {
 			_state.put(STATE_TCX_IS_COURSES, _rdoTCX_Courses.getSelection());
 			_state.put(STATE_TCX_IS_EXPORT_DESCRITION, _chkTCX_Description.getSelection());
 			_state.put(STATE_TCX_IS_NAME_FROM_TOUR, _rdoTCX_NameFromTour.getSelection());
-			_state.put(STATE_TCX_COURSE_NAME, getUniqueItems(_comboTcxCourseName.getItems(), getCourseName()));
+			_state.put(
+					STATE_TCX_COURSE_NAME,
+					Util.getUniqueItems(_comboTcxCourseName.getItems(), getCourseName(), COMBO_HISTORY_LENGTH));
 		}
 
 		// merge all tours
@@ -2072,8 +2053,12 @@ public class DialogExportTour extends TitleAreaDialog {
 
 		// export file/path
 		if (validateFilePath()) {
-			_state.put(STATE_EXPORT_PATH_NAME, getUniqueItems(_comboPath.getItems(), getExportPathName()));
-			_state.put(STATE_EXPORT_FILE_NAME, getUniqueItems(_comboFile.getItems(), getExportFileName()));
+			_state.put(
+					STATE_EXPORT_PATH_NAME,
+					Util.getUniqueItems(_comboPath.getItems(), getExportPathName(), COMBO_HISTORY_LENGTH));
+			_state.put(
+					STATE_EXPORT_FILE_NAME,
+					Util.getUniqueItems(_comboFile.getItems(), getExportFileName(), COMBO_HISTORY_LENGTH));
 		}
 		_state.put(STATE_IS_OVERWRITE_FILES, _chkOverwriteFiles.getSelection());
 	}

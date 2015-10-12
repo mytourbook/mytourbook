@@ -144,6 +144,9 @@ public class UI {
 	public static final String				SYMBOL_UNDERSCORE						= "_";																		//$NON-NLS-1$
 	public static final String				SYMBOL_WIND_WITH_SPACE					= "W ";																	//$NON-NLS-1$
 
+	public static final String				LINK_TAG_END							= "</a>";																	//$NON-NLS-1$
+	public static final String				LINK_TAG_START							= "<a>";																	//$NON-NLS-1$
+
 	public static final int					FORM_FIRST_COLUMN_INDENT				= 16;
 
 	/**
@@ -916,6 +919,20 @@ public class UI {
 
 		_state.put(statePrefix + DIALOG_ORIGIN_X, (String) null);
 		_state.put(statePrefix + DIALOG_ORIGIN_Y, (String) null);
+	}
+
+	public static void restoreCombo(final Combo combo, final String[] comboItems) {
+
+		if (comboItems == null || comboItems.length == 0) {
+			return;
+		}
+
+		for (final String pathItem : comboItems) {
+			combo.add(pathItem);
+		}
+
+		// restore last used path
+		combo.setText(comboItems[0]);
 	}
 
 	/**

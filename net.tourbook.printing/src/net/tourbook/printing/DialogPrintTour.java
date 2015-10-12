@@ -28,10 +28,10 @@ import java.util.TimeZone;
 import javax.xml.transform.TransformerException;
 
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.UI;
 import net.tourbook.data.TourData;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.ImageComboLabel;
-import net.tourbook.ui.UI;
 
 import org.apache.fop.apps.FOPException;
 import org.eclipse.core.runtime.IPath;
@@ -209,6 +209,7 @@ public class DialogPrintTour extends TitleAreaDialog {
 		shell.setText(Messages.Dialog_Print_Shell_Text);
 
 		shell.addListener(SWT.Resize, new Listener() {
+			@Override
 			public void handleEvent(final Event event) {
 
 				// allow resizing the width but not the height
@@ -290,6 +291,7 @@ public class DialogPrintTour extends TitleAreaDialog {
 		Label label;
 
 		final ModifyListener filePathModifyListener = new ModifyListener() {
+			@Override
 			public void modifyText(final ModifyEvent e) {
 				validateFields();
 			}
@@ -504,6 +506,7 @@ public class DialogPrintTour extends TitleAreaDialog {
 
 	private void displayErrorMessage(final Exception exception) {
 		Display.getDefault().syncExec(new Runnable() {
+			@Override
 			public void run() {
 				ErrorDialog.openError(
 						Display.getCurrent().getActiveShell(),
@@ -580,13 +583,14 @@ public class DialogPrintTour extends TitleAreaDialog {
 
 						// get filepath
 						final IPath filePath = printFilePath
-								.append(UI.format_yyyymmdd_hhmmss(tourData))
+								.append(net.tourbook.ui.UI.format_yyyymmdd_hhmmss(tourData))
 								.addFileExtension(PDF_FILE_EXTENSION);
 
 						/*
 						 * print: update dialog progress monitor
 						 */
 						Display.getDefault().syncExec(new Runnable() {
+							@Override
 							public void run() {
 
 								// display printed filepath
@@ -682,9 +686,10 @@ public class DialogPrintTour extends TitleAreaDialog {
 	@Override
 	protected void okPressed() {
 
-		UI.disableAllControls(_inputContainer);
+		net.tourbook.ui.UI.disableAllControls(_inputContainer);
 
 		BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
+			@Override
 			public void run() {
 				try {
 					doPrint();
@@ -803,7 +808,7 @@ public class DialogPrintTour extends TitleAreaDialog {
 			final int startTime = minTourData.timeSerie[_tourStartIndex];
 			final DateTime tourTime = dtTour.plusSeconds(startTime);
 
-			_comboFile.setText(UI.format_yyyymmdd_hhmmss(
+			_comboFile.setText(net.tourbook.ui.UI.format_yyyymmdd_hhmmss(
 					tourTime.getYear(),
 					tourTime.getMonthOfYear(),
 					tourTime.getDayOfMonth(),
@@ -814,7 +819,7 @@ public class DialogPrintTour extends TitleAreaDialog {
 
 			// display the tour date/time
 
-			_comboFile.setText(UI.format_yyyymmdd_hhmmss(minTourData));
+			_comboFile.setText(net.tourbook.ui.UI.format_yyyymmdd_hhmmss(minTourData));
 		}
 	}
 

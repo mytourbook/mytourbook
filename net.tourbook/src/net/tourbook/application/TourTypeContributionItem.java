@@ -473,7 +473,7 @@ public class TourTypeContributionItem extends CustomControlContribution {
 				filterTooltip = filterName;
 			}
 
-			_lnkFilterText.setText("<a>" + shortFilterName + "</a>"); //$NON-NLS-1$ //$NON-NLS-2$
+			_lnkFilterText.setText(UI.LINK_TAG_START + shortFilterName + UI.LINK_TAG_END);
 			_lnkFilterText.setToolTipText(filterTooltip);
 
 			_lblFilterIcon.setImage(TourTypeFilter.getFilterImage(ttFilter));

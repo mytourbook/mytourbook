@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -22,14 +22,18 @@ import net.tourbook.data.TourData;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.tour.TourManager;
+import net.tourbook.tour.TourTypeMenuManager;
 import net.tourbook.ui.ITourProvider;
+import net.tourbook.ui.UI;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ActionContributionItem;
 import org.eclipse.jface.action.IMenuCreator;
 import org.eclipse.jface.action.IMenuManager;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.events.MenuAdapter;
 import org.eclipse.swt.events.MenuEvent;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
@@ -39,6 +43,50 @@ public class ActionSetTourTypeMenu extends Action implements IMenuCreator {
 	private Menu	_menu;
 
 	ITourProvider	_tourProvider;
+
+	private static class ActionSetTourType extends Action {
+
+		private TourType		_tourType;
+		private ITourProvider	_tourProvider;
+
+		private boolean			_isSaveTour;
+
+		/**
+		 * @param tourType
+		 * @param tourProvider
+		 * @param isSaveTour
+		 *            when <code>true</code> the tour will be saved and a
+		 *            {@link TourManager#TOUR_CHANGED} event is fired, otherwise the
+		 *            {@link TourData} from the tour provider is only updated
+		 * @param isChecked
+		 */
+		public ActionSetTourType(	final TourType tourType,
+									final ITourProvider tourProvider,
+									final boolean isSaveTour,
+									final boolean isChecked) {
+
+			super(tourType.getName(), AS_CHECK_BOX);
+
+			if (isChecked == false) {
+
+				// show image when tour type can be selected, disabled images look ugly on win
+				final Image tourTypeImage = UI.getInstance().getTourTypeImage(tourType.getTypeId());
+				setImageDescriptor(ImageDescriptor.createFromImage(tourTypeImage));
+			}
+
+			setChecked(isChecked);
+			setEnabled(isChecked == false);
+
+			_tourType = tourType;
+			_tourProvider = tourProvider;
+			_isSaveTour = isSaveTour;
+		}
+
+		@Override
+		public void run() {
+			TourTypeMenuManager.setTourTypeIntoTour(_tourType, _tourProvider, _isSaveTour);
+		}
+	}
 
 	public ActionSetTourTypeMenu(final ITourProvider tourProvider) {
 
@@ -83,7 +131,9 @@ public class ActionSetTourTypeMenu extends Action implements IMenuCreator {
 				isChecked = true;
 			}
 
-			menuMgr.add(new ActionSetTourType(tourType, tourProvider, isSaveTour, isChecked));
+			final ActionSetTourType action = new ActionSetTourType(tourType, tourProvider, isSaveTour, isChecked);
+
+			menuMgr.add(action);
 		}
 	}
 
@@ -93,6 +143,7 @@ public class ActionSetTourTypeMenu extends Action implements IMenuCreator {
 		item.fill(menu, -1);
 	}
 
+	@Override
 	public void dispose() {
 		if (_menu != null) {
 			_menu.dispose();
@@ -128,10 +179,12 @@ public class ActionSetTourTypeMenu extends Action implements IMenuCreator {
 		}
 	}
 
+	@Override
 	public Menu getMenu(final Control parent) {
 		return null;
 	}
 
+	@Override
 	public Menu getMenu(final Menu parent) {
 
 		dispose();

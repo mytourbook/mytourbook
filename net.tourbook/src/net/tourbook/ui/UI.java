@@ -69,7 +69,6 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
@@ -307,7 +306,13 @@ public class UI {
 				IMAGE_TOUR_TYPE_FILTER_SYSTEM,
 				TourbookPlugin.getImageDescriptor(Messages.Image__undo_tour_type_filter_system));
 
-		// data transfer
+		// import/data transfer
+		IMAGE_REGISTRY.put(
+				RawDataView.IMAGE_AUTOMATED_IMPORT,
+				TourbookPlugin.getImageDescriptor(Messages.Image__RawData_AutomatedImport));
+		IMAGE_REGISTRY.put(
+				RawDataView.IMAGE_AUTOMATED_IMPORT_CONFIG,
+				TourbookPlugin.getImageDescriptor(Messages.Image__RawData_AutomatedImportConfig));
 		IMAGE_REGISTRY.put(
 				RawDataView.IMAGE_DATA_TRANSFER,
 				TourbookPlugin.getImageDescriptor(Messages.Image__RawData_Transfer));
@@ -1024,20 +1029,6 @@ public class UI {
 		}
 
 		return null;
-	}
-
-	public static void restoreCombo(final Combo combo, final String[] comboItems) {
-
-		if (comboItems == null || comboItems.length == 0) {
-			return;
-		}
-
-		for (final String pathItem : comboItems) {
-			combo.add(pathItem);
-		}
-
-		// restore last used path
-		combo.setText(comboItems[0]);
 	}
 
 	public static ImageData rotate(final ImageData srcData, final int direction) {

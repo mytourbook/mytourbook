@@ -159,6 +159,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	public static final String				IMAGE_DATA_TRANSFER							= "IMAGE_DATA_TRANSFER";					//$NON-NLS-1$
 	public static final String				IMAGE_DATA_TRANSFER_DIRECT					= "IMAGE_DATA_TRANSFER_DIRECT";			//$NON-NLS-1$
 	public static final String				IMAGE_IMPORT								= "IMAGE_IMPORT";							//$NON-NLS-1$
+	public static final String				IMAGE_AUTOMATED_IMPORT						= "IMAGE_AUTOMATED_IMPORT";				//$NON-NLS-1$
+	public static final String				IMAGE_AUTOMATED_IMPORT_CONFIG				= "IMAGE_AUTOMATED_IMPORT_CONFIG";			//$NON-NLS-1$
 
 	private final IPreferenceStore			_prefStore									= TourbookPlugin.getPrefStore();
 	private final IDialogSettings			_state										= TourbookPlugin.getState(ID);
@@ -208,6 +210,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 	private TagMenuManager					_tagMenuMgr;
 	private TourDoubleClickState			_tourDoubleClickState						= new TourDoubleClickState();
+
+	private int								_linkDefaultWidth;
 
 	/*
 	 * resources
@@ -599,8 +603,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	@Override
 	public void createPartControl(final Composite parent) {
 
-		createResources();
-		_pc = new PixelConverter(parent);
+		initUI(parent);
 
 		// define all columns
 		_columnManager = new ColumnManager(this, _state);
@@ -653,18 +656,16 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		_pageBook = new PageBook(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, true).applyTo(_pageBook);
 
-		_pageTips = createUI10Tips(_pageBook);
+		_pageTips = createUI_10_Page_Tips(_pageBook);
 
 		_pageViewerContainer = new Composite(_pageBook, SWT.NONE);
 		GridLayoutFactory.fillDefaults().applyTo(_pageViewerContainer);
 		{
-			createUI15TourViewer(_pageViewerContainer);
+			createUI_20_Page_TourViewer(_pageViewerContainer);
 		}
 	}
 
-	private Composite createUI10Tips(final Composite parent) {
-
-		final int defaultWidth = 300;
+	private Composite createUI_10_Page_Tips(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
@@ -676,27 +677,19 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 			 */
 			Label label = new Label(container, SWT.WRAP);
 			GridDataFactory.fillDefaults()//
-					.hint(defaultWidth, SWT.DEFAULT)
+					.hint(_linkDefaultWidth, SWT.DEFAULT)
 					.grab(true, false)
 					.span(2, 1)
 					.applyTo(label);
 			label.setText(Messages.Import_Data_Label_Info);
 
 			/*
-			 * link: import
+			 * Link: Import from files
 			 */
-			final CLabel iconImport = new CLabel(container, SWT.NONE);
-			GridDataFactory.fillDefaults().indent(0, 10).applyTo(iconImport);
-			iconImport.setImage(UI.IMAGE_REGISTRY.get(IMAGE_IMPORT));
+			final Link linkImport = createUI_Link(container, //
+					IMAGE_IMPORT,
+					Messages.Import_Data_Link_Import);
 
-			final Link linkImport = new Link(container, SWT.NONE);
-			GridDataFactory.fillDefaults()//
-					.hint(defaultWidth, SWT.DEFAULT)
-					.align(SWT.FILL, SWT.CENTER)
-					.grab(true, false)
-					.indent(0, 10)
-					.applyTo(linkImport);
-			linkImport.setText(Messages.Import_Data_Link_Import);
 			linkImport.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(final SelectionEvent e) {
@@ -705,22 +698,44 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 			});
 
 			/*
+			 * Link: Automated import from files
+			 */
+			final Link linkAutomatedImport = createUI_Link(container, //
+					IMAGE_AUTOMATED_IMPORT,
+					Messages.Import_Data_Link_AutomatedImport);
+
+			linkAutomatedImport.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(final SelectionEvent e) {
+					_rawDataMgr.actionAutomatedImport();
+				}
+			});
+
+			/*
+			 * Link: Automated import from files
+			 */
+			final Link linkAutomatedImportConfig = createUI_Link(container, //
+					IMAGE_AUTOMATED_IMPORT_CONFIG,
+					Messages.Import_Data_Link_AutomatedImportConfig);
+
+			linkAutomatedImportConfig.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(final SelectionEvent e) {
+					_rawDataMgr.actionAutomatedImportConfiguration();
+				}
+			});
+
+			// spacer
+			label = new Label(container, SWT.NONE);
+			GridDataFactory.fillDefaults().span(2, 1).applyTo(label);
+
+			/*
 			 * link: data transfer
 			 */
-			final CLabel iconTransfer = new CLabel(container, SWT.NONE);
-			GridDataFactory.fillDefaults().indent(0, 10).applyTo(iconTransfer);
-			iconTransfer.setImage(UI.IMAGE_REGISTRY.get(IMAGE_DATA_TRANSFER));
+			final Link linkTransfer = createUI_Link(container,//
+					IMAGE_DATA_TRANSFER,
+					Messages.Import_Data_Link_ReceiveFromSerialPort_Configured);
 
-			final Link linkTransfer = new Link(container, SWT.NONE);
-			GridDataFactory.fillDefaults()//
-					.hint(defaultWidth, SWT.DEFAULT)
-					.align(SWT.FILL, SWT.CENTER)
-					.grab(true, false)
-					.indent(0, 10)
-					.applyTo(linkTransfer);
-//			<a>Transfer tours from a sportcomputer</a>
-//			<a>Touren von einem Sportcomputer übertragen</a>
-			linkTransfer.setText(Messages.Import_Data_Link_ReceiveFromSerialPort_Configured);
 			linkTransfer.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(final SelectionEvent e) {
@@ -731,20 +746,9 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 			/*
 			 * link: direct data transfer
 			 */
-			final CLabel iconDirectTransfer = new CLabel(container, SWT.NONE);
-			GridDataFactory.fillDefaults().indent(0, 10).applyTo(iconDirectTransfer);
-			iconDirectTransfer.setImage(UI.IMAGE_REGISTRY.get(IMAGE_DATA_TRANSFER_DIRECT));
-
-			final Link linkTransferDirect = new Link(container, SWT.NONE);
-			GridDataFactory.fillDefaults() //
-					.hint(defaultWidth, SWT.DEFAULT)
-					.align(SWT.FILL, SWT.CENTER)
-					.grab(true, false)
-					.indent(0, 10)
-					.applyTo(linkTransferDirect);
-//			<a>Transfer tours from a sportcomputer with previous configuration</a>
-//			<a>Touren von einem Sportcomputer übertragen, mit vorheriger Konfiguration</a>
-			linkTransferDirect.setText(Messages.Import_Data_Link_ReceiveFromSerialPort_Directly);
+			final Link linkTransferDirect = createUI_Link(container,//
+					IMAGE_DATA_TRANSFER_DIRECT,
+					Messages.Import_Data_Link_ReceiveFromSerialPort_Directly);
 			linkTransferDirect.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(final SelectionEvent e) {
@@ -757,7 +761,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 			 */
 			label = new Label(container, SWT.WRAP);
 			GridDataFactory.fillDefaults()//
-					.hint(defaultWidth, SWT.DEFAULT)
+					.hint(_linkDefaultWidth, SWT.DEFAULT)
 					.grab(true, false)
 					.indent(0, 20)
 					.span(2, 1)
@@ -769,9 +773,43 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	}
 
 	/**
+	 * create the views context menu
+	 */
+	private void createUI_20_ContextMenu() {
+
+		final Table table = (Table) _tourViewer.getControl();
+
+		final MenuManager menuMgr = new MenuManager("#PopupMenu"); //$NON-NLS-1$
+		menuMgr.setRemoveAllWhenShown(true);
+		menuMgr.addMenuListener(new IMenuListener() {
+			@Override
+			public void menuAboutToShow(final IMenuManager manager) {
+				fillContextMenu(manager);
+			}
+		});
+
+		final Menu tableContextMenu = menuMgr.createContextMenu(table);
+		tableContextMenu.addMenuListener(new MenuAdapter() {
+			@Override
+			public void menuHidden(final MenuEvent e) {
+				_tagMenuMgr.onHideMenu();
+			}
+
+			@Override
+			public void menuShown(final MenuEvent menuEvent) {
+				_tagMenuMgr.onShowMenu(menuEvent, table, Display.getCurrent().getCursorLocation(), _tourInfoToolTip);
+			}
+		});
+
+		getSite().registerContextMenu(menuMgr, _tourViewer);
+
+		_columnManager.createHeaderContextMenu(table, tableContextMenu);
+	}
+
+	/**
 	 * @param parent
 	 */
-	private void createUI15TourViewer(final Composite parent) {
+	private void createUI_20_Page_TourViewer(final Composite parent) {
 
 		// table
 		final Table table = new Table(parent, SWT.H_SCROLL | SWT.V_SCROLL | SWT.FULL_SELECTION | SWT.MULTI);
@@ -809,41 +847,26 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		// set tour info tooltip provider
 		_tourInfoToolTip = new TableViewerTourInfoToolTip(_tourViewer);
 
-		createUI20ContextMenu();
+		createUI_20_ContextMenu();
 	}
 
-	/**
-	 * create the views context menu
-	 */
-	private void createUI20ContextMenu() {
+	private Link createUI_Link(final Composite parent, final String image, final String text) {
 
-		final Table table = (Table) _tourViewer.getControl();
+		final CLabel iconImport = new CLabel(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().indent(0, 10).applyTo(iconImport);
+		iconImport.setImage(UI.IMAGE_REGISTRY.get(image));
 
-		final MenuManager menuMgr = new MenuManager("#PopupMenu"); //$NON-NLS-1$
-		menuMgr.setRemoveAllWhenShown(true);
-		menuMgr.addMenuListener(new IMenuListener() {
-			@Override
-			public void menuAboutToShow(final IMenuManager manager) {
-				fillContextMenu(manager);
-			}
-		});
+		final Link linkImport = new Link(parent, SWT.NONE);
+		GridDataFactory.fillDefaults()//
+				.hint(_linkDefaultWidth, SWT.DEFAULT)
+				.align(SWT.FILL, SWT.CENTER)
+				.grab(true, false)
+				.indent(0, 10)
+				.applyTo(linkImport);
 
-		final Menu tableContextMenu = menuMgr.createContextMenu(table);
-		tableContextMenu.addMenuListener(new MenuAdapter() {
-			@Override
-			public void menuHidden(final MenuEvent e) {
-				_tagMenuMgr.onHideMenu();
-			}
+		linkImport.setText(text);
 
-			@Override
-			public void menuShown(final MenuEvent menuEvent) {
-				_tagMenuMgr.onShowMenu(menuEvent, table, Display.getCurrent().getCursorLocation(), _tourInfoToolTip);
-			}
-		});
-
-		getSite().registerContextMenu(menuMgr, _tourViewer);
-
-		_columnManager.createHeaderContextMenu(table, tableContextMenu);
+		return linkImport;
 	}
 
 	/**
@@ -1821,6 +1844,15 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		return _tourViewer;
 	}
 
+	private void initUI(final Composite parent) {
+
+		createResources();
+
+		_pc = new PixelConverter(parent);
+
+		_linkDefaultWidth = _pc.convertWidthInCharsToPixels(40);
+	}
+
 	private void onSelectionChanged(final ISelection selection) {
 
 		if (!selection.isEmpty() && (selection instanceof SelectionDeletedTours)) {
@@ -1854,7 +1886,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		_pageViewerContainer.setRedraw(false);
 		{
 			_tourViewer.getTable().dispose();
-			createUI15TourViewer(_pageViewerContainer);
+			createUI_20_Page_TourViewer(_pageViewerContainer);
 			_pageViewerContainer.layout();
 
 			// update the viewer

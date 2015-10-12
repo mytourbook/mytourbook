@@ -112,6 +112,22 @@ public class Messages extends NLS {
 	public static String		dialog_export_shell_text;
 	public static String		dialog_export_txt_filePath_tooltip;
 
+	public static String	Dialog_AutoImportConfig_Action_AddSpeed_Tooltip;
+
+	public static String	Dialog_AutoImportConfig_Action_RemoveSpeed_Tooltip;
+
+	public static String	Dialog_AutoImportConfig_Checkbox_SetTourType;
+
+	public static String	Dialog_AutoImportConfig_Dialog_Message;
+
+	public static String	Dialog_AutoImportConfig_Dialog_Title;
+
+	public static String	Dialog_AutoImportConfig_Group_TourType;
+
+	public static String	Dialog_AutoImportConfig_Label_DeviceFolder;
+
+	public static String	Dialog_AutoImportConfig_Spinner_Speed_Tooltip;
+
 	public static String		Dialog_HRZone_Button_AddZone;
 	public static String		Dialog_HRZone_Button_EditHrZones;
 	public static String		Dialog_HRZone_Button_RemoveZone;
@@ -689,6 +705,8 @@ public class Messages extends NLS {
 	public static String		Image__PulseZones;
 	public static String		Image__PulseZones_Disabled;
 	public static String		Image__quick_edit;
+	public static String		Image__RawData_AutomatedImport;
+	public static String		Image__RawData_AutomatedImportConfig;
 	public static String		Image__RawData_Import;
 	public static String		Image__RawData_Transfer;
 	public static String		Image__RawData_TransferDirect;
@@ -788,9 +806,12 @@ public class Messages extends NLS {
 	public static String		Import_Data_Error_CreatingFileName_Title;
 	public static String		Import_Data_Label_Hint;
 	public static String		Import_Data_Label_Info;
+	public static String		Import_Data_Link_AutomatedImport;
+	public static String		Import_Data_Link_AutomatedImportConfig;
 	public static String		Import_Data_Link_Import;
 	public static String		Import_Data_Link_ReceiveFromSerialPort_Configured;
 	public static String		Import_Data_Link_ReceiveFromSerialPort_Directly;
+
 	public static String		Import_Wizard_Control_combo_person_default_settings;
 	public static String		Import_Wizard_Control_combo_ports_not_available;
 	public static String		Import_Wizard_Dlg_message;

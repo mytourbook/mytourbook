@@ -455,6 +455,18 @@
 				label="%command_device_importFromFile"
 				mnemonic="%command_device_importFromFile_mnemonic"/>
 				
+			<command
+				commandId="net.tourbook.command.device.ImportAutomated"
+				icon="icons/import-automated.png"
+				label="%Command_Device_ImportAutomated"
+				mnemonic="%Command_Device_ImportAutomated_Mnemonic"/>
+
+			<command
+				commandId="net.tourbook.command.device.ImportAutomatedConfiguration"
+				icon="icons/import-automated-config.png"
+				label="%Command_Device_ImportAutomatedConfiguration"
+				mnemonic="%Command_Device_ImportAutomatedConfiguration_Mnemonic"/>
+
 			<separator
 				name="net.tourbook.separator.device"
 				visible="true"/>
@@ -961,28 +973,49 @@
 		
 		<menuContribution locationURI="toolbar:net.tourbook.views.rawData.RawDataView?after=import">
 		
-		   <command
-		         commandId="net.tourbook.command.device.importFromFile"
-		         icon="icons/open_folder_add.gif"
-		         label="%command_device_importFromFile"
-		         mnemonic="%command_device_importFromFile_mnemonic">
-		   </command>
-		   <command
-		         commandId="net.tourbook.command.device.synchronize"
-		         icon="icons/device-synchronize.gif"
-		         label="%Command_Device_ReceiveFromSerialPort_Configured"
-		         mnemonic="%Command_Device_ReceiveFromSerialPort_Configured_Mnemonic"
-		         style="push"
-		         tooltip="%Command_Device_ReceiveFromSerialPort_Configured_Tooltip">
-		   </command>
-		   <command
-		         commandId="net.tourbook.command.device.synchronize.direct"
-		         icon="icons/device-synchronize-direct.gif"
-		         label="%Command_Device_ReceiveFromSerialPort_Directly"
-		         mnemonic="%Command_Device_ReceiveFromSerialPort_Directly_Mnemonic"
-		         style="push"
-		         tooltip="%Command_Device_ReceiveFromSerialPort_Directly_Tooltip">
-		   </command>
+			<command
+				commandId="net.tourbook.command.device.importFromFile"
+				icon="icons/open_folder_add.gif"
+				label="%command_device_importFromFile"
+				mnemonic="%command_device_importFromFile_mnemonic"
+			/>
+			<command
+				commandId="net.tourbook.command.device.ImportAutomated"
+				icon="icons/import-automated.png"
+				label="%Command_Device_ImportAutomated"
+				mnemonic="%Command_Device_ImportAutomated_Mnemonic"
+				tooltip="%Command_Device_ImportAutomated_Tooltip"
+			/>
+			<command
+				commandId="net.tourbook.command.device.ImportAutomatedConfiguration"
+				icon="icons/import-automated-config.png"
+				label="%Command_Device_ImportAutomatedConfiguration"
+				mnemonic="%Command_Device_ImportAutomatedConfiguration_Mnemonic"
+				tooltip="%Command_Device_ImportAutomatedConfiguration_Tooltip"
+			/>
+
+			<separator
+				name="net.tourbook.separator.device"
+				visible="true"
+			/>
+
+			<command
+				commandId="net.tourbook.command.device.synchronize"
+				icon="icons/device-synchronize.gif"
+				label="%Command_Device_ReceiveFromSerialPort_Configured"
+				mnemonic="%Command_Device_ReceiveFromSerialPort_Configured_Mnemonic"
+				style="push"
+				tooltip="%Command_Device_ReceiveFromSerialPort_Configured_Tooltip"
+			/>
+			<command
+				commandId="net.tourbook.command.device.synchronize.direct"
+				icon="icons/device-synchronize-direct.gif"
+				label="%Command_Device_ReceiveFromSerialPort_Directly"
+				mnemonic="%Command_Device_ReceiveFromSerialPort_Directly_Mnemonic"
+				style="push"
+				tooltip="%Command_Device_ReceiveFromSerialPort_Directly_Tooltip"
+			/>
+			
 		</menuContribution>
 
 
@@ -1163,6 +1196,18 @@
             defaultHandler="net.tourbook.importdata.ActionHandlerImportFromFile"
             name="%command_device_importFromFile">
       </command>
+      
+		<command
+			id="net.tourbook.command.device.ImportAutomated"
+			defaultHandler="net.tourbook.importdata.ActionHandler_AutomatedImport"
+			name="%Command_Device_ImportAutomated"
+		/>
+		<command
+			id="net.tourbook.command.device.ImportAutomatedConfiguration"
+			defaultHandler="net.tourbook.importdata.ActionHandler_AutomatedImportConfiguration"
+			name="%Command_Device_ImportAutomatedConfiguration"
+		/>
+
       <command
             id="net.tourbook.command.device.synchronize.direct"
             defaultHandler="net.tourbook.importdata.ActionHandlerImportFromDeviceDirect"
@@ -1666,13 +1711,22 @@
 			commandId="net.tourbook.command.device.importFromFile"
 			sequence="%Shortcut_Key_App_ImportFromFile"
 			contextId="org.eclipse.ui.contexts.window"
-			schemeId="net.tourbook.scheme"/>
+			schemeId="net.tourbook.scheme"
+		/>
+
+		<key
+			commandId="net.tourbook.command.device.ImportAutomated"
+			sequence="%Shortcut_Key_App_ImportFromFileAutomated"
+			contextId="org.eclipse.ui.contexts.window"
+			schemeId="net.tourbook.scheme"
+		/>
 
 		<key
 			commandId="net.tourbook.command.createNewTour"
 			sequence="%Shortcut_Key_App_NewTour"
 			contextId="org.eclipse.ui.contexts.window"
-			schemeId="net.tourbook.scheme"/>
+			schemeId="net.tourbook.scheme"
+		/>
 
 
 		<!-- Picture directory -->            

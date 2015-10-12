@@ -180,6 +180,21 @@ public class RawDataManager {
 		});
 	}
 
+	public void actionAutomatedImport() {
+
+	}
+
+	public void actionAutomatedImportConfiguration() {
+
+		final Shell shell = Display.getDefault().getActiveShell();
+
+		final DialogAutomatedImportConfig dialog = new DialogAutomatedImportConfig(shell);
+
+		if (dialog.open() == Window.OK) {
+
+		}
+	}
+
 	public void actionImportFromDevice() {
 
 		final DataTransferWizardDialog dialog = new DataTransferWizardDialog(//
