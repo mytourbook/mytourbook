@@ -437,9 +437,4 @@ public interface ITourbookPreferences {
 	 */
 	public static final String	TOUR_SEGMENTER_CHART_VALUE_FONT					= "TOUR_SEGMENTER_CHART_VALUE_FONT";						//$NON-NLS-1$
 
-	/*
-	 * Automated import
-	 */
-	public static final String	AUTOMATED_IMPORT_IS_TOUR_TYPE					= "AUTOMATED_IMPORT_IS_TOUR_TYPE";							//$NON-NLS-1$
-
 }

@@ -20,6 +20,10 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.Reader;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.io.Writer;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -38,6 +42,7 @@ import net.tourbook.data.TourData;
 import net.tourbook.data.TourPerson;
 import net.tourbook.data.TourTag;
 import net.tourbook.data.TourType;
+import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
@@ -50,6 +55,7 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.dialogs.IDialogConstants;
+import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.MessageDialogWithToggle;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
@@ -64,72 +70,95 @@ import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.ui.IMemento;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.WorkbenchException;
+import org.eclipse.ui.XMLMemento;
 
 public class RawDataManager {
 
-	private static final String				RAW_DATA_LAST_SELECTED_PATH			= "raw-data-view.last-selected-import-path";				//$NON-NLS-1$
-	private static final String				TEMP_IMPORTED_FILE					= "received-device-data.txt";								//$NON-NLS-1$
+	private static final String					ID									= "net.tourbook.importdata.RawDataManager";				//$NON-NLS-1$
 
-	public static final int					ADJUST_IMPORT_YEAR_IS_DISABLED		= -1;
+	private static final String					RAW_DATA_LAST_SELECTED_PATH			= "raw-data-view.last-selected-import-path";				//$NON-NLS-1$
+	private static final String					TEMP_IMPORTED_FILE					= "received-device-data.txt";								//$NON-NLS-1$
 
-	private final IPreferenceStore			_prefStore							= TourbookPlugin.getPrefStore();
+	public static final int						ADJUST_IMPORT_YEAR_IS_DISABLED		= -1;
 
-	private static RawDataManager			_instance							= null;
+	private static final String					STATE_AUTOMATED_IMPORT_CONFIG		= "STATE_AUTOMATED_IMPORT_CONFIG";							//$NON-NLS-1$
+	private static final String					TAG_IMPORT_CONFIG					= "Config";
+	private static final String					TAG_IMPORT_CONFIG_ROOT				= "AutomatedImportConfig";
+	private static final String					TAG_SPEED_VERTICES					= "SpeedVertices";
+	private static final String					TAG_SPEED_VERTEX					= "Speed";
+
+	private static final String					ATTR_AVG_SPEED						= "avgSpeed";
+	private static final String					ATTR_CONFIG_NAME					= "name";													//$NON-NLS-1$
+	private static final String					ATTR_IS_SET_TOUR_TYPE				= "isSetTourType";											//$NON-NLS-1$
+	private static final String					ATTR_TOUR_TYPE_ID					= "tourTypeId";
+
+	static final int							CONFIG_SPEED_MIN					= 0;
+	static final int							CONFIG_SPEED_MAX					= 3000;
+
+	private static final int					CONFIG_SPEED_DEFAULT				= 0;
+
+	private static RawDataManager				_instance							= null;
+
+	private final IPreferenceStore				_prefStore							= TourbookPlugin.getPrefStore();
+	private final IDialogSettings				_state								= TourbookPlugin.getState(ID);
 
 	/**
 	 * contains the device data imported from the device/file
 	 */
-	private final DeviceData				_deviceData							= new DeviceData();
+	private final DeviceData					_deviceData							= new DeviceData();
 
 	/**
 	 * Contains tours which are imported or received and displayed in the import view.
 	 */
-	private final HashMap<Long, TourData>	_toursInImportView					= new HashMap<Long, TourData>();
+	private final HashMap<Long, TourData>		_toursInImportView					= new HashMap<Long, TourData>();
 
 	/**
 	 * Contains tours which are imported from the last file name.
 	 */
-	private final HashMap<Long, TourData>	_newlyImportedTours					= new HashMap<Long, TourData>();
+	private final HashMap<Long, TourData>		_newlyImportedTours					= new HashMap<Long, TourData>();
 
-	private String							_lastImportedFileName;
+	private String								_lastImportedFileName;
 
 	/**
 	 * Contains the filenames for all imported files which are displayed in the import view
 	 */
-	private final HashSet<String>			_importedFileNames					= new HashSet<String>();
+	private final HashSet<String>				_importedFileNames					= new HashSet<String>();
 
 	/**
 	 * Contains filenames which are not directly imported but is imported from other imported files
 	 */
-	private final HashSet<String>			_importedFileNamesChildren			= new HashSet<String>();
+	private final HashSet<String>				_importedFileNamesChildren			= new HashSet<String>();
 
-	private boolean							_isImported;
+	private boolean								_isImported;
 
-	private boolean							_isImportCanceled;
+	private boolean								_isImportCanceled;
 	//
-	private int								_importState_ImportYear				= ADJUST_IMPORT_YEAR_IS_DISABLED;
+	private int									_importState_ImportYear				= ADJUST_IMPORT_YEAR_IS_DISABLED;
 
-	private boolean							_importState_IsConvertWayPoints		= RawDataView.STATE_IS_CONVERT_WAYPOINTS_DEFAULT;
-	private boolean							_importState_IsCreateTourIdWithTime	= RawDataView.STATE_IS_CREATE_TOUR_ID_WITH_TIME_DEFAULT;
-	private boolean							_importState_IsMergeTracks			= RawDataView.STATE_IS_MERGE_TRACKS_DEFAULT;
-	private boolean							_importState_IsChecksumValidation	= RawDataView.STATE_IS_CHECKSUM_VALIDATION_DEFAULT;
+	private boolean								_importState_IsConvertWayPoints		= RawDataView.STATE_IS_CONVERT_WAYPOINTS_DEFAULT;
+	private boolean								_importState_IsCreateTourIdWithTime	= RawDataView.STATE_IS_CREATE_TOUR_ID_WITH_TIME_DEFAULT;
+	private boolean								_importState_IsMergeTracks			= RawDataView.STATE_IS_MERGE_TRACKS_DEFAULT;
+	private boolean								_importState_IsChecksumValidation	= RawDataView.STATE_IS_CHECKSUM_VALIDATION_DEFAULT;
 
-	private List<TourbookDevice>			_devicesBySortPriority;
+	private List<TourbookDevice>				_devicesBySortPriority;
 
-	private HashMap<String, TourbookDevice>	_devicesByExtension;
+	private HashMap<String, TourbookDevice>		_devicesByExtension;
 
-	private final ArrayList<TourType>		_tempTourTypes						= new ArrayList<TourType>();
-	private final ArrayList<TourTag>		_tempTourTags						= new ArrayList<TourTag>();
+	private final ArrayList<TourType>			_tempTourTypes						= new ArrayList<TourType>();
+	private final ArrayList<TourTag>			_tempTourTags						= new ArrayList<TourTag>();
 
 	/**
 	 * Filepath from the previous reimported tour
 	 */
-	private IPath							_previousSelectedReimportFolder;
+	private IPath								_previousSelectedReimportFolder;
+
+	private ArrayList<AutomatedImportConfig>	_importConfigs;
 
 	public static enum ReImport {
 
@@ -188,10 +217,16 @@ public class RawDataManager {
 
 		final Shell shell = Display.getDefault().getActiveShell();
 
-		final DialogAutomatedImportConfig dialog = new DialogAutomatedImportConfig(shell);
+		final DialogAutomatedImportConfig dialog = new DialogAutomatedImportConfig(shell, getImportConfigs());
 
 		if (dialog.open() == Window.OK) {
 
+			final ArrayList<AutomatedImportConfig> modifiedConfigs = dialog.getModifiedConfigs();
+
+			_importConfigs.clear();
+			_importConfigs.addAll(modifiedConfigs);
+
+			saveImportConfig(modifiedConfigs);
 		}
 	}
 
@@ -1024,6 +1059,15 @@ public class RawDataManager {
 		return _devicesBySortPriority;
 	}
 
+	private ArrayList<AutomatedImportConfig> getImportConfigs() {
+
+		if (_importConfigs == null) {
+			_importConfigs = loadImportConfig();
+		}
+
+		return _importConfigs;
+	}
+
 	public HashSet<String> getImportedFiles() {
 		return _importedFileNames;
 	}
@@ -1445,6 +1489,75 @@ public class RawDataManager {
 		return newFile.getAbsolutePath();
 	}
 
+	private ArrayList<AutomatedImportConfig> loadImportConfig() {
+
+		final ArrayList<AutomatedImportConfig> importConfigs = new ArrayList<>();
+
+		final String stateValue = Util.getStateString(_state, STATE_AUTOMATED_IMPORT_CONFIG, null);
+
+		if ((stateValue != null) && (stateValue.length() > 0)) {
+
+			try {
+
+				final Reader reader = new StringReader(stateValue);
+
+				loadImportConfig_Data(XMLMemento.createReadRoot(reader), importConfigs);
+
+			} catch (final WorkbenchException e) {
+				// ignore
+			}
+		}
+
+		return importConfigs;
+	}
+
+	private void loadImportConfig_Data(final XMLMemento xmlMemento, final ArrayList<AutomatedImportConfig> importConfigs) {
+
+		final ArrayList<TourType> allTourTypes = TourDatabase.getAllTourTypes();
+
+		for (final IMemento xmlConfig : xmlMemento.getChildren()) {
+
+			final AutomatedImportConfig importConfig = new AutomatedImportConfig();
+
+			importConfig.name = Util.getXmlString(xmlConfig, ATTR_CONFIG_NAME, UI.EMPTY_STRING);
+			importConfig.isSetTourType = Util.getXmlBoolean(xmlConfig, ATTR_IS_SET_TOUR_TYPE, true);
+
+			final ArrayList<SpeedVertex> speedVertices = importConfig.speedVertices;
+
+			for (final IMemento xmlSpeed : xmlConfig.getChildren()) {
+
+				final long xmlTourTypeId = Util.getXmlLong(xmlSpeed, ATTR_TOUR_TYPE_ID, 0);
+
+				/*
+				 * Check if the loaded tour type id is valid
+				 */
+				boolean idIsValid = false;
+
+				for (final TourType tourType : allTourTypes) {
+					if (tourType.getTypeId() == xmlTourTypeId) {
+						idIsValid = true;
+						break;
+					}
+				}
+
+				if (idIsValid) {
+
+					final SpeedVertex speedVertex = new SpeedVertex();
+
+					speedVertex.tourTypeId = xmlTourTypeId;
+					speedVertex.avgSpeed = Util.getXmlInteger(
+							xmlSpeed,
+							ATTR_AVG_SPEED,
+							CONFIG_SPEED_DEFAULT,
+							CONFIG_SPEED_MIN,
+							CONFIG_SPEED_MAX);
+
+					speedVertices.add(speedVertex);
+				}
+			}
+		}
+	}
+
 	public void removeAllTours() {
 
 		_toursInImportView.clear();
@@ -1495,6 +1608,56 @@ public class RawDataManager {
 					// file path is not needed any more
 					_importedFileNames.remove(oldFilePath);
 				}
+			}
+		}
+	}
+
+	private void saveImportConfig(final ArrayList<AutomatedImportConfig> modifiedConfigs) {
+
+		// Build the XML block for writing the bindings and active scheme.
+		final XMLMemento xmlMemento = XMLMemento.createWriteRoot(TAG_IMPORT_CONFIG_ROOT);
+
+		saveImportConfig_Data(xmlMemento, modifiedConfigs);
+
+		// Write the XML block to the state store.
+		final Writer writer = new StringWriter();
+		try {
+
+			xmlMemento.save(writer);
+			_state.put(STATE_AUTOMATED_IMPORT_CONFIG, writer.toString());
+
+		} catch (final IOException e) {
+
+			StatusUtil.log(e);
+
+		} finally {
+
+			try {
+				writer.close();
+			} catch (final IOException e) {
+				StatusUtil.log(e);
+			}
+		}
+	}
+
+	private void saveImportConfig_Data(	final XMLMemento xmlMemento,
+										final ArrayList<AutomatedImportConfig> modifiedConfigs) {
+
+		for (final AutomatedImportConfig importConfig : modifiedConfigs) {
+
+			final IMemento xmlImportConfig = xmlMemento.createChild(TAG_IMPORT_CONFIG);
+
+			xmlImportConfig.putString(ATTR_CONFIG_NAME, importConfig.name);
+			xmlImportConfig.putBoolean(ATTR_IS_SET_TOUR_TYPE, importConfig.isSetTourType);
+
+			final IMemento xmlSpeedVertices = xmlImportConfig.createChild(TAG_SPEED_VERTICES);
+
+			for (final SpeedVertex speedVertex : importConfig.speedVertices) {
+
+				final IMemento xmlSpeedVertex = xmlSpeedVertices.createChild(TAG_SPEED_VERTEX);
+
+				Util.setXmlLong(xmlSpeedVertex, ATTR_TOUR_TYPE_ID, speedVertex.tourTypeId);
+				xmlSpeedVertex.putInteger(ATTR_AVG_SPEED, speedVertex.avgSpeed);
 			}
 		}
 	}

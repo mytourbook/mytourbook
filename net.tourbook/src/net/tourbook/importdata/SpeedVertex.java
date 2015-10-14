@@ -13,34 +13,31 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-/**
- * @author Alfred Barten
- */
 package net.tourbook.importdata;
 
 import net.tourbook.common.util.StatusUtil;
 
-public class TourTypeVertex implements Comparable<Object>, Cloneable {
+public class SpeedVertex implements Comparable<Object>, Cloneable {
 
 	int		avgSpeed;
 	long	tourTypeId;
 
-	public TourTypeVertex() {}
+	public SpeedVertex() {}
 
-	public TourTypeVertex(final int value) {
+	public SpeedVertex(final int value) {
 
 		this.avgSpeed = value;
 
 	}
 
 	@Override
-	public TourTypeVertex clone() {
+	public SpeedVertex clone() {
 
-		TourTypeVertex clonedObject = null;
+		SpeedVertex clonedObject = null;
 
 		try {
 
-			clonedObject = (TourTypeVertex) super.clone();
+			clonedObject = (SpeedVertex) super.clone();
 
 		} catch (final CloneNotSupportedException e) {
 			StatusUtil.log(e);
@@ -52,15 +49,14 @@ public class TourTypeVertex implements Comparable<Object>, Cloneable {
 	@Override
 	public int compareTo(final Object anotherObject) throws ClassCastException {
 
-		final TourTypeVertex anotherRGBVertex = (TourTypeVertex) anotherObject;
-		final int anotherValue = anotherRGBVertex.avgSpeed;
+		final int anotherValue = ((SpeedVertex) anotherObject).avgSpeed;
 
 		return avgSpeed - anotherValue;
 	}
 
 	@Override
 	public String toString() {
-		return "TourTypeVertex ["
+		return "\nSpeedVertex ["
 		//
 				+ ("avgSpeed=" + avgSpeed + ", ")
 				+ ("tourTypeId=" + tourTypeId + ", ")

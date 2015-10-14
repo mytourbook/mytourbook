@@ -1264,6 +1264,20 @@ public class Util {
 		return value;
 	}
 
+	public static long getXmlLong(final IMemento memento, final String key, final long defaultValue) {
+
+		final String strValue = memento.getString(key);
+
+		try {
+
+			return Long.parseLong(strValue);
+
+		} catch (final NumberFormatException e) {
+
+			return defaultValue;
+		}
+	}
+
 	/**
 	 * @param xmlMemento
 	 * @param defaultValue
@@ -1969,6 +1983,11 @@ public class Util {
 		stateValues[2] = Integer.toString(rgb.blue);
 
 		state.put(stateKey, stateValues);
+	}
+
+	public static void setXmlLong(final IMemento memento, final String attributeName, final long longValue) {
+
+		memento.putString(attributeName, Long.toString(longValue));
 	}
 
 	/**

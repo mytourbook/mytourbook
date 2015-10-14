@@ -116,13 +116,19 @@ public class Messages extends NLS {
 
 	public static String	Dialog_AutoImportConfig_Action_RemoveSpeed_Tooltip;
 
+	public static String	Dialog_AutoImportConfig_Action_SortVertices_Tooltip;
+
 	public static String	Dialog_AutoImportConfig_Checkbox_SetTourType;
+
+	public static String	Dialog_AutoImportConfig_Column_Name;
 
 	public static String	Dialog_AutoImportConfig_Dialog_Message;
 
 	public static String	Dialog_AutoImportConfig_Dialog_Title;
 
 	public static String	Dialog_AutoImportConfig_Group_TourType;
+
+	public static String	Dialog_AutoImportConfig_Label_ConfigName;
 
 	public static String	Dialog_AutoImportConfig_Label_DeviceFolder;
 
@@ -288,6 +294,8 @@ public class Messages extends NLS {
 	public static String		app_unit_seconds;
 
 	public static String		App_Action_About;
+
+	public static String	App_Action_Add;
 	public static String		App_Action_Cancel;
 	public static String		App_Action_Close_ToolTip;
 	public static String		App_Action_Columns;
@@ -631,6 +639,10 @@ public class Messages extends NLS {
 	public static String		Image__App_Edit_Paste;
 	public static String		Image__App_OK;
 	public static String		Image__App_RestoreDefault;
+
+	public static String	Image__App_Sort;
+
+	public static String	Image__App_Sort_Disabled;
 	public static String		Image__App_Trash;
 	public static String		Image__App_Trash_Disabled;
 	public static String		Image__ArrowDown;
