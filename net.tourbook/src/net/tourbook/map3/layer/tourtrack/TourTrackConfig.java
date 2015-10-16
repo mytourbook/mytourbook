@@ -17,6 +17,7 @@ package net.tourbook.map3.layer.tourtrack;
 
 import gov.nasa.worldwind.WorldWind;
 import net.tourbook.common.color.Map3GradientColorManager;
+import net.tourbook.common.widgets.ComboEntry;
 import net.tourbook.map3.Messages;
 
 import org.eclipse.swt.graphics.RGB;
