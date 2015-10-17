@@ -16,11 +16,12 @@
 package net.tourbook.importdata;
 
 import net.tourbook.common.util.StatusUtil;
+import net.tourbook.database.TourDatabase;
 
 public class SpeedVertex implements Comparable<Object>, Cloneable {
 
 	int		avgSpeed;
-	long	tourTypeId;
+	long	tourTypeId	= TourDatabase.ENTITY_IS_NOT_SAVED;
 
 	public SpeedVertex() {}
 

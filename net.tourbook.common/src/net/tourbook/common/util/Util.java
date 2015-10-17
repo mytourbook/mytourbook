@@ -1165,6 +1165,26 @@ public class Util {
 		return value;
 	}
 
+	public static <E extends Enum<E>> Enum<E> getXmlEnum(	final IMemento xml,
+															final String attrName,
+															final Enum<E> defaultValue) {
+
+		final String xmlValue = xml.getString(attrName);
+
+		if (xmlValue == null) {
+			return defaultValue;
+		}
+
+		try {
+
+			return Enum.valueOf(defaultValue.getDeclaringClass(), xmlValue);
+
+		} catch (final IllegalArgumentException ex) {
+
+			return defaultValue;
+		}
+	}
+
 	private static Float getXmlFloat(final IMemento xmlMemento, final String key, final Float defaultValue) {
 
 		Float value = xmlMemento.getFloat(key);
@@ -1264,7 +1284,7 @@ public class Util {
 		return value;
 	}
 
-	public static long getXmlLong(final IMemento memento, final String key, final long defaultValue) {
+	public static Long getXmlLong(final IMemento memento, final String key, final Long defaultValue) {
 
 		final String strValue = memento.getString(key);
 
@@ -1983,6 +2003,11 @@ public class Util {
 		stateValues[2] = Integer.toString(rgb.blue);
 
 		state.put(stateKey, stateValues);
+	}
+
+	public static <E extends Enum<E>> void setXmlEnum(final IMemento xml, final String attrName, final Enum<E> value) {
+
+		xml.putString(attrName, value.name());
 	}
 
 	public static void setXmlLong(final IMemento memento, final String attributeName, final long longValue) {

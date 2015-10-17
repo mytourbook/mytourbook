@@ -180,7 +180,7 @@ public class TourDatabase {
 	private final static String						TABLE_TOURCATEGORY__TOURDATA				= TABLE_TOUR_CATEGORY
 																										+ "_" + TABLE_TOUR_DATA;			//$NON-NLS-1$
 	/**
-	 * contains <code>-1</code> which is the Id for a not saved entity
+	 * Is <code>-1</code> which is the id for a not saved entity.
 	 */
 	public static final int							ENTITY_IS_NOT_SAVED							= -1;
 	//
@@ -1660,16 +1660,22 @@ public class TourDatabase {
 	}
 
 	/**
-	 * Get tour type from id
+	 * Get {@link TourType} from all available tour type by it's id.
 	 * 
 	 * @param tourTypeId
 	 * @return Returns a {@link TourType} from the id or <code>null</code> when tour type is not
 	 *         available for the id.
 	 */
-	public static TourType getTourType(final long tourTypeId) {
+	public static TourType getTourType(final Long tourTypeId) {
+
+		if (tourTypeId == null) {
+			return null;
+		}
+
+		final long tourTypeL = tourTypeId.longValue();
 
 		for (final TourType tourType : getAllTourTypes()) {
-			if (tourType.getTypeId() == tourTypeId) {
+			if (tourType.getTypeId() == tourTypeL) {
 				return tourType;
 			}
 		}

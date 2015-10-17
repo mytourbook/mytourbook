@@ -112,27 +112,24 @@ public class Messages extends NLS {
 	public static String		dialog_export_shell_text;
 	public static String		dialog_export_txt_filePath_tooltip;
 
-	public static String	Dialog_AutoImportConfig_Action_AddSpeed_Tooltip;
+	public static String		Dialog_AutoImportConfig_Action_AddSpeed_Tooltip;
+	public static String		Dialog_AutoImportConfig_Action_RemoveSpeed_Tooltip;
+	public static String		Dialog_AutoImportConfig_Action_SortVertices_Tooltip;
+	public static String		Dialog_AutoImportConfig_Checkbox_SetTourType;
+	public static String		Dialog_AutoImportConfig_Column_Name;
 
-	public static String	Dialog_AutoImportConfig_Action_RemoveSpeed_Tooltip;
-
-	public static String	Dialog_AutoImportConfig_Action_SortVertices_Tooltip;
-
-	public static String	Dialog_AutoImportConfig_Checkbox_SetTourType;
-
-	public static String	Dialog_AutoImportConfig_Column_Name;
-
-	public static String	Dialog_AutoImportConfig_Dialog_Message;
-
-	public static String	Dialog_AutoImportConfig_Dialog_Title;
-
-	public static String	Dialog_AutoImportConfig_Group_TourType;
-
-	public static String	Dialog_AutoImportConfig_Label_ConfigName;
-
-	public static String	Dialog_AutoImportConfig_Label_DeviceFolder;
-
-	public static String	Dialog_AutoImportConfig_Spinner_Speed_Tooltip;
+	public static String	Dialog_AutoImportConfig_Column_TourType;
+	public static String		Dialog_AutoImportConfig_Dialog_Message;
+	public static String		Dialog_AutoImportConfig_Dialog_Title;
+	public static String		Dialog_AutoImportConfig_Group_Configuration;
+	public static String		Dialog_AutoImportConfig_Group_TourType;
+	public static String		Dialog_AutoImportConfig_Label_BackupFolder;
+	public static String		Dialog_AutoImportConfig_Label_ConfigName;
+	public static String		Dialog_AutoImportConfig_Label_ConfigTitle;
+	public static String		Dialog_AutoImportConfig_Label_DeviceFolder;
+	public static String		Dialog_AutoImportConfig_Label_TourType;
+	public static String		Dialog_AutoImportConfig_Link_TourType;
+	public static String		Dialog_AutoImportConfig_Spinner_Speed_Tooltip;
 
 	public static String		Dialog_HRZone_Button_AddZone;
 	public static String		Dialog_HRZone_Button_EditHrZones;
@@ -295,10 +292,12 @@ public class Messages extends NLS {
 
 	public static String		App_Action_About;
 
-	public static String	App_Action_Add;
+	public static String		App_Action_Add;
 	public static String		App_Action_Cancel;
 	public static String		App_Action_Close_ToolTip;
 	public static String		App_Action_Columns;
+
+	public static String		App_Action_Copy;
 	public static String		App_Action_Dialog_ActionIsInProgress_Message;
 	public static String		App_Action_Dialog_ActionIsInProgress_Title;
 	public static String		App_Action_Duplicate;
@@ -317,6 +316,8 @@ public class Messages extends NLS {
 	public static String		App_Action_open_preferences;
 	public static String		App_Action_OpenOtherViews;
 	public static String		App_Action_Remove;
+
+	public static String		App_Action_Remove_Immediate;
 	public static String		App_Action_RestoreDefault_Tooltip;
 	public static String		App_Action_set_tour_type;
 	public static String		App_Action_Save;
@@ -640,9 +641,9 @@ public class Messages extends NLS {
 	public static String		Image__App_OK;
 	public static String		Image__App_RestoreDefault;
 
-	public static String	Image__App_Sort;
+	public static String		Image__App_Sort;
 
-	public static String	Image__App_Sort_Disabled;
+	public static String		Image__App_Sort_Disabled;
 	public static String		Image__App_Trash;
 	public static String		Image__App_Trash_Disabled;
 	public static String		Image__ArrowDown;
@@ -823,6 +824,12 @@ public class Messages extends NLS {
 	public static String		Import_Data_Link_Import;
 	public static String		Import_Data_Link_ReceiveFromSerialPort_Configured;
 	public static String		Import_Data_Link_ReceiveFromSerialPort_Directly;
+
+	public static String		Import_Data_TourTypeConfig_BySpeed;
+
+	public static String		Import_Data_TourTypeConfig_NotUsed;
+
+	public static String		Import_Data_TourTypeConfig_OneForAll;
 
 	public static String		Import_Wizard_Control_combo_person_default_settings;
 	public static String		Import_Wizard_Control_combo_ports_not_available;

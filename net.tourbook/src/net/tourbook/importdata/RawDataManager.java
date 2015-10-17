@@ -38,6 +38,7 @@ import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.util.ITourViewer3;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
+import net.tourbook.common.widgets.ComboEnumEntry;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourPerson;
 import net.tourbook.data.TourTag;
@@ -87,21 +88,43 @@ public class RawDataManager {
 
 	public static final int						ADJUST_IMPORT_YEAR_IS_DISABLED		= -1;
 
-	private static final String					STATE_AUTOMATED_IMPORT_CONFIG		= "STATE_AUTOMATED_IMPORT_CONFIG";							//$NON-NLS-1$
-	private static final String					TAG_IMPORT_CONFIG					= "Config";
-	private static final String					TAG_IMPORT_CONFIG_ROOT				= "AutomatedImportConfig";
-	private static final String					TAG_SPEED_VERTICES					= "SpeedVertices";
-	private static final String					TAG_SPEED_VERTEX					= "Speed";
+	private static final String					XML_STATE_AUTOMATED_IMPORT_CONFIG	= "XML_STATE_AUTOMATED_IMPORT_CONFIG";						//$NON-NLS-1$
+	private static final String					TAG_IMPORT_CONFIG					= "Config";												//$NON-NLS-1$
+	private static final String					TAG_IMPORT_CONFIG_ROOT				= "AutomatedImportConfig";									//$NON-NLS-1$
+	private static final String					TAG_SPEED_VERTEX					= "Speed";													//$NON-NLS-1$
 
-	private static final String					ATTR_AVG_SPEED						= "avgSpeed";
+	private static final String					ATTR_AVG_SPEED						= "avgSpeed";												//$NON-NLS-1$
 	private static final String					ATTR_CONFIG_NAME					= "name";													//$NON-NLS-1$
-	private static final String					ATTR_IS_SET_TOUR_TYPE				= "isSetTourType";											//$NON-NLS-1$
-	private static final String					ATTR_TOUR_TYPE_ID					= "tourTypeId";
+	private static final String					ATTR_CONFIG_BACKUP_FOLDER			= "backupFolder";											//$NON-NLS-1$
+	private static final String					ATTR_CONFIG_DEVICE_FOLDER			= "deviceFolder";											//$NON-NLS-1$
+	private static final String					ATTR_TOUR_TYPE_CONFIG				= "tourTypeConfig";										//$NON-NLS-1$
+	private static final String					ATTR_TOUR_TYPE_ID					= "tourTypeId";											//$NON-NLS-1$
 
 	static final int							CONFIG_SPEED_MIN					= 0;
 	static final int							CONFIG_SPEED_MAX					= 3000;
 
 	private static final int					CONFIG_SPEED_DEFAULT				= 0;
+
+	static final ComboEnumEntry<TourTypeConfig>	DEFAULT_TOUR_TYPE_CONFIG;
+	static final ComboEnumEntry<?>[]			ALL_IMPORT_TOUR_TYPE_CONFIG;
+
+	static {
+
+		DEFAULT_TOUR_TYPE_CONFIG = new ComboEnumEntry<>(Messages.Import_Data_TourTypeConfig_NotUsed,//
+				TourTypeConfig.TOUR_TYPE_CONFIG_NOT_USED);
+
+		ALL_IMPORT_TOUR_TYPE_CONFIG = new ComboEnumEntry<?>[] {
+
+		DEFAULT_TOUR_TYPE_CONFIG,
+
+		new ComboEnumEntry<>(Messages.Import_Data_TourTypeConfig_OneForAll,//
+				TourTypeConfig.TOUR_TYPE_CONFIG_ONE_FOR_ALL),
+
+		new ComboEnumEntry<>(Messages.Import_Data_TourTypeConfig_BySpeed, //
+				TourTypeConfig.TOUR_TYPE_CONFIG_BY_SPEED)
+		//
+		};
+	}
 
 	private static RawDataManager				_instance							= null;
 
@@ -1493,7 +1516,7 @@ public class RawDataManager {
 
 		final ArrayList<AutomatedImportConfig> importConfigs = new ArrayList<>();
 
-		final String stateValue = Util.getStateString(_state, STATE_AUTOMATED_IMPORT_CONFIG, null);
+		final String stateValue = Util.getStateString(_state, XML_STATE_AUTOMATED_IMPORT_CONFIG, null);
 
 		if ((stateValue != null) && (stateValue.length() > 0)) {
 
@@ -1513,48 +1536,64 @@ public class RawDataManager {
 
 	private void loadImportConfig_Data(final XMLMemento xmlMemento, final ArrayList<AutomatedImportConfig> importConfigs) {
 
-		final ArrayList<TourType> allTourTypes = TourDatabase.getAllTourTypes();
-
 		for (final IMemento xmlConfig : xmlMemento.getChildren()) {
 
 			final AutomatedImportConfig importConfig = new AutomatedImportConfig();
 
 			importConfig.name = Util.getXmlString(xmlConfig, ATTR_CONFIG_NAME, UI.EMPTY_STRING);
-			importConfig.isSetTourType = Util.getXmlBoolean(xmlConfig, ATTR_IS_SET_TOUR_TYPE, true);
+			importConfig.backupFolder = Util.getXmlString(xmlConfig, ATTR_CONFIG_BACKUP_FOLDER, UI.EMPTY_STRING);
+			importConfig.deviceFolder = Util.getXmlString(xmlConfig, ATTR_CONFIG_DEVICE_FOLDER, UI.EMPTY_STRING);
 
-			final ArrayList<SpeedVertex> speedVertices = importConfig.speedVertices;
+			final Enum<TourTypeConfig> ttConfig = Util.getXmlEnum(
+					xmlConfig,
+					ATTR_TOUR_TYPE_CONFIG,
+					TourTypeConfig.TOUR_TYPE_CONFIG_NOT_USED);
 
-			for (final IMemento xmlSpeed : xmlConfig.getChildren()) {
+			importConfig.tourTypeConfig = ttConfig;
 
-				final long xmlTourTypeId = Util.getXmlLong(xmlSpeed, ATTR_TOUR_TYPE_ID, 0);
+			if (TourTypeConfig.TOUR_TYPE_CONFIG_BY_SPEED.equals(ttConfig)) {
 
-				/*
-				 * Check if the loaded tour type id is valid
-				 */
-				boolean idIsValid = false;
+				final ArrayList<SpeedVertex> speedVertices = importConfig.speedVertices;
 
-				for (final TourType tourType : allTourTypes) {
-					if (tourType.getTypeId() == xmlTourTypeId) {
-						idIsValid = true;
-						break;
+				for (final IMemento xmlSpeed : xmlConfig.getChildren()) {
+
+					final Long xmlTourTypeId = Util.getXmlLong(xmlSpeed, ATTR_TOUR_TYPE_ID, null);
+
+					/*
+					 * Check if the loaded tour type id is valid
+					 */
+					final TourType tourType = TourDatabase.getTourType(xmlTourTypeId);
+
+					if (tourType != null) {
+
+						final SpeedVertex speedVertex = new SpeedVertex();
+
+						speedVertex.tourTypeId = xmlTourTypeId;
+
+						speedVertex.avgSpeed = Util.getXmlInteger(
+								xmlSpeed,
+								ATTR_AVG_SPEED,
+								CONFIG_SPEED_DEFAULT,
+								CONFIG_SPEED_MIN,
+								CONFIG_SPEED_MAX);
+
+						speedVertices.add(speedVertex);
 					}
 				}
 
-				if (idIsValid) {
+			} else if (TourTypeConfig.TOUR_TYPE_CONFIG_ONE_FOR_ALL.equals(ttConfig)) {
 
-					final SpeedVertex speedVertex = new SpeedVertex();
+				final Long xmlTourTypeId = Util.getXmlLong(xmlConfig, ATTR_TOUR_TYPE_ID, null);
 
-					speedVertex.tourTypeId = xmlTourTypeId;
-					speedVertex.avgSpeed = Util.getXmlInteger(
-							xmlSpeed,
-							ATTR_AVG_SPEED,
-							CONFIG_SPEED_DEFAULT,
-							CONFIG_SPEED_MIN,
-							CONFIG_SPEED_MAX);
+				importConfig.oneTourType = TourDatabase.getTourType(xmlTourTypeId);
 
-					speedVertices.add(speedVertex);
-				}
+			} else {
+
+				// this is the default, TourTypeConfig.TOUR_TYPE_CONFIG_NOT_USED
+
 			}
+
+			importConfigs.add(importConfig);
 		}
 	}
 
@@ -1624,7 +1663,7 @@ public class RawDataManager {
 		try {
 
 			xmlMemento.save(writer);
-			_state.put(STATE_AUTOMATED_IMPORT_CONFIG, writer.toString());
+			_state.put(XML_STATE_AUTOMATED_IMPORT_CONFIG, writer.toString());
 
 		} catch (final IOException e) {
 
@@ -1645,19 +1684,37 @@ public class RawDataManager {
 
 		for (final AutomatedImportConfig importConfig : modifiedConfigs) {
 
-			final IMemento xmlImportConfig = xmlMemento.createChild(TAG_IMPORT_CONFIG);
+			final IMemento xmlConfig = xmlMemento.createChild(TAG_IMPORT_CONFIG);
 
-			xmlImportConfig.putString(ATTR_CONFIG_NAME, importConfig.name);
-			xmlImportConfig.putBoolean(ATTR_IS_SET_TOUR_TYPE, importConfig.isSetTourType);
+			xmlConfig.putString(ATTR_CONFIG_NAME, importConfig.name);
+			xmlConfig.putString(ATTR_CONFIG_BACKUP_FOLDER, importConfig.backupFolder);
+			xmlConfig.putString(ATTR_CONFIG_DEVICE_FOLDER, importConfig.deviceFolder);
 
-			final IMemento xmlSpeedVertices = xmlImportConfig.createChild(TAG_SPEED_VERTICES);
+			final Enum<TourTypeConfig> ttConfig = importConfig.tourTypeConfig;
+			Util.setXmlEnum(xmlConfig, ATTR_TOUR_TYPE_CONFIG, ttConfig);
 
-			for (final SpeedVertex speedVertex : importConfig.speedVertices) {
+			if (TourTypeConfig.TOUR_TYPE_CONFIG_BY_SPEED.equals(ttConfig)) {
 
-				final IMemento xmlSpeedVertex = xmlSpeedVertices.createChild(TAG_SPEED_VERTEX);
+				for (final SpeedVertex speedVertex : importConfig.speedVertices) {
 
-				Util.setXmlLong(xmlSpeedVertex, ATTR_TOUR_TYPE_ID, speedVertex.tourTypeId);
-				xmlSpeedVertex.putInteger(ATTR_AVG_SPEED, speedVertex.avgSpeed);
+					final IMemento xmlSpeedVertex = xmlConfig.createChild(TAG_SPEED_VERTEX);
+
+					Util.setXmlLong(xmlSpeedVertex, ATTR_TOUR_TYPE_ID, speedVertex.tourTypeId);
+					xmlSpeedVertex.putInteger(ATTR_AVG_SPEED, speedVertex.avgSpeed);
+				}
+
+			} else if (TourTypeConfig.TOUR_TYPE_CONFIG_ONE_FOR_ALL.equals(ttConfig)) {
+
+				final TourType oneTourType = importConfig.oneTourType;
+
+				if (oneTourType != null) {
+					Util.setXmlLong(xmlConfig, ATTR_TOUR_TYPE_ID, oneTourType.getTypeId());
+				}
+
+			} else {
+
+				// this is the default or TourTypeConfig.TOUR_TYPE_CONFIG_NOT_USED
+
 			}
 		}
 	}

@@ -19,13 +19,17 @@ import java.util.ArrayList;
 
 import net.tourbook.common.UI;
 import net.tourbook.common.util.StatusUtil;
+import net.tourbook.data.TourType;
 
-class AutomatedImportConfig implements Cloneable {
+class AutomatedImportConfig implements Cloneable, Comparable<AutomatedImportConfig> {
 
 	String					name			= UI.EMPTY_STRING;
+	String					backupFolder	= UI.EMPTY_STRING;
+	String					deviceFolder	= UI.EMPTY_STRING;
 
-	boolean					isSetTourType	= true;
+	Enum<TourTypeConfig>	tourTypeConfig	= TourTypeConfig.TOUR_TYPE_CONFIG_NOT_USED;
 
+	TourType				oneTourType;
 	ArrayList<SpeedVertex>	speedVertices	= new ArrayList<>();
 
 	private int				_id;
@@ -47,8 +51,8 @@ class AutomatedImportConfig implements Cloneable {
 			clonedObject = (AutomatedImportConfig) super.clone();
 
 			clonedObject._id = ++_idCreator;
-			clonedObject.speedVertices = new ArrayList<>();
 
+			clonedObject.speedVertices = new ArrayList<>();
 			for (final SpeedVertex speedVertex : speedVertices) {
 				clonedObject.speedVertices.add(speedVertex.clone());
 			}
@@ -58,6 +62,12 @@ class AutomatedImportConfig implements Cloneable {
 		}
 
 		return clonedObject;
+	}
+
+	@Override
+	public int compareTo(final AutomatedImportConfig otherConfig) {
+
+		return name.compareTo(otherConfig.name);
 	}
 
 	@Override
@@ -82,6 +92,10 @@ class AutomatedImportConfig implements Cloneable {
 		return true;
 	}
 
+	public int getCreateId() {
+		return _id;
+	}
+
 	@Override
 	public int hashCode() {
 
@@ -97,7 +111,7 @@ class AutomatedImportConfig implements Cloneable {
 		return "AutomatedImportConfig ["
 		//
 				+ ("name=" + name + ", ")
-				+ ("isSetTourType=" + isSetTourType + ", ")
+//				+ ("isSetTourType=" + isSetTourType + ", ")
 				+ ("speedVertices=" + speedVertices)
 
 				+ "]";
