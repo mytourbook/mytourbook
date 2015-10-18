@@ -15,16 +15,25 @@
  *******************************************************************************/
 package net.tourbook.importdata;
 
+import net.tourbook.common.util.Util;
+import net.tourbook.ui.views.rawData.RawDataView;
+
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.ui.IViewPart;
 
 public class ActionHandler_AutomatedImportConfiguration extends AbstractHandler {
 
 	@Override
 	public Object execute(final ExecutionEvent arg0) throws ExecutionException {
 
-		RawDataManager.getInstance().actionAutomatedImportConfiguration();
+		final IViewPart importView = Util.showView(RawDataView.ID, true);
+
+		if (importView instanceof RawDataView) {
+
+			((RawDataView) importView).actionSetupAutomatedImport();
+		}
 
 		return null;
 	}

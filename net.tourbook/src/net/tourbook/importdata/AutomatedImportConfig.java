@@ -21,20 +21,24 @@ import net.tourbook.common.UI;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.data.TourType;
 
-class AutomatedImportConfig implements Cloneable, Comparable<AutomatedImportConfig> {
+public class AutomatedImportConfig implements Cloneable, Comparable<AutomatedImportConfig> {
 
-	String					name			= UI.EMPTY_STRING;
-	String					backupFolder	= UI.EMPTY_STRING;
-	String					deviceFolder	= UI.EMPTY_STRING;
+	public String					name			= UI.EMPTY_STRING;
+	public String					backupFolder	= UI.EMPTY_STRING;
+	public String					deviceFolder	= UI.EMPTY_STRING;
 
-	Enum<TourTypeConfig>	tourTypeConfig	= TourTypeConfig.TOUR_TYPE_CONFIG_NOT_USED;
+	public Enum<TourTypeConfig>		tourTypeConfig	= TourTypeConfig.TOUR_TYPE_CONFIG_NOT_USED;
 
-	TourType				oneTourType;
-	ArrayList<SpeedVertex>	speedVertices	= new ArrayList<>();
+	public TourType					oneTourType;
+	public ArrayList<SpeedVertex>	speedVertices	= new ArrayList<>();
 
-	private int				_id;
+	/** Contains the image hash or 0 when an image is not displayed. */
+	public int						imageHash;
 
-	private static int		_idCreator;
+	public int						imageWidth;
+
+	private long					_id;
+	private static long				_idCreator;
 
 	AutomatedImportConfig() {
 
@@ -72,7 +76,6 @@ class AutomatedImportConfig implements Cloneable, Comparable<AutomatedImportConf
 
 	@Override
 	public boolean equals(final Object obj) {
-
 		if (this == obj) {
 			return true;
 		}
@@ -82,28 +85,57 @@ class AutomatedImportConfig implements Cloneable, Comparable<AutomatedImportConf
 		if (getClass() != obj.getClass()) {
 			return false;
 		}
-
 		final AutomatedImportConfig other = (AutomatedImportConfig) obj;
-
 		if (_id != other._id) {
 			return false;
 		}
-
 		return true;
 	}
 
-	public int getCreateId() {
+	public long getCreateId() {
 		return _id;
 	}
 
 	@Override
 	public int hashCode() {
-
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + _id;
-
+		result = prime * result + (int) (_id ^ (_id >>> 32));
 		return result;
+	}
+
+	/**
+	 * Setup data for the tour type config image.
+	 */
+	void setupConfigImage() {
+
+		if (TourTypeConfig.TOUR_TYPE_CONFIG_BY_SPEED.equals(tourTypeConfig)) {
+
+			final int numVertices = speedVertices.size();
+
+			imageHash = speedVertices.hashCode();
+			imageWidth = numVertices * UI.TOUR_TYPE_IMAGE_SIZE;
+
+		} else if (TourTypeConfig.TOUR_TYPE_CONFIG_ONE_FOR_ALL.equals(tourTypeConfig)) {
+
+			if (oneTourType == null) {
+
+				imageHash = 0;
+				imageWidth = 0;
+
+			} else {
+
+				imageHash = oneTourType.hashCode();
+				imageWidth = UI.TOUR_TYPE_IMAGE_SIZE;
+			}
+
+		} else {
+
+			// this is the default or TourTypeConfig.TOUR_TYPE_CONFIG_NOT_USED
+
+			imageHash = 0;
+			imageWidth = 0;
+		}
 	}
 
 	@Override
@@ -111,8 +143,8 @@ class AutomatedImportConfig implements Cloneable, Comparable<AutomatedImportConf
 		return "AutomatedImportConfig ["
 		//
 				+ ("name=" + name + ", ")
-//				+ ("isSetTourType=" + isSetTourType + ", ")
-				+ ("speedVertices=" + speedVertices)
+				+ ("speedVertices=" + speedVertices + ", ")
+				+ ("tourTypeConfig=" + tourTypeConfig + ", ")
 
 				+ "]";
 	}

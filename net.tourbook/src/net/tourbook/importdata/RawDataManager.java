@@ -232,27 +232,6 @@ public class RawDataManager {
 		});
 	}
 
-	public void actionAutomatedImport() {
-
-	}
-
-	public void actionAutomatedImportConfiguration() {
-
-		final Shell shell = Display.getDefault().getActiveShell();
-
-		final DialogAutomatedImportConfig dialog = new DialogAutomatedImportConfig(shell, getImportConfigs());
-
-		if (dialog.open() == Window.OK) {
-
-			final ArrayList<AutomatedImportConfig> modifiedConfigs = dialog.getModifiedConfigs();
-
-			_importConfigs.clear();
-			_importConfigs.addAll(modifiedConfigs);
-
-			saveImportConfig(modifiedConfigs);
-		}
-	}
-
 	public void actionImportFromDevice() {
 
 		final DataTransferWizardDialog dialog = new DataTransferWizardDialog(//
@@ -1045,6 +1024,15 @@ public class RawDataManager {
 		}
 	}
 
+	public ArrayList<AutomatedImportConfig> getAutoImportConfigs() {
+
+		if (_importConfigs == null) {
+			_importConfigs = loadImportConfig();
+		}
+
+		return _importConfigs;
+	}
+
 	public DeviceData getDeviceData() {
 		return _deviceData;
 	}
@@ -1080,15 +1068,6 @@ public class RawDataManager {
 		}
 
 		return _devicesBySortPriority;
-	}
-
-	private ArrayList<AutomatedImportConfig> getImportConfigs() {
-
-		if (_importConfigs == null) {
-			_importConfigs = loadImportConfig();
-		}
-
-		return _importConfigs;
 	}
 
 	public HashSet<String> getImportedFiles() {
@@ -1593,6 +1572,8 @@ public class RawDataManager {
 
 			}
 
+			importConfig.setupConfigImage();
+
 			importConfigs.add(importConfig);
 		}
 	}
@@ -1651,7 +1632,7 @@ public class RawDataManager {
 		}
 	}
 
-	private void saveImportConfig(final ArrayList<AutomatedImportConfig> modifiedConfigs) {
+	public void saveImportConfig(final ArrayList<AutomatedImportConfig> modifiedConfigs) {
 
 		// Build the XML block for writing the bindings and active scheme.
 		final XMLMemento xmlMemento = XMLMemento.createWriteRoot(TAG_IMPORT_CONFIG_ROOT);

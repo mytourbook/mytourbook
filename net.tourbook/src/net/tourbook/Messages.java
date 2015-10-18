@@ -719,7 +719,6 @@ public class Messages extends NLS {
 	public static String		Image__PulseZones_Disabled;
 	public static String		Image__quick_edit;
 	public static String		Image__RawData_AutomatedImport;
-	public static String		Image__RawData_AutomatedImportConfig;
 	public static String		Image__RawData_Import;
 	public static String		Image__RawData_Transfer;
 	public static String		Image__RawData_TransferDirect;
@@ -821,6 +820,8 @@ public class Messages extends NLS {
 	public static String		Import_Data_Label_Info;
 	public static String		Import_Data_Link_AutomatedImport;
 	public static String		Import_Data_Link_AutomatedImportConfig;
+
+	public static String	Import_Data_Link_ConfigName;
 	public static String		Import_Data_Link_Import;
 	public static String		Import_Data_Link_ReceiveFromSerialPort_Configured;
 	public static String		Import_Data_Link_ReceiveFromSerialPort_Directly;

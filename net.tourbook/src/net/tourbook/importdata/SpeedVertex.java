@@ -20,8 +20,8 @@ import net.tourbook.database.TourDatabase;
 
 public class SpeedVertex implements Comparable<Object>, Cloneable {
 
-	int		avgSpeed;
-	long	tourTypeId	= TourDatabase.ENTITY_IS_NOT_SAVED;
+	public int	avgSpeed;
+	public long	tourTypeId	= TourDatabase.ENTITY_IS_NOT_SAVED;
 
 	public SpeedVertex() {}
 

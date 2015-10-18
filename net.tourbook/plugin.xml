@@ -461,12 +461,6 @@
 				label="%Command_Device_ImportAutomated"
 				mnemonic="%Command_Device_ImportAutomated_Mnemonic"/>
 
-			<command
-				commandId="net.tourbook.command.device.ImportAutomatedConfiguration"
-				icon="icons/import-automated-config.png"
-				label="%Command_Device_ImportAutomatedConfiguration"
-				mnemonic="%Command_Device_ImportAutomatedConfiguration_Mnemonic"/>
-
 			<separator
 				name="net.tourbook.separator.device"
 				visible="true"/>
@@ -986,13 +980,6 @@
 				mnemonic="%Command_Device_ImportAutomated_Mnemonic"
 				tooltip="%Command_Device_ImportAutomated_Tooltip"
 			/>
-			<command
-				commandId="net.tourbook.command.device.ImportAutomatedConfiguration"
-				icon="icons/import-automated-config.png"
-				label="%Command_Device_ImportAutomatedConfiguration"
-				mnemonic="%Command_Device_ImportAutomatedConfiguration_Mnemonic"
-				tooltip="%Command_Device_ImportAutomatedConfiguration_Tooltip"
-			/>
 
 			<separator
 				name="net.tourbook.separator.device"
@@ -1199,11 +1186,6 @@
       
 		<command
 			id="net.tourbook.command.device.ImportAutomated"
-			defaultHandler="net.tourbook.importdata.ActionHandler_AutomatedImport"
-			name="%Command_Device_ImportAutomated"
-		/>
-		<command
-			id="net.tourbook.command.device.ImportAutomatedConfiguration"
 			defaultHandler="net.tourbook.importdata.ActionHandler_AutomatedImportConfiguration"
 			name="%Command_Device_ImportAutomatedConfiguration"
 		/>
@@ -1710,13 +1692,6 @@
 		<key
 			commandId="net.tourbook.command.device.importFromFile"
 			sequence="%Shortcut_Key_App_ImportFromFile"
-			contextId="org.eclipse.ui.contexts.window"
-			schemeId="net.tourbook.scheme"
-		/>
-
-		<key
-			commandId="net.tourbook.command.device.ImportAutomated"
-			sequence="%Shortcut_Key_App_ImportFromFileAutomated"
 			contextId="org.eclipse.ui.contexts.window"
 			schemeId="net.tourbook.scheme"
 		/>

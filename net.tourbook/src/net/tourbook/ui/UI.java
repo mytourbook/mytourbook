@@ -215,9 +215,6 @@ public class UI {
 	public static final String								IMAGE_TOUR_TYPE_FILTER			= "tourType-filter";							//$NON-NLS-1$
 	public static final String								IMAGE_TOUR_TYPE_FILTER_SYSTEM	= "tourType-filter-system";					//$NON-NLS-1$
 
-	private static final int								TOUR_TYPE_IMAGE_WIDTH			= 16;
-	private static final int								TOUR_TYPE_IMAGE_HEIGHT			= 16;
-
 	private static UI										instance;
 
 	private static DateFormat								_dateFormatterShort;
@@ -310,9 +307,6 @@ public class UI {
 		IMAGE_REGISTRY.put(
 				RawDataView.IMAGE_AUTOMATED_IMPORT,
 				TourbookPlugin.getImageDescriptor(Messages.Image__RawData_AutomatedImport));
-		IMAGE_REGISTRY.put(
-				RawDataView.IMAGE_AUTOMATED_IMPORT_CONFIG,
-				TourbookPlugin.getImageDescriptor(Messages.Image__RawData_AutomatedImportConfig));
 		IMAGE_REGISTRY.put(
 				RawDataView.IMAGE_DATA_TRANSFER,
 				TourbookPlugin.getImageDescriptor(Messages.Image__RawData_Transfer));
@@ -1335,7 +1329,10 @@ public class UI {
 
 		final Display display = Display.getCurrent();
 
-		final Image tourTypeImage = new Image(display, TOUR_TYPE_IMAGE_WIDTH, TOUR_TYPE_IMAGE_HEIGHT);
+		final Image tourTypeImage = new Image(
+				display,
+				net.tourbook.common.UI.TOUR_TYPE_IMAGE_SIZE,
+				net.tourbook.common.UI.TOUR_TYPE_IMAGE_SIZE);
 		final GC gcImage = new GC(tourTypeImage);
 		{
 			drawTourTypeImage(typeId, gcImage);
@@ -1384,6 +1381,7 @@ public class UI {
 			return;
 		}
 
+		final int tourTypeImageSize = net.tourbook.common.UI.TOUR_TYPE_IMAGE_SIZE;
 		final Display display = Display.getCurrent();
 		final DrawingColors drawingColors = getTourTypeColors(display, typeId);
 
@@ -1393,14 +1391,14 @@ public class UI {
 		final Color colorTransparent = new Color(display, 0x01, 0x00, 0x00);
 
 		gcImage.setBackground(colorTransparent);
-		gcImage.fillRectangle(0, 0, TOUR_TYPE_IMAGE_WIDTH, TOUR_TYPE_IMAGE_HEIGHT);
+		gcImage.fillRectangle(0, 0, tourTypeImageSize, tourTypeImageSize);
 
 		gcImage.setForeground(colorBright);
 		gcImage.setBackground(colorDark);
-		gcImage.fillGradientRectangle(4, 4, TOUR_TYPE_IMAGE_WIDTH - 8, TOUR_TYPE_IMAGE_HEIGHT - 8, false);
+		gcImage.fillGradientRectangle(4, 4, tourTypeImageSize - 8, tourTypeImageSize - 8, false);
 
 		gcImage.setForeground(colorLine);
-		gcImage.drawRectangle(3, 3, TOUR_TYPE_IMAGE_WIDTH - 7, TOUR_TYPE_IMAGE_HEIGHT - 7);
+		gcImage.drawRectangle(3, 3, tourTypeImageSize - 7, tourTypeImageSize - 7);
 
 		drawingColors.dispose();
 		colorTransparent.dispose();
@@ -1448,7 +1446,8 @@ public class UI {
 
 	/**
 	 * @param typeId
-	 * @return Returns an image which represents the tour type
+	 * @return Returns an image which represents the tour type. This image must not be disposed,
+	 *         this is done when the app closes.
 	 */
 	public Image getTourTypeImage(final long typeId) {
 
@@ -1478,7 +1477,6 @@ public class UI {
 
 			return updateTourTypeImage(existingImage, typeId, keyColorId);
 		}
-
 	}
 
 	/**
@@ -1542,7 +1540,10 @@ public class UI {
 
 		final Display display = Display.getCurrent();
 
-		final Image tourTypeImage = new Image(display, TOUR_TYPE_IMAGE_WIDTH, TOUR_TYPE_IMAGE_HEIGHT);
+		final Image tourTypeImage = new Image(
+				display,
+				net.tourbook.common.UI.TOUR_TYPE_IMAGE_SIZE,
+				net.tourbook.common.UI.TOUR_TYPE_IMAGE_SIZE);
 		GC gc = new GC(tourTypeImage);
 		{
 			drawTourTypeImage(typeId, gc);
