@@ -31,6 +31,7 @@ import java.util.Set;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.UI;
 import net.tourbook.common.action.ActionOpenPrefDialog;
 import net.tourbook.common.util.ColumnDefinition;
 import net.tourbook.common.util.ColumnManager;
@@ -68,7 +69,6 @@ import net.tourbook.tour.TourManager;
 import net.tourbook.tour.TourTypeMenuManager;
 import net.tourbook.ui.ITourProviderAll;
 import net.tourbook.ui.TableColumnFactory;
-import net.tourbook.ui.UI;
 import net.tourbook.ui.action.ActionEditQuick;
 import net.tourbook.ui.action.ActionEditTour;
 import net.tourbook.ui.action.ActionJoinTours;
@@ -79,12 +79,15 @@ import net.tourbook.ui.views.TableViewerTourInfoToolTip;
 import net.tourbook.ui.views.TourInfoToolTipCellLabelProvider;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.ActionContributionItem;
 import org.eclipse.jface.action.GroupMarker;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
+import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.layout.GridDataFactory;
@@ -112,7 +115,6 @@ import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.jface.window.Window;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
@@ -131,6 +133,7 @@ import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
+import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchActionConstants;
@@ -147,43 +150,44 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	public static final String				ID											= "net.tourbook.views.rawData.RawDataView"; //$NON-NLS-1$
 
 	public static final int					COLUMN_DATE									= 0;
+
 	public static final int					COLUMN_TITLE								= 1;
 	public static final int					COLUMN_DATA_FORMAT							= 2;
 	public static final int					COLUMN_FILE_NAME							= 3;
-
 	private static final String				STATE_IMPORTED_FILENAMES					= "importedFilenames";						//$NON-NLS-1$
-	private static final String				STATE_SELECTED_TOUR_INDICES					= "SelectedTourIndices";					//$NON-NLS-1$
 
+	private static final String				STATE_SELECTED_TOUR_INDICES					= "SelectedTourIndices";					//$NON-NLS-1$
 	private static final String				STATE_IS_REMOVE_TOURS_WHEN_VIEW_CLOSED		= "STATE_IS_REMOVE_TOURS_WHEN_VIEW_CLOSED"; //$NON-NLS-1$
 
 	public static final String				STATE_IS_MERGE_TRACKS						= "isMergeTracks";							//$NON-NLS-1$
+
 	public static final String				STATE_IS_CHECKSUM_VALIDATION				= "isChecksumValidation";					//$NON-NLS-1$
 	public static final String				STATE_IS_CONVERT_WAYPOINTS					= "STATE_IS_CONVERT_WAYPOINTS";			//$NON-NLS-1$
 	public static final String				STATE_IS_CREATE_TOUR_ID_WITH_TIME			= "isCreateTourIdWithTime";				//$NON-NLS-1$
-
 	public static final boolean				STATE_IS_MERGE_TRACKS_DEFAULT				= false;
+
 	public static final boolean				STATE_IS_CHECKSUM_VALIDATION_DEFAULT		= true;
 	public static final boolean				STATE_IS_CONVERT_WAYPOINTS_DEFAULT			= true;
 	public static final boolean				STATE_IS_CREATE_TOUR_ID_WITH_TIME_DEFAULT	= false;
-
 	public static final String				IMAGE_DATA_TRANSFER							= "IMAGE_DATA_TRANSFER";					//$NON-NLS-1$
+
 	public static final String				IMAGE_DATA_TRANSFER_DIRECT					= "IMAGE_DATA_TRANSFER_DIRECT";			//$NON-NLS-1$
 	public static final String				IMAGE_IMPORT								= "IMAGE_IMPORT";							//$NON-NLS-1$
 	public static final String				IMAGE_AUTOMATED_IMPORT						= "IMAGE_AUTOMATED_IMPORT";				//$NON-NLS-1$
-
 	private final IPreferenceStore			_prefStore									= TourbookPlugin.getPrefStore();
-	private final IDialogSettings			_state										= TourbookPlugin.getState(ID);
 
+	private final IDialogSettings			_state										= TourbookPlugin.getState(ID);
 	private RawDataManager					_rawDataMgr									= RawDataManager.getInstance();
 
 	private PostSelectionProvider			_postSelectionProvider;
+
 	private IPartListener2					_partListener;
 	private ISelectionListener				_postSelectionListener;
 	private IPropertyChangeListener			_prefChangeListener;
 	private ITourEventListener				_tourEventListener;
-
 	// context menu actions
 	private ActionClearView					_actionClearView;
+
 	private ActionExport					_actionExportTour;
 	private ActionEditQuick					_actionEditQuick;
 	private ActionEditTour					_actionEditTour;
@@ -200,7 +204,6 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	private ActionSaveTourInDatabase		_actionSaveTour;
 	private ActionSaveTourInDatabase		_actionSaveTourWithPerson;
 	private ActionSetTourTypeMenu			_actionSetTourType;
-
 	// view actions
 	private ActionRemoveToursWhenClosed		_actionRemoveToursWhenClosed;
 //	private ActionAdjustYear				_actionAdjustImportedYear;
@@ -209,11 +212,11 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 //	private ActionMergeGPXTours				_actionMergeGPXTours;
 
 	protected TourPerson					_activePerson;
+
 	protected TourPerson					_newActivePerson;
-
 	protected boolean						_isPartVisible								= false;
-	protected boolean						_isViewerPersonDataDirty					= false;
 
+	protected boolean						_isViewerPersonDataDirty					= false;
 	private ColumnManager					_columnManager;
 
 	private final Calendar					_calendar									= GregorianCalendar
@@ -221,14 +224,15 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 	private final DateFormat				_dateFormatter								= DateFormat
 																								.getDateInstance(DateFormat.SHORT);
+
 	private final DateFormat				_timeFormatter								= DateFormat
 																								.getTimeInstance(DateFormat.SHORT);
 	private final DateFormat				_durationFormatter							= DateFormat.getTimeInstance(
 																								DateFormat.SHORT,
 																								Locale.GERMAN);
-
 	private final NumberFormat				_nf1										= NumberFormat
 																								.getNumberInstance();
+
 	private final NumberFormat				_nf3										= NumberFormat
 																								.getNumberInstance();
 	{
@@ -237,44 +241,43 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		_nf3.setMinimumFractionDigits(3);
 		_nf3.setMaximumFractionDigits(3);
 	}
-
 	private boolean							_isToolTipInDate;
+
 	private boolean							_isToolTipInTime;
 	private boolean							_isToolTipInTitle;
 	private boolean							_isToolTipInTags;
-
 	private TagMenuManager					_tagMenuMgr;
-	private TourDoubleClickState			_tourDoubleClickState						= new TourDoubleClickState();
 
+	private TourDoubleClickState			_tourDoubleClickState						= new TourDoubleClickState();
 	private int								_linkDefaultWidth;
 
 	private HashMap<Long, Image>			_configImages								= new HashMap<>();
-	private HashMap<Long, Integer>			_configImageHash							= new HashMap<>();
 
+	private HashMap<Long, Integer>			_configImageHash							= new HashMap<>();
 	/*
 	 * resources
 	 */
 	private ImageDescriptor					_imageDescDatabase;
+
 	private ImageDescriptor					_imageDescDatabaseOtherPerson;
 	private ImageDescriptor					_imageDescDatabaseAssignMergedTour;
 	private ImageDescriptor					_imageDescDatabasePlaceholder;
 	private ImageDescriptor					_imageDescDelete;
-
 	private Image							_imageDatabase;
+
 	private Image							_imageDatabaseOtherPerson;
 	private Image							_imageDatabaseAssignMergedTour;
 	private Image							_imageDatabasePlaceholder;
 	private Image							_imageDelete;
-
 	/*
 	 * UI controls
 	 */
 	private PageBook						_pageBook;
+
 	private Composite						_pageImportActions;
 	private Composite						_pageViewerContainer;
 	private Composite						_innerAutoImportContainer;
 	private Composite						_outerAutoImportContainer;
-
 	private TableViewer						_tourViewer;
 
 	private TableViewerTourInfoToolTip		_tourInfoToolTip;
@@ -282,6 +285,21 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	private PixelConverter					_pc;
 
 	private ScrolledComposite				_pageTipsScrolledContainer;
+
+	private class ActionAutoImport extends Action {
+
+		private int	__configIndex;
+
+		public ActionAutoImport(final int configIndex) {
+
+			__configIndex = configIndex;
+		}
+
+		@Override
+		public void run() {
+			actionRunAutoImport(__configIndex);
+		}
+	}
 
 	private class TourDataContentProvider implements IStructuredContentProvider {
 
@@ -371,6 +389,11 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		reloadViewer();
 	}
 
+	private void actionRunAutoImport(final int configIndex) {
+		// TODO Auto-generated method stub
+
+	}
+
 	void actionSaveTour(final TourPerson person) {
 
 		final ArrayList<TourData> savedTours = new ArrayList<TourData>();
@@ -428,7 +451,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 			importConfigs.clear();
 			importConfigs.addAll(modifiedConfigs);
 
-			RawDataManager.getInstance().saveImportConfig(modifiedConfigs);
+			RawDataManager.getInstance().saveImportConfig(importConfigs);
 
 			createUI_14_AutoImport_InnerContainer();
 
@@ -526,7 +549,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 					// measurement system has changed
 
-					UI.updateUnits();
+					net.tourbook.ui.UI.updateUnits();
 
 					_columnManager.saveState(_state);
 					_columnManager.clearColumns();
@@ -638,45 +661,6 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		_actionSetTourType = new ActionSetTourTypeMenu(this);
 
 		_tagMenuMgr = new TagMenuManager(this, true);
-	}
-
-	private String createConfigTooltip(final AutomatedImportConfig importConfig) {
-
-		final Enum<TourTypeConfig> tourTypeConfig = importConfig.tourTypeConfig;
-
-		final StringBuilder sb = new StringBuilder();
-		sb.append(importConfig.name);
-
-		sb.append(UI.NEW_LINE);
-		sb.append(UI.NEW_LINE);
-
-		if (TourTypeConfig.TOUR_TYPE_CONFIG_BY_SPEED.equals(tourTypeConfig)) {
-
-			for (final SpeedVertex vertex : importConfig.speedVertices) {
-
-				sb.append('<');
-				sb.append(vertex.avgSpeed);
-				sb.append(net.tourbook.common.UI.TAB);
-				sb.append(TourDatabase.getTourTypeName(vertex.tourTypeId));
-				sb.append(UI.NEW_LINE);
-			}
-
-		} else if (TourTypeConfig.TOUR_TYPE_CONFIG_ONE_FOR_ALL.equals(tourTypeConfig)) {
-
-			if (importConfig.oneTourType != null) {
-
-				sb.append(TourDatabase.getTourTypeName(importConfig.oneTourType.getTypeId()));
-				sb.append(UI.NEW_LINE);
-			}
-
-		} else {
-
-			// this is the default or TourTypeConfig.TOUR_TYPE_CONFIG_NOT_USED
-
-			sb.append(Messages.Import_Data_TourTypeConfig_NotUsed);
-		}
-
-		return sb.toString();
 	}
 
 	@Override
@@ -878,95 +862,85 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		}
 
 		_innerAutoImportContainer = new Composite(_outerAutoImportContainer, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(_innerAutoImportContainer);
-		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(_innerAutoImportContainer);
-//		_innerAutoImportContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
+		GridDataFactory.fillDefaults()//
+				.grab(false, false)
+				.applyTo(_innerAutoImportContainer);
+		GridLayoutFactory.fillDefaults()//
+				.numColumns(1)
+				.spacing(0, 0)
+				.applyTo(_innerAutoImportContainer);
+//		_innerAutoImportContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_DARK_GRAY));
 		{
 
 			final ArrayList<AutomatedImportConfig> importConfigs = RawDataManager.getInstance().getAutoImportConfigs();
 
+			// create an action for each import configuration
 			for (int configIndex = 0; configIndex < importConfigs.size(); configIndex++) {
 
 				final AutomatedImportConfig importConfig = importConfigs.get(configIndex);
+
 				final String configName = importConfig.name;
+				final String configTooltip = createUI_ConfigTooltip(importConfig);
 
-				final String configTooltip = createConfigTooltip(importConfig);
-
-				/*
-				 * Action: Start import
-				 */
-
-//				final ToolBar toolbar = new ToolBar(parent, SWT.FLAT);
-//
-//				final ToolBarManager tbm = new ToolBarManager(toolbar);
-//
-//				tbm.add(_action_VertexAdd);
-//
-//				tbm.update(true);
-
-				final Link link = new Link(_innerAutoImportContainer, SWT.NONE);
-				GridDataFactory.fillDefaults()//
-//						.align(SWT.END, SWT.FILL)
-						.applyTo(link);
-
-				link.setText(configName.length() == 0 //
+				final String actionText = configName.length() == 0 //
 						? Messages.Import_Data_Link_ConfigName
-						: net.tourbook.common.UI.LINK_TAG_START + configName + net.tourbook.common.UI.LINK_TAG_END);
-				link.setToolTipText(configTooltip);
+						: configName;
 
-				// keep reference to this config
-				link.setData(configIndex);
-
-				link.addSelectionListener(new SelectionAdapter() {
-					@Override
-					public void widgetSelected(final SelectionEvent e) {
-						onSelectImportConfig(e);
-					}
-				});
+				final Image importConfigImage = getImportConfigImage(importConfig);
 
 				/*
 				 * Icon
 				 */
-				final Label label = new Label(_innerAutoImportContainer, SWT.NONE);
-				GridDataFactory.fillDefaults().applyTo(label);
-				label.setImage(getImportConfigImage(importConfig));
-				label.setToolTipText(configTooltip);
+//				{
+//
+//					if (importConfigImage == null) {
+//
+//						// fill left column
+//						new Label(_innerAutoImportContainer, SWT.NONE);
+//
+//					} else {
+//
+//						final ActionAutoImport actionAutoImportIcon = new ActionAutoImport(configIndex);
+//						actionAutoImportIcon.setToolTipText(configTooltip);
+//						actionAutoImportIcon.setImageDescriptor(ImageDescriptor.createFromImage(importConfigImage));
+//
+//						final ToolBar toolbar = new ToolBar(_innerAutoImportContainer, SWT.FLAT);
+//						GridDataFactory.fillDefaults()//
+//								.align(SWT.END, SWT.FILL)
+//								.applyTo(toolbar);
+//						final ToolBarManager tbm = new ToolBarManager(toolbar);
+//						tbm.add(actionAutoImportIcon);
+//						tbm.update(true);
+//					}
+//				}
+
+				/*
+				 * Text
+				 */
+				{
+					final ActionAutoImport actionAutoImportText = new ActionAutoImport(configIndex);
+					actionAutoImportText.setText(actionText);
+					actionAutoImportText.setToolTipText(configTooltip);
+
+					if (importConfigImage != null) {
+						actionAutoImportText.setImageDescriptor(ImageDescriptor.createFromImage(importConfigImage));
+					}
+
+					final ActionContributionItem item = new ActionContributionItem(actionAutoImportText);
+					item.setMode(ActionContributionItem.MODE_FORCE_TEXT);
+
+					final ToolBar toolbar = new ToolBar(_innerAutoImportContainer, SWT.FLAT | SWT.RIGHT);
+					GridDataFactory.fillDefaults()//
+//							.grab(true, false)
+//							.align(SWT.END, SWT.FILL)
+							.applyTo(toolbar);
+
+					final ToolBarManager tbm = new ToolBarManager(toolbar);
+					tbm.add(item);
+					tbm.update(true);
+				}
 			}
 		}
-	}
-
-	/**
-	 * create the views context menu
-	 */
-	private void createUI_20_ContextMenu() {
-
-		final Table table = (Table) _tourViewer.getControl();
-
-		final MenuManager menuMgr = new MenuManager("#PopupMenu"); //$NON-NLS-1$
-		menuMgr.setRemoveAllWhenShown(true);
-		menuMgr.addMenuListener(new IMenuListener() {
-			@Override
-			public void menuAboutToShow(final IMenuManager manager) {
-				fillContextMenu(manager);
-			}
-		});
-
-		final Menu tableContextMenu = menuMgr.createContextMenu(table);
-		tableContextMenu.addMenuListener(new MenuAdapter() {
-			@Override
-			public void menuHidden(final MenuEvent e) {
-				_tagMenuMgr.onHideMenu();
-			}
-
-			@Override
-			public void menuShown(final MenuEvent menuEvent) {
-				_tagMenuMgr.onShowMenu(menuEvent, table, Display.getCurrent().getCursorLocation(), _tourInfoToolTip);
-			}
-		});
-
-		getSite().registerContextMenu(menuMgr, _tourViewer);
-
-		_columnManager.createHeaderContextMenu(table, tableContextMenu);
 	}
 
 	/**
@@ -1010,16 +984,105 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		// set tour info tooltip provider
 		_tourInfoToolTip = new TableViewerTourInfoToolTip(_tourViewer);
 
-		createUI_20_ContextMenu();
+		createUI_22_ContextMenu();
+	}
+
+	/**
+	 * create the views context menu
+	 */
+	private void createUI_22_ContextMenu() {
+
+		final Table table = (Table) _tourViewer.getControl();
+
+		final MenuManager menuMgr = new MenuManager("#PopupMenu"); //$NON-NLS-1$
+		menuMgr.setRemoveAllWhenShown(true);
+		menuMgr.addMenuListener(new IMenuListener() {
+			@Override
+			public void menuAboutToShow(final IMenuManager manager) {
+				fillContextMenu(manager);
+			}
+		});
+
+		final Menu tableContextMenu = menuMgr.createContextMenu(table);
+		tableContextMenu.addMenuListener(new MenuAdapter() {
+			@Override
+			public void menuHidden(final MenuEvent e) {
+				_tagMenuMgr.onHideMenu();
+			}
+
+			@Override
+			public void menuShown(final MenuEvent menuEvent) {
+				_tagMenuMgr.onShowMenu(menuEvent, table, Display.getCurrent().getCursorLocation(), _tourInfoToolTip);
+			}
+		});
+
+		getSite().registerContextMenu(menuMgr, _tourViewer);
+
+		_columnManager.createHeaderContextMenu(table, tableContextMenu);
+	}
+
+	private String createUI_ConfigTooltip(final AutomatedImportConfig importConfig) {
+
+		final Enum<TourTypeConfig> tourTypeConfig = importConfig.tourTypeConfig;
+
+		final StringBuilder sb = new StringBuilder();
+
+		/*
+		 * Config name
+		 */
+		final String configName = importConfig.name;
+		if (configName.length() > 0) {
+
+			sb.append(configName);
+
+			sb.append(UI.NEW_LINE);
+			sb.append(UI.NEW_LINE);
+		}
+
+		/*
+		 * Tour types
+		 */
+		if (TourTypeConfig.TOUR_TYPE_CONFIG_BY_SPEED.equals(tourTypeConfig)) {
+
+			for (final SpeedVertex vertex : importConfig.speedVertices) {
+
+				final float speed = vertex.avgSpeed / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
+
+				sb.append('<');
+				sb.append((int) speed);
+				sb.append(UI.SPACE2);
+				sb.append(UI.UNIT_LABEL_SPEED);
+				sb.append(UI.SPACE2);
+				sb.append(TourDatabase.getTourTypeName(vertex.tourTypeId));
+				sb.append(UI.NEW_LINE);
+			}
+
+		} else if (TourTypeConfig.TOUR_TYPE_CONFIG_ONE_FOR_ALL.equals(tourTypeConfig)) {
+
+			if (importConfig.oneTourType != null) {
+
+				sb.append(TourDatabase.getTourTypeName(importConfig.oneTourType.getTypeId()));
+				sb.append(UI.NEW_LINE);
+			}
+
+		} else {
+
+			// this is the default or TourTypeConfig.TOUR_TYPE_CONFIG_NOT_USED
+
+			sb.append(Messages.Import_Data_TourTypeConfig_NotUsed);
+		}
+
+		return sb.toString();
 	}
 
 	private Link createUI_Link(final Composite parent, final String image, final String text) {
 
-		final CLabel iconImport = new CLabel(parent, SWT.NONE);
+		final Label iconImport = new Label(parent, SWT.NONE);
 		GridDataFactory.fillDefaults()//
 //				.indent(0, 10)
+				.hint(16, 16)
 				.applyTo(iconImport);
-		iconImport.setImage(UI.IMAGE_REGISTRY.get(image));
+		iconImport.setImage(net.tourbook.ui.UI.IMAGE_REGISTRY.get(image));
 
 		final Link linkImport = new Link(parent, SWT.NONE);
 		GridDataFactory.fillDefaults()//
@@ -1080,7 +1143,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 			public void update(final ViewerCell cell) {
 				final int tourAltDown = ((TourData) cell.getElement()).getTourAltDown();
 				if (tourAltDown != 0) {
-					cell.setText(Long.toString((long) (-tourAltDown / UI.UNIT_VALUE_ALTITUDE)));
+					cell.setText(Long.toString((long) (-tourAltDown / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE)));
 				}
 			}
 		});
@@ -1101,7 +1164,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 			public void update(final ViewerCell cell) {
 				final int tourAltUp = ((TourData) cell.getElement()).getTourAltUp();
 				if (tourAltUp != 0) {
-					cell.setText(Long.toString((long) (tourAltUp / UI.UNIT_VALUE_ALTITUDE)));
+					cell.setText(Long.toString((long) (tourAltUp / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE)));
 				}
 			}
 		});
@@ -1125,9 +1188,9 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 				final float pace = tourDistance == 0 ? //
 						0
-						: drivingTime * 1000 / tourDistance * UI.UNIT_VALUE_DISTANCE;
+						: drivingTime * 1000 / tourDistance * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
 
-				cell.setText(UI.format_mm_ss((long) pace));
+				cell.setText(net.tourbook.ui.UI.format_mm_ss((long) pace));
 			}
 		});
 	}
@@ -1150,7 +1213,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 				double speed = 0;
 
 				if (drivingTime != 0) {
-					speed = tourDistance / drivingTime * 3.6 / UI.UNIT_VALUE_DISTANCE;
+					speed = tourDistance / drivingTime * 3.6 / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
 				}
 
 				cell.setText(speed == 0.0 ? UI.EMPTY_STRING : _nf1.format(speed));
@@ -1273,7 +1336,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 				if (tourDistance == 0) {
 					cell.setText(UI.EMPTY_STRING);
 				} else {
-					cell.setText(_nf3.format(tourDistance / 1000 / UI.UNIT_VALUE_DISTANCE));
+					cell.setText(_nf3.format(tourDistance / 1000 / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE));
 				}
 			}
 		});
@@ -1527,13 +1590,16 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 			@Override
 			public void update(final ViewerCell cell) {
 
+				final net.tourbook.ui.UI ui = net.tourbook.ui.UI.getInstance();
+
 				final TourType tourType = ((TourData) cell.getElement()).getTourType();
+
 				if (tourType == null) {
-					cell.setImage(UI.getInstance().getTourTypeImage(TourDatabase.ENTITY_IS_NOT_SAVED));
+					cell.setImage(ui.getTourTypeImage(TourDatabase.ENTITY_IS_NOT_SAVED));
 				} else {
 
 					final long tourTypeId = tourType.getTypeId();
-					final Image tourTypeImage = UI.getInstance().getTourTypeImage(tourTypeId);
+					final Image tourTypeImage = ui.getTourTypeImage(tourTypeId);
 
 					/*
 					 * when a tour type image is modified, it will keep the same image resource only
@@ -1583,7 +1649,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 				if (weatherCloudId == null) {
 					cell.setText(UI.EMPTY_STRING);
 				} else {
-					final Image img = net.tourbook.common.UI.IMAGE_REGISTRY.get(weatherCloudId);
+					final Image img = UI.IMAGE_REGISTRY.get(weatherCloudId);
 					if (img != null) {
 						cell.setImage(img);
 					} else {
@@ -1977,6 +2043,12 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 	public Image getImportConfigImage(final AutomatedImportConfig importConfig) {
 
+		final int imageWidth = importConfig.imageWidth;
+
+		if (imageWidth == 0) {
+			return null;
+		}
+
 		final long configId = importConfig.getCreateId();
 		Image image = _configImages.get(configId);
 
@@ -1992,9 +2064,9 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		if (TourTypeConfig.TOUR_TYPE_CONFIG_BY_SPEED.equals(tourTypeConfig)) {
 
 			final ArrayList<SpeedVertex> speedVertices = importConfig.speedVertices;
-			final int imageSize = net.tourbook.common.UI.TOUR_TYPE_IMAGE_SIZE;
+			final int imageSize = UI.TOUR_TYPE_IMAGE_SIZE;
 
-			final Image ttConfigImage = new Image(display, importConfig.imageWidth, imageSize);
+			final Image ttConfigImage = new Image(display, imageWidth, imageSize);
 			final GC gcImage = new GC(ttConfigImage);
 			{
 				for (int imageIndex = 0; imageIndex < speedVertices.size(); imageIndex++) {
@@ -2035,10 +2107,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 			if (tourType != null) {
 
 				// create a copy because the copied image can be disposed
-				final Image newImage = new Image(
-						display,
-						net.tourbook.common.UI.TOUR_TYPE_IMAGE_SIZE,
-						net.tourbook.common.UI.TOUR_TYPE_IMAGE_SIZE);
+				final Image newImage = new Image(display, UI.TOUR_TYPE_IMAGE_SIZE, UI.TOUR_TYPE_IMAGE_SIZE);
 				final GC gcImage = new GC(newImage);
 				{
 					final Image ttImage = ui.getTourTypeImage(tourType.getTypeId());

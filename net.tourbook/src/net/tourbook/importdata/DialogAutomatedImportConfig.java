@@ -47,6 +47,7 @@ import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.jface.util.LocalSelectionTransfer;
 import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.ColumnWeightData;
@@ -60,9 +61,15 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
-import org.eclipse.jface.viewers.ViewerComparator;
+import org.eclipse.jface.viewers.ViewerDropAdapter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
+import org.eclipse.swt.dnd.DND;
+import org.eclipse.swt.dnd.DragSourceEvent;
+import org.eclipse.swt.dnd.DragSourceListener;
+import org.eclipse.swt.dnd.DropTargetEvent;
+import org.eclipse.swt.dnd.Transfer;
+import org.eclipse.swt.dnd.TransferData;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.DisposeEvent;
@@ -103,19 +110,17 @@ import org.eclipse.ui.part.PageBook;
  */
 public class DialogAutomatedImportConfig extends TitleAreaDialog implements ITourViewer {
 
-	private static final String					ID									= "net.tourbook.importdata.DialogAutomatedImportConfig";	//$NON-NLS-1$
+	private static final String					ID							= "net.tourbook.importdata.DialogAutomatedImportConfig";	//$NON-NLS-1$
 	//
-	private static final String					STATE_CONFIG_VIEWER_SORT_DIRECTION	= "STATE_CONFIG_VIEWER_SORT_DIRECTION";					//$NON-NLS-1$
-	private static final String					STATE_SELECTED_CONFIG_NAME			= "STATE_SELECTED_CONFIG_NAME";							//$NON-NLS-1$
+	private static final String					STATE_SELECTED_CONFIG_NAME	= "STATE_SELECTED_CONFIG_NAME";							//$NON-NLS-1$
 	//
-	private static final String					DATA_KEY_TOUR_TYPE_ID				= "DATA_KEY_TOUR_TYPE_ID";									//$NON-NLS-1$
-	private static final String					DATA_KEY_VERTEX_INDEX				= "DATA_KEY_VERTEX_INDEX";									//$NON-NLS-1$
+	private static final String					DATA_KEY_TOUR_TYPE_ID		= "DATA_KEY_TOUR_TYPE_ID";									//$NON-NLS-1$
+	private static final String					DATA_KEY_VERTEX_INDEX		= "DATA_KEY_VERTEX_INDEX";									//$NON-NLS-1$
 	//
 	//
-	private final IDialogSettings				_state								= TourbookPlugin.getState(ID);
+	private final IDialogSettings				_state						= TourbookPlugin.getState(ID);
 	//
 	private SelectionAdapter					_defaultSelectionListener;
-	private SelectionAdapter					_sortSelectionListener;
 	private SelectionAdapter					_vertexTourTypeListener;
 	private MouseWheelListener					_vertexValueMouseWheelListener;
 	//
@@ -155,11 +160,12 @@ public class DialogAutomatedImportConfig extends TitleAreaDialog implements ITou
 	private TableColumnDefinition				_colDefProfileImage;
 	private int									_columnIndexConfigImage;
 
-	private ConfigComparator					_configComparator;
 	private AutomatedImportConfig				_initialConfig;
 
-	private HashMap<Long, Image>				_configImages						= new HashMap<>();
-	private HashMap<Long, Integer>				_configImageHash					= new HashMap<>();
+	private HashMap<Long, Image>				_configImages				= new HashMap<>();
+	private HashMap<Long, Integer>				_configImageHash			= new HashMap<>();
+
+	private long								_dragStart;
 
 	/*
 	 * UI controls
@@ -355,54 +361,6 @@ public class DialogAutomatedImportConfig extends TitleAreaDialog implements ITou
 		}
 	}
 
-//	@Override
-//	public void dispose() {
-//
-//		disposeProfileImages();
-//
-//		super.dispose();
-//	}
-
-	private final class ConfigComparator extends ViewerComparator {
-
-		private int	__sortDirection	= SWT.UP;
-
-		@Override
-		public int compare(final Viewer viewer, final Object e1, final Object e2) {
-
-			// compare by name
-
-			final AutomatedImportConfig p1 = (AutomatedImportConfig) e1;
-			final AutomatedImportConfig p2 = (AutomatedImportConfig) e2;
-
-			int rc = p1.name.compareTo(p2.name);
-
-			// If descending order, flip the direction
-			if (__sortDirection == SWT.DOWN) {
-				rc = -rc;
-			}
-
-			/*
-			 * MUST return 1 or -1 otherwise long values are not sorted correctly.
-			 */
-			return rc > 0 //
-					? 1
-					: rc < 0 //
-							? -1
-							: 0;
-		}
-
-		/**
-		 * @return Returns the sort direction.
-		 */
-		int toggleSort() {
-
-			__sortDirection = __sortDirection == SWT.UP ? SWT.DOWN : SWT.UP;
-
-			return __sortDirection;
-		}
-	}
-
 	public DialogAutomatedImportConfig(	final Shell parentShell,
 										final ArrayList<AutomatedImportConfig> importConfigs,
 										final RawDataView rawDataView) {
@@ -595,7 +553,8 @@ public class DialogAutomatedImportConfig extends TitleAreaDialog implements ITou
 			{
 				createUI_20_ConfigTitle(configContainer);
 				createUI_22_ConfigViewer_Container(configContainer);
-				createUI_29_ConfigActions(configContainer);
+				createUI_24_ConfigActions(configContainer);
+				createUI_26_DragDropHint(configContainer);
 			}
 
 			final Group group = new Group(container, SWT.NONE);
@@ -603,7 +562,7 @@ public class DialogAutomatedImportConfig extends TitleAreaDialog implements ITou
 					.grab(true, false)
 					.span(2, 1)
 //					.hint(SWT.DEFAULT, convertVerticalDLUsToPixels(188))
-//					.indent(0, convertVerticalDLUsToPixels(4))
+					.indent(0, convertVerticalDLUsToPixels(8))
 					.applyTo(group);
 			GridLayoutFactory.swtDefaults().numColumns(2).applyTo(group);
 			group.setText(Messages.Dialog_AutoImportConfig_Group_Configuration);
@@ -641,72 +600,7 @@ public class DialogAutomatedImportConfig extends TitleAreaDialog implements ITou
 		}
 	}
 
-	private void createUI_24_ConfigViewer_Table(final Composite parent) {
-
-		/*
-		 * Create tree
-		 */
-		final Table table = new Table(parent, //
-				SWT.H_SCROLL //
-						| SWT.V_SCROLL
-						| SWT.BORDER
-						| SWT.FULL_SELECTION);
-		GridDataFactory.fillDefaults().grab(true, true).applyTo(table);
-
-		table.setHeaderVisible(true);
-
-		/*
-		 * NOTE: MeasureItem, PaintItem and EraseItem are called repeatedly. Therefore, it is
-		 * critical for performance that these methods be as efficient as possible.
-		 */
-		final Listener paintListener = new Listener() {
-			@Override
-			public void handleEvent(final Event event) {
-
-				if (event.type == SWT.MeasureItem || event.type == SWT.PaintItem) {
-					onPaintViewer(event);
-				}
-			}
-		};
-		table.addListener(SWT.MeasureItem, paintListener);
-		table.addListener(SWT.PaintItem, paintListener);
-
-		/*
-		 * Create tree viewer
-		 */
-		_configViewer = new TableViewer(table);
-
-//		_columnManager.setColumnLayout(new TableColumnLayout());
-		_columnManager.createColumns(_configViewer);
-
-		final TableColumn sortColumn = table.getColumn(0);
-		table.setSortColumn(sortColumn);
-
-		_tcConfigImage = _colDefProfileImage.getTableColumn();
-		_columnIndexConfigImage = _colDefProfileImage.getCreateIndex();
-
-		_configViewer.setUseHashlookup(true);
-		_configViewer.setContentProvider(new ClientsContentProvider());
-		_configViewer.setComparator(_configComparator);
-
-		_configViewer.addSelectionChangedListener(new ISelectionChangedListener() {
-			@Override
-			public void selectionChanged(final SelectionChangedEvent event) {
-				onSelectConfig(event.getSelection());
-			}
-		});
-
-		_configViewer.addDoubleClickListener(new IDoubleClickListener() {
-			@Override
-			public void doubleClick(final DoubleClickEvent event) {
-				onConfig_DblClick();
-			}
-		});
-
-		createContextMenu();
-	}
-
-	private void createUI_29_ConfigActions(final Composite parent) {
+	private void createUI_24_ConfigActions(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults()//
@@ -760,6 +654,211 @@ public class DialogAutomatedImportConfig extends TitleAreaDialog implements ITou
 			gd.verticalAlignment = SWT.END;
 
 		}
+	}
+
+	private void createUI_24_ConfigViewer_Table(final Composite parent) {
+
+		/*
+		 * Create tree
+		 */
+		final Table table = new Table(parent, //
+				SWT.H_SCROLL //
+						| SWT.V_SCROLL
+						| SWT.BORDER
+						| SWT.FULL_SELECTION);
+		GridDataFactory.fillDefaults().grab(true, true).applyTo(table);
+
+		table.setHeaderVisible(true);
+
+		/*
+		 * NOTE: MeasureItem, PaintItem and EraseItem are called repeatedly. Therefore, it is
+		 * critical for performance that these methods be as efficient as possible.
+		 */
+		final Listener paintListener = new Listener() {
+			@Override
+			public void handleEvent(final Event event) {
+
+				if (event.type == SWT.MeasureItem || event.type == SWT.PaintItem) {
+					onPaintViewer(event);
+				}
+			}
+		};
+		table.addListener(SWT.MeasureItem, paintListener);
+		table.addListener(SWT.PaintItem, paintListener);
+
+		/*
+		 * Create tree viewer
+		 */
+		_configViewer = new TableViewer(table);
+
+//		_columnManager.setColumnLayout(new TableColumnLayout());
+		_columnManager.createColumns(_configViewer);
+
+		_tcConfigImage = _colDefProfileImage.getTableColumn();
+		_columnIndexConfigImage = _colDefProfileImage.getCreateIndex();
+
+		_configViewer.setUseHashlookup(true);
+		_configViewer.setContentProvider(new ClientsContentProvider());
+
+		_configViewer.addSelectionChangedListener(new ISelectionChangedListener() {
+			@Override
+			public void selectionChanged(final SelectionChangedEvent event) {
+				onSelectConfig(event.getSelection());
+			}
+		});
+
+		_configViewer.addDoubleClickListener(new IDoubleClickListener() {
+			@Override
+			public void doubleClick(final DoubleClickEvent event) {
+				onConfig_DblClick();
+			}
+		});
+
+		createContextMenu();
+
+		/*
+		 * set drag adapter
+		 */
+		_configViewer.addDragSupport(
+				DND.DROP_MOVE,
+				new Transfer[] { LocalSelectionTransfer.getTransfer() },
+				new DragSourceListener() {
+
+					@Override
+					public void dragFinished(final DragSourceEvent event) {
+
+						final LocalSelectionTransfer transfer = LocalSelectionTransfer.getTransfer();
+
+						if (event.doit == false) {
+							return;
+						}
+
+						transfer.setSelection(null);
+						transfer.setSelectionSetTime(0);
+					}
+
+					@Override
+					public void dragSetData(final DragSourceEvent event) {
+						// data are set in LocalSelectionTransfer
+					}
+
+					@Override
+					public void dragStart(final DragSourceEvent event) {
+
+						final LocalSelectionTransfer transfer = LocalSelectionTransfer.getTransfer();
+						final ISelection selection = _configViewer.getSelection();
+
+						transfer.setSelection(selection);
+						transfer.setSelectionSetTime(_dragStart = event.time & 0xFFFFFFFFL);
+
+						event.doit = !selection.isEmpty();
+					}
+				});
+
+		/*
+		 * set drop adapter
+		 */
+		final ViewerDropAdapter viewerDropAdapter = new ViewerDropAdapter(_configViewer) {
+
+			private Widget	_tableItem;
+
+			@Override
+			public void dragOver(final DropTargetEvent dropEvent) {
+
+				// keep table item
+				_tableItem = dropEvent.item;
+
+				super.dragOver(dropEvent);
+			}
+
+			@Override
+			public boolean performDrop(final Object data) {
+
+				if (data instanceof StructuredSelection) {
+					final StructuredSelection selection = (StructuredSelection) data;
+
+					if (selection.getFirstElement() instanceof AutomatedImportConfig) {
+
+						final AutomatedImportConfig filterItem = (AutomatedImportConfig) selection.getFirstElement();
+
+						final int location = getCurrentLocation();
+						final Table filterTable = _configViewer.getTable();
+
+						/*
+						 * check if drag was startet from this filter, remove the filter item before
+						 * the new filter is inserted
+						 */
+						if (LocalSelectionTransfer.getTransfer().getSelectionSetTime() == _dragStart) {
+							_configViewer.remove(filterItem);
+						}
+
+						int filterIndex;
+
+						if (_tableItem == null) {
+
+							_configViewer.add(filterItem);
+							filterIndex = filterTable.getItemCount() - 1;
+
+						} else {
+
+							// get index of the target in the table
+							filterIndex = filterTable.indexOf((TableItem) _tableItem);
+							if (filterIndex == -1) {
+								return false;
+							}
+
+							if (location == LOCATION_BEFORE) {
+								_configViewer.insert(filterItem, filterIndex);
+							} else if (location == LOCATION_AFTER || location == LOCATION_ON) {
+								_configViewer.insert(filterItem, ++filterIndex);
+							}
+						}
+
+						// reselect filter item
+						_configViewer.setSelection(new StructuredSelection(filterItem));
+
+						// set focus to selection
+						filterTable.setSelection(filterIndex);
+						filterTable.setFocus();
+
+						return true;
+					}
+				}
+
+				return false;
+			}
+
+			@Override
+			public boolean validateDrop(final Object target, final int operation, final TransferData transferType) {
+
+				final ISelection selection = LocalSelectionTransfer.getTransfer().getSelection();
+				if (selection instanceof StructuredSelection) {
+					final Object dragFilter = ((StructuredSelection) selection).getFirstElement();
+					if (target == dragFilter) {
+						return false;
+					}
+				}
+
+				if (LocalSelectionTransfer.getTransfer().isSupportedType(transferType) == false) {
+					return false;
+				}
+
+				return true;
+			}
+
+		};
+
+		_configViewer.addDropSupport(
+				DND.DROP_MOVE,
+				new Transfer[] { LocalSelectionTransfer.getTransfer() },
+				viewerDropAdapter);
+	}
+
+	private void createUI_26_DragDropHint(final Composite parent) {
+
+		final Label label = new Label(parent, SWT.WRAP);
+		GridDataFactory.fillDefaults().span(2, 1).applyTo(label);
+		label.setText(Messages.Dialog_AutoImportConfig_Info_ConfigDragDrop);
 	}
 
 	private void createUI_40_Name(final Composite parent) {
@@ -1182,23 +1281,20 @@ public class DialogAutomatedImportConfig extends TitleAreaDialog implements ITou
 	 * 
 	 * @param parent
 	 * @param action
-	 * @return
 	 */
-	private ToolBarManager createUI_ActionButton(final Composite parent, final Action action) {
+	private void createUI_ActionButton(final Composite parent, final Action action) {
 
 		final ToolBar toolbar = new ToolBar(parent, SWT.FLAT);
 
 		final ToolBarManager tbm = new ToolBarManager(toolbar);
 		tbm.add(action);
 		tbm.update(true);
-
-		return tbm;
 	}
 
 	private void defineAllColumns() {
 
 		defineColumn_10_ProfileName();
-		defineColumn_30_ColorImage();
+		defineColumn_20_ColorImage();
 	}
 
 	/**
@@ -1210,7 +1306,6 @@ public class DialogAutomatedImportConfig extends TitleAreaDialog implements ITou
 
 		colDef.setColumnLabel(Messages.Dialog_AutoImportConfig_Column_Name);
 		colDef.setColumnHeaderText(Messages.Dialog_AutoImportConfig_Column_Name);
-		colDef.setColumnSelectionListener(_sortSelectionListener);
 
 		colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(10));
 		colDef.setColumnWeightData(new ColumnWeightData(10));
@@ -1230,7 +1325,7 @@ public class DialogAutomatedImportConfig extends TitleAreaDialog implements ITou
 	/**
 	 * Column: Color image
 	 */
-	private void defineColumn_30_ColorImage() {
+	private void defineColumn_20_ColorImage() {
 
 		final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager, "colorImage", SWT.LEAD); //$NON-NLS-1$
 		_colDefProfileImage = colDef;
@@ -1470,12 +1565,6 @@ public class DialogAutomatedImportConfig extends TitleAreaDialog implements ITou
 				onSelectDefault();
 			}
 		};
-		_sortSelectionListener = new SelectionAdapter() {
-			@Override
-			public void widgetSelected(final SelectionEvent e) {
-				onConfig_SortColumn(e.widget);
-			}
-		};
 
 		/*
 		 * Vertex listener
@@ -1493,8 +1582,6 @@ public class DialogAutomatedImportConfig extends TitleAreaDialog implements ITou
 				UI.openControlMenu((Link) event.widget);
 			}
 		};
-
-		_configComparator = new ConfigComparator();
 	}
 
 	@Override
@@ -1624,30 +1711,6 @@ public class DialogAutomatedImportConfig extends TitleAreaDialog implements ITou
 		}
 
 		_configViewer.getTable().setFocus();
-	}
-
-	private void onConfig_SortColumn(final Widget widget) {
-
-		final Table table = _configViewer.getTable();
-
-		// set UI sort indicator
-		final int sortDirection = _configComparator.toggleSort();
-		table.setSortDirection(sortDirection);
-
-		_viewerContainer.setRedraw(false);
-		{
-			// keep selection
-			final ISelection selectionBackup = _configViewer.getSelection();
-			{
-				// update viewer with new sorting
-				_configViewer.refresh();
-			}
-			_configViewer.setSelection(selectionBackup);
-
-			table.setSelection(table.getSelectionIndex());
-			table.showSelection();
-		}
-		_viewerContainer.setRedraw(true);
 	}
 
 	private void onData_SelectBrowseDirectory(final Widget widget) {
@@ -1838,10 +1901,6 @@ public class DialogAutomatedImportConfig extends TitleAreaDialog implements ITou
 
 	private void restoreState() {
 
-		final int stateSortDirection = Util.getStateInt(_state, STATE_CONFIG_VIEWER_SORT_DIRECTION, SWT.UP);
-		_configComparator.__sortDirection = stateSortDirection;
-		_configViewer.getTable().setSortDirection(stateSortDirection);
-
 		/*
 		 * Reselect previous selected config
 		 */
@@ -1865,9 +1924,25 @@ public class DialogAutomatedImportConfig extends TitleAreaDialog implements ITou
 	private void saveState() {
 
 		_state.put(STATE_SELECTED_CONFIG_NAME, _currentConfig == null ? UI.EMPTY_STRING : _currentConfig.name);
-		_state.put(STATE_CONFIG_VIEWER_SORT_DIRECTION, _configComparator.__sortDirection);
 
 		_columnManager.saveState(_state);
+
+		/*
+		 * Create config list in the table sort order
+		 */
+		final ArrayList<AutomatedImportConfig> tableConfigs = new ArrayList<>();
+
+		for (final TableItem tableItem : _configViewer.getTable().getItems()) {
+
+			final Object itemData = tableItem.getData();
+
+			if (itemData instanceof AutomatedImportConfig) {
+				tableConfigs.add((AutomatedImportConfig) itemData);
+			}
+		}
+
+		_dialogConfigs.clear();
+		_dialogConfigs.addAll(tableConfigs);
 	}
 
 	private void selectTourTypePage(final Enum<TourTypeConfig> selectedConfig) {
@@ -1904,9 +1979,6 @@ public class DialogAutomatedImportConfig extends TitleAreaDialog implements ITou
 			// Setup default config
 			createDefaultConfig();
 		}
-
-		// sort by name
-		Collections.sort(_dialogConfigs);
 	}
 
 	/**

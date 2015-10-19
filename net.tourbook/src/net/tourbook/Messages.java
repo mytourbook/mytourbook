@@ -123,6 +123,8 @@ public class Messages extends NLS {
 	public static String		Dialog_AutoImportConfig_Dialog_Title;
 	public static String		Dialog_AutoImportConfig_Group_Configuration;
 	public static String		Dialog_AutoImportConfig_Group_TourType;
+
+	public static String	Dialog_AutoImportConfig_Info_ConfigDragDrop;
 	public static String		Dialog_AutoImportConfig_Label_BackupFolder;
 	public static String		Dialog_AutoImportConfig_Label_ConfigName;
 	public static String		Dialog_AutoImportConfig_Label_ConfigTitle;

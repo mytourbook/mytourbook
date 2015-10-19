@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -119,6 +119,7 @@ public class PrefPageTourTypeFilterList extends PreferencePage implements IWorkb
 	private void addPrefListener() {
 
 		_prefChangeListener = new IPropertyChangeListener() {
+			@Override
 			public void propertyChange(final PropertyChangeEvent event) {
 
 				if (event.getProperty().equals(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED)) {
@@ -154,9 +155,9 @@ public class PrefPageTourTypeFilterList extends PreferencePage implements IWorkb
 		GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
 		GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
 		{
-			createUI10FilterViewer(container);
-			createUI20TourTypeViewer(container);
-			createUI30Buttons(container);
+			createUI_10_FilterViewer(container);
+			createUI_20_TourTypeViewer(container);
+			createUI_30_Buttons(container);
 		}
 
 		// hint to use drag & drop
@@ -184,7 +185,7 @@ public class PrefPageTourTypeFilterList extends PreferencePage implements IWorkb
 		return container;
 	}
 
-	private void createUI10FilterViewer(final Composite parent) {
+	private void createUI_10_FilterViewer(final Composite parent) {
 
 		final TableLayoutComposite layouter = new TableLayoutComposite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, true).hint(200, SWT.DEFAULT).applyTo(layouter);
@@ -238,22 +239,27 @@ public class PrefPageTourTypeFilterList extends PreferencePage implements IWorkb
 		layouter.addColumnData(new ColumnWeightData(1));
 
 		_filterViewer.setContentProvider(new IStructuredContentProvider() {
+			@Override
 			public void dispose() {}
 
+			@Override
 			public Object[] getElements(final Object inputElement) {
 				return _filterList.toArray();
 			}
 
+			@Override
 			public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
 		});
 
 		_filterViewer.addSelectionChangedListener(new ISelectionChangedListener() {
+			@Override
 			public void selectionChanged(final SelectionChangedEvent event) {
 				onSelectFilter();
 			}
 		});
 
 		_filterViewer.addDoubleClickListener(new IDoubleClickListener() {
+			@Override
 			public void doubleClick(final DoubleClickEvent event) {
 				onRenameFilterSet();
 			}
@@ -267,6 +273,7 @@ public class PrefPageTourTypeFilterList extends PreferencePage implements IWorkb
 				new Transfer[] { LocalSelectionTransfer.getTransfer() },
 				new DragSourceListener() {
 
+					@Override
 					public void dragFinished(final DragSourceEvent event) {
 
 						final LocalSelectionTransfer transfer = LocalSelectionTransfer.getTransfer();
@@ -279,10 +286,12 @@ public class PrefPageTourTypeFilterList extends PreferencePage implements IWorkb
 						transfer.setSelectionSetTime(0);
 					}
 
+					@Override
 					public void dragSetData(final DragSourceEvent event) {
 						// data are set in LocalSelectionTransfer
 					}
 
+					@Override
 					public void dragStart(final DragSourceEvent event) {
 
 						final LocalSelectionTransfer transfer = LocalSelectionTransfer.getTransfer();
@@ -396,7 +405,7 @@ public class PrefPageTourTypeFilterList extends PreferencePage implements IWorkb
 				viewerDropAdapter);
 	}
 
-	private void createUI20TourTypeViewer(final Composite parent) {
+	private void createUI_20_TourTypeViewer(final Composite parent) {
 
 		final TableLayoutComposite layouter = new TableLayoutComposite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, true).hint(200, SWT.DEFAULT).applyTo(layouter);
@@ -426,28 +435,34 @@ public class PrefPageTourTypeFilterList extends PreferencePage implements IWorkb
 
 		_tourTypeViewer.setContentProvider(new IStructuredContentProvider() {
 
+			@Override
 			public void dispose() {}
 
+			@Override
 			public Object[] getElements(final Object inputElement) {
 				return _tourTypes.toArray();
 			}
 
+			@Override
 			public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
 		});
 
 		_tourTypeViewer.addCheckStateListener(new ICheckStateListener() {
+			@Override
 			public void checkStateChanged(final CheckStateChangedEvent event) {
 				_isModified = true;
 			}
 		});
 
 		_tourTypeViewer.addSelectionChangedListener(new ISelectionChangedListener() {
+			@Override
 			public void selectionChanged(final SelectionChangedEvent event) {
 				onSelectTourType();
 			}
 		});
 
 		_tourTypeViewer.addDoubleClickListener(new IDoubleClickListener() {
+			@Override
 			public void doubleClick(final DoubleClickEvent event) {
 
 				/*
@@ -465,7 +480,7 @@ public class PrefPageTourTypeFilterList extends PreferencePage implements IWorkb
 		});
 	}
 
-	private void createUI30Buttons(final Composite parent) {
+	private void createUI_30_Buttons(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().applyTo(container);
@@ -557,6 +572,7 @@ public class PrefPageTourTypeFilterList extends PreferencePage implements IWorkb
 				&& filterItem.getFilterType() == TourTypeFilter.FILTER_TYPE_TOURTYPE_SET);
 	}
 
+	@Override
 	public void init(final IWorkbench workbench) {
 		setPreferenceStore(_prefStore);
 	}
